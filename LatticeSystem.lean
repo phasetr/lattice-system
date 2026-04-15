@@ -2,3 +2,5 @@
 -- Import modules here that should be built as part of the library.
 import LatticeSystem.Basic
 import LatticeSystem.Quantum.Pauli
+import LatticeSystem.Quantum.ManyBody
+import LatticeSystem.Quantum.IsingChain
