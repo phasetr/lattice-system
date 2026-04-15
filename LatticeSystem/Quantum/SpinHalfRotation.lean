@@ -575,4 +575,92 @@ theorem spinHalfRot3_conj_spinHalfOp1 (θ : ℝ) :
     spinHalfOp3_anticomm_spinHalfOp1
     spinHalfOp3_commutator_spinHalfOp1 θ
 
+/-- `(Û^(1)_θ)† · Ŝ^(3) · Û^(1)_θ = cos(θ)·Ŝ^(3) + sin(θ)·Ŝ^(2)`. -/
+theorem spinHalfRot1_conj_spinHalfOp3 (θ : ℝ) :
+    (spinHalfRot1 θ)ᴴ * spinHalfOp3 * spinHalfRot1 θ =
+      (Real.cos θ : ℂ) • spinHalfOp3 + (Real.sin θ : ℂ) • spinHalfOp2 := by
+  have hcomm : spinHalfOp1 * spinHalfOp3 - spinHalfOp3 * spinHalfOp1 =
+      Complex.I • (-spinHalfOp2) := by
+    rw [show spinHalfOp1 * spinHalfOp3 - spinHalfOp3 * spinHalfOp1 =
+          -(spinHalfOp3 * spinHalfOp1 - spinHalfOp1 * spinHalfOp3) from by abel,
+      spinHalfOp3_commutator_spinHalfOp1, smul_neg]
+  have h : (spinHalfRot1 θ)ᴴ * spinHalfOp3 * spinHalfRot1 θ =
+      (Real.cos θ : ℂ) • spinHalfOp3 - (Real.sin θ : ℂ) • (-spinHalfOp2) :=
+    rotOf_conj_of_ne spinHalfOp1_isHermitian spinHalfOp1_mul_self
+      (anticomm_swap spinHalfOp3_anticomm_spinHalfOp1) hcomm θ
+  rw [h, smul_neg, sub_neg_eq_add]
+
+/-- `(Û^(2)_θ)† · Ŝ^(1) · Û^(2)_θ = cos(θ)·Ŝ^(1) + sin(θ)·Ŝ^(3)`. -/
+theorem spinHalfRot2_conj_spinHalfOp1 (θ : ℝ) :
+    (spinHalfRot2 θ)ᴴ * spinHalfOp1 * spinHalfRot2 θ =
+      (Real.cos θ : ℂ) • spinHalfOp1 + (Real.sin θ : ℂ) • spinHalfOp3 := by
+  have hcomm : spinHalfOp2 * spinHalfOp1 - spinHalfOp1 * spinHalfOp2 =
+      Complex.I • (-spinHalfOp3) := by
+    rw [show spinHalfOp2 * spinHalfOp1 - spinHalfOp1 * spinHalfOp2 =
+          -(spinHalfOp1 * spinHalfOp2 - spinHalfOp2 * spinHalfOp1) from by abel,
+      spinHalfOp1_commutator_spinHalfOp2, smul_neg]
+  have h : (spinHalfRot2 θ)ᴴ * spinHalfOp1 * spinHalfRot2 θ =
+      (Real.cos θ : ℂ) • spinHalfOp1 - (Real.sin θ : ℂ) • (-spinHalfOp3) :=
+    rotOf_conj_of_ne spinHalfOp2_isHermitian spinHalfOp2_mul_self
+      (anticomm_swap spinHalfOp1_anticomm_spinHalfOp2) hcomm θ
+  rw [h, smul_neg, sub_neg_eq_add]
+
+/-- `(Û^(3)_θ)† · Ŝ^(2) · Û^(3)_θ = cos(θ)·Ŝ^(2) + sin(θ)·Ŝ^(1)` (Tasaki (2.1.14)). -/
+theorem spinHalfRot3_conj_spinHalfOp2 (θ : ℝ) :
+    (spinHalfRot3 θ)ᴴ * spinHalfOp2 * spinHalfRot3 θ =
+      (Real.cos θ : ℂ) • spinHalfOp2 + (Real.sin θ : ℂ) • spinHalfOp1 := by
+  have hcomm : spinHalfOp3 * spinHalfOp2 - spinHalfOp2 * spinHalfOp3 =
+      Complex.I • (-spinHalfOp1) := by
+    rw [show spinHalfOp3 * spinHalfOp2 - spinHalfOp2 * spinHalfOp3 =
+          -(spinHalfOp2 * spinHalfOp3 - spinHalfOp3 * spinHalfOp2) from by abel,
+      spinHalfOp2_commutator_spinHalfOp3, smul_neg]
+  have h : (spinHalfRot3 θ)ᴴ * spinHalfOp2 * spinHalfRot3 θ =
+      (Real.cos θ : ℂ) • spinHalfOp2 - (Real.sin θ : ℂ) • (-spinHalfOp1) :=
+    rotOf_conj_of_ne spinHalfOp3_isHermitian spinHalfOp3_mul_self
+      (anticomm_swap spinHalfOp2_anticomm_spinHalfOp3) hcomm θ
+  rw [h, smul_neg, sub_neg_eq_add]
+
+/-! ## Same-axis invariance (Tasaki eq (2.1.15))
+
+For same-axis conjugation, `Sα` commutes with `rotOf Sα θ` (since it
+commutes with 1 and with itself), so `(rotOf Sα θ)ᴴ · Sα · rotOf Sα θ =
+(rotOf Sα θ)ᴴ · rotOf Sα θ · Sα = Sα` via unitarity.
+-/
+
+private lemma rotOf_comm_self (Sα : Matrix (Fin 2) (Fin 2) ℂ) (θ : ℝ) :
+    Sα * rotOf Sα θ = rotOf Sα θ * Sα := by
+  unfold rotOf
+  rw [mul_sub, sub_mul, mul_smul_comm, smul_mul_assoc, Matrix.mul_one,
+    Matrix.one_mul, mul_smul_comm, smul_mul_assoc]
+
+/-- `(Û^(1)_θ)† · Ŝ^(1) · Û^(1)_θ = Ŝ^(1)`. -/
+theorem spinHalfRot1_conj_spinHalfOp1 (θ : ℝ) :
+    (spinHalfRot1 θ)ᴴ * spinHalfOp1 * spinHalfRot1 θ = spinHalfOp1 := by
+  rw [spinHalfRot1_adjoint]
+  have h : spinHalfOp1 * spinHalfRot1 θ = spinHalfRot1 θ * spinHalfOp1 :=
+    rotOf_comm_self spinHalfOp1 θ
+  rw [mul_assoc, h, ← mul_assoc]
+  rw [spinHalfRot1_mul, show -θ + θ = 0 from by ring, spinHalfRot1_zero,
+    Matrix.one_mul]
+
+/-- `(Û^(2)_θ)† · Ŝ^(2) · Û^(2)_θ = Ŝ^(2)`. -/
+theorem spinHalfRot2_conj_spinHalfOp2 (θ : ℝ) :
+    (spinHalfRot2 θ)ᴴ * spinHalfOp2 * spinHalfRot2 θ = spinHalfOp2 := by
+  rw [spinHalfRot2_adjoint]
+  have h : spinHalfOp2 * spinHalfRot2 θ = spinHalfRot2 θ * spinHalfOp2 :=
+    rotOf_comm_self spinHalfOp2 θ
+  rw [mul_assoc, h, ← mul_assoc]
+  rw [spinHalfRot2_mul, show -θ + θ = 0 from by ring, spinHalfRot2_zero,
+    Matrix.one_mul]
+
+/-- `(Û^(3)_θ)† · Ŝ^(3) · Û^(3)_θ = Ŝ^(3)` (Tasaki eq (2.1.15)). -/
+theorem spinHalfRot3_conj_spinHalfOp3 (θ : ℝ) :
+    (spinHalfRot3 θ)ᴴ * spinHalfOp3 * spinHalfRot3 θ = spinHalfOp3 := by
+  rw [spinHalfRot3_adjoint]
+  have h : spinHalfOp3 * spinHalfRot3 θ = spinHalfRot3 θ * spinHalfOp3 :=
+    rotOf_comm_self spinHalfOp3 θ
+  rw [mul_assoc, h, ← mul_assoc]
+  rw [spinHalfRot3_mul, show -θ + θ = 0 from by ring, spinHalfRot3_zero,
+    Matrix.one_mul]
+
 end LatticeSystem.Quantum
