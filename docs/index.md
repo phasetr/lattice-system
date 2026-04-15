@@ -58,6 +58,18 @@ Systems*, §2.1 eqs. (2.1.1), (2.1.7), (2.1.8), pp. 13-15.
 | `spinHalfOp1_commutator_spinHalfOp2` etc. | `[Ŝ^(α), Ŝ^(β)] = i · Ŝ^(γ)` (Tasaki (2.1.1)) | `Quantum/SpinHalf.lean` |
 | `spinHalf_total_spin_squared` | `Σ (Ŝ^(α))² = (3/4) · I`, i.e. `S(S+1)` with `S=1/2` | `Quantum/SpinHalf.lean` |
 
+### Pauli-basis decomposition (Tasaki §2.1 Problem 2.1.a, S = 1/2)
+
+Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, §2.1 Problem 2.1.a, p. 15.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `pauliCoeff0/1/2/3` | explicit coefficient functions | `Quantum/SpinHalfDecomp.lean` |
+| `pauli_decomposition` | `A = Σᵢ cᵢ · σ^(i)` | `Quantum/SpinHalfDecomp.lean` |
+| `spinHalf_decomposition` | same via `Ŝ^(α) = σ^(α) / 2` | `Quantum/SpinHalfDecomp.lean` |
+| `pauli_linearIndep` | `{1, σ^x, σ^y, σ^z}` is linearly independent | `Quantum/SpinHalfDecomp.lean` |
+
 ### S = 1 matrix representations (Tasaki §2.1 eq. (2.1.9))
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body

@@ -56,6 +56,7 @@ LatticeSystem/
                              and algebra (Tasaki section 2.1)
     SpinHalfBasis.lean    -- basis states |up>, |down>, raising/lowering S^+/-
                              and their actions (Tasaki section 2.1)
+    SpinHalfDecomp.lean   -- Pauli basis of M_2(C) (Tasaki Problem 2.1.a, S=1/2)
     SpinOne.lean          -- S = 1 matrix representations (3x3)
                              (Tasaki section 2.1, eq 2.1.9)
     ManyBody.lean         -- multi-site operator space, onSite embedding,
@@ -217,6 +218,72 @@ Tasaki~\cite{Tasaki:QMB}:
     \pm i \hat S^{(2)}$ appears in the paragraph above eq.~(2.1.3) on
     p.~14.
 \end{itemize}
+
+%======================================================================
+\section{Pauli-basis decomposition for $M_2(\mathbb{C})$ (Tasaki §2.1 Problem 2.1.a, S = 1/2)}
+\label{sec:spinhalfdecomp}
+%======================================================================
+
+\emph{Source file:} \texttt{LatticeSystem/Quantum/SpinHalfDecomp.lean}.
+
+\subsection{Definitions and main theorem}
+
+Tasaki's Problem~2.1.a (p.~15) asks to show that every operator on
+$\mathcal{H}_0 \simeq \mathbb{C}^{2S+1}$ is a polynomial of $\hat 1,
+\hat S^{(1)}, \hat S^{(2)}, \hat S^{(3)}$. For $S = 1/2$ the operator
+space has dimension $4 = (2S+1)^2$, so a \emph{linear} combination
+suffices.
+
+\begin{definition}
+Given $A \in M_2(\mathbb{C})$, define the four scalar coefficients
+\begin{align*}
+  c_0(A) &= \tfrac{A_{00} + A_{11}}{2}, &
+  c_1(A) &= \tfrac{A_{01} + A_{10}}{2}, \\
+  c_2(A) &= \tfrac{i (A_{01} - A_{10})}{2}, &
+  c_3(A) &= \tfrac{A_{00} - A_{11}}{2}.
+\end{align*}
+Lean names: \texttt{pauliCoeff0}, \texttt{pauliCoeff1},
+\texttt{pauliCoeff2}, \texttt{pauliCoeff3}.
+\end{definition}
+
+\begin{theorem}[\texttt{pauli\_decomposition}]
+For every $A \in M_2(\mathbb{C})$,
+\[
+  A = c_0(A)\,I + c_1(A)\,\sigma^x + c_2(A)\,\sigma^y
+      + c_3(A)\,\sigma^z.
+\]
+\end{theorem}
+
+\begin{theorem}[\texttt{spinHalf\_decomposition}]
+The same decomposition expressed via $\hat S^{(\alpha)} =
+\sigma^{(\alpha)}/2$:
+\[
+  A = c_0(A)\,I + 2 c_1(A)\,\hat S^{(1)}
+      + 2 c_2(A)\,\hat S^{(2)} + 2 c_3(A)\,\hat S^{(3)}.
+\]
+\end{theorem}
+
+\begin{theorem}[\texttt{pauli\_linearIndep}]
+If $a_0 I + a_1 \sigma^x + a_2 \sigma^y + a_3 \sigma^z = 0$ for some
+$a_0, a_1, a_2, a_3 \in \mathbb{C}$, then all $a_i = 0$. Combined with
+\texttt{pauli\_decomposition}, this says $\{I, \sigma^x, \sigma^y,
+\sigma^z\}$ is a $\mathbb{C}$-basis of $M_2(\mathbb{C})$.
+\end{theorem}
+
+\paragraph{Proof technique.}
+The decomposition reduces to an entry-wise calculation by
+\texttt{ext; fin\_cases; simp; ring\_nf; simp only [Complex.I\_sq]; ring}.
+Linear independence extracts four scalar equations by evaluating both
+sides at the four matrix entries $(0,0), (0,1), (1,0), (1,1)$; the
+resulting $4 \times 4$ linear system is solved by
+\texttt{linear\_combination} (the off-diagonal case requires
+\texttt{Complex.I\_ne\_zero} to conclude $a_2 = 0$ from
+$a_2 \cdot i = 0$).
+
+\paragraph{References.}
+Tasaki~\cite{Tasaki:QMB}, §2.1, Problem~2.1.a, p.~15.
+The author's solution on p.~493 proves the general-$S$ case; we cover
+only $S = 1/2$ here.
 
 %======================================================================
 \section{S = 1 matrix representations (Tasaki §2.1 eq 2.1.9)}
@@ -439,6 +506,7 @@ Pauli matrices and their algebra & finite-dim & \emph{formalized} \\
 Spin-1/2 operators and $[\hat S^{(\alpha)},\hat S^{(\beta)}]$ (Tasaki §2.1) & finite-dim & \emph{formalized} \\
 Basis states, $\hat S^{(3)}$ eigen-eqn, $\hat S^\pm$ (Tasaki §2.1) & finite-dim & \emph{formalized} \\
 $S = 1$ matrix representations (Tasaki §2.1 eq.~2.1.9) & finite-dim & \emph{formalized} \\
+Pauli basis of $M_2(\mathbb{C})$ (Tasaki Problem 2.1.a, $S=1/2$) & finite-dim & \emph{formalized} \\
 Multi-body operator space / \texttt{onSite} & finite-dim & \emph{formalized} \\
 Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
 1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\

@@ -4,6 +4,7 @@ import LatticeSystem.Basic
 import LatticeSystem.Quantum.Pauli
 import LatticeSystem.Quantum.SpinHalf
 import LatticeSystem.Quantum.SpinHalfBasis
+import LatticeSystem.Quantum.SpinHalfDecomp
 import LatticeSystem.Quantum.SpinOne
 import LatticeSystem.Quantum.ManyBody
 import LatticeSystem.Quantum.IsingChain
