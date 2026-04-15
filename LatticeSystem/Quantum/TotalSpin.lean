@@ -265,6 +265,54 @@ theorem totalSpinHalfOpMinus_conjTranspose :
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [onSite_conjTranspose, spinHalfOpMinus_conjTranspose]
 
+/-- Cartan ladder relation: `[Ŝ_tot^(3), Ŝ^+_tot] = Ŝ^+_tot`.
+Derived from `[Ŝ_tot^(3), Ŝ_tot^(α)]` for `α = 1, 2` and
+`Ŝ^+_tot = Ŝ_tot^(1) + i · Ŝ_tot^(2)` (Tasaki eq (2.2.8)). -/
+theorem totalSpinHalfOp3_commutator_totalSpinHalfOpPlus :
+    (totalSpinHalfOp3 Λ * totalSpinHalfOpPlus Λ
+        - totalSpinHalfOpPlus Λ * totalSpinHalfOp3 Λ : ManyBodyOp Λ) =
+      totalSpinHalfOpPlus Λ := by
+  set A := totalSpinHalfOp1 Λ
+  set B := totalSpinHalfOp2 Λ
+  set C := totalSpinHalfOp3 Λ
+  have hCA : C * A - A * C = Complex.I • B :=
+    totalSpinHalfOp3_commutator_totalSpinHalfOp1 Λ
+  have hBC : B * C - C * B = Complex.I • A :=
+    totalSpinHalfOp2_commutator_totalSpinHalfOp3 Λ
+  rw [totalSpinHalfOpPlus_eq_add]
+  rw [mul_add, add_mul, mul_smul_comm, smul_mul_assoc]
+  have step1 : C * A + Complex.I • (C * B) - (A * C + Complex.I • (B * C)) =
+      (C * A - A * C) + Complex.I • (C * B - B * C) := by
+    rw [smul_sub]; abel
+  rw [step1, hCA]
+  have hCB : C * B - B * C = -(Complex.I • A) := by
+    rw [show C * B - B * C = -(B * C - C * B) from by abel, hBC]
+  rw [hCB, smul_neg, smul_smul, Complex.I_mul_I, neg_smul, one_smul]
+  abel
+
+/-- Cartan ladder relation: `[Ŝ_tot^(3), Ŝ^-_tot] = -Ŝ^-_tot`. -/
+theorem totalSpinHalfOp3_commutator_totalSpinHalfOpMinus :
+    (totalSpinHalfOp3 Λ * totalSpinHalfOpMinus Λ
+        - totalSpinHalfOpMinus Λ * totalSpinHalfOp3 Λ : ManyBodyOp Λ) =
+      -(totalSpinHalfOpMinus Λ) := by
+  set A := totalSpinHalfOp1 Λ
+  set B := totalSpinHalfOp2 Λ
+  set C := totalSpinHalfOp3 Λ
+  have hCA : C * A - A * C = Complex.I • B :=
+    totalSpinHalfOp3_commutator_totalSpinHalfOp1 Λ
+  have hBC : B * C - C * B = Complex.I • A :=
+    totalSpinHalfOp2_commutator_totalSpinHalfOp3 Λ
+  rw [totalSpinHalfOpMinus_eq_sub]
+  rw [mul_sub, sub_mul, mul_smul_comm, smul_mul_assoc]
+  have step1 : C * A - Complex.I • (C * B) - (A * C - Complex.I • (B * C)) =
+      (C * A - A * C) - Complex.I • (C * B - B * C) := by
+    rw [smul_sub]; abel
+  rw [step1, hCA]
+  have hCB : C * B - B * C = -(Complex.I • A) := by
+    rw [show C * B - B * C = -(B * C - C * B) from by abel, hBC]
+  rw [hCB, smul_neg, smul_smul, Complex.I_mul_I, neg_smul, one_smul]
+  abel
+
 /-- Total ladder commutator: `[Ŝ^+_tot, Ŝ^-_tot] = 2 · Ŝ_tot^(3)`. -/
 theorem totalSpinHalfOpPlus_commutator_totalSpinHalfOpMinus :
     (totalSpinHalfOpPlus Λ * totalSpinHalfOpMinus Λ

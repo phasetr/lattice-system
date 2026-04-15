@@ -127,4 +127,20 @@ theorem spinOneOpMinus_mulVec_spinOneMinus :
     simp [spinOneOpMinus, spinOneMinus, Matrix.mulVec, dotProduct,
       Fin.sum_univ_three]
 
+/-! ## Adjoint and ladder commutator (S = 1) -/
+
+/-- `(Ŝ^+)† = Ŝ^-` for `S = 1`. -/
+theorem spinOneOpPlus_conjTranspose :
+    (spinOneOpPlus).conjTranspose = spinOneOpMinus := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinOneOpPlus, spinOneOpMinus, Matrix.conjTranspose_apply]
+
+/-- `(Ŝ^-)† = Ŝ^+` for `S = 1`. -/
+theorem spinOneOpMinus_conjTranspose :
+    (spinOneOpMinus).conjTranspose = spinOneOpPlus := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinOneOpPlus, spinOneOpMinus, Matrix.conjTranspose_apply]
+
 end LatticeSystem.Quantum
