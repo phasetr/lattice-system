@@ -5,14 +5,15 @@ title: Home
 
 ## lattice-system
 
-Lean 4 + mathlib による一般的な格子模型の形式化プロジェクト.
-先行プロジェクト [ising-model](https://github.com/phasetr/ising-model) を
-包含・一般化し, 古典スピン系, 量子スピン系, Hubbard, BCS, CAR 代数,
-格子 QCD までを段階的に射程に置く.
+A Lean 4 + Mathlib formalization project targeting general lattice models.
+This project subsumes and generalizes the earlier
+[ising-model](https://github.com/phasetr/ising-model) project, progressively
+covering classical spin systems, quantum spin systems, Hubbard, BCS,
+CAR algebras, and eventually lattice QCD.
 
 ## Scope
 
-| Area | Stage | Typical References |
+| Area | Stage | Typical references |
 |---|---|---|
 | Classical spin systems | Inherited from ising-model | Friedli-Velenik, Glimm-Jaffe |
 | Quantum spin systems | Current focus | Tasaki, Bru-Pedra |
