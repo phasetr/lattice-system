@@ -54,6 +54,8 @@ LatticeSystem/
     Pauli.lean            -- single-site Pauli matrices, basic relations
     SpinHalf.lean         -- spin-1/2 operators S^(alpha) = sigma^(alpha)/2
                              and algebra (Tasaki section 2.1)
+    SpinHalfBasis.lean    -- basis states |up>, |down>, raising/lowering S^+/-
+                             and their actions (Tasaki section 2.1)
     ManyBody.lean         -- multi-site operator space, onSite embedding,
                              commutativity at distinct sites
     IsingChain.lean       -- 1D open-chain quantum Ising Hamiltonian
@@ -136,6 +138,83 @@ $\alpha\neq\beta$; Ex.~2.40 (``Commutation relations'') on p.~77 for the
 commutator $[\sigma^\alpha, \sigma^\beta] = 2i\varepsilon_{\alpha\beta\gamma}
 \sigma^\gamma$ (combining this with the anticommutator gives the cyclic
 products $\sigma^x\sigma^y = i\sigma^z$, etc.).
+
+%======================================================================
+\section{Basis states and raising/lowering operators (Tasaki §2.1)}
+\label{sec:spinhalfbasis}
+%======================================================================
+
+\emph{Source file:} \texttt{LatticeSystem/Quantum/SpinHalfBasis.lean}.
+
+\subsection{Definitions}
+
+\begin{definition}[Tasaki eq.~(2.1.6), p.~14]
+Identify the $S = 1/2$ computational basis states with the column vectors
+\[
+  |\psi^\uparrow\rangle
+    = \begin{pmatrix} 1 \\ 0 \end{pmatrix},\quad
+  |\psi^\downarrow\rangle
+    = \begin{pmatrix} 0 \\ 1 \end{pmatrix}.
+\]
+Lean names: \texttt{spinHalfUp}, \texttt{spinHalfDown}, both of type
+$\mathrm{Fin}\,2 \to \mathbb{C}$.
+\end{definition}
+
+\begin{definition}
+The raising and lowering operators are
+\[
+  \hat S^+ = \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix},\quad
+  \hat S^- = \begin{pmatrix} 0 & 0 \\ 1 & 0 \end{pmatrix}.
+\]
+Lean names: \texttt{spinHalfOpPlus}, \texttt{spinHalfOpMinus}.
+\end{definition}
+
+\subsection{Formalized facts}
+
+\begin{lemma}[Tasaki eq.~(2.1.4), p.~14]
+$\hat S^{(3)}|\psi^\uparrow\rangle = \tfrac{1}{2}|\psi^\uparrow\rangle$
+and
+$\hat S^{(3)}|\psi^\downarrow\rangle = -\tfrac{1}{2}|\psi^\downarrow\rangle$.
+Lean names: \texttt{spinHalfOp3\_mulVec\_spinHalfUp/Down}.
+\end{lemma}
+
+\begin{lemma}[Consistency with Tasaki's standard definition]
+$\hat S^+ = \hat S^{(1)} + i\,\hat S^{(2)}$ and
+$\hat S^- = \hat S^{(1)} - i\,\hat S^{(2)}$.
+Lean names: \texttt{spinHalfOpPlus\_eq\_add}, \texttt{spinHalfOpMinus\_eq\_sub}.
+\end{lemma}
+
+\begin{lemma}[Tasaki eq.~(2.1.5), p.~14]
+\[
+  \hat S^+|\psi^\uparrow\rangle = 0,\quad
+  \hat S^-|\psi^\uparrow\rangle = |\psi^\downarrow\rangle,\quad
+  \hat S^+|\psi^\downarrow\rangle = |\psi^\uparrow\rangle,\quad
+  \hat S^-|\psi^\downarrow\rangle = 0.
+\]
+Lean names: \texttt{spinHalfOpPlus/Minus\_mulVec\_spinHalfUp/Down}.
+\end{lemma}
+
+\paragraph{Proof technique.}
+Matrix-vector multiplication is \texttt{Matrix.mulVec}, which unfolds to
+a sum computable via \texttt{Fin.sum\_univ\_two}. Each equation reduces
+entry-wise by \texttt{ext i; fin\_cases i; simp} with the relevant
+definitions. The equivalence
+\texttt{spinHalfOpPlus = spinHalfOp1 + I \textbullet\ spinHalfOp2} needs
+the single nontrivial complex identity $i^2 = -1$ (\texttt{Complex.I\_sq});
+it is dispatched by \texttt{ring\_nf; rw [Complex.I\_sq]; ring}.
+
+\paragraph{References.}
+Tasaki~\cite{Tasaki:QMB}:
+\begin{itemize}
+  \item eq.~(2.1.4), p.~14: $\hat S^{(3)}$ eigenvalue equation
+    for $S = 1/2$.
+  \item eq.~(2.1.5), p.~14: action of $\hat S^\pm$.
+  \item eq.~(2.1.6), p.~14: identification of basis states with column
+    vectors.
+  \item The raising/lowering definition $\hat S^\pm := \hat S^{(1)}
+    \pm i \hat S^{(2)}$ appears in the paragraph above eq.~(2.1.3) on
+    p.~14.
+\end{itemize}
 
 %======================================================================
 \section{Multi-body operator space and site embedding}
@@ -293,6 +372,7 @@ Area & Stage & Status \\
 \hline
 Pauli matrices and their algebra & finite-dim & \emph{formalized} \\
 Spin-1/2 operators and $[\hat S^{(\alpha)},\hat S^{(\beta)}]$ (Tasaki §2.1) & finite-dim & \emph{formalized} \\
+Basis states, $\hat S^{(3)}$ eigen-eqn, $\hat S^\pm$ (Tasaki §2.1) & finite-dim & \emph{formalized} \\
 Multi-body operator space / \texttt{onSite} & finite-dim & \emph{formalized} \\
 Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
 1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\
@@ -324,8 +404,7 @@ H.~Tasaki.
 \emph{Physics and Mathematics of Quantum Many-Body Systems}.
 Graduate Texts in Physics, Springer, 2020. Primary reference for
 quantum spin systems and for the one-dimensional transverse-field
-quantum Ising model (§3.3). The local PDF copy used for citation is
-\texttt{.self-local/refs/Hal.Tasaki.P534.Physics\_and\_Mathematics\_of\_Quantum\_Many\_Body\_Systems.pdf}.
+quantum Ising model (§3.3).
 
 \bibitem{NielsenChuang}
 M.~A.~Nielsen and I.~L.~Chuang.
@@ -334,8 +413,7 @@ Edition. Cambridge University Press, 2010. Used as a cross-check for
 the standard Pauli relations: §2.1.3, Figure~2.2 (pp.~65--66) for the
 definitions, Ex.~2.19 (p.~70) for Hermiticity, Ex.~2.40 (p.~77) for
 the commutator, Ex.~2.41 (p.~78) for $\sigma^2 = I$ and
-anticommutation. The local PDF copy used for citation is
-\texttt{.self-local/refs/Nielsen.Chuang.P704.2010.Quantum\_Computation\_and\_Quantum\_Information.pdf}.
+anticommutation.
 
 \bibitem{FriedliVelenik}
 S.~Friedli and Y.~Velenik.

@@ -71,6 +71,24 @@ spin operators `Ŝ^(α)` are defined as `σ^(α) / 2`.
 | `spinHalfOp1/2/3_commutator_*` | `[Ŝ^(α), Ŝ^(β)] = i · Ŝ^(γ)` (cyclic) |
 | `spinHalf_total_spin_squared` | `(Ŝ^(1))² + (Ŝ^(2))² + (Ŝ^(3))² = (3/4) · I` |
 
+### Basis states and raising/lowering operators (`LatticeSystem/Quantum/SpinHalfBasis.lean`)
+
+Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, §2.1, eqs. (2.1.4), (2.1.5), (2.1.6), p. 14.
+
+| Lean name | Statement |
+|---|---|
+| `spinHalfUp`, `spinHalfDown` | basis column vectors `\|ψ^↑⟩`, `\|ψ^↓⟩` (Tasaki (2.1.6)) |
+| `spinHalfOp3_mulVec_spinHalfUp` | `Ŝ^(3) \|ψ^↑⟩ = (1/2) \|ψ^↑⟩` (Tasaki (2.1.4)) |
+| `spinHalfOp3_mulVec_spinHalfDown` | `Ŝ^(3) \|ψ^↓⟩ = -(1/2) \|ψ^↓⟩` |
+| `spinHalfOpPlus`, `spinHalfOpMinus` | raising/lowering operators `Ŝ^±` |
+| `spinHalfOpPlus_eq_add` | `Ŝ^+ = Ŝ^(1) + i · Ŝ^(2)` |
+| `spinHalfOpMinus_eq_sub` | `Ŝ^- = Ŝ^(1) - i · Ŝ^(2)` |
+| `spinHalfOpPlus_mulVec_spinHalfUp` | `Ŝ^+ \|ψ^↑⟩ = 0` (Tasaki (2.1.5)) |
+| `spinHalfOpMinus_mulVec_spinHalfUp` | `Ŝ^- \|ψ^↑⟩ = \|ψ^↓⟩` |
+| `spinHalfOpPlus_mulVec_spinHalfDown` | `Ŝ^+ \|ψ^↓⟩ = \|ψ^↑⟩` |
+| `spinHalfOpMinus_mulVec_spinHalfDown` | `Ŝ^- \|ψ^↓⟩ = 0` |
+
 ### Multi-body operator space and site embedding (`LatticeSystem/Quantum/ManyBody.lean`)
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
@@ -107,7 +125,8 @@ with Tasaki's (3.3.1) up to these constants.
 | P1a | Finite-volume quantum spin operator algebra (Pauli, onSite, commutativity) | Done |
 | P1b | Finite-chain quantum Ising Hamiltonian, Hermiticity | Done |
 | P1c (Tasaki §2.1) | Spin-1/2 operators `Ŝ^(α)` and the commutator algebra | Done |
-| P1d (Tasaki §2.1 cont.) | Basis states `\|ψ_σ⟩`, raising/lowering `Ŝ^±`, S = 1 matrices | Not started |
+| P1d (Tasaki §2.1 cont.) | Basis states `\|ψ^↑⟩, \|ψ^↓⟩`, raising/lowering `Ŝ^±` (S = 1/2) | Done |
+| P1d' (Tasaki §2.1 cont.) | S = 1 matrix representations, Problem 2.1.a | Not started |
 | P1e (Tasaki §2.1 cont.) | Spin rotation operators `Û^(α)_θ` and their properties | Not started |
 | P1f (Tasaki §2.2) | General quantum spin systems on an abstract finite lattice | Not started |
 | P1g | Gibbs state `ρ = e^{-βH}/Z`, expectation `⟨O⟩_β = Tr(ρO)` | Not started |
