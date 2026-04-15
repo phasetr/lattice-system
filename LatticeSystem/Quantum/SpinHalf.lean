@@ -203,4 +203,30 @@ theorem spinHalf_total_spin_squared :
   congr 1
   norm_num
 
+/-! ## Cyclic products `Ŝ^(α) Ŝ^(β) = (i/2) · Ŝ^(γ)` -/
+
+/-- `Ŝ^(1) · Ŝ^(2) = (i/2) · Ŝ^(3)`. Corollary of `σ^x σ^y = i · σ^z`. -/
+theorem spinHalfOp1_mul_spinHalfOp2 :
+    spinHalfOp1 * spinHalfOp2 = (I / 2) • spinHalfOp3 := by
+  unfold spinHalfOp1 spinHalfOp2 spinHalfOp3
+  simp only [Matrix.smul_mul, Matrix.mul_smul, smul_smul, pauliX_mul_pauliY]
+  congr 1
+  ring
+
+/-- `Ŝ^(2) · Ŝ^(3) = (i/2) · Ŝ^(1)`. -/
+theorem spinHalfOp2_mul_spinHalfOp3 :
+    spinHalfOp2 * spinHalfOp3 = (I / 2) • spinHalfOp1 := by
+  unfold spinHalfOp1 spinHalfOp2 spinHalfOp3
+  simp only [Matrix.smul_mul, Matrix.mul_smul, smul_smul, pauliY_mul_pauliZ]
+  congr 1
+  ring
+
+/-- `Ŝ^(3) · Ŝ^(1) = (i/2) · Ŝ^(2)`. -/
+theorem spinHalfOp3_mul_spinHalfOp1 :
+    spinHalfOp3 * spinHalfOp1 = (I / 2) • spinHalfOp2 := by
+  unfold spinHalfOp1 spinHalfOp2 spinHalfOp3
+  simp only [Matrix.smul_mul, Matrix.mul_smul, smul_smul, pauliZ_mul_pauliX]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
