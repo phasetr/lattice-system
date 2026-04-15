@@ -119,12 +119,21 @@ followed by \texttt{fin\_cases} on each row/column index and
 \texttt{simp} with the definitions.
 
 \paragraph{References.}
-These identities are classical and appear in every standard quantum
-mechanics textbook. Within the references assembled for this project,
-the most directly relevant treatment of spin-$\tfrac{1}{2}$ operators
-is Tasaki~\cite{Tasaki:QMB} (chapter on quantum spin systems). For a
-cross-check of Pauli relations \textit{per se} we used
-Nielsen--Chuang~\cite{NielsenChuang}, §2.1.3.
+Tasaki~\cite{Tasaki:QMB}, §2.1, eq.~(2.1.8), p.~15, defines the Pauli
+matrices and remarks on $(\sigma^\alpha)^2 = I$ and the anticommutation
+relations for spin-$\tfrac{1}{2}$ just before the definition (Tasaki
+uses $\hat S^{(\alpha)}$ with
+$\hat\sigma^{(\alpha)} = 2\hat S^{(\alpha)}$).
+Independently, Nielsen--Chuang~\cite{NielsenChuang} gives the same
+matrices in §2.1.3, Figure~2.2, pp.~65--66, and the four families of
+relations we formalized are stated as exercises:
+Ex.~2.19 (``Pauli matrices: Hermitian and unitary'') on p.~70 for
+Hermiticity; Ex.~2.41 (``Anti-commutation relations'') on p.~78 for
+$(\sigma^\alpha)^2 = I$ and $\{\sigma^\alpha, \sigma^\beta\} = 0$ for
+$\alpha\neq\beta$; Ex.~2.40 (``Commutation relations'') on p.~77 for the
+commutator $[\sigma^\alpha, \sigma^\beta] = 2i\varepsilon_{\alpha\beta\gamma}
+\sigma^\gamma$ (combining this with the anticommutator gives the cyclic
+products $\sigma^x\sigma^y = i\sigma^z$, etc.).
 
 %======================================================================
 \section{Multi-body operator space and site embedding}
@@ -202,8 +211,11 @@ yields the equality.
 \paragraph{References.}
 The matrix-level formulation we use (configuration-indexed matrices on
 $\mathbb{C}^{\mathrm{Fin}\,N \to \mathrm{Fin}\,2}$) is a standard
-computational-basis setup; see Tasaki~\cite{Tasaki:QMB}, chapter on
-spin chains, for the physical interpretation.
+computational-basis setup; see Tasaki~\cite{Tasaki:QMB}, §2.2,
+pp.~21--26, where the tensor-product structure of the Hilbert space
+and the general form of site-local operators are developed (our
+\texttt{onSite}$\,i\,A$ is the matrix realization of the operator
+$\bigotimes_{k\neq i} \hat I_k \otimes A_i$ in the computational basis).
 
 %======================================================================
 \section{Quantum Ising chain on an open boundary}
@@ -250,9 +262,19 @@ multiplication (local helper \texttt{isHermitian\_smul\_real} using
 $\overline{c} = c$ for $c \in \mathbb{R}$).
 
 \paragraph{References.}
-The 1D transverse-field Ising chain is a textbook example of an
-interacting quantum spin system; see
-Tasaki~\cite{Tasaki:QMB}, chapter on spin chains.
+Tasaki~\cite{Tasaki:QMB}, §3.3, eq.~(3.3.1) on p.~55 states the
+one-dimensional transverse-field quantum Ising Hamiltonian on an open
+chain:
+\[
+  \hat H
+    = -\sum_{x=1}^{L-1}\hat S^{(3)}_x \hat S^{(3)}_{x+1}
+      -\lambda \sum_{x=1}^{L} \hat S^{(1)}_x,
+\]
+explicitly noting the choice of open boundary conditions. Our
+formalization uses the Pauli convention
+$\hat\sigma^{(\alpha)} = 2\hat S^{(\alpha)}$ and introduces an
+explicit coupling $J$ in front of the bond term, so our $H_{J,h}^{N+1}$
+matches Tasaki's (3.3.1) up to the constants $J$ and the Pauli rescaling.
 
 %======================================================================
 \section{Progress table}
@@ -297,14 +319,20 @@ Lattice QCD & survey & not started \\
 \bibitem{Tasaki:QMB}
 H.~Tasaki.
 \emph{Physics and Mathematics of Quantum Many-Body Systems}.
-Springer, 2020. Primary reference for quantum spin systems and spin
-chains in this project.
+Graduate Texts in Physics, Springer, 2020. Primary reference for
+quantum spin systems and for the one-dimensional transverse-field
+quantum Ising model (§3.3). The local PDF copy used for citation is
+\texttt{.self-local/refs/Hal.Tasaki.P534.Physics\_and\_Mathematics\_of\_Quantum\_Many\_Body\_Systems.pdf}.
 
 \bibitem{NielsenChuang}
 M.~A.~Nielsen and I.~L.~Chuang.
 \emph{Quantum Computation and Quantum Information}, 10th Anniversary
 Edition. Cambridge University Press, 2010. Used as a cross-check for
-the standard Pauli relations (§2.1.3).
+the standard Pauli relations: §2.1.3, Figure~2.2 (pp.~65--66) for the
+definitions, Ex.~2.19 (p.~70) for Hermiticity, Ex.~2.40 (p.~77) for
+the commutator, Ex.~2.41 (p.~78) for $\sigma^2 = I$ and
+anticommutation. The local PDF copy used for citation is
+\texttt{.self-local/refs/Nielsen.Chuang.P704.2010.Quantum\_Computation\_and\_Quantum\_Information.pdf}.
 
 \bibitem{FriedliVelenik}
 S.~Friedli and Y.~Velenik.

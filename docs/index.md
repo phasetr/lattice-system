@@ -31,7 +31,10 @@ mathematical statements and proof sketches are in
 ### Single-site Pauli operators
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*; cross-checked with Nielsen-Chuang §2.1.3.
+Systems*, §2.1 eq. (2.1.8), p. 15. Cross-checked with Nielsen-Chuang
+§2.1.3 Figure 2.2 (pp. 65-66, definitions), Ex. 2.19 (p. 70,
+Hermiticity), Ex. 2.41 (p. 78, `(σ^α)² = I` and anticommutation),
+Ex. 2.40 (p. 77, commutator, whence the cyclic products).
 
 | Lean name | Statement | File |
 |---|---|---|
@@ -43,7 +46,8 @@ Systems*; cross-checked with Nielsen-Chuang §2.1.3.
 ### Multi-body operator space
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, chapter on spin chains.
+Systems*, §2.2, pp. 21-26 (tensor-product Hilbert space and site-local
+operators).
 
 | Lean name | Statement | File |
 |---|---|---|
@@ -55,7 +59,9 @@ Systems*, chapter on spin chains.
 ### One-dimensional open-chain quantum Ising
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, chapter on spin chains.
+Systems*, §3.3 eq. (3.3.1), p. 55 (transverse-field Ising on an open
+chain). Our formalization uses the Pauli convention `σ = 2·S` and an
+explicit bond coupling `J`.
 
 | Lean name | Statement | File |
 |---|---|---|

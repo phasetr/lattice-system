@@ -41,8 +41,12 @@ mathematical statement of each, see [`tex/proof-guide.tex`](tex/proof-guide.tex)
 ### Single-site Pauli operators (`LatticeSystem/Quantum/Pauli.lean`)
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, chapter on quantum spin systems; cross-checked with
-Nielsen-Chuang *Quantum Computation and Quantum Information*, §2.1.3.
+Systems*, §2.1, eq. (2.1.8), p. 15. Cross-checked with Nielsen-Chuang
+*Quantum Computation and Quantum Information*, §2.1.3 Figure 2.2
+(pp. 65-66) for the definitions, Ex. 2.19 (p. 70) for Hermiticity,
+Ex. 2.41 (p. 78) for `(σ^α)² = I` and anticommutation, and Ex. 2.40
+(p. 77) for the commutator (which, combined with the anticommutator,
+gives the cyclic products).
 
 | Lean name | Statement |
 |---|---|
@@ -54,7 +58,9 @@ Nielsen-Chuang *Quantum Computation and Quantum Information*, §2.1.3.
 ### Multi-body operator space and site embedding (`LatticeSystem/Quantum/ManyBody.lean`)
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, chapter on spin chains (configuration-indexed setup).
+Systems*, §2.2 "Quantum Spin Systems", pp. 21-26 (tensor-product
+Hilbert space and site-local operators). `onSite i A` is the matrix
+realization of `(⊗ₖ≠ᵢ I) ⊗ Aᵢ` in the computational basis.
 
 | Lean name | Statement |
 |---|---|
@@ -66,7 +72,11 @@ Systems*, chapter on spin chains (configuration-indexed setup).
 ### One-dimensional open-chain quantum Ising (`LatticeSystem/Quantum/IsingChain.lean`)
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, chapter on spin chains (1D transverse-field Ising model).
+Systems*, §3.3 "Quantum Ising Model", eq. (3.3.1) on p. 55
+(one-dimensional transverse-field quantum Ising on an open chain).
+Our `quantumIsingHamiltonian N J h` uses the Pauli convention
+`σ = 2 · S` and introduces an explicit bond coupling `J`, so it agrees
+with Tasaki's (3.3.1) up to these constants.
 
 | Lean name | Statement |
 |---|---|
