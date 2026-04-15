@@ -309,6 +309,58 @@ Use $\hat U^{(\alpha)}_\pi = -2i\,\hat S^{(\alpha)}$ to rewrite
 by the $\hat S^{(\alpha)}$ anticommutation at distinct axes.
 \end{proof}
 
+\subsection{$\pi$-rotation products and coordinate transformations}
+
+\begin{theorem}[Tasaki eq.~(2.1.29), $S = 1/2$ case]
+$\hat U^{(1)}_\pi \hat U^{(2)}_\pi = \hat U^{(3)}_\pi$ and the two
+cyclic permutations. Lean names:
+\texttt{spinHalfRot1\_pi\_mul\_spinHalfRot2\_pi} etc.
+\end{theorem}
+
+\begin{proof}
+$\hat U^{(1)}_\pi \hat U^{(2)}_\pi = (-2i)^2 \hat S^{(1)}\hat S^{(2)}
+  = -4 \cdot \tfrac{i}{2}\hat S^{(3)} = -2i\,\hat S^{(3)} = \hat U^{(3)}_\pi$,
+using the cyclic product $\hat S^{(1)}\hat S^{(2)} = \tfrac{i}{2}\hat S^{(3)}$
+formalized as \texttt{spinHalfOp1\_mul\_spinHalfOp2} in
+\texttt{Quantum/SpinHalf.lean}.
+\end{proof}
+
+\begin{theorem}[conjugation by $\hat U^{(\alpha)}_\pi$]
+For any $\alpha, \beta \in \{1, 2, 3\}$,
+\[
+  (\hat U^{(\alpha)}_\pi)^\dagger \hat S^{(\beta)} \hat U^{(\alpha)}_\pi
+    = \begin{cases}
+        +\hat S^{(\alpha)} & \text{if } \alpha = \beta, \\
+        -\hat S^{(\beta)} & \text{if } \alpha \neq \beta.
+      \end{cases}
+\]
+Lean names: \texttt{spinHalfRot1/2/3\_pi\_conj\_spinHalfOp1/2/3} for
+the nine distinct pairings. This is the Tasaki eq.~(2.1.15)
+($\alpha = \beta$) and eq.~(2.1.21) ($\alpha \neq \beta$) both
+specialized at $\theta = \pi$.
+\end{theorem}
+
+\begin{proof}
+Using $(\hat U^{(\alpha)}_\pi)^\dagger = 2i\,\hat S^{(\alpha)}$ and
+$\hat U^{(\alpha)}_\pi = -2i\,\hat S^{(\alpha)}$, the conjugation
+reduces to
+\[
+  (\hat U^{(\alpha)}_\pi)^\dagger \hat S^{(\beta)} \hat U^{(\alpha)}_\pi
+    = (2i)(-2i)\,\hat S^{(\alpha)} \hat S^{(\beta)} \hat S^{(\alpha)}
+    = -4 i^2\,\hat S^{(\alpha)} \hat S^{(\beta)} \hat S^{(\alpha)}
+    = 4\,\hat S^{(\alpha)} \hat S^{(\beta)} \hat S^{(\alpha)}.
+\]
+For $\alpha = \beta$: $\hat S^{(\alpha)} \hat S^{(\alpha)} \hat S^{(\alpha)}
+  = (\hat 1/4) \hat S^{(\alpha)} = \hat S^{(\alpha)}/4$, giving
+$\hat S^{(\alpha)}$.
+For $\alpha \neq \beta$: anticommutation
+$\hat S^{(\alpha)} \hat S^{(\beta)} = -\hat S^{(\beta)} \hat S^{(\alpha)}$
+plus $\hat S^{(\alpha)} \hat S^{(\alpha)} = \hat 1/4$ give
+$\hat S^{(\alpha)} \hat S^{(\beta)} \hat S^{(\alpha)}
+  = -\hat S^{(\beta)}/4$, giving $-\hat S^{(\beta)}$.
+Both cases require $i^2 = -1$ (\texttt{Complex.I\_sq}).
+\end{proof}
+
 \paragraph{Proof technique.}
 All statements are parametrised through a private helper
 \texttt{rotOf S theta := cos(theta/2) * 1 - (2*I*sin(theta/2)) * S} and then
@@ -643,6 +695,7 @@ Pauli basis of $M_2(\mathbb{C})$ (Tasaki Problem 2.1.a, $S=1/2$) & finite-dim & 
 $S = 1/2$ rotation (closed form, $\theta=0$, adjoint, $2\pi$) & finite-dim & \emph{formalized} \\
 $S = 1/2$ rotation (group law, unitarity) & finite-dim & \emph{formalized} \\
 $S = 1/2$ $\pi$-rotations (eq.~2.1.25) & finite-dim & \emph{formalized} \\
+$S = 1/2$ $\pi$-rotation products and conjugations (Tasaki §2.1) & finite-dim & \emph{formalized} \\
 Multi-body operator space / \texttt{onSite} & finite-dim & \emph{formalized} \\
 Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
 1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\
