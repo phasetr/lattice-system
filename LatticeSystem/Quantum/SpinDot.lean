@@ -74,4 +74,16 @@ theorem spinHalfDot_eq_plus_minus (x y : Λ) :
   rw [key p r, smul_smul]
   norm_num
 
+/-- Symmetry: `Ŝ_x · Ŝ_y = Ŝ_y · Ŝ_x`. For `x = y` this is trivial;
+for `x ≠ y` the site-embedded operators commute
+(`onSite_mul_onSite_of_ne`). -/
+theorem spinHalfDot_comm (x y : Λ) :
+    (spinHalfDot x y : ManyBodyOp Λ) = spinHalfDot y x := by
+  unfold spinHalfDot
+  by_cases hxy : x = y
+  · subst hxy; rfl
+  · rw [onSite_mul_onSite_of_ne hxy spinHalfOp1 spinHalfOp1,
+      onSite_mul_onSite_of_ne hxy spinHalfOp2 spinHalfOp2,
+      onSite_mul_onSite_of_ne hxy spinHalfOp3 spinHalfOp3]
+
 end LatticeSystem.Quantum
