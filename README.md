@@ -71,6 +71,25 @@ spin operators `Ŝ^(α)` are defined as `σ^(α) / 2`.
 | `spinHalfOp1/2/3_commutator_*` | `[Ŝ^(α), Ŝ^(β)] = i · Ŝ^(γ)` (cyclic) |
 | `spinHalf_total_spin_squared` | `(Ŝ^(1))² + (Ŝ^(2))² + (Ŝ^(3))² = (3/4) · I` |
 
+### Spin-1/2 rotation operators (`LatticeSystem/Quantum/SpinHalfRotation.lean`)
+
+Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, §2.1, eq. (2.1.26), p. 17 (closed form) and eq. (2.1.23),
+p. 16 (the `Û^(α)_{2π} = -1` identity for half-odd-integer spin).
+
+Definition: `Û^(α)_θ := cos(θ/2) · 1 - 2i · sin(θ/2) · Ŝ^(α)`.
+
+| Lean name | Statement |
+|---|---|
+| `spinHalfRot1/2/3 (θ)` | closed-form rotation operators |
+| `spinHalfRot1/2/3_zero` | `Û^(α)_0 = 1` |
+| `spinHalfRot1/2/3_adjoint` | `(Û^(α)_θ)† = Û^(α)_{-θ}` |
+| `spinHalfRot1/2/3_two_pi` | `Û^(α)_{2π} = -1` (Tasaki eq. (2.1.23)) |
+
+The group law `Û^(α)_θ · Û^(α)_φ = Û^(α)_{θ+φ}` and unitarity
+`Û^(α)_θ · (Û^(α)_θ)† = 1` are deferred to a follow-up PR (their proofs
+require matrix algebra in the commutative subring `span_ℂ {1, Ŝ^(α)}`).
+
 ### Pauli-basis decomposition of 2×2 matrices (`LatticeSystem/Quantum/SpinHalfDecomp.lean`)
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
@@ -162,7 +181,9 @@ with Tasaki's (3.3.1) up to these constants.
 | P1d' (Tasaki §2.1 cont.) | S = 1 matrix representations (eq. (2.1.9)) | Done |
 | P1d'' (Tasaki §2.1 cont.) | Problem 2.1.a for S = 1/2 (Pauli basis of `M_2(ℂ)`) | Done |
 | P1d''' (Tasaki §2.1 cont.) | Problem 2.1.a for `S ≥ 1` (polynomial basis of `M_{2S+1}(ℂ)`) | Not started |
-| P1e (Tasaki §2.1 cont.) | Spin rotation operators `Û^(α)_θ` and their properties | Not started |
+| P1e (Tasaki §2.1 cont.) | Spin rotation `Û^(α)_θ` closed form + `Û_0`, adjoint, `Û_{2π}` | Done |
+| P1e' | Rotation group law + unitarity | Not started |
+| P1e'' (Tasaki §2.1 cont.) | Equivalence `Û^(α)_θ = exp(-iθŜ^(α))` via Mathlib matrix `exp` | Not started |
 | P1f (Tasaki §2.2) | General quantum spin systems on an abstract finite lattice | Not started |
 | P1g | Gibbs state `ρ = e^{-βH}/Z`, expectation `⟨O⟩_β = Tr(ρO)` | Not started |
 | P1h | Periodic boundary conditions, other quantum chains (Heisenberg) | Not started |

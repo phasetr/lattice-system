@@ -57,6 +57,8 @@ LatticeSystem/
     SpinHalfBasis.lean    -- basis states |up>, |down>, raising/lowering S^+/-
                              and their actions (Tasaki section 2.1)
     SpinHalfDecomp.lean   -- Pauli basis of M_2(C) (Tasaki Problem 2.1.a, S=1/2)
+    SpinHalfRotation.lean -- Closed-form S=1/2 spin rotation operators
+                             (Tasaki section 2.1, eq 2.1.26)
     SpinOne.lean          -- S = 1 matrix representations (3x3)
                              (Tasaki section 2.1, eq 2.1.9)
     ManyBody.lean         -- multi-site operator space, onSite embedding,
@@ -218,6 +220,76 @@ Tasaki~\cite{Tasaki:QMB}:
     \pm i \hat S^{(2)}$ appears in the paragraph above eq.~(2.1.3) on
     p.~14.
 \end{itemize}
+
+%======================================================================
+\section{Spin-1/2 rotation operators (Tasaki §2.1 eq 2.1.26)}
+\label{sec:spinhalfrot}
+%======================================================================
+
+\emph{Source file:} \texttt{LatticeSystem/Quantum/SpinHalfRotation.lean}.
+
+\subsection{Definitions}
+
+\begin{definition}[Tasaki eq.~(2.1.26), p.~17]
+For $\alpha \in \{1, 2, 3\}$ and $\theta \in \mathbb{R}$, the
+$S = 1/2$ spin rotation operator about the $\alpha$-axis by angle
+$\theta$ is
+\[
+  \hat U^{(\alpha)}_\theta
+    := \cos(\theta/2)\,\hat 1 - 2i\,\sin(\theta/2)\,\hat S^{(\alpha)}
+    \in M_2(\mathbb{C}).
+\]
+Lean names: \texttt{spinHalfRot1}, \texttt{spinHalfRot2}, \texttt{spinHalfRot3}.
+\end{definition}
+
+For $S = 1/2$ this closed form coincides with the matrix exponential
+$\exp(-i\theta\hat S^{(\alpha)})$ because $(\hat S^{(\alpha)})^2 = I/4$;
+establishing that equivalence with Mathlib's \texttt{Matrix.exp} is
+future work.
+
+\subsection{Formalized facts}
+
+\begin{lemma}[identity at $\theta = 0$]
+$\hat U^{(\alpha)}_0 = \hat 1$. Lean name:
+\texttt{spinHalfRot1/2/3\_zero}.
+\end{lemma}
+
+\begin{lemma}[adjoint is the reverse rotation]
+$(\hat U^{(\alpha)}_\theta)^\dagger = \hat U^{(\alpha)}_{-\theta}$.
+Lean name: \texttt{spinHalfRot1/2/3\_adjoint}.
+\end{lemma}
+
+\begin{theorem}[$2\pi$ rotation, Tasaki eq.~(2.1.23), p.~16, $S = 1/2$]
+$\hat U^{(\alpha)}_{2\pi} = -\hat 1$. Lean name:
+\texttt{spinHalfRot1/2/3\_two\_pi}.
+\end{theorem}
+
+\paragraph{Proof technique.}
+All statements are parametrised through a private helper
+\texttt{rotOf S theta := cos(theta/2) * 1 - (2*I*sin(theta/2)) * S} and then
+instantiated at \texttt{S = spinHalfOp\{1,2,3\}}. The
+\texttt{adjoint} lemma needs \texttt{Complex.conj\_I} (for
+$\overline{i} = -i$), \texttt{Complex.conj\_ofReal} (for real sin),
+and \texttt{Real.cos\_neg} / \texttt{Real.sin\_neg}.
+The $2\pi$ lemma follows from \texttt{Real.cos\_pi} and
+\texttt{Real.sin\_pi}.
+
+\paragraph{Not yet formalized.}
+\begin{itemize}
+  \item Group law
+    $\hat U^{(\alpha)}_\theta \hat U^{(\alpha)}_\varphi
+      = \hat U^{(\alpha)}_{\theta+\varphi}$.
+  \item Unitarity
+    $\hat U^{(\alpha)}_\theta (\hat U^{(\alpha)}_\theta)^\dagger = \hat 1$.
+  \item The exponential equivalence with \texttt{Matrix.exp}.
+\end{itemize}
+Both deferred because their proofs require matrix algebra in the
+commutative subring $\mathrm{span}_{\mathbb{C}}\{\hat 1, \hat S^{(\alpha)}\}$
+with relation $(\hat S^{(\alpha)})^2 = \hat 1 / 4$.
+
+\paragraph{References.}
+Tasaki~\cite{Tasaki:QMB}, §2.1, eq.~(2.1.23) (p.~16) and eq.~(2.1.26)
+(p.~17).
 
 %======================================================================
 \section{Pauli-basis decomposition for $M_2(\mathbb{C})$ (Tasaki §2.1 Problem 2.1.a, S = 1/2)}
@@ -507,6 +579,8 @@ Spin-1/2 operators and $[\hat S^{(\alpha)},\hat S^{(\beta)}]$ (Tasaki §2.1) & f
 Basis states, $\hat S^{(3)}$ eigen-eqn, $\hat S^\pm$ (Tasaki §2.1) & finite-dim & \emph{formalized} \\
 $S = 1$ matrix representations (Tasaki §2.1 eq.~2.1.9) & finite-dim & \emph{formalized} \\
 Pauli basis of $M_2(\mathbb{C})$ (Tasaki Problem 2.1.a, $S=1/2$) & finite-dim & \emph{formalized} \\
+$S = 1/2$ rotation: closed form, $\theta=0$, adjoint, $2\pi$ (Tasaki §2.1) & finite-dim & \emph{formalized} \\
+$S = 1/2$ rotation: group law, unitarity & finite-dim & not started \\
 Multi-body operator space / \texttt{onSite} & finite-dim & \emph{formalized} \\
 Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
 1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\
