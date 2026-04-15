@@ -332,6 +332,117 @@ theorem totalSpinHalfOp3_commutator_totalSpinHalfOpMinus :
   rw [hCB, smul_neg, smul_smul, Complex.I_mul_I, neg_smul, one_smul]
   abel
 
+/-! ## Total spin squared (Casimir operator) -/
+
+/-- The total spin squared `(Ŝ_tot)² := Σ_α (Ŝ_tot^(α))²`. This is the
+quantum-mechanical Casimir invariant of the `su(2)` algebra acting on
+the many-body Hilbert space. -/
+noncomputable def totalSpinHalfSquared : ManyBodyOp Λ :=
+  totalSpinHalfOp1 Λ * totalSpinHalfOp1 Λ +
+    totalSpinHalfOp2 Λ * totalSpinHalfOp2 Λ +
+    totalSpinHalfOp3 Λ * totalSpinHalfOp3 Λ
+
+/-- `(Ŝ_tot)²` is Hermitian. -/
+theorem totalSpinHalfSquared_isHermitian :
+    (totalSpinHalfSquared Λ).IsHermitian := by
+  unfold totalSpinHalfSquared
+  refine ((?_ : Matrix.IsHermitian _).add ?_).add ?_
+  · unfold Matrix.IsHermitian
+    rw [Matrix.conjTranspose_mul, (totalSpinHalfOp1_isHermitian Λ)]
+  · unfold Matrix.IsHermitian
+    rw [Matrix.conjTranspose_mul, (totalSpinHalfOp2_isHermitian Λ)]
+  · unfold Matrix.IsHermitian
+    rw [Matrix.conjTranspose_mul, (totalSpinHalfOp3_isHermitian Λ)]
+
+/-- Internal Leibniz: `[X·X, C] = X·[X,C] + [X,C]·X`. -/
+private lemma square_commutator_totalSpin (X C : ManyBodyOp Λ) :
+    X * X * C - C * (X * X) = X * (X * C - C * X) + (X * C - C * X) * X := by
+  rw [mul_sub, sub_mul]
+  have h1 : X * (C * X) = X * C * X := (mul_assoc X C X).symm
+  have h2 : X * X * C = X * (X * C) := mul_assoc X X C
+  have h3 : C * (X * X) = C * X * X := (mul_assoc C X X).symm
+  rw [h1, h2, h3]; abel
+
+/-- Casimir invariance: `[(Ŝ_tot)², Ŝ_tot^(3)] = 0`. -/
+theorem totalSpinHalfSquared_commutator_totalSpinHalfOp3 :
+    totalSpinHalfSquared Λ * totalSpinHalfOp3 Λ
+        - totalSpinHalfOp3 Λ * totalSpinHalfSquared Λ = 0 := by
+  unfold totalSpinHalfSquared
+  set A := totalSpinHalfOp1 Λ
+  set B := totalSpinHalfOp2 Λ
+  set C := totalSpinHalfOp3 Λ
+  have hCA : C * A - A * C = Complex.I • B :=
+    totalSpinHalfOp3_commutator_totalSpinHalfOp1 Λ
+  have hBC : B * C - C * B = Complex.I • A :=
+    totalSpinHalfOp2_commutator_totalSpinHalfOp3 Λ
+  rw [add_mul, add_mul, mul_add, mul_add]
+  rw [show A * A * C + B * B * C + C * C * C - (C * (A * A) + C * (B * B) + C * (C * C))
+        = (A * A * C - C * (A * A)) + (B * B * C - C * (B * B))
+          + (C * C * C - C * (C * C)) from by abel]
+  rw [square_commutator_totalSpin Λ A, square_commutator_totalSpin Λ B,
+    square_commutator_totalSpin Λ C]
+  have hAC : A * C - C * A = -(Complex.I • B) := by
+    rw [show A * C - C * A = -(C * A - A * C) from by abel, hCA]
+  have hCC : C * C - C * C = (0 : ManyBodyOp Λ) := sub_self _
+  rw [hAC, hBC, hCC]
+  rw [mul_zero, zero_mul, add_zero]
+  rw [mul_neg, neg_mul, mul_smul_comm, smul_mul_assoc, mul_smul_comm, smul_mul_assoc]
+  abel
+
+/-- Casimir invariance: `[(Ŝ_tot)², Ŝ_tot^(1)] = 0`. -/
+theorem totalSpinHalfSquared_commutator_totalSpinHalfOp1 :
+    totalSpinHalfSquared Λ * totalSpinHalfOp1 Λ
+        - totalSpinHalfOp1 Λ * totalSpinHalfSquared Λ = 0 := by
+  unfold totalSpinHalfSquared
+  set A := totalSpinHalfOp1 Λ
+  set B := totalSpinHalfOp2 Λ
+  set C := totalSpinHalfOp3 Λ
+  have hAB : A * B - B * A = Complex.I • C :=
+    totalSpinHalfOp1_commutator_totalSpinHalfOp2 Λ
+  have hCA : C * A - A * C = Complex.I • B :=
+    totalSpinHalfOp3_commutator_totalSpinHalfOp1 Λ
+  rw [add_mul, add_mul, mul_add, mul_add]
+  rw [show A * A * A + B * B * A + C * C * A - (A * (A * A) + A * (B * B) + A * (C * C))
+        = (A * A * A - A * (A * A)) + (B * B * A - A * (B * B))
+          + (C * C * A - A * (C * C)) from by abel]
+  rw [square_commutator_totalSpin Λ A, square_commutator_totalSpin Λ B,
+    square_commutator_totalSpin Λ C]
+  have hAA : A * A - A * A = (0 : ManyBodyOp Λ) := sub_self _
+  have hBA : B * A - A * B = -(Complex.I • C) := by
+    rw [show B * A - A * B = -(A * B - B * A) from by abel, hAB]
+  rw [hAA, hBA, hCA]
+  rw [mul_zero, zero_mul, add_zero]
+  rw [mul_neg, neg_mul, mul_smul_comm, smul_mul_assoc, mul_smul_comm, smul_mul_assoc]
+  rw [zero_add]
+  abel
+
+/-- Casimir invariance: `[(Ŝ_tot)², Ŝ_tot^(2)] = 0`. -/
+theorem totalSpinHalfSquared_commutator_totalSpinHalfOp2 :
+    totalSpinHalfSquared Λ * totalSpinHalfOp2 Λ
+        - totalSpinHalfOp2 Λ * totalSpinHalfSquared Λ = 0 := by
+  unfold totalSpinHalfSquared
+  set A := totalSpinHalfOp1 Λ
+  set B := totalSpinHalfOp2 Λ
+  set C := totalSpinHalfOp3 Λ
+  have hAB : A * B - B * A = Complex.I • C :=
+    totalSpinHalfOp1_commutator_totalSpinHalfOp2 Λ
+  have hBC : B * C - C * B = Complex.I • A :=
+    totalSpinHalfOp2_commutator_totalSpinHalfOp3 Λ
+  rw [add_mul, add_mul, mul_add, mul_add]
+  rw [show A * A * B + B * B * B + C * C * B - (B * (A * A) + B * (B * B) + B * (C * C))
+        = (A * A * B - B * (A * A)) + (B * B * B - B * (B * B))
+          + (C * C * B - B * (C * C)) from by abel]
+  rw [square_commutator_totalSpin Λ A, square_commutator_totalSpin Λ B,
+    square_commutator_totalSpin Λ C]
+  have hBB : B * B - B * B = (0 : ManyBodyOp Λ) := sub_self _
+  have hCB : C * B - B * C = -(Complex.I • A) := by
+    rw [show C * B - B * C = -(B * C - C * B) from by abel, hBC]
+  rw [hAB, hBB, hCB]
+  rw [mul_zero, zero_mul, add_zero]
+  rw [mul_neg, neg_mul, mul_smul_comm, smul_mul_assoc, mul_smul_comm, smul_mul_assoc]
+  rw [add_zero]
+  abel
+
 /-- Total ladder commutator: `[Ŝ^+_tot, Ŝ^-_tot] = 2 · Ŝ_tot^(3)`. -/
 theorem totalSpinHalfOpPlus_commutator_totalSpinHalfOpMinus :
     (totalSpinHalfOpPlus Λ * totalSpinHalfOpMinus Λ
