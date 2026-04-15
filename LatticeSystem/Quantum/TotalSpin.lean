@@ -165,6 +165,51 @@ def spinSign (s : Fin 2) : ℤ := if s = 0 then 1 else -1
 def magnetization (σ : Λ → Fin 2) : ℤ :=
   ∑ x : Λ, spinSign (σ x)
 
+/-! ## Ŝ^(3)_tot eigenvalue on basis states (Tasaki eq (2.2.10))
+
+Each computational-basis state `|σ⟩` is an eigenvector of `Ŝ_tot^(3)`
+with eigenvalue `(1/2) · |σ|`, where `|σ| = Σ_x spinSign(σ_x)` is the
+total magnetization. -/
+
+/-- Half-spin eigenvalue as a complex number. -/
+noncomputable def spinHalfSign (s : Fin 2) : ℂ :=
+  if s = 0 then (1 / 2 : ℂ) else -(1 / 2 : ℂ)
+
+/-- `Ŝ_x^(3) · |σ⟩ = ±(1/2) · |σ⟩` depending on `σ_x`. -/
+theorem onSite_spinHalfOp3_mulVec_basisVec (x : Λ) (σ : Λ → Fin 2) :
+    (onSite x spinHalfOp3 : ManyBodyOp Λ).mulVec (basisVec σ) =
+      spinHalfSign (σ x) • basisVec σ := by
+  rw [onSite_mulVec_basisVec]
+  funext τ
+  simp only [Pi.smul_apply, smul_eq_mul, Fin.sum_univ_two,
+    spinHalfSign, spinHalfOp3, pauliZ]
+  match hsx : σ x with
+  | 0 =>
+    have : Function.update σ x (0 : Fin 2) = σ := by
+      rw [← hsx]; exact Function.update_eq_self _ _
+    rw [this]; simp
+  | 1 =>
+    have : Function.update σ x (1 : Fin 2) = σ := by
+      rw [← hsx]; exact Function.update_eq_self _ _
+    rw [this]; simp
+
+/-- `Ŝ_tot^(3) · |σ⟩ = (Σ_x spinHalfSign(σ_x)) · |σ⟩`, so every
+computational-basis state is an eigenvector of `Ŝ_tot^(3)`. -/
+theorem totalSpinHalfOp3_mulVec_basisVec (σ : Λ → Fin 2) :
+    (totalSpinHalfOp3 Λ).mulVec (basisVec σ) =
+      (∑ x : Λ, spinHalfSign (σ x)) • basisVec σ := by
+  unfold totalSpinHalfOp3
+  funext τ
+  change ∑ ρ, (∑ x, onSite x spinHalfOp3) τ ρ * basisVec σ ρ =
+       ((∑ x, spinHalfSign (σ x)) • basisVec σ) τ
+  simp only [Matrix.sum_apply, Finset.sum_mul, Pi.smul_apply, smul_eq_mul]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  have h := onSite_spinHalfOp3_mulVec_basisVec Λ x σ
+  have hτ := congrFun h τ
+  change ∑ ρ, onSite x spinHalfOp3 τ ρ * basisVec σ ρ = spinHalfSign (σ x) * basisVec σ τ
+  convert hτ using 1
+
 
 /-! ## Total spin commutation relations
 
