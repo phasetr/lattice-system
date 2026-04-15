@@ -52,6 +52,8 @@ LatticeSystem/
   Basic.lean              -- placeholder for shared infrastructure
   Quantum/
     Pauli.lean            -- single-site Pauli matrices, basic relations
+    SpinHalf.lean         -- spin-1/2 operators S^(alpha) = sigma^(alpha)/2
+                             and algebra (Tasaki section 2.1)
     ManyBody.lean         -- multi-site operator space, onSite embedding,
                              commutativity at distinct sites
     IsingChain.lean       -- 1D open-chain quantum Ising Hamiltonian
@@ -290,6 +292,7 @@ updated when a formalization completes, via the project workflow.
 Area & Stage & Status \\
 \hline
 Pauli matrices and their algebra & finite-dim & \emph{formalized} \\
+Spin-1/2 operators and $[\hat S^{(\alpha)},\hat S^{(\beta)}]$ (Tasaki §2.1) & finite-dim & \emph{formalized} \\
 Multi-body operator space / \texttt{onSite} & finite-dim & \emph{formalized} \\
 Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
 1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\

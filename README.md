@@ -55,6 +55,22 @@ gives the cyclic products).
 | `pauliX_mul_pauliY`, `pauliY_mul_pauliZ`, `pauliZ_mul_pauliX` | `σ^x σ^y = i·σ^z`, cyclic |
 | `pauliX_anticomm_pauliY`, `pauliY_anticomm_pauliZ`, `pauliZ_anticomm_pauliX` | `σ^α σ^β + σ^β σ^α = 0` for `α ≠ β` |
 
+### Spin-1/2 operators (`LatticeSystem/Quantum/SpinHalf.lean`)
+
+Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, §2.1, eqs. (2.1.1), (2.1.7), (2.1.8), pp. 13-15. The S = 1/2
+spin operators `Ŝ^(α)` are defined as `σ^(α) / 2`.
+
+| Lean name | Statement |
+|---|---|
+| `spinHalfOp1`, `spinHalfOp2`, `spinHalfOp3` | definitions (Tasaki (2.1.7)) |
+| `pauliX/Y/Z_eq_two_smul_spinHalfOp1/2/3` | `σ^(α) = 2 · Ŝ^(α)` (Tasaki (2.1.8)) |
+| `spinHalfOp1/2/3_isHermitian` | Hermiticity |
+| `spinHalfOp1/2/3_mul_self` | `(Ŝ^(α))² = (1/4) · I` |
+| `spinHalfOp1/2/3_anticomm_*` | `Ŝ^(α) Ŝ^(β) + Ŝ^(β) Ŝ^(α) = 0` (α ≠ β) |
+| `spinHalfOp1/2/3_commutator_*` | `[Ŝ^(α), Ŝ^(β)] = i · Ŝ^(γ)` (cyclic) |
+| `spinHalf_total_spin_squared` | `(Ŝ^(1))² + (Ŝ^(2))² + (Ŝ^(3))² = (3/4) · I` |
+
 ### Multi-body operator space and site embedding (`LatticeSystem/Quantum/ManyBody.lean`)
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
@@ -90,8 +106,12 @@ with Tasaki's (3.3.1) up to these constants.
 | P0 | Project skeleton, CI, documentation infrastructure | Done |
 | P1a | Finite-volume quantum spin operator algebra (Pauli, onSite, commutativity) | Done |
 | P1b | Finite-chain quantum Ising Hamiltonian, Hermiticity | Done |
-| P1c | Gibbs state `ρ = e^{-βH}/Z`, expectation `⟨O⟩_β = Tr(ρO)` | Not started |
-| P1d | Periodic boundary conditions, other quantum chains (Heisenberg) | Not started |
+| P1c (Tasaki §2.1) | Spin-1/2 operators `Ŝ^(α)` and the commutator algebra | Done |
+| P1d (Tasaki §2.1 cont.) | Basis states `\|ψ_σ⟩`, raising/lowering `Ŝ^±`, S = 1 matrices | Not started |
+| P1e (Tasaki §2.1 cont.) | Spin rotation operators `Û^(α)_θ` and their properties | Not started |
+| P1f (Tasaki §2.2) | General quantum spin systems on an abstract finite lattice | Not started |
+| P1g | Gibbs state `ρ = e^{-βH}/Z`, expectation `⟨O⟩_β = Tr(ρO)` | Not started |
+| P1h | Periodic boundary conditions, other quantum chains (Heisenberg) | Not started |
 | P2 | Finite-volume Hubbard / BCS | Not started |
 | P3 | CAR algebras, quasi-local C*-algebras, KMS states | Not started |
 | P4 | Thermodynamic limit, phase transitions | Not started |
