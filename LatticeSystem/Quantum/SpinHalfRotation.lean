@@ -663,4 +663,53 @@ theorem spinHalfRot3_conj_spinHalfOp3 (θ : ℝ) :
   rw [spinHalfRot3_mul, show -θ + θ = 0 from by ring, spinHalfRot3_zero,
     Matrix.one_mul]
 
+/-! ## π/2 rotation conjugation (Tasaki eq (2.1.22))
+
+`(Û^(α)_{π/2})† · Ŝ^(β) · Û^(α)_{π/2} = -ε^{αβγ} · Ŝ^(γ)` for
+`(α, β, γ)` cyclic. This is the specialization of (2.1.16) at
+`θ = π/2` using `cos(π/2) = 0`, `sin(π/2) = 1`.
+-/
+
+/-- `(Û^(1)_{π/2})† · Ŝ^(2) · Û^(1)_{π/2} = -Ŝ^(3)` (ε^{123}=+1). -/
+theorem spinHalfRot1_half_pi_conj_spinHalfOp2 :
+    (spinHalfRot1 (Real.pi / 2))ᴴ * spinHalfOp2 * spinHalfRot1 (Real.pi / 2) =
+      -spinHalfOp3 := by
+  rw [spinHalfRot1_conj_spinHalfOp2, Real.cos_pi_div_two, Real.sin_pi_div_two]
+  simp
+
+/-- `(Û^(2)_{π/2})† · Ŝ^(3) · Û^(2)_{π/2} = -Ŝ^(1)` (ε^{231}=+1). -/
+theorem spinHalfRot2_half_pi_conj_spinHalfOp3 :
+    (spinHalfRot2 (Real.pi / 2))ᴴ * spinHalfOp3 * spinHalfRot2 (Real.pi / 2) =
+      -spinHalfOp1 := by
+  rw [spinHalfRot2_conj_spinHalfOp3, Real.cos_pi_div_two, Real.sin_pi_div_two]
+  simp
+
+/-- `(Û^(3)_{π/2})† · Ŝ^(1) · Û^(3)_{π/2} = -Ŝ^(2)` (ε^{312}=+1). -/
+theorem spinHalfRot3_half_pi_conj_spinHalfOp1 :
+    (spinHalfRot3 (Real.pi / 2))ᴴ * spinHalfOp1 * spinHalfRot3 (Real.pi / 2) =
+      -spinHalfOp2 := by
+  rw [spinHalfRot3_conj_spinHalfOp1, Real.cos_pi_div_two, Real.sin_pi_div_two]
+  simp
+
+/-- `(Û^(1)_{π/2})† · Ŝ^(3) · Û^(1)_{π/2} = Ŝ^(2)` (ε^{132}=-1). -/
+theorem spinHalfRot1_half_pi_conj_spinHalfOp3 :
+    (spinHalfRot1 (Real.pi / 2))ᴴ * spinHalfOp3 * spinHalfRot1 (Real.pi / 2) =
+      spinHalfOp2 := by
+  rw [spinHalfRot1_conj_spinHalfOp3, Real.cos_pi_div_two, Real.sin_pi_div_two]
+  simp
+
+/-- `(Û^(2)_{π/2})† · Ŝ^(1) · Û^(2)_{π/2} = Ŝ^(3)` (ε^{213}=-1). -/
+theorem spinHalfRot2_half_pi_conj_spinHalfOp1 :
+    (spinHalfRot2 (Real.pi / 2))ᴴ * spinHalfOp1 * spinHalfRot2 (Real.pi / 2) =
+      spinHalfOp3 := by
+  rw [spinHalfRot2_conj_spinHalfOp1, Real.cos_pi_div_two, Real.sin_pi_div_two]
+  simp
+
+/-- `(Û^(3)_{π/2})† · Ŝ^(2) · Û^(3)_{π/2} = Ŝ^(1)` (ε^{321}=-1). -/
+theorem spinHalfRot3_half_pi_conj_spinHalfOp2 :
+    (spinHalfRot3 (Real.pi / 2))ᴴ * spinHalfOp2 * spinHalfRot3 (Real.pi / 2) =
+      spinHalfOp1 := by
+  rw [spinHalfRot3_conj_spinHalfOp2, Real.cos_pi_div_two, Real.sin_pi_div_two]
+  simp
+
 end LatticeSystem.Quantum
