@@ -165,6 +165,7 @@ def spinSign (s : Fin 2) : ℤ := if s = 0 then 1 else -1
 def magnetization (σ : Λ → Fin 2) : ℤ :=
   ∑ x : Λ, spinSign (σ x)
 
+
 /-! ## Total spin commutation relations
 
 The total spin operators `Ŝ_tot^(α)` satisfy the same commutation

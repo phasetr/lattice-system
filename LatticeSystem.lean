@@ -11,4 +11,5 @@ import LatticeSystem.Quantum.SpinOneBasis
 import LatticeSystem.Quantum.ManyBody
 import LatticeSystem.Quantum.TotalSpin
 import LatticeSystem.Quantum.SpinDot
+import LatticeSystem.Quantum.Rotation3D
 import LatticeSystem.Quantum.IsingChain
