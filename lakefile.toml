@@ -1,0 +1,6 @@
+name = "LatticeSystem"
+version = "0.1.0"
+defaultTargets = ["LatticeSystem"]
+
+[[lean_lib]]
+name = "LatticeSystem"
