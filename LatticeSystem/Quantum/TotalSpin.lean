@@ -225,6 +225,25 @@ theorem totalSpinHalfOp3_commutator_totalSpinHalfOp1 :
   unfold totalSpinHalfOp1 totalSpinHalfOp2 totalSpinHalfOp3
   exact totalSpin_commutator_general Λ spinHalfOp3_commutator_spinHalfOp1
 
+/-! ## On-site operator commutes with total spin via its single-site commutator -/
+
+/-- For any single-site operator `onSite x Sα` and any total-spin-like sum
+`Σ_z onSite z Sβ`, the commutator concentrates at site `x`:
+`[onSite x Sα, Σ_z onSite z Sβ] = onSite x [Sα, Sβ]`. -/
+theorem onSite_commutator_totalOnSite
+    (x : Λ) (Sα Sβ : Matrix (Fin 2) (Fin 2) ℂ) :
+    (onSite x Sα : ManyBodyOp Λ) * (∑ z : Λ, onSite z Sβ)
+        - (∑ z : Λ, onSite z Sβ) * onSite x Sα =
+      onSite x (Sα * Sβ - Sβ * Sα) := by
+  rw [Finset.mul_sum, Finset.sum_mul]
+  rw [← Finset.sum_sub_distrib]
+  rw [Finset.sum_eq_single x]
+  · rw [onSite_mul_onSite_same, onSite_mul_onSite_same, ← onSite_sub]
+  · intros z _ hzx
+    rw [onSite_mul_onSite_of_ne hzx.symm]
+    simp
+  · intro h; exact absurd (Finset.mem_univ x) h
+
 /-! ## Adjoint relations and ladder commutator for total raising/lowering -/
 
 private lemma onSite_conjTranspose (i : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) :

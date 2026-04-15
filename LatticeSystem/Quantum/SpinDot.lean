@@ -99,4 +99,126 @@ theorem spinHalfDot_self (x : Λ) :
     rw [← add_smul, ← add_smul]; norm_num]
   rw [onSite_smul, onSite_one]
 
+/-! ## Squared-sum decomposition (Tasaki eq (2.2.18)) -/
+
+/-- The two-site total spin squared: `(Ŝ_x + Ŝ_y)²`, i.e.
+`Σ_α (Ŝ_x^(α) + Ŝ_y^(α))²`. -/
+noncomputable def spinHalfPairSpinSq (x y : Λ) : ManyBodyOp Λ :=
+  (onSite x spinHalfOp1 + onSite y spinHalfOp1) *
+    (onSite x spinHalfOp1 + onSite y spinHalfOp1) +
+    (onSite x spinHalfOp2 + onSite y spinHalfOp2) *
+      (onSite x spinHalfOp2 + onSite y spinHalfOp2) +
+    (onSite x spinHalfOp3 + onSite y spinHalfOp3) *
+      (onSite x spinHalfOp3 + onSite y spinHalfOp3)
+
+/-- Site embeddings of the *same* operator at any two sites commute,
+regardless of whether the sites coincide. -/
+private lemma onSite_mul_onSite_self_comm (x y : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) :
+    (onSite x A : ManyBodyOp Λ) * onSite y A = onSite y A * onSite x A := by
+  by_cases hxy : x = y
+  · subst hxy; rfl
+  · exact onSite_mul_onSite_of_ne hxy A A
+
+/-! ## SU(2) invariance (partial, Tasaki eq (2.2.17)) -/
+
+/-- The Leibniz rule for commutators of products: `[A·B, T] = A·[B,T] + [A,T]·B`. -/
+private lemma leibniz_commutator (A B T : ManyBodyOp Λ) :
+    A * B * T - T * (A * B) = A * (B * T - T * B) + (A * T - T * A) * B := by
+  rw [mul_sub, sub_mul]
+  have h1 : A * (T * B) = A * T * B := (mul_assoc A T B).symm
+  have h2 : A * B * T = A * (B * T) := mul_assoc A B T
+  have h3 : T * (A * B) = T * A * B := (mul_assoc T A B).symm
+  rw [h1, h2, h3]
+  abel
+
+/-- SU(2) invariance at axis 3: `[Ŝ_x · Ŝ_y, Ŝ_tot^(3)] = 0`. This is the
+axis-3 case of Tasaki eq. (2.2.17). -/
+theorem spinHalfDot_commutator_totalSpinHalfOp3 (x y : Λ) :
+    spinHalfDot x y * totalSpinHalfOp3 Λ - totalSpinHalfOp3 Λ * spinHalfDot x y = 0 := by
+  unfold spinHalfDot totalSpinHalfOp3
+  set T := (∑ z : Λ, onSite z spinHalfOp3 : ManyBodyOp Λ)
+  -- Distribute the commutator over the α-sum in spinHalfDot
+  have distrib : ∀ (A B C : ManyBodyOp Λ),
+      (A + B + C) * T - T * (A + B + C) = (A * T - T * A) + (B * T - T * B) + (C * T - T * C) := by
+    intros A B C
+    rw [add_mul, add_mul, mul_add, mul_add]; abel
+  rw [distrib]
+  set a1 := (onSite x spinHalfOp1 * onSite y spinHalfOp1 : ManyBodyOp Λ)
+  set a2 := (onSite x spinHalfOp2 * onSite y spinHalfOp2 : ManyBodyOp Λ)
+  set a3 := (onSite x spinHalfOp3 * onSite y spinHalfOp3 : ManyBodyOp Λ)
+  -- Compute each commutator via Leibniz
+  have h1 : a1 * T - T * a1 =
+      onSite x spinHalfOp1 *
+          onSite y (spinHalfOp1 * spinHalfOp3 - spinHalfOp3 * spinHalfOp1) +
+        onSite x (spinHalfOp1 * spinHalfOp3 - spinHalfOp3 * spinHalfOp1) *
+          onSite y spinHalfOp1 := by
+    change (onSite x spinHalfOp1) * (onSite y spinHalfOp1) * T
+        - T * ((onSite x spinHalfOp1) * (onSite y spinHalfOp1)) = _
+    rw [leibniz_commutator]
+    rw [onSite_commutator_totalOnSite Λ y spinHalfOp1 spinHalfOp3,
+        onSite_commutator_totalOnSite Λ x spinHalfOp1 spinHalfOp3]
+  have h2 : a2 * T - T * a2 =
+      onSite x spinHalfOp2 *
+          onSite y (spinHalfOp2 * spinHalfOp3 - spinHalfOp3 * spinHalfOp2) +
+        onSite x (spinHalfOp2 * spinHalfOp3 - spinHalfOp3 * spinHalfOp2) *
+          onSite y spinHalfOp2 := by
+    change (onSite x spinHalfOp2) * (onSite y spinHalfOp2) * T
+        - T * ((onSite x spinHalfOp2) * (onSite y spinHalfOp2)) = _
+    rw [leibniz_commutator]
+    rw [onSite_commutator_totalOnSite Λ y spinHalfOp2 spinHalfOp3,
+        onSite_commutator_totalOnSite Λ x spinHalfOp2 spinHalfOp3]
+  have h3 : a3 * T - T * a3 = 0 := by
+    change (onSite x spinHalfOp3) * (onSite y spinHalfOp3) * T
+        - T * ((onSite x spinHalfOp3) * (onSite y spinHalfOp3)) = 0
+    rw [leibniz_commutator]
+    rw [onSite_commutator_totalOnSite Λ y spinHalfOp3 spinHalfOp3,
+        onSite_commutator_totalOnSite Λ x spinHalfOp3 spinHalfOp3]
+    rw [sub_self]
+    simp [onSite_zero]
+  rw [h1, h2, h3]
+  -- Substitute the single-site commutators with their known values
+  rw [show spinHalfOp1 * spinHalfOp3 - spinHalfOp3 * spinHalfOp1 =
+      -(Complex.I • spinHalfOp2) from by
+    rw [show spinHalfOp1 * spinHalfOp3 - spinHalfOp3 * spinHalfOp1 =
+        -(spinHalfOp3 * spinHalfOp1 - spinHalfOp1 * spinHalfOp3) from by abel,
+      spinHalfOp3_commutator_spinHalfOp1]]
+  rw [spinHalfOp2_commutator_spinHalfOp3]
+  rw [onSite_smul, onSite_smul]
+  rw [show onSite x (-(Complex.I • spinHalfOp2)) =
+      -(Complex.I • onSite x spinHalfOp2) from by
+    rw [show -(Complex.I • spinHalfOp2) = (-Complex.I) • spinHalfOp2 from by
+      rw [neg_smul]]
+    rw [onSite_smul]
+    rw [neg_smul]]
+  rw [show onSite y (-(Complex.I • spinHalfOp2)) =
+      -(Complex.I • onSite y spinHalfOp2) from by
+    rw [show -(Complex.I • spinHalfOp2) = (-Complex.I) • spinHalfOp2 from by
+      rw [neg_smul]]
+    rw [onSite_smul]
+    rw [neg_smul]]
+  -- Now the terms should cancel
+  rw [mul_neg, neg_mul, mul_smul_comm, smul_mul_assoc, mul_smul_comm, smul_mul_assoc]
+  abel
+
+/-- Tasaki eq. (2.2.18) (the defining identity, rearranged):
+`(Ŝ_x + Ŝ_y)² = 2·(Ŝ_x · Ŝ_y) + Ŝ_x · Ŝ_x + Ŝ_y · Ŝ_y`. -/
+theorem spinHalfPairSpinSq_eq (x y : Λ) :
+    (spinHalfPairSpinSq x y : ManyBodyOp Λ) =
+      (2 : ℂ) • spinHalfDot x y + spinHalfDot x x + spinHalfDot y y := by
+  unfold spinHalfPairSpinSq spinHalfDot
+  simp_rw [mul_add, add_mul]
+  rw [onSite_mul_onSite_self_comm y x spinHalfOp1,
+      onSite_mul_onSite_self_comm y x spinHalfOp2,
+      onSite_mul_onSite_self_comm y x spinHalfOp3]
+  rw [show (2 : ℂ) • (onSite x spinHalfOp1 * onSite y spinHalfOp1 +
+        onSite x spinHalfOp2 * onSite y spinHalfOp2 +
+        onSite x spinHalfOp3 * onSite y spinHalfOp3 : ManyBodyOp Λ) =
+      (onSite x spinHalfOp1 * onSite y spinHalfOp1 +
+        onSite x spinHalfOp2 * onSite y spinHalfOp2 +
+        onSite x spinHalfOp3 * onSite y spinHalfOp3) +
+      (onSite x spinHalfOp1 * onSite y spinHalfOp1 +
+        onSite x spinHalfOp2 * onSite y spinHalfOp2 +
+        onSite x spinHalfOp3 * onSite y spinHalfOp3) from two_smul _ _]
+  abel
+
 end LatticeSystem.Quantum
