@@ -86,4 +86,17 @@ theorem spinHalfDot_comm (x y : Λ) :
       onSite_mul_onSite_of_ne hxy spinHalfOp2 spinHalfOp2,
       onSite_mul_onSite_of_ne hxy spinHalfOp3 spinHalfOp3]
 
+/-- Same-site dot product: `Ŝ_x · Ŝ_x = (3/4) · 1` (the S = 1/2
+`S(S+1) = 3/4` identity, lifted to the many-body space). -/
+theorem spinHalfDot_self (x : Λ) :
+    (spinHalfDot x x : ManyBodyOp Λ) = (3 / 4 : ℂ) • 1 := by
+  unfold spinHalfDot
+  rw [onSite_mul_onSite_same, onSite_mul_onSite_same, onSite_mul_onSite_same]
+  rw [spinHalfOp1_mul_self, spinHalfOp2_mul_self, spinHalfOp3_mul_self]
+  rw [← onSite_add, ← onSite_add]
+  rw [show ((1 / 4 : ℂ) • 1 + (1 / 4 : ℂ) • 1 + (1 / 4 : ℂ) • 1 : Matrix (Fin 2) (Fin 2) ℂ)
+        = (3 / 4 : ℂ) • 1 from by
+    rw [← add_smul, ← add_smul]; norm_num]
+  rw [onSite_smul, onSite_one]
+
 end LatticeSystem.Quantum

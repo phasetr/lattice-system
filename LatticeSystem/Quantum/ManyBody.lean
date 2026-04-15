@@ -222,6 +222,30 @@ theorem onSite_zero (i : Λ) :
   simp only [onSite_apply, Matrix.zero_apply]
   split_ifs <;> rfl
 
+/-- `onSite i 1 = 1`: the site embedding of the 2×2 identity is the
+many-body identity. -/
+theorem onSite_one (i : Λ) :
+    (onSite i (1 : Matrix (Fin 2) (Fin 2) ℂ) : ManyBodyOp Λ) = 1 := by
+  ext σ' σ
+  simp only [onSite_apply, Matrix.one_apply]
+  by_cases heq : σ' = σ
+  · subst heq
+    simp
+  · have : ¬ (∀ k, k ≠ i → σ' k = σ k) ∨ σ' i ≠ σ i := by
+      by_contra hall
+      push Not at hall
+      obtain ⟨hoff, hi⟩ := hall
+      apply heq
+      funext k
+      by_cases hki : k = i
+      · subst hki; exact hi
+      · exact hoff k hki
+    rcases this with h | h
+    · rw [if_neg h, if_neg heq]
+    · by_cases hagree : ∀ k, k ≠ i → σ' k = σ k
+      · rw [if_pos hagree, if_neg h, if_neg heq]
+      · rw [if_neg hagree, if_neg heq]
+
 /-- `onSite` commutes with scalar multiplication. -/
 theorem onSite_smul (i : Λ) (c : ℂ) (A : Matrix (Fin 2) (Fin 2) ℂ) :
     (onSite i (c • A) : ManyBodyOp Λ) = c • onSite i A := by
