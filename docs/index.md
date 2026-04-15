@@ -58,6 +58,19 @@ Systems*, §2.1 eqs. (2.1.1), (2.1.7), (2.1.8), pp. 13-15.
 | `spinHalfOp1_commutator_spinHalfOp2` etc. | `[Ŝ^(α), Ŝ^(β)] = i · Ŝ^(γ)` (Tasaki (2.1.1)) | `Quantum/SpinHalf.lean` |
 | `spinHalf_total_spin_squared` | `Σ (Ŝ^(α))² = (3/4) · I`, i.e. `S(S+1)` with `S=1/2` | `Quantum/SpinHalf.lean` |
 
+### Basis states and raising/lowering (Tasaki §2.1)
+
+Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, §2.1 eqs. (2.1.4), (2.1.5), (2.1.6), p. 14.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `spinHalfUp`, `spinHalfDown` | `\|ψ^↑⟩`, `\|ψ^↓⟩` as column vectors (Tasaki (2.1.6)) | `Quantum/SpinHalfBasis.lean` |
+| `spinHalfOp3_mulVec_spinHalfUp/Down` | `Ŝ^(3)` eigenvalue equations (Tasaki (2.1.4)) | `Quantum/SpinHalfBasis.lean` |
+| `spinHalfOpPlus`, `spinHalfOpMinus` | raising/lowering `Ŝ^±` | `Quantum/SpinHalfBasis.lean` |
+| `spinHalfOpPlus_eq_add`, `spinHalfOpMinus_eq_sub` | `Ŝ^± = Ŝ^(1) ± i · Ŝ^(2)` | `Quantum/SpinHalfBasis.lean` |
+| `spinHalfOpPlus/Minus_mulVec_spinHalfUp/Down` | raising/lowering actions (Tasaki (2.1.5)) | `Quantum/SpinHalfBasis.lean` |
+
 ### Multi-body operator space
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
