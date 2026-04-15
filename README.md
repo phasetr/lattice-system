@@ -70,6 +70,7 @@ to the repository.
 
 ## Learning resources
 
+- [Lean by Example](https://lean-ja.github.io/lean-by-example/)
 - [The Mechanics of Proof (Math 2001)](https://hrmacbeth.github.io/math2001/) by Heather Macbeth
 - [Mathematics in Lean](https://leanprover-community.github.io/mathematics_in_lean/index.html)
 
