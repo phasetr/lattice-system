@@ -264,6 +264,17 @@ $\hat U^{(\alpha)}_{2\pi} = -\hat 1$. Lean name:
 \texttt{spinHalfRot1/2/3\_two\_pi}.
 \end{theorem}
 
+\begin{theorem}[group law (Tasaki p.~15)]
+$\hat U^{(\alpha)}_\theta \hat U^{(\alpha)}_\varphi
+  = \hat U^{(\alpha)}_{\theta + \varphi}$.
+Lean name: \texttt{spinHalfRot1/2/3\_mul}.
+\end{theorem}
+
+\begin{theorem}[unitarity]
+$\hat U^{(\alpha)}_\theta (\hat U^{(\alpha)}_\theta)^\dagger = \hat 1$.
+Lean name: \texttt{spinHalfRot1/2/3\_unitary}.
+\end{theorem}
+
 \paragraph{Proof technique.}
 All statements are parametrised through a private helper
 \texttt{rotOf S theta := cos(theta/2) * 1 - (2*I*sin(theta/2)) * S} and then
@@ -274,18 +285,34 @@ and \texttt{Real.cos\_neg} / \texttt{Real.sin\_neg}.
 The $2\pi$ lemma follows from \texttt{Real.cos\_pi} and
 \texttt{Real.sin\_pi}.
 
+\paragraph{Proof technique for the group law and unitarity.}
+The key step is an algebraic expansion lemma
+\texttt{rot\_mul\_helper}: for any $S$ and $k$ with $S^2 = k I$, and
+any $a, b, c, d \in \mathbb{C}$,
+\[
+  (aI - bS)(cI - dS) = (ac + bdk)\,I - (ad + bc)\,S.
+\]
+The proof expands the product via \texttt{sub\_mul}, \texttt{mul\_sub},
+\texttt{Matrix.smul\_mul}, \texttt{Matrix.mul\_smul},
+\texttt{Matrix.one\_mul}, \texttt{Matrix.mul\_one} and
+\texttt{smul\_smul}, substitutes $S^2 = kI$, and closes with the
+Mathlib \texttt{module} tactic that collects the $I$ and $S$ components.
+For the group law, the remaining ring identity in $\cos$ and $\sin$
+uses the addition formulas \texttt{Real.cos\_add} / \texttt{Real.sin\_add}
+and a \texttt{linear\_combination} with \texttt{Complex.I\_sq} to
+eliminate $i^2 = -1$. Unitarity follows by combining the adjoint
+identity with the group law:
+$\hat U^{(\alpha)}_\theta (\hat U^{(\alpha)}_\theta)^\dagger
+  = \hat U^{(\alpha)}_\theta \hat U^{(\alpha)}_{-\theta}
+  = \hat U^{(\alpha)}_{\theta + (-\theta)}
+  = \hat U^{(\alpha)}_0 = \hat 1$.
+
 \paragraph{Not yet formalized.}
 \begin{itemize}
-  \item Group law
-    $\hat U^{(\alpha)}_\theta \hat U^{(\alpha)}_\varphi
-      = \hat U^{(\alpha)}_{\theta+\varphi}$.
-  \item Unitarity
-    $\hat U^{(\alpha)}_\theta (\hat U^{(\alpha)}_\theta)^\dagger = \hat 1$.
-  \item The exponential equivalence with \texttt{Matrix.exp}.
+  \item The exponential equivalence
+    $\hat U^{(\alpha)}_\theta = \exp(-i\theta\,\hat S^{(\alpha)})$
+    via Mathlib's \texttt{Matrix.exp}.
 \end{itemize}
-Both deferred because their proofs require matrix algebra in the
-commutative subring $\mathrm{span}_{\mathbb{C}}\{\hat 1, \hat S^{(\alpha)}\}$
-with relation $(\hat S^{(\alpha)})^2 = \hat 1 / 4$.
 
 \paragraph{References.}
 Tasaki~\cite{Tasaki:QMB}, §2.1, eq.~(2.1.23) (p.~16) and eq.~(2.1.26)
@@ -579,8 +606,8 @@ Spin-1/2 operators and $[\hat S^{(\alpha)},\hat S^{(\beta)}]$ (Tasaki §2.1) & f
 Basis states, $\hat S^{(3)}$ eigen-eqn, $\hat S^\pm$ (Tasaki §2.1) & finite-dim & \emph{formalized} \\
 $S = 1$ matrix representations (Tasaki §2.1 eq.~2.1.9) & finite-dim & \emph{formalized} \\
 Pauli basis of $M_2(\mathbb{C})$ (Tasaki Problem 2.1.a, $S=1/2$) & finite-dim & \emph{formalized} \\
-$S = 1/2$ rotation: closed form, $\theta=0$, adjoint, $2\pi$ (Tasaki §2.1) & finite-dim & \emph{formalized} \\
-$S = 1/2$ rotation: group law, unitarity & finite-dim & not started \\
+$S = 1/2$ rotation (closed form, $\theta=0$, adjoint, $2\pi$) & finite-dim & \emph{formalized} \\
+$S = 1/2$ rotation (group law, unitarity) & finite-dim & \emph{formalized} \\
 Multi-body operator space / \texttt{onSite} & finite-dim & \emph{formalized} \\
 Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
 1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\

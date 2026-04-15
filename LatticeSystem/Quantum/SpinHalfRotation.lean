@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.SpinHalf
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.Module
 
 /-!
 # Spin-1/2 rotation operators via the closed form
@@ -148,5 +150,78 @@ theorem spinHalfRot2_two_pi : spinHalfRot2 (2 * Real.pi) = -1 :=
 /-- `Û^(3)_{2π} = -1` for S = 1/2. -/
 theorem spinHalfRot3_two_pi : spinHalfRot3 (2 * Real.pi) = -1 :=
   rotOf_two_pi _
+
+/-! ## Helper lemma for matrix algebra in `span_ℂ {1, S}` -/
+
+/-- Expansion lemma: if `S * S = k · 1` then
+`(a • 1 - b • S) * (c • 1 - d • S) = (a*c + b*d*k) • 1 - (a*d + b*c) • S`.
+This is the key identity that lets us reduce products of rotation-style
+matrices to linear combinations of `1` and `S`. -/
+private lemma rot_mul_helper {S : Matrix (Fin 2) (Fin 2) ℂ} {k : ℂ}
+    (hS : S * S = k • (1 : Matrix (Fin 2) (Fin 2) ℂ)) (a b c d : ℂ) :
+    (a • (1 : Matrix (Fin 2) (Fin 2) ℂ) - b • S) * (c • 1 - d • S)
+      = (a * c + b * d * k) • (1 : Matrix (Fin 2) (Fin 2) ℂ) - (a * d + b * c) • S := by
+  rw [sub_mul, mul_sub, mul_sub,
+      Matrix.smul_mul, Matrix.smul_mul, Matrix.smul_mul, Matrix.smul_mul,
+      Matrix.mul_smul, Matrix.mul_smul, Matrix.mul_smul, Matrix.mul_smul,
+      Matrix.one_mul, Matrix.one_mul, Matrix.mul_one, hS,
+      smul_smul, smul_smul, smul_smul, smul_smul, smul_smul]
+  module
+
+/-! ## Group law `Û^(α)_θ · Û^(α)_φ = Û^(α)_{θ+φ}` -/
+
+private lemma rotOf_mul_rotOf {S : Matrix (Fin 2) (Fin 2) ℂ}
+    (hS_sq : S * S = (1 / 4 : ℂ) • 1) (θ φ : ℝ) :
+    rotOf S θ * rotOf S φ = rotOf S (θ + φ) := by
+  unfold rotOf
+  rw [rot_mul_helper hS_sq,
+    show (θ + φ) / 2 = θ / 2 + φ / 2 from by ring,
+    Real.cos_add, Real.sin_add]
+  push_cast
+  congr 1
+  · -- `1`-coefficient match: uses `I^2 = -1`.
+    congr 1
+    linear_combination (Complex.sin ((θ : ℂ) / 2) * Complex.sin ((φ : ℂ) / 2)) * Complex.I_sq
+  · -- `S`-coefficient match: pure ring identity, no `I^2` involved.
+    congr 1
+    ring
+
+/-- `Û^(1)_θ · Û^(1)_φ = Û^(1)_{θ+φ}`. -/
+theorem spinHalfRot1_mul (θ φ : ℝ) :
+    spinHalfRot1 θ * spinHalfRot1 φ = spinHalfRot1 (θ + φ) :=
+  rotOf_mul_rotOf spinHalfOp1_mul_self θ φ
+
+/-- `Û^(2)_θ · Û^(2)_φ = Û^(2)_{θ+φ}`. -/
+theorem spinHalfRot2_mul (θ φ : ℝ) :
+    spinHalfRot2 θ * spinHalfRot2 φ = spinHalfRot2 (θ + φ) :=
+  rotOf_mul_rotOf spinHalfOp2_mul_self θ φ
+
+/-- `Û^(3)_θ · Û^(3)_φ = Û^(3)_{θ+φ}`. -/
+theorem spinHalfRot3_mul (θ φ : ℝ) :
+    spinHalfRot3 θ * spinHalfRot3 φ = spinHalfRot3 (θ + φ) :=
+  rotOf_mul_rotOf spinHalfOp3_mul_self θ φ
+
+/-! ## Unitarity `Û^(α)_θ · (Û^(α)_θ)† = 1` -/
+
+private lemma rotOf_mul_conjTranspose {S : Matrix (Fin 2) (Fin 2) ℂ}
+    (hS : S.IsHermitian) (hS_sq : S * S = (1 / 4 : ℂ) • 1) (θ : ℝ) :
+    rotOf S θ * (rotOf S θ)ᴴ = 1 := by
+  rw [rotOf_adjoint hS, rotOf_mul_rotOf hS_sq, add_neg_cancel]
+  exact rotOf_zero S
+
+/-- `Û^(1)_θ · (Û^(1)_θ)† = 1`. -/
+theorem spinHalfRot1_unitary (θ : ℝ) :
+    spinHalfRot1 θ * (spinHalfRot1 θ)ᴴ = 1 :=
+  rotOf_mul_conjTranspose spinHalfOp1_isHermitian spinHalfOp1_mul_self θ
+
+/-- `Û^(2)_θ · (Û^(2)_θ)† = 1`. -/
+theorem spinHalfRot2_unitary (θ : ℝ) :
+    spinHalfRot2 θ * (spinHalfRot2 θ)ᴴ = 1 :=
+  rotOf_mul_conjTranspose spinHalfOp2_isHermitian spinHalfOp2_mul_self θ
+
+/-- `Û^(3)_θ · (Û^(3)_θ)† = 1`. -/
+theorem spinHalfRot3_unitary (θ : ℝ) :
+    spinHalfRot3 θ * (spinHalfRot3 θ)ᴴ = 1 :=
+  rotOf_mul_conjTranspose spinHalfOp3_isHermitian spinHalfOp3_mul_self θ
 
 end LatticeSystem.Quantum
