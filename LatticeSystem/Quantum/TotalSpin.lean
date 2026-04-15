@@ -269,6 +269,44 @@ theorem onSite_spinHalfOpMinus_mulVec_basisVec (x : Λ) (σ : Λ → Fin 2) :
     rw [h1]
     simp
 
+/-- `Ŝ^+_tot · |σ⟩` is the sum of site-wise raising actions. -/
+theorem totalSpinHalfOpPlus_mulVec_basisVec (σ : Λ → Fin 2) :
+    (totalSpinHalfOpPlus Λ).mulVec (basisVec σ) =
+      ∑ x : Λ, (if σ x = 1 then basisVec (Function.update σ x 0)
+                           else (0 : (Λ → Fin 2) → ℂ)) := by
+  unfold totalSpinHalfOpPlus
+  funext τ
+  change ∑ ρ, (∑ x, onSite x spinHalfOpPlus) τ ρ * basisVec σ ρ =
+       (∑ x : Λ, (if σ x = 1 then basisVec (Function.update σ x 0)
+                              else (0 : (Λ → Fin 2) → ℂ))) τ
+  simp only [Matrix.sum_apply, Finset.sum_mul, Finset.sum_apply]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  have h := onSite_spinHalfOpPlus_mulVec_basisVec Λ x σ
+  have hτ := congrFun h τ
+  change ∑ ρ, onSite x spinHalfOpPlus τ ρ * basisVec σ ρ = _
+  rw [← hτ]
+  rfl
+
+/-- `Ŝ^-_tot · |σ⟩` is the sum of site-wise lowering actions. -/
+theorem totalSpinHalfOpMinus_mulVec_basisVec (σ : Λ → Fin 2) :
+    (totalSpinHalfOpMinus Λ).mulVec (basisVec σ) =
+      ∑ x : Λ, (if σ x = 0 then basisVec (Function.update σ x 1)
+                           else (0 : (Λ → Fin 2) → ℂ)) := by
+  unfold totalSpinHalfOpMinus
+  funext τ
+  change ∑ ρ, (∑ x, onSite x spinHalfOpMinus) τ ρ * basisVec σ ρ =
+       (∑ x : Λ, (if σ x = 0 then basisVec (Function.update σ x 1)
+                              else (0 : (Λ → Fin 2) → ℂ))) τ
+  simp only [Matrix.sum_apply, Finset.sum_mul, Finset.sum_apply]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  have h := onSite_spinHalfOpMinus_mulVec_basisVec Λ x σ
+  have hτ := congrFun h τ
+  change ∑ ρ, onSite x spinHalfOpMinus τ ρ * basisVec σ ρ = _
+  rw [← hτ]
+  rfl
+
 /-! ## Total spin commutation relations
 
 The total spin operators `Ŝ_tot^(α)` satisfy the same commutation
