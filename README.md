@@ -71,6 +71,25 @@ spin operators `Ŝ^(α)` are defined as `σ^(α) / 2`.
 | `spinHalfOp1/2/3_commutator_*` | `[Ŝ^(α), Ŝ^(β)] = i · Ŝ^(γ)` (cyclic) |
 | `spinHalf_total_spin_squared` | `(Ŝ^(1))² + (Ŝ^(2))² + (Ŝ^(3))² = (3/4) · I` |
 
+### S = 1 matrix representations (`LatticeSystem/Quantum/SpinOne.lean`)
+
+Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, §2.1, eq. (2.1.9), p. 15. The `S = 1` spin operators are the
+`3 × 3` Hermitian matrices
+
+```
+Ŝ^(1) = (1/√2) !![0, 1, 0; 1, 0, 1; 0, 1, 0]
+Ŝ^(2) = (1/√2) !![0, -i, 0; i, 0, -i; 0, i, 0]
+Ŝ^(3) =         !![1, 0, 0; 0, 0, 0; 0, 0, -1]
+```
+
+| Lean name | Statement |
+|---|---|
+| `spinOneOp1/2/3` | definitions (Tasaki (2.1.9)) |
+| `spinOneOp1/2/3_isHermitian` | Hermiticity |
+| `spinOneOp1_commutator_spinOneOp2` etc. | `[Ŝ^(α), Ŝ^(β)] = i · Ŝ^(γ)` (cyclic, S = 1) |
+| `spinOne_total_spin_squared` | `(Ŝ^(1))² + (Ŝ^(2))² + (Ŝ^(3))² = 2 · I` |
+
 ### Basis states and raising/lowering operators (`LatticeSystem/Quantum/SpinHalfBasis.lean`)
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
@@ -126,7 +145,8 @@ with Tasaki's (3.3.1) up to these constants.
 | P1b | Finite-chain quantum Ising Hamiltonian, Hermiticity | Done |
 | P1c (Tasaki §2.1) | Spin-1/2 operators `Ŝ^(α)` and the commutator algebra | Done |
 | P1d (Tasaki §2.1 cont.) | Basis states `\|ψ^↑⟩, \|ψ^↓⟩`, raising/lowering `Ŝ^±` (S = 1/2) | Done |
-| P1d' (Tasaki §2.1 cont.) | S = 1 matrix representations, Problem 2.1.a | Not started |
+| P1d' (Tasaki §2.1 cont.) | S = 1 matrix representations (eq. (2.1.9)) | Done |
+| P1d'' (Tasaki §2.1 cont.) | Problem 2.1.a (operator polynomial basis), general `S ≥ 3/2` | Not started |
 | P1e (Tasaki §2.1 cont.) | Spin rotation operators `Û^(α)_θ` and their properties | Not started |
 | P1f (Tasaki §2.2) | General quantum spin systems on an abstract finite lattice | Not started |
 | P1g | Gibbs state `ρ = e^{-βH}/Z`, expectation `⟨O⟩_β = Tr(ρO)` | Not started |

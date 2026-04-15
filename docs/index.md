@@ -58,6 +58,18 @@ Systems*, §2.1 eqs. (2.1.1), (2.1.7), (2.1.8), pp. 13-15.
 | `spinHalfOp1_commutator_spinHalfOp2` etc. | `[Ŝ^(α), Ŝ^(β)] = i · Ŝ^(γ)` (Tasaki (2.1.1)) | `Quantum/SpinHalf.lean` |
 | `spinHalf_total_spin_squared` | `Σ (Ŝ^(α))² = (3/4) · I`, i.e. `S(S+1)` with `S=1/2` | `Quantum/SpinHalf.lean` |
 
+### S = 1 matrix representations (Tasaki §2.1 eq. (2.1.9))
+
+Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, §2.1 eq. (2.1.9), p. 15.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `spinOneOp1/2/3` | 3×3 matrix definitions (Tasaki (2.1.9)) | `Quantum/SpinOne.lean` |
+| `spinOneOp1/2/3_isHermitian` | Hermiticity | `Quantum/SpinOne.lean` |
+| `spinOneOp1_commutator_spinOneOp2` etc. | `[Ŝ^(α), Ŝ^(β)] = i · Ŝ^(γ)` (S = 1) | `Quantum/SpinOne.lean` |
+| `spinOne_total_spin_squared` | `Σ (Ŝ^(α))² = 2 · I`, i.e. `S(S+1)` with `S = 1` | `Quantum/SpinOne.lean` |
+
 ### Basis states and raising/lowering (Tasaki §2.1)
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
