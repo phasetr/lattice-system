@@ -30,11 +30,11 @@ open Matrix
 variable {N : ℕ}
 
 /-- Site-`i` `σ^z` operator on the `N + 1`-site many-body space. -/
-noncomputable def spinZ (N : ℕ) (i : Fin (N + 1)) : ManyBodyOp (N + 1) :=
+noncomputable def spinZ (N : ℕ) (i : Fin (N + 1)) : ManyBodyOp (Fin (N + 1)) :=
   onSite i pauliZ
 
 /-- Site-`i` `σ^x` operator on the `N + 1`-site many-body space. -/
-noncomputable def spinX (N : ℕ) (i : Fin (N + 1)) : ManyBodyOp (N + 1) :=
+noncomputable def spinX (N : ℕ) (i : Fin (N + 1)) : ManyBodyOp (Fin (N + 1)) :=
   onSite i pauliX
 
 /-- Each single-site `σ^z` operator is Hermitian. -/
@@ -66,7 +66,7 @@ theorem spinZ_mul_spinZ_succ_isHermitian (i : Fin N) :
 
 /-- The quantum Ising Hamiltonian on an open chain of `N + 1` sites. -/
 noncomputable def quantumIsingHamiltonian (N : ℕ) (J h : ℝ) :
-    ManyBodyOp (N + 1) :=
+    ManyBodyOp (Fin (N + 1)) :=
   (-(J : ℂ)) • ∑ i : Fin N, spinZ N i.castSucc * spinZ N i.succ
     + (-(h : ℂ)) • ∑ i : Fin (N + 1), spinX N i
 

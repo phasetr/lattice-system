@@ -9,13 +9,16 @@ import Mathlib.LinearAlgebra.Matrix.Hermitian
 # Multi-body operator space and site-embedded operators
 
 This module introduces the operator space on the many-body spin-1/2 Hilbert
-space of an `N`-site lattice, represented as matrices indexed by
-configurations `Fin N → Fin 2`.
+space of an arbitrary finite lattice `Λ`, represented as matrices indexed
+by configurations `Λ → Fin 2`. Following Tasaki *Physics and Mathematics
+of Quantum Many-Body Systems*, §2.2, p. 21, the lattice is any finite set
+`Λ` with decidable equality; specializing to `Λ = Fin N` recovers an
+`N`-site chain.
 
 The principal construction is the site-embedded operator
 
 ```
-onSite i A : ManyBodyOp N
+onSite i A : ManyBodyOp Λ
 ```
 
 which acts as a single-site operator `A : Matrix (Fin 2) (Fin 2) ℂ` on site
@@ -35,30 +38,30 @@ namespace LatticeSystem.Quantum
 
 open Matrix
 
-variable {N : ℕ}
+variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
-/-- The operator space on the `N`-site spin-1/2 many-body Hilbert space,
-represented as matrices indexed by computational-basis configurations
-`σ : Fin N → Fin 2`. -/
-abbrev ManyBodyOp (N : ℕ) : Type :=
-  Matrix (Fin N → Fin 2) (Fin N → Fin 2) ℂ
+/-- The operator space on the spin-1/2 many-body Hilbert space indexed by
+the lattice `Λ`, represented as matrices indexed by computational-basis
+configurations `σ : Λ → Fin 2`. -/
+abbrev ManyBodyOp (Λ : Type*) : Type _ :=
+  Matrix (Λ → Fin 2) (Λ → Fin 2) ℂ
 
 /-- The site-embedded operator `onSite i A` acts as `A` on site `i` and as
 the identity on every other site. Its matrix element is `A (σ' i) (σ i)`
 when `σ'` and `σ` agree at every site other than `i`, and `0` otherwise. -/
-def onSite (i : Fin N) (A : Matrix (Fin 2) (Fin 2) ℂ) : ManyBodyOp N :=
+def onSite (i : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) : ManyBodyOp Λ :=
   fun σ' σ => if (∀ k, k ≠ i → σ' k = σ k) then A (σ' i) (σ i) else 0
 
 /-- Unfolding the matrix element of `onSite i A`. -/
-theorem onSite_apply (i : Fin N) (A : Matrix (Fin 2) (Fin 2) ℂ)
-    (σ' σ : Fin N → Fin 2) :
+theorem onSite_apply (i : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ)
+    (σ' σ : Λ → Fin 2) :
     onSite i A σ' σ =
       if (∀ k, k ≠ i → σ' k = σ k) then A (σ' i) (σ i) else 0 := rfl
 
 /-! ## Hermiticity preservation -/
 
 /-- If `A` is Hermitian, so is its site embedding `onSite i A`. -/
-theorem onSite_isHermitian (i : Fin N) {A : Matrix (Fin 2) (Fin 2) ℂ}
+theorem onSite_isHermitian (i : Λ) {A : Matrix (Fin 2) (Fin 2) ℂ}
     (hA : A.IsHermitian) : (onSite i A).IsHermitian := by
   ext σ σ'
   simp only [Matrix.conjTranspose_apply, onSite_apply]
@@ -76,24 +79,27 @@ theorem onSite_isHermitian (i : Fin N) {A : Matrix (Fin 2) (Fin 2) ℂ}
 /-- The unique configuration `τ` that contributes to
 `(onSite i A * onSite j B) σ' σ` as a function of `σ'`, `σ`, `j`: on site
 `j` it takes the value `σ' j`, and elsewhere it equals `σ`. -/
-private def pivotLeft (σ' σ : Fin N → Fin 2) (j : Fin N) : Fin N → Fin 2 :=
+private def pivotLeft (σ' σ : Λ → Fin 2) (j : Λ) : Λ → Fin 2 :=
   Function.update σ j (σ' j)
 
-private lemma pivotLeft_at_i_of_ne {i j : Fin N} (hij : i ≠ j)
-    (σ' σ : Fin N → Fin 2) : pivotLeft σ' σ j i = σ i := by
+omit [Fintype Λ] in
+private lemma pivotLeft_at_i_of_ne {i j : Λ} (hij : i ≠ j)
+    (σ' σ : Λ → Fin 2) : pivotLeft σ' σ j i = σ i := by
   rw [pivotLeft, Function.update_of_ne hij]
 
-private lemma pivotLeft_at_j (σ' σ : Fin N → Fin 2) (j : Fin N) :
+omit [Fintype Λ] in
+private lemma pivotLeft_at_j (σ' σ : Λ → Fin 2) (j : Λ) :
     pivotLeft σ' σ j j = σ' j := by
   rw [pivotLeft, Function.update_self]
 
-private lemma pivotLeft_off_j {j k : Fin N} (hk : k ≠ j)
-    (σ' σ : Fin N → Fin 2) :
+omit [Fintype Λ] in
+private lemma pivotLeft_off_j {j k : Λ} (hk : k ≠ j)
+    (σ' σ : Λ → Fin 2) :
     pivotLeft σ' σ j k = σ k := by
   rw [pivotLeft, Function.update_of_ne hk]
 
-private lemma onSite_mul_onSite_apply_of_ne_aux {i j : Fin N} (hij : i ≠ j)
-    (A B : Matrix (Fin 2) (Fin 2) ℂ) (σ' σ : Fin N → Fin 2) :
+private lemma onSite_mul_onSite_apply_of_ne_aux {i j : Λ} (hij : i ≠ j)
+    (A B : Matrix (Fin 2) (Fin 2) ℂ) (σ' σ : Λ → Fin 2) :
     (onSite i A * onSite j B) σ' σ =
       onSite i A σ' (pivotLeft σ' σ j) * onSite j B (pivotLeft σ' σ j) σ := by
   rw [Matrix.mul_apply]
@@ -121,8 +127,8 @@ private lemma onSite_mul_onSite_apply_of_ne_aux {i j : Fin N} (hij : i ≠ j)
       exact hτj (hall j hij.symm).symm
     rw [if_neg hnotall, zero_mul]
 
-private lemma onSite_mul_onSite_value_of_agree {i j : Fin N} (hij : i ≠ j)
-    (A B : Matrix (Fin 2) (Fin 2) ℂ) {σ' σ : Fin N → Fin 2}
+private lemma onSite_mul_onSite_value_of_agree {i j : Λ} (hij : i ≠ j)
+    (A B : Matrix (Fin 2) (Fin 2) ℂ) {σ' σ : Λ → Fin 2}
     (hagree : ∀ k, k ≠ i → k ≠ j → σ' k = σ k) :
     onSite i A σ' (pivotLeft σ' σ j) * onSite j B (pivotLeft σ' σ j) σ =
       A (σ' i) (σ i) * B (σ' j) (σ j) := by
@@ -137,8 +143,8 @@ private lemma onSite_mul_onSite_value_of_agree {i j : Fin N} (hij : i ≠ j)
     · rw [pivotLeft_off_j hkj]
       exact hagree k hki hkj
 
-private lemma onSite_mul_onSite_value_of_disagree {i j : Fin N}
-    (A B : Matrix (Fin 2) (Fin 2) ℂ) {σ' σ : Fin N → Fin 2}
+private lemma onSite_mul_onSite_value_of_disagree {i j : Λ}
+    (A B : Matrix (Fin 2) (Fin 2) ℂ) {σ' σ : Λ → Fin 2}
     (hdis : ¬ ∀ k, k ≠ i → k ≠ j → σ' k = σ k) :
     onSite i A σ' (pivotLeft σ' σ j) * onSite j B (pivotLeft σ' σ j) σ = 0 := by
   simp only [onSite_apply]
@@ -151,8 +157,8 @@ private lemma onSite_mul_onSite_value_of_disagree {i j : Fin N}
     rwa [pivotLeft_off_j hkj] at this
 
 /-- The matrix element `(onSite i A * onSite j B) σ' σ` when `i ≠ j`. -/
-private lemma onSite_mul_onSite_apply_of_ne {i j : Fin N} (hij : i ≠ j)
-    (A B : Matrix (Fin 2) (Fin 2) ℂ) (σ' σ : Fin N → Fin 2) :
+private lemma onSite_mul_onSite_apply_of_ne {i j : Λ} (hij : i ≠ j)
+    (A B : Matrix (Fin 2) (Fin 2) ℂ) (σ' σ : Λ → Fin 2) :
     (onSite i A * onSite j B) σ' σ =
       if ∀ k, k ≠ i → k ≠ j → σ' k = σ k then
         A (σ' i) (σ i) * B (σ' j) (σ j)
@@ -165,9 +171,9 @@ private lemma onSite_mul_onSite_apply_of_ne {i j : Fin N} (hij : i ≠ j)
     exact onSite_mul_onSite_value_of_disagree A B h
 
 /-- Operators embedded at distinct sites commute. -/
-theorem onSite_mul_onSite_of_ne {i j : Fin N} (hij : i ≠ j)
+theorem onSite_mul_onSite_of_ne {i j : Λ} (hij : i ≠ j)
     (A B : Matrix (Fin 2) (Fin 2) ℂ) :
-    onSite i A * onSite j B = onSite j B * onSite i A := by
+    (onSite i A * onSite j B : ManyBodyOp Λ) = onSite j B * onSite i A := by
   ext σ' σ
   rw [onSite_mul_onSite_apply_of_ne hij, onSite_mul_onSite_apply_of_ne hij.symm]
   have hcond :
