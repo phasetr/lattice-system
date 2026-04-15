@@ -58,6 +58,19 @@ Systems*, §2.1 eqs. (2.1.1), (2.1.7), (2.1.8), pp. 13-15.
 | `spinHalfOp1_commutator_spinHalfOp2` etc. | `[Ŝ^(α), Ŝ^(β)] = i · Ŝ^(γ)` (Tasaki (2.1.1)) | `Quantum/SpinHalf.lean` |
 | `spinHalf_total_spin_squared` | `Σ (Ŝ^(α))² = (3/4) · I`, i.e. `S(S+1)` with `S=1/2` | `Quantum/SpinHalf.lean` |
 
+### Spin-1/2 rotation operators (Tasaki §2.1 eq. (2.1.26))
+
+Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, §2.1 eq. (2.1.26), p. 17 (closed form) and eq. (2.1.23),
+p. 16 (`Û_{2π} = -1` for half-odd-integer spin).
+
+| Lean name | Statement | File |
+|---|---|---|
+| `spinHalfRot1/2/3` | `Û^(α)_θ := cos(θ/2) · 1 - 2i · sin(θ/2) · Ŝ^(α)` | `Quantum/SpinHalfRotation.lean` |
+| `spinHalfRot1/2/3_zero` | `Û^(α)_0 = 1` | `Quantum/SpinHalfRotation.lean` |
+| `spinHalfRot1/2/3_adjoint` | `(Û^(α)_θ)† = Û^(α)_{-θ}` | `Quantum/SpinHalfRotation.lean` |
+| `spinHalfRot1/2/3_two_pi` | `Û^(α)_{2π} = -1` (Tasaki eq. (2.1.23)) | `Quantum/SpinHalfRotation.lean` |
+
 ### Pauli-basis decomposition (Tasaki §2.1 Problem 2.1.a, S = 1/2)
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
