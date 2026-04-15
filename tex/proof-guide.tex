@@ -1,0 +1,350 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{hyperref}
+\usepackage[hmargin=2cm]{geometry}
+\usepackage{fvextra}
+\DefineVerbatimEnvironment{Verbatim}{Verbatim}{breaklines,fontsize=\small}
+\fvset{breaklines}
+
+\usepackage{microtype}
+\emergencystretch=3em
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{lattice-system Formalization: \\
+       A Mathematical Guide to the Lean 4 Code}
+\author{lattice-system project}
+\date{2026-04-15}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This document is a guide to reading the Lean~4 source code of the
+\texttt{lattice-system} project. The project generalizes the earlier
+\texttt{ising-model} project toward a broad class of lattice models
+(classical spin systems, quantum spin systems, Hubbard, BCS,
+CAR-algebraic, and eventually lattice QCD). The current scope is
+\emph{finite-volume quantum spin systems}. This guide explains which
+file contains what, which textbook material each formalization
+corresponds to, and what is and is not yet proved.
+\end{abstract}
+
+\tableofcontents
+
+%======================================================================
+\section{How to read this codebase}
+%======================================================================
+
+\subsection{File dependency graph}
+
+Read the files in this order. Each file imports only the files above it.
+
+\begin{Verbatim}
+LatticeSystem/
+  Basic.lean              -- placeholder for shared infrastructure
+  Quantum/
+    Pauli.lean            -- single-site Pauli matrices, basic relations
+    ManyBody.lean         -- multi-site operator space, onSite embedding,
+                             commutativity at distinct sites
+    IsingChain.lean       -- 1D open-chain quantum Ising Hamiltonian
+\end{Verbatim}
+
+\subsection{Textbook correspondence}
+
+Each module lists its primary textbook reference in its header and in
+the per-module sections below. The references assembled for the project
+overall are listed in Section~\ref{sec:refs}.
+
+%======================================================================
+\section{Single-site Pauli operators}
+\label{sec:pauli}
+%======================================================================
+
+\emph{Source file:} \texttt{LatticeSystem/Quantum/Pauli.lean}.
+
+\subsection{Definitions}
+
+\begin{definition}[Pauli matrices]
+The Pauli matrices are defined as elements of
+$\operatorname{Matrix}(\mathrm{Fin}\,2, \mathrm{Fin}\,2, \mathbb{C})$ by
+\[
+  \sigma^x = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix},\quad
+  \sigma^y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix},\quad
+  \sigma^z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}.
+\]
+Lean names: \texttt{pauliX}, \texttt{pauliY}, \texttt{pauliZ}.
+\end{definition}
+
+\subsection{Formalized facts}
+
+\begin{lemma}[\texttt{pauliX\_isHermitian}, \texttt{pauliY\_isHermitian},
+\texttt{pauliZ\_isHermitian}]
+Each Pauli matrix is Hermitian: $(\sigma^\alpha)^\dagger = \sigma^\alpha$
+for $\alpha \in \{x, y, z\}$.
+\end{lemma}
+
+\begin{lemma}[\texttt{pauliX\_mul\_self}, \texttt{pauliY\_mul\_self},
+\texttt{pauliZ\_mul\_self}]
+Each Pauli matrix squares to the identity: $(\sigma^\alpha)^2 = I$.
+\end{lemma}
+
+\begin{lemma}[\texttt{pauliX\_mul\_pauliY}, \texttt{pauliY\_mul\_pauliZ},
+\texttt{pauliZ\_mul\_pauliX}]
+The cyclic Pauli products hold:
+\[
+  \sigma^x \sigma^y = i \sigma^z,\quad
+  \sigma^y \sigma^z = i \sigma^x,\quad
+  \sigma^z \sigma^x = i \sigma^y.
+\]
+\end{lemma}
+
+\begin{lemma}[\texttt{pauliX\_anticomm\_pauliY},
+\texttt{pauliY\_anticomm\_pauliZ}, \texttt{pauliZ\_anticomm\_pauliX}]
+Distinct Pauli matrices anticommute:
+$\sigma^\alpha \sigma^\beta + \sigma^\beta \sigma^\alpha = 0$
+for $\alpha \neq \beta$.
+\end{lemma}
+
+\paragraph{Proof technique.}
+All four families are proved by \texttt{ext} on the matrix entries
+followed by \texttt{fin\_cases} on each row/column index and
+\texttt{simp} with the definitions.
+
+\paragraph{References.}
+These identities are classical and appear in every standard quantum
+mechanics textbook. Within the references assembled for this project,
+the most directly relevant treatment of spin-$\tfrac{1}{2}$ operators
+is Tasaki~\cite{Tasaki:QMB} (chapter on quantum spin systems). For a
+cross-check of Pauli relations \textit{per se} we used
+Nielsen--Chuang~\cite{NielsenChuang}, §2.1.3.
+
+%======================================================================
+\section{Multi-body operator space and site embedding}
+\label{sec:manybody}
+%======================================================================
+
+\emph{Source file:} \texttt{LatticeSystem/Quantum/ManyBody.lean}.
+
+\subsection{Definitions}
+
+\begin{definition}[Many-body operator space]
+For an $N$-site lattice, the many-body operator space is
+\[
+  \texttt{ManyBodyOp}\,N
+    := \operatorname{Matrix}\bigl(
+      (\mathrm{Fin}\,N \to \mathrm{Fin}\,2),\;
+      (\mathrm{Fin}\,N \to \mathrm{Fin}\,2),\;
+      \mathbb{C}\bigr).
+\]
+Equivalently, this is the space of operators on $\mathbb{C}^{2^N}$
+indexed by the computational-basis configurations
+$\sigma : \mathrm{Fin}\,N \to \mathrm{Fin}\,2$.
+\end{definition}
+
+\begin{definition}[Site-embedded operator]
+For $i \in \mathrm{Fin}\,N$ and
+$A \in \operatorname{Matrix}(\mathrm{Fin}\,2, \mathrm{Fin}\,2, \mathbb{C})$,
+define $\texttt{onSite}\,i\,A \in \texttt{ManyBodyOp}\,N$ by
+\[
+  (\texttt{onSite}\,i\,A)_{\sigma',\sigma}
+    = \begin{cases}
+        A_{\sigma'(i),\sigma(i)} & \text{if } \sigma'(k) = \sigma(k)
+          \text{ for every } k \neq i, \\
+        0 & \text{otherwise.}
+      \end{cases}
+\]
+\end{definition}
+
+\subsection{Formalized facts}
+
+\begin{lemma}[\texttt{onSite\_isHermitian}]
+If $A$ is Hermitian, so is $\texttt{onSite}\,i\,A$.
+\end{lemma}
+
+\begin{lemma}[\texttt{onSite\_mul\_onSite\_of\_ne}]
+For $i \neq j$ and any single-site $A$, $B$,
+\[
+  (\texttt{onSite}\,i\,A)(\texttt{onSite}\,j\,B)
+    = (\texttt{onSite}\,j\,B)(\texttt{onSite}\,i\,A).
+\]
+\end{lemma}
+
+\begin{lemma}[\texttt{Matrix.IsHermitian.mul\_of\_commute}]
+If $A$, $B$ are Hermitian matrices with $AB = BA$, then $AB$ is
+Hermitian.
+\end{lemma}
+
+\paragraph{Proof technique.}
+The site-commutativity proof is the technical core. Expanding the
+matrix product gives
+\[
+  \bigl((\texttt{onSite}\,i\,A)(\texttt{onSite}\,j\,B)\bigr)_{\sigma',\sigma}
+    = \sum_\tau
+      (\texttt{onSite}\,i\,A)_{\sigma',\tau}\,
+      (\texttt{onSite}\,j\,B)_{\tau,\sigma}.
+\]
+Since $i \neq j$, at most one $\tau$ makes both factors nonzero:
+$\tau = \mathrm{Function.update}\,\sigma\,j\,(\sigma'(j))$, i.e.,
+$\tau(j) = \sigma'(j)$ and $\tau(k) = \sigma(k)$ otherwise. The proof
+isolates this pivot by \texttt{Fintype.sum\_eq\_single} and shows all
+other $\tau$ kill at least one factor. A matching computation for the
+swapped ordering, combined with the commutativity of~$\mathbb{C}$,
+yields the equality.
+
+\paragraph{References.}
+The matrix-level formulation we use (configuration-indexed matrices on
+$\mathbb{C}^{\mathrm{Fin}\,N \to \mathrm{Fin}\,2}$) is a standard
+computational-basis setup; see Tasaki~\cite{Tasaki:QMB}, chapter on
+spin chains, for the physical interpretation.
+
+%======================================================================
+\section{Quantum Ising chain on an open boundary}
+\label{sec:ising}
+%======================================================================
+
+\emph{Source file:} \texttt{LatticeSystem/Quantum/IsingChain.lean}.
+
+\subsection{Definition}
+
+\begin{definition}[Open-chain quantum Ising Hamiltonian]
+Let $N \in \mathbb{N}$, $J \in \mathbb{R}$, and $h \in \mathbb{R}$.
+On the $(N+1)$-site lattice, define
+\[
+  H_{J,h}^{N+1}
+    = -J \sum_{i=0}^{N-1} \sigma^z_i \sigma^z_{i+1}
+      - h \sum_{i=0}^{N} \sigma^x_i,
+\]
+where $\sigma^\alpha_i := \texttt{onSite}\,i\,\sigma^\alpha$. The
+coupling sum is indexed by $i \in \mathrm{Fin}\,N$ with
+$i \mapsto (\texttt{castSucc}\,i, \texttt{succ}\,i)$, so it is empty
+when $N = 0$ (one-site system) and yields the usual $N$ coupling terms
+on an $(N+1)$-site open chain otherwise. Lean name:
+\texttt{quantumIsingHamiltonian}.
+\end{definition}
+
+\subsection{Formalized fact}
+
+\begin{theorem}[\texttt{quantumIsingHamiltonian\_isHermitian}]
+For any $N \in \mathbb{N}$ and real $J$, $h$, the Hamiltonian
+$H_{J,h}^{N+1}$ is Hermitian.
+\end{theorem}
+
+\paragraph{Proof technique.}
+The bond term $\sigma^z_i \sigma^z_{i+1}$ is a product of two Hermitian
+operators at distinct sites (via
+\texttt{castSucc\_ne\_succ}), which commute by
+\texttt{onSite\_mul\_onSite\_of\_ne} and whose product is then
+Hermitian by \texttt{Matrix.IsHermitian.mul\_of\_commute}.
+The field term $\sigma^x_i$ is Hermitian by
+\texttt{onSite\_isHermitian}. Hermiticity is closed under finite sums
+(local helper \texttt{isHermitian\_sum}) and under real scalar
+multiplication (local helper \texttt{isHermitian\_smul\_real} using
+$\overline{c} = c$ for $c \in \mathbb{R}$).
+
+\paragraph{References.}
+The 1D transverse-field Ising chain is a textbook example of an
+interacting quantum spin system; see
+Tasaki~\cite{Tasaki:QMB}, chapter on spin chains.
+
+%======================================================================
+\section{Progress table}
+\label{sec:progress}
+%======================================================================
+
+The table below tracks the status of each planned area. Entries are
+updated when a formalization completes, via the project workflow.
+
+\begin{center}
+\begin{tabular}{lll}
+\hline
+Area & Stage & Status \\
+\hline
+Pauli matrices and their algebra & finite-dim & \emph{formalized} \\
+Multi-body operator space / \texttt{onSite} & finite-dim & \emph{formalized} \\
+Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
+1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\
+Gibbs state $\rho = e^{-\beta H}/Z$ & finite-dim & not started \\
+Expectation $\langle O\rangle_\beta = \operatorname{Tr}(\rho O)$ & finite-dim & not started \\
+Periodic boundary conditions & finite-dim & not started \\
+Quantum Heisenberg chain & finite-dim & not started \\
+Partial trace & finite-dim & not started \\
+Quantum canonical ensemble wrapper & finite-dim & not started \\
+Hubbard model, finite volume & finite-dim & not started \\
+BCS model (mean field) & finite-dim & not started \\
+CAR algebra & algebraic & not started \\
+Quasi-local C*-algebras, KMS states & algebraic & not started \\
+Thermodynamic limit, phase transitions & infinite & not started \\
+Lattice QCD & survey & not started \\
+\hline
+\end{tabular}
+\end{center}
+
+%======================================================================
+\section{References}
+\label{sec:refs}
+%======================================================================
+
+\begin{thebibliography}{10}
+
+\bibitem{Tasaki:QMB}
+H.~Tasaki.
+\emph{Physics and Mathematics of Quantum Many-Body Systems}.
+Springer, 2020. Primary reference for quantum spin systems and spin
+chains in this project.
+
+\bibitem{NielsenChuang}
+M.~A.~Nielsen and I.~L.~Chuang.
+\emph{Quantum Computation and Quantum Information}, 10th Anniversary
+Edition. Cambridge University Press, 2010. Used as a cross-check for
+the standard Pauli relations (§2.1.3).
+
+\bibitem{FriedliVelenik}
+S.~Friedli and Y.~Velenik.
+\emph{Statistical Mechanics of Lattice Systems: A Concrete
+Mathematical Introduction}. Cambridge University Press, 2017.
+Reference for classical lattice models; not yet used at the current
+stage.
+
+\bibitem{GlimmJaffe}
+J.~Glimm and A.~Jaffe.
+\emph{Quantum Physics: A Functional Integral Point of View}. Springer,
+1987. Reference for constructive field theory; not yet used at the
+current stage.
+
+\bibitem{ArakiMoriya}
+H.~Araki and H.~Moriya.
+\emph{Equilibrium Statistical Mechanics of Fermion Lattice Systems}.
+Reviews in Mathematical Physics, 2003. Planned reference for the
+CAR-algebra stage; not yet used.
+
+\bibitem{BruPedra}
+J.-B.~Bru and W.~de~Siqueira~Pedra.
+\emph{C*-Algebras and Mathematical Foundations of Quantum Statistical
+Mechanics: An Introduction}. Planned reference for the algebraic
+stage; not yet used.
+
+\bibitem{Simon:LGI}
+B.~Simon.
+\emph{The Statistical Mechanics of Lattice Gases, Volume~I}. Princeton
+University Press, 1993. Reference for classical lattice gases; not yet
+used at the current stage.
+
+\end{thebibliography}
+
+\begin{remark}
+The bibliography lists every reference named in either
+\texttt{CLAUDE.local.md} (local planning notes) or this guide. Entries
+labelled \emph{not yet used} are retained so that future work can cite
+them without re-establishing the bibliography; the current code uses
+only the entries explicitly referenced above.
+\end{remark}
+
+\end{document}
