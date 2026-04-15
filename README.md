@@ -1,213 +1,81 @@
 # lattice-system
 
-A Lean 4 + Mathlib formalization project targeting general lattice models.
+A Lean 4 + mathlib project for formalizing theorems about general
+lattice models. The project subsumes and generalizes the earlier
+[ising-model](https://github.com/phasetr/ising-model) project, with
+the current focus on finite-volume quantum spin systems and the
+longer-term goal of covering Hubbard / BCS, CAR-algebraic fermion
+lattice systems, and eventually lattice QCD.
 
-This project subsumes and generalizes the earlier
-[ising-model](https://github.com/phasetr/ising-model) project, with the
-following scope progressively covered.
+## About this project
 
-## Scope
+This repository is written by a programmer without an academic
+position, whose interests lie in non-relativistic quantum field theory
+and rigorous statistical mechanics. Continuing a long-standing interest
+in mathematical physics from my student days, and combined with the
+goal of improving my technical skills as a programmer, I maintain
+`lattice-system` as a personal hobby project to become proficient in
+Lean 4 by formalizing results around lattice models.
 
-| Area | Stage | Typical references |
-|---|---|---|
-| Classical spin systems (Ising etc.) | Inherited from ising-model | Friedli-Velenik, Glimm-Jaffe |
-| Quantum spin systems | Current focus | Tasaki, Nielsen-Chuang (cross-check) |
-| Hubbard / BCS | Medium term | Tasaki 1998, Bru-Pedra, Kashima |
-| CAR-algebraic formulation | Medium-long term | Araki-Moriya 2003, Bru-Pedra |
-| Thermodynamic limit, phase transitions | Long term | Simon, Friedli-Velenik |
-| Lattice QCD | Longest term | Aarts, Davies |
+The intended scope is finite-volume results in the first instance and,
+more gradually, the infinite-volume / algebraic formulations described
+in the project page. This project is not intended to interfere with
+the work of researchers in the field, and if any overlap arises I am
+happy to coordinate accordingly.
 
-## Project status
+## Formalization status
 
-Initial formalization is under way. The current focus is finite-volume
-quantum spin systems. A survey of Mathlib's support for this domain has
-been completed (kept locally in the author's planning notes). A
-Mathlib-style mathematical guide to the formalized code is maintained
-in [`tex/proof-guide.tex`](tex/proof-guide.tex).
+All theorems are formally proved with **zero `sorry`**.
 
-CI: Lean Action CI + docgen-action + Jekyll Pages.
+For the complete list of formalized theorems, the phase-by-phase
+progress table, and the primary textbook references used at each step,
+see the
+**[project page](https://phasetr.github.io/lattice-system/)**.
 
 ## Documentation
 
-- Project page: https://phasetr.github.io/lattice-system/
-- API documentation (doc-gen4): https://phasetr.github.io/lattice-system/docs/
-- Mathematical guide to the code: [`tex/proof-guide.tex`](tex/proof-guide.tex)
+- Project page: [https://phasetr.github.io/lattice-system/](https://phasetr.github.io/lattice-system/)
+- API documentation (doc-gen4): [https://phasetr.github.io/lattice-system/docs/](https://phasetr.github.io/lattice-system/docs/)
 
-## Formalized theorems
+Mathematical documentation for the formalized proofs is in `tex/` as
+LaTeX source files. To compile:
 
-All items below are formally proved with **zero `sorry`**. For the full
-mathematical statement of each, see [`tex/proof-guide.tex`](tex/proof-guide.tex).
-
-### Single-site Pauli operators (`LatticeSystem/Quantum/Pauli.lean`)
-
-Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, §2.1, eq. (2.1.8), p. 15. Cross-checked with Nielsen-Chuang
-*Quantum Computation and Quantum Information*, §2.1.3 Figure 2.2
-(pp. 65-66) for the definitions, Ex. 2.19 (p. 70) for Hermiticity,
-Ex. 2.41 (p. 78) for `(σ^α)² = I` and anticommutation, and Ex. 2.40
-(p. 77) for the commutator (which, combined with the anticommutator,
-gives the cyclic products).
-
-| Lean name | Statement |
-|---|---|
-| `pauliX_isHermitian`, `pauliY_isHermitian`, `pauliZ_isHermitian` | `(σ^α)† = σ^α` for `α ∈ {x, y, z}` |
-| `pauliX_mul_self`, `pauliY_mul_self`, `pauliZ_mul_self` | `(σ^α)² = I` |
-| `pauliX_mul_pauliY`, `pauliY_mul_pauliZ`, `pauliZ_mul_pauliX` | `σ^x σ^y = i·σ^z`, cyclic |
-| `pauliX_anticomm_pauliY`, `pauliY_anticomm_pauliZ`, `pauliZ_anticomm_pauliX` | `σ^α σ^β + σ^β σ^α = 0` for `α ≠ β` |
-
-### Spin-1/2 operators (`LatticeSystem/Quantum/SpinHalf.lean`)
-
-Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, §2.1, eqs. (2.1.1), (2.1.7), (2.1.8), pp. 13-15. The S = 1/2
-spin operators `Ŝ^(α)` are defined as `σ^(α) / 2`.
-
-| Lean name | Statement |
-|---|---|
-| `spinHalfOp1`, `spinHalfOp2`, `spinHalfOp3` | definitions (Tasaki (2.1.7)) |
-| `pauliX/Y/Z_eq_two_smul_spinHalfOp1/2/3` | `σ^(α) = 2 · Ŝ^(α)` (Tasaki (2.1.8)) |
-| `spinHalfOp1/2/3_isHermitian` | Hermiticity |
-| `spinHalfOp1/2/3_mul_self` | `(Ŝ^(α))² = (1/4) · I` |
-| `spinHalfOp1/2/3_anticomm_*` | `Ŝ^(α) Ŝ^(β) + Ŝ^(β) Ŝ^(α) = 0` (α ≠ β) |
-| `spinHalfOp1/2/3_commutator_*` | `[Ŝ^(α), Ŝ^(β)] = i · Ŝ^(γ)` (cyclic) |
-| `spinHalf_total_spin_squared` | `(Ŝ^(1))² + (Ŝ^(2))² + (Ŝ^(3))² = (3/4) · I` |
-| `spinHalfOp1_mul_spinHalfOp2` (and cyclic) | `Ŝ^(α) · Ŝ^(β) = (i/2) · Ŝ^(γ)` |
-
-### Spin-1/2 rotation operators (`LatticeSystem/Quantum/SpinHalfRotation.lean`)
-
-Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, §2.1, eq. (2.1.26), p. 17 (closed form) and eq. (2.1.23),
-p. 16 (the `Û^(α)_{2π} = -1` identity for half-odd-integer spin).
-
-Definition: `Û^(α)_θ := cos(θ/2) · 1 - 2i · sin(θ/2) · Ŝ^(α)`.
-
-| Lean name | Statement |
-|---|---|
-| `spinHalfRot1/2/3 (θ)` | closed-form rotation operators |
-| `spinHalfRot1/2/3_zero` | `Û^(α)_0 = 1` |
-| `spinHalfRot1/2/3_adjoint` | `(Û^(α)_θ)† = Û^(α)_{-θ}` |
-| `spinHalfRot1/2/3_two_pi` | `Û^(α)_{2π} = -1` (Tasaki eq. (2.1.23)) |
-| `spinHalfRot1/2/3_mul` | group law `Û^(α)_θ · Û^(α)_φ = Û^(α)_{θ+φ}` |
-| `spinHalfRot1/2/3_unitary` | unitarity `Û^(α)_θ · (Û^(α)_θ)† = 1` |
-| `spinHalfRot1/2/3_pi` | `Û^(α)_π = -2i · Ŝ^(α)` |
-| `spinHalfRot1/2/3_pi_sq` | `(Û^(α)_π)² = -1` |
-| `spinHalfRot1_pi_anticomm_spinHalfRot2_pi` etc. | `Û^(α)_π · Û^(β)_π + Û^(β)_π · Û^(α)_π = 0` for `α ≠ β` (Tasaki eq. (2.1.25), S=1/2) |
-| `spinHalfRot1/2/3_pi_conjTranspose` | `(Û^(α)_π)† = 2i · Ŝ^(α)` |
-| `spinHalfRot1_pi_mul_spinHalfRot2_pi` etc. | `Û^(α)_π · Û^(β)_π = Û^(γ)_π` (Tasaki eq. (2.1.29), S=1/2) |
-| `spinHalfRot1/2/3_pi_conj_spinHalfOp1/2/3` | `(Û^(α)_π)† · Ŝ^(α) · Û^(α)_π = Ŝ^(α)` (invariance of rotation axis, Tasaki eq. (2.1.15) at θ=π) |
-| `spinHalfRot_pi_conj_spinHalfOp` off-axis (6 theorems) | `(Û^(α)_π)† · Ŝ^(β) · Û^(α)_π = -Ŝ^(β)` for `α ≠ β` (Tasaki eq. (2.1.21) at θ=π) |
-
-Equivalence with the matrix exponential `Û^(α)_θ = exp(-iθŜ^(α))` via
-Mathlib's `Matrix.exp` is deferred to a follow-up PR.
-
-### Pauli-basis decomposition of 2×2 matrices (`LatticeSystem/Quantum/SpinHalfDecomp.lean`)
-
-Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, §2.1, Problem 2.1.a, p. 15. The `S = 1/2` case: every 2×2
-complex matrix is a ℂ-linear combination of `{1, σ^x, σ^y, σ^z}`, and
-these four matrices are linearly independent.
-
-| Lean name | Statement |
-|---|---|
-| `pauliCoeff0/1/2/3` | explicit coefficient functions |
-| `pauli_decomposition` | `A = c₀ · 1 + c₁ · σ^x + c₂ · σ^y + c₃ · σ^z` |
-| `spinHalf_decomposition` | same via `Ŝ^(α) = σ^(α) / 2` |
-| `pauli_linearIndep` | `{1, σ^x, σ^y, σ^z}` is linearly independent |
-
-### S = 1 matrix representations (`LatticeSystem/Quantum/SpinOne.lean`)
-
-Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, §2.1, eq. (2.1.9), p. 15. The `S = 1` spin operators are the
-`3 × 3` Hermitian matrices
-
-```
-Ŝ^(1) = (1/√2) !![0, 1, 0; 1, 0, 1; 0, 1, 0]
-Ŝ^(2) = (1/√2) !![0, -i, 0; i, 0, -i; 0, i, 0]
-Ŝ^(3) =         !![1, 0, 0; 0, 0, 0; 0, 0, -1]
+```sh
+cd tex
+latexmk -lualatex -f -interaction=nonstopmode proof-guide.tex
 ```
 
-| Lean name | Statement |
-|---|---|
-| `spinOneOp1/2/3` | definitions (Tasaki (2.1.9)) |
-| `spinOneOp1/2/3_isHermitian` | Hermiticity |
-| `spinOneOp1_commutator_spinOneOp2` etc. | `[Ŝ^(α), Ŝ^(β)] = i · Ŝ^(γ)` (cyclic, S = 1) |
-| `spinOne_total_spin_squared` | `(Ŝ^(1))² + (Ŝ^(2))² + (Ŝ^(3))² = 2 · I` |
+Requires a TeX Live installation with LuaLaTeX. PDFs are not committed
+to the repository.
 
-### Basis states and raising/lowering operators (`LatticeSystem/Quantum/SpinHalfBasis.lean`)
+| File                  | Description                                       |
+|-----------------------|---------------------------------------------------|
+| `tex/proof-guide.tex` | Mathematical walkthrough of the formalized proofs |
 
-Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, §2.1, eqs. (2.1.4), (2.1.5), (2.1.6), p. 14.
+## Related projects and references
 
-| Lean name | Statement |
-|---|---|
-| `spinHalfUp`, `spinHalfDown` | basis column vectors `\|ψ^↑⟩`, `\|ψ^↓⟩` (Tasaki (2.1.6)) |
-| `spinHalfOp3_mulVec_spinHalfUp` | `Ŝ^(3) \|ψ^↑⟩ = (1/2) \|ψ^↑⟩` (Tasaki (2.1.4)) |
-| `spinHalfOp3_mulVec_spinHalfDown` | `Ŝ^(3) \|ψ^↓⟩ = -(1/2) \|ψ^↓⟩` |
-| `spinHalfOpPlus`, `spinHalfOpMinus` | raising/lowering operators `Ŝ^±` |
-| `spinHalfOpPlus_eq_add` | `Ŝ^+ = Ŝ^(1) + i · Ŝ^(2)` |
-| `spinHalfOpMinus_eq_sub` | `Ŝ^- = Ŝ^(1) - i · Ŝ^(2)` |
-| `spinHalfOpPlus_mulVec_spinHalfUp` | `Ŝ^+ \|ψ^↑⟩ = 0` (Tasaki (2.1.5)) |
-| `spinHalfOpMinus_mulVec_spinHalfUp` | `Ŝ^- \|ψ^↑⟩ = \|ψ^↓⟩` |
-| `spinHalfOpPlus_mulVec_spinHalfDown` | `Ŝ^+ \|ψ^↓⟩ = \|ψ^↑⟩` |
-| `spinHalfOpMinus_mulVec_spinHalfDown` | `Ŝ^- \|ψ^↓⟩ = 0` |
+- Tasaki, H., *Physics and Mathematics of Quantum Many-Body Systems* — [Springer](https://link.springer.com/book/10.1007/978-3-030-41265-4)
+- Nielsen, M. A. and Chuang, I. L., *Quantum Computation and Quantum Information* — [Cambridge UP](https://www.cambridge.org/highereducation/books/quantum-computation-and-quantum-information/01E10196D0A682A6AEFFEA52D53BE9AE)
+- Araki, H. and Moriya, H., *Equilibrium Statistical Mechanics of Fermion Lattice Systems*, Rev. Math. Phys. 15 (2003), 93-198 — [World Scientific](https://www.worldscientific.com/doi/10.1142/S0129055X03001606)
+- Bru, J.-B. and de Siqueira Pedra, W., *C\*-Algebras and Mathematical Foundations of Quantum Statistical Mechanics: An Introduction* — [Springer](https://link.springer.com/book/10.1007/978-3-031-28949-1)
+- Tasaki, H., *From Nagaoka's Ferromagnetism to Flat-Band Ferromagnetism and Beyond* (1998) — [arXiv:cond-mat/9712219](https://arxiv.org/abs/cond-mat/9712219)
+- Simon, B., *The Statistical Mechanics of Lattice Gases, Vol. I* — [Princeton UP](https://press.princeton.edu/books/hardcover/9780691636436/the-statistical-mechanics-of-lattice-gases-volume-i)
+- Friedli, S. and Velenik, Y., *Statistical Mechanics of Lattice Systems: A Concrete Mathematical Introduction* — [Cambridge UP](https://www.unige.ch/math/folks/velenik/smbook/)
+- Glimm, J. and Jaffe, A., *Quantum Physics: A Functional Integral Point of View* — [Springer](https://link.springer.com/book/10.1007/978-1-4612-4728-9)
+- Fernández, R., Fröhlich, J., and Sokal, A. D., *Random Walks, Critical Phenomena, and Triviality in Quantum Field Theory* — [Springer](https://link.springer.com/book/10.1007/978-3-662-02866-7)
+- Aarts, G., *Introductory lectures on lattice QCD at nonzero baryon number* (2015) — [arXiv:1512.05145](https://arxiv.org/abs/1512.05145)
+- [phasetr/ising-model](https://github.com/phasetr/ising-model) — Upstream project; this repository reuses its conventions and infrastructure.
+- [leanprover-community/physlib](https://github.com/leanprover-community/physlib) — A physics library in Lean 4.
+- [YaelDillies/gibbs-measure](https://github.com/YaelDillies/gibbs-measure) — Lean 4 formalization project on Gibbs measures (classical).
 
-### Multi-body operator space and site embedding (`LatticeSystem/Quantum/ManyBody.lean`)
+## Learning resources
 
-Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, §2.2 "Quantum Spin Systems", pp. 21-26 (tensor-product
-Hilbert space and site-local operators). `onSite i A` is the matrix
-realization of `(⊗ₖ≠ᵢ I) ⊗ Aᵢ` in the computational basis.
-
-| Lean name | Statement |
-|---|---|
-| `onSite i A` | definition: single-site `A` acting at site `i`, identity elsewhere |
-| `onSite_isHermitian` | Hermiticity lifts from `A` to `onSite i A` |
-| `onSite_mul_onSite_of_ne` | operators embedded at distinct sites commute |
-| `Matrix.IsHermitian.mul_of_commute` | product of commuting Hermitian matrices is Hermitian |
-
-### One-dimensional open-chain quantum Ising (`LatticeSystem/Quantum/IsingChain.lean`)
-
-Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
-Systems*, §3.3 "Quantum Ising Model", eq. (3.3.1) on p. 55
-(one-dimensional transverse-field quantum Ising on an open chain).
-Our `quantumIsingHamiltonian N J h` uses the Pauli convention
-`σ = 2 · S` and introduces an explicit bond coupling `J`, so it agrees
-with Tasaki's (3.3.1) up to these constants.
-
-| Lean name | Statement |
-|---|---|
-| `quantumIsingHamiltonian N J h` | definition: `H = -J Σ σ^z_i σ^z_{i+1} - h Σ σ^x_i` on `N+1` sites |
-| `quantumIsingHamiltonian_isHermitian` | `H` is Hermitian for real `J`, `h` |
-
-## Roadmap
-
-| Phase | Scope | Status |
-|---|---|---|
-| P0 | Project skeleton, CI, documentation infrastructure | Done |
-| P1a | Finite-volume quantum spin operator algebra (Pauli, onSite, commutativity) | Done |
-| P1b | Finite-chain quantum Ising Hamiltonian, Hermiticity | Done |
-| P1c (Tasaki §2.1) | Spin-1/2 operators `Ŝ^(α)` and the commutator algebra | Done |
-| P1d (Tasaki §2.1 cont.) | Basis states `\|ψ^↑⟩, \|ψ^↓⟩`, raising/lowering `Ŝ^±` (S = 1/2) | Done |
-| P1d' (Tasaki §2.1 cont.) | S = 1 matrix representations (eq. (2.1.9)) | Done |
-| P1d'' (Tasaki §2.1 cont.) | Problem 2.1.a for S = 1/2 (Pauli basis of `M_2(ℂ)`) | Done |
-| P1d''' (Tasaki §2.1 cont.) | Problem 2.1.a for `S ≥ 1` (polynomial basis of `M_{2S+1}(ℂ)`) | Not started |
-| P1e (Tasaki §2.1 cont.) | Spin rotation `Û^(α)_θ` closed form + `Û_0`, adjoint, `Û_{2π}` | Done |
-| P1e' | Rotation group law + unitarity | Done |
-| P1e'' (Tasaki §2.1 cont.) | Equivalence `Û^(α)_θ = exp(-iθŜ^(α))` via Mathlib matrix `exp` | Not started |
-| P1e''' (Tasaki §2.1, eq. (2.1.25), (2.1.26)) | π-rotations: `Û^(α)_π = -2i·Ŝ^(α)`, `(Û^(α)_π)² = -1`, anticommutation at distinct axes | Done |
-| P1e'''' (Tasaki §2.1, eq. (2.1.15)/(2.1.21) at θ=π, (2.1.29)) | `Û^(α)_π · Û^(β)_π = Û^(γ)_π`; conjugation `(Û^(α)_π)†·Ŝ^(β)·Û^(α)_π = ±Ŝ^(β)` | Done |
-| P1e''''' (Tasaki §2.1, eq. (2.1.10)-(2.1.22)) | General θ transformation `(Û^(α)_θ)† Ŝ^(β) Û^(α)_θ = …` | Not started |
-| P1e'''''' (Tasaki §2.1, eq. (2.1.27)-(2.1.34)) | Z₂ × Z₂ representation | Not started |
-| P1f (Tasaki §2.2) | General quantum spin systems on an abstract finite lattice | Not started |
-| P1g | Gibbs state `ρ = e^{-βH}/Z`, expectation `⟨O⟩_β = Tr(ρO)` | Not started |
-| P1h | Periodic boundary conditions, other quantum chains (Heisenberg) | Not started |
-| P2 | Finite-volume Hubbard / BCS | Not started |
-| P3 | CAR algebras, quasi-local C*-algebras, KMS states | Not started |
-| P4 | Thermodynamic limit, phase transitions | Not started |
-| P5 | Lattice QCD | Not started |
+- [The Mechanics of Proof (Math 2001)](https://hrmacbeth.github.io/math2001/) by Heather Macbeth
+- [Mathematics in Lean](https://leanprover-community.github.io/mathematics_in_lean/index.html)
 
 ## Build
 
-```
+```sh
 lake build
 ```
 
