@@ -443,6 +443,44 @@ theorem totalSpinHalfSquared_commutator_totalSpinHalfOp2 :
   rw [add_zero]
   abel
 
+/-- Casimir invariance with the raising operator: `[(Ŝ_tot)², Ŝ^+_tot] = 0`. -/
+theorem totalSpinHalfSquared_commutator_totalSpinHalfOpPlus :
+    totalSpinHalfSquared Λ * totalSpinHalfOpPlus Λ
+        - totalSpinHalfOpPlus Λ * totalSpinHalfSquared Λ = 0 := by
+  rw [totalSpinHalfOpPlus_eq_add, mul_add, add_mul]
+  rw [mul_smul_comm, smul_mul_assoc]
+  have h1 := totalSpinHalfSquared_commutator_totalSpinHalfOp1 Λ
+  have h2 := totalSpinHalfSquared_commutator_totalSpinHalfOp2 Λ
+  rw [show totalSpinHalfSquared Λ * totalSpinHalfOp1 Λ +
+            Complex.I • (totalSpinHalfSquared Λ * totalSpinHalfOp2 Λ) -
+          (totalSpinHalfOp1 Λ * totalSpinHalfSquared Λ +
+            Complex.I • (totalSpinHalfOp2 Λ * totalSpinHalfSquared Λ)) =
+        (totalSpinHalfSquared Λ * totalSpinHalfOp1 Λ -
+            totalSpinHalfOp1 Λ * totalSpinHalfSquared Λ) +
+          Complex.I • (totalSpinHalfSquared Λ * totalSpinHalfOp2 Λ -
+            totalSpinHalfOp2 Λ * totalSpinHalfSquared Λ) from by
+    rw [smul_sub]; abel]
+  rw [h1, h2, smul_zero, add_zero]
+
+/-- Casimir invariance with the lowering operator: `[(Ŝ_tot)², Ŝ^-_tot] = 0`. -/
+theorem totalSpinHalfSquared_commutator_totalSpinHalfOpMinus :
+    totalSpinHalfSquared Λ * totalSpinHalfOpMinus Λ
+        - totalSpinHalfOpMinus Λ * totalSpinHalfSquared Λ = 0 := by
+  rw [totalSpinHalfOpMinus_eq_sub, mul_sub, sub_mul]
+  rw [mul_smul_comm, smul_mul_assoc]
+  have h1 := totalSpinHalfSquared_commutator_totalSpinHalfOp1 Λ
+  have h2 := totalSpinHalfSquared_commutator_totalSpinHalfOp2 Λ
+  rw [show totalSpinHalfSquared Λ * totalSpinHalfOp1 Λ -
+            Complex.I • (totalSpinHalfSquared Λ * totalSpinHalfOp2 Λ) -
+          (totalSpinHalfOp1 Λ * totalSpinHalfSquared Λ -
+            Complex.I • (totalSpinHalfOp2 Λ * totalSpinHalfSquared Λ)) =
+        (totalSpinHalfSquared Λ * totalSpinHalfOp1 Λ -
+            totalSpinHalfOp1 Λ * totalSpinHalfSquared Λ) -
+          Complex.I • (totalSpinHalfSquared Λ * totalSpinHalfOp2 Λ -
+            totalSpinHalfOp2 Λ * totalSpinHalfSquared Λ) from by
+    rw [smul_sub]; abel]
+  rw [h1, h2, smul_zero, sub_zero]
+
 /-- Total ladder commutator: `[Ŝ^+_tot, Ŝ^-_tot] = 2 · Ŝ_tot^(3)`. -/
 theorem totalSpinHalfOpPlus_commutator_totalSpinHalfOpMinus :
     (totalSpinHalfOpPlus Λ * totalSpinHalfOpMinus Λ
