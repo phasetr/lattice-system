@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.SpinHalf
 import LatticeSystem.Quantum.SpinHalfBasis
+import LatticeSystem.Quantum.SpinHalfRotation
 import LatticeSystem.Quantum.ManyBody
 
 /-!
@@ -121,11 +122,11 @@ theorem spinHalfOp3_onSite_commutator_spinHalfOp1_onSite (x : Λ) :
 /-! ## Total raising/lowering operators (Tasaki eq (2.2.8)) -/
 
 /-- Total raising operator: `Ŝ^+_tot := Σ_{x ∈ Λ} Ŝ_x^+`. -/
-def totalSpinHalfOpPlus : ManyBodyOp Λ :=
+noncomputable def totalSpinHalfOpPlus : ManyBodyOp Λ :=
   ∑ x : Λ, onSite x spinHalfOpPlus
 
 /-- Total lowering operator: `Ŝ^-_tot := Σ_{x ∈ Λ} Ŝ_x^-`. -/
-def totalSpinHalfOpMinus : ManyBodyOp Λ :=
+noncomputable def totalSpinHalfOpMinus : ManyBodyOp Λ :=
   ∑ x : Λ, onSite x spinHalfOpMinus
 
 /-- The defining identity (Tasaki eq (2.2.8)):
@@ -655,5 +656,29 @@ theorem totalSpinHalfOpPlus_commutator_totalSpinHalfOpMinus :
         · intro h; exact absurd (Finset.mem_univ x) h
     _ = (2 : ℂ) • ∑ x : Λ, onSite x spinHalfOp3 := by
         rw [← Finset.smul_sum]
+
+/-! ## Global π-rotation operator (Tasaki eq (2.2.11) at θ = π)
+
+Distinct-site `onSite` embeddings commute (`onSite_mul_onSite_of_ne`),
+so we can form `Û^(α)_π_tot := ∏_{x ∈ Λ} Û^(α)_π_x` as a
+`Finset.noncommProd`. -/
+
+/-- Total π-rotation about axis 1: `Û^(1)_π_tot`. -/
+noncomputable def totalSpinHalfRot1Pi : ManyBodyOp Λ :=
+  (Finset.univ : Finset Λ).noncommProd
+    (fun x => onSite x (spinHalfRot1 Real.pi))
+    (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+
+/-- Total π-rotation about axis 2: `Û^(2)_π_tot`. -/
+noncomputable def totalSpinHalfRot2Pi : ManyBodyOp Λ :=
+  (Finset.univ : Finset Λ).noncommProd
+    (fun x => onSite x (spinHalfRot2 Real.pi))
+    (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+
+/-- Total π-rotation about axis 3: `Û^(3)_π_tot`. -/
+noncomputable def totalSpinHalfRot3Pi : ManyBodyOp Λ :=
+  (Finset.univ : Finset Λ).noncommProd
+    (fun x => onSite x (spinHalfRot3 Real.pi))
+    (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
 
 end LatticeSystem.Quantum
