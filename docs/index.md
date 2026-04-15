@@ -22,6 +22,33 @@ CAR algebras, and eventually lattice QCD.
 | Thermodynamic limit | Long term | Simon, Friedli-Velenik |
 | Lattice QCD | Longest term | Aarts, Davies |
 
+## Roadmap
+
+| Phase | Scope | Status |
+|---|---|---|
+| P0 | Project skeleton, CI, documentation infrastructure | Done |
+| P1a | Finite-volume quantum spin operator algebra (Pauli, `onSite`, commutativity) | Done |
+| P1b | Finite-chain quantum Ising Hamiltonian, Hermiticity | Done |
+| P1c (Tasaki §2.1) | Spin-1/2 operators `Ŝ^(α)` and the commutator algebra | Done |
+| P1d (Tasaki §2.1) | Basis states `|ψ^↑⟩, |ψ^↓⟩`, raising/lowering `Ŝ^±` (S = 1/2) | Done |
+| P1d' (Tasaki §2.1) | S = 1 matrix representations (eq. (2.1.9)) | Done |
+| P1d'' (Tasaki §2.1) | Problem 2.1.a for S = 1/2 (Pauli basis of `M_2(ℂ)`) | Done |
+| P1d''' (Tasaki §2.1) | Problem 2.1.a for `S ≥ 1` (polynomial basis of `M_{2S+1}(ℂ)`) | Not started |
+| P1e (Tasaki §2.1) | S = 1/2 rotation `Û^(α)_θ` closed form, `Û_0`, adjoint, `Û_{2π}` | Done |
+| P1e' | Rotation group law and unitarity | Done |
+| P1e'' (Tasaki §2.1) | `Û^(α)_θ = exp(-iθŜ^(α))` via Mathlib matrix `exp` | Not started |
+| P1e''' (Tasaki §2.1) | π-rotations: `Û^(α)_π = -2i·Ŝ^(α)`, anticommutation at distinct axes | Done |
+| P1e'''' (Tasaki §2.1) | `Û^(α)_π · Û^(β)_π = Û^(γ)_π`; conjugations `(Û^(α)_π)†·Ŝ^(β)·Û^(α)_π = ±Ŝ^(β)` | Done |
+| P1e''''' (Tasaki §2.1) | General θ transformation `(Û^(α)_θ)† Ŝ^(β) Û^(α)_θ = …` | Not started |
+| P1e'''''' (Tasaki §2.1) | Z₂ × Z₂ representation (eqs. (2.1.27)-(2.1.34)) | Not started |
+| P1f (Tasaki §2.2) | General quantum spin systems on an abstract finite lattice | Not started |
+| P1g | Gibbs state `ρ = e^{-βH}/Z`, expectation `⟨O⟩_β = Tr(ρO)` | Not started |
+| P1h | Periodic boundary conditions, other quantum chains (Heisenberg) | Not started |
+| P2 | Finite-volume Hubbard / BCS | Not started |
+| P3 | CAR algebras, quasi-local C*-algebras, KMS states | Not started |
+| P4 | Thermodynamic limit, phase transitions | Not started |
+| P5 | Lattice QCD | Not started |
+
 ## Formalized theorems
 
 All items below are formally proved with **zero `sorry`**. Full
@@ -147,3 +174,4 @@ explicit bond coupling `J`.
 - [GitHub repository](https://github.com/phasetr/lattice-system)
 - [Mathematical guide (`tex/proof-guide.tex`)](https://github.com/phasetr/lattice-system/blob/main/tex/proof-guide.tex)
 - [ising-model (upstream project)](https://github.com/phasetr/ising-model)
+- [Lean by Example](https://lean-ja.github.io/lean-by-example/)
