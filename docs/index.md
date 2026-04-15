@@ -174,3 +174,4 @@ explicit bond coupling `J`.
 - [GitHub repository](https://github.com/phasetr/lattice-system)
 - [Mathematical guide (`tex/proof-guide.tex`)](https://github.com/phasetr/lattice-system/blob/main/tex/proof-guide.tex)
 - [ising-model (upstream project)](https://github.com/phasetr/ising-model)
+- [Lean by Example](https://lean-ja.github.io/lean-by-example/)
