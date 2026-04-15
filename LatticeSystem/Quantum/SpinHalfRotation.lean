@@ -467,4 +467,112 @@ theorem spinHalfRot3_pi_conj_spinHalfOp2 :
   rotOf_pi_conj_of_ne spinHalfOp3_isHermitian spinHalfOp3_mul_self
     (anticomm_swap spinHalfOp2_anticomm_spinHalfOp3)
 
+/-! ## General-θ conjugation (Tasaki eq (2.1.16))
+
+For distinct axes the closed-form rotation conjugates the spin operator
+by the standard rotation matrix: `(Û^(α)_θ)† · Ŝ^(β) · Û^(α)_θ =
+cos(θ)·Ŝ^(β) - sin(θ)·Ŝ^(γ)`, where `(α, β, γ)` is cyclic.
+-/
+
+/-- Expansion of the general-θ conjugation as an algebraic identity.
+For `Sα` Hermitian with `Sα² = (1/4)·1`, anticommuting with `Sβ`, and
+with commutator `[Sα, Sβ] = I·Sγ`, we have
+`(rotOf Sα θ)ᴴ · Sβ · rotOf Sα θ = cos(θ)·Sβ - sin(θ)·Sγ`. -/
+private lemma rotOf_conj_of_ne
+    {Sα Sβ Sγ : Matrix (Fin 2) (Fin 2) ℂ}
+    (hα : Sα.IsHermitian) (hα_sq : Sα * Sα = (1 / 4 : ℂ) • 1)
+    (hanti : Sα * Sβ + Sβ * Sα = 0)
+    (hcomm : Sα * Sβ - Sβ * Sα = Complex.I • Sγ)
+    (θ : ℝ) :
+    (rotOf Sα θ)ᴴ * Sβ * rotOf Sα θ =
+      (Real.cos θ : ℂ) • Sβ - (Real.sin θ : ℂ) • Sγ := by
+  have htriple : Sα * Sβ * Sα = (-(1 / 4 : ℂ)) • Sβ :=
+    spinHalfOp_triple_of_anticomm hα_sq hanti
+  rw [rotOf_adjoint hα]
+  unfold rotOf
+  set c := (Real.cos (θ / 2) : ℂ) with hc
+  set s := (Real.sin (θ / 2) : ℂ) with hs
+  have hcn : (Real.cos (-θ / 2) : ℂ) = c := by
+    rw [show (-θ : ℝ) / 2 = -(θ / 2) from by ring, Real.cos_neg]
+  have hsn : (Real.sin (-θ / 2) : ℂ) = -s := by
+    rw [show (-θ : ℝ) / 2 = -(θ / 2) from by ring]
+    simp [Real.sin_neg, hs]
+  rw [hcn, hsn]
+  rw [show (2 * Complex.I * -s : ℂ) = -(2 * Complex.I * s) from by ring,
+      neg_smul, sub_neg_eq_add]
+  -- Now goal: (c • 1 + (2*I*s) • Sα) * Sβ * (c • 1 - (2*I*s) • Sα) = cos θ • Sβ - sin θ • Sγ
+  set k := (2 * Complex.I * s : ℂ) with hk
+  -- Expand via distributivity
+  have expand :
+      (c • (1 : Matrix (Fin 2) (Fin 2) ℂ) + k • Sα) * Sβ *
+          (c • (1 : Matrix (Fin 2) (Fin 2) ℂ) - k • Sα) =
+        (c * c) • Sβ + (c * k) • (Sα * Sβ) - (c * k) • (Sβ * Sα)
+          - (k * k) • (Sα * Sβ * Sα) := by
+    rw [add_mul, add_mul, mul_sub, mul_sub]
+    simp only [smul_mul_assoc, mul_smul_comm, Matrix.one_mul, Matrix.mul_one,
+      smul_smul]
+    rw [show (k * c : ℂ) = c * k from mul_comm _ _]
+    abel
+  rw [expand]
+  rw [show (c * c) • Sβ + (c * k) • (Sα * Sβ) - (c * k) • (Sβ * Sα) -
+        (k * k) • (Sα * Sβ * Sα) =
+      (c * c) • Sβ + (c * k) • (Sα * Sβ - Sβ * Sα) -
+        (k * k) • (Sα * Sβ * Sα) from by
+    rw [smul_sub]; abel]
+  rw [hcomm, htriple]
+  rw [smul_smul, smul_smul]
+  -- Goal: (c*c)•Sβ + (c*k*I)•Sγ - (k*k)•(-(1/4)•Sβ) = cos θ•Sβ - sin θ•Sγ
+  -- After smul_smul on -(k*k)•(-(1/4)•Sβ), we'd need two smul_smuls
+  -- Actually the -(k*k) has a minus
+  have hI2 : Complex.I * Complex.I = -1 := Complex.I_mul_I
+  rw [show c * k * Complex.I = -(2 * c * s) from by
+    rw [hk]; linear_combination (2 * c * s) * hI2]
+  rw [show (k * k : ℂ) = -(4 * (s * s)) from by
+    rw [hk]; linear_combination (4 * (s * s)) * hI2]
+  -- Simplify the scalar coefficient of Sβ
+  rw [show -(4 * (s * s)) * -(1 / 4 : ℂ) = s * s from by ring]
+  -- Goal: (c*c)•Sβ + -(2*c*s)•Sγ - (s*s)•Sβ = cos θ•Sβ - sin θ•Sγ
+  have hcos : (Real.cos θ : ℂ) = c * c - s * s := by
+    change (Real.cos θ : ℂ) = (Real.cos (θ / 2) : ℂ) * (Real.cos (θ / 2) : ℂ)
+      - (Real.sin (θ / 2) : ℂ) * (Real.sin (θ / 2) : ℂ)
+    have hcos' : Real.cos θ = (Real.cos (θ / 2))^2 - (Real.sin (θ / 2))^2 := by
+      rw [show θ = 2 * (θ / 2) from by ring, Real.cos_two_mul,
+        show (1 : ℝ) = (Real.cos (θ / 2))^2 + (Real.sin (θ / 2))^2 from
+          (Real.cos_sq_add_sin_sq _).symm]
+      ring
+    rw [hcos']
+    push_cast; ring
+  have hsin : (Real.sin θ : ℂ) = 2 * c * s := by
+    change (Real.sin θ : ℂ) =
+      2 * (Real.cos (θ / 2) : ℂ) * (Real.sin (θ / 2) : ℂ)
+    rw [show θ = 2 * (θ / 2) from by ring, Real.sin_two_mul]
+    push_cast; ring
+  rw [hcos, hsin]
+  rw [sub_smul, neg_smul]
+  abel
+
+/-- `(Û^(1)_θ)† · Ŝ^(2) · Û^(1)_θ = cos(θ)·Ŝ^(2) - sin(θ)·Ŝ^(3)`. -/
+theorem spinHalfRot1_conj_spinHalfOp2 (θ : ℝ) :
+    (spinHalfRot1 θ)ᴴ * spinHalfOp2 * spinHalfRot1 θ =
+      (Real.cos θ : ℂ) • spinHalfOp2 - (Real.sin θ : ℂ) • spinHalfOp3 :=
+  rotOf_conj_of_ne spinHalfOp1_isHermitian spinHalfOp1_mul_self
+    spinHalfOp1_anticomm_spinHalfOp2
+    spinHalfOp1_commutator_spinHalfOp2 θ
+
+/-- `(Û^(2)_θ)† · Ŝ^(3) · Û^(2)_θ = cos(θ)·Ŝ^(3) - sin(θ)·Ŝ^(1)`. -/
+theorem spinHalfRot2_conj_spinHalfOp3 (θ : ℝ) :
+    (spinHalfRot2 θ)ᴴ * spinHalfOp3 * spinHalfRot2 θ =
+      (Real.cos θ : ℂ) • spinHalfOp3 - (Real.sin θ : ℂ) • spinHalfOp1 :=
+  rotOf_conj_of_ne spinHalfOp2_isHermitian spinHalfOp2_mul_self
+    spinHalfOp2_anticomm_spinHalfOp3
+    spinHalfOp2_commutator_spinHalfOp3 θ
+
+/-- `(Û^(3)_θ)† · Ŝ^(1) · Û^(3)_θ = cos(θ)·Ŝ^(1) - sin(θ)·Ŝ^(2)`. -/
+theorem spinHalfRot3_conj_spinHalfOp1 (θ : ℝ) :
+    (spinHalfRot3 θ)ᴴ * spinHalfOp1 * spinHalfRot3 θ =
+      (Real.cos θ : ℂ) • spinHalfOp1 - (Real.sin θ : ℂ) • spinHalfOp2 :=
+  rotOf_conj_of_ne spinHalfOp3_isHermitian spinHalfOp3_mul_self
+    spinHalfOp3_anticomm_spinHalfOp1
+    spinHalfOp3_commutator_spinHalfOp1 θ
+
 end LatticeSystem.Quantum
