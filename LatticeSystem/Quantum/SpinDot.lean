@@ -328,6 +328,46 @@ theorem spinHalfDot_commutator_totalSpinHalfOp2 (x y : Λ) :
     smul_mul_assoc]
   abel
 
+/-- SU(2) invariance with the raising operator:
+`[Ŝ_x · Ŝ_y, Ŝ^+_tot] = 0`. -/
+theorem spinHalfDot_commutator_totalSpinHalfOpPlus (x y : Λ) :
+    spinHalfDot x y * totalSpinHalfOpPlus Λ -
+        totalSpinHalfOpPlus Λ * spinHalfDot x y = 0 := by
+  rw [totalSpinHalfOpPlus_eq_add, mul_add, add_mul]
+  rw [mul_smul_comm, smul_mul_assoc]
+  have h1 := spinHalfDot_commutator_totalSpinHalfOp1 x y
+  have h2 := spinHalfDot_commutator_totalSpinHalfOp2 x y
+  rw [show spinHalfDot x y * totalSpinHalfOp1 Λ +
+            Complex.I • (spinHalfDot x y * totalSpinHalfOp2 Λ) -
+          (totalSpinHalfOp1 Λ * spinHalfDot x y +
+            Complex.I • (totalSpinHalfOp2 Λ * spinHalfDot x y)) =
+        (spinHalfDot x y * totalSpinHalfOp1 Λ -
+            totalSpinHalfOp1 Λ * spinHalfDot x y) +
+          Complex.I • (spinHalfDot x y * totalSpinHalfOp2 Λ -
+            totalSpinHalfOp2 Λ * spinHalfDot x y) from by
+    rw [smul_sub]; abel]
+  rw [h1, h2, smul_zero, add_zero]
+
+/-- SU(2) invariance with the lowering operator:
+`[Ŝ_x · Ŝ_y, Ŝ^-_tot] = 0`. -/
+theorem spinHalfDot_commutator_totalSpinHalfOpMinus (x y : Λ) :
+    spinHalfDot x y * totalSpinHalfOpMinus Λ -
+        totalSpinHalfOpMinus Λ * spinHalfDot x y = 0 := by
+  rw [totalSpinHalfOpMinus_eq_sub, mul_sub, sub_mul]
+  rw [mul_smul_comm, smul_mul_assoc]
+  have h1 := spinHalfDot_commutator_totalSpinHalfOp1 x y
+  have h2 := spinHalfDot_commutator_totalSpinHalfOp2 x y
+  rw [show spinHalfDot x y * totalSpinHalfOp1 Λ -
+            Complex.I • (spinHalfDot x y * totalSpinHalfOp2 Λ) -
+          (totalSpinHalfOp1 Λ * spinHalfDot x y -
+            Complex.I • (totalSpinHalfOp2 Λ * spinHalfDot x y)) =
+        (spinHalfDot x y * totalSpinHalfOp1 Λ -
+            totalSpinHalfOp1 Λ * spinHalfDot x y) -
+          Complex.I • (spinHalfDot x y * totalSpinHalfOp2 Λ -
+            totalSpinHalfOp2 Λ * spinHalfDot x y) from by
+    rw [smul_sub]; abel]
+  rw [h1, h2, smul_zero, sub_zero]
+
 /-- Tasaki eq. (2.2.18) (the defining identity, rearranged):
 `(Ŝ_x + Ŝ_y)² = 2·(Ŝ_x · Ŝ_y) + Ŝ_x · Ŝ_x + Ŝ_y · Ŝ_y`. -/
 theorem spinHalfPairSpinSq_eq (x y : Λ) :
