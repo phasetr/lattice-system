@@ -275,6 +275,40 @@ $\hat U^{(\alpha)}_\theta (\hat U^{(\alpha)}_\theta)^\dagger = \hat 1$.
 Lean name: \texttt{spinHalfRot1/2/3\_unitary}.
 \end{theorem}
 
+\subsection{The $\pi$-rotations}
+
+\begin{lemma}[$\hat U^{(\alpha)}_\pi$ in closed form]
+$\hat U^{(\alpha)}_\pi = -2i\,\hat S^{(\alpha)}$. Proof: instantiate the
+closed form at $\theta = \pi$ using $\cos(\pi/2) = 0$ and
+$\sin(\pi/2) = 1$. Lean name: \texttt{spinHalfRot1/2/3\_pi}.
+\end{lemma}
+
+\begin{lemma}
+$(\hat U^{(\alpha)}_\pi)^2 = -\hat 1$. Proof: group law
+$\hat U^{(\alpha)}_\pi \hat U^{(\alpha)}_\pi = \hat U^{(\alpha)}_{2\pi}
+= -\hat 1$. Lean name: \texttt{spinHalfRot1/2/3\_pi\_sq}.
+\end{lemma}
+
+\begin{theorem}[Tasaki eq.~(2.1.25), $S = 1/2$ case]
+For $\alpha \neq \beta$,
+$\hat U^{(\alpha)}_\pi \hat U^{(\beta)}_\pi
+  + \hat U^{(\beta)}_\pi \hat U^{(\alpha)}_\pi = 0$.
+Lean names: \texttt{spinHalfRot1\_pi\_anticomm\_spinHalfRot2\_pi}
+and the two cyclic variants.
+\end{theorem}
+
+\begin{proof}
+Use $\hat U^{(\alpha)}_\pi = -2i\,\hat S^{(\alpha)}$ to rewrite
+\[
+  \hat U^{(\alpha)}_\pi \hat U^{(\beta)}_\pi
+    + \hat U^{(\beta)}_\pi \hat U^{(\alpha)}_\pi
+    = (-2i)^2 (\hat S^{(\alpha)}\hat S^{(\beta)}
+      + \hat S^{(\beta)}\hat S^{(\alpha)})
+    = (-2i)^2 \cdot 0 = 0
+\]
+by the $\hat S^{(\alpha)}$ anticommutation at distinct axes.
+\end{proof}
+
 \paragraph{Proof technique.}
 All statements are parametrised through a private helper
 \texttt{rotOf S theta := cos(theta/2) * 1 - (2*I*sin(theta/2)) * S} and then
@@ -608,6 +642,7 @@ $S = 1$ matrix representations (Tasaki §2.1 eq.~2.1.9) & finite-dim & \emph{for
 Pauli basis of $M_2(\mathbb{C})$ (Tasaki Problem 2.1.a, $S=1/2$) & finite-dim & \emph{formalized} \\
 $S = 1/2$ rotation (closed form, $\theta=0$, adjoint, $2\pi$) & finite-dim & \emph{formalized} \\
 $S = 1/2$ rotation (group law, unitarity) & finite-dim & \emph{formalized} \\
+$S = 1/2$ $\pi$-rotations (eq.~2.1.25) & finite-dim & \emph{formalized} \\
 Multi-body operator space / \texttt{onSite} & finite-dim & \emph{formalized} \\
 Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
 1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\

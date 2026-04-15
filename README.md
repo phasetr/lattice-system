@@ -87,6 +87,9 @@ Definition: `Û^(α)_θ := cos(θ/2) · 1 - 2i · sin(θ/2) · Ŝ^(α)`.
 | `spinHalfRot1/2/3_two_pi` | `Û^(α)_{2π} = -1` (Tasaki eq. (2.1.23)) |
 | `spinHalfRot1/2/3_mul` | group law `Û^(α)_θ · Û^(α)_φ = Û^(α)_{θ+φ}` |
 | `spinHalfRot1/2/3_unitary` | unitarity `Û^(α)_θ · (Û^(α)_θ)† = 1` |
+| `spinHalfRot1/2/3_pi` | `Û^(α)_π = -2i · Ŝ^(α)` |
+| `spinHalfRot1/2/3_pi_sq` | `(Û^(α)_π)² = -1` |
+| `spinHalfRot1_pi_anticomm_spinHalfRot2_pi` etc. | `Û^(α)_π · Û^(β)_π + Û^(β)_π · Û^(α)_π = 0` for `α ≠ β` (Tasaki eq. (2.1.25), S=1/2) |
 
 Equivalence with the matrix exponential `Û^(α)_θ = exp(-iθŜ^(α))` via
 Mathlib's `Matrix.exp` is deferred to a follow-up PR.
@@ -185,6 +188,9 @@ with Tasaki's (3.3.1) up to these constants.
 | P1e (Tasaki §2.1 cont.) | Spin rotation `Û^(α)_θ` closed form + `Û_0`, adjoint, `Û_{2π}` | Done |
 | P1e' | Rotation group law + unitarity | Done |
 | P1e'' (Tasaki §2.1 cont.) | Equivalence `Û^(α)_θ = exp(-iθŜ^(α))` via Mathlib matrix `exp` | Not started |
+| P1e''' (Tasaki §2.1, eq. (2.1.25), (2.1.26)) | π-rotations: `Û^(α)_π = -2i·Ŝ^(α)`, `(Û^(α)_π)² = -1`, anticommutation at distinct axes | Done |
+| P1e'''' (Tasaki §2.1) | General transformation `(Û^(α)_θ)† Ŝ^(β) Û^(α)_θ = …` (eqs. (2.1.10)-(2.1.22)) | Not started |
+| P1e''''' (Tasaki §2.1) | Z₂ × Z₂ representation (eqs. (2.1.27)-(2.1.34)) | Not started |
 | P1f (Tasaki §2.2) | General quantum spin systems on an abstract finite lattice | Not started |
 | P1g | Gibbs state `ρ = e^{-βH}/Z`, expectation `⟨O⟩_β = Tr(ρO)` | Not started |
 | P1h | Periodic boundary conditions, other quantum chains (Heisenberg) | Not started |

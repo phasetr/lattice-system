@@ -224,4 +224,72 @@ theorem spinHalfRot3_unitary (θ : ℝ) :
     spinHalfRot3 θ * (spinHalfRot3 θ)ᴴ = 1 :=
   rotOf_mul_conjTranspose spinHalfOp3_isHermitian spinHalfOp3_mul_self θ
 
+/-! ## `Û^(α)_π`: the `π` rotation as `-2i · Ŝ^(α)` (Tasaki eq 2.1.26 at θ=π) -/
+
+private lemma rotOf_pi (S : Matrix (Fin 2) (Fin 2) ℂ) :
+    rotOf S Real.pi = (-(2 * I)) • S := by
+  unfold rotOf
+  simp [Real.cos_pi_div_two, Real.sin_pi_div_two]
+
+/-- `Û^(1)_π = -2i · Ŝ^(1)`. -/
+theorem spinHalfRot1_pi : spinHalfRot1 Real.pi = (-(2 * I)) • spinHalfOp1 :=
+  rotOf_pi _
+
+/-- `Û^(2)_π = -2i · Ŝ^(2)`. -/
+theorem spinHalfRot2_pi : spinHalfRot2 Real.pi = (-(2 * I)) • spinHalfOp2 :=
+  rotOf_pi _
+
+/-- `Û^(3)_π = -2i · Ŝ^(3)`. -/
+theorem spinHalfRot3_pi : spinHalfRot3 Real.pi = (-(2 * I)) • spinHalfOp3 :=
+  rotOf_pi _
+
+/-! ## `(Û^(α)_π)² = -1` -/
+
+/-- `(Û^(1)_π)² = -1` (from group law and `Û^(1)_{2π} = -1`). -/
+theorem spinHalfRot1_pi_sq :
+    spinHalfRot1 Real.pi * spinHalfRot1 Real.pi = -1 := by
+  rw [spinHalfRot1_mul, show Real.pi + Real.pi = 2 * Real.pi from by ring,
+    spinHalfRot1_two_pi]
+
+/-- `(Û^(2)_π)² = -1`. -/
+theorem spinHalfRot2_pi_sq :
+    spinHalfRot2 Real.pi * spinHalfRot2 Real.pi = -1 := by
+  rw [spinHalfRot2_mul, show Real.pi + Real.pi = 2 * Real.pi from by ring,
+    spinHalfRot2_two_pi]
+
+/-- `(Û^(3)_π)² = -1`. -/
+theorem spinHalfRot3_pi_sq :
+    spinHalfRot3 Real.pi * spinHalfRot3 Real.pi = -1 := by
+  rw [spinHalfRot3_mul, show Real.pi + Real.pi = 2 * Real.pi from by ring,
+    spinHalfRot3_two_pi]
+
+/-! ## π-rotation anticommutation at distinct axes (Tasaki eq 2.1.25, S = 1/2) -/
+
+/-- `Û^(1)_π · Û^(2)_π + Û^(2)_π · Û^(1)_π = 0`. -/
+theorem spinHalfRot1_pi_anticomm_spinHalfRot2_pi :
+    spinHalfRot1 Real.pi * spinHalfRot2 Real.pi
+      + spinHalfRot2 Real.pi * spinHalfRot1 Real.pi = 0 := by
+  rw [spinHalfRot1_pi, spinHalfRot2_pi,
+    Matrix.smul_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_smul,
+    smul_smul, smul_smul, ← smul_add,
+    spinHalfOp1_anticomm_spinHalfOp2, smul_zero]
+
+/-- `Û^(2)_π · Û^(3)_π + Û^(3)_π · Û^(2)_π = 0`. -/
+theorem spinHalfRot2_pi_anticomm_spinHalfRot3_pi :
+    spinHalfRot2 Real.pi * spinHalfRot3 Real.pi
+      + spinHalfRot3 Real.pi * spinHalfRot2 Real.pi = 0 := by
+  rw [spinHalfRot2_pi, spinHalfRot3_pi,
+    Matrix.smul_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_smul,
+    smul_smul, smul_smul, ← smul_add,
+    spinHalfOp2_anticomm_spinHalfOp3, smul_zero]
+
+/-- `Û^(3)_π · Û^(1)_π + Û^(1)_π · Û^(3)_π = 0`. -/
+theorem spinHalfRot3_pi_anticomm_spinHalfRot1_pi :
+    spinHalfRot3 Real.pi * spinHalfRot1 Real.pi
+      + spinHalfRot1 Real.pi * spinHalfRot3 Real.pi = 0 := by
+  rw [spinHalfRot3_pi, spinHalfRot1_pi,
+    Matrix.smul_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_smul,
+    smul_smul, smul_smul, ← smul_add,
+    spinHalfOp3_anticomm_spinHalfOp1, smul_zero]
+
 end LatticeSystem.Quantum
