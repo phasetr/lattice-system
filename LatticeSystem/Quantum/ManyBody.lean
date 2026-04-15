@@ -195,4 +195,146 @@ theorem Matrix.IsHermitian.mul_of_commute {n : Type*} [Fintype n]
   unfold Matrix.IsHermitian
   rw [Matrix.conjTranspose_mul, hA, hB, hcomm]
 
+/-! ## Linearity of the site embedding -/
+
+/-- `onSite` is additive in the operator argument. -/
+theorem onSite_add (i : Λ) (A B : Matrix (Fin 2) (Fin 2) ℂ) :
+    (onSite i (A + B) : ManyBodyOp Λ) = onSite i A + onSite i B := by
+  ext σ' σ
+  simp only [onSite_apply, Matrix.add_apply]
+  by_cases h : ∀ k, k ≠ i → σ' k = σ k
+  · simp [if_pos h]
+  · simp [if_neg h]
+
+/-- `onSite` takes subtraction of operators to subtraction of embeddings. -/
+theorem onSite_sub (i : Λ) (A B : Matrix (Fin 2) (Fin 2) ℂ) :
+    (onSite i (A - B) : ManyBodyOp Λ) = onSite i A - onSite i B := by
+  ext σ' σ
+  simp only [onSite_apply, Matrix.sub_apply]
+  by_cases h : ∀ k, k ≠ i → σ' k = σ k
+  · simp [if_pos h]
+  · simp [if_neg h]
+
+/-- `onSite i 0 = 0`. -/
+theorem onSite_zero (i : Λ) :
+    (onSite i (0 : Matrix (Fin 2) (Fin 2) ℂ) : ManyBodyOp Λ) = 0 := by
+  ext σ' σ
+  simp only [onSite_apply, Matrix.zero_apply]
+  split_ifs <;> rfl
+
+/-- `onSite` commutes with scalar multiplication. -/
+theorem onSite_smul (i : Λ) (c : ℂ) (A : Matrix (Fin 2) (Fin 2) ℂ) :
+    (onSite i (c • A) : ManyBodyOp Λ) = c • onSite i A := by
+  ext σ' σ
+  simp only [onSite_apply, Matrix.smul_apply]
+  by_cases h : ∀ k, k ≠ i → σ' k = σ k
+  · simp [if_pos h]
+  · simp [if_neg h]
+
+/-! ## Same-site multiplication (Tasaki eq (2.2.6), `x = y` case)
+
+For `onSite i A * onSite i B` (two operators embedded at the *same* site),
+the product is the site embedding of the Fin 2 matrix product `A * B`.
+This is the diagonal (`x = y`) case of Tasaki eq. (2.2.6), whose
+off-diagonal (`x ≠ y`) case is `onSite_mul_onSite_of_ne`.
+-/
+
+/-- The pivot used in the same-site product: the unique `τ` (as a function
+of `τi ∈ Fin 2`) that agrees with `σ` off site `i` and takes value `τi`
+at site `i`. -/
+private def fiberUpdate (σ : Λ → Fin 2) (i : Λ) (t : Fin 2) : Λ → Fin 2 :=
+  Function.update σ i t
+
+omit [Fintype Λ] in
+private lemma fiberUpdate_at (σ : Λ → Fin 2) (i : Λ) (t : Fin 2) :
+    fiberUpdate σ i t i = t := by
+  rw [fiberUpdate, Function.update_self]
+
+omit [Fintype Λ] in
+private lemma fiberUpdate_off {σ : Λ → Fin 2} {i k : Λ} (hk : k ≠ i) (t : Fin 2) :
+    fiberUpdate σ i t k = σ k := by
+  rw [fiberUpdate, Function.update_of_ne hk]
+
+/-- Same-site product reduces to the site embedding of the 2×2 product. -/
+theorem onSite_mul_onSite_same (i : Λ) (A B : Matrix (Fin 2) (Fin 2) ℂ) :
+    (onSite i A * onSite i B : ManyBodyOp Λ) = onSite i (A * B) := by
+  ext σ' σ
+  rw [Matrix.mul_apply]
+  simp only [onSite_apply]
+  by_cases h : ∀ k, k ≠ i → σ' k = σ k
+  · rw [if_pos h, Matrix.mul_apply]
+    -- First, rewrite each τ-term to be nonzero only when τ = fiberUpdate σ i (τ i).
+    have hterm : ∀ τ : Λ → Fin 2,
+        (if ∀ k, k ≠ i → σ' k = τ k then A (σ' i) (τ i) else 0) *
+            (if ∀ k, k ≠ i → τ k = σ k then B (τ i) (σ i) else 0) =
+          if τ = fiberUpdate σ i (τ i) then
+            A (σ' i) (τ i) * B (τ i) (σ i)
+          else 0 := by
+      intro τ
+      by_cases hτ : τ = fiberUpdate σ i (τ i)
+      · have hoff_σ : ∀ k, k ≠ i → τ k = σ k := by
+          intro k hk
+          have hstep : τ k = fiberUpdate σ i (τ i) k := congrFun hτ k
+          rw [hstep, fiberUpdate_off hk]
+        have hoff_σ' : ∀ k, k ≠ i → σ' k = τ k := fun k hk =>
+          (h k hk).trans (hoff_σ k hk).symm
+        rw [if_pos hoff_σ', if_pos hoff_σ, if_pos hτ]
+      · have hnot : ¬ ∀ k, k ≠ i → τ k = σ k := by
+          intro hall
+          apply hτ
+          funext k
+          by_cases hki : k = i
+          · subst hki; rw [fiberUpdate_at]
+          · rw [fiberUpdate_off hki]; exact hall k hki
+        rw [if_neg hnot, mul_zero, if_neg hτ]
+    rw [Finset.sum_congr rfl (fun τ _ => hterm τ)]
+    -- Convert the ite-sum to a filter-sum.
+    rw [← Finset.sum_filter]
+    -- Reindex the filter-sum over Fin 2 via t ↦ fiberUpdate σ i t.
+    symm
+    refine Finset.sum_bij (fun (t : Fin 2) _ => fiberUpdate σ i t)
+      ?memImage ?inj ?surj ?eq
+    case memImage =>
+      intro t _
+      simp only
+      rw [Finset.mem_filter]
+      refine ⟨Finset.mem_univ _, ?_⟩
+      funext k
+      by_cases hki : k = i
+      · subst hki
+        rw [fiberUpdate_at, fiberUpdate_at]
+      · rw [fiberUpdate_off hki, fiberUpdate_off hki]
+    case inj =>
+      intros s _ u _ hsu
+      simp only at hsu
+      have := congrFun hsu i
+      simpa [fiberUpdate_at] using this
+    case surj =>
+      intros τ hτ
+      rw [Finset.mem_filter] at hτ
+      refine ⟨τ i, Finset.mem_univ _, ?_⟩
+      simp only
+      exact hτ.2.symm
+    case eq =>
+      intro t _
+      simp only
+      rw [fiberUpdate_at]
+  · rw [if_neg h]
+    apply Finset.sum_eq_zero
+    intro τ _
+    by_cases h1 : ∀ k, k ≠ i → σ' k = τ k
+    · have h2 : ¬ ∀ k, k ≠ i → τ k = σ k := by
+        intro hh
+        exact h (fun k hk => (h1 k hk).trans (hh k hk))
+      rw [if_neg h2, mul_zero]
+    · rw [if_neg h1, zero_mul]
+
+/-- Same-site commutator: `[onSite i A, onSite i B] = onSite i [A, B]`.
+Specialized to Pauli-basis spin operators, this is the diagonal (`x = y`)
+case of Tasaki eq. (2.2.6). -/
+theorem onSite_commutator_same (i : Λ) (A B : Matrix (Fin 2) (Fin 2) ℂ) :
+    (onSite i A * onSite i B - onSite i B * onSite i A : ManyBodyOp Λ) =
+      onSite i (A * B - B * A) := by
+  rw [onSite_mul_onSite_same, onSite_mul_onSite_same, ← onSite_sub]
+
 end LatticeSystem.Quantum

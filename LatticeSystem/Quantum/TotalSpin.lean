@@ -3,6 +3,7 @@ Copyright (c) 2026 lattice-system contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.SpinHalf
+import LatticeSystem.Quantum.SpinHalfBasis
 import LatticeSystem.Quantum.ManyBody
 
 /-!
@@ -89,5 +90,79 @@ theorem spinHalfOp_onSite_comm_of_ne {x y : Λ} (hxy : x ≠ y)
     (Sα Sβ : Matrix (Fin 2) (Fin 2) ℂ) :
     onSite x Sα * onSite y Sβ = onSite y Sβ * onSite x Sα :=
   onSite_mul_onSite_of_ne hxy Sα Sβ
+
+/-! ## Same-site commutation (Tasaki eq (2.2.6), `x = y` case, S = 1/2)
+
+These are the diagonal cases of Tasaki eq. (2.2.6): at the same site
+`x`, the spin operators obey the single-site commutation relations
+(2.1.1) lifted by `onSite`. -/
+
+/-- Same-site commutator: `[Ŝ_x^(1), Ŝ_x^(2)] = i · Ŝ_x^(3)`. -/
+theorem spinHalfOp1_onSite_commutator_spinHalfOp2_onSite (x : Λ) :
+    (onSite x spinHalfOp1 * onSite x spinHalfOp2
+        - onSite x spinHalfOp2 * onSite x spinHalfOp1 : ManyBodyOp Λ) =
+      Complex.I • onSite x spinHalfOp3 := by
+  rw [onSite_commutator_same, spinHalfOp1_commutator_spinHalfOp2, onSite_smul]
+
+/-- Same-site commutator: `[Ŝ_x^(2), Ŝ_x^(3)] = i · Ŝ_x^(1)`. -/
+theorem spinHalfOp2_onSite_commutator_spinHalfOp3_onSite (x : Λ) :
+    (onSite x spinHalfOp2 * onSite x spinHalfOp3
+        - onSite x spinHalfOp3 * onSite x spinHalfOp2 : ManyBodyOp Λ) =
+      Complex.I • onSite x spinHalfOp1 := by
+  rw [onSite_commutator_same, spinHalfOp2_commutator_spinHalfOp3, onSite_smul]
+
+/-- Same-site commutator: `[Ŝ_x^(3), Ŝ_x^(1)] = i · Ŝ_x^(2)`. -/
+theorem spinHalfOp3_onSite_commutator_spinHalfOp1_onSite (x : Λ) :
+    (onSite x spinHalfOp3 * onSite x spinHalfOp1
+        - onSite x spinHalfOp1 * onSite x spinHalfOp3 : ManyBodyOp Λ) =
+      Complex.I • onSite x spinHalfOp2 := by
+  rw [onSite_commutator_same, spinHalfOp3_commutator_spinHalfOp1, onSite_smul]
+
+/-! ## Total raising/lowering operators (Tasaki eq (2.2.8)) -/
+
+/-- Total raising operator: `Ŝ^+_tot := Σ_{x ∈ Λ} Ŝ_x^+`. -/
+def totalSpinHalfOpPlus : ManyBodyOp Λ :=
+  ∑ x : Λ, onSite x spinHalfOpPlus
+
+/-- Total lowering operator: `Ŝ^-_tot := Σ_{x ∈ Λ} Ŝ_x^-`. -/
+def totalSpinHalfOpMinus : ManyBodyOp Λ :=
+  ∑ x : Λ, onSite x spinHalfOpMinus
+
+/-- The defining identity (Tasaki eq (2.2.8)):
+`Ŝ^+_tot = Ŝ^(1)_tot + i · Ŝ^(2)_tot`. -/
+theorem totalSpinHalfOpPlus_eq_add :
+    (totalSpinHalfOpPlus Λ : ManyBodyOp Λ) =
+      totalSpinHalfOp1 Λ + Complex.I • totalSpinHalfOp2 Λ := by
+  unfold totalSpinHalfOpPlus totalSpinHalfOp1 totalSpinHalfOp2
+  rw [Finset.smul_sum, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro x _
+  rw [← onSite_smul, ← onSite_add, spinHalfOpPlus_eq_add]
+
+/-- The defining identity (Tasaki eq (2.2.8)):
+`Ŝ^-_tot = Ŝ^(1)_tot - i · Ŝ^(2)_tot`. -/
+theorem totalSpinHalfOpMinus_eq_sub :
+    (totalSpinHalfOpMinus Λ : ManyBodyOp Λ) =
+      totalSpinHalfOp1 Λ - Complex.I • totalSpinHalfOp2 Λ := by
+  unfold totalSpinHalfOpMinus totalSpinHalfOp1 totalSpinHalfOp2
+  rw [Finset.smul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro x _
+  rw [← onSite_smul, ← onSite_sub, spinHalfOpMinus_eq_sub]
+
+/-! ## Total magnetization (Tasaki eq (2.2.2))
+
+Tasaki eq. (2.2.2) defines the total magnetization `|σ| := Σ_{x ∈ Λ} σ_x`
+for `σ_x ∈ {-1, +1}`. In our encoding `σ_x : Fin 2` with `0 ↦ +1/2`
+(spin up) and `1 ↦ -1/2` (spin down), the natural integer-valued
+magnetization is `Σ_x (1 - 2 · σ_x)`. -/
+
+/-- Sign-of-spin function: `0 ↦ 1` (spin up), `1 ↦ -1` (spin down). -/
+def spinSign (s : Fin 2) : ℤ := if s = 0 then 1 else -1
+
+/-- Total magnetization of a basis state `σ : Λ → Fin 2`:
+`|σ| := Σ_{x ∈ Λ} spinSign (σ x) ∈ {-|Λ|, ..., |Λ|}`. -/
+def magnetization (σ : Λ → Fin 2) : ℤ :=
+  ∑ x : Λ, spinSign (σ x)
 
 end LatticeSystem.Quantum
