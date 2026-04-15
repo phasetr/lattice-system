@@ -99,6 +99,33 @@ theorem spinHalfDot_self (x : Λ) :
     rw [← add_smul, ← add_smul]; norm_num]
   rw [onSite_smul, onSite_one]
 
+/-- `Ŝ_x · Ŝ_y` is Hermitian: for `x = y`, it reduces to the scalar
+`(3/4)·1`; for `x ≠ y`, each of the three axis terms is a product of
+commuting site embeddings of Hermitian single-site operators. -/
+theorem spinHalfDot_isHermitian (x y : Λ) :
+    (spinHalfDot x y : ManyBodyOp Λ).IsHermitian := by
+  by_cases hxy : x = y
+  · subst hxy
+    rw [spinHalfDot_self]
+    unfold Matrix.IsHermitian
+    rw [Matrix.conjTranspose_smul,
+      show star ((3 / 4 : ℂ)) = (3 / 4 : ℂ) from by simp,
+      Matrix.conjTranspose_one]
+  · unfold spinHalfDot
+    refine Matrix.IsHermitian.add (Matrix.IsHermitian.add ?_ ?_) ?_
+    · exact Matrix.IsHermitian.mul_of_commute
+        (onSite_isHermitian x spinHalfOp1_isHermitian)
+        (onSite_isHermitian y spinHalfOp1_isHermitian)
+        (onSite_mul_onSite_of_ne hxy _ _)
+    · exact Matrix.IsHermitian.mul_of_commute
+        (onSite_isHermitian x spinHalfOp2_isHermitian)
+        (onSite_isHermitian y spinHalfOp2_isHermitian)
+        (onSite_mul_onSite_of_ne hxy _ _)
+    · exact Matrix.IsHermitian.mul_of_commute
+        (onSite_isHermitian x spinHalfOp3_isHermitian)
+        (onSite_isHermitian y spinHalfOp3_isHermitian)
+        (onSite_mul_onSite_of_ne hxy _ _)
+
 /-! ## Squared-sum decomposition (Tasaki eq (2.2.18)) -/
 
 /-- The two-site total spin squared: `(Ŝ_x + Ŝ_y)²`, i.e.
