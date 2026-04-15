@@ -361,4 +361,64 @@ theorem onSite_commutator_same (i : Λ) (A B : Matrix (Fin 2) (Fin 2) ℂ) :
       onSite i (A * B - B * A) := by
   rw [onSite_mul_onSite_same, onSite_mul_onSite_same, ← onSite_sub]
 
+/-! ## Basis states and tensor action (Tasaki eq (2.2.1), (2.2.4))
+
+The computational basis of the many-body Hilbert space is indexed by
+configurations `σ : Λ → Fin 2`. We define `basisVec σ` as the standard
+basis vector concentrated at `σ`, and show that `onSite i A` acts on
+these basis vectors as Tasaki eq. (2.2.4): it sums over the two
+possible values of the site-`i` entry, weighted by the matrix elements
+of `A`.
+-/
+
+/-- The standard basis vector at configuration `σ : Λ → Fin 2`: the
+function that is `1` at `σ` and `0` elsewhere. -/
+def basisVec (σ : Λ → Fin 2) : (Λ → Fin 2) → ℂ :=
+  fun τ => if τ = σ then 1 else 0
+
+/-- Tasaki eq. (2.2.4) for `S = 1/2`: the site-`i` operator acts on a
+computational-basis state `|σ⟩` by sending `σ_i` through the `Fin 2`
+matrix `A`, giving a superposition over the two possible values of the
+site-`i` entry:
+`Ŝ_x^(α) |Ψ_σ⟩ = Σ_k A k (σ x) · |Ψ_{σ[x↦k]}⟩`. -/
+theorem onSite_mulVec_basisVec
+    (i : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) (σ : Λ → Fin 2) :
+    ((onSite i A).mulVec (basisVec σ) : (Λ → Fin 2) → ℂ) =
+      fun τ => ∑ k : Fin 2, A k (σ i) * basisVec (Function.update σ i k) τ := by
+  funext τ
+  change ∑ ρ, (onSite i A) τ ρ * basisVec σ ρ =
+       ∑ k : Fin 2, A k (σ i) * basisVec (Function.update σ i k) τ
+  -- LHS: only ρ = σ contributes
+  rw [Fintype.sum_eq_single σ (fun ρ hρ => by
+    simp only [basisVec, if_neg hρ, mul_zero])]
+  simp only [onSite_apply, basisVec]
+  by_cases hagree : ∀ k, k ≠ i → τ k = σ k
+  · rw [if_pos hagree]
+    -- RHS: only k = τ i contributes
+    rw [Fintype.sum_eq_single (τ i) (fun k hk => by
+      rw [if_neg, mul_zero]
+      intro heq
+      apply hk
+      have := congrFun heq i
+      rw [Function.update_self] at this
+      exact this.symm)]
+    have hupd : τ = Function.update σ i (τ i) := by
+      funext j
+      by_cases hj : j = i
+      · subst hj; rw [Function.update_self]
+      · rw [Function.update_of_ne hj]; exact hagree j hj
+    rw [if_pos hupd]
+    simp only [if_true]
+  · rw [if_neg hagree, zero_mul]
+    symm
+    apply Finset.sum_eq_zero
+    intros k _
+    rw [if_neg, mul_zero]
+    intro heq
+    apply hagree
+    intros j hj
+    have := congrFun heq j
+    rw [Function.update_of_ne hj] at this
+    exact this
+
 end LatticeSystem.Quantum
