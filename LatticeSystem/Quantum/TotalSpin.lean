@@ -210,6 +210,25 @@ theorem totalSpinHalfOp3_mulVec_basisVec (σ : Λ → Fin 2) :
   change ∑ ρ, onSite x spinHalfOp3 τ ρ * basisVec σ ρ = spinHalfSign (σ x) * basisVec σ τ
   convert hτ using 1
 
+/-- `Ŝ_tot^(3) · |σ⟩ = (|σ| / 2) · |σ⟩`: the `Ŝ_tot^(3)` eigenvalue is
+half the total magnetization (Tasaki eq. (2.2.10)). -/
+theorem totalSpinHalfOp3_mulVec_basisVec_eq_magnetization (σ : Λ → Fin 2) :
+    (totalSpinHalfOp3 Λ).mulVec (basisVec σ) =
+      ((magnetization Λ σ : ℂ) / 2) • basisVec σ := by
+  rw [totalSpinHalfOp3_mulVec_basisVec]
+  congr 1
+  have heach : ∀ x : Λ, spinHalfSign (σ x) = ((spinSign (σ x) : ℂ) / 2) := by
+    intro x
+    unfold spinHalfSign spinSign
+    match hsx : σ x with
+    | 0 => simp
+    | 1 => push_cast; ring
+  rw [Finset.sum_congr rfl (fun x _ => heach x)]
+  unfold magnetization
+  push_cast
+  rw [div_eq_mul_inv, Finset.sum_mul]
+  simp only [div_eq_mul_inv]
+
 
 /-! ## Total spin commutation relations
 
