@@ -56,6 +56,8 @@ LatticeSystem/
                              and algebra (Tasaki section 2.1)
     SpinHalfBasis.lean    -- basis states |up>, |down>, raising/lowering S^+/-
                              and their actions (Tasaki section 2.1)
+    SpinOne.lean          -- S = 1 matrix representations (3x3)
+                             (Tasaki section 2.1, eq 2.1.9)
     ManyBody.lean         -- multi-site operator space, onSite embedding,
                              commutativity at distinct sites
     IsingChain.lean       -- 1D open-chain quantum Ising Hamiltonian
@@ -217,6 +219,69 @@ Tasaki~\cite{Tasaki:QMB}:
 \end{itemize}
 
 %======================================================================
+\section{S = 1 matrix representations (Tasaki §2.1 eq 2.1.9)}
+\label{sec:spinone}
+%======================================================================
+
+\emph{Source file:} \texttt{LatticeSystem/Quantum/SpinOne.lean}.
+
+\subsection{Definitions}
+
+\begin{definition}[Tasaki eq.~(2.1.9), p.~15]
+The $S = 1$ spin operators are the $3 \times 3$ matrices
+\[
+  \hat S^{(1)} = \tfrac{1}{\sqrt{2}}
+    \begin{pmatrix} 0 & 1 & 0 \\ 1 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix},\quad
+  \hat S^{(2)} = \tfrac{1}{\sqrt{2}}
+    \begin{pmatrix} 0 & -i & 0 \\ i & 0 & -i \\ 0 & i & 0 \end{pmatrix},\quad
+  \hat S^{(3)} =
+    \begin{pmatrix} 1 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & -1 \end{pmatrix}.
+\]
+Lean names: \texttt{spinOneOp1}, \texttt{spinOneOp2}, \texttt{spinOneOp3}.
+\end{definition}
+
+\subsection{Formalized facts}
+
+\begin{lemma}[Hermiticity]
+Each $\hat S^{(\alpha)}$ (for $\alpha \in \{1, 2, 3\}$) is Hermitian
+(\texttt{spinOneOp1/2/3\_isHermitian}).
+\end{lemma}
+
+\begin{theorem}[Commutation relations, Tasaki eq.~(2.1.1), $S = 1$ case]
+\[
+  [\hat S^{(1)}, \hat S^{(2)}] = i\,\hat S^{(3)},\quad
+  [\hat S^{(2)}, \hat S^{(3)}] = i\,\hat S^{(1)},\quad
+  [\hat S^{(3)}, \hat S^{(1)}] = i\,\hat S^{(2)}.
+\]
+Lean names: \texttt{spinOneOp1\_commutator\_spinOneOp2} and cyclic.
+\end{theorem}
+
+\begin{theorem}[Total spin, $S = 1$ case of $\hat S^2 = S(S+1) I$]
+\[
+  (\hat S^{(1)})^2 + (\hat S^{(2)})^2 + (\hat S^{(3)})^2 = 2\,I.
+\]
+Lean name: \texttt{spinOne\_total\_spin\_squared}.
+\end{theorem}
+
+\paragraph{Proof technique.}
+Every statement is verified by entry-wise computation:
+\texttt{ext; fin\_cases i; fin\_cases j; simp} expands the $3 \times 3$
+matrix products via the \texttt{!!} notation's built-in simp rules.
+The auxiliary \texttt{invSqrt2\_sq : invSqrt2\textasciicircum 2 = 1/2}
+(proved from \texttt{Real.mul\_self\_sqrt}) handles the squared
+$\tfrac{1}{\sqrt{2}}$ coefficient, and \texttt{Complex.I\_sq : I\textasciicircum 2 = -1}
+handles the squared imaginary unit after \texttt{ring\_nf} normalization.
+The \texttt{!!} notation's simp set already rewrites bare $I \cdot I$ to
+$-1$, so \texttt{Complex.I\_sq} is only required where
+\texttt{ring\_nf} has introduced \texttt{I\textasciicircum 2}.
+
+\paragraph{References.}
+Tasaki~\cite{Tasaki:QMB}, §2.1, eq.~(2.1.9), p.~15.
+The commutation and total-spin identities are the $S = 1$ instances of
+the abstract relations eq.~(2.1.1) on p.~13 and the convention
+$\hat S^2 = S(S+1) I$ stated just below it (p.~14).
+
+%======================================================================
 \section{Multi-body operator space and site embedding}
 \label{sec:manybody}
 %======================================================================
@@ -373,6 +438,7 @@ Area & Stage & Status \\
 Pauli matrices and their algebra & finite-dim & \emph{formalized} \\
 Spin-1/2 operators and $[\hat S^{(\alpha)},\hat S^{(\beta)}]$ (Tasaki §2.1) & finite-dim & \emph{formalized} \\
 Basis states, $\hat S^{(3)}$ eigen-eqn, $\hat S^\pm$ (Tasaki §2.1) & finite-dim & \emph{formalized} \\
+$S = 1$ matrix representations (Tasaki §2.1 eq.~2.1.9) & finite-dim & \emph{formalized} \\
 Multi-body operator space / \texttt{onSite} & finite-dim & \emph{formalized} \\
 Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
 1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\
