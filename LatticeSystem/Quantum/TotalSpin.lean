@@ -229,6 +229,45 @@ theorem totalSpinHalfOp3_mulVec_basisVec_eq_magnetization (σ : Λ → Fin 2) :
   rw [div_eq_mul_inv, Finset.sum_mul]
   simp only [div_eq_mul_inv]
 
+/-- `Ŝ_x^+ · |σ⟩`: acts as raising on a down spin at site `x`
+(annihilates an up spin). -/
+theorem onSite_spinHalfOpPlus_mulVec_basisVec (x : Λ) (σ : Λ → Fin 2) :
+    (onSite x spinHalfOpPlus : ManyBodyOp Λ).mulVec (basisVec σ) =
+      if σ x = 1 then basisVec (Function.update σ x 0) else 0 := by
+  rw [onSite_mulVec_basisVec]
+  funext τ
+  simp only [Fin.sum_univ_two, spinHalfOpPlus]
+  match hsx : σ x with
+  | 0 =>
+    have h0 : Function.update σ x (0 : Fin 2) = σ := by
+      rw [← hsx]; exact Function.update_eq_self _ _
+    rw [h0]
+    simp
+  | 1 =>
+    have h1 : Function.update σ x (1 : Fin 2) = σ := by
+      rw [← hsx]; exact Function.update_eq_self _ _
+    rw [h1]
+    simp
+
+/-- `Ŝ_x^- · |σ⟩`: acts as lowering on an up spin at site `x`
+(annihilates a down spin). -/
+theorem onSite_spinHalfOpMinus_mulVec_basisVec (x : Λ) (σ : Λ → Fin 2) :
+    (onSite x spinHalfOpMinus : ManyBodyOp Λ).mulVec (basisVec σ) =
+      if σ x = 0 then basisVec (Function.update σ x 1) else 0 := by
+  rw [onSite_mulVec_basisVec]
+  funext τ
+  simp only [Fin.sum_univ_two, spinHalfOpMinus]
+  match hsx : σ x with
+  | 0 =>
+    have h0 : Function.update σ x (0 : Fin 2) = σ := by
+      rw [← hsx]; exact Function.update_eq_self _ _
+    rw [h0]
+    simp
+  | 1 =>
+    have h1 : Function.update σ x (1 : Fin 2) = σ := by
+      rw [← hsx]; exact Function.update_eq_self _ _
+    rw [h1]
+    simp
 
 /-! ## Total spin commutation relations
 
