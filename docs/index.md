@@ -41,7 +41,11 @@ CAR algebras, and eventually lattice QCD.
 | P1e'''' (Tasaki §2.1) | `Û^(α)_π · Û^(β)_π = Û^(γ)_π`; conjugations `(Û^(α)_π)†·Ŝ^(β)·Û^(α)_π = ±Ŝ^(β)` | Done |
 | P1e''''' (Tasaki §2.1) | General θ transformation `(Û^(α)_θ)† Ŝ^(β) Û^(α)_θ = …` | Not started |
 | P1e'''''' (Tasaki §2.1) | Z₂ × Z₂ representation (eqs. (2.1.27)-(2.1.34)) | Not started |
-| P1f (Tasaki §2.2) | General quantum spin systems on an abstract finite lattice | Not started |
+| P1f (Tasaki §2.2) | Abstract lattice `Λ`, site operators `Ŝ_x^(α)`, distinct-site commutation (eq. (2.2.6)) | Done |
+| P1f' (Tasaki §2.2) | Total spin operator `Ŝ_tot^(α)` (eq. (2.2.7)) and Hermiticity | Done |
+| P1f'' (Tasaki §2.2) | Global rotation `Û^(α)_θ = exp(-iθ Ŝ_tot^(α))` (eq. (2.2.11)) | Not started |
+| P1f''' (Tasaki §2.2) | SU(2) / U(1) invariance (eqs. (2.2.12)-(2.2.13)) | Not started |
+| P1f'''' (Tasaki §2.2) | Two-site interaction `Ŝ_x · Ŝ_y` and its SU(2) invariance (eqs. (2.2.16)-(2.2.19)) | Not started |
 | P1g | Gibbs state `ρ = e^{-βH}/Z`, expectation `⟨O⟩_β = Tr(ρO)` | Not started |
 | P1h | Periodic boundary conditions, other quantum chains (Heisenberg) | Not started |
 | P2 | Finite-volume Hubbard / BCS | Not started |
@@ -143,18 +147,31 @@ Systems*, §2.1 eqs. (2.1.4), (2.1.5), (2.1.6), p. 14.
 | `spinHalfOpPlus_eq_add`, `spinHalfOpMinus_eq_sub` | `Ŝ^± = Ŝ^(1) ± i · Ŝ^(2)` | `Quantum/SpinHalfBasis.lean` |
 | `spinHalfOpPlus/Minus_mulVec_spinHalfUp/Down` | raising/lowering actions (Tasaki (2.1.5)) | `Quantum/SpinHalfBasis.lean` |
 
-### Multi-body operator space
+### Multi-body operator space (abstract lattice)
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, §2.2, pp. 21-26 (tensor-product Hilbert space and site-local
-operators).
+operators). The lattice `Λ` is an arbitrary finite set with decidable
+equality; specializing to `Λ = Fin N` recovers an `N`-site chain.
 
 | Lean name | Statement | File |
 |---|---|---|
-| `onSite i A` | site-embedded operator | `Quantum/ManyBody.lean` |
+| `ManyBodyOp Λ` | `Matrix (Λ → Fin 2) (Λ → Fin 2) ℂ` | `Quantum/ManyBody.lean` |
+| `onSite i A` | site-embedded operator at `i : Λ` | `Quantum/ManyBody.lean` |
 | `onSite_isHermitian` | `A.IsHermitian → (onSite i A).IsHermitian` | `Quantum/ManyBody.lean` |
-| `onSite_mul_onSite_of_ne` | operators at distinct sites commute | `Quantum/ManyBody.lean` |
+| `onSite_mul_onSite_of_ne` | distinct-site commutation (Tasaki (2.2.6), S = 1/2) | `Quantum/ManyBody.lean` |
 | `Matrix.IsHermitian.mul_of_commute` | commuting Hermitians multiply Hermitian | `Quantum/ManyBody.lean` |
+
+### Total spin operator (Tasaki §2.2 eq. (2.2.7))
+
+Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, §2.2 eq. (2.2.7), p. 22.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `totalSpinHalfOp1/2/3 Λ` | `Ŝ_tot^(α) := Σ_{x ∈ Λ} onSite x Ŝ^(α)` | `Quantum/TotalSpin.lean` |
+| `totalSpinHalfOp1/2/3_isHermitian` | `Ŝ_tot^(α)` is Hermitian | `Quantum/TotalSpin.lean` |
+| `spinHalfOp_onSite_comm_of_ne` | S = 1/2 named wrapper of `onSite_mul_onSite_of_ne` | `Quantum/TotalSpin.lean` |
 
 ### One-dimensional open-chain quantum Ising
 

@@ -59,6 +59,8 @@ LatticeSystem/
     SpinHalfDecomp.lean   -- Pauli basis of M_2(C) (Tasaki Problem 2.1.a, S=1/2)
     SpinHalfRotation.lean -- Closed-form S=1/2 spin rotation operators
                              (Tasaki section 2.1, eq 2.1.26)
+    TotalSpin.lean        -- Total spin operator on an abstract lattice
+                             (Tasaki section 2.2, eq 2.2.7)
     SpinOne.lean          -- S = 1 matrix representations (3x3)
                              (Tasaki section 2.1, eq 2.1.9)
     ManyBody.lean         -- multi-site operator space, onSite embedding,
@@ -534,6 +536,75 @@ the abstract relations eq.~(2.1.1) on p.~13 and the convention
 $\hat S^2 = S(S+1) I$ stated just below it (p.~14).
 
 %======================================================================
+\section{Abstract lattice, site operators, and total spin (Tasaki §2.2)}
+\label{sec:sec22}
+%======================================================================
+
+\emph{Source files:} \texttt{LatticeSystem/Quantum/ManyBody.lean},
+\texttt{Quantum/TotalSpin.lean}.
+
+\subsection{Abstract lattice}
+
+Tasaki~§2.2, p.~21 formulates quantum spin systems on any finite set
+$\Lambda$. Our \texttt{ManyBodyOp} now takes $\Lambda : \text{Type}^*$
+equipped with \texttt{Fintype} and \texttt{DecidableEq} instances, with
+the Hilbert space model
+\[
+  \texttt{ManyBodyOp}\,\Lambda
+    := \operatorname{Matrix}\bigl((\Lambda \to \mathrm{Fin}\,2),
+        (\Lambda \to \mathrm{Fin}\,2), \mathbb{C}\bigr).
+\]
+All earlier theorems about \texttt{onSite}, \texttt{onSite\_isHermitian},
+and \texttt{onSite\_mul\_onSite\_of\_ne} carry over verbatim with the
+abstract $\Lambda$.
+
+\subsection{Distinct-site commutation (Tasaki eq.~(2.2.6), S = 1/2)}
+
+\begin{theorem}
+For $x \neq y$ in $\Lambda$ and any single-site operators $S_\alpha$,
+$S_\beta$,
+$\hat S_x^{(\alpha)} \hat S_y^{(\beta)} = \hat S_y^{(\beta)} \hat S_x^{(\alpha)}$.
+\end{theorem}
+
+This is the $S = 1/2$ case of Tasaki eq.~(2.2.6) on p.~22. Lean name:
+\texttt{onSite\_mul\_onSite\_of\_ne} (or its S = 1/2 named wrapper
+\texttt{spinHalfOp\_onSite\_comm\_of\_ne}).
+
+\subsection{Total spin (Tasaki eq.~(2.2.7))}
+
+\begin{definition}
+$\hat S_{\mathrm{tot}}^{(\alpha)}
+  := \sum_{x \in \Lambda} \hat S_x^{(\alpha)}
+  = \sum_{x \in \Lambda} \texttt{onSite}\,x\,\hat S^{(\alpha)}$
+for $\alpha \in \{1, 2, 3\}$. Lean names:
+\texttt{totalSpinHalfOp1}, \texttt{totalSpinHalfOp2},
+\texttt{totalSpinHalfOp3}.
+\end{definition}
+
+\begin{lemma}
+$\hat S_{\mathrm{tot}}^{(\alpha)}$ is Hermitian, for each $\alpha$.
+Lean names: \texttt{totalSpinHalfOp1/2/3\_isHermitian}.
+\end{lemma}
+
+\begin{proof}
+A sum of Hermitian matrices is Hermitian, and each
+$\texttt{onSite}\,x\,\hat S^{(\alpha)}$ is Hermitian by the lemma
+\texttt{onSite\_isHermitian}.
+\end{proof}
+
+\paragraph{Not yet formalized.}
+\begin{itemize}
+  \item Global rotation operator
+    $\hat U^{(\alpha)}_\theta = \exp(-i\theta \hat S_{\mathrm{tot}}^{(\alpha)})$
+    (eq.~(2.2.11)).
+  \item SU(2) / U(1) invariance of operators commuting with
+    $\hat S_{\mathrm{tot}}^{(\alpha)}$ (eqs.~(2.2.12)-(2.2.13)).
+  \item Two-site operator $\hat S_x \cdot \hat S_y$ and its
+    SU(2) invariance (eqs.~(2.2.16)-(2.2.19)).
+  \item Problem 2.2.a-c.
+\end{itemize}
+
+%======================================================================
 \section{Multi-body operator space and site embedding}
 \label{sec:manybody}
 %======================================================================
@@ -696,6 +767,7 @@ $S = 1/2$ rotation (closed form, $\theta=0$, adjoint, $2\pi$) & finite-dim & \em
 $S = 1/2$ rotation (group law, unitarity) & finite-dim & \emph{formalized} \\
 $S = 1/2$ $\pi$-rotations (eq.~2.1.25) & finite-dim & \emph{formalized} \\
 $S = 1/2$ $\pi$-rotation products and conjugations (Tasaki §2.1) & finite-dim & \emph{formalized} \\
+Abstract lattice + total spin (Tasaki §2.2, partial) & finite-dim & \emph{formalized} \\
 Multi-body operator space / \texttt{onSite} & finite-dim & \emph{formalized} \\
 Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
 1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\

@@ -8,4 +8,5 @@ import LatticeSystem.Quantum.SpinHalfDecomp
 import LatticeSystem.Quantum.SpinHalfRotation
 import LatticeSystem.Quantum.SpinOne
 import LatticeSystem.Quantum.ManyBody
+import LatticeSystem.Quantum.TotalSpin
 import LatticeSystem.Quantum.IsingChain
