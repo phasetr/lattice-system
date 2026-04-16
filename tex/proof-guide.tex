@@ -1049,6 +1049,45 @@ formalization of Tasaki \S2.1 and \S2.2.
   $\hat U^{(\alpha)}_{\pi,{\rm tot}} \cdot
    \hat U^{(\beta)}_{\pi,{\rm tot}}
    = \hat U^{(\gamma)}_{\pi,{\rm tot}}$ (Tasaki Problem 2.2.a).
+\item \texttt{onSiteRingHom}, \texttt{onSiteLinearMap},
+  \texttt{continuous\_onSite}, \texttt{onSite\_pow}: site embedding
+  packaged as a ring/linear/continuous map and lifted to powers.
+\item \texttt{totalSpinHalfRot\{1,2,3\}Pi\_two\_site},
+  \texttt{totalSpinHalfRot\{1,2,3\}\_two\_site}: for $\Lambda = {\rm Fin}\,2$,
+  the global rotation factors as $\texttt{onSite}\,0\,(\hat U^{(\alpha)}_\theta)
+  \cdot \texttt{onSite}\,1\,(\hat U^{(\alpha)}_\theta)$ (Tasaki Problem
+  2.2.b at $\theta = \pi$ and general $\theta$).
+\item \texttt{spinHalfDot\_mulVec\_basisVec\_parallel},
+  \texttt{spinHalfDot\_mulVec\_basisVec\_both\_up/down}: for $x \neq y$
+  with $\sigma_x = \sigma_y$, $\hat S_x \cdot \hat S_y |\sigma\rangle =
+  (1/4)|\sigma\rangle$ (Tasaki eq.~(2.2.19), parallel case; gives the
+  triplet $m = \pm 1$ eigenvalue).
+\item \texttt{basisSwap}, \texttt{basisSwap\_involutive},
+  \texttt{basisSwap\_antiparallel}: site-swap of $\sigma$ at $x, y$,
+  involution, and preservation of anti-parallelism.
+\item \texttt{spinHalfDot\_mulVec\_basisVec\_antiparallel}: for
+  $\sigma_x \neq \sigma_y$, $\hat S_x \cdot \hat S_y |\sigma\rangle =
+  (1/2)|\mathrm{swap}\,\sigma\rangle - (1/4)|\sigma\rangle$.
+\item \texttt{spinHalfDot\_mulVec\_singlet}: singlet eigenvalue
+  $\hat S_x \cdot \hat S_y (|\sigma\rangle - |\mathrm{swap}\,\sigma\rangle)
+  = -(3/4)(|\sigma\rangle - |\mathrm{swap}\,\sigma\rangle)$ (Tasaki
+  eq.~(2.2.19), $S = 0$ singlet).
+\item \texttt{spinHalfDot\_mulVec\_triplet\_anti}: triplet $m = 0$
+  eigenvalue $\hat S_x \cdot \hat S_y (|\sigma\rangle + |\mathrm{swap}\,\sigma\rangle)
+  = (1/4)(|\sigma\rangle + |\mathrm{swap}\,\sigma\rangle)$ (Tasaki
+  eq.~(2.2.19), $S = 1$, $m = 0$).
+\item \texttt{heisenbergHamiltonian},
+  \texttt{heisenbergHamiltonian\_commutator\_totalSpinHalfOp\{1,2,3\}},
+  \texttt{heisenbergHamiltonian\_commutator\_totalSpinHalfOp\{Plus,Minus\}}:
+  the general Heisenberg-type Hamiltonian
+  $H = \sum_{x,y} J(x,y)\,\hat S_x \cdot \hat S_y$ commutes with
+  $\hat S^{(\alpha)}_{\rm tot}$ and $\hat S^{\pm}_{\rm tot}$
+  (Tasaki eq.~(2.2.13), SU(2) invariance).
+\item \texttt{totalSpinHalfSquared\_mulVec\_basisVec\_const},
+  \texttt{totalSpinHalfSquared\_mulVec\_basisVec\_all\_up/down}:
+  $\hat S_{\rm tot}^2 |s\,s\,\dots\,s\rangle = (N(N+2)/4)|s\,s\,\dots\,s\rangle$
+  for any constant $s : {\rm Fin}\,2$ — the Casimir eigenvalue at
+  the maximum total spin $S = N/2$.
 \end{itemize}
 
 \section{Progress table}
