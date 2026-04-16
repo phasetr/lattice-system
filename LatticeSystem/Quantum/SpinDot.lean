@@ -772,4 +772,79 @@ theorem totalSpinHalfSquared_mulVec_basisVec_all_down :
         basisVec (fun _ : Λ => (1 : Fin 2)) :=
   totalSpinHalfSquared_mulVec_basisVec_const 1
 
+/-! ## Two-site singlet / triplet Casimir eigenvalues
+
+For `Λ = Fin 2`, the natural anti-parallel basis state `|↑↓⟩` satisfies:
+
+* `Ŝ_tot² (|↑↓⟩ - |↓↑⟩) = 0` (singlet, `S = 0`).
+* `Ŝ_tot² (|↑↓⟩ + |↓↑⟩) = 2 (|↑↓⟩ + |↓↑⟩)` (triplet `m = 0`, `S = 1`).
+
+Combined with the all-up/all-down statements, this exhausts the
+`Ŝ_tot²` spectrum of two spin-1/2 particles. -/
+
+/-- The two-site `↑↓` configuration (anti-parallel: site 0 up, site 1 down). -/
+private def upDown : Fin 2 → Fin 2
+  | 0 => 0
+  | 1 => 1
+
+private lemma upDown_zero : upDown 0 = 0 := rfl
+private lemma upDown_one : upDown 1 = 1 := rfl
+
+private lemma upDown_antiparallel : upDown 0 ≠ upDown 1 := by
+  rw [upDown_zero, upDown_one]; exact zero_ne_one
+
+private lemma basisSwap_upDown :
+    basisSwap upDown (0 : Fin 2) 1 = fun (i : Fin 2) =>
+      match i with | 0 => 1 | 1 => 0 := by
+  funext i
+  unfold basisSwap upDown
+  fin_cases i <;> simp
+
+/-- Two-site singlet eigenvalue: `Ŝ_tot² (|↑↓⟩ - |↓↑⟩) = 0`. -/
+theorem totalSpinHalfSquared_mulVec_two_site_singlet :
+    (totalSpinHalfSquared (Fin 2)).mulVec
+        (basisVec upDown - basisVec (basisSwap upDown 0 1)) = 0 := by
+  rw [totalSpinHalfSquared_eq_sum_dot]
+  have hzo : (0 : Fin 2) ≠ 1 := zero_ne_one
+  have hoz : (1 : Fin 2) ≠ 0 := one_ne_zero
+  have hud_swap : basisSwap upDown 1 0 = basisSwap upDown 0 1 := by
+    funext i; unfold basisSwap upDown
+    fin_cases i <;> simp
+  -- Distribute the double sum into 4 terms
+  rw [show (∑ x : Fin 2, ∑ y : Fin 2, spinHalfDot x y :) =
+      spinHalfDot 0 0 + spinHalfDot 0 1 + spinHalfDot 1 0 + spinHalfDot 1 1 from by
+    simp [Fin.sum_univ_two]; abel]
+  rw [Matrix.add_mulVec, Matrix.add_mulVec, Matrix.add_mulVec]
+  -- Each diagonal term = (3/4)·1, off-diagonal terms = -(3/4)
+  rw [spinHalfDot_self, Matrix.smul_mulVec, Matrix.one_mulVec]
+  rw [spinHalfDot_self, Matrix.smul_mulVec, Matrix.one_mulVec]
+  rw [spinHalfDot_mulVec_singlet hzo upDown upDown_antiparallel]
+  rw [spinHalfDot_comm 1 0]
+  rw [spinHalfDot_mulVec_singlet hzo upDown upDown_antiparallel]
+  -- Now: (3/4)·v + -(3/4)·v + -(3/4)·v + (3/4)·v = 0
+  set v : (Fin 2 → Fin 2) → ℂ := basisVec upDown - basisVec (basisSwap upDown 0 1)
+  change (3 / 4 : ℂ) • v + -(3 / 4 : ℂ) • v + -(3 / 4 : ℂ) • v + (3 / 4 : ℂ) • v = 0
+  module
+
+/-- Two-site triplet `m = 0` eigenvalue: `Ŝ_tot² (|↑↓⟩ + |↓↑⟩) = 2 (|↑↓⟩ + |↓↑⟩)`. -/
+theorem totalSpinHalfSquared_mulVec_two_site_triplet_zero :
+    (totalSpinHalfSquared (Fin 2)).mulVec
+        (basisVec upDown + basisVec (basisSwap upDown 0 1)) =
+      (2 : ℂ) • (basisVec upDown + basisVec (basisSwap upDown 0 1)) := by
+  rw [totalSpinHalfSquared_eq_sum_dot]
+  have hzo : (0 : Fin 2) ≠ 1 := zero_ne_one
+  rw [show (∑ x : Fin 2, ∑ y : Fin 2, spinHalfDot x y :) =
+      spinHalfDot 0 0 + spinHalfDot 0 1 + spinHalfDot 1 0 + spinHalfDot 1 1 from by
+    simp [Fin.sum_univ_two]; abel]
+  rw [Matrix.add_mulVec, Matrix.add_mulVec, Matrix.add_mulVec]
+  rw [spinHalfDot_self, Matrix.smul_mulVec, Matrix.one_mulVec]
+  rw [spinHalfDot_self, Matrix.smul_mulVec, Matrix.one_mulVec]
+  rw [spinHalfDot_mulVec_triplet_anti hzo upDown upDown_antiparallel]
+  rw [spinHalfDot_comm 1 0]
+  rw [spinHalfDot_mulVec_triplet_anti hzo upDown upDown_antiparallel]
+  set v : (Fin 2 → Fin 2) → ℂ := basisVec upDown + basisVec (basisSwap upDown 0 1)
+  change (3 / 4 : ℂ) • v + (1 / 4 : ℂ) • v + (1 / 4 : ℂ) • v + (3 / 4 : ℂ) • v =
+       (2 : ℂ) • v
+  module
+
 end LatticeSystem.Quantum
