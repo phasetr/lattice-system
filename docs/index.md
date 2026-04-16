@@ -48,7 +48,7 @@ CAR algebras, and eventually lattice QCD.
 | P1f'-pm (Tasaki §2.2) | Total raising/lowering `Ŝ^±_tot = Σ_x Ŝ_x^±` (eq. (2.2.8)) | Done |
 | P1f-mag (Tasaki §2.2) | Total magnetization `|σ| := Σ_x spinSign(σ_x)` (eq. (2.2.2)) | Done |
 | P1f'' (Tasaki §2.2) | Global rotation `Û^(α)_θ = exp(-iθ Ŝ_tot^(α))` (eq. (2.2.11)) | Done (proved without axioms) |
-| P1f''' (Tasaki §2.2) | SU(2) / U(1) invariance (eqs. (2.2.12)-(2.2.13)) | Done (`totalSpinHalfRot{α}_commute_of_commute` lifts `[Â, Ŝ_tot^(α)] = 0` to commutativity with `Û^(α)_θ_tot`; conjugation-form `(Û)† Â Û = Â` follows from this + unitarity of `exp` of skew-adjoint, deferred) |
+| P1f''' (Tasaki §2.2) | SU(2) / U(1) invariance (eqs. (2.2.12)-(2.2.13)) | Done (commutativity `totalSpinHalfRot{α}_commute_of_commute`, unitarity `totalSpinHalfRot{α}_conjTranspose_mul_self`, and finite-form invariance `totalSpinHalfRot{α}_conj_eq_self_of_commute` all proved without axioms) |
 | P1f'''' (Tasaki §2.2) | Two-site inner product `Ŝ_x · Ŝ_y` raising/lowering decomposition (eq. (2.2.16)) | Done |
 | P1f''''' (Tasaki §2.2) | SU(2) invariance of `Ŝ_x · Ŝ_y` and eigenvalues (eqs. (2.2.17)–(2.2.19)) | Done |
 | P1g | Gibbs state `ρ = e^{-βH}/Z`, expectation `⟨O⟩_β = Tr(ρO)` | Not started |
@@ -280,6 +280,8 @@ Systems*, §2.2 eqs. (2.2.7) and (2.2.8), p. 22.
 | `totalSpinHalfRot{1,2,3}_eq_exp` | Tasaki eq. (2.2.11): `Û^(α)_θ_tot = exp(-iθ Ŝ_tot^(α))`. Composes `spinHalfRot{α}_eq_exp` (single site), `onSite_exp_eq_exp_onSite` (per-site bridge), and `Matrix.exp_sum_of_commute` (commuting-summand exp = noncommProd of exps) | `Quantum/TotalSpin.lean` |
 | `totalSpinHalfRot{1,2,3}_commute_of_commute` | Tasaki §2.2 (2.2.12) → (2.2.13): `Commute A (Ŝ_tot^(α)) → Commute A (Û^(α)_θ_tot)`. Generic operator version, follows from `Commute.exp_right` after rewriting `Û` via `_eq_exp` | `Quantum/TotalSpin.lean` |
 | `totalSpinHalfOp{Plus,Minus}_exp_commute_of_commute` | ladder version: `Commute A (Ŝ^±_tot) → Commute A (exp(c • Ŝ^±_tot))` for any `c : ℂ` (useful for U(1) symmetry) | `Quantum/TotalSpin.lean` |
+| `totalSpinHalfRot{1,2,3}_conjTranspose_mul_self` | `(Û^(α)_θ_tot)ᴴ * Û^(α)_θ_tot = 1` (unitarity). Derived from `exp_mem_unitary_of_mem_skewAdjoint` after recognizing `-iθ Ŝ_tot^(α)` as skew-adjoint | `Quantum/TotalSpin.lean` |
+| `totalSpinHalfRot{1,2,3}_conj_eq_self_of_commute` | Tasaki eq. (2.2.13) finite form: `Commute A (Ŝ_tot^(α)) → (Û^(α)_θ_tot)ᴴ * A * Û^(α)_θ_tot = A`. Combines `_commute_of_commute` with unitarity | `Quantum/TotalSpin.lean` |
 | `IsInMagnetizationSubspace` | predicate for the magnetization-`M` eigenspace `H_M` (Tasaki eq. (2.2.9)/(2.2.10)) | `Quantum/MagnetizationSubspace.lean` |
 | `basisVec_mem_magnetizationSubspace` | `|σ⟩ ∈ H_{|σ|/2}` — basis states lie in their magnetization subspace | `Quantum/MagnetizationSubspace.lean` |
 

@@ -1046,4 +1046,99 @@ theorem totalSpinHalfOpMinus_exp_commute_of_commute (c : ℂ) (A : ManyBodyOp Λ
     Commute A (NormedSpace.exp (c • totalSpinHalfOpMinus Λ)) :=
   (h.smul_right c).exp_right
 
+/-! ## Unitarity and conjugation form of the global rotation
+
+`Û^(α)_θ_tot = exp(-iθ Ŝ_tot^(α))` is unitary because `-iθ Ŝ_tot^(α)`
+is skew-adjoint (Ŝ_tot^(α) is Hermitian, multiplied by an imaginary
+scalar). From unitarity plus the commutativity established above, the
+finite SU(2) invariance `(Û)† Â Û = Â` (Tasaki eq. (2.2.13))
+follows directly. -/
+
+omit [Fintype Λ] [DecidableEq Λ] in
+private lemma neg_I_mul_real_skewAdjoint_smul_isHermitian (θ : ℝ)
+    {S : ManyBodyOp Λ} (hS : S.IsHermitian) :
+    ((-(Complex.I * (θ : ℂ))) • S) ∈ skewAdjoint (ManyBodyOp Λ) := by
+  rw [skewAdjoint.mem_iff, star_smul]
+  have hSstar : (star S : ManyBodyOp Λ) = S := hS
+  rw [hSstar]
+  have hcoeff : star (-(Complex.I * (θ : ℂ))) = -(-(Complex.I * (θ : ℂ))) := by
+    rw [star_neg, RCLike.star_def, map_mul, Complex.conj_I, Complex.conj_ofReal,
+      neg_mul]
+  rw [hcoeff, neg_smul]
+
+/-- Generic helper: the matrix exponential of `c • S` (with `S`
+Hermitian and `c` purely imaginary, `c̄ = -c`) is unitary, in the
+form `(exp ((-(I·θ)) • S))ᴴ * exp ((-(I·θ)) • S) = 1`. Pushes the
+Frobenius topology bridge through `exp_mem_unitary_of_mem_skewAdjoint`
+with the same `letI` + `@`-notation pattern as `onSite_exp_eq_exp_onSite`. -/
+private theorem manyBody_exp_neg_I_smul_unitary {S : ManyBodyOp Λ}
+    (hS : S.IsHermitian) (θ : ℝ) :
+    Matrix.conjTranspose
+        (NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • S)) *
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • S) = 1 := by
+  letI _iAddTgt : NormedAddCommGroup (ManyBodyOp Λ) :=
+    Matrix.frobeniusNormedAddCommGroup
+  letI _iSpaceTgt : NormedSpace ℂ (ManyBodyOp Λ) :=
+    Matrix.frobeniusNormedSpace
+  letI iRingTgt : NormedRing (ManyBodyOp Λ) :=
+    Matrix.frobeniusNormedRing
+  letI iAlgTgt : NormedAlgebra ℚ (ManyBodyOp Λ) :=
+    Matrix.frobeniusNormedAlgebra
+  haveI iComplTgt : CompleteSpace (ManyBodyOp Λ) :=
+    FiniteDimensional.complete ℂ (ManyBodyOp Λ)
+  have hskew := neg_I_mul_real_skewAdjoint_smul_isHermitian (Λ := Λ) θ hS
+  have hunit : NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • S) ∈
+      unitary (ManyBodyOp Λ) :=
+    @NormedSpace.exp_mem_unitary_of_mem_skewAdjoint
+      (ManyBodyOp Λ) iRingTgt iAlgTgt iComplTgt _ _ _ hskew
+  exact hunit.1
+
+/-- `Û^(1)_θ_tot` is unitary: its conjugate transpose is its inverse. -/
+theorem totalSpinHalfRot1_conjTranspose_mul_self (θ : ℝ) :
+    Matrix.conjTranspose (totalSpinHalfRot1 Λ θ) * totalSpinHalfRot1 Λ θ = 1 := by
+  rw [totalSpinHalfRot1_eq_exp]
+  exact manyBody_exp_neg_I_smul_unitary Λ (totalSpinHalfOp1_isHermitian Λ) θ
+
+/-- `Û^(2)_θ_tot` is unitary. -/
+theorem totalSpinHalfRot2_conjTranspose_mul_self (θ : ℝ) :
+    Matrix.conjTranspose (totalSpinHalfRot2 Λ θ) * totalSpinHalfRot2 Λ θ = 1 := by
+  rw [totalSpinHalfRot2_eq_exp]
+  exact manyBody_exp_neg_I_smul_unitary Λ (totalSpinHalfOp2_isHermitian Λ) θ
+
+/-- `Û^(3)_θ_tot` is unitary. -/
+theorem totalSpinHalfRot3_conjTranspose_mul_self (θ : ℝ) :
+    Matrix.conjTranspose (totalSpinHalfRot3 Λ θ) * totalSpinHalfRot3 Λ θ = 1 := by
+  rw [totalSpinHalfRot3_eq_exp]
+  exact manyBody_exp_neg_I_smul_unitary Λ (totalSpinHalfOp3_isHermitian Λ) θ
+
+/-- Tasaki §2.2 eq (2.2.13), axis 1: `(Û^(1)_θ_tot)ᴴ * Â * Û^(1)_θ_tot = Â`
+when `Â` commutes with `Ŝ_tot^(1)`. The full finite-form SU(2)
+invariance for axis 1. -/
+theorem totalSpinHalfRot1_conj_eq_self_of_commute (θ : ℝ) (A : ManyBodyOp Λ)
+    (h : Commute A (totalSpinHalfOp1 Λ)) :
+    Matrix.conjTranspose (totalSpinHalfRot1 Λ θ) * A * totalSpinHalfRot1 Λ θ = A := by
+  have hcomm : A * totalSpinHalfRot1 Λ θ = totalSpinHalfRot1 Λ θ * A :=
+    totalSpinHalfRot1_commute_of_commute Λ θ A h
+  -- (Û† * A) * Û = Û† * (A * Û) = Û† * (Û * A) = (Û† * Û) * A = 1 * A = A
+  rw [mul_assoc, hcomm, ← mul_assoc,
+      totalSpinHalfRot1_conjTranspose_mul_self, one_mul]
+
+/-- Tasaki §2.2 eq (2.2.13), axis 2. -/
+theorem totalSpinHalfRot2_conj_eq_self_of_commute (θ : ℝ) (A : ManyBodyOp Λ)
+    (h : Commute A (totalSpinHalfOp2 Λ)) :
+    Matrix.conjTranspose (totalSpinHalfRot2 Λ θ) * A * totalSpinHalfRot2 Λ θ = A := by
+  have hcomm : A * totalSpinHalfRot2 Λ θ = totalSpinHalfRot2 Λ θ * A :=
+    totalSpinHalfRot2_commute_of_commute Λ θ A h
+  rw [mul_assoc, hcomm, ← mul_assoc,
+      totalSpinHalfRot2_conjTranspose_mul_self, one_mul]
+
+/-- Tasaki §2.2 eq (2.2.13), axis 3. -/
+theorem totalSpinHalfRot3_conj_eq_self_of_commute (θ : ℝ) (A : ManyBodyOp Λ)
+    (h : Commute A (totalSpinHalfOp3 Λ)) :
+    Matrix.conjTranspose (totalSpinHalfRot3 Λ θ) * A * totalSpinHalfRot3 Λ θ = A := by
+  have hcomm : A * totalSpinHalfRot3 Λ θ = totalSpinHalfRot3 Λ θ * A :=
+    totalSpinHalfRot3_commute_of_commute Λ θ A h
+  rw [mul_assoc, hcomm, ← mul_assoc,
+      totalSpinHalfRot3_conjTranspose_mul_self, one_mul]
+
 end LatticeSystem.Quantum
