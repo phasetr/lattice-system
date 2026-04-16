@@ -707,38 +707,41 @@ theorem heisenbergHamiltonian_commutator_totalSpinHalfOpMinus (J : Λ → Λ →
   rw [Matrix.smul_mul, Matrix.mul_smul, ← smul_sub]
   rw [spinHalfDot_commutator_totalSpinHalfOpMinus, smul_zero]
 
-/-! ## Casimir eigenvalue on the all-up state -/
+/-! ## Casimir eigenvalue on the all-up / all-down states -/
 
-/-- `Ŝ_x · Ŝ_y` action on the all-up basis state: `(3/4) |↑⟩` for `x = y`,
-`(1/4) |↑⟩` for `x ≠ y`. The case split is uniform across `Λ`. -/
-private theorem spinHalfDot_mulVec_all_up (x y : Λ) :
-    (spinHalfDot x y).mulVec (basisVec (fun _ : Λ => (0 : Fin 2))) =
+/-- `Ŝ_x · Ŝ_y` action on a uniformly-aligned basis state (constant `s`):
+`(3/4) |s⟩` for `x = y`, `(1/4) |s⟩` for `x ≠ y`. -/
+private theorem spinHalfDot_mulVec_const (s : Fin 2) (x y : Λ) :
+    (spinHalfDot x y).mulVec (basisVec (fun _ : Λ => s)) =
       (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ)) •
-        basisVec (fun _ : Λ => (0 : Fin 2)) := by
+        basisVec (fun _ : Λ => s) := by
   by_cases hxy : x = y
   · subst hxy
     rw [if_pos rfl, spinHalfDot_self]
     rw [Matrix.smul_mulVec, Matrix.one_mulVec]
   · rw [if_neg hxy]
-    exact spinHalfDot_mulVec_basisVec_both_up hxy
+    exact spinHalfDot_mulVec_basisVec_parallel hxy _ rfl
 
-/-- The Casimir eigenvalue on the all-up state: `Ŝ_tot² |↑↑…↑⟩ =
-(N(N+2)/4) |↑↑…↑⟩` where `N = |Λ|`. Equivalently `S(S+1)|↑…↑⟩` with
-the maximum total spin `S = N/2` characteristic of the symmetric
-spin-coherent state. -/
-theorem totalSpinHalfSquared_mulVec_basisVec_all_up :
-    (totalSpinHalfSquared Λ).mulVec (basisVec (fun _ : Λ => (0 : Fin 2))) =
+/-- Specialization to the all-up state. -/
+private theorem spinHalfDot_mulVec_all_up (x y : Λ) :
+    (spinHalfDot x y).mulVec (basisVec (fun _ : Λ => (0 : Fin 2))) =
+      (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ)) •
+        basisVec (fun _ : Λ => (0 : Fin 2)) :=
+  spinHalfDot_mulVec_const 0 x y
+
+/-- The Casimir eigenvalue on a uniformly-aligned basis state:
+`Ŝ_tot² |s s … s⟩ = (N(N+2)/4) |s s … s⟩` where `N = |Λ|`. Both
+the all-up and all-down states are eigenvectors with eigenvalue
+`S(S+1) = (N/2)(N/2+1)`, the maximum total spin `S = N/2`. -/
+theorem totalSpinHalfSquared_mulVec_basisVec_const (s : Fin 2) :
+    (totalSpinHalfSquared Λ).mulVec (basisVec (fun _ : Λ => s)) =
       ((Fintype.card Λ : ℂ) * (Fintype.card Λ + 2) / 4) •
-        basisVec (fun _ : Λ => (0 : Fin 2)) := by
+        basisVec (fun _ : Λ => s) := by
   rw [totalSpinHalfSquared_eq_sum_dot]
-  -- Pull mulVec inside both sums
   rw [Matrix.sum_mulVec]
-  simp_rw [Matrix.sum_mulVec, spinHalfDot_mulVec_all_up]
-  -- Rewrite as sum of scalars times the same basisVec
+  simp_rw [Matrix.sum_mulVec, spinHalfDot_mulVec_const]
   simp_rw [← Finset.sum_smul]
   congr 1
-  -- Goal: ∑ x, ∑ y, (if x = y then 3/4 else 1/4) = N(N+2)/4
-  -- Inner sum: ∑ y, (if x = y then 3/4 else 1/4) = N/4 + 1/2
   have hinner : ∀ x : Λ, (∑ y : Λ, (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ))) =
       (Fintype.card Λ : ℂ) / 4 + 1 / 2 := by
     intro x
@@ -754,5 +757,19 @@ theorem totalSpinHalfSquared_mulVec_basisVec_all_up :
     ring
   simp_rw [hinner, Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
   ring
+
+/-- Specialization to the all-up state. -/
+theorem totalSpinHalfSquared_mulVec_basisVec_all_up :
+    (totalSpinHalfSquared Λ).mulVec (basisVec (fun _ : Λ => (0 : Fin 2))) =
+      ((Fintype.card Λ : ℂ) * (Fintype.card Λ + 2) / 4) •
+        basisVec (fun _ : Λ => (0 : Fin 2)) :=
+  totalSpinHalfSquared_mulVec_basisVec_const 0
+
+/-- Specialization to the all-down state. -/
+theorem totalSpinHalfSquared_mulVec_basisVec_all_down :
+    (totalSpinHalfSquared Λ).mulVec (basisVec (fun _ : Λ => (1 : Fin 2))) =
+      ((Fintype.card Λ : ℂ) * (Fintype.card Λ + 2) / 4) •
+        basisVec (fun _ : Λ => (1 : Fin 2)) :=
+  totalSpinHalfSquared_mulVec_basisVec_const 1
 
 end LatticeSystem.Quantum
