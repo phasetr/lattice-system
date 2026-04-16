@@ -681,4 +681,45 @@ noncomputable def totalSpinHalfRot3Pi : ManyBodyOp Λ :=
     (fun x => onSite x (spinHalfRot3 Real.pi))
     (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
 
+/-! ## General-θ global rotation (Tasaki eq (2.2.11)) -/
+
+/-- Total rotation about axis 1 by angle `θ`: `Û^(1)_θ_tot := ∏_x Û^(1)_θ_x`. -/
+noncomputable def totalSpinHalfRot1 (θ : ℝ) : ManyBodyOp Λ :=
+  (Finset.univ : Finset Λ).noncommProd
+    (fun x => onSite x (spinHalfRot1 θ))
+    (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+
+/-- Total rotation about axis 2 by angle `θ`. -/
+noncomputable def totalSpinHalfRot2 (θ : ℝ) : ManyBodyOp Λ :=
+  (Finset.univ : Finset Λ).noncommProd
+    (fun x => onSite x (spinHalfRot2 θ))
+    (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+
+/-- Total rotation about axis 3 by angle `θ`. -/
+noncomputable def totalSpinHalfRot3 (θ : ℝ) : ManyBodyOp Λ :=
+  (Finset.univ : Finset Λ).noncommProd
+    (fun x => onSite x (spinHalfRot3 θ))
+    (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+
+/-- `Û^(α)_π_tot` is a special case of `Û^(α)_θ_tot` at `θ = π`. -/
+theorem totalSpinHalfRot1Pi_eq : totalSpinHalfRot1Pi Λ = totalSpinHalfRot1 Λ Real.pi := rfl
+theorem totalSpinHalfRot2Pi_eq : totalSpinHalfRot2Pi Λ = totalSpinHalfRot2 Λ Real.pi := rfl
+theorem totalSpinHalfRot3Pi_eq : totalSpinHalfRot3Pi Λ = totalSpinHalfRot3 Λ Real.pi := rfl
+
+/-- `Û^(α)_0_tot = 1`: the identity rotation on the many-body space. -/
+theorem totalSpinHalfRot1_zero : totalSpinHalfRot1 Λ 0 = 1 := by
+  unfold totalSpinHalfRot1
+  simp_rw [spinHalfRot1_zero, onSite_one]
+  exact (Finset.noncommProd_eq_pow_card _ _ _ 1 (fun _ _ => rfl)).trans (one_pow _)
+
+theorem totalSpinHalfRot2_zero : totalSpinHalfRot2 Λ 0 = 1 := by
+  unfold totalSpinHalfRot2
+  simp_rw [spinHalfRot2_zero, onSite_one]
+  exact (Finset.noncommProd_eq_pow_card _ _ _ 1 (fun _ _ => rfl)).trans (one_pow _)
+
+theorem totalSpinHalfRot3_zero : totalSpinHalfRot3 Λ 0 = 1 := by
+  unfold totalSpinHalfRot3
+  simp_rw [spinHalfRot3_zero, onSite_one]
+  exact (Finset.noncommProd_eq_pow_card _ _ _ 1 (fun _ _ => rfl)).trans (one_pow _)
+
 end LatticeSystem.Quantum
