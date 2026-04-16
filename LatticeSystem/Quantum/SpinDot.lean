@@ -416,4 +416,19 @@ theorem spinHalfPairSpinSq_eq (x y : Λ) :
         onSite x spinHalfOp3 * onSite y spinHalfOp3) from two_smul _ _]
   abel
 
+/-! ## Total spin squared as sum of two-site dot products -/
+
+/-- `(Ŝ_tot)² = Σ_{x,y} Ŝ_x · Ŝ_y` — the total spin squared decomposes
+into a double sum of two-site inner products. This is the natural
+companion to Tasaki eq. (2.2.16). -/
+theorem totalSpinHalfSquared_eq_sum_dot :
+    totalSpinHalfSquared Λ = ∑ x : Λ, ∑ y : Λ, spinHalfDot x y := by
+  unfold totalSpinHalfSquared totalSpinHalfOp1 totalSpinHalfOp2 totalSpinHalfOp3
+  simp only [Finset.sum_mul, Finset.mul_sum]
+  simp_rw [← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  refine Finset.sum_congr rfl fun y _ => ?_
+  rw [spinHalfDot_comm]
+  rfl
+
 end LatticeSystem.Quantum
