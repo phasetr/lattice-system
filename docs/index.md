@@ -47,8 +47,8 @@ CAR algebras, and eventually lattice QCD.
 | P1f' (Tasaki §2.2) | Total spin operator `Ŝ_tot^(α)` (eq. (2.2.7)) and Hermiticity | Done |
 | P1f'-pm (Tasaki §2.2) | Total raising/lowering `Ŝ^±_tot = Σ_x Ŝ_x^±` (eq. (2.2.8)) | Done |
 | P1f-mag (Tasaki §2.2) | Total magnetization `|σ| := Σ_x spinSign(σ_x)` (eq. (2.2.2)) | Done |
-| P1f'' (Tasaki §2.2) | Global rotation `Û^(α)_θ = exp(-iθ Ŝ_tot^(α))` (eq. (2.2.11)) | Axiomatized (TODO: prove; see [open items](#open-items--axioms)) |
-| P1f''' (Tasaki §2.2) | SU(2) / U(1) invariance (eqs. (2.2.12)-(2.2.13)) | Done for Heisenberg-type operators; the fully general operator-level statement (any `Â` with `[Â, Ŝ_tot^(α)] = 0`) is open — see [open items](#open-items--axioms) |
+| P1f'' (Tasaki §2.2) | Global rotation `Û^(α)_θ = exp(-iθ Ŝ_tot^(α))` (eq. (2.2.11)) | Done (proved without axioms) |
+| P1f''' (Tasaki §2.2) | SU(2) / U(1) invariance (eqs. (2.2.12)-(2.2.13)) | Done for Heisenberg-type operators; the fully general operator-level statement (any `Â` with `[Â, Ŝ_tot^(α)] = 0`) is still open (`exp_commute_of_commute` lifted to many-body) |
 | P1f'''' (Tasaki §2.2) | Two-site inner product `Ŝ_x · Ŝ_y` raising/lowering decomposition (eq. (2.2.16)) | Done |
 | P1f''''' (Tasaki §2.2) | SU(2) invariance of `Ŝ_x · Ŝ_y` and eigenvalues (eqs. (2.2.17)–(2.2.19)) | Done |
 | P1g | Gibbs state `ρ = e^{-βH}/Z`, expectation `⟨O⟩_β = Tr(ρO)` | Not started |
@@ -276,8 +276,8 @@ Systems*, §2.2 eqs. (2.2.7) and (2.2.8), p. 22.
 | `onSite_pow` | `(onSite x A)^k = onSite x (A^k)` (powers commute with `onSite`) | `Quantum/TotalSpin.lean` |
 | `totalSpinHalfRot{1,2,3}Pi_two_site` | for `Λ = Fin 2`, the global π-rotation factors as `onSite 0 (Û^(α)_π) * onSite 1 (Û^(α)_π)` (Tasaki Problem 2.2.b) | `Quantum/TotalSpin.lean` |
 | `totalSpinHalfRot{1,2,3}_two_site` | for `Λ = Fin 2` and any `θ`, the global rotation factors as `onSite 0 (Û^(α)_θ) * onSite 1 (Û^(α)_θ)` (general-θ extension of Problem 2.2.b) | `Quantum/TotalSpin.lean` |
-| `totalSpinHalfRot{1,2,3}_eq_exp_axiom` | **AXIOM** (Tasaki eq. (2.2.11)): `Û^(α)_θ_tot = exp(-iθ Ŝ_tot^(α))`. See [open items](#open-items--axioms) for the technical blocker | `Quantum/TotalSpin.lean` |
-| `totalSpinHalfRot{1,2,3}_eq_exp` | re-export of the axiom above as a theorem (uses `_axiom` directly) | `Quantum/TotalSpin.lean` |
+| `onSite_exp_eq_exp_onSite` | `onSite x (exp A) = exp (onSite x A)` — bridge between single-site and many-body matrix exponential. Local Frobenius normed structure + `LinearMap.continuous_of_finiteDimensional` + `NormedSpace.map_exp` | `Quantum/TotalSpin.lean` |
+| `totalSpinHalfRot{1,2,3}_eq_exp` | Tasaki eq. (2.2.11): `Û^(α)_θ_tot = exp(-iθ Ŝ_tot^(α))`. Composes `spinHalfRot{α}_eq_exp` (single site), `onSite_exp_eq_exp_onSite` (per-site bridge), and `Matrix.exp_sum_of_commute` (commuting-summand exp = noncommProd of exps) | `Quantum/TotalSpin.lean` |
 | `IsInMagnetizationSubspace` | predicate for the magnetization-`M` eigenspace `H_M` (Tasaki eq. (2.2.9)/(2.2.10)) | `Quantum/MagnetizationSubspace.lean` |
 | `basisVec_mem_magnetizationSubspace` | `|σ⟩ ∈ H_{|σ|/2}` — basis states lie in their magnetization subspace | `Quantum/MagnetizationSubspace.lean` |
 
@@ -350,46 +350,6 @@ matrix) can be written as a polynomial in `1̂, Ŝ^(1), Ŝ^(2), Ŝ^(3)`.
 **Status**: `S = 1/2` case is `pauliBasis` (P1d''). The general-`S`
 case requires generic `Fin (2S+1)` typing and Lagrange interpolation
 infrastructure; not started.
-
-### Axiom (P1f'') — Tasaki eq. (2.2.11)
-
-**Statement**: For `α ∈ {1, 2, 3}` and `θ ∈ ℝ`,
-`Û^(α)_θ_tot = exp(-iθ Ŝ_tot^(α)) = ∏_{x ∈ Λ} exp(-iθ Ŝ_x^(α))`.
-
-In Lean this is currently axiomatized as:
-
-```lean
-axiom totalSpinHalfRot1_eq_exp_axiom (Λ : Type*) [Fintype Λ] [DecidableEq Λ]
-    (θ : ℝ) :
-    totalSpinHalfRot1 Λ θ =
-      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp1 Λ)
--- and similarly for axes 2, 3
-```
-
-(See `Quantum/TotalSpin.lean`.)
-
-**Why axiomatized**: The morally correct proof composes
-1. `spinHalfRot α θ = exp(-(I·θ) • spinHalfOp α)` — already proved
-   single-site (P1e'').
-2. `onSite x (exp B) = exp (onSite x B)` — would follow from
-   `NormedSpace.map_exp` applied to `onSiteRingHom`.
-3. `exp(Σ_x onSite x B) = ∏_x exp(onSite x B)` — would follow from
-   `Matrix.exp_sum_of_commute` for distinct-site embeddings.
-
-**Step 2 is the actual blocker**. `continuous_onSite` is established
-under the canonical Pi-product matrix topology, but
-`NormedSpace.map_exp` requires `NormedRing` + `CompleteSpace`
-instances, which only resolve under the Frobenius (or other operator)
-norm topology. The two topologies coincide on finite-dimensional
-matrices, but Lean's instance resolution does **not** bridge them
-(even with `open scoped Matrix.Norms.Frobenius` and explicit
-`haveI : CompleteSpace _ := FiniteDimensional.complete ℂ _`).
-
-A future PR should either (a) establish a topology-bridging lemma
-between the Pi-product and Frobenius structures on
-`Matrix (Fin n) (Fin n) ℂ`, (b) re-prove `continuous_onSite` under the
-Frobenius topology, or (c) find an alternative formulation that avoids
-`NormedSpace.map_exp` entirely.
 
 ### TODO — Magnetization-sector direct sum (eqs. (2.2.9)/(2.2.10))
 

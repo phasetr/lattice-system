@@ -1101,11 +1101,17 @@ formalization of Tasaki \S2.1 and \S2.2.
   $\hat S_{\rm tot}^2 |s\,s\,\dots\,s\rangle = (N(N+2)/4)|s\,s\,\dots\,s\rangle$
   for any constant $s : {\rm Fin}\,2$ — the Casimir eigenvalue at
   the maximum total spin $S = N/2$.
-\item \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp\_axiom} (\textbf{AXIOM}),
+\item \texttt{onSite\_exp\_eq\_exp\_onSite},
   \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}: Tasaki eq.~(2.2.11),
   $\hat U^{(\alpha)}_{\theta,{\rm tot}}
-   = \exp[-i\theta \hat S^{(\alpha)}_{\rm tot}]$, currently
-  axiomatized.  See §\ref{sec:open-items} below.
+   = \exp[-i\theta \hat S^{(\alpha)}_{\rm tot}]$. The proof composes
+  the per-site exp form, the bridge
+  $\texttt{onSite}\,x\,(\exp A) = \exp(\texttt{onSite}\,x\,A)$
+  (proved by installing the Frobenius normed structure locally and
+  invoking \texttt{NormedSpace.map\_exp} via
+  \texttt{LinearMap.continuous\_of\_finiteDimensional}), and
+  \texttt{Matrix.exp\_sum\_of\_commute} for the commuting site
+  embeddings.
 \end{itemize}
 
 \section{Open items / TODO and axioms}
@@ -1144,59 +1150,6 @@ polynomial in $\hat 1, \hat S^{(1)}, \hat S^{(2)}, \hat S^{(3)}$.
 \textbf{Status}: $S = 1/2$ is done as \texttt{pauliBasis} (P1d''). The
 general-$S$ case requires generic \texttt{Fin\,(2S+1)} typing and a
 Lagrange interpolation infrastructure; not started.
-
-\subsection*{Axiom: Tasaki eq.~(2.2.11) (P1f'')}
-
-\textbf{Statement}: For $\alpha \in \{1, 2, 3\}$ and $\theta \in
-\mathbb{R}$,
-\[
-  \hat U^{(\alpha)}_{\theta,{\rm tot}}
-    = \exp[-i\theta \hat S^{(\alpha)}_{\rm tot}]
-    = \prod_{x \in \Lambda} \exp[-i\theta \hat S^{(\alpha)}_x].
-\]
-
-In Lean this is currently axiomatized as
-\texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp\_axiom} in
-\texttt{Quantum/TotalSpin.lean}, with thin re-exports
-\texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}.
-
-\textbf{Why axiomatized}. The morally correct proof composes
-\begin{enumerate}
-\item $\hat U^{(\alpha)}_\theta = \exp[-(i\theta)\,\hat S^{(\alpha)}]$
-  at the single-site level (P1e'',
-  \texttt{spinHalfRot\{1,2,3\}\_eq\_exp}).
-\item $\texttt{onSite}\,x\,(\exp B) = \exp(\texttt{onSite}\,x\,B)$,
-  i.e.\ the bridge that the site-embedding ring homomorphism commutes
-  with the matrix exponential. This would follow from
-  \texttt{NormedSpace.map\_exp} applied to \texttt{onSiteRingHom}.
-\item $\exp(\sum_x \texttt{onSite}\,x\,B)
-  = \prod_x \exp(\texttt{onSite}\,x\,B)$ for distinct-site
-  embeddings. This would follow from
-  \texttt{Matrix.exp\_sum\_of\_commute}.
-\end{enumerate}
-
-\textbf{Step 2 is the actual blocker}. Our
-\texttt{continuous\_onSite} is established under the canonical
-Pi-product matrix topology
-(\texttt{Matrix.instTopologicalSpace}), but
-\texttt{NormedSpace.map\_exp} requires \texttt{NormedRing} and
-\texttt{CompleteSpace} instances, which only resolve under the
-Frobenius (or other operator) norm topology. The two topologies
-coincide on finite-dimensional matrices, but Lean's instance
-resolution does \emph{not} bridge them: even with
-\texttt{open scoped Matrix.Norms.Frobenius} and explicit
-\texttt{haveI : CompleteSpace \_ := FiniteDimensional.complete} declarations the
-type-class search picks the Pi topology for
-\texttt{continuous\_onSite} and the Frobenius topology for
-\texttt{NormedSpace.map\_exp}, and they fail to unify.
-
-A future PR should either (a) establish a topology-bridging lemma
-between the Pi-product and Frobenius structures on
-\texttt{Matrix\,(Fin n)\,(Fin n)\,$\mathbb{C}$}, (b) re-prove
-\texttt{continuous\_onSite} under the Frobenius topology, or (c) find
-an alternative formulation that avoids
-\texttt{NormedSpace.map\_exp} entirely (e.g.\ by direct power-series
-manipulation).
 
 \subsection*{TODO: Magnetization-sector direct sum (eqs.~(2.2.9)/(2.2.10))}
 
@@ -1247,8 +1200,9 @@ and the corresponding finite-form $(\hat U^{(\alpha)}_\theta)^\dagger
 operator $\hat A = \sum_{x,y} J(x,y)\,\hat S_x \cdot \hat S_y$ (axes
 1, 2, 3 and the ladder $\hat S^{\pm}_{\rm tot}$). The fully general
 operator-level statement (any $\hat A$ satisfying eq.~(2.2.12) also
-satisfies eq.~(2.2.13)) is open and depends on the axiomatized
-eq.~(2.2.11) above.
+satisfies eq.~(2.2.13)) is open. With eq.~(2.2.11) now proved
+unconditionally (no axioms), the missing ingredient is a generic
+\texttt{exp\_commute\_of\_commute} lifted to many-body operators.
 
 \section{Progress table}
 \label{sec:progress}
