@@ -44,4 +44,15 @@ theorem integral_sin_zero_pi :
   rw [integral_sin]
   simp [Real.cos_pi, Real.cos_zero]; ring
 
+/-! ## Combined 2D integral: SU(2) volume in Euler angles -/
+
+/-- `∫ φ in 0..2π, ∫ θ in 0..π, sin θ = 4π`. This is the total volume
+of the SU(2) parameter space in Euler-angle coordinates. -/
+theorem integral_sin_two_pi_pi :
+    ∫ _φ in (0 : ℝ)..(2 * Real.pi),
+      ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ = 4 * Real.pi := by
+  simp only [integral_sin_zero_pi]
+  rw [intervalIntegral.integral_const]
+  simp [smul_eq_mul]; ring
+
 end LatticeSystem.Quantum
