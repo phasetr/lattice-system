@@ -911,4 +911,64 @@ theorem spinHalfRot1_eq_exp (θ : ℝ) :
       hadamard_mul_spinHalfOp3_mul_hadamard]]
   rw [Matrix.exp_conj _ _ hU, hWinv]
 
+/-! ## y-axis diagonalizer (basis change between σ^y and σ^z) -/
+
+/-- The unitary `V = (1/√2)·!![1, 1; i, -i]` whose columns are the
+`σ^y` eigenvectors. It satisfies `V · Ŝ^(3) · V† = Ŝ^(2)`. -/
+noncomputable def yDiag : Matrix (Fin 2) (Fin 2) ℂ :=
+  ((Real.sqrt 2 : ℂ)⁻¹) • !![1, 1; Complex.I, -Complex.I]
+
+/-- Adjoint (= inverse) of `yDiag`. -/
+noncomputable def yDiagAdj : Matrix (Fin 2) (Fin 2) ℂ :=
+  ((Real.sqrt 2 : ℂ)⁻¹) • !![1, -Complex.I; 1, Complex.I]
+
+/-- `V · V† = 1`. -/
+theorem yDiag_mul_yDiagAdj : yDiag * yDiagAdj = 1 := by
+  unfold yDiag yDiagAdj
+  rw [Matrix.smul_mul, Matrix.mul_smul, smul_smul, sqrt2_inv_mul_sqrt2_inv]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    first | (simp; ring) | simp
+
+/-- `V† · V = 1`. -/
+theorem yDiagAdj_mul_yDiag : yDiagAdj * yDiag = 1 := by
+  unfold yDiag yDiagAdj
+  rw [Matrix.smul_mul, Matrix.mul_smul, smul_smul, sqrt2_inv_mul_sqrt2_inv]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    first | (simp; ring) | simp
+
+/-- `V · Ŝ^(3) · V† = Ŝ^(2)`. -/
+theorem yDiag_mul_spinHalfOp3_mul_yDiagAdj :
+    yDiag * spinHalfOp3 * yDiagAdj = spinHalfOp2 := by
+  unfold yDiag yDiagAdj spinHalfOp3 spinHalfOp2 pauliZ pauliY
+  rw [Matrix.smul_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_smul,
+    smul_smul]
+  rw [sqrt2_inv_mul_sqrt2_inv]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    first | (simp; ring) | simp
+
+/-- `Û^(2)_θ = V · Û^(3)_θ · V†` (analog of `spinHalfRot1_eq_hadamard_conj`). -/
+theorem spinHalfRot2_eq_yDiag_conj (θ : ℝ) :
+    spinHalfRot2 θ = yDiag * spinHalfRot3 θ * yDiagAdj := by
+  unfold spinHalfRot2 spinHalfRot3 rotOf
+  rw [mul_sub, sub_mul, mul_smul_comm, smul_mul_assoc, Matrix.mul_one,
+    mul_smul_comm, smul_mul_assoc, yDiag_mul_yDiagAdj,
+    yDiag_mul_spinHalfOp3_mul_yDiagAdj]
+
+/-- Problem 2.1.b for axis 2: `Û^(2)_θ = exp(-iθ Ŝ^(2))`. -/
+theorem spinHalfRot2_eq_exp (θ : ℝ) :
+    spinHalfRot2 θ =
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • spinHalfOp2) := by
+  rw [spinHalfRot2_eq_yDiag_conj, spinHalfRot3_eq_exp]
+  have hU : IsUnit yDiag := IsUnit.of_mul_eq_one yDiagAdj yDiag_mul_yDiagAdj
+  have hWinv : yDiag⁻¹ = yDiagAdj :=
+    Matrix.inv_eq_left_inv yDiagAdj_mul_yDiag
+  rw [show (-(Complex.I * (θ : ℂ))) • spinHalfOp2 =
+      yDiag * ((-(Complex.I * (θ : ℂ))) • spinHalfOp3) * yDiag⁻¹ from by
+    rw [hWinv, mul_smul_comm, smul_mul_assoc,
+      yDiag_mul_spinHalfOp3_mul_yDiagAdj]]
+  rw [Matrix.exp_conj _ _ hU, hWinv]
+
 end LatticeSystem.Quantum
