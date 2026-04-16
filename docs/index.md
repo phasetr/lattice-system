@@ -283,7 +283,13 @@ Systems*, §2.2 eqs. (2.2.7) and (2.2.8), p. 22.
 | `totalSpinHalfRot{1,2,3}_conjTranspose_mul_self` | `(Û^(α)_θ_tot)ᴴ * Û^(α)_θ_tot = 1` (unitarity). Derived from `exp_mem_unitary_of_mem_skewAdjoint` after recognizing `-iθ Ŝ_tot^(α)` as skew-adjoint | `Quantum/TotalSpin.lean` |
 | `totalSpinHalfRot{1,2,3}_conj_eq_self_of_commute` | Tasaki eq. (2.2.13) finite form: `Commute A (Ŝ_tot^(α)) → (Û^(α)_θ_tot)ᴴ * A * Û^(α)_θ_tot = A`. Combines `_commute_of_commute` with unitarity | `Quantum/TotalSpin.lean` |
 | `IsInMagnetizationSubspace` | predicate for the magnetization-`M` eigenspace `H_M` (Tasaki eq. (2.2.9)/(2.2.10)) | `Quantum/MagnetizationSubspace.lean` |
+| `magnetizationSubspace M` | the magnetization-`M` eigenspace as a `Submodule ℂ ((Λ → Fin 2) → ℂ)` | `Quantum/MagnetizationSubspace.lean` |
 | `basisVec_mem_magnetizationSubspace` | `|σ⟩ ∈ H_{|σ|/2}` — basis states lie in their magnetization subspace | `Quantum/MagnetizationSubspace.lean` |
+| `magnetizationSubspace_disjoint` | distinct sectors `H_M ⊓ H_{M'} = ⊥` (`M ≠ M'`) — eigenvalue uniqueness | `Quantum/MagnetizationSubspace.lean` |
+| `iSup_magnetizationSubspace_eq_top` | `⨆_M H_M = ⊤` — every vector decomposes as a sum across sectors | `Quantum/MagnetizationSubspace.lean` |
+| `magnetizationSubspace_eq_eigenspace` | bridge `H_M = (Ŝ_tot^(3) as End).eigenspace M` (used to inherit `iSupIndep`) | `Quantum/MagnetizationSubspace.lean` |
+| `magnetizationSubspace_iSupIndep` | `iSupIndep`: each sector is disjoint from the supremum of all others | `Quantum/MagnetizationSubspace.lean` |
+| `magnetizationSubspace_isInternal` | `DirectSum.IsInternal`: full direct-sum decomposition `H = ⊕_M H_M` (Tasaki eqs. (2.2.9)/(2.2.10)) | `Quantum/MagnetizationSubspace.lean` |
 
 ### Two-site spin inner product (Tasaki §2.2 eq. (2.2.16))
 
@@ -354,24 +360,6 @@ matrix) can be written as a polynomial in `1̂, Ŝ^(1), Ŝ^(2), Ŝ^(3)`.
 **Status**: `S = 1/2` case is `pauliBasis` (P1d''). The general-`S`
 case requires generic `Fin (2S+1)` typing and Lagrange interpolation
 infrastructure; not started.
-
-### TODO — Magnetization-sector direct sum (eqs. (2.2.9)/(2.2.10))
-
-**Statement (Tasaki p.22)**: The full Hilbert space decomposes as a
-direct sum over magnetization eigenspaces,
-
-```
-H = ⊕_{M = -|Λ|S}^{|Λ|S} H_M,    H_M := { |Φ⟩ ∈ H | Ŝ_tot^(3) |Φ⟩ = M |Φ⟩ }.
-```
-
-**Status**: Currently only the predicate `IsInMagnetizationSubspace`
-and the basis-state membership lemma `basisVec_mem_magnetizationSubspace`
-are formalized. The full direct-sum decomposition (a `DirectSum` /
-`Submodule.iSup` statement showing `H = ⊕_M H_M`, plus orthogonality
-of distinct sectors) is not yet established and requires further
-linear-algebra infrastructure (the magnetization subspaces as
-`Submodule ℂ ((Λ → Fin 2) → ℂ)`, and a direct-sum decomposition
-theorem).
 
 ### TODO — Tasaki Problem 2.2.c (SU(2) non-invariance / averaged state)
 
