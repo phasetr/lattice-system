@@ -33,7 +33,7 @@ CAR algebras, and eventually lattice QCD.
 | P1d (Tasaki §2.1) | Basis states `|ψ^↑⟩, |ψ^↓⟩`, raising/lowering `Ŝ^±` (S = 1/2) | Done |
 | P1d' (Tasaki §2.1) | S = 1 matrix representations (eq. (2.1.9)) | Done |
 | P1d'' (Tasaki §2.1) | Problem 2.1.a for S = 1/2 (Pauli basis of `M_2(ℂ)`) | Done |
-| P1d''' (Tasaki §2.1) | Problem 2.1.a for `S ≥ 1` (polynomial basis of `M_{2S+1}(ℂ)` via Lagrange interpolation in `Ŝ^(3)` and `Ŝ^±` ladder action) | TODO (see [open items](#open-items--axioms)) |
+| P1d''' (Tasaki §2.1) | Problem 2.1.a for `S ≥ 1` (polynomial basis of `M_{2S+1}(ℂ)` via Lagrange interpolation in `Ŝ^(3)` and `Ŝ^±` ladder action) | Done for `S = 1`; general `S ≥ 1` (`Fin (2S+1)` abstraction) deferred — see [open items](#open-items--axioms) |
 | P1e (Tasaki §2.1) | S = 1/2 rotation `Û^(α)_θ` closed form, `Û_0`, adjoint, `Û_{2π}` | Done |
 | P1e' | Rotation group law and unitarity | Done |
 | P1e'' (Tasaki §2.1) | `Û^(α)_θ = exp(-iθŜ^(α))` via `Matrix.exp_diagonal` + `Matrix.exp_conj` (Problem 2.1.b, all 3 axes) | Done |
@@ -171,6 +171,22 @@ Systems*, §2.1 Problem 2.1.a, p. 15.
 | `spinHalf_decomposition` | same via `Ŝ^(α) = σ^(α) / 2` | `Quantum/SpinHalfDecomp.lean` |
 | `pauli_linearIndep` | `{1, σ^x, σ^y, σ^z}` is linearly independent | `Quantum/SpinHalfDecomp.lean` |
 
+### Polynomial-basis decomposition for S = 1 (Tasaki §2.1 Problem 2.1.a, S = 1)
+
+Primary reference: Tasaki, *Physics and Mathematics of Quantum
+Many-Body Systems*, §2.1 Problem 2.1.a, p. 15 + solution S.1, p. 493.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `spinOneProj{Plus,Zero,Minus}` | the three diagonal projectors `\|ψ^σ⟩⟨ψ^σ\|` (σ ∈ {+1, 0, -1}) | `Quantum/SpinOneDecomp.lean` |
+| `spinOneProj{Plus,Zero,Minus}_eq_polynomial` | each diagonal projector equals a polynomial in `Ŝ^(3)` (Lagrange interpolation) | `Quantum/SpinOneDecomp.lean` |
+| `spinOneUnit{01,02,10,12,20,21}` | the six off-diagonal matrix units `\|ψ^τ⟩⟨ψ^σ\|` (τ ≠ σ) | `Quantum/SpinOneDecomp.lean` |
+| `spinOneUnit{01,12}_eq_polynomial` | `(1/√2) Ŝ^- · P_σ` for the two single-step lowering units | `Quantum/SpinOneDecomp.lean` |
+| `spinOneUnit{10,21}_eq_polynomial` | `(1/√2) Ŝ^+ · P_σ` for the two single-step raising units | `Quantum/SpinOneDecomp.lean` |
+| `spinOneUnit02_eq_polynomial` | `(1/2) (Ŝ^-)² · P_+` for the double-step lowering unit | `Quantum/SpinOneDecomp.lean` |
+| `spinOneUnit20_eq_polynomial` | `(1/2) (Ŝ^+)² · P_-` for the double-step raising unit | `Quantum/SpinOneDecomp.lean` |
+| `spinOne_decomposition` | every 3×3 complex matrix is a linear combination of the 9 matrix units (entry-wise); combined with the polynomial expressions above this gives Tasaki Problem 2.1.a for `S = 1` | `Quantum/SpinOneDecomp.lean` |
+
 ### S = 1 matrix representations (Tasaki §2.1 eq. (2.1.9))
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
@@ -219,6 +235,7 @@ case (`σ ∈ {-1, 0, +1}`).
 | `spinOneRot{1,2,3}_zero` / `spinOneRot{1,2,3}_pi` | boundary checks `Û^(α)_0 = 1` and `Û^(α)_π = û_α` | `Quantum/SpinOneBasis.lean` |
 | `spinOnePiRot{1,2}_eq` | `û_α = 1 - 2·(Ŝ^(α))²` for axes 1, 2 (Tasaki eq. (2.1.30) for S = 1) | `Quantum/SpinOneBasis.lean` |
 | `spinOneOp{1,2}_mul_self` | `(Ŝ^(α))²` explicit form (helper for the `_pi` boundary checks) | `Quantum/SpinOne.lean` |
+| `spinOneOpPlus_eq_add`, `spinOneOpMinus_eq_sub` | `Ŝ^± = Ŝ^(1) ± i·Ŝ^(2)` for `S = 1` (Tasaki eq. (2.1.5), spin-1 case). Together with `spinOneUnit*_eq_polynomial` and `spinOneProj{Plus,Zero,Minus}_eq_polynomial`, fully reduces every off-diagonal matrix unit to a polynomial in `Ŝ^(1), Ŝ^(2), Ŝ^(3)` | `Quantum/SpinOneBasis.lean` |
 | `spinOnePiRot{1,2,3}_mulVec_spinOne{Plus,Zero,Minus}` | π-rotation matrix elements on the basis `|ψ^{+1,0,-1}⟩` (Tasaki eq. (2.1.34) / Problem 2.1.g for S = 1) | `Quantum/SpinOneBasis.lean` |
 
 ### Multi-body operator space (abstract lattice)
@@ -341,25 +358,19 @@ The following Tasaki §2.1 / §2.2 items are **not yet fully proved**.
 They are tracked here so that future PRs can pick them up and replace
 each axiom by a proof (or fill in the deferred construction).
 
-### TODO (P1d''') — Problem 2.1.a for `S ≥ 1`
+### TODO (P1d''') — Problem 2.1.a for general `S ≥ 1`
 
-**Statement (Tasaki p.15)**: For any spin `S ≥ 1`, every operator on the
+**Statement (Tasaki p.15)**: For any spin `S`, every operator on the
 single-site Hilbert space `h_0 = ℂ^{2S+1}` (i.e. every `(2S+1) × (2S+1)`
 matrix) can be written as a polynomial in `1̂, Ŝ^(1), Ŝ^(2), Ŝ^(3)`.
 
-**Proof outline (Tasaki solution S.1, p.493)**:
-1. The diagonal projector `|ψ^σ⟩⟨ψ^σ|` is given by Lagrange interpolation
-   in `Ŝ^(3)`:
-   `|ψ^σ⟩⟨ψ^σ| = ∏_{τ=-S, τ≠σ}^{S} (Ŝ^(3) - τ·1̂) / (σ - τ)`.
-2. Off-diagonal matrix units `|ψ^τ⟩⟨ψ^σ|` (`τ ≠ σ`) are obtained by
-   applying `Ŝ^±` to a diagonal projector and normalizing.
-3. The set `{|ψ^τ⟩⟨ψ^σ|}_{τ, σ}` spans `M_{2S+1}(ℂ)`; combined with
-   Steps 1-2 this shows every matrix is a polynomial in
-   `1̂, Ŝ^(1), Ŝ^(2), Ŝ^(3)`.
-
-**Status**: `S = 1/2` case is `pauliBasis` (P1d''). The general-`S`
-case requires generic `Fin (2S+1)` typing and Lagrange interpolation
-infrastructure; not started.
+**Status**: `S = 1/2` case is `pauliBasis` (P1d''). `S = 1` case is now
+done via `Quantum/SpinOneDecomp.lean` (`spinOneProj{Plus,Zero,Minus}_eq_polynomial`,
+`spinOneUnit*_eq_polynomial`, `spinOne_decomposition`), following
+Tasaki solution S.1: diagonal projectors via Lagrange interpolation in
+`Ŝ^(3)`, off-diagonals via `Ŝ^±`, spanning theorem. The general
+`S ≥ 1` case requires generic `Fin (2S+1)` typing and a polymorphic
+Lagrange interpolation infrastructure; not started.
 
 ### TODO — Tasaki Problem 2.2.c (SU(2) non-invariance / averaged state)
 
