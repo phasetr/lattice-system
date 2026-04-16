@@ -892,66 +892,105 @@ theorem totalSpinHalfRot3_two_site (θ : ℝ) :
 The defining identity
 `Û^(α)_θ_tot = exp(-iθ Ŝ_tot^(α)) = ∏_x exp(-iθ Ŝ_x^(α))`
 (Tasaki *Physics and Mathematics of Quantum Many-Body Systems*, p.22,
-eq. (2.2.11)) is **axiomatized** here pending Lean infrastructure
-to bridge the Pi-product matrix topology and the Frobenius
-normed-ring topology. See the Roadmap entry P1f'' and the discussion
-in `tex/proof-guide.tex` (TODO section).
+eq. (2.2.11)). The proof composes:
+1. `spinHalfRot α θ = exp(-(I·θ) • spinHalfOp α)`
+   (P1e'', `spinHalfRot{1,2,3}_eq_exp`).
+2. `onSite x (exp B) = exp (onSite x B)` via
+   `NormedSpace.map_exp` applied to `onSiteRingHom`. This requires
+   bridging the canonical Pi-product matrix topology with the
+   Frobenius normed-ring structure: we install Frobenius normed
+   instances locally via `letI` and pull continuity from
+   `LinearMap.continuous_of_finiteDimensional`.
+3. `exp(Σ_x onSite x B) = ∏_x exp(onSite x B)` via
+   `Matrix.exp_sum_of_commute` (which hides the norm choice
+   internally). -/
 
-The morally correct proof goes:
-1. `spinHalfRot α θ = exp(-(I·θ) • spinHalfOp α)` (P1e'',
-   `spinHalfRot{1,2,3}_eq_exp`).
-2. `onSite x (exp B) = exp (onSite x B)` (continuous ring-hom
-   commutes with `exp`; `NormedSpace.map_exp` applied to
-   `onSiteRingHom`). **This step is the actual blocker**: the
-   continuity of `onSite x` is established under the canonical
-   Pi-product matrix topology, but `NormedSpace.map_exp` requires
-   `NormedRing` + `CompleteSpace` instances which only resolve under
-   the Frobenius (or other operator) norm. The two topologies coincide
-   on finite-dim matrices but Lean's instance resolution does not
-   bridge them.
-3. `exp(Σ_x onSite x B) = ∏_x exp(onSite x B)` (Matrix.exp_sum_of_commute).
+/-- `onSite x` commutes with the matrix exponential:
+`onSite x (exp A) = exp (onSite x A)`. The key bridge between
+single-site and many-body matrix exponentials.
 
-We therefore **axiomatize the end result** (the per-axis `_eq_exp`
-identity) and use it as a black box in downstream work. -/
+Bridges the canonical Pi-product matrix topology with the Frobenius
+normed-ring structure: install Frobenius `NormedRing`/`NormedAlgebra`
+locally via `letI`, derive `CompleteSpace` from `FiniteDimensional`,
+pull continuity from `LinearMap.continuous_of_finiteDimensional`, and
+finally invoke `NormedSpace.map_exp` with all instances passed
+explicitly (the implicit unification fails to bridge between the
+default and Frobenius topologies). -/
+theorem onSite_exp_eq_exp_onSite (x : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) :
+    onSite x (NormedSpace.exp A) =
+      NormedSpace.exp (onSite x A : ManyBodyOp Λ) := by
+  letI iAddSrc : NormedAddCommGroup (Matrix (Fin 2) (Fin 2) ℂ) :=
+    Matrix.frobeniusNormedAddCommGroup
+  letI _iSpaceSrc : NormedSpace ℂ (Matrix (Fin 2) (Fin 2) ℂ) :=
+    Matrix.frobeniusNormedSpace
+  letI iRingSrc : NormedRing (Matrix (Fin 2) (Fin 2) ℂ) :=
+    Matrix.frobeniusNormedRing
+  letI iAlgSrc : NormedAlgebra ℚ (Matrix (Fin 2) (Fin 2) ℂ) :=
+    Matrix.frobeniusNormedAlgebra
+  letI _iAddTgt : NormedAddCommGroup (ManyBodyOp Λ) :=
+    Matrix.frobeniusNormedAddCommGroup
+  letI _iSpaceTgt : NormedSpace ℂ (ManyBodyOp Λ) :=
+    Matrix.frobeniusNormedSpace
+  letI iRingTgt : NormedRing (ManyBodyOp Λ) :=
+    Matrix.frobeniusNormedRing
+  letI iAlgTgt : Algebra ℚ (ManyBodyOp Λ) :=
+    (Matrix.frobeniusNormedAlgebra (R := ℚ)).toAlgebra
+  haveI iComplSrc : CompleteSpace (Matrix (Fin 2) (Fin 2) ℂ) :=
+    FiniteDimensional.complete ℂ (Matrix (Fin 2) (Fin 2) ℂ)
+  have hcont : Continuous (onSiteRingHom Λ x) :=
+    (onSiteLinearMap (Λ := Λ) x).continuous_of_finiteDimensional
+  -- Implicit unification of the `CompleteSpace` instance fails when we just
+  -- write `NormedSpace.map_exp ...`, so we pass everything explicitly.
+  exact @NormedSpace.map_exp (Matrix (Fin 2) (Fin 2) ℂ) (ManyBodyOp Λ)
+    iRingSrc iAlgSrc iComplSrc iRingTgt iAlgTgt _ _ _
+    (onSiteRingHom Λ x) hcont A
+  -- (Lemma `iAddSrc` is referenced by the `NormedRing` synth path even though
+  -- it's not passed positionally, so `letI` keeps it in scope.)
 
-/-- **AXIOM** (Tasaki §2.2 eq (2.2.11), axis 1):
+/-- Tasaki §2.2 eq (2.2.11), axis 1:
 `Û^(1)_θ_tot = exp(-iθ Ŝ_tot^(1))`. -/
-axiom totalSpinHalfRot1_eq_exp_axiom (Λ : Type*) [Fintype Λ] [DecidableEq Λ]
-    (θ : ℝ) :
-    totalSpinHalfRot1 Λ θ =
-      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp1 Λ)
-
-/-- **AXIOM** (Tasaki §2.2 eq (2.2.11), axis 2):
-`Û^(2)_θ_tot = exp(-iθ Ŝ_tot^(2))`. -/
-axiom totalSpinHalfRot2_eq_exp_axiom (Λ : Type*) [Fintype Λ] [DecidableEq Λ]
-    (θ : ℝ) :
-    totalSpinHalfRot2 Λ θ =
-      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 Λ)
-
-/-- **AXIOM** (Tasaki §2.2 eq (2.2.11), axis 3):
-`Û^(3)_θ_tot = exp(-iθ Ŝ_tot^(3))`. -/
-axiom totalSpinHalfRot3_eq_exp_axiom (Λ : Type*) [Fintype Λ] [DecidableEq Λ]
-    (θ : ℝ) :
-    totalSpinHalfRot3 Λ θ =
-      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp3 Λ)
-
-/-- Tasaki §2.2 eq (2.2.11), axis 1, as a re-exported theorem
-(currently invoking the axiom). -/
 theorem totalSpinHalfRot1_eq_exp (θ : ℝ) :
     totalSpinHalfRot1 Λ θ =
-      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp1 Λ) :=
-  totalSpinHalfRot1_eq_exp_axiom Λ θ
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp1 Λ) := by
+  unfold totalSpinHalfRot1 totalSpinHalfOp1
+  rw [Finset.smul_sum]
+  simp_rw [← onSite_smul]
+  rw [Matrix.exp_sum_of_commute (Finset.univ : Finset Λ)
+        (fun x => (onSite x ((-(Complex.I * (θ : ℂ))) • spinHalfOp1) : ManyBodyOp Λ))
+        (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)]
+  refine Finset.noncommProd_congr rfl ?_ _
+  intros x _
+  rw [← onSite_exp_eq_exp_onSite Λ x ((-(Complex.I * (θ : ℂ))) • spinHalfOp1),
+      ← spinHalfRot1_eq_exp]
 
-/-- Tasaki §2.2 eq (2.2.11), axis 2, as a re-exported theorem. -/
+/-- Tasaki §2.2 eq (2.2.11), axis 2. -/
 theorem totalSpinHalfRot2_eq_exp (θ : ℝ) :
     totalSpinHalfRot2 Λ θ =
-      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 Λ) :=
-  totalSpinHalfRot2_eq_exp_axiom Λ θ
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 Λ) := by
+  unfold totalSpinHalfRot2 totalSpinHalfOp2
+  rw [Finset.smul_sum]
+  simp_rw [← onSite_smul]
+  rw [Matrix.exp_sum_of_commute (Finset.univ : Finset Λ)
+        (fun x => (onSite x ((-(Complex.I * (θ : ℂ))) • spinHalfOp2) : ManyBodyOp Λ))
+        (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)]
+  refine Finset.noncommProd_congr rfl ?_ _
+  intros x _
+  rw [← onSite_exp_eq_exp_onSite Λ x ((-(Complex.I * (θ : ℂ))) • spinHalfOp2),
+      ← spinHalfRot2_eq_exp]
 
-/-- Tasaki §2.2 eq (2.2.11), axis 3, as a re-exported theorem. -/
+/-- Tasaki §2.2 eq (2.2.11), axis 3. -/
 theorem totalSpinHalfRot3_eq_exp (θ : ℝ) :
     totalSpinHalfRot3 Λ θ =
-      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp3 Λ) :=
-  totalSpinHalfRot3_eq_exp_axiom Λ θ
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp3 Λ) := by
+  unfold totalSpinHalfRot3 totalSpinHalfOp3
+  rw [Finset.smul_sum]
+  simp_rw [← onSite_smul]
+  rw [Matrix.exp_sum_of_commute (Finset.univ : Finset Λ)
+        (fun x => (onSite x ((-(Complex.I * (θ : ℂ))) • spinHalfOp3) : ManyBodyOp Λ))
+        (fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)]
+  refine Finset.noncommProd_congr rfl ?_ _
+  intros x _
+  rw [← onSite_exp_eq_exp_onSite Λ x ((-(Complex.I * (θ : ℂ))) • spinHalfOp3),
+      ← spinHalfRot3_eq_exp]
 
 end LatticeSystem.Quantum
