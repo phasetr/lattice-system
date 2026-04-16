@@ -809,4 +809,12 @@ theorem continuous_onSite (x : Λ) : Continuous (fun A : Matrix (Fin 2) (Fin 2) 
     (onSite x A : ManyBodyOp Λ)) :=
   (onSiteLinearMap (Λ := Λ) x).continuous_of_finiteDimensional
 
+/-- `(onSite x A)^k = onSite x (A^k)`. Direct induction using
+`onSite_one` (base) and `onSite_mul_onSite_same` (step). -/
+theorem onSite_pow (x : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) (k : ℕ) :
+    ((onSite x A : ManyBodyOp Λ))^k = onSite x (A^k) := by
+  induction k with
+  | zero => rw [pow_zero, pow_zero, onSite_one]
+  | succ k ih => rw [pow_succ, pow_succ, ih, onSite_mul_onSite_same]
+
 end LatticeSystem.Quantum
