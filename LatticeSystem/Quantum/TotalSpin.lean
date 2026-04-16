@@ -1050,7 +1050,7 @@ finite SU(2) invariance `(Û)† Â Û = Â` (Tasaki eq. (2.2.13))
 follows directly. -/
 
 omit [Fintype Λ] [DecidableEq Λ] in
-private lemma neg_I_mul_real_skewAdjoint_smul_isHermitian (θ : ℝ)
+private lemma neg_I_mul_real_smul_isHermitian_mem_skewAdjoint (θ : ℝ)
     {S : ManyBodyOp Λ} (hS : S.IsHermitian) :
     ((-(Complex.I * (θ : ℂ))) • S) ∈ skewAdjoint (ManyBodyOp Λ) := by
   rw [skewAdjoint.mem_iff, star_smul]
@@ -1081,7 +1081,7 @@ private theorem manyBody_exp_neg_I_smul_unitary {S : ManyBodyOp Λ}
     Matrix.frobeniusNormedAlgebra
   haveI iComplTgt : CompleteSpace (ManyBodyOp Λ) :=
     FiniteDimensional.complete ℂ (ManyBodyOp Λ)
-  have hskew := neg_I_mul_real_skewAdjoint_smul_isHermitian (Λ := Λ) θ hS
+  have hskew := neg_I_mul_real_smul_isHermitian_mem_skewAdjoint (Λ := Λ) θ hS
   have hunit : NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • S) ∈
       unitary (ManyBodyOp Λ) :=
     @NormedSpace.exp_mem_unitary_of_mem_skewAdjoint
