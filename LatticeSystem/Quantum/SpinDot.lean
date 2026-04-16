@@ -637,4 +637,74 @@ theorem spinHalfDot_mulVec_triplet_anti
   rw [smul_add]
   module
 
+/-! ## Heisenberg-type SU(2)-invariant Hamiltonian (Tasaki §2.2 (2.2.13)) -/
+
+/-- The general Heisenberg-type Hamiltonian
+`H = Σ_{x,y} J(x,y) Ŝ_x · Ŝ_y`. Any choice of coupling `J` yields an
+SU(2)-invariant operator (proved below). -/
+noncomputable def heisenbergHamiltonian (J : Λ → Λ → ℂ) : ManyBodyOp Λ :=
+  ∑ x : Λ, ∑ y : Λ, J x y • spinHalfDot x y
+
+/-- A Heisenberg-type Hamiltonian commutes with `Ŝ_tot^(1)` (Tasaki
+§2.2 SU(2)-invariance, eq. (2.2.13) for axis 1). -/
+theorem heisenbergHamiltonian_commutator_totalSpinHalfOp1 (J : Λ → Λ → ℂ) :
+    heisenbergHamiltonian J * totalSpinHalfOp1 Λ -
+        totalSpinHalfOp1 Λ * heisenbergHamiltonian J = 0 := by
+  unfold heisenbergHamiltonian
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun x _ => ?_
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun y _ => ?_
+  rw [Matrix.smul_mul, Matrix.mul_smul, ← smul_sub]
+  rw [spinHalfDot_commutator_totalSpinHalfOp1, smul_zero]
+
+/-- A Heisenberg-type Hamiltonian commutes with `Ŝ_tot^(2)`. -/
+theorem heisenbergHamiltonian_commutator_totalSpinHalfOp2 (J : Λ → Λ → ℂ) :
+    heisenbergHamiltonian J * totalSpinHalfOp2 Λ -
+        totalSpinHalfOp2 Λ * heisenbergHamiltonian J = 0 := by
+  unfold heisenbergHamiltonian
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun x _ => ?_
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun y _ => ?_
+  rw [Matrix.smul_mul, Matrix.mul_smul, ← smul_sub]
+  rw [spinHalfDot_commutator_totalSpinHalfOp2, smul_zero]
+
+/-- A Heisenberg-type Hamiltonian commutes with `Ŝ_tot^(3)`. -/
+theorem heisenbergHamiltonian_commutator_totalSpinHalfOp3 (J : Λ → Λ → ℂ) :
+    heisenbergHamiltonian J * totalSpinHalfOp3 Λ -
+        totalSpinHalfOp3 Λ * heisenbergHamiltonian J = 0 := by
+  unfold heisenbergHamiltonian
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun x _ => ?_
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun y _ => ?_
+  rw [Matrix.smul_mul, Matrix.mul_smul, ← smul_sub]
+  rw [spinHalfDot_commutator_totalSpinHalfOp3, smul_zero]
+
+/-- A Heisenberg-type Hamiltonian commutes with `Ŝ^+_tot` (ladder
+form of SU(2) invariance). -/
+theorem heisenbergHamiltonian_commutator_totalSpinHalfOpPlus (J : Λ → Λ → ℂ) :
+    heisenbergHamiltonian J * totalSpinHalfOpPlus Λ -
+        totalSpinHalfOpPlus Λ * heisenbergHamiltonian J = 0 := by
+  unfold heisenbergHamiltonian
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun x _ => ?_
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun y _ => ?_
+  rw [Matrix.smul_mul, Matrix.mul_smul, ← smul_sub]
+  rw [spinHalfDot_commutator_totalSpinHalfOpPlus, smul_zero]
+
+/-- A Heisenberg-type Hamiltonian commutes with `Ŝ^-_tot`. -/
+theorem heisenbergHamiltonian_commutator_totalSpinHalfOpMinus (J : Λ → Λ → ℂ) :
+    heisenbergHamiltonian J * totalSpinHalfOpMinus Λ -
+        totalSpinHalfOpMinus Λ * heisenbergHamiltonian J = 0 := by
+  unfold heisenbergHamiltonian
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun x _ => ?_
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun y _ => ?_
+  rw [Matrix.smul_mul, Matrix.mul_smul, ← smul_sub]
+  rw [spinHalfDot_commutator_totalSpinHalfOpMinus, smul_zero]
+
 end LatticeSystem.Quantum
