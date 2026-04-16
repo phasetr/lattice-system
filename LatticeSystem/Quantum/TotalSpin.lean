@@ -6,6 +6,8 @@ import LatticeSystem.Quantum.SpinHalf
 import LatticeSystem.Quantum.SpinHalfBasis
 import LatticeSystem.Quantum.SpinHalfRotation
 import LatticeSystem.Quantum.ManyBody
+import Mathlib.Topology.UniformSpace.Matrix
+import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 
 /-!
 # Total spin operator (Tasaki §2.2)
