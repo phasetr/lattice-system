@@ -921,6 +921,131 @@ explicit coupling $J$ in front of the bond term, so our $H_{J,h}^{N+1}$
 matches Tasaki's (3.3.1) up to the constants $J$ and the Pauli rescaling.
 
 %======================================================================
+%======================================================================
+\section{Tasaki §2.1/§2.2 supplementary content}
+\label{sec:supplementary}
+%======================================================================
+
+The following additional theorems (added in PR \#16) extend the
+formalization of Tasaki \S2.1 and \S2.2.
+
+\subsection{Tasaki \S2.1 supplementary}
+
+\begin{itemize}
+\item \texttt{spinHalfRot\{1,2,3\}\_conj\_spinHalfOp\{2,3,1\}}: general-$\theta$
+  cyclic conjugation $(\hat U^{(\alpha)}_\theta)^\dagger \hat S^{(\beta)}
+  \hat U^{(\alpha)}_\theta = \cos\theta\,\hat S^{(\beta)} - \sin\theta\,\hat S^{(\gamma)}$
+  (Tasaki eq.~(2.1.16)), 6 cyclic + 6 anti-cyclic + 3 same-axis (Tasaki
+  eq.~(2.1.13)-(2.1.15)).
+\item \texttt{spinHalfRot\{1,2,3\}\_half\_pi\_conj\_spinHalfOp\_*}:
+  $\pi/2$-rotation conjugation (Tasaki eq.~(2.1.22)), 6 cases.
+\item \texttt{spinHalfRot3\_eq\_exp}: $\hat U^{(3)}_\theta =
+  \exp(-i\theta\hat S^{(3)})$ via \texttt{Matrix.exp\_diagonal} +
+  Euler (Tasaki Problem 2.1.b, axis 3).
+\item \texttt{spinHalfRot3\_mul\_spinHalfRot2\_mulVec\_spinHalfUp}:
+  coherent state $\hat U^{(3)}_\varphi \hat U^{(2)}_\theta |\psi^\uparrow\rangle$
+  (Tasaki Problem 2.1.d).
+\item \texttt{spinHalfRot3\_half\_pi\_mul\_spinHalfRot2\_half\_pi\_mulVec\_spinHalfUp}:
+  the $\theta=\varphi=\pi/2$ specialization (Tasaki Problem 2.1.e).
+\item \texttt{spinHalfDotVec}, \texttt{spinHalfDotVec\_isHermitian},
+  \texttt{spinHalfRot3\_commute\_spinHalfOp3\_smul}: vector inner
+  product $\hat S \cdot v$ and same-axis commutation (Tasaki
+  eq.~(2.1.19)-(2.1.20), partial).
+\item \texttt{rot3D\{1,2,3\}}, \texttt{rot3D\{1,2,3\}\_zero},
+  \texttt{rot3D\{1,2,3\}\_pi}: explicit 3D rotation matrices
+  $R^{(\alpha)}_\theta$ (Tasaki eq.~(2.1.11)).
+\item \texttt{rot3D\{1,2,3\}Pi}, \texttt{rot3D\{1,2,3\}Pi\_sq},
+  \texttt{rot3D\{1,2,3\}Pi\_mul\_rot3D\{2,3,1\}Pi},
+  \texttt{rot3D\{1,2,3\}Pi\_comm\_*}: $\pi$-rotation matrices
+  $R^{(\alpha)}_\pi$ and their group structure (Tasaki eq.~(2.1.28),
+  Problem 2.1.f).
+\item \texttt{spinOnePiRot\{1,2,3\}}, \texttt{spinOnePiRot3\_eq},
+  \texttt{spinOnePiRot\{1,2,3\}\_sq}, \texttt{spinOnePiRot\{1,2,3\}\_comm\_*}:
+  $S = 1$ $\pi$-rotation matrices and their integer-spin Z$_2 \times$ Z$_2$
+  relations (Tasaki eq.~(2.1.31)/(2.1.33)/(2.1.34)).
+\item \texttt{spinOneOpPlus}, \texttt{spinOneOpMinus},
+  \texttt{spinOneOp3\_mulVec\_*}, \texttt{spinOneOpPlus/Minus\_mulVec\_*},
+  \texttt{spinOneOpPlus/Minus\_conjTranspose}, \texttt{spinOneRot3}:
+  $S = 1$ basis, raising/lowering, adjoints, and closed-form rotation
+  (axis 3) (Tasaki eq.~(2.1.2)-(2.1.6) for $S=1$, Problem 2.1.c).
+\item \texttt{Quantum/Z2Z2.lean}: documentation module unifying the
+  Z$_2 \times$ Z$_2$ structure (Tasaki eq.~(2.1.27)-(2.1.34)) for
+  both $S=1/2$ (projective) and $S=1$ (genuine) representations.
+\end{itemize}
+
+\subsection{Tasaki \S2.2 supplementary}
+
+\begin{itemize}
+\item \texttt{onSite\_add}, \texttt{onSite\_sub}, \texttt{onSite\_zero},
+  \texttt{onSite\_smul}, \texttt{onSite\_one}: linearity and identity
+  preservation of \texttt{onSite}.
+\item \texttt{onSite\_mul\_onSite\_same},
+  \texttt{onSite\_commutator\_same}: same-site product / commutator
+  (Tasaki eq.~(2.2.6) diagonal).
+\item \texttt{spinHalfOp\{1,2,3\}\_onSite\_commutator\_spinHalfOp\{2,3,1\}\_onSite}:
+  same-site spin commutators.
+\item \texttt{onSite\_commutator\_totalOnSite}: generic
+  $[\texttt{onSite}\,x\,A, \sum_z \texttt{onSite}\,z\,B]
+   = \texttt{onSite}\,x\,[A, B]$.
+\item \texttt{basisVec}, \texttt{onSite\_mulVec\_basisVec}: basis
+  states and the explicit tensor-product action (Tasaki
+  eq.~(2.2.1)/(2.2.4)).
+\item \texttt{totalSpinHalfOpPlus}, \texttt{totalSpinHalfOpMinus},
+  \texttt{totalSpinHalfOpPlus\_eq\_add},
+  \texttt{totalSpinHalfOpMinus\_eq\_sub},
+  \texttt{totalSpinHalfOpPlus/Minus\_conjTranspose}:
+  $\hat S^{\pm}_{\rm tot}$ and adjoints (Tasaki eq.~(2.2.8)).
+\item \texttt{totalSpinHalfOp\{1,2,3\}\_commutator\_totalSpinHalfOp\{2,3,1\}}:
+  total-spin commutators.
+\item \texttt{totalSpinHalfOp3\_commutator\_totalSpinHalfOpPlus/Minus}:
+  Cartan ladder $[\hat S_{\rm tot}^{(3)}, \hat S^{\pm}_{\rm tot}]
+   = \pm\hat S^{\pm}_{\rm tot}$.
+\item \texttt{totalSpinHalfOpPlus\_commutator\_totalSpinHalfOpMinus}:
+  $[\hat S^+_{\rm tot}, \hat S^-_{\rm tot}] = 2\hat S^{(3)}_{\rm tot}$.
+\item \texttt{totalSpinHalfSquared}, \texttt{totalSpinHalfSquared\_isHermitian},
+  \texttt{totalSpinHalfSquared\_commutator\_*}:
+  Casimir operator $(\hat S_{\rm tot})^2$ and its $\mathrm{SU}(2)$
+  invariance (Tasaki eq.~(2.2.12)).
+\item \texttt{spinSign}, \texttt{magnetization}: total magnetization
+  $|\sigma| := \sum_x \mathrm{sign}(\sigma_x)$ (Tasaki eq.~(2.2.2)).
+\item \texttt{spinHalfSign}, \texttt{onSite\_spinHalfOp3\_mulVec\_basisVec},
+  \texttt{totalSpinHalfOp3\_mulVec\_basisVec},
+  \texttt{totalSpinHalfOp3\_mulVec\_basisVec\_eq\_magnetization}:
+  $\hat S^{(3)}_{\rm tot}$ eigenvalues on basis states (Tasaki
+  eq.~(2.2.10)).
+\item \texttt{onSite\_spinHalfOpPlus/Minus\_mulVec\_basisVec},
+  \texttt{totalSpinHalfOpPlus/Minus\_mulVec\_basisVec}: raising and
+  lowering action on basis states.
+\item \texttt{spinHalfDot}, \texttt{spinHalfDot\_eq\_plus\_minus}:
+  two-site inner product $\hat S_x \cdot \hat S_y$ and its
+  raising/lowering decomposition (Tasaki eq.~(2.2.16)).
+\item \texttt{spinHalfDot\_comm}, \texttt{spinHalfDot\_self},
+  \texttt{spinHalfDot\_isHermitian},
+  \texttt{spinHalfPairSpinSq}, \texttt{spinHalfPairSpinSq\_eq}:
+  symmetry, $\hat S_x \cdot \hat S_x = (3/4)\cdot 1$, Hermiticity, and
+  the squared-sum identity (Tasaki eq.~(2.2.18)).
+\item \texttt{totalSpinHalfSquared\_eq\_sum\_dot}:
+  $(\hat S_{\rm tot})^2 = \sum_{x,y} \hat S_x \cdot \hat S_y$.
+\item \texttt{spinHalfDot\_commutator\_totalSpinHalfOp\{1,2,3\}},
+  \texttt{spinHalfDot\_commutator\_totalSpinHalfOpPlus/Minus}:
+  $\mathrm{SU}(2)$ invariance of $\hat S_x \cdot \hat S_y$
+  (Tasaki eq.~(2.2.17)).
+\item \texttt{IsInMagnetizationSubspace},
+  \texttt{basisVec\_mem\_magnetizationSubspace}: magnetization
+  subspace predicate and basis state membership (Tasaki
+  eq.~(2.2.9)/(2.2.10)).
+\item \texttt{totalSpinHalfRot\{1,2,3\}Pi},
+  \texttt{totalSpinHalfRot\{1,2,3\}\,\theta},
+  \texttt{totalSpinHalfRot\{1,2,3\}\_zero},
+  \texttt{totalSpinHalfRot\{1,2,3\}Pi\_eq}: global rotation
+  $\hat U^{(\alpha)}_{\rm tot,\theta}$ via \texttt{Finset.noncommProd}
+  (Tasaki eq.~(2.2.11)).
+\item \texttt{totalSpinHalfRot\{1,2,3\}Pi\_mul\_totalSpinHalfRot\{2,3,1\}Pi}:
+  $\hat U^{(\alpha)}_{\pi,{\rm tot}} \cdot
+   \hat U^{(\beta)}_{\pi,{\rm tot}}
+   = \hat U^{(\gamma)}_{\pi,{\rm tot}}$ (Tasaki Problem 2.2.a).
+\end{itemize}
+
 \section{Progress table}
 \label{sec:progress}
 %======================================================================
