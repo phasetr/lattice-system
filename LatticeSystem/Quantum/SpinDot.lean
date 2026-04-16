@@ -431,4 +431,74 @@ theorem totalSpinHalfSquared_eq_sum_dot :
   rw [spinHalfDot_comm]
   rfl
 
+/-! ## Two-spin Ŝ_x · Ŝ_y eigenvalues on basis states (Tasaki eq (2.2.19))
+
+For two distinct sites `x ≠ y`, the two-site dot product `Ŝ_x · Ŝ_y`
+acts on a computational-basis state `|σ⟩` according to whether the two
+spins are parallel (`σ x = σ y`) or anti-parallel (`σ x ≠ σ y`).
+
+* **Parallel** (`σ x = σ y`): `Ŝ_x · Ŝ_y |σ⟩ = (1/4) |σ⟩`. The ladder
+  terms vanish (one factor of `Ŝ^±` annihilates `|σ⟩`) and the diagonal
+  term contributes `(±1/2)·(±1/2) = +1/4`.
+* **Anti-parallel** (`σ x ≠ σ y`): `Ŝ_x · Ŝ_y |σ⟩ = (1/2)|σ_swap⟩
+  + (-1/4)|σ⟩` where `|σ_swap⟩` is the basis state with sites `x` and
+  `y` swapped. From this one recovers the spin-1/2 triplet/singlet
+  eigenvalues `1/4`, `-3/4`. -/
+
+/-- Parallel-spin eigenvalue: if `σ x = σ y` (and `x ≠ y`), then
+`Ŝ_x · Ŝ_y |σ⟩ = (1/4) |σ⟩`. -/
+theorem spinHalfDot_mulVec_basisVec_parallel
+    {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin 2) (h : σ x = σ y) :
+    (spinHalfDot x y).mulVec (basisVec σ) = (1 / 4 : ℂ) • basisVec σ := by
+  have hupd0 : Function.update σ y (0 : Fin 2) x = σ x :=
+    Function.update_of_ne hxy 0 σ
+  have hupd1 : Function.update σ y (1 : Fin 2) x = σ x :=
+    Function.update_of_ne hxy 1 σ
+  rw [spinHalfDot_eq_plus_minus]
+  rw [Matrix.add_mulVec, Matrix.smul_mulVec, Matrix.add_mulVec,
+      ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
+  rw [onSite_spinHalfOp3_mulVec_basisVec, Matrix.mulVec_smul,
+      onSite_spinHalfOp3_mulVec_basisVec, smul_smul]
+  rw [onSite_spinHalfOpMinus_mulVec_basisVec,
+      onSite_spinHalfOpPlus_mulVec_basisVec]
+  by_cases hsx : σ x = 0
+  · have hsy : σ y = 0 := h ▸ hsx
+    rw [if_pos hsy, if_neg (by rw [hsy]; exact zero_ne_one)]
+    rw [onSite_spinHalfOpPlus_mulVec_basisVec]
+    rw [if_neg (by rw [hupd1, hsx]; exact zero_ne_one)]
+    simp only [Matrix.mulVec_zero, smul_zero, add_zero, zero_add]
+    rw [hsx, hsy]
+    have hsign : (spinHalfSign 0 * spinHalfSign 0 : ℂ) = (1 / 4 : ℂ) := by
+      unfold spinHalfSign; norm_num
+    rw [hsign]
+  · have hsx1 : σ x = 1 := by
+      match hxv : σ x with
+      | 0 => exact absurd hxv hsx
+      | 1 => rfl
+    have hsy1 : σ y = 1 := h ▸ hsx1
+    rw [if_neg (by rw [hsy1]; exact one_ne_zero), if_pos hsy1]
+    rw [onSite_spinHalfOpMinus_mulVec_basisVec]
+    rw [if_neg (by rw [hupd0, hsx1]; exact one_ne_zero)]
+    simp only [Matrix.mulVec_zero, smul_zero, add_zero, zero_add]
+    rw [hsx1, hsy1]
+    have hsign : (spinHalfSign 1 * spinHalfSign 1 : ℂ) = (1 / 4 : ℂ) := by
+      unfold spinHalfSign; norm_num
+    rw [hsign]
+
+/-- Two-spin both-up: `Ŝ_x · Ŝ_y |↑↑⟩ = (1/4) |↑↑⟩` (the spin-1
+triplet eigenvalue). -/
+theorem spinHalfDot_mulVec_basisVec_both_up
+    {x y : Λ} (hxy : x ≠ y) :
+    (spinHalfDot x y).mulVec (basisVec (fun _ : Λ => (0 : Fin 2))) =
+      (1 / 4 : ℂ) • basisVec (fun _ : Λ => (0 : Fin 2)) :=
+  spinHalfDot_mulVec_basisVec_parallel hxy _ rfl
+
+/-- Two-spin both-down: `Ŝ_x · Ŝ_y |↓↓⟩ = (1/4) |↓↓⟩` (the spin-1
+triplet eigenvalue at `m = -1`). -/
+theorem spinHalfDot_mulVec_basisVec_both_down
+    {x y : Λ} (hxy : x ≠ y) :
+    (spinHalfDot x y).mulVec (basisVec (fun _ : Λ => (1 : Fin 2))) =
+      (1 / 4 : ℂ) • basisVec (fun _ : Λ => (1 : Fin 2)) :=
+  spinHalfDot_mulVec_basisVec_parallel hxy _ rfl
+
 end LatticeSystem.Quantum
