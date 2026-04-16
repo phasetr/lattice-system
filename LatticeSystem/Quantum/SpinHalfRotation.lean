@@ -863,6 +863,18 @@ theorem hadamard_mul_self : hadamard * hadamard = 1 := by
   fin_cases i <;> fin_cases j <;>
     first | (simp; norm_num) | simp
 
+/-- `W · Ŝ^(3) · W = Ŝ^(1)` (the inverse direction of the Hadamard
+basis change). -/
+theorem hadamard_mul_spinHalfOp3_mul_hadamard :
+    hadamard * spinHalfOp3 * hadamard = spinHalfOp1 := by
+  unfold hadamard spinHalfOp1 spinHalfOp3 pauliX pauliZ
+  rw [Matrix.smul_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_smul,
+    smul_smul]
+  rw [sqrt2_inv_mul_sqrt2_inv]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    first | (simp; ring) | simp
+
 /-- `W · Ŝ^(1) · W = Ŝ^(3)` — the Hadamard takes the x-spin to the
 z-spin (basis change). -/
 theorem hadamard_mul_spinHalfOp1_mul_hadamard :
@@ -874,5 +886,13 @@ theorem hadamard_mul_spinHalfOp1_mul_hadamard :
   ext i j
   fin_cases i <;> fin_cases j <;>
     first | (simp; ring) | simp
+
+/-- `Û^(1)_θ` is the Hadamard-conjugate of `Û^(3)_θ`. -/
+theorem spinHalfRot1_eq_hadamard_conj (θ : ℝ) :
+    spinHalfRot1 θ = hadamard * spinHalfRot3 θ * hadamard := by
+  unfold spinHalfRot1 spinHalfRot3 rotOf
+  rw [mul_sub, sub_mul, mul_smul_comm, smul_mul_assoc, Matrix.mul_one,
+    mul_smul_comm, smul_mul_assoc, hadamard_mul_self,
+    hadamard_mul_spinHalfOp3_mul_hadamard]
 
 end LatticeSystem.Quantum
