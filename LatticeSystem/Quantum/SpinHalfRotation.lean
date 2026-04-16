@@ -808,4 +808,35 @@ theorem spinHalfRot3_half_pi_mul_spinHalfRot2_half_pi_mulVec_spinHalfUp :
   have h := spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp (Real.pi / 2) (Real.pi / 2)
   convert h using 2 <;> push_cast <;> ring
 
+/-! ## Vector inner product `Ŝ · v` (Tasaki eq (2.1.19))
+
+For a 3-vector `v = (v₁, v₂, v₃)`, the inner product `Ŝ · v :=
+v₁ Ŝ^(1) + v₂ Ŝ^(2) + v₃ Ŝ^(3)` is the spin operator projected onto
+direction `v`. -/
+
+/-- Vector inner product `Ŝ · v` for `S = 1/2`. -/
+noncomputable def spinHalfDotVec (v : Fin 3 → ℂ) : Matrix (Fin 2) (Fin 2) ℂ :=
+  v 0 • spinHalfOp1 + v 1 • spinHalfOp2 + v 2 • spinHalfOp3
+
+/-- `Ŝ · v` is Hermitian when `v` is real-valued (so `star v = v`). -/
+theorem spinHalfDotVec_isHermitian (v : Fin 3 → ℂ)
+    (hv : ∀ i, star (v i) = v i) :
+    (spinHalfDotVec v).IsHermitian := by
+  unfold spinHalfDotVec
+  refine Matrix.IsHermitian.add (Matrix.IsHermitian.add ?_ ?_) ?_
+  · unfold Matrix.IsHermitian
+    rw [Matrix.conjTranspose_smul, hv 0, spinHalfOp1_isHermitian]
+  · unfold Matrix.IsHermitian
+    rw [Matrix.conjTranspose_smul, hv 1, spinHalfOp2_isHermitian]
+  · unfold Matrix.IsHermitian
+    rw [Matrix.conjTranspose_smul, hv 2, spinHalfOp3_isHermitian]
+
+/-- Same-axis rotation commutes with the spin operator along that axis. -/
+theorem spinHalfRot3_commute_spinHalfOp3_smul (θ : ℝ) (v3 : ℂ) :
+    spinHalfRot3 θ * (v3 • spinHalfOp3) =
+      (v3 • spinHalfOp3) * spinHalfRot3 θ := by
+  rw [mul_smul_comm, smul_mul_assoc]
+  congr 1
+  exact (rotOf_comm_self spinHalfOp3 θ).symm
+
 end LatticeSystem.Quantum
