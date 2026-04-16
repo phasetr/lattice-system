@@ -847,4 +847,21 @@ theorem totalSpinHalfSquared_mulVec_two_site_triplet_zero :
        (2 : ℂ) • v
   module
 
+/-- The two-site singlet is annihilated by `Ŝ_tot^(3)`: zero magnetization. -/
+theorem totalSpinHalfOp3_mulVec_two_site_singlet :
+    (totalSpinHalfOp3 (Fin 2)).mulVec
+        (basisVec upDown - basisVec (basisSwap upDown 0 1)) = 0 := by
+  rw [Matrix.mulVec_sub]
+  rw [totalSpinHalfOp3_mulVec_basisVec]
+  rw [totalSpinHalfOp3_mulVec_basisVec]
+  -- Σ spinHalfSign upDown = (1/2) + (-1/2) = 0
+  have h_ud : ∑ x : Fin 2, spinHalfSign (upDown x) = 0 := by
+    rw [Fin.sum_univ_two]
+    simp [upDown_zero, upDown_one, spinHalfSign]
+  -- For swap σ x = 1, swap σ y = 0: Σ spinHalfSign = (-1/2) + (1/2) = 0
+  have h_swap : ∑ x : Fin 2, spinHalfSign (basisSwap upDown 0 1 x) = 0 := by
+    rw [Fin.sum_univ_two]
+    rw [basisSwap_upDown]; simp [spinHalfSign]
+  rw [h_ud, h_swap, zero_smul, zero_smul, sub_self]
+
 end LatticeSystem.Quantum
