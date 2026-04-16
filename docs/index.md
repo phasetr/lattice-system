@@ -120,6 +120,22 @@ p. 16 (`Û_{2π} = -1` for half-odd-integer spin).
 | `spinHalfRot{1,2,3}_half_pi_conj_spinHalfOp_*` | `π/2`-rotation conjugation `(Û^(α)_{π/2})† Ŝ^(β) Û^(α)_{π/2} = -ε^{αβγ} Ŝ^(γ)` (Tasaki eq. (2.1.22), 6 cases) | `Quantum/SpinHalfRotation.lean` |
 | `spinHalfRot3_eq_exp` | `Û^(3)_θ = exp(-iθ Ŝ^(3))` via `Matrix.exp_diagonal` + Euler (Problem 2.1.b, axis 3) | `Quantum/SpinHalfRotation.lean` |
 
+### 3D rotation matrices `R^(α)_θ` (general θ, Tasaki §2.1 eq. (2.1.11))
+
+| Lean name | Statement | File |
+|---|---|---|
+| `rot3D{1,2,3} θ` | 3×3 real rotation matrices by angle θ about each axis | `Quantum/Rotation3D.lean` |
+| `rot3D{1,2,3}_zero` | `R^(α)_0 = 1` | `Quantum/Rotation3D.lean` |
+| `rot3D{1,2,3}_pi` | `R^(α)_π` from general formula matches explicit π-rotation | `Quantum/Rotation3D.lean` |
+
+### Z₂ × Z₂ representation (Tasaki §2.1 eqs. (2.1.27)-(2.1.34))
+
+The Z₂ × Z₂ structure is proved across files:
+- S = 1/2 (projective, eq. (2.1.31)): `spinHalfRot*_pi_sq = -1`, anticommutation, products.
+- S = 1 (genuine, eq. (2.1.27)): `spinOnePiRot*_sq = 1`, commutation.
+
+See `Quantum/Z2Z2.lean` for the unified documentation.
+
 ### 3D rotation matrices `R^(α)_π` (Tasaki §2.1 eq. (2.1.28))
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
