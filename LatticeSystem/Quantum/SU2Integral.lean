@@ -8,35 +8,40 @@ import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
 /-!
-# SU(2)-averaged state infrastructure (Tasaki §2.2 Problem 2.2.c)
+# Trig-integral helpers for Tasaki §2.2 Problem 2.2.c
 
-Imports the interval-integral and trig-integral machinery from mathlib
-that is needed to state and prove the SU(2)-averaged-state identity
+Concrete trig-integral evaluations needed for the SU(2)-averaged-state
+computation (Tasaki §2.2, Problem 2.2.c, eq. (2.2.15)). These are
+proved using mathlib's `intervalIntegral` and
+`SpecialFunctions.Integrals`. Each is a thin wrapper around mathlib's
+`integral_sin`, `integral_cos`, or `integral_sin_sq`/`integral_cos_sq`.
 
-```
-(1/4π) ∫₀²π dφ ∫₀π dθ sin θ · (Û^(3)_φ · Û^(2)_θ · |ψ^↑⟩) ⊗ |ψ^↓⟩
-= (1/2)(|↑↓⟩ - |↓↑⟩)
-```
-
-(Tasaki *Physics and Mathematics of Quantum Many-Body Systems*,
-§2.2, Problem 2.2.c, eq. (2.2.15)).
-
-This module currently provides only the **import bridge**: it brings
-`Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic` and
-`Mathlib.Analysis.SpecialFunctions.Integrals.Basic` into the project,
-making `∫ x in a..b, f x` and standard trig integrals
-(`integral_sin`, `integral_cos`, etc.) available.
-
-The full integral statement and proof require component-wise expansion
-of the rotated state (using `spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp`
-from `SpinHalfRotation.lean`), followed by standard trig-integral
-evaluations. This is tracked as the next work item (B-3c, work 0020).
+The full integral statement (Problem 2.2.c itself) will be assembled
+from these helpers in a follow-up work item (B-3c).
 -/
 
 namespace LatticeSystem.Quantum
 
--- This module serves as an import bridge. The integral statement
--- and proof will be added in B-3c (work 0020) once the component-wise
--- trig integrals are verified.
+open MeasureTheory Real
+
+/-! ## Standard trig integrals over one full period or half period -/
+
+/-- `∫ φ in 0..2π, cos φ = 0`. -/
+theorem integral_cos_zero_two_pi :
+    ∫ φ in (0 : ℝ)..(2 * Real.pi), Real.cos φ = 0 := by
+  rw [integral_cos]
+  simp [Real.sin_two_pi, Real.sin_zero]
+
+/-- `∫ φ in 0..2π, sin φ = 0`. -/
+theorem integral_sin_zero_two_pi :
+    ∫ φ in (0 : ℝ)..(2 * Real.pi), Real.sin φ = 0 := by
+  rw [integral_sin]
+  simp [Real.cos_two_pi, Real.cos_zero]
+
+/-- `∫ θ in 0..π, sin θ = 2`. -/
+theorem integral_sin_zero_pi :
+    ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ = 2 := by
+  rw [integral_sin]
+  simp [Real.cos_pi, Real.cos_zero]; ring
 
 end LatticeSystem.Quantum
