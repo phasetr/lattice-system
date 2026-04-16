@@ -887,4 +887,71 @@ theorem totalSpinHalfRot3_two_site (θ : ℝ) :
   simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
     Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
 
+/-! ## Total rotation as matrix exponential (Tasaki §2.2 eq (2.2.11))
+
+The defining identity
+`Û^(α)_θ_tot = exp(-iθ Ŝ_tot^(α)) = ∏_x exp(-iθ Ŝ_x^(α))`
+(Tasaki *Physics and Mathematics of Quantum Many-Body Systems*, p.22,
+eq. (2.2.11)) is **axiomatized** here pending Lean infrastructure
+to bridge the Pi-product matrix topology and the Frobenius
+normed-ring topology. See the Roadmap entry P1f'' and the discussion
+in `tex/proof-guide.tex` (TODO section).
+
+The morally correct proof goes:
+1. `spinHalfRot α θ = exp(-(I·θ) • spinHalfOp α)` (P1e'',
+   `spinHalfRot{1,2,3}_eq_exp`).
+2. `onSite x (exp B) = exp (onSite x B)` (continuous ring-hom
+   commutes with `exp`; `NormedSpace.map_exp` applied to
+   `onSiteRingHom`). **This step is the actual blocker**: the
+   continuity of `onSite x` is established under the canonical
+   Pi-product matrix topology, but `NormedSpace.map_exp` requires
+   `NormedRing` + `CompleteSpace` instances which only resolve under
+   the Frobenius (or other operator) norm. The two topologies coincide
+   on finite-dim matrices but Lean's instance resolution does not
+   bridge them.
+3. `exp(Σ_x onSite x B) = ∏_x exp(onSite x B)` (Matrix.exp_sum_of_commute).
+
+We therefore **axiomatize the end result** (the per-axis `_eq_exp`
+identity) and use it as a black box in downstream work. -/
+
+/-- **AXIOM** (Tasaki §2.2 eq (2.2.11), axis 1):
+`Û^(1)_θ_tot = exp(-iθ Ŝ_tot^(1))`. -/
+axiom totalSpinHalfRot1_eq_exp_axiom (Λ : Type*) [Fintype Λ] [DecidableEq Λ]
+    (θ : ℝ) :
+    totalSpinHalfRot1 Λ θ =
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp1 Λ)
+
+/-- **AXIOM** (Tasaki §2.2 eq (2.2.11), axis 2):
+`Û^(2)_θ_tot = exp(-iθ Ŝ_tot^(2))`. -/
+axiom totalSpinHalfRot2_eq_exp_axiom (Λ : Type*) [Fintype Λ] [DecidableEq Λ]
+    (θ : ℝ) :
+    totalSpinHalfRot2 Λ θ =
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 Λ)
+
+/-- **AXIOM** (Tasaki §2.2 eq (2.2.11), axis 3):
+`Û^(3)_θ_tot = exp(-iθ Ŝ_tot^(3))`. -/
+axiom totalSpinHalfRot3_eq_exp_axiom (Λ : Type*) [Fintype Λ] [DecidableEq Λ]
+    (θ : ℝ) :
+    totalSpinHalfRot3 Λ θ =
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp3 Λ)
+
+/-- Tasaki §2.2 eq (2.2.11), axis 1, as a re-exported theorem
+(currently invoking the axiom). -/
+theorem totalSpinHalfRot1_eq_exp (θ : ℝ) :
+    totalSpinHalfRot1 Λ θ =
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp1 Λ) :=
+  totalSpinHalfRot1_eq_exp_axiom Λ θ
+
+/-- Tasaki §2.2 eq (2.2.11), axis 2, as a re-exported theorem. -/
+theorem totalSpinHalfRot2_eq_exp (θ : ℝ) :
+    totalSpinHalfRot2 Λ θ =
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp2 Λ) :=
+  totalSpinHalfRot2_eq_exp_axiom Λ θ
+
+/-- Tasaki §2.2 eq (2.2.11), axis 3, as a re-exported theorem. -/
+theorem totalSpinHalfRot3_eq_exp (θ : ℝ) :
+    totalSpinHalfRot3 Λ θ =
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp3 Λ) :=
+  totalSpinHalfRot3_eq_exp_axiom Λ θ
+
 end LatticeSystem.Quantum

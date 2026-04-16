@@ -33,7 +33,7 @@ CAR algebras, and eventually lattice QCD.
 | P1d (Tasaki §2.1) | Basis states `|ψ^↑⟩, |ψ^↓⟩`, raising/lowering `Ŝ^±` (S = 1/2) | Done |
 | P1d' (Tasaki §2.1) | S = 1 matrix representations (eq. (2.1.9)) | Done |
 | P1d'' (Tasaki §2.1) | Problem 2.1.a for S = 1/2 (Pauli basis of `M_2(ℂ)`) | Done |
-| P1d''' (Tasaki §2.1) | Problem 2.1.a for `S ≥ 1` (polynomial basis of `M_{2S+1}(ℂ)`) | Not started |
+| P1d''' (Tasaki §2.1) | Problem 2.1.a for `S ≥ 1` (polynomial basis of `M_{2S+1}(ℂ)` via Lagrange interpolation in `Ŝ^(3)` and `Ŝ^±` ladder action) | TODO (see [open items](#open-items--axioms)) |
 | P1e (Tasaki §2.1) | S = 1/2 rotation `Û^(α)_θ` closed form, `Û_0`, adjoint, `Û_{2π}` | Done |
 | P1e' | Rotation group law and unitarity | Done |
 | P1e'' (Tasaki §2.1) | `Û^(α)_θ = exp(-iθŜ^(α))` via `Matrix.exp_diagonal` + `Matrix.exp_conj` (Problem 2.1.b, all 3 axes) | Done |
@@ -47,7 +47,7 @@ CAR algebras, and eventually lattice QCD.
 | P1f' (Tasaki §2.2) | Total spin operator `Ŝ_tot^(α)` (eq. (2.2.7)) and Hermiticity | Done |
 | P1f'-pm (Tasaki §2.2) | Total raising/lowering `Ŝ^±_tot = Σ_x Ŝ_x^±` (eq. (2.2.8)) | Done |
 | P1f-mag (Tasaki §2.2) | Total magnetization `|σ| := Σ_x spinSign(σ_x)` (eq. (2.2.2)) | Done |
-| P1f'' (Tasaki §2.2) | Global rotation `Û^(α)_θ = exp(-iθ Ŝ_tot^(α))` (eq. (2.2.11)) | Not started |
+| P1f'' (Tasaki §2.2) | Global rotation `Û^(α)_θ = exp(-iθ Ŝ_tot^(α))` (eq. (2.2.11)) | Axiomatized (TODO: prove; see [open items](#open-items--axioms)) |
 | P1f''' (Tasaki §2.2) | SU(2) / U(1) invariance (eqs. (2.2.12)-(2.2.13)) | Done (Heisenberg-form) |
 | P1f'''' (Tasaki §2.2) | Two-site inner product `Ŝ_x · Ŝ_y` raising/lowering decomposition (eq. (2.2.16)) | Done |
 | P1f''''' (Tasaki §2.2) | SU(2) invariance of `Ŝ_x · Ŝ_y` and eigenvalues (eqs. (2.2.17)–(2.2.19)) | Done |
@@ -273,6 +273,8 @@ Systems*, §2.2 eqs. (2.2.7) and (2.2.8), p. 22.
 | `onSite_pow` | `(onSite x A)^k = onSite x (A^k)` (powers commute with `onSite`) | `Quantum/TotalSpin.lean` |
 | `totalSpinHalfRot{1,2,3}Pi_two_site` | for `Λ = Fin 2`, the global π-rotation factors as `onSite 0 (Û^(α)_π) * onSite 1 (Û^(α)_π)` (Tasaki Problem 2.2.b) | `Quantum/TotalSpin.lean` |
 | `totalSpinHalfRot{1,2,3}_two_site` | for `Λ = Fin 2` and any `θ`, the global rotation factors as `onSite 0 (Û^(α)_θ) * onSite 1 (Û^(α)_θ)` (general-θ extension of Problem 2.2.b) | `Quantum/TotalSpin.lean` |
+| `totalSpinHalfRot{1,2,3}_eq_exp_axiom` | **AXIOM** (Tasaki eq. (2.2.11)): `Û^(α)_θ_tot = exp(-iθ Ŝ_tot^(α))`. See [open items](#open-items--axioms) for the technical blocker | `Quantum/TotalSpin.lean` |
+| `totalSpinHalfRot{1,2,3}_eq_exp` | re-export of the axiom above as a theorem (uses `_axiom` directly) | `Quantum/TotalSpin.lean` |
 | `IsInMagnetizationSubspace` | predicate for the magnetization-`M` eigenspace `H_M` (Tasaki eq. (2.2.9)/(2.2.10)) | `Quantum/MagnetizationSubspace.lean` |
 | `basisVec_mem_magnetizationSubspace` | `|σ⟩ ∈ H_{|σ|/2}` — basis states lie in their magnetization subspace | `Quantum/MagnetizationSubspace.lean` |
 
@@ -319,6 +321,72 @@ explicit bond coupling `J`.
 |---|---|---|
 | `quantumIsingHamiltonian N J h` | `H = -J Σ σ^z_i σ^z_{i+1} - h Σ σ^x_i` | `Quantum/IsingChain.lean` |
 | `quantumIsingHamiltonian_isHermitian` | `H` is Hermitian for real `J`, `h` | `Quantum/IsingChain.lean` |
+
+## Open items / axioms
+
+The following Tasaki §2.1 / §2.2 items are **not yet fully proved**.
+They are tracked here so that future PRs can pick them up and replace
+each axiom by a proof (or fill in the deferred construction).
+
+### TODO (P1d''') — Problem 2.1.a for `S ≥ 1`
+
+**Statement (Tasaki p.15)**: For any spin `S ≥ 1`, every operator on the
+single-site Hilbert space `h_0 = ℂ^{2S+1}` (i.e. every `(2S+1) × (2S+1)`
+matrix) can be written as a polynomial in `1̂, Ŝ^(1), Ŝ^(2), Ŝ^(3)`.
+
+**Proof outline (Tasaki solution S.1, p.493)**:
+1. The diagonal projector `|ψ^σ⟩⟨ψ^σ|` is given by Lagrange interpolation
+   in `Ŝ^(3)`:
+   `|ψ^σ⟩⟨ψ^σ| = ∏_{τ=-S, τ≠σ}^{S} (Ŝ^(3) - τ·1̂) / (σ - τ)`.
+2. Off-diagonal matrix units `|ψ^τ⟩⟨ψ^σ|` (`τ ≠ σ`) are obtained by
+   applying `Ŝ^±` to a diagonal projector and normalizing.
+3. The set `{|ψ^τ⟩⟨ψ^σ|}_{τ, σ}` spans `M_{2S+1}(ℂ)`; combined with
+   Steps 1-2 this shows every matrix is a polynomial in
+   `1̂, Ŝ^(1), Ŝ^(2), Ŝ^(3)`.
+
+**Status**: `S = 1/2` case is `pauliBasis` (P1d''). The general-`S`
+case requires generic `Fin (2S+1)` typing and Lagrange interpolation
+infrastructure; not started.
+
+### Axiom (P1f'') — Tasaki eq. (2.2.11)
+
+**Statement**: For `α ∈ {1, 2, 3}` and `θ ∈ ℝ`,
+`Û^(α)_θ_tot = exp(-iθ Ŝ_tot^(α)) = ∏_{x ∈ Λ} exp(-iθ Ŝ_x^(α))`.
+
+In Lean this is currently axiomatized as:
+
+```lean
+axiom totalSpinHalfRot1_eq_exp_axiom (Λ : Type*) [Fintype Λ] [DecidableEq Λ]
+    (θ : ℝ) :
+    totalSpinHalfRot1 Λ θ =
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • totalSpinHalfOp1 Λ)
+-- and similarly for axes 2, 3
+```
+
+(See `Quantum/TotalSpin.lean`.)
+
+**Why axiomatized**: The morally correct proof composes
+1. `spinHalfRot α θ = exp(-(I·θ) • spinHalfOp α)` — already proved
+   single-site (P1e'').
+2. `onSite x (exp B) = exp (onSite x B)` — would follow from
+   `NormedSpace.map_exp` applied to `onSiteRingHom`.
+3. `exp(Σ_x onSite x B) = ∏_x exp(onSite x B)` — would follow from
+   `Matrix.exp_sum_of_commute` for distinct-site embeddings.
+
+**Step 2 is the actual blocker**. `continuous_onSite` is established
+under the canonical Pi-product matrix topology, but
+`NormedSpace.map_exp` requires `NormedRing` + `CompleteSpace`
+instances, which only resolve under the Frobenius (or other operator)
+norm topology. The two topologies coincide on finite-dimensional
+matrices, but Lean's instance resolution does **not** bridge them
+(even with `open scoped Matrix.Norms.Frobenius` and explicit
+`haveI : CompleteSpace _ := FiniteDimensional.complete ℂ _`).
+
+A future PR should either (a) establish a topology-bridging lemma
+between the Pi-product and Frobenius structures on
+`Matrix (Fin n) (Fin n) ℂ`, (b) re-prove `continuous_onSite` under the
+Frobenius topology, or (c) find an alternative formulation that avoids
+`NormedSpace.map_exp` entirely.
 
 ## Links
 

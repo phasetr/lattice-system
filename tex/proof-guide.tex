@@ -1088,7 +1088,102 @@ formalization of Tasaki \S2.1 and \S2.2.
   $\hat S_{\rm tot}^2 |s\,s\,\dots\,s\rangle = (N(N+2)/4)|s\,s\,\dots\,s\rangle$
   for any constant $s : {\rm Fin}\,2$ — the Casimir eigenvalue at
   the maximum total spin $S = N/2$.
+\item \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp\_axiom} (\textbf{AXIOM}),
+  \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}: Tasaki eq.~(2.2.11),
+  $\hat U^{(\alpha)}_{\theta,{\rm tot}}
+   = \exp[-i\theta \hat S^{(\alpha)}_{\rm tot}]$, currently
+  axiomatized.  See §\ref{sec:open-items} below.
 \end{itemize}
+
+\section{Open items / TODO and axioms}
+\label{sec:open-items}
+%======================================================================
+
+The following Tasaki §2.1 / §2.2 items are \emph{not yet fully proved}
+in the Lean development. They are documented here so that future PRs
+can pick them up and replace each axiom by a proof (or fill in the
+deferred construction).
+
+\subsection*{TODO: Problem 2.1.a for \texorpdfstring{$S \geq 1$}{S >= 1} (P1d''')}
+
+\textbf{Statement} (Tasaki p.15): For any spin $S \geq 1$, every
+operator on the single-site Hilbert space $h_0 = \mathbb{C}^{2S+1}$
+(i.e.\ every $(2S+1) \times (2S+1)$ matrix) can be written as a
+polynomial in $\hat 1, \hat S^{(1)}, \hat S^{(2)}, \hat S^{(3)}$.
+
+\textbf{Proof outline} (Tasaki solution S.1, p.493):
+\begin{enumerate}
+\item The diagonal projector $|\psi^\sigma\rangle\langle\psi^\sigma|$
+  is given by Lagrange interpolation in $\hat S^{(3)}$:
+  \[
+    |\psi^\sigma\rangle\langle\psi^\sigma|
+    = \prod_{\substack{\tau = -S \\ \tau \neq \sigma}}^{S}
+        \frac{\hat S^{(3)} - \tau \hat 1}{\sigma - \tau}.
+  \]
+\item Off-diagonal matrix units $|\psi^\tau\rangle\langle\psi^\sigma|$
+  ($\tau \neq \sigma$) are obtained by applying $\hat S^\pm$ to a
+  diagonal projector and normalizing.
+\item The set $\{|\psi^\tau\rangle\langle\psi^\sigma|\}_{\tau,\sigma}$
+  spans $M_{2S+1}(\mathbb{C})$; combined with Steps 1--2 this shows
+  every matrix is a polynomial in $\hat 1, \hat S^{(\alpha)}$.
+\end{enumerate}
+
+\textbf{Status}: $S = 1/2$ is done as \texttt{pauliBasis} (P1d''). The
+general-$S$ case requires generic \texttt{Fin\,(2S+1)} typing and a
+Lagrange interpolation infrastructure; not started.
+
+\subsection*{Axiom: Tasaki eq.~(2.2.11) (P1f'')}
+
+\textbf{Statement}: For $\alpha \in \{1, 2, 3\}$ and $\theta \in
+\mathbb{R}$,
+\[
+  \hat U^{(\alpha)}_{\theta,{\rm tot}}
+    = \exp[-i\theta \hat S^{(\alpha)}_{\rm tot}]
+    = \prod_{x \in \Lambda} \exp[-i\theta \hat S^{(\alpha)}_x].
+\]
+
+In Lean this is currently axiomatized as
+\texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp\_axiom} in
+\texttt{Quantum/TotalSpin.lean}, with thin re-exports
+\texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}.
+
+\textbf{Why axiomatized}. The morally correct proof composes
+\begin{enumerate}
+\item $\hat U^{(\alpha)}_\theta = \exp[-(i\theta)\,\hat S^{(\alpha)}]$
+  at the single-site level (P1e'',
+  \texttt{spinHalfRot\{1,2,3\}\_eq\_exp}).
+\item $\texttt{onSite}\,x\,(\exp B) = \exp(\texttt{onSite}\,x\,B)$,
+  i.e.\ the bridge that the site-embedding ring homomorphism commutes
+  with the matrix exponential. This would follow from
+  \texttt{NormedSpace.map\_exp} applied to \texttt{onSiteRingHom}.
+\item $\exp(\sum_x \texttt{onSite}\,x\,B)
+  = \prod_x \exp(\texttt{onSite}\,x\,B)$ for distinct-site
+  embeddings. This would follow from
+  \texttt{Matrix.exp\_sum\_of\_commute}.
+\end{enumerate}
+
+\textbf{Step 2 is the actual blocker}. Our
+\texttt{continuous\_onSite} is established under the canonical
+Pi-product matrix topology
+(\texttt{Matrix.instTopologicalSpace}), but
+\texttt{NormedSpace.map\_exp} requires \texttt{NormedRing} and
+\texttt{CompleteSpace} instances, which only resolve under the
+Frobenius (or other operator) norm topology. The two topologies
+coincide on finite-dimensional matrices, but Lean's instance
+resolution does \emph{not} bridge them: even with
+\texttt{open scoped Matrix.Norms.Frobenius} and explicit
+\texttt{haveI : CompleteSpace \_ := FiniteDimensional.complete} declarations the
+type-class search picks the Pi topology for
+\texttt{continuous\_onSite} and the Frobenius topology for
+\texttt{NormedSpace.map\_exp}, and they fail to unify.
+
+A future PR should either (a) establish a topology-bridging lemma
+between the Pi-product and Frobenius structures on
+\texttt{Matrix\,(Fin n)\,(Fin n)\,$\mathbb{C}$}, (b) re-prove
+\texttt{continuous\_onSite} under the Frobenius topology, or (c) find
+an alternative formulation that avoids
+\texttt{NormedSpace.map\_exp} entirely (e.g.\ by direct power-series
+manipulation).
 
 \section{Progress table}
 \label{sec:progress}
