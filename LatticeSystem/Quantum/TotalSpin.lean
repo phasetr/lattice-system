@@ -706,6 +706,64 @@ theorem totalSpinHalfRot1Pi_eq : totalSpinHalfRot1Pi Λ = totalSpinHalfRot1 Λ R
 theorem totalSpinHalfRot2Pi_eq : totalSpinHalfRot2Pi Λ = totalSpinHalfRot2 Λ Real.pi := rfl
 theorem totalSpinHalfRot3Pi_eq : totalSpinHalfRot3Pi Λ = totalSpinHalfRot3 Λ Real.pi := rfl
 
+/-! ## Tasaki Problem 2.2.a: total π-rotation product (in cyclic axes) -/
+
+/-- Tasaki Problem 2.2.a, axes (1,2)→3:
+`Û^(1)_π_tot · Û^(2)_π_tot = Û^(3)_π_tot`. Derived from
+the single-site relation `Û^(1)_π · Û^(2)_π = Û^(3)_π` (Tasaki eq.
+(2.1.29)) lifted by `Finset.noncommProd_mul_distrib`. -/
+theorem totalSpinHalfRot1Pi_mul_totalSpinHalfRot2Pi :
+    totalSpinHalfRot1Pi Λ * totalSpinHalfRot2Pi Λ = totalSpinHalfRot3Pi Λ := by
+  unfold totalSpinHalfRot1Pi totalSpinHalfRot2Pi totalSpinHalfRot3Pi
+  rw [← Finset.noncommProd_mul_distrib
+    (s := (Finset.univ : Finset Λ))
+    (f := fun x : Λ => onSite x (spinHalfRot1 Real.pi))
+    (g := fun x : Λ => onSite x (spinHalfRot2 Real.pi))
+    (comm_ff := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+    (comm_gg := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+    (comm_gf := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)]
+  refine Finset.noncommProd_congr rfl ?_ _
+  intros x _
+  change onSite x (spinHalfRot1 Real.pi) * onSite x (spinHalfRot2 Real.pi) =
+       onSite x (spinHalfRot3 Real.pi)
+  rw [onSite_mul_onSite_same, spinHalfRot1_pi_mul_spinHalfRot2_pi]
+
+/-- Tasaki Problem 2.2.a, axes (2,3)→1:
+`Û^(2)_π_tot · Û^(3)_π_tot = Û^(1)_π_tot`. -/
+theorem totalSpinHalfRot2Pi_mul_totalSpinHalfRot3Pi :
+    totalSpinHalfRot2Pi Λ * totalSpinHalfRot3Pi Λ = totalSpinHalfRot1Pi Λ := by
+  unfold totalSpinHalfRot1Pi totalSpinHalfRot2Pi totalSpinHalfRot3Pi
+  rw [← Finset.noncommProd_mul_distrib
+    (s := (Finset.univ : Finset Λ))
+    (f := fun x : Λ => onSite x (spinHalfRot2 Real.pi))
+    (g := fun x : Λ => onSite x (spinHalfRot3 Real.pi))
+    (comm_ff := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+    (comm_gg := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+    (comm_gf := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)]
+  refine Finset.noncommProd_congr rfl ?_ _
+  intros x _
+  change onSite x (spinHalfRot2 Real.pi) * onSite x (spinHalfRot3 Real.pi) =
+       onSite x (spinHalfRot1 Real.pi)
+  rw [onSite_mul_onSite_same, spinHalfRot2_pi_mul_spinHalfRot3_pi]
+
+/-- Tasaki Problem 2.2.a, axes (3,1)→2:
+`Û^(3)_π_tot · Û^(1)_π_tot = Û^(2)_π_tot`. -/
+theorem totalSpinHalfRot3Pi_mul_totalSpinHalfRot1Pi :
+    totalSpinHalfRot3Pi Λ * totalSpinHalfRot1Pi Λ = totalSpinHalfRot2Pi Λ := by
+  unfold totalSpinHalfRot1Pi totalSpinHalfRot2Pi totalSpinHalfRot3Pi
+  rw [← Finset.noncommProd_mul_distrib
+    (s := (Finset.univ : Finset Λ))
+    (f := fun x : Λ => onSite x (spinHalfRot3 Real.pi))
+    (g := fun x : Λ => onSite x (spinHalfRot1 Real.pi))
+    (comm_ff := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+    (comm_gg := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)
+    (comm_gf := fun _ _ _ _ hxy => onSite_mul_onSite_of_ne hxy _ _)]
+  refine Finset.noncommProd_congr rfl ?_ _
+  intros x _
+  change onSite x (spinHalfRot3 Real.pi) * onSite x (spinHalfRot1 Real.pi) =
+       onSite x (spinHalfRot2 Real.pi)
+  rw [onSite_mul_onSite_same, spinHalfRot3_pi_mul_spinHalfRot1_pi]
+
 /-- `Û^(α)_0_tot = 1`: the identity rotation on the many-body space. -/
 theorem totalSpinHalfRot1_zero : totalSpinHalfRot1 Λ 0 = 1 := by
   unfold totalSpinHalfRot1
