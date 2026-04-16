@@ -780,4 +780,18 @@ theorem totalSpinHalfRot3_zero : totalSpinHalfRot3 Λ 0 = 1 := by
   simp_rw [spinHalfRot3_zero, onSite_one]
   exact (Finset.noncommProd_eq_pow_card _ _ _ 1 (fun _ _ => rfl)).trans (one_pow _)
 
+/-! ## Site embedding as a ring homomorphism
+
+The site-embedding `onSite x` preserves all ring operations, so it
+extends to a `RingHom`. -/
+
+/-- `onSite x` as a ring homomorphism. -/
+noncomputable def onSiteRingHom (x : Λ) :
+    Matrix (Fin 2) (Fin 2) ℂ →+* ManyBodyOp Λ where
+  toFun := fun A => onSite x A
+  map_one' := onSite_one x
+  map_mul' := fun A B => (onSite_mul_onSite_same x A B).symm
+  map_zero' := onSite_zero x
+  map_add' := fun A B => onSite_add x A B
+
 end LatticeSystem.Quantum
