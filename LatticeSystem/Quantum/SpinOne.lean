@@ -94,6 +94,33 @@ theorem spinOneOp3_isHermitian : spinOneOp3.IsHermitian := by
   ext i j
   fin_cases i <;> fin_cases j <;> simp [Matrix.conjTranspose]
 
+/-! ## Squared single-axis spin operators (S = 1) -/
+
+/-- `(Ŝ^(1))² = (1/2) · !![1,0,1; 0,2,0; 1,0,1]`. Public-form helper
+for proving `Û^(1)_π = û_1` from the closed-form rotation. -/
+theorem spinOneOp1_mul_self :
+    spinOneOp1 * spinOneOp1 =
+      (1 / 2 : ℂ) • !![1, 0, 1; 0, 2, 0; 1, 0, 1] := by
+  unfold spinOneOp1
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    (simp [Matrix.smul_apply, Matrix.mul_apply, Fin.sum_univ_three]
+     <;> ring_nf
+     <;> simp only [invSqrt2_sq]
+     <;> ring)
+
+/-- `(Ŝ^(2))² = (1/2) · !![1,0,-1; 0,2,0; -1,0,1]`. -/
+theorem spinOneOp2_mul_self :
+    spinOneOp2 * spinOneOp2 =
+      (1 / 2 : ℂ) • !![1, 0, -1; 0, 2, 0; -1, 0, 1] := by
+  unfold spinOneOp2
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    (simp [Matrix.smul_apply, Matrix.mul_apply, Fin.sum_univ_three]
+     <;> ring_nf
+     <;> simp only [invSqrt2_sq, Complex.I_sq]
+     <;> ring)
+
 /-! ## Total spin (Tasaki convention `Ŝ² = S(S+1) I`, S = 1) -/
 
 /-- `(Ŝ^(1))² + (Ŝ^(2))² + (Ŝ^(3))² = 2 · I`. -/

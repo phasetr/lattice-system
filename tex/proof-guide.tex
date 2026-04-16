@@ -970,9 +970,22 @@ formalization of Tasaki \S2.1 and \S2.2.
   relations (Tasaki eq.~(2.1.31)/(2.1.33)/(2.1.34)).
 \item \texttt{spinOneOpPlus}, \texttt{spinOneOpMinus},
   \texttt{spinOneOp3\_mulVec\_*}, \texttt{spinOneOpPlus/Minus\_mulVec\_*},
-  \texttt{spinOneOpPlus/Minus\_conjTranspose}, \texttt{spinOneRot3}:
-  $S = 1$ basis, raising/lowering, adjoints, and closed-form rotation
-  (axis 3) (Tasaki eq.~(2.1.2)-(2.1.6) for $S=1$, Problem 2.1.c).
+  \texttt{spinOneOpPlus/Minus\_conjTranspose}: $S = 1$ basis,
+  raising/lowering, adjoints (Tasaki eq.~(2.1.2)-(2.1.6) for $S=1$).
+\item \texttt{spinOneRot\{1,2,3\}},
+  \texttt{spinOneRot\{1,2,3\}\_zero},
+  \texttt{spinOneRot\{1,2,3\}\_pi},
+  \texttt{spinOnePiRot\{1,2\}\_eq},
+  \texttt{spinOneOp\{1,2\}\_mul\_self}:
+  $S = 1$ closed-form rotation $\hat U^{(\alpha)}_\theta = \hat 1 -
+  i\sin\theta\,\hat S^{(\alpha)} - (1-\cos\theta)(\hat S^{(\alpha)})^2$
+  for all 3 axes (Tasaki Problem 2.1.c, eq.~(2.1.30)) and the
+  squared-operator helpers used in the boundary checks $\hat U^{(\alpha)}_\pi
+  = \hat u_\alpha$.
+\item \texttt{spinOnePiRot\{1,2,3\}\_mulVec\_spinOne\{Plus,Zero,Minus\}}:
+  action of the $S = 1$ $\pi$-rotation matrices on the
+  $|\psi^{+1,0,-1}\rangle$ basis (Tasaki eq.~(2.1.34) / Problem 2.1.g
+  for $S = 1$).
 \item \texttt{Quantum/Z2Z2.lean}: documentation module unifying the
   Z$_2 \times$ Z$_2$ structure (Tasaki eq.~(2.1.27)-(2.1.34)) for
   both $S=1/2$ (projective) and $S=1$ (genuine) representations.
@@ -1184,6 +1197,58 @@ between the Pi-product and Frobenius structures on
 an alternative formulation that avoids
 \texttt{NormedSpace.map\_exp} entirely (e.g.\ by direct power-series
 manipulation).
+
+\subsection*{TODO: Magnetization-sector direct sum (eqs.~(2.2.9)/(2.2.10))}
+
+\textbf{Statement} (Tasaki p.22): The full Hilbert space decomposes as
+a direct sum over magnetization eigenspaces,
+\[
+  \mathcal H = \bigoplus_{M = -|\Lambda|S}^{|\Lambda|S} \mathcal H_M,
+  \qquad
+  \mathcal H_M := \{|\Phi\rangle \in \mathcal H \mid
+    \hat S^{(3)}_{\rm tot} |\Phi\rangle = M |\Phi\rangle\}.
+\]
+
+\textbf{Status}: Only the predicate
+\texttt{IsInMagnetizationSubspace} and the basis-state membership
+lemma \texttt{basisVec\_mem\_magnetizationSubspace} are formalized.
+The full direct-sum decomposition (a \texttt{DirectSum} /
+\texttt{Submodule.iSup} statement that
+$\mathcal H = \bigoplus_M \mathcal H_M$, plus orthogonality of
+distinct sectors) requires further linear-algebra infrastructure (the
+magnetization subspaces as \texttt{Submodule}\,$\mathbb{C}$\,$((\Lambda
+\to \mathrm{Fin}\,2) \to \mathbb{C})$, and the direct-sum
+decomposition theorem).
+
+\subsection*{TODO: Tasaki Problem 2.2.c}
+
+\textbf{Statement} (Tasaki p.23, eq.~(2.2.15)): An explicit averaged
+state of the form
+\[
+  \frac{1}{4\pi} \int_0^{2\pi}\!\!d\varphi \int_0^\pi d\theta \sin\theta\;
+    \hat U^{(3)}_\varphi \hat U^{(2)}_\theta\,
+    |\!\uparrow_1\rangle |\!\downarrow_2\rangle
+\]
+equals (up to phase) the singlet $(1/\sqrt 2)(|\!\uparrow_1\rangle
+|\!\downarrow_2\rangle - |\!\downarrow_1\rangle |\!\uparrow_2\rangle)$.
+The problem asks to verify this and characterize states that fail to
+be SU(2)-invariant.
+
+\textbf{Status}: Not formalized. Requires a measure-theoretic
+averaging construction (integration over the SU(2) parameter space),
+which is beyond the current scope of finite-dim algebra. Tracked here
+for a future infrastructure PR.
+
+\subsection*{Roadmap status note: P1f''' (eqs.~(2.2.12)--(2.2.13))}
+
+The Lean development proves $[\hat A, \hat S^{(\alpha)}_{\rm tot}] = 0$
+and the corresponding finite-form $(\hat U^{(\alpha)}_\theta)^\dagger
+\hat A \hat U^{(\alpha)}_\theta = \hat A$ for the \emph{Heisenberg-type}
+operator $\hat A = \sum_{x,y} J(x,y)\,\hat S_x \cdot \hat S_y$ (axes
+1, 2, 3 and the ladder $\hat S^{\pm}_{\rm tot}$). The fully general
+operator-level statement (any $\hat A$ satisfying eq.~(2.2.12) also
+satisfies eq.~(2.2.13)) is open and depends on the axiomatized
+eq.~(2.2.11) above.
 
 \section{Progress table}
 \label{sec:progress}

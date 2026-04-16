@@ -265,4 +265,130 @@ theorem spinOneRot3_pi : spinOneRot3 Real.pi = spinOnePiRot3 := by
   simp [Real.sin_pi, Real.cos_pi]
   ring
 
+/-- S = 1 closed-form rotation about axis 1.
+`Û^(1)_θ = 1 - i sin θ · Ŝ^(1) - (1 - cos θ) · (Ŝ^(1))²`. -/
+noncomputable def spinOneRot1 (θ : ℝ) : Matrix (Fin 3) (Fin 3) ℂ :=
+  1 - (Complex.I * (Real.sin θ : ℂ)) • spinOneOp1 -
+    ((1 : ℂ) - (Real.cos θ : ℂ)) • (spinOneOp1 * spinOneOp1)
+
+/-- S = 1 closed-form rotation about axis 2.
+`Û^(2)_θ = 1 - i sin θ · Ŝ^(2) - (1 - cos θ) · (Ŝ^(2))²`. -/
+noncomputable def spinOneRot2 (θ : ℝ) : Matrix (Fin 3) (Fin 3) ℂ :=
+  1 - (Complex.I * (Real.sin θ : ℂ)) • spinOneOp2 -
+    ((1 : ℂ) - (Real.cos θ : ℂ)) • (spinOneOp2 * spinOneOp2)
+
+/-- `Û^(1)_0 = 1` for S = 1. -/
+theorem spinOneRot1_zero : spinOneRot1 0 = 1 := by
+  unfold spinOneRot1
+  simp [Real.sin_zero, Real.cos_zero]
+
+/-- `Û^(2)_0 = 1` for S = 1. -/
+theorem spinOneRot2_zero : spinOneRot2 0 = 1 := by
+  unfold spinOneRot2
+  simp [Real.sin_zero, Real.cos_zero]
+
+/-- `û_1 = 1̂ - 2 · (Ŝ^(1))²` for α = 1 (Tasaki eq (2.1.30) for S = 1). -/
+theorem spinOnePiRot1_eq :
+    (spinOnePiRot1 : Matrix (Fin 3) (Fin 3) ℂ) =
+      1 - (2 : ℂ) • (spinOneOp1 * spinOneOp1) := by
+  rw [spinOneOp1_mul_self]
+  unfold spinOnePiRot1
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [Matrix.smul_apply, Matrix.sub_apply, Matrix.one_apply] <;> ring
+
+/-- `û_2 = 1̂ - 2 · (Ŝ^(2))²` for α = 2. -/
+theorem spinOnePiRot2_eq :
+    (spinOnePiRot2 : Matrix (Fin 3) (Fin 3) ℂ) =
+      1 - (2 : ℂ) • (spinOneOp2 * spinOneOp2) := by
+  rw [spinOneOp2_mul_self]
+  unfold spinOnePiRot2
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [Matrix.smul_apply, Matrix.sub_apply, Matrix.one_apply] <;> ring
+
+/-- `Û^(1)_π = û_1` for S = 1. -/
+theorem spinOneRot1_pi : spinOneRot1 Real.pi = spinOnePiRot1 := by
+  unfold spinOneRot1
+  rw [spinOnePiRot1_eq]
+  simp [Real.sin_pi, Real.cos_pi]
+  ring
+
+/-- `Û^(2)_π = û_2` for S = 1. -/
+theorem spinOneRot2_pi : spinOneRot2 Real.pi = spinOnePiRot2 := by
+  unfold spinOneRot2
+  rw [spinOnePiRot2_eq]
+  simp [Real.sin_pi, Real.cos_pi]
+  ring
+
+/-! ## Tasaki Problem 2.1.g / eq (2.1.34): action of `û_α` on the
+spin-1 basis states `|ψ^{+1,0,-1}⟩`. The matrix elements
+`⟨ψ^σ| û_α |ψ^τ⟩` reduce to a small set of values:
+- `û_3 |ψ^σ⟩ = e^{-iπσ} |ψ^σ⟩` (diagonal: `+1` at σ=0, `-1` at σ=±1).
+- `û_2 |ψ^σ⟩ = (-1)^{1+σ} |ψ^{-σ}⟩` (off-diagonal anti-flip).
+- `û_1 |ψ^σ⟩ = (-1) |ψ^{-σ}⟩` (off-diagonal anti-flip with global sign). -/
+
+/-- `û_3 |ψ^+⟩ = -|ψ^+⟩`. -/
+theorem spinOnePiRot3_mulVec_spinOnePlus :
+    spinOnePiRot3.mulVec spinOnePlus = -1 • spinOnePlus := by
+  unfold spinOnePiRot3 spinOnePlus
+  funext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_three]
+
+/-- `û_3 |ψ^0⟩ = |ψ^0⟩`. -/
+theorem spinOnePiRot3_mulVec_spinOneZero :
+    spinOnePiRot3.mulVec spinOneZero = spinOneZero := by
+  unfold spinOnePiRot3 spinOneZero
+  funext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_three]
+
+/-- `û_3 |ψ^-⟩ = -|ψ^-⟩`. -/
+theorem spinOnePiRot3_mulVec_spinOneMinus :
+    spinOnePiRot3.mulVec spinOneMinus = -1 • spinOneMinus := by
+  unfold spinOnePiRot3 spinOneMinus
+  funext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_three]
+
+/-- `û_2 |ψ^+⟩ = |ψ^-⟩`. -/
+theorem spinOnePiRot2_mulVec_spinOnePlus :
+    spinOnePiRot2.mulVec spinOnePlus = spinOneMinus := by
+  unfold spinOnePiRot2 spinOnePlus spinOneMinus
+  funext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_three]
+
+/-- `û_2 |ψ^0⟩ = -|ψ^0⟩`. -/
+theorem spinOnePiRot2_mulVec_spinOneZero :
+    spinOnePiRot2.mulVec spinOneZero = -1 • spinOneZero := by
+  unfold spinOnePiRot2 spinOneZero
+  funext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_three]
+
+/-- `û_2 |ψ^-⟩ = |ψ^+⟩`. -/
+theorem spinOnePiRot2_mulVec_spinOneMinus :
+    spinOnePiRot2.mulVec spinOneMinus = spinOnePlus := by
+  unfold spinOnePiRot2 spinOneMinus spinOnePlus
+  funext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_three]
+
+/-- `û_1 |ψ^+⟩ = -|ψ^-⟩`. -/
+theorem spinOnePiRot1_mulVec_spinOnePlus :
+    spinOnePiRot1.mulVec spinOnePlus = -1 • spinOneMinus := by
+  unfold spinOnePiRot1 spinOnePlus spinOneMinus
+  funext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_three]
+
+/-- `û_1 |ψ^0⟩ = -|ψ^0⟩`. -/
+theorem spinOnePiRot1_mulVec_spinOneZero :
+    spinOnePiRot1.mulVec spinOneZero = -1 • spinOneZero := by
+  unfold spinOnePiRot1 spinOneZero
+  funext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_three]
+
+/-- `û_1 |ψ^-⟩ = -|ψ^+⟩`. -/
+theorem spinOnePiRot1_mulVec_spinOneMinus :
+    spinOnePiRot1.mulVec spinOneMinus = -1 • spinOnePlus := by
+  unfold spinOnePiRot1 spinOneMinus spinOnePlus
+  funext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_three]
+
 end LatticeSystem.Quantum

@@ -48,7 +48,7 @@ CAR algebras, and eventually lattice QCD.
 | P1f'-pm (Tasaki §2.2) | Total raising/lowering `Ŝ^±_tot = Σ_x Ŝ_x^±` (eq. (2.2.8)) | Done |
 | P1f-mag (Tasaki §2.2) | Total magnetization `|σ| := Σ_x spinSign(σ_x)` (eq. (2.2.2)) | Done |
 | P1f'' (Tasaki §2.2) | Global rotation `Û^(α)_θ = exp(-iθ Ŝ_tot^(α))` (eq. (2.2.11)) | Axiomatized (TODO: prove; see [open items](#open-items--axioms)) |
-| P1f''' (Tasaki §2.2) | SU(2) / U(1) invariance (eqs. (2.2.12)-(2.2.13)) | Done (Heisenberg-form) |
+| P1f''' (Tasaki §2.2) | SU(2) / U(1) invariance (eqs. (2.2.12)-(2.2.13)) | Done for Heisenberg-type operators; the fully general operator-level statement (any `Â` with `[Â, Ŝ_tot^(α)] = 0`) is open — see [open items](#open-items--axioms) |
 | P1f'''' (Tasaki §2.2) | Two-site inner product `Ŝ_x · Ŝ_y` raising/lowering decomposition (eq. (2.2.16)) | Done |
 | P1f''''' (Tasaki §2.2) | SU(2) invariance of `Ŝ_x · Ŝ_y` and eigenvalues (eqs. (2.2.17)–(2.2.19)) | Done |
 | P1g | Gibbs state `ρ = e^{-βH}/Z`, expectation `⟨O⟩_β = Tr(ρO)` | Not started |
@@ -215,8 +215,11 @@ case (`σ ∈ {-1, 0, +1}`).
 | `spinOnePiRot3_eq` | `û_3 = 1 - 2·(Ŝ^(3))²` (Tasaki eq. (2.1.32), α = 3 case) | `Quantum/SpinOneBasis.lean` |
 | `spinOnePiRot{1,2,3}_sq` | `(û_α)² = 1` for integer S (Tasaki eq. (2.1.31) integer case) | `Quantum/SpinOneBasis.lean` |
 | `spinOnePiRot{1,2,3}_comm_*` | distinct-axis commutation `û_α · û_β = û_β · û_α` for integer S | `Quantum/SpinOneBasis.lean` |
-| `spinOneRot3` | `Û^(3)_θ = 1 - i sin θ · Ŝ^(3) - (1 - cos θ) · (Ŝ^(3))²` (Tasaki Problem 2.1.c, axis 3) | `Quantum/SpinOneBasis.lean` |
-| `spinOneRot3_zero` / `spinOneRot3_pi` | boundary checks `Û^(3)_0 = 1` and `Û^(3)_π = û_3` | `Quantum/SpinOneBasis.lean` |
+| `spinOneRot{1,2,3}` | `Û^(α)_θ = 1 - i sin θ · Ŝ^(α) - (1 - cos θ) · (Ŝ^(α))²` (Tasaki Problem 2.1.c, all 3 axes) | `Quantum/SpinOneBasis.lean` |
+| `spinOneRot{1,2,3}_zero` / `spinOneRot{1,2,3}_pi` | boundary checks `Û^(α)_0 = 1` and `Û^(α)_π = û_α` | `Quantum/SpinOneBasis.lean` |
+| `spinOnePiRot{1,2}_eq` | `û_α = 1 - 2·(Ŝ^(α))²` for axes 1, 2 (Tasaki eq. (2.1.30) for S = 1) | `Quantum/SpinOneBasis.lean` |
+| `spinOneOp{1,2}_mul_self` | `(Ŝ^(α))²` explicit form (helper for the `_pi` boundary checks) | `Quantum/SpinOne.lean` |
+| `spinOnePiRot{1,2,3}_mulVec_spinOne{Plus,Zero,Minus}` | π-rotation matrix elements on the basis `|ψ^{+1,0,-1}⟩` (Tasaki eq. (2.1.34) / Problem 2.1.g for S = 1) | `Quantum/SpinOneBasis.lean` |
 
 ### Multi-body operator space (abstract lattice)
 
@@ -387,6 +390,42 @@ between the Pi-product and Frobenius structures on
 `Matrix (Fin n) (Fin n) ℂ`, (b) re-prove `continuous_onSite` under the
 Frobenius topology, or (c) find an alternative formulation that avoids
 `NormedSpace.map_exp` entirely.
+
+### TODO — Magnetization-sector direct sum (eqs. (2.2.9)/(2.2.10))
+
+**Statement (Tasaki p.22)**: The full Hilbert space decomposes as a
+direct sum over magnetization eigenspaces,
+
+```
+H = ⊕_{M = -|Λ|S}^{|Λ|S} H_M,    H_M := { |Φ⟩ ∈ H | Ŝ_tot^(3) |Φ⟩ = M |Φ⟩ }.
+```
+
+**Status**: Currently only the predicate `IsInMagnetizationSubspace`
+and the basis-state membership lemma `basisVec_mem_magnetizationSubspace`
+are formalized. The full direct-sum decomposition (a `DirectSum` /
+`Submodule.iSup` statement showing `H = ⊕_M H_M`, plus orthogonality
+of distinct sectors) is not yet established and requires further
+linear-algebra infrastructure (the magnetization subspaces as
+`Submodule ℂ ((Λ → Fin 2) → ℂ)`, and a direct-sum decomposition
+theorem).
+
+### TODO — Tasaki Problem 2.2.c (SU(2) non-invariance / averaged state)
+
+**Statement (Tasaki p.23, eq. (2.2.15))**: An explicit averaged state
+of the form
+
+```
+(1/4π) ∫₀^{2π} dφ ∫₀^π dθ sin θ · Û^(3)_φ · Û^(2)_θ · |↑₁⟩|↓₂⟩
+```
+
+equals (up to phase) the singlet `(1/√2)(|↑₁⟩|↓₂⟩ - |↓₁⟩|↑₂⟩)`. The
+problem asks to verify this and to characterize states that fail to be
+SU(2)-invariant.
+
+**Status**: Not formalized. Requires a measure-theoretic averaging
+construction (integration over the SU(2) parameter space) which is
+beyond the current scope of finite-dim algebra. Tracked here for a
+future infrastructure PR.
 
 ## Links
 
