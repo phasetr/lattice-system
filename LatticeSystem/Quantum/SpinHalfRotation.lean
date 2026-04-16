@@ -797,4 +797,15 @@ theorem spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp (θ φ : ℝ) :
       -(Complex.sin (↑θ / 2)) *
         (Complex.cos (↑φ / 2) + Complex.I * Complex.sin (↑φ / 2)) * hI
 
+/-! ## Problem 2.1.e: phase factor at θ = φ = π/2 -/
+
+/-- Tasaki Problem 2.1.e: at `θ = φ = π/2` the coherent state
+specializes to `e^{-iπ/4} cos(π/4) |ψ^↑⟩ + e^{iπ/4} sin(π/4) |ψ^↓⟩`. -/
+theorem spinHalfRot3_half_pi_mul_spinHalfRot2_half_pi_mulVec_spinHalfUp :
+    (spinHalfRot3 (Real.pi / 2) * spinHalfRot2 (Real.pi / 2)).mulVec spinHalfUp =
+      ![Complex.exp (-(Complex.I * Real.pi / 4)) * (Real.cos (Real.pi / 4) : ℂ),
+        Complex.exp (Complex.I * Real.pi / 4) * (Real.sin (Real.pi / 4) : ℂ)] := by
+  have h := spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp (Real.pi / 2) (Real.pi / 2)
+  convert h using 2 <;> push_cast <;> ring
+
 end LatticeSystem.Quantum
