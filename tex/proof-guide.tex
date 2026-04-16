@@ -986,6 +986,18 @@ formalization of Tasaki \S2.1 and \S2.2.
   action of the $S = 1$ $\pi$-rotation matrices on the
   $|\psi^{+1,0,-1}\rangle$ basis (Tasaki eq.~(2.1.34) / Problem 2.1.g
   for $S = 1$).
+\item \texttt{spinOneProj\{Plus,Zero,Minus\}},
+  \texttt{spinOneProj\{Plus,Zero,Minus\}\_eq\_polynomial},
+  \texttt{spinOneUnit\{01,02,10,12,20,21\}},
+  \texttt{spinOneUnit*\_eq\_polynomial},
+  \texttt{spinOne\_decomposition}: Tasaki Problem 2.1.a for $S = 1$.
+  Three diagonal projectors $|\psi^\sigma\rangle\langle\psi^\sigma|$
+  expressed as polynomials in $\hat S^{(3)}$ via Lagrange
+  interpolation, six off-diagonal matrix units expressed as
+  $\hat S^{\pm}$ acting on diagonal projectors, and the spanning
+  theorem that every $3 \times 3$ complex matrix is a linear
+  combination of the nine matrix units (entry-wise).
+  See \texttt{Quantum/SpinOneDecomp.lean}.
 \item \texttt{Quantum/Z2Z2.lean}: documentation module unifying the
   Z$_2 \times$ Z$_2$ structure (Tasaki eq.~(2.1.27)-(2.1.34)) for
   both $S=1/2$ (projective) and $S=1$ (genuine) representations.
@@ -1156,33 +1168,18 @@ in the Lean development. They are documented here so that future PRs
 can pick them up and replace each axiom by a proof (or fill in the
 deferred construction).
 
-\subsection*{TODO: Problem 2.1.a for \texorpdfstring{$S \geq 1$}{S >= 1} (P1d''')}
+\subsection*{TODO: Problem 2.1.a for general \texorpdfstring{$S \geq 1$}{S >= 1} (P1d''')}
 
-\textbf{Statement} (Tasaki p.15): For any spin $S \geq 1$, every
-operator on the single-site Hilbert space $h_0 = \mathbb{C}^{2S+1}$
-(i.e.\ every $(2S+1) \times (2S+1)$ matrix) can be written as a
-polynomial in $\hat 1, \hat S^{(1)}, \hat S^{(2)}, \hat S^{(3)}$.
+\textbf{Statement} (Tasaki p.15): For any spin $S$, every operator on
+the single-site Hilbert space $h_0 = \mathbb{C}^{2S+1}$ can be written
+as a polynomial in $\hat 1, \hat S^{(1)}, \hat S^{(2)}, \hat S^{(3)}$.
 
-\textbf{Proof outline} (Tasaki solution S.1, p.493):
-\begin{enumerate}
-\item The diagonal projector $|\psi^\sigma\rangle\langle\psi^\sigma|$
-  is given by Lagrange interpolation in $\hat S^{(3)}$:
-  \[
-    |\psi^\sigma\rangle\langle\psi^\sigma|
-    = \prod_{\substack{\tau = -S \\ \tau \neq \sigma}}^{S}
-        \frac{\hat S^{(3)} - \tau \hat 1}{\sigma - \tau}.
-  \]
-\item Off-diagonal matrix units $|\psi^\tau\rangle\langle\psi^\sigma|$
-  ($\tau \neq \sigma$) are obtained by applying $\hat S^\pm$ to a
-  diagonal projector and normalizing.
-\item The set $\{|\psi^\tau\rangle\langle\psi^\sigma|\}_{\tau,\sigma}$
-  spans $M_{2S+1}(\mathbb{C})$; combined with Steps 1--2 this shows
-  every matrix is a polynomial in $\hat 1, \hat S^{(\alpha)}$.
-\end{enumerate}
-
-\textbf{Status}: $S = 1/2$ is done as \texttt{pauliBasis} (P1d''). The
-general-$S$ case requires generic \texttt{Fin\,(2S+1)} typing and a
-Lagrange interpolation infrastructure; not started.
+\textbf{Status}: $S = 1/2$ is done as \texttt{pauliBasis} (P1d''),
+and $S = 1$ is now done as \texttt{Quantum/SpinOneDecomp.lean} (3
+diagonal Lagrange-interpolation projectors + 6 off-diagonal matrix
+units via $\hat S^{\pm}$ + a 9-element spanning theorem). The general
+$S \geq 1$ case requires generic \texttt{Fin\,(2S+1)} typing and a
+polymorphic Lagrange-interpolation infrastructure; not started.
 
 \subsection*{TODO: Tasaki Problem 2.2.c}
 
