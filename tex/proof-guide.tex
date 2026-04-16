@@ -939,9 +939,14 @@ formalization of Tasaki \S2.1 and \S2.2.
   eq.~(2.1.13)-(2.1.15)).
 \item \texttt{spinHalfRot\{1,2,3\}\_half\_pi\_conj\_spinHalfOp\_*}:
   $\pi/2$-rotation conjugation (Tasaki eq.~(2.1.22)), 6 cases.
-\item \texttt{spinHalfRot3\_eq\_exp}: $\hat U^{(3)}_\theta =
-  \exp(-i\theta\hat S^{(3)})$ via \texttt{Matrix.exp\_diagonal} +
-  Euler (Tasaki Problem 2.1.b, axis 3).
+\item \texttt{spinHalfRot\{1,2,3\}\_eq\_exp}: $\hat U^{(\alpha)}_\theta =
+  \exp(-i\theta\hat S^{(\alpha)})$ for all three axes (Tasaki
+  Problem 2.1.b). Axis 3 uses \texttt{Matrix.exp\_diagonal} +
+  Euler; axes 1, 2 are derived from axis 3 via \texttt{Matrix.exp\_conj}
+  with Hadamard / y-axis basis-change unitaries.
+\item \texttt{hadamard}, \texttt{yDiag}: basis-change unitaries with
+  \texttt{hadamard\_mul\_self}, \texttt{yDiag\_mul\_yDiagAdj}, etc.
+  Used to lift the axis-3 exponential proof to axes 1, 2.
 \item \texttt{spinHalfRot3\_mul\_spinHalfRot2\_mulVec\_spinHalfUp}:
   coherent state $\hat U^{(3)}_\varphi \hat U^{(2)}_\theta |\psi^\uparrow\rangle$
   (Tasaki Problem 2.1.d).
