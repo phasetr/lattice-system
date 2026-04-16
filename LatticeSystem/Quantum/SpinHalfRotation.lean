@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.SpinHalf
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Analysis.Normed.Algebra.MatrixExponential
+import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Tactic.LinearCombination
 import Mathlib.Tactic.Module
 
@@ -711,5 +713,56 @@ theorem spinHalfRot3_half_pi_conj_spinHalfOp2 :
       spinHalfOp1 := by
   rw [spinHalfRot3_conj_spinHalfOp2, Real.cos_pi_div_two, Real.sin_pi_div_two]
   simp
+
+/-! ## Equivalence with matrix exponential (Tasaki Problem 2.1.b)
+
+For the axis-3 case, `-iθ Ŝ^(3)` is diagonal, so
+`exp(-iθ Ŝ^(3)) = diag(exp(-iθ/2), exp(iθ/2))` via
+`Matrix.exp_diagonal`, and each entry evaluates via Euler's formula
+to `cos(θ/2) ∓ i sin(θ/2)`, matching `spinHalfRot3 θ`. -/
+
+/-- `pauliZ = diagonal(1, -1)`. -/
+private lemma pauliZ_eq_diagonal :
+    pauliZ = Matrix.diagonal (fun i : Fin 2 => if i = 0 then (1 : ℂ) else -1) := by
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp [pauliZ, Matrix.diagonal]
+
+set_option linter.flexible false in
+set_option linter.unusedTactic false in
+set_option linter.unusedSimpArgs false in
+/-- Problem 2.1.b for axis 3: `Û^(3)_θ = exp(-iθ Ŝ^(3))`. -/
+theorem spinHalfRot3_eq_exp (θ : ℝ) :
+    spinHalfRot3 θ =
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • spinHalfOp3) := by
+  unfold spinHalfRot3 spinHalfOp3 rotOf
+  rw [pauliZ_eq_diagonal]
+  -- LHS: cos(θ/2)•1 - (2I sin(θ/2)·(1/2)) • diagonal(1,-1)
+  -- RHS: exp(-(Iθ) • (1/2) • diagonal(1,-1))
+  -- Convert RHS to exp of a diagonal matrix
+  conv_rhs =>
+    rw [smul_smul, show -(Complex.I * ↑θ) * (1 / 2) = -(Complex.I * ↑θ / 2) from by ring]
+    rw [show (-(Complex.I * ↑θ / 2)) •
+          (Matrix.diagonal fun i : Fin 2 => if i = 0 then (1 : ℂ) else -1) =
+        Matrix.diagonal (fun i : Fin 2 =>
+          if i = 0 then -(Complex.I * ↑θ / 2)
+          else Complex.I * ↑θ / 2) from by
+      ext i j; fin_cases i <;> fin_cases j <;>
+        simp [Matrix.diagonal, Matrix.smul_apply]]
+    rw [Matrix.exp_diagonal]
+  -- Now both sides are element-by-element. Compare entries.
+  -- Unify NormedSpace.exp on ℂ with Complex.exp
+  have hexp : ∀ z : ℂ, NormedSpace.exp z = Complex.exp z :=
+    congr_fun Complex.exp_eq_exp_ℂ.symm
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    (simp [Matrix.diagonal, Matrix.sub_apply, Matrix.smul_apply, hexp]
+     <;> first
+      | (rw [show -(Complex.I * ↑θ / 2) = (-(↑θ / 2)) * Complex.I from by ring,
+            Complex.exp_mul_I]
+         simp only [Complex.cos_neg, Complex.sin_neg, neg_mul, mul_neg]
+         ring)
+      | (rw [show Complex.I * ↑θ / 2 = (↑θ / 2) * Complex.I from by ring,
+            Complex.exp_mul_I]
+         ring))
 
 end LatticeSystem.Quantum
