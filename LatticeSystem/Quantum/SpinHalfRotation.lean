@@ -863,4 +863,16 @@ theorem hadamard_mul_self : hadamard * hadamard = 1 := by
   fin_cases i <;> fin_cases j <;>
     first | (simp; norm_num) | simp
 
+/-- `W · Ŝ^(1) · W = Ŝ^(3)` — the Hadamard takes the x-spin to the
+z-spin (basis change). -/
+theorem hadamard_mul_spinHalfOp1_mul_hadamard :
+    hadamard * spinHalfOp1 * hadamard = spinHalfOp3 := by
+  unfold hadamard spinHalfOp1 spinHalfOp3 pauliX pauliZ
+  rw [Matrix.smul_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_smul,
+    smul_smul]
+  rw [sqrt2_inv_mul_sqrt2_inv]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    first | (simp; ring) | simp
+
 end LatticeSystem.Quantum
