@@ -839,4 +839,14 @@ theorem spinHalfRot3_commute_spinHalfOp3_smul (θ : ℝ) (v3 : ℂ) :
   congr 1
   exact (rotOf_comm_self spinHalfOp3 θ).symm
 
+/-! ## Hadamard matrix (basis change between σ^x and σ^z) -/
+
+/-- The Hadamard matrix `W = (1/√2)·!![1, 1; 1, -1]`. It satisfies
+`W * W = 1` and `W * σ^x * W = σ^z` (equivalently
+`W * Ŝ^(1) * W = Ŝ^(3)`). These identities provide the basis change
+that, together with `Matrix.exp_units_conj`, would extend Problem 2.1.b
+to axes 1 and 2. -/
+noncomputable def hadamard : Matrix (Fin 2) (Fin 2) ℂ :=
+  ((Real.sqrt 2 : ℂ)⁻¹) • !![1, 1; 1, -1]
+
 end LatticeSystem.Quantum
