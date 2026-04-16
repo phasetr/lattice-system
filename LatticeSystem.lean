@@ -7,6 +7,7 @@ import LatticeSystem.Quantum.SpinHalfBasis
 import LatticeSystem.Quantum.SpinHalfDecomp
 import LatticeSystem.Quantum.SpinHalfRotation
 import LatticeSystem.Quantum.SU2
+import LatticeSystem.Quantum.SU2Integral
 import LatticeSystem.Quantum.SpinOne
 import LatticeSystem.Quantum.SpinOneBasis
 import LatticeSystem.Quantum.SpinOneDecomp
