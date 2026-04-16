@@ -817,4 +817,39 @@ theorem onSite_pow (x : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) (k : ℕ) :
   | zero => rw [pow_zero, pow_zero, onSite_one]
   | succ k ih => rw [pow_succ, pow_succ, ih, onSite_mul_onSite_same]
 
+/-! ## Two-spin explicit total π-rotation (Tasaki Problem 2.2.b) -/
+
+/-- For two sites, the total π-rotation about axis 1 factors as the
+product over site 0 and site 1. -/
+theorem totalSpinHalfRot1Pi_two_site :
+    totalSpinHalfRot1Pi (Fin 2) =
+      onSite (0 : Fin 2) (spinHalfRot1 Real.pi) *
+        onSite (1 : Fin 2) (spinHalfRot1 Real.pi) := by
+  unfold totalSpinHalfRot1Pi
+  show ((Finset.univ : Finset (Fin 2)).noncommProd _ _ : ManyBodyOp (Fin 2)) = _
+  simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
+    Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
+
+/-- For two sites, the total π-rotation about axis 2 factors as the
+product over site 0 and site 1. -/
+theorem totalSpinHalfRot2Pi_two_site :
+    totalSpinHalfRot2Pi (Fin 2) =
+      onSite (0 : Fin 2) (spinHalfRot2 Real.pi) *
+        onSite (1 : Fin 2) (spinHalfRot2 Real.pi) := by
+  unfold totalSpinHalfRot2Pi
+  show ((Finset.univ : Finset (Fin 2)).noncommProd _ _ : ManyBodyOp (Fin 2)) = _
+  simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
+    Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
+
+/-- For two sites, the total π-rotation about axis 3 factors as the
+product over site 0 and site 1. -/
+theorem totalSpinHalfRot3Pi_two_site :
+    totalSpinHalfRot3Pi (Fin 2) =
+      onSite (0 : Fin 2) (spinHalfRot3 Real.pi) *
+        onSite (1 : Fin 2) (spinHalfRot3 Real.pi) := by
+  unfold totalSpinHalfRot3Pi
+  show ((Finset.univ : Finset (Fin 2)).noncommProd _ _ : ManyBodyOp (Fin 2)) = _
+  simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
+    Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
+
 end LatticeSystem.Quantum
