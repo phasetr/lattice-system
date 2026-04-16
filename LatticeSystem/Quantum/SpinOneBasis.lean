@@ -3,6 +3,7 @@ Copyright (c) 2026 lattice-system contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.SpinOne
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 /-!
 # Basis states and raising/lowering operators for S = 1
@@ -239,5 +240,29 @@ theorem spinOnePiRot3_comm_spinOnePiRot1 :
   ext i j
   fin_cases i <;> fin_cases j <;>
     simp [Matrix.mul_apply, Fin.sum_univ_three]
+
+/-! ## S = 1 closed-form rotation (Tasaki Problem 2.1.c)
+
+For `S = 1`, the closed form analogue of Tasaki eq. (2.1.26) reads
+`Û^(α)_θ = 1̂ - i sin θ · Ŝ^(α) - (1 - cos θ) · (Ŝ^(α))²`.
+-/
+
+/-- S = 1 closed-form rotation about axis 3.
+`Û^(3)_θ = 1 - i sin θ · Ŝ^(3) - (1 - cos θ) · (Ŝ^(3))²`. -/
+noncomputable def spinOneRot3 (θ : ℝ) : Matrix (Fin 3) (Fin 3) ℂ :=
+  1 - (Complex.I * (Real.sin θ : ℂ)) • spinOneOp3 -
+    ((1 : ℂ) - (Real.cos θ : ℂ)) • (spinOneOp3 * spinOneOp3)
+
+/-- `Û^(3)_0 = 1` for S = 1. -/
+theorem spinOneRot3_zero : spinOneRot3 0 = 1 := by
+  unfold spinOneRot3
+  simp [Real.sin_zero, Real.cos_zero]
+
+/-- `Û^(3)_π = û_3` for S = 1. -/
+theorem spinOneRot3_pi : spinOneRot3 Real.pi = spinOnePiRot3 := by
+  unfold spinOneRot3
+  rw [spinOnePiRot3_eq]
+  simp [Real.sin_pi, Real.cos_pi]
+  ring
 
 end LatticeSystem.Quantum

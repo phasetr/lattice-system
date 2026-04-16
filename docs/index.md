@@ -205,6 +205,8 @@ case (`σ ∈ {-1, 0, +1}`).
 | `spinOnePiRot3_eq` | `û_3 = 1 - 2·(Ŝ^(3))²` (Tasaki eq. (2.1.32), α = 3 case) | `Quantum/SpinOneBasis.lean` |
 | `spinOnePiRot{1,2,3}_sq` | `(û_α)² = 1` for integer S (Tasaki eq. (2.1.31) integer case) | `Quantum/SpinOneBasis.lean` |
 | `spinOnePiRot{1,2,3}_comm_*` | distinct-axis commutation `û_α · û_β = û_β · û_α` for integer S | `Quantum/SpinOneBasis.lean` |
+| `spinOneRot3` | `Û^(3)_θ = 1 - i sin θ · Ŝ^(3) - (1 - cos θ) · (Ŝ^(3))²` (Tasaki Problem 2.1.c, axis 3) | `Quantum/SpinOneBasis.lean` |
+| `spinOneRot3_zero` / `spinOneRot3_pi` | boundary checks `Û^(3)_0 = 1` and `Û^(3)_π = û_3` | `Quantum/SpinOneBasis.lean` |
 
 ### Multi-body operator space (abstract lattice)
 
