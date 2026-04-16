@@ -592,6 +592,121 @@ $\texttt{onSite}\,x\,\hat S^{(\alpha)}$ is Hermitian by the lemma
 \texttt{onSite\_isHermitian}.
 \end{proof}
 
+\subsection{Same-site commutation (Tasaki eq.~(2.2.6), $x = y$ case)}
+
+\begin{lemma}
+For any $i \in \Lambda$ and any $A, B \in M_2(\mathbb C)$,
+\[
+  \texttt{onSite}\,i\,A \cdot \texttt{onSite}\,i\,B
+    = \texttt{onSite}\,i\,(A \cdot B).
+\]
+Lean name: \texttt{onSite\_mul\_onSite\_same}. As a direct consequence,
+\[
+  [\texttt{onSite}\,i\,A,\,\texttt{onSite}\,i\,B]
+    = \texttt{onSite}\,i\,[A, B]
+\]
+(\texttt{onSite\_commutator\_same}). Specializing $A, B$ to
+$\hat S^{(\alpha)}, \hat S^{(\beta)}$ recovers the $x = y$ case of
+Tasaki eq.~(2.2.6), namely
+$[\hat S_x^{(\alpha)}, \hat S_x^{(\beta)}]
+  = i \sum_\gamma \varepsilon^{\alpha\beta\gamma} \hat S_x^{(\gamma)}$
+for $\alpha, \beta \in \{1, 2, 3\}$. Lean names:
+\texttt{spinHalfOp1\_onSite\_commutator\_spinHalfOp2\_onSite},
+\texttt{spinHalfOp2\_onSite\_commutator\_spinHalfOp3\_onSite},
+\texttt{spinHalfOp3\_onSite\_commutator\_spinHalfOp1\_onSite}.
+\end{lemma}
+
+\begin{proof}
+Expand the matrix product via \texttt{Matrix.mul\_apply} and observe
+that $\texttt{onSite}\,i\,A$ is block-diagonal along the fibers
+$\{\tau : \tau \upharpoonright_{\Lambda\setminus\{i\}} = \sigma
+ \upharpoonright_{\Lambda\setminus\{i\}}\}$. Within each fiber, the
+product is the $2\times 2$ matrix multiplication $A \cdot B$.
+Off-fiber contributions vanish because the constraint
+``$\tau$ agrees with $\sigma'$ off $i$'' and
+``$\tau$ agrees with $\sigma$ off $i$'' together force $\sigma'$ to
+agree with $\sigma$ off $i$. See
+\texttt{LatticeSystem/Quantum/ManyBody.lean}.
+\end{proof}
+
+\subsection{Total raising/lowering operators (Tasaki eq.~(2.2.8))}
+
+\begin{definition}
+The total raising and lowering operators are
+\[
+  \hat S^{\pm}_{\mathrm{tot}}
+    := \sum_{x \in \Lambda} \hat S_x^{\pm}
+    = \sum_{x \in \Lambda} \texttt{onSite}\,x\,\hat S^{\pm}.
+\]
+Lean names: \texttt{totalSpinHalfOpPlus}, \texttt{totalSpinHalfOpMinus}.
+\end{definition}
+
+\begin{lemma}[Tasaki eq.~(2.2.8)]
+$\hat S^{\pm}_{\mathrm{tot}}
+  = \hat S^{(1)}_{\mathrm{tot}} \pm i \hat S^{(2)}_{\mathrm{tot}}$.
+Lean names: \texttt{totalSpinHalfOpPlus\_eq\_add},
+\texttt{totalSpinHalfOpMinus\_eq\_sub}.
+\end{lemma}
+
+\begin{proof}
+At each site $x$ this is
+$\hat S_x^{+} = \hat S_x^{(1)} + i\hat S_x^{(2)}$
+(\texttt{spinHalfOpPlus\_eq\_add}, applied through
+\texttt{onSite\_add} and \texttt{onSite\_smul}), which sums over
+$x \in \Lambda$ by linearity.
+\end{proof}
+
+\subsection{Total magnetization (Tasaki eq.~(2.2.2))}
+
+\begin{definition}
+For $\sigma : \Lambda \to \mathrm{Fin}\,2$, let
+\[
+  \operatorname{spinSign}(s) := \begin{cases} +1 & s = 0, \\ -1 & s = 1, \end{cases}
+  \qquad
+  |\sigma| := \sum_{x \in \Lambda} \operatorname{spinSign}(\sigma_x).
+\]
+Lean names: \texttt{spinSign}, \texttt{magnetization}.
+\end{definition}
+
+\subsection{Two-site spin inner product (Tasaki eq.~(2.2.16))}
+
+\begin{definition}
+\[
+  \hat S_x \cdot \hat S_y
+    := \sum_{\alpha = 1}^{3}
+       \texttt{onSite}\,x\,\hat S^{(\alpha)}
+       \cdot
+       \texttt{onSite}\,y\,\hat S^{(\alpha)}.
+\]
+Lean name: \texttt{spinHalfDot}.
+\end{definition}
+
+\begin{lemma}[Tasaki eq.~(2.2.16)]
+For $S = 1/2$,
+\[
+  \hat S_x \cdot \hat S_y
+    = \tfrac12 \bigl( \hat S_x^{+}\hat S_y^{-}
+                    + \hat S_x^{-}\hat S_y^{+}\bigr)
+      + \hat S_x^{(3)} \hat S_y^{(3)}.
+\]
+Lean name: \texttt{spinHalfDot\_eq\_plus\_minus}.
+\end{lemma}
+
+\begin{proof}
+Expand the right-hand side via
+$\hat S_x^{\pm} = \hat S_x^{(1)} \pm i\hat S_x^{(2)}$ and the companion
+identity at site $y$, then use $i^2 = -1$. Writing $a_k, b_k$ for
+$\texttt{onSite}\,x\,\hat S^{(k)}$, $\texttt{onSite}\,y\,\hat S^{(k)}$
+respectively, the expansion gives
+\[
+  (a_1 + i a_2)(b_1 - i b_2) + (a_1 - i a_2)(b_1 + i b_2)
+    = 2(a_1 b_1 + a_2 b_2),
+\]
+so the right-hand side of the identity collapses to
+$a_1 b_1 + a_2 b_2 + a_3 b_3$, which is the definition of
+$\hat S_x \cdot \hat S_y$.
+\end{proof}
+
 \paragraph{Not yet formalized.}
 \begin{itemize}
   \item Global rotation operator
@@ -599,9 +714,69 @@ $\texttt{onSite}\,x\,\hat S^{(\alpha)}$ is Hermitian by the lemma
     (eq.~(2.2.11)).
   \item SU(2) / U(1) invariance of operators commuting with
     $\hat S_{\mathrm{tot}}^{(\alpha)}$ (eqs.~(2.2.12)-(2.2.13)).
-  \item Two-site operator $\hat S_x \cdot \hat S_y$ and its
-    SU(2) invariance (eqs.~(2.2.16)-(2.2.19)).
+  \item SU(2) invariance of $\hat S_x \cdot \hat S_y$ and its
+    eigenvalues (eqs.~(2.2.17)-(2.2.19)).
+  \item Magnetization eigenspace decomposition
+    $\mathcal H = \bigoplus_M \mathcal H_M$ (eqs.~(2.2.9)-(2.2.10)).
   \item Problem 2.2.a-c.
+\end{itemize}
+
+%======================================================================
+\section{S = 1 basis states and raising/lowering
+         (Tasaki \S2.1 eqs.~(2.1.2)-(2.1.6), S = 1)}
+\label{sec:spinonebasis}
+%======================================================================
+
+\emph{Source file:} \texttt{LatticeSystem/Quantum/SpinOneBasis.lean}.
+
+\begin{definition}
+Column vectors in $\mathrm{Fin}\,3 \to \mathbb C$:
+\[
+  |\psi^{+1}\rangle := (1, 0, 0)^T, \quad
+  |\psi^{0}\rangle  := (0, 1, 0)^T, \quad
+  |\psi^{-1}\rangle := (0, 0, 1)^T.
+\]
+Lean names: \texttt{spinOnePlus}, \texttt{spinOneZero},
+\texttt{spinOneMinus}.
+\end{definition}
+
+\begin{lemma}[Tasaki eq.~(2.1.2), S = 1]
+\[
+  \hat S^{(3)} |\psi^{+1}\rangle = |\psi^{+1}\rangle, \quad
+  \hat S^{(3)} |\psi^{0}\rangle = 0, \quad
+  \hat S^{(3)} |\psi^{-1}\rangle = -|\psi^{-1}\rangle.
+\]
+Lean names:
+\texttt{spinOneOp3\_mulVec\_spinOnePlus/Zero/Minus}.
+\end{lemma}
+
+\begin{definition}
+The raising/lowering matrices (cf.~(2.1.3), $S = 1$):
+\[
+  \hat S^{+} := \begin{pmatrix} 0 & \sqrt 2 & 0 \\ 0 & 0 & \sqrt 2 \\ 0 & 0 & 0 \end{pmatrix}, \qquad
+  \hat S^{-} := \begin{pmatrix} 0 & 0 & 0 \\ \sqrt 2 & 0 & 0 \\ 0 & \sqrt 2 & 0 \end{pmatrix}.
+\]
+Lean names: \texttt{spinOneOpPlus}, \texttt{spinOneOpMinus}.
+\end{definition}
+
+\begin{lemma}[Tasaki eq.~(2.1.3), S = 1]
+\[
+  \hat S^{+} |\psi^{+1}\rangle = 0, \quad
+  \hat S^{+} |\psi^{0}\rangle = \sqrt 2 \,|\psi^{+1}\rangle, \quad
+  \hat S^{+} |\psi^{-1}\rangle = \sqrt 2 \,|\psi^{0}\rangle,
+\]
+and the corresponding actions of $\hat S^{-}$. Lean names:
+\texttt{spinOneOpPlus/Minus\_mulVec\_spinOnePlus/Zero/Minus}.
+\end{lemma}
+
+\paragraph{Not yet formalized.}
+\begin{itemize}
+  \item Identification
+    $\hat S^{\pm} = \hat S^{(1)} \pm i\hat S^{(2)}$ for $S = 1$
+    (follows from the definitions~(2.1.9)).
+  \item Problem 2.1.c: $S = 1$ analogue of the closed form~(2.1.26).
+  \item Problem 2.1.g: derivation of the explicit $\pi$-rotation
+    matrices~(2.1.33)/(2.1.34) for $S = 1$.
 \end{itemize}
 
 %======================================================================
@@ -746,6 +921,335 @@ explicit coupling $J$ in front of the bond term, so our $H_{J,h}^{N+1}$
 matches Tasaki's (3.3.1) up to the constants $J$ and the Pauli rescaling.
 
 %======================================================================
+%======================================================================
+\section{Tasaki §2.1/§2.2 supplementary content}
+\label{sec:supplementary}
+%======================================================================
+
+The following additional theorems (added in PR \#16) extend the
+formalization of Tasaki \S2.1 and \S2.2.
+
+\subsection{Tasaki \S2.1 supplementary}
+
+\begin{itemize}
+\item \texttt{spinHalfRot\{1,2,3\}\_conj\_spinHalfOp\{2,3,1\}}: general-$\theta$
+  cyclic conjugation $(\hat U^{(\alpha)}_\theta)^\dagger \hat S^{(\beta)}
+  \hat U^{(\alpha)}_\theta = \cos\theta\,\hat S^{(\beta)} - \sin\theta\,\hat S^{(\gamma)}$
+  (Tasaki eq.~(2.1.16)), 6 cyclic + 6 anti-cyclic + 3 same-axis (Tasaki
+  eq.~(2.1.13)-(2.1.15)).
+\item \texttt{spinHalfRot\{1,2,3\}\_half\_pi\_conj\_spinHalfOp\_*}:
+  $\pi/2$-rotation conjugation (Tasaki eq.~(2.1.22)), 6 cases.
+\item \texttt{spinHalfRot\{1,2,3\}\_eq\_exp}: $\hat U^{(\alpha)}_\theta =
+  \exp(-i\theta\hat S^{(\alpha)})$ for all three axes (Tasaki
+  Problem 2.1.b). Axis 3 uses \texttt{Matrix.exp\_diagonal} +
+  Euler; axes 1, 2 are derived from axis 3 via \texttt{Matrix.exp\_conj}
+  with Hadamard / y-axis basis-change unitaries.
+\item \texttt{hadamard}, \texttt{yDiag}: basis-change unitaries with
+  \texttt{hadamard\_mul\_self}, \texttt{yDiag\_mul\_yDiagAdj}, etc.
+  Used to lift the axis-3 exponential proof to axes 1, 2.
+\item \texttt{spinHalfRot3\_mul\_spinHalfRot2\_mulVec\_spinHalfUp}:
+  coherent state $\hat U^{(3)}_\varphi \hat U^{(2)}_\theta |\psi^\uparrow\rangle$
+  (Tasaki Problem 2.1.d).
+\item \texttt{spinHalfRot3\_half\_pi\_mul\_spinHalfRot2\_half\_pi\_mulVec\_spinHalfUp}:
+  the $\theta=\varphi=\pi/2$ specialization (Tasaki Problem 2.1.e).
+\item \texttt{spinHalfDotVec}, \texttt{spinHalfDotVec\_isHermitian},
+  \texttt{spinHalfRot3\_commute\_spinHalfOp3\_smul}: vector inner
+  product $\hat S \cdot v$ and same-axis commutation (Tasaki
+  eq.~(2.1.19)-(2.1.20), partial).
+\item \texttt{rot3D\{1,2,3\}}, \texttt{rot3D\{1,2,3\}\_zero},
+  \texttt{rot3D\{1,2,3\}\_pi}: explicit 3D rotation matrices
+  $R^{(\alpha)}_\theta$ (Tasaki eq.~(2.1.11)).
+\item \texttt{rot3D\{1,2,3\}Pi}, \texttt{rot3D\{1,2,3\}Pi\_sq},
+  \texttt{rot3D\{1,2,3\}Pi\_mul\_rot3D\{2,3,1\}Pi},
+  \texttt{rot3D\{1,2,3\}Pi\_comm\_*}: $\pi$-rotation matrices
+  $R^{(\alpha)}_\pi$ and their group structure (Tasaki eq.~(2.1.28),
+  Problem 2.1.f).
+\item \texttt{spinOnePiRot\{1,2,3\}}, \texttt{spinOnePiRot3\_eq},
+  \texttt{spinOnePiRot\{1,2,3\}\_sq}, \texttt{spinOnePiRot\{1,2,3\}\_comm\_*}:
+  $S = 1$ $\pi$-rotation matrices and their integer-spin Z$_2 \times$ Z$_2$
+  relations (Tasaki eq.~(2.1.31)/(2.1.33)/(2.1.34)).
+\item \texttt{spinOneOpPlus}, \texttt{spinOneOpMinus},
+  \texttt{spinOneOp3\_mulVec\_*}, \texttt{spinOneOpPlus/Minus\_mulVec\_*},
+  \texttt{spinOneOpPlus/Minus\_conjTranspose}: $S = 1$ basis,
+  raising/lowering, adjoints (Tasaki eq.~(2.1.2)-(2.1.6) for $S=1$).
+\item \texttt{spinOneRot\{1,2,3\}},
+  \texttt{spinOneRot\{1,2,3\}\_zero},
+  \texttt{spinOneRot\{1,2,3\}\_pi},
+  \texttt{spinOnePiRot\{1,2\}\_eq},
+  \texttt{spinOneOp\{1,2\}\_mul\_self}:
+  $S = 1$ closed-form rotation $\hat U^{(\alpha)}_\theta = \hat 1 -
+  i\sin\theta\,\hat S^{(\alpha)} - (1-\cos\theta)(\hat S^{(\alpha)})^2$
+  for all 3 axes (Tasaki Problem 2.1.c, eq.~(2.1.30)) and the
+  squared-operator helpers used in the boundary checks $\hat U^{(\alpha)}_\pi
+  = \hat u_\alpha$.
+\item \texttt{spinOnePiRot\{1,2,3\}\_mulVec\_spinOne\{Plus,Zero,Minus\}}:
+  action of the $S = 1$ $\pi$-rotation matrices on the
+  $|\psi^{+1,0,-1}\rangle$ basis (Tasaki eq.~(2.1.34) / Problem 2.1.g
+  for $S = 1$).
+\item \texttt{Quantum/Z2Z2.lean}: documentation module unifying the
+  Z$_2 \times$ Z$_2$ structure (Tasaki eq.~(2.1.27)-(2.1.34)) for
+  both $S=1/2$ (projective) and $S=1$ (genuine) representations.
+\end{itemize}
+
+\subsection{Tasaki \S2.2 supplementary}
+
+\begin{itemize}
+\item \texttt{onSite\_add}, \texttt{onSite\_sub}, \texttt{onSite\_zero},
+  \texttt{onSite\_smul}, \texttt{onSite\_one}: linearity and identity
+  preservation of \texttt{onSite}.
+\item \texttt{onSite\_mul\_onSite\_same},
+  \texttt{onSite\_commutator\_same}: same-site product / commutator
+  (Tasaki eq.~(2.2.6) diagonal).
+\item \texttt{spinHalfOp\{1,2,3\}\_onSite\_commutator\_spinHalfOp\{2,3,1\}\_onSite}:
+  same-site spin commutators.
+\item \texttt{onSite\_commutator\_totalOnSite}: generic
+  $[\texttt{onSite}\,x\,A, \sum_z \texttt{onSite}\,z\,B]
+   = \texttt{onSite}\,x\,[A, B]$.
+\item \texttt{basisVec}, \texttt{onSite\_mulVec\_basisVec}: basis
+  states and the explicit tensor-product action (Tasaki
+  eq.~(2.2.1)/(2.2.4)).
+\item \texttt{totalSpinHalfOpPlus}, \texttt{totalSpinHalfOpMinus},
+  \texttt{totalSpinHalfOpPlus\_eq\_add},
+  \texttt{totalSpinHalfOpMinus\_eq\_sub},
+  \texttt{totalSpinHalfOpPlus/Minus\_conjTranspose}:
+  $\hat S^{\pm}_{\rm tot}$ and adjoints (Tasaki eq.~(2.2.8)).
+\item \texttt{totalSpinHalfOp\{1,2,3\}\_commutator\_totalSpinHalfOp\{2,3,1\}}:
+  total-spin commutators.
+\item \texttt{totalSpinHalfOp3\_commutator\_totalSpinHalfOpPlus/Minus}:
+  Cartan ladder $[\hat S_{\rm tot}^{(3)}, \hat S^{\pm}_{\rm tot}]
+   = \pm\hat S^{\pm}_{\rm tot}$.
+\item \texttt{totalSpinHalfOpPlus\_commutator\_totalSpinHalfOpMinus}:
+  $[\hat S^+_{\rm tot}, \hat S^-_{\rm tot}] = 2\hat S^{(3)}_{\rm tot}$.
+\item \texttt{totalSpinHalfSquared}, \texttt{totalSpinHalfSquared\_isHermitian},
+  \texttt{totalSpinHalfSquared\_commutator\_*}:
+  Casimir operator $(\hat S_{\rm tot})^2$ and its $\mathrm{SU}(2)$
+  invariance (Tasaki eq.~(2.2.12)).
+\item \texttt{spinSign}, \texttt{magnetization}: total magnetization
+  $|\sigma| := \sum_x \mathrm{sign}(\sigma_x)$ (Tasaki eq.~(2.2.2)).
+\item \texttt{spinHalfSign}, \texttt{onSite\_spinHalfOp3\_mulVec\_basisVec},
+  \texttt{totalSpinHalfOp3\_mulVec\_basisVec},
+  \texttt{totalSpinHalfOp3\_mulVec\_basisVec\_eq\_magnetization}:
+  $\hat S^{(3)}_{\rm tot}$ eigenvalues on basis states (Tasaki
+  eq.~(2.2.10)).
+\item \texttt{onSite\_spinHalfOpPlus/Minus\_mulVec\_basisVec},
+  \texttt{totalSpinHalfOpPlus/Minus\_mulVec\_basisVec}: raising and
+  lowering action on basis states.
+\item \texttt{spinHalfDot}, \texttt{spinHalfDot\_eq\_plus\_minus}:
+  two-site inner product $\hat S_x \cdot \hat S_y$ and its
+  raising/lowering decomposition (Tasaki eq.~(2.2.16)).
+\item \texttt{spinHalfDot\_comm}, \texttt{spinHalfDot\_self},
+  \texttt{spinHalfDot\_isHermitian},
+  \texttt{spinHalfPairSpinSq}, \texttt{spinHalfPairSpinSq\_eq}:
+  symmetry, $\hat S_x \cdot \hat S_x = (3/4)\cdot 1$, Hermiticity, and
+  the squared-sum identity (Tasaki eq.~(2.2.18)).
+\item \texttt{totalSpinHalfSquared\_eq\_sum\_dot}:
+  $(\hat S_{\rm tot})^2 = \sum_{x,y} \hat S_x \cdot \hat S_y$.
+\item \texttt{spinHalfDot\_commutator\_totalSpinHalfOp\{1,2,3\}},
+  \texttt{spinHalfDot\_commutator\_totalSpinHalfOpPlus/Minus}:
+  $\mathrm{SU}(2)$ invariance of $\hat S_x \cdot \hat S_y$
+  (Tasaki eq.~(2.2.17)).
+\item \texttt{IsInMagnetizationSubspace},
+  \texttt{basisVec\_mem\_magnetizationSubspace}: magnetization
+  subspace predicate and basis state membership (Tasaki
+  eq.~(2.2.9)/(2.2.10)).
+\item \texttt{totalSpinHalfRot\{1,2,3\}Pi},
+  \texttt{totalSpinHalfRot\{1,2,3\}\,\theta},
+  \texttt{totalSpinHalfRot\{1,2,3\}\_zero},
+  \texttt{totalSpinHalfRot\{1,2,3\}Pi\_eq}: global rotation
+  $\hat U^{(\alpha)}_{\rm tot,\theta}$ via \texttt{Finset.noncommProd}
+  (Tasaki eq.~(2.2.11)).
+\item \texttt{totalSpinHalfRot\{1,2,3\}Pi\_mul\_totalSpinHalfRot\{2,3,1\}Pi}:
+  $\hat U^{(\alpha)}_{\pi,{\rm tot}} \cdot
+   \hat U^{(\beta)}_{\pi,{\rm tot}}
+   = \hat U^{(\gamma)}_{\pi,{\rm tot}}$ (Tasaki Problem 2.2.a).
+\item \texttt{onSiteRingHom}, \texttt{onSiteLinearMap},
+  \texttt{continuous\_onSite}, \texttt{onSite\_pow}: site embedding
+  packaged as a ring/linear/continuous map and lifted to powers.
+\item \texttt{totalSpinHalfRot\{1,2,3\}Pi\_two\_site},
+  \texttt{totalSpinHalfRot\{1,2,3\}\_two\_site}: for $\Lambda = {\rm Fin}\,2$,
+  the global rotation factors as $\texttt{onSite}\,0\,(\hat U^{(\alpha)}_\theta)
+  \cdot \texttt{onSite}\,1\,(\hat U^{(\alpha)}_\theta)$ (Tasaki Problem
+  2.2.b at $\theta = \pi$ and general $\theta$).
+\item \texttt{spinHalfDot\_mulVec\_basisVec\_parallel},
+  \texttt{spinHalfDot\_mulVec\_basisVec\_both\_up/down}: for $x \neq y$
+  with $\sigma_x = \sigma_y$, $\hat S_x \cdot \hat S_y |\sigma\rangle =
+  (1/4)|\sigma\rangle$ (Tasaki eq.~(2.2.19), parallel case; gives the
+  triplet $m = \pm 1$ eigenvalue).
+\item \texttt{basisSwap}, \texttt{basisSwap\_involutive},
+  \texttt{basisSwap\_antiparallel}: site-swap of $\sigma$ at $x, y$,
+  involution, and preservation of anti-parallelism.
+\item \texttt{spinHalfDot\_mulVec\_basisVec\_antiparallel}: for
+  $\sigma_x \neq \sigma_y$, $\hat S_x \cdot \hat S_y |\sigma\rangle =
+  (1/2)|\mathrm{swap}\,\sigma\rangle - (1/4)|\sigma\rangle$.
+\item \texttt{spinHalfDot\_mulVec\_singlet}: singlet eigenvalue
+  $\hat S_x \cdot \hat S_y (|\sigma\rangle - |\mathrm{swap}\,\sigma\rangle)
+  = -(3/4)(|\sigma\rangle - |\mathrm{swap}\,\sigma\rangle)$ (Tasaki
+  eq.~(2.2.19), $S = 0$ singlet).
+\item \texttt{spinHalfDot\_mulVec\_triplet\_anti}: triplet $m = 0$
+  eigenvalue $\hat S_x \cdot \hat S_y (|\sigma\rangle + |\mathrm{swap}\,\sigma\rangle)
+  = (1/4)(|\sigma\rangle + |\mathrm{swap}\,\sigma\rangle)$ (Tasaki
+  eq.~(2.2.19), $S = 1$, $m = 0$).
+\item \texttt{heisenbergHamiltonian},
+  \texttt{heisenbergHamiltonian\_commutator\_totalSpinHalfOp\{1,2,3\}},
+  \texttt{heisenbergHamiltonian\_commutator\_totalSpinHalfOp\{Plus,Minus\}}:
+  the general Heisenberg-type Hamiltonian
+  $H = \sum_{x,y} J(x,y)\,\hat S_x \cdot \hat S_y$ commutes with
+  $\hat S^{(\alpha)}_{\rm tot}$ and $\hat S^{\pm}_{\rm tot}$
+  (Tasaki eq.~(2.2.13), SU(2) invariance).
+\item \texttt{totalSpinHalfSquared\_mulVec\_basisVec\_const},
+  \texttt{totalSpinHalfSquared\_mulVec\_basisVec\_all\_up/down}:
+  $\hat S_{\rm tot}^2 |s\,s\,\dots\,s\rangle = (N(N+2)/4)|s\,s\,\dots\,s\rangle$
+  for any constant $s : {\rm Fin}\,2$ — the Casimir eigenvalue at
+  the maximum total spin $S = N/2$.
+\item \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp\_axiom} (\textbf{AXIOM}),
+  \texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}: Tasaki eq.~(2.2.11),
+  $\hat U^{(\alpha)}_{\theta,{\rm tot}}
+   = \exp[-i\theta \hat S^{(\alpha)}_{\rm tot}]$, currently
+  axiomatized.  See §\ref{sec:open-items} below.
+\end{itemize}
+
+\section{Open items / TODO and axioms}
+\label{sec:open-items}
+%======================================================================
+
+The following Tasaki §2.1 / §2.2 items are \emph{not yet fully proved}
+in the Lean development. They are documented here so that future PRs
+can pick them up and replace each axiom by a proof (or fill in the
+deferred construction).
+
+\subsection*{TODO: Problem 2.1.a for \texorpdfstring{$S \geq 1$}{S >= 1} (P1d''')}
+
+\textbf{Statement} (Tasaki p.15): For any spin $S \geq 1$, every
+operator on the single-site Hilbert space $h_0 = \mathbb{C}^{2S+1}$
+(i.e.\ every $(2S+1) \times (2S+1)$ matrix) can be written as a
+polynomial in $\hat 1, \hat S^{(1)}, \hat S^{(2)}, \hat S^{(3)}$.
+
+\textbf{Proof outline} (Tasaki solution S.1, p.493):
+\begin{enumerate}
+\item The diagonal projector $|\psi^\sigma\rangle\langle\psi^\sigma|$
+  is given by Lagrange interpolation in $\hat S^{(3)}$:
+  \[
+    |\psi^\sigma\rangle\langle\psi^\sigma|
+    = \prod_{\substack{\tau = -S \\ \tau \neq \sigma}}^{S}
+        \frac{\hat S^{(3)} - \tau \hat 1}{\sigma - \tau}.
+  \]
+\item Off-diagonal matrix units $|\psi^\tau\rangle\langle\psi^\sigma|$
+  ($\tau \neq \sigma$) are obtained by applying $\hat S^\pm$ to a
+  diagonal projector and normalizing.
+\item The set $\{|\psi^\tau\rangle\langle\psi^\sigma|\}_{\tau,\sigma}$
+  spans $M_{2S+1}(\mathbb{C})$; combined with Steps 1--2 this shows
+  every matrix is a polynomial in $\hat 1, \hat S^{(\alpha)}$.
+\end{enumerate}
+
+\textbf{Status}: $S = 1/2$ is done as \texttt{pauliBasis} (P1d''). The
+general-$S$ case requires generic \texttt{Fin\,(2S+1)} typing and a
+Lagrange interpolation infrastructure; not started.
+
+\subsection*{Axiom: Tasaki eq.~(2.2.11) (P1f'')}
+
+\textbf{Statement}: For $\alpha \in \{1, 2, 3\}$ and $\theta \in
+\mathbb{R}$,
+\[
+  \hat U^{(\alpha)}_{\theta,{\rm tot}}
+    = \exp[-i\theta \hat S^{(\alpha)}_{\rm tot}]
+    = \prod_{x \in \Lambda} \exp[-i\theta \hat S^{(\alpha)}_x].
+\]
+
+In Lean this is currently axiomatized as
+\texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp\_axiom} in
+\texttt{Quantum/TotalSpin.lean}, with thin re-exports
+\texttt{totalSpinHalfRot\{1,2,3\}\_eq\_exp}.
+
+\textbf{Why axiomatized}. The morally correct proof composes
+\begin{enumerate}
+\item $\hat U^{(\alpha)}_\theta = \exp[-(i\theta)\,\hat S^{(\alpha)}]$
+  at the single-site level (P1e'',
+  \texttt{spinHalfRot\{1,2,3\}\_eq\_exp}).
+\item $\texttt{onSite}\,x\,(\exp B) = \exp(\texttt{onSite}\,x\,B)$,
+  i.e.\ the bridge that the site-embedding ring homomorphism commutes
+  with the matrix exponential. This would follow from
+  \texttt{NormedSpace.map\_exp} applied to \texttt{onSiteRingHom}.
+\item $\exp(\sum_x \texttt{onSite}\,x\,B)
+  = \prod_x \exp(\texttt{onSite}\,x\,B)$ for distinct-site
+  embeddings. This would follow from
+  \texttt{Matrix.exp\_sum\_of\_commute}.
+\end{enumerate}
+
+\textbf{Step 2 is the actual blocker}. Our
+\texttt{continuous\_onSite} is established under the canonical
+Pi-product matrix topology
+(\texttt{Matrix.instTopologicalSpace}), but
+\texttt{NormedSpace.map\_exp} requires \texttt{NormedRing} and
+\texttt{CompleteSpace} instances, which only resolve under the
+Frobenius (or other operator) norm topology. The two topologies
+coincide on finite-dimensional matrices, but Lean's instance
+resolution does \emph{not} bridge them: even with
+\texttt{open scoped Matrix.Norms.Frobenius} and explicit
+\texttt{haveI : CompleteSpace \_ := FiniteDimensional.complete} declarations the
+type-class search picks the Pi topology for
+\texttt{continuous\_onSite} and the Frobenius topology for
+\texttt{NormedSpace.map\_exp}, and they fail to unify.
+
+A future PR should either (a) establish a topology-bridging lemma
+between the Pi-product and Frobenius structures on
+\texttt{Matrix\,(Fin n)\,(Fin n)\,$\mathbb{C}$}, (b) re-prove
+\texttt{continuous\_onSite} under the Frobenius topology, or (c) find
+an alternative formulation that avoids
+\texttt{NormedSpace.map\_exp} entirely (e.g.\ by direct power-series
+manipulation).
+
+\subsection*{TODO: Magnetization-sector direct sum (eqs.~(2.2.9)/(2.2.10))}
+
+\textbf{Statement} (Tasaki p.22): The full Hilbert space decomposes as
+a direct sum over magnetization eigenspaces,
+\[
+  \mathcal H = \bigoplus_{M = -|\Lambda|S}^{|\Lambda|S} \mathcal H_M,
+  \qquad
+  \mathcal H_M := \{|\Phi\rangle \in \mathcal H \mid
+    \hat S^{(3)}_{\rm tot} |\Phi\rangle = M |\Phi\rangle\}.
+\]
+
+\textbf{Status}: Only the predicate
+\texttt{IsInMagnetizationSubspace} and the basis-state membership
+lemma \texttt{basisVec\_mem\_magnetizationSubspace} are formalized.
+The full direct-sum decomposition (a \texttt{DirectSum} /
+\texttt{Submodule.iSup} statement that
+$\mathcal H = \bigoplus_M \mathcal H_M$, plus orthogonality of
+distinct sectors) requires further linear-algebra infrastructure (the
+magnetization subspaces as \texttt{Submodule}\,$\mathbb{C}$\,$((\Lambda
+\to \mathrm{Fin}\,2) \to \mathbb{C})$, and the direct-sum
+decomposition theorem).
+
+\subsection*{TODO: Tasaki Problem 2.2.c}
+
+\textbf{Statement} (Tasaki p.23, eq.~(2.2.15)): An explicit averaged
+state of the form
+\[
+  \frac{1}{4\pi} \int_0^{2\pi}\!\!d\varphi \int_0^\pi d\theta \sin\theta\;
+    \hat U^{(3)}_\varphi \hat U^{(2)}_\theta\,
+    |\!\uparrow_1\rangle |\!\downarrow_2\rangle
+\]
+equals (up to phase) the singlet $(1/\sqrt 2)(|\!\uparrow_1\rangle
+|\!\downarrow_2\rangle - |\!\downarrow_1\rangle |\!\uparrow_2\rangle)$.
+The problem asks to verify this and characterize states that fail to
+be SU(2)-invariant.
+
+\textbf{Status}: Not formalized. Requires a measure-theoretic
+averaging construction (integration over the SU(2) parameter space),
+which is beyond the current scope of finite-dim algebra. Tracked here
+for a future infrastructure PR.
+
+\subsection*{Roadmap status note: P1f''' (eqs.~(2.2.12)--(2.2.13))}
+
+The Lean development proves $[\hat A, \hat S^{(\alpha)}_{\rm tot}] = 0$
+and the corresponding finite-form $(\hat U^{(\alpha)}_\theta)^\dagger
+\hat A \hat U^{(\alpha)}_\theta = \hat A$ for the \emph{Heisenberg-type}
+operator $\hat A = \sum_{x,y} J(x,y)\,\hat S_x \cdot \hat S_y$ (axes
+1, 2, 3 and the ladder $\hat S^{\pm}_{\rm tot}$). The fully general
+operator-level statement (any $\hat A$ satisfying eq.~(2.2.12) also
+satisfies eq.~(2.2.13)) is open and depends on the axiomatized
+eq.~(2.2.11) above.
+
 \section{Progress table}
 \label{sec:progress}
 %======================================================================

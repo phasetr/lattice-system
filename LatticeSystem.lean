@@ -7,6 +7,11 @@ import LatticeSystem.Quantum.SpinHalfBasis
 import LatticeSystem.Quantum.SpinHalfDecomp
 import LatticeSystem.Quantum.SpinHalfRotation
 import LatticeSystem.Quantum.SpinOne
+import LatticeSystem.Quantum.SpinOneBasis
 import LatticeSystem.Quantum.ManyBody
 import LatticeSystem.Quantum.TotalSpin
+import LatticeSystem.Quantum.SpinDot
+import LatticeSystem.Quantum.Rotation3D
+import LatticeSystem.Quantum.MagnetizationSubspace
+import LatticeSystem.Quantum.Z2Z2
 import LatticeSystem.Quantum.IsingChain

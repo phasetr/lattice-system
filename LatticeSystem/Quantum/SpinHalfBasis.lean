@@ -113,4 +113,31 @@ theorem spinHalfOpMinus_mulVec_spinHalfDown :
     simp [spinHalfOpMinus, spinHalfDown, Matrix.mulVec, dotProduct,
       Fin.sum_univ_two]
 
+/-! ## Adjoint relations between raising and lowering -/
+
+/-- `(Ŝ^+)† = Ŝ^-`. -/
+theorem spinHalfOpPlus_conjTranspose :
+    (spinHalfOpPlus)ᴴ = spinHalfOpMinus := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinHalfOpPlus, spinHalfOpMinus, Matrix.conjTranspose_apply]
+
+/-- `(Ŝ^-)† = Ŝ^+`. -/
+theorem spinHalfOpMinus_conjTranspose :
+    (spinHalfOpMinus)ᴴ = spinHalfOpPlus := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinHalfOpPlus, spinHalfOpMinus, Matrix.conjTranspose_apply]
+
+/-! ## Single-site ladder commutator `[Ŝ^+, Ŝ^-] = 2 · Ŝ^(3)` -/
+
+/-- The ladder commutator: `[Ŝ^+, Ŝ^-] = 2 · Ŝ^(3)`. -/
+theorem spinHalfOpPlus_commutator_spinHalfOpMinus :
+    spinHalfOpPlus * spinHalfOpMinus - spinHalfOpMinus * spinHalfOpPlus =
+      (2 : ℂ) • spinHalfOp3 := by
+  unfold spinHalfOpPlus spinHalfOpMinus spinHalfOp3
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [Matrix.smul_apply, Matrix.sub_apply, pauliZ]
+
 end LatticeSystem.Quantum
