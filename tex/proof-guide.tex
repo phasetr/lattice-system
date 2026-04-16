@@ -1049,9 +1049,18 @@ formalization of Tasaki \S2.1 and \S2.2.
   $\mathrm{SU}(2)$ invariance of $\hat S_x \cdot \hat S_y$
   (Tasaki eq.~(2.2.17)).
 \item \texttt{IsInMagnetizationSubspace},
-  \texttt{basisVec\_mem\_magnetizationSubspace}: magnetization
-  subspace predicate and basis state membership (Tasaki
-  eq.~(2.2.9)/(2.2.10)).
+  \texttt{magnetizationSubspace}, \texttt{basisVec\_mem\_magnetizationSubspace},
+  \texttt{magnetizationSubspace\_disjoint},
+  \texttt{iSup\_magnetizationSubspace\_eq\_top},
+  \texttt{magnetizationSubspace\_eq\_eigenspace},
+  \texttt{magnetizationSubspace\_iSupIndep},
+  \texttt{magnetizationSubspace\_isInternal}:
+  magnetization subspace as a \texttt{Submodule}, basis-state
+  membership, pairwise disjointness, supremum-equals-top, identification
+  with \texttt{Module.End.eigenspace} (used to inherit
+  \texttt{eigenspaces\_iSupIndep}), and the full internal direct-sum
+  decomposition $\mathcal H = \bigoplus_M \mathcal H_M$
+  (Tasaki eq.~(2.2.9)/(2.2.10)).
 \item \texttt{totalSpinHalfRot\{1,2,3\}Pi},
   \texttt{totalSpinHalfRot\{1,2,3\}\,\theta},
   \texttt{totalSpinHalfRot\{1,2,3\}\_zero},
@@ -1174,28 +1183,6 @@ polynomial in $\hat 1, \hat S^{(1)}, \hat S^{(2)}, \hat S^{(3)}$.
 \textbf{Status}: $S = 1/2$ is done as \texttt{pauliBasis} (P1d''). The
 general-$S$ case requires generic \texttt{Fin\,(2S+1)} typing and a
 Lagrange interpolation infrastructure; not started.
-
-\subsection*{TODO: Magnetization-sector direct sum (eqs.~(2.2.9)/(2.2.10))}
-
-\textbf{Statement} (Tasaki p.22): The full Hilbert space decomposes as
-a direct sum over magnetization eigenspaces,
-\[
-  \mathcal H = \bigoplus_{M = -|\Lambda|S}^{|\Lambda|S} \mathcal H_M,
-  \qquad
-  \mathcal H_M := \{|\Phi\rangle \in \mathcal H \mid
-    \hat S^{(3)}_{\rm tot} |\Phi\rangle = M |\Phi\rangle\}.
-\]
-
-\textbf{Status}: Only the predicate
-\texttt{IsInMagnetizationSubspace} and the basis-state membership
-lemma \texttt{basisVec\_mem\_magnetizationSubspace} are formalized.
-The full direct-sum decomposition (a \texttt{DirectSum} /
-\texttt{Submodule.iSup} statement that
-$\mathcal H = \bigoplus_M \mathcal H_M$, plus orthogonality of
-distinct sectors) requires further linear-algebra infrastructure (the
-magnetization subspaces as \texttt{Submodule}\,$\mathbb{C}$\,$((\Lambda
-\to \mathrm{Fin}\,2) \to \mathbb{C})$, and the direct-sum
-decomposition theorem).
 
 \subsection*{TODO: Tasaki Problem 2.2.c}
 
