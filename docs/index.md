@@ -236,6 +236,9 @@ case (`σ ∈ {-1, 0, +1}`).
 | `spinOnePiRot{1,2}_eq` | `û_α = 1 - 2·(Ŝ^(α))²` for axes 1, 2 (Tasaki eq. (2.1.30) for S = 1) | `Quantum/SpinOneBasis.lean` |
 | `spinOneOp{1,2}_mul_self` | `(Ŝ^(α))²` explicit form (helper for the `_pi` boundary checks) | `Quantum/SpinOne.lean` |
 | `spinOneOpPlus_eq_add`, `spinOneOpMinus_eq_sub` | `Ŝ^± = Ŝ^(1) ± i·Ŝ^(2)` for `S = 1` (Tasaki eq. (2.1.5), spin-1 case). Together with `spinOneUnit*_eq_polynomial` and `spinOneProj{Plus,Zero,Minus}_eq_polynomial`, fully reduces every off-diagonal matrix unit to a polynomial in `Ŝ^(1), Ŝ^(2), Ŝ^(3)` | `Quantum/SpinOneBasis.lean` |
+| `spinHalfRot{1,2,3}_mem_unitary` | each axis rotation `Û^(α)_θ` lies in the unitary submonoid of `Matrix (Fin 2) (Fin 2) ℂ` (preparation for Tasaki §2.2 Problem 2.2.c) | `Quantum/SU2.lean` |
+| `spinHalfEulerProduct φ θ ψ` | `Û^(3)_φ · Û^(2)_θ · Û^(3)_ψ` — the forward Euler-angle parametrization of single-spin SU(2) | `Quantum/SU2.lean` |
+| `spinHalfEulerProduct_mem_unitary` | the Euler-angle product is unitary | `Quantum/SU2.lean` |
 | `spinOnePiRot{1,2,3}_mulVec_spinOne{Plus,Zero,Minus}` | π-rotation matrix elements on the basis `|ψ^{+1,0,-1}⟩` (Tasaki eq. (2.1.34) / Problem 2.1.g for S = 1) | `Quantum/SpinOneBasis.lean` |
 
 ### Multi-body operator space (abstract lattice)
@@ -371,6 +374,24 @@ Tasaki solution S.1: diagonal projectors via Lagrange interpolation in
 `Ŝ^(3)`, off-diagonals via `Ŝ^±`, spanning theorem. The general
 `S ≥ 1` case requires generic `Fin (2S+1)` typing and a polymorphic
 Lagrange interpolation infrastructure; not started.
+
+### TODO — Tasaki §2.1 single-spin SU(2) det = 1 (deferred from PR #21)
+
+**Statement**: `det (Û^(α)_θ) = 1` for `α ∈ {1, 2, 3}` and `θ ∈ ℝ`.
+The closed form `Û^(α)_θ = cos(θ/2) - 2i sin(θ/2) Ŝ^(α)` makes
+`det (Û^(α)_θ) = cos²(θ/2) + sin²(θ/2) = 1` (Pythagorean identity).
+
+**Status**: Mathematically trivial but **not yet formalized** because
+the residual `linear_combination` after expanding `Matrix.det_fin_two`
+mixes `Complex.cos (↑θ / 2)`, `↑(Real.cos (θ/2))`, `↑2`, `(↑2)⁻¹`,
+and `Complex.I^2`/`Complex.I^4` and the Real-vs-Complex casting
+forces a series of rewrites that stymie `ring`. The `unitarity`
+membership in `unitary (Matrix _ _ ℂ)` (PR #21) suffices for
+downstream Problem 2.2.c work without the `det = 1` refinement.
+
+A future PR should prove `spinHalfRot{α}_det_eq_one` and use it to
+strengthen `unitary (Matrix _ _ ℂ)` membership to a true `SU(2)`
+membership (i.e. a `Subgroup` cut out by `det = 1`).
 
 ### TODO — Tasaki Problem 2.2.c (SU(2) non-invariance / averaged state)
 
