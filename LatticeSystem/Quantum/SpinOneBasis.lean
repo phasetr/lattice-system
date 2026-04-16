@@ -128,6 +128,42 @@ theorem spinOneOpMinus_mulVec_spinOneMinus :
     simp [spinOneOpMinus, spinOneMinus, Matrix.mulVec, dotProduct,
       Fin.sum_univ_three]
 
+/-! ## Ladder operators as `Ŝ^(1) ± i·Ŝ^(2)` (Tasaki eq (2.1.5), S = 1)
+
+The unique non-trivial entries on either side are at indices `(0, 1)`
+and `(1, 2)` for `Ŝ^+` (resp. `(1, 0)` and `(2, 1)` for `Ŝ^-`). At
+those entries the right-hand side reduces to `2·invSqrt2 = √2` via
+`sqrt2_mul_sqrt2` already declared just below. We use that fact in
+the `linear_combination` proof. -/
+
+/-- `Ŝ^+ = Ŝ^(1) + i·Ŝ^(2)` for `S = 1`. -/
+theorem spinOneOpPlus_eq_add :
+    spinOneOpPlus = spinOneOp1 + Complex.I • spinOneOp2 := by
+  unfold spinOneOpPlus spinOneOp1 spinOneOp2
+  have h2 : (Real.sqrt 2 : ℂ) * (Real.sqrt 2 : ℂ) = 2 := by
+    rw [← Complex.ofReal_mul, Real.mul_self_sqrt (by norm_num : (0:ℝ) ≤ 2)]
+    norm_num
+  have hsq : ((Real.sqrt 2 : ℂ))^2 = 2 := by rw [sq]; exact h2
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    (simp [Matrix.add_apply, invSqrt2]
+     try (field_simp; rw [show (Complex.I)^2 = -1 from Complex.I_sq]; ring_nf
+          try (rw [hsq])))
+
+/-- `Ŝ^- = Ŝ^(1) - i·Ŝ^(2)` for `S = 1`. -/
+theorem spinOneOpMinus_eq_sub :
+    spinOneOpMinus = spinOneOp1 - Complex.I • spinOneOp2 := by
+  unfold spinOneOpMinus spinOneOp1 spinOneOp2
+  have h2 : (Real.sqrt 2 : ℂ) * (Real.sqrt 2 : ℂ) = 2 := by
+    rw [← Complex.ofReal_mul, Real.mul_self_sqrt (by norm_num : (0:ℝ) ≤ 2)]
+    norm_num
+  have hsq : ((Real.sqrt 2 : ℂ))^2 = 2 := by rw [sq]; exact h2
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    (simp [Matrix.sub_apply, invSqrt2]
+     try (field_simp; rw [show (Complex.I)^2 = -1 from Complex.I_sq]; ring_nf
+          try (rw [hsq])))
+
 /-! ## Adjoint and ladder commutator (S = 1) -/
 
 /-- `(Ŝ^+)† = Ŝ^-` for `S = 1`. -/
@@ -295,7 +331,7 @@ theorem spinOnePiRot1_eq :
   unfold spinOnePiRot1
   ext i j
   fin_cases i <;> fin_cases j <;>
-    simp [Matrix.smul_apply, Matrix.sub_apply, Matrix.one_apply] <;> ring
+    (simp; try ring)
 
 /-- `û_2 = 1̂ - 2 · (Ŝ^(2))²` for α = 2. -/
 theorem spinOnePiRot2_eq :
@@ -305,7 +341,7 @@ theorem spinOnePiRot2_eq :
   unfold spinOnePiRot2
   ext i j
   fin_cases i <;> fin_cases j <;>
-    simp [Matrix.smul_apply, Matrix.sub_apply, Matrix.one_apply] <;> ring
+    (simp; try ring)
 
 /-- `Û^(1)_π = û_1` for S = 1. -/
 theorem spinOneRot1_pi : spinOneRot1 Real.pi = spinOnePiRot1 := by

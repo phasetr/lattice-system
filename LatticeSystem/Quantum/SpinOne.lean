@@ -34,9 +34,11 @@ namespace LatticeSystem.Quantum
 
 open Matrix Complex
 
-/-- Convenience scalar `1/√2 ∈ ℂ` appearing in the S = 1 spin-1 and
-spin-2 operators. -/
-private noncomputable def invSqrt2 : ℂ := ((Real.sqrt 2 : ℂ))⁻¹
+/-- Convenience scalar `1 / √2 ∈ ℂ` appearing in the S = 1 spin-1
+and spin-2 operators. Exposed publicly so that downstream files can
+`unfold` it when relating Hermitian/anti-Hermitian spin operators
+(e.g. `Ŝ^± = Ŝ^(1) ± i·Ŝ^(2)` for S = 1). -/
+noncomputable def invSqrt2 : ℂ := ((Real.sqrt 2 : ℂ))⁻¹
 
 /-- `1/√2` is real, i.e. self-conjugate. -/
 private lemma star_invSqrt2 : star invSqrt2 = invSqrt2 := by
