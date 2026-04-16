@@ -3,6 +3,7 @@ Copyright (c) 2026 lattice-system contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.SpinHalf
+import LatticeSystem.Quantum.SpinHalfBasis
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.Analysis.SpecialFunctions.Exponential
@@ -764,5 +765,36 @@ theorem spinHalfRot3_eq_exp (θ : ℝ) :
       | (rw [show Complex.I * ↑θ / 2 = (↑θ / 2) * Complex.I from by ring,
             Complex.exp_mul_I]
          ring))
+
+/-! ## Coherent state (Tasaki §2.1 Problem 2.1.d) -/
+
+set_option linter.flexible false in
+set_option linter.unusedTactic false in
+/-- Tasaki Problem 2.1.d: `Û^(3)_φ · Û^(2)_θ · |ψ^↑⟩ =
+e^{-iφ/2} cos(θ/2) |ψ^↑⟩ + e^{iφ/2} sin(θ/2) |ψ^↓⟩`. -/
+theorem spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp (θ φ : ℝ) :
+    (spinHalfRot3 φ * spinHalfRot2 θ).mulVec spinHalfUp =
+      ![Complex.exp (-(Complex.I * (φ : ℂ) / 2)) * (Real.cos (θ / 2) : ℂ),
+        Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.sin (θ / 2) : ℂ)] := by
+  unfold spinHalfRot3 spinHalfRot2 rotOf spinHalfOp3 spinHalfOp2 pauliZ pauliY
+  ext i
+  fin_cases i
+  · -- case 0: up component
+    simp [Matrix.mul_apply, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
+       spinHalfUp, Matrix.smul_apply, Matrix.sub_apply]
+    rw [show -(Complex.I * (φ : ℂ) / 2) = (-(↑φ / 2)) * Complex.I from by ring,
+      Complex.exp_mul_I]
+    left
+    simp only [Complex.cos_neg, Complex.sin_neg, neg_mul]
+    push_cast; ring
+  · -- case 1: down component
+    simp [Matrix.mul_apply, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
+       spinHalfUp, Matrix.smul_apply, Matrix.sub_apply]
+    rw [show Complex.I * (φ : ℂ) / 2 = (↑φ / 2) * Complex.I from by ring,
+      Complex.exp_mul_I]
+    have hI : Complex.I * Complex.I = -1 := Complex.I_mul_I
+    linear_combination
+      -(Complex.sin (↑θ / 2)) *
+        (Complex.cos (↑φ / 2) + Complex.I * Complex.sin (↑φ / 2)) * hI
 
 end LatticeSystem.Quantum
