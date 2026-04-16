@@ -993,4 +993,57 @@ theorem totalSpinHalfRot3_eq_exp (θ : ℝ) :
   rw [← onSite_exp_eq_exp_onSite Λ x ((-(Complex.I * (θ : ℂ))) • spinHalfOp3),
       ← spinHalfRot3_eq_exp]
 
+/-! ## Generic operator-level SU(2) invariance (Tasaki §2.2 (2.2.12) → (2.2.13))
+
+If an operator `A` commutes with the total spin generator
+`Ŝ_tot^(α)`, then `A` also commutes with the global rotation
+`Û^(α)_θ_tot = exp(-iθ Ŝ_tot^(α))` (and therefore is invariant under
+its conjugation).
+
+The Heisenberg-type case (`A = Σ J(x,y) Ŝ_x · Ŝ_y`) was already
+handled by `heisenbergHamiltonian_commutator_*` in `SpinDot.lean`;
+here we provide the fully generic statement. -/
+
+private lemma totalSpinHalfRot_commute_aux (S : ManyBodyOp Λ) (θ : ℝ)
+    (A : ManyBodyOp Λ) (h : Commute A S) :
+    Commute A (NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • S)) :=
+  (h.smul_right _).exp_right
+
+/-- Tasaki §2.2 (2.2.12) → (2.2.13), axis 1: any operator commuting
+with `Ŝ_tot^(1)` also commutes with `Û^(1)_θ_tot`. -/
+theorem totalSpinHalfRot1_commute_of_commute (θ : ℝ) (A : ManyBodyOp Λ)
+    (h : Commute A (totalSpinHalfOp1 Λ)) :
+    Commute A (totalSpinHalfRot1 Λ θ) := by
+  rw [totalSpinHalfRot1_eq_exp]
+  exact totalSpinHalfRot_commute_aux Λ _ θ A h
+
+/-- Tasaki §2.2 (2.2.12) → (2.2.13), axis 2. -/
+theorem totalSpinHalfRot2_commute_of_commute (θ : ℝ) (A : ManyBodyOp Λ)
+    (h : Commute A (totalSpinHalfOp2 Λ)) :
+    Commute A (totalSpinHalfRot2 Λ θ) := by
+  rw [totalSpinHalfRot2_eq_exp]
+  exact totalSpinHalfRot_commute_aux Λ _ θ A h
+
+/-- Tasaki §2.2 (2.2.12) → (2.2.13), axis 3. -/
+theorem totalSpinHalfRot3_commute_of_commute (θ : ℝ) (A : ManyBodyOp Λ)
+    (h : Commute A (totalSpinHalfOp3 Λ)) :
+    Commute A (totalSpinHalfRot3 Λ θ) := by
+  rw [totalSpinHalfRot3_eq_exp]
+  exact totalSpinHalfRot_commute_aux Λ _ θ A h
+
+/-- Tasaki §2.2 (2.2.12) → (2.2.13), ladder version: `A` commuting
+with `Ŝ^+_tot` also commutes with `exp(c • Ŝ^+_tot)` for any `c ∈ ℂ`
+(direct application of `Commute.exp_right`; useful for U(1) symmetry
+arguments together with the analogous `Ŝ^-_tot` statement). -/
+theorem totalSpinHalfOpPlus_exp_commute_of_commute (c : ℂ) (A : ManyBodyOp Λ)
+    (h : Commute A (totalSpinHalfOpPlus Λ)) :
+    Commute A (NormedSpace.exp (c • totalSpinHalfOpPlus Λ)) :=
+  (h.smul_right c).exp_right
+
+/-- Same for the lowering operator. -/
+theorem totalSpinHalfOpMinus_exp_commute_of_commute (c : ℂ) (A : ManyBodyOp Λ)
+    (h : Commute A (totalSpinHalfOpMinus Λ)) :
+    Commute A (NormedSpace.exp (c • totalSpinHalfOpMinus Λ)) :=
+  (h.smul_right c).exp_right
+
 end LatticeSystem.Quantum

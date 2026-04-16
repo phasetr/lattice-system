@@ -1112,6 +1112,14 @@ formalization of Tasaki \S2.1 and \S2.2.
   \texttt{LinearMap.continuous\_of\_finiteDimensional}), and
   \texttt{Matrix.exp\_sum\_of\_commute} for the commuting site
   embeddings.
+\item \texttt{totalSpinHalfRot\{1,2,3\}\_commute\_of\_commute},
+  \texttt{totalSpinHalfOp\{Plus,Minus\}\_exp\_commute\_of\_commute}:
+  Tasaki eqs.~(2.2.12)$\to$(2.2.13), generic operator-level form.
+  $\mathrm{Commute}\,A\,\hat S^{(\alpha)}_{\rm tot}
+    \Rightarrow \mathrm{Commute}\,A\,\hat U^{(\alpha)}_{\theta,{\rm tot}}$
+  (and its $\hat S^{\pm}_{\rm tot}$ ladder analogue). Proof: rewrite
+  $\hat U$ via \texttt{\_eq\_exp}, then invoke
+  \texttt{Commute.smul\_right} and \texttt{Commute.exp\_right}.
 \end{itemize}
 
 \section{Open items / TODO and axioms}
@@ -1194,15 +1202,20 @@ for a future infrastructure PR.
 
 \subsection*{Roadmap status note: P1f''' (eqs.~(2.2.12)--(2.2.13))}
 
-The Lean development proves $[\hat A, \hat S^{(\alpha)}_{\rm tot}] = 0$
-and the corresponding finite-form $(\hat U^{(\alpha)}_\theta)^\dagger
-\hat A \hat U^{(\alpha)}_\theta = \hat A$ for the \emph{Heisenberg-type}
-operator $\hat A = \sum_{x,y} J(x,y)\,\hat S_x \cdot \hat S_y$ (axes
-1, 2, 3 and the ladder $\hat S^{\pm}_{\rm tot}$). The fully general
-operator-level statement (any $\hat A$ satisfying eq.~(2.2.12) also
-satisfies eq.~(2.2.13)) is open. With eq.~(2.2.11) now proved
-unconditionally (no axioms), the missing ingredient is a generic
-\texttt{exp\_commute\_of\_commute} lifted to many-body operators.
+The fully general operator-level statement is now formalized as
+\texttt{totalSpinHalfRot\{1,2,3\}\_commute\_of\_commute}:
+$\mathrm{Commute}\,A\,\hat S^{(\alpha)}_{\rm tot}
+  \Rightarrow \mathrm{Commute}\,A\,\hat U^{(\alpha)}_{\theta,{\rm tot}}$.
+Combined with PR~\#16's Heisenberg-form
+\texttt{heisenbergHamiltonian\_commutator\_*}, this closes the
+commutativity side of P1f'''.
+
+The conjugation-form $(\hat U^{(\alpha)}_\theta)^\dagger \hat A
+\hat U^{(\alpha)}_\theta = \hat A$ requires unitarity of
+$\hat U^{(\alpha)}_{\theta,{\rm tot}}$, which in turn follows from
+$-i\theta\,\hat S^{(\alpha)}_{\rm tot}$ being skew-adjoint and
+\texttt{exp\_mem\_unitary\_of\_mem\_skewAdjoint}. Tracked as a
+follow-up unit.
 
 \section{Progress table}
 \label{sec:progress}
