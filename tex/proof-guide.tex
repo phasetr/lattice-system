@@ -1181,25 +1181,6 @@ units via $\hat S^{\pm}$ + a 9-element spanning theorem). The general
 $S \geq 1$ case requires generic \texttt{Fin\,(2S+1)} typing and a
 polymorphic Lagrange-interpolation infrastructure; not started.
 
-\subsection*{TODO: single-spin $\det\hat U^{(\alpha)}_\theta = 1$
-(deferred from PR \#21)}
-
-\textbf{Statement}: $\det\hat U^{(\alpha)}_\theta = 1$ for
-$\alpha \in \{1, 2, 3\}$ and $\theta \in \mathbb{R}$.
-
-\textbf{Status}: Mathematically a one-line Pythagorean computation
-$\cos^2(\theta/2) + \sin^2(\theta/2) = 1$. Lean-wise, the residual
-\texttt{linear\_combination} after \texttt{Matrix.det\_fin\_two}
-mixes \texttt{Complex.cos\,(↑θ\,/\,2)},
-\texttt{↑(Real.cos\,(θ/2))}, \texttt{↑2}, \texttt{(↑2)⁻¹} and
-\texttt{Complex.I\textasciicircum 2/4}; the Real-vs-Complex casting
-forces several rewrites that stymie \texttt{ring}. PR \#21 instead
-uses unitarity (membership in
-\texttt{unitary\,(Matrix\,\_\,\_\,$\mathbb{C}$)}), which suffices for
-downstream Problem 2.2.c. A future PR should prove
-\texttt{spinHalfRot\{1,2,3\}\_det\_eq\_one} and strengthen the
-membership to a true SU(2).
-
 \subsection*{TODO: Tasaki Problem 2.2.c}
 
 \textbf{Statement} (Tasaki p.23, eq.~(2.2.15)): An explicit averaged

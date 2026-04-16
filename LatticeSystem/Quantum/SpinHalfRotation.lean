@@ -227,6 +227,45 @@ theorem spinHalfRot3_unitary (θ : ℝ) :
     spinHalfRot3 θ * (spinHalfRot3 θ)ᴴ = 1 :=
   rotOf_mul_conjTranspose spinHalfOp3_isHermitian spinHalfOp3_mul_self θ
 
+/-! ## `Û^(α)_θ` has determinant 1 (preparation for SU2.lean)
+
+The closed-form rotation matrix has
+`det = cos²(θ/2) + sin²(θ/2) = 1` (Pythagorean identity, complex form).
+This makes `Û^(α)_θ` an element of `SU(2)` (the special unitary group),
+not just `U(2)`. -/
+
+/-- `det Û^(1)_θ = cos²(θ/2) + sin²(θ/2) = 1`. -/
+theorem spinHalfRot1_det_eq_one (θ : ℝ) : (spinHalfRot1 θ).det = 1 := by
+  unfold spinHalfRot1 rotOf spinHalfOp1
+  rw [Matrix.det_fin_two]
+  have hcs : Complex.cos ((θ : ℂ) / 2) ^ 2 + Complex.sin ((θ : ℂ) / 2) ^ 2 = 1 :=
+    Complex.cos_sq_add_sin_sq _
+  have hI : (Complex.I : ℂ) ^ 2 = -1 := Complex.I_sq
+  simp [pauliX, Complex.ofReal_cos, Complex.ofReal_sin, Complex.ofReal_div]
+  linear_combination hcs - (Complex.sin ((θ : ℂ) / 2)) ^ 2 * hI
+
+/-- `det Û^(2)_θ = 1`. The pauliY case has an extra `I^4` term in the
+expansion that we cancel using `(I^2 - 1) · sin² · hI`. -/
+theorem spinHalfRot2_det_eq_one (θ : ℝ) : (spinHalfRot2 θ).det = 1 := by
+  unfold spinHalfRot2 rotOf spinHalfOp2
+  rw [Matrix.det_fin_two]
+  have hcs : Complex.cos ((θ : ℂ) / 2) ^ 2 + Complex.sin ((θ : ℂ) / 2) ^ 2 = 1 :=
+    Complex.cos_sq_add_sin_sq _
+  have hI : (Complex.I : ℂ) ^ 2 = -1 := Complex.I_sq
+  simp [pauliY, Complex.ofReal_cos, Complex.ofReal_sin, Complex.ofReal_div]
+  linear_combination hcs +
+    (Complex.sin ((θ : ℂ) / 2)) ^ 2 * (Complex.I ^ 2 - 1) * hI
+
+/-- `det Û^(3)_θ = 1`. -/
+theorem spinHalfRot3_det_eq_one (θ : ℝ) : (spinHalfRot3 θ).det = 1 := by
+  unfold spinHalfRot3 rotOf spinHalfOp3
+  rw [Matrix.det_fin_two]
+  have hcs : Complex.cos ((θ : ℂ) / 2) ^ 2 + Complex.sin ((θ : ℂ) / 2) ^ 2 = 1 :=
+    Complex.cos_sq_add_sin_sq _
+  have hI : (Complex.I : ℂ) ^ 2 = -1 := Complex.I_sq
+  simp [pauliZ, Complex.ofReal_cos, Complex.ofReal_sin, Complex.ofReal_div]
+  linear_combination hcs - (Complex.sin ((θ : ℂ) / 2)) ^ 2 * hI
+
 /-! ## `Û^(α)_π`: the `π` rotation as `-2i · Ŝ^(α)` (Tasaki eq 2.1.26 at θ=π) -/
 
 private lemma rotOf_pi (S : Matrix (Fin 2) (Fin 2) ℂ) :

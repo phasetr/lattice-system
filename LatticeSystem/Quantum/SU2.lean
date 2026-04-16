@@ -3,44 +3,38 @@ Copyright (c) 2026 lattice-system contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.SpinHalfRotation
+import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 
 /-!
-# Single-spin rotation submonoid (Tasaki §2.2 Problem 2.2.c preparation)
+# `SU(2)` parametrization (Tasaki §2.2 Problem 2.2.c preparation)
 
-Bundles the **single-spin unitary group** `U(2)` of `2 × 2` complex
+Bundles the **special unitary group** `SU(2)` of `2 × 2` complex
 matrices, verifies that the spin-1/2 single-axis rotations
-`spinHalfRot{1,2,3} θ` (Tasaki eq. (2.1.26)) lie in `U(2)`, and
+`spinHalfRot{1,2,3} θ` (Tasaki eq. (2.1.26)) lie in `SU(2)`, and
 provides the forward Euler-angle parametrization
-`(φ, θ, ψ) ↦ Û^(3)_φ · Û^(2)_θ · Û^(3)_ψ ∈ U(2)` needed downstream
+`(φ, θ, ψ) ↦ Û^(3)_φ · Û^(2)_θ · Û^(3)_ψ ∈ SU(2)` needed downstream
 for the SU(2)-averaged-state characterization in Tasaki §2.2
 Problem 2.2.c (eq. (2.2.15)).
 
-## Notes on `U(2)` vs `SU(2)`
-
-Tasaki's spin-1/2 rotations actually lie in the *special* unitary
-group `SU(2)` (determinant 1). For the purposes of Problem 2.2.c the
-unitary structure is what is integrated against, and the
-det = 1 specialization is not strictly needed. We therefore work with
-the unitary submonoid `unitary (Matrix (Fin 2) (Fin 2) ℂ)` and
-defer the explicit `det = 1` proofs to a follow-up PR (the
-straightforward calculation is `cos²(θ/2) + sin²(θ/2) = 1` per axis,
-which is a Pythagorean identity but requires nontrivial
-Real-vs-Complex casting in Lean).
+`SU(2)` is bundled as a `Submonoid` of `Matrix (Fin 2) (Fin 2) ℂ`,
+intersection of `unitary` (`star U * U = 1 ∧ U * star U = 1`) with the
+condition `Matrix.det U = 1`. Multiplicativity of `det` makes the
+intersection a submonoid.
 
 ## Main definitions
 
-* `spinHalfEulerProduct φ θ ψ` — the Euler-angle product
-  `Û^(3)_φ · Û^(2)_θ · Û^(3)_ψ` as an element of
-  `Matrix (Fin 2) (Fin 2) ℂ`.
+* `SU2` — the submonoid of `Matrix (Fin 2) (Fin 2) ℂ` consisting of
+  unitary matrices with determinant `1`.
+* `spinHalfEulerProduct φ θ ψ` — the SU(2) element built from three
+  Euler angles via the Z-Y-Z decomposition.
 
 ## Main theorems
 
-* `spinHalfRot{1,2,3}_mem_unitary`: each axis rotation lies in
-  `unitary (Matrix (Fin 2) (Fin 2) ℂ)`.
-* `spinHalfEulerProduct_mem_unitary`: the Euler-angle product lies in
-  `unitary (Matrix (Fin 2) (Fin 2) ℂ)`.
+* `mem_SU2_iff` — membership unfolds to `unitary ∧ det = 1`.
+* `spinHalfRot{1,2,3}_mem_SU2` — each axis rotation lies in `SU(2)`.
+* `spinHalfEulerProduct_mem_SU2` — the Euler-angle product lies in `SU(2)`.
 
-The reverse direction (every `U(2)` element decomposes into Euler
+The reverse direction (every `SU(2)` element decomposes into Euler
 angles) is left to a future PR.
 -/
 
@@ -48,16 +42,26 @@ namespace LatticeSystem.Quantum
 
 open Matrix Complex
 
+/-- `SU(2)` as a submonoid of `Matrix (Fin 2) (Fin 2) ℂ`: unitary
+matrices with determinant `1`. -/
+def SU2 : Submonoid (Matrix (Fin 2) (Fin 2) ℂ) where
+  carrier := { U | U ∈ unitary (Matrix (Fin 2) (Fin 2) ℂ) ∧ Matrix.det U = 1 }
+  one_mem' := ⟨one_mem _, by simp⟩
+  mul_mem' := fun {U V} hU hV =>
+    ⟨mul_mem hU.1 hV.1, by rw [Matrix.det_mul, hU.2, hV.2, mul_one]⟩
+
+theorem mem_SU2_iff (U : Matrix (Fin 2) (Fin 2) ℂ) :
+    U ∈ SU2 ↔ U ∈ unitary (Matrix (Fin 2) (Fin 2) ℂ) ∧ Matrix.det U = 1 :=
+  Iff.rfl
+
 /-! ## Spin-1/2 rotations are unitary -/
 
 /-- `Û^(1)_θ ∈ unitary`. -/
 theorem spinHalfRot1_mem_unitary (θ : ℝ) :
     spinHalfRot1 θ ∈ unitary (Matrix (Fin 2) (Fin 2) ℂ) := by
   refine ⟨?_, ?_⟩
-  · -- star Û * Û = 1 ↔ Û · Ûᴴ = 1 (mul_eq_one_comm in matrix), and Û · Ûᴴ = 1 by spinHalfRot1_unitary.
-    rw [show star (spinHalfRot1 θ) = (spinHalfRot1 θ).conjTranspose from rfl,
+  · rw [show star (spinHalfRot1 θ) = (spinHalfRot1 θ).conjTranspose from rfl,
       spinHalfRot1_adjoint]
-    -- Now goal: Û_{-θ} * Û_θ = 1. Use group law Û_a · Û_b = Û_{a+b}.
     rw [spinHalfRot1_mul, neg_add_cancel, spinHalfRot1_zero]
   · rw [show star (spinHalfRot1 θ) = (spinHalfRot1 θ).conjTranspose from rfl]
     exact spinHalfRot1_unitary θ
@@ -82,10 +86,24 @@ theorem spinHalfRot3_mem_unitary (θ : ℝ) :
   · rw [show star (spinHalfRot3 θ) = (spinHalfRot3 θ).conjTranspose from rfl]
     exact spinHalfRot3_unitary θ
 
+/-! ## Spin-1/2 rotations are in SU(2) -/
+
+/-- `Û^(1)_θ ∈ SU(2)`. -/
+theorem spinHalfRot1_mem_SU2 (θ : ℝ) : spinHalfRot1 θ ∈ SU2 :=
+  ⟨spinHalfRot1_mem_unitary θ, spinHalfRot1_det_eq_one θ⟩
+
+/-- `Û^(2)_θ ∈ SU(2)`. -/
+theorem spinHalfRot2_mem_SU2 (θ : ℝ) : spinHalfRot2 θ ∈ SU2 :=
+  ⟨spinHalfRot2_mem_unitary θ, spinHalfRot2_det_eq_one θ⟩
+
+/-- `Û^(3)_θ ∈ SU(2)`. -/
+theorem spinHalfRot3_mem_SU2 (θ : ℝ) : spinHalfRot3 θ ∈ SU2 :=
+  ⟨spinHalfRot3_mem_unitary θ, spinHalfRot3_det_eq_one θ⟩
+
 /-! ## Forward Euler-angle parametrization -/
 
-/-- The unitary 2×2 matrix built from three Euler angles `(φ, θ, ψ)`
-via the standard Z–Y–Z decomposition: `Û^(3)_φ · Û^(2)_θ · Û^(3)_ψ`.
+/-- The SU(2) element built from three Euler angles `(φ, θ, ψ)` via
+the standard Z-Y-Z decomposition: `Û^(3)_φ · Û^(2)_θ · Û^(3)_ψ`.
 This is the parametrization used in Tasaki §2.2 Problem 2.2.c
 (eq. (2.2.15)). -/
 noncomputable def spinHalfEulerProduct (φ θ ψ : ℝ) :
@@ -98,5 +116,11 @@ theorem spinHalfEulerProduct_mem_unitary (φ θ ψ : ℝ) :
       unitary (Matrix (Fin 2) (Fin 2) ℂ) :=
   mul_mem (mul_mem (spinHalfRot3_mem_unitary φ) (spinHalfRot2_mem_unitary θ))
     (spinHalfRot3_mem_unitary ψ)
+
+/-- The Euler-angle product lies in `SU(2)`. -/
+theorem spinHalfEulerProduct_mem_SU2 (φ θ ψ : ℝ) :
+    spinHalfEulerProduct φ θ ψ ∈ SU2 :=
+  mul_mem (mul_mem (spinHalfRot3_mem_SU2 φ) (spinHalfRot2_mem_SU2 θ))
+    (spinHalfRot3_mem_SU2 ψ)
 
 end LatticeSystem.Quantum
