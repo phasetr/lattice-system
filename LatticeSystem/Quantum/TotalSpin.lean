@@ -794,4 +794,17 @@ noncomputable def onSiteRingHom (x : Λ) :
   map_zero' := onSite_zero x
   map_add' := fun A B => onSite_add x A B
 
+/-- `onSite x` as a `ℂ`-linear map. -/
+noncomputable def onSiteLinearMap (x : Λ) :
+    Matrix (Fin 2) (Fin 2) ℂ →ₗ[ℂ] ManyBodyOp Λ where
+  toFun := fun A => onSite x A
+  map_add' := fun A B => onSite_add x A B
+  map_smul' := fun c A => onSite_smul x c A
+
+/-- `onSite x` is continuous (as a ℂ-linear map between finite-dimensional
+normed spaces). -/
+theorem continuous_onSite (x : Λ) : Continuous (fun A : Matrix (Fin 2) (Fin 2) ℂ =>
+    (onSite x A : ManyBodyOp Λ)) :=
+  (onSiteLinearMap (Λ := Λ) x).continuous_of_finiteDimensional
+
 end LatticeSystem.Quantum
