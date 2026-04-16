@@ -1112,6 +1112,30 @@ formalization of Tasaki \S2.1 and \S2.2.
   \texttt{LinearMap.continuous\_of\_finiteDimensional}), and
   \texttt{Matrix.exp\_sum\_of\_commute} for the commuting site
   embeddings.
+\item \texttt{totalSpinHalfRot\{1,2,3\}\_commute\_of\_commute},
+  \texttt{totalSpinHalfOp\{Plus,Minus\}\_exp\_commute\_of\_commute}:
+  Tasaki eq.~(2.2.12)$\to$ commutativity with $\hat U$.
+  $\mathrm{Commute}\,A\,\hat S^{(\alpha)}_{\rm tot}
+    \Rightarrow \mathrm{Commute}\,A\,\hat U^{(\alpha)}_{\theta,{\rm tot}}$
+  (and its $\hat S^{\pm}_{\rm tot}$ ladder analogue). Proof: rewrite
+  $\hat U$ via \texttt{\_eq\_exp}, then invoke
+  \texttt{Commute.smul\_right} and \texttt{Commute.exp\_right}.
+\item \texttt{totalSpinHalfRot\{1,2,3\}\_conjTranspose\_mul\_self}:
+  unitarity $(\hat U^{(\alpha)}_{\theta,{\rm tot}})^\dagger
+  \hat U^{(\alpha)}_{\theta,{\rm tot}} = \hat 1$. Derived from
+  \texttt{NormedSpace.exp\_mem\_unitary\_of\_mem\_skewAdjoint} after
+  recognising $-i\theta\,\hat S^{(\alpha)}_{\rm tot}$ as skew-adjoint
+  (the helper \texttt{neg\_I\_mul\_real\_skewAdjoint\_smul\_isHermitian}).
+  Same Frobenius topology bridge with explicit \texttt{@}-notation as
+  \texttt{onSite\_exp\_eq\_exp\_onSite}.
+\item \texttt{totalSpinHalfRot\{1,2,3\}\_conj\_eq\_self\_of\_commute}:
+  Tasaki eq.~(2.2.13) finite form,
+  $\mathrm{Commute}\,A\,\hat S^{(\alpha)}_{\rm tot}
+    \Rightarrow (\hat U^{(\alpha)}_{\theta,{\rm tot}})^\dagger\,A\,
+    \hat U^{(\alpha)}_{\theta,{\rm tot}} = A$. Combines
+  \texttt{\_commute\_of\_commute} and \texttt{\_conjTranspose\_mul\_self}
+  via standard $\hat U^\dagger A \hat U = \hat U^\dagger \hat U A
+  = A$.
 \end{itemize}
 
 \section{Open items / TODO and axioms}
@@ -1194,15 +1218,17 @@ for a future infrastructure PR.
 
 \subsection*{Roadmap status note: P1f''' (eqs.~(2.2.12)--(2.2.13))}
 
-The Lean development proves $[\hat A, \hat S^{(\alpha)}_{\rm tot}] = 0$
-and the corresponding finite-form $(\hat U^{(\alpha)}_\theta)^\dagger
-\hat A \hat U^{(\alpha)}_\theta = \hat A$ for the \emph{Heisenberg-type}
-operator $\hat A = \sum_{x,y} J(x,y)\,\hat S_x \cdot \hat S_y$ (axes
-1, 2, 3 and the ladder $\hat S^{\pm}_{\rm tot}$). The fully general
-operator-level statement (any $\hat A$ satisfying eq.~(2.2.12) also
-satisfies eq.~(2.2.13)) is open. With eq.~(2.2.11) now proved
-unconditionally (no axioms), the missing ingredient is a generic
-\texttt{exp\_commute\_of\_commute} lifted to many-body operators.
+The fully general operator-level statement is now formalised in
+three pieces:
+\texttt{totalSpinHalfRot\{1,2,3\}\_commute\_of\_commute}
+($\mathrm{Commute}\,A\,\hat S^{(\alpha)}_{\rm tot}
+  \Rightarrow \mathrm{Commute}\,A\,\hat U^{(\alpha)}_{\theta,{\rm tot}}$),
+\texttt{totalSpinHalfRot\{1,2,3\}\_conjTranspose\_mul\_self}
+(unitarity $\hat U^\dagger\hat U = \hat 1$, via
+\texttt{exp\_mem\_unitary\_of\_mem\_skewAdjoint}), and
+\texttt{totalSpinHalfRot\{1,2,3\}\_conj\_eq\_self\_of\_commute}
+(the Tasaki~(2.2.13) finite form, combination of the previous two).
+P1f''' is now fully closed without axioms.
 
 \section{Progress table}
 \label{sec:progress}
