@@ -852,4 +852,39 @@ theorem totalSpinHalfRot3Pi_two_site :
   simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
     Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
 
+/-! ## Two-spin explicit total general-θ rotation -/
+
+/-- For two sites, the total `θ`-rotation about axis 1 factors as the
+product over site 0 and site 1. -/
+theorem totalSpinHalfRot1_two_site (θ : ℝ) :
+    totalSpinHalfRot1 (Fin 2) θ =
+      onSite (0 : Fin 2) (spinHalfRot1 θ) *
+        onSite (1 : Fin 2) (spinHalfRot1 θ) := by
+  unfold totalSpinHalfRot1
+  show ((Finset.univ : Finset (Fin 2)).noncommProd _ _ : ManyBodyOp (Fin 2)) = _
+  simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
+    Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
+
+/-- For two sites, the total `θ`-rotation about axis 2 factors as the
+product over site 0 and site 1. -/
+theorem totalSpinHalfRot2_two_site (θ : ℝ) :
+    totalSpinHalfRot2 (Fin 2) θ =
+      onSite (0 : Fin 2) (spinHalfRot2 θ) *
+        onSite (1 : Fin 2) (spinHalfRot2 θ) := by
+  unfold totalSpinHalfRot2
+  show ((Finset.univ : Finset (Fin 2)).noncommProd _ _ : ManyBodyOp (Fin 2)) = _
+  simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
+    Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
+
+/-- For two sites, the total `θ`-rotation about axis 3 factors as the
+product over site 0 and site 1. -/
+theorem totalSpinHalfRot3_two_site (θ : ℝ) :
+    totalSpinHalfRot3 (Fin 2) θ =
+      onSite (0 : Fin 2) (spinHalfRot3 θ) *
+        onSite (1 : Fin 2) (spinHalfRot3 θ) := by
+  unfold totalSpinHalfRot3
+  show ((Finset.univ : Finset (Fin 2)).noncommProd _ _ : ManyBodyOp (Fin 2)) = _
+  simp [show (Finset.univ : Finset (Fin 2)) = insert 0 {1} from by decide,
+    Finset.noncommProd_insert_of_notMem, Finset.noncommProd_singleton]
+
 end LatticeSystem.Quantum
