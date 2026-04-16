@@ -895,4 +895,20 @@ theorem spinHalfRot1_eq_hadamard_conj (θ : ℝ) :
     mul_smul_comm, smul_mul_assoc, hadamard_mul_self,
     hadamard_mul_spinHalfOp3_mul_hadamard]
 
+/-- Problem 2.1.b for axis 1: `Û^(1)_θ = exp(-iθ Ŝ^(1))`.
+Derived from the axis-3 case via Hadamard conjugation
+(`Matrix.exp_conj`). -/
+theorem spinHalfRot1_eq_exp (θ : ℝ) :
+    spinHalfRot1 θ =
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • spinHalfOp1) := by
+  rw [spinHalfRot1_eq_hadamard_conj, spinHalfRot3_eq_exp]
+  have hU : IsUnit hadamard := IsUnit.of_mul_eq_one hadamard hadamard_mul_self
+  have hWinv : hadamard⁻¹ = hadamard :=
+    Matrix.inv_eq_left_inv hadamard_mul_self
+  rw [show (-(Complex.I * (θ : ℂ))) • spinHalfOp1 =
+      hadamard * ((-(Complex.I * (θ : ℂ))) • spinHalfOp3) * hadamard⁻¹ from by
+    rw [hWinv, mul_smul_comm, smul_mul_assoc,
+      hadamard_mul_spinHalfOp3_mul_hadamard]]
+  rw [Matrix.exp_conj _ _ hU, hWinv]
+
 end LatticeSystem.Quantum
