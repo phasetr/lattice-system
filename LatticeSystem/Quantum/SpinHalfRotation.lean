@@ -842,11 +842,25 @@ theorem spinHalfRot3_commute_spinHalfOp3_smul (θ : ℝ) (v3 : ℂ) :
 /-! ## Hadamard matrix (basis change between σ^x and σ^z) -/
 
 /-- The Hadamard matrix `W = (1/√2)·!![1, 1; 1, -1]`. It satisfies
-`W * W = 1` and `W * σ^x * W = σ^z` (equivalently
-`W * Ŝ^(1) * W = Ŝ^(3)`). These identities provide the basis change
-that, together with `Matrix.exp_units_conj`, would extend Problem 2.1.b
-to axes 1 and 2. -/
+`W * W = 1` and `W * Ŝ^(1) * W = Ŝ^(3)`. These identities provide the
+basis change that, with `Matrix.exp_units_conj`, would extend
+Problem 2.1.b to axes 1 and 2. -/
 noncomputable def hadamard : Matrix (Fin 2) (Fin 2) ℂ :=
   ((Real.sqrt 2 : ℂ)⁻¹) • !![1, 1; 1, -1]
+
+private lemma sqrt2_inv_mul_sqrt2_inv :
+    ((Real.sqrt 2 : ℂ)⁻¹) * ((Real.sqrt 2 : ℂ)⁻¹) = (1 / 2 : ℂ) := by
+  rw [← mul_inv, ← Complex.ofReal_mul,
+    Real.mul_self_sqrt (by norm_num : (0:ℝ) ≤ 2)]
+  push_cast; ring
+
+/-- `W · W = 1` (the Hadamard matrix is its own inverse). -/
+theorem hadamard_mul_self : hadamard * hadamard = 1 := by
+  unfold hadamard
+  rw [Matrix.smul_mul, Matrix.mul_smul, smul_smul,
+    sqrt2_inv_mul_sqrt2_inv]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    first | (simp; norm_num) | simp
 
 end LatticeSystem.Quantum
