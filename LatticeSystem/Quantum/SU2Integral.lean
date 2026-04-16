@@ -55,4 +55,72 @@ theorem integral_sin_two_pi_pi :
   rw [intervalIntegral.integral_const]
   simp [smul_eq_mul]; ring
 
+/-! ## Half-angle integrals for the θ component of Problem 2.2.c
+
+`sin θ cos²(θ/2) = (sin θ + sin θ cos θ) / 2 = (sin θ) / 2 + (sin 2θ) / 4`
+and similarly for `sin²(θ/2)`. Integrated over `[0, π]`, the `sin 2θ`
+term vanishes and the `sin θ` term gives 1 for each. -/
+
+/-- `∫ θ in 0..π, sin θ · cos θ = 0`. Antiderivative: `sin²(θ)/2`. -/
+theorem integral_sin_mul_cos_zero_pi :
+    ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ * Real.cos θ = 0 := by
+  have key : ∀ x ∈ Set.uIcc (0 : ℝ) Real.pi,
+      HasDerivAt (fun x => (Real.sin x) ^ 2 / 2) (Real.sin x * Real.cos x) x := by
+    intros x _
+    have h := (Real.hasDerivAt_sin x).pow 2
+    convert h.div_const 2 using 1
+    ring
+  have hint : IntervalIntegrable (fun x => Real.sin x * Real.cos x)
+      MeasureTheory.volume 0 Real.pi :=
+    (Real.continuous_sin.mul Real.continuous_cos).intervalIntegrable _ _
+  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt key hint]
+  simp [Real.sin_pi, Real.sin_zero]
+
+/-- `∫ θ in 0..π, sin θ · cos²(θ/2) = 1`. Uses the half-angle identity
+`cos²(θ/2) = (1 + cos θ) / 2` and the vanishing of `∫ sin θ cos θ`. -/
+theorem integral_sin_mul_cos_sq_half_zero_pi :
+    ∫ θ in (0 : ℝ)..Real.pi,
+      Real.sin θ * Real.cos (θ / 2) ^ 2 = 1 := by
+  have hid : ∀ θ : ℝ, Real.sin θ * Real.cos (θ / 2) ^ 2 =
+      (1 / 2) * Real.sin θ + (1 / 2) * (Real.sin θ * Real.cos θ) := by
+    intro θ
+    have hcos : Real.cos θ = 2 * Real.cos (θ / 2) ^ 2 - 1 := by
+      have h := Real.cos_two_mul (θ / 2)
+      rwa [show 2 * (θ / 2) = θ from by ring] at h
+    linear_combination -(1 / 2) * Real.sin θ * hcos
+  conv_lhs => arg 1; ext θ; rw [hid θ]
+  have h1 : IntervalIntegrable (fun θ => (1/2 : ℝ) * Real.sin θ) MeasureTheory.volume 0 Real.pi :=
+    (Real.continuous_sin.const_mul _).intervalIntegrable _ _
+  have h2 : IntervalIntegrable (fun θ => (1/2 : ℝ) * (Real.sin θ * Real.cos θ))
+      MeasureTheory.volume 0 Real.pi :=
+    ((Real.continuous_sin.mul Real.continuous_cos).const_mul _).intervalIntegrable _ _
+  rw [intervalIntegral.integral_add h1 h2,
+      intervalIntegral.integral_const_mul, intervalIntegral.integral_const_mul,
+      integral_sin_zero_pi, integral_sin_mul_cos_zero_pi]
+  ring
+
+/-- `∫ θ in 0..π, sin θ · sin²(θ/2) = 1`. Uses the half-angle identity
+`sin²(θ/2) = (1 - cos θ) / 2`. -/
+theorem integral_sin_mul_sin_sq_half_zero_pi :
+    ∫ θ in (0 : ℝ)..Real.pi,
+      Real.sin θ * Real.sin (θ / 2) ^ 2 = 1 := by
+  have hid : ∀ θ : ℝ, Real.sin θ * Real.sin (θ / 2) ^ 2 =
+      (1 / 2) * Real.sin θ - (1 / 2) * (Real.sin θ * Real.cos θ) := by
+    intro θ
+    have hcos : Real.cos θ = 1 - 2 * Real.sin (θ / 2) ^ 2 := by
+      have h := Real.cos_two_mul' (θ / 2)
+      rw [show 2 * (θ / 2) = θ from by ring] at h
+      linear_combination h + Real.sin_sq_add_cos_sq (θ / 2)
+    linear_combination (1 / 2) * Real.sin θ * hcos
+  conv_lhs => arg 1; ext θ; rw [hid θ]
+  have h1 : IntervalIntegrable (fun θ => (1/2 : ℝ) * Real.sin θ) MeasureTheory.volume 0 Real.pi :=
+    (Real.continuous_sin.const_mul _).intervalIntegrable _ _
+  have h2 : IntervalIntegrable (fun θ => (1/2 : ℝ) * (Real.sin θ * Real.cos θ))
+      MeasureTheory.volume 0 Real.pi :=
+    ((Real.continuous_sin.mul Real.continuous_cos).const_mul _).intervalIntegrable _ _
+  rw [intervalIntegral.integral_sub h1 h2,
+      intervalIntegral.integral_const_mul, intervalIntegral.integral_const_mul,
+      integral_sin_zero_pi, integral_sin_mul_cos_zero_pi]
+  ring
+
 end LatticeSystem.Quantum
