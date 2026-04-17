@@ -783,17 +783,17 @@ Combined with the all-up/all-down statements, this exhausts the
 `Ŝ_tot²` spectrum of two spin-1/2 particles. -/
 
 /-- The two-site `↑↓` configuration (anti-parallel: site 0 up, site 1 down). -/
-private def upDown : Fin 2 → Fin 2
+def upDown : Fin 2 → Fin 2
   | 0 => 0
   | 1 => 1
 
-private lemma upDown_zero : upDown 0 = 0 := rfl
-private lemma upDown_one : upDown 1 = 1 := rfl
+lemma upDown_zero : upDown 0 = 0 := rfl
+lemma upDown_one : upDown 1 = 1 := rfl
 
-private lemma upDown_antiparallel : upDown 0 ≠ upDown 1 := by
+lemma upDown_antiparallel : upDown 0 ≠ upDown 1 := by
   rw [upDown_zero, upDown_one]; exact zero_ne_one
 
-private lemma basisSwap_upDown :
+lemma basisSwap_upDown :
     basisSwap upDown (0 : Fin 2) 1 = fun (i : Fin 2) =>
       match i with | 0 => 1 | 1 => 0 := by
   funext i

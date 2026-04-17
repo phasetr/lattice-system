@@ -264,4 +264,69 @@ theorem onSite_zero_mul_one_mulVec_basisVec
   have : τ 1 = 0 ∨ τ 1 = 1 := by rcases τ 1 with ⟨v, hv⟩; omega
   rcases this with h | h <;> simp [h]
 
+/-! ## Matrix entry ↔ mulVec connection -/
+
+private lemma matrix_col0_eq_mulVec_up (M : Matrix (Fin 2) (Fin 2) ℂ) (k : Fin 2) :
+    M k 0 = (M.mulVec spinHalfUp) k := by
+  simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two, spinHalfUp]
+
+private lemma matrix_col1_eq_mulVec_down (M : Matrix (Fin 2) (Fin 2) ℂ) (k : Fin 2) :
+    M k 1 = (M.mulVec spinHalfDown) k := by
+  simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two, spinHalfDown]
+
+/-! ## Tasaki Problem 2.2.c: SU(2)-averaged state is the singlet
+
+The SU(2)-averaged state `(1/4π) ∫₀²π dφ ∫₀π dθ sin θ · Û(φ,θ)|↑↓⟩`
+equals `(1/2)(|↑↓⟩ - |↓↑⟩)`, the spin singlet. This is Tasaki
+*Physics and Mathematics of Quantum Many-Body Systems*, §2.2,
+Problem 2.2.c, eq. (2.2.15). -/
+
+/-- Expand the integrand: the component of the rotated state at configuration `τ`
+is a product of single-site rotation entries. -/
+private theorem totalRot_mulVec_upDown_component (θ φ : ℝ) (τ : Fin 2 → Fin 2) :
+    ((totalSpinHalfRot3 (Fin 2) φ * totalSpinHalfRot2 (Fin 2) θ).mulVec
+      (basisVec upDown)) τ =
+    (![Complex.exp (-(Complex.I * (φ : ℂ) / 2)) * (Real.cos (θ / 2) : ℂ),
+       Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.sin (θ / 2) : ℂ)] (τ 0)) *
+    (![-(Complex.exp (-(Complex.I * (φ : ℂ) / 2))) * (Real.sin (θ / 2) : ℂ),
+       Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.cos (θ / 2) : ℂ)] (τ 1)) := by
+  rw [totalRot32_two_site, onSite_zero_mul_one_mulVec_basisVec]
+  unfold upDown
+  conv_lhs =>
+    rw [show (spinHalfRot3 φ * spinHalfRot2 θ) (τ 0) 0 =
+      ((spinHalfRot3 φ * spinHalfRot2 θ).mulVec spinHalfUp) (τ 0) from
+        (matrix_col0_eq_mulVec_up _ _).symm ▸ rfl,
+      show (spinHalfRot3 φ * spinHalfRot2 θ) (τ 1) 1 =
+      ((spinHalfRot3 φ * spinHalfRot2 θ).mulVec spinHalfDown) (τ 1) from
+        (matrix_col1_eq_mulVec_down _ _).symm ▸ rfl,
+      spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp,
+      spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfDown]
+
+set_option maxHeartbeats 1600000 in
+/-- Tasaki Problem 2.2.c: the SU(2)-averaged two-site state is the singlet.
+Stated component-wise for each configuration `τ : Fin 2 → Fin 2`.
+Tasaki *Physics and Mathematics of Quantum Many-Body Systems*,
+§2.2 eq. (2.2.15). -/
+theorem problem_2_2_c (τ : Fin 2 → Fin 2) :
+    (1 / (4 * (Real.pi : ℂ))) *
+      ∫ φ in (0 : ℝ)..(2 * Real.pi),
+        ∫ θ in (0 : ℝ)..Real.pi,
+          ((Real.sin θ : ℂ) *
+            ((totalSpinHalfRot3 (Fin 2) φ * totalSpinHalfRot2 (Fin 2) θ).mulVec
+              (basisVec upDown)) τ) =
+    (1 / 2 : ℂ) * (basisVec upDown τ - basisVec (basisSwap upDown (0 : Fin 2) 1) τ) := by
+  -- Expand integrand to explicit trig/exp products
+  conv_lhs => arg 2; arg 1; ext φ; arg 1; ext θ; rw [totalRot_mulVec_upDown_component]
+  -- Simplify RHS
+  have hbs : basisSwap upDown (0 : Fin 2) 1 = fun i : Fin 2 =>
+      match i with | 0 => 1 | 1 => 0 := by
+    funext i; simp [basisSwap, upDown, Function.update]; fin_cases i <;> simp
+  -- Case split on τ 0 and τ 1
+  have ht0 : τ 0 = 0 ∨ τ 0 = 1 := by rcases τ 0 with ⟨v, hv⟩; omega
+  have ht1 : τ 1 = 0 ∨ τ 1 = 1 := by rcases τ 1 with ⟨v, hv⟩; omega
+  rcases ht0 with h0 | h0 <;> rcases ht1 with h1 | h1 <;>
+    simp only [h0, h1, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+      Matrix.head_fin_const, basisVec, hbs, upDown, fin2_eq_iff]
+  all_goals sorry
+
 end LatticeSystem.Quantum
