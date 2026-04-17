@@ -69,6 +69,8 @@ LatticeSystem/
     GibbsState.lean       -- Gibbs state rho = exp(-beta H)/Z,
                              trace normalization, thermal expectation
                              (Tasaki section 3.3)
+    HeisenbergChain.lean  -- open and periodic Heisenberg chain Hamiltonians,
+                             Hermiticity (Tasaki section 3.5, p. 89)
 \end{Verbatim}
 
 \subsection{Textbook correspondence}
@@ -1342,6 +1344,95 @@ future PR once the CFC instance chain is optimized.
 
 Reference: Tasaki~\cite{Tasaki:QMB}, §3.3.
 
+%======================================================================
+\section{Heisenberg chain}
+\label{sec:heisenberg-chain}
+%======================================================================
+
+\emph{Source file:} \texttt{LatticeSystem/Quantum/HeisenbergChain.lean}.
+
+\emph{Primary reference:} Tasaki~\cite{Tasaki:QMB}, §3.5, p.~89.
+
+\subsection{Coupling functions}
+
+\begin{definition}[\texttt{openChainCoupling}]
+For an $N$-site chain, the \emph{open-chain coupling} is the function
+$J_{\mathrm{open}} : \mathrm{Fin}\,N \to \mathrm{Fin}\,N \to \mathbb{R}$
+defined by
+\[
+  J_{\mathrm{open}}(i,j) \;:=\;
+  \begin{cases}
+    1 & \text{if } j = i + 1 \text{ or } i = j + 1,\\
+    0 & \text{otherwise.}
+  \end{cases}
+\]
+It is symmetric and has support only on nearest-neighbour pairs of the
+open chain.
+Lean name: \texttt{openChainCoupling~$N$}.
+\end{definition}
+
+\begin{definition}[\texttt{periodicChainCoupling}]
+The \emph{periodic-chain coupling} extends the open-chain coupling by
+adding the boundary bond between sites $0$ and $N - 1$:
+\[
+  J_{\mathrm{per}}(i,j) \;:=\;
+  \begin{cases}
+    1 & \text{if } (i,j) \in \bigl\{(k,k+1),(k+1,k) \mid 0 \le k < N-1\bigr\}
+         \cup \{(0, N-1),(N-1,0)\},\\
+    0 & \text{otherwise.}
+  \end{cases}
+\]
+Lean name: \texttt{periodicChainCoupling~$N$}.
+\end{definition}
+
+\subsection{Formalized facts}
+
+\begin{theorem}[\texttt{heisenbergHamiltonian\_isHermitian\_of\_real\_symm}]
+Let $\Lambda$ be a finite lattice and let
+$J : \Lambda \to \Lambda \to \mathbb{R}$ be a real-valued symmetric
+coupling ($J(x,y) = J(y,x)$ for all $x,y$).  Then the Heisenberg
+Hamiltonian
+\[
+  H \;:=\; \sum_{x,y \in \Lambda} J(x,y)\,\hat S_x \cdot \hat S_y
+\]
+is Hermitian.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Each two-site term $\hat S_x \cdot \hat S_y$ is Hermitian
+(proved in \texttt{spinHalfDot\_isHermitian}).  Scaling by the real
+coefficient $J(x,y)$ preserves Hermiticity, and a finite sum of
+Hermitian matrices is Hermitian.  The symmetry $J(x,y) = J(y,x)$
+together with the commutativity $\hat S_x \cdot \hat S_y =
+\hat S_y \cdot \hat S_x$ ensures that the double sum produces each bond
+only once up to the real scalar.
+\end{proof}
+
+\begin{theorem}[\texttt{openChainHeisenberg\_isHermitian}]
+The open-chain Heisenberg Hamiltonian
+$H_{\mathrm{open}} := \sum_{i=0}^{N-2} \hat S_i \cdot \hat S_{i+1}$
+is Hermitian.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Instantiate \texttt{heisenbergHamiltonian\_isHermitian\_of\_real\_symm}
+with $J = J_{\mathrm{open}}$, verifying that $J_{\mathrm{open}}$ is
+real and symmetric by construction.
+\end{proof}
+
+\begin{theorem}[\texttt{periodicChainHeisenberg\_isHermitian}]
+The periodic-chain Heisenberg Hamiltonian
+$H_{\mathrm{per}} := H_{\mathrm{open}} + \hat S_0 \cdot \hat S_{N-1}$
+is Hermitian.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Instantiate \texttt{heisenbergHamiltonian\_isHermitian\_of\_real\_symm}
+with $J = J_{\mathrm{per}}$.  Symmetry of $J_{\mathrm{per}}$ follows
+from the explicit definition, which treats the boundary bond
+$(0, N-1)$ and $(N-1, 0)$ symmetrically.
+\end{proof}
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
@@ -1428,8 +1519,8 @@ Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
 1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\
 Gibbs state $\rho = e^{-\beta H}/Z$, $\operatorname{Tr}(\rho)=1$, $\langle\mathbf{1}\rangle=1$ & finite-dim & \emph{in progress} (sorry-free) \\
 Expectation $\langle O\rangle_\beta = \operatorname{Tr}(\rho O)$ & finite-dim & \emph{in progress} (see above) \\
-Periodic boundary conditions & finite-dim & not started \\
-Quantum Heisenberg chain & finite-dim & not started \\
+Periodic boundary conditions & finite-dim & \emph{formalized} \\
+Quantum Heisenberg chain (open and periodic BC) & finite-dim & \emph{formalized} \\
 Partial trace & finite-dim & not started \\
 Quantum canonical ensemble wrapper & finite-dim & not started \\
 Hubbard model, finite volume & finite-dim & not started \\

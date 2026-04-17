@@ -53,7 +53,7 @@ CAR algebras, and eventually lattice QCD.
 | P1f''''' (Tasaki §2.2) | SU(2) invariance of `Ŝ_x · Ŝ_y` and eigenvalues (eqs. (2.2.17)–(2.2.19)) | Done |
 | P1f-2c (Tasaki §2.2 Problem 2.2.c) | SU(2)-averaged two-site state = singlet projector (eq. (2.2.15)); integration over Euler angles `φ ∈ [0,2π]`, `θ ∈ [0,π]` | Done |
 | P1g | Gibbs state `ρ = e^{-βH}/Z`, `Tr(ρ) = 1`, `⟨1⟩ = 1` (`partitionFn_ne_zero` deferred due to CFC timeout) | In progress (sorry-free) |
-| P1h | Periodic boundary conditions, other quantum chains (Heisenberg) | Not started |
+| P1h | Periodic boundary conditions, Heisenberg chain (open and periodic BC) | Done |
 | P2 | Finite-volume Hubbard / BCS | Not started |
 | P3 | CAR algebras, quasi-local C*-algebras, KMS states | Not started |
 | P4 | Thermodynamic limit, phase transitions | Not started |
@@ -391,6 +391,19 @@ module are fully proved.
 | `gibbsState_isHermitian` | `ρ` is Hermitian | `Quantum/GibbsState.lean` |
 | `gibbsExpectation β H O` | `⟨O⟩ := Matrix.trace (ρ * O)` | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_one` | `⟨1⟩ = 1` | `Quantum/GibbsState.lean` |
+
+### Heisenberg chain (Tasaki §3.5)
+
+Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, §3.5, p. 89.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `openChainCoupling N` | coupling function `J : Fin N → Fin N → ℝ` for the open chain: `J i (i+1) = J (i+1) i = 1`, zero otherwise | `Quantum/HeisenbergChain.lean` |
+| `periodicChainCoupling N` | coupling function for the periodic chain: open-chain bonds plus `J 0 (N-1) = J (N-1) 0 = 1` | `Quantum/HeisenbergChain.lean` |
+| `heisenbergHamiltonian_isHermitian_of_real_symm` | for any real symmetric coupling `J` the Heisenberg Hamiltonian `H = Σ_{x,y} J(x,y) Ŝ_x · Ŝ_y` is Hermitian | `Quantum/HeisenbergChain.lean` |
+| `openChainHeisenberg_isHermitian` | specialization: the open-chain Heisenberg Hamiltonian is Hermitian | `Quantum/HeisenbergChain.lean` |
+| `periodicChainHeisenberg_isHermitian` | specialization: the periodic-chain Heisenberg Hamiltonian is Hermitian | `Quantum/HeisenbergChain.lean` |
 
 ## Open items / axioms
 
