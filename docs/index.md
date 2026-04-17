@@ -52,7 +52,7 @@ CAR algebras, and eventually lattice QCD.
 | P1f'''' (Tasaki §2.2) | Two-site inner product `Ŝ_x · Ŝ_y` raising/lowering decomposition (eq. (2.2.16)) | Done |
 | P1f''''' (Tasaki §2.2) | SU(2) invariance of `Ŝ_x · Ŝ_y` and eigenvalues (eqs. (2.2.17)–(2.2.19)) | Done |
 | P1f-2c (Tasaki §2.2 Problem 2.2.c) | SU(2)-averaged two-site state = singlet projector (eq. (2.2.15)); integration over Euler angles `φ ∈ [0,2π]`, `θ ∈ [0,π]` | Done |
-| P1g | Gibbs state `ρ = e^{-βH}/Z`, expectation `⟨O⟩_β = Tr(ρO)` | Not started |
+| P1g | Gibbs state `ρ = e^{-βH}/Z`, `Tr(ρ) = 1`, `⟨1⟩ = 1` (`partitionFn_ne_zero` deferred due to CFC timeout) | In progress (sorry-free) |
 | P1h | Periodic boundary conditions, other quantum chains (Heisenberg) | Not started |
 | P2 | Finite-volume Hubbard / BCS | Not started |
 | P3 | CAR algebras, quasi-local C*-algebras, KMS states | Not started |
@@ -371,6 +371,26 @@ explicit bond coupling `J`.
 |---|---|---|
 | `quantumIsingHamiltonian N J h` | `H = -J Σ σ^z_i σ^z_{i+1} - h Σ σ^x_i` | `Quantum/IsingChain.lean` |
 | `quantumIsingHamiltonian_isHermitian` | `H` is Hermitian for real `J`, `h` | `Quantum/IsingChain.lean` |
+
+### Gibbs state (Tasaki §3.3)
+
+Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, §3.3.
+
+**Note**: One `sorry` remains for `partitionFn_ne_zero` (Z ≠ 0); that
+step requires CFC assembly not yet available. All other theorems in this
+module are fully proved.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `gibbsExp β H` | `exp(-βH) := Matrix.exp (-β • H)` | `Quantum/GibbsState.lean` |
+| `gibbsExp_isHermitian` | `exp(-βH)` is Hermitian (when `H` is Hermitian) | `Quantum/GibbsState.lean` |
+| `partitionFn β H` | `Z := Matrix.trace (exp(-βH))` | `Quantum/GibbsState.lean` |
+| `gibbsState β H` | `ρ := (1/Z) • exp(-βH)` | `Quantum/GibbsState.lean` |
+| `gibbsState_trace` | `Tr(ρ) = 1` | `Quantum/GibbsState.lean` |
+| `gibbsState_isHermitian` | `ρ` is Hermitian | `Quantum/GibbsState.lean` |
+| `gibbsExpectation β H O` | `⟨O⟩ := Matrix.trace (ρ * O)` | `Quantum/GibbsState.lean` |
+| `gibbsExpectation_one` | `⟨1⟩ = 1` | `Quantum/GibbsState.lean` |
 
 ## Open items / axioms
 

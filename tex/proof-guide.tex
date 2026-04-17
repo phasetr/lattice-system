@@ -66,6 +66,9 @@ LatticeSystem/
     ManyBody.lean         -- multi-site operator space, onSite embedding,
                              commutativity at distinct sites
     IsingChain.lean       -- 1D open-chain quantum Ising Hamiltonian
+    GibbsState.lean       -- Gibbs state rho = exp(-beta H)/Z,
+                             trace normalization, thermal expectation
+                             (Tasaki section 3.3)
 \end{Verbatim}
 
 \subsection{Textbook correspondence}
@@ -1249,6 +1252,96 @@ formalization of Tasaki \S2.1 and \S2.2.
   eq.~(2.2.15), p.~24.
 \end{itemize}
 
+%======================================================================
+\section{Gibbs state (Tasaki §3.3, pp.\,75--78)}
+\label{sec:gibbs}
+%======================================================================
+
+\emph{Source file:} \texttt{LatticeSystem/Quantum/GibbsState.lean}.
+
+\subsection{Definitions}
+
+Let $n \in \mathbb{N}$ and let $H \in M_n(\mathbb{C})$ be a Hermitian matrix
+(the Hamiltonian). Fix an inverse temperature $\beta \in \mathbb{R}$.
+
+\begin{definition}[\texttt{gibbsExp}]
+The \emph{Gibbs exponential} is
+\[
+  e^{-\beta H} \;:=\; \exp(-\beta H)
+  \;\in\; M_n(\mathbb{C}),
+\]
+computed via the matrix exponential \texttt{Matrix.exp} applied to
+$-\beta \cdot H$.
+\end{definition}
+
+\begin{definition}[\texttt{partitionFn}]
+The \emph{partition function} is
+\[
+  Z \;:=\; \operatorname{Tr}(e^{-\beta H}).
+\]
+Lean name: \texttt{partitionFn~$\beta$~$H$}.
+\end{definition}
+
+\begin{definition}[\texttt{gibbsState}]
+The \emph{Gibbs state} (density matrix) is
+\[
+  \rho \;:=\; \frac{1}{Z}\,e^{-\beta H}.
+\]
+Lean name: \texttt{gibbsState~$\beta$~$H$}.
+\end{definition}
+
+\begin{definition}[\texttt{gibbsExpectation}]
+The \emph{thermal expectation value} of an observable $O \in M_n(\mathbb{C})$
+is
+\[
+  \langle O \rangle_\beta \;:=\; \operatorname{Tr}(\rho\, O).
+\]
+Lean name: \texttt{gibbsExpectation~$\beta$~$H$~$O$}.
+\end{definition}
+
+\subsection{Formalized facts}
+
+\begin{lemma}[\texttt{gibbsExp\_isHermitian}]
+If $H$ is Hermitian then $e^{-\beta H}$ is Hermitian.
+\end{lemma}
+
+\begin{lemma}[\texttt{gibbsState\_trace}]
+$\operatorname{Tr}(\rho) = 1$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+By linearity of the trace,
+$\operatorname{Tr}(\rho)
+ = \operatorname{Tr}\!\bigl(\tfrac{1}{Z} e^{-\beta H}\bigr)
+ = \tfrac{1}{Z}\operatorname{Tr}(e^{-\beta H})
+ = \tfrac{Z}{Z} = 1$,
+provided $Z \neq 0$.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsState\_isHermitian}]
+$\rho$ is Hermitian.
+\end{lemma}
+
+\begin{lemma}[\texttt{gibbsExpectation\_one}]
+$\langle \mathbf{1} \rangle_\beta = 1$, i.e.\
+$\operatorname{Tr}(\rho \cdot \mathbf{1}) = 1$.
+\end{lemma}
+
+\begin{remark}[Status of \texttt{partitionFn\_ne\_zero}]
+The step $Z \neq 0$ (the partition function is strictly positive) is
+\emph{not} included as a Lean theorem in this PR because the CFC-based
+proof (\texttt{IsSelfAdjoint.exp\_nonneg} under \texttt{MatrixOrder} +
+\texttt{PosSemidef.trace\_eq\_zero\_iff}) causes a deterministic
+timeout in Lean's typeclass resolution.  Instead, all downstream
+theorems take \texttt{hZ : partitionFn $\beta$ H $\neq$ 0} as an
+explicit hypothesis, keeping the module sorry-free.  The standard
+mathematical argument ($H$ Hermitian $\Rightarrow$ eigenvalues real
+$\Rightarrow$ $Z = \sum_i e^{-\beta\lambda_i} > 0$) is deferred to a
+future PR once the CFC instance chain is optimized.
+\end{remark}
+
+Reference: Tasaki~\cite{Tasaki:QMB}, §3.3.
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
@@ -1333,8 +1426,8 @@ SU(2)-averaged singlet, Problem 2.2.c (Tasaki eq.~(2.2.15)) & finite-dim & \emph
 Multi-body operator space / \texttt{onSite} & finite-dim & \emph{formalized} \\
 Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
 1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\
-Gibbs state $\rho = e^{-\beta H}/Z$ & finite-dim & not started \\
-Expectation $\langle O\rangle_\beta = \operatorname{Tr}(\rho O)$ & finite-dim & not started \\
+Gibbs state $\rho = e^{-\beta H}/Z$, $\operatorname{Tr}(\rho)=1$, $\langle\mathbf{1}\rangle=1$ & finite-dim & \emph{in progress} (sorry-free) \\
+Expectation $\langle O\rangle_\beta = \operatorname{Tr}(\rho O)$ & finite-dim & \emph{in progress} (see above) \\
 Periodic boundary conditions & finite-dim & not started \\
 Quantum Heisenberg chain & finite-dim & not started \\
 Partial trace & finite-dim & not started \\
