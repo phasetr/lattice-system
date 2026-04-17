@@ -59,19 +59,14 @@ noncomputable def partitionFn (β : ℝ) (H : ManyBodyOp Λ) : ℂ :=
 1. `exp(-β H)` is PSD (`IsSelfAdjoint.exp_nonneg` + CFC for matrices)
 2. `exp(-β H) ≠ 0` (`Matrix.isUnit_exp` → `IsUnit.ne_zero`)
 3. PSD + nonzero → trace ≠ 0 (`PosSemidef.trace_eq_zero_iff`) -/
+/- The CFC-based proof (IsSelfAdjoint.exp_nonneg under open scoped MatrixOrder
+   + PosSemidef.trace_eq_zero_iff + Matrix.isUnit_exp → ne_zero) is
+   mathematically correct but causes deterministic timeout in Lean's
+   typeclass resolution for Matrix n n ℂ. Admitting until the instance
+   chain is optimized or a direct eigenvector-based proof is available. -/
 theorem partitionFn_ne_zero {H : ManyBodyOp Λ} (hH : H.IsHermitian) (β : ℝ)
     [Nonempty (Λ → Fin 2)] :
     partitionFn β H ≠ 0 := by
-  unfold partitionFn gibbsExp
-  set A := (-(β : ℂ)) • H
-  have hherm : (NormedSpace.exp A).IsHermitian :=
-    Matrix.IsHermitian.exp (hH.smul (by
-      rw [IsSelfAdjoint, star_neg, RCLike.star_def, Complex.conj_ofReal]))
-  have _hne : NormedSpace.exp A ≠ 0 := (Matrix.isUnit_exp _).ne_zero
-  -- Proof path: exp(-βH) is PSD (via CFC IsSelfAdjoint.exp_nonneg under
-  -- open scoped MatrixOrder) + nonzero → trace ≠ 0 (PosSemidef.trace_eq_zero_iff).
-  -- The CFC instance resolution for Matrix n n ℂ with MatrixOrder currently
-  -- causes deterministic timeout. Admitting for now.
   sorry
 
 /-! ## Gibbs state (density matrix) -/
