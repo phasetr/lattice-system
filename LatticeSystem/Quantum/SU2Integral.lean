@@ -325,8 +325,125 @@ theorem problem_2_2_c (τ : Fin 2 → Fin 2) :
   have ht0 : τ 0 = 0 ∨ τ 0 = 1 := by rcases τ 0 with ⟨v, hv⟩; omega
   have ht1 : τ 1 = 0 ∨ τ 1 = 1 := by rcases τ 1 with ⟨v, hv⟩; omega
   rcases ht0 with h0 | h0 <;> rcases ht1 with h1 | h1 <;>
-    simp only [h0, h1, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-      Matrix.head_fin_const, basisVec, hbs, upDown, fin2_eq_iff]
-  all_goals sorry
+    simp only [h0, h1, Matrix.cons_val_zero, Matrix.cons_val_one,
+      basisVec, hbs, upDown, fin2_eq_iff]
+  -- 4 cases: (0,0), (0,1), (1,0), (1,1). Each needs integral computation.
+  -- Common exp-cancellation helper
+  · -- τ = (0, 0): exp(-iφ) integrates to 0 over [0,2π]
+    norm_num
+    have hfactor : (fun x : ℝ => ∫ x₁ in (0 : ℝ)..Real.pi,
+        Complex.sin ↑x₁ * (Complex.exp (-(Complex.I * ↑x / 2)) * Complex.cos (↑x₁ / 2) *
+          (Complex.exp (-(Complex.I * ↑x / 2)) * Complex.sin (↑x₁ / 2)))) =
+      fun x : ℝ => Complex.exp (-(Complex.I * (x : ℂ))) *
+        ∫ x₁ in (0 : ℝ)..Real.pi,
+          Complex.sin ↑x₁ * Complex.cos (↑x₁ / 2) * Complex.sin (↑x₁ / 2) := by
+      ext x
+      have : ∀ x₁ : ℝ, Complex.sin ↑x₁ *
+          (Complex.exp (-(Complex.I * ↑x / 2)) * Complex.cos (↑x₁ / 2) *
+            (Complex.exp (-(Complex.I * ↑x / 2)) * Complex.sin (↑x₁ / 2))) =
+          Complex.exp (-(Complex.I * (x : ℂ))) *
+            (Complex.sin ↑x₁ * Complex.cos (↑x₁ / 2) * Complex.sin (↑x₁ / 2)) := by
+        intro x₁
+        have hexp : Complex.exp (-(Complex.I * ↑x / 2)) * Complex.exp (-(Complex.I * ↑x / 2)) =
+            Complex.exp (-(Complex.I * (x : ℂ))) := by
+          rw [← Complex.exp_add]; ring
+        calc Complex.sin ↑x₁ *
+            (Complex.exp (-(Complex.I * ↑x / 2)) * Complex.cos (↑x₁ / 2) *
+              (Complex.exp (-(Complex.I * ↑x / 2)) * Complex.sin (↑x₁ / 2)))
+            = Complex.exp (-(Complex.I * ↑x / 2)) * Complex.exp (-(Complex.I * ↑x / 2)) *
+              (Complex.sin ↑x₁ * Complex.cos (↑x₁ / 2) * Complex.sin (↑x₁ / 2)) := by ring
+          _ = _ := by rw [hexp]
+      simp_rw [this]; exact intervalIntegral.integral_const_mul _ _
+    rw [hfactor]
+    set C := ∫ x₁ in (0 : ℝ)..Real.pi,
+      Complex.sin ↑x₁ * Complex.cos (↑x₁ / 2) * Complex.sin (↑x₁ / 2)
+    show ∫ x in (0 : ℝ)..(2 * Real.pi), Complex.exp (-(Complex.I * ↑x)) * C = 0
+    rw [show (fun x : ℝ => Complex.exp (-(Complex.I * ↑x)) * C) =
+      fun x : ℝ => C * Complex.exp (-(Complex.I * ↑x)) from by ext; ring]
+    have : ∫ x in (0 : ℝ)..(2 * Real.pi), C * Complex.exp (-(Complex.I * (x : ℂ))) =
+        C * ∫ x in (0 : ℝ)..(2 * Real.pi), Complex.exp (-(Complex.I * (x : ℂ))) :=
+      intervalIntegral.integral_const_mul _ _
+    rw [this, integral_cexp_neg_I_mul_zero_two_pi, mul_zero]
+  · -- τ = (0, 1) = upDown: cos²(θ/2) integral gives 1/2
+    have key : ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
+        ↑(Real.sin θ) * (Complex.exp (-(Complex.I * ↑φ / 2)) * ↑(Real.cos (θ / 2)) *
+          (Complex.exp (Complex.I * ↑φ / 2) * ↑(Real.cos (θ / 2)))) =
+        2 * (Real.pi : ℂ) := by
+      have hsimp : ∀ (φ θ : ℝ),
+          ↑(Real.sin θ) * (Complex.exp (-(Complex.I * ↑φ / 2)) * ↑(Real.cos (θ / 2)) *
+            (Complex.exp (Complex.I * ↑φ / 2) * ↑(Real.cos (θ / 2)))) =
+          (↑(Real.sin θ * Real.cos (θ / 2) ^ 2) : ℂ) := by
+        intros φ' θ'
+        have hexp : Complex.exp (-(Complex.I * ↑φ' / 2)) * Complex.exp (Complex.I * ↑φ' / 2) = 1 := by
+          rw [← Complex.exp_add]; ring_nf; simp
+        rw [show Complex.exp (-(Complex.I * ↑φ' / 2)) * ↑(Real.cos (θ' / 2)) *
+          (Complex.exp (Complex.I * ↑φ' / 2) * ↑(Real.cos (θ' / 2))) =
+          Complex.exp (-(Complex.I * ↑φ' / 2)) * Complex.exp (Complex.I * ↑φ' / 2) *
+          (↑(Real.cos (θ' / 2)) * ↑(Real.cos (θ' / 2))) from by ring, hexp]
+        push_cast; ring
+      simp_rw [hsimp, intervalIntegral.integral_ofReal, integral_sin_mul_cos_sq_half_zero_pi]
+      simp [intervalIntegral.integral_const, smul_eq_mul]
+    rw [key]
+    have hpi : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_pos.ne'
+    field_simp; simp; ring
+  · -- τ = (1, 0) = swap: -sin²(θ/2) integral gives -1/2
+    have key : ∫ φ in (0 : ℝ)..(2 * Real.pi), ∫ θ in (0 : ℝ)..Real.pi,
+        ↑(Real.sin θ) * (Complex.exp (Complex.I * ↑φ / 2) * ↑(Real.sin (θ / 2)) *
+          (-(Complex.exp (-(Complex.I * ↑φ / 2))) * ↑(Real.sin (θ / 2)))) =
+        -(2 * (Real.pi : ℂ)) := by
+      have hsimp : ∀ (φ θ : ℝ),
+          ↑(Real.sin θ) * (Complex.exp (Complex.I * ↑φ / 2) * ↑(Real.sin (θ / 2)) *
+            (-(Complex.exp (-(Complex.I * ↑φ / 2))) * ↑(Real.sin (θ / 2)))) =
+          (↑(-(Real.sin θ * Real.sin (θ / 2) ^ 2)) : ℂ) := by
+        intros φ' θ'
+        have hexp : Complex.exp (Complex.I * ↑φ' / 2) * Complex.exp (-(Complex.I * ↑φ' / 2)) = 1 := by
+          rw [← Complex.exp_add]; ring_nf; simp
+        rw [show Complex.exp (Complex.I * ↑φ' / 2) * ↑(Real.sin (θ' / 2)) *
+          (-(Complex.exp (-(Complex.I * ↑φ' / 2))) * ↑(Real.sin (θ' / 2))) =
+          -(Complex.exp (Complex.I * ↑φ' / 2) * Complex.exp (-(Complex.I * ↑φ' / 2)) *
+          (↑(Real.sin (θ' / 2)) * ↑(Real.sin (θ' / 2)))) from by ring, hexp]
+        push_cast; ring
+      simp_rw [hsimp, intervalIntegral.integral_ofReal,
+        show ∫ θ in (0 : ℝ)..Real.pi, -(Real.sin θ * Real.sin (θ / 2) ^ 2) = -1 from by
+          rw [intervalIntegral.integral_neg, integral_sin_mul_sin_sq_half_zero_pi]]
+      simp [intervalIntegral.integral_const, smul_eq_mul]
+    rw [key]
+    have hpi : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_pos.ne'
+    field_simp; simp; ring
+  · -- τ = (1, 1): exp(iφ) integrates to 0 over [0,2π]
+    norm_num
+    have hfactor : (fun φ : ℝ => ∫ θ in (0 : ℝ)..Real.pi,
+        Complex.sin ↑θ * (Complex.exp (Complex.I * ↑φ / 2) * Complex.sin (↑θ / 2) *
+          (Complex.exp (Complex.I * ↑φ / 2) * Complex.cos (↑θ / 2)))) =
+      fun φ : ℝ => Complex.exp (Complex.I * (φ : ℂ)) *
+        ∫ θ in (0 : ℝ)..Real.pi,
+          Complex.sin ↑θ * Complex.sin (↑θ / 2) * Complex.cos (↑θ / 2) := by
+      ext φ
+      have : ∀ θ : ℝ, Complex.sin ↑θ *
+          (Complex.exp (Complex.I * ↑φ / 2) * Complex.sin (↑θ / 2) *
+            (Complex.exp (Complex.I * ↑φ / 2) * Complex.cos (↑θ / 2))) =
+          Complex.exp (Complex.I * (φ : ℂ)) *
+            (Complex.sin ↑θ * Complex.sin (↑θ / 2) * Complex.cos (↑θ / 2)) := by
+        intro θ
+        have hexp : Complex.exp (Complex.I * ↑φ / 2) * Complex.exp (Complex.I * ↑φ / 2) =
+            Complex.exp (Complex.I * (φ : ℂ)) := by
+          rw [← Complex.exp_add]; ring
+        calc Complex.sin ↑θ *
+            (Complex.exp (Complex.I * ↑φ / 2) * Complex.sin (↑θ / 2) *
+              (Complex.exp (Complex.I * ↑φ / 2) * Complex.cos (↑θ / 2)))
+            = Complex.exp (Complex.I * ↑φ / 2) * Complex.exp (Complex.I * ↑φ / 2) *
+              (Complex.sin ↑θ * Complex.sin (↑θ / 2) * Complex.cos (↑θ / 2)) := by ring
+          _ = _ := by rw [hexp]
+      simp_rw [this]; exact intervalIntegral.integral_const_mul _ _
+    rw [hfactor]
+    set C := ∫ θ in (0 : ℝ)..Real.pi,
+      Complex.sin ↑θ * Complex.sin (↑θ / 2) * Complex.cos (↑θ / 2)
+    show ∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.exp (Complex.I * ↑φ) * C = 0
+    rw [show (fun φ : ℝ => Complex.exp (Complex.I * ↑φ) * C) =
+      fun φ : ℝ => C * Complex.exp (Complex.I * ↑φ) from by ext; ring]
+    have : ∫ φ in (0 : ℝ)..(2 * Real.pi), C * Complex.exp (Complex.I * (φ : ℂ)) =
+        C * ∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.exp (Complex.I * (φ : ℂ)) :=
+      intervalIntegral.integral_const_mul _ _
+    rw [this, integral_cexp_I_mul_zero_two_pi, mul_zero]
 
 end LatticeSystem.Quantum
