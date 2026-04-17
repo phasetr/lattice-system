@@ -3,13 +3,7 @@ Copyright (c) 2026 lattice-system contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.ManyBody
-import Mathlib.Analysis.Normed.Algebra.Exponential
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
-import Mathlib.LinearAlgebra.Matrix.PosDef
-import Mathlib.Analysis.Matrix.PosDef
-import Mathlib.Analysis.Matrix.Order
-import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.ExpLog.Basic
-import Mathlib.Analysis.Matrix.HermitianFunctionalCalculus
 
 /-!
 # Gibbs state for finite-volume quantum systems
@@ -23,9 +17,9 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
 `β : ℝ`. We prove:
 
 * `gibbsExp_isHermitian` — `exp(-β H)` is Hermitian.
-* `partitionFn_pos` — the partition function `Z > 0`.
-* `gibbsState_trace` — `Tr(ρ_β) = 1`.
-* `gibbsExpectation_one` — `⟨1⟩_β = 1`.
+* `gibbsState_trace` — `Tr(ρ_β) = 1` (given `Z ≠ 0`).
+* `gibbsState_isHermitian` — `ρ_β` is Hermitian.
+* `gibbsExpectation_one` — `⟨1⟩_β = 1` (given `Z ≠ 0`).
 -/
 
 namespace LatticeSystem.Quantum
