@@ -51,12 +51,20 @@ theorem gibbsExp_isHermitian {H : ManyBodyOp Λ} (hH : H.IsHermitian) (β : ℝ)
 noncomputable def partitionFn (β : ℝ) (H : ManyBodyOp Λ) : ℂ :=
   (gibbsExp β H).trace
 
-/-- The partition function is positive: `Z(β) > 0` for Hermitian `H`
-on a nonempty lattice. -/
-theorem partitionFn_pos {H : ManyBodyOp Λ} (hH : H.IsHermitian) (β : ℝ)
+/-- The partition function is nonzero: `Z(β) ≠ 0`. This follows from the
+fact that `exp(-β H)` is positive-definite (its eigenvalues are
+`exp(-β λ_i) > 0`), so its trace is a sum of positive reals.
+
+The formal proof requires assembling:
+1. `IsSelfAdjoint.exp_nonneg` (CFC, exp of self-adjoint is non-negative)
+2. `Matrix.isUnit_exp` (matrix exp is invertible)
+3. PSD + invertible → PosDef
+4. `Matrix.PosDef.trace_pos`
+
+TODO: assemble from the CFC path once the needed instances are verified. -/
+theorem partitionFn_ne_zero {H : ManyBodyOp Λ} (hH : H.IsHermitian) (β : ℝ)
     [Nonempty (Λ → Fin 2)] :
-    0 < (partitionFn β H).re := by
-  unfold partitionFn
+    partitionFn β H ≠ 0 := by
   sorry
 
 /-! ## Gibbs state (density matrix) -/
