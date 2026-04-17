@@ -1157,6 +1157,96 @@ formalization of Tasaki \S2.1 and \S2.2.
   \texttt{\_commute\_of\_commute} and \texttt{\_conjTranspose\_mul\_self}
   via standard $\hat U^\dagger A \hat U = \hat U^\dagger \hat U A
   = A$.
+\item \textbf{Problem 2.2.c} (Tasaki §2.2, eq.~(2.2.15), p.~24):
+  The SU(2)-averaged two-site state is the spin singlet.
+
+  \textit{Statement.}
+  \[
+    \frac{1}{4\pi}
+    \int_0^{2\pi}\!\!d\varphi\int_0^\pi\!\!d\theta\,\sin\theta\;
+    \hat U^{(3)}_{\varphi,{\rm tot}}\,\hat U^{(2)}_{\theta,{\rm tot}}\,
+    |\!\uparrow\downarrow\rangle
+    \;=\;
+    \tfrac{1}{2}\bigl(|\!\uparrow\downarrow\rangle
+                     - |\!\downarrow\uparrow\rangle\bigr),
+  \]
+  where $|\!\uparrow\downarrow\rangle := |\sigma_0=0,\sigma_1=1\rangle
+  \in \mathcal{H}_{\rm Fin\,2}$.
+
+  \textit{Proof outline.}
+  \begin{enumerate}
+  \item \textbf{Factorization of the global rotation.}
+    Using \texttt{noncommProd\_mul\_distrib} and the \texttt{onSite}
+    commutativity at distinct sites, the product
+    $\hat U^{(3)}_{\varphi,{\rm tot}}\,\hat U^{(2)}_{\theta,{\rm tot}}$
+    factors as
+    $(\hat U^{(3)}_\varphi)_0\,(\hat U^{(2)}_\theta)_0\;
+     \cdot\;
+     (\hat U^{(3)}_\varphi)_1\,(\hat U^{(2)}_\theta)_1$,
+    where the subscript denotes the site embedding via \texttt{onSite}.
+
+  \item \textbf{Tensor-product decomposition.}
+    The two-site action on $|\sigma_0,\sigma_1\rangle$ produces
+    a sum weighted by $M(\tau_0,\sigma_0)\cdot M(\tau_1,\sigma_1)$,
+    where $M = \hat U^{(3)}_\varphi\,\hat U^{(2)}_\theta \in M_2(\mathbb{C})$
+    (the single-site combined rotation matrix).
+
+  \item \textbf{Explicit single-site action (Problem 2.1.d).}
+    From the coherent-state results (\texttt{spinHalfRot3} then
+    \texttt{spinHalfRot2}):
+    \begin{align*}
+      M\,|\!\uparrow\rangle &=
+        e^{-i\varphi/2}\cos\tfrac{\theta}{2}|\!\uparrow\rangle
+        - e^{-i\varphi/2}\sin\tfrac{\theta}{2}|\!\downarrow\rangle,\\
+      M\,|\!\downarrow\rangle &=
+        e^{+i\varphi/2}\sin\tfrac{\theta}{2}|\!\uparrow\rangle
+        + e^{+i\varphi/2}\cos\tfrac{\theta}{2}|\!\downarrow\rangle.
+    \end{align*}
+
+  \item \textbf{Integration over four configuration cases.}
+    Expanding the two-site product $M|\sigma_0\rangle\otimes M|\sigma_1\rangle$
+    for the input $(\sigma_0,\sigma_1)=(\uparrow,\downarrow)$ yields
+    four output components $|\tau_0,\tau_1\rangle$:
+    \begin{itemize}
+      \item $|\!\uparrow\downarrow\rangle$: the phase $e^{-i\varphi/2}
+        \cdot e^{+i\varphi/2} = 1$ cancels; the angular integral gives
+        $\int_0^\pi \sin\theta\,\cos^2\!\tfrac{\theta}{2}\,d\theta = 1$,
+        contributing $+\tfrac{1}{2}$.
+      \item $|\!\downarrow\uparrow\rangle$: the phase again cancels;
+        the angular integral gives
+        $-\int_0^\pi \sin\theta\,\sin^2\!\tfrac{\theta}{2}\,d\theta = -1$,
+        contributing $-\tfrac{1}{2}$.
+      \item $|\!\uparrow\uparrow\rangle$: contains the factor
+        $e^{-i\varphi/2}\cdot e^{+i\varphi/2}\cdot e^{+i\varphi}
+         = e^{+i\varphi}$; the azimuthal integral
+        $\int_0^{2\pi}e^{\pm i\varphi}\,d\varphi = 0$ forces this to zero.
+      \item $|\!\downarrow\downarrow\rangle$: contains $e^{-i\varphi}$;
+        again vanishes by the azimuthal integral.
+    \end{itemize}
+
+  \item \textbf{Conclusion.}
+    The normalisation factor $\tfrac{1}{4\pi}\cdot 2\pi = \tfrac{1}{2}$
+    combines with the angular integrals to give
+    $\tfrac{1}{2}|\!\uparrow\downarrow\rangle - \tfrac{1}{2}|\!\downarrow\uparrow\rangle$,
+    which is the (unnormalised) spin singlet up to the factor
+    $1/\sqrt{2}$ (the statement records the un-normalised form as
+    in Tasaki eq.~(2.2.15)).
+  \end{enumerate}
+
+  \textit{Key helper lemmas.}
+  \begin{itemize}
+    \item \texttt{integral\_cexp\_I\_mul\_zero\_two\_pi}:
+      $\int_0^{2\pi}e^{i\varphi}\,d\varphi = 0$.
+    \item \texttt{integral\_cexp\_neg\_I\_mul\_zero\_two\_pi}:
+      $\int_0^{2\pi}e^{-i\varphi}\,d\varphi = 0$.
+    \item \texttt{integral\_sin\_mul\_cos\_sq\_half\_zero\_pi}:
+      $\int_0^\pi\sin\theta\,\cos^2\!\tfrac{\theta}{2}\,d\theta = 1$.
+    \item \texttt{integral\_sin\_mul\_sin\_sq\_half\_zero\_pi}:
+      $\int_0^\pi\sin\theta\,\sin^2\!\tfrac{\theta}{2}\,d\theta = 1$.
+  \end{itemize}
+
+  Reference: Tasaki~\cite{Tasaki:QMB}, §2.2, Problem~2.2.c,
+  eq.~(2.2.15), p.~24.
 \end{itemize}
 
 \section{Open items / TODO and axioms}
@@ -1181,24 +1271,27 @@ units via $\hat S^{\pm}$ + a 9-element spanning theorem). The general
 $S \geq 1$ case requires generic \texttt{Fin\,(2S+1)} typing and a
 polymorphic Lagrange-interpolation infrastructure; not started.
 
-\subsection*{TODO: Tasaki Problem 2.2.c}
+\subsection*{DONE: Tasaki Problem 2.2.c}
 
-\textbf{Statement} (Tasaki p.23, eq.~(2.2.15)): An explicit averaged
-state of the form
+\textbf{Statement} (Tasaki §2.2, eq.~(2.2.15), p.~24): The
+SU(2)-averaged two-site state
 \[
   \frac{1}{4\pi} \int_0^{2\pi}\!\!d\varphi \int_0^\pi d\theta \sin\theta\;
-    \hat U^{(3)}_\varphi \hat U^{(2)}_\theta\,
-    |\!\uparrow_1\rangle |\!\downarrow_2\rangle
+    \hat U^{(3)}_{\varphi,{\rm tot}}\,\hat U^{(2)}_{\theta,{\rm tot}}\,
+    |\!\uparrow\downarrow\rangle
+  \;=\;
+  \tfrac{1}{2}\bigl(|\!\uparrow\downarrow\rangle
+                   - |\!\downarrow\uparrow\rangle\bigr).
 \]
-equals (up to phase) the singlet $(1/\sqrt 2)(|\!\uparrow_1\rangle
-|\!\downarrow_2\rangle - |\!\downarrow_1\rangle |\!\uparrow_2\rangle)$.
-The problem asks to verify this and characterize states that fail to
-be SU(2)-invariant.
 
-\textbf{Status}: Not formalized. Requires a measure-theoretic
-averaging construction (integration over the SU(2) parameter space),
-which is beyond the current scope of finite-dim algebra. Tracked here
-for a future infrastructure PR.
+\textbf{Status}: Formalized in
+\texttt{Quantum/SU2Average.lean} (branch \texttt{feat/problem-2-2-c}).
+The proof decomposes into four trigonometric integral lemmas
+(\texttt{integral\_cexp\_\{I,neg\_I\}\_mul\_zero\_two\_pi},
+\texttt{integral\_sin\_mul\_\{cos,sin\}\_sq\_half\_zero\_pi}) and the
+factorization of the global rotation via
+\texttt{noncommProd\_mul\_distrib}; see the detailed outline in the
+Tasaki §2.2 supplementary subsection above.
 
 \subsection*{Roadmap status note: P1f''' (eqs.~(2.2.12)--(2.2.13))}
 
@@ -1236,6 +1329,7 @@ $S = 1/2$ rotation (group law, unitarity) & finite-dim & \emph{formalized} \\
 $S = 1/2$ $\pi$-rotations (eq.~2.1.25) & finite-dim & \emph{formalized} \\
 $S = 1/2$ $\pi$-rotation products and conjugations (Tasaki §2.1) & finite-dim & \emph{formalized} \\
 Abstract lattice + total spin (Tasaki §2.2, partial) & finite-dim & \emph{formalized} \\
+SU(2)-averaged singlet, Problem 2.2.c (Tasaki eq.~(2.2.15)) & finite-dim & \emph{formalized} \\
 Multi-body operator space / \texttt{onSite} & finite-dim & \emph{formalized} \\
 Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
 1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\

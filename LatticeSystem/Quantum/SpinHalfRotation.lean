@@ -836,6 +836,36 @@ theorem spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp (θ φ : ℝ) :
       -(Complex.sin (↑θ / 2)) *
         (Complex.cos (↑φ / 2) + Complex.I * Complex.sin (↑φ / 2)) * hI
 
+set_option linter.flexible false in
+set_option linter.unusedTactic false in
+/-- `Û^(3)_φ · Û^(2)_θ · |ψ^↓⟩ =
+-e^{-iφ/2} sin(θ/2) |ψ^↑⟩ + e^{iφ/2} cos(θ/2) |ψ^↓⟩`.
+Companion to `spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp`. -/
+theorem spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfDown (θ φ : ℝ) :
+    (spinHalfRot3 φ * spinHalfRot2 θ).mulVec spinHalfDown =
+      ![-(Complex.exp (-(Complex.I * (φ : ℂ) / 2))) * (Real.sin (θ / 2) : ℂ),
+        Complex.exp (Complex.I * (φ : ℂ) / 2) * (Real.cos (θ / 2) : ℂ)] := by
+  unfold spinHalfRot3 spinHalfRot2 rotOf spinHalfOp3 spinHalfOp2 pauliZ pauliY
+  ext i
+  fin_cases i
+  · -- case 0: up component (involves I² from σ_y)
+    simp [Matrix.mul_apply, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
+       spinHalfDown, Matrix.smul_apply, Matrix.sub_apply]
+    rw [show -(Complex.I * (φ : ℂ) / 2) = (-(↑φ / 2)) * Complex.I from by ring,
+      Complex.exp_mul_I]
+    simp only [Complex.cos_neg, Complex.sin_neg, neg_mul]
+    have hI : Complex.I * Complex.I = -1 := Complex.I_mul_I
+    linear_combination
+      (Complex.sin (↑θ / 2)) *
+        (Complex.cos (↑φ / 2) - Complex.I * Complex.sin (↑φ / 2)) * hI
+  · -- case 1: down component (no I² terms)
+    simp [Matrix.mul_apply, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
+       spinHalfDown, Matrix.smul_apply, Matrix.sub_apply]
+    rw [show Complex.I * (φ : ℂ) / 2 = (↑φ / 2) * Complex.I from by ring,
+      Complex.exp_mul_I]
+    left
+    push_cast; ring
+
 /-! ## Problem 2.1.e: phase factor at θ = φ = π/2 -/
 
 /-- Tasaki Problem 2.1.e: at `θ = φ = π/2` the coherent state
