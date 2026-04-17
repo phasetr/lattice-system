@@ -52,7 +52,7 @@ CAR algebras, and eventually lattice QCD.
 | P1f'''' (Tasaki §2.2) | Two-site inner product `Ŝ_x · Ŝ_y` raising/lowering decomposition (eq. (2.2.16)) | Done |
 | P1f''''' (Tasaki §2.2) | SU(2) invariance of `Ŝ_x · Ŝ_y` and eigenvalues (eqs. (2.2.17)–(2.2.19)) | Done |
 | P1f-2c (Tasaki §2.2 Problem 2.2.c) | SU(2)-averaged two-site state = singlet projector (eq. (2.2.15)); integration over Euler angles `φ ∈ [0,2π]`, `θ ∈ [0,π]` | Done |
-| P1g | Gibbs state `ρ = e^{-βH}/Z`, `Tr(ρ) = 1`, `⟨1⟩ = 1` (one sorry remains for `partitionFn_ne_zero`) | In progress |
+| P1g | Gibbs state `ρ = e^{-βH}/Z`, `Tr(ρ) = 1`, `⟨1⟩ = 1` (`partitionFn_ne_zero` deferred due to CFC timeout) | In progress (sorry-free) |
 | P1h | Periodic boundary conditions, other quantum chains (Heisenberg) | Not started |
 | P2 | Finite-volume Hubbard / BCS | Not started |
 | P3 | CAR algebras, quasi-local C*-algebras, KMS states | Not started |

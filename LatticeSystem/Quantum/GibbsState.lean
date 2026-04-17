@@ -55,21 +55,14 @@ theorem gibbsExp_isHermitian {H : ManyBodyOp Λ} (hH : H.IsHermitian) (β : ℝ)
 noncomputable def partitionFn (β : ℝ) (H : ManyBodyOp Λ) : ℂ :=
   (gibbsExp β H).trace
 
-/-- The partition function is nonzero: `Z(β) ≠ 0`. Proved via:
-1. `exp(-β H)` is PSD (`IsSelfAdjoint.exp_nonneg` + CFC for matrices)
-2. `exp(-β H) ≠ 0` (`Matrix.isUnit_exp` → `IsUnit.ne_zero`)
-3. PSD + nonzero → trace ≠ 0 (`PosSemidef.trace_eq_zero_iff`) -/
-/- The CFC-based proof (IsSelfAdjoint.exp_nonneg under open scoped MatrixOrder
-   + PosSemidef.trace_eq_zero_iff + Matrix.isUnit_exp → ne_zero) is
-   mathematically correct but causes deterministic timeout in Lean's
-   typeclass resolution for Matrix n n ℂ. Admitting until the instance
-   chain is optimized or a direct eigenvector-based proof is available. -/
-theorem partitionFn_ne_zero {H : ManyBodyOp Λ} (hH : H.IsHermitian) (β : ℝ)
-    [Nonempty (Λ → Fin 2)] :
-    partitionFn β H ≠ 0 := by
-  sorry
+/-! ## Gibbs state (density matrix)
 
-/-! ## Gibbs state (density matrix) -/
+Note: `partitionFn β H ≠ 0` (the partition function is nonzero) is
+NOT proved here because the CFC-based proof
+(`IsSelfAdjoint.exp_nonneg` under `open scoped MatrixOrder` +
+`PosSemidef.trace_eq_zero_iff` + `Matrix.isUnit_exp`) causes
+deterministic timeout in Lean's typeclass resolution. All downstream
+theorems take `hZ : partitionFn β H ≠ 0` as an explicit hypothesis. -/
 
 /-- The Gibbs state (density matrix) `ρ_β = (1/Z) exp(-β H)`. -/
 noncomputable def gibbsState (β : ℝ) (H : ManyBodyOp Λ) : ManyBodyOp Λ :=
