@@ -1329,13 +1329,15 @@ $\operatorname{Tr}(\rho \cdot \mathbf{1}) = 1$.
 
 \begin{remark}[Status of \texttt{partitionFn\_ne\_zero}]
 The step $Z \neq 0$ (the partition function is strictly positive) is
-needed for both \texttt{gibbsState\_trace} and
-\texttt{gibbsExpectation\_one}. In the current Lean development this is
-admitted with \texttt{sorry}. The standard argument is that $H$ is
-Hermitian, hence diagonalizable with real eigenvalues $\lambda_i$, so
-$Z = \sum_i e^{-\beta\lambda_i} > 0$. Formalizing this in Lean requires
-a continuous-functional-calculus (CFC) assembly that is not yet
-available in the project; it is deferred to a future PR.
+\emph{not} included as a Lean theorem in this PR because the CFC-based
+proof (\texttt{IsSelfAdjoint.exp\_nonneg} under \texttt{MatrixOrder} +
+\texttt{PosSemidef.trace\_eq\_zero\_iff}) causes a deterministic
+timeout in Lean's typeclass resolution.  Instead, all downstream
+theorems take \texttt{hZ : partitionFn $\beta$ H $\neq$ 0} as an
+explicit hypothesis, keeping the module sorry-free.  The standard
+mathematical argument ($H$ Hermitian $\Rightarrow$ eigenvalues real
+$\Rightarrow$ $Z = \sum_i e^{-\beta\lambda_i} > 0$) is deferred to a
+future PR once the CFC instance chain is optimized.
 \end{remark}
 
 Reference: Tasaki~\cite{Tasaki:QMB}, §3.3.
@@ -1424,7 +1426,7 @@ SU(2)-averaged singlet, Problem 2.2.c (Tasaki eq.~(2.2.15)) & finite-dim & \emph
 Multi-body operator space / \texttt{onSite} & finite-dim & \emph{formalized} \\
 Site commutativity at distinct sites & finite-dim & \emph{formalized} \\
 1D open-chain quantum Ising, Hermiticity & finite-dim & \emph{formalized} \\
-Gibbs state $\rho = e^{-\beta H}/Z$, $\operatorname{Tr}(\rho)=1$, $\langle\mathbf{1}\rangle=1$ & finite-dim & \emph{in progress} (1 sorry) \\
+Gibbs state $\rho = e^{-\beta H}/Z$, $\operatorname{Tr}(\rho)=1$, $\langle\mathbf{1}\rangle=1$ & finite-dim & \emph{in progress} (sorry-free) \\
 Expectation $\langle O\rangle_\beta = \operatorname{Tr}(\rho O)$ & finite-dim & \emph{in progress} (see above) \\
 Periodic boundary conditions & finite-dim & not started \\
 Quantum Heisenberg chain & finite-dim & not started \\
