@@ -28,6 +28,10 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
+/-- Negation of a real cast to `ℂ` is self-adjoint. -/
+private lemma negReal_isSelfAdjoint (β : ℝ) : IsSelfAdjoint (-(β : ℂ)) := by
+  rw [IsSelfAdjoint, star_neg, RCLike.star_def, Complex.conj_ofReal]
+
 /-! ## Gibbs exponential -/
 
 /-- The Gibbs exponential `exp(-β H)` for inverse temperature `β : ℝ`
@@ -38,10 +42,7 @@ noncomputable def gibbsExp (β : ℝ) (H : ManyBodyOp Λ) : ManyBodyOp Λ :=
 /-- `exp(-β H)` is Hermitian when `H` is Hermitian. -/
 theorem gibbsExp_isHermitian {H : ManyBodyOp Λ} (hH : H.IsHermitian) (β : ℝ) :
     (gibbsExp β H).IsHermitian := by
-  unfold gibbsExp
-  apply Matrix.IsHermitian.exp
-  exact hH.smul (by rw [IsSelfAdjoint, star_neg, RCLike.star_def,
-    Complex.conj_ofReal])
+  exact Matrix.IsHermitian.exp (hH.smul (negReal_isSelfAdjoint β))
 
 /-! ## Partition function -/
 
@@ -66,23 +67,16 @@ noncomputable def gibbsState (β : ℝ) (H : ManyBodyOp Λ) : ManyBodyOp Λ :=
 theorem gibbsState_trace {H : ManyBodyOp Λ} (β : ℝ)
     (hZ : partitionFn β H ≠ 0) :
     (gibbsState β H).trace = 1 := by
-  unfold gibbsState
-  rw [Matrix.trace_smul, smul_eq_mul, one_div]
+  simp only [gibbsState, Matrix.trace_smul, smul_eq_mul, one_div]
   exact inv_mul_cancel₀ hZ
 
 /-- The Gibbs state is Hermitian. -/
 theorem gibbsState_isHermitian {H : ManyBodyOp Λ} (hH : H.IsHermitian) (β : ℝ) :
     (gibbsState β H).IsHermitian := by
-  unfold gibbsState
   apply Matrix.IsHermitian.smul (gibbsExp_isHermitian hH β)
   have htr : star (partitionFn β H) = partitionFn β H := by
-    unfold partitionFn
-    rw [← Matrix.trace_conjTranspose, (gibbsExp_isHermitian hH β).eq]
-  rw [IsSelfAdjoint]
-  simp only [one_div]
-  calc star (partitionFn β H)⁻¹
-      = (star (partitionFn β H))⁻¹ := star_inv₀ _
-    _ = (partitionFn β H)⁻¹ := by rw [htr]
+    simp only [partitionFn, ← Matrix.trace_conjTranspose, (gibbsExp_isHermitian hH β).eq]
+  rw [IsSelfAdjoint, one_div, star_inv₀, htr]
 
 /-! ## Expectation value -/
 
@@ -94,8 +88,7 @@ noncomputable def gibbsExpectation (β : ℝ) (H O : ManyBodyOp Λ) : ℂ :=
 theorem gibbsExpectation_one {H : ManyBodyOp Λ} (β : ℝ)
     (hZ : partitionFn β H ≠ 0) :
     gibbsExpectation β H 1 = 1 := by
-  unfold gibbsExpectation
-  rw [mul_one]
+  simp only [gibbsExpectation, mul_one]
   exact gibbsState_trace β hZ
 
 end LatticeSystem.Quantum
