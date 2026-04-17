@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.SU2
 import LatticeSystem.Quantum.ManyBody
+import LatticeSystem.Quantum.TotalSpin
+import LatticeSystem.Quantum.SpinDot
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
@@ -122,5 +124,144 @@ theorem integral_sin_mul_sin_sq_half_zero_pi :
       intervalIntegral.integral_const_mul, intervalIntegral.integral_const_mul,
       integral_sin_zero_pi, integral_sin_mul_cos_zero_pi]
   ring
+
+/-! ## Complex exponential integrals for the φ component of Problem 2.2.c
+
+`∫₀²π e^{±iφ} dφ = 0` follows from `e^{iφ} = cos φ + i sin φ` and the
+vanishing of `∫ cos` and `∫ sin` over one full period. -/
+
+/-- `∫ φ in 0..2π, e^{iφ} = 0`. -/
+theorem integral_cexp_I_mul_zero_two_pi :
+    ∫ φ in (0 : ℝ)..(2 * Real.pi),
+      Complex.exp (Complex.I * (φ : ℂ)) = 0 := by
+  have hid : ∀ φ : ℝ, Complex.exp (Complex.I * (φ : ℂ)) =
+      (Real.cos φ : ℂ) + Complex.I * (Real.sin φ : ℂ) := by
+    intro φ
+    rw [show Complex.I * (φ : ℂ) = (φ : ℂ) * Complex.I from by ring,
+      Complex.exp_mul_I]
+    push_cast; ring
+  conv_lhs => arg 1; ext φ; rw [hid φ]
+  have h1 : IntervalIntegrable (fun φ => (Real.cos φ : ℂ))
+      MeasureTheory.volume (0 : ℝ) (2 * Real.pi) :=
+    (Complex.continuous_ofReal.comp Real.continuous_cos).intervalIntegrable _ _
+  have h2 : IntervalIntegrable (fun φ => Complex.I * (Real.sin φ : ℂ))
+      MeasureTheory.volume (0 : ℝ) (2 * Real.pi) :=
+    ((Complex.continuous_ofReal.comp Real.continuous_sin).const_mul _).intervalIntegrable _ _
+  rw [intervalIntegral.integral_add h1 h2]
+  have hcos : ∫ φ in (0 : ℝ)..(2 * Real.pi), (Real.cos φ : ℂ) = 0 := by
+    rw [intervalIntegral.integral_ofReal, integral_cos_zero_two_pi]; simp
+  have hsin : ∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.I * (Real.sin φ : ℂ) = 0 := by
+    have : ∫ φ in (0 : ℝ)..(2 * Real.pi), (Real.sin φ : ℂ) = 0 := by
+      rw [intervalIntegral.integral_ofReal, integral_sin_zero_two_pi]; simp
+    calc ∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.I * (Real.sin φ : ℂ)
+        = Complex.I * ∫ φ in (0 : ℝ)..(2 * Real.pi), (Real.sin φ : ℂ) :=
+          intervalIntegral.integral_const_mul ..
+        _ = 0 := by rw [this, mul_zero]
+  rw [hcos, hsin, add_zero]
+
+/-- `∫ φ in 0..2π, e^{-iφ} = 0`. -/
+theorem integral_cexp_neg_I_mul_zero_two_pi :
+    ∫ φ in (0 : ℝ)..(2 * Real.pi),
+      Complex.exp (-(Complex.I * (φ : ℂ))) = 0 := by
+  have hid : ∀ φ : ℝ, Complex.exp (-(Complex.I * (φ : ℂ))) =
+      (Real.cos φ : ℂ) - Complex.I * (Real.sin φ : ℂ) := by
+    intro φ
+    rw [show -(Complex.I * (φ : ℂ)) = (-(φ : ℂ)) * Complex.I from by ring,
+      Complex.exp_mul_I]
+    simp only [Complex.cos_neg, Complex.sin_neg, neg_mul]
+    push_cast; ring
+  conv_lhs => arg 1; ext φ; rw [hid φ]
+  have h1 : IntervalIntegrable (fun φ => (Real.cos φ : ℂ))
+      MeasureTheory.volume (0 : ℝ) (2 * Real.pi) :=
+    (Complex.continuous_ofReal.comp Real.continuous_cos).intervalIntegrable _ _
+  have h2 : IntervalIntegrable (fun φ => Complex.I * (Real.sin φ : ℂ))
+      MeasureTheory.volume (0 : ℝ) (2 * Real.pi) :=
+    ((Complex.continuous_ofReal.comp Real.continuous_sin).const_mul _).intervalIntegrable _ _
+  rw [intervalIntegral.integral_sub h1 h2]
+  have hcos : ∫ φ in (0 : ℝ)..(2 * Real.pi), (Real.cos φ : ℂ) = 0 := by
+    rw [intervalIntegral.integral_ofReal, integral_cos_zero_two_pi]; simp
+  have hsin : ∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.I * (Real.sin φ : ℂ) = 0 := by
+    have : ∫ φ in (0 : ℝ)..(2 * Real.pi), (Real.sin φ : ℂ) = 0 := by
+      rw [intervalIntegral.integral_ofReal, integral_sin_zero_two_pi]; simp
+    calc ∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.I * (Real.sin φ : ℂ)
+        = Complex.I * ∫ φ in (0 : ℝ)..(2 * Real.pi), (Real.sin φ : ℂ) :=
+          intervalIntegral.integral_const_mul ..
+        _ = 0 := by rw [this, mul_zero]
+  rw [hcos, hsin, sub_zero]
+
+/-! ## Two-site factorization of total rotation product
+
+Tasaki §2.2 eq (2.2.11): the product `Û^(3)_φ_tot · Û^(2)_θ_tot` factors
+as a product of single-site combined rotations
+`∏_x onSite x (Û^(3)_φ · Û^(2)_θ)`. -/
+
+/-- Total rotation `Û^(3)_φ · Û^(2)_θ` on two sites factors into per-site
+combined rotations. -/
+theorem totalRot32_two_site (θ φ : ℝ) :
+    totalSpinHalfRot3 (Fin 2) φ * totalSpinHalfRot2 (Fin 2) θ =
+      onSite (0 : Fin 2) (spinHalfRot3 φ * spinHalfRot2 θ) *
+        onSite (1 : Fin 2) (spinHalfRot3 φ * spinHalfRot2 θ) := by
+  rw [totalSpinHalfRot3_two_site, totalSpinHalfRot2_two_site]
+  have h10 : (1 : Fin 2) ≠ 0 := by decide
+  set R3₀ := onSite (0 : Fin 2) (spinHalfRot3 φ)
+  set R3₁ := onSite (1 : Fin 2) (spinHalfRot3 φ)
+  set R2₀ := onSite (0 : Fin 2) (spinHalfRot2 θ)
+  set R2₁ := onSite (1 : Fin 2) (spinHalfRot2 θ)
+  show R3₀ * R3₁ * (R2₀ * R2₁) = _
+  have : R3₁ * R2₀ = R2₀ * R3₁ :=
+    onSite_mul_onSite_of_ne h10 (spinHalfRot3 φ) (spinHalfRot2 θ)
+  rw [mul_assoc R3₀, ← mul_assoc R3₁, this, mul_assoc R2₀, ← mul_assoc R3₀]
+  rw [onSite_mul_onSite_same, onSite_mul_onSite_same]
+
+/-! ## Tensor product action on a two-site basis vector
+
+For `Λ = Fin 2`, the product `onSite 0 M * onSite 1 N` acts on a basis
+vector `|σ⟩` as the Kronecker product: the coefficient of `|τ⟩` is
+`M (τ 0) (σ 0) * N (τ 1) (σ 1)`. -/
+
+private lemma fin2_forall_ne_zero (τ κ : Fin 2 → Fin 2) :
+    (∀ k, k ≠ (0 : Fin 2) → τ k = κ k) ↔ τ 1 = κ 1 := by
+  constructor
+  · intro h; exact h 1 (by decide)
+  · intro h k hk; fin_cases k <;> simp_all
+
+private lemma fin2_forall_ne_one (τ κ : Fin 2 → Fin 2) :
+    (∀ k, k ≠ (1 : Fin 2) → τ k = κ k) ↔ τ 0 = κ 0 := by
+  constructor
+  · intro h; exact h 0 (by decide)
+  · intro h k hk; fin_cases k <;> simp_all
+
+private lemma fin2_eq_iff (σ τ : Fin 2 → Fin 2) :
+    σ = τ ↔ σ 0 = τ 0 ∧ σ 1 = τ 1 := by
+  constructor
+  · rintro rfl; exact ⟨rfl, rfl⟩
+  · intro ⟨h0, h1⟩; funext i; fin_cases i <;> assumption
+
+/-- Two-site tensor product action on a basis vector. -/
+theorem onSite_zero_mul_one_mulVec_basisVec
+    (M N : Matrix (Fin 2) (Fin 2) ℂ) (σ τ : Fin 2 → Fin 2) :
+    ((onSite (0 : Fin 2) M * onSite (1 : Fin 2) N).mulVec (basisVec σ)) τ =
+      M (τ 0) (σ 0) * N (τ 1) (σ 1) := by
+  conv_lhs =>
+    rw [show (onSite (0 : Fin 2) M * onSite (1 : Fin 2) N).mulVec (basisVec σ) =
+      (onSite (0 : Fin 2) M).mulVec ((onSite (1 : Fin 2) N).mulVec (basisVec σ)) from
+      (Matrix.mulVec_mulVec ..).symm]
+  rw [onSite_mulVec_basisVec 1 N σ]
+  simp only [Matrix.mulVec, dotProduct, onSite_apply, fin2_forall_ne_zero, Fin.sum_univ_two]
+  have hupd0 : (Function.update σ 1 (0 : Fin 2)) 0 = σ 0 := by
+    rw [Function.update_apply]; simp
+  have hupd1 : (Function.update σ 1 (1 : Fin 2)) 0 = σ 0 := by
+    rw [Function.update_apply]; simp
+  simp only [basisVec, fin2_eq_iff, Function.update_self, hupd0, hupd1]
+  simp only [ite_mul, zero_mul, mul_ite, mul_one, mul_zero]
+  rw [Fintype.sum_eq_single (fun i : Fin 2 => if i = 0 then σ 0 else τ 1) (fun x hx => by
+    by_cases h1 : τ 1 = x 1
+    · rw [if_pos h1]
+      have h0 : x 0 ≠ σ 0 := by
+        intro h0; apply hx; funext i; fin_cases i <;> simp_all
+      simp [h0]
+    · simp [h1])]
+  have : τ 1 = 0 ∨ τ 1 = 1 := by rcases τ 1 with ⟨v, hv⟩; omega
+  rcases this with h | h <;> simp [h]
 
 end LatticeSystem.Quantum
