@@ -399,8 +399,8 @@ Systems*, §3.5, p. 89.
 
 | Lean name | Statement | File |
 |---|---|---|
-| `openChainCoupling N` | coupling function `J : Fin N → Fin N → ℝ` for the open chain: `J i (i+1) = J (i+1) i = 1`, zero otherwise | `Quantum/HeisenbergChain.lean` |
-| `periodicChainCoupling N` | coupling function for the periodic chain: open-chain bonds plus `J 0 (N-1) = J (N-1) 0 = 1` | `Quantum/HeisenbergChain.lean` |
+| `openChainCoupling N J` | coupling `Fin (N+1) → Fin (N+1) → ℂ`: returns `-J` on nearest-neighbour bonds, zero otherwise | `Quantum/HeisenbergChain.lean` |
+| `periodicChainCoupling N J` | coupling `Fin (N+2) → Fin (N+2) → ℂ`: returns `-J` on nearest-neighbour bonds (mod N+2), zero otherwise | `Quantum/HeisenbergChain.lean` |
 | `heisenbergHamiltonian_isHermitian_of_real_symm` | for any real symmetric coupling `J` the Heisenberg Hamiltonian `H = Σ_{x,y} J(x,y) Ŝ_x · Ŝ_y` is Hermitian | `Quantum/HeisenbergChain.lean` |
 | `openChainHeisenberg_isHermitian` | specialization: the open-chain Heisenberg Hamiltonian is Hermitian | `Quantum/HeisenbergChain.lean` |
 | `periodicChainHeisenberg_isHermitian` | specialization: the periodic-chain Heisenberg Hamiltonian is Hermitian | `Quantum/HeisenbergChain.lean` |
