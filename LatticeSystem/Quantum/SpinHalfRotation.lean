@@ -74,6 +74,7 @@ noncomputable def spinHalfRot3 (θ : ℝ) : Matrix (Fin 2) (Fin 2) ℂ :=
 
 /-! ## Value at `θ = 0` -/
 
+/-- `rotOf S 0 = 1`: the generic rotation is the identity at angle zero. -/
 private lemma rotOf_zero (S : Matrix (Fin 2) (Fin 2) ℂ) : rotOf S 0 = 1 := by
   simp [rotOf]
 
@@ -88,6 +89,7 @@ theorem spinHalfRot3_zero : spinHalfRot3 0 = 1 := rotOf_zero _
 
 /-! ## Adjoint = rotation by the opposite angle -/
 
+/-- `(rotOf S θ)ᴴ = rotOf S (-θ)` when `S` is Hermitian. -/
 private lemma rotOf_adjoint {S : Matrix (Fin 2) (Fin 2) ℂ}
     (hS : S.IsHermitian) (θ : ℝ) :
     (rotOf S θ)ᴴ = rotOf S (-θ) := by
@@ -133,6 +135,7 @@ theorem spinHalfRot3_adjoint (θ : ℝ) :
 
 /-! ## Rotation by `2π` (Tasaki eq 2.1.23 for S = 1/2) -/
 
+/-- `rotOf S (2π) = -1`: the 2π rotation gives `-1` for any spin operator `S`. -/
 private lemma rotOf_two_pi (S : Matrix (Fin 2) (Fin 2) ℂ) :
     rotOf S (2 * Real.pi) = -1 := by
   unfold rotOf
@@ -173,6 +176,8 @@ private lemma rot_mul_helper {S : Matrix (Fin 2) (Fin 2) ℂ} {k : ℂ}
 
 /-! ## Group law `Û^(α)_θ · Û^(α)_φ = Û^(α)_{θ+φ}` -/
 
+/-- Group law for `rotOf`: product of two generic rotations equals the rotation by the sum of angles,
+when `S * S = (1/4) · 1`. -/
 private lemma rotOf_mul_rotOf {S : Matrix (Fin 2) (Fin 2) ℂ}
     (hS_sq : S * S = (1 / 4 : ℂ) • 1) (θ φ : ℝ) :
     rotOf S θ * rotOf S φ = rotOf S (θ + φ) := by
@@ -206,6 +211,7 @@ theorem spinHalfRot3_mul (θ φ : ℝ) :
 
 /-! ## Unitarity `Û^(α)_θ · (Û^(α)_θ)† = 1` -/
 
+/-- `rotOf S θ * (rotOf S θ)ᴴ = 1`: unitarity of the generic rotation. -/
 private lemma rotOf_mul_conjTranspose {S : Matrix (Fin 2) (Fin 2) ℂ}
     (hS : S.IsHermitian) (hS_sq : S * S = (1 / 4 : ℂ) • 1) (θ : ℝ) :
     rotOf S θ * (rotOf S θ)ᴴ = 1 := by
@@ -268,6 +274,7 @@ theorem spinHalfRot3_det_eq_one (θ : ℝ) : (spinHalfRot3 θ).det = 1 := by
 
 /-! ## `Û^(α)_π`: the `π` rotation as `-2i · Ŝ^(α)` (Tasaki eq 2.1.26 at θ=π) -/
 
+/-- `rotOf S π = (-2i) • S`: the π-rotation is a pure imaginary multiple of `S`. -/
 private lemma rotOf_pi (S : Matrix (Fin 2) (Fin 2) ℂ) :
     rotOf S Real.pi = (-(2 * I)) • S := by
   unfold rotOf
@@ -336,6 +343,7 @@ theorem spinHalfRot3_pi_anticomm_spinHalfRot1_pi :
 
 /-! ## `(Û^(α)_π)† = 2i · Ŝ^(α)` -/
 
+/-- `rotOf S (-π) = (2i) • S`: the negative-π rotation is the conjugate of the π-rotation. -/
 private lemma rotOf_neg_pi (S : Matrix (Fin 2) (Fin 2) ℂ) :
     rotOf S (-Real.pi) = (2 * I) • S := by
   unfold rotOf
@@ -343,6 +351,7 @@ private lemma rotOf_neg_pi (S : Matrix (Fin 2) (Fin 2) ℂ) :
     Real.cos_neg, Real.sin_neg, Real.cos_pi_div_two, Real.sin_pi_div_two]
   simp
 
+/-- `(rotOf S π)ᴴ = (2i) • S` when `S` is Hermitian. -/
 private lemma rotOf_pi_conjTranspose {S : Matrix (Fin 2) (Fin 2) ℂ}
     (hS : S.IsHermitian) :
     (rotOf S Real.pi)ᴴ = (2 * I) • S := by
@@ -458,10 +467,12 @@ private lemma spinHalfOp_triple_of_anticomm
     _ = -((1 / 4 : ℂ) • Sβ) := by rw [Matrix.mul_one]
     _ = (-(1 / 4 : ℂ)) • Sβ := by rw [neg_smul]
 
+/-- Symmetry of anticommutation: `A * B + B * A = 0` implies `B * A + A * B = 0`. -/
 private lemma anticomm_swap {A B : Matrix (Fin 2) (Fin 2) ℂ}
     (h : A * B + B * A = 0) : B * A + A * B = 0 := by
   rw [add_comm]; exact h
 
+/-- `(rotOf Sα π)ᴴ * Sβ * rotOf Sα π = -Sβ` when `Sα` and `Sβ` anticommute. -/
 private lemma rotOf_pi_conj_of_ne {Sα Sβ : Matrix (Fin 2) (Fin 2) ℂ}
     (hα : Sα.IsHermitian) (hα_sq : Sα * Sα = (1 / 4 : ℂ) • 1)
     (hanti : Sα * Sβ + Sβ * Sα = 0) :
@@ -669,6 +680,7 @@ commutes with 1 and with itself), so `(rotOf Sα θ)ᴴ · Sα · rotOf Sα θ =
 (rotOf Sα θ)ᴴ · rotOf Sα θ · Sα = Sα` via unitarity.
 -/
 
+/-- `Sα * rotOf Sα θ = rotOf Sα θ * Sα`: a spin operator commutes with its own rotation. -/
 private lemma rotOf_comm_self (Sα : Matrix (Fin 2) (Fin 2) ℂ) (θ : ℝ) :
     Sα * rotOf Sα θ = rotOf Sα θ * Sα := by
   unfold rotOf
@@ -917,6 +929,7 @@ Problem 2.1.b to axes 1 and 2. -/
 noncomputable def hadamard : Matrix (Fin 2) (Fin 2) ℂ :=
   ((Real.sqrt 2 : ℂ)⁻¹) • !![1, 1; 1, -1]
 
+/-- `(1/√2) * (1/√2) = 1/2` in `ℂ`; used to simplify Hadamard products. -/
 private lemma sqrt2_inv_mul_sqrt2_inv :
     ((Real.sqrt 2 : ℂ)⁻¹) * ((Real.sqrt 2 : ℂ)⁻¹) = (1 / 2 : ℂ) := by
   rw [← mul_inv, ← Complex.ofReal_mul,

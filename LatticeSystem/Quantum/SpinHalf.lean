@@ -75,6 +75,7 @@ theorem pauliZ_eq_two_smul_spinHalfOp3 :
 
 /-! ## Hermiticity -/
 
+/-- The scalar `1/2 : ℂ` is self-conjugate. -/
 private lemma star_one_half_complex : star ((1 / 2 : ℂ)) = (1 / 2 : ℂ) := by
   simp
 
@@ -141,18 +142,21 @@ theorem spinHalfOp3_anticomm_spinHalfOp1 :
 
 /-! ## Commutation relations (Tasaki eq 2.1.1, p. 13, S = 1/2 case) -/
 
+/-- Reversed product `σ^y · σ^x = -i · σ^z`. -/
 private lemma pauliY_mul_pauliX : pauliY * pauliX = (-I) • pauliZ := by
   have h : pauliY * pauliX = -(pauliX * pauliY) := by
     rw [eq_neg_iff_add_eq_zero, add_comm]
     exact pauliX_anticomm_pauliY
   rw [h, pauliX_mul_pauliY, neg_smul]
 
+/-- Reversed product `σ^z · σ^y = -i · σ^x`. -/
 private lemma pauliZ_mul_pauliY : pauliZ * pauliY = (-I) • pauliX := by
   have h : pauliZ * pauliY = -(pauliY * pauliZ) := by
     rw [eq_neg_iff_add_eq_zero, add_comm]
     exact pauliY_anticomm_pauliZ
   rw [h, pauliY_mul_pauliZ, neg_smul]
 
+/-- Reversed product `σ^x · σ^z = -i · σ^y`. -/
 private lemma pauliX_mul_pauliZ : pauliX * pauliZ = (-I) • pauliY := by
   have h : pauliX * pauliZ = -(pauliZ * pauliX) := by
     rw [eq_neg_iff_add_eq_zero, add_comm]

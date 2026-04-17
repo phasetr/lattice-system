@@ -91,4 +91,34 @@ theorem gibbsExpectation_one {H : ManyBodyOp Λ} (β : ℝ)
   simp only [gibbsExpectation, mul_one]
   exact gibbsState_trace β hZ
 
+/-! ## Properties at β = 0 -/
+
+/-- At `β = 0`, `exp(-0 · H) = 1` (the identity matrix). -/
+theorem gibbsExp_zero (H : ManyBodyOp Λ) : gibbsExp 0 H = 1 := by
+  simp only [gibbsExp, neg_zero, Complex.ofReal_zero, zero_smul, NormedSpace.exp_zero]
+
+/-- At `β = 0`, the partition function equals the dimension of the
+Hilbert space: `Z(0) = |Λ → Fin 2|`. -/
+theorem partitionFn_zero (H : ManyBodyOp Λ) :
+    partitionFn 0 H = Fintype.card (Λ → Fin 2) := by
+  simp only [partitionFn, gibbsExp_zero, Matrix.trace_one]
+
+/-- The partition function at `β = 0` is nonzero (the dimension is positive). -/
+theorem partitionFn_zero_ne_zero [Nonempty (Λ → Fin 2)] (H : ManyBodyOp Λ) :
+    partitionFn 0 H ≠ 0 := by
+  rw [partitionFn_zero]
+  exact_mod_cast Fintype.card_pos.ne'
+
+/-! ## Linearity of expectation -/
+
+/-- Expectation is additive: `⟨O₁ + O₂⟩ = ⟨O₁⟩ + ⟨O₂⟩`. -/
+theorem gibbsExpectation_add {H : ManyBodyOp Λ} (β : ℝ) (O₁ O₂ : ManyBodyOp Λ) :
+    gibbsExpectation β H (O₁ + O₂) = gibbsExpectation β H O₁ + gibbsExpectation β H O₂ := by
+  simp only [gibbsExpectation, mul_add, Matrix.trace_add]
+
+/-- Expectation is homogeneous: `⟨c • O⟩ = c • ⟨O⟩`. -/
+theorem gibbsExpectation_smul {H : ManyBodyOp Λ} (β : ℝ) (c : ℂ) (O : ManyBodyOp Λ) :
+    gibbsExpectation β H (c • O) = c * gibbsExpectation β H O := by
+  simp only [gibbsExpectation, Matrix.mul_smul, Matrix.trace_smul, smul_eq_mul]
+
 end LatticeSystem.Quantum

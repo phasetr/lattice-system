@@ -50,6 +50,7 @@ noncomputable def totalSpinHalfOp3 : ManyBodyOp Λ :=
 
 /-! ## Hermiticity -/
 
+/-- A finite sum of Hermitian matrices is Hermitian. -/
 private lemma isHermitian_sum {ι : Type*} {n : Type*}
     (s : Finset ι) {f : ι → Matrix n n ℂ} (hf : ∀ i ∈ s, (f i).IsHermitian) :
     (∑ i ∈ s, f i).IsHermitian := by
@@ -319,6 +320,8 @@ Tasaki eq. (2.2.6) diagonal) with the off-diagonal contribution
 (`x ≠ y`, vanishing by `onSite_mul_onSite_of_ne`).
 -/
 
+/-- General total-spin commutator: if `[Sα, Sβ] = I • Sγ` then
+`[Σ_x onSite x Sα, Σ_x onSite x Sβ] = I • Σ_x onSite x Sγ`. -/
 private lemma totalSpin_commutator_general
     {Sα Sβ Sγ : Matrix (Fin 2) (Fin 2) ℂ}
     (hab : Sα * Sβ - Sβ * Sα = Complex.I • Sγ) :
@@ -391,6 +394,7 @@ theorem onSite_commutator_totalOnSite
 
 /-! ## Adjoint relations and ladder commutator for total raising/lowering -/
 
+/-- The conjugate transpose of `onSite i A` equals `onSite i Aᴴ`. -/
 private lemma onSite_conjTranspose (i : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) :
     (onSite i A).conjTranspose = (onSite i A.conjTranspose : ManyBodyOp Λ) := by
   ext σ' σ
@@ -403,6 +407,7 @@ private lemma onSite_conjTranspose (i : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) :
     rw [if_neg h, if_neg h', star_zero]
 
 omit [Fintype Λ] [DecidableEq Λ] in
+/-- Conjugate transpose distributes over finite sums in `ManyBodyOp Λ`. -/
 private lemma sum_conjTranspose_manyBody
     {s : Finset Λ} (f : Λ → ManyBodyOp Λ) :
     (∑ x ∈ s, f x).conjTranspose = ∑ x ∈ s, (f x).conjTranspose := by
@@ -705,7 +710,9 @@ noncomputable def totalSpinHalfRot3 (θ : ℝ) : ManyBodyOp Λ :=
 
 /-- `Û^(α)_π_tot` is a special case of `Û^(α)_θ_tot` at `θ = π`. -/
 theorem totalSpinHalfRot1Pi_eq : totalSpinHalfRot1Pi Λ = totalSpinHalfRot1 Λ Real.pi := rfl
+/-- `Û^(2)_π_tot` is a special case of `Û^(2)_θ_tot` at `θ = π`. -/
 theorem totalSpinHalfRot2Pi_eq : totalSpinHalfRot2Pi Λ = totalSpinHalfRot2 Λ Real.pi := rfl
+/-- `Û^(3)_π_tot` is a special case of `Û^(3)_θ_tot` at `θ = π`. -/
 theorem totalSpinHalfRot3Pi_eq : totalSpinHalfRot3Pi Λ = totalSpinHalfRot3 Λ Real.pi := rfl
 
 /-! ## Tasaki Problem 2.2.a: total π-rotation product (in cyclic axes) -/
@@ -772,11 +779,13 @@ theorem totalSpinHalfRot1_zero : totalSpinHalfRot1 Λ 0 = 1 := by
   simp_rw [spinHalfRot1_zero, onSite_one]
   exact (Finset.noncommProd_eq_pow_card _ _ _ 1 (fun _ _ => rfl)).trans (one_pow _)
 
+/-- `Û^(2)_0_tot = 1`. -/
 theorem totalSpinHalfRot2_zero : totalSpinHalfRot2 Λ 0 = 1 := by
   unfold totalSpinHalfRot2
   simp_rw [spinHalfRot2_zero, onSite_one]
   exact (Finset.noncommProd_eq_pow_card _ _ _ 1 (fun _ _ => rfl)).trans (one_pow _)
 
+/-- `Û^(3)_0_tot = 1`. -/
 theorem totalSpinHalfRot3_zero : totalSpinHalfRot3 Λ 0 = 1 := by
   unfold totalSpinHalfRot3
   simp_rw [spinHalfRot3_zero, onSite_one]
@@ -999,6 +1008,7 @@ The Heisenberg-type case (`A = Σ J(x,y) Ŝ_x · Ŝ_y`) was already
 handled by `heisenbergHamiltonian_commutator_*` in `SpinDot.lean`;
 here we provide the fully generic statement. -/
 
+/-- If `A` commutes with `S` then `A` commutes with `exp(c • S)` for any scalar `c`. -/
 private lemma totalSpinHalfRot_commute_aux (S : ManyBodyOp Λ) (θ : ℝ)
     (A : ManyBodyOp Λ) (h : Commute A S) :
     Commute A (NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • S)) :=
@@ -1050,6 +1060,7 @@ finite SU(2) invariance `(Û)† Â Û = Â` (Tasaki eq. (2.2.13))
 follows directly. -/
 
 omit [Fintype Λ] [DecidableEq Λ] in
+/-- `(-(I·θ)) • S` is skew-adjoint when `S` is Hermitian. -/
 private lemma neg_I_mul_real_smul_isHermitian_mem_skewAdjoint (θ : ℝ)
     {S : ManyBodyOp Λ} (hS : S.IsHermitian) :
     ((-(Complex.I * (θ : ℂ))) • S) ∈ skewAdjoint (ManyBodyOp Λ) := by

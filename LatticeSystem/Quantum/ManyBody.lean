@@ -83,21 +83,26 @@ private def pivotLeft (σ' σ : Λ → Fin 2) (j : Λ) : Λ → Fin 2 :=
   Function.update σ j (σ' j)
 
 omit [Fintype Λ] in
+/-- `pivotLeft` at a site `i ≠ j` equals the original configuration `σ`. -/
 private lemma pivotLeft_at_i_of_ne {i j : Λ} (hij : i ≠ j)
     (σ' σ : Λ → Fin 2) : pivotLeft σ' σ j i = σ i := by
   rw [pivotLeft, Function.update_of_ne hij]
 
 omit [Fintype Λ] in
+/-- `pivotLeft` at site `j` equals `σ' j`. -/
 private lemma pivotLeft_at_j (σ' σ : Λ → Fin 2) (j : Λ) :
     pivotLeft σ' σ j j = σ' j := by
   rw [pivotLeft, Function.update_self]
 
 omit [Fintype Λ] in
+/-- `pivotLeft` at a site `k ≠ j` equals the original configuration `σ`. -/
 private lemma pivotLeft_off_j {j k : Λ} (hk : k ≠ j)
     (σ' σ : Λ → Fin 2) :
     pivotLeft σ' σ j k = σ k := by
   rw [pivotLeft, Function.update_of_ne hk]
 
+/-- The matrix element of `onSite i A * onSite j B` factors through the unique
+pivot `pivotLeft σ' σ j` when `i ≠ j`. -/
 private lemma onSite_mul_onSite_apply_of_ne_aux {i j : Λ} (hij : i ≠ j)
     (A B : Matrix (Fin 2) (Fin 2) ℂ) (σ' σ : Λ → Fin 2) :
     (onSite i A * onSite j B) σ' σ =
@@ -127,6 +132,8 @@ private lemma onSite_mul_onSite_apply_of_ne_aux {i j : Λ} (hij : i ≠ j)
       exact hτj (hall j hij.symm).symm
     rw [if_neg hnotall, zero_mul]
 
+/-- When `σ'` and `σ` agree off both sites `i` and `j`, the pivot product
+evaluates to `A (σ' i) (σ i) * B (σ' j) (σ j)`. -/
 private lemma onSite_mul_onSite_value_of_agree {i j : Λ} (hij : i ≠ j)
     (A B : Matrix (Fin 2) (Fin 2) ℂ) {σ' σ : Λ → Fin 2}
     (hagree : ∀ k, k ≠ i → k ≠ j → σ' k = σ k) :
@@ -143,6 +150,8 @@ private lemma onSite_mul_onSite_value_of_agree {i j : Λ} (hij : i ≠ j)
     · rw [pivotLeft_off_j hkj]
       exact hagree k hki hkj
 
+/-- When `σ'` and `σ` disagree at some site off both `i` and `j`, the pivot
+product is zero. -/
 private lemma onSite_mul_onSite_value_of_disagree {i j : Λ}
     (A B : Matrix (Fin 2) (Fin 2) ℂ) {σ' σ : Λ → Fin 2}
     (hdis : ¬ ∀ k, k ≠ i → k ≠ j → σ' k = σ k) :
@@ -270,11 +279,13 @@ private def fiberUpdate (σ : Λ → Fin 2) (i : Λ) (t : Fin 2) : Λ → Fin 2 
   Function.update σ i t
 
 omit [Fintype Λ] in
+/-- `fiberUpdate` at site `i` returns the new value `t`. -/
 private lemma fiberUpdate_at (σ : Λ → Fin 2) (i : Λ) (t : Fin 2) :
     fiberUpdate σ i t i = t := by
   rw [fiberUpdate, Function.update_self]
 
 omit [Fintype Λ] in
+/-- `fiberUpdate` at a site `k ≠ i` leaves the original value unchanged. -/
 private lemma fiberUpdate_off {σ : Λ → Fin 2} {i k : Λ} (hk : k ≠ i) (t : Fin 2) :
     fiberUpdate σ i t k = σ k := by
   rw [fiberUpdate, Function.update_of_ne hk]
