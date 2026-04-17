@@ -104,7 +104,7 @@ theorem partitionFn_zero (H : ManyBodyOp Λ) :
   simp only [partitionFn, gibbsExp_zero, Matrix.trace_one]
 
 /-- The partition function at `β = 0` is nonzero (the dimension is positive). -/
-theorem partitionFn_ne_zero_of_zero [Nonempty (Λ → Fin 2)] (H : ManyBodyOp Λ) :
+theorem partitionFn_zero_ne_zero [Nonempty (Λ → Fin 2)] (H : ManyBodyOp Λ) :
     partitionFn 0 H ≠ 0 := by
   rw [partitionFn_zero]
   exact_mod_cast Fintype.card_pos.ne'

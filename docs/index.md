@@ -386,7 +386,7 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `gibbsExp_zero` | `exp(-0·H) = 1` (Tasaki §3.3, pp. 75–78) | `Quantum/GibbsState.lean` |
 | `partitionFn β H` | `Z := Matrix.trace (exp(-βH))` | `Quantum/GibbsState.lean` |
 | `partitionFn_zero` | `Z(0) = Fintype.card α` (dimension of the Hilbert space) | `Quantum/GibbsState.lean` |
-| `partitionFn_ne_zero_of_zero` | `Z(0) ≠ 0` (concrete sorry-free proof that the partition function is nonzero at β = 0) | `Quantum/GibbsState.lean` |
+| `partitionFn_zero_ne_zero` | `Z(0) ≠ 0` (concrete sorry-free proof that the partition function is nonzero at β = 0) | `Quantum/GibbsState.lean` |
 | `gibbsState β H` | `ρ := (1/Z) • exp(-βH)` | `Quantum/GibbsState.lean` |
 | `gibbsState_trace` | `Tr(ρ) = 1` | `Quantum/GibbsState.lean` |
 | `gibbsState_isHermitian` | `ρ` is Hermitian | `Quantum/GibbsState.lean` |
