@@ -219,18 +219,21 @@ For `Λ = Fin 2`, the product `onSite 0 M * onSite 1 N` acts on a basis
 vector `|σ⟩` as the Kronecker product: the coefficient of `|τ⟩` is
 `M (τ 0) (σ 0) * N (τ 1) (σ 1)`. -/
 
+/-- On `Fin 2`, agreement away from `0` is equivalent to agreement at `1`. -/
 private lemma fin2_forall_ne_zero (τ κ : Fin 2 → Fin 2) :
     (∀ k, k ≠ (0 : Fin 2) → τ k = κ k) ↔ τ 1 = κ 1 := by
   constructor
   · intro h; exact h 1 (by decide)
   · intro h k hk; fin_cases k <;> simp_all
 
+/-- On `Fin 2`, agreement away from `1` is equivalent to agreement at `0`. -/
 private lemma fin2_forall_ne_one (τ κ : Fin 2 → Fin 2) :
     (∀ k, k ≠ (1 : Fin 2) → τ k = κ k) ↔ τ 0 = κ 0 := by
   constructor
   · intro h; exact h 0 (by decide)
   · intro h k hk; fin_cases k <;> simp_all
 
+/-- Equality of functions `Fin 2 → Fin 2` reduces to pointwise equality at `0` and `1`. -/
 private lemma fin2_eq_iff (σ τ : Fin 2 → Fin 2) :
     σ = τ ↔ σ 0 = τ 0 ∧ σ 1 = τ 1 := by
   constructor
@@ -266,10 +269,12 @@ theorem onSite_zero_mul_one_mulVec_basisVec
 
 /-! ## Matrix entry ↔ mulVec connection -/
 
+/-- Column 0 of `M` equals `M · |↑⟩` entry-wise. -/
 private lemma matrix_col0_eq_mulVec_up (M : Matrix (Fin 2) (Fin 2) ℂ) (k : Fin 2) :
     M k 0 = (M.mulVec spinHalfUp) k := by
   simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two, spinHalfUp]
 
+/-- Column 1 of `M` equals `M · |↓⟩` entry-wise. -/
 private lemma matrix_col1_eq_mulVec_down (M : Matrix (Fin 2) (Fin 2) ℂ) (k : Fin 2) :
     M k 1 = (M.mulVec spinHalfDown) k := by
   simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two, spinHalfDown]

@@ -787,12 +787,16 @@ def upDown : Fin 2 → Fin 2
   | 0 => 0
   | 1 => 1
 
+/-- `upDown` maps site 0 to spin-up. -/
 lemma upDown_zero : upDown 0 = 0 := rfl
+/-- `upDown` maps site 1 to spin-down. -/
 lemma upDown_one : upDown 1 = 1 := rfl
 
+/-- The two sites carry opposite spins under `upDown`. -/
 lemma upDown_antiparallel : upDown 0 ≠ upDown 1 := by
   rw [upDown_zero, upDown_one]; exact zero_ne_one
 
+/-- Explicit form of the swap of `upDown` at sites `0` and `1`. -/
 lemma basisSwap_upDown :
     basisSwap upDown (0 : Fin 2) 1 = fun (i : Fin 2) =>
       match i with | 0 => 1 | 1 => 0 := by

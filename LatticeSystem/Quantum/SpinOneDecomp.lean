@@ -123,6 +123,7 @@ def spinOneUnit21 : Matrix (Fin 3) (Fin 3) ℂ :=
      0, 0, 1;
      0, 0, 0]
 
+/-- `√2 · √2 = 2` in `ℂ`; used to simplify entries in off-diagonal matrix unit proofs. -/
 private lemma sqrt2_sq : ((Real.sqrt 2 : ℂ)) * ((Real.sqrt 2 : ℂ)) = 2 := by
   rw [← Complex.ofReal_mul, Real.mul_self_sqrt (by norm_num : (0 : ℝ) ≤ 2)]
   norm_num

@@ -180,6 +180,7 @@ theorem spinOneOpMinus_conjTranspose :
   fin_cases i <;> fin_cases j <;>
     simp [spinOneOpPlus, spinOneOpMinus, Matrix.conjTranspose_apply]
 
+/-- `√2 · √2 = 2` in `ℂ`; used when simplifying entries of `spinOneOpPlus` and `spinOneOpMinus`. -/
 private lemma sqrt2_mul_sqrt2 : (Real.sqrt 2 : ℂ) * (Real.sqrt 2 : ℂ) = 2 := by
   rw [← Complex.ofReal_mul, Real.mul_self_sqrt (by norm_num : (0:ℝ) ≤ 2)]
   norm_num

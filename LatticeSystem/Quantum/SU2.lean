@@ -50,6 +50,7 @@ def SU2 : Submonoid (Matrix (Fin 2) (Fin 2) ℂ) where
   mul_mem' := fun {U V} hU hV =>
     ⟨mul_mem hU.1 hV.1, by rw [Matrix.det_mul, hU.2, hV.2, mul_one]⟩
 
+/-- Membership in `SU2` unfolds to unitarity and unit determinant. -/
 theorem mem_SU2_iff (U : Matrix (Fin 2) (Fin 2) ℂ) :
     U ∈ SU2 ↔ U ∈ unitary (Matrix (Fin 2) (Fin 2) ℂ) ∧ Matrix.det U = 1 :=
   Iff.rfl

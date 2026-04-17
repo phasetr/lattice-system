@@ -72,6 +72,7 @@ noncomputable def quantumIsingHamiltonian (N : ℕ) (J h : ℝ) :
 
 /-! ## Helpers for Hermiticity under sums and real scalar multiples -/
 
+/-- Hermiticity is preserved under finite sums. -/
 private lemma isHermitian_sum {ι : Type*} {n : Type*}
     (s : Finset ι) {f : ι → Matrix n n ℂ} (hf : ∀ i ∈ s, (f i).IsHermitian) :
     (∑ i ∈ s, f i).IsHermitian := by
@@ -83,11 +84,13 @@ private lemma isHermitian_sum {ι : Type*} {n : Type*}
     refine Matrix.IsHermitian.add (hf a (Finset.mem_insert_self a t)) ?_
     exact ih (fun i hi => hf i (Finset.mem_insert_of_mem hi))
 
+/-- Hermiticity is preserved under `Finset.univ` sums. -/
 private lemma isHermitian_univ_sum {ι : Type*} [Fintype ι] {n : Type*}
     {f : ι → Matrix n n ℂ} (hf : ∀ i, (f i).IsHermitian) :
     (∑ i, f i).IsHermitian :=
   isHermitian_sum Finset.univ (fun i _ => hf i)
 
+/-- Scaling a Hermitian matrix by a real scalar preserves Hermiticity. -/
 private lemma isHermitian_smul_real {n : Type*}
     (c : ℝ) {M : Matrix n n ℂ} (hM : M.IsHermitian) :
     ((c : ℂ) • M).IsHermitian := by
