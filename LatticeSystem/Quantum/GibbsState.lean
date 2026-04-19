@@ -37,6 +37,8 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
   `⟨H · A⟩_β = ⟨A · H⟩_β` and `⟨[H, A]⟩_β = 0` (Tasaki §3.3, p. 80).
 * `gibbsExpectation_sq_im_of_isHermitian` — for Hermitian `H, O`,
   `(⟨O · O⟩_β).im = 0` (variance precursor).
+* `gibbsExpectation_pow_im_of_isHermitian` — for Hermitian `H, O` and
+  any `n : ℕ`, `(⟨O ^ n⟩_β).im = 0` (all higher moments are real).
 * `Matrix.trace_mul_conjTranspose_swap_of_isHermitian` — generic
   helper: for Hermitian `ρ`, `star Tr(ρ · X) = Tr(ρ · Xᴴ)`.
 * `gibbsExpectation_star_swap_of_isHermitian` — for Hermitian `H, A, B`,
@@ -364,6 +366,14 @@ theorem gibbsExpectation_sq_im_of_isHermitian {H O : ManyBodyOp Λ}
     (gibbsExpectation β H (O * O)).im = 0 :=
   gibbsExpectation_im_of_isHermitian hH
     (Matrix.IsHermitian.mul_of_commute hO hO (Commute.refl O)) β
+
+/-- For Hermitian `H`, Hermitian `O`, and any `n : ℕ`,
+`(⟨O ^ n⟩_β).im = 0`. Generalises `gibbsExpectation_sq_im_of_isHermitian`
+to arbitrary natural powers via `Matrix.IsHermitian.pow`. -/
+theorem gibbsExpectation_pow_im_of_isHermitian {H O : ManyBodyOp Λ}
+    (hH : H.IsHermitian) (hO : O.IsHermitian) (β : ℝ) (n : ℕ) :
+    (gibbsExpectation β H (O ^ n)).im = 0 :=
+  gibbsExpectation_im_of_isHermitian hH (hO.pow n) β
 
 /-! ## Anticommutator real, commutator purely imaginary
 
