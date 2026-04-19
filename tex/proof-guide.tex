@@ -1791,6 +1791,20 @@ inherit its standard interpretation as a non-negative real number
 yet developed).
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsExpectation\_pow\_im\_of\_isHermitian}]
+For Hermitian $H$, Hermitian observable $O$, and any $n \in \mathbb{N}$,
+$\Im\langle O^n \rangle_\beta = 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+$O^n$ is Hermitian by \texttt{Matrix.IsHermitian.pow}, the
+specialisation of \texttt{IsSelfAdjoint.pow}. The result then
+specialises \texttt{gibbsExpectation\_im\_of\_isHermitian}
+at observable $O^n$. This generalises the second-moment realness to
+all natural-power moments, the algebraic foundation of the canonical
+moment-generating function and cumulant expansion.
+\end{proof}
+
 \subsection{Anticommutator real, commutator purely imaginary}
 \label{subsec:gibbs-anti-comm}
 
