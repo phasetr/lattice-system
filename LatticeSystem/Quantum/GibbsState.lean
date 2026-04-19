@@ -30,8 +30,11 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
 * `Matrix.trace_mul_star_of_isHermitian` — generic auxiliary:
   for Hermitian matrices `A`, `B`, `star (Tr(A · B)) = Tr(A · B)`.
 * `gibbsExpectation_star_of_isHermitian`,
-  `gibbsExpectation_im_of_isHermitian` — for Hermitian `H` and Hermitian
-  observable `O`, the expectation `⟨O⟩_β` is real.
+  `gibbsExpectation_im_of_isHermitian`,
+  `gibbsExpectation_ofReal_re_eq_of_isHermitian` — for Hermitian `H`
+  and Hermitian observable `O`, the expectation `⟨O⟩_β` is real
+  (in three equivalent forms: fixed by `star`, vanishing imaginary
+  part, equal to its real part cast to `ℂ`).
 * `gibbsExpectation_mul_hamiltonian_comm`,
   `gibbsExpectation_commutator_hamiltonian` — conservation laws:
   `⟨H · A⟩_β = ⟨A · H⟩_β` and `⟨[H, A]⟩_β = 0` (Tasaki §3.3, p. 80).
@@ -333,6 +336,17 @@ theorem gibbsExpectation_im_of_isHermitian {H O : ManyBodyOp Λ}
     (hH : H.IsHermitian) (hO : O.IsHermitian) (β : ℝ) :
     (gibbsExpectation β H O).im = 0 :=
   Complex.conj_eq_iff_im.mp (gibbsExpectation_star_of_isHermitian hH hO β)
+
+/-- For Hermitian `H` and Hermitian observable `O`, the Gibbs expectation
+equals the complex embedding of its real part:
+`((⟨O⟩_β).re : ℂ) = ⟨O⟩_β`. The imaginary part vanishes by
+`gibbsExpectation_im_of_isHermitian`, so `Complex.re_add_im` closes
+the equality. -/
+theorem gibbsExpectation_ofReal_re_eq_of_isHermitian {H O : ManyBodyOp Λ}
+    (hH : H.IsHermitian) (hO : O.IsHermitian) (β : ℝ) :
+    ((gibbsExpectation β H O).re : ℂ) = gibbsExpectation β H O := by
+  have him := gibbsExpectation_im_of_isHermitian hH hO β
+  apply Complex.ext <;> simp [him]
 
 /-! ## Conservation laws
 

@@ -1749,6 +1749,20 @@ Immediate corollary of
 conjugation iff its imaginary part vanishes.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsExpectation\_ofReal\_re\_eq\_of\_isHermitian}]
+For Hermitian $H$ and Hermitian observable $O$,
+$((\langle O \rangle_\beta).\Re : \mathbb{C}) = \langle O \rangle_\beta$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Constructive complement to the previous lemma.  By
+\texttt{Complex.ext}, equality of two complex numbers reduces to equality
+of real and imaginary parts.  The real part is trivially equal; the
+imaginary parts agree because $(\Re z, 0)$ has zero imaginary part and
+$\Im\langle O \rangle_\beta = 0$ by
+\texttt{gibbsExpectation\_im\_of\_isHermitian}.
+\end{proof}
+
 \subsection{Conservation laws}
 \label{subsec:gibbs-conservation}
 
