@@ -164,4 +164,19 @@ theorem quantumIsingGibbsExpectation_commutator_hamiltonian
         (quantumIsingHamiltonian N J h * A - A * quantumIsingHamiltonian N J h) = 0 :=
   gibbsExpectation_commutator_hamiltonian β (quantumIsingHamiltonian N J h) A
 
+/-- Ising-chain energy expectation as a sum of bond and transverse-field
+contributions:
+`⟨H_Ising⟩_β = -J · ∑ ⟨σ^z_i σ^z_{i+1}⟩_β + (-h) · ∑ ⟨σ^x_i⟩_β`. -/
+theorem quantumIsingGibbsExpectation_self_eq (β J h : ℝ) (N : ℕ) :
+    gibbsExpectation β (quantumIsingHamiltonian N J h)
+        (quantumIsingHamiltonian N J h) =
+      (-(J : ℂ)) * (∑ i : Fin N,
+          gibbsExpectation β (quantumIsingHamiltonian N J h)
+            (spinZ N i.castSucc * spinZ N i.succ))
+        + (-(h : ℂ)) * (∑ i : Fin (N + 1),
+            gibbsExpectation β (quantumIsingHamiltonian N J h) (spinX N i)) := by
+  unfold quantumIsingHamiltonian
+  rw [gibbsExpectation_add, gibbsExpectation_smul, gibbsExpectation_sum,
+    gibbsExpectation_smul, gibbsExpectation_sum]
+
 end LatticeSystem.Quantum

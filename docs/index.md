@@ -28,7 +28,7 @@ CAR algebras, and eventually lattice QCD.
 |---|---|---|
 | P0 | Project skeleton, CI, documentation infrastructure | Done |
 | P1a | Finite-volume quantum spin operator algebra (Pauli, `onSite`, commutativity) | Done |
-| P1b | Finite-chain quantum Ising Hamiltonian, Hermiticity, Gibbs state instantiation (Hermiticity, commutativity with `H`, β = 0 closed form, expectation realness for Hermitian observables, conservation `⟨[H, A]⟩ = 0`) | Done |
+| P1b | Finite-chain quantum Ising Hamiltonian, Hermiticity, Gibbs state instantiation (Hermiticity, commutativity with `H`, β = 0 closed form, expectation realness for Hermitian observables, conservation `⟨[H, A]⟩ = 0`, energy expectation as bond + transverse-field decomposition) | Done |
 | P1c (Tasaki §2.1) | Spin-1/2 operators `Ŝ^(α)` and the commutator algebra | Done |
 | P1d (Tasaki §2.1) | Basis states `|ψ^↑⟩, |ψ^↓⟩`, raising/lowering `Ŝ^±` (S = 1/2) | Done |
 | P1d' (Tasaki §2.1) | S = 1 matrix representations (eq. (2.1.9)) | Done |
@@ -377,6 +377,7 @@ explicit bond coupling `J`.
 | `quantumIsingGibbsExpectation_zero` | infinite-temperature closed form `⟨A⟩_0 = (1/dim) · Tr A` (independent of `J, h`) | `Quantum/IsingChain.lean` |
 | `quantumIsingGibbsExpectation_im_of_isHermitian` | for Hermitian `O`, `(⟨O⟩_β).im = 0` | `Quantum/IsingChain.lean` |
 | `quantumIsingGibbsExpectation_commutator_hamiltonian` | conservation `⟨[H_Ising, A]⟩_β = 0` | `Quantum/IsingChain.lean` |
+| `quantumIsingGibbsExpectation_self_eq` | `⟨H_Ising⟩_β = -J · ∑ ⟨σ^z σ^z⟩_β + (-h) · ∑ ⟨σ^x⟩_β` (energy as bond + transverse-field decomposition) | `Quantum/IsingChain.lean` |
 
 ### Gibbs state (Tasaki §3.3)
 

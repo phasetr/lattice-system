@@ -995,6 +995,28 @@ Direct specialisations of
 using \texttt{quantumIsingHamiltonian\_isHermitian}.
 \end{proof}
 
+\begin{theorem}[\texttt{quantumIsingGibbsExpectation\_self\_eq}]
+The Ising-chain energy expectation splits into bond and
+transverse-field contributions:
+\[
+  \langle H_{J,h}^{N+1} \rangle_\beta
+  \;=\;
+  -J \cdot \sum_{i=0}^{N-1}
+      \langle \sigma^z_i \sigma^z_{i+1} \rangle_\beta
+  \;+\;
+  -h \cdot \sum_{i=0}^{N}
+      \langle \sigma^x_i \rangle_\beta.
+\]
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Unfold $H_{J,h}^{N+1} = -J \cdot \sum \sigma^z\sigma^z + (-h) \cdot \sum \sigma^x$
+and apply
+\texttt{gibbsExpectation\_add},
+\texttt{gibbsExpectation\_smul} (twice, for $-J$ and $-h$), and
+\texttt{gibbsExpectation\_sum} (twice, on the two index sets).
+\end{proof}
+
 %======================================================================
 %======================================================================
 \section{Tasaki §2.1/§2.2 supplementary content}
