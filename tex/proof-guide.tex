@@ -1428,6 +1428,30 @@ previous lemma; \texttt{IsUnit.of\_mul\_eq\_one} produces the
 \texttt{IsUnit} certificate.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsExp\_natCast\_mul}]
+For every $n \in \mathbb{N}$,
+$e^{-(n\beta) H} = (e^{-\beta H})^n$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Induction on $n$. Base case $n = 0$: $e^{0} = I = M^0$. Inductive
+step: $((n+1)\beta) = n\beta + \beta$, hence by \texttt{gibbsExp\_add}
+and the IH,
+$e^{-((n+1)\beta) H} = e^{-(n\beta) H} \cdot e^{-\beta H}
+                    = (e^{-\beta H})^n \cdot e^{-\beta H}
+                    = (e^{-\beta H})^{n+1}$
+via \texttt{pow\_succ}.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsExp\_two\_mul}]
+$e^{-(2\beta) H} = e^{-\beta H} \cdot e^{-\beta H}$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Specialise the previous lemma at $n = 2$ and unfold $M^2 = M \cdot M$
+via \texttt{pow\_two}.
+\end{proof}
+
 \begin{lemma}[\texttt{partitionFn\_zero}]
 At $\beta = 0$,
 \[

@@ -47,6 +47,9 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
   `gibbsExp_isUnit` — one-parameter group property in `β`:
   `e^{-(β₁+β₂)H} = e^{-β₁H} · e^{-β₂H}`, `e^{βH} · e^{-βH} = 1`,
   hence `e^{-βH}` is invertible. Foundation for KMS / Wick rotation.
+* `gibbsExp_natCast_mul`, `gibbsExp_two_mul` — exact discrete
+  semigroup identity `gibbsExp ((n : ℝ) · β) H = (gibbsExp β H)^n`
+  for `n : ℕ`.
 -/
 
 namespace LatticeSystem.Quantum
@@ -154,6 +157,23 @@ theorem gibbsExp_self_mul_neg (β : ℝ) (H : ManyBodyOp Λ) :
 theorem gibbsExp_isUnit (β : ℝ) (H : ManyBodyOp Λ) :
     IsUnit (gibbsExp β H) :=
   IsUnit.of_mul_eq_one _ (gibbsExp_self_mul_neg β H)
+
+/-- Exact discrete semigroup identity: for `n : ℕ`,
+`gibbsExp ((n : ℝ) * β) H = (gibbsExp β H) ^ n`. -/
+theorem gibbsExp_natCast_mul (n : ℕ) (β : ℝ) (H : ManyBodyOp Λ) :
+    gibbsExp ((n : ℝ) * β) H = (gibbsExp β H) ^ n := by
+  induction n with
+  | zero => simp [gibbsExp_zero]
+  | succ k ih =>
+    have hsplit : ((k + 1 : ℕ) : ℝ) * β = (k : ℝ) * β + β := by push_cast; ring
+    rw [hsplit, gibbsExp_add, ih, pow_succ]
+
+/-- Specialisation at `n = 2`:
+`gibbsExp (2β) H = gibbsExp β H · gibbsExp β H`. -/
+theorem gibbsExp_two_mul (β : ℝ) (H : ManyBodyOp Λ) :
+    gibbsExp (2 * β) H = gibbsExp β H * gibbsExp β H := by
+  have := gibbsExp_natCast_mul 2 β H
+  simpa [pow_two] using this
 
 /-- At `β = 0`, the partition function equals the dimension of the
 Hilbert space: `Z(0) = |Λ → Fin 2|`. -/
