@@ -150,4 +150,18 @@ theorem quantumIsingGibbsExpectation_zero (J h : ℝ) (N : ℕ)
       = ((Fintype.card (Fin (N + 1) → Fin 2) : ℂ))⁻¹ * A.trace :=
   gibbsExpectation_zero (quantumIsingHamiltonian N J h) A
 
+/-- For any Hermitian observable `O`, the Ising-chain expectation
+`⟨O⟩_β` is real (imaginary part vanishes). -/
+theorem quantumIsingGibbsExpectation_im_of_isHermitian
+    (β J h : ℝ) (N : ℕ) {O : ManyBodyOp (Fin (N + 1))} (hO : O.IsHermitian) :
+    (gibbsExpectation β (quantumIsingHamiltonian N J h) O).im = 0 :=
+  gibbsExpectation_im_of_isHermitian (quantumIsingHamiltonian_isHermitian N J h) hO β
+
+/-- Ising-chain conservation law: `⟨[H, A]⟩_β = 0`. -/
+theorem quantumIsingGibbsExpectation_commutator_hamiltonian
+    (β J h : ℝ) (N : ℕ) (A : ManyBodyOp (Fin (N + 1))) :
+    gibbsExpectation β (quantumIsingHamiltonian N J h)
+        (quantumIsingHamiltonian N J h * A - A * quantumIsingHamiltonian N J h) = 0 :=
+  gibbsExpectation_commutator_hamiltonian β (quantumIsingHamiltonian N J h) A
+
 end LatticeSystem.Quantum
