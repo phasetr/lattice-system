@@ -193,7 +193,7 @@ theorem gibbsState_ne_zero {H : ManyBodyOp Λ} (β : ℝ)
   exact smul_ne_zero (one_div_ne_zero hZ) (gibbsExp_ne_zero β H)
 
 /-- Explicit matrix inverse of the Gibbs state when the partition function
-is nonzero: `(ρ_β)⁻¹ = Z(β) · e^{-β H} · ... = Z(β) • e^{β H}`. Note that
+is nonzero: `(ρ_β)⁻¹ = Z(β) · e^{β H}`. Note that
 `gibbsExp (-β) H = e^{β H}` in our convention. -/
 theorem gibbsState_inv {H : ManyBodyOp Λ} (β : ℝ)
     (hZ : partitionFn β H ≠ 0) :
