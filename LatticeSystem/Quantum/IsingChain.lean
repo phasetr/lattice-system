@@ -197,6 +197,26 @@ theorem quantumIsingGibbsExpectation_hamiltonian_pow_im
     (quantumIsingHamiltonian_isHermitian N J h)
     (quantumIsingHamiltonian_isHermitian N J h) β n
 
+/-- Ising-chain anticommutator expectation is real:
+for Hermitian `A, B`, `(⟨A · B + B · A⟩_β).im = 0`. -/
+theorem quantumIsingGibbsExpectation_anticommutator_im
+    (β J h : ℝ) (N : ℕ) {A B : ManyBodyOp (Fin (N + 1))}
+    (hA : A.IsHermitian) (hB : B.IsHermitian) :
+    (gibbsExpectation β (quantumIsingHamiltonian N J h)
+        (A * B + B * A)).im = 0 :=
+  gibbsExpectation_anticommutator_im
+    (quantumIsingHamiltonian_isHermitian N J h) hA hB β
+
+/-- Ising-chain commutator expectation is purely imaginary:
+for Hermitian `A, B`, `(⟨A · B − B · A⟩_β).re = 0`. -/
+theorem quantumIsingGibbsExpectation_commutator_re
+    (β J h : ℝ) (N : ℕ) {A B : ManyBodyOp (Fin (N + 1))}
+    (hA : A.IsHermitian) (hB : B.IsHermitian) :
+    (gibbsExpectation β (quantumIsingHamiltonian N J h)
+        (A * B - B * A)).re = 0 :=
+  gibbsExpectation_commutator_re
+    (quantumIsingHamiltonian_isHermitian N J h) hA hB β
+
 /-- Ising-chain energy expectation as a sum of bond and transverse-field
 contributions:
 `⟨H_Ising⟩_β = (-J) · ∑ ⟨σ^z_i σ^z_{i+1}⟩_β + (-h) · ∑ ⟨σ^x_i⟩_β`. -/
