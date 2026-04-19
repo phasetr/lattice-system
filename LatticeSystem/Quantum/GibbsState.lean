@@ -340,8 +340,9 @@ theorem gibbsExpectation_im_of_isHermitian {H O : ManyBodyOp Λ}
 /-- For Hermitian `H` and Hermitian observable `O`, the Gibbs expectation
 equals the complex embedding of its real part:
 `((⟨O⟩_β).re : ℂ) = ⟨O⟩_β`. The imaginary part vanishes by
-`gibbsExpectation_im_of_isHermitian`, so `Complex.re_add_im` closes
-the equality. -/
+`gibbsExpectation_im_of_isHermitian`; `Complex.ext` then reduces
+the goal to its real and imaginary components, both discharged
+by `simp` after rewriting with the realness hypothesis. -/
 theorem gibbsExpectation_ofReal_re_eq_of_isHermitian {H O : ManyBodyOp Λ}
     (hH : H.IsHermitian) (hO : O.IsHermitian) (β : ℝ) :
     ((gibbsExpectation β H O).re : ℂ) = gibbsExpectation β H O := by
