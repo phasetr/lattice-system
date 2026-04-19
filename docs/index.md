@@ -401,6 +401,8 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `gibbsExp_neg_mul_self` | `exp(βH) · exp(-βH) = 1` | `Quantum/GibbsState.lean` |
 | `gibbsExp_self_mul_neg` | `exp(-βH) · exp(βH) = 1` | `Quantum/GibbsState.lean` |
 | `gibbsExp_isUnit` | `exp(-βH)` is invertible | `Quantum/GibbsState.lean` |
+| `gibbsExp_ne_zero` | `exp(-βH) ≠ 0` (corollary of `gibbsExp_isUnit`) | `Quantum/GibbsState.lean` |
+| `gibbsState_ne_zero` | `ρ_β ≠ 0` when `Z(β) ≠ 0` | `Quantum/GibbsState.lean` |
 | `gibbsExp_natCast_mul` | `exp(-(n·β)H) = (exp(-βH))^n` for `n : ℕ` (exact discrete semigroup identity) | `Quantum/GibbsState.lean` |
 | `gibbsExp_two_mul` | `exp(-(2β)H) = exp(-βH) · exp(-βH)` | `Quantum/GibbsState.lean` |
 | `gibbsExp_inv` | `(exp(-βH))⁻¹ = exp(βH)` (matrix inverse made explicit) | `Quantum/GibbsState.lean` |
