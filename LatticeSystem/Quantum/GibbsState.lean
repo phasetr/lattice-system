@@ -43,6 +43,10 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
   `(⟨H · O⟩_β).im = 0` (energy-mode expectation reality).
 * `gibbsState_zero`, `gibbsExpectation_zero` — high-temperature limit
   `ρ_0 = (1/dim) · I` and `⟨A⟩_0 = (1/dim) · Tr A` (Tasaki §3.3, p. 78).
+* `gibbsExp_add`, `gibbsExp_neg_mul_self`, `gibbsExp_self_mul_neg`,
+  `gibbsExp_isUnit` — one-parameter group property in `β`:
+  `e^{-(β₁+β₂)H} = e^{-β₁H} · e^{-β₂H}`, `e^{βH} · e^{-βH} = 1`,
+  hence `e^{-βH}` is invertible. Foundation for KMS / Wick rotation.
 -/
 
 namespace LatticeSystem.Quantum
@@ -119,6 +123,37 @@ theorem gibbsExpectation_one {H : ManyBodyOp Λ} (β : ℝ)
 /-- At `β = 0`, `exp(-0 · H) = 1` (the identity matrix). -/
 theorem gibbsExp_zero (H : ManyBodyOp Λ) : gibbsExp 0 H = 1 := by
   simp only [gibbsExp, neg_zero, Complex.ofReal_zero, zero_smul, NormedSpace.exp_zero]
+
+/-! ## One-parameter group property in `β` -/
+
+/-- The Gibbs exponential is additive in the inverse temperature:
+`gibbsExp (β₁ + β₂) H = gibbsExp β₁ H * gibbsExp β₂ H`. The two factors
+commute because both are functions of the same `H`. -/
+theorem gibbsExp_add (β₁ β₂ : ℝ) (H : ManyBodyOp Λ) :
+    gibbsExp (β₁ + β₂) H = gibbsExp β₁ H * gibbsExp β₂ H := by
+  unfold gibbsExp
+  have hcomm : Commute (-(β₁ : ℂ) • H) (-(β₂ : ℂ) • H) :=
+    ((Commute.refl H).smul_left _).smul_right _
+  have hsum : -((β₁ + β₂ : ℝ) : ℂ) • H = -(β₁ : ℂ) • H + -(β₂ : ℂ) • H := by
+    push_cast; module
+  rw [hsum, Matrix.exp_add_of_commute _ _ hcomm]
+
+/-- `exp(βH) · exp(-βH) = 1`: the Gibbs exponential at `-β` is a left
+inverse of the one at `β`. -/
+theorem gibbsExp_neg_mul_self (β : ℝ) (H : ManyBodyOp Λ) :
+    gibbsExp (-β) H * gibbsExp β H = 1 := by
+  rw [← gibbsExp_add, neg_add_cancel, gibbsExp_zero]
+
+/-- `exp(-βH) · exp(βH) = 1`: the Gibbs exponential at `β` is a left
+inverse of the one at `-β`. -/
+theorem gibbsExp_self_mul_neg (β : ℝ) (H : ManyBodyOp Λ) :
+    gibbsExp β H * gibbsExp (-β) H = 1 := by
+  rw [← gibbsExp_add, add_neg_cancel, gibbsExp_zero]
+
+/-- The Gibbs exponential is a unit (invertible) for every `β` and `H`. -/
+theorem gibbsExp_isUnit (β : ℝ) (H : ManyBodyOp Λ) :
+    IsUnit (gibbsExp β H) :=
+  IsUnit.of_mul_eq_one _ (gibbsExp_self_mul_neg β H)
 
 /-- At `β = 0`, the partition function equals the dimension of the
 Hilbert space: `Z(0) = |Λ → Fin 2|`. -/

@@ -1393,6 +1393,41 @@ $-0 \cdot H = 0$, so $\exp(-0 \cdot H) = \exp(0) = \mathbf{1}$ by
 \texttt{Matrix.exp\_zero}.
 \end{proof}
 
+\subsubsection*{One-parameter group in $\beta$}
+
+\begin{lemma}[\texttt{gibbsExp\_add}]
+For all $\beta_1, \beta_2 \in \mathbb{R}$ and Hamiltonian $H$,
+$e^{-(\beta_1 + \beta_2) H} = e^{-\beta_1 H} \cdot e^{-\beta_2 H}$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The arguments $-\beta_1 H$ and $-\beta_2 H$ commute (both are scalar
+multiples of the same $H$). Apply
+\texttt{Matrix.exp\_add\_of\_commute} after rewriting
+$-(\beta_1+\beta_2) H = -\beta_1 H + -\beta_2 H$.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsExp\_neg\_mul\_self} / \texttt{gibbsExp\_self\_mul\_neg}]
+$e^{\beta H} \cdot e^{-\beta H} = e^{-\beta H} \cdot e^{\beta H} = I$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Specialise \texttt{gibbsExp\_add} with $\beta_2 = -\beta_1$ (or
+$\beta_1 = -\beta_2$) and use \texttt{gibbsExp\_zero} to reduce
+$e^{0} = I$.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsExp\_isUnit}]
+$e^{-\beta H}$ is a unit (invertible element) for every $\beta$ and
+every Hamiltonian $H$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Witness the inverse via $e^{-\beta H} \cdot e^{\beta H} = I$ from the
+previous lemma; \texttt{IsUnit.of\_mul\_eq\_one} produces the
+\texttt{IsUnit} certificate.
+\end{proof}
+
 \begin{lemma}[\texttt{partitionFn\_zero}]
 At $\beta = 0$,
 \[
