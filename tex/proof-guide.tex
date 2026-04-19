@@ -1479,6 +1479,52 @@ Immediate corollary of
 conjugation iff its imaginary part vanishes.
 \end{proof}
 
+\subsection{Conservation laws}
+\label{subsec:gibbs-conservation}
+
+\emph{Reference:} Tasaki~\cite{Tasaki:QMB}, §3.3, p.~80.
+
+\begin{lemma}[\texttt{gibbsExpectation\_mul\_hamiltonian\_comm}]
+For any observable $A \in M_n(\mathbb{C})$,
+$\langle H A \rangle_\beta = \langle A H \rangle_\beta$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Inside the trace,
+\[
+  \operatorname{Tr}(\rho_\beta H A)
+  = \operatorname{Tr}(H \rho_\beta A)
+  = \operatorname{Tr}(\rho_\beta A H),
+\]
+the first equality by
+\texttt{gibbsState\_commute\_hamiltonian} (i.e.\ $\rho_\beta H = H \rho_\beta$)
+and the second by the cyclic property
+\texttt{Matrix.trace\_mul\_comm}, applied as
+$\operatorname{Tr}(H (\rho_\beta A)) = \operatorname{Tr}((\rho_\beta A) H)$.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsExpectation\_commutator\_hamiltonian}]
+For any observable $A$,
+$\langle [H, A] \rangle_\beta = 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Expanding $[H, A] = H A - A H$ and using
+\texttt{gibbsExpectation\_add}, \texttt{gibbsExpectation\_smul} for
+linearity, the result follows immediately from
+\texttt{gibbsExpectation\_mul\_hamiltonian\_comm}.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsExpectation\_hamiltonian\_im}]
+For a Hermitian Hamiltonian $H$,
+$\Im\langle H \rangle_\beta = 0$, i.e.\ the energy expectation
+$\langle H \rangle_\beta$ is real.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Specialise \texttt{gibbsExpectation\_im\_of\_isHermitian} to $O = H$.
+\end{proof}
+
 %======================================================================
 \section{Heisenberg chain}
 \label{sec:heisenberg-chain}

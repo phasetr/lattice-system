@@ -28,6 +28,9 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
 * `gibbsExpectation_star_of_isHermitian`,
   `gibbsExpectation_im_of_isHermitian` — for Hermitian `H` and Hermitian
   observable `O`, the expectation `⟨O⟩_β` is real.
+* `gibbsExpectation_mul_hamiltonian_comm`,
+  `gibbsExpectation_commutator_hamiltonian` — conservation laws:
+  `⟨H · A⟩_β = ⟨A · H⟩_β` and `⟨[H, A]⟩_β = 0` (Tasaki §3.3, p. 80).
 -/
 
 namespace LatticeSystem.Quantum
@@ -182,5 +185,39 @@ theorem gibbsExpectation_im_of_isHermitian {H O : ManyBodyOp Λ}
     (hH : H.IsHermitian) (hO : O.IsHermitian) (β : ℝ) :
     (gibbsExpectation β H O).im = 0 :=
   Complex.conj_eq_iff_im.mp (gibbsExpectation_star_of_isHermitian hH hO β)
+
+/-! ## Conservation laws
+
+Since `[ρ_β, H] = 0`, the Gibbs expectation of any commutator with the
+Hamiltonian vanishes:
+
+  `⟨[H, A]⟩_β = Tr(ρ (HA - AH)) = Tr(Hρ A) - Tr(ρ AH)
+              = Tr(ρ AH) - Tr(ρ AH) = 0`,
+
+using `gibbsState_commute_hamiltonian` and the cyclic property of the
+trace `Matrix.trace_mul_comm`. Equivalently, `⟨HA⟩_β = ⟨AH⟩_β` for any
+observable `A`. See Tasaki §3.3, p. 80. -/
+
+/-- The Hamiltonian and any observable can be exchanged inside the
+Gibbs expectation: `⟨H · A⟩_β = ⟨A · H⟩_β`. -/
+theorem gibbsExpectation_mul_hamiltonian_comm (β : ℝ) (H A : ManyBodyOp Λ) :
+    gibbsExpectation β H (H * A) = gibbsExpectation β H (A * H) := by
+  unfold gibbsExpectation
+  rw [← Matrix.mul_assoc, (gibbsState_commute_hamiltonian β H).eq,
+    Matrix.mul_assoc, Matrix.trace_mul_comm, Matrix.mul_assoc]
+
+/-- The Gibbs expectation of any commutator with the Hamiltonian vanishes:
+`⟨[H, A]⟩_β = 0`. -/
+theorem gibbsExpectation_commutator_hamiltonian (β : ℝ) (H A : ManyBodyOp Λ) :
+    gibbsExpectation β H (H * A - A * H) = 0 := by
+  rw [sub_eq_add_neg, ← neg_one_smul ℂ (A * H), gibbsExpectation_add,
+    gibbsExpectation_smul, gibbsExpectation_mul_hamiltonian_comm]
+  ring
+
+/-- For a Hermitian Hamiltonian `H`, the energy expectation `⟨H⟩_β` is real. -/
+theorem gibbsExpectation_hamiltonian_im {H : ManyBodyOp Λ}
+    (hH : H.IsHermitian) (β : ℝ) :
+    (gibbsExpectation β H H).im = 0 :=
+  gibbsExpectation_im_of_isHermitian hH hH β
 
 end LatticeSystem.Quantum

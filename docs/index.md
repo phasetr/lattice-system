@@ -52,7 +52,7 @@ CAR algebras, and eventually lattice QCD.
 | P1f'''' (Tasaki §2.2) | Two-site inner product `Ŝ_x · Ŝ_y` raising/lowering decomposition (eq. (2.2.16)) | Done |
 | P1f''''' (Tasaki §2.2) | SU(2) invariance of `Ŝ_x · Ŝ_y` and eigenvalues (eqs. (2.2.17)–(2.2.19)) | Done |
 | P1f-2c (Tasaki §2.2 Problem 2.2.c) | SU(2)-averaged two-site state = singlet projector (eq. (2.2.15)); integration over Euler angles `φ ∈ [0,2π]`, `θ ∈ [0,π]` | Done |
-| P1g | Gibbs state `ρ = e^{-βH}/Z`, `Tr(ρ) = 1`, `⟨1⟩ = 1`, `Z(0) = dim`, `Z(0) ≠ 0`, linearity `⟨O₁+O₂⟩ = ⟨O₁⟩+⟨O₂⟩`, `⟨c·O⟩ = c·⟨O⟩`, `[ρ, H] = 0`, reality of `⟨O⟩` for Hermitian `O` | Done |
+| P1g | Gibbs state `ρ = e^{-βH}/Z`, `Tr(ρ) = 1`, `⟨1⟩ = 1`, `Z(0) = dim`, `Z(0) ≠ 0`, linearity `⟨O₁+O₂⟩ = ⟨O₁⟩+⟨O₂⟩`, `⟨c·O⟩ = c·⟨O⟩`, `[ρ, H] = 0`, reality of `⟨O⟩` for Hermitian `O`, conservation `⟨[H,A]⟩ = 0` | Done |
 | P1h | Periodic boundary conditions, Heisenberg chain (open and periodic BC) | Done |
 | P2 | Finite-volume Hubbard / BCS | Not started |
 | P3 | CAR algebras, quasi-local C*-algebras, KMS states | Not started |
@@ -399,6 +399,9 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `Matrix.trace_mul_star_of_isHermitian` | `star (Tr(A · B)) = Tr(A · B)` for Hermitian `A, B : Matrix n n ℂ` (algebraic core, Gibbs-independent) | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_star_of_isHermitian` | `star ⟨O⟩_β = ⟨O⟩_β` for Hermitian `H`, `O` | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_im_of_isHermitian` | `(⟨O⟩_β).im = 0` for Hermitian `H`, `O` | `Quantum/GibbsState.lean` |
+| `gibbsExpectation_mul_hamiltonian_comm` | `⟨H · A⟩_β = ⟨A · H⟩_β` for any `A` (Tasaki §3.3, p. 80) | `Quantum/GibbsState.lean` |
+| `gibbsExpectation_commutator_hamiltonian` | `⟨[H, A]⟩_β = 0` (conservation law) | `Quantum/GibbsState.lean` |
+| `gibbsExpectation_hamiltonian_im` | `(⟨H⟩_β).im = 0` for Hermitian `H` (real energy expectation) | `Quantum/GibbsState.lean` |
 
 ### Heisenberg chain (Tasaki §3.5)
 
