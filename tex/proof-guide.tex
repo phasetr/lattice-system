@@ -1452,6 +1452,35 @@ Specialise the previous lemma at $n = 2$ and unfold $M^2 = M \cdot M$
 via \texttt{pow\_two}.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsExp\_inv}]
+$(e^{-\beta H})^{-1} = e^{\beta H}$, i.e.\ the matrix inverse of the
+Gibbs exponential at $\beta$ is the Gibbs exponential at $-\beta$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+By \texttt{gibbsExp\_neg\_mul\_self},
+$e^{\beta H} \cdot e^{-\beta H} = I$.  Apply
+\texttt{Matrix.inv\_eq\_left\_inv}, which says $A^{-1} = B$ whenever
+$B A = I$.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsExp\_intCast\_mul}]
+For every $n \in \mathbb{Z}$,
+$e^{-(n\beta) H} = (e^{-\beta H})^n$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Case split on $n = m$ or $n = -m$ for $m \in \mathbb{N}$ via
+\texttt{Int.eq\_nat\_or\_neg}. The non-negative branch reduces to
+\texttt{gibbsExp\_natCast\_mul} after \texttt{zpow\_natCast}. The
+negative branch uses \texttt{Matrix.zpow\_neg} (which requires
+$e^{-\beta H}$ to be a unit, witnessed via
+\texttt{gibbsExp\_isUnit} composed with
+\texttt{Matrix.isUnit\_iff\_isUnit\_det}), and then
+\texttt{gibbsExp\_inv} to flip the sign of $\beta$ inside the
+$m$-th power.
+\end{proof}
+
 \begin{lemma}[\texttt{partitionFn\_zero}]
 At $\beta = 0$,
 \[
