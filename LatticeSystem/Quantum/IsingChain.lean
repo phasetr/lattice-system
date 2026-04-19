@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.ManyBody
 import LatticeSystem.Quantum.Pauli
+import LatticeSystem.Quantum.GibbsState
 
 /-!
 # One-dimensional quantum Ising chain on an open boundary
@@ -19,8 +20,15 @@ Using the `N + 1` parametrization lets the coupling sum `Σ_{i : Fin N}`
 automatically reduce to `0` when there is only a single site, so the
 definition is uniform.
 
-The main result of this module is `quantumIsingHamiltonian_isHermitian`,
-the self-adjointness of `H` for real parameters `J`, `h`.
+The main results of this module are:
+
+* `quantumIsingHamiltonian_isHermitian` — self-adjointness of `H` for
+  real parameters `J`, `h`.
+* `quantumIsingGibbsState β J h N` and its inherited properties
+  (Hermiticity, commutativity with `H`, the β = 0 closed form),
+  bridging this concrete chain to the abstract Gibbs framework of
+  `GibbsState.lean`. See Tasaki, *Physics and Mathematics of Quantum
+  Many-Body Systems*, §3.3, p. 80.
 -/
 
 namespace LatticeSystem.Quantum
@@ -97,7 +105,7 @@ private lemma isHermitian_smul_real {n : Type*}
   unfold Matrix.IsHermitian
   rw [Matrix.conjTranspose_smul, hM]
   congr 1
-  simp [Complex.star_def]
+  simp
 
 /-- The quantum Ising Hamiltonian is Hermitian. -/
 theorem quantumIsingHamiltonian_isHermitian (N : ℕ) (J h : ℝ) :
@@ -113,5 +121,33 @@ theorem quantumIsingHamiltonian_isHermitian (N : ℕ) (J h : ℝ) :
       isHermitian_univ_sum (fun i => spinX_isHermitian i)
     have := isHermitian_smul_real (-h) hsum
     simpa using this
+
+/-! ## Gibbs state for the quantum Ising chain -/
+
+/-- The Gibbs state of the open-boundary 1D quantum Ising chain on
+`Fin (N + 1)` sites with real coupling `J`, transverse field `h`, and
+inverse temperature `β`. -/
+noncomputable def quantumIsingGibbsState (β J h : ℝ) (N : ℕ) :
+    ManyBodyOp (Fin (N + 1)) :=
+  gibbsState β (quantumIsingHamiltonian N J h)
+
+/-- The Ising-chain Gibbs state is Hermitian. -/
+theorem quantumIsingGibbsState_isHermitian (β J h : ℝ) (N : ℕ) :
+    (quantumIsingGibbsState β J h N).IsHermitian :=
+  gibbsState_isHermitian (quantumIsingHamiltonian_isHermitian N J h) β
+
+/-- The Ising-chain Gibbs state commutes with its Hamiltonian. -/
+theorem quantumIsingGibbsState_commute_hamiltonian (β J h : ℝ) (N : ℕ) :
+    Commute (quantumIsingGibbsState β J h N) (quantumIsingHamiltonian N J h) :=
+  gibbsState_commute_hamiltonian β (quantumIsingHamiltonian N J h)
+
+/-- Infinite-temperature (β = 0) closed form for the Ising-chain
+expectation: `⟨A⟩_0 = (1/dim) · Tr A` for any observable `A`,
+independent of `J` and `h`. -/
+theorem quantumIsingGibbsExpectation_zero (J h : ℝ) (N : ℕ)
+    (A : ManyBodyOp (Fin (N + 1))) :
+    gibbsExpectation 0 (quantumIsingHamiltonian N J h) A
+      = ((Fintype.card (Fin (N + 1) → Fin 2) : ℂ))⁻¹ * A.trace :=
+  gibbsExpectation_zero (quantumIsingHamiltonian N J h) A
 
 end LatticeSystem.Quantum
