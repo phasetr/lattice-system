@@ -164,6 +164,21 @@ theorem openChainHeisenbergGibbsExpectation_commutator_hamiltonian
   gibbsExpectation_commutator_hamiltonian β
     (heisenbergHamiltonian (openChainCoupling N J)) A
 
+/-- Open-chain Heisenberg energy expectation is real:
+`(⟨H_open⟩_β).im = 0`. -/
+theorem openChainHeisenbergGibbsExpectation_hamiltonian_im (β J : ℝ) (N : ℕ) :
+    (gibbsExpectation β (heisenbergHamiltonian (openChainCoupling N J))
+        (heisenbergHamiltonian (openChainCoupling N J))).im = 0 :=
+  gibbsExpectation_hamiltonian_im (openChainHeisenberg_isHermitian N J) β
+
+/-- For Hermitian `O`, the open-chain Heisenberg expectation
+`⟨H_open · O⟩_β` is real. -/
+theorem openChainHeisenbergGibbsExpectation_mul_hamiltonian_im
+    (β J : ℝ) (N : ℕ) {O : ManyBodyOp (Fin (N + 1))} (hO : O.IsHermitian) :
+    (gibbsExpectation β (heisenbergHamiltonian (openChainCoupling N J))
+        (heisenbergHamiltonian (openChainCoupling N J) * O)).im = 0 :=
+  gibbsExpectation_mul_hamiltonian_im (openChainHeisenberg_isHermitian N J) hO β
+
 /-! ## Gibbs state for the periodic-chain Heisenberg Hamiltonian -/
 
 /-- The Gibbs state of the periodic-boundary 1D Heisenberg chain on
@@ -207,5 +222,20 @@ theorem periodicChainHeisenbergGibbsExpectation_commutator_hamiltonian
           - A * heisenbergHamiltonian (periodicChainCoupling N J)) = 0 :=
   gibbsExpectation_commutator_hamiltonian β
     (heisenbergHamiltonian (periodicChainCoupling N J)) A
+
+/-- Periodic-chain Heisenberg energy expectation is real:
+`(⟨H_periodic⟩_β).im = 0`. -/
+theorem periodicChainHeisenbergGibbsExpectation_hamiltonian_im (β J : ℝ) (N : ℕ) :
+    (gibbsExpectation β (heisenbergHamiltonian (periodicChainCoupling N J))
+        (heisenbergHamiltonian (periodicChainCoupling N J))).im = 0 :=
+  gibbsExpectation_hamiltonian_im (periodicChainHeisenberg_isHermitian N J) β
+
+/-- For Hermitian `O`, the periodic-chain Heisenberg expectation
+`⟨H_periodic · O⟩_β` is real. -/
+theorem periodicChainHeisenbergGibbsExpectation_mul_hamiltonian_im
+    (β J : ℝ) (N : ℕ) {O : ManyBodyOp (Fin (N + 2))} (hO : O.IsHermitian) :
+    (gibbsExpectation β (heisenbergHamiltonian (periodicChainCoupling N J))
+        (heisenbergHamiltonian (periodicChainCoupling N J) * O)).im = 0 :=
+  gibbsExpectation_mul_hamiltonian_im (periodicChainHeisenberg_isHermitian N J) hO β
 
 end LatticeSystem.Quantum

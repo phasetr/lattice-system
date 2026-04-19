@@ -977,15 +977,21 @@ Specialise \texttt{gibbsExpectation\_zero} to $H_{J,h}^{N+1}$; at
 $\beta = 0$ the Hamiltonian drops out because $e^{-0\cdot H} = I$.
 \end{proof}
 
-\begin{theorem}[Ising expectation realness and conservation]
+\begin{theorem}[Ising expectation realness, conservation, energy realness]
 For the open Ising Hamiltonian $H_{J,h}^{N+1}$:
 \begin{enumerate}
   \item For any Hermitian observable $O$,
     $\Im\langle O \rangle_\beta = 0$.
   \item For any observable $A$, $\langle [H, A] \rangle_\beta = 0$.
+  \item $\Im\langle H \rangle_\beta = 0$.
+  \item For any Hermitian observable $O$,
+    $\Im\langle H \cdot O \rangle_\beta = 0$.
 \end{enumerate}
-Lean names: \texttt{quantumIsingGibbsExpectation\_im\_of\_isHermitian},
-\texttt{quantumIsingGibbsExpectation\_commutator\_hamiltonian}.
+Lean names:
+\texttt{quantumIsingGibbsExpectation\_im\_of\_isHermitian},
+\texttt{quantumIsingGibbsExpectation\_commutator\_hamiltonian},
+\texttt{quantumIsingGibbsExpectation\_hamiltonian\_im},
+\texttt{quantumIsingGibbsExpectation\_mul\_hamiltonian\_im}.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
@@ -1986,16 +1992,21 @@ Hamiltonians; the Hamiltonian itself is irrelevant at $\beta = 0$ because
 $e^{-0 \cdot H} = I$.
 \end{proof}
 
-\begin{theorem}[Expectation realness and conservation]
+\begin{theorem}[Expectation realness, conservation, energy realness]
 For both the open and periodic Heisenberg Hamiltonians:
 \begin{enumerate}
   \item For any Hermitian observable $O$,
     $\Im\langle O \rangle_\beta = 0$.
   \item For any observable $A$, $\langle [H, A] \rangle_\beta = 0$.
+  \item $\Im\langle H \rangle_\beta = 0$ (energy expectation is real).
+  \item For any Hermitian observable $O$,
+    $\Im\langle H \cdot O \rangle_\beta = 0$.
 \end{enumerate}
 Lean names (open chain):
 \texttt{openChainHeisenbergGibbsExpectation\_im\_of\_isHermitian},
-\texttt{openChainHeisenbergGibbsExpectation\_commutator\_hamiltonian};
+\texttt{openChainHeisenbergGibbsExpectation\_commutator\_hamiltonian},
+\texttt{openChainHeisenbergGibbsExpectation\_hamiltonian\_im},
+\texttt{openChainHeisenbergGibbsExpectation\_mul\_hamiltonian\_im};
 analogous for the periodic chain.
 \end{theorem}
 
