@@ -1578,6 +1578,22 @@ into the definition $\rho_\beta = (1/Z)\,e^{-\beta H}$ gives
 $\rho_0 = \dim(\mathcal{H})^{-1} \cdot I$.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsState\_zero\_inv}]
+At $\beta = 0$, the matrix inverse of the Gibbs state is
+$\rho_0^{-1} = \dim(\mathcal{H}) \cdot I$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Substitute $\rho_0 = \dim^{-1} \cdot I$ via \texttt{gibbsState\_zero}.
+By \texttt{Matrix.inv\_eq\_left\_inv}, it suffices to verify the
+left-inverse identity
+$(\dim \cdot I)\,(\dim^{-1} \cdot I) = I$, which
+\texttt{smul\_mul\_smul\_comm} reduces to
+$(\dim \cdot \dim^{-1}) \cdot (I \cdot I) = 1 \cdot I = I$, then
+\texttt{inv\_mul\_cancel\_zero} closes the goal using
+$\dim \neq 0$ (as a positive natural number cast to $\mathbb{C}$).
+\end{proof}
+
 \begin{lemma}[\texttt{gibbsExpectation\_zero}]
 At $\beta = 0$, the expectation of any observable $A$ reduces to the
 normalised trace

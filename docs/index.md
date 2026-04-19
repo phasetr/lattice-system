@@ -406,6 +406,7 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `partitionFn_zero` | `Z(0) = Fintype.card (Λ → Fin 2)` (dimension of the Hilbert space) | `Quantum/GibbsState.lean` |
 | `partitionFn_zero_ne_zero` | `Z(0) ≠ 0` (concrete sorry-free proof that the partition function is nonzero at β = 0) | `Quantum/GibbsState.lean` |
 | `gibbsState_zero` | `ρ_0 = (1/dim) · I` (maximally mixed state at infinite temperature) | `Quantum/GibbsState.lean` |
+| `gibbsState_zero_inv` | `ρ_0⁻¹ = dim · I` (matrix inverse at β = 0) | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_zero` | `⟨A⟩_0 = (1/dim) · Tr A` (high-temperature limit) | `Quantum/GibbsState.lean` |
 | `gibbsState β H` | `ρ := (1/Z) • exp(-βH)` | `Quantum/GibbsState.lean` |
 | `gibbsState_trace` | `Tr(ρ) = 1` | `Quantum/GibbsState.lean` |
