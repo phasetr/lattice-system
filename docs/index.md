@@ -437,6 +437,9 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `gibbsExpectation_hamiltonian_im` | `(⟨H⟩_β).im = 0` for Hermitian `H` (real energy expectation) | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_sq_im_of_isHermitian` | `(⟨O · O⟩_β).im = 0` for Hermitian `H, O` (second-moment realness, variance precursor) | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_pow_im_of_isHermitian` | `(⟨O^n⟩_β).im = 0` for Hermitian `H, O`, any `n : ℕ` (all natural-power moments real) | `Quantum/GibbsState.lean` |
+| `gibbsVariance β H O` | `Var_β(O) := ⟨O · O⟩_β − ⟨O⟩_β²` (canonical-ensemble variance) | `Quantum/GibbsState.lean` |
+| `gibbsVariance_eq` | unfolding lemma for `gibbsVariance` | `Quantum/GibbsState.lean` |
+| `gibbsVariance_im_of_isHermitian` | `(Var_β(O)).im = 0` for Hermitian `H, O` (variance is real) | `Quantum/GibbsState.lean` |
 | `Matrix.trace_mul_conjTranspose_swap_of_isHermitian` | `star Tr(ρ · X) = Tr(ρ · Xᴴ)` for Hermitian `ρ` (generic helper) | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_star_swap_of_isHermitian` | `star ⟨A · B⟩_β = ⟨B · A⟩_β` for Hermitian `H, A, B` | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_anticommutator_im` | `(⟨A·B + B·A⟩_β).im = 0` (anticommutator is real) | `Quantum/GibbsState.lean` |
