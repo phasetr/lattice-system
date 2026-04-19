@@ -47,9 +47,9 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
   `gibbsExp_isUnit` — one-parameter group property in `β`:
   `e^{-(β₁+β₂)H} = e^{-β₁H} · e^{-β₂H}`, `e^{βH} · e^{-βH} = 1`,
   hence `e^{-βH}` is invertible. Foundation for KMS / Wick rotation.
-* `gibbsExp_natCast_mul`, `gibbsExp_two_mul` — natural-power identity
-  `gibbsExp ((n : ℝ) · β) H = (gibbsExp β H)^n` for `n : ℕ` (discrete
-  Trotter step).
+* `gibbsExp_natCast_mul`, `gibbsExp_two_mul` — exact discrete
+  semigroup identity `gibbsExp ((n : ℝ) · β) H = (gibbsExp β H)^n`
+  for `n : ℕ`.
 -/
 
 namespace LatticeSystem.Quantum
@@ -158,7 +158,7 @@ theorem gibbsExp_isUnit (β : ℝ) (H : ManyBodyOp Λ) :
     IsUnit (gibbsExp β H) :=
   IsUnit.of_mul_eq_one _ (gibbsExp_self_mul_neg β H)
 
-/-- Natural-power identity (Trotter discretisation): for `n : ℕ`,
+/-- Exact discrete semigroup identity: for `n : ℕ`,
 `gibbsExp ((n : ℝ) * β) H = (gibbsExp β H) ^ n`. -/
 theorem gibbsExp_natCast_mul (n : ℕ) (β : ℝ) (H : ManyBodyOp Λ) :
     gibbsExp ((n : ℝ) * β) H = (gibbsExp β H) ^ n := by
