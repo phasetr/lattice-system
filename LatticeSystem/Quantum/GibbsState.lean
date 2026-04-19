@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.ManyBody
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
+import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 
 /-!
 # Gibbs state for finite-volume quantum systems
@@ -50,6 +51,9 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
 * `gibbsExp_natCast_mul`, `gibbsExp_two_mul` — exact discrete
   semigroup identity `gibbsExp ((n : ℝ) · β) H = (gibbsExp β H)^n`
   for `n : ℕ`.
+* `gibbsExp_inv`, `gibbsExp_intCast_mul` — explicit matrix inverse
+  `(gibbsExp β H)⁻¹ = gibbsExp (-β) H` and the integer-power extension
+  to `n : ℤ`.
 -/
 
 namespace LatticeSystem.Quantum
@@ -174,6 +178,28 @@ theorem gibbsExp_two_mul (β : ℝ) (H : ManyBodyOp Λ) :
     gibbsExp (2 * β) H = gibbsExp β H * gibbsExp β H := by
   have := gibbsExp_natCast_mul 2 β H
   simpa [pow_two] using this
+
+/-- The matrix inverse of `gibbsExp β H` is `gibbsExp (-β) H`,
+making the inverse provided abstractly by `gibbsExp_isUnit` explicit. -/
+theorem gibbsExp_inv (β : ℝ) (H : ManyBodyOp Λ) :
+    (gibbsExp β H)⁻¹ = gibbsExp (-β) H :=
+  Matrix.inv_eq_left_inv (gibbsExp_neg_mul_self β H)
+
+/-- Integer-power identity: for `n : ℤ`,
+`gibbsExp ((n : ℝ) * β) H = (gibbsExp β H) ^ n`. Extends
+`gibbsExp_natCast_mul` to negative powers using `gibbsExp_inv`. -/
+theorem gibbsExp_intCast_mul (n : ℤ) (β : ℝ) (H : ManyBodyOp Λ) :
+    gibbsExp ((n : ℝ) * β) H = (gibbsExp β H) ^ n := by
+  obtain ⟨m, rfl | rfl⟩ := n.eq_nat_or_neg
+  · push_cast
+    rw [zpow_natCast, gibbsExp_natCast_mul]
+  · have hM : IsUnit (gibbsExp β H).det :=
+      (Matrix.isUnit_iff_isUnit_det _).mp (gibbsExp_isUnit β H)
+    push_cast
+    rw [Matrix.zpow_neg hM, zpow_natCast,
+        show -((m : ℝ)) * β = -((m : ℝ) * β) from by ring,
+        ← gibbsExp_inv ((m : ℝ) * β) H,
+        gibbsExp_natCast_mul]
 
 /-- At `β = 0`, the partition function equals the dimension of the
 Hilbert space: `Z(0) = |Λ → Fin 2|`. -/
