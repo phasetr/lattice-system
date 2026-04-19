@@ -405,6 +405,7 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `gibbsState_ne_zero` | `ρ_β ≠ 0` when `Z(β) ≠ 0` | `Quantum/GibbsState.lean` |
 | `gibbsState_inv` | `(ρ_β)⁻¹ = Z(β) · e^{βH}` when `Z(β) ≠ 0` (general matrix inverse, generalises `gibbsState_zero_inv`) | `Quantum/GibbsState.lean` |
 | `partitionFn_smul_gibbsState_eq_gibbsExp` | `Z(β) · ρ_β = e^{-βH}` when `Z(β) ≠ 0` (canonical rescaled identity) | `Quantum/GibbsState.lean` |
+| `partitionFn_mul_gibbsExpectation_eq` | `Z(β) · ⟨A⟩_β = Tr(e^{-βH} · A)` when `Z(β) ≠ 0` (canonical unnormalised expectation) | `Quantum/GibbsState.lean` |
 | `gibbsExp_natCast_mul` | `exp(-(n·β)H) = (exp(-βH))^n` for `n : ℕ` (exact discrete semigroup identity) | `Quantum/GibbsState.lean` |
 | `gibbsExp_two_mul` | `exp(-(2β)H) = exp(-βH) · exp(-βH)` | `Quantum/GibbsState.lean` |
 | `gibbsExp_inv` | `(exp(-βH))⁻¹ = exp(βH)` (matrix inverse made explicit) | `Quantum/GibbsState.lean` |
