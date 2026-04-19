@@ -38,7 +38,7 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
 * `gibbsExpectation_sq_im_of_isHermitian` — for Hermitian `H, O`,
   `(⟨O · O⟩_β).im = 0` (variance precursor).
 * `gibbsExpectation_pow_im_of_isHermitian` — for Hermitian `H, O` and
-  any `n : ℕ`, `(⟨O ^ n⟩_β).im = 0` (all higher moments are real).
+  any `n : ℕ`, `(⟨O ^ n⟩_β).im = 0` (all natural-power moments real).
 * `Matrix.trace_mul_conjTranspose_swap_of_isHermitian` — generic
   helper: for Hermitian `ρ`, `star Tr(ρ · X) = Tr(ρ · Xᴴ)`.
 * `gibbsExpectation_star_swap_of_isHermitian` — for Hermitian `H, A, B`,
