@@ -195,7 +195,7 @@ Hamiltonian vanishes:
               = Tr(ρ AH) - Tr(ρ AH) = 0`,
 
 using `gibbsState_commute_hamiltonian` and the cyclic property of the
-trace `Matrix.trace_mul_cycle`. Equivalently, `⟨HA⟩_β = ⟨AH⟩_β` for any
+trace `Matrix.trace_mul_comm`. Equivalently, `⟨HA⟩_β = ⟨AH⟩_β` for any
 observable `A`. See Tasaki §3.3, p. 80. -/
 
 /-- The Hamiltonian and any observable can be exchanged inside the
