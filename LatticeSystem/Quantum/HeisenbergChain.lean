@@ -198,6 +198,24 @@ theorem openChainHeisenbergGibbsExpectation_hamiltonian_pow_im
   gibbsExpectation_pow_im_of_isHermitian
     (openChainHeisenberg_isHermitian N J) (openChainHeisenberg_isHermitian N J) β n
 
+/-- Open-chain Heisenberg anticommutator expectation is real:
+for Hermitian `A, B`, `(⟨A · B + B · A⟩_β).im = 0`. -/
+theorem openChainHeisenbergGibbsExpectation_anticommutator_im
+    (β J : ℝ) (N : ℕ) {A B : ManyBodyOp (Fin (N + 1))}
+    (hA : A.IsHermitian) (hB : B.IsHermitian) :
+    (gibbsExpectation β (heisenbergHamiltonian (openChainCoupling N J))
+        (A * B + B * A)).im = 0 :=
+  gibbsExpectation_anticommutator_im (openChainHeisenberg_isHermitian N J) hA hB β
+
+/-- Open-chain Heisenberg commutator expectation is purely imaginary:
+for Hermitian `A, B`, `(⟨A · B − B · A⟩_β).re = 0`. -/
+theorem openChainHeisenbergGibbsExpectation_commutator_re
+    (β J : ℝ) (N : ℕ) {A B : ManyBodyOp (Fin (N + 1))}
+    (hA : A.IsHermitian) (hB : B.IsHermitian) :
+    (gibbsExpectation β (heisenbergHamiltonian (openChainCoupling N J))
+        (A * B - B * A)).re = 0 :=
+  gibbsExpectation_commutator_re (openChainHeisenberg_isHermitian N J) hA hB β
+
 /-! ## Gibbs state for the periodic-chain Heisenberg Hamiltonian -/
 
 /-- The Gibbs state of the periodic-boundary 1D Heisenberg chain on
@@ -277,5 +295,25 @@ theorem periodicChainHeisenbergGibbsExpectation_hamiltonian_pow_im
   gibbsExpectation_pow_im_of_isHermitian
     (periodicChainHeisenberg_isHermitian N J)
     (periodicChainHeisenberg_isHermitian N J) β n
+
+/-- Periodic-chain Heisenberg anticommutator expectation is real:
+for Hermitian `A, B`, `(⟨A · B + B · A⟩_β).im = 0`. -/
+theorem periodicChainHeisenbergGibbsExpectation_anticommutator_im
+    (β J : ℝ) (N : ℕ) {A B : ManyBodyOp (Fin (N + 2))}
+    (hA : A.IsHermitian) (hB : B.IsHermitian) :
+    (gibbsExpectation β (heisenbergHamiltonian (periodicChainCoupling N J))
+        (A * B + B * A)).im = 0 :=
+  gibbsExpectation_anticommutator_im
+    (periodicChainHeisenberg_isHermitian N J) hA hB β
+
+/-- Periodic-chain Heisenberg commutator expectation is purely imaginary:
+for Hermitian `A, B`, `(⟨A · B − B · A⟩_β).re = 0`. -/
+theorem periodicChainHeisenbergGibbsExpectation_commutator_re
+    (β J : ℝ) (N : ℕ) {A B : ManyBodyOp (Fin (N + 2))}
+    (hA : A.IsHermitian) (hB : B.IsHermitian) :
+    (gibbsExpectation β (heisenbergHamiltonian (periodicChainCoupling N J))
+        (A * B - B * A)).re = 0 :=
+  gibbsExpectation_commutator_re
+    (periodicChainHeisenberg_isHermitian N J) hA hB β
 
 end LatticeSystem.Quantum

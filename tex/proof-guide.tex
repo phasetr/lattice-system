@@ -988,6 +988,10 @@ For the open Ising Hamiltonian $H_{J,h}^{N+1}$:
     $\Im\langle H \cdot O \rangle_\beta = 0$.
   \item $\Im\langle H^2 \rangle_\beta = 0$.
   \item $\Im\langle H^n \rangle_\beta = 0$ for any $n \in \mathbb{N}$.
+  \item For any Hermitian $A, B$,
+    $\Im\langle A B + B A \rangle_\beta = 0$.
+  \item For any Hermitian $A, B$,
+    $\Re\langle A B - B A \rangle_\beta = 0$.
 \end{enumerate}
 Lean names:
 \texttt{quantumIsingGibbsExpectation\_im\_of\_isHermitian},
@@ -995,7 +999,9 @@ Lean names:
 \texttt{quantumIsingGibbsExpectation\_hamiltonian\_im},
 \texttt{quantumIsingGibbsExpectation\_mul\_hamiltonian\_im},
 \texttt{quantumIsingGibbsExpectation\_hamiltonian\_sq\_im},
-\texttt{quantumIsingGibbsExpectation\_hamiltonian\_pow\_im}.
+\texttt{quantumIsingGibbsExpectation\_hamiltonian\_pow\_im},
+\texttt{quantumIsingGibbsExpectation\_anticommutator\_im},
+\texttt{quantumIsingGibbsExpectation\_commutator\_re}.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
@@ -2058,6 +2064,10 @@ For both the open and periodic Heisenberg Hamiltonians:
   \item $\Im\langle H^2 \rangle_\beta = 0$ (energy-squared expectation is real).
   \item $\Im\langle H^n \rangle_\beta = 0$ for any $n \in \mathbb{N}$
     (all natural-power energy moments are real).
+  \item For any Hermitian $A, B$,
+    $\Im\langle A B + B A \rangle_\beta = 0$ (anticommutator real).
+  \item For any Hermitian $A, B$,
+    $\Re\langle A B - B A \rangle_\beta = 0$ (commutator purely imaginary).
 \end{enumerate}
 Lean names (open chain):
 \texttt{openChainHeisenbergGibbsExpectation\_im\_of\_isHermitian},
@@ -2065,7 +2075,9 @@ Lean names (open chain):
 \texttt{openChainHeisenbergGibbsExpectation\_hamiltonian\_im},
 \texttt{openChainHeisenbergGibbsExpectation\_mul\_hamiltonian\_im},
 \texttt{openChainHeisenbergGibbsExpectation\_hamiltonian\_sq\_im},
-\texttt{openChainHeisenbergGibbsExpectation\_hamiltonian\_pow\_im};
+\texttt{openChainHeisenbergGibbsExpectation\_hamiltonian\_pow\_im},
+\texttt{openChainHeisenbergGibbsExpectation\_anticommutator\_im},
+\texttt{openChainHeisenbergGibbsExpectation\_commutator\_re};
 analogous for the periodic chain.
 \end{theorem}
 
