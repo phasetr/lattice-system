@@ -56,9 +56,11 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
   high-temperature limit `ρ_0 = (1/dim) · I`, its matrix inverse
   `ρ_0⁻¹ = dim · I`, and `⟨A⟩_0 = (1/dim) · Tr A` (Tasaki §3.3, p. 78).
 * `gibbsExp_add`, `gibbsExp_neg_mul_self`, `gibbsExp_self_mul_neg`,
-  `gibbsExp_isUnit` — one-parameter group property in `β`:
-  `e^{-(β₁+β₂)H} = e^{-β₁H} · e^{-β₂H}`, `e^{βH} · e^{-βH} = 1`,
-  hence `e^{-βH}` is invertible. Foundation for KMS / Wick rotation.
+  `gibbsExp_isUnit`, `gibbsExp_ne_zero` — one-parameter group property
+  in `β`: `e^{-(β₁+β₂)H} = e^{-β₁H} · e^{-β₂H}`,
+  `e^{βH} · e^{-βH} = 1`, hence `e^{-βH}` is invertible (and in
+  particular nonzero). Foundation for KMS / Wick rotation.
+* `gibbsState_ne_zero` — `ρ_β ≠ 0` whenever `Z(β) ≠ 0`.
 * `gibbsExp_natCast_mul`, `gibbsExp_two_mul` — exact discrete
   semigroup identity `gibbsExp ((n : ℝ) · β) H = (gibbsExp β H)^n`
   for `n : ℕ`.
@@ -172,6 +174,20 @@ theorem gibbsExp_self_mul_neg (β : ℝ) (H : ManyBodyOp Λ) :
 theorem gibbsExp_isUnit (β : ℝ) (H : ManyBodyOp Λ) :
     IsUnit (gibbsExp β H) :=
   IsUnit.of_mul_eq_one _ (gibbsExp_self_mul_neg β H)
+
+/-- The Gibbs exponential is nonzero. Direct corollary of
+`gibbsExp_isUnit` via `IsUnit.ne_zero`. -/
+theorem gibbsExp_ne_zero (β : ℝ) (H : ManyBodyOp Λ) :
+    gibbsExp β H ≠ 0 :=
+  (gibbsExp_isUnit β H).ne_zero
+
+/-- The Gibbs state is nonzero whenever the partition function is.
+Follows from `gibbsExp_ne_zero` and nonzero scalar multiplication. -/
+theorem gibbsState_ne_zero {H : ManyBodyOp Λ} (β : ℝ)
+    (hZ : partitionFn β H ≠ 0) :
+    gibbsState β H ≠ 0 := by
+  unfold gibbsState
+  exact smul_ne_zero (one_div_ne_zero hZ) (gibbsExp_ne_zero β H)
 
 /-- Exact discrete semigroup identity: for `n : ℕ`,
 `gibbsExp ((n : ℝ) * β) H = (gibbsExp β H) ^ n`. -/

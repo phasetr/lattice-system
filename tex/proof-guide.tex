@@ -1484,6 +1484,26 @@ previous lemma; \texttt{IsUnit.of\_mul\_eq\_one} produces the
 \texttt{IsUnit} certificate.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsExp\_ne\_zero}]
+$e^{-\beta H} \neq 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Direct corollary of \texttt{gibbsExp\_isUnit} via
+\texttt{IsUnit.ne\_zero}: a unit in a nontrivial ring is nonzero.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsState\_ne\_zero}]
+If $Z(\beta, H) \neq 0$, then $\rho_\beta \neq 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+$\rho_\beta = (1/Z) \cdot e^{-\beta H}$.  The scalar $1/Z$ is nonzero
+by hypothesis (\texttt{one\_div\_ne\_zero}), and the operator factor
+is nonzero by \texttt{gibbsExp\_ne\_zero}; the scalar-multiple of
+two nonzeros is nonzero (\texttt{smul\_ne\_zero}).
+\end{proof}
+
 \begin{lemma}[\texttt{gibbsExp\_natCast\_mul}]
 For every $n \in \mathbb{N}$,
 $e^{-(n\beta) H} = (e^{-\beta H})^n$.
