@@ -189,6 +189,15 @@ theorem openChainHeisenbergGibbsExpectation_hamiltonian_sq_im
   exact gibbsExpectation_sq_im_of_isHermitian
     (openChainHeisenberg_isHermitian N J) (openChainHeisenberg_isHermitian N J) β
 
+/-- Open-chain Heisenberg energy n-th power expectation is real:
+`(⟨H_open^n⟩_β).im = 0` for any `n : ℕ`. -/
+theorem openChainHeisenbergGibbsExpectation_hamiltonian_pow_im
+    (β J : ℝ) (N : ℕ) (n : ℕ) :
+    (gibbsExpectation β (heisenbergHamiltonian (openChainCoupling N J))
+        ((heisenbergHamiltonian (openChainCoupling N J))^n)).im = 0 :=
+  gibbsExpectation_pow_im_of_isHermitian
+    (openChainHeisenberg_isHermitian N J) (openChainHeisenberg_isHermitian N J) β n
+
 /-! ## Gibbs state for the periodic-chain Heisenberg Hamiltonian -/
 
 /-- The Gibbs state of the periodic-boundary 1D Heisenberg chain on
@@ -258,5 +267,15 @@ theorem periodicChainHeisenbergGibbsExpectation_hamiltonian_sq_im
   exact gibbsExpectation_sq_im_of_isHermitian
     (periodicChainHeisenberg_isHermitian N J)
     (periodicChainHeisenberg_isHermitian N J) β
+
+/-- Periodic-chain Heisenberg energy n-th power expectation is real:
+`(⟨H_periodic^n⟩_β).im = 0` for any `n : ℕ`. -/
+theorem periodicChainHeisenbergGibbsExpectation_hamiltonian_pow_im
+    (β J : ℝ) (N : ℕ) (n : ℕ) :
+    (gibbsExpectation β (heisenbergHamiltonian (periodicChainCoupling N J))
+        ((heisenbergHamiltonian (periodicChainCoupling N J))^n)).im = 0 :=
+  gibbsExpectation_pow_im_of_isHermitian
+    (periodicChainHeisenberg_isHermitian N J)
+    (periodicChainHeisenberg_isHermitian N J) β n
 
 end LatticeSystem.Quantum
