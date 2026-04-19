@@ -93,8 +93,8 @@ theorem openChainHeisenbergGibbsState_commute_hamiltonian (β J : ℝ) (N : ℕ)
       (heisenbergHamiltonian (openChainCoupling N J)) :=
   gibbsState_commute_hamiltonian β (heisenbergHamiltonian (openChainCoupling N J))
 
-/-- High-temperature closed form for the open-chain Heisenberg expectation:
-`⟨A⟩_0 = (1/dim) · Tr A` for any observable `A`. -/
+/-- Infinite-temperature (β = 0) closed form for the open-chain
+Heisenberg expectation: `⟨A⟩_0 = (1/dim) · Tr A` for any observable `A`. -/
 theorem openChainHeisenbergGibbsExpectation_zero (J : ℝ) (N : ℕ)
     (A : ManyBodyOp (Fin (N + 1))) :
     gibbsExpectation 0 (heisenbergHamiltonian (openChainCoupling N J)) A
@@ -121,8 +121,8 @@ theorem periodicChainHeisenbergGibbsState_commute_hamiltonian (β J : ℝ) (N : 
   gibbsState_commute_hamiltonian β
     (heisenbergHamiltonian (periodicChainCoupling N J))
 
-/-- High-temperature closed form for the periodic-chain Heisenberg expectation:
-`⟨A⟩_0 = (1/dim) · Tr A` for any observable `A`. -/
+/-- Infinite-temperature (β = 0) closed form for the periodic-chain
+Heisenberg expectation: `⟨A⟩_0 = (1/dim) · Tr A` for any observable `A`. -/
 theorem periodicChainHeisenbergGibbsExpectation_zero (J : ℝ) (N : ℕ)
     (A : ManyBodyOp (Fin (N + 2))) :
     gibbsExpectation 0 (heisenbergHamiltonian (periodicChainCoupling N J)) A
