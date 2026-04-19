@@ -1528,6 +1528,24 @@ This generalises \texttt{gibbsState\_zero\_inv}: at $\beta = 0$,
 $Z = \dim$ and $e^{0 \cdot H} = I$, recovering $\rho_0^{-1} = \dim \cdot I$.
 \end{proof}
 
+\begin{lemma}[\texttt{partitionFn\_smul\_gibbsState\_eq\_gibbsExp}]
+If $Z(\beta, H) \neq 0$, then
+$Z(\beta, H) \cdot \rho_\beta = e^{-\beta H}$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Unfold $\rho_\beta = (1/Z) \cdot e^{-\beta H}$ in the LHS:
+$Z \cdot ((1/Z) \cdot e^{-\beta H})
+ = (Z \cdot 1/Z) \cdot e^{-\beta H}$
+via \texttt{smul\_smul}.  Then \texttt{mul\_one\_div\_cancel} (with
+the partition-function nonzero hypothesis) reduces the scalar to $1$,
+and \texttt{one\_smul} closes the goal.
+
+Inverts the defining relation $\rho_\beta = (1/Z) \cdot e^{-\beta H}$
+into the canonical "rescaled" form, useful when factoring out the
+partition function in expectation computations.
+\end{proof}
+
 \begin{lemma}[\texttt{gibbsExp\_natCast\_mul}]
 For every $n \in \mathbb{N}$,
 $e^{-(n\beta) H} = (e^{-\beta H})^n$.
