@@ -1525,6 +1525,71 @@ $\langle H \rangle_\beta$ is real.
 Specialise \texttt{gibbsExpectation\_im\_of\_isHermitian} to $O = H$.
 \end{proof}
 
+\subsection{Anticommutator real, commutator purely imaginary}
+\label{subsec:gibbs-anti-comm}
+
+\emph{Reference:} Tasaki~\cite{Tasaki:QMB}, §3.3, p.~80.
+
+\begin{lemma}[\texttt{Matrix.trace\_mul\_conjTranspose\_swap\_of\_isHermitian}]
+For Hermitian $\rho$ and arbitrary $X \in M_n(\mathbb{C})$,
+$\overline{\operatorname{Tr}(\rho X)} = \operatorname{Tr}(\rho X^\dagger)$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+$\overline{\operatorname{Tr}(\rho X)}
+ = \operatorname{Tr}((\rho X)^\dagger)
+ = \operatorname{Tr}(X^\dagger \rho^\dagger)
+ = \operatorname{Tr}(X^\dagger \rho)
+ = \operatorname{Tr}(\rho X^\dagger)$,
+using \texttt{Matrix.trace\_conjTranspose},
+\texttt{Matrix.conjTranspose\_mul}, $\rho^\dagger = \rho$, and the
+cyclic property \texttt{Matrix.trace\_mul\_comm}.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsExpectation\_star\_swap\_of\_isHermitian}]
+For Hermitian $H$ and Hermitian $A, B$,
+$\overline{\langle A B \rangle_\beta} = \langle B A \rangle_\beta$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Apply the previous lemma at $\rho = \rho_\beta$, $X = A B$, then use
+$(A B)^\dagger = B^\dagger A^\dagger = B A$ by Hermiticity.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsExpectation\_anticommutator\_im}]
+For Hermitian $H$ and Hermitian $A, B$,
+$\Im\langle A B + B A \rangle_\beta = 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+By the swap lemma, $\langle A B + B A \rangle_\beta = z + \overline{z}$
+where $z = \langle A B \rangle_\beta$. The imaginary part of $z + \bar z$
+vanishes ($\Im z + (-\Im z) = 0$).
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsExpectation\_commutator\_re}]
+For Hermitian $H$ and Hermitian $A, B$,
+$\Re\langle A B - B A \rangle_\beta = 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+By the swap lemma, $\langle A B - B A \rangle_\beta = z - \overline{z}
+= 2 i\,\Im z$, which is purely imaginary. Equivalently
+$\Re(z + (-1)\bar z) = \Re z + (-1)\,\Re\bar z = \Re z - \Re z = 0$.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsExpectation\_mul\_hamiltonian\_im}]
+For Hermitian $H$ and Hermitian observable $O$,
+$\Im\langle H O \rangle_\beta = 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+By the conservation law $\langle H O \rangle_\beta = \langle O H \rangle_\beta$
+combined with the swap lemma at $A = H, B = O$
+($\overline{\langle H O \rangle_\beta} = \langle O H \rangle_\beta = \langle H O \rangle_\beta$),
+the expectation is fixed by complex conjugation, hence real.
+\end{proof}
+
 %======================================================================
 \section{Heisenberg chain}
 \label{sec:heisenberg-chain}
