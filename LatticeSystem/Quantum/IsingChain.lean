@@ -177,6 +177,16 @@ theorem quantumIsingGibbsExpectation_mul_hamiltonian_im
         (quantumIsingHamiltonian N J h * O)).im = 0 :=
   gibbsExpectation_mul_hamiltonian_im (quantumIsingHamiltonian_isHermitian N J h) hO β
 
+/-- Ising-chain energy-squared expectation is real:
+`(⟨H_Ising^2⟩_β).im = 0`. -/
+theorem quantumIsingGibbsExpectation_hamiltonian_sq_im (β J h : ℝ) (N : ℕ) :
+    (gibbsExpectation β (quantumIsingHamiltonian N J h)
+        ((quantumIsingHamiltonian N J h)^2)).im = 0 := by
+  rw [pow_two]
+  exact gibbsExpectation_sq_im_of_isHermitian
+    (quantumIsingHamiltonian_isHermitian N J h)
+    (quantumIsingHamiltonian_isHermitian N J h) β
+
 /-- Ising-chain energy expectation as a sum of bond and transverse-field
 contributions:
 `⟨H_Ising⟩_β = (-J) · ∑ ⟨σ^z_i σ^z_{i+1}⟩_β + (-h) · ∑ ⟨σ^x_i⟩_β`. -/

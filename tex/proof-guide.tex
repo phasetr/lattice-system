@@ -986,12 +986,14 @@ For the open Ising Hamiltonian $H_{J,h}^{N+1}$:
   \item $\Im\langle H \rangle_\beta = 0$.
   \item For any Hermitian observable $O$,
     $\Im\langle H \cdot O \rangle_\beta = 0$.
+  \item $\Im\langle H^2 \rangle_\beta = 0$.
 \end{enumerate}
 Lean names:
 \texttt{quantumIsingGibbsExpectation\_im\_of\_isHermitian},
 \texttt{quantumIsingGibbsExpectation\_commutator\_hamiltonian},
 \texttt{quantumIsingGibbsExpectation\_hamiltonian\_im},
-\texttt{quantumIsingGibbsExpectation\_mul\_hamiltonian\_im}.
+\texttt{quantumIsingGibbsExpectation\_mul\_hamiltonian\_im},
+\texttt{quantumIsingGibbsExpectation\_hamiltonian\_sq\_im}.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
@@ -1769,6 +1771,26 @@ $\langle H \rangle_\beta$ is real.
 Specialise \texttt{gibbsExpectation\_im\_of\_isHermitian} to $O = H$.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsExpectation\_sq\_im\_of\_isHermitian}]
+For Hermitian $H$ and Hermitian observable $O$,
+$\Im\langle O \cdot O \rangle_\beta = 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+$O \cdot O$ is Hermitian: it is the product of two commuting
+Hermitian operators (\texttt{Matrix.IsHermitian.mul\_of\_commute}
+applied with \texttt{Commute.refl O}). The result then specialises
+\texttt{gibbsExpectation\_im\_of\_isHermitian} at observable
+$O \cdot O$.
+
+This is the variance precursor: the second moment
+$\langle O^2 \rangle_\beta$ being real lets the variance
+$\operatorname{Var}_\beta(O) = \langle O^2 \rangle_\beta - \langle O \rangle_\beta^2$
+inherit its standard interpretation as a non-negative real number
+(positivity itself requires the spectral / CFC infrastructure not
+yet developed).
+\end{proof}
+
 \subsection{Anticommutator real, commutator purely imaginary}
 \label{subsec:gibbs-anti-comm}
 
@@ -2001,12 +2023,14 @@ For both the open and periodic Heisenberg Hamiltonians:
   \item $\Im\langle H \rangle_\beta = 0$ (energy expectation is real).
   \item For any Hermitian observable $O$,
     $\Im\langle H \cdot O \rangle_\beta = 0$.
+  \item $\Im\langle H^2 \rangle_\beta = 0$ (energy-squared expectation is real).
 \end{enumerate}
 Lean names (open chain):
 \texttt{openChainHeisenbergGibbsExpectation\_im\_of\_isHermitian},
 \texttt{openChainHeisenbergGibbsExpectation\_commutator\_hamiltonian},
 \texttt{openChainHeisenbergGibbsExpectation\_hamiltonian\_im},
-\texttt{openChainHeisenbergGibbsExpectation\_mul\_hamiltonian\_im};
+\texttt{openChainHeisenbergGibbsExpectation\_mul\_hamiltonian\_im},
+\texttt{openChainHeisenbergGibbsExpectation\_hamiltonian\_sq\_im};
 analogous for the periodic chain.
 \end{theorem}
 

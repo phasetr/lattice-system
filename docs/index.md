@@ -28,7 +28,7 @@ CAR algebras, and eventually lattice QCD.
 |---|---|---|
 | P0 | Project skeleton, CI, documentation infrastructure | Done |
 | P1a | Finite-volume quantum spin operator algebra (Pauli, `onSite`, commutativity) | Done |
-| P1b | Finite-chain quantum Ising Hamiltonian, Hermiticity, Gibbs state instantiation (Hermiticity, commutativity with `H`, β = 0 closed form, expectation realness for Hermitian observables, conservation `⟨[H, A]⟩ = 0`, energy expectation as bond + transverse-field decomposition, energy expectation real, `⟨H · O⟩` real for Hermitian `O`) | Done |
+| P1b | Finite-chain quantum Ising Hamiltonian, Hermiticity, Gibbs state instantiation (Hermiticity, commutativity with `H`, β = 0 closed form, expectation realness for Hermitian observables, conservation `⟨[H, A]⟩ = 0`, energy expectation as bond + transverse-field decomposition, energy expectation real, `⟨H · O⟩` real for Hermitian `O`, `⟨H²⟩` real) | Done |
 | P1c (Tasaki §2.1) | Spin-1/2 operators `Ŝ^(α)` and the commutator algebra | Done |
 | P1d (Tasaki §2.1) | Basis states `|ψ^↑⟩, |ψ^↓⟩`, raising/lowering `Ŝ^±` (S = 1/2) | Done |
 | P1d' (Tasaki §2.1) | S = 1 matrix representations (eq. (2.1.9)) | Done |
@@ -53,7 +53,7 @@ CAR algebras, and eventually lattice QCD.
 | P1f''''' (Tasaki §2.2) | SU(2) invariance of `Ŝ_x · Ŝ_y` and eigenvalues (eqs. (2.2.17)–(2.2.19)) | Done |
 | P1f-2c (Tasaki §2.2 Problem 2.2.c) | SU(2)-averaged two-site state = singlet projector (eq. (2.2.15)); integration over Euler angles `φ ∈ [0,2π]`, `θ ∈ [0,π]` | Done |
 | P1g | Gibbs state `ρ = e^{-βH}/Z`, `Tr(ρ) = 1`, `⟨1⟩ = 1`, `Z(0) = dim`, `Z(0) ≠ 0`, linearity `⟨O₁+O₂⟩ = ⟨O₁⟩+⟨O₂⟩`, `⟨c·O⟩ = c·⟨O⟩`, `⟨-O⟩ = -⟨O⟩`, `⟨A−B⟩ = ⟨A⟩−⟨B⟩`, `⟨Σ f⟩ = Σ ⟨f⟩`, `[ρ, H] = 0`, reality of `⟨O⟩` for Hermitian `O`, conservation `⟨[H,A]⟩ = 0`, anticommutator real / commutator imaginary, `(⟨H·O⟩).im = 0`, β = 0 closed form `ρ_0 = I/dim` and `⟨A⟩_0 = Tr A / dim`, one-parameter group property `e^{-(β₁+β₂)H} = e^{-β₁H} · e^{-β₂H}` and invertibility, exact discrete semigroup identity `e^{-(nβ)H} = (e^{-βH})^n` (extended to `n : ℤ` via `gibbsExp_inv`) | Done |
-| P1h | Periodic boundary conditions, Heisenberg chain (open and periodic BC), Gibbs state instantiation for both BCs (Hermiticity, commutativity with `H`, β = 0 closed form, expectation realness for Hermitian observables, conservation `⟨[H, A]⟩ = 0`, energy expectation as a bond-sum decomposition, energy expectation real, `⟨H · O⟩` real for Hermitian `O`) | Done |
+| P1h | Periodic boundary conditions, Heisenberg chain (open and periodic BC), Gibbs state instantiation for both BCs (Hermiticity, commutativity with `H`, β = 0 closed form, expectation realness for Hermitian observables, conservation `⟨[H, A]⟩ = 0`, energy expectation as a bond-sum decomposition, energy expectation real, `⟨H · O⟩` real for Hermitian `O`, `⟨H²⟩` real) | Done |
 | P2 | Finite-volume Hubbard / BCS | Not started |
 | P3 | CAR algebras, quasi-local C*-algebras, KMS states | Not started |
 | P4 | Thermodynamic limit, phase transitions | Not started |
@@ -379,6 +379,7 @@ explicit bond coupling `J`.
 | `quantumIsingGibbsExpectation_commutator_hamiltonian` | conservation `⟨[H_Ising, A]⟩_β = 0` | `Quantum/IsingChain.lean` |
 | `quantumIsingGibbsExpectation_hamiltonian_im` | `(⟨H_Ising⟩_β).im = 0` (energy expectation is real) | `Quantum/IsingChain.lean` |
 | `quantumIsingGibbsExpectation_mul_hamiltonian_im` | for Hermitian `O`, `(⟨H_Ising · O⟩_β).im = 0` | `Quantum/IsingChain.lean` |
+| `quantumIsingGibbsExpectation_hamiltonian_sq_im` | `(⟨H_Ising^2⟩_β).im = 0` (energy-squared expectation real) | `Quantum/IsingChain.lean` |
 | `quantumIsingGibbsExpectation_self_eq` | `⟨H_Ising⟩_β = -J · ∑ ⟨σ^z σ^z⟩_β + (-h) · ∑ ⟨σ^x⟩_β` (energy as bond + transverse-field decomposition) | `Quantum/IsingChain.lean` |
 
 ### Gibbs state (Tasaki §3.3)
@@ -424,6 +425,7 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `gibbsExpectation_mul_hamiltonian_comm` | `⟨H · A⟩_β = ⟨A · H⟩_β` for any `A` (Tasaki §3.3, p. 80) | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_commutator_hamiltonian` | `⟨[H, A]⟩_β = 0` (conservation law) | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_hamiltonian_im` | `(⟨H⟩_β).im = 0` for Hermitian `H` (real energy expectation) | `Quantum/GibbsState.lean` |
+| `gibbsExpectation_sq_im_of_isHermitian` | `(⟨O · O⟩_β).im = 0` for Hermitian `H, O` (second-moment realness, variance precursor) | `Quantum/GibbsState.lean` |
 | `Matrix.trace_mul_conjTranspose_swap_of_isHermitian` | `star Tr(ρ · X) = Tr(ρ · Xᴴ)` for Hermitian `ρ` (generic helper) | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_star_swap_of_isHermitian` | `star ⟨A · B⟩_β = ⟨B · A⟩_β` for Hermitian `H, A, B` | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_anticommutator_im` | `(⟨A·B + B·A⟩_β).im = 0` (anticommutator is real) | `Quantum/GibbsState.lean` |
@@ -453,6 +455,7 @@ Systems*, §3.5, p. 89.
 | `openChainHeisenbergGibbsExpectation_commutator_hamiltonian` | conservation `⟨[H_open, A]⟩_β = 0` | `Quantum/HeisenbergChain.lean` |
 | `openChainHeisenbergGibbsExpectation_hamiltonian_im` | `(⟨H_open⟩_β).im = 0` (energy expectation is real) | `Quantum/HeisenbergChain.lean` |
 | `openChainHeisenbergGibbsExpectation_mul_hamiltonian_im` | for Hermitian `O`, `(⟨H_open · O⟩_β).im = 0` | `Quantum/HeisenbergChain.lean` |
+| `openChainHeisenbergGibbsExpectation_hamiltonian_sq_im` | `(⟨H_open^2⟩_β).im = 0` (energy-squared expectation real) | `Quantum/HeisenbergChain.lean` |
 | `periodicChainHeisenbergGibbsState β J N` | analogous Gibbs state for the periodic-chain Hamiltonian | `Quantum/HeisenbergChain.lean` |
 | `periodicChainHeisenbergGibbsState_isHermitian` | periodic-chain Gibbs state Hermiticity | `Quantum/HeisenbergChain.lean` |
 | `periodicChainHeisenbergGibbsState_commute_hamiltonian` | `[ρ_β, H_periodic] = 0` | `Quantum/HeisenbergChain.lean` |
@@ -461,6 +464,7 @@ Systems*, §3.5, p. 89.
 | `periodicChainHeisenbergGibbsExpectation_commutator_hamiltonian` | conservation `⟨[H_periodic, A]⟩_β = 0` | `Quantum/HeisenbergChain.lean` |
 | `periodicChainHeisenbergGibbsExpectation_hamiltonian_im` | `(⟨H_periodic⟩_β).im = 0` (energy expectation is real) | `Quantum/HeisenbergChain.lean` |
 | `periodicChainHeisenbergGibbsExpectation_mul_hamiltonian_im` | for Hermitian `O`, `(⟨H_periodic · O⟩_β).im = 0` | `Quantum/HeisenbergChain.lean` |
+| `periodicChainHeisenbergGibbsExpectation_hamiltonian_sq_im` | `(⟨H_periodic^2⟩_β).im = 0` (energy-squared expectation real) | `Quantum/HeisenbergChain.lean` |
 
 ## Open items / axioms
 

@@ -35,6 +35,8 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
 * `gibbsExpectation_mul_hamiltonian_comm`,
   `gibbsExpectation_commutator_hamiltonian` — conservation laws:
   `⟨H · A⟩_β = ⟨A · H⟩_β` and `⟨[H, A]⟩_β = 0` (Tasaki §3.3, p. 80).
+* `gibbsExpectation_sq_im_of_isHermitian` — for Hermitian `H, O`,
+  `(⟨O · O⟩_β).im = 0` (variance precursor).
 * `Matrix.trace_mul_conjTranspose_swap_of_isHermitian` — generic
   helper: for Hermitian `ρ`, `star Tr(ρ · X) = Tr(ρ · Xᴴ)`.
 * `gibbsExpectation_star_swap_of_isHermitian` — for Hermitian `H, A, B`,
@@ -352,6 +354,16 @@ theorem gibbsExpectation_hamiltonian_im {H : ManyBodyOp Λ}
     (hH : H.IsHermitian) (β : ℝ) :
     (gibbsExpectation β H H).im = 0 :=
   gibbsExpectation_im_of_isHermitian hH hH β
+
+/-- For Hermitian `H` and Hermitian observable `O`, the second-moment
+expectation `⟨O · O⟩_β` is real. The product `O · O` is Hermitian
+because `O` commutes with itself; the result then specialises
+`gibbsExpectation_im_of_isHermitian`. -/
+theorem gibbsExpectation_sq_im_of_isHermitian {H O : ManyBodyOp Λ}
+    (hH : H.IsHermitian) (hO : O.IsHermitian) (β : ℝ) :
+    (gibbsExpectation β H (O * O)).im = 0 :=
+  gibbsExpectation_im_of_isHermitian hH
+    (Matrix.IsHermitian.mul_of_commute hO hO (Commute.refl O)) β
 
 /-! ## Anticommutator real, commutator purely imaginary
 
