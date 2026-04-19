@@ -1986,6 +1986,42 @@ Hamiltonian, using the Hermiticity lemmas
 \texttt{periodicChainHeisenberg\_isHermitian}.
 \end{proof}
 
+\subsection{Bond-sum decomposition of the energy expectation}
+\label{subsec:heisenberg-bondsum}
+
+\begin{theorem}[\texttt{heisenbergHamiltonian\_gibbsExpectation\_eq}]
+For any Gibbs Hamiltonian $H$ and any coupling
+$J : \Lambda \to \Lambda \to \mathbb{C}$,
+\[
+  \langle \texttt{heisenbergHamiltonian}\,J \rangle_\beta
+  \;=\;
+  \sum_{x \in \Lambda} \sum_{y \in \Lambda}
+    J(x,y)\,\langle \hat S_x \cdot \hat S_y \rangle_\beta.
+\]
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Apply \texttt{gibbsExpectation\_sum} to the outer and inner sums of
+$\sum_{x,y} J(x,y) \cdot \hat S_x \cdot \hat S_y$, then
+\texttt{gibbsExpectation\_smul} pulls each scalar $J(x,y)$ out of the
+expectation.
+\end{proof}
+
+\begin{remark}[Open- and periodic-chain energy bond-sums]
+Specialising at
+$H = \texttt{heisenbergHamiltonian (openChainCoupling N J)}$
+(resp.\ \texttt{periodicChainCoupling}) yields
+\[
+  \langle H_{\mathrm{open}} \rangle_\beta
+  \;=\;
+  \sum_{x,y \in \mathrm{Fin}\,(N+1)}
+    J_{\mathrm{open}}(x,y)\,\langle \hat S_x \cdot \hat S_y \rangle_\beta,
+\]
+and analogously for the periodic chain on $\mathrm{Fin}(N+2)$.
+Lean names: \texttt{openChainHeisenbergGibbsExpectation\_self\_eq},
+\texttt{periodicChainHeisenbergGibbsExpectation\_self\_eq}.
+\end{remark}
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
