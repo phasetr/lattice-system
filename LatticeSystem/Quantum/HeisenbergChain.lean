@@ -101,6 +101,22 @@ theorem openChainHeisenbergGibbsExpectation_zero (J : ℝ) (N : ℕ)
       = ((Fintype.card (Fin (N + 1) → Fin 2) : ℂ))⁻¹ * A.trace :=
   gibbsExpectation_zero (heisenbergHamiltonian (openChainCoupling N J)) A
 
+/-- For any Hermitian observable `O`, the open-chain Heisenberg expectation
+`⟨O⟩_β` is real (imaginary part vanishes). -/
+theorem openChainHeisenbergGibbsExpectation_im_of_isHermitian
+    (β J : ℝ) (N : ℕ) {O : ManyBodyOp (Fin (N + 1))} (hO : O.IsHermitian) :
+    (gibbsExpectation β (heisenbergHamiltonian (openChainCoupling N J)) O).im = 0 :=
+  gibbsExpectation_im_of_isHermitian (openChainHeisenberg_isHermitian N J) hO β
+
+/-- Open-chain Heisenberg conservation law: `⟨[H, A]⟩_β = 0`. -/
+theorem openChainHeisenbergGibbsExpectation_commutator_hamiltonian
+    (β J : ℝ) (N : ℕ) (A : ManyBodyOp (Fin (N + 1))) :
+    gibbsExpectation β (heisenbergHamiltonian (openChainCoupling N J))
+        (heisenbergHamiltonian (openChainCoupling N J) * A
+          - A * heisenbergHamiltonian (openChainCoupling N J)) = 0 :=
+  gibbsExpectation_commutator_hamiltonian β
+    (heisenbergHamiltonian (openChainCoupling N J)) A
+
 /-! ## Gibbs state for the periodic-chain Heisenberg Hamiltonian -/
 
 /-- The Gibbs state of the periodic-boundary 1D Heisenberg chain on
@@ -128,5 +144,21 @@ theorem periodicChainHeisenbergGibbsExpectation_zero (J : ℝ) (N : ℕ)
     gibbsExpectation 0 (heisenbergHamiltonian (periodicChainCoupling N J)) A
       = ((Fintype.card (Fin (N + 2) → Fin 2) : ℂ))⁻¹ * A.trace :=
   gibbsExpectation_zero (heisenbergHamiltonian (periodicChainCoupling N J)) A
+
+/-- For any Hermitian observable `O`, the periodic-chain Heisenberg
+expectation `⟨O⟩_β` is real (imaginary part vanishes). -/
+theorem periodicChainHeisenbergGibbsExpectation_im_of_isHermitian
+    (β J : ℝ) (N : ℕ) {O : ManyBodyOp (Fin (N + 2))} (hO : O.IsHermitian) :
+    (gibbsExpectation β (heisenbergHamiltonian (periodicChainCoupling N J)) O).im = 0 :=
+  gibbsExpectation_im_of_isHermitian (periodicChainHeisenberg_isHermitian N J) hO β
+
+/-- Periodic-chain Heisenberg conservation law: `⟨[H, A]⟩_β = 0`. -/
+theorem periodicChainHeisenbergGibbsExpectation_commutator_hamiltonian
+    (β J : ℝ) (N : ℕ) (A : ManyBodyOp (Fin (N + 2))) :
+    gibbsExpectation β (heisenbergHamiltonian (periodicChainCoupling N J))
+        (heisenbergHamiltonian (periodicChainCoupling N J) * A
+          - A * heisenbergHamiltonian (periodicChainCoupling N J)) = 0 :=
+  gibbsExpectation_commutator_hamiltonian β
+    (heisenbergHamiltonian (periodicChainCoupling N J)) A
 
 end LatticeSystem.Quantum
