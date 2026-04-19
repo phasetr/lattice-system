@@ -1378,6 +1378,32 @@ function can be shown nonzero by elementary means, avoiding the CFC
 timeout entirely.
 \end{remark}
 
+\begin{lemma}[\texttt{gibbsState\_zero}]
+At infinite temperature ($\beta = 0$),
+$\rho_0 = \dim(\mathcal{H})^{-1} \cdot I$, the maximally mixed state.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+By \texttt{gibbsExp\_zero}, $e^{-0\cdot H} = I$.  By
+\texttt{partitionFn\_zero}, $Z(0, H) = \dim(\mathcal{H})$.  Substituting
+into the definition $\rho_\beta = (1/Z)\,e^{-\beta H}$ gives
+$\rho_0 = \dim(\mathcal{H})^{-1} \cdot I$.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsExpectation\_zero}]
+At $\beta = 0$, the expectation of any observable $A$ reduces to the
+normalised trace
+$\langle A \rangle_0 = \dim(\mathcal{H})^{-1} \cdot \operatorname{Tr}(A)$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+$\langle A \rangle_0 = \operatorname{Tr}(\rho_0 \cdot A)
+= \operatorname{Tr}(\dim^{-1}\,I \cdot A)
+= \dim^{-1} \cdot \operatorname{Tr}(A)$,
+using \texttt{gibbsState\_zero}, \texttt{Matrix.smul\_mul},
+\texttt{Matrix.one\_mul}, and \texttt{Matrix.trace\_smul}.
+\end{proof}
+
 \begin{lemma}[\texttt{gibbsExpectation\_add}]
 For observables $O_1, O_2 \in M_n(\mathbb{C})$,
 \[
