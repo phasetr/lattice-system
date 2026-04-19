@@ -49,8 +49,9 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
   is purely imaginary.
 * `gibbsExpectation_mul_hamiltonian_im` — for Hermitian `H, O`,
   `(⟨H · O⟩_β).im = 0` (energy-mode expectation reality).
-* `gibbsState_zero`, `gibbsExpectation_zero` — high-temperature limit
-  `ρ_0 = (1/dim) · I` and `⟨A⟩_0 = (1/dim) · Tr A` (Tasaki §3.3, p. 78).
+* `gibbsState_zero`, `gibbsState_zero_inv`, `gibbsExpectation_zero` —
+  high-temperature limit `ρ_0 = (1/dim) · I`, its matrix inverse
+  `ρ_0⁻¹ = dim · I`, and `⟨A⟩_0 = (1/dim) · Tr A` (Tasaki §3.3, p. 78).
 * `gibbsExp_add`, `gibbsExp_neg_mul_self`, `gibbsExp_self_mul_neg`,
   `gibbsExp_isUnit` — one-parameter group property in `β`:
   `e^{-(β₁+β₂)H} = e^{-β₁H} · e^{-β₂H}`, `e^{βH} · e^{-βH} = 1`,
@@ -227,6 +228,16 @@ theorem partitionFn_zero_ne_zero (H : ManyBodyOp Λ) :
 theorem gibbsState_zero (H : ManyBodyOp Λ) :
     gibbsState 0 H = ((Fintype.card (Λ → Fin 2) : ℂ))⁻¹ • (1 : ManyBodyOp Λ) := by
   simp only [gibbsState, gibbsExp_zero, partitionFn_zero, one_div]
+
+/-- At `β = 0`, the matrix inverse of the Gibbs state is the dimension
+times the identity: `ρ_0⁻¹ = dim · I`. -/
+theorem gibbsState_zero_inv (H : ManyBodyOp Λ) :
+    (gibbsState 0 H)⁻¹ =
+      (Fintype.card (Λ → Fin 2) : ℂ) • (1 : ManyBodyOp Λ) := by
+  rw [gibbsState_zero]
+  apply Matrix.inv_eq_left_inv
+  rw [smul_mul_smul_comm, mul_inv_cancel₀, Matrix.one_mul, one_smul]
+  exact_mod_cast Fintype.card_pos.ne'
 
 /-- At `β = 0`, the Gibbs expectation reduces to the normalised trace
 `⟨A⟩_0 = (1 / dim) · Tr(A)`. -/
