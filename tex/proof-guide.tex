@@ -1504,6 +1504,30 @@ is nonzero by \texttt{gibbsExp\_ne\_zero}; the scalar-multiple of
 two nonzeros is nonzero (\texttt{smul\_ne\_zero}).
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsState\_inv}]
+If $Z(\beta, H) \neq 0$, then
+$\rho_\beta^{-1} = Z(\beta, H) \cdot e^{\beta H}$
+(in our convention, $e^{\beta H} = \texttt{gibbsExp}\,(-\beta)\,H$).
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Apply \texttt{Matrix.inv\_eq\_left\_inv} to the witness
+\[
+  (Z \cdot e^{\beta H})\,\bigl((1/Z) \cdot e^{-\beta H}\bigr)
+  \;=\;
+  (Z \cdot 1/Z) \cdot (e^{\beta H} \cdot e^{-\beta H})
+  \;=\; 1 \cdot 1 \;=\; 1,
+\]
+discharged by \texttt{smul\_mul\_smul\_comm},
+\texttt{gibbsExp\_neg\_mul\_self} (which gives
+$e^{\beta H}\cdot e^{-\beta H} = 1$), \texttt{mul\_one\_div\_cancel}
+applied with the partition-function nonzero hypothesis, and
+\texttt{one\_smul}.
+
+This generalises \texttt{gibbsState\_zero\_inv}: at $\beta = 0$,
+$Z = \dim$ and $e^{0 \cdot H} = I$, recovering $\rho_0^{-1} = \dim \cdot I$.
+\end{proof}
+
 \begin{lemma}[\texttt{gibbsExp\_natCast\_mul}]
 For every $n \in \mathbb{N}$,
 $e^{-(n\beta) H} = (e^{-\beta H})^n$.
