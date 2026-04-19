@@ -31,6 +31,16 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
 * `gibbsExpectation_mul_hamiltonian_comm`,
   `gibbsExpectation_commutator_hamiltonian` — conservation laws:
   `⟨H · A⟩_β = ⟨A · H⟩_β` and `⟨[H, A]⟩_β = 0` (Tasaki §3.3, p. 80).
+* `Matrix.trace_mul_conjTranspose_swap_of_isHermitian` — generic
+  helper: for Hermitian `ρ`, `star Tr(ρ · X) = Tr(ρ · Xᴴ)`.
+* `gibbsExpectation_star_swap_of_isHermitian` — for Hermitian `H, A, B`,
+  `star ⟨A · B⟩_β = ⟨B · A⟩_β`.
+* `gibbsExpectation_anticommutator_im`,
+  `gibbsExpectation_commutator_re` — under Hermitian `H, A, B`,
+  the anticommutator expectation is real and the commutator expectation
+  is purely imaginary.
+* `gibbsExpectation_mul_hamiltonian_im` — for Hermitian `H, O`,
+  `(⟨H · O⟩_β).im = 0` (energy-mode expectation reality).
 -/
 
 namespace LatticeSystem.Quantum
@@ -219,5 +229,65 @@ theorem gibbsExpectation_hamiltonian_im {H : ManyBodyOp Λ}
     (hH : H.IsHermitian) (β : ℝ) :
     (gibbsExpectation β H H).im = 0 :=
   gibbsExpectation_im_of_isHermitian hH hH β
+
+/-! ## Anticommutator real, commutator purely imaginary
+
+For Hermitian `ρ` and arbitrary `X`,
+  `star Tr(ρ · X) = Tr((ρ · X)ᴴ) = Tr(Xᴴ · ρ) = Tr(ρ · Xᴴ)`,
+combining `trace_conjTranspose`, `conjTranspose_mul`, Hermiticity of
+`ρ`, and the cyclic property `Matrix.trace_mul_comm`. Specialising
+`X = A · B` with `A, B` Hermitian gives
+`star ⟨A · B⟩_β = ⟨B · A⟩_β`. From this, `⟨A·B + B·A⟩_β` (an "anti-
+commutator") is `z + star z = 2·Re z`, hence real, and `⟨A·B − B·A⟩_β`
+is `z − star z = 2 i·Im z`, hence purely imaginary. -/
+
+/-- For Hermitian `ρ : Matrix n n ℂ` and arbitrary `X`,
+`star Tr(ρ · X) = Tr(ρ · Xᴴ)`. -/
+theorem _root_.Matrix.trace_mul_conjTranspose_swap_of_isHermitian
+    {n : Type*} [Fintype n] {ρ : Matrix n n ℂ} (hρ : ρ.IsHermitian)
+    (X : Matrix n n ℂ) :
+    star (ρ * X).trace = (ρ * X.conjTranspose).trace := by
+  rw [← Matrix.trace_conjTranspose, Matrix.conjTranspose_mul, hρ.eq,
+    Matrix.trace_mul_comm]
+
+/-- For Hermitian `H` and Hermitian `A, B`,
+`star ⟨A · B⟩_β = ⟨B · A⟩_β`. -/
+theorem gibbsExpectation_star_swap_of_isHermitian {H A B : ManyBodyOp Λ}
+    (hH : H.IsHermitian) (hA : A.IsHermitian) (hB : B.IsHermitian) (β : ℝ) :
+    star (gibbsExpectation β H (A * B)) = gibbsExpectation β H (B * A) := by
+  unfold gibbsExpectation
+  rw [Matrix.trace_mul_conjTranspose_swap_of_isHermitian
+        (gibbsState_isHermitian hH β) (A * B),
+      Matrix.conjTranspose_mul, hA.eq, hB.eq]
+
+/-- For Hermitian `H` and Hermitian `A, B`, the anticommutator
+expectation `⟨A · B + B · A⟩_β` is real. -/
+theorem gibbsExpectation_anticommutator_im {H A B : ManyBodyOp Λ}
+    (hH : H.IsHermitian) (hA : A.IsHermitian) (hB : B.IsHermitian) (β : ℝ) :
+    (gibbsExpectation β H (A * B + B * A)).im = 0 := by
+  rw [gibbsExpectation_add, ← gibbsExpectation_star_swap_of_isHermitian hH hA hB β,
+    Complex.add_im, Complex.star_def, Complex.conj_im, add_neg_cancel]
+
+/-- For Hermitian `H` and Hermitian `A, B`, the commutator expectation
+`⟨A · B − B · A⟩_β` is purely imaginary. -/
+theorem gibbsExpectation_commutator_re {H A B : ManyBodyOp Λ}
+    (hH : H.IsHermitian) (hA : A.IsHermitian) (hB : B.IsHermitian) (β : ℝ) :
+    (gibbsExpectation β H (A * B - B * A)).re = 0 := by
+  rw [sub_eq_add_neg, ← neg_one_smul ℂ (B * A), gibbsExpectation_add,
+    gibbsExpectation_smul,
+    ← gibbsExpectation_star_swap_of_isHermitian hH hA hB β]
+  simp [Complex.add_re, Complex.conj_re]
+
+/-- For Hermitian `H` and Hermitian observable `O`,
+`(⟨H · O⟩_β).im = 0`, i.e.\ the expectation of the (generally
+non-Hermitian) product `H · O` is real. -/
+theorem gibbsExpectation_mul_hamiltonian_im {H O : ManyBodyOp Λ}
+    (hH : H.IsHermitian) (hO : O.IsHermitian) (β : ℝ) :
+    (gibbsExpectation β H (H * O)).im = 0 := by
+  have hcomm := gibbsExpectation_mul_hamiltonian_comm β H O
+  have hstar := gibbsExpectation_star_swap_of_isHermitian hH hH hO β
+  have : star (gibbsExpectation β H (H * O)) = gibbsExpectation β H (H * O) := by
+    rw [hstar, ← hcomm]
+  exact Complex.conj_eq_iff_im.mp this
 
 end LatticeSystem.Quantum
