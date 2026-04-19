@@ -74,6 +74,53 @@ theorem periodicChainHeisenberg_isHermitian (N : ℕ) (J : ℝ) :
     (by intro x y; simp only [periodicChainCoupling]; split_ifs <;> simp)
     (by intro x y; simp only [periodicChainCoupling]; simp [or_comm])
 
+/-! ## Energy expectation as a bond-sum decomposition
+
+Combining `gibbsExpectation_sum` (linearity over Finset sums) and
+`gibbsExpectation_smul` (scalar pull-out) at the defining formula
+`heisenbergHamiltonian J = ∑ x, ∑ y, J x y • spinHalfDot x y` gives an
+explicit bond-sum decomposition of the energy expectation, valid for
+any Gibbs Hamiltonian `H`. -/
+
+/-- Generic bond-sum decomposition: for any Gibbs Hamiltonian `H` and
+coupling `J`,
+`⟨heisenbergHamiltonian J⟩_β = ∑ x, ∑ y, J x y · ⟨spinHalfDot x y⟩_β`. -/
+theorem heisenbergHamiltonian_gibbsExpectation_eq
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (β : ℝ) (H : ManyBodyOp Λ) (J : Λ → Λ → ℂ) :
+    gibbsExpectation β H (heisenbergHamiltonian J) =
+      ∑ x : Λ, ∑ y : Λ, J x y * gibbsExpectation β H (spinHalfDot x y) := by
+  unfold heisenbergHamiltonian
+  rw [gibbsExpectation_sum]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [gibbsExpectation_sum]
+  refine Finset.sum_congr rfl (fun y _ => ?_)
+  exact gibbsExpectation_smul β (J x y) (spinHalfDot x y)
+
+/-- Open-chain Heisenberg energy as a bond-sum:
+`⟨H_open⟩_β = ∑ x, ∑ y, openChainCoupling N J x y · ⟨Ŝ_x · Ŝ_y⟩_β`. -/
+theorem openChainHeisenbergGibbsExpectation_self_eq (β J : ℝ) (N : ℕ) :
+    gibbsExpectation β (heisenbergHamiltonian (openChainCoupling N J))
+        (heisenbergHamiltonian (openChainCoupling N J)) =
+      ∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+        openChainCoupling N J x y *
+          gibbsExpectation β (heisenbergHamiltonian (openChainCoupling N J))
+            (spinHalfDot x y) :=
+  heisenbergHamiltonian_gibbsExpectation_eq β
+    (heisenbergHamiltonian (openChainCoupling N J)) (openChainCoupling N J)
+
+/-- Periodic-chain Heisenberg energy as a bond-sum:
+`⟨H_periodic⟩_β = ∑ x, ∑ y, periodicChainCoupling N J x y · ⟨Ŝ_x · Ŝ_y⟩_β`. -/
+theorem periodicChainHeisenbergGibbsExpectation_self_eq (β J : ℝ) (N : ℕ) :
+    gibbsExpectation β (heisenbergHamiltonian (periodicChainCoupling N J))
+        (heisenbergHamiltonian (periodicChainCoupling N J)) =
+      ∑ x : Fin (N + 2), ∑ y : Fin (N + 2),
+        periodicChainCoupling N J x y *
+          gibbsExpectation β (heisenbergHamiltonian (periodicChainCoupling N J))
+            (spinHalfDot x y) :=
+  heisenbergHamiltonian_gibbsExpectation_eq β
+    (heisenbergHamiltonian (periodicChainCoupling N J)) (periodicChainCoupling N J)
+
 /-! ## Gibbs state for the open-chain Heisenberg Hamiltonian -/
 
 /-- The Gibbs state of the open-boundary 1D Heisenberg chain on
