@@ -41,6 +41,8 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
   is purely imaginary.
 * `gibbsExpectation_mul_hamiltonian_im` — for Hermitian `H, O`,
   `(⟨H · O⟩_β).im = 0` (energy-mode expectation reality).
+* `gibbsState_zero`, `gibbsExpectation_zero` — high-temperature limit
+  `ρ_0 = (1/dim) · I` and `⟨A⟩_0 = (1/dim) · Tr A` (Tasaki §3.3, p. 78).
 -/
 
 namespace LatticeSystem.Quantum
@@ -124,11 +126,26 @@ theorem partitionFn_zero (H : ManyBodyOp Λ) :
     partitionFn 0 H = Fintype.card (Λ → Fin 2) := by
   simp only [partitionFn, gibbsExp_zero, Matrix.trace_one]
 
-/-- The partition function at `β = 0` is nonzero (the dimension is positive). -/
-theorem partitionFn_zero_ne_zero [Nonempty (Λ → Fin 2)] (H : ManyBodyOp Λ) :
+/-- The partition function at `β = 0` is nonzero (the dimension is positive).
+The configuration space `Λ → Fin 2` is automatically nonempty since
+`Fin 2` is nonempty, so no extra hypothesis is needed. -/
+theorem partitionFn_zero_ne_zero (H : ManyBodyOp Λ) :
     partitionFn 0 H ≠ 0 := by
   rw [partitionFn_zero]
   exact_mod_cast Fintype.card_pos.ne'
+
+/-- At `β = 0`, the Gibbs state is the maximally mixed state
+`ρ_0 = (1 / dim) · I`. -/
+theorem gibbsState_zero (H : ManyBodyOp Λ) :
+    gibbsState 0 H = ((Fintype.card (Λ → Fin 2) : ℂ))⁻¹ • (1 : ManyBodyOp Λ) := by
+  simp only [gibbsState, gibbsExp_zero, partitionFn_zero, one_div]
+
+/-- At `β = 0`, the Gibbs expectation reduces to the normalised trace
+`⟨A⟩_0 = (1 / dim) · Tr(A)`. -/
+theorem gibbsExpectation_zero (H A : ManyBodyOp Λ) :
+    gibbsExpectation 0 H A = ((Fintype.card (Λ → Fin 2) : ℂ))⁻¹ * A.trace := by
+  simp only [gibbsExpectation, gibbsState_zero, Matrix.smul_mul, Matrix.one_mul,
+    Matrix.trace_smul, smul_eq_mul]
 
 /-! ## Linearity of expectation -/
 
