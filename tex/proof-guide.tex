@@ -925,6 +925,58 @@ $\hat\sigma^{(\alpha)} = 2\hat S^{(\alpha)}$ and introduces an
 explicit coupling $J$ in front of the bond term, so our $H_{J,h}^{N+1}$
 matches Tasaki's (3.3.1) up to the constants $J$ and the Pauli rescaling.
 
+\subsection{Gibbs state instantiation}
+\label{subsec:ising-gibbs}
+
+\emph{Reference:} Tasaki~\cite{Tasaki:QMB}, §3.3, p.~80.
+
+\begin{definition}[\texttt{quantumIsingGibbsState}]
+The Gibbs state of the open-boundary 1D quantum Ising chain on
+$\mathrm{Fin}(N+1)$ sites with real $J$, $h$ and inverse temperature
+$\beta$ is
+\[
+  \rho_\beta^{\mathrm{Ising}}
+  \;:=\;
+  \frac{e^{-\beta H_{J,h}^{N+1}}}{\operatorname{Tr}\,e^{-\beta H_{J,h}^{N+1}}},
+\]
+i.e.\ \texttt{gibbsState $\beta$ (quantumIsingHamiltonian $N$ $J$ $h$)}.
+\end{definition}
+
+\begin{theorem}[Hermiticity]
+$\rho_\beta^{\mathrm{Ising}}$ is Hermitian. Lean name:
+\texttt{quantumIsingGibbsState\_isHermitian}.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Apply the abstract \texttt{gibbsState\_isHermitian} with the Hermitian
+$H_{J,h}^{N+1}$ from \texttt{quantumIsingHamiltonian\_isHermitian}.
+\end{proof}
+
+\begin{theorem}[Commutativity with the Hamiltonian]
+$[\rho_\beta^{\mathrm{Ising}}, H_{J,h}^{N+1}] = 0$. Lean name:
+\texttt{quantumIsingGibbsState\_commute\_hamiltonian}.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Specialise the abstract \texttt{gibbsState\_commute\_hamiltonian} to
+$H_{J,h}^{N+1}$.
+\end{proof}
+
+\begin{theorem}[Infinite-temperature closed form]
+At $\beta = 0$, for any observable $A$,
+\[
+  \langle A \rangle_0^{\mathrm{Ising}}
+  \;=\; \dim^{-1}\,\operatorname{Tr}(A),
+\]
+independent of the parameters $J, h$. Lean name:
+\texttt{quantumIsingGibbsExpectation\_zero}.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Specialise \texttt{gibbsExpectation\_zero} to $H_{J,h}^{N+1}$; at
+$\beta = 0$ the Hamiltonian drops out because $e^{-0\cdot H} = I$.
+\end{proof}
+
 %======================================================================
 %======================================================================
 \section{Tasaki §2.1/§2.2 supplementary content}
