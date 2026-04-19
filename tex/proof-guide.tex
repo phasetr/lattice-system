@@ -1546,6 +1546,28 @@ into the canonical "rescaled" form, useful when factoring out the
 partition function in expectation computations.
 \end{proof}
 
+\begin{lemma}[\texttt{partitionFn\_mul\_gibbsExpectation\_eq}]
+If $Z(\beta, H) \neq 0$, then for any observable $A$,
+$Z(\beta, H) \cdot \langle A \rangle_\beta
+ = \operatorname{Tr}(e^{-\beta H} \cdot A)$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Push the scalar $Z$ inside the trace via
+\texttt{Matrix.trace\_smul} (rewriting
+$Z \cdot \operatorname{Tr}(\rho_\beta A)
+ = \operatorname{Tr}(Z \cdot (\rho_\beta A))$),
+then \texttt{Matrix.smul\_mul} repackages the scalar onto the first
+factor: $\operatorname{Tr}((Z \cdot \rho_\beta) A)$.
+The bracket is exactly $e^{-\beta H}$ by
+\texttt{partitionFn\_smul\_gibbsState\_eq\_gibbsExp}, giving
+$\operatorname{Tr}(e^{-\beta H} A)$.
+
+The "unnormalised" expectation $\operatorname{Tr}(e^{-\beta H} A)$ is
+the form that appears throughout canonical-ensemble derivations
+(free-energy expansions, Trotter / path-integral arguments).
+\end{proof}
+
 \begin{lemma}[\texttt{gibbsExp\_natCast\_mul}]
 For every $n \in \mathbb{N}$,
 $e^{-(n\beta) H} = (e^{-\beta H})^n$.

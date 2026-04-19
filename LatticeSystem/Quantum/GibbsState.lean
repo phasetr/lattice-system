@@ -64,8 +64,10 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
 * `gibbsState_inv` — when `Z(β) ≠ 0`,
   `(ρ_β)⁻¹ = Z(β) · e^{β H}`. Generalises `gibbsState_zero_inv`
   beyond β = 0.
-* `partitionFn_smul_gibbsState_eq_gibbsExp` — when `Z(β) ≠ 0`,
-  `Z(β) · ρ_β = e^{-β H}` (canonical rescaled identity).
+* `partitionFn_smul_gibbsState_eq_gibbsExp`,
+  `partitionFn_mul_gibbsExpectation_eq` — when `Z(β) ≠ 0`,
+  `Z(β) · ρ_β = e^{-β H}` (canonical rescaled identity) and
+  `Z(β) · ⟨A⟩_β = Tr(e^{-β H} · A)` (canonical normalisation).
 * `gibbsExp_natCast_mul`, `gibbsExp_two_mul` — exact discrete
   semigroup identity `gibbsExp ((n : ℝ) · β) H = (gibbsExp β H)^n`
   for `n : ℕ`.
@@ -213,6 +215,22 @@ theorem partitionFn_smul_gibbsState_eq_gibbsExp {H : ManyBodyOp Λ} (β : ℝ)
     partitionFn β H • gibbsState β H = gibbsExp β H := by
   unfold gibbsState
   rw [smul_smul, mul_one_div_cancel hZ, one_smul]
+
+/-- Canonical normalisation identity: when `Z(β) ≠ 0`,
+`Z(β) · ⟨A⟩_β = Tr(e^{-β H} · A)`. The "unnormalised" expectation on
+the right is the form that appears throughout canonical-ensemble
+derivations. -/
+theorem partitionFn_mul_gibbsExpectation_eq {H : ManyBodyOp Λ} (β : ℝ)
+    (hZ : partitionFn β H ≠ 0) (A : ManyBodyOp Λ) :
+    partitionFn β H * gibbsExpectation β H A = (gibbsExp β H * A).trace := by
+  unfold gibbsExpectation
+  calc partitionFn β H * (gibbsState β H * A).trace
+      = (partitionFn β H • (gibbsState β H * A)).trace := by
+        rw [Matrix.trace_smul, smul_eq_mul]
+    _ = ((partitionFn β H • gibbsState β H) * A).trace := by
+        rw [Matrix.smul_mul]
+    _ = (gibbsExp β H * A).trace := by
+        rw [partitionFn_smul_gibbsState_eq_gibbsExp β hZ]
 
 /-- Exact discrete semigroup identity: for `n : ℕ`,
 `gibbsExp ((n : ℝ) * β) H = (gibbsExp β H) ^ n`. -/
