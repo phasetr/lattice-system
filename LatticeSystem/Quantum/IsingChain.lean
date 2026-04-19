@@ -166,7 +166,7 @@ theorem quantumIsingGibbsExpectation_commutator_hamiltonian
 
 /-- Ising-chain energy expectation as a sum of bond and transverse-field
 contributions:
-`⟨H_Ising⟩_β = -J · ∑ ⟨σ^z_i σ^z_{i+1}⟩_β + (-h) · ∑ ⟨σ^x_i⟩_β`. -/
+`⟨H_Ising⟩_β = (-J) · ∑ ⟨σ^z_i σ^z_{i+1}⟩_β + (-h) · ∑ ⟨σ^x_i⟩_β`. -/
 theorem quantumIsingGibbsExpectation_self_eq (β J h : ℝ) (N : ℕ) :
     gibbsExpectation β (quantumIsingHamiltonian N J h)
         (quantumIsingHamiltonian N J h) =
