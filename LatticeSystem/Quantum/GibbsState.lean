@@ -61,6 +61,9 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
   `e^{βH} · e^{-βH} = 1`, hence `e^{-βH}` is invertible (and in
   particular nonzero). Foundation for KMS / Wick rotation.
 * `gibbsState_ne_zero` — `ρ_β ≠ 0` whenever `Z(β) ≠ 0`.
+* `gibbsState_inv` — when `Z(β) ≠ 0`,
+  `(ρ_β)⁻¹ = Z(β) · e^{β H}`. Generalises `gibbsState_zero_inv`
+  beyond β = 0.
 * `gibbsExp_natCast_mul`, `gibbsExp_two_mul` — exact discrete
   semigroup identity `gibbsExp ((n : ℝ) · β) H = (gibbsExp β H)^n`
   for `n : ℕ`.
@@ -188,6 +191,16 @@ theorem gibbsState_ne_zero {H : ManyBodyOp Λ} (β : ℝ)
     gibbsState β H ≠ 0 := by
   unfold gibbsState
   exact smul_ne_zero (one_div_ne_zero hZ) (gibbsExp_ne_zero β H)
+
+/-- Explicit matrix inverse of the Gibbs state when the partition function
+is nonzero: `(ρ_β)⁻¹ = Z(β) · e^{-β H} · ... = Z(β) • e^{β H}`. Note that
+`gibbsExp (-β) H = e^{β H}` in our convention. -/
+theorem gibbsState_inv {H : ManyBodyOp Λ} (β : ℝ)
+    (hZ : partitionFn β H ≠ 0) :
+    (gibbsState β H)⁻¹ = partitionFn β H • gibbsExp (-β) H := by
+  unfold gibbsState
+  apply Matrix.inv_eq_left_inv
+  rw [smul_mul_smul_comm, gibbsExp_neg_mul_self, mul_one_div_cancel hZ, one_smul]
 
 /-- Exact discrete semigroup identity: for `n : ℕ`,
 `gibbsExp ((n : ℝ) * β) H = (gibbsExp β H) ^ n`. -/
