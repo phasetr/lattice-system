@@ -987,13 +987,15 @@ For the open Ising Hamiltonian $H_{J,h}^{N+1}$:
   \item For any Hermitian observable $O$,
     $\Im\langle H \cdot O \rangle_\beta = 0$.
   \item $\Im\langle H^2 \rangle_\beta = 0$.
+  \item $\Im\langle H^n \rangle_\beta = 0$ for any $n \in \mathbb{N}$.
 \end{enumerate}
 Lean names:
 \texttt{quantumIsingGibbsExpectation\_im\_of\_isHermitian},
 \texttt{quantumIsingGibbsExpectation\_commutator\_hamiltonian},
 \texttt{quantumIsingGibbsExpectation\_hamiltonian\_im},
 \texttt{quantumIsingGibbsExpectation\_mul\_hamiltonian\_im},
-\texttt{quantumIsingGibbsExpectation\_hamiltonian\_sq\_im}.
+\texttt{quantumIsingGibbsExpectation\_hamiltonian\_sq\_im},
+\texttt{quantumIsingGibbsExpectation\_hamiltonian\_pow\_im}.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
@@ -2054,13 +2056,16 @@ For both the open and periodic Heisenberg Hamiltonians:
   \item For any Hermitian observable $O$,
     $\Im\langle H \cdot O \rangle_\beta = 0$.
   \item $\Im\langle H^2 \rangle_\beta = 0$ (energy-squared expectation is real).
+  \item $\Im\langle H^n \rangle_\beta = 0$ for any $n \in \mathbb{N}$
+    (all natural-power energy moments are real).
 \end{enumerate}
 Lean names (open chain):
 \texttt{openChainHeisenbergGibbsExpectation\_im\_of\_isHermitian},
 \texttt{openChainHeisenbergGibbsExpectation\_commutator\_hamiltonian},
 \texttt{openChainHeisenbergGibbsExpectation\_hamiltonian\_im},
 \texttt{openChainHeisenbergGibbsExpectation\_mul\_hamiltonian\_im},
-\texttt{openChainHeisenbergGibbsExpectation\_hamiltonian\_sq\_im};
+\texttt{openChainHeisenbergGibbsExpectation\_hamiltonian\_sq\_im},
+\texttt{openChainHeisenbergGibbsExpectation\_hamiltonian\_pow\_im};
 analogous for the periodic chain.
 \end{theorem}
 
