@@ -1594,6 +1594,38 @@ so $\operatorname{Tr}(\rho \cdot (c \cdot O))
 by linearity of the trace.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsExpectation\_neg} / \texttt{gibbsExpectation\_sub}]
+$\langle -O \rangle_\beta = -\langle O \rangle_\beta$
+and $\langle A - B \rangle_\beta
+     = \langle A \rangle_\beta - \langle B \rangle_\beta$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Negation: $\rho \cdot (-O) = -(\rho \cdot O)$ via
+\texttt{Matrix.mul\_neg}, then \texttt{Matrix.trace\_neg} commutes the
+sign out of the trace.  Subtraction: rewrite $A - B$ as $A + (-B)$ and
+combine \texttt{gibbsExpectation\_add} with \texttt{gibbsExpectation\_neg}.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsExpectation\_sum}]
+For any \texttt{Finset s} and family $f : \iota \to M_n(\mathbb{C})$,
+\[
+  \Bigl\langle \sum_{i \in s} f(i) \Bigr\rangle_\beta
+  \;=\; \sum_{i \in s} \langle f(i) \rangle_\beta.
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Induction on the finset.  Base case $s = \emptyset$:
+$\sum_{i \in \emptyset} f(i) = 0$, and
+$\langle 0 \rangle_\beta
+ = \operatorname{Tr}(\rho \cdot 0) = \operatorname{Tr}(0) = 0
+ = \sum_{i \in \emptyset} \langle f(i) \rangle_\beta$.
+Inductive step: \texttt{Finset.sum\_insert} splits off the new element,
+\texttt{gibbsExpectation\_add} pushes the expectation through the sum,
+and the IH closes the rest.
+\end{proof}
+
 Reference: Tasaki~\cite{Tasaki:QMB}, §3.3, pp.\,75--78.
 
 \subsection{Commutativity with the Hamiltonian and reality of expectation}
