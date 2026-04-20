@@ -203,6 +203,54 @@ theorem totalSpinHalfOpPlus_pow_basisVec_all_down_mem_magnetizationSubspace
       magnetizationSubspace Λ ((-((Fintype.card Λ : ℂ) / 2)) + (k : ℂ)) :=
   totalSpinHalfOp3_mulVec_totalSpinHalfOpPlus_pow_basisVec_all_down Λ k
 
+/-! ## Two-site Néel and singlet/triplet states in `H_0` (Tasaki §2.5/§A.3)
+
+The two-site antiparallel basis states `|↑↓⟩ = basisVec upDown` and
+`|↓↑⟩ = basisVec (basisSwap upDown 0 1)` both have total magnetisation
+zero, hence lie in `magnetizationSubspace (Fin 2) 0`. Their sum and
+difference are the standard SU(2) singlet (`m = 0`, `S = 0`) and
+triplet-`m=0` (`S = 1`) states. -/
+
+/-- The two-site Néel state `|↑↓⟩` lies in `H_0` (Tasaki §2.5
+eq. (2.5.2), p. 37, two-site spin-1/2 instance). -/
+theorem basisVec_upDown_mem_magnetizationSubspace_zero :
+    (basisVec upDown : (Fin 2 → Fin 2) → ℂ) ∈
+      magnetizationSubspace (Fin 2) 0 := by
+  have h := basisVec_mem_magnetizationSubspace (Fin 2) upDown
+  have hmag : magnetization (Fin 2) upDown = 0 := by
+    unfold magnetization
+    rw [Fin.sum_univ_two]
+    simp [upDown_zero, upDown_one, spinSign]
+  rw [hmag] at h
+  simpa using h
+
+/-- The swapped two-site state `|↓↑⟩` lies in `H_0`. -/
+theorem basisVec_basisSwap_upDown_mem_magnetizationSubspace_zero :
+    (basisVec (basisSwap upDown 0 1) : (Fin 2 → Fin 2) → ℂ) ∈
+      magnetizationSubspace (Fin 2) 0 := by
+  have h := basisVec_mem_magnetizationSubspace (Fin 2)
+    (basisSwap upDown 0 1)
+  have hmag : magnetization (Fin 2) (basisSwap upDown 0 1) = 0 := by
+    unfold magnetization
+    rw [Fin.sum_univ_two, basisSwap_upDown]
+    simp [spinSign]
+  rw [hmag] at h
+  simpa using h
+
+/-- The spin-singlet `|↑↓⟩ - |↓↑⟩` lies in `H_0`. -/
+theorem singlet_mem_magnetizationSubspace_zero :
+    (basisVec upDown - basisVec (basisSwap upDown 0 1) : (Fin 2 → Fin 2) → ℂ) ∈
+      magnetizationSubspace (Fin 2) 0 :=
+  Submodule.sub_mem _ basisVec_upDown_mem_magnetizationSubspace_zero
+    basisVec_basisSwap_upDown_mem_magnetizationSubspace_zero
+
+/-- The triplet `m = 0` state `|↑↓⟩ + |↓↑⟩` lies in `H_0`. -/
+theorem triplet_zero_mem_magnetizationSubspace_zero :
+    (basisVec upDown + basisVec (basisSwap upDown 0 1) : (Fin 2 → Fin 2) → ℂ) ∈
+      magnetizationSubspace (Fin 2) 0 :=
+  Submodule.add_mem _ basisVec_upDown_mem_magnetizationSubspace_zero
+    basisVec_basisSwap_upDown_mem_magnetizationSubspace_zero
+
 /-! ## Generic commuting-with-Ŝtot^(3) operator preserves the magnetisation sectors
 
 Any operator `A` that commutes with `Ŝtot^(3)` maps each magnetisation
