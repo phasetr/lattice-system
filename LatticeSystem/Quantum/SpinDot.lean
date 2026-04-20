@@ -882,6 +882,59 @@ theorem heisenbergHamiltonian_mulVec_totalSpinHalfOpMinus_basisVec_const
   rw [Matrix.mulVec_mulVec, hcomm', ← Matrix.mulVec_mulVec,
     heisenbergHamiltonian_mulVec_basisVec_const, Matrix.mulVec_smul]
 
+/-- Iterated form of
+`heisenbergHamiltonian_mulVec_totalSpinHalfOpMinus_basisVec_const`:
+for any constant `s : Fin 2` and every natural-number power `k`,
+`(Ŝ_tot^-)^k · |s..s⟩` is an `H`-eigenvector with the same eigenvalue
+as `|s..s⟩`. Specialised to `s = 0` (the all-up state `|Φ↑⟩`), this is
+the unnormalised version of Tasaki §2.4 eq. (2.4.9), p. 33: the
+ferromagnetic ground states `|Φ_M⟩ ∝ (Ŝ_tot^-)^{|Λ|S - M} · |Φ↑⟩` all
+share the eigenvalue of `|Φ↑⟩`. -/
+theorem heisenbergHamiltonian_mulVec_totalSpinHalfOpMinus_pow_basisVec_const
+    (J : Λ → Λ → ℂ) (s : Fin 2) (k : ℕ) :
+    (heisenbergHamiltonian J).mulVec
+        (((totalSpinHalfOpMinus Λ) ^ k).mulVec (basisVec (fun _ : Λ => s))) =
+      (∑ x : Λ, ∑ y : Λ,
+          J x y * (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ))) •
+        ((totalSpinHalfOpMinus Λ) ^ k).mulVec (basisVec (fun _ : Λ => s)) := by
+  induction k with
+  | zero =>
+    simp only [pow_zero, Matrix.one_mulVec]
+    exact heisenbergHamiltonian_mulVec_basisVec_const J s
+  | succ k ih =>
+    have hcomm := heisenbergHamiltonian_commutator_totalSpinHalfOpMinus J
+    have hcomm' : heisenbergHamiltonian J * totalSpinHalfOpMinus Λ =
+        totalSpinHalfOpMinus Λ * heisenbergHamiltonian J :=
+      sub_eq_zero.mp hcomm
+    rw [pow_succ', ← Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hcomm',
+      ← Matrix.mulVec_mulVec, ih, Matrix.mulVec_smul]
+
+/-- Iterated form of
+`heisenbergHamiltonian_mulVec_totalSpinHalfOpPlus_basisVec_const`:
+for any constant `s : Fin 2` and every `k : ℕ`,
+`(Ŝ_tot^+)^k · |s..s⟩` is an `H`-eigenvector with the same eigenvalue
+as `|s..s⟩`. Companion to the lowering version above; both are
+direct corollaries of the SU(2) invariance of every Heisenberg
+Hamiltonian (Tasaki §2.4, eq. (2.4.7), p. 33), iterated. -/
+theorem heisenbergHamiltonian_mulVec_totalSpinHalfOpPlus_pow_basisVec_const
+    (J : Λ → Λ → ℂ) (s : Fin 2) (k : ℕ) :
+    (heisenbergHamiltonian J).mulVec
+        (((totalSpinHalfOpPlus Λ) ^ k).mulVec (basisVec (fun _ : Λ => s))) =
+      (∑ x : Λ, ∑ y : Λ,
+          J x y * (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ))) •
+        ((totalSpinHalfOpPlus Λ) ^ k).mulVec (basisVec (fun _ : Λ => s)) := by
+  induction k with
+  | zero =>
+    simp only [pow_zero, Matrix.one_mulVec]
+    exact heisenbergHamiltonian_mulVec_basisVec_const J s
+  | succ k ih =>
+    have hcomm := heisenbergHamiltonian_commutator_totalSpinHalfOpPlus J
+    have hcomm' : heisenbergHamiltonian J * totalSpinHalfOpPlus Λ =
+        totalSpinHalfOpPlus Λ * heisenbergHamiltonian J :=
+      sub_eq_zero.mp hcomm
+    rw [pow_succ', ← Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hcomm',
+      ← Matrix.mulVec_mulVec, ih, Matrix.mulVec_smul]
+
 /-! ## Two-site singlet / triplet Casimir eigenvalues
 
 For `Λ = Fin 2`, the natural anti-parallel basis state `|↑↓⟩` satisfies:

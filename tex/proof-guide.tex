@@ -2784,8 +2784,9 @@ the global lowering operator on the all-up state:
 \]
 The eigenvalue is preserved at each ladder step because $\hat
 S_{\mathrm{tot}}^{\pm}$ commutes with the SU(2)-invariant
-Hamiltonian.  Our spin-1/2 formalisation captures the single-step
-form.
+Hamiltonian.  Our spin-1/2 formalisation captures both the single-step
+form (below) and the iterated form (further below) for arbitrary
+constant configurations $|s\,s\,\dots\,s\rangle$.
 
 \begin{lemma}[\texttt{heisenbergHamiltonian\_mulVec\_totalSpinHalfOpMinus\_basisVec\_const}]
 For every $J : \Lambda \to \Lambda \to \mathbb{C}$ and every
@@ -2826,6 +2827,39 @@ normalisation factor of (2.4.9) and the corresponding
 \emph{completeness} of $\{|\Phi_{M}\rangle\}_{M}$ as the ferromagnetic
 ground-state space (Tasaki Theorem~2.1) are not yet formalised.
 \end{remark}
+
+\begin{theorem}[\texttt{heisenbergHamiltonian\_mulVec\_totalSpinHalfOpMinus\_pow\_basisVec\_const}]
+For every $J : \Lambda \to \Lambda \to \mathbb{C}$, every
+$s \in \{0,1\}$, and every $k \in \mathbb{N}$,
+\[
+  \texttt{heisenbergHamiltonian}\,J \cdot
+    \bigl((\hat S_{\mathrm{tot}}^{-})^{k} \cdot
+            |s\,s\,\dots\,s\rangle\bigr)
+  \;=\;
+  c_{J}\;
+    \bigl((\hat S_{\mathrm{tot}}^{-})^{k} \cdot
+            |s\,s\,\dots\,s\rangle\bigr).
+\]
+A companion statement holds for $\hat S_{\mathrm{tot}}^{+}$
+(\texttt{heisenbergHamiltonian\_mulVec\_totalSpinHalfOpPlus\_pow\_basisVec\_const}).
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Induction on $k$. The base case $k=0$ uses
+\texttt{pow\_zero} and \texttt{Matrix.one\_mulVec} to reduce to
+Theorem~\ref{subsec:heisenberg-allup}. The inductive step uses
+\texttt{pow\_succ'}
+($M^{k+1} = M\cdot M^{k}$) to peel one factor of
+$\hat S_{\mathrm{tot}}^{-}$, swaps it past $\hat H$ via
+\texttt{heisenbergHamiltonian\_commutator\_totalSpinHalfOpMinus} (turned
+into the commutation $\hat H\cdot\hat S_{\mathrm{tot}}^{-}
+=\hat S_{\mathrm{tot}}^{-}\cdot\hat H$ by
+\texttt{sub\_eq\_zero.mp}), applies the inductive hypothesis to the
+inner $\hat H \cdot \bigl((\hat S_{\mathrm{tot}}^{-})^{k}\cdot
+|s\,s\,\dots\,s\rangle\bigr)$, and pulls the resulting scalar out of
+the leftmost $\hat S_{\mathrm{tot}}^{-}$ via
+\texttt{Matrix.mulVec\_smul}.
+\end{proof}
 
 %======================================================================
 \section{Single-mode fermion (Phase 2 skeleton)}
