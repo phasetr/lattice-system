@@ -1440,4 +1440,28 @@ theorem fermionDensityDensity_commute_fermionTotalNumber
   (fermionMultiNumber_commute_fermionTotalNumber N i).mul_left
     (fermionMultiNumber_commute_fermionTotalNumber N j)
 
+/-- The general single-particle hopping operator on `Fin (N + 1)`
+modes with arbitrary complex coefficients
+`t : Fin (N+1) → Fin (N+1) → ℂ`:
+`H_hop = Σ_{i,j} t_{i,j} · c_i† c_j`. This is the kinetic part of
+any tight-binding or Hubbard-style Hamiltonian. -/
+noncomputable def fermionHopping (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℂ) : ManyBodyOp (Fin (N + 1)) :=
+  ∑ i, ∑ j, t i j •
+    (fermionMultiCreation N i * fermionMultiAnnihilation N j)
+
+/-- The general hopping operator commutes with the total particle-
+number operator `N̂`: every term `c_i† c_j` commutes with `N̂`
+(`fermionTotalNumber_commute_hopping`), the scalar action `t_{ij} •`
+preserves the commute, and finite sums of pairwise commuting
+operators commute with `N̂`. This is charge conservation for the
+kinetic Hamiltonian. -/
+theorem fermionHopping_commute_fermionTotalNumber
+    (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) :
+    Commute (fermionHopping N t) (fermionTotalNumber N) := by
+  unfold fermionHopping
+  refine Commute.sum_left _ _ _ (fun i _ => ?_)
+  refine Commute.sum_left _ _ _ (fun j _ => ?_)
+  exact ((fermionTotalNumber_commute_hopping N i j).symm).smul_left (t i j)
+
 end LatticeSystem.Fermion
