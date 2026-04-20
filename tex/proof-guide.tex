@@ -3073,6 +3073,27 @@ iterates already vanish at $k = 1$, so the eigenvalue equation holds
 trivially.
 \end{remark}
 
+\begin{remark}[Boundary annihilation]
+The ladder eventually terminates at the opposite-weight constant
+configuration:
+\begin{align*}
+  \hat S_{\mathrm{tot}}^{-} \cdot
+    |{\downarrow}\dots{\downarrow}\rangle &= 0,\\
+  \hat S_{\mathrm{tot}}^{+} \cdot
+    |{\uparrow}\dots{\uparrow}\rangle &= 0.
+\end{align*}
+Each on-site lowering $\hat S_{x}^{-}\,|{\downarrow}\rangle = 0$
+already at the minimum, summed over $x \in \Lambda$ gives the global
+identity (and dually for raising at the maximum).  Lean names:
+\texttt{totalSpinHalfOpMinus\_mulVec\_basisVec\_all\_down} and
+\texttt{totalSpinHalfOpPlus\_mulVec\_basisVec\_all\_up}.  These are
+the boundary conditions ensuring $\bigl((\hat
+S_{\mathrm{tot}}^{-})^{k}\,|{\uparrow}\dots{\uparrow}\rangle\bigr)_{k}$
+of Tasaki eq.~(2.4.9) traverses the magnetisation sectors
+$\mathcal H_{S_{\max}},\mathcal H_{S_{\max}-1},\dots,
+\mathcal H_{-S_{\max}}$ before becoming zero on further iteration.
+\end{remark}
+
 \begin{remark}[Magnetisation-subspace placement]
 Combining the two ladders with \texttt{mem\_magnetizationSubspace\_iff}
 yields

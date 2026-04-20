@@ -342,6 +342,36 @@ theorem totalSpinHalfOpMinus_mulVec_basisVec (σ : Λ → Fin 2) :
   rw [← hτ]
   rfl
 
+/-! ## Ladder termination on the fully-polarised states (Tasaki §2.4 boundary)
+
+The lowering operator annihilates the all-down state (already at the
+minimum `Sz = -Smax`); the raising operator annihilates the all-up
+state. These are the boundary conditions ensuring Tasaki's
+ferromagnetic ground-state ladder `(Ŝtot^-)^k · |↑..↑⟩` (Tasaki §2.4
+eq. (2.4.9), p. 33) terminates: the iterates pass through the
+magnetisation sectors `H_{Smax}, H_{Smax-1}, …, H_{-Smax}` and
+become the zero vector beyond. -/
+
+/-- `Ŝtot^- · |↓..↓⟩ = 0`: the global lowering operator annihilates
+the all-down state. -/
+theorem totalSpinHalfOpMinus_mulVec_basisVec_all_down :
+    (totalSpinHalfOpMinus Λ).mulVec (basisVec (fun _ : Λ => (1 : Fin 2))) = 0 := by
+  unfold totalSpinHalfOpMinus
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero fun x _ => ?_
+  rw [onSite_spinHalfOpMinus_mulVec_basisVec]
+  simp
+
+/-- `Ŝtot^+ · |↑..↑⟩ = 0`: the global raising operator annihilates
+the all-up state. -/
+theorem totalSpinHalfOpPlus_mulVec_basisVec_all_up :
+    (totalSpinHalfOpPlus Λ).mulVec (basisVec (fun _ : Λ => (0 : Fin 2))) = 0 := by
+  unfold totalSpinHalfOpPlus
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero fun x _ => ?_
+  rw [onSite_spinHalfOpPlus_mulVec_basisVec]
+  simp
+
 /-! ## Total spin commutation relations
 
 The total spin operators `Ŝ_tot^(α)` satisfy the same commutation
