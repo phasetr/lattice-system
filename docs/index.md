@@ -560,6 +560,8 @@ Systems*, §3.5, p. 89.
 | `openChainHeisenbergHamiltonian_two_site_mulVec_basisVec_singlet` | `H_open(N=1) · (|↑↓⟩ - |↓↑⟩) = (3J/2) · (|↑↓⟩ - |↓↑⟩)` — singlet eigenvalue, the antiferromagnetic ground state for `J > 0` (Tasaki §2.5 concrete instance) | `Quantum/HeisenbergChain.lean` |
 | `openChainHeisenbergHamiltonian_two_site_mulVec_basisVec_all_down` | `H_open(N=1) · |↓↓⟩ = -(J/2) · |↓↓⟩` — all-down state has the same eigenvalue as all-up (both are `S = 1` triplet states) | `Quantum/HeisenbergChain.lean` |
 | `openChainHeisenbergHamiltonian_two_site_mulVec_basisVec_triplet_zero` | `H_open(N=1) · (|↑↓⟩ + |↓↑⟩) = -(J/2) · (|↑↓⟩ + |↓↑⟩)` — triplet `m = 0` state, completing the 3-fold degenerate triplet representation `S = 1` with eigenvalue `-J/2` | `Quantum/HeisenbergChain.lean` |
+| `openChainHeisenbergHamiltonian_three_site_eq` | for `N = 2` (the 3-site open chain on `Fin 3`, 2 bonds), `H_open = -2J · (spinHalfDot 0 1 + spinHalfDot 1 2)` — explicit two-bond reduction | `Quantum/HeisenbergChain.lean` |
+| `openChainHeisenbergHamiltonian_three_site_mulVec_basisVec_all_up` | `H_open(N=2) · |↑↑↑⟩ = -J · |↑↑↑⟩` — confirming the linear scaling `E(|↑..↑⟩) = -N·J/2` (here `N = 2` bonds, `J = 1` per bond) | `Quantum/HeisenbergChain.lean` |
 
 ### Single-mode fermion (P2 skeleton)
 
