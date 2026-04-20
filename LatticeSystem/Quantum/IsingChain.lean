@@ -255,4 +255,12 @@ theorem quantumIsingGibbsExpectation_ofReal_re_eq
   gibbsExpectation_ofReal_re_eq_of_isHermitian
     (quantumIsingHamiltonian_isHermitian N J h) hO β
 
+/-- Ising-chain Rényi-n trace identity:
+`Tr(ρ_β^n) = Z(n β) / Z(β)^n`. -/
+theorem quantumIsingGibbsState_pow_trace (β J h : ℝ) (N : ℕ) (n : ℕ) :
+    ((quantumIsingGibbsState β J h N)^n).trace
+      = partitionFn ((n : ℝ) * β) (quantumIsingHamiltonian N J h)
+        / (partitionFn β (quantumIsingHamiltonian N J h)) ^ n :=
+  gibbsState_pow_trace β (quantumIsingHamiltonian N J h) n
+
 end LatticeSystem.Quantum
