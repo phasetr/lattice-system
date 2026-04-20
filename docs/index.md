@@ -446,6 +446,10 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `gibbsCovariance_eq` | unfolding lemma for `gibbsCovariance` | `Quantum/GibbsState.lean` |
 | `gibbsCovariance_self_eq_variance` | `Cov_β(O, O) = Var_β(O)` | `Quantum/GibbsState.lean` |
 | `gibbsCovariance_sub_swap_eq_commutator` | `Cov_β(A, B) − Cov_β(B, A) = ⟨A · B − B · A⟩_β` (antisymmetric part = commutator expectation) | `Quantum/GibbsState.lean` |
+| `gibbsCovariance_add_left` | `Cov_β(A₁ + A₂, B) = Cov_β(A₁, B) + Cov_β(A₂, B)` | `Quantum/GibbsState.lean` |
+| `gibbsCovariance_add_right` | `Cov_β(A, B₁ + B₂) = Cov_β(A, B₁) + Cov_β(A, B₂)` | `Quantum/GibbsState.lean` |
+| `gibbsCovariance_smul_left` | `Cov_β(c • A, B) = c · Cov_β(A, B)` | `Quantum/GibbsState.lean` |
+| `gibbsCovariance_smul_right` | `Cov_β(A, c • B) = c · Cov_β(A, B)` | `Quantum/GibbsState.lean` |
 | `gibbsCovarianceSymm β H A B` | `Cov^s_β(A, B) := (1/2) · ⟨A · B + B · A⟩_β − ⟨A⟩_β · ⟨B⟩_β` (symmetric / real-valued covariance) | `Quantum/GibbsState.lean` |
 | `gibbsCovarianceSymm_self_eq_variance` | `Cov^s_β(O, O) = Var_β(O)` | `Quantum/GibbsState.lean` |
 | `gibbsCovarianceSymm_im_of_isHermitian` | `(Cov^s_β(A, B)).im = 0` for Hermitian `H, A, B` | `Quantum/GibbsState.lean` |

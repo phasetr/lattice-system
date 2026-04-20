@@ -2026,6 +2026,29 @@ $\langle A B - B A \rangle_\beta$ by linearity
 (\texttt{gibbsExpectation\_sub}).
 \end{proof}
 
+\begin{lemma}[Bilinearity of $\operatorname{Cov}_\beta$]
+The complex covariance is bilinear in its two observable arguments:
+\begin{align*}
+\operatorname{Cov}_\beta(A_1 + A_2, B) &= \operatorname{Cov}_\beta(A_1, B) + \operatorname{Cov}_\beta(A_2, B), \\
+\operatorname{Cov}_\beta(A, B_1 + B_2) &= \operatorname{Cov}_\beta(A, B_1) + \operatorname{Cov}_\beta(A, B_2), \\
+\operatorname{Cov}_\beta(c \cdot A, B) &= c \cdot \operatorname{Cov}_\beta(A, B), \\
+\operatorname{Cov}_\beta(A, c \cdot B) &= c \cdot \operatorname{Cov}_\beta(A, B).
+\end{align*}
+Lean names: \texttt{gibbsCovariance\_add\_left},
+\texttt{gibbsCovariance\_add\_right},
+\texttt{gibbsCovariance\_smul\_left},
+\texttt{gibbsCovariance\_smul\_right}.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Each follows from matrix-level distributivity (\texttt{add\_mul},
+\texttt{mul\_add}, \texttt{Matrix.smul\_mul}, \texttt{Matrix.mul\_smul})
+on the inner $A \cdot B$ factor, plus linearity of
+\texttt{gibbsExpectation} (additivity \texttt{gibbsExpectation\_add},
+scalar pullout \texttt{gibbsExpectation\_smul}), and a
+\texttt{ring} closing of the resulting complex-arithmetic equality.
+\end{proof}
+
 \subsection{Symmetric covariance}
 \label{subsec:gibbs-covariance-symm}
 
