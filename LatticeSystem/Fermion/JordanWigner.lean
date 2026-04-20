@@ -517,6 +517,62 @@ theorem fermionMultiAnnihilation_creation_anticomm_two_site_cross :
       onSite_mul_onSite_same, pauliZ_mul_spinHalfOpPlus]
   rw [hfirst, hsecond, neg_add_cancel]
 
+/-- Cross-site CAR for any chain length `N ≥ 1`:
+`c_0 · c_1 + c_1 · c_0 = 0` on `Fin (N+1)`. Generalises the `Fin 2`
+case to arbitrary `N`, since the JW string at site 1 only depends on
+the filter `{j : j.val < 1} = {0}`, independent of `N`. -/
+theorem fermionMultiAnnihilation_anticomm_zero_one
+    (N : ℕ) (hN : 1 ≤ N) :
+    fermionMultiAnnihilation N (0 : Fin (N + 1)) *
+        fermionMultiAnnihilation N ⟨1, by omega⟩ +
+      fermionMultiAnnihilation N ⟨1, by omega⟩ *
+        fermionMultiAnnihilation N 0 = 0 := by
+  rw [fermionMultiAnnihilation_zero]
+  have hjw : jwString N ⟨1, by omega⟩ = onSite (0 : Fin (N + 1)) pauliZ := by
+    have hfilter : (Finset.univ : Finset (Fin (N + 1))).filter
+        (fun j : Fin (N + 1) => j.val < (⟨1, by omega⟩ : Fin (N + 1)).val) =
+        ({(0 : Fin (N + 1))} : Finset (Fin (N + 1))) := by
+      ext k
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and,
+        Finset.mem_singleton]
+      refine ⟨fun h => ?_, fun h => ?_⟩
+      · apply Fin.ext
+        have : (k.val : ℕ) < 1 := h
+        have : (k.val : ℕ) = 0 := by omega
+        rw [this]; rfl
+      · rw [h]; show (0 : ℕ) < 1; omega
+    unfold jwString
+    rw [Finset.noncommProd_congr hfilter (fun _ _ => rfl)]
+    exact Finset.noncommProd_singleton _ _
+  show onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+        fermionMultiAnnihilation N ⟨1, by omega⟩ +
+      fermionMultiAnnihilation N ⟨1, by omega⟩ *
+        onSite (0 : Fin (N + 1)) spinHalfOpPlus = 0
+  unfold fermionMultiAnnihilation
+  rw [hjw]
+  have h01 : (0 : Fin (N + 1)) ≠ ⟨1, by omega⟩ := by
+    intro h
+    have := Fin.val_eq_of_eq h
+    simp at this
+  -- c_0 · c_1 = σ^+_0 · σ^z_0 · σ^+_1 = -σ^+_0 · σ^+_1
+  have hfirst : onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+      (onSite (0 : Fin (N + 1)) pauliZ *
+        onSite (⟨1, by omega⟩ : Fin (N + 1)) spinHalfOpPlus) =
+        -(onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+          onSite (⟨1, by omega⟩ : Fin (N + 1)) spinHalfOpPlus) := by
+    rw [← Matrix.mul_assoc, onSite_mul_onSite_same, spinHalfOpPlus_mul_pauliZ]
+    rw [show (-spinHalfOpPlus : Matrix (Fin 2) (Fin 2) ℂ) = (-1 : ℂ) • spinHalfOpPlus
+      from by rw [neg_one_smul], onSite_smul, Matrix.smul_mul, neg_one_smul]
+  -- c_1 · c_0 = σ^z_0 · σ^+_1 · σ^+_0 = σ^z_0 · σ^+_0 · σ^+_1 = σ^+_0 · σ^+_1
+  have hsecond : (onSite (0 : Fin (N + 1)) pauliZ *
+      onSite (⟨1, by omega⟩ : Fin (N + 1)) spinHalfOpPlus) *
+      onSite (0 : Fin (N + 1)) spinHalfOpPlus =
+        onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+          onSite (⟨1, by omega⟩ : Fin (N + 1)) spinHalfOpPlus := by
+    rw [Matrix.mul_assoc, onSite_mul_onSite_of_ne h01.symm, ← Matrix.mul_assoc,
+      onSite_mul_onSite_same, pauliZ_mul_spinHalfOpPlus]
+  rw [hfirst, hsecond, neg_add_cancel]
+
 /-- Fourth off-diagonal CAR on `Fin 2`: `c_0† · c_1 + c_1 · c_0† = 0`.
 Obtained from PR #110's mixed annihilation/creation version by taking
 `conjTranspose`. Completes the 2-site off-diagonal CAR relations. -/
