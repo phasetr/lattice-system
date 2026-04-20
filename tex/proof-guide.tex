@@ -2683,6 +2683,91 @@ Lean names: \texttt{openChainHeisenbergGibbsExpectation\_self\_eq},
 \texttt{periodicChainHeisenbergGibbsExpectation\_self\_eq}.
 \end{remark}
 
+\subsection{Action on the fully-polarised state (Tasaki §2.4 (2.4.5))}
+\label{subsec:heisenberg-allup}
+
+Tasaki \emph{Physics and Mathematics of Quantum Many-Body Systems},
+§2.4 ``The Ferromagnetic Heisenberg Model'', eq.~(2.4.5) (p.~32),
+asserts that the fully-polarised state
+$|\Phi^{\uparrow}\rangle = \bigotimes_{x} |\psi_{x}^{S}\rangle$
+satisfies
+\[
+  -\hat S_x \cdot \hat S_y \, |\Phi^{\uparrow}\rangle
+  \;=\; -\hat S_x^{(3)} \hat S_y^{(3)} \, |\Phi^{\uparrow}\rangle
+  \;=\; -S^{2}\, |\Phi^{\uparrow}\rangle,
+\]
+so each bond term contributes the minimum eigenvalue $-S^{2}$ and
+the ferromagnetic ground-state energy is $E_{\mathrm{GS}}=-|B|S^{2}$.
+
+For $S=1/2$, every Heisenberg-type Hamiltonian acts as a scalar on
+every uniformly-aligned basis state.
+
+\begin{theorem}[\texttt{heisenbergHamiltonian\_mulVec\_basisVec\_const}]
+For every $J : \Lambda \to \Lambda \to \mathbb{C}$ and every
+$s \in \{0,1\} = \{\uparrow,\downarrow\}$,
+\[
+  \texttt{heisenbergHamiltonian}\,J \cdot \,
+    |\,\underbrace{s\,s\,\dots\,s}_{|\Lambda|}\,\rangle
+  \;=\;
+  \Bigl(\sum_{x,y\in\Lambda} J(x,y)\,
+    \chi_{x,y}\Bigr) \cdot
+    |\,s\,s\,\dots\,s\,\rangle,
+\]
+where $\chi_{x,y} := \tfrac{3}{4}$ if $x=y$ (the diagonal Casimir
+contribution $S(S+1)=3/4$) and $\chi_{x,y}:=\tfrac{1}{4}$ otherwise
+(the maximum eigenvalue $S^{2}=1/4$ of $\hat S_x\cdot\hat S_y$ on
+parallel spins).
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Unfold \texttt{heisenbergHamiltonian} to
+$\sum_{x,y} J(x,y)\,\hat S_x\cdot\hat S_y$. By
+\texttt{Matrix.sum\_mulVec} each summand acts on the constant basis
+state independently. The internal lemma
+\texttt{spinHalfDot\_mulVec\_const} provides the eigenvalue
+$\tfrac{3}{4}$ for $x=y$ (using \texttt{spinHalfDot\_self}, which
+gives $\hat S_x\cdot\hat S_x = (3/4)\,I$) and $\tfrac{1}{4}$ for
+$x\ne y$ (using \texttt{spinHalfDot\_mulVec\_basisVec\_parallel};
+both sites carry the same value~$s$). Distributivity of scalar
+multiplication and \texttt{Finset.sum\_smul} consolidate the bilinear
+sum into a single eigenvalue.
+\end{proof}
+
+\begin{remark}[Specialisations]
+The all-up case $s=0$ (\texttt{heisenbergHamiltonian\_mulVec\_basisVec\_all\_up})
+and the all-down case $s=1$
+(\texttt{heisenbergHamiltonian\_mulVec\_basisVec\_all\_down}) are
+direct corollaries.
+
+To recover Tasaki's ferromagnetic ground-state energy
+$E_{\mathrm{GS}}=-|B|\,S^{2}=-|B|/4$ from
+$H = -\sum_{\{x,y\}\in B}\hat S_x\cdot\hat S_y$ (sum over unordered
+bonds, no self-bonds) in our ordered-pair convention, take
+$J(x,y)=-\tfrac{1}{2}$ for both orientations of every bond
+$\{x,y\}\in B$ and $J(x,y)=0$ otherwise.  Then the bilinear sum
+contains $2|B|$ nonzero terms each contributing
+$(-\tfrac{1}{2})(\tfrac{1}{4})=-\tfrac{1}{8}$, so
+$\sum_{x,y}J(x,y)\,\chi_{x,y}=-\tfrac{|B|}{4}=-|B|\,S^{2}$.
+
+The present theorem proves only the \emph{eigenvector} property — that
+the constant configuration is an eigenvector of every Heisenberg-type
+Hamiltonian.  Whether the eigenvalue equals the ground-state energy
+depends on the sign and structure of $J$ and is not asserted here.
+Tasaki's argument that $|\Phi^{\uparrow}\rangle$ \emph{minimises} the
+ferromagnetic energy uses Lemma~A.9 (frustration-free Hamiltonians);
+that step is not yet formalised.
+\end{remark}
+
+\begin{remark}[Relation to Tasaki (2.4.5)]
+Tasaki's eq.~(2.4.5) is the bond statement
+$-\hat S_x\!\cdot\!\hat S_y\,|\Phi^{\uparrow}\rangle
+   = -S^{2}\,|\Phi^{\uparrow}\rangle$ for $x\ne y$.  The present theorem
+is the bilinear-sum lift of that statement (and of the diagonal
+identity $\hat S_x\!\cdot\!\hat S_x = S(S+1)\,I$ from
+\texttt{spinHalfDot\_self}); it subsumes (2.4.5) for the off-diagonal
+indices and additionally records the diagonal Casimir contribution.
+\end{remark}
+
 %======================================================================
 \section{Single-mode fermion (Phase 2 skeleton)}
 \label{sec:fermion-mode}
