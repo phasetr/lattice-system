@@ -48,6 +48,11 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
 * `gibbsCovariance β H A B` — canonical-ensemble (complex) covariance
   `⟨A · B⟩_β − ⟨A⟩_β · ⟨B⟩_β`; `gibbsCovariance_self_eq_variance`
   recovers the variance at `A = B`.
+* `gibbsCovarianceSymm β H A B` — symmetric (real-valued for Hermitian
+  observables) covariance
+  `(1/2) · ⟨A · B + B · A⟩_β − ⟨A⟩_β · ⟨B⟩_β`. Self-equals-variance
+  at `A = B` and realness for Hermitian `A, B`
+  (`gibbsCovarianceSymm_im_of_isHermitian`).
 * `Matrix.trace_mul_conjTranspose_swap_of_isHermitian` — generic
   helper: for Hermitian `ρ`, `star Tr(ρ · X) = Tr(ρ · Xᴴ)`.
 * `gibbsExpectation_star_swap_of_isHermitian` — for Hermitian `H, A, B`,
@@ -587,5 +592,56 @@ theorem gibbsExpectation_mul_hamiltonian_im {H O : ManyBodyOp Λ}
   have : star (gibbsExpectation β H (H * O)) = gibbsExpectation β H (H * O) := by
     rw [hstar, ← hcomm]
   exact Complex.conj_eq_iff_im.mp this
+
+/-! ## Symmetric covariance (real-valued for Hermitian observables) -/
+
+/-- The symmetric (real-valued for Hermitian observables) canonical
+covariance: `Cov^s_β(A, B) := (1/2) · ⟨A · B + B · A⟩_β − ⟨A⟩_β · ⟨B⟩_β`.
+The complex covariance `gibbsCovariance` for non-commuting Hermitian
+observables generally has a nonzero imaginary part; averaging over the
+anticommutator restores realness. -/
+noncomputable def gibbsCovarianceSymm (β : ℝ) (H A B : ManyBodyOp Λ) : ℂ :=
+  (2 : ℂ)⁻¹ * gibbsExpectation β H (A * B + B * A)
+    - gibbsExpectation β H A * gibbsExpectation β H B
+
+/-- Unfolding lemma:
+`Cov^s_β(A, B) = (1/2) · ⟨A · B + B · A⟩_β − ⟨A⟩_β · ⟨B⟩_β`. -/
+theorem gibbsCovarianceSymm_eq (β : ℝ) (H A B : ManyBodyOp Λ) :
+    gibbsCovarianceSymm β H A B =
+      (2 : ℂ)⁻¹ * gibbsExpectation β H (A * B + B * A)
+        - gibbsExpectation β H A * gibbsExpectation β H B :=
+  rfl
+
+/-- Self symmetric-covariance is the variance:
+`Cov^s_β(O, O) = Var_β(O)`. The anticommutator `O · O + O · O = 2(O · O)`
+collapses the (1/2) prefactor. -/
+theorem gibbsCovarianceSymm_self_eq_variance (β : ℝ) (H O : ManyBodyOp Λ) :
+    gibbsCovarianceSymm β H O O = gibbsVariance β H O := by
+  unfold gibbsCovarianceSymm gibbsVariance
+  have h2 : O * O + O * O = (2 : ℂ) • (O * O) := by
+    rw [two_smul]
+  rw [h2, gibbsExpectation_smul, ← mul_assoc, inv_mul_cancel₀ two_ne_zero,
+    one_mul, pow_two]
+
+/-- For Hermitian `H` and Hermitian `A, B`, the symmetric covariance
+is real. The anticommutator term is real by
+`gibbsExpectation_anticommutator_im` (the (1/2) prefactor preserves
+realness), and `⟨A⟩ · ⟨B⟩` is the product of two real complex numbers. -/
+theorem gibbsCovarianceSymm_im_of_isHermitian {H A B : ManyBodyOp Λ}
+    (hH : H.IsHermitian) (hA : A.IsHermitian) (hB : B.IsHermitian) (β : ℝ) :
+    (gibbsCovarianceSymm β H A B).im = 0 := by
+  unfold gibbsCovarianceSymm
+  have h_anti : (gibbsExpectation β H (A * B + B * A)).im = 0 :=
+    gibbsExpectation_anticommutator_im hH hA hB β
+  have h_a : (gibbsExpectation β H A).im = 0 :=
+    gibbsExpectation_im_of_isHermitian hH hA β
+  have h_b : (gibbsExpectation β H B).im = 0 :=
+    gibbsExpectation_im_of_isHermitian hH hB β
+  have h_prod : (gibbsExpectation β H A * gibbsExpectation β H B).im = 0 := by
+    rw [Complex.mul_im, h_a, h_b, zero_mul, mul_zero, add_zero]
+  have h_inv : ((2 : ℂ)⁻¹).im = 0 := by simp
+  have h_half : ((2 : ℂ)⁻¹ * gibbsExpectation β H (A * B + B * A)).im = 0 := by
+    rw [Complex.mul_im, h_inv, h_anti, mul_zero, zero_mul, add_zero]
+  rw [Complex.sub_im, h_half, h_prod, sub_zero]
 
 end LatticeSystem.Quantum
