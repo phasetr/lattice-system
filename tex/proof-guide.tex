@@ -2868,6 +2868,54 @@ conjTranspose into \texttt{onSite}),
 $(c_i^\dagger)^\dagger = c_i$ direction is symmetric.
 \end{proof}
 
+\subsection{Site-occupation number operator}
+
+\begin{lemma}[\texttt{jwString\_sq}]
+$J_i^2 = I$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Each factor $\sigma^z_j$ satisfies $(\sigma^z)^2 = I$ at the
+single-site level, hence
+$(\texttt{onSite}\,j\,\sigma^z)^2 = \texttt{onSite}\,j\,((\sigma^z)^2) = \texttt{onSite}\,j\,I = I$
+via \texttt{onSite\_mul\_onSite\_same} and the auxiliary
+\texttt{onSite\_one}.  An induction on the noncomm-product (using
+the same commutativity/factor-cancellation pattern as the Hermiticity
+proof) extends to the full string.
+\end{proof}
+
+\begin{definition}[\texttt{fermionMultiNumber}]
+The site-occupation number operator is $n_i := c_i^\dagger \cdot c_i$.
+\end{definition}
+
+\begin{lemma}[\texttt{fermionMultiNumber\_eq\_onSite}]
+$n_i = \texttt{onSite}\,i\,(\sigma^- \cdot \sigma^+)$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+$(J_i \sigma^-)(J_i \sigma^+)
+ = J_i (\sigma^- J_i) \sigma^+
+ = J_i (J_i \sigma^-) \sigma^+
+ = J_i^2 (\sigma^- \sigma^+)
+ = I \cdot \texttt{onSite}\,i\,(\sigma^- \sigma^+)
+ = \texttt{onSite}\,i\,(\sigma^- \sigma^+)$,
+using \texttt{jwString\_commute\_onSite}, \texttt{jwString\_sq}, and
+\texttt{onSite\_mul\_onSite\_same}.
+\end{proof}
+
+\begin{lemma}[\texttt{fermionMultiNumber\_isHermitian},
+            \texttt{fermionMultiNumber\_sq}]
+$n_i$ is Hermitian and idempotent ($n_i^2 = n_i$, eigenvalues $0, 1$).
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Reduce both via the previous lemma to the single-site
+$\sigma^- \sigma^+ = \texttt{!![0,0;0,1]}$.  This $2 \times 2$
+matrix is manifestly Hermitian (real-diagonal) and idempotent
+(diagonal of $0, 1$).  Lift through \texttt{onSite\_isHermitian} and
+\texttt{onSite\_mul\_onSite\_same}.
+\end{proof}
+
 \subsection*{Deferred: cross-site CAR}
 
 The cross-site relations

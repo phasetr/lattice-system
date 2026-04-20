@@ -225,6 +225,125 @@ theorem fermionMultiCreation_conjTranspose (N : ℕ) (i : Fin (N + 1)) :
     onSite_conjTranspose, spinHalfOpMinus_conjTranspose]
   exact (jwString_commute_onSite N i spinHalfOpPlus).eq.symm
 
+/-! ## Site-occupation number operator -/
+
+/-- A noncomm-product of pairwise-commuting matrices, each squaring to
+the identity, itself squares to the identity. Used here for the JW
+string, where each `σ^z_j` satisfies `σ^z² = 1`. -/
+private lemma noncommProd_sq_of_pairwise_commute_of_sq_one
+    {ι : Type*} {n : Type*} [Fintype n] [DecidableEq n]
+    (s : Finset ι) (f : ι → Matrix n n ℂ)
+    (hcomm : (s : Set ι).Pairwise (fun a b => Commute (f a) (f b)))
+    (hSq : ∀ a ∈ s, f a * f a = 1) :
+    s.noncommProd f hcomm * s.noncommProd f hcomm = 1 := by
+  classical
+  induction s using Finset.induction_on with
+  | empty =>
+    simp only [Finset.noncommProd_empty]
+    rw [Matrix.one_mul]
+  | @insert a t hat ih =>
+    rw [Finset.noncommProd_insert_of_notMem _ _ _ _ hat]
+    have hcomm_t : (t : Set ι).Pairwise (fun a b => Commute (f a) (f b)) :=
+      hcomm.mono fun x hx => Finset.mem_insert_of_mem hx
+    have hSq_t : ∀ b ∈ t, f b * f b = 1 :=
+      fun b hb => hSq b (Finset.mem_insert_of_mem hb)
+    have hcomm_a : Commute (f a) (t.noncommProd f hcomm_t) := by
+      apply Finset.noncommProd_commute
+      intro b hb
+      have hab : a ≠ b := fun h => hat (h ▸ hb)
+      exact hcomm (Finset.mem_insert_self a t) (Finset.mem_insert_of_mem hb) hab
+    -- (f a · ∏)·(f a · ∏) = f a · (∏ · f a) · ∏ = f a · (f a · ∏) · ∏ = (f a · f a) · ∏²
+    -- = 1 · 1 = 1
+    rw [show f a * t.noncommProd f hcomm_t * (f a * t.noncommProd f hcomm_t)
+          = (f a * f a) * (t.noncommProd f hcomm_t * t.noncommProd f hcomm_t) by
+        rw [Matrix.mul_assoc, ← Matrix.mul_assoc (t.noncommProd f hcomm_t) (f a),
+            ← hcomm_a.eq, Matrix.mul_assoc, Matrix.mul_assoc]]
+    rw [hSq a (Finset.mem_insert_self a t), Matrix.one_mul, ih hcomm_t hSq_t]
+
+/-- `onSite i 1 = 1` (the site embedding of the identity is the
+identity). -/
+private lemma onSite_one {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (i : Λ) :
+    (onSite i (1 : Matrix (Fin 2) (Fin 2) ℂ) : ManyBodyOp Λ) = 1 := by
+  ext σ' σ
+  simp only [onSite_apply, Matrix.one_apply]
+  by_cases h : ∀ k, k ≠ i → σ' k = σ k
+  · rw [if_pos h]
+    by_cases hi : σ' i = σ i
+    · rw [if_pos hi, if_pos]
+      funext k
+      by_cases hk : k = i
+      · rw [hk]; exact hi
+      · exact h k hk
+    · rw [if_neg hi]
+      symm
+      rw [if_neg]
+      intro hσ
+      apply hi
+      rw [hσ]
+  · rw [if_neg h]
+    symm
+    rw [if_neg]
+    intro hσ
+    apply h
+    intro k _
+    rw [hσ]
+
+/-- `(jwString N i)² = 1`: the JW string squares to the identity, since
+each `σ^z` factor satisfies `(σ^z)² = 1`. -/
+theorem jwString_sq (N : ℕ) (i : Fin (N + 1)) :
+    jwString N i * jwString N i = 1 := by
+  unfold jwString
+  apply noncommProd_sq_of_pairwise_commute_of_sq_one
+  intro j _
+  rw [onSite_mul_onSite_same, pauliZ_mul_self, onSite_one]
+
+/-- The multi-mode fermion site-occupation number operator at site `i`:
+`n_i = c_i† · c_i`. -/
+noncomputable def fermionMultiNumber (N : ℕ) (i : Fin (N + 1)) :
+    ManyBodyOp (Fin (N + 1)) :=
+  fermionMultiCreation N i * fermionMultiAnnihilation N i
+
+/-- The multi-mode number operator at site `i` equals
+`onSite i (σ^- · σ^+)`: the JW strings cancel via `J² = 1`, leaving
+the single-site number operator. -/
+theorem fermionMultiNumber_eq_onSite (N : ℕ) (i : Fin (N + 1)) :
+    fermionMultiNumber N i
+      = onSite i (spinHalfOpMinus * spinHalfOpPlus) := by
+  unfold fermionMultiNumber fermionMultiAnnihilation fermionMultiCreation
+  -- (J · σ^-)·(J · σ^+) = J · (σ^- · J) · σ^+ = J · (J · σ^-) · σ^+ = J² · (σ^- · σ^+)
+  have hcomm : Commute (jwString N i) (onSite i spinHalfOpMinus) :=
+    jwString_commute_onSite N i spinHalfOpMinus
+  rw [show jwString N i * onSite i spinHalfOpMinus *
+          (jwString N i * onSite i spinHalfOpPlus)
+        = jwString N i * jwString N i *
+          (onSite i spinHalfOpMinus * onSite i spinHalfOpPlus) by
+      rw [Matrix.mul_assoc, ← Matrix.mul_assoc (onSite i spinHalfOpMinus),
+          ← hcomm.eq, Matrix.mul_assoc, Matrix.mul_assoc]]
+  rw [jwString_sq, Matrix.one_mul, onSite_mul_onSite_same]
+
+/-- The multi-mode number operator is Hermitian. -/
+theorem fermionMultiNumber_isHermitian (N : ℕ) (i : Fin (N + 1)) :
+    (fermionMultiNumber N i).IsHermitian := by
+  rw [fermionMultiNumber_eq_onSite]
+  -- σ^- · σ^+ is Hermitian (it equals the diagonal !![0,0;0,1])
+  have h_sq : (spinHalfOpMinus * spinHalfOpPlus).IsHermitian := by
+    unfold spinHalfOpMinus spinHalfOpPlus
+    ext i j
+    fin_cases i <;> fin_cases j <;> simp [Matrix.conjTranspose_apply]
+  exact onSite_isHermitian i h_sq
+
+/-- The multi-mode number operator is idempotent: `n_i² = n_i`
+(eigenvalues `0, 1` giving the site occupation count). -/
+theorem fermionMultiNumber_sq (N : ℕ) (i : Fin (N + 1)) :
+    fermionMultiNumber N i * fermionMultiNumber N i = fermionMultiNumber N i := by
+  rw [fermionMultiNumber_eq_onSite, onSite_mul_onSite_same]
+  congr 1
+  -- (σ^- · σ^+)² = σ^- · σ^+ as 2×2 matrices
+  unfold spinHalfOpMinus spinHalfOpPlus
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp
+
 /-- `(c_i†)² = 0`: cannot create the same fermion mode twice. -/
 theorem fermionMultiCreation_sq (N : ℕ) (i : Fin (N + 1)) :
     fermionMultiCreation N i * fermionMultiCreation N i = 0 := by
