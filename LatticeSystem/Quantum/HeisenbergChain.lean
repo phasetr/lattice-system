@@ -712,16 +712,15 @@ theorem openChainCoupling_sum_eq (N : ℕ) (J : ℝ) :
     ring]
   ring
 
-/-- Eigenvalue on the all-up state for the open chain Heisenberg
-Hamiltonian on `Fin (N+1)` (Tasaki §2.4 eq. (2.4.5)/(2.4.1) for
-`S = 1/2`):
-`H_open · |↑..↑⟩ = -(N·J/2) · |↑..↑⟩`. The eigenvalue matches the
-ferromagnetic ground-state energy `E_GS = -|B|·S²` for `|B| = N`
-bonds and `S = 1/2`, scaled by 2 for our ordered-pair convention. -/
-theorem openChainHeisenbergHamiltonian_mulVec_basisVec_all_up (N : ℕ) (J : ℝ) :
+/-- Eigenvalue on any constant configuration `|s..s⟩` for the open
+chain Heisenberg Hamiltonian on `Fin (N+1)`: both the all-up
+(`s = 0`) and all-down (`s = 1`) states share the same eigenvalue
+`-(N·J/2)` by SU(2) symmetry of `H_open`. -/
+theorem openChainHeisenbergHamiltonian_mulVec_basisVec_const
+    (N : ℕ) (J : ℝ) (s : Fin 2) :
     (heisenbergHamiltonian (openChainCoupling N J)).mulVec
-        (basisVec (fun _ : Fin (N + 1) => (0 : Fin 2))) =
-      (-(N * J / 2 : ℂ)) • basisVec (fun _ : Fin (N + 1) => (0 : Fin 2)) := by
+        (basisVec (fun _ : Fin (N + 1) => s)) =
+      (-(N * J / 2 : ℂ)) • basisVec (fun _ : Fin (N + 1) => s) := by
   rw [heisenbergHamiltonian_mulVec_basisVec_const]
   congr 1
   -- Sum: Σ x y, openChainCoupling N J x y · χ_{x,y}.
@@ -752,5 +751,26 @@ theorem openChainHeisenbergHamiltonian_mulVec_basisVec_all_up (N : ℕ) (J : ℝ
     rw [Finset.mul_sum]]
   rw [openChainCoupling_sum_eq N J]
   ring
+
+/-- Eigenvalue on the all-up state for the open chain Heisenberg
+Hamiltonian on `Fin (N+1)` (Tasaki §2.4 eq. (2.4.5)/(2.4.1) for
+`S = 1/2`):
+`H_open · |↑..↑⟩ = -(N·J/2) · |↑..↑⟩`. The eigenvalue matches the
+ferromagnetic ground-state energy `E_GS = -|B|·S²` for `|B| = N`
+bonds and `S = 1/2`, scaled by 2 for our ordered-pair convention. -/
+theorem openChainHeisenbergHamiltonian_mulVec_basisVec_all_up (N : ℕ) (J : ℝ) :
+    (heisenbergHamiltonian (openChainCoupling N J)).mulVec
+        (basisVec (fun _ : Fin (N + 1) => (0 : Fin 2))) =
+      (-(N * J / 2 : ℂ)) • basisVec (fun _ : Fin (N + 1) => (0 : Fin 2)) :=
+  openChainHeisenbergHamiltonian_mulVec_basisVec_const N J 0
+
+/-- Eigenvalue on the all-down state for the open chain Heisenberg
+Hamiltonian on `Fin (N+1)`: by SU(2) symmetry, the all-down state
+shares the same eigenvalue `-(N·J/2)` as the all-up state. -/
+theorem openChainHeisenbergHamiltonian_mulVec_basisVec_all_down (N : ℕ) (J : ℝ) :
+    (heisenbergHamiltonian (openChainCoupling N J)).mulVec
+        (basisVec (fun _ : Fin (N + 1) => (1 : Fin 2))) =
+      (-(N * J / 2 : ℂ)) • basisVec (fun _ : Fin (N + 1) => (1 : Fin 2)) :=
+  openChainHeisenbergHamiltonian_mulVec_basisVec_const N J 1
 
 end LatticeSystem.Quantum

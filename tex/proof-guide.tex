@@ -2776,7 +2776,19 @@ eigenvalue is $\sum_{x,y} J_{\mathrm{open}}(x,y)\cdot \chi_{x,y}$.
 The diagonal terms vanish since $J_{\mathrm{open}}(x,x) = 0$, so the
 sum equals $(1/4)\cdot \sum_{x,y} J_{\mathrm{open}}(x,y)$. Apply the
 counting lemma above to obtain $(1/4)\cdot (-2N\cdot J) = -N\cdot J/2$.
-\end{proof}  The
+\end{proof}
+
+\begin{remark}[Symmetric specialisations]
+The proof above generalises to any constant configuration
+$|s\,s\,\dots\,s\rangle$ ($s \in \{0,1\}$):
+$\hat H_{\mathrm{open}}\cdot|s\,s\,\dots\,s\rangle = -\tfrac{N\cdot J}{2}
+\cdot|s\,s\,\dots\,s\rangle$, since the constant-config eigenvalue
+formula does not depend on $s$ (Lean
+\texttt{openChainHeisenbergHamiltonian\_mulVec\_basisVec\_const}).
+The all-down case
+\texttt{openChainHeisenbergHamiltonian\_mulVec\_basisVec\_all\_down}
+follows by SU(2) symmetry of the Heisenberg Hamiltonian.
+\end{remark}  The
 ferromagnetic ($J<0$) ground state is the triply-degenerate triplet
 $\{|{\uparrow}{\uparrow}\rangle,
 |{\downarrow}{\downarrow}\rangle,
