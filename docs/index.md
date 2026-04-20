@@ -562,6 +562,8 @@ Systems*, §3.5, p. 89.
 | `openChainHeisenbergHamiltonian_two_site_mulVec_basisVec_triplet_zero` | `H_open(N=1) · (|↑↓⟩ + |↓↑⟩) = -(J/2) · (|↑↓⟩ + |↓↑⟩)` — triplet `m = 0` state, completing the 3-fold degenerate triplet representation `S = 1` with eigenvalue `-J/2` | `Quantum/HeisenbergChain.lean` |
 | `openChainHeisenbergHamiltonian_three_site_eq` | for `N = 2` (the 3-site open chain on `Fin 3`, 2 bonds), `H_open = -2J · (spinHalfDot 0 1 + spinHalfDot 1 2)` — explicit two-bond reduction | `Quantum/HeisenbergChain.lean` |
 | `openChainHeisenbergHamiltonian_three_site_mulVec_basisVec_all_up` | `H_open(N=2) · |↑↑↑⟩ = -J · |↑↑↑⟩` — confirming the linear scaling `E(|↑..↑⟩) = -N·J/2` (here `N = 2` bonds, `J = 1` per bond) | `Quantum/HeisenbergChain.lean` |
+| `openChainCoupling_sum_eq` | for any `N : ℕ`, `Σ_{x,y ∈ Fin (N+1)} openChainCoupling N J x y = -(2N · J : ℂ)` (the bond-counting lemma: each of the `N` unordered nearest-neighbour bonds is counted in both orientations) | `Quantum/HeisenbergChain.lean` |
+| `openChainHeisenbergHamiltonian_mulVec_basisVec_all_up` | for any `N : ℕ`, `J : ℝ`, `H_open · |↑..↑⟩ = -(N·J/2 : ℂ) · |↑..↑⟩` — Tasaki §2.4 (2.4.5)/(2.4.1) ferromagnetic ground-state energy `E_GS = -|B|·S²` for `S = 1/2`, `|B| = N` bonds (open chain on `Fin (N+1)`) | `Quantum/HeisenbergChain.lean` |
 
 ### Single-mode fermion (P2 skeleton)
 
