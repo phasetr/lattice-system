@@ -1341,4 +1341,24 @@ theorem fermionMultiNumber_commute_fermionMultiCreation_of_ne
   -- Flip for target form.
   exact h2.symm
 
+/-- `[N̂, c_j†] = c_j†`: dual of PR #130 via adjoint. -/
+theorem fermionTotalNumber_commutator_fermionMultiCreation
+    (N : ℕ) (j : Fin (N + 1)) :
+    fermionTotalNumber N * fermionMultiCreation N j -
+        fermionMultiCreation N j * fermionTotalNumber N =
+      fermionMultiCreation N j := by
+  have h := fermionTotalNumber_commutator_fermionMultiAnnihilation N j
+  have h2 := congrArg Matrix.conjTranspose h
+  simp only [Matrix.conjTranspose_sub, Matrix.conjTranspose_mul,
+    Matrix.conjTranspose_neg,
+    fermionMultiAnnihilation_conjTranspose,
+    (fermionTotalNumber_isHermitian N).eq] at h2
+  -- h2 : c_j† · N̂ - N̂ · c_j† = -c_j†
+  rw [show fermionTotalNumber N * fermionMultiCreation N j -
+        fermionMultiCreation N j * fermionTotalNumber N =
+      -(fermionMultiCreation N j * fermionTotalNumber N -
+          fermionTotalNumber N * fermionMultiCreation N j) from by abel]
+  rw [h2]
+  exact neg_neg _
+
 end LatticeSystem.Fermion
