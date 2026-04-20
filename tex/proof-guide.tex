@@ -2953,6 +2953,54 @@ on the inner application and pull the resulting scalar out via
 \texttt{Matrix.mulVec\_smul}.
 \end{proof}
 
+\subsection{Magnetic-quantum-number ladder on the all-up state (Tasaki §2.4 (2.4.9))}
+\label{subsec:magnetic-ladder}
+
+The companion to the \emph{$H$-eigenvalue} ladder is the
+\emph{$\hat S_{\mathrm{tot}}^{(3)}$-eigenvalue} ladder.  The
+all-up state has $\hat S_{\mathrm{tot}}^{(3)}$ eigenvalue
+$S_{\max} = |\Lambda|/2$, and each application of $\hat
+S_{\mathrm{tot}}^{-}$ lowers the eigenvalue by one (the Cartan
+ladder relation $[\hat S_{\mathrm{tot}}^{(3)},\hat
+S_{\mathrm{tot}}^{-}] = -\hat S_{\mathrm{tot}}^{-}$).
+
+\begin{theorem}[\texttt{totalSpinHalfOp3\_mulVec\_totalSpinHalfOpMinus\_pow\_basisVec\_all\_up}]
+For every $k \in \mathbb{N}$,
+\[
+  \hat S_{\mathrm{tot}}^{(3)} \cdot
+    \bigl((\hat S_{\mathrm{tot}}^{-})^{k} \cdot
+            |{\uparrow}\dots{\uparrow}\rangle\bigr)
+  \;=\;
+  \Bigl(\tfrac{|\Lambda|}{2} - k\Bigr) \cdot
+    \bigl((\hat S_{\mathrm{tot}}^{-})^{k} \cdot
+            |{\uparrow}\dots{\uparrow}\rangle\bigr).
+\]
+This is the magnetic-quantum-number $M = S_{\max} - k$ labelling of
+the iterated lowering ladder
+$|\Phi_{M}\rangle \propto (\hat S_{\mathrm{tot}}^{-})^{S_{\max} - M}
+|\Phi^{\uparrow}\rangle$ in Tasaki eq.~(2.4.9), p.~33.  The
+normalisation factor and the restriction $M \in \{-S_{\max},\ldots,
++S_{\max}\}$ are not asserted.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Induction on $k$.  The base case $k=0$ uses
+\texttt{totalSpinHalfOp3\_mulVec\_basisVec} and the identity
+$\sum_{x \in \Lambda} \tfrac{1}{2} = |\Lambda|/2$ on the constant
+all-up configuration.  The inductive step rewrites $\hat
+S_{\mathrm{tot}}^{(3)} \cdot \hat S_{\mathrm{tot}}^{-}$ as $\hat
+S_{\mathrm{tot}}^{-} \cdot \hat S_{\mathrm{tot}}^{(3)} - \hat
+S_{\mathrm{tot}}^{-}$ via
+\texttt{totalSpinHalfOp3\_commutator\_totalSpinHalfOpMinus} (the
+Cartan relation), then uses \texttt{Matrix.sub\_mulVec},
+\texttt{Matrix.mulVec\_mulVec}, and \texttt{pow\_succ'} to apply the
+inductive hypothesis to the inner $\hat S_{\mathrm{tot}}^{(3)}\cdot
+(\hat S_{\mathrm{tot}}^{-})^{k}\cdot|{\uparrow}\dots{\uparrow}\rangle$,
+and finishes with $c\,v - v = (c-1)\,v$ (with $c = |\Lambda|/2 - k$
+the previous-step eigenvalue, so $c-1 = |\Lambda|/2 - (k+1)$) via the
+\texttt{module} tactic on the resulting scalar smul.
+\end{proof}
+
 %======================================================================
 \section{Single-mode fermion (Phase 2 skeleton)}
 \label{sec:fermion-mode}

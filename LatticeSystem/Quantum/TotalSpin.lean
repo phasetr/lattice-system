@@ -1152,4 +1152,53 @@ theorem totalSpinHalfRot3_conj_eq_self_of_commute (θ : ℝ) (A : ManyBodyOp Λ)
     (totalSpinHalfRot3_conjTranspose_mul_self Λ θ) A
     (totalSpinHalfRot3_commute_of_commute Λ θ A h)
 
+/-! ## Magnetic-quantum-number ladder on the all-up state (Tasaki §2.4 (2.4.9))
+
+The all-up state `|↑..↑⟩` has `Ŝtot^(3)` eigenvalue `Smax = |Λ|/2`.
+Iterating the global lowering operator `Ŝtot^-` lowers the eigenvalue
+by one each step (Cartan ladder relation
+`[Ŝtot^(3), Ŝtot^-] = -Ŝtot^-`), so
+`Ŝtot^(3) · (Ŝtot^-)^k · |↑..↑⟩ = (Smax - k) · (Ŝtot^-)^k · |↑..↑⟩`.
+
+This is the magnetic-quantum-number `M = Smax - k` labelling of
+Tasaki's ferromagnetic ground states `|Φ_M⟩ ∝ (Ŝtot^-)^{Smax - M} |Φ↑⟩`
+(eq. (2.4.9), p. 33). The normalisation factor of (2.4.9) and the
+restriction to `M ∈ {-Smax, ..., +Smax}` are not asserted here. -/
+
+/-- `Ŝ_tot^(3) · (Ŝ_tot^-)^k · |↑..↑⟩ = (|Λ|/2 - k) · (Ŝ_tot^-)^k · |↑..↑⟩`:
+the magnetic-quantum-number labelling of Tasaki's ferromagnetic
+ground-state ladder (eq. (2.4.9), p. 33). -/
+theorem totalSpinHalfOp3_mulVec_totalSpinHalfOpMinus_pow_basisVec_all_up (k : ℕ) :
+    (totalSpinHalfOp3 Λ).mulVec
+        (((totalSpinHalfOpMinus Λ) ^ k).mulVec
+          (basisVec (fun _ : Λ => (0 : Fin 2)))) =
+      (((Fintype.card Λ : ℂ) / 2) - (k : ℂ)) •
+        ((totalSpinHalfOpMinus Λ) ^ k).mulVec
+          (basisVec (fun _ : Λ => (0 : Fin 2))) := by
+  induction k with
+  | zero =>
+    simp only [pow_zero, Matrix.one_mulVec, Nat.cast_zero, sub_zero]
+    rw [totalSpinHalfOp3_mulVec_basisVec]
+    congr 1
+    have hsign : (∑ _x : Λ, spinHalfSign (0 : Fin 2)) = (Fintype.card Λ : ℂ) / 2 := by
+      simp only [spinHalfSign, if_true, Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+      ring
+    convert hsign
+  | succ k ih =>
+    have h := totalSpinHalfOp3_commutator_totalSpinHalfOpMinus Λ
+    have hcomm : totalSpinHalfOp3 Λ * totalSpinHalfOpMinus Λ =
+        totalSpinHalfOpMinus Λ * totalSpinHalfOp3 Λ - totalSpinHalfOpMinus Λ := by
+      have hadd : totalSpinHalfOp3 Λ * totalSpinHalfOpMinus Λ =
+          (totalSpinHalfOp3 Λ * totalSpinHalfOpMinus Λ -
+            totalSpinHalfOpMinus Λ * totalSpinHalfOp3 Λ) +
+          totalSpinHalfOpMinus Λ * totalSpinHalfOp3 Λ := by abel
+      rw [hadd, h]; abel
+    rw [pow_succ', ← Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hcomm,
+      Matrix.sub_mulVec, ← Matrix.mulVec_mulVec, ih, Matrix.mulVec_smul]
+    set v : (Λ → Fin 2) → ℂ := (totalSpinHalfOpMinus Λ).mulVec
+      (((totalSpinHalfOpMinus Λ) ^ k).mulVec
+        (basisVec (fun _ : Λ => (0 : Fin 2))))
+    push_cast
+    module
+
 end LatticeSystem.Quantum
