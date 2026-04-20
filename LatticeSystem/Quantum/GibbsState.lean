@@ -45,6 +45,9 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
 * `gibbsVariance β H O` — canonical-ensemble variance
   `⟨O²⟩_β − (⟨O⟩_β)²` and its realness for Hermitian observables
   (`gibbsVariance_im_of_isHermitian`).
+* `gibbsCovariance β H A B` — canonical-ensemble (complex) covariance
+  `⟨A · B⟩_β − ⟨A⟩_β · ⟨B⟩_β`; `gibbsCovariance_self_eq_variance`
+  recovers the variance at `A = B`.
 * `Matrix.trace_mul_conjTranspose_swap_of_isHermitian` — generic
   helper: for Hermitian `ρ`, `star Tr(ρ · X) = Tr(ρ · Xᴴ)`.
 * `gibbsExpectation_star_swap_of_isHermitian` — for Hermitian `H, A, B`,
@@ -501,6 +504,29 @@ theorem gibbsVariance_zero (H O : ManyBodyOp Λ) :
         - (((Fintype.card (Λ → Fin 2) : ℂ))⁻¹ * O.trace) ^ 2 := by
   unfold gibbsVariance
   rw [gibbsExpectation_zero, gibbsExpectation_zero]
+
+/-! ## Covariance -/
+
+/-- The canonical-ensemble covariance of two observables `A`, `B` at
+inverse temperature `β` under Hamiltonian `H`:
+`Cov_β(A, B) := ⟨A · B⟩_β − ⟨A⟩_β · ⟨B⟩_β`. -/
+noncomputable def gibbsCovariance (β : ℝ) (H A B : ManyBodyOp Λ) : ℂ :=
+  gibbsExpectation β H (A * B) - gibbsExpectation β H A * gibbsExpectation β H B
+
+/-- Unfolding lemma:
+`Cov_β(A, B) = ⟨A · B⟩_β − ⟨A⟩_β · ⟨B⟩_β`. -/
+theorem gibbsCovariance_eq (β : ℝ) (H A B : ManyBodyOp Λ) :
+    gibbsCovariance β H A B =
+      gibbsExpectation β H (A * B)
+        - gibbsExpectation β H A * gibbsExpectation β H B :=
+  rfl
+
+/-- Self-covariance is the variance:
+`Cov_β(O, O) = Var_β(O)`. -/
+theorem gibbsCovariance_self_eq_variance (β : ℝ) (H O : ManyBodyOp Λ) :
+    gibbsCovariance β H O O = gibbsVariance β H O := by
+  unfold gibbsCovariance gibbsVariance
+  rw [pow_two]
 
 /-! ## Anticommutator real, commutator purely imaginary
 
