@@ -339,6 +339,36 @@ theorem fermionMultiCreation_sq (N : ℕ) (i : Fin (N + 1)) :
     simp [onSite_apply]
   rw [h_zero, Matrix.mul_zero]
 
+/-! ## Number operator: commutativity and total -/
+
+/-- Site-occupation number operators commute for any sites
+`i, j : Fin (N + 1)`: they are simultaneously diagonal in the
+occupation-number basis. -/
+theorem fermionMultiNumber_commute (N : ℕ) (i j : Fin (N + 1)) :
+    Commute (fermionMultiNumber N i) (fermionMultiNumber N j) := by
+  rw [fermionMultiNumber_eq_onSite, fermionMultiNumber_eq_onSite]
+  by_cases hij : i = j
+  · subst hij
+    exact Commute.refl _
+  · exact onSite_mul_onSite_of_ne hij _ _
+
+/-- The total particle-number operator on `Fin (N + 1)`:
+`N̂ := Σ_i n_i`. -/
+noncomputable def fermionTotalNumber (N : ℕ) : ManyBodyOp (Fin (N + 1)) :=
+  ∑ i : Fin (N + 1), fermionMultiNumber N i
+
+/-- The total particle-number operator is Hermitian (sum of
+Hermitian summands). -/
+theorem fermionTotalNumber_isHermitian (N : ℕ) :
+    (fermionTotalNumber N).IsHermitian := by
+  unfold fermionTotalNumber
+  classical
+  induction (Finset.univ : Finset (Fin (N + 1))) using Finset.induction_on with
+  | empty => simp
+  | @insert a t hat ih =>
+    rw [Finset.sum_insert hat]
+    exact (fermionMultiNumber_isHermitian N a).add ih
+
 /-! ## Same-site canonical anticommutation -/
 
 /-- The single-site identity `σ^+ · σ^- + σ^- · σ^+ = I`. This is the

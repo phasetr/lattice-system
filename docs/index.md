@@ -580,6 +580,9 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionMultiNumber_isHermitian` | `n_i` is Hermitian | `Fermion/JordanWigner.lean` |
 | `fermionMultiNumber_sq` | `n_i² = n_i` (idempotent, eigenvalues 0, 1) | `Fermion/JordanWigner.lean` |
 | `fermionMultiAnticomm_self` | `c_i · c_i† + c_i† · c_i = 1` (same-site CAR) | `Fermion/JordanWigner.lean` |
+| `fermionMultiNumber_commute` | `Commute (n_i) (n_j)` for any sites (simultaneously diagonal) | `Fermion/JordanWigner.lean` |
+| `fermionTotalNumber N` | `N̂ := Σ_i n_i` (total particle-number operator) | `Fermion/JordanWigner.lean` |
+| `fermionTotalNumber_isHermitian` | `N̂` is Hermitian | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
