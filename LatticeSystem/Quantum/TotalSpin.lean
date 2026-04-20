@@ -1303,4 +1303,20 @@ theorem totalSpinHalfOp3_mulVec_totalSpinHalfOpPlus_pow_basisVec_all_down (k : �
     push_cast
     module
 
+/-! ## Generic eigenvalue preservation under commuting operators
+
+The abstract pattern underlying PRs #82/#83/#86/#87/#93/#106: if
+`[A, B] = 0` and `v` is an `A`-eigenvector with eigenvalue `λ`, then
+`B · v` is another `A`-eigenvector with the same eigenvalue. -/
+
+/-- Generic eigenvalue preservation: if `Commute A B` and `A · v = λ · v`,
+then `A · (B · v) = λ · (B · v)`. -/
+theorem mulVec_preserves_eigenvalue_of_commute
+    {A B : ManyBodyOp Λ} (h : Commute A B)
+    {lam : ℂ} {v : (Λ → Fin 2) → ℂ}
+    (hv : A.mulVec v = lam • v) :
+    A.mulVec (B.mulVec v) = lam • B.mulVec v := by
+  rw [Matrix.mulVec_mulVec, h, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul]
+
 end LatticeSystem.Quantum
