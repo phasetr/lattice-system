@@ -1489,4 +1489,27 @@ theorem fermionDensityInteraction_commute_fermionTotalNumber
   exact (fermionDensityDensity_commute_fermionTotalNumber N i j).smul_left
     (V i j)
 
+/-- The canonical charge-conserving fermion Hamiltonian on
+`Fin (N + 1)` modes, the sum of a single-particle hopping term and a
+density–density interaction:
+`H = H_hop + V_int = Σ_{i,j} t_{i,j} c_i† c_j + Σ_{i,j} V_{i,j} n_i n_j`.
+Captures the algebraic skeleton of single-species Hubbard / extended
+Hubbard models on a chain. -/
+noncomputable def fermionGenericHamiltonian (N : ℕ)
+    (t V : Fin (N + 1) → Fin (N + 1) → ℂ) : ManyBodyOp (Fin (N + 1)) :=
+  fermionHopping N t + fermionDensityInteraction N V
+
+/-- The canonical Hamiltonian `H = H_hop + V_int` commutes with the
+total particle-number operator `N̂`. Both summands separately commute
+with `N̂` (`fermionHopping_commute_fermionTotalNumber` and
+`fermionDensityInteraction_commute_fermionTotalNumber`), so by
+`Commute.add_left` so does their sum. This is the unified statement
+of charge conservation for any Hubbard-type Hamiltonian. -/
+theorem fermionGenericHamiltonian_commute_fermionTotalNumber
+    (N : ℕ) (t V : Fin (N + 1) → Fin (N + 1) → ℂ) :
+    Commute (fermionGenericHamiltonian N t V) (fermionTotalNumber N) := by
+  unfold fermionGenericHamiltonian
+  exact (fermionHopping_commute_fermionTotalNumber N t).add_left
+    (fermionDensityInteraction_commute_fermionTotalNumber N V)
+
 end LatticeSystem.Fermion
