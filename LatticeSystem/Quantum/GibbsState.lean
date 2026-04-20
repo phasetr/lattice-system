@@ -915,6 +915,18 @@ theorem gibbsCovarianceSymm_eq_half_add_swap
   rw [gibbsExpectation_add]
   ring
 
+/-- For commuting observables `A, B`, the complex covariance equals
+the symmetric covariance: `Cov_β(A, B) = Cov^s_β(A, B)`. The
+commutator-based antisymmetric part vanishes when `[A, B] = 0`. -/
+theorem gibbsCovariance_eq_symm_of_commute (β : ℝ) (H : ManyBodyOp Λ)
+    {A B : ManyBodyOp Λ} (h : Commute A B) :
+    gibbsCovariance β H A B = gibbsCovarianceSymm β H A B := by
+  rw [gibbsCovariance_eq_symm_add_half_commutator]
+  have hzero : A * B - B * A = 0 := by rw [h.eq, sub_self]
+  rw [hzero]
+  unfold gibbsExpectation
+  rw [Matrix.mul_zero, Matrix.trace_zero, mul_zero, add_zero]
+
 /-- The symmetric covariance vanishes when its left argument is a
 scalar multiple of the identity, provided `Z(β) ≠ 0`. Direct
 corollary of `gibbsCovariance_const_smul_one_left_eq_zero` /

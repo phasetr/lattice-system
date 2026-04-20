@@ -475,6 +475,7 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `gibbsVariance_add_const_smul_one` | `Var_β(A + c • 1) = Var_β(A)` (when `Z ≠ 0`) | `Quantum/GibbsState.lean` |
 | `gibbsCovariance_eq_symm_add_half_commutator` | `Cov_β(A, B) = Cov^s_β(A, B) + (1/2) · ⟨A · B − B · A⟩_β` (symmetric / antisymmetric decomposition) | `Quantum/GibbsState.lean` |
 | `gibbsCovarianceSymm_eq_half_add_swap` | `Cov^s_β(A, B) = (1/2) · (Cov_β(A, B) + Cov_β(B, A))` | `Quantum/GibbsState.lean` |
+| `gibbsCovariance_eq_symm_of_commute` | for commuting `A, B`, `Cov_β(A, B) = Cov^s_β(A, B)` | `Quantum/GibbsState.lean` |
 | `Matrix.trace_mul_conjTranspose_swap_of_isHermitian` | `star Tr(ρ · X) = Tr(ρ · Xᴴ)` for Hermitian `ρ` (generic helper) | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_star_swap_of_isHermitian` | `star ⟨A · B⟩_β = ⟨B · A⟩_β` for Hermitian `H, A, B` | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_anticommutator_im` | `(⟨A·B + B·A⟩_β).im = 0` (anticommutator is real) | `Quantum/GibbsState.lean` |
