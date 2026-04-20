@@ -1418,4 +1418,12 @@ theorem fermionTotalNumber_commute_hopping (N : ℕ) (i j : Fin (N + 1)) :
     _ = (fermionMultiCreation N i * fermionMultiAnnihilation N j) *
           fermionTotalNumber N := by rw [← Matrix.mul_assoc]
 
+/-- The site-occupation number `n_i` commutes with the total
+particle-number operator `N̂ = Σ_j n_j`: sum of pairwise commutators
+all vanish (`fermionMultiNumber_commute`). -/
+theorem fermionMultiNumber_commute_fermionTotalNumber (N : ℕ) (i : Fin (N + 1)) :
+    Commute (fermionMultiNumber N i) (fermionTotalNumber N) := by
+  unfold fermionTotalNumber
+  exact Commute.sum_right _ _ _ (fun j _ => fermionMultiNumber_commute N i j)
+
 end LatticeSystem.Fermion
