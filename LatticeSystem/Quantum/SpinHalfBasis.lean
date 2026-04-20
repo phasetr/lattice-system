@@ -114,6 +114,18 @@ theorem spinHalfOpPlus_mul_spinHalfOpMinus_mul_spinHalfOpPlus :
   fin_cases i <;> fin_cases j <;>
     simp [spinHalfOpPlus, spinHalfOpMinus, Matrix.mul_apply, Fin.sum_univ_two]
 
+/-- The fermion number matrix `σ^- · σ^+ = !![0,0;0,1]` commutes with
+`σ^z = !![1,0;0,-1]` as matrices (both diagonal in the computational
+basis). -/
+theorem spinHalfOpMinus_mul_spinHalfOpPlus_commute_pauliZ :
+    Commute (spinHalfOpMinus * spinHalfOpPlus) pauliZ := by
+  show spinHalfOpMinus * spinHalfOpPlus * pauliZ =
+    pauliZ * (spinHalfOpMinus * spinHalfOpPlus)
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinHalfOpPlus, spinHalfOpMinus, pauliZ, Matrix.mul_apply,
+      Fin.sum_univ_two]
+
 /-! ## Raising/lowering actions (Tasaki eq 2.1.5, p. 14) -/
 
 /-- `Ŝ^+ |ψ^↑⟩ = 0`. -/
