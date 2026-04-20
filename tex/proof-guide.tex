@@ -3111,6 +3111,40 @@ and
 \texttt{totalSpinHalfOpPlus\_pow\_basisVec\_all\_down\_mem\_magnetizationSubspace}.
 \end{remark}
 
+\subsection{Two-site Néel and singlet/triplet placement (Tasaki §2.5/§A.3)}
+\label{subsec:two-site-singlet-mag}
+
+For $\Lambda = \mathrm{Fin}\,2$, the antiparallel basis states
+$|{\uparrow}{\downarrow}\rangle$ and $|{\downarrow}{\uparrow}\rangle$
+both have total magnetisation zero, so they lie in $\mathcal H_{0}$.
+By Submodule closure, so do their sum $|{\uparrow}{\downarrow}\rangle
++ |{\downarrow}{\uparrow}\rangle$ (the triplet $m=0$ state) and
+difference $|{\uparrow}{\downarrow}\rangle -
+|{\downarrow}{\uparrow}\rangle$ (the singlet).
+
+\begin{theorem}[\texttt{basisVec\_upDown\_mem\_magnetizationSubspace\_zero},
+\texttt{basisVec\_basisSwap\_upDown\_mem\_magnetizationSubspace\_zero}]
+The two-site Néel state $|{\uparrow}{\downarrow}\rangle$ and the
+swapped state $|{\downarrow}{\uparrow}\rangle$ both lie in
+$\mathcal H_{0}$ on $\Lambda = \mathrm{Fin}\,2$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Apply \texttt{basisVec\_mem\_magnetizationSubspace} to the
+configurations $\sigma = \texttt{upDown}$ and
+$\sigma = \texttt{basisSwap}\,\texttt{upDown}\,0\,1$, then compute
+the magnetisation $\sum_{x}\texttt{spinSign}(\sigma\,x) = 0$ via
+\texttt{Fin.sum\_univ\_two}.
+\end{proof}
+
+\begin{proposition}[\texttt{singlet\_mem\_magnetizationSubspace\_zero},
+\texttt{triplet\_zero\_mem\_magnetizationSubspace\_zero}]
+The spin-singlet $|{\uparrow}{\downarrow}\rangle -
+|{\downarrow}{\uparrow}\rangle$ and the triplet $m=0$ state
+$|{\uparrow}{\downarrow}\rangle + |{\downarrow}{\uparrow}\rangle$
+both lie in $\mathcal H_{0}$, by \texttt{Submodule.\{add,sub\}\_mem}.
+\end{proposition}
+
 \begin{theorem}[\texttt{mulVec\_mem\_magnetizationSubspace\_of\_commute\_of\_mem}]
 For any operator $A$ with $[A,\hat S_{\mathrm{tot}}^{(3)}] = 0$ and
 any $M \in \mathbb{C}$,
