@@ -203,6 +203,33 @@ theorem totalSpinHalfOpPlus_pow_basisVec_all_down_mem_magnetizationSubspace
       magnetizationSubspace Λ ((-((Fintype.card Λ : ℂ) / 2)) + (k : ℂ)) :=
   totalSpinHalfOp3_mulVec_totalSpinHalfOpPlus_pow_basisVec_all_down Λ k
 
+/-! ## Generic commuting-with-Ŝtot^(3) operator preserves the magnetisation sectors
+
+Any operator `A` that commutes with `Ŝtot^(3)` maps each magnetisation
+subspace `H_M` to itself. The Casimir `Ŝtot²` (commuting via
+`totalSpinHalfSquared_commutator_totalSpinHalfOp3 = 0`) and the
+Heisenberg Hamiltonian (PR #91) are both specialisations. -/
+
+/-- An operator commuting with `Ŝtot^(3)` preserves every magnetisation
+subspace `H_M`. -/
+theorem mulVec_mem_magnetizationSubspace_of_commute_of_mem
+    {A : ManyBodyOp Λ} (h : Commute A (totalSpinHalfOp3 Λ))
+    {M : ℂ} {v : (Λ → Fin 2) → ℂ}
+    (hv : v ∈ magnetizationSubspace Λ M) :
+    A.mulVec v ∈ magnetizationSubspace Λ M := by
+  rw [mem_magnetizationSubspace_iff] at hv ⊢
+  rw [Matrix.mulVec_mulVec, h.symm, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul]
+
+/-- The Casimir `Ŝtot²` preserves every magnetisation subspace `H_M`
+(consequence of `[Ŝtot², Ŝtot^(3)] = 0`). -/
+theorem totalSpinHalfSquared_mulVec_mem_magnetizationSubspace_of_mem
+    {M : ℂ} {v : (Λ → Fin 2) → ℂ}
+    (hv : v ∈ magnetizationSubspace Λ M) :
+    (totalSpinHalfSquared Λ).mulVec v ∈ magnetizationSubspace Λ M :=
+  mulVec_mem_magnetizationSubspace_of_commute_of_mem Λ
+    (sub_eq_zero.mp (totalSpinHalfSquared_commutator_totalSpinHalfOp3 Λ)) hv
+
 /-! ## Heisenberg Hamiltonian preserves the magnetisation sectors
 
 A direct consequence of SU(2) invariance
