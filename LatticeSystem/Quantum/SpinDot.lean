@@ -722,6 +722,19 @@ theorem heisenbergHamiltonian_commute_totalSpinHalfSquared (J : Λ → Λ → �
     sub_eq_zero.mp (heisenbergHamiltonian_commutator_totalSpinHalfOp3 J)
   exact ((h1.mul_right h1).add_right (h2.mul_right h2)).add_right (h3.mul_right h3)
 
+/-- The Heisenberg Hamiltonian preserves `Ŝtot²` eigenvalues: if
+`Ŝtot² · v = S · v`, then `Ŝtot² · (H · v) = S · (H · v)`. Operator-level
+simultaneous diagonalisation of `H` and the SU(2) Casimir. -/
+theorem heisenbergHamiltonian_mulVec_preserves_totalSpinHalfSquared_eigenvalue
+    (J : Λ → Λ → ℂ) {S : ℂ} {v : (Λ → Fin 2) → ℂ}
+    (hv : (totalSpinHalfSquared Λ).mulVec v = S • v) :
+    (totalSpinHalfSquared Λ).mulVec ((heisenbergHamiltonian J).mulVec v) =
+      S • (heisenbergHamiltonian J).mulVec v := by
+  have hcomm : totalSpinHalfSquared Λ * heisenbergHamiltonian J =
+      heisenbergHamiltonian J * totalSpinHalfSquared Λ :=
+    (heisenbergHamiltonian_commute_totalSpinHalfSquared J).symm
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hv, Matrix.mulVec_smul]
+
 /-! ## Casimir eigenvalue on the all-up / all-down states -/
 
 /-- `Ŝ_x · Ŝ_y` action on a uniformly-aligned basis state (constant `s`):
