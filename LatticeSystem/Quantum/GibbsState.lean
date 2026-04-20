@@ -311,6 +311,20 @@ theorem partitionFn_im_of_isHermitian {H : ManyBodyOp Λ}
     (partitionFn β H).im = 0 :=
   (gibbsExp_isHermitian hH β).trace_im
 
+/-- The Gibbs state purity equals `Z(2β) / Z(β)²`:
+`Tr(ρ_β²) = partitionFn (2 β) H / (partitionFn β H)²`. The "purity"
+measure of the canonical density matrix; equal to 1 for pure states,
+less than 1 for mixed states. The `Z = 0` edge case is handled by
+Lean's `1/0 = 0` convention: both sides collapse to zero. -/
+theorem gibbsState_mul_self_trace (β : ℝ) (H : ManyBodyOp Λ) :
+    (gibbsState β H * gibbsState β H).trace
+      = partitionFn (2 * β) H / (partitionFn β H) ^ 2 := by
+  unfold gibbsState
+  rw [Matrix.smul_mul, Matrix.mul_smul, smul_smul, ← gibbsExp_two_mul,
+    Matrix.trace_smul, smul_eq_mul]
+  unfold partitionFn
+  field_simp
+
 /-- At `β = 0`, the Gibbs state is the maximally mixed state
 `ρ_0 = (1 / dim) · I`. -/
 theorem gibbsState_zero (H : ManyBodyOp Λ) :

@@ -418,6 +418,7 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `partitionFn_zero_ne_zero` | `Z(0) ≠ 0` (concrete sorry-free proof that the partition function is nonzero at β = 0) | `Quantum/GibbsState.lean` |
 | `Matrix.IsHermitian.trace_im` | for any Hermitian `A : Matrix n n ℂ`, `A.trace.im = 0` (generic helper) | `Quantum/GibbsState.lean` |
 | `partitionFn_im_of_isHermitian` | for Hermitian `H`, `(partitionFn β H).im = 0` (Z is real) | `Quantum/GibbsState.lean` |
+| `gibbsState_mul_self_trace` | `Tr(ρ_β²) = Z(2β) / Z(β)²` (purity / Rényi-2 entropy precursor) | `Quantum/GibbsState.lean` |
 | `gibbsState_zero` | `ρ_0 = (1/dim) · I` (maximally mixed state at infinite temperature) | `Quantum/GibbsState.lean` |
 | `gibbsState_zero_inv` | `ρ_0⁻¹ = dim · I` (matrix inverse at β = 0) | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_zero` | `⟨A⟩_0 = (1/dim) · Tr A` (high-temperature limit) | `Quantum/GibbsState.lean` |

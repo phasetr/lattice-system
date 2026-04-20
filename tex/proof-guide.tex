@@ -1684,6 +1684,30 @@ $Z(\beta, H) = \operatorname{Tr}(e^{-\beta H})$.  By
 previous lemma then gives $\Im Z = 0$.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsState\_mul\_self\_trace} (purity)]
+$\operatorname{Tr}(\rho_\beta^2)
+ = Z(2\beta, H) / Z(\beta, H)^2$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Unfold $\rho_\beta = (1/Z) \cdot e^{-\beta H}$:
+$\rho_\beta \cdot \rho_\beta
+ = (1/Z) \cdot \bigl(e^{-\beta H} \cdot ((1/Z) \cdot e^{-\beta H})\bigr)
+ = (1/Z)^2 \cdot (e^{-\beta H} \cdot e^{-\beta H})
+ = (1/Z)^2 \cdot e^{-(2\beta) H}$,
+the last step by \texttt{gibbsExp\_two\_mul}.  Taking the trace and
+using \texttt{Matrix.trace\_smul} gives $(1/Z)^2 \cdot Z(2\beta, H)$,
+which \texttt{field\_simp} converts to $Z(2\beta, H) / Z^2$.
+The $Z = 0$ edge case is handled by Lean's $1/0 = 0$ convention:
+both sides collapse to zero, so no nonvanishing-$Z$ hypothesis is
+needed.
+
+The "purity" measure of the canonical density matrix; equal to $1$
+for pure states, less than $1$ for mixed states.  Expressed entirely
+in terms of partition functions evaluated at two temperatures, the
+canonical form used in Rényi-2 entropy and replica-trick computations.
+\end{proof}
+
 \begin{lemma}[\texttt{gibbsState\_zero}]
 At infinite temperature ($\beta = 0$),
 $\rho_0 = \dim(\mathcal{H})^{-1} \cdot I$, the maximally mixed state.
