@@ -480,4 +480,66 @@ theorem openChainHeisenbergHamiltonian_two_site_mulVec_basisVec_triplet_zero (J 
   rw [h, smul_smul]
   congr 1; ring
 
+/-! ## 3-site (Fin 3) explicit form (Tasaki §2.4)
+
+For `N = 2` (the 3-site open chain on `Fin 3` with 2 bonds), the
+Heisenberg Hamiltonian collapses to the sum of 2 bond terms. The
+all-up state has eigenvalue `-J`, matching the linear scaling
+`E(|↑..↑⟩) = -N·J/2` with `N = 2` bonds. -/
+
+/-- Explicit form of the 3-site open chain Heisenberg Hamiltonian:
+`H_open(N=2) = -2J · (spinHalfDot 0 1 + spinHalfDot 1 2)`. -/
+theorem openChainHeisenbergHamiltonian_three_site_eq (J : ℝ) :
+    heisenbergHamiltonian (openChainCoupling 2 J) =
+      (-(2 * J) : ℂ) • (spinHalfDot (0 : Fin 3) 1 + spinHalfDot 1 2) := by
+  unfold heisenbergHamiltonian
+  rw [Fin.sum_univ_three, Fin.sum_univ_three, Fin.sum_univ_three,
+    Fin.sum_univ_three]
+  -- 9 pairs (x,y) ∈ Fin 3 × Fin 3 — evaluate openChainCoupling at each.
+  have h00 : openChainCoupling 2 J 0 0 = 0 := by simp [openChainCoupling]
+  have h01 : openChainCoupling 2 J 0 1 = -(J : ℂ) := by simp [openChainCoupling]
+  have h02 : openChainCoupling 2 J 0 2 = 0 := by simp [openChainCoupling]
+  have h10 : openChainCoupling 2 J 1 0 = -(J : ℂ) := by simp [openChainCoupling]
+  have h11 : openChainCoupling 2 J 1 1 = 0 := by simp [openChainCoupling]
+  have h12 : openChainCoupling 2 J 1 2 = -(J : ℂ) := by simp [openChainCoupling]
+  have h20 : openChainCoupling 2 J 2 0 = 0 := by simp [openChainCoupling]
+  have h21 : openChainCoupling 2 J 2 1 = -(J : ℂ) := by simp [openChainCoupling]
+  have h22 : openChainCoupling 2 J 2 2 = 0 := by simp [openChainCoupling]
+  rw [h00, h01, h02, h10, h11, h12, h20, h21, h22]
+  -- Apply spinHalfDot_comm to merge (1,0) → (0,1) and (2,1) → (1,2).
+  rw [spinHalfDot_comm 1 0, spinHalfDot_comm 2 1]
+  -- Combine the four -J·spinHalfDot terms into -2J·(spinHalfDot 0 1 + spinHalfDot 1 2).
+  rw [smul_add]
+  set d01 : ManyBodyOp (Fin 3) := spinHalfDot 0 1
+  set d12 : ManyBodyOp (Fin 3) := spinHalfDot 1 2
+  -- LHS: 0+(-J)d01+0 + (-J)d01+0+(-J)d12 + 0+(-J)d12+0
+  --    = (-J)d01 + (-J)d01 + (-J)d12 + (-J)d12
+  --    = -2J·d01 + -2J·d12
+  -- After zero_smul cleanup:
+  rw [zero_smul, zero_smul, zero_smul, zero_smul, zero_smul]
+  module
+
+/-- Eigenvalue on the all-up state for the 3-site open chain Heisenberg
+Hamiltonian: `H · |↑↑↑⟩ = -J · |↑↑↑⟩`. The eigenvalue `-J` matches the
+pattern `E(|↑..↑⟩) = -N·J/2 = -|B|·S²·2` for `N = |B| = 2` bonds and
+`S = 1/2`. -/
+theorem openChainHeisenbergHamiltonian_three_site_mulVec_basisVec_all_up (J : ℝ) :
+    (heisenbergHamiltonian (openChainCoupling 2 J)).mulVec
+        (basisVec (fun _ : Fin 3 => (0 : Fin 2))) =
+      (-(J : ℂ)) • basisVec (fun _ : Fin 3 => (0 : Fin 2)) := by
+  rw [openChainHeisenbergHamiltonian_three_site_eq, Matrix.smul_mulVec,
+    Matrix.add_mulVec]
+  have h01 : (spinHalfDot (0 : Fin 3) 1).mulVec
+      (basisVec (fun _ : Fin 3 => (0 : Fin 2))) =
+        (1 / 4 : ℂ) • basisVec (fun _ : Fin 3 => (0 : Fin 2)) :=
+    spinHalfDot_mulVec_basisVec_both_up (by decide)
+  have h12 : (spinHalfDot (1 : Fin 3) 2).mulVec
+      (basisVec (fun _ : Fin 3 => (0 : Fin 2))) =
+        (1 / 4 : ℂ) • basisVec (fun _ : Fin 3 => (0 : Fin 2)) :=
+    spinHalfDot_mulVec_basisVec_both_up (by decide)
+  rw [h01, h12]
+  set v : (Fin 3 → Fin 2) → ℂ := basisVec (fun _ : Fin 3 => (0 : Fin 2))
+  -- (-2J) • ((1/4) • v + (1/4) • v) = -J • v
+  module
+
 end LatticeSystem.Quantum
