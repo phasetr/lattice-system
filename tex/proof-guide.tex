@@ -2010,9 +2010,49 @@ by \texttt{pow\_two}.
 For non-commuting Hermitian $A, B$, $\operatorname{Cov}_\beta(A, B)$
 is generally complex: its imaginary part captures
 $(1/2) \Im\langle [A, B] \rangle_\beta$.  The symmetric / real-valued
-covariance $(1/2) \langle \{A, B\} \rangle_\beta - \langle A \rangle_\beta \langle B \rangle_\beta$
-is left for a follow-up PR.
+covariance is treated below.
 \end{remark}
+
+\subsection{Symmetric covariance}
+\label{subsec:gibbs-covariance-symm}
+
+\begin{definition}[\texttt{gibbsCovarianceSymm}]
+The symmetric (real-valued for Hermitian observables)
+canonical-ensemble covariance is
+\[
+  \operatorname{Cov}^{\mathrm{s}}_\beta(A, B)
+  \;:=\;
+  \frac{1}{2} \langle A B + B A \rangle_\beta
+  - \langle A \rangle_\beta \cdot \langle B \rangle_\beta.
+\]
+\end{definition}
+
+\begin{lemma}[\texttt{gibbsCovarianceSymm\_self\_eq\_variance}]
+$\operatorname{Cov}^{\mathrm{s}}_\beta(O, O) = \operatorname{Var}_\beta(O)$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The anticommutator $O \cdot O + O \cdot O = 2 (O \cdot O)$ collapses
+the $1/2$ prefactor: $\tfrac{1}{2} \langle 2 (O \cdot O) \rangle_\beta
+= \langle O \cdot O \rangle_\beta$.  Combined with
+$(\langle O \rangle_\beta)^2 = \langle O \rangle_\beta \cdot \langle O \rangle_\beta$,
+the LHS equals the variance.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsCovarianceSymm\_im\_of\_isHermitian}]
+For Hermitian $H$ and Hermitian $A, B$,
+$\Im\operatorname{Cov}^{\mathrm{s}}_\beta(A, B) = 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The anticommutator expectation
+$\langle A B + B A \rangle_\beta$ is real by
+\texttt{gibbsExpectation\_anticommutator\_im}, and the $1/2$ prefactor
+preserves realness.  Each first moment $\langle A \rangle_\beta$,
+$\langle B \rangle_\beta$ is real by
+\texttt{gibbsExpectation\_im\_of\_isHermitian}, so the product is
+real.  The difference of two reals is real.
+\end{proof}
 
 \subsection{Anticommutator real, commutator purely imaginary}
 \label{subsec:gibbs-anti-comm}
