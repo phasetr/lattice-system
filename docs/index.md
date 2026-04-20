@@ -627,6 +627,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionTotalNumber N` | `N̂ := Σ_i n_i` (total particle-number operator) | `Fermion/JordanWigner.lean` |
 | `fermionTotalNumber_isHermitian` | `N̂` is Hermitian | `Fermion/JordanWigner.lean` |
 | `fermionMultiAnnihilation_anticomm_two_site_cross` | simplest nontrivial cross-site CAR on `Fin 2`: `c_0 · c_1 + c_1 · c_0 = 0` (JW string at site 1 is `σ^z_0`, combined with `σ^+ σ^z = -σ^+` and `σ^z σ^+ = σ^+`) | `Fermion/JordanWigner.lean` |
+| `fermionMultiCreation_anticomm_two_site_cross` | adjoint form: `c_0† · c_1† + c_1† · c_0† = 0` on `Fin 2`, obtained by taking `conjTranspose` of the annihilation version | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
