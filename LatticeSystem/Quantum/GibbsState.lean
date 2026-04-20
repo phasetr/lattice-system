@@ -545,6 +545,44 @@ theorem gibbsCovariance_sub_swap_eq_commutator (β : ℝ) (H A B : ManyBodyOp Λ
   rw [gibbsExpectation_sub]
   ring
 
+/-! ### Bilinearity of the complex covariance -/
+
+/-- Additivity in the left argument:
+`Cov_β(A₁ + A₂, B) = Cov_β(A₁, B) + Cov_β(A₂, B)`. -/
+theorem gibbsCovariance_add_left (β : ℝ) (H A₁ A₂ B : ManyBodyOp Λ) :
+    gibbsCovariance β H (A₁ + A₂) B
+      = gibbsCovariance β H A₁ B + gibbsCovariance β H A₂ B := by
+  unfold gibbsCovariance
+  rw [add_mul, gibbsExpectation_add, gibbsExpectation_add]
+  ring
+
+/-- Additivity in the right argument:
+`Cov_β(A, B₁ + B₂) = Cov_β(A, B₁) + Cov_β(A, B₂)`. -/
+theorem gibbsCovariance_add_right (β : ℝ) (H A B₁ B₂ : ManyBodyOp Λ) :
+    gibbsCovariance β H A (B₁ + B₂)
+      = gibbsCovariance β H A B₁ + gibbsCovariance β H A B₂ := by
+  unfold gibbsCovariance
+  rw [mul_add, gibbsExpectation_add, gibbsExpectation_add]
+  ring
+
+/-- Scalar pull-out from the left argument:
+`Cov_β(c • A, B) = c · Cov_β(A, B)`. -/
+theorem gibbsCovariance_smul_left (β : ℝ) (H : ManyBodyOp Λ) (c : ℂ)
+    (A B : ManyBodyOp Λ) :
+    gibbsCovariance β H (c • A) B = c * gibbsCovariance β H A B := by
+  unfold gibbsCovariance
+  rw [Matrix.smul_mul, gibbsExpectation_smul, gibbsExpectation_smul]
+  ring
+
+/-- Scalar pull-out from the right argument:
+`Cov_β(A, c • B) = c · Cov_β(A, B)`. -/
+theorem gibbsCovariance_smul_right (β : ℝ) (H A : ManyBodyOp Λ) (c : ℂ)
+    (B : ManyBodyOp Λ) :
+    gibbsCovariance β H A (c • B) = c * gibbsCovariance β H A B := by
+  unfold gibbsCovariance
+  rw [Matrix.mul_smul, gibbsExpectation_smul, gibbsExpectation_smul]
+  ring
+
 /-! ## Anticommutator real, commutator purely imaginary
 
 For Hermitian `ρ` and arbitrary `X`,
