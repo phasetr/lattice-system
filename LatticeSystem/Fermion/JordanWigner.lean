@@ -1361,4 +1361,61 @@ theorem fermionTotalNumber_commutator_fermionMultiCreation
   rw [h2]
   exact neg_neg _
 
+/-- The hopping operator `c_i† · c_j` commutes with the total
+particle-number operator `N̂`. Follows from `[N̂, c_i†] = c_i†`
+and `[N̂, c_j] = -c_j`: the shifts cancel. -/
+theorem fermionTotalNumber_commute_hopping (N : ℕ) (i j : Fin (N + 1)) :
+    Commute (fermionTotalNumber N)
+      (fermionMultiCreation N i * fermionMultiAnnihilation N j) := by
+  -- From [N̂, c_i†] = c_i†: N̂ · c_i† = c_i† · N̂ + c_i†.
+  have h_cr : fermionTotalNumber N * fermionMultiCreation N i =
+      fermionMultiCreation N i * fermionTotalNumber N +
+        fermionMultiCreation N i := by
+    have h := fermionTotalNumber_commutator_fermionMultiCreation N i
+    rw [sub_eq_iff_eq_add] at h
+    rw [h]; abel
+  -- From [N̂, c_j] = -c_j: N̂ · c_j = c_j · N̂ - c_j.
+  have h_an : fermionTotalNumber N * fermionMultiAnnihilation N j =
+      fermionMultiAnnihilation N j * fermionTotalNumber N -
+        fermionMultiAnnihilation N j := by
+    have h := fermionTotalNumber_commutator_fermionMultiAnnihilation N j
+    rw [sub_eq_iff_eq_add] at h
+    rw [h]; abel
+  -- Combine: N̂ · c_i† · c_j = c_i† · N̂ · c_j + c_i† · c_j
+  --                        = c_i† · (c_j · N̂ - c_j) + c_i† · c_j
+  --                        = c_i† · c_j · N̂ - c_i† · c_j + c_i† · c_j
+  --                        = c_i† · c_j · N̂.
+  show fermionTotalNumber N *
+      (fermionMultiCreation N i * fermionMultiAnnihilation N j) =
+    (fermionMultiCreation N i * fermionMultiAnnihilation N j) *
+      fermionTotalNumber N
+  calc fermionTotalNumber N *
+        (fermionMultiCreation N i * fermionMultiAnnihilation N j)
+      = (fermionTotalNumber N * fermionMultiCreation N i) *
+          fermionMultiAnnihilation N j := by rw [Matrix.mul_assoc]
+    _ = (fermionMultiCreation N i * fermionTotalNumber N +
+          fermionMultiCreation N i) * fermionMultiAnnihilation N j := by rw [h_cr]
+    _ = fermionMultiCreation N i * fermionTotalNumber N *
+          fermionMultiAnnihilation N j +
+        fermionMultiCreation N i * fermionMultiAnnihilation N j := by
+          rw [Matrix.add_mul]
+    _ = fermionMultiCreation N i *
+          (fermionTotalNumber N * fermionMultiAnnihilation N j) +
+        fermionMultiCreation N i * fermionMultiAnnihilation N j := by
+          rw [Matrix.mul_assoc]
+    _ = fermionMultiCreation N i *
+          (fermionMultiAnnihilation N j * fermionTotalNumber N -
+            fermionMultiAnnihilation N j) +
+        fermionMultiCreation N i * fermionMultiAnnihilation N j := by
+          rw [h_an]
+    _ = fermionMultiCreation N i *
+          (fermionMultiAnnihilation N j * fermionTotalNumber N) -
+        fermionMultiCreation N i * fermionMultiAnnihilation N j +
+        fermionMultiCreation N i * fermionMultiAnnihilation N j := by
+          rw [Matrix.mul_sub]
+    _ = fermionMultiCreation N i *
+          (fermionMultiAnnihilation N j * fermionTotalNumber N) := by abel
+    _ = (fermionMultiCreation N i * fermionMultiAnnihilation N j) *
+          fermionTotalNumber N := by rw [← Matrix.mul_assoc]
+
 end LatticeSystem.Fermion
