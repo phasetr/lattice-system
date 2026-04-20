@@ -3135,6 +3135,33 @@ applies, leaving $\hat S_{\mathrm{tot}}^{(3)} \cdot (\hat H \cdot v)
 \texttt{Matrix.mulVec\_smul}.
 \end{proof}
 
+\begin{theorem}[\texttt{totalSpinHalfOpMinus\_mulVec\_mem\_magnetizationSubspace\_of\_mem}]
+For any $M \in \mathbb{C}$, if $v \in \mathcal H_{M}$ then
+$\hat S_{\mathrm{tot}}^{-} \cdot v \in \mathcal H_{M-1}$.  Dually,
+$\hat S_{\mathrm{tot}}^{+} \cdot v \in \mathcal H_{M+1}$
+(\texttt{totalSpinHalfOpPlus\_mulVec\_mem\_magnetizationSubspace\_of\_mem}).
+This is the SU(2) ladder action on the magnetisation eigenspaces of
+Tasaki eq.~(2.2.10).
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Apply the Cartan relation $\hat S_{\mathrm{tot}}^{(3)} \cdot \hat
+S_{\mathrm{tot}}^{-} = \hat S_{\mathrm{tot}}^{-} \cdot \hat
+S_{\mathrm{tot}}^{(3)} - \hat S_{\mathrm{tot}}^{-}$ (rearranged from
+\texttt{totalSpinHalfOp3\_commutator\_totalSpinHalfOpMinus} via
+\texttt{abel}).  Then $\hat S_{\mathrm{tot}}^{(3)} \cdot
+(\hat S_{\mathrm{tot}}^{-} \cdot v)
+= \hat S_{\mathrm{tot}}^{-} \cdot \hat S_{\mathrm{tot}}^{(3)} \cdot v
+- \hat S_{\mathrm{tot}}^{-} \cdot v
+= \hat S_{\mathrm{tot}}^{-} \cdot M \cdot v
+- \hat S_{\mathrm{tot}}^{-} \cdot v
+= (M-1) \cdot (\hat S_{\mathrm{tot}}^{-} \cdot v)$ via
+\texttt{Matrix.mulVec\_mulVec}, \texttt{Matrix.sub\_mulVec},
+\texttt{Matrix.mulVec\_smul}, and \texttt{sub\_smul, one\_smul}.
+The dual case for $\hat S_{\mathrm{tot}}^{+}$ replaces subtraction
+with addition throughout.
+\end{proof}
+
 %======================================================================
 \section{Single-mode fermion (Phase 2 skeleton)}
 \label{sec:fermion-mode}
