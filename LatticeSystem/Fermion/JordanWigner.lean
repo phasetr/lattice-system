@@ -791,6 +791,27 @@ theorem fermionMultiAnnihilation_anticomm_zero_two_fin_three :
           rw [pauliZ_mul_spinHalfOpPlus]
   rw [hfirst, hsecond, neg_add_cancel]
 
+/-- Cross-site CAR `{c_0†, c_2†} = 0` on `Fin 3`. Direct consequence
+of PR #116 via `conjTranspose`. -/
+theorem fermionMultiCreation_anticomm_zero_two_fin_three :
+    fermionMultiCreation 2 (0 : Fin 3) *
+        fermionMultiCreation 2 2 +
+      fermionMultiCreation 2 2 *
+        fermionMultiCreation 2 0 = 0 := by
+  have h := fermionMultiAnnihilation_anticomm_zero_two_fin_three
+  have h2 := congrArg Matrix.conjTranspose h
+  simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_mul,
+    fermionMultiAnnihilation_conjTranspose, Matrix.conjTranspose_zero] at h2
+  rw [show fermionMultiCreation 2 (0 : Fin 3) *
+        fermionMultiCreation 2 2 +
+      fermionMultiCreation 2 2 *
+        fermionMultiCreation 2 (0 : Fin 3) =
+      fermionMultiCreation 2 2 *
+        fermionMultiCreation 2 (0 : Fin 3) +
+      fermionMultiCreation 2 (0 : Fin 3) *
+        fermionMultiCreation 2 2 from add_comm _ _]
+  exact h2
+
 /-- Fourth off-diagonal CAR on `Fin 2`: `c_0† · c_1 + c_1 · c_0† = 0`.
 Obtained from PR #110's mixed annihilation/creation version by taking
 `conjTranspose`. Completes the 2-site off-diagonal CAR relations. -/
