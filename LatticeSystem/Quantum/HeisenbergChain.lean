@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import LatticeSystem.Quantum.SpinDot
 import LatticeSystem.Quantum.IsingChain
 import LatticeSystem.Quantum.GibbsState
+import LatticeSystem.Quantum.MagnetizationSubspace
 
 /-!
 # One-dimensional Heisenberg chain coupling functions and Gibbs state
@@ -863,5 +864,32 @@ theorem openChainHeisenbergHamiltonian_mulVec_totalSpinHalfOpPlus_pow_basisVec_a
     rw [Finset.mul_sum]]
   rw [openChainCoupling_sum_eq N J]
   ring
+
+/-! ## Chain Heisenberg preserves magnetisation sectors (Tasaki §2.2 (2.2.10))
+
+Both the open and periodic chain Heisenberg Hamiltonians preserve
+every magnetisation subspace `H_M`. Direct consequence of
+`heisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem`
+(PR #91) applied to the chain couplings. -/
+
+/-- The open chain Heisenberg Hamiltonian preserves every
+magnetisation subspace `H_M` (SU(2) invariance). -/
+theorem openChainHeisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem
+    (N : ℕ) (J : ℝ) {M : ℂ} {v : (Fin (N + 1) → Fin 2) → ℂ}
+    (hv : v ∈ magnetizationSubspace (Fin (N + 1)) M) :
+    (heisenbergHamiltonian (openChainCoupling N J)).mulVec v ∈
+      magnetizationSubspace (Fin (N + 1)) M :=
+  heisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem (Fin (N + 1))
+    (openChainCoupling N J) hv
+
+/-- The periodic chain Heisenberg Hamiltonian preserves every
+magnetisation subspace `H_M` (SU(2) invariance). -/
+theorem periodicChainHeisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem
+    (N : ℕ) (J : ℝ) {M : ℂ} {v : (Fin (N + 2) → Fin 2) → ℂ}
+    (hv : v ∈ magnetizationSubspace (Fin (N + 2)) M) :
+    (heisenbergHamiltonian (periodicChainCoupling N J)).mulVec v ∈
+      magnetizationSubspace (Fin (N + 2)) M :=
+  heisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem (Fin (N + 2))
+    (periodicChainCoupling N J) hv
 
 end LatticeSystem.Quantum
