@@ -103,4 +103,69 @@ theorem fermionMultiCreation_zero (N : ℕ) :
   unfold fermionMultiCreation
   rw [jwString_zero, Matrix.one_mul]
 
+/-! ## On-site CAR vanishing -/
+
+/-- The Jordan–Wigner string at site `i` commutes with any single-site
+operator at site `i`: the string lives on sites strictly less than
+`i`, so each factor `σ^z_j` (for `j.val < i.val`, hence `j ≠ i`)
+commutes with the site-`i` operator via `onSite_mul_onSite_of_ne`. -/
+theorem jwString_commute_onSite (N : ℕ) (i : Fin (N + 1))
+    (A : Matrix (Fin 2) (Fin 2) ℂ) :
+    Commute (jwString N i) (onSite i A) := by
+  unfold jwString
+  apply Commute.symm
+  apply Finset.noncommProd_commute
+  intro j hj
+  rw [Finset.mem_filter] at hj
+  exact onSite_mul_onSite_of_ne (Fin.ne_of_val_ne (Nat.ne_of_lt hj.2).symm) A pauliZ
+
+/-- `c_i² = 0`: cannot annihilate the same fermion mode twice
+(Pauli exclusion at a single mode). -/
+theorem fermionMultiAnnihilation_sq (N : ℕ) (i : Fin (N + 1)) :
+    fermionMultiAnnihilation N i * fermionMultiAnnihilation N i = 0 := by
+  unfold fermionMultiAnnihilation
+  have hcomm : Commute (onSite i spinHalfOpPlus) (jwString N i) :=
+    (jwString_commute_onSite N i spinHalfOpPlus).symm
+  rw [show jwString N i * onSite i spinHalfOpPlus *
+          (jwString N i * onSite i spinHalfOpPlus)
+        = jwString N i * jwString N i *
+          (onSite i spinHalfOpPlus * onSite i spinHalfOpPlus) by
+      rw [Matrix.mul_assoc, ← Matrix.mul_assoc (onSite i spinHalfOpPlus),
+          hcomm.eq, Matrix.mul_assoc, Matrix.mul_assoc]]
+  rw [onSite_mul_onSite_same]
+  have h_sq : spinHalfOpPlus * spinHalfOpPlus = (0 : Matrix (Fin 2) (Fin 2) ℂ) := by
+    unfold spinHalfOpPlus
+    ext i j
+    fin_cases i <;> fin_cases j <;> simp
+  rw [h_sq]
+  have h_zero : onSite i (0 : Matrix (Fin 2) (Fin 2) ℂ)
+              = (0 : ManyBodyOp (Fin (N + 1))) := by
+    ext σ' σ
+    simp [onSite_apply]
+  rw [h_zero, Matrix.mul_zero]
+
+/-- `(c_i†)² = 0`: cannot create the same fermion mode twice. -/
+theorem fermionMultiCreation_sq (N : ℕ) (i : Fin (N + 1)) :
+    fermionMultiCreation N i * fermionMultiCreation N i = 0 := by
+  unfold fermionMultiCreation
+  have hcomm : Commute (onSite i spinHalfOpMinus) (jwString N i) :=
+    (jwString_commute_onSite N i spinHalfOpMinus).symm
+  rw [show jwString N i * onSite i spinHalfOpMinus *
+          (jwString N i * onSite i spinHalfOpMinus)
+        = jwString N i * jwString N i *
+          (onSite i spinHalfOpMinus * onSite i spinHalfOpMinus) by
+      rw [Matrix.mul_assoc, ← Matrix.mul_assoc (onSite i spinHalfOpMinus),
+          hcomm.eq, Matrix.mul_assoc, Matrix.mul_assoc]]
+  rw [onSite_mul_onSite_same]
+  have h_sq : spinHalfOpMinus * spinHalfOpMinus = (0 : Matrix (Fin 2) (Fin 2) ℂ) := by
+    unfold spinHalfOpMinus
+    ext i j
+    fin_cases i <;> fin_cases j <;> simp
+  rw [h_sq]
+  have h_zero : onSite i (0 : Matrix (Fin 2) (Fin 2) ℂ)
+              = (0 : ManyBodyOp (Fin (N + 1))) := by
+    ext σ' σ
+    simp [onSite_apply]
+  rw [h_zero, Matrix.mul_zero]
+
 end LatticeSystem.Fermion

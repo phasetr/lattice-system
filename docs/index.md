@@ -54,7 +54,7 @@ CAR algebras, and eventually lattice QCD.
 | P1f-2c (Tasaki §2.2 Problem 2.2.c) | SU(2)-averaged two-site state = singlet projector (eq. (2.2.15)); integration over Euler angles `φ ∈ [0,2π]`, `θ ∈ [0,π]` | Done |
 | P1g | Gibbs state `ρ = e^{-βH}/Z`, `Tr(ρ) = 1`, `⟨1⟩ = 1`, `Z(0) = dim`, `Z(0) ≠ 0`, linearity `⟨O₁+O₂⟩ = ⟨O₁⟩+⟨O₂⟩`, `⟨c·O⟩ = c·⟨O⟩`, `⟨-O⟩ = -⟨O⟩`, `⟨A−B⟩ = ⟨A⟩−⟨B⟩`, `⟨Σ f⟩ = Σ ⟨f⟩`, `[ρ, H] = 0`, reality of `⟨O⟩` for Hermitian `O`, conservation `⟨[H,A]⟩ = 0`, anticommutator real / commutator imaginary, `(⟨H·O⟩).im = 0`, β = 0 closed form `ρ_0 = I/dim` and `⟨A⟩_0 = Tr A / dim`, one-parameter group property `e^{-(β₁+β₂)H} = e^{-β₁H} · e^{-β₂H}` and invertibility, exact discrete semigroup identity `e^{-(nβ)H} = (e^{-βH})^n` (extended to `n : ℤ` via `gibbsExp_inv`) | Done |
 | P1h | Periodic boundary conditions, Heisenberg chain (open and periodic BC), Gibbs state instantiation for both BCs (Hermiticity, commutativity with `H`, β = 0 closed form, expectation realness for Hermitian observables, conservation `⟨[H, A]⟩ = 0`, energy expectation as a bond-sum decomposition, energy expectation real, `⟨H · O⟩` real for Hermitian `O`, `⟨H^n⟩` real for any `n : ℕ`) | Done |
-| P2 | Finite-volume Hubbard / BCS | In progress (single-mode CAR algebra; multi-mode Jordan–Wigner backbone: JW string + multi-mode `c_i`, `c_i†` definitions, `c_0` and `c_0†` reductions at the leftmost site) |
+| P2 | Finite-volume Hubbard / BCS | In progress (single-mode CAR algebra; multi-mode Jordan–Wigner backbone: JW string + multi-mode `c_i`, `c_i†` definitions, `c_0` reductions, on-site Pauli-exclusion `c_i² = 0` / `(c_i†)² = 0`) |
 | P3 | CAR algebras, quasi-local C*-algebras, KMS states | Not started |
 | P4 | Thermodynamic limit, phase transitions | Not started |
 | P5 | Lattice QCD | Not started |
@@ -568,6 +568,9 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionMultiCreation N i` | `c_i† = jwString_i · σ^-_i` | `Fermion/JordanWigner.lean` |
 | `fermionMultiAnnihilation_zero` | `c_0 = σ^+_0` (no JW string at the leftmost site) | `Fermion/JordanWigner.lean` |
 | `fermionMultiCreation_zero` | `c_0† = σ^-_0` | `Fermion/JordanWigner.lean` |
+| `jwString_commute_onSite` | `Commute (jwString N i) (onSite i A)` (string commutes past same-site operators) | `Fermion/JordanWigner.lean` |
+| `fermionMultiAnnihilation_sq` | `c_i² = 0` (Pauli exclusion) | `Fermion/JordanWigner.lean` |
+| `fermionMultiCreation_sq` | `(c_i†)² = 0` | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 

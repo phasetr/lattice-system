@@ -2809,18 +2809,41 @@ $c_0 = \sigma^+_0$ and $c_0^\dagger = \sigma^-_0$ (the JW string is
 the identity at the leftmost site).
 \end{lemma}
 
-\subsection*{Deferred: full CAR algebra}
+\subsection{On-site CAR vanishing (Pauli exclusion)}
 
-The canonical anticommutation relations
-$c_i^2 = 0$, $(c_i^\dagger)^2 = 0$,
-$\{c_i, c_j^\dagger\} = \delta_{ij} \cdot I$,
+\begin{lemma}[\texttt{jwString\_commute\_onSite}]
+For any $A \in M_2(\mathbb{C})$, $[J_i, \texttt{onSite } i\, A] = 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Each factor $\sigma^z_j$ (with $j.\mathrm{val} < i.\mathrm{val}$,
+hence $j \neq i$) commutes with the site-$i$ operator via
+\texttt{onSite\_mul\_onSite\_of\_ne}, and pairwise commutativity lifts
+to the noncomm-product via \texttt{Finset.noncommProd\_commute}.
+\end{proof}
+
+\begin{lemma}[\texttt{fermionMultiAnnihilation\_sq}, \texttt{fermionMultiCreation\_sq}]
+$c_i^2 = 0$ and $(c_i^\dagger)^2 = 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+$(J_i \sigma^+_i)(J_i \sigma^+_i)
+ = J_i (\sigma^+_i J_i) \sigma^+_i
+ = J_i (J_i \sigma^+_i) \sigma^+_i
+ = J_i^2 (\sigma^+_i \sigma^+_i)$,
+where the middle commutation uses the previous lemma.  The single-site
+square $\sigma^+ \cdot \sigma^+ = 0$ then gives
+$J_i^2 \cdot \texttt{onSite } i\, 0 = J_i^2 \cdot 0 = 0$.  Same
+argument for $(c_i^\dagger)^2$ with $\sigma^-$ in place of $\sigma^+$.
+\end{proof}
+
+\subsection*{Deferred: cross-site CAR}
+
+The cross-site relations
+$\{c_i, c_j^\dagger\} = \delta_{ij} \cdot I$ and
 $\{c_i, c_j\} = 0$ for $i \neq j$ are deferred to follow-up PRs.
-They require careful tracking of the JW-string interactions across
-sites; the on-site $c_i^2 = 0$ requires the JW string to commute past
-the same-site $\sigma^+$ (which works since the string lives on
-sites strictly less than $i$), while the cross-site
-anticommutations involve sign cancellations from $\sigma^z$ acting
-on intermediate sites.
+They require careful tracking of sign cancellations from the JW
+string $\sigma^z$ acting on intermediate sites between $i$ and $j$.
 
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
