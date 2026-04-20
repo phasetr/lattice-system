@@ -2683,6 +2683,79 @@ Lean names: \texttt{openChainHeisenbergGibbsExpectation\_self\_eq},
 \texttt{periodicChainHeisenbergGibbsExpectation\_self\_eq}.
 \end{remark}
 
+%======================================================================
+\section{Single-mode fermion (Phase 2 skeleton)}
+\label{sec:fermion-mode}
+%======================================================================
+
+\emph{Source file:} \texttt{LatticeSystem/Fermion/Mode.lean}.
+
+\emph{Convention.}  A single fermion mode acts on the two-dimensional
+Hilbert space $\mathbb{C}^2$ with computational basis
+$|0\rangle = e_0$ (vacuum) and $|1\rangle = e_1$ (occupied).
+
+\subsection{Definitions}
+
+\begin{definition}[\texttt{fermionAnnihilation}, \texttt{fermionCreation}, \texttt{fermionNumber}]
+\[
+  c \;=\; |0\rangle\langle 1| \;=\;
+  \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix},
+  \quad
+  c^\dagger \;=\; |1\rangle\langle 0| \;=\;
+  \begin{pmatrix} 0 & 0 \\ 1 & 0 \end{pmatrix},
+  \quad
+  n \;=\; c^\dagger c \;=\;
+  \begin{pmatrix} 0 & 0 \\ 0 & 1 \end{pmatrix}.
+\]
+The number-operator decomposition $n = c^\dagger c$ is recorded
+explicitly as \texttt{fermionNumber\_eq\_creation\_mul\_annihilation}.
+\end{definition}
+
+\subsection{CAR relations}
+
+\begin{lemma}[\texttt{fermionAnnihilation\_sq}, \texttt{fermionCreation\_sq}]
+$c^2 = 0$ and $(c^\dagger)^2 = 0$.
+\end{lemma}
+
+\begin{lemma}[\texttt{fermionAnticomm\_self}]
+The single-mode canonical anticommutation relation:
+\[
+  \{c, c^\dagger\} \;=\; c\,c^\dagger + c^\dagger\,c \;=\; I.
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Direct $2 \times 2$ matrix computation; \texttt{fin\_cases} on row /
+column followed by \texttt{simp}.
+\end{proof}
+
+\begin{lemma}[\texttt{fermionNumber\_sq}]
+The number operator is idempotent: $n^2 = n$ (eigenvalues $0$ and $1$).
+\end{lemma}
+
+\subsection{Hermiticity}
+
+\begin{lemma}[\texttt{fermionAnnihilation\_conjTranspose}, \texttt{fermionCreation\_conjTranspose}, \texttt{fermionNumber\_isHermitian}]
+$c^\dagger = (c)^\dagger$, $c = (c^\dagger)^\dagger$, and $n$ is
+Hermitian.
+\end{lemma}
+
+\subsection*{Roadmap to multi-mode CAR}
+
+The single-mode operators above are the building blocks.  The
+multi-mode CAR algebra on a finite ordered lattice
+$\Lambda = \mathrm{Fin}\,(N+1)$ will be obtained via the Jordan–Wigner
+mapping
+\[
+  c_i \;=\; \Bigl(\bigotimes_{j < i} \sigma^z_j\Bigr) \otimes c
+  \quad
+  \text{(and similarly for } c_i^\dagger\text{)},
+\]
+using the Pauli infrastructure already developed in
+\texttt{LatticeSystem/Quantum/Pauli.lean} and
+\texttt{LatticeSystem/Quantum/SpinHalf.lean}.  This is the next PR's
+target.
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
