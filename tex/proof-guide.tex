@@ -2280,6 +2280,32 @@ $\langle A B + B A \rangle_\beta$, which equals
 $2 \operatorname{Cov}^{\mathrm{s}}_\beta(A, B) + 2 \langle A \rangle_\beta \langle B \rangle_\beta$.
 \end{proof}
 
+\begin{lemma}[Variance under transformations]
+\begin{itemize}
+  \item $\operatorname{Var}_\beta(c \cdot A) = c^2 \operatorname{Var}_\beta(A)$
+    (\texttt{gibbsVariance\_smul}).
+  \item $\operatorname{Var}_\beta(-A) = \operatorname{Var}_\beta(A)$
+    (\texttt{gibbsVariance\_neg}).
+  \item For $Z \neq 0$: $\operatorname{Var}_\beta(I) = 0$
+    (\texttt{gibbsVariance\_one}),
+    $\operatorname{Var}_\beta(c \cdot I) = 0$
+    (\texttt{gibbsVariance\_smul\_one}), and
+    $\operatorname{Var}_\beta(A + c \cdot I) = \operatorname{Var}_\beta(A)$
+    (\texttt{gibbsVariance\_add\_const\_smul\_one}).
+\end{itemize}
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Variance scales as $c^2$ via \texttt{Matrix.smul\_mul} /
+\texttt{Matrix.mul\_smul} / \texttt{smul\_smul} on the inner product
+and \texttt{gibbsExpectation\_smul} on each occurrence; the
+$\operatorname{Var}(-A)$ case is the $c = -1$ specialization.
+$\operatorname{Var}(I) = \langle I \rangle - \langle I \rangle^2 = 1 - 1 = 0$
+when $\langle I \rangle = 1$, requiring $Z \neq 0$.  The constant-shift
+invariance follows by direct expansion of $(A + c \cdot I)(A + c \cdot I)$
+together with $\langle I \rangle = 1$; the cross terms cancel.
+\end{proof}
+
 \begin{lemma}[Symmetric / antisymmetric decomposition]
 $\operatorname{Cov}_\beta(A, B)
  = \operatorname{Cov}^{\mathrm{s}}_\beta(A, B)

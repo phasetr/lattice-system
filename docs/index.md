@@ -468,6 +468,11 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `gibbsCovarianceSymm_add_left/right` | additivity of `Cov^s_β` in each argument | `Quantum/GibbsState.lean` |
 | `gibbsCovarianceSymm_smul_left/right` | scalar pull-out from each argument of `Cov^s_β` | `Quantum/GibbsState.lean` |
 | `gibbsVariance_add` | `Var_β(A + B) = Var_β(A) + Var_β(B) + 2 · Cov^s_β(A, B)` (sum-of-observables variance identity) | `Quantum/GibbsState.lean` |
+| `gibbsVariance_one` | `Var_β(1) = 0` (when `Z ≠ 0`) | `Quantum/GibbsState.lean` |
+| `gibbsVariance_smul` | `Var_β(c • A) = c² · Var_β(A)` | `Quantum/GibbsState.lean` |
+| `gibbsVariance_smul_one` | `Var_β(c • 1) = 0` (when `Z ≠ 0`) | `Quantum/GibbsState.lean` |
+| `gibbsVariance_neg` | `Var_β(−A) = Var_β(A)` | `Quantum/GibbsState.lean` |
+| `gibbsVariance_add_const_smul_one` | `Var_β(A + c • 1) = Var_β(A)` (when `Z ≠ 0`) | `Quantum/GibbsState.lean` |
 | `gibbsCovariance_eq_symm_add_half_commutator` | `Cov_β(A, B) = Cov^s_β(A, B) + (1/2) · ⟨A · B − B · A⟩_β` (symmetric / antisymmetric decomposition) | `Quantum/GibbsState.lean` |
 | `gibbsCovarianceSymm_eq_half_add_swap` | `Cov^s_β(A, B) = (1/2) · (Cov_β(A, B) + Cov_β(B, A))` | `Quantum/GibbsState.lean` |
 | `Matrix.trace_mul_conjTranspose_swap_of_isHermitian` | `star Tr(ρ · X) = Tr(ρ · Xᴴ)` for Hermitian `ρ` (generic helper) | `Quantum/GibbsState.lean` |
