@@ -707,6 +707,21 @@ theorem heisenbergHamiltonian_commutator_totalSpinHalfOpMinus (J : Λ → Λ →
   rw [Matrix.smul_mul, Matrix.mul_smul, ← smul_sub]
   rw [spinHalfDot_commutator_totalSpinHalfOpMinus, smul_zero]
 
+/-- A Heisenberg-type Hamiltonian commutes with the Casimir `Ŝtot²`:
+operator-level SU(2)/U(1) invariance at the Casimir level. Follows
+from `[H, Ŝtot^α] = 0` for each axis via `Commute.mul_right` and
+`Commute.add_right`. -/
+theorem heisenbergHamiltonian_commute_totalSpinHalfSquared (J : Λ → Λ → ℂ) :
+    Commute (heisenbergHamiltonian J) (totalSpinHalfSquared Λ) := by
+  unfold totalSpinHalfSquared
+  have h1 : Commute (heisenbergHamiltonian J) (totalSpinHalfOp1 Λ) :=
+    sub_eq_zero.mp (heisenbergHamiltonian_commutator_totalSpinHalfOp1 J)
+  have h2 : Commute (heisenbergHamiltonian J) (totalSpinHalfOp2 Λ) :=
+    sub_eq_zero.mp (heisenbergHamiltonian_commutator_totalSpinHalfOp2 J)
+  have h3 : Commute (heisenbergHamiltonian J) (totalSpinHalfOp3 Λ) :=
+    sub_eq_zero.mp (heisenbergHamiltonian_commutator_totalSpinHalfOp3 J)
+  exact ((h1.mul_right h1).add_right (h2.mul_right h2)).add_right (h3.mul_right h3)
+
 /-! ## Casimir eigenvalue on the all-up / all-down states -/
 
 /-- `Ŝ_x · Ŝ_y` action on a uniformly-aligned basis state (constant `s`):
