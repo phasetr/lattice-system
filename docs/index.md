@@ -442,6 +442,7 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `gibbsExpectation_im_of_isHermitian` | `(⟨O⟩_β).im = 0` for Hermitian `H`, `O` | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_ofReal_re_eq_of_isHermitian` | `((⟨O⟩_β).re : ℂ) = ⟨O⟩_β` for Hermitian `H`, `O` (real-cast equality) | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_mul_hamiltonian_comm` | `⟨H · A⟩_β = ⟨A · H⟩_β` for any `A` (Tasaki §3.3, p. 80) | `Quantum/GibbsState.lean` |
+| `gibbsExpectation_mul_comm_of_commute_hamiltonian` | for any conserved `A` (`[A, H] = 0`), `⟨A · O⟩_β = ⟨O · A⟩_β` | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_commutator_hamiltonian` | `⟨[H, A]⟩_β = 0` (conservation law) | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_hamiltonian_im` | `(⟨H⟩_β).im = 0` for Hermitian `H` (real energy expectation) | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_sq_im_of_isHermitian` | `(⟨O · O⟩_β).im = 0` for Hermitian `H, O` (second-moment realness, variance precursor) | `Quantum/GibbsState.lean` |
