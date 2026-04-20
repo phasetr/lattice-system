@@ -573,6 +573,106 @@ theorem fermionMultiAnnihilation_anticomm_zero_one
       onSite_mul_onSite_same, pauliZ_mul_spinHalfOpPlus]
   rw [hfirst, hsecond, neg_add_cancel]
 
+/-- Dual cross-site CAR for creation operators on `Fin (N+1)`, `N ≥ 1`:
+`c_0† · c_1† + c_1† · c_0† = 0`. Obtained from PR #112 by taking
+`conjTranspose`. -/
+theorem fermionMultiCreation_anticomm_zero_one (N : ℕ) (hN : 1 ≤ N) :
+    fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiCreation N ⟨1, by omega⟩ +
+      fermionMultiCreation N ⟨1, by omega⟩ *
+        fermionMultiCreation N 0 = 0 := by
+  have h := fermionMultiAnnihilation_anticomm_zero_one N hN
+  have h2 := congrArg Matrix.conjTranspose h
+  simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_mul,
+    fermionMultiAnnihilation_conjTranspose, Matrix.conjTranspose_zero] at h2
+  rw [show fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiCreation N ⟨1, by omega⟩ +
+      fermionMultiCreation N ⟨1, by omega⟩ *
+        fermionMultiCreation N (0 : Fin (N + 1)) =
+      fermionMultiCreation N ⟨1, by omega⟩ *
+        fermionMultiCreation N (0 : Fin (N + 1)) +
+      fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiCreation N ⟨1, by omega⟩ from add_comm _ _]
+  exact h2
+
+/-- Mixed cross-site CAR on `Fin (N+1)`, `N ≥ 1`:
+`c_0 · c_1† + c_1† · c_0 = 0`. Same template as PR #112 with
+`σ^+_1` replaced by `σ^-_1` at site 1. -/
+theorem fermionMultiAnnihilation_creation_anticomm_zero_one
+    (N : ℕ) (hN : 1 ≤ N) :
+    fermionMultiAnnihilation N (0 : Fin (N + 1)) *
+        fermionMultiCreation N ⟨1, by omega⟩ +
+      fermionMultiCreation N ⟨1, by omega⟩ *
+        fermionMultiAnnihilation N 0 = 0 := by
+  rw [fermionMultiAnnihilation_zero]
+  have hjw : jwString N ⟨1, by omega⟩ = onSite (0 : Fin (N + 1)) pauliZ := by
+    have hfilter : (Finset.univ : Finset (Fin (N + 1))).filter
+        (fun j : Fin (N + 1) => j.val < (⟨1, by omega⟩ : Fin (N + 1)).val) =
+        ({(0 : Fin (N + 1))} : Finset (Fin (N + 1))) := by
+      ext k
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and,
+        Finset.mem_singleton]
+      refine ⟨fun h => ?_, fun h => ?_⟩
+      · apply Fin.ext
+        have : (k.val : ℕ) < 1 := h
+        have : (k.val : ℕ) = 0 := by omega
+        rw [this]; rfl
+      · rw [h]; show (0 : ℕ) < 1; omega
+    unfold jwString
+    rw [Finset.noncommProd_congr hfilter (fun _ _ => rfl)]
+    exact Finset.noncommProd_singleton _ _
+  show onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+        fermionMultiCreation N ⟨1, by omega⟩ +
+      fermionMultiCreation N ⟨1, by omega⟩ *
+        onSite (0 : Fin (N + 1)) spinHalfOpPlus = 0
+  unfold fermionMultiCreation
+  rw [hjw]
+  have h01 : (0 : Fin (N + 1)) ≠ ⟨1, by omega⟩ := by
+    intro h
+    have := Fin.val_eq_of_eq h
+    simp at this
+  have hfirst : onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+      (onSite (0 : Fin (N + 1)) pauliZ *
+        onSite (⟨1, by omega⟩ : Fin (N + 1)) spinHalfOpMinus) =
+        -(onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+          onSite (⟨1, by omega⟩ : Fin (N + 1)) spinHalfOpMinus) := by
+    rw [← Matrix.mul_assoc, onSite_mul_onSite_same, spinHalfOpPlus_mul_pauliZ]
+    rw [show (-spinHalfOpPlus : Matrix (Fin 2) (Fin 2) ℂ) = (-1 : ℂ) • spinHalfOpPlus
+      from by rw [neg_one_smul], onSite_smul, Matrix.smul_mul, neg_one_smul]
+  have hsecond : (onSite (0 : Fin (N + 1)) pauliZ *
+      onSite (⟨1, by omega⟩ : Fin (N + 1)) spinHalfOpMinus) *
+      onSite (0 : Fin (N + 1)) spinHalfOpPlus =
+        onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+          onSite (⟨1, by omega⟩ : Fin (N + 1)) spinHalfOpMinus := by
+    rw [Matrix.mul_assoc, onSite_mul_onSite_of_ne h01.symm, ← Matrix.mul_assoc,
+      onSite_mul_onSite_same, pauliZ_mul_spinHalfOpPlus]
+  rw [hfirst, hsecond, neg_add_cancel]
+
+/-- Mixed cross-site CAR on `Fin (N+1)`, `N ≥ 1`:
+`c_0† · c_1 + c_1 · c_0† = 0`. Obtained by `conjTranspose` of the
+previous. -/
+theorem fermionMultiCreation_annihilation_anticomm_zero_one
+    (N : ℕ) (hN : 1 ≤ N) :
+    fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiAnnihilation N ⟨1, by omega⟩ +
+      fermionMultiAnnihilation N ⟨1, by omega⟩ *
+        fermionMultiCreation N 0 = 0 := by
+  have h := fermionMultiAnnihilation_creation_anticomm_zero_one N hN
+  have h2 := congrArg Matrix.conjTranspose h
+  simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_mul,
+    fermionMultiAnnihilation_conjTranspose, fermionMultiCreation_conjTranspose,
+    Matrix.conjTranspose_zero] at h2
+  rw [show fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiAnnihilation N ⟨1, by omega⟩ +
+      fermionMultiAnnihilation N ⟨1, by omega⟩ *
+        fermionMultiCreation N (0 : Fin (N + 1)) =
+      fermionMultiAnnihilation N ⟨1, by omega⟩ *
+        fermionMultiCreation N (0 : Fin (N + 1)) +
+      fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiAnnihilation N ⟨1, by omega⟩
+    from add_comm _ _]
+  exact h2
+
 /-- Fourth off-diagonal CAR on `Fin 2`: `c_0† · c_1 + c_1 · c_0† = 0`.
 Obtained from PR #110's mixed annihilation/creation version by taking
 `conjTranspose`. Completes the 2-site off-diagonal CAR relations. -/

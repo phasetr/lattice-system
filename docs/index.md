@@ -631,6 +631,9 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionMultiAnnihilation_creation_anticomm_two_site_cross` | mixed cross-site: `c_0 · c_1† + c_1† · c_0 = 0` on `Fin 2` (same proof template as the annihilation-only version with `σ^+_1` replaced by `σ^-_1` at site 1) | `Fermion/JordanWigner.lean` |
 | `fermionMultiCreation_annihilation_anticomm_two_site_cross` | fourth off-diagonal CAR: `c_0† · c_1 + c_1 · c_0† = 0` on `Fin 2` (adjoint of the previous; completes the 2-site off-diagonal CAR relations) | `Fermion/JordanWigner.lean` |
 | `fermionMultiAnnihilation_anticomm_zero_one` | generalisation to any chain length: `c_0 · c_1 + c_1 · c_0 = 0` on `Fin (N+1)` for any `N ≥ 1` (the JW string at site 1 is uniformly `σ^z_0` independent of `N`) | `Fermion/JordanWigner.lean` |
+| `fermionMultiCreation_anticomm_zero_one` | dual: `c_0† · c_1† + c_1† · c_0† = 0` on `Fin (N+1)`, `N ≥ 1` (adjoint of the above) | `Fermion/JordanWigner.lean` |
+| `fermionMultiAnnihilation_creation_anticomm_zero_one` | mixed: `c_0 · c_1† + c_1† · c_0 = 0` on `Fin (N+1)`, `N ≥ 1` | `Fermion/JordanWigner.lean` |
+| `fermionMultiCreation_annihilation_anticomm_zero_one` | mixed dual: `c_0† · c_1 + c_1 · c_0† = 0` on `Fin (N+1)`, `N ≥ 1` | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
