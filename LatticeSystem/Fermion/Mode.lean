@@ -176,12 +176,14 @@ theorem fermionNumber_mulVec_occupied :
 
 /-! ## Identification with spin-1/2 raising / lowering operators
 
-In the computational basis, the single-mode fermion creation /
-annihilation operators are exactly the spin-1/2 raising / lowering
-operators:
+In the computational basis, with the convention
+`|0⟩ = e₀ = spin-up`, `|1⟩ = e₁ = spin-down`, the single-mode
+fermion creation / annihilation operators are exactly the spin-1/2
+raising / lowering operators:
 
-  `c = σ^+`  (annihilation = raising)
-  `c† = σ^-` (creation = lowering)
+  `c = |0⟩⟨1| = σ^+`  (annihilation in fermion language ≡ raising
+                       from down to up in spin language)
+  `c† = |1⟩⟨0| = σ^-` (creation ≡ lowering from up to down)
 
 This is the algebraic basis of the Jordan–Wigner mapping that lifts
 the single-mode CAR algebra to the multi-mode case using the existing
