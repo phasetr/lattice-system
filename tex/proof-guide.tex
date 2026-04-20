@@ -1927,6 +1927,42 @@ all natural-power moments, the algebraic foundation of the canonical
 moment-generating function and cumulant expansion.
 \end{proof}
 
+\subsection{Variance}
+\label{subsec:gibbs-variance}
+
+\emph{Reference:} Tasaki~\cite{Tasaki:QMB}, §3.3 (canonical-ensemble
+fluctuations).
+
+\begin{definition}[\texttt{gibbsVariance}]
+The canonical-ensemble \emph{variance} of an observable $O$ at
+inverse temperature $\beta$ under Hamiltonian $H$ is
+\[
+  \operatorname{Var}_\beta(O)
+  \;:=\;
+  \langle O \cdot O \rangle_\beta - \langle O \rangle_\beta^2.
+\]
+\end{definition}
+
+\begin{lemma}[\texttt{gibbsVariance\_im\_of\_isHermitian}]
+For Hermitian $H$ and Hermitian observable $O$,
+$\Im\operatorname{Var}_\beta(O) = 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Both $\langle O \cdot O \rangle_\beta$ (by
+\texttt{gibbsExpectation\_sq\_im\_of\_isHermitian}) and
+$\langle O \rangle_\beta$ (by
+\texttt{gibbsExpectation\_im\_of\_isHermitian}) are real. The square
+of a real complex number $z$ has imaginary part $2 \cdot \Re z \cdot \Im z = 0$
+(here computed by \texttt{Complex.mul\_im} after the \texttt{pow\_two}
+unfold). The difference of two reals is real
+(\texttt{Complex.sub\_im}).
+
+Non-negativity $\operatorname{Var}_\beta(O) \geq 0$ requires the
+spectral / CFC infrastructure (positivity of $\rho_\beta$) and is
+deferred.
+\end{proof}
+
 \subsection{Anticommutator real, commutator purely imaginary}
 \label{subsec:gibbs-anti-comm}
 

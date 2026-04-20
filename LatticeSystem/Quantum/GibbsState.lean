@@ -42,6 +42,9 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
   `(⟨O · O⟩_β).im = 0` (variance precursor).
 * `gibbsExpectation_pow_im_of_isHermitian` — for Hermitian `H, O` and
   any `n : ℕ`, `(⟨O ^ n⟩_β).im = 0` (all natural-power moments real).
+* `gibbsVariance β H O` — canonical-ensemble variance
+  `⟨O²⟩_β − (⟨O⟩_β)²` and its realness for Hermitian observables
+  (`gibbsVariance_im_of_isHermitian`).
 * `Matrix.trace_mul_conjTranspose_swap_of_isHermitian` — generic
   helper: for Hermitian `ρ`, `star Tr(ρ · X) = Tr(ρ · Xᴴ)`.
 * `gibbsExpectation_star_swap_of_isHermitian` — for Hermitian `H, A, B`,
@@ -459,6 +462,36 @@ theorem gibbsExpectation_pow_im_of_isHermitian {H O : ManyBodyOp Λ}
     (hH : H.IsHermitian) (hO : O.IsHermitian) (β : ℝ) (n : ℕ) :
     (gibbsExpectation β H (O ^ n)).im = 0 :=
   gibbsExpectation_im_of_isHermitian hH (hO.pow n) β
+
+/-! ## Variance -/
+
+/-- The canonical-ensemble variance of an observable `O` at inverse
+temperature `β` under Hamiltonian `H`:
+`Var_β(O) := ⟨O²⟩_β − (⟨O⟩_β)²`. -/
+noncomputable def gibbsVariance (β : ℝ) (H O : ManyBodyOp Λ) : ℂ :=
+  gibbsExpectation β H (O * O) - (gibbsExpectation β H O) ^ 2
+
+/-- Unfolding lemma: `Var_β(O) = ⟨O · O⟩_β − ⟨O⟩_β²`. -/
+theorem gibbsVariance_eq (β : ℝ) (H O : ManyBodyOp Λ) :
+    gibbsVariance β H O =
+      gibbsExpectation β H (O * O) - (gibbsExpectation β H O) ^ 2 :=
+  rfl
+
+/-- For Hermitian Gibbs `H` and Hermitian observable `O`, the variance
+is real. The second moment is real by `gibbsExpectation_sq_im_of_isHermitian`,
+the squared first moment by squaring a real complex number, and the
+difference of two reals is real. -/
+theorem gibbsVariance_im_of_isHermitian {H O : ManyBodyOp Λ}
+    (hH : H.IsHermitian) (hO : O.IsHermitian) (β : ℝ) :
+    (gibbsVariance β H O).im = 0 := by
+  unfold gibbsVariance
+  have h1 : (gibbsExpectation β H (O * O)).im = 0 :=
+    gibbsExpectation_sq_im_of_isHermitian hH hO β
+  have h2 : (gibbsExpectation β H O).im = 0 :=
+    gibbsExpectation_im_of_isHermitian hH hO β
+  have h2sq : ((gibbsExpectation β H O) ^ 2).im = 0 := by
+    rw [pow_two, Complex.mul_im, h2, zero_mul, mul_zero, add_zero]
+  rw [Complex.sub_im, h1, h2sq, sub_zero]
 
 /-! ## Anticommutator real, commutator purely imaginary
 
