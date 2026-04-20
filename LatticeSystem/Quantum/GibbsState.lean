@@ -493,6 +493,15 @@ theorem gibbsVariance_im_of_isHermitian {H O : ManyBodyOp Λ}
     rw [pow_two, Complex.mul_im, h2, zero_mul, mul_zero, add_zero]
   rw [Complex.sub_im, h1, h2sq, sub_zero]
 
+/-- At `β = 0`, the variance reduces to the normalised-trace formula
+`Var_0(O) = (1/dim) · Tr(O²) − ((1/dim) · Tr O)²`. -/
+theorem gibbsVariance_zero (H O : ManyBodyOp Λ) :
+    gibbsVariance 0 H O =
+      ((Fintype.card (Λ → Fin 2) : ℂ))⁻¹ * (O * O).trace
+        - (((Fintype.card (Λ → Fin 2) : ℂ))⁻¹ * O.trace) ^ 2 := by
+  unfold gibbsVariance
+  rw [gibbsExpectation_zero, gibbsExpectation_zero]
+
 /-! ## Anticommutator real, commutator purely imaginary
 
 For Hermitian `ρ` and arbitrary `X`,

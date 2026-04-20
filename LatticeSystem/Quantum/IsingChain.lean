@@ -232,4 +232,12 @@ theorem quantumIsingGibbsExpectation_self_eq (β J h : ℝ) (N : ℕ) :
   rw [gibbsExpectation_add, gibbsExpectation_smul, gibbsExpectation_sum,
     gibbsExpectation_smul, gibbsExpectation_sum]
 
+/-- Ising-chain energy variance is real: `(Var_β(H_Ising)).im = 0`. -/
+theorem quantumIsingGibbsHamiltonianVariance_im (β J h : ℝ) (N : ℕ) :
+    (gibbsVariance β (quantumIsingHamiltonian N J h)
+        (quantumIsingHamiltonian N J h)).im = 0 :=
+  gibbsVariance_im_of_isHermitian
+    (quantumIsingHamiltonian_isHermitian N J h)
+    (quantumIsingHamiltonian_isHermitian N J h) β
+
 end LatticeSystem.Quantum

@@ -992,6 +992,7 @@ For the open Ising Hamiltonian $H_{J,h}^{N+1}$:
     $\Im\langle A B + B A \rangle_\beta = 0$.
   \item For any Hermitian $A, B$,
     $\Re\langle A B - B A \rangle_\beta = 0$.
+  \item $\Im\operatorname{Var}_\beta(H) = 0$ (energy variance real).
 \end{enumerate}
 Lean names:
 \texttt{quantumIsingGibbsExpectation\_im\_of\_isHermitian},
@@ -1001,7 +1002,8 @@ Lean names:
 \texttt{quantumIsingGibbsExpectation\_hamiltonian\_sq\_im},
 \texttt{quantumIsingGibbsExpectation\_hamiltonian\_pow\_im},
 \texttt{quantumIsingGibbsExpectation\_anticommutator\_im},
-\texttt{quantumIsingGibbsExpectation\_commutator\_re}.
+\texttt{quantumIsingGibbsExpectation\_commutator\_re},
+\texttt{quantumIsingGibbsHamiltonianVariance\_im}.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
@@ -1963,6 +1965,23 @@ spectral / CFC infrastructure (positivity of $\rho_\beta$) and is
 deferred.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsVariance\_zero}]
+At infinite temperature ($\beta = 0$),
+\[
+  \operatorname{Var}_0(O)
+  \;=\;
+  \dim^{-1} \operatorname{Tr}(O^2)
+  - \bigl(\dim^{-1} \operatorname{Tr}(O)\bigr)^2.
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Substitute the $\beta = 0$ closed form
+$\langle A \rangle_0 = \dim^{-1} \cdot \operatorname{Tr}(A)$
+(\texttt{gibbsExpectation\_zero}) into the variance definition for both
+the second-moment and first-moment occurrences.
+\end{proof}
+
 \subsection{Anticommutator real, commutator purely imaginary}
 \label{subsec:gibbs-anti-comm}
 
@@ -2202,6 +2221,7 @@ For both the open and periodic Heisenberg Hamiltonians:
     $\Im\langle A B + B A \rangle_\beta = 0$ (anticommutator real).
   \item For any Hermitian $A, B$,
     $\Re\langle A B - B A \rangle_\beta = 0$ (commutator purely imaginary).
+  \item $\Im\operatorname{Var}_\beta(H) = 0$ (energy variance real).
 \end{enumerate}
 Lean names (open chain):
 \texttt{openChainHeisenbergGibbsExpectation\_im\_of\_isHermitian},
@@ -2211,7 +2231,8 @@ Lean names (open chain):
 \texttt{openChainHeisenbergGibbsExpectation\_hamiltonian\_sq\_im},
 \texttt{openChainHeisenbergGibbsExpectation\_hamiltonian\_pow\_im},
 \texttt{openChainHeisenbergGibbsExpectation\_anticommutator\_im},
-\texttt{openChainHeisenbergGibbsExpectation\_commutator\_re};
+\texttt{openChainHeisenbergGibbsExpectation\_commutator\_re},
+\texttt{openChainHeisenbergGibbsHamiltonianVariance\_im};
 analogous for the periodic chain.
 \end{theorem}
 
