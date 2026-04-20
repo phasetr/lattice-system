@@ -943,11 +943,10 @@ Heisenberg Hamiltonian commutes with every global rotation
 `Û^(α)_θ = exp(-iθ Ŝ_tot^α)`. Composing with the constant-config
 eigenvector `heisenbergHamiltonian_mulVec_basisVec_const` then shows
 that the rotated state `Û^(α)_θ · |s..s⟩` shares the H-eigenvalue
-with `|s..s⟩` (single-axis form). The composition into the
+with `|s..s⟩` (single-axis form). Composing axes 2 and 3 gives the
 spin-coherent state `|Ξ_θ,ϕ⟩ = Û^(3)_ϕ · Û^(2)_θ · |Φ↑⟩` of Tasaki
-eq. (2.4.6)/(2.4.7) follows as an immediate corollary by applying
-the rotated-state lemma twice; that two-step composition is not
-formalised here. -/
+eq. (2.4.6)/(2.4.7), formalised as
+`heisenbergHamiltonian_mulVec_totalSpinHalfRot32_basisVec_const` below. -/
 
 /-- The Heisenberg Hamiltonian commutes with the global rotation
 `Û^(1)_θ = exp(-iθ Ŝ_tot^(1))` for any `θ : ℝ`. -/
@@ -1013,6 +1012,25 @@ theorem heisenbergHamiltonian_mulVec_totalSpinHalfRot3_basisVec_const
         (totalSpinHalfRot3 Λ θ).mulVec (basisVec (fun _ : Λ => s)) := by
   rw [Matrix.mulVec_mulVec, (heisenbergHamiltonian_commute_totalSpinHalfRot3 J θ),
     ← Matrix.mulVec_mulVec, heisenbergHamiltonian_mulVec_basisVec_const,
+    Matrix.mulVec_smul]
+
+/-- Two-step rotated constant-spin state shares the H-eigenvalue: the
+spin-coherent state of Tasaki §2.4 eq. (2.4.6), p. 33,
+`|Ξ_θ,ϕ⟩ = Û^(3)_ϕ · Û^(2)_θ · |Φ↑⟩` (specialised at `s = 0`), is an
+H-eigenvector with the same eigenvalue as the original constant
+configuration. This is Tasaki eq. (2.4.7) for `S = 1/2`. -/
+theorem heisenbergHamiltonian_mulVec_totalSpinHalfRot32_basisVec_const
+    (J : Λ → Λ → ℂ) (θ ϕ : ℝ) (s : Fin 2) :
+    (heisenbergHamiltonian J).mulVec
+        ((totalSpinHalfRot3 Λ ϕ).mulVec
+          ((totalSpinHalfRot2 Λ θ).mulVec (basisVec (fun _ : Λ => s)))) =
+      (∑ x : Λ, ∑ y : Λ,
+          J x y * (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ))) •
+        (totalSpinHalfRot3 Λ ϕ).mulVec
+          ((totalSpinHalfRot2 Λ θ).mulVec (basisVec (fun _ : Λ => s))) := by
+  rw [Matrix.mulVec_mulVec, (heisenbergHamiltonian_commute_totalSpinHalfRot3 J ϕ),
+    ← Matrix.mulVec_mulVec,
+    heisenbergHamiltonian_mulVec_totalSpinHalfRot2_basisVec_const,
     Matrix.mulVec_smul]
 
 /-! ## Two-site singlet / triplet Casimir eigenvalues
