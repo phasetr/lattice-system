@@ -85,6 +85,34 @@ theorem jwString_zero (N : ℕ) :
   unfold jwString
   simp
 
+/-- Recursive factorisation of the JW string: adding a new site `i`
+at the right extends the product by one `σ^z_i` factor.
+`jwString N ⟨i.val + 1, _⟩ = jwString N i * onSite i pauliZ`. -/
+theorem jwString_succ_eq (N : ℕ) (i : Fin (N + 1)) (hi : i.val + 1 < N + 1) :
+    jwString N ⟨i.val + 1, hi⟩ = jwString N i * onSite i pauliZ := by
+  unfold jwString
+  have hfilter : (Finset.univ : Finset (Fin (N + 1))).filter
+      (fun j => j.val < (⟨i.val + 1, hi⟩ : Fin (N + 1)).val) =
+      insert i ((Finset.univ : Finset (Fin (N + 1))).filter
+        (fun j => j.val < i.val)) := by
+    ext k
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert]
+    constructor
+    · intro h
+      show k = i ∨ k.val < i.val
+      by_cases heq : k.val = i.val
+      · exact Or.inl (Fin.ext heq)
+      · exact Or.inr (by omega)
+    · intro h
+      rcases h with h | h
+      · rw [h]; exact Nat.lt_succ_self _
+      · exact Nat.lt_succ_of_lt h
+  have hi_notmem : i ∉ (Finset.univ : Finset (Fin (N + 1))).filter
+      (fun j => j.val < i.val) := by
+    simp
+  rw [Finset.noncommProd_congr hfilter (fun _ _ => rfl)]
+  rw [Finset.noncommProd_insert_of_notMem' _ _ _ _ hi_notmem]
+
 /-! ## Multi-mode creation and annihilation operators -/
 
 /-- The multi-mode fermion annihilation operator at site `i`:
