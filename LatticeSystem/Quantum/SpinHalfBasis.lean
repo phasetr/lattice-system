@@ -79,6 +79,24 @@ theorem spinHalfOpMinus_eq_sub :
     simp [spinHalfOpMinus, spinHalfOp1, spinHalfOp2, pauliX, pauliY] <;>
     ring_nf <;> (try rw [Complex.I_sq]) <;> ring
 
+/-- `σ^+ · σ^z = -σ^+`: the raising operator anticommutes with `σ^z`
+(right multiplication flips the sign, since `σ^+` maps the down state
+`|↓⟩` to `|↑⟩`, and `|↓⟩` has `σ^z`-eigenvalue `-1`). -/
+theorem spinHalfOpPlus_mul_pauliZ :
+    spinHalfOpPlus * pauliZ = -spinHalfOpPlus := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinHalfOpPlus, pauliZ, Matrix.mul_apply, Fin.sum_univ_two]
+
+/-- `σ^z · σ^+ = σ^+`: the raising operator commutes with `σ^z`
+on the left (left multiplication preserves the sign, since `σ^+ |↓⟩
+= |↑⟩` has `σ^z`-eigenvalue `+1`). -/
+theorem pauliZ_mul_spinHalfOpPlus :
+    pauliZ * spinHalfOpPlus = spinHalfOpPlus := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinHalfOpPlus, pauliZ, Matrix.mul_apply, Fin.sum_univ_two]
+
 /-! ## Raising/lowering actions (Tasaki eq 2.1.5, p. 14) -/
 
 /-- `Ŝ^+ |ψ^↑⟩ = 0`. -/
