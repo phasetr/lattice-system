@@ -1293,6 +1293,36 @@ theorem fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne
         (spinHalfOpMinus * spinHalfOpPlus) pauliZ
   exact hcomm_onSite_i_jwString.mul_right hcomm_onSite_i_j
 
+/-- `[N̂, c_j] = -c_j`: the total particle-number operator shifts
+annihilation operators down by one. Sum of the diagonal contribution
+`[n_j, c_j] = -c_j` with the vanishing off-diagonal terms `[n_i, c_j] = 0`
+for `i ≠ j`. -/
+theorem fermionTotalNumber_commutator_fermionMultiAnnihilation
+    (N : ℕ) (j : Fin (N + 1)) :
+    fermionTotalNumber N * fermionMultiAnnihilation N j -
+        fermionMultiAnnihilation N j * fermionTotalNumber N =
+      -fermionMultiAnnihilation N j := by
+  unfold fermionTotalNumber
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  rw [show (∑ i : Fin (N + 1),
+        (fermionMultiNumber N i * fermionMultiAnnihilation N j -
+          fermionMultiAnnihilation N j * fermionMultiNumber N i)) =
+      (fermionMultiNumber N j * fermionMultiAnnihilation N j -
+          fermionMultiAnnihilation N j * fermionMultiNumber N j) from by
+    rw [← Finset.sum_erase_add _ _ (Finset.mem_univ j)]
+    rw [show (∑ i ∈ (Finset.univ : Finset (Fin (N + 1))).erase j,
+          (fermionMultiNumber N i * fermionMultiAnnihilation N j -
+            fermionMultiAnnihilation N j * fermionMultiNumber N i)) = 0 from by
+      apply Finset.sum_eq_zero
+      intro i hi
+      rw [Finset.mem_erase] at hi
+      have h : fermionMultiNumber N i * fermionMultiAnnihilation N j =
+          fermionMultiAnnihilation N j * fermionMultiNumber N i :=
+        (fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne hi.1)
+      rw [h, sub_self]]
+    rw [zero_add]]
+  exact fermionMultiNumber_commutator_fermionMultiAnnihilation_self N j
+
 /-- Dual: `Commute (n_i) (c_j†)` for `i ≠ j`. Direct consequence of
 `fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne` by taking
 matrix `conjTranspose`. -/
