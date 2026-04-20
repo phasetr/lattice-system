@@ -834,6 +834,54 @@ theorem heisenbergHamiltonian_mulVec_basisVec_all_down (J : Λ → Λ → ℂ) :
         basisVec (fun _ : Λ => (1 : Fin 2)) :=
   heisenbergHamiltonian_mulVec_basisVec_const J 1
 
+/-! ## Eigenvalue propagation under Ŝ_tot^± (Tasaki §2.4 (2.4.7)/(2.4.9))
+
+Since `[H, Ŝ_tot^±] = 0` for any Heisenberg-type Hamiltonian
+(`heisenbergHamiltonian_commutator_totalSpinHalfOp{Plus,Minus}`), and
+the constant configuration `|s s … s⟩` is an `H`-eigenvector
+(`heisenbergHamiltonian_mulVec_basisVec_const`), the lowered state
+`Ŝ_tot^- · |s s … s⟩` is again an `H`-eigenvector with the same
+eigenvalue. Iterating gives the entire ferromagnetic ground-state
+ladder `(Ŝ_tot^-)^k · |Φ↑⟩ ∝ |Φ_M⟩` of Tasaki eq. (2.4.9). -/
+
+/-- Eigenvalue propagation under `Ŝ_tot^+`: applying the global raising
+operator to a constant-spin basis state preserves the H-eigenvalue.
+This is a direct corollary of the SU(2) invariance of every Heisenberg
+Hamiltonian (Tasaki §2.4, eq. (2.4.7), p. 33). The companion `_Minus_`
+result is the explicit lowering ladder Tasaki uses in eq. (2.4.9). -/
+theorem heisenbergHamiltonian_mulVec_totalSpinHalfOpPlus_basisVec_const
+    (J : Λ → Λ → ℂ) (s : Fin 2) :
+    (heisenbergHamiltonian J).mulVec
+        ((totalSpinHalfOpPlus Λ).mulVec (basisVec (fun _ : Λ => s))) =
+      (∑ x : Λ, ∑ y : Λ,
+          J x y * (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ))) •
+        (totalSpinHalfOpPlus Λ).mulVec (basisVec (fun _ : Λ => s)) := by
+  have hcomm := heisenbergHamiltonian_commutator_totalSpinHalfOpPlus J
+  have hcomm' : heisenbergHamiltonian J * totalSpinHalfOpPlus Λ =
+      totalSpinHalfOpPlus Λ * heisenbergHamiltonian J :=
+    sub_eq_zero.mp hcomm
+  rw [Matrix.mulVec_mulVec, hcomm', ← Matrix.mulVec_mulVec,
+    heisenbergHamiltonian_mulVec_basisVec_const, Matrix.mulVec_smul]
+
+/-- Eigenvalue propagation under `Ŝ_tot^-`: applying the global lowering
+operator to a constant-spin basis state preserves the H-eigenvalue.
+Tasaki §2.4 eqs. (2.4.7)/(2.4.9), p. 33, for `S = 1/2`. This is the
+ladder step generating the ferromagnetic ground states `|Φ_M⟩` from
+`|Φ↑⟩` in eq. (2.4.9). -/
+theorem heisenbergHamiltonian_mulVec_totalSpinHalfOpMinus_basisVec_const
+    (J : Λ → Λ → ℂ) (s : Fin 2) :
+    (heisenbergHamiltonian J).mulVec
+        ((totalSpinHalfOpMinus Λ).mulVec (basisVec (fun _ : Λ => s))) =
+      (∑ x : Λ, ∑ y : Λ,
+          J x y * (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ))) •
+        (totalSpinHalfOpMinus Λ).mulVec (basisVec (fun _ : Λ => s)) := by
+  have hcomm := heisenbergHamiltonian_commutator_totalSpinHalfOpMinus J
+  have hcomm' : heisenbergHamiltonian J * totalSpinHalfOpMinus Λ =
+      totalSpinHalfOpMinus Λ * heisenbergHamiltonian J :=
+    sub_eq_zero.mp hcomm
+  rw [Matrix.mulVec_mulVec, hcomm', ← Matrix.mulVec_mulVec,
+    heisenbergHamiltonian_mulVec_basisVec_const, Matrix.mulVec_smul]
+
 /-! ## Two-site singlet / triplet Casimir eigenvalues
 
 For `Λ = Fin 2`, the natural anti-parallel basis state `|↑↓⟩` satisfies:
