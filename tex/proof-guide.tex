@@ -2911,8 +2911,8 @@ $s \in \{0,1\}$,
 Composing two axes (axis~2 then axis~3, as in Tasaki eq.~(2.4.6)) gives
 $\hat H \cdot |\Xi_{\theta,\phi}\rangle
    = c_{J} \cdot |\Xi_{\theta,\phi}\rangle$
-of Tasaki eq.~(2.4.7).  This composition is not formalised here; see
-the remark below.
+of Tasaki eq.~(2.4.7).  This composition is formalised below as
+\texttt{heisenbergHamiltonian\_mulVec\_totalSpinHalfRot32\_basisVec\_const}.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
@@ -2924,14 +2924,34 @@ constant-config eigenvalue
 product, and \texttt{Matrix.mulVec\_smul} to pull the scalar out.
 \end{proof}
 
-\begin{remark}[Toward $|\Xi_{\theta,\phi}\rangle$]
-A single axis-$\alpha$ rotation here lies one composition short of the
-two-axis rotation $\hat U^{(3)}_{\phi}\hat U^{(2)}_{\theta}$ used in
-Tasaki eq.~(2.4.6).  The composition follows by applying the theorem
-twice: first to pass $\hat H$ past $\hat U^{(2)}_{\theta}$, then past
-$\hat U^{(3)}_{\phi}$, since both rotations commute with the
-SU(2)-invariant Hamiltonian.
-\end{remark}
+\begin{theorem}[\texttt{heisenbergHamiltonian\_mulVec\_totalSpinHalfRot32\_basisVec\_const}]
+For every $J : \Lambda \to \Lambda \to \mathbb{C}$, every
+$\theta,\phi \in \mathbb{R}$, and every $s \in \{0,1\}$,
+\[
+  \texttt{heisenbergHamiltonian}\,J \cdot
+    \bigl(\hat U^{(3)}_{\phi} \cdot \hat U^{(2)}_{\theta}
+            \cdot |s\,s\,\dots\,s\rangle\bigr)
+  \;=\;
+  c_{J}\;
+    \bigl(\hat U^{(3)}_{\phi} \cdot \hat U^{(2)}_{\theta}
+            \cdot |s\,s\,\dots\,s\rangle\bigr).
+\]
+Specialised to $s = 0$, this is Tasaki eq.~(2.4.7) for the
+spin-coherent state $|\Xi_{\theta,\phi}\rangle = \hat U^{(3)}_{\phi}
+\hat U^{(2)}_{\theta} |\Phi^{\uparrow}\rangle$ of eq.~(2.4.6).
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Apply the single-axis rotated-eigenvector lemma (above) twice.
+Using \texttt{Matrix.mulVec\_mulVec} merge $\hat H \cdot \hat
+U^{(3)}_{\phi}$, swap them via
+\texttt{heisenbergHamiltonian\_commute\_totalSpinHalfRot3}, expand
+back to $\hat U^{(3)}_{\phi} \cdot (\hat H \cdot \hat U^{(2)}_{\theta}
+\cdot |s\,s\,\dots\,s\rangle)$, then invoke
+\texttt{heisenbergHamiltonian\_mulVec\_totalSpinHalfRot2\_basisVec\_const}
+on the inner application and pull the resulting scalar out via
+\texttt{Matrix.mulVec\_smul}.
+\end{proof}
 
 %======================================================================
 \section{Single-mode fermion (Phase 2 skeleton)}
