@@ -2916,10 +2916,34 @@ matrix is manifestly Hermitian (real-diagonal) and idempotent
 \texttt{onSite\_mul\_onSite\_same}.
 \end{proof}
 
+\subsection{Same-site canonical anticommutation}
+
+\begin{lemma}[\texttt{fermionMultiAnticomm\_self}]
+$\{c_i, c_i^\dagger\} = c_i \cdot c_i^\dagger + c_i^\dagger \cdot c_i = I$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Both products rearrange as
+$(J \sigma^\pm)(J \sigma^\mp)
+ = J (\sigma^\pm J) \sigma^\mp
+ = J (J \sigma^\pm) \sigma^\mp
+ = J^2 (\sigma^\pm \sigma^\mp)$,
+using \texttt{jwString\_commute\_onSite} for the middle commutation.
+After \texttt{jwString\_sq} reduces $J^2$ to $I$ and
+\texttt{onSite\_mul\_onSite\_same} folds the products into the single
+site, the sum becomes
+$\texttt{onSite}\,i\,(\sigma^+\sigma^- + \sigma^-\sigma^+)
+ = \texttt{onSite}\,i\,I = I$
+via \texttt{onSite\_add} and the small auxiliary
+\texttt{spinHalfOpPlus\_anticomm\_spinHalfOpMinus} (a $2\times 2$
+\texttt{fin\_cases} computation showing the spin raising/lowering
+anticommutator equals the identity).
+\end{proof}
+
 \subsection*{Deferred: cross-site CAR}
 
 The cross-site relations
-$\{c_i, c_j^\dagger\} = \delta_{ij} \cdot I$ and
+$\{c_i, c_j^\dagger\} = 0$ for $i \neq j$ and
 $\{c_i, c_j\} = 0$ for $i \neq j$ are deferred to follow-up PRs.
 They require careful tracking of sign cancellations from the JW
 string $\sigma^z$ acting on intermediate sites between $i$ and $j$.
