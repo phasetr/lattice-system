@@ -3027,6 +3027,52 @@ $\sum_{x} \tfrac{1}{2} \mapsto \sum_{x} (-\tfrac{1}{2}) =
 + v = (c+1)\,v$ in place of subtraction.
 \end{proof}
 
+\begin{theorem}[\texttt{totalSpinHalfSquared\_mulVec\_totalSpinHalfOpMinus\_pow\_basisVec\_const}]
+For every $s \in \{0,1\}$ and every $k \in \mathbb{N}$,
+\[
+  (\hat S_{\mathrm{tot}})^{2}
+    \cdot \bigl((\hat S_{\mathrm{tot}}^{-})^{k} \cdot
+                 |s\,s\,\dots\,s\rangle\bigr)
+  \;=\; S_{\max}(S_{\max}+1)\;
+    \bigl((\hat S_{\mathrm{tot}}^{-})^{k} \cdot
+            |s\,s\,\dots\,s\rangle\bigr),
+\]
+with $S_{\max} = |\Lambda|/2$.  The companion theorem holds with
+$\hat S_{\mathrm{tot}}^{+}$ replacing $\hat S_{\mathrm{tot}}^{-}$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Induction on $k$, identical template to the $\hat H$ case
+(\ref{subsec:heisenberg-ladder}): the base case is the constant-config
+Casimir eigenvalue $\hat S_{\mathrm{tot}}^{2}\,
+|s\,s\,\dots\,s\rangle = S_{\max}(S_{\max}+1)\,|s\,s\,\dots\,s\rangle$
+(\texttt{totalSpinHalfSquared\_mulVec\_basisVec\_const}); the step
+swaps $\hat S_{\mathrm{tot}}^{2}$ past $\hat S_{\mathrm{tot}}^{\mp}$
+via \texttt{totalSpinHalfSquared\_commutator\_totalSpinHalfOp\{Plus,Minus\}}
+(both zero, since $\hat S_{\mathrm{tot}}^{2}$ is the SU(2) Casimir),
+applies the inductive hypothesis, and pulls the scalar out via
+\texttt{Matrix.mulVec\_smul}.
+\end{proof}
+
+\begin{remark}[Simultaneous-eigenvector packaging]
+For the matched highest- and lowest-weight ladders, combining this
+Casimir invariance with the $\hat H$ ladder
+(\ref{subsec:heisenberg-ladder}) and the $\hat S_{\mathrm{tot}}^{(3)}$
+ladder (\ref{subsec:magnetic-ladder}) shows that
+$(\hat S_{\mathrm{tot}}^{-})^{k}\,|{\uparrow}\dots{\uparrow}\rangle$
+and $(\hat S_{\mathrm{tot}}^{+})^{k}\,|{\downarrow}\dots{\downarrow}\rangle$
+are simultaneous eigenvectors of $(\hat H,\,\hat S_{\mathrm{tot}}^{2},\,
+\hat S_{\mathrm{tot}}^{(3)})$ with eigenvalues
+$(c_{J},\,S_{\max}(S_{\max}+1),\,S_{\max}\mp k)$ — a complete SU(2)
+highest- (or lowest-) weight labelling.  The Casimir invariance holds
+for any constant configuration, but the matching $\hat
+S_{\mathrm{tot}}^{(3)}$ eigenvalue is only formalised for these
+matched ladders; for mismatched cases (e.g.\ $\hat
+S_{\mathrm{tot}}^{-}|{\downarrow}\dots{\downarrow}\rangle$) the
+iterates already vanish at $k = 1$, so the eigenvalue equation holds
+trivially.
+\end{remark}
+
 \begin{remark}[Magnetisation-subspace placement]
 Combining the two ladders with \texttt{mem\_magnetizationSubspace\_iff}
 yields
