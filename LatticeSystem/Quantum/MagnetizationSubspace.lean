@@ -229,4 +229,50 @@ theorem heisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem
   rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hv,
     Matrix.mulVec_smul]
 
+/-! ## Ladder operators shift magnetisation `H_M → H_{M ± 1}`
+
+The standard SU(2) ladder action: by the Cartan relations
+`[Ŝtot^(3), Ŝtot^±] = ±Ŝtot^±` (already in `TotalSpin.lean`), the
+raising operator `Ŝtot^+` increases the magnetisation eigenvalue by
+one (`H_M → H_{M+1}`) and the lowering operator `Ŝtot^-` decreases
+it by one (`H_M → H_{M-1}`). -/
+
+/-- `Ŝ^-_tot` shifts magnetisation by `-1`: if `v ∈ H_M` then
+`Ŝ^-_tot · v ∈ H_{M-1}`. -/
+theorem totalSpinHalfOpMinus_mulVec_mem_magnetizationSubspace_of_mem
+    {M : ℂ} {v : (Λ → Fin 2) → ℂ}
+    (hv : v ∈ magnetizationSubspace Λ M) :
+    (totalSpinHalfOpMinus Λ).mulVec v ∈ magnetizationSubspace Λ (M - 1) := by
+  rw [mem_magnetizationSubspace_iff] at hv ⊢
+  -- [Ŝtot^(3), Ŝtot^-] = -Ŝtot^- ⟹ Ŝtot^(3) · Ŝtot^- = Ŝtot^- · Ŝtot^(3) - Ŝtot^-
+  have h := totalSpinHalfOp3_commutator_totalSpinHalfOpMinus Λ
+  have hcomm : totalSpinHalfOp3 Λ * totalSpinHalfOpMinus Λ =
+      totalSpinHalfOpMinus Λ * totalSpinHalfOp3 Λ - totalSpinHalfOpMinus Λ := by
+    have hadd : totalSpinHalfOp3 Λ * totalSpinHalfOpMinus Λ =
+        (totalSpinHalfOp3 Λ * totalSpinHalfOpMinus Λ -
+          totalSpinHalfOpMinus Λ * totalSpinHalfOp3 Λ) +
+        totalSpinHalfOpMinus Λ * totalSpinHalfOp3 Λ := by abel
+    rw [hadd, h]; abel
+  rw [Matrix.mulVec_mulVec, hcomm, Matrix.sub_mulVec, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul, sub_smul, one_smul]
+
+/-- `Ŝ^+_tot` shifts magnetisation by `+1`: if `v ∈ H_M` then
+`Ŝ^+_tot · v ∈ H_{M+1}`. -/
+theorem totalSpinHalfOpPlus_mulVec_mem_magnetizationSubspace_of_mem
+    {M : ℂ} {v : (Λ → Fin 2) → ℂ}
+    (hv : v ∈ magnetizationSubspace Λ M) :
+    (totalSpinHalfOpPlus Λ).mulVec v ∈ magnetizationSubspace Λ (M + 1) := by
+  rw [mem_magnetizationSubspace_iff] at hv ⊢
+  -- [Ŝtot^(3), Ŝtot^+] = +Ŝtot^+ ⟹ Ŝtot^(3) · Ŝtot^+ = Ŝtot^+ · Ŝtot^(3) + Ŝtot^+
+  have h := totalSpinHalfOp3_commutator_totalSpinHalfOpPlus Λ
+  have hcomm : totalSpinHalfOp3 Λ * totalSpinHalfOpPlus Λ =
+      totalSpinHalfOpPlus Λ * totalSpinHalfOp3 Λ + totalSpinHalfOpPlus Λ := by
+    have hadd : totalSpinHalfOp3 Λ * totalSpinHalfOpPlus Λ =
+        (totalSpinHalfOp3 Λ * totalSpinHalfOpPlus Λ -
+          totalSpinHalfOpPlus Λ * totalSpinHalfOp3 Λ) +
+        totalSpinHalfOpPlus Λ * totalSpinHalfOp3 Λ := by abel
+    rw [hadd, h]; abel
+  rw [Matrix.mulVec_mulVec, hcomm, Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul, add_smul, one_smul]
+
 end LatticeSystem.Quantum
