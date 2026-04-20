@@ -2264,6 +2264,22 @@ follow from the symmetrisation identity
 \texttt{gibbsCovarianceSymm\_eq\_half\_add\_swap}.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsVariance\_add}]
+$\operatorname{Var}_\beta(A + B)
+ = \operatorname{Var}_\beta(A) + \operatorname{Var}_\beta(B)
+   + 2 \operatorname{Cov}^{\mathrm{s}}_\beta(A, B)$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Expand
+$(A + B)(A + B) = A^2 + A B + B A + B^2$
+via \texttt{add\_mul} / \texttt{mul\_add} / \texttt{abel}, push the
+expectation through with \texttt{simp [gibbsExpectation\_add]}, and
+close with \texttt{ring}.  The cross term collects into
+$\langle A B + B A \rangle_\beta$, which equals
+$2 \operatorname{Cov}^{\mathrm{s}}_\beta(A, B) + 2 \langle A \rangle_\beta \langle B \rangle_\beta$.
+\end{proof}
+
 \begin{lemma}[Symmetric / antisymmetric decomposition]
 $\operatorname{Cov}_\beta(A, B)
  = \operatorname{Cov}^{\mathrm{s}}_\beta(A, B)
