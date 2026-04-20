@@ -1963,6 +1963,30 @@ and the second by the cyclic property
 $\operatorname{Tr}(H (\rho_\beta A)) = \operatorname{Tr}((\rho_\beta A) H)$.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsExpectation\_mul\_comm\_of\_commute\_hamiltonian}]
+For any conserved quantity $A$ (i.e.\ $[A, H] = 0$) and any
+observable $O$,
+$\langle A O \rangle_\beta = \langle O A \rangle_\beta$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Generalisation of the previous lemma from $A = H$ to any conserved
+quantity.  The key observation is that $A$ commutes with the Gibbs
+state: $\rho_\beta = (1/Z) \cdot e^{-\beta H}$ is a power-series
+function of $H$, so
+\texttt{Commute.exp\_right} (with the scalar
+$-\beta$ inserted via \texttt{Commute.smul\_right}) gives
+$[A, e^{-\beta H}] = 0$, and \texttt{Commute.smul\_right}
+extends to $[A, \rho_\beta] = 0$.  Then
+$\operatorname{Tr}(\rho A O) = \operatorname{Tr}(A \rho O) =
+ \operatorname{Tr}(\rho O A)$,
+the latter by \texttt{Matrix.trace\_mul\_comm}.
+
+This is the algebraic statement that conserved quantities can be
+"factored through" the Gibbs expectation, the basis for selection
+rules and conservation-induced simplifications.
+\end{proof}
+
 \begin{lemma}[\texttt{gibbsExpectation\_commutator\_hamiltonian}]
 For any observable $A$,
 $\langle [H, A] \rangle_\beta = 0$.

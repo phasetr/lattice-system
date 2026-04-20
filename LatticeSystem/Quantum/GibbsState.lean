@@ -496,6 +496,20 @@ theorem gibbsExpectation_mul_hamiltonian_comm (β : ℝ) (H A : ManyBodyOp Λ) :
   rw [← Matrix.mul_assoc, (gibbsState_commute_hamiltonian β H).eq,
     Matrix.mul_assoc, Matrix.trace_mul_comm, Matrix.mul_assoc]
 
+/-- Generalisation of `gibbsExpectation_mul_hamiltonian_comm` to any
+conserved quantity `A`: when `[A, H] = 0`, `⟨A · O⟩_β = ⟨O · A⟩_β`
+for any observable `O`. The Gibbs state inherits the commutativity:
+`A` commutes with `gibbsExp β H` (via `Commute.exp_right`), and a
+fortiori with `gibbsState β H = (1/Z) • gibbsExp β H`. -/
+theorem gibbsExpectation_mul_comm_of_commute_hamiltonian (β : ℝ)
+    {H A : ManyBodyOp Λ} (hA : Commute A H) (O : ManyBodyOp Λ) :
+    gibbsExpectation β H (A * O) = gibbsExpectation β H (O * A) := by
+  have hρ : Commute A (gibbsState β H) :=
+    ((hA.smul_right (-(β : ℂ))).exp_right).smul_right _
+  unfold gibbsExpectation
+  rw [← Matrix.mul_assoc, hρ.eq.symm, Matrix.mul_assoc,
+    Matrix.trace_mul_comm, Matrix.mul_assoc]
+
 /-- The Gibbs expectation of any commutator with the Hamiltonian vanishes:
 `⟨[H, A]⟩_β = 0`. -/
 theorem gibbsExpectation_commutator_hamiltonian (β : ℝ) (H A : ManyBodyOp Λ) :
