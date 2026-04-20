@@ -176,6 +176,19 @@ theorem gibbsExp_add (β₁ β₂ : ℝ) (H : ManyBodyOp Λ) :
     push_cast; module
   rw [hsum, Matrix.exp_add_of_commute _ _ hcomm]
 
+/-- For commuting Hamiltonians `H₁, H₂`, the Gibbs exponential
+factorises: `e^{-β(H₁+H₂)} = e^{-βH₁} · e^{-βH₂}`. This is the basic
+identity behind exact decoupling, mean-field block decompositions, and
+the simplest cases of the Suzuki–Trotter formula (where the
+commutator-correction terms vanish). -/
+theorem gibbsExp_add_of_commute_hamiltonians (β : ℝ)
+    {H₁ H₂ : ManyBodyOp Λ} (h : Commute H₁ H₂) :
+    gibbsExp β (H₁ + H₂) = gibbsExp β H₁ * gibbsExp β H₂ := by
+  unfold gibbsExp
+  have hcomm : Commute (-(β : ℂ) • H₁) (-(β : ℂ) • H₂) :=
+    (h.smul_left _).smul_right _
+  rw [smul_add, Matrix.exp_add_of_commute _ _ hcomm]
+
 /-- `exp(βH) · exp(-βH) = 1`: the Gibbs exponential at `-β` is a left
 inverse of the one at `β`. -/
 theorem gibbsExp_neg_mul_self (β : ℝ) (H : ManyBodyOp Λ) :

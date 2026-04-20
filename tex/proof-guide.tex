@@ -1465,6 +1465,23 @@ multiples of the same $H$). Apply
 $-(\beta_1+\beta_2) H = -\beta_1 H + -\beta_2 H$.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsExp\_add\_of\_commute\_hamiltonians}]
+For commuting Hamiltonians $H_1, H_2$,
+$e^{-\beta (H_1 + H_2)} = e^{-\beta H_1} \cdot e^{-\beta H_2}$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The scalar multiples $-\beta H_1$ and $-\beta H_2$ commute (since
+$[H_1, H_2] = 0$).  Apply \texttt{Matrix.exp\_add\_of\_commute}
+after $-\beta(H_1 + H_2) = -\beta H_1 + -\beta H_2$ via
+\texttt{smul\_add}.
+
+The basic identity behind exact decoupling, mean-field block
+decompositions, and the simplest cases of the Suzuki–Trotter formula
+(where the commutator-correction terms vanish for commuting
+decompositions).
+\end{proof}
+
 \begin{lemma}[\texttt{gibbsExp\_neg\_mul\_self} / \texttt{gibbsExp\_self\_mul\_neg}]
 $e^{\beta H} \cdot e^{-\beta H} = e^{-\beta H} \cdot e^{\beta H} = I$.
 \end{lemma}
