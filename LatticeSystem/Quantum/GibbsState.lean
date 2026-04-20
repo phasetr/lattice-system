@@ -682,6 +682,50 @@ theorem gibbsCovarianceSymm_comm (β : ℝ) (H A B : ManyBodyOp Λ) :
   unfold gibbsCovarianceSymm
   rw [add_comm (A * B) (B * A), mul_comm (gibbsExpectation β H A)]
 
+/-! #### Bilinearity of the symmetric covariance -/
+
+/-- Additivity in the left argument:
+`Cov^s_β(A₁ + A₂, B) = Cov^s_β(A₁, B) + Cov^s_β(A₂, B)`. -/
+theorem gibbsCovarianceSymm_add_left (β : ℝ) (H A₁ A₂ B : ManyBodyOp Λ) :
+    gibbsCovarianceSymm β H (A₁ + A₂) B
+      = gibbsCovarianceSymm β H A₁ B + gibbsCovarianceSymm β H A₂ B := by
+  unfold gibbsCovarianceSymm
+  have hexp : (A₁ + A₂) * B + B * (A₁ + A₂)
+              = (A₁ * B + B * A₁) + (A₂ * B + B * A₂) := by
+    rw [add_mul, mul_add]; abel
+  rw [hexp, gibbsExpectation_add, gibbsExpectation_add,
+      gibbsExpectation_add (β := β) (H := H) A₁ A₂]
+  ring
+
+/-- Additivity in the right argument:
+`Cov^s_β(A, B₁ + B₂) = Cov^s_β(A, B₁) + Cov^s_β(A, B₂)`. -/
+theorem gibbsCovarianceSymm_add_right (β : ℝ) (H A B₁ B₂ : ManyBodyOp Λ) :
+    gibbsCovarianceSymm β H A (B₁ + B₂)
+      = gibbsCovarianceSymm β H A B₁ + gibbsCovarianceSymm β H A B₂ := by
+  rw [gibbsCovarianceSymm_comm β H A (B₁ + B₂),
+      gibbsCovarianceSymm_add_left,
+      gibbsCovarianceSymm_comm β H B₁ A, gibbsCovarianceSymm_comm β H B₂ A]
+
+/-- Scalar pull-out from the left argument:
+`Cov^s_β(c • A, B) = c · Cov^s_β(A, B)`. -/
+theorem gibbsCovarianceSymm_smul_left (β : ℝ) (H : ManyBodyOp Λ) (c : ℂ)
+    (A B : ManyBodyOp Λ) :
+    gibbsCovarianceSymm β H (c • A) B = c * gibbsCovarianceSymm β H A B := by
+  unfold gibbsCovarianceSymm
+  have hexp : (c • A) * B + B * (c • A) = c • (A * B + B * A) := by
+    rw [Matrix.smul_mul, Matrix.mul_smul, smul_add]
+  rw [hexp, gibbsExpectation_smul, gibbsExpectation_smul]
+  ring
+
+/-- Scalar pull-out from the right argument:
+`Cov^s_β(A, c • B) = c · Cov^s_β(A, B)`. -/
+theorem gibbsCovarianceSymm_smul_right (β : ℝ) (H A : ManyBodyOp Λ) (c : ℂ)
+    (B : ManyBodyOp Λ) :
+    gibbsCovarianceSymm β H A (c • B) = c * gibbsCovarianceSymm β H A B := by
+  rw [gibbsCovarianceSymm_comm β H A (c • B),
+      gibbsCovarianceSymm_smul_left,
+      gibbsCovarianceSymm_comm β H B A]
+
 /-- For Hermitian `H` and Hermitian `A, B`, the symmetric covariance
 is real. The anticommutator term is real by
 `gibbsExpectation_anticommutator_im` (the (1/2) prefactor preserves
