@@ -260,35 +260,6 @@ private lemma noncommProd_sq_of_pairwise_commute_of_sq_one
             ← hcomm_a.eq, Matrix.mul_assoc, Matrix.mul_assoc]]
     rw [hSq a (Finset.mem_insert_self a t), Matrix.one_mul, ih hcomm_t hSq_t]
 
-/-- `onSite i 1 = 1` (the site embedding of the identity is the
-identity). -/
-private lemma onSite_one {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
-    (i : Λ) :
-    (onSite i (1 : Matrix (Fin 2) (Fin 2) ℂ) : ManyBodyOp Λ) = 1 := by
-  ext σ' σ
-  simp only [onSite_apply, Matrix.one_apply]
-  by_cases h : ∀ k, k ≠ i → σ' k = σ k
-  · rw [if_pos h]
-    by_cases hi : σ' i = σ i
-    · rw [if_pos hi, if_pos]
-      funext k
-      by_cases hk : k = i
-      · rw [hk]; exact hi
-      · exact h k hk
-    · rw [if_neg hi]
-      symm
-      rw [if_neg]
-      intro hσ
-      apply hi
-      rw [hσ]
-  · rw [if_neg h]
-    symm
-    rw [if_neg]
-    intro hσ
-    apply h
-    intro k _
-    rw [hσ]
-
 /-- `(jwString N i)² = 1`: the JW string squares to the identity, since
 each `σ^z` factor satisfies `(σ^z)² = 1`. -/
 theorem jwString_sq (N : ℕ) (i : Fin (N + 1)) :
