@@ -2916,6 +2916,33 @@ matrix is manifestly Hermitian (real-diagonal) and idempotent
 \texttt{onSite\_mul\_onSite\_same}.
 \end{proof}
 
+\subsection{Number operator: commutativity and total}
+
+\begin{lemma}[\texttt{fermionMultiNumber\_commute}]
+For any $i, j \in \mathrm{Fin}\,(N+1)$, $[n_i, n_j] = 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Both $n_i$ and $n_j$ equal $\texttt{onSite}\,k\,(\sigma^- \sigma^+)$
+for $k = i, j$.  If $i = j$, commutativity is reflexive; if
+$i \neq j$, different-site embeddings commute via
+\texttt{onSite\_mul\_onSite\_of\_ne}.
+\end{proof}
+
+\begin{definition}[\texttt{fermionTotalNumber}]
+$\hat N := \sum_{i \in \mathrm{Fin}\,(N+1)} n_i$.
+\end{definition}
+
+\begin{lemma}[\texttt{fermionTotalNumber\_isHermitian}]
+$\hat N$ is Hermitian.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Finset induction: empty sum is the zero matrix (Hermitian); insert
+step uses \texttt{Matrix.IsHermitian.add} to combine the new
+\texttt{fermionMultiNumber} (Hermitian) with the inductive sum.
+\end{proof}
+
 \subsection{Same-site canonical anticommutation}
 
 \begin{lemma}[\texttt{fermionMultiAnticomm\_self}]
