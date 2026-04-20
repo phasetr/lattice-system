@@ -649,6 +649,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `spinHalfOpMinus_mul_spinHalfOpPlus_commute_pauliZ` | matrix identity: `Commute (σ^- σ^+) σ^z` (both diagonal in the computational basis) | `Quantum/SpinHalfBasis.lean` |
 | `fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne` | `Commute (n_i) (c_j)` for `i ≠ j` — the number operator at site `i` commutes with any annihilation at a different site, via the `n σ^z = σ^z n` matrix commutativity absorbing the JW-string `σ^z_i` factor | `Fermion/JordanWigner.lean` |
 | `fermionMultiNumber_commute_fermionMultiCreation_of_ne` | dual: `Commute (n_i) (c_j†)` for `i ≠ j` via adjoint | `Fermion/JordanWigner.lean` |
+| `fermionTotalNumber_commutator_fermionMultiAnnihilation` | `[N̂, c_j] = -c_j` — the total particle-number operator shifts annihilation down by one (sum of diagonal `[n_j, c_j] = -c_j` with vanishing off-diagonal terms) | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
