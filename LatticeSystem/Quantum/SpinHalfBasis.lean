@@ -97,6 +97,23 @@ theorem pauliZ_mul_spinHalfOpPlus :
   fin_cases i <;> fin_cases j <;>
     simp [spinHalfOpPlus, pauliZ, Matrix.mul_apply, Fin.sum_univ_two]
 
+/-- `σ^+ · σ^+ = 0`: the raising operator squares to zero (Pauli
+exclusion: cannot raise twice). -/
+theorem spinHalfOpPlus_mul_self :
+    spinHalfOpPlus * spinHalfOpPlus = (0 : Matrix (Fin 2) (Fin 2) ℂ) := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinHalfOpPlus, Matrix.mul_apply, Fin.sum_univ_two]
+
+/-- `σ^+ · σ^- · σ^+ = σ^+`: the projector `σ^+ σ^- = |↑⟩⟨↑|`
+applied to `σ^+` returns `σ^+` (since `σ^+` lands in the up-state
+range). -/
+theorem spinHalfOpPlus_mul_spinHalfOpMinus_mul_spinHalfOpPlus :
+    spinHalfOpPlus * spinHalfOpMinus * spinHalfOpPlus = spinHalfOpPlus := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [spinHalfOpPlus, spinHalfOpMinus, Matrix.mul_apply, Fin.sum_univ_two]
+
 /-! ## Raising/lowering actions (Tasaki eq 2.1.5, p. 14) -/
 
 /-- `Ŝ^+ |ψ^↑⟩ = 0`. -/
