@@ -989,6 +989,161 @@ theorem fermionMultiAnnihilation_anticomm_zero_two_general
                 rw [pauliZ_mul_spinHalfOpPlus]
   rw [hfirst, hsecond, neg_add_cancel]
 
+/-- Dual `{c_0†, c_2†} = 0` for any `N ≥ 2` via adjoint of PR #123. -/
+theorem fermionMultiCreation_anticomm_zero_two_general
+    (N : ℕ) (hN : 2 ≤ N) :
+    fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiCreation N ⟨2, by omega⟩ +
+      fermionMultiCreation N ⟨2, by omega⟩ *
+        fermionMultiCreation N 0 = 0 := by
+  have h := fermionMultiAnnihilation_anticomm_zero_two_general N hN
+  have h2 := congrArg Matrix.conjTranspose h
+  simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_mul,
+    fermionMultiAnnihilation_conjTranspose, Matrix.conjTranspose_zero] at h2
+  rw [show fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiCreation N ⟨2, by omega⟩ +
+      fermionMultiCreation N ⟨2, by omega⟩ *
+        fermionMultiCreation N (0 : Fin (N + 1)) =
+      fermionMultiCreation N ⟨2, by omega⟩ *
+        fermionMultiCreation N (0 : Fin (N + 1)) +
+      fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiCreation N ⟨2, by omega⟩ from add_comm _ _]
+  exact h2
+
+/-- Mixed `{c_0, c_2†} = 0` for any `N ≥ 2`. Same template as PR #123
+with `σ^+_2` replaced by `σ^-_2`. -/
+theorem fermionMultiAnnihilation_creation_anticomm_zero_two_general
+    (N : ℕ) (hN : 2 ≤ N) :
+    fermionMultiAnnihilation N (0 : Fin (N + 1)) *
+        fermionMultiCreation N ⟨2, by omega⟩ +
+      fermionMultiCreation N ⟨2, by omega⟩ *
+        fermionMultiAnnihilation N 0 = 0 := by
+  rw [fermionMultiAnnihilation_zero]
+  have hjw1 : jwString N ⟨1, by omega⟩ = onSite (0 : Fin (N + 1)) pauliZ := by
+    have h := jwString_succ_eq N (0 : Fin (N + 1))
+      (show (0 : Fin (N + 1)).val + 1 < N + 1 by simp; omega)
+    simpa [jwString_zero] using h
+  have hjw2 : jwString N ⟨2, by omega⟩ =
+      onSite (0 : Fin (N + 1)) pauliZ *
+        onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ := by
+    have h := jwString_succ_eq N (⟨1, by omega⟩ : Fin (N + 1))
+      (show (⟨1, _⟩ : Fin (N + 1)).val + 1 < N + 1 by simp; omega)
+    rw [hjw1] at h
+    convert h using 2
+  show onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+        fermionMultiCreation N ⟨2, by omega⟩ +
+      fermionMultiCreation N ⟨2, by omega⟩ *
+        onSite (0 : Fin (N + 1)) spinHalfOpPlus = 0
+  unfold fermionMultiCreation
+  rw [hjw2]
+  have h01 : (0 : Fin (N + 1)) ≠ ⟨1, by omega⟩ := by
+    intro h
+    exact absurd (congrArg Fin.val h) (by
+      show (0 : Fin (N + 1)).val ≠ (⟨1, _⟩ : Fin (N + 1)).val
+      simp)
+  have h02 : (0 : Fin (N + 1)) ≠ ⟨2, by omega⟩ := by
+    intro h
+    exact absurd (congrArg Fin.val h) (by
+      show (0 : Fin (N + 1)).val ≠ (⟨2, _⟩ : Fin (N + 1)).val
+      simp)
+  have hfirst : onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+      (onSite (0 : Fin (N + 1)) pauliZ *
+        onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+        onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus) =
+        -(onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+          (onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+            onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus)) := by
+    rw [show onSite (0 : Fin (N + 1)) pauliZ *
+            onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+            onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus =
+        onSite (0 : Fin (N + 1)) pauliZ *
+            (onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+              onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus) from
+          by rw [Matrix.mul_assoc]]
+    rw [← Matrix.mul_assoc (onSite (0 : Fin (N + 1)) spinHalfOpPlus),
+      onSite_mul_onSite_same, spinHalfOpPlus_mul_pauliZ]
+    rw [show (-spinHalfOpPlus : Matrix (Fin 2) (Fin 2) ℂ) = (-1 : ℂ) • spinHalfOpPlus
+      from by rw [neg_one_smul], onSite_smul, Matrix.smul_mul, neg_one_smul]
+  have hsecond : onSite (0 : Fin (N + 1)) pauliZ *
+      onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+      onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus *
+      onSite (0 : Fin (N + 1)) spinHalfOpPlus =
+        onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+          (onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+            onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus) := by
+    have step1 : onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus *
+        onSite (0 : Fin (N + 1)) spinHalfOpPlus =
+      onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+        onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus :=
+      onSite_mul_onSite_of_ne h02.symm spinHalfOpMinus spinHalfOpPlus
+    have step2 : onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+        onSite (0 : Fin (N + 1)) spinHalfOpPlus =
+      onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+        onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ :=
+      onSite_mul_onSite_of_ne h01.symm pauliZ spinHalfOpPlus
+    calc onSite (0 : Fin (N + 1)) pauliZ *
+          onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+          onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus *
+          onSite (0 : Fin (N + 1)) spinHalfOpPlus
+        = onSite (0 : Fin (N + 1)) pauliZ *
+          onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+          (onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus *
+            onSite (0 : Fin (N + 1)) spinHalfOpPlus) := by rw [Matrix.mul_assoc]
+      _ = onSite (0 : Fin (N + 1)) pauliZ *
+          onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+          (onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+            onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus) := by rw [step1]
+      _ = onSite (0 : Fin (N + 1)) pauliZ *
+          (onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+            (onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+              onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus)) := by
+                rw [Matrix.mul_assoc]
+      _ = onSite (0 : Fin (N + 1)) pauliZ *
+          (onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+            onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+            onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus) := by
+                rw [Matrix.mul_assoc]
+      _ = onSite (0 : Fin (N + 1)) pauliZ *
+          (onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+            onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+            onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus) := by rw [step2]
+      _ = onSite (0 : Fin (N + 1)) pauliZ *
+          onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+          (onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+            onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus) := by
+                rw [Matrix.mul_assoc, Matrix.mul_assoc]
+      _ = onSite (0 : Fin (N + 1)) (pauliZ * spinHalfOpPlus) *
+          (onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+            onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus) := by
+                rw [onSite_mul_onSite_same]
+      _ = onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+          (onSite (⟨1, by omega⟩ : Fin (N + 1)) pauliZ *
+            onSite (⟨2, by omega⟩ : Fin (N + 1)) spinHalfOpMinus) := by
+                rw [pauliZ_mul_spinHalfOpPlus]
+  rw [hfirst, hsecond, neg_add_cancel]
+
+/-- Mixed dual `{c_0†, c_2} = 0` for any `N ≥ 2` via adjoint. -/
+theorem fermionMultiCreation_annihilation_anticomm_zero_two_general
+    (N : ℕ) (hN : 2 ≤ N) :
+    fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiAnnihilation N ⟨2, by omega⟩ +
+      fermionMultiAnnihilation N ⟨2, by omega⟩ *
+        fermionMultiCreation N 0 = 0 := by
+  have h := fermionMultiAnnihilation_creation_anticomm_zero_two_general N hN
+  have h2 := congrArg Matrix.conjTranspose h
+  simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_mul,
+    fermionMultiAnnihilation_conjTranspose, fermionMultiCreation_conjTranspose,
+    Matrix.conjTranspose_zero] at h2
+  rw [show fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiAnnihilation N ⟨2, by omega⟩ +
+      fermionMultiAnnihilation N ⟨2, by omega⟩ *
+        fermionMultiCreation N (0 : Fin (N + 1)) =
+      fermionMultiAnnihilation N ⟨2, by omega⟩ *
+        fermionMultiCreation N (0 : Fin (N + 1)) +
+      fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiAnnihilation N ⟨2, by omega⟩ from add_comm _ _]
+  exact h2
+
 /-- Mixed cross-site CAR `{c_0†, c_2} = 0` on `Fin 3` via adjoint of
 PR #119. -/
 theorem fermionMultiCreation_annihilation_anticomm_zero_two_fin_three :
