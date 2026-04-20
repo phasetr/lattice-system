@@ -54,7 +54,7 @@ CAR algebras, and eventually lattice QCD.
 | P1f-2c (Tasaki §2.2 Problem 2.2.c) | SU(2)-averaged two-site state = singlet projector (eq. (2.2.15)); integration over Euler angles `φ ∈ [0,2π]`, `θ ∈ [0,π]` | Done |
 | P1g | Gibbs state `ρ = e^{-βH}/Z`, `Tr(ρ) = 1`, `⟨1⟩ = 1`, `Z(0) = dim`, `Z(0) ≠ 0`, linearity `⟨O₁+O₂⟩ = ⟨O₁⟩+⟨O₂⟩`, `⟨c·O⟩ = c·⟨O⟩`, `⟨-O⟩ = -⟨O⟩`, `⟨A−B⟩ = ⟨A⟩−⟨B⟩`, `⟨Σ f⟩ = Σ ⟨f⟩`, `[ρ, H] = 0`, reality of `⟨O⟩` for Hermitian `O`, conservation `⟨[H,A]⟩ = 0`, anticommutator real / commutator imaginary, `(⟨H·O⟩).im = 0`, β = 0 closed form `ρ_0 = I/dim` and `⟨A⟩_0 = Tr A / dim`, one-parameter group property `e^{-(β₁+β₂)H} = e^{-β₁H} · e^{-β₂H}` and invertibility, exact discrete semigroup identity `e^{-(nβ)H} = (e^{-βH})^n` (extended to `n : ℤ` via `gibbsExp_inv`) | Done |
 | P1h | Periodic boundary conditions, Heisenberg chain (open and periodic BC), Gibbs state instantiation for both BCs (Hermiticity, commutativity with `H`, β = 0 closed form, expectation realness for Hermitian observables, conservation `⟨[H, A]⟩ = 0`, energy expectation as a bond-sum decomposition, energy expectation real, `⟨H · O⟩` real for Hermitian `O`, `⟨H^n⟩` real for any `n : ℕ`) | Done |
-| P2 | Finite-volume Hubbard / BCS | In progress (single-mode CAR algebra; multi-mode Jordan–Wigner backbone: JW string + multi-mode `c_i`, `c_i†` definitions and Hermiticity, `c_0` reductions, on-site Pauli-exclusion `c_i² = 0` / `(c_i†)² = 0`, adjoint `(c_i)ᴴ = c_i†`) |
+| P2 | Finite-volume Hubbard / BCS | In progress (single-mode CAR algebra; multi-mode Jordan–Wigner backbone: JW string + multi-mode `c_i`, `c_i†` definitions and Hermiticity, `c_0` reductions, on-site Pauli-exclusion `c_i² = 0` / `(c_i†)² = 0`, adjoint `(c_i)ᴴ = c_i†`, JW string idempotent `J² = 1`, site-occupation number operator `n_i = c_i† c_i = onSite i (σ^- σ^+)` with Hermiticity and idempotency) |
 | P3 | CAR algebras, quasi-local C*-algebras, KMS states | Not started |
 | P4 | Thermodynamic limit, phase transitions | Not started |
 | P5 | Lattice QCD | Not started |
@@ -574,6 +574,11 @@ fermion mode acting on `ℂ²` with computational basis
 | `jwString_isHermitian` | `(jwString N i)ᴴ = jwString N i` (product of pairwise-commuting Hermitian σ^z is Hermitian) | `Fermion/JordanWigner.lean` |
 | `fermionMultiAnnihilation_conjTranspose` | `(c_i)ᴴ = c_i†` | `Fermion/JordanWigner.lean` |
 | `fermionMultiCreation_conjTranspose` | `(c_i†)ᴴ = c_i` | `Fermion/JordanWigner.lean` |
+| `jwString_sq` | `(jwString N i)² = 1` | `Fermion/JordanWigner.lean` |
+| `fermionMultiNumber N i` | `n_i := c_i† · c_i` (site-occupation number operator) | `Fermion/JordanWigner.lean` |
+| `fermionMultiNumber_eq_onSite` | `n_i = onSite i (σ^- · σ^+)` (JW strings cancel via `J² = 1`) | `Fermion/JordanWigner.lean` |
+| `fermionMultiNumber_isHermitian` | `n_i` is Hermitian | `Fermion/JordanWigner.lean` |
+| `fermionMultiNumber_sq` | `n_i² = n_i` (idempotent, eigenvalues 0, 1) | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
