@@ -1208,7 +1208,7 @@ theorem fermionMultiCreation_annihilation_anticomm_two_site_cross :
     from add_comm _ _]
   exact h2
 
-/-! ## Number/annihilation commutator -/
+/-! ## Number / annihilation-creation commutators -/
 
 /-- Standard fermion algebra: `[n_i, c_i] = -c_i`. -/
 theorem fermionMultiNumber_commutator_fermionMultiAnnihilation_self
@@ -1240,5 +1240,28 @@ theorem fermionMultiNumber_commutator_fermionMultiAnnihilation_self
     rw [show spinHalfOpPlus * (spinHalfOpMinus * spinHalfOpPlus) = spinHalfOpPlus from
       by rw [← Matrix.mul_assoc, spinHalfOpPlus_mul_spinHalfOpMinus_mul_spinHalfOpPlus]]
   rw [hncv, hcvn, zero_sub]
+
+/-- Dual: `[n_i, c_i†] = c_i†`. Direct consequence of
+`fermionMultiNumber_commutator_fermionMultiAnnihilation_self` by
+taking `conjTranspose`. -/
+theorem fermionMultiNumber_commutator_fermionMultiCreation_self
+    (N : ℕ) (i : Fin (N + 1)) :
+    fermionMultiNumber N i * fermionMultiCreation N i -
+        fermionMultiCreation N i * fermionMultiNumber N i =
+      fermionMultiCreation N i := by
+  have h := fermionMultiNumber_commutator_fermionMultiAnnihilation_self N i
+  have h2 := congrArg Matrix.conjTranspose h
+  simp only [Matrix.conjTranspose_sub, Matrix.conjTranspose_mul,
+    Matrix.conjTranspose_neg,
+    fermionMultiAnnihilation_conjTranspose,
+    (fermionMultiNumber_isHermitian N i).eq] at h2
+  -- h2 : c_i† · n_i - n_i · c_i† = -c_i†
+  -- Rewrite goal as negation of h2.
+  rw [show fermionMultiNumber N i * fermionMultiCreation N i -
+        fermionMultiCreation N i * fermionMultiNumber N i =
+      -(fermionMultiCreation N i * fermionMultiNumber N i -
+          fermionMultiNumber N i * fermionMultiCreation N i) from by abel]
+  rw [h2]
+  exact neg_neg _
 
 end LatticeSystem.Fermion
