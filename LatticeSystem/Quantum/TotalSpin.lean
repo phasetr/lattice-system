@@ -214,6 +214,37 @@ theorem totalSpinHalfOp3_mulVec_basisVec (σ : Λ → Fin 2) :
   change ∑ ρ, onSite x spinHalfOp3 τ ρ * basisVec σ ρ = spinHalfSign (σ x) * basisVec σ τ
   convert hτ using 1
 
+/-- `Ŝ_tot^(3) · |s..s⟩ = (|Λ| · spinHalfSign s) · |s..s⟩`: every
+constant-spin basis state is an `Ŝ_tot^(3)` eigenvector with
+eigenvalue `|Λ| · (±1/2)` depending on `s`. -/
+theorem totalSpinHalfOp3_mulVec_basisVec_const (s : Fin 2) :
+    (totalSpinHalfOp3 Λ).mulVec (basisVec (fun _ : Λ => s)) =
+      ((Fintype.card Λ : ℂ) * spinHalfSign s) •
+        basisVec (fun _ : Λ => s) := by
+  rw [totalSpinHalfOp3_mulVec_basisVec]
+  congr 1
+  rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+
+/-- All-up specialisation: `Ŝ_tot^(3) · |↑..↑⟩ = (|Λ|/2) · |↑..↑⟩`. -/
+theorem totalSpinHalfOp3_mulVec_basisVec_all_up :
+    (totalSpinHalfOp3 Λ).mulVec (basisVec (fun _ : Λ => (0 : Fin 2))) =
+      ((Fintype.card Λ : ℂ) / 2) • basisVec (fun _ : Λ => (0 : Fin 2)) := by
+  rw [totalSpinHalfOp3_mulVec_basisVec_const]
+  have hsign : spinHalfSign (0 : Fin 2) = (1 / 2 : ℂ) := by
+    simp [spinHalfSign]
+  rw [hsign]
+  congr 1; ring
+
+/-- All-down specialisation: `Ŝ_tot^(3) · |↓..↓⟩ = -(|Λ|/2) · |↓..↓⟩`. -/
+theorem totalSpinHalfOp3_mulVec_basisVec_all_down :
+    (totalSpinHalfOp3 Λ).mulVec (basisVec (fun _ : Λ => (1 : Fin 2))) =
+      (-((Fintype.card Λ : ℂ) / 2)) • basisVec (fun _ : Λ => (1 : Fin 2)) := by
+  rw [totalSpinHalfOp3_mulVec_basisVec_const]
+  have hsign : spinHalfSign (1 : Fin 2) = -(1 / 2 : ℂ) := by
+    simp [spinHalfSign]
+  rw [hsign]
+  congr 1; ring
+
 /-- `Ŝ_tot^(3) · |σ⟩ = (|σ| / 2) · |σ⟩`: the `Ŝ_tot^(3)` eigenvalue is
 half the total magnetization (Tasaki eq. (2.2.10)). -/
 theorem totalSpinHalfOp3_mulVec_basisVec_eq_magnetization (σ : Λ → Fin 2) :

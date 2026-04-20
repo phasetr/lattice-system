@@ -3027,6 +3027,23 @@ $\sum_{x} \tfrac{1}{2} \mapsto \sum_{x} (-\tfrac{1}{2}) =
 + v = (c+1)\,v$ in place of subtraction.
 \end{proof}
 
+\begin{remark}[Magnetisation-subspace placement]
+Combining the two ladders with \texttt{mem\_magnetizationSubspace\_iff}
+yields
+\begin{align*}
+  (\hat S_{\mathrm{tot}}^{-})^{k}\,|{\uparrow}\dots{\uparrow}\rangle
+    &\in \mathcal H_{S_{\max} - k},\\
+  (\hat S_{\mathrm{tot}}^{+})^{k}\,|{\downarrow}\dots{\downarrow}\rangle
+    &\in \mathcal H_{-S_{\max} + k},
+\end{align*}
+where $\mathcal H_{M}$ is the magnetisation-$M$ subspace of Tasaki
+eq.~(2.2.10) (formalised as \texttt{magnetizationSubspace} in
+\texttt{Quantum/MagnetizationSubspace.lean}).  Lean names:
+\texttt{totalSpinHalfOpMinus\_pow\_basisVec\_all\_up\_mem\_magnetizationSubspace}
+and
+\texttt{totalSpinHalfOpPlus\_pow\_basisVec\_all\_down\_mem\_magnetizationSubspace}.
+\end{remark}
+
 %======================================================================
 \section{Single-mode fermion (Phase 2 skeleton)}
 \label{sec:fermion-mode}
