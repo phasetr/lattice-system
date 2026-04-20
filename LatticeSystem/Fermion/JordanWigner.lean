@@ -1293,4 +1293,22 @@ theorem fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne
         (spinHalfOpMinus * spinHalfOpPlus) pauliZ
   exact hcomm_onSite_i_jwString.mul_right hcomm_onSite_i_j
 
+/-- Dual: `Commute (n_i) (c_j†)` for `i ≠ j`. Direct consequence of
+`fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne` by taking
+matrix `conjTranspose`. -/
+theorem fermionMultiNumber_commute_fermionMultiCreation_of_ne
+    {N : ℕ} {i j : Fin (N + 1)} (hij : i ≠ j) :
+    Commute (fermionMultiNumber N i) (fermionMultiCreation N j) := by
+  have h := fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne hij
+  -- Commute A B means A * B = B * A
+  -- Take conjTranspose: B† * A† = A† * B†, i.e. Commute A† B†.
+  have h_eq : fermionMultiNumber N i * fermionMultiAnnihilation N j =
+      fermionMultiAnnihilation N j * fermionMultiNumber N i := h
+  have h2 := congrArg Matrix.conjTranspose h_eq
+  simp only [Matrix.conjTranspose_mul, fermionMultiAnnihilation_conjTranspose,
+    (fermionMultiNumber_isHermitian N i).eq] at h2
+  -- h2 : c_j† * n_i = n_i * c_j†, i.e. Commute (fermionMultiCreation N j) (fermionMultiNumber N i).
+  -- Flip for target form.
+  exact h2.symm
+
 end LatticeSystem.Fermion
