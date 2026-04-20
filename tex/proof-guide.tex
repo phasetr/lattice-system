@@ -2102,6 +2102,27 @@ $\langle A \rangle_\beta \cdot \langle B \rangle_\beta
 is commutative in $\mathbb{C}$.
 \end{proof}
 
+\begin{lemma}[Bilinearity of $\operatorname{Cov}^{\mathrm{s}}_\beta$]
+The symmetric covariance is bilinear in its observable arguments
+(\texttt{add\_left}, \texttt{add\_right}, \texttt{smul\_left},
+\texttt{smul\_right}).  Combined with
+\texttt{gibbsCovarianceSymm\_comm} and the realness for Hermitian
+observables, this makes $\operatorname{Cov}^{\mathrm{s}}_\beta$ a
+genuine real-valued symmetric bilinear pairing on Hermitian
+observables.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The left-additivity is direct: split
+$(A_1 + A_2) B + B (A_1 + A_2) = (A_1 B + B A_1) + (A_2 B + B A_2)$
+via \texttt{add\_mul} / \texttt{mul\_add} / \texttt{abel}, then apply
+\texttt{gibbsExpectation\_add} on the resulting sums and close with
+\texttt{ring}.  Right-additivity follows from left-additivity and
+\texttt{gibbsCovarianceSymm\_comm}.  Scalar pull-out uses
+\texttt{Matrix.smul\_mul} / \texttt{Matrix.mul\_smul} on the
+anticommutator and \texttt{gibbsExpectation\_smul}.
+\end{proof}
+
 \subsection{Anticommutator real, commutator purely imaginary}
 \label{subsec:gibbs-anti-comm}
 

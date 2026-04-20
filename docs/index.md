@@ -454,6 +454,8 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `gibbsCovarianceSymm_self_eq_variance` | `Cov^s_β(O, O) = Var_β(O)` | `Quantum/GibbsState.lean` |
 | `gibbsCovarianceSymm_im_of_isHermitian` | `(Cov^s_β(A, B)).im = 0` for Hermitian `H, A, B` | `Quantum/GibbsState.lean` |
 | `gibbsCovarianceSymm_comm` | `Cov^s_β(A, B) = Cov^s_β(B, A)` (symmetric in observables) | `Quantum/GibbsState.lean` |
+| `gibbsCovarianceSymm_add_left/right` | additivity of `Cov^s_β` in each argument | `Quantum/GibbsState.lean` |
+| `gibbsCovarianceSymm_smul_left/right` | scalar pull-out from each argument of `Cov^s_β` | `Quantum/GibbsState.lean` |
 | `Matrix.trace_mul_conjTranspose_swap_of_isHermitian` | `star Tr(ρ · X) = Tr(ρ · Xᴴ)` for Hermitian `ρ` (generic helper) | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_star_swap_of_isHermitian` | `star ⟨A · B⟩_β = ⟨B · A⟩_β` for Hermitian `H, A, B` | `Quantum/GibbsState.lean` |
 | `gibbsExpectation_anticommutator_im` | `(⟨A·B + B·A⟩_β).im = 0` (anticommutator is real) | `Quantum/GibbsState.lean` |
