@@ -450,4 +450,34 @@ theorem openChainHeisenbergHamiltonian_two_site_mulVec_basisVec_singlet (J : ℝ
   rw [h, smul_smul]
   congr 1; ring
 
+/-- Eigenvalue on the all-down state for the 2-site open chain
+Heisenberg Hamiltonian: `H · |↓↓⟩ = -(J/2) · |↓↓⟩`. By the SU(2)
+symmetry, the all-down state has the same eigenvalue as the all-up
+state (both lie in the `S = 1` triplet representation). -/
+theorem openChainHeisenbergHamiltonian_two_site_mulVec_basisVec_all_down (J : ℝ) :
+    (heisenbergHamiltonian (openChainCoupling 1 J)).mulVec
+        (basisVec (fun _ : Fin 2 => (1 : Fin 2))) =
+      (-(J / 2 : ℂ)) • basisVec (fun _ : Fin 2 => (1 : Fin 2)) := by
+  rw [openChainHeisenbergHamiltonian_two_site_eq, Matrix.smul_mulVec]
+  have h : (spinHalfDot (0 : Fin 2) 1).mulVec
+      (basisVec (fun _ : Fin 2 => (1 : Fin 2))) =
+        (1 / 4 : ℂ) • basisVec (fun _ : Fin 2 => (1 : Fin 2)) :=
+    spinHalfDot_mulVec_basisVec_both_down (by decide)
+  rw [h, smul_smul]
+  congr 1; ring
+
+/-- Eigenvalue on the triplet `m = 0` state for the 2-site open chain
+Heisenberg Hamiltonian: `H · (|↑↓⟩ + |↓↑⟩) = -(J/2) · (|↑↓⟩ + |↓↑⟩)`.
+The triplet representation `S = 1` has 3 degenerate states
+(`|↑↑⟩, |↓↓⟩, |↑↓⟩+|↓↑⟩`) all with eigenvalue `-J/2`. -/
+theorem openChainHeisenbergHamiltonian_two_site_mulVec_basisVec_triplet_zero (J : ℝ) :
+    (heisenbergHamiltonian (openChainCoupling 1 J)).mulVec
+        (basisVec upDown + basisVec (basisSwap upDown 0 1)) =
+      (-(J / 2 : ℂ)) • (basisVec upDown + basisVec (basisSwap upDown 0 1)) := by
+  rw [openChainHeisenbergHamiltonian_two_site_eq, Matrix.smul_mulVec]
+  have h := spinHalfDot_mulVec_triplet_anti (Λ := Fin 2) (x := 0) (y := 1)
+    (by decide) upDown upDown_antiparallel
+  rw [h, smul_smul]
+  congr 1; ring
+
 end LatticeSystem.Quantum
