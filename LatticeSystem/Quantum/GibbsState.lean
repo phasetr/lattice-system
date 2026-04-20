@@ -825,6 +825,21 @@ theorem gibbsCovarianceSymm_smul_right (β : ℝ) (H A : ManyBodyOp Λ) (c : ℂ
       gibbsCovarianceSymm_smul_left,
       gibbsCovarianceSymm_comm β H B A]
 
+/-- The sum-of-observables variance identity:
+`Var_β(A + B) = Var_β(A) + Var_β(B) + 2 · Cov^s_β(A, B)`.
+The cross term is the symmetric covariance (averaged anticommutator);
+for commuting `A, B` it reduces to `2·Cov(A, B)`. -/
+theorem gibbsVariance_add (β : ℝ) (H A B : ManyBodyOp Λ) :
+    gibbsVariance β H (A + B)
+      = gibbsVariance β H A + gibbsVariance β H B
+        + 2 * gibbsCovarianceSymm β H A B := by
+  unfold gibbsVariance gibbsCovarianceSymm
+  have hexpand : (A + B) * (A + B) = A * A + A * B + B * A + B * B := by
+    rw [add_mul, mul_add, mul_add]; abel
+  rw [hexpand]
+  simp only [gibbsExpectation_add]
+  ring
+
 /-! #### Symmetric / antisymmetric decomposition -/
 
 /-- The complex covariance decomposes into its symmetric part plus
