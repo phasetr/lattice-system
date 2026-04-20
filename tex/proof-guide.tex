@@ -1684,9 +1684,34 @@ $Z(\beta, H) = \operatorname{Tr}(e^{-\beta H})$.  By
 previous lemma then gives $\Im Z = 0$.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsState\_pow\_trace} (Rényi-$n$ precursor)]
+For any $n \in \mathbb{N}$,
+$\operatorname{Tr}(\rho_\beta^n)
+ = Z(n\beta, H) / Z(\beta, H)^n$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Unfold $\rho_\beta = (1/Z) \cdot e^{-\beta H}$ and apply
+\texttt{smul\_pow} to get
+$\rho_\beta^n = (1/Z)^n \cdot (e^{-\beta H})^n$.  Replace
+$(e^{-\beta H})^n$ by $e^{-(n\beta) H}$ using
+\texttt{gibbsExp\_natCast\_mul}.  Pull the scalar out of the trace
+via \texttt{Matrix.trace\_smul} and rewrite
+$(1/Z)^n = (Z^n)^{-1}$ via \texttt{one\_div} / \texttt{inv\_pow},
+then \texttt{div\_eq\_inv\_mul} matches the RHS without needing a
+$Z \neq 0$ hypothesis (Lean's $1/0 = 0$ convention handles the
+edge case).
+
+The Rényi-$n$ entropy precursor; the n-th moment of the density
+matrix expressed entirely in terms of partition functions evaluated
+at temperature $n \beta$, the canonical form behind the replica trick
+and entanglement-entropy computations.
+\end{proof}
+
 \begin{lemma}[\texttt{gibbsState\_mul\_self\_trace} (purity)]
 $\operatorname{Tr}(\rho_\beta^2)
- = Z(2\beta, H) / Z(\beta, H)^2$.
+ = Z(2\beta, H) / Z(\beta, H)^2$. (Special case $n = 2$ of the
+preceding lemma, with a direct \texttt{gibbsExp\_two\_mul} proof.)
 \end{lemma}
 
 \begin{proof}[Proof sketch]
