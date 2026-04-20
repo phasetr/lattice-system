@@ -173,4 +173,33 @@ theorem magnetizationSubspace_isInternal :
     ⟨magnetizationSubspace_iSupIndep Λ,
      iSup_magnetizationSubspace_eq_top Λ⟩
 
+/-! ## Membership of the ferromagnetic ground-state ladder iterates
+
+Combining `totalSpinHalfOp3_mulVec_totalSpinHalfOp{Minus,Plus}_pow_basisVec_all_{up,down}`
+(in `TotalSpin.lean`) with `mem_magnetizationSubspace_iff` shows that
+the unnormalised iterates `(Ŝtot^∓)^k · |↑..↑⟩` and
+`(Ŝtot^+)^k · |↓..↓⟩` of Tasaki §2.4 eq. (2.4.9) ground-state ladder
+lie in the magnetisation sectors `H_{Smax - k}` and `H_{-Smax + k}`
+respectively. -/
+
+/-- The unnormalised iterate `(Ŝtot^-)^k · |↑..↑⟩` lies in the
+magnetisation subspace `H_{|Λ|/2 - k}` (Tasaki §2.4 eq. (2.4.9), p. 33,
+expressed in the `magnetizationSubspace` Submodule language). -/
+theorem totalSpinHalfOpMinus_pow_basisVec_all_up_mem_magnetizationSubspace
+    (k : ℕ) :
+    ((totalSpinHalfOpMinus Λ) ^ k).mulVec
+        (basisVec (fun _ : Λ => (0 : Fin 2))) ∈
+      magnetizationSubspace Λ (((Fintype.card Λ : ℂ) / 2) - (k : ℂ)) :=
+  totalSpinHalfOp3_mulVec_totalSpinHalfOpMinus_pow_basisVec_all_up Λ k
+
+/-- The unnormalised iterate `(Ŝtot^+)^k · |↓..↓⟩` lies in the
+magnetisation subspace `H_{-|Λ|/2 + k}` (Tasaki §2.4 eq. (2.4.9), p. 33,
+parameterised from the lowest weight). -/
+theorem totalSpinHalfOpPlus_pow_basisVec_all_down_mem_magnetizationSubspace
+    (k : ℕ) :
+    ((totalSpinHalfOpPlus Λ) ^ k).mulVec
+        (basisVec (fun _ : Λ => (1 : Fin 2))) ∈
+      magnetizationSubspace Λ ((-((Fintype.card Λ : ℂ) / 2)) + (k : ℂ)) :=
+  totalSpinHalfOp3_mulVec_totalSpinHalfOpPlus_pow_basisVec_all_down Λ k
+
 end LatticeSystem.Quantum
