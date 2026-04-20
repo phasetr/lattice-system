@@ -1264,4 +1264,33 @@ theorem fermionMultiNumber_commutator_fermionMultiCreation_self
   rw [h2]
   exact neg_neg _
 
+/-- For `i ≠ j`, `n_i` commutes with `c_j` as operators. The `σ^z_i`
+factor inside `jwString N j` commutes with `n_i` (since `[n, σ^z] = 0`
+as matrices); disjoint-site factors commute trivially. -/
+theorem fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne
+    {N : ℕ} {i j : Fin (N + 1)} (hij : i ≠ j) :
+    Commute (fermionMultiNumber N i) (fermionMultiAnnihilation N j) := by
+  rw [fermionMultiNumber_eq_onSite]
+  unfold fermionMultiAnnihilation
+  have hcomm_onSite_i_j : Commute (onSite i (spinHalfOpMinus * spinHalfOpPlus))
+      (onSite j spinHalfOpPlus) := by
+    show onSite i (spinHalfOpMinus * spinHalfOpPlus) * onSite j spinHalfOpPlus =
+      onSite j spinHalfOpPlus * onSite i (spinHalfOpMinus * spinHalfOpPlus)
+    exact onSite_mul_onSite_of_ne hij (spinHalfOpMinus * spinHalfOpPlus)
+      spinHalfOpPlus
+  have hcomm_onSite_i_jwString :
+      Commute (onSite i (spinHalfOpMinus * spinHalfOpPlus)) (jwString N j) := by
+    unfold jwString
+    apply Finset.noncommProd_commute
+    intro k _
+    by_cases hki : k = i
+    · subst hki
+      show onSite k (spinHalfOpMinus * spinHalfOpPlus) * onSite k pauliZ =
+        onSite k pauliZ * onSite k (spinHalfOpMinus * spinHalfOpPlus)
+      rw [onSite_mul_onSite_same, onSite_mul_onSite_same,
+        spinHalfOpMinus_mul_spinHalfOpPlus_commute_pauliZ.eq]
+    · exact onSite_mul_onSite_of_ne (Ne.symm hki)
+        (spinHalfOpMinus * spinHalfOpPlus) pauliZ
+  exact hcomm_onSite_i_jwString.mul_right hcomm_onSite_i_j
+
 end LatticeSystem.Fermion
