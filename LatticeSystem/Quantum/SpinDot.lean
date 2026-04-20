@@ -772,6 +772,68 @@ theorem totalSpinHalfSquared_mulVec_basisVec_all_down :
         basisVec (fun _ : Λ => (1 : Fin 2)) :=
   totalSpinHalfSquared_mulVec_basisVec_const 1
 
+/-! ## Heisenberg Hamiltonian on the fully-polarised state (Tasaki §2.4 (2.4.5))
+
+Tasaki *Physics and Mathematics of Quantum Many-Body Systems* §2.4
+"The Ferromagnetic Heisenberg Model", eq. (2.4.5), p. 32, asserts that
+the fully-polarised state `|Φ↑⟩ = ⊗_x |ψ_x^S⟩` satisfies
+
+```
+- Ŝ_x · Ŝ_y |Φ↑⟩ = - Ŝ_x^(3) Ŝ_y^(3) |Φ↑⟩ = - S² |Φ↑⟩,
+```
+
+so each bond term contributes the minimum eigenvalue `-S²`. Summed over
+the bond set `B`, this gives `E_GS = -|B| S²` (the ferromagnetic
+ground-state energy).
+
+For `S = 1/2` this lifts to: every Heisenberg-type Hamiltonian
+`H = Σ_{x,y} J(x,y) Ŝ_x · Ŝ_y` acts on a constant-spin basis state
+`|s s … s⟩` as a scalar, with eigenvalue determined entirely by `J`. -/
+
+/-- Heisenberg Hamiltonian on a uniformly-aligned basis state (constant
+spin configuration `s : Fin 2`): the state is a simultaneous eigenvector
+of every Heisenberg-type Hamiltonian, and the eigenvalue is the
+weighted bilinear sum of the couplings.
+
+This is the bilinear-sum lift of Tasaki §2.4 eq. (2.4.5), p. 32, for
+`S = 1/2`: each bond term `Ŝ_x · Ŝ_y` (for `x ≠ y`) contributes
+`1/4 = S²` (the maximum eigenvalue of `Ŝ_x · Ŝ_y` for `S = 1/2`),
+and each diagonal term `Ŝ_x · Ŝ_x` contributes `3/4 = S(S+1)`
+(via `spinHalfDot_self`). The diagonal `3/4` summand is an
+extension beyond Tasaki's bond-only statement (which only treats
+`x ≠ y`). The eigenvalue equals the ground-state energy only for
+suitable ferromagnetic `J`; that step is not asserted here. -/
+theorem heisenbergHamiltonian_mulVec_basisVec_const
+    (J : Λ → Λ → ℂ) (s : Fin 2) :
+    (heisenbergHamiltonian J).mulVec (basisVec (fun _ : Λ => s)) =
+      (∑ x : Λ, ∑ y : Λ,
+          J x y * (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ))) •
+        basisVec (fun _ : Λ => s) := by
+  unfold heisenbergHamiltonian
+  rw [Matrix.sum_mulVec]
+  simp_rw [Matrix.sum_mulVec, Matrix.smul_mulVec,
+    spinHalfDot_mulVec_const s, smul_smul]
+  simp_rw [← Finset.sum_smul]
+
+/-- Specialisation of `heisenbergHamiltonian_mulVec_basisVec_const`
+to the all-up state (Tasaki §2.4 eq. (2.4.5), p. 32, for `S = 1/2`). -/
+theorem heisenbergHamiltonian_mulVec_basisVec_all_up (J : Λ → Λ → ℂ) :
+    (heisenbergHamiltonian J).mulVec (basisVec (fun _ : Λ => (0 : Fin 2))) =
+      (∑ x : Λ, ∑ y : Λ,
+          J x y * (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ))) •
+        basisVec (fun _ : Λ => (0 : Fin 2)) :=
+  heisenbergHamiltonian_mulVec_basisVec_const J 0
+
+/-- Specialisation of `heisenbergHamiltonian_mulVec_basisVec_const`
+to the all-down state (Tasaki §2.4 eq. (2.4.5), p. 32, for `S = 1/2`,
+flipped). -/
+theorem heisenbergHamiltonian_mulVec_basisVec_all_down (J : Λ → Λ → ℂ) :
+    (heisenbergHamiltonian J).mulVec (basisVec (fun _ : Λ => (1 : Fin 2))) =
+      (∑ x : Λ, ∑ y : Λ,
+          J x y * (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ))) •
+        basisVec (fun _ : Λ => (1 : Fin 2)) :=
+  heisenbergHamiltonian_mulVec_basisVec_const J 1
+
 /-! ## Two-site singlet / triplet Casimir eigenvalues
 
 For `Λ = Fin 2`, the natural anti-parallel basis state `|↑↓⟩` satisfies:
