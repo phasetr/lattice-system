@@ -325,6 +325,21 @@ theorem gibbsState_mul_self_trace (β : ℝ) (H : ManyBodyOp Λ) :
   unfold partitionFn
   field_simp
 
+/-- The Gibbs state higher-moment trace identity:
+`Tr(ρ_β^n) = Z(nβ) / Z(β)^n` for any `n : ℕ`. The Rényi-n entropy
+precursor; expresses the trace of the n-th power of the density matrix
+entirely in terms of partition functions evaluated at temperature `n β`.
+
+Edge cases: at `n = 0`, both sides equal `Tr(1) = dim`. At `Z = 0`,
+the identity holds by Lean's `1/0 = 0` convention (both sides
+collapse to zero for `n ≥ 1`). -/
+theorem gibbsState_pow_trace (β : ℝ) (H : ManyBodyOp Λ) (n : ℕ) :
+    ((gibbsState β H) ^ n).trace
+      = partitionFn ((n : ℝ) * β) H / (partitionFn β H) ^ n := by
+  unfold gibbsState partitionFn
+  rw [smul_pow, ← gibbsExp_natCast_mul, Matrix.trace_smul, smul_eq_mul,
+    one_div, inv_pow, div_eq_inv_mul]
+
 /-- At `β = 0`, the Gibbs state is the maximally mixed state
 `ρ_0 = (1 / dim) · I`. -/
 theorem gibbsState_zero (H : ManyBodyOp Λ) :
