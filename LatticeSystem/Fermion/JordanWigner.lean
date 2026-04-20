@@ -339,4 +339,43 @@ theorem fermionMultiCreation_sq (N : ℕ) (i : Fin (N + 1)) :
     simp [onSite_apply]
   rw [h_zero, Matrix.mul_zero]
 
+/-! ## Same-site canonical anticommutation -/
+
+/-- The single-site identity `σ^+ · σ^- + σ^- · σ^+ = I`. This is the
+spin-1/2 raising/lowering anticommutator, equal to the identity. -/
+private lemma spinHalfOpPlus_anticomm_spinHalfOpMinus :
+    spinHalfOpPlus * spinHalfOpMinus + spinHalfOpMinus * spinHalfOpPlus
+      = (1 : Matrix (Fin 2) (Fin 2) ℂ) := by
+  unfold spinHalfOpPlus spinHalfOpMinus
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp
+
+/-- The same-site canonical anticommutation relation:
+`c_i · c_i† + c_i† · c_i = 1`. Combined with `c_i² = 0` and
+`(c_i†)² = 0`, this constitutes the full single-site CAR algebra in
+the multi-mode setting. -/
+theorem fermionMultiAnticomm_self (N : ℕ) (i : Fin (N + 1)) :
+    fermionMultiAnnihilation N i * fermionMultiCreation N i
+      + fermionMultiCreation N i * fermionMultiAnnihilation N i = 1 := by
+  unfold fermionMultiAnnihilation fermionMultiCreation
+  have hcomm_plus : Commute (onSite i spinHalfOpPlus) (jwString N i) :=
+    (jwString_commute_onSite N i spinHalfOpPlus).symm
+  have hcomm_minus : Commute (onSite i spinHalfOpMinus) (jwString N i) :=
+    (jwString_commute_onSite N i spinHalfOpMinus).symm
+  have h1 : jwString N i * onSite i spinHalfOpPlus *
+              (jwString N i * onSite i spinHalfOpMinus)
+          = jwString N i * jwString N i *
+              (onSite i spinHalfOpPlus * onSite i spinHalfOpMinus) := by
+    rw [Matrix.mul_assoc, ← Matrix.mul_assoc (onSite i spinHalfOpPlus),
+        hcomm_plus.eq, Matrix.mul_assoc, Matrix.mul_assoc]
+  have h2 : jwString N i * onSite i spinHalfOpMinus *
+              (jwString N i * onSite i spinHalfOpPlus)
+          = jwString N i * jwString N i *
+              (onSite i spinHalfOpMinus * onSite i spinHalfOpPlus) := by
+    rw [Matrix.mul_assoc, ← Matrix.mul_assoc (onSite i spinHalfOpMinus),
+        hcomm_minus.eq, Matrix.mul_assoc, Matrix.mul_assoc]
+  rw [h1, h2, jwString_sq, Matrix.one_mul, Matrix.one_mul,
+    onSite_mul_onSite_same, onSite_mul_onSite_same, ← onSite_add,
+    spinHalfOpPlus_anticomm_spinHalfOpMinus, onSite_one]
+
 end LatticeSystem.Fermion
