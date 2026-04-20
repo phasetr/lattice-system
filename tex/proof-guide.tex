@@ -2013,6 +2013,19 @@ $(1/2) \Im\langle [A, B] \rangle_\beta$.  The symmetric / real-valued
 covariance is treated below.
 \end{remark}
 
+\begin{lemma}[\texttt{gibbsCovariance\_sub\_swap\_eq\_commutator}]
+$\operatorname{Cov}_\beta(A, B) - \operatorname{Cov}_\beta(B, A)
+ = \langle A B - B A \rangle_\beta$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The product terms $\langle A \rangle_\beta \cdot \langle B \rangle_\beta$
+cancel under subtraction.  The remaining
+$\langle A B \rangle_\beta - \langle B A \rangle_\beta$ is exactly
+$\langle A B - B A \rangle_\beta$ by linearity
+(\texttt{gibbsExpectation\_sub}).
+\end{proof}
+
 \subsection{Symmetric covariance}
 \label{subsec:gibbs-covariance-symm}
 
@@ -2052,6 +2065,18 @@ preserves realness.  Each first moment $\langle A \rangle_\beta$,
 $\langle B \rangle_\beta$ is real by
 \texttt{gibbsExpectation\_im\_of\_isHermitian}, so the product is
 real.  The difference of two reals is real.
+\end{proof}
+
+\begin{lemma}[\texttt{gibbsCovarianceSymm\_comm}]
+$\operatorname{Cov}^{\mathrm{s}}_\beta(A, B) = \operatorname{Cov}^{\mathrm{s}}_\beta(B, A)$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The anticommutator $A B + B A = B A + A B$ is unchanged under swap
+(matrix-level \texttt{add\_comm}), and the product
+$\langle A \rangle_\beta \cdot \langle B \rangle_\beta
+ = \langle B \rangle_\beta \cdot \langle A \rangle_\beta$
+is commutative in $\mathbb{C}$.
 \end{proof}
 
 \subsection{Anticommutator real, commutator purely imaginary}

@@ -533,6 +533,18 @@ theorem gibbsCovariance_self_eq_variance (β : ℝ) (H O : ManyBodyOp Λ) :
   unfold gibbsCovariance gibbsVariance
   rw [pow_two]
 
+/-- The antisymmetric part of the complex covariance equals the
+commutator expectation:
+`Cov_β(A, B) − Cov_β(B, A) = ⟨A · B − B · A⟩_β`.
+The product terms `⟨A⟩ · ⟨B⟩` cancel, isolating the noncommutativity
+of `A` and `B`. -/
+theorem gibbsCovariance_sub_swap_eq_commutator (β : ℝ) (H A B : ManyBodyOp Λ) :
+    gibbsCovariance β H A B - gibbsCovariance β H B A
+      = gibbsExpectation β H (A * B - B * A) := by
+  unfold gibbsCovariance
+  rw [gibbsExpectation_sub]
+  ring
+
 /-! ## Anticommutator real, commutator purely imaginary
 
 For Hermitian `ρ` and arbitrary `X`,
@@ -622,6 +634,15 @@ theorem gibbsCovarianceSymm_self_eq_variance (β : ℝ) (H O : ManyBodyOp Λ) :
     rw [two_smul]
   rw [h2, gibbsExpectation_smul, ← mul_assoc, inv_mul_cancel₀ two_ne_zero,
     one_mul, pow_two]
+
+/-- The symmetric covariance is symmetric in its observable arguments:
+`Cov^s_β(A, B) = Cov^s_β(B, A)`. The anticommutator
+`A · B + B · A = B · A + A · B` is unchanged under swap, and the product
+`⟨A⟩ · ⟨B⟩ = ⟨B⟩ · ⟨A⟩` is commutative in `ℂ`. -/
+theorem gibbsCovarianceSymm_comm (β : ℝ) (H A B : ManyBodyOp Λ) :
+    gibbsCovarianceSymm β H A B = gibbsCovarianceSymm β H B A := by
+  unfold gibbsCovarianceSymm
+  rw [add_comm (A * B) (B * A), mul_comm (gibbsExpectation β H A)]
 
 /-- For Hermitian `H` and Hermitian `A, B`, the symmetric covariance
 is real. The anticommutator term is real by
