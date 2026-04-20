@@ -772,6 +772,54 @@ theorem totalSpinHalfSquared_mulVec_basisVec_all_down :
         basisVec (fun _ : Λ => (1 : Fin 2)) :=
   totalSpinHalfSquared_mulVec_basisVec_const 1
 
+/-! ## Casimir invariance under Ŝ_tot^± on constant configs (Tasaki §2.4)
+
+`(Ŝ_tot)²` commutes with both `Ŝ_tot^+` and `Ŝ_tot^-`
+(`totalSpinHalfSquared_commutator_totalSpinHalfOp{Plus,Minus}` in
+`TotalSpin.lean`). Combined with the constant-config eigenvalue
+`Ŝ_tot² · |s..s⟩ = (|Λ|·(|Λ|+2)/4) · |s..s⟩`, every iterate
+`(Ŝ_tot^∓)^k · |s..s⟩` is a `Ŝ_tot²`-eigenvector with the same
+maximum-spin eigenvalue `S_max(S_max+1)`. -/
+
+/-- `Ŝ_tot² · (Ŝ_tot^-)^k · |s..s⟩ = (|Λ|·(|Λ|+2)/4) · (Ŝ_tot^-)^k · |s..s⟩`:
+the lowering ladder iterates remain in the maximum-total-spin
+SU(2) representation `S = S_max = |Λ|/2`. -/
+theorem totalSpinHalfSquared_mulVec_totalSpinHalfOpMinus_pow_basisVec_const
+    (s : Fin 2) (k : ℕ) :
+    (totalSpinHalfSquared Λ).mulVec
+        (((totalSpinHalfOpMinus Λ) ^ k).mulVec (basisVec (fun _ : Λ => s))) =
+      ((Fintype.card Λ : ℂ) * (Fintype.card Λ + 2) / 4) •
+        ((totalSpinHalfOpMinus Λ) ^ k).mulVec (basisVec (fun _ : Λ => s)) := by
+  induction k with
+  | zero =>
+    simp only [pow_zero, Matrix.one_mulVec]
+    exact totalSpinHalfSquared_mulVec_basisVec_const s
+  | succ k ih =>
+    have hcomm : totalSpinHalfSquared Λ * totalSpinHalfOpMinus Λ =
+        totalSpinHalfOpMinus Λ * totalSpinHalfSquared Λ :=
+      sub_eq_zero.mp (totalSpinHalfSquared_commutator_totalSpinHalfOpMinus Λ)
+    rw [pow_succ', ← Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hcomm,
+      ← Matrix.mulVec_mulVec, ih, Matrix.mulVec_smul]
+
+/-- `Ŝ_tot² · (Ŝ_tot^+)^k · |s..s⟩ = (|Λ|·(|Λ|+2)/4) · (Ŝ_tot^+)^k · |s..s⟩`:
+companion of the lowering version above. -/
+theorem totalSpinHalfSquared_mulVec_totalSpinHalfOpPlus_pow_basisVec_const
+    (s : Fin 2) (k : ℕ) :
+    (totalSpinHalfSquared Λ).mulVec
+        (((totalSpinHalfOpPlus Λ) ^ k).mulVec (basisVec (fun _ : Λ => s))) =
+      ((Fintype.card Λ : ℂ) * (Fintype.card Λ + 2) / 4) •
+        ((totalSpinHalfOpPlus Λ) ^ k).mulVec (basisVec (fun _ : Λ => s)) := by
+  induction k with
+  | zero =>
+    simp only [pow_zero, Matrix.one_mulVec]
+    exact totalSpinHalfSquared_mulVec_basisVec_const s
+  | succ k ih =>
+    have hcomm : totalSpinHalfSquared Λ * totalSpinHalfOpPlus Λ =
+        totalSpinHalfOpPlus Λ * totalSpinHalfSquared Λ :=
+      sub_eq_zero.mp (totalSpinHalfSquared_commutator_totalSpinHalfOpPlus Λ)
+    rw [pow_succ', ← Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hcomm,
+      ← Matrix.mulVec_mulVec, ih, Matrix.mulVec_smul]
+
 /-! ## Heisenberg Hamiltonian on the fully-polarised state (Tasaki §2.4 (2.4.5))
 
 Tasaki *Physics and Mathematics of Quantum Many-Body Systems* §2.4
