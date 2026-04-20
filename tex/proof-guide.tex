@@ -2725,7 +2725,58 @@ $\hat H \cdot |{\uparrow}{\uparrow}{\uparrow}\rangle
 linear scaling $E(|{\uparrow}\dots{\uparrow}\rangle) = -N\cdot J/2$
 ($N = 2$ bonds here).  Lean theorems
 \texttt{openChainHeisenbergHamiltonian\_three\_site\_eq} and
-\texttt{openChainHeisenbergHamiltonian\_three\_site\_mulVec\_basisVec\_all\_up}.  The
+\texttt{openChainHeisenbergHamiltonian\_three\_site\_mulVec\_basisVec\_all\_up}.
+
+\subsection{General open-chain ferromagnetic ground-state energy
+(Tasaki §2.4 (2.4.5)/(2.4.1))}
+\label{subsec:openchain-allup-general}
+
+Generalising the 2-site / 3-site cases, for any chain length
+$N + 1$ the all-up state is an exact eigenvector of the open-chain
+Heisenberg Hamiltonian with eigenvalue $-N\cdot J/2$, matching
+Tasaki's ferromagnetic ground-state energy
+$E_{\mathrm{GS}} = -|B|\cdot S^{2}$ for $S = 1/2$ and $|B| = N$
+unordered bonds.
+
+\begin{lemma}[\texttt{openChainCoupling\_sum\_eq}]
+For any $N \in \mathbb{N}$ and $J \in \mathbb{R}$,
+\[
+  \sum_{x \in \mathrm{Fin}(N+1)} \sum_{y \in \mathrm{Fin}(N+1)}
+    J_{\mathrm{open}}(x,y) \;=\; -2N\cdot J.
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Split the disjunction $i+1 = j \lor j+1 = i$ into two disjoint
+subsums (the conjunction is impossible).  For each fixed $x$, the
+right-neighbour count is $1$ if $x_{\mathrm{val}} < N$ else $0$; the
+left-neighbour count is $1$ if $x_{\mathrm{val}} > 0$ else $0$
+(\texttt{openChain\_row\_sum\_succ} and \texttt{openChain\_row\_sum\_pred}).
+Each row sum, when summed over $x$, contributes $N$ via Finset
+filter cardinalities (\texttt{sum\_lt\_eq} and \texttt{sum\_pos\_eq}).
+Combining gives $-J\cdot N + (-J)\cdot N = -2N\cdot J$.
+\end{proof}
+
+\begin{theorem}[\texttt{openChainHeisenbergHamiltonian\_mulVec\_basisVec\_all\_up}]
+For any $N \in \mathbb{N}$ and $J \in \mathbb{R}$,
+\[
+  \texttt{heisenbergHamiltonian (openChainCoupling }N\, J)
+    \cdot |{\uparrow}\dots{\uparrow}\rangle
+  \;=\; -\frac{N\cdot J}{2}\cdot
+    |{\uparrow}\dots{\uparrow}\rangle.
+\]
+This is the Tasaki ferromagnetic ground-state energy
+$E_{\mathrm{GS}} = -|B|\cdot S^{2}$ for $S = 1/2$, $|B| = N$ bonds.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+By the constant-config eigenvalue
+(\texttt{heisenbergHamiltonian\_mulVec\_basisVec\_const}), the
+eigenvalue is $\sum_{x,y} J_{\mathrm{open}}(x,y)\cdot \chi_{x,y}$.
+The diagonal terms vanish since $J_{\mathrm{open}}(x,x) = 0$, so the
+sum equals $(1/4)\cdot \sum_{x,y} J_{\mathrm{open}}(x,y)$. Apply the
+counting lemma above to obtain $(1/4)\cdot (-2N\cdot J) = -N\cdot J/2$.
+\end{proof}  The
 ferromagnetic ($J<0$) ground state is the triply-degenerate triplet
 $\{|{\uparrow}{\uparrow}\rangle,
 |{\downarrow}{\downarrow}\rangle,

@@ -542,4 +542,215 @@ theorem openChainHeisenbergHamiltonian_three_site_mulVec_basisVec_all_up (J : �
   -- (-2J) • ((1/4) • v + (1/4) • v) = -J • v
   module
 
+/-! ## General open chain all-up eigenvalue (Tasaki §2.4 (2.4.5)/(2.4.1))
+
+For the open chain on `Fin (N+1)` with `N` bonds, the all-up state is
+an eigenvector of the Heisenberg Hamiltonian with eigenvalue
+`-N·J/2`. This matches Tasaki's `E_GS = -|B|·S² = -N·(1/4)` for
+`S = 1/2` and `|B| = N` bonds, scaled by 2 for our ordered-pair
+convention. -/
+
+/-- For `x : Fin (N+1)`, the row sum of indicators `[x+1 = y]`
+(equivalently, the count of right-neighbours of `x` in the open chain)
+equals `1` if `x.val < N` and `0` otherwise. -/
+private lemma openChain_row_sum_succ (N : ℕ) (x : Fin (N + 1)) (v : ℂ) :
+    (∑ y : Fin (N + 1), if x.val + 1 = y.val then v else 0) =
+      (if x.val < N then v else 0) := by
+  by_cases h : x.val < N
+  · rw [if_pos h]
+    rw [Finset.sum_eq_single (⟨x.val + 1, by omega⟩ : Fin (N + 1))]
+    · simp
+    · intro b _ hb
+      apply if_neg
+      intro heq
+      apply hb
+      ext
+      exact heq.symm
+    · intro hmem
+      exact absurd (Finset.mem_univ _) hmem
+  · rw [if_neg h]
+    apply Finset.sum_eq_zero
+    intro y _
+    apply if_neg
+    intro heq
+    apply h
+    have := y.isLt
+    omega
+
+/-- For `x : Fin (N+1)`, the row sum of indicators `[y+1 = x]`
+(equivalently, the count of left-neighbours of `x`) equals `1` if
+`x.val > 0` and `0` otherwise. -/
+private lemma openChain_row_sum_pred (N : ℕ) (x : Fin (N + 1)) (v : ℂ) :
+    (∑ y : Fin (N + 1), if y.val + 1 = x.val then v else 0) =
+      (if 0 < x.val then v else 0) := by
+  by_cases h : 0 < x.val
+  · rw [if_pos h]
+    rw [Finset.sum_eq_single (⟨x.val - 1, by omega⟩ : Fin (N + 1))]
+    · have : (⟨x.val - 1, by omega⟩ : Fin (N + 1)).val + 1 = x.val := by
+        show (x.val - 1) + 1 = x.val
+        omega
+      rw [if_pos this]
+    · intro b _ hb
+      apply if_neg
+      intro heq
+      apply hb
+      ext
+      show b.val = x.val - 1
+      omega
+    · intro hmem
+      exact absurd (Finset.mem_univ _) hmem
+  · rw [if_neg h]
+    apply Finset.sum_eq_zero
+    intro y _
+    apply if_neg
+    intro heq
+    apply h
+    omega
+
+/-- Σ_{x : Fin (N+1)} (if x.val < N then 1 else 0) = N: there are
+exactly `N` elements with `x.val < N` (namely `0, 1, …, N-1`). -/
+private lemma sum_lt_eq (N : ℕ) :
+    (∑ x : Fin (N + 1), if x.val < N then (1 : ℂ) else 0) = (N : ℂ) := by
+  rw [show (∑ x : Fin (N + 1), if x.val < N then (1 : ℂ) else 0) =
+      ((Finset.univ : Finset (Fin (N + 1))).filter (fun x => x.val < N)).card by
+    rw [Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const,
+      nsmul_eq_mul, mul_one]]
+  congr 1
+  rw [Finset.card_filter]
+  rw [Finset.sum_fin_eq_sum_range]
+  rw [show (∑ k ∈ Finset.range (N + 1),
+        if h : k < N + 1 then (if k < N then (1 : ℕ) else 0) else 0) =
+      ∑ k ∈ Finset.range (N + 1), if k < N then (1 : ℕ) else 0 from by
+    refine Finset.sum_congr rfl (fun k hk => ?_)
+    rw [Finset.mem_range] at hk
+    simp [hk]]
+  rw [Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const,
+    smul_eq_mul, mul_one]
+  rw [show ((Finset.range (N + 1)).filter (fun k => k < N)).card = N from by
+    rw [show (Finset.range (N + 1)).filter (fun k => k < N) = Finset.range N from by
+      ext k
+      simp [Finset.mem_filter, Finset.mem_range]
+      omega]
+    exact Finset.card_range N]
+
+/-- Σ_{x : Fin (N+1)} (if 0 < x.val then 1 else 0) = N: there are
+exactly `N` elements with `x.val > 0`. -/
+private lemma sum_pos_eq (N : ℕ) :
+    (∑ x : Fin (N + 1), if 0 < x.val then (1 : ℂ) else 0) = (N : ℂ) := by
+  rw [show (∑ x : Fin (N + 1), if 0 < x.val then (1 : ℂ) else 0) =
+      ((Finset.univ : Finset (Fin (N + 1))).filter (fun x => 0 < x.val)).card by
+    rw [Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const,
+      nsmul_eq_mul, mul_one]]
+  congr 1
+  rw [Finset.card_filter]
+  rw [Finset.sum_fin_eq_sum_range]
+  rw [show (∑ k ∈ Finset.range (N + 1),
+        if h : k < N + 1 then (if 0 < k then (1 : ℕ) else 0) else 0) =
+      ∑ k ∈ Finset.range (N + 1), if 0 < k then (1 : ℕ) else 0 from by
+    refine Finset.sum_congr rfl (fun k hk => ?_)
+    rw [Finset.mem_range] at hk
+    simp [hk]]
+  rw [Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const,
+    smul_eq_mul, mul_one]
+  rw [show ((Finset.range (N + 1)).filter (fun k => 0 < k)).card = N from by
+    rw [show (Finset.range (N + 1)).filter (fun k => 0 < k) =
+        (Finset.range (N + 1)).erase 0 from by
+      ext k
+      simp [Finset.mem_filter, Finset.mem_range, Finset.mem_erase]
+      omega]
+    rw [Finset.card_erase_of_mem (by simp)]
+    simp [Finset.card_range]]
+
+/-- The total bilinear sum of `openChainCoupling N J` equals `-2N·J`:
+each of the `N` unordered nearest-neighbour bonds contributes `-J` in
+both orientations (open chain on `Fin (N+1)`). -/
+theorem openChainCoupling_sum_eq (N : ℕ) (J : ℝ) :
+    (∑ x : Fin (N + 1), ∑ y : Fin (N + 1), openChainCoupling N J x y) =
+      (-(2 * N * J) : ℂ) := by
+  -- Split the sum by the disjoint union of the two predicates.
+  have hsplit : ∀ x y : Fin (N + 1),
+      openChainCoupling N J x y =
+        (if x.val + 1 = y.val then -(J : ℂ) else 0) +
+        (if y.val + 1 = x.val then -(J : ℂ) else 0) := by
+    intro x y
+    unfold openChainCoupling
+    by_cases h1 : x.val + 1 = y.val
+    · have h2 : ¬ y.val + 1 = x.val := by omega
+      rw [if_pos h1, if_neg h2, add_zero]
+      rw [if_pos (Or.inl h1)]
+    · by_cases h2 : y.val + 1 = x.val
+      · rw [if_neg h1, if_pos h2, zero_add]
+        rw [if_pos (Or.inr h2)]
+      · rw [if_neg h1, if_neg h2, add_zero]
+        rw [if_neg (by tauto)]
+  simp_rw [hsplit, Finset.sum_add_distrib]
+  rw [show (∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+        if x.val + 1 = y.val then -(J : ℂ) else 0) =
+      (-(N * J : ℂ)) from by
+    simp_rw [openChain_row_sum_succ N _ (-(J : ℂ))]
+    rw [show (∑ x : Fin (N + 1), if x.val < N then -(J : ℂ) else 0) =
+        (-(J : ℂ)) * N from by
+      rw [show (∑ x : Fin (N + 1), if x.val < N then -(J : ℂ) else 0) =
+          (-(J : ℂ)) * (∑ x : Fin (N + 1), if x.val < N then (1 : ℂ) else 0) from by
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl (fun x _ => ?_)
+        by_cases h : x.val < N <;> simp [h]]
+      rw [sum_lt_eq]]
+    ring]
+  rw [show (∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+        if y.val + 1 = x.val then -(J : ℂ) else 0) =
+      (-(N * J : ℂ)) from by
+    simp_rw [openChain_row_sum_pred N _ (-(J : ℂ))]
+    rw [show (∑ x : Fin (N + 1), if 0 < x.val then -(J : ℂ) else 0) =
+        (-(J : ℂ)) * N from by
+      rw [show (∑ x : Fin (N + 1), if 0 < x.val then -(J : ℂ) else 0) =
+          (-(J : ℂ)) * (∑ x : Fin (N + 1), if 0 < x.val then (1 : ℂ) else 0) from by
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl (fun x _ => ?_)
+        by_cases h : 0 < x.val <;> simp [h]]
+      rw [sum_pos_eq]]
+    ring]
+  ring
+
+/-- Eigenvalue on the all-up state for the open chain Heisenberg
+Hamiltonian on `Fin (N+1)` (Tasaki §2.4 eq. (2.4.5)/(2.4.1) for
+`S = 1/2`):
+`H_open · |↑..↑⟩ = -(N·J/2) · |↑..↑⟩`. The eigenvalue matches the
+ferromagnetic ground-state energy `E_GS = -|B|·S²` for `|B| = N`
+bonds and `S = 1/2`, scaled by 2 for our ordered-pair convention. -/
+theorem openChainHeisenbergHamiltonian_mulVec_basisVec_all_up (N : ℕ) (J : ℝ) :
+    (heisenbergHamiltonian (openChainCoupling N J)).mulVec
+        (basisVec (fun _ : Fin (N + 1) => (0 : Fin 2))) =
+      (-(N * J / 2 : ℂ)) • basisVec (fun _ : Fin (N + 1) => (0 : Fin 2)) := by
+  rw [heisenbergHamiltonian_mulVec_basisVec_const]
+  congr 1
+  -- Sum: Σ x y, openChainCoupling N J x y · χ_{x,y}.
+  -- Diagonal terms vanish (openChainCoupling x x = 0), off-diagonal × 1/4.
+  have hdiag : ∀ x : Fin (N + 1), openChainCoupling N J x x = 0 := by
+    intro x
+    unfold openChainCoupling
+    rw [if_neg (by simp)]
+  have hsame : ∀ x y : Fin (N + 1),
+      openChainCoupling N J x y *
+        (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ)) =
+      (1 / 4 : ℂ) * openChainCoupling N J x y := by
+    intro x y
+    by_cases h : x = y
+    · subst h
+      rw [if_pos rfl, hdiag]
+      ring
+    · rw [if_neg h]
+      ring
+  simp_rw [hsame]
+  -- Pull out the 1/4 from the inner sum, then outer sum.
+  rw [show (∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+        (1 / 4 : ℂ) * openChainCoupling N J x y) =
+      (1 / 4 : ℂ) * (∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+        openChainCoupling N J x y) from by
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl (fun x _ => ?_)
+    rw [Finset.mul_sum]]
+  rw [openChainCoupling_sum_eq N J]
+  ring
+
 end LatticeSystem.Quantum
