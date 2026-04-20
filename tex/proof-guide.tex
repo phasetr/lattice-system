@@ -1982,6 +1982,38 @@ $\langle A \rangle_0 = \dim^{-1} \cdot \operatorname{Tr}(A)$
 the second-moment and first-moment occurrences.
 \end{proof}
 
+\subsection{Covariance}
+\label{subsec:gibbs-covariance}
+
+\begin{definition}[\texttt{gibbsCovariance}]
+The canonical-ensemble (complex) covariance of two observables
+$A, B$ at inverse temperature $\beta$ under Hamiltonian $H$ is
+\[
+  \operatorname{Cov}_\beta(A, B)
+  \;:=\;
+  \langle A \cdot B \rangle_\beta
+  - \langle A \rangle_\beta \cdot \langle B \rangle_\beta.
+\]
+\end{definition}
+
+\begin{lemma}[\texttt{gibbsCovariance\_self\_eq\_variance}]
+$\operatorname{Cov}_\beta(O, O) = \operatorname{Var}_\beta(O)$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Unfold both sides; the variance uses $(\langle O \rangle_\beta)^2$,
+which equals $\langle O \rangle_\beta \cdot \langle O \rangle_\beta$
+by \texttt{pow\_two}.
+\end{proof}
+
+\begin{remark}
+For non-commuting Hermitian $A, B$, $\operatorname{Cov}_\beta(A, B)$
+is generally complex: its imaginary part captures
+$(1/2) \Im\langle [A, B] \rangle_\beta$.  The symmetric / real-valued
+covariance $(1/2) \langle \{A, B\} \rangle_\beta - \langle A \rangle_\beta \langle B \rangle_\beta$
+is left for a follow-up PR.
+\end{remark}
+
 \subsection{Anticommutator real, commutator purely imaginary}
 \label{subsec:gibbs-anti-comm}
 
