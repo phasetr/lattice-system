@@ -2683,6 +2683,32 @@ Lean names: \texttt{openChainHeisenbergGibbsExpectation\_self\_eq},
 \texttt{periodicChainHeisenbergGibbsExpectation\_self\_eq}.
 \end{remark}
 
+\subsection{2-site explicit form and spectrum}
+\label{subsec:two-site-spectrum}
+
+The simplest concrete instance is $\Lambda = \mathrm{Fin}\,2$
+($N = 1$ in \texttt{openChainCoupling 1 J}).  Direct evaluation gives
+\[
+  \texttt{heisenbergHamiltonian}\,(\texttt{openChainCoupling 1 J})
+  \;=\; -2J\,\hat S_{0}\!\cdot\!\hat S_{1},
+\]
+a single bond term.  The four computational basis decompositions
+$|{\uparrow}{\uparrow}\rangle$, $|{\downarrow}{\downarrow}\rangle$,
+the singlet $|{\uparrow}{\downarrow}\rangle - |{\downarrow}{\uparrow}\rangle$,
+and the triplet $|{\uparrow}{\downarrow}\rangle + |{\downarrow}{\uparrow}\rangle$
+are exact eigenstates with eigenvalues $-J/2$, $-J/2$, $+3J/2$, and
+$-J/2$ respectively (Lean theorems
+\texttt{openChainHeisenbergHamiltonian\_two\_site\_mulVec\_basisVec\_all\_up}
+and
+\texttt{openChainHeisenbergHamiltonian\_two\_site\_mulVec\_basisVec\_singlet};
+the all-down and triplet eigenvalues follow analogously).  The
+ferromagnetic ($J<0$) ground state is the triply-degenerate triplet
+$\{|{\uparrow}{\uparrow}\rangle,
+|{\downarrow}{\downarrow}\rangle,
+|{\uparrow}{\downarrow}\rangle + |{\downarrow}{\uparrow}\rangle\}$,
+and the antiferromagnetic ($J>0$) ground state is the singlet —
+matching Tasaki \S2.4 / \S2.5 for the simplest two-site case.
+
 \subsection{Action on the fully-polarised state (Tasaki §2.4 (2.4.5))}
 \label{subsec:heisenberg-allup}
 

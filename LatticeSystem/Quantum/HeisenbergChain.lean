@@ -34,7 +34,9 @@ open Matrix
 /-! ## Nearest-neighbour coupling functions -/
 
 /-- Open-boundary nearest-neighbour coupling on `Fin (N + 1)`:
-`J(x, y) = J` if `|x - y| = 1`, else `0`. -/
+`J(x, y) = -J` if `|x.val - y.val| = 1`, else `0`. The negative sign
+encodes Tasaki's ferromagnetic convention `H = -J Σ_{⟨x,y⟩} Ŝ_x · Ŝ_y`
+(eq. (2.4.1)) so that `J > 0` is ferromagnetic. -/
 noncomputable def openChainCoupling (N : ℕ) (J : ℝ) : Fin (N + 1) → Fin (N + 1) → ℂ :=
   fun x y => if (x.val + 1 = y.val) ∨ (y.val + 1 = x.val) then -(J : ℂ) else 0
 
@@ -386,5 +388,66 @@ theorem periodicChainHeisenbergGibbsState_pow_trace
         / (partitionFn β
             (heisenbergHamiltonian (periodicChainCoupling N J))) ^ n :=
   gibbsState_pow_trace β (heisenbergHamiltonian (periodicChainCoupling N J)) n
+
+/-! ## 2-site (Fin 2) explicit form and spectrum (Tasaki §2.4)
+
+The simplest concrete instance: for `N = 1` (the open chain on `Fin 2`),
+the Heisenberg Hamiltonian collapses to a single bond term. The four
+distinguished states (all-up, all-down, singlet, triplet `m=0`) are
+exact eigenstates with eigenvalues `-J/2, -J/2, +3J/2, -J/2`. -/
+
+/-- Explicit form of the 2-site open chain Heisenberg Hamiltonian:
+`H_open(N=1) = -2J · spinHalfDot 0 1`. -/
+theorem openChainHeisenbergHamiltonian_two_site_eq (J : ℝ) :
+    heisenbergHamiltonian (openChainCoupling 1 J) =
+      (-(2 * J) : ℂ) • spinHalfDot (0 : Fin 2) 1 := by
+  unfold heisenbergHamiltonian
+  rw [Fin.sum_univ_two, Fin.sum_univ_two, Fin.sum_univ_two]
+  -- Compute openChainCoupling 1 J for each of the 4 (x,y) pairs.
+  have h00 : openChainCoupling 1 J 0 0 = 0 := by
+    simp [openChainCoupling]
+  have h01 : openChainCoupling 1 J 0 1 = -(J : ℂ) := by
+    simp [openChainCoupling]
+  have h10 : openChainCoupling 1 J 1 0 = -(J : ℂ) := by
+    simp [openChainCoupling]
+  have h11 : openChainCoupling 1 J 1 1 = 0 := by
+    simp [openChainCoupling]
+  rw [h00, h01, h10, h11]
+  -- spinHalfDot 1 0 = spinHalfDot 0 1 by symmetry; combine the two -J terms.
+  rw [spinHalfDot_comm 1 0]
+  rw [zero_smul, zero_smul, zero_add, add_zero]
+  rw [show (-(J : ℂ)) • spinHalfDot (0 : Fin 2) 1 + -(J : ℂ) • spinHalfDot 0 1 =
+        (-(2 * J : ℂ)) • spinHalfDot 0 1 from by
+    rw [← add_smul]; ring_nf]
+
+/-- Eigenvalue on the all-up state for the 2-site open chain Heisenberg
+Hamiltonian: `H · |↑↑⟩ = -(J/2) · |↑↑⟩`. This is the explicit
+ferromagnetic ground-state energy `-S²·|B|·1` for `S = 1/2`, `|B| = 1`. -/
+theorem openChainHeisenbergHamiltonian_two_site_mulVec_basisVec_all_up (J : ℝ) :
+    (heisenbergHamiltonian (openChainCoupling 1 J)).mulVec
+        (basisVec (fun _ : Fin 2 => (0 : Fin 2))) =
+      (-(J / 2 : ℂ)) • basisVec (fun _ : Fin 2 => (0 : Fin 2)) := by
+  rw [openChainHeisenbergHamiltonian_two_site_eq, Matrix.smul_mulVec]
+  -- spinHalfDot 0 1 |↑↑⟩ = (1/4) |↑↑⟩ for x ≠ y
+  have h : (spinHalfDot (0 : Fin 2) 1).mulVec
+      (basisVec (fun _ : Fin 2 => (0 : Fin 2))) =
+        (1 / 4 : ℂ) • basisVec (fun _ : Fin 2 => (0 : Fin 2)) :=
+    spinHalfDot_mulVec_basisVec_both_up (by decide)
+  rw [h, smul_smul]
+  congr 1; ring
+
+/-- Eigenvalue on the singlet for the 2-site open chain Heisenberg
+Hamiltonian: `H · (|↑↓⟩ - |↓↑⟩) = (3J/2) · (|↑↓⟩ - |↓↑⟩)`. The
+singlet is the exact ground state for antiferromagnetic `J > 0`
+(Tasaki §2.5 conventions). -/
+theorem openChainHeisenbergHamiltonian_two_site_mulVec_basisVec_singlet (J : ℝ) :
+    (heisenbergHamiltonian (openChainCoupling 1 J)).mulVec
+        (basisVec upDown - basisVec (basisSwap upDown 0 1)) =
+      ((3 * J / 2 : ℂ)) • (basisVec upDown - basisVec (basisSwap upDown 0 1)) := by
+  rw [openChainHeisenbergHamiltonian_two_site_eq, Matrix.smul_mulVec]
+  have h := spinHalfDot_mulVec_singlet (Λ := Fin 2) (x := 0) (y := 1) (by decide)
+    upDown upDown_antiparallel
+  rw [h, smul_smul]
+  congr 1; ring
 
 end LatticeSystem.Quantum
