@@ -370,6 +370,7 @@ Systems*, §2.2 eq. (2.2.16), p. 24.
 | `heisenbergHamiltonian_commutator_totalSpinHalfOp{Plus,Minus}` | `[H, Ŝ^±_tot] = 0` (ladder form of SU(2) invariance) | `Quantum/SpinDot.lean` |
 | `heisenbergHamiltonian_commute_totalSpinHalfSquared` | `Commute H Ŝtot²` — the Casimir operator-level form of SU(2) invariance (consequence of `[H, Ŝtot^α] = 0` for each α, via `Commute.mul_right` and `.add_right`) | `Quantum/SpinDot.lean` |
 | `heisenbergHamiltonian_mulVec_preserves_totalSpinHalfSquared_eigenvalue` | if `Ŝtot² · v = S · v` then `Ŝtot² · (H · v) = S · (H · v)` — operator-level simultaneous diagonalisation of `H` and the SU(2) Casimir | `Quantum/SpinDot.lean` |
+| `spinHalfOpPlus_mul_pauliZ` / `pauliZ_mul_spinHalfOpPlus` | `σ^+ · σ^z = -σ^+` and `σ^z · σ^+ = σ^+` — the (anti)commutation at the single-site Pauli algebra level, used for the Jordan-Wigner cross-site CAR | `Quantum/SpinHalfBasis.lean` |
 | `totalSpinHalfSquared_mulVec_basisVec_const` | `Ŝ_tot² |s s … s⟩ = (N(N+2)/4) |s s … s⟩` for any constant `s : Fin 2` (Casimir eigenvalue at maximum total spin `S = N/2`) | `Quantum/SpinDot.lean` |
 | `totalSpinHalfSquared_mulVec_basisVec_all_up/down` | specializations of the above to `s = 0` (all-up) and `s = 1` (all-down) | `Quantum/SpinDot.lean` |
 | `totalSpinHalfSquared_mulVec_totalSpinHalfOp{Minus,Plus}_pow_basisVec_const` | for any `s : Fin 2` and `k : ℕ`, `Ŝtot² · (Ŝtot^∓)^k · |s…s⟩ = (|Λ|·(|Λ|+2)/4) · (Ŝtot^∓)^k · |s…s⟩` — the iterated ladder iterates remain in the maximum-total-spin SU(2) representation `S = Smax = |Λ|/2` (Casimir invariance, Tasaki §2.4) | `Quantum/SpinDot.lean` |
@@ -625,6 +626,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionMultiNumber_commute` | `Commute (n_i) (n_j)` for any sites (simultaneously diagonal) | `Fermion/JordanWigner.lean` |
 | `fermionTotalNumber N` | `N̂ := Σ_i n_i` (total particle-number operator) | `Fermion/JordanWigner.lean` |
 | `fermionTotalNumber_isHermitian` | `N̂` is Hermitian | `Fermion/JordanWigner.lean` |
+| `fermionMultiAnnihilation_anticomm_two_site_cross` | simplest nontrivial cross-site CAR on `Fin 2`: `c_0 · c_1 + c_1 · c_0 = 0` (JW string at site 1 is `σ^z_0`, combined with `σ^+ σ^z = -σ^+` and `σ^z σ^+ = σ^+`) | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 

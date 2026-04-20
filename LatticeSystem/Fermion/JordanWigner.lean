@@ -408,4 +408,54 @@ theorem fermionMultiAnticomm_self (N : ℕ) (i : Fin (N + 1)) :
     onSite_mul_onSite_same, onSite_mul_onSite_same, ← onSite_add,
     spinHalfOpPlus_anticomm_spinHalfOpMinus, onSite_one]
 
+/-! ## Cross-site CAR on `Fin 2` (simplest nontrivial JW case)
+
+For the 2-site lattice `Fin 2`, the Jordan-Wigner string at site 1 is
+exactly `σ^z_0` (the single factor), so
+`c_0 = σ^+_0` and `c_1 = σ^z_0 · σ^+_1`. Combining the Pauli identities
+`σ^+ σ^z = -σ^+` and `σ^z σ^+ = σ^+` with the `onSite` algebra,
+`{c_0, c_1} = 0`. -/
+
+/-- Cross-site CAR on `Fin 2`: `c_0 · c_1 + c_1 · c_0 = 0`. The
+simplest nontrivial Jordan-Wigner cross-site anticommutator. -/
+theorem fermionMultiAnnihilation_anticomm_two_site_cross :
+    fermionMultiAnnihilation 1 (0 : Fin 2) *
+        fermionMultiAnnihilation 1 1 +
+      fermionMultiAnnihilation 1 1 *
+        fermionMultiAnnihilation 1 0 = 0 := by
+  -- c_0 = σ^+_0 via jwString_zero.
+  rw [fermionMultiAnnihilation_zero]
+  -- c_1 = jwString 1 1 * σ^+_1. The JW string has one factor (site 0).
+  have hjw : jwString 1 (1 : Fin 2) = onSite (0 : Fin 2) pauliZ := by
+    have hfilter : (Finset.univ : Finset (Fin 2)).filter
+        (fun j : Fin 2 => j.val < (1 : Fin 2).val) = ({0} : Finset (Fin 2)) := by
+      ext k; fin_cases k <;> simp
+    unfold jwString
+    rw [Finset.noncommProd_congr hfilter (fun _ _ => rfl)]
+    exact Finset.noncommProd_singleton _ _
+  show onSite (0 : Fin 2) spinHalfOpPlus *
+        fermionMultiAnnihilation 1 1 +
+      fermionMultiAnnihilation 1 1 *
+        onSite (0 : Fin 2) spinHalfOpPlus = 0
+  unfold fermionMultiAnnihilation
+  rw [hjw]
+  -- Goal: σ^+_0 · (σ^z_0 · σ^+_1) + (σ^z_0 · σ^+_1) · σ^+_0 = 0
+  have h01 : (0 : Fin 2) ≠ 1 := by decide
+  -- Compute c_0 · c_1 = σ^+_0 · σ^z_0 · σ^+_1 = (σ^+ σ^z)_0 · σ^+_1 = -σ^+_0 · σ^+_1
+  have hfirst : onSite (0 : Fin 2) spinHalfOpPlus *
+      (onSite (0 : Fin 2) pauliZ * onSite (1 : Fin 2) spinHalfOpPlus) =
+        -(onSite (0 : Fin 2) spinHalfOpPlus * onSite (1 : Fin 2) spinHalfOpPlus) := by
+    rw [← Matrix.mul_assoc, onSite_mul_onSite_same, spinHalfOpPlus_mul_pauliZ]
+    -- Goal: onSite 0 (-σ^+) * onSite 1 σ^+ = -(onSite 0 σ^+ * onSite 1 σ^+)
+    rw [show (-spinHalfOpPlus : Matrix (Fin 2) (Fin 2) ℂ) = (-1 : ℂ) • spinHalfOpPlus
+      from by rw [neg_one_smul], onSite_smul, Matrix.smul_mul, neg_one_smul]
+  -- Compute c_1 · c_0 = σ^z_0 · σ^+_1 · σ^+_0 = σ^z_0 · σ^+_0 · σ^+_1 = σ^+_0 · σ^+_1
+  have hsecond : (onSite (0 : Fin 2) pauliZ * onSite (1 : Fin 2) spinHalfOpPlus) *
+      onSite (0 : Fin 2) spinHalfOpPlus =
+        onSite (0 : Fin 2) spinHalfOpPlus * onSite (1 : Fin 2) spinHalfOpPlus := by
+    -- Swap σ^+_1 past σ^+_0 (disjoint sites 0 and 1), then combine σ^z σ^+ = σ^+
+    rw [Matrix.mul_assoc, onSite_mul_onSite_of_ne h01.symm, ← Matrix.mul_assoc,
+      onSite_mul_onSite_same, pauliZ_mul_spinHalfOpPlus]
+  rw [hfirst, hsecond, neg_add_cancel]
+
 end LatticeSystem.Fermion
