@@ -3001,6 +3001,32 @@ the previous-step eigenvalue, so $c-1 = |\Lambda|/2 - (k+1)$) via the
 \texttt{module} tactic on the resulting scalar smul.
 \end{proof}
 
+\begin{theorem}[\texttt{totalSpinHalfOp3\_mulVec\_totalSpinHalfOpPlus\_pow\_basisVec\_all\_down}]
+For every $k \in \mathbb{N}$,
+\[
+  \hat S_{\mathrm{tot}}^{(3)} \cdot
+    \bigl((\hat S_{\mathrm{tot}}^{+})^{k} \cdot
+            |{\downarrow}\dots{\downarrow}\rangle\bigr)
+  \;=\;
+  \Bigl(-\tfrac{|\Lambda|}{2} + k\Bigr) \cdot
+    \bigl((\hat S_{\mathrm{tot}}^{+})^{k} \cdot
+            |{\downarrow}\dots{\downarrow}\rangle\bigr).
+\]
+This is the dual ladder of the previous theorem, parameterising the
+same ferromagnetic-ground-state lattice from the lowest weight
+$M = -S_{\max}$ upward.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Identical structure to the lowering version, replacing $\hat
+S_{\mathrm{tot}}^{-} \mapsto \hat S_{\mathrm{tot}}^{+}$, the Cartan
+sign $-\hat S_{\mathrm{tot}}^{-} \mapsto +\hat S_{\mathrm{tot}}^{+}$
+(\texttt{totalSpinHalfOp3\_commutator\_totalSpinHalfOpPlus}), and
+$\sum_{x} \tfrac{1}{2} \mapsto \sum_{x} (-\tfrac{1}{2}) =
+-|\Lambda|/2$ in the base case.  The inductive step closes via $c\,v
++ v = (c+1)\,v$ in place of subtraction.
+\end{proof}
+
 %======================================================================
 \section{Single-mode fermion (Phase 2 skeleton)}
 \label{sec:fermion-mode}
