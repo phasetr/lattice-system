@@ -2698,10 +2698,13 @@ the singlet $|{\uparrow}{\downarrow}\rangle - |{\downarrow}{\uparrow}\rangle$,
 and the triplet $|{\uparrow}{\downarrow}\rangle + |{\downarrow}{\uparrow}\rangle$
 are exact eigenstates with eigenvalues $-J/2$, $-J/2$, $+3J/2$, and
 $-J/2$ respectively (Lean theorems
-\texttt{openChainHeisenbergHamiltonian\_two\_site\_mulVec\_basisVec\_all\_up}
-and
-\texttt{openChainHeisenbergHamiltonian\_two\_site\_mulVec\_basisVec\_singlet};
-the all-down and triplet eigenvalues follow analogously).  The
+\texttt{openChainHeisenbergHamiltonian\_two\_site\_mulVec\_basisVec\_all\_up},
+\texttt{\_all\_down},
+\texttt{\_singlet}, and \texttt{\_triplet\_zero}).
+The four eigenvalues form the explicit Clebsch--Gordan decomposition
+$\tfrac{1}{2}\otimes\tfrac{1}{2} = 0\oplus 1$: the singlet
+($S=0$, eigenvalue $+3J/2$) and the triplet ($S=1$, three-fold
+degenerate at $-J/2$).  The
 ferromagnetic ($J<0$) ground state is the triply-degenerate triplet
 $\{|{\uparrow}{\uparrow}\rangle,
 |{\downarrow}{\downarrow}\rangle,
