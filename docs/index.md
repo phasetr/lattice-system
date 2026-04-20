@@ -446,6 +446,7 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `gibbsVariance_eq` | unfolding lemma for `gibbsVariance` | `Quantum/GibbsState.lean` |
 | `gibbsVariance_im_of_isHermitian` | `(Var_β(O)).im = 0` for Hermitian `H, O` (variance is real) | `Quantum/GibbsState.lean` |
 | `gibbsVariance_zero` | at β = 0, `Var_0(O) = (1/dim) · Tr(O²) − ((1/dim) · Tr O)²` | `Quantum/GibbsState.lean` |
+| `gibbsVariance_eq_centered_sq` | `Var_β(O) = ⟨(O − ⟨O⟩_β · 1) · (O − ⟨O⟩_β · 1)⟩_β` (centered-square form, `Z ≠ 0`) | `Quantum/GibbsState.lean` |
 | `gibbsCovariance β H A B` | `Cov_β(A, B) := ⟨A · B⟩_β − ⟨A⟩_β · ⟨B⟩_β` (canonical-ensemble complex covariance) | `Quantum/GibbsState.lean` |
 | `gibbsCovariance_eq` | unfolding lemma for `gibbsCovariance` | `Quantum/GibbsState.lean` |
 | `gibbsCovariance_self_eq_variance` | `Cov_β(O, O) = Var_β(O)` | `Quantum/GibbsState.lean` |

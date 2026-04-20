@@ -2006,6 +2006,31 @@ $\langle A \rangle_0 = \dim^{-1} \cdot \operatorname{Tr}(A)$
 the second-moment and first-moment occurrences.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsVariance\_eq\_centered\_sq}]
+For $Z(\beta, H) \neq 0$,
+\[
+  \operatorname{Var}_\beta(O)
+  \;=\;
+  \langle (O - \langle O \rangle_\beta \cdot I) \cdot (O - \langle O \rangle_\beta \cdot I) \rangle_\beta.
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Expand the matrix square:
+$(O - c I)(O - c I) = O^2 - c \cdot O - c \cdot O + c^2 \cdot I$
+where $c = \langle O \rangle_\beta$.  Apply linearity of the
+expectation (\texttt{gibbsExpectation\_add}, \texttt{gibbsExpectation\_sub},
+\texttt{gibbsExpectation\_smul}) and use
+$\langle I \rangle_\beta = 1$ (\texttt{gibbsExpectation\_one},
+requiring $Z \neq 0$) to obtain
+$\langle O^2 \rangle_\beta - 2 c^2 + c^2 = \langle O^2 \rangle_\beta - c^2
+ = \operatorname{Var}_\beta(O)$.
+
+Identifies the canonical-ensemble variance with the second moment of
+the centered observable $\hat O = O - \langle O \rangle_\beta \cdot I$,
+the standard form for concentration / cumulant arguments.
+\end{proof}
+
 \subsection{Covariance}
 \label{subsec:gibbs-covariance}
 

@@ -525,6 +525,26 @@ theorem gibbsVariance_zero (H O : ManyBodyOp Λ) :
   unfold gibbsVariance
   rw [gibbsExpectation_zero, gibbsExpectation_zero]
 
+/-- The variance equals the second moment of the centered observable
+`Ô := O − ⟨O⟩ · 1`:
+`Var_β(O) = ⟨(O − ⟨O⟩_β · 1) · (O − ⟨O⟩_β · 1)⟩_β` (when `Z(β) ≠ 0`). -/
+theorem gibbsVariance_eq_centered_sq {H O : ManyBodyOp Λ} (β : ℝ)
+    (hZ : partitionFn β H ≠ 0) :
+    gibbsExpectation β H ((O - (gibbsExpectation β H O) • (1 : ManyBodyOp Λ)) *
+        (O - (gibbsExpectation β H O) • 1)) = gibbsVariance β H O := by
+  set c := gibbsExpectation β H O with hc
+  have hsq : (O - c • (1 : ManyBodyOp Λ)) * (O - c • 1) =
+             O * O - c • O - c • O + (c * c) • (1 : ManyBodyOp Λ) := by
+    simp only [sub_mul, mul_sub, Matrix.smul_mul, Matrix.mul_smul,
+      Matrix.one_mul, Matrix.mul_one, smul_smul]
+    abel
+  rw [hsq]
+  simp only [gibbsExpectation_add, gibbsExpectation_sub, gibbsExpectation_smul]
+  rw [show gibbsExpectation β H 1 = 1 from gibbsExpectation_one β hZ]
+  unfold gibbsVariance
+  rw [pow_two, ← hc]
+  ring
+
 /-! ## Covariance -/
 
 /-- The canonical-ensemble covariance of two observables `A`, `B` at
