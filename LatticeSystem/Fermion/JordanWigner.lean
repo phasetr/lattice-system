@@ -154,6 +154,77 @@ theorem fermionMultiAnnihilation_sq (N : ℕ) (i : Fin (N + 1)) :
     simp [onSite_apply]
   rw [h_zero, Matrix.mul_zero]
 
+/-! ## JW string Hermiticity and adjoint of multi-mode operators -/
+
+/-- The conjugate transpose distributes through `onSite`:
+`(onSite i A)ᴴ = onSite i Aᴴ`. Holds entrywise since the `onSite`
+matrix element is `A (σ' i) (σ i)` (or `0`), and conjTranspose acts
+entrywise as `star`. -/
+private lemma onSite_conjTranspose {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (i : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) :
+    (onSite i A : ManyBodyOp Λ)ᴴ = onSite i Aᴴ := by
+  ext σ' σ
+  simp only [Matrix.conjTranspose_apply, onSite_apply]
+  by_cases h : ∀ k, k ≠ i → σ' k = σ k
+  · have h' : ∀ k, k ≠ i → σ k = σ' k := fun k hki => (h k hki).symm
+    rw [if_pos h, if_pos h']
+  · have h' : ¬ (∀ k, k ≠ i → σ k = σ' k) :=
+      fun hp => h (fun k hki => (hp k hki).symm)
+    rw [if_neg h, if_neg h', star_zero]
+
+/-- A noncomm-product of pairwise-commuting Hermitian matrices is
+Hermitian. Used here for the JW string, which is a product of
+mutually commuting Hermitian `σ^z_j` factors. -/
+private lemma noncommProd_isHermitian_of_pairwise_commute_of_isHermitian
+    {ι : Type*} {n : Type*} [Fintype n] [DecidableEq n]
+    (s : Finset ι) (f : ι → Matrix n n ℂ)
+    (hcomm : (s : Set ι).Pairwise (fun a b => Commute (f a) (f b)))
+    (hHerm : ∀ a ∈ s, (f a).IsHermitian) :
+    (s.noncommProd f hcomm).IsHermitian := by
+  classical
+  induction s using Finset.induction_on with
+  | empty =>
+    simp only [Finset.noncommProd_empty]
+    exact Matrix.isHermitian_one
+  | @insert a t hat ih =>
+    rw [Finset.noncommProd_insert_of_notMem _ _ _ _ hat]
+    have hcomm_t : (t : Set ι).Pairwise (fun a b => Commute (f a) (f b)) :=
+      hcomm.mono fun x hx => Finset.mem_insert_of_mem hx
+    have hHerm_t : ∀ b ∈ t, (f b).IsHermitian :=
+      fun b hb => hHerm b (Finset.mem_insert_of_mem hb)
+    refine Matrix.IsHermitian.mul_of_commute
+      (hHerm a (Finset.mem_insert_self a t)) (ih hcomm_t hHerm_t) ?_
+    apply Finset.noncommProd_commute
+    intro b hb
+    have hab : a ≠ b := fun h => hat (h ▸ hb)
+    exact hcomm (Finset.mem_insert_self a t) (Finset.mem_insert_of_mem hb) hab
+
+/-- The Jordan–Wigner string is Hermitian: `(jwString N i)ᴴ = jwString N i`. -/
+theorem jwString_isHermitian (N : ℕ) (i : Fin (N + 1)) :
+    (jwString N i).IsHermitian := by
+  unfold jwString
+  apply noncommProd_isHermitian_of_pairwise_commute_of_isHermitian
+  intro j _
+  exact onSite_isHermitian j pauliZ_isHermitian
+
+/-- `(c_i)ᴴ = c_i†`: the adjoint of the multi-mode annihilation operator
+equals the multi-mode creation operator. -/
+theorem fermionMultiAnnihilation_conjTranspose (N : ℕ) (i : Fin (N + 1)) :
+    (fermionMultiAnnihilation N i)ᴴ = fermionMultiCreation N i := by
+  unfold fermionMultiAnnihilation fermionMultiCreation
+  rw [Matrix.conjTranspose_mul, (jwString_isHermitian N i).eq,
+    onSite_conjTranspose, spinHalfOpPlus_conjTranspose]
+  exact (jwString_commute_onSite N i spinHalfOpMinus).eq.symm
+
+/-- `(c_i†)ᴴ = c_i`: the adjoint of the multi-mode creation operator
+equals the multi-mode annihilation operator. -/
+theorem fermionMultiCreation_conjTranspose (N : ℕ) (i : Fin (N + 1)) :
+    (fermionMultiCreation N i)ᴴ = fermionMultiAnnihilation N i := by
+  unfold fermionMultiAnnihilation fermionMultiCreation
+  rw [Matrix.conjTranspose_mul, (jwString_isHermitian N i).eq,
+    onSite_conjTranspose, spinHalfOpMinus_conjTranspose]
+  exact (jwString_commute_onSite N i spinHalfOpPlus).eq.symm
+
 /-- `(c_i†)² = 0`: cannot create the same fermion mode twice. -/
 theorem fermionMultiCreation_sq (N : ℕ) (i : Fin (N + 1)) :
     fermionMultiCreation N i * fermionMultiCreation N i = 0 := by

@@ -2837,6 +2837,37 @@ $J_i^2 \cdot \texttt{onSite } i\, 0 = J_i^2 \cdot 0 = 0$.  Same
 argument for $(c_i^\dagger)^2$ with $\sigma^-$ in place of $\sigma^+$.
 \end{proof}
 
+\subsection{JW string Hermiticity and adjoint of multi-mode operators}
+
+\begin{lemma}[\texttt{jwString\_isHermitian}]
+$J_i$ is Hermitian.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+The string is a noncomm-product of pairwise-commuting Hermitian
+$\sigma^z_j$ factors.  An induction over the Finset, using
+\texttt{Matrix.IsHermitian.mul\_of\_commute} at each step (the new
+factor commutes with the rest by
+\texttt{Finset.noncommProd\_commute}), establishes the result.
+\end{proof}
+
+\begin{lemma}[\texttt{fermionMultiAnnihilation\_conjTranspose},
+            \texttt{fermionMultiCreation\_conjTranspose}]
+$(c_i)^\dagger = c_i^\dagger$ and $(c_i^\dagger)^\dagger = c_i$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+$(J_i \sigma^+_i)^\dagger = (\sigma^+_i)^\dagger \cdot J_i^\dagger
+ = \sigma^-_i \cdot J_i = J_i \cdot \sigma^-_i = c_i^\dagger$,
+using \texttt{Matrix.conjTranspose\_mul},
+\texttt{jwString\_isHermitian},
+\texttt{onSite\_conjTranspose} (a small private lemma that lifts
+conjTranspose into \texttt{onSite}),
+\texttt{spinHalfOpPlus\_conjTranspose}, and finally
+\texttt{jwString\_commute\_onSite} to swap the order back.  The
+$(c_i^\dagger)^\dagger = c_i$ direction is symmetric.
+\end{proof}
+
 \subsection*{Deferred: cross-site CAR}
 
 The cross-site relations
