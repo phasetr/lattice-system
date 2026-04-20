@@ -240,4 +240,19 @@ theorem quantumIsingGibbsHamiltonianVariance_im (β J h : ℝ) (N : ℕ) :
     (quantumIsingHamiltonian_isHermitian N J h)
     (quantumIsingHamiltonian_isHermitian N J h) β
 
+/-- Ising-chain partition function is real:
+`(partitionFn β H_Ising).im = 0`. -/
+theorem quantumIsing_partitionFn_im (β J h : ℝ) (N : ℕ) :
+    (partitionFn β (quantumIsingHamiltonian N J h)).im = 0 :=
+  partitionFn_im_of_isHermitian (quantumIsingHamiltonian_isHermitian N J h) β
+
+/-- Ising-chain expectation real-cast equality:
+for Hermitian `O`, `((⟨O⟩_β).re : ℂ) = ⟨O⟩_β`. -/
+theorem quantumIsingGibbsExpectation_ofReal_re_eq
+    (β J h : ℝ) (N : ℕ) {O : ManyBodyOp (Fin (N + 1))} (hO : O.IsHermitian) :
+    (((gibbsExpectation β (quantumIsingHamiltonian N J h) O).re : ℂ))
+      = gibbsExpectation β (quantumIsingHamiltonian N J h) O :=
+  gibbsExpectation_ofReal_re_eq_of_isHermitian
+    (quantumIsingHamiltonian_isHermitian N J h) hO β
+
 end LatticeSystem.Quantum

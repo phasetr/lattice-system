@@ -224,6 +224,22 @@ theorem openChainHeisenbergGibbsHamiltonianVariance_im (β J : ℝ) (N : ℕ) :
   gibbsVariance_im_of_isHermitian
     (openChainHeisenberg_isHermitian N J) (openChainHeisenberg_isHermitian N J) β
 
+/-- Open-chain Heisenberg partition function is real:
+`(partitionFn β H_open).im = 0`. -/
+theorem openChainHeisenberg_partitionFn_im (β J : ℝ) (N : ℕ) :
+    (partitionFn β (heisenbergHamiltonian (openChainCoupling N J))).im = 0 :=
+  partitionFn_im_of_isHermitian (openChainHeisenberg_isHermitian N J) β
+
+/-- Open-chain Heisenberg expectation real-cast equality:
+for Hermitian `O`, `((⟨O⟩_β).re : ℂ) = ⟨O⟩_β`. -/
+theorem openChainHeisenbergGibbsExpectation_ofReal_re_eq
+    (β J : ℝ) (N : ℕ) {O : ManyBodyOp (Fin (N + 1))} (hO : O.IsHermitian) :
+    (((gibbsExpectation β (heisenbergHamiltonian (openChainCoupling N J)) O).re
+        : ℂ))
+      = gibbsExpectation β (heisenbergHamiltonian (openChainCoupling N J)) O :=
+  gibbsExpectation_ofReal_re_eq_of_isHermitian
+    (openChainHeisenberg_isHermitian N J) hO β
+
 /-! ## Gibbs state for the periodic-chain Heisenberg Hamiltonian -/
 
 /-- The Gibbs state of the periodic-boundary 1D Heisenberg chain on
@@ -333,5 +349,22 @@ theorem periodicChainHeisenbergGibbsHamiltonianVariance_im
   gibbsVariance_im_of_isHermitian
     (periodicChainHeisenberg_isHermitian N J)
     (periodicChainHeisenberg_isHermitian N J) β
+
+/-- Periodic-chain Heisenberg partition function is real:
+`(partitionFn β H_periodic).im = 0`. -/
+theorem periodicChainHeisenberg_partitionFn_im (β J : ℝ) (N : ℕ) :
+    (partitionFn β (heisenbergHamiltonian (periodicChainCoupling N J))).im = 0 :=
+  partitionFn_im_of_isHermitian (periodicChainHeisenberg_isHermitian N J) β
+
+/-- Periodic-chain Heisenberg expectation real-cast equality:
+for Hermitian `O`, `((⟨O⟩_β).re : ℂ) = ⟨O⟩_β`. -/
+theorem periodicChainHeisenbergGibbsExpectation_ofReal_re_eq
+    (β J : ℝ) (N : ℕ) {O : ManyBodyOp (Fin (N + 2))} (hO : O.IsHermitian) :
+    (((gibbsExpectation β
+        (heisenbergHamiltonian (periodicChainCoupling N J)) O).re : ℂ))
+      = gibbsExpectation β
+          (heisenbergHamiltonian (periodicChainCoupling N J)) O :=
+  gibbsExpectation_ofReal_re_eq_of_isHermitian
+    (periodicChainHeisenberg_isHermitian N J) hO β
 
 end LatticeSystem.Quantum
