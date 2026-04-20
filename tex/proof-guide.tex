@@ -2331,6 +2331,20 @@ purely imaginary for Hermitian observables) parts, the algebraic
 backbone of Kubo / fluctuation-dissipation arguments.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsCovariance\_eq\_symm\_of\_commute}]
+For commuting observables $A, B$ (i.e.\ $[A, B] = 0$),
+$\operatorname{Cov}_\beta(A, B) = \operatorname{Cov}^{\mathrm{s}}_\beta(A, B)$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Apply the symmetric / antisymmetric decomposition.  The
+commutator-based correction
+$\tfrac{1}{2} \langle A B - B A \rangle_\beta$ vanishes when
+$A B - B A = 0$ (\texttt{Commute.eq}), and
+$\langle 0 \rangle_\beta = 0$ via
+\texttt{Matrix.mul\_zero} / \texttt{Matrix.trace\_zero}.
+\end{proof}
+
 \subsection{Anticommutator real, commutator purely imaginary}
 \label{subsec:gibbs-anti-comm}
 
