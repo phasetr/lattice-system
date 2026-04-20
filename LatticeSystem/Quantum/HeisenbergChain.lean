@@ -216,6 +216,14 @@ theorem openChainHeisenbergGibbsExpectation_commutator_re
         (A * B - B * A)).re = 0 :=
   gibbsExpectation_commutator_re (openChainHeisenberg_isHermitian N J) hA hB β
 
+/-- Open-chain Heisenberg energy variance is real:
+`(Var_β(H_open)).im = 0`. -/
+theorem openChainHeisenbergGibbsHamiltonianVariance_im (β J : ℝ) (N : ℕ) :
+    (gibbsVariance β (heisenbergHamiltonian (openChainCoupling N J))
+        (heisenbergHamiltonian (openChainCoupling N J))).im = 0 :=
+  gibbsVariance_im_of_isHermitian
+    (openChainHeisenberg_isHermitian N J) (openChainHeisenberg_isHermitian N J) β
+
 /-! ## Gibbs state for the periodic-chain Heisenberg Hamiltonian -/
 
 /-- The Gibbs state of the periodic-boundary 1D Heisenberg chain on
@@ -315,5 +323,15 @@ theorem periodicChainHeisenbergGibbsExpectation_commutator_re
         (A * B - B * A)).re = 0 :=
   gibbsExpectation_commutator_re
     (periodicChainHeisenberg_isHermitian N J) hA hB β
+
+/-- Periodic-chain Heisenberg energy variance is real:
+`(Var_β(H_periodic)).im = 0`. -/
+theorem periodicChainHeisenbergGibbsHamiltonianVariance_im
+    (β J : ℝ) (N : ℕ) :
+    (gibbsVariance β (heisenbergHamiltonian (periodicChainCoupling N J))
+        (heisenbergHamiltonian (periodicChainCoupling N J))).im = 0 :=
+  gibbsVariance_im_of_isHermitian
+    (periodicChainHeisenberg_isHermitian N J)
+    (periodicChainHeisenberg_isHermitian N J) β
 
 end LatticeSystem.Quantum
