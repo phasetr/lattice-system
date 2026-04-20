@@ -726,6 +726,31 @@ theorem gibbsCovarianceSymm_smul_right (β : ℝ) (H A : ManyBodyOp Λ) (c : ℂ
       gibbsCovarianceSymm_smul_left,
       gibbsCovarianceSymm_comm β H B A]
 
+/-! #### Symmetric / antisymmetric decomposition -/
+
+/-- The complex covariance decomposes into its symmetric part plus
+half the commutator expectation:
+`Cov_β(A, B) = Cov^s_β(A, B) + (1/2) · ⟨A · B − B · A⟩_β`. -/
+theorem gibbsCovariance_eq_symm_add_half_commutator
+    (β : ℝ) (H A B : ManyBodyOp Λ) :
+    gibbsCovariance β H A B
+      = gibbsCovarianceSymm β H A B
+        + (2 : ℂ)⁻¹ * gibbsExpectation β H (A * B - B * A) := by
+  unfold gibbsCovariance gibbsCovarianceSymm
+  rw [gibbsExpectation_sub, gibbsExpectation_add]
+  ring
+
+/-- The symmetric covariance is the symmetrisation of the complex
+covariance:
+`Cov^s_β(A, B) = (1/2) · (Cov_β(A, B) + Cov_β(B, A))`. -/
+theorem gibbsCovarianceSymm_eq_half_add_swap
+    (β : ℝ) (H A B : ManyBodyOp Λ) :
+    gibbsCovarianceSymm β H A B
+      = (2 : ℂ)⁻¹ * (gibbsCovariance β H A B + gibbsCovariance β H B A) := by
+  unfold gibbsCovariance gibbsCovarianceSymm
+  rw [gibbsExpectation_add]
+  ring
+
 /-- For Hermitian `H` and Hermitian `A, B`, the symmetric covariance
 is real. The anticommutator term is real by
 `gibbsExpectation_anticommutator_im` (the (1/2) prefactor preserves
