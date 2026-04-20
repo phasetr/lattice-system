@@ -42,11 +42,21 @@ The string makes the otherwise-bosonic spin raising / lowering
 operators anticommute across distinct sites, giving the correct
 fermion statistics.
 
-This PR contains only the definitions and the immediate identity
-`jwString N 0 = 1` (empty product at the leftmost site). The
-canonical anticommutation relations
-`c_i² = 0`, `(c_i†)² = 0`, `{c_i, c_j†} = δ_ij`,
-`{c_i, c_j} = 0` are deferred to follow-up PRs.
+## Results
+
+* `jwString_zero` — `jwString N 0 = 1` (empty product at the leftmost
+  site).
+* `fermionMultiAnnihilation_zero`, `fermionMultiCreation_zero` —
+  `c_0 = σ^+_0`, `c_0† = σ^-_0` (no JW string at the leftmost site).
+* `jwString_commute_onSite` — `[jwString N i, onSite i A] = 0` for
+  any `A`.
+* `fermionMultiAnnihilation_sq` — `c_i² = 0` (Pauli exclusion).
+* `fermionMultiCreation_sq` — `(c_i†)² = 0`.
+
+The cross-site anticommutation relations
+`{c_i, c_j†} = δ_ij` and `{c_i, c_j} = 0` for `i ≠ j` are deferred
+to follow-up PRs (they require sign-cancellation tracking through
+the JW string acting on intermediate sites).
 -/
 
 namespace LatticeSystem.Fermion
