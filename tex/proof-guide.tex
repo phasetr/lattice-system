@@ -2861,6 +2861,78 @@ the leftmost $\hat S_{\mathrm{tot}}^{-}$ via
 \texttt{Matrix.mulVec\_smul}.
 \end{proof}
 
+\subsection{Commutativity with global rotation (Tasaki §2.4 (2.4.7))}
+\label{subsec:heisenberg-rot-commute}
+
+Tasaki's argument that the spin-coherent state
+$|\Xi_{\theta,\phi}\rangle = \hat U^{(3)}_{\phi}\hat U^{(2)}_{\theta}
+|\Phi^{\uparrow}\rangle$ of eq.~(2.4.6) is a ground state of $\hat H$
+runs through the operator-level identity
+$[\hat H, \hat U^{(\alpha)}_{\theta}] = 0$.  In the formalisation we
+already have $[\hat H, \hat S_{\mathrm{tot}}^{(\alpha)}] = 0$
+(see~\ref{subsec:heisenberg-bondsum}), and
+\texttt{totalSpinHalfRot\{1,2,3\}\_commute\_of\_commute} from
+\texttt{TotalSpin.lean} lifts this to the exponential.
+
+\begin{lemma}[\texttt{heisenbergHamiltonian\_commute\_totalSpinHalfRot\{1,2,3\}}]
+For every $J : \Lambda \to \Lambda \to \mathbb{C}$, every $\theta \in
+\mathbb{R}$, and every axis $\alpha \in \{1,2,3\}$,
+\[
+  \texttt{heisenbergHamiltonian}\,J \cdot
+    \hat U^{(\alpha)}_{\theta}
+  \;=\;
+  \hat U^{(\alpha)}_{\theta} \cdot
+    \texttt{heisenbergHamiltonian}\,J.
+\]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Convert
+\texttt{heisenbergHamiltonian\_commutator\_totalSpinHalfOp\{$\alpha$\}}
+($H\cdot S - S\cdot H = 0$) into a \texttt{Commute} witness via
+\texttt{sub\_eq\_zero.mp}, then apply
+\texttt{totalSpinHalfRot\{$\alpha$\}\_commute\_of\_commute}, which
+internally lifts \texttt{Commute} past
+\texttt{NormedSpace.exp} via \texttt{Commute.exp\_right}.
+\end{proof}
+
+\begin{theorem}[\texttt{heisenbergHamiltonian\_mulVec\_totalSpinHalfRot\{1,2,3\}\_basisVec\_const}]
+For every $J$, every $\theta$, every axis $\alpha$, and every
+$s \in \{0,1\}$,
+\[
+  \texttt{heisenbergHamiltonian}\,J \cdot
+    \bigl(\hat U^{(\alpha)}_{\theta} \cdot
+            |s\,s\,\dots\,s\rangle\bigr)
+  \;=\;
+  c_{J}\;
+    \bigl(\hat U^{(\alpha)}_{\theta} \cdot
+            |s\,s\,\dots\,s\rangle\bigr).
+\]
+Composing two axes (axis~2 then axis~3, as in Tasaki eq.~(2.4.6)) gives
+$\hat H \cdot |\Xi_{\theta,\phi}\rangle
+   = c_{J} \cdot |\Xi_{\theta,\phi}\rangle$
+of Tasaki eq.~(2.4.7).  This composition is not formalised here; see
+the remark below.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Use \texttt{Matrix.mulVec\_mulVec} to merge the two outer matrices,
+the lemma above to swap $\hat H$ past $\hat U^{(\alpha)}_{\theta}$,
+\texttt{Matrix.mulVec\_mulVec} again to expand back, the
+constant-config eigenvalue
+\texttt{heisenbergHamiltonian\_mulVec\_basisVec\_const} on the inner
+product, and \texttt{Matrix.mulVec\_smul} to pull the scalar out.
+\end{proof}
+
+\begin{remark}[Toward $|\Xi_{\theta,\phi}\rangle$]
+A single axis-$\alpha$ rotation here lies one composition short of the
+two-axis rotation $\hat U^{(3)}_{\phi}\hat U^{(2)}_{\theta}$ used in
+Tasaki eq.~(2.4.6).  The composition follows by applying the theorem
+twice: first to pass $\hat H$ past $\hat U^{(2)}_{\theta}$, then past
+$\hat U^{(3)}_{\phi}$, since both rotations commute with the
+SU(2)-invariant Hamiltonian.
+\end{remark}
+
 %======================================================================
 \section{Single-mode fermion (Phase 2 skeleton)}
 \label{sec:fermion-mode}

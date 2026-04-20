@@ -935,6 +935,86 @@ theorem heisenbergHamiltonian_mulVec_totalSpinHalfOpPlus_pow_basisVec_const
     rw [pow_succ', ← Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hcomm',
       ← Matrix.mulVec_mulVec, ih, Matrix.mulVec_smul]
 
+/-! ## Commutativity with global rotation Û^(α)_θ (Tasaki §2.4 (2.4.7))
+
+Combining `heisenbergHamiltonian_commutator_totalSpinHalfOp{1,2,3}`
+with `totalSpinHalfRot{1,2,3}_commute_of_commute` gives that the
+Heisenberg Hamiltonian commutes with every global rotation
+`Û^(α)_θ = exp(-iθ Ŝ_tot^α)`. Composing with the constant-config
+eigenvector `heisenbergHamiltonian_mulVec_basisVec_const` then shows
+that the rotated state `Û^(α)_θ · |s..s⟩` shares the H-eigenvalue
+with `|s..s⟩` (single-axis form). The composition into the
+spin-coherent state `|Ξ_θ,ϕ⟩ = Û^(3)_ϕ · Û^(2)_θ · |Φ↑⟩` of Tasaki
+eq. (2.4.6)/(2.4.7) follows as an immediate corollary by applying
+the rotated-state lemma twice; that two-step composition is not
+formalised here. -/
+
+/-- The Heisenberg Hamiltonian commutes with the global rotation
+`Û^(1)_θ = exp(-iθ Ŝ_tot^(1))` for any `θ : ℝ`. -/
+theorem heisenbergHamiltonian_commute_totalSpinHalfRot1
+    (J : Λ → Λ → ℂ) (θ : ℝ) :
+    Commute (heisenbergHamiltonian J) (totalSpinHalfRot1 Λ θ) := by
+  have hcomm : Commute (heisenbergHamiltonian J) (totalSpinHalfOp1 Λ) :=
+    sub_eq_zero.mp (heisenbergHamiltonian_commutator_totalSpinHalfOp1 J)
+  exact totalSpinHalfRot1_commute_of_commute Λ θ _ hcomm
+
+/-- The Heisenberg Hamiltonian commutes with the global rotation
+`Û^(2)_θ = exp(-iθ Ŝ_tot^(2))` for any `θ : ℝ`. -/
+theorem heisenbergHamiltonian_commute_totalSpinHalfRot2
+    (J : Λ → Λ → ℂ) (θ : ℝ) :
+    Commute (heisenbergHamiltonian J) (totalSpinHalfRot2 Λ θ) := by
+  have hcomm : Commute (heisenbergHamiltonian J) (totalSpinHalfOp2 Λ) :=
+    sub_eq_zero.mp (heisenbergHamiltonian_commutator_totalSpinHalfOp2 J)
+  exact totalSpinHalfRot2_commute_of_commute Λ θ _ hcomm
+
+/-- The Heisenberg Hamiltonian commutes with the global rotation
+`Û^(3)_θ = exp(-iθ Ŝ_tot^(3))` for any `θ : ℝ`. -/
+theorem heisenbergHamiltonian_commute_totalSpinHalfRot3
+    (J : Λ → Λ → ℂ) (θ : ℝ) :
+    Commute (heisenbergHamiltonian J) (totalSpinHalfRot3 Λ θ) := by
+  have hcomm : Commute (heisenbergHamiltonian J) (totalSpinHalfOp3 Λ) :=
+    sub_eq_zero.mp (heisenbergHamiltonian_commutator_totalSpinHalfOp3 J)
+  exact totalSpinHalfRot3_commute_of_commute Λ θ _ hcomm
+
+/-- Rotated constant-spin state under axis-1 rotation shares the
+H-eigenvalue with the original (Tasaki §2.4 (2.4.7), p. 33). -/
+theorem heisenbergHamiltonian_mulVec_totalSpinHalfRot1_basisVec_const
+    (J : Λ → Λ → ℂ) (θ : ℝ) (s : Fin 2) :
+    (heisenbergHamiltonian J).mulVec
+        ((totalSpinHalfRot1 Λ θ).mulVec (basisVec (fun _ : Λ => s))) =
+      (∑ x : Λ, ∑ y : Λ,
+          J x y * (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ))) •
+        (totalSpinHalfRot1 Λ θ).mulVec (basisVec (fun _ : Λ => s)) := by
+  rw [Matrix.mulVec_mulVec, (heisenbergHamiltonian_commute_totalSpinHalfRot1 J θ),
+    ← Matrix.mulVec_mulVec, heisenbergHamiltonian_mulVec_basisVec_const,
+    Matrix.mulVec_smul]
+
+/-- Rotated constant-spin state under axis-2 rotation shares the
+H-eigenvalue with the original (Tasaki §2.4 (2.4.7), p. 33). -/
+theorem heisenbergHamiltonian_mulVec_totalSpinHalfRot2_basisVec_const
+    (J : Λ → Λ → ℂ) (θ : ℝ) (s : Fin 2) :
+    (heisenbergHamiltonian J).mulVec
+        ((totalSpinHalfRot2 Λ θ).mulVec (basisVec (fun _ : Λ => s))) =
+      (∑ x : Λ, ∑ y : Λ,
+          J x y * (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ))) •
+        (totalSpinHalfRot2 Λ θ).mulVec (basisVec (fun _ : Λ => s)) := by
+  rw [Matrix.mulVec_mulVec, (heisenbergHamiltonian_commute_totalSpinHalfRot2 J θ),
+    ← Matrix.mulVec_mulVec, heisenbergHamiltonian_mulVec_basisVec_const,
+    Matrix.mulVec_smul]
+
+/-- Rotated constant-spin state under axis-3 rotation shares the
+H-eigenvalue with the original (Tasaki §2.4 (2.4.7), p. 33). -/
+theorem heisenbergHamiltonian_mulVec_totalSpinHalfRot3_basisVec_const
+    (J : Λ → Λ → ℂ) (θ : ℝ) (s : Fin 2) :
+    (heisenbergHamiltonian J).mulVec
+        ((totalSpinHalfRot3 Λ θ).mulVec (basisVec (fun _ : Λ => s))) =
+      (∑ x : Λ, ∑ y : Λ,
+          J x y * (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ))) •
+        (totalSpinHalfRot3 Λ θ).mulVec (basisVec (fun _ : Λ => s)) := by
+  rw [Matrix.mulVec_mulVec, (heisenbergHamiltonian_commute_totalSpinHalfRot3 J θ),
+    ← Matrix.mulVec_mulVec, heisenbergHamiltonian_mulVec_basisVec_const,
+    Matrix.mulVec_smul]
+
 /-! ## Two-site singlet / triplet Casimir eigenvalues
 
 For `Λ = Fin 2`, the natural anti-parallel basis state `|↑↓⟩` satisfies:
