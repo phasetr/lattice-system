@@ -2740,6 +2740,35 @@ $c^\dagger = (c)^\dagger$, $c = (c^\dagger)^\dagger$, and $n$ is
 Hermitian.
 \end{lemma}
 
+\subsection{Basis vectors and basis action}
+
+\begin{definition}[\texttt{fermionVacuum}, \texttt{fermionOccupied}]
+$|0\rangle = (1, 0)$ and $|1\rangle = (0, 1)$.
+\end{definition}
+
+\begin{lemma}[Basis action]
+\begin{align*}
+  c\,|0\rangle &= 0, & c\,|1\rangle &= |0\rangle, \\
+  c^\dagger\,|0\rangle &= |1\rangle, & c^\dagger\,|1\rangle &= 0, \\
+  n\,|0\rangle &= 0, & n\,|1\rangle &= |1\rangle.
+\end{align*}
+Lean names: \texttt{fermionAnnihilation\_mulVec\_vacuum} /
+\texttt{\_occupied},
+\texttt{fermionCreation\_mulVec\_vacuum} / \texttt{\_occupied},
+\texttt{fermionNumber\_mulVec\_vacuum} / \texttt{\_occupied}.
+\end{lemma}
+
+\subsection{Identification with spin-1/2 raising / lowering operators}
+
+In the computational basis,
+\[
+  c \;=\; \sigma^+,
+  \qquad
+  c^\dagger \;=\; \sigma^-.
+\]
+Lean names: \texttt{fermionAnnihilation\_eq\_spinHalfOpPlus},
+\texttt{fermionCreation\_eq\_spinHalfOpMinus}.
+
 \subsection*{Roadmap to multi-mode CAR}
 
 The single-mode operators above are the building blocks.  The
@@ -2747,11 +2776,13 @@ multi-mode CAR algebra on a finite ordered lattice
 $\Lambda = \mathrm{Fin}\,(N+1)$ will be obtained via the Jordan–Wigner
 mapping
 \[
-  c_i \;=\; \Bigl(\bigotimes_{j < i} \sigma^z_j\Bigr) \otimes c
-  \quad
-  \text{(and similarly for } c_i^\dagger\text{)},
+  c_i \;=\; \Bigl(\prod_{j < i} \sigma^z_j\Bigr)\,\sigma^+_i,
+  \qquad
+  c_i^\dagger \;=\; \Bigl(\prod_{j < i} \sigma^z_j\Bigr)\,\sigma^-_i,
 \]
-using the Pauli infrastructure already developed in
+where the parity string makes the otherwise-bosonic spin
+raising / lowering operators anticommute across distinct sites.  Built
+entirely from the spin infrastructure in
 \texttt{LatticeSystem/Quantum/Pauli.lean} and
 \texttt{LatticeSystem/Quantum/SpinHalf.lean}.  This is the next PR's
 target.

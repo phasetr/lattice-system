@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Mathlib.Data.Complex.Basic
 import Mathlib.LinearAlgebra.Matrix.Hermitian
 import Mathlib.LinearAlgebra.Matrix.Notation
+import LatticeSystem.Quantum.SpinHalfBasis
 
 /-!
 # Single-mode fermion creation and annihilation operators
@@ -122,5 +123,83 @@ theorem fermionNumber_isHermitian : fermionNumber.IsHermitian := by
   unfold fermionNumber
   ext i j
   fin_cases i <;> fin_cases j <;> simp [Matrix.conjTranspose_apply]
+
+/-! ## Basis vectors and basis action -/
+
+/-- Vacuum basis vector `|0⟩ = (1, 0)`. -/
+def fermionVacuum : Fin 2 → ℂ := ![1, 0]
+
+/-- Occupied basis vector `|1⟩ = (0, 1)`. -/
+def fermionOccupied : Fin 2 → ℂ := ![0, 1]
+
+/-- `c|0⟩ = 0`: the annihilation operator destroys the vacuum. -/
+theorem fermionAnnihilation_mulVec_vacuum :
+    fermionAnnihilation.mulVec fermionVacuum = 0 := by
+  unfold fermionAnnihilation fermionVacuum
+  ext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+
+/-- `c|1⟩ = |0⟩`: the annihilation operator removes the particle. -/
+theorem fermionAnnihilation_mulVec_occupied :
+    fermionAnnihilation.mulVec fermionOccupied = fermionVacuum := by
+  unfold fermionAnnihilation fermionOccupied fermionVacuum
+  ext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+
+/-- `c†|0⟩ = |1⟩`: the creation operator adds a particle to the vacuum. -/
+theorem fermionCreation_mulVec_vacuum :
+    fermionCreation.mulVec fermionVacuum = fermionOccupied := by
+  unfold fermionCreation fermionVacuum fermionOccupied
+  ext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+
+/-- `c†|1⟩ = 0`: cannot add a second particle (Pauli exclusion). -/
+theorem fermionCreation_mulVec_occupied :
+    fermionCreation.mulVec fermionOccupied = 0 := by
+  unfold fermionCreation fermionOccupied
+  ext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+
+/-- `n|0⟩ = 0`: vacuum has no particles. -/
+theorem fermionNumber_mulVec_vacuum :
+    fermionNumber.mulVec fermionVacuum = 0 := by
+  unfold fermionNumber fermionVacuum
+  ext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+
+/-- `n|1⟩ = |1⟩`: occupied state has one particle. -/
+theorem fermionNumber_mulVec_occupied :
+    fermionNumber.mulVec fermionOccupied = fermionOccupied := by
+  unfold fermionNumber fermionOccupied
+  ext i
+  fin_cases i <;> simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+
+/-! ## Identification with spin-1/2 raising / lowering operators
+
+In the computational basis, with the convention
+`|0⟩ = e₀ = spin-up`, `|1⟩ = e₁ = spin-down`, the single-mode
+fermion creation / annihilation operators are exactly the spin-1/2
+raising / lowering operators:
+
+  `c = |0⟩⟨1| = σ^+`  (annihilation in fermion language ≡ raising
+                       from down to up in spin language)
+  `c† = |1⟩⟨0| = σ^-` (creation ≡ lowering from up to down)
+
+This is the algebraic basis of the Jordan–Wigner mapping that lifts
+the single-mode CAR algebra to the multi-mode case using the existing
+spin infrastructure.
+-/
+
+/-- `c = σ^+` (annihilation equals raising in the computational basis). -/
+theorem fermionAnnihilation_eq_spinHalfOpPlus :
+    fermionAnnihilation = LatticeSystem.Quantum.spinHalfOpPlus := by
+  unfold fermionAnnihilation
+  rfl
+
+/-- `c† = σ^-` (creation equals lowering in the computational basis). -/
+theorem fermionCreation_eq_spinHalfOpMinus :
+    fermionCreation = LatticeSystem.Quantum.spinHalfOpMinus := by
+  unfold fermionCreation
+  rfl
 
 end LatticeSystem.Fermion

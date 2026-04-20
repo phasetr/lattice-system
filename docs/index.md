@@ -54,7 +54,7 @@ CAR algebras, and eventually lattice QCD.
 | P1f-2c (Tasaki §2.2 Problem 2.2.c) | SU(2)-averaged two-site state = singlet projector (eq. (2.2.15)); integration over Euler angles `φ ∈ [0,2π]`, `θ ∈ [0,π]` | Done |
 | P1g | Gibbs state `ρ = e^{-βH}/Z`, `Tr(ρ) = 1`, `⟨1⟩ = 1`, `Z(0) = dim`, `Z(0) ≠ 0`, linearity `⟨O₁+O₂⟩ = ⟨O₁⟩+⟨O₂⟩`, `⟨c·O⟩ = c·⟨O⟩`, `⟨-O⟩ = -⟨O⟩`, `⟨A−B⟩ = ⟨A⟩−⟨B⟩`, `⟨Σ f⟩ = Σ ⟨f⟩`, `[ρ, H] = 0`, reality of `⟨O⟩` for Hermitian `O`, conservation `⟨[H,A]⟩ = 0`, anticommutator real / commutator imaginary, `(⟨H·O⟩).im = 0`, β = 0 closed form `ρ_0 = I/dim` and `⟨A⟩_0 = Tr A / dim`, one-parameter group property `e^{-(β₁+β₂)H} = e^{-β₁H} · e^{-β₂H}` and invertibility, exact discrete semigroup identity `e^{-(nβ)H} = (e^{-βH})^n` (extended to `n : ℤ` via `gibbsExp_inv`) | Done |
 | P1h | Periodic boundary conditions, Heisenberg chain (open and periodic BC), Gibbs state instantiation for both BCs (Hermiticity, commutativity with `H`, β = 0 closed form, expectation realness for Hermitian observables, conservation `⟨[H, A]⟩ = 0`, energy expectation as a bond-sum decomposition, energy expectation real, `⟨H · O⟩` real for Hermitian `O`, `⟨H^n⟩` real for any `n : ℕ`) | Done |
-| P2 | Finite-volume Hubbard / BCS | In progress (single-mode CAR algebra: creation / annihilation / number operator with anticommutation, idempotency, Hermiticity) |
+| P2 | Finite-volume Hubbard / BCS | In progress (single-mode CAR algebra: creation / annihilation / number operator with anticommutation, idempotency, Hermiticity, basis-vector action, identification with spin-1/2 raising / lowering operators) |
 | P3 | CAR algebras, quasi-local C*-algebras, KMS states | Not started |
 | P4 | Thermodynamic limit, phase transitions | Not started |
 | P5 | Lattice QCD | Not started |
@@ -551,6 +551,12 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionAnnihilation_conjTranspose` | `cᴴ = c†` | `Fermion/Mode.lean` |
 | `fermionCreation_conjTranspose` | `(c†)ᴴ = c` | `Fermion/Mode.lean` |
 | `fermionNumber_isHermitian` | `n` is Hermitian | `Fermion/Mode.lean` |
+| `fermionVacuum`, `fermionOccupied` | basis vectors `|0⟩ = (1, 0)`, `|1⟩ = (0, 1)` | `Fermion/Mode.lean` |
+| `fermionAnnihilation_mulVec_vacuum` / `_occupied` | `c|0⟩ = 0`, `c|1⟩ = |0⟩` | `Fermion/Mode.lean` |
+| `fermionCreation_mulVec_vacuum` / `_occupied` | `c†|0⟩ = |1⟩`, `c†|1⟩ = 0` | `Fermion/Mode.lean` |
+| `fermionNumber_mulVec_vacuum` / `_occupied` | `n|0⟩ = 0`, `n|1⟩ = |1⟩` | `Fermion/Mode.lean` |
+| `fermionAnnihilation_eq_spinHalfOpPlus` | `c = σ^+` (computational-basis identification) | `Fermion/Mode.lean` |
+| `fermionCreation_eq_spinHalfOpMinus` | `c† = σ^-` | `Fermion/Mode.lean` |
 
 ## Open items / axioms
 
