@@ -1201,4 +1201,45 @@ theorem totalSpinHalfOp3_mulVec_totalSpinHalfOpMinus_pow_basisVec_all_up (k : �
     push_cast
     module
 
+/-- `Ŝ_tot^(3) · (Ŝ_tot^+)^k · |↓..↓⟩ = (-|Λ|/2 + k) · (Ŝ_tot^+)^k · |↓..↓⟩`:
+the dual ladder. Starting from the all-down state with eigenvalue
+`-Smax`, the Cartan relation `[Ŝ_tot^(3), Ŝ_tot^+] = +Ŝ_tot^+`
+raises the eigenvalue by one at each step, giving the unnormalised
+iterates magnetic quantum number `M = -Smax + k` (Tasaki §2.4
+eq. (2.4.9), p. 33, parameterised from the lowest weight). -/
+theorem totalSpinHalfOp3_mulVec_totalSpinHalfOpPlus_pow_basisVec_all_down (k : ℕ) :
+    (totalSpinHalfOp3 Λ).mulVec
+        (((totalSpinHalfOpPlus Λ) ^ k).mulVec
+          (basisVec (fun _ : Λ => (1 : Fin 2)))) =
+      ((-((Fintype.card Λ : ℂ) / 2)) + (k : ℂ)) •
+        ((totalSpinHalfOpPlus Λ) ^ k).mulVec
+          (basisVec (fun _ : Λ => (1 : Fin 2))) := by
+  induction k with
+  | zero =>
+    simp only [pow_zero, Matrix.one_mulVec, Nat.cast_zero, add_zero]
+    rw [totalSpinHalfOp3_mulVec_basisVec]
+    congr 1
+    have hone : ((1 : Fin 2) = 0) ↔ False := by decide
+    have hsign : (∑ _x : Λ, spinHalfSign (1 : Fin 2)) = -((Fintype.card Λ : ℂ) / 2) := by
+      simp only [spinHalfSign, hone, if_false, Finset.sum_const, Finset.card_univ,
+        nsmul_eq_mul]
+      ring
+    exact hsign
+  | succ k ih =>
+    have h := totalSpinHalfOp3_commutator_totalSpinHalfOpPlus Λ
+    have hcomm : totalSpinHalfOp3 Λ * totalSpinHalfOpPlus Λ =
+        totalSpinHalfOpPlus Λ * totalSpinHalfOp3 Λ + totalSpinHalfOpPlus Λ := by
+      have hadd : totalSpinHalfOp3 Λ * totalSpinHalfOpPlus Λ =
+          (totalSpinHalfOp3 Λ * totalSpinHalfOpPlus Λ -
+            totalSpinHalfOpPlus Λ * totalSpinHalfOp3 Λ) +
+          totalSpinHalfOpPlus Λ * totalSpinHalfOp3 Λ := by abel
+      rw [hadd, h]; abel
+    rw [pow_succ', ← Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hcomm,
+      Matrix.add_mulVec, ← Matrix.mulVec_mulVec, ih, Matrix.mulVec_smul]
+    set v : (Λ → Fin 2) → ℂ := (totalSpinHalfOpPlus Λ).mulVec
+      (((totalSpinHalfOpPlus Λ) ^ k).mulVec
+        (basisVec (fun _ : Λ => (1 : Fin 2))))
+    push_cast
+    module
+
 end LatticeSystem.Quantum
