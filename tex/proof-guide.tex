@@ -2769,23 +2769,58 @@ In the computational basis,
 Lean names: \texttt{fermionAnnihilation\_eq\_spinHalfOpPlus},
 \texttt{fermionCreation\_eq\_spinHalfOpMinus}.
 
-\subsection*{Roadmap to multi-mode CAR}
+%======================================================================
+\section{Multi-mode fermion via Jordan–Wigner (Phase 2 backbone)}
+\label{sec:fermion-jw}
+%======================================================================
 
-The single-mode operators above are the building blocks.  The
-multi-mode CAR algebra on a finite ordered lattice
-$\Lambda = \mathrm{Fin}\,(N+1)$ will be obtained via the Jordan–Wigner
-mapping
+\emph{Source file:} \texttt{LatticeSystem/Fermion/JordanWigner.lean}.
+
+\subsection{Definitions}
+
+\begin{definition}[\texttt{jwString}]
+The Jordan–Wigner string at site $i \in \mathrm{Fin}\,(N+1)$ is
 \[
-  c_i \;=\; \Bigl(\prod_{j < i} \sigma^z_j\Bigr)\,\sigma^+_i,
-  \qquad
-  c_i^\dagger \;=\; \Bigl(\prod_{j < i} \sigma^z_j\Bigr)\,\sigma^-_i,
+  J_i \;:=\; \prod_{\substack{j : \mathrm{Fin}\,(N+1) \\ j.\mathrm{val} < i.\mathrm{val}}}
+              \sigma^z_j,
 \]
-where the parity string makes the otherwise-bosonic spin
-raising / lowering operators anticommute across distinct sites.  Built
-entirely from the spin infrastructure in
-\texttt{LatticeSystem/Quantum/Pauli.lean} and
-\texttt{LatticeSystem/Quantum/SpinHalf.lean}.  This is the next PR's
-target.
+implemented as a \texttt{Finset.noncommProd} (because
+$\texttt{ManyBodyOp}\,\Lambda$ is a non-commutative ring), with the
+pairwise-commutativity certificate supplied by
+\texttt{onSite\_mul\_onSite\_of\_ne}.
+\end{definition}
+
+\begin{definition}[\texttt{fermionMultiAnnihilation}, \texttt{fermionMultiCreation}]
+\[
+  c_i \;:=\; J_i \cdot \sigma^+_i,
+  \qquad
+  c_i^\dagger \;:=\; J_i \cdot \sigma^-_i.
+\]
+\end{definition}
+
+\subsection{Boundary identifications}
+
+\begin{lemma}[\texttt{jwString\_zero}]
+$J_0 = I$ (empty product at the leftmost site).
+\end{lemma}
+
+\begin{lemma}[\texttt{fermionMultiAnnihilation\_zero}, \texttt{fermionMultiCreation\_zero}]
+$c_0 = \sigma^+_0$ and $c_0^\dagger = \sigma^-_0$ (the JW string is
+the identity at the leftmost site).
+\end{lemma}
+
+\subsection*{Deferred: full CAR algebra}
+
+The canonical anticommutation relations
+$c_i^2 = 0$, $(c_i^\dagger)^2 = 0$,
+$\{c_i, c_j^\dagger\} = \delta_{ij} \cdot I$,
+$\{c_i, c_j\} = 0$ for $i \neq j$ are deferred to follow-up PRs.
+They require careful tracking of the JW-string interactions across
+sites; the on-site $c_i^2 = 0$ requires the JW string to commute past
+the same-site $\sigma^+$ (which works since the string lives on
+sites strictly less than $i$), while the cross-site
+anticommutations involve sign cancellations from $\sigma^z$ acting
+on intermediate sites.
 
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
