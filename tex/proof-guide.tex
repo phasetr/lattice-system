@@ -2707,7 +2707,11 @@ $-J/2$ respectively (Lean theorems
 The four eigenvalues form the explicit Clebsch--Gordan decomposition
 $\tfrac{1}{2}\otimes\tfrac{1}{2} = 0\oplus 1$: the singlet
 ($S=0$, eigenvalue $+3J/2$) and the triplet ($S=1$, three-fold
-degenerate at $-J/2$).
+degenerate at $-J/2$).  Under our convention $H = -J\sum_{\langle
+x,y\rangle}\hat S_x\!\cdot\!\hat S_y$ (Tasaki eq.~(2.4.1)), the
+ferromagnetic regime is $J > 0$ (triplet ground state, energy
+$-J/2$) and the antiferromagnetic regime is $J < 0$ (singlet ground
+state, energy $+3J/2$).
 
 \subsection{3-site explicit form}
 \label{subsec:three-site-explicit}
@@ -2788,13 +2792,34 @@ formula does not depend on $s$ (Lean
 The all-down case
 \texttt{openChainHeisenbergHamiltonian\_mulVec\_basisVec\_all\_down}
 follows by SU(2) symmetry of the Heisenberg Hamiltonian.
-\end{remark}  The
-ferromagnetic ($J<0$) ground state is the triply-degenerate triplet
-$\{|{\uparrow}{\uparrow}\rangle,
-|{\downarrow}{\downarrow}\rangle,
-|{\uparrow}{\downarrow}\rangle + |{\downarrow}{\uparrow}\rangle\}$,
-and the antiferromagnetic ($J>0$) ground state is the singlet —
-matching Tasaki \S2.4 / \S2.5 for the simplest two-site case.
+\end{remark}
+
+\begin{theorem}[\texttt{openChainHeisenbergHamiltonian\_mulVec\_totalSpinHalfOpMinus\_pow\_basisVec\_all\_up}]
+For any $N \in \mathbb{N}$, $J \in \mathbb{R}$, and $k \in \mathbb{N}$,
+\[
+  \hat H_{\mathrm{open}} \cdot
+    \bigl((\hat S_{\mathrm{tot}}^{-})^{k} \cdot
+            |{\uparrow}\dots{\uparrow}\rangle\bigr)
+  \;=\;
+  -\frac{N\cdot J}{2}\;
+    \bigl((\hat S_{\mathrm{tot}}^{-})^{k} \cdot
+            |{\uparrow}\dots{\uparrow}\rangle\bigr).
+\]
+The dual ladder from $|{\downarrow}\dots{\downarrow}\rangle$
+($\hat S_{\mathrm{tot}}^{+}$) shares the same eigenvalue
+(\texttt{openChainHeisenbergHamiltonian\_mulVec\_totalSpinHalfOpPlus\_pow\_basisVec\_all\_down}).
+This makes Tasaki eq.~(2.4.9) explicit for the open chain.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Apply
+\texttt{heisenbergHamiltonian\_mulVec\_totalSpinHalfOpMinus\_pow\_basisVec\_const}
+(\ref{subsec:heisenberg-ladder}, iterated lowering preserves the
+H-eigenvalue) to reduce the goal to showing $c_{J} = -N\cdot J/2$ for
+the chain coupling.  Then proceed exactly as in the const-config
+proof above: drop the diagonal contribution and apply the bond
+counting lemma.
+\end{proof}
 
 \subsection{Action on the fully-polarised state (Tasaki §2.4 (2.4.5))}
 \label{subsec:heisenberg-allup}
