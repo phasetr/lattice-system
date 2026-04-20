@@ -773,4 +773,95 @@ theorem openChainHeisenbergHamiltonian_mulVec_basisVec_all_down (N : ℕ) (J : �
       (-(N * J / 2 : ℂ)) • basisVec (fun _ : Fin (N + 1) => (1 : Fin 2)) :=
   openChainHeisenbergHamiltonian_mulVec_basisVec_const N J 1
 
+/-! ## Open chain Heisenberg ladder iterates with explicit eigenvalue
+
+Combining the iterated lowering ladder (`heisenbergHamiltonian_mulVec_
+totalSpinHalfOpMinus_pow_basisVec_const`, PR #82) with the explicit
+eigenvalue computation above gives the unnormalised Tasaki §2.4
+eq. (2.4.9) ferromagnetic ground states with their explicit chain
+eigenvalue `-(N·J/2)`. -/
+
+/-- The unnormalised iterates `(Ŝtot^-)^k · |↑..↑⟩` are
+H-eigenvectors of the open chain Heisenberg Hamiltonian with
+eigenvalue `-(N·J/2)`. Tasaki §2.4 eq. (2.4.9), p. 33, made explicit
+for the chain. -/
+theorem openChainHeisenbergHamiltonian_mulVec_totalSpinHalfOpMinus_pow_basisVec_all_up
+    (N : ℕ) (J : ℝ) (k : ℕ) :
+    (heisenbergHamiltonian (openChainCoupling N J)).mulVec
+        (((totalSpinHalfOpMinus (Fin (N + 1))) ^ k).mulVec
+          (basisVec (fun _ : Fin (N + 1) => (0 : Fin 2)))) =
+      (-(N * J / 2 : ℂ)) •
+        ((totalSpinHalfOpMinus (Fin (N + 1))) ^ k).mulVec
+          (basisVec (fun _ : Fin (N + 1) => (0 : Fin 2))) := by
+  have hpow := heisenbergHamiltonian_mulVec_totalSpinHalfOpMinus_pow_basisVec_const
+    (Λ := Fin (N + 1)) (openChainCoupling N J) 0 k
+  -- Goal: H · ((Ŝtot^-)^k · |↑..↑⟩) = -(N·J/2) • ((Ŝtot^-)^k · |↑..↑⟩).
+  rw [hpow]
+  -- Now goal is: c_J • ... = -(N·J/2) • ... where c_J = Σ_{x,y} J(x,y) χ_{x,y}.
+  -- We need to show c_J = -(N·J/2).
+  congr 1
+  -- Compute c_J using openChainCoupling_sum_eq + diagonal vanishing.
+  have hdiag : ∀ x : Fin (N + 1), openChainCoupling N J x x = 0 := by
+    intro x
+    unfold openChainCoupling
+    rw [if_neg (by simp)]
+  have hsame : ∀ x y : Fin (N + 1),
+      openChainCoupling N J x y *
+        (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ)) =
+      (1 / 4 : ℂ) * openChainCoupling N J x y := by
+    intro x y
+    by_cases h : x = y
+    · subst h
+      rw [if_pos rfl, hdiag]; ring
+    · rw [if_neg h]; ring
+  simp_rw [hsame]
+  rw [show (∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+        (1 / 4 : ℂ) * openChainCoupling N J x y) =
+      (1 / 4 : ℂ) * (∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+        openChainCoupling N J x y) from by
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl (fun x _ => ?_)
+    rw [Finset.mul_sum]]
+  rw [openChainCoupling_sum_eq N J]
+  ring
+
+/-- The dual ladder iterates `(Ŝtot^+)^k · |↓..↓⟩` are also
+H-eigenvectors of the open chain Heisenberg Hamiltonian with
+eigenvalue `-(N·J/2)`. -/
+theorem openChainHeisenbergHamiltonian_mulVec_totalSpinHalfOpPlus_pow_basisVec_all_down
+    (N : ℕ) (J : ℝ) (k : ℕ) :
+    (heisenbergHamiltonian (openChainCoupling N J)).mulVec
+        (((totalSpinHalfOpPlus (Fin (N + 1))) ^ k).mulVec
+          (basisVec (fun _ : Fin (N + 1) => (1 : Fin 2)))) =
+      (-(N * J / 2 : ℂ)) •
+        ((totalSpinHalfOpPlus (Fin (N + 1))) ^ k).mulVec
+          (basisVec (fun _ : Fin (N + 1) => (1 : Fin 2))) := by
+  have hpow := heisenbergHamiltonian_mulVec_totalSpinHalfOpPlus_pow_basisVec_const
+    (Λ := Fin (N + 1)) (openChainCoupling N J) 1 k
+  rw [hpow]
+  congr 1
+  have hdiag : ∀ x : Fin (N + 1), openChainCoupling N J x x = 0 := by
+    intro x
+    unfold openChainCoupling
+    rw [if_neg (by simp)]
+  have hsame : ∀ x y : Fin (N + 1),
+      openChainCoupling N J x y *
+        (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ)) =
+      (1 / 4 : ℂ) * openChainCoupling N J x y := by
+    intro x y
+    by_cases h : x = y
+    · subst h
+      rw [if_pos rfl, hdiag]; ring
+    · rw [if_neg h]; ring
+  simp_rw [hsame]
+  rw [show (∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+        (1 / 4 : ℂ) * openChainCoupling N J x y) =
+      (1 / 4 : ℂ) * (∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+        openChainCoupling N J x y) from by
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl (fun x _ => ?_)
+    rw [Finset.mul_sum]]
+  rw [openChainCoupling_sum_eq N J]
+  ring
+
 end LatticeSystem.Quantum
