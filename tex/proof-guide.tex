@@ -1660,6 +1660,30 @@ function can be shown nonzero by elementary means, avoiding the CFC
 timeout entirely.
 \end{remark}
 
+\begin{lemma}[\texttt{Matrix.IsHermitian.trace\_im}]
+For any Hermitian matrix $A \in M_n(\mathbb{C})$,
+$\Im\operatorname{Tr}(A) = 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+$\operatorname{Tr}(A^\dagger) = \overline{\operatorname{Tr}(A)}$
+(\texttt{Matrix.trace\_conjTranspose}), and $A^\dagger = A$ by
+Hermiticity, so $\operatorname{Tr}(A) = \overline{\operatorname{Tr}(A)}$.
+Then \texttt{Complex.conj\_eq\_iff\_im} gives the imaginary-part
+vanishing.
+\end{proof}
+
+\begin{lemma}[\texttt{partitionFn\_im\_of\_isHermitian}]
+For a Hermitian Hamiltonian $H$,
+$\Im Z(\beta, H) = 0$, i.e.\ the partition function is real.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+$Z(\beta, H) = \operatorname{Tr}(e^{-\beta H})$.  By
+\texttt{gibbsExp\_isHermitian}, $e^{-\beta H}$ is Hermitian; the
+previous lemma then gives $\Im Z = 0$.
+\end{proof}
+
 \begin{lemma}[\texttt{gibbsState\_zero}]
 At infinite temperature ($\beta = 0$),
 $\rho_0 = \dim(\mathcal{H})^{-1} \cdot I$, the maximally mixed state.

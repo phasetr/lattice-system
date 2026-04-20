@@ -296,6 +296,21 @@ theorem partitionFn_zero_ne_zero (H : ManyBodyOp Λ) :
   rw [partitionFn_zero]
   exact_mod_cast Fintype.card_pos.ne'
 
+/-- For any Hermitian matrix `A : Matrix n n ℂ`, the trace is real. -/
+theorem _root_.Matrix.IsHermitian.trace_im
+    {n : Type*} [Fintype n] {A : Matrix n n ℂ} (hA : A.IsHermitian) :
+    A.trace.im = 0 := by
+  have : star A.trace = A.trace := by
+    rw [← Matrix.trace_conjTranspose, hA.eq]
+  exact Complex.conj_eq_iff_im.mp this
+
+/-- For a Hermitian Hamiltonian `H`, the partition function
+`Z(β) = Tr(e^{-βH})` is real. -/
+theorem partitionFn_im_of_isHermitian {H : ManyBodyOp Λ}
+    (hH : H.IsHermitian) (β : ℝ) :
+    (partitionFn β H).im = 0 :=
+  (gibbsExp_isHermitian hH β).trace_im
+
 /-- At `β = 0`, the Gibbs state is the maximally mixed state
 `ρ_0 = (1 / dim) · I`. -/
 theorem gibbsState_zero (H : ManyBodyOp Λ) :
