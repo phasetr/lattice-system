@@ -1426,4 +1426,18 @@ theorem fermionMultiNumber_commute_fermionTotalNumber (N : ℕ) (i : Fin (N + 1)
   unfold fermionTotalNumber
   exact Commute.sum_right _ _ _ (fun j _ => fermionMultiNumber_commute N i j)
 
+/-- The density-density operator `n_i · n_j` commutes with the total
+particle-number operator `N̂ = Σ_k n_k`. Since both `n_i` and `n_j`
+individually commute with `N̂`
+(`fermionMultiNumber_commute_fermionTotalNumber`), so does their
+product. This is the foundational identity that makes any
+density–density interaction (e.g. the Hubbard `U Σ_i n_{i,↑} n_{i,↓}`,
+once two species are introduced) particle-number conserving. -/
+theorem fermionDensityDensity_commute_fermionTotalNumber
+    (N : ℕ) (i j : Fin (N + 1)) :
+    Commute (fermionMultiNumber N i * fermionMultiNumber N j)
+      (fermionTotalNumber N) :=
+  (fermionMultiNumber_commute_fermionTotalNumber N i).mul_left
+    (fermionMultiNumber_commute_fermionTotalNumber N j)
+
 end LatticeSystem.Fermion
