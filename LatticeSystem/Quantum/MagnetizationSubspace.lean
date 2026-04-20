@@ -3,6 +3,7 @@ Copyright (c) 2026 lattice-system contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.TotalSpin
+import LatticeSystem.Quantum.SpinDot
 import Mathlib.Algebra.DirectSum.Module
 import Mathlib.LinearAlgebra.Eigenspace.Basic
 
@@ -201,5 +202,31 @@ theorem totalSpinHalfOpPlus_pow_basisVec_all_down_mem_magnetizationSubspace
         (basisVec (fun _ : Λ => (1 : Fin 2))) ∈
       magnetizationSubspace Λ ((-((Fintype.card Λ : ℂ) / 2)) + (k : ℂ)) :=
   totalSpinHalfOp3_mulVec_totalSpinHalfOpPlus_pow_basisVec_all_down Λ k
+
+/-! ## Heisenberg Hamiltonian preserves the magnetisation sectors
+
+A direct consequence of SU(2) invariance
+(`heisenbergHamiltonian_commutator_totalSpinHalfOp3 J = 0`): if
+`v ∈ H_M`, then `H · v ∈ H_M`. This is the operator-level statement
+that any Heisenberg Hamiltonian block-diagonalises against Tasaki
+eq. (2.2.10) decomposition into magnetisation sectors. -/
+
+/-- The Heisenberg Hamiltonian preserves the magnetisation-`M`
+subspace `H_M`: if `v ∈ magnetizationSubspace M`, then
+`H · v ∈ magnetizationSubspace M`. Equivalently, `H` block-diagonalises
+against Tasaki §2.2 eq. (2.2.10), p. 22, decomposition into
+magnetisation sectors. The invariance follows from the SU(2)
+symmetry `[H, Ŝtot^(3)] = 0` (Tasaki §2.2 eq. (2.2.13), p. 23,
+`heisenbergHamiltonian_commutator_totalSpinHalfOp3` in `SpinDot.lean`). -/
+theorem heisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem
+    (J : Λ → Λ → ℂ) {M : ℂ} {v : (Λ → Fin 2) → ℂ}
+    (hv : v ∈ magnetizationSubspace Λ M) :
+    (heisenbergHamiltonian J).mulVec v ∈ magnetizationSubspace Λ M := by
+  rw [mem_magnetizationSubspace_iff] at hv ⊢
+  have hcomm : totalSpinHalfOp3 Λ * heisenbergHamiltonian J =
+      heisenbergHamiltonian J * totalSpinHalfOp3 Λ :=
+    (sub_eq_zero.mp (heisenbergHamiltonian_commutator_totalSpinHalfOp3 J)).symm
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul]
 
 end LatticeSystem.Quantum
