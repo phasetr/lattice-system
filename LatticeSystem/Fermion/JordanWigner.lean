@@ -517,4 +517,25 @@ theorem fermionMultiAnnihilation_creation_anticomm_two_site_cross :
       onSite_mul_onSite_same, pauliZ_mul_spinHalfOpPlus]
   rw [hfirst, hsecond, neg_add_cancel]
 
+/-- Fourth off-diagonal CAR on `Fin 2`: `c_0† · c_1 + c_1 · c_0† = 0`.
+Obtained from PR #110's mixed annihilation/creation version by taking
+`conjTranspose`. Completes the 2-site off-diagonal CAR relations. -/
+theorem fermionMultiCreation_annihilation_anticomm_two_site_cross :
+    fermionMultiCreation 1 (0 : Fin 2) *
+        fermionMultiAnnihilation 1 1 +
+      fermionMultiAnnihilation 1 1 *
+        fermionMultiCreation 1 0 = 0 := by
+  have h := fermionMultiAnnihilation_creation_anticomm_two_site_cross
+  have h2 := congrArg Matrix.conjTranspose h
+  simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_mul,
+    fermionMultiAnnihilation_conjTranspose, fermionMultiCreation_conjTranspose,
+    Matrix.conjTranspose_zero] at h2
+  -- h2 : c_1 · c_0† + c_0† · c_1 = 0, goal: c_0† · c_1 + c_1 · c_0† = 0
+  rw [show fermionMultiCreation 1 (0 : Fin 2) * fermionMultiAnnihilation 1 1 +
+        fermionMultiAnnihilation 1 1 * fermionMultiCreation 1 (0 : Fin 2) =
+      fermionMultiAnnihilation 1 1 * fermionMultiCreation 1 (0 : Fin 2) +
+        fermionMultiCreation 1 (0 : Fin 2) * fermionMultiAnnihilation 1 1
+    from add_comm _ _]
+  exact h2
+
 end LatticeSystem.Fermion
