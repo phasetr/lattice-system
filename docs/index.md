@@ -640,6 +640,9 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionMultiAnnihilation_creation_anticomm_zero_two_fin_three` | mixed: `c_0 · c_2† + c_2† · c_0 = 0` on `Fin 3` | `Fermion/JordanWigner.lean` |
 | `fermionMultiCreation_annihilation_anticomm_zero_two_fin_three` | mixed dual: `c_0† · c_2 + c_2 · c_0† = 0` on `Fin 3` (adjoint of the previous) | `Fermion/JordanWigner.lean` |
 | `fermionMultiAnnihilation_anticomm_zero_two_general` | generalised to any N ≥ 2: `c_0 · c_2 + c_2 · c_0 = 0` on `Fin (N+1)` | `Fermion/JordanWigner.lean` |
+| `fermionMultiCreation_anticomm_zero_two_general` | dual: `c_0† · c_2† + c_2† · c_0† = 0` for any N ≥ 2 (adjoint) | `Fermion/JordanWigner.lean` |
+| `fermionMultiAnnihilation_creation_anticomm_zero_two_general` | mixed: `c_0 · c_2† + c_2† · c_0 = 0` for any N ≥ 2 | `Fermion/JordanWigner.lean` |
+| `fermionMultiCreation_annihilation_anticomm_zero_two_general` | mixed dual: `c_0† · c_2 + c_2 · c_0† = 0` for any N ≥ 2 (adjoint) | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
