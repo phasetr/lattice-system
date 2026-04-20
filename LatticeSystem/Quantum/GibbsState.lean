@@ -840,6 +840,56 @@ theorem gibbsVariance_add (β : ℝ) (H A B : ManyBodyOp Λ) :
   simp only [gibbsExpectation_add]
   ring
 
+/-! #### Variance under scalar / negation / constant shift -/
+
+/-- Variance of the identity is zero when `Z ≠ 0`:
+`Var_β(1) = ⟨1⟩ - ⟨1⟩² = 1 - 1 = 0`. -/
+theorem gibbsVariance_one {H : ManyBodyOp Λ} (β : ℝ)
+    (hZ : partitionFn β H ≠ 0) :
+    gibbsVariance β H 1 = 0 := by
+  unfold gibbsVariance
+  rw [Matrix.one_mul, gibbsExpectation_one β hZ]
+  ring
+
+/-- Variance scales as the square: `Var_β(c • A) = c² · Var_β(A)`. -/
+theorem gibbsVariance_smul (β : ℝ) (H : ManyBodyOp Λ) (c : ℂ) (A : ManyBodyOp Λ) :
+    gibbsVariance β H (c • A) = c ^ 2 * gibbsVariance β H A := by
+  unfold gibbsVariance
+  rw [Matrix.smul_mul, Matrix.mul_smul, smul_smul, gibbsExpectation_smul,
+    gibbsExpectation_smul]
+  ring
+
+/-- Variance of a scalar multiple of the identity is zero
+(when `Z ≠ 0`): `Var_β(c • 1) = c² · 0 = 0`. -/
+theorem gibbsVariance_smul_one {H : ManyBodyOp Λ} (β : ℝ)
+    (hZ : partitionFn β H ≠ 0) (c : ℂ) :
+    gibbsVariance β H (c • (1 : ManyBodyOp Λ)) = 0 := by
+  rw [gibbsVariance_smul, gibbsVariance_one β hZ, mul_zero]
+
+/-- Variance is invariant under negation: `Var_β(−A) = Var_β(A)`.
+Specialisation of `gibbsVariance_smul` at `c = −1`. -/
+theorem gibbsVariance_neg (β : ℝ) (H A : ManyBodyOp Λ) :
+    gibbsVariance β H (-A) = gibbsVariance β H A := by
+  rw [show -A = ((-1 : ℂ)) • A by simp]
+  rw [gibbsVariance_smul]
+  ring
+
+/-- Variance is invariant under a constant additive shift
+(when `Z ≠ 0`): `Var_β(A + c • 1) = Var_β(A)`. -/
+theorem gibbsVariance_add_const_smul_one {H : ManyBodyOp Λ} (β : ℝ)
+    (hZ : partitionFn β H ≠ 0) (A : ManyBodyOp Λ) (c : ℂ) :
+    gibbsVariance β H (A + c • (1 : ManyBodyOp Λ)) = gibbsVariance β H A := by
+  unfold gibbsVariance
+  have hexp_self : (A + c • (1 : ManyBodyOp Λ)) * (A + c • 1)
+                 = A * A + c • A + c • A + (c * c) • (1 : ManyBodyOp Λ) := by
+    simp only [add_mul, mul_add, Matrix.smul_mul, Matrix.mul_smul,
+      Matrix.one_mul, Matrix.mul_one, smul_smul]
+    abel
+  rw [hexp_self]
+  simp only [gibbsExpectation_add, gibbsExpectation_smul,
+    gibbsExpectation_one β hZ]
+  ring
+
 /-! #### Symmetric / antisymmetric decomposition -/
 
 /-- The complex covariance decomposes into its symmetric part plus
