@@ -1987,6 +1987,21 @@ This is the algebraic statement that conserved quantities can be
 rules and conservation-induced simplifications.
 \end{proof}
 
+\begin{lemma}[\texttt{gibbsExpectation\_commutator\_eq\_zero\_of\_commute\_hamiltonian}]
+For any conserved quantity $A$ and any observable $O$,
+$\langle A O - O A \rangle_\beta = 0$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Linearity (\texttt{gibbsExpectation\_sub}) plus the previous lemma:
+$\langle A O - O A \rangle_\beta = \langle A O \rangle_\beta - \langle O A \rangle_\beta = 0$.
+
+The standard "selection rule" form of Noether's theorem at finite
+volume: when $A$ is a conserved quantity, the Heisenberg equation
+$\dot A = i[H, A] = 0$ implies that the Gibbs ensemble cannot
+distinguish $A O$ from $O A$.
+\end{proof}
+
 \begin{lemma}[\texttt{gibbsExpectation\_commutator\_hamiltonian}]
 For any observable $A$,
 $\langle [H, A] \rangle_\beta = 0$.

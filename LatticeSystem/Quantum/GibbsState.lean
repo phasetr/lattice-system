@@ -510,6 +510,17 @@ theorem gibbsExpectation_mul_comm_of_commute_hamiltonian (β : ℝ)
   rw [← Matrix.mul_assoc, hρ.eq.symm, Matrix.mul_assoc,
     Matrix.trace_mul_comm, Matrix.mul_assoc]
 
+/-- Conservation-induced commutator vanishing: when `[A, H] = 0`,
+`⟨A · O − O · A⟩_β = 0` for any observable `O`. The standard
+"selection rule" form of Noether's theorem at finite volume.
+Generalises `gibbsExpectation_commutator_hamiltonian` from `A = H`
+to any conserved `A`. -/
+theorem gibbsExpectation_commutator_eq_zero_of_commute_hamiltonian (β : ℝ)
+    {H A : ManyBodyOp Λ} (hA : Commute A H) (O : ManyBodyOp Λ) :
+    gibbsExpectation β H (A * O - O * A) = 0 := by
+  rw [gibbsExpectation_sub,
+    gibbsExpectation_mul_comm_of_commute_hamiltonian β hA O, sub_self]
+
 /-- The Gibbs expectation of any commutator with the Hamiltonian vanishes:
 `⟨[H, A]⟩_β = 0`. -/
 theorem gibbsExpectation_commutator_hamiltonian (β : ℝ) (H A : ManyBodyOp Λ) :
