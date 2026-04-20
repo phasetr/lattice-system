@@ -568,6 +568,8 @@ Systems*, §3.5, p. 89.
 | `openChainHeisenbergHamiltonian_mulVec_basisVec_all_down` | `s = 1` specialisation: same eigenvalue `-(N·J/2)` for the all-down state by SU(2) symmetry | `Quantum/HeisenbergChain.lean` |
 | `openChainHeisenbergHamiltonian_mulVec_totalSpinHalfOpMinus_pow_basisVec_all_up` | for any `N : ℕ`, `J : ℝ`, `k : ℕ`, `H_open · ((Ŝtot^-)^k · |↑..↑⟩) = -(N·J/2 : ℂ) · ((Ŝtot^-)^k · |↑..↑⟩)` — the unnormalised Tasaki §2.4 (2.4.9) ferromagnetic ground states `|Φ_M⟩` made explicit on the chain (combines PRs #82 + #98) | `Quantum/HeisenbergChain.lean` |
 | `openChainHeisenbergHamiltonian_mulVec_totalSpinHalfOpPlus_pow_basisVec_all_down` | dual ladder from `|↓..↓⟩`, same eigenvalue `-(N·J/2)` | `Quantum/HeisenbergChain.lean` |
+| `openChainHeisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem` | `H_open` preserves every magnetisation subspace `H_M` (chain specialisation of PR #91) | `Quantum/HeisenbergChain.lean` |
+| `periodicChainHeisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem` | `H_periodic` preserves every magnetisation subspace `H_M` (chain specialisation of PR #91) | `Quantum/HeisenbergChain.lean` |
 
 ### Single-mode fermion (P2 skeleton)
 
