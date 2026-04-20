@@ -1464,4 +1464,29 @@ theorem fermionHopping_commute_fermionTotalNumber
   refine Commute.sum_left _ _ _ (fun j _ => ?_)
   exact ((fermionTotalNumber_commute_hopping N i j).symm).smul_left (t i j)
 
+/-- The general density-density interaction on `Fin (N + 1)` modes
+with arbitrary complex coefficients `V : Fin (N+1) → Fin (N+1) → ℂ`:
+`V_int = Σ_{i,j} V_{i,j} · n_i n_j`. Captures any density–density
+potential (extended Hubbard, long-range Coulomb on a chain, etc.). -/
+noncomputable def fermionDensityInteraction (N : ℕ)
+    (V : Fin (N + 1) → Fin (N + 1) → ℂ) : ManyBodyOp (Fin (N + 1)) :=
+  ∑ i, ∑ j, V i j •
+    (fermionMultiNumber N i * fermionMultiNumber N j)
+
+/-- The general density-density interaction commutes with the total
+particle-number operator `N̂`: every term `n_i n_j` commutes with `N̂`
+(`fermionDensityDensity_commute_fermionTotalNumber`), the scalar
+action `V_{ij} •` preserves the commute, and finite sums commute.
+Together with `fermionHopping_commute_fermionTotalNumber` this gives
+charge conservation for any Hubbard-type Hamiltonian
+`H = H_hop + V_int`. -/
+theorem fermionDensityInteraction_commute_fermionTotalNumber
+    (N : ℕ) (V : Fin (N + 1) → Fin (N + 1) → ℂ) :
+    Commute (fermionDensityInteraction N V) (fermionTotalNumber N) := by
+  unfold fermionDensityInteraction
+  refine Commute.sum_left _ _ _ (fun i _ => ?_)
+  refine Commute.sum_left _ _ _ (fun j _ => ?_)
+  exact (fermionDensityDensity_commute_fermionTotalNumber N i j).smul_left
+    (V i j)
+
 end LatticeSystem.Fermion
