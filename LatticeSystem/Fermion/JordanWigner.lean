@@ -479,4 +479,42 @@ theorem fermionMultiCreation_anticomm_two_site_cross :
         fermionMultiCreation 1 (0 : Fin 2) * fermionMultiCreation 1 1 from add_comm _ _]
   exact h2
 
+/-- Mixed cross-site CAR on `Fin 2`: `c_0 · c_1† + c_1† · c_0 = 0`.
+Same proof structure as PR #108 with `σ^+_1` replaced by `σ^-_1` at
+site 1 (the site-0 Pauli identities are unchanged). -/
+theorem fermionMultiAnnihilation_creation_anticomm_two_site_cross :
+    fermionMultiAnnihilation 1 (0 : Fin 2) *
+        fermionMultiCreation 1 1 +
+      fermionMultiCreation 1 1 *
+        fermionMultiAnnihilation 1 0 = 0 := by
+  rw [fermionMultiAnnihilation_zero]
+  have hjw : jwString 1 (1 : Fin 2) = onSite (0 : Fin 2) pauliZ := by
+    have hfilter : (Finset.univ : Finset (Fin 2)).filter
+        (fun j : Fin 2 => j.val < (1 : Fin 2).val) = ({0} : Finset (Fin 2)) := by
+      ext k; fin_cases k <;> simp
+    unfold jwString
+    rw [Finset.noncommProd_congr hfilter (fun _ _ => rfl)]
+    exact Finset.noncommProd_singleton _ _
+  show onSite (0 : Fin 2) spinHalfOpPlus *
+        fermionMultiCreation 1 1 +
+      fermionMultiCreation 1 1 *
+        onSite (0 : Fin 2) spinHalfOpPlus = 0
+  unfold fermionMultiCreation
+  rw [hjw]
+  have h01 : (0 : Fin 2) ≠ 1 := by decide
+  -- c_0 · c_1† = σ^+_0 · σ^z_0 · σ^-_1 = -σ^+_0 · σ^-_1
+  have hfirst : onSite (0 : Fin 2) spinHalfOpPlus *
+      (onSite (0 : Fin 2) pauliZ * onSite (1 : Fin 2) spinHalfOpMinus) =
+        -(onSite (0 : Fin 2) spinHalfOpPlus * onSite (1 : Fin 2) spinHalfOpMinus) := by
+    rw [← Matrix.mul_assoc, onSite_mul_onSite_same, spinHalfOpPlus_mul_pauliZ]
+    rw [show (-spinHalfOpPlus : Matrix (Fin 2) (Fin 2) ℂ) = (-1 : ℂ) • spinHalfOpPlus
+      from by rw [neg_one_smul], onSite_smul, Matrix.smul_mul, neg_one_smul]
+  -- c_1† · c_0 = σ^z_0 · σ^-_1 · σ^+_0 = σ^z_0 · σ^+_0 · σ^-_1 = σ^+_0 · σ^-_1
+  have hsecond : (onSite (0 : Fin 2) pauliZ * onSite (1 : Fin 2) spinHalfOpMinus) *
+      onSite (0 : Fin 2) spinHalfOpPlus =
+        onSite (0 : Fin 2) spinHalfOpPlus * onSite (1 : Fin 2) spinHalfOpMinus := by
+    rw [Matrix.mul_assoc, onSite_mul_onSite_of_ne h01.symm, ← Matrix.mul_assoc,
+      onSite_mul_onSite_same, pauliZ_mul_spinHalfOpPlus]
+  rw [hfirst, hsecond, neg_add_cancel]
+
 end LatticeSystem.Fermion
