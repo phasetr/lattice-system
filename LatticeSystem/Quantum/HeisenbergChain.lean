@@ -240,6 +240,15 @@ theorem openChainHeisenbergGibbsExpectation_ofReal_re_eq
   gibbsExpectation_ofReal_re_eq_of_isHermitian
     (openChainHeisenberg_isHermitian N J) hO β
 
+/-- Open-chain Heisenberg Rényi-n trace identity:
+`Tr(ρ_β^n) = Z(n β) / Z(β)^n`. -/
+theorem openChainHeisenbergGibbsState_pow_trace (β J : ℝ) (N : ℕ) (n : ℕ) :
+    ((openChainHeisenbergGibbsState β J N)^n).trace
+      = partitionFn ((n : ℝ) * β)
+          (heisenbergHamiltonian (openChainCoupling N J))
+        / (partitionFn β (heisenbergHamiltonian (openChainCoupling N J))) ^ n :=
+  gibbsState_pow_trace β (heisenbergHamiltonian (openChainCoupling N J)) n
+
 /-! ## Gibbs state for the periodic-chain Heisenberg Hamiltonian -/
 
 /-- The Gibbs state of the periodic-boundary 1D Heisenberg chain on
@@ -366,5 +375,16 @@ theorem periodicChainHeisenbergGibbsExpectation_ofReal_re_eq
           (heisenbergHamiltonian (periodicChainCoupling N J)) O :=
   gibbsExpectation_ofReal_re_eq_of_isHermitian
     (periodicChainHeisenberg_isHermitian N J) hO β
+
+/-- Periodic-chain Heisenberg Rényi-n trace identity:
+`Tr(ρ_β^n) = Z(n β) / Z(β)^n`. -/
+theorem periodicChainHeisenbergGibbsState_pow_trace
+    (β J : ℝ) (N : ℕ) (n : ℕ) :
+    ((periodicChainHeisenbergGibbsState β J N)^n).trace
+      = partitionFn ((n : ℝ) * β)
+          (heisenbergHamiltonian (periodicChainCoupling N J))
+        / (partitionFn β
+            (heisenbergHamiltonian (periodicChainCoupling N J))) ^ n :=
+  gibbsState_pow_trace β (heisenbergHamiltonian (periodicChainCoupling N J)) n
 
 end LatticeSystem.Quantum
