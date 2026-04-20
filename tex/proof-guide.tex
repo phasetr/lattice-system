@@ -2147,6 +2147,32 @@ via \texttt{add\_mul} / \texttt{mul\_add} / \texttt{abel}, then apply
 anticommutator and \texttt{gibbsExpectation\_smul}.
 \end{proof}
 
+\begin{lemma}[Vanishing on constant-scalar arguments]
+For $c \in \mathbb{C}$ and $Z(\beta, H) \neq 0$,
+\[
+  \operatorname{Cov}_\beta(c \cdot I, B)
+  = \operatorname{Cov}_\beta(A, c \cdot I)
+  = 0,
+\]
+and analogously for $\operatorname{Cov}^{\mathrm{s}}_\beta$.
+Lean names: \texttt{gibbsCovariance\_const\_smul\_one\_left\_eq\_zero},
+\texttt{gibbsCovariance\_const\_smul\_one\_right\_eq\_zero},
+\texttt{gibbsCovarianceSymm\_const\_smul\_one\_left\_eq\_zero},
+\texttt{gibbsCovarianceSymm\_const\_smul\_one\_right\_eq\_zero}.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+Constant scalars are deterministic observables.  Concretely
+$\langle (c \cdot I) B \rangle_\beta = c \langle B \rangle_\beta$
+(via \texttt{Matrix.smul\_mul} / \texttt{Matrix.one\_mul} and
+\texttt{gibbsExpectation\_smul}), and
+$\langle c \cdot I \rangle_\beta = c \cdot \langle I \rangle_\beta = c$
+(using \texttt{gibbsExpectation\_one} which requires $Z \neq 0$).
+The two terms cancel.  The $\operatorname{Cov}^{\mathrm{s}}$ versions
+follow from the symmetrisation identity
+\texttt{gibbsCovarianceSymm\_eq\_half\_add\_swap}.
+\end{proof}
+
 \begin{lemma}[Symmetric / antisymmetric decomposition]
 $\operatorname{Cov}_\beta(A, B)
  = \operatorname{Cov}^{\mathrm{s}}_\beta(A, B)

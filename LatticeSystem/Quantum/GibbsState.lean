@@ -598,6 +598,28 @@ theorem gibbsCovariance_smul_right (β : ℝ) (H A : ManyBodyOp Λ) (c : ℂ)
   rw [Matrix.mul_smul, gibbsExpectation_smul, gibbsExpectation_smul]
   ring
 
+/-! #### Vanishing on constant-scalar arguments -/
+
+/-- The complex covariance vanishes when its left argument is a scalar
+multiple of the identity, provided `Z(β) ≠ 0`. -/
+theorem gibbsCovariance_const_smul_one_left_eq_zero {H : ManyBodyOp Λ} (β : ℝ)
+    (hZ : partitionFn β H ≠ 0) (c : ℂ) (B : ManyBodyOp Λ) :
+    gibbsCovariance β H (c • (1 : ManyBodyOp Λ)) B = 0 := by
+  unfold gibbsCovariance
+  rw [Matrix.smul_mul, Matrix.one_mul, gibbsExpectation_smul,
+    gibbsExpectation_smul, gibbsExpectation_one β hZ, mul_one]
+  ring
+
+/-- The complex covariance vanishes when its right argument is a scalar
+multiple of the identity, provided `Z(β) ≠ 0`. -/
+theorem gibbsCovariance_const_smul_one_right_eq_zero {H : ManyBodyOp Λ} (β : ℝ)
+    (hZ : partitionFn β H ≠ 0) (A : ManyBodyOp Λ) (c : ℂ) :
+    gibbsCovariance β H A (c • (1 : ManyBodyOp Λ)) = 0 := by
+  unfold gibbsCovariance
+  rw [Matrix.mul_smul, Matrix.mul_one, gibbsExpectation_smul,
+    gibbsExpectation_smul, gibbsExpectation_one β hZ, mul_one]
+  ring
+
 /-! ## Anticommutator real, commutator purely imaginary
 
 For Hermitian `ρ` and arbitrary `X`,
@@ -765,6 +787,26 @@ theorem gibbsCovarianceSymm_eq_half_add_swap
   unfold gibbsCovariance gibbsCovarianceSymm
   rw [gibbsExpectation_add]
   ring
+
+/-- The symmetric covariance vanishes when its left argument is a
+scalar multiple of the identity, provided `Z(β) ≠ 0`. Direct
+corollary of `gibbsCovariance_const_smul_one_left_eq_zero` /
+`_right_eq_zero` via the symmetrisation identity. -/
+theorem gibbsCovarianceSymm_const_smul_one_left_eq_zero {H : ManyBodyOp Λ}
+    (β : ℝ) (hZ : partitionFn β H ≠ 0) (c : ℂ) (B : ManyBodyOp Λ) :
+    gibbsCovarianceSymm β H (c • (1 : ManyBodyOp Λ)) B = 0 := by
+  rw [gibbsCovarianceSymm_eq_half_add_swap,
+    gibbsCovariance_const_smul_one_left_eq_zero β hZ,
+    gibbsCovariance_const_smul_one_right_eq_zero β hZ]
+  ring
+
+/-- The symmetric covariance vanishes when its right argument is a
+scalar multiple of the identity, provided `Z(β) ≠ 0`. -/
+theorem gibbsCovarianceSymm_const_smul_one_right_eq_zero {H : ManyBodyOp Λ}
+    (β : ℝ) (hZ : partitionFn β H ≠ 0) (A : ManyBodyOp Λ) (c : ℂ) :
+    gibbsCovarianceSymm β H A (c • (1 : ManyBodyOp Λ)) = 0 := by
+  rw [gibbsCovarianceSymm_comm,
+    gibbsCovarianceSymm_const_smul_one_left_eq_zero β hZ]
 
 /-- For Hermitian `H` and Hermitian `A, B`, the symmetric covariance
 is real. The anticommutator term is real by

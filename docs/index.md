@@ -454,6 +454,8 @@ All theorems in this module are fully proved with **zero `sorry`**.
 | `gibbsCovariance_add_right` | `Cov_β(A, B₁ + B₂) = Cov_β(A, B₁) + Cov_β(A, B₂)` | `Quantum/GibbsState.lean` |
 | `gibbsCovariance_smul_left` | `Cov_β(c • A, B) = c · Cov_β(A, B)` | `Quantum/GibbsState.lean` |
 | `gibbsCovariance_smul_right` | `Cov_β(A, c • B) = c · Cov_β(A, B)` | `Quantum/GibbsState.lean` |
+| `gibbsCovariance_const_smul_one_left/right_eq_zero` | `Cov_β(c • 1, B) = 0` and `Cov_β(A, c • 1) = 0` (when `Z ≠ 0`) | `Quantum/GibbsState.lean` |
+| `gibbsCovarianceSymm_const_smul_one_left/right_eq_zero` | `Cov^s_β(c • 1, B) = 0` and `Cov^s_β(A, c • 1) = 0` (when `Z ≠ 0`) | `Quantum/GibbsState.lean` |
 | `gibbsCovarianceSymm β H A B` | `Cov^s_β(A, B) := (1/2) · ⟨A · B + B · A⟩_β − ⟨A⟩_β · ⟨B⟩_β` (symmetric / real-valued covariance) | `Quantum/GibbsState.lean` |
 | `gibbsCovarianceSymm_self_eq_variance` | `Cov^s_β(O, O) = Var_β(O)` | `Quantum/GibbsState.lean` |
 | `gibbsCovarianceSymm_im_of_isHermitian` | `(Cov^s_β(A, B)).im = 0` for Hermitian `H, A, B` | `Quantum/GibbsState.lean` |
