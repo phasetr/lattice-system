@@ -635,6 +635,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionMultiAnnihilation_creation_anticomm_zero_one` | mixed: `c_0 · c_1† + c_1† · c_0 = 0` on `Fin (N+1)`, `N ≥ 1` | `Fermion/JordanWigner.lean` |
 | `fermionMultiCreation_annihilation_anticomm_zero_one` | mixed dual: `c_0† · c_1 + c_1 · c_0† = 0` on `Fin (N+1)`, `N ≥ 1` | `Fermion/JordanWigner.lean` |
 | `jwString_succ_eq` | recursive factorisation of the JW string: `jwString N ⟨i+1, _⟩ = jwString N i * onSite i pauliZ` (key general lemma for proving jwString at any specific site without raw `Finset.noncommProd` manipulation) | `Fermion/JordanWigner.lean` |
+| `fermionMultiAnnihilation_anticomm_zero_two_fin_three` | first 3-site cross-site CAR: `c_0 · c_2 + c_2 · c_0 = 0` on `Fin 3` (using `jwString_succ_eq` to factor `jwString 2 2 = σ^z_0 · σ^z_1`) | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
