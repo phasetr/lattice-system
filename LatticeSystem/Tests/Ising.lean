@@ -125,21 +125,72 @@ example (N : ℕ) (i : Fin (N + 1)) : (spinX N i).IsHermitian :=
 
 Per codex consultation (see `.self-local/docs/ising-bridge-plan.md`)
 the plan was to add matrix-entry tests at the 2-site (N=1) level
-to catch any behavioural drift in the upcoming
+to catch any behavioural drift in the
 `quantumIsingHamiltonian` → `isingHamiltonianGeneric` bridge.
 
 The computational entry-level tests turned out to be blocked: the
 many-body matrix expression after unfolding
 `onSite` + `pauliX/Z` + multi-site product is too complex for
-`simp` to reduce in a stable way. The shim tests above
-(Hamiltonian Hermiticity, Gibbs state properties, etc.) remain
-as signature-preservation guards, but are brittle to renames.
+`simp` to reduce in a stable way. Instead, the bridge theorem
+itself (PR #187) serves as the primary regression test:
+its proof fixes the normalisation.
 
-Alternative robust tests (to be explored in a follow-up PR):
+Alternative robust tests (still TODO):
 - `mulVec` on `basisVec`: cleanly reduces via
   `onSite_mulVec_basisVec`. E.g.
   `H.mulVec (basisVec all-up) = (-J) • basisVec all-up` when h=0.
 - Bridge identity by `unfold; simp_rw; funext; ...` comparing
   operator-level equality rather than entry-level equality. -/
+
+/-! ## Ising bridge theorem specialisations (PR #187)
+
+The generic bridge
+`quantumIsingHamiltonian N J h
+  = isingHamiltonianGeneric (couplingOf (pathGraph (N+1)) (-J/2)) h`
+instantiated at small `N`, as shim regression tests alongside
+the generic proof. -/
+
+example (J h : ℝ) :
+    quantumIsingHamiltonian 0 J h
+      = isingHamiltonianGeneric
+          (couplingOf (SimpleGraph.pathGraph 1) (-(J : ℂ) / 2))
+          (h : ℂ) :=
+  quantumIsingHamiltonian_eq_isingHamiltonianGeneric 0 J h
+
+example (J h : ℝ) :
+    quantumIsingHamiltonian 2 J h
+      = isingHamiltonianGeneric
+          (couplingOf (SimpleGraph.pathGraph 3) (-(J : ℂ) / 2))
+          (h : ℂ) :=
+  quantumIsingHamiltonian_eq_isingHamiltonianGeneric 2 J h
+
+example (J h : ℝ) :
+    quantumIsingHamiltonian 3 J h
+      = isingHamiltonianGeneric
+          (couplingOf (SimpleGraph.pathGraph 4) (-(J : ℂ) / 2))
+          (h : ℂ) :=
+  quantumIsingHamiltonian_eq_isingHamiltonianGeneric 3 J h
+
+/-! ## sum_pathGraph_{forward,backward,adj} helpers (PR #187)
+
+Concrete small-N instances of the edge-sum decomposition. -/
+
+example (f : Fin 3 → Fin 3 → ℕ) :
+    ∑ x : Fin 3, ∑ y : Fin 3,
+      (if x.val + 1 = y.val then f x y else 0)
+    = ∑ i : Fin 2, f i.castSucc i.succ :=
+  LatticeSystem.Lattice.sum_pathGraph_forward 2 f
+
+example (f : Fin 4 → Fin 4 → ℕ) :
+    ∑ x : Fin 4, ∑ y : Fin 4,
+      (if y.val + 1 = x.val then f x y else 0)
+    = ∑ i : Fin 3, f i.succ i.castSucc :=
+  LatticeSystem.Lattice.sum_pathGraph_backward 3 f
+
+example (f : Fin 3 → Fin 3 → ℕ) :
+    ∑ x : Fin 3, ∑ y : Fin 3,
+      (if (SimpleGraph.pathGraph 3).Adj x y then f x y else 0)
+    = ∑ i : Fin 2, (f i.castSucc i.succ + f i.succ i.castSucc) :=
+  LatticeSystem.Lattice.sum_pathGraph_adj 2 f
 
 end LatticeSystem.Tests.Ising
