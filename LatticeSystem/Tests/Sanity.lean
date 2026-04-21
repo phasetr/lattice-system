@@ -146,4 +146,48 @@ example (J h : ℝ) :
         (-(J : ℂ)) (h : ℂ)).IsHermitian :=
   isingHamiltonianOnGraph_isHermitian _ (by simp) (by simp)
 
+/-! ## Decide-based property tests
+
+These are universally-quantified properties verified by `decide`
+on small finite instances. They are *real proofs* (no `sorry`),
+so they fit the project's no-`sorry` policy while providing
+property-test-style coverage. -/
+
+/-- Property: `pathGraph 3` adjacency is symmetric over all
+`Fin 3 × Fin 3` pairs. -/
+example : ∀ x y : Fin 3,
+    (SimpleGraph.pathGraph 3).Adj x y = (SimpleGraph.pathGraph 3).Adj y x := by
+  decide
+
+/-- Property: `pathGraph 4` adjacency is symmetric over all
+`Fin 4 × Fin 4` pairs. -/
+example : ∀ x y : Fin 4,
+    (SimpleGraph.pathGraph 4).Adj x y = (SimpleGraph.pathGraph 4).Adj y x := by
+  decide
+
+/-- Property: `pathGraph 3` is irreflexive (no self-loops). -/
+example : ∀ x : Fin 3, ¬ (SimpleGraph.pathGraph 3).Adj x x := by
+  decide
+
+/-- Property: `cycleGraph 3` adjacency is symmetric over all
+`Fin 3 × Fin 3` pairs. -/
+example : ∀ x y : Fin 3,
+    (SimpleGraph.cycleGraph 3).Adj x y = (SimpleGraph.cycleGraph 3).Adj y x := by
+  decide
+
+/-- Property: `cycleGraph 4` adjacency is symmetric over all
+`Fin 4 × Fin 4` pairs. -/
+example : ∀ x y : Fin 4,
+    (SimpleGraph.cycleGraph 4).Adj x y = (SimpleGraph.cycleGraph 4).Adj y x := by
+  decide
+
+/-- Property: `cycleGraph 3` is irreflexive. -/
+example : ∀ x : Fin 3, ¬ (SimpleGraph.cycleGraph 3).Adj x x := by
+  decide
+
+/-- Property: every vertex of `pathGraph 3` has at least one
+neighbour in `Fin 3` (the path graph is connected). -/
+example : ∀ x : Fin 3, ∃ y : Fin 3, (SimpleGraph.pathGraph 3).Adj x y := by
+  decide
+
 end LatticeSystem.Tests
