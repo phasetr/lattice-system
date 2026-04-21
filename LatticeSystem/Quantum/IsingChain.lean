@@ -466,4 +466,17 @@ theorem quantumIsingHamiltonian_one_eq_isingHamiltonianGeneric
           (h : ℂ) :=
   quantumIsingHamiltonian_eq_isingHamiltonianGeneric 1 J h
 
+/-- Bridge: `quantumIsingGibbsState = isingGibbsStateOnGraph` on
+`pathGraph (N+1)` with edge weight `-J/2`. Direct corollary of the
+chain Hamiltonian bridge. -/
+theorem quantumIsingGibbsState_eq_isingGibbsStateOnGraph
+    (β J h : ℝ) (N : ℕ) :
+    quantumIsingGibbsState β J h N
+      = isingGibbsStateOnGraph (SimpleGraph.pathGraph (N + 1)) β
+          (-(J / 2)) h := by
+  unfold quantumIsingGibbsState isingGibbsStateOnGraph isingHamiltonianOnGraph
+  rw [quantumIsingHamiltonian_eq_isingHamiltonianGeneric]
+  congr 1
+  · push_cast; ring
+
 end LatticeSystem.Quantum
