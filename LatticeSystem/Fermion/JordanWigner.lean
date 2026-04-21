@@ -2292,6 +2292,30 @@ theorem hubbardHamiltonianOnGraph_isHermitian
   exact (hubbardKineticOnGraph_isHermitian N G hJ).add
     (hubbardOnSiteInteraction_isHermitian N hU)
 
+/-! ## 1D Hubbard chain instance -/
+
+/-- The canonical 1D nearest-neighbour Hubbard Hamiltonian on a
+chain of `N + 1` spinful sites, with hopping amplitude `J : ℝ`
+(ferromagnetic sign convention `−J`) and on-site Coulomb
+repulsion `U : ℝ`. -/
+noncomputable def hubbardChainHamiltonian (N : ℕ) (J U : ℝ) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  hubbardHamiltonianOnGraph N (SimpleGraph.pathGraph (N + 1))
+    (-(J : ℂ)) (U : ℂ)
+
+/-- The 1D Hubbard chain Hamiltonian is Hermitian. -/
+theorem hubbardChainHamiltonian_isHermitian (N : ℕ) (J U : ℝ) :
+    (hubbardChainHamiltonian N J U).IsHermitian :=
+  hubbardHamiltonianOnGraph_isHermitian N _ (by simp) (by simp)
+
+/-- The 1D Hubbard chain Hamiltonian commutes with `N̂` (charge
+conservation). -/
+theorem hubbardChainHamiltonian_commute_fermionTotalNumber
+    (N : ℕ) (J U : ℝ) :
+    Commute (hubbardChainHamiltonian N J U)
+      (fermionTotalNumber (2 * N + 1)) :=
+  hubbardHamiltonianOnGraph_commute_fermionTotalNumber N _ _ _
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`

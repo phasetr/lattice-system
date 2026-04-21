@@ -756,6 +756,8 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardKineticOnGraph_commute_fermionTotalNumber` / `hubbardKineticOnGraph_isHermitian` | charge conservation always; Hermiticity for real `J` | `Fermion/JordanWigner.lean` |
 | `hubbardHamiltonianOnGraph N G J U` | full Hubbard Hamiltonian from a graph + on-site coupling | `Fermion/JordanWigner.lean` |
 | `hubbardHamiltonianOnGraph_commute_fermionTotalNumber` / `hubbardHamiltonianOnGraph_isHermitian` | charge conservation; Hermiticity for real `J` and real `U` | `Fermion/JordanWigner.lean` |
+| `hubbardChainHamiltonian N J U` | the canonical 1D nearest-neighbour Hubbard chain `−J Σ_{σ,⟨i,j⟩} c_{iσ}† c_{jσ} + U Σ_i n_{i↑} n_{i↓}` (built from `pathGraph (N+1)`) | `Fermion/JordanWigner.lean` |
+| `hubbardChainHamiltonian_isHermitian` / `hubbardChainHamiltonian_commute_fermionTotalNumber` | Hermiticity (real `J, U`) and charge conservation | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
