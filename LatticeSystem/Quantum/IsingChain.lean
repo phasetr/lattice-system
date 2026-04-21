@@ -388,57 +388,82 @@ is deferred to a follow-up PR; the pattern scales but the generic
 proof needs an edge-enumeration sum lemma for `pathGraph` that is
 currently not in mathlib. -/
 
-set_option linter.unusedSimpArgs false in
+/-- **Generic-N bridge**: the \(N+1\)-site open-chain quantum
+Ising Hamiltonian equals the graph-built Ising Hamiltonian on
+`pathGraph (N+1)` with weight `-J/2`. The factor `1/2` compensates
+for the symmetric double-sum convention (each undirected edge
+contributes twice in the graph-built version). The proof uses
+`sum_pathGraph_adj` to decompose the adjacency double sum into the
+edge-indexed single sum, then `spinZ_commute` (i.e. `onSite` at
+distinct sites commutes) to identify the two orientations. -/
+theorem quantumIsingHamiltonian_eq_isingHamiltonianGeneric
+    (N : ℕ) (J h : ℝ) :
+    quantumIsingHamiltonian N J h
+      = isingHamiltonianGeneric
+          (LatticeSystem.Lattice.couplingOf
+            (SimpleGraph.pathGraph (N + 1)) (-(J : ℂ) / 2))
+          (h : ℂ) := by
+  unfold quantumIsingHamiltonian isingHamiltonianGeneric
+  -- Decompose the RHS bond sum via the pathGraph adjacency helper.
+  have h_bond :
+      ∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+          LatticeSystem.Lattice.couplingOf (SimpleGraph.pathGraph (N + 1))
+            (-(J : ℂ) / 2) x y • spinZDot x y
+        = (-(J : ℂ)) • ∑ i : Fin N, spinZ N i.castSucc * spinZ N i.succ := by
+    -- couplingOf unfolds to an `if`
+    have : ∀ x y : Fin (N + 1),
+        LatticeSystem.Lattice.couplingOf (SimpleGraph.pathGraph (N + 1))
+          (-(J : ℂ) / 2) x y • spinZDot x y
+        = (if (SimpleGraph.pathGraph (N + 1)).Adj x y
+           then (-(J : ℂ) / 2) • spinZDot x y else 0) := by
+      intro x y
+      unfold LatticeSystem.Lattice.couplingOf
+      by_cases h : (SimpleGraph.pathGraph (N + 1)).Adj x y
+      · rw [if_pos h, if_pos h]
+      · rw [if_neg h, if_neg h, zero_smul]
+    simp_rw [this]
+    rw [LatticeSystem.Lattice.sum_pathGraph_adj]
+    -- Σ_i ((-J/2) • spinZDot cs s + (-J/2) • spinZDot s cs)
+    -- = Σ_i ((-J/2) • spinZDot cs s + (-J/2) • spinZDot cs s)  (by symmetry)
+    -- = Σ_i (-J) • spinZDot cs s
+    have h_comm_i : ∀ i : Fin N,
+        spinZDot (i.succ : Fin (N+1)) i.castSucc
+          = spinZDot i.castSucc i.succ := by
+      intro i
+      unfold spinZDot
+      have h_ne : (i.succ : Fin (N+1)) ≠ i.castSucc := by
+        intro heq
+        have := congrArg Fin.val heq
+        simp [Fin.castSucc, Fin.succ] at this
+      exact onSite_mul_onSite_of_ne h_ne pauliZ pauliZ
+    simp_rw [h_comm_i]
+    -- Goal: Σ_i ((-J/2) • spinZDot cs s + (-J/2) • spinZDot cs s)
+    --     = (-J) • Σ_i (spinZ cs * spinZ s)
+    have h_combine : ∀ i : Fin N,
+        (-(J : ℂ) / 2) • spinZDot i.castSucc i.succ
+          + (-(J : ℂ) / 2) • spinZDot i.castSucc i.succ
+        = (-(J : ℂ)) • spinZDot i.castSucc i.succ := by
+      intro i; rw [← add_smul]; congr 1; ring
+    simp_rw [h_combine]
+    rw [← Finset.smul_sum]
+    rfl
+  rw [h_bond]
+  -- Now: (-J) • bond + (-h) • Σ spinX = (-J) • bond - h • Σ onSite pauliX
+  rw [sub_eq_add_neg]
+  congr 1
+  show (-(h : ℂ)) • ∑ i : Fin (N + 1), spinX N i
+    = -((h : ℂ) • ∑ x : Fin (N + 1), onSite x pauliX)
+  simp only [spinX, neg_smul]
 
-/-- Bridge for N=1: the 2-site quantum Ising Hamiltonian equals
-the graph-built Ising Hamiltonian on `pathGraph 2` with weight
-`-J/2`. The factor `1/2` compensates for the symmetric double-sum
-convention (each undirected edge contributes twice in the
-graph-built version). This PROOF is the robust regression guard:
-if any refactor changes the normalization, the proof fails. -/
+/-- N=1 corollary of the generic bridge (PR #185 milestone kept
+for direct reference). -/
 theorem quantumIsingHamiltonian_one_eq_isingHamiltonianGeneric
     (J h : ℝ) :
     quantumIsingHamiltonian 1 J h
       = isingHamiltonianGeneric
           (LatticeSystem.Lattice.couplingOf
             (SimpleGraph.pathGraph 2) (-(J : ℂ) / 2))
-          (h : ℂ) := by
-  unfold quantumIsingHamiltonian isingHamiltonianGeneric
-  show (-(J : ℂ)) • ∑ i : Fin 1, spinZ 1 i.castSucc * spinZ 1 i.succ
-      + (-(h : ℂ)) • ∑ i : Fin 2, spinX 1 i
-      = ∑ x : Fin 2, ∑ y : Fin 2,
-          LatticeSystem.Lattice.couplingOf
-            (SimpleGraph.pathGraph 2) (-(J : ℂ) / 2) x y • spinZDot x y
-        - (h : ℂ) • ∑ x : Fin 2, onSite x pauliX
-  simp only [Fin.sum_univ_two, Fin.sum_univ_one, spinX, spinZ, spinZDot,
-    LatticeSystem.Lattice.couplingOf, SimpleGraph.pathGraph_adj,
-    Fin.castSucc_zero, Fin.succ_zero_eq_one]
-  have h_adj_0_1 : (SimpleGraph.pathGraph 2).Adj (0 : Fin 2) 1 := by
-    rw [SimpleGraph.pathGraph_adj]; left; rfl
-  have h_adj_1_0 : (SimpleGraph.pathGraph 2).Adj (1 : Fin 2) 0 := by
-    rw [SimpleGraph.pathGraph_adj]; right; rfl
-  have h_comm : onSite (0 : Fin 2) pauliZ * onSite (1 : Fin 2) pauliZ
-      = onSite (1 : Fin 2) pauliZ * onSite (0 : Fin 2) pauliZ :=
-    onSite_mul_onSite_of_ne (by decide : (0 : Fin 2) ≠ 1) pauliZ pauliZ
-  simp [if_pos h_adj_0_1, if_pos h_adj_1_0, h_comm]
-  -- Goal now:
-  --   -(J • (Z_1 * Z_0)) + -(h • X_0) + -(h • X_1)
-  --   = -(J/2) • (Z_1 * Z_0) + -(J/2) • (Z_1 * Z_0) - (h • X_0 + h • X_1)
-  -- where J, h are ℝ acting on ℂ-matrices.
-  -- Combine RHS bond: (-J/2) • A + (-J/2) • A = (-J) • A = -(J • A).
-  have h_two_halves :
-      ((-(J : ℂ) / 2) : ℂ) • (onSite (1 : Fin 2) pauliZ * onSite 0 pauliZ)
-      + ((-(J : ℂ) / 2) : ℂ) • (onSite (1 : Fin 2) pauliZ * onSite 0 pauliZ)
-      = (-(J : ℂ)) • (onSite (1 : Fin 2) pauliZ * onSite 0 pauliZ) := by
-    rw [← add_smul]; congr 1; ring
-  rw [h_two_halves]
-  -- Goal: -(J • A) + (-(h • X_0) + -(h • X_1))
-  --     = -(J : ℂ) • A - (h • X_0 + h • X_1)
-  -- ℝ-smul: -(J • A) = -(↑J : ℂ) • A is the content of Complex.real_smul.
-  show -((J : ℂ) • (onSite (1 : Fin 2) pauliZ * onSite 0 pauliZ))
-      + (-((h : ℂ) • onSite (0 : Fin 2) pauliX) + -((h : ℂ) • onSite 1 pauliX))
-      = -(J : ℂ) • (onSite 1 pauliZ * onSite 0 pauliZ)
-        - ((h : ℂ) • onSite 0 pauliX + (h : ℂ) • onSite 1 pauliX)
-  module
+          (h : ℂ) :=
+  quantumIsingHamiltonian_eq_isingHamiltonianGeneric 1 J h
 
 end LatticeSystem.Quantum
