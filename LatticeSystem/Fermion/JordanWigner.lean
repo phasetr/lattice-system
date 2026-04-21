@@ -1838,6 +1838,76 @@ theorem hubbardOnSiteInteraction_isHermitian
   rw [(fermionMultiNumber_mul_isHermitian (2 * N + 1)
     (spinfulIndex N i 0) (spinfulIndex N i 1)).eq, hU]
 
+/-- The spin-symmetric tight-binding kinetic operator on the spinful
+chain: `T = Σ_{σ} Σ_{i,j} t_{i,j} c_{i,σ}† c_{j,σ}`. Each spin
+sector hops independently with the same coupling matrix `t`. -/
+noncomputable def hubbardKinetic (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℂ) : ManyBodyOp (Fin (2 * N + 2)) :=
+  ∑ σ : Fin 2, ∑ i : Fin (N + 1), ∑ j : Fin (N + 1),
+    t i j • (fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+      fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j σ))
+
+/-- The spinful kinetic operator commutes with the total particle
+number `N̂` on the underlying chain. Each summand
+`t_{ij} • c_{iσ}† c_{jσ}` commutes with `N̂` via
+`fermionTotalNumber_commute_hopping`, and finite sums preserve
+this. -/
+theorem hubbardKinetic_commute_fermionTotalNumber
+    (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) :
+    Commute (hubbardKinetic N t) (fermionTotalNumber (2 * N + 1)) := by
+  unfold hubbardKinetic
+  refine Commute.sum_left _ _ _ (fun σ _ => ?_)
+  refine Commute.sum_left _ _ _ (fun i _ => ?_)
+  refine Commute.sum_left _ _ _ (fun j _ => ?_)
+  exact ((fermionTotalNumber_commute_hopping (2 * N + 1)
+    (spinfulIndex N i σ) (spinfulIndex N j σ)).symm).smul_left (t i j)
+
+/-- The spinful kinetic operator is Hermitian when the hopping
+matrix `t` is Hermitian (`star (t i j) = t j i`). For each fixed
+spin `σ`, the inner double sum is the single-species
+`fermionHopping (2N+1) t̃` for the lifted coupling
+`t̃ (spinfulIndex N i σ) (spinfulIndex N j σ) = t i j`; we prove
+Hermiticity term-by-term using the conjTranspose flip and a
+`Finset.sum_comm` index swap. -/
+theorem hubbardKinetic_isHermitian
+    (N : ℕ) {t : Fin (N + 1) → Fin (N + 1) → ℂ}
+    (ht : ∀ i j, star (t i j) = t j i) :
+    (hubbardKinetic N t).IsHermitian := by
+  show (hubbardKinetic N t)ᴴ = hubbardKinetic N t
+  unfold hubbardKinetic
+  rw [Matrix.conjTranspose_sum]
+  refine Finset.sum_congr rfl (fun σ _ => ?_)
+  calc (∑ i : Fin (N + 1), ∑ j : Fin (N + 1), t i j •
+          (fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+            fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j σ)))ᴴ
+      = ∑ i, (∑ j, t i j •
+            (fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+              fermionMultiAnnihilation (2 * N + 1)
+                (spinfulIndex N j σ)))ᴴ := by
+        rw [Matrix.conjTranspose_sum]
+    _ = ∑ i, ∑ j, (t i j •
+            (fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+              fermionMultiAnnihilation (2 * N + 1)
+                (spinfulIndex N j σ)))ᴴ := by
+        congr 1; funext i
+        rw [Matrix.conjTranspose_sum]
+    _ = ∑ i, ∑ j, t j i •
+            (fermionMultiCreation (2 * N + 1) (spinfulIndex N j σ) *
+              fermionMultiAnnihilation (2 * N + 1)
+                (spinfulIndex N i σ)) := by
+        congr 1; funext i; congr 1; funext j
+        rw [Matrix.conjTranspose_smul,
+          fermionHoppingTerm_conjTranspose, ht]
+    _ = ∑ j, ∑ i, t j i •
+            (fermionMultiCreation (2 * N + 1) (spinfulIndex N j σ) *
+              fermionMultiAnnihilation (2 * N + 1)
+                (spinfulIndex N i σ)) :=
+        Finset.sum_comm
+    _ = ∑ i, ∑ j, t i j •
+            (fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+              fermionMultiAnnihilation (2 * N + 1)
+                (spinfulIndex N j σ)) := rfl
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`
