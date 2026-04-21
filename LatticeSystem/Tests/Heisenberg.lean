@@ -114,4 +114,21 @@ example (J : ℝ) :
     (heisenbergHamiltonian (cubicLatticeCoupling 1 J)).IsHermitian :=
   cubicLatticeHeisenberg_isHermitian 1 J
 
+/-! ## Heisenberg-on-graph named wrapper (PR #189) -/
+
+example (J : ℝ) :
+    (heisenbergHamiltonianOnGraph (pathGraph 3)
+        (-(J : ℂ))).IsHermitian :=
+  heisenbergHamiltonianOnGraph_isHermitian _ (by simp)
+
+example (J : ℂ) :
+    Commute (heisenbergHamiltonianOnGraph (cycleGraph 4) J)
+      (totalSpinHalfOp1 (Fin 4)) :=
+  heisenbergHamiltonianOnGraph_commute_totalSpinHalfOp1 _ J
+
+example (J : ℂ) :
+    Commute (heisenbergHamiltonianOnGraph (pathGraph 3) J)
+      (totalSpinHalfSquared (Fin 3)) :=
+  heisenbergHamiltonianOnGraph_commute_totalSpinHalfSquared _ J
+
 end LatticeSystem.Tests.Heisenberg

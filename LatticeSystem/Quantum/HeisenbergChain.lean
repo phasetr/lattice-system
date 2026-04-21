@@ -98,6 +98,15 @@ theorem heisenbergHamiltonian_isHermitian_of_real_symm
   rw [Matrix.conjTranspose_smul, (spinHalfDot_isHermitian x y).eq]
   rw [hreal, hsymm, spinHalfDot_comm]
 
+/-- Canonical named wrapper for the Heisenberg Hamiltonian with
+hopping pattern derived from a `SimpleGraph G` and uniform complex
+edge weight `J`. Parallel to `isingHamiltonianOnGraph`. -/
+noncomputable def heisenbergHamiltonianOnGraph
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
+    ManyBodyOp Λ :=
+  heisenbergHamiltonian (LatticeSystem.Lattice.couplingOf G J)
+
 /-- **Heisenberg-on-graph Hermiticity.** For *any* `SimpleGraph G` on
 the vertex set `Λ` and any real complex edge weight `J : ℂ` (i.e.
 `star J = J`), the Heisenberg Hamiltonian
@@ -242,6 +251,40 @@ theorem heisenbergHamiltonian_couplingOf_commute_totalSpinHalfSquared
         (LatticeSystem.Lattice.couplingOf G J))
       (totalSpinHalfSquared Λ) :=
   heisenbergHamiltonian_commute_totalSpinHalfSquared _
+
+/-! ### Named-wrapper corollaries -/
+
+/-- Hermiticity of the graph-wrapper Hamiltonian for real `J`. -/
+theorem heisenbergHamiltonianOnGraph_isHermitian
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] {J : ℂ} (hJ : star J = J) :
+    (heisenbergHamiltonianOnGraph G J).IsHermitian :=
+  heisenbergHamiltonian_couplingOf_isHermitian G hJ
+
+/-- Commute with total-spin components. -/
+theorem heisenbergHamiltonianOnGraph_commute_totalSpinHalfOp1
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
+    Commute (heisenbergHamiltonianOnGraph G J) (totalSpinHalfOp1 Λ) :=
+  heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp1 G J
+
+theorem heisenbergHamiltonianOnGraph_commute_totalSpinHalfOp2
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
+    Commute (heisenbergHamiltonianOnGraph G J) (totalSpinHalfOp2 Λ) :=
+  heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp2 G J
+
+theorem heisenbergHamiltonianOnGraph_commute_totalSpinHalfOp3
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
+    Commute (heisenbergHamiltonianOnGraph G J) (totalSpinHalfOp3 Λ) :=
+  heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp3 G J
+
+theorem heisenbergHamiltonianOnGraph_commute_totalSpinHalfSquared
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
+    Commute (heisenbergHamiltonianOnGraph G J) (totalSpinHalfSquared Λ) :=
+  heisenbergHamiltonian_couplingOf_commute_totalSpinHalfSquared G J
 
 /-! ## Heisenberg-on-graph Gibbs state
 
