@@ -190,4 +190,16 @@ neighbour in `Fin 3` (the path graph is connected). -/
 example : ∀ x : Fin 3, ∃ y : Fin 3, (SimpleGraph.pathGraph 3).Adj x y := by
   decide
 
+/-! ## Bipartiteness of `pathGraph` -/
+
+/-- Open chain `pathGraph (N + 1)` is bipartite for any `N`. -/
+example (N : ℕ) : (SimpleGraph.pathGraph (N + 1)).IsBipartite :=
+  pathGraph_isBipartite N
+
+/-- The parity colouring assigns `0` to vertex `0`. -/
+example : (pathGraphParityColoring 4) 0 = (0 : Fin 2) := by decide
+
+/-- The parity colouring assigns `1` to vertex `1`. -/
+example : (pathGraphParityColoring 4) 1 = (1 : Fin 2) := by decide
+
 end LatticeSystem.Tests
