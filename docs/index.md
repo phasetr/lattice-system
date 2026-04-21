@@ -737,6 +737,11 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardGibbsState N β t U` | the Hubbard Gibbs state `gibbsState β H_Hubbard` | `Fermion/JordanWigner.lean` |
 | `hubbardGibbsState_isHermitian` | Hermiticity (Hermitian `t`, real `U`) | `Fermion/JordanWigner.lean` |
 | `hubbardGibbsState_commute_hamiltonian` | `Commute ρ_β H_Hubbard` | `Fermion/JordanWigner.lean` |
+| `fermionTotalUpNumber`, `fermionTotalDownNumber` | spinful conserved charges `N_↑ = Σ_i n_{i↑}`, `N_↓ = Σ_i n_{i↓}` | `Fermion/JordanWigner.lean` |
+| `fermionTotalSpinZ` | total spin polarisation `S^z_tot = (1/2)(N_↑ − N_↓)` | `Fermion/JordanWigner.lean` |
+| `fermionTotalUpNumber_commute_fermionTotalDownNumber` | `[N_↑, N_↓] = 0` | `Fermion/JordanWigner.lean` |
+| `fermionTotalUpNumber_commute_fermionTotalNumber` / `fermionTotalDownNumber_commute_fermionTotalNumber` | `[N_↑, N̂] = [N_↓, N̂] = 0` | `Fermion/JordanWigner.lean` |
+| `fermionTotalSpinZ_commute_fermionTotalNumber` | `[S^z_tot, N̂] = 0` (spin polarisation commutes with total number) | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
