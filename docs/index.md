@@ -435,6 +435,13 @@ explicit bond coupling `J`.
 | `isingHamiltonianOnGraph_isHermitian` | Hermitian for real `J, h` | `Quantum/IsingChain.lean` |
 | `isingGibbsStateOnGraph G β J h` | Gibbs state of the graph-built Ising Hamiltonian | `Quantum/IsingChain.lean` |
 | `isingGibbsStateOnGraph_isHermitian` / `isingGibbsStateOnGraph_commute_hamiltonian` | Hermiticity (real `J, h`) and commute with the Hamiltonian | `Quantum/IsingChain.lean` |
+
+### Testing infrastructure
+
+| Lean name / location | Purpose |
+|---|---|
+| `LatticeSystem/Tests/Sanity.lean` | sanity-check `example` blocks for concrete small-N instances (Pauli arithmetic, spin-1/2 ladder actions, Heisenberg / Ising Hermiticity on small chains, graph-centric bridge identities) |
+| decide-based property tests (in `Tests/Sanity.lean`) | universally-quantified properties verified by `decide` on small finite types (graph adjacency symmetry / irreflexivity / connectivity on `pathGraph n` and `cycleGraph n` for small `n`); real proofs, no `sorry` |
 | `quantumIsingGibbsState β J h N` | `gibbsState β (quantumIsingHamiltonian N J h)` | `Quantum/IsingChain.lean` |
 | `quantumIsingGibbsState_isHermitian` | the Ising-chain Gibbs state `ρ_β` is Hermitian | `Quantum/IsingChain.lean` |
 | `quantumIsingGibbsState_commute_hamiltonian` | `[ρ_β, H_Ising] = 0` | `Quantum/IsingChain.lean` |
