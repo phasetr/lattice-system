@@ -752,6 +752,10 @@ fermion mode acting on `ℂ²` with computational basis
 | `spinfulIndex_up_ne_down` | the up-channel position `2 i` is never the down-channel position `2 j + 1` | `Fermion/JordanWigner.lean` |
 | `fermionTotalDownNumber_commute_fermionUp{Creation,Annihilation,Number}` and the dual `fermionTotalUpNumber_commute_fermionDown{Creation,Annihilation,Number}` | the spinful number on one species commutes with every operator of the other species (different JW positions) | `Fermion/JordanWigner.lean` |
 | `fermionTotalDownNumber_commute_upHopping` / `fermionTotalUpNumber_commute_downHopping` | the spinful same-σ hopping term `c_{iσ}† c_{jσ}` commutes with the opposite-spin total number `N_{σ'≠σ}` (cross-spin half of `[H_kinetic, N_σ] = 0`) | `Fermion/JordanWigner.lean` |
+| `hubbardKineticOnGraph N G J` | spinful Hubbard kinetic operator from a `SimpleGraph G` and edge weight `J` | `Fermion/JordanWigner.lean` |
+| `hubbardKineticOnGraph_commute_fermionTotalNumber` / `hubbardKineticOnGraph_isHermitian` | charge conservation always; Hermiticity for real `J` | `Fermion/JordanWigner.lean` |
+| `hubbardHamiltonianOnGraph N G J U` | full Hubbard Hamiltonian from a graph + on-site coupling | `Fermion/JordanWigner.lean` |
+| `hubbardHamiltonianOnGraph_commute_fermionTotalNumber` / `hubbardHamiltonianOnGraph_isHermitian` | charge conservation; Hermiticity for real `J` and real `U` | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
