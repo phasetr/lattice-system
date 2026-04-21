@@ -479,4 +479,28 @@ theorem quantumIsingGibbsState_eq_isingGibbsStateOnGraph
   congr 1
   · push_cast; ring
 
+/-! ## Periodic Ising chain (cycleGraph) -/
+
+/-- Periodic 1D quantum Ising Hamiltonian on `N + 2` sites, via
+`isingHamiltonianOnGraph` with `cycleGraph (N + 2)`. -/
+noncomputable def isingCycleHamiltonian (N : ℕ) (J h : ℝ) :
+    ManyBodyOp (Fin (N + 2)) :=
+  isingHamiltonianOnGraph (SimpleGraph.cycleGraph (N + 2))
+    (-(J : ℂ)) (h : ℂ)
+
+/-- Hermiticity of the periodic Ising chain. -/
+theorem isingCycleHamiltonian_isHermitian (N : ℕ) (J h : ℝ) :
+    (isingCycleHamiltonian N J h).IsHermitian :=
+  isingHamiltonianOnGraph_isHermitian _ (by simp) (by simp)
+
+/-- Gibbs state of the periodic Ising chain. -/
+noncomputable def isingCycleGibbsState (N : ℕ) (β : ℝ) (J h : ℝ) :
+    ManyBodyOp (Fin (N + 2)) :=
+  gibbsState β (isingCycleHamiltonian N J h)
+
+/-- Hermiticity of the periodic Ising Gibbs state. -/
+theorem isingCycleGibbsState_isHermitian (N : ℕ) (β : ℝ) (J h : ℝ) :
+    (isingCycleGibbsState N β J h).IsHermitian :=
+  gibbsState_isHermitian (isingCycleHamiltonian_isHermitian N J h) β
+
 end LatticeSystem.Quantum
