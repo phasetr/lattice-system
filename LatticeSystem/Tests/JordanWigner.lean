@@ -150,11 +150,66 @@ example (N : ℕ) (i j : Fin (N + 1)) (hij : i.val < j.val) :
       jwString N j * onSite i spinHalfOpPlus = 0 :=
   jwString_anticomm_onSite_pos_spinHalfOpPlus N i j hij
 
+/-- Companion: `{σ^-_i, jwString N j} = 0` for every `i < j`. -/
+example (N : ℕ) (i j : Fin (N + 1)) (hij : i.val < j.val) :
+    onSite i spinHalfOpMinus * jwString N j +
+      jwString N j * onSite i spinHalfOpMinus = 0 :=
+  jwString_anticomm_onSite_pos_spinHalfOpMinus N i j hij
+
+/-- Any two JW strings commute. -/
+example (N : ℕ) (i j : Fin (N + 1)) :
+    Commute (jwString N i) (jwString N j) :=
+  jwString_commute_jwString N i j
+
 /-- Instance check: `(i, j) = (1, 3)` on `Fin 4`. -/
 example :
     onSite (1 : Fin 4) spinHalfOpPlus * jwString 3 3 +
       jwString 3 3 * onSite (1 : Fin 4) spinHalfOpPlus = 0 :=
   jwString_anticomm_onSite_pos_spinHalfOpPlus 3 1 3 (by decide)
+
+/-! ## Fully general cross-site CAR `{c_i, c_j} = 0` for `i < j` (#210) -/
+
+/-- `{c_i, c_j} = 0` for every `i j : Fin (N + 1)` with
+`i.val < j.val`. -/
+example (N : ℕ) (i j : Fin (N + 1)) (hij : i.val < j.val) :
+    fermionMultiAnnihilation N i * fermionMultiAnnihilation N j +
+      fermionMultiAnnihilation N j * fermionMultiAnnihilation N i = 0 :=
+  fermionMultiAnnihilation_anticomm_lt N i j hij
+
+/-- `{c_i†, c_j†} = 0` for every `i < j`. -/
+example (N : ℕ) (i j : Fin (N + 1)) (hij : i.val < j.val) :
+    fermionMultiCreation N i * fermionMultiCreation N j +
+      fermionMultiCreation N j * fermionMultiCreation N i = 0 :=
+  fermionMultiCreation_anticomm_lt N i j hij
+
+/-- `{c_i, c_j†} = 0` for every `i < j`. -/
+example (N : ℕ) (i j : Fin (N + 1)) (hij : i.val < j.val) :
+    fermionMultiAnnihilation N i * fermionMultiCreation N j +
+      fermionMultiCreation N j * fermionMultiAnnihilation N i = 0 :=
+  fermionMultiAnnihilation_creation_anticomm_lt N i j hij
+
+/-- `{c_i†, c_j} = 0` for every `i < j`. -/
+example (N : ℕ) (i j : Fin (N + 1)) (hij : i.val < j.val) :
+    fermionMultiCreation N i * fermionMultiAnnihilation N j +
+      fermionMultiAnnihilation N j * fermionMultiCreation N i = 0 :=
+  fermionMultiCreation_annihilation_anticomm_lt N i j hij
+
+/-- Instance check: `(i, j) = (1, 3)` on `Fin 4` — general case
+not covered by the `_zero_pos` specialisations. -/
+example :
+    fermionMultiAnnihilation 3 (1 : Fin 4) *
+        fermionMultiAnnihilation 3 3 +
+      fermionMultiAnnihilation 3 3 *
+        fermionMultiAnnihilation 3 1 = 0 :=
+  fermionMultiAnnihilation_anticomm_lt 3 1 3 (by decide)
+
+/-- Instance check: mixed `(i, j) = (2, 3)` on `Fin 4`. -/
+example :
+    fermionMultiAnnihilation 3 (2 : Fin 4) *
+        fermionMultiCreation 3 3 +
+      fermionMultiCreation 3 3 *
+        fermionMultiAnnihilation 3 2 = 0 :=
+  fermionMultiAnnihilation_creation_anticomm_lt 3 2 3 (by decide)
 
 /-! ## Adjoint relations -/
 
