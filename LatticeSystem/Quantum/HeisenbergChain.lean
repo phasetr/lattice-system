@@ -117,6 +117,31 @@ theorem heisenbergHamiltonian_couplingOf_isHermitian
     (LatticeSystem.Lattice.couplingOf_real G hJ)
     (LatticeSystem.Lattice.couplingOf_symm G J)
 
+/-! ## 2D square lattice as a box product of path graphs
+
+The standard 2D square lattice on `(N + 1) × (N + 1)` sites with
+open boundary conditions is the box product
+`pathGraph (N + 1) □ pathGraph (N + 1)` of two path graphs.
+Heisenberg Hermiticity follows for free from the graph-centric
+framework. -/
+
+/-- Open-boundary 2D square-lattice coupling on
+`Fin (N+1) × Fin (N+1)`: returns `-J` on nearest-neighbour bonds of
+the box product `pathGraph (N+1) □ pathGraph (N+1)`, zero
+otherwise. The negative sign matches Tasaki's ferromagnetic
+convention (`J > 0` is ferromagnetic). -/
+noncomputable def squareLatticeCoupling (N : ℕ) (J : ℝ) :
+    Fin (N + 1) × Fin (N + 1) → Fin (N + 1) × Fin (N + 1) → ℂ :=
+  LatticeSystem.Lattice.couplingOf
+    (SimpleGraph.pathGraph (N + 1) □ SimpleGraph.pathGraph (N + 1))
+    (-(J : ℂ))
+
+/-- The 2D square-lattice Heisenberg Hamiltonian is Hermitian. Free
+corollary of `heisenbergHamiltonian_couplingOf_isHermitian`. -/
+theorem squareLatticeHeisenberg_isHermitian (N : ℕ) (J : ℝ) :
+    (heisenbergHamiltonian (squareLatticeCoupling N J)).IsHermitian :=
+  heisenbergHamiltonian_couplingOf_isHermitian _ (by simp)
+
 /-- The open-chain Heisenberg Hamiltonian is Hermitian. -/
 theorem openChainHeisenberg_isHermitian (N : ℕ) (J : ℝ) :
     (heisenbergHamiltonian (openChainCoupling N J)).IsHermitian :=

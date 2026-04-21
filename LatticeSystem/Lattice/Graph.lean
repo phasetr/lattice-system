@@ -128,4 +128,21 @@ theorem cycleGraph_adj_iff (N : ℕ) (x y : Fin (N + 2)) :
     · exact Or.inr (sub_eq_iff_eq_add'.mpr h.symm)
     · exact Or.inl (sub_eq_iff_eq_add'.mpr h.symm)
 
+/-! ## Higher-dimensional lattices via the box product
+
+mathlib's `SimpleGraph.boxProd` (notation `□`) takes
+`G : SimpleGraph α` and `H : SimpleGraph β` and returns a graph on
+`α × β` with adjacency
+`(G □ H).Adj x y ↔ G.Adj x.1 y.1 ∧ x.2 = y.2 ∨ H.Adj x.2 y.2 ∧ x.1 = y.1`.
+This realises the standard 2D / nD square (or cubic) lattices as
+products of path / cycle graphs. -/
+
+/-- Decidability for the box-product adjacency. -/
+instance boxProd_decidableAdj
+    {α β : Type*} (G : SimpleGraph α) (H : SimpleGraph β)
+    [DecidableEq α] [DecidableEq β]
+    [DecidableRel G.Adj] [DecidableRel H.Adj] :
+    DecidableRel (G □ H).Adj := fun _ _ =>
+  decidable_of_iff _ boxProd_adj.symm
+
 end LatticeSystem.Lattice
