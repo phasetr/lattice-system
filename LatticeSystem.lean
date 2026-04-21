@@ -18,6 +18,7 @@ import LatticeSystem.Quantum.TotalSpin
 import LatticeSystem.Quantum.SpinDot
 import LatticeSystem.Quantum.Rotation3D
 import LatticeSystem.Quantum.MagnetizationSubspace
+import LatticeSystem.Quantum.NeelState
 import LatticeSystem.Quantum.Z2Z2
 import LatticeSystem.Quantum.IsingChain
 import LatticeSystem.Fermion.Mode
@@ -31,3 +32,4 @@ import LatticeSystem.Tests.JordanWigner
 import LatticeSystem.Tests.Ising
 import LatticeSystem.Tests.JWAbstract
 import LatticeSystem.Tests.Scale
+import LatticeSystem.Tests.NeelState
