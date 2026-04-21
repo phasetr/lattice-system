@@ -300,7 +300,7 @@ noncomputable def heisenbergGibbsStateOnGraph
     {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
     (β : ℝ) (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
     ManyBodyOp Λ :=
-  gibbsState β (heisenbergHamiltonian (LatticeSystem.Lattice.couplingOf G J))
+  gibbsState β (heisenbergHamiltonianOnGraph G J)
 
 /-- The graph Heisenberg Gibbs state is Hermitian for any real
 edge weight `J`. -/
