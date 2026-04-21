@@ -142,6 +142,59 @@ theorem squareLatticeHeisenberg_isHermitian (N : ℕ) (J : ℝ) :
     (heisenbergHamiltonian (squareLatticeCoupling N J)).IsHermitian :=
   heisenbergHamiltonian_couplingOf_isHermitian _ (by simp)
 
+/-! ## Heisenberg-on-graph SU(2) invariance
+
+The existing generic-`J` SU(2)-invariance theorems for
+`heisenbergHamiltonian` (proved in `Quantum/SpinDot.lean`)
+specialise immediately to any graph-built coupling
+`couplingOf G J`. We expose them under graph-centric names so that
+downstream graph-defined Hamiltonians inherit the invariance
+without any additional proof. -/
+
+/-- For any graph `G` and edge weight `J : ℂ`, the Heisenberg
+Hamiltonian on `G` commutes with `Ŝ_tot^(1)`. -/
+theorem heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp1
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
+    Commute (heisenbergHamiltonian
+        (LatticeSystem.Lattice.couplingOf G J)) (totalSpinHalfOp1 Λ) :=
+  sub_eq_zero.mp
+    (heisenbergHamiltonian_commutator_totalSpinHalfOp1
+      (LatticeSystem.Lattice.couplingOf G J))
+
+/-- For any graph `G` and edge weight `J : ℂ`, the Heisenberg
+Hamiltonian on `G` commutes with `Ŝ_tot^(2)`. -/
+theorem heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp2
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
+    Commute (heisenbergHamiltonian
+        (LatticeSystem.Lattice.couplingOf G J)) (totalSpinHalfOp2 Λ) :=
+  sub_eq_zero.mp
+    (heisenbergHamiltonian_commutator_totalSpinHalfOp2
+      (LatticeSystem.Lattice.couplingOf G J))
+
+/-- For any graph `G` and edge weight `J : ℂ`, the Heisenberg
+Hamiltonian on `G` commutes with `Ŝ_tot^(3)`. -/
+theorem heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp3
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
+    Commute (heisenbergHamiltonian
+        (LatticeSystem.Lattice.couplingOf G J)) (totalSpinHalfOp3 Λ) :=
+  sub_eq_zero.mp
+    (heisenbergHamiltonian_commutator_totalSpinHalfOp3
+      (LatticeSystem.Lattice.couplingOf G J))
+
+/-- For any graph `G` and edge weight `J : ℂ`, the Heisenberg
+Hamiltonian on `G` commutes with the total-spin Casimir
+`Ŝ_tot²`. -/
+theorem heisenbergHamiltonian_couplingOf_commute_totalSpinHalfSquared
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
+    Commute (heisenbergHamiltonian
+        (LatticeSystem.Lattice.couplingOf G J))
+      (totalSpinHalfSquared Λ) :=
+  heisenbergHamiltonian_commute_totalSpinHalfSquared _
+
 /-- The open-chain Heisenberg Hamiltonian is Hermitian. -/
 theorem openChainHeisenberg_isHermitian (N : ℕ) (J : ℝ) :
     (heisenbergHamiltonian (openChainCoupling N J)).IsHermitian :=
