@@ -165,6 +165,31 @@ theorem squareTorusHeisenberg_isHermitian (N : ℕ) (J : ℝ) :
     (heisenbergHamiltonian (squareTorusCoupling N J)).IsHermitian :=
   heisenbergHamiltonian_couplingOf_isHermitian _ (by simp)
 
+/-! ## 3D cubic lattice as a triple box product of path graphs
+
+The standard 3D cubic lattice on `(N + 1)^3` sites with open
+boundary conditions is the box product of three path graphs.
+Hermiticity of the corresponding Heisenberg Hamiltonian follows
+for free. -/
+
+/-- Open-boundary 3D cubic-lattice coupling on
+`(Fin (N+1) × Fin (N+1)) × Fin (N+1)`: returns `-J` on
+nearest-neighbour bonds of the iterated box product, zero
+otherwise. -/
+noncomputable def cubicLatticeCoupling (N : ℕ) (J : ℝ) :
+    (Fin (N + 1) × Fin (N + 1)) × Fin (N + 1) →
+      (Fin (N + 1) × Fin (N + 1)) × Fin (N + 1) → ℂ :=
+  LatticeSystem.Lattice.couplingOf
+    ((SimpleGraph.pathGraph (N + 1) □ SimpleGraph.pathGraph (N + 1)) □
+      SimpleGraph.pathGraph (N + 1))
+    (-(J : ℂ))
+
+/-- The 3D cubic-lattice Heisenberg Hamiltonian is Hermitian. Free
+corollary of `heisenbergHamiltonian_couplingOf_isHermitian`. -/
+theorem cubicLatticeHeisenberg_isHermitian (N : ℕ) (J : ℝ) :
+    (heisenbergHamiltonian (cubicLatticeCoupling N J)).IsHermitian :=
+  heisenbergHamiltonian_couplingOf_isHermitian _ (by simp)
+
 /-! ## Heisenberg-on-graph SU(2) invariance
 
 The existing generic-`J` SU(2)-invariance theorems for
