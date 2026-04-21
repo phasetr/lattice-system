@@ -163,6 +163,54 @@ theorem pathGraph_isBipartite (N : ℕ) :
     (pathGraph (N + 1)).IsBipartite :=
   ⟨pathGraphParityColoring N⟩
 
+/-- Parity-based 2-colouring of the *even* cycle
+`cycleGraph (2 * K + 2)` (so at least 2 vertices, always even
+length): each vertex `i : Fin (2 * K + 2)` maps to
+`⟨i.val % 2, _⟩ : Fin 2`. Validity uses `cycleGraph_adj_iff`
+together with the wrap-around analysis: the only non-trivial case
+is `(2K + 1) + 1 = 0`, where the parities `1` and `0` still differ
+because the cycle length is even. (Odd cycles are *not*
+bipartite.) -/
+def cycleGraphEvenParityColoring (K : ℕ) :
+    (cycleGraph (2 * K + 2)).Coloring (Fin 2) :=
+  Coloring.mk
+    (fun i : Fin (2 * K + 2) =>
+      (⟨i.val % 2, Nat.mod_lt _ (by decide)⟩ : Fin 2))
+    (fun {x y} (h : (cycleGraph (2 * K + 2)).Adj x y) => by
+      have hx : x.val < 2 * K + 2 := x.isLt
+      have hy : y.val < 2 * K + 2 := y.isLt
+      rw [cycleGraph_adj_iff] at h
+      intro hcol
+      have hparity : x.val % 2 = y.val % 2 := congrArg Fin.val hcol
+      rcases h with hxy | hyx
+      · have h1 := congrArg (Fin.val (n := 2 * K + 2)) hxy
+        simp only [Fin.val_add, Fin.val_one] at h1
+        rcases Nat.lt_or_ge (x.val + 1) (2 * K + 2) with hlt | hge
+        · rw [Nat.mod_eq_of_lt hlt] at h1
+          omega
+        · have hx_eq : x.val = 2 * K + 1 := by omega
+          have hy_eq : y.val = 0 := by
+            rw [hx_eq] at h1
+            simp at h1
+            omega
+          omega
+      · have h1 := congrArg (Fin.val (n := 2 * K + 2)) hyx
+        simp only [Fin.val_add, Fin.val_one] at h1
+        rcases Nat.lt_or_ge (y.val + 1) (2 * K + 2) with hlt | hge
+        · rw [Nat.mod_eq_of_lt hlt] at h1
+          omega
+        · have hy_eq : y.val = 2 * K + 1 := by omega
+          have hx_eq : x.val = 0 := by
+            rw [hy_eq] at h1
+            simp at h1
+            omega
+          omega)
+
+/-- The even cycle `cycleGraph (2 * K + 2)` is bipartite. -/
+theorem cycleGraph_even_isBipartite (K : ℕ) :
+    (cycleGraph (2 * K + 2)).IsBipartite :=
+  ⟨cycleGraphEvenParityColoring K⟩
+
 /-! ## Higher-dimensional lattices via the box product
 
 mathlib's `SimpleGraph.boxProd` (notation `□`) takes
