@@ -194,4 +194,32 @@ example (t : Fin 2 → Fin 2 → ℂ) (U : ℂ) :
     (hubbardHamiltonian 1 t U).mulVec (fermionMultiVacuum (2 * 1 + 1)) = 0 :=
   hubbardHamiltonian_mulVec_vacuum 1 t U
 
+/-! ## Eigenstate construction (PRs #155-#157) -/
+
+/-- Single-particle state `c_i† |vac⟩` has `N̂`-eigenvalue 1. -/
+example (N : ℕ) (i : Fin (N + 1)) :
+    (fermionTotalNumber N).mulVec
+        ((fermionMultiCreation N i).mulVec (fermionMultiVacuum N)) =
+      (fermionMultiCreation N i).mulVec (fermionMultiVacuum N) :=
+  fermionTotalNumber_mulVec_singleParticle N i
+
+/-- Two-particle state `c_i† c_j† |vac⟩` has `N̂`-eigenvalue 2. -/
+example (N : ℕ) (i j : Fin (N + 1)) :
+    (fermionTotalNumber N).mulVec
+        ((fermionMultiCreation N i * fermionMultiCreation N j).mulVec
+          (fermionMultiVacuum N)) =
+      (2 : ℂ) •
+        (fermionMultiCreation N i * fermionMultiCreation N j).mulVec
+          (fermionMultiVacuum N) :=
+  fermionTotalNumber_mulVec_twoParticle N i j
+
+/-- Generic charge-eigenstate helper: if `[N̂, X] = α X` and
+`N̂ v = 0`, then `N̂ (X v) = α (X v)`. -/
+example {N : ℕ} {X : ManyBodyOp (Fin (N + 1))} {α : ℂ}
+    (hX : fermionTotalNumber N * X - X * fermionTotalNumber N = α • X)
+    {v : (Fin (N + 1) → Fin 2) → ℂ}
+    (hv : (fermionTotalNumber N).mulVec v = 0) :
+    (fermionTotalNumber N).mulVec (X.mulVec v) = α • X.mulVec v :=
+  fermionTotalNumber_mulVec_eigenstate_of_commute hX hv
+
 end LatticeSystem.Tests.Hubbard
