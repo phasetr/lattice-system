@@ -1,18 +1,22 @@
 # lattice-system
 
 A Lean 4 + mathlib project for formalizing theorems about many-body
-systems on **finite graphs**. Despite the name, the primary
-combinatorial abstraction is a finite graph `(Λ, E_Λ)`, with concrete
-lattices (1D chain, square / cubic grids, …) appearing as specific
-graph instances (`SimpleGraph.pathGraph`, `SimpleGraph.cycleGraph`,
-products of these, …). This convention follows the standard
-mathematical-physics literature on many-body systems on graphs.
+systems on **graphs**. Despite the name, the primary combinatorial
+abstraction is a graph `(Λ, E_Λ)` — finite for finite-volume work
+and infinite for the thermodynamic-limit / algebraic-formulation
+work that is a major long-term goal — with concrete lattices
+(1D chain, square / cubic grids, infinite chains, ℤ^d, …)
+appearing as specific graph instances (`SimpleGraph.pathGraph`,
+`SimpleGraph.cycleGraph`, products of these, infinite analogues, …).
+This convention follows the standard mathematical-physics literature
+on many-body systems on graphs.
 
 The project subsumes and generalizes the earlier
 [ising-model](https://github.com/phasetr/ising-model) project, with
 the current focus on finite-volume quantum spin systems and the
 longer-term goal of covering Hubbard / BCS, CAR-algebraic fermion
-lattice systems, and eventually lattice QCD.
+systems, the **infinite-volume / thermodynamic limit** (which
+intrinsically requires infinite graphs), and eventually lattice QCD.
 
 ## About this project
 
