@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import LatticeSystem.Quantum.ManyBody
 import LatticeSystem.Quantum.Pauli
 import LatticeSystem.Quantum.SpinHalfBasis
+import LatticeSystem.Quantum.GibbsState
 import LatticeSystem.Fermion.Mode
 
 /-!
@@ -1592,5 +1593,37 @@ theorem fermionGenericHamiltonian_isHermitian
   unfold fermionGenericHamiltonian
   exact (fermionHopping_isHermitian N ht).add
     (fermionDensityInteraction_isHermitian N hV)
+
+/-! ## Hubbard-skeleton Gibbs state
+
+Combining the canonical fermion Hamiltonian with the generic
+`gibbsState` framework gives the Gibbs state of the Hubbard
+skeleton. -/
+
+/-- The Gibbs state of the canonical Hubbard-skeleton Hamiltonian
+`H = H_hop + V_int`. -/
+noncomputable def fermionGenericGibbsState
+    (N : ℕ) (β : ℝ) (t V : Fin (N + 1) → Fin (N + 1) → ℂ) :
+    ManyBodyOp (Fin (N + 1)) :=
+  LatticeSystem.Quantum.gibbsState β (fermionGenericHamiltonian N t V)
+
+/-- The Hubbard-skeleton Gibbs state is Hermitian when `t` is
+Hermitian and `V` is entry-wise real. -/
+theorem fermionGenericGibbsState_isHermitian
+    (N : ℕ) (β : ℝ) {t V : Fin (N + 1) → Fin (N + 1) → ℂ}
+    (ht : ∀ i j, star (t i j) = t j i)
+    (hV : ∀ i j, star (V i j) = V i j) :
+    (fermionGenericGibbsState N β t V).IsHermitian :=
+  LatticeSystem.Quantum.gibbsState_isHermitian
+    (fermionGenericHamiltonian_isHermitian N ht hV) β
+
+/-- The Hubbard-skeleton Gibbs state commutes with its
+Hamiltonian (instance of the generic
+`gibbsState_commute_hamiltonian`). -/
+theorem fermionGenericGibbsState_commute_hamiltonian
+    (N : ℕ) (β : ℝ) (t V : Fin (N + 1) → Fin (N + 1) → ℂ) :
+    Commute (fermionGenericGibbsState N β t V)
+      (fermionGenericHamiltonian N t V) :=
+  LatticeSystem.Quantum.gibbsState_commute_hamiltonian β _
 
 end LatticeSystem.Fermion
