@@ -2457,4 +2457,37 @@ theorem hubbardChainGibbsState_eq_onGraph (N : ℕ) (β : ℝ) (J U : ℝ) :
           (-(J : ℂ)) (U : ℂ) :=
   rfl
 
+/-! ## Periodic 1D Hubbard chain (cycleGraph instance) -/
+
+/-- The canonical 1D periodic Hubbard ring on `N + 1` spinful sites,
+defined via `hubbardHamiltonianOnGraph` with the cycle graph on
+`N + 1` vertices. -/
+noncomputable def hubbardCycleHamiltonian (N : ℕ) (J U : ℝ) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  hubbardHamiltonianOnGraph N (SimpleGraph.cycleGraph (N + 1))
+    (-(J : ℂ)) (U : ℂ)
+
+/-- Hermiticity of the periodic Hubbard chain. -/
+theorem hubbardCycleHamiltonian_isHermitian (N : ℕ) (J U : ℝ) :
+    (hubbardCycleHamiltonian N J U).IsHermitian :=
+  hubbardHamiltonianOnGraph_isHermitian N _ (by simp) (by simp)
+
+/-- Charge conservation for the periodic Hubbard chain. -/
+theorem hubbardCycleHamiltonian_commute_fermionTotalNumber
+    (N : ℕ) (J U : ℝ) :
+    Commute (hubbardCycleHamiltonian N J U)
+      (fermionTotalNumber (2 * N + 1)) :=
+  hubbardHamiltonianOnGraph_commute_fermionTotalNumber N _ _ _
+
+/-- Gibbs state of the periodic Hubbard chain. -/
+noncomputable def hubbardCycleGibbsState (N : ℕ) (β : ℝ) (J U : ℝ) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  LatticeSystem.Quantum.gibbsState β (hubbardCycleHamiltonian N J U)
+
+/-- Hermiticity of the periodic Hubbard Gibbs state. -/
+theorem hubbardCycleGibbsState_isHermitian (N : ℕ) (β : ℝ) (J U : ℝ) :
+    (hubbardCycleGibbsState N β J U).IsHermitian :=
+  LatticeSystem.Quantum.gibbsState_isHermitian
+    (hubbardCycleHamiltonian_isHermitian N J U) β
+
 end LatticeSystem.Fermion
