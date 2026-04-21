@@ -1678,4 +1678,39 @@ theorem fermionTotalNumber_mulVec_vacuum (N : ℕ) :
   rw [Matrix.sum_mulVec]
   exact Finset.sum_eq_zero (fun i _ => fermionMultiNumber_mulVec_vacuum N i)
 
+/-- The hopping operator annihilates the vacuum:
+`H_hop · |vac⟩ = Σ t_{ij} c_i† (c_j |vac⟩) = 0`. -/
+theorem fermionHopping_mulVec_vacuum
+    (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) :
+    (fermionHopping N t).mulVec (fermionMultiVacuum N) = 0 := by
+  unfold fermionHopping
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun j _ => ?_)
+  rw [Matrix.smul_mulVec, ← Matrix.mulVec_mulVec,
+    fermionMultiAnnihilation_mulVec_vacuum, Matrix.mulVec_zero, smul_zero]
+
+/-- The density-density interaction annihilates the vacuum:
+`V_int · |vac⟩ = Σ V_{ij} n_i (n_j |vac⟩) = 0`. -/
+theorem fermionDensityInteraction_mulVec_vacuum
+    (N : ℕ) (V : Fin (N + 1) → Fin (N + 1) → ℂ) :
+    (fermionDensityInteraction N V).mulVec (fermionMultiVacuum N) = 0 := by
+  unfold fermionDensityInteraction
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun j _ => ?_)
+  rw [Matrix.smul_mulVec, ← Matrix.mulVec_mulVec,
+    fermionMultiNumber_mulVec_vacuum, Matrix.mulVec_zero, smul_zero]
+
+/-- The full Hubbard-skeleton Hamiltonian annihilates the vacuum:
+`H · |vac⟩ = (H_hop + V_int) · |vac⟩ = 0 + 0 = 0`. -/
+theorem fermionGenericHamiltonian_mulVec_vacuum
+    (N : ℕ) (t V : Fin (N + 1) → Fin (N + 1) → ℂ) :
+    (fermionGenericHamiltonian N t V).mulVec (fermionMultiVacuum N) = 0 := by
+  unfold fermionGenericHamiltonian
+  rw [Matrix.add_mulVec, fermionHopping_mulVec_vacuum,
+    fermionDensityInteraction_mulVec_vacuum, add_zero]
+
 end LatticeSystem.Fermion
