@@ -216,6 +216,68 @@ theorem cubicLatticeHeisenberg_isHermitian (N : ℕ) (J : ℝ) :
     (heisenbergHamiltonian (cubicLatticeCoupling N J)).IsHermitian :=
   heisenbergHamiltonian_couplingOf_isHermitian _ (by simp)
 
+/-! ## Gibbs states for the 2D / 3D Heisenberg lattices
+
+Each higher-dimensional Heisenberg Hamiltonian inherits its Gibbs
+state via the generic `gibbsState β H` constructor; Hermiticity
+and commute-with-Hamiltonian follow as one-line corollaries of
+`gibbsState_isHermitian` and `gibbsState_commute_hamiltonian`. -/
+
+/-- Gibbs state of the 2D open-boundary square-lattice Heisenberg
+Hamiltonian. -/
+noncomputable def squareLatticeHeisenbergGibbsState (β J : ℝ) (N : ℕ) :
+    ManyBodyOp (Fin (N + 1) × Fin (N + 1)) :=
+  gibbsState β (heisenbergHamiltonian (squareLatticeCoupling N J))
+
+/-- Hermiticity of the 2D open-boundary square-lattice Gibbs state. -/
+theorem squareLatticeHeisenbergGibbsState_isHermitian (β J : ℝ) (N : ℕ) :
+    (squareLatticeHeisenbergGibbsState β J N).IsHermitian :=
+  gibbsState_isHermitian (squareLatticeHeisenberg_isHermitian N J) β
+
+/-- The 2D open-boundary square-lattice Gibbs state commutes with
+its Hamiltonian. -/
+theorem squareLatticeHeisenbergGibbsState_commute_hamiltonian
+    (β J : ℝ) (N : ℕ) :
+    Commute (squareLatticeHeisenbergGibbsState β J N)
+      (heisenbergHamiltonian (squareLatticeCoupling N J)) :=
+  gibbsState_commute_hamiltonian β _
+
+/-- Gibbs state of the 2D periodic-boundary square-lattice (torus)
+Heisenberg Hamiltonian. -/
+noncomputable def squareTorusHeisenbergGibbsState (β J : ℝ) (N : ℕ) :
+    ManyBodyOp (Fin (N + 2) × Fin (N + 2)) :=
+  gibbsState β (heisenbergHamiltonian (squareTorusCoupling N J))
+
+/-- Hermiticity of the 2D torus Gibbs state. -/
+theorem squareTorusHeisenbergGibbsState_isHermitian (β J : ℝ) (N : ℕ) :
+    (squareTorusHeisenbergGibbsState β J N).IsHermitian :=
+  gibbsState_isHermitian (squareTorusHeisenberg_isHermitian N J) β
+
+/-- The 2D torus Gibbs state commutes with its Hamiltonian. -/
+theorem squareTorusHeisenbergGibbsState_commute_hamiltonian
+    (β J : ℝ) (N : ℕ) :
+    Commute (squareTorusHeisenbergGibbsState β J N)
+      (heisenbergHamiltonian (squareTorusCoupling N J)) :=
+  gibbsState_commute_hamiltonian β _
+
+/-- Gibbs state of the 3D open-boundary cubic-lattice Heisenberg
+Hamiltonian. -/
+noncomputable def cubicLatticeHeisenbergGibbsState (β J : ℝ) (N : ℕ) :
+    ManyBodyOp ((Fin (N + 1) × Fin (N + 1)) × Fin (N + 1)) :=
+  gibbsState β (heisenbergHamiltonian (cubicLatticeCoupling N J))
+
+/-- Hermiticity of the 3D cubic-lattice Gibbs state. -/
+theorem cubicLatticeHeisenbergGibbsState_isHermitian (β J : ℝ) (N : ℕ) :
+    (cubicLatticeHeisenbergGibbsState β J N).IsHermitian :=
+  gibbsState_isHermitian (cubicLatticeHeisenberg_isHermitian N J) β
+
+/-- The 3D cubic-lattice Gibbs state commutes with its Hamiltonian. -/
+theorem cubicLatticeHeisenbergGibbsState_commute_hamiltonian
+    (β J : ℝ) (N : ℕ) :
+    Commute (cubicLatticeHeisenbergGibbsState β J N)
+      (heisenbergHamiltonian (cubicLatticeCoupling N J)) :=
+  gibbsState_commute_hamiltonian β _
+
 /-! ## Heisenberg-on-graph SU(2) invariance
 
 The existing generic-`J` SU(2)-invariance theorems for
