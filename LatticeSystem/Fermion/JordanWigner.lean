@@ -2018,6 +2018,48 @@ theorem fermionTotalSpinZ_commute_fermionTotalNumber (N : ℕ) :
   exact (fermionTotalUpNumber_commute_fermionTotalNumber N).sub_left
     (fermionTotalDownNumber_commute_fermionTotalNumber N)
 
+/-- `N_↑` commutes with the Hubbard on-site interaction
+`U Σ_i n_{i↑} n_{i↓}`. All summands are products of pairwise
+commuting number operators. -/
+theorem fermionTotalUpNumber_commute_hubbardOnSiteInteraction
+    (N : ℕ) (U : ℂ) :
+    Commute (fermionTotalUpNumber N) (hubbardOnSiteInteraction N U) := by
+  unfold fermionTotalUpNumber hubbardOnSiteInteraction
+  refine Commute.sum_left _ _ _ (fun k _ => ?_)
+  refine Commute.sum_right _ _ _ (fun i _ => ?_)
+  refine Commute.smul_right ?_ U
+  unfold fermionUpNumber fermionDownNumber
+  refine Commute.mul_right ?_ ?_
+  · exact fermionMultiNumber_commute (2 * N + 1)
+      (spinfulIndex N k 0) (spinfulIndex N i 0)
+  · exact fermionMultiNumber_commute (2 * N + 1)
+      (spinfulIndex N k 0) (spinfulIndex N i 1)
+
+/-- `N_↓` commutes with the Hubbard on-site interaction. -/
+theorem fermionTotalDownNumber_commute_hubbardOnSiteInteraction
+    (N : ℕ) (U : ℂ) :
+    Commute (fermionTotalDownNumber N) (hubbardOnSiteInteraction N U) := by
+  unfold fermionTotalDownNumber hubbardOnSiteInteraction
+  refine Commute.sum_left _ _ _ (fun k _ => ?_)
+  refine Commute.sum_right _ _ _ (fun i _ => ?_)
+  refine Commute.smul_right ?_ U
+  unfold fermionUpNumber fermionDownNumber
+  refine Commute.mul_right ?_ ?_
+  · exact fermionMultiNumber_commute (2 * N + 1)
+      (spinfulIndex N k 1) (spinfulIndex N i 0)
+  · exact fermionMultiNumber_commute (2 * N + 1)
+      (spinfulIndex N k 1) (spinfulIndex N i 1)
+
+/-- `S^z_tot` commutes with the Hubbard on-site interaction. Free
+corollary. -/
+theorem fermionTotalSpinZ_commute_hubbardOnSiteInteraction
+    (N : ℕ) (U : ℂ) :
+    Commute (fermionTotalSpinZ N) (hubbardOnSiteInteraction N U) := by
+  unfold fermionTotalSpinZ
+  refine Commute.smul_left ?_ _
+  exact (fermionTotalUpNumber_commute_hubbardOnSiteInteraction N U).sub_left
+    (fermionTotalDownNumber_commute_hubbardOnSiteInteraction N U)
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`

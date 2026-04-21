@@ -742,6 +742,8 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionTotalUpNumber_commute_fermionTotalDownNumber` | `[N_↑, N_↓] = 0` | `Fermion/JordanWigner.lean` |
 | `fermionTotalUpNumber_commute_fermionTotalNumber` / `fermionTotalDownNumber_commute_fermionTotalNumber` | `[N_↑, N̂] = [N_↓, N̂] = 0` | `Fermion/JordanWigner.lean` |
 | `fermionTotalSpinZ_commute_fermionTotalNumber` | `[S^z_tot, N̂] = 0` (spin polarisation commutes with total number) | `Fermion/JordanWigner.lean` |
+| `fermionTotalUpNumber_commute_hubbardOnSiteInteraction` / `fermionTotalDownNumber_commute_hubbardOnSiteInteraction` | `[N_↑, H_int] = [N_↓, H_int] = 0` | `Fermion/JordanWigner.lean` |
+| `fermionTotalSpinZ_commute_hubbardOnSiteInteraction` | `[S^z_tot, H_int] = 0` (free corollary) | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
