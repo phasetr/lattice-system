@@ -131,4 +131,39 @@ example (J : ℂ) :
       (totalSpinHalfSquared (Fin 3)) :=
   heisenbergHamiltonianOnGraph_commute_totalSpinHalfSquared _ J
 
+/-! ## 2D / 3D Heisenberg Gibbs states -/
+
+/-- 2D open square-lattice Gibbs state Hermiticity. -/
+example (β J : ℝ) (N : ℕ) :
+    (squareLatticeHeisenbergGibbsState β J N).IsHermitian :=
+  squareLatticeHeisenbergGibbsState_isHermitian β J N
+
+/-- 2D open square-lattice Gibbs state commutes with H. -/
+example (β J : ℝ) (N : ℕ) :
+    Commute (squareLatticeHeisenbergGibbsState β J N)
+      (heisenbergHamiltonian (squareLatticeCoupling N J)) :=
+  squareLatticeHeisenbergGibbsState_commute_hamiltonian β J N
+
+/-- 2D torus Gibbs state Hermiticity. -/
+example (β J : ℝ) (N : ℕ) :
+    (squareTorusHeisenbergGibbsState β J N).IsHermitian :=
+  squareTorusHeisenbergGibbsState_isHermitian β J N
+
+/-- 2D torus Gibbs state commutes with H. -/
+example (β J : ℝ) (N : ℕ) :
+    Commute (squareTorusHeisenbergGibbsState β J N)
+      (heisenbergHamiltonian (squareTorusCoupling N J)) :=
+  squareTorusHeisenbergGibbsState_commute_hamiltonian β J N
+
+/-- 3D cubic-lattice Gibbs state Hermiticity. -/
+example (β J : ℝ) (N : ℕ) :
+    (cubicLatticeHeisenbergGibbsState β J N).IsHermitian :=
+  cubicLatticeHeisenbergGibbsState_isHermitian β J N
+
+/-- 3D cubic-lattice Gibbs state commutes with H. -/
+example (β J : ℝ) (N : ℕ) :
+    Commute (cubicLatticeHeisenbergGibbsState β J N)
+      (heisenbergHamiltonian (cubicLatticeCoupling N J)) :=
+  cubicLatticeHeisenbergGibbsState_commute_hamiltonian β J N
+
 end LatticeSystem.Tests.Heisenberg
