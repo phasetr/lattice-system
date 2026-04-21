@@ -121,4 +121,74 @@ example (N : ℕ) (i : Fin (N + 1)) : (spinZ N i).IsHermitian :=
 example (N : ℕ) (i : Fin (N + 1)) : (spinX N i).IsHermitian :=
   spinX_isHermitian i
 
+/-! ## Computational matrix-entry tests (pre-bridge regression guards)
+
+These tests pin down the value of `quantumIsingHamiltonian` at
+specific matrix entries on the 2-site (N=1) chain. They are
+**robust to internal refactors** — if the upcoming bridge to
+`isingHamiltonianGeneric (couplingOf (pathGraph 2) (-J/2)) h`
+preserves behaviour, these values stay fixed; if it accidentally
+changes normalization (e.g. a missing factor of 2), the tests
+fail loudly.
+
+See `.self-local/docs/ising-bridge-plan.md` for the codex
+consultation and rationale. -/
+
+/-- Diagonal entry on the all-up state: `⟨↑↑|H|↑↑⟩ = -J` for the
+2-site chain (edge count = 1). The ZZ bond gives σ^z_0 σ^z_1 · 1
+= 1 on up-up; the X term is off-diagonal so contributes 0 here. -/
+example (J : ℝ) :
+    (quantumIsingHamiltonian 1 J 0)
+        (fun _ : Fin 2 => (0 : Fin 2))
+        (fun _ : Fin 2 => (0 : Fin 2))
+      = -(J : ℂ) := by
+  unfold quantumIsingHamiltonian spinZ spinX onSite pauliX pauliZ
+  simp [Matrix.add_apply, Matrix.smul_apply, Matrix.mul_apply,
+    Fin.sum_univ_succ]
+
+/-- Same but with general real `h`: the ZZ term still gives `-J`
+on the diagonal (since σ^x is purely off-diagonal and doesn't
+contribute to diag). -/
+example (J h : ℝ) :
+    (quantumIsingHamiltonian 1 J h)
+        (fun _ : Fin 2 => (0 : Fin 2))
+        (fun _ : Fin 2 => (0 : Fin 2))
+      = -(J : ℂ) := by
+  unfold quantumIsingHamiltonian spinZ spinX onSite pauliX pauliZ
+  simp [Matrix.add_apply, Matrix.smul_apply, Matrix.mul_apply,
+    Fin.sum_univ_succ]
+
+/-- Off-diagonal, site-0 flipped: `⟨↓↑|H|↑↑⟩ = -h`. The ZZ term
+contributes 0 (σ^z is diagonal, so ⟨↓↑|σ^z_0 σ^z_1|↑↑⟩ has the
+wrong site-0 matrix element); the X term contributes `-h` via
+σ^x_0 flipping site 0. -/
+example (J h : ℝ) :
+    (quantumIsingHamiltonian 1 J h)
+        (Function.update (fun _ : Fin 2 => (0 : Fin 2)) 0 1)
+        (fun _ : Fin 2 => (0 : Fin 2))
+      = -(h : ℂ) := by
+  unfold quantumIsingHamiltonian spinZ spinX onSite pauliX pauliZ
+  simp [Matrix.add_apply, Fin.sum_univ_succ]
+
+/-- Off-diagonal, site-1 flipped: `⟨↑↓|H|↑↑⟩ = -h` (symmetric to
+above). -/
+example (J h : ℝ) :
+    (quantumIsingHamiltonian 1 J h)
+        (Function.update (fun _ : Fin 2 => (0 : Fin 2)) 1 1)
+        (fun _ : Fin 2 => (0 : Fin 2))
+      = -(h : ℂ) := by
+  unfold quantumIsingHamiltonian spinZ spinX onSite pauliX pauliZ
+  simp [Matrix.add_apply, Fin.sum_univ_succ]
+
+/-- Two-flip off-diagonal: `⟨↓↓|H|↑↑⟩ = 0` (σ^x is single-site,
+cannot flip two sites simultaneously; σ^z is diagonal). -/
+example (J h : ℝ) :
+    (quantumIsingHamiltonian 1 J h)
+        (fun _ : Fin 2 => (1 : Fin 2))
+        (fun _ : Fin 2 => (0 : Fin 2))
+      = 0 := by
+  unfold quantumIsingHamiltonian spinZ spinX onSite pauliX pauliZ
+  simp [Matrix.add_apply, Matrix.smul_apply, Matrix.mul_apply,
+    Fin.sum_univ_succ]
+
 end LatticeSystem.Tests.Ising
