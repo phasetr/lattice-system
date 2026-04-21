@@ -121,4 +121,25 @@ example (N : ℕ) (i : Fin (N + 1)) : (spinZ N i).IsHermitian :=
 example (N : ℕ) (i : Fin (N + 1)) : (spinX N i).IsHermitian :=
   spinX_isHermitian i
 
+/-! ## Computational matrix-entry tests (attempted, partially blocked)
+
+Per codex consultation (see `.self-local/docs/ising-bridge-plan.md`)
+the plan was to add matrix-entry tests at the 2-site (N=1) level
+to catch any behavioural drift in the upcoming
+`quantumIsingHamiltonian` → `isingHamiltonianGeneric` bridge.
+
+The computational entry-level tests turned out to be blocked: the
+many-body matrix expression after unfolding
+`onSite` + `pauliX/Z` + multi-site product is too complex for
+`simp` to reduce in a stable way. The shim tests above
+(Hamiltonian Hermiticity, Gibbs state properties, etc.) remain
+as signature-preservation guards, but are brittle to renames.
+
+Alternative robust tests (to be explored in a follow-up PR):
+- `mulVec` on `basisVec`: cleanly reduces via
+  `onSite_mulVec_basisVec`. E.g.
+  `H.mulVec (basisVec all-up) = (-J) • basisVec all-up` when h=0.
+- Bridge identity by `unfold; simp_rw; funext; ...` comparing
+  operator-level equality rather than entry-level equality. -/
+
 end LatticeSystem.Tests.Ising
