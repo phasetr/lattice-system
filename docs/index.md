@@ -792,6 +792,51 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardChainGibbsState N β J U` | Gibbs state of the 1D Hubbard chain | `Fermion/JordanWigner.lean` |
 | `hubbardChainGibbsState_isHermitian` / `hubbardChainGibbsState_commute_hamiltonian` | Hermiticity (real `J, U`) and commute with the Hamiltonian | `Fermion/JordanWigner.lean` |
 
+## Continuum-limit roadmap
+
+The project's long-term goals include the `φ^4` / Ising continuum
+limit and lattice-QCD-style formalisations, both of which are defined
+as limits `a → 0` of families of finite-spacing lattice systems. A
+survey of the gap between the current finite-volume matrix framework
+and what the continuum limit actually demands is recorded in
+`.self-local/docs/continuum-limit-survey.md`; it proposes the four
+phases below and consulted codex twice on scope and design choices.
+
+**Phase A (current, this PR)**. Add a **thin type-level tag**
+`class LatticeWithSpacing (Λ : Type*) where spacing : ℝ≥0`
+so that a lattice spacing `a : ℝ≥0` can be attached to `Λ` as
+metadata. Provide the default instance `Fin (N + 1)` with
+`spacing := 1` so every pre-existing Hamiltonian in the library is
+`rfl`-equivalent to its `spacing := 1` specialisation. No geometry,
+no rescaling, no continuum object.
+
+**Phase B (deferred)**. Lattice sequences `Λ_n` with
+`spacing a_n → 0`, rescaling of coupling constants
+(`J_n = ĥ · a_n^{-2+d}` etc.), and lattice-point embeddings in
+`ℝ^d`. Introduce when a concrete theorem (e.g. Osterwalder-Schrader,
+a specific block-spin transformation) requires iterating over a
+spacing sequence.
+
+**Phase C (deferred)**. Operator-valued distribution / GNS /
+Hilbert-space infrastructure to house the continuum limit itself.
+Per codex (2026-04-22), we do **not** generalise
+`ManyBodyOp Λ = Matrix _ _ ℂ` to a type class preemptively: existing
+proofs depend on Matrix-specific API (`conjTranspose`, `exp`,
+`trace`, `mulVec`, entry formulas), and the right abstraction becomes
+clear only once a second concrete backend (infinite-volume Hilbert
+space, quasi-local C*-algebra) is in place.
+
+**Phase D (deferred)**. Coupling-constant running
+`g : ℝ≥0 → ℝ` and renormalisation-group transformations. Follows
+phases B-C.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `LatticeWithSpacing` | `class LatticeWithSpacing (Λ : Type*) where spacing : ℝ≥0` — thin type-level tag recording the lattice spacing `a : ℝ≥0` of a vertex type | `Lattice/Scale.lean` |
+| `spacingOf` | `spacingOf Λ := LatticeWithSpacing.spacing` — named accessor | `Lattice/Scale.lean` |
+| `instLatticeWithSpacingFinSucc` | default `spacing := 1` instance for `Fin (N + 1)`, making every existing Hamiltonian `rfl`-equivalent to the unit-spacing specialisation | `Lattice/Scale.lean` |
+| `spacing_fin_succ` / `spacingOf_fin_succ` | `spacing = 1` computed at `Fin (N + 1)` | `Lattice/Scale.lean` |
+
 ## Open items / axioms
 
 The following Tasaki §2.1 / §2.2 items are **not yet fully proved**.

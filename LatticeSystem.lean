@@ -2,6 +2,7 @@
 -- Import modules here that should be built as part of the library.
 import LatticeSystem.Basic
 import LatticeSystem.Lattice.Graph
+import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
 import LatticeSystem.Quantum.SpinHalf
 import LatticeSystem.Quantum.SpinHalfBasis
@@ -29,3 +30,4 @@ import LatticeSystem.Tests.Hubbard
 import LatticeSystem.Tests.JordanWigner
 import LatticeSystem.Tests.Ising
 import LatticeSystem.Tests.JWAbstract
+import LatticeSystem.Tests.Scale
