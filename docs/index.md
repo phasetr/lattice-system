@@ -734,6 +734,9 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardHamiltonian N t U` | the canonical (single-band) Hubbard Hamiltonian `H = T + U Σ n_{i↑} n_{i↓}` on `Fin (2N+2)` | `Fermion/JordanWigner.lean` |
 | `hubbardHamiltonian_commute_fermionTotalNumber` | `[H, N̂] = 0` (charge conservation) | `Fermion/JordanWigner.lean` |
 | `hubbardHamiltonian_isHermitian` | `H` is Hermitian when `t` is Hermitian and `U` is real | `Fermion/JordanWigner.lean` |
+| `hubbardGibbsState N β t U` | the Hubbard Gibbs state `gibbsState β H_Hubbard` | `Fermion/JordanWigner.lean` |
+| `hubbardGibbsState_isHermitian` | Hermiticity (Hermitian `t`, real `U`) | `Fermion/JordanWigner.lean` |
+| `hubbardGibbsState_commute_hamiltonian` | `Commute ρ_β H_Hubbard` | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
