@@ -2335,6 +2335,25 @@ theorem hubbardChainHamiltonian_mulVec_vacuum
       (fermionMultiVacuum (2 * N + 1)) = 0 :=
   hubbardHamiltonianOnGraph_mulVec_vacuum N _ _ _
 
+/-- The Gibbs state of the 1D Hubbard chain Hamiltonian. -/
+noncomputable def hubbardChainGibbsState (N : ℕ) (β : ℝ) (J U : ℝ) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  LatticeSystem.Quantum.gibbsState β (hubbardChainHamiltonian N J U)
+
+/-- The 1D Hubbard chain Gibbs state is Hermitian. -/
+theorem hubbardChainGibbsState_isHermitian (N : ℕ) (β : ℝ) (J U : ℝ) :
+    (hubbardChainGibbsState N β J U).IsHermitian :=
+  LatticeSystem.Quantum.gibbsState_isHermitian
+    (hubbardChainHamiltonian_isHermitian N J U) β
+
+/-- The 1D Hubbard chain Gibbs state commutes with its
+Hamiltonian. -/
+theorem hubbardChainGibbsState_commute_hamiltonian
+    (N : ℕ) (β : ℝ) (J U : ℝ) :
+    Commute (hubbardChainGibbsState N β J U)
+      (hubbardChainHamiltonian N J U) :=
+  LatticeSystem.Quantum.gibbsState_commute_hamiltonian β _
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`
