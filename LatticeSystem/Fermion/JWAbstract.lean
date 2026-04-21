@@ -151,4 +151,59 @@ theorem fermionNumberAbstract_eq_fermionMultiNumber
     fermionNumberAbstract i = fermionMultiNumber N i :=
   rfl
 
+/-- The JW string at site `i` commutes with any single-site
+operator at the same site `i`: the string only touches sites
+`j < i`, which are all distinct from `i`. -/
+theorem jwStringAbstract_commute_onSite (i : Λ)
+    (A : Matrix (Fin 2) (Fin 2) ℂ) :
+    Commute (jwStringAbstract i) (onSite i A) := by
+  unfold jwStringAbstract
+  apply Commute.symm
+  apply Finset.noncommProd_commute
+  intro j hj
+  have hji : j ≠ i := by
+    intro heq
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hj
+    rw [heq] at hj
+    exact lt_irrefl i hj
+  exact onSite_mul_onSite_of_ne hji.symm A pauliZ
+
+/-- `(onSite i A)ᴴ = onSite i Aᴴ` (public copy of the `private`
+helper in `JordanWigner.lean`). -/
+theorem onSite_conjTransposeAbstract
+    {Λ' : Type*} [Fintype Λ'] [DecidableEq Λ']
+    (i : Λ') (A : Matrix (Fin 2) (Fin 2) ℂ) :
+    (onSite i A : ManyBodyOp Λ')ᴴ = onSite i Aᴴ := by
+  ext σ σ'
+  simp only [onSite_apply, Matrix.conjTranspose_apply]
+  by_cases h : ∀ k, k ≠ i → σ k = σ' k
+  · have h' : ∀ k, k ≠ i → σ' k = σ k := fun k hki => (h k hki).symm
+    rw [if_pos h', if_pos h]
+  · have h' : ¬ (∀ k, k ≠ i → σ' k = σ k) :=
+      fun hp => h (fun k hki => (hp k hki).symm)
+    rw [if_neg h, if_neg h', star_zero]
+
+/-- `(c_i)ᴴ = c_i†`. -/
+theorem fermionAnnihilationAbstract_conjTranspose (i : Λ) :
+    (fermionAnnihilationAbstract i)ᴴ = fermionCreationAbstract i := by
+  unfold fermionAnnihilationAbstract fermionCreationAbstract
+  rw [Matrix.conjTranspose_mul, onSite_conjTransposeAbstract,
+    spinHalfOpPlus_conjTranspose, (jwStringAbstract_isHermitian i).eq,
+    (jwStringAbstract_commute_onSite i spinHalfOpMinus).eq]
+
+/-- `(c_i†)ᴴ = c_i`. -/
+theorem fermionCreationAbstract_conjTranspose (i : Λ) :
+    (fermionCreationAbstract i)ᴴ = fermionAnnihilationAbstract i := by
+  unfold fermionAnnihilationAbstract fermionCreationAbstract
+  rw [Matrix.conjTranspose_mul, onSite_conjTransposeAbstract,
+    spinHalfOpMinus_conjTranspose, (jwStringAbstract_isHermitian i).eq,
+    (jwStringAbstract_commute_onSite i spinHalfOpPlus).eq]
+
+/-- `n_i` is Hermitian. -/
+theorem fermionNumberAbstract_isHermitian (i : Λ) :
+    (fermionNumberAbstract i).IsHermitian := by
+  unfold fermionNumberAbstract Matrix.IsHermitian
+  rw [Matrix.conjTranspose_mul, fermionAnnihilationAbstract_conjTranspose,
+    fermionCreationAbstract_conjTranspose]
+
 end LatticeSystem.Fermion
