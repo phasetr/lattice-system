@@ -1748,6 +1748,63 @@ theorem fermionTotalNumber_mulVec_eigenstate_of_commute
   rw [h_comm, Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hv,
     Matrix.mulVec_zero, zero_add, Matrix.smul_mulVec]
 
+/-! ## Spinful (two-species) fermion operator wrappers
+
+To realise true Hubbard / spinful fermion models we re-index a
+single-species chain of length `2 * (N + 1)` as a chain of
+`N + 1` spinful sites, with each site carrying a spin label
+`σ : Fin 2`. The bijection `(i, σ) ↦ 2 * i + σ` puts the two
+species at site `i` in the consecutive JW positions
+`2 i` (spin up) and `2 i + 1` (spin down).
+
+All algebraic facts about the two-species operators (CARs,
+charge conservation, Hermiticity) follow for free from the
+single-species results applied to the underlying chain. -/
+
+/-- The spinful site index: `(i, σ) ↦ 2 * i + σ`. -/
+def spinfulIndex (N : ℕ) (i : Fin (N + 1)) (σ : Fin 2) :
+    Fin (2 * N + 2) :=
+  ⟨2 * i.val + σ.val, by
+    have hi : i.val < N + 1 := i.isLt
+    have hσ : σ.val < 2 := σ.isLt
+    omega⟩
+
+/-- Spin-up annihilation operator at spinful site `i`:
+the JW annihilation at the underlying single-species position
+`2 * i`. -/
+noncomputable def fermionUpAnnihilation (N : ℕ) (i : Fin (N + 1)) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N i 0)
+
+/-- Spin-down annihilation operator at spinful site `i`:
+the JW annihilation at the underlying single-species position
+`2 * i + 1`. -/
+noncomputable def fermionDownAnnihilation (N : ℕ) (i : Fin (N + 1)) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N i 1)
+
+/-- Spin-up creation operator at spinful site `i`. -/
+noncomputable def fermionUpCreation (N : ℕ) (i : Fin (N + 1)) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  fermionMultiCreation (2 * N + 1) (spinfulIndex N i 0)
+
+/-- Spin-down creation operator at spinful site `i`. -/
+noncomputable def fermionDownCreation (N : ℕ) (i : Fin (N + 1)) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  fermionMultiCreation (2 * N + 1) (spinfulIndex N i 1)
+
+/-- Spin-up site occupation number at spinful site `i`:
+`n_{i,↑} = c_{i,↑}† · c_{i,↑}`. -/
+noncomputable def fermionUpNumber (N : ℕ) (i : Fin (N + 1)) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  fermionMultiNumber (2 * N + 1) (spinfulIndex N i 0)
+
+/-- Spin-down site occupation number at spinful site `i`:
+`n_{i,↓} = c_{i,↓}† · c_{i,↓}`. -/
+noncomputable def fermionDownNumber (N : ℕ) (i : Fin (N + 1)) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  fermionMultiNumber (2 * N + 1) (spinfulIndex N i 1)
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`
