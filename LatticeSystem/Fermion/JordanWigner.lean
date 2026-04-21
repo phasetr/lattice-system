@@ -7,6 +7,7 @@ import LatticeSystem.Quantum.Pauli
 import LatticeSystem.Quantum.SpinHalfBasis
 import LatticeSystem.Quantum.GibbsState
 import LatticeSystem.Fermion.Mode
+import LatticeSystem.Lattice.Graph
 
 /-!
 # Multi-mode fermion via Jordan–Wigner mapping
@@ -2234,6 +2235,62 @@ theorem fermionTotalUpNumber_commute_downHopping
       (fermionDownCreation N i * fermionDownAnnihilation N j) :=
   (fermionTotalUpNumber_commute_fermionDownCreation N i).mul_right
     (fermionTotalUpNumber_commute_fermionDownAnnihilation N j)
+
+/-! ## Hubbard-on-graph wrappers (graph-centric Hubbard) -/
+
+/-- Hubbard kinetic operator with hopping matrix derived from a
+`SimpleGraph G` and uniform edge weight `J : ℂ`. -/
+noncomputable def hubbardKineticOnGraph (N : ℕ)
+    (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj] (J : ℂ) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  hubbardKinetic N (LatticeSystem.Lattice.couplingOf G J)
+
+/-- The graph-built Hubbard kinetic operator commutes with `N̂`. -/
+theorem hubbardKineticOnGraph_commute_fermionTotalNumber
+    (N : ℕ) (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj]
+    (J : ℂ) :
+    Commute (hubbardKineticOnGraph N G J)
+      (fermionTotalNumber (2 * N + 1)) :=
+  hubbardKinetic_commute_fermionTotalNumber N _
+
+/-- The graph-built Hubbard kinetic operator is Hermitian when
+`J` is real: the coupling `couplingOf G J` is then a Hermitian
+matrix on the (symmetric, decidable) graph. -/
+theorem hubbardKineticOnGraph_isHermitian
+    (N : ℕ) (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj]
+    {J : ℂ} (hJ : star J = J) :
+    (hubbardKineticOnGraph N G J).IsHermitian := by
+  unfold hubbardKineticOnGraph
+  refine hubbardKinetic_isHermitian N (fun i j => ?_)
+  rw [LatticeSystem.Lattice.couplingOf_real G hJ,
+    LatticeSystem.Lattice.couplingOf_symm]
+
+/-- The full Hubbard Hamiltonian with hopping derived from a
+`SimpleGraph G` plus on-site interaction `U`. -/
+noncomputable def hubbardHamiltonianOnGraph (N : ℕ)
+    (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj] (J U : ℂ) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  hubbardKineticOnGraph N G J + hubbardOnSiteInteraction N U
+
+/-- The graph-built Hubbard Hamiltonian commutes with `N̂`. -/
+theorem hubbardHamiltonianOnGraph_commute_fermionTotalNumber
+    (N : ℕ) (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj]
+    (J U : ℂ) :
+    Commute (hubbardHamiltonianOnGraph N G J U)
+      (fermionTotalNumber (2 * N + 1)) := by
+  unfold hubbardHamiltonianOnGraph
+  exact (hubbardKineticOnGraph_commute_fermionTotalNumber N G J).add_left
+    (hubbardOnSiteInteraction_commute_fermionTotalNumber N U)
+
+/-- The graph-built Hubbard Hamiltonian is Hermitian when both
+`J` and `U` are real. -/
+theorem hubbardHamiltonianOnGraph_isHermitian
+    (N : ℕ) (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj]
+    {J U : ℂ} (hJ : star J = J) (hU : star U = U) :
+    (hubbardHamiltonianOnGraph N G J U).IsHermitian := by
+  unfold hubbardHamiltonianOnGraph
+  exact (hubbardKineticOnGraph_isHermitian N G hJ).add
+    (hubbardOnSiteInteraction_isHermitian N hU)
 
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
