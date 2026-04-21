@@ -129,4 +129,51 @@ example : ¬ integerChainGraph.Adj 0 2 := by
   rw [integerChainGraph_adj_iff]
   rintro (h | h) <;> omega
 
+/-- Adjacency for negative integers: `(-3) ~ (-2)`. -/
+example : integerChainGraph.Adj (-3) (-2) := by
+  rw [integerChainGraph_adj_iff]; left; ring
+
+/-- Symmetry: `(-2) ~ (-3)`. -/
+example : integerChainGraph.Adj (-2) (-3) := by
+  rw [integerChainGraph_adj_iff]; right; ring
+
+/-- `5 ≁ 7` (distance 2, not adjacent). -/
+example : ¬ integerChainGraph.Adj 5 7 := by
+  rw [integerChainGraph_adj_iff]
+  rintro (h | h) <;> omega
+
+/-- `(-1) ≁ 1` (distance 2, not adjacent). -/
+example : ¬ integerChainGraph.Adj (-1) 1 := by
+  rw [integerChainGraph_adj_iff]
+  rintro (h | h) <;> omega
+
+/-- Irreflexivity for arbitrary `n : ℤ`. -/
+example (n : ℤ) : ¬ integerChainGraph.Adj n n := integerChainGraph.irrefl
+
+/-! ## integerSquareLatticeGraph (2D infinite ℤ × ℤ) -/
+
+/-- Horizontal step: `(0, 0) ~ (1, 0)`. -/
+example : integerSquareLatticeGraph.Adj (0, 0) (1, 0) := by
+  rw [integerSquareLatticeGraph_adj_iff]
+  left
+  refine ⟨?_, rfl⟩
+  rw [integerChainGraph_adj_iff]; left; ring
+
+/-- Vertical step: `(0, 0) ~ (0, 1)`. -/
+example : integerSquareLatticeGraph.Adj (0, 0) (0, 1) := by
+  rw [integerSquareLatticeGraph_adj_iff]
+  right
+  refine ⟨?_, rfl⟩
+  rw [integerChainGraph_adj_iff]; left; ring
+
+/-- Diagonal non-step: `(0, 0) ≁ (1, 1)` (a single edge can change
+only one coordinate). -/
+example : ¬ integerSquareLatticeGraph.Adj (0, 0) (1, 1) := by
+  rw [integerSquareLatticeGraph_adj_iff]
+  rintro (⟨_, h⟩ | ⟨_, h⟩) <;> simp at h
+
+/-- Irreflexivity for any `(a, b) : ℤ × ℤ`. -/
+example (p : ℤ × ℤ) : ¬ integerSquareLatticeGraph.Adj p p :=
+  integerSquareLatticeGraph.irrefl
+
 end LatticeSystem.Tests.Graph
