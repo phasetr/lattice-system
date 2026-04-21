@@ -222,4 +222,16 @@ example {N : ℕ} {X : ManyBodyOp (Fin (N + 1))} {α : ℂ}
     (fermionTotalNumber N).mulVec (X.mulVec v) = α • X.mulVec v :=
   fermionTotalNumber_mulVec_eigenstate_of_commute hX hv
 
+/-! ## Periodic Hubbard Gibbs state -/
+
+/-- Periodic Hubbard Gibbs state Hermiticity. -/
+example (N : ℕ) (β J U : ℝ) :
+    (hubbardCycleGibbsState N β J U).IsHermitian :=
+  hubbardCycleGibbsState_isHermitian N β J U
+
+/-- Periodic Hubbard Gibbs state commutes with Hamiltonian. -/
+example (N : ℕ) (β J U : ℝ) :
+    Commute (hubbardCycleGibbsState N β J U) (hubbardCycleHamiltonian N J U) :=
+  hubbardCycleGibbsState_commute_hamiltonian N β J U
+
 end LatticeSystem.Tests.Hubbard

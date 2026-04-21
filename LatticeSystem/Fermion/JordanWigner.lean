@@ -3053,4 +3053,14 @@ theorem hubbardCycleGibbsState_isHermitian (N : ℕ) (β : ℝ) (J U : ℝ) :
   LatticeSystem.Quantum.gibbsState_isHermitian
     (hubbardCycleHamiltonian_isHermitian N J U) β
 
+/-- The periodic Hubbard Gibbs state commutes with the periodic
+Hubbard Hamiltonian. The dual companion of
+`hubbardChainGibbsState_commute_hamiltonian` (open chain). -/
+theorem hubbardCycleGibbsState_commute_hamiltonian
+    (N : ℕ) (β : ℝ) (J U : ℝ) :
+    Commute (hubbardCycleGibbsState N β J U)
+      (hubbardCycleHamiltonian N J U) :=
+  LatticeSystem.Quantum.gibbsState_commute_hamiltonian β
+    (hubbardCycleHamiltonian N J U)
+
 end LatticeSystem.Fermion
