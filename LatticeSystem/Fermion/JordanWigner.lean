@@ -1959,6 +1959,65 @@ theorem hubbardGibbsState_commute_hamiltonian
     Commute (hubbardGibbsState N β t U) (hubbardHamiltonian N t U) :=
   LatticeSystem.Quantum.gibbsState_commute_hamiltonian β _
 
+/-! ## Spinful conserved charges N_↑, N_↓, and S^z_tot
+
+The spinful Hilbert space carries two natural U(1) charges
+(particle numbers per spin) and one diagonal SU(2) charge
+(z-component of total spin). They all commute pairwise (and with
+the total particle number `N̂`); commute with the full Hubbard
+Hamiltonian is deferred to a later PR. -/
+
+/-- Total spin-up particle number `N_↑ = Σ_i n_{i,↑}`. -/
+noncomputable def fermionTotalUpNumber (N : ℕ) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  ∑ i : Fin (N + 1), fermionUpNumber N i
+
+/-- Total spin-down particle number `N_↓ = Σ_i n_{i,↓}`. -/
+noncomputable def fermionTotalDownNumber (N : ℕ) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  ∑ i : Fin (N + 1), fermionDownNumber N i
+
+/-- Total z-component of spin `S^z_tot = (1/2)(N_↑ − N_↓)`. -/
+noncomputable def fermionTotalSpinZ (N : ℕ) : ManyBodyOp (Fin (2 * N + 2)) :=
+  (1 / 2 : ℂ) • (fermionTotalUpNumber N - fermionTotalDownNumber N)
+
+/-- `N_↑` and `N_↓` commute (sums of pairwise commuting number
+operators). -/
+theorem fermionTotalUpNumber_commute_fermionTotalDownNumber (N : ℕ) :
+    Commute (fermionTotalUpNumber N) (fermionTotalDownNumber N) := by
+  unfold fermionTotalUpNumber fermionTotalDownNumber
+  refine Commute.sum_left _ _ _ (fun i _ => ?_)
+  refine Commute.sum_right _ _ _ (fun j _ => ?_)
+  exact fermionMultiNumber_commute (2 * N + 1)
+    (spinfulIndex N i 0) (spinfulIndex N j 1)
+
+/-- `N_↑` commutes with the total particle number `N̂` on the
+underlying chain. -/
+theorem fermionTotalUpNumber_commute_fermionTotalNumber (N : ℕ) :
+    Commute (fermionTotalUpNumber N) (fermionTotalNumber (2 * N + 1)) := by
+  unfold fermionTotalUpNumber
+  refine Commute.sum_left _ _ _ (fun i _ => ?_)
+  exact fermionMultiNumber_commute_fermionTotalNumber (2 * N + 1)
+    (spinfulIndex N i 0)
+
+/-- `N_↓` commutes with the total particle number `N̂` on the
+underlying chain. -/
+theorem fermionTotalDownNumber_commute_fermionTotalNumber (N : ℕ) :
+    Commute (fermionTotalDownNumber N) (fermionTotalNumber (2 * N + 1)) := by
+  unfold fermionTotalDownNumber
+  refine Commute.sum_left _ _ _ (fun i _ => ?_)
+  exact fermionMultiNumber_commute_fermionTotalNumber (2 * N + 1)
+    (spinfulIndex N i 1)
+
+/-- The total z-spin `S^z_tot` commutes with the total particle
+number `N̂`: free corollary of the up/down individual commutes. -/
+theorem fermionTotalSpinZ_commute_fermionTotalNumber (N : ℕ) :
+    Commute (fermionTotalSpinZ N) (fermionTotalNumber (2 * N + 1)) := by
+  unfold fermionTotalSpinZ
+  refine Commute.smul_left ?_ _
+  exact (fermionTotalUpNumber_commute_fermionTotalNumber N).sub_left
+    (fermionTotalDownNumber_commute_fermionTotalNumber N)
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`
