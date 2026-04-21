@@ -36,17 +36,19 @@ open Matrix
 /-! ## Nearest-neighbour coupling functions -/
 
 /-- Open-boundary nearest-neighbour coupling on `Fin (N + 1)`:
-`J(x, y) = -J` if `|x.val - y.val| = 1`, else `0`. The negative sign
-encodes Tasaki's ferromagnetic convention `H = -J Σ_{⟨x,y⟩} Ŝ_x · Ŝ_y`
-(eq. (2.4.1)) so that `J > 0` is ferromagnetic. -/
-noncomputable def openChainCoupling (N : ℕ) (J : ℝ) : Fin (N + 1) → Fin (N + 1) → ℂ :=
-  fun x y => if (x.val + 1 = y.val) ∨ (y.val + 1 = x.val) then -(J : ℂ) else 0
+primary definition via `couplingOf (pathGraph (N+1)) (-J)`. The
+negative sign encodes Tasaki's ferromagnetic convention
+`H = -J Σ_{⟨x,y⟩} Ŝ_x · Ŝ_y` (eq. (2.4.1)) so that `J > 0` is
+ferromagnetic. -/
+noncomputable def openChainCoupling (N : ℕ) (J : ℝ) :
+    Fin (N + 1) → Fin (N + 1) → ℂ :=
+  LatticeSystem.Lattice.couplingOf (SimpleGraph.pathGraph (N + 1)) (-(J : ℂ))
 
 /-- Periodic nearest-neighbour coupling on `Fin (N + 2)` (at least 2 sites):
-`J(x, y) = -J` if `y ≡ x + 1 (mod N+2)` or vice versa, else `0`. -/
+primary definition via `couplingOf (cycleGraph (N+2)) (-J)`. -/
 noncomputable def periodicChainCoupling (N : ℕ) (J : ℝ) :
     Fin (N + 2) → Fin (N + 2) → ℂ :=
-  fun x y => if (x + 1 = y) ∨ (y + 1 = x) then -(J : ℂ) else 0
+  LatticeSystem.Lattice.couplingOf (SimpleGraph.cycleGraph (N + 2)) (-(J : ℂ))
 
 /-! ## Bridge to mathlib's `SimpleGraph.pathGraph` and `cycleGraph`
 
@@ -57,30 +59,45 @@ ferromagnetic sign convention). This makes explicit that our chain
 Hamiltonians are instances of a general graph-defined Heisenberg
 model in the sense of Miyao 2021 §3. -/
 
-/-- The open-chain coupling is exactly the `couplingOf` of the
-mathlib path graph `pathGraph (N + 1)` with weight `-J`. -/
+/-- The open-chain coupling equals `couplingOf (pathGraph (N+1)) (-J)`
+definitionally (this is how it is now defined). -/
 theorem openChainCoupling_eq_couplingOf (N : ℕ) (J : ℝ) :
     openChainCoupling N J =
       LatticeSystem.Lattice.couplingOf (SimpleGraph.pathGraph (N + 1))
-        (-(J : ℂ)) := by
-  funext x y
-  unfold openChainCoupling LatticeSystem.Lattice.couplingOf
-  by_cases h : x.val + 1 = y.val ∨ y.val + 1 = x.val
-  · rw [if_pos h, if_pos ((SimpleGraph.pathGraph_adj).mpr h)]
-  · rw [if_neg h, if_neg (fun h' => h ((SimpleGraph.pathGraph_adj).mp h'))]
+        (-(J : ℂ)) :=
+  rfl
 
-/-- The periodic-chain coupling is exactly the `couplingOf` of the
-mathlib cycle graph `cycleGraph (N + 2)` with weight `-J`. -/
+/-- The periodic-chain coupling equals `couplingOf (cycleGraph (N+2)) (-J)`
+definitionally. -/
 theorem periodicChainCoupling_eq_couplingOf (N : ℕ) (J : ℝ) :
     periodicChainCoupling N J =
       LatticeSystem.Lattice.couplingOf (SimpleGraph.cycleGraph (N + 2))
-        (-(J : ℂ)) := by
-  funext x y
+        (-(J : ℂ)) :=
+  rfl
+
+/-- Explicit if-form for `openChainCoupling`: retained as an
+unfolding lemma for existing downstream proofs that used
+`simp [openChainCoupling_apply]` to reduce to the if-expression. -/
+theorem openChainCoupling_apply (N : ℕ) (J : ℝ) (x y : Fin (N + 1)) :
+    openChainCoupling N J x y
+      = if x.val + 1 = y.val ∨ y.val + 1 = x.val then -(J : ℂ) else 0 := by
+  unfold openChainCoupling LatticeSystem.Lattice.couplingOf
+  by_cases h : (SimpleGraph.pathGraph (N + 1)).Adj x y
+  · rw [if_pos h, SimpleGraph.pathGraph_adj] at *
+    rw [if_pos h]
+  · rw [SimpleGraph.pathGraph_adj] at h
+    rw [if_neg (by rwa [SimpleGraph.pathGraph_adj]), if_neg h]
+
+/-- Explicit if-form for `periodicChainCoupling`. -/
+theorem periodicChainCoupling_apply (N : ℕ) (J : ℝ) (x y : Fin (N + 2)) :
+    periodicChainCoupling N J x y
+      = if x + 1 = y ∨ y + 1 = x then -(J : ℂ) else 0 := by
   unfold periodicChainCoupling LatticeSystem.Lattice.couplingOf
-  by_cases h : x + 1 = y ∨ y + 1 = x
-  · rw [if_pos h, if_pos ((LatticeSystem.Lattice.cycleGraph_adj_iff N x y).mpr h)]
-  · rw [if_neg h,
-      if_neg (fun h' => h ((LatticeSystem.Lattice.cycleGraph_adj_iff N x y).mp h'))]
+  by_cases h : (SimpleGraph.cycleGraph (N + 2)).Adj x y
+  · rw [if_pos h,
+      if_pos ((LatticeSystem.Lattice.cycleGraph_adj_iff N x y).mp h)]
+  · rw [if_neg h, if_neg (fun h' => h
+      ((LatticeSystem.Lattice.cycleGraph_adj_iff N x y).mpr h'))]
 
 /-! ## Hermiticity -/
 
@@ -321,19 +338,19 @@ theorem heisenbergGibbsStateOnGraph_commute_hamiltonian
       (heisenbergHamiltonian (LatticeSystem.Lattice.couplingOf G J)) :=
   gibbsState_commute_hamiltonian β _
 
-/-- The open-chain Heisenberg Hamiltonian is Hermitian. -/
+/-- The open-chain Heisenberg Hamiltonian is Hermitian. Now via
+the graph-centric wrapper (`openChainCoupling` is definitionally
+`couplingOf (pathGraph (N+1)) (-J)`). -/
 theorem openChainHeisenberg_isHermitian (N : ℕ) (J : ℝ) :
     (heisenbergHamiltonian (openChainCoupling N J)).IsHermitian :=
-  heisenbergHamiltonian_isHermitian_of_real_symm
-    (by intro x y; simp [openChainCoupling]; split_ifs <;> simp)
-    (by intro x y; simp [openChainCoupling, or_comm])
+  heisenbergHamiltonian_couplingOf_isHermitian _ (by simp)
 
-/-- The periodic-chain Heisenberg Hamiltonian is Hermitian. -/
+/-- The periodic-chain Heisenberg Hamiltonian is Hermitian. Via the
+graph-centric wrapper (`periodicChainCoupling` is definitionally
+`couplingOf (cycleGraph (N+2)) (-J)`). -/
 theorem periodicChainHeisenberg_isHermitian (N : ℕ) (J : ℝ) :
     (heisenbergHamiltonian (periodicChainCoupling N J)).IsHermitian :=
-  heisenbergHamiltonian_isHermitian_of_real_symm
-    (by intro x y; simp only [periodicChainCoupling]; split_ifs <;> simp)
-    (by intro x y; simp only [periodicChainCoupling]; simp [or_comm])
+  heisenbergHamiltonian_couplingOf_isHermitian _ (by simp)
 
 /-! ## Energy expectation as a bond-sum decomposition
 
@@ -664,13 +681,13 @@ theorem openChainHeisenbergHamiltonian_two_site_eq (J : ℝ) :
   rw [Fin.sum_univ_two, Fin.sum_univ_two, Fin.sum_univ_two]
   -- Compute openChainCoupling 1 J for each of the 4 (x,y) pairs.
   have h00 : openChainCoupling 1 J 0 0 = 0 := by
-    simp [openChainCoupling]
+    simp [openChainCoupling_apply]
   have h01 : openChainCoupling 1 J 0 1 = -(J : ℂ) := by
-    simp [openChainCoupling]
+    simp [openChainCoupling_apply]
   have h10 : openChainCoupling 1 J 1 0 = -(J : ℂ) := by
-    simp [openChainCoupling]
+    simp [openChainCoupling_apply]
   have h11 : openChainCoupling 1 J 1 1 = 0 := by
-    simp [openChainCoupling]
+    simp [openChainCoupling_apply]
   rw [h00, h01, h10, h11]
   -- spinHalfDot 1 0 = spinHalfDot 0 1 by symmetry; combine the two -J terms.
   rw [spinHalfDot_comm 1 0]
@@ -755,15 +772,15 @@ theorem openChainHeisenbergHamiltonian_three_site_eq (J : ℝ) :
   rw [Fin.sum_univ_three, Fin.sum_univ_three, Fin.sum_univ_three,
     Fin.sum_univ_three]
   -- 9 pairs (x,y) ∈ Fin 3 × Fin 3 — evaluate openChainCoupling at each.
-  have h00 : openChainCoupling 2 J 0 0 = 0 := by simp [openChainCoupling]
-  have h01 : openChainCoupling 2 J 0 1 = -(J : ℂ) := by simp [openChainCoupling]
-  have h02 : openChainCoupling 2 J 0 2 = 0 := by simp [openChainCoupling]
-  have h10 : openChainCoupling 2 J 1 0 = -(J : ℂ) := by simp [openChainCoupling]
-  have h11 : openChainCoupling 2 J 1 1 = 0 := by simp [openChainCoupling]
-  have h12 : openChainCoupling 2 J 1 2 = -(J : ℂ) := by simp [openChainCoupling]
-  have h20 : openChainCoupling 2 J 2 0 = 0 := by simp [openChainCoupling]
-  have h21 : openChainCoupling 2 J 2 1 = -(J : ℂ) := by simp [openChainCoupling]
-  have h22 : openChainCoupling 2 J 2 2 = 0 := by simp [openChainCoupling]
+  have h00 : openChainCoupling 2 J 0 0 = 0 := by simp [openChainCoupling_apply]
+  have h01 : openChainCoupling 2 J 0 1 = -(J : ℂ) := by simp [openChainCoupling_apply]
+  have h02 : openChainCoupling 2 J 0 2 = 0 := by simp [openChainCoupling_apply]
+  have h10 : openChainCoupling 2 J 1 0 = -(J : ℂ) := by simp [openChainCoupling_apply]
+  have h11 : openChainCoupling 2 J 1 1 = 0 := by simp [openChainCoupling_apply]
+  have h12 : openChainCoupling 2 J 1 2 = -(J : ℂ) := by simp [openChainCoupling_apply]
+  have h20 : openChainCoupling 2 J 2 0 = 0 := by simp [openChainCoupling_apply]
+  have h21 : openChainCoupling 2 J 2 1 = -(J : ℂ) := by simp [openChainCoupling_apply]
+  have h22 : openChainCoupling 2 J 2 2 = 0 := by simp [openChainCoupling_apply]
   rw [h00, h01, h02, h10, h11, h12, h20, h21, h22]
   -- Apply spinHalfDot_comm to merge (1,0) → (0,1) and (2,1) → (1,2).
   rw [spinHalfDot_comm 1 0, spinHalfDot_comm 2 1]
@@ -932,7 +949,7 @@ theorem openChainCoupling_sum_eq (N : ℕ) (J : ℝ) :
         (if x.val + 1 = y.val then -(J : ℂ) else 0) +
         (if y.val + 1 = x.val then -(J : ℂ) else 0) := by
     intro x y
-    unfold openChainCoupling
+    rw [openChainCoupling_apply]
     by_cases h1 : x.val + 1 = y.val
     · have h2 : ¬ y.val + 1 = x.val := by omega
       rw [if_pos h1, if_neg h2, add_zero]
@@ -986,7 +1003,7 @@ theorem openChainHeisenbergHamiltonian_mulVec_basisVec_const
   -- Diagonal terms vanish (openChainCoupling x x = 0), off-diagonal × 1/4.
   have hdiag : ∀ x : Fin (N + 1), openChainCoupling N J x x = 0 := by
     intro x
-    unfold openChainCoupling
+    rw [openChainCoupling_apply]
     rw [if_neg (by simp)]
   have hsame : ∀ x y : Fin (N + 1),
       openChainCoupling N J x y *
@@ -1062,7 +1079,7 @@ theorem openChainHeisenbergHamiltonian_mulVec_totalSpinHalfOpMinus_pow_basisVec_
   -- Compute c_J using openChainCoupling_sum_eq + diagonal vanishing.
   have hdiag : ∀ x : Fin (N + 1), openChainCoupling N J x x = 0 := by
     intro x
-    unfold openChainCoupling
+    rw [openChainCoupling_apply]
     rw [if_neg (by simp)]
   have hsame : ∀ x y : Fin (N + 1),
       openChainCoupling N J x y *
@@ -1101,7 +1118,7 @@ theorem openChainHeisenbergHamiltonian_mulVec_totalSpinHalfOpPlus_pow_basisVec_a
   congr 1
   have hdiag : ∀ x : Fin (N + 1), openChainCoupling N J x x = 0 := by
     intro x
-    unfold openChainCoupling
+    rw [openChainCoupling_apply]
     rw [if_neg (by simp)]
   have hsame : ∀ x y : Fin (N + 1),
       openChainCoupling N J x y *
