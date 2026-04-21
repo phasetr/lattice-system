@@ -19,11 +19,23 @@ jobs:
       - uses: actions/checkout@v5
       - uses: leanprover/lean-action@v1
 
-  docs:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: leanprover/lean-action@v1
-      - uses: leanprover-community/docgen-action@main
+  # API docs generation (doc-gen4 via docgen-action) is currently
+  # DISABLED because it was taking unreasonably long on every push
+  # to main (often >1h). The workflow rebuilds the whole mathlib
+  # toolchain and then re-elaborates all source files a second time,
+  # which nearly doubles the CI cost for no value the main `build`
+  # job does not already provide.
+  #
+  # To re-enable later (once the slowness is diagnosed / mitigated),
+  # simply delete this comment and uncomment the job below. Also
+  # update `README.md` and `docs/index.md` to reinstate the links
+  # to `https://phasetr.github.io/lattice-system/docs/`.
+  #
+  # docs:
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v5
+  #     - uses: leanprover/lean-action@v1
+  #     - uses: leanprover-community/docgen-action@main
