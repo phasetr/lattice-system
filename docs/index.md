@@ -580,6 +580,12 @@ Systems*, §3.5, p. 89.
 | `hubbardGibbsStateOnGraph N β G J U` | Gibbs state of the graph-built Hubbard Hamiltonian | `Fermion/JordanWigner.lean` |
 | `hubbardGibbsStateOnGraph_isHermitian` / `_commute_hamiltonian` | Hermiticity / commute corollaries | `Fermion/JordanWigner.lean` |
 | `hubbardChainGibbsState_eq_onGraph` | rfl bridge: `hubbardChainGibbsState = hubbardGibbsStateOnGraph (pathGraph (N+1)) (-J) U` | `Fermion/JordanWigner.lean` |
+| `jwStringAbstract i` | Jordan-Wigner string for any `[Fintype Λ] [LinearOrder Λ]` — product of `σ^z_j` over `j < i`; generalises the Fin-specific `jwString` | `Fermion/JWAbstract.lean` |
+| `jwStringAbstract_isHermitian` / `jwStringAbstract_sq` / `jwStringAbstract_commute_onSite` | basic structural identities | `Fermion/JWAbstract.lean` |
+| `fermionAnnihilationAbstract i` / `fermionCreationAbstract i` / `fermionNumberAbstract i` | abstract-Λ annihilation / creation / number; rfl-bridges to the Fin-specific versions | `Fermion/JWAbstract.lean` |
+| `fermionAnnihilationAbstract_conjTranspose` / `fermionCreationAbstract_conjTranspose` / `fermionNumberAbstract_isHermitian` | adjoint relations and Hermiticity in the abstract form | `Fermion/JWAbstract.lean` |
+| `fermionAnnihilationAbstract_sq` / `fermionCreationAbstract_sq` | `c_i² = 0`, `c_i†² = 0` (Pauli exclusion) | `Fermion/JWAbstract.lean` |
+| `fermionMultiAnticommAbstract_self` / `fermionNumberAbstract_sq` | `{c_i, c_i†} = 1` and `n_i² = n_i` (abstract same-site CAR + idempotency) | `Fermion/JWAbstract.lean` |
 | `LatticeSystem.Lattice.boxProd_decidableAdj` | `DecidableRel (G □ H).Adj` for the box product (mathlib provides only the bare definition); enables 2D / nD lattices via `couplingOf` | `Lattice/Graph.lean` |
 | `LatticeSystem.Lattice.integerChainGraph` | the **infinite** one-dimensional chain `ℤ` as a `SimpleGraph` (= `hasse ℤ`), the infinite-volume analogue of `pathGraph (N+1)` | `Lattice/Graph.lean` |
 | `LatticeSystem.Lattice.integerChainGraph_adj_iff` | adjacency: `a ~ b ↔ b = a + 1 ∨ a = b + 1` | `Lattice/Graph.lean` |
