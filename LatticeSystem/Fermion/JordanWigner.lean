@@ -1512,4 +1512,31 @@ theorem fermionGenericHamiltonian_commute_fermionTotalNumber
   exact (fermionHopping_commute_fermionTotalNumber N t).add_left
     (fermionDensityInteraction_commute_fermionTotalNumber N V)
 
+/-- The product `n_i * n_j` is Hermitian: each `n_i` is Hermitian
+(`fermionMultiNumber_isHermitian`) and `n_i, n_j` commute pairwise
+(`fermionMultiNumber_commute`), so the product of two commuting
+Hermitian operators is Hermitian. -/
+theorem fermionMultiNumber_mul_isHermitian (N : ℕ) (i j : Fin (N + 1)) :
+    (fermionMultiNumber N i * fermionMultiNumber N j).IsHermitian :=
+  Matrix.IsHermitian.mul_of_commute (fermionMultiNumber_isHermitian N i)
+    (fermionMultiNumber_isHermitian N j) (fermionMultiNumber_commute N i j)
+
+/-- The density-density interaction
+`V_int = Σ_{i,j} V_{i,j} n_i n_j` is Hermitian whenever every
+coupling entry is real (`star V_{i,j} = V_{i,j}`). Each `n_i n_j` is
+Hermitian (commuting Hermitian factors), and `(V_{i,j} • n_i n_j)†
+= star V_{i,j} • n_i n_j = V_{i,j} • n_i n_j` under the realness
+hypothesis; the sum of Hermitians is Hermitian. -/
+theorem fermionDensityInteraction_isHermitian
+    (N : ℕ) {V : Fin (N + 1) → Fin (N + 1) → ℂ}
+    (hV : ∀ i j, star (V i j) = V i j) :
+    (fermionDensityInteraction N V).IsHermitian := by
+  unfold fermionDensityInteraction Matrix.IsHermitian
+  rw [Matrix.conjTranspose_sum]
+  congr 1; funext i
+  rw [Matrix.conjTranspose_sum]
+  congr 1; funext j
+  rw [Matrix.conjTranspose_smul, (fermionMultiNumber_mul_isHermitian N i j).eq,
+    hV]
+
 end LatticeSystem.Fermion
