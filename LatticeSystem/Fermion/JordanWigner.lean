@@ -2217,6 +2217,24 @@ theorem fermionTotalUpNumber_commute_fermionDownNumber
   exact fermionMultiNumber_commute (2 * N + 1)
     (spinfulIndex N k 0) (spinfulIndex N i 1)
 
+/-- `N_↓` commutes with the up-sector hopping term
+`c_{i,↑}† · c_{j,↑}` (cross-spin). -/
+theorem fermionTotalDownNumber_commute_upHopping
+    (N : ℕ) (i j : Fin (N + 1)) :
+    Commute (fermionTotalDownNumber N)
+      (fermionUpCreation N i * fermionUpAnnihilation N j) :=
+  (fermionTotalDownNumber_commute_fermionUpCreation N i).mul_right
+    (fermionTotalDownNumber_commute_fermionUpAnnihilation N j)
+
+/-- `N_↑` commutes with the down-sector hopping term
+`c_{i,↓}† · c_{j,↓}` (cross-spin). -/
+theorem fermionTotalUpNumber_commute_downHopping
+    (N : ℕ) (i j : Fin (N + 1)) :
+    Commute (fermionTotalUpNumber N)
+      (fermionDownCreation N i * fermionDownAnnihilation N j) :=
+  (fermionTotalUpNumber_commute_fermionDownCreation N i).mul_right
+    (fermionTotalUpNumber_commute_fermionDownAnnihilation N j)
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`
