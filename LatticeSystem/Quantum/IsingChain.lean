@@ -451,7 +451,7 @@ theorem quantumIsingHamiltonian_eq_isingHamiltonianGeneric
   -- Now: (-J) • bond + (-h) • Σ spinX = (-J) • bond - h • Σ onSite pauliX
   rw [sub_eq_add_neg]
   congr 1
-  show (-(h : ℂ)) • ∑ i : Fin (N + 1), spinX N i
+  change (-(h : ℂ)) • ∑ i : Fin (N + 1), spinX N i
     = -((h : ℂ) • ∑ x : Fin (N + 1), onSite x pauliX)
   simp only [spinX, neg_smul]
 
