@@ -29,10 +29,15 @@
 \begin{abstract}
 This document is a guide to reading the Lean~4 source code of the
 \texttt{lattice-system} project. The project generalizes the earlier
-\texttt{ising-model} project toward a broad class of lattice models
-(classical spin systems, quantum spin systems, Hubbard, BCS,
-CAR-algebraic, and eventually lattice QCD). The current scope is
-\emph{finite-volume quantum spin systems}. This guide explains which
+\texttt{ising-model} project toward a broad class of many-body
+systems on graphs (classical spin systems, quantum spin systems,
+Hubbard, BCS, CAR-algebraic, and eventually lattice QCD). Despite
+its name, the underlying combinatorial datum is a graph
+$(\Lambda, E_\Lambda)$ rather than a specific lattice; concrete
+lattices appear as graph instances. The current scope is finite
+graphs and finite-volume quantum spin systems, but a major
+long-term goal is the \emph{infinite-volume / thermodynamic limit},
+which intrinsically uses infinite graphs. This guide explains which
 file contains what, which textbook material each formalization
 corresponds to, and what is and is not yet proved.
 \end{abstract}

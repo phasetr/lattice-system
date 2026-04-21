@@ -11,12 +11,20 @@ import Mathlib.Data.Complex.Basic
 
 This is the foundational module that fixes the project's
 **graph-centric** orientation: the underlying combinatorial datum of
-every many-body system in this library is a finite graph `(Λ, E_Λ)`,
-with `Λ` the vertex set (a finite type) and `E_Λ` either a
+every many-body system in this library is a graph `(Λ, E_Λ)`,
+with `Λ` the vertex set (a `Type*`) and `E_Λ` either a
 `SimpleGraph Λ` or, equivalently, the support of a coupling function
-`J : Λ → Λ → ℂ`. Lattices such as the 1D chain or higher-dimensional
-grids are treated as **examples** of graphs (`pathGraph`,
-`cycleGraph`, products of these, …), not as a primary abstraction.
+`J : Λ → Λ → ℂ`. Lattices such as the 1D chain, higher-dimensional
+grids, or their infinite analogues `ℤ`, `ℤ^d` are treated as
+**examples** of graphs (`pathGraph`, `cycleGraph`, products of
+these, infinite analogues, …), not as a primary abstraction.
+
+`Λ` is *not* assumed finite at this level; finiteness
+(`[Fintype Λ]`) is added only locally where needed (e.g. for traces,
+partition functions, finite sums of local terms). The framework is
+intended to support both **finite-volume** work and the
+**infinite-volume / thermodynamic limit** that is one of the
+project's primary long-term goals.
 
 This convention follows the standard mathematical-physics literature
 on many-body systems on graphs — Lieb's theorem on bipartite
@@ -84,7 +92,12 @@ theorem couplingOf_real (G : SimpleGraph Λ) [DecidableRel G.Adj]
   · rw [if_pos h, hJ]
   · rw [if_neg h, star_zero]
 
-/-! ## Standard finite lattices as path / cycle graphs -/
+/-! ## Standard one-dimensional chains as path / cycle graphs
+
+The finite open / periodic chains used throughout the codebase are
+particular instances of mathlib's `pathGraph` and `cycleGraph`. The
+infinite chain `ℤ` and higher-dimensional infinite grids will be
+added when infinite-volume work begins. -/
 
 /-- Decidability for the path graph adjacency. mathlib provides only
 the bare `pathGraph` definition; we add the `DecidableRel` instance

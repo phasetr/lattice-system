@@ -14,14 +14,22 @@ CAR algebras, and eventually lattice QCD.
 ## Design axis: graphs, not lattices
 
 Despite the name, the **primary combinatorial abstraction in this
-library is a finite graph `(Λ, E_Λ)`**, not "a lattice". Concrete
-lattices (the 1D chain, square / cubic grids, …) appear only as
-specific instances such as `SimpleGraph.pathGraph`,
-`SimpleGraph.cycleGraph`, or products of these. This convention
-follows the standard mathematical-physics literature on many-body
-systems on graphs (Lieb's theorem on bipartite lattices, the
-Marshall–Lieb–Mattis theorem, Miyao 2021 §3, …) and aligns the
-project with mathlib's `SimpleGraph` foundations.
+library is a graph `(Λ, E_Λ)`** — finite for finite-volume work and
+infinite for the thermodynamic-limit / algebraic-formulation work
+that is a major long-term goal — not "a lattice". Concrete lattices
+(the 1D chain, square / cubic grids, infinite chains, ℤ^d, …) appear
+only as specific instances such as `SimpleGraph.pathGraph`,
+`SimpleGraph.cycleGraph`, products of these, or their infinite
+analogues. This convention follows the standard mathematical-physics
+literature on many-body systems on graphs (Lieb's theorem on
+bipartite lattices, the Marshall–Lieb–Mattis theorem, Miyao 2021
+§3, …) and aligns the project with mathlib's `SimpleGraph`
+foundations.
+
+Finite-volume work uses `Λ : Type*` together with `[Fintype Λ]`
+when needed (e.g. for traces, partition functions, finite sums of
+local terms); infinite-volume work drops the `Fintype` assumption
+and uses graphs over types like `ℤ` or `ℤ^d` instead.
 
 The bridge from a `SimpleGraph` to the pairwise coupling
 `J : Λ → Λ → ℂ` consumed by `heisenbergHamiltonian` (and similar
@@ -39,7 +47,7 @@ respectively.
 | Quantum spin systems | Current focus | Tasaki, Nielsen-Chuang (cross-check) |
 | Hubbard / BCS | Medium term | Tasaki 1998, Bru-Pedra |
 | CAR-algebraic formulation | Medium-long term | Araki-Moriya, Bru-Pedra |
-| Thermodynamic limit | Long term | Simon, Friedli-Velenik |
+| Thermodynamic limit (infinite graphs) | Long term, **major project goal** | Simon, Friedli-Velenik, Bratteli-Robinson |
 | Lattice QCD | Longest term | Aarts, Davies |
 
 ## Roadmap
