@@ -11,6 +11,26 @@ This project subsumes and generalizes the earlier
 covering classical spin systems, quantum spin systems, Hubbard, BCS,
 CAR algebras, and eventually lattice QCD.
 
+## Design axis: graphs, not lattices
+
+Despite the name, the **primary combinatorial abstraction in this
+library is a finite graph `(Λ, E_Λ)`**, not "a lattice". Concrete
+lattices (the 1D chain, square / cubic grids, …) appear only as
+specific instances such as `SimpleGraph.pathGraph`,
+`SimpleGraph.cycleGraph`, or products of these. This convention
+follows the standard mathematical-physics literature on many-body
+systems on graphs (Lieb's theorem on bipartite lattices, the
+Marshall–Lieb–Mattis theorem, Miyao 2021 §3, …) and aligns the
+project with mathlib's `SimpleGraph` foundations.
+
+The bridge from a `SimpleGraph` to the pairwise coupling
+`J : Λ → Λ → ℂ` consumed by `heisenbergHamiltonian` (and similar
+operators) lives in `LatticeSystem.Lattice.Graph` (`couplingOf`).
+Existing chain coupling families (`openChainCoupling`,
+`periodicChainCoupling`) are characterised as
+`couplingOf (pathGraph _) _` and `couplingOf (cycleGraph _) _`
+respectively.
+
 ## Scope
 
 | Area | Stage | Typical references |
@@ -519,8 +539,13 @@ Systems*, §3.5, p. 89.
 
 | Lean name | Statement | File |
 |---|---|---|
+| `LatticeSystem.Lattice.couplingOf G J` | the canonical pairwise coupling `Λ → Λ → ℂ` of a `SimpleGraph G` with uniform edge weight `J`: returns `J` on edges of `G`, zero otherwise (graph-centric bridge) | `Lattice/Graph.lean` |
+| `LatticeSystem.Lattice.couplingOf_symm` / `_self` / `_real` | symmetry (from `G.Adj` symmetry), vanishing on the diagonal (from irreflexivity), and reality (for real edge weight) | `Lattice/Graph.lean` |
+| `LatticeSystem.Lattice.pathGraph_adj_iff` / `cycleGraph_adj_iff` | path / cycle graph adjacency in the explicit `x.val + 1 = y.val ∨ ...` form used elsewhere in the codebase | `Lattice/Graph.lean` |
 | `openChainCoupling N J` | coupling `Fin (N+1) → Fin (N+1) → ℂ`: returns `-J` on nearest-neighbour bonds, zero otherwise | `Quantum/HeisenbergChain.lean` |
 | `periodicChainCoupling N J` | coupling `Fin (N+2) → Fin (N+2) → ℂ`: returns `-J` on nearest-neighbour bonds (mod N+2), zero otherwise | `Quantum/HeisenbergChain.lean` |
+| `openChainCoupling_eq_couplingOf` | the open-chain coupling is `couplingOf (pathGraph (N+1)) (-J)` | `Quantum/HeisenbergChain.lean` |
+| `periodicChainCoupling_eq_couplingOf` | the periodic-chain coupling is `couplingOf (cycleGraph (N+2)) (-J)` | `Quantum/HeisenbergChain.lean` |
 | `heisenbergHamiltonian_isHermitian_of_real_symm` | for any real symmetric coupling `J` the Heisenberg Hamiltonian `H = Σ_{x,y} J(x,y) Ŝ_x · Ŝ_y` is Hermitian | `Quantum/HeisenbergChain.lean` |
 | `openChainHeisenberg_isHermitian` | specialization: the open-chain Heisenberg Hamiltonian is Hermitian | `Quantum/HeisenbergChain.lean` |
 | `periodicChainHeisenberg_isHermitian` | specialization: the periodic-chain Heisenberg Hamiltonian is Hermitian | `Quantum/HeisenbergChain.lean` |

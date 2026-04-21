@@ -1,6 +1,7 @@
 -- This module serves as the root of the `LatticeSystem` library.
 -- Import modules here that should be built as part of the library.
 import LatticeSystem.Basic
+import LatticeSystem.Lattice.Graph
 import LatticeSystem.Quantum.Pauli
 import LatticeSystem.Quantum.SpinHalf
 import LatticeSystem.Quantum.SpinHalfBasis

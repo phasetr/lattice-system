@@ -1,7 +1,14 @@
 # lattice-system
 
-A Lean 4 + mathlib project for formalizing theorems about general
-lattice models. The project subsumes and generalizes the earlier
+A Lean 4 + mathlib project for formalizing theorems about many-body
+systems on **finite graphs**. Despite the name, the primary
+combinatorial abstraction is a finite graph `(Λ, E_Λ)`, with concrete
+lattices (1D chain, square / cubic grids, …) appearing as specific
+graph instances (`SimpleGraph.pathGraph`, `SimpleGraph.cycleGraph`,
+products of these, …). This convention follows the standard
+mathematical-physics literature on many-body systems on graphs.
+
+The project subsumes and generalizes the earlier
 [ising-model](https://github.com/phasetr/ising-model) project, with
 the current focus on finite-volume quantum spin systems and the
 longer-term goal of covering Hubbard / BCS, CAR-algebraic fermion
