@@ -56,4 +56,22 @@ example :
     letI : LatticeWithSpacing (Fin 4) := ⟨(2 : ℝ≥0)⟩
     LatticeWithSpacing.spacing (Λ := Fin 4) = (2 : ℝ≥0) := rfl
 
+/-! ## Infinite-volume instances -/
+
+example : LatticeWithSpacing.spacing (Λ := ℤ) = 1 := rfl
+example : spacingOf ℤ = 1 := rfl
+example : LatticeWithSpacing.spacing (Λ := ℤ × ℤ) = 1 := rfl
+example : spacingOf (ℤ × ℤ) = 1 := rfl
+
+example : LatticeWithSpacing.spacing (Λ := ℤ) = 1 := spacing_int
+example : spacingOf ℤ = 1 := spacingOf_int
+example : LatticeWithSpacing.spacing (Λ := ℤ × ℤ) = 1 := spacing_int_sq
+example : spacingOf (ℤ × ℤ) = 1 := spacingOf_int_sq
+
+/-! ## Custom spacing for ℤ (anisotropic continuum-limit scaffold) -/
+
+example :
+    letI : LatticeWithSpacing ℤ := ⟨(1 / 2 : ℝ≥0)⟩
+    LatticeWithSpacing.spacing (Λ := ℤ) = (1 / 2 : ℝ≥0) := rfl
+
 end LatticeSystem.Tests.Scale

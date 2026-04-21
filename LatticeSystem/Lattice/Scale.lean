@@ -81,4 +81,31 @@ instance instLatticeWithSpacingFinSucc (N : ℕ) :
 @[simp] lemma spacingOf_fin_succ (N : ℕ) :
     spacingOf (Fin (N + 1)) = 1 := rfl
 
+/-- Default `spacing := 1` instance for `ℤ`, the infinite chain.
+
+This is the unit-spacing specialisation of the infinite-volume
+setting that future continuum-limit / thermodynamic-limit work will
+inhabit (`integerChainGraph` lives on `ℤ`). Anisotropic / non-unit
+spacings on `ℤ` will be introduced via a named local instance when a
+specific theorem requires them — the default here just keeps the
+library `rfl`-equivalent to the existing unit-spacing conventions. -/
+instance instLatticeWithSpacingInt : LatticeWithSpacing ℤ where
+  spacing := 1
+
+@[simp] lemma spacing_int :
+    LatticeWithSpacing.spacing (Λ := ℤ) = 1 := rfl
+
+@[simp] lemma spacingOf_int : spacingOf ℤ = 1 := rfl
+
+/-- Default `spacing := 1` instance for `ℤ × ℤ`, the infinite 2D
+square lattice. Matches the 2D `integerSquareLatticeGraph` already
+in the library. -/
+instance instLatticeWithSpacingIntSq : LatticeWithSpacing (ℤ × ℤ) where
+  spacing := 1
+
+@[simp] lemma spacing_int_sq :
+    LatticeWithSpacing.spacing (Λ := ℤ × ℤ) = 1 := rfl
+
+@[simp] lemma spacingOf_int_sq : spacingOf (ℤ × ℤ) = 1 := rfl
+
 end LatticeSystem.Lattice
