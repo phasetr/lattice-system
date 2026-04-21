@@ -45,4 +45,16 @@ example : neelChainState 2 ∈ magnetizationSubspace (Fin (2 * 2)) (0 : ℂ) :=
 example : neelChainState 3 ∈ magnetizationSubspace (Fin (2 * 3)) (0 : ℂ) :=
   neelChainState_mem_magnetizationSubspace_zero 3
 
+/-! ## H · |Φ_Néel⟩ stays in `H_0` (SU(2) invariance corollary) -/
+
+example (K : ℕ) (J : Fin (2 * K) → Fin (2 * K) → ℂ) :
+    (heisenbergHamiltonian J).mulVec (neelChainState K) ∈
+      magnetizationSubspace (Fin (2 * K)) (0 : ℂ) :=
+  heisenbergHamiltonian_mulVec_neelChainState_mem_magnetizationSubspace_zero K J
+
+example (J : Fin (2 * 2) → Fin (2 * 2) → ℂ) :
+    (heisenbergHamiltonian J).mulVec (neelChainState 2) ∈
+      magnetizationSubspace (Fin (2 * 2)) (0 : ℂ) :=
+  heisenbergHamiltonian_mulVec_neelChainState_mem_magnetizationSubspace_zero 2 J
+
 end LatticeSystem.Tests.NeelState

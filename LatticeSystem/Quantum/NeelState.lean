@@ -120,4 +120,21 @@ theorem neelChainState_mem_magnetizationSubspace_zero (K : ℕ) :
   rw [neelChainConfig_magnetization_zero] at h
   simpa using h
 
+/-- For any Heisenberg-type coupling `J : Fin (2*K) → Fin (2*K) → ℂ`,
+the action of `H = heisenbergHamiltonian J` on the Néel chain state
+again lies in the zero-magnetisation sector `H_0`. This is an
+immediate corollary of the SU(2) invariance
+`heisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem`
+(Tasaki §2.2 eq. (2.2.13), p. 23) applied to the Néel state in
+`H_0` (Tasaki §2.5 eq. (2.5.2), p. 37). The Néel state is *not*
+itself an eigenstate (Tasaki §2.5 (2.5.3)), but it cannot leak
+into other magnetisation sectors. -/
+theorem heisenbergHamiltonian_mulVec_neelChainState_mem_magnetizationSubspace_zero
+    (K : ℕ) (J : Fin (2 * K) → Fin (2 * K) → ℂ) :
+    (heisenbergHamiltonian J).mulVec (neelChainState K) ∈
+      magnetizationSubspace (Fin (2 * K)) (0 : ℂ) :=
+  heisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem
+    (Λ := Fin (2 * K)) J
+    (neelChainState_mem_magnetizationSubspace_zero K)
+
 end LatticeSystem.Quantum
