@@ -407,6 +407,14 @@ noncomputable def openChainHeisenbergGibbsState (β J : ℝ) (N : ℕ) :
     ManyBodyOp (Fin (N + 1)) :=
   gibbsState β (heisenbergHamiltonian (openChainCoupling N J))
 
+/-- `openChainHeisenbergGibbsState` is definitionally equal to the
+graph-form `heisenbergGibbsStateOnGraph` applied to `pathGraph (N+1)`. -/
+theorem openChainHeisenbergGibbsState_eq_onGraph (β J : ℝ) (N : ℕ) :
+    openChainHeisenbergGibbsState β J N
+      = heisenbergGibbsStateOnGraph β (SimpleGraph.pathGraph (N + 1))
+          (-(J : ℂ)) :=
+  rfl
+
 /-- The open-chain Heisenberg Gibbs state is Hermitian. -/
 theorem openChainHeisenbergGibbsState_isHermitian (β J : ℝ) (N : ℕ) :
     (openChainHeisenbergGibbsState β J N).IsHermitian :=
@@ -534,6 +542,15 @@ theorem openChainHeisenbergGibbsState_pow_trace (β J : ℝ) (N : ℕ) (n : ℕ)
 noncomputable def periodicChainHeisenbergGibbsState (β J : ℝ) (N : ℕ) :
     ManyBodyOp (Fin (N + 2)) :=
   gibbsState β (heisenbergHamiltonian (periodicChainCoupling N J))
+
+/-- `periodicChainHeisenbergGibbsState` is definitionally equal to
+the graph-form `heisenbergGibbsStateOnGraph` applied to
+`cycleGraph (N+2)`. -/
+theorem periodicChainHeisenbergGibbsState_eq_onGraph (β J : ℝ) (N : ℕ) :
+    periodicChainHeisenbergGibbsState β J N
+      = heisenbergGibbsStateOnGraph β (SimpleGraph.cycleGraph (N + 2))
+          (-(J : ℂ)) :=
+  rfl
 
 /-- The periodic-chain Heisenberg Gibbs state is Hermitian. -/
 theorem periodicChainHeisenbergGibbsState_isHermitian (β J : ℝ) (N : ℕ) :
