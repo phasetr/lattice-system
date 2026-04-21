@@ -3804,15 +3804,66 @@ using \(\sigma^+_k\sigma^+_0 = \sigma^+_0\sigma^+_k\) (different
 sites).
 \end{proof}
 
-\subsection*{Deferred: cross-site CAR for \(0 < i < j\)}
+\subsection*{Fully general cross-site CAR for \(i < j\)}
 
-The fully general cross-site relations
-\(\{c_i, c_j^\dagger\} = 0\) and \(\{c_i, c_j\} = 0\) for arbitrary
-\(i \neq j\) (with neither site fixed to \(0\)) are deferred to
-follow-up PRs. The proof structure mirrors the \(i = 0\) case but
-requires an additional factorisation of the JW string at site \(i\)
-so that the anti-commutator of \(\sigma^+_i\) with
-\texttt{jwString}\,\(j\) can be evaluated site-by-site.
+\noindent\textbf{Theorem (general \(\{c_i, c_j\} = 0\)).} For every
+\(N : \mathbb{N}\) and every \(i, j : \texttt{Fin}\,(N+1)\) with
+\(i < j\),
+\[
+  c_i c_j + c_j c_i = 0,\quad
+  c_i^\dagger c_j^\dagger + c_j^\dagger c_i^\dagger = 0,\quad
+  c_i c_j^\dagger + c_j^\dagger c_i = 0,\quad
+  c_i^\dagger c_j + c_j c_i^\dagger = 0.
+\]
+
+\begin{proof}
+Write \(c_i = \texttt{JW}_i \sigma^+_i\), \(c_j = \texttt{JW}_j \sigma^+_j\).
+The two key operator-level facts (tracked in Lean as
+\texttt{jwString\_anticomm\_onSite\_pos\_spinHalfOpPlus} and
+\texttt{jwString\_commute\_jwString}) are:
+\begin{enumerate}
+\item \emph{Interior-site anticommutation.}
+For \(i < j\), \(\sigma^+_i \cdot \texttt{JW}_j +
+\texttt{JW}_j \cdot \sigma^+_i = 0\). Proof: factor
+\(\texttt{JW}_j = \sigma^z_i \cdot M\) where \(M =
+\texttt{jwStringExceptAt}\,N\,j\,i\) is a product of \(\sigma^z\)
+at sites \(\neq i\); then the single-site Pauli identities
+\(\sigma^+\sigma^z = -\sigma^+\), \(\sigma^z\sigma^+ = \sigma^+\)
+and the commutation \([\sigma^+_i, M] = 0\) close the argument.
+\item \emph{JW string commutativity.}
+\(\texttt{JW}_i \cdot \texttt{JW}_j = \texttt{JW}_j \cdot \texttt{JW}_i\)
+always — both are \texttt{Finset.noncommProd}'s of \(\sigma^z_k\) at
+distinct sites, hence pairwise commute.
+\end{enumerate}
+
+Using (1) as \(\sigma^+_i \cdot \texttt{JW}_j =
+-(\texttt{JW}_j \cdot \sigma^+_i)\), together with the
+single-site commutations
+\([\sigma^+_i, \texttt{JW}_i] = 0\),
+\([\sigma^+_j, \texttt{JW}_i] = 0\), and \([\sigma^+_i, \sigma^+_j] = 0\),
+\begin{align*}
+  c_i \cdot c_j
+  &= \texttt{JW}_i \cdot \sigma^+_i \cdot \texttt{JW}_j \cdot \sigma^+_j
+  \;=\; -\,\texttt{JW}_i \cdot \texttt{JW}_j \cdot \sigma^+_i \cdot \sigma^+_j,\\
+  c_j \cdot c_i
+  &= \texttt{JW}_j \cdot \sigma^+_j \cdot \texttt{JW}_i \cdot \sigma^+_i
+  \;=\; \texttt{JW}_j \cdot \texttt{JW}_i \cdot \sigma^+_i \cdot \sigma^+_j.
+\end{align*}
+Adding and invoking (2),
+\[
+  c_i c_j + c_j c_i =
+    (-\,\texttt{JW}_i \texttt{JW}_j + \texttt{JW}_j \texttt{JW}_i)
+      \,\sigma^+_i \sigma^+_j \;=\; 0.
+\]
+
+The three remaining forms follow by:
+\(\{c_i^\dagger, c_j^\dagger\}\) --- matrix
+\texttt{conjTranspose};
+\(\{c_i, c_j^\dagger\}\) --- same argument with \(\sigma^-_j\)
+instead of \(\sigma^+_j\) at site \(j\), which still commutes with
+\(\sigma^+_i\) (different sites);
+\(\{c_i^\dagger, c_j\}\) --- \texttt{conjTranspose} again.
+\end{proof}
 
 \section{Continuum-limit roadmap (Phase A scaffold)}
 \label{sec:continuum-limit-roadmap}

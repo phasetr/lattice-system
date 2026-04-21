@@ -1312,6 +1312,54 @@ theorem jwString_anticomm_onSite_pos_spinHalfOpPlus
     _ = 0 * M := by rw [neg_add_cancel]
     _ = 0 := Matrix.zero_mul _
 
+/-- Companion anticommutator at an interior site with the lowering
+operator: for every `i j : Fin (N + 1)` with `i.val < j.val`,
+
+  `σ^-_i · jwString N j + jwString N j · σ^-_i = 0`.
+
+Derived from the `σ^+_i` version
+(`jwString_anticomm_onSite_pos_spinHalfOpPlus`) by matrix
+`conjTranspose`, using `jwString_isHermitian` and
+`spinHalfOpPlus_conjTranspose` (`(σ^+)† = σ^-`). -/
+theorem jwString_anticomm_onSite_pos_spinHalfOpMinus
+    (N : ℕ) (i j : Fin (N + 1)) (hij : i.val < j.val) :
+    onSite i spinHalfOpMinus * jwString N j +
+      jwString N j * onSite i spinHalfOpMinus = 0 := by
+  have h := jwString_anticomm_onSite_pos_spinHalfOpPlus N i j hij
+  have h2 := congrArg Matrix.conjTranspose h
+  simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_mul,
+    Matrix.conjTranspose_zero, (jwString_isHermitian N j).eq] at h2
+  have hplus : (onSite i spinHalfOpPlus)ᴴ = onSite i spinHalfOpMinus := by
+    rw [onSite_conjTranspose, spinHalfOpPlus_conjTranspose]
+  rw [hplus] at h2
+  -- h2 : JW_j · σ^-_i + σ^-_i · JW_j = 0; goal: σ^-_i · JW_j + JW_j · σ^-_i = 0
+  exact (add_comm _ _).trans h2
+
+/-! ## JW string commutativity (any two strings commute)
+
+Every `jwString N i` is a product of `σ^z` operators at distinct
+sites, each of which is self-inverse (`σ^z · σ^z = 1`) and pairwise
+commuting (`onSite_mul_onSite_of_ne`). Consequently any two
+Jordan-Wigner strings `jwString N i` and `jwString N j` commute —
+a combinatorial fact used in the fully general cross-site CAR
+(#210). -/
+
+/-- Two Jordan-Wigner strings commute. Both are built as
+`Finset.noncommProd` over subsets of `Fin (N + 1)` of the function
+`k ↦ onSite k pauliZ`; every cross pair lies at distinct sites so
+`onSite_mul_onSite_of_ne` applies term-wise. -/
+theorem jwString_commute_jwString (N : ℕ) (i j : Fin (N + 1)) :
+    Commute (jwString N i) (jwString N j) := by
+  unfold jwString
+  apply Finset.noncommProd_commute
+  intro a ha
+  apply Commute.symm
+  apply Finset.noncommProd_commute
+  intro b hb
+  by_cases hab : a = b
+  · subst hab
+    exact Commute.refl _
+  · exact onSite_mul_onSite_of_ne hab pauliZ pauliZ
 
 /-! ## General cross-site CAR at site zero (`{c_0, c_k} = 0`, `k ≥ 1`)
 
@@ -1557,6 +1605,173 @@ theorem fermionMultiCreation_annihilation_anticomm_zero_pos
         fermionMultiCreation N (0 : Fin (N + 1)) *
           fermionMultiAnnihilation N k from add_comm _ _]
   exact h2
+
+/-! ## Fully general cross-site CAR for arbitrary `i < j` (#210)
+
+For every `i j : Fin (N + 1)` with `i.val < j.val`,
+
+  `c_i · c_j + c_j · c_i = 0`   (and the three dual / mixed forms).
+
+The (0, k) special case was #208, #211. This section closes the
+general case via the interior-site JW string anticommutator
+(`jwString_anticomm_onSite_pos_spinHalfOpPlus{,Minus}`) together
+with the JW string commutativity lemma
+(`jwString_commute_jwString`). -/
+
+/-- Fully general cross-site CAR for annihilation operators:
+`c_i · c_j + c_j · c_i = 0` for every `i j : Fin (N + 1)` with
+`i.val < j.val`.
+
+Proof: write `c_i = JW_i · σ^+_i`, `c_j = JW_j · σ^+_j`. Using
+commutativity of `σ^+_i` with `JW_i` (`jwString_commute_onSite`)
+and the anticommutator `{σ^+_i, JW_j} = 0` (for `i < j`),
+
+  `c_i c_j = JW_i · σ^+_i · JW_j · σ^+_j = -JW_i · JW_j · σ^+_i · σ^+_j`,
+  `c_j c_i = JW_j · σ^+_j · JW_i · σ^+_i =  JW_j · JW_i · σ^+_i · σ^+_j`,
+
+and the two `JW_i · JW_j`, `JW_j · JW_i` agree by
+`jwString_commute_jwString`, so the sum collapses. -/
+theorem fermionMultiAnnihilation_anticomm_lt
+    (N : ℕ) (i j : Fin (N + 1)) (hij : i.val < j.val) :
+    fermionMultiAnnihilation N i * fermionMultiAnnihilation N j +
+      fermionMultiAnnihilation N j * fermionMultiAnnihilation N i = 0 := by
+  have h_ne : i ≠ j := by
+    intro h
+    exact absurd (congrArg Fin.val h) (by omega)
+  have h_anticomm : onSite i spinHalfOpPlus * jwString N j +
+      jwString N j * onSite i spinHalfOpPlus = 0 :=
+    jwString_anticomm_onSite_pos_spinHalfOpPlus N i j hij
+  have hcomm_JWi_JWj : Commute (jwString N i) (jwString N j) :=
+    jwString_commute_jwString N i j
+  have hcomm_plus_i_JWi : Commute (onSite i spinHalfOpPlus) (jwString N i) :=
+    (jwString_commute_onSite N i spinHalfOpPlus).symm
+  have hcomm_plus_j_JWi :
+      Commute (onSite j spinHalfOpPlus) (jwString N i) := by
+    unfold jwString
+    apply Finset.noncommProd_commute
+    intro k hk
+    rw [Finset.mem_filter] at hk
+    have hkj : k ≠ j := by
+      intro h; rw [h] at hk; exact absurd hk.2 (lt_asymm hij)
+    exact onSite_mul_onSite_of_ne hkj.symm spinHalfOpPlus pauliZ
+  have hcomm_plus_i_plus_j : onSite i spinHalfOpPlus * onSite j spinHalfOpPlus
+      = onSite j spinHalfOpPlus * onSite i spinHalfOpPlus :=
+    onSite_mul_onSite_of_ne h_ne _ _
+  unfold fermionMultiAnnihilation
+  set A := onSite i spinHalfOpPlus
+  set B := onSite j spinHalfOpPlus
+  set JWi := jwString N i
+  set JWj := jwString N j
+  -- Goal: (JWi * A) * (JWj * B) + (JWj * B) * (JWi * A) = 0
+  have hAJ : A * JWj = -(JWj * A) := by
+    have := h_anticomm
+    rw [add_eq_zero_iff_eq_neg] at this
+    exact this
+  have hBJ : B * JWi = JWi * B := hcomm_plus_j_JWi.eq
+  have hAB : A * B = B * A := hcomm_plus_i_plus_j
+  have hJJ : JWi * JWj = JWj * JWi := hcomm_JWi_JWj.eq
+  have step_ci_cj : (JWi * A) * (JWj * B) =
+      -(JWi * JWj * A * B) := by
+    rw [show (JWi * A) * (JWj * B) = JWi * (A * JWj) * B by noncomm_ring]
+    rw [hAJ]
+    noncomm_ring
+  have step_cj_ci : (JWj * B) * (JWi * A) =
+      JWj * JWi * A * B := by
+    rw [show (JWj * B) * (JWi * A) = JWj * (B * JWi) * A by noncomm_ring]
+    rw [hBJ]
+    rw [show JWj * (JWi * B) * A = JWj * JWi * (B * A) by noncomm_ring]
+    rw [← hAB]
+    noncomm_ring
+  rw [step_ci_cj, step_cj_ci, hJJ]
+  abel
+
+/-- Companion: for every `i j` with `i.val < j.val`,
+
+  `c_i† · c_j† + c_j† · c_i† = 0`.
+
+Derived via matrix `conjTranspose` from
+`fermionMultiAnnihilation_anticomm_lt`. -/
+theorem fermionMultiCreation_anticomm_lt
+    (N : ℕ) (i j : Fin (N + 1)) (hij : i.val < j.val) :
+    fermionMultiCreation N i * fermionMultiCreation N j +
+      fermionMultiCreation N j * fermionMultiCreation N i = 0 := by
+  have h := fermionMultiAnnihilation_anticomm_lt N i j hij
+  have h2 := congrArg Matrix.conjTranspose h
+  simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_mul,
+    fermionMultiAnnihilation_conjTranspose,
+    Matrix.conjTranspose_zero] at h2
+  -- h2 : c_j† c_i† + c_i† c_j† = 0; goal: c_i† c_j† + c_j† c_i† = 0
+  exact (add_comm _ _).trans h2
+
+/-- Mixed `{c_i, c_j†} = 0` for every `i j : Fin (N + 1)` with
+`i.val < j.val`. Same proof structure as
+`fermionMultiAnnihilation_anticomm_lt`: `σ^-_j` at site `j` is
+replaced by `σ^-_j` (still commutes with `σ^+_i` since `i ≠ j`).
+-/
+theorem fermionMultiAnnihilation_creation_anticomm_lt
+    (N : ℕ) (i j : Fin (N + 1)) (hij : i.val < j.val) :
+    fermionMultiAnnihilation N i * fermionMultiCreation N j +
+      fermionMultiCreation N j * fermionMultiAnnihilation N i = 0 := by
+  have h_ne : i ≠ j := by
+    intro h
+    exact absurd (congrArg Fin.val h) (by omega)
+  have h_anticomm : onSite i spinHalfOpPlus * jwString N j +
+      jwString N j * onSite i spinHalfOpPlus = 0 :=
+    jwString_anticomm_onSite_pos_spinHalfOpPlus N i j hij
+  have hcomm_JWi_JWj : Commute (jwString N i) (jwString N j) :=
+    jwString_commute_jwString N i j
+  have hcomm_minus_j_JWi :
+      Commute (onSite j spinHalfOpMinus) (jwString N i) := by
+    unfold jwString
+    apply Finset.noncommProd_commute
+    intro k hk
+    rw [Finset.mem_filter] at hk
+    have hkj : k ≠ j := by
+      intro h; rw [h] at hk; exact absurd hk.2 (lt_asymm hij)
+    exact onSite_mul_onSite_of_ne hkj.symm spinHalfOpMinus pauliZ
+  have hcomm_plus_i_minus_j :
+      onSite i spinHalfOpPlus * onSite j spinHalfOpMinus
+      = onSite j spinHalfOpMinus * onSite i spinHalfOpPlus :=
+    onSite_mul_onSite_of_ne h_ne _ _
+  unfold fermionMultiAnnihilation fermionMultiCreation
+  set A := onSite i spinHalfOpPlus
+  set B := onSite j spinHalfOpMinus
+  set JWi := jwString N i
+  set JWj := jwString N j
+  have hAJ : A * JWj = -(JWj * A) := by
+    have := h_anticomm
+    rw [add_eq_zero_iff_eq_neg] at this
+    exact this
+  have hBJ : B * JWi = JWi * B := hcomm_minus_j_JWi.eq
+  have hAB : A * B = B * A := hcomm_plus_i_minus_j
+  have hJJ : JWi * JWj = JWj * JWi := hcomm_JWi_JWj.eq
+  have step_ci_cjd : (JWi * A) * (JWj * B) = -(JWi * JWj * A * B) := by
+    rw [show (JWi * A) * (JWj * B) = JWi * (A * JWj) * B by noncomm_ring]
+    rw [hAJ]
+    noncomm_ring
+  have step_cjd_ci : (JWj * B) * (JWi * A) = JWj * JWi * A * B := by
+    rw [show (JWj * B) * (JWi * A) = JWj * (B * JWi) * A by noncomm_ring]
+    rw [hBJ]
+    rw [show JWj * (JWi * B) * A = JWj * JWi * (B * A) by noncomm_ring]
+    rw [← hAB]
+    noncomm_ring
+  rw [step_ci_cjd, step_cjd_ci, hJJ]
+  abel
+
+/-- Mixed dual `{c_i†, c_j} = 0` for every `i j : Fin (N + 1)` with
+`i.val < j.val`. Derived via matrix `conjTranspose` from
+`fermionMultiAnnihilation_creation_anticomm_lt`. -/
+theorem fermionMultiCreation_annihilation_anticomm_lt
+    (N : ℕ) (i j : Fin (N + 1)) (hij : i.val < j.val) :
+    fermionMultiCreation N i * fermionMultiAnnihilation N j +
+      fermionMultiAnnihilation N j * fermionMultiCreation N i = 0 := by
+  have h := fermionMultiAnnihilation_creation_anticomm_lt N i j hij
+  have h2 := congrArg Matrix.conjTranspose h
+  simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_mul,
+    fermionMultiAnnihilation_conjTranspose,
+    fermionMultiCreation_conjTranspose,
+    Matrix.conjTranspose_zero] at h2
+  exact (add_comm _ _).trans h2
 
 /-! ## Number / annihilation-creation commutators -/
 
