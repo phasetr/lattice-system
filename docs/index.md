@@ -811,6 +811,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardHamiltonianOnGraph_mulVec_vacuum` / `hubbardChainHamiltonian_mulVec_vacuum` | both graph-built Hubbard Hamiltonians annihilate the JW vacuum | `Fermion/JordanWigner.lean` |
 | `hubbardChainGibbsState N β J U` | Gibbs state of the 1D Hubbard chain | `Fermion/JordanWigner.lean` |
 | `hubbardChainGibbsState_isHermitian` / `hubbardChainGibbsState_commute_hamiltonian` | Hermiticity (real `J, U`) and commute with the Hamiltonian | `Fermion/JordanWigner.lean` |
+| `hubbardCycleGibbsState_commute_hamiltonian` | the periodic Hubbard Gibbs state commutes with the periodic Hubbard Hamiltonian (companion of the open-chain version, free corollary of `gibbsState_commute_hamiltonian`) | `Fermion/JordanWigner.lean` |
 
 ## Continuum-limit roadmap
 
