@@ -26,3 +26,4 @@ import LatticeSystem.Tests.Graph
 import LatticeSystem.Tests.Heisenberg
 import LatticeSystem.Tests.Hubbard
 import LatticeSystem.Tests.JordanWigner
+import LatticeSystem.Tests.Ising
