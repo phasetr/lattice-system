@@ -112,4 +112,43 @@ theorem jwStringAbstract_eq_jwString (N : ℕ) (i : Fin (N + 1)) :
     jwStringAbstract i = jwString N i :=
   rfl
 
+/-! ## Abstract fermion creation / annihilation / number operators -/
+
+open LatticeSystem.Quantum in
+/-- Abstract fermion annihilation at site `i`: JW string times
+single-site raising operator `σ^+`. -/
+noncomputable def fermionAnnihilationAbstract (i : Λ) : ManyBodyOp Λ :=
+  jwStringAbstract i * onSite i spinHalfOpPlus
+
+open LatticeSystem.Quantum in
+/-- Abstract fermion creation at site `i`: JW string times
+single-site lowering operator `σ^-`. -/
+noncomputable def fermionCreationAbstract (i : Λ) : ManyBodyOp Λ :=
+  jwStringAbstract i * onSite i spinHalfOpMinus
+
+open LatticeSystem.Quantum in
+/-- Abstract fermion site-occupation number `n_i = c_i† · c_i`. -/
+noncomputable def fermionNumberAbstract (i : Λ) : ManyBodyOp Λ :=
+  fermionCreationAbstract i * fermionAnnihilationAbstract i
+
+/-- Bridge: abstract annihilation on `Fin (N+1)` equals the
+existing `fermionMultiAnnihilation`. -/
+theorem fermionAnnihilationAbstract_eq_fermionMultiAnnihilation
+    (N : ℕ) (i : Fin (N + 1)) :
+    fermionAnnihilationAbstract i = fermionMultiAnnihilation N i :=
+  rfl
+
+/-- Bridge: abstract creation on `Fin (N+1)` equals the existing
+`fermionMultiCreation`. -/
+theorem fermionCreationAbstract_eq_fermionMultiCreation
+    (N : ℕ) (i : Fin (N + 1)) :
+    fermionCreationAbstract i = fermionMultiCreation N i :=
+  rfl
+
+/-- Bridge for the number operator. -/
+theorem fermionNumberAbstract_eq_fermionMultiNumber
+    (N : ℕ) (i : Fin (N + 1)) :
+    fermionNumberAbstract i = fermionMultiNumber N i :=
+  rfl
+
 end LatticeSystem.Fermion
