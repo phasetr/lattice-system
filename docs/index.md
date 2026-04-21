@@ -751,6 +751,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardKinetic_mulVec_vacuum` / `hubbardOnSiteInteraction_mulVec_vacuum` / `hubbardHamiltonian_mulVec_vacuum` | each annihilates the vacuum (so `|vac⟩` is a 0-energy / 0-particle eigenstate) | `Fermion/JordanWigner.lean` |
 | `spinfulIndex_up_ne_down` | the up-channel position `2 i` is never the down-channel position `2 j + 1` | `Fermion/JordanWigner.lean` |
 | `fermionTotalDownNumber_commute_fermionUp{Creation,Annihilation,Number}` and the dual `fermionTotalUpNumber_commute_fermionDown{Creation,Annihilation,Number}` | the spinful number on one species commutes with every operator of the other species (different JW positions) | `Fermion/JordanWigner.lean` |
+| `fermionTotalDownNumber_commute_upHopping` / `fermionTotalUpNumber_commute_downHopping` | the spinful same-σ hopping term `c_{iσ}† c_{jσ}` commutes with the opposite-spin total number `N_{σ'≠σ}` (cross-spin half of `[H_kinetic, N_σ] = 0`) | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
