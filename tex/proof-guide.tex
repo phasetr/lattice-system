@@ -3758,6 +3758,53 @@ $\{c_i, c_j\} = 0$ for $i \neq j$ are deferred to follow-up PRs.
 They require careful tracking of sign cancellations from the JW
 string $\sigma^z$ acting on intermediate sites between $i$ and $j$.
 
+\section{Continuum-limit roadmap (Phase A scaffold)}
+\label{sec:continuum-limit-roadmap}
+%======================================================================
+
+The project's long-term goals include the $\varphi^4$ / Ising
+continuum limit and lattice-QCD-style formalisations, both of which
+are defined as limits $a \to 0$ of families of finite-spacing lattice
+systems. The gap between the current finite-volume matrix framework
+and what the continuum limit actually requires is surveyed in
+\texttt{.self-local/docs/continuum-limit-survey.md}, which proposes
+the following four phases:
+
+\begin{description}
+\item[Phase A (now, scaffold).] Add a \emph{thin} type-level tag
+\begin{verbatim}
+class LatticeWithSpacing (L : Type*) where
+  spacing : NNReal
+\end{verbatim}
+attaching a lattice spacing $a : \mathbb{R}_{\geq 0}$ to the abstract
+vertex type $\Lambda$. A default instance supplies
+$\texttt{spacing} = 1$ on $\texttt{Fin}(N+1)$, so every pre-existing
+Hamiltonian is \texttt{rfl}-equivalent to its unit-spacing
+specialisation. No geometry, no rescaling, no continuum object.
+\item[Phase B (deferred).] Lattice sequences $\Lambda_n$ with
+$a_n \to 0$, rescaling of coupling constants
+$J_n = \hat h \cdot a_n^{-2+d}$, and lattice-point embeddings in
+$\mathbb{R}^d$.
+\item[Phase C (deferred).] Operator-valued distribution / GNS /
+Hilbert-space infrastructure. Per codex consultation (2026-04-22),
+we do \emph{not} generalise
+$\texttt{ManyBodyOp}\,\Lambda = \texttt{Matrix}\,\_\,\_\,\mathbb{C}$
+to a type class preemptively: existing proofs depend on
+Matrix-specific API (\texttt{conjTranspose}, \texttt{exp},
+\texttt{trace}, \texttt{mulVec}, entry formulas). Refactor only when
+a second concrete backend (infinite-volume Hilbert space, quasi-local
+$C^*$-algebra) materialises.
+\item[Phase D (deferred).] Running couplings $g : \mathbb{R}_{>0} \to
+\mathbb{R}$ and renormalisation-group transformations.
+\end{description}
+
+The Phase A module \texttt{LatticeSystem/Lattice/Scale.lean} exports
+the class \texttt{LatticeWithSpacing}, the accessor
+\texttt{spacingOf\,}$\Lambda$, the default instance
+\texttt{instLatticeWithSpacingFinSucc}, and the simp lemmas
+\texttt{spacing\_fin\_succ}, \texttt{spacingOf\_fin\_succ}. Tests
+pinning these values are in \texttt{LatticeSystem/Tests/Scale.lean}.
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
