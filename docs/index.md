@@ -836,6 +836,9 @@ phases B-C.
 | `spacingOf` | `spacingOf Λ := LatticeWithSpacing.spacing` — named accessor | `Lattice/Scale.lean` |
 | `instLatticeWithSpacingFinSucc` | default `spacing := 1` instance for `Fin (N + 1)`, making every existing Hamiltonian `rfl`-equivalent to the unit-spacing specialisation | `Lattice/Scale.lean` |
 | `spacing_fin_succ` / `spacingOf_fin_succ` | `spacing = 1` computed at `Fin (N + 1)` | `Lattice/Scale.lean` |
+| `instLatticeWithSpacingInt` | default `spacing := 1` instance for `ℤ` (infinite chain — matches `integerChainGraph`) | `Lattice/Scale.lean` |
+| `instLatticeWithSpacingIntSq` | default `spacing := 1` instance for `ℤ × ℤ` (infinite 2D square lattice — matches `integerSquareLatticeGraph`) | `Lattice/Scale.lean` |
+| `spacing_int` / `spacingOf_int` / `spacing_int_sq` / `spacingOf_int_sq` | `spacing = 1` computed at `ℤ`, `ℤ × ℤ` | `Lattice/Scale.lean` |
 
 ## Open items / axioms
 
