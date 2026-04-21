@@ -193,4 +193,16 @@ example (f : Fin 3 → Fin 3 → ℕ) :
     = ∑ i : Fin 2, (f i.castSucc i.succ + f i.succ i.castSucc) :=
   LatticeSystem.Lattice.sum_pathGraph_adj 2 f
 
+/-! ## Periodic Ising chain Gibbs state -/
+
+/-- Periodic Ising Gibbs state Hermiticity. -/
+example (N : ℕ) (β J h : ℝ) :
+    (isingCycleGibbsState N β J h).IsHermitian :=
+  isingCycleGibbsState_isHermitian N β J h
+
+/-- Periodic Ising Gibbs state commutes with Hamiltonian. -/
+example (N : ℕ) (β J h : ℝ) :
+    Commute (isingCycleGibbsState N β J h) (isingCycleHamiltonian N J h) :=
+  isingCycleGibbsState_commute_hamiltonian N β J h
+
 end LatticeSystem.Tests.Ising
