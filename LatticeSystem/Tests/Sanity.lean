@@ -6,6 +6,7 @@ import LatticeSystem.Quantum.Pauli
 import LatticeSystem.Quantum.SpinHalfBasis
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Quantum.HeisenbergChain
+import LatticeSystem.Quantum.IsingChain
 
 /-!
 # Sanity / regression test suite
@@ -116,5 +117,17 @@ example (J : ℝ) :
     (heisenbergHamiltonian
         (couplingOf (SimpleGraph.pathGraph 2) (-(J : ℂ)))).IsHermitian :=
   heisenbergHamiltonian_couplingOf_isHermitian _ (by simp)
+
+/-! ## Generic Ising Hamiltonian Hermiticity -/
+
+/-- The generic Ising Hamiltonian on `pathGraph 2` with real `-J`
+edge weight and real field `h` is Hermitian. -/
+example (J h : ℝ) :
+    (isingHamiltonianGeneric
+        (couplingOf (SimpleGraph.pathGraph 2) (-(J : ℂ)))
+        (h : ℂ)).IsHermitian :=
+  isingHamiltonianGeneric_isHermitian
+    (LatticeSystem.Lattice.couplingOf_real _ (by simp))
+    (by simp)
 
 end LatticeSystem.Tests

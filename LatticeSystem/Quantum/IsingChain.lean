@@ -37,6 +37,73 @@ open Matrix
 
 variable {N : ℕ}
 
+/-! ## Generic (graph-friendly) Ising operators
+
+These mirror the structure of `spinHalfDot` and
+`heisenbergHamiltonian`: the bond operator `spinZDot x y` and the
+Hamiltonian `isingHamiltonianGeneric J h` work for any finite
+vertex type `Λ` with a pairwise coupling `J : Λ → Λ → ℂ`. -/
+
+/-- The Ising bond operator: `σ^z_x · σ^z_y` on the many-body
+space. For `x = y` this collapses to `(σ^z_x)^2 = I`; in practical
+use one passes a coupling `J` that vanishes on the diagonal (e.g.
+`couplingOf G c`). -/
+noncomputable def spinZDot {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (x y : Λ) : ManyBodyOp Λ :=
+  onSite x pauliZ * onSite y pauliZ
+
+/-- `spinZDot x y` is Hermitian: distinct sites commute, so the
+product of two commuting Hermitian matrices is Hermitian; the
+`x = y` case is `(σ^z)^2`, also Hermitian. -/
+theorem spinZDot_isHermitian {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (x y : Λ) : (spinZDot x y).IsHermitian := by
+  by_cases hxy : x = y
+  · subst hxy
+    have h := onSite_isHermitian x pauliZ_isHermitian
+    exact Matrix.IsHermitian.mul_of_commute h h rfl
+  · exact Matrix.IsHermitian.mul_of_commute
+      (onSite_isHermitian x pauliZ_isHermitian)
+      (onSite_isHermitian y pauliZ_isHermitian)
+      (onSite_mul_onSite_of_ne hxy pauliZ pauliZ)
+
+/-- The generic Ising Hamiltonian on any finite vertex set `Λ`
+with pairwise coupling `J` and uniform transverse field `h`:
+`H = Σ_{x,y} J(x,y) σ^z_x σ^z_y − h Σ_x σ^x_x`.
+For graph-defined Ising one passes `J = couplingOf G (-c/2)` with
+edge weight `c`; the standard chain version corresponds to the
+path graph. -/
+noncomputable def isingHamiltonianGeneric
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (J : Λ → Λ → ℂ) (h : ℂ) : ManyBodyOp Λ :=
+  ∑ x : Λ, ∑ y : Λ, J x y • spinZDot x y - h • ∑ x : Λ, onSite x pauliX
+
+/-- The generic Ising Hamiltonian is Hermitian for entry-wise real
+`J` and real `h`. Since each `spinZDot x y` is Hermitian and number
+operators commute pairwise, real `J` already suffices (no symmetry
+hypothesis needed; the matrix structure absorbs it). -/
+theorem isingHamiltonianGeneric_isHermitian
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    {J : Λ → Λ → ℂ} (hreal : ∀ x y, star (J x y) = J x y)
+    {h : ℂ} (hh : star h = h) :
+    (isingHamiltonianGeneric J h).IsHermitian := by
+  unfold isingHamiltonianGeneric Matrix.IsHermitian
+  rw [Matrix.conjTranspose_sub]
+  refine congrArg₂ _ ?_ ?_
+  · rw [Matrix.conjTranspose_sum]
+    refine Finset.sum_congr rfl (fun x _ => ?_)
+    rw [Matrix.conjTranspose_sum]
+    refine Finset.sum_congr rfl (fun y _ => ?_)
+    rw [Matrix.conjTranspose_smul, (spinZDot_isHermitian x y).eq, hreal]
+  · rw [Matrix.conjTranspose_smul]
+    have hsumH : (∑ x : Λ, onSite x pauliX).IsHermitian := by
+      classical
+      induction (Finset.univ : Finset Λ) using Finset.induction_on with
+      | empty => simp [Matrix.IsHermitian]
+      | @insert a t hns ih =>
+        rw [Finset.sum_insert hns]
+        exact Matrix.IsHermitian.add (onSite_isHermitian a pauliX_isHermitian) ih
+    rw [hsumH.eq, hh]
+
 /-- Site-`i` `σ^z` operator on the `N + 1`-site many-body space. -/
 noncomputable def spinZ (N : ℕ) (i : Fin (N + 1)) : ManyBodyOp (Fin (N + 1)) :=
   onSite i pauliZ
