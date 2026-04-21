@@ -23,3 +23,4 @@ import LatticeSystem.Fermion.Mode
 import LatticeSystem.Fermion.JordanWigner
 import LatticeSystem.Tests.Sanity
 import LatticeSystem.Tests.Graph
+import LatticeSystem.Tests.Heisenberg
