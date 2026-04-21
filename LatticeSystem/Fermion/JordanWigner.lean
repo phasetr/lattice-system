@@ -1626,4 +1626,40 @@ theorem fermionGenericGibbsState_commute_hamiltonian
       (fermionGenericHamiltonian N t V) :=
   LatticeSystem.Quantum.gibbsState_commute_hamiltonian β _
 
+/-! ## Fermion vacuum state
+
+The Jordan–Wigner vacuum is the all-up many-body basis vector
+`|↑↑…↑⟩`, since `c_i = jwString N i · σ^+_i` and
+`σ^+ |↑⟩ = 0` site-locally. -/
+
+/-- The fermion vacuum state on `Fin (N + 1)` JW modes: the
+many-body computational-basis vector `|↑↑…↑⟩`. -/
+noncomputable def fermionMultiVacuum (N : ℕ) : (Fin (N + 1) → Fin 2) → ℂ :=
+  LatticeSystem.Quantum.basisVec (fun _ : Fin (N + 1) => (0 : Fin 2))
+
+/-- The vacuum is annihilated by every fermion annihilation
+operator: `c_i · |vac⟩ = 0` for every site `i`. Proof:
+`c_i = jwString N i · σ^+_i`; the inner factor `σ^+_i` acts on
+`|↑↑…↑⟩` by sending its site-`i` entry through `σ^+`, but
+`σ^+ k 0 = 0` for both `k = 0, 1` since `σ^+ = !![0,1;0,0]`,
+so the result vanishes; the outer `jwString` factor then maps
+zero to zero. -/
+theorem fermionMultiAnnihilation_mulVec_vacuum
+    (N : ℕ) (i : Fin (N + 1)) :
+    (fermionMultiAnnihilation N i).mulVec (fermionMultiVacuum N) = 0 := by
+  unfold fermionMultiAnnihilation fermionMultiVacuum
+  rw [← Matrix.mulVec_mulVec]
+  have hinner : (LatticeSystem.Quantum.onSite i spinHalfOpPlus).mulVec
+      (LatticeSystem.Quantum.basisVec
+        (fun _ : Fin (N + 1) => (0 : Fin 2))) = 0 := by
+    rw [LatticeSystem.Quantum.onSite_mulVec_basisVec]
+    funext τ
+    apply Finset.sum_eq_zero
+    intro k _
+    show spinHalfOpPlus k 0 *
+      LatticeSystem.Quantum.basisVec
+        (Function.update (fun _ => (0 : Fin 2)) i k) τ = 0
+    fin_cases k <;> simp [spinHalfOpPlus]
+  rw [hinner, Matrix.mulVec_zero]
+
 end LatticeSystem.Fermion

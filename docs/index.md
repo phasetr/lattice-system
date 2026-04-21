@@ -712,6 +712,8 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionGenericGibbsState N β t V` | Gibbs state `gibbsState β (H_hop + V_int)` for the Hubbard-skeleton Hamiltonian | `Fermion/JordanWigner.lean` |
 | `fermionGenericGibbsState_isHermitian` | Hermiticity (when `t` is Hermitian and `V` is real) | `Fermion/JordanWigner.lean` |
 | `fermionGenericGibbsState_commute_hamiltonian` | `Commute ρ_β H` (always true for the Gibbs state of any operator with itself) | `Fermion/JordanWigner.lean` |
+| `fermionMultiVacuum N` | the JW vacuum on `Fin (N+1)` modes — the all-up many-body basis vector `|↑↑…↑⟩` | `Fermion/JordanWigner.lean` |
+| `fermionMultiAnnihilation_mulVec_vacuum` | every annihilation operator kills the vacuum: `(c_i).mulVec (fermionMultiVacuum N) = 0` | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
