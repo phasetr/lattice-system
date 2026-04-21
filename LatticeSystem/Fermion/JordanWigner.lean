@@ -2316,6 +2316,25 @@ theorem hubbardChainHamiltonian_commute_fermionTotalNumber
       (fermionTotalNumber (2 * N + 1)) :=
   hubbardHamiltonianOnGraph_commute_fermionTotalNumber N _ _ _
 
+/-- `hubbardHamiltonianOnGraph` annihilates the vacuum. Both
+`hubbardKinetic` and `hubbardOnSiteInteraction` do, by PR #166. -/
+theorem hubbardHamiltonianOnGraph_mulVec_vacuum
+    (N : ℕ) (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj]
+    (J U : ℂ) :
+    (hubbardHamiltonianOnGraph N G J U).mulVec
+      (fermionMultiVacuum (2 * N + 1)) = 0 := by
+  unfold hubbardHamiltonianOnGraph hubbardKineticOnGraph
+  rw [Matrix.add_mulVec, hubbardKinetic_mulVec_vacuum,
+    hubbardOnSiteInteraction_mulVec_vacuum, add_zero]
+
+/-- The 1D Hubbard chain Hamiltonian annihilates the vacuum. Free
+corollary of `hubbardHamiltonianOnGraph_mulVec_vacuum`. -/
+theorem hubbardChainHamiltonian_mulVec_vacuum
+    (N : ℕ) (J U : ℝ) :
+    (hubbardChainHamiltonian N J U).mulVec
+      (fermionMultiVacuum (2 * N + 1)) = 0 :=
+  hubbardHamiltonianOnGraph_mulVec_vacuum N _ _ _
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`
