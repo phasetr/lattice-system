@@ -1385,6 +1385,76 @@ theorem fermionMultiCreation_anticomm_zero_pos
           fermionMultiCreation N k from add_comm _ _]
   exact h2
 
+/-- Mixed cross-site CAR `{c_0, c_k†} = 0` for every `k : Fin (N + 1)`
+with `0 < k.val`. Proof: identical structure to
+`fermionMultiAnnihilation_anticomm_zero_pos`, since `c_k†` differs
+from `c_k` only by the single-site factor at `k` (`σ^-_k` instead of
+`σ^+_k`); the JW-string part is unchanged. Generalises
+`fermionMultiAnnihilation_creation_anticomm_zero_one` and
+`fermionMultiAnnihilation_creation_anticomm_zero_two_general`. -/
+theorem fermionMultiAnnihilation_creation_anticomm_zero_pos
+    (N : ℕ) (k : Fin (N + 1)) (hk : 0 < k.val) :
+    fermionMultiAnnihilation N (0 : Fin (N + 1)) *
+        fermionMultiCreation N k +
+      fermionMultiCreation N k *
+        fermionMultiAnnihilation N 0 = 0 := by
+  rw [fermionMultiAnnihilation_zero]
+  have hm : k.val - 1 + 1 < N + 1 := by
+    have := k.isLt; omega
+  have hkeq : k = ⟨k.val - 1 + 1, hm⟩ := by
+    apply Fin.ext
+    change k.val = k.val - 1 + 1
+    omega
+  have h_ne : (0 : Fin (N + 1)) ≠ k := by
+    intro h
+    exact absurd (congrArg Fin.val h) (by
+      change (0 : ℕ) ≠ k.val
+      omega)
+  unfold fermionMultiCreation
+  set A := onSite (0 : Fin (N + 1)) spinHalfOpPlus
+  set B := jwString N k
+  set M := onSite k spinHalfOpMinus
+  have hcomm_AM : A * M = M * A :=
+    onSite_mul_onSite_of_ne h_ne _ _
+  have hanticomm : A * B + B * A = 0 := by
+    change onSite (0 : Fin (N + 1)) spinHalfOpPlus * jwString N k +
+      jwString N k * onSite (0 : Fin (N + 1)) spinHalfOpPlus = 0
+    rw [hkeq]
+    exact jwString_anticomm_onSite_zero_spinHalfOpPlus N (k.val - 1) hm
+  calc A * (B * M) + B * M * A
+      = A * B * M + B * M * A := by rw [← Matrix.mul_assoc]
+    _ = A * B * M + B * (M * A) := by rw [Matrix.mul_assoc B]
+    _ = A * B * M + B * (A * M) := by rw [← hcomm_AM]
+    _ = A * B * M + B * A * M := by rw [← Matrix.mul_assoc B]
+    _ = (A * B + B * A) * M := by rw [Matrix.add_mul]
+    _ = 0 * M := by rw [hanticomm]
+    _ = 0 := Matrix.zero_mul _
+
+/-- Mixed cross-site CAR `{c_0†, c_k} = 0` for every `k : Fin (N + 1)`
+with `0 < k.val`, via `conjTranspose` of
+`fermionMultiAnnihilation_creation_anticomm_zero_pos`. -/
+theorem fermionMultiCreation_annihilation_anticomm_zero_pos
+    (N : ℕ) (k : Fin (N + 1)) (hk : 0 < k.val) :
+    fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiAnnihilation N k +
+      fermionMultiAnnihilation N k *
+        fermionMultiCreation N 0 = 0 := by
+  have h := fermionMultiAnnihilation_creation_anticomm_zero_pos N k hk
+  have h2 := congrArg Matrix.conjTranspose h
+  simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_mul,
+    fermionMultiAnnihilation_conjTranspose,
+    fermionMultiCreation_conjTranspose,
+    Matrix.conjTranspose_zero] at h2
+  rw [show fermionMultiCreation N (0 : Fin (N + 1)) *
+          fermionMultiAnnihilation N k +
+        fermionMultiAnnihilation N k *
+          fermionMultiCreation N (0 : Fin (N + 1)) =
+      fermionMultiAnnihilation N k *
+          fermionMultiCreation N (0 : Fin (N + 1)) +
+        fermionMultiCreation N (0 : Fin (N + 1)) *
+          fermionMultiAnnihilation N k from add_comm _ _]
+  exact h2
+
 /-! ## Number / annihilation-creation commutators -/
 
 /-- Standard fermion algebra: `[n_i, c_i] = -c_i`. -/

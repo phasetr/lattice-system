@@ -117,6 +117,31 @@ example :
         fermionMultiAnnihilation 3 0 = 0 :=
   fermionMultiAnnihilation_anticomm_zero_pos 3 3 (by decide)
 
+/-- Mixed `{c_0, c_k†} = 0` for every positive `k`. -/
+example (N : ℕ) (k : Fin (N + 1)) (hk : 0 < k.val) :
+    fermionMultiAnnihilation N (0 : Fin (N + 1)) *
+        fermionMultiCreation N k +
+      fermionMultiCreation N k *
+        fermionMultiAnnihilation N 0 = 0 :=
+  fermionMultiAnnihilation_creation_anticomm_zero_pos N k hk
+
+/-- Mixed dual `{c_0†, c_k} = 0` for every positive `k`. -/
+example (N : ℕ) (k : Fin (N + 1)) (hk : 0 < k.val) :
+    fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiAnnihilation N k +
+      fermionMultiAnnihilation N k *
+        fermionMultiCreation N 0 = 0 :=
+  fermionMultiCreation_annihilation_anticomm_zero_pos N k hk
+
+/-- Mixed instance check: `k = 3` on `Fin 4` — not covered by the
+existing `_zero_one` / `_zero_two_general` mixed specialisations. -/
+example :
+    fermionMultiAnnihilation 3 (0 : Fin 4) *
+        fermionMultiCreation 3 3 +
+      fermionMultiCreation 3 3 *
+        fermionMultiAnnihilation 3 0 = 0 :=
+  fermionMultiAnnihilation_creation_anticomm_zero_pos 3 3 (by decide)
+
 /-! ## Adjoint relations -/
 
 /-- `(c_i)ᴴ = c_i†`. -/
