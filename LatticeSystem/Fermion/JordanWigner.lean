@@ -2112,6 +2112,41 @@ theorem fermionTotalSpinZ_mulVec_vacuum (N : ℕ) :
     fermionTotalUpNumber_mulVec_vacuum,
     fermionTotalDownNumber_mulVec_vacuum, sub_zero, smul_zero]
 
+/-- The Hubbard kinetic operator annihilates the vacuum. -/
+theorem hubbardKinetic_mulVec_vacuum
+    (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) :
+    (hubbardKinetic N t).mulVec (fermionMultiVacuum (2 * N + 1)) = 0 := by
+  unfold hubbardKinetic
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun σ _ => ?_)
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun j _ => ?_)
+  rw [Matrix.smul_mulVec, ← Matrix.mulVec_mulVec,
+    fermionMultiAnnihilation_mulVec_vacuum, Matrix.mulVec_zero, smul_zero]
+
+/-- The Hubbard on-site interaction annihilates the vacuum. -/
+theorem hubbardOnSiteInteraction_mulVec_vacuum (N : ℕ) (U : ℂ) :
+    (hubbardOnSiteInteraction N U).mulVec
+      (fermionMultiVacuum (2 * N + 1)) = 0 := by
+  unfold hubbardOnSiteInteraction
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  rw [Matrix.smul_mulVec]
+  unfold fermionUpNumber fermionDownNumber
+  rw [← Matrix.mulVec_mulVec, fermionMultiNumber_mulVec_vacuum,
+    Matrix.mulVec_zero, smul_zero]
+
+/-- The full Hubbard Hamiltonian annihilates the vacuum. -/
+theorem hubbardHamiltonian_mulVec_vacuum
+    (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ) :
+    (hubbardHamiltonian N t U).mulVec
+      (fermionMultiVacuum (2 * N + 1)) = 0 := by
+  unfold hubbardHamiltonian
+  rw [Matrix.add_mulVec, hubbardKinetic_mulVec_vacuum,
+    hubbardOnSiteInteraction_mulVec_vacuum, add_zero]
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`

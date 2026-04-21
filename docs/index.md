@@ -748,6 +748,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionUpNumber_mulVec_vacuum` / `fermionDownNumber_mulVec_vacuum` | each spinful site number kills the vacuum | `Fermion/JordanWigner.lean` |
 | `fermionTotalUpNumber_mulVec_vacuum` / `fermionTotalDownNumber_mulVec_vacuum` | `N_↑ · |vac⟩ = N_↓ · |vac⟩ = 0` | `Fermion/JordanWigner.lean` |
 | `fermionTotalSpinZ_mulVec_vacuum` | `S^z_tot · |vac⟩ = 0` (the vacuum is unpolarised) | `Fermion/JordanWigner.lean` |
+| `hubbardKinetic_mulVec_vacuum` / `hubbardOnSiteInteraction_mulVec_vacuum` / `hubbardHamiltonian_mulVec_vacuum` | each annihilates the vacuum (so `|vac⟩` is a 0-energy / 0-particle eigenstate) | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
