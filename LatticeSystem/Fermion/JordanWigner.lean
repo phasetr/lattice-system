@@ -1662,4 +1662,20 @@ theorem fermionMultiAnnihilation_mulVec_vacuum
     fin_cases k <;> simp [spinHalfOpPlus]
   rw [hinner, Matrix.mulVec_zero]
 
+/-- Each site-occupation number annihilates the vacuum:
+`n_i · |vac⟩ = c_i† (c_i |vac⟩) = c_i† 0 = 0`. -/
+theorem fermionMultiNumber_mulVec_vacuum (N : ℕ) (i : Fin (N + 1)) :
+    (fermionMultiNumber N i).mulVec (fermionMultiVacuum N) = 0 := by
+  unfold fermionMultiNumber
+  rw [← Matrix.mulVec_mulVec, fermionMultiAnnihilation_mulVec_vacuum,
+    Matrix.mulVec_zero]
+
+/-- The vacuum is an `N̂`-eigenstate with eigenvalue 0:
+`N̂ · |vac⟩ = (Σ_j n_j) · |vac⟩ = Σ_j (n_j · |vac⟩) = 0`. -/
+theorem fermionTotalNumber_mulVec_vacuum (N : ℕ) :
+    (fermionTotalNumber N).mulVec (fermionMultiVacuum N) = 0 := by
+  unfold fermionTotalNumber
+  rw [Matrix.sum_mulVec]
+  exact Finset.sum_eq_zero (fun i _ => fermionMultiNumber_mulVec_vacuum N i)
+
 end LatticeSystem.Fermion
