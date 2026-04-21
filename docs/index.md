@@ -744,6 +744,10 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionTotalSpinZ_commute_fermionTotalNumber` | `[S^z_tot, N̂] = 0` (spin polarisation commutes with total number) | `Fermion/JordanWigner.lean` |
 | `fermionTotalUpNumber_commute_hubbardOnSiteInteraction` / `fermionTotalDownNumber_commute_hubbardOnSiteInteraction` | `[N_↑, H_int] = [N_↓, H_int] = 0` | `Fermion/JordanWigner.lean` |
 | `fermionTotalSpinZ_commute_hubbardOnSiteInteraction` | `[S^z_tot, H_int] = 0` (free corollary) | `Fermion/JordanWigner.lean` |
+| `fermionUpAnnihilation_mulVec_vacuum` / `fermionDownAnnihilation_mulVec_vacuum` | every spinful annihilation kills the JW vacuum | `Fermion/JordanWigner.lean` |
+| `fermionUpNumber_mulVec_vacuum` / `fermionDownNumber_mulVec_vacuum` | each spinful site number kills the vacuum | `Fermion/JordanWigner.lean` |
+| `fermionTotalUpNumber_mulVec_vacuum` / `fermionTotalDownNumber_mulVec_vacuum` | `N_↑ · |vac⟩ = N_↓ · |vac⟩ = 0` | `Fermion/JordanWigner.lean` |
+| `fermionTotalSpinZ_mulVec_vacuum` | `S^z_tot · |vac⟩ = 0` (the vacuum is unpolarised) | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
