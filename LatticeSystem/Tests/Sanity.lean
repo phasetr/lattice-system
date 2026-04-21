@@ -130,4 +130,20 @@ example (J h : ℝ) :
     (LatticeSystem.Lattice.couplingOf_real _ (by simp))
     (by simp)
 
+/-! ## Ising-on-graph wrapper -/
+
+/-- The 2-site graph-Ising Hamiltonian on `pathGraph 2` is
+Hermitian. -/
+example (J h : ℝ) :
+    (isingHamiltonianOnGraph (SimpleGraph.pathGraph 2)
+        (-(J : ℂ)) (h : ℂ)).IsHermitian :=
+  isingHamiltonianOnGraph_isHermitian _ (by simp) (by simp)
+
+/-- The 3-site torus graph-Ising Hamiltonian on `cycleGraph 3` is
+Hermitian. -/
+example (J h : ℝ) :
+    (isingHamiltonianOnGraph (SimpleGraph.cycleGraph 3)
+        (-(J : ℂ)) (h : ℂ)).IsHermitian :=
+  isingHamiltonianOnGraph_isHermitian _ (by simp) (by simp)
+
 end LatticeSystem.Tests
