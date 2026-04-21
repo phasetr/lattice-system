@@ -46,7 +46,14 @@ see the
 ## Documentation
 
 - Project page: [https://phasetr.github.io/lattice-system/](https://phasetr.github.io/lattice-system/)
-- API documentation (doc-gen4): [https://phasetr.github.io/lattice-system/docs/](https://phasetr.github.io/lattice-system/docs/)
+- API documentation (doc-gen4): **currently disabled** because the
+  docs-generation CI job was consistently slow (often >1h per push
+  to `main`). To build the API docs locally, run
+  `lake build +Mathlib:docs` (or consult
+  [doc-gen4](https://github.com/leanprover-community/doc-gen4)
+  directly). The CI job is commented out in
+  `.github/workflows/lean_action_ci.yml` with a note on how to
+  re-enable.
 
 Mathematical documentation for the formalized proofs is in `tex/` as
 LaTeX source files. To compile:
