@@ -693,6 +693,8 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionHopping`, `fermionHopping_commute_fermionTotalNumber` | the general single-particle hopping `H_hop = Σ_{i,j} t_{i,j} c_i† c_j` and the proof that it commutes with `N̂` (charge conservation of the kinetic Hamiltonian) | `Fermion/JordanWigner.lean` |
 | `fermionDensityInteraction`, `fermionDensityInteraction_commute_fermionTotalNumber` | the general density–density interaction `V_int = Σ_{i,j} V_{i,j} n_i n_j` and the proof that it commutes with `N̂` (paired with `H_hop` this gives charge conservation for any Hubbard-type Hamiltonian) | `Fermion/JordanWigner.lean` |
 | `fermionGenericHamiltonian`, `fermionGenericHamiltonian_commute_fermionTotalNumber` | the canonical charge-conserving fermion Hamiltonian `H = H_hop + V_int` and the proof that `[H, N̂] = 0`, the unified statement of charge conservation for single-species Hubbard / extended Hubbard models | `Fermion/JordanWigner.lean` |
+| `fermionMultiNumber_mul_isHermitian` | `(n_i · n_j)` is Hermitian for any sites (commuting Hermitian factors) | `Fermion/JordanWigner.lean` |
+| `fermionDensityInteraction_isHermitian` | `V_int = Σ V_{ij} n_i n_j` is Hermitian when every coupling entry is real (`star V_{ij} = V_{ij}`) | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
