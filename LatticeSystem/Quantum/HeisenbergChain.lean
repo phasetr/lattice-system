@@ -880,7 +880,7 @@ private lemma openChain_row_sum_pred (N : ℕ) (x : Fin (N + 1)) (v : ℂ) :
   · rw [if_pos h]
     rw [Finset.sum_eq_single (⟨x.val - 1, by omega⟩ : Fin (N + 1))]
     · have : (⟨x.val - 1, by omega⟩ : Fin (N + 1)).val + 1 = x.val := by
-        show (x.val - 1) + 1 = x.val
+        change (x.val - 1) + 1 = x.val
         omega
       rw [if_pos this]
     · intro b _ hb
@@ -888,7 +888,7 @@ private lemma openChain_row_sum_pred (N : ℕ) (x : Fin (N + 1)) (v : ℂ) :
       intro heq
       apply hb
       ext
-      show b.val = x.val - 1
+      change b.val = x.val - 1
       omega
     · intro hmem
       exact absurd (Finset.mem_univ _) hmem

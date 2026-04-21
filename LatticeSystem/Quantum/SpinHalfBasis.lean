@@ -119,7 +119,7 @@ theorem spinHalfOpPlus_mul_spinHalfOpMinus_mul_spinHalfOpPlus :
 basis). -/
 theorem spinHalfOpMinus_mul_spinHalfOpPlus_commute_pauliZ :
     Commute (spinHalfOpMinus * spinHalfOpPlus) pauliZ := by
-  show spinHalfOpMinus * spinHalfOpPlus * pauliZ =
+  change spinHalfOpMinus * spinHalfOpPlus * pauliZ =
     pauliZ * (spinHalfOpMinus * spinHalfOpPlus)
   ext i j
   fin_cases i <;> fin_cases j <;>

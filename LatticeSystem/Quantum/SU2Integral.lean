@@ -207,7 +207,7 @@ theorem totalRot32_two_site (θ φ : ℝ) :
   set R3₁ := onSite (1 : Fin 2) (spinHalfRot3 φ)
   set R2₀ := onSite (0 : Fin 2) (spinHalfRot2 θ)
   set R2₁ := onSite (1 : Fin 2) (spinHalfRot2 θ)
-  show R3₀ * R3₁ * (R2₀ * R2₁) = _
+  change R3₀ * R3₁ * (R2₀ * R2₁) = _
   have : R3₁ * R2₀ = R2₀ * R3₁ :=
     onSite_mul_onSite_of_ne h10 (spinHalfRot3 φ) (spinHalfRot2 θ)
   rw [mul_assoc R3₀, ← mul_assoc R3₁, this, mul_assoc R2₀, ← mul_assoc R3₀]
@@ -308,6 +308,8 @@ private theorem totalRot_mulVec_upDown_component (θ φ : ℝ) (τ : Fin 2 → F
       spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfDown]
 
 set_option maxHeartbeats 1600000 in
+-- The 16-case row-by-column analysis on `Fin 2 → Fin 2` together with
+-- the Euler-angle integrals exceeds the default 200k budget.
 /-- Tasaki Problem 2.2.c: the SU(2)-averaged two-site state is the singlet.
 Stated component-wise for each configuration `τ : Fin 2 → Fin 2`.
 Tasaki *Physics and Mathematics of Quantum Many-Body Systems*,
@@ -362,7 +364,7 @@ theorem problem_2_2_c (τ : Fin 2 → Fin 2) :
     rw [hfactor]
     set C := ∫ x₁ in (0 : ℝ)..Real.pi,
       Complex.sin ↑x₁ * Complex.cos (↑x₁ / 2) * Complex.sin (↑x₁ / 2)
-    show ∫ x in (0 : ℝ)..(2 * Real.pi), Complex.exp (-(Complex.I * ↑x)) * C = 0
+    change ∫ x in (0 : ℝ)..(2 * Real.pi), Complex.exp (-(Complex.I * ↑x)) * C = 0
     rw [show (fun x : ℝ => Complex.exp (-(Complex.I * ↑x)) * C) =
       fun x : ℝ => C * Complex.exp (-(Complex.I * ↑x)) from by ext; ring]
     have : ∫ x in (0 : ℝ)..(2 * Real.pi), C * Complex.exp (-(Complex.I * (x : ℂ))) =
@@ -379,7 +381,8 @@ theorem problem_2_2_c (τ : Fin 2 → Fin 2) :
             (Complex.exp (Complex.I * ↑φ / 2) * ↑(Real.cos (θ / 2)))) =
           (↑(Real.sin θ * Real.cos (θ / 2) ^ 2) : ℂ) := by
         intros φ' θ'
-        have hexp : Complex.exp (-(Complex.I * ↑φ' / 2)) * Complex.exp (Complex.I * ↑φ' / 2) = 1 := by
+        have hexp : Complex.exp (-(Complex.I * ↑φ' / 2)) *
+            Complex.exp (Complex.I * ↑φ' / 2) = 1 := by
           rw [← Complex.exp_add]; ring_nf; simp
         rw [show Complex.exp (-(Complex.I * ↑φ' / 2)) * ↑(Real.cos (θ' / 2)) *
           (Complex.exp (Complex.I * ↑φ' / 2) * ↑(Real.cos (θ' / 2))) =
@@ -401,7 +404,8 @@ theorem problem_2_2_c (τ : Fin 2 → Fin 2) :
             (-(Complex.exp (-(Complex.I * ↑φ / 2))) * ↑(Real.sin (θ / 2)))) =
           (↑(-(Real.sin θ * Real.sin (θ / 2) ^ 2)) : ℂ) := by
         intros φ' θ'
-        have hexp : Complex.exp (Complex.I * ↑φ' / 2) * Complex.exp (-(Complex.I * ↑φ' / 2)) = 1 := by
+        have hexp : Complex.exp (Complex.I * ↑φ' / 2) *
+            Complex.exp (-(Complex.I * ↑φ' / 2)) = 1 := by
           rw [← Complex.exp_add]; ring_nf; simp
         rw [show Complex.exp (Complex.I * ↑φ' / 2) * ↑(Real.sin (θ' / 2)) *
           (-(Complex.exp (-(Complex.I * ↑φ' / 2))) * ↑(Real.sin (θ' / 2))) =
@@ -443,7 +447,7 @@ theorem problem_2_2_c (τ : Fin 2 → Fin 2) :
     rw [hfactor]
     set C := ∫ θ in (0 : ℝ)..Real.pi,
       Complex.sin ↑θ * Complex.sin (↑θ / 2) * Complex.cos (↑θ / 2)
-    show ∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.exp (Complex.I * ↑φ) * C = 0
+    change ∫ φ in (0 : ℝ)..(2 * Real.pi), Complex.exp (Complex.I * ↑φ) * C = 0
     rw [show (fun φ : ℝ => Complex.exp (Complex.I * ↑φ) * C) =
       fun φ : ℝ => C * Complex.exp (Complex.I * ↑φ) from by ext; ring]
     have : ∫ φ in (0 : ℝ)..(2 * Real.pi), C * Complex.exp (Complex.I * (φ : ℂ)) =

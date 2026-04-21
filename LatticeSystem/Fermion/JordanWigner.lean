@@ -463,7 +463,7 @@ theorem fermionMultiAnnihilation_anticomm_two_site_cross :
     unfold jwString
     rw [Finset.noncommProd_congr hfilter (fun _ _ => rfl)]
     exact Finset.noncommProd_singleton _ _
-  show onSite (0 : Fin 2) spinHalfOpPlus *
+  change onSite (0 : Fin 2) spinHalfOpPlus *
         fermionMultiAnnihilation 1 1 +
       fermionMultiAnnihilation 1 1 *
         onSite (0 : Fin 2) spinHalfOpPlus = 0
@@ -525,7 +525,7 @@ theorem fermionMultiAnnihilation_creation_anticomm_two_site_cross :
     unfold jwString
     rw [Finset.noncommProd_congr hfilter (fun _ _ => rfl)]
     exact Finset.noncommProd_singleton _ _
-  show onSite (0 : Fin 2) spinHalfOpPlus *
+  change onSite (0 : Fin 2) spinHalfOpPlus *
         fermionMultiCreation 1 1 +
       fermionMultiCreation 1 1 *
         onSite (0 : Fin 2) spinHalfOpPlus = 0
@@ -570,11 +570,11 @@ theorem fermionMultiAnnihilation_anticomm_zero_one
         have : (k.val : ℕ) < 1 := h
         have : (k.val : ℕ) = 0 := by omega
         rw [this]; rfl
-      · rw [h]; show (0 : ℕ) < 1; omega
+      · rw [h]; change (0 : ℕ) < 1; omega
     unfold jwString
     rw [Finset.noncommProd_congr hfilter (fun _ _ => rfl)]
     exact Finset.noncommProd_singleton _ _
-  show onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+  change onSite (0 : Fin (N + 1)) spinHalfOpPlus *
         fermionMultiAnnihilation N ⟨1, by omega⟩ +
       fermionMultiAnnihilation N ⟨1, by omega⟩ *
         onSite (0 : Fin (N + 1)) spinHalfOpPlus = 0
@@ -647,11 +647,11 @@ theorem fermionMultiAnnihilation_creation_anticomm_zero_one
         have : (k.val : ℕ) < 1 := h
         have : (k.val : ℕ) = 0 := by omega
         rw [this]; rfl
-      · rw [h]; show (0 : ℕ) < 1; omega
+      · rw [h]; change (0 : ℕ) < 1; omega
     unfold jwString
     rw [Finset.noncommProd_congr hfilter (fun _ _ => rfl)]
     exact Finset.noncommProd_singleton _ _
-  show onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+  change onSite (0 : Fin (N + 1)) spinHalfOpPlus *
         fermionMultiCreation N ⟨1, by omega⟩ +
       fermionMultiCreation N ⟨1, by omega⟩ *
         onSite (0 : Fin (N + 1)) spinHalfOpPlus = 0
@@ -723,7 +723,7 @@ theorem fermionMultiAnnihilation_anticomm_zero_two_fin_three :
     rw [hjw1] at h
     -- h : jwString 2 ⟨2, _⟩ = onSite 0 pauliZ * onSite 1 pauliZ
     convert h using 2
-  show onSite (0 : Fin 3) spinHalfOpPlus *
+  change onSite (0 : Fin 3) spinHalfOpPlus *
         fermionMultiAnnihilation 2 2 +
       fermionMultiAnnihilation 2 2 *
         onSite (0 : Fin 3) spinHalfOpPlus = 0
@@ -809,7 +809,7 @@ theorem fermionMultiAnnihilation_creation_anticomm_zero_two_fin_three :
     have h := jwString_succ_eq 2 (1 : Fin 3) (by decide)
     rw [hjw1] at h
     convert h using 2
-  show onSite (0 : Fin 3) spinHalfOpPlus *
+  change onSite (0 : Fin 3) spinHalfOpPlus *
         fermionMultiCreation 2 2 +
       fermionMultiCreation 2 2 *
         onSite (0 : Fin 3) spinHalfOpPlus = 0
@@ -898,7 +898,7 @@ theorem fermionMultiAnnihilation_anticomm_zero_two_general
       (show (⟨1, _⟩ : Fin (N + 1)).val + 1 < N + 1 by simp; omega)
     rw [hjw1] at h
     convert h using 2
-  show onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+  change onSite (0 : Fin (N + 1)) spinHalfOpPlus *
         fermionMultiAnnihilation N ⟨2, by omega⟩ +
       fermionMultiAnnihilation N ⟨2, by omega⟩ *
         onSite (0 : Fin (N + 1)) spinHalfOpPlus = 0
@@ -907,12 +907,12 @@ theorem fermionMultiAnnihilation_anticomm_zero_two_general
   have h01 : (0 : Fin (N + 1)) ≠ ⟨1, by omega⟩ := by
     intro h
     exact absurd (congrArg Fin.val h) (by
-      show (0 : Fin (N + 1)).val ≠ (⟨1, _⟩ : Fin (N + 1)).val
+      change (0 : Fin (N + 1)).val ≠ (⟨1, _⟩ : Fin (N + 1)).val
       simp)
   have h02 : (0 : Fin (N + 1)) ≠ ⟨2, by omega⟩ := by
     intro h
     exact absurd (congrArg Fin.val h) (by
-      show (0 : Fin (N + 1)).val ≠ (⟨2, _⟩ : Fin (N + 1)).val
+      change (0 : Fin (N + 1)).val ≠ (⟨2, _⟩ : Fin (N + 1)).val
       simp)
   -- Same as PR #116 structure
   have hfirst : onSite (0 : Fin (N + 1)) spinHalfOpPlus *
@@ -1032,7 +1032,7 @@ theorem fermionMultiAnnihilation_creation_anticomm_zero_two_general
       (show (⟨1, _⟩ : Fin (N + 1)).val + 1 < N + 1 by simp; omega)
     rw [hjw1] at h
     convert h using 2
-  show onSite (0 : Fin (N + 1)) spinHalfOpPlus *
+  change onSite (0 : Fin (N + 1)) spinHalfOpPlus *
         fermionMultiCreation N ⟨2, by omega⟩ +
       fermionMultiCreation N ⟨2, by omega⟩ *
         onSite (0 : Fin (N + 1)) spinHalfOpPlus = 0
@@ -1041,12 +1041,12 @@ theorem fermionMultiAnnihilation_creation_anticomm_zero_two_general
   have h01 : (0 : Fin (N + 1)) ≠ ⟨1, by omega⟩ := by
     intro h
     exact absurd (congrArg Fin.val h) (by
-      show (0 : Fin (N + 1)).val ≠ (⟨1, _⟩ : Fin (N + 1)).val
+      change (0 : Fin (N + 1)).val ≠ (⟨1, _⟩ : Fin (N + 1)).val
       simp)
   have h02 : (0 : Fin (N + 1)) ≠ ⟨2, by omega⟩ := by
     intro h
     exact absurd (congrArg Fin.val h) (by
-      show (0 : Fin (N + 1)).val ≠ (⟨2, _⟩ : Fin (N + 1)).val
+      change (0 : Fin (N + 1)).val ≠ (⟨2, _⟩ : Fin (N + 1)).val
       simp)
   have hfirst : onSite (0 : Fin (N + 1)) spinHalfOpPlus *
       (onSite (0 : Fin (N + 1)) pauliZ *
@@ -1276,7 +1276,7 @@ theorem fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne
   unfold fermionMultiAnnihilation
   have hcomm_onSite_i_j : Commute (onSite i (spinHalfOpMinus * spinHalfOpPlus))
       (onSite j spinHalfOpPlus) := by
-    show onSite i (spinHalfOpMinus * spinHalfOpPlus) * onSite j spinHalfOpPlus =
+    change onSite i (spinHalfOpMinus * spinHalfOpPlus) * onSite j spinHalfOpPlus =
       onSite j spinHalfOpPlus * onSite i (spinHalfOpMinus * spinHalfOpPlus)
     exact onSite_mul_onSite_of_ne hij (spinHalfOpMinus * spinHalfOpPlus)
       spinHalfOpPlus
@@ -1287,7 +1287,7 @@ theorem fermionMultiNumber_commute_fermionMultiAnnihilation_of_ne
     intro k _
     by_cases hki : k = i
     · subst hki
-      show onSite k (spinHalfOpMinus * spinHalfOpPlus) * onSite k pauliZ =
+      change onSite k (spinHalfOpMinus * spinHalfOpPlus) * onSite k pauliZ =
         onSite k pauliZ * onSite k (spinHalfOpMinus * spinHalfOpPlus)
       rw [onSite_mul_onSite_same, onSite_mul_onSite_same,
         spinHalfOpMinus_mul_spinHalfOpPlus_commute_pauliZ.eq]
@@ -1387,7 +1387,7 @@ theorem fermionTotalNumber_commute_hopping (N : ℕ) (i j : Fin (N + 1)) :
   --                        = c_i† · (c_j · N̂ - c_j) + c_i† · c_j
   --                        = c_i† · c_j · N̂ - c_i† · c_j + c_i† · c_j
   --                        = c_i† · c_j · N̂.
-  show fermionTotalNumber N *
+  change fermionTotalNumber N *
       (fermionMultiCreation N i * fermionMultiAnnihilation N j) =
     (fermionMultiCreation N i * fermionMultiAnnihilation N j) *
       fermionTotalNumber N
@@ -1559,7 +1559,7 @@ theorem fermionHopping_isHermitian
     (N : ℕ) {t : Fin (N + 1) → Fin (N + 1) → ℂ}
     (ht : ∀ i j, star (t i j) = t j i) :
     (fermionHopping N t).IsHermitian := by
-  show (fermionHopping N t)ᴴ = fermionHopping N t
+  change (fermionHopping N t)ᴴ = fermionHopping N t
   unfold fermionHopping
   calc (∑ i, ∑ j, t i j •
           (fermionMultiCreation N i * fermionMultiAnnihilation N j))ᴴ
@@ -1657,7 +1657,7 @@ theorem fermionMultiAnnihilation_mulVec_vacuum
     funext τ
     apply Finset.sum_eq_zero
     intro k _
-    show spinHalfOpPlus k 0 *
+    change spinHalfOpPlus k 0 *
       LatticeSystem.Quantum.basisVec
         (Function.update (fun _ => (0 : Fin 2)) i k) τ = 0
     fin_cases k <;> simp [spinHalfOpPlus]
@@ -1830,7 +1830,7 @@ preserves Hermiticity under the realness assumption. -/
 theorem hubbardOnSiteInteraction_isHermitian
     (N : ℕ) {U : ℂ} (hU : star U = U) :
     (hubbardOnSiteInteraction N U).IsHermitian := by
-  show (hubbardOnSiteInteraction N U)ᴴ = hubbardOnSiteInteraction N U
+  change (hubbardOnSiteInteraction N U)ᴴ = hubbardOnSiteInteraction N U
   unfold hubbardOnSiteInteraction
   rw [Matrix.conjTranspose_sum]
   refine Finset.sum_congr rfl (fun i _ => ?_)
@@ -1874,7 +1874,7 @@ theorem hubbardKinetic_isHermitian
     (N : ℕ) {t : Fin (N + 1) → Fin (N + 1) → ℂ}
     (ht : ∀ i j, star (t i j) = t j i) :
     (hubbardKinetic N t).IsHermitian := by
-  show (hubbardKinetic N t)ᴴ = hubbardKinetic N t
+  change (hubbardKinetic N t)ᴴ = hubbardKinetic N t
   unfold hubbardKinetic
   rw [Matrix.conjTranspose_sum]
   refine Finset.sum_congr rfl (fun σ _ => ?_)
@@ -2157,7 +2157,7 @@ theorem spinfulIndex_up_ne_down (N : ℕ) (i j : Fin (N + 1)) :
     spinfulIndex N i 0 ≠ spinfulIndex N j 1 := by
   intro heq
   have h := congrArg Fin.val heq
-  show False
+  change False
   simp [spinfulIndex] at h
   omega
 

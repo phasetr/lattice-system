@@ -176,8 +176,8 @@ private lemma rot_mul_helper {S : Matrix (Fin 2) (Fin 2) ℂ} {k : ℂ}
 
 /-! ## Group law `Û^(α)_θ · Û^(α)_φ = Û^(α)_{θ+φ}` -/
 
-/-- Group law for `rotOf`: product of two generic rotations equals the rotation by the sum of angles,
-when `S * S = (1/4) · 1`. -/
+/-- Group law for `rotOf`: product of two generic rotations equals
+the rotation by the sum of angles, when `S * S = (1/4) · 1`. -/
 private lemma rotOf_mul_rotOf {S : Matrix (Fin 2) (Fin 2) ℂ}
     (hS_sq : S * S = (1 / 4 : ℂ) • 1) (θ φ : ℝ) :
     rotOf S θ * rotOf S φ = rotOf S (θ + φ) := by
