@@ -57,4 +57,28 @@ example (J : Fin (2 * 2) → Fin (2 * 2) → ℂ) :
       magnetizationSubspace (Fin (2 * 2)) (0 : ℂ) :=
   heisenbergHamiltonian_mulVec_neelChainState_mem_magnetizationSubspace_zero 2 J
 
+/-! ## Adjacent-bond action `Ŝ_x · Ŝ_y · |Φ_Néel⟩` -/
+
+example (K : ℕ) {i : ℕ} (hi : i + 1 < 2 * K) :
+    (spinHalfDot
+        (⟨i, by omega⟩ : Fin (2 * K))
+        (⟨i + 1, hi⟩ : Fin (2 * K))).mulVec (neelChainState K) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelChainConfig K)
+            (⟨i, by omega⟩ : Fin (2 * K))
+            (⟨i + 1, hi⟩ : Fin (2 * K)))
+        - (1 / 4 : ℂ) • neelChainState K :=
+  spinHalfDot_mulVec_neelChainState_adjacent K hi
+
+example :
+    (spinHalfDot
+        (⟨0, by decide⟩ : Fin (2 * 2))
+        (⟨1, by decide⟩ : Fin (2 * 2))).mulVec (neelChainState 2) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelChainConfig 2)
+            (⟨0, by decide⟩ : Fin (2 * 2))
+            (⟨1, by decide⟩ : Fin (2 * 2)))
+        - (1 / 4 : ℂ) • neelChainState 2 :=
+  spinHalfDot_mulVec_neelChainState_adjacent 2 (by decide)
+
 end LatticeSystem.Tests.NeelState

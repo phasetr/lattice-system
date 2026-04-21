@@ -3,6 +3,7 @@ Copyright (c) 2026 lattice-system contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.MagnetizationSubspace
+import LatticeSystem.Quantum.SpinDot
 
 /-!
 # Néel state on a bipartite even chain (Tasaki §2.5)
@@ -136,5 +137,41 @@ theorem heisenbergHamiltonian_mulVec_neelChainState_mem_magnetizationSubspace_ze
   heisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem
     (Λ := Fin (2 * K)) J
     (neelChainState_mem_magnetizationSubspace_zero K)
+
+/-- Tasaki §2.5 eq. (2.5.3), p. 37 (concrete chain instance):
+on every adjacent bond `(i, i+1)` of the chain `Fin (2 * K)`, the
+two-site spin inner product `Ŝ_x · Ŝ_y` acts on the Néel state by
+
+  `Ŝ_x · Ŝ_y · |Φ_Néel⟩
+    = (1/2) |swap_{x, y} Φ_Néel⟩ - (1/4) |Φ_Néel⟩`,
+
+since adjacent indices have opposite parities and hence opposite
+Néel spins (antiparallel case). One-line corollary of the generic
+`spinHalfDot_mulVec_basisVec_antiparallel` (Tasaki §2.2 (2.2.19),
+antiparallel) instantiated at `σ = neelChainConfig K` and the
+parity-derived `σ x ≠ σ y` certificate. -/
+theorem spinHalfDot_mulVec_neelChainState_adjacent
+    (K : ℕ) {i : ℕ} (hi : i + 1 < 2 * K) :
+    (spinHalfDot
+        (⟨i, by omega⟩ : Fin (2 * K))
+        (⟨i + 1, hi⟩ : Fin (2 * K))).mulVec (neelChainState K) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelChainConfig K)
+            (⟨i, by omega⟩ : Fin (2 * K))
+            (⟨i + 1, hi⟩ : Fin (2 * K)))
+        - (1 / 4 : ℂ) • neelChainState K := by
+  unfold neelChainState
+  apply spinHalfDot_mulVec_basisVec_antiparallel
+  · intro h
+    have := congrArg Fin.val h
+    simp at this
+  · -- σ_Néel ⟨i⟩ ≠ σ_Néel ⟨i + 1⟩: opposite parities
+    unfold neelChainConfig
+    simp only
+    by_cases hp : i % 2 = 0
+    · have hp1 : (i + 1) % 2 ≠ 0 := by omega
+      simp [hp, hp1]
+    · have hp1 : (i + 1) % 2 = 0 := by omega
+      simp [hp, hp1]
 
 end LatticeSystem.Quantum
