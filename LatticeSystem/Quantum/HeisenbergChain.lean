@@ -142,6 +142,29 @@ theorem squareLatticeHeisenberg_isHermitian (N : ℕ) (J : ℝ) :
     (heisenbergHamiltonian (squareLatticeCoupling N J)).IsHermitian :=
   heisenbergHamiltonian_couplingOf_isHermitian _ (by simp)
 
+/-! ## 2D periodic square lattice (torus) as a box product of cycle graphs
+
+The 2D discrete torus on `(N + 2) × (N + 2)` sites is the box
+product `cycleGraph (N + 2) □ cycleGraph (N + 2)` of two cycle
+graphs. Heisenberg Hermiticity follows for free. -/
+
+/-- Periodic 2D square-lattice (torus) coupling on
+`Fin (N + 2) × Fin (N + 2)`: returns `-J` on nearest-neighbour bonds
+of the box product `cycleGraph (N+2) □ cycleGraph (N+2)`, zero
+otherwise. -/
+noncomputable def squareTorusCoupling (N : ℕ) (J : ℝ) :
+    Fin (N + 2) × Fin (N + 2) → Fin (N + 2) × Fin (N + 2) → ℂ :=
+  LatticeSystem.Lattice.couplingOf
+    (SimpleGraph.cycleGraph (N + 2) □ SimpleGraph.cycleGraph (N + 2))
+    (-(J : ℂ))
+
+/-- The 2D periodic square-lattice (torus) Heisenberg Hamiltonian
+is Hermitian. Free corollary of
+`heisenbergHamiltonian_couplingOf_isHermitian`. -/
+theorem squareTorusHeisenberg_isHermitian (N : ℕ) (J : ℝ) :
+    (heisenbergHamiltonian (squareTorusCoupling N J)).IsHermitian :=
+  heisenbergHamiltonian_couplingOf_isHermitian _ (by simp)
+
 /-! ## Heisenberg-on-graph SU(2) invariance
 
 The existing generic-`J` SU(2)-invariance theorems for
