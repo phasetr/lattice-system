@@ -1539,4 +1539,43 @@ theorem fermionDensityInteraction_isHermitian
   rw [Matrix.conjTranspose_smul, (fermionMultiNumber_mul_isHermitian N i j).eq,
     hV]
 
+/-- Auxiliary: the conjugate transpose of a single hopping term
+`c_i† * c_j` equals `c_j† * c_i`. -/
+theorem fermionHoppingTerm_conjTranspose (N : ℕ) (i j : Fin (N + 1)) :
+    (fermionMultiCreation N i * fermionMultiAnnihilation N j)ᴴ =
+      fermionMultiCreation N j * fermionMultiAnnihilation N i := by
+  rw [Matrix.conjTranspose_mul, fermionMultiAnnihilation_conjTranspose,
+    fermionMultiCreation_conjTranspose]
+
+/-- The single-particle hopping operator
+`H_hop = Σ_{i,j} t_{i,j} c_i† c_j` is Hermitian when the coupling
+matrix `t` is Hermitian, i.e. `star (t i j) = t j i` for all
+`i, j`. The conjugate transpose flips creation/annihilation and
+reverses the index order; an `i ↔ j` reindexing brings the sum back
+to its original form under the Hermiticity hypothesis. -/
+theorem fermionHopping_isHermitian
+    (N : ℕ) {t : Fin (N + 1) → Fin (N + 1) → ℂ}
+    (ht : ∀ i j, star (t i j) = t j i) :
+    (fermionHopping N t).IsHermitian := by
+  show (fermionHopping N t)ᴴ = fermionHopping N t
+  unfold fermionHopping
+  calc (∑ i, ∑ j, t i j •
+          (fermionMultiCreation N i * fermionMultiAnnihilation N j))ᴴ
+      = ∑ i, (∑ j, t i j •
+            (fermionMultiCreation N i * fermionMultiAnnihilation N j))ᴴ := by
+        rw [Matrix.conjTranspose_sum]
+    _ = ∑ i, ∑ j, (t i j •
+            (fermionMultiCreation N i * fermionMultiAnnihilation N j))ᴴ := by
+        congr 1; funext i
+        rw [Matrix.conjTranspose_sum]
+    _ = ∑ i, ∑ j, t j i •
+            (fermionMultiCreation N j * fermionMultiAnnihilation N i) := by
+        congr 1; funext i; congr 1; funext j
+        rw [Matrix.conjTranspose_smul, fermionHoppingTerm_conjTranspose, ht]
+    _ = ∑ j, ∑ i, t j i •
+            (fermionMultiCreation N j * fermionMultiAnnihilation N i) :=
+        Finset.sum_comm
+    _ = ∑ i, ∑ j, t i j •
+            (fermionMultiCreation N i * fermionMultiAnnihilation N j) := rfl
+
 end LatticeSystem.Fermion
