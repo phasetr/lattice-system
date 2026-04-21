@@ -731,6 +731,9 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardKinetic N t` | the spinful tight-binding kinetic operator `T = Σ_{σ} Σ_{i,j} t_{i,j} c_{i,σ}† c_{j,σ}` | `Fermion/JordanWigner.lean` |
 | `hubbardKinetic_commute_fermionTotalNumber` | `[T, N̂] = 0` (charge conservation of the kinetic operator) | `Fermion/JordanWigner.lean` |
 | `hubbardKinetic_isHermitian` | `T` is Hermitian when `t` is a Hermitian matrix (`star (t i j) = t j i`) | `Fermion/JordanWigner.lean` |
+| `hubbardHamiltonian N t U` | the canonical (single-band) Hubbard Hamiltonian `H = T + U Σ n_{i↑} n_{i↓}` on `Fin (2N+2)` | `Fermion/JordanWigner.lean` |
+| `hubbardHamiltonian_commute_fermionTotalNumber` | `[H, N̂] = 0` (charge conservation) | `Fermion/JordanWigner.lean` |
+| `hubbardHamiltonian_isHermitian` | `H` is Hermitian when `t` is Hermitian and `U` is real | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 

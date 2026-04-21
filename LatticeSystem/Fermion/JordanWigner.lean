@@ -1908,6 +1908,35 @@ theorem hubbardKinetic_isHermitian
               fermionMultiAnnihilation (2 * N + 1)
                 (spinfulIndex N j σ)) := rfl
 
+/-- The canonical (single-band) Hubbard Hamiltonian:
+`H = Σ_{σ} Σ_{i,j} t_{i,j} c_{iσ}† c_{jσ} + U Σ_i n_{i↑} n_{i↓}`. -/
+noncomputable def hubbardHamiltonian (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  hubbardKinetic N t + hubbardOnSiteInteraction N U
+
+/-- The Hubbard Hamiltonian commutes with the total particle
+number `N̂`: charge conservation. Direct from
+`hubbardKinetic_commute_fermionTotalNumber` and
+`hubbardOnSiteInteraction_commute_fermionTotalNumber` via
+`Commute.add_left`. -/
+theorem hubbardHamiltonian_commute_fermionTotalNumber
+    (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ) :
+    Commute (hubbardHamiltonian N t U) (fermionTotalNumber (2 * N + 1)) := by
+  unfold hubbardHamiltonian
+  exact (hubbardKinetic_commute_fermionTotalNumber N t).add_left
+    (hubbardOnSiteInteraction_commute_fermionTotalNumber N U)
+
+/-- The Hubbard Hamiltonian is Hermitian when the hopping matrix
+`t` is Hermitian and the on-site coupling `U` is real. -/
+theorem hubbardHamiltonian_isHermitian
+    (N : ℕ) {t : Fin (N + 1) → Fin (N + 1) → ℂ} {U : ℂ}
+    (ht : ∀ i j, star (t i j) = t j i) (hU : star U = U) :
+    (hubbardHamiltonian N t U).IsHermitian := by
+  unfold hubbardHamiltonian
+  exact (hubbardKinetic_isHermitian N ht).add
+    (hubbardOnSiteInteraction_isHermitian N hU)
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`
