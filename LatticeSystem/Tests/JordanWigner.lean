@@ -142,6 +142,20 @@ example :
         fermionMultiAnnihilation 3 0 = 0 :=
   fermionMultiAnnihilation_creation_anticomm_zero_pos 3 3 (by decide)
 
+/-! ## JW string anticommutator at interior site (#210) -/
+
+/-- For every `i < j`, `{σ^+_i, jwString N j} = 0`. -/
+example (N : ℕ) (i j : Fin (N + 1)) (hij : i.val < j.val) :
+    onSite i spinHalfOpPlus * jwString N j +
+      jwString N j * onSite i spinHalfOpPlus = 0 :=
+  jwString_anticomm_onSite_pos_spinHalfOpPlus N i j hij
+
+/-- Instance check: `(i, j) = (1, 3)` on `Fin 4`. -/
+example :
+    onSite (1 : Fin 4) spinHalfOpPlus * jwString 3 3 +
+      jwString 3 3 * onSite (1 : Fin 4) spinHalfOpPlus = 0 :=
+  jwString_anticomm_onSite_pos_spinHalfOpPlus 3 1 3 (by decide)
+
 /-! ## Adjoint relations -/
 
 /-- `(c_i)ᴴ = c_i†`. -/
