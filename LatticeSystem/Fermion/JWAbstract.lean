@@ -206,4 +206,36 @@ theorem fermionNumberAbstract_isHermitian (i : Λ) :
   rw [Matrix.conjTranspose_mul, fermionAnnihilationAbstract_conjTranspose,
     fermionCreationAbstract_conjTranspose]
 
+/-- General helper: if `X² = 1` and `X, Y` commute, then
+`(X·Y)² = Y²`. -/
+private lemma commute_sq_lemma {n : Type*} [Fintype n] [DecidableEq n]
+    (X Y : Matrix n n ℂ) (hX_sq : X * X = 1) (hcomm : Commute X Y) :
+    X * Y * (X * Y) = Y * Y := by
+  have : X * Y * (X * Y) = X * X * (Y * Y) := by
+    show X * Y * (X * Y) = X * X * (Y * Y)
+    rw [show X * Y * (X * Y) = X * (Y * X) * Y by noncomm_ring,
+        ← hcomm.eq]
+    noncomm_ring
+  rw [this, hX_sq, Matrix.one_mul]
+
+/-- `c_i² = 0` (fermion exclusion). -/
+theorem fermionAnnihilationAbstract_sq (i : Λ) :
+    fermionAnnihilationAbstract i * fermionAnnihilationAbstract i = 0 := by
+  unfold fermionAnnihilationAbstract
+  rw [commute_sq_lemma _ _ (jwStringAbstract_sq i)
+    (jwStringAbstract_commute_onSite i spinHalfOpPlus)]
+  rw [onSite_mul_onSite_same, spinHalfOpPlus_mul_self, onSite_zero]
+
+/-- `c_i†² = 0`. -/
+theorem fermionCreationAbstract_sq (i : Λ) :
+    fermionCreationAbstract i * fermionCreationAbstract i = 0 := by
+  unfold fermionCreationAbstract
+  rw [commute_sq_lemma _ _ (jwStringAbstract_sq i)
+    (jwStringAbstract_commute_onSite i spinHalfOpMinus)]
+  have h : spinHalfOpMinus * spinHalfOpMinus =
+      (0 : Matrix (Fin 2) (Fin 2) ℂ) := by
+    ext a b; fin_cases a <;> fin_cases b <;>
+      simp [spinHalfOpMinus, Matrix.mul_apply, Fin.sum_univ_two]
+  rw [onSite_mul_onSite_same, h, onSite_zero]
+
 end LatticeSystem.Fermion
