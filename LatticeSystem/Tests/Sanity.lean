@@ -202,4 +202,12 @@ example : (pathGraphParityColoring 4) 0 = (0 : Fin 2) := by decide
 /-- The parity colouring assigns `1` to vertex `1`. -/
 example : (pathGraphParityColoring 4) 1 = (1 : Fin 2) := by decide
 
+/-- Even cycle `cycleGraph (2 * K + 2)` is bipartite for any `K`. -/
+example (K : ℕ) : (SimpleGraph.cycleGraph (2 * K + 2)).IsBipartite :=
+  cycleGraph_even_isBipartite K
+
+/-- `cycleGraph 4` (K = 1) is bipartite. -/
+example : (SimpleGraph.cycleGraph 4).IsBipartite :=
+  cycleGraph_even_isBipartite 1
+
 end LatticeSystem.Tests
