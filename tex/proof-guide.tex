@@ -45,6 +45,110 @@ corresponds to, and what is and is not yet proved.
 \tableofcontents
 
 %======================================================================
+\section{Graph-centric framework}
+%======================================================================
+
+Despite the name, the primary combinatorial datum underlying
+Heisenberg, Ising, and Hubbard in this library is a
+\emph{graph} $(\Lambda, E_\Lambda)$, not a specific lattice.
+Concrete lattices (1D chain, 2D / 3D grids, torus, infinite
+$\mathbb{Z}$ chain, $\mathbb{Z}^d$ grid, $\ldots$) appear as
+instances. The framework supports both finite-volume work
+(with $[\mathrm{Fintype}~\Lambda]$ for traces and finite sums)
+and the infinite-volume / thermodynamic limit work that is a
+major long-term goal.
+
+\subsection{The \texttt{couplingOf} bridge}
+
+The canonical pairwise-coupling function associated with a
+\texttt{SimpleGraph G} and uniform edge weight $J \in \mathbb{C}$
+lives in \texttt{LatticeSystem.Lattice.Graph}:
+
+\begin{align*}
+  \texttt{couplingOf}~G~J~x~y \;=\; \begin{cases}
+    J & \text{if } G.\mathrm{Adj}~x~y, \\
+    0 & \text{otherwise.}
+  \end{cases}
+\end{align*}
+
+This function is symmetric (because graph adjacency is),
+vanishes on the diagonal (because \texttt{SimpleGraph} has no
+self-loops), and is real whenever $J$ is real
+(\texttt{couplingOf\_real}).
+
+\subsection{Named Hamiltonian wrappers on graphs}
+
+Three named wrappers package the graph-form Hamiltonians:
+
+\begin{itemize}
+  \item \texttt{isingHamiltonianOnGraph G J h} $=$
+    $\sum_{x,y} (\texttt{couplingOf}~G~J~x~y) \cdot \hat{\sigma}^z_x \hat{\sigma}^z_y
+     - h \sum_x \hat{\sigma}^x_x$.
+  \item \texttt{heisenbergHamiltonianOnGraph G J} $=$
+    $\sum_{x,y} (\texttt{couplingOf}~G~J~x~y) \cdot \hat{S}_x \cdot \hat{S}_y$.
+  \item \texttt{hubbardHamiltonianOnGraph N G J U} $=$
+    $\sum_\sigma \sum_{x,y} (\texttt{couplingOf}~G~J~x~y) \cdot c_{x,\sigma}^\dagger c_{y,\sigma}
+     + U \sum_i n_{i\uparrow} n_{i\downarrow}$.
+\end{itemize}
+
+Each carries Hermiticity, charge/spin conservation, and Gibbs
+state theorems in the \emph{generic} form; concrete lattice
+instances (chain, torus, cubic) are corollaries obtained by
+plugging in \texttt{pathGraph}, \texttt{cycleGraph}, and
+box products thereof.
+
+\subsection{Chain $\leftrightarrow$ graph bridges}
+
+\texttt{openChainCoupling}, \texttt{periodicChainCoupling},
+\texttt{squareLatticeCoupling}, \texttt{squareTorusCoupling}, and
+\texttt{cubicLatticeCoupling} are primary \texttt{couplingOf}
+instances; their bridge theorems hold by \texttt{rfl}.
+
+For the chain Hamiltonians:
+
+\begin{itemize}
+  \item \texttt{quantumIsingHamiltonian\_eq\_isingHamiltonianGeneric}:
+    the 1D Ising chain equals
+    \texttt{isingHamiltonianGeneric (couplingOf (pathGraph (N+1)) (-J/2)) h}.
+    The factor $1/2$ absorbs the symmetric double-sum convention.
+  \item \texttt{openChainHeisenbergGibbsState\_eq\_onGraph},
+    \texttt{periodicChainHeisenbergGibbsState\_eq\_onGraph},
+    \texttt{quantumIsingGibbsState\_eq\_isingGibbsStateOnGraph},
+    \texttt{hubbardChainGibbsState\_eq\_onGraph}:
+    chain Gibbs states are the graph form applied to the corresponding
+    \texttt{pathGraph} / \texttt{cycleGraph}.
+\end{itemize}
+
+\subsection{Edge-sum decomposition helper}
+
+The technical lemma
+\texttt{LatticeSystem.Lattice.sum\_pathGraph\_adj} converts a
+double sum over ordered adjacent pairs of \texttt{pathGraph (N+1)}
+into a single sum over $\mathrm{Fin}~N$:
+
+\begin{align*}
+  \sum_{x,y \in \mathrm{Fin}(N+1)} [G.\mathrm{Adj}~x~y]\, f(x,y)
+  = \sum_{i \in \mathrm{Fin}~N} \bigl(f(i.\mathrm{cs}, i.\mathrm{s})
+    + f(i.\mathrm{s}, i.\mathrm{cs})\bigr).
+\end{align*}
+
+This is the missing piece used to prove the generic-$N$ Ising
+chain bridge.
+
+\subsection{Future directions}
+
+\begin{itemize}
+  \item Jordan--Wigner abstraction to any
+    $[\mathrm{LinearOrder}~\Lambda]~[\mathrm{Fintype}~\Lambda]$
+    (currently \texttt{Fin (N+1)}-specific).
+  \item Infinite-volume many-body operators on graphs like
+    $\mathbb{Z}$ or $\mathbb{Z}^d$ (already present at the graph
+    level; requires new many-body operator infrastructure
+    beyond the current finite-matrix representation).
+  \item Bipartite-graph predicates for Lieb / MLM-style theorems.
+\end{itemize}
+
+%======================================================================
 \section{How to read this codebase}
 %======================================================================
 
