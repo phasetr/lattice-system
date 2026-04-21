@@ -2425,4 +2425,36 @@ theorem fermionTotalNumber_mulVec_twoParticle
     fermionTotalNumber_mulVec_vacuum, Matrix.mulVec_zero, zero_add,
     Matrix.smul_mulVec]
 
+/-! ## Hubbard Gibbs state on a graph -/
+
+/-- Gibbs state of the graph-built Hubbard Hamiltonian. -/
+noncomputable def hubbardGibbsStateOnGraph (N : ℕ) (β : ℝ)
+    (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj] (J U : ℂ) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  LatticeSystem.Quantum.gibbsState β (hubbardHamiltonianOnGraph N G J U)
+
+/-- Hermiticity of the graph-built Hubbard Gibbs state. -/
+theorem hubbardGibbsStateOnGraph_isHermitian
+    (N : ℕ) (β : ℝ) (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj]
+    {J U : ℂ} (hJ : star J = J) (hU : star U = U) :
+    (hubbardGibbsStateOnGraph N β G J U).IsHermitian :=
+  LatticeSystem.Quantum.gibbsState_isHermitian
+    (hubbardHamiltonianOnGraph_isHermitian N G hJ hU) β
+
+/-- The graph-built Hubbard Gibbs state commutes with its Hamiltonian. -/
+theorem hubbardGibbsStateOnGraph_commute_hamiltonian
+    (N : ℕ) (β : ℝ) (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj]
+    (J U : ℂ) :
+    Commute (hubbardGibbsStateOnGraph N β G J U)
+      (hubbardHamiltonianOnGraph N G J U) :=
+  LatticeSystem.Quantum.gibbsState_commute_hamiltonian β _
+
+/-- Bridge: `hubbardChainGibbsState` = `hubbardGibbsStateOnGraph`
+on `pathGraph (N+1)` with weight `-J`. -/
+theorem hubbardChainGibbsState_eq_onGraph (N : ℕ) (β : ℝ) (J U : ℝ) :
+    hubbardChainGibbsState N β J U
+      = hubbardGibbsStateOnGraph N β (SimpleGraph.pathGraph (N + 1))
+          (-(J : ℂ)) (U : ℂ) :=
+  rfl
+
 end LatticeSystem.Fermion
