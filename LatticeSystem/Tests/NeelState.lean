@@ -81,4 +81,29 @@ example :
         - (1 / 4 : ℂ) • neelChainState 2 :=
   spinHalfDot_mulVec_neelChainState_adjacent 2 (by decide)
 
+/-! ## Wrap-around bond `(2K + 1, 0)` action on the periodic chain -/
+
+example (K : ℕ) :
+    (spinHalfDot
+        (⟨2 * K + 1, by omega⟩ : Fin (2 * (K + 1)))
+        (⟨0, by omega⟩ : Fin (2 * (K + 1)))).mulVec
+        (neelChainState (K + 1)) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelChainConfig (K + 1))
+            (⟨2 * K + 1, by omega⟩ : Fin (2 * (K + 1)))
+            (⟨0, by omega⟩ : Fin (2 * (K + 1))))
+        - (1 / 4 : ℂ) • neelChainState (K + 1) :=
+  spinHalfDot_mulVec_neelChainState_wrap K
+
+example :
+    (spinHalfDot
+        (⟨3, by decide⟩ : Fin (2 * 2))
+        (⟨0, by decide⟩ : Fin (2 * 2))).mulVec (neelChainState 2) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelChainConfig 2)
+            (⟨3, by decide⟩ : Fin (2 * 2))
+            (⟨0, by decide⟩ : Fin (2 * 2)))
+        - (1 / 4 : ℂ) • neelChainState 2 :=
+  spinHalfDot_mulVec_neelChainState_wrap 1
+
 end LatticeSystem.Tests.NeelState

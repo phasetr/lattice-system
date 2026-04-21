@@ -174,4 +174,36 @@ theorem spinHalfDot_mulVec_neelChainState_adjacent
     · have hp1 : (i + 1) % 2 = 0 := by omega
       simp [hp, hp1]
 
+/-- Companion of `spinHalfDot_mulVec_neelChainState_adjacent` for
+the **wrap-around** bond `(2K - 1, 0)` of the periodic chain
+`cycleGraph (2 * (K + 1))`. For `K ≥ 0` (so chain length
+`2 * (K + 1) ≥ 2`), the indices `2*K + 1` and `0` carry opposite
+parities, so the bond is again antiparallel:
+
+  `Ŝ_⟨2K+1⟩ · Ŝ_⟨0⟩ · |Φ_Néel⟩
+    = (1/2) · |swap_{2K+1, 0} Φ_Néel⟩ - (1/4) · |Φ_Néel⟩`.
+
+Together with `spinHalfDot_mulVec_neelChainState_adjacent` this
+covers every bond of the periodic chain `cycleGraph (2*(K+1))`. -/
+theorem spinHalfDot_mulVec_neelChainState_wrap (K : ℕ) :
+    (spinHalfDot
+        (⟨2 * K + 1, by omega⟩ : Fin (2 * (K + 1)))
+        (⟨0, by omega⟩ : Fin (2 * (K + 1)))).mulVec
+        (neelChainState (K + 1)) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelChainConfig (K + 1))
+            (⟨2 * K + 1, by omega⟩ : Fin (2 * (K + 1)))
+            (⟨0, by omega⟩ : Fin (2 * (K + 1))))
+        - (1 / 4 : ℂ) • neelChainState (K + 1) := by
+  unfold neelChainState
+  apply spinHalfDot_mulVec_basisVec_antiparallel
+  · intro h
+    have := congrArg Fin.val h
+    simp at this
+  · -- σ_Néel ⟨2K+1⟩ = 1, σ_Néel ⟨0⟩ = 0 (opposite parities)
+    unfold neelChainConfig
+    simp only
+    have h1 : (2 * K + 1) % 2 = 1 := by omega
+    simp [h1]
+
 end LatticeSystem.Quantum
