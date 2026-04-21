@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import LatticeSystem.Quantum.ManyBody
 import LatticeSystem.Quantum.Pauli
 import LatticeSystem.Quantum.GibbsState
+import LatticeSystem.Lattice.Graph
 
 /-!
 # One-dimensional quantum Ising chain on an open boundary
@@ -103,6 +104,53 @@ theorem isingHamiltonianGeneric_isHermitian
         rw [Finset.sum_insert hns]
         exact Matrix.IsHermitian.add (onSite_isHermitian a pauliX_isHermitian) ih
     rw [hsumH.eq, hh]
+
+/-! ## Graph-centric Ising wrappers -/
+
+/-- The Ising Hamiltonian on a graph `G` with edge weight `J : ℂ`
+and uniform transverse field `h : ℂ`:
+`H = Σ_{x,y} (couplingOf G J)(x,y) σ^z_x σ^z_y − h Σ_x σ^x_x`.
+The symmetric double sum double-counts each undirected edge — same
+convention as `heisenbergHamiltonian (couplingOf G J)`. -/
+noncomputable def isingHamiltonianOnGraph
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J h : ℂ) :
+    ManyBodyOp Λ :=
+  isingHamiltonianGeneric (LatticeSystem.Lattice.couplingOf G J) h
+
+/-- The graph-built Ising Hamiltonian is Hermitian when `J` and
+`h` are real. -/
+theorem isingHamiltonianOnGraph_isHermitian
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] {J h : ℂ}
+    (hJ : star J = J) (hh : star h = h) :
+    (isingHamiltonianOnGraph G J h).IsHermitian :=
+  isingHamiltonianGeneric_isHermitian
+    (LatticeSystem.Lattice.couplingOf_real G hJ) hh
+
+/-- The Gibbs state of a graph-built Ising Hamiltonian. -/
+noncomputable def isingGibbsStateOnGraph
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (β : ℝ) (J h : ℝ) :
+    ManyBodyOp Λ :=
+  gibbsState β (isingHamiltonianOnGraph G (J : ℂ) (h : ℂ))
+
+/-- The graph-built Ising Gibbs state is Hermitian. -/
+theorem isingGibbsStateOnGraph_isHermitian
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (β : ℝ) (J h : ℝ) :
+    (isingGibbsStateOnGraph G β J h).IsHermitian :=
+  gibbsState_isHermitian
+    (isingHamiltonianOnGraph_isHermitian G (by simp) (by simp)) β
+
+/-- The graph-built Ising Gibbs state commutes with its
+Hamiltonian. -/
+theorem isingGibbsStateOnGraph_commute_hamiltonian
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (β : ℝ) (J h : ℝ) :
+    Commute (isingGibbsStateOnGraph G β J h)
+      (isingHamiltonianOnGraph G (J : ℂ) (h : ℂ)) :=
+  gibbsState_commute_hamiltonian β _
 
 /-- Site-`i` `σ^z` operator on the `N + 1`-site many-body space. -/
 noncomputable def spinZ (N : ℕ) (i : Fin (N + 1)) : ManyBodyOp (Fin (N + 1)) :=
