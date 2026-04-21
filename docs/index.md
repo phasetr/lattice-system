@@ -725,6 +725,9 @@ fermion mode acting on `ℂ²` with computational basis
 | `spinfulIndex N i σ` | bijection `(i, σ : Fin 2) ↦ 2 * i + σ ∈ Fin (2*N+2)`, embedding two-species data into a single-species JW chain | `Fermion/JordanWigner.lean` |
 | `fermionUpAnnihilation`, `fermionDownAnnihilation`, `fermionUpCreation`, `fermionDownCreation` | spinful annihilation / creation operators as wrappers around the underlying single-species operators at `2i` (up) and `2i+1` (down) | `Fermion/JordanWigner.lean` |
 | `fermionUpNumber`, `fermionDownNumber` | spinful site-occupation numbers `n_{i,↑}`, `n_{i,↓}` | `Fermion/JordanWigner.lean` |
+| `hubbardOnSiteInteraction N U` | the on-site Hubbard interaction `H_int = U Σ_i n_{i,↑} · n_{i,↓}` | `Fermion/JordanWigner.lean` |
+| `hubbardOnSiteInteraction_commute_fermionTotalNumber` | `[H_int, N̂] = 0` (charge conservation) | `Fermion/JordanWigner.lean` |
+| `hubbardOnSiteInteraction_isHermitian` | `H_int` is Hermitian when `U` is real (`star U = U`) | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 

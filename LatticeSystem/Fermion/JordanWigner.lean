@@ -1805,6 +1805,39 @@ noncomputable def fermionDownNumber (N : ℕ) (i : Fin (N + 1)) :
     ManyBodyOp (Fin (2 * N + 2)) :=
   fermionMultiNumber (2 * N + 1) (spinfulIndex N i 1)
 
+/-- The on-site Hubbard interaction
+`H_int = U Σ_i n_{i,↑} · n_{i,↓}` on the spinful chain. -/
+noncomputable def hubbardOnSiteInteraction (N : ℕ) (U : ℂ) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  ∑ i : Fin (N + 1), U • (fermionUpNumber N i * fermionDownNumber N i)
+
+/-- The Hubbard on-site interaction commutes with the total
+particle-number operator `N̂` on the underlying chain (charge
+conservation). -/
+theorem hubbardOnSiteInteraction_commute_fermionTotalNumber
+    (N : ℕ) (U : ℂ) :
+    Commute (hubbardOnSiteInteraction N U) (fermionTotalNumber (2 * N + 1)) := by
+  unfold hubbardOnSiteInteraction
+  refine Commute.sum_left _ _ _ (fun i _ => ?_)
+  exact (fermionDensityDensity_commute_fermionTotalNumber (2 * N + 1)
+    (spinfulIndex N i 0) (spinfulIndex N i 1)).smul_left U
+
+/-- The Hubbard on-site interaction is Hermitian when the coupling
+`U` is real (`star U = U`). Each summand `n_{i,↑} · n_{i,↓}` is
+Hermitian (commuting Hermitian factors), and the scalar `U`
+preserves Hermiticity under the realness assumption. -/
+theorem hubbardOnSiteInteraction_isHermitian
+    (N : ℕ) {U : ℂ} (hU : star U = U) :
+    (hubbardOnSiteInteraction N U).IsHermitian := by
+  show (hubbardOnSiteInteraction N U)ᴴ = hubbardOnSiteInteraction N U
+  unfold hubbardOnSiteInteraction
+  rw [Matrix.conjTranspose_sum]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [Matrix.conjTranspose_smul]
+  unfold fermionUpNumber fermionDownNumber
+  rw [(fermionMultiNumber_mul_isHermitian (2 * N + 1)
+    (spinfulIndex N i 0) (spinfulIndex N i 1)).eq, hU]
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`
