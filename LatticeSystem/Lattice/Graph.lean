@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Mathlib.Combinatorics.SimpleGraph.Hasse
 import Mathlib.Combinatorics.SimpleGraph.Circulant
 import Mathlib.Data.Complex.Basic
+import Mathlib.Data.Int.SuccPred
 
 /-!
 # Graph-centric framework for many-body lattice systems
@@ -144,5 +145,41 @@ instance boxProd_decidableAdj
     [DecidableRel G.Adj] [DecidableRel H.Adj] :
     DecidableRel (G □ H).Adj := fun _ _ =>
   decidable_of_iff _ boxProd_adj.symm
+
+/-! ## Infinite chain ℤ
+
+The infinite one-dimensional chain on `ℤ` is the Hasse graph of the
+integers (the cover relation `a ⋖ b` on `ℤ` is `b = a + 1`). This is
+the natural infinite-volume analogue of `pathGraph (N + 1)`, and
+makes the framework's support for **infinite graphs** explicit at
+the graph level.
+
+Many-body operators on infinite `Λ` require separate infrastructure
+(the current `ManyBodyOp Λ = Matrix (Λ → Fin 2) (Λ → Fin 2) ℂ`
+representation needs `Fintype Λ`); that infrastructure will be added
+when the infinite-volume / KMS-state work begins. -/
+
+/-- The infinite one-dimensional chain on `ℤ` as a `SimpleGraph`,
+the infinite analogue of `pathGraph (N + 1)`. -/
+def integerChainGraph : SimpleGraph ℤ := hasse ℤ
+
+/-- Adjacency in the integer chain: `a ~ b` iff `b = a + 1` or
+`a = b + 1`. -/
+theorem integerChainGraph_adj_iff (a b : ℤ) :
+    integerChainGraph.Adj a b ↔ b = a + 1 ∨ a = b + 1 := by
+  unfold integerChainGraph
+  rw [hasse_adj]
+  constructor
+  · rintro (h | h)
+    · exact Or.inl (Order.covBy_iff_add_one_eq.mp h).symm
+    · exact Or.inr (Order.covBy_iff_add_one_eq.mp h).symm
+  · rintro (h | h)
+    · exact Or.inl (Order.covBy_iff_add_one_eq.mpr h.symm)
+    · exact Or.inr (Order.covBy_iff_add_one_eq.mpr h.symm)
+
+/-- Decidability for the integer chain adjacency. -/
+instance integerChainGraph_decidableAdj :
+    DecidableRel integerChainGraph.Adj := fun a b =>
+  decidable_of_iff _ (integerChainGraph_adj_iff a b).symm
 
 end LatticeSystem.Lattice
