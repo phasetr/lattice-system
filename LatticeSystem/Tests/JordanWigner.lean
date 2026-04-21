@@ -89,6 +89,34 @@ example :
         fermionMultiCreation 1 1 * fermionMultiAnnihilation 1 0 = 0 :=
   fermionMultiAnnihilation_creation_anticomm_two_site_cross
 
+/-! ## General cross-site CAR at site 0 (`{c_0, c_k} = 0`, `k ≥ 1`) -/
+
+/-- `c_0 c_k + c_k c_0 = 0` for every `k : Fin (N + 1)` with
+`0 < k.val`. -/
+example (N : ℕ) (k : Fin (N + 1)) (hk : 0 < k.val) :
+    fermionMultiAnnihilation N (0 : Fin (N + 1)) *
+        fermionMultiAnnihilation N k +
+      fermionMultiAnnihilation N k *
+        fermionMultiAnnihilation N 0 = 0 :=
+  fermionMultiAnnihilation_anticomm_zero_pos N k hk
+
+/-- Dual: `c_0† c_k† + c_k† c_0† = 0` for every positive `k`. -/
+example (N : ℕ) (k : Fin (N + 1)) (hk : 0 < k.val) :
+    fermionMultiCreation N (0 : Fin (N + 1)) *
+        fermionMultiCreation N k +
+      fermionMultiCreation N k *
+        fermionMultiCreation N 0 = 0 :=
+  fermionMultiCreation_anticomm_zero_pos N k hk
+
+/-- Instance check: `k = 3` on `Fin 4` (`N = 3`) — not covered by the
+existing `_zero_one` or `_zero_two_general` specialisations. -/
+example :
+    fermionMultiAnnihilation 3 (0 : Fin 4) *
+        fermionMultiAnnihilation 3 3 +
+      fermionMultiAnnihilation 3 3 *
+        fermionMultiAnnihilation 3 0 = 0 :=
+  fermionMultiAnnihilation_anticomm_zero_pos 3 3 (by decide)
+
 /-! ## Adjoint relations -/
 
 /-- `(c_i)ᴴ = c_i†`. -/

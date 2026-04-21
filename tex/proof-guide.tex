@@ -3750,13 +3750,69 @@ via \texttt{onSite\_add} and the small auxiliary
 anticommutator equals the identity).
 \end{proof}
 
-\subsection*{Deferred: cross-site CAR}
+\subsection*{General cross-site CAR at site zero}
 
-The cross-site relations
-$\{c_i, c_j^\dagger\} = 0$ for $i \neq j$ and
-$\{c_i, c_j\} = 0$ for $i \neq j$ are deferred to follow-up PRs.
-They require careful tracking of sign cancellations from the JW
-string $\sigma^z$ acting on intermediate sites between $i$ and $j$.
+\noindent\textbf{Theorem (general \(\{c_0, c_k\} = 0\)).} For every
+\(N : \mathbb{N}\) and every \(k : \texttt{Fin}\,(N + 1)\) with
+\(0 < k.\texttt{val}\),
+\[
+  c_0 \cdot c_k + c_k \cdot c_0 \;=\; 0.
+\]
+The companion relation \(c_0^\dagger c_k^\dagger + c_k^\dagger c_0^\dagger = 0\)
+follows by matrix \texttt{conjTranspose}.
+
+\begin{proof}
+The proof reduces to the \emph{operator-level} anticommutator
+\(\{\sigma^+_0,\,\texttt{jwString}\,N\,k\} = 0\), which is proved
+by induction on the length of the JW string.
+
+\textbf{Base case} (\(k.\texttt{val} = 1\)):
+\(\texttt{jwString}\,N\,\langle 1\rangle = \sigma^z_0\), and the
+single-site Pauli anticommutator
+\(\sigma^+\sigma^z + \sigma^z\sigma^+ = 0\) (immediate from
+\texttt{spinHalfOpPlus\_mul\_pauliZ} \(= -\sigma^+\) and
+\texttt{pauliZ\_mul\_spinHalfOpPlus} \(= \sigma^+\)) lifts to
+\texttt{onSite} via additivity and \texttt{onSite\_zero}.
+
+\textbf{Inductive step}: suppose
+\(\{\sigma^+_0, \texttt{jwString}\,N\,\langle m+1\rangle\} = 0\).
+Then using \texttt{jwString\_succ\_eq},
+\(\texttt{jwString}\,N\,\langle m+2\rangle =
+\texttt{jwString}\,N\,\langle m+1\rangle \cdot \sigma^z_{m+1}\), and
+\(\sigma^z_{m+1}\) commutes with \(\sigma^+_0\) (different sites
+\(m+1 \neq 0\), via \texttt{onSite\_mul\_onSite\_of\_ne}). Then
+\begin{align*}
+  \sigma^+_0 (\texttt{JW} \cdot \sigma^z_{m+1}) +
+  (\texttt{JW} \cdot \sigma^z_{m+1})\sigma^+_0
+  &= (\sigma^+_0\,\texttt{JW} + \texttt{JW}\,\sigma^+_0)\,\sigma^z_{m+1}
+    \;=\; 0 \cdot \sigma^z_{m+1} \;=\; 0,
+\end{align*}
+where the first step uses the commutation
+\(\sigma^z_{m+1}\sigma^+_0 = \sigma^+_0\sigma^z_{m+1}\) and the
+distributivity of matrix multiplication over addition.
+
+The main theorem follows by observing
+\(c_k = \texttt{JW}\,\sigma^+_k\), so that
+\begin{align*}
+  c_0 c_k + c_k c_0
+  &= \sigma^+_0 (\texttt{JW}\,\sigma^+_k) + (\texttt{JW}\,\sigma^+_k) \sigma^+_0 \\
+  &= \sigma^+_0\,\texttt{JW}\,\sigma^+_k + \texttt{JW}\,\sigma^+_0\,\sigma^+_k \\
+  &= (\sigma^+_0\,\texttt{JW} + \texttt{JW}\,\sigma^+_0)\,\sigma^+_k
+    \;=\; 0\,\sigma^+_k \;=\; 0,
+\end{align*}
+using \(\sigma^+_k\sigma^+_0 = \sigma^+_0\sigma^+_k\) (different
+sites).
+\end{proof}
+
+\subsection*{Deferred: cross-site CAR for \(0 < i < j\)}
+
+The fully general cross-site relations
+\(\{c_i, c_j^\dagger\} = 0\) and \(\{c_i, c_j\} = 0\) for arbitrary
+\(i \neq j\) (with neither site fixed to \(0\)) are deferred to
+follow-up PRs. The proof structure mirrors the \(i = 0\) case but
+requires an additional factorisation of the JW string at site \(i\)
+so that the anti-commutator of \(\sigma^+_i\) with
+\texttt{jwString}\,\(j\) can be evaluated site-by-site.
 
 \section{Continuum-limit roadmap (Phase A scaffold)}
 \label{sec:continuum-limit-roadmap}
