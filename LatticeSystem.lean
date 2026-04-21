@@ -21,3 +21,4 @@ import LatticeSystem.Quantum.Z2Z2
 import LatticeSystem.Quantum.IsingChain
 import LatticeSystem.Fermion.Mode
 import LatticeSystem.Fermion.JordanWigner
+import LatticeSystem.Tests.Sanity
