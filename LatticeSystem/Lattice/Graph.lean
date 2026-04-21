@@ -182,4 +182,19 @@ instance integerChainGraph_decidableAdj :
     DecidableRel integerChainGraph.Adj := fun a b =>
   decidable_of_iff _ (integerChainGraph_adj_iff a b).symm
 
+/-- The 2D infinite square lattice on `ℤ × ℤ` as a `SimpleGraph`,
+the box product of two integer chains. Adjacency: nearest neighbours
+in one coordinate, equal in the other. Infinite-volume analogue of
+the finite `squareLatticeCoupling` (PR #141). -/
+def integerSquareLatticeGraph : SimpleGraph (ℤ × ℤ) :=
+  integerChainGraph □ integerChainGraph
+
+/-- Adjacency in the 2D infinite square lattice: a horizontal step
+or a vertical step. -/
+theorem integerSquareLatticeGraph_adj_iff (x y : ℤ × ℤ) :
+    integerSquareLatticeGraph.Adj x y ↔
+      (integerChainGraph.Adj x.1 y.1 ∧ x.2 = y.2) ∨
+        (integerChainGraph.Adj x.2 y.2 ∧ x.1 = y.1) :=
+  boxProd_adj
+
 end LatticeSystem.Lattice

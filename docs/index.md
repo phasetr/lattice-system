@@ -559,6 +559,8 @@ Systems*, §3.5, p. 89.
 | `LatticeSystem.Lattice.boxProd_decidableAdj` | `DecidableRel (G □ H).Adj` for the box product (mathlib provides only the bare definition); enables 2D / nD lattices via `couplingOf` | `Lattice/Graph.lean` |
 | `LatticeSystem.Lattice.integerChainGraph` | the **infinite** one-dimensional chain `ℤ` as a `SimpleGraph` (= `hasse ℤ`), the infinite-volume analogue of `pathGraph (N+1)` | `Lattice/Graph.lean` |
 | `LatticeSystem.Lattice.integerChainGraph_adj_iff` | adjacency: `a ~ b ↔ b = a + 1 ∨ a = b + 1` | `Lattice/Graph.lean` |
+| `LatticeSystem.Lattice.integerSquareLatticeGraph` | the **infinite** 2D square lattice on `ℤ × ℤ` as `integerChainGraph □ integerChainGraph`; infinite analogue of `squareLatticeCoupling` | `Lattice/Graph.lean` |
+| `LatticeSystem.Lattice.integerSquareLatticeGraph_adj_iff` | adjacency: nearest neighbour in one coordinate, equal in the other | `Lattice/Graph.lean` |
 | `squareLatticeCoupling N J`, `squareLatticeHeisenberg_isHermitian` | the 2D open-boundary square lattice on `Fin (N+1) × Fin (N+1)` realised as `couplingOf (pathGraph (N+1) □ pathGraph (N+1)) (-J)`; Hermiticity is a one-line corollary of the graph-generic theorem above | `Quantum/HeisenbergChain.lean` |
 | `heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp{1,2,3}` | for any `SimpleGraph G` and edge weight `J : ℂ`, the Heisenberg Hamiltonian on `G` commutes with each total-spin component (free corollary of the generic-J theorems) | `Quantum/HeisenbergChain.lean` |
 | `heisenbergHamiltonian_couplingOf_commute_totalSpinHalfSquared` | the same Hamiltonian commutes with the total-spin Casimir `Ŝ_tot²` (graph-centric SU(2) invariance) | `Quantum/HeisenbergChain.lean` |
