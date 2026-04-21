@@ -182,6 +182,92 @@ instance integerChainGraph_decidableAdj :
     DecidableRel integerChainGraph.Adj := fun a b =>
   decidable_of_iff _ (integerChainGraph_adj_iff a b).symm
 
+/-! ## Sum decomposition over pathGraph adjacency
+
+Technical helpers for proving bridge theorems between chain-specific
+operators (defined via `Σ_{i:Fin N} f (i.castSucc) (i.succ)`) and
+graph-built ones (defined via `Σ_{x,y} (couplingOf (pathGraph _) _
+x y) • f x y`). Each undirected edge of `pathGraph (N+1)` corresponds
+to an `i : Fin N`, with two ordered adjacency pairs. -/
+
+/-- Forward edges of `pathGraph (N+1)`: ordered pairs `(x, y)` with
+`x.val + 1 = y.val` enumerate `Fin N` via `i ↦ (i.castSucc, i.succ)`. -/
+lemma sum_pathGraph_forward {α : Type*} [AddCommMonoid α] (N : ℕ)
+    (f : Fin (N + 1) → Fin (N + 1) → α) :
+    ∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+      (if x.val + 1 = y.val then f x y else 0)
+    = ∑ i : Fin N, f i.castSucc i.succ := by
+  rw [← Finset.sum_product']
+  rw [← Finset.sum_filter]
+  symm
+  apply Finset.sum_bij (fun i (_ : i ∈ (Finset.univ : Finset (Fin N))) =>
+    ((i.castSucc, i.succ) : Fin (N + 1) × Fin (N + 1)))
+  · intro i _; simp
+  · intro i _ j _ hij
+    exact Fin.castSucc_injective _ (Prod.ext_iff.mp hij).1
+  · intro ⟨x, y⟩ hp
+    simp only [Finset.mem_filter, Finset.mem_product, Finset.mem_univ,
+      true_and] at hp
+    refine ⟨⟨x.val, ?_⟩, Finset.mem_univ _, ?_⟩
+    · have : x.val < N + 1 := x.isLt; omega
+    · ext
+      · rfl
+      · simp [Fin.succ]; omega
+  · intro i _; rfl
+
+/-- Backward edges of `pathGraph (N+1)`: ordered pairs `(x, y)` with
+`y.val + 1 = x.val` enumerate `Fin N` via `i ↦ (i.succ, i.castSucc)`. -/
+lemma sum_pathGraph_backward {α : Type*} [AddCommMonoid α] (N : ℕ)
+    (f : Fin (N + 1) → Fin (N + 1) → α) :
+    ∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+      (if y.val + 1 = x.val then f x y else 0)
+    = ∑ i : Fin N, f i.succ i.castSucc := by
+  rw [← Finset.sum_product']
+  rw [← Finset.sum_filter]
+  symm
+  apply Finset.sum_bij (fun i (_ : i ∈ (Finset.univ : Finset (Fin N))) =>
+    ((i.succ, i.castSucc) : Fin (N + 1) × Fin (N + 1)))
+  · intro i _; simp
+  · intro i _ j _ hij
+    exact Fin.succ_injective _ (Prod.ext_iff.mp hij).1
+  · intro ⟨x, y⟩ hp
+    simp only [Finset.mem_filter, Finset.mem_product, Finset.mem_univ,
+      true_and] at hp
+    refine ⟨⟨y.val, ?_⟩, Finset.mem_univ _, ?_⟩
+    · have : y.val < N + 1 := y.isLt; omega
+    · ext
+      · simp [Fin.succ]; omega
+      · rfl
+  · intro i _; rfl
+
+/-- **Sum over `pathGraph (N+1)` adjacency decomposes into forward
++ backward edge sums**: the double sum over adjacent ordered pairs
+equals `Σ_i (f cs s + f s cs)` where `i : Fin N` ranges over the
+unordered edges. -/
+lemma sum_pathGraph_adj {α : Type*} [AddCommMonoid α] (N : ℕ)
+    (f : Fin (N + 1) → Fin (N + 1) → α) :
+    ∑ x : Fin (N + 1), ∑ y : Fin (N + 1),
+      (if (SimpleGraph.pathGraph (N + 1)).Adj x y then f x y else 0)
+    = ∑ i : Fin N, (f i.castSucc i.succ + f i.succ i.castSucc) := by
+  have key : ∀ x y : Fin (N + 1),
+      (if (SimpleGraph.pathGraph (N + 1)).Adj x y then f x y else 0)
+      = (if x.val + 1 = y.val then f x y else 0)
+        + (if y.val + 1 = x.val then f x y else 0) := by
+    intro x y
+    by_cases h : (SimpleGraph.pathGraph (N + 1)).Adj x y
+    · rw [if_pos h, SimpleGraph.pathGraph_adj] at *
+      rcases h with h | h
+      · rw [if_pos h, if_neg (by omega : ¬ y.val + 1 = x.val), add_zero]
+      · rw [if_neg (by omega : ¬ x.val + 1 = y.val), if_pos h, zero_add]
+    · rw [SimpleGraph.pathGraph_adj] at h
+      rw [if_neg (show ¬ (SimpleGraph.pathGraph (N + 1)).Adj x y by
+        rw [SimpleGraph.pathGraph_adj]; exact h)]
+      rw [if_neg (by tauto : ¬ x.val + 1 = y.val),
+          if_neg (by tauto : ¬ y.val + 1 = x.val), add_zero]
+  simp_rw [key, Finset.sum_add_distrib]
+  rw [sum_pathGraph_forward, sum_pathGraph_backward,
+    ← Finset.sum_add_distrib]
+
 /-- The 2D infinite square lattice on `ℤ × ℤ` as a `SimpleGraph`,
 the box product of two integer chains. Adjacency: nearest neighbours
 in one coordinate, equal in the other. Infinite-volume analogue of
