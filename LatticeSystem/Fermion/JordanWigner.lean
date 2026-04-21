@@ -1731,4 +1731,75 @@ theorem fermionTotalNumber_mulVec_singleParticle
   rw [h_comm, Matrix.add_mulVec, ← Matrix.mulVec_mulVec,
     fermionTotalNumber_mulVec_vacuum, Matrix.mulVec_zero, zero_add]
 
+/-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
+with eigenvalue 2. The Leibniz rule
+`[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`
+yields `[N̂, c_i† c_j†] = 2 c_i† c_j†`; applied to the vacuum and
+combined with `N̂ |vac⟩ = 0` this gives the eigenvalue 2. -/
+theorem fermionTotalNumber_mulVec_twoParticle
+    (N : ℕ) (i j : Fin (N + 1)) :
+    (fermionTotalNumber N).mulVec
+        ((fermionMultiCreation N i * fermionMultiCreation N j).mulVec
+          (fermionMultiVacuum N)) =
+      (2 : ℂ) •
+        (fermionMultiCreation N i * fermionMultiCreation N j).mulVec
+          (fermionMultiVacuum N) := by
+  rw [Matrix.mulVec_mulVec]
+  have h₁ : fermionTotalNumber N * fermionMultiCreation N i =
+      fermionMultiCreation N i * fermionTotalNumber N +
+        fermionMultiCreation N i :=
+    (eq_add_of_sub_eq
+      (fermionTotalNumber_commutator_fermionMultiCreation N i)).trans
+      (add_comm _ _)
+  have h₂ : fermionTotalNumber N * fermionMultiCreation N j =
+      fermionMultiCreation N j * fermionTotalNumber N +
+        fermionMultiCreation N j :=
+    (eq_add_of_sub_eq
+      (fermionTotalNumber_commutator_fermionMultiCreation N j)).trans
+      (add_comm _ _)
+  have h_comm : fermionTotalNumber N *
+      (fermionMultiCreation N i * fermionMultiCreation N j) =
+      (fermionMultiCreation N i * fermionMultiCreation N j) *
+        fermionTotalNumber N +
+      (2 : ℂ) •
+        (fermionMultiCreation N i * fermionMultiCreation N j) := by
+    calc fermionTotalNumber N *
+          (fermionMultiCreation N i * fermionMultiCreation N j)
+        = (fermionTotalNumber N * fermionMultiCreation N i) *
+            fermionMultiCreation N j := by rw [← Matrix.mul_assoc]
+      _ = (fermionMultiCreation N i * fermionTotalNumber N +
+            fermionMultiCreation N i) * fermionMultiCreation N j := by
+            rw [h₁]
+      _ = fermionMultiCreation N i * fermionTotalNumber N *
+            fermionMultiCreation N j +
+          fermionMultiCreation N i * fermionMultiCreation N j := by
+            rw [Matrix.add_mul]
+      _ = fermionMultiCreation N i *
+            (fermionTotalNumber N * fermionMultiCreation N j) +
+          fermionMultiCreation N i * fermionMultiCreation N j := by
+            rw [Matrix.mul_assoc]
+      _ = fermionMultiCreation N i *
+            (fermionMultiCreation N j * fermionTotalNumber N +
+              fermionMultiCreation N j) +
+          fermionMultiCreation N i * fermionMultiCreation N j := by
+            rw [h₂]
+      _ = fermionMultiCreation N i *
+            (fermionMultiCreation N j * fermionTotalNumber N) +
+          fermionMultiCreation N i * fermionMultiCreation N j +
+          fermionMultiCreation N i * fermionMultiCreation N j := by
+            rw [Matrix.mul_add]
+      _ = fermionMultiCreation N i * fermionMultiCreation N j *
+            fermionTotalNumber N +
+          (fermionMultiCreation N i * fermionMultiCreation N j +
+            fermionMultiCreation N i * fermionMultiCreation N j) := by
+            rw [← Matrix.mul_assoc]; abel
+      _ = fermionMultiCreation N i * fermionMultiCreation N j *
+            fermionTotalNumber N +
+          (2 : ℂ) •
+            (fermionMultiCreation N i * fermionMultiCreation N j) := by
+            rw [two_smul]
+  rw [h_comm, Matrix.add_mulVec, ← Matrix.mulVec_mulVec,
+    fermionTotalNumber_mulVec_vacuum, Matrix.mulVec_zero, zero_add,
+    Matrix.smul_mulVec]
+
 end LatticeSystem.Fermion
