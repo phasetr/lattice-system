@@ -6,6 +6,7 @@ import LatticeSystem.Quantum.SpinDot
 import LatticeSystem.Quantum.IsingChain
 import LatticeSystem.Quantum.GibbsState
 import LatticeSystem.Quantum.MagnetizationSubspace
+import LatticeSystem.Lattice.Graph
 
 /-!
 # One-dimensional Heisenberg chain coupling functions and Gibbs state
@@ -46,6 +47,40 @@ noncomputable def openChainCoupling (N : ℕ) (J : ℝ) : Fin (N + 1) → Fin (N
 noncomputable def periodicChainCoupling (N : ℕ) (J : ℝ) :
     Fin (N + 2) → Fin (N + 2) → ℂ :=
   fun x y => if (x + 1 = y) ∨ (y + 1 = x) then -(J : ℂ) else 0
+
+/-! ## Bridge to mathlib's `SimpleGraph.pathGraph` and `cycleGraph`
+
+The standard 1D nearest-neighbour couplings are exactly the
+`couplingOf` of the path / cycle graphs from
+`LatticeSystem.Lattice.Graph`, with edge weight `-J` (Tasaki's
+ferromagnetic sign convention). This makes explicit that our chain
+Hamiltonians are instances of a general graph-defined Heisenberg
+model in the sense of Miyao 2021 §3. -/
+
+/-- The open-chain coupling is exactly the `couplingOf` of the
+mathlib path graph `pathGraph (N + 1)` with weight `-J`. -/
+theorem openChainCoupling_eq_couplingOf (N : ℕ) (J : ℝ) :
+    openChainCoupling N J =
+      LatticeSystem.Lattice.couplingOf (SimpleGraph.pathGraph (N + 1))
+        (-(J : ℂ)) := by
+  funext x y
+  unfold openChainCoupling LatticeSystem.Lattice.couplingOf
+  by_cases h : x.val + 1 = y.val ∨ y.val + 1 = x.val
+  · rw [if_pos h, if_pos ((SimpleGraph.pathGraph_adj).mpr h)]
+  · rw [if_neg h, if_neg (fun h' => h ((SimpleGraph.pathGraph_adj).mp h'))]
+
+/-- The periodic-chain coupling is exactly the `couplingOf` of the
+mathlib cycle graph `cycleGraph (N + 2)` with weight `-J`. -/
+theorem periodicChainCoupling_eq_couplingOf (N : ℕ) (J : ℝ) :
+    periodicChainCoupling N J =
+      LatticeSystem.Lattice.couplingOf (SimpleGraph.cycleGraph (N + 2))
+        (-(J : ℂ)) := by
+  funext x y
+  unfold periodicChainCoupling LatticeSystem.Lattice.couplingOf
+  by_cases h : x + 1 = y ∨ y + 1 = x
+  · rw [if_pos h, if_pos ((LatticeSystem.Lattice.cycleGraph_adj_iff N x y).mpr h)]
+  · rw [if_neg h,
+      if_neg (fun h' => h ((LatticeSystem.Lattice.cycleGraph_adj_iff N x y).mp h'))]
 
 /-! ## Hermiticity -/
 
