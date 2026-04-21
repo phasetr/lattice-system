@@ -238,4 +238,59 @@ theorem fermionCreationAbstract_sq (i : Λ) :
       simp [spinHalfOpMinus, Matrix.mul_apply, Fin.sum_univ_two]
   rw [onSite_mul_onSite_same, h, onSite_zero]
 
+/-- General helper: if `X² = 1` and `X, Y_i` commute (for
+i=1,2), then `(X·Y_1)·(X·Y_2) = Y_1·Y_2`. -/
+private lemma commute_sq_lemma_two {n : Type*} [Fintype n] [DecidableEq n]
+    (X Y1 Y2 : Matrix n n ℂ) (hX_sq : X * X = 1)
+    (hcomm1 : Commute X Y1) :
+    X * Y1 * (X * Y2) = Y1 * Y2 := by
+  have : X * Y1 * (X * Y2) = X * X * (Y1 * Y2) := by
+    rw [show X * Y1 * (X * Y2) = X * (Y1 * X) * Y2 by noncomm_ring,
+      ← hcomm1.eq]
+    noncomm_ring
+  rw [this, hX_sq, Matrix.one_mul]
+
+/-- Same-site mixed anticommutator: `{c_i, c_i†} = c_i · c_i† +
+c_i† · c_i = 1`. -/
+theorem fermionMultiAnticommAbstract_self (i : Λ) :
+    fermionAnnihilationAbstract i * fermionCreationAbstract i
+        + fermionCreationAbstract i * fermionAnnihilationAbstract i = 1 := by
+  unfold fermionAnnihilationAbstract fermionCreationAbstract
+  rw [commute_sq_lemma_two _ _ _ (jwStringAbstract_sq i)
+    (jwStringAbstract_commute_onSite i spinHalfOpPlus)]
+  rw [commute_sq_lemma_two _ _ _ (jwStringAbstract_sq i)
+    (jwStringAbstract_commute_onSite i spinHalfOpMinus)]
+  rw [onSite_mul_onSite_same, onSite_mul_onSite_same, ← onSite_add]
+  have h_sum : spinHalfOpPlus * spinHalfOpMinus +
+      spinHalfOpMinus * spinHalfOpPlus
+    = (1 : Matrix (Fin 2) (Fin 2) ℂ) := by
+    ext a b
+    fin_cases a <;> fin_cases b <;>
+      simp [spinHalfOpPlus, spinHalfOpMinus]
+  rw [h_sum, onSite_one]
+
+/-- `n_i² = n_i` (idempotent). -/
+theorem fermionNumberAbstract_sq (i : Λ) :
+    fermionNumberAbstract i * fermionNumberAbstract i
+      = fermionNumberAbstract i := by
+  unfold fermionNumberAbstract
+  have anticomm := fermionMultiAnticommAbstract_self i
+  have cd_eq : fermionAnnihilationAbstract i * fermionCreationAbstract i
+      = 1 - fermionCreationAbstract i * fermionAnnihilationAbstract i :=
+    eq_sub_of_add_eq anticomm
+  calc fermionCreationAbstract i * fermionAnnihilationAbstract i *
+        (fermionCreationAbstract i * fermionAnnihilationAbstract i)
+      = fermionCreationAbstract i *
+          (fermionAnnihilationAbstract i * fermionCreationAbstract i) *
+          fermionAnnihilationAbstract i := by noncomm_ring
+    _ = fermionCreationAbstract i *
+          (1 - fermionCreationAbstract i * fermionAnnihilationAbstract i) *
+          fermionAnnihilationAbstract i := by rw [cd_eq]
+    _ = fermionCreationAbstract i * fermionAnnihilationAbstract i
+          - fermionCreationAbstract i * fermionCreationAbstract i
+          * (fermionAnnihilationAbstract i * fermionAnnihilationAbstract i) := by
+        noncomm_ring
+    _ = fermionCreationAbstract i * fermionAnnihilationAbstract i := by
+        rw [fermionCreationAbstract_sq, Matrix.zero_mul, sub_zero]
+
 end LatticeSystem.Fermion

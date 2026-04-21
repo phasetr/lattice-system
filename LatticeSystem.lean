@@ -28,3 +28,4 @@ import LatticeSystem.Tests.Heisenberg
 import LatticeSystem.Tests.Hubbard
 import LatticeSystem.Tests.JordanWigner
 import LatticeSystem.Tests.Ising
+import LatticeSystem.Tests.JWAbstract
