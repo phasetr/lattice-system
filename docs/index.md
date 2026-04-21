@@ -697,6 +697,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionDensityInteraction_isHermitian` | `V_int = Σ V_{ij} n_i n_j` is Hermitian when every coupling entry is real (`star V_{ij} = V_{ij}`) | `Fermion/JordanWigner.lean` |
 | `fermionHoppingTerm_conjTranspose` | `(c_i† · c_j)ᴴ = c_j† · c_i` (single hopping term) | `Fermion/JordanWigner.lean` |
 | `fermionHopping_isHermitian` | `H_hop = Σ t_{ij} c_i† c_j` is Hermitian when `t` is Hermitian (`star (t i j) = t j i`); proved via term-wise conjTranspose + `Finset.sum_comm` for the index swap | `Fermion/JordanWigner.lean` |
+| `fermionGenericHamiltonian_isHermitian` | `H = H_hop + V_int` is Hermitian when `t` is Hermitian and `V` is entry-wise real; one-line corollary of the two summand Hermiticities via `Matrix.IsHermitian.add` | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 

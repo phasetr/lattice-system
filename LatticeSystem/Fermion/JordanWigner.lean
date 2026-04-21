@@ -1578,4 +1578,19 @@ theorem fermionHopping_isHermitian
     _ = ∑ i, ∑ j, t i j •
             (fermionMultiCreation N i * fermionMultiAnnihilation N j) := rfl
 
+/-- The canonical fermion Hamiltonian `H = H_hop + V_int` is
+Hermitian whenever the hopping matrix `t` is Hermitian
+(`star (t i j) = t j i`) and the density-density coupling `V` is
+entry-wise real (`star (V i j) = V i j`). Direct sum of
+`fermionHopping_isHermitian` and `fermionDensityInteraction_isHermitian`
+via `Matrix.IsHermitian.add`. -/
+theorem fermionGenericHamiltonian_isHermitian
+    (N : ℕ) {t V : Fin (N + 1) → Fin (N + 1) → ℂ}
+    (ht : ∀ i j, star (t i j) = t j i)
+    (hV : ∀ i j, star (V i j) = V i j) :
+    (fermionGenericHamiltonian N t V).IsHermitian := by
+  unfold fermionGenericHamiltonian
+  exact (fermionHopping_isHermitian N ht).add
+    (fermionDensityInteraction_isHermitian N hV)
+
 end LatticeSystem.Fermion
