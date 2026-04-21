@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Combinatorics.SimpleGraph.Hasse
 import Mathlib.Combinatorics.SimpleGraph.Circulant
+import Mathlib.Combinatorics.SimpleGraph.Bipartite
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Int.SuccPred
 
@@ -128,6 +129,39 @@ theorem cycleGraph_adj_iff (N : ℕ) (x y : Fin (N + 2)) :
   · rintro (h | h)
     · exact Or.inr (sub_eq_iff_eq_add'.mpr h.symm)
     · exact Or.inl (sub_eq_iff_eq_add'.mpr h.symm)
+
+/-! ## Bipartiteness of `pathGraph`
+
+The 1D open chain `pathGraph (N + 1)` is bipartite for every `N`.
+The natural 2-colouring is by index parity: send each vertex
+`i : Fin (N + 1)` to `i.val % 2 : Fin 2`. Adjacent vertices differ
+by one in their index, so they receive opposite colours.
+
+This is the graph-theoretic underpinning of the Néel state
+(`LatticeSystem.Quantum.NeelState`) and of the Marshall-Lieb-Mattis
+theorem (Tasaki §2.5), both of which require a bipartite splitting
+of the underlying lattice. -/
+
+/-- Parity-based 2-colouring of the open chain `pathGraph (N + 1)`:
+each vertex `i : Fin (N + 1)` is mapped to
+`⟨i.val % 2, _⟩ : Fin 2`. Validity follows from `pathGraph_adj_iff`
+together with the fact that consecutive integers have opposite
+parities. -/
+def pathGraphParityColoring (N : ℕ) :
+    (pathGraph (N + 1)).Coloring (Fin 2) :=
+  Coloring.mk
+    (fun i : Fin (N + 1) =>
+      (⟨i.val % 2, Nat.mod_lt _ (by decide)⟩ : Fin 2))
+    (fun {x y} (h : (pathGraph (N + 1)).Adj x y) => by
+      rw [pathGraph_adj_iff] at h
+      intro hcol
+      have hparity : x.val % 2 = y.val % 2 := congrArg Fin.val hcol
+      omega)
+
+/-- The open chain `pathGraph (N + 1)` is bipartite. -/
+theorem pathGraph_isBipartite (N : ℕ) :
+    (pathGraph (N + 1)).IsBipartite :=
+  ⟨pathGraphParityColoring N⟩
 
 /-! ## Higher-dimensional lattices via the box product
 
