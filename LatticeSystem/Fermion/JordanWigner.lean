@@ -2060,6 +2060,58 @@ theorem fermionTotalSpinZ_commute_hubbardOnSiteInteraction
   exact (fermionTotalUpNumber_commute_hubbardOnSiteInteraction N U).sub_left
     (fermionTotalDownNumber_commute_hubbardOnSiteInteraction N U)
 
+/-! ## Spinful vacuum eigenstate corollaries
+
+The JW vacuum on the underlying chain `Fin (2N+2)` is the
+canonical spinful vacuum. All single-species vacuum results lift
+mechanically. -/
+
+/-- The spin-up annihilation operator at any site kills the
+vacuum. -/
+theorem fermionUpAnnihilation_mulVec_vacuum (N : ℕ) (i : Fin (N + 1)) :
+    (fermionUpAnnihilation N i).mulVec
+      (fermionMultiVacuum (2 * N + 1)) = 0 :=
+  fermionMultiAnnihilation_mulVec_vacuum (2 * N + 1) (spinfulIndex N i 0)
+
+/-- The spin-down annihilation operator at any site kills the
+vacuum. -/
+theorem fermionDownAnnihilation_mulVec_vacuum (N : ℕ) (i : Fin (N + 1)) :
+    (fermionDownAnnihilation N i).mulVec
+      (fermionMultiVacuum (2 * N + 1)) = 0 :=
+  fermionMultiAnnihilation_mulVec_vacuum (2 * N + 1) (spinfulIndex N i 1)
+
+/-- `n_{i,↑} · |vac⟩ = 0`. -/
+theorem fermionUpNumber_mulVec_vacuum (N : ℕ) (i : Fin (N + 1)) :
+    (fermionUpNumber N i).mulVec (fermionMultiVacuum (2 * N + 1)) = 0 :=
+  fermionMultiNumber_mulVec_vacuum (2 * N + 1) (spinfulIndex N i 0)
+
+/-- `n_{i,↓} · |vac⟩ = 0`. -/
+theorem fermionDownNumber_mulVec_vacuum (N : ℕ) (i : Fin (N + 1)) :
+    (fermionDownNumber N i).mulVec (fermionMultiVacuum (2 * N + 1)) = 0 :=
+  fermionMultiNumber_mulVec_vacuum (2 * N + 1) (spinfulIndex N i 1)
+
+/-- `N_↑ · |vac⟩ = 0`. -/
+theorem fermionTotalUpNumber_mulVec_vacuum (N : ℕ) :
+    (fermionTotalUpNumber N).mulVec (fermionMultiVacuum (2 * N + 1)) = 0 := by
+  unfold fermionTotalUpNumber
+  rw [Matrix.sum_mulVec]
+  exact Finset.sum_eq_zero (fun i _ => fermionUpNumber_mulVec_vacuum N i)
+
+/-- `N_↓ · |vac⟩ = 0`. -/
+theorem fermionTotalDownNumber_mulVec_vacuum (N : ℕ) :
+    (fermionTotalDownNumber N).mulVec (fermionMultiVacuum (2 * N + 1)) = 0 := by
+  unfold fermionTotalDownNumber
+  rw [Matrix.sum_mulVec]
+  exact Finset.sum_eq_zero (fun i _ => fermionDownNumber_mulVec_vacuum N i)
+
+/-- The vacuum is unpolarised: `S^z_tot · |vac⟩ = 0`. -/
+theorem fermionTotalSpinZ_mulVec_vacuum (N : ℕ) :
+    (fermionTotalSpinZ N).mulVec (fermionMultiVacuum (2 * N + 1)) = 0 := by
+  unfold fermionTotalSpinZ
+  rw [Matrix.smul_mulVec, Matrix.sub_mulVec,
+    fermionTotalUpNumber_mulVec_vacuum,
+    fermionTotalDownNumber_mulVec_vacuum, sub_zero, smul_zero]
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`
