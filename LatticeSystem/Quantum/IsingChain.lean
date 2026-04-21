@@ -503,4 +503,12 @@ theorem isingCycleGibbsState_isHermitian (N : ℕ) (β : ℝ) (J h : ℝ) :
     (isingCycleGibbsState N β J h).IsHermitian :=
   gibbsState_isHermitian (isingCycleHamiltonian_isHermitian N J h) β
 
+/-- The periodic Ising Gibbs state commutes with the periodic Ising
+Hamiltonian. The dual companion of `quantumIsingGibbsState_commute_hamiltonian`
+(open chain) and `isingGibbsStateOnGraph_commute_hamiltonian` (graph). -/
+theorem isingCycleGibbsState_commute_hamiltonian
+    (N : ℕ) (β : ℝ) (J h : ℝ) :
+    Commute (isingCycleGibbsState N β J h) (isingCycleHamiltonian N J h) :=
+  gibbsState_commute_hamiltonian β (isingCycleHamiltonian N J h)
+
 end LatticeSystem.Quantum
