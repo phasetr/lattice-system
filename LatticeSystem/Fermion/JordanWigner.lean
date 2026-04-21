@@ -1713,4 +1713,22 @@ theorem fermionGenericHamiltonian_mulVec_vacuum
   rw [Matrix.add_mulVec, fermionHopping_mulVec_vacuum,
     fermionDensityInteraction_mulVec_vacuum, add_zero]
 
+/-- The single-particle state `c_i† |vac⟩` is an `N̂`-eigenstate
+with eigenvalue 1. Uses `[N̂, c_i†] = c_i†` (so
+`N̂ c_i† = c_i† N̂ + c_i†`) and `N̂ |vac⟩ = 0`. -/
+theorem fermionTotalNumber_mulVec_singleParticle
+    (N : ℕ) (i : Fin (N + 1)) :
+    (fermionTotalNumber N).mulVec
+        ((fermionMultiCreation N i).mulVec (fermionMultiVacuum N)) =
+      (fermionMultiCreation N i).mulVec (fermionMultiVacuum N) := by
+  rw [Matrix.mulVec_mulVec]
+  have h_comm : fermionTotalNumber N * fermionMultiCreation N i =
+      fermionMultiCreation N i * fermionTotalNumber N +
+        fermionMultiCreation N i :=
+    (eq_add_of_sub_eq
+      (fermionTotalNumber_commutator_fermionMultiCreation N i)).trans
+      (add_comm _ _)
+  rw [h_comm, Matrix.add_mulVec, ← Matrix.mulVec_mulVec,
+    fermionTotalNumber_mulVec_vacuum, Matrix.mulVec_zero, zero_add]
+
 end LatticeSystem.Fermion

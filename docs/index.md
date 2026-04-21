@@ -719,6 +719,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionHopping_mulVec_vacuum` | `H_hop · |vac⟩ = 0` (each `c_i† c_j |vac⟩ = c_i† 0 = 0`) | `Fermion/JordanWigner.lean` |
 | `fermionDensityInteraction_mulVec_vacuum` | `V_int · |vac⟩ = 0` (each `n_i n_j |vac⟩ = n_i 0 = 0`) | `Fermion/JordanWigner.lean` |
 | `fermionGenericHamiltonian_mulVec_vacuum` | `H · |vac⟩ = 0` for the full Hubbard skeleton (linearity) | `Fermion/JordanWigner.lean` |
+| `fermionTotalNumber_mulVec_singleParticle` | `c_i† |vac⟩` is an `N̂`-eigenstate of eigenvalue 1 (uses `[N̂, c_i†] = c_i†` and `N̂ |vac⟩ = 0`) | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
