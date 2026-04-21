@@ -1731,6 +1731,23 @@ theorem fermionTotalNumber_mulVec_singleParticle
   rw [h_comm, Matrix.add_mulVec, ← Matrix.mulVec_mulVec,
     fermionTotalNumber_mulVec_vacuum, Matrix.mulVec_zero, zero_add]
 
+/-- **Charge-eigenstate helper.** If `X` carries U(1) charge `α`
+(`[N̂, X] = α • X`) and `v` is `N̂`-annihilated, then `X v` is an
+`N̂`-eigenstate with eigenvalue `α`. Generalises
+`fermionTotalNumber_mulVec_singleParticle` (α = 1, X = c_i†) and
+`fermionTotalNumber_mulVec_twoParticle` (α = 2, X = c_i† c_j†). -/
+theorem fermionTotalNumber_mulVec_eigenstate_of_commute
+    {N : ℕ} {X : ManyBodyOp (Fin (N + 1))} {α : ℂ}
+    (hX : fermionTotalNumber N * X - X * fermionTotalNumber N = α • X)
+    {v : (Fin (N + 1) → Fin 2) → ℂ}
+    (hv : (fermionTotalNumber N).mulVec v = 0) :
+    (fermionTotalNumber N).mulVec (X.mulVec v) = α • X.mulVec v := by
+  rw [Matrix.mulVec_mulVec]
+  have h_comm : fermionTotalNumber N * X = X * fermionTotalNumber N + α • X :=
+    (eq_add_of_sub_eq hX).trans (add_comm _ _)
+  rw [h_comm, Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_zero, zero_add, Matrix.smul_mulVec]
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`
