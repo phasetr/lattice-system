@@ -1937,6 +1937,28 @@ theorem hubbardHamiltonian_isHermitian
   exact (hubbardKinetic_isHermitian N ht).add
     (hubbardOnSiteInteraction_isHermitian N hU)
 
+/-- The Gibbs state of the canonical Hubbard Hamiltonian. -/
+noncomputable def hubbardGibbsState
+    (N : ℕ) (β : ℝ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ) :
+    ManyBodyOp (Fin (2 * N + 2)) :=
+  LatticeSystem.Quantum.gibbsState β (hubbardHamiltonian N t U)
+
+/-- The Hubbard Gibbs state is Hermitian when `t` is Hermitian and
+`U` is real. -/
+theorem hubbardGibbsState_isHermitian
+    (N : ℕ) (β : ℝ) {t : Fin (N + 1) → Fin (N + 1) → ℂ} {U : ℂ}
+    (ht : ∀ i j, star (t i j) = t j i) (hU : star U = U) :
+    (hubbardGibbsState N β t U).IsHermitian :=
+  LatticeSystem.Quantum.gibbsState_isHermitian
+    (hubbardHamiltonian_isHermitian N ht hU) β
+
+/-- The Hubbard Gibbs state commutes with the Hubbard Hamiltonian
+(generic instance of `gibbsState_commute_hamiltonian`). -/
+theorem hubbardGibbsState_commute_hamiltonian
+    (N : ℕ) (β : ℝ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ) :
+    Commute (hubbardGibbsState N β t U) (hubbardHamiltonian N t U) :=
+  LatticeSystem.Quantum.gibbsState_commute_hamiltonian β _
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`
