@@ -759,6 +759,8 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardChainHamiltonian N J U` | the canonical 1D nearest-neighbour Hubbard chain `−J Σ_{σ,⟨i,j⟩} c_{iσ}† c_{jσ} + U Σ_i n_{i↑} n_{i↓}` (built from `pathGraph (N+1)`) | `Fermion/JordanWigner.lean` |
 | `hubbardChainHamiltonian_isHermitian` / `hubbardChainHamiltonian_commute_fermionTotalNumber` | Hermiticity (real `J, U`) and charge conservation | `Fermion/JordanWigner.lean` |
 | `hubbardHamiltonianOnGraph_mulVec_vacuum` / `hubbardChainHamiltonian_mulVec_vacuum` | both graph-built Hubbard Hamiltonians annihilate the JW vacuum | `Fermion/JordanWigner.lean` |
+| `hubbardChainGibbsState N β J U` | Gibbs state of the 1D Hubbard chain | `Fermion/JordanWigner.lean` |
+| `hubbardChainGibbsState_isHermitian` / `hubbardChainGibbsState_commute_hamiltonian` | Hermiticity (real `J, U`) and commute with the Hamiltonian | `Fermion/JordanWigner.lean` |
 
 ## Open items / axioms
 
