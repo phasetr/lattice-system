@@ -555,6 +555,7 @@ Systems*, §3.5, p. 89.
 | `openChainCoupling_eq_couplingOf` | the open-chain coupling is `couplingOf (pathGraph (N+1)) (-J)` | `Quantum/HeisenbergChain.lean` |
 | `periodicChainCoupling_eq_couplingOf` | the periodic-chain coupling is `couplingOf (cycleGraph (N+2)) (-J)` | `Quantum/HeisenbergChain.lean` |
 | `heisenbergHamiltonian_isHermitian_of_real_symm` | for any real symmetric coupling `J` the Heisenberg Hamiltonian `H = Σ_{x,y} J(x,y) Ŝ_x · Ŝ_y` is Hermitian | `Quantum/HeisenbergChain.lean` |
+| `heisenbergHamiltonian_couplingOf_isHermitian` | **graph-centric** Hermiticity: for any `SimpleGraph G` and real edge weight `J : ℂ`, the Heisenberg Hamiltonian `heisenbergHamiltonian (couplingOf G J)` is Hermitian. The chain instances are corollaries via the bridge theorems | `Quantum/HeisenbergChain.lean` |
 | `openChainHeisenberg_isHermitian` | specialization: the open-chain Heisenberg Hamiltonian is Hermitian | `Quantum/HeisenbergChain.lean` |
 | `periodicChainHeisenberg_isHermitian` | specialization: the periodic-chain Heisenberg Hamiltonian is Hermitian | `Quantum/HeisenbergChain.lean` |
 | `heisenbergHamiltonian_gibbsExpectation_eq` | generic bond-sum decomposition `⟨H⟩_β = ∑ x, ∑ y, J x y · ⟨Ŝ_x · Ŝ_y⟩_β` (any Gibbs Hamiltonian, any coupling `J`) | `Quantum/HeisenbergChain.lean` |

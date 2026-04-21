@@ -98,6 +98,25 @@ theorem heisenbergHamiltonian_isHermitian_of_real_symm
   rw [Matrix.conjTranspose_smul, (spinHalfDot_isHermitian x y).eq]
   rw [hreal, hsymm, spinHalfDot_comm]
 
+/-- **Heisenberg-on-graph Hermiticity.** For *any* `SimpleGraph G` on
+the vertex set `Λ` and any real complex edge weight `J : ℂ` (i.e.
+`star J = J`), the Heisenberg Hamiltonian
+`heisenbergHamiltonian (couplingOf G J)` is Hermitian. The two
+hypotheses required by
+`heisenbergHamiltonian_isHermitian_of_real_symm` are exactly the
+real and symmetric properties of `couplingOf G J` provided by
+`couplingOf_real` and `couplingOf_symm` in
+`LatticeSystem.Lattice.Graph`. -/
+theorem heisenbergHamiltonian_couplingOf_isHermitian
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] {J : ℂ}
+    (hJ : star J = J) :
+    (heisenbergHamiltonian
+        (LatticeSystem.Lattice.couplingOf G J)).IsHermitian :=
+  heisenbergHamiltonian_isHermitian_of_real_symm
+    (LatticeSystem.Lattice.couplingOf_real G hJ)
+    (LatticeSystem.Lattice.couplingOf_symm G J)
+
 /-- The open-chain Heisenberg Hamiltonian is Hermitian. -/
 theorem openChainHeisenberg_isHermitian (N : ℕ) (J : ℝ) :
     (heisenbergHamiltonian (openChainCoupling N J)).IsHermitian :=
