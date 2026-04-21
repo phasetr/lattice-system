@@ -195,6 +195,41 @@ theorem heisenbergHamiltonian_couplingOf_commute_totalSpinHalfSquared
       (totalSpinHalfSquared Λ) :=
   heisenbergHamiltonian_commute_totalSpinHalfSquared _
 
+/-! ## Heisenberg-on-graph Gibbs state
+
+For any finite graph `G` with real edge weight `J : ℂ`, the Gibbs
+state `ρ_β = gibbsState β (heisenbergHamiltonian (couplingOf G J))`
+is defined and inherits Hermiticity from `gibbsState_isHermitian`
++ the graph-centric Hamiltonian Hermiticity (PR #140). This
+prepares for thermal-state work on arbitrary finite graphs. -/
+
+/-- The Heisenberg Gibbs state for a finite graph `G` with real
+edge weight `J : ℂ` at inverse temperature `β : ℝ`. -/
+noncomputable def heisenbergGibbsStateOnGraph
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (β : ℝ) (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
+    ManyBodyOp Λ :=
+  gibbsState β (heisenbergHamiltonian (LatticeSystem.Lattice.couplingOf G J))
+
+/-- The graph Heisenberg Gibbs state is Hermitian for any real
+edge weight `J`. -/
+theorem heisenbergGibbsStateOnGraph_isHermitian
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (β : ℝ) (G : SimpleGraph Λ) [DecidableRel G.Adj] {J : ℂ}
+    (hJ : star J = J) :
+    (heisenbergGibbsStateOnGraph β G J).IsHermitian :=
+  gibbsState_isHermitian
+    (heisenbergHamiltonian_couplingOf_isHermitian G hJ) β
+
+/-- The graph Heisenberg Gibbs state commutes with its Hamiltonian
+(instance of the generic `gibbsState_commute_hamiltonian`). -/
+theorem heisenbergGibbsStateOnGraph_commute_hamiltonian
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (β : ℝ) (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
+    Commute (heisenbergGibbsStateOnGraph β G J)
+      (heisenbergHamiltonian (LatticeSystem.Lattice.couplingOf G J)) :=
+  gibbsState_commute_hamiltonian β _
+
 /-- The open-chain Heisenberg Hamiltonian is Hermitian. -/
 theorem openChainHeisenberg_isHermitian (N : ℕ) (J : ℝ) :
     (heisenbergHamiltonian (openChainCoupling N J)).IsHermitian :=
