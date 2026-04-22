@@ -3955,12 +3955,55 @@ expands the explicit matrix entries of
 \(I^{2} = -1\) (\texttt{Complex.I\_sq}) to close the residual
 arithmetic.
 
-\noindent\textbf{Status / scope.} The single-spin case is closed
-(\texttt{LatticeSystem/Quantum/TimeReversalSpinHalf.lean}). The
-multi-spin extension \(\hat{\Theta}_{\text{tot}} =
-\bigotimes_{x \in \Lambda} \hat{\Theta}_x\) (Tasaki §2.3 lattice
-discussion) and the integer-spin case
-(\(\hat{\Theta}^{2} = +\hat{1}\)) are deferred.
+\noindent\textbf{Multi-spin extension and lattice Kramers.}
+For finite \(\Lambda\) with \([\texttt{Fintype}\,\Lambda]
+[\texttt{DecidableEq}\,\Lambda]\) the tensor product
+\(\hat{\Theta}_{\text{tot}} :=
+\bigotimes_{x \in \Lambda} \hat{\Theta}_x\) acts on the many-body
+Hilbert space \((\Lambda \to \texttt{Fin}\,2) \to \mathbb{C}\) by
+\[
+  (\hat{\Theta}_{\text{tot}}\,v)(\tau)
+  \;:=\;
+  \Bigl(\prod_{x \in \Lambda} \varepsilon(\tau\,x)\Bigr)\,
+  \overline{v(\texttt{flip}\,\tau)},
+\]
+where \(\texttt{flip}\,\tau\,x := 1 - \tau\,x\) is the spin-flipped
+configuration and \(\varepsilon(0) := 1\),
+\(\varepsilon(1) := -1\) is the per-site sign factor coming from
+\(\hat{\Theta}|\!\uparrow\rangle = |\!\downarrow\rangle\),
+\(\hat{\Theta}|\!\downarrow\rangle = -|\!\uparrow\rangle\). In Lean
+this is \texttt{timeReversalSpinHalfMulti}; the helpers
+\texttt{flipConfig}, \texttt{timeReversalSign} package the
+configuration and sign data.
+
+\noindent\textbf{Theorem (multi-spin Kramers degeneracy at
+\(S = 1/2\), Tasaki §2.3 half-odd-integer extension).}
+For any finite \(\Lambda\),
+\[
+  \hat{\Theta}_{\text{tot}}^{2} \;=\; (-1)^{|\Lambda|} \cdot \hat{1}.
+\]
+\begin{proof}
+A direct computation: applying the formula twice and using
+\(\overline{\overline{x}} = x\) and the per-site identity
+\(\varepsilon(\tau\,x) \cdot \varepsilon((\texttt{flip}\,\tau)(x))
+   = -1\) (from \texttt{timeReversalSign\_mul\_flip}) gives
+\(\bigl(\prod_x \varepsilon(\tau\,x)\bigr)
+  \cdot \bigl(\prod_x \varepsilon((\texttt{flip}\,\tau)(x))\bigr)
+  = \prod_x (-1) = (-1)^{|\Lambda|}\),
+which factors out to give \((-1)^{|\Lambda|} \cdot v(\tau)\).
+\end{proof}
+
+In particular \(\hat{\Theta}_{\text{tot}}^{2} = -\hat{1}\) when
+\(|\Lambda|\) is odd (the Kramers minus sign survives) and
+\(\hat{\Theta}_{\text{tot}}^{2} = +\hat{1}\) when \(|\Lambda|\)
+is even (the minus signs cancel pairwise).
+
+\noindent\textbf{Status / scope.} The \(S = 1/2\) single-spin and
+multi-spin cases are closed
+(\texttt{LatticeSystem/Quantum/TimeReversalSpinHalf.lean},
+\texttt{LatticeSystem/Quantum/TimeReversalMulti.lean}). The
+integer-spin case (\(\hat{\Theta}^{2} = +\hat{1}\) for any
+\(|\Lambda|\)) is deferred.
 
 \section{Continuum-limit roadmap (Phase A scaffold)}
 \label{sec:continuum-limit-roadmap}
