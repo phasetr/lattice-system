@@ -84,4 +84,11 @@ example (τ : Fin 3 → Fin 2) (x : Fin 3) :
 example (τ : Fin 3 → Fin 2) (x : Fin 3) :
     siteFlipAt (siteFlipAt τ x) x = τ := siteFlipAt_involutive τ x
 
+/-! ## `(onSite x σ^x).mulVec (basisVec σ) = basisVec (siteFlipAt σ x)` -/
+
+example (x : Fin 3) (σ : Fin 3 → Fin 2) :
+    ((onSite x pauliX).mulVec (basisVec σ) : (Fin 3 → Fin 2) → ℂ) =
+      basisVec (siteFlipAt σ x) :=
+  onSite_pauliX_mulVec_basisVec x σ
+
 end LatticeSystem.Tests.TimeReversalMulti
