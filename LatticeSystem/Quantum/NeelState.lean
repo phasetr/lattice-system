@@ -365,4 +365,78 @@ theorem timeReversalSpinHalfMulti_neelChainState_one :
   rw [neelChainConfig_one_eq_upDown,
     timeReversalSpinHalfMulti_basisVec_upDown]
 
+/-! ## 2D Néel per-bond `Ŝ_x · Ŝ_y` action -/
+
+/-- Tasaki §2.5 eq. (2.5.3) per-bond action for the **horizontal**
+nearest-neighbour bond `((i, j), (i+1, j))` of the 2D
+checkerboard Néel state. The two endpoints have opposite parities
+(`(i + j)` vs `(i + 1 + j)` differ by 1), so the bond is
+antiparallel and the action is
+
+  `Ŝ_(i,j) · Ŝ_(i+1,j) · |Φ_Néel⟩
+    = (1/2) · |swap_{(i,j),(i+1,j)} Φ_Néel⟩
+        - (1/4) · |Φ_Néel⟩`. -/
+theorem spinHalfDot_mulVec_neelSquareState_horizontal_adjacent
+    (K L : ℕ) {i j : ℕ}
+    (hi : i + 1 < 2 * K) (hj : j < 2 * L) :
+    (spinHalfDot
+        ((⟨i, by omega⟩, ⟨j, hj⟩) :
+          Fin (2 * K) × Fin (2 * L))
+        ((⟨i + 1, hi⟩, ⟨j, hj⟩) :
+          Fin (2 * K) × Fin (2 * L))).mulVec
+        (neelSquareState K L) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelSquareConfig K L)
+            ((⟨i, by omega⟩, ⟨j, hj⟩) :
+              Fin (2 * K) × Fin (2 * L))
+            ((⟨i + 1, hi⟩, ⟨j, hj⟩) :
+              Fin (2 * K) × Fin (2 * L)))
+        - (1 / 4 : ℂ) • neelSquareState K L := by
+  unfold neelSquareState
+  apply spinHalfDot_mulVec_basisVec_antiparallel
+  · intro h
+    have := congrArg Prod.fst h
+    have hval := congrArg Fin.val this
+    simp at hval
+  · -- Opposite parities: (i + j) and (i + 1 + j) differ by 1
+    unfold neelSquareConfig
+    simp only
+    by_cases hp : (i + j) % 2 = 0
+    · have hp1 : ((i + 1) + j) % 2 ≠ 0 := by omega
+      simp [hp, hp1]
+    · have hp1 : ((i + 1) + j) % 2 = 0 := by omega
+      simp [hp, hp1]
+
+/-- Vertical-bond analogue: `((i, j), (i, j+1))` is also
+antiparallel with the same `(1/2) swap - (1/4) Néel` decomposition. -/
+theorem spinHalfDot_mulVec_neelSquareState_vertical_adjacent
+    (K L : ℕ) {i j : ℕ}
+    (hi : i < 2 * K) (hj : j + 1 < 2 * L) :
+    (spinHalfDot
+        ((⟨i, hi⟩, ⟨j, by omega⟩) :
+          Fin (2 * K) × Fin (2 * L))
+        ((⟨i, hi⟩, ⟨j + 1, hj⟩) :
+          Fin (2 * K) × Fin (2 * L))).mulVec
+        (neelSquareState K L) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelSquareConfig K L)
+            ((⟨i, hi⟩, ⟨j, by omega⟩) :
+              Fin (2 * K) × Fin (2 * L))
+            ((⟨i, hi⟩, ⟨j + 1, hj⟩) :
+              Fin (2 * K) × Fin (2 * L)))
+        - (1 / 4 : ℂ) • neelSquareState K L := by
+  unfold neelSquareState
+  apply spinHalfDot_mulVec_basisVec_antiparallel
+  · intro h
+    have := congrArg Prod.snd h
+    have hval := congrArg Fin.val this
+    simp at hval
+  · unfold neelSquareConfig
+    simp only
+    by_cases hp : (i + j) % 2 = 0
+    · have hp1 : (i + (j + 1)) % 2 ≠ 0 := by omega
+      simp [hp, hp1]
+    · have hp1 : (i + (j + 1)) % 2 = 0 := by omega
+      simp [hp, hp1]
+
 end LatticeSystem.Quantum
