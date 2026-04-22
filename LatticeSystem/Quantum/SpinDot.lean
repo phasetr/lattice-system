@@ -597,6 +597,22 @@ theorem basisSwap_antiparallel {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin 2)
   rw [Function.update_of_ne hxy, Function.update_self]
   exact h.symm
 
+omit [Fintype Λ] in
+/-- The swap of an anti-parallel configuration changes `σ`:
+`σ x ≠ σ y → basisSwap σ x y ≠ σ`. The swap necessarily flips the
+values at positions `x` and `y`, and these are different by
+hypothesis. Useful for orthogonality computations on swapped
+configurations. -/
+theorem basisSwap_ne_self {x y : Λ} (hxy : x ≠ y)
+    {σ : Λ → Fin 2} (h : σ x ≠ σ y) :
+    basisSwap σ x y ≠ σ := by
+  intro heq
+  apply h
+  have h1 : basisSwap σ x y x = σ x := by rw [heq]
+  unfold basisSwap at h1
+  rw [Function.update_of_ne hxy, Function.update_self] at h1
+  exact h1.symm
+
 /-- Singlet eigenvalue (Tasaki (2.2.19)): for `x ≠ y` and σ
 anti-parallel, the unsymmetric combination `|σ⟩ - |swap σ⟩` is an
 eigenvector of `Ŝ_x · Ŝ_y` with eigenvalue `-3/4`. -/
