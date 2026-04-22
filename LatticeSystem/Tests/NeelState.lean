@@ -288,6 +288,59 @@ example :
         (0 : ℂ) :=
   neelCubicState_mem_magnetizationSubspace_zero 1 1 1
 
+/-! ## 3D Néel cubic-torus wrap-around bond actions -/
+
+example (K L M : ℕ) {j k : ℕ}
+    (hj : j < 2 * L) (hk : k < 2 * M) :
+    (spinHalfDot
+        (((⟨2 * K + 1, by omega⟩, ⟨j, hj⟩), ⟨k, hk⟩) :
+          (Fin (2 * (K + 1)) × Fin (2 * L)) × Fin (2 * M))
+        (((⟨0, by omega⟩, ⟨j, hj⟩), ⟨k, hk⟩) :
+          (Fin (2 * (K + 1)) × Fin (2 * L)) × Fin (2 * M))).mulVec
+        (neelCubicState (K + 1) L M) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelCubicConfig (K + 1) L M)
+            (((⟨2 * K + 1, by omega⟩, ⟨j, hj⟩), ⟨k, hk⟩) :
+              (Fin (2 * (K + 1)) × Fin (2 * L)) × Fin (2 * M))
+            (((⟨0, by omega⟩, ⟨j, hj⟩), ⟨k, hk⟩) :
+              (Fin (2 * (K + 1)) × Fin (2 * L)) × Fin (2 * M))) -
+        (1 / 4 : ℂ) • neelCubicState (K + 1) L M :=
+  spinHalfDot_mulVec_neelCubicState_x_wrap K L M hj hk
+
+example (K L M : ℕ) {i k : ℕ}
+    (hi : i < 2 * K) (hk : k < 2 * M) :
+    (spinHalfDot
+        (((⟨i, hi⟩, ⟨2 * L + 1, by omega⟩), ⟨k, hk⟩) :
+          (Fin (2 * K) × Fin (2 * (L + 1))) × Fin (2 * M))
+        (((⟨i, hi⟩, ⟨0, by omega⟩), ⟨k, hk⟩) :
+          (Fin (2 * K) × Fin (2 * (L + 1))) × Fin (2 * M))).mulVec
+        (neelCubicState K (L + 1) M) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelCubicConfig K (L + 1) M)
+            (((⟨i, hi⟩, ⟨2 * L + 1, by omega⟩), ⟨k, hk⟩) :
+              (Fin (2 * K) × Fin (2 * (L + 1))) × Fin (2 * M))
+            (((⟨i, hi⟩, ⟨0, by omega⟩), ⟨k, hk⟩) :
+              (Fin (2 * K) × Fin (2 * (L + 1))) × Fin (2 * M))) -
+        (1 / 4 : ℂ) • neelCubicState K (L + 1) M :=
+  spinHalfDot_mulVec_neelCubicState_y_wrap K L M hi hk
+
+example (K L M : ℕ) {i j : ℕ}
+    (hi : i < 2 * K) (hj : j < 2 * L) :
+    (spinHalfDot
+        (((⟨i, hi⟩, ⟨j, hj⟩), ⟨2 * M + 1, by omega⟩) :
+          (Fin (2 * K) × Fin (2 * L)) × Fin (2 * (M + 1)))
+        (((⟨i, hi⟩, ⟨j, hj⟩), ⟨0, by omega⟩) :
+          (Fin (2 * K) × Fin (2 * L)) × Fin (2 * (M + 1)))).mulVec
+        (neelCubicState K L (M + 1)) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelCubicConfig K L (M + 1))
+            (((⟨i, hi⟩, ⟨j, hj⟩), ⟨2 * M + 1, by omega⟩) :
+              (Fin (2 * K) × Fin (2 * L)) × Fin (2 * (M + 1)))
+            (((⟨i, hi⟩, ⟨j, hj⟩), ⟨0, by omega⟩) :
+              (Fin (2 * K) × Fin (2 * L)) × Fin (2 * (M + 1)))) -
+        (1 / 4 : ℂ) • neelCubicState K L (M + 1) :=
+  spinHalfDot_mulVec_neelCubicState_z_wrap K L M hi hj
+
 /-! ## 3D Néel state K = L = M = 1 time-reversal -/
 
 example :
