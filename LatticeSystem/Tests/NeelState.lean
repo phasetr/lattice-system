@@ -600,6 +600,24 @@ example (K L M : ℕ) {i j k : ℕ}
             (neelCubicState K L M)) τ = -(1 / 4 : ℂ) :=
   neelCubicState_inner_spinHalfDot_x_adjacent_eq_neg_one_quarter K L M hi hj hk
 
+/-! ## Néel chain energy expectation (K=1 open chain) -/
+
+example (J : ℝ) :
+    ∑ τ : Fin 2 → Fin 2,
+        neelChainState 1 τ *
+          ((heisenbergHamiltonian (openChainCoupling 1 J)).mulVec
+            (neelChainState 1)) τ = (J / 2 : ℂ) :=
+  neelChainState_energy_expectation_K1 J
+
+example :
+    ∑ τ : Fin 2 → Fin 2,
+        neelChainState 1 τ *
+          ((heisenbergHamiltonian (openChainCoupling 1 1)).mulVec
+            (neelChainState 1)) τ = (1 / 2 : ℂ) := by
+  rw [neelChainState_energy_expectation_K1]
+  push_cast
+  ring
+
 /-! ## Marshall × time-reversal bridge -/
 
 example (K : ℕ) :
