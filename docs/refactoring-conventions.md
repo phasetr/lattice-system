@@ -127,9 +127,29 @@ When generalising a definition, keep the **specialised version**
 with a `@[deprecated <replacement> (since := "YYYY-MM-DD")]`
 annotation. The deprecation window is at least one minor version
 of the project (or one feature-cluster of subsequent PRs).
+**Concrete current policy: 6 months from `since`** — see
+[deprecations.html](deprecations.html) for the live tracking
+table, removal-PR checklist, and current entries.
 
 **Do not deprecate** until all bridge lemmas are in place and
 verified.
+
+When `@[deprecated]` cannot use a target name (because the
+generic replacement requires a lambda argument the deprecation
+syntax can't express), use the message form
+`@[deprecated "use the generic ... with the ... indicator ..."
+(since := "YYYY-MM-DD")]` to give callers a concrete migration
+hint.
+
+Internal companion theorems on the deprecated name continue to
+exist (they are the migration scaffolding). Suppress the
+deprecation linter for the block of companions immediately after
+the deprecated declaration with a single
+`set_option linter.deprecated false` and a comment explaining
+why. Tests that exercise the deprecated names for backward-compat
+coverage do the same at file level (test files exempt). The
+deprecation warning text itself is captured by `#guard_msgs`
+(method F) at the end of the test file.
 
 ### Review check — generic / dedup
 
