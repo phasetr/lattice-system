@@ -26,6 +26,7 @@ import LatticeSystem.Quantum.IsingChain
 import LatticeSystem.Fermion.Mode
 import LatticeSystem.Fermion.JordanWigner
 import LatticeSystem.Fermion.JWAbstract
+import LatticeSystem.Tests.Foundation
 import LatticeSystem.Tests.Sanity
 import LatticeSystem.Tests.Graph
 import LatticeSystem.Tests.Heisenberg
