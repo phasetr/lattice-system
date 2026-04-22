@@ -70,11 +70,11 @@ form -/
 example : spinHalfOpPlus = !![0, 1; 0, 0] := by
   ext i j
   fin_cases i <;> fin_cases j <;>
-    simp [spinHalfOpPlus, spinHalfOp1, spinHalfOp2, pauliX, pauliY]
+    simp [spinHalfOpPlus]
 
 example : spinHalfOpMinus = !![0, 0; 1, 0] := by
   ext i j
   fin_cases i <;> fin_cases j <;>
-    simp [spinHalfOpMinus, spinHalfOp1, spinHalfOp2, pauliX, pauliY]
+    simp [spinHalfOpMinus]
 
 end LatticeSystem.Tests.SpinHalfFamily
