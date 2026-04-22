@@ -43,4 +43,21 @@ example :
     timeReversalSpinHalf (timeReversalSpinHalf spinHalfUp) = -spinHalfUp :=
   timeReversalSpinHalf_sq spinHalfUp
 
+/-! ## `Θ̂` flips the spin: `Θ̂ Ŝ^(α) Θ̂⁻¹ = -Ŝ^(α)` (equivariance form) -/
+
+example (v : Fin 2 → ℂ) :
+    timeReversalSpinHalf (spinHalfOp1.mulVec v) =
+      (-spinHalfOp1).mulVec (timeReversalSpinHalf v) :=
+  timeReversalSpinHalf_spinHalfOp1_mulVec v
+
+example (v : Fin 2 → ℂ) :
+    timeReversalSpinHalf (spinHalfOp2.mulVec v) =
+      (-spinHalfOp2).mulVec (timeReversalSpinHalf v) :=
+  timeReversalSpinHalf_spinHalfOp2_mulVec v
+
+example (v : Fin 2 → ℂ) :
+    timeReversalSpinHalf (spinHalfOp3.mulVec v) =
+      (-spinHalfOp3).mulVec (timeReversalSpinHalf v) :=
+  timeReversalSpinHalf_spinHalfOp3_mulVec v
+
 end LatticeSystem.Tests.TimeReversalSpinHalf

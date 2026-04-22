@@ -3914,6 +3914,25 @@ The double conjugation \(\overline{\overline{x}} = x\) cancels and
 the explicit minus sign in the first component survives.
 \end{proof}
 
+\noindent\textbf{Theorem (spin sign flip,
+Tasaki eq.~(2.3.14)).} For \(\alpha \in \{1, 2, 3\}\),
+\[
+  \hat{\Theta}\bigl(\hat{S}^{(\alpha)}\,v\bigr)
+  \;=\; (-\hat{S}^{(\alpha)})\bigl(\hat{\Theta}\,v\bigr)
+  \qquad \text{for every } v : \texttt{Fin}\,2 \to \mathbb{C}.
+\]
+This is the equivariance form of
+\(\hat{\Theta}\,\hat{S}^{(\alpha)}\,\hat{\Theta}^{-1}
+   = -\hat{S}^{(\alpha)}\).
+The matrix-action form is needed because \(\hat{\Theta}\) is
+antilinear and the conjugation
+\(\hat{\Theta}^{-1} \cdot \hat{S}^{(\alpha)} \cdot \hat{\Theta}\)
+cannot be written as a complex matrix in the conventional sense.
+In Lean this is \texttt{timeReversalSpinHalf\_spinHalfOp\{1,2,3\}\_mulVec};
+the proof is a direct \texttt{fin\_cases} computation using the
+explicit formulae for \(\sigma^{x}, \sigma^{y}, \sigma^{z}\) and
+the conjugate ring homomorphism on the entries.
+
 \noindent\textbf{Status / scope.} The single-spin case is closed
 (\texttt{LatticeSystem/Quantum/TimeReversalSpinHalf.lean}). The
 multi-spin extension \(\hat{\Theta}_{\text{tot}} =
