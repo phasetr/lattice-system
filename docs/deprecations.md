@@ -79,6 +79,36 @@ Existing `#guard_msgs` deprecation tests:
 
 ---
 
+## Remaining linter suppressions
+
+For transparency, the following `set_option linter.* false`
+suppressions remain in source files as of 2026-04-23. Each is
+per-theorem (not file-level) and carries a comment justifying
+the suppression. They exist because refactoring the underlying
+proof requires interactive `simp?` investigation per
+`fin_cases` sub-case, which is best performed in a focused Lean
+session.
+
+| Module | Theorem | Suppressed linters | Reason |
+|---|---|---|---|
+| `Quantum/SpinHalfRotation/Conjugation.lean` | `spinHalfRot3_eq_exp` | `flexible`, `unusedTactic`, `unusedSimpArgs` | Per-sub-case `simp [...]` after `fin_cases i <;> fin_cases j` |
+| `Quantum/SpinHalfRotation/Conjugation.lean` | `spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp` | `flexible`, `unusedTactic` | Same |
+| `Quantum/SpinHalfRotation/Conjugation.lean` | `spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfDown` | `flexible`, `unusedTactic` | Same |
+| `Quantum/SpinOneBasis.lean` | `spinOneOpPlus_eq_add` | `flexible` | Per-sub-case `simp [...]` after `fin_cases` over a 3×3 matrix |
+| `Quantum/SpinOneBasis.lean` | `spinOneOpMinus_eq_sub` | `flexible` | Same |
+| `Quantum/SpinOneDecomp.lean` | `spinOneUnit02_eq_polynomial` | `flexible` | Same |
+| `Quantum/SpinOneDecomp.lean` | `spinOneUnit20_eq_polynomial` | `flexible` | Same |
+| `Quantum/NeelState/MarshallSign.lean` | (block after deprecated defs) | `deprecated` | Internal companion theorems on the deprecated names |
+| `Tests/NeelState.lean` | (file-level inside backward-compat tests) | `deprecated` | Tests intentionally exercise deprecated names; deprecation warnings are independently captured by `#guard_msgs` blocks |
+
+The `lake build` is **zero warnings** even with these suppressions —
+they pre-empt warnings the linter would otherwise emit. The
+Phase 4 completion criterion (no `set_option linter.* false` in
+source files) targets eventual removal of these via interactive
+proof refactoring.
+
+---
+
 ## See also
 
 - [refactoring conventions §3 (dedup + deprecation)](refactoring-conventions.html#3-dedup-conventions)
