@@ -272,4 +272,35 @@ example (N : ℕ) (i j : Fin (N + 1)) :
 example (N : ℕ) : (fermionTotalNumber N).IsHermitian :=
   fermionTotalNumber_isHermitian N
 
+/-! ## A. decide-based universal — small-N index parity (Phase 1
+PR 2 strengthening, refactor plan v4 §2.1 method A) -/
+
+/-- The JW string index range `Fin (N + 1)` for `N = 1` is exactly
+`{0, 1}` (universally verified by `decide`). Trivial but pins the
+indexing convention. -/
+example : ∀ i : Fin 2, i.val = 0 ∨ i.val = 1 := by decide
+
+/-- The JW string index range for `N = 2` is exactly `{0, 1, 2}`. -/
+example : ∀ i : Fin 3, i.val = 0 ∨ i.val = 1 ∨ i.val = 2 := by decide
+
+/-! ## G. small exhaustive on `Fin 2` (Phase 1 PR 2 strengthening,
+refactor plan v4 §2.1 method G) -/
+
+/-- For every site `i : Fin 2` (i.e. `N = 1`), the JW string squares
+to identity. Exhaustive `fin_cases` instance pin (smaller than the
+`∀ N i` shim above). -/
+example : ∀ i : Fin 2, jwString 1 i * jwString 1 i = 1 := by
+  intro i
+  exact jwString_sq 1 i
+
+/-- For every site `i : Fin 2`, both `c_i² = 0` and `(c_i†)² = 0`
+hold (exhaustive). -/
+example : ∀ i : Fin 2,
+    fermionMultiAnnihilation 1 i * fermionMultiAnnihilation 1 i =
+        0 ∧
+      fermionMultiCreation 1 i * fermionMultiCreation 1 i = 0 := by
+  intro i
+  exact ⟨fermionMultiAnnihilation_sq 1 i,
+    fermionMultiCreation_sq 1 i⟩
+
 end LatticeSystem.Tests.JordanWigner
