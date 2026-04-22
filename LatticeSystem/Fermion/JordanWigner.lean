@@ -2917,6 +2917,70 @@ theorem hubbardChainGibbsState_commute_hamiltonian
       (hubbardChainHamiltonian N J U) :=
   LatticeSystem.Quantum.gibbsState_commute_hamiltonian β _
 
+/-! ## Hubbard chain Gibbs expectation companions
+
+Generic-`gibbsExpectation*` lemmas instantiated at the 1D Hubbard
+chain Hamiltonian. -/
+
+/-- Infinite-temperature (β = 0) closed form for the Hubbard
+chain expectation: `⟨A⟩_0 = (1/dim) · Tr A`. -/
+theorem hubbardChainGibbsExpectation_zero (N : ℕ) (J U : ℝ)
+    (A : ManyBodyOp (Fin (2 * N + 2))) :
+    LatticeSystem.Quantum.gibbsExpectation 0
+        (hubbardChainHamiltonian N J U) A
+      = ((Fintype.card (Fin (2 * N + 2) → Fin 2) : ℂ))⁻¹ *
+          A.trace :=
+  LatticeSystem.Quantum.gibbsExpectation_zero
+    (hubbardChainHamiltonian N J U) A
+
+/-- For Hermitian `O`, the Hubbard-chain expectation `⟨O⟩_β` is
+real. -/
+theorem hubbardChainGibbsExpectation_im_of_isHermitian
+    (N : ℕ) (β J U : ℝ) {O : ManyBodyOp (Fin (2 * N + 2))}
+    (hO : O.IsHermitian) :
+    (LatticeSystem.Quantum.gibbsExpectation β
+        (hubbardChainHamiltonian N J U) O).im = 0 :=
+  LatticeSystem.Quantum.gibbsExpectation_im_of_isHermitian
+    (hubbardChainHamiltonian_isHermitian N J U) hO β
+
+/-- Hubbard-chain conservation law: `⟨[H, A]⟩_β = 0`. -/
+theorem hubbardChainGibbsExpectation_commutator_hamiltonian
+    (N : ℕ) (β J U : ℝ) (A : ManyBodyOp (Fin (2 * N + 2))) :
+    LatticeSystem.Quantum.gibbsExpectation β
+        (hubbardChainHamiltonian N J U)
+        (hubbardChainHamiltonian N J U * A
+          - A * hubbardChainHamiltonian N J U) = 0 :=
+  LatticeSystem.Quantum.gibbsExpectation_commutator_hamiltonian β
+    (hubbardChainHamiltonian N J U) A
+
+/-- Hubbard-chain energy expectation is real:
+`(⟨H_chain⟩_β).im = 0`. -/
+theorem hubbardChainGibbsExpectation_hamiltonian_im
+    (N : ℕ) (β J U : ℝ) :
+    (LatticeSystem.Quantum.gibbsExpectation β
+        (hubbardChainHamiltonian N J U)
+        (hubbardChainHamiltonian N J U)).im = 0 :=
+  LatticeSystem.Quantum.gibbsExpectation_hamiltonian_im
+    (hubbardChainHamiltonian_isHermitian N J U) β
+
+/-- Hubbard-chain energy n-th power expectation is real:
+`(⟨H_chain^n⟩_β).im = 0` for any `n : ℕ`. -/
+theorem hubbardChainGibbsExpectation_hamiltonian_pow_im
+    (N : ℕ) (β J U : ℝ) (n : ℕ) :
+    (LatticeSystem.Quantum.gibbsExpectation β
+        (hubbardChainHamiltonian N J U)
+        ((hubbardChainHamiltonian N J U)^n)).im = 0 :=
+  LatticeSystem.Quantum.gibbsExpectation_pow_im_of_isHermitian
+    (hubbardChainHamiltonian_isHermitian N J U)
+    (hubbardChainHamiltonian_isHermitian N J U) β n
+
+/-- Hubbard-chain partition function is real. -/
+theorem hubbardChain_partitionFn_im (N : ℕ) (β J U : ℝ) :
+    (LatticeSystem.Quantum.partitionFn β
+        (hubbardChainHamiltonian N J U)).im = 0 :=
+  LatticeSystem.Quantum.partitionFn_im_of_isHermitian
+    (hubbardChainHamiltonian_isHermitian N J U) β
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`
