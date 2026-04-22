@@ -104,6 +104,36 @@ theorem timeReversalSpinHalfMulti_apply
       (∏ x : Λ, timeReversalSign (τ x)) *
         starRingEnd ℂ (v (flipConfig τ)) := rfl
 
+/-- Multi-spin `Θ̂_tot` is additive: `Θ̂_tot (v + w) = Θ̂_tot v + Θ̂_tot w`. -/
+theorem timeReversalSpinHalfMulti_add
+    (v w : (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti (v + w) =
+      timeReversalSpinHalfMulti v + timeReversalSpinHalfMulti w := by
+  funext τ
+  simp only [timeReversalSpinHalfMulti_apply, Pi.add_apply, map_add]
+  ring
+
+/-- Multi-spin `Θ̂_tot` is **antilinear** in the scalar:
+`Θ̂_tot (c • v) = (conj c) • Θ̂_tot v`. -/
+theorem timeReversalSpinHalfMulti_smul
+    (c : ℂ) (v : (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti (c • v) =
+      (starRingEnd ℂ c) • timeReversalSpinHalfMulti v := by
+  funext τ
+  simp only [timeReversalSpinHalfMulti_apply, Pi.smul_apply,
+    smul_eq_mul, map_mul]
+  ring
+
+/-- Multi-spin `Θ̂_tot` is real-linear in the scalar (special case
+of antilinearity at real `r`). -/
+theorem timeReversalSpinHalfMulti_real_smul
+    (r : ℝ) (v : (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti ((r : ℂ) • v) =
+      (r : ℂ) • timeReversalSpinHalfMulti v := by
+  rw [timeReversalSpinHalfMulti_smul]
+  congr 1
+  exact (Complex.conj_ofReal r).symm ▸ Complex.conj_ofReal r
+
 /-- The product of `ε(τ x)` over `Λ` is real: it is either `+1` or
 `-1` depending on parity. -/
 theorem timeReversalSign_prod_conj (τ : Λ → Fin 2) :
