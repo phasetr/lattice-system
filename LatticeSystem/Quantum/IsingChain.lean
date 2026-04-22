@@ -511,4 +511,62 @@ theorem isingCycleGibbsState_commute_hamiltonian
     Commute (isingCycleGibbsState N β J h) (isingCycleHamiltonian N J h) :=
   gibbsState_commute_hamiltonian β (isingCycleHamiltonian N J h)
 
+/-! ## Expectation theorems for the periodic Ising chain
+
+Companions of the open-chain `quantumIsingGibbs*` family from
+the previous section, instantiating the generic `gibbsExpectation*`
+lemmas at the periodic Ising Hamiltonian. -/
+
+/-- Infinite-temperature (β = 0) closed form for the periodic Ising
+expectation: `⟨A⟩_0 = (1/dim) · Tr A` for any observable `A`. -/
+theorem isingCycleGibbsExpectation_zero (N : ℕ) (J h : ℝ)
+    (A : ManyBodyOp (Fin (N + 2))) :
+    gibbsExpectation 0 (isingCycleHamiltonian N J h) A
+      = ((Fintype.card (Fin (N + 2) → Fin 2) : ℂ))⁻¹ * A.trace :=
+  gibbsExpectation_zero (isingCycleHamiltonian N J h) A
+
+/-- For any Hermitian observable `O`, the periodic Ising
+expectation `⟨O⟩_β` is real (imaginary part vanishes). -/
+theorem isingCycleGibbsExpectation_im_of_isHermitian
+    (N : ℕ) (β J h : ℝ) {O : ManyBodyOp (Fin (N + 2))}
+    (hO : O.IsHermitian) :
+    (gibbsExpectation β (isingCycleHamiltonian N J h) O).im = 0 :=
+  gibbsExpectation_im_of_isHermitian
+    (isingCycleHamiltonian_isHermitian N J h) hO β
+
+/-- Periodic Ising conservation law: `⟨[H, A]⟩_β = 0`. -/
+theorem isingCycleGibbsExpectation_commutator_hamiltonian
+    (N : ℕ) (β J h : ℝ) (A : ManyBodyOp (Fin (N + 2))) :
+    gibbsExpectation β (isingCycleHamiltonian N J h)
+        (isingCycleHamiltonian N J h * A
+          - A * isingCycleHamiltonian N J h) = 0 :=
+  gibbsExpectation_commutator_hamiltonian β
+    (isingCycleHamiltonian N J h) A
+
+/-- Periodic Ising energy expectation is real:
+`(⟨H_cycle⟩_β).im = 0`. -/
+theorem isingCycleGibbsExpectation_hamiltonian_im
+    (N : ℕ) (β J h : ℝ) :
+    (gibbsExpectation β (isingCycleHamiltonian N J h)
+        (isingCycleHamiltonian N J h)).im = 0 :=
+  gibbsExpectation_hamiltonian_im
+    (isingCycleHamiltonian_isHermitian N J h) β
+
+/-- Periodic Ising energy n-th power expectation is real:
+`(⟨H_cycle^n⟩_β).im = 0` for any `n : ℕ`. -/
+theorem isingCycleGibbsExpectation_hamiltonian_pow_im
+    (N : ℕ) (β J h : ℝ) (n : ℕ) :
+    (gibbsExpectation β (isingCycleHamiltonian N J h)
+        ((isingCycleHamiltonian N J h)^n)).im = 0 :=
+  gibbsExpectation_pow_im_of_isHermitian
+    (isingCycleHamiltonian_isHermitian N J h)
+    (isingCycleHamiltonian_isHermitian N J h) β n
+
+/-- Periodic Ising partition function is real:
+`(partitionFn β H_cycle).im = 0`. -/
+theorem isingCycle_partitionFn_im (N : ℕ) (β J h : ℝ) :
+    (partitionFn β (isingCycleHamiltonian N J h)).im = 0 :=
+  partitionFn_im_of_isHermitian
+    (isingCycleHamiltonian_isHermitian N J h) β
+
 end LatticeSystem.Quantum
