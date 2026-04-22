@@ -50,6 +50,16 @@ respectively.
 | Thermodynamic limit (infinite graphs) | Long term, **major project goal** | Simon, Friedli-Velenik, Bratteli-Robinson |
 | Lattice QCD | Longest term | Aarts, Davies |
 
+## Refactoring conventions and review criteria
+
+A **single-source-of-truth document** for refactoring conventions
+applied as the review checklist on every pull request:
+[Refactoring conventions and review criteria](refactoring-conventions.html).
+Topics: test methods (decide / bridge / small-exhaustive / shim /
+`#guard_msgs`), module-split criteria, generic / dedup conventions,
+deprecation window policy, naming / docstring rules, linter
+exceptions, public-doc synchronisation.
+
 ## Roadmap
 
 | Phase | Scope | Status |
