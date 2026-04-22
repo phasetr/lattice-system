@@ -567,6 +567,39 @@ example :
             (neelChainState 1)) τ = -(1 / 4 : ℂ) :=
   neelChainState_inner_spinHalfDot_adjacent_eq_neg_one_quarter 1 (by decide)
 
+example (K : ℕ) :
+    ∑ τ : Fin (2 * (K + 1)) → Fin 2,
+        neelChainState (K + 1) τ *
+          ((spinHalfDot
+              (⟨2 * K + 1, by omega⟩ : Fin (2 * (K + 1)))
+              (⟨0, by omega⟩ : Fin (2 * (K + 1)))).mulVec
+            (neelChainState (K + 1))) τ = -(1 / 4 : ℂ) :=
+  neelChainState_inner_spinHalfDot_wrap_eq_neg_one_quarter K
+
+example (K L : ℕ) {i j : ℕ}
+    (hi : i + 1 < 2 * K) (hj : j < 2 * L) :
+    ∑ τ : Fin (2 * K) × Fin (2 * L) → Fin 2,
+        neelSquareState K L τ *
+          ((spinHalfDot
+              ((⟨i, by omega⟩, ⟨j, hj⟩) :
+                Fin (2 * K) × Fin (2 * L))
+              ((⟨i + 1, hi⟩, ⟨j, hj⟩) :
+                Fin (2 * K) × Fin (2 * L))).mulVec
+            (neelSquareState K L)) τ = -(1 / 4 : ℂ) :=
+  neelSquareState_inner_spinHalfDot_horizontal_adjacent_eq_neg_one_quarter K L hi hj
+
+example (K L M : ℕ) {i j k : ℕ}
+    (hi : i + 1 < 2 * K) (hj : j < 2 * L) (hk : k < 2 * M) :
+    ∑ τ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2,
+        neelCubicState K L M τ *
+          ((spinHalfDot
+              (((⟨i, by omega⟩, ⟨j, hj⟩), ⟨k, hk⟩) :
+                (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))
+              (((⟨i + 1, hi⟩, ⟨j, hj⟩), ⟨k, hk⟩) :
+                (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))).mulVec
+            (neelCubicState K L M)) τ = -(1 / 4 : ℂ) :=
+  neelCubicState_inner_spinHalfDot_x_adjacent_eq_neg_one_quarter K L M hi hj hk
+
 /-! ## Marshall × time-reversal bridge -/
 
 example (K : ℕ) :
