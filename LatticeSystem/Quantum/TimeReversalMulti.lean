@@ -738,6 +738,20 @@ private theorem timeReversalSpinHalfMulti_onSite_spinHalfOp3_mul_onSite_mulVec
     Matrix.neg_mulVec, Matrix.neg_mulVec,
     Matrix.mulVec_neg, neg_neg]
 
+/-- `Θ̂_tot` distributes over a finite sum of states. -/
+private theorem timeReversalSpinHalfMulti_sum
+    {ι : Type*} [DecidableEq ι]
+    (s : Finset ι) (f : ι → (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti (∑ i ∈ s, f i) =
+      ∑ i ∈ s, timeReversalSpinHalfMulti (f i) := by
+  induction s using Finset.induction with
+  | empty =>
+    funext τ
+    simp [timeReversalSpinHalfMulti_apply]
+  | insert a t ha ih =>
+    rw [Finset.sum_insert ha, timeReversalSpinHalfMulti_add, ih,
+      Finset.sum_insert ha]
+
 /-- **Time-reversal invariance of `Ŝ_x · Ŝ_y`** (Tasaki §2.3):
 the bilinear two-site spin inner product is invariant under
 `Θ̂_tot`,
@@ -757,5 +771,46 @@ theorem timeReversalSpinHalfMulti_spinHalfDot_mulVec
     timeReversalSpinHalfMulti_onSite_spinHalfOp2_mul_onSite_mulVec,
     timeReversalSpinHalfMulti_onSite_spinHalfOp3_mul_onSite_mulVec,
     ← Matrix.add_mulVec, ← Matrix.add_mulVec]
+
+/-- Helper: `(heisenbergHamiltonian J).mulVec v` expands as a
+double sum of `J(x,y) • (spinHalfDot x y).mulVec v` terms. -/
+private theorem heisenbergHamiltonian_mulVec_expand
+    (J : Λ → Λ → ℂ) (v : (Λ → Fin 2) → ℂ) :
+    (heisenbergHamiltonian J).mulVec v =
+      ∑ x : Λ, ∑ y : Λ, J x y • (spinHalfDot x y).mulVec v := by
+  unfold heisenbergHamiltonian
+  rw [Matrix.sum_mulVec]
+  apply Finset.sum_congr rfl
+  intro x _
+  rw [Matrix.sum_mulVec]
+  apply Finset.sum_congr rfl
+  intro y _
+  rw [Matrix.smul_mulVec]
+
+/-- **Time-reversal invariance of the Heisenberg Hamiltonian**
+(Tasaki §2.3): if every coupling entry `J(x, y)` is real
+(`conj (J x y) = J x y`), then `Θ̂_tot` commutes with `H`.
+
+Combines: `Ŝ_x · Ŝ_y` invariance under `Θ̂_tot` (per-bond),
+antilinearity of `Θ̂_tot` (each scalar `J(x,y)` survives because
+`conj(J(x,y)) = J(x,y)` for real `J`), and additivity of
+`Θ̂_tot` (distribute over the double sum). -/
+theorem timeReversalSpinHalfMulti_heisenbergHamiltonian_mulVec
+    (J : Λ → Λ → ℂ) (hJ : ∀ x y, starRingEnd ℂ (J x y) = J x y)
+    (v : (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((heisenbergHamiltonian J).mulVec v) =
+      (heisenbergHamiltonian J).mulVec
+        (timeReversalSpinHalfMulti v) := by
+  rw [heisenbergHamiltonian_mulVec_expand,
+    heisenbergHamiltonian_mulVec_expand,
+    timeReversalSpinHalfMulti_sum]
+  apply Finset.sum_congr rfl
+  intro x _
+  rw [timeReversalSpinHalfMulti_sum]
+  apply Finset.sum_congr rfl
+  intro y _
+  rw [timeReversalSpinHalfMulti_smul, hJ x y,
+    timeReversalSpinHalfMulti_spinHalfDot_mulVec]
 
 end LatticeSystem.Quantum

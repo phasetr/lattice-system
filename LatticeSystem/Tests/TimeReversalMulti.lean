@@ -157,4 +157,12 @@ example (x y : Fin 3) (v : (Fin 3 → Fin 2) → ℂ) :
       (spinHalfDot x y).mulVec (timeReversalSpinHalfMulti v) :=
   timeReversalSpinHalfMulti_spinHalfDot_mulVec x y v
 
+/-! ## Time-reversal invariance of the Heisenberg Hamiltonian -/
+
+example (J : Fin 3 → Fin 3 → ℂ) (hJ : ∀ x y, starRingEnd ℂ (J x y) = J x y)
+    (v : (Fin 3 → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti ((heisenbergHamiltonian J).mulVec v) =
+      (heisenbergHamiltonian J).mulVec (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_heisenbergHamiltonian_mulVec J hJ v
+
 end LatticeSystem.Tests.TimeReversalMulti
