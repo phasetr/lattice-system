@@ -368,4 +368,54 @@ theorem onSite_pauliX_mulVec_basisVec (x : Λ) (σ : Λ → Fin 2) :
     -- pauliX 0 1 = 1, pauliX 1 1 = 0; updated value 0 = 1 - 1
     simp [pauliX]
 
+/-- Closed-form indicator for `pauliX`: `pauliX a b = 1` iff
+`b = 1 - a`, else `0`. The off-diagonal Pauli matrix viewed as a
+spin-flip indicator. -/
+private theorem pauliX_eq_indicator (a b : Fin 2) :
+    pauliX a b = (if b = 1 - a then (1 : ℂ) else 0) := by
+  fin_cases a <;> fin_cases b <;> rfl
+
+/-- Pointwise unfolding of `(onSite x pauliX).mulVec v`: the
+off-diagonal action sends `v τ` to `v (siteFlipAt τ x)`.
+
+  `((onSite x σ^x).mulVec v) τ = v (siteFlipAt τ x)`. -/
+theorem onSite_pauliX_mulVec_apply
+    (x : Λ) (v : (Λ → Fin 2) → ℂ) (τ : Λ → Fin 2) :
+    ((onSite x pauliX).mulVec v) τ = v (siteFlipAt τ x) := by
+  unfold Matrix.mulVec dotProduct
+  -- Replace each summand by an indicator-shaped expression, then
+  -- reduce via `Fintype.sum_eq_single`.
+  rw [show (∑ σ : Λ → Fin 2, (onSite x pauliX) τ σ * v σ)
+        = ∑ σ : Λ → Fin 2,
+            (if σ = siteFlipAt τ x then v σ else 0) from ?_]
+  · rw [Finset.sum_ite_eq']
+    simp
+  · apply Finset.sum_congr rfl
+    intro σ _
+    simp only [onSite_apply]
+    by_cases hagree : ∀ k, k ≠ x → τ k = σ k
+    · -- agree off x: matrix entry = pauliX (τ x) (σ x) = indicator [σ x = 1 - τ x]
+      rw [if_pos hagree, pauliX_eq_indicator]
+      by_cases hsx : σ x = 1 - τ x
+      · -- σ = siteFlipAt τ x
+        have hσ : σ = siteFlipAt τ x := by
+          funext k
+          by_cases hk : k = x
+          · rw [hk, siteFlipAt_self]; exact hsx
+          · rw [siteFlipAt_of_ne _ hk]; exact (hagree k hk).symm
+        rw [if_pos hsx, if_pos hσ, one_mul]
+      · -- σ ≠ siteFlipAt τ x (since they differ at x)
+        have hσ : σ ≠ siteFlipAt τ x := by
+          intro h
+          apply hsx
+          rw [h, siteFlipAt_self]
+        rw [if_neg hsx, if_neg hσ, zero_mul]
+    · -- disagree off x: matrix entry = 0; also σ ≠ siteFlipAt τ x
+      have hσ : σ ≠ siteFlipAt τ x := by
+        intro h
+        apply hagree
+        intro k hk
+        rw [h, siteFlipAt_of_ne _ hk]
+      rw [if_neg hagree, if_neg hσ, zero_mul]
+
 end LatticeSystem.Quantum
