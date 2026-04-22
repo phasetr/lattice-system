@@ -19,11 +19,19 @@ This file contains:
   (`squareTorusCoupling`),
 - 3D open cubic-lattice coupling (`cubicLatticeCoupling`),
 - Gibbs states + commute-with-H + Hermiticity for each,
-- Expectation companions (energy, partition function, im-of-Hermitian,
-  commutator-with-H, anticommutator, hamiltonian power im, etc.).
+- **Full Gibbs expectation companion family for each variant**
+  (parity with the 1D open / periodic chain in
+  `HeisenbergChain/Gibbs.lean`): `_GibbsExpectation_zero`,
+  `_im_of_isHermitian`, `_commutator_hamiltonian`,
+  `_mul_hamiltonian_im`, `_hamiltonian_im`, `_hamiltonian_sq_im`,
+  `_hamiltonian_pow_im`, `_anticommutator_im`, `_commutator_re`,
+  `_HamiltonianVariance_im`, `_partitionFn_im`,
+  `_ofReal_re_eq`, `_GibbsState_pow_trace` (≥ 14 companions × 3
+  variants = 42 lemmas total).
 
 (Refactor Phase 2 PR 16 — first HeisenbergChain extraction,
-plan v4 §3.1.)
+plan v4 §3.1. Phase 3 PR #334 backfilled the missing 33 2D / 3D
+companions to reach parity with the 1D variants.)
 -/
 
 namespace LatticeSystem.Quantum
