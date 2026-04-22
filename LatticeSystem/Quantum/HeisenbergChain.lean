@@ -28,6 +28,27 @@ We prove:
 
 Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 §3.3, p. 80 (Gibbs state stationarity); §3.5, p. 89 (Heisenberg chain).
+
+Sub-files extending this module (Phase 2 PR 23 / 24 split, plan
+v4 §3.1):
+
+| sub-file | content |
+|---|---|
+| `HeisenbergChain/Eigenvalues.lean` | open / periodic-chain Heisenberg |
+|                                    | eigenvalue propagation, magnetisation- |
+|                                    | subspace preservation, ladder action |
+| `HeisenbergChain/Gibbs.lean` | open / periodic-chain Heisenberg full |
+|                              | Gibbs companion family (15 lemmas × 2 |
+|                              | variants — Hermiticity, commute-with-H, |
+|                              | β=0, im-of-Hermitian, commutator, |
+|                              | mul-Hamiltonian-im, hamiltonian-{sq,pow}-im, |
+|                              | anticommutator, commutator-re, variance, |
+|                              | partitionFn, ofReal-re-eq, pow-trace) |
+
+Downstream code that wants Eigenvalues or Gibbs companions should
+import `Quantum.HeisenbergChain.Eigenvalues` and / or
+`Quantum.HeisenbergChain.Gibbs` directly (this file is content +
+extensions, not a façade).
 -/
 
 namespace LatticeSystem.Quantum
