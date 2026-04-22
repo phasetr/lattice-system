@@ -498,4 +498,103 @@ theorem spinHalfDot_mulVec_neelSquareState_vertical_adjacent
     · have hp1 : (i + (j + 1)) % 2 = 0 := by omega
       simp [hp, hp1]
 
+/-! ## 3D cubic Néel per-bond `Ŝ_x · Ŝ_y` actions -/
+
+/-- 3D x-axis bond `((i,j,k), (i+1,j,k))`: antiparallel under
+the 3D checkerboard. Same `(1/2)·|swap⟩ - (1/4)·|Φ_Néel⟩`
+decomposition. -/
+theorem spinHalfDot_mulVec_neelCubicState_x_adjacent
+    (K L M : ℕ) {i j k : ℕ}
+    (hi : i + 1 < 2 * K) (hj : j < 2 * L) (hk : k < 2 * M) :
+    (spinHalfDot
+        (((⟨i, by omega⟩, ⟨j, hj⟩), ⟨k, hk⟩) :
+          (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))
+        (((⟨i + 1, hi⟩, ⟨j, hj⟩), ⟨k, hk⟩) :
+          (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))).mulVec
+        (neelCubicState K L M) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelCubicConfig K L M)
+            (((⟨i, by omega⟩, ⟨j, hj⟩), ⟨k, hk⟩) :
+              (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))
+            (((⟨i + 1, hi⟩, ⟨j, hj⟩), ⟨k, hk⟩) :
+              (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))) -
+        (1 / 4 : ℂ) • neelCubicState K L M := by
+  unfold neelCubicState
+  apply spinHalfDot_mulVec_basisVec_antiparallel
+  · intro h
+    have h1 := congrArg Prod.fst h
+    have h2 := congrArg Prod.fst h1
+    have hval := congrArg Fin.val h2
+    simp at hval
+  · unfold neelCubicConfig
+    simp only
+    by_cases hp : (i + j + k) % 2 = 0
+    · have hp1 : ((i + 1) + j + k) % 2 ≠ 0 := by omega
+      simp [hp, hp1]
+    · have hp1 : ((i + 1) + j + k) % 2 = 0 := by omega
+      simp [hp, hp1]
+
+/-- 3D y-axis bond `((i,j,k), (i,j+1,k))`. -/
+theorem spinHalfDot_mulVec_neelCubicState_y_adjacent
+    (K L M : ℕ) {i j k : ℕ}
+    (hi : i < 2 * K) (hj : j + 1 < 2 * L) (hk : k < 2 * M) :
+    (spinHalfDot
+        (((⟨i, hi⟩, ⟨j, by omega⟩), ⟨k, hk⟩) :
+          (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))
+        (((⟨i, hi⟩, ⟨j + 1, hj⟩), ⟨k, hk⟩) :
+          (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))).mulVec
+        (neelCubicState K L M) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelCubicConfig K L M)
+            (((⟨i, hi⟩, ⟨j, by omega⟩), ⟨k, hk⟩) :
+              (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))
+            (((⟨i, hi⟩, ⟨j + 1, hj⟩), ⟨k, hk⟩) :
+              (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))) -
+        (1 / 4 : ℂ) • neelCubicState K L M := by
+  unfold neelCubicState
+  apply spinHalfDot_mulVec_basisVec_antiparallel
+  · intro h
+    have h1 := congrArg Prod.fst h
+    have h2 := congrArg Prod.snd h1
+    have hval := congrArg Fin.val h2
+    simp at hval
+  · unfold neelCubicConfig
+    simp only
+    by_cases hp : (i + j + k) % 2 = 0
+    · have hp1 : (i + (j + 1) + k) % 2 ≠ 0 := by omega
+      simp [hp, hp1]
+    · have hp1 : (i + (j + 1) + k) % 2 = 0 := by omega
+      simp [hp, hp1]
+
+/-- 3D z-axis bond `((i,j,k), (i,j,k+1))`. -/
+theorem spinHalfDot_mulVec_neelCubicState_z_adjacent
+    (K L M : ℕ) {i j k : ℕ}
+    (hi : i < 2 * K) (hj : j < 2 * L) (hk : k + 1 < 2 * M) :
+    (spinHalfDot
+        (((⟨i, hi⟩, ⟨j, hj⟩), ⟨k, by omega⟩) :
+          (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))
+        (((⟨i, hi⟩, ⟨j, hj⟩), ⟨k + 1, hk⟩) :
+          (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))).mulVec
+        (neelCubicState K L M) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelCubicConfig K L M)
+            (((⟨i, hi⟩, ⟨j, hj⟩), ⟨k, by omega⟩) :
+              (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))
+            (((⟨i, hi⟩, ⟨j, hj⟩), ⟨k + 1, hk⟩) :
+              (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))) -
+        (1 / 4 : ℂ) • neelCubicState K L M := by
+  unfold neelCubicState
+  apply spinHalfDot_mulVec_basisVec_antiparallel
+  · intro h
+    have h1 := congrArg Prod.snd h
+    have hval := congrArg Fin.val h1
+    simp at hval
+  · unfold neelCubicConfig
+    simp only
+    by_cases hp : (i + j + k) % 2 = 0
+    · have hp1 : (i + j + (k + 1)) % 2 ≠ 0 := by omega
+      simp [hp, hp1]
+    · have hp1 : (i + j + (k + 1)) % 2 = 0 := by omega
+      simp [hp, hp1]
+
 end LatticeSystem.Quantum
