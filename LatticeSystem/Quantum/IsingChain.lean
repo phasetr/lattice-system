@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import LatticeSystem.Quantum.ManyBody
 import LatticeSystem.Quantum.Pauli
 import LatticeSystem.Quantum.GibbsState
+import LatticeSystem.Quantum.GibbsState.Covariance
 import LatticeSystem.Lattice.Graph
 
 /-!
