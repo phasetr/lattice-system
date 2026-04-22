@@ -159,4 +159,39 @@ theorem timeReversalSpinHalfMulti_sq (v : (Λ → Fin 2) → ℂ) :
         ring]
   rw [timeReversalSign_prod_mul_flip]
 
+/-- Action of `Θ̂_tot` on a many-body basis state
+`|Ψ_σ⟩ = basisVec σ`:
+
+  `Θ̂_tot (basisVec σ) = (∏_x ε(flip σ x)) · basisVec (flip σ)`.
+
+This is the natural generalisation of the single-spin
+`Θ̂|↑⟩ = |↓⟩`, `Θ̂|↓⟩ = -|↑⟩` to many sites: each "down" spin
+in the *flipped* configuration contributes a sign `-1`, so the
+total sign is `(-1)^|{x : (flip σ) x = 1}| = (-1)^|{x : σ x = 0}|`.
+At a single site (`|Λ| = 1`), this recovers
+`Θ̂|↑⟩ = (-1)^0 · |↓⟩ = |↓⟩` and
+`Θ̂|↓⟩ = (-1)^1 · |↑⟩ = -|↑⟩`. -/
+theorem timeReversalSpinHalfMulti_basisVec (σ : Λ → Fin 2) :
+    timeReversalSpinHalfMulti (basisVec σ) =
+      (∏ x : Λ, timeReversalSign (flipConfig σ x)) •
+        basisVec (flipConfig σ) := by
+  funext τ
+  simp only [timeReversalSpinHalfMulti_apply, basisVec, Pi.smul_apply,
+    smul_eq_mul]
+  by_cases hτ : τ = flipConfig σ
+  · -- τ = flip σ: both sides reduce to ∏ ε(τ x).
+    rw [if_pos hτ]
+    have hflip : flipConfig τ = σ := by
+      rw [hτ, flipConfig_involutive]
+    rw [hflip, if_pos rfl]
+    simp [hτ]
+  · -- τ ≠ flip σ: both sides vanish.
+    rw [if_neg hτ]
+    have hflip : flipConfig τ ≠ σ := by
+      intro h
+      apply hτ
+      rw [← h, flipConfig_involutive]
+    rw [if_neg hflip]
+    simp
+
 end LatticeSystem.Quantum

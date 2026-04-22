@@ -309,6 +309,7 @@ Systems*, §2.3 eqs. (2.3.4)–(2.3.8), pp. 26–27.
 | `timeReversalSpinHalfMulti` | multi-spin time-reversal map (Tasaki §2.3 lattice extension, `S = 1/2`): `(Θ̂_tot v) τ := (∏_x ε(τ x)) · conj(v (flip τ))` for finite `Λ` | `Quantum/TimeReversalMulti.lean` |
 | `timeReversalSign_prod_conj` / `timeReversalSign_prod_mul_flip` | the product `∏_x ε(τ x)` is real (conjugation invariant); the cross product equals `(-1)^|Λ|` | `Quantum/TimeReversalMulti.lean` |
 | `timeReversalSpinHalfMulti_sq` | **Multi-spin Kramers degeneracy at `S = 1/2`** (Tasaki §2.3 half-odd-integer extension): `Θ̂_tot² = (-1)^|Λ| · 1̂` — `+1̂` when `|Λ|` is even, `-1̂` when odd | `Quantum/TimeReversalMulti.lean` |
+| `timeReversalSpinHalfMulti_basisVec` | action of `Θ̂_tot` on a many-body basis state: `Θ̂_tot |Ψ_σ⟩ = (∏_x ε(flip σ x)) · |Ψ_{flip σ}⟩` — natural many-body generalisation of `Θ̂|↑⟩ = |↓⟩` and `Θ̂|↓⟩ = -|↑⟩` | `Quantum/TimeReversalMulti.lean` |
 
 ### Multi-body operator space (abstract lattice)
 
