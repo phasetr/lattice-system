@@ -613,6 +613,39 @@ theorem basisSwap_ne_self {x y : Λ} (hxy : x ≠ y)
   rw [Function.update_of_ne hxy, Function.update_self] at h1
   exact h1.symm
 
+/-- Generic per-bond expectation of `Ŝ_x · Ŝ_y` on an antiparallel
+basis vector:
+
+  `⟨basisVec σ, Ŝ_x · Ŝ_y · basisVec σ⟩ = -1/4`
+
+(Tasaki §2.5 (2.5.4) ingredient at S = 1/2). Combines
+`spinHalfDot_mulVec_basisVec_antiparallel` (action gives
+`(1/2)·basisVec(swap) - (1/4)·basisVec σ`), `basisVec_inner`
+(orthonormality), and `basisSwap_ne_self` (the swap is a
+*different* configuration, so the cross-term vanishes). -/
+theorem inner_basisVec_spinHalfDot_basisVec_antiparallel
+    {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin 2) (h : σ x ≠ σ y) :
+    ∑ τ : Λ → Fin 2,
+        basisVec σ τ *
+          ((spinHalfDot x y).mulVec (basisVec σ)) τ =
+      -(1 / 4 : ℂ) := by
+  rw [spinHalfDot_mulVec_basisVec_antiparallel hxy σ h]
+  simp_rw [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, mul_sub]
+  rw [Finset.sum_sub_distrib]
+  simp_rw [show ∀ τ : Λ → Fin 2,
+      basisVec σ τ * ((1 / 2 : ℂ) * basisVec (basisSwap σ x y) τ) =
+        (1 / 2 : ℂ) *
+          (basisVec σ τ * basisVec (basisSwap σ x y) τ) from
+      fun τ => by ring]
+  simp_rw [show ∀ τ : Λ → Fin 2,
+      basisVec σ τ * ((1 / 4 : ℂ) * basisVec σ τ) =
+        (1 / 4 : ℂ) * (basisVec σ τ * basisVec σ τ) from
+      fun τ => by ring]
+  rw [← Finset.mul_sum, ← Finset.mul_sum]
+  rw [basisVec_inner, basisVec_inner]
+  rw [if_neg (basisSwap_ne_self hxy h), if_pos rfl]
+  ring
+
 /-- Singlet eigenvalue (Tasaki (2.2.19)): for `x ≠ y` and σ
 anti-parallel, the unsymmetric combination `|σ⟩ - |swap σ⟩` is an
 eigenvector of `Ŝ_x · Ŝ_y` with eigenvalue `-3/4`. -/
