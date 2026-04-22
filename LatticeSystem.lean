@@ -30,6 +30,8 @@ import LatticeSystem.Tests.Foundation
 import LatticeSystem.Tests.TestHelpers
 import LatticeSystem.Tests.SpinDot
 import LatticeSystem.Tests.TotalSpin
+import LatticeSystem.Tests.SpinHalfRotation
+import LatticeSystem.Tests.GibbsState
 import LatticeSystem.Tests.Sanity
 import LatticeSystem.Tests.Graph
 import LatticeSystem.Tests.Heisenberg
