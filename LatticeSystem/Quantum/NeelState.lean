@@ -1045,6 +1045,20 @@ off-diagonal entries, which is the input to the
 Perron-Frobenius-style proof of the Marshall-Lieb-Mattis
 theorem. -/
 
+/-- Generic graph-centric Marshall sign. For a finite vertex type
+`V`, a sublattice-`A` indicator `A : V → Bool`, and a spin-1/2
+configuration `σ : V → Fin 2`, returns `(-1)^(N_A^↓)`:
+
+  `marshallSignOf A σ := ∏_{x ∈ A} (-1)^(σ x)`.
+
+This is the generic form of the chain / 2D / 3D Marshall signs;
+those are obtained by instantiating `A` with the corresponding
+parity colouring. Aligns with the project-wide graph-centric
+design philosophy (CLAUDE.local.md). -/
+noncomputable def marshallSignOf {V : Type*} [Fintype V]
+    (A : V → Bool) (σ : V → Fin 2) : ℂ :=
+  ∏ x : V, if A x then ((-1 : ℂ) ^ (σ x : ℕ)) else 1
+
 /-- Marshall sign of a spin-1/2 configuration on the
 parity-coloured chain `Fin (2 * K)`: `(-1)^(N_A^↓)` with `A` =
 even indices. Encoded as the product `∏_{x even} (-1)^(σ x)`. -/
@@ -1204,6 +1218,41 @@ theorem marshallSignCubicConfig_const_one (K L M : ℕ) :
   rw [← pow_mul,
     show M * (2 * K * (2 * L)) = 2 * (2 * K * L * M) from by ring,
     pow_mul, show ((-1 : ℂ)) ^ 2 = 1 from by norm_num, one_pow]
+
+/-- The chain Marshall sign equals the generic `marshallSignOf`
+applied to the even-parity sublattice indicator. -/
+theorem marshallSignChainConfig_eq_marshallSignOf (K : ℕ)
+    (σ : Fin (2 * K) → Fin 2) :
+    marshallSignChainConfig K σ =
+      marshallSignOf (fun x : Fin (2 * K) =>
+        decide (x.val % 2 = 0)) σ := by
+  unfold marshallSignChainConfig marshallSignOf
+  refine Finset.prod_congr rfl (fun x _ => ?_)
+  by_cases hp : x.val % 2 = 0 <;> simp [hp]
+
+/-- The 2D Marshall sign equals the generic `marshallSignOf`
+applied to the `(i + j)`-parity sublattice indicator. -/
+theorem marshallSignSquareConfig_eq_marshallSignOf (K L : ℕ)
+    (σ : Fin (2 * K) × Fin (2 * L) → Fin 2) :
+    marshallSignSquareConfig K L σ =
+      marshallSignOf
+        (fun p : Fin (2 * K) × Fin (2 * L) =>
+          decide ((p.1.val + p.2.val) % 2 = 0)) σ := by
+  unfold marshallSignSquareConfig marshallSignOf
+  refine Finset.prod_congr rfl (fun p _ => ?_)
+  by_cases hp : (p.1.val + p.2.val) % 2 = 0 <;> simp [hp]
+
+/-- The 3D Marshall sign equals the generic `marshallSignOf`
+applied to the `(i + j + k)`-parity sublattice indicator. -/
+theorem marshallSignCubicConfig_eq_marshallSignOf (K L M : ℕ)
+    (σ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2) :
+    marshallSignCubicConfig K L M σ =
+      marshallSignOf
+        (fun p : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) =>
+          decide ((p.1.1.val + p.1.2.val + p.2.val) % 2 = 0)) σ := by
+  unfold marshallSignCubicConfig marshallSignOf
+  refine Finset.prod_congr rfl (fun p _ => ?_)
+  by_cases hp : (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0 <;> simp [hp]
 
 /-- Per-site Fin 2 identity used in the `flipConfig` Marshall sign
 proofs: `(-1)^((1 - s).val) = (-1) · (-1)^s.val` for `s : Fin 2`.

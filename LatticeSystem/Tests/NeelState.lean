@@ -409,6 +409,29 @@ example :
     marshallSignCubicConfig 2 2 1 (neelCubicConfig 2 2 1) = 1 :=
   marshallSignCubicConfig_neelCubicConfig 2 2 1
 
+/-! ## Graph-centric Marshall sign bridges -/
+
+example (K : ℕ) (σ : Fin (2 * K) → Fin 2) :
+    marshallSignChainConfig K σ =
+      marshallSignOf
+        (fun x : Fin (2 * K) => decide (x.val % 2 = 0)) σ :=
+  marshallSignChainConfig_eq_marshallSignOf K σ
+
+example (K L : ℕ) (σ : Fin (2 * K) × Fin (2 * L) → Fin 2) :
+    marshallSignSquareConfig K L σ =
+      marshallSignOf
+        (fun p : Fin (2 * K) × Fin (2 * L) =>
+          decide ((p.1.val + p.2.val) % 2 = 0)) σ :=
+  marshallSignSquareConfig_eq_marshallSignOf K L σ
+
+example (K L M : ℕ)
+    (σ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2) :
+    marshallSignCubicConfig K L M σ =
+      marshallSignOf
+        (fun p : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) =>
+          decide ((p.1.1.val + p.1.2.val + p.2.val) % 2 = 0)) σ :=
+  marshallSignCubicConfig_eq_marshallSignOf K L M σ
+
 /-! ## Marshall sign on constant configurations -/
 
 example (K : ℕ) :
