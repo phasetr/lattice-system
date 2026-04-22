@@ -42,9 +42,6 @@ The map is implemented as a plain function on the many-body
 state vector (antilinearity prevents a `Matrix` representation).
 -/
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedDecidableInType false
-
 namespace LatticeSystem.Quantum
 
 open Complex
@@ -101,6 +98,7 @@ noncomputable def timeReversalSpinHalfMulti
   fun τ =>
     (∏ x : Λ, timeReversalSign (τ x)) * starRingEnd ℂ (v (flipConfig τ))
 
+omit [DecidableEq Λ] in
 /-- Pointwise unfolding of `Θ̂_tot`. -/
 theorem timeReversalSpinHalfMulti_apply
     (v : (Λ → Fin 2) → ℂ) (τ : Λ → Fin 2) :
@@ -108,6 +106,7 @@ theorem timeReversalSpinHalfMulti_apply
       (∏ x : Λ, timeReversalSign (τ x)) *
         starRingEnd ℂ (v (flipConfig τ)) := rfl
 
+omit [DecidableEq Λ] in
 /-- Multi-spin `Θ̂_tot` is additive: `Θ̂_tot (v + w) = Θ̂_tot v + Θ̂_tot w`. -/
 theorem timeReversalSpinHalfMulti_add
     (v w : (Λ → Fin 2) → ℂ) :
@@ -117,6 +116,7 @@ theorem timeReversalSpinHalfMulti_add
   simp only [timeReversalSpinHalfMulti_apply, Pi.add_apply, map_add]
   ring
 
+omit [DecidableEq Λ] in
 /-- Multi-spin `Θ̂_tot` is **antilinear** in the scalar:
 `Θ̂_tot (c • v) = (conj c) • Θ̂_tot v`. -/
 theorem timeReversalSpinHalfMulti_smul
@@ -128,6 +128,7 @@ theorem timeReversalSpinHalfMulti_smul
     smul_eq_mul, map_mul]
   ring
 
+omit [DecidableEq Λ] in
 /-- Multi-spin `Θ̂_tot` is real-linear in the scalar (special case
 of antilinearity at real `r`). -/
 theorem timeReversalSpinHalfMulti_real_smul
@@ -138,6 +139,7 @@ theorem timeReversalSpinHalfMulti_real_smul
   congr 1
   exact (Complex.conj_ofReal r).symm ▸ Complex.conj_ofReal r
 
+omit [DecidableEq Λ] in
 /-- The product of `ε(τ x)` over `Λ` is real: it is either `+1` or
 `-1` depending on parity. -/
 theorem timeReversalSign_prod_conj (τ : Λ → Fin 2) :
@@ -150,6 +152,7 @@ theorem timeReversalSign_prod_conj (τ : Λ → Fin 2) :
   | 0 => simp [timeReversalSign]
   | 1 => simp [timeReversalSign]
 
+omit [DecidableEq Λ] in
 /-- The product of `ε(τ x) · ε((flip τ) x)` over `x ∈ Λ` equals
 `(-1)^|Λ|`. Combines the per-site `timeReversalSign_mul_flip`
 identity with `Finset.prod_mul_distrib`. -/
@@ -166,6 +169,7 @@ theorem timeReversalSign_prod_mul_flip (τ : Λ → Fin 2) :
   rw [Finset.prod_congr rfl h]
   simp [Finset.card_univ]
 
+omit [DecidableEq Λ] in
 /-- **Kramers degeneracy at `S = 1/2`, multi-spin** (Tasaki §2.3
 half-odd-integer extension): for finite `Λ`,
 
@@ -194,6 +198,7 @@ theorem timeReversalSpinHalfMulti_sq (v : (Λ → Fin 2) → ℂ) :
         ring]
   rw [timeReversalSign_prod_mul_flip]
 
+omit [DecidableEq Λ] in
 /-- Action of `Θ̂_tot` on a many-body basis state
 `|Ψ_σ⟩ = basisVec σ`:
 
