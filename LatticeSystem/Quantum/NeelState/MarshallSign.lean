@@ -73,11 +73,23 @@ theorem marshallSignOf_const_zero {V : Type*} [Fintype V]
   intro x _
   by_cases hA : A x = true <;> simp [hA]
 
-/-! ## Chain / 2D / 3D Marshall signs (definitions) -/
+/-! ## Chain / 2D / 3D Marshall signs (definitions)
+
+These three concrete definitions are kept as named convenience
+APIs but are **deprecated** as of `2026-04-22` (Refactor Phase 3
+PR P3-4). New code should prefer the generic graph-centric
+`marshallSignOf` together with the per-graph parity indicator
+(`fun x : Fin (2*K) => decide (x.val % 2 = 0)` etc.); the
+companion theorems on these names continue to exist and remain
+provable via the `_eq_marshallSignOf` bridges below.
+-/
 
 /-- Marshall sign of a spin-1/2 configuration on the
 parity-coloured chain `Fin (2 * K)`: `(-1)^(N_A^↓)` with `A` =
 even indices. Encoded as the product `∏_{x even} (-1)^(σ x)`. -/
+@[deprecated "use the generic `marshallSignOf` with the chain
+parity indicator `fun x : Fin (2*K) => decide (x.val % 2 = 0)`"
+  (since := "2026-04-22")]
 noncomputable def marshallSignChainConfig (K : ℕ)
     (σ : Fin (2 * K) → Fin 2) : ℂ :=
   ∏ x : Fin (2 * K),
@@ -87,6 +99,9 @@ noncomputable def marshallSignChainConfig (K : ℕ)
 checkerboard `Fin (2 * K) × Fin (2 * L)`: `(-1)^(N_A^↓)` with
 `A` = sites with `(i + j)` even. Encoded as the product
 `∏_{(i, j) with i+j even} (-1)^(σ (i, j))`. -/
+@[deprecated "use the generic `marshallSignOf` with the 2D
+parity indicator `fun p => decide ((p.1.val + p.2.val) % 2 = 0)`"
+  (since := "2026-04-22")]
 noncomputable def marshallSignSquareConfig (K L : ℕ)
     (σ : Fin (2 * K) × Fin (2 * L) → Fin 2) : ℂ :=
   ∏ p : Fin (2 * K) × Fin (2 * L),
@@ -96,12 +111,22 @@ noncomputable def marshallSignSquareConfig (K L : ℕ)
 /-- 3D Marshall sign of a spin-1/2 configuration on the cubic
 checkerboard `(Fin (2 * K) × Fin (2 * L)) × Fin (2 * M)`:
 `(-1)^(N_A^↓)` with `A` = sites with `(i + j + k)` even. -/
+@[deprecated "use the generic `marshallSignOf` with the 3D
+parity indicator
+`fun p => decide ((p.1.1.val + p.1.2.val + p.2.val) % 2 = 0)`"
+  (since := "2026-04-22")]
 noncomputable def marshallSignCubicConfig (K L M : ℕ)
     (σ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2) :
     ℂ :=
   ∏ p : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M),
     (if (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
       then ((-1 : ℂ) ^ (σ p : ℕ)) else 1)
+
+-- Internal companion theorems (bridges + per-config evaluations +
+-- flip + Marshall × time-reversal) reference the deprecated names;
+-- suppress the deprecation linter for the rest of this file so the
+-- existing API continues to compile cleanly.
+set_option linter.deprecated false
 
 /-! ## Bridges to the generic `marshallSignOf` -/
 
