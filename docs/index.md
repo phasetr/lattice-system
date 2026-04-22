@@ -844,6 +844,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardChainGibbsState N β J U` | Gibbs state of the 1D Hubbard chain | `Fermion/JordanWigner.lean` |
 | `hubbardChainGibbsState_isHermitian` / `hubbardChainGibbsState_commute_hamiltonian` | Hermiticity (real `J, U`) and commute with the Hamiltonian | `Fermion/JordanWigner.lean` |
 | `hubbardCycleGibbsState_commute_hamiltonian` | the periodic Hubbard Gibbs state commutes with the periodic Hubbard Hamiltonian (companion of the open-chain version, free corollary of `gibbsState_commute_hamiltonian`) | `Fermion/JordanWigner.lean` |
+| `hubbardChainGibbsExpectation_zero` / `_im_of_isHermitian` / `_commutator_hamiltonian` / `_hamiltonian_im` / `_hamiltonian_pow_im` / `hubbardChain_partitionFn_im` | open-chain Hubbard expectation companions (β = 0 closed form, Hermitian-observable real, conservation, energy / energy-power expectations real, partition function real) | `Fermion/JordanWigner.lean` |
 
 ## Continuum-limit roadmap
 

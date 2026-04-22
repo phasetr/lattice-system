@@ -234,4 +234,29 @@ example (N : ℕ) (β J U : ℝ) :
     Commute (hubbardCycleGibbsState N β J U) (hubbardCycleHamiltonian N J U) :=
   hubbardCycleGibbsState_commute_hamiltonian N β J U
 
+/-! ## Hubbard chain expectation companions -/
+
+example (N : ℕ) (J U : ℝ) (A : ManyBodyOp (Fin (2 * N + 2))) :
+    LatticeSystem.Quantum.gibbsExpectation 0
+        (hubbardChainHamiltonian N J U) A
+      = ((Fintype.card (Fin (2 * N + 2) → Fin 2) : ℂ))⁻¹ * A.trace :=
+  hubbardChainGibbsExpectation_zero N J U A
+
+example (N : ℕ) (β J U : ℝ) :
+    (LatticeSystem.Quantum.gibbsExpectation β
+        (hubbardChainHamiltonian N J U)
+        (hubbardChainHamiltonian N J U)).im = 0 :=
+  hubbardChainGibbsExpectation_hamiltonian_im N β J U
+
+example (N : ℕ) (β J U : ℝ) (n : ℕ) :
+    (LatticeSystem.Quantum.gibbsExpectation β
+        (hubbardChainHamiltonian N J U)
+        ((hubbardChainHamiltonian N J U)^n)).im = 0 :=
+  hubbardChainGibbsExpectation_hamiltonian_pow_im N β J U n
+
+example (N : ℕ) (β J U : ℝ) :
+    (LatticeSystem.Quantum.partitionFn β
+        (hubbardChainHamiltonian N J U)).im = 0 :=
+  hubbardChain_partitionFn_im N β J U
+
 end LatticeSystem.Tests.Hubbard
