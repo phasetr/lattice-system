@@ -85,6 +85,21 @@ for a Hermitian Hamiltonian `H : ManyBodyOp Λ` and inverse temperature
 * `gibbsExp_inv`, `gibbsExp_intCast_mul` — explicit matrix inverse
   `(gibbsExp β H)⁻¹ = gibbsExp (-β) H` and the integer-power extension
   to `n : ℤ`.
+
+Sub-files extending this module (Phase 2 PR 21 split, plan v4
+§3.1):
+
+| sub-file | content |
+|---|---|
+| `GibbsState/Covariance.lean` | canonical-ensemble (complex / |
+|                              | symmetric) covariance + variance, |
+|                              | `_im_of_isHermitian`, `_sq_im`, `_pow_im`, |
+|                              | `_anticommutator_im`, `_commutator_re`, |
+|                              | `_mul_hamiltonian_im`, `partitionFn_im` |
+
+Downstream code that wants the covariance / im-of-Hermitian
+companion family should import `Quantum.GibbsState.Covariance`
+directly (this file is content + extensions, not a façade).
 -/
 
 namespace LatticeSystem.Quantum

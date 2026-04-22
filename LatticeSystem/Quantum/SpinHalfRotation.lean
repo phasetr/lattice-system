@@ -39,6 +39,24 @@ The group law `Û^(α)_θ · Û^(α)_φ = Û^(α)_{θ+φ}` and unitarity
 proofs require matrix algebra in the non-commutative ring
 `Matrix (Fin 2) (Fin 2) ℂ` restricted to the commutative subring
 `span_ℂ {1, Ŝ^(α)}` with relation `(Ŝ^(α))² = I/4`.
+
+Sub-files extending this module (Phase 2 PR 22 split, plan v4
+§3.1):
+
+| sub-file | content |
+|---|---|
+| `SpinHalfRotation/Conjugation.lean` | general-θ conjugation (Tasaki |
+|                                     | eq. (2.1.16)), same-axis invariance |
+|                                     | (eq. (2.1.15)), π/2 conjugation, exp |
+|                                     | form (Problem 2.1.b), coherent state |
+|                                     | (Problem 2.1.d), Problem 2.1.e, vector |
+|                                     | inner product `Ŝ · v`, Hadamard, |
+|                                     | y-axis diagonalizer |
+
+Downstream code that wants the conjugation / coherent-state /
+exp-form machinery should import
+`Quantum.SpinHalfRotation.Conjugation` directly (this file is
+content + extensions, not a façade).
 -/
 
 namespace LatticeSystem.Quantum
