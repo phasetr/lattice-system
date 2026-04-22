@@ -118,4 +118,13 @@ example (J : ℝ) :
         ((J : ℂ) / 2) • neelChainState 1 :=
   heisenbergHamiltonian_openChainCoupling_one_mulVec_neelChainState_one J
 
+/-! ## K = 1 bridge to `upDown` and time-reversal action -/
+
+example : neelChainConfig 1 = upDown := neelChainConfig_one_eq_upDown
+
+example :
+    timeReversalSpinHalfMulti (neelChainState 1) =
+      -basisVec (basisSwap upDown 0 1) :=
+  timeReversalSpinHalfMulti_neelChainState_one
+
 end LatticeSystem.Tests.NeelState
