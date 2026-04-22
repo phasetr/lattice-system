@@ -253,3 +253,22 @@ mechanically** and catch most regressions / drift.
   conventions established in refactor plan v4 (Phase 0, Phase 1,
   early Phase 2). Origin: discussion during the §2.5 burst
   cleanup (#251–#278, then #279 + #280–#284 child issues).
+- **2026-04-22 (PR #312)**: Added §6b (push verification) after
+  PR #311 merged with empty diff because of a silent
+  background-`git push` failure.
+- **2026-04-22 / 2026-04-23 (Phase 3 #283 closed)**: Generic
+  graph-centric Néel API (`neelStateOf`, `_antiparallel` per-bond
+  primitives), Marshall sign generic + `@[deprecated]` window,
+  2D / 3D Heisenberg companion family parity. PRs #329 / #330 /
+  #331 / #332 / #333 / #334.
+- **2026-04-23 (Phase 4 #284 in progress)**: Linter-warning
+  cleanup (`lake build` is **zero warnings + zero errors**), §3
+  expanded with concrete deprecation policy (6-month window from
+  `since`, message-form when target name unavailable, internal
+  companions linter-suppression pattern, `#guard_msgs` capture),
+  `docs/deprecations.md` Jekyll page (live tracking + removal
+  checklist + remaining linter-suppression transparency), all
+  parent module-header docstrings now document their extension
+  sub-files (NeelState, SpinDot, JordanWigner facades; TotalSpin,
+  HeisenbergChain, SpinHalfRotation, GibbsState, TimeReversalMulti
+  content + extensions). PRs #335–#362.
