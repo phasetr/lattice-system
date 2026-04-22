@@ -447,6 +447,79 @@ example {V : Type*} [Fintype V] (A : V → Bool) :
     marshallSignOf A (fun _ : V => (0 : Fin 2)) = 1 :=
   marshallSignOf_const_zero A
 
+/-! ## Generic graph-centric Néel API (Phase 3 PRs 3-4) -/
+
+/-- `neelConfigOf` at a `true`-labelled site returns `↑ : Fin 2 := 0`. -/
+example {V : Type*} (A : V → Bool) (x : V) (h : A x = true) :
+    neelConfigOf A x = (0 : Fin 2) := by
+  unfold neelConfigOf
+  simp [h]
+
+/-- `neelConfigOf` at a `false`-labelled site returns `↓ : Fin 2 := 1`. -/
+example {V : Type*} (A : V → Bool) (x : V) (h : A x = false) :
+    neelConfigOf A x = (1 : Fin 2) := by
+  unfold neelConfigOf
+  simp [h]
+
+/-- `neelConfigOf_apply_ne_of_ne`: the per-bond Fin 2 step for the
+generic antiparallel bond action. -/
+example {V : Type*} (A : V → Bool) {x y : V} (h : A x ≠ A y) :
+    neelConfigOf A x ≠ neelConfigOf A y :=
+  neelConfigOf_apply_ne_of_ne A h
+
+/-- Chain bridge: `neelChainConfig K = neelConfigOf (parityA)`. -/
+example (K : ℕ) :
+    neelChainConfig K =
+      neelConfigOf (fun x : Fin (2 * K) => decide (x.val % 2 = 0)) :=
+  neelChainConfig_eq_neelConfigOf K
+
+/-- Chain bridge (state form). -/
+example (K : ℕ) :
+    neelChainState K =
+      neelStateOf (fun x : Fin (2 * K) => decide (x.val % 2 = 0)) :=
+  neelChainState_eq_neelStateOf K
+
+/-- 2D bridge. -/
+example (K L : ℕ) :
+    neelSquareConfig K L =
+      neelConfigOf (fun p : Fin (2 * K) × Fin (2 * L) =>
+        decide ((p.1.val + p.2.val) % 2 = 0)) :=
+  neelSquareConfig_eq_neelConfigOf K L
+
+/-- 3D bridge. -/
+example (K L M : ℕ) :
+    neelCubicConfig K L M =
+      neelConfigOf
+        (fun p : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) =>
+          decide ((p.1.1.val + p.1.2.val + p.2.val) % 2 = 0)) :=
+  neelCubicConfig_eq_neelConfigOf K L M
+
+/-- Generic per-bond `Ŝ_x · Ŝ_y` action on the canonical Néel
+state (Tasaki §2.5 (2.5.3) graph-centric form). -/
+example {V : Type*} [Fintype V] [DecidableEq V] (A : V → Bool)
+    {x y : V} (hxy : x ≠ y) (hA : A x ≠ A y) :
+    (spinHalfDot x y).mulVec (neelStateOf A) =
+      (1 / 2 : ℂ) • basisVec (basisSwap (neelConfigOf A) x y)
+        - (1 / 4 : ℂ) • neelStateOf A :=
+  spinHalfDot_mulVec_neelStateOf_antiparallel A hxy hA
+
+/-- Generic per-bond expectation `-(1/4)` (Tasaki §2.5 (2.5.4)
+ingredient). -/
+example {V : Type*} [Fintype V] [DecidableEq V] (A : V → Bool)
+    {x y : V} (hxy : x ≠ y) (hA : A x ≠ A y) :
+    ∑ τ : V → Fin 2, neelStateOf A τ *
+        ((spinHalfDot x y).mulVec (neelStateOf A)) τ = -(1 / 4 : ℂ) :=
+  inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel A hxy hA
+
+/-- Generic per-bond `Ŝ^z·Ŝ^z` correlation `-(1/4)`. -/
+example {V : Type*} [Fintype V] [DecidableEq V] (A : V → Bool)
+    {x y : V} (hA : A x ≠ A y) :
+    ∑ τ : V → Fin 2, neelStateOf A τ *
+        ((onSite x spinHalfOp3 *
+            onSite y spinHalfOp3).mulVec (neelStateOf A)) τ =
+      -(1 / 4 : ℂ) :=
+  inner_neelStateOf_szsz_neelStateOf_antiparallel A hA
+
 /-! ## Marshall sign on constant configurations -/
 
 example (K : ℕ) :
