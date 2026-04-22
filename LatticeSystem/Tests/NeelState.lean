@@ -450,6 +450,24 @@ example (K L M : ℕ) :
           (1 : Fin 2)) = 1 :=
   marshallSignCubicConfig_const_one K L M
 
+/-! ## Marshall sign under flipConfig -/
+
+example (K : ℕ) (σ : Fin (2 * K) → Fin 2) :
+    marshallSignChainConfig K (flipConfig σ) =
+      ((-1 : ℂ) ^ K) * marshallSignChainConfig K σ :=
+  marshallSignChainConfig_flipConfig K σ
+
+example (K L : ℕ) (σ : Fin (2 * K) × Fin (2 * L) → Fin 2) :
+    marshallSignSquareConfig K L (flipConfig σ) =
+      marshallSignSquareConfig K L σ :=
+  marshallSignSquareConfig_flipConfig K L σ
+
+example (K L M : ℕ)
+    (σ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2) :
+    marshallSignCubicConfig K L M (flipConfig σ) =
+      marshallSignCubicConfig K L M σ :=
+  marshallSignCubicConfig_flipConfig K L M σ
+
 /-! ## Marshall-rotated states equal the Néel states -/
 
 example (K : ℕ) :
