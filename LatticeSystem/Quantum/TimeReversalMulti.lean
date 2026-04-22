@@ -291,4 +291,57 @@ theorem timeReversalSpinHalfMulti_onSite_pauliZ_mulVec
     rw [hτx1, hflipτx]
     simp
 
+/-! ## Per-site flip helpers (`siteFlipAt`)
+
+The `siteFlipAt` operation flips a single slot `x` of a
+configuration, leaving every other slot fixed. This is the
+combinatorial primitive underlying the action of off-diagonal
+single-site Pauli operators (`σ^x_x`, `σ^y_x`) which swap the
+spin at site `x`.
+
+These helpers package the basic identities; the actual
+multi-site sign-flip equivariance for `σ^x`/`σ^y` (extending the
+`σ^z` lemma above) is deferred. -/
+
+/-- Per-site spin flip of a configuration: swap slot `x` only,
+leaving other slots fixed.
+
+  `siteFlipAt τ x y = if y = x then 1 - τ y else τ y`. -/
+def siteFlipAt (τ : Λ → Fin 2) (x : Λ) : Λ → Fin 2 :=
+  Function.update τ x (1 - τ x)
+
+@[simp] theorem siteFlipAt_self (τ : Λ → Fin 2) (x : Λ) :
+    siteFlipAt τ x x = 1 - τ x := by
+  unfold siteFlipAt
+  rw [Function.update_self]
+
+theorem siteFlipAt_of_ne (τ : Λ → Fin 2) {x y : Λ} (h : y ≠ x) :
+    siteFlipAt τ x y = τ y := by
+  unfold siteFlipAt
+  rw [Function.update_of_ne h]
+
+/-- `flipConfig` and `siteFlipAt` commute: flipping every site and
+then flipping site `x` again equals flipping site `x` first then
+every site. -/
+theorem flipConfig_siteFlipAt_comm (τ : Λ → Fin 2) (x : Λ) :
+    flipConfig (siteFlipAt τ x) = siteFlipAt (flipConfig τ) x := by
+  funext y
+  by_cases hy : y = x
+  · rw [hy, flipConfig_apply, siteFlipAt_self, siteFlipAt_self,
+        flipConfig_apply]
+  · rw [flipConfig_apply, siteFlipAt_of_ne _ hy,
+        siteFlipAt_of_ne _ hy, flipConfig_apply]
+
+/-- `siteFlipAt` is involutive: flipping the same site twice
+returns the original configuration. -/
+theorem siteFlipAt_involutive (τ : Λ → Fin 2) (x : Λ) :
+    siteFlipAt (siteFlipAt τ x) x = τ := by
+  funext y
+  by_cases hy : y = x
+  · rw [hy, siteFlipAt_self, siteFlipAt_self]
+    match h : τ x with
+    | 0 => simp [h]
+    | 1 => simp [h]
+  · rw [siteFlipAt_of_ne _ hy, siteFlipAt_of_ne _ hy]
+
 end LatticeSystem.Quantum
