@@ -365,6 +365,76 @@ theorem timeReversalSpinHalfMulti_neelChainState_one :
   rw [neelChainConfig_one_eq_upDown,
     timeReversalSpinHalfMulti_basisVec_upDown]
 
+/-- Auxiliary alternating-product lemma. The product
+`∏ i : Fin (2 * K), (if i.val % 2 = 0 then -1 else 1) = (-1)^K`,
+since each adjacent pair `(2k, 2k+1)` contributes `(-1) · 1 = -1`.
+Proof by induction on `K`, peeling the last two indices via
+`Fin.prod_univ_castSucc` (mirror of `sum_alternating_sign`). -/
+private lemma prod_alternating_neg_one (K : ℕ) :
+    (∏ i : Fin (2 * K), (if i.val % 2 = 0 then (-1 : ℂ) else 1))
+      = (-1) ^ K := by
+  induction K with
+  | zero => simp
+  | succ K' ih =>
+    rw [show 2 * (K' + 1) = (2 * K' + 1) + 1 from by ring]
+    rw [Fin.prod_univ_castSucc, Fin.prod_univ_castSucc]
+    have h_last_outer :
+        (if (Fin.last (2 * K' + 1)).val % 2 = 0 then (-1 : ℂ) else 1)
+          = 1 := by
+      have h1 : (Fin.last (2 * K' + 1)).val = 2 * K' + 1 := rfl
+      rw [h1, show (2 * K' + 1) % 2 = 1 from by omega]
+      simp
+    have h_last_inner :
+        (if ((Fin.last (2 * K')).castSucc :
+            Fin (2 * K' + 1 + 1)).val % 2 = 0
+          then (-1 : ℂ) else 1) = -1 := by
+      have h1 : ((Fin.last (2 * K')).castSucc :
+          Fin (2 * K' + 1 + 1)).val = 2 * K' := rfl
+      rw [h1, show (2 * K') % 2 = 0 from by omega]
+      simp
+    have h_inner_eq :
+        (∏ i : Fin (2 * K'),
+          if (i.castSucc.castSucc : Fin (2 * K' + 1 + 1)).val % 2 = 0
+            then (-1 : ℂ) else 1)
+        = ∏ i : Fin (2 * K'),
+            (if i.val % 2 = 0 then (-1 : ℂ) else 1) := by
+      apply Finset.prod_congr rfl
+      intro i _
+      rfl
+    rw [h_inner_eq, h_last_inner, h_last_outer, ih]
+    ring
+
+/-- Tasaki §2.5 generalisation of #251 to arbitrary chain length:
+the multi-spin time-reversal acts on the 1D Néel chain state by
+
+  `Θ̂_tot (neelChainState K) =
+    (-1)^K · basisVec (flipConfig (neelChainConfig K))`.
+
+Proof: the per-site sign product collapses to `(-1)^K` since each
+of the `K` even-indexed sites carries `σ = ↑`, contributing
+`timeReversalSign 1 = -1` after `flipConfig`, while each of the
+`K` odd-indexed sites contributes `+1`. -/
+theorem timeReversalSpinHalfMulti_neelChainState (K : ℕ) :
+    timeReversalSpinHalfMulti (neelChainState K) =
+      ((-1 : ℂ) ^ K) • basisVec (flipConfig (neelChainConfig K)) := by
+  unfold neelChainState
+  rw [timeReversalSpinHalfMulti_basisVec]
+  congr 1
+  have h_pointwise : ∀ x : Fin (2 * K),
+      timeReversalSign (flipConfig (neelChainConfig K) x) =
+        (if x.val % 2 = 0 then (-1 : ℂ) else 1) := by
+    intro x
+    unfold flipConfig neelChainConfig timeReversalSign
+    by_cases hp : x.val % 2 = 0
+    · simp [hp]
+    · simp [hp]
+  rw [show (∏ x : Fin (2 * K),
+        timeReversalSign (flipConfig (neelChainConfig K) x))
+      = ∏ x : Fin (2 * K),
+          (if x.val % 2 = 0 then (-1 : ℂ) else 1) from
+      Finset.prod_congr rfl (fun i _ => h_pointwise i)]
+  exact prod_alternating_neg_one K
+
 /-! ## 3D cubic Néel state on `(Fin (2K) × Fin (2L)) × Fin (2M)`
 
 3D analogue of the checkerboard Néel state: at site `((i, j), k)`,

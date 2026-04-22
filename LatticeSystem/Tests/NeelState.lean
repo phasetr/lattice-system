@@ -127,6 +127,29 @@ example :
       -basisVec (basisSwap upDown 0 1) :=
   timeReversalSpinHalfMulti_neelChainState_one
 
+/-! ## 1D Néel time-reversal action at general `K` -/
+
+example (K : ℕ) :
+    timeReversalSpinHalfMulti (neelChainState K) =
+      ((-1 : ℂ) ^ K) • basisVec (flipConfig (neelChainConfig K)) :=
+  timeReversalSpinHalfMulti_neelChainState K
+
+/-- Specialisation: at `K = 2` (4-site chain), the sign factor
+`(-1)^2 = 1` makes the action sign-free. -/
+example :
+    timeReversalSpinHalfMulti (neelChainState 2) =
+      basisVec (flipConfig (neelChainConfig 2)) := by
+  rw [timeReversalSpinHalfMulti_neelChainState 2]
+  simp
+
+/-- Specialisation: at `K = 3` (6-site chain), the sign factor
+`(-1)^3 = -1`. -/
+example :
+    timeReversalSpinHalfMulti (neelChainState 3) =
+      -basisVec (flipConfig (neelChainConfig 3)) := by
+  rw [timeReversalSpinHalfMulti_neelChainState 3]
+  simp [show ((-1 : ℂ) ^ 3) = -1 from by norm_num]
+
 /-! ## 2D checkerboard Néel state -/
 
 example (K L : ℕ) :
