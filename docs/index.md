@@ -313,6 +313,7 @@ Systems*, §2.3 eqs. (2.3.4)–(2.3.8), pp. 26–27.
 | `timeReversalSpinHalfMulti_onSite_pauliZ_mulVec` | multi-site sign-flip equivariance for `σ^z` (Tasaki §2.3 (2.3.14) lifted to many-body): `Θ̂_tot ((onSite x σ^z) v) = (-(onSite x σ^z))(Θ̂_tot v)`. Diagonal-action case; `σ^x`, `σ^y` deferred | `Quantum/TimeReversalMulti.lean` |
 | `siteFlipAt` / `siteFlipAt_self` / `siteFlipAt_of_ne` / `flipConfig_siteFlipAt_comm` / `siteFlipAt_involutive` | per-site flip helpers: `siteFlipAt τ x` flips slot `x` only; commutes with `flipConfig`; involutive. The combinatorial primitive underlying off-diagonal `σ^x_x` / `σ^y_x` action (deferred) | `Quantum/TimeReversalMulti.lean` |
 | `onSite_pauliX_mulVec_basisVec` | basis-state action of the off-diagonal site Pauli: `(onSite x σ^x).mulVec |Ψ_σ⟩ = |Ψ_{siteFlipAt σ x}⟩` (the spin at site `x` is swapped) | `Quantum/TimeReversalMulti.lean` |
+| `pauliX_eq_indicator` / `onSite_pauliX_mulVec_apply` | closed-form `pauliX a b = if b = 1 - a then 1 else 0`, lifted to `((onSite x σ^x).mulVec v) τ = v (siteFlipAt τ x)` for any state `v` (general extension of the basis-state action) | `Quantum/TimeReversalMulti.lean` |
 
 ### Multi-body operator space (abstract lattice)
 

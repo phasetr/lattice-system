@@ -91,4 +91,10 @@ example (x : Fin 3) (σ : Fin 3 → Fin 2) :
       basisVec (siteFlipAt σ x) :=
   onSite_pauliX_mulVec_basisVec x σ
 
+/-- General `(onSite x σ^x).mulVec v` evaluated at `τ` equals
+`v (siteFlipAt τ x)` (linear extension to arbitrary states). -/
+example (x : Fin 3) (v : (Fin 3 → Fin 2) → ℂ) (τ : Fin 3 → Fin 2) :
+    ((onSite x pauliX).mulVec v) τ = v (siteFlipAt τ x) :=
+  onSite_pauliX_mulVec_apply x v τ
+
 end LatticeSystem.Tests.TimeReversalMulti
