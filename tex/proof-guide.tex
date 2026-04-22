@@ -3466,6 +3466,89 @@ The dual case for $\hat S_{\mathrm{tot}}^{+}$ replaces subtraction
 with addition throughout.
 \end{proof}
 
+\subsection{Generic graph-centric Néel state and per-bond
+expectations (Tasaki §2.5 (2.5.2)--(2.5.4), Phase 3 generic API)}
+\label{subsec:neel-state-of}
+
+The chain, 2D, and 3D parity-coloured Néel states share a common
+structure: an alternating spin assignment from a Boolean
+sublattice indicator, and a per-bond $\hat S_x \cdot \hat S_y$
+action / expectation governed by whether the bond crosses the
+sublattice partition.  Tasaki §2.5 abstracts this to any bipartite
+graph; the Lean formalisation captures the abstraction
+(graph-centric design, \texttt{CLAUDE.local.md}) via a single
+generic $\texttt{neelStateOf}$ from a Boolean indicator
+$A : V \to \texttt{Bool}$.
+
+\begin{definition}[\texttt{neelConfigOf} / \texttt{neelStateOf}]
+For a finite vertex type $V$ and sublattice indicator
+$A : V \to \texttt{Bool}$,
+\[
+  \texttt{neelConfigOf}\,A\,x := \begin{cases}
+    \uparrow\,(=0:\mathrm{Fin}\,2) & \text{if } A\,x \\
+    \downarrow\,(=1:\mathrm{Fin}\,2) & \text{otherwise,}
+  \end{cases}
+\]
+and $\texttt{neelStateOf}\,A := \texttt{basisVec}\,(\texttt{neelConfigOf}\,A)$.
+The chain / 2D / 3D \texttt{neelXyzConfig} / \texttt{neelXyzState}
+definitions are bridged via \texttt{neelXyzConfig\_eq\_neelConfigOf}
+and \texttt{neelXyzState\_eq\_neelStateOf}.  Tasaki §2.5
+eq.~(2.5.2) graph-centric form.
+\end{definition}
+
+\begin{theorem}[\texttt{spinHalfDot\_mulVec\_neelStateOf\_antiparallel},
+Tasaki §2.5 eq.~(2.5.3)]
+For any sublattice indicator $A$ and bond $(x, y)$ with $x \ne y$
+and $A\,x \ne A\,y$,
+\[
+  \hat S_x \cdot \hat S_y \cdot \Phi_{\mathrm{N\acute eel}}(A)
+    = \frac{1}{2}\,|\mathrm{swap}_{x,y}\,\Phi_{\mathrm{N\acute eel}}(A)\rangle
+      - \frac{1}{4}\,\Phi_{\mathrm{N\acute eel}}(A).
+\]
+The 11 chain / 2D / 3D adjacent and wrap-around bond actions are
+1-line corollaries via the \texttt{\_eq\_neelStateOf} bridges.
+\end{theorem}
+
+\begin{theorem}[\texttt{inner\_neelStateOf\_spinHalfDot\_neelStateOf\_antiparallel},
+Tasaki §2.5 (2.5.4) ingredient]
+Under the same hypotheses,
+\[
+  \langle \Phi_{\mathrm{N\acute eel}}(A),\,
+      \hat S_x \cdot \hat S_y \cdot \Phi_{\mathrm{N\acute eel}}(A) \rangle
+    = -\frac{1}{4}.
+\]
+The 11 chain / 2D / 3D \texttt{\_eq\_neg\_one\_quarter} per-bond
+expectation lemmas reduce to this via the bridges.
+\end{theorem}
+
+\begin{theorem}[\texttt{inner\_neelStateOf\_szsz\_neelStateOf\_antiparallel}]
+The diagonal $\hat S^z_x \cdot \hat S^z_y$ correlator on the
+generic Néel state at any antiparallel bond:
+\[
+  \langle \Phi_{\mathrm{N\acute eel}}(A),\,
+      \hat S^z_x \cdot \hat S^z_y \cdot \Phi_{\mathrm{N\acute eel}}(A) \rangle
+    = -\frac{1}{4}.
+\]
+Proof: \texttt{inner\_basisVec\_onSite\_spinHalfOp3\_mul\_onSite\_spinHalfOp3\_basisVec}
+returns $\texttt{spinHalfSign}\,(\sigma\,x)\cdot\texttt{spinHalfSign}\,(\sigma\,y)$,
+which equals $-1/4$ at antiparallel $\sigma$ via
+\texttt{spinHalfSign\_mul\_antiparallel}.
+\end{theorem}
+
+\begin{remark}[Marshall sign generalisation, PR \#329]
+Analogously, the parity-coloured chain / 2D / 3D Marshall signs
+are now specialisations of a single generic $\texttt{marshallSignOf}\,A
+:= \prod_{x \in A} (-1)^{\sigma\,x}$ for any sublattice indicator
+$A : V \to \texttt{Bool}$.  The all-up corollary
+$\texttt{marshallSignOf}\,A\,(\mathrm{const}\,0) = 1$
+(\texttt{marshallSignOf\_const\_zero}) collapses the chain / 2D / 3D
+\texttt{\_const\_zero} variants to 1-line proofs through the
+\texttt{\_eq\_marshallSignOf} bridges.  As of 2026-04-22 the chain
+/ 2D / 3D \texttt{marshallSignChainConfig} / \texttt{\_square\_} /
+\texttt{\_cubic\_} variants are marked
+\texttt{@[deprecated]} in favour of the generic form.
+\end{remark}
+
 %======================================================================
 \section{Single-mode fermion (Phase 2 skeleton)}
 \label{sec:fermion-mode}
