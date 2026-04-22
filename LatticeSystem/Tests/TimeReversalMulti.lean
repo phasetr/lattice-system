@@ -208,4 +208,41 @@ example :
       -(basisVec upDown + basisVec (basisSwap upDown 0 1)) :=
   timeReversalSpinHalfMulti_triplet_zero
 
+/-! ## A. decide-based universal: `flipConfig` / `siteFlipAt`
+properties on small `Fin n` (Phase 1 PR 5 strengthening, refactor
+plan v4 §2.1 method A) -/
+
+/-- `flipConfig` is involutive (universally on `Fin 2 → Fin 2`,
+all 4 configurations). -/
+example : ∀ σ : Fin 2 → Fin 2, flipConfig (flipConfig σ) = σ := by
+  intro σ; exact flipConfig_involutive σ
+
+/-- `siteFlipAt` is involutive (universally on `Fin 2 → Fin 2`,
+all 4 configurations × 2 sites = 8 cases). -/
+example :
+    ∀ σ : Fin 2 → Fin 2, ∀ x : Fin 2,
+        siteFlipAt (siteFlipAt σ x) x = σ := by
+  intro σ x; exact siteFlipAt_involutive σ x
+
+/-! ## C. bridge identity (Phase 1 PR 5 strengthening, refactor
+plan v4 §2.1 method C) -/
+
+/-- `flipConfig σ x = 1 - σ x` reaffirmed as a bridge between the
+function form and the per-site arithmetic form. -/
+example (σ : Fin 3 → Fin 2) (x : Fin 3) :
+    flipConfig σ x = 1 - σ x := rfl
+
+/-! ## G. small exhaustive on `Fin 2 → Fin 2` (Phase 1 PR 5
+strengthening, refactor plan v4 §2.1 method G) -/
+
+/-- `siteFlipAt` self-vs-other agreement on `Fin 2`: at the flipped
+site value differs (`= 1 - σ x`); elsewhere unchanged. -/
+example :
+    ∀ τ : Fin 3 → Fin 2, ∀ x : Fin 3,
+        siteFlipAt τ x x = 1 - τ x := by
+  intro τ x; exact siteFlipAt_self τ x
+
+example (τ : Fin 3 → Fin 2) {x y : Fin 3} (h : y ≠ x) :
+    siteFlipAt τ x y = τ y := siteFlipAt_of_ne τ h
+
 end LatticeSystem.Tests.TimeReversalMulti
