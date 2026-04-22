@@ -1476,4 +1476,32 @@ theorem marshallCubicState_flipConfig_eq_timeReversalSpinHalfMulti
   rw [marshallSignCubicConfig_flipConfig_neelCubicConfig, one_smul,
     timeReversalSpinHalfMulti_neelCubicState]
 
+/-! ## Néel state norm² = 1 (orthonormality of the basis vectors) -/
+
+/-- 1D Néel chain state norm² = 1: `∑ τ, |Φ_Néel(τ)|² = 1`. Direct
+consequence of `basisVec_inner` (orthonormality of basis vectors)
+since `neelChainState K = basisVec (neelChainConfig K)`. -/
+theorem neelChainState_norm_squared (K : ℕ) :
+    ∑ τ : Fin (2 * K) → Fin 2,
+        neelChainState K τ * neelChainState K τ = 1 := by
+  unfold neelChainState
+  rw [basisVec_inner]
+  simp
+
+/-- 2D Néel state norm² = 1. -/
+theorem neelSquareState_norm_squared (K L : ℕ) :
+    ∑ τ : Fin (2 * K) × Fin (2 * L) → Fin 2,
+        neelSquareState K L τ * neelSquareState K L τ = 1 := by
+  unfold neelSquareState
+  rw [basisVec_inner]
+  simp
+
+/-- 3D cubic Néel state norm² = 1. -/
+theorem neelCubicState_norm_squared (K L M : ℕ) :
+    ∑ τ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2,
+        neelCubicState K L M τ * neelCubicState K L M τ = 1 := by
+  unfold neelCubicState
+  rw [basisVec_inner]
+  simp
+
 end LatticeSystem.Quantum

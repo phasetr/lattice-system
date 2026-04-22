@@ -507,6 +507,37 @@ example (K L M : ℕ) :
       neelCubicState K L M :=
   marshallCubicState_neelCubicConfig K L M
 
+/-! ## `basisSwap_ne_self` -/
+
+example {Λ : Type*} [DecidableEq Λ] {x y : Λ} (hxy : x ≠ y)
+    {σ : Λ → Fin 2} (h : σ x ≠ σ y) :
+    basisSwap σ x y ≠ σ :=
+  basisSwap_ne_self hxy h
+
+example :
+    basisSwap (neelChainConfig 1)
+        (⟨0, by decide⟩ : Fin 2) ⟨1, by decide⟩ ≠
+      neelChainConfig 1 :=
+  basisSwap_ne_self (by decide)
+    (by unfold neelChainConfig; decide)
+
+/-! ## Néel state norm² = 1 -/
+
+example (K : ℕ) :
+    ∑ τ : Fin (2 * K) → Fin 2,
+        neelChainState K τ * neelChainState K τ = 1 :=
+  neelChainState_norm_squared K
+
+example (K L : ℕ) :
+    ∑ τ : Fin (2 * K) × Fin (2 * L) → Fin 2,
+        neelSquareState K L τ * neelSquareState K L τ = 1 :=
+  neelSquareState_norm_squared K L
+
+example (K L M : ℕ) :
+    ∑ τ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2,
+        neelCubicState K L M τ * neelCubicState K L M τ = 1 :=
+  neelCubicState_norm_squared K L M
+
 /-! ## Marshall × time-reversal bridge -/
 
 example (K : ℕ) :
