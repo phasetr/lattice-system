@@ -167,6 +167,29 @@ This is enforced by review and not by CI.
   user-visible API").
 - [ ] References to Tasaki / mathlib added where applicable.
 
+## 6b. Verifying push before merge (incident-driven)
+
+When chaining `git commit && git push` inside a single background
+shell command, the `git push` step can fail silently — for
+example due to a transient network error or an interrupted
+background task — without aborting the chain or surfacing the
+failure on subsequent commands. The PR API will then report a
+**successful merge of an empty diff**, silently dropping the
+intended changes.
+
+### Review check — push verification
+
+- [ ] After `git push` (especially in chained / background
+  invocations), verify with `git ls-remote origin <branch>`
+  that the remote SHA matches the local `HEAD`.
+- [ ] After `gh pr merge`, run `git pull` on `main` and confirm
+  the expected files are present (`ls` the new file paths).
+- [ ] If a previous PR's diff is empty on inspection, **redo
+  the PR** before claiming the underlying refactor done.
+
+Origin: PR #311 (intended JordanWigner Operators extraction)
+merged with empty diff; redone via PR #312.
+
 ## 7. Refactoring knowledge accumulation (this document)
 
 This document is itself the **single source of truth** for
