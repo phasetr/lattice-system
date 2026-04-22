@@ -306,10 +306,10 @@ private lemma neg_one_pow_one_sub_fin_two (s : Fin 2) :
     ((-1 : ℂ) ^ ((1 - s).val : ℕ)) =
       (-1 : ℂ) * ((-1 : ℂ) ^ (s : ℕ)) := by
   fin_cases s
-  · show ((-1 : ℂ) ^ ((1 - 0 : Fin 2).val : ℕ)) =
+  · change ((-1 : ℂ) ^ ((1 - 0 : Fin 2).val : ℕ)) =
       (-1 : ℂ) * ((-1 : ℂ) ^ ((0 : Fin 2) : ℕ))
     simp
-  · show ((-1 : ℂ) ^ ((1 - 1 : Fin 2).val : ℕ)) =
+  · change ((-1 : ℂ) ^ ((1 - 1 : Fin 2).val : ℕ)) =
       (-1 : ℂ) * ((-1 : ℂ) ^ ((1 : Fin 2) : ℕ))
     simp
 

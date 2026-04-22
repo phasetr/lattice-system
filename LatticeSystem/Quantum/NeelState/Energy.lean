@@ -59,7 +59,7 @@ theorem neelChainState_energy_expectation_K1 (J : ℝ) :
       (by decide)
   -- Identify (⟨0, _⟩ : Fin (2 * 1)) with (0 : Fin 2)
   -- Both reduce to the same Fin 2 element
-  show (-(2 * J) : ℂ) *
+  change (-(2 * J) : ℂ) *
       (∑ τ : Fin 2 → Fin 2, neelChainState 1 τ *
         (Matrix.mulVec (spinHalfDot (0 : Fin 2) (1 : Fin 2))
           (neelChainState 1)) τ) =
@@ -68,7 +68,6 @@ theorem neelChainState_energy_expectation_K1 (J : ℝ) :
   have hone : (⟨0 + 1, by decide⟩ : Fin (2 * 1)) = (1 : Fin 2) := rfl
   rw [hzero, hone] at h
   rw [h]
-  push_cast
   ring
 
 /-- 3D Néel: z-axis wrap bond expectation = -1/4. -/

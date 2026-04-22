@@ -80,7 +80,7 @@ theorem heisenbergHamiltonian_openChainCoupling_one_mulVec_neelChainState_one
   have h := spinHalfDot_mulVec_neelChainState_adjacent 1 (i := 0)
     (by decide)
   -- Replace (0 : Fin 2) by ⟨0, _⟩ and (1 : Fin 2) by ⟨1, _⟩ in the goal.
-  show (-(2 * (J : ℂ))) •
+  change (-(2 * (J : ℂ))) •
       (spinHalfDot (⟨0, by decide⟩ : Fin (2 * 1))
         (⟨1, by decide⟩ : Fin (2 * 1))).mulVec (neelChainState 1) =
     (-(J : ℂ)) • basisVec

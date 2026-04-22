@@ -158,7 +158,7 @@ theorem openChainCoupling_conj (N : ℕ) (J : ℝ) (x y : Fin (N + 1)) :
     starRingEnd ℂ (openChainCoupling N J x y)
       = openChainCoupling N J x y := by
   apply LatticeSystem.Lattice.couplingOf_real
-  show star (-(J : ℂ)) = -(J : ℂ)
+  change star (-(J : ℂ)) = -(J : ℂ)
   rw [star_neg]
   exact congrArg Neg.neg (Complex.conj_ofReal J)
 
@@ -168,7 +168,7 @@ theorem periodicChainCoupling_conj
     starRingEnd ℂ (periodicChainCoupling N J x y)
       = periodicChainCoupling N J x y := by
   apply LatticeSystem.Lattice.couplingOf_real
-  show star (-(J : ℂ)) = -(J : ℂ)
+  change star (-(J : ℂ)) = -(J : ℂ)
   rw [star_neg]
   exact congrArg Neg.neg (Complex.conj_ofReal J)
 
