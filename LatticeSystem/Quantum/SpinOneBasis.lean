@@ -136,7 +136,15 @@ those entries the right-hand side reduces to `2·invSqrt2 = √2` via
 `sqrt2_mul_sqrt2` already declared just below. We use that fact in
 the `linear_combination` proof. -/
 
-/-- `Ŝ^+ = Ŝ^(1) + i·Ŝ^(2)` for `S = 1`. -/
+set_option linter.flexible false in
+/-- `Ŝ^+ = Ŝ^(1) + i·Ŝ^(2)` for `S = 1`. The body's
+`fin_cases i <;> fin_cases j <;> simp [Matrix.add_apply, invSqrt2]
+  ; try (field_simp; ...)` is intentionally generic — the per-entry
+goals are 9 independent matrix-entry equalities; the default simp
+set computes them and then `field_simp; ring_nf` closes the residual
+`√2 · √2 = 2` cases. (`linter.flexible` suppressed at theorem level
+since refactoring to `simp only [exhaustive list]` would require
+interactive `simp?` per sub-case.) -/
 theorem spinOneOpPlus_eq_add :
     spinOneOpPlus = spinOneOp1 + Complex.I • spinOneOp2 := by
   unfold spinOneOpPlus spinOneOp1 spinOneOp2
@@ -150,7 +158,9 @@ theorem spinOneOpPlus_eq_add :
      try (field_simp; rw [show (Complex.I)^2 = -1 from Complex.I_sq]; ring_nf
           try (rw [hsq])))
 
-/-- `Ŝ^- = Ŝ^(1) - i·Ŝ^(2)` for `S = 1`. -/
+set_option linter.flexible false in
+/-- `Ŝ^- = Ŝ^(1) - i·Ŝ^(2)` for `S = 1`. (Same `linter.flexible`
+suppression rationale as `spinOneOpPlus_eq_add` above.) -/
 theorem spinOneOpMinus_eq_sub :
     spinOneOpMinus = spinOneOp1 - Complex.I • spinOneOp2 := by
   unfold spinOneOpMinus spinOneOp1 spinOneOp2
