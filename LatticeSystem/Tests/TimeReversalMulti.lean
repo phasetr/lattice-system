@@ -62,4 +62,11 @@ example (σ : Fin 3 → Fin 2) :
         basisVec (flipConfig σ) :=
   timeReversalSpinHalfMulti_basisVec σ
 
+/-! ## Multi-site σ^z sign-flip equivariance -/
+
+example (x : Fin 3) (v : (Fin 3 → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti ((onSite x pauliZ).mulVec v) =
+      (-(onSite x pauliZ)).mulVec (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_onSite_pauliZ_mulVec x v
+
 end LatticeSystem.Tests.TimeReversalMulti
