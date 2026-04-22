@@ -50,6 +50,24 @@ noncomputable def marshallSignOf {V : Type*} [Fintype V]
     (A : V → Bool) (σ : V → Fin 2) : ℂ :=
   ∏ x : V, if A x then ((-1 : ℂ) ^ (σ x : ℕ)) else 1
 
+/-- All-up Marshall sign on any sublattice indicator is `+1`:
+`marshallSignOf A (fun _ => 0) = 1`. The factor `(-1)^0 = 1`
+contributes from every `A`-site, so the product is `1`
+regardless of `A`.
+
+Generic counterpart of `marshallSignChainConfig_const_zero` /
+`marshallSignSquareConfig_const_zero` /
+`marshallSignCubicConfig_const_zero`; those become 1-line
+corollaries via the `_eq_marshallSignOf` bridges. (Refactor Phase 3
+PR 1.) -/
+theorem marshallSignOf_const_zero {V : Type*} [Fintype V]
+    (A : V → Bool) :
+    marshallSignOf A (fun _ : V => (0 : Fin 2)) = 1 := by
+  unfold marshallSignOf
+  apply Finset.prod_eq_one
+  intro x _
+  by_cases hA : A x = true <;> simp [hA]
+
 /-- Marshall sign of a spin-1/2 configuration on the
 parity-coloured chain `Fin (2 * K)`: `(-1)^(N_A^↓)` with `A` =
 even indices. Encoded as the product `∏_{x even} (-1)^(σ x)`. -/
@@ -114,7 +132,11 @@ theorem marshallSignCubicConfig_neelCubicConfig (K L M : ℕ) :
   · simp [hp]
   · simp [hp]
 
-/-- All-up Marshall sign: `marshallSignChainConfig K (fun _ => 0) = 1`. -/
+/-- All-up Marshall sign: `marshallSignChainConfig K (fun _ => 0) = 1`.
+(Cf. generic `marshallSignOf_const_zero` — the bridge
+`marshallSignChainConfig_eq_marshallSignOf` would let this proof
+be a 1-liner, but the bridge is defined later in the file, so we
+keep the direct proof here for now.) -/
 theorem marshallSignChainConfig_const_zero (K : ℕ) :
     marshallSignChainConfig K (fun _ : Fin (2 * K) => (0 : Fin 2)) = 1 := by
   unfold marshallSignChainConfig
