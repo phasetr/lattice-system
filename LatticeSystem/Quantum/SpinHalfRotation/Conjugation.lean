@@ -286,6 +286,13 @@ private lemma pauliZ_eq_diagonal :
   ext i j
   fin_cases i <;> fin_cases j <;> simp [pauliZ, Matrix.diagonal]
 
+-- Linter suppression: the proof uses `fin_cases i <;> fin_cases j`
+-- followed by `simp [...]` over 4 (2×2) matrix-entry sub-cases,
+-- then a chained `<;> first | ... | ...` discharger. The inner
+-- `simp` is generic across cases and the chained dischargers each
+-- have unused simp args / try blocks for some cases — refactoring
+-- to `simp only [exhaustive list]` requires interactive `simp?`
+-- per sub-case. Tracked under #284 (Phase 4 P4-1).
 set_option linter.flexible false in
 set_option linter.unusedTactic false in
 set_option linter.unusedSimpArgs false in
@@ -326,6 +333,10 @@ theorem spinHalfRot3_eq_exp (θ : ℝ) :
 
 /-! ## Coherent state (Tasaki §2.1 Problem 2.1.d) -/
 
+-- Linter suppression: same rationale as `spinHalfRot3_eq_exp` —
+-- per-sub-case `simp [...]` after `fin_cases i` requires
+-- interactive `simp?` to refactor to `simp only [...]`. Tracked
+-- under #284 (Phase 4 P4-1).
 set_option linter.flexible false in
 set_option linter.unusedTactic false in
 /-- Tasaki Problem 2.1.d: `Û^(3)_φ · Û^(2)_θ · |ψ^↑⟩ =
@@ -355,6 +366,9 @@ theorem spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp (θ φ : ℝ) :
       -(Complex.sin (↑θ / 2)) *
         (Complex.cos (↑φ / 2) + Complex.I * Complex.sin (↑φ / 2)) * hI
 
+-- Linter suppression: same rationale as
+-- `spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp` above. Tracked
+-- under #284 (Phase 4 P4-1).
 set_option linter.flexible false in
 set_option linter.unusedTactic false in
 /-- `Û^(3)_φ · Û^(2)_θ · |ψ^↓⟩ =
