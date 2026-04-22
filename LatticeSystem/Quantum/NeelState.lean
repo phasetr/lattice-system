@@ -1826,6 +1826,31 @@ theorem neelCubicState_inner_spinHalfDot_y_wrap_eq_neg_one_quarter
     · have h1 : (i + (2 * L + 1) + k) % 2 = 0 := by omega
       simp [h1, hik1]
 
+/-! ## S^z S^z spin-spin correlation on the Néel state -/
+
+/-- 1D Néel chain: per-adjacent-bond `Ŝ^(3)_x · Ŝ^(3)_y`
+correlation:
+
+  `⟨Φ_Néel, Ŝ^(3)_x · Ŝ^(3)_y · Φ_Néel⟩ = -1/4`
+
+(diagonal `Ŝ^z·Ŝ^z` correlator at antiparallel bond). -/
+theorem neelChainState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_adjacent_eq_neg_one_quarter
+    (K : ℕ) {i : ℕ} (hi : i + 1 < 2 * K) :
+    ∑ τ : Fin (2 * K) → Fin 2,
+        neelChainState K τ *
+          ((onSite (⟨i, by omega⟩ : Fin (2 * K)) spinHalfOp3 *
+              onSite (⟨i + 1, hi⟩ : Fin (2 * K))
+                spinHalfOp3).mulVec
+            (neelChainState K)) τ = -(1 / 4 : ℂ) := by
+  unfold neelChainState
+  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
+  unfold neelChainConfig spinHalfSign
+  by_cases hp : i % 2 = 0
+  · have hp1 : (i + 1) % 2 ≠ 0 := by omega
+    simp [hp, hp1]; ring
+  · have hp1 : (i + 1) % 2 = 0 := by omega
+    simp [hp, hp1]; ring
+
 /-! ## Heisenberg energy expectation on the Néel state -/
 
 /-- 1D Néel chain at `K = 1` (2-site open chain): the Heisenberg
