@@ -155,4 +155,59 @@ theorem timeReversalSpinHalf_spinHalfOp3_mulVec (v : Fin 2 → ℂ) :
     simp [timeReversalSpinHalf, spinHalfOp3, pauliZ, Matrix.mulVec,
       dotProduct, Fin.sum_univ_two, Complex.conj_ofNat] <;> ring
 
+/-! ## Decomposition `Θ̂ = û_2 · K̂` (Tasaki §2.3 definition)
+
+Tasaki §2.3 (p. 26) defines `Θ̂ := û_2 · K̂` where
+`û_2 = exp(-iπ Ŝ^(2))` is the π rotation about the `2`-axis and
+`K̂` is the antilinear complex-conjugation map of (2.3.4). We
+record `K̂` and prove both the involutive property and the
+factorisation identity. -/
+
+/-- Complex conjugation `K̂` on a single-spin state vector
+(Tasaki §2.3 eq. (2.3.4) at `S = 1/2`): `K̂(v) i := conj(v i)`. -/
+def complexConjugationSpinHalf (v : Fin 2 → ℂ) : Fin 2 → ℂ :=
+  fun i => starRingEnd ℂ (v i)
+
+@[simp] theorem complexConjugationSpinHalf_apply
+    (v : Fin 2 → ℂ) (i : Fin 2) :
+    complexConjugationSpinHalf v i = starRingEnd ℂ (v i) := rfl
+
+/-- `K̂` is involutive: `K̂(K̂ v) = v` for every state `v`. -/
+theorem complexConjugationSpinHalf_sq (v : Fin 2 → ℂ) :
+    complexConjugationSpinHalf (complexConjugationSpinHalf v) = v := by
+  funext i
+  simp [complexConjugationSpinHalf]
+
+/-- `K̂` is additive: `K̂(v + w) = K̂(v) + K̂(w)`. -/
+theorem complexConjugationSpinHalf_add (v w : Fin 2 → ℂ) :
+    complexConjugationSpinHalf (v + w) =
+      complexConjugationSpinHalf v + complexConjugationSpinHalf w := by
+  funext i
+  simp [complexConjugationSpinHalf, Pi.add_apply]
+
+/-- `K̂` is antilinear in the scalar: `K̂(c • v) = (conj c) • K̂(v)`. -/
+theorem complexConjugationSpinHalf_smul (c : ℂ) (v : Fin 2 → ℂ) :
+    complexConjugationSpinHalf (c • v) =
+      (starRingEnd ℂ c) • complexConjugationSpinHalf v := by
+  funext i
+  simp [complexConjugationSpinHalf, Pi.smul_apply, smul_eq_mul]
+
+/-- Tasaki §2.3 definition: the time-reversal map factors as
+`Θ̂ = û_2 · K̂` where `û_2 = spinHalfRot2 π` is the π rotation
+about the `2`-axis. -/
+theorem timeReversalSpinHalf_eq_spinHalfRot2_pi_mulVec
+    (v : Fin 2 → ℂ) :
+    timeReversalSpinHalf v =
+      (spinHalfRot2 Real.pi).mulVec
+        (complexConjugationSpinHalf v) := by
+  funext i
+  have hI2 : (Complex.I)^2 = -1 := Complex.I_sq
+  fin_cases i <;>
+    (simp [timeReversalSpinHalf, complexConjugationSpinHalf,
+       spinHalfRot2_pi, spinHalfOp2, pauliY, Matrix.mulVec,
+       dotProduct, Fin.sum_univ_two];
+     ring_nf;
+     rw [hI2];
+     ring)
+
 end LatticeSystem.Quantum

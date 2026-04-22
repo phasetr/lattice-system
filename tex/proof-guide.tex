@@ -3933,6 +3933,28 @@ the proof is a direct \texttt{fin\_cases} computation using the
 explicit formulae for \(\sigma^{x}, \sigma^{y}, \sigma^{z}\) and
 the conjugate ring homomorphism on the entries.
 
+\noindent\textbf{Decomposition} (Tasaki §2.3, p.~26).
+The factorisation \(\hat{\Theta} = \hat{u}_2 \cdot \hat{K}\) is
+recorded explicitly: \texttt{complexConjugationSpinHalf} defines
+the antilinear conjugation
+\(\hat{K}(v)_i := \overline{v_i}\) (which is involutive,
+additive, and antilinear in the scalar), and
+\texttt{timeReversalSpinHalf\_eq\_spinHalfRot2\_pi\_mulVec}
+proves
+\[
+  \hat{\Theta}\,v
+  \;=\;
+  \hat{u}_2 \cdot \hat{K}(v)
+  \;=\;
+  \bigl(\texttt{spinHalfRot2}\ \pi\bigr).\texttt{mulVec}\,
+    \bigl(\hat{K}(v)\bigr)
+\]
+for every \(v : \texttt{Fin}\,2 \to \mathbb{C}\). The proof
+expands the explicit matrix entries of
+\(\hat{u}_2 = \texttt{spinHalfRot2}\,\pi\) and uses
+\(I^{2} = -1\) (\texttt{Complex.I\_sq}) to close the residual
+arithmetic.
+
 \noindent\textbf{Status / scope.} The single-spin case is closed
 (\texttt{LatticeSystem/Quantum/TimeReversalSpinHalf.lean}). The
 multi-spin extension \(\hat{\Theta}_{\text{tot}} =

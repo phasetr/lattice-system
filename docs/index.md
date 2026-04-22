@@ -301,6 +301,9 @@ Systems*, §2.3 eqs. (2.3.4)–(2.3.8), pp. 26–27.
 | `timeReversalSpinHalf_smul` | **antilinearity** in the scalar: `Θ̂(c • v) = (conj c) • Θ̂(v)` (Tasaki §2.3 antilinearity warning, pp. 26–27) | `Quantum/TimeReversalSpinHalf.lean` |
 | `timeReversalSpinHalf_sq` | **Kramers degeneracy at `S = 1/2`** (Tasaki eq. (2.3.8), half-odd-integer): `Θ̂² = -1̂` | `Quantum/TimeReversalSpinHalf.lean` |
 | `timeReversalSpinHalf_spinHalfOp{1,2,3}_mulVec` | spin sign flip (Tasaki eq. (2.3.14)): `Θ̂(Ŝ^(α) · v) = (-Ŝ^(α)) · (Θ̂ v)` for `α = 1, 2, 3` — equivariance form of `Θ̂ Ŝ^(α) Θ̂⁻¹ = -Ŝ^(α)` | `Quantum/TimeReversalSpinHalf.lean` |
+| `complexConjugationSpinHalf` | the antilinear complex-conjugation map `K̂` of Tasaki §2.3 eq. (2.3.4) at `S = 1/2`: `K̂(v) i := conj(v i)` | `Quantum/TimeReversalSpinHalf.lean` |
+| `complexConjugationSpinHalf_sq` / `_add` / `_smul` | `K̂` is involutive (`K̂² = id`), additive, and antilinear in the scalar | `Quantum/TimeReversalSpinHalf.lean` |
+| `timeReversalSpinHalf_eq_spinHalfRot2_pi_mulVec` | the **factorisation identity** of Tasaki §2.3: `Θ̂ = û_2 · K̂` where `û_2 = spinHalfRot2 π` is the π rotation about the `2`-axis | `Quantum/TimeReversalSpinHalf.lean` |
 
 ### Multi-body operator space (abstract lattice)
 
