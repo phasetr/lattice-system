@@ -126,7 +126,7 @@ theorem inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel
 
   `⟨Φ_Néel(A), Ŝ^z_x · Ŝ^z_y · Φ_Néel(A)⟩ = -(1/4)`.
 
-Combines `inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec`
+Combines `inner_basisVec_szsz_basisVec`
 (returns `spinHalfSign σ x · spinHalfSign σ y`) with
 `spinHalfSign_mul_antiparallel`. (Refactor Phase 3 PR 4.) -/
 theorem inner_neelStateOf_szsz_neelStateOf_antiparallel
@@ -138,7 +138,7 @@ theorem inner_neelStateOf_szsz_neelStateOf_antiparallel
               onSite y spinHalfOp3).mulVec (neelStateOf A)) τ =
       -(1 / 4 : ℂ) := by
   unfold neelStateOf
-  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
+  rw [inner_basisVec_szsz_basisVec]
   exact spinHalfSign_mul_antiparallel
     (neelConfigOf_apply_ne_of_ne A hA)
 

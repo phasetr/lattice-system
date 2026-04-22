@@ -632,7 +632,7 @@ example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (x y : Λ) (σ : Λ → Fin 2
           ((onSite x spinHalfOp3 * onSite y spinHalfOp3 :
               ManyBodyOp Λ).mulVec (basisVec σ)) τ =
       spinHalfSign (σ x) * spinHalfSign (σ y) :=
-  inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec x y σ
+  inner_basisVec_szsz_basisVec x y σ
 
 /-! ## S^z S^z extended coverage (1D wrap, 2D, 3D) -/
 
