@@ -66,6 +66,34 @@ LatticeSystem/Quantum/NeelState/Definition2D.lean
 
 Old `import LatticeSystem.Quantum.NeelState` works unchanged.
 
+### Façade variant: `Core.lean` sub-pattern (cycle avoidance)
+
+When the original module's *bulk* stays put and only a *new
+feature file* is extracted, the naive façade pattern would
+require the new feature file to `import` the (now-trimmed)
+original — and the original-as-façade would `import` the new
+feature file. That is a cycle.
+
+The fix: rename the (trimmed) original to `<Module>/Core.lean`
+and create a fresh `<Module>.lean` façade that imports both
+`<Module>/Core.lean` and the new feature file:
+
+```
+LatticeSystem/Quantum/SpinDot.lean             -- façade (~30 lines)
+LatticeSystem/Quantum/SpinDot/Core.lean        -- bulk of original
+LatticeSystem/Quantum/SpinDot/Hamiltonian.lean -- new feature
+```
+
+Now `Hamiltonian.lean` imports `SpinDot.Core` (not `SpinDot`),
+and `SpinDot.lean` (façade) imports both. No cycle.
+
+When to use: any time the new sub-file would need to import the
+original file's content (which, if not renamed, would be the
+façade).
+
+Origin: PR #317 (SpinDot/Hamiltonian extraction). See
+`docs/index.md` Phase 2 entries for cumulative usage.
+
 ### Helper visibility
 
 When extracting a helper lemma from one file to another, if the
