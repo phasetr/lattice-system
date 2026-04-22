@@ -569,4 +569,22 @@ theorem isingCycle_partitionFn_im (N : ℕ) (β J h : ℝ) :
   partitionFn_im_of_isHermitian
     (isingCycleHamiltonian_isHermitian N J h) β
 
+/-- Periodic Ising real-cast equality: for Hermitian `O`,
+`((⟨O⟩_β).re : ℂ) = ⟨O⟩_β`. -/
+theorem isingCycleGibbsExpectation_ofReal_re_eq
+    (N : ℕ) (β J h : ℝ) {O : ManyBodyOp (Fin (N + 2))}
+    (hO : O.IsHermitian) :
+    (((gibbsExpectation β (isingCycleHamiltonian N J h) O).re : ℂ))
+      = gibbsExpectation β (isingCycleHamiltonian N J h) O :=
+  gibbsExpectation_ofReal_re_eq_of_isHermitian
+    (isingCycleHamiltonian_isHermitian N J h) hO β
+
+/-- Periodic Ising Rényi-n trace identity:
+`Tr(ρ_β^n) = Z(nβ) / Z(β)^n`. -/
+theorem isingCycleGibbsState_pow_trace (N : ℕ) (β J h : ℝ) (n : ℕ) :
+    ((isingCycleGibbsState N β J h)^n).trace
+      = partitionFn ((n : ℝ) * β) (isingCycleHamiltonian N J h)
+        / (partitionFn β (isingCycleHamiltonian N J h)) ^ n :=
+  gibbsState_pow_trace β (isingCycleHamiltonian N J h) n
+
 end LatticeSystem.Quantum

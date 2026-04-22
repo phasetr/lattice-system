@@ -2981,6 +2981,28 @@ theorem hubbardChain_partitionFn_im (N : ℕ) (β J U : ℝ) :
   LatticeSystem.Quantum.partitionFn_im_of_isHermitian
     (hubbardChainHamiltonian_isHermitian N J U) β
 
+/-- Hubbard-chain real-cast equality. -/
+theorem hubbardChainGibbsExpectation_ofReal_re_eq
+    (N : ℕ) (β J U : ℝ) {O : ManyBodyOp (Fin (2 * N + 2))}
+    (hO : O.IsHermitian) :
+    (((LatticeSystem.Quantum.gibbsExpectation β
+        (hubbardChainHamiltonian N J U) O).re : ℂ))
+      = LatticeSystem.Quantum.gibbsExpectation β
+          (hubbardChainHamiltonian N J U) O :=
+  LatticeSystem.Quantum.gibbsExpectation_ofReal_re_eq_of_isHermitian
+    (hubbardChainHamiltonian_isHermitian N J U) hO β
+
+/-- Hubbard-chain Rényi-n trace identity. -/
+theorem hubbardChainGibbsState_pow_trace
+    (N : ℕ) (β J U : ℝ) (n : ℕ) :
+    ((hubbardChainGibbsState N β J U)^n).trace
+      = LatticeSystem.Quantum.partitionFn ((n : ℝ) * β)
+          (hubbardChainHamiltonian N J U)
+        / (LatticeSystem.Quantum.partitionFn β
+            (hubbardChainHamiltonian N J U)) ^ n :=
+  LatticeSystem.Quantum.gibbsState_pow_trace β
+    (hubbardChainHamiltonian N J U) n
+
 /-- The two-particle state `c_i† c_j† |vac⟩` is an `N̂`-eigenstate
 with eigenvalue 2. The Leibniz rule
 `[N̂, AB] = [N̂,A]B + A[N̂,B]` together with `[N̂, c_†] = c_†`
@@ -3185,5 +3207,27 @@ theorem hubbardCycle_partitionFn_im (N : ℕ) (β J U : ℝ) :
         (hubbardCycleHamiltonian N J U)).im = 0 :=
   LatticeSystem.Quantum.partitionFn_im_of_isHermitian
     (hubbardCycleHamiltonian_isHermitian N J U) β
+
+/-- Periodic-Hubbard real-cast equality. -/
+theorem hubbardCycleGibbsExpectation_ofReal_re_eq
+    (N : ℕ) (β J U : ℝ) {O : ManyBodyOp (Fin (2 * N + 2))}
+    (hO : O.IsHermitian) :
+    (((LatticeSystem.Quantum.gibbsExpectation β
+        (hubbardCycleHamiltonian N J U) O).re : ℂ))
+      = LatticeSystem.Quantum.gibbsExpectation β
+          (hubbardCycleHamiltonian N J U) O :=
+  LatticeSystem.Quantum.gibbsExpectation_ofReal_re_eq_of_isHermitian
+    (hubbardCycleHamiltonian_isHermitian N J U) hO β
+
+/-- Periodic-Hubbard Rényi-n trace identity. -/
+theorem hubbardCycleGibbsState_pow_trace
+    (N : ℕ) (β J U : ℝ) (n : ℕ) :
+    ((hubbardCycleGibbsState N β J U)^n).trace
+      = LatticeSystem.Quantum.partitionFn ((n : ℝ) * β)
+          (hubbardCycleHamiltonian N J U)
+        / (LatticeSystem.Quantum.partitionFn β
+            (hubbardCycleHamiltonian N J U)) ^ n :=
+  LatticeSystem.Quantum.gibbsState_pow_trace β
+    (hubbardCycleHamiltonian N J U) n
 
 end LatticeSystem.Fermion
