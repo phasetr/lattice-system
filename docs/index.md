@@ -322,7 +322,7 @@ Systems*, §2.3 eqs. (2.3.4)–(2.3.8), pp. 26–27.
 | `timeReversalSpinHalfMulti_spinHalfDot_mulVec` | **Time-reversal invariance of the bilinear `Ŝ_x · Ŝ_y`** (Tasaki §2.3): `Θ̂_tot ((Ŝ_x · Ŝ_y) v) = (Ŝ_x · Ŝ_y)(Θ̂_tot v)` — two equivariance `-1` factors cancel; sums per-axis | `Quantum/TimeReversalMulti.lean` |
 | `timeReversalSpinHalfMulti_heisenbergHamiltonian_mulVec` | **Time-reversal invariance of the Heisenberg Hamiltonian** (Tasaki §2.3): for real coupling `J` (`conj(J(x,y)) = J(x,y)`), `Θ̂_tot ((H J) v) = (H J)(Θ̂_tot v)`. Combines per-bond invariance + Θ̂_tot antilinearity (J reality) + additivity (over double-sum) | `Quantum/TimeReversalMulti.lean` |
 | `openChainCoupling_conj` / `periodicChainCoupling_conj` | every entry of `openChainCoupling N J` (resp. `periodicChainCoupling N J`) is real (under complex conjugation), since `J : ℝ` makes `(-(J : ℂ))` real-valued | `Quantum/HeisenbergChain.lean` |
-| `timeReversalSpinHalfMulti_openChainHeisenberg_mulVec` / `_periodicChainHeisenberg_mulVec` | concrete time-reversal invariance: the open-chain (resp. periodic-chain) Heisenberg Hamiltonian commutes with `Θ̂_tot` for any real coupling `J : ℝ` | `Quantum/TimeReversalMulti.lean` |
+| `timeReversalSpinHalfMulti_openChainHeisenberg_mulVec` / `_periodicChainHeisenberg_mulVec` / `_squareLatticeHeisenberg_mulVec` / `_squareTorusHeisenberg_mulVec` / `_cubicLatticeHeisenberg_mulVec` | concrete time-reversal invariance: the open / periodic chain, the 2D open square / torus, and the 3D cubic Heisenberg Hamiltonians all commute with `Θ̂_tot` for any real coupling `J : ℝ`. Backed by `*Coupling_conj` reality lemmas in `HeisenbergChain.lean` | `Quantum/TimeReversalMulti.lean` |
 
 ### Multi-body operator space (abstract lattice)
 
