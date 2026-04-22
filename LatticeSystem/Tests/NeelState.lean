@@ -507,4 +507,35 @@ example (K L M : ℕ) :
       neelCubicState K L M :=
   marshallCubicState_neelCubicConfig K L M
 
+/-! ## Marshall × time-reversal bridge -/
+
+example (K : ℕ) :
+    marshallSignChainConfig K (flipConfig (neelChainConfig K)) =
+      (-1 : ℂ) ^ K :=
+  marshallSignChainConfig_flipConfig_neelChainConfig K
+
+example (K L : ℕ) :
+    marshallSignSquareConfig K L (flipConfig (neelSquareConfig K L)) = 1 :=
+  marshallSignSquareConfig_flipConfig_neelSquareConfig K L
+
+example (K L M : ℕ) :
+    marshallSignCubicConfig K L M
+        (flipConfig (neelCubicConfig K L M)) = 1 :=
+  marshallSignCubicConfig_flipConfig_neelCubicConfig K L M
+
+example (K : ℕ) :
+    marshallChainState K (flipConfig (neelChainConfig K)) =
+      timeReversalSpinHalfMulti (neelChainState K) :=
+  marshallChainState_flipConfig_eq_timeReversalSpinHalfMulti K
+
+example (K L : ℕ) :
+    marshallSquareState K L (flipConfig (neelSquareConfig K L)) =
+      timeReversalSpinHalfMulti (neelSquareState K L) :=
+  marshallSquareState_flipConfig_eq_timeReversalSpinHalfMulti K L
+
+example (K L M : ℕ) :
+    marshallCubicState K L M (flipConfig (neelCubicConfig K L M)) =
+      timeReversalSpinHalfMulti (neelCubicState K L M) :=
+  marshallCubicState_flipConfig_eq_timeReversalSpinHalfMulti K L M
+
 end LatticeSystem.Tests.NeelState

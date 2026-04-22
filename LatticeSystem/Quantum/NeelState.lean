@@ -1413,4 +1413,67 @@ theorem marshallCubicState_neelCubicConfig (K L M : ℕ) :
   unfold marshallCubicState neelCubicState
   rw [marshallSignCubicConfig_neelCubicConfig, one_smul]
 
+/-! ## Marshall × time-reversal bridge on the Néel state -/
+
+/-- Marshall sign of the *flipped* Néel chain configuration:
+`marshallSignChainConfig K (flipConfig (neelChainConfig K)) = (-1)^K`.
+Combines `_flipConfig` (factor `(-1)^K`) and `_neelChainConfig`
+(base sign `+1`). -/
+theorem marshallSignChainConfig_flipConfig_neelChainConfig (K : ℕ) :
+    marshallSignChainConfig K (flipConfig (neelChainConfig K)) =
+      (-1 : ℂ) ^ K := by
+  rw [marshallSignChainConfig_flipConfig,
+    marshallSignChainConfig_neelChainConfig, mul_one]
+
+/-- 2D Marshall sign of the flipped Néel configuration: `+1`
+(`flipConfig` invariance + base `+1`). -/
+theorem marshallSignSquareConfig_flipConfig_neelSquareConfig (K L : ℕ) :
+    marshallSignSquareConfig K L (flipConfig (neelSquareConfig K L)) = 1 := by
+  rw [marshallSignSquareConfig_flipConfig,
+    marshallSignSquareConfig_neelSquareConfig]
+
+/-- 3D Marshall sign of the flipped Néel configuration: `+1`
+(`flipConfig` invariance + base `+1`). -/
+theorem marshallSignCubicConfig_flipConfig_neelCubicConfig
+    (K L M : ℕ) :
+    marshallSignCubicConfig K L M
+        (flipConfig (neelCubicConfig K L M)) = 1 := by
+  rw [marshallSignCubicConfig_flipConfig,
+    marshallSignCubicConfig_neelCubicConfig]
+
+/-- The Marshall-rotated *flipped* Néel chain state equals the
+time-reversed Néel chain state:
+
+  `marshallChainState K (flipConfig (neelChainConfig K))
+    = Θ̂_tot · neelChainState K`.
+
+Both sides equal `(-1)^K · basisVec (flipConfig (neelChainConfig K))`. -/
+theorem marshallChainState_flipConfig_eq_timeReversalSpinHalfMulti
+    (K : ℕ) :
+    marshallChainState K (flipConfig (neelChainConfig K)) =
+      timeReversalSpinHalfMulti (neelChainState K) := by
+  unfold marshallChainState
+  rw [marshallSignChainConfig_flipConfig_neelChainConfig,
+    timeReversalSpinHalfMulti_neelChainState]
+
+/-- The Marshall-rotated *flipped* 2D Néel state equals the
+time-reversed 2D Néel state. -/
+theorem marshallSquareState_flipConfig_eq_timeReversalSpinHalfMulti
+    (K L : ℕ) :
+    marshallSquareState K L (flipConfig (neelSquareConfig K L)) =
+      timeReversalSpinHalfMulti (neelSquareState K L) := by
+  unfold marshallSquareState
+  rw [marshallSignSquareConfig_flipConfig_neelSquareConfig, one_smul,
+    timeReversalSpinHalfMulti_neelSquareState]
+
+/-- The Marshall-rotated *flipped* 3D cubic Néel state equals the
+time-reversed 3D Néel state. -/
+theorem marshallCubicState_flipConfig_eq_timeReversalSpinHalfMulti
+    (K L M : ℕ) :
+    marshallCubicState K L M (flipConfig (neelCubicConfig K L M)) =
+      timeReversalSpinHalfMulti (neelCubicState K L M) := by
+  unfold marshallCubicState
+  rw [marshallSignCubicConfig_flipConfig_neelCubicConfig, one_smul,
+    timeReversalSpinHalfMulti_neelCubicState]
+
 end LatticeSystem.Quantum
