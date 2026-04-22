@@ -23,18 +23,23 @@ theorem.
 This module collects:
 - `marshallSignOf` (generic graph-centric form),
 - chain / 2D / 3D specialisations,
+- the `_eq_marshallSignOf` bridges (so generic lemmas apply via `rw`),
 - evaluation on Néel + on constant configurations,
 - behaviour under `flipConfig`,
 - Marshall-rotated state definitions,
 - Marshall × time-reversal bridge.
 
 (Refactor Phase 2 PR 8 — eighth step of the NeelState 7-file
-split, plan v4 §3.1.)
+split, plan v4 §3.1. Reordered in Phase 3 PR 2 so the bridges
+precede the `_const_zero`/`_const_one`/`_flipConfig` lemmas, per
+`docs/refactoring-conventions.md` §3.)
 -/
 
 namespace LatticeSystem.Quantum
 
 open Matrix
+
+/-! ## Generic Marshall sign and its all-up evaluation -/
 
 /-- Generic graph-centric Marshall sign. For a finite vertex type
 `V`, a sublattice-`A` indicator `A : V → Bool`, and a spin-1/2
@@ -68,6 +73,8 @@ theorem marshallSignOf_const_zero {V : Type*} [Fintype V]
   intro x _
   by_cases hA : A x = true <;> simp [hA]
 
+/-! ## Chain / 2D / 3D Marshall signs (definitions) -/
+
 /-- Marshall sign of a spin-1/2 configuration on the
 parity-coloured chain `Fin (2 * K)`: `(-1)^(N_A^↓)` with `A` =
 even indices. Encoded as the product `∏_{x even} (-1)^(σ x)`. -/
@@ -75,18 +82,6 @@ noncomputable def marshallSignChainConfig (K : ℕ)
     (σ : Fin (2 * K) → Fin 2) : ℂ :=
   ∏ x : Fin (2 * K),
     (if x.val % 2 = 0 then ((-1 : ℂ) ^ (σ x : ℕ)) else 1)
-
-/-- The Néel chain configuration has `Marshall sign = 1`: every
-even-indexed site carries `↑ : Fin 2 := 0`, so each factor
-`(-1)^(σ x) = 1` and the empty/down-count gives `(-1)^0 = 1`. -/
-theorem marshallSignChainConfig_neelChainConfig (K : ℕ) :
-    marshallSignChainConfig K (neelChainConfig K) = 1 := by
-  unfold marshallSignChainConfig neelChainConfig
-  apply Finset.prod_eq_one
-  intro x _
-  by_cases hp : x.val % 2 = 0
-  · simp [hp]
-  · simp [hp]
 
 /-- 2D Marshall sign of a spin-1/2 configuration on the
 checkerboard `Fin (2 * K) × Fin (2 * L)`: `(-1)^(N_A^↓)` with
@@ -98,18 +93,6 @@ noncomputable def marshallSignSquareConfig (K L : ℕ)
     (if (p.1.val + p.2.val) % 2 = 0
       then ((-1 : ℂ) ^ (σ p : ℕ)) else 1)
 
-/-- The 2D checkerboard Néel configuration has `Marshall sign = 1`:
-sublattice-A sites carry `↑`, so each contributing factor is
-`(-1)^0 = 1`. -/
-theorem marshallSignSquareConfig_neelSquareConfig (K L : ℕ) :
-    marshallSignSquareConfig K L (neelSquareConfig K L) = 1 := by
-  unfold marshallSignSquareConfig neelSquareConfig
-  apply Finset.prod_eq_one
-  intro p _
-  by_cases hp : (p.1.val + p.2.val) % 2 = 0
-  · simp [hp]
-  · simp [hp]
-
 /-- 3D Marshall sign of a spin-1/2 configuration on the cubic
 checkerboard `(Fin (2 * K) × Fin (2 * L)) × Fin (2 * M)`:
 `(-1)^(N_A^↓)` with `A` = sites with `(i + j + k)` even. -/
@@ -120,117 +103,7 @@ noncomputable def marshallSignCubicConfig (K L M : ℕ)
     (if (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
       then ((-1 : ℂ) ^ (σ p : ℕ)) else 1)
 
-/-- The 3D cubic checkerboard Néel configuration has
-`Marshall sign = 1`: sublattice-A sites carry `↑`, so each
-contributing factor is `(-1)^0 = 1`. -/
-theorem marshallSignCubicConfig_neelCubicConfig (K L M : ℕ) :
-    marshallSignCubicConfig K L M (neelCubicConfig K L M) = 1 := by
-  unfold marshallSignCubicConfig neelCubicConfig
-  apply Finset.prod_eq_one
-  intro p _
-  by_cases hp : (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
-  · simp [hp]
-  · simp [hp]
-
-/-- All-up Marshall sign: `marshallSignChainConfig K (fun _ => 0) = 1`.
-(Cf. generic `marshallSignOf_const_zero` — the bridge
-`marshallSignChainConfig_eq_marshallSignOf` would let this proof
-be a 1-liner, but the bridge is defined later in the file, so we
-keep the direct proof here for now.) -/
-theorem marshallSignChainConfig_const_zero (K : ℕ) :
-    marshallSignChainConfig K (fun _ : Fin (2 * K) => (0 : Fin 2)) = 1 := by
-  unfold marshallSignChainConfig
-  apply Finset.prod_eq_one
-  intro x _
-  by_cases hp : x.val % 2 = 0 <;> simp [hp]
-
-/-- All-down Marshall sign: `marshallSignChainConfig K (fun _ => 1) = (-1)^K`
-(every one of the `K` even-indexed sites carries `↓`). -/
-theorem marshallSignChainConfig_const_one (K : ℕ) :
-    marshallSignChainConfig K (fun _ : Fin (2 * K) => (1 : Fin 2)) =
-      ((-1 : ℂ) ^ K) := by
-  unfold marshallSignChainConfig
-  rw [show (∏ x : Fin (2 * K),
-        if x.val % 2 = 0 then ((-1 : ℂ) ^ ((1 : Fin 2) : ℕ)) else 1)
-      = (∏ x : Fin (2 * K),
-        if x.val % 2 = 0 then (-1 : ℂ) else 1) from
-      Finset.prod_congr rfl (fun x _ => by
-        by_cases hp : x.val % 2 = 0 <;> simp [hp])]
-  exact prod_alternating_neg_one K
-
-/-- 2D all-up Marshall sign: `+1`. -/
-theorem marshallSignSquareConfig_const_zero (K L : ℕ) :
-    marshallSignSquareConfig K L
-        (fun _ : Fin (2 * K) × Fin (2 * L) => (0 : Fin 2)) = 1 := by
-  unfold marshallSignSquareConfig
-  apply Finset.prod_eq_one
-  intro p _
-  by_cases hp : (p.1.val + p.2.val) % 2 = 0 <;> simp [hp]
-
-/-- 2D all-down Marshall sign: `+1` (since the even-A sublattice has
-`2K · L = 2KL` sites — see proof — making `(-1)^(2KL) = 1`). -/
-theorem marshallSignSquareConfig_const_one (K L : ℕ) :
-    marshallSignSquareConfig K L
-        (fun _ : Fin (2 * K) × Fin (2 * L) => (1 : Fin 2)) = 1 := by
-  unfold marshallSignSquareConfig
-  rw [show (∏ p : Fin (2 * K) × Fin (2 * L),
-        if (p.1.val + p.2.val) % 2 = 0
-          then ((-1 : ℂ) ^ ((1 : Fin 2) : ℕ)) else 1)
-      = (∏ p : Fin (2 * K) × Fin (2 * L),
-        if (p.1.val + p.2.val) % 2 = 0 then (-1 : ℂ) else 1) from
-      Finset.prod_congr rfl (fun p _ => by
-        by_cases hp : (p.1.val + p.2.val) % 2 = 0 <;> simp [hp])]
-  rw [Fintype.prod_prod_type]
-  have h_inner : ∀ i : Fin (2 * K),
-      (∏ j : Fin (2 * L),
-          if (i.val + j.val) % 2 = 0 then (-1 : ℂ) else 1) =
-        (-1 : ℂ) ^ L := fun i => prod_alternating_neg_one_offset i.val L
-  rw [Finset.prod_congr rfl (fun i _ => h_inner i)]
-  rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
-  rw [← pow_mul, show L * (2 * K) = 2 * (K * L) from by ring,
-    pow_mul, show ((-1 : ℂ)) ^ 2 = 1 from by norm_num, one_pow]
-
-/-- 3D all-up Marshall sign: `+1`. -/
-theorem marshallSignCubicConfig_const_zero (K L M : ℕ) :
-    marshallSignCubicConfig K L M
-        (fun _ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) =>
-          (0 : Fin 2)) = 1 := by
-  unfold marshallSignCubicConfig
-  apply Finset.prod_eq_one
-  intro p _
-  by_cases hp : (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
-  · simp [hp]
-  · simp [hp]
-
-/-- 3D all-down Marshall sign: `+1` (since the cubic A-sublattice has
-`4KLM` sites and `(-1)^(4KLM) = 1`). -/
-theorem marshallSignCubicConfig_const_one (K L M : ℕ) :
-    marshallSignCubicConfig K L M
-        (fun _ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) =>
-          (1 : Fin 2)) = 1 := by
-  unfold marshallSignCubicConfig
-  rw [show (∏ p : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M),
-        if (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
-          then ((-1 : ℂ) ^ ((1 : Fin 2) : ℕ)) else 1)
-      = (∏ p : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M),
-        if (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
-          then (-1 : ℂ) else 1) from
-      Finset.prod_congr rfl (fun p _ => by
-        by_cases hp : (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
-        · simp [hp]
-        · simp [hp])]
-  rw [Fintype.prod_prod_type]
-  have h_inner : ∀ p : Fin (2 * K) × Fin (2 * L),
-      (∏ k : Fin (2 * M),
-          if (p.1.val + p.2.val + k.val) % 2 = 0 then (-1 : ℂ) else 1) =
-        (-1 : ℂ) ^ M := fun p =>
-    prod_alternating_neg_one_offset (p.1.val + p.2.val) M
-  rw [Finset.prod_congr rfl (fun p _ => h_inner p)]
-  rw [Finset.prod_const, Finset.card_univ,
-    Fintype.card_prod, Fintype.card_fin, Fintype.card_fin]
-  rw [← pow_mul,
-    show M * (2 * K * (2 * L)) = 2 * (2 * K * L * M) from by ring,
-    pow_mul, show ((-1 : ℂ)) ^ 2 = 1 from by norm_num, one_pow]
+/-! ## Bridges to the generic `marshallSignOf` -/
 
 /-- The chain Marshall sign equals the generic `marshallSignOf`
 applied to the even-parity sublattice indicator. -/
@@ -266,6 +139,139 @@ theorem marshallSignCubicConfig_eq_marshallSignOf (K L M : ℕ)
   unfold marshallSignCubicConfig marshallSignOf
   refine Finset.prod_congr rfl (fun p _ => ?_)
   by_cases hp : (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0 <;> simp [hp]
+
+/-! ## Evaluation on the Néel configuration -/
+
+/-- The Néel chain configuration has `Marshall sign = 1`: every
+even-indexed site carries `↑ : Fin 2 := 0`, so each factor
+`(-1)^(σ x) = 1` and the empty/down-count gives `(-1)^0 = 1`. -/
+theorem marshallSignChainConfig_neelChainConfig (K : ℕ) :
+    marshallSignChainConfig K (neelChainConfig K) = 1 := by
+  unfold marshallSignChainConfig neelChainConfig
+  apply Finset.prod_eq_one
+  intro x _
+  by_cases hp : x.val % 2 = 0
+  · simp [hp]
+  · simp [hp]
+
+/-- The 2D checkerboard Néel configuration has `Marshall sign = 1`:
+sublattice-A sites carry `↑`, so each contributing factor is
+`(-1)^0 = 1`. -/
+theorem marshallSignSquareConfig_neelSquareConfig (K L : ℕ) :
+    marshallSignSquareConfig K L (neelSquareConfig K L) = 1 := by
+  unfold marshallSignSquareConfig neelSquareConfig
+  apply Finset.prod_eq_one
+  intro p _
+  by_cases hp : (p.1.val + p.2.val) % 2 = 0
+  · simp [hp]
+  · simp [hp]
+
+/-- The 3D cubic checkerboard Néel configuration has
+`Marshall sign = 1`: sublattice-A sites carry `↑`, so each
+contributing factor is `(-1)^0 = 1`. -/
+theorem marshallSignCubicConfig_neelCubicConfig (K L M : ℕ) :
+    marshallSignCubicConfig K L M (neelCubicConfig K L M) = 1 := by
+  unfold marshallSignCubicConfig neelCubicConfig
+  apply Finset.prod_eq_one
+  intro p _
+  by_cases hp : (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
+  · simp [hp]
+  · simp [hp]
+
+/-! ## Evaluation on constant configurations -/
+
+/-- All-up Marshall sign on the chain: `+1`. One-line corollary of
+the generic `marshallSignOf_const_zero` via the
+`_eq_marshallSignOf` bridge. (Refactor Phase 3 PR 2.) -/
+theorem marshallSignChainConfig_const_zero (K : ℕ) :
+    marshallSignChainConfig K (fun _ : Fin (2 * K) => (0 : Fin 2)) = 1 := by
+  rw [marshallSignChainConfig_eq_marshallSignOf, marshallSignOf_const_zero]
+
+/-- All-down Marshall sign: `marshallSignChainConfig K (fun _ => 1) = (-1)^K`
+(every one of the `K` even-indexed sites carries `↓`). -/
+theorem marshallSignChainConfig_const_one (K : ℕ) :
+    marshallSignChainConfig K (fun _ : Fin (2 * K) => (1 : Fin 2)) =
+      ((-1 : ℂ) ^ K) := by
+  unfold marshallSignChainConfig
+  rw [show (∏ x : Fin (2 * K),
+        if x.val % 2 = 0 then ((-1 : ℂ) ^ ((1 : Fin 2) : ℕ)) else 1)
+      = (∏ x : Fin (2 * K),
+        if x.val % 2 = 0 then (-1 : ℂ) else 1) from
+      Finset.prod_congr rfl (fun x _ => by
+        by_cases hp : x.val % 2 = 0 <;> simp [hp])]
+  exact prod_alternating_neg_one K
+
+/-- 2D all-up Marshall sign: `+1`. One-line corollary of the
+generic `marshallSignOf_const_zero` via the
+`_eq_marshallSignOf` bridge. (Refactor Phase 3 PR 2.) -/
+theorem marshallSignSquareConfig_const_zero (K L : ℕ) :
+    marshallSignSquareConfig K L
+        (fun _ : Fin (2 * K) × Fin (2 * L) => (0 : Fin 2)) = 1 := by
+  rw [marshallSignSquareConfig_eq_marshallSignOf, marshallSignOf_const_zero]
+
+/-- 2D all-down Marshall sign: `+1` (since the even-A sublattice has
+`2K · L = 2KL` sites — see proof — making `(-1)^(2KL) = 1`). -/
+theorem marshallSignSquareConfig_const_one (K L : ℕ) :
+    marshallSignSquareConfig K L
+        (fun _ : Fin (2 * K) × Fin (2 * L) => (1 : Fin 2)) = 1 := by
+  unfold marshallSignSquareConfig
+  rw [show (∏ p : Fin (2 * K) × Fin (2 * L),
+        if (p.1.val + p.2.val) % 2 = 0
+          then ((-1 : ℂ) ^ ((1 : Fin 2) : ℕ)) else 1)
+      = (∏ p : Fin (2 * K) × Fin (2 * L),
+        if (p.1.val + p.2.val) % 2 = 0 then (-1 : ℂ) else 1) from
+      Finset.prod_congr rfl (fun p _ => by
+        by_cases hp : (p.1.val + p.2.val) % 2 = 0 <;> simp [hp])]
+  rw [Fintype.prod_prod_type]
+  have h_inner : ∀ i : Fin (2 * K),
+      (∏ j : Fin (2 * L),
+          if (i.val + j.val) % 2 = 0 then (-1 : ℂ) else 1) =
+        (-1 : ℂ) ^ L := fun i => prod_alternating_neg_one_offset i.val L
+  rw [Finset.prod_congr rfl (fun i _ => h_inner i)]
+  rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+  rw [← pow_mul, show L * (2 * K) = 2 * (K * L) from by ring,
+    pow_mul, show ((-1 : ℂ)) ^ 2 = 1 from by norm_num, one_pow]
+
+/-- 3D all-up Marshall sign: `+1`. One-line corollary of the
+generic `marshallSignOf_const_zero` via the
+`_eq_marshallSignOf` bridge. (Refactor Phase 3 PR 2.) -/
+theorem marshallSignCubicConfig_const_zero (K L M : ℕ) :
+    marshallSignCubicConfig K L M
+        (fun _ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) =>
+          (0 : Fin 2)) = 1 := by
+  rw [marshallSignCubicConfig_eq_marshallSignOf, marshallSignOf_const_zero]
+
+/-- 3D all-down Marshall sign: `+1` (since the cubic A-sublattice has
+`4KLM` sites and `(-1)^(4KLM) = 1`). -/
+theorem marshallSignCubicConfig_const_one (K L M : ℕ) :
+    marshallSignCubicConfig K L M
+        (fun _ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) =>
+          (1 : Fin 2)) = 1 := by
+  unfold marshallSignCubicConfig
+  rw [show (∏ p : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M),
+        if (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
+          then ((-1 : ℂ) ^ ((1 : Fin 2) : ℕ)) else 1)
+      = (∏ p : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M),
+        if (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
+          then (-1 : ℂ) else 1) from
+      Finset.prod_congr rfl (fun p _ => by
+        by_cases hp : (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
+        · simp [hp]
+        · simp [hp])]
+  rw [Fintype.prod_prod_type]
+  have h_inner : ∀ p : Fin (2 * K) × Fin (2 * L),
+      (∏ k : Fin (2 * M),
+          if (p.1.val + p.2.val + k.val) % 2 = 0 then (-1 : ℂ) else 1) =
+        (-1 : ℂ) ^ M := fun p =>
+    prod_alternating_neg_one_offset (p.1.val + p.2.val) M
+  rw [Finset.prod_congr rfl (fun p _ => h_inner p)]
+  rw [Finset.prod_const, Finset.card_univ,
+    Fintype.card_prod, Fintype.card_fin, Fintype.card_fin]
+  rw [← pow_mul,
+    show M * (2 * K * (2 * L)) = 2 * (2 * K * L * M) from by ring,
+    pow_mul, show ((-1 : ℂ)) ^ 2 = 1 from by norm_num, one_pow]
+
+/-! ## Behaviour under the global spin-flip -/
 
 /-- Per-site Fin 2 identity used in the `flipConfig` Marshall sign
 proofs: `(-1)^((1 - s).val) = (-1) · (-1)^s.val` for `s : Fin 2`.
@@ -378,6 +384,8 @@ theorem marshallSignCubicConfig_flipConfig (K L M : ℕ)
     by_cases hp : (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
     · simp only [hp, if_true, neg_one_pow_one_sub_fin_two]
     · simp [hp]
+
+/-! ## Marshall-rotated states -/
 
 /-- The Marshall-rotated chain basis state at configuration `σ`:
 `|σ⟩_M := marshallSignChainConfig K σ · |σ⟩`. -/
