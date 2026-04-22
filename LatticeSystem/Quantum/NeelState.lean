@@ -2088,6 +2088,41 @@ theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_z_wrap_eq
   · have h1 : (i + j + (2 * M + 1)) % 2 = 0 := by omega
     simp [h1, hij1]; ring
 
+/-! ## Off-diagonal correlator (Ŝ^x · Ŝ^x + Ŝ^y · Ŝ^y) on Néel -/
+
+/-- 1D Néel chain: per-adjacent-bond off-diagonal correlator
+`(Ŝ_x · Ŝ_y - Ŝ^(3)_x · Ŝ^(3)_y)` vanishes:
+
+  `⟨Φ_Néel, (Ŝ_x · Ŝ_y - Ŝ^(3)_x · Ŝ^(3)_y) · Φ_Néel⟩ = 0`.
+
+Direct from the generic
+`inner_basisVec_spinHalfDot_sub_szsz_basisVec_antiparallel`. The
+off-diagonal part is entirely supported on swap states. -/
+theorem neelChainState_inner_off_diagonal_correlator_adjacent_eq_zero
+    (K : ℕ) {i : ℕ} (hi : i + 1 < 2 * K) :
+    ∑ τ : Fin (2 * K) → Fin 2,
+        neelChainState K τ *
+          ((spinHalfDot
+              (⟨i, by omega⟩ : Fin (2 * K))
+              (⟨i + 1, hi⟩ : Fin (2 * K)) -
+              (onSite (⟨i, by omega⟩ : Fin (2 * K))
+                  spinHalfOp3 *
+                onSite (⟨i + 1, hi⟩ : Fin (2 * K))
+                  spinHalfOp3) :
+              ManyBodyOp (Fin (2 * K))).mulVec
+            (neelChainState K)) τ = 0 := by
+  unfold neelChainState
+  apply inner_basisVec_spinHalfDot_sub_szsz_basisVec_antiparallel
+  · intro h
+    have := congrArg Fin.val h
+    simp at this
+  · unfold neelChainConfig
+    by_cases hp : i % 2 = 0
+    · have hp1 : (i + 1) % 2 ≠ 0 := by omega
+      simp [hp, hp1]
+    · have hp1 : (i + 1) % 2 = 0 := by omega
+      simp [hp, hp1]
+
 /-! ## Heisenberg energy expectation on the Néel state -/
 
 /-- 1D Néel chain at `K = 1` (2-site open chain): the Heisenberg

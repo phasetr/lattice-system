@@ -688,6 +688,47 @@ theorem inner_basisVec_spinHalfDot_basisVec_antiparallel
   rw [if_neg (basisSwap_ne_self hxy h), if_pos rfl]
   ring
 
+/-- Antiparallel spin-sign product: for `s ≠ t : Fin 2`,
+`spinHalfSign s · spinHalfSign t = -1/4`. One of the two values
+must be `+1/2` and the other `-1/2`. -/
+private lemma spinHalfSign_mul_antiparallel
+    {s t : Fin 2} (h : s ≠ t) :
+    (spinHalfSign s * spinHalfSign t : ℂ) = -(1 / 4 : ℂ) := by
+  unfold spinHalfSign
+  fin_cases s <;> fin_cases t
+  · exact absurd rfl h
+  · simp; ring
+  · simp; ring
+  · exact absurd rfl h
+
+/-- Generic off-diagonal correlator on a basis vector at an
+antiparallel bond:
+
+  `⟨basisVec σ, (Ŝ_x · Ŝ_y - Ŝ^(3)_x · Ŝ^(3)_y) · basisVec σ⟩ = 0`.
+
+The full `Ŝ_x · Ŝ_y` expectation is `-1/4` (#273) and the
+diagonal `Ŝ^(3)_x · Ŝ^(3)_y` part is also `-1/4`
+(`inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec`
+combined with `spinHalfSign_mul_antiparallel`), so the
+off-diagonal `Ŝ^x·Ŝ^x + Ŝ^y·Ŝ^y` part contributes `0` — it
+is entirely supported on swap states. -/
+theorem inner_basisVec_spinHalfDot_sub_szsz_basisVec_antiparallel
+    {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin 2) (h : σ x ≠ σ y) :
+    ∑ τ : Λ → Fin 2,
+        basisVec σ τ *
+          ((spinHalfDot x y -
+              (onSite x spinHalfOp3 *
+                onSite y spinHalfOp3) :
+              ManyBodyOp Λ).mulVec (basisVec σ)) τ = 0 := by
+  rw [Matrix.sub_mulVec]
+  simp_rw [Pi.sub_apply, mul_sub]
+  rw [Finset.sum_sub_distrib,
+    inner_basisVec_spinHalfDot_basisVec_antiparallel hxy σ h,
+    inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec
+      x y σ,
+    spinHalfSign_mul_antiparallel h]
+  ring
+
 /-- Singlet eigenvalue (Tasaki (2.2.19)): for `x ≠ y` and σ
 anti-parallel, the unsymmetric combination `|σ⟩ - |swap σ⟩` is an
 eigenvector of `Ŝ_x · Ŝ_y` with eigenvalue `-3/4`. -/

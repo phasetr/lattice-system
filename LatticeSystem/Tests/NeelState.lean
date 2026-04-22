@@ -644,6 +644,32 @@ example (K L M : ℕ) {i j k : ℕ}
             (neelCubicState K L M)) τ = -(1 / 4 : ℂ) :=
   neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_x_adjacent_eq_neg_one_quarter K L M hi hj hk
 
+/-! ## Off-diagonal correlator vanishes -/
+
+example {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin 2) (h : σ x ≠ σ y) :
+    ∑ τ : Λ → Fin 2,
+        basisVec σ τ *
+          ((spinHalfDot x y -
+              (onSite x spinHalfOp3 *
+                onSite y spinHalfOp3) :
+              ManyBodyOp Λ).mulVec (basisVec σ)) τ = 0 :=
+  inner_basisVec_spinHalfDot_sub_szsz_basisVec_antiparallel hxy σ h
+
+example (K : ℕ) {i : ℕ} (hi : i + 1 < 2 * K) :
+    ∑ τ : Fin (2 * K) → Fin 2,
+        neelChainState K τ *
+          ((spinHalfDot
+              (⟨i, by omega⟩ : Fin (2 * K))
+              (⟨i + 1, hi⟩ : Fin (2 * K)) -
+              (onSite (⟨i, by omega⟩ : Fin (2 * K))
+                  spinHalfOp3 *
+                onSite (⟨i + 1, hi⟩ : Fin (2 * K))
+                  spinHalfOp3) :
+              ManyBodyOp (Fin (2 * K))).mulVec
+            (neelChainState K)) τ = 0 :=
+  neelChainState_inner_off_diagonal_correlator_adjacent_eq_zero K hi
+
 /-! ## Néel chain energy expectation (K=1 open chain) -/
 
 example (J : ℝ) :
