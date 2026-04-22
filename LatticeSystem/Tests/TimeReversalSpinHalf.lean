@@ -60,4 +60,27 @@ example (v : Fin 2 → ℂ) :
       (-spinHalfOp3).mulVec (timeReversalSpinHalf v) :=
   timeReversalSpinHalf_spinHalfOp3_mulVec v
 
+/-! ## Complex conjugation `K̂` -/
+
+example (v : Fin 2 → ℂ) :
+    complexConjugationSpinHalf (complexConjugationSpinHalf v) = v :=
+  complexConjugationSpinHalf_sq v
+
+example (v w : Fin 2 → ℂ) :
+    complexConjugationSpinHalf (v + w) =
+      complexConjugationSpinHalf v + complexConjugationSpinHalf w :=
+  complexConjugationSpinHalf_add v w
+
+example (c : ℂ) (v : Fin 2 → ℂ) :
+    complexConjugationSpinHalf (c • v) =
+      (starRingEnd ℂ c) • complexConjugationSpinHalf v :=
+  complexConjugationSpinHalf_smul c v
+
+/-! ## Decomposition `Θ̂ = û_2 · K̂` -/
+
+example (v : Fin 2 → ℂ) :
+    timeReversalSpinHalf v =
+      (spinHalfRot2 Real.pi).mulVec (complexConjugationSpinHalf v) :=
+  timeReversalSpinHalf_eq_spinHalfRot2_pi_mulVec v
+
 end LatticeSystem.Tests.TimeReversalSpinHalf
