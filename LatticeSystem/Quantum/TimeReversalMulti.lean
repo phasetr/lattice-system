@@ -40,6 +40,25 @@ half-odd-integer-spin Kramers result `Θ̂² = (-1)^(2 S |Λ|)`.
 For finiteness reasons we work with `[Fintype Λ] [DecidableEq Λ]`.
 The map is implemented as a plain function on the many-body
 state vector (antilinearity prevents a `Matrix` representation).
+
+Sub-files extending this module (Phase 2 PR 24 split, plan v4
+§3.1):
+
+| sub-file | content |
+|---|---|
+| `TimeReversalMulti/SpinOpEquivariance.lean` | per-axis `Θ̂_tot Ŝ^(α)_x = |
+|                                             | -Ŝ^(α)_x Θ̂_tot` (Tasaki eq. |
+|                                             | (2.3.14) lattice extension), |
+|                                             | site-flip predicates |
+| `TimeReversalMulti/Heisenberg.lean` | `Θ̂_tot · H_Heisenberg = H · Θ̂_tot` |
+|                                     | for chain (open / periodic), |
+|                                     | 2D / 3D Heisenberg (concrete |
+|                                     | mulVec lemmas), and the two-site |
+|                                     | singlet / triplet `Θ̂_tot` action |
+
+Downstream code wanting the equivariance / Heisenberg-invariance
+companion family should import the sub-modules directly (this
+file is content + extensions, not a façade).
 -/
 
 namespace LatticeSystem.Quantum
