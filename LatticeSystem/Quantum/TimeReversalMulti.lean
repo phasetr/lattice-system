@@ -876,4 +876,71 @@ theorem timeReversalSpinHalfMulti_cubicLatticeHeisenberg_mulVec
   timeReversalSpinHalfMulti_heisenbergHamiltonian_mulVec
     (cubicLatticeCoupling N J) (cubicLatticeCoupling_conj N J) v
 
+/-! ## Time-reversal action on two-site Néel / singlet states
+
+The two-site basis state `|↑↓⟩` flips to `-|↓↑⟩` under `Θ̂_tot`
+(one of the two sites contributes a `-1` from `pauliY_sign`).
+The spin-singlet `|↑↓⟩ - |↓↑⟩`, being SU(2)-invariant in the
+`S = 0` representation, is **time-reversal invariant**. -/
+
+/-- `Θ̂_tot |↑↓⟩ = -|↓↑⟩` on `Fin 2`. -/
+theorem timeReversalSpinHalfMulti_basisVec_upDown :
+    timeReversalSpinHalfMulti (basisVec upDown : (Fin 2 → Fin 2) → ℂ) =
+      -basisVec (basisSwap upDown 0 1) := by
+  rw [timeReversalSpinHalfMulti_basisVec]
+  -- ∏_{x : Fin 2} ε(flip upDown x) = ε(1) * ε(0) = -1 * 1 = -1
+  -- flipConfig upDown = basisSwap upDown 0 1 (both swap the two sites)
+  have hprod : (∏ x : Fin 2, timeReversalSign (flipConfig upDown x))
+      = (-1 : ℂ) := by
+    rw [Fin.prod_univ_two]
+    simp [flipConfig, upDown]
+  have hflip : flipConfig (upDown : Fin 2 → Fin 2) = basisSwap upDown 0 1 := by
+    funext i
+    fin_cases i <;> simp [flipConfig, upDown, basisSwap]
+  rw [hprod, hflip]
+  simp [neg_one_smul]
+
+/-- `Θ̂_tot |↓↑⟩ = -|↑↓⟩` on `Fin 2`. -/
+theorem timeReversalSpinHalfMulti_basisVec_basisSwap_upDown :
+    timeReversalSpinHalfMulti
+        (basisVec (basisSwap upDown 0 1) : (Fin 2 → Fin 2) → ℂ) =
+      -basisVec upDown := by
+  rw [timeReversalSpinHalfMulti_basisVec]
+  have hprod : (∏ x : Fin 2,
+        timeReversalSign (flipConfig (basisSwap upDown 0 1) x))
+      = (-1 : ℂ) := by
+    rw [Fin.prod_univ_two]
+    simp [flipConfig, basisSwap_upDown]
+  have hflip : flipConfig (basisSwap upDown 0 1 : Fin 2 → Fin 2) = upDown := by
+    funext i
+    fin_cases i <;> simp [flipConfig, basisSwap_upDown, upDown]
+  rw [hprod, hflip]
+  simp [neg_one_smul]
+
+/-- **The two-site spin singlet `|↑↓⟩ - |↓↑⟩` is time-reversal
+invariant** (Tasaki §2.3 corollary): being the SU(2)-invariant
+`S = 0` representation, it survives `Θ̂_tot` unchanged.
+
+Proof: `Θ̂_tot` is antilinear, so for the difference of two
+basis vectors `Θ̂_tot(v - w) = conj(1) Θ̂_tot v - conj(1) Θ̂_tot w`.
+The previous two lemmas give `Θ̂_tot |↑↓⟩ = -|↓↑⟩` and
+`Θ̂_tot |↓↑⟩ = -|↑↓⟩`, so the difference becomes
+`-|↓↑⟩ - (-|↑↓⟩) = |↑↓⟩ - |↓↑⟩`. -/
+theorem timeReversalSpinHalfMulti_singlet :
+    timeReversalSpinHalfMulti
+        ((basisVec upDown - basisVec (basisSwap upDown 0 1)) :
+          (Fin 2 → Fin 2) → ℂ) =
+      basisVec upDown - basisVec (basisSwap upDown 0 1) := by
+  rw [show ((basisVec upDown - basisVec (basisSwap upDown 0 1)) :
+          (Fin 2 → Fin 2) → ℂ)
+        = basisVec upDown +
+          ((-1 : ℂ) • basisVec (basisSwap upDown 0 1)) from by
+      rw [neg_one_smul, sub_eq_add_neg]]
+  rw [timeReversalSpinHalfMulti_add,
+    timeReversalSpinHalfMulti_basisVec_upDown,
+    timeReversalSpinHalfMulti_smul,
+    timeReversalSpinHalfMulti_basisVec_basisSwap_upDown]
+  simp [neg_one_smul, sub_eq_add_neg]
+  ring_nf
+
 end LatticeSystem.Quantum
