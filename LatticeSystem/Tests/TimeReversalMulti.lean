@@ -109,4 +109,11 @@ example (x : Fin 3) (v : (Fin 3 → Fin 2) → ℂ) :
       (-(onSite x pauliX)).mulVec (timeReversalSpinHalfMulti v) :=
   timeReversalSpinHalfMulti_onSite_pauliX_mulVec x v
 
+/-! ## σ^y multi-site sign-flip equivariance -/
+
+example (x : Fin 3) (v : (Fin 3 → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti ((onSite x pauliY).mulVec v) =
+      (-(onSite x pauliY)).mulVec (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_onSite_pauliY_mulVec x v
+
 end LatticeSystem.Tests.TimeReversalMulti

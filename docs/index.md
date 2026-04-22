@@ -316,6 +316,7 @@ Systems*, §2.3 eqs. (2.3.4)–(2.3.8), pp. 26–27.
 | `pauliX_eq_indicator` / `onSite_pauliX_mulVec_apply` | closed-form `pauliX a b = if b = 1 - a then 1 else 0`, lifted to `((onSite x σ^x).mulVec v) τ = v (siteFlipAt τ x)` for any state `v` (general extension of the basis-state action) | `Quantum/TimeReversalMulti.lean` |
 | `timeReversalSign_prod_siteFlipAt` | `∏_y ε((siteFlipAt τ x) y) = -(∏_y ε(τ y))` — the per-site flip swaps `ε(τ x)` with `ε(1 - τ x) = -ε(τ x)`, flipping the total sign | `Quantum/TimeReversalMulti.lean` |
 | `timeReversalSpinHalfMulti_onSite_pauliX_mulVec` | multi-site sign-flip equivariance for `σ^x` (Tasaki §2.3 (2.3.14) at α = 1): `Θ̂_tot ((onSite x σ^x) v) = (-(onSite x σ^x))(Θ̂_tot v)` | `Quantum/TimeReversalMulti.lean` |
+| `timeReversalSpinHalfMulti_onSite_pauliY_mulVec` | multi-site sign-flip equivariance for `σ^y` (Tasaki §2.3 (2.3.14) at α = 2): `Θ̂_tot ((onSite x σ^y) v) = (-(onSite x σ^y))(Θ̂_tot v)`. The proof handles the per-site `±i` factor via `conj(pauliY_sign(1 - s)) = pauliY_sign(s)` | `Quantum/TimeReversalMulti.lean` |
 
 ### Multi-body operator space (abstract lattice)
 
