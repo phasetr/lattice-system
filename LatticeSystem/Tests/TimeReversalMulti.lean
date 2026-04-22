@@ -97,4 +97,16 @@ example (x : Fin 3) (v : (Fin 3 → Fin 2) → ℂ) (τ : Fin 3 → Fin 2) :
     ((onSite x pauliX).mulVec v) τ = v (siteFlipAt τ x) :=
   onSite_pauliX_mulVec_apply x v τ
 
+/-! ## σ^x sign-product flip and equivariance -/
+
+example (τ : Fin 3 → Fin 2) (x : Fin 3) :
+    (∏ y : Fin 3, timeReversalSign ((siteFlipAt τ x) y)) =
+      -(∏ y : Fin 3, timeReversalSign (τ y)) :=
+  timeReversalSign_prod_siteFlipAt τ x
+
+example (x : Fin 3) (v : (Fin 3 → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti ((onSite x pauliX).mulVec v) =
+      (-(onSite x pauliX)).mulVec (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_onSite_pauliX_mulVec x v
+
 end LatticeSystem.Tests.TimeReversalMulti

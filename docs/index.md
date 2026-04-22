@@ -314,6 +314,8 @@ Systems*, §2.3 eqs. (2.3.4)–(2.3.8), pp. 26–27.
 | `siteFlipAt` / `siteFlipAt_self` / `siteFlipAt_of_ne` / `flipConfig_siteFlipAt_comm` / `siteFlipAt_involutive` | per-site flip helpers: `siteFlipAt τ x` flips slot `x` only; commutes with `flipConfig`; involutive. The combinatorial primitive underlying off-diagonal `σ^x_x` / `σ^y_x` action (deferred) | `Quantum/TimeReversalMulti.lean` |
 | `onSite_pauliX_mulVec_basisVec` | basis-state action of the off-diagonal site Pauli: `(onSite x σ^x).mulVec |Ψ_σ⟩ = |Ψ_{siteFlipAt σ x}⟩` (the spin at site `x` is swapped) | `Quantum/TimeReversalMulti.lean` |
 | `pauliX_eq_indicator` / `onSite_pauliX_mulVec_apply` | closed-form `pauliX a b = if b = 1 - a then 1 else 0`, lifted to `((onSite x σ^x).mulVec v) τ = v (siteFlipAt τ x)` for any state `v` (general extension of the basis-state action) | `Quantum/TimeReversalMulti.lean` |
+| `timeReversalSign_prod_siteFlipAt` | `∏_y ε((siteFlipAt τ x) y) = -(∏_y ε(τ y))` — the per-site flip swaps `ε(τ x)` with `ε(1 - τ x) = -ε(τ x)`, flipping the total sign | `Quantum/TimeReversalMulti.lean` |
+| `timeReversalSpinHalfMulti_onSite_pauliX_mulVec` | multi-site sign-flip equivariance for `σ^x` (Tasaki §2.3 (2.3.14) at α = 1): `Θ̂_tot ((onSite x σ^x) v) = (-(onSite x σ^x))(Θ̂_tot v)` | `Quantum/TimeReversalMulti.lean` |
 
 ### Multi-body operator space (abstract lattice)
 
