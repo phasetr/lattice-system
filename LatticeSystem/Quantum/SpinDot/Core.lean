@@ -639,7 +639,7 @@ gives `(1/2)(-1/2) = -1/4` (matching the full
 `Ŝ_x · Ŝ_y` expectation, since the off-diagonal `Ŝ^x·Ŝ^x +
 Ŝ^y·Ŝ^y` parts map `|σ⟩` to `|swap σ⟩ ⊥ |σ⟩` and vanish on the
 diagonal). -/
-theorem inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec
+theorem inner_basisVec_szsz_basisVec
     (x y : Λ) (σ : Λ → Fin 2) :
     ∑ τ : Λ → Fin 2,
         basisVec σ τ *
@@ -709,7 +709,7 @@ antiparallel bond:
 
 The full `Ŝ_x · Ŝ_y` expectation is `-1/4` (#273) and the
 diagonal `Ŝ^(3)_x · Ŝ^(3)_y` part is also `-1/4`
-(`inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec`
+(`inner_basisVec_szsz_basisVec`
 combined with `spinHalfSign_mul_antiparallel`), so the
 off-diagonal `Ŝ^x·Ŝ^x + Ŝ^y·Ŝ^y` part contributes `0` — it
 is entirely supported on swap states. -/
@@ -725,7 +725,7 @@ theorem inner_basisVec_spinHalfDot_sub_szsz_basisVec_antiparallel
   simp_rw [Pi.sub_apply, mul_sub]
   rw [Finset.sum_sub_distrib,
     inner_basisVec_spinHalfDot_basisVec_antiparallel hxy σ h,
-    inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec
+    inner_basisVec_szsz_basisVec
       x y σ,
     spinHalfSign_mul_antiparallel h]
   ring
