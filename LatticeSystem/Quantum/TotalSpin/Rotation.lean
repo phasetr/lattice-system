@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.TotalSpin
 import LatticeSystem.Quantum.SpinHalfRotation
+import LatticeSystem.Quantum.SpinHalfRotation.Conjugation
 
 /-!
 # Total spin rotation operators (Tasaki §2.2 (2.2.11))
