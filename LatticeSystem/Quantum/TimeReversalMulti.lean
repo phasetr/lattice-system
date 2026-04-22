@@ -456,6 +456,95 @@ theorem timeReversalSign_prod_siteFlipAt (τ : Λ → Fin 2) (x : Λ) :
         exact Finset.mul_prod_erase Finset.univ
           (fun y => timeReversalSign (τ y)) (Finset.mem_univ x)
 
+/-! ### `σ^y` analogue (`α = 2`) -/
+
+/-- Per-site sign factor for the `σ^y` action: `s ↦ -i` if
+`s = 0` (down ← up), `s ↦ +i` if `s = 1` (up ← down). -/
+private def pauliY_sign (s : Fin 2) : ℂ :=
+  if s = 0 then -Complex.I else Complex.I
+
+/-- Closed-form indicator for `pauliY`:
+`pauliY a b = if b = 1 - a then pauliY_sign(a) else 0`. -/
+private theorem pauliY_eq_indicator (a b : Fin 2) :
+    pauliY a b =
+      (if b = 1 - a then pauliY_sign a else 0) := by
+  fin_cases a <;> fin_cases b <;> rfl
+
+/-- Pointwise unfolding of `(onSite x pauliY).mulVec v`:
+
+  `((onSite x σ^y).mulVec v) τ = pauliY_sign(τ x) · v (siteFlipAt τ x)`. -/
+private theorem onSite_pauliY_mulVec_apply
+    (x : Λ) (v : (Λ → Fin 2) → ℂ) (τ : Λ → Fin 2) :
+    ((onSite x pauliY).mulVec v) τ =
+      pauliY_sign (τ x) * v (siteFlipAt τ x) := by
+  unfold Matrix.mulVec dotProduct
+  rw [show (∑ σ : Λ → Fin 2, (onSite x pauliY) τ σ * v σ)
+        = ∑ σ : Λ → Fin 2,
+            (if σ = siteFlipAt τ x then pauliY_sign (τ x) * v σ
+              else 0) from ?_]
+  · rw [Finset.sum_ite_eq']
+    simp
+  · apply Finset.sum_congr rfl
+    intro σ _
+    simp only [onSite_apply]
+    by_cases hagree : ∀ k, k ≠ x → τ k = σ k
+    · rw [if_pos hagree, pauliY_eq_indicator]
+      by_cases hsx : σ x = 1 - τ x
+      · have hσ : σ = siteFlipAt τ x := by
+          funext k
+          by_cases hk : k = x
+          · rw [hk, siteFlipAt_self]; exact hsx
+          · rw [siteFlipAt_of_ne _ hk]; exact (hagree k hk).symm
+        rw [if_pos hsx, if_pos hσ]
+      · have hσ : σ ≠ siteFlipAt τ x := by
+          intro h
+          apply hsx
+          rw [h, siteFlipAt_self]
+        rw [if_neg hsx, if_neg hσ, zero_mul]
+    · have hσ : σ ≠ siteFlipAt τ x := by
+        intro h
+        apply hagree
+        intro k hk
+        rw [h, siteFlipAt_of_ne _ hk]
+      rw [if_neg hagree, if_neg hσ, zero_mul]
+
+/-- Conjugation flips `pauliY_sign`: `conj(pauliY_sign(1 - s)) = pauliY_sign(s)`. -/
+private theorem conj_pauliY_sign_flip (s : Fin 2) :
+    starRingEnd ℂ (pauliY_sign (1 - s)) = pauliY_sign s := by
+  match s with
+  | 0 => simp [pauliY_sign]
+  | 1 => simp [pauliY_sign]
+
+/-- Multi-site sign-flip equivariance for `σ^y` (Tasaki §2.3
+(2.3.14) at `α = 2`):
+
+  `Θ̂_tot ((onSite x σ^y) v) = (-(onSite x σ^y))(Θ̂_tot v)`.
+
+The proof structure mirrors the `σ^x` case but uses
+`pauliY_sign` (the per-site `±i` factor) instead of `1`. The
+extra `conj` cancellation `conj(pauliY_sign(1 - s)) = pauliY_sign(s)`
+ensures the two factors-of-`i` line up. -/
+theorem timeReversalSpinHalfMulti_onSite_pauliY_mulVec
+    (x : Λ) (v : (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti ((onSite x pauliY).mulVec v) =
+      (-(onSite x pauliY)).mulVec
+        (timeReversalSpinHalfMulti v) := by
+  funext τ
+  rw [Matrix.neg_mulVec, Pi.neg_apply,
+    onSite_pauliY_mulVec_apply,
+    timeReversalSpinHalfMulti_apply,
+    timeReversalSpinHalfMulti_apply,
+    onSite_pauliY_mulVec_apply,
+    ← flipConfig_siteFlipAt_comm,
+    timeReversalSign_prod_siteFlipAt]
+  -- LHS: (∏ ε(τ y)) · conj(pauliY_sign((flip τ) x) · v(siteFlipAt(flip τ) x))
+  -- RHS: -(pauliY_sign(τ x) · (-(∏ ε(τ y))) · conj(v(flip(siteFlipAt τ x))))
+  --    = pauliY_sign(τ x) · (∏ ε(τ y)) · conj(v(siteFlipAt(flip τ) x))
+  -- Need: conj(pauliY_sign((flip τ) x)) = pauliY_sign(τ x).
+  rw [show ((flipConfig τ) x) = 1 - τ x from rfl,
+      map_mul, conj_pauliY_sign_flip]
+  ring
+
 /-- Multi-site sign-flip equivariance for `σ^x` (Tasaki §2.3
 (2.3.14) at `α = 1`):
 
