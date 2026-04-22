@@ -94,6 +94,44 @@ façade).
 Origin: PR #317 (SpinDot/Hamiltonian extraction). See
 `docs/index.md` Phase 2 entries for cumulative usage.
 
+### Façade variant: content + extensions (no façade)
+
+When the parent file already contains the *core* concept and the
+sub-file extends it with derived material (eigenvalue calculations,
+companion-theorem families, additional algebraic structure that
+doesn't fit the parent's responsibility), the parent stays as
+content (not turned into a façade) and the sub-file imports the
+parent. Downstream code that wants the extension content imports
+the sub-file directly. The parent's module-header docstring **must**
+list the extension sub-files in a table.
+
+```
+LatticeSystem/Quantum/HeisenbergChain.lean             -- content
+LatticeSystem/Quantum/HeisenbergChain/Eigenvalues.lean -- extension
+LatticeSystem/Quantum/HeisenbergChain/Gibbs.lean       -- extension
+```
+
+Now `Eigenvalues.lean` and `Gibbs.lean` import `HeisenbergChain`,
+and `HeisenbergChain.lean` does **not** import them. Users who
+just need the basic chain Hamiltonian + Hermiticity import
+`Quantum.HeisenbergChain`; users who want the eigenvalue or Gibbs
+companion family import the specific sub-file. This keeps the
+parent file's import surface small.
+
+When to use vs Core.lean sub-pattern: use *content + extensions*
+when the parent's identity as a content-bearing module is more
+important than convenience for downstream; use *Core.lean* when
+you want a single import to give the full module surface.
+
+Examples in this codebase:
+- `TotalSpin.lean` + `TotalSpin/Casimir.lean` + `TotalSpin/Rotation.lean`
+- `HeisenbergChain.lean` + `HeisenbergChain/Eigenvalues.lean`
+  + `HeisenbergChain/Gibbs.lean`
+- `SpinHalfRotation.lean` + `SpinHalfRotation/Conjugation.lean`
+- `GibbsState.lean` + `GibbsState/Covariance.lean`
+- `TimeReversalMulti.lean` + `TimeReversalMulti/SpinOpEquivariance.lean`
+  + `TimeReversalMulti/Heisenberg.lean`
+
 ### Helper visibility
 
 When extracting a helper lemma from one file to another, if the
