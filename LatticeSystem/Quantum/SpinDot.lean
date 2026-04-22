@@ -729,6 +729,31 @@ theorem inner_basisVec_spinHalfDot_sub_szsz_basisVec_antiparallel
     spinHalfSign_mul_antiparallel h]
   ring
 
+/-- Generic per-bond expectation of `Ŝ_x · Ŝ_y` on a parallel
+basis vector:
+
+  `⟨basisVec σ, Ŝ_x · Ŝ_y · basisVec σ⟩ = +1/4`.
+
+For parallel `σ x = σ y` (and `x ≠ y`), the basis vector is an
+eigenvector of `Ŝ_x · Ŝ_y` with eigenvalue `+1/4`
+(`spinHalfDot_mulVec_basisVec_parallel`); combined with the
+norm² = 1 (`basisVec_inner`) this gives the diagonal expectation
+directly. -/
+theorem inner_basisVec_spinHalfDot_basisVec_parallel
+    {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin 2) (h : σ x = σ y) :
+    ∑ τ : Λ → Fin 2,
+        basisVec σ τ *
+          ((spinHalfDot x y).mulVec (basisVec σ)) τ =
+      (1 / 4 : ℂ) := by
+  rw [spinHalfDot_mulVec_basisVec_parallel hxy σ h]
+  simp_rw [Pi.smul_apply, smul_eq_mul]
+  simp_rw [show ∀ τ : Λ → Fin 2,
+      basisVec σ τ * ((1 / 4 : ℂ) * basisVec σ τ) =
+        (1 / 4 : ℂ) * (basisVec σ τ * basisVec σ τ) from
+      fun τ => by ring]
+  rw [← Finset.mul_sum, basisVec_inner, if_pos rfl]
+  ring
+
 /-- Singlet eigenvalue (Tasaki (2.2.19)): for `x ≠ y` and σ
 anti-parallel, the unsymmetric combination `|σ⟩ - |swap σ⟩` is an
 eigenvector of `Ŝ_x · Ŝ_y` with eigenvalue `-3/4`. -/

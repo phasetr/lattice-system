@@ -670,6 +670,36 @@ example (K : ℕ) {i : ℕ} (hi : i + 1 < 2 * K) :
             (neelChainState K)) τ = 0 :=
   neelChainState_inner_off_diagonal_correlator_adjacent_eq_zero K hi
 
+/-! ## Parallel-bond expectation +1/4 -/
+
+example {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin 2) (h : σ x = σ y) :
+    ∑ τ : Λ → Fin 2,
+        basisVec σ τ *
+          ((spinHalfDot x y).mulVec (basisVec σ)) τ =
+      (1 / 4 : ℂ) :=
+  inner_basisVec_spinHalfDot_basisVec_parallel hxy σ h
+
+example (K : ℕ) {x y : Fin (2 * K)} (hxy : x ≠ y)
+    (h_par : x.val % 2 = y.val % 2) :
+    ∑ τ : Fin (2 * K) → Fin 2,
+        neelChainState K τ *
+          ((spinHalfDot x y).mulVec (neelChainState K)) τ =
+      (1 / 4 : ℂ) :=
+  neelChainState_inner_spinHalfDot_parallel_eq_one_quarter K hxy h_par
+
+/-- Concrete K = 2 instance: sites `(0, 2)` (both even, both `↑`)
+have parallel-bond expectation `+1/4`. -/
+example :
+    ∑ τ : Fin (2 * 2) → Fin 2,
+        neelChainState 2 τ *
+          ((spinHalfDot
+              (⟨0, by decide⟩ : Fin (2 * 2))
+              (⟨2, by decide⟩ : Fin (2 * 2))).mulVec
+            (neelChainState 2)) τ = (1 / 4 : ℂ) :=
+  neelChainState_inner_spinHalfDot_parallel_eq_one_quarter 2
+    (by decide) (by decide)
+
 /-! ## Néel chain energy expectation (K=1 open chain) -/
 
 example (J : ℝ) :

@@ -2123,6 +2123,33 @@ theorem neelChainState_inner_off_diagonal_correlator_adjacent_eq_zero
     · have hp1 : (i + 1) % 2 = 0 := by omega
       simp [hp, hp1]
 
+/-! ## Parallel-bond expectation `+1/4` on the Néel chain -/
+
+/-- 1D Néel chain: same-sublattice (parallel) `Ŝ_x · Ŝ_y`
+expectation:
+
+  `⟨Φ_Néel, Ŝ_x · Ŝ_y · Φ_Néel⟩ = +1/4`
+
+for any pair `x ≠ y` with the same parity (`x.val % 2 = y.val % 2`).
+For example, `(0, 2)` (both even, both `↑`) or `(1, 3)` (both
+odd, both `↓`). Direct from the generic
+`inner_basisVec_spinHalfDot_basisVec_parallel`. -/
+theorem neelChainState_inner_spinHalfDot_parallel_eq_one_quarter
+    (K : ℕ) {x y : Fin (2 * K)} (hxy : x ≠ y)
+    (h_par : x.val % 2 = y.val % 2) :
+    ∑ τ : Fin (2 * K) → Fin 2,
+        neelChainState K τ *
+          ((spinHalfDot x y).mulVec (neelChainState K)) τ =
+      (1 / 4 : ℂ) := by
+  unfold neelChainState
+  apply inner_basisVec_spinHalfDot_basisVec_parallel hxy
+  unfold neelChainConfig
+  by_cases hp : x.val % 2 = 0
+  · have hp1 : y.val % 2 = 0 := h_par ▸ hp
+    simp [hp, hp1]
+  · have hp1 : y.val % 2 ≠ 0 := h_par ▸ hp
+    simp [hp, hp1]
+
 /-! ## Heisenberg energy expectation on the Néel state -/
 
 /-- 1D Néel chain at `K = 1` (2-site open chain): the Heisenberg
