@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import LatticeSystem.Quantum.MagnetizationSubspace
 import LatticeSystem.Quantum.SpinDot
 import LatticeSystem.Quantum.HeisenbergChain
+import LatticeSystem.Quantum.TimeReversalMulti
 
 /-!
 # Néel state on a bipartite even chain (Tasaki §2.5)
@@ -242,5 +243,29 @@ theorem spinHalfDot_mulVec_neelChainState_wrap (K : ℕ) :
     simp only
     have h1 : (2 * K + 1) % 2 = 1 := by omega
     simp [h1]
+
+/-! ## `K = 1` Néel = `upDown` and time-reversal action -/
+
+/-- The `K = 1` Néel chain configuration on `Fin 2` agrees with
+the existing `upDown` configuration (both send `0 ↦ ↑` and
+`1 ↦ ↓`). -/
+theorem neelChainConfig_one_eq_upDown :
+    neelChainConfig 1 = upDown := by
+  funext i
+  fin_cases i <;> rfl
+
+/-- Time-reversal acts on the `K = 1` Néel state by sending it to
+the negative of the swapped configuration:
+
+  `Θ̂_tot (neelChainState 1) = -basisVec (basisSwap upDown 0 1)`,
+
+i.e. `Θ̂_tot |↑↓⟩ = -|↓↑⟩` (the antiparallel pair flips, with
+the per-down sign convention of `Θ̂`). -/
+theorem timeReversalSpinHalfMulti_neelChainState_one :
+    timeReversalSpinHalfMulti (neelChainState 1) =
+      -basisVec (basisSwap upDown 0 1) := by
+  unfold neelChainState
+  rw [neelChainConfig_one_eq_upDown,
+    timeReversalSpinHalfMulti_basisVec_upDown]
 
 end LatticeSystem.Quantum
