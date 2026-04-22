@@ -208,6 +208,40 @@ example (K L : ℕ) {i j : ℕ}
         (1 / 4 : ℂ) • neelSquareState K L :=
   spinHalfDot_mulVec_neelSquareState_vertical_adjacent K L hi hj
 
+/-! ## 2D Néel wrap-around bond actions -/
+
+example (K L : ℕ) {j : ℕ} (hj : j < 2 * L) :
+    (spinHalfDot
+        ((⟨2 * K + 1, by omega⟩, ⟨j, hj⟩) :
+          Fin (2 * (K + 1)) × Fin (2 * L))
+        ((⟨0, by omega⟩, ⟨j, hj⟩) :
+          Fin (2 * (K + 1)) × Fin (2 * L))).mulVec
+        (neelSquareState (K + 1) L) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelSquareConfig (K + 1) L)
+            ((⟨2 * K + 1, by omega⟩, ⟨j, hj⟩) :
+              Fin (2 * (K + 1)) × Fin (2 * L))
+            ((⟨0, by omega⟩, ⟨j, hj⟩) :
+              Fin (2 * (K + 1)) × Fin (2 * L)))
+        - (1 / 4 : ℂ) • neelSquareState (K + 1) L :=
+  spinHalfDot_mulVec_neelSquareState_horizontal_wrap K L hj
+
+example (K L : ℕ) {i : ℕ} (hi : i < 2 * K) :
+    (spinHalfDot
+        ((⟨i, hi⟩, ⟨2 * L + 1, by omega⟩) :
+          Fin (2 * K) × Fin (2 * (L + 1)))
+        ((⟨i, hi⟩, ⟨0, by omega⟩) :
+          Fin (2 * K) × Fin (2 * (L + 1)))).mulVec
+        (neelSquareState K (L + 1)) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelSquareConfig K (L + 1))
+            ((⟨i, hi⟩, ⟨2 * L + 1, by omega⟩) :
+              Fin (2 * K) × Fin (2 * (L + 1)))
+            ((⟨i, hi⟩, ⟨0, by omega⟩) :
+              Fin (2 * K) × Fin (2 * (L + 1))))
+        - (1 / 4 : ℂ) • neelSquareState K (L + 1) :=
+  spinHalfDot_mulVec_neelSquareState_vertical_wrap K L hi
+
 /-! ## 2D Néel state K = L = 1 time-reversal -/
 
 example :

@@ -568,6 +568,78 @@ theorem spinHalfDot_mulVec_neelSquareState_vertical_adjacent
     · have hp1 : (i + (j + 1)) % 2 = 0 := by omega
       simp [hp, hp1]
 
+/-! ## 2D Néel wrap-around bond actions (periodic BC) -/
+
+/-- 2D horizontal wrap-around bond `((2K + 1, j), (0, j))` on the
+2D Néel state over `Fin (2 * (K + 1)) × Fin (2 * L)`. Parities of
+`2K + 1` and `0` differ (odd vs even), so the bond is antiparallel:
+
+  `Ŝ_(2K+1, j) · Ŝ_(0, j) · |Φ_Néel⟩
+    = (1/2) · |swap_{(2K+1,j),(0,j)} Φ_Néel⟩ - (1/4) · |Φ_Néel⟩`.
+
+Together with `_horizontal_adjacent` / `_vertical_adjacent` and
+`_vertical_wrap`, covers every bond of the 2D torus Néel state. -/
+theorem spinHalfDot_mulVec_neelSquareState_horizontal_wrap
+    (K L : ℕ) {j : ℕ} (hj : j < 2 * L) :
+    (spinHalfDot
+        ((⟨2 * K + 1, by omega⟩, ⟨j, hj⟩) :
+          Fin (2 * (K + 1)) × Fin (2 * L))
+        ((⟨0, by omega⟩, ⟨j, hj⟩) :
+          Fin (2 * (K + 1)) × Fin (2 * L))).mulVec
+        (neelSquareState (K + 1) L) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelSquareConfig (K + 1) L)
+            ((⟨2 * K + 1, by omega⟩, ⟨j, hj⟩) :
+              Fin (2 * (K + 1)) × Fin (2 * L))
+            ((⟨0, by omega⟩, ⟨j, hj⟩) :
+              Fin (2 * (K + 1)) × Fin (2 * L)))
+        - (1 / 4 : ℂ) • neelSquareState (K + 1) L := by
+  unfold neelSquareState
+  apply spinHalfDot_mulVec_basisVec_antiparallel
+  · intro h
+    have := congrArg Prod.fst h
+    have hval := congrArg Fin.val this
+    simp at hval
+  · unfold neelSquareConfig
+    simp only
+    rcases Nat.mod_two_eq_zero_or_one j with hj0 | hj1
+    · have h1 : (2 * K + 1 + j) % 2 ≠ 0 := by omega
+      simp [h1, hj0]
+    · have h4 : (2 * K + 1 + j) % 2 = 0 := by omega
+      simp [h4, hj1]
+
+/-- 2D vertical wrap-around bond `((i, 2L + 1), (i, 0))` on the
+2D Néel state over `Fin (2 * K) × Fin (2 * (L + 1))`. Same
+antiparallel decomposition as the horizontal wrap. -/
+theorem spinHalfDot_mulVec_neelSquareState_vertical_wrap
+    (K L : ℕ) {i : ℕ} (hi : i < 2 * K) :
+    (spinHalfDot
+        ((⟨i, hi⟩, ⟨2 * L + 1, by omega⟩) :
+          Fin (2 * K) × Fin (2 * (L + 1)))
+        ((⟨i, hi⟩, ⟨0, by omega⟩) :
+          Fin (2 * K) × Fin (2 * (L + 1)))).mulVec
+        (neelSquareState K (L + 1)) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelSquareConfig K (L + 1))
+            ((⟨i, hi⟩, ⟨2 * L + 1, by omega⟩) :
+              Fin (2 * K) × Fin (2 * (L + 1)))
+            ((⟨i, hi⟩, ⟨0, by omega⟩) :
+              Fin (2 * K) × Fin (2 * (L + 1))))
+        - (1 / 4 : ℂ) • neelSquareState K (L + 1) := by
+  unfold neelSquareState
+  apply spinHalfDot_mulVec_basisVec_antiparallel
+  · intro h
+    have := congrArg Prod.snd h
+    have hval := congrArg Fin.val this
+    simp at hval
+  · unfold neelSquareConfig
+    simp only
+    rcases Nat.mod_two_eq_zero_or_one i with hi0 | hi1
+    · have h1 : (i + (2 * L + 1)) % 2 ≠ 0 := by omega
+      simp [h1, hi0]
+    · have h1 : (i + (2 * L + 1)) % 2 = 0 := by omega
+      simp [h1, hi1]
+
 /-! ## 2D Néel time-reversal action (general K, L) -/
 
 /-- Auxiliary alternating-product lemma with parity offset (the
