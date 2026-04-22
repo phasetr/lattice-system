@@ -176,4 +176,27 @@ example : ¬ integerSquareLatticeGraph.Adj (0, 0) (1, 1) := by
 example (p : ℤ × ℤ) : ¬ integerSquareLatticeGraph.Adj p p :=
   integerSquareLatticeGraph.irrefl
 
+/-! ## A. decide-based universal: small `Fin n` graph properties
+(Phase 1 PR 9 strengthening, refactor plan v4 §2.1 method A) -/
+
+/-- `pathGraph 5` adjacency symmetry universal on `Fin 5`. -/
+example :
+    ∀ x y : Fin 5,
+        (SimpleGraph.pathGraph 5).Adj x y =
+          (SimpleGraph.pathGraph 5).Adj y x := by decide
+
+/-- `cycleGraph 5` has 10 ordered edges (5 undirected). -/
+example :
+    (Finset.univ.filter
+        (fun p : Fin 5 × Fin 5 =>
+          (SimpleGraph.cycleGraph 5).Adj p.1 p.2)).card = 10 := by
+  decide
+
+/-! ## C. bridge identity: `couplingOf` value pattern -/
+
+/-- `couplingOf G J x y = if G.Adj x y then J else 0` (rfl). -/
+example {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V)
+    [DecidableRel G.Adj] (J : ℂ) (x y : V) :
+    couplingOf G J x y = (if G.Adj x y then J else 0) := rfl
+
 end LatticeSystem.Tests.Graph
