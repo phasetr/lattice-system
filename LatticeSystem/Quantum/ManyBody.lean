@@ -387,15 +387,18 @@ function that is `1` at `σ` and `0` elsewhere. -/
 def basisVec (σ : Λ → Fin 2) : (Λ → Fin 2) → ℂ :=
   fun τ => if τ = σ then 1 else 0
 
+omit [DecidableEq Λ] in
 /-- Explicit `if`-form of `basisVec σ τ` (definitional). -/
 theorem basisVec_apply (σ τ : Λ → Fin 2) :
     basisVec σ τ = if τ = σ then 1 else 0 := rfl
 
+omit [DecidableEq Λ] in
 /-- Diagonal value: `basisVec σ σ = 1`. -/
 @[simp]
 theorem basisVec_self (σ : Λ → Fin 2) : basisVec σ σ = 1 := by
   unfold basisVec; rw [if_pos rfl]
 
+omit [DecidableEq Λ] in
 /-- Off-diagonal value: `basisVec σ τ = 0` when `τ ≠ σ`. -/
 theorem basisVec_of_ne {σ τ : Λ → Fin 2} (h : τ ≠ σ) :
     basisVec σ τ = 0 := by
