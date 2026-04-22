@@ -127,4 +127,26 @@ example :
       -basisVec (basisSwap upDown 0 1) :=
   timeReversalSpinHalfMulti_neelChainState_one
 
+/-! ## 2D checkerboard Néel state -/
+
+example (K L : ℕ) :
+    magnetization (Fin (2 * K) × Fin (2 * L))
+        (neelSquareConfig K L) = 0 :=
+  neelSquareConfig_magnetization_zero K L
+
+example (K L : ℕ) :
+    neelSquareState K L ∈
+      magnetizationSubspace (Fin (2 * K) × Fin (2 * L)) (0 : ℂ) :=
+  neelSquareState_mem_magnetizationSubspace_zero K L
+
+example :
+    magnetization (Fin (2 * 1) × Fin (2 * 1))
+        (neelSquareConfig 1 1) = 0 :=
+  neelSquareConfig_magnetization_zero 1 1
+
+example :
+    neelSquareState 2 2 ∈
+      magnetizationSubspace (Fin (2 * 2) × Fin (2 * 2)) (0 : ℂ) :=
+  neelSquareState_mem_magnetizationSubspace_zero 2 2
+
 end LatticeSystem.Tests.NeelState
