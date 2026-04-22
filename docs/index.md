@@ -83,6 +83,7 @@ respectively.
 | P1i (Tasaki §2.4) | Heisenberg Hamiltonian on the fully-polarised state: `H |s…s⟩ = (∑_{x,y} J(x,y)·(if x=y then 3/4 else 1/4)) · |s…s⟩` (eq. (2.4.5), `S = 1/2`); plus the ladder step `Ŝ_tot^± · |s…s⟩` preserves the same H-eigenvalue (eqs. (2.4.7)/(2.4.9), `S = 1/2`) and its iterated form `(Ŝ_tot^±)^k · |s…s⟩` for every `k : ℕ`; plus `[H, Û^(α)_θ] = 0` for the global rotation (eq. (2.4.7) operator-level), the single-axis rotated constant-spin state `Û^(α)_θ · |s…s⟩` shares the H-eigenvalue, and the two-axis spin-coherent state `Û^(3)_ϕ Û^(2)_θ · |s…s⟩ = |Ξ_θ,ϕ⟩` (eq. (2.4.6) for `s = 0`); plus the magnetic-quantum-number labelling `Ŝtot^(3) · (Ŝtot^-)^k · |↑..↑⟩ = (Smax - k) · (Ŝtot^-)^k · |↑..↑⟩` (eq. (2.4.9), unnormalised, lowering from highest weight) and its dual `Ŝtot^(3) · (Ŝtot^+)^k · |↓..↓⟩ = (-Smax + k) · (Ŝtot^+)^k · |↓..↓⟩` (eq. (2.4.9), unnormalised, raising from lowest weight); plus the Casimir invariance `Ŝtot² · (Ŝtot^∓)^k · |s..s⟩ = Smax(Smax+1) · (Ŝtot^∓)^k · |s..s⟩` for any constant `s`. For the matched highest/lowest-weight ladders, the unnormalised iterates `(Ŝtot^-)^k · |↑..↑⟩` and `(Ŝtot^+)^k · |↓..↓⟩` carry `(H, Ŝtot², Ŝtot^(3))` simultaneous eigenvalues `(c_J, Smax(Smax+1), Smax∓k)`; plus the boundary annihilations `Ŝtot^- · |↓..↓⟩ = 0` and `Ŝtot^+ · |↑..↑⟩ = 0` ensuring the ladder terminates after spanning all `2Smax + 1 = |Λ| + 1` magnetisation sectors — building toward the full |Φ_M⟩ / |Ξ_θ,ϕ⟩ ferromagnetic ground-state space | Done |
 | P1g | Gibbs state `ρ = e^{-βH}/Z`, `Tr(ρ) = 1`, `⟨1⟩ = 1`, `Z(0) = dim`, `Z(0) ≠ 0`, linearity `⟨O₁+O₂⟩ = ⟨O₁⟩+⟨O₂⟩`, `⟨c·O⟩ = c·⟨O⟩`, `⟨-O⟩ = -⟨O⟩`, `⟨A−B⟩ = ⟨A⟩−⟨B⟩`, `⟨Σ f⟩ = Σ ⟨f⟩`, `[ρ, H] = 0`, reality of `⟨O⟩` for Hermitian `O`, conservation `⟨[H,A]⟩ = 0`, anticommutator real / commutator imaginary, `(⟨H·O⟩).im = 0`, β = 0 closed form `ρ_0 = I/dim` and `⟨A⟩_0 = Tr A / dim`, one-parameter group property `e^{-(β₁+β₂)H} = e^{-β₁H} · e^{-β₂H}` and invertibility, exact discrete semigroup identity `e^{-(nβ)H} = (e^{-βH})^n` (extended to `n : ℤ` via `gibbsExp_inv`) | Done |
 | P1h | Periodic boundary conditions, Heisenberg chain (open and periodic BC), Gibbs state instantiation for both BCs (Hermiticity, commutativity with `H`, β = 0 closed form, expectation realness for Hermitian observables, conservation `⟨[H, A]⟩ = 0`, energy expectation as a bond-sum decomposition, energy expectation real, `⟨H · O⟩` real for Hermitian `O`, `⟨H^n⟩` real for any `n : ℕ`) | Done |
+| P1j (Tasaki §2.3) | Single-spin time-reversal map `Θ̂ := û_2 · K̂` for `S = 1/2`: explicit formula `Θ̂((a, b)ᵀ) = (-b*, a*)ᵀ` (Tasaki eq. (2.3.6)), action on `|ψ^↑⟩` / `|ψ^↓⟩`, additivity, antilinearity, **Kramers degeneracy** `Θ̂² = -1̂` (Tasaki eq. (2.3.8) at half-odd-integer spin) | Done (single spin only; multi-spin / sublattice extensions deferred) |
 | P2 | Finite-volume Hubbard / BCS | In progress (single-mode CAR algebra; multi-mode Jordan–Wigner backbone: JW string + multi-mode `c_i`, `c_i†` definitions and Hermiticity, `c_0` reductions, full on-site CAR `c_i² = 0`, `(c_i†)² = 0`, `{c_i, c_i†} = 1`, adjoint `(c_i)ᴴ = c_i†`, JW string idempotent `J² = 1`, site-occupation number operator `n_i` with Hermiticity and idempotency; **full cross-site CAR algebra `{c_i, c_j} = 0`, `{c_i†, c_j†} = 0`, `{c_i, c_j†} = 0`, `{c_i†, c_j} = 0` for every `i < j`**) |
 | P3 | CAR algebras, quasi-local C*-algebras, KMS states | Not started |
 | P4 | Thermodynamic limit, phase transitions | Not started |
@@ -286,6 +287,19 @@ case (`σ ∈ {-1, 0, +1}`).
 | `onSite_zero_mul_one_mulVec_basisVec` | explicit tensor-product action `(onSite 0 A * onSite 1 B) |σ⟩ = (A (σ 0)) ⊗ (B (σ 1))` on a two-site basis vector (Problem 2.2.c auxiliary) | `Quantum/SU2Integral.lean` |
 | `problem_2_2_c` | **Main theorem** (Tasaki §2.2 eq. (2.2.15)): `(1/4π) ∫₀^{2π} dφ ∫₀^π dθ sin θ · Û^(3)_φ Û^(2)_θ ρ (Û^(3)_φ Û^(2)_θ)† = (1/2) P_singlet` where `ρ = \|↑₁↓₂⟩⟨↑₁↓₂\|`. The SU(2)-averaged two-site state equals one-half times the singlet projector. | `Quantum/SU2Integral.lean` |
 | `spinOnePiRot{1,2,3}_mulVec_spinOne{Plus,Zero,Minus}` | π-rotation matrix elements on the basis `|ψ^{+1,0,-1}⟩` (Tasaki eq. (2.1.34) / Problem 2.1.g for S = 1) | `Quantum/SpinOneBasis.lean` |
+
+### Time-reversal map for `S = 1/2` (Tasaki §2.3)
+
+Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, §2.3 eqs. (2.3.4)–(2.3.8), pp. 26–27.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `timeReversalSpinHalf` | `Θ̂(v) = (-conj(v 1), conj(v 0))` (Tasaki eq. (2.3.6), `S = 1/2`); the antilinear unitary `û_2 · K̂` of §2.3 | `Quantum/TimeReversalSpinHalf.lean` |
+| `timeReversalSpinHalf_spinHalfUp` / `_spinHalfDown` | `Θ̂|ψ^↑⟩ = |ψ^↓⟩` and `Θ̂|ψ^↓⟩ = -|ψ^↑⟩` | `Quantum/TimeReversalSpinHalf.lean` |
+| `timeReversalSpinHalf_add` | additivity `Θ̂(v + w) = Θ̂(v) + Θ̂(w)` | `Quantum/TimeReversalSpinHalf.lean` |
+| `timeReversalSpinHalf_smul` | **antilinearity** in the scalar: `Θ̂(c • v) = (conj c) • Θ̂(v)` (Tasaki §2.3 antilinearity warning, pp. 26–27) | `Quantum/TimeReversalSpinHalf.lean` |
+| `timeReversalSpinHalf_sq` | **Kramers degeneracy at `S = 1/2`** (Tasaki eq. (2.3.8), half-odd-integer): `Θ̂² = -1̂` | `Quantum/TimeReversalSpinHalf.lean` |
 
 ### Multi-body operator space (abstract lattice)
 

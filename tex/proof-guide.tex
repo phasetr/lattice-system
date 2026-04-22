@@ -3865,6 +3865,62 @@ instead of \(\sigma^+_j\) at site \(j\), which still commutes with
 \(\{c_i^\dagger, c_j\}\) --- \texttt{conjTranspose} again.
 \end{proof}
 
+\section{Time-reversal map for a single \(S = 1/2\) spin (Tasaki §2.3)}
+\label{sec:time-reversal-spin-half}
+%======================================================================
+
+\noindent\textbf{Definition} (Tasaki §2.3 eq.~(2.3.6), \(S = 1/2\)).
+The time-reversal map on a single spin-\(1/2\) is
+\(\hat{\Theta} := \hat{u}_2 \cdot \hat{K}\), where \(\hat{u}_2\) is
+the \(\pi\)-rotation about the \(2\)-axis and \(\hat{K}\) is complex
+conjugation on coefficients in the standard basis. Explicitly,
+\[
+  \hat{\Theta}\!\begin{pmatrix} a \\ b \end{pmatrix}
+  \;=\; \begin{pmatrix} -b^{*} \\ a^{*} \end{pmatrix},
+  \qquad a, b \in \mathbb{C}.
+\]
+In Lean this is \texttt{timeReversalSpinHalf} as a plain
+\((\texttt{Fin}\,2 \to \mathbb{C}) \to (\texttt{Fin}\,2 \to \mathbb{C})\)
+function (an antilinear map cannot be a complex matrix).
+
+\noindent\textbf{Properties.}
+\begin{itemize}
+\item \(\hat{\Theta}|\psi^{\uparrow}\rangle = |\psi^{\downarrow}\rangle\)
+and \(\hat{\Theta}|\psi^{\downarrow}\rangle = -|\psi^{\uparrow}\rangle\)
+(\texttt{timeReversalSpinHalf\_spinHalfUp},
+\texttt{\_spinHalfDown}).
+\item Additivity \(\hat{\Theta}(v + w) = \hat{\Theta}(v) + \hat{\Theta}(w)\)
+(\texttt{timeReversalSpinHalf\_add}).
+\item \emph{Antilinearity in the scalar}
+\(\hat{\Theta}(c \cdot v) = \overline{c} \cdot \hat{\Theta}(v)\)
+(\texttt{timeReversalSpinHalf\_smul}). This is precisely Tasaki's
+warning that \(\hat{\Theta}\) is not a linear operator.
+\end{itemize}
+
+\noindent\textbf{Theorem (Kramers degeneracy at \(S = 1/2\),
+Tasaki eq.~(2.3.8) for half-odd-integer spin).}
+\[
+  \hat{\Theta}^{2} \;=\; -\hat{1}.
+\]
+\begin{proof}
+By double application of the explicit formula:
+\(
+  \hat{\Theta}\!\bigl((-b^{*}, a^{*})^{\mathrm T}\bigr)
+  = (-(\overline{a^{*}}), \overline{-b^{*}})^{\mathrm T}
+  = (-a, -b)^{\mathrm T}
+  = -(a, b)^{\mathrm T}.
+\)
+The double conjugation \(\overline{\overline{x}} = x\) cancels and
+the explicit minus sign in the first component survives.
+\end{proof}
+
+\noindent\textbf{Status / scope.} The single-spin case is closed
+(\texttt{LatticeSystem/Quantum/TimeReversalSpinHalf.lean}). The
+multi-spin extension \(\hat{\Theta}_{\text{tot}} =
+\bigotimes_{x \in \Lambda} \hat{\Theta}_x\) (Tasaki §2.3 lattice
+discussion) and the integer-spin case
+(\(\hat{\Theta}^{2} = +\hat{1}\)) are deferred.
+
 \section{Continuum-limit roadmap (Phase A scaffold)}
 \label{sec:continuum-limit-roadmap}
 %======================================================================

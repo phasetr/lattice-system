@@ -8,6 +8,7 @@ import LatticeSystem.Quantum.SpinHalf
 import LatticeSystem.Quantum.SpinHalfBasis
 import LatticeSystem.Quantum.SpinHalfDecomp
 import LatticeSystem.Quantum.SpinHalfRotation
+import LatticeSystem.Quantum.TimeReversalSpinHalf
 import LatticeSystem.Quantum.SU2
 import LatticeSystem.Quantum.SU2Integral
 import LatticeSystem.Quantum.SpinOne
@@ -33,3 +34,4 @@ import LatticeSystem.Tests.Ising
 import LatticeSystem.Tests.JWAbstract
 import LatticeSystem.Tests.Scale
 import LatticeSystem.Tests.NeelState
+import LatticeSystem.Tests.TimeReversalSpinHalf
