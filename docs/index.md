@@ -613,6 +613,7 @@ Systems*, §3.5, p. 89.
 | `openChainHeisenbergGibbsState_eq_onGraph` / `periodicChainHeisenbergGibbsState_eq_onGraph` | rfl bridges: chain Gibbs = graph Gibbs on pathGraph/cycleGraph | `Quantum/HeisenbergChain.lean` |
 | `quantumIsingGibbsState_eq_isingGibbsStateOnGraph` | chain Ising Gibbs = `isingGibbsStateOnGraph (pathGraph (N+1)) β (-J/2) h` | `Quantum/IsingChain.lean` |
 | `isingCycleGibbsState_commute_hamiltonian` | the periodic Ising Gibbs state commutes with the periodic Ising Hamiltonian (free corollary of `gibbsState_commute_hamiltonian`) | `Quantum/IsingChain.lean` |
+| `isingCycleGibbsExpectation_zero` / `_im_of_isHermitian` / `_commutator_hamiltonian` / `_hamiltonian_im` / `_hamiltonian_pow_im` / `isingCycle_partitionFn_im` | periodic-Ising expectation companions of the open-chain `quantumIsingGibbsExpectation*` family: β = 0 closed form, real-valuedness for Hermitian observables, conservation `⟨[H, A]⟩ = 0`, energy / energy-power expectations real, partition-function real | `Quantum/IsingChain.lean` |
 | `hubbardGibbsStateOnGraph N β G J U` | Gibbs state of the graph-built Hubbard Hamiltonian | `Fermion/JordanWigner.lean` |
 | `hubbardGibbsStateOnGraph_isHermitian` / `_commute_hamiltonian` | Hermiticity / commute corollaries | `Fermion/JordanWigner.lean` |
 | `hubbardChainGibbsState_eq_onGraph` | rfl bridge: `hubbardChainGibbsState = hubbardGibbsStateOnGraph (pathGraph (N+1)) (-J) U` | `Fermion/JordanWigner.lean` |

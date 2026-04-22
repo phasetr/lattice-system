@@ -205,4 +205,36 @@ example (N : ℕ) (β J h : ℝ) :
     Commute (isingCycleGibbsState N β J h) (isingCycleHamiltonian N J h) :=
   isingCycleGibbsState_commute_hamiltonian N β J h
 
+/-! ## Periodic Ising expectation theorems -/
+
+example (N : ℕ) (J h : ℝ) (A : ManyBodyOp (Fin (N + 2))) :
+    gibbsExpectation 0 (isingCycleHamiltonian N J h) A
+      = ((Fintype.card (Fin (N + 2) → Fin 2) : ℂ))⁻¹ * A.trace :=
+  isingCycleGibbsExpectation_zero N J h A
+
+example (N : ℕ) (β J h : ℝ) {O : ManyBodyOp (Fin (N + 2))}
+    (hO : O.IsHermitian) :
+    (gibbsExpectation β (isingCycleHamiltonian N J h) O).im = 0 :=
+  isingCycleGibbsExpectation_im_of_isHermitian N β J h hO
+
+example (N : ℕ) (β J h : ℝ) (A : ManyBodyOp (Fin (N + 2))) :
+    gibbsExpectation β (isingCycleHamiltonian N J h)
+      (isingCycleHamiltonian N J h * A
+        - A * isingCycleHamiltonian N J h) = 0 :=
+  isingCycleGibbsExpectation_commutator_hamiltonian N β J h A
+
+example (N : ℕ) (β J h : ℝ) :
+    (gibbsExpectation β (isingCycleHamiltonian N J h)
+        (isingCycleHamiltonian N J h)).im = 0 :=
+  isingCycleGibbsExpectation_hamiltonian_im N β J h
+
+example (N : ℕ) (β J h : ℝ) (n : ℕ) :
+    (gibbsExpectation β (isingCycleHamiltonian N J h)
+        ((isingCycleHamiltonian N J h)^n)).im = 0 :=
+  isingCycleGibbsExpectation_hamiltonian_pow_im N β J h n
+
+example (N : ℕ) (β J h : ℝ) :
+    (partitionFn β (isingCycleHamiltonian N J h)).im = 0 :=
+  isingCycle_partitionFn_im N β J h
+
 end LatticeSystem.Tests.Ising
