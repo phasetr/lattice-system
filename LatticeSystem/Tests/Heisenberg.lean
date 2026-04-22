@@ -167,6 +167,76 @@ example (β J : ℝ) (N : ℕ) :
       (heisenbergHamiltonian (cubicLatticeCoupling N J)) :=
   cubicLatticeHeisenbergGibbsState_commute_hamiltonian β J N
 
+/-! ## 2D / 3D Heisenberg full Gibbs companion family (PR #334 backfill)
+
+Spot-checks for the 33 companion theorems backfilled in PR #334:
+representative `_im_of_isHermitian`, `_commutator_hamiltonian`,
+`_hamiltonian_pow_im`, `_HamiltonianVariance_im`, and `_pow_trace`
+companions for each of the three 2D / 3D Heisenberg variants. -/
+
+/-- 2D square-lattice: `(⟨O⟩_β).im = 0` for Hermitian `O`. -/
+example (β J : ℝ) (N : ℕ) {O : ManyBodyOp (Fin (N + 1) × Fin (N + 1))}
+    (hO : O.IsHermitian) :
+    (gibbsExpectation β
+        (heisenbergHamiltonian (squareLatticeCoupling N J)) O).im = 0 :=
+  squareLatticeHeisenbergGibbsExpectation_im_of_isHermitian β J N hO
+
+/-- 2D square-lattice: `⟨[H, A]⟩_β = 0`. -/
+example (β J : ℝ) (N : ℕ) (A : ManyBodyOp (Fin (N + 1) × Fin (N + 1))) :
+    gibbsExpectation β (heisenbergHamiltonian (squareLatticeCoupling N J))
+        (heisenbergHamiltonian (squareLatticeCoupling N J) * A
+          - A * heisenbergHamiltonian (squareLatticeCoupling N J)) = 0 :=
+  squareLatticeHeisenbergGibbsExpectation_commutator_hamiltonian β J N A
+
+/-- 2D square-lattice: `(⟨H^n⟩_β).im = 0`. -/
+example (β J : ℝ) (N n : ℕ) :
+    (gibbsExpectation β (heisenbergHamiltonian (squareLatticeCoupling N J))
+        ((heisenbergHamiltonian (squareLatticeCoupling N J)) ^ n)).im = 0 :=
+  squareLatticeHeisenbergGibbsExpectation_hamiltonian_pow_im β J N n
+
+/-- 2D square-lattice: energy variance is real. -/
+example (β J : ℝ) (N : ℕ) :
+    (gibbsVariance β (heisenbergHamiltonian (squareLatticeCoupling N J))
+        (heisenbergHamiltonian (squareLatticeCoupling N J))).im = 0 :=
+  squareLatticeHeisenbergGibbsHamiltonianVariance_im β J N
+
+/-- 2D torus: `(⟨H^n⟩_β).im = 0`. -/
+example (β J : ℝ) (N n : ℕ) :
+    (gibbsExpectation β (heisenbergHamiltonian (squareTorusCoupling N J))
+        ((heisenbergHamiltonian (squareTorusCoupling N J)) ^ n)).im = 0 :=
+  squareTorusHeisenbergGibbsExpectation_hamiltonian_pow_im β J N n
+
+/-- 2D torus: anticommutator expectation real. -/
+example (β J : ℝ) (N : ℕ)
+    {A B : ManyBodyOp (Fin (N + 2) × Fin (N + 2))}
+    (hA : A.IsHermitian) (hB : B.IsHermitian) :
+    (gibbsExpectation β (heisenbergHamiltonian (squareTorusCoupling N J))
+        (A * B + B * A)).im = 0 :=
+  squareTorusHeisenbergGibbsExpectation_anticommutator_im β J N hA hB
+
+/-- 3D cubic-lattice: `(⟨H^n⟩_β).im = 0`. -/
+example (β J : ℝ) (N n : ℕ) :
+    (gibbsExpectation β (heisenbergHamiltonian (cubicLatticeCoupling N J))
+        ((heisenbergHamiltonian (cubicLatticeCoupling N J)) ^ n)).im = 0 :=
+  cubicLatticeHeisenbergGibbsExpectation_hamiltonian_pow_im β J N n
+
+/-- 3D cubic-lattice: commutator expectation purely imaginary. -/
+example (β J : ℝ) (N : ℕ)
+    {A B : ManyBodyOp ((Fin (N + 1) × Fin (N + 1)) × Fin (N + 1))}
+    (hA : A.IsHermitian) (hB : B.IsHermitian) :
+    (gibbsExpectation β (heisenbergHamiltonian (cubicLatticeCoupling N J))
+        (A * B - B * A)).re = 0 :=
+  cubicLatticeHeisenbergGibbsExpectation_commutator_re β J N hA hB
+
+/-- 3D cubic-lattice: Rényi-n trace identity. -/
+example (β J : ℝ) (N n : ℕ) :
+    ((cubicLatticeHeisenbergGibbsState β J N) ^ n).trace
+      = partitionFn ((n : ℝ) * β)
+          (heisenbergHamiltonian (cubicLatticeCoupling N J))
+        / (partitionFn β
+            (heisenbergHamiltonian (cubicLatticeCoupling N J))) ^ n :=
+  cubicLatticeHeisenbergGibbsState_pow_trace β J N n
+
 /-! ## A. decide-based universal: graph adjacency on small `Fin n`
 (Phase 1 PR 4 strengthening, refactor plan v4 §2.1 method A) -/
 
