@@ -310,6 +310,7 @@ Systems*, §2.3 eqs. (2.3.4)–(2.3.8), pp. 26–27.
 | `timeReversalSign_prod_conj` / `timeReversalSign_prod_mul_flip` | the product `∏_x ε(τ x)` is real (conjugation invariant); the cross product equals `(-1)^|Λ|` | `Quantum/TimeReversalMulti.lean` |
 | `timeReversalSpinHalfMulti_sq` | **Multi-spin Kramers degeneracy at `S = 1/2`** (Tasaki §2.3 half-odd-integer extension): `Θ̂_tot² = (-1)^|Λ| · 1̂` — `+1̂` when `|Λ|` is even, `-1̂` when odd | `Quantum/TimeReversalMulti.lean` |
 | `timeReversalSpinHalfMulti_basisVec` | action of `Θ̂_tot` on a many-body basis state: `Θ̂_tot |Ψ_σ⟩ = (∏_x ε(flip σ x)) · |Ψ_{flip σ}⟩` — natural many-body generalisation of `Θ̂|↑⟩ = |↓⟩` and `Θ̂|↓⟩ = -|↑⟩` | `Quantum/TimeReversalMulti.lean` |
+| `timeReversalSpinHalfMulti_onSite_pauliZ_mulVec` | multi-site sign-flip equivariance for `σ^z` (Tasaki §2.3 (2.3.14) lifted to many-body): `Θ̂_tot ((onSite x σ^z) v) = (-(onSite x σ^z))(Θ̂_tot v)`. Diagonal-action case; `σ^x`, `σ^y` deferred | `Quantum/TimeReversalMulti.lean` |
 
 ### Multi-body operator space (abstract lattice)
 

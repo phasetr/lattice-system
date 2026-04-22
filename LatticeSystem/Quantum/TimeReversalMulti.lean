@@ -3,6 +3,7 @@ Copyright (c) 2026 lattice-system contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.ManyBody
+import LatticeSystem.Quantum.Pauli
 import LatticeSystem.Quantum.TimeReversalSpinHalf
 
 /-!
@@ -192,6 +193,102 @@ theorem timeReversalSpinHalfMulti_basisVec (σ : Λ → Fin 2) :
       apply hτ
       rw [← h, flipConfig_involutive]
     rw [if_neg hflip]
+    simp
+
+/-! ## Multi-site spin sign flip: `Θ̂_tot σ^z_x = -σ^z_x Θ̂_tot`
+
+Tasaki §2.3 eq. (2.3.14) lifted to many-body operators: each
+single-site Pauli `σ^(α)_x = onSite x σ^(α)` anticommutes (under
+the antilinear conjugation) with the multi-spin time-reversal,
+
+  `Θ̂_tot ((onSite x A) v) = (-(onSite x A))(Θ̂_tot v)`
+
+for `A ∈ {σ^x, σ^y, σ^z}`. We start with the diagonal case
+`A = σ^z`, where the action on a vector reduces to a pointwise
+sign multiplication. The off-diagonal cases (`σ^x`, `σ^y`) are
+deferred and require a `siteFlipAt` swap analysis. -/
+
+/-- Pointwise unfolding of `(onSite x pauliZ).mulVec v`: since
+`σ^z` is diagonal, the action is multiplication by
+`if τ x = 0 then 1 else -1` at every configuration `τ`. -/
+private theorem onSite_pauliZ_mulVec_apply
+    (x : Λ) (v : (Λ → Fin 2) → ℂ) (τ : Λ → Fin 2) :
+    ((onSite x pauliZ).mulVec v) τ =
+      (if τ x = 0 then (1 : ℂ) else -1) * v τ := by
+  unfold Matrix.mulVec dotProduct
+  rw [show (∑ σ : Λ → Fin 2, (onSite x pauliZ) τ σ * v σ) =
+      ∑ σ : Λ → Fin 2,
+        (if σ = τ then (if τ x = 0 then (1 : ℂ) else -1) * v σ else 0)
+    from ?_]
+  · rw [Finset.sum_ite_eq']
+    simp
+  · apply Finset.sum_congr rfl
+    intro σ _
+    simp only [onSite_apply]
+    by_cases hagree : ∀ k, k ≠ x → τ k = σ k
+    · -- τ and σ agree off site x
+      rw [if_pos hagree]
+      by_cases hx : τ x = σ x
+      · -- τ x = σ x ⇒ τ = σ
+        have hτσ : τ = σ := by
+          funext k
+          by_cases hk : k = x
+          · rw [hk]; exact hx
+          · exact hagree k hk
+        rw [if_pos hτσ.symm]
+        rw [hτσ]
+        match h : σ x with
+        | 0 => simp [pauliZ, h]
+        | 1 => simp [pauliZ, h]
+      · -- τ x ≠ σ x ⇒ τ ≠ σ; pauliZ off-diagonal = 0
+        have hτσ : σ ≠ τ := by
+          intro h
+          apply hx
+          rw [h]
+        rw [if_neg hτσ]
+        match hτ : τ x, hσ : σ x with
+        | 0, 0 => exact absurd (hτ.trans hσ.symm) hx
+        | 0, 1 => simp [pauliZ, hτ, hσ]
+        | 1, 0 => simp [pauliZ, hτ, hσ]
+        | 1, 1 => exact absurd (hτ.trans hσ.symm) hx
+    · rw [if_neg hagree]
+      have hστ : σ ≠ τ := by
+        intro h
+        apply hagree
+        intro k _
+        rw [h]
+      rw [if_neg hστ, zero_mul]
+
+/-- Multi-site sign-flip equivariance for `σ^z` (Tasaki §2.3
+(2.3.14) at `α = 3`): for every `x : Λ` and every state `v`,
+
+  `Θ̂_tot ((onSite x σ^z) v) = (-(onSite x σ^z))(Θ̂_tot v)`.
+
+Proof: both sides reduce via `onSite_pauliZ_mulVec_apply` to a
+sign-multiplication on `v`. The two sign factors `(if τ x = 0)`
+and `(if (flip τ) x = 0)` are swapped, and the explicit minus on
+the RHS exactly compensates. -/
+theorem timeReversalSpinHalfMulti_onSite_pauliZ_mulVec
+    (x : Λ) (v : (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti ((onSite x pauliZ).mulVec v) =
+      (-(onSite x pauliZ)).mulVec
+        (timeReversalSpinHalfMulti v) := by
+  funext τ
+  rw [Matrix.neg_mulVec, Pi.neg_apply,
+    onSite_pauliZ_mulVec_apply,
+    timeReversalSpinHalfMulti_apply,
+    timeReversalSpinHalfMulti_apply,
+    onSite_pauliZ_mulVec_apply]
+  by_cases hτx : τ x = 0
+  · have hflipτx : (flipConfig τ) x = 1 := by simp [flipConfig, hτx]
+    rw [hτx, hflipτx]
+    simp
+  · have hτx1 : τ x = 1 := by
+      match hτ : τ x with
+      | 0 => exact absurd hτ hτx
+      | 1 => rfl
+    have hflipτx : (flipConfig τ) x = 0 := by simp [flipConfig, hτx1]
+    rw [hτx1, hflipτx]
     simp
 
 end LatticeSystem.Quantum
