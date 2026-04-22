@@ -99,6 +99,49 @@ theorem spinHalfDot_mulVec_neelStateOf_antiparallel
   exact spinHalfDot_mulVec_basisVec_antiparallel hxy _
     (neelConfigOf_apply_ne_of_ne A hA)
 
+/-- Generic Néel per-bond expectation of `Ŝ_x · Ŝ_y`
+(Tasaki §2.5 (2.5.4) ingredient, graph-centric form). For
+`A : V → Bool` and a bond `(x, y)` with `x ≠ y` and `A x ≠ A y`,
+
+  `⟨Φ_Néel(A), Ŝ_x · Ŝ_y · Φ_Néel(A)⟩ = -(1/4)`.
+
+Wrapper of `inner_basisVec_spinHalfDot_basisVec_antiparallel`
+specialised to the Néel state. The chain / 2D / 3D `_eq_neg_one_quarter`
+bond expectations in `InnerProduct.lean` reduce to this via
+`neelXyzState_eq_neelStateOf`. (Refactor Phase 3 PR 4.) -/
+theorem inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel
+    {V : Type*} [Fintype V] [DecidableEq V] (A : V → Bool)
+    {x y : V} (hxy : x ≠ y) (hA : A x ≠ A y) :
+    ∑ τ : V → Fin 2,
+        neelStateOf A τ *
+          ((spinHalfDot x y).mulVec (neelStateOf A)) τ =
+      -(1 / 4 : ℂ) := by
+  unfold neelStateOf
+  exact inner_basisVec_spinHalfDot_basisVec_antiparallel hxy _
+    (neelConfigOf_apply_ne_of_ne A hA)
+
+/-- Generic Néel per-bond `Ŝ^z_x · Ŝ^z_y` correlation
+(diagonal half of Tasaki §2.5 (2.5.4) ingredient). For
+`A : V → Bool` and `x ≠ y` with `A x ≠ A y`,
+
+  `⟨Φ_Néel(A), Ŝ^z_x · Ŝ^z_y · Φ_Néel(A)⟩ = -(1/4)`.
+
+Combines `inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec`
+(returns `spinHalfSign σ x · spinHalfSign σ y`) with
+`spinHalfSign_mul_antiparallel`. (Refactor Phase 3 PR 4.) -/
+theorem inner_neelStateOf_szsz_neelStateOf_antiparallel
+    {V : Type*} [Fintype V] [DecidableEq V] (A : V → Bool)
+    {x y : V} (hA : A x ≠ A y) :
+    ∑ τ : V → Fin 2,
+        neelStateOf A τ *
+          ((onSite x spinHalfOp3 *
+              onSite y spinHalfOp3).mulVec (neelStateOf A)) τ =
+      -(1 / 4 : ℂ) := by
+  unfold neelStateOf
+  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
+  exact spinHalfSign_mul_antiparallel
+    (neelConfigOf_apply_ne_of_ne A hA)
+
 /-! ## Chain Néel state -/
 
 /-- The Néel chain configuration on `Fin (2 * K)`: the alternating

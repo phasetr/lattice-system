@@ -692,7 +692,7 @@ theorem inner_basisVec_spinHalfDot_basisVec_antiparallel
 /-- Antiparallel spin-sign product: for `s ≠ t : Fin 2`,
 `spinHalfSign s · spinHalfSign t = -1/4`. One of the two values
 must be `+1/2` and the other `-1/2`. -/
-private lemma spinHalfSign_mul_antiparallel
+theorem spinHalfSign_mul_antiparallel
     {s t : Fin 2} (h : s ≠ t) :
     (spinHalfSign s * spinHalfSign t : ℂ) = -(1 / 4 : ℂ) := by
   unfold spinHalfSign

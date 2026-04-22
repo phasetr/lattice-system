@@ -96,29 +96,16 @@ theorem neelChainState_inner_spinHalfDot_adjacent_eq_neg_one_quarter
               (⟨i, by omega⟩ : Fin (2 * K))
               (⟨i + 1, hi⟩ : Fin (2 * K))).mulVec
             (neelChainState K)) τ = -(1 / 4 : ℂ) := by
-  have h := spinHalfDot_mulVec_neelChainState_adjacent K hi
-  simp_rw [h]
-  simp_rw [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, mul_sub]
-  rw [Finset.sum_sub_distrib]
-  simp_rw [show ∀ τ : Fin (2 * K) → Fin 2,
-      neelChainState K τ * ((1 / 2 : ℂ) * basisVec
-        (basisSwap (neelChainConfig K)
-          (⟨i, by omega⟩ : Fin (2 * K))
-          (⟨i + 1, hi⟩ : Fin (2 * K))) τ)
-        = (1 / 2 : ℂ) *
-          (neelChainState K τ *
-            basisVec (basisSwap (neelChainConfig K)
-              (⟨i, by omega⟩ : Fin (2 * K))
-              (⟨i + 1, hi⟩ : Fin (2 * K))) τ) from fun τ => by ring]
-  simp_rw [show ∀ τ : Fin (2 * K) → Fin 2,
-      neelChainState K τ * ((1 / 4 : ℂ) * neelChainState K τ)
-        = (1 / 4 : ℂ) *
-          (neelChainState K τ * neelChainState K τ) from
-      fun τ => by ring]
-  rw [← Finset.mul_sum, ← Finset.mul_sum]
-  rw [neelChainState_inner_basisVec_basisSwap_adjacent_eq_zero K hi,
-    neelChainState_norm_squared]
-  ring
+  rw [neelChainState_eq_neelStateOf]
+  apply inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel
+  · intro h
+    have := congrArg Fin.val h
+    simp at this
+  · by_cases hp : i % 2 = 0
+    · have hp1 : (i + 1) % 2 ≠ 0 := by omega
+      simp [hp, hp1]
+    · have hp1 : (i + 1) % 2 = 0 := by omega
+      simp [hp, hp1]
 
 /-- 1D Néel chain: per-wrap-bond expectation
 `⟨Φ_Néel(K+1), Ŝ_⟨2K+1⟩ · Ŝ_⟨0⟩ · Φ_Néel(K+1)⟩ = -1/4`. -/
@@ -130,13 +117,12 @@ theorem neelChainState_inner_spinHalfDot_wrap_eq_neg_one_quarter
               (⟨2 * K + 1, by omega⟩ : Fin (2 * (K + 1)))
               (⟨0, by omega⟩ : Fin (2 * (K + 1)))).mulVec
             (neelChainState (K + 1))) τ = -(1 / 4 : ℂ) := by
-  unfold neelChainState
-  apply inner_basisVec_spinHalfDot_basisVec_antiparallel
+  rw [neelChainState_eq_neelStateOf]
+  apply inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel
   · intro h
     have := congrArg Fin.val h
     simp at this
-  · unfold neelChainConfig
-    have h1 : (2 * K + 1) % 2 = 1 := by omega
+  · have h1 : (2 * K + 1) % 2 = 1 := by omega
     simp [h1]
 
 /-- 2D Néel: horizontal adjacent bond expectation = -1/4. -/
@@ -151,15 +137,13 @@ theorem neelSquareState_inner_spinHalfDot_horizontal_adjacent_eq_neg_one_quarter
               ((⟨i + 1, hi⟩, ⟨j, hj⟩) :
                 Fin (2 * K) × Fin (2 * L))).mulVec
             (neelSquareState K L)) τ = -(1 / 4 : ℂ) := by
-  unfold neelSquareState
-  apply inner_basisVec_spinHalfDot_basisVec_antiparallel
+  rw [neelSquareState_eq_neelStateOf]
+  apply inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel
   · intro h
     have := congrArg Prod.fst h
     have hval := congrArg Fin.val this
     simp at hval
-  · unfold neelSquareConfig
-    simp only
-    by_cases hp : (i + j) % 2 = 0
+  · by_cases hp : (i + j) % 2 = 0
     · have hp1 : ((i + 1) + j) % 2 ≠ 0 := by omega
       simp [hp, hp1]
     · have hp1 : ((i + 1) + j) % 2 = 0 := by omega
@@ -177,15 +161,13 @@ theorem neelSquareState_inner_spinHalfDot_vertical_adjacent_eq_neg_one_quarter
               ((⟨i, hi⟩, ⟨j + 1, hj⟩) :
                 Fin (2 * K) × Fin (2 * L))).mulVec
             (neelSquareState K L)) τ = -(1 / 4 : ℂ) := by
-  unfold neelSquareState
-  apply inner_basisVec_spinHalfDot_basisVec_antiparallel
+  rw [neelSquareState_eq_neelStateOf]
+  apply inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel
   · intro h
     have := congrArg Prod.snd h
     have hval := congrArg Fin.val this
     simp at hval
-  · unfold neelSquareConfig
-    simp only
-    by_cases hp : (i + j) % 2 = 0
+  · by_cases hp : (i + j) % 2 = 0
     · have hp1 : (i + (j + 1)) % 2 ≠ 0 := by omega
       simp [hp, hp1]
     · have hp1 : (i + (j + 1)) % 2 = 0 := by omega
@@ -202,15 +184,13 @@ theorem neelSquareState_inner_spinHalfDot_horizontal_wrap_eq_neg_one_quarter
               ((⟨0, by omega⟩, ⟨j, hj⟩) :
                 Fin (2 * (K + 1)) × Fin (2 * L))).mulVec
             (neelSquareState (K + 1) L)) τ = -(1 / 4 : ℂ) := by
-  unfold neelSquareState
-  apply inner_basisVec_spinHalfDot_basisVec_antiparallel
+  rw [neelSquareState_eq_neelStateOf]
+  apply inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel
   · intro h
     have := congrArg Prod.fst h
     have hval := congrArg Fin.val this
     simp at hval
-  · unfold neelSquareConfig
-    simp only
-    rcases Nat.mod_two_eq_zero_or_one j with hj0 | hj1
+  · rcases Nat.mod_two_eq_zero_or_one j with hj0 | hj1
     · have h1 : (2 * K + 1 + j) % 2 ≠ 0 := by omega
       simp [h1, hj0]
     · have h4 : (2 * K + 1 + j) % 2 = 0 := by omega
@@ -227,15 +207,13 @@ theorem neelSquareState_inner_spinHalfDot_vertical_wrap_eq_neg_one_quarter
               ((⟨i, hi⟩, ⟨0, by omega⟩) :
                 Fin (2 * K) × Fin (2 * (L + 1)))).mulVec
             (neelSquareState K (L + 1))) τ = -(1 / 4 : ℂ) := by
-  unfold neelSquareState
-  apply inner_basisVec_spinHalfDot_basisVec_antiparallel
+  rw [neelSquareState_eq_neelStateOf]
+  apply inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel
   · intro h
     have := congrArg Prod.snd h
     have hval := congrArg Fin.val this
     simp at hval
-  · unfold neelSquareConfig
-    simp only
-    rcases Nat.mod_two_eq_zero_or_one i with hi0 | hi1
+  · rcases Nat.mod_two_eq_zero_or_one i with hi0 | hi1
     · have h1 : (i + (2 * L + 1)) % 2 ≠ 0 := by omega
       simp [h1, hi0]
     · have h1 : (i + (2 * L + 1)) % 2 = 0 := by omega
@@ -253,16 +231,14 @@ theorem neelCubicState_inner_spinHalfDot_x_adjacent_eq_neg_one_quarter
               (((⟨i + 1, hi⟩, ⟨j, hj⟩), ⟨k, hk⟩) :
                 (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))).mulVec
             (neelCubicState K L M)) τ = -(1 / 4 : ℂ) := by
-  unfold neelCubicState
-  apply inner_basisVec_spinHalfDot_basisVec_antiparallel
+  rw [neelCubicState_eq_neelStateOf]
+  apply inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel
   · intro h
     have h1 := congrArg Prod.fst h
     have h2 := congrArg Prod.fst h1
     have hval := congrArg Fin.val h2
     simp at hval
-  · unfold neelCubicConfig
-    simp only
-    by_cases hp : (i + j + k) % 2 = 0
+  · by_cases hp : (i + j + k) % 2 = 0
     · have hp1 : ((i + 1) + j + k) % 2 ≠ 0 := by omega
       simp [hp, hp1]
     · have hp1 : ((i + 1) + j + k) % 2 = 0 := by omega
@@ -280,16 +256,14 @@ theorem neelCubicState_inner_spinHalfDot_y_adjacent_eq_neg_one_quarter
               (((⟨i, hi⟩, ⟨j + 1, hj⟩), ⟨k, hk⟩) :
                 (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))).mulVec
             (neelCubicState K L M)) τ = -(1 / 4 : ℂ) := by
-  unfold neelCubicState
-  apply inner_basisVec_spinHalfDot_basisVec_antiparallel
+  rw [neelCubicState_eq_neelStateOf]
+  apply inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel
   · intro h
     have h1 := congrArg Prod.fst h
     have h2 := congrArg Prod.snd h1
     have hval := congrArg Fin.val h2
     simp at hval
-  · unfold neelCubicConfig
-    simp only
-    by_cases hp : (i + j + k) % 2 = 0
+  · by_cases hp : (i + j + k) % 2 = 0
     · have hp1 : (i + (j + 1) + k) % 2 ≠ 0 := by omega
       simp [hp, hp1]
     · have hp1 : (i + (j + 1) + k) % 2 = 0 := by omega
@@ -307,15 +281,13 @@ theorem neelCubicState_inner_spinHalfDot_z_adjacent_eq_neg_one_quarter
               (((⟨i, hi⟩, ⟨j, hj⟩), ⟨k + 1, hk⟩) :
                 (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))).mulVec
             (neelCubicState K L M)) τ = -(1 / 4 : ℂ) := by
-  unfold neelCubicState
-  apply inner_basisVec_spinHalfDot_basisVec_antiparallel
+  rw [neelCubicState_eq_neelStateOf]
+  apply inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel
   · intro h
     have h1 := congrArg Prod.snd h
     have hval := congrArg Fin.val h1
     simp at hval
-  · unfold neelCubicConfig
-    simp only
-    by_cases hp : (i + j + k) % 2 = 0
+  · by_cases hp : (i + j + k) % 2 = 0
     · have hp1 : (i + j + (k + 1)) % 2 ≠ 0 := by omega
       simp [hp, hp1]
     · have hp1 : (i + j + (k + 1)) % 2 = 0 := by omega
@@ -333,16 +305,14 @@ theorem neelCubicState_inner_spinHalfDot_x_wrap_eq_neg_one_quarter
               (((⟨0, by omega⟩, ⟨j, hj⟩), ⟨k, hk⟩) :
                 (Fin (2 * (K + 1)) × Fin (2 * L)) × Fin (2 * M))).mulVec
             (neelCubicState (K + 1) L M)) τ = -(1 / 4 : ℂ) := by
-  unfold neelCubicState
-  apply inner_basisVec_spinHalfDot_basisVec_antiparallel
+  rw [neelCubicState_eq_neelStateOf]
+  apply inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel
   · intro h
     have h1 := congrArg Prod.fst h
     have h2 := congrArg Prod.fst h1
     have hval := congrArg Fin.val h2
     simp at hval
-  · unfold neelCubicConfig
-    simp only
-    rcases Nat.mod_two_eq_zero_or_one (j + k) with hjk0 | hjk1
+  · rcases Nat.mod_two_eq_zero_or_one (j + k) with hjk0 | hjk1
     · have h1 : (2 * K + 1 + j + k) % 2 ≠ 0 := by omega
       simp [h1, hjk0]
     · have h1 : (2 * K + 1 + j + k) % 2 = 0 := by omega
@@ -360,16 +330,14 @@ theorem neelCubicState_inner_spinHalfDot_y_wrap_eq_neg_one_quarter
               (((⟨i, hi⟩, ⟨0, by omega⟩), ⟨k, hk⟩) :
                 (Fin (2 * K) × Fin (2 * (L + 1))) × Fin (2 * M))).mulVec
             (neelCubicState K (L + 1) M)) τ = -(1 / 4 : ℂ) := by
-  unfold neelCubicState
-  apply inner_basisVec_spinHalfDot_basisVec_antiparallel
+  rw [neelCubicState_eq_neelStateOf]
+  apply inner_neelStateOf_spinHalfDot_neelStateOf_antiparallel
   · intro h
     have h1 := congrArg Prod.fst h
     have h2 := congrArg Prod.snd h1
     have hval := congrArg Fin.val h2
     simp at hval
-  · unfold neelCubicConfig
-    simp only
-    rcases Nat.mod_two_eq_zero_or_one (i + k) with hik0 | hik1
+  · rcases Nat.mod_two_eq_zero_or_one (i + k) with hik0 | hik1
     · have h1 : (i + (2 * L + 1) + k) % 2 ≠ 0 := by omega
       simp [h1, hik0]
     · have h1 : (i + (2 * L + 1) + k) % 2 = 0 := by omega
@@ -391,14 +359,13 @@ theorem neelChainState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_adjacent_
               onSite (⟨i + 1, hi⟩ : Fin (2 * K))
                 spinHalfOp3).mulVec
             (neelChainState K)) τ = -(1 / 4 : ℂ) := by
-  unfold neelChainState
-  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
-  unfold neelChainConfig spinHalfSign
+  rw [neelChainState_eq_neelStateOf]
+  apply inner_neelStateOf_szsz_neelStateOf_antiparallel
   by_cases hp : i % 2 = 0
   · have hp1 : (i + 1) % 2 ≠ 0 := by omega
-    simp [hp, hp1]; ring
+    simp [hp, hp1]
   · have hp1 : (i + 1) % 2 = 0 := by omega
-    simp [hp, hp1]; ring
+    simp [hp, hp1]
 
 /-- 1D Néel chain wrap-bond `Ŝ^(3)_x · Ŝ^(3)_y` correlation =
 `-1/4`. -/
@@ -411,11 +378,10 @@ theorem neelChainState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_wrap_eq_n
               onSite (⟨0, by omega⟩ : Fin (2 * (K + 1)))
                 spinHalfOp3).mulVec
             (neelChainState (K + 1))) τ = -(1 / 4 : ℂ) := by
-  unfold neelChainState
-  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
-  unfold neelChainConfig spinHalfSign
+  rw [neelChainState_eq_neelStateOf]
+  apply inner_neelStateOf_szsz_neelStateOf_antiparallel
   have h1 : (2 * K + 1) % 2 = 1 := by omega
-  simp [h1]; ring
+  simp [h1]
 
 /-- 2D Néel: horizontal adjacent `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
 theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_horizontal_adjacent_eq_neg_one_quarter
@@ -428,15 +394,13 @@ theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_horizont
               onSite ((⟨i + 1, hi⟩, ⟨j, hj⟩) :
                 Fin (2 * K) × Fin (2 * L)) spinHalfOp3).mulVec
             (neelSquareState K L)) τ = -(1 / 4 : ℂ) := by
-  unfold neelSquareState
-  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
-  unfold neelSquareConfig spinHalfSign
-  simp only
+  rw [neelSquareState_eq_neelStateOf]
+  apply inner_neelStateOf_szsz_neelStateOf_antiparallel
   by_cases hp : (i + j) % 2 = 0
   · have hp1 : ((i + 1) + j) % 2 ≠ 0 := by omega
-    simp [hp, hp1]; ring
+    simp [hp, hp1]
   · have hp1 : ((i + 1) + j) % 2 = 0 := by omega
-    simp [hp, hp1]; ring
+    simp [hp, hp1]
 
 /-- 2D Néel: vertical adjacent `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
 theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_vertical_adjacent_eq_neg_one_quarter
@@ -449,15 +413,13 @@ theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_vertical
               onSite ((⟨i, hi⟩, ⟨j + 1, hj⟩) :
                 Fin (2 * K) × Fin (2 * L)) spinHalfOp3).mulVec
             (neelSquareState K L)) τ = -(1 / 4 : ℂ) := by
-  unfold neelSquareState
-  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
-  unfold neelSquareConfig spinHalfSign
-  simp only
+  rw [neelSquareState_eq_neelStateOf]
+  apply inner_neelStateOf_szsz_neelStateOf_antiparallel
   by_cases hp : (i + j) % 2 = 0
   · have hp1 : (i + (j + 1)) % 2 ≠ 0 := by omega
-    simp [hp, hp1]; ring
+    simp [hp, hp1]
   · have hp1 : (i + (j + 1)) % 2 = 0 := by omega
-    simp [hp, hp1]; ring
+    simp [hp, hp1]
 
 /-- 2D Néel: horizontal wrap `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
 theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_horizontal_wrap_eq_neg_one_quarter
@@ -469,15 +431,13 @@ theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_horizont
               onSite ((⟨0, by omega⟩, ⟨j, hj⟩) :
                 Fin (2 * (K + 1)) × Fin (2 * L)) spinHalfOp3).mulVec
             (neelSquareState (K + 1) L)) τ = -(1 / 4 : ℂ) := by
-  unfold neelSquareState
-  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
-  unfold neelSquareConfig spinHalfSign
-  simp only
+  rw [neelSquareState_eq_neelStateOf]
+  apply inner_neelStateOf_szsz_neelStateOf_antiparallel
   rcases Nat.mod_two_eq_zero_or_one j with hj0 | hj1
   · have h1 : (2 * K + 1 + j) % 2 ≠ 0 := by omega
-    simp [h1, hj0]; ring
+    simp [h1, hj0]
   · have h4 : (2 * K + 1 + j) % 2 = 0 := by omega
-    simp [h4, hj1]; ring
+    simp [h4, hj1]
 
 /-- 2D Néel: vertical wrap `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
 theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_vertical_wrap_eq_neg_one_quarter
@@ -489,15 +449,13 @@ theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_vertical
               onSite ((⟨i, hi⟩, ⟨0, by omega⟩) :
                 Fin (2 * K) × Fin (2 * (L + 1))) spinHalfOp3).mulVec
             (neelSquareState K (L + 1))) τ = -(1 / 4 : ℂ) := by
-  unfold neelSquareState
-  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
-  unfold neelSquareConfig spinHalfSign
-  simp only
+  rw [neelSquareState_eq_neelStateOf]
+  apply inner_neelStateOf_szsz_neelStateOf_antiparallel
   rcases Nat.mod_two_eq_zero_or_one i with hi0 | hi1
   · have h1 : (i + (2 * L + 1)) % 2 ≠ 0 := by omega
-    simp [h1, hi0]; ring
+    simp [h1, hi0]
   · have h1 : (i + (2 * L + 1)) % 2 = 0 := by omega
-    simp [h1, hi1]; ring
+    simp [h1, hi1]
 
 /-- 3D Néel: x adjacent `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
 theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_x_adjacent_eq_neg_one_quarter
@@ -512,15 +470,13 @@ theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_x_adjacen
                 (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))
                 spinHalfOp3).mulVec
             (neelCubicState K L M)) τ = -(1 / 4 : ℂ) := by
-  unfold neelCubicState
-  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
-  unfold neelCubicConfig spinHalfSign
-  simp only
+  rw [neelCubicState_eq_neelStateOf]
+  apply inner_neelStateOf_szsz_neelStateOf_antiparallel
   by_cases hp : (i + j + k) % 2 = 0
   · have hp1 : ((i + 1) + j + k) % 2 ≠ 0 := by omega
-    simp [hp, hp1]; ring
+    simp [hp, hp1]
   · have hp1 : ((i + 1) + j + k) % 2 = 0 := by omega
-    simp [hp, hp1]; ring
+    simp [hp, hp1]
 
 /-- 3D Néel: y adjacent `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
 theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_y_adjacent_eq_neg_one_quarter
@@ -535,15 +491,13 @@ theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_y_adjacen
                 (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))
                 spinHalfOp3).mulVec
             (neelCubicState K L M)) τ = -(1 / 4 : ℂ) := by
-  unfold neelCubicState
-  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
-  unfold neelCubicConfig spinHalfSign
-  simp only
+  rw [neelCubicState_eq_neelStateOf]
+  apply inner_neelStateOf_szsz_neelStateOf_antiparallel
   by_cases hp : (i + j + k) % 2 = 0
   · have hp1 : (i + (j + 1) + k) % 2 ≠ 0 := by omega
-    simp [hp, hp1]; ring
+    simp [hp, hp1]
   · have hp1 : (i + (j + 1) + k) % 2 = 0 := by omega
-    simp [hp, hp1]; ring
+    simp [hp, hp1]
 
 /-- 3D Néel: z adjacent `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
 theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_z_adjacent_eq_neg_one_quarter
@@ -558,15 +512,13 @@ theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_z_adjacen
                 (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))
                 spinHalfOp3).mulVec
             (neelCubicState K L M)) τ = -(1 / 4 : ℂ) := by
-  unfold neelCubicState
-  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
-  unfold neelCubicConfig spinHalfSign
-  simp only
+  rw [neelCubicState_eq_neelStateOf]
+  apply inner_neelStateOf_szsz_neelStateOf_antiparallel
   by_cases hp : (i + j + k) % 2 = 0
   · have hp1 : (i + j + (k + 1)) % 2 ≠ 0 := by omega
-    simp [hp, hp1]; ring
+    simp [hp, hp1]
   · have hp1 : (i + j + (k + 1)) % 2 = 0 := by omega
-    simp [hp, hp1]; ring
+    simp [hp, hp1]
 
 /-- 3D Néel: x wrap `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
 theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_x_wrap_eq_neg_one_quarter
@@ -581,15 +533,13 @@ theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_x_wrap_eq
                 (Fin (2 * (K + 1)) × Fin (2 * L)) × Fin (2 * M))
                 spinHalfOp3).mulVec
             (neelCubicState (K + 1) L M)) τ = -(1 / 4 : ℂ) := by
-  unfold neelCubicState
-  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
-  unfold neelCubicConfig spinHalfSign
-  simp only
+  rw [neelCubicState_eq_neelStateOf]
+  apply inner_neelStateOf_szsz_neelStateOf_antiparallel
   rcases Nat.mod_two_eq_zero_or_one (j + k) with hjk0 | hjk1
   · have h1 : (2 * K + 1 + j + k) % 2 ≠ 0 := by omega
-    simp [h1, hjk0]; ring
+    simp [h1, hjk0]
   · have h1 : (2 * K + 1 + j + k) % 2 = 0 := by omega
-    simp [h1, hjk1]; ring
+    simp [h1, hjk1]
 
 /-- 3D Néel: y wrap `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
 theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_y_wrap_eq_neg_one_quarter
@@ -604,15 +554,13 @@ theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_y_wrap_eq
                 (Fin (2 * K) × Fin (2 * (L + 1))) × Fin (2 * M))
                 spinHalfOp3).mulVec
             (neelCubicState K (L + 1) M)) τ = -(1 / 4 : ℂ) := by
-  unfold neelCubicState
-  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
-  unfold neelCubicConfig spinHalfSign
-  simp only
+  rw [neelCubicState_eq_neelStateOf]
+  apply inner_neelStateOf_szsz_neelStateOf_antiparallel
   rcases Nat.mod_two_eq_zero_or_one (i + k) with hik0 | hik1
   · have h1 : (i + (2 * L + 1) + k) % 2 ≠ 0 := by omega
-    simp [h1, hik0]; ring
+    simp [h1, hik0]
   · have h1 : (i + (2 * L + 1) + k) % 2 = 0 := by omega
-    simp [h1, hik1]; ring
+    simp [h1, hik1]
 
 /-- 3D Néel: z wrap `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
 theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_z_wrap_eq_neg_one_quarter
@@ -627,15 +575,13 @@ theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_z_wrap_eq
                 (Fin (2 * K) × Fin (2 * L)) × Fin (2 * (M + 1)))
                 spinHalfOp3).mulVec
             (neelCubicState K L (M + 1))) τ = -(1 / 4 : ℂ) := by
-  unfold neelCubicState
-  rw [inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec]
-  unfold neelCubicConfig spinHalfSign
-  simp only
+  rw [neelCubicState_eq_neelStateOf]
+  apply inner_neelStateOf_szsz_neelStateOf_antiparallel
   rcases Nat.mod_two_eq_zero_or_one (i + j) with hij0 | hij1
   · have h1 : (i + j + (2 * M + 1)) % 2 ≠ 0 := by omega
-    simp [h1, hij0]; ring
+    simp [h1, hij0]
   · have h1 : (i + j + (2 * M + 1)) % 2 = 0 := by omega
-    simp [h1, hij1]; ring
+    simp [h1, hij1]
 
 /-! ## Off-diagonal correlator (Ŝ^x · Ŝ^x + Ŝ^y · Ŝ^y) on Néel -/
 
