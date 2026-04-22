@@ -1065,4 +1065,48 @@ theorem marshallSignChainConfig_neelChainConfig (K : ℕ) :
   · simp [hp]
   · simp [hp]
 
+/-- 2D Marshall sign of a spin-1/2 configuration on the
+checkerboard `Fin (2 * K) × Fin (2 * L)`: `(-1)^(N_A^↓)` with
+`A` = sites with `(i + j)` even. Encoded as the product
+`∏_{(i, j) with i+j even} (-1)^(σ (i, j))`. -/
+noncomputable def marshallSignSquareConfig (K L : ℕ)
+    (σ : Fin (2 * K) × Fin (2 * L) → Fin 2) : ℂ :=
+  ∏ p : Fin (2 * K) × Fin (2 * L),
+    (if (p.1.val + p.2.val) % 2 = 0
+      then ((-1 : ℂ) ^ (σ p : ℕ)) else 1)
+
+/-- The 2D checkerboard Néel configuration has `Marshall sign = 1`:
+sublattice-A sites carry `↑`, so each contributing factor is
+`(-1)^0 = 1`. -/
+theorem marshallSignSquareConfig_neelSquareConfig (K L : ℕ) :
+    marshallSignSquareConfig K L (neelSquareConfig K L) = 1 := by
+  unfold marshallSignSquareConfig neelSquareConfig
+  apply Finset.prod_eq_one
+  intro p _
+  by_cases hp : (p.1.val + p.2.val) % 2 = 0
+  · simp [hp]
+  · simp [hp]
+
+/-- 3D Marshall sign of a spin-1/2 configuration on the cubic
+checkerboard `(Fin (2 * K) × Fin (2 * L)) × Fin (2 * M)`:
+`(-1)^(N_A^↓)` with `A` = sites with `(i + j + k)` even. -/
+noncomputable def marshallSignCubicConfig (K L M : ℕ)
+    (σ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2) :
+    ℂ :=
+  ∏ p : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M),
+    (if (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
+      then ((-1 : ℂ) ^ (σ p : ℕ)) else 1)
+
+/-- The 3D cubic checkerboard Néel configuration has
+`Marshall sign = 1`: sublattice-A sites carry `↑`, so each
+contributing factor is `(-1)^0 = 1`. -/
+theorem marshallSignCubicConfig_neelCubicConfig (K L M : ℕ) :
+    marshallSignCubicConfig K L M (neelCubicConfig K L M) = 1 := by
+  unfold marshallSignCubicConfig neelCubicConfig
+  apply Finset.prod_eq_one
+  intro p _
+  by_cases hp : (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
+  · simp [hp]
+  · simp [hp]
+
 end LatticeSystem.Quantum

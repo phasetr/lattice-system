@@ -383,4 +383,30 @@ example :
     marshallSignChainConfig 3 (neelChainConfig 3) = 1 :=
   marshallSignChainConfig_neelChainConfig 3
 
+/-! ## Marshall sign on the 2D / 3D Néel configurations -/
+
+example (K L : ℕ) :
+    marshallSignSquareConfig K L (neelSquareConfig K L) = 1 :=
+  marshallSignSquareConfig_neelSquareConfig K L
+
+example :
+    marshallSignSquareConfig 1 1 (neelSquareConfig 1 1) = 1 :=
+  marshallSignSquareConfig_neelSquareConfig 1 1
+
+example :
+    marshallSignSquareConfig 2 3 (neelSquareConfig 2 3) = 1 :=
+  marshallSignSquareConfig_neelSquareConfig 2 3
+
+example (K L M : ℕ) :
+    marshallSignCubicConfig K L M (neelCubicConfig K L M) = 1 :=
+  marshallSignCubicConfig_neelCubicConfig K L M
+
+example :
+    marshallSignCubicConfig 1 1 1 (neelCubicConfig 1 1 1) = 1 :=
+  marshallSignCubicConfig_neelCubicConfig 1 1 1
+
+example :
+    marshallSignCubicConfig 2 2 1 (neelCubicConfig 2 2 1) = 1 :=
+  marshallSignCubicConfig_neelCubicConfig 2 2 1
+
 end LatticeSystem.Tests.NeelState
