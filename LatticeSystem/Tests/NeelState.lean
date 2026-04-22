@@ -365,4 +365,22 @@ example :
       basisVec (flipConfig (neelCubicConfig 2 2 3)) :=
   timeReversalSpinHalfMulti_neelCubicState 2 2 3
 
+/-! ## Marshall sign on the parity-coloured chain -/
+
+example (K : ℕ) :
+    marshallSignChainConfig K (neelChainConfig K) = 1 :=
+  marshallSignChainConfig_neelChainConfig K
+
+example :
+    marshallSignChainConfig 1 (neelChainConfig 1) = 1 :=
+  marshallSignChainConfig_neelChainConfig 1
+
+example :
+    marshallSignChainConfig 2 (neelChainConfig 2) = 1 :=
+  marshallSignChainConfig_neelChainConfig 2
+
+example :
+    marshallSignChainConfig 3 (neelChainConfig 3) = 1 :=
+  marshallSignChainConfig_neelChainConfig 3
+
 end LatticeSystem.Tests.NeelState

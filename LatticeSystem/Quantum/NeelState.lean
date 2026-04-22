@@ -1030,4 +1030,39 @@ theorem spinHalfDot_mulVec_neelCubicState_z_wrap
     · have h1 : (i + j + (2 * M + 1)) % 2 = 0 := by omega
       simp [h1, hij1]
 
+/-! ## Marshall sign on the parity-coloured chain (Tasaki §2.5)
+
+The Marshall sign (Marshall 1955; Lieb-Mattis 1962; Tasaki §2.5) of
+a spin configuration `σ : Fin (2 * K) → Fin 2` is, on the
+bipartite chain `Fin (2 * K)` with sublattice `A` = even indices:
+
+  `(-1)^(N_A^↓)`
+
+where `N_A^↓` is the number of down spins on sublattice `A`. After
+the Marshall basis change `|σ⟩ ↦ (-1)^(N_A^↓) |σ⟩`, the AF
+Heisenberg Hamiltonian on a bipartite lattice has all non-positive
+off-diagonal entries, which is the input to the
+Perron-Frobenius-style proof of the Marshall-Lieb-Mattis
+theorem. -/
+
+/-- Marshall sign of a spin-1/2 configuration on the
+parity-coloured chain `Fin (2 * K)`: `(-1)^(N_A^↓)` with `A` =
+even indices. Encoded as the product `∏_{x even} (-1)^(σ x)`. -/
+noncomputable def marshallSignChainConfig (K : ℕ)
+    (σ : Fin (2 * K) → Fin 2) : ℂ :=
+  ∏ x : Fin (2 * K),
+    (if x.val % 2 = 0 then ((-1 : ℂ) ^ (σ x : ℕ)) else 1)
+
+/-- The Néel chain configuration has `Marshall sign = 1`: every
+even-indexed site carries `↑ : Fin 2 := 0`, so each factor
+`(-1)^(σ x) = 1` and the empty/down-count gives `(-1)^0 = 1`. -/
+theorem marshallSignChainConfig_neelChainConfig (K : ℕ) :
+    marshallSignChainConfig K (neelChainConfig K) = 1 := by
+  unfold marshallSignChainConfig neelChainConfig
+  apply Finset.prod_eq_one
+  intro x _
+  by_cases hp : x.val % 2 = 0
+  · simp [hp]
+  · simp [hp]
+
 end LatticeSystem.Quantum
