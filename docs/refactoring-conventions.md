@@ -187,16 +187,49 @@ deprecation warning text itself is captured by `#guard_msgs`
   (test files exempt only with comment justification).
 - **In-line `set_option linter.flexible false in`** etc. are
   acceptable only when no proof-level rewrite achieves the goal;
-  must include comment explaining why.
+  must include comment explaining why. Track every remaining
+  per-theorem suppression in [`docs/deprecations.md`](deprecations.html)
+  for transparency.
 - `lake build` should produce **zero linter warnings** in steady
   state.
 
+### Common rewrite patterns (use these instead of suppressing)
+
+- **`linter.unusedSectionVars` / `linter.unusedDecidableInType`**:
+  use `omit [Fintype Λ] in` or `omit [DecidableEq Λ] in` directly
+  before the affected theorem, instead of a file-level
+  `set_option`. The variable is still in scope as a `variable`
+  declaration; `omit` just tells Lean not to auto-include it in
+  this specific theorem's signature.
+- **`linter.deprecated` triggered by internal companions on a
+  deprecated definition**: place a single
+  `set_option linter.deprecated false` after the deprecated
+  declarations and before the companion theorems with a comment
+  pointing to the deprecation rationale. The companions are
+  migration scaffolding (see [§3 Deprecation window](#3-dedup-conventions)).
+- **`linter.unusedSimpArgs`**: trim the dead arguments. If the
+  argument is needed in some sub-cases of a `<;>`-chained simp
+  but not others, accept the warning per-theorem with comment
+  rather than refactoring into separate per-case proofs.
+- **`linter.flexible` (`simp [...]` after `fin_cases`)**: ideally
+  refactor to `simp only [...]` with the explicit lemma list
+  (use `simp?` interactively to find it), or use `suffices` to
+  state the simplified form. Per-theorem
+  `set_option linter.flexible false in` with comment is
+  acceptable as a temporary measure when interactive `simp?` is
+  not available.
+
 ### Review check — linter
 
-- [ ] No new `set_option linter.* false` introduced.
+- [ ] No new `set_option linter.* false` introduced (without
+  comment justification).
+- [ ] Per-theorem `omit [...]` directives preferred over
+  `set_option linter.unused* false`.
 - [ ] If linter exception is removed elsewhere, build still passes.
 - [ ] `lake build` warning count not increased (record before /
   after in PR description if relevant).
+- [ ] New per-theorem suppressions added to `docs/deprecations.md`
+  transparency table.
 
 ## 6. Public-doc synchronisation (CLAUDE.local.md, longstanding)
 
