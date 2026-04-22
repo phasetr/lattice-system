@@ -28,6 +28,8 @@ import LatticeSystem.Fermion.JordanWigner
 import LatticeSystem.Fermion.JWAbstract
 import LatticeSystem.Tests.Foundation
 import LatticeSystem.Tests.TestHelpers
+import LatticeSystem.Tests.SpinDot
+import LatticeSystem.Tests.TotalSpin
 import LatticeSystem.Tests.Sanity
 import LatticeSystem.Tests.Graph
 import LatticeSystem.Tests.Heisenberg
