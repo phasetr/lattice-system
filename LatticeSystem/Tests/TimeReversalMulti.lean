@@ -116,4 +116,21 @@ example (x : Fin 3) (v : (Fin 3 → Fin 2) → ℂ) :
       (-(onSite x pauliY)).mulVec (timeReversalSpinHalfMulti v) :=
   timeReversalSpinHalfMulti_onSite_pauliY_mulVec x v
 
+/-! ## Θ̂_tot additivity / antilinearity -/
+
+example (v w : (Fin 3 → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti (v + w) =
+      timeReversalSpinHalfMulti v + timeReversalSpinHalfMulti w :=
+  timeReversalSpinHalfMulti_add v w
+
+example (c : ℂ) (v : (Fin 3 → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti (c • v) =
+      (starRingEnd ℂ c) • timeReversalSpinHalfMulti v :=
+  timeReversalSpinHalfMulti_smul c v
+
+example (r : ℝ) (v : (Fin 3 → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti ((r : ℂ) • v) =
+      (r : ℂ) • timeReversalSpinHalfMulti v :=
+  timeReversalSpinHalfMulti_real_smul r v
+
 end LatticeSystem.Tests.TimeReversalMulti

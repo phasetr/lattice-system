@@ -317,6 +317,7 @@ Systems*, §2.3 eqs. (2.3.4)–(2.3.8), pp. 26–27.
 | `timeReversalSign_prod_siteFlipAt` | `∏_y ε((siteFlipAt τ x) y) = -(∏_y ε(τ y))` — the per-site flip swaps `ε(τ x)` with `ε(1 - τ x) = -ε(τ x)`, flipping the total sign | `Quantum/TimeReversalMulti.lean` |
 | `timeReversalSpinHalfMulti_onSite_pauliX_mulVec` | multi-site sign-flip equivariance for `σ^x` (Tasaki §2.3 (2.3.14) at α = 1): `Θ̂_tot ((onSite x σ^x) v) = (-(onSite x σ^x))(Θ̂_tot v)` | `Quantum/TimeReversalMulti.lean` |
 | `timeReversalSpinHalfMulti_onSite_pauliY_mulVec` | multi-site sign-flip equivariance for `σ^y` (Tasaki §2.3 (2.3.14) at α = 2): `Θ̂_tot ((onSite x σ^y) v) = (-(onSite x σ^y))(Θ̂_tot v)`. The proof handles the per-site `±i` factor via `conj(pauliY_sign(1 - s)) = pauliY_sign(s)` | `Quantum/TimeReversalMulti.lean` |
+| `timeReversalSpinHalfMulti_add` / `_smul` / `_real_smul` | multi-spin `Θ̂_tot` is additive, antilinear in the scalar (`Θ̂_tot(c • v) = conj(c) • Θ̂_tot v`), and real-linear (special case of antilinearity at real `r`) — foundational for lifting Pauli-axis equivariance to bilinear / Heisenberg-type Hamiltonian forms | `Quantum/TimeReversalMulti.lean` |
 
 ### Multi-body operator space (abstract lattice)
 
