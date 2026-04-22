@@ -32,6 +32,27 @@ noncomputable def neelCubicState (K L M : ℕ) :
     ((Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2) → ℂ :=
   basisVec (neelCubicConfig K L M)
 
+/-- 3D bridge: the 3D cubic Néel configuration is the generic
+`neelConfigOf` at the `(i + j + k)`-parity sublattice
+indicator. (Refactor Phase 3 PR 3.) -/
+theorem neelCubicConfig_eq_neelConfigOf (K L M : ℕ) :
+    neelCubicConfig K L M =
+      neelConfigOf
+        (fun p : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) =>
+          decide ((p.1.1.val + p.1.2.val + p.2.val) % 2 = 0)) := by
+  unfold neelCubicConfig neelConfigOf
+  funext p
+  by_cases hp : (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0 <;> simp [hp]
+
+/-- 3D bridge (state form). -/
+theorem neelCubicState_eq_neelStateOf (K L M : ℕ) :
+    neelCubicState K L M =
+      neelStateOf
+        (fun p : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) =>
+          decide ((p.1.1.val + p.1.2.val + p.2.val) % 2 = 0)) := by
+  unfold neelCubicState neelStateOf
+  rw [neelCubicConfig_eq_neelConfigOf]
+
 /-- Magnetisation of the 3D cubic Néel configuration vanishes:
 the outer-most sum (over `k : Fin (2*M)`) for each fixed
 `((i, j))` is an alternating offset sum. -/

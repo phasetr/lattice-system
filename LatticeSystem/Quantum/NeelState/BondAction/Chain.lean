@@ -43,14 +43,12 @@ theorem spinHalfDot_mulVec_neelChainState_adjacent
             (⟨i, by omega⟩ : Fin (2 * K))
             (⟨i + 1, hi⟩ : Fin (2 * K)))
         - (1 / 4 : ℂ) • neelChainState K := by
-  unfold neelChainState
-  apply spinHalfDot_mulVec_basisVec_antiparallel
+  rw [neelChainState_eq_neelStateOf, neelChainConfig_eq_neelConfigOf]
+  apply spinHalfDot_mulVec_neelStateOf_antiparallel
   · intro h
     have := congrArg Fin.val h
     simp at this
-  · -- σ_Néel ⟨i⟩ ≠ σ_Néel ⟨i + 1⟩: opposite parities
-    unfold neelChainConfig
-    simp only
+  · -- A ⟨i⟩ ≠ A ⟨i+1⟩: opposite parities
     by_cases hp : i % 2 = 0
     · have hp1 : (i + 1) % 2 ≠ 0 := by omega
       simp [hp, hp1]
@@ -114,14 +112,12 @@ theorem spinHalfDot_mulVec_neelChainState_wrap (K : ℕ) :
             (⟨2 * K + 1, by omega⟩ : Fin (2 * (K + 1)))
             (⟨0, by omega⟩ : Fin (2 * (K + 1))))
         - (1 / 4 : ℂ) • neelChainState (K + 1) := by
-  unfold neelChainState
-  apply spinHalfDot_mulVec_basisVec_antiparallel
+  rw [neelChainState_eq_neelStateOf, neelChainConfig_eq_neelConfigOf]
+  apply spinHalfDot_mulVec_neelStateOf_antiparallel
   · intro h
     have := congrArg Fin.val h
     simp at this
-  · -- σ_Néel ⟨2K+1⟩ = 1, σ_Néel ⟨0⟩ = 0 (opposite parities)
-    unfold neelChainConfig
-    simp only
+  · -- A ⟨2K+1⟩ = false, A ⟨0⟩ = true (opposite parities)
     have h1 : (2 * K + 1) % 2 = 1 := by omega
     simp [h1]
 

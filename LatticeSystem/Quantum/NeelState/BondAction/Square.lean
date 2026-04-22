@@ -44,15 +44,13 @@ theorem spinHalfDot_mulVec_neelSquareState_horizontal_adjacent
             ((⟨i + 1, hi⟩, ⟨j, hj⟩) :
               Fin (2 * K) × Fin (2 * L)))
         - (1 / 4 : ℂ) • neelSquareState K L := by
-  unfold neelSquareState
-  apply spinHalfDot_mulVec_basisVec_antiparallel
+  rw [neelSquareState_eq_neelStateOf, neelSquareConfig_eq_neelConfigOf]
+  apply spinHalfDot_mulVec_neelStateOf_antiparallel
   · intro h
     have := congrArg Prod.fst h
     have hval := congrArg Fin.val this
     simp at hval
-  · -- Opposite parities: (i + j) and (i + 1 + j) differ by 1
-    unfold neelSquareConfig
-    simp only
+  · -- Opposite parities: (i + j) vs (i + 1 + j) differ by 1
     by_cases hp : (i + j) % 2 = 0
     · have hp1 : ((i + 1) + j) % 2 ≠ 0 := by omega
       simp [hp, hp1]
@@ -77,15 +75,13 @@ theorem spinHalfDot_mulVec_neelSquareState_vertical_adjacent
             ((⟨i, hi⟩, ⟨j + 1, hj⟩) :
               Fin (2 * K) × Fin (2 * L)))
         - (1 / 4 : ℂ) • neelSquareState K L := by
-  unfold neelSquareState
-  apply spinHalfDot_mulVec_basisVec_antiparallel
+  rw [neelSquareState_eq_neelStateOf, neelSquareConfig_eq_neelConfigOf]
+  apply spinHalfDot_mulVec_neelStateOf_antiparallel
   · intro h
     have := congrArg Prod.snd h
     have hval := congrArg Fin.val this
     simp at hval
-  · unfold neelSquareConfig
-    simp only
-    by_cases hp : (i + j) % 2 = 0
+  · by_cases hp : (i + j) % 2 = 0
     · have hp1 : (i + (j + 1)) % 2 ≠ 0 := by omega
       simp [hp, hp1]
     · have hp1 : (i + (j + 1)) % 2 = 0 := by omega
@@ -115,15 +111,13 @@ theorem spinHalfDot_mulVec_neelSquareState_horizontal_wrap
             ((⟨0, by omega⟩, ⟨j, hj⟩) :
               Fin (2 * (K + 1)) × Fin (2 * L)))
         - (1 / 4 : ℂ) • neelSquareState (K + 1) L := by
-  unfold neelSquareState
-  apply spinHalfDot_mulVec_basisVec_antiparallel
+  rw [neelSquareState_eq_neelStateOf, neelSquareConfig_eq_neelConfigOf]
+  apply spinHalfDot_mulVec_neelStateOf_antiparallel
   · intro h
     have := congrArg Prod.fst h
     have hval := congrArg Fin.val this
     simp at hval
-  · unfold neelSquareConfig
-    simp only
-    rcases Nat.mod_two_eq_zero_or_one j with hj0 | hj1
+  · rcases Nat.mod_two_eq_zero_or_one j with hj0 | hj1
     · have h1 : (2 * K + 1 + j) % 2 ≠ 0 := by omega
       simp [h1, hj0]
     · have h4 : (2 * K + 1 + j) % 2 = 0 := by omega
@@ -147,15 +141,13 @@ theorem spinHalfDot_mulVec_neelSquareState_vertical_wrap
             ((⟨i, hi⟩, ⟨0, by omega⟩) :
               Fin (2 * K) × Fin (2 * (L + 1))))
         - (1 / 4 : ℂ) • neelSquareState K (L + 1) := by
-  unfold neelSquareState
-  apply spinHalfDot_mulVec_basisVec_antiparallel
+  rw [neelSquareState_eq_neelStateOf, neelSquareConfig_eq_neelConfigOf]
+  apply spinHalfDot_mulVec_neelStateOf_antiparallel
   · intro h
     have := congrArg Prod.snd h
     have hval := congrArg Fin.val this
     simp at hval
-  · unfold neelSquareConfig
-    simp only
-    rcases Nat.mod_two_eq_zero_or_one i with hi0 | hi1
+  · rcases Nat.mod_two_eq_zero_or_one i with hi0 | hi1
     · have h1 : (i + (2 * L + 1)) % 2 ≠ 0 := by omega
       simp [h1, hi0]
     · have h1 : (i + (2 * L + 1)) % 2 = 0 := by omega
