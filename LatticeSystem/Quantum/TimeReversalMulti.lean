@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import LatticeSystem.Quantum.ManyBody
 import LatticeSystem.Quantum.Pauli
 import LatticeSystem.Quantum.SpinHalf
+import LatticeSystem.Quantum.SpinDot
 import LatticeSystem.Quantum.TimeReversalSpinHalf
 
 /-!
@@ -657,5 +658,104 @@ theorem timeReversalSpinHalfMulti_onSite_spinHalfOp3_mulVec
       rw [map_div₀]; simp [Complex.conj_ofNat],
     timeReversalSpinHalfMulti_onSite_pauliZ_mulVec]
   rw [← smul_neg, Matrix.smul_mulVec]
+
+/-! ## Time-reversal invariance of bilinear `Ŝ_x · Ŝ_y` (Tasaki §2.3)
+
+Composing the per-α Ŝ^(α) equivariance for both `x` and `y`
+yields *invariance* (not anti-invariance) of the bilinear
+`Ŝ_x · Ŝ_y` under multi-spin time reversal: two `-1` factors
+cancel.
+
+This is the operator-level analogue of Tasaki's observation that
+the Heisenberg Hamiltonian is time-reversal invariant. -/
+
+/-- Per-axis composition: applying `Θ̂_tot` to the bilinear
+`(onSite x Ŝ^(1)) · (onSite y Ŝ^(1))` acting on `v` is the same as
+applying the bilinear product to `Θ̂_tot v` directly — the two
+equivariance `-1` factors cancel. -/
+private theorem timeReversalSpinHalfMulti_onSite_spinHalfOp1_mul_onSite_mulVec
+    (x y : Λ) (v : (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((onSite x spinHalfOp1 * onSite y spinHalfOp1).mulVec v) =
+      (onSite x spinHalfOp1 * onSite y spinHalfOp1).mulVec
+        (timeReversalSpinHalfMulti v) := by
+  rw [show (onSite x spinHalfOp1 * onSite y spinHalfOp1).mulVec v =
+        (onSite x spinHalfOp1).mulVec
+          ((onSite y spinHalfOp1).mulVec v) from
+      (Matrix.mulVec_mulVec _ _ _).symm]
+  rw [show (onSite x spinHalfOp1 * onSite y spinHalfOp1).mulVec
+          (timeReversalSpinHalfMulti v) =
+        (onSite x spinHalfOp1).mulVec
+          ((onSite y spinHalfOp1).mulVec
+            (timeReversalSpinHalfMulti v)) from
+      (Matrix.mulVec_mulVec _ _ _).symm]
+  rw [timeReversalSpinHalfMulti_onSite_spinHalfOp1_mulVec,
+    timeReversalSpinHalfMulti_onSite_spinHalfOp1_mulVec,
+    Matrix.neg_mulVec, Matrix.neg_mulVec,
+    Matrix.mulVec_neg, neg_neg]
+
+/-- Per-axis composition for `Ŝ^(2)`. -/
+private theorem timeReversalSpinHalfMulti_onSite_spinHalfOp2_mul_onSite_mulVec
+    (x y : Λ) (v : (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((onSite x spinHalfOp2 * onSite y spinHalfOp2).mulVec v) =
+      (onSite x spinHalfOp2 * onSite y spinHalfOp2).mulVec
+        (timeReversalSpinHalfMulti v) := by
+  rw [show (onSite x spinHalfOp2 * onSite y spinHalfOp2).mulVec v =
+        (onSite x spinHalfOp2).mulVec
+          ((onSite y spinHalfOp2).mulVec v) from
+      (Matrix.mulVec_mulVec _ _ _).symm]
+  rw [show (onSite x spinHalfOp2 * onSite y spinHalfOp2).mulVec
+          (timeReversalSpinHalfMulti v) =
+        (onSite x spinHalfOp2).mulVec
+          ((onSite y spinHalfOp2).mulVec
+            (timeReversalSpinHalfMulti v)) from
+      (Matrix.mulVec_mulVec _ _ _).symm]
+  rw [timeReversalSpinHalfMulti_onSite_spinHalfOp2_mulVec,
+    timeReversalSpinHalfMulti_onSite_spinHalfOp2_mulVec,
+    Matrix.neg_mulVec, Matrix.neg_mulVec,
+    Matrix.mulVec_neg, neg_neg]
+
+/-- Per-axis composition for `Ŝ^(3)`. -/
+private theorem timeReversalSpinHalfMulti_onSite_spinHalfOp3_mul_onSite_mulVec
+    (x y : Λ) (v : (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((onSite x spinHalfOp3 * onSite y spinHalfOp3).mulVec v) =
+      (onSite x spinHalfOp3 * onSite y spinHalfOp3).mulVec
+        (timeReversalSpinHalfMulti v) := by
+  rw [show (onSite x spinHalfOp3 * onSite y spinHalfOp3).mulVec v =
+        (onSite x spinHalfOp3).mulVec
+          ((onSite y spinHalfOp3).mulVec v) from
+      (Matrix.mulVec_mulVec _ _ _).symm]
+  rw [show (onSite x spinHalfOp3 * onSite y spinHalfOp3).mulVec
+          (timeReversalSpinHalfMulti v) =
+        (onSite x spinHalfOp3).mulVec
+          ((onSite y spinHalfOp3).mulVec
+            (timeReversalSpinHalfMulti v)) from
+      (Matrix.mulVec_mulVec _ _ _).symm]
+  rw [timeReversalSpinHalfMulti_onSite_spinHalfOp3_mulVec,
+    timeReversalSpinHalfMulti_onSite_spinHalfOp3_mulVec,
+    Matrix.neg_mulVec, Matrix.neg_mulVec,
+    Matrix.mulVec_neg, neg_neg]
+
+/-- **Time-reversal invariance of `Ŝ_x · Ŝ_y`** (Tasaki §2.3):
+the bilinear two-site spin inner product is invariant under
+`Θ̂_tot`,
+
+  `Θ̂_tot ((Ŝ_x · Ŝ_y) v) = (Ŝ_x · Ŝ_y) (Θ̂_tot v)`.
+
+Sums the per-axis bilinear invariances over `α = 1, 2, 3`. -/
+theorem timeReversalSpinHalfMulti_spinHalfDot_mulVec
+    (x y : Λ) (v : (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((spinHalfDot x y).mulVec v) =
+      (spinHalfDot x y).mulVec (timeReversalSpinHalfMulti v) := by
+  unfold spinHalfDot
+  rw [Matrix.add_mulVec, Matrix.add_mulVec,
+    timeReversalSpinHalfMulti_add, timeReversalSpinHalfMulti_add,
+    timeReversalSpinHalfMulti_onSite_spinHalfOp1_mul_onSite_mulVec,
+    timeReversalSpinHalfMulti_onSite_spinHalfOp2_mul_onSite_mulVec,
+    timeReversalSpinHalfMulti_onSite_spinHalfOp3_mul_onSite_mulVec,
+    ← Matrix.add_mulVec, ← Matrix.add_mulVec]
 
 end LatticeSystem.Quantum

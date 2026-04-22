@@ -150,4 +150,11 @@ example (x : Fin 3) (v : (Fin 3 → Fin 2) → ℂ) :
       (-(onSite x spinHalfOp3)).mulVec (timeReversalSpinHalfMulti v) :=
   timeReversalSpinHalfMulti_onSite_spinHalfOp3_mulVec x v
 
+/-! ## Time-reversal invariance of `Ŝ_x · Ŝ_y` -/
+
+example (x y : Fin 3) (v : (Fin 3 → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti ((spinHalfDot x y).mulVec v) =
+      (spinHalfDot x y).mulVec (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_spinHalfDot_mulVec x y v
+
 end LatticeSystem.Tests.TimeReversalMulti
