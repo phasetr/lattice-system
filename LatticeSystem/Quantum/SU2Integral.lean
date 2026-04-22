@@ -327,7 +327,7 @@ theorem problem_2_2_c (τ : Fin 2 → Fin 2) :
   -- Simplify RHS
   have hbs : basisSwap upDown (0 : Fin 2) 1 = fun i : Fin 2 =>
       match i with | 0 => 1 | 1 => 0 := by
-    funext i; simp [basisSwap, upDown, Function.update]; fin_cases i <;> simp
+    funext i; simp only [basisSwap, upDown, Function.update]; fin_cases i <;> simp
   -- Case split on τ 0 and τ 1
   have ht0 : τ 0 = 0 ∨ τ 0 = 1 := by rcases τ 0 with ⟨v, hv⟩; omega
   have ht1 : τ 1 = 0 ∨ τ 1 = 1 := by rcases τ 1 with ⟨v, hv⟩; omega
