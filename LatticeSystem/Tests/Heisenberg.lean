@@ -170,9 +170,33 @@ example (β J : ℝ) (N : ℕ) :
 /-! ## 2D / 3D Heisenberg full Gibbs companion family (PR #334 backfill)
 
 Spot-checks for the 33 companion theorems backfilled in PR #334:
-representative `_im_of_isHermitian`, `_commutator_hamiltonian`,
-`_hamiltonian_pow_im`, `_HamiltonianVariance_im`, and `_pow_trace`
-companions for each of the three 2D / 3D Heisenberg variants. -/
+representative `_zero` (β=0 closed form), `_im_of_isHermitian`,
+`_commutator_hamiltonian`, `_hamiltonian_pow_im`,
+`_HamiltonianVariance_im`, and `_pow_trace` companions for each
+of the three 2D / 3D Heisenberg variants. -/
+
+/-- 2D square-lattice: β = 0 closed form `⟨A⟩_0 = (1/dim) · Tr A`. -/
+example (J : ℝ) (N : ℕ) (A : ManyBodyOp (Fin (N + 1) × Fin (N + 1))) :
+    gibbsExpectation 0 (heisenbergHamiltonian (squareLatticeCoupling N J)) A
+      = ((Fintype.card (Fin (N + 1) × Fin (N + 1) → Fin 2) : ℂ))⁻¹
+          * A.trace :=
+  squareLatticeHeisenbergGibbsExpectation_zero J N A
+
+/-- 2D torus: β = 0 closed form. -/
+example (J : ℝ) (N : ℕ) (A : ManyBodyOp (Fin (N + 2) × Fin (N + 2))) :
+    gibbsExpectation 0 (heisenbergHamiltonian (squareTorusCoupling N J)) A
+      = ((Fintype.card (Fin (N + 2) × Fin (N + 2) → Fin 2) : ℂ))⁻¹
+          * A.trace :=
+  squareTorusHeisenbergGibbsExpectation_zero J N A
+
+/-- 3D cubic-lattice: β = 0 closed form. -/
+example (J : ℝ) (N : ℕ)
+    (A : ManyBodyOp ((Fin (N + 1) × Fin (N + 1)) × Fin (N + 1))) :
+    gibbsExpectation 0 (heisenbergHamiltonian (cubicLatticeCoupling N J)) A
+      = ((Fintype.card
+            ((Fin (N + 1) × Fin (N + 1)) × Fin (N + 1) → Fin 2) : ℂ))⁻¹
+          * A.trace :=
+  cubicLatticeHeisenbergGibbsExpectation_zero J N A
 
 /-- 2D square-lattice: `(⟨O⟩_β).im = 0` for Hermitian `O`. -/
 example (β J : ℝ) (N : ℕ) {O : ManyBodyOp (Fin (N + 1) × Fin (N + 1))}
