@@ -35,6 +35,7 @@ import LatticeSystem.Tests.GibbsState
 import LatticeSystem.Tests.MagnetizationSubspace
 import LatticeSystem.Tests.SpinHalfFamily
 import LatticeSystem.Tests.SpinOneFamily
+import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Sanity
 import LatticeSystem.Tests.Graph
 import LatticeSystem.Tests.Heisenberg
