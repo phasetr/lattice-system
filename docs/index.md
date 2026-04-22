@@ -319,6 +319,7 @@ Systems*, §2.3 eqs. (2.3.4)–(2.3.8), pp. 26–27.
 | `timeReversalSpinHalfMulti_onSite_pauliY_mulVec` | multi-site sign-flip equivariance for `σ^y` (Tasaki §2.3 (2.3.14) at α = 2): `Θ̂_tot ((onSite x σ^y) v) = (-(onSite x σ^y))(Θ̂_tot v)`. The proof handles the per-site `±i` factor via `conj(pauliY_sign(1 - s)) = pauliY_sign(s)` | `Quantum/TimeReversalMulti.lean` |
 | `timeReversalSpinHalfMulti_add` / `_smul` / `_real_smul` | multi-spin `Θ̂_tot` is additive, antilinear in the scalar (`Θ̂_tot(c • v) = conj(c) • Θ̂_tot v`), and real-linear (special case of antilinearity at real `r`) — foundational for lifting Pauli-axis equivariance to bilinear / Heisenberg-type Hamiltonian forms | `Quantum/TimeReversalMulti.lean` |
 | `timeReversalSpinHalfMulti_onSite_spinHalfOp{1,2,3}_mulVec` | Tasaki §2.3 (2.3.14) for spin-1/2 ops `Ŝ^(α) = σ^(α) / 2`: `Θ̂_tot ((onSite x Ŝ^(α)) v) = (-(onSite x Ŝ^(α)))(Θ̂_tot v)` for α = 1, 2, 3 — direct corollaries of the Pauli versions by scalar (1/2) multiplication | `Quantum/TimeReversalMulti.lean` |
+| `timeReversalSpinHalfMulti_spinHalfDot_mulVec` | **Time-reversal invariance of the bilinear `Ŝ_x · Ŝ_y`** (Tasaki §2.3): `Θ̂_tot ((Ŝ_x · Ŝ_y) v) = (Ŝ_x · Ŝ_y)(Θ̂_tot v)` — two equivariance `-1` factors cancel; sums per-axis | `Quantum/TimeReversalMulti.lean` |
 
 ### Multi-body operator space (abstract lattice)
 
