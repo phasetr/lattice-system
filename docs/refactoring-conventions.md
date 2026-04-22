@@ -139,6 +139,16 @@ helper is referenced by other downstream files, it must be lifted
 from `private lemma` to `lemma` at extraction time. Document the
 visibility change in the PR body.
 
+Examples:
+- PR #332 lifted `spinHalfSign_mul_antiparallel` from
+  `private lemma` to public `theorem` so the new generic
+  `inner_neelStateOf_szsz_neelStateOf_antiparallel` could use it.
+  Also documented in `docs/index.md` per [§6](#6-public-doc-synchronisation-claudelocalmd-longstanding).
+- During Phase 2 several `_aux` private lemmas had to be lifted
+  when their parent file was split (e.g., `prod_alternating_neg_one`,
+  `onSite_conjTranspose`). Each PR body explicitly documented the
+  visibility change with a one-line "Visibility lift" note.
+
 ### Review check — module split
 
 - [ ] All four split criteria justified in the PR description.
