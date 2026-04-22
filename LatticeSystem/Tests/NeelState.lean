@@ -409,6 +409,47 @@ example :
     marshallSignCubicConfig 2 2 1 (neelCubicConfig 2 2 1) = 1 :=
   marshallSignCubicConfig_neelCubicConfig 2 2 1
 
+/-! ## Marshall sign on constant configurations -/
+
+example (K : ℕ) :
+    marshallSignChainConfig K (fun _ : Fin (2 * K) => (0 : Fin 2)) = 1 :=
+  marshallSignChainConfig_const_zero K
+
+example (K : ℕ) :
+    marshallSignChainConfig K (fun _ : Fin (2 * K) => (1 : Fin 2)) =
+      ((-1 : ℂ) ^ K) :=
+  marshallSignChainConfig_const_one K
+
+example :
+    marshallSignChainConfig 1 (fun _ : Fin 2 => (1 : Fin 2)) = -1 := by
+  rw [marshallSignChainConfig_const_one 1]; simp
+
+example :
+    marshallSignChainConfig 2 (fun _ : Fin 4 => (1 : Fin 2)) = 1 := by
+  rw [marshallSignChainConfig_const_one 2]; simp
+
+example (K L : ℕ) :
+    marshallSignSquareConfig K L
+        (fun _ : Fin (2 * K) × Fin (2 * L) => (0 : Fin 2)) = 1 :=
+  marshallSignSquareConfig_const_zero K L
+
+example (K L : ℕ) :
+    marshallSignSquareConfig K L
+        (fun _ : Fin (2 * K) × Fin (2 * L) => (1 : Fin 2)) = 1 :=
+  marshallSignSquareConfig_const_one K L
+
+example (K L M : ℕ) :
+    marshallSignCubicConfig K L M
+        (fun _ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) =>
+          (0 : Fin 2)) = 1 :=
+  marshallSignCubicConfig_const_zero K L M
+
+example (K L M : ℕ) :
+    marshallSignCubicConfig K L M
+        (fun _ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) =>
+          (1 : Fin 2)) = 1 :=
+  marshallSignCubicConfig_const_one K L M
+
 /-! ## Marshall-rotated states equal the Néel states -/
 
 example (K : ℕ) :
