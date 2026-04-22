@@ -365,7 +365,16 @@ example :
       basisVec (flipConfig (neelCubicConfig 2 2 3)) :=
   timeReversalSpinHalfMulti_neelCubicState 2 2 3
 
-/-! ## Marshall sign on the parity-coloured chain -/
+/-! ## Marshall sign on the parity-coloured chain
+
+The chain / 2D / 3D `marshallSign*Config` defs are deprecated as
+of `2026-04-22` (Phase 3 PR P3-4). The tests below intentionally
+exercise the deprecated names to confirm backward compatibility,
+so the deprecation linter is silenced for the remainder of this
+file. The deprecation warning itself is captured separately in
+the `#guard_msgs` block at the end. -/
+
+set_option linter.deprecated false
 
 example (K : ℕ) :
     marshallSignChainConfig K (neelChainConfig K) = 1 :=
@@ -810,5 +819,45 @@ example : ∀ p : (Fin 2 × Fin 2) × Fin 2,
       (if (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
         then (0 : Fin 2) else 1) := by
   decide
+
+/-! ## F. `#guard_msgs` deprecation-warning capture (Phase 3 PR
+P3-4, refactor plan v4 §2.1 method F)
+
+Confirms that referring to the deprecated chain / 2D / 3D
+`marshallSign*Config` defs emits the expected deprecation
+warning pointing to the generic `marshallSignOf`. The
+`set_option linter.deprecated true` re-enables the linter for
+this block (the file-level `set_option linter.deprecated false`
+above silences it for the backward-compat tests). -/
+
+set_option linter.deprecated true
+
+/--
+warning: `LatticeSystem.Quantum.marshallSignChainConfig` has been deprecated: use the generic `marshallSignOf` with the chain
+parity indicator `fun x : Fin (2*K) => decide (x.val % 2 = 0)`
+---
+info: marshallSignChainConfig : (K : ℕ) → (Fin (2 * K) → Fin 2) → ℂ
+-/
+#guard_msgs in
+#check @marshallSignChainConfig
+
+/--
+warning: `LatticeSystem.Quantum.marshallSignSquareConfig` has been deprecated: use the generic `marshallSignOf` with the 2D
+parity indicator `fun p => decide ((p.1.val + p.2.val) % 2 = 0)`
+---
+info: marshallSignSquareConfig : (K L : ℕ) → (Fin (2 * K) × Fin (2 * L) → Fin 2) → ℂ
+-/
+#guard_msgs in
+#check @marshallSignSquareConfig
+
+/--
+warning: `LatticeSystem.Quantum.marshallSignCubicConfig` has been deprecated: use the generic `marshallSignOf` with the 3D
+parity indicator
+`fun p => decide ((p.1.1.val + p.1.2.val + p.2.val) % 2 = 0)`
+---
+info: marshallSignCubicConfig : (K L M : ℕ) → ((Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2) → ℂ
+-/
+#guard_msgs in
+#check @marshallSignCubicConfig
 
 end LatticeSystem.Tests.NeelState
