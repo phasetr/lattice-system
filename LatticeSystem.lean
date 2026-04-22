@@ -29,6 +29,7 @@ import LatticeSystem.Fermion.JWAbstract
 import LatticeSystem.Tests.Sanity
 import LatticeSystem.Tests.Graph
 import LatticeSystem.Tests.Heisenberg
+import LatticeSystem.Tests.ManyBody
 import LatticeSystem.Tests.Hubbard
 import LatticeSystem.Tests.JordanWigner
 import LatticeSystem.Tests.Ising

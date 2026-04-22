@@ -387,6 +387,47 @@ function that is `1` at `σ` and `0` elsewhere. -/
 def basisVec (σ : Λ → Fin 2) : (Λ → Fin 2) → ℂ :=
   fun τ => if τ = σ then 1 else 0
 
+/-- Explicit `if`-form of `basisVec σ τ` (definitional). -/
+theorem basisVec_apply (σ τ : Λ → Fin 2) :
+    basisVec σ τ = if τ = σ then 1 else 0 := rfl
+
+/-- Diagonal value: `basisVec σ σ = 1`. -/
+@[simp]
+theorem basisVec_self (σ : Λ → Fin 2) : basisVec σ σ = 1 := by
+  unfold basisVec; rw [if_pos rfl]
+
+/-- Off-diagonal value: `basisVec σ τ = 0` when `τ ≠ σ`. -/
+theorem basisVec_of_ne {σ τ : Λ → Fin 2} (h : τ ≠ σ) :
+    basisVec σ τ = 0 := by
+  unfold basisVec; rw [if_neg h]
+
+/-- Selector sum: `∑ τ, f τ · basisVec σ τ = f σ`. -/
+theorem sum_mul_basisVec (σ : Λ → Fin 2)
+    (f : (Λ → Fin 2) → ℂ) :
+    ∑ τ : Λ → Fin 2, f τ * basisVec σ τ = f σ := by
+  rw [Fintype.sum_eq_single σ (fun τ hτ => by
+    rw [basisVec_of_ne hτ, mul_zero])]
+  rw [basisVec_self, mul_one]
+
+/-- Selector sum (left-multiplied): `∑ τ, basisVec σ τ · f τ = f σ`. -/
+theorem basisVec_sum_mul (σ : Λ → Fin 2)
+    (f : (Λ → Fin 2) → ℂ) :
+    ∑ τ : Λ → Fin 2, basisVec σ τ * f τ = f σ := by
+  simp_rw [mul_comm (basisVec σ _) _]
+  exact sum_mul_basisVec σ f
+
+/-- Orthonormality of the standard basis vectors:
+
+  `∑ τ, basisVec σ τ · basisVec ρ τ = if ρ = σ then 1 else 0`.
+
+This is the real bilinear pairing (`basisVec` values are 0 or 1,
+so no complex conjugation is needed). -/
+theorem basisVec_inner (σ ρ : Λ → Fin 2) :
+    ∑ τ : Λ → Fin 2, basisVec σ τ * basisVec ρ τ =
+      if ρ = σ then 1 else 0 := by
+  rw [sum_mul_basisVec ρ (basisVec σ)]
+  rfl
+
 /-- Tasaki eq. (2.2.4) for `S = 1/2`: the site-`i` operator acts on a
 computational-basis state `|σ⟩` by sending `σ_i` through the `Fin 2`
 matrix `A`, giving a superposition over the two possible values of the
