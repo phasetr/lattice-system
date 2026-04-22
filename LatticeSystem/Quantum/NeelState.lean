@@ -523,6 +523,34 @@ theorem timeReversalSpinHalfMulti_neelSquareState_one_one :
     simp [flipConfig, neelSquareConfig, timeReversalSign]
   rw [hprod, one_smul]
 
+/-! ## 3D Néel time-reversal action (K = L = M = 1 instance) -/
+
+/-- Concrete time-reversal action on the 3D cubic Néel state for
+the `K = L = M = 1` checkerboard (8 sites). The 8-site cube has
+4 up spins and 4 down spins, so under `flipConfig` the resulting
+`timeReversalSign` product is `(-1)^4 · 1^4 = 1`:
+
+  `Θ̂_tot (neelCubicState 1 1 1) =
+    basisVec (flipConfig (neelCubicConfig 1 1 1))`.
+
+This is the 3-dimensional analogue of the time-reversal computations
+on the 1D K = 1 chain (#251) and the 2D K = L = 1 plaquette (#256). -/
+theorem timeReversalSpinHalfMulti_neelCubicState_one_one_one :
+    timeReversalSpinHalfMulti (neelCubicState 1 1 1) =
+      basisVec (flipConfig (neelCubicConfig 1 1 1)) := by
+  unfold neelCubicState
+  rw [timeReversalSpinHalfMulti_basisVec]
+  have hprod :
+      (∏ p : (Fin (2 * 1) × Fin (2 * 1)) × Fin (2 * 1),
+          timeReversalSign (flipConfig (neelCubicConfig 1 1 1) p))
+        = (1 : ℂ) := by
+    rw [Fintype.prod_prod_type, Fintype.prod_prod_type]
+    rw [Fin.prod_univ_two, Fin.prod_univ_two, Fin.prod_univ_two,
+        Fin.prod_univ_two, Fin.prod_univ_two, Fin.prod_univ_two,
+        Fin.prod_univ_two]
+    simp [flipConfig, neelCubicConfig, timeReversalSign]
+  rw [hprod, one_smul]
+
 /-! ## 3D cubic Néel per-bond `Ŝ_x · Ŝ_y` actions -/
 
 /-- 3D x-axis bond `((i,j,k), (i+1,j,k))`: antiparallel under
