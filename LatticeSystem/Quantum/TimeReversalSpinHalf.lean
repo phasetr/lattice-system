@@ -109,4 +109,50 @@ theorem timeReversalSpinHalf_sq (v : Fin 2 → ℂ) :
   fin_cases i <;>
     simp [timeReversalSpinHalf, Pi.neg_apply]
 
+/-! ## Time-reversal flips the spin: `Θ̂ Ŝ Θ̂⁻¹ = -Ŝ`
+
+Tasaki §2.3 eq. (2.3.14) (single spin): the antilinear time
+reversal `Θ̂` flips the sign of every spin component,
+`Θ̂ Ŝ^(α) Θ̂⁻¹ = -Ŝ^(α)` for `α = 1, 2, 3`. Equivalently, the
+equivariance form
+
+  `Θ̂ (Ŝ^(α) v) = (-Ŝ^(α)) (Θ̂ v)`
+
+holds for every state `v : Fin 2 → ℂ`. We record the equivariance
+form (the matrix-action form is more useful in this Matrix-based
+framework than the `Θ̂⁻¹ Â Θ̂` form). -/
+
+/-- `Θ̂` flips the sign of `Ŝ^(1)`:
+`Θ̂ (Ŝ^(1) · v) = (-Ŝ^(1)) · (Θ̂ v)` for every `v : Fin 2 → ℂ`. -/
+theorem timeReversalSpinHalf_spinHalfOp1_mulVec (v : Fin 2 → ℂ) :
+    timeReversalSpinHalf (spinHalfOp1.mulVec v) =
+      (-spinHalfOp1).mulVec (timeReversalSpinHalf v) := by
+  rw [Matrix.neg_mulVec]
+  funext i
+  fin_cases i <;>
+    simp [timeReversalSpinHalf, spinHalfOp1, pauliX, Matrix.mulVec,
+      dotProduct, Fin.sum_univ_two, Complex.conj_ofNat] <;> ring
+
+/-- `Θ̂` flips the sign of `Ŝ^(2)`:
+`Θ̂ (Ŝ^(2) · v) = (-Ŝ^(2)) · (Θ̂ v)`. -/
+theorem timeReversalSpinHalf_spinHalfOp2_mulVec (v : Fin 2 → ℂ) :
+    timeReversalSpinHalf (spinHalfOp2.mulVec v) =
+      (-spinHalfOp2).mulVec (timeReversalSpinHalf v) := by
+  rw [Matrix.neg_mulVec]
+  funext i
+  fin_cases i <;>
+    simp [timeReversalSpinHalf, spinHalfOp2, pauliY, Matrix.mulVec,
+      dotProduct, Fin.sum_univ_two, Complex.conj_ofNat] <;> ring
+
+/-- `Θ̂` flips the sign of `Ŝ^(3)`:
+`Θ̂ (Ŝ^(3) · v) = (-Ŝ^(3)) · (Θ̂ v)`. -/
+theorem timeReversalSpinHalf_spinHalfOp3_mulVec (v : Fin 2 → ℂ) :
+    timeReversalSpinHalf (spinHalfOp3.mulVec v) =
+      (-spinHalfOp3).mulVec (timeReversalSpinHalf v) := by
+  rw [Matrix.neg_mulVec]
+  funext i
+  fin_cases i <;>
+    simp [timeReversalSpinHalf, spinHalfOp3, pauliZ, Matrix.mulVec,
+      dotProduct, Fin.sum_univ_two, Complex.conj_ofNat] <;> ring
+
 end LatticeSystem.Quantum
