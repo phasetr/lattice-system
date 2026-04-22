@@ -498,6 +498,31 @@ theorem spinHalfDot_mulVec_neelSquareState_vertical_adjacent
     · have hp1 : (i + (j + 1)) % 2 = 0 := by omega
       simp [hp, hp1]
 
+/-! ## 2D Néel time-reversal action (K = L = 1 instance) -/
+
+/-- Concrete time-reversal action on the 2D Néel state for the
+`K = L = 1` checkerboard (4 sites). The `|Λ| = 4` is even and the
+Néel configuration has equal numbers of ups and downs (2 each),
+so the `(-1)^(# down spins in flip σ)` sign factor equals `1`:
+
+  `Θ̂_tot (neelSquareState 1 1) =
+    basisVec (flipConfig (neelSquareConfig 1 1))`.
+
+This is the 2-dimensional analogue of the time-reversal
+computation on the chain (#251). -/
+theorem timeReversalSpinHalfMulti_neelSquareState_one_one :
+    timeReversalSpinHalfMulti (neelSquareState 1 1) =
+      basisVec (flipConfig (neelSquareConfig 1 1)) := by
+  unfold neelSquareState
+  rw [timeReversalSpinHalfMulti_basisVec]
+  have hprod : (∏ p : Fin (2 * 1) × Fin (2 * 1),
+        timeReversalSign (flipConfig (neelSquareConfig 1 1) p))
+      = (1 : ℂ) := by
+    rw [Fintype.prod_prod_type]
+    rw [Fin.prod_univ_two, Fin.prod_univ_two, Fin.prod_univ_two]
+    simp [flipConfig, neelSquareConfig, timeReversalSign]
+  rw [hprod, one_smul]
+
 /-! ## 3D cubic Néel per-bond `Ŝ_x · Ŝ_y` actions -/
 
 /-- 3D x-axis bond `((i,j,k), (i+1,j,k))`: antiparallel under

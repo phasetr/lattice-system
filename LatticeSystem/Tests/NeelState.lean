@@ -185,6 +185,13 @@ example (K L : ℕ) {i j : ℕ}
         (1 / 4 : ℂ) • neelSquareState K L :=
   spinHalfDot_mulVec_neelSquareState_vertical_adjacent K L hi hj
 
+/-! ## 2D Néel state K = L = 1 time-reversal -/
+
+example :
+    timeReversalSpinHalfMulti (neelSquareState 1 1) =
+      basisVec (flipConfig (neelSquareConfig 1 1)) :=
+  timeReversalSpinHalfMulti_neelSquareState_one_one
+
 /-! ## 3D cubic Néel state -/
 
 example (K L M : ℕ) :
