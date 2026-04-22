@@ -6,6 +6,7 @@ import LatticeSystem.Quantum.NeelState.Definition
 import LatticeSystem.Quantum.NeelState.Definition2D
 import LatticeSystem.Quantum.NeelState.Definition3D
 import LatticeSystem.Quantum.TimeReversalMulti
+import LatticeSystem.Quantum.TimeReversalMulti.Heisenberg
 
 /-!
 # Time-reversal action on the Néel state (Tasaki §2.3 ↔ §2.5)
