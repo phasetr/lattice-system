@@ -69,4 +69,19 @@ example (x : Fin 3) (v : (Fin 3 → Fin 2) → ℂ) :
       (-(onSite x pauliZ)).mulVec (timeReversalSpinHalfMulti v) :=
   timeReversalSpinHalfMulti_onSite_pauliZ_mulVec x v
 
+/-! ## `siteFlipAt` helpers -/
+
+example (τ : Fin 3 → Fin 2) (x : Fin 3) :
+    siteFlipAt τ x x = 1 - τ x := siteFlipAt_self τ x
+
+example (τ : Fin 3 → Fin 2) {x y : Fin 3} (h : y ≠ x) :
+    siteFlipAt τ x y = τ y := siteFlipAt_of_ne τ h
+
+example (τ : Fin 3 → Fin 2) (x : Fin 3) :
+    flipConfig (siteFlipAt τ x) = siteFlipAt (flipConfig τ) x :=
+  flipConfig_siteFlipAt_comm τ x
+
+example (τ : Fin 3 → Fin 2) (x : Fin 3) :
+    siteFlipAt (siteFlipAt τ x) x = τ := siteFlipAt_involutive τ x
+
 end LatticeSystem.Tests.TimeReversalMulti
