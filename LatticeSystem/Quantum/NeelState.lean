@@ -23,7 +23,11 @@ is now a thin re-import of nine sub-files under
 
 | sub-file | content |
 |---|---|
-| `Definition.lean` | chain Néel config / state, magnetisation = 0, H_0 |
+| `Definition.lean` | generic graph-centric `neelStateOf` + |
+|                   | `_antiparallel` per-bond action / expectation primitives |
+|                   | (Tasaki §2.5 (2.5.2)–(2.5.4) graph-centric form, Phase 3 |
+|                   | PR #331 / #332); chain Néel config / state, |
+|                   | magnetisation = 0, H_0 |
 | `Definition2D.lean` | 2D checkerboard analogue |
 | `Definition3D.lean` | 3D cubic checkerboard analogue |
 | `BondAction/Chain.lean` | per-bond `Ŝ_x · Ŝ_y` action on the chain (adjacent + wrap) |
