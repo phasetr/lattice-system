@@ -185,4 +185,26 @@ example (K L : ℕ) {i j : ℕ}
         (1 / 4 : ℂ) • neelSquareState K L :=
   spinHalfDot_mulVec_neelSquareState_vertical_adjacent K L hi hj
 
+/-! ## 3D cubic Néel state -/
+
+example (K L M : ℕ) :
+    magnetization
+        ((Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))
+        (neelCubicConfig K L M) = 0 :=
+  neelCubicConfig_magnetization_zero K L M
+
+example (K L M : ℕ) :
+    neelCubicState K L M ∈
+      magnetizationSubspace
+        ((Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))
+        (0 : ℂ) :=
+  neelCubicState_mem_magnetizationSubspace_zero K L M
+
+example :
+    neelCubicState 1 1 1 ∈
+      magnetizationSubspace
+        ((Fin (2 * 1) × Fin (2 * 1)) × Fin (2 * 1))
+        (0 : ℂ) :=
+  neelCubicState_mem_magnetizationSubspace_zero 1 1 1
+
 end LatticeSystem.Tests.NeelState
