@@ -54,4 +54,12 @@ example (v : (Fin 4 → Fin 2) → ℂ) :
   rw [timeReversalSpinHalfMulti_sq]
   simp [Fintype.card_fin, show ((-1 : ℂ) ^ 4) = 1 from by norm_num]
 
+/-! ## `Θ̂_tot` action on basis states -/
+
+example (σ : Fin 3 → Fin 2) :
+    timeReversalSpinHalfMulti (basisVec σ) =
+      (∏ x : Fin 3, timeReversalSign (flipConfig σ x)) •
+        basisVec (flipConfig σ) :=
+  timeReversalSpinHalfMulti_basisVec σ
+
 end LatticeSystem.Tests.TimeReversalMulti
