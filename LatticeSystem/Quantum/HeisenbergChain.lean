@@ -332,6 +332,34 @@ theorem cubicLatticeHeisenberg_partitionFn_im (β J : ℝ) (N : ℕ) :
   partitionFn_im_of_isHermitian
     (cubicLatticeHeisenberg_isHermitian N J) β
 
+/-! ## Real-coupling identifications (Tasaki §2.3 input)
+
+The chain / lattice coupling families above all take a *real*
+parameter `J : ℝ` and produce complex couplings via `(-(J : ℂ))`,
+which are entry-wise real. This is the key hypothesis required by
+`timeReversalSpinHalfMulti_heisenbergHamiltonian_mulVec` to lift
+to time-reversal invariance. -/
+
+/-- Every entry of `openChainCoupling N J` is real (under complex
+conjugation). -/
+theorem openChainCoupling_conj (N : ℕ) (J : ℝ) (x y : Fin (N + 1)) :
+    starRingEnd ℂ (openChainCoupling N J x y)
+      = openChainCoupling N J x y := by
+  apply LatticeSystem.Lattice.couplingOf_real
+  show star (-(J : ℂ)) = -(J : ℂ)
+  rw [star_neg]
+  exact congrArg Neg.neg (Complex.conj_ofReal J)
+
+/-- Every entry of `periodicChainCoupling N J` is real. -/
+theorem periodicChainCoupling_conj
+    (N : ℕ) (J : ℝ) (x y : Fin (N + 2)) :
+    starRingEnd ℂ (periodicChainCoupling N J x y)
+      = periodicChainCoupling N J x y := by
+  apply LatticeSystem.Lattice.couplingOf_real
+  show star (-(J : ℂ)) = -(J : ℂ)
+  rw [star_neg]
+  exact congrArg Neg.neg (Complex.conj_ofReal J)
+
 /-! ## Heisenberg-on-graph SU(2) invariance
 
 The existing generic-`J` SU(2)-invariance theorems for

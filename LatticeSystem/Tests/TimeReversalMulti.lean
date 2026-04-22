@@ -165,4 +165,20 @@ example (J : Fin 3 → Fin 3 → ℂ) (hJ : ∀ x y, starRingEnd ℂ (J x y) = J
       (heisenbergHamiltonian J).mulVec (timeReversalSpinHalfMulti v) :=
   timeReversalSpinHalfMulti_heisenbergHamiltonian_mulVec J hJ v
 
+/-! ## Chain Heisenberg time-reversal invariance -/
+
+example (N : ℕ) (J : ℝ) (v : (Fin (N + 1) → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((heisenbergHamiltonian (openChainCoupling N J)).mulVec v) =
+      (heisenbergHamiltonian (openChainCoupling N J)).mulVec
+        (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_openChainHeisenberg_mulVec N J v
+
+example (N : ℕ) (J : ℝ) (v : (Fin (N + 2) → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((heisenbergHamiltonian (periodicChainCoupling N J)).mulVec v) =
+      (heisenbergHamiltonian (periodicChainCoupling N J)).mulVec
+        (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_periodicChainHeisenberg_mulVec N J v
+
 end LatticeSystem.Tests.TimeReversalMulti

@@ -6,6 +6,7 @@ import LatticeSystem.Quantum.ManyBody
 import LatticeSystem.Quantum.Pauli
 import LatticeSystem.Quantum.SpinHalf
 import LatticeSystem.Quantum.SpinDot
+import LatticeSystem.Quantum.HeisenbergChain
 import LatticeSystem.Quantum.TimeReversalSpinHalf
 
 /-!
@@ -812,5 +813,32 @@ theorem timeReversalSpinHalfMulti_heisenbergHamiltonian_mulVec
   intro y _
   rw [timeReversalSpinHalfMulti_smul, hJ x y,
     timeReversalSpinHalfMulti_spinHalfDot_mulVec]
+
+/-! ## Concrete time-reversal invariance: chain Heisenberg
+
+Specialisations of the Hamiltonian-level invariance to the
+concrete chain Hamiltonians used throughout the library. -/
+
+/-- Time-reversal invariance of the open-chain Heisenberg
+Hamiltonian (real coupling `J : ℝ`). -/
+theorem timeReversalSpinHalfMulti_openChainHeisenberg_mulVec
+    (N : ℕ) (J : ℝ) (v : (Fin (N + 1) → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((heisenbergHamiltonian (openChainCoupling N J)).mulVec v) =
+      (heisenbergHamiltonian (openChainCoupling N J)).mulVec
+        (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_heisenbergHamiltonian_mulVec
+    (openChainCoupling N J) (openChainCoupling_conj N J) v
+
+/-- Time-reversal invariance of the periodic-chain Heisenberg
+Hamiltonian (real coupling `J : ℝ`). -/
+theorem timeReversalSpinHalfMulti_periodicChainHeisenberg_mulVec
+    (N : ℕ) (J : ℝ) (v : (Fin (N + 2) → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((heisenbergHamiltonian (periodicChainCoupling N J)).mulVec v) =
+      (heisenbergHamiltonian (periodicChainCoupling N J)).mulVec
+        (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_heisenbergHamiltonian_mulVec
+    (periodicChainCoupling N J) (periodicChainCoupling_conj N J) v
 
 end LatticeSystem.Quantum
