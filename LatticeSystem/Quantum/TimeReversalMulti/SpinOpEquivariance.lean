@@ -19,9 +19,6 @@ namespace LatticeSystem.Quantum
 
 open Matrix
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedDecidableInType false
-
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
 /-! ## Multi-site spin sign flip: `Θ̂_tot σ^z_x = -σ^z_x Θ̂_tot`
@@ -139,16 +136,19 @@ leaving other slots fixed.
 def siteFlipAt (τ : Λ → Fin 2) (x : Λ) : Λ → Fin 2 :=
   Function.update τ x (1 - τ x)
 
+omit [Fintype Λ] in
 @[simp] theorem siteFlipAt_self (τ : Λ → Fin 2) (x : Λ) :
     siteFlipAt τ x x = 1 - τ x := by
   unfold siteFlipAt
   rw [Function.update_self]
 
+omit [Fintype Λ] in
 theorem siteFlipAt_of_ne (τ : Λ → Fin 2) {x y : Λ} (h : y ≠ x) :
     siteFlipAt τ x y = τ y := by
   unfold siteFlipAt
   rw [Function.update_of_ne h]
 
+omit [Fintype Λ] in
 /-- `flipConfig` and `siteFlipAt` commute: flipping every site and
 then flipping site `x` again equals flipping site `x` first then
 every site. -/
@@ -161,6 +161,7 @@ theorem flipConfig_siteFlipAt_comm (τ : Λ → Fin 2) (x : Λ) :
   · rw [flipConfig_apply, siteFlipAt_of_ne _ hy,
         siteFlipAt_of_ne _ hy, flipConfig_apply]
 
+omit [Fintype Λ] in
 /-- `siteFlipAt` is involutive: flipping the same site twice
 returns the original configuration. -/
 theorem siteFlipAt_involutive (τ : Λ → Fin 2) (x : Λ) :

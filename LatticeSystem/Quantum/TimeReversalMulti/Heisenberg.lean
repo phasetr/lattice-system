@@ -22,9 +22,6 @@ namespace LatticeSystem.Quantum
 
 open Matrix
 
-set_option linter.unusedSectionVars false
-set_option linter.unusedDecidableInType false
-
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
 /-! ## Time-reversal invariance of bilinear `Ŝ_x · Ŝ_y` (Tasaki §2.3)
@@ -106,12 +103,14 @@ private theorem timeReversalSpinHalfMulti_onSite_spinHalfOp3_mul_onSite_mulVec
     Matrix.neg_mulVec, Matrix.neg_mulVec,
     Matrix.mulVec_neg, neg_neg]
 
+omit [DecidableEq Λ] in
 /-- `Θ̂_tot` distributes over a finite sum of states. -/
 private theorem timeReversalSpinHalfMulti_sum
-    {ι : Type*} [DecidableEq ι]
+    {ι : Type*}
     (s : Finset ι) (f : ι → (Λ → Fin 2) → ℂ) :
     timeReversalSpinHalfMulti (∑ i ∈ s, f i) =
       ∑ i ∈ s, timeReversalSpinHalfMulti (f i) := by
+  classical
   induction s using Finset.induction with
   | empty =>
     funext τ
