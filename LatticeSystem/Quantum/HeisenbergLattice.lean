@@ -556,7 +556,7 @@ theorem squareLatticeCoupling_conj
     starRingEnd ℂ (squareLatticeCoupling N J x y)
       = squareLatticeCoupling N J x y := by
   apply LatticeSystem.Lattice.couplingOf_real
-  show star (-(J : ℂ)) = -(J : ℂ)
+  change star (-(J : ℂ)) = -(J : ℂ)
   rw [star_neg]
   exact congrArg Neg.neg (Complex.conj_ofReal J)
 
@@ -566,7 +566,7 @@ theorem squareTorusCoupling_conj
     starRingEnd ℂ (squareTorusCoupling N J x y)
       = squareTorusCoupling N J x y := by
   apply LatticeSystem.Lattice.couplingOf_real
-  show star (-(J : ℂ)) = -(J : ℂ)
+  change star (-(J : ℂ)) = -(J : ℂ)
   rw [star_neg]
   exact congrArg Neg.neg (Complex.conj_ofReal J)
 
@@ -577,7 +577,7 @@ theorem cubicLatticeCoupling_conj
     starRingEnd ℂ (cubicLatticeCoupling N J x y)
       = cubicLatticeCoupling N J x y := by
   apply LatticeSystem.Lattice.couplingOf_real
-  show star (-(J : ℂ)) = -(J : ℂ)
+  change star (-(J : ℂ)) = -(J : ℂ)
   rw [star_neg]
   exact congrArg Neg.neg (Complex.conj_ofReal J)
 
