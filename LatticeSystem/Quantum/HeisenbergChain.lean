@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import LatticeSystem.Quantum.SpinDot
 import LatticeSystem.Quantum.IsingChain
 import LatticeSystem.Quantum.GibbsState
+import LatticeSystem.Quantum.GibbsState.Covariance
 import LatticeSystem.Quantum.MagnetizationSubspace
 import LatticeSystem.Lattice.Graph
 
