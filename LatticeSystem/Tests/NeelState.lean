@@ -749,4 +749,60 @@ example (K L M : ℕ) :
       timeReversalSpinHalfMulti (neelCubicState K L M) :=
   marshallCubicState_flipConfig_eq_timeReversalSpinHalfMulti K L M
 
+/-! ## A. decide-based universal on `Fin 4 = Fin (2*2)` (Phase 1
+PR 3 strengthening, refactor plan v4 §2.1 method A) -/
+
+/-- Universal alternation property: `neelChainConfig 2` flips
+between adjacent indices. -/
+example :
+    ∀ i : Fin 3,
+        neelChainConfig 2 (⟨i.val, by omega⟩ : Fin 4) ≠
+          neelChainConfig 2 (⟨i.val + 1, by omega⟩ : Fin 4) := by
+  decide
+
+/-- Universal magnetisation balance on `Fin 4`: `neelChainConfig 2`
+has 2 ups and 2 downs. -/
+example :
+    (Finset.univ.filter
+        (fun i : Fin 4 => neelChainConfig 2 i = (0 : Fin 2))).card = 2 := by
+  decide
+
+/-- Universal parity colouring on `Fin 4`: even indices `↑`, odd `↓`. -/
+example :
+    ∀ i : Fin 4,
+        (neelChainConfig 2 i = (0 : Fin 2)) ↔ (i.val % 2 = 0) := by
+  decide
+
+/-- Universal alternation property on `Fin 6 = Fin (2 * 3)`. -/
+example :
+    ∀ i : Fin 5,
+        neelChainConfig 3 (⟨i.val, by omega⟩ : Fin 6) ≠
+          neelChainConfig 3 (⟨i.val + 1, by omega⟩ : Fin 6) := by
+  decide
+
+/-! ## C. bridge identity: `neelChainConfig 1 = upDown` (Phase 1
+PR 3 strengthening) -/
+
+/-- The chain `K = 1` Néel configuration coincides with `upDown`
+(already a named lemma; reaffirmed here as a bridge test for
+test-renaming resilience). -/
+example : neelChainConfig 1 = upDown :=
+  neelChainConfig_one_eq_upDown
+
+/-! ## G. small exhaustive on `Fin 4`: per-site Néel values,
+per-bond antiparallel (Phase 1 PR 3 strengthening) -/
+
+/-- 2D Néel configuration on `Fin (2*1) × Fin (2*1)` exhaustive. -/
+example : ∀ p : Fin 2 × Fin 2,
+    neelSquareConfig 1 1 p =
+      (if (p.1.val + p.2.val) % 2 = 0 then (0 : Fin 2) else 1) := by
+  decide
+
+/-- 3D Néel configuration on `((Fin 2) × (Fin 2)) × (Fin 2)` exhaustive. -/
+example : ∀ p : (Fin 2 × Fin 2) × Fin 2,
+    neelCubicConfig 1 1 1 p =
+      (if (p.1.1.val + p.1.2.val + p.2.val) % 2 = 0
+        then (0 : Fin 2) else 1) := by
+  decide
+
 end LatticeSystem.Tests.NeelState
