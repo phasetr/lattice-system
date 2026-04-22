@@ -600,6 +600,25 @@ example (K L M : ℕ) {i j k : ℕ}
             (neelCubicState K L M)) τ = -(1 / 4 : ℂ) :=
   neelCubicState_inner_spinHalfDot_x_adjacent_eq_neg_one_quarter K L M hi hj hk
 
+/-! ## S^z S^z correlation on Néel state -/
+
+example (K : ℕ) {i : ℕ} (hi : i + 1 < 2 * K) :
+    ∑ τ : Fin (2 * K) → Fin 2,
+        neelChainState K τ *
+          ((onSite (⟨i, by omega⟩ : Fin (2 * K)) spinHalfOp3 *
+              onSite (⟨i + 1, hi⟩ : Fin (2 * K))
+                spinHalfOp3).mulVec
+            (neelChainState K)) τ = -(1 / 4 : ℂ) :=
+  neelChainState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_adjacent_eq_neg_one_quarter K hi
+
+example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (x y : Λ) (σ : Λ → Fin 2) :
+    ∑ τ : Λ → Fin 2,
+        basisVec σ τ *
+          ((onSite x spinHalfOp3 * onSite y spinHalfOp3 :
+              ManyBodyOp Λ).mulVec (basisVec σ)) τ =
+      spinHalfSign (σ x) * spinHalfSign (σ y) :=
+  inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec x y σ
+
 /-! ## Néel chain energy expectation (K=1 open chain) -/
 
 example (J : ℝ) :

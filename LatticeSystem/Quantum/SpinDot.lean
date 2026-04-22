@@ -613,6 +613,48 @@ theorem basisSwap_ne_self {x y : Λ} (hxy : x ≠ y)
   rw [Function.update_of_ne hxy, Function.update_self] at h1
   exact h1.symm
 
+/-- Generic `Ŝ^(3)_x · Ŝ^(3)_y` action on a basis vector:
+
+  `(onSite x Ŝ^(3) * onSite y Ŝ^(3)) · basisVec σ
+    = (spinHalfSign(σ x) · spinHalfSign(σ y)) · basisVec σ`.
+
+Composes the single-site action `Ŝ^(3)_x · |σ⟩ = ε_x · |σ⟩` twice
+(`onSite_spinHalfOp3_mulVec_basisVec`), where `ε_x = ±1/2`. The
+basis vector is an eigenvector of `Ŝ^(3)_x · Ŝ^(3)_y`. -/
+theorem onSite_spinHalfOp3_mul_onSite_spinHalfOp3_mulVec_basisVec
+    (x y : Λ) (σ : Λ → Fin 2) :
+    (onSite x spinHalfOp3 * onSite y spinHalfOp3 :
+        ManyBodyOp Λ).mulVec (basisVec σ) =
+      (spinHalfSign (σ x) * spinHalfSign (σ y)) • basisVec σ := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [onSite_spinHalfOp3_mulVec_basisVec, Matrix.mulVec_smul,
+    onSite_spinHalfOp3_mulVec_basisVec]
+  rw [smul_smul, mul_comm (spinHalfSign (σ y))]
+
+/-- Generic `⟨basisVec σ, Ŝ^(3)_x · Ŝ^(3)_y · basisVec σ⟩
+= spinHalfSign(σ x) · spinHalfSign(σ y)`. The diagonal-only part
+of the spin-spin correlator. For antiparallel `σ x ≠ σ y` this
+gives `(1/2)(-1/2) = -1/4` (matching the full
+`Ŝ_x · Ŝ_y` expectation, since the off-diagonal `Ŝ^x·Ŝ^x +
+Ŝ^y·Ŝ^y` parts map `|σ⟩` to `|swap σ⟩ ⊥ |σ⟩` and vanish on the
+diagonal). -/
+theorem inner_basisVec_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_basisVec
+    (x y : Λ) (σ : Λ → Fin 2) :
+    ∑ τ : Λ → Fin 2,
+        basisVec σ τ *
+          ((onSite x spinHalfOp3 * onSite y spinHalfOp3 :
+              ManyBodyOp Λ).mulVec (basisVec σ)) τ =
+      spinHalfSign (σ x) * spinHalfSign (σ y) := by
+  rw [onSite_spinHalfOp3_mul_onSite_spinHalfOp3_mulVec_basisVec]
+  simp_rw [Pi.smul_apply, smul_eq_mul]
+  simp_rw [show ∀ τ : Λ → Fin 2,
+      basisVec σ τ *
+        ((spinHalfSign (σ x) * spinHalfSign (σ y)) * basisVec σ τ) =
+        (spinHalfSign (σ x) * spinHalfSign (σ y)) *
+          (basisVec σ τ * basisVec σ τ) from fun τ => by ring]
+  rw [← Finset.mul_sum, basisVec_inner, if_pos rfl]
+  ring
+
 /-- Generic per-bond expectation of `Ŝ_x · Ŝ_y` on an antiparallel
 basis vector:
 
