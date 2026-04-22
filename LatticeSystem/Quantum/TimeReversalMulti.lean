@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.ManyBody
 import LatticeSystem.Quantum.Pauli
+import LatticeSystem.Quantum.SpinHalf
 import LatticeSystem.Quantum.TimeReversalSpinHalf
 
 /-!
@@ -600,5 +601,61 @@ theorem timeReversalSpinHalfMulti_onSite_pauliX_mulVec
     ← flipConfig_siteFlipAt_comm,
     timeReversalSign_prod_siteFlipAt]
   ring
+
+/-! ### `Ŝ^(α)` analogues — Tasaki eq. (2.3.14) for spin-1/2 ops
+
+These are direct corollaries of the corresponding `σ^(α)` Pauli
+versions via `Ŝ^(α) = (1/2) • σ^(α)`. -/
+
+/-- Multi-site sign-flip equivariance for `Ŝ^(1) = σ^x / 2`:
+
+  `Θ̂_tot ((onSite x Ŝ^(1)) v) = (-(onSite x Ŝ^(1)))(Θ̂_tot v)`.
+
+Direct corollary of the `σ^x` version
+(`timeReversalSpinHalfMulti_onSite_pauliX_mulVec`) by scalar
+multiplication. -/
+theorem timeReversalSpinHalfMulti_onSite_spinHalfOp1_mulVec
+    (x : Λ) (v : (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((onSite x spinHalfOp1).mulVec v) =
+      (-(onSite x spinHalfOp1)).mulVec
+        (timeReversalSpinHalfMulti v) := by
+  unfold spinHalfOp1
+  rw [onSite_smul, Matrix.smul_mulVec,
+    timeReversalSpinHalfMulti_smul,
+    show starRingEnd ℂ ((1 : ℂ) / 2) = 1 / 2 from by
+      rw [map_div₀]; simp [Complex.conj_ofNat],
+    timeReversalSpinHalfMulti_onSite_pauliX_mulVec]
+  rw [← smul_neg, Matrix.smul_mulVec]
+
+/-- Multi-site sign-flip equivariance for `Ŝ^(2) = σ^y / 2`. -/
+theorem timeReversalSpinHalfMulti_onSite_spinHalfOp2_mulVec
+    (x : Λ) (v : (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((onSite x spinHalfOp2).mulVec v) =
+      (-(onSite x spinHalfOp2)).mulVec
+        (timeReversalSpinHalfMulti v) := by
+  unfold spinHalfOp2
+  rw [onSite_smul, Matrix.smul_mulVec,
+    timeReversalSpinHalfMulti_smul,
+    show starRingEnd ℂ ((1 : ℂ) / 2) = 1 / 2 from by
+      rw [map_div₀]; simp [Complex.conj_ofNat],
+    timeReversalSpinHalfMulti_onSite_pauliY_mulVec]
+  rw [← smul_neg, Matrix.smul_mulVec]
+
+/-- Multi-site sign-flip equivariance for `Ŝ^(3) = σ^z / 2`. -/
+theorem timeReversalSpinHalfMulti_onSite_spinHalfOp3_mulVec
+    (x : Λ) (v : (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((onSite x spinHalfOp3).mulVec v) =
+      (-(onSite x spinHalfOp3)).mulVec
+        (timeReversalSpinHalfMulti v) := by
+  unfold spinHalfOp3
+  rw [onSite_smul, Matrix.smul_mulVec,
+    timeReversalSpinHalfMulti_smul,
+    show starRingEnd ℂ ((1 : ℂ) / 2) = 1 / 2 from by
+      rw [map_div₀]; simp [Complex.conj_ofNat],
+    timeReversalSpinHalfMulti_onSite_pauliZ_mulVec]
+  rw [← smul_neg, Matrix.smul_mulVec]
 
 end LatticeSystem.Quantum

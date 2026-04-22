@@ -133,4 +133,21 @@ example (r : ℝ) (v : (Fin 3 → Fin 2) → ℂ) :
       (r : ℂ) • timeReversalSpinHalfMulti v :=
   timeReversalSpinHalfMulti_real_smul r v
 
+/-! ## Spin-1/2 op equivariance (Tasaki §2.3 (2.3.14)) -/
+
+example (x : Fin 3) (v : (Fin 3 → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti ((onSite x spinHalfOp1).mulVec v) =
+      (-(onSite x spinHalfOp1)).mulVec (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_onSite_spinHalfOp1_mulVec x v
+
+example (x : Fin 3) (v : (Fin 3 → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti ((onSite x spinHalfOp2).mulVec v) =
+      (-(onSite x spinHalfOp2)).mulVec (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_onSite_spinHalfOp2_mulVec x v
+
+example (x : Fin 3) (v : (Fin 3 → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti ((onSite x spinHalfOp3).mulVec v) =
+      (-(onSite x spinHalfOp3)).mulVec (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_onSite_spinHalfOp3_mulVec x v
+
 end LatticeSystem.Tests.TimeReversalMulti
