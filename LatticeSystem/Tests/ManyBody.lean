@@ -56,4 +56,12 @@ example (σ : Λ → Fin 2) :
     ∑ τ : Λ → Fin 2, basisVec σ τ * basisVec σ τ = 1 := by
   rw [basisVec_inner]; simp
 
+/-! ## A. decide-based universal: `Fin 2 → Fin 2` exhaustive (Phase
+1 PR 14 strengthening, refactor plan v4 §2.1 method A) -/
+
+/-- Self-equality on `Fin 2 → Fin 2` configurations: `basisVec σ σ
+= 1` for every σ (universally over the 4 configurations). -/
+example : ∀ σ : Fin 2 → Fin 2, basisVec σ σ = (1 : ℂ) := by
+  intro σ; exact basisVec_self σ
+
 end LatticeSystem.Tests.ManyBody
