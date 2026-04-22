@@ -261,4 +261,21 @@ example :
       basisVec (flipConfig (neelCubicConfig 1 1 1)) :=
   timeReversalSpinHalfMulti_neelCubicState_one_one_one
 
+/-! ## 3D Néel time-reversal at general `K, L, M` -/
+
+example (K L M : ℕ) :
+    timeReversalSpinHalfMulti (neelCubicState K L M) =
+      basisVec (flipConfig (neelCubicConfig K L M)) :=
+  timeReversalSpinHalfMulti_neelCubicState K L M
+
+example :
+    timeReversalSpinHalfMulti (neelCubicState 2 1 1) =
+      basisVec (flipConfig (neelCubicConfig 2 1 1)) :=
+  timeReversalSpinHalfMulti_neelCubicState 2 1 1
+
+example :
+    timeReversalSpinHalfMulti (neelCubicState 2 2 3) =
+      basisVec (flipConfig (neelCubicConfig 2 2 3)) :=
+  timeReversalSpinHalfMulti_neelCubicState 2 2 3
+
 end LatticeSystem.Tests.NeelState
