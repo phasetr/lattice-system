@@ -36,7 +36,9 @@ happy to coordinate accordingly.
 
 ## Formalization status
 
-All theorems are formally proved with **zero `sorry`**.
+All theorems are formally proved with **zero `sorry`**, and
+`lake build` produces **zero linter warnings** (Phase 4 milestone,
+2026-04-23).
 
 For the complete list of formalized theorems, the phase-by-phase
 progress table, and the primary textbook references used at each step,
