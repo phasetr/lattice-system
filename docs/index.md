@@ -634,6 +634,9 @@ Systems*, §3.5, p. 89.
 | `squareLatticeHeisenbergGibbsState` / `_isHermitian` / `_commute_hamiltonian` | Gibbs state of the 2D open-boundary square-lattice Heisenberg Hamiltonian + Hermiticity + commute pair | `Quantum/HeisenbergChain.lean` |
 | `squareTorusHeisenbergGibbsState` / `_isHermitian` / `_commute_hamiltonian` | Gibbs state of the 2D torus Heisenberg Hamiltonian + companions | `Quantum/HeisenbergChain.lean` |
 | `cubicLatticeHeisenbergGibbsState` / `_isHermitian` / `_commute_hamiltonian` | Gibbs state of the 3D open-boundary cubic-lattice Heisenberg Hamiltonian + companions | `Quantum/HeisenbergChain.lean` |
+| `squareLatticeHeisenbergGibbsExpectation_hamiltonian_im` / `squareLatticeHeisenberg_partitionFn_im` | 2D open square-lattice Heisenberg energy expectation real / partition function real | `Quantum/HeisenbergChain.lean` |
+| `squareTorusHeisenbergGibbsExpectation_hamiltonian_im` / `squareTorusHeisenberg_partitionFn_im` | 2D torus Heisenberg energy expectation real / partition function real | `Quantum/HeisenbergChain.lean` |
+| `cubicLatticeHeisenbergGibbsExpectation_hamiltonian_im` / `cubicLatticeHeisenberg_partitionFn_im` | 3D cubic-lattice Heisenberg energy expectation real / partition function real | `Quantum/HeisenbergChain.lean` |
 | `heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp{1,2,3}` | for any `SimpleGraph G` and edge weight `J : ℂ`, the Heisenberg Hamiltonian on `G` commutes with each total-spin component (free corollary of the generic-J theorems) | `Quantum/HeisenbergChain.lean` |
 | `heisenbergHamiltonian_couplingOf_commute_totalSpinHalfSquared` | the same Hamiltonian commutes with the total-spin Casimir `Ŝ_tot²` (graph-centric SU(2) invariance) | `Quantum/HeisenbergChain.lean` |
 | `heisenbergGibbsStateOnGraph β G J` | Gibbs state `gibbsState β (H_G_J)` for any finite graph `G` and complex edge weight `J` | `Quantum/HeisenbergChain.lean` |

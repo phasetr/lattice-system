@@ -278,6 +278,60 @@ theorem cubicLatticeHeisenbergGibbsState_commute_hamiltonian
       (heisenbergHamiltonian (cubicLatticeCoupling N J)) :=
   gibbsState_commute_hamiltonian β _
 
+/-! ## Expectation companions for 2D / 3D Heisenberg lattices
+
+Each higher-dimensional Heisenberg Gibbs state inherits the same
+expectation-theorem family as the 1D chain via the generic
+`gibbsExpectation*` lemmas. -/
+
+/-- 2D open square-lattice Heisenberg energy expectation is real. -/
+theorem squareLatticeHeisenbergGibbsExpectation_hamiltonian_im
+    (β J : ℝ) (N : ℕ) :
+    (gibbsExpectation β
+        (heisenbergHamiltonian (squareLatticeCoupling N J))
+        (heisenbergHamiltonian (squareLatticeCoupling N J))).im = 0 :=
+  gibbsExpectation_hamiltonian_im
+    (squareLatticeHeisenberg_isHermitian N J) β
+
+/-- 2D open square-lattice partition function is real. -/
+theorem squareLatticeHeisenberg_partitionFn_im (β J : ℝ) (N : ℕ) :
+    (partitionFn β
+        (heisenbergHamiltonian (squareLatticeCoupling N J))).im = 0 :=
+  partitionFn_im_of_isHermitian
+    (squareLatticeHeisenberg_isHermitian N J) β
+
+/-- 2D torus Heisenberg energy expectation is real. -/
+theorem squareTorusHeisenbergGibbsExpectation_hamiltonian_im
+    (β J : ℝ) (N : ℕ) :
+    (gibbsExpectation β
+        (heisenbergHamiltonian (squareTorusCoupling N J))
+        (heisenbergHamiltonian (squareTorusCoupling N J))).im = 0 :=
+  gibbsExpectation_hamiltonian_im
+    (squareTorusHeisenberg_isHermitian N J) β
+
+/-- 2D torus partition function is real. -/
+theorem squareTorusHeisenberg_partitionFn_im (β J : ℝ) (N : ℕ) :
+    (partitionFn β
+        (heisenbergHamiltonian (squareTorusCoupling N J))).im = 0 :=
+  partitionFn_im_of_isHermitian
+    (squareTorusHeisenberg_isHermitian N J) β
+
+/-- 3D cubic-lattice Heisenberg energy expectation is real. -/
+theorem cubicLatticeHeisenbergGibbsExpectation_hamiltonian_im
+    (β J : ℝ) (N : ℕ) :
+    (gibbsExpectation β
+        (heisenbergHamiltonian (cubicLatticeCoupling N J))
+        (heisenbergHamiltonian (cubicLatticeCoupling N J))).im = 0 :=
+  gibbsExpectation_hamiltonian_im
+    (cubicLatticeHeisenberg_isHermitian N J) β
+
+/-- 3D cubic-lattice partition function is real. -/
+theorem cubicLatticeHeisenberg_partitionFn_im (β J : ℝ) (N : ℕ) :
+    (partitionFn β
+        (heisenbergHamiltonian (cubicLatticeCoupling N J))).im = 0 :=
+  partitionFn_im_of_isHermitian
+    (cubicLatticeHeisenberg_isHermitian N J) β
+
 /-! ## Heisenberg-on-graph SU(2) invariance
 
 The existing generic-`J` SU(2)-invariance theorems for
