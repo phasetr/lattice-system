@@ -214,4 +214,11 @@ example :
         (0 : ℂ) :=
   neelCubicState_mem_magnetizationSubspace_zero 1 1 1
 
+/-! ## 3D Néel state K = L = M = 1 time-reversal -/
+
+example :
+    timeReversalSpinHalfMulti (neelCubicState 1 1 1) =
+      basisVec (flipConfig (neelCubicConfig 1 1 1)) :=
+  timeReversalSpinHalfMulti_neelCubicState_one_one_one
+
 end LatticeSystem.Tests.NeelState
