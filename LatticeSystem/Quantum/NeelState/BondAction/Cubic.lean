@@ -38,16 +38,14 @@ theorem spinHalfDot_mulVec_neelCubicState_x_adjacent
             (((⟨i + 1, hi⟩, ⟨j, hj⟩), ⟨k, hk⟩) :
               (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))) -
         (1 / 4 : ℂ) • neelCubicState K L M := by
-  unfold neelCubicState
-  apply spinHalfDot_mulVec_basisVec_antiparallel
+  rw [neelCubicState_eq_neelStateOf, neelCubicConfig_eq_neelConfigOf]
+  apply spinHalfDot_mulVec_neelStateOf_antiparallel
   · intro h
     have h1 := congrArg Prod.fst h
     have h2 := congrArg Prod.fst h1
     have hval := congrArg Fin.val h2
     simp at hval
-  · unfold neelCubicConfig
-    simp only
-    by_cases hp : (i + j + k) % 2 = 0
+  · by_cases hp : (i + j + k) % 2 = 0
     · have hp1 : ((i + 1) + j + k) % 2 ≠ 0 := by omega
       simp [hp, hp1]
     · have hp1 : ((i + 1) + j + k) % 2 = 0 := by omega
@@ -70,16 +68,14 @@ theorem spinHalfDot_mulVec_neelCubicState_y_adjacent
             (((⟨i, hi⟩, ⟨j + 1, hj⟩), ⟨k, hk⟩) :
               (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))) -
         (1 / 4 : ℂ) • neelCubicState K L M := by
-  unfold neelCubicState
-  apply spinHalfDot_mulVec_basisVec_antiparallel
+  rw [neelCubicState_eq_neelStateOf, neelCubicConfig_eq_neelConfigOf]
+  apply spinHalfDot_mulVec_neelStateOf_antiparallel
   · intro h
     have h1 := congrArg Prod.fst h
     have h2 := congrArg Prod.snd h1
     have hval := congrArg Fin.val h2
     simp at hval
-  · unfold neelCubicConfig
-    simp only
-    by_cases hp : (i + j + k) % 2 = 0
+  · by_cases hp : (i + j + k) % 2 = 0
     · have hp1 : (i + (j + 1) + k) % 2 ≠ 0 := by omega
       simp [hp, hp1]
     · have hp1 : (i + (j + 1) + k) % 2 = 0 := by omega
@@ -102,15 +98,13 @@ theorem spinHalfDot_mulVec_neelCubicState_z_adjacent
             (((⟨i, hi⟩, ⟨j, hj⟩), ⟨k + 1, hk⟩) :
               (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))) -
         (1 / 4 : ℂ) • neelCubicState K L M := by
-  unfold neelCubicState
-  apply spinHalfDot_mulVec_basisVec_antiparallel
+  rw [neelCubicState_eq_neelStateOf, neelCubicConfig_eq_neelConfigOf]
+  apply spinHalfDot_mulVec_neelStateOf_antiparallel
   · intro h
     have h1 := congrArg Prod.snd h
     have hval := congrArg Fin.val h1
     simp at hval
-  · unfold neelCubicConfig
-    simp only
-    by_cases hp : (i + j + k) % 2 = 0
+  · by_cases hp : (i + j + k) % 2 = 0
     · have hp1 : (i + j + (k + 1)) % 2 ≠ 0 := by omega
       simp [hp, hp1]
     · have hp1 : (i + j + (k + 1)) % 2 = 0 := by omega
@@ -135,16 +129,14 @@ theorem spinHalfDot_mulVec_neelCubicState_x_wrap
             (((⟨0, by omega⟩, ⟨j, hj⟩), ⟨k, hk⟩) :
               (Fin (2 * (K + 1)) × Fin (2 * L)) × Fin (2 * M))) -
         (1 / 4 : ℂ) • neelCubicState (K + 1) L M := by
-  unfold neelCubicState
-  apply spinHalfDot_mulVec_basisVec_antiparallel
+  rw [neelCubicState_eq_neelStateOf, neelCubicConfig_eq_neelConfigOf]
+  apply spinHalfDot_mulVec_neelStateOf_antiparallel
   · intro h
     have h1 := congrArg Prod.fst h
     have h2 := congrArg Prod.fst h1
     have hval := congrArg Fin.val h2
     simp at hval
-  · unfold neelCubicConfig
-    simp only
-    rcases Nat.mod_two_eq_zero_or_one (j + k) with hjk0 | hjk1
+  · rcases Nat.mod_two_eq_zero_or_one (j + k) with hjk0 | hjk1
     · have h1 : (2 * K + 1 + j + k) % 2 ≠ 0 := by omega
       simp [h1, hjk0]
     · have h1 : (2 * K + 1 + j + k) % 2 = 0 := by omega
@@ -167,16 +159,14 @@ theorem spinHalfDot_mulVec_neelCubicState_y_wrap
             (((⟨i, hi⟩, ⟨0, by omega⟩), ⟨k, hk⟩) :
               (Fin (2 * K) × Fin (2 * (L + 1))) × Fin (2 * M))) -
         (1 / 4 : ℂ) • neelCubicState K (L + 1) M := by
-  unfold neelCubicState
-  apply spinHalfDot_mulVec_basisVec_antiparallel
+  rw [neelCubicState_eq_neelStateOf, neelCubicConfig_eq_neelConfigOf]
+  apply spinHalfDot_mulVec_neelStateOf_antiparallel
   · intro h
     have h1 := congrArg Prod.fst h
     have h2 := congrArg Prod.snd h1
     have hval := congrArg Fin.val h2
     simp at hval
-  · unfold neelCubicConfig
-    simp only
-    rcases Nat.mod_two_eq_zero_or_one (i + k) with hik0 | hik1
+  · rcases Nat.mod_two_eq_zero_or_one (i + k) with hik0 | hik1
     · have h1 : (i + (2 * L + 1) + k) % 2 ≠ 0 := by omega
       simp [h1, hik0]
     · have h1 : (i + (2 * L + 1) + k) % 2 = 0 := by omega
@@ -199,15 +189,13 @@ theorem spinHalfDot_mulVec_neelCubicState_z_wrap
             (((⟨i, hi⟩, ⟨j, hj⟩), ⟨0, by omega⟩) :
               (Fin (2 * K) × Fin (2 * L)) × Fin (2 * (M + 1)))) -
         (1 / 4 : ℂ) • neelCubicState K L (M + 1) := by
-  unfold neelCubicState
-  apply spinHalfDot_mulVec_basisVec_antiparallel
+  rw [neelCubicState_eq_neelStateOf, neelCubicConfig_eq_neelConfigOf]
+  apply spinHalfDot_mulVec_neelStateOf_antiparallel
   · intro h
     have h1 := congrArg Prod.snd h
     have hval := congrArg Fin.val h1
     simp at hval
-  · unfold neelCubicConfig
-    simp only
-    rcases Nat.mod_two_eq_zero_or_one (i + j) with hij0 | hij1
+  · rcases Nat.mod_two_eq_zero_or_one (i + j) with hij0 | hij1
     · have h1 : (i + j + (2 * M + 1)) % 2 ≠ 0 := by omega
       simp [h1, hij0]
     · have h1 : (i + j + (2 * M + 1)) % 2 = 0 := by omega

@@ -35,6 +35,25 @@ noncomputable def neelSquareState (K L : ℕ) :
     (Fin (2 * K) × Fin (2 * L) → Fin 2) → ℂ :=
   basisVec (neelSquareConfig K L)
 
+/-- 2D bridge: the 2D Néel checkerboard configuration is the
+generic `neelConfigOf` at the `(i + j)`-parity sublattice
+indicator. (Refactor Phase 3 PR 3.) -/
+theorem neelSquareConfig_eq_neelConfigOf (K L : ℕ) :
+    neelSquareConfig K L =
+      neelConfigOf (fun p : Fin (2 * K) × Fin (2 * L) =>
+        decide ((p.1.val + p.2.val) % 2 = 0)) := by
+  unfold neelSquareConfig neelConfigOf
+  funext p
+  by_cases hp : (p.1.val + p.2.val) % 2 = 0 <;> simp [hp]
+
+/-- 2D bridge (state form). -/
+theorem neelSquareState_eq_neelStateOf (K L : ℕ) :
+    neelSquareState K L =
+      neelStateOf (fun p : Fin (2 * K) × Fin (2 * L) =>
+        decide ((p.1.val + p.2.val) % 2 = 0)) := by
+  unfold neelSquareState neelStateOf
+  rw [neelSquareConfig_eq_neelConfigOf]
+
 /-- 1D parity-sum lemma with a fixed parity offset: for any
 `parity : ℕ` and `L : ℕ`,
 

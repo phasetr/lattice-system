@@ -32,6 +32,75 @@ namespace LatticeSystem.Quantum
 
 open Matrix
 
+/-! ## Generic graph-centric Néel state -/
+
+/-- Generic Néel configuration from a sublattice indicator
+`A : V → Bool`. Sites with `A x = true` carry `↑ : Fin 2 := 0`,
+sites with `A x = false` carry `↓ : Fin 2 := 1`.
+
+This is the canonical Néel configuration on the bipartite
+graph `(V, A)`. The chain / 2D / 3D `neelXyzConfig` definitions
+below are obtained by instantiating `A` with the corresponding
+parity colouring and bridged via `_eq_neelConfigOf`. (Refactor
+Phase 3 PR 3.) -/
+def neelConfigOf {V : Type*} (A : V → Bool) : V → Fin 2 :=
+  fun x => if A x then 0 else 1
+
+/-- Generic Néel state: the many-body basis vector at
+`neelConfigOf A`. -/
+noncomputable def neelStateOf {V : Type*} [Fintype V] [DecidableEq V]
+    (A : V → Bool) : (V → Fin 2) → ℂ :=
+  basisVec (neelConfigOf A)
+
+/-- If two sites lie in different sublattices (`A x ≠ A y`) then
+their Néel spins differ. The two `Fin 2` cases collapse: if
+`A x = true, A y = false` then `(0 : Fin 2) ≠ 1`, and vice versa. -/
+theorem neelConfigOf_apply_ne_of_ne {V : Type*} (A : V → Bool)
+    {x y : V} (h : A x ≠ A y) :
+    neelConfigOf A x ≠ neelConfigOf A y := by
+  unfold neelConfigOf
+  by_cases hx : A x = true
+  · have hy : A y = false := by
+      rcases hb : A y with _ | _
+      · rfl
+      · exact absurd (hx.trans hb.symm) h
+    simp [hx, hy]
+  · have hxF : A x = false := by
+      rcases hb : A x with _ | _
+      · rfl
+      · exact absurd hb hx
+    have hy : A y = true := by
+      rcases hb : A y with _ | _
+      · exact absurd (hxF.trans hb.symm) h
+      · rfl
+    simp [hxF, hy]
+
+/-- Generic Néel bond action across an antiparallel bond
+(Tasaki §2.5 eq. (2.5.3), graph-centric form). For
+`A : V → Bool` and a bond `(x, y)` with `x ≠ y` and
+`A x ≠ A y`,
+
+  `Ŝ_x · Ŝ_y · |Φ_Néel(A)⟩
+    = (1/2) · |swap_{x, y} Φ_Néel(A)⟩
+        - (1/4) · |Φ_Néel(A)⟩`.
+
+This is the single primitive of which the chain / 2D / 3D
+adjacent and wrap-around bond actions are corollaries via
+`neelXyzConfig_eq_neelConfigOf` (chain in `Definition.lean`,
+square in `Definition2D.lean`, cubic in `Definition3D.lean`).
+(Refactor Phase 3 PR 3.) -/
+theorem spinHalfDot_mulVec_neelStateOf_antiparallel
+    {V : Type*} [Fintype V] [DecidableEq V] (A : V → Bool)
+    {x y : V} (hxy : x ≠ y) (hA : A x ≠ A y) :
+    (spinHalfDot x y).mulVec (neelStateOf A) =
+      (1 / 2 : ℂ) • basisVec (basisSwap (neelConfigOf A) x y)
+        - (1 / 4 : ℂ) • neelStateOf A := by
+  unfold neelStateOf
+  exact spinHalfDot_mulVec_basisVec_antiparallel hxy _
+    (neelConfigOf_apply_ne_of_ne A hA)
+
+/-! ## Chain Néel state -/
+
 /-- The Néel chain configuration on `Fin (2 * K)`: the alternating
 two-colouring assigning `↑ : Fin 2 := 0` to even indices and
 `↓ : Fin 2 := 1` to odd indices. -/
@@ -44,6 +113,24 @@ many-body basis vector for the alternating up/down configuration
 noncomputable def neelChainState (K : ℕ) :
     (Fin (2 * K) → Fin 2) → ℂ :=
   basisVec (neelChainConfig K)
+
+/-- Chain bridge: the Néel chain configuration is the generic
+`neelConfigOf` evaluated on the even-parity sublattice
+indicator. -/
+theorem neelChainConfig_eq_neelConfigOf (K : ℕ) :
+    neelChainConfig K =
+      neelConfigOf (fun x : Fin (2 * K) => decide (x.val % 2 = 0)) := by
+  unfold neelChainConfig neelConfigOf
+  funext x
+  by_cases hp : x.val % 2 = 0 <;> simp [hp]
+
+/-- Chain bridge (state form): immediate corollary of
+`neelChainConfig_eq_neelConfigOf`. -/
+theorem neelChainState_eq_neelStateOf (K : ℕ) :
+    neelChainState K =
+      neelStateOf (fun x : Fin (2 * K) => decide (x.val % 2 = 0)) := by
+  unfold neelChainState neelStateOf
+  rw [neelChainConfig_eq_neelConfigOf]
 
 /-- Auxiliary parity-sum lemma. The alternating sum
 `∑ i : Fin (2 * K), (if i.val % 2 = 0 then 1 else -1)` vanishes,
