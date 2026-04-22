@@ -106,4 +106,16 @@ example :
         - (1 / 4 : ℂ) • neelChainState 2 :=
   spinHalfDot_mulVec_neelChainState_wrap 1
 
+/-! ## `H_open(N=1, J) · |Φ_Néel(K=1)⟩ = -J · |↓↑⟩ + (J/2) · |Φ_Néel⟩` -/
+
+example (J : ℝ) :
+    (heisenbergHamiltonian (openChainCoupling 1 J)).mulVec
+        (neelChainState 1) =
+      (-(J : ℂ)) • basisVec
+          (basisSwap (neelChainConfig 1)
+            (⟨0, by decide⟩ : Fin (2 * 1))
+            (⟨1, by decide⟩ : Fin (2 * 1))) +
+        ((J : ℂ) / 2) • neelChainState 1 :=
+  heisenbergHamiltonian_openChainCoupling_one_mulVec_neelChainState_one J
+
 end LatticeSystem.Tests.NeelState

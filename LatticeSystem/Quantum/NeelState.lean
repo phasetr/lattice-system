@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.MagnetizationSubspace
 import LatticeSystem.Quantum.SpinDot
+import LatticeSystem.Quantum.HeisenbergChain
 
 /-!
 # Néel state on a bipartite even chain (Tasaki §2.5)
@@ -173,6 +174,42 @@ theorem spinHalfDot_mulVec_neelChainState_adjacent
       simp [hp, hp1]
     · have hp1 : (i + 1) % 2 = 0 := by omega
       simp [hp, hp1]
+
+/-- Two-site Néel computation (`K = 1`): the open-chain
+Heisenberg Hamiltonian `H_open(N=1, J)` acts on the Néel state
+`|Φ_Néel⟩ = |↑↓⟩` by
+
+  `H · |Φ_Néel⟩ = -J · |↓↑⟩ + (J/2) · |Φ_Néel⟩`,
+
+which decomposes the bond `(0, 1)` action via the antiparallel
+formula. This is the explicit `K = 1` instance of the bond-by-bond
+calculation `spinHalfDot_mulVec_neelChainState_adjacent` lifted
+through `H_open(N=1, J) = -2J · spinHalfDot 0 1`. The
+non-eigenstate character of the Néel state is plain: the
+right-hand side has two distinct basis components. -/
+theorem heisenbergHamiltonian_openChainCoupling_one_mulVec_neelChainState_one
+    (J : ℝ) :
+    (heisenbergHamiltonian (openChainCoupling 1 J)).mulVec
+        (neelChainState 1) =
+      (-(J : ℂ)) • basisVec
+          (basisSwap (neelChainConfig 1)
+            (⟨0, by decide⟩ : Fin (2 * 1))
+            (⟨1, by decide⟩ : Fin (2 * 1))) +
+        ((J : ℂ) / 2) • neelChainState 1 := by
+  rw [openChainHeisenbergHamiltonian_two_site_eq, Matrix.smul_mulVec]
+  have h := spinHalfDot_mulVec_neelChainState_adjacent 1 (i := 0)
+    (by decide)
+  -- Replace (0 : Fin 2) by ⟨0, _⟩ and (1 : Fin 2) by ⟨1, _⟩ in the goal.
+  show (-(2 * (J : ℂ))) •
+      (spinHalfDot (⟨0, by decide⟩ : Fin (2 * 1))
+        (⟨1, by decide⟩ : Fin (2 * 1))).mulVec (neelChainState 1) =
+    (-(J : ℂ)) • basisVec
+        (basisSwap (neelChainConfig 1)
+          (⟨0, by decide⟩ : Fin (2 * 1))
+          (⟨1, by decide⟩ : Fin (2 * 1))) +
+      ((J : ℂ) / 2) • neelChainState 1
+  rw [h]
+  module
 
 /-- Companion of `spinHalfDot_mulVec_neelChainState_adjacent` for
 the **wrap-around** bond `(2K - 1, 0)` of the periodic chain
