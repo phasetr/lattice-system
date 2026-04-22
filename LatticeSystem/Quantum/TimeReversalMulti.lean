@@ -841,4 +841,39 @@ theorem timeReversalSpinHalfMulti_periodicChainHeisenberg_mulVec
   timeReversalSpinHalfMulti_heisenbergHamiltonian_mulVec
     (periodicChainCoupling N J) (periodicChainCoupling_conj N J) v
 
+/-- Time-reversal invariance of the 2D open-boundary square-lattice
+Heisenberg Hamiltonian (real coupling `J : ℝ`). -/
+theorem timeReversalSpinHalfMulti_squareLatticeHeisenberg_mulVec
+    (N : ℕ) (J : ℝ)
+    (v : (Fin (N + 1) × Fin (N + 1) → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((heisenbergHamiltonian (squareLatticeCoupling N J)).mulVec v) =
+      (heisenbergHamiltonian (squareLatticeCoupling N J)).mulVec
+        (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_heisenbergHamiltonian_mulVec
+    (squareLatticeCoupling N J) (squareLatticeCoupling_conj N J) v
+
+/-- Time-reversal invariance of the 2D torus Heisenberg Hamiltonian. -/
+theorem timeReversalSpinHalfMulti_squareTorusHeisenberg_mulVec
+    (N : ℕ) (J : ℝ)
+    (v : (Fin (N + 2) × Fin (N + 2) → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((heisenbergHamiltonian (squareTorusCoupling N J)).mulVec v) =
+      (heisenbergHamiltonian (squareTorusCoupling N J)).mulVec
+        (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_heisenbergHamiltonian_mulVec
+    (squareTorusCoupling N J) (squareTorusCoupling_conj N J) v
+
+/-- Time-reversal invariance of the 3D cubic-lattice Heisenberg
+Hamiltonian. -/
+theorem timeReversalSpinHalfMulti_cubicLatticeHeisenberg_mulVec
+    (N : ℕ) (J : ℝ)
+    (v : ((Fin (N + 1) × Fin (N + 1)) × Fin (N + 1) → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti
+        ((heisenbergHamiltonian (cubicLatticeCoupling N J)).mulVec v) =
+      (heisenbergHamiltonian (cubicLatticeCoupling N J)).mulVec
+        (timeReversalSpinHalfMulti v) :=
+  timeReversalSpinHalfMulti_heisenbergHamiltonian_mulVec
+    (cubicLatticeCoupling N J) (cubicLatticeCoupling_conj N J) v
+
 end LatticeSystem.Quantum

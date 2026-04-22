@@ -360,6 +360,37 @@ theorem periodicChainCoupling_conj
   rw [star_neg]
   exact congrArg Neg.neg (Complex.conj_ofReal J)
 
+/-- Every entry of `squareLatticeCoupling N J` is real. -/
+theorem squareLatticeCoupling_conj
+    (N : ℕ) (J : ℝ) (x y : Fin (N + 1) × Fin (N + 1)) :
+    starRingEnd ℂ (squareLatticeCoupling N J x y)
+      = squareLatticeCoupling N J x y := by
+  apply LatticeSystem.Lattice.couplingOf_real
+  show star (-(J : ℂ)) = -(J : ℂ)
+  rw [star_neg]
+  exact congrArg Neg.neg (Complex.conj_ofReal J)
+
+/-- Every entry of `squareTorusCoupling N J` is real. -/
+theorem squareTorusCoupling_conj
+    (N : ℕ) (J : ℝ) (x y : Fin (N + 2) × Fin (N + 2)) :
+    starRingEnd ℂ (squareTorusCoupling N J x y)
+      = squareTorusCoupling N J x y := by
+  apply LatticeSystem.Lattice.couplingOf_real
+  show star (-(J : ℂ)) = -(J : ℂ)
+  rw [star_neg]
+  exact congrArg Neg.neg (Complex.conj_ofReal J)
+
+/-- Every entry of `cubicLatticeCoupling N J` is real. -/
+theorem cubicLatticeCoupling_conj
+    (N : ℕ) (J : ℝ)
+    (x y : (Fin (N + 1) × Fin (N + 1)) × Fin (N + 1)) :
+    starRingEnd ℂ (cubicLatticeCoupling N J x y)
+      = cubicLatticeCoupling N J x y := by
+  apply LatticeSystem.Lattice.couplingOf_real
+  show star (-(J : ℂ)) = -(J : ℂ)
+  rw [star_neg]
+  exact congrArg Neg.neg (Complex.conj_ofReal J)
+
 /-! ## Heisenberg-on-graph SU(2) invariance
 
 The existing generic-`J` SU(2)-invariance theorems for
