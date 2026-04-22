@@ -7,6 +7,7 @@ import LatticeSystem.Quantum.Pauli
 import LatticeSystem.Quantum.SpinHalf
 import LatticeSystem.Quantum.SpinDot
 import LatticeSystem.Quantum.HeisenbergChain
+import LatticeSystem.Quantum.HeisenbergLattice
 import LatticeSystem.Quantum.TimeReversalSpinHalf
 
 /-!
