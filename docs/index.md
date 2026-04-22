@@ -60,6 +60,10 @@ Topics: test methods (decide / bridge / small-exhaustive / shim /
 deprecation window policy, naming / docstring rules, linter
 exceptions, public-doc synchronisation.
 
+The companion page [Deprecation window](deprecations.html) tracks
+currently-deprecated public declarations, the `since` date,
+recommended replacement, and earliest-removal window.
+
 ## Roadmap
 
 | Phase | Scope | Status |
