@@ -14,8 +14,12 @@ this file is a thin re-import of:
 
 | sub-file | content |
 |---|---|
-| `SpinDot/Core.lean` | `spinHalfDot` def + Hermiticity + ladder decomp + basis-vec actions + inner-product family + SU(2) |
-| `SpinDot/Hamiltonian.lean` | Heisenberg-type Hamiltonian + Casimir + eigenvalue propagation + commutativity with global rotations + singlet/triplet eigenvalues |
+| `SpinDot/Core.lean` | `spinHalfDot` def + Hermiticity + ladder decomp |
+|                     | + basis-vec actions + inner-product family + SU(2) |
+| `SpinDot/Hamiltonian.lean` | Heisenberg-type Hamiltonian + Casimir |
+|                            | + eigenvalue propagation |
+|                            | + commutativity with global rotations |
+|                            | + singlet/triplet eigenvalues |
 
 Old `import LatticeSystem.Quantum.SpinDot` continues to work
 unchanged via this façade.

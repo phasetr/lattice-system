@@ -351,7 +351,7 @@ correlation:
   `⟨Φ_Néel, Ŝ^(3)_x · Ŝ^(3)_y · Φ_Néel⟩ = -1/4`
 
 (diagonal `Ŝ^z·Ŝ^z` correlator at antiparallel bond). -/
-theorem neelChainState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_adjacent_eq_neg_one_quarter
+theorem neelChainState_inner_szsz_adjacent_eq_neg_one_quarter
     (K : ℕ) {i : ℕ} (hi : i + 1 < 2 * K) :
     ∑ τ : Fin (2 * K) → Fin 2,
         neelChainState K τ *
@@ -369,7 +369,7 @@ theorem neelChainState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_adjacent_
 
 /-- 1D Néel chain wrap-bond `Ŝ^(3)_x · Ŝ^(3)_y` correlation =
 `-1/4`. -/
-theorem neelChainState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_wrap_eq_neg_one_quarter
+theorem neelChainState_inner_szsz_wrap_eq_neg_one_quarter
     (K : ℕ) :
     ∑ τ : Fin (2 * (K + 1)) → Fin 2,
         neelChainState (K + 1) τ *
@@ -384,7 +384,7 @@ theorem neelChainState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_wrap_eq_n
   simp [h1]
 
 /-- 2D Néel: horizontal adjacent `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
-theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_horizontal_adjacent_eq_neg_one_quarter
+theorem neelSquareState_inner_szsz_horizontal_adjacent_eq_neg_one_quarter
     (K L : ℕ) {i j : ℕ}
     (hi : i + 1 < 2 * K) (hj : j < 2 * L) :
     ∑ τ : Fin (2 * K) × Fin (2 * L) → Fin 2,
@@ -403,7 +403,7 @@ theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_horizont
     simp [hp, hp1]
 
 /-- 2D Néel: vertical adjacent `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
-theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_vertical_adjacent_eq_neg_one_quarter
+theorem neelSquareState_inner_szsz_vertical_adjacent_eq_neg_one_quarter
     (K L : ℕ) {i j : ℕ}
     (hi : i < 2 * K) (hj : j + 1 < 2 * L) :
     ∑ τ : Fin (2 * K) × Fin (2 * L) → Fin 2,
@@ -422,7 +422,7 @@ theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_vertical
     simp [hp, hp1]
 
 /-- 2D Néel: horizontal wrap `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
-theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_horizontal_wrap_eq_neg_one_quarter
+theorem neelSquareState_inner_szsz_horizontal_wrap_eq_neg_one_quarter
     (K L : ℕ) {j : ℕ} (hj : j < 2 * L) :
     ∑ τ : Fin (2 * (K + 1)) × Fin (2 * L) → Fin 2,
         neelSquareState (K + 1) L τ *
@@ -440,7 +440,7 @@ theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_horizont
     simp [h4, hj1]
 
 /-- 2D Néel: vertical wrap `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
-theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_vertical_wrap_eq_neg_one_quarter
+theorem neelSquareState_inner_szsz_vertical_wrap_eq_neg_one_quarter
     (K L : ℕ) {i : ℕ} (hi : i < 2 * K) :
     ∑ τ : Fin (2 * K) × Fin (2 * (L + 1)) → Fin 2,
         neelSquareState K (L + 1) τ *
@@ -458,7 +458,7 @@ theorem neelSquareState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_vertical
     simp [h1, hi1]
 
 /-- 3D Néel: x adjacent `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
-theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_x_adjacent_eq_neg_one_quarter
+theorem neelCubicState_inner_szsz_x_adjacent_eq_neg_one_quarter
     (K L M : ℕ) {i j k : ℕ}
     (hi : i + 1 < 2 * K) (hj : j < 2 * L) (hk : k < 2 * M) :
     ∑ τ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2,
@@ -479,7 +479,7 @@ theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_x_adjacen
     simp [hp, hp1]
 
 /-- 3D Néel: y adjacent `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
-theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_y_adjacent_eq_neg_one_quarter
+theorem neelCubicState_inner_szsz_y_adjacent_eq_neg_one_quarter
     (K L M : ℕ) {i j k : ℕ}
     (hi : i < 2 * K) (hj : j + 1 < 2 * L) (hk : k < 2 * M) :
     ∑ τ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2,
@@ -500,7 +500,7 @@ theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_y_adjacen
     simp [hp, hp1]
 
 /-- 3D Néel: z adjacent `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
-theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_z_adjacent_eq_neg_one_quarter
+theorem neelCubicState_inner_szsz_z_adjacent_eq_neg_one_quarter
     (K L M : ℕ) {i j k : ℕ}
     (hi : i < 2 * K) (hj : j < 2 * L) (hk : k + 1 < 2 * M) :
     ∑ τ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2,
@@ -521,7 +521,7 @@ theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_z_adjacen
     simp [hp, hp1]
 
 /-- 3D Néel: x wrap `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
-theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_x_wrap_eq_neg_one_quarter
+theorem neelCubicState_inner_szsz_x_wrap_eq_neg_one_quarter
     (K L M : ℕ) {j k : ℕ}
     (hj : j < 2 * L) (hk : k < 2 * M) :
     ∑ τ : (Fin (2 * (K + 1)) × Fin (2 * L)) × Fin (2 * M) → Fin 2,
@@ -542,7 +542,7 @@ theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_x_wrap_eq
     simp [h1, hjk1]
 
 /-- 3D Néel: y wrap `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
-theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_y_wrap_eq_neg_one_quarter
+theorem neelCubicState_inner_szsz_y_wrap_eq_neg_one_quarter
     (K L M : ℕ) {i k : ℕ}
     (hi : i < 2 * K) (hk : k < 2 * M) :
     ∑ τ : (Fin (2 * K) × Fin (2 * (L + 1))) × Fin (2 * M) → Fin 2,
@@ -563,7 +563,7 @@ theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_y_wrap_eq
     simp [h1, hik1]
 
 /-- 3D Néel: z wrap `Ŝ^(3)_x · Ŝ^(3)_y` = -1/4. -/
-theorem neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_z_wrap_eq_neg_one_quarter
+theorem neelCubicState_inner_szsz_z_wrap_eq_neg_one_quarter
     (K L M : ℕ) {i j : ℕ}
     (hi : i < 2 * K) (hj : j < 2 * L) :
     ∑ τ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * (M + 1)) → Fin 2,
