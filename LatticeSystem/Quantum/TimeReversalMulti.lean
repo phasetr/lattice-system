@@ -344,4 +344,28 @@ theorem siteFlipAt_involutive (τ : Λ → Fin 2) (x : Λ) :
     | 1 => simp [h]
   · rw [siteFlipAt_of_ne _ hy, siteFlipAt_of_ne _ hy]
 
+/-- Action of `(onSite x σ^x)` on a basis vector: it swaps the
+spin at site `x`. Tasaki §2.2-style identity for the off-diagonal
+Pauli `σ^x`:
+
+  `(onSite x σ^x).mulVec (basisVec σ) = basisVec (siteFlipAt σ x)`.
+
+Direct corollary of `onSite_mulVec_basisVec` together with the
+single-site `pauliX` matrix entries: `pauliX k (σ x) = 1` iff
+`k = 1 - σ x`, else `0`. -/
+theorem onSite_pauliX_mulVec_basisVec (x : Λ) (σ : Λ → Fin 2) :
+    ((onSite x pauliX).mulVec (basisVec σ) : (Λ → Fin 2) → ℂ) =
+      basisVec (siteFlipAt σ x) := by
+  rw [onSite_mulVec_basisVec]
+  funext τ
+  rw [Fin.sum_univ_two]
+  unfold basisVec siteFlipAt
+  match h : σ x with
+  | 0 =>
+    -- pauliX 0 0 = 0, pauliX 1 0 = 1; updated value 1 = 1 - 0
+    simp [pauliX]
+  | 1 =>
+    -- pauliX 0 1 = 1, pauliX 1 1 = 0; updated value 0 = 1 - 1
+    simp [pauliX]
+
 end LatticeSystem.Quantum
