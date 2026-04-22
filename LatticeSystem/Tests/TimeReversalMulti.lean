@@ -201,4 +201,11 @@ example :
       basisVec upDown - basisVec (basisSwap upDown 0 1) :=
   timeReversalSpinHalfMulti_singlet
 
+example :
+    timeReversalSpinHalfMulti
+        ((basisVec upDown + basisVec (basisSwap upDown 0 1)) :
+          (Fin 2 → Fin 2) → ℂ) =
+      -(basisVec upDown + basisVec (basisSwap upDown 0 1)) :=
+  timeReversalSpinHalfMulti_triplet_zero
+
 end LatticeSystem.Tests.TimeReversalMulti
