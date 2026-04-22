@@ -166,4 +166,58 @@ example (β J : ℝ) (N : ℕ) :
       (heisenbergHamiltonian (cubicLatticeCoupling N J)) :=
   cubicLatticeHeisenbergGibbsState_commute_hamiltonian β J N
 
+/-! ## A. decide-based universal: graph adjacency on small `Fin n`
+(Phase 1 PR 4 strengthening, refactor plan v4 §2.1 method A) -/
+
+/-- `pathGraph 3` adjacency is symmetric (universally on `Fin 3`). -/
+example : ∀ x y : Fin 3, (pathGraph 3).Adj x y = (pathGraph 3).Adj y x := by
+  decide
+
+/-- `pathGraph 3` adjacency is irreflexive. -/
+example : ∀ x : Fin 3, ¬ (pathGraph 3).Adj x x := by decide
+
+/-- `cycleGraph 4` adjacency is symmetric. -/
+example : ∀ x y : Fin 4, (cycleGraph 4).Adj x y = (cycleGraph 4).Adj y x := by
+  decide
+
+/-- `pathGraph 3` has 4 ordered adjacent pairs (= 2 undirected edges). -/
+example :
+    (Finset.univ.filter
+        (fun p : Fin 3 × Fin 3 => (pathGraph 3).Adj p.1 p.2)).card = 4 := by
+  decide
+
+/-- `cycleGraph 4` has 8 ordered adjacent pairs (= 4 undirected edges). -/
+example :
+    (Finset.univ.filter
+        (fun p : Fin 4 × Fin 4 => (cycleGraph 4).Adj p.1 p.2)).card = 8 := by
+  decide
+
+/-! ## C. bridge identity: chain coupling = couplingOf (Phase 1 PR 4
+strengthening, refactor plan v4 §2.1 method C) -/
+
+/-- `openChainCoupling N J = couplingOf (pathGraph (N+1)) (-J)`
+holds definitionally. Bridge between chain-specific and graph-centric
+APIs. -/
+example (N : ℕ) (J : ℝ) :
+    openChainCoupling N J =
+      couplingOf (pathGraph (N + 1)) (-(J : ℂ)) := rfl
+
+/-- `periodicChainCoupling N J = couplingOf (cycleGraph (N+2)) (-J)`
+holds definitionally. -/
+example (N : ℕ) (J : ℝ) :
+    periodicChainCoupling N J =
+      couplingOf (cycleGraph (N + 2)) (-(J : ℂ)) := rfl
+
+/-! ## G. small exhaustive: `couplingOf` values on `Fin 2 × Fin 2`
+(Phase 1 PR 4 strengthening, refactor plan v4 §2.1 method G) -/
+
+/-- The 2-site path-graph coupling on `Fin 2 × Fin 2` follows the
+adjacency exactly. -/
+example (J : ℝ) :
+    ∀ x y : Fin 2,
+        couplingOf (pathGraph 2) (-(J : ℂ)) x y =
+          (if (pathGraph 2).Adj x y then -(J : ℂ) else 0) := by
+  intro x y
+  rfl
+
 end LatticeSystem.Tests.Heisenberg
