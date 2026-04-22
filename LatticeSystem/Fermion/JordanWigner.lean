@@ -3127,4 +3127,63 @@ theorem hubbardCycleGibbsState_commute_hamiltonian
   LatticeSystem.Quantum.gibbsState_commute_hamiltonian β
     (hubbardCycleHamiltonian N J U)
 
+/-! ## Periodic Hubbard chain Gibbs expectation companions -/
+
+/-- Infinite-temperature (β = 0) closed form for the periodic
+Hubbard expectation. -/
+theorem hubbardCycleGibbsExpectation_zero (N : ℕ) (J U : ℝ)
+    (A : ManyBodyOp (Fin (2 * N + 2))) :
+    LatticeSystem.Quantum.gibbsExpectation 0
+        (hubbardCycleHamiltonian N J U) A
+      = ((Fintype.card (Fin (2 * N + 2) → Fin 2) : ℂ))⁻¹ *
+          A.trace :=
+  LatticeSystem.Quantum.gibbsExpectation_zero
+    (hubbardCycleHamiltonian N J U) A
+
+/-- For Hermitian `O`, the periodic-Hubbard expectation `⟨O⟩_β`
+is real. -/
+theorem hubbardCycleGibbsExpectation_im_of_isHermitian
+    (N : ℕ) (β J U : ℝ) {O : ManyBodyOp (Fin (2 * N + 2))}
+    (hO : O.IsHermitian) :
+    (LatticeSystem.Quantum.gibbsExpectation β
+        (hubbardCycleHamiltonian N J U) O).im = 0 :=
+  LatticeSystem.Quantum.gibbsExpectation_im_of_isHermitian
+    (hubbardCycleHamiltonian_isHermitian N J U) hO β
+
+/-- Periodic-Hubbard conservation law: `⟨[H, A]⟩_β = 0`. -/
+theorem hubbardCycleGibbsExpectation_commutator_hamiltonian
+    (N : ℕ) (β J U : ℝ) (A : ManyBodyOp (Fin (2 * N + 2))) :
+    LatticeSystem.Quantum.gibbsExpectation β
+        (hubbardCycleHamiltonian N J U)
+        (hubbardCycleHamiltonian N J U * A
+          - A * hubbardCycleHamiltonian N J U) = 0 :=
+  LatticeSystem.Quantum.gibbsExpectation_commutator_hamiltonian β
+    (hubbardCycleHamiltonian N J U) A
+
+/-- Periodic-Hubbard energy expectation is real. -/
+theorem hubbardCycleGibbsExpectation_hamiltonian_im
+    (N : ℕ) (β J U : ℝ) :
+    (LatticeSystem.Quantum.gibbsExpectation β
+        (hubbardCycleHamiltonian N J U)
+        (hubbardCycleHamiltonian N J U)).im = 0 :=
+  LatticeSystem.Quantum.gibbsExpectation_hamiltonian_im
+    (hubbardCycleHamiltonian_isHermitian N J U) β
+
+/-- Periodic-Hubbard energy n-th power expectation is real. -/
+theorem hubbardCycleGibbsExpectation_hamiltonian_pow_im
+    (N : ℕ) (β J U : ℝ) (n : ℕ) :
+    (LatticeSystem.Quantum.gibbsExpectation β
+        (hubbardCycleHamiltonian N J U)
+        ((hubbardCycleHamiltonian N J U)^n)).im = 0 :=
+  LatticeSystem.Quantum.gibbsExpectation_pow_im_of_isHermitian
+    (hubbardCycleHamiltonian_isHermitian N J U)
+    (hubbardCycleHamiltonian_isHermitian N J U) β n
+
+/-- Periodic-Hubbard partition function is real. -/
+theorem hubbardCycle_partitionFn_im (N : ℕ) (β J U : ℝ) :
+    (LatticeSystem.Quantum.partitionFn β
+        (hubbardCycleHamiltonian N J U)).im = 0 :=
+  LatticeSystem.Quantum.partitionFn_im_of_isHermitian
+    (hubbardCycleHamiltonian_isHermitian N J U) β
+
 end LatticeSystem.Fermion
