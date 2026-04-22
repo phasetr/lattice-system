@@ -568,6 +568,96 @@ theorem spinHalfDot_mulVec_neelSquareState_vertical_adjacent
     · have hp1 : (i + (j + 1)) % 2 = 0 := by omega
       simp [hp, hp1]
 
+/-! ## 2D Néel time-reversal action (general K, L) -/
+
+/-- Auxiliary alternating-product lemma with parity offset (the
+2D analogue of `prod_alternating_neg_one`, mirroring
+`sum_alternating_sign_offset`). For any `parity, L : ℕ`,
+
+  `∏ j : Fin (2 * L), (if (parity + j.val) % 2 = 0 then -1 else 1)
+    = (-1)^L`.
+
+Proof by induction on `L`, peeling the last two indices.
+The product is independent of `parity` because exactly `L` of
+the `2L` indices land in each parity class (regardless of offset). -/
+private lemma prod_alternating_neg_one_offset (parity L : ℕ) :
+    (∏ j : Fin (2 * L),
+      (if (parity + j.val) % 2 = 0 then (-1 : ℂ) else 1))
+        = (-1) ^ L := by
+  induction L with
+  | zero => simp
+  | succ L' ih =>
+    rw [show 2 * (L' + 1) = (2 * L' + 1) + 1 from by ring]
+    rw [Fin.prod_univ_castSucc, Fin.prod_univ_castSucc]
+    have h_inner_eq :
+        (∏ j : Fin (2 * L'),
+          if (parity + (j.castSucc.castSucc :
+                Fin (2 * L' + 1 + 1)).val) % 2 = 0
+            then (-1 : ℂ) else 1) =
+        ∏ j : Fin (2 * L'),
+          (if (parity + j.val) % 2 = 0 then (-1 : ℂ) else 1) := by
+      apply Finset.prod_congr rfl
+      intro j _
+      rfl
+    rw [h_inner_eq, ih]
+    have h_last_outer :
+        (Fin.last (2 * L' + 1)).val = 2 * L' + 1 := rfl
+    have h_last_inner :
+        ((Fin.last (2 * L')).castSucc :
+          Fin (2 * L' + 1 + 1)).val = 2 * L' := rfl
+    rw [h_last_outer, h_last_inner]
+    rcases Nat.mod_two_eq_zero_or_one parity with hp0 | hp1
+    · have h1 : (parity + 2 * L') % 2 = 0 := by omega
+      have h2 : (parity + (2 * L' + 1)) % 2 ≠ 0 := by omega
+      rw [if_pos h1, if_neg h2]
+      ring
+    · have h1 : (parity + 2 * L') % 2 ≠ 0 := by omega
+      have h2 : (parity + (2 * L' + 1)) % 2 = 0 := by omega
+      rw [if_neg h1, if_pos h2]
+      ring
+
+/-- Tasaki §2.5 generalisation of #256 to arbitrary 2D
+checkerboard size: the multi-spin time-reversal acts on the 2D
+Néel state by
+
+  `Θ̂_tot (neelSquareState K L) =
+    basisVec (flipConfig (neelSquareConfig K L))`,
+
+with no overall sign because the 2K · 2L = 4KL sites split
+exactly into 2KL ups and 2KL downs, and `(-1)^(2KL) = 1`. -/
+theorem timeReversalSpinHalfMulti_neelSquareState (K L : ℕ) :
+    timeReversalSpinHalfMulti (neelSquareState K L) =
+      basisVec (flipConfig (neelSquareConfig K L)) := by
+  unfold neelSquareState
+  rw [timeReversalSpinHalfMulti_basisVec]
+  have hprod :
+      (∏ p : Fin (2 * K) × Fin (2 * L),
+          timeReversalSign (flipConfig (neelSquareConfig K L) p))
+        = (1 : ℂ) := by
+    rw [Fintype.prod_prod_type]
+    have h_inner : ∀ i : Fin (2 * K),
+        (∏ j : Fin (2 * L),
+            timeReversalSign
+              (flipConfig (neelSquareConfig K L) (i, j))) =
+          (-1 : ℂ) ^ L := by
+      intro i
+      have h_pointwise : ∀ j : Fin (2 * L),
+          timeReversalSign
+              (flipConfig (neelSquareConfig K L) (i, j)) =
+            (if (i.val + j.val) % 2 = 0 then (-1 : ℂ) else 1) := by
+        intro j
+        unfold flipConfig neelSquareConfig timeReversalSign
+        by_cases hp : (i.val + j.val) % 2 = 0
+        · simp [hp]
+        · simp [hp]
+      rw [Finset.prod_congr rfl (fun j _ => h_pointwise j)]
+      exact prod_alternating_neg_one_offset i.val L
+    rw [Finset.prod_congr rfl (fun i _ => h_inner i)]
+    rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+    rw [← pow_mul, show L * (2 * K) = 2 * (K * L) from by ring,
+      pow_mul, show ((-1 : ℂ)) ^ 2 = 1 from by norm_num, one_pow]
+  rw [hprod, one_smul]
+
 /-! ## 2D Néel time-reversal action (K = L = 1 instance) -/
 
 /-- Concrete time-reversal action on the 2D Néel state for the

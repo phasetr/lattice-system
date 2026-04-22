@@ -215,6 +215,23 @@ example :
       basisVec (flipConfig (neelSquareConfig 1 1)) :=
   timeReversalSpinHalfMulti_neelSquareState_one_one
 
+/-! ## 2D Néel time-reversal at general `K, L` -/
+
+example (K L : ℕ) :
+    timeReversalSpinHalfMulti (neelSquareState K L) =
+      basisVec (flipConfig (neelSquareConfig K L)) :=
+  timeReversalSpinHalfMulti_neelSquareState K L
+
+example :
+    timeReversalSpinHalfMulti (neelSquareState 2 1) =
+      basisVec (flipConfig (neelSquareConfig 2 1)) :=
+  timeReversalSpinHalfMulti_neelSquareState 2 1
+
+example :
+    timeReversalSpinHalfMulti (neelSquareState 2 3) =
+      basisVec (flipConfig (neelSquareConfig 2 3)) :=
+  timeReversalSpinHalfMulti_neelSquareState 2 3
+
 /-! ## 3D cubic Néel state -/
 
 example (K L M : ℕ) :
