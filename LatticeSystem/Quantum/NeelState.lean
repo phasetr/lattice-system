@@ -1504,4 +1504,71 @@ theorem neelCubicState_norm_squared (K L M : ℕ) :
   rw [basisVec_inner]
   simp
 
+/-! ## Néel-state inner product against the swapped basis vector -/
+
+/-- Orthogonality: the 1D Néel state is orthogonal to the swapped
+basis vector at any adjacent (antiparallel) bond. Direct
+consequence of `basisVec_inner` + `basisSwap_ne_self`
+(swap of antiparallel pair changes the configuration). -/
+theorem neelChainState_inner_basisVec_basisSwap_adjacent_eq_zero
+    (K : ℕ) {i : ℕ} (hi : i + 1 < 2 * K) :
+    ∑ τ : Fin (2 * K) → Fin 2,
+        neelChainState K τ *
+          basisVec (basisSwap (neelChainConfig K)
+            (⟨i, by omega⟩ : Fin (2 * K)) ⟨i + 1, hi⟩) τ = 0 := by
+  unfold neelChainState
+  rw [basisVec_inner]
+  rw [if_neg]
+  apply basisSwap_ne_self
+  · intro h
+    have := congrArg Fin.val h
+    simp at this
+  · unfold neelChainConfig
+    by_cases hp : i % 2 = 0
+    · have hp1 : (i + 1) % 2 ≠ 0 := by omega
+      simp [hp, hp1]
+    · have hp1 : (i + 1) % 2 = 0 := by omega
+      simp [hp, hp1]
+
+/-! ## Per-bond expectation `⟨Φ_Néel, Ŝ_x · Ŝ_y · Φ_Néel⟩ = -1/4`
+
+Combining the per-bond action (#23x: `spinHalfDot_mulVec_neelChain
+State_adjacent`) with the orthogonality `⟨Φ_Néel, basisVec(swap)⟩
+= 0` gives the bond expectation `-1/4` (Tasaki §2.5 (2.5.4)
+ingredient). -/
+
+/-- 1D Néel chain: per-adjacent-bond expectation of `Ŝ_x · Ŝ_y`
+equals `-1/4`. -/
+theorem neelChainState_inner_spinHalfDot_adjacent_eq_neg_one_quarter
+    (K : ℕ) {i : ℕ} (hi : i + 1 < 2 * K) :
+    ∑ τ : Fin (2 * K) → Fin 2,
+        neelChainState K τ *
+          ((spinHalfDot
+              (⟨i, by omega⟩ : Fin (2 * K))
+              (⟨i + 1, hi⟩ : Fin (2 * K))).mulVec
+            (neelChainState K)) τ = -(1 / 4 : ℂ) := by
+  have h := spinHalfDot_mulVec_neelChainState_adjacent K hi
+  simp_rw [h]
+  simp_rw [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, mul_sub]
+  rw [Finset.sum_sub_distrib]
+  simp_rw [show ∀ τ : Fin (2 * K) → Fin 2,
+      neelChainState K τ * ((1 / 2 : ℂ) * basisVec
+        (basisSwap (neelChainConfig K)
+          (⟨i, by omega⟩ : Fin (2 * K))
+          (⟨i + 1, hi⟩ : Fin (2 * K))) τ)
+        = (1 / 2 : ℂ) *
+          (neelChainState K τ *
+            basisVec (basisSwap (neelChainConfig K)
+              (⟨i, by omega⟩ : Fin (2 * K))
+              (⟨i + 1, hi⟩ : Fin (2 * K))) τ) from fun τ => by ring]
+  simp_rw [show ∀ τ : Fin (2 * K) → Fin 2,
+      neelChainState K τ * ((1 / 4 : ℂ) * neelChainState K τ)
+        = (1 / 4 : ℂ) *
+          (neelChainState K τ * neelChainState K τ) from
+      fun τ => by ring]
+  rw [← Finset.mul_sum, ← Finset.mul_sum]
+  rw [neelChainState_inner_basisVec_basisSwap_adjacent_eq_zero K hi,
+    neelChainState_norm_squared]
+  ring
+
 end LatticeSystem.Quantum

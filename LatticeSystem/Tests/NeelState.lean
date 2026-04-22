@@ -538,6 +538,35 @@ example (K L M : ℕ) :
         neelCubicState K L M τ * neelCubicState K L M τ = 1 :=
   neelCubicState_norm_squared K L M
 
+/-! ## Néel-state inner products against swapped basis vectors -/
+
+example (K : ℕ) {i : ℕ} (hi : i + 1 < 2 * K) :
+    ∑ τ : Fin (2 * K) → Fin 2,
+        neelChainState K τ *
+          basisVec (basisSwap (neelChainConfig K)
+            (⟨i, by omega⟩ : Fin (2 * K)) ⟨i + 1, hi⟩) τ = 0 :=
+  neelChainState_inner_basisVec_basisSwap_adjacent_eq_zero K hi
+
+/-! ## Per-bond expectation = -1/4 -/
+
+example (K : ℕ) {i : ℕ} (hi : i + 1 < 2 * K) :
+    ∑ τ : Fin (2 * K) → Fin 2,
+        neelChainState K τ *
+          ((spinHalfDot
+              (⟨i, by omega⟩ : Fin (2 * K))
+              (⟨i + 1, hi⟩ : Fin (2 * K))).mulVec
+            (neelChainState K)) τ = -(1 / 4 : ℂ) :=
+  neelChainState_inner_spinHalfDot_adjacent_eq_neg_one_quarter K hi
+
+example :
+    ∑ τ : Fin (2 * 1) → Fin 2,
+        neelChainState 1 τ *
+          ((spinHalfDot
+              (⟨0, by decide⟩ : Fin 2)
+              (⟨1, by decide⟩ : Fin 2)).mulVec
+            (neelChainState 1)) τ = -(1 / 4 : ℂ) :=
+  neelChainState_inner_spinHalfDot_adjacent_eq_neg_one_quarter 1 (by decide)
+
 /-! ## Marshall × time-reversal bridge -/
 
 example (K : ℕ) :
