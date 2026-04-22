@@ -943,4 +943,24 @@ theorem timeReversalSpinHalfMulti_singlet :
   simp [neg_one_smul, sub_eq_add_neg]
   ring_nf
 
+/-- The triplet `m = 0` state `|↑↓⟩ + |↓↑⟩` flips sign under
+`Θ̂_tot`:
+
+  `Θ̂_tot (|↑↓⟩ + |↓↑⟩) = -(|↑↓⟩ + |↓↑⟩)`.
+
+This is consistent with the singlet (S = 0) being even under
+`Θ̂_tot` and the m=0 component of the triplet (S = 1) being odd
+— the two basis vectors `|↑↓⟩, |↓↑⟩` each map to `-` of the
+other, and the symmetric combination picks up the resulting `-1`
+sign. -/
+theorem timeReversalSpinHalfMulti_triplet_zero :
+    timeReversalSpinHalfMulti
+        ((basisVec upDown + basisVec (basisSwap upDown 0 1)) :
+          (Fin 2 → Fin 2) → ℂ) =
+      -(basisVec upDown + basisVec (basisSwap upDown 0 1)) := by
+  rw [timeReversalSpinHalfMulti_add,
+    timeReversalSpinHalfMulti_basisVec_upDown,
+    timeReversalSpinHalfMulti_basisVec_basisSwap_upDown]
+  abel
+
 end LatticeSystem.Quantum

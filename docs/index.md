@@ -325,6 +325,7 @@ Systems*, §2.3 eqs. (2.3.4)–(2.3.8), pp. 26–27.
 | `timeReversalSpinHalfMulti_openChainHeisenberg_mulVec` / `_periodicChainHeisenberg_mulVec` / `_squareLatticeHeisenberg_mulVec` / `_squareTorusHeisenberg_mulVec` / `_cubicLatticeHeisenberg_mulVec` | concrete time-reversal invariance: the open / periodic chain, the 2D open square / torus, and the 3D cubic Heisenberg Hamiltonians all commute with `Θ̂_tot` for any real coupling `J : ℝ`. Backed by `*Coupling_conj` reality lemmas in `HeisenbergChain.lean` | `Quantum/TimeReversalMulti.lean` |
 | `timeReversalSpinHalfMulti_basisVec_upDown` / `_basisVec_basisSwap_upDown` | `Θ̂_tot |↑↓⟩ = -|↓↑⟩` and `Θ̂_tot |↓↑⟩ = -|↑↓⟩` on `Fin 2` | `Quantum/TimeReversalMulti.lean` |
 | `timeReversalSpinHalfMulti_singlet` | the two-site spin singlet `|↑↓⟩ - |↓↑⟩` is **time-reversal invariant** (Tasaki §2.3 / §A.3): being the SU(2) `S = 0` representation, it survives `Θ̂_tot` unchanged | `Quantum/TimeReversalMulti.lean` |
+| `timeReversalSpinHalfMulti_triplet_zero` | the triplet `m = 0` state `|↑↓⟩ + |↓↑⟩` is **anti-invariant** under `Θ̂_tot`: `Θ̂_tot (|↑↓⟩ + |↓↑⟩) = -(|↑↓⟩ + |↓↑⟩)` (the symmetric combination picks up a minus sign from the per-basis-vector flip) | `Quantum/TimeReversalMulti.lean` |
 
 ### Multi-body operator space (abstract lattice)
 
