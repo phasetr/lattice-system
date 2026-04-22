@@ -624,7 +624,7 @@ example (K : ℕ) {i : ℕ} (hi : i + 1 < 2 * K) :
               onSite (⟨i + 1, hi⟩ : Fin (2 * K))
                 spinHalfOp3).mulVec
             (neelChainState K)) τ = -(1 / 4 : ℂ) :=
-  neelChainState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_adjacent_eq_neg_one_quarter K hi
+  neelChainState_inner_szsz_adjacent_eq_neg_one_quarter K hi
 
 example {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (x y : Λ) (σ : Λ → Fin 2) :
     ∑ τ : Λ → Fin 2,
@@ -644,7 +644,7 @@ example (K : ℕ) :
               onSite (⟨0, by omega⟩ : Fin (2 * (K + 1)))
                 spinHalfOp3).mulVec
             (neelChainState (K + 1))) τ = -(1 / 4 : ℂ) :=
-  neelChainState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_wrap_eq_neg_one_quarter K
+  neelChainState_inner_szsz_wrap_eq_neg_one_quarter K
 
 example (K L M : ℕ) {i j k : ℕ}
     (hi : i + 1 < 2 * K) (hj : j < 2 * L) (hk : k < 2 * M) :
@@ -657,7 +657,8 @@ example (K L M : ℕ) {i j k : ℕ}
                 (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M))
                 spinHalfOp3).mulVec
             (neelCubicState K L M)) τ = -(1 / 4 : ℂ) :=
-  neelCubicState_inner_onSite_spinHalfOp3_mul_onSite_spinHalfOp3_x_adjacent_eq_neg_one_quarter K L M hi hj hk
+  neelCubicState_inner_szsz_x_adjacent_eq_neg_one_quarter
+    K L M hi hj hk
 
 /-! ## Off-diagonal correlator vanishes -/
 

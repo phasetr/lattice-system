@@ -30,7 +30,8 @@ is now a thin re-import of nine sub-files under
 | `BondAction/Square.lean` | 2D bond action (horizontal / vertical, adjacent + wrap) |
 | `BondAction/Cubic.lean` | 3D bond action (x / y / z, adjacent + wrap) |
 | `TimeReversal.lean` | `Θ̂_tot · Φ_Néel` action across all dimensions |
-| `MarshallSign.lean` | Marshall sign machinery (generic + chain / 2D / 3D + flip + Marshall × time-reversal bridge) |
+| `MarshallSign.lean` | Marshall sign machinery (generic + chain / 2D / 3D, |
+|                     | + flip + Marshall × time-reversal bridge) |
 | `InnerProduct.lean` | norm² + per-bond expectation `-1/4` (S·S, S^z·S^z, parallel, off-diagonal) |
 | `Energy.lean` | K=1 chain Heisenberg energy expectation `J/2` |
 
