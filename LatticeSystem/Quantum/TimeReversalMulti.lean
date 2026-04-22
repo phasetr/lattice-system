@@ -418,4 +418,68 @@ theorem onSite_pauliX_mulVec_apply
         rw [h, siteFlipAt_of_ne _ hk]
       rw [if_neg hagree, if_neg hσ, zero_mul]
 
+/-- The sign-product flips by `-1` under `siteFlipAt`: for any
+configuration `τ` and site `x`,
+
+  `∏_y ε((siteFlipAt τ x) y) = -(∏_y ε(τ y))`.
+
+(One factor `ε(τ x)` is replaced by `ε(1 - τ x) = -ε(τ x)`.) -/
+theorem timeReversalSign_prod_siteFlipAt (τ : Λ → Fin 2) (x : Λ) :
+    (∏ y : Λ, timeReversalSign ((siteFlipAt τ x) y)) =
+      -(∏ y : Λ, timeReversalSign (τ y)) := by
+  have h_at : timeReversalSign ((siteFlipAt τ x) x)
+      = -timeReversalSign (τ x) := by
+    rw [siteFlipAt_self]
+    match h : τ x with
+    | 0 => simp [timeReversalSign, h]
+    | 1 => simp [timeReversalSign, h]
+  have h_off : (∏ y ∈ Finset.univ.erase x,
+        timeReversalSign ((siteFlipAt τ x) y)) =
+      ∏ y ∈ Finset.univ.erase x, timeReversalSign (τ y) := by
+    apply Finset.prod_congr rfl
+    intro y hy
+    rw [Finset.mem_erase] at hy
+    rw [siteFlipAt_of_ne _ hy.1]
+  calc (∏ y : Λ, timeReversalSign ((siteFlipAt τ x) y))
+      = timeReversalSign ((siteFlipAt τ x) x)
+          * ∏ y ∈ Finset.univ.erase x,
+              timeReversalSign ((siteFlipAt τ x) y) := by
+        rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ x)]
+    _ = (-timeReversalSign (τ x))
+          * ∏ y ∈ Finset.univ.erase x, timeReversalSign (τ y) := by
+        rw [h_at, h_off]
+    _ = -(timeReversalSign (τ x)
+          * ∏ y ∈ Finset.univ.erase x, timeReversalSign (τ y)) := by
+        ring
+    _ = -(∏ y : Λ, timeReversalSign (τ y)) := by
+        congr 1
+        exact Finset.mul_prod_erase Finset.univ
+          (fun y => timeReversalSign (τ y)) (Finset.mem_univ x)
+
+/-- Multi-site sign-flip equivariance for `σ^x` (Tasaki §2.3
+(2.3.14) at `α = 1`):
+
+  `Θ̂_tot ((onSite x σ^x) v) = (-(onSite x σ^x))(Θ̂_tot v)`.
+
+Proof: both sides reduce via `onSite_pauliX_mulVec_apply` to a
+`v` evaluated at `siteFlipAt _ x` (after using
+`flipConfig_siteFlipAt_comm` to identify `flip(siteFlipAt τ x)`
+with `siteFlipAt(flip τ) x`). The sign-product factors differ by
+`-1` (one `ε(τ x)` becomes `ε(1 - τ x)`), exactly cancelling the
+explicit minus on the right. -/
+theorem timeReversalSpinHalfMulti_onSite_pauliX_mulVec
+    (x : Λ) (v : (Λ → Fin 2) → ℂ) :
+    timeReversalSpinHalfMulti ((onSite x pauliX).mulVec v) =
+      (-(onSite x pauliX)).mulVec
+        (timeReversalSpinHalfMulti v) := by
+  funext τ
+  rw [Matrix.neg_mulVec, Pi.neg_apply,
+    onSite_pauliX_mulVec_apply,
+    timeReversalSpinHalfMulti_apply,
+    timeReversalSpinHalfMulti_apply,
+    onSite_pauliX_mulVec_apply,
+    ← flipConfig_siteFlipAt_comm,
+    timeReversalSign_prod_siteFlipAt]
+  ring
+
 end LatticeSystem.Quantum
