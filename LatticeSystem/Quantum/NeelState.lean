@@ -1109,4 +1109,49 @@ theorem marshallSignCubicConfig_neelCubicConfig (K L M : ℕ) :
   · simp [hp]
   · simp [hp]
 
+/-- The Marshall-rotated chain basis state at configuration `σ`:
+`|σ⟩_M := marshallSignChainConfig K σ · |σ⟩`. After the basis
+change `|σ⟩ ↦ |σ⟩_M`, the AF Heisenberg Hamiltonian on the
+bipartite chain has all non-positive off-diagonal entries — the
+input to the Perron-Frobenius proof of MLM (Tasaki §2.5). -/
+noncomputable def marshallChainState (K : ℕ)
+    (σ : Fin (2 * K) → Fin 2) : (Fin (2 * K) → Fin 2) → ℂ :=
+  marshallSignChainConfig K σ • basisVec σ
+
+/-- The Marshall-rotated Néel chain state coincides with the
+Néel chain state itself (since `marshallSignChainConfig K
+(neelChainConfig K) = 1`). -/
+theorem marshallChainState_neelChainConfig (K : ℕ) :
+    marshallChainState K (neelChainConfig K) = neelChainState K := by
+  unfold marshallChainState neelChainState
+  rw [marshallSignChainConfig_neelChainConfig, one_smul]
+
+/-- 2D Marshall-rotated checkerboard state. -/
+noncomputable def marshallSquareState (K L : ℕ)
+    (σ : Fin (2 * K) × Fin (2 * L) → Fin 2) :
+    (Fin (2 * K) × Fin (2 * L) → Fin 2) → ℂ :=
+  marshallSignSquareConfig K L σ • basisVec σ
+
+/-- The Marshall-rotated 2D Néel state coincides with the 2D
+Néel state itself. -/
+theorem marshallSquareState_neelSquareConfig (K L : ℕ) :
+    marshallSquareState K L (neelSquareConfig K L) =
+      neelSquareState K L := by
+  unfold marshallSquareState neelSquareState
+  rw [marshallSignSquareConfig_neelSquareConfig, one_smul]
+
+/-- 3D cubic Marshall-rotated checkerboard state. -/
+noncomputable def marshallCubicState (K L M : ℕ)
+    (σ : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2) :
+    ((Fin (2 * K) × Fin (2 * L)) × Fin (2 * M) → Fin 2) → ℂ :=
+  marshallSignCubicConfig K L M σ • basisVec σ
+
+/-- The Marshall-rotated 3D cubic Néel state coincides with the
+3D cubic Néel state itself. -/
+theorem marshallCubicState_neelCubicConfig (K L M : ℕ) :
+    marshallCubicState K L M (neelCubicConfig K L M) =
+      neelCubicState K L M := by
+  unfold marshallCubicState neelCubicState
+  rw [marshallSignCubicConfig_neelCubicConfig, one_smul]
+
 end LatticeSystem.Quantum

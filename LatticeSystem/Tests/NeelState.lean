@@ -409,4 +409,20 @@ example :
     marshallSignCubicConfig 2 2 1 (neelCubicConfig 2 2 1) = 1 :=
   marshallSignCubicConfig_neelCubicConfig 2 2 1
 
+/-! ## Marshall-rotated states equal the Néel states -/
+
+example (K : ℕ) :
+    marshallChainState K (neelChainConfig K) = neelChainState K :=
+  marshallChainState_neelChainConfig K
+
+example (K L : ℕ) :
+    marshallSquareState K L (neelSquareConfig K L) =
+      neelSquareState K L :=
+  marshallSquareState_neelSquareConfig K L
+
+example (K L M : ℕ) :
+    marshallCubicState K L M (neelCubicConfig K L M) =
+      neelCubicState K L M :=
+  marshallCubicState_neelCubicConfig K L M
+
 end LatticeSystem.Tests.NeelState
