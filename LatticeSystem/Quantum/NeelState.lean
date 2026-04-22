@@ -683,6 +683,55 @@ theorem timeReversalSpinHalfMulti_neelSquareState_one_one :
     simp [flipConfig, neelSquareConfig, timeReversalSign]
   rw [hprod, one_smul]
 
+/-! ## 3D Néel time-reversal action (general K, L, M) -/
+
+/-- Tasaki §2.5 generalisation of #257 to arbitrary 3D cubic
+checkerboard size: the multi-spin time-reversal acts on the 3D
+Néel state by
+
+  `Θ̂_tot (neelCubicState K L M) =
+    basisVec (flipConfig (neelCubicConfig K L M))`,
+
+with no overall sign because the 8KLM sites split exactly into
+4KLM ups and 4KLM downs, and `(-1)^(4KLM) = 1`. Reuses the
+`prod_alternating_neg_one_offset` helper to collapse the
+`k`-axis product first. -/
+theorem timeReversalSpinHalfMulti_neelCubicState (K L M : ℕ) :
+    timeReversalSpinHalfMulti (neelCubicState K L M) =
+      basisVec (flipConfig (neelCubicConfig K L M)) := by
+  unfold neelCubicState
+  rw [timeReversalSpinHalfMulti_basisVec]
+  have hprod :
+      (∏ p : (Fin (2 * K) × Fin (2 * L)) × Fin (2 * M),
+          timeReversalSign (flipConfig (neelCubicConfig K L M) p))
+        = (1 : ℂ) := by
+    rw [Fintype.prod_prod_type]
+    have h_inner : ∀ p : Fin (2 * K) × Fin (2 * L),
+        (∏ k : Fin (2 * M),
+            timeReversalSign
+              (flipConfig (neelCubicConfig K L M) (p, k))) =
+          (-1 : ℂ) ^ M := by
+      intro p
+      have h_pointwise : ∀ k : Fin (2 * M),
+          timeReversalSign
+              (flipConfig (neelCubicConfig K L M) (p, k)) =
+            (if (p.1.val + p.2.val + k.val) % 2 = 0
+              then (-1 : ℂ) else 1) := by
+        intro k
+        unfold flipConfig neelCubicConfig timeReversalSign
+        by_cases hp : (p.1.val + p.2.val + k.val) % 2 = 0
+        · simp [hp]
+        · simp [hp]
+      rw [Finset.prod_congr rfl (fun k _ => h_pointwise k)]
+      exact prod_alternating_neg_one_offset (p.1.val + p.2.val) M
+    rw [Finset.prod_congr rfl (fun p _ => h_inner p)]
+    rw [Finset.prod_const, Finset.card_univ,
+      Fintype.card_prod, Fintype.card_fin, Fintype.card_fin]
+    rw [← pow_mul,
+      show M * (2 * K * (2 * L)) = 2 * (2 * K * L * M) from by ring,
+      pow_mul, show ((-1 : ℂ)) ^ 2 = 1 from by norm_num, one_pow]
+  rw [hprod, one_smul]
+
 /-! ## 3D Néel time-reversal action (K = L = M = 1 instance) -/
 
 /-- Concrete time-reversal action on the 3D cubic Néel state for
