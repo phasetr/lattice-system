@@ -24,6 +24,20 @@ We prove Hermiticity of each axis component. The distinct-site
 commutation `[Ŝ_x^(α), Ŝ_y^(β)] = 0` for `x ≠ y` — the S = 1/2 case of
 Tasaki eq. (2.2.6) — is already available via `onSite_mul_onSite_of_ne`.
 
+Sub-files extending this module (Phase 2 PR 19 / 20 split, plan
+v4 §3.1):
+
+| sub-file | content |
+|---|---|
+| `TotalSpin/Casimir.lean` | total-spin Casimir `Ŝ_tot²` + commutation |
+|                          | with components + magnetisation eigenvalues |
+| `TotalSpin/Rotation.lean` | global rotation operators `Û^(α)_θ` on the |
+|                           | many-body space + commute-with-Ŝ_tot identities |
+
+Downstream code that wants the Casimir or rotation machinery
+should import `Quantum.TotalSpin.Casimir` and / or
+`Quantum.TotalSpin.Rotation` directly (not just `Quantum.TotalSpin`).
+
 Specific topics deferred to later work include the global rotation
 operator `Û^(α)_θ = exp(-iθ Ŝ_tot^(α))` (eq. (2.2.11)), the SU(2) /
 U(1) invariance characterization (eqs. (2.2.12), (2.2.13)), and the
