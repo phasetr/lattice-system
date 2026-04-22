@@ -181,4 +181,24 @@ example (N : ℕ) (J : ℝ) (v : (Fin (N + 2) → Fin 2) → ℂ) :
         (timeReversalSpinHalfMulti v) :=
   timeReversalSpinHalfMulti_periodicChainHeisenberg_mulVec N J v
 
+/-! ## Two-site Néel / singlet time reversal -/
+
+example :
+    timeReversalSpinHalfMulti (basisVec upDown : (Fin 2 → Fin 2) → ℂ) =
+      -basisVec (basisSwap upDown 0 1) :=
+  timeReversalSpinHalfMulti_basisVec_upDown
+
+example :
+    timeReversalSpinHalfMulti
+        (basisVec (basisSwap upDown 0 1) : (Fin 2 → Fin 2) → ℂ) =
+      -basisVec upDown :=
+  timeReversalSpinHalfMulti_basisVec_basisSwap_upDown
+
+example :
+    timeReversalSpinHalfMulti
+        ((basisVec upDown - basisVec (basisSwap upDown 0 1)) :
+          (Fin 2 → Fin 2) → ℂ) =
+      basisVec upDown - basisVec (basisSwap upDown 0 1) :=
+  timeReversalSpinHalfMulti_singlet
+
 end LatticeSystem.Tests.TimeReversalMulti
