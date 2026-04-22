@@ -265,7 +265,7 @@ theorem timeReversalSpinHalfMulti_basisVec_upDown :
     funext i
     fin_cases i <;> simp [flipConfig, upDown, basisSwap]
   rw [hprod, hflip]
-  simp [neg_one_smul]
+  simp
 
 /-- `Θ̂_tot |↓↑⟩ = -|↑↓⟩` on `Fin 2`. -/
 theorem timeReversalSpinHalfMulti_basisVec_basisSwap_upDown :
@@ -282,7 +282,7 @@ theorem timeReversalSpinHalfMulti_basisVec_basisSwap_upDown :
     funext i
     fin_cases i <;> simp [flipConfig, basisSwap_upDown, upDown]
   rw [hprod, hflip]
-  simp [neg_one_smul]
+  simp
 
 /-- **The two-site spin singlet `|↑↓⟩ - |↓↑⟩` is time-reversal
 invariant** (Tasaki §2.3 corollary): being the SU(2)-invariant
@@ -307,7 +307,7 @@ theorem timeReversalSpinHalfMulti_singlet :
     timeReversalSpinHalfMulti_basisVec_upDown,
     timeReversalSpinHalfMulti_smul,
     timeReversalSpinHalfMulti_basisVec_basisSwap_upDown]
-  simp [neg_one_smul, sub_eq_add_neg]
+  simp
   ring_nf
 
 /-- The triplet `m = 0` state `|↑↓⟩ + |↓↑⟩` flips sign under

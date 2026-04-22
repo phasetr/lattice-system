@@ -67,8 +67,8 @@ private theorem onSite_pauliZ_mulVec_apply
         rw [if_pos hτσ.symm]
         rw [hτσ]
         match h : σ x with
-        | 0 => simp [pauliZ, h]
-        | 1 => simp [pauliZ, h]
+        | 0 => simp [pauliZ]
+        | 1 => simp [pauliZ]
       · -- τ x ≠ σ x ⇒ τ ≠ σ; pauliZ off-diagonal = 0
         have hτσ : σ ≠ τ := by
           intro h
@@ -77,8 +77,8 @@ private theorem onSite_pauliZ_mulVec_apply
         rw [if_neg hτσ]
         match hτ : τ x, hσ : σ x with
         | 0, 0 => exact absurd (hτ.trans hσ.symm) hx
-        | 0, 1 => simp [pauliZ, hτ, hσ]
-        | 1, 0 => simp [pauliZ, hτ, hσ]
+        | 0, 1 => simp [pauliZ]
+        | 1, 0 => simp [pauliZ]
         | 1, 1 => exact absurd (hτ.trans hσ.symm) hx
     · rw [if_neg hagree]
       have hστ : σ ≠ τ := by
@@ -169,8 +169,8 @@ theorem siteFlipAt_involutive (τ : Λ → Fin 2) (x : Λ) :
   by_cases hy : y = x
   · rw [hy, siteFlipAt_self, siteFlipAt_self]
     match h : τ x with
-    | 0 => simp [h]
-    | 1 => simp [h]
+    | 0 => simp
+    | 1 => simp
   · rw [siteFlipAt_of_ne _ hy, siteFlipAt_of_ne _ hy]
 
 /-- Action of `(onSite x σ^x)` on a basis vector: it swaps the
@@ -260,8 +260,8 @@ theorem timeReversalSign_prod_siteFlipAt (τ : Λ → Fin 2) (x : Λ) :
       = -timeReversalSign (τ x) := by
     rw [siteFlipAt_self]
     match h : τ x with
-    | 0 => simp [timeReversalSign, h]
-    | 1 => simp [timeReversalSign, h]
+    | 0 => simp [timeReversalSign]
+    | 1 => simp [timeReversalSign]
   have h_off : (∏ y ∈ Finset.univ.erase x,
         timeReversalSign ((siteFlipAt τ x) y)) =
       ∏ y ∈ Finset.univ.erase x, timeReversalSign (τ y) := by
