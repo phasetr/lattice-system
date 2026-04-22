@@ -3952,6 +3952,35 @@ instead of \(\sigma^+_j\) at site \(j\), which still commutes with
 \(\{c_i^\dagger, c_j\}\) --- \texttt{conjTranspose} again.
 \end{proof}
 
+\subsection{Hubbard chain (open and periodic boundary conditions)}
+\label{subsec:hubbard-chain}
+
+The Hubbard chain Hamiltonian on \(\mathrm{Fin}\,(N+1)\) sites is
+\[
+  \hat H_{\rm Hubbard}
+    = -t \sum_{\langle i, j\rangle, \alpha}
+        \bigl(c_{i,\alpha}^\dagger c_{j,\alpha}
+              + c_{j,\alpha}^\dagger c_{i,\alpha}\bigr)
+      + U \sum_i n_{i,\uparrow} n_{i,\downarrow},
+\]
+with the spinful operators
+\(c_{i,\alpha}\) for \(\alpha \in \{\uparrow,\downarrow\}\)
+constructed via Jordan--Wigner from the spinless multi-mode
+operators of the previous section.  The Lean formalisation is
+\texttt{LatticeSystem/Fermion/JordanWigner/Hubbard.lean}.
+
+\textbf{Status}: Formalised on
+\(\mathrm{Fin}\,(N+1)\) (open BC) and \(\mathrm{Fin}\,(N+2)\)
+(periodic BC) with the corresponding Gibbs state +
+expectation companion family
+(\texttt{hubbardChain\{Hamiltonian, Gibbs\}\{State,Expectation\}\_*}
+and the periodic counterparts, Phase 2 work, issue \#241).
+The companion family is at parity with the 1D / 2D / 3D
+Heisenberg variants (Hermiticity, commute-with-H, $\beta = 0$
+closed form, im-of-Hermitian, commutator, mul-Hamiltonian-im,
+hamiltonian-pow-im, anticommutator, commutator-re,
+partition function im, ofReal-re-eq, pow-trace).
+
 \section{Time-reversal map for a single \(S = 1/2\) spin (Tasaki §2.3)}
 \label{sec:time-reversal-spin-half}
 %======================================================================
