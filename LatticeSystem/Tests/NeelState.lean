@@ -432,6 +432,12 @@ example (K L M : ℕ)
           decide ((p.1.1.val + p.1.2.val + p.2.val) % 2 = 0)) σ :=
   marshallSignCubicConfig_eq_marshallSignOf K L M σ
 
+/-! ## Generic `marshallSignOf` properties (Phase 3 PR 1) -/
+
+example {V : Type*} [Fintype V] (A : V → Bool) :
+    marshallSignOf A (fun _ : V => (0 : Fin 2)) = 1 :=
+  marshallSignOf_const_zero A
+
 /-! ## Marshall sign on constant configurations -/
 
 example (K : ℕ) :
