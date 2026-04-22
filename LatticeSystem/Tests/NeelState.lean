@@ -149,4 +149,40 @@ example :
       magnetizationSubspace (Fin (2 * 2) × Fin (2 * 2)) (0 : ℂ) :=
   neelSquareState_mem_magnetizationSubspace_zero 2 2
 
+/-! ## 2D Néel per-bond actions -/
+
+example (K L : ℕ) {i j : ℕ}
+    (hi : i + 1 < 2 * K) (hj : j < 2 * L) :
+    (spinHalfDot
+        ((⟨i, by omega⟩, ⟨j, hj⟩) :
+          Fin (2 * K) × Fin (2 * L))
+        ((⟨i + 1, hi⟩, ⟨j, hj⟩) :
+          Fin (2 * K) × Fin (2 * L))).mulVec
+        (neelSquareState K L) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelSquareConfig K L)
+            ((⟨i, by omega⟩, ⟨j, hj⟩) :
+              Fin (2 * K) × Fin (2 * L))
+            ((⟨i + 1, hi⟩, ⟨j, hj⟩) :
+              Fin (2 * K) × Fin (2 * L)))
+        - (1 / 4 : ℂ) • neelSquareState K L :=
+  spinHalfDot_mulVec_neelSquareState_horizontal_adjacent K L hi hj
+
+example (K L : ℕ) {i j : ℕ}
+    (hi : i < 2 * K) (hj : j + 1 < 2 * L) :
+    (spinHalfDot
+        ((⟨i, hi⟩, ⟨j, by omega⟩) :
+          Fin (2 * K) × Fin (2 * L))
+        ((⟨i, hi⟩, ⟨j + 1, hj⟩) :
+          Fin (2 * K) × Fin (2 * L))).mulVec
+        (neelSquareState K L) =
+      (1 / 2 : ℂ) • basisVec
+          (basisSwap (neelSquareConfig K L)
+            ((⟨i, hi⟩, ⟨j, by omega⟩) :
+              Fin (2 * K) × Fin (2 * L))
+            ((⟨i, hi⟩, ⟨j + 1, hj⟩) :
+              Fin (2 * K) × Fin (2 * L))) -
+        (1 / 4 : ℂ) • neelSquareState K L :=
+  spinHalfDot_mulVec_neelSquareState_vertical_adjacent K L hi hj
+
 end LatticeSystem.Tests.NeelState
