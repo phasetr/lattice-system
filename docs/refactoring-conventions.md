@@ -349,7 +349,7 @@ mechanically** and catch most regressions / drift.
   primitives), Marshall sign generic + `@[deprecated]` window,
   2D / 3D Heisenberg companion family parity. PRs #329 / #330 /
   #331 / #332 / #333 / #334.
-- **2026-04-23 (Phase 4 #284 in progress)**: Linter-warning
+- **2026-04-23 (Phase 4 #284 substantially complete)**: Linter-warning
   cleanup (`lake build` is **zero warnings + zero errors**), §3
   expanded with concrete deprecation policy (6-month window from
   `since`, message-form when target name unavailable, internal
