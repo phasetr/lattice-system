@@ -150,7 +150,7 @@ Examples:
 - PR #332 lifted `spinHalfSign_mul_antiparallel` from
   `private lemma` to public `theorem` so the new generic
   `inner_neelStateOf_szsz_neelStateOf_antiparallel` could use it.
-  Also documented in `docs/index.md` per [§6](#6-public-doc-synchronisation-claudelocalmd-longstanding).
+  Also documented in `docs/index.md` per §6 below.
 - During Phase 2 several `_aux` private lemmas had to be lifted
   when their parent file was split (e.g., `prod_alternating_neg_one`,
   `onSite_conjTranspose`). Each PR body explicitly documented the
@@ -261,7 +261,7 @@ deprecation warning text itself is captured by `#guard_msgs`
   `set_option linter.deprecated false` after the deprecated
   declarations and before the companion theorems with a comment
   pointing to the deprecation rationale. The companions are
-  migration scaffolding (see [§3 Deprecation window](#3-dedup-conventions)).
+  migration scaffolding (see §3 "Deprecation window" above).
 - **`linter.unusedSimpArgs`**: trim the dead arguments. If the
   argument is needed in some sub-cases of a `<;>`-chained simp
   but not others, accept the warning per-theorem with comment
