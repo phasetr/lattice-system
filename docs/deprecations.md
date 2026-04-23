@@ -107,6 +107,10 @@ Phase 4 completion criterion (no `set_option linter.* false` in
 source files) targets eventual removal of these via interactive
 proof refactoring.
 
+**Tracking issue**: [#377](https://github.com/phasetr/lattice-system/issues/377)
+follows the removal of these 7 suppressions in a focused
+Lean-interactive session.
+
 ---
 
 ## See also
