@@ -123,8 +123,7 @@ example (N : ℕ) (i : Fin (N + 1)) : (spinX N i).IsHermitian :=
 
 /-! ## Computational matrix-entry tests (attempted, partially blocked)
 
-Per codex consultation (see `.self-local/docs/ising-bridge-plan.md`)
-the plan was to add matrix-entry tests at the 2-site (N=1) level
+The plan was to add matrix-entry tests at the 2-site (N=1) level
 to catch any behavioural drift in the
 `quantumIsingHamiltonian` → `isingHamiltonianGeneric` bridge.
 
@@ -132,15 +131,14 @@ The computational entry-level tests turned out to be blocked: the
 many-body matrix expression after unfolding
 `onSite` + `pauliX/Z` + multi-site product is too complex for
 `simp` to reduce in a stable way. Instead, the bridge theorem
-itself (PR #187) serves as the primary regression test:
-its proof fixes the normalisation.
+itself (PR #187) serves as the primary regression test, and the
+operator-level bridge identities at small `N` (the
+`quantumIsingHamiltonian_eq_isingHamiltonianGeneric` shim block
+below) provide the operator-equality coverage.
 
-Alternative robust tests (still TODO):
-- `mulVec` on `basisVec`: cleanly reduces via
-  `onSite_mulVec_basisVec`. E.g.
-  `H.mulVec (basisVec all-up) = (-J) • basisVec all-up` when h=0.
-- Bridge identity by `unfold; simp_rw; funext; ...` comparing
-  operator-level equality rather than entry-level equality. -/
+The `mulVec`-on-`basisVec` direction (`H · |↑..↑⟩ = (-J) · |↑..↑⟩`
+at `h = 0`) remains a useful extension if a future PR finds a
+robust `simp` recipe for it. -/
 
 /-! ## Ising bridge theorem specialisations (PR #187)
 
