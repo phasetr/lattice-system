@@ -354,9 +354,14 @@ mechanically** and catch most regressions / drift.
   expanded with concrete deprecation policy (6-month window from
   `since`, message-form when target name unavailable, internal
   companions linter-suppression pattern, `#guard_msgs` capture),
-  `docs/deprecations.md` Jekyll page (live tracking + removal
-  checklist + remaining linter-suppression transparency), all
-  parent module-header docstrings now document their extension
-  sub-files (NeelState, SpinDot, JordanWigner facades; TotalSpin,
-  HeisenbergChain, SpinHalfRotation, GibbsState, TimeReversalMulti
-  content + extensions). PRs #335–#362.
+  §5 with common linter-rewrite patterns (per-theorem `omit`
+  instead of file-level `set_option linter.unused*`, etc.), §2
+  with content + extensions pattern + helper-visibility examples,
+  §1 cross-reference to `Tests/Foundation.lean` POC, §6b
+  push-verification origin, `docs/deprecations.md` Jekyll page
+  (live tracking + removal checklist + remaining linter-
+  suppression transparency), all parent module-header docstrings
+  now document their extension sub-files (NeelState, SpinDot,
+  JordanWigner facades; TotalSpin, HeisenbergChain,
+  SpinHalfRotation, GibbsState, TimeReversalMulti content +
+  extensions). PRs #335–#372.
