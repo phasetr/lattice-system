@@ -3,19 +3,21 @@ Copyright (c) 2026 lattice-system contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.SpinHalfRotation
+import LatticeSystem.Quantum.SpinHalfRotation.Conjugation
 
 /-!
-# Test coverage for Quantum/SpinHalfRotation
+# Test coverage for Quantum/SpinHalfRotation (and `.Conjugation` extension)
 
 A+C+G+D coverage for the spin-1/2 rotation operators
-`spinHalfRot{1,2,3}`, group law, π / 2π values, and the
-exp-form (refactor plan v4 §9 mapping table; refactor Phase 1 PR 7,
-#281).
+`spinHalfRot{1,2,3}`, group law, π / 2π values, exp-form,
+coherent state, Hadamard, and y-axis diagonalizer (refactor plan
+v4 §9 mapping table; refactor Phase 1 PR 7 #281; codex audit
+follow-up Item 5 added the extension-module coverage).
 -/
 
 namespace LatticeSystem.Tests.SpinHalfRotation
 
-open LatticeSystem.Quantum
+open LatticeSystem.Quantum Matrix
 
 /-! ## D. signature shims (zero / 2π / group law) -/
 
@@ -76,5 +78,39 @@ example : spinHalfRot2 Real.pi = (-(2 * Complex.I)) • spinHalfOp2 :=
 /-- `Û^(3)_π = -2i · Ŝ^(3)`. -/
 example : spinHalfRot3 Real.pi = (-(2 * Complex.I)) • spinHalfOp3 :=
   spinHalfRot3_pi
+
+/-! ## D. Conjugation extension (`SpinHalfRotation/Conjugation.lean`)
+
+Codex audit Item 5: pin representative results from the
+extension sub-file so the test file actually exercises the
+content it imports. -/
+
+/-- General-θ conjugation for axis 3 over axis 1 (Tasaki eq.
+(2.1.16)). -/
+example (θ : ℝ) :
+    (spinHalfRot3 θ)ᴴ * spinHalfOp1 * spinHalfRot3 θ =
+      (Real.cos θ : ℂ) • spinHalfOp1 - (Real.sin θ : ℂ) • spinHalfOp2 :=
+  spinHalfRot3_conj_spinHalfOp1 θ
+
+/-- Exp-form (Tasaki Problem 2.1.b) for axis 3. -/
+example (θ : ℝ) :
+    spinHalfRot3 θ =
+      NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • spinHalfOp3) :=
+  spinHalfRot3_eq_exp θ
+
+/-- Hadamard squares to identity. -/
+example : hadamard * hadamard = 1 := hadamard_mul_self
+
+/-- Hadamard conjugation: `H · Ŝ^(3) · H = Ŝ^(1)`. -/
+example :
+    hadamard * spinHalfOp3 * hadamard = spinHalfOp1 :=
+  hadamard_mul_spinHalfOp3_mul_hadamard
+
+/-- Vector inner product `Ŝ · v` on the canonical axis-3 vector
+`(0, 0, 1)` recovers `Ŝ^(3)`. -/
+example :
+    spinHalfDotVec ![0, 0, 1] = spinHalfOp3 := by
+  unfold spinHalfDotVec
+  simp [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
 
 end LatticeSystem.Tests.SpinHalfRotation
