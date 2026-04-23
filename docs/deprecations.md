@@ -115,6 +115,6 @@ Lean-interactive session.
 
 ## See also
 
-- [refactoring conventions §3 (dedup + deprecation)](refactoring-conventions.html#3-dedup-conventions)
+- [refactoring conventions](refactoring-conventions.html) §3 (dedup + deprecation)
 - [Phase 3 tracking issue #283](https://github.com/phasetr/lattice-system/issues/283)
 - [Phase 4 tracking issue #284](https://github.com/phasetr/lattice-system/issues/284)

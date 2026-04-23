@@ -5,7 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import LatticeSystem.Quantum.NeelState.TimeReversal
 
 /-!
-# Marshall sign on the parity-coloured chain (Tasaki §2.5)
+# Marshall sign — generic graph-centric + chain / 2D / 3D specialisations (Tasaki §2.5)
 
 The Marshall sign (Marshall 1955; Lieb-Mattis 1962; Tasaki §2.5) of
 a spin configuration `σ : Fin (2 * K) → Fin 2` is, on the

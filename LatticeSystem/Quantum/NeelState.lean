@@ -14,7 +14,7 @@ import LatticeSystem.Quantum.NeelState.InnerProduct
 import LatticeSystem.Quantum.NeelState.Energy
 
 /-!
-# Néel state on a bipartite even chain (Tasaki §2.5)
+# Néel state — generic graph-centric + chain / 2D / 3D specialisations (Tasaki §2.5)
 
 **Façade module** re-exporting the entire Néel state machinery.
 Following the refactor plan v4 §3.1 (Phase 2 PR 1–9), this file
