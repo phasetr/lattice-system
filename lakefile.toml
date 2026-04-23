@@ -1,7 +1,7 @@
 name = "LatticeSystem"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["LatticeSystem"]
+defaultTargets = ["LatticeSystem", "LatticeSystem.Tests"]
 
 [leanOptions]
 pp.unicode.fun = true
