@@ -27,15 +27,15 @@ altering any existing definition:
 
 No geometric embedding (lattice points in `ℝ^d`), no coupling
 rescaling, no lattice sequence, and no continuum-limit target object
-is defined here. Those are phases B-D of the roadmap recorded in
-`.self-local/docs/continuum-limit-survey.md` and
-`docs/index.md#continuum-limit-roadmap`, and will be introduced only
-when a concrete theorem needs them.
+is defined here. Those are phases B-D of the
+[Continuum-limit roadmap](https://phasetr.github.io/lattice-system/#continuum-limit-roadmap)
+in `docs/index.md`, and will be introduced only when a concrete
+theorem needs them.
 
-The separation follows the codex consultation (2026-04-22) recorded
-alongside the survey document: add spacing as *metadata* now, keep
-geometry separate, and do **not** generalise `ManyBodyOp Λ = Matrix ...`
-to a type class until a second concrete backend is needed.
+The separation follows the codex consultation (2026-04-22): add
+spacing as *metadata* now, keep geometry separate, and do **not**
+generalise `ManyBodyOp Λ = Matrix ...` to a type class until a
+second concrete backend is needed.
 -/
 
 namespace LatticeSystem.Lattice
@@ -51,10 +51,11 @@ definition in the library consumes it, and the default instance for
 `rfl`-equivalent to its `LatticeWithSpacing`-tagged specialisation.
 
 The class exists so that future work on the continuum limit
-(`a → 0`, cf. `.self-local/docs/continuum-limit-survey.md`) has a
-type-level handle on `a`: rescaling of coupling constants, lattice
-sequences `a_n → 0`, and renormalisation-group transformations will
-all be expressed in terms of `spacing`. -/
+(`a → 0`, cf. the
+[Continuum-limit roadmap](https://phasetr.github.io/lattice-system/#continuum-limit-roadmap))
+has a type-level handle on `a`: rescaling of coupling constants,
+lattice sequences `a_n → 0`, and renormalisation-group
+transformations will all be expressed in terms of `spacing`. -/
 class LatticeWithSpacing (Λ : Type*) : Type where
   /-- The lattice spacing `a : ℝ≥0` attached to `Λ`. -/
   spacing : ℝ≥0

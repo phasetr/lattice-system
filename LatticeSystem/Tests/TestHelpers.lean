@@ -29,8 +29,9 @@ intentionally minimal: most tests will rely on `decide` /
 - **F. `#guard_msgs`**: `/-- expected msg -/ #guard_msgs in <command>`.
 - **G. small exhaustive**: `Fin 2/3/4` enumerated by `fin_cases`.
 
-See `.self-local/docs/refactoring-plan-2026-04-22.md` §2.1 for the
-full method matrix.
+See `docs/refactoring-conventions.md` §1
+([project page](https://phasetr.github.io/lattice-system/refactoring-conventions/#1-test-methods-per-refactor-plan-v4-§21))
+for the full method matrix and review checklist.
 -/
 
 namespace LatticeSystem.Tests.Helpers
