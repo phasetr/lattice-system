@@ -35,10 +35,12 @@ We prove:
   `Û^(α)_{2π} = -1` (Tasaki eq. (2.1.23), p. 16).
 
 The group law `Û^(α)_θ · Û^(α)_φ = Û^(α)_{θ+φ}` and unitarity
-`Û^(α)_θ · (Û^(α)_θ)† = 1` are deferred to a follow-up PR, since their
-proofs require matrix algebra in the non-commutative ring
-`Matrix (Fin 2) (Fin 2) ℂ` restricted to the commutative subring
-`span_ℂ {1, Ŝ^(α)}` with relation `(Ŝ^(α))² = I/4`.
+`Û^(α)_θ · (Û^(α)_θ)† = 1` are formalised here as
+`spinHalfRot{1,2,3}_mul` and `spinHalfRot{1,2,3}_unitary`
+respectively. The matrix-exponential equivalence
+`Û^(α)_θ = exp(-iθ Ŝ^(α))` (Tasaki Problem 2.1.b) is in the
+extension sub-file `SpinHalfRotation/Conjugation.lean` as
+`spinHalfRot{1,2,3}_eq_exp`.
 
 Sub-files extending this module (Phase 2 PR 22 split, plan v4
 §3.1):

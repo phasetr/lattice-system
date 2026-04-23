@@ -38,10 +38,14 @@ Downstream code that wants the Casimir or rotation machinery
 should import `Quantum.TotalSpin.Casimir` and / or
 `Quantum.TotalSpin.Rotation` directly (not just `Quantum.TotalSpin`).
 
-Specific topics deferred to later work include the global rotation
-operator `Û^(α)_θ = exp(-iθ Ŝ_tot^(α))` (eq. (2.2.11)), the SU(2) /
-U(1) invariance characterization (eqs. (2.2.12), (2.2.13)), and the
-two-site dot product `Ŝ_x · Ŝ_y` (eqs. (2.2.16) onward).
+The global rotation operator
+`Û^(α)_θ = exp(-iθ Ŝ_tot^(α))` (eq. (2.2.11)) and the SU(2) /
+U(1) invariance characterization (eqs. (2.2.12), (2.2.13)) are
+now formalised in `TotalSpin/Rotation.lean` (commute-of-commute
+trio + unitarity + conjugation form, see P1f''' status note in
+`tex/proof-guide.tex`). The two-site dot product `Ŝ_x · Ŝ_y`
+(eqs. (2.2.16) onward) lives in `Quantum/SpinDot.lean` and its
+sub-file `SpinDot/Hamiltonian.lean`.
 -/
 
 namespace LatticeSystem.Quantum
