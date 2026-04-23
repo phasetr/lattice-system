@@ -3,6 +3,8 @@ Copyright (c) 2026 lattice-system contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.HeisenbergChain
+import LatticeSystem.Quantum.HeisenbergChain.Eigenvalues
+import LatticeSystem.Quantum.HeisenbergChain.Gibbs
 import LatticeSystem.Quantum.HeisenbergLattice
 
 /-!
@@ -314,5 +316,57 @@ example (J : ℝ) :
           (if (pathGraph 2).Adj x y then -(J : ℂ) else 0) := by
   intro x y
   rfl
+
+/-! ## D. HeisenbergChain extension coverage (codex audit Item 7)
+
+Direct spot-checks for `HeisenbergChain/Eigenvalues.lean` and
+`HeisenbergChain/Gibbs.lean`. Was previously covered only
+indirectly through 2D / 3D wrappers and bond-action lemmas. -/
+
+/-- 2-site explicit form: `H_open(N=1, J) = -2J · Ŝ_0 · Ŝ_1`. -/
+example (J : ℝ) :
+    heisenbergHamiltonian (openChainCoupling 1 J) =
+      (-(2 * J) : ℂ) • spinHalfDot (0 : Fin 2) 1 :=
+  openChainHeisenbergHamiltonian_two_site_eq J
+
+/-- 3-site explicit form: `H_open(N=2, J) = -2J (Ŝ_0·Ŝ_1 + Ŝ_1·Ŝ_2)`. -/
+example (J : ℝ) :
+    heisenbergHamiltonian (openChainCoupling 2 J) =
+      (-(2 * J) : ℂ) • (spinHalfDot (0 : Fin 3) 1 + spinHalfDot 1 2) :=
+  openChainHeisenbergHamiltonian_three_site_eq J
+
+/-- The open chain Heisenberg Hamiltonian preserves every
+magnetisation sector `H_M`. -/
+example (N : ℕ) (J : ℝ) {M : ℂ} {v : (Fin (N + 1) → Fin 2) → ℂ}
+    (hv : v ∈ magnetizationSubspace (Fin (N + 1)) M) :
+    (heisenbergHamiltonian (openChainCoupling N J)).mulVec v ∈
+      magnetizationSubspace (Fin (N + 1)) M :=
+  openChainHeisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem N J hv
+
+/-- The periodic chain Heisenberg Hamiltonian preserves every
+magnetisation sector. -/
+example (N : ℕ) (J : ℝ) {M : ℂ} {v : (Fin (N + 2) → Fin 2) → ℂ}
+    (hv : v ∈ magnetizationSubspace (Fin (N + 2)) M) :
+    (heisenbergHamiltonian (periodicChainCoupling N J)).mulVec v ∈
+      magnetizationSubspace (Fin (N + 2)) M :=
+  periodicChainHeisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem N J hv
+
+/-- 1D open-chain Heisenberg: β = 0 closed form. -/
+example (J : ℝ) (N : ℕ) (A : ManyBodyOp (Fin (N + 1))) :
+    gibbsExpectation 0 (heisenbergHamiltonian (openChainCoupling N J)) A
+      = ((Fintype.card (Fin (N + 1) → Fin 2) : ℂ))⁻¹ * A.trace :=
+  openChainHeisenbergGibbsExpectation_zero J N A
+
+/-- 1D open-chain Heisenberg: `(⟨H^n⟩_β).im = 0`. -/
+example (β J : ℝ) (N n : ℕ) :
+    (gibbsExpectation β (heisenbergHamiltonian (openChainCoupling N J))
+        ((heisenbergHamiltonian (openChainCoupling N J)) ^ n)).im = 0 :=
+  openChainHeisenbergGibbsExpectation_hamiltonian_pow_im β J N n
+
+/-- 1D periodic-chain Heisenberg: `(⟨H^n⟩_β).im = 0`. -/
+example (β J : ℝ) (N n : ℕ) :
+    (gibbsExpectation β (heisenbergHamiltonian (periodicChainCoupling N J))
+        ((heisenbergHamiltonian (periodicChainCoupling N J)) ^ n)).im = 0 :=
+  periodicChainHeisenbergGibbsExpectation_hamiltonian_pow_im β J N n
 
 end LatticeSystem.Tests.Heisenberg
