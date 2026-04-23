@@ -43,4 +43,43 @@ example : ∫ θ in (0 : ℝ)..(2 * Real.pi), Real.sin θ = 0 :=
 example : ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ = 2 :=
   integral_sin_zero_pi
 
+/-! ## D. Half-angle / complex-exp helper integrals (codex audit Item 8)
+
+These power the SU(2)-averaged singlet computation
+(`problem_2_2_c`); previously only the three easiest base
+integrals above were pinned. -/
+
+example : ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ * Real.cos θ = 0 :=
+  integral_sin_mul_cos_zero_pi
+
+example :
+    ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ * Real.cos (θ / 2) ^ 2 = 1 :=
+  integral_sin_mul_cos_sq_half_zero_pi
+
+example :
+    ∫ θ in (0 : ℝ)..Real.pi, Real.sin θ * Real.sin (θ / 2) ^ 2 = 1 :=
+  integral_sin_mul_sin_sq_half_zero_pi
+
+example :
+    ∫ φ in (0 : ℝ)..(2 * Real.pi),
+      Complex.exp (Complex.I * (φ : ℂ)) = 0 :=
+  integral_cexp_I_mul_zero_two_pi
+
+example :
+    ∫ φ in (0 : ℝ)..(2 * Real.pi),
+      Complex.exp (-(Complex.I * (φ : ℂ))) = 0 :=
+  integral_cexp_neg_I_mul_zero_two_pi
+
+/-! ## D. Tasaki Problem 2.2.c — full SU(2)-averaged singlet identity -/
+
+example (τ : Fin 2 → Fin 2) :
+    (1 / (4 * (Real.pi : ℂ))) *
+      ∫ φ in (0 : ℝ)..(2 * Real.pi),
+        ∫ θ in (0 : ℝ)..Real.pi,
+          ((Real.sin θ : ℂ) *
+            ((totalSpinHalfRot3 (Fin 2) φ * totalSpinHalfRot2 (Fin 2) θ).mulVec
+              (basisVec upDown)) τ) =
+    (1 / 2 : ℂ) * (basisVec upDown τ - basisVec (basisSwap upDown (0 : Fin 2) 1) τ) :=
+  problem_2_2_c τ
+
 end LatticeSystem.Tests.SU2Family
