@@ -31,6 +31,13 @@ checkable against it.
 
 **Primary axis**: A + C + G. **Limited use**: D, B. **Niche**: F. **Not primary**: E.
 
+For canonical examples of methods A / B / C / F / G in
+working code, see [`LatticeSystem/Tests/Foundation.lean`][1] —
+the test-method POC file from Phase 0 (#280). Each method has
+a labelled subsection with at least one minimal example.
+
+[1]: https://github.com/phasetr/lattice-system/blob/main/LatticeSystem/Tests/Foundation.lean
+
 ### Review check — tests
 
 When a PR introduces or modifies tests, the reviewer checks:
