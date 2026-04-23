@@ -32,6 +32,7 @@ import LatticeSystem.Quantum.HeisenbergChain
 import LatticeSystem.Quantum.HeisenbergChain.Eigenvalues
 import LatticeSystem.Quantum.HeisenbergChain.Gibbs
 import LatticeSystem.Quantum.HeisenbergLattice
+import LatticeSystem.Quantum.HeisenbergLattice.Companions
 import LatticeSystem.Quantum.NeelState
 import LatticeSystem.Quantum.Z2Z2
 import LatticeSystem.Quantum.IsingChain

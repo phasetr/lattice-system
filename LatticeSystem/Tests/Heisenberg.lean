@@ -6,6 +6,7 @@ import LatticeSystem.Quantum.HeisenbergChain
 import LatticeSystem.Quantum.HeisenbergChain.Eigenvalues
 import LatticeSystem.Quantum.HeisenbergChain.Gibbs
 import LatticeSystem.Quantum.HeisenbergLattice
+import LatticeSystem.Quantum.HeisenbergLattice.Companions
 
 /-!
 # Test coverage for Heisenberg-on-graph infrastructure
