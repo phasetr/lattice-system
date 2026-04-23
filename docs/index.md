@@ -1026,6 +1026,40 @@ and the half-angle trig integrals established in earlier PRs. See
 `Quantum/SpinHalfRotation.lean` for `spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfDown`
 and `Quantum/SU2Integral.lean` for all supporting lemmas.
 
+### TODO — Tasaki §2.5 antiferromagnetic deferred items (issue [#240](https://github.com/phasetr/lattice-system/issues/240))
+
+The antiferromagnetic Heisenberg / Néel state machinery in
+Tasaki §2.5 is largely formalised (chain / 2D / 3D Néel states +
+per-bond expectations `-1/4` + generic graph-centric `neelStateOf`
++ Marshall sign machinery + time-reversal action; see Roadmap row
+P1k above). The following subitems remain deferred (large
+mathematical work):
+
+- **Marshall-Lieb-Mattis Theorem 2.2** (uniqueness + sign
+  structure of the AFM ground state). Requires a Perron-Frobenius
+  argument on the Marshall-rotated basis.
+- **Problem 2.5.a** (single-cluster ground-state energy
+  `-S(1+zS)` for general spin `S` and coordination `z`).
+  Requires general-spin infrastructure (depends on P1d''' above).
+- **Problem 2.5.b** (lower bound on `E_GS` via 2.5.a).
+- **Problem 2.5.c** (single-site expectation `⟨Ŝ_x⟩ = 0` in the
+  AFM ground state).
+- **Problem 2.5.d** (two-spin correlation under MLM).
+
+The generic graph-centric `neelStateOf` (Phase 3 PR #331) is the
+foundation on which these will be built when general-spin and
+Perron-Frobenius infrastructure becomes available.
+
+### TODO — remove remaining 7 per-theorem linter suppressions (issue [#377](https://github.com/phasetr/lattice-system/issues/377))
+
+Phase 4 substantially closed `lake build` warnings (zero warnings
++ zero errors as of 2026-04-23), with the exception of 7
+per-theorem `set_option linter.{flexible,unusedTactic,unusedSimpArgs} false in`
+blocks (4 in `SpinOne{Basis,Decomp}`, 3 in
+`SpinHalfRotation/Conjugation`). All are comment-justified and
+listed in the [Deprecation window](deprecations.html#remaining-linter-suppressions)
+page. Removal requires interactive `simp?` per sub-case.
+
 ## Links
 
 - API documentation (doc-gen4): **currently disabled** — the
