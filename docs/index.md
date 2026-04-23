@@ -944,9 +944,9 @@ The project's long-term goals include the `φ^4` / Ising continuum
 limit and lattice-QCD-style formalisations, both of which are defined
 as limits `a → 0` of families of finite-spacing lattice systems. A
 survey of the gap between the current finite-volume matrix framework
-and what the continuum limit actually demands is recorded in
-`.self-local/docs/continuum-limit-survey.md`; it proposes the four
-phases below and consulted codex twice on scope and design choices.
+and what the continuum limit actually demands was recorded during
+Phase A scoping (consulted codex twice on scope and design choices)
+and proposes the four phases below.
 
 **Phase A (current, this PR)**. Add a **thin type-level tag**
 `class LatticeWithSpacing (Λ : Type*) where spacing : ℝ≥0`

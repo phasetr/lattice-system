@@ -13,10 +13,9 @@ defines the JW string for any `[Fintype Λ] [LinearOrder Λ]
 [DecidableEq Λ]`, generalising the `Fin (N+1)`-specific version in
 `LatticeSystem.Fermion.JordanWigner`.
 
-Stage 1 of the JW abstraction plan (see
-`.self-local/docs/jw-abstract-plan.md`). Downstream operators
-(`fermionAnnihilation`, `fermionCreation`, …) are ported in
-subsequent PRs.
+Stage 1 of the JW abstraction (initial Phase 2 work). Downstream
+operators (`fermionAnnihilation`, `fermionCreation`, …) are ported
+in subsequent PRs.
 -/
 
 namespace LatticeSystem.Fermion
