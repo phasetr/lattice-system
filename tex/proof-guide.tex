@@ -4190,6 +4190,32 @@ units via $\hat S^{\pm}$ + a 9-element spanning theorem). The general
 $S \geq 1$ case requires generic \texttt{Fin\,(2S+1)} typing and a
 polymorphic Lagrange-interpolation infrastructure; not started.
 
+\subsection*{TODO: Tasaki §2.5 antiferromagnetic deferred items (issue \#240)}
+
+The antiferromagnetic Heisenberg / Néel state machinery in Tasaki
+§2.5 is largely formalised (chain / 2D / 3D Néel states + per-bond
+expectations $-1/4$ + generic graph-centric \texttt{neelStateOf} +
+Marshall sign machinery + time-reversal action; see
+§\ref{subsec:neel-state-of}). The following subitems remain
+deferred (large mathematical work, requiring infrastructure beyond
+finite-dimensional matrix algebra):
+
+\begin{itemize}
+\item Marshall--Lieb--Mattis Theorem 2.2 (uniqueness + sign
+  structure of the AFM ground state). Requires a Perron--Frobenius
+  argument on the Marshall-rotated basis.
+\item Problem 2.5.a (single-cluster ground-state energy
+  $-S(1+zS)$ for general spin $S$ and coordination $z$).
+  Requires general-spin infrastructure (depends on P1d''' above).
+\item Problem 2.5.b (lower bound on $E_{\mathrm{GS}}$ via 2.5.a).
+\item Problem 2.5.c (single-site expectation
+  $\langle \hat S_x \rangle = 0$ in the AFM ground state).
+\item Problem 2.5.d (two-spin correlation under MLM).
+\end{itemize}
+
+The generic graph-centric \texttt{neelStateOf} (PR \#331) is the
+foundation on which these will be built when the time comes.
+
 \subsection*{DONE: Tasaki Problem 2.2.c}
 
 \textbf{Statement} (Tasaki §2.2, eq.~(2.2.15), p.~24): The
