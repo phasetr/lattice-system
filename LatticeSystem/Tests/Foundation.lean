@@ -9,10 +9,14 @@ import LatticeSystem.Quantum.NeelState
 /-!
 # Test foundation POC (refactor Phase 0, #280)
 
-This file demonstrates each test method adopted in the refactoring
-plan v4 (`.self-local/docs/refactoring-plan-2026-04-22.md` §2.1).
-The intent is to confirm each idiom builds in mathlib v4.29.0 + Lean 4
-before applying it across the codebase in Phase 1.
+This file demonstrates each test method adopted in the public
+refactoring conventions doc
+(`docs/refactoring-conventions.md` §1, see also the project
+page [Refactoring conventions][1]). Each idiom is confirmed
+to build in mathlib v4.29.0 + Lean 4 and serves as a canonical
+reference for new test authors.
+
+[1]: https://phasetr.github.io/lattice-system/refactoring-conventions/
 
 Methods covered:
 - A. decide-based universal property test (finite Decidable predicates).
