@@ -3981,6 +3981,55 @@ closed form, im-of-Hermitian, commutator, mul-Hamiltonian-im,
 hamiltonian-pow-im, anticommutator, commutator-re,
 partition function im, ofReal-re-eq, pow-trace).
 
+\subsection{Hubbard spin symmetry: U(1)\texorpdfstring{$\times$}{×}U(1) invariance (Tasaki §9.3.3)}
+\label{subsec:hubbard-spin-symmetry}
+
+\noindent\textbf{Theorem} (Tasaki §9.3.3, eq.~(9.3.35), p.~333).
+The Hubbard Hamiltonian $\hat H = \hat H_{\rm kin} + \hat H_{\rm int}$
+satisfies
+\[
+  [N_\uparrow, \hat H] = [N_\downarrow, \hat H] = [S^z_{\rm tot}, \hat H] = 0,
+\]
+where $N_\sigma = \sum_x \hat n_{x,\sigma}$ is the total particle count
+per spin and $S^z_{\rm tot} = (N_\uparrow - N_\downarrow)/2$.
+
+\noindent\textbf{Key auxiliary commutators}.
+\begin{align*}
+  [N_\uparrow, \hat c^\dagger_{i,\uparrow}] &= \hat c^\dagger_{i,\uparrow}, &
+  [N_\uparrow, \hat c_{i,\uparrow}] &= -\hat c_{i,\uparrow}.
+\end{align*}
+These are proved by writing $N_\uparrow = \sum_k n_{k,\uparrow}$ and
+isolating the $k = i$ term (same-site commutator $[n_i, c^\dagger_i] = c^\dagger_i$)
+while all other terms vanish by
+$[n_k, c^\dagger_i] = 0$ ($k \neq i$, different JW positions).
+
+\noindent\textbf{Proof sketch}.
+For the kinetic term, each bond contributes
+$[N_\uparrow, \hat c^\dagger_{i,\uparrow}\hat c_{j,\uparrow}] =
+ [N_\uparrow,\hat c^\dagger_{i,\uparrow}]\hat c_{j,\uparrow} +
+ \hat c^\dagger_{i,\uparrow}[N_\uparrow,\hat c_{j,\uparrow}] =
+ \hat c^\dagger_{i,\uparrow}\hat c_{j,\uparrow} -
+ \hat c^\dagger_{i,\uparrow}\hat c_{j,\uparrow} = 0$.
+The cross-species kinetic term $\hat c^\dagger_{i,\downarrow}\hat c_{j,\downarrow}$
+commutes with $N_\uparrow$ because the JW positions are of opposite parity
+(odd vs.\ even); this was already in \texttt{Charges.lean}.
+For the interaction, $[N_{\uparrow/\downarrow}, \hat H_{\rm int}] = 0$
+was established in \texttt{Charges.lean}.
+
+\noindent\textbf{Lean names} (file \texttt{Fermion/JordanWigner/Hubbard/SpinSymmetry.lean}):
+\begin{itemize}
+  \item \texttt{fermionTotalUpNumber\_commutator\_fermionUpCreation}:
+    $[N_\uparrow, c^\dagger_{i,\uparrow}] = c^\dagger_{i,\uparrow}$.
+  \item \texttt{fermionTotalUpNumber\_commute\_upHopping}:
+    $[N_\uparrow, c^\dagger_{i,\uparrow}c_{j,\uparrow}] = 0$.
+  \item \texttt{fermionTotalUpNumber\_commute\_hubbardHamiltonian}:
+    $[N_\uparrow, H] = 0$.
+  \item \texttt{fermionTotalDownNumber\_commute\_hubbardHamiltonian}:
+    $[N_\downarrow, H] = 0$.
+  \item \texttt{fermionTotalSpinZ\_commute\_hubbardHamiltonian}:
+    $[S^z_{\rm tot}, H] = 0$.
+\end{itemize}
+
 \section{Time-reversal map for a single \(S = 1/2\) spin (Tasaki §2.3)}
 \label{sec:time-reversal-spin-half}
 %======================================================================
