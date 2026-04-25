@@ -111,6 +111,6 @@ example :
 example :
     spinHalfDotVec ![0, 0, 1] = spinHalfOp3 := by
   unfold spinHalfDotVec
-  simp [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+  simp [Matrix.cons_val_zero, Matrix.cons_val_one]
 
 end LatticeSystem.Tests.SpinHalfRotation

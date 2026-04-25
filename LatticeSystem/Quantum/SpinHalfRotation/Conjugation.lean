@@ -286,25 +286,31 @@ private lemma pauliZ_eq_diagonal :
   ext i j
   fin_cases i <;> fin_cases j <;> simp [pauliZ, Matrix.diagonal]
 
--- Linter suppression: the proof uses `fin_cases i <;> fin_cases j`
--- followed by `simp [...]` over 4 (2×2) matrix-entry sub-cases,
--- then a chained `<;> first | ... | ...` discharger. The inner
--- `simp` is generic across cases and the chained dischargers each
--- have unused simp args / try blocks for some cases — refactoring
--- to `simp only [exhaustive list]` requires interactive `simp?`
--- per sub-case. Tracked under #284 (Phase 4 P4-1).
-set_option linter.flexible false in
-set_option linter.unusedTactic false in
-set_option linter.unusedSimpArgs false in
+/-- `exp(-(I·θ/2)) = Complex.cos(θ/2) - I·Complex.sin(θ/2)`. -/
+private lemma exp_neg_half (θ : ℝ) :
+    Complex.exp (-(Complex.I * ↑θ / 2)) =
+      Complex.cos (↑θ / 2) - Complex.I * Complex.sin (↑θ / 2) := by
+  rw [show -(Complex.I * ↑θ / 2) = ↑(-(θ / 2)) * Complex.I from by push_cast; ring,
+    Complex.exp_mul_I]
+  push_cast
+  rw [Complex.cos_neg, Complex.sin_neg]
+  ring
+
+/-- `exp(I·θ/2) = Complex.cos(θ/2) + I·Complex.sin(θ/2)`. -/
+private lemma exp_pos_half (θ : ℝ) :
+    Complex.exp (Complex.I * ↑θ / 2) =
+      Complex.cos (↑θ / 2) + Complex.I * Complex.sin (↑θ / 2) := by
+  rw [show Complex.I * ↑θ / 2 = ↑(θ / 2) * Complex.I from by push_cast; ring,
+    Complex.exp_mul_I]
+  push_cast
+  ring
+
 /-- Problem 2.1.b for axis 3: `Û^(3)_θ = exp(-iθ Ŝ^(3))`. -/
 theorem spinHalfRot3_eq_exp (θ : ℝ) :
     spinHalfRot3 θ =
       NormedSpace.exp ((-(Complex.I * (θ : ℂ))) • spinHalfOp3) := by
   unfold spinHalfRot3 spinHalfOp3 rotOf
   rw [pauliZ_eq_diagonal]
-  -- LHS: cos(θ/2)•1 - (2I sin(θ/2)·(1/2)) • diagonal(1,-1)
-  -- RHS: exp(-(Iθ) • (1/2) • diagonal(1,-1))
-  -- Convert RHS to exp of a diagonal matrix
   conv_rhs =>
     rw [smul_smul, show -(Complex.I * ↑θ) * (1 / 2) = -(Complex.I * ↑θ / 2) from by ring]
     rw [show (-(Complex.I * ↑θ / 2)) •
@@ -312,33 +318,17 @@ theorem spinHalfRot3_eq_exp (θ : ℝ) :
         Matrix.diagonal (fun i : Fin 2 =>
           if i = 0 then -(Complex.I * ↑θ / 2)
           else Complex.I * ↑θ / 2) from by
-      ext i j; fin_cases i <;> fin_cases j <;>
-        simp [Matrix.diagonal, Matrix.smul_apply]]
+      ext i j; fin_cases i <;> fin_cases j <;> simp]
     rw [Matrix.exp_diagonal]
-  -- Now both sides are element-by-element. Compare entries.
-  -- Unify NormedSpace.exp on ℂ with Complex.exp
   have hexp : ∀ z : ℂ, NormedSpace.exp z = Complex.exp z :=
     congr_fun Complex.exp_eq_exp_ℂ.symm
   ext i j
   fin_cases i <;> fin_cases j <;>
-    (simp [Matrix.diagonal, Matrix.sub_apply, Matrix.smul_apply, hexp]
-     <;> first
-      | (rw [show -(Complex.I * ↑θ / 2) = (-(↑θ / 2)) * Complex.I from by ring,
-            Complex.exp_mul_I]
-         simp only [Complex.cos_neg, Complex.sin_neg, neg_mul, mul_neg]
-         ring)
-      | (rw [show Complex.I * ↑θ / 2 = (↑θ / 2) * Complex.I from by ring,
-            Complex.exp_mul_I]
-         ring))
+    simp [hexp, exp_neg_half θ, exp_pos_half θ] <;>
+    ring
 
 /-! ## Coherent state (Tasaki §2.1 Problem 2.1.d) -/
 
--- Linter suppression: same rationale as `spinHalfRot3_eq_exp` —
--- per-sub-case `simp [...]` after `fin_cases i` requires
--- interactive `simp?` to refactor to `simp only [...]`. Tracked
--- under #284 (Phase 4 P4-1).
-set_option linter.flexible false in
-set_option linter.unusedTactic false in
 /-- Tasaki Problem 2.1.d: `Û^(3)_φ · Û^(2)_θ · |ψ^↑⟩ =
 e^{-iφ/2} cos(θ/2) |ψ^↑⟩ + e^{iφ/2} sin(θ/2) |ψ^↓⟩`. -/
 theorem spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp (θ φ : ℝ) :
@@ -349,28 +339,17 @@ theorem spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp (θ φ : ℝ) :
   ext i
   fin_cases i
   · -- case 0: up component
+    conv_rhs => rw [exp_neg_half φ]
     simp [Matrix.mul_apply, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
-       spinHalfUp, Matrix.smul_apply, Matrix.sub_apply]
-    rw [show -(Complex.I * (φ : ℂ) / 2) = (-(↑φ / 2)) * Complex.I from by ring,
-      Complex.exp_mul_I]
-    left
-    simp only [Complex.cos_neg, Complex.sin_neg, neg_mul]
-    push_cast; ring
-  · -- case 1: down component
+          spinHalfUp, Matrix.smul_apply, Matrix.sub_apply]
+    ring_nf; simp
+  · -- case 1: down component, I² from σ_y row-1 col-0 entry
+    conv_rhs => rw [exp_pos_half φ]
     simp [Matrix.mul_apply, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
-       spinHalfUp, Matrix.smul_apply, Matrix.sub_apply]
-    rw [show Complex.I * (φ : ℂ) / 2 = (↑φ / 2) * Complex.I from by ring,
-      Complex.exp_mul_I]
-    have hI : Complex.I * Complex.I = -1 := Complex.I_mul_I
-    linear_combination
-      -(Complex.sin (↑θ / 2)) *
-        (Complex.cos (↑φ / 2) + Complex.I * Complex.sin (↑φ / 2)) * hI
+          spinHalfUp, Matrix.smul_apply, Matrix.sub_apply]
+    ring_nf
+    simp [Complex.I_sq]
 
--- Linter suppression: same rationale as
--- `spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp` above. Tracked
--- under #284 (Phase 4 P4-1).
-set_option linter.flexible false in
-set_option linter.unusedTactic false in
 /-- `Û^(3)_φ · Û^(2)_θ · |ψ^↓⟩ =
 -e^{-iφ/2} sin(θ/2) |ψ^↑⟩ + e^{iφ/2} cos(θ/2) |ψ^↓⟩`.
 Companion to `spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp`. -/
@@ -381,23 +360,17 @@ theorem spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfDown (θ φ : ℝ) :
   unfold spinHalfRot3 spinHalfRot2 rotOf spinHalfOp3 spinHalfOp2 pauliZ pauliY
   ext i
   fin_cases i
-  · -- case 0: up component (involves I² from σ_y)
+  · -- case 0: up component, I² from σ_y row-0 col-1 entry
+    conv_rhs => rw [exp_neg_half φ]
     simp [Matrix.mul_apply, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
-       spinHalfDown, Matrix.smul_apply, Matrix.sub_apply]
-    rw [show -(Complex.I * (φ : ℂ) / 2) = (-(↑φ / 2)) * Complex.I from by ring,
-      Complex.exp_mul_I]
-    simp only [Complex.cos_neg, Complex.sin_neg, neg_mul]
-    have hI : Complex.I * Complex.I = -1 := Complex.I_mul_I
-    linear_combination
-      (Complex.sin (↑θ / 2)) *
-        (Complex.cos (↑φ / 2) - Complex.I * Complex.sin (↑φ / 2)) * hI
-  · -- case 1: down component (no I² terms)
+          spinHalfDown, Matrix.smul_apply, Matrix.sub_apply]
+    ring_nf
+    simp [Complex.I_sq]
+  · -- case 1: down component
+    conv_rhs => rw [exp_pos_half φ]
     simp [Matrix.mul_apply, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
-       spinHalfDown, Matrix.smul_apply, Matrix.sub_apply]
-    rw [show Complex.I * (φ : ℂ) / 2 = (↑φ / 2) * Complex.I from by ring,
-      Complex.exp_mul_I]
-    left
-    push_cast; ring
+          spinHalfDown, Matrix.smul_apply, Matrix.sub_apply]
+    ring_nf; simp
 
 /-! ## Problem 2.1.e: phase factor at θ = φ = π/2 -/
 

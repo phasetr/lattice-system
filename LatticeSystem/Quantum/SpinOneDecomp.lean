@@ -160,30 +160,21 @@ theorem spinOneUnit21_eq_polynomial :
   ext i j
   fin_cases i <;> fin_cases j <;> simp
 
-set_option linter.flexible false in
-/-- `|ψ^{-1}⟩⟨ψ^{+1}| = (1/2) (Ŝ^-)² |ψ^{+1}⟩⟨ψ^{+1}|`.
-(`linter.flexible` suppressed: the inner `simp` closes 8 of 9
-matrix-entry sub-cases generically; the residual `√2 · √2 = 2`
-case is closed by the trailing `try (rw [sqrt2_sq]; ring)`.
-Replacing with `simp only [exhaustive list]` would require
-interactive `simp?` per sub-case.) -/
+/-- `|ψ^{-1}⟩⟨ψ^{+1}| = (1/2) (Ŝ^-)² |ψ^{+1}⟩⟨ψ^{+1}|`. -/
 theorem spinOneUnit02_eq_polynomial :
     (spinOneUnit02 : Matrix (Fin 3) (Fin 3) ℂ) =
       (1 / 2 : ℂ) • (spinOneOpMinus * spinOneOpMinus * spinOneProjPlus) := by
   unfold spinOneUnit02 spinOneOpMinus spinOneProjPlus
   ext i j
-  fin_cases i <;> fin_cases j <;> (simp; try (rw [sqrt2_sq]; ring))
+  fin_cases i <;> fin_cases j <;> simp [sqrt2_sq]
 
-set_option linter.flexible false in
-/-- `|ψ^{+1}⟩⟨ψ^{-1}| = (1/2) (Ŝ^+)² |ψ^{-1}⟩⟨ψ^{-1}|`. (Same
-`linter.flexible` suppression rationale as
-`spinOneUnit02_eq_polynomial` above.) -/
+/-- `|ψ^{+1}⟩⟨ψ^{-1}| = (1/2) (Ŝ^+)² |ψ^{-1}⟩⟨ψ^{-1}|`. -/
 theorem spinOneUnit20_eq_polynomial :
     (spinOneUnit20 : Matrix (Fin 3) (Fin 3) ℂ) =
       (1 / 2 : ℂ) • (spinOneOpPlus * spinOneOpPlus * spinOneProjMinus) := by
   unfold spinOneUnit20 spinOneOpPlus spinOneProjMinus
   ext i j
-  fin_cases i <;> fin_cases j <;> (simp; try (rw [sqrt2_sq]; ring))
+  fin_cases i <;> fin_cases j <;> simp [sqrt2_sq]
 
 /-! ## Spanning theorem: every 3×3 complex matrix is a linear combination
 of the 9 matrix units. -/

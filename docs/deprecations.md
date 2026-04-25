@@ -81,35 +81,19 @@ Existing `#guard_msgs` deprecation tests:
 
 ## Remaining linter suppressions
 
-For transparency, the following `set_option linter.* false`
-suppressions remain in source files as of 2026-04-23. Each is
-per-theorem (not file-level) and carries a comment justifying
-the suppression. They exist because refactoring the underlying
-proof requires interactive `simp?` investigation per
-`fin_cases` sub-case, which is best performed in a focused Lean
-session.
+The 7 `set_option linter.flexible / unusedTactic / unusedSimpArgs`
+suppressions that appeared in `SpinOneBasis.lean`, `SpinOneDecomp.lean`,
+and `SpinHalfRotation/Conjugation.lean` were removed in PR #395
+(tracking issue #377).
 
-| Module | Theorem | Suppressed linters | Reason |
+The following `set_option linter.* false` suppressions remain:
+
+| Module | Theorem / block | Suppressed linters | Reason |
 |---|---|---|---|
-| `Quantum/SpinHalfRotation/Conjugation.lean` | `spinHalfRot3_eq_exp` | `flexible`, `unusedTactic`, `unusedSimpArgs` | Per-sub-case `simp [...]` after `fin_cases i <;> fin_cases j` |
-| `Quantum/SpinHalfRotation/Conjugation.lean` | `spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfUp` | `flexible`, `unusedTactic` | Same |
-| `Quantum/SpinHalfRotation/Conjugation.lean` | `spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfDown` | `flexible`, `unusedTactic` | Same |
-| `Quantum/SpinOneBasis.lean` | `spinOneOpPlus_eq_add` | `flexible` | Per-sub-case `simp [...]` after `fin_cases` over a 3×3 matrix |
-| `Quantum/SpinOneBasis.lean` | `spinOneOpMinus_eq_sub` | `flexible` | Same |
-| `Quantum/SpinOneDecomp.lean` | `spinOneUnit02_eq_polynomial` | `flexible` | Same |
-| `Quantum/SpinOneDecomp.lean` | `spinOneUnit20_eq_polynomial` | `flexible` | Same |
 | `Quantum/NeelState/MarshallSign.lean` | (block after deprecated defs) | `deprecated` | Internal companion theorems on the deprecated names |
 | `Tests/NeelState.lean` | (file-level inside backward-compat tests) | `deprecated` | Tests intentionally exercise deprecated names; deprecation warnings are independently captured by `#guard_msgs` blocks |
 
-The `lake build` is **zero warnings** even with these suppressions —
-they pre-empt warnings the linter would otherwise emit. The
-Phase 4 completion criterion (no `set_option linter.* false` in
-source files) targets eventual removal of these via interactive
-proof refactoring.
-
-**Tracking issue**: [#377](https://github.com/phasetr/lattice-system/issues/377)
-follows the removal of the 7 `linter.flexible / unusedTactic /
-unusedSimpArgs` suppressions in a focused Lean-interactive session.
+The `lake build` is **zero warnings and zero errors** as of 2026-04-25.
 
 **Second-pass audit (#390, 2026-04-25)**: a re-scan of the codebase
 confirmed that no additional untracked `set_option linter.*` blocks
