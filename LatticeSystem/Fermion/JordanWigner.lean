@@ -7,6 +7,8 @@ import LatticeSystem.Fermion.JordanWigner.Operators
 import LatticeSystem.Fermion.JordanWigner.CAR
 import LatticeSystem.Fermion.JordanWigner.Number
 import LatticeSystem.Fermion.JordanWigner.Hubbard
+import LatticeSystem.Fermion.JordanWigner.Hubbard.Charges
+import LatticeSystem.Fermion.JordanWigner.Hubbard.Graph
 
 /-!
 # Multi-mode fermion via Jordan–Wigner mapping
