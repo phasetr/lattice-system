@@ -4167,6 +4167,64 @@ The hopping Hamiltonian acts as
 \end{itemize}
 
 %======================================================================
+\subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
+\label{subsec:hubbard-saturated-ferro}
+%======================================================================
+
+\noindent\textbf{Definition.}
+The total-spin Casimir is
+\[
+  (\hat{S}^2_{\rm tot})
+  := \hat{S}^-_{\rm tot}\hat{S}^+_{\rm tot}
+     + \hat{S}^z_{\rm tot}(\hat{S}^z_{\rm tot}+1).
+\]
+From $[\hat{S}^+,\hat{S}^-]=2\hat{S}_z$ one derives
+$\hat{S}^2 = \hat{S}^-\hat{S}^+ + \hat{S}_z(\hat{S}_z+1)$.
+
+\noindent\textbf{Eigenvalue on the all-up state.}
+With $S_{\max} = (N+1)/2$:
+\begin{align*}
+  \hat{S}^z_{\rm tot}\,|\!\uparrow\cdots\uparrow\rangle
+    &= \tfrac{N+1}{2}\,|\!\uparrow\cdots\uparrow\rangle,\\
+  \hat{S}^+_{\rm tot}\,|\!\uparrow\cdots\uparrow\rangle
+    &= 0 \quad\text{(highest-weight state)},\\
+  (\hat{S}^2_{\rm tot})\,|\!\uparrow\cdots\uparrow\rangle
+    &= S_{\max}(S_{\max}+1)\,|\!\uparrow\cdots\uparrow\rangle.
+\end{align*}
+
+\noindent\textbf{Theorem} (\textit{Tasaki §11.1.1, p.~372}).
+$[(\hat{S}^2_{\rm tot}),\hat{H}] = 0$
+(from SU(2) invariance; requires Hermiticity conditions on $t$, $U$).
+
+\noindent\textbf{Definition 11.1} (Tasaki §11.1.1, p.~372; saturated ferromagnetism).
+The Hubbard model exhibits saturated ferromagnetism if there exists a
+ground-state energy $E_0$ such that every nonzero eigenvector $v$
+with $\hat H v = E_0 v$ satisfies
+$(\hat{S}^2_{\rm tot})v = S_{\max}(S_{\max}+1)v$.
+
+\noindent\textbf{Lean names}
+(file \texttt{Fermion/JordanWigner/Hubbard/SaturatedFerromagnetism.lean}):
+\begin{itemize}
+  \item \texttt{fermionTotalSpinSquared N}: the Casimir operator.
+  \item \texttt{fermionTotalUpNumber\_mulVec\_allUpState}:
+    $N_\uparrow\cdot|\!\uparrow\cdots\uparrow\rangle = (N+1)\,|\!\uparrow\cdots\uparrow\rangle$.
+  \item \texttt{fermionTotalDownNumber\_mulVec\_allUpState}:
+    $N_\downarrow\cdot|\!\uparrow\cdots\uparrow\rangle = 0$.
+  \item \texttt{fermionTotalSpinZ\_mulVec\_allUpState}:
+    $\hat{S}^z_{\rm tot}\cdot|\!\uparrow\cdots\uparrow\rangle
+      = \frac{N+1}{2}\,|\!\uparrow\cdots\uparrow\rangle$.
+  \item \texttt{fermionTotalSpinPlus\_mulVec\_allUpState}:
+    $\hat{S}^+_{\rm tot}\cdot|\!\uparrow\cdots\uparrow\rangle = 0$.
+  \item \texttt{fermionTotalSpinSquared\_mulVec\_allUpState}:
+    $(\hat{S}^2_{\rm tot})\cdot|\!\uparrow\cdots\uparrow\rangle
+      = S_{\max}(S_{\max}+1)\,|\!\uparrow\cdots\uparrow\rangle$.
+  \item \texttt{fermionTotalSpinSquared\_commute\_hubbardHamiltonian}:
+    $[(\hat{S}^2_{\rm tot}),\hat H] = 0$.
+  \item \texttt{isSaturatedFerromagnet N t U}: the Lean predicate for
+    Definition 11.1.
+\end{itemize}
+
+%======================================================================
 \section{Time-reversal map for a single \(S = 1/2\) spin (Tasaki §2.3)}
 \label{sec:time-reversal-spin-half}
 %======================================================================
