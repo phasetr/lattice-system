@@ -4030,6 +4030,62 @@ was established in \texttt{Charges.lean}.
     $[S^z_{\rm tot}, H] = 0$.
 \end{itemize}
 
+\subsection{Hubbard spin symmetry: full SU(2) invariance (Tasaki §9.3.3)}
+\label{subsec:hubbard-su2-symmetry}
+
+\noindent\textbf{Theorem} (Tasaki §9.3.3, eq.~(9.3.35), p.~333).
+The Hubbard Hamiltonian also commutes with the SU(2) raising and lowering operators:
+\[
+  [\hat S^+_{\rm tot}, \hat H] = [\hat S^-_{\rm tot}, \hat H] = 0,
+\]
+where
+\[
+  \hat S^+_{\rm tot} = \sum_{x} \hat c^\dagger_{x,\uparrow}\hat c_{x,\downarrow},
+  \qquad
+  \hat S^-_{\rm tot} = (\hat S^+_{\rm tot})^\dagger
+    = \sum_x \hat c^\dagger_{x,\downarrow}\hat c_{x,\uparrow}.
+\]
+
+\noindent\textbf{Key auxiliary commutators} (Tasaki §9.3.3, eq.~(9.3.36), p.~333):
+\begin{align*}
+  [\hat c^\dagger_{j,\uparrow}, \hat S^+_{\rm tot}] &= 0, &
+  [\hat c_{j,\uparrow},   \hat S^+_{\rm tot}] &= \hat c_{j,\downarrow}, \\
+  [\hat c^\dagger_{j,\downarrow}, \hat S^+_{\rm tot}] &= -\hat c^\dagger_{j,\uparrow}, &
+  [\hat c_{j,\downarrow},  \hat S^+_{\rm tot}] &= 0.
+\end{align*}
+Each is proved by the fermionic Leibniz rule
+$[A, BC] = \{A,B\}C - B\{A,C\}$
+and the CAR identities (same-site $\{c_{j,\sigma}, c^\dagger_{j,\sigma}\} = 1$,
+cross-site $\{c_{j,\sigma}, c^\dagger_{k,\tau}\} = 0$ for $(j,\sigma)\neq(k,\tau)$).
+
+\noindent\textbf{Proof sketch for $[\hat S^+_{\rm tot}, \hat H] = 0$}.
+\emph{Kinetic term}: for each bond $(i,j)$,
+\[
+  [\hat S^+_{\rm tot},\, \hat c^\dagger_{i,\uparrow}\hat c_{j,\uparrow}
+     + \hat c^\dagger_{i,\downarrow}\hat c_{j,\downarrow}]
+  = \hat c^\dagger_{i,\uparrow}\hat c_{j,\downarrow}
+    + (-\hat c^\dagger_{i,\uparrow})\hat c_{j,\downarrow} = 0.
+\]
+\emph{Interaction term}: at the same site ($k = x$) both products vanish by
+Pauli exclusion; at different sites ($k \neq x$) all four constituent operators
+commute pairwise (different JW positions), giving zero commutator.
+The result $[\hat S^-_{\rm tot}, \hat H] = 0$ follows by taking adjoints.
+
+\noindent\textbf{Lean names} (file \texttt{Fermion/JordanWigner/Hubbard/SpinSymmetry.lean}):
+\begin{itemize}
+  \item \texttt{fermionTotalSpinPlus} / \texttt{fermionTotalSpinMinus}: definitions.
+  \item \texttt{fermionTotalSpinPlus\_conjTranspose}:
+    $(\hat S^+_{\rm tot})^\dagger = \hat S^-_{\rm tot}$.
+  \item \texttt{fermionUpAnnihilation\_commutator\_fermionTotalSpinPlus}:
+    $[\hat c_{j,\uparrow}, \hat S^+_{\rm tot}] = \hat c_{j,\downarrow}$.
+  \item \texttt{fermionDownCreation\_commutator\_fermionTotalSpinPlus}:
+    $[\hat c^\dagger_{j,\downarrow}, \hat S^+_{\rm tot}] = -\hat c^\dagger_{j,\uparrow}$.
+  \item \texttt{fermionTotalSpinPlus\_commute\_hubbardHamiltonian}:
+    $[\hat S^+_{\rm tot}, \hat H] = 0$.
+  \item \texttt{fermionTotalSpinMinus\_commute\_hubbardHamiltonian}:
+    $[\hat S^-_{\rm tot}, \hat H] = 0$ (by adjoint).
+\end{itemize}
+
 \section{Time-reversal map for a single \(S = 1/2\) spin (Tasaki §2.3)}
 \label{sec:time-reversal-spin-half}
 %======================================================================
