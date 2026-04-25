@@ -108,8 +108,12 @@ source files) targets eventual removal of these via interactive
 proof refactoring.
 
 **Tracking issue**: [#377](https://github.com/phasetr/lattice-system/issues/377)
-follows the removal of these 7 suppressions in a focused
-Lean-interactive session.
+follows the removal of the 7 `linter.flexible / unusedTactic /
+unusedSimpArgs` suppressions in a focused Lean-interactive session.
+
+**Second-pass audit (#390, 2026-04-25)**: a re-scan of the codebase
+confirmed that no additional untracked `set_option linter.*` blocks
+exist beyond those listed in this table.
 
 ---
 
