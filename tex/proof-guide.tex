@@ -3554,6 +3554,88 @@ and removal-PR checklist).
 \end{remark}
 
 %======================================================================
+\section{Perron--Frobenius theorem for symmetric non-negative irreducible matrices}
+\label{sec:perron-frobenius}
+%======================================================================
+
+\emph{Source file:} \texttt{LatticeSystem/Math/PerronFrobenius.lean}.
+
+\medskip
+\textbf{Setting.}
+Let $n$ be a finite type and $A : \mathrm{Matrix}(n,n,\mathbb{R})$ be:
+\begin{itemize}
+  \item \emph{symmetric} (\texttt{A.IsHermitian}),
+  \item \emph{non-negative}: $A_{ij} \geq 0$ for all $i,j$,
+  \item \emph{irreducible} (\texttt{A.IsIrreducible}): for every $i,j$
+    there exists $k>0$ with $(A^k)_{ij} > 0$.
+\end{itemize}
+
+\subsection{Non-negative max eigenvector (\texttt{exists\_nonneg\_eigenvec\_max})}
+
+\textbf{Statement (sorry).}
+There exists a maximum eigenvalue $\mu$ and a non-zero non-negative eigenvector
+$v : n \to \mathbb{R}$ satisfying $Av = \mu v$, $v \neq 0$,
+$v_i \geq 0$ for all $i$, and $\lambda_k \leq \mu$ for every eigenvalue $\lambda_k$.
+
+\textbf{Mathematical proof sketch.}
+Let $v$ be any max eigenvector (from the spectral theorem) and set $w_i = |v_i|$.
+Since $A_{ij} \geq 0$,
+\[
+  (Aw)_i = \sum_j A_{ij}|v_j| \geq \left|\sum_j A_{ij}v_j\right| = |\mu v_i| = \mu|v_i|,
+\]
+so $w \cdot (Aw) \geq \mu\|w\|^2$.
+The Rayleigh quotient bound gives $w \cdot (Aw) \leq \mu\|w\|^2$, hence equality.
+By the eigenbasis expansion $w \cdot (Aw) = \sum_k \lambda_k c_k^2$ and
+$\|w\|^2 = \sum_k c_k^2$ where $c_k = \langle e_k, w\rangle$,
+equality forces $c_k = 0$ for $\lambda_k < \mu$, giving $Aw = \mu w$.
+
+\textbf{Lean status.}
+The proof is \texttt{sorry}: the Rayleigh equality condition
+$\langle w, Aw\rangle = \mu\|w\|^2 \Rightarrow Aw = \mu w$
+requires computing $\langle w, Aw\rangle$ via the eigenbasis inner product,
+which is blocked by the \texttt{EuclideanSpace}/\texttt{n $\to$ $\mathbb{R}$} API gap in Mathlib.
+Tracked in Issue~\#405.
+
+\subsection{Strictly positive max eigenvector (\texttt{exists\_pos\_eigenvec\_max})}
+
+\textbf{Statement.}
+Under the above hypotheses,
+$\exists\,\mu\,\exists\,v,\; Av = \mu v \;\land\; v \neq 0 \;\land\; \forall i,\; v_i > 0$.
+
+\textbf{Proof.}
+Obtain the non-negative eigenvector $v$ from \texttt{exists\_nonneg\_eigenvec\_max}.
+Apply \texttt{pos\_of\_nonneg\_eigenvec} (private lemma): if $v_i = 0$ for some $i$, then
+$(Av)_i = 0$, so each $A_{ij}v_j = 0$; irreducibility via
+\texttt{isIrreducible\_iff\_exists\_pow\_pos} propagates $v_j = 0$ to every $j$,
+contradicting $v \neq 0$.
+
+\subsection{Uniqueness (\texttt{pos\_eigenvec\_unique})}
+
+\textbf{Statement.}
+If $Av = \mu v$ and $Aw = \mu w$ with $v_i > 0$ and $w_i > 0$ for all $i$,
+then $\exists\, r > 0,\; w = r\cdot v$.
+
+\textbf{Proof.}
+Set $r = \sup_i(w_i/v_i)$ (via \texttt{Finset.sup'}).
+Then $w \leq rv$ componentwise.
+Let $u = rv - w \geq 0$; since $A(rv-w) = \mu(rv-w)$, $u$ is a non-negative
+$\mu$-eigenvector.
+The maximizer $i_0$ satisfies $r = w_{i_0}/v_{i_0}$, so $u_{i_0} = 0$.
+By the propagation argument (same as the strict-positivity lemma), $u = 0$, hence $w = rv$.
+
+\begin{center}
+\begin{tabular}{lll}
+\hline
+Lean name & Status & Notes \\
+\hline
+\texttt{exists\_nonneg\_eigenvec\_max} & sorry & Rayleigh equality step; Issue~\#405 \\
+\texttt{exists\_pos\_eigenvec\_max} & proved (uses sorry above) & propagation argument \\
+\texttt{pos\_eigenvec\_unique} & proved & $r = \sup_i w_i/v_i$ argument \\
+\hline
+\end{tabular}
+\end{center}
+
+%======================================================================
 \section{Single-mode fermion (Phase 2 skeleton)}
 \label{sec:fermion-mode}
 %======================================================================
