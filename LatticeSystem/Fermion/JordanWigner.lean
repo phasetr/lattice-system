@@ -11,6 +11,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.Charges
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Graph
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinSymmetry
 import LatticeSystem.Fermion.JordanWigner.Hubbard.AllUpState
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SaturatedFerromagnetism
 
 /-!
 # Multi-mode fermion via Jordan–Wigner mapping
@@ -30,6 +31,8 @@ is now a thin re-import of five sub-files under
 | `Hubbard/Charges.lean` | `N_↑`, `N_↓`, `S^z_tot`, vacuum eigenstates, cross-spin commutes |
 | `Hubbard/Graph.lean` | graph-centric wrappers, chain/cycle Hamiltonians + Gibbs families |
 | `Hubbard/SpinSymmetry.lean` | U(1)×U(1) charges + S^z_tot commutation with H (Tasaki §9.3.3) |
+| `Hubbard/AllUpState.lean` | all-up-spin state: no double occupancy, kinetic eigenvalue (Tasaki §11.1.1) |
+| `Hubbard/SaturatedFerromagnetism.lean` | Casimir `(Ŝ_tot)²`, Definition 11.1 (saturated ferromagnetism) (Tasaki §11.1.1) |
 
 Old `import LatticeSystem.Fermion.JordanWigner` continues to
 work unchanged via this façade. Following the convention from
