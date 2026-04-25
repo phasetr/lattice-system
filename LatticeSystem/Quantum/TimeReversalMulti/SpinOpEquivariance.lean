@@ -143,6 +143,7 @@ omit [Fintype Λ] in
   rw [Function.update_self]
 
 omit [Fintype Λ] in
+/-- `siteFlipAt τ x` leaves site `y ≠ x` unchanged. -/
 theorem siteFlipAt_of_ne (τ : Λ → Fin 2) {x y : Λ} (h : y ≠ x) :
     siteFlipAt τ x y = τ y := by
   unfold siteFlipAt

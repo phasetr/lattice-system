@@ -263,18 +263,21 @@ theorem heisenbergHamiltonianOnGraph_commute_totalSpinHalfOp1
     Commute (heisenbergHamiltonianOnGraph G J) (totalSpinHalfOp1 Λ) :=
   heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp1 G J
 
+/-- The Heisenberg-on-graph Hamiltonian commutes with `Ŝ_tot^(2)`. -/
 theorem heisenbergHamiltonianOnGraph_commute_totalSpinHalfOp2
     {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
     (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
     Commute (heisenbergHamiltonianOnGraph G J) (totalSpinHalfOp2 Λ) :=
   heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp2 G J
 
+/-- The Heisenberg-on-graph Hamiltonian commutes with `Ŝ_tot^(3)`. -/
 theorem heisenbergHamiltonianOnGraph_commute_totalSpinHalfOp3
     {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
     (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
     Commute (heisenbergHamiltonianOnGraph G J) (totalSpinHalfOp3 Λ) :=
   heisenbergHamiltonian_couplingOf_commute_totalSpinHalfOp3 G J
 
+/-- The Heisenberg-on-graph Hamiltonian commutes with `(Ŝ_tot)²`. -/
 theorem heisenbergHamiltonianOnGraph_commute_totalSpinHalfSquared
     {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
     (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) :
