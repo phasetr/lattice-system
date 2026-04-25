@@ -783,6 +783,21 @@ Systems*, §3.5, p. 89.
 | `openChainHeisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem` | `H_open` preserves every magnetisation subspace `H_M` (chain specialisation of PR #91) | `Quantum/HeisenbergChain.lean` |
 | `periodicChainHeisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem` | `H_periodic` preserves every magnetisation subspace `H_M` (chain specialisation of PR #91) | `Quantum/HeisenbergChain.lean` |
 
+### Perron-Frobenius theorem (`Math/PerronFrobenius.lean`)
+
+Perron-Frobenius theorem for real symmetric non-negative irreducible matrices (Issue #405).
+The non-negative eigenvector existence step is currently `sorry`
+(blocked by the `EuclideanSpace`/`n → ℝ` inner-product API gap in Mathlib);
+the strict positivity and uniqueness proofs are complete.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `exists_nonneg_eigenvec_max` | (**sorry**) max eigenvalue has a non-negative eigenvector | `Math/PerronFrobenius.lean` |
+| `exists_pos_eigenvec_max` | max eigenvalue has a strictly positive eigenvector (uses sorry via `exists_nonneg_eigenvec_max`) | `Math/PerronFrobenius.lean` |
+| `pos_eigenvec_unique` | the strictly positive eigenvector is unique up to a positive scalar | `Math/PerronFrobenius.lean` |
+
+References: Seneta, *Non-negative Matrices and Markov Chains*, Ch. 1 (1981).
+
 ### Single-mode fermion (P2 skeleton)
 
 Phase 2 entry point: the canonical anticommutation algebra of a single
