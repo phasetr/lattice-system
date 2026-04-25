@@ -4086,6 +4086,57 @@ The result $[\hat S^-_{\rm tot}, \hat H] = 0$ follows by taking adjoints.
     $[\hat S^-_{\rm tot}, \hat H] = 0$ (by adjoint).
 \end{itemize}
 
+%======================================================================
+\subsection{Hubbard all-up-spin state: no double occupancy (Tasaki §11.1.1)}
+\label{subsec:hubbard-allup-state}
+%======================================================================
+
+\noindent\textbf{Definition.}
+The \emph{all-up-spin state} for the Hubbard model on $N+1$ sites is
+\[
+  |\!\uparrow\cdots\uparrow\rangle
+  = \hat c^\dagger_{N,\uparrow}\cdots\hat c^\dagger_{1,\uparrow}
+    \hat c^\dagger_{0,\uparrow}|\Phi_{\rm vac}\rangle.
+\]
+In the Jordan--Wigner representation on $\mathrm{Fin}(2N+2)$
+(even indices $= $ spin-up, odd indices $=$ spin-down), this is
+$\mathrm{basisVec}(\lambda k.\; \text{if } k \bmod 2 = 0 \text{ then } 1 \text{ else } 0)$.
+
+\noindent\textbf{Theorem} (Tasaki §11.1.1, p.~373; eq.~(10.1.5), p.~344).
+\begin{enumerate}
+\item $\hat n_{i,\uparrow}\,|\!\uparrow\cdots\uparrow\rangle
+        = |\!\uparrow\cdots\uparrow\rangle$ for every site $i$.
+\item $\hat n_{i,\downarrow}\,|\!\uparrow\cdots\uparrow\rangle
+        = 0$ for every site $i$ (no down-spin electrons present).
+\item $\hat H_{\rm int}\,|\!\uparrow\cdots\uparrow\rangle = 0$
+        (no double occupancy $\Rightarrow$ interaction vanishes).
+\item $\hat H\,|\!\uparrow\cdots\uparrow\rangle
+        = \hat H_{\rm hop}\,|\!\uparrow\cdots\uparrow\rangle$
+        (the Hubbard model in the all-up sector reduces to
+        a non-interacting hopping problem).
+\end{enumerate}
+
+\noindent\textbf{Proof sketch for item 3.}
+$\hat H_{\rm int} = U\sum_x \hat n_{x,\uparrow}\hat n_{x,\downarrow}$.
+By item 2, $\hat n_{x,\downarrow}|\!\uparrow\cdots\uparrow\rangle = 0$ for
+every $x$, so each term vanishes and the sum is zero.
+
+\noindent\textbf{Lean names}
+(file \texttt{Fermion/JordanWigner/Hubbard/AllUpState.lean}):
+\begin{itemize}
+  \item \texttt{hubbardAllUpState N}: the basis vector for the all-up state.
+  \item \texttt{fermionUpNumber\_mulVec\_allUpState}:
+    $\hat n_{i,\uparrow}\cdot|\!\uparrow\cdots\uparrow\rangle = |\!\uparrow\cdots\uparrow\rangle$.
+  \item \texttt{fermionDownNumber\_mulVec\_allUpState}:
+    $\hat n_{i,\downarrow}\cdot|\!\uparrow\cdots\uparrow\rangle = 0$.
+  \item \texttt{hubbardOnSiteInteraction\_mulVec\_allUpState}:
+    $\hat H_{\rm int}\cdot|\!\uparrow\cdots\uparrow\rangle = 0$.
+  \item \texttt{hubbardHamiltonian\_mulVec\_allUpState}:
+    $\hat H\cdot|\!\uparrow\cdots\uparrow\rangle
+      = \hat H_{\rm hop}\cdot|\!\uparrow\cdots\uparrow\rangle$.
+\end{itemize}
+
+%======================================================================
 \section{Time-reversal map for a single \(S = 1/2\) spin (Tasaki §2.3)}
 \label{sec:time-reversal-spin-half}
 %======================================================================
@@ -4395,6 +4446,8 @@ Marshall sign, generic + chain / 2D / 3D, flip + time-reversal bridge (Tasaki §
 Time-reversal map for many-body $S=1/2$ + multi-body Kramers degeneracy (Tasaki §2.3) & finite-dim & \emph{formalized} \\
 Multi-mode fermion via Jordan--Wigner (CAR + number op + Hubbard chain) & finite-dim & \emph{formalized} \\
 Hubbard chain, finite volume (open and periodic BC) & finite-dim & \emph{formalized} \\
+Hubbard SU(2) symmetry: $[\hat{S}^{\pm}_{\mathrm{tot}}, H] = 0$ (Tasaki §9.3.3) & finite-dim & \emph{formalized} \\
+Hubbard all-up-spin state: $H_{\mathrm{int}}|\!\!\uparrow\cdots\uparrow\rangle = 0$ (Tasaki §11.1.1) & finite-dim & \emph{formalized} \\
 Partial trace & finite-dim & not started \\
 Quantum canonical ensemble wrapper & finite-dim & not started \\
 BCS model (mean field) & finite-dim & not started \\

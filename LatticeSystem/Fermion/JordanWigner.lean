@@ -10,6 +10,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Charges
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Graph
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinSymmetry
+import LatticeSystem.Fermion.JordanWigner.Hubbard.AllUpState
 
 /-!
 # Multi-mode fermion via Jordan–Wigner mapping
