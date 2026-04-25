@@ -4121,6 +4121,26 @@ $\hat H_{\rm int} = U\sum_x \hat n_{x,\uparrow}\hat n_{x,\downarrow}$.
 By item 2, $\hat n_{x,\downarrow}|\!\uparrow\cdots\uparrow\rangle = 0$ for
 every $x$, so each term vanishes and the sum is zero.
 
+\noindent\textbf{Kinetic eigenvalue} (Tasaki §11.1.1, p.~373).
+The hopping Hamiltonian acts as
+\[
+  \hat H_{\rm hop}\,|\!\uparrow\cdots\uparrow\rangle
+  = \Bigl(\sum_i t_{ii}\Bigr)\,|\!\uparrow\cdots\uparrow\rangle.
+\]
+\begin{itemize}
+  \item \emph{Down-spin terms vanish}: $\hat c_{i,\downarrow}|\!\uparrow\cdots\uparrow\rangle = 0$
+    because the spin-down JW index $2i{+}1$ is unoccupied, so $\sigma^+$ maps it to~0.
+  \item \emph{Up-spin off-diagonal ($i\neq j$) terms vanish}: by the CAR
+    $\{\hat c_{j,\uparrow}, \hat c^\dagger_{i,\uparrow}\} = 0$ for $i\neq j$,
+    $\hat c^\dagger_{i,\uparrow}\hat c_{j,\uparrow}
+      = -\hat c_{j,\uparrow}\hat c^\dagger_{i,\uparrow}$.
+    Then $\hat c^\dagger_{i,\uparrow}|\!\uparrow\cdots\uparrow\rangle = 0$
+    (site $2i$ already occupied, $\sigma^-$ column 1 is all-zero).
+  \item \emph{Diagonal terms}: $\hat c^\dagger_{i,\uparrow}\hat c_{i,\uparrow}
+      = \hat n_{i,\uparrow}$ and $\hat n_{i,\uparrow}|\!\uparrow\cdots\uparrow\rangle
+      = |\!\uparrow\cdots\uparrow\rangle$.
+\end{itemize}
+
 \noindent\textbf{Lean names}
 (file \texttt{Fermion/JordanWigner/Hubbard/AllUpState.lean}):
 \begin{itemize}
@@ -4129,11 +4149,21 @@ every $x$, so each term vanishes and the sum is zero.
     $\hat n_{i,\uparrow}\cdot|\!\uparrow\cdots\uparrow\rangle = |\!\uparrow\cdots\uparrow\rangle$.
   \item \texttt{fermionDownNumber\_mulVec\_allUpState}:
     $\hat n_{i,\downarrow}\cdot|\!\uparrow\cdots\uparrow\rangle = 0$.
+  \item \texttt{fermionDownAnnihilation\_mulVec\_allUpState}:
+    $\hat c_{i,\downarrow}\cdot|\!\uparrow\cdots\uparrow\rangle = 0$.
+  \item \texttt{fermionUpCreation\_mulVec\_allUpState}:
+    $\hat c^\dagger_{i,\uparrow}\cdot|\!\uparrow\cdots\uparrow\rangle = 0$.
   \item \texttt{hubbardOnSiteInteraction\_mulVec\_allUpState}:
     $\hat H_{\rm int}\cdot|\!\uparrow\cdots\uparrow\rangle = 0$.
   \item \texttt{hubbardHamiltonian\_mulVec\_allUpState}:
     $\hat H\cdot|\!\uparrow\cdots\uparrow\rangle
       = \hat H_{\rm hop}\cdot|\!\uparrow\cdots\uparrow\rangle$.
+  \item \texttt{hubbardKinetic\_mulVec\_allUpState}:
+    $\hat H_{\rm hop}\cdot|\!\uparrow\cdots\uparrow\rangle
+      = \bigl(\sum_i t_{ii}\bigr)\,|\!\uparrow\cdots\uparrow\rangle$.
+  \item \texttt{hubbardHamiltonian\_mulVec\_allUpState\_eigenstate}:
+    $\hat H\cdot|\!\uparrow\cdots\uparrow\rangle
+      = \bigl(\sum_i t_{ii}\bigr)\,|\!\uparrow\cdots\uparrow\rangle$.
 \end{itemize}
 
 %======================================================================
