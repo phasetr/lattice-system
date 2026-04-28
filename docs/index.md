@@ -783,27 +783,31 @@ Systems*, §3.5, p. 89.
 | `openChainHeisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem` | `H_open` preserves every magnetisation subspace `H_M` (chain specialisation of PR #91) | `Quantum/HeisenbergChain.lean` |
 | `periodicChainHeisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem` | `H_periodic` preserves every magnetisation subspace `H_M` (chain specialisation of PR #91) | `Quantum/HeisenbergChain.lean` |
 
-### Perron-Frobenius theorem (`Math/PerronFrobenius.lean`, `Math/PerronFrobeniusPrimitive.lean`, `Math/CollatzWielandt.lean`)
+### Perron-Frobenius theorem (`Math/PerronFrobenius.lean`, `Math/PerronFrobeniusPrimitive.lean`, `Math/CollatzWielandt.lean`, `Math/PerronFrobeniusMain.lean`)
 
-Perron-Frobenius theorem for real symmetric non-negative irreducible matrices (Issue #405).
-The sorry is being eliminated via a Collatz-Wielandt port from or4nge19/MCMC (multi-PR).
+Perron-Frobenius theorem for nonneg irreducible/primitive matrices (Issue #405, closed).
+The sorry in `exists_pos_eigenvec_max` is eliminated via the Collatz-Wielandt port (PRs A–C).
 
 | Lean name | Statement | File |
 |---|---|---|
 | `Matrix.IsPrimitive.of_irreducible_pos_diagonal` | irreducible nonneg + positive diagonal → primitive (Seneta §1.1, Prop. 1.3, p. 17) | `Math/PerronFrobeniusPrimitive.lean` |
-| `CollatzWielandt.collatzWielandtFn` | CW function `min_{i\|x_i>0} (Ax)_i/x_i` | `Math/CollatzWielandt.lean` |
+| `CollatzWielandt.collatzWielandtFn` | CW function `min_{i\|x_i>0} (Ax)_i/x_i` (Seneta §1.2, p. 27) | `Math/CollatzWielandt.lean` |
 | `CollatzWielandt.le_any_ratio` | `CW(x) ≤ (Ax)_i/x_i` for `x_i > 0` | `Math/CollatzWielandt.lean` |
 | `CollatzWielandt.le_mulVec` | fundamental inequality `CW(x)·x ≤ Ax` | `Math/CollatzWielandt.lean` |
 | `CollatzWielandt.smul_eq` | scale invariance `CW(cx) = CW(x)` for `c > 0` | `Math/CollatzWielandt.lean` |
 | `CollatzWielandt.upperSemicontinuousOn` | CW is upper-semicontinuous on stdSimplex | `Math/CollatzWielandt.lean` |
-| `CollatzWielandt.exists_maximizer` | CW attains its max on stdSimplex (EVT for USC) | `Math/CollatzWielandt.lean` |
+| `CollatzWielandt.exists_maximizer` | CW attains its max on stdSimplex (EVT for USC, Seneta §1.2, p. 28) | `Math/CollatzWielandt.lean` |
 | `CollatzWielandt.eq_eigenvalue` | `CW(v) = r` when `Av = r·v`, `v > 0` | `Math/CollatzWielandt.lean` |
-| `exists_nonneg_eigenvec_max` | (**sorry**) max eigenvalue has a nonneg eigenvector — to be replaced in PR C | `Math/PerronFrobenius.lean` |
-| `exists_pos_eigenvec_max` | max eigenvalue has a strictly positive eigenvector (depends on sorry) | `Math/PerronFrobenius.lean` |
+| `CollatzWielandt.lt_of_all_ratios_gt` | all ratios `> c` ⟹ `CW(x) > c` | `Math/CollatzWielandt.lean` |
+| `PerronFrobeniusMain.pos_of_nonneg_eigenvec` | irreducible nonneg + `Av = μv`, `v ≥ 0`, `v ≠ 0` ⟹ `v > 0` | `Math/PerronFrobeniusMain.lean` |
+| `PerronFrobeniusMain.exists_positive_eigenvector_of_primitive` | primitive nonneg ⟹ ∃ `r > 0`, `v > 0` with `Av = rv` (Seneta §1.2) | `Math/PerronFrobeniusMain.lean` |
+| `PerronFrobeniusMain.exists_positive_eigenvector_of_irreducible` | irreducible nonneg ⟹ ∃ `r > 0`, `v > 0` with `Av = rv` (Seneta §1.2) | `Math/PerronFrobeniusMain.lean` |
+| `exists_nonneg_eigenvec_max` | (**sorry**, retained for docs) symmetric nonneg max eigenvalue has nonneg eigenvector | `Math/PerronFrobenius.lean` |
+| `exists_pos_eigenvec_max` | (**sorry-free**) irreducible nonneg Hermitian ⟹ max eigenvalue has strictly positive eigenvector | `Math/PerronFrobenius.lean` |
 | `pos_eigenvec_unique` | strictly positive eigenvector unique up to positive scalar | `Math/PerronFrobenius.lean` |
 
 References: E. Seneta, *Non-negative Matrices and Markov Chains* (3rd ed.), Springer 2006, §1.2 (pp. 27–28);
-or4nge19/MCMC: `MCMC/PF/LinearAlgebra/Matrix/PerronFrobenius/CollatzWielandt.lean`.
+or4nge19/MCMC: `MCMC/PF/LinearAlgebra/Matrix/PerronFrobenius/`.
 
 ### Single-mode fermion (P2 skeleton)
 

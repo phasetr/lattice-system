@@ -2,7 +2,7 @@
 Copyright (c) 2026 lattice-system contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import LatticeSystem.Math.PerronFrobeniusPrimitive
+import LatticeSystem.Math.PerronFrobeniusMain
 import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.LinearAlgebra.Matrix.Irreducible.Defs
 import Mathlib.LinearAlgebra.Matrix.PosDef
@@ -47,7 +47,9 @@ the Step 2 argument gives `w = 0`, hence `u = r v`. **[Fully proved.]**
 - `exists_nonneg_eigenvec_max`: the Rayleigh equality condition
   `w ⬝ᵥ (A *ᵥ w) = μ ‖w‖² → A *ᵥ w = μ • w` requires computing
   `⟨w, Aw⟩` via the eigenbasis — blocked by Mathlib's `EuclideanSpace`/`n → ℝ` API gap.
-  The mathematical argument is complete; the Lean proof is deferred to Issue #405.
+  This sorry is retained for documentation but is **no longer on the main proof path**:
+  `exists_pos_eigenvec_max` now calls `exists_positive_eigenvector_of_irreducible`
+  from `PerronFrobeniusMain` directly, bypassing this function entirely.
 
 References: Seneta, *Non-negative Matrices and Markov Chains*, Ch. 1;
 Tasaki §11.2 (application to Nagaoka's theorem). Tracked in Issue #405.
@@ -67,7 +69,8 @@ non-negative eigenvector.
 **Sorry**: the Rayleigh equality condition `R(|v|) = μ → A *ᵥ |v| = μ • |v|`
 requires computing `⟨w, Aw⟩` via the eigenbasis inner product. The mathematical
 argument is correct; the Lean proof is blocked by the `EuclideanSpace`/`n → ℝ` API.
-See Issue #405 for the follow-up. -/
+This function is retained for documentation; `exists_pos_eigenvec_max` now bypasses it
+via the Collatz-Wielandt approach (see `PerronFrobeniusMain`). -/
 theorem exists_nonneg_eigenvec_max [Nonempty n] [DecidableEq n]
     {A : Matrix n n ℝ} (hA : A.IsHermitian)
     (hNonneg : ∀ i j, 0 ≤ A i j) :
@@ -144,14 +147,17 @@ private lemma pos_of_nonneg_eigenvec
 /-- For an irreducible nonneg Hermitian matrix, the max eigenvalue has a
 strictly positive eigenvector.
 
-**Sorry**: the non-negative eigenvector existence step (`exists_nonneg_eigenvec_max`).
-The strict positivity and uniqueness proofs are complete. See Issue #405. -/
+Proof: the sorry-bearing `exists_nonneg_eigenvec_max` is bypassed by calling
+`exists_positive_eigenvector_of_irreducible` directly (Collatz-Wielandt, PR C). -/
 theorem exists_pos_eigenvec_max [Nonempty n]
-    {A : Matrix n n ℝ} (hA : A.IsHermitian) (hIrred : A.IsIrreducible) :
+    {A : Matrix n n ℝ} (_ : A.IsHermitian) (hIrred : A.IsIrreducible) :
     ∃ (μ : ℝ) (v : n → ℝ), A *ᵥ v = μ • v ∧ v ≠ 0 ∧ ∀ i, 0 < v i := by
   classical
-  obtain ⟨μ, v, hAv, hv_ne, hv_nonneg, _⟩ := exists_nonneg_eigenvec_max hA hIrred.nonneg
-  exact ⟨μ, v, hAv, hv_ne, pos_of_nonneg_eigenvec hIrred hAv hv_nonneg hv_ne⟩
+  obtain ⟨μ, v, _, hv_pos, hAv⟩ :=
+    LatticeSystem.Math.PerronFrobeniusMain.exists_positive_eigenvector_of_irreducible hIrred
+  exact ⟨μ, v, hAv,
+    fun h => absurd (hv_pos (Classical.arbitrary n)) (by simp [h]),
+    hv_pos⟩
 
 /-! ## Uniqueness of the positive eigenvector -/
 

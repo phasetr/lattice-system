@@ -3558,7 +3558,11 @@ and removal-PR checklist).
 \label{sec:perron-frobenius}
 %======================================================================
 
-\emph{Source file:} \texttt{LatticeSystem/Math/PerronFrobenius.lean}.
+\emph{Source files:}
+\texttt{LatticeSystem/Math/PerronFrobeniusPrimitive.lean},
+\texttt{LatticeSystem/Math/CollatzWielandt.lean},
+\texttt{LatticeSystem/Math/PerronFrobeniusMain.lean},
+\texttt{LatticeSystem/Math/PerronFrobenius.lean}.
 
 \medskip
 \textbf{Setting.}
@@ -3596,6 +3600,38 @@ requires computing $\langle w, Aw\rangle$ via the eigenbasis inner product,
 which is blocked by the \texttt{EuclideanSpace}/\texttt{n $\to$ $\mathbb{R}$} API gap in Mathlib.
 Tracked in Issue~\#405.
 
+\subsection{Collatz--Wielandt main results (\texttt{PerronFrobeniusMain})}
+\label{sec:pf-main}
+
+\emph{Source file:} \texttt{LatticeSystem/Math/PerronFrobeniusMain.lean}.
+
+\medskip
+The key results eliminating the sorry from \texttt{exists\_pos\_eigenvec\_max}.
+
+\begin{itemize}
+\item \textbf{\texttt{pos\_of\_nonneg\_eigenvec}.}
+  If $A$ is irreducible nonneg, $Av = \mu v$, $v \geq 0$, $v \neq 0$, then $v > 0$.
+  Proof: $v_i = 0$ forces all $v_j = 0$ via irreducibility.
+
+\item \textbf{\texttt{exists\_positive\_eigenvector\_of\_primitive}.}
+  For a primitive nonneg matrix: $\exists\,r>0$, $v>0$, $Av = rv$.
+  Proof: (1) CW maximizer $v$ on $\Delta_n$ satisfies $r_0 \cdot v \leq Av$ (fundamental ineq).
+  (2) If $z = Av - r_0 v \neq 0$, primitivity gives $A^k z > 0$, so all ratios
+  $(A^{k+1}v)_i/(A^k v)_i > r_0$; normalising $A^k v$ contradicts maximality.
+  (3) Hence $Av = r_0 v$. Positivity follows from irreducibility; $r_0 > 0$
+  from $A^k v = r_0^k v > 0$.
+  Ref: Seneta \S1.2 (pp.~27--28); MCMC \texttt{Primitive.lean}.
+
+\item \textbf{\texttt{exists\_positive\_eigenvector\_of\_irreducible}.}
+  For an irreducible nonneg matrix: $\exists\,r>0$, $v>0$, $Av = rv$.
+  Proof: Set $B = I + A$; it is primitive by \texttt{IsPrimitive.of\_irreducible\_pos\_diagonal}.
+  Apply the primitive theorem to $B$: get $r_B > 0$, $v > 0$, $Bv = r_B v$.
+  Then $Av = (r_B-1)v$. Since $B \geq I$, $r_B \geq 1$.
+  If $r_B = 1$ then $Av = 0$, so $A = 0$, contradicting irreducibility.
+  Hence $r_B > 1$.
+  Ref: Seneta \S1.2; MCMC \texttt{Irreducible.lean}.
+\end{itemize}
+
 \subsection{Strictly positive max eigenvector (\texttt{exists\_pos\_eigenvec\_max})}
 
 \textbf{Statement.}
@@ -3603,11 +3639,10 @@ Under the above hypotheses,
 $\exists\,\mu\,\exists\,v,\; Av = \mu v \;\land\; v \neq 0 \;\land\; \forall i,\; v_i > 0$.
 
 \textbf{Proof.}
-Obtain the non-negative eigenvector $v$ from \texttt{exists\_nonneg\_eigenvec\_max}.
-Apply \texttt{pos\_of\_nonneg\_eigenvec} (private lemma): if $v_i = 0$ for some $i$, then
-$(Av)_i = 0$, so each $A_{ij}v_j = 0$; irreducibility via
-\texttt{isIrreducible\_iff\_exists\_pow\_pos} propagates $v_j = 0$ to every $j$,
-contradicting $v \neq 0$.
+Call \texttt{exists\_positive\_eigenvector\_of\_irreducible} directly.
+The sorry-bearing \texttt{exists\_nonneg\_eigenvec\_max} is bypassed entirely.
+(The sorry is retained in that function for documentation of the unresolved
+Rayleigh equality approach.)
 
 \subsection{Uniqueness (\texttt{pos\_eigenvec\_unique})}
 
@@ -3628,9 +3663,14 @@ By the propagation argument (same as the strict-positivity lemma), $u = 0$, henc
 \hline
 Lean name & Status & Notes \\
 \hline
-\texttt{exists\_nonneg\_eigenvec\_max} & sorry & Rayleigh equality step; Issue~\#405 \\
-\texttt{exists\_pos\_eigenvec\_max} & proved (uses sorry above) & propagation argument \\
-\texttt{pos\_eigenvec\_unique} & proved & $r = \sup_i w_i/v_i$ argument \\
+\texttt{IsPrimitive.of\_irreducible\_pos\_diagonal} & proved & PR A \\
+\texttt{CollatzWielandt.*} & proved & PR B \\
+\texttt{pos\_of\_nonneg\_eigenvec} & proved & PR C \\
+\texttt{exists\_positive\_eigenvector\_of\_primitive} & proved & PR C; Seneta \S1.2 \\
+\texttt{exists\_positive\_eigenvector\_of\_irreducible} & proved & PR C; Seneta \S1.2 \\
+\texttt{exists\_nonneg\_eigenvec\_max} & sorry & Rayleigh step; retained for docs \\
+\texttt{exists\_pos\_eigenvec\_max} & \textbf{sorry-free} & bypasses sorry via PR C \\
+\texttt{pos\_eigenvec\_unique} & proved & $r = \sup_i w_i/v_i$ \\
 \hline
 \end{tabular}
 \end{center}
