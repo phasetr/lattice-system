@@ -160,6 +160,18 @@ lemma eq_eigenvalue [Nonempty n] {A : Matrix n n ℝ} {r : ℝ} {v : n → ℝ}
       _ = r := h_ratio _ (mem_supp.mpr (hv _))
   · exact le_inf' _ _ fun i hi => (h_ratio i hi).symm.le
 
+/-- If `(Ax)_i / x_i > c` for every `i` with `x_i > 0`, then `CW(x) > c`.
+
+Used in the Perron-Frobenius maximizer argument to derive a contradiction with maximality. -/
+lemma lt_of_all_ratios_gt [Nonempty n] {A : Matrix n n ℝ} {x : n → ℝ} {c : ℝ}
+    (hx : ∀ i, 0 < x i) (h : ∀ i, c < (A *ᵥ x) i / x i) :
+    c < collatzWielandtFn A x := by
+  unfold collatzWielandtFn
+  have h_supp : (supp x).Nonempty :=
+    ⟨Classical.arbitrary n, mem_supp.mpr (hx _)⟩
+  rw [dif_pos h_supp, Finset.lt_inf'_iff h_supp]
+  exact fun i hi => h i
+
 /-! ## Upper-semicontinuity -/
 
 /-- The CW function is upper-semicontinuous on the standard simplex.
