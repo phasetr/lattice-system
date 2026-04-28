@@ -783,20 +783,21 @@ Systems*, §3.5, p. 89.
 | `openChainHeisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem` | `H_open` preserves every magnetisation subspace `H_M` (chain specialisation of PR #91) | `Quantum/HeisenbergChain.lean` |
 | `periodicChainHeisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem` | `H_periodic` preserves every magnetisation subspace `H_M` (chain specialisation of PR #91) | `Quantum/HeisenbergChain.lean` |
 
-### Perron-Frobenius theorem (`Math/PerronFrobenius.lean`)
+### Perron-Frobenius theorem (`Math/PerronFrobenius.lean`, `Math/PerronFrobeniusPrimitive.lean`)
 
 Perron-Frobenius theorem for real symmetric non-negative irreducible matrices (Issue #405).
-The non-negative eigenvector existence step is currently `sorry`
-(blocked by the `EuclideanSpace`/`n → ℝ` inner-product API gap in Mathlib);
-the strict positivity and uniqueness proofs are complete.
+The sorry is being eliminated via a Collatz-Wielandt port from or4nge19/MCMC (multi-PR, see Issue #405).
+The strict positivity and uniqueness proofs are complete.
 
 | Lean name | Statement | File |
 |---|---|---|
+| `Matrix.IsPrimitive.of_irreducible_pos_diagonal` | irreducible nonneg matrix with positive diagonal is primitive (Seneta §1.1, Prop. 1.3, p. 17) | `Math/PerronFrobeniusPrimitive.lean` |
 | `exists_nonneg_eigenvec_max` | (**sorry**) max eigenvalue has a non-negative eigenvector | `Math/PerronFrobenius.lean` |
 | `exists_pos_eigenvec_max` | max eigenvalue has a strictly positive eigenvector (uses sorry via `exists_nonneg_eigenvec_max`) | `Math/PerronFrobenius.lean` |
 | `pos_eigenvec_unique` | the strictly positive eigenvector is unique up to a positive scalar | `Math/PerronFrobenius.lean` |
 
-References: Seneta, *Non-negative Matrices and Markov Chains*, Ch. 1 (1981).
+References: E. Seneta, *Non-negative Matrices and Markov Chains* (3rd ed.), Springer 2006, §1.1 (pp. 14, 17);
+or4nge19/MCMC: `MCMC/PF/LinearAlgebra/Matrix/PerronFrobenius/Lemmas.lean`.
 
 ### Single-mode fermion (P2 skeleton)
 
