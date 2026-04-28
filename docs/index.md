@@ -799,9 +799,9 @@ The sorry in `exists_pos_eigenvec_max` is eliminated via the Collatz-Wielandt po
 | `CollatzWielandt.exists_maximizer` | CW attains its max on stdSimplex (EVT for USC, Seneta §1.2, p. 28) | `Math/CollatzWielandt.lean` |
 | `CollatzWielandt.eq_eigenvalue` | `CW(v) = r` when `Av = r·v`, `v > 0` | `Math/CollatzWielandt.lean` |
 | `CollatzWielandt.lt_of_all_ratios_gt` | all ratios `> c` ⟹ `CW(x) > c` | `Math/CollatzWielandt.lean` |
-| `PerronFrobeniusMain.pos_of_nonneg_eigenvec` | irreducible nonneg + `Av = μv`, `v ≥ 0`, `v ≠ 0` ⟹ `v > 0` (standard propagation argument) | `Math/PerronFrobeniusMain.lean` |
-| `PerronFrobeniusMain.exists_positive_eigenvector_of_primitive` | primitive nonneg ⟹ ∃ `r > 0`, `v > 0` with `Av = rv` (Seneta §1.2, pp. 27–28) | `Math/PerronFrobeniusMain.lean` |
-| `PerronFrobeniusMain.exists_positive_eigenvector_of_irreducible` | irreducible nonneg ⟹ ∃ `r > 0`, `v > 0` with `Av = rv` (Seneta §1.2, pp. 27–28) | `Math/PerronFrobeniusMain.lean` |
+| `PerronFrobeniusMain.pos_of_nonneg_eigenvec` | irreducible nonneg + `Av = μv`, `v ≥ 0`, `v ≠ 0` ⟹ `v > 0` | `Math/PerronFrobeniusMain.lean` |
+| `PerronFrobeniusMain.exists_positive_eigenvector_of_primitive` | primitive nonneg ⟹ ∃ `r > 0`, `v > 0` with `Av = rv` (Seneta §1.2) | `Math/PerronFrobeniusMain.lean` |
+| `PerronFrobeniusMain.exists_positive_eigenvector_of_irreducible` | irreducible nonneg ⟹ ∃ `r > 0`, `v > 0` with `Av = rv` (Seneta §1.2) | `Math/PerronFrobeniusMain.lean` |
 | `exists_nonneg_eigenvec_max` | (**sorry**, retained for docs) symmetric nonneg max eigenvalue has nonneg eigenvector | `Math/PerronFrobenius.lean` |
 | `exists_pos_eigenvec_max` | (**sorry-free**) irreducible nonneg Hermitian ⟹ max eigenvalue has strictly positive eigenvector | `Math/PerronFrobenius.lean` |
 | `pos_eigenvec_unique` | strictly positive eigenvector unique up to positive scalar | `Math/PerronFrobenius.lean` |
