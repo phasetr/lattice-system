@@ -2,6 +2,7 @@
 Copyright (c) 2026 lattice-system contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import LatticeSystem.Math.PerronFrobeniusPrimitive
 import LatticeSystem.Math.PerronFrobenius
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
