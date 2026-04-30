@@ -3623,12 +3623,66 @@ $\bar\sigma = 0$ specialisation places it in $H_0$
 This file is the first step of the Marshall--Lieb--Mattis
 formalisation track (Issue \#412 = phase B-$\alpha$ for $S = 1/2$).
 The next steps establish:
-(i) realness of the dressed Heisenberg matrix elements;
+(i) realness of the dressed Heisenberg matrix elements
+(see~\ref{ssec:mlm-realness});
 (ii) non-positivity of the off-diagonal elements (the
 Marshall sign trick proper);
 (iii) connectivity in the Perron--Frobenius sense; and finally
 the uniqueness and sign structure of the antiferromagnetic
 Heisenberg ground state on a connected bipartite graph.
+
+\subsection{Realness of the dressed Heisenberg matrix elements
+(Tasaki §2.5 p. 41 Property (i), Issue \#412 PR $\alpha$-2)}
+\label{ssec:mlm-realness}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/MarshallLiebMattis/Realness.lean}.
+
+Property (i) in Tasaki's Perron--Frobenius proof of the
+Marshall--Lieb--Mattis theorem is
+$\langle \widetilde{\Psi}^\sigma | \hat H |
+ \widetilde{\Psi}^{\sigma'}\rangle \in \mathbb{R}$
+for the antiferromagnetic Heisenberg Hamiltonian
+$\hat H = \sum_{x,y} J_{x,y}\,\hat S_x \cdot \hat S_y$ with real
+coupling $J$ (formalised as $(J\,x\,y).{\rm im} = 0$).
+
+\begin{theorem}[Two-site spin product matrix entries are real]
+\label{thm:spinHalfDot-real}
+For every $x, y \in \Lambda$ and every $\sigma, \sigma'$,
+$\big((\hat S_x \cdot \hat S_y)_{\sigma,\sigma'}\big).{\rm im} = 0$.
+By case analysis on $x = y$ / parallel / antiparallel via the
+\texttt{spinHalfDot\_mulVec\_basisVec\_\{parallel,antiparallel\}}
+action lemmas, the entry is in $\{3/4, 1/4, -1/4, 1/2, 0\}$.
+Lean: \texttt{spinHalfDot\_apply\_im\_eq\_zero}.
+\end{theorem}
+
+\begin{theorem}[Heisenberg matrix entries real for real $J$]
+\label{thm:heisenberg-real}
+If $(J\,x\,y).{\rm im} = 0$ for all $x, y$, then
+$\big((H_J)_{\sigma,\sigma'}\big).{\rm im} = 0$.  Proof:
+$\mathbb{R}$-linearity of $\mathrm{Complex.im}$ and
+Theorem~\ref{thm:spinHalfDot-real}.  Lean:
+\texttt{heisenbergHamiltonian\_apply\_im\_eq\_zero}.
+\end{theorem}
+
+\begin{theorem}[Marshall sign is real]
+\label{thm:marshall-sign-real}
+$(\texttt{marshallSignOf}\,A\,\sigma).{\rm im} = 0$.  Each factor
+is $\pm 1 \in \mathbb{R}$.  Lean:
+\texttt{marshallSignOf\_im\_eq\_zero}.
+\end{theorem}
+
+\begin{theorem}[MLM Property (i)]
+\label{thm:dressed-bilinear-real}
+For real $J$, the dressed bilinear pairing
+$\sum_\tau |\widetilde{\Psi}^\sigma\rangle\,\tau \cdot
+ (H_J |\widetilde{\Psi}^{\sigma'}\rangle)\,\tau$
+has zero imaginary part.  The pairing reduces to
+$\texttt{marshallSignOf}\,A\,\sigma \cdot
+ \texttt{marshallSignOf}\,A\,\sigma' \cdot (H_J)_{\sigma,\sigma'}$,
+a product of three reals.  Lean:
+\texttt{dot\_marshallDressed\_heisenbergHamiltonian\_marshallDressed\_im\_eq\_zero}.
+\end{theorem}
 
 %======================================================================
 \section{Perron--Frobenius theorem for symmetric non-negative irreducible matrices}
