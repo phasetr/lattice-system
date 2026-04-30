@@ -3764,6 +3764,70 @@ Theorem~\ref{thm:bond-dressed-nonpos}. Lean:
 \texttt{dot\_marshallDressed\_heisenbergHamiltonian\_marshallDressed\_re\_nonpos\_of\_ne}.
 \end{theorem}
 
+\subsection{Swap-connectivity (Tasaki §2.5 p. 41--42 Property (iii),
+Issue \#412 PR $\alpha$-4)}
+\label{ssec:mlm-connectivity}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/MarshallLiebMattis/Connectivity.lean}.
+
+The third property in Tasaki's Perron--Frobenius proof of
+Theorem 2.2 is connectivity: any two configurations
+$\sigma, \sigma'$ with the same total magnetisation are connected
+by a sequence of nonvanishing matrix elements of
+$\langle\widetilde{\Psi}^\sigma|\hat H|\widetilde{\Psi}^{\sigma'}\rangle$.
+For a connected graph $G$ this reduces to the purely combinatorial
+statement that any pair $(x, y)$ with $\sigma_x \neq \sigma_y$
+admits a $G$-edge swap chain producing
+$\texttt{basisSwap}\,\sigma\,x\,y$ from $\sigma$.
+
+\begin{definition}[\texttt{SwapStep}, \texttt{SwapReachable}]
+\label{def:swap-step}
+$\texttt{SwapStep}\,G\,\sigma\,\sigma'$ holds iff
+$\sigma' = \texttt{basisSwap}\,\sigma\,x\,y$ for some $G$-adjacent
+$(x, y)$ with $\sigma_x \neq \sigma_y$.
+$\texttt{SwapReachable}\,G$ is the reflexive-transitive closure.
+Lean: \texttt{SwapStep}, \texttt{SwapReachable}.
+\end{definition}
+
+\begin{theorem}[Walk-induction Lemma, Tasaki p. 41]
+\label{thm:swap-walk}
+For any $G$-walk from $x$ to $y$ and any configuration
+$\sigma$ with $\sigma_x \neq \sigma_y$,
+$\texttt{SwapReachable}\,G\,\sigma\,(\texttt{basisSwap}\,\sigma\,x\,y)$.
+
+By induction on the walk. The cons case
+$x \to v \to \cdots \to y'$ (after the head edge $(x, v)$) splits
+on $\sigma_v$:
+\begin{itemize}
+\item Case A ($\sigma_v \neq \sigma_x$, so $\sigma_v = \sigma_y$):
+  swap $(x, v)$ first via the head edge; the resulting
+  configuration $\sigma_1$ has $\sigma_1{}_v = \sigma_x \neq
+  \sigma_y = \sigma_1{}_y$, so the inductive hypothesis on the
+  remaining walk applies.
+\item Case B ($\sigma_v = \sigma_x$): apply the inductive
+  hypothesis on the remaining walk first, then swap $(x, v)$
+  via the head edge on the resulting configuration.
+\end{itemize}
+Both cases produce a configuration equal to
+$\texttt{basisSwap}\,\sigma\,x\,y$ off the support
+$\{x, v, y\}$ and at the three special sites by direct check.
+Lean: \texttt{swapReachable\_of\_walk\_of\_ne}.
+\end{theorem}
+
+\begin{theorem}[MLM Property (iii) ingredient]
+\label{thm:swap-reachable}
+For a connected (or merely preconnected) graph $G$ and any
+$\sigma$ with $\sigma_x \neq \sigma_y$,
+$\texttt{SwapReachable}\,G\,\sigma\,(\texttt{basisSwap}\,\sigma\,x\,y)$.
+Combined with iteration over the magnetisation distance
+$\sum_x |\sigma_x - \sigma'_x|$, this gives Perron--Frobenius
+irreducibility of the dressed Heisenberg matrix on the
+magnetisation-$M$ subspace. Lean:
+\texttt{swapReachable\_of\_reachable\_of\_ne},
+\texttt{swapReachable\_of\_preconnected\_of\_ne}.
+\end{theorem}
+
 %======================================================================
 \section{Perron--Frobenius theorem for symmetric non-negative irreducible matrices}
 \label{sec:perron-frobenius}
