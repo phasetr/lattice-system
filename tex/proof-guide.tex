@@ -3872,11 +3872,38 @@ Theorem~\ref{thm:dressed-pairing-factor}. Lean:
 \texttt{dressedHeisenbergMatrixH0\_offdiag\_nonpos}.
 \end{theorem}
 
-The remaining work for $H_0$ uniqueness (PR $\alpha$-5b) is to
+The remaining work for $H_0$ uniqueness (subsequent PRs) is to
 shift $M$ to a non-negative form $cI - M$, prove its
 irreducibility from Theorem~\ref{thm:swap-reachable}, and apply
 Perron--Frobenius to extract the unique strictly positive
 eigenvector that yields Tasaki (2.5.4).
+
+\subsection{Magnetisation preservation under \texttt{basisSwap}
+(Tasaki §2.5 p. 42 ingredient, Issue \#412 PR $\alpha$-5b)}
+\label{ssec:mlm-magnetization-swap}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/MarshallLiebMattis/EqMagnetization.lean}.
+
+\begin{theorem}[Magnetisation preservation under bond swap]
+\label{thm:mag-swap}
+$\texttt{magnetization}\,\Lambda\,(\texttt{basisSwap}\,\sigma\,x\,y) =
+ \texttt{magnetization}\,\Lambda\,\sigma$.
+
+The bond swap is the composition with the transposition permutation
+$\texttt{Equiv.swap}\,x\,y : \Lambda \simeq \Lambda$:
+$\texttt{basisSwap}\,\sigma\,x\,y = \sigma \circ \texttt{Equiv.swap}\,x\,y$.
+Total magnetisation $\sum_z \texttt{spinSign}\,(\sigma\,z)$ is
+invariant under permutation reindexing of the underlying lattice
+(\texttt{Equiv.sum\_comp}). Lean: \texttt{magnetization\_basisSwap},
+with $H_0$-membership corollary
+\texttt{magnetization\_basisSwap\_eq\_zero\_iff}.
+\end{theorem}
+
+This is the key ingredient for the Tasaki §2.5 p. 42 Proposition
+(any two configurations with equal magnetisation are connected via
+a chain of single-edge bond swaps), to be assembled in subsequent
+PRs.
 
 %======================================================================
 \section{Perron--Frobenius theorem for symmetric non-negative irreducible matrices}
