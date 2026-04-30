@@ -3553,6 +3553,83 @@ window 6 months from \texttt{since}; see the project page
 and removal-PR checklist).
 \end{remark}
 
+\subsection{Marshall-dressed standard basis (Tasaki §2.5 (2.5.8),
+Issue \#412 PR $\alpha$-1)}
+\label{ssec:marshall-dressed-basis}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/MarshallDressedBasis.lean}.
+
+For a finite vertex type $V$, a sublattice indicator
+$A : V \to \texttt{Bool}$, and a spin-$1/2$ configuration
+$\sigma : V \to \texttt{Fin}\,2$, the
+\emph{Marshall-dressed standard basis state} is
+\[
+  |\widetilde{\Psi}^\sigma\rangle
+    \;:=\; \texttt{marshallSignOf}\,A\,\sigma \cdot |\sigma\rangle,
+\]
+where $|\sigma\rangle = \texttt{basisVec}\,\sigma$ is the standard
+computational basis vector and
+$\texttt{marshallSignOf}\,A\,\sigma = \prod_{x \in A} (-1)^{\sigma_x}$
+(\texttt{marshallDressedBasis}).  This is Tasaki §2.5 eq.~(2.5.8),
+p.~41: the change of basis underlying the Marshall--Lieb--Mattis
+theorem.
+
+\begin{theorem}[Pointwise rules]
+\label{thm:marshall-dressed-pointwise}
+\[
+  |\widetilde{\Psi}^\sigma\rangle\,\sigma
+    = \texttt{marshallSignOf}\,A\,\sigma,
+\qquad
+  |\widetilde{\Psi}^\sigma\rangle\,\tau = 0 \quad (\tau \neq \sigma).
+\]
+Lean: \texttt{marshallDressedBasis\_self} and
+\texttt{marshallDressedBasis\_of\_ne}.
+\end{theorem}
+
+\begin{theorem}[Marshall sign squares to one]
+\label{thm:marshall-sign-sq}
+$(\texttt{marshallSignOf}\,A\,\sigma)^2 = 1.$ Each factor is
+$\pm 1$ since $(-1)^{\sigma_x}$ is $\pm 1$ for $\sigma_x \in
+\{0, 1\}$.  Lean: \texttt{marshallSignOf\_sq\_eq\_one}.
+\end{theorem}
+
+\begin{theorem}[Orthonormality]
+\label{thm:marshall-dressed-inner}
+Under the real bilinear pairing,
+\[
+  \sum_\tau\, |\widetilde{\Psi}^\sigma\rangle\,\tau \cdot
+    |\widetilde{\Psi}^\rho\rangle\,\tau
+    \;=\; \begin{cases} 1 & \rho = \sigma, \\ 0 & \rho \neq \sigma. \end{cases}
+\]
+Combines orthonormality of $\texttt{basisVec}$
+(\texttt{basisVec\_inner}) with
+Theorem~\ref{thm:marshall-sign-sq}; no complex conjugation
+appears because the Marshall sign and the standard basis values
+are real.  Lean: \texttt{marshallDressedBasis\_inner}.
+\end{theorem}
+
+\begin{theorem}[$H_M$-membership]
+\label{thm:marshall-dressed-hm}
+$|\widetilde{\Psi}^\sigma\rangle$ lies in the same magnetisation
+sector $H_M = H_{\bar\sigma/2}$ as $|\sigma\rangle$ (Tasaki
+eq.~(2.2.10)), since the dressing is a scalar multiplication and
+$H_M$ is a $\mathbb{C}$-submodule.  Lean:
+\texttt{marshallDressedBasis\_mem\_magnetizationSubspace}; the
+$\bar\sigma = 0$ specialisation places it in $H_0$
+(\texttt{\_zero}).
+\end{theorem}
+
+This file is the first step of the Marshall--Lieb--Mattis
+formalisation track (Issue \#412 = phase B-$\alpha$ for $S = 1/2$).
+The next steps establish:
+(i) realness of the dressed Heisenberg matrix elements;
+(ii) non-positivity of the off-diagonal elements (the
+Marshall sign trick proper);
+(iii) connectivity in the Perron--Frobenius sense; and finally
+the uniqueness and sign structure of the antiferromagnetic
+Heisenberg ground state on a connected bipartite graph.
+
 %======================================================================
 \section{Perron--Frobenius theorem for symmetric non-negative irreducible matrices}
 \label{sec:perron-frobenius}
