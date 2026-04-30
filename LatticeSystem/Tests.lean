@@ -29,6 +29,7 @@ import LatticeSystem.Tests.MarshallDressedBasis
 import LatticeSystem.Tests.MarshallLiebMattisRealness
 import LatticeSystem.Tests.MarshallLiebMattisMarshallSignTrick
 import LatticeSystem.Tests.MarshallLiebMattisConnectivity
+import LatticeSystem.Tests.MarshallLiebMattisH0Matrix
 import LatticeSystem.Tests.TimeReversalSpinHalf
 import LatticeSystem.Tests.TimeReversalMulti
 
