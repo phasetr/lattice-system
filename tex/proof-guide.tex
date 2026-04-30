@@ -3828,6 +3828,56 @@ magnetisation-$M$ subspace. Lean:
 \texttt{swapReachable\_of\_preconnected\_of\_ne}.
 \end{theorem}
 
+\subsection{Real-valued dressed Heisenberg matrix on $H_0$ (Tasaki
+§2.5 setup, Issue \#412 PR $\alpha$-5a)}
+\label{ssec:mlm-h0-matrix}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/MarshallLiebMattis/H0Matrix.lean}.
+
+To apply Perron--Frobenius to the dressed Heisenberg Hamiltonian
+on the zero-magnetisation subspace $H_0$, we assemble its
+real-valued matrix. The index type is
+$\texttt{H}_0\texttt{Index}\,\Lambda :=
+ \{\sigma : \Lambda \to \texttt{Fin}\,2 \mid
+   \texttt{magnetization}\,\Lambda\,\sigma = 0\}$, and the matrix is
+\[
+  M_{\sigma, \tau}
+   := \mathrm{Re}\big(\texttt{marshallSignOf}\,A\,\sigma \cdot
+                       \texttt{marshallSignOf}\,A\,\tau \cdot
+                       (H_J)_{\sigma, \tau}\big)
+\]
+(\texttt{dressedHeisenbergMatrixH0}).
+
+\begin{theorem}[Symmetry]
+\label{thm:dressed-matrix-symm}
+For real symmetric $J$ (i.e.\ $(J\,x\,y).{\rm im} = 0$ and
+$J\,x\,y = J\,y\,x$), the matrix $M$ is symmetric:
+$M_{\sigma, \tau} = M_{\tau, \sigma}$.
+Hermiticity of the Heisenberg Hamiltonian
+(\texttt{heisenbergHamiltonian\_isHermitian\_of\_real\_symm})
+combined with the realness of matrix entries
+(Theorem~\ref{thm:heisenberg-real}) implies the entries are
+real symmetric. Lean:
+\texttt{dressedHeisenbergMatrixH0\_isSymm}.
+\end{theorem}
+
+\begin{theorem}[Off-diagonal non-positivity]
+\label{thm:dressed-matrix-offdiag}
+For real non-negative $J$ supported on bipartite bonds and
+distinct $\sigma \neq \tau$, $M_{\sigma, \tau} \le 0$.
+This packages Theorem~\ref{thm:dressed-offdiagonal-nonpos} via
+the factorisation
+Theorem~\ref{thm:dressed-pairing-factor}. Lean:
+\texttt{dressedHeisenbergMatrixH0\_offdiag\_nonpos}.
+\end{theorem}
+
+The remaining work for $H_0$ uniqueness (PR $\alpha$-5b) is to
+shift $M$ to a non-negative form $cI - M$, prove its
+irreducibility from Theorem~\ref{thm:swap-reachable}, and apply
+Perron--Frobenius to extract the unique strictly positive
+eigenvector that yields Tasaki (2.5.4).
+
 %======================================================================
 \section{Perron--Frobenius theorem for symmetric non-negative irreducible matrices}
 \label{sec:perron-frobenius}
