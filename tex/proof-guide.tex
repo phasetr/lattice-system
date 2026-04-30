@@ -3684,6 +3684,86 @@ a product of three reals.  Lean:
 \texttt{dot\_marshallDressed\_heisenbergHamiltonian\_marshallDressed\_im\_eq\_zero}.
 \end{theorem}
 
+\subsection{The Marshall sign trick: non-positive off-diagonal
+dressed elements (Tasaki §2.5 p. 41 Property (ii), Issue \#412
+PR $\alpha$-3)}
+\label{ssec:mlm-marshall-sign-trick}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/MarshallLiebMattis/MarshallSignTrick.lean}.
+
+The second of three properties needed in Tasaki's
+Perron--Frobenius proof of Theorem 2.2 is
+
+\begin{quote}
+  \textbf{(ii)}
+  $\langle \widetilde{\Psi}^\sigma | \hat H |
+   \widetilde{\Psi}^{\sigma'}\rangle \le 0$
+  for $\sigma \neq \sigma'$
+\end{quote}
+
+for the spin-$1/2$ antiferromagnetic Heisenberg Hamiltonian on a
+bipartite graph $(\Lambda, A)$ with real non-negative coupling
+$J$ supported on bipartite bonds (i.e. $J_{x,y} = 0$ whenever
+$A\,x = A\,y$).
+
+\begin{theorem}[Pairing factorisation]
+\label{thm:dressed-pairing-factor}
+For any operator $M$,
+$\sum_\tau |\widetilde{\Psi}^\sigma\rangle\,\tau \cdot
+ (M |\widetilde{\Psi}^{\sigma'}\rangle)\,\tau =
+ \texttt{marshallSignOf}\,A\,\sigma \cdot
+ \texttt{marshallSignOf}\,A\,\sigma' \cdot M_{\sigma,\sigma'}$.
+Lean: \texttt{dot\_marshallDressed\_mulVec\_marshallDressed\_eq}.
+\end{theorem}
+
+\begin{theorem}[Marshall sign relation]
+\label{thm:marshall-swap-sign}
+For a bond $\{x, y\}$ with $A\,x \neq A\,y$ and a configuration
+$\sigma$ antiparallel at $\{x, y\}$ ($\sigma\,x \neq \sigma\,y$),
+$\texttt{marshallSignOf}\,A\,\sigma \cdot
+ \texttt{marshallSignOf}\,A\,(\texttt{basisSwap}\,\sigma\,x\,y) = -1$.
+Outside $\{x, y\}$ each pairwise factor squares to $1$. At the
+unique site in $A \cap \{x, y\}$ the pair contributes
+$(-1)^{\sigma_x + \sigma_y} = -1$ since $\sigma_x \neq \sigma_y$
+in $\texttt{Fin}\,2$. The other site of $\{x, y\}$ lies outside
+$A$ and contributes $1$. Lean:
+\texttt{marshallSignOf\_mul\_marshallSignOf\_basisSwap\_of\_bipartite\_antiparallel}.
+\end{theorem}
+
+\begin{theorem}[Per-bond non-positivity]
+\label{thm:bond-dressed-nonpos}
+For any bond $(x, y)$, real non-negative $J_{x,y}$ supported on
+bipartite bonds, and $\sigma \neq \sigma'$, the contribution
+$\texttt{marshallSignOf}\,A\,\sigma \cdot
+ \texttt{marshallSignOf}\,A\,\sigma' \cdot J_{x,y} \cdot
+ (\hat S_x \cdot \hat S_y)_{\sigma,\sigma'}$
+has non-positive real part. By case analysis on
+$(\hat S_x \cdot \hat S_y)_{\sigma,\sigma'}$: it is zero except
+at $x \neq y$, $\sigma'_x \neq \sigma'_y$, and
+$\sigma = \texttt{basisSwap}\,\sigma'\,x\,y$, where it equals
+$1/2$. In that case, if $A\,x = A\,y$ the bipartite hypothesis
+forces $J_{x,y} = 0$; if $A\,x \neq A\,y$ the Marshall sign
+relation (Theorem~\ref{thm:marshall-swap-sign}) gives sign $-1$,
+yielding $-(1/2)\,(J_{x,y}).\mathrm{re} \le 0$. Lean:
+\texttt{bond\_dressed\_contribution\_re\_nonpos}.
+\end{theorem}
+
+\begin{theorem}[MLM Property (ii)]
+\label{thm:dressed-offdiagonal-nonpos}
+For real non-negative $J$ supported on bipartite bonds and
+$\sigma \neq \sigma'$, the dressed off-diagonal Heisenberg
+pairing has non-positive real part:
+\[
+  \mathrm{Re}\,\sum_\tau\,
+    |\widetilde{\Psi}^\sigma\rangle\,\tau \cdot
+    (H_J\,|\widetilde{\Psi}^{\sigma'}\rangle)\,\tau \;\le\; 0.
+\]
+Sum the bond contributions using
+Theorem~\ref{thm:bond-dressed-nonpos}. Lean:
+\texttt{dot\_marshallDressed\_heisenbergHamiltonian\_marshallDressed\_re\_nonpos\_of\_ne}.
+\end{theorem}
+
 %======================================================================
 \section{Perron--Frobenius theorem for symmetric non-negative irreducible matrices}
 \label{sec:perron-frobenius}
