@@ -90,4 +90,19 @@ example (A : Fin 2 → Bool) :
     Commute (sublatticeSpinHalfSquared A) (sublatticeSpinHalfOp3 A) :=
   sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp3 A
 
+/-- `Commute (Ŝ_A)² (Ŝ_¬A^(1))`. -/
+example (A : Fin 2 → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (sublatticeSpinHalfOp1 (fun x => ! A x)) :=
+  sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp1_complement A
+
+/-- `Commute (Ŝ_A)² (Ŝ_tot^(1))`. -/
+example (A : Fin 2 → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (totalSpinHalfOp1 (Fin 2)) :=
+  sublatticeSpinHalfSquared_commute_totalSpinHalfOp1 A
+
+/-- `Commute (Ŝ_A)² (Ŝ_tot)²`. -/
+example (A : Fin 2 → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (totalSpinHalfSquared (Fin 2)) :=
+  sublatticeSpinHalfSquared_commute_totalSpinHalfSquared A
+
 end LatticeSystem.Tests.MarshallLiebMattisSublatticeSpin

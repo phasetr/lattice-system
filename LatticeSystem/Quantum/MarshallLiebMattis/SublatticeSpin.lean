@@ -3,6 +3,7 @@ Copyright (c) 2026 lattice-system contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.TotalSpin
+import LatticeSystem.Quantum.TotalSpin.Casimir
 
 /-!
 # Sublattice spin operators for the MLM toy Hamiltonian
@@ -562,5 +563,83 @@ theorem sublatticeSpinHalfSquared_cross_commute (A : Λ → Bool) :
     · exact (hα3β1.mul_left hα3β1).mul_right (hα3β1.mul_left hα3β1)
     · exact (hα3β2.mul_left hα3β2).mul_right (hα3β2.mul_left hα3β2)
     · exact (hα3β3.mul_left hα3β3).mul_right (hα3β3.mul_left hα3β3)
+
+/-! ## Sublattice Casimir commutes with `Ŝ_¬A^(α)` -/
+
+/-- `Commute (Ŝ_A)² (Ŝ_¬A^(1))`.  Each axis-`β` square `(Ŝ_A^(β))²` commutes
+with `Ŝ_¬A^(1)` by `Commute.mul_left` applied to the mixed-axes
+cross-commute. -/
+theorem sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp1_complement
+    (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (sublatticeSpinHalfOp1 (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfSquared
+  refine Commute.add_left (Commute.add_left ?_ ?_) ?_
+  · exact (sublatticeSpinHalfOp1_cross_commute A).mul_left
+      (sublatticeSpinHalfOp1_cross_commute A)
+  · exact (sublatticeSpinHalfOp2_cross_commute_op1 A).mul_left
+      (sublatticeSpinHalfOp2_cross_commute_op1 A)
+  · exact (sublatticeSpinHalfOp3_cross_commute_op1 A).mul_left
+      (sublatticeSpinHalfOp3_cross_commute_op1 A)
+
+/-- `Commute (Ŝ_A)² (Ŝ_¬A^(2))`. -/
+theorem sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp2_complement
+    (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (sublatticeSpinHalfOp2 (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfSquared
+  refine Commute.add_left (Commute.add_left ?_ ?_) ?_
+  · exact (sublatticeSpinHalfOp1_cross_commute_op2 A).mul_left
+      (sublatticeSpinHalfOp1_cross_commute_op2 A)
+  · exact (sublatticeSpinHalfOp2_cross_commute A).mul_left
+      (sublatticeSpinHalfOp2_cross_commute A)
+  · exact (sublatticeSpinHalfOp3_cross_commute_op2 A).mul_left
+      (sublatticeSpinHalfOp3_cross_commute_op2 A)
+
+/-- `Commute (Ŝ_A)² (Ŝ_¬A^(3))`. -/
+theorem sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp3_complement
+    (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (sublatticeSpinHalfOp3 (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfSquared
+  refine Commute.add_left (Commute.add_left ?_ ?_) ?_
+  · exact (sublatticeSpinHalfOp1_cross_commute_op3 A).mul_left
+      (sublatticeSpinHalfOp1_cross_commute_op3 A)
+  · exact (sublatticeSpinHalfOp2_cross_commute_op3 A).mul_left
+      (sublatticeSpinHalfOp2_cross_commute_op3 A)
+  · exact (sublatticeSpinHalfOp3_cross_commute A).mul_left
+      (sublatticeSpinHalfOp3_cross_commute A)
+
+/-! ## Sublattice Casimir commutes with the total spin generators and Casimir -/
+
+/-- `Commute (Ŝ_A)² (Ŝ_tot^(1))`. Combines self-invariance (axis 1) with
+the Ŝ_¬A^(1) commutativity above, since `Ŝ_tot^(1) = Ŝ_A^(1) + Ŝ_¬A^(1)`. -/
+theorem sublatticeSpinHalfSquared_commute_totalSpinHalfOp1 (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (totalSpinHalfOp1 Λ) := by
+  rw [totalSpinHalfOp1_eq_sublattice_sum A]
+  exact (sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp1 A).add_right
+    (sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp1_complement A)
+
+/-- `Commute (Ŝ_A)² (Ŝ_tot^(2))`. -/
+theorem sublatticeSpinHalfSquared_commute_totalSpinHalfOp2 (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (totalSpinHalfOp2 Λ) := by
+  rw [totalSpinHalfOp2_eq_sublattice_sum A]
+  exact (sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp2 A).add_right
+    (sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp2_complement A)
+
+/-- `Commute (Ŝ_A)² (Ŝ_tot^(3))`. -/
+theorem sublatticeSpinHalfSquared_commute_totalSpinHalfOp3 (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (totalSpinHalfOp3 Λ) := by
+  rw [totalSpinHalfOp3_eq_sublattice_sum A]
+  exact (sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp3 A).add_right
+    (sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp3_complement A)
+
+/-- `Commute (Ŝ_A)² (Ŝ_tot)²`. The third pairwise commutativity needed
+for the joint eigenbasis of `(Ŝ_tot)²`, `(Ŝ_A)²`, `(Ŝ_¬A)²` (Tasaki §2.5
+toy-Hamiltonian eigenvalue analysis). -/
+theorem sublatticeSpinHalfSquared_commute_totalSpinHalfSquared (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (totalSpinHalfSquared Λ) := by
+  unfold totalSpinHalfSquared
+  have h1 := sublatticeSpinHalfSquared_commute_totalSpinHalfOp1 A
+  have h2 := sublatticeSpinHalfSquared_commute_totalSpinHalfOp2 A
+  have h3 := sublatticeSpinHalfSquared_commute_totalSpinHalfOp3 A
+  exact ((h1.mul_right h1).add_right (h2.mul_right h2)).add_right (h3.mul_right h3)
 
 end LatticeSystem.Quantum
