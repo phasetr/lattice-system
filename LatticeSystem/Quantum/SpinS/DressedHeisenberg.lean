@@ -161,4 +161,14 @@ theorem dressedHeisenbergS_sub_J
   rw [dressedHeisenbergS_add_J, dressedHeisenbergS_neg_J]
   ring
 
+/-- If the underlying Heisenberg matrix element is zero, the dressed
+matrix element is zero. -/
+theorem dressedHeisenbergS_zero_of_heisenberg_zero
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
+    {σ σ' : V → Fin (N + 1)}
+    (h : (heisenbergHamiltonianS J N) σ σ' = 0) :
+    dressedHeisenbergS A J N σ σ' = 0 := by
+  unfold dressedHeisenbergS
+  rw [h, mul_zero]
+
 end LatticeSystem.Quantum

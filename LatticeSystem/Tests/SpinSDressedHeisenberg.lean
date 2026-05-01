@@ -80,4 +80,11 @@ example {N : ℕ} (A : V → Bool) (J J' : V → V → ℂ)
       dressedHeisenbergS A J N σ σ' - dressedHeisenbergS A J' N σ σ' :=
   dressedHeisenbergS_sub_J A J J' N σ σ'
 
+/-- Dressed Heisenberg vanishes when underlying Heisenberg vanishes. -/
+example {N : ℕ} (A : V → Bool) (J : V → V → ℂ)
+    {σ σ' : V → Fin (N + 1)}
+    (h : (heisenbergHamiltonianS J N) σ σ' = 0) :
+    dressedHeisenbergS A J N σ σ' = 0 :=
+  dressedHeisenbergS_zero_of_heisenberg_zero A J N h
+
 end LatticeSystem.Tests.SpinSDressedHeisenberg
