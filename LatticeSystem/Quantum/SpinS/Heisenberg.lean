@@ -159,6 +159,20 @@ theorem heisenbergHamiltonianOnGraphS_isHermitian
   heisenbergHamiltonianS_isHermitian_of_real
     (LatticeSystem.Lattice.couplingOf_real G hJ) N
 
+/-- Spin-`S` Heisenberg Hamiltonian on the open chain `pathGraph (M + 1)`. -/
+noncomputable def heisenbergHamiltonianChainS
+    (M : ℕ) (J : ℝ) (N : ℕ) :
+    ManyBodyOpS (Fin (M + 1)) N :=
+  heisenbergHamiltonianOnGraphS (SimpleGraph.pathGraph (M + 1))
+    (-(J : ℂ)) N
+
+/-- Hermiticity of the chain spin-`S` Heisenberg Hamiltonian (for real
+coupling `J : ℝ`). -/
+theorem heisenbergHamiltonianChainS_isHermitian (M : ℕ) (J : ℝ) (N : ℕ) :
+    (heisenbergHamiltonianChainS M J N).IsHermitian :=
+  heisenbergHamiltonianOnGraphS_isHermitian _
+    (by simp : star (-(J : ℂ)) = -(J : ℂ)) N
+
 /-- The Heisenberg Hamiltonian preserves `(Ŝ_tot)²` eigenvalues:
 if `(Ŝ_tot)² · v = S · v`, then `(Ŝ_tot)² · (Ĥ · v) = S · (Ĥ · v)`.
 Operator-level simultaneous diagonalisation. -/
