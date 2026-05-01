@@ -96,6 +96,54 @@ theorem totalSpinHalfOp3_eq_sublattice_sum (A : Λ → Bool) :
     · simp [h]
     · exact absurd h hA
 
+/-! ## Hermiticity -/
+
+/-- Each sublattice spin operator is Hermitian.
+Sum of Hermitian operators is Hermitian. -/
+theorem sublatticeSpinHalfOp1_isHermitian (A : Λ → Bool) :
+    (sublatticeSpinHalfOp1 A).IsHermitian := by
+  unfold sublatticeSpinHalfOp1
+  refine Finset.sum_induction _ _ (fun a b => Matrix.IsHermitian.add) Matrix.isHermitian_zero ?_
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    exact onSite_isHermitian x spinHalfOp1_isHermitian
+  · cases h : A x
+    · rw [if_neg]
+      · simp [Matrix.IsHermitian]
+      · simp [h]
+    · exact absurd h hA
+
+/-- `Ŝ_A^(2)` is Hermitian. -/
+theorem sublatticeSpinHalfOp2_isHermitian (A : Λ → Bool) :
+    (sublatticeSpinHalfOp2 A).IsHermitian := by
+  unfold sublatticeSpinHalfOp2
+  refine Finset.sum_induction _ _ (fun a b => Matrix.IsHermitian.add) Matrix.isHermitian_zero ?_
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    exact onSite_isHermitian x spinHalfOp2_isHermitian
+  · cases h : A x
+    · rw [if_neg]
+      · simp [Matrix.IsHermitian]
+      · simp [h]
+    · exact absurd h hA
+
+/-- `Ŝ_A^(3)` is Hermitian. -/
+theorem sublatticeSpinHalfOp3_isHermitian (A : Λ → Bool) :
+    (sublatticeSpinHalfOp3 A).IsHermitian := by
+  unfold sublatticeSpinHalfOp3
+  refine Finset.sum_induction _ _ (fun a b => Matrix.IsHermitian.add) Matrix.isHermitian_zero ?_
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    exact onSite_isHermitian x spinHalfOp3_isHermitian
+  · cases h : A x
+    · rw [if_neg]
+      · simp [Matrix.IsHermitian]
+      · simp [h]
+    · exact absurd h hA
+
 /-! ## Vector spin squared `(Ŝ_A)²` -/
 
 /-- The sublattice-`A` total spin squared (Casimir):
@@ -112,7 +160,7 @@ noncomputable def sublatticeSpinHalfSquared (A : Λ → Bool) : ManyBodyOp Λ :=
         sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp2 A +
         sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp3 A := rfl
 
-/-! ## Cross-sublattice commutativity (axis 1)
+/-! ## Cross-sublattice commutativity
 
 The sublattice-`A` and sublattice-`¬A` operators commute pairwise:
 each pair `(onSite x σ_α)`, `(onSite y σ_α)` for `x ∈ A`, `y ∉ A`
@@ -145,6 +193,51 @@ theorem sublatticeSpinHalfOp1_cross_commute (A : Λ → Bool) :
         subst heq; rw [hAx] at hAy'; exact Bool.noConfusion hAy'
       rw [if_pos hAx, if_pos rfl]
       exact onSite_mul_onSite_of_ne hxy spinHalfOp1 spinHalfOp1
+  · rw [if_neg hAx]; exact Commute.zero_left _
+
+/-- Cross-sublattice commutativity (axis 2):
+`Ŝ_A^(2)` and `Ŝ_¬A^(2)` commute. -/
+theorem sublatticeSpinHalfOp2_cross_commute (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfOp2 A) (sublatticeSpinHalfOp2 (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfOp2
+  refine Commute.sum_left _ _ _ fun x _ => ?_
+  refine Commute.sum_right _ _ _ fun y _ => ?_
+  by_cases hAx : A x = true
+  · by_cases hAy : A y = true
+    · rw [show (fun z : Λ => ! A z) y = false from by simp [hAy]]
+      simp
+    · -- A x = true, A y = false. y term: `onSite y σ2`.
+      have hAy' : A y = false := by
+        cases h : A y
+        · rfl
+        · exact absurd h hAy
+      rw [show (fun z : Λ => ! A z) y = true from by simp [hAy']]
+      have hxy : x ≠ y := fun heq => by
+        subst heq; rw [hAx] at hAy'; exact Bool.noConfusion hAy'
+      rw [if_pos hAx, if_pos rfl]
+      exact onSite_mul_onSite_of_ne hxy spinHalfOp2 spinHalfOp2
+  · rw [if_neg hAx]; exact Commute.zero_left _
+
+/-- Cross-sublattice commutativity (axis 3):
+`Ŝ_A^(3)` and `Ŝ_¬A^(3)` commute. -/
+theorem sublatticeSpinHalfOp3_cross_commute (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfOp3 A) (sublatticeSpinHalfOp3 (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfOp3
+  refine Commute.sum_left _ _ _ fun x _ => ?_
+  refine Commute.sum_right _ _ _ fun y _ => ?_
+  by_cases hAx : A x = true
+  · by_cases hAy : A y = true
+    · rw [show (fun z : Λ => ! A z) y = false from by simp [hAy]]
+      simp
+    · have hAy' : A y = false := by
+        cases h : A y
+        · rfl
+        · exact absurd h hAy
+      rw [show (fun z : Λ => ! A z) y = true from by simp [hAy']]
+      have hxy : x ≠ y := fun heq => by
+        subst heq; rw [hAx] at hAy'; exact Bool.noConfusion hAy'
+      rw [if_pos hAx, if_pos rfl]
+      exact onSite_mul_onSite_of_ne hxy spinHalfOp3 spinHalfOp3
   · rw [if_neg hAx]; exact Commute.zero_left _
 
 end LatticeSystem.Quantum
