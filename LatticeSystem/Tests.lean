@@ -48,6 +48,7 @@ import LatticeSystem.Tests.SpinSMultiSiteDotComm
 import LatticeSystem.Tests.SpinSTotalSquared
 import LatticeSystem.Tests.SpinSMagnetization
 import LatticeSystem.Tests.SpinSMarshallSign
+import LatticeSystem.Tests.SpinSDressedHeisenberg
 import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Pauli
 import LatticeSystem.Tests.Z2Z2
