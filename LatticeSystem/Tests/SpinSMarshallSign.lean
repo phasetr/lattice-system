@@ -16,4 +16,10 @@ example {N : ℕ} (A : V → Bool) :
     marshallSignS A (fun _ : V => (0 : Fin (N + 1))) = 1 :=
   marshallSignS_const_zero A
 
+/-- Marshall-dressed basis vector. -/
+example {N : ℕ} [DecidableEq V] (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallDressedBasisS A σ =
+      marshallSignS A σ • basisVecS σ :=
+  rfl
+
 end LatticeSystem.Tests.SpinSMarshallSign

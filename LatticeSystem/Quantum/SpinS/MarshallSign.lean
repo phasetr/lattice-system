@@ -37,4 +37,22 @@ theorem marshallSignS_const_zero (A : V → Bool) :
   · simp [hAx]
   · simp [hAx]
 
+/-! ## Marshall-dressed basis -/
+
+/-- The Marshall-dressed basis vector at `σ`:
+
+  `marshallDressedBasisS A σ := marshallSignS A σ • basisVecS σ`.
+
+This is the orthonormal basis used in the Marshall–Lieb–Mattis
+machinery: by absorbing the Marshall sign into the basis vector, the
+Heisenberg matrix elements become *real and non-positive*
+off-diagonal in this rotated basis (Marshall sign trick), enabling
+the Perron–Frobenius argument.
+
+Generalises the spin-1/2 `marshallDressedBasis`
+(`Quantum/MarshallDressedBasis.lean`) to arbitrary spin. -/
+noncomputable def marshallDressedBasisS [DecidableEq V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) : (V → Fin (N + 1)) → ℂ :=
+  marshallSignS A σ • basisVecS σ
+
 end LatticeSystem.Quantum
