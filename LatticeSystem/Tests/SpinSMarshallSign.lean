@@ -68,4 +68,9 @@ example {N : ℕ} [DecidableEq V] (A : V → Bool) (σ : V → Fin (N + 1)) :
       magSubspaceS V N (magEigenvalueS σ) :=
   marshallDressedBasisS_mem_magSubspaceS A σ
 
+/-- Inverse relation: re-scaling by the sign recovers the basis vector. -/
+example {N : ℕ} [DecidableEq V] (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallSignS A σ : ℂ) • marshallDressedBasisS A σ = basisVecS σ :=
+  marshallSignS_smul_marshallDressedBasisS A σ
+
 end LatticeSystem.Tests.SpinSMarshallSign
