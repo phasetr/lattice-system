@@ -20,4 +20,16 @@ example (N : ℕ) : (totalSpinSOp2 Λ N).IsHermitian := totalSpinSOp2_isHermitia
 /-- `Ŝ_tot^(3)` is Hermitian. -/
 example (N : ℕ) : (totalSpinSOp3 Λ N).IsHermitian := totalSpinSOp3_isHermitian Λ N
 
+/-- `Ŝ_tot^+ = Ŝ_tot^(1) + i · Ŝ_tot^(2)`. -/
+example (N : ℕ) :
+    (totalSpinSOpPlus Λ N : ManyBodyOpS Λ N) =
+      totalSpinSOp1 Λ N + Complex.I • totalSpinSOp2 Λ N :=
+  totalSpinSOpPlus_eq_add Λ N
+
+/-- `Ŝ_tot^- = Ŝ_tot^(1) − i · Ŝ_tot^(2)`. -/
+example (N : ℕ) :
+    (totalSpinSOpMinus Λ N : ManyBodyOpS Λ N) =
+      totalSpinSOp1 Λ N - Complex.I • totalSpinSOp2 Λ N :=
+  totalSpinSOpMinus_eq_sub Λ N
+
 end LatticeSystem.Tests.SpinSTotalSpin
