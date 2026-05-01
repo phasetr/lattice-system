@@ -89,4 +89,17 @@ theorem dressedHeisenbergS_diag_star
     star (dressedHeisenbergS A J N σ σ) = dressedHeisenbergS A J N σ σ :=
   dressedHeisenbergS_star_swap A N hreal σ σ
 
+/-- The diagonal of `dressedHeisenbergS` has zero imaginary part for
+real coupling — equivalent to "the diagonal is real" in concrete
+`Complex.im = 0` form. -/
+theorem dressedHeisenbergS_diag_im_zero
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hreal : ∀ x y, star (J x y) = J x y)
+    (σ : V → Fin (N + 1)) :
+    (dressedHeisenbergS A J N σ σ).im = 0 := by
+  have hstar := dressedHeisenbergS_diag_star A N hreal σ
+  -- `Complex.conj z = z ↔ z.im = 0` is the standard fact.
+  have := Complex.conj_eq_iff_im.mp hstar
+  exact this
+
 end LatticeSystem.Quantum
