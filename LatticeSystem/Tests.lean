@@ -26,6 +26,7 @@ import LatticeSystem.Tests.SpinSPlusMinusDiag
 import LatticeSystem.Tests.SpinSMinusPlusDiag
 import LatticeSystem.Tests.SpinSCasimir
 import LatticeSystem.Tests.SpinSEigenstates
+import LatticeSystem.Tests.SpinSLadderStates
 import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Pauli
 import LatticeSystem.Tests.Z2Z2
