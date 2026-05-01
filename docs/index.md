@@ -260,6 +260,7 @@ Generic spin-`S` operators live on `Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ`, wit
 | `spinSOp1` / `spinSOp2` | `Ŝ^(1) := (Ŝ^+ + Ŝ^-) / 2`, `Ŝ^(2) := (Ŝ^+ − Ŝ^-) / (2 i)` | `Quantum/SpinS/Operators.lean` |
 | `spinSOp{Plus,Minus}_apply_top` / `_bottom` | `Ŝ^+` annihilates `\|N⟩` (highest weight); `Ŝ^-` annihilates `\|0⟩` (lowest weight) — the ladder boundaries | `Quantum/SpinS/Operators.lean` |
 | `spinSOp3_commutator_spinSOp{Plus,Minus}` | **Cartan relations** `[Ŝ^{(3)}, Ŝ^+] = Ŝ^+` and `[Ŝ^{(3)}, Ŝ^-] = -Ŝ^-`: `Ŝ^±` shift the magnetic quantum number by `±1`. Proved entry-wise via `Matrix.diagonal_mul` / `mul_diagonal` (β-2 of Issue #458) | `Quantum/SpinS/Algebra.lean` |
+| `spinSOp{Plus,Minus}_conjTranspose` / `spinSOp{1,2,3}_isHermitian` | adjointness `(Ŝ^+)ᴴ = Ŝ^-`, `(Ŝ^-)ᴴ = Ŝ^+`, and Hermiticity of `Ŝ^{(α)}` for `α ∈ {1, 2, 3}` (β-3 of Issue #458). The ladder adjointness follows from the matrix-entry symmetry; `Ŝ^{(1)}` and `Ŝ^{(2)}` use the `1/2` and `1/(2i)` self-conjugacy facts | `Quantum/SpinS/Hermitian.lean` |
 
 ### Basis states and raising/lowering (Tasaki §2.1)
 
