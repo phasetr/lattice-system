@@ -272,6 +272,7 @@ Generic spin-`S` operators live on `Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ`, wit
 | `spinSOpPlus_mul_spinSOpMinus_eq_diagonal` | `Ŝ^+ · Ŝ^- = diag((i + 1)(N − i))`. The product is diagonal because `Ŝ^+[i, l] · Ŝ^-[l, j]` is non-zero only when `l = i + 1 = j + 1`, forcing `i = j`. Combined with the analogous `Ŝ^- · Ŝ^+` and `(Ŝ^{(3)})²`, this assembles the Casimir identity (β-12 of Issue #458) | `Quantum/SpinS/PlusMinusDiag.lean` |
 | `spinSOpMinus_mul_spinSOpPlus_eq_diagonal` | `Ŝ^- · Ŝ^+ = diag(i · (N − i + 1))`. Symmetric to β-12 with `Ŝ^±` swapped (β-13 of Issue #458) | `Quantum/SpinS/MinusPlusDiag.lean` |
 | `spinSOp1_sq_add_spinSOp2_sq` / `spinSOp_total_squared` | **Casimir identity** for general spin-`S`: `(Ŝ^{(1)})² + (Ŝ^{(2)})² + (Ŝ^{(3)})² = (N(N+2)/4) · 1`, equivalent to `S(S+1) · 1` for `S = N/2`. Proves the irreducible spin-`S` representation has Casimir eigenvalue `S(S+1)` (Schur's lemma). The intermediate identity `(Ŝ^{(1)})² + (Ŝ^{(2)})² = (1/2)(Ŝ^+ · Ŝ^- + Ŝ^- · Ŝ^+)` is proved using `module` (β-14 of Issue #458) | `Quantum/SpinS/Casimir.lean` |
+| `spinSOp3_mulVec_basis` | spin-`S` eigenstate equation `Ŝ^{(3)} · \|k⟩ = (N/2 − k) · \|k⟩`, where `\|k⟩ := Pi.single k 1` is the `k`-th unit basis vector of `(Fin (N + 1) → ℂ)` (β-15 of Issue #458) | `Quantum/SpinS/Eigenstates.lean` |
 
 ### Basis states and raising/lowering (Tasaki §2.1)
 
