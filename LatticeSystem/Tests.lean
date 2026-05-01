@@ -16,6 +16,7 @@ import LatticeSystem.Tests.SpinSAlgebra
 import LatticeSystem.Tests.SpinSHermitian
 import LatticeSystem.Tests.SpinSDiagProj
 import LatticeSystem.Tests.SpinSLagrange
+import LatticeSystem.Tests.SpinSLadderProj
 import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Pauli
 import LatticeSystem.Tests.Z2Z2
