@@ -3943,7 +3943,7 @@ on the magnetisation-$M$ subspace. Subsequent PRs will:
 \begin{itemize}
 \item upgrade $\mathrm{configDist}$ reachability to a positive
 matrix-power entry $(B^n)_{\sigma, \sigma'} > 0$ for the shifted
-non-negative matrix $B = cI - M$;
+non-negative matrix $B = cI - M$ defined below;
 \item apply Perron--Frobenius
 (\texttt{LatticeSystem.Math.PerronFrobenius.exists\_pos\_eigenvec\_max}
 and \texttt{pos\_eigenvec\_unique}) to extract the unique
@@ -3953,6 +3953,51 @@ ground-state expansion
 $|\Phi_{\rm GS}\rangle = \sum_\sigma c_\sigma |\widetilde{\Psi}^\sigma\rangle$
 with $c_\sigma > 0$ (Tasaki (2.5.4)).
 \end{itemize}
+
+\subsection{Shifted dressed Heisenberg matrix $B = cI - M$ on
+$H_0$ (Issue \#412 PR $\alpha$-5d)}
+\label{ssec:mlm-h0-shifted}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/MarshallLiebMattis/H0Shifted.lean}.
+
+To apply Perron--Frobenius, the dressed Heisenberg matrix $M$ must
+be transformed into a non-negative form. The $cI - M$ shift
+preserves the eigenvector structure (eigenvalue $\mu$ of $M$ becomes
+$c - \mu$ of $B$ with the same eigenvector), and translates the
+\emph{minimum} eigenvalue of $M$ (= ground state of the restricted
+Heisenberg) into the \emph{maximum} eigenvalue of $B$ (which is
+where Perron--Frobenius gives a unique positive eigenvector).
+
+\begin{definition}[Shifted matrix]
+\label{def:shifted-matrix}
+$B := \texttt{dressedHeisenbergShifted}\,A\,J\,c$, with
+$B_{\sigma, \tau} := (c \cdot I)_{\sigma, \tau} - M_{\sigma, \tau}$.
+Lean: \texttt{dressedHeisenbergShifted}.
+\end{definition}
+
+\begin{theorem}[Symmetry]
+\label{thm:shifted-symm}
+For real symmetric $J$ and any $c \in \mathbb{R}$, $B$ is symmetric.
+Inherits symmetry from
+Theorem~\ref{thm:dressed-matrix-symm}; the $cI$ term is trivially
+symmetric. Lean: \texttt{dressedHeisenbergShifted\_isSymm}.
+\end{theorem}
+
+\begin{theorem}[Non-negativity]
+\label{thm:shifted-nonneg}
+For real non-negative $J$ on bipartite bonds:
+\begin{itemize}
+\item Off-diagonal entries of $B$ are non-negative (sign flip of
+$M$'s non-positive off-diagonal,
+Theorem~\ref{thm:dressed-matrix-offdiag});
+\item Diagonal entries are non-negative when $c \ge M_{\sigma, \sigma}$
+for every $\sigma$.
+\end{itemize}
+Lean: \texttt{dressedHeisenbergShifted\_offdiag\_nonneg},
+\texttt{dressedHeisenbergShifted\_diag\_nonneg},
+\texttt{dressedHeisenbergShifted\_nonneg}.
+\end{theorem}
 
 %======================================================================
 \section{Perron--Frobenius theorem for symmetric non-negative irreducible matrices}
