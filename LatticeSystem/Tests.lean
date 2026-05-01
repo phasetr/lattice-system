@@ -44,6 +44,7 @@ import LatticeSystem.Tests.SpinSMultiSiteDot
 import LatticeSystem.Tests.SpinSHeisenberg
 import LatticeSystem.Tests.SpinSTotalSpin
 import LatticeSystem.Tests.SpinSMultiSiteCommutator
+import LatticeSystem.Tests.SpinSMultiSiteDotComm
 import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Pauli
 import LatticeSystem.Tests.Z2Z2
