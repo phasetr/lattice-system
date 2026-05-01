@@ -83,4 +83,10 @@ example {N : ℕ} (σ : V → Fin (N + 1)) :
     marshallSignS (fun _ : V => true) σ = (-1 : ℂ) ^ magSumS σ :=
   marshallSignS_eq_neg_one_pow_of_A_true σ
 
+/-- Product of two Marshall signs factors site-wise. -/
+example {N : ℕ} (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
+    marshallSignS A σ * marshallSignS A σ' =
+      ∏ x : V, if A x then ((-1 : ℂ) ^ ((σ x).val + (σ' x).val)) else 1 :=
+  marshallSignS_mul A σ σ'
+
 end LatticeSystem.Tests.SpinSMarshallSign
