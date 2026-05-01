@@ -87,4 +87,10 @@ example {N : ℕ} (A : V → Bool) (J : V → V → ℂ)
     dressedHeisenbergS A J N σ σ' = 0 :=
   dressedHeisenbergS_zero_of_heisenberg_zero A J N h
 
+/-- Dressed Heisenberg matrix is Hermitian for real coupling. -/
+example {N : ℕ} (A : V → Bool) {J : V → V → ℂ}
+    (hreal : ∀ x y, star (J x y) = J x y) :
+    (dressedHeisenbergSMatrix A J N).IsHermitian :=
+  dressedHeisenbergSMatrix_isHermitian A N hreal
+
 end LatticeSystem.Tests.SpinSDressedHeisenberg
