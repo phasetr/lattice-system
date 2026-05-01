@@ -16,4 +16,10 @@ example (x y : Λ) (N : ℕ) :
     (spinSDot x y N : ManyBodyOpS Λ N) = spinSDot y x N :=
   spinSDot_comm x y N
 
+/-- Same-site Casimir: `Ŝ_x · Ŝ_x = (N(N+2)/4) · 1`. -/
+example (x : Λ) (N : ℕ) :
+    (spinSDot x x N : ManyBodyOpS Λ N) =
+      ((N : ℂ) * (N + 2) / 4) • 1 :=
+  spinSDot_self x N
+
 end LatticeSystem.Tests.SpinSMultiSiteDot
