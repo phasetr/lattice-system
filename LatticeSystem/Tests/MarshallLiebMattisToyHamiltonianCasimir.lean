@@ -47,4 +47,9 @@ example (A : Fin 2 → Bool) :
         - sublatticeSpinHalfSquared (fun x => ! A x) :=
   heisenbergToyHamiltonian_eq_casimir_diff A
 
+/-- The toy Hamiltonian commutes with the total spin Casimir. -/
+example (A : Fin 2 → Bool) :
+    Commute (heisenbergToyHamiltonian A) (totalSpinHalfSquared (Fin 2)) :=
+  heisenbergToyHamiltonian_commute_totalSpinHalfSquared A
+
 end LatticeSystem.Tests.MarshallLiebMattisToyHamiltonianCasimir
