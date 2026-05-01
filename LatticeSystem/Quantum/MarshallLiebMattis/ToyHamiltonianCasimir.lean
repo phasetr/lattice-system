@@ -240,4 +240,51 @@ theorem heisenbergToyHamiltonian_mulVec_basisVec_const
       sublatticeSpinHalfSquared_mulVec_basisVec_const (fun x => ! A x) s]
   rw [← sub_smul, ← sub_smul]
 
+/-- Cardinality identity: `|Λ| = |A| + |¬A|` for any sublattice
+indicator `A : Λ → Bool`.  Direct from
+`Finset.card_filter_add_card_filter_not`. -/
+private theorem sublatticeCard_add_complement (A : Λ → Bool) :
+    sublatticeCard A + sublatticeCard (fun x => ! A x) = Fintype.card Λ := by
+  unfold sublatticeCard
+  have hfilter : Finset.univ.filter (fun x : Λ => (! A x) = true) =
+      Finset.univ.filter (fun x : Λ => ¬ (A x = true)) := by
+    ext x; simp [Bool.not_eq_true]
+  rw [hfilter, Finset.card_filter_add_card_filter_not (s := Finset.univ)
+      (fun x : Λ => A x = true)]
+  exact Finset.card_univ
+
+/-- **Simplified Ĥ_toy eigenvalue on the all-aligned state**:
+`Ĥ_toy · |s s … s⟩ = (|A| · |¬A| / 2) · |s s … s⟩`.
+
+Algebraic simplification of the Casimir-difference formula via
+`|Λ| = |A| + |¬A|`:
+
+```
+  |Λ|(|Λ|+2)/4 − |A|(|A|+2)/4 − |¬A|(|¬A|+2)/4
+= (a + b)(a + b + 2)/4 − a(a + 2)/4 − b(b + 2)/4   (a = |A|, b = |¬A|)
+= 2ab/4 = ab/2.
+```
+
+The eigenvalue is non-negative for any bipartite lattice and
+strictly positive when both sublattices are non-empty — physically,
+the all-aligned state has positive AFM energy on a bipartite bond
+graph. -/
+theorem heisenbergToyHamiltonian_mulVec_basisVec_const_simplified
+    (A : Λ → Bool) (s : Fin 2) :
+    (heisenbergToyHamiltonian A).mulVec (basisVec (fun _ : Λ => s)) =
+      (((sublatticeCard A : ℂ) * (sublatticeCard (fun x => ! A x) : ℂ)) / 2) •
+        basisVec (fun _ : Λ => s) := by
+  rw [heisenbergToyHamiltonian_mulVec_basisVec_const A s]
+  congr 1
+  -- Algebraic identity using |Λ| = |A| + |¬A|.
+  have hsum := sublatticeCard_add_complement A
+  -- Convert ℕ-cast equation to ℂ.
+  have hsumℂ : (Fintype.card Λ : ℂ) =
+      (sublatticeCard A : ℂ) + (sublatticeCard (fun x => ! A x) : ℂ) := by
+    have := congrArg (Nat.cast (R := ℂ)) hsum.symm
+    push_cast at this
+    exact this
+  rw [hsumℂ]
+  ring
+
 end LatticeSystem.Quantum
