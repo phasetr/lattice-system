@@ -90,6 +90,16 @@ theorem spinSDot_isHermitian (x y : Λ) (N : ℕ) :
         (onSiteS_isHermitian y (spinSOp3_isHermitian N))
         (onSiteS_mul_onSiteS_of_ne hxy _ _)
 
+/-- Sum of same-site Casimirs:
+`Σ_{x : Λ} (Ŝ_x · Ŝ_x) = |Λ| · (N(N+2)/4) • 1`. -/
+theorem sum_spinSDot_self {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (N : ℕ) :
+    (∑ x : Λ, spinSDot x x N : ManyBodyOpS Λ N) =
+      ((Fintype.card Λ : ℂ) * ((N : ℂ) * (N + 2) / 4)) • 1 := by
+  simp_rw [spinSDot_self]
+  rw [Finset.sum_const, Finset.card_univ]
+  rw [← Nat.cast_smul_eq_nsmul ℂ (Fintype.card Λ)]
+  rw [smul_smul]
+
 /-- **Raising/lowering decomposition** of the two-site spin-`S` dot
 product (Tasaki §2.2 eq. (2.2.16) for arbitrary spin):
 
