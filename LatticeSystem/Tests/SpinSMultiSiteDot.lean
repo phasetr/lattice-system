@@ -37,4 +37,10 @@ example (x y : Λ) (N : ℕ) :
     (spinSDot x y N : ManyBodyOpS Λ N).IsHermitian :=
   spinSDot_isHermitian x y N
 
+/-- Sum of same-site Casimirs. -/
+example (N : ℕ) :
+    (∑ x : Λ, spinSDot x x N : ManyBodyOpS Λ N) =
+      ((Fintype.card Λ : ℂ) * ((N : ℂ) * (N + 2) / 4)) • 1 :=
+  sum_spinSDot_self N
+
 end LatticeSystem.Tests.SpinSMultiSiteDot
