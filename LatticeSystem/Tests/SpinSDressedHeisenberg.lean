@@ -100,4 +100,18 @@ example {N : ℕ} (A : V → Bool) (G : SimpleGraph V) [DecidableRel G.Adj]
         (LatticeSystem.Lattice.couplingOf G J) N).IsHermitian :=
   dressedHeisenbergSMatrix_couplingOf_isHermitian A G hJ N
 
+/-- Dressed Heisenberg on chain Hermitian. -/
+example (M : ℕ) (A : Fin (M + 1) → Bool) (J : ℝ) (N : ℕ) :
+    (dressedHeisenbergSMatrix A
+        (LatticeSystem.Lattice.couplingOf
+          (SimpleGraph.pathGraph (M + 1)) (-(J : ℂ))) N).IsHermitian :=
+  dressedHeisenbergSMatrix_chain_isHermitian M A J N
+
+/-- Dressed Heisenberg on periodic chain Hermitian. -/
+example (M : ℕ) (A : Fin (M + 2) → Bool) (J : ℝ) (N : ℕ) :
+    (dressedHeisenbergSMatrix A
+        (LatticeSystem.Lattice.couplingOf
+          (SimpleGraph.cycleGraph (M + 2)) (-(J : ℂ))) N).IsHermitian :=
+  dressedHeisenbergSMatrix_periodicChain_isHermitian M A J N
+
 end LatticeSystem.Tests.SpinSDressedHeisenberg
