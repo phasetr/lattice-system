@@ -112,4 +112,39 @@ noncomputable def sublatticeSpinHalfSquared (A : Λ → Bool) : ManyBodyOp Λ :=
         sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp2 A +
         sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp3 A := rfl
 
+/-! ## Cross-sublattice commutativity (axis 1)
+
+The sublattice-`A` and sublattice-`¬A` operators commute pairwise:
+each pair `(onSite x σ_α)`, `(onSite y σ_α)` for `x ∈ A`, `y ∉ A`
+has `x ≠ y` (since `A x = true ≠ false = A y`), so the site-embedded
+operators commute (`onSite_mul_onSite_of_ne`).
+
+This is the key combinatorial fact for the Casimir identity
+`(Ŝ_tot^(α))² = (Ŝ_A^(α))² + 2 Ŝ_A^(α) Ŝ_¬A^(α) + (Ŝ_¬A^(α))²`. -/
+
+/-- Cross-sublattice commutativity (axis 1):
+`Ŝ_A^(1)` and `Ŝ_¬A^(1)` commute. -/
+theorem sublatticeSpinHalfOp1_cross_commute (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfOp1 A) (sublatticeSpinHalfOp1 (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfOp1
+  refine Commute.sum_left _ _ _ fun x _ => ?_
+  refine Commute.sum_right _ _ _ fun y _ => ?_
+  -- Case-split on `A x` and `A y` (not `!A y`).
+  by_cases hAx : A x = true
+  · by_cases hAy : A y = true
+    · -- A x = true, A y = true.  `(fun z => !A z) y = !true = false`, so the y term is 0.
+      rw [show (fun z : Λ => ! A z) y = false from by simp [hAy]]
+      simp
+    · -- A x = true, A y = false. y term: `onSite y σ1`.
+      have hAy' : A y = false := by
+        cases h : A y
+        · rfl
+        · exact absurd h hAy
+      rw [show (fun z : Λ => ! A z) y = true from by simp [hAy']]
+      have hxy : x ≠ y := fun heq => by
+        subst heq; rw [hAx] at hAy'; exact Bool.noConfusion hAy'
+      rw [if_pos hAx, if_pos rfl]
+      exact onSite_mul_onSite_of_ne hxy spinHalfOp1 spinHalfOp1
+  · rw [if_neg hAx]; exact Commute.zero_left _
+
 end LatticeSystem.Quantum
