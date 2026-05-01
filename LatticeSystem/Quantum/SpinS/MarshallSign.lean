@@ -63,6 +63,22 @@ theorem marshallSignS_sq (A : V → Bool) (σ : V → Fin (N + 1)) :
     rw [one_pow]
   · simp [hAx]
 
+/-- The Marshall sign is real: its complex conjugate is itself. Each
+factor `(-1)^k` is real, so the star/conjugation acts as identity on
+the product. -/
+theorem marshallSignS_star (A : V → Bool) (σ : V → Fin (N + 1)) :
+    star (marshallSignS A σ) = marshallSignS A σ := by
+  unfold marshallSignS
+  rw [star_prod]
+  apply Finset.prod_congr rfl
+  intro x _
+  by_cases hAx : A x
+  · simp only [hAx, if_true]
+    rw [show ((-1 : ℂ) ^ (σ x).val) = ((-1 : ℂ)) ^ (σ x).val from rfl]
+    rw [star_pow]
+    rw [show star (-1 : ℂ) = -1 from by simp]
+  · simp [hAx]
+
 /-! ## Marshall-dressed basis -/
 
 /-- The Marshall-dressed basis vector at `σ`:

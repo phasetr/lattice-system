@@ -49,4 +49,9 @@ example {N : ℕ} (A : V → Bool) (σ : V → Fin (N + 1)) :
     marshallSignS A σ * marshallSignS A σ = 1 :=
   marshallSignS_sq A σ
 
+/-- Marshall sign is real: star = self. -/
+example {N : ℕ} (A : V → Bool) (σ : V → Fin (N + 1)) :
+    star (marshallSignS A σ) = marshallSignS A σ :=
+  marshallSignS_star A σ
+
 end LatticeSystem.Tests.SpinSMarshallSign
