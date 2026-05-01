@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.TotalSpin
+import LatticeSystem.Quantum.SpinS.MultiSiteCommutator
 
 /-!
 # Spin-`S` total spin squared `(Ŝ_tot)²`
@@ -37,5 +38,123 @@ theorem totalSpinSSquared_isHermitian :
     rw [Matrix.conjTranspose_mul, (totalSpinSOp2_isHermitian Λ N)]
   · unfold Matrix.IsHermitian
     rw [Matrix.conjTranspose_mul, (totalSpinSOp3_isHermitian Λ N)]
+
+/-! ## Total-spin SU(2) cyclic commutators in named form -/
+
+/-- `[Ŝ_tot^{(1)}, Ŝ_tot^{(2)}] = i · Ŝ_tot^{(3)}` (named-operator form). -/
+theorem totalSpinSOp1_commutator_totalSpinSOp2_named :
+    (totalSpinSOp1 Λ N * totalSpinSOp2 Λ N
+        - totalSpinSOp2 Λ N * totalSpinSOp1 Λ N : ManyBodyOpS Λ N) =
+      Complex.I • totalSpinSOp3 Λ N := by
+  unfold totalSpinSOp1 totalSpinSOp2 totalSpinSOp3
+  exact totalSpinSOp1_commutator_totalSpinSOp2 (Λ := Λ) N
+
+/-- `[Ŝ_tot^{(2)}, Ŝ_tot^{(3)}] = i · Ŝ_tot^{(1)}` (named-operator form). -/
+theorem totalSpinSOp2_commutator_totalSpinSOp3_named :
+    (totalSpinSOp2 Λ N * totalSpinSOp3 Λ N
+        - totalSpinSOp3 Λ N * totalSpinSOp2 Λ N : ManyBodyOpS Λ N) =
+      Complex.I • totalSpinSOp1 Λ N := by
+  unfold totalSpinSOp1 totalSpinSOp2 totalSpinSOp3
+  exact totalSpinSOp2_commutator_totalSpinSOp3 (Λ := Λ) N
+
+/-- `[Ŝ_tot^{(3)}, Ŝ_tot^{(1)}] = i · Ŝ_tot^{(2)}` (named-operator form). -/
+theorem totalSpinSOp3_commutator_totalSpinSOp1_named :
+    (totalSpinSOp3 Λ N * totalSpinSOp1 Λ N
+        - totalSpinSOp1 Λ N * totalSpinSOp3 Λ N : ManyBodyOpS Λ N) =
+      Complex.I • totalSpinSOp2 Λ N := by
+  unfold totalSpinSOp1 totalSpinSOp2 totalSpinSOp3
+  exact totalSpinSOp3_commutator_totalSpinSOp1 (Λ := Λ) N
+
+/-! ## Casimir invariance: `[(Ŝ_tot)², Ŝ_tot^{(α)}] = 0` -/
+
+/-- Internal Leibniz: `[X·X, C] = X·[X,C] + [X,C]·X`. -/
+private lemma square_commutator_totalSpinS (X C : ManyBodyOpS Λ N) :
+    X * X * C - C * (X * X) = X * (X * C - C * X) + (X * C - C * X) * X := by
+  rw [mul_sub, sub_mul]
+  have h1 : X * (C * X) = X * C * X := (mul_assoc X C X).symm
+  have h2 : X * X * C = X * (X * C) := mul_assoc X X C
+  have h3 : C * (X * X) = C * X * X := (mul_assoc C X X).symm
+  rw [h1, h2, h3]; abel
+
+/-- Casimir invariance: `[(Ŝ_tot)², Ŝ_tot^{(3)}] = 0`. -/
+theorem totalSpinSSquared_commutator_totalSpinSOp3 :
+    totalSpinSSquared Λ N * totalSpinSOp3 Λ N
+        - totalSpinSOp3 Λ N * totalSpinSSquared Λ N = 0 := by
+  unfold totalSpinSSquared
+  set A := totalSpinSOp1 Λ N
+  set B := totalSpinSOp2 Λ N
+  set C := totalSpinSOp3 Λ N
+  have hCA : C * A - A * C = Complex.I • B :=
+    totalSpinSOp3_commutator_totalSpinSOp1_named Λ N
+  have hBC : B * C - C * B = Complex.I • A :=
+    totalSpinSOp2_commutator_totalSpinSOp3_named Λ N
+  rw [add_mul, add_mul, mul_add, mul_add]
+  rw [show A * A * C + B * B * C + C * C * C - (C * (A * A) + C * (B * B) + C * (C * C))
+        = (A * A * C - C * (A * A)) + (B * B * C - C * (B * B))
+          + (C * C * C - C * (C * C)) from by abel]
+  rw [square_commutator_totalSpinS Λ N A, square_commutator_totalSpinS Λ N B,
+    square_commutator_totalSpinS Λ N C]
+  have hAC : A * C - C * A = -(Complex.I • B) := by
+    rw [show A * C - C * A = -(C * A - A * C) from by abel, hCA]
+  have hCC : C * C - C * C = (0 : ManyBodyOpS Λ N) := sub_self _
+  rw [hAC, hBC, hCC]
+  rw [mul_zero, zero_mul, add_zero]
+  rw [mul_neg, neg_mul, mul_smul_comm, smul_mul_assoc, mul_smul_comm, smul_mul_assoc]
+  abel
+
+/-- Casimir invariance: `[(Ŝ_tot)², Ŝ_tot^{(1)}] = 0`. -/
+theorem totalSpinSSquared_commutator_totalSpinSOp1 :
+    totalSpinSSquared Λ N * totalSpinSOp1 Λ N
+        - totalSpinSOp1 Λ N * totalSpinSSquared Λ N = 0 := by
+  unfold totalSpinSSquared
+  set A := totalSpinSOp1 Λ N
+  set B := totalSpinSOp2 Λ N
+  set C := totalSpinSOp3 Λ N
+  have hAB : A * B - B * A = Complex.I • C :=
+    totalSpinSOp1_commutator_totalSpinSOp2_named Λ N
+  have hCA : C * A - A * C = Complex.I • B :=
+    totalSpinSOp3_commutator_totalSpinSOp1_named Λ N
+  rw [add_mul, add_mul, mul_add, mul_add]
+  rw [show A * A * A + B * B * A + C * C * A - (A * (A * A) + A * (B * B) + A * (C * C))
+        = (A * A * A - A * (A * A)) + (B * B * A - A * (B * B))
+          + (C * C * A - A * (C * C)) from by abel]
+  rw [square_commutator_totalSpinS Λ N A, square_commutator_totalSpinS Λ N B,
+    square_commutator_totalSpinS Λ N C]
+  have hAA : A * A - A * A = (0 : ManyBodyOpS Λ N) := sub_self _
+  have hBA : B * A - A * B = -(Complex.I • C) := by
+    rw [show B * A - A * B = -(A * B - B * A) from by abel, hAB]
+  rw [hAA, hBA, hCA]
+  rw [mul_zero, zero_mul, add_zero]
+  rw [mul_neg, neg_mul, mul_smul_comm, smul_mul_assoc, mul_smul_comm, smul_mul_assoc]
+  rw [zero_add]
+  abel
+
+/-- Casimir invariance: `[(Ŝ_tot)², Ŝ_tot^{(2)}] = 0`. -/
+theorem totalSpinSSquared_commutator_totalSpinSOp2 :
+    totalSpinSSquared Λ N * totalSpinSOp2 Λ N
+        - totalSpinSOp2 Λ N * totalSpinSSquared Λ N = 0 := by
+  unfold totalSpinSSquared
+  set A := totalSpinSOp1 Λ N
+  set B := totalSpinSOp2 Λ N
+  set C := totalSpinSOp3 Λ N
+  have hAB : A * B - B * A = Complex.I • C :=
+    totalSpinSOp1_commutator_totalSpinSOp2_named Λ N
+  have hBC : B * C - C * B = Complex.I • A :=
+    totalSpinSOp2_commutator_totalSpinSOp3_named Λ N
+  rw [add_mul, add_mul, mul_add, mul_add]
+  rw [show A * A * B + B * B * B + C * C * B - (B * (A * A) + B * (B * B) + B * (C * C))
+        = (A * A * B - B * (A * A)) + (B * B * B - B * (B * B))
+          + (C * C * B - B * (C * C)) from by abel]
+  rw [square_commutator_totalSpinS Λ N A, square_commutator_totalSpinS Λ N B,
+    square_commutator_totalSpinS Λ N C]
+  have hBB : B * B - B * B = (0 : ManyBodyOpS Λ N) := sub_self _
+  have hCB : C * B - B * C = -(Complex.I • A) := by
+    rw [show C * B - B * C = -(B * C - C * B) from by abel, hBC]
+  rw [hAB, hBB, hCB]
+  rw [mul_zero, zero_mul]
+  rw [show (0 : ManyBodyOpS Λ N) + 0 = 0 from by abel]
+  rw [add_zero]
+  rw [mul_neg, neg_mul, mul_smul_comm, smul_mul_assoc, mul_smul_comm, smul_mul_assoc]
+  abel
 
 end LatticeSystem.Quantum
