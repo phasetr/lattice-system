@@ -41,6 +41,7 @@ import LatticeSystem.Tests.MarshallLiebMattisDressedSwapValue
 import LatticeSystem.Tests.MarshallLiebMattisH0ShiftedSwap
 import LatticeSystem.Tests.MarshallLiebMattisMatrixPowPath
 import LatticeSystem.Tests.MarshallLiebMattisMatrixPowExtend
+import LatticeSystem.Tests.MarshallLiebMattisToyHamiltonian
 import LatticeSystem.Tests.TimeReversalSpinHalf
 import LatticeSystem.Tests.TimeReversalMulti
 
