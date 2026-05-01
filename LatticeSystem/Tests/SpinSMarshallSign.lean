@@ -39,4 +39,9 @@ example {N : ℕ} [DecidableEq V] (A : V → Bool) :
       basisVecS (fun _ : V => (0 : Fin (N + 1))) :=
   marshallDressedBasisS_const_zero A
 
+/-- Marshall sign is non-zero. -/
+example {N : ℕ} (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ ≠ 0 :=
+  marshallSignS_ne_zero A σ
+
 end LatticeSystem.Tests.SpinSMarshallSign
