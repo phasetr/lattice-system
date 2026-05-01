@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.TotalSpin
 import LatticeSystem.Quantum.SpinS.MultiSiteCommutator
+import LatticeSystem.Quantum.SpinS.MultiSiteDot
 
 /-!
 # Spin-`S` total spin squared `(Ŝ_tot)²`
@@ -156,5 +157,40 @@ theorem totalSpinSSquared_commutator_totalSpinSOp2 :
   rw [add_zero]
   rw [mul_neg, neg_mul, mul_smul_comm, smul_mul_assoc, mul_smul_comm, smul_mul_assoc]
   abel
+
+/-! ## Casimir as a sum of two-site dot products -/
+
+/-- **Casimir expansion**: `(Ŝ_tot)² = Σ_{x, y : Λ} Ŝ_x · Ŝ_y`.
+
+The spin-`S` generalisation of Tasaki §2.2 eq. (2.2.18). Together
+with `spinSDot_self` (β-3e), this exhibits `(Ŝ_tot)²` as a finite
+sum of (i) per-site Casimir terms `(N(N+2)/4) • 1` and (ii)
+off-diagonal `Ŝ_x · Ŝ_y` couplings. -/
+theorem totalSpinSSquared_eq_sum_spinSDot :
+    (totalSpinSSquared Λ N : ManyBodyOpS Λ N) =
+      ∑ x : Λ, ∑ y : Λ, spinSDot x y N := by
+  unfold totalSpinSSquared totalSpinSOp1 totalSpinSOp2 totalSpinSOp3
+  -- Each axis: (∑ x ax) * (∑ y ay) = ∑ x ∑ y ax * ay
+  have expand : ∀ A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ,
+      (∑ x : Λ, onSiteS x A : ManyBodyOpS Λ N) * (∑ y : Λ, onSiteS y A) =
+        ∑ x : Λ, ∑ y : Λ, onSiteS x A * onSiteS y A := by
+    intro A
+    rw [Finset.sum_mul]
+    refine Finset.sum_congr rfl fun x _ => ?_
+    rw [Finset.mul_sum]
+  rw [expand (spinSOp1 N), expand (spinSOp2 N), expand (spinSOp3 N)]
+  -- Combine the three Σ x Σ y A_α B_α into Σ x Σ y (A_1 + A_2 + A_3)
+  rw [show (∑ x : Λ, ∑ y : Λ,
+              onSiteS x (spinSOp1 N) * onSiteS y (spinSOp1 N) : ManyBodyOpS Λ N) +
+          (∑ x : Λ, ∑ y : Λ,
+              onSiteS x (spinSOp2 N) * onSiteS y (spinSOp2 N)) +
+          (∑ x : Λ, ∑ y : Λ,
+              onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)) =
+          ∑ x : Λ, ∑ y : Λ,
+            (onSiteS x (spinSOp1 N) * onSiteS y (spinSOp1 N) +
+             onSiteS x (spinSOp2 N) * onSiteS y (spinSOp2 N) +
+             onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)) from by
+    simp [Finset.sum_add_distrib]]
+  rfl
 
 end LatticeSystem.Quantum
