@@ -186,4 +186,29 @@ theorem heisenbergToyHamiltonian_commute_totalSpinHalfSquared (A : Λ → Bool) 
     Commute (heisenbergToyHamiltonian A) (totalSpinHalfSquared Λ) :=
   heisenbergHamiltonian_commute_totalSpinHalfSquared (bipartiteCoupling A)
 
+/-- The toy Hamiltonian commutes with the `A`-sublattice Casimir:
+`Commute Ĥ_toy (Ŝ_A)²`. Follows from the closed form
+`Ĥ_toy = (Ŝ_tot)² − (Ŝ_A)² − (Ŝ_¬A)²` and the three pairwise
+commutativities of the three Casimir operators. -/
+theorem heisenbergToyHamiltonian_commute_sublatticeSpinHalfSquared (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonian A) (sublatticeSpinHalfSquared A) := by
+  rw [heisenbergToyHamiltonian_eq_casimir_diff A]
+  refine Commute.sub_left (Commute.sub_left ?_ ?_) ?_
+  · exact (sublatticeSpinHalfSquared_commute_totalSpinHalfSquared A).symm
+  · exact Commute.refl _
+  · exact (sublatticeSpinHalfSquared_cross_commute A).symm
+
+/-- The toy Hamiltonian commutes with the `¬A`-sublattice Casimir:
+`Commute Ĥ_toy (Ŝ_¬A)²`. Symmetric to the `A` case. -/
+theorem heisenbergToyHamiltonian_commute_sublatticeSpinHalfSquared_complement
+    (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonian A)
+            (sublatticeSpinHalfSquared (fun x => ! A x)) := by
+  rw [heisenbergToyHamiltonian_eq_casimir_diff A]
+  refine Commute.sub_left (Commute.sub_left ?_ ?_) ?_
+  · exact (sublatticeSpinHalfSquared_commute_totalSpinHalfSquared
+      (fun x => ! A x)).symm
+  · exact sublatticeSpinHalfSquared_cross_commute A
+  · exact Commute.refl _
+
 end LatticeSystem.Quantum

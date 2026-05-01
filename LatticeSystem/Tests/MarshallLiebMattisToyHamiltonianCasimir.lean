@@ -52,4 +52,15 @@ example (A : Fin 2 → Bool) :
     Commute (heisenbergToyHamiltonian A) (totalSpinHalfSquared (Fin 2)) :=
   heisenbergToyHamiltonian_commute_totalSpinHalfSquared A
 
+/-- `Commute Ĥ_toy (Ŝ_A)²`. -/
+example (A : Fin 2 → Bool) :
+    Commute (heisenbergToyHamiltonian A) (sublatticeSpinHalfSquared A) :=
+  heisenbergToyHamiltonian_commute_sublatticeSpinHalfSquared A
+
+/-- `Commute Ĥ_toy (Ŝ_¬A)²`. -/
+example (A : Fin 2 → Bool) :
+    Commute (heisenbergToyHamiltonian A)
+            (sublatticeSpinHalfSquared (fun x => ! A x)) :=
+  heisenbergToyHamiltonian_commute_sublatticeSpinHalfSquared_complement A
+
 end LatticeSystem.Tests.MarshallLiebMattisToyHamiltonianCasimir
