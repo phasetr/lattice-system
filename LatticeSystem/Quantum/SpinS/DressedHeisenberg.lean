@@ -1,5 +1,7 @@
 import LatticeSystem.Quantum.SpinS.Heisenberg
 import LatticeSystem.Quantum.SpinS.MarshallSign
+import LatticeSystem.Lattice.Graph
+import Mathlib.Combinatorics.SimpleGraph.Basic
 
 /-!
 # Marshall-dressed spin-`S` Heisenberg matrix elements
@@ -190,5 +192,18 @@ theorem dressedHeisenbergSMatrix_isHermitian
   ext σ σ'
   simp only [Matrix.conjTranspose_apply, dressedHeisenbergSMatrix_apply]
   exact dressedHeisenbergS_star_swap A N hreal σ σ'
+
+/-- Hermiticity of the dressed Heisenberg matrix on a graph-derived
+coupling, with a real complex edge weight. The hypothesis
+`star J = J` ensures `couplingOf G J` is entry-wise real
+(`couplingOf_real`), which then feeds into
+`dressedHeisenbergSMatrix_isHermitian`. -/
+theorem dressedHeisenbergSMatrix_couplingOf_isHermitian
+    (A : V → Bool) (G : SimpleGraph V) [DecidableRel G.Adj]
+    {J : ℂ} (hJ : star J = J) (N : ℕ) :
+    (dressedHeisenbergSMatrix A
+        (LatticeSystem.Lattice.couplingOf G J) N).IsHermitian :=
+  dressedHeisenbergSMatrix_isHermitian A N
+    (LatticeSystem.Lattice.couplingOf_real G hJ)
 
 end LatticeSystem.Quantum
