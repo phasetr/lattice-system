@@ -332,4 +332,43 @@ theorem sublatticeSpinHalfOp3_cross_commute_op2 (A : Λ → Bool) :
   unfold sublatticeSpinHalfOp3 sublatticeSpinHalfOp2
   exact sublatticeSpinHalfOpGeneric_cross_commute A spinHalfOp3 spinHalfOp2
 
+/-! ## Inter-Casimir cross-sublattice commutativity -/
+
+/-- The two sublattice Casimirs commute:
+`Commute (Ŝ_A)² (Ŝ_¬A)²`. Each pairwise component
+`Commute ((Ŝ_A^(α))²) ((Ŝ_¬A^(β))²)` follows from the mixed-axes
+cross-commute by chaining `Commute.mul_left` / `Commute.mul_right`.
+
+Used to set up the joint eigenbasis of `(Ŝ_tot)²`, `(Ŝ_A)²`, `(Ŝ_¬A)²`
+for the toy-Hamiltonian eigenvalue analysis. -/
+theorem sublatticeSpinHalfSquared_cross_commute (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfSquared A)
+            (sublatticeSpinHalfSquared (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfSquared
+  -- Each axis-α square commutes with each axis-β square.
+  have hα1β1 := sublatticeSpinHalfOp1_cross_commute A
+  have hα1β2 := sublatticeSpinHalfOp1_cross_commute_op2 A
+  have hα1β3 := sublatticeSpinHalfOp1_cross_commute_op3 A
+  have hα2β1 := sublatticeSpinHalfOp2_cross_commute_op1 A
+  have hα2β2 := sublatticeSpinHalfOp2_cross_commute A
+  have hα2β3 := sublatticeSpinHalfOp2_cross_commute_op3 A
+  have hα3β1 := sublatticeSpinHalfOp3_cross_commute_op1 A
+  have hα3β2 := sublatticeSpinHalfOp3_cross_commute_op2 A
+  have hα3β3 := sublatticeSpinHalfOp3_cross_commute A
+  -- Sum-left: each (Ŝ_A^α)² (= sum) commutes with the product (Ŝ_¬A^β)²
+  -- for each β. Then add over α; then add over β.
+  refine Commute.add_left (Commute.add_left ?_ ?_) ?_
+  · refine Commute.add_right (Commute.add_right ?_ ?_) ?_
+    · exact (hα1β1.mul_left hα1β1).mul_right (hα1β1.mul_left hα1β1)
+    · exact (hα1β2.mul_left hα1β2).mul_right (hα1β2.mul_left hα1β2)
+    · exact (hα1β3.mul_left hα1β3).mul_right (hα1β3.mul_left hα1β3)
+  · refine Commute.add_right (Commute.add_right ?_ ?_) ?_
+    · exact (hα2β1.mul_left hα2β1).mul_right (hα2β1.mul_left hα2β1)
+    · exact (hα2β2.mul_left hα2β2).mul_right (hα2β2.mul_left hα2β2)
+    · exact (hα2β3.mul_left hα2β3).mul_right (hα2β3.mul_left hα2β3)
+  · refine Commute.add_right (Commute.add_right ?_ ?_) ?_
+    · exact (hα3β1.mul_left hα3β1).mul_right (hα3β1.mul_left hα3β1)
+    · exact (hα3β2.mul_left hα3β2).mul_right (hα3β2.mul_left hα3β2)
+    · exact (hα3β3.mul_left hα3β3).mul_right (hα3β3.mul_left hα3β3)
+
 end LatticeSystem.Quantum
