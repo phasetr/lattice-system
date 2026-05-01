@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.MultiSite
 import LatticeSystem.Quantum.SpinS.Casimir
+import LatticeSystem.Quantum.SpinS.PMAsOneTwo
 
 /-!
 # Two-site spin-`S` inner product `Ŝ_x · Ŝ_y`
@@ -56,5 +57,50 @@ theorem spinSDot_self (x : Λ) (N : ℕ) :
       onSiteS_mul_onSiteS_same]
   rw [← onSiteS_add, ← onSiteS_add, spinSOp_total_squared,
       onSiteS_smul, onSiteS_one]
+
+/-- **Raising/lowering decomposition** of the two-site spin-`S` dot
+product (Tasaki §2.2 eq. (2.2.16) for arbitrary spin):
+
+  `Ŝ_x · Ŝ_y = (1/2)(Ŝ_x^+ Ŝ_y^- + Ŝ_x^- Ŝ_y^+) + Ŝ_x^{(3)} Ŝ_y^{(3)}`.
+
+Generalises the spin-1/2 statement `spinHalfDot_eq_plus_minus`. -/
+theorem spinSDot_eq_plus_minus (x y : Λ) (N : ℕ) :
+    (spinSDot x y N : ManyBodyOpS Λ N) =
+      (1 / 2 : ℂ) •
+        (onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N) +
+          onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)) +
+        onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N) := by
+  unfold spinSDot
+  rw [spinSOpPlus_eq_one_add_I_smul_two,
+      spinSOpMinus_eq_one_sub_I_smul_two]
+  simp only [onSiteS_add, onSiteS_sub, onSiteS_smul]
+  set a1 := (onSiteS x (spinSOp1 N) : ManyBodyOpS Λ N)
+  set a2 := (onSiteS x (spinSOp2 N) : ManyBodyOpS Λ N)
+  set b1 := (onSiteS y (spinSOp1 N) : ManyBodyOpS Λ N)
+  set b2 := (onSiteS y (spinSOp2 N) : ManyBodyOpS Λ N)
+  have e1 : (a1 + Complex.I • a2) * (b1 - Complex.I • b2) =
+      a1 * b1 + a2 * b2 +
+        (Complex.I • (a2 * b1) - Complex.I • (a1 * b2)) := by
+    rw [add_mul, mul_sub, mul_sub]
+    rw [mul_smul_comm, smul_mul_assoc, smul_mul_assoc, mul_smul_comm]
+    rw [smul_smul, Complex.I_mul_I, neg_smul, one_smul]
+    abel
+  have e2 : (a1 - Complex.I • a2) * (b1 + Complex.I • b2) =
+      a1 * b1 + a2 * b2 -
+        (Complex.I • (a2 * b1) - Complex.I • (a1 * b2)) := by
+    rw [sub_mul, mul_add, mul_add]
+    rw [mul_smul_comm, smul_mul_assoc, smul_mul_assoc, mul_smul_comm]
+    rw [smul_smul, Complex.I_mul_I, neg_smul, one_smul]
+    abel
+  rw [e1, e2]
+  have key : ∀ (p r : ManyBodyOpS Λ N),
+      (p + r) + (p - r) = (2 : ℂ) • p := by
+    intros p r
+    rw [two_smul]; abel
+  set p : ManyBodyOpS Λ N := a1 * b1 + a2 * b2 with hp
+  set r : ManyBodyOpS Λ N := Complex.I • (a2 * b1) - Complex.I • (a1 * b2)
+    with hr
+  rw [key p r, smul_smul]
+  norm_num
 
 end LatticeSystem.Quantum

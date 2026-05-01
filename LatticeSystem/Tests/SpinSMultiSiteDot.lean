@@ -22,4 +22,14 @@ example (x : Λ) (N : ℕ) :
       ((N : ℂ) * (N + 2) / 4) • 1 :=
   spinSDot_self x N
 
+/-- Raising/lowering decomposition `Ŝ_x · Ŝ_y =
+    (1/2)(Ŝ_x^+ Ŝ_y^- + Ŝ_x^- Ŝ_y^+) + Ŝ_x^(3) Ŝ_y^(3)`. -/
+example (x y : Λ) (N : ℕ) :
+    (spinSDot x y N : ManyBodyOpS Λ N) =
+      (1 / 2 : ℂ) •
+        (onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N) +
+          onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)) +
+        onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N) :=
+  spinSDot_eq_plus_minus x y N
+
 end LatticeSystem.Tests.SpinSMultiSiteDot
