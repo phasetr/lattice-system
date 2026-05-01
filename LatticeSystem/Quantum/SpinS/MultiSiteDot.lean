@@ -1,6 +1,8 @@
 import LatticeSystem.Quantum.SpinS.MultiSite
 import LatticeSystem.Quantum.SpinS.Casimir
 import LatticeSystem.Quantum.SpinS.PMAsOneTwo
+import LatticeSystem.Quantum.SpinS.Hermitian
+import LatticeSystem.Quantum.ManyBody
 
 /-!
 # Two-site spin-`S` inner product `Ŝ_x · Ŝ_y`
@@ -57,6 +59,36 @@ theorem spinSDot_self (x : Λ) (N : ℕ) :
       onSiteS_mul_onSiteS_same]
   rw [← onSiteS_add, ← onSiteS_add, spinSOp_total_squared,
       onSiteS_smul, onSiteS_one]
+
+/-- `Ŝ_x · Ŝ_y` is Hermitian on the multi-site spin-`S` Hilbert space.
+For `x = y`, it reduces to the scalar `(N(N+2)/4) · 1` (β-3e). For
+`x ≠ y`, each of the three axis terms is a product of commuting site
+embeddings of Hermitian single-site operators (β-3 of Issue #458 +
+β-3a). -/
+theorem spinSDot_isHermitian (x y : Λ) (N : ℕ) :
+    (spinSDot x y N : ManyBodyOpS Λ N).IsHermitian := by
+  by_cases hxy : x = y
+  · subst hxy
+    rw [spinSDot_self]
+    unfold Matrix.IsHermitian
+    rw [Matrix.conjTranspose_smul,
+      show star (((N : ℂ) * (N + 2) / 4)) = ((N : ℂ) * (N + 2) / 4)
+        from by simp,
+      Matrix.conjTranspose_one]
+  · unfold spinSDot
+    refine Matrix.IsHermitian.add (Matrix.IsHermitian.add ?_ ?_) ?_
+    · exact Matrix.IsHermitian.mul_of_commute
+        (onSiteS_isHermitian x (spinSOp1_isHermitian N))
+        (onSiteS_isHermitian y (spinSOp1_isHermitian N))
+        (onSiteS_mul_onSiteS_of_ne hxy _ _)
+    · exact Matrix.IsHermitian.mul_of_commute
+        (onSiteS_isHermitian x (spinSOp2_isHermitian N))
+        (onSiteS_isHermitian y (spinSOp2_isHermitian N))
+        (onSiteS_mul_onSiteS_of_ne hxy _ _)
+    · exact Matrix.IsHermitian.mul_of_commute
+        (onSiteS_isHermitian x (spinSOp3_isHermitian N))
+        (onSiteS_isHermitian y (spinSOp3_isHermitian N))
+        (onSiteS_mul_onSiteS_of_ne hxy _ _)
 
 /-- **Raising/lowering decomposition** of the two-site spin-`S` dot
 product (Tasaki §2.2 eq. (2.2.16) for arbitrary spin):

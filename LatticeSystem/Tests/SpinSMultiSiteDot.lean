@@ -32,4 +32,9 @@ example (x y : Λ) (N : ℕ) :
         onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N) :=
   spinSDot_eq_plus_minus x y N
 
+/-- Hermiticity of `Ŝ_x · Ŝ_y`. -/
+example (x y : Λ) (N : ℕ) :
+    (spinSDot x y N : ManyBodyOpS Λ N).IsHermitian :=
+  spinSDot_isHermitian x y N
+
 end LatticeSystem.Tests.SpinSMultiSiteDot
