@@ -57,4 +57,9 @@ example (G : SimpleGraph Λ) [DecidableRel G.Adj] {J : ℂ}
     (heisenbergHamiltonianOnGraphS G J N : ManyBodyOpS Λ N).IsHermitian :=
   heisenbergHamiltonianOnGraphS_isHermitian G hJ N
 
+/-- Spin-S chain Heisenberg Hermitian. -/
+example (M : ℕ) (J : ℝ) (N : ℕ) :
+    (heisenbergHamiltonianChainS M J N).IsHermitian :=
+  heisenbergHamiltonianChainS_isHermitian M J N
+
 end LatticeSystem.Tests.SpinSHeisenberg
