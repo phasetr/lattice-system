@@ -57,4 +57,27 @@ theorem dressedHeisenbergS_A_false (J : V → V → ℂ) (N : ℕ)
   rw [marshallSignS_eq_one_of_A_false, marshallSignS_eq_one_of_A_false,
       one_mul, one_mul]
 
+/-- For a real-coupled Heisenberg Hamiltonian, the dressed matrix
+element is symmetric under σ ↔ σ' (combined with complex conjugation).
+This is the matrix-level reflection symmetry that makes the dressed
+matrix Hermitian. -/
+theorem dressedHeisenbergS_star_swap
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hreal : ∀ x y, star (J x y) = J x y)
+    (σ σ' : V → Fin (N + 1)) :
+    star (dressedHeisenbergS A J N σ' σ) = dressedHeisenbergS A J N σ σ' := by
+  unfold dressedHeisenbergS
+  rw [star_mul, star_mul]
+  rw [marshallSignS_star, marshallSignS_star]
+  -- Now: star (heisenberg σ' σ) * (sign σ * sign σ') = sign σ * sign σ' * heisenberg σ σ'.
+  -- Heisenberg Hermiticity: star (H σ' σ) = (Hᴴ) σ σ' = H σ σ' (since H is Hermitian).
+  have hH := heisenbergHamiltonianS_isHermitian_of_real (Λ := V) hreal N
+  have hsym : star ((heisenbergHamiltonianS J N) σ' σ) =
+      (heisenbergHamiltonianS J N) σ σ' := by
+    have := hH.apply σ σ'
+    -- `IsHermitian.apply : star (M b a) = M a b`.
+    exact this
+  rw [hsym]
+  ring
+
 end LatticeSystem.Quantum
