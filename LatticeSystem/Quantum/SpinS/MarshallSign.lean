@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Magnetization
+import LatticeSystem.Quantum.SpinS.TotalSpin
 
 /-!
 # Spin-`S` Marshall sign on a bipartite sublattice
@@ -159,5 +160,17 @@ theorem marshallDressedBasisS_inner_product [DecidableEq V]
       have hne : τ ≠ σ' := fun heq => hσ heq
       rw [marshallDressedBasisS_of_ne A hne, mul_zero]
     · rw [marshallDressedBasisS_of_ne A hτσ, star_zero, zero_mul]
+
+/-- The Marshall-dressed basis vector lies in the magnetization
+subspace of its underlying configuration: scaling by the Marshall
+sign preserves the magnetization eigenvalue (linearity of the
+subspace). -/
+theorem marshallDressedBasisS_mem_magSubspaceS [DecidableEq V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallDressedBasisS A σ : (V → Fin (N + 1)) → ℂ) ∈
+      magSubspaceS V N (magEigenvalueS σ) := by
+  unfold marshallDressedBasisS
+  exact (magSubspaceS V N (magEigenvalueS σ)).smul_mem _
+    (basisVecS_mem_magSubspaceS σ)
 
 end LatticeSystem.Quantum
