@@ -85,4 +85,13 @@ theorem magSubspaceS_disjoint {M M' : ℂ} (hMM' : M ≠ M') :
   have hne : M - M' ≠ 0 := sub_ne_zero.mpr hMM'
   exact (smul_eq_zero.mp hsub).resolve_left hne
 
+/-- The magnetic-quantum-number eigenvalue of `Ŝ_tot^{(3)}` on the
+basis state `|σ⟩` (definition only — the eigenvalue identity
+`Ŝ_tot^{(3)} · |σ⟩ = magEigenvalueS σ • |σ⟩` is proved in a follow-up
+PR):
+
+  `magEigenvalueS σ := (|Λ| · N : ℂ)/2 − magSumS σ`. -/
+noncomputable def magEigenvalueS (σ : Λ → Fin (N + 1)) : ℂ :=
+  ((Fintype.card Λ : ℂ) * (N : ℂ)) / 2 - (magSumS σ : ℂ)
+
 end LatticeSystem.Quantum
