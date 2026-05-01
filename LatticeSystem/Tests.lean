@@ -42,6 +42,7 @@ import LatticeSystem.Tests.SpinSPMMemAdjoin
 import LatticeSystem.Tests.SpinSNeighborUnitAdjoin
 import LatticeSystem.Tests.SpinSOffsetUnitAdjoin
 import LatticeSystem.Tests.SpinSAllUnitsAdjoin
+import LatticeSystem.Tests.SpinSSpanningTheorem
 import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Pauli
 import LatticeSystem.Tests.Z2Z2
