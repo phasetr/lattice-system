@@ -33,4 +33,10 @@ example (N : ℕ) :
         - totalSpinSOp2 Λ N * totalSpinSSquared Λ N = 0 :=
   totalSpinSSquared_commutator_totalSpinSOp2 Λ N
 
+/-- Casimir as a sum: `(Ŝ_tot)² = ∑_{x, y} Ŝ_x · Ŝ_y`. -/
+example (N : ℕ) :
+    (totalSpinSSquared Λ N : ManyBodyOpS Λ N) =
+      ∑ x : Λ, ∑ y : Λ, spinSDot x y N :=
+  totalSpinSSquared_eq_sum_spinSDot Λ N
+
 end LatticeSystem.Tests.SpinSTotalSquared
