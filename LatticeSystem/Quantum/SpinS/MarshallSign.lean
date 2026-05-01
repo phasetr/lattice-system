@@ -38,6 +38,24 @@ theorem marshallSignS_const_zero (A : V → Bool) :
   · simp [hAx]
   · simp [hAx]
 
+/-- Marshall sign with the all-false sublattice indicator is `+1`:
+no factor `(-1)^k` ever fires, so the product is `1`. -/
+theorem marshallSignS_eq_one_of_A_false
+    (σ : V → Fin (N + 1)) :
+    marshallSignS (fun _ : V => false) σ = 1 := by
+  unfold marshallSignS
+  apply Finset.prod_eq_one
+  intro x _
+  rfl
+
+/-- Marshall sign with the all-true sublattice indicator: each factor
+fires, giving `(-1)^(magSumS σ)`. -/
+theorem marshallSignS_eq_neg_one_pow_of_A_true (σ : V → Fin (N + 1)) :
+    marshallSignS (fun _ : V => true) σ = (-1 : ℂ) ^ magSumS σ := by
+  unfold marshallSignS magSumS
+  simp only [if_true]
+  rw [← Finset.prod_pow_eq_pow_sum]
+
 /-- The Marshall sign is non-zero. Each factor is either `(-1)^k = ±1`
 or `1`, never zero, so the product is non-zero. -/
 theorem marshallSignS_ne_zero (A : V → Bool) (σ : V → Fin (N + 1)) :
