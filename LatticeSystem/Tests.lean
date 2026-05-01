@@ -22,6 +22,7 @@ import LatticeSystem.Tests.SpinSLadderBoundary
 import LatticeSystem.Tests.SpinSDiagProjProperties
 import LatticeSystem.Tests.SpinSOffDiagUnit
 import LatticeSystem.Tests.SpinSOp3Square
+import LatticeSystem.Tests.SpinSPlusMinusDiag
 import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Pauli
 import LatticeSystem.Tests.Z2Z2
