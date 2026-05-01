@@ -150,4 +150,15 @@ theorem dressedHeisenbergS_neg_J
   rw [dressedHeisenbergS_smul_J]
   ring
 
+/-- Dressed Heisenberg subtraction in coupling. -/
+theorem dressedHeisenbergS_sub_J
+    (A : V → Bool) (J J' : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergS A (fun x y => J x y - J' x y) N σ σ' =
+      dressedHeisenbergS A J N σ σ' - dressedHeisenbergS A J' N σ σ' := by
+  rw [show (fun x y : V => J x y - J' x y) =
+        (fun x y : V => J x y + (-(J' x y))) from by
+    funext x y; ring]
+  rw [dressedHeisenbergS_add_J, dressedHeisenbergS_neg_J]
+  ring
+
 end LatticeSystem.Quantum
