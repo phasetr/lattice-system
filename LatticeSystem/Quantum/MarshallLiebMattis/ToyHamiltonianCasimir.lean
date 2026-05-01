@@ -171,4 +171,19 @@ theorem heisenbergToyHamiltonian_eq_casimir_diff (A : Λ → Bool) :
       heisenbergToyHamiltonian_eq_two_sublatticeSpinDot A]
   abel
 
+/-! ## Commutativity with the total Casimir -/
+
+/-- The toy Hamiltonian commutes with the total spin Casimir:
+`Commute Ĥ_toy (Ŝ_tot)²`.  Follows from the general SU(2)
+invariance of any Heisenberg-type Hamiltonian
+(`heisenbergHamiltonian_commute_totalSpinHalfSquared`).
+
+This is the standard fact used to project the toy Hamiltonian's
+ground state onto a fixed `(Ŝ_tot)²` eigenspace; combined with the
+Casimir identity, it underpins the `S_tot = 0` selection of the
+toy ground state in Tasaki §2.5 (2.5.11)–(2.5.14). -/
+theorem heisenbergToyHamiltonian_commute_totalSpinHalfSquared (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonian A) (totalSpinHalfSquared Λ) :=
+  heisenbergHamiltonian_commute_totalSpinHalfSquared (bipartiteCoupling A)
+
 end LatticeSystem.Quantum
