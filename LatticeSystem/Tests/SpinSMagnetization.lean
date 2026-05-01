@@ -38,4 +38,10 @@ example {N : ℕ} (σ : Λ → Fin (N + 1)) :
       magSubspaceS Λ N (magEigenvalueS σ) :=
   basisVecS_mem_magSubspaceS σ
 
+/-- Constant config formula. -/
+example {N : ℕ} (s : Fin (N + 1)) :
+    magEigenvalueS (fun _ : Λ => s) =
+      (Fintype.card Λ : ℂ) * ((N : ℂ) / 2 - (s.val : ℂ)) :=
+  magEigenvalueS_const s
+
 end LatticeSystem.Tests.SpinSMagnetization
