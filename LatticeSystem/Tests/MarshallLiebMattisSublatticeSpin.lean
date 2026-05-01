@@ -48,4 +48,10 @@ example (A : Fin 2 → Bool) :
     Commute (sublatticeSpinHalfOp3 A) (sublatticeSpinHalfOp1 (fun x => ! A x)) :=
   sublatticeSpinHalfOp3_cross_commute_op1 A
 
+/-- The two sublattice Casimirs commute: `Commute (Ŝ_A)² (Ŝ_¬A)²`. -/
+example (A : Fin 2 → Bool) :
+    Commute (sublatticeSpinHalfSquared A)
+            (sublatticeSpinHalfSquared (fun x => ! A x)) :=
+  sublatticeSpinHalfSquared_cross_commute A
+
 end LatticeSystem.Tests.MarshallLiebMattisSublatticeSpin
