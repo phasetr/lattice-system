@@ -44,4 +44,15 @@ example {N : ℕ} (s : Fin (N + 1)) :
       (Fintype.card Λ : ℂ) * ((N : ℂ) / 2 - (s.val : ℂ)) :=
   magEigenvalueS_const s
 
+/-- All-zero magSumS is 0. -/
+example {N : ℕ} :
+    magSumS (fun _ : Λ => (0 : Fin (N + 1))) = 0 :=
+  magSumS_const_zero
+
+/-- All-zero is the highest-weight state with eigenvalue `|Λ| · N/2`. -/
+example {N : ℕ} :
+    magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1))) =
+      (Fintype.card Λ : ℂ) * (N : ℂ) / 2 :=
+  magEigenvalueS_const_zero
+
 end LatticeSystem.Tests.SpinSMagnetization

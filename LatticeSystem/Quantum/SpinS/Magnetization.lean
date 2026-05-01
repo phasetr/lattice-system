@@ -170,6 +170,23 @@ theorem magSumS_const (s : Fin (N + 1)) :
   rw [Finset.sum_const, Finset.card_univ, smul_eq_mul]
 
 omit [DecidableEq Λ] in
+/-- `magSumS (fun _ => 0) = 0`. -/
+theorem magSumS_const_zero :
+    magSumS (fun _ : Λ => (0 : Fin (N + 1))) = 0 := by
+  rw [magSumS_const]
+  simp
+
+omit [DecidableEq Λ] in
+/-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
+theorem magEigenvalueS_const_zero :
+    magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1))) =
+      (Fintype.card Λ : ℂ) * (N : ℂ) / 2 := by
+  unfold magEigenvalueS
+  rw [magSumS_const_zero]
+  push_cast
+  ring
+
+omit [DecidableEq Λ] in
 /-- `magEigenvalueS` of a constant configuration. The maximum value
 `(|Λ| · N : ℂ)/2` is attained at `s = 0`; the minimum value
 `-(|Λ| · N : ℂ)/2` at `s = N` (the natural number index of the lowest
