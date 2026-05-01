@@ -55,4 +55,29 @@ noncomputable def marshallDressedBasisS [DecidableEq V]
     (A : V → Bool) (σ : V → Fin (N + 1)) : (V → Fin (N + 1)) → ℂ :=
   marshallSignS A σ • basisVecS σ
 
+/-- Component formula: `marshallDressedBasisS A σ τ` is
+`marshallSignS A σ` if `τ = σ`, else `0`. -/
+theorem marshallDressedBasisS_apply [DecidableEq V]
+    (A : V → Bool) (σ τ : V → Fin (N + 1)) :
+    marshallDressedBasisS A σ τ =
+      if τ = σ then marshallSignS A σ else 0 := by
+  unfold marshallDressedBasisS basisVecS
+  rw [Pi.smul_apply, smul_eq_mul]
+  by_cases h : τ = σ
+  · rw [if_pos h, if_pos h, mul_one]
+  · rw [if_neg h, if_neg h, mul_zero]
+
+/-- Diagonal component: `marshallDressedBasisS A σ σ = marshallSignS A σ`. -/
+@[simp]
+theorem marshallDressedBasisS_self [DecidableEq V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallDressedBasisS A σ σ = marshallSignS A σ := by
+  rw [marshallDressedBasisS_apply, if_pos rfl]
+
+/-- Off-diagonal component: zero for `τ ≠ σ`. -/
+theorem marshallDressedBasisS_of_ne [DecidableEq V]
+    (A : V → Bool) {σ τ : V → Fin (N + 1)} (hne : τ ≠ σ) :
+    marshallDressedBasisS A σ τ = 0 := by
+  rw [marshallDressedBasisS_apply, if_neg hne]
+
 end LatticeSystem.Quantum

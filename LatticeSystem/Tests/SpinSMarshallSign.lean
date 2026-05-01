@@ -22,4 +22,15 @@ example {N : ℕ} [DecidableEq V] (A : V → Bool) (σ : V → Fin (N + 1)) :
       marshallSignS A σ • basisVecS σ :=
   rfl
 
+/-- Diagonal: `marshallDressedBasisS A σ σ = marshallSignS A σ`. -/
+example {N : ℕ} [DecidableEq V] (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallDressedBasisS A σ σ = marshallSignS A σ :=
+  marshallDressedBasisS_self A σ
+
+/-- Off-diagonal: zero for `τ ≠ σ`. -/
+example {N : ℕ} [DecidableEq V] (A : V → Bool)
+    {σ τ : V → Fin (N + 1)} (hne : τ ≠ σ) :
+    marshallDressedBasisS A σ τ = 0 :=
+  marshallDressedBasisS_of_ne A hne
+
 end LatticeSystem.Tests.SpinSMarshallSign
