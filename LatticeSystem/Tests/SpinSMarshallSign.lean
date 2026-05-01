@@ -62,4 +62,10 @@ example {N : ℕ} [DecidableEq V] (A : V → Bool) (σ σ' : V → Fin (N + 1)) 
       if σ = σ' then 1 else 0 :=
   marshallDressedBasisS_inner_product A σ σ'
 
+/-- Marshall-dressed basis lies in its own magnetization subspace. -/
+example {N : ℕ} [DecidableEq V] (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallDressedBasisS A σ : (V → Fin (N + 1)) → ℂ) ∈
+      magSubspaceS V N (magEigenvalueS σ) :=
+  marshallDressedBasisS_mem_magSubspaceS A σ
+
 end LatticeSystem.Tests.SpinSMarshallSign
