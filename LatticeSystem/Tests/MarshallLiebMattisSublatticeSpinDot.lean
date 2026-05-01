@@ -47,4 +47,13 @@ example (A : Fin 2 → Bool) :
         basisVec (fun _ : Fin 2 => (0 : Fin 2)) :=
   sublatticeSpinHalfSquared_mulVec_basisVec_all_up A
 
+/-- `(Ŝ_A)² · |σ⟩ = (|A|·(|A|+2)/4) · |σ⟩` when σ is constant on A. -/
+example (A : Fin 2 → Bool) {σ : Fin 2 → Fin 2} {s : Fin 2}
+    (hσ : ∀ x : Fin 2, A x = true → σ x = s) :
+    (sublatticeSpinHalfSquared A).mulVec (basisVec σ) =
+      (((Finset.univ.filter (fun x : Fin 2 => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Fin 2 => A x = true)).card + 2) / 4) •
+        basisVec σ :=
+  sublatticeSpinHalfSquared_mulVec_basisVec_of_const_on A hσ
+
 end LatticeSystem.Tests.MarshallLiebMattisSublatticeSpinDot
