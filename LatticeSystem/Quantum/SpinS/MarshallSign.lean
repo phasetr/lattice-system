@@ -173,4 +173,17 @@ theorem marshallDressedBasisS_mem_magSubspaceS [DecidableEq V]
   exact (magSubspaceS V N (magEigenvalueS σ)).smul_mem _
     (basisVecS_mem_magSubspaceS σ)
 
+/-- **Inverse relation**: scaling the Marshall-dressed basis by the
+(real) Marshall sign recovers the plain basis vector:
+
+  `marshallSignS A σ • marshallDressedBasisS A σ = basisVecS σ`.
+
+(Since the Marshall sign is real and squares to 1, multiplying by it
+once more inverts the dressing.) -/
+theorem marshallSignS_smul_marshallDressedBasisS [DecidableEq V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallSignS A σ : ℂ) • marshallDressedBasisS A σ = basisVecS σ := by
+  unfold marshallDressedBasisS
+  rw [smul_smul, marshallSignS_sq, one_smul]
+
 end LatticeSystem.Quantum
