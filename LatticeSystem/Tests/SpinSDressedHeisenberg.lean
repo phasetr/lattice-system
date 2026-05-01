@@ -53,4 +53,10 @@ example {N : ℕ} (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
     dressedHeisenbergS A (fun _ _ : V => (0 : ℂ)) N σ σ' = 0 :=
   dressedHeisenbergS_zero_J A N σ σ'
 
+/-- Dressed Heisenberg additivity in J. -/
+example {N : ℕ} (A : V → Bool) (J J' : V → V → ℂ) (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergS A (fun x y => J x y + J' x y) N σ σ' =
+      dressedHeisenbergS A J N σ σ' + dressedHeisenbergS A J' N σ σ' :=
+  dressedHeisenbergS_add_J A J J' N σ σ'
+
 end LatticeSystem.Tests.SpinSDressedHeisenberg
