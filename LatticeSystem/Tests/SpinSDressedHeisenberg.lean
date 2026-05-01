@@ -17,4 +17,10 @@ example {N : ℕ} (A : V → Bool) (J : V → V → ℂ) (σ : V → Fin (N + 1)
       (heisenbergHamiltonianS J N) σ σ :=
   dressedHeisenbergS_diag A J N σ
 
+/-- Dressed Heisenberg with trivial sublattice = plain matrix element. -/
+example {N : ℕ} (J : V → V → ℂ) (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergS (fun _ : V => false) J N σ σ' =
+      (heisenbergHamiltonianS J N) σ σ' :=
+  dressedHeisenbergS_A_false J N σ σ'
+
 end LatticeSystem.Tests.SpinSDressedHeisenberg
