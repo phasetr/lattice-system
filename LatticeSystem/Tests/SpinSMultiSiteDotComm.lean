@@ -17,4 +17,16 @@ example (x y : Λ) (N : ℕ) :
         totalSpinSOp3 Λ N * spinSDot x y N = 0 :=
   spinSDot_commutator_totalSpinSOp3 x y N
 
+/-- Axis-1 SU(2) invariance. -/
+example (x y : Λ) (N : ℕ) :
+    spinSDot x y N * totalSpinSOp1 Λ N -
+        totalSpinSOp1 Λ N * spinSDot x y N = 0 :=
+  spinSDot_commutator_totalSpinSOp1 x y N
+
+/-- Axis-2 SU(2) invariance. -/
+example (x y : Λ) (N : ℕ) :
+    spinSDot x y N * totalSpinSOp2 Λ N -
+        totalSpinSOp2 Λ N * spinSDot x y N = 0 :=
+  spinSDot_commutator_totalSpinSOp2 x y N
+
 end LatticeSystem.Tests.SpinSMultiSiteDotComm
