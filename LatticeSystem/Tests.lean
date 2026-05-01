@@ -35,6 +35,7 @@ import LatticeSystem.Tests.MarshallLiebMattisEqMagnetizationReachable
 import LatticeSystem.Tests.MarshallLiebMattisH0Shifted
 import LatticeSystem.Tests.MarshallLiebMattisSpinDotSwapEntry
 import LatticeSystem.Tests.MarshallLiebMattisHeisenbergSwapEntry
+import LatticeSystem.Tests.MarshallLiebMattisSpinDotOffBond
 import LatticeSystem.Tests.TimeReversalSpinHalf
 import LatticeSystem.Tests.TimeReversalMulti
 

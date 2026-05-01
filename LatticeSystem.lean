@@ -48,6 +48,7 @@ import LatticeSystem.Quantum.MarshallLiebMattis.EqMagnetizationReachable
 import LatticeSystem.Quantum.MarshallLiebMattis.H0Shifted
 import LatticeSystem.Quantum.MarshallLiebMattis.SpinDotSwapEntry
 import LatticeSystem.Quantum.MarshallLiebMattis.HeisenbergSwapEntry
+import LatticeSystem.Quantum.MarshallLiebMattis.SpinDotOffBond
 import LatticeSystem.Quantum.Z2Z2
 import LatticeSystem.Quantum.IsingChain
 import LatticeSystem.Fermion.Mode
