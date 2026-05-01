@@ -32,6 +32,19 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
+/-- The cross-sublattice spin dot product is symmetric across the
+bipartition: `Ŝ_A · Ŝ_¬A = Ŝ_¬A · Ŝ_A`. Each axis pair commutes by
+the cross-sublattice commutativity lemmas. -/
+theorem sublatticeSpinDot_complement_comm (A : Λ → Bool) :
+    sublatticeSpinDot A (fun x => ! A x) =
+      sublatticeSpinDot (fun x => ! A x) A := by
+  unfold sublatticeSpinDot
+  congr 1
+  · congr 1
+    · exact (sublatticeSpinHalfOp1_cross_commute A).eq
+    · exact (sublatticeSpinHalfOp2_cross_commute A).eq
+  · exact (sublatticeSpinHalfOp3_cross_commute A).eq
+
 /-- The MLM toy Hamiltonian decomposes as an oriented cross-sublattice
 spin dot product:
 `Ĥ_toy = Ŝ_A · Ŝ_¬A + Ŝ_¬A · Ŝ_A`. -/
@@ -97,5 +110,17 @@ theorem heisenbergToyHamiltonian_eq_sublatticeSpinDot_sum (A : Λ → Bool) :
       have h2 : ¬ ((fun z : Λ => ! A z) x ∧ A y) := by
         intro ⟨_, h⟩; rw [hAy'] at h; exact Bool.noConfusion h
       rw [if_neg h1, if_neg h2, add_zero]
+
+/-- The MLM toy Hamiltonian equals twice the cross-sublattice
+spin dot product:
+`Ĥ_toy = 2 • Ŝ_A · Ŝ_¬A`. Combines the oriented sum form
+`Ĥ_toy = Ŝ_A · Ŝ_¬A + Ŝ_¬A · Ŝ_A` with the cross-sublattice
+symmetry. -/
+theorem heisenbergToyHamiltonian_eq_two_sublatticeSpinDot (A : Λ → Bool) :
+    heisenbergToyHamiltonian A =
+      (2 : ℂ) • sublatticeSpinDot A (fun x => ! A x) := by
+  rw [heisenbergToyHamiltonian_eq_sublatticeSpinDot_sum]
+  rw [← sublatticeSpinDot_complement_comm]
+  rw [two_smul]
 
 end LatticeSystem.Quantum
