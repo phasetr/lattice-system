@@ -29,4 +29,10 @@ example {N : ℕ} (A : V → Bool) {J : V → V → ℂ} (hreal : ∀ x y, star 
     star (dressedHeisenbergS A J N σ' σ) = dressedHeisenbergS A J N σ σ' :=
   dressedHeisenbergS_star_swap A N hreal σ σ'
 
+/-- Dressed Heisenberg diagonal is real for real coupling. -/
+example {N : ℕ} (A : V → Bool) {J : V → V → ℂ} (hreal : ∀ x y, star (J x y) = J x y)
+    (σ : V → Fin (N + 1)) :
+    star (dressedHeisenbergS A J N σ σ) = dressedHeisenbergS A J N σ σ :=
+  dressedHeisenbergS_diag_star A N hreal σ
+
 end LatticeSystem.Tests.SpinSDressedHeisenberg

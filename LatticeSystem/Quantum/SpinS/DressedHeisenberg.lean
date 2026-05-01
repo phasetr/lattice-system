@@ -80,4 +80,13 @@ theorem dressedHeisenbergS_star_swap
   rw [hsym]
   ring
 
+/-- Diagonal dressed-Heisenberg matrix elements are real for real
+coupling: applying `dressedHeisenbergS_star_swap` at `σ = σ'`. -/
+theorem dressedHeisenbergS_diag_star
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hreal : ∀ x y, star (J x y) = J x y)
+    (σ : V → Fin (N + 1)) :
+    star (dressedHeisenbergS A J N σ σ) = dressedHeisenbergS A J N σ σ :=
+  dressedHeisenbergS_star_swap A N hreal σ σ
+
 end LatticeSystem.Quantum
