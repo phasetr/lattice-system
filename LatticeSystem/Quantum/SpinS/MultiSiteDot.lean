@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MultiSite
+import LatticeSystem.Quantum.SpinS.Casimir
 
 /-!
 # Two-site spin-`S` inner product `Ŝ_x · Ŝ_y`
@@ -42,5 +43,18 @@ theorem spinSDot_comm (x y : Λ) (N : ℕ) :
   · rw [onSiteS_mul_onSiteS_of_ne hxy (spinSOp1 N) (spinSOp1 N),
         onSiteS_mul_onSiteS_of_ne hxy (spinSOp2 N) (spinSOp2 N),
         onSiteS_mul_onSiteS_of_ne hxy (spinSOp3 N) (spinSOp3 N)]
+
+/-- **Same-site Casimir**: `Ŝ_x · Ŝ_x = (N(N+2)/4) · 1` on the
+multi-site space, the lift of the single-site Casimir identity
+`(Ŝ^{(1)})² + (Ŝ^{(2)})² + (Ŝ^{(3)})² = (N(N+2)/4) · 1` (β-14 of
+Issue #458) to the many-body Hilbert space via `onSiteS`. -/
+theorem spinSDot_self (x : Λ) (N : ℕ) :
+    (spinSDot x x N : ManyBodyOpS Λ N) =
+      ((N : ℂ) * (N + 2) / 4) • 1 := by
+  unfold spinSDot
+  rw [onSiteS_mul_onSiteS_same, onSiteS_mul_onSiteS_same,
+      onSiteS_mul_onSiteS_same]
+  rw [← onSiteS_add, ← onSiteS_add, spinSOp_total_squared,
+      onSiteS_smul, onSiteS_one]
 
 end LatticeSystem.Quantum
