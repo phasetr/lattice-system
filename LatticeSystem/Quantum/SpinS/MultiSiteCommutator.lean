@@ -64,4 +64,26 @@ theorem spinSOp3_onSiteS_commutator_spinSOp1_onSiteS (x : Λ) :
       Complex.I • onSiteS x (spinSOp2 N) := by
   rw [onSiteS_commutator_same, spinSOp3_commutator_spinSOp1, onSiteS_smul]
 
+/-- For any single-site operator `onSiteS x A` and any
+total-spin-like sum `Σ_z onSiteS z B`, the commutator concentrates
+at site `x`:
+
+  `[onSiteS x A, Σ_z onSiteS z B] = onSiteS x [A, B]`.
+
+The off-site terms vanish by `onSiteS_mul_onSiteS_of_ne` (β-3b),
+and the on-site term collapses via `onSiteS_mul_onSiteS_same` (β-3d). -/
+theorem onSiteS_commutator_totalOnSiteS
+    (x : Λ) (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS x A : ManyBodyOpS Λ N) * (∑ z : Λ, onSiteS z B)
+        - (∑ z : Λ, onSiteS z B) * onSiteS x A =
+      onSiteS x (A * B - B * A) := by
+  rw [Finset.mul_sum, Finset.sum_mul]
+  rw [← Finset.sum_sub_distrib]
+  rw [Finset.sum_eq_single x]
+  · rw [onSiteS_mul_onSiteS_same, onSiteS_mul_onSiteS_same, ← onSiteS_sub]
+  · intros z _ hzx
+    rw [onSiteS_mul_onSiteS_of_ne hzx.symm]
+    simp
+  · intro h; exact absurd (Finset.mem_univ x) h
+
 end LatticeSystem.Quantum

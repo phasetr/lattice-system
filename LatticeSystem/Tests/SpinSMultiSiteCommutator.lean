@@ -26,4 +26,11 @@ example (x : Λ) :
       Complex.I • onSiteS x (spinSOp3 N) :=
   spinSOp1_onSiteS_commutator_spinSOp2_onSiteS x
 
+/-- `[onSiteS x A, ∑ z, onSiteS z B] = onSiteS x [A, B]`. -/
+example (x : Λ) (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS x A : ManyBodyOpS Λ N) * (∑ z : Λ, onSiteS z B) -
+        (∑ z : Λ, onSiteS z B) * onSiteS x A =
+      onSiteS x (A * B - B * A) :=
+  onSiteS_commutator_totalOnSiteS x A B
+
 end LatticeSystem.Tests.SpinSMultiSiteCommutator
