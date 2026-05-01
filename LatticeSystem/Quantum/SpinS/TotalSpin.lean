@@ -98,4 +98,48 @@ theorem totalSpinSOpMinus_eq_sub :
   intro x _
   rw [← onSiteS_smul, ← onSiteS_sub, spinSOpMinus_eq_one_sub_I_smul_two]
 
+/-! ## Adjoint relations -/
+
+/-- The conjugate transpose of `onSiteS i A` equals `onSiteS i Aᴴ`. -/
+private lemma onSiteS_conjTranspose (i : Λ)
+    (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i A : ManyBodyOpS Λ N).conjTranspose =
+      (onSiteS i A.conjTranspose : ManyBodyOpS Λ N) := by
+  ext σ' σ
+  simp only [Matrix.conjTranspose_apply, onSiteS_apply]
+  by_cases h : ∀ k, k ≠ i → σ' k = σ k
+  · have h' : ∀ k, k ≠ i → σ k = σ' k := fun k hk => (h k hk).symm
+    rw [if_pos h, if_pos h']
+  · have h' : ¬ ∀ k, k ≠ i → σ k = σ' k := fun hp =>
+      h (fun k hk => (hp k hk).symm)
+    rw [if_neg h, if_neg h', star_zero]
+
+omit [Fintype Λ] [DecidableEq Λ] in
+/-- Conjugate transpose distributes over finite sums in `ManyBodyOpS Λ N`. -/
+private lemma sum_conjTranspose_manyBodyS {N : ℕ}
+    {s : Finset Λ} (f : Λ → ManyBodyOpS Λ N) :
+    (∑ x ∈ s, f x).conjTranspose = ∑ x ∈ s, (f x).conjTranspose := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp
+  | @insert a t hns ih =>
+    rw [Finset.sum_insert hns, Finset.sum_insert hns,
+      Matrix.conjTranspose_add, ih]
+
+/-- `(Ŝ_tot^+)† = Ŝ_tot^-`. -/
+theorem totalSpinSOpPlus_conjTranspose :
+    (totalSpinSOpPlus Λ N).conjTranspose = totalSpinSOpMinus Λ N := by
+  unfold totalSpinSOpPlus totalSpinSOpMinus
+  rw [sum_conjTranspose_manyBodyS]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  rw [onSiteS_conjTranspose, spinSOpPlus_conjTranspose]
+
+/-- `(Ŝ_tot^-)† = Ŝ_tot^+`. -/
+theorem totalSpinSOpMinus_conjTranspose :
+    (totalSpinSOpMinus Λ N).conjTranspose = totalSpinSOpPlus Λ N := by
+  unfold totalSpinSOpPlus totalSpinSOpMinus
+  rw [sum_conjTranspose_manyBodyS]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  rw [onSiteS_conjTranspose, spinSOpMinus_conjTranspose]
+
 end LatticeSystem.Quantum
