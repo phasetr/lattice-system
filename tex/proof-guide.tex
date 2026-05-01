@@ -3902,8 +3902,57 @@ with $H_0$-membership corollary
 
 This is the key ingredient for the Tasaki §2.5 p. 42 Proposition
 (any two configurations with equal magnetisation are connected via
-a chain of single-edge bond swaps), to be assembled in subsequent
-PRs.
+a chain of single-edge bond swaps), proved next.
+
+\subsection{Tasaki §2.5 p. 42 Proposition: equal-magnetisation
+reachability (Issue \#412 PR $\alpha$-5c)}
+\label{ssec:mlm-eq-magnetization-reachable}
+
+\emph{Source file:}
+\texttt{LatticeSystem/Quantum/MarshallLiebMattis/EqMagnetizationReachable.lean}.
+
+\begin{theorem}[Tasaki §2.5 p. 42 Proposition]
+\label{thm:eq-mag-reachable}
+For a connected graph $G$ and any two configurations
+$\sigma, \sigma'$ with the same total magnetisation
+$\bar\sigma = \bar\sigma'$,
+$\texttt{SwapReachable}\,G\,\sigma\,\sigma'$.
+
+Strong induction on the **configuration distance**
+$\mathrm{configDist}(\sigma, \sigma') :=
+ \#\{x \in \Lambda \mid \sigma_x \neq \sigma'_x\}$:
+\begin{itemize}
+\item Base $\mathrm{configDist} = 0$: $\sigma = \sigma'$, refl.
+\item Inductive step: pigeonhole on the magnetisation equality
+gives sites $x$ with $(\sigma_x, \sigma'_x) = (0, 1)$ and $y$ with
+$(\sigma_y, \sigma'_y) = (1, 0)$
+(\texttt{exists\_swap\_pair\_of\_eq\_magnetization}); apply
+Theorem~\ref{thm:swap-reachable} to get $\sigma \to
+\texttt{basisSwap}\,\sigma\,x\,y$; the new configuration has
+$\mathrm{configDist}$ strictly smaller (sites $x, y$ newly agree
+with $\sigma'$, see \texttt{configDist\_basisSwap\_lt}) and the
+same magnetisation as $\sigma'$
+(Theorem~\ref{thm:mag-swap}); apply IH.
+\end{itemize}
+Lean: \texttt{swapReachable\_of\_eq\_magnetization}.
+\end{theorem}
+
+This completes the combinatorial content needed for
+Perron--Frobenius irreducibility of the dressed Heisenberg matrix
+on the magnetisation-$M$ subspace. Subsequent PRs will:
+\begin{itemize}
+\item upgrade $\mathrm{configDist}$ reachability to a positive
+matrix-power entry $(B^n)_{\sigma, \sigma'} > 0$ for the shifted
+non-negative matrix $B = cI - M$;
+\item apply Perron--Frobenius
+(\texttt{LatticeSystem.Math.PerronFrobenius.exists\_pos\_eigenvec\_max}
+and \texttt{pos\_eigenvec\_unique}) to extract the unique
+strictly-positive eigenvector;
+\item translate back to the antiferromagnetic Heisenberg
+ground-state expansion
+$|\Phi_{\rm GS}\rangle = \sum_\sigma c_\sigma |\widetilde{\Psi}^\sigma\rangle$
+with $c_\sigma > 0$ (Tasaki (2.5.4)).
+\end{itemize}
 
 %======================================================================
 \section{Perron--Frobenius theorem for symmetric non-negative irreducible matrices}
