@@ -63,4 +63,10 @@ example (A : Fin 2 → Bool) :
             (sublatticeSpinHalfSquared (fun x => ! A x)) :=
   heisenbergToyHamiltonian_commute_sublatticeSpinHalfSquared_complement A
 
+/-- Eigenvalue of the toy Hamiltonian on the all-aligned state. -/
+example (A : Fin 2 → Bool) (s : Fin 2) :
+    ∃ c : ℂ, (heisenbergToyHamiltonian A).mulVec (basisVec (fun _ : Fin 2 => s)) =
+      c • basisVec (fun _ : Fin 2 => s) :=
+  ⟨_, heisenbergToyHamiltonian_mulVec_basisVec_const A s⟩
+
 end LatticeSystem.Tests.MarshallLiebMattisToyHamiltonianCasimir

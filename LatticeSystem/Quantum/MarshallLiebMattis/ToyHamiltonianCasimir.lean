@@ -211,4 +211,33 @@ theorem heisenbergToyHamiltonian_commute_sublatticeSpinHalfSquared_complement
   · exact sublatticeSpinHalfSquared_cross_commute A
   · exact Commute.refl _
 
+/-! ## Eigenvalue on the all-aligned state -/
+
+/-- Cardinality of the `A`-sublattice (number of sites with `A x = true`). -/
+private noncomputable def sublatticeCard (A : Λ → Bool) : ℕ :=
+  (Finset.univ.filter (fun x : Λ => A x = true)).card
+
+/-- The toy Hamiltonian has an explicit eigenvalue on the all-aligned
+basis state, computed from the closed form `Ĥ_toy = (Ŝ_tot)² − (Ŝ_A)² − (Ŝ_¬A)²`:
+
+`Ĥ_toy · |s s … s⟩ = (|Λ|(|Λ|+2)/4 − |A|(|A|+2)/4 − |¬A|(|¬A|+2)/4) · |s s … s⟩`.
+
+This is the maximum-spin eigenvalue contribution: each Casimir
+attains its maximum on the all-aligned state with `S = N/2`. -/
+theorem heisenbergToyHamiltonian_mulVec_basisVec_const
+    (A : Λ → Bool) (s : Fin 2) :
+    (heisenbergToyHamiltonian A).mulVec (basisVec (fun _ : Λ => s)) =
+      (((Fintype.card Λ : ℂ) * (Fintype.card Λ + 2) / 4)
+        - ((sublatticeCard A : ℂ) * ((sublatticeCard A : ℕ) + 2) / 4)
+        - ((sublatticeCard (fun x => ! A x) : ℂ) *
+            ((sublatticeCard (fun x => ! A x) : ℕ) + 2) / 4)) •
+        basisVec (fun _ : Λ => s) := by
+  unfold sublatticeCard
+  rw [heisenbergToyHamiltonian_eq_casimir_diff A]
+  rw [Matrix.sub_mulVec, Matrix.sub_mulVec]
+  rw [totalSpinHalfSquared_mulVec_basisVec_const,
+      sublatticeSpinHalfSquared_mulVec_basisVec_const A s,
+      sublatticeSpinHalfSquared_mulVec_basisVec_const (fun x => ! A x) s]
+  rw [← sub_smul, ← sub_smul]
+
 end LatticeSystem.Quantum
