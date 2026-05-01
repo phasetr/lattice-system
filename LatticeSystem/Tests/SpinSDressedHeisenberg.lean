@@ -48,4 +48,9 @@ example {N : ℕ} (A : V → Bool) {J : V → V → ℂ} (hreal : ∀ x y, star 
       ((dressedHeisenbergS A J N σ σ).re : ℂ) :=
   dressedHeisenbergS_diag_eq_ofReal A N hreal σ
 
+/-- Dressed Heisenberg with zero coupling = 0. -/
+example {N : ℕ} (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergS A (fun _ _ : V => (0 : ℂ)) N σ σ' = 0 :=
+  dressedHeisenbergS_zero_J A N σ σ'
+
 end LatticeSystem.Tests.SpinSDressedHeisenberg
