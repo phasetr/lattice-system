@@ -208,6 +208,13 @@ theorem heisenbergHamiltonianOnGraphS_commute_totalSpinSOp3
         totalSpinSOp3 Λ N * heisenbergHamiltonianOnGraphS G J N = 0 :=
   heisenbergHamiltonianS_commutator_totalSpinSOp3 _ N
 
+/-- The Heisenberg-on-graph Hamiltonian commutes with `(Ŝ_tot)²`. -/
+theorem heisenbergHamiltonianOnGraphS_commute_totalSpinSSquared
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (N : ℕ) :
+    Commute (heisenbergHamiltonianOnGraphS G J N)
+      (totalSpinSSquared Λ N) :=
+  heisenbergHamiltonianS_commute_totalSpinSSquared _ N
+
 /-- The Heisenberg Hamiltonian preserves `(Ŝ_tot)²` eigenvalues:
 if `(Ŝ_tot)² · v = S · v`, then `(Ŝ_tot)² · (Ĥ · v) = S · (Ĥ · v)`.
 Operator-level simultaneous diagonalisation. -/
