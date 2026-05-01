@@ -73,4 +73,14 @@ example {N : ℕ} [DecidableEq V] (A : V → Bool) (σ : V → Fin (N + 1)) :
     (marshallSignS A σ : ℂ) • marshallDressedBasisS A σ = basisVecS σ :=
   marshallSignS_smul_marshallDressedBasisS A σ
 
+/-- Marshall sign on the trivial (false) sublattice is `+1`. -/
+example {N : ℕ} (σ : V → Fin (N + 1)) :
+    marshallSignS (fun _ : V => false) σ = 1 :=
+  marshallSignS_eq_one_of_A_false σ
+
+/-- Marshall sign on the full (true) sublattice is `(-1)^(magSumS σ)`. -/
+example {N : ℕ} (σ : V → Fin (N + 1)) :
+    marshallSignS (fun _ : V => true) σ = (-1 : ℂ) ^ magSumS σ :=
+  marshallSignS_eq_neg_one_pow_of_A_true σ
+
 end LatticeSystem.Tests.SpinSMarshallSign
