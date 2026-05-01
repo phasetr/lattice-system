@@ -45,4 +45,11 @@ example (i : Λ) (c : ℂ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
     (onSiteS i (c • A) : ManyBodyOpS Λ N) = c • onSiteS i A :=
   onSiteS_smul i c A
 
+/-- `basisVecS σ σ = 1`. -/
+example {N : ℕ} (σ : Λ → Fin (N + 1)) : basisVecS σ σ = 1 := basisVecS_self σ
+
+/-- `basisVecS σ τ = 0` for `τ ≠ σ`. -/
+example {N : ℕ} (σ τ : Λ → Fin (N + 1)) (hne : τ ≠ σ) : basisVecS σ τ = 0 :=
+  basisVecS_of_ne hne
+
 end LatticeSystem.Tests.SpinSMultiSite
