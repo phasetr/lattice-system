@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 import LatticeSystem.Quantum.SpinS.MultiSiteDotComm
 import LatticeSystem.Quantum.SpinS.TotalSpin
+import LatticeSystem.Quantum.SpinS.TotalSquared
 
 /-!
 # Spin-`S` Heisenberg-type Hamiltonian
@@ -88,5 +89,38 @@ theorem heisenbergHamiltonianS_commutator_totalSpinSOp3
   refine Finset.sum_eq_zero fun y _ => ?_
   rw [Matrix.smul_mul, Matrix.mul_smul, ← smul_sub]
   rw [spinSDot_commutator_totalSpinSOp3, smul_zero]
+
+/-- The Heisenberg Hamiltonian commutes with the Casimir `(Ŝ_tot)²`:
+operator-level SU(2) invariance at the Casimir level. Follows from
+`[Ĥ_J, Ŝ_tot^{(α)}] = 0` for each axis (β-3o) via `Commute.mul_right`
+and `Commute.add_right`. -/
+theorem heisenbergHamiltonianS_commute_totalSpinSSquared
+    (J : Λ → Λ → ℂ) (N : ℕ) :
+    Commute (heisenbergHamiltonianS J N) (totalSpinSSquared Λ N) := by
+  unfold totalSpinSSquared
+  have h1 : Commute (heisenbergHamiltonianS J N) (totalSpinSOp1 Λ N) :=
+    sub_eq_zero.mp (heisenbergHamiltonianS_commutator_totalSpinSOp1 J N)
+  have h2 : Commute (heisenbergHamiltonianS J N) (totalSpinSOp2 Λ N) :=
+    sub_eq_zero.mp (heisenbergHamiltonianS_commutator_totalSpinSOp2 J N)
+  have h3 : Commute (heisenbergHamiltonianS J N) (totalSpinSOp3 Λ N) :=
+    sub_eq_zero.mp (heisenbergHamiltonianS_commutator_totalSpinSOp3 J N)
+  exact ((h1.mul_right h1).add_right (h2.mul_right h2)).add_right
+    (h3.mul_right h3)
+
+/-- The Heisenberg Hamiltonian preserves `(Ŝ_tot)²` eigenvalues:
+if `(Ŝ_tot)² · v = S · v`, then `(Ŝ_tot)² · (Ĥ · v) = S · (Ĥ · v)`.
+Operator-level simultaneous diagonalisation. -/
+theorem heisenbergHamiltonianS_mulVec_preserves_totalSpinSSquared_eigenvalue
+    (J : Λ → Λ → ℂ) (N : ℕ)
+    {S : ℂ} {v : (Λ → Fin (N + 1)) → ℂ}
+    (hv : (totalSpinSSquared Λ N).mulVec v = S • v) :
+    (totalSpinSSquared Λ N).mulVec
+        ((heisenbergHamiltonianS J N).mulVec v) =
+      S • (heisenbergHamiltonianS J N).mulVec v := by
+  have hcomm : totalSpinSSquared Λ N * heisenbergHamiltonianS J N =
+      heisenbergHamiltonianS J N * totalSpinSSquared Λ N :=
+    (heisenbergHamiltonianS_commute_totalSpinSSquared J N).symm
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul]
 
 end LatticeSystem.Quantum

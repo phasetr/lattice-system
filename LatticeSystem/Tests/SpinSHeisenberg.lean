@@ -34,4 +34,9 @@ example (J : Λ → Λ → ℂ) (N : ℕ) :
         totalSpinSOp3 Λ N * heisenbergHamiltonianS J N = 0 :=
   heisenbergHamiltonianS_commutator_totalSpinSOp3 J N
 
+/-- Casimir-level SU(2) invariance: `Commute Ĥ_J (Ŝ_tot)²`. -/
+example (J : Λ → Λ → ℂ) (N : ℕ) :
+    Commute (heisenbergHamiltonianS J N) (totalSpinSSquared Λ N) :=
+  heisenbergHamiltonianS_commute_totalSpinSSquared J N
+
 end LatticeSystem.Tests.SpinSHeisenberg
