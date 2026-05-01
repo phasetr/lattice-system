@@ -218,4 +218,14 @@ theorem marshallSignS_smul_marshallDressedBasisS [DecidableEq V]
   unfold marshallDressedBasisS
   rw [smul_smul, marshallSignS_sq, one_smul]
 
+/-- The Marshall-dressed basis vector is non-zero: at its diagonal
+component, `marshallDressedBasisS A σ σ = marshallSignS A σ ≠ 0`. -/
+theorem marshallDressedBasisS_ne_zero [DecidableEq V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallDressedBasisS A σ ≠ 0 := by
+  intro h
+  have h0 : marshallDressedBasisS A σ σ = 0 := by rw [h]; rfl
+  rw [marshallDressedBasisS_self] at h0
+  exact marshallSignS_ne_zero A σ h0
+
 end LatticeSystem.Quantum

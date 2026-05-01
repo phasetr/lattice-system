@@ -89,4 +89,9 @@ example {N : ℕ} (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
       ∏ x : V, if A x then ((-1 : ℂ) ^ ((σ x).val + (σ' x).val)) else 1 :=
   marshallSignS_mul A σ σ'
 
+/-- Marshall-dressed basis is non-zero. -/
+example {N : ℕ} [DecidableEq V] (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallDressedBasisS A σ ≠ 0 :=
+  marshallDressedBasisS_ne_zero A σ
+
 end LatticeSystem.Tests.SpinSMarshallSign
