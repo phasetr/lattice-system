@@ -59,6 +59,7 @@ import LatticeSystem.Quantum.MarshallLiebMattis.H0ShiftedIrreducible
 import LatticeSystem.Quantum.MarshallLiebMattis.H0PFApplication
 import LatticeSystem.Quantum.MarshallLiebMattis.ToyHamiltonian
 import LatticeSystem.Quantum.MarshallLiebMattis.BipartiteGraph
+import LatticeSystem.Quantum.MarshallLiebMattis.ToyPF
 import LatticeSystem.Quantum.Z2Z2
 import LatticeSystem.Quantum.IsingChain
 import LatticeSystem.Fermion.Mode
