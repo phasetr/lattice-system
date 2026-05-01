@@ -49,6 +49,20 @@ theorem marshallSignS_ne_zero (A : V → Bool) (σ : V → Fin (N + 1)) :
     exact pow_ne_zero _ (by norm_num : (-1 : ℂ) ≠ 0)
   · simp [hAx]
 
+/-- The Marshall sign is `±1`: its square is `1`. -/
+theorem marshallSignS_sq (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ * marshallSignS A σ = 1 := by
+  unfold marshallSignS
+  rw [← Finset.prod_mul_distrib]
+  apply Finset.prod_eq_one
+  intro x _
+  by_cases hAx : A x
+  · simp only [hAx, if_true]
+    rw [← pow_add, ← two_mul, pow_mul]
+    rw [show ((-1 : ℂ) ^ 2) = 1 from by norm_num]
+    rw [one_pow]
+  · simp [hAx]
+
 /-! ## Marshall-dressed basis -/
 
 /-- The Marshall-dressed basis vector at `σ`:
