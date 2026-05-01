@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.MultiSite
 import LatticeSystem.Quantum.SpinS.Hermitian
+import LatticeSystem.Quantum.SpinS.PMAsOneTwo
 
 /-!
 # Total spin-`S` operators on a multi-site Hilbert space
@@ -72,5 +73,29 @@ theorem totalSpinSOp3_isHermitian : (totalSpinSOp3 Λ N).IsHermitian := by
   unfold totalSpinSOp3
   exact isHermitian_sum_aux Finset.univ
     (fun x _ => onSiteS_isHermitian x (spinSOp3_isHermitian N))
+
+/-! ## Total raising/lowering decomposition -/
+
+/-- `Ŝ_tot^+ = Ŝ_tot^{(1)} + i · Ŝ_tot^{(2)}`. Multi-site
+generalisation of the single-site identity β-26 (Issue #458),
+proved by linearity of `onSiteS` and `Finset.sum`. -/
+theorem totalSpinSOpPlus_eq_add :
+    (totalSpinSOpPlus Λ N : ManyBodyOpS Λ N) =
+      totalSpinSOp1 Λ N + Complex.I • totalSpinSOp2 Λ N := by
+  unfold totalSpinSOpPlus totalSpinSOp1 totalSpinSOp2
+  rw [Finset.smul_sum, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro x _
+  rw [← onSiteS_smul, ← onSiteS_add, spinSOpPlus_eq_one_add_I_smul_two]
+
+/-- `Ŝ_tot^- = Ŝ_tot^{(1)} − i · Ŝ_tot^{(2)}`. -/
+theorem totalSpinSOpMinus_eq_sub :
+    (totalSpinSOpMinus Λ N : ManyBodyOpS Λ N) =
+      totalSpinSOp1 Λ N - Complex.I • totalSpinSOp2 Λ N := by
+  unfold totalSpinSOpMinus totalSpinSOp1 totalSpinSOp2
+  rw [Finset.smul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro x _
+  rw [← onSiteS_smul, ← onSiteS_sub, spinSOpMinus_eq_one_sub_I_smul_two]
 
 end LatticeSystem.Quantum
