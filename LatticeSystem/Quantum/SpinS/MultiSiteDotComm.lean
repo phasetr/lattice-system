@@ -107,4 +107,144 @@ theorem spinSDot_commutator_totalSpinSOp3 (x y : Λ) (N : ℕ) :
       smul_mul_assoc]
   abel
 
+/-- **SU(2) invariance, axis 1**: `[Ŝ_x · Ŝ_y, Ŝ_tot^{(1)}] = 0`. -/
+theorem spinSDot_commutator_totalSpinSOp1 (x y : Λ) (N : ℕ) :
+    spinSDot x y N * totalSpinSOp1 Λ N -
+        totalSpinSOp1 Λ N * spinSDot x y N = 0 := by
+  unfold spinSDot totalSpinSOp1
+  set T := (∑ z : Λ, onSiteS z (spinSOp1 N) : ManyBodyOpS Λ N)
+  have distrib : ∀ (A B C : ManyBodyOpS Λ N),
+      (A + B + C) * T - T * (A + B + C) =
+        (A * T - T * A) + (B * T - T * B) + (C * T - T * C) := by
+    intros A B C
+    rw [add_mul, add_mul, mul_add, mul_add]; abel
+  rw [distrib]
+  set a1 := (onSiteS x (spinSOp1 N) * onSiteS y (spinSOp1 N) : ManyBodyOpS Λ N)
+  set a2 := (onSiteS x (spinSOp2 N) * onSiteS y (spinSOp2 N) : ManyBodyOpS Λ N)
+  set a3 := (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N) : ManyBodyOpS Λ N)
+  have h1 : a1 * T - T * a1 = 0 := by
+    change onSiteS x (spinSOp1 N) * onSiteS y (spinSOp1 N) * T
+        - T * (onSiteS x (spinSOp1 N) * onSiteS y (spinSOp1 N)) = 0
+    rw [leibniz_commutatorS]
+    rw [onSiteS_commutator_totalOnSiteS y (spinSOp1 N) (spinSOp1 N),
+        onSiteS_commutator_totalOnSiteS x (spinSOp1 N) (spinSOp1 N)]
+    rw [sub_self]
+    simp [onSiteS_zero]
+  have h2 : a2 * T - T * a2 =
+      onSiteS x (spinSOp2 N) *
+          onSiteS y (spinSOp2 N * spinSOp1 N - spinSOp1 N * spinSOp2 N) +
+        onSiteS x (spinSOp2 N * spinSOp1 N - spinSOp1 N * spinSOp2 N) *
+          onSiteS y (spinSOp2 N) := by
+    change onSiteS x (spinSOp2 N) * onSiteS y (spinSOp2 N) * T
+        - T * (onSiteS x (spinSOp2 N) * onSiteS y (spinSOp2 N)) = _
+    rw [leibniz_commutatorS]
+    rw [onSiteS_commutator_totalOnSiteS y (spinSOp2 N) (spinSOp1 N),
+        onSiteS_commutator_totalOnSiteS x (spinSOp2 N) (spinSOp1 N)]
+  have h3 : a3 * T - T * a3 =
+      onSiteS x (spinSOp3 N) *
+          onSiteS y (spinSOp3 N * spinSOp1 N - spinSOp1 N * spinSOp3 N) +
+        onSiteS x (spinSOp3 N * spinSOp1 N - spinSOp1 N * spinSOp3 N) *
+          onSiteS y (spinSOp3 N) := by
+    change onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N) * T
+        - T * (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)) = _
+    rw [leibniz_commutatorS]
+    rw [onSiteS_commutator_totalOnSiteS y (spinSOp3 N) (spinSOp1 N),
+        onSiteS_commutator_totalOnSiteS x (spinSOp3 N) (spinSOp1 N)]
+  rw [h1, h2, h3]
+  -- [Ŝ^(2), Ŝ^(1)] = -i Ŝ^(3)
+  rw [show spinSOp2 N * spinSOp1 N - spinSOp1 N * spinSOp2 N =
+      -(Complex.I • spinSOp3 N) from by
+    rw [show spinSOp2 N * spinSOp1 N - spinSOp1 N * spinSOp2 N =
+        -(spinSOp1 N * spinSOp2 N - spinSOp2 N * spinSOp1 N) from by abel,
+      spinSOp1_commutator_spinSOp2]]
+  rw [spinSOp3_commutator_spinSOp1]
+  rw [onSiteS_smul, onSiteS_smul]
+  rw [show onSiteS x (-(Complex.I • spinSOp3 N) :
+      Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) =
+      -(Complex.I • onSiteS (Λ := Λ) (N := N) x (spinSOp3 N)) from by
+    rw [show -(Complex.I • spinSOp3 N :
+        Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) =
+        (-Complex.I) • spinSOp3 N from by rw [neg_smul]]
+    rw [onSiteS_smul]; rw [neg_smul]]
+  rw [show onSiteS y (-(Complex.I • spinSOp3 N) :
+      Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) =
+      -(Complex.I • onSiteS (Λ := Λ) (N := N) y (spinSOp3 N)) from by
+    rw [show -(Complex.I • spinSOp3 N :
+        Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) =
+        (-Complex.I) • spinSOp3 N from by rw [neg_smul]]
+    rw [onSiteS_smul]; rw [neg_smul]]
+  rw [mul_neg, neg_mul, mul_smul_comm, smul_mul_assoc, mul_smul_comm,
+      smul_mul_assoc]
+  abel
+
+/-- **SU(2) invariance, axis 2**: `[Ŝ_x · Ŝ_y, Ŝ_tot^{(2)}] = 0`. -/
+theorem spinSDot_commutator_totalSpinSOp2 (x y : Λ) (N : ℕ) :
+    spinSDot x y N * totalSpinSOp2 Λ N -
+        totalSpinSOp2 Λ N * spinSDot x y N = 0 := by
+  unfold spinSDot totalSpinSOp2
+  set T := (∑ z : Λ, onSiteS z (spinSOp2 N) : ManyBodyOpS Λ N)
+  have distrib : ∀ (A B C : ManyBodyOpS Λ N),
+      (A + B + C) * T - T * (A + B + C) =
+        (A * T - T * A) + (B * T - T * B) + (C * T - T * C) := by
+    intros A B C
+    rw [add_mul, add_mul, mul_add, mul_add]; abel
+  rw [distrib]
+  set a1 := (onSiteS x (spinSOp1 N) * onSiteS y (spinSOp1 N) : ManyBodyOpS Λ N)
+  set a2 := (onSiteS x (spinSOp2 N) * onSiteS y (spinSOp2 N) : ManyBodyOpS Λ N)
+  set a3 := (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N) : ManyBodyOpS Λ N)
+  have h1 : a1 * T - T * a1 =
+      onSiteS x (spinSOp1 N) *
+          onSiteS y (spinSOp1 N * spinSOp2 N - spinSOp2 N * spinSOp1 N) +
+        onSiteS x (spinSOp1 N * spinSOp2 N - spinSOp2 N * spinSOp1 N) *
+          onSiteS y (spinSOp1 N) := by
+    change onSiteS x (spinSOp1 N) * onSiteS y (spinSOp1 N) * T
+        - T * (onSiteS x (spinSOp1 N) * onSiteS y (spinSOp1 N)) = _
+    rw [leibniz_commutatorS]
+    rw [onSiteS_commutator_totalOnSiteS y (spinSOp1 N) (spinSOp2 N),
+        onSiteS_commutator_totalOnSiteS x (spinSOp1 N) (spinSOp2 N)]
+  have h2 : a2 * T - T * a2 = 0 := by
+    change onSiteS x (spinSOp2 N) * onSiteS y (spinSOp2 N) * T
+        - T * (onSiteS x (spinSOp2 N) * onSiteS y (spinSOp2 N)) = 0
+    rw [leibniz_commutatorS]
+    rw [onSiteS_commutator_totalOnSiteS y (spinSOp2 N) (spinSOp2 N),
+        onSiteS_commutator_totalOnSiteS x (spinSOp2 N) (spinSOp2 N)]
+    rw [sub_self]
+    simp [onSiteS_zero]
+  have h3 : a3 * T - T * a3 =
+      onSiteS x (spinSOp3 N) *
+          onSiteS y (spinSOp3 N * spinSOp2 N - spinSOp2 N * spinSOp3 N) +
+        onSiteS x (spinSOp3 N * spinSOp2 N - spinSOp2 N * spinSOp3 N) *
+          onSiteS y (spinSOp3 N) := by
+    change onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N) * T
+        - T * (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)) = _
+    rw [leibniz_commutatorS]
+    rw [onSiteS_commutator_totalOnSiteS y (spinSOp3 N) (spinSOp2 N),
+        onSiteS_commutator_totalOnSiteS x (spinSOp3 N) (spinSOp2 N)]
+  rw [h1, h2, h3]
+  -- [Ŝ^(1), Ŝ^(2)] = i Ŝ^(3); [Ŝ^(3), Ŝ^(2)] = -i Ŝ^(1).
+  rw [spinSOp1_commutator_spinSOp2]
+  rw [show spinSOp3 N * spinSOp2 N - spinSOp2 N * spinSOp3 N =
+      -(Complex.I • spinSOp1 N) from by
+    rw [show spinSOp3 N * spinSOp2 N - spinSOp2 N * spinSOp3 N =
+        -(spinSOp2 N * spinSOp3 N - spinSOp3 N * spinSOp2 N) from by abel,
+      spinSOp2_commutator_spinSOp3]]
+  rw [onSiteS_smul, onSiteS_smul]
+  rw [show onSiteS x (-(Complex.I • spinSOp1 N) :
+      Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) =
+      -(Complex.I • onSiteS (Λ := Λ) (N := N) x (spinSOp1 N)) from by
+    rw [show -(Complex.I • spinSOp1 N :
+        Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) =
+        (-Complex.I) • spinSOp1 N from by rw [neg_smul]]
+    rw [onSiteS_smul]; rw [neg_smul]]
+  rw [show onSiteS y (-(Complex.I • spinSOp1 N) :
+      Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) =
+      -(Complex.I • onSiteS (Λ := Λ) (N := N) y (spinSOp1 N)) from by
+    rw [show -(Complex.I • spinSOp1 N :
+        Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) =
+        (-Complex.I) • spinSOp1 N from by rw [neg_smul]]
+    rw [onSiteS_smul]; rw [neg_smul]]
+  rw [mul_neg, neg_mul, mul_smul_comm, smul_mul_assoc, mul_smul_comm,
+      smul_mul_assoc]
+  abel
+
 end LatticeSystem.Quantum
