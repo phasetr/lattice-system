@@ -64,6 +64,66 @@ theorem spinSOp3_onSiteS_commutator_spinSOp1_onSiteS (x : Λ) :
       Complex.I • onSiteS x (spinSOp2 N) := by
   rw [onSiteS_commutator_same, spinSOp3_commutator_spinSOp1, onSiteS_smul]
 
+/-! ## Total-spin commutators for arbitrary spin -/
+
+/-- General total-spin commutator: if `[A, B] = I • C` then
+`[Σ_x onSiteS x A, Σ_x onSiteS x B] = I • Σ_x onSiteS x C`. -/
+theorem totalSpinS_commutator_general
+    {N : ℕ} {A B C : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ}
+    (hab : A * B - B * A = Complex.I • C) :
+    ((∑ x : Λ, onSiteS x A : ManyBodyOpS Λ N) * (∑ x : Λ, onSiteS x B)
+        - (∑ x : Λ, onSiteS x B) * (∑ x : Λ, onSiteS x A)) =
+      Complex.I • ∑ x : Λ, onSiteS x C := by
+  calc (∑ x : Λ, onSiteS x A : ManyBodyOpS Λ N) * (∑ x : Λ, onSiteS x B)
+          - (∑ x : Λ, onSiteS x B) * (∑ x : Λ, onSiteS x A)
+      = ∑ x : Λ, ∑ y : Λ,
+          (onSiteS x A * onSiteS y B - onSiteS y B * onSiteS x A) := by
+        rw [Finset.sum_mul, Finset.sum_mul]
+        simp_rw [Finset.mul_sum]
+        rw [Finset.sum_comm
+            (f := fun y x => (onSiteS y B : ManyBodyOpS Λ N) * onSiteS x A)
+            (s := Finset.univ) (t := Finset.univ)]
+        rw [← Finset.sum_sub_distrib]
+        refine Finset.sum_congr rfl fun x _ => ?_
+        rw [← Finset.sum_sub_distrib]
+    _ = ∑ x : Λ, (Complex.I • onSiteS x C : ManyBodyOpS Λ N) := by
+        refine Finset.sum_congr rfl fun x _ => ?_
+        rw [Finset.sum_eq_single x]
+        · rw [onSiteS_commutator_same, hab, onSiteS_smul]
+        · intros y _ hyx
+          rw [onSiteS_mul_onSiteS_of_ne hyx.symm]
+          simp
+        · intro h; exact absurd (Finset.mem_univ x) h
+    _ = Complex.I • ∑ x : Λ, (onSiteS x C : ManyBodyOpS Λ N) := by
+        rw [← Finset.smul_sum]
+
+/-- Total-spin SU(2) commutator: `[Ŝ_tot^{(1)}, Ŝ_tot^{(2)}] = i Ŝ_tot^{(3)}`. -/
+theorem totalSpinSOp1_commutator_totalSpinSOp2 (N : ℕ) :
+    ((∑ x : Λ, onSiteS x (spinSOp1 N) : ManyBodyOpS Λ N) *
+        (∑ x : Λ, onSiteS x (spinSOp2 N))
+        - (∑ x : Λ, onSiteS x (spinSOp2 N)) *
+            (∑ x : Λ, onSiteS x (spinSOp1 N))) =
+      Complex.I • ∑ x : Λ, onSiteS x (spinSOp3 N) :=
+  totalSpinS_commutator_general (Λ := Λ) (spinSOp1_commutator_spinSOp2 N)
+
+/-- Total-spin SU(2) commutator: `[Ŝ_tot^{(2)}, Ŝ_tot^{(3)}] = i Ŝ_tot^{(1)}`. -/
+theorem totalSpinSOp2_commutator_totalSpinSOp3 (N : ℕ) :
+    ((∑ x : Λ, onSiteS x (spinSOp2 N) : ManyBodyOpS Λ N) *
+        (∑ x : Λ, onSiteS x (spinSOp3 N))
+        - (∑ x : Λ, onSiteS x (spinSOp3 N)) *
+            (∑ x : Λ, onSiteS x (spinSOp2 N))) =
+      Complex.I • ∑ x : Λ, onSiteS x (spinSOp1 N) :=
+  totalSpinS_commutator_general (Λ := Λ) (spinSOp2_commutator_spinSOp3 N)
+
+/-- Total-spin SU(2) commutator: `[Ŝ_tot^{(3)}, Ŝ_tot^{(1)}] = i Ŝ_tot^{(2)}`. -/
+theorem totalSpinSOp3_commutator_totalSpinSOp1 (N : ℕ) :
+    ((∑ x : Λ, onSiteS x (spinSOp3 N) : ManyBodyOpS Λ N) *
+        (∑ x : Λ, onSiteS x (spinSOp1 N))
+        - (∑ x : Λ, onSiteS x (spinSOp1 N)) *
+            (∑ x : Λ, onSiteS x (spinSOp3 N))) =
+      Complex.I • ∑ x : Λ, onSiteS x (spinSOp2 N) :=
+  totalSpinS_commutator_general (Λ := Λ) (spinSOp3_commutator_spinSOp1 N)
+
 /-- For any single-site operator `onSiteS x A` and any
 total-spin-like sum `Σ_z onSiteS z B`, the commutator concentrates
 at site `x`:
