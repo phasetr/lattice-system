@@ -86,12 +86,44 @@ theorem magSubspaceS_disjoint {M M' : ℂ} (hMM' : M ≠ M') :
   exact (smul_eq_zero.mp hsub).resolve_left hne
 
 /-- The magnetic-quantum-number eigenvalue of `Ŝ_tot^{(3)}` on the
-basis state `|σ⟩` (definition only — the eigenvalue identity
-`Ŝ_tot^{(3)} · |σ⟩ = magEigenvalueS σ • |σ⟩` is proved in a follow-up
-PR):
+basis state `|σ⟩`:
 
   `magEigenvalueS σ := (|Λ| · N : ℂ)/2 − magSumS σ`. -/
 noncomputable def magEigenvalueS (σ : Λ → Fin (N + 1)) : ℂ :=
   ((Fintype.card Λ : ℂ) * (N : ℂ)) / 2 - (magSumS σ : ℂ)
+
+/-- `onSiteS x (spinSOp3 N) · |σ⟩ = ((N : ℂ)/2 − (σ x).val) • |σ⟩`. -/
+theorem onSiteS_spinSOp3_mulVec_basisVecS (x : Λ) (σ : Λ → Fin (N + 1)) :
+    (onSiteS x (spinSOp3 N) : ManyBodyOpS Λ N).mulVec (basisVecS σ) =
+      ((N : ℂ) / 2 - (σ x).val) • basisVecS σ := by
+  funext τ
+  show ∑ τ', (onSiteS x (spinSOp3 N)) τ τ' * basisVecS σ τ' =
+       ((N : ℂ) / 2 - (σ x).val) * basisVecS σ τ
+  rw [Fintype.sum_eq_single σ (fun ρ hρ => by
+    simp only [basisVecS, if_neg hρ, mul_zero])]
+  -- Goal: (onSiteS x (spinSOp3 N)) τ σ * basisVecS σ σ = ((N : ℂ) / 2 - σ x.val) * basisVecS σ τ.
+  rw [basisVecS_self, mul_one]
+  by_cases heq : τ = σ
+  · -- τ = σ: LHS = (spinSOp3 N) (σ x) (σ x) = (N/2 - σ x.val).
+    rw [heq, basisVecS_self, mul_one]
+    rw [onSiteS_apply, if_pos (fun _ _ => rfl)]
+    change (Matrix.diagonal fun k => ((N : ℂ) / 2 - (k.val : ℂ))) (σ x) (σ x) =
+        (N : ℂ) / 2 - ((σ x).val : ℂ)
+    rw [Matrix.diagonal_apply_eq]
+  · rw [basisVecS_of_ne heq, mul_zero]
+    -- LHS = (onSiteS x (spinSOp3 N)) τ σ. We show this is 0 when τ ≠ σ.
+    rw [onSiteS_apply]
+    by_cases hagree : ∀ k, k ≠ x → τ k = σ k
+    · rw [if_pos hagree]
+      have hτx : τ x ≠ σ x := by
+        intro hτx
+        apply heq
+        funext k
+        by_cases hkx : k = x
+        · subst hkx; exact hτx
+        · exact hagree k hkx
+      change (Matrix.diagonal fun k => ((N : ℂ) / 2 - (k.val : ℂ))) (τ x) (σ x) = 0
+      rw [Matrix.diagonal_apply_ne _ hτx]
+    · rw [if_neg hagree]
 
 end LatticeSystem.Quantum
