@@ -358,4 +358,29 @@ noncomputable def spinSSiteOpPlus (i : Λ) (N : ℕ) : ManyBodyOpS Λ N :=
 noncomputable def spinSSiteOpMinus (i : Λ) (N : ℕ) : ManyBodyOpS Λ N :=
   onSiteS i (spinSOpMinus N)
 
+/-! ## Computational basis vectors -/
+
+/-- The standard basis vector at configuration `σ : Λ → Fin (N + 1)`:
+the function that is `1` at `σ` and `0` elsewhere. Multi-site spin-`S`
+generalisation of `basisVec` (`Quantum/ManyBody.lean`). -/
+def basisVecS (σ : Λ → Fin (N + 1)) : (Λ → Fin (N + 1)) → ℂ :=
+  fun τ => if τ = σ then 1 else 0
+
+omit [DecidableEq Λ] in
+/-- Explicit `if`-form of `basisVecS σ τ`. -/
+theorem basisVecS_apply (σ τ : Λ → Fin (N + 1)) :
+    basisVecS σ τ = if τ = σ then 1 else 0 := rfl
+
+omit [DecidableEq Λ] in
+/-- Diagonal value: `basisVecS σ σ = 1`. -/
+@[simp]
+theorem basisVecS_self (σ : Λ → Fin (N + 1)) : basisVecS σ σ = 1 := by
+  unfold basisVecS; rw [if_pos rfl]
+
+omit [DecidableEq Λ] in
+/-- Off-diagonal: `basisVecS σ τ = 0` for `τ ≠ σ`. -/
+theorem basisVecS_of_ne {σ τ : Λ → Fin (N + 1)} (hne : τ ≠ σ) :
+    basisVecS σ τ = 0 := by
+  unfold basisVecS; rw [if_neg hne]
+
 end LatticeSystem.Quantum
