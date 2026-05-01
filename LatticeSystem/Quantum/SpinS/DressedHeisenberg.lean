@@ -130,4 +130,14 @@ theorem dressedHeisenbergS_add_J
   rw [Matrix.add_apply]
   ring
 
+/-- Dressed Heisenberg is homogeneous in the coupling. -/
+theorem dressedHeisenbergS_smul_J
+    (A : V → Bool) (c : ℂ) (J : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergS A (fun x y => c * J x y) N σ σ' =
+      c * dressedHeisenbergS A J N σ σ' := by
+  unfold dressedHeisenbergS
+  rw [heisenbergHamiltonianS_smul]
+  rw [Matrix.smul_apply, smul_eq_mul]
+  ring
+
 end LatticeSystem.Quantum
