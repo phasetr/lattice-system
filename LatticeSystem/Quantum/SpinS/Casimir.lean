@@ -1,7 +1,3 @@
-/-
-Copyright (c) 2026 lattice-system contributors. All rights reserved.
-Released under Apache 2.0 license as described in the file LICENSE.
--/
 import LatticeSystem.Quantum.SpinS.Op3Square
 import LatticeSystem.Quantum.SpinS.PlusMinusDiag
 import LatticeSystem.Quantum.SpinS.MinusPlusDiag

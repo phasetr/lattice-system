@@ -1,7 +1,3 @@
-/-
-Copyright (c) 2026 lattice-system contributors. All rights reserved.
-Released under Apache 2.0 license as described in the file LICENSE.
--/
 import Mathlib.Combinatorics.SimpleGraph.Hasse
 import Mathlib.Combinatorics.SimpleGraph.Circulant
 import Mathlib.Combinatorics.SimpleGraph.Bipartite
