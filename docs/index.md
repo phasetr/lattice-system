@@ -259,6 +259,7 @@ Generic spin-`S` operators live on `Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ`, wit
 | `spinSOpPlus` / `spinSOpMinus` | raising/lowering operators with matrix entries `√(k·(N − k + 1))` (resp. `√((N − k)(k + 1))`) on the immediate sub/super-diagonal | `Quantum/SpinS/Operators.lean` |
 | `spinSOp1` / `spinSOp2` | `Ŝ^(1) := (Ŝ^+ + Ŝ^-) / 2`, `Ŝ^(2) := (Ŝ^+ − Ŝ^-) / (2 i)` | `Quantum/SpinS/Operators.lean` |
 | `spinSOp{Plus,Minus}_apply_top` / `_bottom` | `Ŝ^+` annihilates `\|N⟩` (highest weight); `Ŝ^-` annihilates `\|0⟩` (lowest weight) — the ladder boundaries | `Quantum/SpinS/Operators.lean` |
+| `spinSOp3_commutator_spinSOp{Plus,Minus}` | **Cartan relations** `[Ŝ^{(3)}, Ŝ^+] = Ŝ^+` and `[Ŝ^{(3)}, Ŝ^-] = -Ŝ^-`: `Ŝ^±` shift the magnetic quantum number by `±1`. Proved entry-wise via `Matrix.diagonal_mul` / `mul_diagonal` (β-2 of Issue #458) | `Quantum/SpinS/Algebra.lean` |
 
 ### Basis states and raising/lowering (Tasaki §2.1)
 
