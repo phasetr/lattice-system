@@ -22,4 +22,11 @@ example (i : Λ) (N : ℕ) :
     (spinSSiteOp3 (Λ := Λ) i N).IsHermitian :=
   onSiteS_isHermitian i (spinSOp3_isHermitian N)
 
+/-- Operators at distinct sites commute. -/
+example {i j : Λ} (hij : i ≠ j)
+    (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i A * onSiteS j B : ManyBodyOpS Λ N) =
+      onSiteS j B * onSiteS i A :=
+  onSiteS_mul_onSiteS_of_ne hij A B
+
 end LatticeSystem.Tests.SpinSMultiSite
