@@ -160,4 +160,26 @@ theorem basisVecS_mem_magSubspaceS (σ : Λ → Fin (N + 1)) :
       magSubspaceS Λ N (magEigenvalueS σ) :=
   totalSpinSOp3_mulVec_basisVecS σ
 
+/-! ## Constant configurations -/
+
+omit [DecidableEq Λ] in
+/-- `magSumS` of a constant configuration `(fun _ => s)` is `|Λ| · s.val`. -/
+theorem magSumS_const (s : Fin (N + 1)) :
+    magSumS (fun _ : Λ => s) = Fintype.card Λ * s.val := by
+  unfold magSumS
+  rw [Finset.sum_const, Finset.card_univ, smul_eq_mul]
+
+omit [DecidableEq Λ] in
+/-- `magEigenvalueS` of a constant configuration. The maximum value
+`(|Λ| · N : ℂ)/2` is attained at `s = 0`; the minimum value
+`-(|Λ| · N : ℂ)/2` at `s = N` (the natural number index of the lowest
+weight state). -/
+theorem magEigenvalueS_const (s : Fin (N + 1)) :
+    magEigenvalueS (fun _ : Λ => s) =
+      (Fintype.card Λ : ℂ) * ((N : ℂ) / 2 - (s.val : ℂ)) := by
+  unfold magEigenvalueS
+  rw [magSumS_const]
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
