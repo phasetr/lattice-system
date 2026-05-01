@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpinDot
 import LatticeSystem.Quantum.MarshallLiebMattis.ToyHamiltonian
+import LatticeSystem.Quantum.TotalSpin.Casimir
 
 /-!
 # Toy Hamiltonian as a cross-sublattice spin dot product
@@ -122,5 +123,52 @@ theorem heisenbergToyHamiltonian_eq_two_sublatticeSpinDot (A : Λ → Bool) :
   rw [heisenbergToyHamiltonian_eq_sublatticeSpinDot_sum]
   rw [← sublatticeSpinDot_complement_comm]
   rw [two_smul]
+
+/-! ## Casimir identity for the total spin -/
+
+/-- Helper: for commuting operators, `(a + b)(a + b) = a*a + 2•(a*b) + b*b`. -/
+private lemma square_add_of_commute
+    {a b : ManyBodyOp Λ} (h : Commute a b) :
+    (a + b) * (a + b) = a * a + (2 : ℂ) • (a * b) + b * b := by
+  rw [add_mul, mul_add, mul_add, h.eq, two_smul]
+  abel
+
+/-- **Casimir identity** (Tasaki §2.5 (2.5.11)): the total spin
+squared decomposes across the bipartition as
+
+`(Ŝ_tot)² = (Ŝ_A)² + 2 • (Ŝ_A · Ŝ_¬A) + (Ŝ_¬A)²`.
+
+Each axis contributes `(Ŝ_A^α + Ŝ_¬A^α)² = (Ŝ_A^α)² + 2 Ŝ_A^α Ŝ_¬A^α + (Ŝ_¬A^α)²`
+by the cross-sublattice commutativity (PRs α-6g + α-6h); summing
+gives the operator identity. -/
+theorem totalSpinHalfSquared_eq_sublattice_casimir (A : Λ → Bool) :
+    totalSpinHalfSquared Λ =
+      sublatticeSpinHalfSquared A
+      + (2 : ℂ) • sublatticeSpinDot A (fun x => ! A x)
+      + sublatticeSpinHalfSquared (fun x => ! A x) := by
+  unfold totalSpinHalfSquared sublatticeSpinHalfSquared
+  rw [sublatticeSpinDot_def]
+  rw [totalSpinHalfOp1_eq_sublattice_sum A,
+      totalSpinHalfOp2_eq_sublattice_sum A,
+      totalSpinHalfOp3_eq_sublattice_sum A]
+  rw [square_add_of_commute (sublatticeSpinHalfOp1_cross_commute A),
+      square_add_of_commute (sublatticeSpinHalfOp2_cross_commute A),
+      square_add_of_commute (sublatticeSpinHalfOp3_cross_commute A)]
+  rw [smul_add, smul_add]
+  abel
+
+/-- **Tasaki §2.5 (2.5.11) closed form** (without the `1/|Λ|` factor):
+the toy Hamiltonian equals the difference of the total Casimir and
+the two sublattice Casimirs:
+
+`Ĥ_toy = (Ŝ_tot)² − (Ŝ_A)² − (Ŝ_¬A)²`. -/
+theorem heisenbergToyHamiltonian_eq_casimir_diff (A : Λ → Bool) :
+    heisenbergToyHamiltonian A =
+      totalSpinHalfSquared Λ
+        - sublatticeSpinHalfSquared A
+        - sublatticeSpinHalfSquared (fun x => ! A x) := by
+  rw [totalSpinHalfSquared_eq_sublattice_casimir A,
+      heisenbergToyHamiltonian_eq_two_sublatticeSpinDot A]
+  abel
 
 end LatticeSystem.Quantum
