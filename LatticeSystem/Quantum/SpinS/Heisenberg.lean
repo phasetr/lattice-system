@@ -1,4 +1,6 @@
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
+import LatticeSystem.Quantum.SpinS.MultiSiteDotComm
+import LatticeSystem.Quantum.SpinS.TotalSpin
 
 /-!
 # Spin-`S` Heisenberg-type Hamiltonian
@@ -44,5 +46,47 @@ theorem heisenbergHamiltonianS_isHermitian_of_real
   congr 1; funext y
   rw [Matrix.conjTranspose_smul, (spinSDot_isHermitian x y N).eq]
   rw [hreal]
+
+/-! ## SU(2) invariance (Tasaki §2.2 (2.2.13) general S) -/
+
+/-- SU(2) invariance, axis 1: the spin-`S` Heisenberg Hamiltonian
+commutes with `Ŝ_tot^{(1)}`. -/
+theorem heisenbergHamiltonianS_commutator_totalSpinSOp1
+    (J : Λ → Λ → ℂ) (N : ℕ) :
+    heisenbergHamiltonianS J N * totalSpinSOp1 Λ N -
+        totalSpinSOp1 Λ N * heisenbergHamiltonianS J N = 0 := by
+  unfold heisenbergHamiltonianS
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun x _ => ?_
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun y _ => ?_
+  rw [Matrix.smul_mul, Matrix.mul_smul, ← smul_sub]
+  rw [spinSDot_commutator_totalSpinSOp1, smul_zero]
+
+/-- SU(2) invariance, axis 2: `[Ĥ_J, Ŝ_tot^{(2)}] = 0`. -/
+theorem heisenbergHamiltonianS_commutator_totalSpinSOp2
+    (J : Λ → Λ → ℂ) (N : ℕ) :
+    heisenbergHamiltonianS J N * totalSpinSOp2 Λ N -
+        totalSpinSOp2 Λ N * heisenbergHamiltonianS J N = 0 := by
+  unfold heisenbergHamiltonianS
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun x _ => ?_
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun y _ => ?_
+  rw [Matrix.smul_mul, Matrix.mul_smul, ← smul_sub]
+  rw [spinSDot_commutator_totalSpinSOp2, smul_zero]
+
+/-- SU(2) invariance, axis 3: `[Ĥ_J, Ŝ_tot^{(3)}] = 0`. -/
+theorem heisenbergHamiltonianS_commutator_totalSpinSOp3
+    (J : Λ → Λ → ℂ) (N : ℕ) :
+    heisenbergHamiltonianS J N * totalSpinSOp3 Λ N -
+        totalSpinSOp3 Λ N * heisenbergHamiltonianS J N = 0 := by
+  unfold heisenbergHamiltonianS
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun x _ => ?_
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_eq_zero fun y _ => ?_
+  rw [Matrix.smul_mul, Matrix.mul_smul, ← smul_sub]
+  rw [spinSDot_commutator_totalSpinSOp3, smul_zero]
 
 end LatticeSystem.Quantum
