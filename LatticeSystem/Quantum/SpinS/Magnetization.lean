@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MultiSite
+import LatticeSystem.Quantum.SpinS.TotalSpin
 
 /-!
 # Spin-`S` magnetization function on configurations
@@ -44,5 +45,44 @@ theorem magSumS_le (σ : Λ → Fin (N + 1)) :
         omega
     _ = Fintype.card Λ * N := by
         rw [Finset.sum_const, Finset.card_univ, smul_eq_mul]
+
+/-! ## Magnetization subspace -/
+
+/-- The magnetization-`M` subspace of the multi-site spin-`S` Hilbert
+space: the `Ŝ_tot^{(3)}`-eigenspace for eigenvalue `M`, packaged as a
+`Submodule ℂ`. -/
+noncomputable def magSubspaceS (Λ : Type*) [Fintype Λ] [DecidableEq Λ]
+    (N : ℕ) (M : ℂ) :
+    Submodule ℂ ((Λ → Fin (N + 1)) → ℂ) where
+  carrier := { v | (totalSpinSOp3 Λ N).mulVec v = M • v }
+  zero_mem' := by
+    simp only [Set.mem_setOf_eq, Matrix.mulVec_zero, smul_zero]
+  add_mem' := by
+    intros v w hv hw
+    simp only [Set.mem_setOf_eq] at hv hw ⊢
+    rw [Matrix.mulVec_add, hv, hw, smul_add]
+  smul_mem' := by
+    intros c v hv
+    simp only [Set.mem_setOf_eq] at hv ⊢
+    rw [Matrix.mulVec_smul, hv, smul_comm]
+
+/-- A vector lies in `magSubspaceS Λ N M` iff it is a `Ŝ_tot^{(3)}`
+eigenvector with eigenvalue `M`. -/
+@[simp]
+theorem mem_magSubspaceS_iff (M : ℂ) (v : (Λ → Fin (N + 1)) → ℂ) :
+    v ∈ magSubspaceS Λ N M ↔ (totalSpinSOp3 Λ N).mulVec v = M • v :=
+  Iff.rfl
+
+/-- Distinct magnetization eigenvalues give disjoint subspaces. -/
+theorem magSubspaceS_disjoint {M M' : ℂ} (hMM' : M ≠ M') :
+    Disjoint (magSubspaceS Λ N M) (magSubspaceS Λ N M') := by
+  rw [Submodule.disjoint_def]
+  intros v hM hM'
+  rw [mem_magSubspaceS_iff] at hM hM'
+  have heq : M • v = M' • v := hM.symm.trans hM'
+  have hsub : (M - M') • v = 0 := by
+    rw [sub_smul, heq, sub_self]
+  have hne : M - M' ≠ 0 := sub_ne_zero.mpr hMM'
+  exact (smul_eq_zero.mp hsub).resolve_left hne
 
 end LatticeSystem.Quantum
