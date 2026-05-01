@@ -274,6 +274,7 @@ Generic spin-`S` operators live on `Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ`, wit
 | `spinSOp1_sq_add_spinSOp2_sq` / `spinSOp_total_squared` | **Casimir identity** for general spin-`S`: `(Ŝ^{(1)})² + (Ŝ^{(2)})² + (Ŝ^{(3)})² = (N(N+2)/4) · 1`, equivalent to `S(S+1) · 1` for `S = N/2`. Proves the irreducible spin-`S` representation has Casimir eigenvalue `S(S+1)` (Schur's lemma). The intermediate identity `(Ŝ^{(1)})² + (Ŝ^{(2)})² = (1/2)(Ŝ^+ · Ŝ^- + Ŝ^- · Ŝ^+)` is proved using `module` (β-14 of Issue #458) | `Quantum/SpinS/Casimir.lean` |
 | `spinSOp3_mulVec_basis` | spin-`S` eigenstate equation `Ŝ^{(3)} · \|k⟩ = (N/2 − k) · \|k⟩`, where `\|k⟩ := Pi.single k 1` is the `k`-th unit basis vector of `(Fin (N + 1) → ℂ)` (β-15 of Issue #458) | `Quantum/SpinS/Eigenstates.lean` |
 | `spinSOpPlus_mulVec_basis` / `spinSOpMinus_mulVec_basis` | **Ladder action on basis vectors**: `Ŝ^+ · \|k⟩ = √(k(N − k + 1)) · \|k − 1⟩` for `k ≥ 1`, and `Ŝ^- · \|k⟩ = √((N − k)(k + 1)) · \|k + 1⟩` for `k ≤ N − 1`. The standard SU(2) ladder relations on the magnetic-quantum-number basis (β-16 of Issue #458) | `Quantum/SpinS/LadderStates.lean` |
+| `spinSOp_total_squared_mulVec_basis` | **Casimir eigenvalue on basis**: `(Ŝ)² · \|k⟩ = (N(N+2)/4) · \|k⟩`. Direct consequence of `(Ŝ)² = (N(N+2)/4) · 1` (β-14) — every basis vector has the universal Casimir eigenvalue, reflecting that the spin-`S` representation is a single irreducible (Schur) (β-17 of Issue #458) | `Quantum/SpinS/CasimirEigenvalue.lean` |
 
 ### Basis states and raising/lowering (Tasaki §2.1)
 
