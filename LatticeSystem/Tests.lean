@@ -34,6 +34,7 @@ import LatticeSystem.Tests.SpinSCyclicCommutator
 import LatticeSystem.Tests.SpinSCyclicCommutator23
 import LatticeSystem.Tests.SpinSCyclicCommutator31
 import LatticeSystem.Tests.SpinSDiagProjOrtho
+import LatticeSystem.Tests.SpinSAevalDiagonal
 import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Pauli
 import LatticeSystem.Tests.Z2Z2
