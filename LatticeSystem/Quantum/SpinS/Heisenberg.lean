@@ -187,6 +187,27 @@ theorem heisenbergHamiltonianPeriodicChainS_isHermitian
   heisenbergHamiltonianOnGraphS_isHermitian _
     (by simp : star (-(J : ℂ)) = -(J : ℂ)) N
 
+/-- The Heisenberg-on-graph Hamiltonian commutes with `Ŝ_tot^{(α)}`
+for every axis (specialised SU(2) invariance for graph-derived
+couplings). -/
+theorem heisenbergHamiltonianOnGraphS_commute_totalSpinSOp1
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (N : ℕ) :
+    heisenbergHamiltonianOnGraphS G J N * totalSpinSOp1 Λ N -
+        totalSpinSOp1 Λ N * heisenbergHamiltonianOnGraphS G J N = 0 :=
+  heisenbergHamiltonianS_commutator_totalSpinSOp1 _ N
+
+theorem heisenbergHamiltonianOnGraphS_commute_totalSpinSOp2
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (N : ℕ) :
+    heisenbergHamiltonianOnGraphS G J N * totalSpinSOp2 Λ N -
+        totalSpinSOp2 Λ N * heisenbergHamiltonianOnGraphS G J N = 0 :=
+  heisenbergHamiltonianS_commutator_totalSpinSOp2 _ N
+
+theorem heisenbergHamiltonianOnGraphS_commute_totalSpinSOp3
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (N : ℕ) :
+    heisenbergHamiltonianOnGraphS G J N * totalSpinSOp3 Λ N -
+        totalSpinSOp3 Λ N * heisenbergHamiltonianOnGraphS G J N = 0 :=
+  heisenbergHamiltonianS_commutator_totalSpinSOp3 _ N
+
 /-- The Heisenberg Hamiltonian preserves `(Ŝ_tot)²` eigenvalues:
 if `(Ŝ_tot)² · v = S · v`, then `(Ŝ_tot)² · (Ĥ · v) = S · (Ĥ · v)`.
 Operator-level simultaneous diagonalisation. -/
