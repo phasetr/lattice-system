@@ -73,4 +73,11 @@ example {N : ℕ} (A : V → Bool) (J : V → V → ℂ)
       -(dressedHeisenbergS A J N σ σ') :=
   dressedHeisenbergS_neg_J A J N σ σ'
 
+/-- Dressed Heisenberg subtraction in J. -/
+example {N : ℕ} (A : V → Bool) (J J' : V → V → ℂ)
+    (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergS A (fun x y => J x y - J' x y) N σ σ' =
+      dressedHeisenbergS A J N σ σ' - dressedHeisenbergS A J' N σ σ' :=
+  dressedHeisenbergS_sub_J A J J' N σ σ'
+
 end LatticeSystem.Tests.SpinSDressedHeisenberg
