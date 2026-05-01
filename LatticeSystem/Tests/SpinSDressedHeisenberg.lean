@@ -59,4 +59,11 @@ example {N : ℕ} (A : V → Bool) (J J' : V → V → ℂ) (σ σ' : V → Fin 
       dressedHeisenbergS A J N σ σ' + dressedHeisenbergS A J' N σ σ' :=
   dressedHeisenbergS_add_J A J J' N σ σ'
 
+/-- Dressed Heisenberg homogeneity in J. -/
+example {N : ℕ} (A : V → Bool) (c : ℂ) (J : V → V → ℂ)
+    (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergS A (fun x y => c * J x y) N σ σ' =
+      c * dressedHeisenbergS A J N σ σ' :=
+  dressedHeisenbergS_smul_J A c J N σ σ'
+
 end LatticeSystem.Tests.SpinSDressedHeisenberg
