@@ -102,4 +102,14 @@ theorem dressedHeisenbergS_diag_im_zero
   have := Complex.conj_eq_iff_im.mp hstar
   exact this
 
+/-- Diagonal `dressedHeisenbergS` equals its real-part embedding: a
+useful form for converting to a real-valued matrix. -/
+theorem dressedHeisenbergS_diag_eq_ofReal
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hreal : ∀ x y, star (J x y) = J x y)
+    (σ : V → Fin (N + 1)) :
+    dressedHeisenbergS A J N σ σ =
+      ((dressedHeisenbergS A J N σ σ).re : ℂ) := by
+  apply Complex.ext <;> simp [dressedHeisenbergS_diag_im_zero A N hreal σ]
+
 end LatticeSystem.Quantum
