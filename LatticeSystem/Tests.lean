@@ -30,6 +30,7 @@ import LatticeSystem.Tests.SpinSLadderStates
 import LatticeSystem.Tests.SpinSCasimirEigenvalue
 import LatticeSystem.Tests.SpinSCasimirInvariance
 import LatticeSystem.Tests.SpinSCartan3
+import LatticeSystem.Tests.SpinSCyclicCommutator
 import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Pauli
 import LatticeSystem.Tests.Z2Z2
