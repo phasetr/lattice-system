@@ -41,6 +41,7 @@ import LatticeSystem.Tests.SpinSAllUnitsAdjoin
 import LatticeSystem.Tests.SpinSSpanningTheorem
 import LatticeSystem.Tests.SpinSMultiSite
 import LatticeSystem.Tests.SpinSMultiSiteDot
+import LatticeSystem.Tests.SpinSHeisenberg
 import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Pauli
 import LatticeSystem.Tests.Z2Z2
