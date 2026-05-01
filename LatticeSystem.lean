@@ -50,6 +50,7 @@ import LatticeSystem.Quantum.MarshallLiebMattis.SpinDotSwapEntry
 import LatticeSystem.Quantum.MarshallLiebMattis.HeisenbergSwapEntry
 import LatticeSystem.Quantum.MarshallLiebMattis.SpinDotOffBond
 import LatticeSystem.Quantum.MarshallLiebMattis.HeisenbergSwapValue
+import LatticeSystem.Quantum.MarshallLiebMattis.DressedSwapValue
 import LatticeSystem.Quantum.Z2Z2
 import LatticeSystem.Quantum.IsingChain
 import LatticeSystem.Fermion.Mode
