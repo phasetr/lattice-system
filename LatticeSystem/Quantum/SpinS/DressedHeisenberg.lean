@@ -46,4 +46,15 @@ theorem dressedHeisenbergS_diag (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
   unfold dressedHeisenbergS
   rw [marshallSignS_sq, one_mul]
 
+/-- Dressed Heisenberg with the trivial (false) sublattice indicator
+reduces to the plain Heisenberg matrix element: no Marshall-sign
+factors fire. -/
+theorem dressedHeisenbergS_A_false (J : V → V → ℂ) (N : ℕ)
+    (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergS (fun _ : V => false) J N σ σ' =
+      (heisenbergHamiltonianS J N) σ σ' := by
+  unfold dressedHeisenbergS
+  rw [marshallSignS_eq_one_of_A_false, marshallSignS_eq_one_of_A_false,
+      one_mul, one_mul]
+
 end LatticeSystem.Quantum
