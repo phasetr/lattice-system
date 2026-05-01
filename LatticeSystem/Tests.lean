@@ -40,6 +40,7 @@ import LatticeSystem.Tests.SpinSPMAsOneTwo
 import LatticeSystem.Tests.SpinSProjMemAdjoin
 import LatticeSystem.Tests.SpinSPMMemAdjoin
 import LatticeSystem.Tests.SpinSNeighborUnitAdjoin
+import LatticeSystem.Tests.SpinSOffsetUnitAdjoin
 import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Pauli
 import LatticeSystem.Tests.Z2Z2
