@@ -224,4 +224,17 @@ theorem dressedHeisenbergSMatrix_periodicChain_isHermitian
   dressedHeisenbergSMatrix_couplingOf_isHermitian A _
     (by simp : star (-(J : ℂ)) = -(J : ℂ)) N
 
+/-- The real-part of the dressed Heisenberg matrix as a real-valued
+matrix on the multi-site Hilbert space. -/
+noncomputable def dressedHeisenbergSReMatrix
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) :
+    Matrix (V → Fin (N + 1)) (V → Fin (N + 1)) ℝ :=
+  fun σ σ' => (dressedHeisenbergS A J N σ σ').re
+
+/-- Component-wise unfolding. -/
+theorem dressedHeisenbergSReMatrix_apply
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergSReMatrix A J N σ σ' =
+      (dressedHeisenbergS A J N σ σ').re := rfl
+
 end LatticeSystem.Quantum
