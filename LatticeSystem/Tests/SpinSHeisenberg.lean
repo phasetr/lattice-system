@@ -62,4 +62,9 @@ example (M : ℕ) (J : ℝ) (N : ℕ) :
     (heisenbergHamiltonianChainS M J N).IsHermitian :=
   heisenbergHamiltonianChainS_isHermitian M J N
 
+/-- Spin-S periodic chain Heisenberg Hermitian. -/
+example (M : ℕ) (J : ℝ) (N : ℕ) :
+    (heisenbergHamiltonianPeriodicChainS M J N).IsHermitian :=
+  heisenbergHamiltonianPeriodicChainS_isHermitian M J N
+
 end LatticeSystem.Tests.SpinSHeisenberg

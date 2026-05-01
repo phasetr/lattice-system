@@ -173,6 +173,20 @@ theorem heisenbergHamiltonianChainS_isHermitian (M : ℕ) (J : ℝ) (N : ℕ) :
   heisenbergHamiltonianOnGraphS_isHermitian _
     (by simp : star (-(J : ℂ)) = -(J : ℂ)) N
 
+/-- Spin-`S` Heisenberg Hamiltonian on the periodic chain `cycleGraph (M + 2)`. -/
+noncomputable def heisenbergHamiltonianPeriodicChainS
+    (M : ℕ) (J : ℝ) (N : ℕ) :
+    ManyBodyOpS (Fin (M + 2)) N :=
+  heisenbergHamiltonianOnGraphS (SimpleGraph.cycleGraph (M + 2))
+    (-(J : ℂ)) N
+
+/-- Hermiticity of the periodic chain spin-`S` Heisenberg Hamiltonian. -/
+theorem heisenbergHamiltonianPeriodicChainS_isHermitian
+    (M : ℕ) (J : ℝ) (N : ℕ) :
+    (heisenbergHamiltonianPeriodicChainS M J N).IsHermitian :=
+  heisenbergHamiltonianOnGraphS_isHermitian _
+    (by simp : star (-(J : ℂ)) = -(J : ℂ)) N
+
 /-- The Heisenberg Hamiltonian preserves `(Ŝ_tot)²` eigenvalues:
 if `(Ŝ_tot)² · v = S · v`, then `(Ŝ_tot)² · (Ĥ · v) = S · (Ĥ · v)`.
 Operator-level simultaneous diagonalisation. -/
