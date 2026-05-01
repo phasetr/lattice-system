@@ -37,6 +37,18 @@ theorem marshallSignS_const_zero (A : V → Bool) :
   · simp [hAx]
   · simp [hAx]
 
+/-- The Marshall sign is non-zero. Each factor is either `(-1)^k = ±1`
+or `1`, never zero, so the product is non-zero. -/
+theorem marshallSignS_ne_zero (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ ≠ 0 := by
+  unfold marshallSignS
+  apply Finset.prod_ne_zero_iff.mpr
+  intro x _
+  by_cases hAx : A x
+  · simp only [hAx, if_true]
+    exact pow_ne_zero _ (by norm_num : (-1 : ℂ) ≠ 0)
+  · simp [hAx]
+
 /-! ## Marshall-dressed basis -/
 
 /-- The Marshall-dressed basis vector at `σ`:
