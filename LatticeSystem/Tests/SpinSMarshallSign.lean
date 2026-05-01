@@ -33,4 +33,10 @@ example {N : ℕ} [DecidableEq V] (A : V → Bool)
     marshallDressedBasisS A σ τ = 0 :=
   marshallDressedBasisS_of_ne A hne
 
+/-- All-`0` config dressed basis equals plain basis. -/
+example {N : ℕ} [DecidableEq V] (A : V → Bool) :
+    marshallDressedBasisS A (fun _ : V => (0 : Fin (N + 1))) =
+      basisVecS (fun _ : V => (0 : Fin (N + 1))) :=
+  marshallDressedBasisS_const_zero A
+
 end LatticeSystem.Tests.SpinSMarshallSign

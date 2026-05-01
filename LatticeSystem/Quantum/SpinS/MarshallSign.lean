@@ -80,4 +80,14 @@ theorem marshallDressedBasisS_of_ne [DecidableEq V]
     marshallDressedBasisS A σ τ = 0 := by
   rw [marshallDressedBasisS_apply, if_neg hne]
 
+/-- All-`s = 0` Marshall-dressed basis vector equals the standard
+basis vector at the all-zero config (since the Marshall sign is
+`+1` there). -/
+theorem marshallDressedBasisS_const_zero [DecidableEq V]
+    (A : V → Bool) :
+    marshallDressedBasisS A (fun _ : V => (0 : Fin (N + 1))) =
+      basisVecS (fun _ : V => (0 : Fin (N + 1))) := by
+  unfold marshallDressedBasisS
+  rw [marshallSignS_const_zero, one_smul]
+
 end LatticeSystem.Quantum
