@@ -75,4 +75,19 @@ example (A : Fin 2 → Bool) :
       Complex.I • sublatticeSpinHalfOp2 A :=
   sublatticeSpinHalfOp3_commutator_sublatticeSpinHalfOp1 A
 
+/-- Sublattice Casimir self-invariance: `Commute (Ŝ_A)² (Ŝ_A^(1))`. -/
+example (A : Fin 2 → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (sublatticeSpinHalfOp1 A) :=
+  sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp1 A
+
+/-- Sublattice Casimir self-invariance: `Commute (Ŝ_A)² (Ŝ_A^(2))`. -/
+example (A : Fin 2 → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (sublatticeSpinHalfOp2 A) :=
+  sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp2 A
+
+/-- Sublattice Casimir self-invariance: `Commute (Ŝ_A)² (Ŝ_A^(3))`. -/
+example (A : Fin 2 → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (sublatticeSpinHalfOp3 A) :=
+  sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp3 A
+
 end LatticeSystem.Tests.MarshallLiebMattisSublatticeSpin

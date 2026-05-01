@@ -418,6 +418,112 @@ theorem sublatticeSpinHalfOp3_commutator_sublatticeSpinHalfOp1 (A : Λ → Bool)
   unfold sublatticeSpinHalfOp1 sublatticeSpinHalfOp2 sublatticeSpinHalfOp3
   exact sublatticeSpin_commutator_general A spinHalfOp3_commutator_spinHalfOp1
 
+/-! ## Sublattice Casimir self-invariance `[(Ŝ_A)², Ŝ_A^(α)] = 0` -/
+
+/-- Internal Leibniz: `[X·X, C] = X·[X,C] + [X,C]·X`. Pure ring identity,
+the sublattice analog of `square_commutator_totalSpin`. -/
+private lemma square_commutator_sublattice (X C : ManyBodyOp Λ) :
+    X * X * C - C * (X * X) = X * (X * C - C * X) + (X * C - C * X) * X := by
+  rw [mul_sub, sub_mul]
+  have h1 : X * (C * X) = X * C * X := (mul_assoc X C X).symm
+  have h2 : X * X * C = X * (X * C) := mul_assoc X X C
+  have h3 : C * (X * X) = C * X * X := (mul_assoc C X X).symm
+  rw [h1, h2, h3]; abel
+
+/-- Sublattice Casimir invariance: `[(Ŝ_A)², Ŝ_A^(1)] = 0`. -/
+theorem sublatticeSpinHalfSquared_commutator_sublatticeSpinHalfOp1 (A : Λ → Bool) :
+    sublatticeSpinHalfSquared A * sublatticeSpinHalfOp1 A
+        - sublatticeSpinHalfOp1 A * sublatticeSpinHalfSquared A = 0 := by
+  unfold sublatticeSpinHalfSquared
+  set P := sublatticeSpinHalfOp1 A
+  set Q := sublatticeSpinHalfOp2 A
+  set R := sublatticeSpinHalfOp3 A
+  have hPQ : P * Q - Q * P = Complex.I • R :=
+    sublatticeSpinHalfOp1_commutator_sublatticeSpinHalfOp2 A
+  have hRP : R * P - P * R = Complex.I • Q :=
+    sublatticeSpinHalfOp3_commutator_sublatticeSpinHalfOp1 A
+  rw [add_mul, add_mul, mul_add, mul_add]
+  rw [show P * P * P + Q * Q * P + R * R * P - (P * (P * P) + P * (Q * Q) + P * (R * R))
+        = (P * P * P - P * (P * P)) + (Q * Q * P - P * (Q * Q))
+          + (R * R * P - P * (R * R)) from by abel]
+  rw [square_commutator_sublattice P P, square_commutator_sublattice Q P,
+    square_commutator_sublattice R P]
+  have hPP : P * P - P * P = (0 : ManyBodyOp Λ) := sub_self _
+  have hQP : Q * P - P * Q = -(Complex.I • R) := by
+    rw [show Q * P - P * Q = -(P * Q - Q * P) from by abel, hPQ]
+  rw [hPP, hQP, hRP]
+  rw [mul_zero, zero_mul, add_zero]
+  rw [mul_neg, neg_mul, mul_smul_comm, smul_mul_assoc, mul_smul_comm, smul_mul_assoc]
+  rw [zero_add]
+  abel
+
+/-- Sublattice Casimir invariance: `[(Ŝ_A)², Ŝ_A^(2)] = 0`. -/
+theorem sublatticeSpinHalfSquared_commutator_sublatticeSpinHalfOp2 (A : Λ → Bool) :
+    sublatticeSpinHalfSquared A * sublatticeSpinHalfOp2 A
+        - sublatticeSpinHalfOp2 A * sublatticeSpinHalfSquared A = 0 := by
+  unfold sublatticeSpinHalfSquared
+  set P := sublatticeSpinHalfOp1 A
+  set Q := sublatticeSpinHalfOp2 A
+  set R := sublatticeSpinHalfOp3 A
+  have hPQ : P * Q - Q * P = Complex.I • R :=
+    sublatticeSpinHalfOp1_commutator_sublatticeSpinHalfOp2 A
+  have hQR : Q * R - R * Q = Complex.I • P :=
+    sublatticeSpinHalfOp2_commutator_sublatticeSpinHalfOp3 A
+  rw [add_mul, add_mul, mul_add, mul_add]
+  rw [show P * P * Q + Q * Q * Q + R * R * Q - (Q * (P * P) + Q * (Q * Q) + Q * (R * R))
+        = (P * P * Q - Q * (P * P)) + (Q * Q * Q - Q * (Q * Q))
+          + (R * R * Q - Q * (R * R)) from by abel]
+  rw [square_commutator_sublattice P Q, square_commutator_sublattice Q Q,
+    square_commutator_sublattice R Q]
+  have hQQ : Q * Q - Q * Q = (0 : ManyBodyOp Λ) := sub_self _
+  have hRQ : R * Q - Q * R = -(Complex.I • P) := by
+    rw [show R * Q - Q * R = -(Q * R - R * Q) from by abel, hQR]
+  rw [hPQ, hQQ, hRQ]
+  rw [mul_zero, zero_mul, add_zero]
+  rw [mul_neg, neg_mul, mul_smul_comm, smul_mul_assoc, mul_smul_comm, smul_mul_assoc]
+  abel
+
+/-- Sublattice Casimir invariance: `[(Ŝ_A)², Ŝ_A^(3)] = 0`. -/
+theorem sublatticeSpinHalfSquared_commutator_sublatticeSpinHalfOp3 (A : Λ → Bool) :
+    sublatticeSpinHalfSquared A * sublatticeSpinHalfOp3 A
+        - sublatticeSpinHalfOp3 A * sublatticeSpinHalfSquared A = 0 := by
+  unfold sublatticeSpinHalfSquared
+  set P := sublatticeSpinHalfOp1 A
+  set Q := sublatticeSpinHalfOp2 A
+  set R := sublatticeSpinHalfOp3 A
+  have hRP : R * P - P * R = Complex.I • Q :=
+    sublatticeSpinHalfOp3_commutator_sublatticeSpinHalfOp1 A
+  have hQR : Q * R - R * Q = Complex.I • P :=
+    sublatticeSpinHalfOp2_commutator_sublatticeSpinHalfOp3 A
+  rw [add_mul, add_mul, mul_add, mul_add]
+  rw [show P * P * R + Q * Q * R + R * R * R - (R * (P * P) + R * (Q * Q) + R * (R * R))
+        = (P * P * R - R * (P * P)) + (Q * Q * R - R * (Q * Q))
+          + (R * R * R - R * (R * R)) from by abel]
+  rw [square_commutator_sublattice P R, square_commutator_sublattice Q R,
+    square_commutator_sublattice R R]
+  have hPR : P * R - R * P = -(Complex.I • Q) := by
+    rw [show P * R - R * P = -(R * P - P * R) from by abel, hRP]
+  have hRR : R * R - R * R = (0 : ManyBodyOp Λ) := sub_self _
+  rw [hPR, hQR, hRR]
+  rw [mul_zero, zero_mul, add_zero]
+  rw [mul_neg, neg_mul, mul_smul_comm, smul_mul_assoc, mul_smul_comm, smul_mul_assoc]
+  abel
+
+/-- `Commute (Ŝ_A)² (Ŝ_A^(1))`. -/
+theorem sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp1 (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (sublatticeSpinHalfOp1 A) :=
+  sub_eq_zero.mp (sublatticeSpinHalfSquared_commutator_sublatticeSpinHalfOp1 A)
+
+/-- `Commute (Ŝ_A)² (Ŝ_A^(2))`. -/
+theorem sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp2 (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (sublatticeSpinHalfOp2 A) :=
+  sub_eq_zero.mp (sublatticeSpinHalfSquared_commutator_sublatticeSpinHalfOp2 A)
+
+/-- `Commute (Ŝ_A)² (Ŝ_A^(3))`. -/
+theorem sublatticeSpinHalfSquared_commute_sublatticeSpinHalfOp3 (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfSquared A) (sublatticeSpinHalfOp3 A) :=
+  sub_eq_zero.mp (sublatticeSpinHalfSquared_commutator_sublatticeSpinHalfOp3 A)
+
 /-! ## Inter-Casimir cross-sublattice commutativity -/
 
 /-- The two sublattice Casimirs commute:
