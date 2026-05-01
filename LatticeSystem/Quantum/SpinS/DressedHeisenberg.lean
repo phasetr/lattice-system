@@ -120,4 +120,14 @@ theorem dressedHeisenbergS_zero_J
   unfold dressedHeisenbergS heisenbergHamiltonianS
   simp
 
+/-- Dressed Heisenberg is additive in the coupling. -/
+theorem dressedHeisenbergS_add_J
+    (A : V → Bool) (J J' : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergS A (fun x y => J x y + J' x y) N σ σ' =
+      dressedHeisenbergS A J N σ σ' + dressedHeisenbergS A J' N σ σ' := by
+  unfold dressedHeisenbergS
+  rw [heisenbergHamiltonianS_add]
+  rw [Matrix.add_apply]
+  ring
+
 end LatticeSystem.Quantum
