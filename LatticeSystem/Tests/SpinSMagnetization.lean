@@ -26,4 +26,16 @@ example {N : ℕ} {M M' : ℂ} (hMM' : M ≠ M') :
     Disjoint (magSubspaceS Λ N M) (magSubspaceS Λ N M') :=
   magSubspaceS_disjoint hMM'
 
+/-- `Ŝ_tot^(3) · |σ⟩ = magEigenvalueS σ • |σ⟩`. -/
+example {N : ℕ} (σ : Λ → Fin (N + 1)) :
+    (totalSpinSOp3 Λ N).mulVec (basisVecS σ) =
+      magEigenvalueS σ • basisVecS σ :=
+  totalSpinSOp3_mulVec_basisVecS σ
+
+/-- Each basis state lies in its own magnetization subspace. -/
+example {N : ℕ} (σ : Λ → Fin (N + 1)) :
+    (basisVecS σ : (Λ → Fin (N + 1)) → ℂ) ∈
+      magSubspaceS Λ N (magEigenvalueS σ) :=
+  basisVecS_mem_magSubspaceS σ
+
 end LatticeSystem.Tests.SpinSMagnetization
