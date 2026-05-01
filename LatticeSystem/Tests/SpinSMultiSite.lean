@@ -29,4 +29,20 @@ example {i j : Λ} (hij : i ≠ j)
       onSiteS j B * onSiteS i A :=
   onSiteS_mul_onSiteS_of_ne hij A B
 
+/-- Same-site product reduces to a single embedding. -/
+example (i : Λ) (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i A * onSiteS i B : ManyBodyOpS Λ N) = onSiteS i (A * B) :=
+  onSiteS_mul_onSiteS_same i A B
+
+/-- `onSiteS i 1 = 1`. -/
+example (i : Λ) (N : ℕ) :
+    (onSiteS i (1 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+        ManyBodyOpS Λ N) = 1 :=
+  onSiteS_one i
+
+/-- `onSiteS` is `ℂ`-linear: scalar pull-out. -/
+example (i : Λ) (c : ℂ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i (c • A) : ManyBodyOpS Λ N) = c • onSiteS i A :=
+  onSiteS_smul i c A
+
 end LatticeSystem.Tests.SpinSMultiSite

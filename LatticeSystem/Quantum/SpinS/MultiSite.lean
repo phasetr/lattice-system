@@ -181,6 +181,160 @@ theorem onSiteS_mul_onSiteS_of_ne {i j : Λ} (hij : i ≠ j)
   · exact absurd (hcond.mpr h2) h1
   · rfl
 
+/-! ## Linearity of the site embedding -/
+
+/-- `onSiteS` is additive in the operator argument. -/
+theorem onSiteS_add (i : Λ) (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i (A + B) : ManyBodyOpS Λ N) = onSiteS i A + onSiteS i B := by
+  ext σ' σ
+  simp only [onSiteS_apply, Matrix.add_apply]
+  by_cases h : ∀ k, k ≠ i → σ' k = σ k
+  · simp [if_pos h]
+  · simp [if_neg h]
+
+/-- `onSiteS` takes subtraction of operators to subtraction of embeddings. -/
+theorem onSiteS_sub (i : Λ) (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i (A - B) : ManyBodyOpS Λ N) = onSiteS i A - onSiteS i B := by
+  ext σ' σ
+  simp only [onSiteS_apply, Matrix.sub_apply]
+  by_cases h : ∀ k, k ≠ i → σ' k = σ k
+  · simp [if_pos h]
+  · simp [if_neg h]
+
+/-- `onSiteS i 0 = 0`. -/
+theorem onSiteS_zero (i : Λ) :
+    (onSiteS i (0 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+        ManyBodyOpS Λ N) = 0 := by
+  ext σ' σ
+  simp only [onSiteS_apply, Matrix.zero_apply]
+  split_ifs <;> rfl
+
+/-- `onSiteS i 1 = 1`: the site embedding of the `(N+1) × (N+1)`
+identity is the many-body identity. -/
+theorem onSiteS_one (i : Λ) :
+    (onSiteS i (1 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+        ManyBodyOpS Λ N) = 1 := by
+  ext σ' σ
+  simp only [onSiteS_apply, Matrix.one_apply]
+  by_cases heq : σ' = σ
+  · subst heq
+    simp
+  · have : ¬ (∀ k, k ≠ i → σ' k = σ k) ∨ σ' i ≠ σ i := by
+      by_contra hall
+      push Not at hall
+      obtain ⟨hoff, hi⟩ := hall
+      apply heq
+      funext k
+      by_cases hki : k = i
+      · subst hki; exact hi
+      · exact hoff k hki
+    rcases this with h | h
+    · rw [if_neg h, if_neg heq]
+    · by_cases hagree : ∀ k, k ≠ i → σ' k = σ k
+      · rw [if_pos hagree, if_neg h, if_neg heq]
+      · rw [if_neg hagree, if_neg heq]
+
+/-- `onSiteS` commutes with scalar multiplication. -/
+theorem onSiteS_smul (i : Λ) (c : ℂ)
+    (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i (c • A) : ManyBodyOpS Λ N) = c • onSiteS i A := by
+  ext σ' σ
+  simp only [onSiteS_apply, Matrix.smul_apply]
+  by_cases h : ∀ k, k ≠ i → σ' k = σ k
+  · simp [if_pos h]
+  · simp [if_neg h]
+
+/-! ## Same-site multiplication -/
+
+private def fiberUpdateS {N : ℕ} (σ : Λ → Fin (N + 1)) (i : Λ)
+    (t : Fin (N + 1)) : Λ → Fin (N + 1) :=
+  Function.update σ i t
+
+omit [Fintype Λ] in
+private lemma fiberUpdateS_at (σ : Λ → Fin (N + 1)) (i : Λ)
+    (t : Fin (N + 1)) :
+    fiberUpdateS σ i t i = t := by
+  rw [fiberUpdateS, Function.update_self]
+
+omit [Fintype Λ] in
+private lemma fiberUpdateS_off {σ : Λ → Fin (N + 1)} {i k : Λ}
+    (hk : k ≠ i) (t : Fin (N + 1)) :
+    fiberUpdateS σ i t k = σ k := by
+  rw [fiberUpdateS, Function.update_of_ne hk]
+
+/-- Same-site product reduces to the site embedding of the
+`(N+1) × (N+1)` matrix product. -/
+theorem onSiteS_mul_onSiteS_same (i : Λ)
+    (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i A * onSiteS i B : ManyBodyOpS Λ N) = onSiteS i (A * B) := by
+  ext σ' σ
+  rw [Matrix.mul_apply]
+  simp only [onSiteS_apply]
+  by_cases h : ∀ k, k ≠ i → σ' k = σ k
+  · rw [if_pos h, Matrix.mul_apply]
+    have hterm : ∀ τ : Λ → Fin (N + 1),
+        (if ∀ k, k ≠ i → σ' k = τ k then A (σ' i) (τ i) else 0) *
+            (if ∀ k, k ≠ i → τ k = σ k then B (τ i) (σ i) else 0) =
+          if τ = fiberUpdateS σ i (τ i) then
+            A (σ' i) (τ i) * B (τ i) (σ i)
+          else 0 := by
+      intro τ
+      by_cases hτ : τ = fiberUpdateS σ i (τ i)
+      · have hoff_σ : ∀ k, k ≠ i → τ k = σ k := by
+          intro k hk
+          have hstep : τ k = fiberUpdateS σ i (τ i) k := congrFun hτ k
+          rw [hstep, fiberUpdateS_off hk]
+        have hoff_σ' : ∀ k, k ≠ i → σ' k = τ k := fun k hk =>
+          (h k hk).trans (hoff_σ k hk).symm
+        rw [if_pos hoff_σ', if_pos hoff_σ, if_pos hτ]
+      · have hnot : ¬ ∀ k, k ≠ i → τ k = σ k := by
+          intro hall
+          apply hτ
+          funext k
+          by_cases hki : k = i
+          · subst hki; rw [fiberUpdateS_at]
+          · rw [fiberUpdateS_off hki]; exact hall k hki
+        rw [if_neg hnot, mul_zero, if_neg hτ]
+    rw [Finset.sum_congr rfl (fun τ _ => hterm τ)]
+    rw [← Finset.sum_filter]
+    symm
+    refine Finset.sum_bij (fun (t : Fin (N + 1)) _ => fiberUpdateS σ i t)
+      ?memImage ?inj ?surj ?eq
+    case memImage =>
+      intro t _
+      simp only
+      rw [Finset.mem_filter]
+      refine ⟨Finset.mem_univ _, ?_⟩
+      funext k
+      by_cases hki : k = i
+      · subst hki
+        rw [fiberUpdateS_at, fiberUpdateS_at]
+      · rw [fiberUpdateS_off hki, fiberUpdateS_off hki]
+    case inj =>
+      intros s _ u _ hsu
+      simp only at hsu
+      have := congrFun hsu i
+      simpa [fiberUpdateS_at] using this
+    case surj =>
+      intros τ hτ
+      rw [Finset.mem_filter] at hτ
+      refine ⟨τ i, Finset.mem_univ _, ?_⟩
+      simp only
+      exact hτ.2.symm
+    case eq =>
+      intro t _
+      simp only
+      rw [fiberUpdateS_at]
+  · rw [if_neg h]
+    apply Finset.sum_eq_zero
+    intro τ _
+    by_cases h1 : ∀ k, k ≠ i → σ' k = τ k
+    · have h2 : ¬ ∀ k, k ≠ i → τ k = σ k := by
+        intro hh
+        exact h (fun k hk => (h1 k hk).trans (hh k hk))
+      rw [if_neg h2, mul_zero]
+    · rw [if_neg h1, zero_mul]
+
 /-! ## Specialised site-embedded spin-`S` operators -/
 
 /-- The site-`i` spin-`S` operator `Ŝ_i^{(1)}` on the many-body
