@@ -5041,18 +5041,35 @@ in the Lean development. They are documented here so that future PRs
 can pick them up and replace each axiom by a proof (or fill in the
 deferred construction).
 
-\subsection*{TODO: Problem 2.1.a for general \texorpdfstring{$S \geq 1$}{S >= 1} (P1d''')}
+\subsection*{DONE: Problem 2.1.a for general \texorpdfstring{$S \geq 1$}{S >= 1} (P1d''')}
 
-\textbf{Statement} (Tasaki p.15): For any spin $S$, every operator on
-the single-site Hilbert space $h_0 = \mathbb{C}^{2S+1}$ can be written
-as a polynomial in $\hat 1, \hat S^{(1)}, \hat S^{(2)}, \hat S^{(3)}$.
+\textbf{Statement} (Tasaki p.15, solution S.1 p.493): For any spin $S$,
+every operator on the single-site Hilbert space $h_0 = \mathbb{C}^{2S+1}$
+can be written as a polynomial in $\hat 1, \hat S^{(1)}, \hat S^{(2)},
+\hat S^{(3)}$.
 
-\textbf{Status}: $S = 1/2$ is done as \texttt{pauliBasis} (P1d''),
-and $S = 1$ is now done as \texttt{Quantum/SpinOneDecomp.lean} (3
-diagonal Lagrange-interpolation projectors + 6 off-diagonal matrix
-units via $\hat S^{\pm}$ + a 9-element spanning theorem). The general
-$S \geq 1$ case requires generic \texttt{Fin\,(2S+1)} typing and a
-polymorphic Lagrange-interpolation infrastructure; not started.
+\textbf{Status}: \emph{Done in general spin-$S$ form (Issue~\#458 closed
+in PR~\#490).} The headline theorem
+\texttt{LatticeSystem.Quantum.spinS\_adjoin\_eq\_top}
+in
+\texttt{Quantum/SpinS/SpanningTheorem.lean} states
+\[
+  \mathrm{Algebra.adjoin}\,\mathbb{C}\,\{\hat S^{(1)}_N, \hat S^{(2)}_N,
+    \hat S^{(3)}_N\}
+  \;=\; \top
+  \;\subseteq\; \mathrm{Subalgebra}\,\mathbb{C}\,
+    (\mathrm{Matrix}\,(\mathrm{Fin}\,(N+1))\,(\mathrm{Fin}\,(N+1))\,\mathbb{C}).
+\]
+The proof follows Tasaki's solution S.1: diagonal projectors $P_k$
+are Lagrange-interpolation polynomials in $\hat S^{(3)}$
+(\texttt{spinSDiagProj\_eq\_lagrange\_aeval}); off-diagonal matrix
+units $E_{i,j}$ are products of stride-1 ladder units
+(\texttt{single\_offset\_succ\_\{,swap\_\}mem\_adjoin}); the
+entry-wise decomposition $M = \sum_{i,j} M_{i,j} \cdot E_{i,j}$
+(\texttt{Matrix.matrix\_eq\_sum\_single}) closes the spanning. The
+earlier concrete-case modules \texttt{pauliBasis} ($S = 1/2$) and
+\texttt{spinOne\_decomposition} ($S = 1$) remain as illustrative
+specialisations.
 
 \subsection*{TODO: Tasaki §2.5 antiferromagnetic deferred items (issue \#240)}
 
@@ -5070,7 +5087,8 @@ finite-dimensional matrix algebra):
   argument on the Marshall-rotated basis.
 \item Problem 2.5.a (single-cluster ground-state energy
   $-S(1+zS)$ for general spin $S$ and coordination $z$).
-  Requires general-spin infrastructure (depends on P1d''' above).
+  Requires general-spin infrastructure (P1d''' above is now done in
+  PR~\#490; this remains for the §2.5-specific cluster argument).
 \item Problem 2.5.b (lower bound on $E_{\mathrm{GS}}$ via 2.5.a).
 \item Problem 2.5.c (single-site expectation
   $\langle \hat S_x \rangle = 0$ in the AFM ground state).
