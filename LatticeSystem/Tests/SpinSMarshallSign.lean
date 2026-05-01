@@ -54,4 +54,12 @@ example {N : ℕ} (A : V → Bool) (σ : V → Fin (N + 1)) :
     star (marshallSignS A σ) = marshallSignS A σ :=
   marshallSignS_star A σ
 
+/-- Marshall-dressed basis orthonormality. -/
+example {N : ℕ} [DecidableEq V] (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
+    (∑ τ : V → Fin (N + 1),
+        star (marshallDressedBasisS A σ τ) *
+          marshallDressedBasisS A σ' τ) =
+      if σ = σ' then 1 else 0 :=
+  marshallDressedBasisS_inner_product A σ σ'
+
 end LatticeSystem.Tests.SpinSMarshallSign

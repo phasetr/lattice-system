@@ -132,4 +132,32 @@ theorem marshallDressedBasisS_const_zero [DecidableEq V]
   unfold marshallDressedBasisS
   rw [marshallSignS_const_zero, one_smul]
 
+/-- **Orthonormality of the Marshall-dressed basis**:
+
+  `Σ_τ (marshallDressedBasisS A σ τ).star * marshallDressedBasisS A σ' τ
+     = if σ = σ' then 1 else 0`. -/
+theorem marshallDressedBasisS_inner_product [DecidableEq V]
+    (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
+    (∑ τ : V → Fin (N + 1),
+        star (marshallDressedBasisS A σ τ) *
+          marshallDressedBasisS A σ' τ) =
+      if σ = σ' then 1 else 0 := by
+  by_cases hσ : σ = σ'
+  · subst hσ
+    rw [if_pos rfl]
+    -- Only τ = σ contributes; that term is (marshallSignS).star * marshallSignS = 1.
+    rw [Fintype.sum_eq_single σ (fun τ hτ => by
+      rw [marshallDressedBasisS_of_ne A hτ, mul_zero])]
+    rw [marshallDressedBasisS_self, marshallSignS_star,
+        marshallSignS_sq]
+  · rw [if_neg hσ]
+    -- For σ ≠ σ', no τ can simultaneously equal σ and σ', so each term is 0.
+    apply Finset.sum_eq_zero
+    intro τ _
+    by_cases hτσ : τ = σ
+    · subst hτσ
+      have hne : τ ≠ σ' := fun heq => hσ heq
+      rw [marshallDressedBasisS_of_ne A hne, mul_zero]
+    · rw [marshallDressedBasisS_of_ne A hτσ, star_zero, zero_mul]
+
 end LatticeSystem.Quantum
