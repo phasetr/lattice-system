@@ -23,4 +23,10 @@ example {N : ℕ} (J : V → V → ℂ) (σ σ' : V → Fin (N + 1)) :
       (heisenbergHamiltonianS J N) σ σ' :=
   dressedHeisenbergS_A_false J N σ σ'
 
+/-- Dressed Heisenberg star-swap symmetry for real coupling. -/
+example {N : ℕ} (A : V → Bool) {J : V → V → ℂ} (hreal : ∀ x y, star (J x y) = J x y)
+    (σ σ' : V → Fin (N + 1)) :
+    star (dressedHeisenbergS A J N σ' σ) = dressedHeisenbergS A J N σ σ' :=
+  dressedHeisenbergS_star_swap A N hreal σ σ'
+
 end LatticeSystem.Tests.SpinSDressedHeisenberg
