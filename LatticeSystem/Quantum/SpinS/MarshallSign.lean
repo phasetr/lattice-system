@@ -56,6 +56,20 @@ theorem marshallSignS_eq_neg_one_pow_of_A_true (σ : V → Fin (N + 1)) :
   simp only [if_true]
   rw [← Finset.prod_pow_eq_pow_sum]
 
+/-- Product of two Marshall signs at the same sublattice indicator
+factors site-wise: each `A`-site contributes `(-1)^((σ x).val + (σ' x).val)`. -/
+theorem marshallSignS_mul (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
+    marshallSignS A σ * marshallSignS A σ' =
+      ∏ x : V, if A x then ((-1 : ℂ) ^ ((σ x).val + (σ' x).val)) else 1 := by
+  unfold marshallSignS
+  rw [← Finset.prod_mul_distrib]
+  apply Finset.prod_congr rfl
+  intro x _
+  by_cases hAx : A x
+  · simp only [hAx, if_true]
+    rw [← pow_add]
+  · simp [hAx]
+
 /-- The Marshall sign is non-zero. Each factor is either `(-1)^k = ±1`
 or `1`, never zero, so the product is non-zero. -/
 theorem marshallSignS_ne_zero (A : V → Bool) (σ : V → Fin (N + 1)) :
