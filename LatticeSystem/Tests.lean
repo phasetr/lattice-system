@@ -28,6 +28,7 @@ import LatticeSystem.Tests.SpinSCasimir
 import LatticeSystem.Tests.SpinSEigenstates
 import LatticeSystem.Tests.SpinSLadderStates
 import LatticeSystem.Tests.SpinSCasimirEigenvalue
+import LatticeSystem.Tests.SpinSCasimirInvariance
 import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Pauli
 import LatticeSystem.Tests.Z2Z2
