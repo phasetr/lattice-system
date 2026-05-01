@@ -96,4 +96,52 @@ theorem totalSpinHalfOp3_eq_sublattice_sum (A : Λ → Bool) :
     · simp [h]
     · exact absurd h hA
 
+/-! ## Hermiticity -/
+
+/-- Each sublattice spin operator is Hermitian.
+Sum of Hermitian operators is Hermitian. -/
+theorem sublatticeSpinHalfOp1_isHermitian (A : Λ → Bool) :
+    (sublatticeSpinHalfOp1 A).IsHermitian := by
+  unfold sublatticeSpinHalfOp1
+  refine Finset.sum_induction _ _ (fun a b => Matrix.IsHermitian.add) Matrix.isHermitian_zero ?_
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    exact onSite_isHermitian x spinHalfOp1_isHermitian
+  · cases h : A x
+    · rw [if_neg]
+      · simp [Matrix.IsHermitian]
+      · simp [h]
+    · exact absurd h hA
+
+/-- `Ŝ_A^(2)` is Hermitian. -/
+theorem sublatticeSpinHalfOp2_isHermitian (A : Λ → Bool) :
+    (sublatticeSpinHalfOp2 A).IsHermitian := by
+  unfold sublatticeSpinHalfOp2
+  refine Finset.sum_induction _ _ (fun a b => Matrix.IsHermitian.add) Matrix.isHermitian_zero ?_
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    exact onSite_isHermitian x spinHalfOp2_isHermitian
+  · cases h : A x
+    · rw [if_neg]
+      · simp [Matrix.IsHermitian]
+      · simp [h]
+    · exact absurd h hA
+
+/-- `Ŝ_A^(3)` is Hermitian. -/
+theorem sublatticeSpinHalfOp3_isHermitian (A : Λ → Bool) :
+    (sublatticeSpinHalfOp3 A).IsHermitian := by
+  unfold sublatticeSpinHalfOp3
+  refine Finset.sum_induction _ _ (fun a b => Matrix.IsHermitian.add) Matrix.isHermitian_zero ?_
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    exact onSite_isHermitian x spinHalfOp3_isHermitian
+  · cases h : A x
+    · rw [if_neg]
+      · simp [Matrix.IsHermitian]
+      · simp [h]
+    · exact absurd h hA
+
 end LatticeSystem.Quantum
