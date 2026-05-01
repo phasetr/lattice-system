@@ -44,4 +44,9 @@ example {N : ℕ} (A : V → Bool) (σ : V → Fin (N + 1)) :
     marshallSignS A σ ≠ 0 :=
   marshallSignS_ne_zero A σ
 
+/-- Marshall sign squared is 1. -/
+example {N : ℕ} (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ * marshallSignS A σ = 1 :=
+  marshallSignS_sq A σ
+
 end LatticeSystem.Tests.SpinSMarshallSign
