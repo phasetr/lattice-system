@@ -171,4 +171,24 @@ theorem dressedHeisenbergS_zero_of_heisenberg_zero
   unfold dressedHeisenbergS
   rw [h, mul_zero]
 
+/-- The Marshall-dressed Heisenberg Hamiltonian as a many-body matrix. -/
+noncomputable def dressedHeisenbergSMatrix
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) :
+    ManyBodyOpS V N :=
+  fun σ σ' => dressedHeisenbergS A J N σ σ'
+
+/-- Component-wise unfolding of `dressedHeisenbergSMatrix`. -/
+theorem dressedHeisenbergSMatrix_apply
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergSMatrix A J N σ σ' = dressedHeisenbergS A J N σ σ' := rfl
+
+/-- For real coupling, the dressed matrix is Hermitian. -/
+theorem dressedHeisenbergSMatrix_isHermitian
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hreal : ∀ x y, star (J x y) = J x y) :
+    (dressedHeisenbergSMatrix A J N).IsHermitian := by
+  ext σ σ'
+  simp only [Matrix.conjTranspose_apply, dressedHeisenbergSMatrix_apply]
+  exact dressedHeisenbergS_star_swap A N hreal σ σ'
+
 end LatticeSystem.Quantum
