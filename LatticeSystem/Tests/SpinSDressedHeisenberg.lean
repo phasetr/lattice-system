@@ -93,4 +93,11 @@ example {N : ℕ} (A : V → Bool) {J : V → V → ℂ}
     (dressedHeisenbergSMatrix A J N).IsHermitian :=
   dressedHeisenbergSMatrix_isHermitian A N hreal
 
+/-- Dressed Heisenberg on graph couplings is Hermitian for real edge weight. -/
+example {N : ℕ} (A : V → Bool) (G : SimpleGraph V) [DecidableRel G.Adj]
+    {J : ℂ} (hJ : star J = J) :
+    (dressedHeisenbergSMatrix A
+        (LatticeSystem.Lattice.couplingOf G J) N).IsHermitian :=
+  dressedHeisenbergSMatrix_couplingOf_isHermitian A G hJ N
+
 end LatticeSystem.Tests.SpinSDressedHeisenberg
