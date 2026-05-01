@@ -75,7 +75,7 @@ recommended replacement, and earliest-removal window.
 | P1d (Tasaki §2.1) | Basis states `|ψ^↑⟩, |ψ^↓⟩`, raising/lowering `Ŝ^±` (S = 1/2) | Done |
 | P1d' (Tasaki §2.1) | S = 1 matrix representations (eq. (2.1.9)) | Done |
 | P1d'' (Tasaki §2.1) | Problem 2.1.a for S = 1/2 (Pauli basis of `M_2(ℂ)`) | Done |
-| P1d''' (Tasaki §2.1) | Problem 2.1.a for `S ≥ 1` (polynomial basis of `M_{2S+1}(ℂ)` via Lagrange interpolation in `Ŝ^(3)` and `Ŝ^±` ladder action) | Done for `S = 1`; general `S ≥ 1` (`Fin (2S+1)` abstraction) deferred — see [open items](#open-items--axioms) |
+| P1d''' (Tasaki §2.1) | Problem 2.1.a for `S ≥ 1` (polynomial basis of `M_{2S+1}(ℂ)` via Lagrange interpolation in `Ŝ^(3)` and `Ŝ^±` ladder action) | Done for `S = 1`; general `S ≥ 1` (`Fin (2S+1)` abstraction) **In progress (Issue #458)** — β-1 (operators on `Fin (N + 1)` with `N = 2S`) underway; β-2 (SU(2) commutator algebra), β-3 (Lagrange interpolation), β-4 (off-diagonal units), β-5 (spanning) follow |
 | P1e (Tasaki §2.1) | S = 1/2 rotation `Û^(α)_θ` closed form, `Û_0`, adjoint, `Û_{2π}` | Done |
 | P1e' | Rotation group law and unitarity | Done |
 | P1e'' (Tasaki §2.1) | `Û^(α)_θ = exp(-iθŜ^(α))` via `Matrix.exp_diagonal` + `Matrix.exp_conj` (Problem 2.1.b, all 3 axes) | Done |
@@ -246,6 +246,19 @@ Systems*, §2.1 eq. (2.1.9), p. 15.
 | `spinOneOp1/2/3_isHermitian` | Hermiticity | `Quantum/SpinOne.lean` |
 | `spinOneOp1_commutator_spinOneOp2` etc. | `[Ŝ^(α), Ŝ^(β)] = i · Ŝ^(γ)` (S = 1) | `Quantum/SpinOne.lean` |
 | `spinOne_total_spin_squared` | `Σ (Ŝ^(α))² = 2 · I`, i.e. `S(S+1)` with `S = 1` | `Quantum/SpinOne.lean` |
+
+### Spin-`S` operators (general S ≥ 0, parameterised by `N = 2S : ℕ`)
+
+Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §2.1 Problem 2.1.a (p. 15) and solution S.1 (p. 493).
+
+Generic spin-`S` operators live on `Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ`, with `N = 2S : ℕ` (so `N = 1` ⇔ `S = 1/2`, `N = 2` ⇔ `S = 1`). Tracking issue #458 (Tasaki §2.1 P1d''' general-S generalisation).
+
+| Lean name | Statement | File |
+|---|---|---|
+| `spinSOp3` | `Ŝ^(3) := diag(N/2, N/2 - 1, …, -N/2)` for `N : ℕ` | `Quantum/SpinS/Operators.lean` |
+| `spinSOpPlus` / `spinSOpMinus` | raising/lowering operators with matrix entries `√(k·(N − k + 1))` (resp. `√((N − k)(k + 1))`) on the immediate sub/super-diagonal | `Quantum/SpinS/Operators.lean` |
+| `spinSOp1` / `spinSOp2` | `Ŝ^(1) := (Ŝ^+ + Ŝ^-) / 2`, `Ŝ^(2) := (Ŝ^+ − Ŝ^-) / (2 i)` | `Quantum/SpinS/Operators.lean` |
+| `spinSOp{Plus,Minus}_apply_top` / `_bottom` | `Ŝ^+` annihilates `\|N⟩` (highest weight); `Ŝ^-` annihilates `\|0⟩` (lowest weight) — the ladder boundaries | `Quantum/SpinS/Operators.lean` |
 
 ### Basis states and raising/lowering (Tasaki §2.1)
 
