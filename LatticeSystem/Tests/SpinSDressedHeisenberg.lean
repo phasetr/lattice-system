@@ -41,4 +41,11 @@ example {N : ℕ} (A : V → Bool) {J : V → V → ℂ} (hreal : ∀ x y, star 
     (dressedHeisenbergS A J N σ σ).im = 0 :=
   dressedHeisenbergS_diag_im_zero A N hreal σ
 
+/-- Dressed Heisenberg diagonal as ofReal of its real part. -/
+example {N : ℕ} (A : V → Bool) {J : V → V → ℂ} (hreal : ∀ x y, star (J x y) = J x y)
+    (σ : V → Fin (N + 1)) :
+    dressedHeisenbergS A J N σ σ =
+      ((dressedHeisenbergS A J N σ σ).re : ℂ) :=
+  dressedHeisenbergS_diag_eq_ofReal A N hreal σ
+
 end LatticeSystem.Tests.SpinSDressedHeisenberg
