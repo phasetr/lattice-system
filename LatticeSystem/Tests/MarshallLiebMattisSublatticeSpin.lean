@@ -33,4 +33,19 @@ example (A : Fin 2 → Bool) :
     (sublatticeSpinHalfSquared A).IsHermitian :=
   sublatticeSpinHalfSquared_isHermitian A
 
+/-- Mixed-axes cross-commute: `Ŝ_A^(1)` and `Ŝ_¬A^(2)` commute. -/
+example (A : Fin 2 → Bool) :
+    Commute (sublatticeSpinHalfOp1 A) (sublatticeSpinHalfOp2 (fun x => ! A x)) :=
+  sublatticeSpinHalfOp1_cross_commute_op2 A
+
+/-- Mixed-axes cross-commute: `Ŝ_A^(2)` and `Ŝ_¬A^(3)` commute. -/
+example (A : Fin 2 → Bool) :
+    Commute (sublatticeSpinHalfOp2 A) (sublatticeSpinHalfOp3 (fun x => ! A x)) :=
+  sublatticeSpinHalfOp2_cross_commute_op3 A
+
+/-- Mixed-axes cross-commute: `Ŝ_A^(3)` and `Ŝ_¬A^(1)` commute. -/
+example (A : Fin 2 → Bool) :
+    Commute (sublatticeSpinHalfOp3 A) (sublatticeSpinHalfOp1 (fun x => ! A x)) :=
+  sublatticeSpinHalfOp3_cross_commute_op1 A
+
 end LatticeSystem.Tests.MarshallLiebMattisSublatticeSpin

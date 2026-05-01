@@ -254,4 +254,82 @@ theorem sublatticeSpinHalfOp3_cross_commute (A : Λ → Bool) :
       exact onSite_mul_onSite_of_ne hxy spinHalfOp3 spinHalfOp3
   · rw [if_neg hAx]; exact Commute.zero_left _
 
+/-! ## Generic mixed-axes cross-sublattice commutativity
+
+Sites in `A` and sites in `¬A` are necessarily distinct, so any
+single-site operators embedded at those sites commute via
+`onSite_mul_onSite_of_ne`. Lifted to the sublattice sums, this gives
+that `Ŝ_A^(α)` and `Ŝ_¬A^(β)` commute for **any** axes `α, β`
+— the existing `_cross_commute` lemmas are the diagonal case `α = β`.
+
+This generic form is needed when expanding `(Ŝ_A)² · Ŝ_¬A^(α)` etc.,
+which mix axes `1, 2, 3` in the Casimir-eigenvalue analysis. -/
+
+/-- Generic helper: the `A`-sublattice sum of `onSite x S` commutes
+with the `¬A`-sublattice sum of `onSite y T` for **any** single-site
+operators `S, T`. Each cross-pair has `x ∈ A`, `y ∉ A`, so `x ≠ y`. -/
+theorem sublatticeSpinHalfOpGeneric_cross_commute
+    (A : Λ → Bool) (S T : Matrix (Fin 2) (Fin 2) ℂ) :
+    Commute
+      (∑ x : Λ, if A x then onSite x S else 0)
+      (∑ y : Λ, if (! A y) then onSite y T else 0) := by
+  refine Commute.sum_left _ _ _ fun x _ => ?_
+  refine Commute.sum_right _ _ _ fun y _ => ?_
+  by_cases hAx : A x = true
+  · by_cases hAy : A y = true
+    · rw [show (! A y) = false from by simp [hAy]]
+      simp
+    · have hAy' : A y = false := by
+        cases h : A y
+        · rfl
+        · exact absurd h hAy
+      rw [show (! A y) = true from by simp [hAy']]
+      have hxy : x ≠ y := fun heq => by
+        subst heq; rw [hAx] at hAy'; exact Bool.noConfusion hAy'
+      rw [if_pos hAx, if_pos rfl]
+      exact onSite_mul_onSite_of_ne hxy S T
+  · rw [if_neg hAx]; exact Commute.zero_left _
+
+/-- Mixed-axes cross-sublattice commutativity:
+`Ŝ_A^(1)` commutes with `Ŝ_¬A^(2)`. -/
+theorem sublatticeSpinHalfOp1_cross_commute_op2 (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfOp1 A) (sublatticeSpinHalfOp2 (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfOp1 sublatticeSpinHalfOp2
+  exact sublatticeSpinHalfOpGeneric_cross_commute A spinHalfOp1 spinHalfOp2
+
+/-- Mixed-axes cross-sublattice commutativity:
+`Ŝ_A^(1)` commutes with `Ŝ_¬A^(3)`. -/
+theorem sublatticeSpinHalfOp1_cross_commute_op3 (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfOp1 A) (sublatticeSpinHalfOp3 (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfOp1 sublatticeSpinHalfOp3
+  exact sublatticeSpinHalfOpGeneric_cross_commute A spinHalfOp1 spinHalfOp3
+
+/-- Mixed-axes cross-sublattice commutativity:
+`Ŝ_A^(2)` commutes with `Ŝ_¬A^(1)`. -/
+theorem sublatticeSpinHalfOp2_cross_commute_op1 (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfOp2 A) (sublatticeSpinHalfOp1 (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfOp2 sublatticeSpinHalfOp1
+  exact sublatticeSpinHalfOpGeneric_cross_commute A spinHalfOp2 spinHalfOp1
+
+/-- Mixed-axes cross-sublattice commutativity:
+`Ŝ_A^(2)` commutes with `Ŝ_¬A^(3)`. -/
+theorem sublatticeSpinHalfOp2_cross_commute_op3 (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfOp2 A) (sublatticeSpinHalfOp3 (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfOp2 sublatticeSpinHalfOp3
+  exact sublatticeSpinHalfOpGeneric_cross_commute A spinHalfOp2 spinHalfOp3
+
+/-- Mixed-axes cross-sublattice commutativity:
+`Ŝ_A^(3)` commutes with `Ŝ_¬A^(1)`. -/
+theorem sublatticeSpinHalfOp3_cross_commute_op1 (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfOp3 A) (sublatticeSpinHalfOp1 (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfOp3 sublatticeSpinHalfOp1
+  exact sublatticeSpinHalfOpGeneric_cross_commute A spinHalfOp3 spinHalfOp1
+
+/-- Mixed-axes cross-sublattice commutativity:
+`Ŝ_A^(3)` commutes with `Ŝ_¬A^(2)`. -/
+theorem sublatticeSpinHalfOp3_cross_commute_op2 (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfOp3 A) (sublatticeSpinHalfOp2 (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfOp3 sublatticeSpinHalfOp2
+  exact sublatticeSpinHalfOpGeneric_cross_commute A spinHalfOp3 spinHalfOp2
+
 end LatticeSystem.Quantum
