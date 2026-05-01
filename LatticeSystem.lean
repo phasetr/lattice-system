@@ -54,6 +54,7 @@ import LatticeSystem.Quantum.MarshallLiebMattis.DressedSwapValue
 import LatticeSystem.Quantum.MarshallLiebMattis.H0ShiftedSwap
 import LatticeSystem.Quantum.MarshallLiebMattis.MatrixPowPath
 import LatticeSystem.Quantum.MarshallLiebMattis.MatrixPowExtend
+import LatticeSystem.Quantum.MarshallLiebMattis.H0ShiftedReachable
 import LatticeSystem.Quantum.Z2Z2
 import LatticeSystem.Quantum.IsingChain
 import LatticeSystem.Fermion.Mode
