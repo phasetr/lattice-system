@@ -55,7 +55,7 @@ noncomputable def sublatticeSpinDot (A B : Λ → Bool) : ManyBodyOp Λ :=
         sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp2 B +
         sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp3 B := rfl
 
-/-! ## Bilinear expansion -/
+/-! ## Bilinear expansion (helper) -/
 
 /-- Per-axis expansion: a single product
 `Ŝ_A^(α) Ŝ_B^(α)` factors as a double sum
@@ -80,6 +80,30 @@ private theorem sublatticeSpinHalfOp_mul_eq_sum_sum
       rintro ⟨_, h⟩; exact hBy h
   · rw [if_neg hAx, zero_mul, if_neg]
     rintro ⟨h, _⟩; exact hAx h
+
+/-! ## Hermiticity of `Ŝ_A · Ŝ_¬A` -/
+
+/-- The cross-sublattice spin dot product `Ŝ_A · Ŝ_¬A` is Hermitian.
+Each axis-`α` summand `Ŝ_A^(α) Ŝ_¬A^(α)` is the product of two
+commuting Hermitian operators (cross-commute lemmas), hence Hermitian. -/
+theorem sublatticeSpinDot_complement_isHermitian (A : Λ → Bool) :
+    (sublatticeSpinDot A (fun x => ! A x)).IsHermitian := by
+  unfold sublatticeSpinDot
+  refine ((?_ : Matrix.IsHermitian _).add ?_).add ?_
+  · exact Matrix.IsHermitian.mul_of_commute
+      (sublatticeSpinHalfOp1_isHermitian A)
+      (sublatticeSpinHalfOp1_isHermitian (fun x => ! A x))
+      (sublatticeSpinHalfOp1_cross_commute A).eq
+  · exact Matrix.IsHermitian.mul_of_commute
+      (sublatticeSpinHalfOp2_isHermitian A)
+      (sublatticeSpinHalfOp2_isHermitian (fun x => ! A x))
+      (sublatticeSpinHalfOp2_cross_commute A).eq
+  · exact Matrix.IsHermitian.mul_of_commute
+      (sublatticeSpinHalfOp3_isHermitian A)
+      (sublatticeSpinHalfOp3_isHermitian (fun x => ! A x))
+      (sublatticeSpinHalfOp3_cross_commute A).eq
+
+/-! ## Bilinear expansion -/
 
 /-- The cross-sublattice spin dot product expands as a double sum
 over sites of the spin-dot products:

@@ -27,4 +27,9 @@ example (A B : Fin 2 → Bool) :
         if A x ∧ B y then spinHalfDot x y else 0 :=
   sublatticeSpinDot_eq_sum_sum A B
 
+/-- `Ŝ_A · Ŝ_¬A` is Hermitian. -/
+example (A : Fin 2 → Bool) :
+    (sublatticeSpinDot A (fun x => ! A x)).IsHermitian :=
+  sublatticeSpinDot_complement_isHermitian A
+
 end LatticeSystem.Tests.MarshallLiebMattisSublatticeSpinDot

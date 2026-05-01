@@ -160,6 +160,20 @@ noncomputable def sublatticeSpinHalfSquared (A : Λ → Bool) : ManyBodyOp Λ :=
         sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp2 A +
         sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp3 A := rfl
 
+/-- `(Ŝ_A)²` is Hermitian.  Each `(Ŝ_A^(α))²` is Hermitian as the
+product of a self-commuting Hermitian operator with itself; the sum
+of Hermitian operators is Hermitian. -/
+theorem sublatticeSpinHalfSquared_isHermitian (A : Λ → Bool) :
+    (sublatticeSpinHalfSquared A).IsHermitian := by
+  unfold sublatticeSpinHalfSquared
+  refine ((?_ : Matrix.IsHermitian _).add ?_).add ?_
+  · exact Matrix.IsHermitian.mul_of_commute
+      (sublatticeSpinHalfOp1_isHermitian A) (sublatticeSpinHalfOp1_isHermitian A) rfl
+  · exact Matrix.IsHermitian.mul_of_commute
+      (sublatticeSpinHalfOp2_isHermitian A) (sublatticeSpinHalfOp2_isHermitian A) rfl
+  · exact Matrix.IsHermitian.mul_of_commute
+      (sublatticeSpinHalfOp3_isHermitian A) (sublatticeSpinHalfOp3_isHermitian A) rfl
+
 /-! ## Cross-sublattice commutativity
 
 The sublattice-`A` and sublattice-`¬A` operators commute pairwise:
