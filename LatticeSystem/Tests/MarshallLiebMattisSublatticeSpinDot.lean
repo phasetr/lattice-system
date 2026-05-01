@@ -32,4 +32,19 @@ example (A : Fin 2 → Bool) :
     (sublatticeSpinDot A (fun x => ! A x)).IsHermitian :=
   sublatticeSpinDot_complement_isHermitian A
 
+/-- `(Ŝ_A)² = Σ_{x ∈ A} Σ_{y ∈ A} Ŝ_x · Ŝ_y`. -/
+example (A : Fin 2 → Bool) :
+    sublatticeSpinHalfSquared A =
+      ∑ x : Fin 2, ∑ y : Fin 2,
+        if A x ∧ A y then spinHalfDot x y else 0 :=
+  sublatticeSpinHalfSquared_eq_sum_dot A
+
+/-- `(Ŝ_A)² · |↑↑⟩ = (|A|·(|A|+2)/4) · |↑↑⟩`. -/
+example (A : Fin 2 → Bool) :
+    (sublatticeSpinHalfSquared A).mulVec (basisVec (fun _ : Fin 2 => (0 : Fin 2))) =
+      (((Finset.univ.filter (fun x : Fin 2 => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Fin 2 => A x = true)).card + 2) / 4) •
+        basisVec (fun _ : Fin 2 => (0 : Fin 2)) :=
+  sublatticeSpinHalfSquared_mulVec_basisVec_all_up A
+
 end LatticeSystem.Tests.MarshallLiebMattisSublatticeSpinDot

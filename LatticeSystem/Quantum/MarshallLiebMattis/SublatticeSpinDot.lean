@@ -131,4 +131,106 @@ theorem sublatticeSpinDot_eq_sum_sum (A B : Λ → Bool) :
     rfl
   · simp only [if_neg hAB, add_zero]
 
+/-! ## Sublattice spin squared as a double-sum of spin-dot products -/
+
+/-- `(Ŝ_A)² = Σ_{x ∈ A} Σ_{y ∈ A} Ŝ_x · Ŝ_y`.  Specialisation of
+`sublatticeSpinDot_eq_sum_sum` to `B = A`, since `(Ŝ_A)² = Ŝ_A · Ŝ_A`
+definitionally. -/
+theorem sublatticeSpinHalfSquared_eq_sum_dot (A : Λ → Bool) :
+    sublatticeSpinHalfSquared A =
+      ∑ x : Λ, ∑ y : Λ,
+        if A x ∧ A y then spinHalfDot x y else 0 :=
+  sublatticeSpinDot_eq_sum_sum A A
+
+/-! ## Casimir eigenvalue on the all-up / all-down basis state -/
+
+/-- `(Ŝ_A)² · |s s … s⟩ = (|A|·(|A|+2)/4) · |s s … s⟩` for any
+`s : Fin 2` and any sublattice indicator `A`. The all-aligned basis
+state is an eigenvector of the sublattice Casimir with eigenvalue
+`S_A_max(S_A_max+1) = (|A|/2)·(|A|/2+1) = |A|(|A|+2)/4`, the maximum
+spin of the `A`-subsystem. -/
+theorem sublatticeSpinHalfSquared_mulVec_basisVec_const (A : Λ → Bool) (s : Fin 2) :
+    (sublatticeSpinHalfSquared A).mulVec (basisVec (fun _ : Λ => s)) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => A x = true)).card + 2) / 4) •
+        basisVec (fun _ : Λ => s) := by
+  rw [sublatticeSpinHalfSquared_eq_sum_dot]
+  rw [Matrix.sum_mulVec]
+  simp_rw [Matrix.sum_mulVec]
+  -- The action on |s..s⟩ at indicator-positive (x, y) is the constant-config
+  -- formula; otherwise the term is 0.
+  have hterm : ∀ x y : Λ, (if A x ∧ A y then (spinHalfDot x y) else 0).mulVec
+        (basisVec (fun _ : Λ => s)) =
+      (if A x ∧ A y then (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ)) else 0) •
+        basisVec (fun _ : Λ => s) := by
+    intro x y
+    by_cases hAA : A x ∧ A y
+    · rw [if_pos hAA, if_pos hAA]
+      by_cases hxy : x = y
+      · subst hxy
+        rw [if_pos rfl, spinHalfDot_self]
+        rw [Matrix.smul_mulVec, Matrix.one_mulVec]
+      · rw [if_neg hxy]
+        exact spinHalfDot_mulVec_basisVec_parallel hxy _ rfl
+    · rw [if_neg hAA, if_neg hAA, Matrix.zero_mulVec, zero_smul]
+  simp_rw [hterm, ← Finset.sum_smul]
+  congr 1
+  -- Helper: ∑_x (if A x then C else 0) = |A| * C.
+  have hindicator_sum : ∀ (C : ℂ),
+      (∑ x : Λ, if A x = true then C else 0) =
+        ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) * C := by
+    intro C
+    rw [← Finset.sum_filter]
+    rw [Finset.sum_const, nsmul_eq_mul]
+  -- Compute the double sum: |A| diagonal terms (3/4) + (|A|² - |A|) off-diagonal (1/4).
+  have hinner : ∀ x : Λ, (∑ y : Λ,
+        if A x ∧ A y then (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ)) else 0) =
+      if A x = true then
+        (((Finset.univ.filter (fun z : Λ => A z = true)).card : ℂ) / 4 + 1 / 2)
+      else 0 := by
+    intro x
+    by_cases hAx : A x = true
+    · rw [if_pos hAx]
+      have hsplit : ∀ y : Λ,
+          (if A x ∧ A y then (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ)) else 0) =
+            (if A y = true then (1 / 4 : ℂ) else 0) +
+              (if x = y then (1 / 2 : ℂ) else 0) := by
+        intro y
+        by_cases hAy : A y = true
+        · rw [if_pos ⟨hAx, hAy⟩, if_pos hAy]
+          by_cases hxy : x = y
+          · simp [hxy]; ring
+          · simp [hxy]
+        · rw [if_neg (fun ⟨_, h⟩ => hAy h), if_neg hAy]
+          have : x ≠ y := fun heq => hAy (heq ▸ hAx)
+          simp [this]
+      simp_rw [hsplit, Finset.sum_add_distrib]
+      rw [hindicator_sum, Finset.sum_ite_eq Finset.univ x (fun _ => (1 / 2 : ℂ))]
+      rw [if_pos (Finset.mem_univ _)]
+      ring
+    · rw [if_neg hAx]
+      refine Finset.sum_eq_zero fun y _ => ?_
+      rw [if_neg]
+      rintro ⟨h, _⟩; exact hAx h
+  simp_rw [hinner]
+  -- Outer sum: indicator-restricted sum of `(|A|/4 + 1/2)`.
+  rw [hindicator_sum]
+  ring
+
+/-- Specialisation to all-up state. -/
+theorem sublatticeSpinHalfSquared_mulVec_basisVec_all_up (A : Λ → Bool) :
+    (sublatticeSpinHalfSquared A).mulVec (basisVec (fun _ : Λ => (0 : Fin 2))) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => A x = true)).card + 2) / 4) •
+        basisVec (fun _ : Λ => (0 : Fin 2)) :=
+  sublatticeSpinHalfSquared_mulVec_basisVec_const A 0
+
+/-- Specialisation to all-down state. -/
+theorem sublatticeSpinHalfSquared_mulVec_basisVec_all_down (A : Λ → Bool) :
+    (sublatticeSpinHalfSquared A).mulVec (basisVec (fun _ : Λ => (1 : Fin 2))) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => A x = true)).card + 2) / 4) •
+        basisVec (fun _ : Λ => (1 : Fin 2)) :=
+  sublatticeSpinHalfSquared_mulVec_basisVec_const A 1
+
 end LatticeSystem.Quantum
