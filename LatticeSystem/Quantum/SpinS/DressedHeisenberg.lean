@@ -112,4 +112,12 @@ theorem dressedHeisenbergS_diag_eq_ofReal
       ((dressedHeisenbergS A J N σ σ).re : ℂ) := by
   apply Complex.ext <;> simp [dressedHeisenbergS_diag_im_zero A N hreal σ]
 
+/-- Dressed Heisenberg with zero coupling has zero matrix elements
+(the underlying Heisenberg Hamiltonian is the zero operator). -/
+theorem dressedHeisenbergS_zero_J
+    (A : V → Bool) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergS A (fun _ _ : V => (0 : ℂ)) N σ σ' = 0 := by
+  unfold dressedHeisenbergS heisenbergHamiltonianS
+  simp
+
 end LatticeSystem.Quantum
