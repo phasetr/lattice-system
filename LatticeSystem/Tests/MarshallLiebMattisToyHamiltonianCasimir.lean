@@ -69,4 +69,11 @@ example (A : Fin 2 → Bool) (s : Fin 2) :
       c • basisVec (fun _ : Fin 2 => s) :=
   ⟨_, heisenbergToyHamiltonian_mulVec_basisVec_const A s⟩
 
+/-- Simplified eigenvalue of the toy Hamiltonian on the all-aligned state:
+`Ĥ_toy · |s..s⟩ = (|A|·|¬A|/2) · |s..s⟩`. -/
+example (A : Fin 2 → Bool) (s : Fin 2) :
+    ∃ c : ℂ, (heisenbergToyHamiltonian A).mulVec (basisVec (fun _ : Fin 2 => s)) =
+      c • basisVec (fun _ : Fin 2 => s) :=
+  ⟨_, heisenbergToyHamiltonian_mulVec_basisVec_const_simplified A s⟩
+
 end LatticeSystem.Tests.MarshallLiebMattisToyHamiltonianCasimir
