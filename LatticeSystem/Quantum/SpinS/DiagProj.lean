@@ -70,7 +70,7 @@ theorem spinSDiagProj_apply_off (k : Fin (N + 1)) {i j : Fin (N + 1)}
 
 /-- The shifted operator `Ŝ^{(3)} − λ_j • 1` is itself a diagonal
 matrix with entries `λ_i − λ_j = j − i` (in the index variables). -/
-private theorem spinSOp3_sub_smul_one_eq_diagonal (N : ℕ) (j : Fin (N + 1)) :
+theorem spinSOp3_sub_smul_one_eq_diagonal (N : ℕ) (j : Fin (N + 1)) :
     spinSOp3 N - (((N : ℂ) / 2 - (j.val : ℂ)) • (1 : Matrix (Fin (N+1)) (Fin (N+1)) ℂ)) =
       Matrix.diagonal fun i : Fin (N + 1) =>
         ((j.val : ℂ) - (i.val : ℂ)) := by
