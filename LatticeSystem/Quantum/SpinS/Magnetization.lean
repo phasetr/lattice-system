@@ -97,7 +97,7 @@ theorem onSiteS_spinSOp3_mulVec_basisVecS (x : Λ) (σ : Λ → Fin (N + 1)) :
     (onSiteS x (spinSOp3 N) : ManyBodyOpS Λ N).mulVec (basisVecS σ) =
       ((N : ℂ) / 2 - (σ x).val) • basisVecS σ := by
   funext τ
-  show ∑ τ', (onSiteS x (spinSOp3 N)) τ τ' * basisVecS σ τ' =
+  change ∑ τ', (onSiteS x (spinSOp3 N)) τ τ' * basisVecS σ τ' =
        ((N : ℂ) / 2 - (σ x).val) * basisVecS σ τ
   rw [Fintype.sum_eq_single σ (fun ρ hρ => by
     simp only [basisVecS, if_neg hρ, mul_zero])]
@@ -125,5 +125,39 @@ theorem onSiteS_spinSOp3_mulVec_basisVecS (x : Λ) (σ : Λ → Fin (N + 1)) :
       change (Matrix.diagonal fun k => ((N : ℂ) / 2 - (k.val : ℂ))) (τ x) (σ x) = 0
       rw [Matrix.diagonal_apply_ne _ hτx]
     · rw [if_neg hagree]
+
+/-- `Ŝ_tot^{(3)} · |σ⟩ = magEigenvalueS σ • |σ⟩` — every basis state
+is a `Ŝ_tot^{(3)}`-eigenvector. -/
+theorem totalSpinSOp3_mulVec_basisVecS (σ : Λ → Fin (N + 1)) :
+    (totalSpinSOp3 Λ N).mulVec (basisVecS σ) =
+      magEigenvalueS σ • basisVecS σ := by
+  unfold totalSpinSOp3
+  -- Distribute mulVec over the Finset.sum:
+  have hsum : (∑ x : Λ, onSiteS x (spinSOp3 N) : ManyBodyOpS Λ N).mulVec
+        (basisVecS σ) =
+      ∑ x : Λ, (onSiteS x (spinSOp3 N) : ManyBodyOpS Λ N).mulVec
+        (basisVecS σ) := by
+    classical
+    induction (Finset.univ : Finset Λ) using Finset.induction_on with
+    | empty => simp
+    | @insert a t hat ih =>
+      rw [Finset.sum_insert hat, Finset.sum_insert hat,
+          Matrix.add_mulVec, ih]
+  rw [hsum]
+  simp_rw [onSiteS_spinSOp3_mulVec_basisVecS]
+  rw [← Finset.sum_smul]
+  congr 1
+  unfold magEigenvalueS magSumS
+  rw [Finset.sum_sub_distrib]
+  rw [Finset.sum_const, Finset.card_univ]
+  push_cast
+  rw [nsmul_eq_mul]
+  ring
+
+/-- Every basis state lies in the magnetization-`magEigenvalueS σ` subspace. -/
+theorem basisVecS_mem_magSubspaceS (σ : Λ → Fin (N + 1)) :
+    (basisVecS σ : (Λ → Fin (N + 1)) → ℂ) ∈
+      magSubspaceS Λ N (magEigenvalueS σ) :=
+  totalSpinSOp3_mulVec_basisVecS σ
 
 end LatticeSystem.Quantum
