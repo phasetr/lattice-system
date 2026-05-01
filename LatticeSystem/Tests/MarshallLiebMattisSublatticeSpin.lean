@@ -54,4 +54,25 @@ example (A : Fin 2 → Bool) :
             (sublatticeSpinHalfSquared (fun x => ! A x)) :=
   sublatticeSpinHalfSquared_cross_commute A
 
+/-- Sublattice SU(2) algebra: `[Ŝ_A^(1), Ŝ_A^(2)] = i · Ŝ_A^(3)`. -/
+example (A : Fin 2 → Bool) :
+    sublatticeSpinHalfOp1 A * sublatticeSpinHalfOp2 A
+        - sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp1 A =
+      Complex.I • sublatticeSpinHalfOp3 A :=
+  sublatticeSpinHalfOp1_commutator_sublatticeSpinHalfOp2 A
+
+/-- Sublattice SU(2) algebra: `[Ŝ_A^(2), Ŝ_A^(3)] = i · Ŝ_A^(1)`. -/
+example (A : Fin 2 → Bool) :
+    sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp3 A
+        - sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp2 A =
+      Complex.I • sublatticeSpinHalfOp1 A :=
+  sublatticeSpinHalfOp2_commutator_sublatticeSpinHalfOp3 A
+
+/-- Sublattice SU(2) algebra: `[Ŝ_A^(3), Ŝ_A^(1)] = i · Ŝ_A^(2)`. -/
+example (A : Fin 2 → Bool) :
+    sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp1 A
+        - sublatticeSpinHalfOp1 A * sublatticeSpinHalfOp3 A =
+      Complex.I • sublatticeSpinHalfOp2 A :=
+  sublatticeSpinHalfOp3_commutator_sublatticeSpinHalfOp1 A
+
 end LatticeSystem.Tests.MarshallLiebMattisSublatticeSpin
