@@ -142,4 +142,26 @@ theorem totalSpinSOpMinus_conjTranspose :
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [onSiteS_conjTranspose, spinSOpMinus_conjTranspose]
 
+/-! ## Convenient spin-`S` total operator unfoldings -/
+
+/-- Definitional unfolding of `Ŝ_tot^{(1)}`. -/
+theorem totalSpinSOp1_def :
+    totalSpinSOp1 Λ N = ∑ x : Λ, onSiteS x (spinSOp1 N) := rfl
+
+/-- Definitional unfolding of `Ŝ_tot^{(2)}`. -/
+theorem totalSpinSOp2_def :
+    totalSpinSOp2 Λ N = ∑ x : Λ, onSiteS x (spinSOp2 N) := rfl
+
+/-- Definitional unfolding of `Ŝ_tot^{(3)}`. -/
+theorem totalSpinSOp3_def :
+    totalSpinSOp3 Λ N = ∑ x : Λ, onSiteS x (spinSOp3 N) := rfl
+
+/-- Definitional unfolding of `Ŝ_tot^+`. -/
+theorem totalSpinSOpPlus_def :
+    totalSpinSOpPlus Λ N = ∑ x : Λ, onSiteS x (spinSOpPlus N) := rfl
+
+/-- Definitional unfolding of `Ŝ_tot^-`. -/
+theorem totalSpinSOpMinus_def :
+    totalSpinSOpMinus Λ N = ∑ x : Λ, onSiteS x (spinSOpMinus N) := rfl
+
 end LatticeSystem.Quantum
