@@ -107,6 +107,34 @@ theorem heisenbergHamiltonianS_commute_totalSpinSSquared
   exact ((h1.mul_right h1).add_right (h2.mul_right h2)).add_right
     (h3.mul_right h3)
 
+/-! ## Linearity in the coupling -/
+
+/-- The Heisenberg Hamiltonian is additive in the coupling: -/
+theorem heisenbergHamiltonianS_add (J J' : Λ → Λ → ℂ) (N : ℕ) :
+    heisenbergHamiltonianS (Λ := Λ) (fun x y => J x y + J' x y) N =
+      heisenbergHamiltonianS J N + heisenbergHamiltonianS J' N := by
+  unfold heisenbergHamiltonianS
+  rw [← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro x _
+  rw [← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro y _
+  rw [add_smul]
+
+/-- The Heisenberg Hamiltonian is homogeneous in the coupling: -/
+theorem heisenbergHamiltonianS_smul (c : ℂ) (J : Λ → Λ → ℂ) (N : ℕ) :
+    heisenbergHamiltonianS (Λ := Λ) (fun x y => c * J x y) N =
+      c • heisenbergHamiltonianS J N := by
+  unfold heisenbergHamiltonianS
+  rw [Finset.smul_sum]
+  refine Finset.sum_congr rfl ?_
+  intro x _
+  rw [Finset.smul_sum]
+  refine Finset.sum_congr rfl ?_
+  intro y _
+  rw [smul_smul]
+
 /-- The Heisenberg Hamiltonian preserves `(Ŝ_tot)²` eigenvalues:
 if `(Ŝ_tot)² · v = S · v`, then `(Ŝ_tot)² · (Ĥ · v) = S · (Ĥ · v)`.
 Operator-level simultaneous diagonalisation. -/

@@ -39,4 +39,16 @@ example (J : Λ → Λ → ℂ) (N : ℕ) :
     Commute (heisenbergHamiltonianS J N) (totalSpinSSquared Λ N) :=
   heisenbergHamiltonianS_commute_totalSpinSSquared J N
 
+/-- Heisenberg additive in coupling. -/
+example (J J' : Λ → Λ → ℂ) (N : ℕ) :
+    heisenbergHamiltonianS (fun x y => J x y + J' x y) N =
+      heisenbergHamiltonianS J N + heisenbergHamiltonianS J' N :=
+  heisenbergHamiltonianS_add J J' N
+
+/-- Heisenberg homogeneous in coupling. -/
+example (c : ℂ) (J : Λ → Λ → ℂ) (N : ℕ) :
+    heisenbergHamiltonianS (fun x y => c * J x y) N =
+      c • heisenbergHamiltonianS J N :=
+  heisenbergHamiltonianS_smul c J N
+
 end LatticeSystem.Tests.SpinSHeisenberg
