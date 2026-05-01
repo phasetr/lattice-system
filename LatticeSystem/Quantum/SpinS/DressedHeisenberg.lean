@@ -140,4 +140,14 @@ theorem dressedHeisenbergS_smul_J
   rw [Matrix.smul_apply, smul_eq_mul]
   ring
 
+/-- Dressed Heisenberg negation in coupling: `dressed (-J) = -dressed J`. -/
+theorem dressedHeisenbergS_neg_J
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergS A (fun x y => -(J x y)) N σ σ' =
+      -(dressedHeisenbergS A J N σ σ') := by
+  rw [show (fun x y : V => -(J x y)) = (fun x y : V => (-1 : ℂ) * J x y) from by
+    funext x y; ring]
+  rw [dressedHeisenbergS_smul_J]
+  ring
+
 end LatticeSystem.Quantum
