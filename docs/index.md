@@ -270,6 +270,7 @@ Generic spin-`S` operators live on `Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ`, wit
 | `spinSOpPlus_mul_diagProj_succ_eq_single` / `spinSOpMinus_mul_diagProj_eq_single` | **Off-diagonal matrix-unit decomposition**: `Ŝ^+ · P_{i+1} = √((i+1)(N−i)) · E_{i, i+1}` and `Ŝ^- · P_i = √((N−i)(i+1)) · E_{i+1, i}`, where `E_{a, b} := Matrix.single a b 1` is the (a, b) matrix unit (β-10 of Issue #458). These are the simplest off-diagonal matrix units expressible via `Ŝ^±` ladder action on diagonal projectors | `Quantum/SpinS/OffDiagUnit.lean` |
 | `spinSOp3_sq_eq_diagonal` | `(Ŝ^{(3)})² = diag((N/2 − i)²)`. Step toward the **Casimir identity** `(Ŝ^{(1)})² + (Ŝ^{(2)})² + (Ŝ^{(3)})² = (N(N+2)/4) · 1` for general spin (β-11 of Issue #458) | `Quantum/SpinS/Op3Square.lean` |
 | `spinSOpPlus_mul_spinSOpMinus_eq_diagonal` | `Ŝ^+ · Ŝ^- = diag((i + 1)(N − i))`. The product is diagonal because `Ŝ^+[i, l] · Ŝ^-[l, j]` is non-zero only when `l = i + 1 = j + 1`, forcing `i = j`. Combined with the analogous `Ŝ^- · Ŝ^+` and `(Ŝ^{(3)})²`, this assembles the Casimir identity (β-12 of Issue #458) | `Quantum/SpinS/PlusMinusDiag.lean` |
+| `spinSOpMinus_mul_spinSOpPlus_eq_diagonal` | `Ŝ^- · Ŝ^+ = diag(i · (N − i + 1))`. Symmetric to β-12 with `Ŝ^±` swapped (β-13 of Issue #458) | `Quantum/SpinS/MinusPlusDiag.lean` |
 
 ### Basis states and raising/lowering (Tasaki §2.1)
 
