@@ -75,7 +75,7 @@ recommended replacement, and earliest-removal window.
 | P1d (Tasaki §2.1) | Basis states `|ψ^↑⟩, |ψ^↓⟩`, raising/lowering `Ŝ^±` (S = 1/2) | Done |
 | P1d' (Tasaki §2.1) | S = 1 matrix representations (eq. (2.1.9)) | Done |
 | P1d'' (Tasaki §2.1) | Problem 2.1.a for S = 1/2 (Pauli basis of `M_2(ℂ)`) | Done |
-| P1d''' (Tasaki §2.1) | Problem 2.1.a for `S ≥ 1` (polynomial basis of `M_{2S+1}(ℂ)` via Lagrange interpolation in `Ŝ^(3)` and `Ŝ^±` ladder action) | Done for `S = 1`; general `S ≥ 1` (`Fin (2S+1)` abstraction) **In progress (Issue #458)** — β-1 (operators on `Fin (N + 1)` with `N = 2S`) underway; β-2 (SU(2) commutator algebra), β-3 (Lagrange interpolation), β-4 (off-diagonal units), β-5 (spanning) follow |
+| P1d''' (Tasaki §2.1) | Problem 2.1.a for `S ≥ 1` (polynomial basis of `M_{2S+1}(ℂ)` via Lagrange interpolation in `Ŝ^(3)` and `Ŝ^±` ladder action) | **Done for general `S ≥ 1`** — `spinS_adjoin_eq_top` (Issue #458 closed in PR #490). Algebra spanned: `Algebra.adjoin ℂ {Ŝ^{(1)}, Ŝ^{(2)}, Ŝ^{(3)}} = ⊤`. |
 | P1e (Tasaki §2.1) | S = 1/2 rotation `Û^(α)_θ` closed form, `Û_0`, adjoint, `Û_{2π}` | Done |
 | P1e' | Rotation group law and unitarity | Done |
 | P1e'' (Tasaki §2.1) | `Û^(α)_θ = exp(-iθŜ^(α))` via `Matrix.exp_diagonal` + `Matrix.exp_conj` (Problem 2.1.b, all 3 axes) | Done |
@@ -1169,19 +1169,27 @@ The following Tasaki §2.1 / §2.2 items are **not yet fully proved**.
 They are tracked here so that future PRs can pick them up and replace
 each axiom by a proof (or fill in the deferred construction).
 
-### TODO (P1d''') — Problem 2.1.a for general `S ≥ 1`
+### ~~TODO (P1d''') — Problem 2.1.a for general `S ≥ 1`~~ **DONE**
 
 **Statement (Tasaki p.15)**: For any spin `S`, every operator on the
 single-site Hilbert space `h_0 = ℂ^{2S+1}` (i.e. every `(2S+1) × (2S+1)`
 matrix) can be written as a polynomial in `1̂, Ŝ^(1), Ŝ^(2), Ŝ^(3)`.
 
-**Status**: `S = 1/2` case is `pauliBasis` (P1d''). `S = 1` case is now
-done via `Quantum/SpinOneDecomp.lean` (`spinOneProj{Plus,Zero,Minus}_eq_polynomial`,
-`spinOneUnit*_eq_polynomial`, `spinOne_decomposition`), following
-Tasaki solution S.1: diagonal projectors via Lagrange interpolation in
-`Ŝ^(3)`, off-diagonals via `Ŝ^±`, spanning theorem. The general
-`S ≥ 1` case requires generic `Fin (2S+1)` typing and a polymorphic
-Lagrange interpolation infrastructure; not started.
+**Status**: Done in general spin-`S` form (Issue #458 closed in PR #490).
+The headline theorem `LatticeSystem.Quantum.spinS_adjoin_eq_top` proves
+
+```
+Algebra.adjoin ℂ {Ŝ^(1) N, Ŝ^(2) N, Ŝ^(3) N}
+  = (⊤ : Subalgebra ℂ (Matrix (Fin (N+1)) (Fin (N+1)) ℂ))
+```
+
+via Tasaki solution S.1: diagonal projectors `P_k` are Lagrange-interpolation
+polynomials in `Ŝ^{(3)}` (`spinSDiagProj_eq_lagrange_aeval`); off-diagonal
+matrix units `E_{i,j}` are products of ladder-step units
+(`single_offset_succ_{,swap_}mem_adjoin`); the entry-wise decomposition
+`M = ∑_{i,j} M_{i,j} • E_{i,j}` then closes the spanning. The earlier
+concrete-case modules `pauliBasis` (`S = 1/2`) and `spinOne_decomposition`
+(`S = 1`) remain as illustrative specialisations.
 
 ### ~~TODO — Tasaki Problem 2.2.c (SU(2) non-invariance / averaged state)~~ **DONE**
 
@@ -1217,7 +1225,7 @@ mathematical work):
   argument on the Marshall-rotated basis.
 - **Problem 2.5.a** (single-cluster ground-state energy
   `-S(1+zS)` for general spin `S` and coordination `z`).
-  Requires general-spin infrastructure (depends on P1d''' above).
+  Requires general-spin infrastructure (P1d''' above is now done in PR #490; this remains for the §2.5-specific cluster argument).
 - **Problem 2.5.b** (lower bound on `E_GS` via 2.5.a).
 - **Problem 2.5.c** (single-site expectation `⟨Ŝ_x⟩ = 0` in the
   AFM ground state).
