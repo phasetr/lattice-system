@@ -51,4 +51,10 @@ example (c : ℂ) (J : Λ → Λ → ℂ) (N : ℕ) :
       c • heisenbergHamiltonianS J N :=
   heisenbergHamiltonianS_smul c J N
 
+/-- Heisenberg on a graph + Hermiticity for real edge weight. -/
+example (G : SimpleGraph Λ) [DecidableRel G.Adj] {J : ℂ}
+    (hJ : star J = J) (N : ℕ) :
+    (heisenbergHamiltonianOnGraphS G J N : ManyBodyOpS Λ N).IsHermitian :=
+  heisenbergHamiltonianOnGraphS_isHermitian G hJ N
+
 end LatticeSystem.Tests.SpinSHeisenberg

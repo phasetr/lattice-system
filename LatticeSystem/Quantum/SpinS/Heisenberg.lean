@@ -2,6 +2,8 @@ import LatticeSystem.Quantum.SpinS.MultiSiteDot
 import LatticeSystem.Quantum.SpinS.MultiSiteDotComm
 import LatticeSystem.Quantum.SpinS.TotalSpin
 import LatticeSystem.Quantum.SpinS.TotalSquared
+import LatticeSystem.Lattice.Graph
+import Mathlib.Combinatorics.SimpleGraph.Basic
 
 /-!
 # Spin-`S` Heisenberg-type Hamiltonian
@@ -134,6 +136,28 @@ theorem heisenbergHamiltonianS_smul (c : ℂ) (J : Λ → Λ → ℂ) (N : ℕ) 
   refine Finset.sum_congr rfl ?_
   intro y _
   rw [smul_smul]
+
+/-! ## Heisenberg on a `SimpleGraph` -/
+
+/-- Canonical named wrapper for the spin-`S` Heisenberg Hamiltonian
+with hopping pattern derived from a `SimpleGraph G` and uniform
+complex edge weight `J`. Spin-`S` analogue of
+`heisenbergHamiltonianOnGraph` (`Quantum/HeisenbergChain.lean`). -/
+noncomputable def heisenbergHamiltonianOnGraphS
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (N : ℕ) :
+    ManyBodyOpS Λ N :=
+  heisenbergHamiltonianS (LatticeSystem.Lattice.couplingOf G J) N
+
+/-- The Heisenberg Hamiltonian on a graph is Hermitian for any real
+complex edge weight `J` (i.e. `star J = J`). Direct corollary of
+`heisenbergHamiltonianS_isHermitian_of_real` and
+`couplingOf_real`. -/
+theorem heisenbergHamiltonianOnGraphS_isHermitian
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] {J : ℂ}
+    (hJ : star J = J) (N : ℕ) :
+    (heisenbergHamiltonianOnGraphS G J N : ManyBodyOpS Λ N).IsHermitian :=
+  heisenbergHamiltonianS_isHermitian_of_real
+    (LatticeSystem.Lattice.couplingOf_real G hJ) N
 
 /-- The Heisenberg Hamiltonian preserves `(Ŝ_tot)²` eigenvalues:
 if `(Ŝ_tot)² · v = S · v`, then `(Ŝ_tot)² · (Ĥ · v) = S · (Ĥ · v)`.
