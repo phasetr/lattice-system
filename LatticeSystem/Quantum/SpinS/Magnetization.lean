@@ -371,6 +371,30 @@ theorem totalSpinSOp3_mulVec_basisVecS_real (σ : Λ → Fin (N + 1)) :
   rw [totalSpinSOp3_mulVec_basisVecS, ← magEigenvalueS_eq_ofReal_re]
 
 omit [DecidableEq Λ] in
+/-- `magEigenvalueS σ = magEigenvalueS σ' ↔ magSumS σ = magSumS σ'`:
+two configurations have the same eigenvalue iff they have the same
+magnetization sum. -/
+theorem magEigenvalueS_eq_iff (σ σ' : Λ → Fin (N + 1)) :
+    magEigenvalueS σ = magEigenvalueS σ' ↔
+      magSumS σ = magSumS σ' := by
+  unfold magEigenvalueS
+  constructor
+  · intro h
+    have h' : (magSumS σ : ℂ) = (magSumS σ' : ℂ) := by
+      have h2 :
+          -(magSumS σ : ℂ) + ((Fintype.card Λ : ℂ) * (N : ℂ)) / 2 =
+          -(magSumS σ' : ℂ) + ((Fintype.card Λ : ℂ) * (N : ℂ)) / 2 := by
+        have := h
+        linear_combination this
+      have h3 : -(magSumS σ : ℂ) = -(magSumS σ' : ℂ) :=
+        add_right_cancel h2
+      have h4 : (magSumS σ : ℂ) = (magSumS σ' : ℂ) := neg_injective h3
+      exact h4
+    exact_mod_cast h'
+  · intro h
+    rw [h]
+
+omit [DecidableEq Λ] in
 /-- `magSumS σ ≥ (σ y).val` at any site `y`. -/
 theorem magSumS_ge_of_exists (σ : Λ → Fin (N + 1)) (y : Λ) :
     (σ y).val ≤ magSumS σ := by
