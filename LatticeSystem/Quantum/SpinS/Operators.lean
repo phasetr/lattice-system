@@ -290,6 +290,15 @@ theorem spinSOp1_mul_spinSOp1_re_nonneg (N : ℕ)
   exact mul_nonneg (spinSOp1_apply_re_nonneg N i j)
     (spinSOp1_apply_re_nonneg N k l)
 
+/-- The product `Ŝ^{(2)}_{i,j} * Ŝ^{(2)}_{k,l}` has zero imaginary
+part. (Pure imag × pure imag = real.) -/
+theorem spinSOp2_mul_spinSOp2_im_zero (N : ℕ)
+    (i j k l : Fin (N + 1)) :
+    (spinSOp2 N i j * spinSOp2 N k l).im = 0 := by
+  rw [Complex.mul_im]
+  rw [spinSOp2_apply_re_zero, spinSOp2_apply_re_zero]
+  ring
+
 /-- All entries of `Ŝ^{(3)}` have zero imaginary part. -/
 theorem spinSOp3_apply_im_zero (N : ℕ) (i j : Fin (N + 1)) :
     (spinSOp3 N i j).im = 0 := by
