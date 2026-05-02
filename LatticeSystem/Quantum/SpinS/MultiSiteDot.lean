@@ -145,6 +145,14 @@ theorem spinSDot_self_N_zero {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
   rw [spinSDot_self]
   simp
 
+/-- `spinSDot x x N` is a scalar multiple of the identity, hence
+commutes with every operator. -/
+theorem spinSDot_self_commute (x : Λ) (N : ℕ) (B : ManyBodyOpS Λ N) :
+    Commute (spinSDot x x N) B := by
+  rw [spinSDot_self]
+  unfold Commute SemiconjBy
+  rw [Matrix.smul_mul, Matrix.mul_smul, Matrix.one_mul, Matrix.mul_one]
+
 /-- **Raising/lowering decomposition** of the two-site spin-`S` dot
 product (Tasaki §2.2 eq. (2.2.16) for arbitrary spin):
 
