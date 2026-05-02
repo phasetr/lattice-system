@@ -556,6 +556,21 @@ theorem dressedHeisenbergSReMatrix_periodicChain_isHermitian
   dressedHeisenbergSReMatrix_couplingOf_isHermitian A _
     (by simp : star (-(J : ℂ)) = -(J : ℂ)) N
 
+/-- The complex dressed matrix entry equals the real-embedded
+real-part: `dressed σ' σ = ((dressedRe σ' σ : ℝ) : ℂ)` for coupling
+with real entries. -/
+theorem dressedHeisenbergSMatrix_apply_eq_ofReal_re
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hreal : ∀ x y, (J x y).im = 0)
+    (σ' σ : V → Fin (N + 1)) :
+    dressedHeisenbergSMatrix A J N σ' σ =
+      ((dressedHeisenbergSReMatrix A J N σ' σ : ℝ) : ℂ) := by
+  rw [dressedHeisenbergSReMatrix_apply]
+  apply Complex.ext
+  · rfl
+  · rw [Complex.ofReal_im]
+    exact dressedHeisenbergS_apply_im_zero A N hreal σ' σ
+
 /-- The real-part dressed Heisenberg matrix entry vanishes when the
 two configurations have different magnetization quantum numbers. -/
 theorem dressedHeisenbergSReMatrix_apply_eq_zero_of_mag_ne
