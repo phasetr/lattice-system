@@ -507,4 +507,10 @@ theorem onSiteS_self_commute (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) �
     Commute (onSiteS i A : ManyBodyOpS Λ N) (onSiteS i A) :=
   Commute.refl _
 
+/-- Commute version of distinct-site commutativity. -/
+theorem onSiteS_commute_of_ne {i j : Λ} (hij : i ≠ j)
+    (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    Commute (onSiteS i A : ManyBodyOpS Λ N) (onSiteS j B) :=
+  onSiteS_mul_onSiteS_of_ne hij A B
+
 end LatticeSystem.Quantum
