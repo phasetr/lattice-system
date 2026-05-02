@@ -100,6 +100,13 @@ theorem sum_spinSDot_self {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (N : ℕ) :
   rw [← Nat.cast_smul_eq_nsmul ℂ (Fintype.card Λ)]
   rw [smul_smul]
 
+/-- Symmetry of the spin-`S` two-site dot product (alternative form):
+`spinSDot x y N = spinSDot y x N` for any `x, y` (no `≠` required). -/
+theorem spinSDot_swap {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (x y : Λ) (N : ℕ) :
+    spinSDot x y N = spinSDot y x N :=
+  spinSDot_comm x y N
+
 /-- **Raising/lowering decomposition** of the two-site spin-`S` dot
 product (Tasaki §2.2 eq. (2.2.16) for arbitrary spin):
 
