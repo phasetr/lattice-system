@@ -353,4 +353,22 @@ theorem dressedHeisenbergSReMatrix_couplingOf_isHermitian
   dressedHeisenbergSReMatrix_isHermitian A N
     (LatticeSystem.Lattice.couplingOf_real G hJ)
 
+/-- Real-part dressed Heisenberg matrix on the open chain — Hermiticity. -/
+theorem dressedHeisenbergSReMatrix_chain_isHermitian
+    (M : ℕ) (A : Fin (M + 1) → Bool) (J : ℝ) (N : ℕ) :
+    (dressedHeisenbergSReMatrix A
+        (LatticeSystem.Lattice.couplingOf
+          (SimpleGraph.pathGraph (M + 1)) (-(J : ℂ))) N).IsHermitian :=
+  dressedHeisenbergSReMatrix_couplingOf_isHermitian A _
+    (by simp : star (-(J : ℂ)) = -(J : ℂ)) N
+
+/-- Real-part dressed Heisenberg matrix on the periodic chain — Hermiticity. -/
+theorem dressedHeisenbergSReMatrix_periodicChain_isHermitian
+    (M : ℕ) (A : Fin (M + 2) → Bool) (J : ℝ) (N : ℕ) :
+    (dressedHeisenbergSReMatrix A
+        (LatticeSystem.Lattice.couplingOf
+          (SimpleGraph.cycleGraph (M + 2)) (-(J : ℂ))) N).IsHermitian :=
+  dressedHeisenbergSReMatrix_couplingOf_isHermitian A _
+    (by simp : star (-(J : ℂ)) = -(J : ℂ)) N
+
 end LatticeSystem.Quantum
