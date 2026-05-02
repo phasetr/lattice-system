@@ -335,6 +335,18 @@ theorem spinSDot_apply_eq_pm_3 (x y : Λ) (N : ℕ)
           : ManyBodyOpS Λ N) σ' σ := by
   rw [spinSDot_eq_plus_minus]
 
+/-- For `x ≠ y` and configurations differing off the two-site set
+`{x, y}`, the matrix element of `Ŝ_x · Ŝ_y` is zero (already
+established as `spinSDot_apply_eq_zero_of_off_two_site_diff`). The
+real part trivially has zero. -/
+theorem spinSDot_apply_re_eq_zero_of_off_two_site_diff
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ¬ ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    ((spinSDot x y N : ManyBodyOpS Λ N) σ' σ).re = 0 := by
+  rw [spinSDot_apply_eq_zero_of_off_two_site_diff hxy N h]
+  simp
+
 /-- `spinSDot x y 0` (trivial spin, distinct sites) equals zero. -/
 theorem spinSDot_N_zero_of_ne {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
     {x y : Λ} (hxy : x ≠ y) :
