@@ -164,4 +164,20 @@ theorem totalSpinSOpPlus_def :
 theorem totalSpinSOpMinus_def :
     totalSpinSOpMinus Λ N = ∑ x : Λ, onSiteS x (spinSOpMinus N) := rfl
 
+/-- For trivial spin (`N = 0`), `Ŝ_tot^{(3)}` is the zero matrix.
+The only configuration has all entries `0` so the sum is `0`. -/
+theorem totalSpinSOp3_N_zero :
+    (totalSpinSOp3 Λ 0 : ManyBodyOpS Λ 0) = 0 := by
+  unfold totalSpinSOp3
+  refine Finset.sum_eq_zero (fun x _ => ?_)
+  ext σ' σ
+  rw [Matrix.zero_apply, onSiteS_apply]
+  by_cases h : ∀ k, k ≠ x → σ' k = σ k
+  · rw [if_pos h]
+    have hσ'x : σ' x = 0 := by apply Fin.ext; have := (σ' x).isLt; omega
+    have hσx : σ x = 0 := by apply Fin.ext; have := (σ x).isLt; omega
+    rw [hσ'x, hσx, spinSOp3_apply_diag]
+    simp
+  · rw [if_neg h]
+
 end LatticeSystem.Quantum
