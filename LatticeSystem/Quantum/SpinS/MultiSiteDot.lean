@@ -115,6 +115,14 @@ theorem spinSDot_isHermitian_restated {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
     (spinSDot x y N : ManyBodyOpS Λ N).IsHermitian :=
   spinSDot_isHermitian x y N
 
+/-- `spinSDot x y N` and `spinSDot y x N` are the same Hermitian
+operator (combining `spinSDot_comm` with Hermiticity). -/
+theorem spinSDot_swap_isHermitian
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (x y : Λ) (N : ℕ) :
+    (spinSDot y x N : ManyBodyOpS Λ N).IsHermitian := by
+  rw [← spinSDot_comm x y N]
+  exact spinSDot_isHermitian x y N
+
 /-- **Raising/lowering decomposition** of the two-site spin-`S` dot
 product (Tasaki §2.2 eq. (2.2.16) for arbitrary spin):
 
