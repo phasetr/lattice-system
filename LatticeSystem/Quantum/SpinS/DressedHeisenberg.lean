@@ -540,6 +540,32 @@ theorem dressedHeisenbergSReMatrix_const_zero
         (fun _ : V => (0 : Fin (N + 1)))).re :=
   dressedHeisenbergSReMatrix_diag A J N _
 
+/-- For symmetric coupling `J x y = J y x`, the dressed Heisenberg
+matrix `dressedHeisenbergS A J N` is symmetric on the configuration
+basis. The Marshall sign factor `sign(σ')·sign(σ)` is symmetric in
+`(σ', σ)`, and the underlying Heisenberg is symmetric for symmetric
+coupling. -/
+theorem dressedHeisenbergS_apply_swap_of_symm
+    (A : V → Bool) {J : V → V → ℂ}
+    (hsym : ∀ x y, J x y = J y x) (N : ℕ)
+    (σ' σ : V → Fin (N + 1)) :
+    dressedHeisenbergS A J N σ' σ =
+      dressedHeisenbergS A J N σ σ' := by
+  unfold dressedHeisenbergS
+  rw [heisenbergHamiltonianS_apply_swap_of_symm hsym N σ' σ]
+  ring
+
+/-- For symmetric coupling, the real-part dressed Heisenberg matrix
+is symmetric on the configuration basis. -/
+theorem dressedHeisenbergSReMatrix_apply_swap_of_symm
+    (A : V → Bool) {J : V → V → ℂ}
+    (hsym : ∀ x y, J x y = J y x) (N : ℕ)
+    (σ' σ : V → Fin (N + 1)) :
+    dressedHeisenbergSReMatrix A J N σ' σ =
+      dressedHeisenbergSReMatrix A J N σ σ' := by
+  rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergSReMatrix_apply,
+      dressedHeisenbergS_apply_swap_of_symm A hsym N σ' σ]
+
 /-- The real-part dressed Heisenberg matrix is additive in the
 coupling. -/
 theorem dressedHeisenbergSReMatrix_add_J
