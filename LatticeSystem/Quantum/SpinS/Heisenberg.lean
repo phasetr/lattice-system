@@ -139,6 +139,22 @@ theorem heisenbergHamiltonianS_zero (N : ℕ) :
   refine Finset.sum_eq_zero (fun y _ => ?_)
   simp
 
+/-- For the trivial spin parameter `N = 0` (`S = 0`), every Heisenberg
+matrix element on the multi-site space is the same-site Casimir
+contribution, which equals zero. So the Heisenberg Hamiltonian is the
+zero operator. -/
+theorem heisenbergHamiltonianS_N_zero (J : Λ → Λ → ℂ) :
+    heisenbergHamiltonianS (Λ := Λ) J 0 = 0 := by
+  unfold heisenbergHamiltonianS
+  refine Finset.sum_eq_zero (fun x _ => ?_)
+  refine Finset.sum_eq_zero (fun y _ => ?_)
+  by_cases hxy : x = y
+  · subst hxy
+    rw [show spinSDot x x 0 = (0 : ManyBodyOpS Λ 0) from spinSDot_self_N_zero x]
+    simp
+  · rw [spinSDot_N_zero_of_ne hxy]
+    simp
+
 /-- The Heisenberg Hamiltonian negates with the coupling: -/
 theorem heisenbergHamiltonianS_neg (J : Λ → Λ → ℂ) (N : ℕ) :
     heisenbergHamiltonianS (Λ := Λ) (fun x y => -(J x y)) N =
