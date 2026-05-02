@@ -126,4 +126,83 @@ theorem exists_over_under_of_eq_magSumS
       apply Finset.sum_lt_sum (fun x _ => h_no_under x) ⟨z, Finset.mem_univ z, hzgt⟩
     omega
 
+/-! ## Distance reduction by raise/lower step -/
+
+/-- Helper: pointwise summation split into (x, y, rest) for `x ≠ y`. -/
+private theorem sum_split_two_sites
+    {α : Type*} [AddCommMonoid α] {x y : V} (hxy : x ≠ y) (f : V → α) :
+    (∑ k : V, f k) =
+      f x + f y + ∑ k ∈ (Finset.univ : Finset V) \ ({x, y} : Finset V), f k := by
+  classical
+  have h1 : (∑ k : V, f k) =
+      (∑ k ∈ (Finset.univ : Finset V) \ ({x, y} : Finset V), f k) +
+        ∑ k ∈ ({x, y} : Finset V), f k :=
+    (Finset.sum_sdiff (Finset.subset_univ ({x, y} : Finset V))).symm
+  rw [h1, Finset.sum_insert (Finset.notMem_singleton.mpr hxy),
+    Finset.sum_singleton]
+  abel
+
+/-- For `x ≠ y` with `(σ' x).val < (σ x).val` (over site `x`) and
+`(σ y).val < (σ' y).val` (under site `y`), the configuration σ'' obtained
+from σ by lowering at x and raising at y has `configDistS` strictly
+smaller than `σ`'s distance to `σ'`:
+
+    `configDistS σ'' σ' + 2 = configDistS σ σ'`. -/
+theorem configDistS_decrease_of_over_under
+    {σ σ' : V → Fin (N + 1)} {x y : V} (hxy : x ≠ y)
+    (hover : (σ' x).val < (σ x).val) (hunder : (σ y).val < (σ' y).val) :
+    let σ'' : V → Fin (N + 1) :=
+      Function.update (Function.update σ x
+        ⟨(σ x).val - 1, by have := (σ x).isLt; omega⟩) y
+        ⟨(σ y).val + 1, by have := (σ y).isLt; omega⟩
+    configDistS σ'' σ' + 2 = configDistS σ σ' := by
+  classical
+  intro σ''
+  unfold configDistS
+  -- Split sum into (x, y, rest) for both σ and σ''.
+  rw [sum_split_two_sites hxy (fun k => Nat.dist (σ k).val (σ' k).val)]
+  rw [sum_split_two_sites hxy (fun k => Nat.dist (σ'' k).val (σ' k).val)]
+  -- σ'' agrees with σ off {x, y}.
+  have hrest : ∀ k ∈ (Finset.univ : Finset V) \ ({x, y} : Finset V),
+      Nat.dist (σ'' k).val (σ' k).val = Nat.dist (σ k).val (σ' k).val := by
+    intro k hk
+    simp only [Finset.mem_sdiff, Finset.mem_insert, Finset.mem_singleton,
+      not_or, Finset.mem_univ, true_and] at hk
+    obtain ⟨hkx, hky⟩ := hk
+    -- σ'' k = σ k for k ∉ {x, y}.
+    show Nat.dist (σ'' k).val (σ' k).val = Nat.dist (σ k).val (σ' k).val
+    have hupd : σ'' k = σ k := by
+      show (Function.update (Function.update σ x _) y _) k = σ k
+      rw [Function.update_of_ne hky, Function.update_of_ne hkx]
+    rw [hupd]
+  rw [Finset.sum_congr rfl hrest]
+  -- Compute σ'' x and σ'' y.
+  have hupdy_y : σ'' y =
+      ⟨(σ y).val + 1, by have := (σ y).isLt; omega⟩ := by
+    show (Function.update (Function.update σ x _) y _) y = _
+    rw [Function.update_self]
+  have hupd_x : σ'' x = ⟨(σ x).val - 1, by have := (σ x).isLt; omega⟩ := by
+    show (Function.update (Function.update σ x _) y _) x = _
+    rw [Function.update_of_ne hxy, Function.update_self]
+  rw [hupd_x, hupdy_y]
+  -- Now distances at x and y change by 1 each.
+  -- Nat.dist ((σ x).val - 1) (σ' x).val = Nat.dist (σ x).val (σ' x).val - 1
+  --   (using hover : (σ' x).val < (σ x).val).
+  -- Nat.dist ((σ y).val + 1) (σ' y).val = Nat.dist (σ y).val (σ' y).val - 1
+  --   (using hunder : (σ y).val < (σ' y).val).
+  -- Total: distance shrinks by 2 at the (x, y) pair.
+  -- Use Nat.dist as |a - b| via `Nat.dist` definition: dist a b = (a - b) + (b - a).
+  have hx_eq : Nat.dist ((σ x).val - 1) (σ' x).val + 1 =
+      Nat.dist (σ x).val (σ' x).val := by
+    unfold Nat.dist
+    omega
+  have hy_eq : Nat.dist ((σ y).val + 1) (σ' y).val + 1 =
+      Nat.dist (σ y).val (σ' y).val := by
+    unfold Nat.dist
+    omega
+  -- Rewrite using hx_eq.symm and hy_eq.symm to eliminate Nat.dist on RHS.
+  rw [← hx_eq, ← hy_eq]
+  -- Goal: a + b + S + 2 = (a + 1) + (b + 1) + S, just arithmetic.
+  ring
+
 end LatticeSystem.Quantum
