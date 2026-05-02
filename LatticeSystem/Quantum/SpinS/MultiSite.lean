@@ -397,4 +397,11 @@ theorem onSiteS_neg (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
   rw [show ((-1 : ℂ) • onSiteS (N := N) i A : ManyBodyOpS Λ N) =
         -onSiteS i A from by rw [neg_smul, one_smul]]
 
+/-- Triple-product same-site identity:
+`(onSiteS i A) · (onSiteS i A) · (onSiteS i A) = onSiteS i (A * A * A)`. -/
+theorem onSiteS_cube (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i A : ManyBodyOpS Λ N) * onSiteS i A * onSiteS i A =
+      onSiteS i (A * A * A) := by
+  rw [onSiteS_mul_onSiteS_same, onSiteS_mul_onSiteS_same]
+
 end LatticeSystem.Quantum
