@@ -383,4 +383,9 @@ theorem basisVecS_of_ne {σ τ : Λ → Fin (N + 1)} (hne : τ ≠ σ) :
     basisVecS σ τ = 0 := by
   unfold basisVecS; rw [if_neg hne]
 
+/-- Same-site square: `(onSiteS i A) · (onSiteS i A) = onSiteS i (A * A)`. -/
+theorem onSiteS_sq (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i A : ManyBodyOpS Λ N) * onSiteS i A = onSiteS i (A * A) :=
+  onSiteS_mul_onSiteS_same i A A
+
 end LatticeSystem.Quantum
