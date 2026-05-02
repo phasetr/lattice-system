@@ -322,6 +322,19 @@ theorem spinSDot_apply_eq_ofReal_re (x y : Λ) (N : ℕ)
   · rw [Complex.ofReal_im]
     exact spinSDot_apply_im_zero x y N σ' σ
 
+/-- The matrix-element form of the raising/lowering decomposition of
+`spinSDot`: combines the `(1/2)(S+S- + S-S+)` ladder part with the
+`S^3 ⊗ S^3` diagonal part. -/
+theorem spinSDot_apply_eq_pm_3 (x y : Λ) (N : ℕ)
+    (σ' σ : Λ → Fin (N + 1)) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ =
+      ((1 / 2 : ℂ) •
+        (onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N) +
+          onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)) +
+        onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
+          : ManyBodyOpS Λ N) σ' σ := by
+  rw [spinSDot_eq_plus_minus]
+
 /-- `spinSDot x y 0` (trivial spin, distinct sites) equals zero. -/
 theorem spinSDot_N_zero_of_ne {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
     {x y : Λ} (hxy : x ≠ y) :
