@@ -77,6 +77,13 @@ theorem marshallSignS_eq_of_eq (A : V → Bool)
     {σ' σ : V → Fin (N + 1)} (h : σ' = σ) :
     marshallSignS A σ' = marshallSignS A σ := by rw [h]
 
+/-- Symmetric form of the Marshall sign product:
+`marshallSignS A σ' * marshallSignS A σ = marshallSignS A σ * marshallSignS A σ'`. -/
+theorem marshallSignS_mul_swap (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
+    marshallSignS A σ * marshallSignS A σ' =
+      marshallSignS A σ' * marshallSignS A σ :=
+  mul_comm _ _
+
 /-- For a constant configuration `σ ≡ s` and `s.val` even, the
 Marshall sign is `+1`. (Each `(-1)^(s.val)` factor is `+1`.) -/
 theorem marshallSignS_const_of_even
