@@ -745,6 +745,7 @@ theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_im_zero
     ring
   · rw [if_neg h]; simp
 
+
 /-- For distinct sites `x ≠ y`, the **sum** `(S+_x S-_y) + (S-_x S+_y)`
 matrix element has non-negative real part on every `(σ', σ)` pair. -/
 theorem onSiteS_spinSOpPlus_Minus_plus_Minus_Plus_re_nonneg
@@ -770,6 +771,19 @@ theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_im_zero
     rw [spinSOp3_apply_im_zero, spinSOp3_apply_im_zero]
     ring
   · rw [if_neg h]; simp
+
+/-- For distinct sites `x ≠ y`, the product `onSiteS x (S^3) * onSiteS y (S^3)`
+preserves real entries. -/
+theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_eq_ofReal_re
+    {x y : Λ} (hxy : x ≠ y) (σ' σ : Λ → Fin (N + 1)) :
+    (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
+          : ManyBodyOpS Λ N) σ' σ =
+      ((((onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
+          : ManyBodyOpS Λ N) σ' σ).re : ℝ) : ℂ) := by
+  apply Complex.ext
+  · simp
+  · rw [Complex.ofReal_im]
+    exact onSiteS_spinSOp3_mul_onSiteS_spinSOp3_im_zero hxy σ' σ
 
 /-- For distinct sites `x ≠ y`, when configurations agree at every
 site other than `x` and `y`, the matrix element of `S^3_x S^3_y`
