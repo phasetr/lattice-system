@@ -293,4 +293,13 @@ theorem spinSDot_eq_plus_minus (x y : Λ) (N : ℕ) :
   rw [key p r, smul_smul]
   norm_num
 
+/-- The matrix element of `Ŝ_x · Ŝ_y` always has zero imaginary part
+(unified version, no `x ≠ y` assumption). -/
+theorem spinSDot_apply_im_zero (x y : Λ) (N : ℕ)
+    (σ' σ : Λ → Fin (N + 1)) :
+    ((spinSDot x y N : ManyBodyOpS Λ N) σ' σ).im = 0 := by
+  by_cases hxy : x = y
+  · subst hxy; exact spinSDot_self_apply_im_zero x N σ' σ
+  · exact spinSDot_apply_im_zero_of_ne hxy N σ' σ
+
 end LatticeSystem.Quantum
