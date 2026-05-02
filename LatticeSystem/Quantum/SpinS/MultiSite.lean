@@ -642,6 +642,15 @@ theorem onSiteS_zero_mul (i : Λ) (B : ManyBodyOpS Λ N) :
     (onSiteS i (0 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) : ManyBodyOpS Λ N) * B = 0 := by
   rw [onSiteS_zero, zero_mul]
 
+/-- The site-`i` smul embedding: `onSiteS i (c • A) = c • onSiteS i A`,
+restated in matrix form (already proved in `onSiteS_smul`). -/
+theorem onSiteS_smul_apply (i : Λ) (c : ℂ)
+    (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
+    (σ' σ : Λ → Fin (N + 1)) :
+    (onSiteS i (c • A) : ManyBodyOpS Λ N) σ' σ =
+      c * (onSiteS i A : ManyBodyOpS Λ N) σ' σ := by
+  rw [onSiteS_smul, Matrix.smul_apply, smul_eq_mul]
+
 /-- The right multiplicative version: `B * onSiteS i 0 = 0`. -/
 theorem mul_onSiteS_zero (i : Λ) (B : ManyBodyOpS Λ N) :
     B * (onSiteS i (0 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
