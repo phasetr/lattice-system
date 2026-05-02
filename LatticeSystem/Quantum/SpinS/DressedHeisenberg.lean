@@ -278,4 +278,13 @@ theorem dressedHeisenbergSReMatrix_zero_J
   rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_zero_J]
   simp
 
+/-- With the trivial sublattice indicator (`fun _ => false`), the
+real-part dressed Heisenberg matrix equals the real-part of the plain
+Heisenberg matrix. -/
+theorem dressedHeisenbergSReMatrix_A_false (J : V → V → ℂ) (N : ℕ)
+    (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergSReMatrix (fun _ : V => false) J N σ σ' =
+      ((heisenbergHamiltonianS J N) σ σ').re := by
+  rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_A_false]
+
 end LatticeSystem.Quantum
