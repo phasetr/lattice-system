@@ -419,6 +419,19 @@ theorem heisenbergHamiltonianS_apply_im_zero
   rw [hreal x y, spinSDot_apply_im_zero]
   ring
 
+/-- For real coupling `J`, each Heisenberg matrix entry equals its
+real-part embedding. -/
+theorem heisenbergHamiltonianS_apply_eq_ofReal_re
+    {J : Λ → Λ → ℂ} (N : ℕ)
+    (hreal : ∀ x y, (J x y).im = 0)
+    (σ' σ : Λ → Fin (N + 1)) :
+    (heisenbergHamiltonianS J N) σ' σ =
+      (((heisenbergHamiltonianS J N) σ' σ).re : ℂ) := by
+  apply Complex.ext
+  · simp
+  · rw [Complex.ofReal_im]
+    exact heisenbergHamiltonianS_apply_im_zero (Λ := Λ) N hreal σ' σ
+
 /-- The matrix element `H σ' σ` vanishes when the two configurations
 have different magnetization quantum numbers. This is the matrix-level
 expression of `[H, S^z_tot] = 0`. -/
