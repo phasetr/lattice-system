@@ -299,6 +299,15 @@ theorem spinSOp2_mul_spinSOp2_im_zero (N : ℕ)
   rw [spinSOp2_apply_re_zero, spinSOp2_apply_re_zero]
   ring
 
+/-- The product `Ŝ^{(1)}_{i,j} * Ŝ^{(1)}_{k,l}` has zero imaginary
+part. (Real × real = real.) -/
+theorem spinSOp1_mul_spinSOp1_im_zero (N : ℕ)
+    (i j k l : Fin (N + 1)) :
+    (spinSOp1 N i j * spinSOp1 N k l).im = 0 := by
+  rw [Complex.mul_im]
+  rw [spinSOp1_apply_im_zero, spinSOp1_apply_im_zero]
+  ring
+
 /-- All entries of `Ŝ^{(3)}` have zero imaginary part. -/
 theorem spinSOp3_apply_im_zero (N : ℕ) (i j : Fin (N + 1)) :
     (spinSOp3 N i j).im = 0 := by
