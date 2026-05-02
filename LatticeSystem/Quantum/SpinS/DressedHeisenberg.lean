@@ -657,6 +657,42 @@ theorem dressedHeisenbergSReMatrix_apply_eq_zero_of_one_site_diff
     dressedHeisenbergS_apply_eq_zero_of_one_site_diff A J N hagree hz]
   simp
 
+/-- Dressed Heisenberg matrix vanishes on three-site differences. -/
+theorem dressedHeisenbergS_apply_eq_zero_of_three_diff
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
+    {σ' σ : V → Fin (N + 1)}
+    {z₁ z₂ z₃ : V}
+    (h12 : z₁ ≠ z₂) (h13 : z₁ ≠ z₃) (h23 : z₂ ≠ z₃)
+    (hz1 : σ' z₁ ≠ σ z₁) (hz2 : σ' z₂ ≠ σ z₂) (hz3 : σ' z₃ ≠ σ z₃) :
+    dressedHeisenbergS A J N σ' σ = 0 := by
+  unfold dressedHeisenbergS
+  rw [heisenbergHamiltonianS_apply_eq_zero_of_three_diff (Λ := V) J N
+    h12 h13 h23 hz1 hz2 hz3]
+  ring
+
+/-- Dressed Heisenberg `Matrix` vanishes on three-site differences. -/
+theorem dressedHeisenbergSMatrix_apply_eq_zero_of_three_diff
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
+    {σ' σ : V → Fin (N + 1)}
+    {z₁ z₂ z₃ : V}
+    (h12 : z₁ ≠ z₂) (h13 : z₁ ≠ z₃) (h23 : z₂ ≠ z₃)
+    (hz1 : σ' z₁ ≠ σ z₁) (hz2 : σ' z₂ ≠ σ z₂) (hz3 : σ' z₃ ≠ σ z₃) :
+    dressedHeisenbergSMatrix A J N σ' σ = 0 :=
+  dressedHeisenbergS_apply_eq_zero_of_three_diff A J N h12 h13 h23 hz1 hz2 hz3
+
+/-- Real-part dressed Heisenberg matrix vanishes on three-site differences. -/
+theorem dressedHeisenbergSReMatrix_apply_eq_zero_of_three_diff
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
+    {σ' σ : V → Fin (N + 1)}
+    {z₁ z₂ z₃ : V}
+    (h12 : z₁ ≠ z₂) (h13 : z₁ ≠ z₃) (h23 : z₂ ≠ z₃)
+    (hz1 : σ' z₁ ≠ σ z₁) (hz2 : σ' z₂ ≠ σ z₂) (hz3 : σ' z₃ ≠ σ z₃) :
+    dressedHeisenbergSReMatrix A J N σ' σ = 0 := by
+  rw [dressedHeisenbergSReMatrix_apply,
+    dressedHeisenbergS_apply_eq_zero_of_three_diff A J N
+      h12 h13 h23 hz1 hz2 hz3]
+  simp
+
 /-- Symmetric: bipartite case `x ∉ A, y ∈ A`, raising at `x`. -/
 theorem marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_y
     {x y : V} (hxy : x ≠ y) (N : ℕ)
