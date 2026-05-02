@@ -243,6 +243,36 @@ theorem marshallSignS_mul_of_agree_off_two_site
     · simp [hAz]
   rw [hrest, mul_one]
 
+/-- **Marshall sign on a bipartite raising/lowering bond is `-1`**.
+For `x ∈ A`, `y ∉ A`, and configurations `σ', σ` that agree off
+`{x, y}` with `(σ' x).val + (σ x).val` odd and `(σ' y).val + (σ y).val`
+even (or vice versa) — i.e., a single raising/lowering shift on
+exactly one of `{x, y}` lying in `A` — the Marshall sign product is
+`-1`. The general formula collapses since the `y` factor (with `A y`
+false) is `1`, and the `x` factor with odd exponent is `-1`. -/
+theorem marshallSignS_mul_of_agree_off_two_site_bipartite_x
+    (A : V → Bool) {x y : V} (hxy : x ≠ y)
+    (hAx : A x = true) (hAy : A y = false)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hxod : Odd ((σ' x).val + (σ x).val)) :
+    marshallSignS A σ' * marshallSignS A σ = -1 := by
+  rw [marshallSignS_mul_of_agree_off_two_site A hxy h]
+  rw [if_pos hAx]
+  simp [hAy, Odd.neg_one_pow hxod]
+
+/-- Same as above but with `x ∉ A`, `y ∈ A`. -/
+theorem marshallSignS_mul_of_agree_off_two_site_bipartite_y
+    (A : V → Bool) {x y : V} (hxy : x ≠ y)
+    (hAx : A x = false) (hAy : A y = true)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hyod : Odd ((σ' y).val + (σ y).val)) :
+    marshallSignS A σ' * marshallSignS A σ = -1 := by
+  rw [marshallSignS_mul_of_agree_off_two_site A hxy h]
+  rw [if_neg (by simp [hAx])]
+  simp [hAy, Odd.neg_one_pow hyod]
+
 /-- The Marshall sign equals its inverse: `(marshallSignS A σ)⁻¹ = marshallSignS A σ`. -/
 theorem marshallSignS_inv (A : V → Bool) (σ : V → Fin (N + 1)) :
     (marshallSignS A σ)⁻¹ = marshallSignS A σ := by
