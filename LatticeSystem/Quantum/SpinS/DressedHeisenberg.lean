@@ -325,6 +325,50 @@ theorem dressedHeisenbergSMatrix_mulVec_marshallDressedBasisS_mem_magSubspaceS
   exact (magSubspaceS V N (magEigenvalueS σ)).smul_mem _
     (dressedHeisenbergSMatrix_mulVec_basisVecS_mem_magSubspaceS A J N σ)
 
+/-- The dressed Heisenberg matrix commutes with `Ŝ_tot^{(3)}`. -/
+theorem dressedHeisenbergSMatrix_commute_totalSpinSOp3
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) :
+    Commute (dressedHeisenbergSMatrix A J N) (totalSpinSOp3 V N) := by
+  unfold Commute SemiconjBy
+  ext σ' σ
+  classical
+  -- Compute LHS: ∑ τ, dressed σ' τ * S^z τ σ collapses to dressed σ' σ * magEig σ.
+  have hL : (dressedHeisenbergSMatrix A J N * totalSpinSOp3 V N) σ' σ =
+      dressedHeisenbergSMatrix A J N σ' σ * magEigenvalueS σ := by
+    rw [Matrix.mul_apply]
+    rw [Finset.sum_eq_single σ
+      (fun τ _ hτ => by
+        rw [show (totalSpinSOp3 V N) τ σ = 0 from
+          totalSpinSOp3_apply_off_diag hτ]; ring)
+      (fun hσ => (hσ (Finset.mem_univ σ)).elim)]
+    rw [totalSpinSOp3_apply_diag]
+  have hR : (totalSpinSOp3 V N * dressedHeisenbergSMatrix A J N) σ' σ =
+      magEigenvalueS σ' * dressedHeisenbergSMatrix A J N σ' σ := by
+    rw [Matrix.mul_apply]
+    rw [Finset.sum_eq_single σ'
+      (fun τ _ hτ => by
+        rw [show (totalSpinSOp3 V N) σ' τ = 0 from
+          totalSpinSOp3_apply_off_diag (Ne.symm hτ)]; ring)
+      (fun hσ => (hσ (Finset.mem_univ σ')).elim)]
+    rw [totalSpinSOp3_apply_diag]
+  rw [hL, hR]
+  by_cases hmag : magEigenvalueS σ = magEigenvalueS σ'
+  · rw [hmag]; ring
+  · have hzero := dressedHeisenbergSMatrix_apply_eq_zero_of_mag_ne
+      A J N hmag
+    rw [hzero]; ring
+
+/-- The dressed Heisenberg matrix preserves each magnetization
+subspace: for `v ∈ magSubspaceS V N M`, `(dressedMatrix · v) ∈
+magSubspaceS V N M`. -/
+theorem dressedHeisenbergSMatrix_mulVec_mem_magSubspaceS
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (M : ℂ)
+    {v : (V → Fin (N + 1)) → ℂ}
+    (hv : v ∈ magSubspaceS V N M) :
+    (dressedHeisenbergSMatrix A J N).mulVec v ∈ magSubspaceS V N M :=
+  mem_magSubspaceS_of_commute M (dressedHeisenbergSMatrix A J N)
+    (dressedHeisenbergSMatrix_commute_totalSpinSOp3 A J N).symm hv
+
 /-- For real coupling, the dressed matrix is Hermitian. -/
 theorem dressedHeisenbergSMatrix_isHermitian
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
