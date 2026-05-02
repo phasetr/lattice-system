@@ -250,6 +250,12 @@ theorem dressedHeisenbergSReMatrix_apply
     dressedHeisenbergSReMatrix A J N σ σ' =
       (dressedHeisenbergS A J N σ σ').re := rfl
 
+/-- Definitional unfolding of `dressedHeisenbergSReMatrix`. -/
+theorem dressedHeisenbergSReMatrix_def
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) :
+    dressedHeisenbergSReMatrix A J N =
+      fun σ σ' => (dressedHeisenbergS A J N σ σ').re := rfl
+
 /-- For real coupling, the real-part dressed Heisenberg matrix is
 symmetric: `Mᵀ = M`. This follows from the Hermiticity of the
 complex dressed Heisenberg matrix combined with reality of the
