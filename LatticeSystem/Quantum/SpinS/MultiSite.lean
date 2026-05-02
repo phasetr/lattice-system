@@ -492,4 +492,9 @@ theorem onSiteS_pow_one (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
     (onSiteS i A : ManyBodyOpS Λ N) ^ 1 = onSiteS i A := by
   rw [pow_one]
 
+/-- `onSiteS i A ^ 2 = onSiteS i (A^2)`. -/
+theorem onSiteS_pow_two (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i A : ManyBodyOpS Λ N) ^ 2 = onSiteS i (A ^ 2) :=
+  onSiteS_pow i A 2
+
 end LatticeSystem.Quantum
