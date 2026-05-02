@@ -130,6 +130,14 @@ theorem spinSDot_swap_isHermitian
   rw [← spinSDot_comm x y N]
   exact spinSDot_isHermitian x y N
 
+/-- For `x = y`, the same-site dot product equals `(N(N+2)/4) • 1`
+(restated for emphasis). -/
+theorem spinSDot_self_eq {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (x : Λ) (N : ℕ) :
+    (spinSDot x x N : ManyBodyOpS Λ N) =
+      ((N : ℂ) * (N + 2) / 4) • 1 :=
+  spinSDot_self x N
+
 /-- **Raising/lowering decomposition** of the two-site spin-`S` dot
 product (Tasaki §2.2 eq. (2.2.16) for arbitrary spin):
 
