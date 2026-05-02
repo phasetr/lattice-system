@@ -275,6 +275,17 @@ theorem fun_eq_sum_smul_basisVecS (v : (Λ → Fin (N + 1)) → ℂ) :
   rw [Finset.sum_ite_eq Finset.univ τ (fun σ => v σ)]
   simp
 
+/-- **Magnetization-subspace decomposition is total**: every vector
+in the multi-site spin-`S` Hilbert space lies in the supremum of all
+magnetization subspaces. Equivalently, `⨆_M magSubspaceS Λ N M = ⊤`. -/
+theorem iSup_magSubspaceS_eq_top :
+    (⨆ M : ℂ, magSubspaceS Λ N M) = ⊤ := by
+  refine eq_top_iff.mpr (fun v _ => ?_)
+  rw [fun_eq_sum_smul_basisVecS v]
+  refine Submodule.sum_mem _ ?_
+  intro σ _
+  exact (⨆ M : ℂ, magSubspaceS Λ N M).smul_mem _ (basisVecS_mem_iSup_magSubspaceS σ)
+
 /-! ## Constant configurations -/
 
 omit [DecidableEq Λ] in
