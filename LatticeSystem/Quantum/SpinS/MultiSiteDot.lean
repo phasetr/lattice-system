@@ -351,6 +351,14 @@ theorem spinSDot_apply_diag_re_of_ne
   push_cast
   simp
 
+/-- For the same-site case, the diagonal real part is `N(N+2)/4`. -/
+theorem spinSDot_self_apply_diag_re (x : Λ) (N : ℕ)
+    (σ : Λ → Fin (N + 1)) :
+    ((spinSDot x x N : ManyBodyOpS Λ N) σ σ).re =
+      (N : ℝ) * (N + 2) / 4 := by
+  rw [spinSDot_self_apply_diag]
+  simp
+
 /-- The matrix-element form of the raising/lowering decomposition of
 `spinSDot`: combines the `(1/2)(S+S- + S-S+)` ladder part with the
 `S^3 ⊗ S^3` diagonal part. -/
