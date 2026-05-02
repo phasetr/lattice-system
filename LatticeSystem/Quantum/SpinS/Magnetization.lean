@@ -552,6 +552,18 @@ theorem magEigenvalueS_re_of_isEmpty [IsEmpty Λ] (σ : Λ → Fin (N + 1)) :
   rw [magEigenvalueS_of_isEmpty σ]
   simp
 
+/-- For trivial spin (`N = 0`), `magSubspaceS Λ 0 0 = ⊤`: every
+vector is in the zero-magnetization subspace because every basis
+state has eigenvalue 0. -/
+theorem magSubspaceS_N_zero_zero_eq_top :
+    magSubspaceS Λ 0 0 = ⊤ := by
+  refine eq_top_iff.mpr (fun v _ => ?_)
+  rw [mem_magSubspaceS_iff]
+  rw [show (totalSpinSOp3 Λ 0 : ManyBodyOpS Λ 0) = 0 from
+    totalSpinSOp3_N_zero (Λ := Λ)]
+  rw [Matrix.zero_mulVec]
+  simp
+
 omit [DecidableEq Λ] in
 /-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
 theorem magEigenvalueS_const_zero :
