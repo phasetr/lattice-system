@@ -174,6 +174,12 @@ theorem marshallSignS_im (A : V → Bool) (σ : V → Fin (N + 1)) :
   · rw [h]; simp
   · rw [h]; simp
 
+/-- Marshall sign multiplication is commutative (trivially in ℂ). -/
+theorem marshallSignS_mul_comm (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
+    marshallSignS A σ * marshallSignS A σ' =
+      marshallSignS A σ' * marshallSignS A σ :=
+  mul_comm _ _
+
 /-- The Marshall sign is real: its complex conjugate is itself. Each
 factor `(-1)^k` is real, so the star/conjugation acts as identity on
 the product. -/
