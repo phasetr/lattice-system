@@ -575,6 +575,34 @@ theorem spinSDot_apply_eq_raising_lowering_explicit
   push_cast
   ring
 
+/-- Symmetric: lowering at `x` and raising at `y`. -/
+theorem spinSDot_apply_eq_lowering_raising_explicit
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hx : (σ x).val + 1 = (σ' x).val)
+    (hy : (σ' y).val + 1 = (σ y).val) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ =
+      (1 / 2 : ℂ) *
+        ((Real.sqrt (((N : ℝ) - (σ x).val) *
+            ((σ x).val + 1)) : ℝ) *
+          (Real.sqrt (((σ y).val : ℝ) *
+            ((N : ℝ) - (σ y).val + 1)) : ℝ)) := by
+  have hσx : σ' x ≠ σ x := by
+    intro heq
+    have : (σ' x).val = (σ x).val := by rw [heq]
+    omega
+  rw [spinSDot_apply_eq_pm_only_of_off_diag_at_x hxy N h hσx]
+  -- (S+_x S-_y) σ' σ = 0 from lowering at x (S+ wrong direction).
+  rw [onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_eq_zero_of_lowering_x
+    hxy h hx]
+  rw [onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_of_off_two_site_agree
+    hxy h]
+  rw [spinSOpMinus_apply_lower N hx, spinSOpPlus_apply_raise N hy]
+  push_cast
+  ring
+
+
 /-- Symmetric: for `x ≠ y` and configurations `σ', σ` agreeing off
 `{x, y}`, the matrix element of `Ŝ_x · Ŝ_y` has non-negative real
 part on the lowering/raising pair `(σ x).val + 1 = (σ' x).val`. -/
