@@ -150,6 +150,22 @@ theorem spinSOpMinus_apply_diag (N : ℕ) (k : Fin (N + 1)) :
   apply spinSOpMinus_apply_other
   omega
 
+/-- Diagonal entries of `Ŝ^{(1)}` vanish (it is purely off-diagonal). -/
+theorem spinSOp1_apply_diag (N : ℕ) (k : Fin (N + 1)) :
+    spinSOp1 N k k = 0 := by
+  unfold spinSOp1
+  rw [Matrix.smul_apply, Matrix.add_apply,
+    spinSOpPlus_apply_diag, spinSOpMinus_apply_diag]
+  simp
+
+/-- Diagonal entries of `Ŝ^{(2)}` vanish (it is purely off-diagonal). -/
+theorem spinSOp2_apply_diag (N : ℕ) (k : Fin (N + 1)) :
+    spinSOp2 N k k = 0 := by
+  unfold spinSOp2
+  rw [Matrix.smul_apply, Matrix.sub_apply,
+    spinSOpPlus_apply_diag, spinSOpMinus_apply_diag]
+  simp
+
 /-- Top of the ladder: `Ŝ^+` annihilates the highest-weight state. -/
 theorem spinSOpPlus_apply_top (N : ℕ) (j : Fin (N + 1)) :
     spinSOpPlus N (Fin.last N) j = 0 := by
