@@ -287,4 +287,13 @@ theorem dressedHeisenbergSReMatrix_A_false (J : V → V → ℂ) (N : ℕ)
       ((heisenbergHamiltonianS J N) σ σ').re := by
   rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_A_false]
 
+/-- The diagonal of the real-part dressed Heisenberg matrix equals
+the real-part of the plain Heisenberg diagonal: the Marshall sign
+squares to 1, so the dressing does not change the diagonal. -/
+theorem dressedHeisenbergSReMatrix_diag (A : V → Bool) (J : V → V → ℂ)
+    (N : ℕ) (σ : V → Fin (N + 1)) :
+    dressedHeisenbergSReMatrix A J N σ σ =
+      ((heisenbergHamiltonianS J N) σ σ).re := by
+  rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_diag]
+
 end LatticeSystem.Quantum
