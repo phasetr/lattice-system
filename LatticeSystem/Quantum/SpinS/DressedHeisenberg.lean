@@ -241,6 +241,14 @@ theorem dressedHeisenbergSMatrix_sub_J
   rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_sub_J]
   simp [dressedHeisenbergSMatrix_apply]
 
+/-- The diagonal of the dressed Heisenberg matrix equals the diagonal
+of the plain Heisenberg matrix (Marshall signs cancel as `(±1)^2 = 1`). -/
+theorem dressedHeisenbergSMatrix_apply_diag
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ : V → Fin (N + 1)) :
+    dressedHeisenbergSMatrix A J N σ σ =
+      (heisenbergHamiltonianS J N) σ σ := by
+  rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_diag]
+
 /-- For real coupling, the dressed matrix is Hermitian. -/
 theorem dressedHeisenbergSMatrix_isHermitian
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
