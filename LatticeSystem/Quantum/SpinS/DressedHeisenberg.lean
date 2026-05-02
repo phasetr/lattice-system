@@ -38,6 +38,13 @@ noncomputable def dressedHeisenbergS
   marshallSignS A σ * marshallSignS A σ' *
     (heisenbergHamiltonianS J N) σ σ'
 
+/-- Definitional unfolding of `dressedHeisenbergS`. -/
+theorem dressedHeisenbergS_def
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergS A J N σ σ' =
+      marshallSignS A σ * marshallSignS A σ' *
+        (heisenbergHamiltonianS J N) σ σ' := rfl
+
 /-- Diagonal Marshall-dressed matrix element:
 `dressedHeisenbergS A J N σ σ = (heisenbergHamiltonianS J N) σ σ`
 (since `marshallSignS A σ * marshallSignS A σ = 1` by γ-1e). -/
