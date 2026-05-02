@@ -234,6 +234,14 @@ theorem dressedHeisenbergSMatrix_zero_J (A : V → Bool) (N : ℕ) :
   rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_zero_J]
   simp
 
+/-- For trivial spin (`N = 0`), the dressed Heisenberg matrix is zero. -/
+theorem dressedHeisenbergSMatrix_N_zero
+    (A : V → Bool) (J : V → V → ℂ) :
+    dressedHeisenbergSMatrix A J 0 = 0 := by
+  ext σ σ'
+  rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_N_zero]
+  simp
+
 /-- The dressed Heisenberg matrix is additive in the coupling. -/
 theorem dressedHeisenbergSMatrix_add_J
     (A : V → Bool) (J J' : V → V → ℂ) (N : ℕ) :
