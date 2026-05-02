@@ -74,4 +74,56 @@ theorem configDistS_pos_iff (σ σ' : V → Fin (N + 1)) :
     0 < configDistS σ σ' ↔ σ ≠ σ' := by
   rw [Nat.pos_iff_ne_zero, ne_eq, configDistS_eq_zero_iff]
 
+/-! ## Existence of over/under sites for equal-magnetization pairs -/
+
+omit [DecidableEq V] in
+/-- For two distinct configurations with equal magnetization sums,
+there exists a site where `σ` exceeds `σ'` and another where `σ`
+falls below `σ'`. This is the input to the iteration argument that
+reduces `configDistS` step by step toward zero. -/
+theorem exists_over_under_of_eq_magSumS
+    {σ σ' : V → Fin (N + 1)}
+    (hne : σ ≠ σ') (hmag : magSumS σ = magSumS σ') :
+    (∃ x : V, (σ' x).val < (σ x).val) ∧
+      ∃ y : V, (σ y).val < (σ' y).val := by
+  -- Witness of disagreement.
+  obtain ⟨z, hz⟩ := Function.ne_iff.mp hne
+  -- WLOG σ z ≠ σ' z, so either σ z > σ' z or σ z < σ' z.
+  have hzord : (σ z).val < (σ' z).val ∨ (σ' z).val < (σ z).val := by
+    rcases Nat.lt_or_ge (σ z).val (σ' z).val with h | h
+    · exact Or.inl h
+    · refine Or.inr ?_
+      rcases Nat.lt_or_ge (σ' z).val (σ z).val with h' | h'
+      · exact h'
+      · -- (σ z).val ≥ (σ' z).val and (σ z).val ≤ (σ' z).val: equal.
+        exfalso; apply hz; apply Fin.ext; omega
+  -- From the magnetization equality, ∑ over = ∑ under (positive integer sums).
+  -- If only over (no under), sum-σ > sum-σ', contradiction.
+  -- If only under (no over), sum-σ < sum-σ', contradiction.
+  refine ⟨?_, ?_⟩
+  · -- Show ∃ x, (σ' x).val < (σ x).val.
+    by_contra h_no_over
+    push Not at h_no_over
+    -- h_no_over : ∀ x, (σ x).val ≤ (σ' x).val.
+    have hzlt : (σ z).val < (σ' z).val := by
+      rcases hzord with hlt | hgt
+      · exact hlt
+      · exact (Nat.lt_irrefl _ (Nat.lt_of_le_of_lt (h_no_over z) hgt)).elim
+    have hsum_lt : magSumS σ < magSumS σ' := by
+      unfold magSumS
+      apply Finset.sum_lt_sum (fun x _ => h_no_over x) ⟨z, Finset.mem_univ z, hzlt⟩
+    omega
+  · -- Show ∃ y, (σ y).val < (σ' y).val.
+    by_contra h_no_under
+    push Not at h_no_under
+    -- h_no_under : ∀ y, (σ' y).val ≤ (σ y).val.
+    have hzgt : (σ' z).val < (σ z).val := by
+      rcases hzord with hlt | hgt
+      · exact (Nat.lt_irrefl _ (Nat.lt_of_le_of_lt (h_no_under z) hlt)).elim
+      · exact hgt
+    have hsum_gt : magSumS σ' < magSumS σ := by
+      unfold magSumS
+      apply Finset.sum_lt_sum (fun x _ => h_no_under x) ⟨z, Finset.mem_univ z, hzgt⟩
+    omega
+
 end LatticeSystem.Quantum
