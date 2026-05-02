@@ -729,4 +729,18 @@ theorem onSiteS_spinSOpPlus_Minus_plus_Minus_Plus_re_nonneg
   have h2 := onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_re_nonneg hxy σ' σ
   linarith
 
+/-- For distinct sites `x ≠ y`, the product `S^3_x ⊗ S^3_y` matrix
+element has zero imaginary part. -/
+theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_im_zero
+    {x y : Λ} (hxy : x ≠ y) (σ' σ : Λ → Fin (N + 1)) :
+    ((onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
+          : ManyBodyOpS Λ N) σ' σ).im = 0 := by
+  rw [onSiteS_mul_onSiteS_apply_eq hxy]
+  by_cases h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k
+  · rw [if_pos h]
+    rw [Complex.mul_im]
+    rw [spinSOp3_apply_im_zero, spinSOp3_apply_im_zero]
+    ring
+  · rw [if_neg h]; simp
+
 end LatticeSystem.Quantum
