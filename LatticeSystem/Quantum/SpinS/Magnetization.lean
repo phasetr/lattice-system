@@ -112,6 +112,18 @@ theorem zero_mem_magSubspaceS (M : ℂ) :
     (0 : (Λ → Fin (N + 1)) → ℂ) ∈ magSubspaceS Λ N M :=
   (magSubspaceS Λ N M).zero_mem
 
+/-- Sum-membership for the magnetization subspace. -/
+theorem add_mem_magSubspaceS (M : ℂ) {v w : (Λ → Fin (N + 1)) → ℂ}
+    (hv : v ∈ magSubspaceS Λ N M) (hw : w ∈ magSubspaceS Λ N M) :
+    v + w ∈ magSubspaceS Λ N M :=
+  (magSubspaceS Λ N M).add_mem hv hw
+
+/-- Scalar multiplication membership. -/
+theorem smul_mem_magSubspaceS (M : ℂ) (c : ℂ)
+    {v : (Λ → Fin (N + 1)) → ℂ} (hv : v ∈ magSubspaceS Λ N M) :
+    c • v ∈ magSubspaceS Λ N M :=
+  (magSubspaceS Λ N M).smul_mem c hv
+
 /-- Distinct magnetization eigenvalues give disjoint subspaces. -/
 theorem magSubspaceS_disjoint {M M' : ℂ} (hMM' : M ≠ M') :
     Disjoint (magSubspaceS Λ N M) (magSubspaceS Λ N M') := by
