@@ -1,3 +1,4 @@
+import LatticeSystem.Quantum.SpinS.Magnetization
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 import LatticeSystem.Quantum.SpinS.MultiSiteDotComm
 import LatticeSystem.Quantum.SpinS.TotalSpin
@@ -336,5 +337,17 @@ theorem heisenbergHamiltonianS_mulVec_preserves_totalSpinSOp3_eigenvalue
       (heisenbergHamiltonianS_commutator_totalSpinSOp3 J N)).symm
   rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hv,
     Matrix.mulVec_smul]
+
+/-- The Heisenberg Hamiltonian preserves each magnetization subspace:
+`v ∈ magSubspaceS Λ N M ⇒ (Ĥ · v) ∈ magSubspaceS Λ N M`.
+Direct corollary of the `Ŝ_tot^{(3)}` commutativity. -/
+theorem heisenbergHamiltonianS_mulVec_mem_magSubspaceS
+    (J : Λ → Λ → ℂ) (N : ℕ) (M : ℂ)
+    {v : (Λ → Fin (N + 1)) → ℂ}
+    (hv : v ∈ magSubspaceS Λ N M) :
+    (heisenbergHamiltonianS J N).mulVec v ∈ magSubspaceS Λ N M :=
+  mem_magSubspaceS_of_commute M (heisenbergHamiltonianS J N)
+    (sub_eq_zero.mp
+      (heisenbergHamiltonianS_commutator_totalSpinSOp3 J N)).symm hv
 
 end LatticeSystem.Quantum
