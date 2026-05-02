@@ -61,6 +61,22 @@ theorem onSiteS_apply (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
     onSiteS i A σ' σ =
       if (∀ k, k ≠ i → σ' k = σ k) then A (σ' i) (σ i) else 0 := rfl
 
+/-- The matrix element vanishes when configurations differ off-site. -/
+theorem onSiteS_apply_eq_zero_of_off_site_diff
+    (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ¬ (∀ k, k ≠ i → σ' k = σ k)) :
+    onSiteS i A σ' σ = 0 := by
+  rw [onSiteS_apply, if_neg h]
+
+/-- The matrix element when configurations agree off-site. -/
+theorem onSiteS_apply_of_off_site_agree
+    (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ i → σ' k = σ k) :
+    onSiteS i A σ' σ = A (σ' i) (σ i) := by
+  rw [onSiteS_apply, if_pos h]
+
 /-- If `A` is Hermitian, so is its site embedding `onSiteS i A`. -/
 theorem onSiteS_isHermitian (i : Λ)
     {A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ} (hA : A.IsHermitian) :
