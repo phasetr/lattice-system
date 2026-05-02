@@ -197,6 +197,13 @@ theorem dressedHeisenbergSMatrix_apply
     (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
     dressedHeisenbergSMatrix A J N σ σ' = dressedHeisenbergS A J N σ σ' := rfl
 
+/-- The dressed Heisenberg matrix is zero when the coupling is zero. -/
+theorem dressedHeisenbergSMatrix_zero_J (A : V → Bool) (N : ℕ) :
+    dressedHeisenbergSMatrix A (fun _ _ : V => (0 : ℂ)) N = 0 := by
+  ext σ σ'
+  rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_zero_J]
+  simp
+
 /-- For real coupling, the dressed matrix is Hermitian. -/
 theorem dressedHeisenbergSMatrix_isHermitian
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
