@@ -785,6 +785,32 @@ theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_eq_ofReal_re
   · rw [Complex.ofReal_im]
     exact onSiteS_spinSOp3_mul_onSiteS_spinSOp3_im_zero hxy σ' σ
 
+/-- For distinct sites `x ≠ y`, the product `S+_x ⊗ S-_y` matrix
+element equals its real-part embedding. -/
+theorem onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_eq_ofReal_re
+    {x y : Λ} (hxy : x ≠ y) (σ' σ : Λ → Fin (N + 1)) :
+    (onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N)
+          : ManyBodyOpS Λ N) σ' σ =
+      ((((onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N)
+          : ManyBodyOpS Λ N) σ' σ).re : ℝ) : ℂ) := by
+  apply Complex.ext
+  · simp
+  · rw [Complex.ofReal_im]
+    exact onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_im_zero hxy σ' σ
+
+/-- For distinct sites `x ≠ y`, the product `S-_x ⊗ S+_y` matrix
+element equals its real-part embedding. -/
+theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_eq_ofReal_re
+    {x y : Λ} (hxy : x ≠ y) (σ' σ : Λ → Fin (N + 1)) :
+    (onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
+          : ManyBodyOpS Λ N) σ' σ =
+      ((((onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
+          : ManyBodyOpS Λ N) σ' σ).re : ℝ) : ℂ) := by
+  apply Complex.ext
+  · simp
+  · rw [Complex.ofReal_im]
+    exact onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_im_zero hxy σ' σ
+
 /-- For distinct sites `x ≠ y`, when configurations agree at every
 site other than `x` and `y`, the matrix element of `S^3_x S^3_y`
 factors into the per-site `S^3` entries. -/
