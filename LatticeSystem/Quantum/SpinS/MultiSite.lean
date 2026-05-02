@@ -97,6 +97,18 @@ theorem onSiteS_apply_im_zero (i : Λ)
   · rw [if_pos h]; exact hA _ _
   · rw [if_neg h]; simp
 
+/-- If every entry of `A` has zero real part, every entry of
+`onSiteS i A` has zero real part. -/
+theorem onSiteS_apply_re_zero (i : Λ)
+    {A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ}
+    (hA : ∀ p q, (A p q).re = 0)
+    (σ' σ : Λ → Fin (N + 1)) :
+    ((onSiteS i A : ManyBodyOpS Λ N) σ' σ).re = 0 := by
+  rw [onSiteS_apply]
+  by_cases h : ∀ k, k ≠ i → σ' k = σ k
+  · rw [if_pos h]; exact hA _ _
+  · rw [if_neg h]; simp
+
 /-- If `A` is Hermitian, so is its site embedding `onSiteS i A`. -/
 theorem onSiteS_isHermitian (i : Λ)
     {A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ} (hA : A.IsHermitian) :
