@@ -44,6 +44,12 @@ theorem magSumS_nonneg (σ : Λ → Fin (N + 1)) : 0 ≤ magSumS σ := by
   exact Finset.sum_nonneg (fun _ _ => Nat.zero_le _)
 
 omit [DecidableEq Λ] in
+/-- The cast `(magSumS σ : ℝ) ≥ 0`. -/
+theorem magSumS_real_nonneg (σ : Λ → Fin (N + 1)) :
+    (0 : ℝ) ≤ (magSumS σ : ℝ) := by
+  exact_mod_cast magSumS_nonneg σ
+
+omit [DecidableEq Λ] in
 /-- `magSumS σ ≤ |Λ| · N`. -/
 theorem magSumS_le (σ : Λ → Fin (N + 1)) :
     magSumS σ ≤ Fintype.card Λ * N := by
