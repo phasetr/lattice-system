@@ -318,6 +318,14 @@ theorem marshallDressedBasisS_const_zero [DecidableEq V]
   unfold marshallDressedBasisS
   rw [marshallSignS_const_zero, one_smul]
 
+/-- For `N = 0` (`S = 0`), the Marshall-dressed basis vector equals
+the plain basis vector. -/
+theorem marshallDressedBasisS_N_zero [DecidableEq V]
+    (A : V → Bool) (σ : V → Fin 1) :
+    marshallDressedBasisS A σ = basisVecS σ := by
+  unfold marshallDressedBasisS
+  rw [marshallSignS_N_zero, one_smul]
+
 /-- **Orthonormality of the Marshall-dressed basis**:
 
   `Σ_τ (marshallDressedBasisS A σ τ).star * marshallDressedBasisS A σ' τ
