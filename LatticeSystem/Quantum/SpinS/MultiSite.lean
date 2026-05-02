@@ -651,6 +651,25 @@ theorem onSiteS_smul_apply (i : Λ) (c : ℂ)
       c * (onSiteS i A : ManyBodyOpS Λ N) σ' σ := by
   rw [onSiteS_smul, Matrix.smul_apply, smul_eq_mul]
 
+/-- The site-`i` add embedding entry-wise:
+`(onSiteS i (A + B)) σ' σ = (onSiteS i A) σ' σ + (onSiteS i B) σ' σ`. -/
+theorem onSiteS_add_apply (i : Λ)
+    (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
+    (σ' σ : Λ → Fin (N + 1)) :
+    (onSiteS i (A + B) : ManyBodyOpS Λ N) σ' σ =
+      (onSiteS i A : ManyBodyOpS Λ N) σ' σ +
+      (onSiteS i B : ManyBodyOpS Λ N) σ' σ := by
+  rw [onSiteS_add, Matrix.add_apply]
+
+/-- The site-`i` sub embedding entry-wise. -/
+theorem onSiteS_sub_apply (i : Λ)
+    (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
+    (σ' σ : Λ → Fin (N + 1)) :
+    (onSiteS i (A - B) : ManyBodyOpS Λ N) σ' σ =
+      (onSiteS i A : ManyBodyOpS Λ N) σ' σ -
+      (onSiteS i B : ManyBodyOpS Λ N) σ' σ := by
+  rw [onSiteS_sub, Matrix.sub_apply]
+
 /-- The right multiplicative version: `B * onSiteS i 0 = 0`. -/
 theorem mul_onSiteS_zero (i : Λ) (B : ManyBodyOpS Λ N) :
     B * (onSiteS i (0 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
