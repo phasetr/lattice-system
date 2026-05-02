@@ -404,4 +404,16 @@ theorem onSiteS_cube (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
       onSiteS i (A * A * A) := by
   rw [onSiteS_mul_onSiteS_same, onSiteS_mul_onSiteS_same]
 
+/-- Power identity: `(onSiteS i A)^k = onSiteS i (A^k)`. -/
+theorem onSiteS_pow (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
+    (k : ℕ) :
+    (onSiteS i A : ManyBodyOpS Λ N) ^ k = onSiteS i (A ^ k) := by
+  induction k with
+  | zero =>
+    simp only [pow_zero]
+    exact (onSiteS_one i).symm
+  | succ k ih =>
+    rw [pow_succ, ih, onSiteS_mul_onSiteS_same]
+    rw [pow_succ]
+
 end LatticeSystem.Quantum
