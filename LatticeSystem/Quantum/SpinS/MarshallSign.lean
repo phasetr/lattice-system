@@ -167,6 +167,13 @@ theorem marshallSignS_re (A : V → Bool) (σ : V → Fin (N + 1)) :
   · left; rw [h]; rfl
   · right; rw [h]; rfl
 
+/-- Imaginary part of the Marshall sign is zero. -/
+theorem marshallSignS_im (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallSignS A σ).im = 0 := by
+  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
+  · rw [h]; simp
+  · rw [h]; simp
+
 /-- The Marshall sign is real: its complex conjugate is itself. Each
 factor `(-1)^k` is real, so the star/conjugation acts as identity on
 the product. -/
