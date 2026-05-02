@@ -134,6 +134,15 @@ theorem marshallSignS_norm (A : V → Bool) (σ : V → Fin (N + 1)) :
   · rw [h, norm_one]
   · rw [h]; simp
 
+/-- Even powers of the Marshall sign are `1`. -/
+theorem marshallSignS_pow_two_mul (A : V → Bool) (σ : V → Fin (N + 1))
+    (k : ℕ) :
+    marshallSignS A σ ^ (2 * k) = 1 := by
+  rw [pow_mul]
+  rw [show marshallSignS A σ ^ 2 = 1 from by
+    rw [pow_two]; exact marshallSignS_sq A σ]
+  rw [one_pow]
+
 /-- The Marshall sign is real: its complex conjugate is itself. Each
 factor `(-1)^k` is real, so the star/conjugation acts as identity on
 the product. -/
