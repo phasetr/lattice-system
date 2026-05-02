@@ -263,6 +263,18 @@ theorem basisVecS_mem_iSup_magSubspaceS (σ : Λ → Fin (N + 1)) :
       ⨆ M : ℂ, magSubspaceS Λ N M :=
   Submodule.mem_iSup_of_mem (magEigenvalueS σ) (basisVecS_mem_magSubspaceS σ)
 
+/-- **Basis decomposition** of any vector: `v = Σ_σ v(σ) • |σ⟩`.
+This is the standard expansion of a function on a finite set into
+indicator functions. -/
+theorem fun_eq_sum_smul_basisVecS (v : (Λ → Fin (N + 1)) → ℂ) :
+    v = ∑ σ : Λ → Fin (N + 1), v σ • (basisVecS σ : (Λ → Fin (N + 1)) → ℂ) := by
+  funext τ
+  rw [Finset.sum_apply]
+  simp only [Pi.smul_apply, basisVecS_apply, smul_eq_mul, mul_ite,
+    mul_one, mul_zero]
+  rw [Finset.sum_ite_eq Finset.univ τ (fun σ => v σ)]
+  simp
+
 /-! ## Constant configurations -/
 
 omit [DecidableEq Λ] in
