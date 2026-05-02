@@ -212,6 +212,27 @@ theorem spinSOpMinus_apply_re_pos_of_lower (N : ℕ) {i j : Fin (N + 1)}
   · have : (0 : ℝ) ≤ (j.val : ℝ) := by positivity
     linarith
 
+/-- The product `Ŝ^+_{i,j} * Ŝ^-_{k,l}` has non-negative real part
+(both factors have zero imaginary part and non-negative real part). -/
+theorem spinSOpPlus_mul_spinSOpMinus_re_nonneg (N : ℕ)
+    (i j k l : Fin (N + 1)) :
+    0 ≤ (spinSOpPlus N i j * spinSOpMinus N k l).re := by
+  rw [Complex.mul_re]
+  rw [spinSOpPlus_apply_im_zero, spinSOpMinus_apply_im_zero]
+  rw [zero_mul, sub_zero]
+  exact mul_nonneg (spinSOpPlus_apply_re_nonneg N i j)
+    (spinSOpMinus_apply_re_nonneg N k l)
+
+/-- Symmetric: `Ŝ^-_{i,j} * Ŝ^+_{k,l}` has non-negative real part. -/
+theorem spinSOpMinus_mul_spinSOpPlus_re_nonneg (N : ℕ)
+    (i j k l : Fin (N + 1)) :
+    0 ≤ (spinSOpMinus N i j * spinSOpPlus N k l).re := by
+  rw [Complex.mul_re]
+  rw [spinSOpMinus_apply_im_zero, spinSOpPlus_apply_im_zero]
+  rw [zero_mul, sub_zero]
+  exact mul_nonneg (spinSOpMinus_apply_re_nonneg N i j)
+    (spinSOpPlus_apply_re_nonneg N k l)
+
 /-- Diagonal entries of `Ŝ^{(1)}` vanish (it is purely off-diagonal). -/
 theorem spinSOp1_apply_diag (N : ℕ) (k : Fin (N + 1)) :
     spinSOp1 N k k = 0 := by
