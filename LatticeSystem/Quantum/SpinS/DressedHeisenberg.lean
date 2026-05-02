@@ -716,6 +716,37 @@ theorem marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_y
   rw [neg_nonpos]
   exact spinSDot_apply_re_nonneg_of_raising_lowering_x hxy N h _hx
 
+/-- Mirror of `marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_y`:
+bipartite case `x ∉ A, y ∈ A`, but lowering at `y` and raising at `x`. -/
+theorem marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_y_lowering
+    {x y : V} (hxy : x ≠ y) (N : ℕ)
+    (A : V → Bool) (hAx : A x = false) (hAy : A y = true)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hx : (σ x).val + 1 = (σ' x).val)
+    (_hy : (σ' y).val + 1 = (σ y).val) :
+    ((marshallSignS A σ' * marshallSignS A σ) *
+        (spinSDot x y N : ManyBodyOpS V N) σ' σ).re ≤ 0 := by
+  have hsign : marshallSignS A σ' * marshallSignS A σ = -1 := by
+    apply marshallSignS_mul_of_agree_off_two_site_bipartite_y A hxy hAx hAy h
+    rw [show (σ' y).val = (σ y).val - 1 from by omega]
+    rw [show (σ y).val - 1 + (σ y).val = 2 * (σ y).val - 1 from by omega]
+    -- Need: Odd (2 * (σ y).val - 1).
+    rcases (σ y).val.eq_zero_or_pos with hzero | hpos
+    · -- (σ y).val = 0 forces (σ' y).val + 1 = 0, impossible.
+      exfalso
+      rw [hzero] at _hy
+      omega
+    · refine ⟨(σ y).val - 1, ?_⟩
+      omega
+  rw [hsign]
+  rw [show ((-1 : ℂ) * (spinSDot x y N : ManyBodyOpS V N) σ' σ).re =
+        -((spinSDot x y N : ManyBodyOpS V N) σ' σ).re from by
+    rw [Complex.mul_re]
+    simp]
+  rw [neg_nonpos]
+  exact spinSDot_apply_re_nonneg_of_raising_lowering_y hxy N h hx
+
 /-- The real-part dressed Heisenberg matrix is additive in the
 coupling. -/
 theorem dressedHeisenbergSReMatrix_add_J
@@ -914,6 +945,82 @@ theorem dressedHeisenbergS_apply_re_nonpos_bipartite_y
       ((marshallSignS A σ' * marshallSignS A σ) *
         (spinSDot x y N : ManyBodyOpS V N) σ' σ).re ≤ 0 :=
     marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_y hxy N A
+      hAx hAy h hx hy
+  have h2J : 0 ≤ 2 * (J x y).re := by linarith
+  nlinarith
+
+/-- Mirror of `dressedHeisenbergS_apply_re_nonpos_bipartite_x`:
+bipartite case `x ∈ A, y ∉ A`, but lowering at `x` and raising at `y`. -/
+theorem dressedHeisenbergS_apply_re_nonpos_bipartite_x_lowering
+    {x y : V} (hxy : x ≠ y) (N : ℕ)
+    (A : V → Bool) (hAx : A x = true) (hAy : A y = false)
+    {J : V → V → ℂ} (hJ_real : (J x y).im = 0) (hJ_nn : 0 ≤ (J x y).re)
+    (hJ_sym : J x y = J y x)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hx : (σ' x).val + 1 = (σ x).val)
+    (hy : (σ y).val + 1 = (σ' y).val) :
+    (dressedHeisenbergS A J N σ' σ).re ≤ 0 := by
+  have hne : σ' ≠ σ := by
+    intro heq
+    have : (σ' x).val = (σ x).val := by rw [heq]
+    omega
+  rw [dressedHeisenbergS_apply_of_off_two_site_agree A hxy N hne h]
+  rw [show (J x y + J y x) = 2 * J x y from by rw [← hJ_sym]; ring]
+  rw [show (2 : ℂ) * J x y = ((2 * (J x y).re : ℝ) : ℂ) from by
+    apply Complex.ext
+    · simp
+    · simp [hJ_real]]
+  rw [show (((2 * (J x y).re : ℝ) : ℂ) *
+        (marshallSignS A σ' * marshallSignS A σ) *
+        (spinSDot x y N : ManyBodyOpS V N) σ' σ : ℂ) =
+      ((2 * (J x y).re : ℝ) : ℂ) *
+        ((marshallSignS A σ' * marshallSignS A σ) *
+          (spinSDot x y N : ManyBodyOpS V N) σ' σ) from by ring]
+  rw [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, zero_mul,
+    sub_zero]
+  have hc :
+      ((marshallSignS A σ' * marshallSignS A σ) *
+        (spinSDot x y N : ManyBodyOpS V N) σ' σ).re ≤ 0 :=
+    marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_x hxy N A
+      hAx hAy h hx hy
+  have h2J : 0 ≤ 2 * (J x y).re := by linarith
+  nlinarith
+
+/-- Mirror of `dressedHeisenbergS_apply_re_nonpos_bipartite_y`:
+bipartite case `x ∉ A, y ∈ A`, but raising at `x` and lowering at `y`. -/
+theorem dressedHeisenbergS_apply_re_nonpos_bipartite_y_lowering
+    {x y : V} (hxy : x ≠ y) (N : ℕ)
+    (A : V → Bool) (hAx : A x = false) (hAy : A y = true)
+    {J : V → V → ℂ} (hJ_real : (J x y).im = 0) (hJ_nn : 0 ≤ (J x y).re)
+    (hJ_sym : J x y = J y x)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hx : (σ x).val + 1 = (σ' x).val)
+    (hy : (σ' y).val + 1 = (σ y).val) :
+    (dressedHeisenbergS A J N σ' σ).re ≤ 0 := by
+  have hne : σ' ≠ σ := by
+    intro heq
+    have : (σ' x).val = (σ x).val := by rw [heq]
+    omega
+  rw [dressedHeisenbergS_apply_of_off_two_site_agree A hxy N hne h]
+  rw [show (J x y + J y x) = 2 * J x y from by rw [← hJ_sym]; ring]
+  rw [show (2 : ℂ) * J x y = ((2 * (J x y).re : ℝ) : ℂ) from by
+    apply Complex.ext
+    · simp
+    · simp [hJ_real]]
+  rw [show (((2 * (J x y).re : ℝ) : ℂ) *
+        (marshallSignS A σ' * marshallSignS A σ) *
+        (spinSDot x y N : ManyBodyOpS V N) σ' σ : ℂ) =
+      ((2 * (J x y).re : ℝ) : ℂ) *
+        ((marshallSignS A σ' * marshallSignS A σ) *
+          (spinSDot x y N : ManyBodyOpS V N) σ' σ) from by ring]
+  rw [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, zero_mul,
+    sub_zero]
+  have hc :
+      ((marshallSignS A σ' * marshallSignS A σ) *
+        (spinSDot x y N : ManyBodyOpS V N) σ' σ).re ≤ 0 :=
+    marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_y_lowering hxy N A
       hAx hAy h hx hy
   have h2J : 0 ≤ 2 * (J x y).re := by linarith
   nlinarith
