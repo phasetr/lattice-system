@@ -274,6 +274,18 @@ theorem dressedHeisenbergSMatrix_mulVec_basisVecS_apply
       (fun σ' => dressedHeisenbergSMatrix A J N τ σ')]
   simp
 
+/-- Like the plain Heisenberg, the dressed matrix element vanishes
+when the two configurations have different magnetization quantum
+numbers. The Marshall sign factors do not change the support. -/
+theorem dressedHeisenbergSMatrix_apply_eq_zero_of_mag_ne
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
+    {σ' σ : V → Fin (N + 1)}
+    (h : magEigenvalueS σ ≠ magEigenvalueS σ') :
+    dressedHeisenbergSMatrix A J N σ' σ = 0 := by
+  rw [dressedHeisenbergSMatrix_apply_eq_smul]
+  rw [heisenbergHamiltonianS_apply_eq_zero_of_mag_ne (Λ := V) J N h]
+  ring
+
 /-- For real coupling, the dressed matrix is Hermitian. -/
 theorem dressedHeisenbergSMatrix_isHermitian
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
