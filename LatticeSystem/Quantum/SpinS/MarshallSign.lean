@@ -180,6 +180,11 @@ theorem marshallSignS_mul_comm (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
       marshallSignS A σ' * marshallSignS A σ :=
   mul_comm _ _
 
+/-- Restated form: `marshallSignS A σ * marshallSignS A σ = 1`. -/
+theorem marshallSignS_mul_self (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ * marshallSignS A σ = 1 :=
+  marshallSignS_sq A σ
+
 /-- The Marshall sign is real: its complex conjugate is itself. Each
 factor `(-1)^k` is real, so the star/conjugation acts as identity on
 the product. -/
