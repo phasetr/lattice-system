@@ -262,6 +262,17 @@ theorem magSumS_pos_iff (σ : Λ → Fin (N + 1)) :
   rfl
 
 omit [DecidableEq Λ] in
+/-- For `N = 0` (`S = 0`), `magSumS σ = 0` always (the only Fin 1
+value is 0). -/
+theorem magSumS_of_N_zero (σ : Λ → Fin 1) :
+    magSumS σ = 0 := by
+  apply (magSumS_eq_zero_iff (N := 0) σ).mpr
+  intro x
+  apply Fin.ext
+  have := (σ x).isLt
+  omega
+
+omit [DecidableEq Λ] in
 /-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
 theorem magEigenvalueS_const_zero :
     magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1))) =
