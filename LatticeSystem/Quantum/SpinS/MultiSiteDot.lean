@@ -638,6 +638,7 @@ theorem spinSDot_apply_re_nonneg_of_raising_lowering_y
   simp
   positivity
 
+
 /-- **One-site difference vanishing**: for `x ≠ y` and configurations
 `σ', σ` agreeing off a single site `z`, the matrix element of
 `Ŝ_x · Ŝ_y` vanishes. (Two-site operators cannot connect
@@ -687,5 +688,52 @@ theorem spinSDot_apply_eq_zero_of_one_site_diff
           Matrix.diagonal_apply_ne _ hz]]
       ring
     · exact spinSDot_apply_eq_zero_of_diff_outside_pair hxy N hzx hzy hz
+
+/-- For `x ≠ y` and configurations `σ', σ` agreeing off `{x, y}` with
+`σ' ≠ σ`, the spinSDot matrix element of any pair `(x', y')` with
+`x' ≠ y'` and `x'` outside `{x, y}` vanishes. (The non-zero
+off-diagonal entries of `Ŝ_x · Ŝ_y` are confined to the supporting
+two-site set.) -/
+theorem spinSDot_apply_eq_zero_of_x_outside_pair
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)} (hne : σ' ≠ σ)
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    {x' y' : Λ} (hxy' : x' ≠ y')
+    (hxx' : x' ≠ x) (hyx' : x' ≠ y) :
+    (spinSDot x' y' N : ManyBodyOpS Λ N) σ' σ = 0 := by
+  by_cases hxd : σ' x = σ x
+  · by_cases hyd : σ' y = σ y
+    · exfalso
+      apply hne
+      funext k
+      by_cases hkx : k = x
+      · subst hkx; exact hxd
+      · by_cases hky : k = y
+        · subst hky; exact hyd
+        · exact h k hkx hky
+    · by_cases hyy' : y = y'
+      · have hagree : ∀ k, k ≠ y' → σ' k = σ k := fun k hk => by
+          subst hyy'
+          by_cases hkx : k = x
+          · subst hkx; exact hxd
+          · exact h k hkx hk
+        exact spinSDot_apply_eq_zero_of_one_site_diff hxy' N hagree
+          (hyy' ▸ hyd)
+      · exact spinSDot_apply_eq_zero_of_diff_outside_pair hxy' N
+          (Ne.symm hyx') hyy' hyd
+  · by_cases hxy2 : x = y'
+    · by_cases hyd : σ' y = σ y
+      · have hagree : ∀ k, k ≠ y' → σ' k = σ k := fun k hk => by
+          subst hxy2
+          by_cases hky : k = y
+          · subst hky; exact hyd
+          · exact h k hk hky
+        exact spinSDot_apply_eq_zero_of_one_site_diff hxy' N hagree
+          (hxy2 ▸ hxd)
+      · have hyy' : y ≠ y' := fun heq => hxy.symm (heq.trans hxy2.symm)
+        exact spinSDot_apply_eq_zero_of_diff_outside_pair hxy' N
+          (Ne.symm hyx') hyy' hyd
+    · exact spinSDot_apply_eq_zero_of_diff_outside_pair hxy' N
+        (Ne.symm hxx') (Ne.symm fun heq => hxy2 heq.symm) hxd
 
 end LatticeSystem.Quantum
