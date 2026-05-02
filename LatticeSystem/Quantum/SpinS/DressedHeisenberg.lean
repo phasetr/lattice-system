@@ -625,6 +625,38 @@ theorem marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_x_lowering
   rw [neg_nonpos]
   exact spinSDot_apply_re_nonneg_of_raising_lowering_y hxy N h hx
 
+/-- The dressed Heisenberg matrix vanishes on one-site differences.
+Direct corollary: dressed = sign × sign × H, and H vanishes there. -/
+theorem dressedHeisenbergS_apply_eq_zero_of_one_site_diff
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
+    {σ' σ : V → Fin (N + 1)}
+    {z : V} (hagree : ∀ k, k ≠ z → σ' k = σ k) (hz : σ' z ≠ σ z) :
+    dressedHeisenbergS A J N σ' σ = 0 := by
+  unfold dressedHeisenbergS
+  rw [heisenbergHamiltonianS_apply_eq_zero_of_one_site_diff
+    (Λ := V) J N hagree hz]
+  ring
+
+/-- The dressed Heisenberg matrix (as a `ManyBodyOpS`) vanishes on
+one-site differences. -/
+theorem dressedHeisenbergSMatrix_apply_eq_zero_of_one_site_diff
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
+    {σ' σ : V → Fin (N + 1)}
+    {z : V} (hagree : ∀ k, k ≠ z → σ' k = σ k) (hz : σ' z ≠ σ z) :
+    dressedHeisenbergSMatrix A J N σ' σ = 0 :=
+  dressedHeisenbergS_apply_eq_zero_of_one_site_diff A J N hagree hz
+
+/-- The real-part dressed Heisenberg matrix vanishes on one-site
+differences. -/
+theorem dressedHeisenbergSReMatrix_apply_eq_zero_of_one_site_diff
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
+    {σ' σ : V → Fin (N + 1)}
+    {z : V} (hagree : ∀ k, k ≠ z → σ' k = σ k) (hz : σ' z ≠ σ z) :
+    dressedHeisenbergSReMatrix A J N σ' σ = 0 := by
+  rw [dressedHeisenbergSReMatrix_apply,
+    dressedHeisenbergS_apply_eq_zero_of_one_site_diff A J N hagree hz]
+  simp
+
 /-- Symmetric: bipartite case `x ∉ A, y ∈ A`, raising at `x`. -/
 theorem marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_y
     {x y : V} (hxy : x ≠ y) (N : ℕ)
