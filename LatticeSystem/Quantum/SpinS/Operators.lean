@@ -138,6 +138,15 @@ theorem spinSOpPlus_apply_im_zero (N : ℕ) (i j : Fin (N + 1)) :
   · rw [if_pos h]; simp
   · rw [if_neg h]; simp
 
+/-- All entries of `Ŝ^+` have non-negative real part. -/
+theorem spinSOpPlus_apply_re_nonneg (N : ℕ) (i j : Fin (N + 1)) :
+    0 ≤ (spinSOpPlus N i j).re := by
+  unfold spinSOpPlus
+  by_cases h : i.val + 1 = j.val
+  · rw [if_pos h, Complex.ofReal_re]
+    exact Real.sqrt_nonneg _
+  · rw [if_neg h]; simp
+
 /-- The `Ŝ^-` matrix entry on a lowering pair. -/
 theorem spinSOpMinus_apply_lower (N : ℕ) {i j : Fin (N + 1)}
     (h : j.val + 1 = i.val) :
@@ -164,6 +173,15 @@ theorem spinSOpMinus_apply_im_zero (N : ℕ) (i j : Fin (N + 1)) :
   unfold spinSOpMinus
   by_cases h : j.val + 1 = i.val
   · rw [if_pos h]; simp
+  · rw [if_neg h]; simp
+
+/-- All entries of `Ŝ^-` have non-negative real part. -/
+theorem spinSOpMinus_apply_re_nonneg (N : ℕ) (i j : Fin (N + 1)) :
+    0 ≤ (spinSOpMinus N i j).re := by
+  unfold spinSOpMinus
+  by_cases h : j.val + 1 = i.val
+  · rw [if_pos h, Complex.ofReal_re]
+    exact Real.sqrt_nonneg _
   · rw [if_neg h]; simp
 
 /-- Diagonal entries of `Ŝ^{(1)}` vanish (it is purely off-diagonal). -/
