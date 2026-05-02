@@ -182,6 +182,20 @@ theorem spinSOp2_apply_diag (N : ℕ) (k : Fin (N + 1)) :
     spinSOpPlus_apply_diag, spinSOpMinus_apply_diag]
   simp
 
+/-- All entries of `Ŝ^{(1)}` have zero imaginary part. -/
+theorem spinSOp1_apply_im_zero (N : ℕ) (i j : Fin (N + 1)) :
+    (spinSOp1 N i j).im = 0 := by
+  unfold spinSOp1
+  rw [Matrix.smul_apply, Matrix.add_apply, smul_eq_mul]
+  simp [spinSOpPlus_apply_im_zero, spinSOpMinus_apply_im_zero]
+
+/-- All entries of `Ŝ^{(2)}` have zero real part. -/
+theorem spinSOp2_apply_re_zero (N : ℕ) (i j : Fin (N + 1)) :
+    (spinSOp2 N i j).re = 0 := by
+  unfold spinSOp2
+  rw [Matrix.smul_apply, Matrix.sub_apply, smul_eq_mul]
+  simp [spinSOpPlus_apply_im_zero, spinSOpMinus_apply_im_zero]
+
 /-- Top of the ladder: `Ŝ^+` annihilates the highest-weight state. -/
 theorem spinSOpPlus_apply_top (N : ℕ) (j : Fin (N + 1)) :
     spinSOpPlus N (Fin.last N) j = 0 := by
