@@ -64,6 +64,17 @@ theorem marshallSignS_of_isEmpty [IsEmpty V]
   rw [show (Finset.univ : Finset V) = ∅ from Finset.eq_empty_of_isEmpty _]
   exact Finset.prod_empty
 
+/-- The Marshall sign restricted to `A`-sites: factors away the
+trivial `1` contributions from non-`A` sites. -/
+theorem marshallSignS_eq_prod_A_filter
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ =
+      ∏ x ∈ Finset.univ.filter (fun x : V => A x = true),
+        ((-1 : ℂ) ^ (σ x).val) := by
+  classical
+  unfold marshallSignS
+  rw [Finset.prod_filter]
+
 /-- Definitional unfolding of `marshallSignS`. -/
 theorem marshallSignS_def (A : V → Bool) (σ : V → Fin (N + 1)) :
     marshallSignS A σ =
