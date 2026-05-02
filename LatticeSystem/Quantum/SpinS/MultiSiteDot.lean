@@ -302,4 +302,15 @@ theorem spinSDot_apply_im_zero (x y : Λ) (N : ℕ)
   · subst hxy; exact spinSDot_self_apply_im_zero x N σ' σ
   · exact spinSDot_apply_im_zero_of_ne hxy N σ' σ
 
+/-- For real coupling, the matrix element of `Ŝ_x · Ŝ_y` always
+equals its own real-part embedding. -/
+theorem spinSDot_apply_eq_ofReal_re (x y : Λ) (N : ℕ)
+    (σ' σ : Λ → Fin (N + 1)) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ =
+      (((spinSDot x y N : ManyBodyOpS Λ N) σ' σ).re : ℂ) := by
+  apply Complex.ext
+  · simp
+  · rw [Complex.ofReal_im]
+    exact spinSDot_apply_im_zero x y N σ' σ
+
 end LatticeSystem.Quantum
