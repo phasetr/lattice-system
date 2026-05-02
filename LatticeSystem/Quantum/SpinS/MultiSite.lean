@@ -487,4 +487,9 @@ theorem onSiteS_pow_zero (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
   rw [pow_zero]
   exact onSiteS_one i
 
+/-- `onSiteS i A ^ 1 = onSiteS i A`. -/
+theorem onSiteS_pow_one (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i A : ManyBodyOpS Λ N) ^ 1 = onSiteS i A := by
+  rw [pow_one]
+
 end LatticeSystem.Quantum
