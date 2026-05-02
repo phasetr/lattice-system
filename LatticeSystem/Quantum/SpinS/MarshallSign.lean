@@ -345,6 +345,14 @@ theorem marshallDressedBasisS_N_zero [DecidableEq V]
   unfold marshallDressedBasisS
   rw [marshallSignS_N_zero, one_smul]
 
+/-- For an empty lattice, the Marshall-dressed basis vector equals
+the plain basis vector (Marshall sign is `1`). -/
+theorem marshallDressedBasisS_of_isEmpty [DecidableEq V] [IsEmpty V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallDressedBasisS A σ = basisVecS σ := by
+  unfold marshallDressedBasisS
+  rw [marshallSignS_of_isEmpty, one_smul]
+
 /-- **Orthonormality of the Marshall-dressed basis**:
 
   `Σ_τ (marshallDressedBasisS A σ τ).star * marshallDressedBasisS A σ' τ
