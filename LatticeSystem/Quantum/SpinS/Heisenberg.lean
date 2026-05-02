@@ -320,4 +320,21 @@ theorem heisenbergHamiltonianS_mulVec_preserves_totalSpinSSquared_eigenvalue
   rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hv,
     Matrix.mulVec_smul]
 
+/-- The Heisenberg Hamiltonian preserves `Ŝ_tot^{(3)}` eigenvalues:
+if `Ŝ_tot^{(3)} · v = M · v`, then `Ŝ_tot^{(3)} · (Ĥ · v) = M · (Ĥ · v)`.
+The `(Ŝ_tot)^{(3)}`-analogue of the Casimir version. -/
+theorem heisenbergHamiltonianS_mulVec_preserves_totalSpinSOp3_eigenvalue
+    (J : Λ → Λ → ℂ) (N : ℕ)
+    {M : ℂ} {v : (Λ → Fin (N + 1)) → ℂ}
+    (hv : (totalSpinSOp3 Λ N).mulVec v = M • v) :
+    (totalSpinSOp3 Λ N).mulVec
+        ((heisenbergHamiltonianS J N).mulVec v) =
+      M • (heisenbergHamiltonianS J N).mulVec v := by
+  have hcomm : totalSpinSOp3 Λ N * heisenbergHamiltonianS J N =
+      heisenbergHamiltonianS J N * totalSpinSOp3 Λ N :=
+    (sub_eq_zero.mp
+      (heisenbergHamiltonianS_commutator_totalSpinSOp3 J N)).symm
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul]
+
 end LatticeSystem.Quantum
