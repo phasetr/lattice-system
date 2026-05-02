@@ -1257,4 +1257,90 @@ theorem dressedHeisenbergS_apply_re_nonpos_of_off_two_site_agree_bipartite
               A hxy N hne h hσx hxlower hxraise
           rw [hzero]; simp
 
+/-- **Global off-diagonal dressed Heisenberg non-positivity** (Tasaki §2.5
+Theorem 2.2 input for general spin):
+
+For real symmetric coupling `J` supported on bipartite bonds (`A x = A y
+⟹ J x y = 0`) with `(J x y).re ≥ 0`, every off-diagonal entry of the
+dressed Heisenberg matrix has non-positive real part:
+
+    `Re (dressedHeisenbergS A J N σ' σ) ≤ 0` for all `σ' ≠ σ`.
+
+This is the Phase B-γ γ-3 input to Perron–Frobenius. The proof
+case-splits on the cardinality of the difference set
+`D := {k | σ' k ≠ σ k}`:
+- `|D| = 1`: `dressedHeisenbergS_apply_eq_zero_of_one_site_diff` → 0.
+- `|D| = 2` with `D = {x, y}`:
+  - `A x = A y`: bipartite-supported `J` forces both `J x y, J y x = 0`,
+    so the two-site formula gives `dressed = 0`.
+  - `A x ≠ A y`: apply the per-bond unified non-positivity
+    (`dressedHeisenbergS_apply_re_nonpos_of_off_two_site_agree_bipartite`).
+- `|D| ≥ 3`: `dressedHeisenbergS_apply_eq_zero_of_three_diff` → 0. -/
+theorem dressedHeisenbergS_apply_re_nonpos_of_ne_bipartite
+    (A : V → Bool) (N : ℕ)
+    {J : V → V → ℂ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    {σ' σ : V → Fin (N + 1)} (hne : σ' ≠ σ) :
+    (dressedHeisenbergS A J N σ' σ).re ≤ 0 := by
+  classical
+  let D := (Finset.univ : Finset V).filter (fun k => σ' k ≠ σ k)
+  have hDne : D.Nonempty := by
+    obtain ⟨z, hz⟩ := Function.ne_iff.mp hne
+    exact ⟨z, Finset.mem_filter.mpr ⟨Finset.mem_univ z, hz⟩⟩
+  obtain ⟨x, hxD⟩ := hDne
+  have hσx : σ' x ≠ σ x := (Finset.mem_filter.mp hxD).2
+  by_cases hD1 : (D.erase x).Nonempty
+  · -- |D| ≥ 2.
+    obtain ⟨y, hyD⟩ := hD1
+    have hxy : x ≠ y := (Finset.mem_erase.mp hyD).1.symm
+    have hyD' : y ∈ D := (Finset.mem_erase.mp hyD).2
+    have hσy : σ' y ≠ σ y := (Finset.mem_filter.mp hyD').2
+    by_cases hD2 : ((D.erase x).erase y).Nonempty
+    · -- |D| ≥ 3: three_diff vanishing.
+      obtain ⟨z, hzD⟩ := hD2
+      have hyz : y ≠ z := (Finset.mem_erase.mp hzD).1.symm
+      have hzD' : z ∈ D.erase x := (Finset.mem_erase.mp hzD).2
+      have hxz : x ≠ z := (Finset.mem_erase.mp hzD').1.symm
+      have hσz : σ' z ≠ σ z :=
+        (Finset.mem_filter.mp (Finset.mem_erase.mp hzD').2).2
+      have hzero : dressedHeisenbergS A J N σ' σ = 0 :=
+        dressedHeisenbergS_apply_eq_zero_of_three_diff A J N
+          hxy hxz hyz hσx hσy hσz
+      rw [hzero]; simp
+    · -- |D| = 2: D = {x, y}. So σ' σ off-{x, y}-agree.
+      have hagree : ∀ k, k ≠ x → k ≠ y → σ' k = σ k := by
+        intro k hkx hky
+        by_contra hkne
+        have hkD : k ∈ D := Finset.mem_filter.mpr ⟨Finset.mem_univ k, hkne⟩
+        have hkD' : k ∈ D.erase x := Finset.mem_erase.mpr ⟨hkx, hkD⟩
+        have hkD'' : k ∈ (D.erase x).erase y :=
+          Finset.mem_erase.mpr ⟨hky, hkD'⟩
+        exact hD2 ⟨k, hkD''⟩
+      by_cases hAne : A x = A y
+      · -- A x = A y: bipartite J forces (J x y) = (J y x) = 0.
+        have hJxy : J x y = 0 := hJ_bipartite x y hAne
+        have hJyx : J y x = 0 := hJ_bipartite y x hAne.symm
+        have hzero : dressedHeisenbergS A J N σ' σ = 0 := by
+          rw [dressedHeisenbergS_apply_of_off_two_site_agree A hxy N
+            hne hagree]
+          rw [hJxy, hJyx]
+          ring
+        rw [hzero]; simp
+      · -- A x ≠ A y: apply the per-bond unified non-positivity.
+        exact dressedHeisenbergS_apply_re_nonpos_of_off_two_site_agree_bipartite
+          hxy N A hAne (hJ_real x y) (hJ_nn x y) (hJ_sym x y) hne hagree
+  · -- |D| = 1: D = {x}. So σ' σ agree off {x}.
+    have hagree : ∀ k, k ≠ x → σ' k = σ k := by
+      intro k hkx
+      by_contra hkne
+      have hkD : k ∈ D := Finset.mem_filter.mpr ⟨Finset.mem_univ k, hkne⟩
+      have hkD' : k ∈ D.erase x := Finset.mem_erase.mpr ⟨hkx, hkD⟩
+      exact hD1 ⟨k, hkD'⟩
+    have hzero : dressedHeisenbergS A J N σ' σ = 0 :=
+      dressedHeisenbergS_apply_eq_zero_of_one_site_diff A J N hagree hσx
+    rw [hzero]; simp
+
 end LatticeSystem.Quantum
