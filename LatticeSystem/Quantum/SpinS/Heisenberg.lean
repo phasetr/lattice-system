@@ -395,6 +395,50 @@ theorem heisenbergHamiltonianS_mulVec_basisVecS_mem_magSubspaceS
     (heisenbergHamiltonianS J N).mulVec (basisVecS σ) ∈
       magSubspaceS Λ N (magEigenvalueS σ) :=
   heisenbergHamiltonianS_mulVec_mem_magSubspaceS _ N _
-    (basisVecS_mem_magSubspaceS σ)
+    (basisVecS_mem_basisVec_magSubspaceS σ)
+where
+  basisVecS_mem_basisVec_magSubspaceS := basisVecS_mem_magSubspaceS
+
+/-- The matrix element `H σ' σ` vanishes when the two configurations
+have different magnetization quantum numbers. This is the matrix-level
+expression of `[H, S^z_tot] = 0`. -/
+theorem heisenbergHamiltonianS_apply_eq_zero_of_mag_ne
+    (J : Λ → Λ → ℂ) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : magEigenvalueS σ ≠ magEigenvalueS σ') :
+    (heisenbergHamiltonianS J N) σ' σ = 0 := by
+  -- Apply H to |σ⟩: result is in magSubspaceS Λ N (magEig σ).
+  have hH := heisenbergHamiltonianS_mulVec_basisVecS_mem_magSubspaceS
+    (Λ := Λ) J N σ
+  rw [mem_magSubspaceS_iff] at hH
+  -- Read at row σ': S^z_tot · (H · |σ⟩) σ' = (magEig σ) · (H · |σ⟩) σ'.
+  have hentry := congrFun hH σ'
+  -- LHS: (S^z · H · |σ⟩) σ' = magEig σ' · (H · |σ⟩) σ' (using S^z diagonal).
+  classical
+  have hLHS :
+      (totalSpinSOp3 Λ N).mulVec
+        ((heisenbergHamiltonianS J N).mulVec (basisVecS σ)) σ' =
+      magEigenvalueS σ' *
+        ((heisenbergHamiltonianS J N).mulVec (basisVecS σ)) σ' := by
+    change ∑ τ, (totalSpinSOp3 Λ N) σ' τ *
+        ((heisenbergHamiltonianS J N).mulVec (basisVecS σ)) τ = _
+    rw [Finset.sum_eq_single σ']
+    · rw [totalSpinSOp3_apply_diag]
+    · intro τ _ hτne
+      rw [totalSpinSOp3_apply_off_diag (Ne.symm hτne), zero_mul]
+    · intro hσ; exact (hσ (Finset.mem_univ σ')).elim
+  rw [hLHS, Pi.smul_apply, smul_eq_mul] at hentry
+  -- hentry : magEig σ' · X = magEig σ · X, where X = (H · |σ⟩) σ' = H σ' σ.
+  have hHapply : (heisenbergHamiltonianS J N).mulVec (basisVecS σ) σ' =
+      (heisenbergHamiltonianS J N) σ' σ :=
+    heisenbergHamiltonianS_mulVec_basisVecS_apply (Λ := Λ) J N σ σ'
+  rw [hHapply] at hentry
+  have hzero :
+      (magEigenvalueS σ' - magEigenvalueS σ) *
+        (heisenbergHamiltonianS J N) σ' σ = 0 := by
+    linear_combination hentry
+  rcases mul_eq_zero.mp hzero with hmag | hH
+  · exact (h (sub_eq_zero.mp hmag).symm).elim
+  · exact hH
 
 end LatticeSystem.Quantum
