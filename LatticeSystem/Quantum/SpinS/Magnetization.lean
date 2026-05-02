@@ -398,6 +398,20 @@ theorem magEigenvalueS_re (σ : Λ → Fin (N + 1)) :
   simp
 
 omit [DecidableEq Λ] in
+/-- `magEigenvalueS σ` is bounded: `(magEigenvalueS σ).re ≥ -(|Λ| · N) / 2`.
+The most-down configuration `σ ≡ N` (giving `magSumS σ = |Λ| · N`)
+gives the lowest value `-(|Λ| · N) / 2`. -/
+theorem magEigenvalueS_re_lower_bound (σ : Λ → Fin (N + 1)) :
+    -((Fintype.card Λ : ℝ) * (N : ℝ)) / 2 ≤ (magEigenvalueS σ).re := by
+  rw [magEigenvalueS_re]
+  have hle := magSumS_le σ
+  have : (magSumS σ : ℝ) ≤ ((Fintype.card Λ : ℝ) * (N : ℝ)) := by
+    have : ((magSumS σ : ℕ) : ℝ) ≤ ((Fintype.card Λ * N : ℕ) : ℝ) :=
+      Nat.cast_le.mpr hle
+    simp at this; linarith
+  linarith
+
+omit [DecidableEq Λ] in
 /-- `magEigenvalueS σ = ((magEigenvalueS σ).re : ℂ)`: its imaginary
 part vanishes, so it equals its embedded real part. -/
 theorem magEigenvalueS_eq_ofReal_re (σ : Λ → Fin (N + 1)) :
