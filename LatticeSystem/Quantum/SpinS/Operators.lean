@@ -198,6 +198,20 @@ theorem spinSOpMinus_apply_re_nonneg (N : ℕ) (i j : Fin (N + 1)) :
     exact Real.sqrt_nonneg _
   · rw [if_neg h]; simp
 
+/-- The `Ŝ^-` matrix entry on a lowering pair is strictly positive. -/
+theorem spinSOpMinus_apply_re_pos_of_lower (N : ℕ) {i j : Fin (N + 1)}
+    (h : j.val + 1 = i.val) :
+    0 < (spinSOpMinus N i j).re := by
+  rw [spinSOpMinus_apply_lower N h, Complex.ofReal_re]
+  apply Real.sqrt_pos.mpr
+  apply mul_pos
+  · have hi : i.val ≤ N := by have := i.isLt; omega
+    have hj : j.val < N := by omega
+    have : (j.val : ℝ) < (N : ℝ) := by exact_mod_cast hj
+    linarith
+  · have : (0 : ℝ) ≤ (j.val : ℝ) := by positivity
+    linarith
+
 /-- Diagonal entries of `Ŝ^{(1)}` vanish (it is purely off-diagonal). -/
 theorem spinSOp1_apply_diag (N : ℕ) (k : Fin (N + 1)) :
     spinSOp1 N k k = 0 := by
