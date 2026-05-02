@@ -90,6 +90,20 @@ theorem marshallSignS_const_of_even
     exact Even.neg_one_pow hs
   · simp [hAx]
 
+/-- For a constant configuration `σ ≡ s` and `s.val` odd, the
+Marshall sign is `(-1)^|A|`. -/
+theorem marshallSignS_const_of_odd
+    (A : V → Bool) {s : Fin (N + 1)} (hs : Odd s.val) :
+    marshallSignS A (fun _ : V => s) =
+      ((-1 : ℂ) ^ (Finset.univ.filter (fun x : V => A x = true)).card) := by
+  classical
+  unfold marshallSignS
+  rw [Finset.prod_filter]
+  simp only [Bool.coe_true_iff_eq_true]
+  rw [Finset.prod_ite_const]
+  congr 1
+  exact Odd.neg_one_pow hs
+
 
 /-- The Marshall sign restricted to `A`-sites: factors away the
 trivial `1` contributions from non-`A` sites. -/
