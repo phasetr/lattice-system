@@ -347,4 +347,14 @@ theorem marshallDressedBasisS_norm_eq_basisVecS [DecidableEq V]
   rw [Pi.smul_apply, smul_eq_mul, norm_mul]
   rw [marshallSignS_norm, one_mul]
 
+/-- The Marshall-dressed basis vector lies in the supremum of all
+magnetization subspaces (since it lies in `magSubspaceS V N (magEigenvalueS σ)`
+which is included in `⨆ M, magSubspaceS V N M`). -/
+theorem marshallDressedBasisS_mem_iSup_magSubspaceS [DecidableEq V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallDressedBasisS A σ : (V → Fin (N + 1)) → ℂ) ∈
+      ⨆ M : ℂ, magSubspaceS V N M :=
+  Submodule.mem_iSup_of_mem (magEigenvalueS σ)
+    (marshallDressedBasisS_mem_magSubspaceS A σ)
+
 end LatticeSystem.Quantum
