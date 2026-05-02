@@ -151,6 +151,14 @@ theorem dressedHeisenbergS_N_zero
   rw [heisenbergHamiltonianS_N_zero (Λ := V) J]
   simp
 
+/-- The diagonal real part of `dressedHeisenbergS` equals the
+diagonal real part of `heisenbergHamiltonianS`. -/
+theorem dressedHeisenbergS_diag_re
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ : V → Fin (N + 1)) :
+    (dressedHeisenbergS A J N σ σ).re =
+      ((heisenbergHamiltonianS J N) σ σ).re := by
+  rw [dressedHeisenbergS_diag]
+
 /-- Dressed Heisenberg is additive in the coupling. -/
 theorem dressedHeisenbergS_add_J
     (A : V → Bool) (J J' : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
