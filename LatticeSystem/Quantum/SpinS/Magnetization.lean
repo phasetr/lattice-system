@@ -148,6 +148,13 @@ theorem neg_mem_magSubspaceS (M : ℂ)
     -v ∈ magSubspaceS Λ N M :=
   (magSubspaceS Λ N M).neg_mem hv
 
+/-- Subtraction membership in `magSubspaceS`. -/
+theorem sub_mem_magSubspaceS (M : ℂ)
+    {v w : (Λ → Fin (N + 1)) → ℂ} (hv : v ∈ magSubspaceS Λ N M)
+    (hw : w ∈ magSubspaceS Λ N M) :
+    v - w ∈ magSubspaceS Λ N M :=
+  (magSubspaceS Λ N M).sub_mem hv hw
+
 /-- Distinct magnetization eigenvalues give disjoint subspaces. -/
 theorem magSubspaceS_disjoint {M M' : ℂ} (hMM' : M ≠ M') :
     Disjoint (magSubspaceS Λ N M) (magSubspaceS Λ N M') := by
