@@ -142,6 +142,15 @@ theorem dressedHeisenbergS_zero_J
   unfold dressedHeisenbergS heisenbergHamiltonianS
   simp
 
+/-- For trivial spin (`N = 0`, `S = 0`), every dressed Heisenberg
+matrix element vanishes (the underlying Heisenberg is zero). -/
+theorem dressedHeisenbergS_N_zero
+    (A : V → Bool) (J : V → V → ℂ) (σ σ' : V → Fin 1) :
+    dressedHeisenbergS A J 0 σ σ' = 0 := by
+  unfold dressedHeisenbergS
+  rw [heisenbergHamiltonianS_N_zero (Λ := V) J]
+  simp
+
 /-- Dressed Heisenberg is additive in the coupling. -/
 theorem dressedHeisenbergS_add_J
     (A : V → Bool) (J J' : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
