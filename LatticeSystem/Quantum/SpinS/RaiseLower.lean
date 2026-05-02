@@ -154,4 +154,60 @@ theorem magEigenvalueS_eq_of_raiseLowerReachableS {G : SimpleGraph V}
   unfold magEigenvalueS
   rw [magSumS_eq_of_raiseLowerReachableS h]
 
+/-! ## Single-edge raise/lower step constructions -/
+
+/-- The configuration obtained from `σ` by lowering at `x` (subtracting
+1) and raising at `y` (adding 1). Well-defined Fin values when
+`(σ y).val < (σ x).val ≤ N` (so the lowered `x` value `≥ 0` and the
+raised `y` value `≤ N`). -/
+noncomputable def raiseLowerSwapS {N : ℕ}
+    (σ : V → Fin (N + 1)) (x y : V)
+    (hxy_strict : (σ y).val < (σ x).val) : V → Fin (N + 1) :=
+  Function.update (Function.update σ x
+    ⟨(σ x).val - 1, by have := (σ x).isLt; omega⟩) y
+    ⟨(σ y).val + 1, by have := (σ y).isLt; omega⟩
+
+omit [Fintype V] in
+/-- `raiseLowerSwapS σ x y` at site `x` equals `σ x − 1` (when `x ≠ y`). -/
+theorem raiseLowerSwapS_apply_x {x y : V} (hxy : x ≠ y)
+    {σ : V → Fin (N + 1)} (hxy_strict : (σ y).val < (σ x).val) :
+    (raiseLowerSwapS σ x y hxy_strict x).val = (σ x).val - 1 := by
+  unfold raiseLowerSwapS
+  rw [Function.update_of_ne hxy, Function.update_self]
+
+omit [Fintype V] in
+/-- `raiseLowerSwapS σ x y` at site `y` equals `σ y + 1`. -/
+theorem raiseLowerSwapS_apply_y {x y : V}
+    {σ : V → Fin (N + 1)} (hxy_strict : (σ y).val < (σ x).val) :
+    (raiseLowerSwapS σ x y hxy_strict y).val = (σ y).val + 1 := by
+  unfold raiseLowerSwapS
+  rw [Function.update_self]
+
+omit [Fintype V] in
+/-- `raiseLowerSwapS σ x y` agrees with `σ` off `{x, y}`. -/
+theorem raiseLowerSwapS_apply_off {x y : V}
+    {σ : V → Fin (N + 1)} (hxy_strict : (σ y).val < (σ x).val)
+    {z : V} (hzx : z ≠ x) (hzy : z ≠ y) :
+    raiseLowerSwapS σ x y hxy_strict z = σ z := by
+  unfold raiseLowerSwapS
+  rw [Function.update_of_ne hzy, Function.update_of_ne hzx]
+
+omit [Fintype V] in
+/-- For an adjacent pair `(x, y)` with `σ y < σ x`, the
+`raiseLowerSwapS` lowering at `x` and raising at `y` is a
+`RaiseLowerStepS`. -/
+theorem raiseLowerStepS_of_adj_of_lt {G : SimpleGraph V}
+    {x y : V} (hadj : G.Adj x y)
+    {σ : V → Fin (N + 1)} (hxy_strict : (σ y).val < (σ x).val) :
+    RaiseLowerStepS G σ (raiseLowerSwapS σ x y hxy_strict) := by
+  have hxy : x ≠ y := fun heq => G.loopless.irrefl _ (heq ▸ hadj)
+  refine ⟨x, y, hadj, Or.inr ⟨?_, ?_⟩, ?_⟩
+  · -- (σ' x).val + 1 = (σ x).val
+    rw [raiseLowerSwapS_apply_x hxy hxy_strict]
+    omega
+  · -- (σ y).val + 1 = (σ' y).val
+    rw [raiseLowerSwapS_apply_y hxy_strict]
+  · intro k hkx hky
+    exact raiseLowerSwapS_apply_off hxy_strict hkx hky
+
 end LatticeSystem.Quantum
