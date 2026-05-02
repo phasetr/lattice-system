@@ -33,6 +33,11 @@ def magSumS (σ : Λ → Fin (N + 1)) : ℕ :=
   ∑ x : Λ, (σ x).val
 
 omit [DecidableEq Λ] in
+/-- Definitional unfolding of `magSumS`. -/
+theorem magSumS_def (σ : Λ → Fin (N + 1)) :
+    magSumS σ = ∑ x : Λ, (σ x).val := rfl
+
+omit [DecidableEq Λ] in
 /-- `magSumS σ ≥ 0` always. -/
 theorem magSumS_nonneg (σ : Λ → Fin (N + 1)) : 0 ≤ magSumS σ := by
   unfold magSumS
