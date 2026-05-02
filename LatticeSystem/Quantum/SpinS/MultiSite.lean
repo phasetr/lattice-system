@@ -822,4 +822,22 @@ theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_of_off_two_site_agree
       spinSOp3 N (σ' x) (σ x) * spinSOp3 N (σ' y) (σ y) := by
   rw [onSiteS_mul_onSiteS_apply_eq hxy, if_pos h]
 
+/-- Same factor formula for `S^+_x ⊗ S^-_y`. -/
+theorem onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_of_off_two_site_agree
+    {x y : Λ} (hxy : x ≠ y) {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    (onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N)
+          : ManyBodyOpS Λ N) σ' σ =
+      spinSOpPlus N (σ' x) (σ x) * spinSOpMinus N (σ' y) (σ y) := by
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, if_pos h]
+
+/-- Same factor formula for `S^-_x ⊗ S^+_y`. -/
+theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_of_off_two_site_agree
+    {x y : Λ} (hxy : x ≠ y) {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    (onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
+          : ManyBodyOpS Λ N) σ' σ =
+      spinSOpMinus N (σ' x) (σ x) * spinSOpPlus N (σ' y) (σ y) := by
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, if_pos h]
+
 end LatticeSystem.Quantum
