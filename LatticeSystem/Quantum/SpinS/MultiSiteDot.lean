@@ -750,4 +750,38 @@ theorem spinSDot_apply_eq_zero_of_y_outside_pair
   exact spinSDot_apply_eq_zero_of_x_outside_pair hxy N hne h
     (Ne.symm hxy') hxy'' hyy'
 
+/-- **Combined off-pair vanishing**: for `x ≠ y`, `σ', σ` agreeing
+off `{x, y}` with `σ' ≠ σ`, and `(x', y')` not equal to `(x, y)` or
+`(y, x)`, the spinSDot matrix element vanishes.
+
+Cases: `x' = y'` gives the same-site Casimir vanishing on `σ' ≠ σ`;
+otherwise at least one of `x', y'` is outside `{x, y}` (since
+`{x', y'} ⊆ {x, y}` and `x' ≠ y'` would force `(x', y') ∈
+{(x, y), (y, x)}`), so the corresponding outside-pair lemma applies. -/
+theorem spinSDot_apply_eq_zero_of_pair_not_xy_or_yx
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)} (hne : σ' ≠ σ)
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (x' y' : Λ)
+    (hpair : ¬ ((x' = x ∧ y' = y) ∨ (x' = y ∧ y' = x))) :
+    (spinSDot x' y' N : ManyBodyOpS Λ N) σ' σ = 0 := by
+  by_cases hxy' : x' = y'
+  · subst hxy'
+    have ⟨z, hz⟩ : ∃ z, σ' z ≠ σ z := Function.ne_iff.mp hne
+    exact spinSDot_self_apply_eq_zero_of_diff_at x' N hz
+  · -- x' ≠ y'. At least one of x', y' is outside {x, y} (else (x',y') would
+    -- be (x,y) or (y,x), which is excluded).
+    by_cases hxx' : x' = x
+    · -- x' = x; then y' ≠ y (else hpair would be Or.inl). And y' ≠ x' = x (hxy').
+      have hyy : y' ≠ y := fun heq => hpair (Or.inl ⟨hxx', heq⟩)
+      have hyx : y' ≠ x := fun heq => hxy' (hxx'.trans heq.symm)
+      exact spinSDot_apply_eq_zero_of_y_outside_pair hxy N hne h hxy' hyx hyy
+    · by_cases hxy2 : x' = y
+      · -- x' = y; then y' ≠ x (else hpair would be Or.inr). And y' ≠ y (hxy').
+        have hyx : y' ≠ x := fun heq => hpair (Or.inr ⟨hxy2, heq⟩)
+        have hyy : y' ≠ y := fun heq => hxy' (hxy2.trans heq.symm)
+        exact spinSDot_apply_eq_zero_of_y_outside_pair hxy N hne h hxy' hyx hyy
+      · -- x' ∉ {x, y}; use x_outside.
+        exact spinSDot_apply_eq_zero_of_x_outside_pair hxy N hne h hxy' hxx' hxy2
+
 end LatticeSystem.Quantum
