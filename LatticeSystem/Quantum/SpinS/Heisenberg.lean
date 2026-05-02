@@ -370,4 +370,20 @@ theorem heisenbergHamiltonianS_apply_diag_im_zero
   have := hH.apply σ σ
   exact Complex.conj_eq_iff_im.mp this
 
+/-- Applying the Heisenberg Hamiltonian to a basis vector and reading
+the result at configuration `τ` yields the matrix element
+`H τ σ`. The basis-vector mulVec collapses to a single matrix entry. -/
+theorem heisenbergHamiltonianS_mulVec_basisVecS_apply
+    (J : Λ → Λ → ℂ) (N : ℕ) (σ τ : Λ → Fin (N + 1)) :
+    (heisenbergHamiltonianS J N).mulVec (basisVecS σ) τ =
+      (heisenbergHamiltonianS J N) τ σ := by
+  classical
+  change ∑ σ' : Λ → Fin (N + 1),
+      (heisenbergHamiltonianS J N) τ σ' * basisVecS σ σ' =
+        (heisenbergHamiltonianS J N) τ σ
+  simp_rw [basisVecS_apply, mul_ite, mul_one, mul_zero]
+  rw [Finset.sum_ite_eq' Finset.univ σ
+      (fun σ' => (heisenbergHamiltonianS J N) τ σ')]
+  simp
+
 end LatticeSystem.Quantum
