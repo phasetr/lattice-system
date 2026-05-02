@@ -717,4 +717,16 @@ theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_im_zero
     ring
   · rw [if_neg h]; simp
 
+/-- For distinct sites `x ≠ y`, the **sum** `(S+_x S-_y) + (S-_x S+_y)`
+matrix element has non-negative real part on every `(σ', σ)` pair. -/
+theorem onSiteS_spinSOpPlus_Minus_plus_Minus_Plus_re_nonneg
+    {x y : Λ} (hxy : x ≠ y) (σ' σ : Λ → Fin (N + 1)) :
+    0 ≤ ((onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N) +
+          onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
+          : ManyBodyOpS Λ N) σ' σ).re := by
+  rw [Matrix.add_apply, Complex.add_re]
+  have h1 := onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_re_nonneg hxy σ' σ
+  have h2 := onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_re_nonneg hxy σ' σ
+  linarith
+
 end LatticeSystem.Quantum
