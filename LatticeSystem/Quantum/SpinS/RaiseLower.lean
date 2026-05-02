@@ -210,4 +210,36 @@ theorem raiseLowerStepS_of_adj_of_lt {G : SimpleGraph V}
   · intro k hkx hky
     exact raiseLowerSwapS_apply_off hxy_strict hkx hky
 
+/-! ## Symmetry of the step relation -/
+
+omit [Fintype V] [DecidableEq V] in
+/-- `RaiseLowerStepS` is symmetric: if `σ ↦ σ'` is a raise/lower step,
+then `σ' ↦ σ` is also a raise/lower step (along the same edge,
+swapping the raise/lower roles). -/
+theorem RaiseLowerStepS.symm {G : SimpleGraph V}
+    {σ σ' : V → Fin (N + 1)} (h : RaiseLowerStepS G σ σ') :
+    RaiseLowerStepS G σ' σ := by
+  obtain ⟨x, y, hadj, hsh, hagree⟩ := h
+  refine ⟨x, y, hadj, ?_, fun k hkx hky => (hagree k hkx hky).symm⟩
+  rcases hsh with ⟨hxr, hyl⟩ | ⟨hxl, hyr⟩
+  · -- Original σ → σ' was "raise x, lower y". Reverse σ' → σ is "lower x, raise y".
+    -- Lower x from σ' to σ: (σ x).val + 1 = (σ' x).val ✓ matches hxr.
+    -- Raise y from σ' to σ: (σ' y).val + 1 = (σ y).val ✓ matches hyl.
+    exact Or.inr ⟨hxr, hyl⟩
+  · -- Original σ → σ' was "lower x, raise y". Reverse σ' → σ is "raise x, lower y".
+    -- Raise x from σ' to σ: (σ' x).val + 1 = (σ x).val ✓ matches hxl.
+    -- Lower y from σ' to σ: (σ y).val + 1 = (σ' y).val ✓ matches hyr.
+    exact Or.inl ⟨hxl, hyr⟩
+
+omit [Fintype V] [DecidableEq V] in
+/-- `RaiseLowerReachableS` is symmetric: if `σ` reaches `σ'`, then
+`σ'` reaches `σ`. (Iterates `RaiseLowerStepS.symm` along the chain.) -/
+theorem RaiseLowerReachableS.symm {G : SimpleGraph V}
+    {σ σ' : V → Fin (N + 1)} (h : RaiseLowerReachableS G σ σ') :
+    RaiseLowerReachableS G σ' σ := by
+  induction h with
+  | refl => exact RaiseLowerReachableS.refl G _
+  | tail _h₁ h₂ ih =>
+    exact (RaiseLowerReachableS.single h₂.symm).trans ih
+
 end LatticeSystem.Quantum
