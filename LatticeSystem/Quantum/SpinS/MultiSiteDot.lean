@@ -359,6 +359,16 @@ theorem spinSDot_self_apply_diag_re (x : Λ) (N : ℕ)
   rw [spinSDot_self_apply_diag]
   simp
 
+/-- The same-site `spinSDot x x N σ σ` equals its real-part embedding. -/
+theorem spinSDot_self_apply_diag_eq_ofReal_re (x : Λ) (N : ℕ)
+    (σ : Λ → Fin (N + 1)) :
+    (spinSDot x x N : ManyBodyOpS Λ N) σ σ =
+      (((((spinSDot x x N : ManyBodyOpS Λ N) σ σ).re : ℝ) : ℂ)) := by
+  apply Complex.ext
+  · simp
+  · rw [Complex.ofReal_im]
+    exact spinSDot_self_apply_im_zero x N σ σ
+
 /-- The matrix-element form of the raising/lowering decomposition of
 `spinSDot`: combines the `(1/2)(S+S- + S-S+)` ladder part with the
 `S^3 ⊗ S^3` diagonal part. -/
