@@ -113,6 +113,13 @@ theorem marshallSignS_eq_one_or_neg_one
     have := add_eq_zero_iff_eq_neg.mp h2
     rw [this]
 
+/-- The norm of the Marshall sign is `1`. -/
+theorem marshallSignS_norm (A : V → Bool) (σ : V → Fin (N + 1)) :
+    ‖marshallSignS A σ‖ = 1 := by
+  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
+  · rw [h, norm_one]
+  · rw [h]; simp
+
 /-- The Marshall sign is real: its complex conjugate is itself. Each
 factor `(-1)^k` is real, so the star/conjugation acts as identity on
 the product. -/
