@@ -147,6 +147,20 @@ theorem spinSOpPlus_apply_re_nonneg (N : ℕ) (i j : Fin (N + 1)) :
     exact Real.sqrt_nonneg _
   · rw [if_neg h]; simp
 
+/-- The `Ŝ^+` matrix entry on a raising pair is strictly positive. -/
+theorem spinSOpPlus_apply_re_pos_of_raise (N : ℕ) {i j : Fin (N + 1)}
+    (h : i.val + 1 = j.val) :
+    0 < (spinSOpPlus N i j).re := by
+  rw [spinSOpPlus_apply_raise N h, Complex.ofReal_re]
+  apply Real.sqrt_pos.mpr
+  apply mul_pos
+  · have : 1 ≤ j.val := by omega
+    have : (1 : ℝ) ≤ (j.val : ℝ) := by exact_mod_cast this
+    linarith
+  · have hj : j.val ≤ N := by have := j.isLt; omega
+    have : (j.val : ℝ) ≤ (N : ℝ) := by exact_mod_cast hj
+    linarith
+
 /-- The `Ŝ^-` matrix entry on a lowering pair. -/
 theorem spinSOpMinus_apply_lower (N : ℕ) {i j : Fin (N + 1)}
     (h : j.val + 1 = i.val) :
