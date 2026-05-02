@@ -145,6 +145,7 @@ theorem spinSDot_self_N_zero {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
   rw [spinSDot_self]
   simp
 
+
 /-- `spinSDot x x N` is a scalar multiple of the identity, hence
 commutes with every operator. -/
 theorem spinSDot_self_commute (x : Λ) (N : ℕ) (B : ManyBodyOpS Λ N) :
@@ -320,5 +321,25 @@ theorem spinSDot_apply_eq_ofReal_re (x y : Λ) (N : ℕ)
   · simp
   · rw [Complex.ofReal_im]
     exact spinSDot_apply_im_zero x y N σ' σ
+
+/-- `spinSDot x y 0` (trivial spin, distinct sites) equals zero. -/
+theorem spinSDot_N_zero_of_ne {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    {x y : Λ} (hxy : x ≠ y) :
+    (spinSDot x y 0 : ManyBodyOpS Λ 0) = 0 := by
+  ext σ' σ
+  rw [Matrix.zero_apply]
+  by_cases h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k
+  · have hσ'x : σ' x = 0 := by apply Fin.ext; have := (σ' x).isLt; omega
+    have hσx : σ x = 0 := by apply Fin.ext; have := (σ x).isLt; omega
+    have hσ'y : σ' y = 0 := by apply Fin.ext; have := (σ' y).isLt; omega
+    have hσy : σ y = 0 := by apply Fin.ext; have := (σ y).isLt; omega
+    unfold spinSDot
+    simp only [Matrix.add_apply]
+    rw [onSiteS_mul_onSiteS_apply_eq hxy, onSiteS_mul_onSiteS_apply_eq hxy,
+        onSiteS_mul_onSiteS_apply_eq hxy]
+    rw [if_pos h, if_pos h, if_pos h]
+    rw [hσ'x, hσx, hσ'y, hσy, spinSOp1_apply_diag, spinSOp2_apply_diag]
+    simp
+  · exact spinSDot_apply_eq_zero_of_off_two_site_diff hxy 0 h
 
 end LatticeSystem.Quantum
