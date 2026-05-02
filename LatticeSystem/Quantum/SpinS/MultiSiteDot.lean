@@ -347,6 +347,23 @@ theorem spinSDot_apply_re_eq_zero_of_off_two_site_diff
   rw [spinSDot_apply_eq_zero_of_off_two_site_diff hxy N h]
   simp
 
+/-- For `x ≠ y` and `σ', σ` agreeing off `{x, y}`, the dot-product
+matrix element factors via the per-site spinSOp_α matrix elements:
+`(Ŝ_x · Ŝ_y) σ' σ = Σ_α S^α(σ'_x)(σ_x) * S^α(σ'_y)(σ_y)`. -/
+theorem spinSDot_apply_of_off_two_site_agree
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ =
+      spinSOp1 N (σ' x) (σ x) * spinSOp1 N (σ' y) (σ y) +
+      spinSOp2 N (σ' x) (σ x) * spinSOp2 N (σ' y) (σ y) +
+      spinSOp3 N (σ' x) (σ x) * spinSOp3 N (σ' y) (σ y) := by
+  unfold spinSDot
+  simp only [Matrix.add_apply]
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, onSiteS_mul_onSiteS_apply_eq hxy,
+      onSiteS_mul_onSiteS_apply_eq hxy]
+  rw [if_pos h, if_pos h, if_pos h]
+
 /-- `spinSDot x y 0` (trivial spin, distinct sites) equals zero. -/
 theorem spinSDot_N_zero_of_ne {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
     {x y : Λ} (hxy : x ≠ y) :
