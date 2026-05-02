@@ -249,6 +249,15 @@ theorem dressedHeisenbergSMatrix_apply_diag
       (heisenbergHamiltonianS J N) σ σ := by
   rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_diag]
 
+/-- The dressed Heisenberg matrix as a product: `dressed σ' σ =
+sign(σ') · sign(σ) · heisenberg σ' σ`. -/
+theorem dressedHeisenbergSMatrix_apply_eq_smul
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ' σ : V → Fin (N + 1)) :
+    dressedHeisenbergSMatrix A J N σ' σ =
+      marshallSignS A σ' * marshallSignS A σ *
+        (heisenbergHamiltonianS J N) σ' σ := by
+  rfl
+
 /-- For real coupling, the dressed matrix is Hermitian. -/
 theorem dressedHeisenbergSMatrix_isHermitian
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
