@@ -196,6 +196,83 @@ theorem marshallSignS_pow_three (A : V → Bool) (σ : V → Fin (N + 1)) :
   rw [show (3 : ℕ) = 2 + 1 from rfl]
   rw [pow_succ, pow_two, marshallSignS_sq, one_mul]
 
+/-- **Marshall sign factorization on two-site differences**: when
+configurations `σ', σ` agree at every site except possibly `x` and
+`y` (with `x ≠ y`), the product `marshallSignS A σ' * marshallSignS A σ`
+factors into a product of per-site contributions at `x` and `y`,
+since at every other site the agreement forces the contribution to
+be `(-1)^(2 σ_z) = 1`. -/
+theorem marshallSignS_mul_of_agree_off_two_site
+    (A : V → Bool) {x y : V} (hxy : x ≠ y)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    marshallSignS A σ' * marshallSignS A σ =
+      (if A x then ((-1 : ℂ) ^ ((σ' x).val + (σ x).val)) else 1) *
+      (if A y then ((-1 : ℂ) ^ ((σ' y).val + (σ y).val)) else 1) := by
+  classical
+  rw [marshallSignS_mul]
+  have hsplit :
+      (Finset.univ : Finset V) = {x, y} ∪ (Finset.univ \ {x, y}) := by
+    ext z
+    simp only [Finset.mem_univ, Finset.mem_union, Finset.mem_insert,
+      Finset.mem_singleton, Finset.mem_sdiff, true_iff, true_and]
+    by_cases hzx : z = x
+    · left; left; exact hzx
+    · by_cases hzy : z = y
+      · left; right; exact hzy
+      · right
+        intro hz
+        rcases hz with hz | hz
+        · exact hzx hz
+        · exact hzy hz
+  rw [hsplit]
+  rw [Finset.prod_union (by
+    rw [Finset.disjoint_iff_inter_eq_empty]
+    ext z; simp)]
+  rw [Finset.prod_pair hxy]
+  have hrest : ∏ z ∈ (Finset.univ \ {x, y} : Finset V),
+      (if A z then ((-1 : ℂ) ^ ((σ' z).val + (σ z).val)) else 1) = 1 := by
+    refine Finset.prod_eq_one (fun z hz => ?_)
+    rw [Finset.mem_sdiff] at hz
+    have hzxy : z ∉ ({x, y} : Finset V) := hz.2
+    have hzx : z ≠ x := fun heq => hzxy (by simp [heq])
+    have hzy : z ≠ y := fun heq => hzxy (by simp [heq])
+    rw [h z hzx hzy]
+    by_cases hAz : A z
+    · simp [hAz, ← two_mul, pow_mul]
+    · simp [hAz]
+  rw [hrest, mul_one]
+
+/-- **Marshall sign on a bipartite raising/lowering bond is `-1`**.
+For `x ∈ A`, `y ∉ A`, and configurations `σ', σ` that agree off
+`{x, y}` with `(σ' x).val + (σ x).val` odd and `(σ' y).val + (σ y).val`
+even (or vice versa) — i.e., a single raising/lowering shift on
+exactly one of `{x, y}` lying in `A` — the Marshall sign product is
+`-1`. The general formula collapses since the `y` factor (with `A y`
+false) is `1`, and the `x` factor with odd exponent is `-1`. -/
+theorem marshallSignS_mul_of_agree_off_two_site_bipartite_x
+    (A : V → Bool) {x y : V} (hxy : x ≠ y)
+    (hAx : A x = true) (hAy : A y = false)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hxod : Odd ((σ' x).val + (σ x).val)) :
+    marshallSignS A σ' * marshallSignS A σ = -1 := by
+  rw [marshallSignS_mul_of_agree_off_two_site A hxy h]
+  rw [if_pos hAx]
+  simp [hAy, Odd.neg_one_pow hxod]
+
+/-- Same as above but with `x ∉ A`, `y ∈ A`. -/
+theorem marshallSignS_mul_of_agree_off_two_site_bipartite_y
+    (A : V → Bool) {x y : V} (hxy : x ≠ y)
+    (hAx : A x = false) (hAy : A y = true)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hyod : Odd ((σ' y).val + (σ y).val)) :
+    marshallSignS A σ' * marshallSignS A σ = -1 := by
+  rw [marshallSignS_mul_of_agree_off_two_site A hxy h]
+  rw [if_neg (by simp [hAx])]
+  simp [hAy, Odd.neg_one_pow hyod]
+
 /-- The Marshall sign equals its inverse: `(marshallSignS A σ)⁻¹ = marshallSignS A σ`. -/
 theorem marshallSignS_inv (A : V → Bool) (σ : V → Fin (N + 1)) :
     (marshallSignS A σ)⁻¹ = marshallSignS A σ := by
