@@ -255,6 +255,14 @@ theorem basisVecS_mem_magSubspaceS (σ : Λ → Fin (N + 1)) :
       magSubspaceS Λ N (magEigenvalueS σ) :=
   totalSpinSOp3_mulVec_basisVecS σ
 
+/-- Every basis state lies in the supremum of all magnetization
+subspaces. This is a stepping stone toward proving that the
+magnetization subspaces span the full multi-site Hilbert space. -/
+theorem basisVecS_mem_iSup_magSubspaceS (σ : Λ → Fin (N + 1)) :
+    (basisVecS σ : (Λ → Fin (N + 1)) → ℂ) ∈
+      ⨆ M : ℂ, magSubspaceS Λ N M :=
+  Submodule.mem_iSup_of_mem (magEigenvalueS σ) (basisVecS_mem_magSubspaceS σ)
+
 /-! ## Constant configurations -/
 
 omit [DecidableEq Λ] in
