@@ -416,4 +416,14 @@ theorem onSiteS_pow (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
     rw [pow_succ, ih, onSiteS_mul_onSiteS_same]
     rw [pow_succ]
 
+/-- `onSiteS i 0 ^ k = 0` for `k > 0` (zero embedding stays zero
+under repeated multiplication). Specialisation of `onSiteS_pow`. -/
+theorem onSiteS_zero_pow (i : Λ) {k : ℕ} (hk : 0 < k) :
+    (onSiteS i (0 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
+        : ManyBodyOpS Λ N) ^ k = 0 := by
+  rw [onSiteS_pow]
+  rw [show (0 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) ^ k = 0 from
+    zero_pow (Nat.pos_iff_ne_zero.mp hk)]
+  exact onSiteS_zero i
+
 end LatticeSystem.Quantum
