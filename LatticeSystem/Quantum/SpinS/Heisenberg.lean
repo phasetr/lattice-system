@@ -164,6 +164,15 @@ theorem heisenbergHamiltonianS_sub (J J' : Λ → Λ → ℂ) (N : ℕ) :
   rw [heisenbergHamiltonianS_neg]
   abel
 
+/-- The Heisenberg Hamiltonian matrix element formula:
+`(heisenbergHamiltonianS J N) σ τ = ∑_{x,y} J(x,y) (Ŝ_x · Ŝ_y) σ τ`. -/
+theorem heisenbergHamiltonianS_apply (J : Λ → Λ → ℂ) (N : ℕ)
+    (σ τ : Λ → Fin (N + 1)) :
+    (heisenbergHamiltonianS J N) σ τ =
+      ∑ x : Λ, ∑ y : Λ, J x y * (spinSDot x y N) σ τ := by
+  unfold heisenbergHamiltonianS
+  simp [Matrix.sum_apply, Matrix.smul_apply, smul_eq_mul]
+
 /-- The Heisenberg Hamiltonian is homogeneous in the coupling: -/
 theorem heisenbergHamiltonianS_smul (c : ℂ) (J : Λ → Λ → ℂ) (N : ℕ) :
     heisenbergHamiltonianS (Λ := Λ) (fun x y => c * J x y) N =
