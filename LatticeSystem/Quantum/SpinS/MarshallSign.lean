@@ -56,6 +56,14 @@ theorem marshallSignS_eq_neg_one_pow_of_A_true (σ : V → Fin (N + 1)) :
   simp only [if_true]
   rw [← Finset.prod_pow_eq_pow_sum]
 
+/-- Marshall sign over an empty lattice is `1`. -/
+theorem marshallSignS_of_isEmpty [IsEmpty V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ = 1 := by
+  unfold marshallSignS
+  rw [show (Finset.univ : Finset V) = ∅ from Finset.eq_empty_of_isEmpty _]
+  exact Finset.prod_empty
+
 /-- Product of two Marshall signs at the same sublattice indicator
 factors site-wise: each `A`-site contributes `(-1)^((σ x).val + (σ' x).val)`. -/
 theorem marshallSignS_mul (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
