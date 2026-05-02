@@ -736,4 +736,18 @@ theorem spinSDot_apply_eq_zero_of_x_outside_pair
     · exact spinSDot_apply_eq_zero_of_diff_outside_pair hxy' N
         (Ne.symm hxx') (Ne.symm fun heq => hxy2 heq.symm) hxd
 
+/-- Symmetric: `y'` outside `{x, y}` also vanishes (using `spinSDot_comm`). -/
+theorem spinSDot_apply_eq_zero_of_y_outside_pair
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)} (hne : σ' ≠ σ)
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    {x' y' : Λ} (hxy' : x' ≠ y')
+    (hxy'' : y' ≠ x) (hyy' : y' ≠ y) :
+    (spinSDot x' y' N : ManyBodyOpS Λ N) σ' σ = 0 := by
+  rw [show (spinSDot x' y' N : ManyBodyOpS Λ N) σ' σ =
+      (spinSDot y' x' N : ManyBodyOpS Λ N) σ' σ from by
+    rw [spinSDot_comm]]
+  exact spinSDot_apply_eq_zero_of_x_outside_pair hxy N hne h
+    (Ne.symm hxy') hxy'' hyy'
+
 end LatticeSystem.Quantum
