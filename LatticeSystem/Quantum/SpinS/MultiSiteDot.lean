@@ -37,6 +37,13 @@ noncomputable def spinSDot (x y : Λ) (N : ℕ) : ManyBodyOpS Λ N :=
     onSiteS x (spinSOp2 N) * onSiteS y (spinSOp2 N) +
     onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
 
+/-- Definitional unfolding of `spinSDot`. -/
+theorem spinSDot_def (x y : Λ) (N : ℕ) :
+    spinSDot x y N =
+      onSiteS x (spinSOp1 N) * onSiteS y (spinSOp1 N) +
+        onSiteS x (spinSOp2 N) * onSiteS y (spinSOp2 N) +
+        onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N) := rfl
+
 /-- Symmetry of the two-site dot product: `Ŝ_x · Ŝ_y = Ŝ_y · Ŝ_x`. -/
 theorem spinSDot_comm (x y : Λ) (N : ℕ) :
     (spinSDot x y N : ManyBodyOpS Λ N) = spinSDot y x N := by
