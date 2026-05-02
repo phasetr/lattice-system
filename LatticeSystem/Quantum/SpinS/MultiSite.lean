@@ -45,6 +45,12 @@ def onSiteS (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
   fun σ' σ =>
     if (∀ k, k ≠ i → σ' k = σ k) then A (σ' i) (σ i) else 0
 
+/-- Definitional unfolding of `onSiteS`. -/
+theorem onSiteS_def (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS (N := N) i A : ManyBodyOpS Λ N) =
+      (fun σ' σ =>
+        if (∀ k, k ≠ i → σ' k = σ k) then A (σ' i) (σ i) else 0) := rfl
+
 /-- Unfolding the matrix element of `onSiteS i A`. -/
 theorem onSiteS_apply (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
     (σ' σ : Λ → Fin (N + 1)) :
