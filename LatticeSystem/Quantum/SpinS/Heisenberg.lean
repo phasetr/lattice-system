@@ -138,6 +138,19 @@ theorem heisenbergHamiltonianS_zero (N : ℕ) :
   refine Finset.sum_eq_zero (fun y _ => ?_)
   simp
 
+/-- The Heisenberg Hamiltonian negates with the coupling: -/
+theorem heisenbergHamiltonianS_neg (J : Λ → Λ → ℂ) (N : ℕ) :
+    heisenbergHamiltonianS (Λ := Λ) (fun x y => -(J x y)) N =
+      -(heisenbergHamiltonianS J N) := by
+  unfold heisenbergHamiltonianS
+  rw [← Finset.sum_neg_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro x _
+  rw [← Finset.sum_neg_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro y _
+  rw [neg_smul]
+
 /-- The Heisenberg Hamiltonian is homogeneous in the coupling: -/
 theorem heisenbergHamiltonianS_smul (c : ℂ) (J : Λ → Λ → ℂ) (N : ℕ) :
     heisenbergHamiltonianS (Λ := Λ) (fun x y => c * J x y) N =
