@@ -564,6 +564,22 @@ theorem magSubspaceS_N_zero_zero_eq_top :
   rw [Matrix.zero_mulVec]
   simp
 
+/-- For trivial spin (`N = 0`) and `M ≠ 0`, `magSubspaceS Λ 0 M = ⊥`:
+no vector has nonzero magnetization since `Ŝ_tot^{(3)} = 0`. -/
+theorem magSubspaceS_N_zero_ne_zero_eq_bot {M : ℂ} (hM : M ≠ 0) :
+    magSubspaceS Λ 0 M = ⊥ := by
+  refine eq_bot_iff.mpr (fun v hv => ?_)
+  rw [mem_magSubspaceS_iff] at hv
+  rw [show (totalSpinSOp3 Λ 0 : ManyBodyOpS Λ 0) = 0 from
+    totalSpinSOp3_N_zero (Λ := Λ)] at hv
+  rw [Matrix.zero_mulVec] at hv
+  -- hv : 0 = M • v
+  rw [Submodule.mem_bot]
+  have : M • v = 0 := hv.symm
+  rcases smul_eq_zero.mp this with hM' | hv'
+  · exact (hM hM').elim
+  · exact hv'
+
 omit [DecidableEq Λ] in
 /-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
 theorem magEigenvalueS_const_zero :
