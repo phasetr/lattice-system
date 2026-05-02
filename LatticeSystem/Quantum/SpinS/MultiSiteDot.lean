@@ -183,6 +183,13 @@ theorem spinSDot_self_apply_diag_re_nonneg (x : Λ) (N : ℕ)
   rw [show (((N : ℂ) * (N + 2) / 4)).re = ((N : ℝ) * (N + 2) / 4) from by simp]
   positivity
 
+/-- For `σ' ≠ σ`, the same-site dot product real-part vanishes. -/
+theorem spinSDot_self_apply_re_eq_zero_of_ne (x : Λ) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)} (hne : σ' ≠ σ) :
+    ((spinSDot x x N : ManyBodyOpS Λ N) σ' σ).re = 0 := by
+  rw [spinSDot_self_apply_eq_zero_of_ne x N hne]
+  simp
+
 /-- For `x ≠ y`, the matrix element of `Ŝ_x · Ŝ_y` between
 configurations differing off the two-site set `{x, y}` is zero
 (the operator only acts on `x` and `y`). -/
