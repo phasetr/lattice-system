@@ -486,6 +486,15 @@ theorem dressedHeisenbergSReMatrix_zero_J
   rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_zero_J]
   simp
 
+/-- For trivial spin (`N = 0`), the real-part dressed Heisenberg
+matrix is zero. -/
+theorem dressedHeisenbergSReMatrix_N_zero
+    (A : V → Bool) (J : V → V → ℂ) :
+    dressedHeisenbergSReMatrix A J 0 = 0 := by
+  ext σ σ'
+  rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_N_zero]
+  simp
+
 /-- With the trivial sublattice indicator (`fun _ => false`), the
 real-part dressed Heisenberg matrix equals the real-part of the plain
 Heisenberg matrix. -/
