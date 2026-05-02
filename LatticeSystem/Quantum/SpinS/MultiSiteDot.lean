@@ -174,6 +174,21 @@ theorem spinSDot_self_apply_diag (x : Λ) (N : ℕ) (σ : Λ → Fin (N + 1)) :
     (spinSDot x x N : ManyBodyOpS Λ N) σ σ = (N : ℂ) * (N + 2) / 4 := by
   rw [spinSDot_self_apply, if_pos rfl, mul_one]
 
+/-- For `x ≠ y`, the matrix element of `Ŝ_x · Ŝ_y` between
+configurations differing off the two-site set `{x, y}` is zero
+(the operator only acts on `x` and `y`). -/
+theorem spinSDot_apply_eq_zero_of_off_two_site_diff
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ¬ ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ = 0 := by
+  unfold spinSDot
+  simp only [Matrix.add_apply]
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, onSiteS_mul_onSiteS_apply_eq hxy,
+      onSiteS_mul_onSiteS_apply_eq hxy]
+  rw [if_neg h, if_neg h, if_neg h]
+  ring
+
 /-- **Raising/lowering decomposition** of the two-site spin-`S` dot
 product (Tasaki §2.2 eq. (2.2.16) for arbitrary spin):
 
