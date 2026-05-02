@@ -321,4 +321,14 @@ theorem dressedHeisenbergSReMatrix_add_J
   rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_add_J]
   simp [dressedHeisenbergSReMatrix_apply]
 
+/-- The real-part dressed Heisenberg matrix negates with the
+coupling. -/
+theorem dressedHeisenbergSReMatrix_neg_J
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
+    (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergSReMatrix A (fun x y => -(J x y)) N σ σ' =
+      -(dressedHeisenbergSReMatrix A J N σ σ') := by
+  rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_neg_J]
+  simp [dressedHeisenbergSReMatrix_apply]
+
 end LatticeSystem.Quantum
