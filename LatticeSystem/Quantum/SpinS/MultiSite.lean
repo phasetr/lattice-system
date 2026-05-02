@@ -77,6 +77,14 @@ theorem onSiteS_apply_of_off_site_agree
     onSiteS i A σ' σ = A (σ' i) (σ i) := by
   rw [onSiteS_apply, if_pos h]
 
+/-- The diagonal matrix element on the same configuration. -/
+theorem onSiteS_apply_diag
+    (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
+    (σ : Λ → Fin (N + 1)) :
+    onSiteS i A σ σ = A (σ i) (σ i) := by
+  rw [onSiteS_apply_of_off_site_agree]
+  intro _ _; rfl
+
 /-- If `A` is Hermitian, so is its site embedding `onSiteS i A`. -/
 theorem onSiteS_isHermitian (i : Λ)
     {A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ} (hA : A.IsHermitian) :
