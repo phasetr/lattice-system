@@ -186,6 +186,12 @@ noncomputable def dressedHeisenbergSMatrix
     ManyBodyOpS V N :=
   fun σ σ' => dressedHeisenbergS A J N σ σ'
 
+/-- Definitional unfolding of `dressedHeisenbergSMatrix`. -/
+theorem dressedHeisenbergSMatrix_def
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) :
+    dressedHeisenbergSMatrix A J N =
+      (fun σ σ' => dressedHeisenbergS A J N σ σ') := rfl
+
 /-- Component-wise unfolding of `dressedHeisenbergSMatrix`. -/
 theorem dressedHeisenbergSMatrix_apply
     (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
