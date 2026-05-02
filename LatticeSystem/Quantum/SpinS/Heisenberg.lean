@@ -151,6 +151,19 @@ theorem heisenbergHamiltonianS_neg (J : Λ → Λ → ℂ) (N : ℕ) :
   intro y _
   rw [neg_smul]
 
+/-- The Heisenberg Hamiltonian is anti-distributive over subtraction
+in the coupling: -/
+theorem heisenbergHamiltonianS_sub (J J' : Λ → Λ → ℂ) (N : ℕ) :
+    heisenbergHamiltonianS (Λ := Λ) (fun x y => J x y - J' x y) N =
+      heisenbergHamiltonianS J N - heisenbergHamiltonianS J' N := by
+  have h : (fun x y : Λ => J x y - J' x y) =
+      (fun x y => J x y + (-(J' x y))) := by
+    ext x y; ring
+  rw [h]
+  rw [heisenbergHamiltonianS_add]
+  rw [heisenbergHamiltonianS_neg]
+  abel
+
 /-- The Heisenberg Hamiltonian is homogeneous in the coupling: -/
 theorem heisenbergHamiltonianS_smul (c : ℂ) (J : Λ → Λ → ℂ) (N : ℕ) :
     heisenbergHamiltonianS (Λ := Λ) (fun x y => c * J x y) N =
