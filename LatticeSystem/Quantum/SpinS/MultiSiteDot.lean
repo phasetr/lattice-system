@@ -329,6 +329,17 @@ theorem spinSDot_apply_eq_ofReal_re (x y : Λ) (N : ℕ)
   · rw [Complex.ofReal_im]
     exact spinSDot_apply_im_zero x y N σ' σ
 
+/-- For `x ≠ y`, when `σ' = σ` the spinSDot value is its own
+real-part embedding (matches the diagonal formula). -/
+theorem spinSDot_apply_diag_eq_ofReal_re_of_ne
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ) (σ : Λ → Fin (N + 1)) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ σ =
+      ((((spinSDot x y N : ManyBodyOpS Λ N) σ σ).re : ℝ) : ℂ) := by
+  apply Complex.ext
+  · simp
+  · rw [Complex.ofReal_im]
+    exact spinSDot_apply_im_zero_of_ne hxy N σ σ
+
 /-- The matrix-element form of the raising/lowering decomposition of
 `spinSDot`: combines the `(1/2)(S+S- + S-S+)` ladder part with the
 `S^3 ⊗ S^3` diagonal part. -/
