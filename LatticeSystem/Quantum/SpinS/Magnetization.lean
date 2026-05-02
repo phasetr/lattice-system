@@ -33,6 +33,12 @@ def magSumS (σ : Λ → Fin (N + 1)) : ℕ :=
   ∑ x : Λ, (σ x).val
 
 omit [DecidableEq Λ] in
+/-- `magSumS σ ≥ 0` always. -/
+theorem magSumS_nonneg (σ : Λ → Fin (N + 1)) : 0 ≤ magSumS σ := by
+  unfold magSumS
+  exact Finset.sum_nonneg (fun _ _ => Nat.zero_le _)
+
+omit [DecidableEq Λ] in
 /-- `magSumS σ ≤ |Λ| · N`. -/
 theorem magSumS_le (σ : Λ → Fin (N + 1)) :
     magSumS σ ≤ Fintype.card Λ * N := by
