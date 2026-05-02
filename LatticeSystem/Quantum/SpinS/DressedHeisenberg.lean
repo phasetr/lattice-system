@@ -286,6 +286,33 @@ theorem dressedHeisenbergSMatrix_apply_eq_zero_of_mag_ne
   rw [heisenbergHamiltonianS_apply_eq_zero_of_mag_ne (Λ := V) J N h]
   ring
 
+/-- The dressed Heisenberg matrix applied to a basis state lies in
+the magnetization subspace `magSubspaceS V N (magEigenvalueS σ)`. -/
+theorem dressedHeisenbergSMatrix_mulVec_basisVecS_mem_magSubspaceS
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ : V → Fin (N + 1)) :
+    (dressedHeisenbergSMatrix A J N).mulVec (basisVecS σ) ∈
+      magSubspaceS V N (magEigenvalueS σ) := by
+  rw [mem_magSubspaceS_iff]
+  funext τ
+  classical
+  change ∑ ρ, (totalSpinSOp3 V N) τ ρ *
+      (dressedHeisenbergSMatrix A J N).mulVec (basisVecS σ) ρ =
+    (magEigenvalueS σ •
+      (dressedHeisenbergSMatrix A J N).mulVec (basisVecS σ)) τ
+  rw [Finset.sum_eq_single τ]
+  · rw [totalSpinSOp3_apply_diag,
+        dressedHeisenbergSMatrix_mulVec_basisVecS_apply,
+        Pi.smul_apply, smul_eq_mul,
+        dressedHeisenbergSMatrix_mulVec_basisVecS_apply]
+    by_cases hmag : magEigenvalueS τ = magEigenvalueS σ
+    · rw [hmag]
+    · have hzero := dressedHeisenbergSMatrix_apply_eq_zero_of_mag_ne
+        A J N (Ne.symm hmag)
+      rw [hzero]; ring
+  · intro ρ _ hρ
+    rw [totalSpinSOp3_apply_off_diag (Ne.symm hρ), zero_mul]
+  · intro hτ; exact (hτ (Finset.mem_univ τ)).elim
+
 /-- For real coupling, the dressed matrix is Hermitian. -/
 theorem dressedHeisenbergSMatrix_isHermitian
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
