@@ -475,4 +475,9 @@ theorem onSiteS_finset_sum {ι : Type*} (i : Λ) (s : Finset ι)
     rw [Finset.sum_insert hat, Finset.sum_insert hat,
       onSiteS_add, ih]
 
+/-- Convenience: `onSiteS i A = onSiteS i (A + 0)`. -/
+theorem onSiteS_add_zero (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i (A + 0) : ManyBodyOpS Λ N) = onSiteS i A := by
+  rw [add_zero]
+
 end LatticeSystem.Quantum
