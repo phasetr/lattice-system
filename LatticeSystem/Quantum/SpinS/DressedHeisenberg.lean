@@ -529,6 +529,17 @@ theorem dressedHeisenbergSReMatrix_diag_indep (A A' : V → Bool)
       dressedHeisenbergSReMatrix A' J N σ σ := by
   rw [dressedHeisenbergSReMatrix_diag, dressedHeisenbergSReMatrix_diag]
 
+/-- The real-part dressed Heisenberg matrix at the all-zero configuration
+equals the real part of the corresponding Heisenberg diagonal entry. -/
+theorem dressedHeisenbergSReMatrix_const_zero
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) :
+    dressedHeisenbergSReMatrix A J N (fun _ : V => (0 : Fin (N + 1)))
+        (fun _ : V => (0 : Fin (N + 1))) =
+      ((heisenbergHamiltonianS J N)
+        (fun _ : V => (0 : Fin (N + 1)))
+        (fun _ : V => (0 : Fin (N + 1)))).re :=
+  dressedHeisenbergSReMatrix_diag A J N _
+
 /-- The real-part dressed Heisenberg matrix is additive in the
 coupling. -/
 theorem dressedHeisenbergSReMatrix_add_J
