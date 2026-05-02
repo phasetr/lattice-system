@@ -463,4 +463,16 @@ theorem onSiteS_zero_pow (i : Λ) {k : ℕ} (hk : 0 < k) :
     zero_pow (Nat.pos_iff_ne_zero.mp hk)]
   exact onSiteS_zero i
 
+/-- The site-embedded sum: `onSiteS i (∑ k, A k) = ∑ k, onSiteS i (A k)`. -/
+theorem onSiteS_finset_sum {ι : Type*} (i : Λ) (s : Finset ι)
+    (f : ι → Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i (∑ k ∈ s, f k) : ManyBodyOpS Λ N) =
+      ∑ k ∈ s, onSiteS i (f k) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp [onSiteS_zero]
+  | @insert a t hat ih =>
+    rw [Finset.sum_insert hat, Finset.sum_insert hat,
+      onSiteS_add, ih]
+
 end LatticeSystem.Quantum
