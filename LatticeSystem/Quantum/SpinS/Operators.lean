@@ -207,6 +207,34 @@ theorem spinSOp3_apply_im_zero (N : ℕ) (i j : Fin (N + 1)) :
   · rw [Matrix.diagonal_apply_ne _ h]
     simp
 
+/-- Each entry of `Ŝ^{(3)}` equals its own real-part embedding. -/
+theorem spinSOp3_apply_eq_ofReal (N : ℕ) (i j : Fin (N + 1)) :
+    spinSOp3 N i j = ((spinSOp3 N i j).re : ℂ) := by
+  apply Complex.ext
+  · simp
+  · simp [spinSOp3_apply_im_zero]
+
+/-- Each entry of `Ŝ^+` equals its own real-part embedding. -/
+theorem spinSOpPlus_apply_eq_ofReal (N : ℕ) (i j : Fin (N + 1)) :
+    spinSOpPlus N i j = ((spinSOpPlus N i j).re : ℂ) := by
+  apply Complex.ext
+  · simp
+  · simp [spinSOpPlus_apply_im_zero]
+
+/-- Each entry of `Ŝ^-` equals its own real-part embedding. -/
+theorem spinSOpMinus_apply_eq_ofReal (N : ℕ) (i j : Fin (N + 1)) :
+    spinSOpMinus N i j = ((spinSOpMinus N i j).re : ℂ) := by
+  apply Complex.ext
+  · simp
+  · simp [spinSOpMinus_apply_im_zero]
+
+/-- Each entry of `Ŝ^{(1)}` equals its own real-part embedding. -/
+theorem spinSOp1_apply_eq_ofReal (N : ℕ) (i j : Fin (N + 1)) :
+    spinSOp1 N i j = ((spinSOp1 N i j).re : ℂ) := by
+  apply Complex.ext
+  · simp
+  · simp [spinSOp1_apply_im_zero]
+
 /-- Top of the ladder: `Ŝ^+` annihilates the highest-weight state. -/
 theorem spinSOpPlus_apply_top (N : ℕ) (j : Fin (N + 1)) :
     spinSOpPlus N (Fin.last N) j = 0 := by
