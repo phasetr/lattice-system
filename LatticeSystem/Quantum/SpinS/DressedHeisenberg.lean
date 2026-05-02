@@ -213,6 +213,15 @@ theorem dressedHeisenbergSMatrix_add_J
   rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_add_J]
   simp [dressedHeisenbergSMatrix_apply]
 
+/-- The dressed Heisenberg matrix is homogeneous in the coupling. -/
+theorem dressedHeisenbergSMatrix_smul_J
+    (A : V → Bool) (c : ℂ) (J : V → V → ℂ) (N : ℕ) :
+    dressedHeisenbergSMatrix A (fun x y => c * J x y) N =
+      c • dressedHeisenbergSMatrix A J N := by
+  ext σ σ'
+  rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_smul_J]
+  simp [dressedHeisenbergSMatrix_apply]
+
 /-- For real coupling, the dressed matrix is Hermitian. -/
 theorem dressedHeisenbergSMatrix_isHermitian
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
