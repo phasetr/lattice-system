@@ -821,4 +821,50 @@ theorem spinSDot_apply_eq_zero_of_pair_not_xy_or_yx
       · -- x' ∉ {x, y}; use x_outside.
         exact spinSDot_apply_eq_zero_of_x_outside_pair hxy N hne h hxy' hxx' hxy2
 
+/-- **spinSDot vanishing on non-`±1` differences at `x`**: for `x ≠ y`
+and configurations `σ', σ` agreeing off `{x, y}` such that `σ', σ`
+differ at `x` by an amount other than `±1` (i.e., neither raising nor
+lowering by one step), the matrix element vanishes.
+
+The `S^+_x ⊗ S^-_y` term vanishes (since `S^+(σ' x, σ x) = 0` requires
+`(σ' x).val + 1 = (σ x).val`); the `S^-_x ⊗ S^+_y` term vanishes
+(since `S^-(σ' x, σ x) = 0` requires `(σ x).val + 1 = (σ' x).val`);
+the `S^3_x ⊗ S^3_y` term vanishes (since `σ' x ≠ σ x` forces
+`S^3(σ' x, σ x) = 0`). -/
+theorem spinSDot_apply_eq_zero_of_off_two_site_agree_diff_at_x_not_pm1
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hne : σ' x ≠ σ x)
+    (hp : (σ' x).val + 1 ≠ (σ x).val)
+    (hm : (σ x).val + 1 ≠ (σ' x).val) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ = 0 := by
+  rw [spinSDot_apply_eq_pm_only_of_off_diag_at_x hxy N h hne]
+  rw [onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_of_off_two_site_agree
+    hxy h]
+  rw [onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_of_off_two_site_agree
+    hxy h]
+  rw [spinSOpPlus_apply_other N hp]
+  rw [spinSOpMinus_apply_other N hm]
+  ring
+
+/-- Symmetric: spinSDot vanishes when the difference at `y` is not
+`±1`. -/
+theorem spinSDot_apply_eq_zero_of_off_two_site_agree_diff_at_y_not_pm1
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hne : σ' y ≠ σ y)
+    (hp : (σ' y).val + 1 ≠ (σ y).val)
+    (hm : (σ y).val + 1 ≠ (σ' y).val) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ = 0 := by
+  rw [spinSDot_apply_eq_pm_only_of_off_diag_at_y hxy N h hne]
+  rw [onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_of_off_two_site_agree
+    hxy h]
+  rw [onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_of_off_two_site_agree
+    hxy h]
+  rw [spinSOpMinus_apply_other N hm]
+  rw [spinSOpPlus_apply_other N hp]
+  ring
+
 end LatticeSystem.Quantum
