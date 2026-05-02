@@ -136,4 +136,42 @@ theorem dressedHeisenbergS_apply_ne_zero_of_raiseLowerStepS_witness
   rw [heq] at hneg
   simp at hneg
 
+/-! ## Real-matrix versions -/
+
+/-- The real-valued dressed Heisenberg matrix entry on a bipartite
+raise/lower step is *strictly negative*. -/
+theorem dressedHeisenbergSReMatrix_apply_neg_of_raiseLowerStepS_witness
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ)
+    {G : SimpleGraph V} {σ' σ : V → Fin (N + 1)}
+    {x y : V} (hadj : G.Adj x y) (hAne : A x ≠ A y)
+    (hJ_real : (J x y).im = 0) (hJ_pos : 0 < (J x y).re)
+    (hJ_sym : J x y = J y x)
+    (hsh : ((σ x).val + 1 = (σ' x).val ∧ (σ' y).val + 1 = (σ y).val) ∨
+      ((σ' x).val + 1 = (σ x).val ∧ (σ y).val + 1 = (σ' y).val))
+    (hagree : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    dressedHeisenbergSReMatrix A J N σ' σ < 0 := by
+  rw [dressedHeisenbergSReMatrix_apply]
+  exact dressedHeisenbergS_apply_re_neg_of_raiseLowerStepS_witness A N hadj
+    hAne hJ_real hJ_pos hJ_sym hsh hagree
+
+/-- The real-valued dressed Heisenberg matrix entry on a bipartite
+raise/lower step is non-zero. -/
+theorem dressedHeisenbergSReMatrix_apply_ne_zero_of_raiseLowerStepS_witness
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ)
+    {G : SimpleGraph V} {σ' σ : V → Fin (N + 1)}
+    {x y : V} (hadj : G.Adj x y) (hAne : A x ≠ A y)
+    (hJ_real : (J x y).im = 0) (hJ_pos : 0 < (J x y).re)
+    (hJ_sym : J x y = J y x)
+    (hsh : ((σ x).val + 1 = (σ' x).val ∧ (σ' y).val + 1 = (σ y).val) ∨
+      ((σ' x).val + 1 = (σ x).val ∧ (σ y).val + 1 = (σ' y).val))
+    (hagree : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    dressedHeisenbergSReMatrix A J N σ' σ ≠ 0 := by
+  intro heq
+  have hneg := dressedHeisenbergSReMatrix_apply_neg_of_raiseLowerStepS_witness
+    A N hadj hAne hJ_real hJ_pos hJ_sym hsh hagree
+  rw [heq] at hneg
+  simp at hneg
+
 end LatticeSystem.Quantum
