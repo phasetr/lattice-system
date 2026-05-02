@@ -602,6 +602,52 @@ theorem marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_x
   rw [neg_nonpos]
   exact spinSDot_apply_re_nonneg_of_raising_lowering_x hxy N h hx
 
+/-- Symmetric: lowering at `x` direction. -/
+theorem marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_x_lowering
+    {x y : V} (hxy : x ≠ y) (N : ℕ)
+    (A : V → Bool) (hAx : A x = true) (hAy : A y = false)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hx : (σ x).val + 1 = (σ' x).val)
+    (_hy : (σ' y).val + 1 = (σ y).val) :
+    ((marshallSignS A σ' * marshallSignS A σ) *
+        (spinSDot x y N : ManyBodyOpS V N) σ' σ).re ≤ 0 := by
+  have hsign : marshallSignS A σ' * marshallSignS A σ = -1 := by
+    apply marshallSignS_mul_of_agree_off_two_site_bipartite_x A hxy hAx hAy h
+    rw [show (σ' x).val = (σ x).val + 1 from hx.symm]
+    rw [show (σ x).val + 1 + (σ x).val = 2 * (σ x).val + 1 from by ring]
+    exact ⟨(σ x).val, rfl⟩
+  rw [hsign]
+  rw [show ((-1 : ℂ) * (spinSDot x y N : ManyBodyOpS V N) σ' σ).re =
+        -((spinSDot x y N : ManyBodyOpS V N) σ' σ).re from by
+    rw [Complex.mul_re]
+    simp]
+  rw [neg_nonpos]
+  exact spinSDot_apply_re_nonneg_of_raising_lowering_y hxy N h hx
+
+/-- Symmetric: bipartite case `x ∉ A, y ∈ A`, raising at `x`. -/
+theorem marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_y
+    {x y : V} (hxy : x ≠ y) (N : ℕ)
+    (A : V → Bool) (hAx : A x = false) (hAy : A y = true)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (_hx : (σ' x).val + 1 = (σ x).val)
+    (hy : (σ y).val + 1 = (σ' y).val) :
+    ((marshallSignS A σ' * marshallSignS A σ) *
+        (spinSDot x y N : ManyBodyOpS V N) σ' σ).re ≤ 0 := by
+  have hsign : marshallSignS A σ' * marshallSignS A σ = -1 := by
+    apply marshallSignS_mul_of_agree_off_two_site_bipartite_y A hxy hAx hAy h
+    rw [show (σ' y).val = (σ y).val + 1 from hy.symm]
+    rw [show (σ y).val + 1 + (σ y).val = 2 * (σ y).val + 1 from by ring]
+    exact ⟨(σ y).val, rfl⟩
+  rw [hsign]
+  rw [show ((-1 : ℂ) * (spinSDot x y N : ManyBodyOpS V N) σ' σ).re =
+        -((spinSDot x y N : ManyBodyOpS V N) σ' σ).re from by
+    rw [Complex.mul_re]
+    simp]
+  rw [neg_nonpos]
+  exact spinSDot_apply_re_nonneg_of_raising_lowering_x hxy N h _hx
+
 /-- The real-part dressed Heisenberg matrix is additive in the
 coupling. -/
 theorem dressedHeisenbergSReMatrix_add_J
