@@ -369,6 +369,7 @@ theorem spinSDot_self_apply_diag_eq_ofReal_re (x : Λ) (N : ℕ)
   · rw [Complex.ofReal_im]
     exact spinSDot_self_apply_im_zero x N σ σ
 
+
 /-- The matrix-element form of the raising/lowering decomposition of
 `spinSDot`: combines the `(1/2)(S+S- + S-S+)` ladder part with the
 `S^3 ⊗ S^3` diagonal part. -/
@@ -438,5 +439,45 @@ theorem spinSDot_N_zero_total {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
   by_cases hxy : x = y
   · subst hxy; exact spinSDot_self_N_zero x
   · exact spinSDot_N_zero_of_ne hxy
+
+/-! ## Off-diagonal `Ŝ_x · Ŝ_y` matrix elements on raising/lowering pairs -/
+
+/-- For `x ≠ y` and configurations `σ', σ` agreeing off `{x, y}`,
+the matrix element of `Ŝ_x · Ŝ_y` has non-negative real part on the
+raising/lowering pair `σ_x = σ'_x + 1, σ_y + 1 = σ'_y`.
+
+The `S^+_x ⊗ S^-_y` term contributes a positive `√(...) × √(...)`,
+the `S^-_x ⊗ S^+_y` term vanishes (wrong direction), and the
+`S^3_x ⊗ S^3_y` term vanishes (off-diagonal in `S^3`). -/
+theorem spinSDot_apply_re_nonneg_of_raising_lowering_x
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hx : (σ' x).val + 1 = (σ x).val) :
+    0 ≤ ((spinSDot x y N : ManyBodyOpS Λ N) σ' σ).re := by
+  rw [spinSDot_apply_eq_pm_3]
+  rw [Matrix.add_apply, Complex.add_re]
+  rw [Matrix.smul_apply, smul_eq_mul, Complex.mul_re]
+  rw [Matrix.add_apply, Complex.add_re]
+  have h1 := onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_re_nonneg
+    (Λ := Λ) hxy σ' σ
+  have h2 := onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_re_nonneg
+    (Λ := Λ) hxy σ' σ
+  have h12re : ((1 / 2 : ℂ)).re = 1 / 2 := by norm_num
+  have h12im : ((1 / 2 : ℂ)).im = 0 := by norm_num
+  rw [h12re, h12im, zero_mul, sub_zero]
+  have hσ'x : σ' x ≠ σ x := by
+    intro heq
+    have : (σ' x).val = (σ x).val := by rw [heq]
+    omega
+  have h3eq : (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
+      : ManyBodyOpS Λ N) σ' σ = 0 := by
+    rw [onSiteS_mul_onSiteS_apply_eq hxy, if_pos h]
+    rw [show spinSOp3 N (σ' x) (σ x) = 0 from
+      Matrix.diagonal_apply_ne _ hσ'x]
+    ring
+  rw [h3eq]
+  simp
+  positivity
 
 end LatticeSystem.Quantum
