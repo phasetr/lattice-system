@@ -282,6 +282,15 @@ theorem magEigenvalueS_of_N_zero (σ : Λ → Fin 1) :
   ring
 
 omit [DecidableEq Λ] in
+/-- `magSumS σ` over an empty lattice is `0`. -/
+theorem magSumS_of_isEmpty [IsEmpty Λ] (σ : Λ → Fin (N + 1)) :
+    magSumS σ = 0 := by
+  unfold magSumS
+  rw [Finset.sum_empty.symm]
+  congr 1
+  exact Finset.eq_empty_of_isEmpty _
+
+omit [DecidableEq Λ] in
 /-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
 theorem magEigenvalueS_const_zero :
     magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1))) =
