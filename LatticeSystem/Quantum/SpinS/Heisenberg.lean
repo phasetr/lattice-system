@@ -604,6 +604,63 @@ theorem heisenbergHamiltonianS_apply_eq_ofReal_re
   · rw [Complex.ofReal_im]
     exact heisenbergHamiltonianS_apply_im_zero (Λ := Λ) N hreal σ' σ
 
+/-- **Magnetization conservation, spinSDot matrix-element form**: the
+two-site `Ŝ_x · Ŝ_y` matrix element vanishes when `σ', σ` carry
+different magnetization quantum numbers.
+
+This is the matrix-level expression of `[Ŝ_x · Ŝ_y, Ŝ^{(3)}_tot] = 0`
+(`spinSDot_commutator_totalSpinSOp3`). The proof structure mirrors the
+Heisenberg analogue (`heisenbergHamiltonianS_apply_eq_zero_of_mag_ne`)
+since both rely on commutativity with `Ŝ^{(3)}_tot`. -/
+theorem spinSDot_apply_eq_zero_of_mag_ne
+    (x y : Λ) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : magEigenvalueS σ ≠ magEigenvalueS σ') :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ = 0 := by
+  classical
+  -- Apply spinSDot to |σ⟩: result is in magSubspaceS Λ N (magEig σ).
+  have hcomm : Commute (totalSpinSOp3 Λ N)
+      (spinSDot x y N : ManyBodyOpS Λ N) :=
+    (sub_eq_zero.mp (spinSDot_commutator_totalSpinSOp3 x y N)).symm
+  have hH : (spinSDot x y N : ManyBodyOpS Λ N).mulVec (basisVecS σ) ∈
+      magSubspaceS Λ N (magEigenvalueS σ) :=
+    mem_magSubspaceS_of_commute _ _ hcomm
+      (basisVecS_mem_magSubspaceS σ)
+  rw [mem_magSubspaceS_iff] at hH
+  have hentry := congrFun hH σ'
+  have hLHS :
+      (totalSpinSOp3 Λ N).mulVec
+        ((spinSDot x y N : ManyBodyOpS Λ N).mulVec (basisVecS σ)) σ' =
+      magEigenvalueS σ' *
+        ((spinSDot x y N : ManyBodyOpS Λ N).mulVec (basisVecS σ)) σ' := by
+    change ∑ τ, (totalSpinSOp3 Λ N) σ' τ *
+        ((spinSDot x y N : ManyBodyOpS Λ N).mulVec (basisVecS σ)) τ = _
+    rw [Finset.sum_eq_single σ']
+    · rw [totalSpinSOp3_apply_diag]
+    · intro τ _ hτne
+      rw [totalSpinSOp3_apply_off_diag (Ne.symm hτne), zero_mul]
+    · intro hσ; exact (hσ (Finset.mem_univ σ')).elim
+  rw [hLHS, Pi.smul_apply, smul_eq_mul] at hentry
+  -- Identify (spinSDot · |σ⟩) σ' with the matrix entry spinSDot σ' σ.
+  have hSapply :
+      (spinSDot x y N : ManyBodyOpS Λ N).mulVec (basisVecS σ) σ' =
+        (spinSDot x y N : ManyBodyOpS Λ N) σ' σ := by
+    change ∑ σ'' : Λ → Fin (N + 1),
+        (spinSDot x y N : ManyBodyOpS Λ N) σ' σ'' * basisVecS σ σ'' =
+          (spinSDot x y N : ManyBodyOpS Λ N) σ' σ
+    simp_rw [basisVecS_apply, mul_ite, mul_one, mul_zero]
+    rw [Finset.sum_ite_eq' Finset.univ σ
+        (fun σ'' => (spinSDot x y N : ManyBodyOpS Λ N) σ' σ'')]
+    simp
+  rw [hSapply] at hentry
+  have hzero :
+      (magEigenvalueS σ' - magEigenvalueS σ) *
+        (spinSDot x y N : ManyBodyOpS Λ N) σ' σ = 0 := by
+    linear_combination hentry
+  rcases mul_eq_zero.mp hzero with hmag | hS
+  · exact (h (sub_eq_zero.mp hmag).symm).elim
+  · exact hS
+
 /-- The matrix element `H σ' σ` vanishes when the two configurations
 have different magnetization quantum numbers. This is the matrix-level
 expression of `[H, S^z_tot] = 0`. -/
