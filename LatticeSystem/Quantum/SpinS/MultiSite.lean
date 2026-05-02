@@ -518,4 +518,10 @@ theorem onSiteS_zero_mul (i : Λ) (B : ManyBodyOpS Λ N) :
     (onSiteS i (0 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) : ManyBodyOpS Λ N) * B = 0 := by
   rw [onSiteS_zero, zero_mul]
 
+/-- The right multiplicative version: `B * onSiteS i 0 = 0`. -/
+theorem mul_onSiteS_zero (i : Λ) (B : ManyBodyOpS Λ N) :
+    B * (onSiteS i (0 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+        ManyBodyOpS Λ N) = 0 := by
+  rw [onSiteS_zero, mul_zero]
+
 end LatticeSystem.Quantum
