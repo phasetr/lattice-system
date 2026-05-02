@@ -64,6 +64,11 @@ theorem marshallSignS_of_isEmpty [IsEmpty V]
   rw [show (Finset.univ : Finset V) = ∅ from Finset.eq_empty_of_isEmpty _]
   exact Finset.prod_empty
 
+/-- Definitional unfolding of `marshallSignS`. -/
+theorem marshallSignS_def (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ =
+      ∏ x : V, if A x then ((-1 : ℂ) ^ (σ x).val) else 1 := rfl
+
 /-- Product of two Marshall signs at the same sublattice indicator
 factors site-wise: each `A`-site contributes `(-1)^((σ x).val + (σ' x).val)`. -/
 theorem marshallSignS_mul (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
