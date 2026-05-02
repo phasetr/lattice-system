@@ -355,6 +355,15 @@ theorem magEigenvalueS_re (σ : Λ → Fin (N + 1)) :
   simp
 
 omit [DecidableEq Λ] in
+/-- `magEigenvalueS σ = ((magEigenvalueS σ).re : ℂ)`: its imaginary
+part vanishes, so it equals its embedded real part. -/
+theorem magEigenvalueS_eq_ofReal_re (σ : Λ → Fin (N + 1)) :
+    magEigenvalueS σ = ((magEigenvalueS σ).re : ℂ) := by
+  apply Complex.ext
+  · simp
+  · simp [magEigenvalueS_im_zero]
+
+omit [DecidableEq Λ] in
 /-- `magSumS σ ≥ (σ y).val` at any site `y`. -/
 theorem magSumS_ge_of_exists (σ : Λ → Fin (N + 1)) (y : Λ) :
     (σ y).val ≤ magSumS σ := by
