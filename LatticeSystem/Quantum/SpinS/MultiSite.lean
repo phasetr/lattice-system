@@ -502,4 +502,9 @@ theorem onSiteS_pow_three (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) 
     (onSiteS i A : ManyBodyOpS Λ N) ^ 3 = onSiteS i (A ^ 3) :=
   onSiteS_pow i A 3
 
+/-- `onSiteS i A` commutes with itself trivially. -/
+theorem onSiteS_self_commute (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    Commute (onSiteS i A : ManyBodyOpS Λ N) (onSiteS i A) :=
+  Commute.refl _
+
 end LatticeSystem.Quantum
