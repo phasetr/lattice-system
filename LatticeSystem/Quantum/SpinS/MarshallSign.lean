@@ -72,6 +72,11 @@ theorem marshallSignS_N_zero (A : V → Bool) (σ : V → Fin 1) :
     funext x; apply Fin.ext; have := (σ x).isLt; omega
   rw [this, marshallSignS_const_zero]
 
+/-- The Marshall sign at `σ'` and `σ` are equal when σ' = σ. -/
+theorem marshallSignS_eq_of_eq (A : V → Bool)
+    {σ' σ : V → Fin (N + 1)} (h : σ' = σ) :
+    marshallSignS A σ' = marshallSignS A σ := by rw [h]
+
 
 /-- The Marshall sign restricted to `A`-sites: factors away the
 trivial `1` contributions from non-`A` sites. -/
