@@ -334,6 +334,16 @@ theorem spinSOp3_apply_diag_re (N : ℕ) (k : Fin (N + 1)) :
   rw [spinSOp3_apply_diag]
   simp
 
+/-- The diagonal product `(spinSOp3 N k k * spinSOp3 N l l).re =
+(N/2 - k.val)(N/2 - l.val)`. -/
+theorem spinSOp3_mul_spinSOp3_diag_re (N : ℕ) (k l : Fin (N + 1)) :
+    (spinSOp3 N k k * spinSOp3 N l l).re =
+      ((N : ℝ) / 2 - (k.val : ℝ)) * ((N : ℝ) / 2 - (l.val : ℝ)) := by
+  rw [Complex.mul_re]
+  rw [spinSOp3_apply_im_zero, spinSOp3_apply_im_zero]
+  rw [zero_mul, sub_zero]
+  rw [spinSOp3_apply_diag_re, spinSOp3_apply_diag_re]
+
 /-- Each entry of `Ŝ^{(3)}` equals its own real-part embedding. -/
 theorem spinSOp3_apply_eq_ofReal (N : ℕ) (i j : Fin (N + 1)) :
     spinSOp3 N i j = ((spinSOp3 N i j).re : ℂ) := by
