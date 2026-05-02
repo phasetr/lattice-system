@@ -688,4 +688,33 @@ theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_re_nonneg
     exact spinSOpMinus_mul_spinSOpPlus_re_nonneg N (σ' x) (σ x) (σ' y) (σ y)
   · rw [if_neg h]; simp
 
+/-- For distinct sites `x ≠ y`, the product
+`onSiteS x (Ŝ^+) * onSiteS y (Ŝ^-)` has zero imaginary part on every
+`(σ', σ)` pair. -/
+theorem onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_im_zero
+    {x y : Λ} (hxy : x ≠ y) (σ' σ : Λ → Fin (N + 1)) :
+    ((onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N)
+          : ManyBodyOpS Λ N) σ' σ).im = 0 := by
+  rw [onSiteS_mul_onSiteS_apply_eq hxy]
+  by_cases h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k
+  · rw [if_pos h]
+    rw [Complex.mul_im]
+    rw [spinSOpPlus_apply_im_zero, spinSOpMinus_apply_im_zero]
+    ring
+  · rw [if_neg h]; simp
+
+/-- Symmetric: `onSiteS x (Ŝ^-) * onSiteS y (Ŝ^+)` has zero imaginary
+part on every `(σ', σ)` pair. -/
+theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_im_zero
+    {x y : Λ} (hxy : x ≠ y) (σ' σ : Λ → Fin (N + 1)) :
+    ((onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
+          : ManyBodyOpS Λ N) σ' σ).im = 0 := by
+  rw [onSiteS_mul_onSiteS_apply_eq hxy]
+  by_cases h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k
+  · rw [if_pos h]
+    rw [Complex.mul_im]
+    rw [spinSOpMinus_apply_im_zero, spinSOpPlus_apply_im_zero]
+    ring
+  · rw [if_neg h]; simp
+
 end LatticeSystem.Quantum
