@@ -56,6 +56,12 @@ theorem magSumS_complex_re (σ : Λ → Fin (N + 1)) :
   simp
 
 omit [DecidableEq Λ] in
+/-- The cast `(magSumS σ : ℂ).im = 0`. -/
+theorem magSumS_complex_im (σ : Λ → Fin (N + 1)) :
+    ((magSumS σ : ℂ)).im = 0 := by
+  simp
+
+omit [DecidableEq Λ] in
 /-- `magSumS σ ≤ |Λ| · N`. -/
 theorem magSumS_le (σ : Λ → Fin (N + 1)) :
     magSumS σ ≤ Fintype.card Λ * N := by
