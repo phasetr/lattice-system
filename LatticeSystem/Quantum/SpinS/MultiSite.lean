@@ -388,4 +388,13 @@ theorem onSiteS_sq (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
     (onSiteS i A : ManyBodyOpS Λ N) * onSiteS i A = onSiteS i (A * A) :=
   onSiteS_mul_onSiteS_same i A A
 
+/-- Negation distributes over `onSiteS`: `onSiteS i (-A) = -(onSiteS i A)`. -/
+theorem onSiteS_neg (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i (-A) : ManyBodyOpS Λ N) = -(onSiteS i A) := by
+  rw [show (-A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) =
+        (-1 : ℂ) • A from by rw [neg_smul, one_smul]]
+  rw [onSiteS_smul]
+  rw [show ((-1 : ℂ) • onSiteS (N := N) i A : ManyBodyOpS Λ N) =
+        -onSiteS i A from by rw [neg_smul, one_smul]]
+
 end LatticeSystem.Quantum
