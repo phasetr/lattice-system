@@ -130,6 +130,14 @@ theorem spinSOpPlus_apply_diag (N : ℕ) (k : Fin (N + 1)) :
   apply spinSOpPlus_apply_other
   omega
 
+/-- All entries of `Ŝ^+` have zero imaginary part. -/
+theorem spinSOpPlus_apply_im_zero (N : ℕ) (i j : Fin (N + 1)) :
+    (spinSOpPlus N i j).im = 0 := by
+  unfold spinSOpPlus
+  by_cases h : i.val + 1 = j.val
+  · rw [if_pos h]; simp
+  · rw [if_neg h]; simp
+
 /-- The `Ŝ^-` matrix entry on a lowering pair. -/
 theorem spinSOpMinus_apply_lower (N : ℕ) {i j : Fin (N + 1)}
     (h : j.val + 1 = i.val) :
@@ -149,6 +157,14 @@ theorem spinSOpMinus_apply_diag (N : ℕ) (k : Fin (N + 1)) :
     spinSOpMinus N k k = 0 := by
   apply spinSOpMinus_apply_other
   omega
+
+/-- All entries of `Ŝ^-` have zero imaginary part. -/
+theorem spinSOpMinus_apply_im_zero (N : ℕ) (i j : Fin (N + 1)) :
+    (spinSOpMinus N i j).im = 0 := by
+  unfold spinSOpMinus
+  by_cases h : j.val + 1 = i.val
+  · rw [if_pos h]; simp
+  · rw [if_neg h]; simp
 
 /-- Diagonal entries of `Ŝ^{(1)}` vanish (it is purely off-diagonal). -/
 theorem spinSOp1_apply_diag (N : ℕ) (k : Fin (N + 1)) :
