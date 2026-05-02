@@ -129,6 +129,15 @@ theorem heisenbergHamiltonianS_add (J J' : Λ → Λ → ℂ) (N : ℕ) :
   intro y _
   rw [add_smul]
 
+/-- The Heisenberg Hamiltonian is zero when the coupling is zero
+(every term in the double sum vanishes). -/
+theorem heisenbergHamiltonianS_zero (N : ℕ) :
+    heisenbergHamiltonianS (Λ := Λ) (fun _ _ => (0 : ℂ)) N = 0 := by
+  unfold heisenbergHamiltonianS
+  refine Finset.sum_eq_zero (fun x _ => ?_)
+  refine Finset.sum_eq_zero (fun y _ => ?_)
+  simp
+
 /-- The Heisenberg Hamiltonian is homogeneous in the coupling: -/
 theorem heisenbergHamiltonianS_smul (c : ℂ) (J : Λ → Λ → ℂ) (N : ℕ) :
     heisenbergHamiltonianS (Λ := Λ) (fun x y => c * J x y) N =
