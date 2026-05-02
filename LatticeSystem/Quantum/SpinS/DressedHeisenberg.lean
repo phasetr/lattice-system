@@ -566,6 +566,42 @@ theorem dressedHeisenbergSReMatrix_apply_swap_of_symm
   rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergSReMatrix_apply,
       dressedHeisenbergS_apply_swap_of_symm A hsym N σ' σ]
 
+/-! ## Marshall-dressed `(Ŝ_x · Ŝ_y)` on bipartite raising/lowering pairs -/
+
+/-- **Bipartite Marshall dressing makes the off-diagonal `Ŝ_x · Ŝ_y`
+matrix element non-positive**: for `x ∈ A`, `y ∉ A`, configurations
+`σ', σ` agreeing off `{x, y}` with the raising shift at `x`
+(`σ_x = σ'_x + 1`) and lowering shift at `y` (`σ_y + 1 = σ'_y`), the
+dressed spinSDot real part `(marshallSignS A σ' * marshallSignS A σ) *
+(Ŝ_x · Ŝ_y) σ' σ` is non-positive.
+
+The Marshall sign factor is `-1` (PR #772), the off-diagonal entry
+is positive (PR #781), so the product is non-positive. This is the
+key non-positivity needed for the Marshall sign trick (Tasaki Theorem 2.2). -/
+theorem marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_x
+    {x y : V} (hxy : x ≠ y) (N : ℕ)
+    (A : V → Bool) (hAx : A x = true) (hAy : A y = false)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hx : (σ' x).val + 1 = (σ x).val)
+    (_hy : (σ y).val + 1 = (σ' y).val) :
+    ((marshallSignS A σ' * marshallSignS A σ) *
+        (spinSDot x y N : ManyBodyOpS V N) σ' σ).re ≤ 0 := by
+  -- Marshall sign factor: bipartite raising at x with A x = true gives -1.
+  have hsign : marshallSignS A σ' * marshallSignS A σ = -1 := by
+    apply marshallSignS_mul_of_agree_off_two_site_bipartite_x A hxy hAx hAy h
+    -- Need: Odd ((σ' x).val + (σ x).val).
+    rw [show (σ x).val = (σ' x).val + 1 from hx.symm]
+    rw [show (σ' x).val + ((σ' x).val + 1) = 2 * (σ' x).val + 1 from by ring]
+    exact ⟨(σ' x).val, rfl⟩
+  rw [hsign]
+  rw [show ((-1 : ℂ) * (spinSDot x y N : ManyBodyOpS V N) σ' σ).re =
+        -((spinSDot x y N : ManyBodyOpS V N) σ' σ).re from by
+    rw [Complex.mul_re]
+    simp]
+  rw [neg_nonpos]
+  exact spinSDot_apply_re_nonneg_of_raising_lowering_x hxy N h hx
+
 /-- The real-part dressed Heisenberg matrix is additive in the
 coupling. -/
 theorem dressedHeisenbergSReMatrix_add_J
