@@ -412,6 +412,16 @@ theorem magEigenvalueS_re_lower_bound (σ : Λ → Fin (N + 1)) :
   linarith
 
 omit [DecidableEq Λ] in
+/-- `magEigenvalueS σ` is bounded above: `(magEigenvalueS σ).re ≤ (|Λ| · N) / 2`.
+The most-up configuration `σ ≡ 0` (giving `magSumS σ = 0`) gives the
+highest value `(|Λ| · N) / 2`. -/
+theorem magEigenvalueS_re_upper_bound (σ : Λ → Fin (N + 1)) :
+    (magEigenvalueS σ).re ≤ ((Fintype.card Λ : ℝ) * (N : ℝ)) / 2 := by
+  rw [magEigenvalueS_re]
+  have hnn := magSumS_real_nonneg σ
+  linarith
+
+omit [DecidableEq Λ] in
 /-- `magEigenvalueS σ = ((magEigenvalueS σ).re : ℂ)`: its imaginary
 part vanishes, so it equals its embedded real part. -/
 theorem magEigenvalueS_eq_ofReal_re (σ : Λ → Fin (N + 1)) :
