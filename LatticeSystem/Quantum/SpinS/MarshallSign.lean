@@ -380,4 +380,19 @@ theorem basisVecS_eq_marshallSignS_smul_marshallDressedBasisS
       marshallSignS A σ • marshallDressedBasisS A σ :=
   (marshallSignS_smul_marshallDressedBasisS A σ).symm
 
+/-- **Marshall-dressed basis decomposition** of any vector:
+`v = Σ_σ (marshallSignS A σ * v(σ)) • marshallDressedBasisS A σ`.
+Substituting `basisVecS σ = marshallSignS A σ • marshallDressedBasisS A σ`
+into `fun_eq_sum_smul_basisVecS`. -/
+theorem fun_eq_sum_smul_marshallDressedBasisS [DecidableEq V]
+    (A : V → Bool) (v : (V → Fin (N + 1)) → ℂ) :
+    v = ∑ σ : V → Fin (N + 1),
+      (marshallSignS A σ * v σ) • marshallDressedBasisS A σ := by
+  conv_lhs => rw [fun_eq_sum_smul_basisVecS v]
+  refine Finset.sum_congr rfl ?_
+  intro σ _
+  rw [basisVecS_eq_marshallSignS_smul_marshallDressedBasisS A σ]
+  rw [smul_smul]
+  rw [mul_comm (v σ) (marshallSignS A σ)]
+
 end LatticeSystem.Quantum
