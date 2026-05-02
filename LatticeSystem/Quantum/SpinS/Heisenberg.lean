@@ -173,6 +173,15 @@ theorem heisenbergHamiltonianS_apply (J : Λ → Λ → ℂ) (N : ℕ)
   unfold heisenbergHamiltonianS
   simp [Matrix.sum_apply, Matrix.smul_apply, smul_eq_mul]
 
+/-- `totalSpinSSquared Λ N` is the Heisenberg Hamiltonian with
+constant unit coupling: `(Ŝ_tot)² = ∑_{x,y} (Ŝ_x · Ŝ_y)`. -/
+theorem totalSpinSSquared_eq_heisenbergHamiltonianS_unit :
+    (totalSpinSSquared Λ N : ManyBodyOpS Λ N) =
+      heisenbergHamiltonianS (Λ := Λ) (fun _ _ => (1 : ℂ)) N := by
+  rw [totalSpinSSquared_eq_sum_spinSDot]
+  unfold heisenbergHamiltonianS
+  simp
+
 /-- The Heisenberg Hamiltonian is homogeneous in the coupling: -/
 theorem heisenbergHamiltonianS_smul (c : ℂ) (J : Λ → Λ → ℂ) (N : ℕ) :
     heisenbergHamiltonianS (Λ := Λ) (fun x y => c * J x y) N =
