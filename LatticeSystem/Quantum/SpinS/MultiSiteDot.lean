@@ -226,6 +226,7 @@ theorem spinSDot_self_apply_eq_zero_of_diff_at
     (spinSDot x x N : ManyBodyOpS Λ N) σ' σ = 0 :=
   spinSDot_self_apply_eq_zero_of_ne x N (fun heq => hz (by rw [heq]))
 
+
 /-- For `x ≠ y`, the diagonal matrix element of `Ŝ_x · Ŝ_y` reduces
 to the product of the two `Ŝ^{(3)}` eigenvalues:
 `(Ŝ_x · Ŝ_y) σ σ = (N/2 - σ_x.val)(N/2 - σ_y.val)`.
@@ -636,5 +637,55 @@ theorem spinSDot_apply_re_nonneg_of_raising_lowering_y
   rw [h3eq]
   simp
   positivity
+
+/-- **One-site difference vanishing**: for `x ≠ y` and configurations
+`σ', σ` agreeing off a single site `z`, the matrix element of
+`Ŝ_x · Ŝ_y` vanishes. (Two-site operators cannot connect
+single-site differences — magnetization conservation at the
+matrix-element level.)
+
+Cases:
+- `z ∉ {x, y}`: the off-pair difference site forces vanishing.
+- `z ∈ {x, y}`: σ' σ agree at the *other* site of `{x, y}`, but
+  S^- and S^+ have no diagonal entries, and S^3_z has off-diagonal
+  zero, so all three axis terms vanish. -/
+theorem spinSDot_apply_eq_zero_of_one_site_diff
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    {z : Λ} (hagree : ∀ k, k ≠ z → σ' k = σ k) (hz : σ' z ≠ σ z) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ = 0 := by
+  by_cases hzx : z = x
+  · subst hzx
+    have hy : σ' y = σ y := hagree y (Ne.symm hxy)
+    have h2agree : ∀ k, k ≠ z → k ≠ y → σ' k = σ k := fun k hkz _ => hagree k hkz
+    rw [spinSDot_apply_of_off_two_site_agree hxy N h2agree]
+    rw [show spinSOp1 N (σ' z) (σ z) * spinSOp1 N (σ' y) (σ y) =
+        spinSOp1 N (σ' z) (σ z) * 0 from by
+      rw [hy, spinSOp1_apply_diag]]
+    rw [show spinSOp2 N (σ' z) (σ z) * spinSOp2 N (σ' y) (σ y) =
+        spinSOp2 N (σ' z) (σ z) * 0 from by
+      rw [hy, spinSOp2_apply_diag]]
+    rw [show spinSOp3 N (σ' z) (σ z) * spinSOp3 N (σ' y) (σ y) =
+        0 * spinSOp3 N (σ' y) (σ y) from by
+      rw [show spinSOp3 N (σ' z) (σ z) = 0 from
+        Matrix.diagonal_apply_ne _ hz]]
+    ring
+  · by_cases hzy : z = y
+    · subst hzy
+      have hx : σ' x = σ x := hagree x hxy
+      have h2agree : ∀ k, k ≠ x → k ≠ z → σ' k = σ k := fun k _ hkz => hagree k hkz
+      rw [spinSDot_apply_of_off_two_site_agree hxy N h2agree]
+      rw [show spinSOp1 N (σ' x) (σ x) * spinSOp1 N (σ' z) (σ z) =
+          0 * spinSOp1 N (σ' z) (σ z) from by
+        rw [hx, spinSOp1_apply_diag]]
+      rw [show spinSOp2 N (σ' x) (σ x) * spinSOp2 N (σ' z) (σ z) =
+          0 * spinSOp2 N (σ' z) (σ z) from by
+        rw [hx, spinSOp2_apply_diag]]
+      rw [show spinSOp3 N (σ' x) (σ x) * spinSOp3 N (σ' z) (σ z) =
+          spinSOp3 N (σ' x) (σ x) * 0 from by
+        rw [show spinSOp3 N (σ' z) (σ z) = 0 from
+          Matrix.diagonal_apply_ne _ hz]]
+      ring
+    · exact spinSDot_apply_eq_zero_of_diff_outside_pair hxy N hzx hzy hz
 
 end LatticeSystem.Quantum
