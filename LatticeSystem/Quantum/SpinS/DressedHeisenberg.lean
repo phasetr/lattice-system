@@ -296,4 +296,12 @@ theorem dressedHeisenbergSReMatrix_diag (A : V → Bool) (J : V → V → ℂ)
       ((heisenbergHamiltonianS J N) σ σ).re := by
   rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_diag]
 
+/-- The real-part dressed Heisenberg matrix is independent of the
+sublattice indicator on its diagonal. -/
+theorem dressedHeisenbergSReMatrix_diag_indep (A A' : V → Bool)
+    (J : V → V → ℂ) (N : ℕ) (σ : V → Fin (N + 1)) :
+    dressedHeisenbergSReMatrix A J N σ σ =
+      dressedHeisenbergSReMatrix A' J N σ σ := by
+  rw [dressedHeisenbergSReMatrix_diag, dressedHeisenbergSReMatrix_diag]
+
 end LatticeSystem.Quantum
