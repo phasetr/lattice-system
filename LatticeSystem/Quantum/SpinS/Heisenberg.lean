@@ -448,6 +448,7 @@ theorem heisenbergHamiltonianS_apply_swap_of_symm
   rw [spinSDot_apply_swap]
 
 
+
 /-- For real coupling `J`, the Heisenberg matrix entries have zero
 imaginary part. (Each `Ŝ_x · Ŝ_y` matrix element is real, and a real
 coupling preserves this.) -/
