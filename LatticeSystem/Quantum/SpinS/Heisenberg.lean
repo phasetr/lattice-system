@@ -415,6 +415,39 @@ theorem heisenbergHamiltonianS_mulVec_basisVecS_mem_magSubspaceS
 where
   basisVecS_mem_basisVec_magSubspaceS := basisVecS_mem_magSubspaceS
 
+/-! ## Heisenberg Hamiltonian symmetry for symmetric coupling -/
+
+/-- For real-valued symmetric matrix `spinSDot x y` the matrix
+element is symmetric in the configuration arguments:
+`(Ŝ_x · Ŝ_y) σ' σ = (Ŝ_x · Ŝ_y) σ σ'`. Combines Hermiticity and
+the real-valuedness of all spinSDot entries. -/
+theorem spinSDot_apply_swap (x y : Λ) (N : ℕ)
+    (σ' σ : Λ → Fin (N + 1)) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ =
+      (spinSDot x y N : ManyBodyOpS Λ N) σ σ' := by
+  have hH := spinSDot_isHermitian (Λ := Λ) x y N
+  have happ := hH.apply σ σ'
+  have him : ((spinSDot x y N : ManyBodyOpS Λ N) σ' σ).im = 0 :=
+    spinSDot_apply_im_zero x y N σ' σ
+  have hreal : star ((spinSDot x y N : ManyBodyOpS Λ N) σ' σ) =
+      (spinSDot x y N : ManyBodyOpS Λ N) σ' σ :=
+    Complex.conj_eq_iff_im.mpr him
+  exact (happ.symm.trans hreal).symm
+
+/-- For symmetric coupling `J x y = J y x`, the Heisenberg matrix
+element `H σ' σ` equals `H σ σ'`. The Heisenberg matrix is symmetric
+on the configuration basis. -/
+theorem heisenbergHamiltonianS_apply_swap_of_symm
+    {J : Λ → Λ → ℂ} (_hsym : ∀ x y, J x y = J y x) (N : ℕ)
+    (σ' σ : Λ → Fin (N + 1)) :
+    (heisenbergHamiltonianS J N) σ' σ =
+      (heisenbergHamiltonianS J N) σ σ' := by
+  rw [heisenbergHamiltonianS_apply, heisenbergHamiltonianS_apply]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  refine Finset.sum_congr rfl fun y _ => ?_
+  rw [spinSDot_apply_swap]
+
+
 /-- For real coupling `J`, the Heisenberg matrix entries have zero
 imaginary part. (Each `Ŝ_x · Ŝ_y` matrix element is real, and a real
 coupling preserves this.) -/
