@@ -53,6 +53,7 @@ import LatticeSystem.Tests.SpinSRaiseLower
 import LatticeSystem.Tests.SpinSHeisenbergRaiseLower
 import LatticeSystem.Tests.SpinSDressedHeisenbergRaiseLower
 import LatticeSystem.Tests.SpinSConfigDist
+import LatticeSystem.Tests.SpinSRaiseLowerMatrixPow
 import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Pauli
 import LatticeSystem.Tests.Z2Z2
