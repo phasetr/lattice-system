@@ -513,4 +513,9 @@ theorem onSiteS_commute_of_ne {i j : Λ} (hij : i ≠ j)
     Commute (onSiteS i A : ManyBodyOpS Λ N) (onSiteS j B) :=
   onSiteS_mul_onSiteS_of_ne hij A B
 
+/-- The site-`i` zero embedding has every product with anything equal to zero. -/
+theorem onSiteS_zero_mul (i : Λ) (B : ManyBodyOpS Λ N) :
+    (onSiteS i (0 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) : ManyBodyOpS Λ N) * B = 0 := by
+  rw [onSiteS_zero, zero_mul]
+
 end LatticeSystem.Quantum
