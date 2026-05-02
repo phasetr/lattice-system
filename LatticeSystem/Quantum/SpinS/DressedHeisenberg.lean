@@ -343,4 +343,14 @@ theorem dressedHeisenbergSReMatrix_isHermitian
   have h := dressedHeisenbergSReMatrix_isSymm A N hreal
   exact congrFun (congrFun h σ) σ'
 
+/-- Real-part dressed Heisenberg matrix Hermiticity for a graph-derived
+coupling. -/
+theorem dressedHeisenbergSReMatrix_couplingOf_isHermitian
+    (A : V → Bool) (G : SimpleGraph V) [DecidableRel G.Adj]
+    {J : ℂ} (hJ : star J = J) (N : ℕ) :
+    (dressedHeisenbergSReMatrix A
+        (LatticeSystem.Lattice.couplingOf G J) N).IsHermitian :=
+  dressedHeisenbergSReMatrix_isHermitian A N
+    (LatticeSystem.Lattice.couplingOf_real G hJ)
+
 end LatticeSystem.Quantum
