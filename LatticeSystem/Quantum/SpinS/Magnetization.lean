@@ -273,6 +273,15 @@ theorem magSumS_of_N_zero (σ : Λ → Fin 1) :
   omega
 
 omit [DecidableEq Λ] in
+/-- For `N = 0` (`S = 0`), `magEigenvalueS σ = 0` always. -/
+theorem magEigenvalueS_of_N_zero (σ : Λ → Fin 1) :
+    magEigenvalueS σ = 0 := by
+  unfold magEigenvalueS
+  rw [magSumS_of_N_zero σ]
+  push_cast
+  ring
+
+omit [DecidableEq Λ] in
 /-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
 theorem magEigenvalueS_const_zero :
     magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1))) =
