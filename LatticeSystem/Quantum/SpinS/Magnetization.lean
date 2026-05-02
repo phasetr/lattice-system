@@ -155,6 +155,13 @@ theorem sub_mem_magSubspaceS (M : ℂ)
     v - w ∈ magSubspaceS Λ N M :=
   (magSubspaceS Λ N M).sub_mem hv hw
 
+/-- `Finset.sum` membership in `magSubspaceS`. -/
+theorem finset_sum_mem_magSubspaceS {ι : Type*} (M : ℂ)
+    (s : Finset ι) (f : ι → (Λ → Fin (N + 1)) → ℂ)
+    (hf : ∀ i ∈ s, f i ∈ magSubspaceS Λ N M) :
+    (∑ i ∈ s, f i) ∈ magSubspaceS Λ N M :=
+  (magSubspaceS Λ N M).sum_mem hf
+
 /-- Distinct magnetization eigenvalues give disjoint subspaces. -/
 theorem magSubspaceS_disjoint {M M' : ℂ} (hMM' : M ≠ M') :
     Disjoint (magSubspaceS Λ N M) (magSubspaceS Λ N M') := by
