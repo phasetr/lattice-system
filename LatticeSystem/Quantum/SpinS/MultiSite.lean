@@ -480,4 +480,11 @@ theorem onSiteS_add_zero (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
     (onSiteS i (A + 0) : ManyBodyOpS Λ N) = onSiteS i A := by
   rw [add_zero]
 
+/-- `onSiteS i A^0 = 1` (zero power gives the identity). -/
+theorem onSiteS_pow_zero (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    (onSiteS i A : ManyBodyOpS Λ N) ^ 0 = 1 := by
+  rw [onSiteS_pow]
+  rw [pow_zero]
+  exact onSiteS_one i
+
 end LatticeSystem.Quantum
