@@ -857,4 +857,45 @@ theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_eq_zero_of_off_two_si
           : ManyBodyOpS Λ N) σ' σ = 0 := by
   rw [onSiteS_mul_onSiteS_apply_eq hxy, if_neg h]
 
+/-- Vanishing with witness difference site: if `z ∉ {x, y}` and
+`σ' z ≠ σ z`, the product `onSiteS x A * onSiteS y B` vanishes at
+`(σ', σ)`. -/
+theorem onSiteS_mul_onSiteS_apply_eq_zero_of_diff_outside_pair
+    {x y : Λ} (hxy : x ≠ y)
+    (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
+    {σ' σ : Λ → Fin (N + 1)}
+    {z : Λ} (hzx : z ≠ x) (hzy : z ≠ y) (hz : σ' z ≠ σ z) :
+    (onSiteS x A * onSiteS y B : ManyBodyOpS Λ N) σ' σ = 0 := by
+  rw [onSiteS_mul_onSiteS_apply_eq hxy]
+  rw [if_neg]
+  intro hagree
+  exact hz (hagree z hzx hzy)
+
+/-- Same for `S^3_x ⊗ S^3_y`. -/
+theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_eq_zero_of_diff_outside_pair
+    {x y : Λ} (hxy : x ≠ y)
+    {σ' σ : Λ → Fin (N + 1)}
+    {z : Λ} (hzx : z ≠ x) (hzy : z ≠ y) (hz : σ' z ≠ σ z) :
+    (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
+          : ManyBodyOpS Λ N) σ' σ = 0 :=
+  onSiteS_mul_onSiteS_apply_eq_zero_of_diff_outside_pair hxy _ _ hzx hzy hz
+
+/-- Same for `S+_x ⊗ S-_y`. -/
+theorem onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_eq_zero_of_diff_outside_pair
+    {x y : Λ} (hxy : x ≠ y)
+    {σ' σ : Λ → Fin (N + 1)}
+    {z : Λ} (hzx : z ≠ x) (hzy : z ≠ y) (hz : σ' z ≠ σ z) :
+    (onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N)
+          : ManyBodyOpS Λ N) σ' σ = 0 :=
+  onSiteS_mul_onSiteS_apply_eq_zero_of_diff_outside_pair hxy _ _ hzx hzy hz
+
+/-- Same for `S-_x ⊗ S+_y`. -/
+theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_eq_zero_of_diff_outside_pair
+    {x y : Λ} (hxy : x ≠ y)
+    {σ' σ : Λ → Fin (N + 1)}
+    {z : Λ} (hzx : z ≠ x) (hzy : z ≠ y) (hz : σ' z ≠ σ z) :
+    (onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
+          : ManyBodyOpS Λ N) σ' σ = 0 :=
+  onSiteS_mul_onSiteS_apply_eq_zero_of_diff_outside_pair hxy _ _ hzx hzy hz
+
 end LatticeSystem.Quantum
