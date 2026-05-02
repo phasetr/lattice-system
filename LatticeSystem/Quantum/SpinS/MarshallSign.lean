@@ -72,6 +72,7 @@ theorem marshallSignS_N_zero (A : V → Bool) (σ : V → Fin 1) :
     funext x; apply Fin.ext; have := (σ x).isLt; omega
   rw [this, marshallSignS_const_zero]
 
+
 /-- The Marshall sign restricted to `A`-sites: factors away the
 trivial `1` contributions from non-`A` sites. -/
 theorem marshallSignS_eq_prod_A_filter
