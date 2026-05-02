@@ -28,6 +28,13 @@ noncomputable def totalSpinSSquared : ManyBodyOpS Λ N :=
     totalSpinSOp2 Λ N * totalSpinSOp2 Λ N +
     totalSpinSOp3 Λ N * totalSpinSOp3 Λ N
 
+/-- Definitional unfolding. -/
+theorem totalSpinSSquared_def :
+    totalSpinSSquared Λ N =
+      totalSpinSOp1 Λ N * totalSpinSOp1 Λ N +
+        totalSpinSOp2 Λ N * totalSpinSOp2 Λ N +
+        totalSpinSOp3 Λ N * totalSpinSOp3 Λ N := rfl
+
 /-- `(Ŝ_tot)²` is Hermitian. -/
 theorem totalSpinSSquared_isHermitian :
     (totalSpinSSquared Λ N).IsHermitian := by
