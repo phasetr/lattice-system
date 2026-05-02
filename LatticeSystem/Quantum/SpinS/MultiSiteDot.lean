@@ -209,6 +209,35 @@ theorem spinSDot_apply_diag_of_ne
       spinSOp3_apply_diag, spinSOp3_apply_diag]
   ring
 
+/-- For `x ≠ y`, the matrix element of `Ŝ_x · Ŝ_y` always has zero
+imaginary part. The three axis contributions are `real × real`,
+`pure imag × pure imag`, and `real × real` respectively. -/
+theorem spinSDot_apply_im_zero_of_ne
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ) (σ' σ : Λ → Fin (N + 1)) :
+    ((spinSDot x y N : ManyBodyOpS Λ N) σ' σ).im = 0 := by
+  unfold spinSDot
+  simp only [Matrix.add_apply]
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, onSiteS_mul_onSiteS_apply_eq hxy,
+      onSiteS_mul_onSiteS_apply_eq hxy]
+  by_cases h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k
+  · rw [if_pos h, if_pos h, if_pos h]
+    -- Sum of three terms, each has im = 0.
+    have h1 : ((spinSOp1 N (σ' x) (σ x)) * (spinSOp1 N (σ' y) (σ y))).im = 0 := by
+      rw [Complex.mul_im]
+      rw [spinSOp1_apply_im_zero, spinSOp1_apply_im_zero]
+      ring
+    have h2 : ((spinSOp2 N (σ' x) (σ x)) * (spinSOp2 N (σ' y) (σ y))).im = 0 := by
+      rw [Complex.mul_im]
+      rw [spinSOp2_apply_re_zero, spinSOp2_apply_re_zero]
+      ring
+    have h3 : ((spinSOp3 N (σ' x) (σ x)) * (spinSOp3 N (σ' y) (σ y))).im = 0 := by
+      rw [Complex.mul_im]
+      rw [spinSOp3_apply_im_zero, spinSOp3_apply_im_zero]
+      ring
+    rw [Complex.add_im, Complex.add_im, h1, h2, h3]
+    ring
+  · rw [if_neg h, if_neg h, if_neg h]; simp
+
 /-- **Raising/lowering decomposition** of the two-site spin-`S` dot
 product (Tasaki §2.2 eq. (2.2.16) for arbitrary spin):
 
