@@ -501,6 +501,42 @@ theorem spinSDot_apply_re_nonneg_of_raising_lowering_x
   simp
   positivity
 
+/-- For `x ≠ y` and configurations `σ', σ` agreeing off `{x, y}` with
+`σ' x ≠ σ x`, the `S^3 ⊗ S^3` part of `Ŝ_x · Ŝ_y` vanishes, so the
+matrix element collapses to the `(1/2)(S+ S- + S- S+)` part. -/
+theorem spinSDot_apply_eq_pm_only_of_off_diag_at_x
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) (hσx : σ' x ≠ σ x) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ =
+      (1 / 2 : ℂ) *
+        ((onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N)
+            : ManyBodyOpS Λ N) σ' σ +
+          (onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
+            : ManyBodyOpS Λ N) σ' σ) := by
+  rw [spinSDot_apply_eq_pm_3]
+  rw [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, Matrix.add_apply]
+  rw [onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_eq_zero_of_off_diag_at_x
+    hxy h hσx]
+  ring
+
+/-- Symmetric (vanishes by `σ' y ≠ σ y`). -/
+theorem spinSDot_apply_eq_pm_only_of_off_diag_at_y
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) (hσy : σ' y ≠ σ y) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ =
+      (1 / 2 : ℂ) *
+        ((onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N)
+            : ManyBodyOpS Λ N) σ' σ +
+          (onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
+            : ManyBodyOpS Λ N) σ' σ) := by
+  rw [spinSDot_apply_eq_pm_3]
+  rw [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, Matrix.add_apply]
+  rw [onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_eq_zero_of_off_diag_at_y
+    hxy h hσy]
+  ring
+
 /-- Symmetric: for `x ≠ y` and configurations `σ', σ` agreeing off
 `{x, y}`, the matrix element of `Ŝ_x · Ŝ_y` has non-negative real
 part on the lowering/raising pair `(σ x).val + 1 = (σ' x).val`. -/
