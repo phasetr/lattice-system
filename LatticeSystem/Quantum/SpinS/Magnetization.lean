@@ -431,6 +431,7 @@ theorem magEigenvalueS_re_abs_bound (σ : Λ → Fin (N + 1)) :
   have := magEigenvalueS_re_lower_bound (Λ := Λ) σ
   linarith
 
+
 omit [DecidableEq Λ] in
 /-- `magEigenvalueS σ = ((magEigenvalueS σ).re : ℂ)`: its imaginary
 part vanishes, so it equals its embedded real part. -/
@@ -528,6 +529,20 @@ theorem magEigenvalueS_of_isEmpty [IsEmpty Λ] (σ : Λ → Fin (N + 1)) :
     exact_mod_cast this
   rw [this]
   ring
+
+omit [DecidableEq Λ] in
+/-- For `N = 0` (`S = 0`), `(magEigenvalueS σ).re = 0`. -/
+theorem magEigenvalueS_re_of_N_zero (σ : Λ → Fin 1) :
+    (magEigenvalueS (N := 0) σ).re = 0 := by
+  rw [magEigenvalueS_of_N_zero σ]
+  simp
+
+omit [DecidableEq Λ] in
+/-- For an empty lattice, `(magEigenvalueS σ).re = 0`. -/
+theorem magEigenvalueS_re_of_isEmpty [IsEmpty Λ] (σ : Λ → Fin (N + 1)) :
+    (magEigenvalueS σ).re = 0 := by
+  rw [magEigenvalueS_of_isEmpty σ]
+  simp
 
 omit [DecidableEq Λ] in
 /-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
