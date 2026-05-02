@@ -121,6 +121,27 @@ theorem onSiteS_apply_re_nonneg (i : Λ)
   · rw [if_pos h]; exact hA _ _
   · rw [if_neg h]; simp
 
+/-- Every entry of `onSiteS i (Ŝ^+)` has zero imaginary part. -/
+theorem onSiteS_spinSOpPlus_apply_im_zero (i : Λ) (σ' σ : Λ → Fin (N + 1)) :
+    ((onSiteS i (spinSOpPlus N) : ManyBodyOpS Λ N) σ' σ).im = 0 :=
+  onSiteS_apply_im_zero i (spinSOpPlus_apply_im_zero N) σ' σ
+
+/-- Every entry of `onSiteS i (Ŝ^-)` has zero imaginary part. -/
+theorem onSiteS_spinSOpMinus_apply_im_zero (i : Λ) (σ' σ : Λ → Fin (N + 1)) :
+    ((onSiteS i (spinSOpMinus N) : ManyBodyOpS Λ N) σ' σ).im = 0 :=
+  onSiteS_apply_im_zero i (spinSOpMinus_apply_im_zero N) σ' σ
+
+/-- Every entry of `onSiteS i (Ŝ^+)` has non-negative real part. -/
+theorem onSiteS_spinSOpPlus_apply_re_nonneg (i : Λ) (σ' σ : Λ → Fin (N + 1)) :
+    0 ≤ ((onSiteS i (spinSOpPlus N) : ManyBodyOpS Λ N) σ' σ).re :=
+  onSiteS_apply_re_nonneg i (spinSOpPlus_apply_re_nonneg N) σ' σ
+
+/-- Every entry of `onSiteS i (Ŝ^-)` has non-negative real part. -/
+theorem onSiteS_spinSOpMinus_apply_re_nonneg
+    (i : Λ) (σ' σ : Λ → Fin (N + 1)) :
+    0 ≤ ((onSiteS i (spinSOpMinus N) : ManyBodyOpS Λ N) σ' σ).re :=
+  onSiteS_apply_re_nonneg i (spinSOpMinus_apply_re_nonneg N) σ' σ
+
 /-- If `A` is Hermitian, so is its site embedding `onSiteS i A`. -/
 theorem onSiteS_isHermitian (i : Λ)
     {A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ} (hA : A.IsHermitian) :
