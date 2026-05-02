@@ -185,6 +185,18 @@ noncomputable def heisenbergHamiltonianPeriodicChainS
   heisenbergHamiltonianOnGraphS (SimpleGraph.cycleGraph (M + 2))
     (-(J : ℂ)) N
 
+/-- Definitional unfolding of `heisenbergHamiltonianChainS`. -/
+theorem heisenbergHamiltonianChainS_def (M : ℕ) (J : ℝ) (N : ℕ) :
+    heisenbergHamiltonianChainS M J N =
+      heisenbergHamiltonianOnGraphS (SimpleGraph.pathGraph (M + 1))
+        (-(J : ℂ)) N := rfl
+
+/-- Definitional unfolding of `heisenbergHamiltonianPeriodicChainS`. -/
+theorem heisenbergHamiltonianPeriodicChainS_def (M : ℕ) (J : ℝ) (N : ℕ) :
+    heisenbergHamiltonianPeriodicChainS M J N =
+      heisenbergHamiltonianOnGraphS (SimpleGraph.cycleGraph (M + 2))
+        (-(J : ℂ)) N := rfl
+
 /-- Hermiticity of the periodic chain spin-`S` Heisenberg Hamiltonian. -/
 theorem heisenbergHamiltonianPeriodicChainS_isHermitian
     (M : ℕ) (J : ℝ) (N : ℕ) :
