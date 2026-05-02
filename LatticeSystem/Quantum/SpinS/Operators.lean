@@ -310,6 +310,15 @@ theorem spinSOp3_apply_im_zero (N : ℕ) (i j : Fin (N + 1)) :
   · rw [Matrix.diagonal_apply_ne _ h]
     simp
 
+/-- The product `Ŝ^{(3)}_{i,j} * Ŝ^{(3)}_{k,l}` has zero imaginary
+part. (Both factors are real.) -/
+theorem spinSOp3_mul_spinSOp3_im_zero (N : ℕ)
+    (i j k l : Fin (N + 1)) :
+    (spinSOp3 N i j * spinSOp3 N k l).im = 0 := by
+  rw [Complex.mul_im]
+  rw [spinSOp3_apply_im_zero, spinSOp3_apply_im_zero]
+  ring
+
 /-- Each entry of `Ŝ^{(3)}` equals its own real-part embedding. -/
 theorem spinSOp3_apply_eq_ofReal (N : ℕ) (i j : Fin (N + 1)) :
     spinSOp3 N i j = ((spinSOp3 N i j).re : ℂ) := by
