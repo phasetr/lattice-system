@@ -358,4 +358,16 @@ theorem heisenbergHamiltonianOnGraphS_mulVec_mem_magSubspaceS
     (heisenbergHamiltonianOnGraphS G J N).mulVec v ∈ magSubspaceS Λ N M :=
   heisenbergHamiltonianS_mulVec_mem_magSubspaceS _ N M hv
 
+/-- For real coupling, the diagonal entries of the Heisenberg
+Hamiltonian have zero imaginary part. (Since the Hamiltonian is
+Hermitian for real coupling, its diagonal is real.) -/
+theorem heisenbergHamiltonianS_apply_diag_im_zero
+    {J : Λ → Λ → ℂ} (N : ℕ)
+    (hreal : ∀ x y, star (J x y) = J x y)
+    (σ : Λ → Fin (N + 1)) :
+    ((heisenbergHamiltonianS J N) σ σ).im = 0 := by
+  have hH := heisenbergHamiltonianS_isHermitian_of_real (Λ := Λ) hreal N
+  have := hH.apply σ σ
+  exact Complex.conj_eq_iff_im.mp this
+
 end LatticeSystem.Quantum
