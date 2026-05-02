@@ -253,6 +253,15 @@ theorem magSumS_ge_of_exists (σ : Λ → Fin (N + 1)) (y : Λ) :
     (f := fun x => (σ x).val) (fun _ _ => Nat.zero_le _) (Finset.mem_univ y)
 
 omit [DecidableEq Λ] in
+/-- `magSumS σ > 0` ↔ there exists `x` with `σ x ≠ 0`. -/
+theorem magSumS_pos_iff (σ : Λ → Fin (N + 1)) :
+    0 < magSumS σ ↔ ∃ x : Λ, σ x ≠ 0 := by
+  rw [Nat.pos_iff_ne_zero]
+  rw [Ne, magSumS_eq_zero_iff]
+  push_neg
+  rfl
+
+omit [DecidableEq Λ] in
 /-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
 theorem magEigenvalueS_const_zero :
     magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1))) =
