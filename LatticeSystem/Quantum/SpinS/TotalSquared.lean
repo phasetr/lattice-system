@@ -35,6 +35,15 @@ theorem totalSpinSSquared_def :
         totalSpinSOp2 Λ N * totalSpinSOp2 Λ N +
         totalSpinSOp3 Λ N * totalSpinSOp3 Λ N := rfl
 
+/-- Re-expression of `totalSpinSSquared` as a finite sum of squares
+of total operators (matching the definition with `^2` instead of
+`mul` self). -/
+theorem totalSpinSSquared_eq_pow_sum :
+    totalSpinSSquared Λ N =
+      totalSpinSOp1 Λ N ^ 2 + totalSpinSOp2 Λ N ^ 2 + totalSpinSOp3 Λ N ^ 2 := by
+  unfold totalSpinSSquared
+  simp only [pow_two]
+
 /-- `(Ŝ_tot)²` is Hermitian. -/
 theorem totalSpinSSquared_isHermitian :
     (totalSpinSSquared Λ N).IsHermitian := by
