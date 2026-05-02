@@ -34,6 +34,11 @@ noncomputable def heisenbergHamiltonianS (J : Λ → Λ → ℂ) (N : ℕ) :
     ManyBodyOpS Λ N :=
   ∑ x : Λ, ∑ y : Λ, J x y • spinSDot x y N
 
+/-- Definitional unfolding of `heisenbergHamiltonianS`. -/
+theorem heisenbergHamiltonianS_def (J : Λ → Λ → ℂ) (N : ℕ) :
+    heisenbergHamiltonianS (Λ := Λ) J N =
+      ∑ x : Λ, ∑ y : Λ, J x y • spinSDot x y N := rfl
+
 /-- A spin-`S` Heisenberg Hamiltonian with **real** coupling
 (`star (J x y) = J x y`) is Hermitian. No symmetry of `J` is needed,
 since `Ŝ_x · Ŝ_y` is always Hermitian (β-3g) — symmetry of the
