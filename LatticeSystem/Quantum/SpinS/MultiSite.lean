@@ -162,6 +162,7 @@ theorem onSiteS_spinSOp3_apply_im_zero (i : Λ) (σ' σ : Λ → Fin (N + 1)) :
     ((onSiteS i (spinSOp3 N) : ManyBodyOpS Λ N) σ' σ).im = 0 :=
   onSiteS_apply_im_zero i (spinSOp3_apply_im_zero N) σ' σ
 
+
 /-- If `A` is Hermitian, so is its site embedding `onSiteS i A`. -/
 theorem onSiteS_isHermitian (i : Λ)
     {A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ} (hA : A.IsHermitian) :
@@ -661,5 +662,30 @@ theorem onSiteS_mulVec_basisVecS_apply
   simp_rw [basisVecS_apply, mul_ite, mul_one, mul_zero]
   rw [Finset.sum_ite_eq' Finset.univ σ (fun σ' => (onSiteS i A) τ σ')]
   simp
+
+/-- For distinct sites `x ≠ y`, the product
+`onSiteS x (Ŝ^+) * onSiteS y (Ŝ^-)` has non-negative real-part
+matrix element on every `(σ', σ)` pair. -/
+theorem onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_re_nonneg
+    {x y : Λ} (hxy : x ≠ y) (σ' σ : Λ → Fin (N + 1)) :
+    0 ≤ ((onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N)
+          : ManyBodyOpS Λ N) σ' σ).re := by
+  rw [onSiteS_mul_onSiteS_apply_eq hxy]
+  by_cases h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k
+  · rw [if_pos h]
+    exact spinSOpPlus_mul_spinSOpMinus_re_nonneg N (σ' x) (σ x) (σ' y) (σ y)
+  · rw [if_neg h]; simp
+
+/-- Symmetric: `onSiteS x (Ŝ^-) * onSiteS y (Ŝ^+)` has non-negative
+real-part matrix element on every `(σ', σ)` pair. -/
+theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_re_nonneg
+    {x y : Λ} (hxy : x ≠ y) (σ' σ : Λ → Fin (N + 1)) :
+    0 ≤ ((onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
+          : ManyBodyOpS Λ N) σ' σ).re := by
+  rw [onSiteS_mul_onSiteS_apply_eq hxy]
+  by_cases h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k
+  · rw [if_pos h]
+    exact spinSOpMinus_mul_spinSOpPlus_re_nonneg N (σ' x) (σ x) (σ' y) (σ y)
+  · rw [if_neg h]; simp
 
 end LatticeSystem.Quantum
