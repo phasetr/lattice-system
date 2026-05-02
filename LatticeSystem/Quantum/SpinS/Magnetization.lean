@@ -126,6 +126,12 @@ basis state `|σ⟩`:
 noncomputable def magEigenvalueS (σ : Λ → Fin (N + 1)) : ℂ :=
   ((Fintype.card Λ : ℂ) * (N : ℂ)) / 2 - (magSumS σ : ℂ)
 
+omit [DecidableEq Λ] in
+/-- Definitional unfolding of `magEigenvalueS`. -/
+theorem magEigenvalueS_def (σ : Λ → Fin (N + 1)) :
+    magEigenvalueS σ =
+      ((Fintype.card Λ : ℂ) * (N : ℂ)) / 2 - (magSumS σ : ℂ) := rfl
+
 /-- `onSiteS x (spinSOp3 N) · |σ⟩ = ((N : ℂ)/2 − (σ x).val) • |σ⟩`. -/
 theorem onSiteS_spinSOp3_mulVec_basisVecS (x : Λ) (σ : Λ → Fin (N + 1)) :
     (onSiteS x (spinSOp3 N) : ManyBodyOpS Λ N).mulVec (basisVecS σ) =
