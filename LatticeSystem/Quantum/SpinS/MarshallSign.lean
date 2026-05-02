@@ -369,4 +369,15 @@ theorem marshallDressedBasisS_eq_or [DecidableEq V]
   · left; rw [h, one_smul]
   · right; rw [h, neg_smul, one_smul]
 
+/-- **Inverse decomposition**: every plain basis vector is
+`marshallSignS A σ` times the corresponding Marshall-dressed basis
+vector. (This is `marshallSignS_smul_marshallDressedBasisS` restated
+with sides swapped for use as a rewrite from `basisVecS` toward
+`marshallDressedBasisS`.) -/
+theorem basisVecS_eq_marshallSignS_smul_marshallDressedBasisS
+    [DecidableEq V] (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (basisVecS σ : (V → Fin (N + 1)) → ℂ) =
+      marshallSignS A σ • marshallDressedBasisS A σ :=
+  (marshallSignS_smul_marshallDressedBasisS A σ).symm
+
 end LatticeSystem.Quantum
