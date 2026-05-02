@@ -898,4 +898,43 @@ theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_eq_zero_of_diff_outsi
           : ManyBodyOpS Λ N) σ' σ = 0 :=
   onSiteS_mul_onSiteS_apply_eq_zero_of_diff_outside_pair hxy _ _ hzx hzy hz
 
+/-! ## `(S^3 ⊗ S^3)` matrix element formulas -/
+
+/-- For `x ≠ y`, when `σ' = σ`, the `S^3_x ⊗ S^3_y` matrix element
+factors into the per-site `S^3` diagonal entries:
+`(N/2 - σ_x.val) * (N/2 - σ_y.val)`. -/
+theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_diag
+    {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin (N + 1)) :
+    (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
+          : ManyBodyOpS Λ N) σ σ =
+      ((N : ℂ) / 2 - (σ x).val) * ((N : ℂ) / 2 - (σ y).val) := by
+  rw [onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_of_off_two_site_agree hxy
+    (fun _ _ _ => rfl)]
+  rw [spinSOp3_apply_diag, spinSOp3_apply_diag]
+
+/-- For `x ≠ y` and `σ' σ` agreeing off `{x, y}` with `σ' x ≠ σ x`,
+the `S^3_x ⊗ S^3_y` matrix element vanishes (`S^3` is diagonal). -/
+theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_eq_zero_of_off_diag_at_x
+    {x y : Λ} (hxy : x ≠ y)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) (hσx : σ' x ≠ σ x) :
+    (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
+          : ManyBodyOpS Λ N) σ' σ = 0 := by
+  rw [onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_of_off_two_site_agree hxy h]
+  rw [show spinSOp3 N (σ' x) (σ x) = 0 from
+    Matrix.diagonal_apply_ne _ hσx]
+  ring
+
+/-- Symmetric: vanishes if `σ' y ≠ σ y`. -/
+theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_eq_zero_of_off_diag_at_y
+    {x y : Λ} (hxy : x ≠ y)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) (hσy : σ' y ≠ σ y) :
+    (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
+          : ManyBodyOpS Λ N) σ' σ = 0 := by
+  rw [onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_of_off_two_site_agree hxy h]
+  rw [show spinSOp3 N (σ' y) (σ y) = 0 from
+    Matrix.diagonal_apply_ne _ hσy]
+  ring
+
 end LatticeSystem.Quantum
