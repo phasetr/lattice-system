@@ -153,6 +153,16 @@ theorem spinSDot_self_commute (x : Λ) (N : ℕ) (B : ManyBodyOpS Λ N) :
   unfold Commute SemiconjBy
   rw [Matrix.smul_mul, Matrix.mul_smul, Matrix.one_mul, Matrix.mul_one]
 
+/-- The same-site dot product matrix element on basis configurations:
+`(spinSDot x x N) σ τ = (N(N+2)/4) δ_{σ,τ}` (delta-diagonal). -/
+theorem spinSDot_self_apply (x : Λ) (N : ℕ) (σ τ : Λ → Fin (N + 1)) :
+    (spinSDot x x N : ManyBodyOpS Λ N) σ τ =
+      ((N : ℂ) * (N + 2) / 4) * (if σ = τ then 1 else 0) := by
+  rw [spinSDot_self]
+  rw [Matrix.smul_apply]
+  rw [Matrix.one_apply]
+  rw [smul_eq_mul]
+
 /-- **Raising/lowering decomposition** of the two-site spin-`S` dot
 product (Tasaki §2.2 eq. (2.2.16) for arbitrary spin):
 
