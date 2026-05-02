@@ -64,6 +64,14 @@ theorem marshallSignS_of_isEmpty [IsEmpty V]
   rw [show (Finset.univ : Finset V) = ∅ from Finset.eq_empty_of_isEmpty _]
   exact Finset.prod_empty
 
+/-- For `N = 0` (`S = 0`), the only configuration is the constant
+zero, so the Marshall sign is always `1`. -/
+theorem marshallSignS_N_zero (A : V → Bool) (σ : V → Fin 1) :
+    marshallSignS A σ = 1 := by
+  have : σ = (fun _ => (0 : Fin 1)) := by
+    funext x; apply Fin.ext; have := (σ x).isLt; omega
+  rw [this, marshallSignS_const_zero]
+
 /-- The Marshall sign restricted to `A`-sites: factors away the
 trivial `1` contributions from non-`A` sites. -/
 theorem marshallSignS_eq_prod_A_filter
