@@ -50,6 +50,12 @@ theorem magSumS_real_nonneg (σ : Λ → Fin (N + 1)) :
   exact_mod_cast magSumS_nonneg σ
 
 omit [DecidableEq Λ] in
+/-- The cast `(magSumS σ : ℂ).re = (magSumS σ : ℝ)`. -/
+theorem magSumS_complex_re (σ : Λ → Fin (N + 1)) :
+    ((magSumS σ : ℂ)).re = (magSumS σ : ℝ) := by
+  simp
+
+omit [DecidableEq Λ] in
 /-- `magSumS σ ≤ |Λ| · N`. -/
 theorem magSumS_le (σ : Λ → Fin (N + 1)) :
     magSumS σ ≤ Fintype.card Λ * N := by
