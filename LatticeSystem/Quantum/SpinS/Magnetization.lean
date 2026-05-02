@@ -240,6 +240,11 @@ theorem magSumS_const_zero :
   simp
 
 omit [DecidableEq Λ] in
+/-- `magSumS σ = magSumS σ`: trivial reflexivity. -/
+theorem magSumS_refl (σ : Λ → Fin (N + 1)) :
+    magSumS σ = magSumS σ := rfl
+
+omit [DecidableEq Λ] in
 /-- `magSumS σ = 0` iff `σ x = 0` for every `x : Λ`. -/
 theorem magSumS_eq_zero_iff (σ : Λ → Fin (N + 1)) :
     magSumS σ = 0 ↔ ∀ x : Λ, σ x = 0 := by
