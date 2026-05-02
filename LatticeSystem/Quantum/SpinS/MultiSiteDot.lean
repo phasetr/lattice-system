@@ -750,6 +750,43 @@ theorem spinSDot_apply_eq_zero_of_y_outside_pair
   exact spinSDot_apply_eq_zero_of_x_outside_pair hxy N hne h
     (Ne.symm hxy') hxy'' hyy'
 
+/-- For `x' ≠ y'`, if there are three pairwise-distinct sites
+`z₁, z₂, z₃` where `σ', σ` differ, the spinSDot matrix element
+vanishes (pigeonhole: at least one of the three is outside `{x', y'}`). -/
+theorem spinSDot_apply_eq_zero_of_three_diff
+    {x' y' : Λ} (hxy' : x' ≠ y') (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    {z₁ z₂ z₃ : Λ}
+    (h12 : z₁ ≠ z₂) (h13 : z₁ ≠ z₃) (h23 : z₂ ≠ z₃)
+    (hz1 : σ' z₁ ≠ σ z₁) (hz2 : σ' z₂ ≠ σ z₂) (hz3 : σ' z₃ ≠ σ z₃) :
+    (spinSDot x' y' N : ManyBodyOpS Λ N) σ' σ = 0 := by
+  -- Find a zᵢ outside {x', y'}; pigeonhole on the 2-element set.
+  by_cases h1x : z₁ = x'
+  · by_cases h1y : z₁ = y'
+    · -- z₁ = x' and z₁ = y' contradicts hxy'.
+      exact (hxy' (h1x.symm.trans h1y)).elim
+    · -- z₁ = x' but z₁ ≠ y'. So if z₂ = x', then z₂ = z₁, contradicting h12.
+      -- So z₂ ≠ x'. Now case on z₂ = y'.
+      have h2x : z₂ ≠ x' := fun heq => h12 (h1x.trans heq.symm)
+      by_cases h2y : z₂ = y'
+      · -- z₁ = x' and z₂ = y'. Now z₃ ∉ {x', y'} (else z₃ = z₁ or z₂).
+        have h3x : z₃ ≠ x' := fun heq => h13 (h1x.trans heq.symm)
+        have h3y : z₃ ≠ y' := fun heq => h23 (h2y.trans heq.symm)
+        exact spinSDot_apply_eq_zero_of_diff_outside_pair hxy' N h3x h3y hz3
+      · -- z₂ ∉ {x', y'}.
+        exact spinSDot_apply_eq_zero_of_diff_outside_pair hxy' N h2x h2y hz2
+  · by_cases h1y : z₁ = y'
+    · -- z₁ = y'.
+      have h2y : z₂ ≠ y' := fun heq => h12 (h1y.trans heq.symm)
+      by_cases h2x : z₂ = x'
+      · -- z₁ = y' and z₂ = x'. z₃ ∉ {x', y'}.
+        have h3x : z₃ ≠ x' := fun heq => h23 (h2x.trans heq.symm)
+        have h3y : z₃ ≠ y' := fun heq => h13 (h1y.trans heq.symm)
+        exact spinSDot_apply_eq_zero_of_diff_outside_pair hxy' N h3x h3y hz3
+      · exact spinSDot_apply_eq_zero_of_diff_outside_pair hxy' N h2x h2y hz2
+    · -- z₁ ∉ {x', y'}.
+      exact spinSDot_apply_eq_zero_of_diff_outside_pair hxy' N h1x h1y hz1
+
 /-- **Combined off-pair vanishing**: for `x ≠ y`, `σ', σ` agreeing
 off `{x, y}` with `σ' ≠ σ`, and `(x', y')` not equal to `(x, y)` or
 `(y, x)`, the spinSDot matrix element vanishes.
