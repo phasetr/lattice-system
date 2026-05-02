@@ -107,6 +107,11 @@ theorem mem_magSubspaceS_iff (M : ℂ) (v : (Λ → Fin (N + 1)) → ℂ) :
     v ∈ magSubspaceS Λ N M ↔ (totalSpinSOp3 Λ N).mulVec v = M • v :=
   Iff.rfl
 
+/-- The zero vector lies in every magnetization subspace. -/
+theorem zero_mem_magSubspaceS (M : ℂ) :
+    (0 : (Λ → Fin (N + 1)) → ℂ) ∈ magSubspaceS Λ N M :=
+  (magSubspaceS Λ N M).zero_mem
+
 /-- Distinct magnetization eigenvalues give disjoint subspaces. -/
 theorem magSubspaceS_disjoint {M M' : ℂ} (hMM' : M ≠ M') :
     Disjoint (magSubspaceS Λ N M) (magSubspaceS Λ N M') := by
