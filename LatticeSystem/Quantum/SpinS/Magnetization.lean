@@ -363,6 +363,13 @@ theorem magEigenvalueS_eq_ofReal_re (σ : Λ → Fin (N + 1)) :
   · simp
   · simp [magEigenvalueS_im_zero]
 
+/-- `Ŝ_tot^{(3)} · |σ⟩ = ((magEigenvalueS σ).re : ℂ) • |σ⟩` — the
+real-eigenvalue form of `totalSpinSOp3_mulVec_basisVecS`. -/
+theorem totalSpinSOp3_mulVec_basisVecS_real (σ : Λ → Fin (N + 1)) :
+    (totalSpinSOp3 Λ N).mulVec (basisVecS σ) =
+      ((magEigenvalueS σ).re : ℂ) • basisVecS σ := by
+  rw [totalSpinSOp3_mulVec_basisVecS, ← magEigenvalueS_eq_ofReal_re]
+
 omit [DecidableEq Λ] in
 /-- `magSumS σ ≥ (σ y).val` at any site `y`. -/
 theorem magSumS_ge_of_exists (σ : Λ → Fin (N + 1)) (y : Λ) :
