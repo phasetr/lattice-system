@@ -189,6 +189,26 @@ theorem spinSDot_apply_eq_zero_of_off_two_site_diff
   rw [if_neg h, if_neg h, if_neg h]
   ring
 
+/-- For `x ≠ y`, the diagonal matrix element of `Ŝ_x · Ŝ_y` reduces
+to the product of the two `Ŝ^{(3)}` eigenvalues:
+`(Ŝ_x · Ŝ_y) σ σ = (N/2 - σ_x.val)(N/2 - σ_y.val)`.
+
+The `Ŝ^{(1)} ⊗ Ŝ^{(1)}` and `Ŝ^{(2)} ⊗ Ŝ^{(2)}` parts vanish on the
+diagonal (their factors are off-diagonal). -/
+theorem spinSDot_apply_diag_of_ne
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ) (σ : Λ → Fin (N + 1)) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ σ =
+      ((N : ℂ) / 2 - (σ x).val) * ((N : ℂ) / 2 - (σ y).val) := by
+  unfold spinSDot
+  simp only [Matrix.add_apply]
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, onSiteS_mul_onSiteS_apply_eq hxy,
+      onSiteS_mul_onSiteS_apply_eq hxy]
+  have hagree : ∀ k : Λ, k ≠ x → k ≠ y → σ k = σ k := fun _ _ _ => rfl
+  rw [if_pos hagree, if_pos hagree, if_pos hagree]
+  rw [spinSOp1_apply_diag, spinSOp2_apply_diag,
+      spinSOp3_apply_diag, spinSOp3_apply_diag]
+  ring
+
 /-- **Raising/lowering decomposition** of the two-site spin-`S` dot
 product (Tasaki §2.2 eq. (2.2.16) for arbitrary spin):
 
