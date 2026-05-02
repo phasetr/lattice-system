@@ -124,6 +124,12 @@ theorem smul_mem_magSubspaceS (M : ℂ) (c : ℂ)
     c • v ∈ magSubspaceS Λ N M :=
   (magSubspaceS Λ N M).smul_mem c hv
 
+/-- Negation membership in `magSubspaceS`. -/
+theorem neg_mem_magSubspaceS (M : ℂ)
+    {v : (Λ → Fin (N + 1)) → ℂ} (hv : v ∈ magSubspaceS Λ N M) :
+    -v ∈ magSubspaceS Λ N M :=
+  (magSubspaceS Λ N M).neg_mem hv
+
 /-- Distinct magnetization eigenvalues give disjoint subspaces. -/
 theorem magSubspaceS_disjoint {M M' : ℂ} (hMM' : M ≠ M') :
     Disjoint (magSubspaceS Λ N M) (magSubspaceS Λ N M') := by
