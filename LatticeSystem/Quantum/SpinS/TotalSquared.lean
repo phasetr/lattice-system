@@ -209,4 +209,13 @@ theorem totalSpinSSquared_eq_sum_spinSDot :
     simp [Finset.sum_add_distrib]]
   rfl
 
+/-- For trivial spin (`N = 0`), `(Ŝ_tot)² = 0` (every per-site
+contribution vanishes). -/
+theorem totalSpinSSquared_N_zero :
+    (totalSpinSSquared Λ 0 : ManyBodyOpS Λ 0) = 0 := by
+  rw [totalSpinSSquared_eq_sum_spinSDot]
+  refine Finset.sum_eq_zero (fun x _ => ?_)
+  refine Finset.sum_eq_zero (fun y _ => ?_)
+  exact spinSDot_N_zero_total x y
+
 end LatticeSystem.Quantum
