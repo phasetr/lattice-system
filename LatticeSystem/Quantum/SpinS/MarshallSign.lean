@@ -96,6 +96,23 @@ theorem marshallSignS_sq (A : V → Bool) (σ : V → Fin (N + 1)) :
     rw [one_pow]
   · simp [hAx]
 
+/-- The Marshall sign is either `1` or `-1`: a corollary of
+`marshallSignS_sq` in the field ℂ. -/
+theorem marshallSignS_eq_one_or_neg_one
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ = 1 ∨ marshallSignS A σ = -1 := by
+  have hsq := marshallSignS_sq A σ
+  -- `x² = 1 ↔ (x - 1)(x + 1) = 0`, then field property.
+  have h : (marshallSignS A σ - 1) * (marshallSignS A σ + 1) = 0 := by
+    rw [show (marshallSignS A σ - 1) * (marshallSignS A σ + 1) =
+        marshallSignS A σ * marshallSignS A σ - 1 from by ring]
+    rw [hsq, sub_self]
+  rcases mul_eq_zero.mp h with h1 | h2
+  · left; exact sub_eq_zero.mp h1
+  · right
+    have := add_eq_zero_iff_eq_neg.mp h2
+    rw [this]
+
 /-- The Marshall sign is real: its complex conjugate is itself. Each
 factor `(-1)^k` is real, so the star/conjugation acts as identity on
 the product. -/
