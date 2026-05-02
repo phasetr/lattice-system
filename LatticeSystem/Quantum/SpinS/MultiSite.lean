@@ -358,6 +358,28 @@ noncomputable def spinSSiteOpPlus (i : Λ) (N : ℕ) : ManyBodyOpS Λ N :=
 noncomputable def spinSSiteOpMinus (i : Λ) (N : ℕ) : ManyBodyOpS Λ N :=
   onSiteS i (spinSOpMinus N)
 
+/-! ## Definitional unfoldings for site operators -/
+
+/-- Definitional unfolding of `spinSSiteOp1`. -/
+theorem spinSSiteOp1_def (i : Λ) (N : ℕ) :
+    spinSSiteOp1 (Λ := Λ) i N = onSiteS i (spinSOp1 N) := rfl
+
+/-- Definitional unfolding of `spinSSiteOp2`. -/
+theorem spinSSiteOp2_def (i : Λ) (N : ℕ) :
+    spinSSiteOp2 (Λ := Λ) i N = onSiteS i (spinSOp2 N) := rfl
+
+/-- Definitional unfolding of `spinSSiteOp3`. -/
+theorem spinSSiteOp3_def (i : Λ) (N : ℕ) :
+    spinSSiteOp3 (Λ := Λ) i N = onSiteS i (spinSOp3 N) := rfl
+
+/-- Definitional unfolding of `spinSSiteOpPlus`. -/
+theorem spinSSiteOpPlus_def (i : Λ) (N : ℕ) :
+    spinSSiteOpPlus (Λ := Λ) i N = onSiteS i (spinSOpPlus N) := rfl
+
+/-- Definitional unfolding of `spinSSiteOpMinus`. -/
+theorem spinSSiteOpMinus_def (i : Λ) (N : ℕ) :
+    spinSSiteOpMinus (Λ := Λ) i N = onSiteS i (spinSOpMinus N) := rfl
+
 /-! ## Computational basis vectors -/
 
 /-- The standard basis vector at configuration `σ : Λ → Fin (N + 1)`:
