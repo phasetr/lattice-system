@@ -258,6 +258,22 @@ theorem dressedHeisenbergSMatrix_apply_eq_smul
         (heisenbergHamiltonianS J N) σ' σ := by
   rfl
 
+/-- Applying the dressed Heisenberg matrix to a basis vector and
+reading the result at configuration `τ` yields the matrix element
+`dressedMatrix τ σ`. -/
+theorem dressedHeisenbergSMatrix_mulVec_basisVecS_apply
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ τ : V → Fin (N + 1)) :
+    (dressedHeisenbergSMatrix A J N).mulVec (basisVecS σ) τ =
+      dressedHeisenbergSMatrix A J N τ σ := by
+  classical
+  change ∑ σ' : V → Fin (N + 1),
+      dressedHeisenbergSMatrix A J N τ σ' * basisVecS σ σ' =
+        dressedHeisenbergSMatrix A J N τ σ
+  simp_rw [basisVecS_apply, mul_ite, mul_one, mul_zero]
+  rw [Finset.sum_ite_eq' Finset.univ σ
+      (fun σ' => dressedHeisenbergSMatrix A J N τ σ')]
+  simp
+
 /-- For real coupling, the dressed matrix is Hermitian. -/
 theorem dressedHeisenbergSMatrix_isHermitian
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
