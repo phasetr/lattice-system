@@ -395,6 +395,11 @@ def basisVecS (σ : Λ → Fin (N + 1)) : (Λ → Fin (N + 1)) → ℂ :=
   fun τ => if τ = σ then 1 else 0
 
 omit [DecidableEq Λ] in
+/-- Definitional unfolding of `basisVecS`. -/
+theorem basisVecS_def (σ : Λ → Fin (N + 1)) :
+    basisVecS σ = (fun τ => if τ = σ then (1 : ℂ) else 0) := rfl
+
+omit [DecidableEq Λ] in
 /-- Explicit `if`-form of `basisVecS σ τ`. -/
 theorem basisVecS_apply (σ τ : Λ → Fin (N + 1)) :
     basisVecS σ τ = if τ = σ then 1 else 0 := rfl
