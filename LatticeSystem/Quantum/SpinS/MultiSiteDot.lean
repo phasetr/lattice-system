@@ -209,6 +209,16 @@ theorem spinSDot_apply_diag_of_ne
       spinSOp3_apply_diag, spinSOp3_apply_diag]
   ring
 
+/-- The same-site dot product matrix element has zero imaginary part:
+the matrix is a real scalar multiple of the identity. -/
+theorem spinSDot_self_apply_im_zero (x : Λ) (N : ℕ)
+    (σ' σ : Λ → Fin (N + 1)) :
+    ((spinSDot x x N : ManyBodyOpS Λ N) σ' σ).im = 0 := by
+  rw [spinSDot_self_apply]
+  by_cases h : σ' = σ
+  · rw [if_pos h]; simp
+  · rw [if_neg h]; simp
+
 /-- For `x ≠ y`, the matrix element of `Ŝ_x · Ŝ_y` always has zero
 imaginary part. The three axis contributions are `real × real`,
 `pure imag × pure imag`, and `real × real` respectively. -/
