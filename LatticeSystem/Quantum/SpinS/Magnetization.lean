@@ -192,6 +192,21 @@ theorem magSumS_eq_zero_iff (σ : Λ → Fin (N + 1)) :
     rfl
 
 omit [DecidableEq Λ] in
+/-- `magEigenvalueS σ = 0` ↔ `magSumS σ = |Λ| · N / 2` (the
+half-occupation condition). For spin-1/2 (`N = 1`) this means the
+configuration has equal numbers of up/down spins. -/
+theorem magEigenvalueS_eq_zero_iff (σ : Λ → Fin (N + 1)) :
+    magEigenvalueS σ = 0 ↔
+      ((Fintype.card Λ : ℂ) * (N : ℂ)) / 2 = (magSumS σ : ℂ) := by
+  unfold magEigenvalueS
+  constructor
+  · intro h
+    exact sub_eq_zero.mp h
+  · intro h
+    rw [← h]
+    ring
+
+omit [DecidableEq Λ] in
 /-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
 theorem magEigenvalueS_const_zero :
     magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1))) =
