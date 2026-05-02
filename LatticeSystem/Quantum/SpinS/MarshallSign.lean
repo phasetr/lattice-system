@@ -357,4 +357,16 @@ theorem marshallDressedBasisS_mem_iSup_magSubspaceS [DecidableEq V]
   Submodule.mem_iSup_of_mem (magEigenvalueS σ)
     (marshallDressedBasisS_mem_magSubspaceS A σ)
 
+/-- **Marshall-dressed basis is `±basisVecS`**: depending on whether
+the Marshall sign is `+1` or `-1`, the dressed basis vector equals
+`+basisVecS σ` or `-basisVecS σ`. -/
+theorem marshallDressedBasisS_eq_or [DecidableEq V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallDressedBasisS A σ = basisVecS σ ∨
+      marshallDressedBasisS A σ = -basisVecS σ := by
+  unfold marshallDressedBasisS
+  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
+  · left; rw [h, one_smul]
+  · right; rw [h, neg_smul, one_smul]
+
 end LatticeSystem.Quantum
