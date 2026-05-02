@@ -384,4 +384,12 @@ theorem spinSDot_N_zero_of_ne {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
     simp
   · exact spinSDot_apply_eq_zero_of_off_two_site_diff hxy 0 h
 
+/-- Unified `spinSDot x y 0 = 0` (any sites). -/
+theorem spinSDot_N_zero_total {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (x y : Λ) :
+    (spinSDot x y 0 : ManyBodyOpS Λ 0) = 0 := by
+  by_cases hxy : x = y
+  · subst hxy; exact spinSDot_self_N_zero x
+  · exact spinSDot_N_zero_of_ne hxy
+
 end LatticeSystem.Quantum
