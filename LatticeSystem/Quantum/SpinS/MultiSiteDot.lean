@@ -138,6 +138,13 @@ theorem spinSDot_self_eq {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
       ((N : ℂ) * (N + 2) / 4) • 1 :=
   spinSDot_self x N
 
+/-- `spinSDot x x 0` (trivial spin) equals zero. -/
+theorem spinSDot_self_N_zero {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (x : Λ) :
+    (spinSDot x x 0 : ManyBodyOpS Λ 0) = 0 := by
+  rw [spinSDot_self]
+  simp
+
 /-- **Raising/lowering decomposition** of the two-site spin-`S` dot
 product (Tasaki §2.2 eq. (2.2.16) for arbitrary spin):
 
