@@ -350,4 +350,12 @@ theorem heisenbergHamiltonianS_mulVec_mem_magSubspaceS
     (sub_eq_zero.mp
       (heisenbergHamiltonianS_commutator_totalSpinSOp3 J N)).symm hv
 
+/-- The Heisenberg-on-graph Hamiltonian preserves magnetization subspaces. -/
+theorem heisenbergHamiltonianOnGraphS_mulVec_mem_magSubspaceS
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (N : ℕ) (M : ℂ)
+    {v : (Λ → Fin (N + 1)) → ℂ}
+    (hv : v ∈ magSubspaceS Λ N M) :
+    (heisenbergHamiltonianOnGraphS G J N).mulVec v ∈ magSubspaceS Λ N M :=
+  heisenbergHamiltonianS_mulVec_mem_magSubspaceS _ N M hv
+
 end LatticeSystem.Quantum
