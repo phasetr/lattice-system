@@ -447,6 +447,29 @@ theorem heisenbergHamiltonianS_apply_swap_of_symm
   refine Finset.sum_congr rfl fun y _ => ?_
   rw [spinSDot_apply_swap]
 
+/-- **Heisenberg matrix vanishes on three-site differences**: if
+`σ', σ` differ at three pairwise-distinct sites `z₁, z₂, z₃`, the
+Heisenberg matrix element `H σ' σ` vanishes (every spinSDot term in
+the double sum vanishes by pigeonhole). -/
+theorem heisenbergHamiltonianS_apply_eq_zero_of_three_diff
+    (J : Λ → Λ → ℂ) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    {z₁ z₂ z₃ : Λ}
+    (h12 : z₁ ≠ z₂) (h13 : z₁ ≠ z₃) (h23 : z₂ ≠ z₃)
+    (hz1 : σ' z₁ ≠ σ z₁) (hz2 : σ' z₂ ≠ σ z₂) (hz3 : σ' z₃ ≠ σ z₃) :
+    (heisenbergHamiltonianS J N) σ' σ = 0 := by
+  rw [heisenbergHamiltonianS_apply]
+  refine Finset.sum_eq_zero (fun x' _ => ?_)
+  refine Finset.sum_eq_zero (fun y' _ => ?_)
+  by_cases hxy' : x' = y'
+  · subst hxy'
+    rw [show (spinSDot x' x' N : ManyBodyOpS Λ N) σ' σ = 0 from
+      spinSDot_self_apply_eq_zero_of_diff_at x' N hz1]
+    ring
+  · rw [show (spinSDot x' y' N : ManyBodyOpS Λ N) σ' σ = 0 from
+      spinSDot_apply_eq_zero_of_three_diff hxy' N h12 h13 h23 hz1 hz2 hz3]
+    ring
+
 /-- **Magnetization conservation, matrix-element form**: if `σ', σ`
 differ at exactly one site `z` (i.e., agree everywhere off `{z}`),
 the Heisenberg matrix element `H σ' σ` vanishes.
