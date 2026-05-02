@@ -310,4 +310,15 @@ theorem dressedHeisenbergSReMatrix_diag_indep (A A' : V → Bool)
       dressedHeisenbergSReMatrix A' J N σ σ := by
   rw [dressedHeisenbergSReMatrix_diag, dressedHeisenbergSReMatrix_diag]
 
+/-- The real-part dressed Heisenberg matrix is additive in the
+coupling. -/
+theorem dressedHeisenbergSReMatrix_add_J
+    (A : V → Bool) (J J' : V → V → ℂ) (N : ℕ)
+    (σ σ' : V → Fin (N + 1)) :
+    dressedHeisenbergSReMatrix A (fun x y => J x y + J' x y) N σ σ' =
+      dressedHeisenbergSReMatrix A J N σ σ' +
+        dressedHeisenbergSReMatrix A J' N σ σ' := by
+  rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_add_J]
+  simp [dressedHeisenbergSReMatrix_apply]
+
 end LatticeSystem.Quantum
