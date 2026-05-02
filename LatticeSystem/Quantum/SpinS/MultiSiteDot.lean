@@ -480,4 +480,38 @@ theorem spinSDot_apply_re_nonneg_of_raising_lowering_x
   simp
   positivity
 
+/-- Symmetric: for `x ≠ y` and configurations `σ', σ` agreeing off
+`{x, y}`, the matrix element of `Ŝ_x · Ŝ_y` has non-negative real
+part on the lowering/raising pair `(σ x).val + 1 = (σ' x).val`. -/
+theorem spinSDot_apply_re_nonneg_of_raising_lowering_y
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hx : (σ x).val + 1 = (σ' x).val) :
+    0 ≤ ((spinSDot x y N : ManyBodyOpS Λ N) σ' σ).re := by
+  rw [spinSDot_apply_eq_pm_3]
+  rw [Matrix.add_apply, Complex.add_re]
+  rw [Matrix.smul_apply, smul_eq_mul, Complex.mul_re]
+  rw [Matrix.add_apply, Complex.add_re]
+  have h1 := onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_re_nonneg
+    (Λ := Λ) hxy σ' σ
+  have h2 := onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_re_nonneg
+    (Λ := Λ) hxy σ' σ
+  have h12re : ((1 / 2 : ℂ)).re = 1 / 2 := by norm_num
+  have h12im : ((1 / 2 : ℂ)).im = 0 := by norm_num
+  rw [h12re, h12im, zero_mul, sub_zero]
+  have hσ'x : σ' x ≠ σ x := by
+    intro heq
+    have : (σ' x).val = (σ x).val := by rw [heq]
+    omega
+  have h3eq : (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
+      : ManyBodyOpS Λ N) σ' σ = 0 := by
+    rw [onSiteS_mul_onSiteS_apply_eq hxy, if_pos h]
+    rw [show spinSOp3 N (σ' x) (σ x) = 0 from
+      Matrix.diagonal_apply_ne _ hσ'x]
+    ring
+  rw [h3eq]
+  simp
+  positivity
+
 end LatticeSystem.Quantum
