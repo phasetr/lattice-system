@@ -543,4 +543,16 @@ theorem dressedHeisenbergSReMatrix_periodicChain_isHermitian
   dressedHeisenbergSReMatrix_couplingOf_isHermitian A _
     (by simp : star (-(J : ℂ)) = -(J : ℂ)) N
 
+/-- The real-part dressed Heisenberg matrix entry vanishes when the
+two configurations have different magnetization quantum numbers. -/
+theorem dressedHeisenbergSReMatrix_apply_eq_zero_of_mag_ne
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
+    {σ' σ : V → Fin (N + 1)}
+    (h : magEigenvalueS σ ≠ magEigenvalueS σ') :
+    dressedHeisenbergSReMatrix A J N σ' σ = 0 := by
+  rw [dressedHeisenbergSReMatrix_apply]
+  have hzero : dressedHeisenbergS A J N σ' σ = 0 :=
+    dressedHeisenbergSMatrix_apply_eq_zero_of_mag_ne A J N h
+  rw [hzero]; simp
+
 end LatticeSystem.Quantum
