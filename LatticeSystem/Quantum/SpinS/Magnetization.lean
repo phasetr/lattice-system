@@ -186,6 +186,7 @@ theorem magEigenvalueS_const_zero :
   push_cast
   ring
 
+
 omit [DecidableEq Λ] in
 /-- `magEigenvalueS` of a constant configuration. The maximum value
 `(|Λ| · N : ℂ)/2` is attained at `s = 0`; the minimum value
@@ -197,6 +198,16 @@ theorem magEigenvalueS_const (s : Fin (N + 1)) :
   unfold magEigenvalueS
   rw [magSumS_const]
   push_cast
+  ring
+
+omit [DecidableEq Λ] in
+/-- `magEigenvalueS` at the lowest-weight all-`Fin.last N` config:
+`-((|Λ| · N : ℂ)/2)`, the minimum eigenvalue of `Ŝ_tot^{(3)}`. -/
+theorem magEigenvalueS_const_last :
+    magEigenvalueS (fun _ : Λ => (Fin.last N : Fin (N + 1))) =
+      -((Fintype.card Λ : ℂ) * (N : ℂ) / 2) := by
+  rw [magEigenvalueS_const]
+  simp [Fin.val_last]
   ring
 
 end LatticeSystem.Quantum
