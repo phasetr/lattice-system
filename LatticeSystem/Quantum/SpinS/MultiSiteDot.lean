@@ -205,6 +205,27 @@ theorem spinSDot_apply_eq_zero_of_off_two_site_diff
   rw [if_neg h, if_neg h, if_neg h]
   ring
 
+/-- For `x ≠ y`, if there is some site `z ∉ {x, y}` where `σ' z ≠ σ z`,
+the matrix element of `Ŝ_x · Ŝ_y` vanishes. (Equivalent reformulation
+parameterized by a witness difference site.) -/
+theorem spinSDot_apply_eq_zero_of_diff_outside_pair
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    {z : Λ} (hzx : z ≠ x) (hzy : z ≠ y) (hz : σ' z ≠ σ z) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ = 0 := by
+  apply spinSDot_apply_eq_zero_of_off_two_site_diff hxy N
+  intro hagree
+  exact hz (hagree z hzx hzy)
+
+/-- Same-site dot product: if `σ' z ≠ σ z` at some witness site `z`,
+the matrix element vanishes (since the same-site dot product is
+proportional to `Matrix.diagonal` and `σ' ≠ σ`). -/
+theorem spinSDot_self_apply_eq_zero_of_diff_at
+    (x : Λ) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)} {z : Λ} (hz : σ' z ≠ σ z) :
+    (spinSDot x x N : ManyBodyOpS Λ N) σ' σ = 0 :=
+  spinSDot_self_apply_eq_zero_of_ne x N (fun heq => hz (by rw [heq]))
+
 /-- For `x ≠ y`, the diagonal matrix element of `Ŝ_x · Ŝ_y` reduces
 to the product of the two `Ŝ^{(3)}` eigenvalues:
 `(Ŝ_x · Ŝ_y) σ σ = (N/2 - σ_x.val)(N/2 - σ_y.val)`.
