@@ -233,6 +233,7 @@ theorem spinSOpMinus_mul_spinSOpPlus_re_nonneg (N : ℕ)
   exact mul_nonneg (spinSOpMinus_apply_re_nonneg N i j)
     (spinSOpPlus_apply_re_nonneg N k l)
 
+
 /-- Diagonal entries of `Ŝ^{(1)}` vanish (it is purely off-diagonal). -/
 theorem spinSOp1_apply_diag (N : ℕ) (k : Fin (N + 1)) :
     spinSOp1 N k k = 0 := by
@@ -277,6 +278,17 @@ theorem spinSOp2_apply_re_zero (N : ℕ) (i j : Fin (N + 1)) :
   unfold spinSOp2
   rw [Matrix.smul_apply, Matrix.sub_apply, smul_eq_mul]
   simp [spinSOpPlus_apply_im_zero, spinSOpMinus_apply_im_zero]
+
+/-- The product `Ŝ^{(1)}_{i,j} * Ŝ^{(1)}_{k,l}` has non-negative real
+part: both factors are real and have non-negative real part. -/
+theorem spinSOp1_mul_spinSOp1_re_nonneg (N : ℕ)
+    (i j k l : Fin (N + 1)) :
+    0 ≤ (spinSOp1 N i j * spinSOp1 N k l).re := by
+  rw [Complex.mul_re]
+  rw [spinSOp1_apply_im_zero, spinSOp1_apply_im_zero]
+  rw [zero_mul, sub_zero]
+  exact mul_nonneg (spinSOp1_apply_re_nonneg N i j)
+    (spinSOp1_apply_re_nonneg N k l)
 
 /-- All entries of `Ŝ^{(3)}` have zero imaginary part. -/
 theorem spinSOp3_apply_im_zero (N : ℕ) (i j : Fin (N + 1)) :
