@@ -1037,4 +1037,58 @@ theorem dressedHeisenbergSReMatrix_apply_eq_zero_of_mag_ne
     dressedHeisenbergSMatrix_apply_eq_zero_of_mag_ne A J N h
   rw [hzero]; simp
 
+/-! ## Off-`{x, y}`-agree vanishing variants (γ-3 prep)
+
+These three lemmas package the vanishing cases of the two-site
+matrix-element formula: when σ', σ off-`{x, y}`-agree but the
+spinSDot factor is forced to zero by some structural reason, the
+dressed-Heisenberg matrix element vanishes too. -/
+
+/-- **Off-`{x, y}`-agree dressed vanishing, magnetization mismatch**:
+when σ', σ off-`{x, y}`-agree with σ' ≠ σ but carry different
+magnetization quantum numbers, the dressed matrix element vanishes
+(via the two-site formula and `spinSDot_apply_eq_zero_of_mag_ne`). -/
+theorem dressedHeisenbergS_apply_eq_zero_of_off_two_site_agree_of_mag_ne
+    (A : V → Bool) {J : V → V → ℂ} {x y : V} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : V → Fin (N + 1)} (hne : σ' ≠ σ)
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hmag : magEigenvalueS σ ≠ magEigenvalueS σ') :
+    dressedHeisenbergS A J N σ' σ = 0 := by
+  rw [dressedHeisenbergS_apply_of_off_two_site_agree A hxy N hne h]
+  rw [spinSDot_apply_eq_zero_of_mag_ne x y N hmag]
+  ring
+
+/-- **Off-`{x, y}`-agree dressed vanishing at `x` non-`±1` shift**:
+when σ', σ off-`{x, y}`-agree with σ' ≠ σ and σ' x val differs from
+σ x val by an amount other than `±1`, the dressed matrix element
+vanishes (via the two-site formula and the spinSDot diff-at-x-not-pm1
+vanishing lemma). -/
+theorem dressedHeisenbergS_apply_eq_zero_of_off_two_site_agree_diff_at_x_not_pm1
+    (A : V → Bool) {J : V → V → ℂ} {x y : V} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : V → Fin (N + 1)} (hne : σ' ≠ σ)
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hσx : σ' x ≠ σ x)
+    (hxp : (σ' x).val + 1 ≠ (σ x).val)
+    (hxm : (σ x).val + 1 ≠ (σ' x).val) :
+    dressedHeisenbergS A J N σ' σ = 0 := by
+  rw [dressedHeisenbergS_apply_of_off_two_site_agree A hxy N hne h]
+  rw [spinSDot_apply_eq_zero_of_off_two_site_agree_diff_at_x_not_pm1
+    hxy N h hσx hxp hxm]
+  ring
+
+/-- **Off-`{x, y}`-agree dressed vanishing at `y` non-`±1` shift**:
+symmetric of `..._diff_at_x_not_pm1`. -/
+theorem dressedHeisenbergS_apply_eq_zero_of_off_two_site_agree_diff_at_y_not_pm1
+    (A : V → Bool) {J : V → V → ℂ} {x y : V} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : V → Fin (N + 1)} (hne : σ' ≠ σ)
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hσy : σ' y ≠ σ y)
+    (hyp : (σ' y).val + 1 ≠ (σ y).val)
+    (hym : (σ y).val + 1 ≠ (σ' y).val) :
+    dressedHeisenbergS A J N σ' σ = 0 := by
+  rw [dressedHeisenbergS_apply_of_off_two_site_agree A hxy N hne h]
+  rw [spinSDot_apply_eq_zero_of_off_two_site_agree_diff_at_y_not_pm1
+    hxy N h hσy hyp hym]
+  ring
+
 end LatticeSystem.Quantum
