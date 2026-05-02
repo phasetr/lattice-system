@@ -124,6 +124,12 @@ theorem spinSOpPlus_apply_other (N : ℕ) {i j : Fin (N + 1)}
   unfold spinSOpPlus
   rw [if_neg h]
 
+/-- Diagonal entries of `Ŝ^+` vanish. -/
+theorem spinSOpPlus_apply_diag (N : ℕ) (k : Fin (N + 1)) :
+    spinSOpPlus N k k = 0 := by
+  apply spinSOpPlus_apply_other
+  omega
+
 /-- The `Ŝ^-` matrix entry on a lowering pair. -/
 theorem spinSOpMinus_apply_lower (N : ℕ) {i j : Fin (N + 1)}
     (h : j.val + 1 = i.val) :
@@ -137,6 +143,12 @@ theorem spinSOpMinus_apply_other (N : ℕ) {i j : Fin (N + 1)}
     (h : j.val + 1 ≠ i.val) : spinSOpMinus N i j = 0 := by
   unfold spinSOpMinus
   rw [if_neg h]
+
+/-- Diagonal entries of `Ŝ^-` vanish. -/
+theorem spinSOpMinus_apply_diag (N : ℕ) (k : Fin (N + 1)) :
+    spinSOpMinus N k k = 0 := by
+  apply spinSOpMinus_apply_other
+  omega
 
 /-- Top of the ladder: `Ŝ^+` annihilates the highest-weight state. -/
 theorem spinSOpPlus_apply_top (N : ℕ) (j : Fin (N + 1)) :
