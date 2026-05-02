@@ -182,6 +182,25 @@ theorem totalSpinSSquared_eq_heisenbergHamiltonianS_unit :
   unfold heisenbergHamiltonianS
   simp
 
+/-- The diagonal Heisenberg matrix element on a configuration `σ`:
+splits into a same-site Casimir contribution `∑_x J(x,x) (N(N+2)/4)`
+and a distinct-site `Ŝ^{(3)}_x Ŝ^{(3)}_y` contribution
+`∑_{x≠y} J(x,y) m_x m_y` where `m_z = N/2 - σ_z.val`. -/
+theorem heisenbergHamiltonianS_apply_diag (J : Λ → Λ → ℂ) (N : ℕ)
+    (σ : Λ → Fin (N + 1)) :
+    (heisenbergHamiltonianS J N) σ σ =
+      ∑ x : Λ, ∑ y : Λ,
+        J x y * (if x = y then (N : ℂ) * (N + 2) / 4
+                 else ((N : ℂ) / 2 - (σ x).val) *
+                      ((N : ℂ) / 2 - (σ y).val)) := by
+  rw [heisenbergHamiltonianS_apply]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  refine Finset.sum_congr rfl (fun y _ => ?_)
+  by_cases hxy : x = y
+  · subst hxy
+    rw [if_pos rfl, spinSDot_self_apply_diag]
+  · rw [if_neg hxy, spinSDot_apply_diag_of_ne hxy]
+
 /-- The Heisenberg Hamiltonian is homogeneous in the coupling: -/
 theorem heisenbergHamiltonianS_smul (c : ℂ) (J : Λ → Λ → ℂ) (N : ℕ) :
     heisenbergHamiltonianS (Λ := Λ) (fun x y => c * J x y) N =
