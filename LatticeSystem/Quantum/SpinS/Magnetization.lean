@@ -245,6 +245,14 @@ theorem magEigenvalueS_im_zero (σ : Λ → Fin (N + 1)) :
   simp
 
 omit [DecidableEq Λ] in
+/-- `magSumS σ ≥ (σ y).val` at any site `y`. -/
+theorem magSumS_ge_of_exists (σ : Λ → Fin (N + 1)) (y : Λ) :
+    (σ y).val ≤ magSumS σ := by
+  unfold magSumS
+  exact Finset.single_le_sum
+    (f := fun x => (σ x).val) (fun _ _ => Nat.zero_le _) (Finset.mem_univ y)
+
+omit [DecidableEq Λ] in
 /-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
 theorem magEigenvalueS_const_zero :
     magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1))) =
