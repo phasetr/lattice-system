@@ -174,6 +174,14 @@ theorem spinSDot_self_apply_diag (x : Λ) (N : ℕ) (σ : Λ → Fin (N + 1)) :
     (spinSDot x x N : ManyBodyOpS Λ N) σ σ = (N : ℂ) * (N + 2) / 4 := by
   rw [spinSDot_self_apply, if_pos rfl, mul_one]
 
+/-- The same-site dot product diagonal value `N(N+2)/4` is non-negative. -/
+theorem spinSDot_self_apply_diag_re_nonneg (x : Λ) (N : ℕ)
+    (σ : Λ → Fin (N + 1)) :
+    0 ≤ ((spinSDot x x N : ManyBodyOpS Λ N) σ σ).re := by
+  rw [spinSDot_self_apply_diag]
+  rw [show (((N : ℂ) * (N + 2) / 4)).re = ((N : ℝ) * (N + 2) / 4) from by simp]
+  positivity
+
 /-- For `x ≠ y`, the matrix element of `Ŝ_x · Ŝ_y` between
 configurations differing off the two-site set `{x, y}` is zero
 (the operator only acts on `x` and `y`). -/
