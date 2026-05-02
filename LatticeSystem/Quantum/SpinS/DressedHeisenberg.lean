@@ -159,6 +159,14 @@ theorem dressedHeisenbergS_diag_re
       ((heisenbergHamiltonianS J N) σ σ).re := by
   rw [dressedHeisenbergS_diag]
 
+/-- The diagonal of `dressedHeisenbergSReMatrix` equals the diagonal
+real part of `heisenbergHamiltonianS`. -/
+theorem dressedHeisenbergSReMatrix_diag_eq_heisenberg
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ : V → Fin (N + 1)) :
+    dressedHeisenbergSReMatrix A J N σ σ =
+      ((heisenbergHamiltonianS J N) σ σ).re := by
+  rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_diag_re]
+
 /-- Dressed Heisenberg is additive in the coupling. -/
 theorem dressedHeisenbergS_add_J
     (A : V → Bool) (J J' : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
