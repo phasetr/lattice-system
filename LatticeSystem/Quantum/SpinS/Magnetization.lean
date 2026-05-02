@@ -346,6 +346,14 @@ theorem magSumS_const_zero :
   simp
 
 omit [DecidableEq Λ] in
+/-- `magSumS (fun _ => Fin.last N) = |Λ| · N`. -/
+theorem magSumS_const_last :
+    magSumS (fun _ : Λ => (Fin.last N : Fin (N + 1))) =
+      Fintype.card Λ * N := by
+  rw [magSumS_const]
+  rfl
+
+omit [DecidableEq Λ] in
 /-- `magSumS σ = magSumS σ`: trivial reflexivity. -/
 theorem magSumS_refl (σ : Λ → Fin (N + 1)) :
     magSumS σ = magSumS σ := rfl
