@@ -265,6 +265,39 @@ theorem mem_magSubspaceS_of_commute (M : ℂ) (H : ManyBodyOpS Λ N)
   rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hv,
     Matrix.mulVec_smul]
 
+/-- General matrix entry of `Ŝ_tot^{(3)}` extracted via the eigenvalue
+equation `S^z |σ⟩ = magEig σ • |σ⟩` evaluated at row `σ'`. -/
+theorem totalSpinSOp3_apply (σ' σ : Λ → Fin (N + 1)) :
+    (totalSpinSOp3 Λ N) σ' σ =
+      magEigenvalueS σ * (if σ' = σ then 1 else 0) := by
+  classical
+  have hkey := totalSpinSOp3_mulVec_basisVecS σ
+  have happly :
+      (totalSpinSOp3 Λ N).mulVec (basisVecS σ) σ' =
+        (totalSpinSOp3 Λ N) σ' σ := by
+    change ∑ τ, (totalSpinSOp3 Λ N) σ' τ * basisVecS σ τ =
+      (totalSpinSOp3 Λ N) σ' σ
+    simp_rw [basisVecS_apply, mul_ite, mul_one, mul_zero]
+    rw [Finset.sum_ite_eq' Finset.univ σ
+        (fun τ => (totalSpinSOp3 Λ N) σ' τ)]
+    simp
+  have heq : (totalSpinSOp3 Λ N).mulVec (basisVecS σ) σ' =
+      magEigenvalueS σ * basisVecS σ σ' := by
+    rw [hkey, Pi.smul_apply, smul_eq_mul]
+  rw [happly] at heq
+  rw [heq, basisVecS_apply]
+
+/-- The diagonal entry of `Ŝ_tot^{(3)}` is `magEigenvalueS σ`. -/
+theorem totalSpinSOp3_apply_diag (σ : Λ → Fin (N + 1)) :
+    (totalSpinSOp3 Λ N) σ σ = magEigenvalueS σ := by
+  rw [totalSpinSOp3_apply, if_pos rfl, mul_one]
+
+/-- Off-diagonal entries of `Ŝ_tot^{(3)}` vanish. -/
+theorem totalSpinSOp3_apply_off_diag {σ' σ : Λ → Fin (N + 1)}
+    (h : σ' ≠ σ) :
+    (totalSpinSOp3 Λ N) σ' σ = 0 := by
+  rw [totalSpinSOp3_apply, if_neg h, mul_zero]
+
 /-- Every basis state lies in the supremum of all magnetization
 subspaces. This is a stepping stone toward proving that the
 magnetization subspaces span the full multi-site Hilbert space. -/
