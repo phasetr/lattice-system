@@ -203,6 +203,20 @@ theorem marshallSignS_re_eq_one_or_neg_one (A : V → Bool) (σ : V → Fin (N +
   · left; rw [h]; simp
   · right; rw [h]; simp
 
+/-- The absolute value of the Marshall sign's real part is exactly 1. -/
+theorem marshallSignS_re_abs (A : V → Bool) (σ : V → Fin (N + 1)) :
+    |(marshallSignS A σ).re| = 1 := by
+  rcases marshallSignS_re_eq_one_or_neg_one A σ with h | h
+  · rw [h]; simp
+  · rw [h]; simp
+
+/-- The square of the Marshall sign's real part equals 1. -/
+theorem marshallSignS_re_sq (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallSignS A σ).re * (marshallSignS A σ).re = 1 := by
+  rcases marshallSignS_re_eq_one_or_neg_one A σ with h | h
+  · rw [h]; norm_num
+  · rw [h]; norm_num
+
 /-- Marshall sign multiplication is commutative (trivially in ℂ). -/
 theorem marshallSignS_mul_comm (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
     marshallSignS A σ * marshallSignS A σ' =
