@@ -1091,4 +1091,170 @@ theorem dressedHeisenbergS_apply_eq_zero_of_off_two_site_agree_diff_at_y_not_pm1
     hxy N h hσy hyp hym]
   ring
 
+/-- Helper: configurations agreeing off `{x, y}` have equal
+magnetizations iff `(σ x).val + (σ y).val = (σ' x).val + (σ' y).val`. -/
+private theorem magEigenvalueS_eq_iff_of_off_two_site_agree
+    {x y : V} (hxy : x ≠ y) {N : ℕ} {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    magEigenvalueS σ' = magEigenvalueS σ ↔
+      (σ' x).val + (σ' y).val = (σ x).val + (σ y).val := by
+  classical
+  have hsplit : ∀ τ : V → Fin (N + 1),
+      magSumS τ =
+        (∑ k ∈ ((Finset.univ : Finset V) \ ({x, y} : Finset V)),
+            (τ k).val) + ((τ x).val + (τ y).val) := by
+    intro τ
+    unfold magSumS
+    rw [← Finset.sum_sdiff (Finset.subset_univ ({x, y} : Finset V))]
+    congr 1
+    rw [Finset.sum_insert (Finset.notMem_singleton.mpr hxy),
+      Finset.sum_singleton]
+  have hrest :
+      ∑ k ∈ (Finset.univ : Finset V) \ ({x, y} : Finset V), (σ' k).val =
+        ∑ k ∈ (Finset.univ : Finset V) \ ({x, y} : Finset V), (σ k).val := by
+    refine Finset.sum_congr rfl (fun k hk => ?_)
+    simp only [Finset.mem_sdiff, Finset.mem_insert, Finset.mem_singleton,
+      not_or, Finset.mem_univ, true_and] at hk
+    rw [h k hk.1 hk.2]
+  unfold magEigenvalueS
+  constructor
+  · intro hmag
+    have hsumeq : magSumS σ' = magSumS σ := by
+      have : ((magSumS σ' : ℂ)) = ((magSumS σ : ℂ)) := by linear_combination -hmag
+      exact_mod_cast this
+    rw [hsplit σ', hsplit σ, hrest] at hsumeq
+    omega
+  · intro hxy_sum
+    have hsumeq : magSumS σ' = magSumS σ := by
+      rw [hsplit σ', hsplit σ, hrest]
+      omega
+    push_cast [hsumeq]
+    ring
+
+/-- **Full off-diagonal dressed Heisenberg non-positivity on a bipartite
+bond** (Tasaki §2.5 Property (ii) for general spin, all cases unified):
+
+For `x ≠ y` with bipartite indicator `A x ≠ A y`, real symmetric
+coupling `J` with `(J x y).re ≥ 0`, and *any* `σ' ≠ σ` agreeing off
+`{x, y}`,
+
+    `Re (dressedHeisenbergS A J N σ' σ) ≤ 0`.
+
+Case analysis on the values of σ', σ at `{x, y}`:
+- differ at exactly one site → `dressed = 0` (one_site_diff).
+- differ at both, magnetization mismatched → `dressed = 0` (mag_ne).
+- differ at both, mag conserved, `|Δσ x| ≠ 1` → `dressed = 0`
+  (`diff_at_x_not_pm1`).
+- differ at both, mag conserved, `|Δσ x| = 1` → exactly one of the
+  four bipartite raising/lowering non-positivity lemmas (γ-2e). -/
+theorem dressedHeisenbergS_apply_re_nonpos_of_off_two_site_agree_bipartite
+    {x y : V} (hxy : x ≠ y) (N : ℕ)
+    (A : V → Bool) (hAne : A x ≠ A y)
+    {J : V → V → ℂ} (hJ_real : (J x y).im = 0) (hJ_nn : 0 ≤ (J x y).re)
+    (hJ_sym : J x y = J y x)
+    {σ' σ : V → Fin (N + 1)} (hne : σ' ≠ σ)
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    (dressedHeisenbergS A J N σ' σ).re ≤ 0 := by
+  -- Decompose A x ≠ A y into the two Bool sublattice configurations.
+  have hA_or :
+      (A x = true ∧ A y = false) ∨ (A x = false ∧ A y = true) := by
+    have hxbool : A x = true ∨ A x = false := by
+      cases A x <;> simp
+    have hybool : A y = true ∨ A y = false := by
+      cases A y <;> simp
+    rcases hxbool with hax | hax <;> rcases hybool with hay | hay
+    · exact (hAne (hax.trans hay.symm)).elim
+    · exact Or.inl ⟨hax, hay⟩
+    · exact Or.inr ⟨hax, hay⟩
+    · exact (hAne (hax.trans hay.symm)).elim
+  by_cases hσx : σ' x = σ x
+  · -- σ' x = σ x; σ' ≠ σ forces difference at y → one_site_diff at y.
+    have hσy : σ' y ≠ σ y := by
+      intro hσy
+      apply hne
+      funext k
+      by_cases hkx : k = x
+      · subst hkx; exact hσx
+      · by_cases hky : k = y
+        · subst hky; exact hσy
+        · exact h k hkx hky
+    have hagree_y : ∀ k, k ≠ y → σ' k = σ k := fun k hky => by
+      by_cases hkx : k = x
+      · subst hkx; exact hσx
+      · exact h k hkx hky
+    rw [dressedHeisenbergS_apply_eq_zero_of_one_site_diff A J N
+      hagree_y hσy]
+    simp
+  · by_cases hσy : σ' y = σ y
+    · -- σ' y = σ y; differ only at x → one_site_diff at x.
+      have hagree_x : ∀ k, k ≠ x → σ' k = σ k := fun k hkx => by
+        by_cases hky : k = y
+        · subst hky; exact hσy
+        · exact h k hkx hky
+      rw [dressedHeisenbergS_apply_eq_zero_of_one_site_diff A J N
+        hagree_x hσx]
+      simp
+    · -- σ' x ≠ σ x AND σ' y ≠ σ y: both differ.
+      -- Case on the difference at x.
+      by_cases hxraise : (σ x).val + 1 = (σ' x).val
+      · -- σ' x = σ x + 1: raising at x.
+        by_cases hylower : (σ' y).val + 1 = (σ y).val
+        · -- σ y = σ' y + 1: lowering at y. Mag conserved → use bipartite.
+          rcases hA_or with ⟨hAx, hAy⟩ | ⟨hAx, hAy⟩
+          · -- A x = true, A y = false.
+            exact dressedHeisenbergS_apply_re_nonpos_bipartite_x
+              hxy N A hAx hAy hJ_real hJ_nn hJ_sym h hxraise hylower
+          · -- A x = false, A y = true.
+            exact dressedHeisenbergS_apply_re_nonpos_bipartite_y_lowering
+              hxy N A hAx hAy hJ_real hJ_nn hJ_sym h hxraise hylower
+        · -- σ y val + 1 ≠ σ' y val. Either raising at y too (mag-ne) or non-pm1.
+          by_cases hyraise : (σ y).val + 1 = (σ' y).val
+          · -- raising at y too: mag mismatched (both raised).
+            have hzero : dressedHeisenbergS A J N σ' σ = 0 := by
+              apply dressedHeisenbergS_apply_eq_zero_of_off_two_site_agree_of_mag_ne
+                A hxy N hne h
+              intro hmag
+              have hsum := (magEigenvalueS_eq_iff_of_off_two_site_agree
+                hxy h).mp hmag.symm
+              omega
+            rw [hzero]; simp
+          · -- σ' y val differs from σ y val by ≥ 2.
+            have hzero : dressedHeisenbergS A J N σ' σ = 0 :=
+              dressedHeisenbergS_apply_eq_zero_of_off_two_site_agree_diff_at_y_not_pm1
+                A hxy N hne h hσy hylower hyraise
+            rw [hzero]; simp
+      · -- (σ x).val + 1 ≠ (σ' x).val.
+        by_cases hxlower : (σ' x).val + 1 = (σ x).val
+        · -- σ' x val + 1 = σ x val: lowering at x.
+          by_cases hyraise : (σ y).val + 1 = (σ' y).val
+          · -- raising at y: mag conserved → bipartite.
+            rcases hA_or with ⟨hAx, hAy⟩ | ⟨hAx, hAy⟩
+            · -- A x = true, A y = false.
+              exact dressedHeisenbergS_apply_re_nonpos_bipartite_x_lowering
+                hxy N A hAx hAy hJ_real hJ_nn hJ_sym h hxlower hyraise
+            · -- A x = false, A y = true.
+              exact dressedHeisenbergS_apply_re_nonpos_bipartite_y
+                hxy N A hAx hAy hJ_real hJ_nn hJ_sym h hxlower hyraise
+          · -- σ y val + 1 ≠ σ' y val.
+            by_cases hylower : (σ' y).val + 1 = (σ y).val
+            · -- σ' y val + 1 = σ y val: lowering at y too. Mag mismatched.
+              have hzero : dressedHeisenbergS A J N σ' σ = 0 := by
+                apply dressedHeisenbergS_apply_eq_zero_of_off_two_site_agree_of_mag_ne
+                  A hxy N hne h
+                intro hmag
+                have hsum := (magEigenvalueS_eq_iff_of_off_two_site_agree
+                  hxy h).mp hmag.symm
+                omega
+              rw [hzero]; simp
+            · -- σ' y differs by ≥ 2 from σ y.
+              have hzero : dressedHeisenbergS A J N σ' σ = 0 :=
+                dressedHeisenbergS_apply_eq_zero_of_off_two_site_agree_diff_at_y_not_pm1
+                  A hxy N hne h hσy hylower hyraise
+              rw [hzero]; simp
+        · -- |σ' x - σ x| ≥ 2.
+          have hzero : dressedHeisenbergS A J N σ' σ = 0 :=
+            dressedHeisenbergS_apply_eq_zero_of_off_two_site_agree_diff_at_x_not_pm1
+              A hxy N hne h hσx hxlower hxraise
+          rw [hzero]; simp
+
 end LatticeSystem.Quantum
