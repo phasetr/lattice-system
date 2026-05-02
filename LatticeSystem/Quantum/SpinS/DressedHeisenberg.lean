@@ -571,6 +571,16 @@ theorem dressedHeisenbergSMatrix_apply_eq_ofReal_re
   · rw [Complex.ofReal_im]
     exact dressedHeisenbergS_apply_im_zero A N hreal σ' σ
 
+/-- Matrix-level equality: the complex dressed matrix equals the
+ℂ-embedding of the real-valued dressed matrix entry-wise. -/
+theorem dressedHeisenbergSMatrix_eq_dressedHeisenbergSReMatrix_complex
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hreal : ∀ x y, (J x y).im = 0) :
+    dressedHeisenbergSMatrix A J N =
+      (dressedHeisenbergSReMatrix A J N).map (fun r : ℝ => (r : ℂ)) := by
+  ext σ' σ
+  rw [Matrix.map_apply, dressedHeisenbergSMatrix_apply_eq_ofReal_re A N hreal]
+
 /-- The real-part dressed Heisenberg matrix entry vanishes when the
 two configurations have different magnetization quantum numbers. -/
 theorem dressedHeisenbergSReMatrix_apply_eq_zero_of_mag_ne
