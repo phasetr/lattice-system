@@ -196,6 +196,13 @@ theorem marshallSignS_eq_ofReal_re (A : V → Bool) (σ : V → Fin (N + 1)) :
   · rw [Complex.ofReal_im]
     exact marshallSignS_im A σ
 
+/-- The real part of the Marshall sign is `±1`. -/
+theorem marshallSignS_re_eq_one_or_neg_one (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallSignS A σ).re = 1 ∨ (marshallSignS A σ).re = -1 := by
+  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
+  · left; rw [h]; simp
+  · right; rw [h]; simp
+
 /-- Marshall sign multiplication is commutative (trivially in ℂ). -/
 theorem marshallSignS_mul_comm (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
     marshallSignS A σ * marshallSignS A σ' =
