@@ -937,4 +937,34 @@ theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_eq_zero_of_off_diag_at_y
     Matrix.diagonal_apply_ne _ hσy]
   ring
 
+/-- For `x ≠ y` and `σ', σ` agreeing off `{x, y}` with `σ_x = σ'_x + 1`
+("S+ raises k=σ from σ' = σ - 1"), the `S-_x ⊗ S+_y` matrix element
+vanishes (wrong direction at site `x`). -/
+theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_eq_zero_of_raising_x
+    {x y : Λ} (hxy : x ≠ y)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hx : (σ' x).val + 1 = (σ x).val) :
+    (onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
+          : ManyBodyOpS Λ N) σ' σ = 0 := by
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, if_pos h]
+  rw [show spinSOpMinus N (σ' x) (σ x) = 0 from
+    spinSOpMinus_apply_other N (by omega)]
+  ring
+
+/-- For `x ≠ y` and `σ', σ` agreeing off `{x, y}` with
+`σ'_x = σ_x + 1` ("S- lowers k=σ to σ' = σ + 1"), the `S+_x ⊗ S-_y`
+matrix element vanishes (wrong direction at site `x`). -/
+theorem onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_eq_zero_of_lowering_x
+    {x y : Λ} (hxy : x ≠ y)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hx : (σ x).val + 1 = (σ' x).val) :
+    (onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N)
+          : ManyBodyOpS Λ N) σ' σ = 0 := by
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, if_pos h]
+  rw [show spinSOpPlus N (σ' x) (σ x) = 0 from
+    spinSOpPlus_apply_other N (by omega)]
+  ring
+
 end LatticeSystem.Quantum
