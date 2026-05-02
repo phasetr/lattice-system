@@ -494,7 +494,82 @@ theorem heisenbergHamiltonianS_apply_eq_zero_of_one_site_diff
       spinSDot_apply_eq_zero_of_one_site_diff hxy' N hagree hz]
     ring
 
+/-- **Two-site matrix-element formula**: for `x ≠ y` and configurations
+`σ', σ` agreeing off `{x, y}` with `σ' ≠ σ`, the Heisenberg matrix
+element factorises as
 
+    `H σ' σ = (J(x, y) + J(y, x)) · (Ŝ_x · Ŝ_y) σ' σ`.
+
+In the double sum `∑_{x', y'} J(x', y') (Ŝ_{x'} · Ŝ_{y'}) σ' σ`,
+exactly two terms contribute (at `(x', y') = (x, y)` and `(y, x)`)
+because all other pairs give zero by `spinSDot_apply_eq_zero_of_*`
+(same-site Casimir vanishes on `σ' ≠ σ`; off-pair entries are killed
+by the outside-pair lemmas). The two surviving terms combine via
+`spinSDot_comm` (`Ŝ_y · Ŝ_x = Ŝ_x · Ŝ_y`). -/
+theorem heisenbergHamiltonianS_apply_of_off_two_site_agree
+    {J : Λ → Λ → ℂ} {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)} (hne : σ' ≠ σ)
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    (heisenbergHamiltonianS J N) σ' σ =
+      (J x y + J y x) * (spinSDot x y N : ManyBodyOpS Λ N) σ' σ := by
+  classical
+  rw [heisenbergHamiltonianS_apply]
+  -- Step 1: Outer terms x' ∉ {x, y} vanish.
+  have hfxy_zero : ∀ x' ∈ (Finset.univ : Finset Λ),
+      x' ∉ ({x, y} : Finset Λ) →
+      (∑ y' : Λ, J x' y' *
+        (spinSDot x' y' N : ManyBodyOpS Λ N) σ' σ) = 0 := by
+    intro x' _ hx'
+    rw [Finset.mem_insert, Finset.mem_singleton, not_or] at hx'
+    obtain ⟨hxx', hyx'⟩ := hx'
+    refine Finset.sum_eq_zero (fun y' _ => ?_)
+    by_cases hxy' : x' = y'
+    · subst hxy'
+      obtain ⟨z, hz⟩ := Function.ne_iff.mp hne
+      rw [spinSDot_self_apply_eq_zero_of_diff_at x' N hz]
+      ring
+    · rw [spinSDot_apply_eq_zero_of_x_outside_pair hxy N hne h hxy'
+        hxx' hyx']
+      ring
+  rw [← Finset.sum_subset
+    (Finset.subset_univ ({x, y} : Finset Λ)) hfxy_zero]
+  rw [Finset.sum_insert (Finset.notMem_singleton.mpr hxy),
+    Finset.sum_singleton]
+  -- Step 2: Inner sum at outer site `x` reduces to the `y'` = `y` term.
+  have hf_x : (∑ y' : Λ, J x y' *
+      (spinSDot x y' N : ManyBodyOpS Λ N) σ' σ) =
+      J x y * (spinSDot x y N : ManyBodyOpS Λ N) σ' σ := by
+    rw [Finset.sum_eq_single y]
+    · intro y' _ hy'ne
+      by_cases hxy' : x = y'
+      · subst hxy'
+        obtain ⟨z, hz⟩ := Function.ne_iff.mp hne
+        rw [spinSDot_self_apply_eq_zero_of_diff_at x N hz]
+        ring
+      · rw [spinSDot_apply_eq_zero_of_y_outside_pair hxy N hne h hxy'
+          (fun heq => hxy' heq.symm) hy'ne]
+        ring
+    · intro hyu; exact (hyu (Finset.mem_univ y)).elim
+  -- Step 3: Inner sum at outer site `y` reduces to the `y'` = `x` term.
+  have hf_y : (∑ y' : Λ, J y y' *
+      (spinSDot y y' N : ManyBodyOpS Λ N) σ' σ) =
+      J y x * (spinSDot x y N : ManyBodyOpS Λ N) σ' σ := by
+    rw [Finset.sum_eq_single x]
+    · rw [show (spinSDot y x N : ManyBodyOpS Λ N) σ' σ =
+            (spinSDot x y N : ManyBodyOpS Λ N) σ' σ from by
+        rw [spinSDot_comm]]
+    · intro y' _ hy'ne
+      by_cases hyy' : y = y'
+      · subst hyy'
+        obtain ⟨z, hz⟩ := Function.ne_iff.mp hne
+        rw [spinSDot_self_apply_eq_zero_of_diff_at y N hz]
+        ring
+      · rw [spinSDot_apply_eq_zero_of_y_outside_pair hxy N hne h hyy'
+          hy'ne (fun heq => hyy' heq.symm)]
+        ring
+    · intro hxu; exact (hxu (Finset.mem_univ x)).elim
+  rw [hf_x, hf_y]
+  ring
 
 /-- For real coupling `J`, the Heisenberg matrix entries have zero
 imaginary part. (Each `Ŝ_x · Ŝ_y` matrix element is real, and a real
