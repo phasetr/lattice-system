@@ -399,6 +399,26 @@ theorem heisenbergHamiltonianS_mulVec_basisVecS_mem_magSubspaceS
 where
   basisVecS_mem_basisVec_magSubspaceS := basisVecS_mem_magSubspaceS
 
+/-- For real coupling `J`, the Heisenberg matrix entries have zero
+imaginary part. (Each `Ŝ_x · Ŝ_y` matrix element is real, and a real
+coupling preserves this.) -/
+theorem heisenbergHamiltonianS_apply_im_zero
+    {J : Λ → Λ → ℂ} (N : ℕ)
+    (hreal : ∀ x y, (J x y).im = 0)
+    (σ' σ : Λ → Fin (N + 1)) :
+    ((heisenbergHamiltonianS J N) σ' σ).im = 0 := by
+  rw [heisenbergHamiltonianS_apply]
+  -- Sum of products of (J x y) (real) with (spinSDot x y N σ' σ) (real)
+  rw [show ((∑ x : Λ, ∑ y : Λ, J x y * (spinSDot x y N) σ' σ).im : ℝ) =
+        ∑ x : Λ, ∑ y : Λ, (J x y * (spinSDot x y N) σ' σ).im from by
+    rw [Complex.im_sum]; refine Finset.sum_congr rfl (fun x _ => ?_)
+    rw [Complex.im_sum]]
+  refine Finset.sum_eq_zero (fun x _ => ?_)
+  refine Finset.sum_eq_zero (fun y _ => ?_)
+  rw [Complex.mul_im]
+  rw [hreal x y, spinSDot_apply_im_zero]
+  ring
+
 /-- The matrix element `H σ' σ` vanishes when the two configurations
 have different magnetization quantum numbers. This is the matrix-level
 expression of `[H, S^z_tot] = 0`. -/
