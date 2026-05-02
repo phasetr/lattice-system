@@ -259,4 +259,14 @@ theorem marshallDressedBasisS_self_norm [DecidableEq V]
     ‖marshallDressedBasisS A σ σ‖ = 1 := by
   rw [marshallDressedBasisS_self, marshallSignS_norm]
 
+/-- Component-wise norm of the Marshall-dressed basis equals the
+component-wise norm of the plain basis (since dressing only changes
+sign): `‖marshallDressedBasisS A σ τ‖ = ‖basisVecS σ τ‖`. -/
+theorem marshallDressedBasisS_norm_eq_basisVecS [DecidableEq V]
+    (A : V → Bool) (σ τ : V → Fin (N + 1)) :
+    ‖marshallDressedBasisS A σ τ‖ = ‖(basisVecS σ τ : ℂ)‖ := by
+  unfold marshallDressedBasisS
+  rw [Pi.smul_apply, smul_eq_mul, norm_mul]
+  rw [marshallSignS_norm, one_mul]
+
 end LatticeSystem.Quantum
