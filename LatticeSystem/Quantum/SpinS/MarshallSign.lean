@@ -75,6 +75,7 @@ theorem marshallSignS_eq_prod_A_filter
   unfold marshallSignS
   rw [Finset.prod_filter]
 
+
 /-- Definitional unfolding of `marshallSignS`. -/
 theorem marshallSignS_def (A : V → Bool) (σ : V → Fin (N + 1)) :
     marshallSignS A σ =
@@ -184,6 +185,16 @@ theorem marshallSignS_im (A : V → Bool) (σ : V → Fin (N + 1)) :
   rcases marshallSignS_eq_one_or_neg_one A σ with h | h
   · rw [h]; simp
   · rw [h]; simp
+
+/-- `marshallSignS A σ = ((marshallSignS A σ).re : ℂ)`: the Marshall
+sign is real-valued (always ±1, both real), so it equals its embedded
+real part. -/
+theorem marshallSignS_eq_ofReal_re (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ = ((marshallSignS A σ).re : ℂ) := by
+  apply Complex.ext
+  · simp
+  · rw [Complex.ofReal_im]
+    exact marshallSignS_im A σ
 
 /-- Marshall sign multiplication is commutative (trivially in ℂ). -/
 theorem marshallSignS_mul_comm (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
