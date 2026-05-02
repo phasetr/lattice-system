@@ -313,6 +313,18 @@ theorem dressedHeisenbergSMatrix_mulVec_basisVecS_mem_magSubspaceS
     rw [totalSpinSOp3_apply_off_diag (Ne.symm hρ), zero_mul]
   · intro hτ; exact (hτ (Finset.mem_univ τ)).elim
 
+/-- The dressed Heisenberg matrix applied to a Marshall-dressed basis
+state lies in the same magnetization subspace as the underlying
+basis vector. -/
+theorem dressedHeisenbergSMatrix_mulVec_marshallDressedBasisS_mem_magSubspaceS
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ : V → Fin (N + 1)) :
+    (dressedHeisenbergSMatrix A J N).mulVec (marshallDressedBasisS A σ) ∈
+      magSubspaceS V N (magEigenvalueS σ) := by
+  unfold marshallDressedBasisS
+  rw [Matrix.mulVec_smul]
+  exact (magSubspaceS V N (magEigenvalueS σ)).smul_mem _
+    (dressedHeisenbergSMatrix_mulVec_basisVecS_mem_magSubspaceS A J N σ)
+
 /-- For real coupling, the dressed matrix is Hermitian. -/
 theorem dressedHeisenbergSMatrix_isHermitian
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
