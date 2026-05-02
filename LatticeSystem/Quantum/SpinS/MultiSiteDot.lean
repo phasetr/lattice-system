@@ -537,6 +537,44 @@ theorem spinSDot_apply_eq_pm_only_of_off_diag_at_y
     hxy h hσy]
   ring
 
+/-- **Explicit off-diagonal `Ŝ_x · Ŝ_y` matrix element** on a two-site
+raising/lowering pair. For `x ≠ y` and `σ', σ` agreeing off `{x, y}`
+with the raising shift at `x` (`σ_x = σ'_x + 1`) and lowering shift at
+`y` (`σ_y + 1 = σ'_y`), the matrix element equals
+`(1/2) · √(σ_x · (N - σ_x + 1)) · √((N - σ_y) · (σ_y + 1))`,
+a positive real number.
+
+The `S^3 ⊗ S^3` part vanishes (off-diagonal in `S^3`); the
+`S^-_x ⊗ S^+_y` part vanishes (wrong direction at `x`); only the
+`S^+_x ⊗ S^-_y` term contributes. -/
+theorem spinSDot_apply_eq_raising_lowering_explicit
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hx : (σ' x).val + 1 = (σ x).val)
+    (hy : (σ y).val + 1 = (σ' y).val) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ =
+      (1 / 2 : ℂ) *
+        ((Real.sqrt (((σ x).val : ℝ) *
+            ((N : ℝ) - (σ x).val + 1)) : ℝ) *
+          (Real.sqrt (((N : ℝ) - (σ y).val) *
+            ((σ y).val + 1)) : ℝ)) := by
+  have hσx : σ' x ≠ σ x := by
+    intro heq
+    have : (σ' x).val = (σ x).val := by rw [heq]
+    omega
+  rw [spinSDot_apply_eq_pm_only_of_off_diag_at_x hxy N h hσx]
+  -- Now we have (1/2) * ((S+_x S-_y) σ' σ + (S-_x S+_y) σ' σ).
+  -- (S-_x S+_y) σ' σ = 0 from raising at x.
+  rw [onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_eq_zero_of_raising_x
+    hxy h hx]
+  -- (S+_x S-_y) σ' σ = (S+)(σ'x σx) * (S-)(σ'y σy).
+  rw [onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_of_off_two_site_agree
+    hxy h]
+  rw [spinSOpPlus_apply_raise N hx, spinSOpMinus_apply_lower N hy]
+  push_cast
+  ring
+
 /-- Symmetric: for `x ≠ y` and configurations `σ', σ` agreeing off
 `{x, y}`, the matrix element of `Ŝ_x · Ŝ_y` has non-negative real
 part on the lowering/raising pair `(σ x).val + 1 = (σ' x).val`. -/
