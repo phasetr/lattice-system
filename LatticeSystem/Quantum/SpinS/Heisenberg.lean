@@ -447,6 +447,30 @@ theorem heisenbergHamiltonianS_apply_swap_of_symm
   refine Finset.sum_congr rfl fun y _ => ?_
   rw [spinSDot_apply_swap]
 
+/-- **Magnetization conservation, matrix-element form**: if `σ', σ`
+differ at exactly one site `z` (i.e., agree everywhere off `{z}`),
+the Heisenberg matrix element `H σ' σ` vanishes.
+
+Every term in the double sum vanishes: `(x' = y')` gives the
+diagonal Casimir times `δ_{σ',σ} = 0`; `(x' ≠ y')` gives a two-site
+spinSDot entry which vanishes on one-site differences. -/
+theorem heisenbergHamiltonianS_apply_eq_zero_of_one_site_diff
+    (J : Λ → Λ → ℂ) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    {z : Λ} (hagree : ∀ k, k ≠ z → σ' k = σ k) (hz : σ' z ≠ σ z) :
+    (heisenbergHamiltonianS J N) σ' σ = 0 := by
+  rw [heisenbergHamiltonianS_apply]
+  refine Finset.sum_eq_zero (fun x' _ => ?_)
+  refine Finset.sum_eq_zero (fun y' _ => ?_)
+  by_cases hxy' : x' = y'
+  · subst hxy'
+    rw [show (spinSDot x' x' N : ManyBodyOpS Λ N) σ' σ = 0 from
+      spinSDot_self_apply_eq_zero_of_diff_at x' N hz]
+    ring
+  · rw [show (spinSDot x' y' N : ManyBodyOpS Λ N) σ' σ = 0 from
+      spinSDot_apply_eq_zero_of_one_site_diff hxy' N hagree hz]
+    ring
+
 
 
 /-- For real coupling `J`, the Heisenberg matrix entries have zero
