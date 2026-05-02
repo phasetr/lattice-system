@@ -558,4 +558,19 @@ theorem mul_onSiteS_zero (i : Λ) (B : ManyBodyOpS Λ N) :
         ManyBodyOpS Λ N) = 0 := by
   rw [onSiteS_zero, mul_zero]
 
+/-- Applying `onSiteS i A` to a basis vector and reading the result
+at configuration `τ` yields the matrix element `(onSiteS i A) τ σ`:
+the basis-vector mulVec collapses to a single matrix entry. -/
+theorem onSiteS_mulVec_basisVecS_apply
+    (i : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
+    (σ τ : Λ → Fin (N + 1)) :
+    (onSiteS i A : ManyBodyOpS Λ N).mulVec (basisVecS σ) τ =
+      (onSiteS i A : ManyBodyOpS Λ N) τ σ := by
+  classical
+  change ∑ σ' : Λ → Fin (N + 1), (onSiteS i A) τ σ' * basisVecS σ σ' =
+        (onSiteS i A) τ σ
+  simp_rw [basisVecS_apply, mul_ite, mul_one, mul_zero]
+  rw [Finset.sum_ite_eq' Finset.univ σ (fun σ' => (onSiteS i A) τ σ')]
+  simp
+
 end LatticeSystem.Quantum
