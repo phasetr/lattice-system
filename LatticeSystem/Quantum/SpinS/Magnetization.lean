@@ -177,6 +177,21 @@ theorem magSumS_const_zero :
   simp
 
 omit [DecidableEq Λ] in
+/-- `magSumS σ = 0` iff `σ x = 0` for every `x : Λ`. -/
+theorem magSumS_eq_zero_iff (σ : Λ → Fin (N + 1)) :
+    magSumS σ = 0 ↔ ∀ x : Λ, σ x = 0 := by
+  unfold magSumS
+  rw [Finset.sum_eq_zero_iff]
+  constructor
+  · intro h x
+    have := h x (Finset.mem_univ x)
+    apply Fin.ext
+    exact this
+  · intro h x _
+    rw [h x]
+    rfl
+
+omit [DecidableEq Λ] in
 /-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
 theorem magEigenvalueS_const_zero :
     magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1))) =
