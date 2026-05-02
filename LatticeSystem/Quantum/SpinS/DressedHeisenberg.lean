@@ -250,4 +250,23 @@ theorem dressedHeisenbergSReMatrix_apply
     dressedHeisenbergSReMatrix A J N σ σ' =
       (dressedHeisenbergS A J N σ σ').re := rfl
 
+/-- For real coupling, the real-part dressed Heisenberg matrix is
+symmetric: `Mᵀ = M`. This follows from the Hermiticity of the
+complex dressed Heisenberg matrix combined with reality of the
+diagonal/off-diagonal sums. -/
+theorem dressedHeisenbergSReMatrix_isSymm
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hreal : ∀ x y, star (J x y) = J x y) :
+    (dressedHeisenbergSReMatrix A J N).IsSymm := by
+  ext σ σ'
+  simp only [Matrix.transpose_apply, dressedHeisenbergSReMatrix_apply]
+  -- Use Hermiticity: star (z σ' σ) = z σ σ'.
+  have h := dressedHeisenbergS_star_swap A N hreal σ σ'
+  -- `star z = w` in ℂ means `Complex.conj z = w`, hence `z.re = w.re`.
+  have : (dressedHeisenbergS A J N σ' σ).re =
+      (dressedHeisenbergS A J N σ σ').re := by
+    have := congrArg Complex.re h
+    simpa using this
+  exact this
+
 end LatticeSystem.Quantum
