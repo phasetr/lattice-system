@@ -386,4 +386,15 @@ theorem heisenbergHamiltonianS_mulVec_basisVecS_apply
       (fun σ' => (heisenbergHamiltonianS J N) τ σ')]
   simp
 
+/-- The Heisenberg Hamiltonian applied to a basis state stays in the
+same magnetization subspace: `Ĥ |σ⟩ ∈ magSubspaceS Λ N (magEigenvalueS σ)`.
+Direct corollary of `basisVecS_mem_magSubspaceS` and the magnetization
+preservation property. -/
+theorem heisenbergHamiltonianS_mulVec_basisVecS_mem_magSubspaceS
+    (J : Λ → Λ → ℂ) (N : ℕ) (σ : Λ → Fin (N + 1)) :
+    (heisenbergHamiltonianS J N).mulVec (basisVecS σ) ∈
+      magSubspaceS Λ N (magEigenvalueS σ) :=
+  heisenbergHamiltonianS_mulVec_mem_magSubspaceS _ N _
+    (basisVecS_mem_magSubspaceS σ)
+
 end LatticeSystem.Quantum
