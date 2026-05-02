@@ -802,6 +802,28 @@ theorem dressedHeisenbergSMatrix_eq_dressedHeisenbergSReMatrix_complex
   ext σ' σ
   rw [Matrix.map_apply, dressedHeisenbergSMatrix_apply_eq_ofReal_re A N hreal]
 
+/-- **Two-site matrix-element formula for the dressed Heisenberg
+matrix**: for `x ≠ y` and configurations `σ', σ` agreeing off `{x, y}`
+with `σ' ≠ σ`,
+
+    `dressedHeisenbergS A J N σ' σ
+       = (J(x, y) + J(y, x)) ·
+           (marshallSignS A σ' · marshallSignS A σ) · (Ŝ_x · Ŝ_y) σ' σ`.
+
+Direct corollary of `heisenbergHamiltonianS_apply_of_off_two_site_agree`
+unfolded through the dressed-Heisenberg definition. -/
+theorem dressedHeisenbergS_apply_of_off_two_site_agree
+    (A : V → Bool) {J : V → V → ℂ} {x y : V} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : V → Fin (N + 1)} (hne : σ' ≠ σ)
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    dressedHeisenbergS A J N σ' σ =
+      (J x y + J y x) * (marshallSignS A σ' * marshallSignS A σ) *
+        (spinSDot x y N : ManyBodyOpS V N) σ' σ := by
+  unfold dressedHeisenbergS
+  rw [heisenbergHamiltonianS_apply_of_off_two_site_agree (Λ := V) hxy N
+    hne h]
+  ring
+
 /-- The real-part dressed Heisenberg matrix entry vanishes when the
 two configurations have different magnetization quantum numbers. -/
 theorem dressedHeisenbergSReMatrix_apply_eq_zero_of_mag_ne
