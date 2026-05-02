@@ -111,6 +111,19 @@ theorem dressedHeisenbergS_diag_im_zero
   have := Complex.conj_eq_iff_im.mp hstar
   exact this
 
+/-- All entries of `dressedHeisenbergS` have zero imaginary part for
+coupling whose entries are real. -/
+theorem dressedHeisenbergS_apply_im_zero
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hreal : ∀ x y, (J x y).im = 0)
+    (σ' σ : V → Fin (N + 1)) :
+    (dressedHeisenbergS A J N σ' σ).im = 0 := by
+  unfold dressedHeisenbergS
+  rw [Complex.mul_im, Complex.mul_im]
+  rw [marshallSignS_im, marshallSignS_im]
+  rw [heisenbergHamiltonianS_apply_im_zero (Λ := V) N hreal]
+  ring
+
 /-- Diagonal `dressedHeisenbergS` equals its real-part embedding: a
 useful form for converting to a real-valued matrix. -/
 theorem dressedHeisenbergS_diag_eq_ofReal
