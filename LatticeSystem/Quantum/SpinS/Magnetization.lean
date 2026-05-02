@@ -291,6 +291,18 @@ theorem magSumS_of_isEmpty [IsEmpty Λ] (σ : Λ → Fin (N + 1)) :
   exact Finset.eq_empty_of_isEmpty _
 
 omit [DecidableEq Λ] in
+/-- `magEigenvalueS σ = 0` over an empty lattice. -/
+theorem magEigenvalueS_of_isEmpty [IsEmpty Λ] (σ : Λ → Fin (N + 1)) :
+    magEigenvalueS σ = 0 := by
+  unfold magEigenvalueS
+  rw [magSumS_of_isEmpty σ]
+  have : (Fintype.card Λ : ℂ) = 0 := by
+    have : Fintype.card Λ = 0 := Fintype.card_eq_zero
+    exact_mod_cast this
+  rw [this]
+  ring
+
+omit [DecidableEq Λ] in
 /-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
 theorem magEigenvalueS_const_zero :
     magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1))) =
