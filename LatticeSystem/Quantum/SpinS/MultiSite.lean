@@ -743,4 +743,15 @@ theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_im_zero
     ring
   · rw [if_neg h]; simp
 
+/-- For distinct sites `x ≠ y`, when configurations agree at every
+site other than `x` and `y`, the matrix element of `S^3_x S^3_y`
+factors into the per-site `S^3` entries. -/
+theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_of_off_two_site_agree
+    {x y : Λ} (hxy : x ≠ y) {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
+          : ManyBodyOpS Λ N) σ' σ =
+      spinSOp3 N (σ' x) (σ x) * spinSOp3 N (σ' y) (σ y) := by
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, if_pos h]
+
 end LatticeSystem.Quantum
