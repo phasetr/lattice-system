@@ -269,4 +269,13 @@ theorem dressedHeisenbergSReMatrix_isSymm
     simpa using this
   exact this
 
+/-- The real-part dressed Heisenberg matrix is zero when the coupling
+is zero (since the underlying Hamiltonian is zero). -/
+theorem dressedHeisenbergSReMatrix_zero_J
+    (A : V → Bool) (N : ℕ) :
+    dressedHeisenbergSReMatrix A (fun _ _ : V => (0 : ℂ)) N = 0 := by
+  ext σ σ'
+  rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_zero_J]
+  simp
+
 end LatticeSystem.Quantum
