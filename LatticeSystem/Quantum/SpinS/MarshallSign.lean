@@ -160,6 +160,13 @@ theorem marshallSignS_mul_self_inv (A : V → Bool) (σ : V → Fin (N + 1)) :
     marshallSignS A σ * (marshallSignS A σ)⁻¹ = 1 := by
   rw [marshallSignS_inv, marshallSignS_sq]
 
+/-- The Marshall sign is `±1` valued in `ℝ` (after embedding into ℂ). -/
+theorem marshallSignS_re (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallSignS A σ).re = 1 ∨ (marshallSignS A σ).re = -1 := by
+  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
+  · left; rw [h]; rfl
+  · right; rw [h]; rfl
+
 /-- The Marshall sign is real: its complex conjugate is itself. Each
 factor `(-1)^k` is real, so the star/conjugation acts as identity on
 the product. -/
