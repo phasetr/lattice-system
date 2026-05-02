@@ -46,6 +46,29 @@ theorem magSumS_le (σ : Λ → Fin (N + 1)) :
     _ = Fintype.card Λ * N := by
         rw [Finset.sum_const, Finset.card_univ, smul_eq_mul]
 
+omit [DecidableEq Λ] in
+/-- `magSumS σ = |Λ| · N` iff `σ x = Fin.last N` for every `x : Λ`
+(the lowest-weight all-`Fin.last N` config achieves the maximum). -/
+theorem magSumS_eq_max_iff (σ : Λ → Fin (N + 1)) :
+    magSumS σ = Fintype.card Λ * N ↔ ∀ x : Λ, σ x = Fin.last N := by
+  unfold magSumS
+  constructor
+  · intro h x
+    -- If `magSumS σ = |Λ| · N`, then each `(σ x).val = N` (max).
+    have hle : ∀ y ∈ (Finset.univ : Finset Λ), (σ y).val ≤ N :=
+      fun y _ => by have := (σ y).isLt; omega
+    have hsum_eq : ∀ y ∈ (Finset.univ : Finset Λ), (σ y).val = N := by
+      apply (Finset.sum_eq_sum_iff_of_le hle).mp
+      rw [Finset.sum_const, Finset.card_univ, smul_eq_mul]
+      exact h
+    apply Fin.ext
+    rw [hsum_eq x (Finset.mem_univ x)]
+    rfl
+  · intro h
+    have heq : ∀ x : Λ, (σ x).val = N := fun x => by rw [h x]; rfl
+    rw [Finset.sum_congr rfl (fun x _ => heq x)]
+    rw [Finset.sum_const, Finset.card_univ, smul_eq_mul]
+
 /-! ## Magnetization subspace -/
 
 /-- The magnetization-`M` subspace of the multi-site spin-`S` Hilbert
