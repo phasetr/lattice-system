@@ -236,6 +236,15 @@ theorem magEigenvalueS_eq_zero_iff (σ : Λ → Fin (N + 1)) :
     ring
 
 omit [DecidableEq Λ] in
+/-- `magEigenvalueS σ ∈ ℝ`: the eigenvalue is real-valued (its
+imaginary part is zero). The eigenvalue is constructed as
+`(|Λ| · N : ℂ)/2 - magSumS σ`, both terms real. -/
+theorem magEigenvalueS_im_zero (σ : Λ → Fin (N + 1)) :
+    (magEigenvalueS σ).im = 0 := by
+  unfold magEigenvalueS
+  simp
+
+omit [DecidableEq Λ] in
 /-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
 theorem magEigenvalueS_const_zero :
     magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1))) =
