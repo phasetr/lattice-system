@@ -77,6 +77,19 @@ theorem marshallSignS_eq_of_eq (A : V → Bool)
     {σ' σ : V → Fin (N + 1)} (h : σ' = σ) :
     marshallSignS A σ' = marshallSignS A σ := by rw [h]
 
+/-- For a constant configuration `σ ≡ s` and `s.val` even, the
+Marshall sign is `+1`. (Each `(-1)^(s.val)` factor is `+1`.) -/
+theorem marshallSignS_const_of_even
+    (A : V → Bool) {s : Fin (N + 1)} (hs : Even s.val) :
+    marshallSignS A (fun _ : V => s) = 1 := by
+  unfold marshallSignS
+  apply Finset.prod_eq_one
+  intro x _
+  by_cases hAx : A x
+  · simp [hAx]
+    exact Even.neg_one_pow hs
+  · simp [hAx]
+
 
 /-- The Marshall sign restricted to `A`-sites: factors away the
 trivial `1` contributions from non-`A` sites. -/
