@@ -347,6 +347,14 @@ theorem magEigenvalueS_im_zero (σ : Λ → Fin (N + 1)) :
   simp
 
 omit [DecidableEq Λ] in
+/-- The real part of `magEigenvalueS σ` is `(|Λ| · N : ℝ)/2 - magSumS σ`. -/
+theorem magEigenvalueS_re (σ : Λ → Fin (N + 1)) :
+    (magEigenvalueS σ).re =
+      ((Fintype.card Λ : ℝ) * (N : ℝ)) / 2 - (magSumS σ : ℝ) := by
+  unfold magEigenvalueS
+  simp
+
+omit [DecidableEq Λ] in
 /-- `magSumS σ ≥ (σ y).val` at any site `y`. -/
 theorem magSumS_ge_of_exists (σ : Λ → Fin (N + 1)) (y : Λ) :
     (σ y).val ≤ magSumS σ := by
