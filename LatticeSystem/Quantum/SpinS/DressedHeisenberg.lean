@@ -331,4 +331,16 @@ theorem dressedHeisenbergSReMatrix_neg_J
   rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_neg_J]
   simp [dressedHeisenbergSReMatrix_apply]
 
+/-- For real coupling, the real-part dressed Heisenberg matrix is
+Hermitian (which for a real-valued matrix is equivalent to
+symmetry). -/
+theorem dressedHeisenbergSReMatrix_isHermitian
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hreal : ∀ x y, star (J x y) = J x y) :
+    (dressedHeisenbergSReMatrix A J N).IsHermitian := by
+  ext σ σ'
+  simp only [Matrix.conjTranspose_apply, star_trivial]
+  have h := dressedHeisenbergSReMatrix_isSymm A N hreal
+  exact congrFun (congrFun h σ) σ'
+
 end LatticeSystem.Quantum
