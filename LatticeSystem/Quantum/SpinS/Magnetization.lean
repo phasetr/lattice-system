@@ -255,6 +255,16 @@ theorem basisVecS_mem_magSubspaceS (σ : Λ → Fin (N + 1)) :
       magSubspaceS Λ N (magEigenvalueS σ) :=
   totalSpinSOp3_mulVec_basisVecS σ
 
+/-- An operator that commutes with `Ŝ_tot^{(3)}` preserves each
+magnetization subspace. -/
+theorem mem_magSubspaceS_of_commute (M : ℂ) (H : ManyBodyOpS Λ N)
+    (hcomm : Commute (totalSpinSOp3 Λ N) H)
+    {v : (Λ → Fin (N + 1)) → ℂ} (hv : v ∈ magSubspaceS Λ N M) :
+    H.mulVec v ∈ magSubspaceS Λ N M := by
+  rw [mem_magSubspaceS_iff] at hv ⊢
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul]
+
 /-- Every basis state lies in the supremum of all magnetization
 subspaces. This is a stepping stone toward proving that the
 magnetization subspaces span the full multi-site Hilbert space. -/
