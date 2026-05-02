@@ -143,6 +143,13 @@ theorem marshallSignS_pow_two_mul (A : V → Bool) (σ : V → Fin (N + 1))
     rw [pow_two]; exact marshallSignS_sq A σ]
   rw [one_pow]
 
+/-- The Marshall sign equals its inverse: `(marshallSignS A σ)⁻¹ = marshallSignS A σ`. -/
+theorem marshallSignS_inv (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallSignS A σ)⁻¹ = marshallSignS A σ := by
+  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
+  · rw [h]; simp
+  · rw [h]; simp
+
 /-- The Marshall sign is real: its complex conjugate is itself. Each
 factor `(-1)^k` is real, so the star/conjugation acts as identity on
 the product. -/
