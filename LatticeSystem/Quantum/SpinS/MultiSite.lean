@@ -840,4 +840,21 @@ theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_of_off_two_site_agree
       spinSOpMinus N (σ' x) (σ x) * spinSOpPlus N (σ' y) (σ y) := by
   rw [onSiteS_mul_onSiteS_apply_eq hxy, if_pos h]
 
+/-- For distinct sites `x ≠ y` and configurations differing on at
+least one of `{x, y}^c`, the `S+_x ⊗ S-_y` matrix element vanishes. -/
+theorem onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_eq_zero_of_off_two_site_diff
+    {x y : Λ} (hxy : x ≠ y) {σ' σ : Λ → Fin (N + 1)}
+    (h : ¬ ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    (onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N)
+          : ManyBodyOpS Λ N) σ' σ = 0 := by
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, if_neg h]
+
+/-- Same for `S-_x ⊗ S+_y`. -/
+theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_eq_zero_of_off_two_site_diff
+    {x y : Λ} (hxy : x ≠ y) {σ' σ : Λ → Fin (N + 1)}
+    (h : ¬ ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    (onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
+          : ManyBodyOpS Λ N) σ' σ = 0 := by
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, if_neg h]
+
 end LatticeSystem.Quantum
