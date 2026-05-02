@@ -84,6 +84,7 @@ theorem marshallSignS_mul_swap (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
       marshallSignS A σ' * marshallSignS A σ :=
   mul_comm _ _
 
+
 /-- For a constant configuration `σ ≡ s` and `s.val` even, the
 Marshall sign is `+1`. (Each `(-1)^(s.val)` factor is `+1`.) -/
 theorem marshallSignS_const_of_even
@@ -188,6 +189,12 @@ theorem marshallSignS_pow_two_mul (A : V → Bool) (σ : V → Fin (N + 1))
   rw [show marshallSignS A σ ^ 2 = 1 from by
     rw [pow_two]; exact marshallSignS_sq A σ]
   rw [one_pow]
+
+/-- Cube of the Marshall sign equals itself: `(σ_M)^3 = σ_M`. -/
+theorem marshallSignS_pow_three (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ ^ 3 = marshallSignS A σ := by
+  rw [show (3 : ℕ) = 2 + 1 from rfl]
+  rw [pow_succ, pow_two, marshallSignS_sq, one_mul]
 
 /-- The Marshall sign equals its inverse: `(marshallSignS A σ)⁻¹ = marshallSignS A σ`. -/
 theorem marshallSignS_inv (A : V → Bool) (σ : V → Fin (N + 1)) :
