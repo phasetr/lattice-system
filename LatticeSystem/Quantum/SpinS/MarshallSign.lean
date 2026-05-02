@@ -185,6 +185,14 @@ theorem marshallSignS_mul_self (A : V → Bool) (σ : V → Fin (N + 1)) :
     marshallSignS A σ * marshallSignS A σ = 1 :=
   marshallSignS_sq A σ
 
+/-- The Marshall sign belongs to the set `{1, -1}`. -/
+theorem marshallSignS_mem_pm_one
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ ∈ ({1, -1} : Set ℂ) := by
+  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
+  · left; exact h
+  · right; rw [Set.mem_singleton_iff]; exact h
+
 /-- The Marshall sign is real: its complex conjugate is itself. Each
 factor `(-1)^k` is real, so the star/conjugation acts as identity on
 the product. -/
