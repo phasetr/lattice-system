@@ -586,4 +586,20 @@ theorem magEigenvalueS_const_last :
   simp [Fin.val_last]
   ring
 
+omit [DecidableEq Λ] in
+/-- `magEigenvalueS_re` at the all-zero config: `(|Λ| · N : ℝ)/2`. -/
+theorem magEigenvalueS_re_const_zero :
+    (magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1)))).re =
+      (Fintype.card Λ : ℝ) * (N : ℝ) / 2 := by
+  rw [magEigenvalueS_const_zero]
+  simp
+
+omit [DecidableEq Λ] in
+/-- `magEigenvalueS_re` at the all-`Fin.last N` config: `-((|Λ| · N : ℝ)/2)`. -/
+theorem magEigenvalueS_re_const_last :
+    (magEigenvalueS (fun _ : Λ => (Fin.last N : Fin (N + 1)))).re =
+      -((Fintype.card Λ : ℝ) * (N : ℝ) / 2) := by
+  rw [magEigenvalueS_const_last]
+  simp
+
 end LatticeSystem.Quantum
