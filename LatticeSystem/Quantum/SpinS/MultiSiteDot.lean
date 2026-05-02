@@ -107,6 +107,14 @@ theorem spinSDot_swap {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
     spinSDot x y N = spinSDot y x N :=
   spinSDot_comm x y N
 
+/-- The two-site spin-`S` dot product is Hermitian (`Matrix.IsHermitian`)
+specifically: `(spinSDot x y N).IsHermitian`. Restated form of β-3g
+for direct use. -/
+theorem spinSDot_isHermitian_restated {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (x y : Λ) (N : ℕ) :
+    (spinSDot x y N : ManyBodyOpS Λ N).IsHermitian :=
+  spinSDot_isHermitian x y N
+
 /-- **Raising/lowering decomposition** of the two-site spin-`S` dot
 product (Tasaki §2.2 eq. (2.2.16) for arbitrary spin):
 
