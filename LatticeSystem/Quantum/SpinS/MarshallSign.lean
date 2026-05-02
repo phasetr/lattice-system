@@ -252,4 +252,11 @@ theorem marshallDressedBasisS_ne_zero [DecidableEq V]
   rw [marshallDressedBasisS_self] at h0
   exact marshallSignS_ne_zero A σ h0
 
+/-- The Marshall-dressed basis vector at its own configuration has
+norm 1: `‖marshallDressedBasisS A σ σ‖ = 1`. -/
+theorem marshallDressedBasisS_self_norm [DecidableEq V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    ‖marshallDressedBasisS A σ σ‖ = 1 := by
+  rw [marshallDressedBasisS_self, marshallSignS_norm]
+
 end LatticeSystem.Quantum
