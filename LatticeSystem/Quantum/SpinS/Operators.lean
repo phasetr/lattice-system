@@ -328,6 +328,12 @@ theorem spinSOp3_mul_spinSOp3_im_zero (N : ℕ)
   rw [spinSOp3_apply_im_zero, spinSOp3_apply_im_zero]
   ring
 
+/-- `(spinSOp3 N k k).re = N/2 - k.val`. -/
+theorem spinSOp3_apply_diag_re (N : ℕ) (k : Fin (N + 1)) :
+    (spinSOp3 N k k).re = (N : ℝ) / 2 - (k.val : ℝ) := by
+  rw [spinSOp3_apply_diag]
+  simp
+
 /-- Each entry of `Ŝ^{(3)}` equals its own real-part embedding. -/
 theorem spinSOp3_apply_eq_ofReal (N : ℕ) (i j : Fin (N + 1)) :
     spinSOp3 N i j = ((spinSOp3 N i j).re : ℂ) := by
