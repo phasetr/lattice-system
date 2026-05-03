@@ -5863,6 +5863,11 @@ $\langle 1| c c^\dagger |1\rangle = 0$.
 $n + c\,c^\dagger = 1$, the resolution of identity in the
 occupation basis.
 
+\textbf{$c\,c^\dagger$ idempotent (PR~\#974)}: the new file
+\texttt{Fermion/CCDaggerIdempotent.lean} shows
+$(c\,c^\dagger)^2 = c\,c^\dagger$. From $c\,c^\dagger = 1 - n$
+and $n^2 = n$: $(1-n)^2 = 1 - 2n + n^2 = 1 - n$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
