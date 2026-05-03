@@ -765,4 +765,89 @@ theorem totalSpinSSquared_mulVec_totalSpinSOpPlus_pow_allAlignedStateS_last
     totalSpinSSquared_mulVec_allAlignedStateS_last_eigenvalue,
     Matrix.mulVec_smul]
 
+/-! ## Multi-site Cartan relations `[Ŝ^z_{tot}, Ŝ^±_{tot}] = ±Ŝ^±_{tot}`
+
+These are the multi-site lift of the single-site Cartan relations
+`[Ŝ^z, Ŝ^±] = ±Ŝ^±` (`spinSOp3_commutator_spinSOp{Plus,Minus}` in
+`SpinS/Algebra.lean`). They are the operator-level statement that
+`Ŝ^+_{tot}` (resp. `Ŝ^-_{tot}`) shifts the magnetic quantum number
+by `+1` (resp. `−1`).
+
+These relations are the operator-algebraic input to the
+magnetic-quantum-number labelling along the iterated ladder
+`(Ŝ^±_{tot})^k`, which identifies the iterated states with the
+`m_z`-basis of the `J_{tot} = |V|·S` irreducible SU(2)
+representation.
+-/
+
+/-- Multi-site Cartan relation:
+`[Ŝ^z_{tot}, Ŝ^-_{tot}] = -Ŝ^-_{tot}`.
+
+Proof: lift the single-site Cartan
+`[Ŝ^z, Ŝ^-] = -Ŝ^-` (spinSOp3_commutator_spinSOpMinus) to multi-site
+via `onSiteS_commutator_totalOnSiteS` (off-site terms vanish, on-site
+terms collapse to single-site commutators) summed over `x : V`. -/
+theorem totalSpinSOp3_commutator_totalSpinSOpMinus :
+    (totalSpinSOp3 V N : ManyBodyOpS V N) * totalSpinSOpMinus V N -
+      totalSpinSOpMinus V N * totalSpinSOp3 V N =
+      -totalSpinSOpMinus V N := by
+  unfold totalSpinSOp3 totalSpinSOpMinus
+  -- LHS = (Σ_x onSiteS x Ŝ^z) * (Σ_y onSiteS y Ŝ^-) -
+  --       (Σ_y onSiteS y Ŝ^-) * (Σ_x onSiteS x Ŝ^z)
+  -- Distribute outer sums; for each fixed x:
+  --   onSiteS x Ŝ^z * (Σ_y onSiteS y Ŝ^-) - (Σ_y onSiteS y Ŝ^-) * onSiteS x Ŝ^z
+  --   = onSiteS x [Ŝ^z, Ŝ^-]   (by onSiteS_commutator_totalOnSiteS)
+  --   = onSiteS x (-Ŝ^-)
+  --   = -onSiteS x Ŝ^-.
+  -- Summing over x gives -Σ_x onSiteS x Ŝ^- = -Ŝ^-_{tot}.
+  rw [Finset.sum_mul]
+  rw [show ((∑ x : V, onSiteS x (spinSOp3 N) * (∑ y : V, onSiteS y (spinSOpMinus N)) :
+            ManyBodyOpS V N) -
+          (∑ y : V, onSiteS y (spinSOpMinus N)) *
+            (∑ x : V, onSiteS x (spinSOp3 N))) =
+        ∑ x : V, ((onSiteS x (spinSOp3 N) : ManyBodyOpS V N) *
+            (∑ y : V, onSiteS y (spinSOpMinus N)) -
+          (∑ y : V, onSiteS y (spinSOpMinus N)) *
+            onSiteS x (spinSOp3 N)) from by
+    rw [Finset.mul_sum]
+    rw [← Finset.sum_sub_distrib]]
+  rw [show (∑ x : V, ((onSiteS x (spinSOp3 N) : ManyBodyOpS V N) *
+            (∑ y : V, onSiteS y (spinSOpMinus N)) -
+          (∑ y : V, onSiteS y (spinSOpMinus N)) *
+            onSiteS x (spinSOp3 N))) =
+        ∑ x : V, (onSiteS x (-spinSOpMinus N) : ManyBodyOpS V N) from by
+    refine Finset.sum_congr rfl (fun x _ => ?_)
+    rw [onSiteS_commutator_totalOnSiteS x (spinSOp3 N) (spinSOpMinus N),
+      spinSOp3_commutator_spinSOpMinus]]
+  rw [show (∑ x : V, (onSiteS x (-spinSOpMinus N) : ManyBodyOpS V N)) =
+        -∑ x : V, (onSiteS x (spinSOpMinus N) : ManyBodyOpS V N) from by
+    rw [← Finset.sum_neg_distrib]
+    refine Finset.sum_congr rfl (fun x _ => ?_)
+    rw [show (-spinSOpMinus N : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) =
+        (-1 : ℂ) • spinSOpMinus N from by rw [neg_one_smul]]
+    rw [onSiteS_smul, neg_one_smul]]
+
+/-- Multi-site Cartan relation:
+`[Ŝ^z_{tot}, Ŝ^+_{tot}] = +Ŝ^+_{tot}`. Symmetric proof via
+`spinSOp3_commutator_spinSOpPlus`. -/
+theorem totalSpinSOp3_commutator_totalSpinSOpPlus :
+    (totalSpinSOp3 V N : ManyBodyOpS V N) * totalSpinSOpPlus V N -
+      totalSpinSOpPlus V N * totalSpinSOp3 V N =
+      totalSpinSOpPlus V N := by
+  unfold totalSpinSOp3 totalSpinSOpPlus
+  rw [Finset.sum_mul]
+  rw [show ((∑ x : V, onSiteS x (spinSOp3 N) * (∑ y : V, onSiteS y (spinSOpPlus N)) :
+            ManyBodyOpS V N) -
+          (∑ y : V, onSiteS y (spinSOpPlus N)) *
+            (∑ x : V, onSiteS x (spinSOp3 N))) =
+        ∑ x : V, ((onSiteS x (spinSOp3 N) : ManyBodyOpS V N) *
+            (∑ y : V, onSiteS y (spinSOpPlus N)) -
+          (∑ y : V, onSiteS y (spinSOpPlus N)) *
+            onSiteS x (spinSOp3 N)) from by
+    rw [Finset.mul_sum]
+    rw [← Finset.sum_sub_distrib]]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [onSiteS_commutator_totalOnSiteS x (spinSOp3 N) (spinSOpPlus N),
+    spinSOp3_commutator_spinSOpPlus]
+
 end LatticeSystem.Quantum
