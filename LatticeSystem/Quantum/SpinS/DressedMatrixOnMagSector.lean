@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.ShiftedDressedMatrix
 import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.RaiseLowerMatrixPow
+import LatticeSystem.Math.PerronFrobeniusMain
 import Mathlib.LinearAlgebra.Matrix.Irreducible.Defs
 
 /-!
@@ -197,5 +198,35 @@ theorem isIrreducible_shiftedDressedSReMatrixOnMagSector
         hJ_nn hJ_sym hJ_bipartite (fun σ => le_of_lt (hc_strict σ))
         h_intermediate (Ne.symm hne)
     exact ⟨k, hk_pos, hpos⟩
+
+/-- **Perron–Frobenius for the spin-S dressed Heisenberg matrix**:
+under the standard Marshall hypotheses + strict shift dominance +
+intermediate-existence, the sector-restricted shifted dressed matrix
+admits a Perron eigenvector: there exist a positive eigenvalue `r > 0`
+and a strictly positive eigenvector `v > 0` (componentwise) with
+
+    `(shiftedDressedSReMatrixOnMagSector A J N c M).mulVec v = r • v`.
+
+Direct corollary of `Matrix.IsIrreducible` (#846) +
+`exists_positive_eigenvector_of_irreducible` from the project's
+Perron–Frobenius infrastructure. -/
+theorem exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N) :
+    ∃ (r : ℝ) (v : magConfigS V N M → ℝ),
+      0 < r ∧ (∀ σ, 0 < v σ) ∧
+      (shiftedDressedSReMatrixOnMagSector A J N c M).mulVec v = r • v :=
+  LatticeSystem.Math.PerronFrobeniusMain.exists_positive_eigenvector_of_irreducible
+    (isIrreducible_shiftedDressedSReMatrixOnMagSector A N c hJ_real hJ_pos
+      hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate)
 
 end LatticeSystem.Quantum
