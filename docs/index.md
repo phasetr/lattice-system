@@ -1002,6 +1002,15 @@ Issue #412; assembled in PRs #875–#879. All theorems live in
 | `totalSpinSSquared_apply_diag_allAlignedConfigS_zero` | explicit Casimir diagonal value `|V|·N(N+2)/4 + (|V|²−|V|)·N²/4` (PR #878) |
 | `totalSpinSSquared_mulVec_allAlignedStateS_zero_eigenvalue` | **`(Ŝ_tot)² · |σ_⊤⟩ = (|V|·N/2)·(|V|·N/2 + 1) · |σ_⊤⟩`** — operator-level form of "all-up is the highest-weight vector of the J_tot = |V|·S irreducible SU(2) representation" (PR #878) |
 | `totalSpinSSquared_mulVec_allAlignedStateS_last` / `_apply_diag_` / `_eigenvalue` | symmetric lowest-weight Casimir eigenvalue (same value) (PR #879) |
+| `heisenbergHamiltonianS_commute_totalSpinSOp1` / `_Op2` / `_OpPlus` / `_OpMinus` | `Commute`-form conversions: H commutes with each axis-total operator (PR #881) |
+| `heisenbergHamiltonianS_commute_totalSpinSOpMinus_pow` / `_Plus_pow` | iterated power Commute by induction (PR #881) |
+| `heisenbergHamiltonianS_mulVec_totalSpinSOpMinus_pow_allAlignedStateS_zero` | for any k, `(Ŝ^-_tot)^k · |σ_⊤⟩` is a Heisenberg eigenvector at the same eigenvalue as `|σ_⊤⟩` (PR #881) |
+| `heisenbergHamiltonianS_mulVec_totalSpinSOpPlus_pow_allAlignedStateS_last` | symmetric for `Ŝ^+_tot` on all-down (PR #881) |
+| `totalSpinSSquared_commute_totalSpinSOp1` / `_Op2` / `_OpPlus` / `_OpMinus` / `_OpMinus_pow` / `_OpPlus_pow` | Casimir Commute-form analogues (PR #882) |
+| `totalSpinSSquared_mulVec_totalSpinSOpMinus_pow_allAlignedStateS_zero` | for any k, `(Ŝ^-_tot)^k · |σ_⊤⟩` preserves the Casimir eigenvalue `(|V|·N/2)·(|V|·N/2+1)` (PR #882) |
+| `totalSpinSSquared_mulVec_totalSpinSOpPlus_pow_allAlignedStateS_last` | symmetric (PR #882) |
+| `totalSpinSOp3_commutator_totalSpinSOpMinus` | multi-site Cartan: `[Ŝ^z_tot, Ŝ^-_tot] = -Ŝ^-_tot` (PR #883) |
+| `totalSpinSOp3_commutator_totalSpinSOpPlus` | multi-site Cartan: `[Ŝ^z_tot, Ŝ^+_tot] = +Ŝ^+_tot` (PR #883) |
 
 References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.4 (pp. 30–37, spin-1/2 case).
