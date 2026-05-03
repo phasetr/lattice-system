@@ -5617,6 +5617,15 @@ combines \texttt{spinSDot\_self} ($\hat{S}_x \cdot \hat{S}_x =
 $\Phi$, independent of state — the universal single-site Casimir
 identity. Foundation for Tasaki Problem 2.5.c (γ-7).
 
+\textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
+(PRs~\#922 + \#923)}: the new file
+\texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
+\texttt{spinSOp\{Plus, Minus, 1, 2, 3\} 1 = spinHalfOp\{Plus, Minus, 1, 2, 3\}}
+by entrywise \texttt{ext + fin\_cases} on $\textsf{Fin}\,2$. At
+$N = 1$ ($S = 1/2$), each generic spin-`S` operator reduces to the
+corresponding half-Pauli matrix, providing a direct bridge between
+the generic and spin-`1/2` formalisms.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
