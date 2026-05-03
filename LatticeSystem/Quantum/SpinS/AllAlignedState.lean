@@ -675,4 +675,94 @@ theorem heisenbergHamiltonianS_mulVec_totalSpinSOpPlus_pow_allAlignedStateS_last
     heisenbergHamiltonianS_mulVec_allAlignedStateS_last,
     Matrix.mulVec_smul]
 
+/-! ## Casimir-eigenvalue preservation along the iterated ladder
+
+The Casimir `(Ŝ_tot)²` commutes with each `Ŝ^{(α)}_tot` (and hence
+with `Ŝ^±_tot`), so iterated `(Ŝ^-_tot)^k` applied to the highest-
+weight all-up state preserves the Casimir eigenvalue
+`(|V|·N/2)·(|V|·N/2 + 1)`. Symmetric for `(Ŝ^+_tot)^k` on all-down.
+-/
+
+/-- The total Casimir `(Ŝ_tot)²` commutes with `Ŝ^{(1)}_tot`. -/
+theorem totalSpinSSquared_commute_totalSpinSOp1 :
+    Commute (totalSpinSSquared V N) (totalSpinSOp1 V N) := by
+  unfold Commute SemiconjBy
+  exact sub_eq_zero.mp (totalSpinSSquared_commutator_totalSpinSOp1 V N)
+
+/-- The total Casimir `(Ŝ_tot)²` commutes with `Ŝ^{(2)}_tot`. -/
+theorem totalSpinSSquared_commute_totalSpinSOp2 :
+    Commute (totalSpinSSquared V N) (totalSpinSOp2 V N) := by
+  unfold Commute SemiconjBy
+  exact sub_eq_zero.mp (totalSpinSSquared_commutator_totalSpinSOp2 V N)
+
+/-- The total Casimir `(Ŝ_tot)²` commutes with `Ŝ^+_tot`. -/
+theorem totalSpinSSquared_commute_totalSpinSOpPlus :
+    Commute (totalSpinSSquared V N) (totalSpinSOpPlus V N) := by
+  rw [totalSpinSOpPlus_eq_add]
+  exact (totalSpinSSquared_commute_totalSpinSOp1).add_right
+    ((totalSpinSSquared_commute_totalSpinSOp2).smul_right Complex.I)
+
+/-- The total Casimir `(Ŝ_tot)²` commutes with `Ŝ^-_tot`. -/
+theorem totalSpinSSquared_commute_totalSpinSOpMinus :
+    Commute (totalSpinSSquared V N) (totalSpinSOpMinus V N) := by
+  rw [totalSpinSOpMinus_eq_sub]
+  exact (totalSpinSSquared_commute_totalSpinSOp1).sub_right
+    ((totalSpinSSquared_commute_totalSpinSOp2).smul_right Complex.I)
+
+/-- The total Casimir commutes with `(Ŝ^-_tot)^k` for any `k : ℕ`. -/
+theorem totalSpinSSquared_commute_totalSpinSOpMinus_pow (k : ℕ) :
+    Commute (totalSpinSSquared V N) ((totalSpinSOpMinus V N) ^ k) := by
+  induction k with
+  | zero => simp [Commute, SemiconjBy]
+  | succ k ih =>
+    rw [pow_succ]
+    exact ih.mul_right totalSpinSSquared_commute_totalSpinSOpMinus
+
+/-- The total Casimir commutes with `(Ŝ^+_tot)^k` for any `k : ℕ`. -/
+theorem totalSpinSSquared_commute_totalSpinSOpPlus_pow (k : ℕ) :
+    Commute (totalSpinSSquared V N) ((totalSpinSOpPlus V N) ^ k) := by
+  induction k with
+  | zero => simp [Commute, SemiconjBy]
+  | succ k ih =>
+    rw [pow_succ]
+    exact ih.mul_right totalSpinSSquared_commute_totalSpinSOpPlus
+
+/-- **Casimir eigenvalue preservation along the lowering ladder**
+from the all-up state: for any `k : ℕ`, the iterated lowering
+`(Ŝ^-_tot)^k · |σ_⊤⟩` is a `(Ŝ_tot)²`-eigenvector with the same
+eigenvalue `(|V|·N/2)·(|V|·N/2 + 1)`. -/
+theorem totalSpinSSquared_mulVec_totalSpinSOpMinus_pow_allAlignedStateS_zero
+    [Nonempty V] (k : ℕ) :
+    (totalSpinSSquared V N).mulVec
+      (((totalSpinSOpMinus V N) ^ k).mulVec
+        (allAlignedStateS V N (0 : Fin (N + 1)))) =
+      ((Fintype.card V : ℂ) * (N : ℂ) / 2 *
+        ((Fintype.card V : ℂ) * (N : ℂ) / 2 + 1)) •
+        ((totalSpinSOpMinus V N) ^ k).mulVec
+          (allAlignedStateS V N (0 : Fin (N + 1))) := by
+  have hcomm : totalSpinSSquared V N * ((totalSpinSOpMinus V N) ^ k) =
+      ((totalSpinSOpMinus V N) ^ k) * totalSpinSSquared V N :=
+    totalSpinSSquared_commute_totalSpinSOpMinus_pow k
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec,
+    totalSpinSSquared_mulVec_allAlignedStateS_zero_eigenvalue,
+    Matrix.mulVec_smul]
+
+/-- **Casimir eigenvalue preservation along the raising ladder**
+from the all-down state. -/
+theorem totalSpinSSquared_mulVec_totalSpinSOpPlus_pow_allAlignedStateS_last
+    [Nonempty V] (k : ℕ) :
+    (totalSpinSSquared V N).mulVec
+      (((totalSpinSOpPlus V N) ^ k).mulVec
+        (allAlignedStateS V N (Fin.last N))) =
+      ((Fintype.card V : ℂ) * (N : ℂ) / 2 *
+        ((Fintype.card V : ℂ) * (N : ℂ) / 2 + 1)) •
+        ((totalSpinSOpPlus V N) ^ k).mulVec
+          (allAlignedStateS V N (Fin.last N)) := by
+  have hcomm : totalSpinSSquared V N * ((totalSpinSOpPlus V N) ^ k) =
+      ((totalSpinSOpPlus V N) ^ k) * totalSpinSSquared V N :=
+    totalSpinSSquared_commute_totalSpinSOpPlus_pow k
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec,
+    totalSpinSSquared_mulVec_allAlignedStateS_last_eigenvalue,
+    Matrix.mulVec_smul]
+
 end LatticeSystem.Quantum
