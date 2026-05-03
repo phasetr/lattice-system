@@ -703,4 +703,20 @@ theorem heisenbergHamiltonianS_apply_eq_zero_of_mag_ne
   · exact (h (sub_eq_zero.mp hmag).symm).elim
   · exact hH
 
+/-! ## Real-valued Heisenberg matrix (for real coupling) -/
+
+/-- The real-part of the Heisenberg Hamiltonian as a real-valued
+matrix on the multi-site Hilbert space. For real-coupled `J`, this
+matrix completely determines the Hermitian Hamiltonian. -/
+noncomputable def heisenbergHamiltonianSReMatrix
+    (J : Λ → Λ → ℂ) (N : ℕ) :
+    Matrix (Λ → Fin (N + 1)) (Λ → Fin (N + 1)) ℝ :=
+  fun σ τ => ((heisenbergHamiltonianS J N) σ τ).re
+
+/-- Component-wise unfolding of `heisenbergHamiltonianSReMatrix`. -/
+theorem heisenbergHamiltonianSReMatrix_apply
+    (J : Λ → Λ → ℂ) (N : ℕ) (σ τ : Λ → Fin (N + 1)) :
+    heisenbergHamiltonianSReMatrix J N σ τ =
+      ((heisenbergHamiltonianS J N) σ τ).re := rfl
+
 end LatticeSystem.Quantum
