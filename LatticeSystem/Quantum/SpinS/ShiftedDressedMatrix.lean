@@ -196,6 +196,18 @@ theorem exists_matrixPow_pos_of_raiseLowerReachableS_bipartite
       hJ_real hJ_pos hJ_sym hstep
   · exact hreach
 
+/-- The shifted dressed matrix vanishes between configurations of
+different magnetization (just like the dressed matrix itself, since
+the shift `c·1` only affects the diagonal). -/
+theorem shiftedDressedSReMatrix_apply_eq_zero_of_magSumS_ne
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ)
+    {σ' σ : V → Fin (N + 1)} (h : magSumS σ ≠ magSumS σ') :
+    shiftedDressedSReMatrix A J N c σ' σ = 0 := by
+  have hne : σ' ≠ σ := fun heq => h (heq ▸ rfl)
+  rw [shiftedDressedSReMatrix_apply_off_diag A J N c hne]
+  rw [dressedHeisenbergSReMatrix_apply_eq_zero_of_magSumS_ne A J N h]
+  ring
+
 /-- **Strictly positive matrix-power** for distinct configurations. For
 σ ≠ σ' raise/lower-reachable, the matrix-power positivity holds at
 some `k ≥ 1` (excluding the trivial `k = 0` reflexive case which
