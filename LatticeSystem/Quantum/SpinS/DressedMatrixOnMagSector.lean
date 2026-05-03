@@ -817,4 +817,98 @@ theorem marshallLiebMattis_spinS_heisenbergSector_groundState
     A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
     hmul hsign_v_pos hw hw_pos
 
+/-! ## Eigenvalue uniqueness (positive eigenvectors share the same eigenvalue) -/
+
+/-- The dressed Heisenberg sector matrix is symmetric (lifted from the
+symmetry of the full dressed Heisenberg matrix via `IsSymm.submatrix`). -/
+theorem dressedHeisenbergSReMatrixOnMagSector_isSymm
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (M : ℕ)
+    (hreal : ∀ x y, star (J x y) = J x y) :
+    (dressedHeisenbergSReMatrixOnMagSector A J N M).IsSymm :=
+  (dressedHeisenbergSReMatrix_isSymm A N hreal).submatrix Subtype.val
+
+/-- **Eigenvalue uniqueness for symmetric matrices on positive
+eigenvectors**: for a real symmetric matrix `A` over `ℝ`, two strictly
+positive eigenvectors with eigenvalues `μ` and `ν` must satisfy `μ = ν`.
+
+Proof: by symmetry `⟨v, A w⟩ = ⟨A v, w⟩`, hence `μ ⟨v, w⟩ = ν ⟨v, w⟩`,
+and `⟨v, w⟩ > 0` (positive componentwise sum), so `μ = ν`. -/
+theorem pos_eigenvec_eigenvalue_unique_of_isSymm
+    {n : Type*} [Fintype n] [Nonempty n]
+    {A : Matrix n n ℝ} (hA : A.IsSymm)
+    {μ ν : ℝ} {v w : n → ℝ}
+    (hv : A.mulVec v = μ • v) (hv_pos : ∀ i, 0 < v i)
+    (hw : A.mulVec w = ν • w) (hw_pos : ∀ i, 0 < w i) :
+    μ = ν := by
+  have h_inner_pos : 0 < v ⬝ᵥ w := by
+    refine Finset.sum_pos (fun i _ => mul_pos (hv_pos i) (hw_pos i))
+      Finset.univ_nonempty
+  -- ⟨v, A w⟩ = ν * (v ⬝ᵥ w).
+  have h_right : v ⬝ᵥ A.mulVec w = ν * (v ⬝ᵥ w) := by
+    rw [hw, dotProduct_smul, smul_eq_mul]
+  -- ⟨v, A w⟩ = ⟨A v, w⟩ by symmetry, then = μ * (v ⬝ᵥ w).
+  have hsym : Matrix.vecMul v A = A.mulVec v := by
+    funext i
+    change ∑ j, v j * A j i = ∑ j, A i j * v j
+    refine Finset.sum_congr rfl (fun j _ => ?_)
+    have hAji : A j i = A i j := by
+      have hT : A.transpose = A := hA
+      have h := congrFun (congrFun hT i) j
+      change A j i = A i j at h
+      exact h
+    rw [hAji, mul_comm]
+  have h_left : v ⬝ᵥ A.mulVec w = μ * (v ⬝ᵥ w) := by
+    rw [Matrix.dotProduct_mulVec, hsym, hv, smul_dotProduct, smul_eq_mul]
+  have h_eq : μ * (v ⬝ᵥ w) = ν * (v ⬝ᵥ w) := by
+    rw [← h_left, h_right]
+  exact mul_right_cancel₀ (ne_of_gt h_inner_pos) h_eq
+
+/-- **Eigenvalue uniqueness for the dressed Heisenberg sector matrix**:
+any two strictly positive eigenvectors with eigenvalues `μ₁, μ₂` must
+satisfy `μ₁ = μ₂`. (The dressed sector matrix is symmetric and admits
+positive eigenvectors only at the unique Perron eigenvalue.) -/
+theorem pos_eigenvec_eigenvalue_unique_dressedHeisenbergSReMatrixOnMagSector
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, star (J x y) = J x y)
+    {μ₁ μ₂ : ℝ} {v w : magConfigS V N M → ℝ}
+    (hv : (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v = μ₁ • v)
+    (hv_pos : ∀ σ, 0 < v σ)
+    (hw : (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec w = μ₂ • w)
+    (hw_pos : ∀ σ, 0 < w σ) :
+    μ₁ = μ₂ :=
+  pos_eigenvec_eigenvalue_unique_of_isSymm
+    (dressedHeisenbergSReMatrixOnMagSector_isSymm A N M hJ_real)
+    hv hv_pos hw hw_pos
+
+/-- **Eigenvalue uniqueness for the Heisenberg sector matrix on
+Marshall-positive eigenvectors** (Tasaki §2.5 Theorem 2.2 strengthening):
+any two real eigenvectors with strictly positive Marshall conjugates
+must have the same eigenvalue.
+
+Reduction: by inverse Marshall conjugation (PR #854), the conjugates
+`sign · w_i` are positive eigenvectors of the dressed sector matrix
+with the same eigenvalues as the heis sector eigenvectors. By dressed
+sector eigenvalue uniqueness (this PR) the eigenvalues coincide. -/
+theorem marshallPositive_eigenvec_eigenvalue_unique_heisenbergHamiltonianSReMatrixOnMagSector
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    {μ₁ μ₂ : ℝ} {w₁ w₂ : magConfigS V N M → ℝ}
+    (hw₁ : (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec w₁ = μ₁ • w₁)
+    (hw₁_marshall_pos : ∀ σ, 0 < (marshallSignS A σ.1).re * w₁ σ)
+    (hw₂ : (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec w₂ = μ₂ • w₂)
+    (hw₂_marshall_pos : ∀ σ, 0 < (marshallSignS A σ.1).re * w₂ σ) :
+    μ₁ = μ₂ := by
+  -- Marshall-conjugate both: vᵢ := sign · wᵢ are dressed positive eigenvectors at μᵢ.
+  have hv₁ := dressedHeisenbergSReMatrixOnMagSector_mulVec_of_heis_eigenvec
+    A N hJ_real hw₁
+  have hv₂ := dressedHeisenbergSReMatrixOnMagSector_mulVec_of_heis_eigenvec
+    A N hJ_real hw₂
+  exact pos_eigenvec_eigenvalue_unique_dressedHeisenbergSReMatrixOnMagSector
+    A N hJ_real' hv₁ hw₁_marshall_pos hv₂ hw₂_marshall_pos
+
 end LatticeSystem.Quantum
