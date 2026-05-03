@@ -1075,6 +1075,8 @@ Issue #412; assembled in PRs #875–#879. All theorems live in
 | `allAlignedStateS_last_expectation_heisenbergHamiltonianS_eq_saturated` | clean form of `⟨|σ_⊥⟩, H · |σ_⊥⟩⟩ = saturatedFerromagnetEigenvalueS J N` (combines #943 + #946) (PR #948, file `Quantum/SpinS/SaturatedHeisenbergExpectationClean.lean`) |
 | `saturatedFerromagnetEigenvalueS_uniform` | for uniform `J = 1`, `saturatedFerromagnetEigenvalueS = saturatedFerromagnetCasimirEigenvalueS = m_max(m_max + 1)` (PR #949, file `Quantum/SpinS/SaturatedHeisenbergUniformEigenvalue.lean`) |
 | `saturatedFerromagnetEigenvalueS_explicit` | **explicit form**: `saturatedFerromagnetEigenvalueS J N = ∑_x ∑_y J(x,y) · (if x = y then N(N+2)/4 else (N/2)²)` (PR #951, file `Quantum/SpinS/SaturatedEigenvalueExplicit.lean`) |
+| `explicit_uniform_eq_casimir_eigenvalue` | combinatorial simplification: explicit form at `J = 1` equals `m_max(m_max + 1)` (PR #953, file `Quantum/SpinS/SaturatedExplicitUniformSimp.lean`) |
+| `allAlignedStateS_{zero,last}_expectation_heisenbergHamiltonianS_explicit` | explicit H expectation on saturated states: `⟨|σ_⊤/⊥⟩, H · |σ_⊤/⊥⟩⟩ = ∑_x ∑_y J(x,y) · (if x = y then N(N+2)/4 else (N/2)²)` (PR #954, file `Quantum/SpinS/HExpectationExplicit.lean`) |
 
 References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.4 (pp. 30–37, spin-1/2 case).
