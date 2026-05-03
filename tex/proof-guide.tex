@@ -5585,6 +5585,38 @@ each iterate $v_k = (\hat S^-_{\rm tot})^k\,|\sigma_\top\rangle$ and
 $A\in\{\hat S^z_{\rm tot}, \hat S_{\rm tot}^2, H\}$ with the
 corresponding eigenvalue $\alpha$.
 
+\textbf{basisVecS spans + linearly independent (PR~\#917)}: the new
+file \texttt{Quantum/SpinS/BasisVecSBasis.lean} proves
+\texttt{basisVecS\_span\_eq\_top} (via
+\texttt{fun\_eq\_sum\_smul\_basisVecS}) and
+\texttt{basisVecS\_linearIndependent} (via pointwise evaluation of
+zero-sums). These structural facts identify
+\texttt{basisVecS} as a basis of the multi-site Hilbert space.
+
+\textbf{Multi-site dimension formula (PR~\#918)}: the new file
+\texttt{Quantum/SpinS/MultiSiteFinrank.lean} proves
+\texttt{multiSiteSpinS\_finrank}: $\dim_\mathbb{C} ((V \to
+\textsf{Fin}\,(N+1)) \to \mathbb{C}) = (N+1)^{|V|}$. Direct from
+mathlib's \texttt{Module.finrank\_fintype\_fun\_eq\_card} +
+\texttt{Fintype.card\_fun} + \texttt{Fintype.card\_fin}. The
+standard quantum-mechanical dimension formula $(2S+1)^{|\Lambda|}$.
+
+\textbf{basisSpinS as Module.Basis (PR~\#919)}: the new file
+\texttt{Quantum/SpinS/BasisSpinS.lean} bundles \#917 into a
+\texttt{Module.Basis (V $\to$ Fin (N+1)) $\mathbb{C}$
+((V $\to$ Fin (N+1)) $\to$ $\mathbb{C}$)} via
+\texttt{Module.Basis.mk}, with the apply equality
+\texttt{basisSpinS V N $\sigma$ = basisVecS $\sigma$}.
+
+\textbf{Universal single-site Casimir expectation (PR~\#920)}: the
+new file \texttt{Quantum/SpinS/SingleSiteCasimirExpectation.lean}
+combines \texttt{spinSDot\_self} ($\hat{S}_x \cdot \hat{S}_x =
+(N(N+2)/4)\,\mathbf{1}$) with \texttt{dotProduct\_smul} to give
+\texttt{spinSDot\_self\_expectation\_normalized}: $\langle\Phi,
+\hat{S}_x \cdot \hat{S}_x\,\Phi\rangle = S(S+1)$ for any normalized
+$\Phi$, independent of state — the universal single-site Casimir
+identity. Foundation for Tasaki Problem 2.5.c (γ-7).
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
