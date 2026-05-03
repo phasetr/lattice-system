@@ -5845,6 +5845,14 @@ $(c\cdot c^\dagger) |0\rangle = |0\rangle$ and
 $(c\cdot c^\dagger) |1\rangle = 0$, the vacuum/occupied eigenstate
 identifications.
 
+\textbf{Vacuum/occupied orthonormality (PR~\#968)}: the new file
+\texttt{Fermion/StatesOrthonormal.lean} computes the standard
+orthonormality of $|0\rangle, |1\rangle$ entrywise.
+
+\textbf{Number expectations (PR~\#969)}: the new file
+\texttt{Fermion/NumberExpectations.lean} gives $\langle 0| n |0\rangle = 0$
+and $\langle 1| n |1\rangle = 1$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
