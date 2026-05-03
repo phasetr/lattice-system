@@ -5264,9 +5264,60 @@ with ladder commutation and iterated-ladder eigenvalue preservation:
   \texttt{totalSpinSOp3\_commutator\_totalSpinSOpMinus} and
   \texttt{...\_OpPlus}: $[\hat S^z_{\rm tot}, \hat S^\pm_{\rm tot}] =
   \pm \hat S^\pm_{\rm tot}$ (\#883), the operator-algebraic input to
-  the magnetic-quantum-number labelling along the ladder (deferred
-  follow-up).
+  the magnetic-quantum-number labelling along the ladder.
 \end{itemize}
+
+\textbf{Magnetic-quantum-number labelling along the ladder
+(PRs~\#886--\#887)}: with the multi-site Cartan in hand, the
+unnormalised iterates $(\hat S^\mp_{\rm tot})^k\,|\sigma_\top\rangle$
+and $(\hat S^\pm_{\rm tot})^k\,|\sigma_\bot\rangle$ are simultaneous
+$\hat S^z_{\rm tot}$-eigenvectors with eigenvalue $m_{\max}\mp k$ resp.
+$-m_{\max}\pm k$, where $m_{\max} = |\Lambda|\cdot N/2$.
+\begin{itemize}
+\item Single-step shifts on the all-aligned states
+  \texttt{totalSpinSOp3\_mulVec\_totalSpinSOpMinus\_mulVec\_allAlignedStateS\_zero}
+  and \texttt{...\_OpPlus\_mulVec\_allAlignedStateS\_last}~(\#886):
+  the once-lowered (resp. once-raised) all-up (resp. all-down)
+  state is an $\hat S^z_{\rm tot}$ eigenvector at $m_{\max}-1$
+  (resp. $-m_{\max}+1$).
+\item Generic single-step shift on \emph{any} $\hat S^z_{\rm tot}$
+  eigenvector
+  \texttt{totalSpinSOp3\_mulVec\_totalSpinSOpMinus\_mulVec\_eigenvec}
+  and \texttt{...\_OpPlus\_mulVec\_eigenvec}~(\#887): if
+  $\hat S^z_{\rm tot}\psi = \lambda\psi$ then
+  $\hat S^z_{\rm tot}(\hat S^\mp_{\rm tot}\psi) = (\lambda\mp 1)
+   (\hat S^\mp_{\rm tot}\psi)$. Proof: rearrange
+  $\hat S^z_{\rm tot}\hat S^\mp_{\rm tot} = \hat S^\mp_{\rm tot}
+   \hat S^z_{\rm tot}\mp\hat S^\mp_{\rm tot}$ via
+  \texttt{sub\_eq\_iff\_eq\_add} on the multi-site Cartan, lift to
+  \texttt{mulVec}, substitute $\psi$ as an eigenvector.
+\item Iterated form
+  \texttt{totalSpinSOp3\_mulVec\_totalSpinSOpMinus\_pow\_allAlignedStateS\_zero}
+  and \texttt{...\_OpPlus\_pow\_allAlignedStateS\_last}~(\#887):
+  $\hat S^z_{\rm tot}\,(\hat S^\mp_{\rm tot})^k|\sigma_{\top/\bot}\rangle
+   = (\pm m_{\max}\mp k)\,(\hat S^\mp_{\rm tot})^k
+     |\sigma_{\top/\bot}\rangle$. Proof: induction on $k$ at the
+  \emph{eigenvector} level, applying the generic single-step shift
+  to the eigenvector supplied by the IH. This bypasses the
+  technically delicate operator-level iterated Cartan
+  $\hat S^z_{\rm tot}\,(\hat S^\mp_{\rm tot})^k =
+   (\hat S^\mp_{\rm tot})^k\,\hat S^z_{\rm tot} \mp
+   k\,(\hat S^\mp_{\rm tot})^k$.
+\end{itemize}
+
+\textbf{Extremal magnetization sectors are 1-dimensional
+(PR~\#885)}: the combinatorial counterpart of the uniqueness of the
+highest- and lowest-weight states of the $J_{\rm tot}=|\Lambda|\cdot S$
+irreducible SU(2) representation. In the file
+\texttt{Quantum/SpinS/MagConfigExtremalCardinality.lean} the
+$M=0$ (resp. $M=|V|\cdot N$) magnetization sector subtype
+\texttt{magConfigS V N M} is shown to contain exactly the
+all-up (resp. all-down) configuration, hence
+\texttt{Fintype.card (magConfigS V N 0) = 1} via
+\texttt{Fintype.card\_eq\_one\_iff} and the
+\texttt{magSumS\_pos\_of\_ne\_allAlignedConfigS\_zero}~/
+\texttt{magSumS\_lt\_card\_mul\_of\_ne\_allAlignedConfigS\_last}
+strict bounds; \texttt{Nonempty} instances follow.
 
 \subsection*{DONE: Tasaki Problem 2.2.c}
 

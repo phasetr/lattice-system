@@ -1011,6 +1011,13 @@ Issue #412; assembled in PRs #875–#879. All theorems live in
 | `totalSpinSSquared_mulVec_totalSpinSOpPlus_pow_allAlignedStateS_last` | symmetric (PR #882) |
 | `totalSpinSOp3_commutator_totalSpinSOpMinus` | multi-site Cartan: `[Ŝ^z_tot, Ŝ^-_tot] = -Ŝ^-_tot` (PR #883) |
 | `totalSpinSOp3_commutator_totalSpinSOpPlus` | multi-site Cartan: `[Ŝ^z_tot, Ŝ^+_tot] = +Ŝ^+_tot` (PR #883) |
+| `magConfigS_zero_eq_allAlignedConfigS` / `magConfigS_card_zero` / `magConfigS_zero_instNonempty` | the `M = 0` magnetization sector contains exactly the all-up configuration `allAlignedConfigS V N 0`; cardinality 1; non-empty (PR #885, file `Quantum/SpinS/MagConfigExtremalCardinality.lean`) |
+| `magConfigS_last_eq_allAlignedConfigS` / `magConfigS_card_last` / `magConfigS_last_instNonempty` | symmetric `M = |V|·N` sector contains exactly the all-down configuration `allAlignedConfigS V N (Fin.last N)`; cardinality 1; non-empty (PR #885) |
+| `totalSpinSOp3_mulVec_totalSpinSOpMinus_mulVec_allAlignedStateS_zero` | single-step magnetic-quantum-number shift: `Ŝ^z_tot · (Ŝ^-_tot · |σ_⊤⟩) = (|V|·N/2 − 1) · (Ŝ^-_tot · |σ_⊤⟩)` — the once-lowered all-up state is an `Ŝ^z_tot` eigenvector with magnetic quantum number `m_max − 1` (PR #886) |
+| `totalSpinSOp3_mulVec_totalSpinSOpPlus_mulVec_allAlignedStateS_last` | symmetric: `Ŝ^z_tot · (Ŝ^+_tot · |σ_⊥⟩) = (−|V|·N/2 + 1) · (Ŝ^+_tot · |σ_⊥⟩)` (PR #886) |
+| `totalSpinSOp3_mulVec_totalSpinSOpMinus_mulVec_eigenvec` / `_OpPlus_mulVec_eigenvec` | generic single-step shift on any `Ŝ^z_tot` eigenvector: `Ŝ^z_tot ψ = λ ψ` ⇒ `Ŝ^z_tot (Ŝ^∓_tot ψ) = (λ ∓ 1) (Ŝ^∓_tot ψ)`. Proven via the multi-site Cartan rearrangement `Ŝ^z_tot · Ŝ^∓_tot = Ŝ^∓_tot · Ŝ^z_tot ∓ Ŝ^∓_tot` lifted to `mulVec` (PR #887) |
+| `totalSpinSOp3_mulVec_totalSpinSOpMinus_pow_allAlignedStateS_zero` | **iterated magnetic-quantum-number labelling** `Ŝ^z_tot · ((Ŝ^-_tot)^k · |σ_⊤⟩) = (|V|·N/2 − k) · ((Ŝ^-_tot)^k · |σ_⊤⟩)` for every `k : ℕ`. Inducts at the eigenvector level using the generic single-step shift `_eigenvec`, bypassing the technically delicate operator-level iterated Cartan (PR #887) |
+| `totalSpinSOp3_mulVec_totalSpinSOpPlus_pow_allAlignedStateS_last` | symmetric for `(Ŝ^+_tot)^k · |σ_⊥⟩` with eigenvalue `−|V|·N/2 + k` (PR #887) |
 
 References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.4 (pp. 30–37, spin-1/2 case).
