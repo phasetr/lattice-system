@@ -129,4 +129,31 @@ theorem exists_matrixPow_pos_of_magConfigS_bipartite
   · exact raiseLowerReachableSMagSector_bipartiteCompleteGraph A
       h_intermediate σ σ'
 
+/-- **Strict positive-length matrix-power positivity** on the sector
+for distinct configurations: for σ ≠ σ' in the same sector, the
+matrix-power is positive at some k ≥ 1 (excluding the trivial k = 0). -/
+theorem exists_matrixPow_pos_length_of_magConfigS_bipartite
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ ≤ c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {σ σ' : magConfigS V N M} (hne : σ ≠ σ') :
+    ∃ k : ℕ, 1 ≤ k ∧
+      0 < (shiftedDressedSReMatrixOnMagSector A J N c M ^ k) σ' σ := by
+  obtain ⟨k, hpos⟩ := exists_matrixPow_pos_of_magConfigS_bipartite A N c
+    hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc h_intermediate σ σ'
+  refine ⟨k, ?_, hpos⟩
+  rcases Nat.eq_zero_or_pos k with hk0 | hkpos
+  · -- k = 0: (M_sec^0) σ' σ = δ σ' σ = 0 (since σ' ≠ σ).
+    subst hk0
+    rw [pow_zero, Matrix.one_apply, if_neg (Ne.symm hne)] at hpos
+    exact (lt_irrefl _ hpos).elim
+  · exact hkpos
+
 end LatticeSystem.Quantum
