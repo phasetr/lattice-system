@@ -5882,6 +5882,15 @@ both products vanish, hence \texttt{Commute n (c $\cdot$ c$^\dagger$)}.
 \texttt{fermionAnnihilation\_conjTranspose} +
 \texttt{fermionCreation\_conjTranspose}.
 
+\textbf{$n\cdot c = 0$ and $c\cdot n = c$ (PR~\#982)}: in the file
+\texttt{Fermion/AnnihilationNumberIdentities.lean}.
+$n\cdot c = (c^\dagger c)\,c = c^\dagger(c\,c) = c^\dagger\cdot 0 = 0$
+via \texttt{fermionAnnihilation\_sq}.
+$c\cdot n = c(c^\dagger c) = (c\,c^\dagger)\,c = (1-n)\,c
+ = c - n\cdot c = c$
+via \texttt{fermionAnticomm\_self} (so $c\,c^\dagger = 1 - n$) and
+the previous identity.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-

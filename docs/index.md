@@ -1125,6 +1125,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionNumber_mul_fermionAnnihilation_mul_fermionCreation_eq_zero` / `fermionAnnihilation_mul_fermionCreation_mul_fermionNumber_eq_zero` | `n · (c · c†) = 0`; `(c · c†) · n = 0` (orthogonal projections) | `Fermion/ProjectionsOrthogonal.lean` (PR #976) |
 | `fermionNumber_commute_fermionAnnihilation_mul_fermionCreation` | `Commute n (c · c†)` (both products zero) | `Fermion/ProjectionsCommute.lean` (PR #978) |
 | `fermionAnnihilation_mul_fermionCreation_isHermitian` | `(c · c†)ᴴ = c · c†` | `Fermion/CCDaggerHermitian.lean` (PR #980) |
+| `fermionNumber_mul_fermionAnnihilation_eq_zero` / `fermionAnnihilation_mul_fermionNumber_eq_fermionAnnihilation` | `n · c = 0`; `c · n = c` | `Fermion/AnnihilationNumberIdentities.lean` (PR #982) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 
