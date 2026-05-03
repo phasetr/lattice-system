@@ -1081,6 +1081,7 @@ Issue #412; assembled in PRs #875–#879. All theorems live in
 | `allAlignedConfigS_eigenvalue_injective` / `allAlignedStateS_linearIndependent` | the family `{|c..c⟩ : c ∈ Fin (N+1)}` is `LinearIndependent ℂ` for `[Nonempty V]` via distinct `Ŝ^z_tot` eigenvalues (PR #957, file `Quantum/SpinS/AllAlignedStateLI.lean`) |
 | `allAlignedStateS_span_finrank` | `Module.finrank ℂ (Submodule.span ℂ (Set.range allAlignedStateS)) = N + 1` for `[Nonempty V]` (PR #959, file `Quantum/SpinS/AllAlignedStateSpan.lean`) |
 | `allAlignedStateS_inner_of_ne` | all-aligned states at distinct constants are orthogonal (PR #960, file `Quantum/SpinS/AllAlignedStateOrthogonal.lean`) |
+| `allAlignedStateS_mem_magSubspaceS` | `|c..c⟩ ∈ magSubspaceS V N (|V|·N/2 − |V|·c.val)` for any `c` (PR #962, file `Quantum/SpinS/AllAlignedStateMagSubspace.lean`) |
 
 References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.4 (pp. 30–37, spin-1/2 case).
@@ -1113,6 +1114,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionAnnihilation_eq_spinSOpPlus_one` | `c = spinSOpPlus 1` (transitive bridge to generic spin-`S` at `N = 1`) | `Fermion/SpinSBridge.lean` (PR #936) |
 | `fermionCreation_eq_spinSOpMinus_one` | `c† = spinSOpMinus 1` | `Fermion/SpinSBridge.lean` (PR #936) |
 | `fermionNumber_eq_half_smul_one_sub_spinSOp3_one` | `n = (1/2) · I − spinSOp3 1` (standard physics identification `n = (I − σ^z)/2` lifted to spin-`S` at `N = 1`) | `Fermion/NumberSpinSBridge.lean` (PR #937) |
+| `fermionAnnihilation_mul_fermionCreation_eq_one_sub_number` | `c · c† = 1 − n` (hole occupation) | `Fermion/AnnihilationCreationIdentity.lean` (PR #963) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 
