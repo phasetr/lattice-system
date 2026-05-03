@@ -158,6 +158,50 @@ theorem magSectorRestrictionLinearMap_comp_magSectorEmbeddingLinearMap (M : ℕ)
   ext Φ τ
   exact congrFun (magSectorRestriction_magSectorEmbedding Φ) τ
 
+/-! ## Characterisation of the image of `magSectorEmbedding`
+
+A full-Hilbert-space vector lies in the image of the magnetization-`M`
+sector embedding iff it is supported on the sector `M`. Together with
+the round-trip identity (`magSectorRestriction_magSectorEmbedding`),
+this gives a clean characterisation of the magnetization-`M` subspace
+of the full space.
+-/
+
+/-- Sufficient condition for membership in the image of
+`magSectorEmbedding`: a vector `f : (V → Fin (N+1)) → ℂ` supported
+entirely on the magnetization-`M` sector lies in the image — explicitly,
+`f = magSectorEmbedding (magSectorRestriction f)`. -/
+theorem magSectorEmbedding_magSectorRestriction_of_supported {M : ℕ}
+    {f : (V → Fin (N + 1)) → ℂ}
+    (hf : ∀ σ, magSumS σ ≠ M → f σ = 0) :
+    magSectorEmbedding (magSectorRestriction (M := M) f) = f := by
+  funext σ
+  by_cases h : magSumS σ = M
+  · exact magSectorEmbedding_magSectorRestriction_apply_of_mem f h
+  · rw [magSectorEmbedding_apply_of_not_mem _ h, hf σ h]
+
+/-- Necessary condition: every vector in the image of
+`magSectorEmbedding` is supported on the sector. -/
+theorem support_of_mem_range_magSectorEmbedding {M : ℕ}
+    {Φ : magConfigS V N M → ℂ}
+    {σ : V → Fin (N + 1)} (h : magSumS σ ≠ M) :
+    magSectorEmbedding Φ σ = 0 :=
+  magSectorEmbedding_apply_of_not_mem Φ h
+
+/-- **Image characterisation**: a vector `f` is in the image of
+`magSectorEmbedding (M := M)` iff `f` is supported on the
+magnetization-`M` sector. -/
+theorem mem_range_magSectorEmbedding_iff_supported {M : ℕ}
+    (f : (V → Fin (N + 1)) → ℂ) :
+    (∃ Φ : magConfigS V N M → ℂ, magSectorEmbedding Φ = f) ↔
+      (∀ σ, magSumS σ ≠ M → f σ = 0) := by
+  constructor
+  · rintro ⟨Φ, rfl⟩ σ h
+    exact magSectorEmbedding_apply_of_not_mem Φ h
+  · intro hf
+    exact ⟨magSectorRestriction f,
+      magSectorEmbedding_magSectorRestriction_of_supported hf⟩
+
 /-! ## Heisenberg matrix element vanishes between different sectors -/
 
 section
