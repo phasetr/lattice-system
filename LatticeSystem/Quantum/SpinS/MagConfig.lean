@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.Magnetization
 import LatticeSystem.Quantum.SpinS.RaiseLower
+import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
 import Mathlib.Combinatorics.SimpleGraph.Basic
 
 /-!
@@ -75,5 +76,44 @@ theorem RaiseLowerReachableSMagSector.trans {G : SimpleGraph V} {M : ℕ}
     (h₂ : RaiseLowerReachableSMagSector G τ ρ) :
     RaiseLowerReachableSMagSector G σ ρ :=
   Relation.ReflTransGen.trans h₁ h₂
+
+omit [DecidableEq V] in
+/-- Tail extension on the subtype. -/
+theorem RaiseLowerReachableSMagSector.tail' {G : SimpleGraph V} {M : ℕ}
+    {σ τ ρ : magConfigS V N M}
+    (h₁ : RaiseLowerReachableSMagSector G σ τ)
+    (h₂ : RaiseLowerStepSMagSector G τ ρ) :
+    RaiseLowerReachableSMagSector G σ ρ :=
+  Relation.ReflTransGen.tail h₁ h₂
+
+/-- Lift `RaiseLowerReachableS` from the full type to the subtype
+`magConfigS V N M`: given the chain endpoints both lie in the same
+sector, the chain itself stays within the sector (by `magSumS`
+preservation along each step). -/
+theorem raiseLowerReachableSMagSector_of_raiseLowerReachableS
+    {G : SimpleGraph V} {M : ℕ} {σ τ : V → Fin (N + 1)}
+    (hσM : magSumS σ = M) (hτM : magSumS τ = M)
+    (hreach : RaiseLowerReachableS G σ τ) :
+    RaiseLowerReachableSMagSector G ⟨σ, hσM⟩ ⟨τ, hτM⟩ := by
+  -- Generalize the target endpoint and its sector-proof.
+  suffices h : ∀ (ρ : V → Fin (N + 1))
+      (hρM : magSumS ρ = M)
+      (_h : RaiseLowerReachableS G σ ρ),
+      RaiseLowerReachableSMagSector G ⟨σ, hσM⟩ ⟨ρ, hρM⟩ from
+    h τ hτM hreach
+  intro ρ hρM hch
+  induction hch with
+  | refl =>
+    -- σ = ρ; the subtypes are equal.
+    convert RaiseLowerReachableSMagSector.refl G ⟨σ, hσM⟩
+  | @tail b c _hσb hbc ih =>
+    -- _hσb : RaiseLowerReachableS G σ b; hbc : RaiseLowerStepS G b c.
+    -- ih : ∀ (hbM : magSumS b = M), RaiseLowerReachableSMagSector G ⟨σ, hσM⟩ ⟨b, hbM⟩.
+    -- Goal: RaiseLowerReachableSMagSector G ⟨σ, hσM⟩ ⟨c, hρM⟩.
+    have hbM : magSumS b = M := by
+      have := magSumS_eq_of_raiseLowerStepS hbc
+      omega
+    apply RaiseLowerReachableSMagSector.tail' (ih hbM)
+    exact hbc
 
 end LatticeSystem.Quantum
