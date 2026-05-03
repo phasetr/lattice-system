@@ -958,27 +958,26 @@ theorem marshallPositive_eigenvec_eigenvalue_unique_heisenbergHamiltonianSReMatr
   exact pos_eigenvec_eigenvalue_unique_dressedHeisenbergSReMatrixOnMagSector
     A N hJ_real' hv₁ hw₁_marshall_pos hv₂ hw₂_marshall_pos
 
-/-- **Tasaki §2.5 Theorem 2.2 (Marshall–Lieb–Mattis), strongest
-ground-state form on the magnetization sector**: bundles existence
-(PR #853), eigenvector uniqueness at the same eigenvalue (PR #854),
-and eigenvalue uniqueness (PR #856) into a single statement of the
-form
+/-- **Tasaki §2.5 Theorem 2.2 ground-state existence on the complex
+Heisenberg sector matrix**: the un-dressed complex Heisenberg
+Hamiltonian, restricted to the magnetization-`M` sector, admits a
+strictly Marshall-positive complex ground-state eigenvector
 
-  ∃ μ < c, ∃ v > 0,
-    heis_sec.mulVec (sign · v) = μ • (sign · v) ∧
-    ∀ {μ'} {w}, heis_sec.mulVec w = μ' • w → (sign · w > 0) →
-      μ' = μ ∧ ∃ r > 0, w = r • (sign · v)
+  `Φ σ := ((sign A σ.1).re * v σ : ℂ)`
 
-The crucial strengthening over PR #855: the uniqueness clause no
-longer requires the comparison eigenvector `w` to be at the SAME `μ`
-— eigenvalue uniqueness for Marshall-positive eigenvectors (PR #856)
-forces `μ' = μ` automatically. -/
-theorem marshallLiebMattis_spinS_heisenbergSector_groundState_full
+(real-valued, equal to a positive function of `σ` times the Marshall
+sign at `σ`) at some real eigenvalue `μ < c`.
+
+Composition of:
+- `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector`
+  (PR #853, real-form existence).
+- `heisenbergHamiltonianSMatrixOnMagSector_mulVec_ofReal`
+  (PR #858, real → complex eigenvector lift). -/
+theorem exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
-    (hJ_real' : ∀ x y, star (J x y) = J x y)
     (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
     (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
     (hJ_sym : ∀ x y, J x y = J y x)
@@ -987,38 +986,15 @@ theorem marshallLiebMattis_spinS_heisenbergSector_groundState_full
     (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
       ∃ z, A z ≠ A x ∧ (τ z).val < N) :
     ∃ (μ : ℝ) (v : magConfigS V N M → ℝ),
-      μ < c ∧
-      (∀ σ, 0 < v σ) ∧
-      (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
-        (fun σ => (marshallSignS A σ.1).re * v σ) =
-        μ • (fun σ => (marshallSignS A σ.1).re * v σ) ∧
-      (∀ {μ' : ℝ} {w : magConfigS V N M → ℝ},
-        (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec w = μ' • w →
-        (∀ σ, 0 < (marshallSignS A σ.1).re * w σ) →
-        μ' = μ ∧ ∃ r : ℝ, 0 < r ∧
-          w = r • (fun σ => (marshallSignS A σ.1).re * v σ)) := by
-  obtain ⟨μ, v, hμ_lt, hv_pos, hmul⟩ :=
+      μ < c ∧ (∀ σ, 0 < v σ) ∧
+      (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec
+        (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) =
+        (μ : ℂ) • (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) := by
+  obtain ⟨μ, v, hμ, hv_pos, hmul⟩ :=
     exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
       (M := M) A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
       h_intermediate
-  refine ⟨μ, v, hμ_lt, hv_pos, hmul, ?_⟩
-  intro μ' w hw hw_marshall_pos
-  -- Marshall-positive `sign · v` is positive (sign² = 1 cancellation).
-  have hsign_v_pos : ∀ σ, 0 < (marshallSignS A σ.1).re *
-      ((marshallSignS A σ.1).re * v σ) := fun σ => by
-    have hsq : (marshallSignS A σ.1).re * (marshallSignS A σ.1).re = 1 :=
-      marshallSignS_re_sq A σ.1
-    rw [← mul_assoc, hsq, one_mul]
-    exact hv_pos σ
-  -- Eigenvalue uniqueness forces μ' = μ.
-  have hμ_eq : μ' = μ :=
-    marshallPositive_eigenvec_eigenvalue_unique_heisenbergHamiltonianSReMatrixOnMagSector
-      A N hJ_real hJ_real' hw hw_marshall_pos hmul hsign_v_pos
-  refine ⟨hμ_eq, ?_⟩
-  -- Substitute μ' = μ, then apply same-eigenvalue uniqueness (PR #854).
-  subst hμ_eq
-  exact marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector
-    A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
-    hmul hsign_v_pos hw hw_marshall_pos
+  exact ⟨μ, v, hμ, hv_pos,
+    heisenbergHamiltonianSMatrixOnMagSector_mulVec_ofReal N hJ_real hmul⟩
 
 end LatticeSystem.Quantum
