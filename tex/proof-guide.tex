@@ -5551,6 +5551,40 @@ $-m_{\max}+k$ (PR \#887 raising side), giving
 $k\leq|V|\cdot N$ and the non-zero scalar identification
 \texttt{totalSpinSOpPlus\_pow\_card\_mul\_N\_allAlignedStateS\_last\_eq\_smul\_zero}.
 
+\textbf{Round-trip identity (PR~\#912)}: the new file
+\texttt{Quantum/SpinS/LadderRoundTrip.lean} composes \#909 (lowering
+reaches $c_1\,|\sigma_\bot\rangle$) with \#910 (raising from
+$|\sigma_\bot\rangle$ reaches $c_2\,|\sigma_\top\rangle$) to give
+\texttt{totalSpinSOpPlus\_pow\_mulVec\_totalSpinSOpMinus\_pow\_allAlignedStateS\_zero\_eq\_smul}:
+the round-trip $(\hat S^+_{\rm tot})^{|V|\cdot N}\,(\hat S^-_{\rm tot})^{|V|\cdot N}\,|\sigma_\top\rangle$
+returns to a non-zero $c_1c_2\cdot|\sigma_\top\rangle$. The
+saturated-ferromagnet ladder closes on itself.
+
+\textbf{Expectation values on all-aligned states (PR~\#913)}: the new
+file \texttt{Quantum/SpinS/AllAlignedStateExpectations.lean} computes
+the inner-product expectation values
+$\langle v, w\rangle := \texttt{dotProduct (star v) w}$ on the
+all-aligned states: norm-squared 1
+(\texttt{basisVecS\_inner\_self} / \texttt{allAlignedStateS\_inner\_self}),
+$\hat S^z_{\rm tot}$ expectation $\pm m_{\max}$, and Casimir
+$\hat S_{\rm tot}^2$ expectation $m_{\max}(m_{\max}+1)$. These are
+the explicit $J = m_{\max}$ quantum numbers.
+
+\textbf{basisVecS orthonormality (PR~\#914)}: the new file
+\texttt{Quantum/SpinS/BasisVecSOrthonormal.lean} extends \#913 with
+the off-diagonal case: distinct configurations $\sigma\neq\tau$
+give orthogonal basis vectors. Bundled in Kronecker form
+\texttt{basisVecS\_inner\_kronecker}.
+
+\textbf{Ladder iterate expectation values (PR~\#915)}: the new file
+\texttt{Quantum/SpinS/IterateExpectations.lean} packages the
+eigenvalue identities (\#881 H, \#882 Casimir, \#887 $\hat S^z$)
+into the inner-product form
+$\langle v_k, A\,v_k\rangle = \alpha\,\langle v_k, v_k\rangle$ for
+each iterate $v_k = (\hat S^-_{\rm tot})^k\,|\sigma_\top\rangle$ and
+$A\in\{\hat S^z_{\rm tot}, \hat S_{\rm tot}^2, H\}$ with the
+corresponding eigenvalue $\alpha$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
