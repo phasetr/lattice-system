@@ -201,6 +201,52 @@ theorem heisenbergHamiltonianS_mulVec_magSectorEmbedding
     change (0 : ℂ) = ((μ : ℂ) • magSectorEmbedding Φ) σ
     rw [Pi.smul_apply, magSectorEmbedding_apply_of_not_mem Φ h, smul_zero]
 
+/-- **Tasaki §2.5 Theorem 2.2 (Marshall–Lieb–Mattis), full-Hilbert-
+space ground-state existence**: the un-dressed quantum Heisenberg
+Hamiltonian on the full multi-spin Hilbert space `(V → Fin (N+1)) → ℂ`
+admits a strictly non-zero eigenvector `Ψ : (V → Fin (N+1)) → ℂ` at
+some real eigenvalue `μ < c`, supported entirely on the magnetization-
+`M` sector and with the Marshall sign structure
+
+  `Ψ σ = ((sign A σ.1).re * v σ : ℂ)` for `σ ∈ sector M`,
+  `Ψ σ = 0` for `σ ∉ sector M`,
+
+with `v > 0` componentwise on the sector.
+
+Composition of:
+- `exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector`
+  (PR #860, complex sector existence).
+- `heisenbergHamiltonianS_mulVec_magSectorEmbedding`
+  (this PR, sector → full lift).
+
+This is the COMPLEX-Hilbert-space form of Tasaki §2.5 Theorem 2.2 on
+the actual quantum Heisenberg Hamiltonian, lifted from the sector
+form (PRs #847–#865). -/
+theorem exists_marshallSign_eigenvector_heisenbergHamiltonianS_full
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [DecidableEq V]
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N) :
+    ∃ (μ : ℝ) (v : magConfigS V N M → ℝ),
+      μ < c ∧ (∀ σ, 0 < v σ) ∧
+      (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) =
+        (μ : ℂ) • magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) := by
+  obtain ⟨μ, v, hμ, hv_pos, hmul⟩ :=
+    exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector
+      (M := M) A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+      h_intermediate
+  exact ⟨μ, v, hμ, hv_pos,
+    heisenbergHamiltonianS_mulVec_magSectorEmbedding J _ hmul⟩
+
 end
 
 end LatticeSystem.Quantum
