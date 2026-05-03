@@ -5821,6 +5821,20 @@ $\langle|c_1..c_1\rangle, |c_2..c_2\rangle\rangle = 0$ for
 $c_1 \neq c_2$ via \texttt{basisVecS\_inner\_of\_ne} (PR \#914) +
 \texttt{allAlignedConfigS\_injective} (PR \#956).
 
+\textbf{All-aligned magnetization subspace membership (PR~\#962)}:
+the new file
+\texttt{Quantum/SpinS/AllAlignedStateMagSubspace.lean} proves
+\texttt{allAlignedStateS\_mem\_magSubspaceS}: for any constant
+$c$, $|c..c\rangle \in \texttt{magSubspaceS}\,V\,N\,(|V|\cdot N/2
+- |V|\cdot c)$. Generalises \#891's extremal cases to general $c$.
+
+\textbf{Fermion identity $c\cdot c^\dagger = 1 - n$ (PR~\#963)}:
+the new file \texttt{Fermion/AnnihilationCreationIdentity.lean}
+proves the standard hole-occupation identity from
+\texttt{fermionAnticomm\_self} ($c\,c^\dagger + c^\dagger\,c = 1$)
+and \texttt{fermionNumber\_eq\_creation\_mul\_annihilation}
+($n = c^\dagger\,c$).
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
