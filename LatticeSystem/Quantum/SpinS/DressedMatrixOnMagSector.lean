@@ -552,4 +552,190 @@ theorem exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSecto
     heisenbergHamiltonianSReMatrixOnMagSector_mulVec_of_dressed_eigenvec
       A N hJ_real hmul⟩
 
+/-! ## Inverse Marshall conjugation and uniqueness on the Heisenberg sector -/
+
+/-- **Inverse Marshall conjugation** (heisenberg → dressed): given an
+eigenvector `w` of the (un-dressed) Heisenberg sector matrix with
+eigenvalue `μ`, the Marshall-conjugated vector `sign · w` is an
+eigenvector of the dressed Heisenberg sector matrix with the same
+eigenvalue `μ`.
+
+Symmetric to `heisenbergHamiltonianSReMatrixOnMagSector_mulVec_of_dressed_eigenvec`,
+using the OTHER direction of the matrix relation
+`dressed = sign · sign · heis`. -/
+theorem dressedHeisenbergSReMatrixOnMagSector_mulVec_of_heis_eigenvec
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) {M : ℕ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    {μ : ℝ} {w : magConfigS V N M → ℝ}
+    (hw : (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec w = μ • w) :
+    (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec
+      (fun σ => (marshallSignS A σ.1).re * w σ) =
+      μ • (fun σ => (marshallSignS A σ.1).re * w σ) := by
+  funext σ
+  have hσ := congrFun hw σ
+  change (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec
+      (fun τ => (marshallSignS A τ.1).re * w τ) σ =
+    μ * ((marshallSignS A σ.1).re * w σ)
+  change ∑ τ, dressedHeisenbergSReMatrixOnMagSector A J N M σ τ *
+      ((marshallSignS A τ.1).re * w τ) =
+    μ * ((marshallSignS A σ.1).re * w σ)
+  have hsum : ∀ τ : magConfigS V N M,
+      dressedHeisenbergSReMatrixOnMagSector A J N M σ τ *
+        ((marshallSignS A τ.1).re * w τ) =
+      (marshallSignS A σ.1).re *
+        (heisenbergHamiltonianSReMatrixOnMagSector J N M σ τ * w τ) := by
+    intro τ
+    rw [dressedHeisenbergSReMatrixOnMagSector_apply,
+      heisenbergHamiltonianSReMatrixOnMagSector_apply,
+      dressedHeisenbergSReMatrix_eq_marshallSign_mul_heisenberg A N hJ_real]
+    have hsq_τ : (marshallSignS A τ.1).re * (marshallSignS A τ.1).re = 1 :=
+      marshallSignS_re_sq A τ.1
+    have key : ((marshallSignS A σ.1).re * (marshallSignS A τ.1).re *
+        heisenbergHamiltonianSReMatrix J N σ.1 τ.1) *
+        ((marshallSignS A τ.1).re * w τ) =
+      (marshallSignS A σ.1).re *
+        (((marshallSignS A τ.1).re * (marshallSignS A τ.1).re) *
+          heisenbergHamiltonianSReMatrix J N σ.1 τ.1 * w τ) := by ring
+    rw [key, hsq_τ, one_mul]
+  rw [Finset.sum_congr rfl (fun τ _ => hsum τ)]
+  rw [← Finset.mul_sum]
+  change (marshallSignS A σ.1).re *
+      (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec w σ =
+    μ * ((marshallSignS A σ.1).re * w σ)
+  rw [hσ]
+  change (marshallSignS A σ.1).re * (μ * w σ) = μ * ((marshallSignS A σ.1).re * w σ)
+  ring
+
+/-- Convert an eigenvector of the dressed matrix to an eigenvector of
+the shifted matrix (with shifted eigenvalue): if `dressed_sec v = μ v`,
+then `shifted_sec v = (c − μ) v`. (Inverse of #849.) -/
+theorem shiftedDressedSReMatrixOnMagSector_mulVec_of_dressed_eigenvec
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) {M : ℕ}
+    {μ : ℝ} {v : magConfigS V N M → ℝ}
+    (hv : (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v = μ • v) :
+    (shiftedDressedSReMatrixOnMagSector A J N c M).mulVec v = (c - μ) • v := by
+  -- shifted = c • 1 - dressed.
+  have hdef := shiftedDressedSReMatrixOnMagSector_eq_smul_sub_dressed A J N c M
+  rw [hdef]
+  -- Goal: (c • 1 - dressed).mulVec v = (c - μ) • v.
+  funext σ
+  rw [Matrix.sub_mulVec]
+  change (c • (1 : Matrix _ _ ℝ)).mulVec v σ -
+      (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v σ =
+    (c - μ) * v σ
+  rw [show ((c : ℝ) • (1 : Matrix _ _ ℝ)).mulVec v =
+      c • (1 : Matrix _ _ ℝ).mulVec v from Matrix.smul_mulVec _ _ _,
+    Matrix.one_mulVec]
+  have hσ := congrFun hv σ
+  change c * v σ - (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v σ =
+    (c - μ) * v σ
+  have : (μ • v) σ = μ * v σ := rfl
+  rw [this] at hσ
+  linarith
+
+/-- **Uniqueness of dressed sector eigenvectors at a given eigenvalue**:
+any two strictly positive eigenvectors of the dressed Heisenberg sector
+matrix with the same eigenvalue `μ` are positive scalar multiples of
+each other.
+
+Reduction to `pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector`
+(#848): convert both `dressed_sec`-eigenvectors to `shifted_sec`-
+eigenvectors at the shifted eigenvalue `c - μ`, then apply PF
+uniqueness on the shifted matrix. -/
+theorem pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {μ : ℝ} {v w : magConfigS V N M → ℝ}
+    (hv : (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v = μ • v)
+    (hv_pos : ∀ σ, 0 < v σ)
+    (hw : (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec w = μ • w)
+    (hw_pos : ∀ σ, 0 < w σ) :
+    ∃ r : ℝ, 0 < r ∧ w = r • v := by
+  -- Convert both to shifted-eigenvectors at (c - μ).
+  have hv' := shiftedDressedSReMatrixOnMagSector_mulVec_of_dressed_eigenvec
+    A J N c hv
+  have hw' := shiftedDressedSReMatrixOnMagSector_mulVec_of_dressed_eigenvec
+    A J N c hw
+  exact pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector A N c
+    hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
+    hv' hv_pos hw' hw_pos
+
+/-- **Uniqueness of Marshall-positive Heisenberg sector eigenvectors**
+(Tasaki §2.5 Theorem 2.2 nondegeneracy half, Heisenberg form): any two
+real eigenvectors `w₁, w₂` of the (un-dressed) Heisenberg sector matrix
+at the SAME eigenvalue `μ`, both with strictly positive Marshall-
+conjugates `sign · wᵢ > 0`, are positive scalar multiples of each
+other.
+
+Reduction: by inverse Marshall conjugation, the conjugates `vᵢ := sign · wᵢ`
+are positive eigenvectors of the dressed sector matrix at `μ`. By dressed
+sector uniqueness (this PR) `v₂ = r • v₁` for some `r > 0`. Multiplying
+both sides by `sign` (which squares to 1) gives `w₂ = r • w₁`. -/
+theorem marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {μ : ℝ} {w₁ w₂ : magConfigS V N M → ℝ}
+    (hw₁ : (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec w₁ = μ • w₁)
+    (hw₁_marshall_pos : ∀ σ, 0 < (marshallSignS A σ.1).re * w₁ σ)
+    (hw₂ : (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec w₂ = μ • w₂)
+    (hw₂_marshall_pos : ∀ σ, 0 < (marshallSignS A σ.1).re * w₂ σ) :
+    ∃ r : ℝ, 0 < r ∧ w₂ = r • w₁ := by
+  -- Marshall-conjugate both: vᵢ := sign · wᵢ are dressed eigenvectors.
+  have hv₁ := dressedHeisenbergSReMatrixOnMagSector_mulVec_of_heis_eigenvec
+    A N hJ_real hw₁
+  have hv₂ := dressedHeisenbergSReMatrixOnMagSector_mulVec_of_heis_eigenvec
+    A N hJ_real hw₂
+  -- Apply dressed uniqueness.
+  obtain ⟨r, hr_pos, hrel⟩ :=
+    pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector
+      A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
+      hv₁ hw₁_marshall_pos hv₂ hw₂_marshall_pos
+  -- hrel : (fun σ => sign σ.1.re * w₂ σ) = r • (fun σ => sign σ.1.re * w₁ σ).
+  refine ⟨r, hr_pos, ?_⟩
+  funext σ
+  -- Multiply both sides of hrel σ by sign σ.1.re; sign² = 1 cancels.
+  have hσ := congrFun hrel σ
+  -- hσ : sign σ.1.re * w₂ σ = r * (sign σ.1.re * w₁ σ).
+  change (marshallSignS A σ.1).re * w₂ σ =
+    r * ((marshallSignS A σ.1).re * w₁ σ) at hσ
+  have hsq : (marshallSignS A σ.1).re * (marshallSignS A σ.1).re = 1 :=
+    marshallSignS_re_sq A σ.1
+  -- Multiply both sides by sign σ.1.re.
+  have h_eq : (marshallSignS A σ.1).re *
+      ((marshallSignS A σ.1).re * w₂ σ) =
+    (marshallSignS A σ.1).re *
+      (r * ((marshallSignS A σ.1).re * w₁ σ)) := by
+    rw [hσ]
+  -- Simplify both sides via sign² = 1.
+  change w₂ σ = r * w₁ σ
+  have lhs_eq : (marshallSignS A σ.1).re *
+      ((marshallSignS A σ.1).re * w₂ σ) = w₂ σ := by
+    rw [← mul_assoc, hsq, one_mul]
+  have rhs_eq : (marshallSignS A σ.1).re *
+      (r * ((marshallSignS A σ.1).re * w₁ σ)) = r * w₁ σ := by
+    have : (marshallSignS A σ.1).re *
+        (r * ((marshallSignS A σ.1).re * w₁ σ)) =
+      ((marshallSignS A σ.1).re * (marshallSignS A σ.1).re) * (r * w₁ σ) := by
+      ring
+    rw [this, hsq, one_mul]
+  linarith
+
 end LatticeSystem.Quantum
