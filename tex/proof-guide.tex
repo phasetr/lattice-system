@@ -5426,6 +5426,58 @@ $\{(\hat S^-_{\rm tot})^k\,|\sigma_\top\rangle :
 the ground-state sector with the $J_{\rm tot} = m_{\max}$
 irreducible SU(2) representation.
 
+\textbf{Pairwise orthogonality of the ladder iterates (PR~\#898)}:
+strengthens the LI conclusion to orthogonality. The new file
+\texttt{Quantum/SpinS/SaturatedFullLadderOrthogonality.lean}
+proves the generic helper
+\texttt{Matrix.IsHermitian.dotProduct\_eq\_zero\_of\_eigenvalues\_ne}:
+for a Hermitian matrix $M$ and two eigenvectors at distinct real
+eigenvalues, $\alpha\,\langle v,w\rangle = \langle Mv, w\rangle =
+\langle v, Mw\rangle = \beta\,\langle v,w\rangle$, hence
+$\langle v,w\rangle = 0$. The shift to the left side uses
+\texttt{Matrix.dotProduct\_mulVec} and \texttt{Matrix.star\_mulVec}
+combined with Hermiticity. Applied to $\hat S^z_{\rm tot}$
+(Hermitian by \texttt{totalSpinSOp3\_isHermitian}) with the
+real eigenvalues $m_{\max} - k$ (from \texttt{Complex.conj\_natCast})
+and the injectivity of \texttt{ladderEigenvalueUp}.
+
+\textbf{Ladder iterates lie in a single Heisenberg eigenspace
+(PR~\#899)}: defines
+\texttt{saturatedFerromagnetEigenvalueS J N} as the H diagonal
+at the all-up configuration; bridges PR \#881 to
+\texttt{Module.End.eigenspace} membership via
+\texttt{Module.End.mem\_eigenspace\_iff} +
+\texttt{Matrix.mulVecLin\_apply}. Combined with the LI of \#896
+and \texttt{LinearIndependent.fintype\_card\_le\_finrank}, gives
+the dimension lower bound
+\texttt{heisenbergHamiltonianS\_eigenspace\_finrank\_ge\_succ\_card\_mul\_N}:
+the H-eigenspace at $c_J$ has $\dim_{\mathbb{C}} \geq 2m_{\max}+1$.
+The LI family is restricted to the eigenspace via the subtype
+embedding \texttt{E.subtype} and
+\texttt{LinearIndependent.of\_comp}.
+
+\textbf{Ladder iterates lie in a single Casimir eigenspace
+(PR~\#900)}: mirror of PR \#899 for the Casimir operator
+$(\hat S_{\rm tot})^2$. Defines
+\texttt{saturatedFerromagnetCasimirEigenvalueS V N} as
+$m_{\max}(m_{\max}+1)$, bridges PR \#882 to
+\texttt{Module.End.eigenspace}, and provides the parallel
+dimension lower bound
+\texttt{totalSpinSSquared\_eigenspace\_finrank\_ge\_succ\_card\_mul\_N}.
+
+\textbf{Simultaneous (H, $\hat S_{\rm tot}^2$, $\hat S^z_{\rm tot}$)
+eigenvector bundle (PR~\#901)}: packages PRs \#881, \#882, \#887,
+\#895 into the operator-level form of Tasaki §2.4 (2.4.10):
+each iterate $(\hat S^-_{\rm tot})^k\,|\sigma_\top\rangle$ is
+non-zero and is simultaneously a Heisenberg eigenvector at
+$c_J$, a Casimir eigenvector at $m_{\max}(m_{\max}+1)$, and an
+$\hat S^z_{\rm tot}$ eigenvector at $m_{\max}-k$. The resulting
+\texttt{ladderIterateUp\_simultaneous\_eigenvector} statement is
+the structural identification of the unnormalised ferromagnetic
+ground-state ladder iterates $|\Phi_M\rangle$ with the
+$J_{\rm tot} = m_{\max}$ irreducible SU(2) representation
+(eigenvalues $(c_J, m_{\max}(m_{\max}+1), M)$).
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
