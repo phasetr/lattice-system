@@ -5478,6 +5478,37 @@ ground-state ladder iterates $|\Phi_M\rangle$ with the
 $J_{\rm tot} = m_{\max}$ irreducible SU(2) representation
 (eigenvalues $(c_J, m_{\max}(m_{\max}+1), M)$).
 
+\textbf{Joint $(H, \hat S_{\rm tot}^2)$ eigenspace (PR~\#903)}: the
+new file \texttt{Quantum/SpinS/SaturatedLadderJointEigenspace.lean}
+defines \texttt{saturatedFerromagnetJointEigenspace J N} as the
+meet ($\sqcap$) of the Heisenberg and Casimir eigenspaces at
+$(c_J, m_{\max}(m_{\max}+1))$; combines \#899 and \#900 to show
+each ladder iterate lies in the joint eigenspace, then derives
+\texttt{saturatedFerromagnetJointEigenspace\_finrank\_ge\_succ\_card\_mul\_N}:
+$\dim_\mathbb{C} \geq |V|\cdot N + 1 = 2m_{\max} + 1$.
+
+\textbf{Ladder span finrank (PR~\#904)}: the new file
+\texttt{Quantum/SpinS/SaturatedLadderSpan.lean} applies mathlib's
+\texttt{finrank\_span\_eq\_card} to the LI family of \#896,
+yielding
+\texttt{ladderIterateUp\_span\_finrank\_eq\_succ\_card\_mul\_N}:
+$\dim_\mathbb{C} \texttt{Submodule.span} = |V|\cdot N + 1 =
+2m_{\max} + 1$. The span is contained in the joint eigenspace
+of \#903 via \texttt{Submodule.span\_le}.
+
+\textbf{Boundary annihilation (PR~\#905)}: the new file
+\texttt{Quantum/SpinS/LadderBoundaryAnnihilation.lean} caps the
+ladder at exactly $2m_{\max}+1$ non-zero terms by proving
+\texttt{totalSpinSOpMinus\_pow\_succ\_card\_mul\_N\_allAlignedStateS\_zero}:
+$(\hat S^-_{\rm tot})^{|V|\cdot N + 1}\,|\sigma_\top\rangle = 0$.
+Argument: PR \#887 places the iterate in the
+$\hat S^z_{\rm tot}$-eigenspace at $-m_{\max}-1$; the helper
+\texttt{magSubspaceS\_eq\_bot\_of\_not\_in\_spectrum} shows that
+this magnetization subspace is $\bot$ (since $\hat S^z_{\rm tot}$
+is diagonal in the \texttt{basisVecS} basis with eigenvalues
+\texttt{magEigenvalueS}~$\sigma \in [-m_{\max}, m_{\max}]$, never
+$-m_{\max}-1$).
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
