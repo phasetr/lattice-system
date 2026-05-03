@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.ShiftedDressedMatrix
 import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.RaiseLowerMatrixPow
+import Mathlib.LinearAlgebra.Matrix.Irreducible.Defs
 
 /-!
 # Sector-restricted dressed Heisenberg matrix
@@ -155,5 +156,46 @@ theorem exists_matrixPow_pos_length_of_magConfigS_bipartite
     rw [pow_zero, Matrix.one_apply, if_neg (Ne.symm hne)] at hpos
     exact (lt_irrefl _ hpos).elim
   · exact hkpos
+
+/-- **Spin-S Marshall–Lieb–Mattis γ-3 final**: the sector-restricted
+shifted dressed Heisenberg matrix is `Matrix.IsIrreducible` under
+the standard hypotheses (real symmetric `J` supported on bipartite
+bonds, non-negative on each entry, positive on graph edges) plus
+strict shift dominance (`c > dressedReMatrix σ σ` for all σ) and the
+intermediate-existence hypothesis.
+
+Proof: combines the matrix-power positivity for distinct σ ≠ σ'
+(#845) with the diagonal positivity (`M σ σ = c - dressed σ σ > 0`
+when `c > dressed σ σ`) via the
+`Matrix.isIrreducible_iff_exists_pow_pos` characterization. -/
+theorem isIrreducible_shiftedDressedSReMatrixOnMagSector
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N) :
+    (shiftedDressedSReMatrixOnMagSector A J N c M).IsIrreducible := by
+  rw [Matrix.isIrreducible_iff_exists_pow_pos
+    (shiftedDressedSReMatrixOnMagSector_nonneg A N c M hJ_real hJ_nn hJ_sym
+      hJ_bipartite (fun σ => le_of_lt (hc_strict σ)))]
+  intro σ τ
+  by_cases hne : σ = τ
+  · -- Diagonal: use k = 1, M σ σ = c - dressed σ σ > 0.
+    subst hne
+    refine ⟨1, Nat.one_pos, ?_⟩
+    rw [pow_one, shiftedDressedSReMatrixOnMagSector_apply,
+      shiftedDressedSReMatrix_apply_diag]
+    linarith [hc_strict σ.1]
+  · -- Off-diagonal: use #845.
+    obtain ⟨k, hk_pos, hpos⟩ :=
+      exists_matrixPow_pos_length_of_magConfigS_bipartite A N c hJ_real hJ_pos
+        hJ_nn hJ_sym hJ_bipartite (fun σ => le_of_lt (hc_strict σ))
+        h_intermediate (Ne.symm hne)
+    exact ⟨k, hk_pos, hpos⟩
 
 end LatticeSystem.Quantum
