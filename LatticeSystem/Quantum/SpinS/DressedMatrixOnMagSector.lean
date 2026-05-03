@@ -263,4 +263,78 @@ theorem pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector
       hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate)
     hv hv_pos hw hw_pos
 
+/-! ## Dressed Heisenberg sector matrix and its eigenvector -/
+
+/-- The dressed Heisenberg real-matrix restricted to the magnetization-`M`
+sector. -/
+noncomputable def dressedHeisenbergSReMatrixOnMagSector
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (M : ℕ) :
+    Matrix (magConfigS V N M) (magConfigS V N M) ℝ :=
+  (dressedHeisenbergSReMatrix A J N).submatrix Subtype.val Subtype.val
+
+/-- Component-wise unfolding of `dressedHeisenbergSReMatrixOnMagSector`. -/
+theorem dressedHeisenbergSReMatrixOnMagSector_apply
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (M : ℕ)
+    (σ τ : magConfigS V N M) :
+    dressedHeisenbergSReMatrixOnMagSector A J N M σ τ =
+      dressedHeisenbergSReMatrix A J N σ.1 τ.1 := rfl
+
+/-- The shifted matrix decomposes as `c·1 − dressed` on the sector. -/
+theorem shiftedDressedSReMatrixOnMagSector_eq_smul_sub_dressed
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) (M : ℕ) :
+    shiftedDressedSReMatrixOnMagSector A J N c M =
+      c • 1 - dressedHeisenbergSReMatrixOnMagSector A J N M := by
+  ext σ τ
+  rw [Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul,
+    shiftedDressedSReMatrixOnMagSector_apply,
+    dressedHeisenbergSReMatrixOnMagSector_apply]
+  by_cases hστ : σ = τ
+  · subst hστ
+    rw [shiftedDressedSReMatrix_apply_diag, Matrix.one_apply_eq]
+    ring
+  · have hστ' : σ.1 ≠ τ.1 := fun heq => hστ (Subtype.ext heq)
+    rw [shiftedDressedSReMatrix_apply_off_diag A J N c hστ',
+      Matrix.one_apply_ne hστ]
+    ring
+
+/-- Convert an eigenvector of the shifted matrix to an eigenvector of
+the dressed matrix (with shifted eigenvalue): if `M_sec v = r v`, then
+`dressed_sec v = (c − r) v`. -/
+theorem dressedHeisenbergSReMatrixOnMagSector_mulVec_of_shifted_eigenvec
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) {M : ℕ}
+    {r : ℝ} {v : magConfigS V N M → ℝ}
+    (hv : (shiftedDressedSReMatrixOnMagSector A J N c M).mulVec v = r • v) :
+    (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v = (c - r) • v := by
+  -- shifted = c•1 - dressed, so dressed = c•1 - shifted.
+  -- mulVec linearity:
+  -- shifted * v = (c•1 - dressed) * v = c • v - dressed * v.
+  -- So r • v = c • v - dressed * v ⟹ dressed * v = (c - r) • v.
+  have hdef := shiftedDressedSReMatrixOnMagSector_eq_smul_sub_dressed A J N c M
+  rw [hdef] at hv
+  -- hv : (c • 1 - dressed).mulVec v = r • v.
+  -- Expand: (c • 1).mulVec v - dressed.mulVec v = r • v.
+  -- So dressed.mulVec v = (c • 1).mulVec v - r • v = c • v - r • v = (c - r) • v.
+  funext σ
+  have hσ := congrFun hv σ
+  show (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v σ = (c - r) * v σ
+  -- Compute (c • 1).mulVec v σ = c * v σ.
+  have hone : ((c • 1 : Matrix (magConfigS V N M) (magConfigS V N M) ℝ) -
+      dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v σ =
+      c * v σ - (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v σ := by
+    rw [Matrix.sub_mulVec]
+    show (c • (1 : Matrix _ _ ℝ)).mulVec v σ -
+        (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v σ =
+      c * v σ - (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v σ
+    congr 1
+    rw [show (c • (1 : Matrix _ _ ℝ)) = (c : ℝ) • (1 : Matrix _ _ ℝ) from rfl,
+      show ((c : ℝ) • (1 : Matrix _ _ ℝ)).mulVec v = c • (1 : Matrix _ _ ℝ).mulVec v
+        from Matrix.smul_mulVec _ _ _]
+    rw [Matrix.one_mulVec]
+    rfl
+  rw [hone] at hσ
+  show (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v σ = (c - r) * v σ
+  have : (r • v) σ = r * v σ := rfl
+  rw [this] at hσ
+  linarith
+
 end LatticeSystem.Quantum
