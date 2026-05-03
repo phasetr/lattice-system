@@ -5901,6 +5901,14 @@ $n\cdot c^\dagger = (c^\dagger c)\,c^\dagger = c^\dagger(c\,c^\dagger)
  = c^\dagger(1-n) = c^\dagger - c^\dagger\cdot n = c^\dagger$
 via \texttt{fermionAnticomm\_self} and the previous identity.
 
+\textbf{Partial-isometry relations $c\,c^\dagger c = c$ and
+$c^\dagger c\,c^\dagger = c^\dagger$ (PR~\#986)}: in the file
+\texttt{Fermion/PartialIsometry.lean}.
+$c\,c^\dagger c = c\,(c^\dagger c) = c\,n = c$ by PR~\#982.
+$c^\dagger c\,c^\dagger = (c^\dagger c)\,c^\dagger = n\,c^\dagger = c^\dagger$
+by PR~\#984. These are the standard $S\,S^*S = S$ /
+$S^*S\,S^* = S^*$ partial-isometry identities of operator algebra.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
