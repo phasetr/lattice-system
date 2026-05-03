@@ -79,4 +79,12 @@ example {N : ℕ} [Fintype V] [DecidableEq V] {A : V → Bool}
   exists_raiseLowerReachableS_bipartite_of_over_under hxy hover hunder
     h_intermediate
 
+/-- Bipartite reachability for equal-magnetization configurations. -/
+example {N : ℕ} [Fintype V] [DecidableEq V] (A : V → Bool)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {σ σ' : V → Fin (N + 1)} (hmag : magSumS σ = magSumS σ') :
+    RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ σ' :=
+  raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS A h_intermediate hmag
+
 end LatticeSystem.Tests.SpinSBipartiteCompleteGraph
