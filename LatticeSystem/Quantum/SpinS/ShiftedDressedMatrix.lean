@@ -1,4 +1,6 @@
 import LatticeSystem.Quantum.SpinS.DressedHeisenberg
+import LatticeSystem.Quantum.SpinS.DressedHeisenbergRaiseLower
+import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
 
 /-!
 # The shifted dressed Heisenberg matrix
@@ -120,5 +122,38 @@ theorem shiftedDressedSReMatrix_nonneg
     exact shiftedDressedSReMatrix_apply_diag_nonneg A J N c σ' (hc σ')
   · exact shiftedDressedSReMatrix_apply_off_diag_nonneg A N c hJ_real hJ_nn
       hJ_sym hJ_bipartite hne
+
+/-! ## Strict positivity on bipartite raise/lower steps -/
+
+/-- **Strict positivity of the shifted dressed matrix on bipartite
+raise/lower steps**: for a `RaiseLowerStepS` in the bipartite complete
+graph (so σ ≠ τ automatically and witness sites are bipartite), the
+shifted matrix entry is strictly positive:
+
+    `0 < shiftedDressedSReMatrix A J N c τ σ`.
+
+Proof: off-diagonal formula reduces to `-dressedReMatrix τ σ`, which
+is positive by #826. -/
+theorem shiftedDressedSReMatrix_apply_pos_of_raiseLowerStepS_bipartite
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    {σ τ : V → Fin (N + 1)}
+    (hstep : RaiseLowerStepS (bipartiteCompleteGraphOf A) σ τ) :
+    0 < shiftedDressedSReMatrix A J N c τ σ := by
+  -- σ ≠ τ from the step witness (changes the value at x or y).
+  have hne : τ ≠ σ := by
+    obtain ⟨x, y, _hadj, hsh, _hagree⟩ := hstep
+    intro heq
+    rcases hsh with ⟨hxr, _⟩ | ⟨hxl, _⟩
+    · have : (τ x).val = (σ x).val := by rw [heq]
+      omega
+    · have : (τ x).val = (σ x).val := by rw [heq]
+      omega
+  rw [shiftedDressedSReMatrix_apply_off_diag A J N c hne]
+  exact neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_bipartite A
+    N hJ_real hJ_pos hJ_sym hstep
 
 end LatticeSystem.Quantum
