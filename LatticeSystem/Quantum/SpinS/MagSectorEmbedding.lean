@@ -210,18 +210,21 @@ theorem magSectorRestriction_eq_zero_iff_vanishes {M : ℕ}
     funext τ
     exact hf τ.1 τ.2
 
-/-! ## Sector disjointness and direct-sum decomposition
+/-! ## Sector disjointness and finite-sum decomposition
 
-Different magnetization sectors are *disjoint* in the full
-configuration space: a vector that is simultaneously in the image of
+Different magnetization sectors are *disjoint* in the full configuration
+space: a vector that is simultaneously in the image of
 `magSectorEmbedding (M := M₁)` and `magSectorEmbedding (M := M₂)` for
 `M₁ ≠ M₂` must be zero. Combined with the fact that every full vector
-decomposes as a sum of its sector-supported components, this gives the
-direct-sum decomposition
+decomposes as a finite sum of its sector-supported components, this
+gives the basic ingredients of the magnetization-sector decomposition
 
-  $\quad\;\bigl((V \to \text{Fin}(N+1)) \to \mathbb{C}\bigr)
-    \;=\; \bigoplus_{M=0}^{|V|\cdot N}
-      \mathrm{im}\bigl(\mathrm{magSectorEmbedding}_{M}\bigr).$
+  $\quad\;f \;=\; \sum_{M=0}^{|V|\cdot N}
+      \mathrm{magSectorEmbedding}\bigl(\mathrm{magSectorRestriction}_{M}\,f\bigr)
+    \quad\text{for every }f.$
+
+(Lifting this to a formal internal `DirectSum` / `Submodule.IsInternal`
+statement is a separate downstream packaging step and is not done here.)
 -/
 
 /-- **Sector disjointness**: a vector simultaneously supported on
@@ -242,7 +245,7 @@ theorem eq_zero_of_supported_on_two_sectors {M₁ M₂ : ℕ}
 /-- The intersection of the images of two distinct sector embeddings is
 trivial: if `magSectorEmbedding Φ₁ = magSectorEmbedding Φ₂` for
 sectors `M₁ ≠ M₂`, then both `Φ₁ = 0` and `Φ₂ = 0`. -/
-theorem magSectorEmbedding_eq_iff_both_zero_of_ne {M₁ M₂ : ℕ}
+theorem eq_zero_of_magSectorEmbedding_eq_of_ne {M₁ M₂ : ℕ}
     (hM : M₁ ≠ M₂)
     (Φ₁ : magConfigS V N M₁ → ℂ) (Φ₂ : magConfigS V N M₂ → ℂ)
     (hΦ : magSectorEmbedding Φ₁ = magSectorEmbedding Φ₂) :
@@ -281,7 +284,7 @@ giving the magnetization-sector decomposition. -/
 
 /-- The "sector-`M` slice" of a full vector `f`: agrees with `f` on
 sector `M`, zero elsewhere. -/
-noncomputable def magSectorSlice (M : ℕ)
+def magSectorSlice (M : ℕ)
     (f : (V → Fin (N + 1)) → ℂ) :
     (V → Fin (N + 1)) → ℂ := fun σ =>
   if magSumS σ = M then f σ else 0
@@ -339,9 +342,10 @@ theorem sum_magSectorSlice_eq (f : (V → Fin (N + 1)) → ℂ) :
   exact magSectorSlice_apply_of_mem (magSumS σ) f rfl
 
 /-- **Magnetization-sector decomposition (LinearMap-image form)**:
-every full vector `f` is a finite sum of sector-embedded vectors,
-one per attainable magnetization. -/
-theorem exists_magSectorEmbedding_decomposition (f : (V → Fin (N + 1)) → ℂ) :
+every full vector `f` equals the finite sum of sector-embedded
+restrictions, one per attainable magnetization. -/
+theorem eq_sum_magSectorEmbedding_magSectorRestriction
+    (f : (V → Fin (N + 1)) → ℂ) :
     f = ∑ M ∈ Finset.range (Fintype.card V * N + 1),
       magSectorEmbedding (magSectorRestriction (M := M) f) := by
   have h := sum_magSectorSlice_eq f
