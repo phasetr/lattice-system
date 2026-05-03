@@ -5361,6 +5361,71 @@ $\sqrt{N}>0$. The symmetric raising side
 \texttt{oneFlippedDownConfig\,/\,..\_at\_oneFlippedDownConfig\,/\,..\_ne\_zero}
 covers $\hat S^+_{\rm tot}\,|\sigma_\bot\rangle$.
 
+\textbf{Multi-site Cartan ⁺⁻ relation (PR~\#893)}: completes the
+SU(2) algebra of total operators with
+$[\hat S^+_{\rm tot}, \hat S^-_{\rm tot}] = 2\,\hat S^z_{\rm tot}$
+(and the antisymmetric corollary $-2\,\hat S^z_{\rm tot}$). The
+new file \texttt{Quantum/SpinS/MultiSiteCartanPlusMinus.lean}
+lifts the single-site \texttt{spinSOpPlus\_commutator\_spinSOpMinus}
+to multi-site via \texttt{onSiteS\_commutator\_totalOnSiteS}
+(off-site terms cancel via cross-site commutativity, on-site reduces
+to \texttt{onSiteS x ((2:ℂ) • spinSOp3 N)}), then applies linearity
+of \texttt{onSiteS} in the matrix argument and \texttt{Finset.smul\_sum}.
+
+\textbf{Casimir rearrangement (PR~\#894)}: the standard SU(2)
+Casimir identity at the multi-site level
+$\hat S^+_{\rm tot} \hat S^-_{\rm tot} =
+ (\hat S_{\rm tot})^2 - (\hat S^z_{\rm tot})^2 + \hat S^z_{\rm tot}$
+(and symmetric $-\hat S^z_{\rm tot}$ for MinusPlus order). The new
+file \texttt{Quantum/SpinS/CasimirRearrangement.lean} first proves
+the sum identity
+$\hat S^+ \hat S^- + \hat S^- \hat S^+ = 2\,((\hat S^{(1)}_{\rm tot})
+^2 + (\hat S^{(2)}_{\rm tot})^2)$ by expanding both
+$(A \pm iB)(A \mp iB)$ products — the $\pm i [A, B]$ cross terms
+cancel — then combines with the Cartan ⁺⁻ (\#893) and divides by
+2 via \texttt{smul\_right\_injective}. Substituting
+$(\hat S^{(1)}_{\rm tot})^2 + (\hat S^{(2)}_{\rm tot})^2 =
+ (\hat S_{\rm tot})^2 - (\hat S^{(3)}_{\rm tot})^2$
+via \texttt{totalSpinSSquared\_def} closes the identity.
+
+\textbf{Inductive non-vanishing of $(\hat S^-_{\rm tot})^k\,|\sigma_\top\rangle$
+for $k\leq 2m_{\max}$ (PR~\#895)}: the technical hurdle for the
+full ladder linear independence. In the new file
+\texttt{Quantum/SpinS/IterateInductiveNonvanishing.lean} the
+eigenvalue identity
+$\hat S^+_{\rm tot}\,((\hat S^-_{\rm tot})^{k+1}|\sigma_\top\rangle)
+ = (k+1)(|V|\cdot N - k)\,(\hat S^-_{\rm tot})^k|\sigma_\top\rangle$
+is derived from the Casimir rearrangement (\#894) plus iterate
+eigenvalue identities (\#882 Casimir, \#887 $\hat S^z$ — applied
+twice for $(\hat S^z)^2$). Then induction: base $k=0$ is
+\texttt{allAlignedStateS\_ne\_zero} (\#891); step assumes
+$v_k \neq 0$ and $k < |V|\cdot N$, contradicts $v_{k+1} = 0$ via
+the scalar-mul cancellation (the scalar $(k+1)(|V|\cdot N - k)$
+is non-zero in $\mathbb{C}$ for $k < |V|\cdot N$).
+
+\textbf{Full saturated-ferromagnet ladder LI (PR~\#896)}: the
+$(2m_{\max} + 1)$-element ladder basis statement. In the new file
+\texttt{Quantum/SpinS/SaturatedFullLadderLI.lean} the family
+\texttt{ladderIterateUp V N k} (parameterised by $k:\textsf{Fin}
+(|V|\cdot N+1)$) and the eigenvalue function
+\texttt{ladderEigenvalueUp V N k = $m_{\max}-k$} are introduced.
+Injectivity of the eigenvalue function is by
+\texttt{linear\_combination -hij}; per-$k$
+\texttt{Module.End.HasEigenvector} witnesses combine
+\texttt{ladderIterateUp\_mem\_eigenspace} (PR \#887 + \#889 bridge)
+with \texttt{ladderIterateUp\_hasEigenvector}'s non-vanishing
+(PR \#895, with the bound \texttt{Nat.lt\_succ\_iff.mp k.isLt}).
+The main theorem
+\texttt{ladderIterateUp\_linearIndependent} applies
+\texttt{Module.End.eigenvectors\_linearIndependent'} to assemble
+the LI conclusion. This completes the Tasaki §2.4 saturated-
+ferromagnet ground-state ladder basis identification: the
+$(2m_{\max} + 1)$-vector family
+$\{(\hat S^-_{\rm tot})^k\,|\sigma_\top\rangle :
+ k = 0,\ldots,2m_{\max}\}$ is linearly independent, identifying
+the ground-state sector with the $J_{\rm tot} = m_{\max}$
+irreducible SU(2) representation.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
