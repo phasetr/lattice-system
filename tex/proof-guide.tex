@@ -5891,6 +5891,16 @@ $c\cdot n = c(c^\dagger c) = (c\,c^\dagger)\,c = (1-n)\,c
 via \texttt{fermionAnticomm\_self} (so $c\,c^\dagger = 1 - n$) and
 the previous identity.
 
+\textbf{$c^\dagger\cdot n = 0$ and $n\cdot c^\dagger = c^\dagger$
+(PR~\#984)}: companion to PR~\#982, in the file
+\texttt{Fermion/CreationNumberIdentities.lean}.
+$c^\dagger\cdot n = c^\dagger(c^\dagger c) = (c^\dagger)^2\,c
+ = 0\cdot c = 0$
+via \texttt{fermionCreation\_sq}.
+$n\cdot c^\dagger = (c^\dagger c)\,c^\dagger = c^\dagger(c\,c^\dagger)
+ = c^\dagger(1-n) = c^\dagger - c^\dagger\cdot n = c^\dagger$
+via \texttt{fermionAnticomm\_self} and the previous identity.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
