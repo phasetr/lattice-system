@@ -383,6 +383,33 @@ theorem heisenbergHamiltonianSReMatrixOnMagSector_apply
     heisenbergHamiltonianSReMatrixOnMagSector J N M σ τ =
       heisenbergHamiltonianSReMatrix J N σ.1 τ.1 := rfl
 
+/-- The complex Heisenberg Hamiltonian restricted to the magnetization-`M`
+sector (as a complex matrix on the subtype `magConfigS V N M`). -/
+noncomputable def heisenbergHamiltonianSMatrixOnMagSector
+    (J : V → V → ℂ) (N : ℕ) (M : ℕ) :
+    Matrix (magConfigS V N M) (magConfigS V N M) ℂ :=
+  (heisenbergHamiltonianS J N).submatrix Subtype.val Subtype.val
+
+/-- Component-wise unfolding of the complex sector matrix. -/
+theorem heisenbergHamiltonianSMatrixOnMagSector_apply
+    (J : V → V → ℂ) (N : ℕ) (M : ℕ)
+    (σ τ : magConfigS V N M) :
+    heisenbergHamiltonianSMatrixOnMagSector J N M σ τ =
+      heisenbergHamiltonianS J N σ.1 τ.1 := rfl
+
+/-- For real coupling, the complex sector matrix entry equals the
+real-form sector matrix entry embedded in `ℂ`. -/
+theorem heisenbergHamiltonianSMatrixOnMagSector_apply_eq_ofReal
+    {J : V → V → ℂ} (N : ℕ) (M : ℕ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (σ τ : magConfigS V N M) :
+    heisenbergHamiltonianSMatrixOnMagSector J N M σ τ =
+      ((heisenbergHamiltonianSReMatrixOnMagSector J N M σ τ : ℝ) : ℂ) := by
+  rw [heisenbergHamiltonianSMatrixOnMagSector_apply,
+    heisenbergHamiltonianSReMatrixOnMagSector_apply,
+    heisenbergHamiltonianSReMatrix_apply]
+  exact heisenbergHamiltonianS_apply_eq_ofReal_re N hJ_real σ.1 τ.1
+
 /-- **Matrix relation: dressed = sign · sign · heisenberg** (real-part
 form). For real coupling, the dressed Heisenberg matrix entry at
 `(σ, τ)` equals the product of the Marshall signs at `σ` and `τ` with
