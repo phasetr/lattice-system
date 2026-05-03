@@ -99,4 +99,34 @@ theorem exists_matrixPow_apply_pos_of_raiseLowerReachableSMagSector
     · refine ⟨_, Finset.mem_univ _, mul_pos ?_ hpos⟩
       exact hB_step h₂
 
+/-- **Sector-restricted matrix-power positivity** for any pair of
+configurations in the same magnetization sector (γ-3 PF irreducibility
+input on the subtype). Composition of:
+- Bipartite subtype reachability (#841).
+- Sector matrix-pow lift from reachability (#843).
+- Sector matrix non-negativity (#834).
+- Sector matrix step positivity (#842). -/
+theorem exists_matrixPow_pos_of_magConfigS_bipartite
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ ≤ c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (σ σ' : magConfigS V N M) :
+    ∃ k : ℕ, 0 < (shiftedDressedSReMatrixOnMagSector A J N c M ^ k) σ' σ := by
+  apply exists_matrixPow_apply_pos_of_raiseLowerReachableSMagSector
+  · intro σ τ
+    exact shiftedDressedSReMatrixOnMagSector_nonneg A N c M hJ_real hJ_nn
+      hJ_sym hJ_bipartite hc σ τ
+  · intro σ τ hstep
+    exact shiftedDressedSReMatrixOnMagSector_apply_pos_of_raiseLowerStepSMagSector
+      A N c M hJ_real hJ_pos hJ_sym hstep
+  · exact raiseLowerReachableSMagSector_bipartiteCompleteGraph A
+      h_intermediate σ σ'
+
 end LatticeSystem.Quantum
