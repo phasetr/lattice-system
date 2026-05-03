@@ -5651,6 +5651,29 @@ configuration $\sigma$ (transverse operators are purely off-diagonal,
 the saturated-ferromagnet $|c..c\rangle$ has per-axis spin profile
 $(0, 0, N/2-c)$ — only the z-component is non-zero.
 
+\textbf{Singlet correlation sum (PR~\#929)}: the new file
+\texttt{Quantum/SpinS/SingletCorrelationSum.lean} proves that for
+any singlet state $\Phi$ ($\hat{S}_{\rm tot}^2\,\Phi = 0$),
+$\sum_{x, y}\langle\Phi, \hat{S}_x\cdot\hat{S}_y\,\Phi\rangle = 0$.
+Direct combination of \texttt{totalSpinSSquared\_eq\_sum\_spinSDot}
+with \texttt{Matrix.sum\_mulVec} + \texttt{dotProduct\_sum} linearity
+and \texttt{dotProduct\_zero}.
+
+\textbf{Universal correlation = Casimir expectation (PR~\#930)}:
+the new file \texttt{Quantum/SpinS/CorrelationSumCasimir.lean}
+generalises \#929 to ANY state:
+$\sum_{x, y}\langle\Phi, \hat{S}_x\cdot\hat{S}_y\,\Phi\rangle =
+\langle\Phi, \hat{S}_{\rm tot}^2\,\Phi\rangle$. Specialised to
+$|\sigma_\top\rangle$ and $|\sigma_\bot\rangle$ gives the Casimir
+eigenvalue $m_{\max}(m_{\max}+1)$.
+
+\textbf{Eigenvector correlation sum (PR~\#931)}: the new file
+\texttt{Quantum/SpinS/CorrelationEigenvector.lean} parameterises
+the result of \#930 by the eigenvalue: for $\hat{S}_{\rm tot}^2\Phi
+= \lambda\,\Phi$, $\sum_{x, y}\langle\Phi, \hat{S}_x\cdot\hat{S}_y\,\Phi\rangle
+= \lambda\,\langle\Phi, \Phi\rangle$. For normalized $\Phi$, the
+sum equals $\lambda$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
