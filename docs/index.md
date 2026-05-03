@@ -1057,6 +1057,7 @@ Issue #412; assembled in PRs #875–#879. All theorems live in
 | `multiSiteSpinS_finrank` | **`Module.finrank ℂ ((V → Fin (N+1)) → ℂ) = (N + 1)^|V|`** (the standard quantum-mechanical dimension `(2S + 1)^|Λ|`, PR #918, file `Quantum/SpinS/MultiSiteFinrank.lean`) |
 | `basisSpinS V N` / `basisSpinS_apply` | the standard basis packaged as `Module.Basis (V → Fin (N + 1)) ℂ ((V → Fin (N + 1)) → ℂ)` via `Module.Basis.mk` (PR #919, file `Quantum/SpinS/BasisSpinS.lean`) |
 | `spinSDot_self_mulVec` / `_expectation` / `_expectation_normalized` / `_expectation_allAlignedStateS` | **universal single-site Casimir expectation `⟨Φ, Ŝ_x · Ŝ_x · Φ⟩ = S(S+1)`** for normalized `Φ`. Direct from `spinSDot_self`. Foundation for Tasaki Problem 2.5.c (γ-7) (PR #920, file `Quantum/SpinS/SingleSiteCasimirExpectation.lean`) |
+| `spinSOpPlus_one_eq_spinHalfOpPlus` / `_Minus_` / `_Op1_` / `_Op2_` / `_Op3_` | **spin-`S` ↔ spin-`1/2` bridge at `N = 1`**: `spinSOp{Plus, Minus, 1, 2, 3} 1 = spinHalfOp{Plus, Minus, 1, 2, 3}` (each is the corresponding half-Pauli matrix) (PRs #922 + #923, file `Quantum/SpinS/SpinHalfSpecialization.lean`) |
 
 References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.4 (pp. 30–37, spin-1/2 case).
