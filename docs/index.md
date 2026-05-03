@@ -1070,6 +1070,8 @@ Issue #412; assembled in PRs #875–#879. All theorems live in
 | `spinSDot_mulVec_allAlignedStateS_last_of_ne` | symmetric raising-side per-pair eigenvalue on `|σ_⊥⟩` (PR #940, file `Quantum/SpinS/SpinSDotAllAlignedLast.lean`) |
 | `allAlignedStateS_zero_expectation_spinSDot_of_ne` / `_last_expectation_spinSDot_of_ne` | **per-pair correlation**: `⟨|σ_⊤/⊥⟩, Ŝ_x · Ŝ_y · |σ_⊤/⊥⟩⟩ = N²/4 = S²` for `x ≠ y` (PR #941, file `Quantum/SpinS/PerPairCorrelationExpectation.lean`) |
 | `allAlignedStateS_zero_expectation_heisenbergHamiltonianS` / `_last_expectation_heisenbergHamiltonianS` | **Heisenberg expectation on saturated states**: `⟨|σ_⊤⟩, H · |σ_⊤⟩⟩ = saturatedFerromagnetEigenvalueS J N`; `⟨|σ_⊥⟩, H · |σ_⊥⟩⟩ = H(σ_⊥, σ_⊥)` (PR #943, file `Quantum/SpinS/SaturatedHeisenbergExpectation.lean`) |
+| `heisenbergHamiltonianS_uniform_eq_totalSpinSSquared` | `heisenbergHamiltonianS (fun _ _ => 1) N = totalSpinSSquared V N` (uniform-J Heisenberg = total-spin Casimir) (PR #945, file `Quantum/SpinS/HeisenbergUniformCasimir.lean`) |
+| `heisenbergHamiltonianS_diag_allAlignedConfigS_last_eq_zero` | **`H(σ_⊥, σ_⊥) = saturatedFerromagnetEigenvalueS J N`**: both extremal H-diagonals equal (via #875/#876 same explicit formula + uniqueness on non-zero eigenvectors) (PR #946, file `Quantum/SpinS/SaturatedHeisenbergSymmetric.lean`) |
 
 References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.4 (pp. 30–37, spin-1/2 case).

@@ -5739,6 +5739,21 @@ $\langle|\sigma_\top\rangle, H\,|\sigma_\top\rangle\rangle =
 $H(\sigma_\top, \sigma_\top)$ in \#899). Symmetric for
 $|\sigma_\bot\rangle$, with eigenvalue $H(\sigma_\bot, \sigma_\bot)$.
 
+\textbf{Uniform-J Heisenberg equals Casimir (PR~\#945)}: the new
+file \texttt{Quantum/SpinS/HeisenbergUniformCasimir.lean} proves
+\texttt{heisenbergHamiltonianS (fun \_ \_ => 1) N = totalSpinSSquared V N}.
+Direct from the definition $H = \sum_{x, y} J\,\hat{S}_x\cdot\hat{S}_y$
++ \texttt{totalSpinSSquared\_eq\_sum\_spinSDot}.
+
+\textbf{H-diagonal symmetry (PR~\#946)}: the new file
+\texttt{Quantum/SpinS/SaturatedHeisenbergSymmetric.lean} shows
+$H(\sigma_\bot, \sigma_\bot) =
+\texttt{saturatedFerromagnetEigenvalueS}\,J\,N$. Both \#875 and
+\#876 produce the same explicit eigenvalue $E$, and uniqueness of
+the eigenvalue on a non-zero eigenvector (via
+\texttt{allAlignedStateS\_ne\_zero}) extracts
+$E = H(\sigma_\top, \sigma_\top) = H(\sigma_\bot, \sigma_\bot)$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
