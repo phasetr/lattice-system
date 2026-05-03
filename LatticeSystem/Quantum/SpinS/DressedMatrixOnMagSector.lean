@@ -53,4 +53,18 @@ theorem shiftedDressedSReMatrixOnMagSector_nonneg
   exact shiftedDressedSReMatrix_nonneg A N c hJ_real hJ_nn hJ_sym
     hJ_bipartite hc σ.1 τ.1
 
+/-- The sector-restricted matrix is strictly positive on bipartite
+raise/lower steps lifted to the subtype. -/
+theorem shiftedDressedSReMatrixOnMagSector_apply_pos_of_raiseLowerStepSMagSector
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) (M : ℕ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    {σ τ : magConfigS V N M}
+    (hstep : RaiseLowerStepSMagSector (bipartiteCompleteGraphOf A) σ τ) :
+    0 < shiftedDressedSReMatrixOnMagSector A J N c M τ σ := by
+  rw [shiftedDressedSReMatrixOnMagSector_apply]
+  exact shiftedDressedSReMatrix_apply_pos_of_raiseLowerStepS_bipartite A N c
+    hJ_real hJ_pos hJ_sym hstep
+
 end LatticeSystem.Quantum
