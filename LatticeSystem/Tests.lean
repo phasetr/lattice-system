@@ -55,6 +55,7 @@ import LatticeSystem.Tests.SpinSDressedHeisenbergRaiseLower
 import LatticeSystem.Tests.SpinSConfigDist
 import LatticeSystem.Tests.SpinSRaiseLowerMatrixPow
 import LatticeSystem.Tests.SpinSBipartiteCompleteGraph
+import LatticeSystem.Tests.SpinSShiftedDressedMatrix
 import LatticeSystem.Tests.SU2Family
 import LatticeSystem.Tests.Pauli
 import LatticeSystem.Tests.Z2Z2
