@@ -155,6 +155,52 @@ theorem heisenbergHamiltonianS_mulVec_magSectorEmbedding_apply_subtype
   -- So we get the desired sum (modulo Subtype identification).
   rfl
 
+/-- **Full-Hilbert-space ground-state lift** (Tasaki §2.5 Theorem 2.2,
+sector → full bridge): a sector eigenvector of the Heisenberg sector
+matrix at eigenvalue `μ` lifts to a full-Hilbert-space eigenvector of
+the un-dressed quantum Heisenberg Hamiltonian at the same `μ`, via
+zero-extension outside the magnetization sector.
+
+Proof: pointwise on `σ : V → Fin (N + 1)`.
+- If `σ ∈ sector M`: use the central bridge
+  `heisenbergHamiltonianS_mulVec_magSectorEmbedding_apply_subtype` and
+  the sector eigenvector equation.
+- If `σ ∉ sector M`: both sides vanish — LHS because every term in
+  the `mulVec` sum is zero (either the embedding is zero outside the
+  sector, or the Hamiltonian matrix element vanishes between
+  configurations of different `magSumS` by `[H, S^z_tot] = 0`); RHS
+  because the embedding is zero. -/
+theorem heisenbergHamiltonianS_mulVec_magSectorEmbedding
+    (J : V → V → ℂ) {M : ℕ}
+    (Φ : magConfigS V N M → ℂ)
+    {μ : ℝ}
+    (hΦ : (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φ =
+      (μ : ℂ) • Φ) :
+    (heisenbergHamiltonianS J N).mulVec (magSectorEmbedding Φ) =
+      (μ : ℂ) • (magSectorEmbedding Φ) := by
+  funext σ
+  by_cases h : magSumS σ = M
+  · -- σ ∈ sector M.
+    rw [heisenbergHamiltonianS_mulVec_magSectorEmbedding_apply_subtype J Φ ⟨σ, h⟩]
+    have hsec := congrFun hΦ ⟨σ, h⟩
+    rw [hsec]
+    change (μ : ℂ) * Φ ⟨σ, h⟩ = ((μ : ℂ) • magSectorEmbedding Φ) σ
+    rw [Pi.smul_apply, magSectorEmbedding_apply_of_mem Φ h, smul_eq_mul]
+  · -- σ ∉ sector M. Both sides are zero.
+    have hLHS : (heisenbergHamiltonianS J N).mulVec (magSectorEmbedding Φ) σ = 0 := by
+      change ∑ ρ, heisenbergHamiltonianS J N σ ρ * magSectorEmbedding Φ ρ = 0
+      refine Finset.sum_eq_zero (fun ρ _ => ?_)
+      by_cases hρ : magSumS ρ = M
+      · -- ρ ∈ sector M, but magSumS σ ≠ M = magSumS ρ ⟹ heis σ ρ = 0.
+        have hne : magSumS ρ ≠ magSumS σ :=
+          fun heq => h (heq.symm.trans hρ)
+        rw [heisenbergHamiltonianS_apply_eq_zero_of_magSumS_ne (V := V) J N hne,
+          zero_mul]
+      · rw [magSectorEmbedding_apply_of_not_mem Φ hρ, mul_zero]
+    rw [hLHS]
+    change (0 : ℂ) = ((μ : ℂ) • magSectorEmbedding Φ) σ
+    rw [Pi.smul_apply, magSectorEmbedding_apply_of_not_mem Φ h, smul_zero]
+
 end
 
 end LatticeSystem.Quantum
