@@ -738,4 +738,56 @@ theorem marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSect
     rw [this, hsq, one_mul]
   linarith
 
+/-- **Tasaki §2.5 Theorem 2.2 (Marshall–Lieb–Mattis), ground-state form
+on the magnetization sector**: for the bipartite antiferromagnetic
+Heisenberg matrix restricted to the magnetization-`M` sector, there
+exists a Marshall-positive ground-state eigenvector `sign · v` (with
+`v > 0` componentwise) at some eigenvalue `μ < c`, AND any other
+Marshall-positive eigenvector at the SAME eigenvalue `μ` is a positive
+scalar multiple of it.
+
+Bundles the existence theorem
+(`exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector`,
+PR #853) with the same-eigenvalue uniqueness theorem
+(`marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector`,
+PR #854) into the form most directly usable downstream. -/
+theorem marshallLiebMattis_spinS_heisenbergSector_groundState
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N) :
+    ∃ (μ : ℝ) (v : magConfigS V N M → ℝ),
+      μ < c ∧
+      (∀ σ, 0 < v σ) ∧
+      (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+        (fun σ => (marshallSignS A σ.1).re * v σ) =
+        μ • (fun σ => (marshallSignS A σ.1).re * v σ) ∧
+      (∀ {w : magConfigS V N M → ℝ},
+        (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec w = μ • w →
+        (∀ σ, 0 < (marshallSignS A σ.1).re * w σ) →
+        ∃ r : ℝ, 0 < r ∧
+          w = r • (fun σ => (marshallSignS A σ.1).re * v σ)) := by
+  obtain ⟨μ, v, hμ_lt, hv_pos, hmul⟩ :=
+    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
+      (M := M) A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+      h_intermediate
+  refine ⟨μ, v, hμ_lt, hv_pos, hmul, ?_⟩
+  intro w hw hw_pos
+  have hsign_v_pos : ∀ σ, 0 < (marshallSignS A σ.1).re *
+      ((marshallSignS A σ.1).re * v σ) := fun σ => by
+    have hsq : (marshallSignS A σ.1).re * (marshallSignS A σ.1).re = 1 :=
+      marshallSignS_re_sq A σ.1
+    rw [← mul_assoc, hsq, one_mul]
+    exact hv_pos σ
+  exact marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector
+    A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
+    hmul hsign_v_pos hw hw_pos
+
 end LatticeSystem.Quantum
