@@ -1072,6 +1072,8 @@ Issue #412; assembled in PRs #875–#879. All theorems live in
 | `allAlignedStateS_zero_expectation_heisenbergHamiltonianS` / `_last_expectation_heisenbergHamiltonianS` | **Heisenberg expectation on saturated states**: `⟨|σ_⊤⟩, H · |σ_⊤⟩⟩ = saturatedFerromagnetEigenvalueS J N`; `⟨|σ_⊥⟩, H · |σ_⊥⟩⟩ = H(σ_⊥, σ_⊥)` (PR #943, file `Quantum/SpinS/SaturatedHeisenbergExpectation.lean`) |
 | `heisenbergHamiltonianS_uniform_eq_totalSpinSSquared` | `heisenbergHamiltonianS (fun _ _ => 1) N = totalSpinSSquared V N` (uniform-J Heisenberg = total-spin Casimir) (PR #945, file `Quantum/SpinS/HeisenbergUniformCasimir.lean`) |
 | `heisenbergHamiltonianS_diag_allAlignedConfigS_last_eq_zero` | **`H(σ_⊥, σ_⊥) = saturatedFerromagnetEigenvalueS J N`**: both extremal H-diagonals equal (via #875/#876 same explicit formula + uniqueness on non-zero eigenvectors) (PR #946, file `Quantum/SpinS/SaturatedHeisenbergSymmetric.lean`) |
+| `allAlignedStateS_last_expectation_heisenbergHamiltonianS_eq_saturated` | clean form of `⟨|σ_⊥⟩, H · |σ_⊥⟩⟩ = saturatedFerromagnetEigenvalueS J N` (combines #943 + #946) (PR #948, file `Quantum/SpinS/SaturatedHeisenbergExpectationClean.lean`) |
+| `saturatedFerromagnetEigenvalueS_uniform` | for uniform `J = 1`, `saturatedFerromagnetEigenvalueS = saturatedFerromagnetCasimirEigenvalueS = m_max(m_max + 1)` (PR #949, file `Quantum/SpinS/SaturatedHeisenbergUniformEigenvalue.lean`) |
 
 References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.4 (pp. 30–37, spin-1/2 case).

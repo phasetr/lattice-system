@@ -5754,6 +5754,23 @@ the eigenvalue on a non-zero eigenvector (via
 \texttt{allAlignedStateS\_ne\_zero}) extracts
 $E = H(\sigma_\top, \sigma_\top) = H(\sigma_\bot, \sigma_\bot)$.
 
+\textbf{Symmetric H expectation cleanup (PR~\#948)}: the new file
+\texttt{Quantum/SpinS/SaturatedHeisenbergExpectationClean.lean}
+chains \#943 and \#946 to give the clean form
+$\langle|\sigma_\bot\rangle, H\,|\sigma_\bot\rangle\rangle =
+\texttt{saturatedFerromagnetEigenvalueS}\,J\,N$, matching the
+$|\sigma_\top\rangle$ statement.
+
+\textbf{Uniform-J saturated eigenvalue equals Casimir (PR~\#949)}:
+the new file
+\texttt{Quantum/SpinS/SaturatedHeisenbergUniformEigenvalue.lean}
+proves
+$\texttt{saturatedFerromagnetEigenvalueS}\,(\lambda\_\_, 1)\,N =
+\texttt{saturatedFerromagnetCasimirEigenvalueS}\,V\,N =
+m_{\max}(m_{\max}+1)$. Direct from \#945 ($H_{\rm uniform} =
+\hat{S}_{\rm tot}^2$) plus the diagonal entry of $\hat{S}_{\rm tot}^2$
+at $\sigma_\top$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
