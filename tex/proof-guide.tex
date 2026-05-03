@@ -5809,6 +5809,18 @@ is linearly independent over $\mathbb{C}$. Direct application of
 injective $\hat{S}^z_{\rm tot}$ eigenvalue function
 $c \mapsto |V|\cdot N/2 - |V|\cdot c$.
 
+\textbf{All-aligned span finrank (PR~\#959)}: the new file
+\texttt{Quantum/SpinS/AllAlignedStateSpan.lean} applies
+\texttt{finrank\_span\_eq\_card} to PR \#957's LI family,
+yielding $\dim_\mathbb{C}\,\texttt{Submodule.span}\,\mathbb{C}\,
+(\textsf{Set.range}\,\texttt{allAlignedStateS}) = N + 1$.
+
+\textbf{All-aligned states orthogonal (PR~\#960)}: the new file
+\texttt{Quantum/SpinS/AllAlignedStateOrthogonal.lean} proves
+$\langle|c_1..c_1\rangle, |c_2..c_2\rangle\rangle = 0$ for
+$c_1 \neq c_2$ via \texttt{basisVecS\_inner\_of\_ne} (PR \#914) +
+\texttt{allAlignedConfigS\_injective} (PR \#956).
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
