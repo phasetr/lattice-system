@@ -208,6 +208,37 @@ theorem shiftedDressedSReMatrix_apply_eq_zero_of_magSumS_ne
   rw [dressedHeisenbergSReMatrix_apply_eq_zero_of_magSumS_ne A J N h]
   ring
 
+/-- The shifted dressed matrix-power preserves magnetization: for any
+`k`, `(shiftedDressedSReMatrix^k) σ' σ = 0` when `σ', σ` have
+different `magSumS` values. By induction on `k`, splitting the
+matrix-product sum into terms where the intermediate index has either
+the same magnetization as `σ` (then later step vanishes) or different
+(IH gives 0). -/
+theorem shiftedDressedSReMatrix_pow_apply_eq_zero_of_magSumS_ne
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) :
+    ∀ (k : ℕ) {σ' σ : V → Fin (N + 1)},
+      magSumS σ ≠ magSumS σ' →
+      (shiftedDressedSReMatrix A J N c ^ k) σ' σ = 0 := by
+  intro k
+  induction k with
+  | zero =>
+    intro σ' σ h
+    have hne : σ' ≠ σ := fun heq => h (heq ▸ rfl)
+    rw [pow_zero, Matrix.one_apply, if_neg hne]
+  | succ m ih =>
+    intro σ' σ h
+    rw [pow_succ, Matrix.mul_apply]
+    refine Finset.sum_eq_zero ?_
+    intro l _
+    by_cases hlσ : magSumS l = magSumS σ
+    · -- magSumS l = magSumS σ ≠ magSumS σ', so shiftedDressed l σ at position
+      -- between (M^m σ' l) and (M l σ): for l with magSumS l = magSumS σ ≠
+      -- magSumS σ', the entry (M^m) σ' l = 0 by IH.
+      rw [ih (hlσ ▸ h.symm).symm, zero_mul]
+    · -- magSumS l ≠ magSumS σ, so M l σ = 0 by base.
+      rw [shiftedDressedSReMatrix_apply_eq_zero_of_magSumS_ne A J N c
+        (Ne.symm hlσ), mul_zero]
+
 /-- **Strictly positive matrix-power** for distinct configurations. For
 σ ≠ σ' raise/lower-reachable, the matrix-power positivity holds at
 some `k ≥ 1` (excluding the trivial `k = 0` reflexive case which
