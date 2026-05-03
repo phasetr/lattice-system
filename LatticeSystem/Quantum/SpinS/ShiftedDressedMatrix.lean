@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.DressedHeisenberg
 import LatticeSystem.Quantum.SpinS.DressedHeisenbergRaiseLower
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
+import LatticeSystem.Quantum.SpinS.RaiseLowerMatrixPow
 
 /-!
 # The shifted dressed Heisenberg matrix
@@ -155,5 +156,44 @@ theorem shiftedDressedSReMatrix_apply_pos_of_raiseLowerStepS_bipartite
   rw [shiftedDressedSReMatrix_apply_off_diag A J N c hne]
   exact neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_bipartite A
     N hJ_real hJ_pos hJ_sym hstep
+
+/-! ## Matrix-power positivity from raise/lower reachability -/
+
+/-- **Matrix-power positivity from raise/lower reachability** (γ-3 PF
+irreducibility input). For the shifted dressed matrix
+`shiftedDressedSReMatrix A J N c` (with `c` chosen large enough to
+dominate the diagonal), and for any two configurations σ, σ' connected
+by a `RaiseLowerReachableS` chain in the bipartite complete graph,
+there exists a power `k` such that the matrix-power entry is strictly
+positive:
+
+    `0 < (shiftedDressedSReMatrix A J N c ^ k) σ' σ`.
+
+Proof: combines `exists_matrixPow_apply_pos_of_raiseLowerReachableS`
+(#815) with the non-negativity (#828) and step-positivity (#829) of
+the shifted matrix. -/
+theorem exists_matrixPow_pos_of_raiseLowerReachableS_bipartite
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ ≤ c)
+    {σ σ' : V → Fin (N + 1)}
+    (hreach : RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ σ') :
+    ∃ k : ℕ,
+      0 < (shiftedDressedSReMatrix A J N c ^ k) σ' σ := by
+  apply exists_matrixPow_apply_pos_of_raiseLowerReachableS
+  · -- Non-negativity of the shifted matrix.
+    intro σ τ
+    exact shiftedDressedSReMatrix_nonneg A N c hJ_real hJ_nn hJ_sym
+      hJ_bipartite hc σ τ
+  · -- Strict positivity on raise/lower steps.
+    intro σ τ hstep
+    exact shiftedDressedSReMatrix_apply_pos_of_raiseLowerStepS_bipartite A N c
+      hJ_real hJ_pos hJ_sym hstep
+  · exact hreach
 
 end LatticeSystem.Quantum
