@@ -119,4 +119,51 @@ theorem totalSpinSOpMinus_pow_succ_card_mul_N_allAlignedStateS_zero
   rw [h_bot, Submodule.mem_bot] at hv_mem
   exact hv_mem
 
+/-! ## Symmetric boundary annihilation (raising side) -/
+
+/-- The eigenvalue `m_max + 1 = |V|·N/2 + 1` is above the highest
+eigenvalue `m_max` of `Ŝ^z_{tot}` on `basisVecS`-basis states,
+hence not equal to `magEigenvalueS σ` for any `σ`. -/
+theorem magEigenvalueS_ne_mMax_add_one (σ : V → Fin (N + 1)) :
+    magEigenvalueS σ ≠
+      ((Fintype.card V : ℂ) * (N : ℂ) / 2) + 1 := by
+  unfold magEigenvalueS
+  intro h
+  -- h : (|V|·N : ℂ)/2 − magSumS σ = (|V|·N : ℂ)/2 + 1.
+  have hSumS : (magSumS σ : ℂ) = (-1 : ℂ) := by linear_combination -h
+  -- Cast to Nat: magSumS σ has positive Nat value, can't equal -1 in ℂ.
+  have hReal : ((magSumS σ : ℝ) : ℂ) = ((-1 : ℝ) : ℂ) := by
+    push_cast; exact_mod_cast hSumS
+  have hReal' : (magSumS σ : ℝ) = -1 := by exact_mod_cast hReal
+  have hNonneg : (0 : ℝ) ≤ (magSumS σ : ℝ) := by positivity
+  linarith
+
+/-- **Symmetric boundary annihilation** (raising side): for
+`[Nonempty V]`, the iterate
+`(Ŝ^+_{tot})^{|V|·N + 1} · |σ_⊥⟩ = 0`.
+
+PR #887 (raising side) gives the iterate as an `Ŝ^z_{tot}`-eigenvector
+at `−m_max + (|V|·N + 1) = m_max + 1`, outside the spectrum. -/
+theorem totalSpinSOpPlus_pow_succ_card_mul_N_allAlignedStateS_last
+    [Nonempty V] :
+    ((totalSpinSOpPlus V N) ^ (Fintype.card V * N + 1)).mulVec
+        (allAlignedStateS V N (Fin.last N)) = 0 := by
+  set v := ((totalSpinSOpPlus V N) ^ (Fintype.card V * N + 1)).mulVec
+    (allAlignedStateS V N (Fin.last N))
+  have h_eigen : (totalSpinSOp3 V N).mulVec v =
+      (((Fintype.card V : ℂ) * (N : ℂ) / 2) + 1) • v := by
+    have h := totalSpinSOp3_mulVec_totalSpinSOpPlus_pow_allAlignedStateS_last
+      (V := V) (N := N) (Fintype.card V * N + 1)
+    convert h using 2
+    push_cast
+    ring
+  have hv_mem : v ∈ magSubspaceS V N
+      (((Fintype.card V : ℂ) * (N : ℂ) / 2) + 1) := by
+    rw [mem_magSubspaceS_iff]
+    exact h_eigen
+  have h_bot := magSubspaceS_eq_bot_of_not_in_spectrum
+    (V := V) (N := N) magEigenvalueS_ne_mMax_add_one
+  rw [h_bot, Submodule.mem_bot] at hv_mem
+  exact hv_mem
+
 end LatticeSystem.Quantum
