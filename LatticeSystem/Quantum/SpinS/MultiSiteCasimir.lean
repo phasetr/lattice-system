@@ -1,6 +1,5 @@
 import LatticeSystem.Quantum.SpinS.TotalSquared
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
-import LatticeSystem.Quantum.SpinS.MultiSite
 
 /-!
 # Multi-site spin-`S` Casimir decomposition (Tasaki §2.4 / §2.5 setup)
@@ -112,5 +111,38 @@ theorem two_smul_spinSDot_fin_two (N : ℕ) :
       (((N : ℂ) * (N + 2) / 2)) • 1 := by
   rw [totalSpinSSquared_fin_two]
   abel
+
+/-- **Literal scalar form** of the two-site Casimir-Heisenberg
+identity (Tasaki Problem 2.5.a single-bond, `z = 1`):
+
+  `Ŝ_0 · Ŝ_1 = (1/2) · (Ŝ_tot)² − (N(N+2)/4) · 1`.
+
+Direct corollary of `two_smul_spinSDot_fin_two` after applying `(1/2) •`
+to both sides. -/
+theorem spinSDot_fin_two_eq (N : ℕ) :
+    (spinSDot (0 : Fin 2) 1 N : ManyBodyOpS (Fin 2) N) =
+      ((1 / 2 : ℂ)) • totalSpinSSquared (Fin 2) N -
+      (((N : ℂ) * (N + 2) / 4)) • 1 := by
+  -- Apply (1/2 : ℂ) • _ to both sides of `two_smul_spinSDot_fin_two`.
+  have h := two_smul_spinSDot_fin_two N
+  have h' : ((1 / 2 : ℂ) • ((2 : ℕ) • spinSDot (0 : Fin 2) 1 N) : ManyBodyOpS (Fin 2) N) =
+      (1 / 2 : ℂ) • (totalSpinSSquared (Fin 2) N -
+        (((N : ℂ) * (N + 2) / 2)) • 1) :=
+    congrArg ((1 / 2 : ℂ) • ·) h
+  -- Simplify LHS: (1/2) • (2 • A) = A.
+  have hLHS : ((1 / 2 : ℂ) • ((2 : ℕ) • spinSDot (0 : Fin 2) 1 N) : ManyBodyOpS (Fin 2) N) =
+      spinSDot (0 : Fin 2) 1 N := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ, smul_smul,
+      show ((1 / 2 : ℂ) * (2 : ℕ)) = 1 from by push_cast; ring, one_smul]
+  -- Simplify RHS: (1/2) • ((Ŝ_tot)² - c • 1) = (1/2) • (Ŝ_tot)² - (c/2) • 1.
+  have hRHS : ((1 / 2 : ℂ) • (totalSpinSSquared (Fin 2) N -
+        (((N : ℂ) * (N + 2) / 2)) • 1) : ManyBodyOpS (Fin 2) N) =
+      (1 / 2 : ℂ) • totalSpinSSquared (Fin 2) N -
+      (((N : ℂ) * (N + 2) / 4)) • 1 := by
+    rw [smul_sub, smul_smul]
+    congr 2
+    ring
+  rw [hLHS, hRHS] at h'
+  exact h'
 
 end LatticeSystem.Quantum
