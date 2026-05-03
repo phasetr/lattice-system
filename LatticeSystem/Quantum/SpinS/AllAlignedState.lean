@@ -560,4 +560,119 @@ theorem totalSpinSSquared_mulVec_allAlignedStateS_last_eigenvalue [Nonempty V] :
   congr 1
   ring
 
+/-! ## Heisenberg-eigenvalue preservation along the lowering ladder
+
+The Heisenberg Hamiltonian commutes with each total-spin axis
+operator `Ŝ^{(α)}_tot` (Tasaki §2.4 (2.4.7) operator-level), hence
+also with the raising/lowering operators `Ŝ^±_tot`. Iterated
+applications of `Ŝ^-_tot` to the highest-weight all-up state therefore
+produce eigenvectors of the Heisenberg Hamiltonian at the SAME
+eigenvalue, generating the full $J_{\rm tot} = |V|\cdot S$
+irreducible representation as Heisenberg eigenstates. Symmetrically,
+iterated `Ŝ^+_tot` applied to the all-down state.
+-/
+
+/-- The Heisenberg Hamiltonian commutes with `Ŝ^{(1)}_tot`. Restated
+from `heisenbergHamiltonianS_commutator_totalSpinSOp1`. -/
+theorem heisenbergHamiltonianS_commute_totalSpinSOp1
+    (J : V → V → ℂ) :
+    Commute (heisenbergHamiltonianS J N) (totalSpinSOp1 V N) := by
+  unfold Commute SemiconjBy
+  have h := heisenbergHamiltonianS_commutator_totalSpinSOp1 (Λ := V) J N
+  exact sub_eq_zero.mp h
+
+/-- The Heisenberg Hamiltonian commutes with `Ŝ^{(2)}_tot`. -/
+theorem heisenbergHamiltonianS_commute_totalSpinSOp2
+    (J : V → V → ℂ) :
+    Commute (heisenbergHamiltonianS J N) (totalSpinSOp2 V N) := by
+  unfold Commute SemiconjBy
+  have h := heisenbergHamiltonianS_commutator_totalSpinSOp2 (Λ := V) J N
+  exact sub_eq_zero.mp h
+
+/-- The Heisenberg Hamiltonian commutes with `Ŝ^+_tot`. -/
+theorem heisenbergHamiltonianS_commute_totalSpinSOpPlus
+    (J : V → V → ℂ) :
+    Commute (heisenbergHamiltonianS J N) (totalSpinSOpPlus V N) := by
+  rw [totalSpinSOpPlus_eq_add]
+  exact (heisenbergHamiltonianS_commute_totalSpinSOp1 J).add_right
+    ((heisenbergHamiltonianS_commute_totalSpinSOp2 J).smul_right Complex.I)
+
+/-- The Heisenberg Hamiltonian commutes with `Ŝ^-_tot`. -/
+theorem heisenbergHamiltonianS_commute_totalSpinSOpMinus
+    (J : V → V → ℂ) :
+    Commute (heisenbergHamiltonianS J N) (totalSpinSOpMinus V N) := by
+  rw [totalSpinSOpMinus_eq_sub]
+  exact (heisenbergHamiltonianS_commute_totalSpinSOp1 J).sub_right
+    ((heisenbergHamiltonianS_commute_totalSpinSOp2 J).smul_right Complex.I)
+
+/-- The Heisenberg Hamiltonian commutes with `(Ŝ^-_tot)^k` for any
+`k : ℕ`, by induction. -/
+theorem heisenbergHamiltonianS_commute_totalSpinSOpMinus_pow
+    (J : V → V → ℂ) (k : ℕ) :
+    Commute (heisenbergHamiltonianS J N)
+      ((totalSpinSOpMinus V N) ^ k) := by
+  induction k with
+  | zero => simp [Commute, SemiconjBy]
+  | succ k ih =>
+    rw [pow_succ]
+    exact ih.mul_right (heisenbergHamiltonianS_commute_totalSpinSOpMinus J)
+
+/-- **Heisenberg eigenvalue preservation along the lowering ladder
+from all-up**: for any `k : ℕ`, the iterated lowering
+`(Ŝ^-_tot)^k · |σ_⊤⟩` is a Heisenberg eigenvector with the SAME
+eigenvalue as `|σ_⊤⟩` itself.
+
+Proof: `[H, Ŝ^-_tot] = 0` ⟹ `H · (Ŝ^-_tot)^k = (Ŝ^-_tot)^k · H`,
+combined with `H · |σ_⊤⟩ = E · |σ_⊤⟩`. -/
+theorem heisenbergHamiltonianS_mulVec_totalSpinSOpMinus_pow_allAlignedStateS_zero
+    (J : V → V → ℂ) (k : ℕ) :
+    (heisenbergHamiltonianS J N).mulVec
+      (((totalSpinSOpMinus V N) ^ k).mulVec
+        (allAlignedStateS V N (0 : Fin (N + 1)))) =
+      ((heisenbergHamiltonianS J N)
+        (allAlignedConfigS V N 0) (allAlignedConfigS V N 0)) •
+        ((totalSpinSOpMinus V N) ^ k).mulVec
+          (allAlignedStateS V N (0 : Fin (N + 1))) := by
+  -- H · ((Ŝ^-)^k · |⊤⟩) = ((Ŝ^-)^k · H) · |⊤⟩  by commutation
+  --                   = (Ŝ^-)^k · (E • |⊤⟩)   by H eigenvector
+  --                   = E • ((Ŝ^-)^k · |⊤⟩).
+  have hcomm : heisenbergHamiltonianS J N * ((totalSpinSOpMinus V N) ^ k) =
+      ((totalSpinSOpMinus V N) ^ k) * heisenbergHamiltonianS J N :=
+    (heisenbergHamiltonianS_commute_totalSpinSOpMinus_pow J k)
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec,
+    heisenbergHamiltonianS_mulVec_allAlignedStateS_zero,
+    Matrix.mulVec_smul]
+
+/-- The Heisenberg Hamiltonian commutes with `(Ŝ^+_tot)^k` for any
+`k : ℕ`, by induction. -/
+theorem heisenbergHamiltonianS_commute_totalSpinSOpPlus_pow
+    (J : V → V → ℂ) (k : ℕ) :
+    Commute (heisenbergHamiltonianS J N)
+      ((totalSpinSOpPlus V N) ^ k) := by
+  induction k with
+  | zero => simp [Commute, SemiconjBy]
+  | succ k ih =>
+    rw [pow_succ]
+    exact ih.mul_right (heisenbergHamiltonianS_commute_totalSpinSOpPlus J)
+
+/-- **Heisenberg eigenvalue preservation along the raising ladder
+from all-down**: for any `k : ℕ`, `(Ŝ^+_tot)^k · |σ_⊥⟩` is a Heisenberg
+eigenvector with the same eigenvalue as `|σ_⊥⟩`. -/
+theorem heisenbergHamiltonianS_mulVec_totalSpinSOpPlus_pow_allAlignedStateS_last
+    (J : V → V → ℂ) (k : ℕ) :
+    (heisenbergHamiltonianS J N).mulVec
+      (((totalSpinSOpPlus V N) ^ k).mulVec
+        (allAlignedStateS V N (Fin.last N))) =
+      ((heisenbergHamiltonianS J N)
+        (allAlignedConfigS V N (Fin.last N))
+        (allAlignedConfigS V N (Fin.last N))) •
+        ((totalSpinSOpPlus V N) ^ k).mulVec
+          (allAlignedStateS V N (Fin.last N)) := by
+  have hcomm : heisenbergHamiltonianS J N * ((totalSpinSOpPlus V N) ^ k) =
+      ((totalSpinSOpPlus V N) ^ k) * heisenbergHamiltonianS J N :=
+    (heisenbergHamiltonianS_commute_totalSpinSOpPlus_pow J k)
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec,
+    heisenbergHamiltonianS_mulVec_allAlignedStateS_last,
+    Matrix.mulVec_smul]
+
 end LatticeSystem.Quantum
