@@ -1115,6 +1115,8 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionCreation_eq_spinSOpMinus_one` | `c† = spinSOpMinus 1` | `Fermion/SpinSBridge.lean` (PR #936) |
 | `fermionNumber_eq_half_smul_one_sub_spinSOp3_one` | `n = (1/2) · I − spinSOp3 1` (standard physics identification `n = (I − σ^z)/2` lifted to spin-`S` at `N = 1`) | `Fermion/NumberSpinSBridge.lean` (PR #937) |
 | `fermionAnnihilation_mul_fermionCreation_eq_one_sub_number` | `c · c† = 1 − n` (hole occupation) | `Fermion/AnnihilationCreationIdentity.lean` (PR #963) |
+| `fermionAnnihilation_mul_fermionCreation_eq_half_smul_one_add_spinSOp3_one` | `c · c† = (1/2) · I + spinSOp3 1` (spin-`S` form) | `Fermion/CCDaggerSpinSBridge.lean` (PR #965) |
+| `fermionAnnihilation_mul_fermionCreation_mulVec_vacuum` / `_occupied` | `(c · c†) · |0⟩ = |0⟩`; `(c · c†) · |1⟩ = 0` (vacuum/occupied as eigenstates of `c · c†`) | `Fermion/CCDaggerAction.lean` (PR #966) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 
