@@ -914,6 +914,59 @@ The sorry in `exists_pos_eigenvec_max` is eliminated via the Collatz-Wielandt po
 References: E. Seneta, *Non-negative Matrices and Markov Chains* (3rd ed.), Springer 2006, §1.2 (pp. 27–28);
 or4nge19/MCMC: `MCMC/PF/LinearAlgebra/Matrix/PerronFrobenius/`.
 
+### Spin-`S` Marshall–Lieb–Mattis on the magnetization sector (Tasaki §2.5 Theorem 2.2 generic S, sector form)
+
+Generic-spin (`N = 2S`) version of Tasaki §2.5 Theorem 2.2 applied to the
+**magnetization-`M` sector** of the un-dressed antiferromagnetic
+Heisenberg Hamiltonian on a bipartite graph. The sector subtype
+`magConfigS V N M := { σ : V → Fin (N + 1) // magSumS σ = M }` is the
+natural index type since the dressed Heisenberg matrix is irreducible
+on each sector. All theorems live in
+`Quantum/SpinS/DressedMatrixOnMagSector.lean`. Tracked in Issue #412.
+
+| Lean name | Statement |
+|---|---|
+| `magConfigS V N M` | sector subtype of magnetization-`M` configurations (`Quantum/SpinS/MagConfig.lean`) |
+| `RaiseLowerStepSMagSector G σ τ` / `RaiseLowerReachableSMagSector G` | bipartite raise/lower step lifted to `magConfigS` and its reflexive transitive closure (`Quantum/SpinS/MagConfig.lean`) |
+| `raiseLowerReachableSMagSector_bipartiteCompleteGraph` | any two configurations in the same sector are reachable via raise/lower steps under the bipartite-intermediate hypothesis (Tasaki §2.5 Property (iii) generic-S form) |
+| `shiftedDressedSReMatrixOnMagSector A J N c M` | shifted dressed Heisenberg matrix `c·1 - dressed_re` restricted to the sector via `Matrix.submatrix Subtype.val Subtype.val`, the input to PF irreducibility |
+| `dressedHeisenbergSReMatrixOnMagSector A J N M` | dressed Heisenberg real-form matrix restricted to the sector |
+| `heisenbergHamiltonianSReMatrixOnMagSector J N M` | un-dressed Heisenberg real-form matrix restricted to the sector |
+| `heisenbergHamiltonianSMatrixOnMagSector J N M` | un-dressed Heisenberg COMPLEX matrix restricted to the sector |
+| `isIrreducible_shiftedDressedSReMatrixOnMagSector` | `Matrix.IsIrreducible` for the shifted sector matrix (Tasaki §2.5 γ-3 final, MLM PF input) |
+| `exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector` | PF eigenvector existence for the shifted sector matrix (`r > 0`, `v > 0` componentwise) |
+| `pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector` | PF eigenvector uniqueness on the shifted sector matrix (Tasaki §2.5 nondegeneracy) |
+| `exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector` | PF on the dressed sector matrix at eigenvalue `c - r` (Tasaki §2.5 dressed-form ground state) |
+| `pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector` | dressed sector eigenvector uniqueness at fixed eigenvalue (PR #856) |
+| `pos_eigenvec_eigenvalue_unique_dressedHeisenbergSReMatrixOnMagSector` | dressed sector positive eigenvectors share the same eigenvalue (Rayleigh identity for symmetric matrices, PR #856) |
+| `dressedHeisenbergSReMatrix_eq_marshallSign_mul_heisenberg` / `heisenbergHamiltonianSReMatrix_eq_marshallSign_mul_dressed` | matrix relations `dressed = sign·sign·heis` and inverse via `sign² = 1` (PR #853) |
+| `heisenbergHamiltonianSReMatrixOnMagSector_mulVec_of_dressed_eigenvec` | Marshall sign conjugation of dressed sector eigenvector to un-dressed Heisenberg sector eigenvector (PR #853) |
+| `dressedHeisenbergSReMatrixOnMagSector_mulVec_of_heis_eigenvec` | inverse Marshall conjugation (PR #854) |
+| `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector` | un-dressed Heisenberg sector ground-state existence with Marshall sign structure (PR #853) |
+| `marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector` | un-dressed Heisenberg sector Marshall-positive eigenvector uniqueness at fixed eigenvalue (PR #854) |
+| `marshallPositive_eigenvec_eigenvalue_unique_heisenbergHamiltonianSReMatrixOnMagSector` | un-dressed Heisenberg sector Marshall-positive eigenvalue uniqueness (PR #856) |
+| `marshallLiebMattis_spinS_heisenbergSector_groundState` | bundled Tasaki §2.5 Theorem 2.2 (existence + same-eigenvalue uniqueness, PR #855) |
+| `marshallLiebMattis_spinS_heisenbergSector_groundState_full` | strongest bundled Tasaki §2.5 Theorem 2.2: existence + forced eigenvalue uniqueness + eigenvector uniqueness (PR #859) |
+| `heisenbergHamiltonianSMatrixOnMagSector_isHermitian` | complex sector matrix is Hermitian for real coupling (PR #858) |
+| `heisenbergHamiltonianSMatrixOnMagSector_apply_eq_ofReal` | for real coupling, complex sector entries equal real-form entries embedded in `ℂ` (PR #857) |
+| `heisenbergHamiltonianSMatrixOnMagSector_mulVec_ofReal` | real → complex eigenvector lift (PR #858) |
+| `heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec` | complex → real real-part extraction (PR #861) |
+| `exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector` | complex-form Tasaki §2.5 Theorem 2.2 ground-state existence on the un-dressed quantum Heisenberg sector matrix (PR #860) |
+| `marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector` | complex-form Marshall-positive uniqueness via real-part extraction (PR #862) |
+| `marshallLiebMattis_spinS_heisenbergSector_complexGroundState_full` | strongest bundled Tasaki §2.5 Theorem 2.2 on the complex sector matrix (PR #863) |
+
+The complex-form `marshallLiebMattis_spinS_heisenbergSector_complexGroundState_full`
+is the COMPLEX-Hilbert-space form of Tasaki §2.5 Theorem 2.2 in the
+magnetization sector: the ground state of the un-dressed quantum
+Heisenberg Hamiltonian restricted to the sector is unique (up to a
+positive real scalar in its real part) and has the Marshall sign
+structure `Φ σ := ((sign A σ.1).re * v σ : ℂ)` with `v > 0`.
+
+References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, Springer 2020, §2.5 Theorem 2.2 (pp. 39–43); E. Seneta,
+*Non-negative Matrices and Markov Chains* (3rd ed.), Springer 2006,
+§1.2 (pp. 27–28) for the underlying Perron–Frobenius theorem.
+
 ### Single-mode fermion (P2 skeleton)
 
 Phase 2 entry point: the canonical anticommutation algebra of a single
