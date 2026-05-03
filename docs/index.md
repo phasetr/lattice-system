@@ -1121,6 +1121,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionVacuum_expectation_fermionNumber` / `fermionOccupied_expectation_fermionNumber` | `⟨n⟩` on vacuum = 0; on occupied = 1 | `Fermion/NumberExpectations.lean` (PR #969) |
 | `fermionVacuum_expectation_fermionAnnihilation_mul_fermionCreation` / `fermionOccupied_expectation_fermionAnnihilation_mul_fermionCreation` | `⟨c · c†⟩` on vacuum = 1; on occupied = 0 | `Fermion/CCDaggerExpectations.lean` (PR #971) |
 | `fermionNumber_add_fermionAnnihilation_mul_fermionCreation_eq_one` | `n + c · c† = 1` (resolution of identity in occupation basis) | `Fermion/ProjectionSum.lean` (PR #972) |
+| `fermionAnnihilation_mul_fermionCreation_sq` | `(c · c†)² = c · c†` (idempotent projection) | `Fermion/CCDaggerIdempotent.lean` (PR #974) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 
