@@ -268,4 +268,62 @@ theorem exists_raiseLowerReachableS_bipartite_of_over_under
         hxy hAeq hover hunder
     exact ⟨σ'', RaiseLowerReachableS.single hstep, hreduce⟩
 
+/-! ## Bipartite reachability iteration for equal-magnetization configs -/
+
+/-- **Bipartite reachability for equal-magnetization configurations**:
+on the complete bipartite graph `bipartiteCompleteGraphOf A`, any two
+configurations with the same magnetization sum are connected by a
+chain of bipartite raise/lower steps, given a strong intermediate-
+existence hypothesis.
+
+The hypothesis `h_intermediate` requires that for every configuration
+`τ` (with the magnetization preserved by raise/lower steps) and every
+sublattice color, there is a vertex on the OPPOSITE sublattice with
+`τ < N` — i.e., not all opposite vertices are saturated. This holds
+in many physically interesting cases (e.g., the magnetization-zero
+subspace with balanced sublattices, away from the "all-saturated"
+extreme).
+
+Proof: strong induction on `configDistS`, using
+`exists_raiseLowerReachableS_bipartite_of_over_under` (PR #821) at
+each step (which combines the easy and hard cases). -/
+theorem raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS
+    (A : V → Bool)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {σ σ' : V → Fin (N + 1)} (hmag : magSumS σ = magSumS σ') :
+    RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ σ' := by
+  -- Strong induction on configDistS σ σ'.
+  suffices h : ∀ n, ∀ σ σ' : V → Fin (N + 1),
+      magSumS σ = magSumS σ' → configDistS σ σ' ≤ n →
+      RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ σ' from
+    h (configDistS σ σ') σ σ' hmag (le_refl _)
+  intro n
+  induction n with
+  | zero =>
+    intro σ σ' _ hd
+    have hsigma : σ = σ' :=
+      (configDistS_eq_zero_iff σ σ').mp (Nat.le_zero.mp hd)
+    rw [hsigma]
+    exact RaiseLowerReachableS.refl _ _
+  | succ n ih =>
+    intro σ σ' hmag hd
+    by_cases hne : σ = σ'
+    · rw [hne]; exact RaiseLowerReachableS.refl _ _
+    · obtain ⟨⟨x, hover⟩, y, hunder⟩ :=
+        exists_over_under_of_eq_magSumS hne hmag
+      have hxy : x ≠ y := fun heq => by subst heq; omega
+      have hint : A x = A y → ∃ z, A z ≠ A x ∧ (σ z).val < N :=
+        fun _ => h_intermediate σ x
+      obtain ⟨σ_2, hreach, hreduce⟩ :=
+        exists_raiseLowerReachableS_bipartite_of_over_under
+          hxy hover hunder hint
+      have hmag_2 : magSumS σ_2 = magSumS σ :=
+        magSumS_eq_of_raiseLowerReachableS hreach
+      have hIH : RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ_2 σ' := by
+        apply ih
+        · rw [hmag_2]; exact hmag
+        · omega
+      exact hreach.trans hIH
+
 end LatticeSystem.Quantum
