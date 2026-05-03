@@ -9,23 +9,25 @@ import LatticeSystem.Quantum.SpinS.MultiSiteDot
 
 For a multi-site spin-`S` system on a finite vertex set `V`, the
 **all-aligned** (constant-spin) state with `σ x = c` for all `x : V`
-is a basis vector of the multi-site Hilbert space. The two extreme
-cases — `c = 0` (highest weight, "all up") and `c = N` (lowest weight,
-"all down") — are simultaneous eigenvectors of:
+is a basis vector of the multi-site Hilbert space.
 
-1. The total `Ŝ^z_tot` operator with eigenvalue `±|V|·N/2`.
-2. The total Casimir `(Ŝ_tot)²` with eigenvalue `(|V|·N/2)(|V|·N/2+1)`
-   — the `J = |V|·S` highest-weight irreducible representation.
-3. Any Heisenberg Hamiltonian `H = Σ_{x,y} J(x,y) Ŝ_x · Ŝ_y` with
-   eigenvalue
-     `Σ_{x≠y} J(x,y) · N²/4 + Σ_x J(x,x) · N(N+2)/4`.
+This file proves:
 
-This file proves these eigenvector statements for **all** constant-`c`
-states (not just `c = 0` or `c = N`); the off-diagonal vanishing is
-NOT generic — only the extreme weights `c = 0` and `c = N` give
-Heisenberg eigenvectors. We prove the (Ŝ_tot)² eigenvalue formula
-under the highest/lowest-weight assumption (`c = 0` or `c = N`) and
-the Heisenberg eigenvalue formula likewise.
+1. The all-aligned state at any `c : Fin (N+1)` is a `Ŝ^z_tot`
+   eigenvector with eigenvalue `|V|·N/2 − |V|·c`.
+2. The two extreme cases `c = 0` (highest weight, "all up") and
+   `c = N` (lowest weight, "all down") are the **unique** elements of
+   their respective magnetization sectors (`magSumS = 0` and
+   `magSumS = |V|·N`), hence automatically Heisenberg eigenvectors
+   for ANY coupling via the magnetization-conservation identity
+   `[H, Ŝ^z_tot] = 0`. The eigenvalue is the explicit diagonal
+   `Σ_x J(x,x) · N(N+2)/4 + Σ_{x≠y} J(x,y) · N²/4`.
+
+The `(Ŝ_tot)²` eigenvalue `(|V|·N/2)(|V|·N/2+1)` (the `J = |V|·S`
+highest-weight irreducible representation) is left to a follow-up
+textbook unit, since it requires the alternative Casimir form
+`(Ŝ_tot)² = Ŝ^-_tot Ŝ^+_tot + (Ŝ^z_tot)² + Ŝ^z_tot` plus
+`Ŝ^+_tot · |σ_⊤⟩ = 0`.
 
 The spin-`S` extension of Tasaki §2.4 (which treats `S = 1/2` in
 detail) and the operator-level form of the saturated-ferromagnetic
@@ -100,23 +102,24 @@ theorem magSumS_allAlignedConfigS_zero :
 
 omit [DecidableEq V] in
 /-- The all-up configuration is the **unique** configuration with
-`magSumS = 0`: every other configuration has `magSumS ≥ 1`. -/
+`magSumS = 0`: every other configuration has `magSumS > 0`. -/
 theorem magSumS_pos_of_ne_allAlignedConfigS_zero
     {σ : V → Fin (N + 1)} (h : σ ≠ allAlignedConfigS V N 0) :
-    magSumS σ ≠ 0 := by
-  intro hmag
-  apply h
-  funext x
-  unfold magSumS at hmag
-  -- ∑ x, (σ x).val = 0 with non-negative summands ⟹ each is 0.
-  have hx : (σ x).val = 0 := by
-    have := Finset.sum_eq_zero_iff_of_nonneg
-      (s := (Finset.univ : Finset V))
-      (f := fun y => (σ y).val)
-      (fun y _ => Nat.zero_le _) |>.mp hmag x (Finset.mem_univ x)
-    exact this
-  unfold allAlignedConfigS
-  exact Fin.ext hx
+    0 < magSumS σ := by
+  rcases Nat.eq_zero_or_pos (magSumS σ) with hmag | hpos
+  · exfalso
+    apply h
+    funext x
+    unfold magSumS at hmag
+    have hx : (σ x).val = 0 := by
+      have := Finset.sum_eq_zero_iff_of_nonneg
+        (s := (Finset.univ : Finset V))
+        (f := fun y => (σ y).val)
+        (fun y _ => Nat.zero_le _) |>.mp hmag x (Finset.mem_univ x)
+      exact this
+    unfold allAlignedConfigS
+    exact Fin.ext hx
+  · exact hpos
 
 /-- **The all-up state is a Heisenberg eigenvector** (any coupling
 `J`): for the all-up basis state `|σ_⊤⟩` (`σ x = 0` for all `x`),
@@ -127,7 +130,7 @@ By magnetization conservation `[H, Ŝ^z_tot] = 0`, the only matrix
 element `H τ σ_⊤` non-zero requires `magSumS τ = magSumS σ_⊤ = 0`,
 which forces `τ = σ_⊤`. -/
 theorem heisenbergHamiltonianS_mulVec_allAlignedStateS_zero
-    (J : V → V → ℂ) (N : ℕ) :
+    (J : V → V → ℂ) :
     (heisenbergHamiltonianS J N).mulVec
       (allAlignedStateS V N (0 : Fin (N + 1))) =
       ((heisenbergHamiltonianS J N)
@@ -154,7 +157,8 @@ theorem heisenbergHamiltonianS_mulVec_allAlignedStateS_zero
       simp [magEigenvalueS] at this
       exact_mod_cast this.symm
     rw [magSumS_allAlignedConfigS_zero] at hmag
-    exact magSumS_pos_of_ne_allAlignedConfigS_zero h hmag
+    have hpos := magSumS_pos_of_ne_allAlignedConfigS_zero h
+    omega
 
 /-- **Explicit Heisenberg eigenvalue formula on all-up**: combining
 `heisenbergHamiltonianS_mulVec_allAlignedStateS_zero` with the
@@ -162,7 +166,7 @@ diagonal computation `heisenbergHamiltonianS_apply_diag` gives
 
   `H · |σ_⊤⟩ = (Σ_x J(x,x) · N(N+2)/4 + Σ_{x≠y} J(x,y) · N²/4) · |σ_⊤⟩`. -/
 theorem heisenbergHamiltonianS_mulVec_allAlignedStateS_zero_eigenvalue
-    (J : V → V → ℂ) (N : ℕ) :
+    (J : V → V → ℂ) :
     (heisenbergHamiltonianS J N).mulVec
       (allAlignedStateS V N (0 : Fin (N + 1))) =
       ((∑ x : V, ∑ y : V,
