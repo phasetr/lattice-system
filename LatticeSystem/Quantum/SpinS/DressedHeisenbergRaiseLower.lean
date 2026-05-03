@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.HeisenbergRaiseLower
 import LatticeSystem.Quantum.SpinS.DressedHeisenberg
+import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
 
 /-!
 # Marshall-dressed Heisenberg matrix elements on raise/lower steps
@@ -195,5 +196,26 @@ theorem neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_witness
     A N hadj hAne hJ_real hJ_pos hJ_sym hsh hagree
   show 0 < -dressedHeisenbergSReMatrix A J N σ' σ
   linarith
+
+/-- For a `RaiseLowerStepS` in the bipartite complete graph
+`bipartiteCompleteGraphOf A` (so the witness sites are automatically
+bipartite), the negation `-dressedHeisenbergSReMatrix` has strictly
+positive entries between the two configurations:
+
+    `0 < (-dressedHeisenbergSReMatrix A J N) τ σ`. -/
+theorem neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_bipartite
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    {σ τ : V → Fin (N + 1)}
+    (hstep : RaiseLowerStepS (bipartiteCompleteGraphOf A) σ τ) :
+    0 < (-dressedHeisenbergSReMatrix A J N) τ σ := by
+  obtain ⟨x, y, hadj, hsh, hagree⟩ := hstep
+  -- A x ≠ A y from bipartiteCompleteGraphOf adjacency.
+  have hAne : A x ≠ A y := bipartiteCompleteGraphOf_adj_sublattice_ne hadj
+  exact neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_witness A N
+    hadj hAne (hJ_real x y) (hJ_pos x y hadj) (hJ_sym x y) hsh hagree
 
 end LatticeSystem.Quantum
