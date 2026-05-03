@@ -5835,6 +5835,16 @@ proves the standard hole-occupation identity from
 and \texttt{fermionNumber\_eq\_creation\_mul\_annihilation}
 ($n = c^\dagger\,c$).
 
+\textbf{$c\,c^\dagger$ in spin-`S` form (PR~\#965)}: the new file
+\texttt{Fermion/CCDaggerSpinSBridge.lean} chains \#937 and \#963
+to give $c\cdot c^\dagger = (1/2)\,I + \hat{S}^{(3)}_1$.
+
+\textbf{$c\,c^\dagger$ action on basis states (PR~\#966)}: the new
+file \texttt{Fermion/CCDaggerAction.lean} proves
+$(c\cdot c^\dagger) |0\rangle = |0\rangle$ and
+$(c\cdot c^\dagger) |1\rangle = 0$, the vacuum/occupied eigenstate
+identifications.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
