@@ -1037,4 +1037,94 @@ theorem heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
     (fun σ => (W σ).re) σ = μ * (W σ).re
   exact hRe_eq
 
+/-- **Real part extraction**: for real coupling, the real part of a
+complex eigenvector of the complex Heisenberg sector matrix at a real
+eigenvalue `μ` is a real eigenvector of the real-form sector matrix at
+the same `μ`.
+
+This is the inverse of `heisenbergHamiltonianSMatrixOnMagSector_mulVec_ofReal`
+(PR #858) and gives a complete real-↔-complex correspondence on the
+sector for real coupling. -/
+theorem heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
+    {J : V → V → ℂ} (N : ℕ) {M : ℕ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    {μ : ℝ} {W : magConfigS V N M → ℂ}
+    (hW : (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec W =
+      (μ : ℂ) • W) :
+    (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+      (fun σ => (W σ).re) = μ • (fun σ => (W σ).re) := by
+  funext σ
+  have hσ := congrFun hW σ
+  -- Take real parts of both sides of hσ.
+  have hRe_eq : ((heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec W σ).re =
+      (((μ : ℂ) • W) σ).re := by rw [hσ]
+  -- LHS: Re(∑τ heis_C σ τ * W τ) = ∑τ heis_re σ τ * (W τ).re.
+  have hLHS : ((heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec W σ).re =
+      ∑ τ, heisenbergHamiltonianSReMatrixOnMagSector J N M σ τ * (W τ).re := by
+    change (∑ τ, heisenbergHamiltonianSMatrixOnMagSector J N M σ τ * W τ).re = _
+    rw [Complex.re_sum]
+    refine Finset.sum_congr rfl (fun τ _ => ?_)
+    rw [heisenbergHamiltonianSMatrixOnMagSector_apply_eq_ofReal _ _ hJ_real]
+    rw [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]
+    ring
+  -- RHS: Re(μ • W σ) = μ * (W σ).re.
+  have hRHS : (((μ : ℂ) • W) σ).re = μ * (W σ).re := by
+    change ((μ : ℂ) * W σ).re = _
+    rw [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]
+    ring
+  rw [hLHS, hRHS] at hRe_eq
+  change (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+    (fun σ => (W σ).re) σ = μ * (W σ).re
+  exact hRe_eq
+
+/-- **Complex-form uniqueness for Marshall-positive eigenvectors of the
+real-coupling complex Heisenberg sector matrix at real eigenvalues**:
+any two complex sector eigenvectors `W₁, W₂` with strictly positive
+Marshall-conjugated real parts share the same eigenvalue (`μ₁ = μ₂`)
+and their real parts are positive scalar multiples of each other.
+
+Proof: extract real parts via PR #861 to reduce to the real-form
+Marshall-positive uniqueness theorems (PRs #854, #856). -/
+theorem marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {μ₁ μ₂ : ℝ} {W₁ W₂ : magConfigS V N M → ℂ}
+    (hW₁ : (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec W₁ =
+      (μ₁ : ℂ) • W₁)
+    (hW₁_marshall_pos : ∀ σ, 0 < (marshallSignS A σ.1).re * (W₁ σ).re)
+    (hW₂ : (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec W₂ =
+      (μ₂ : ℂ) • W₂)
+    (hW₂_marshall_pos : ∀ σ, 0 < (marshallSignS A σ.1).re * (W₂ σ).re) :
+    μ₁ = μ₂ ∧ ∃ r : ℝ, 0 < r ∧
+      ∀ σ, (W₂ σ).re = r * (W₁ σ).re := by
+  -- Extract real parts → real-form sector eigenvectors at μᵢ.
+  have hW₁_re :=
+    heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
+      N hJ_real hW₁
+  have hW₂_re :=
+    heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
+      N hJ_real hW₂
+  -- Eigenvalue uniqueness for Marshall-positive heis_sec eigenvectors.
+  have hμ_eq : μ₁ = μ₂ :=
+    marshallPositive_eigenvec_eigenvalue_unique_heisenbergHamiltonianSReMatrixOnMagSector
+      A N hJ_real hJ_real' hW₁_re hW₁_marshall_pos hW₂_re hW₂_marshall_pos
+  refine ⟨hμ_eq, ?_⟩
+  subst hμ_eq
+  -- Same-eigenvalue eigenvector uniqueness on heis_sec.
+  obtain ⟨r, hr_pos, hrel⟩ :=
+    marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector
+      A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
+      hW₁_re hW₁_marshall_pos hW₂_re hW₂_marshall_pos
+  exact ⟨r, hr_pos, fun σ => congrFun hrel σ⟩
+
 end LatticeSystem.Quantum
