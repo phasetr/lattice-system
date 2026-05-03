@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.ShiftedDressedMatrix
 import LatticeSystem.Quantum.SpinS.MagConfig
+import LatticeSystem.Quantum.SpinS.RaiseLowerMatrixPow
 
 /-!
 # Sector-restricted dressed Heisenberg matrix
@@ -66,5 +67,36 @@ theorem shiftedDressedSReMatrixOnMagSector_apply_pos_of_raiseLowerStepSMagSector
   rw [shiftedDressedSReMatrixOnMagSector_apply]
   exact shiftedDressedSReMatrix_apply_pos_of_raiseLowerStepS_bipartite A N c
     hJ_real hJ_pos hJ_sym hstep
+
+/-- **Matrix-power positivity from raise/lower reachability on subtype**:
+the magConfigS analogue of `exists_matrixPow_apply_pos_of_raiseLowerReachableS`
+(PR #815). For a non-negative matrix B on the magConfigS subtype with
+0 < B τ σ on every RaiseLowerStepSMagSector σ → τ, the relation
+RaiseLowerReachableSMagSector G σ σ' lifts to: there exists k ≥ 0 with
+0 < (B^k) σ' σ.
+
+Proof: induction on Relation.ReflTransGen, identical to #815. -/
+theorem exists_matrixPow_apply_pos_of_raiseLowerReachableSMagSector
+    {G : SimpleGraph V} {M : ℕ}
+    {B : Matrix (magConfigS V N M) (magConfigS V N M) ℝ}
+    (hB_nn : ∀ σ τ, 0 ≤ B σ τ)
+    (hB_step : ∀ {σ τ : magConfigS V N M},
+      RaiseLowerStepSMagSector G σ τ → 0 < B τ σ)
+    {σ σ' : magConfigS V N M}
+    (hreach : RaiseLowerReachableSMagSector G σ σ') :
+    ∃ k : ℕ, 0 < (B ^ k) σ' σ := by
+  induction hreach with
+  | refl =>
+    refine ⟨0, ?_⟩
+    simp [Matrix.one_apply_eq]
+  | tail _h₁ h₂ ih =>
+    obtain ⟨k, hpos⟩ := ih
+    refine ⟨k + 1, ?_⟩
+    rw [pow_succ', Matrix.mul_apply]
+    apply Finset.sum_pos'
+    · intro l _
+      exact mul_nonneg (hB_nn _ _) (Matrix.pow_apply_nonneg hB_nn _ _ _)
+    · refine ⟨_, Finset.mem_univ _, mul_pos ?_ hpos⟩
+      exact hB_step h₂
 
 end LatticeSystem.Quantum
