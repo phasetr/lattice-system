@@ -1037,6 +1037,22 @@ theorem dressedHeisenbergSReMatrix_apply_eq_zero_of_mag_ne
     dressedHeisenbergSMatrix_apply_eq_zero_of_mag_ne A J N h
   rw [hzero]; simp
 
+/-- magSumS-based version: when two configurations have different
+`magSumS` values, the dressed real-matrix entry vanishes. (Equivalent
+to the `magEigenvalueS`-based version via bijection.) -/
+theorem dressedHeisenbergSReMatrix_apply_eq_zero_of_magSumS_ne
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
+    {σ' σ : V → Fin (N + 1)}
+    (h : magSumS σ ≠ magSumS σ') :
+    dressedHeisenbergSReMatrix A J N σ' σ = 0 := by
+  apply dressedHeisenbergSReMatrix_apply_eq_zero_of_mag_ne
+  unfold magEigenvalueS
+  intro heq
+  apply h
+  -- magEig σ = magEig σ' ⟹ magSum σ = magSum σ'.
+  have : ((magSumS σ : ℂ)) = ((magSumS σ' : ℂ)) := by linear_combination -heq
+  exact_mod_cast this
+
 /-! ## Off-`{x, y}`-agree vanishing variants (γ-3 prep)
 
 These three lemmas package the vanishing cases of the two-site
