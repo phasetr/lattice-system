@@ -5853,6 +5853,16 @@ orthonormality of $|0\rangle, |1\rangle$ entrywise.
 \texttt{Fermion/NumberExpectations.lean} gives $\langle 0| n |0\rangle = 0$
 and $\langle 1| n |1\rangle = 1$.
 
+\textbf{$c\,c^\dagger$ expectations (PR~\#971)}: the new file
+\texttt{Fermion/CCDaggerExpectations.lean} gives
+$\langle 0| c c^\dagger |0\rangle = 1$ and
+$\langle 1| c c^\dagger |1\rangle = 0$.
+
+\textbf{Projection sum (PR~\#972)}: the new file
+\texttt{Fermion/ProjectionSum.lean} proves
+$n + c\,c^\dagger = 1$, the resolution of identity in the
+occupation basis.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
