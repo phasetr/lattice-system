@@ -309,16 +309,9 @@ Casimir eigenvalue computation `(Ŝ_tot)² · |σ_⊤⟩
   = (|V|·N/2)·(|V|·N/2 + 1) · |σ_⊤⟩`.
 -/
 
-/-- Single-site `Ŝ^+` matrix element with the highest-weight column
-(`σ_x = 0`) vanishes: `(Ŝ^+) i 0 = 0` for any `i`. -/
-theorem spinSOpPlus_apply_zero_eq_zero (N : ℕ) (i : Fin (N + 1)) :
-    spinSOpPlus N i (0 : Fin (N + 1)) = 0 := by
-  rw [show (0 : Fin (N + 1)) = ⟨0, Nat.succ_pos N⟩ from rfl]
-  exact spinSOpPlus_apply_first_col i
-
 /-- For any site `x : V`, the on-site `Ŝ^+` matrix element with the
 all-up configuration vanishes: `(onSiteS x Ŝ^+) σ' σ_⊤ = 0` for
-every `σ'`. -/
+every `σ'`. Direct corollary of `spinSOpPlus_apply_first_col`. -/
 theorem onSiteS_spinSOpPlus_apply_allAlignedConfigS_zero
     (x : V) (σ' : V → Fin (N + 1)) :
     (onSiteS x (spinSOpPlus N) : ManyBodyOpS V N) σ'
@@ -327,7 +320,8 @@ theorem onSiteS_spinSOpPlus_apply_allAlignedConfigS_zero
   · rw [onSiteS_apply_of_off_site_agree _ _ h]
     show spinSOpPlus N (σ' x) ((allAlignedConfigS V N 0) x) = 0
     unfold allAlignedConfigS
-    exact spinSOpPlus_apply_zero_eq_zero N (σ' x)
+    rw [show (0 : Fin (N + 1)) = ⟨0, Nat.succ_pos N⟩ from rfl]
+    exact spinSOpPlus_apply_first_col (σ' x)
   · exact onSiteS_apply_eq_zero_of_off_site_diff _ _ h
 
 /-- **The on-site raising operator annihilates the all-up state**:
@@ -354,14 +348,9 @@ theorem totalSpinSOpPlus_mulVec_allAlignedStateS_zero :
 
 /-! ## Lowest-weight annihilation by `Ŝ^-_tot` -/
 
-/-- Single-site `Ŝ^-` matrix element with the lowest-weight column
-(`σ_x = N`) vanishes: `(Ŝ^-) i (Fin.last N) = 0` for any `i`. -/
-theorem spinSOpMinus_apply_last_eq_zero (N : ℕ) (i : Fin (N + 1)) :
-    spinSOpMinus N i (Fin.last N) = 0 := by
-  exact spinSOpMinus_apply_last_col i
-
 /-- For any site `x : V`, the on-site `Ŝ^-` matrix element with the
-all-down configuration vanishes. -/
+all-down configuration vanishes. Direct corollary of
+`spinSOpMinus_apply_last_col`. -/
 theorem onSiteS_spinSOpMinus_apply_allAlignedConfigS_last
     (x : V) (σ' : V → Fin (N + 1)) :
     (onSiteS x (spinSOpMinus N) : ManyBodyOpS V N) σ'
@@ -371,7 +360,7 @@ theorem onSiteS_spinSOpMinus_apply_allAlignedConfigS_last
     show spinSOpMinus N (σ' x)
         ((allAlignedConfigS V N (Fin.last N)) x) = 0
     unfold allAlignedConfigS
-    exact spinSOpMinus_apply_last_eq_zero N (σ' x)
+    exact spinSOpMinus_apply_last_col (σ' x)
   · exact onSiteS_apply_eq_zero_of_off_site_diff _ _ h
 
 /-- **The on-site lowering operator annihilates the all-down state**:
