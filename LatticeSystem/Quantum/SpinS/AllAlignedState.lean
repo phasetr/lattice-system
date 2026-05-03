@@ -209,38 +209,17 @@ theorem magSumS_allAlignedConfigS_last :
 
 omit [DecidableEq V] in
 /-- The all-down configuration is the **unique** configuration with
-`magSumS = |V|·N`: every other configuration has `magSumS < |V|·N`. -/
+`magSumS = |V|·N`: every other configuration has `magSumS < |V|·N`.
+
+Short proof using the existing `magSumS_eq_max_iff` characterisation. -/
 theorem magSumS_lt_card_mul_of_ne_allAlignedConfigS_last
     {σ : V → Fin (N + 1)} (h : σ ≠ allAlignedConfigS V N (Fin.last N)) :
     magSumS σ < Fintype.card V * N := by
-  -- Find some x with (σ x).val < N (otherwise all (σ x).val = N, i.e., σ = all-down).
-  by_contra hge
-  push Not at hge
-  -- hge : Fintype.card V * N ≤ magSumS σ.
-  -- Combined with magSumS σ ≤ |V|·N (`magSumS_le`), get equality.
-  have heq : magSumS σ = Fintype.card V * N := le_antisymm (magSumS_le σ) hge
-  -- Each summand (σ y).val ≤ N, sum equals |V|·N ⟹ each is exactly N.
-  apply h
-  funext x
-  -- Show (σ x).val = N for every x.
-  have hbound : ∀ y, (σ y).val ≤ N := fun y => Nat.lt_succ_iff.mp (σ y).isLt
-  have hxN : (σ x).val = N := by
-    -- Sum trick: if any (σ x).val < N, sum would be < |V|·N.
-    by_contra hne
-    have hxlt : (σ x).val < N := lt_of_le_of_ne (hbound x) hne
-    -- Sum bound via Finset.sum_le_sum applied with strict inequality at x.
-    have : magSumS σ < Fintype.card V * N := by
-      unfold magSumS
-      calc ∑ y : V, (σ y).val
-          < ∑ y : V, N := by
-            refine Finset.sum_lt_sum (fun y _ => hbound y) ⟨x, Finset.mem_univ x, hxlt⟩
-        _ = Fintype.card V * N := by
-            rw [Finset.sum_const, Finset.card_univ, smul_eq_mul]
-    omega
-  unfold allAlignedConfigS
-  apply Fin.ext
-  rw [hxN]
-  simp [Fin.last]
+  rcases lt_or_eq_of_le (magSumS_le σ) with hlt | heq
+  · exact hlt
+  · exfalso; apply h
+    funext x
+    exact (magSumS_eq_max_iff σ).mp heq x
 
 /-- **The all-down state is a Heisenberg eigenvector** (any coupling
 `J`): for the all-down basis state `|σ_⊥⟩` (`σ x = N` for all `x`),
@@ -272,10 +251,9 @@ theorem heisenbergHamiltonianS_mulVec_allAlignedStateS_last
   · rw [basisVecS_apply, if_neg h, mul_zero]
     apply heisenbergHamiltonianS_apply_eq_zero_of_mag_ne (Λ := V) J N
     intro hEig
-    have hmag : magSumS τ = magSumS (allAlignedConfigS V N (Fin.last N)) := by
-      have := congrArg (fun z : ℂ => -(z - ((Fintype.card V : ℂ) * (N : ℂ)) / 2)) hEig
-      simp [magEigenvalueS] at this
-      exact_mod_cast this.symm
+    have hmag : magSumS τ = magSumS (allAlignedConfigS V N (Fin.last N)) :=
+      ((magEigenvalueS_eq_iff τ (allAlignedConfigS V N (Fin.last N))).mp
+        hEig.symm)
     rw [magSumS_allAlignedConfigS_last] at hmag
     have hlt := magSumS_lt_card_mul_of_ne_allAlignedConfigS_last h
     omega
