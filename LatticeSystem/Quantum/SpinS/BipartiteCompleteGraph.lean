@@ -239,4 +239,33 @@ theorem exists_raiseLowerReachableS_bipartite_of_over_under_eq_sublattice
   · -- Distance reduction: σ_2 = direct lower-x raise-y at (x, y), so reduce by 2.
     exact configDistS_decrease_of_over_under hxy hover hunder
 
+/-- **Unified bipartite over/under reduction**: combines the easy case
+(#819, over/under on different sublattices: direct step) and the hard
+case (#820, same sublattice: 2-step transport via intermediate).
+
+For an over site `x` and under site `y` with `x ≠ y`, the intermediate-
+existence hypothesis `h_intermediate` guarantees a transport when
+`A x = A y` (only used in the hard case). The conclusion combines
+both cases as a `RaiseLowerReachableS` (which subsumes a single step). -/
+theorem exists_raiseLowerReachableS_bipartite_of_over_under
+    {A : V → Bool} {σ σ' : V → Fin (N + 1)}
+    {x y : V} (hxy : x ≠ y)
+    (hover : (σ' x).val < (σ x).val)
+    (hunder : (σ y).val < (σ' y).val)
+    (h_intermediate : A x = A y →
+      ∃ z, A z ≠ A x ∧ (σ z).val < N) :
+    ∃ σ'' : V → Fin (N + 1),
+      RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ σ'' ∧
+        configDistS σ'' σ' + 2 = configDistS σ σ' := by
+  by_cases hAeq : A x = A y
+  · -- Hard case: same sublattice, use 2-step transport.
+    obtain ⟨z, hAz, hzN⟩ := h_intermediate hAeq
+    exact exists_raiseLowerReachableS_bipartite_of_over_under_eq_sublattice
+      hxy hAeq hover hunder hAz hzN
+  · -- Easy case: different sublattices, use direct step.
+    obtain ⟨σ'', hstep, hreduce⟩ :=
+      exists_raiseLowerStepS_bipartite_of_over_under_ne_sublattice
+        hxy hAeq hover hunder
+    exact ⟨σ'', RaiseLowerReachableS.single hstep, hreduce⟩
+
 end LatticeSystem.Quantum
