@@ -5071,20 +5071,40 @@ earlier concrete-case modules \texttt{pauliBasis} ($S = 1/2$) and
 \texttt{spinOne\_decomposition} ($S = 1$) remain as illustrative
 specialisations.
 
-\subsection*{TODO: Tasaki §2.5 antiferromagnetic deferred items (issue \#240)}
+\subsection*{DONE / partial: Tasaki §2.5 antiferromagnetic deferred items (issue \#240, \#412)}
 
 The antiferromagnetic Heisenberg / Néel state machinery in Tasaki
 §2.5 is largely formalised (chain / 2D / 3D Néel states + per-bond
 expectations $-1/4$ + generic graph-centric \texttt{neelStateOf} +
 Marshall sign machinery + time-reversal action; see
-§\ref{subsec:neel-state-of}). The following subitems remain
-deferred (large mathematical work, requiring infrastructure beyond
-finite-dimensional matrix algebra):
+§\ref{subsec:neel-state-of}). Status of the substructure items:
 
 \begin{itemize}
-\item Marshall--Lieb--Mattis Theorem 2.2 (uniqueness + sign
-  structure of the AFM ground state). Requires a Perron--Frobenius
-  argument on the Marshall-rotated basis.
+\item \textbf{DONE} Marshall--Lieb--Mattis Theorem 2.2 (uniqueness + sign
+  structure of the AFM ground state) for general spin~$S$ on the
+  magnetization-$M$ sector AND on the full Hilbert space, via a
+  Perron--Frobenius argument on the Marshall-rotated dressed
+  Heisenberg sector matrix. Tracked in Issue~\#412; assembled in
+  PRs~\#794--\#869.
+  \begin{itemize}
+  \item \emph{Sector form (real)}: existence (\#853), eigenvector
+    uniqueness (\#854), eigenvalue uniqueness (\#856), bundled
+    same-eigenvalue (\#855), bundled forced-eigenvalue (\#859).
+  \item \emph{Sector form (complex)}: complex sector matrix (\#857,
+    Hermiticity~\#858), real-$\leftrightarrow$-complex
+    correspondence (\#858, \#861), complex existence (\#860),
+    complex Marshall-positive uniqueness (\#862), bundled complex
+    sector ground-state theorem (\#865).
+  \item \emph{Full-Hilbert-space form (textbook unit)}: sector
+    embedding/restriction (\#867), Heisenberg commutes with
+    embedding (\#868), and the full bundled theorem
+    \texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
+    (\#869) — Tasaki §2.5 Theorem~2.2 ground-state form on the
+    actual quantum Heisenberg Hamiltonian: existence + Marshall sign
+    structure + same-eigenvalue uniqueness up to positive real
+    scalar in the real part, sector-restricted to the
+    magnetization-$M$ sector.
+  \end{itemize}
 \item Problem 2.5.a (single-cluster ground-state energy
   $-S(1+zS)$ for general spin $S$ and coordination $z$).
   Requires general-spin infrastructure (P1d''' above is now done in
@@ -5097,6 +5117,89 @@ finite-dimensional matrix algebra):
 
 The generic graph-centric \texttt{neelStateOf} (PR \#331) is the
 foundation on which these will be built when the time comes.
+
+\subsection*{Marshall--Lieb--Mattis Theorem 2.2 (Tasaki §2.5)
+              — formalisation outline}
+\label{subsec:mlm-spin-s-formalisation}
+
+\textbf{Statement} (Tasaki §2.5 Theorem 2.2, p.~39, generic spin $S$
+form on a magnetization sector). Let $G = (V, E)$ be a connected
+bipartite graph with sublattice indicator $A: V \to \{0,1\}$, and
+let $J: V \times V \to \mathbb{R}_{\ge 0}$ be a real, symmetric,
+non-negative coupling supported on bipartite bonds (i.e.\
+$J(x,y) = 0$ when $A(x) = A(y)$) with $J(x,y) > 0$ on every edge.
+For a fixed magnetization quantum number $M$, the ground state of
+the Heisenberg Hamiltonian
+\[
+  \hat H = \sum_{x,y \in V} J(x,y)\,\hat{\boldsymbol S}_x \cdot
+  \hat{\boldsymbol S}_y
+\]
+restricted to the $M$-sector subspace
+$\mathcal H_M = \{\Psi : (V \to \mathrm{Fin}(N+1)) \to \mathbb C \mid
+  \Psi$ supported on $\{\sigma : \mathrm{magSum}(\sigma) = M\}\}$
+exists, is unique up to a positive real scalar in its real part, and
+has the Marshall sign structure
+\[
+  \Psi_{GS}(\sigma)
+  \;=\;
+  \mathrm{sign}_A(\sigma)\,v(\sigma) + 0i,
+  \qquad v(\sigma) > 0 \quad \text{for } \sigma \in \mathcal H_M,
+  \qquad \Psi_{GS}(\sigma) = 0 \quad \text{otherwise}.
+\]
+
+\textbf{Proof outline (formalised)}.
+\begin{enumerate}
+\item \emph{Marshall sign trick} (Tasaki Property~(ii), p.~41).
+  The dressed matrix
+  $\widetilde H_{\sigma\sigma'} = \mathrm{sign}_A(\sigma)\,
+   \mathrm{sign}_A(\sigma')\,H_{\sigma\sigma'}$ has all
+  off-diagonal entries non-positive: this is the sign-flip identity
+  $\mathrm{sign}_A(\sigma)\,\mathrm{sign}_A(\mathrm{swap}(\sigma)) = -1$
+  combined with the explicit two-site $\hat S \cdot \hat S$ matrix
+  element on raise/lower bonds.
+\item \emph{Bipartite raise/lower reachability} (Tasaki Property~(iii),
+  p.~41–42). Any two configurations $\sigma, \sigma'$ in the same
+  $M$-sector are connected by a sequence of bipartite raise/lower
+  steps in the bipartite complete graph (with the
+  intermediate-existence hypothesis on the configuration). On the
+  $M$-sector subtype \texttt{magConfigS V N M} this lifts to a chain
+  of \texttt{RaiseLowerStepSMagSector} steps.
+\item \emph{Perron--Frobenius irreducibility} on the shifted
+  dressed sector matrix
+  $B := c\,\mathbf 1 - \widetilde H_{\mathrm{sec}}$, $c$ chosen
+  larger than every diagonal entry of $\widetilde H_{\mathrm{sec}}$.
+  Properties~(i)--(iii) plus reachability give $B$ symmetric,
+  non-negative, and irreducible on the sector subtype.
+\item \emph{Spectral conclusion}. PF gives a unique strictly positive
+  Perron eigenvector $u$ of $B$ at eigenvalue $r > 0$, hence a
+  positive eigenvector of $\widetilde H_{\mathrm{sec}}$ at
+  $\mu = c - r$. Marshall-conjugation
+  $\Phi(\sigma) := \mathrm{sign}_A(\sigma)\,u(\sigma)$ converts this
+  to a (real-valued, sign-structured) eigenvector of the
+  un-dressed Heisenberg sector matrix at the same $\mu$.
+\item \emph{Eigenvalue uniqueness} on the dressed sector matrix
+  (symmetry + Rayleigh identity): any two strictly positive
+  eigenvectors share the same eigenvalue.
+\item \emph{Real $\leftrightarrow$ complex correspondence} on the
+  sector via real-part extraction (\#861) and \texttt{ofReal}
+  embedding (\#858) — the complex sector eigenvector and the
+  real-form sector eigenvector match on real coupling.
+\item \emph{Sector $\leftrightarrow$ full-Hilbert-space lift}
+  (\#868, \#869): the full Heisenberg Hamiltonian commutes with the
+  zero-extension embedding from the sector, since
+  $H_{\sigma\sigma'} = 0$ between configurations of different
+  $\mathrm{magSum}$ (matrix-level form of $[H, \hat S^z_{\rm tot}] = 0$).
+  Inversely, any full-Hilbert-space eigenvector at real $\mu$
+  supported on the sector restricts to a sector eigenvector at $\mu$.
+  These give a sector $\leftrightarrow$ full bijection on
+  Marshall-positive sector-supported eigenvectors at the same $\mu$.
+\end{enumerate}
+
+\textbf{Lean entry point}:
+\texttt{LatticeSystem/Quantum/SpinS/MagSectorEmbedding.lean},
+theorem
+\texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
+(\#869).
 
 \subsection*{DONE: Tasaki Problem 2.2.c}
 
@@ -5167,6 +5270,7 @@ Quantum Heisenberg lattice (2D / 3D, full Gibbs companion family) & finite-dim &
 Néel state on bipartite chain / 2D / 3D + per-bond expectation $-1/4$ (Tasaki §2.5) & finite-dim & \emph{formalized} \\
 Generic graph-centric Néel state \texttt{neelStateOf} (Tasaki §2.5 (2.5.2)) & finite-dim & \emph{formalized} \\
 Marshall sign, generic + chain / 2D / 3D, flip + time-reversal bridge (Tasaki §2.5) & finite-dim & \emph{formalized} \\
+Spin-$S$ Marshall--Lieb--Mattis Theorem 2.2 (Tasaki §2.5), magnetization-sector form (real and complex) and full-Hilbert-space form & finite-dim & \emph{formalized} \\
 Time-reversal map for many-body $S=1/2$ + multi-body Kramers degeneracy (Tasaki §2.3) & finite-dim & \emph{formalized} \\
 Multi-mode fermion via Jordan--Wigner (CAR + number op + Hubbard chain) & finite-dim & \emph{formalized} \\
 Hubbard chain, finite volume (open and periodic BC) & finite-dim & \emph{formalized} \\
