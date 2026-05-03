@@ -366,4 +366,20 @@ theorem exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector
   exact dressedHeisenbergSReMatrixOnMagSector_mulVec_of_shifted_eigenvec A J N c
     hmul
 
+/-! ## Heisenberg sector matrix and its eigenvector via Marshall reverse -/
+
+/-- The real-valued Heisenberg matrix restricted to the magnetization-`M`
+sector. -/
+noncomputable def heisenbergHamiltonianSReMatrixOnMagSector
+    (J : V → V → ℂ) (N : ℕ) (M : ℕ) :
+    Matrix (magConfigS V N M) (magConfigS V N M) ℝ :=
+  (heisenbergHamiltonianSReMatrix J N).submatrix Subtype.val Subtype.val
+
+/-- Component-wise unfolding. -/
+theorem heisenbergHamiltonianSReMatrixOnMagSector_apply
+    (J : V → V → ℂ) (N : ℕ) (M : ℕ)
+    (σ τ : magConfigS V N M) :
+    heisenbergHamiltonianSReMatrixOnMagSector J N M σ τ =
+      heisenbergHamiltonianSReMatrix J N σ.1 τ.1 := rfl
+
 end LatticeSystem.Quantum
