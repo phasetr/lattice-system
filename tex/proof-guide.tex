@@ -5731,6 +5731,14 @@ $\langle|\sigma_{\top/\bot}\rangle, \hat{S}_x\cdot\hat{S}_y\,
 The total off-diagonal sum then equals $|V|\cdot(|V|-1)\cdot S^2$,
 matching \#934.
 
+\textbf{Heisenberg expectation on saturated states (PR~\#943)}: the
+new file \texttt{Quantum/SpinS/SaturatedHeisenbergExpectation.lean}
+gives the H-eigenvalue expectation:
+$\langle|\sigma_\top\rangle, H\,|\sigma_\top\rangle\rangle =
+\texttt{saturatedFerromagnetEigenvalueS}\,J\,N$ (defined as
+$H(\sigma_\top, \sigma_\top)$ in \#899). Symmetric for
+$|\sigma_\bot\rangle$, with eigenvalue $H(\sigma_\bot, \sigma_\bot)$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
