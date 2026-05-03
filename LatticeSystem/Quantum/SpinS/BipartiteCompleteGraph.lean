@@ -53,4 +53,38 @@ theorem bipartiteCompleteGraphOf_adj_ne {A : V → Bool}
     x ≠ y :=
   hadj.1
 
+/-- Decidability instance for adjacency in `bipartiteCompleteGraphOf A`,
+useful for downstream computations (e.g. graph-derived couplings via
+`couplingOf`). Relies on `DecidableEq V`. -/
+instance bipartiteCompleteGraphOf_decidableAdj {V : Type*} [DecidableEq V]
+    (A : V → Bool) :
+    DecidableRel (bipartiteCompleteGraphOf A).Adj := by
+  intro x y
+  unfold bipartiteCompleteGraphOf SimpleGraph.Adj
+  infer_instance
+
+/-- The Marshall-trivial sublattice `A := fun _ => false` gives the
+empty graph. -/
+theorem bipartiteCompleteGraphOf_const_false {V : Type*} :
+    bipartiteCompleteGraphOf (V := V) (fun _ => false) = ⊥ := by
+  ext x y
+  rw [bipartiteCompleteGraphOf_adj_iff]
+  simp
+
+/-- The Marshall-trivial sublattice `A := fun _ => true` gives the
+empty graph. -/
+theorem bipartiteCompleteGraphOf_const_true {V : Type*} :
+    bipartiteCompleteGraphOf (V := V) (fun _ => true) = ⊥ := by
+  ext x y
+  rw [bipartiteCompleteGraphOf_adj_iff]
+  simp
+
+/-- For exactly-two-vertex `V` with the two vertices on different
+sublattices, `bipartiteCompleteGraphOf A` has exactly the (single)
+edge between them — a single edge graph. -/
+theorem bipartiteCompleteGraphOf_adj_of_ne_of_sublattice_ne
+    {A : V → Bool} {x y : V} (hxy : x ≠ y) (hAne : A x ≠ A y) :
+    (bipartiteCompleteGraphOf A).Adj x y :=
+  ⟨hxy, hAne⟩
+
 end LatticeSystem.Quantum
