@@ -5509,6 +5509,48 @@ is diagonal in the \texttt{basisVecS} basis with eigenvalues
 \texttt{magEigenvalueS}~$\sigma \in [-m_{\max}, m_{\max}]$, never
 $-m_{\max}-1$).
 
+\textbf{Symmetric raising-side boundary annihilation (PR~\#907)}:
+extends \texttt{Quantum/SpinS/LadderBoundaryAnnihilation.lean} with
+\texttt{magEigenvalueS\_ne\_mMax\_add\_one} and
+\texttt{totalSpinSOpPlus\_pow\_succ\_card\_mul\_N\_allAlignedStateS\_last}:
+$(\hat S^+_{\rm tot})^{|V|\cdot N + 1}\,|\sigma_\bot\rangle = 0$
+via $m_{\max}+1$ off-spectrum.
+
+\textbf{Extremal magnetization subspaces are 1-dimensional
+(PR~\#908)}: the new file
+\texttt{Quantum/SpinS/MagSubspaceExtremalDim.lean} proves
+\texttt{magEigenvalueS\_eq\_(neg\_)mMax\_iff\_allAlignedConfigS\_(last/zero)}:
+the eigenvalue $\pm m_{\max}$ is achieved exactly at the all-up
+(resp. all-down) constant configuration. Combined with the
+diagonality of $\hat S^z_{\rm tot}$, this yields
+\texttt{magSubspaceS\_(neg\_)mMax\_eq\_span\_allAlignedStateS\_(last/zero)}:
+\texttt{magSubspaceS V N $(\pm m_{\max})$ = span $\mathbb{C}$
+\{$|\sigma_{\top/\bot}\rangle$\}}. Analytic counterpart of PR \#885's
+combinatorial cardinality.
+
+\textbf{Maximal-lowering iterate identification (PR~\#909)}: the new
+file \texttt{Quantum/SpinS/LadderBottom.lean} combines PR \#887's
+eigenvalue identity at $k = |V|\cdot N$ ($-m_{\max}$ eigenvalue)
+with PR \#908's extremal subspace identification, giving
+\texttt{totalSpinSOpMinus\_pow\_card\_mul\_N\_allAlignedStateS\_zero\_eq\_smul\_last}:
+there exists a non-zero $c\in\mathbb{C}$ with
+$(\hat S^-_{\rm tot})^{|V|\cdot N}\,|\sigma_\top\rangle =
+c\,|\sigma_\bot\rangle$. Non-vanishing of $c$ uses PR \#895.
+A symmetric span-membership statement is provided for the raising
+side; the non-zero scalar version is in PR \#910.
+
+\textbf{Symmetric inductive non-vanishing for raising side
+(PR~\#910)}: the new file
+\texttt{Quantum/SpinS/IterateInductiveNonvanishingPlus.lean} mirrors
+PR \#895 using PR \#894's MinusPlus Casimir rearrangement
+$\hat S^- \hat S^+ = \hat S_{\rm tot}^2 - (\hat S^z_{\rm tot})^2 -
+\hat S^z_{\rm tot}$. The same eigenvalue scalar $(k+1)(2m_{\max}-k)$
+arises with the raising-side $\hat S^z_{\rm tot}$ eigenvalue
+$-m_{\max}+k$ (PR \#887 raising side), giving
+\texttt{totalSpinSOpPlus\_pow\_allAlignedStateS\_last\_ne\_zero} for
+$k\leq|V|\cdot N$ and the non-zero scalar identification
+\texttt{totalSpinSOpPlus\_pow\_card\_mul\_N\_allAlignedStateS\_last\_eq\_smul\_zero}.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
