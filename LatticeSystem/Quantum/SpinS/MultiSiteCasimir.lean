@@ -157,8 +157,8 @@ This is the ABSTRACT operator-eigenvalue form of Tasaki Problem 2.5.a
 also an eigenstate of `Ŝ_0 · Ŝ_1`, with the conversion formula
 `μ = λ/2 − S(S+1)`.
 
-In particular, on a `(Ŝ_tot)² = 0` eigenstate (the singlet, `J = 0`),
-`Ŝ_0 · Ŝ_1 = −N(N+2)/4 = −S(S+1)`. -/
+In particular, on a `(Ŝ_tot)² = 0` eigenstate (the singlet sector,
+total-spin quantum number `j = 0`), `Ŝ_0 · Ŝ_1 = −N(N+2)/4 = −S(S+1)`. -/
 theorem spinSDot_fin_two_mulVec_of_totalSpinSSquared_eigenvec
     (N : ℕ) {lam : ℂ} {Φ : (Fin 2 → Fin (N + 1)) → ℂ}
     (hΦ : (totalSpinSSquared (Fin 2) N).mulVec Φ = lam • Φ) :
@@ -181,11 +181,12 @@ theorem spinSDot_fin_two_mulVec_of_totalSpinSSquared_eigenvec
           ((1 / 2) * lam) - ((N : ℂ) * (N + 2) / 4) from by ring]
     rw [sub_smul]]
 
-/-- **Heisenberg eigenvalue formula** for the two-site spin-`S`
-Heisenberg Hamiltonian `H = J · Ŝ_0 · Ŝ_1`. If `Φ` is a `(Ŝ_tot)²`-
-eigenvector at `λ`, then `Φ` is an `H`-eigenvector at
+/-- **Single-bond Heisenberg eigenvalue formula** on the two-site
+spin-`S` system. For the single-bond Hamiltonian `J • Ŝ_0 · Ŝ_1`
+(coupling constant `J : ℂ`), if `Φ` is a `(Ŝ_tot)²`-eigenvector at
+`λ`, then `Φ` is a `J • Ŝ_0 · Ŝ_1`-eigenvector at
 `J · (λ/2 − N(N+2)/4)`. -/
-theorem two_site_heisenberg_mulVec_of_totalSpinSSquared_eigenvec
+theorem smul_spinSDot_fin_two_mulVec_of_totalSpinSSquared_eigenvec
     (N : ℕ) (J : ℂ) {lam : ℂ} {Φ : (Fin 2 → Fin (N + 1)) → ℂ}
     (hΦ : (totalSpinSSquared (Fin 2) N).mulVec Φ = lam • Φ) :
     (J • spinSDot (0 : Fin 2) 1 N).mulVec Φ =
