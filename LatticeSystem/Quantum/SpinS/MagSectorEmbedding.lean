@@ -76,6 +76,88 @@ theorem magSectorRestriction_magSectorEmbedding {M : ℕ}
   funext τ
   exact magSectorEmbedding_apply_subtype Φ τ
 
+/-! ## Linearity of `magSectorEmbedding` and `magSectorRestriction` -/
+
+/-- The embedding sends the zero vector to the zero vector. -/
+theorem magSectorEmbedding_zero {M : ℕ} :
+    magSectorEmbedding (0 : magConfigS V N M → ℂ) = 0 := by
+  funext σ
+  unfold magSectorEmbedding
+  by_cases h : magSumS σ = M
+  · rw [dif_pos h]; rfl
+  · rw [dif_neg h]; rfl
+
+/-- The embedding distributes over addition. -/
+theorem magSectorEmbedding_add {M : ℕ}
+    (Φ Ψ : magConfigS V N M → ℂ) :
+    magSectorEmbedding (Φ + Ψ) = magSectorEmbedding Φ + magSectorEmbedding Ψ := by
+  funext σ
+  show magSectorEmbedding (Φ + Ψ) σ = magSectorEmbedding Φ σ + magSectorEmbedding Ψ σ
+  by_cases h : magSumS σ = M
+  · rw [magSectorEmbedding_apply_of_mem _ h,
+      magSectorEmbedding_apply_of_mem Φ h,
+      magSectorEmbedding_apply_of_mem Ψ h]
+    rfl
+  · rw [magSectorEmbedding_apply_of_not_mem _ h,
+      magSectorEmbedding_apply_of_not_mem Φ h,
+      magSectorEmbedding_apply_of_not_mem Ψ h, add_zero]
+
+/-- The embedding commutes with complex scalar multiplication. -/
+theorem magSectorEmbedding_smul {M : ℕ}
+    (c : ℂ) (Φ : magConfigS V N M → ℂ) :
+    magSectorEmbedding (c • Φ) = c • magSectorEmbedding Φ := by
+  funext σ
+  show magSectorEmbedding (c • Φ) σ = c • magSectorEmbedding Φ σ
+  by_cases h : magSumS σ = M
+  · rw [magSectorEmbedding_apply_of_mem _ h,
+      magSectorEmbedding_apply_of_mem Φ h]
+    rfl
+  · rw [magSectorEmbedding_apply_of_not_mem _ h,
+      magSectorEmbedding_apply_of_not_mem Φ h, smul_zero]
+
+/-- The restriction sends the zero vector to the zero vector. -/
+theorem magSectorRestriction_zero {M : ℕ} :
+    magSectorRestriction (M := M) (V := V) (N := N) 0 = 0 := by
+  funext _
+  rfl
+
+/-- The restriction distributes over addition. -/
+theorem magSectorRestriction_add {M : ℕ}
+    (f g : (V → Fin (N + 1)) → ℂ) :
+    magSectorRestriction (M := M) (f + g) =
+      magSectorRestriction f + magSectorRestriction g := by
+  funext _
+  rfl
+
+/-- The restriction commutes with complex scalar multiplication. -/
+theorem magSectorRestriction_smul {M : ℕ}
+    (c : ℂ) (f : (V → Fin (N + 1)) → ℂ) :
+    magSectorRestriction (M := M) (c • f) = c • magSectorRestriction f := by
+  funext _
+  rfl
+
+/-- **`magSectorEmbedding` as a linear map** (`ℂ`-linear). -/
+noncomputable def magSectorEmbeddingLinearMap (M : ℕ) :
+    (magConfigS V N M → ℂ) →ₗ[ℂ] ((V → Fin (N + 1)) → ℂ) where
+  toFun := magSectorEmbedding
+  map_add' := magSectorEmbedding_add
+  map_smul' := magSectorEmbedding_smul
+
+/-- **`magSectorRestriction` as a linear map** (`ℂ`-linear). -/
+def magSectorRestrictionLinearMap (M : ℕ) :
+    ((V → Fin (N + 1)) → ℂ) →ₗ[ℂ] (magConfigS V N M → ℂ) where
+  toFun := magSectorRestriction
+  map_add' := magSectorRestriction_add
+  map_smul' := magSectorRestriction_smul
+
+/-- The composition `restriction ∘ embedding = id` as a linear-map
+identity (lifts the round-trip `magSectorRestriction_magSectorEmbedding`). -/
+theorem magSectorRestrictionLinearMap_comp_magSectorEmbeddingLinearMap (M : ℕ) :
+    (magSectorRestrictionLinearMap (V := V) (N := N) M).comp
+      (magSectorEmbeddingLinearMap M) = LinearMap.id := by
+  ext Φ τ
+  exact congrFun (magSectorRestriction_magSectorEmbedding Φ) τ
+
 /-! ## Heisenberg matrix element vanishes between different sectors -/
 
 section
