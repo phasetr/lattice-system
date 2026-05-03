@@ -5674,6 +5674,24 @@ the result of \#930 by the eigenvalue: for $\hat{S}_{\rm tot}^2\Phi
 = \lambda\,\langle\Phi, \Phi\rangle$. For normalized $\Phi$, the
 sum equals $\lambda$.
 
+\textbf{Off-diagonal correlation sum (PR~\#933)}: the new file
+\texttt{Quantum/SpinS/CorrelationOffDiagonal.lean} introduces the
+universal diagonal sum
+$\sum_x\langle\Phi, \hat{S}_x\cdot\hat{S}_x\,\Phi\rangle =
+|V|\cdot S(S+1)\cdot\langle\Phi,\Phi\rangle$ (from \#920) and
+subtracts from \#931 to give: for $\hat{S}_{\rm tot}^2\Phi =
+\lambda\,\Phi$, $\sum_{x\neq y}\langle\Phi, \hat{S}_x\cdot\hat{S}_y\,\Phi\rangle
+= (\lambda - |V|\cdot S(S+1))\cdot\langle\Phi,\Phi\rangle$.
+
+\textbf{Saturated off-diagonal correlation sum (PR~\#934)}: the
+new file
+\texttt{Quantum/SpinS/SaturatedOffDiagonalCorrelation.lean}
+specialises \#933 to $|\sigma_{\top/\bot}\rangle$ using \#882
+(Casimir at $k=0$) + \#913 (normalization), yielding
+$\sum_{x\neq y}\langle|\sigma_\top\rangle,
+\hat{S}_x\cdot\hat{S}_y\,|\sigma_\top\rangle\rangle =
+m_{\max}(m_{\max}+1) - |V|\cdot S(S+1) = N^2\,|V|(|V|-1)/4$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
