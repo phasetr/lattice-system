@@ -116,4 +116,27 @@ theorem raiseLowerReachableSMagSector_of_raiseLowerReachableS
     apply RaiseLowerReachableSMagSector.tail' (ih hbM)
     exact hbc
 
+/-- **Bipartite reachability for any two configurations in the same
+magnetization sector** (lifted to the magConfigS subtype): under the
+intermediate-existence hypothesis, any two `magConfigS V N M`
+configurations are connected by a `RaiseLowerReachableSMagSector`
+chain in the bipartite complete graph.
+
+Proof: combine the full-type bipartite reachability theorem (#823)
+with the subtype lifting (#840). -/
+theorem raiseLowerReachableSMagSector_bipartiteCompleteGraph
+    (A : V → Bool) {M : ℕ}
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (σ σ' : magConfigS V N M) :
+    RaiseLowerReachableSMagSector (bipartiteCompleteGraphOf A) σ σ' := by
+  have hreach : RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ.1 σ'.1 :=
+    raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS A
+      h_intermediate (σ.2.trans σ'.2.symm)
+  -- Lift to subtype.
+  have := raiseLowerReachableSMagSector_of_raiseLowerReachableS σ.2 σ'.2 hreach
+  -- this : RaiseLowerReachableSMagSector G ⟨σ.1, σ.2⟩ ⟨σ'.1, σ'.2⟩
+  -- which is the same as σ → σ' (via Subtype.eta).
+  exact this
+
 end LatticeSystem.Quantum
