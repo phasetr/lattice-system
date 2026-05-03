@@ -1066,6 +1066,9 @@ Issue #412; assembled in PRs #875–#879. All theorems live in
 | `totalSpinSSquared_eigenvector_correlation_full_sum` / `_normalized` | **eigenvector correlation sum**: for `Ŝ_tot² Φ = λ • Φ`, `∑_{x, y} ⟨Φ, Ŝ_x · Ŝ_y · Φ⟩ = λ · ⟨Φ, Φ⟩` (= `λ` for normalized) (PR #931, file `Quantum/SpinS/CorrelationEigenvector.lean`) |
 | `correlation_diag_sum_eq_full_state_norm` / `totalSpinSSquared_eigenvector_correlation_offdiag_sum` | **off-diagonal correlation sum**: universal diagonal `∑_x ⟨Ŝ_x · Ŝ_x⟩ = |V|·S(S+1) · ⟨Φ, Φ⟩`; eigenvector off-diagonal `∑_{x ≠ y} ⟨Ŝ_x · Ŝ_y⟩ = (λ − |V|·S(S+1)) · ⟨Φ, Φ⟩` (PR #933, file `Quantum/SpinS/CorrelationOffDiagonal.lean`) |
 | `allAlignedStateS_zero_correlation_offdiag_sum` / `_last_correlation_offdiag_sum` | **explicit off-diagonal value on saturated states**: `∑_{x ≠ y} ⟨|σ_⊤/⊥⟩, Ŝ_x · Ŝ_y · |σ_⊤/⊥⟩⟩ = m_max(m_max + 1) − |V|·S(S+1) = N²·|V|·(|V|−1)/4` (PR #934, file `Quantum/SpinS/SaturatedOffDiagonalCorrelation.lean`) |
+| `spinSDot_mulVec_allAlignedStateS_zero_of_ne` | **per-pair eigenvalue**: for `x ≠ y`, `Ŝ_x · Ŝ_y · |σ_⊤⟩ = (N²/4) · |σ_⊤⟩`. Proof via `spinSDot_eq_plus_minus`: ladder annihilations + `(3)(3) → (N/2)²` (PR #939, file `Quantum/SpinS/SpinSDotAllAlignedZero.lean`) |
+| `spinSDot_mulVec_allAlignedStateS_last_of_ne` | symmetric raising-side per-pair eigenvalue on `|σ_⊥⟩` (PR #940, file `Quantum/SpinS/SpinSDotAllAlignedLast.lean`) |
+| `allAlignedStateS_zero_expectation_spinSDot_of_ne` / `_last_expectation_spinSDot_of_ne` | **per-pair correlation**: `⟨|σ_⊤/⊥⟩, Ŝ_x · Ŝ_y · |σ_⊤/⊥⟩⟩ = N²/4 = S²` for `x ≠ y` (PR #941, file `Quantum/SpinS/PerPairCorrelationExpectation.lean`) |
 
 References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.4 (pp. 30–37, spin-1/2 case).
