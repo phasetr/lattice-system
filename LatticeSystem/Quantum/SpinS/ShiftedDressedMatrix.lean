@@ -270,4 +270,32 @@ theorem exists_matrixPow_pos_length_of_raiseLowerReachableS_bipartite
     exact (lt_irrefl _ hpos).elim
   · exact hkpos
 
+/-- **Strictly positive matrix-power for equal-magnetization
+configurations** (γ-3 PF irreducibility input): for distinct
+configurations σ ≠ σ' in the SAME magnetization sector, under the
+intermediate-existence and standard Marshall hypotheses, there exists
+k ≥ 1 with `(shiftedDressedSReMatrix^k) σ' σ > 0`.
+
+Combines bipartite reachability (#823) with positive-length matrix-pow
+positivity (#832). -/
+theorem exists_matrixPow_pos_length_of_eq_magSumS_bipartite
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ ≤ c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {σ σ' : V → Fin (N + 1)} (hne : σ ≠ σ')
+    (hmag : magSumS σ = magSumS σ') :
+    ∃ k : ℕ, 1 ≤ k ∧ 0 < (shiftedDressedSReMatrix A J N c ^ k) σ' σ := by
+  have hreach : RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ σ' :=
+    raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS A
+      h_intermediate hmag
+  exact exists_matrixPow_pos_length_of_raiseLowerReachableS_bipartite A N c
+    hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc hne hreach
+
 end LatticeSystem.Quantum
