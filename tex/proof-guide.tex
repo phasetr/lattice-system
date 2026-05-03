@@ -5771,6 +5771,15 @@ m_{\max}(m_{\max}+1)$. Direct from \#945 ($H_{\rm uniform} =
 \hat{S}_{\rm tot}^2$) plus the diagonal entry of $\hat{S}_{\rm tot}^2$
 at $\sigma_\top$.
 
+\textbf{Explicit form of saturated FM eigenvalue (PR~\#951)}: the
+new file
+\texttt{Quantum/SpinS/SaturatedEigenvalueExplicit.lean} extracts
+the explicit combinatorial form:
+$\texttt{saturatedFerromagnetEigenvalueS}\,J\,N = \sum_x \sum_y
+J(x,y) \cdot
+(\textsf{if}\ x=y\ \textsf{then}\ N(N+2)/4\ \textsf{else}\ (N/2)^2)$.
+Direct application of \#875 + \#899 uniqueness on $|\sigma_\top\rangle \neq 0$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
