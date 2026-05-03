@@ -1,3 +1,4 @@
+import LatticeSystem.Quantum.SpinS.ConfigDist
 import Mathlib.Combinatorics.SimpleGraph.Basic
 
 /-!
@@ -86,5 +87,59 @@ theorem bipartiteCompleteGraphOf_adj_of_ne_of_sublattice_ne
     {A : V → Bool} {x y : V} (hxy : x ≠ y) (hAne : A x ≠ A y) :
     (bipartiteCompleteGraphOf A).Adj x y :=
   ⟨hxy, hAne⟩
+
+/-! ## Bipartite step from over/under sites -/
+
+variable [Fintype V] [DecidableEq V] {N : ℕ}
+
+/-- For an over site `x` (where `(σ' x).val < (σ x).val`) and an
+under site `y` (where `(σ y).val < (σ' y).val`) on different
+sublattices (`A x ≠ A y`), there exists a configuration `σ''` reachable
+from `σ` by a single bipartite raise/lower step (lower at `x`, raise
+at `y`) such that `configDistS σ'' σ' + 2 = configDistS σ σ'`.
+
+This is the "easy case" of bipartite reachability: when the witness
+sites land on different sublattices, the bipartite complete graph
+contains the required edge directly. The "hard case" (witness sites
+on the same sublattice) requires a 2-step transport through an
+opposite-sublattice intermediate. -/
+theorem exists_raiseLowerStepS_bipartite_of_over_under_ne_sublattice
+    {A : V → Bool} {σ σ' : V → Fin (N + 1)}
+    {x y : V} (hxy : x ≠ y) (hAne : A x ≠ A y)
+    (hover : (σ' x).val < (σ x).val)
+    (hunder : (σ y).val < (σ' y).val) :
+    ∃ σ'' : V → Fin (N + 1),
+      RaiseLowerStepS (bipartiteCompleteGraphOf A) σ σ'' ∧
+        configDistS σ'' σ' + 2 = configDistS σ σ' := by
+  -- Bounds for the raise/lower update.
+  have hx_bound : (σ x).val - 1 < N + 1 := by
+    have := (σ x).isLt; omega
+  have hy_bound : (σ y).val + 1 < N + 1 := by
+    have := (σ' y).isLt; omega
+  -- Define σ''.
+  let σ'' : V → Fin (N + 1) :=
+    Function.update (Function.update σ x ⟨(σ x).val - 1, hx_bound⟩) y
+      ⟨(σ y).val + 1, hy_bound⟩
+  refine ⟨σ'', ?_, ?_⟩
+  · -- Step σ ↦ σ'': lower at x, raise at y.
+    -- Adjacency in the bipartite complete graph: x ≠ y and A x ≠ A y.
+    have hadj : (bipartiteCompleteGraphOf A).Adj x y := ⟨hxy, hAne⟩
+    -- σ'' agrees with σ off {x, y}.
+    have hagree : ∀ k, k ≠ x → k ≠ y → σ'' k = σ k := by
+      intro k hkx hky
+      show (Function.update (Function.update σ x _) y _) k = σ k
+      rw [Function.update_of_ne hky, Function.update_of_ne hkx]
+    -- σ'' x and σ'' y values.
+    have hupd_x : (σ'' x).val = (σ x).val - 1 := by
+      show (Function.update (Function.update σ x _) y _ x).val = _
+      rw [Function.update_of_ne hxy, Function.update_self]
+    have hupd_y : (σ'' y).val = (σ y).val + 1 := by
+      show (Function.update (Function.update σ x _) y _ y).val = _
+      rw [Function.update_self]
+    refine ⟨x, y, hadj, Or.inr ⟨?_, ?_⟩, hagree⟩
+    · rw [hupd_x]; omega
+    · rw [hupd_y]
+  · -- Distance reduces by 2.
+    exact configDistS_decrease_of_over_under hxy hover hunder
 
 end LatticeSystem.Quantum
