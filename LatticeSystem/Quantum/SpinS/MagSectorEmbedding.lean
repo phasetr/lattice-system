@@ -169,8 +169,8 @@ of the full space.
 
 /-- Sufficient condition for membership in the image of
 `magSectorEmbedding`: a vector `f : (V → Fin (N+1)) → ℂ` supported
-entirely on the magnetization-`M` sector lies in the image — explicitly,
-`f = magSectorEmbedding (magSectorRestriction f)`. -/
+entirely on the magnetization-`M` sector equals the embedding of its
+restriction. -/
 theorem magSectorEmbedding_magSectorRestriction_of_supported {M : ℕ}
     {f : (V → Fin (N + 1)) → ℂ}
     (hf : ∀ σ, magSumS σ ≠ M → f σ = 0) :
@@ -179,14 +179,6 @@ theorem magSectorEmbedding_magSectorRestriction_of_supported {M : ℕ}
   by_cases h : magSumS σ = M
   · exact magSectorEmbedding_magSectorRestriction_apply_of_mem f h
   · rw [magSectorEmbedding_apply_of_not_mem _ h, hf σ h]
-
-/-- Necessary condition: every vector in the image of
-`magSectorEmbedding` is supported on the sector. -/
-theorem support_of_mem_range_magSectorEmbedding {M : ℕ}
-    {Φ : magConfigS V N M → ℂ}
-    {σ : V → Fin (N + 1)} (h : magSumS σ ≠ M) :
-    magSectorEmbedding Φ σ = 0 :=
-  magSectorEmbedding_apply_of_not_mem Φ h
 
 /-- **Image characterisation**: a vector `f` is in the image of
 `magSectorEmbedding (M := M)` iff `f` is supported on the
