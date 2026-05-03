@@ -997,4 +997,44 @@ theorem exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMag
   exact ⟨μ, v, hμ, hv_pos,
     heisenbergHamiltonianSMatrixOnMagSector_mulVec_ofReal N hJ_real hmul⟩
 
+/-- **Real part extraction**: for real coupling, the real part of a
+complex eigenvector of the complex Heisenberg sector matrix at a real
+eigenvalue `μ` is a real eigenvector of the real-form sector matrix at
+the same `μ`.
+
+This is the inverse of `heisenbergHamiltonianSMatrixOnMagSector_mulVec_ofReal`
+(PR #858) and gives a complete real-↔-complex correspondence on the
+sector for real coupling. -/
+theorem heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
+    {J : V → V → ℂ} (N : ℕ) {M : ℕ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    {μ : ℝ} {W : magConfigS V N M → ℂ}
+    (hW : (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec W =
+      (μ : ℂ) • W) :
+    (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+      (fun σ => (W σ).re) = μ • (fun σ => (W σ).re) := by
+  funext σ
+  have hσ := congrFun hW σ
+  -- Take real parts of both sides of hσ.
+  have hRe_eq : ((heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec W σ).re =
+      (((μ : ℂ) • W) σ).re := by rw [hσ]
+  -- LHS: Re(∑τ heis_C σ τ * W τ) = ∑τ heis_re σ τ * (W τ).re.
+  have hLHS : ((heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec W σ).re =
+      ∑ τ, heisenbergHamiltonianSReMatrixOnMagSector J N M σ τ * (W τ).re := by
+    change (∑ τ, heisenbergHamiltonianSMatrixOnMagSector J N M σ τ * W τ).re = _
+    rw [Complex.re_sum]
+    refine Finset.sum_congr rfl (fun τ _ => ?_)
+    rw [heisenbergHamiltonianSMatrixOnMagSector_apply_eq_ofReal _ _ hJ_real]
+    rw [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]
+    ring
+  -- RHS: Re(μ • W σ) = μ * (W σ).re.
+  have hRHS : (((μ : ℂ) • W) σ).re = μ * (W σ).re := by
+    change ((μ : ℂ) * W σ).re = _
+    rw [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]
+    ring
+  rw [hLHS, hRHS] at hRe_eq
+  change (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+    (fun σ => (W σ).re) σ = μ * (W σ).re
+  exact hRe_eq
+
 end LatticeSystem.Quantum
