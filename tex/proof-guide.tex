@@ -5626,6 +5626,31 @@ $N = 1$ ($S = 1/2$), each generic spin-`S` operator reduces to the
 corresponding half-Pauli matrix, providing a direct bridge between
 the generic and spin-`1/2` formalisms.
 
+\textbf{Single-site $\hat{S}^{(3)}_x$ expectations on $|c..c\rangle$
+(PR~\#925)}: the new file
+\texttt{Quantum/SpinS/SingleSiteZExpectation.lean} proves
+$\hat{S}^{(3)}_x|c..c\rangle = (N/2 - c)\,|c..c\rangle$ and the
+corresponding expectation values $\langle\hat{S}^{(3)}_x\rangle = N/2 - c$,
+$\langle(\hat{S}^{(3)}_x)^2\rangle = (N/2-c)^2$. For $c=0$ this gives
+$\langle\hat{S}^{(3)}_x\rangle = S$ and $\langle(\hat{S}^{(3)}_x)^2\rangle = S^2$
+(zero variance about the mean $S$).
+
+\textbf{Single-site xy-plane Casimir expectation (PR~\#926)}: the
+new file \texttt{Quantum/SpinS/SingleSiteXYExpectation.lean}
+combines \#920 (universal Casimir $\hat{S}_x\cdot\hat{S}_x = S(S+1)$)
+with \#925 ($\langle(\hat{S}^{(3)}_x)^2\rangle = (N/2-c)^2$) to give
+$\langle(\hat{S}^{(1)}_x)^2 + (\hat{S}^{(2)}_x)^2\rangle =
+N(N+2)/4 - (N/2-c)^2$ on $|c..c\rangle$. For $c=0$ this is $S/2$.
+
+\textbf{Transverse mean vanishes (PR~\#927)}: the new file
+\texttt{Quantum/SpinS/SingleSiteTransverseMeanZero.lean} proves
+$\langle\text{basisVecS}\,\sigma, \hat{S}^{(\alpha)}_x\,
+\text{basisVecS}\,\sigma\rangle = 0$ for $\alpha = 1, 2$ and any
+configuration $\sigma$ (transverse operators are purely off-diagonal,
+\texttt{spinSOp\{1,2\}\_apply\_diag = 0}). Together with PR \#925,
+the saturated-ferromagnet $|c..c\rangle$ has per-axis spin profile
+$(0, 0, N/2-c)$ — only the z-component is non-zero.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
