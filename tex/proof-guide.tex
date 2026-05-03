@@ -5780,6 +5780,20 @@ J(x,y) \cdot
 (\textsf{if}\ x=y\ \textsf{then}\ N(N+2)/4\ \textsf{else}\ (N/2)^2)$.
 Direct application of \#875 + \#899 uniqueness on $|\sigma_\top\rangle \neq 0$.
 
+\textbf{Explicit uniform-J eigenvalue simplification (PR~\#953)}:
+the new file
+\texttt{Quantum/SpinS/SaturatedExplicitUniformSimp.lean} combines
+\#951 (explicit form) with \#949 (uniform = Casimir) to give
+the closed-form simplification
+$\sum_x \sum_y (\textsf{if}\ x=y\ \textsf{then}\ N(N+2)/4\
+\textsf{else}\ (N/2)^2) = m_{\max}(m_{\max}+1)$.
+
+\textbf{Explicit H expectation on saturated states (PR~\#954)}: the
+new file \texttt{Quantum/SpinS/HExpectationExplicit.lean} chains
+\#943/\#948 with \#951 to give the explicit combinatorial form of
+$\langle|\sigma_{\top/\bot}\rangle, H\,|\sigma_{\top/\bot}\rangle\rangle$
+in terms of the $J(x,y)$ couplings.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
