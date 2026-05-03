@@ -5794,6 +5794,21 @@ new file \texttt{Quantum/SpinS/HExpectationExplicit.lean} chains
 $\langle|\sigma_{\top/\bot}\rangle, H\,|\sigma_{\top/\bot}\rangle\rangle$
 in terms of the $J(x,y)$ couplings.
 
+\textbf{Distinct constant-spin states are different (PR~\#956)}:
+the new file \texttt{Quantum/SpinS/AllAlignedStateDistinct.lean}
+proves \texttt{allAlignedConfigS\_injective} (when $V$ is non-empty)
+and the corresponding \texttt{allAlignedStateS\_ne\_of\_ne}.
+Used as a building block for the LI of the all-aligned family.
+
+\textbf{All-aligned states form a LI family (PR~\#957)}: the new
+file \texttt{Quantum/SpinS/AllAlignedStateLI.lean} proves
+\texttt{allAlignedStateS\_linearIndependent}: the
+$(N+1)$-element family $\{|c..c\rangle : c \in \textsf{Fin}\,(N+1)\}$
+is linearly independent over $\mathbb{C}$. Direct application of
+\texttt{Module.End.eigenvectors\_linearIndependent'} with the
+injective $\hat{S}^z_{\rm tot}$ eigenvalue function
+$c \mapsto |V|\cdot N/2 - |V|\cdot c$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
