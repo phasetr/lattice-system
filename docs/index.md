@@ -968,6 +968,44 @@ Systems*, Springer 2020, §2.5 Theorem 2.2 (pp. 39–43); E. Seneta,
 *Non-negative Matrices and Markov Chains* (3rd ed.), Springer 2006,
 §1.2 (pp. 27–28) for the underlying Perron–Frobenius theorem.
 
+### Spin-`S` saturated ferromagnetic state (Tasaki §2.4 generalised)
+
+Generic-spin (`N = 2S`) version of Tasaki §2.4 P1i for the
+**saturated ferromagnet**: the all-aligned (constant-spin) basis
+state `|σ_⊤⟩ = ⊗_x |c⟩` with `σ x = c` for all `x : V`. The two
+extremal weights `c = 0` (highest weight, "all up") and
+`c = Fin.last N` (lowest weight, "all down") are the highest- and
+lowest-weight vectors of the `J_tot = |V|·S = |V|·N/2` irreducible
+SU(2) representation in the multi-site Hilbert space. Tracked in
+Issue #412; assembled in PRs #875–#879. All theorems live in
+`Quantum/SpinS/AllAlignedState.lean`.
+
+| Lean name | Statement |
+|---|---|
+| `allAlignedConfigS V N c` | constant configuration `σ x = c` (PR #875) |
+| `allAlignedStateS V N c` | basis state at constant `c`, equal to `basisVecS (allAlignedConfigS V N c)` (PR #875) |
+| `magSumS_allAlignedConfigS` | `magSumS = |V|·c.val` (PR #875) |
+| `magEigenvalueS_allAlignedConfigS` | `magEigenvalueS = |V|·N/2 − |V|·c` (PR #875) |
+| `totalSpinSOp3_mulVec_allAlignedStateS` | `Ŝ^z_tot · |c⟩ = (|V|·N/2 − |V|·c) · |c⟩` for any `c` (PR #875) |
+| `magSumS_allAlignedConfigS_zero` | `c = 0` ⟹ `magSumS = 0` (PR #875) |
+| `magSumS_pos_of_ne_allAlignedConfigS_zero` | the all-up configuration is the **unique** `magSumS = 0` configuration (PR #875) |
+| `magSumS_allAlignedConfigS_last` | `c = Fin.last N` ⟹ `magSumS = |V|·N` (PR #876) |
+| `magSumS_lt_card_mul_of_ne_allAlignedConfigS_last` | the all-down configuration is the unique configuration with `magSumS = |V|·N` (PR #876) |
+| `heisenbergHamiltonianS_mulVec_allAlignedStateS_zero` | the **all-up state is a Heisenberg eigenvector for ANY coupling** — magnetization conservation `[H, Ŝ^z_tot] = 0` + uniqueness of the M=0 configuration (PR #875) |
+| `heisenbergHamiltonianS_mulVec_allAlignedStateS_zero_eigenvalue` | explicit Heisenberg eigenvalue formula on all-up: `Σ_x J(x,x)·N(N+2)/4 + Σ_{x≠y} J(x,y)·N²/4` (PR #875) |
+| `heisenbergHamiltonianS_mulVec_allAlignedStateS_last` / `_eigenvalue` | symmetric c = N (all-down) Heisenberg eigenvector + same eigenvalue formula (PR #876) |
+| `onSiteS_spinSOpPlus_apply_allAlignedConfigS_zero` | `(onSiteS x Ŝ^+) σ' σ_⊤ = 0` (PR #877) |
+| `onSiteS_spinSOpPlus_mulVec_allAlignedStateS_zero` | `(onSiteS x Ŝ^+).mulVec |σ_⊤⟩ = 0` (PR #877) |
+| `totalSpinSOpPlus_mulVec_allAlignedStateS_zero` | **`Ŝ^+_tot · |σ_⊤⟩ = 0`** (highest-weight annihilation, PR #877) |
+| `onSiteS_spinSOpMinus_apply_allAlignedConfigS_last` / `_mulVec_` / `totalSpinSOpMinus_mulVec_allAlignedStateS_last` | symmetric lowest-weight annihilation `Ŝ^-_tot · |σ_⊥⟩ = 0` (PR #877) |
+| `totalSpinSSquared_mulVec_allAlignedStateS_zero` | the all-up state is a `(Ŝ_tot)²`-eigenvector (PR #878) |
+| `totalSpinSSquared_apply_diag_allAlignedConfigS_zero` | explicit Casimir diagonal value `|V|·N(N+2)/4 + (|V|²−|V|)·N²/4` (PR #878) |
+| `totalSpinSSquared_mulVec_allAlignedStateS_zero_eigenvalue` | **`(Ŝ_tot)² · |σ_⊤⟩ = (|V|·N/2)·(|V|·N/2 + 1) · |σ_⊤⟩`** — operator-level form of "all-up is the highest-weight vector of the J_tot = |V|·S irreducible SU(2) representation" (PR #878) |
+| `totalSpinSSquared_mulVec_allAlignedStateS_last` / `_apply_diag_` / `_eigenvalue` | symmetric lowest-weight Casimir eigenvalue (same value) (PR #879) |
+
+References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, Springer 2020, §2.4 (pp. 30–37, spin-1/2 case).
+
 ### Single-mode fermion (P2 skeleton)
 
 Phase 2 entry point: the canonical anticommutation algebra of a single
