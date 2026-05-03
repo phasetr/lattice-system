@@ -5692,6 +5692,21 @@ $\sum_{x\neq y}\langle|\sigma_\top\rangle,
 \hat{S}_x\cdot\hat{S}_y\,|\sigma_\top\rangle\rangle =
 m_{\max}(m_{\max}+1) - |V|\cdot S(S+1) = N^2\,|V|(|V|-1)/4$.
 
+\textbf{Fermion $\leftrightarrow$ spin-`S` bridge at $N = 1$
+(PR~\#936)}: the new file
+\texttt{Fermion/SpinSBridge.lean} composes the existing
+\texttt{fermionAnnihilation\_eq\_spinHalfOpPlus} (Mode.lean) with
+\#922 \texttt{spinSOpPlus\_one\_eq\_spinHalfOpPlus} to give
+\texttt{fermionAnnihilation\_eq\_spinSOpPlus\_one} (and the dual
+for creation). Direct identification of single-mode fermion
+operators with generic spin-`S` operators at $N = 1$.
+
+\textbf{Fermion number as $1/2 - \hat{S}^{(3)}$ (PR~\#937)}: the
+new file \texttt{Fermion/NumberSpinSBridge.lean} proves
+\texttt{fermionNumber\_eq\_half\_smul\_one\_sub\_spinSOp3\_one}:
+$n = (1/2)\,I - \hat{S}^{(3)}$, the standard physics identification
+$n = (I - \sigma^z)/2$ lifted to generic spin-`S` at $N = 1$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
