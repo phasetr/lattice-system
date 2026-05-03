@@ -190,4 +190,103 @@ theorem heisenbergHamiltonianS_mulVec_allAlignedStateS_zero_eigenvalue
     rw [h0]
     ring
 
+/-! ## Lowest-weight specialisation (`c = Fin.last N`, "all down")
+
+The lowest-weight all-aligned state corresponds to `σ x = N` for all
+`x` (in our `Fin (N+1)` basis convention, `σ x = N` is the
+`m_z = -N/2 = -S` state). It has `magSumS = |V|·N`,
+`Ŝ^z_tot`-eigenvalue `−|V|·N/2`, and is the unique configuration in
+its sector. Hence by magnetization conservation it is automatically a
+Heisenberg-Hamiltonian eigenvector — symmetric to the all-up case.
+-/
+
+omit [DecidableEq V] in
+/-- For `c = Fin.last N`, `magSumS = |V| · N`. -/
+theorem magSumS_allAlignedConfigS_last :
+    magSumS (allAlignedConfigS V N (Fin.last N)) = Fintype.card V * N := by
+  rw [magSumS_allAlignedConfigS]
+  simp
+
+omit [DecidableEq V] in
+/-- The all-down configuration is the **unique** configuration with
+`magSumS = |V|·N`: every other configuration has `magSumS < |V|·N`.
+
+Short proof using the existing `magSumS_eq_max_iff` characterisation. -/
+theorem magSumS_lt_card_mul_of_ne_allAlignedConfigS_last
+    {σ : V → Fin (N + 1)} (h : σ ≠ allAlignedConfigS V N (Fin.last N)) :
+    magSumS σ < Fintype.card V * N := by
+  rcases lt_or_eq_of_le (magSumS_le σ) with hlt | heq
+  · exact hlt
+  · exfalso; apply h
+    funext x
+    exact (magSumS_eq_max_iff σ).mp heq x
+
+/-- **The all-down state is a Heisenberg eigenvector** (any coupling
+`J`): for the all-down basis state `|σ_⊥⟩` (`σ x = N` for all `x`),
+
+  `H · |σ_⊥⟩ = (H_{σ_⊥,σ_⊥}) · |σ_⊥⟩`.
+
+By magnetization conservation `[H, Ŝ^z_tot] = 0`, the only matrix
+element `H τ σ_⊥` non-zero requires `magSumS τ = magSumS σ_⊥ = |V|·N`,
+which forces `τ = σ_⊥`. -/
+theorem heisenbergHamiltonianS_mulVec_allAlignedStateS_last
+    (J : V → V → ℂ) :
+    (heisenbergHamiltonianS J N).mulVec
+      (allAlignedStateS V N (Fin.last N)) =
+      ((heisenbergHamiltonianS J N)
+        (allAlignedConfigS V N (Fin.last N))
+        (allAlignedConfigS V N (Fin.last N))) •
+        allAlignedStateS V N (Fin.last N) := by
+  funext τ
+  unfold allAlignedStateS
+  rw [heisenbergHamiltonianS_mulVec_basisVecS_apply]
+  change heisenbergHamiltonianS J N τ (allAlignedConfigS V N (Fin.last N)) =
+    (heisenbergHamiltonianS J N (allAlignedConfigS V N (Fin.last N))
+      (allAlignedConfigS V N (Fin.last N))) *
+        basisVecS (allAlignedConfigS V N (Fin.last N)) τ
+  by_cases h : τ = allAlignedConfigS V N (Fin.last N)
+  · subst h
+    rw [basisVecS_apply, if_pos rfl]
+    ring
+  · rw [basisVecS_apply, if_neg h, mul_zero]
+    apply heisenbergHamiltonianS_apply_eq_zero_of_mag_ne (Λ := V) J N
+    intro hEig
+    have hmag : magSumS τ = magSumS (allAlignedConfigS V N (Fin.last N)) :=
+      ((magEigenvalueS_eq_iff τ (allAlignedConfigS V N (Fin.last N))).mp
+        hEig.symm)
+    rw [magSumS_allAlignedConfigS_last] at hmag
+    have hlt := magSumS_lt_card_mul_of_ne_allAlignedConfigS_last h
+    omega
+
+/-- **Explicit Heisenberg eigenvalue formula on all-down**: combining
+`heisenbergHamiltonianS_mulVec_allAlignedStateS_last` with
+`heisenbergHamiltonianS_apply_diag` gives the SAME eigenvalue as the
+all-up case (since `(N/2 - N)² = (-N/2)² = N²/4 = (N/2)²`):
+
+  `H · |σ_⊥⟩ = (Σ_x J(x,x) · N(N+2)/4 + Σ_{x≠y} J(x,y) · N²/4) · |σ_⊥⟩`. -/
+theorem heisenbergHamiltonianS_mulVec_allAlignedStateS_last_eigenvalue
+    (J : V → V → ℂ) :
+    (heisenbergHamiltonianS J N).mulVec
+      (allAlignedStateS V N (Fin.last N)) =
+      ((∑ x : V, ∑ y : V,
+        J x y * (if x = y then (N : ℂ) * (N + 2) / 4
+                 else (N : ℂ) / 2 * ((N : ℂ) / 2)))) •
+        allAlignedStateS V N (Fin.last N) := by
+  rw [heisenbergHamiltonianS_mulVec_allAlignedStateS_last]
+  congr 1
+  rw [heisenbergHamiltonianS_apply_diag]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  refine Finset.sum_congr rfl (fun y _ => ?_)
+  by_cases hxy : x = y
+  · rw [if_pos hxy, if_pos hxy]
+  · rw [if_neg hxy, if_neg hxy]
+    show J x y *
+      (((N : ℂ) / 2 - ((allAlignedConfigS V N (Fin.last N)) x).val) *
+        ((N : ℂ) / 2 - ((allAlignedConfigS V N (Fin.last N)) y).val)) =
+      J x y * ((N : ℂ) / 2 * ((N : ℂ) / 2))
+    unfold allAlignedConfigS
+    have hN : ((Fin.last N).val : ℂ) = N := by simp [Fin.last]
+    rw [hN]
+    ring
+
 end LatticeSystem.Quantum
