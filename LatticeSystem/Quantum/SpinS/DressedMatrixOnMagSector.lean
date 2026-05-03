@@ -410,6 +410,53 @@ theorem heisenbergHamiltonianSMatrixOnMagSector_apply_eq_ofReal
     heisenbergHamiltonianSReMatrix_apply]
   exact heisenbergHamiltonianS_apply_eq_ofReal_re N hJ_real σ.1 τ.1
 
+/-- For real coupling, the complex Heisenberg sector matrix is
+Hermitian (lifted from the full-space Hermiticity). -/
+theorem heisenbergHamiltonianSMatrixOnMagSector_isHermitian
+    {J : V → V → ℂ} (N : ℕ) (M : ℕ)
+    (hreal : ∀ x y, star (J x y) = J x y) :
+    (heisenbergHamiltonianSMatrixOnMagSector J N M).IsHermitian :=
+  (heisenbergHamiltonianS_isHermitian_of_real hreal N).submatrix Subtype.val
+
+/-- **Lift a real eigenvector of the real-form sector matrix to a
+complex eigenvector of the complex sector matrix**. For real coupling,
+if the real-form sector matrix satisfies `M_re v = μ • v`, then the
+complex sector matrix satisfies `M_ℂ (v ↑) = μ • (v ↑)` where the
+embedding is `(v ↑) σ := (v σ : ℂ)`.
+
+This is the bridge from the PF/MLM real-eigenvector machinery
+(PRs #847–#856) to eigenvectors of the actual complex Heisenberg
+Hamiltonian on the magnetization sector. -/
+theorem heisenbergHamiltonianSMatrixOnMagSector_mulVec_ofReal
+    {J : V → V → ℂ} (N : ℕ) {M : ℕ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    {μ : ℝ} {v : magConfigS V N M → ℝ}
+    (hv : (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec v = μ • v) :
+    (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec
+      (fun σ => (v σ : ℂ)) =
+      (μ : ℂ) • (fun σ => (v σ : ℂ)) := by
+  funext σ
+  have hσ := congrFun hv σ
+  -- hσ : ∑ τ, M_re σ τ * v τ = μ * v σ.
+  change ∑ τ, heisenbergHamiltonianSMatrixOnMagSector J N M σ τ *
+    (v τ : ℂ) = (μ : ℂ) * (v σ : ℂ)
+  -- Convert each term from ℂ to ℝ via apply_eq_ofReal.
+  have hconv : ∀ τ : magConfigS V N M,
+      heisenbergHamiltonianSMatrixOnMagSector J N M σ τ * (v τ : ℂ) =
+      ((heisenbergHamiltonianSReMatrixOnMagSector J N M σ τ * v τ : ℝ) : ℂ) := by
+    intro τ
+    rw [heisenbergHamiltonianSMatrixOnMagSector_apply_eq_ofReal _ _ hJ_real]
+    push_cast
+    rfl
+  rw [Finset.sum_congr rfl (fun τ _ => hconv τ)]
+  rw [← Complex.ofReal_sum]
+  change ((heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec v σ : ℂ) =
+    (μ : ℂ) * (v σ : ℂ)
+  rw [hσ]
+  change ((μ * v σ : ℝ) : ℂ) = (μ : ℂ) * (v σ : ℂ)
+  push_cast
+  ring
+
 /-- **Matrix relation: dressed = sign · sign · heisenberg** (real-part
 form). For real coupling, the dressed Heisenberg matrix entry at
 `(σ, τ)` equals the product of the Marshall signs at `σ` and `τ` with
