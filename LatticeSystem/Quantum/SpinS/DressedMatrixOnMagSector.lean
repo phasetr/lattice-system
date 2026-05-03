@@ -337,4 +337,33 @@ theorem dressedHeisenbergSReMatrixOnMagSector_mulVec_of_shifted_eigenvec
   rw [this] at hσ
   linarith
 
+/-- **Spin-S Marshall–Lieb–Mattis ground state on the dressed sector
+matrix** (γ-3 FINAL THEOREM, dressed form): there exists a strictly
+positive eigenvector of the dressed Heisenberg sector matrix, with
+eigenvalue `c - r < c` (where `r > 0` is the Perron eigenvalue of
+the shifted matrix).
+
+Combines #847 (existence) with #849 (eigenvalue conversion). -/
+theorem exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N) :
+    ∃ (μ : ℝ) (v : magConfigS V N M → ℝ),
+      μ < c ∧ (∀ σ, 0 < v σ) ∧
+      (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v = μ • v := by
+  obtain ⟨r, v, hr_pos, hv_pos, hmul⟩ :=
+    exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector A N c
+      hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
+  refine ⟨c - r, v, by linarith, hv_pos, ?_⟩
+  exact dressedHeisenbergSReMatrixOnMagSector_mulVec_of_shifted_eigenvec A J N c
+    hmul
+
 end LatticeSystem.Quantum
