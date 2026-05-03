@@ -473,4 +473,91 @@ theorem totalSpinSSquared_mulVec_allAlignedStateS_zero_eigenvalue [Nonempty V] :
   congr 1
   ring
 
+/-! ## `(Ŝ_tot)²` eigenvector on the all-down state (lowest weight) -/
+
+/-- **The all-down state is a `(Ŝ_tot)²`-eigenvector**. Same proof as
+the all-up case via `totalSpinSSquared_eq_heisenbergHamiltonianS_unit`
+and `heisenbergHamiltonianS_mulVec_allAlignedStateS_last` (PR #876). -/
+theorem totalSpinSSquared_mulVec_allAlignedStateS_last :
+    (totalSpinSSquared V N).mulVec
+      (allAlignedStateS V N (Fin.last N)) =
+      ((totalSpinSSquared V N : ManyBodyOpS V N)
+        (allAlignedConfigS V N (Fin.last N))
+        (allAlignedConfigS V N (Fin.last N))) •
+        allAlignedStateS V N (Fin.last N) := by
+  rw [totalSpinSSquared_eq_heisenbergHamiltonianS_unit,
+    heisenbergHamiltonianS_mulVec_allAlignedStateS_last (fun _ _ => (1 : ℂ)),
+    ← totalSpinSSquared_eq_heisenbergHamiltonianS_unit]
+
+/-- The diagonal `(Ŝ_tot)²_{σ_⊥,σ_⊥}` value on the all-down
+configuration: same value as the all-up case since
+`(N/2 - N)² = (-N/2)² = (N/2)²`. -/
+theorem totalSpinSSquared_apply_diag_allAlignedConfigS_last [Nonempty V] :
+    ((totalSpinSSquared V N : ManyBodyOpS V N)
+      (allAlignedConfigS V N (Fin.last N))
+      (allAlignedConfigS V N (Fin.last N))) =
+    (Fintype.card V : ℂ) * ((N : ℂ) * (N + 2) / 4) +
+      ((Fintype.card V : ℂ) * (Fintype.card V : ℂ) -
+        (Fintype.card V : ℂ)) * ((N : ℂ) / 2 * ((N : ℂ) / 2)) := by
+  rw [totalSpinSSquared_eq_heisenbergHamiltonianS_unit,
+    heisenbergHamiltonianS_apply_diag]
+  -- ∑ x ∑ y, 1 · (if x=y then N(N+2)/4 else (N/2 - N)(N/2 - N))
+  --   = |V|·N(N+2)/4 + (|V|²-|V|)·N²/4 (since (N/2 - N)² = (N/2)²).
+  have h_inner : ∀ x : V, (∑ y : V,
+        (1 : ℂ) * (if x = y then (N : ℂ) * (N + 2) / 4
+                    else ((N : ℂ) / 2 - ((allAlignedConfigS V N (Fin.last N)) x).val) *
+                      ((N : ℂ) / 2 - ((allAlignedConfigS V N (Fin.last N)) y).val))) =
+      (N : ℂ) * (N + 2) / 4 +
+        ((Fintype.card V : ℂ) - 1) * ((N : ℂ) / 2 * ((N : ℂ) / 2)) := by
+    intro x
+    rw [show (∑ y : V,
+          (1 : ℂ) * (if x = y then (N : ℂ) * (N + 2) / 4
+                      else ((N : ℂ) / 2 - ((allAlignedConfigS V N (Fin.last N)) x).val) *
+                        ((N : ℂ) / 2 - ((allAlignedConfigS V N (Fin.last N)) y).val))) =
+        ∑ y : V, (if x = y then (N : ℂ) * (N + 2) / 4
+                    else ((N : ℂ) / 2 - (N : ℂ)) * ((N : ℂ) / 2 - (N : ℂ))) from by
+      refine Finset.sum_congr rfl (fun y _ => ?_)
+      rw [one_mul]
+      by_cases hxy : x = y
+      · rw [if_pos hxy, if_pos hxy]
+      · rw [if_neg hxy, if_neg hxy]
+        unfold allAlignedConfigS
+        have hN : ((Fin.last N).val : ℂ) = N := by simp [Fin.last]
+        rw [hN]]
+    rw [← Finset.sum_erase_add _ _ (Finset.mem_univ x), if_pos rfl]
+    rw [show (∑ y ∈ Finset.univ.erase x,
+          if x = y then (N : ℂ) * (N + 2) / 4
+          else ((N : ℂ) / 2 - (N : ℂ)) * ((N : ℂ) / 2 - (N : ℂ))) =
+        ∑ _ ∈ Finset.univ.erase x, ((N : ℂ) / 2) * ((N : ℂ) / 2) from by
+      refine Finset.sum_congr rfl (fun y hy => ?_)
+      rw [if_neg (fun heq => (Finset.mem_erase.mp hy).1 heq.symm)]
+      ring]
+    rw [Finset.sum_const, Finset.card_erase_of_mem (Finset.mem_univ x),
+      Finset.card_univ, nsmul_eq_mul]
+    have hpos : 0 < Fintype.card V := Fintype.card_pos
+    have hsub : ((Fintype.card V - 1 : ℕ) : ℂ) =
+        (Fintype.card V : ℂ) - 1 := by
+      rw [Nat.cast_sub hpos]
+      simp
+    rw [hsub]
+    ring
+  rw [Finset.sum_congr rfl (fun x _ => h_inner x)]
+  rw [Finset.sum_add_distrib, Finset.sum_const, Finset.sum_const,
+    Finset.card_univ, nsmul_eq_mul, nsmul_eq_mul]
+  ring
+
+/-- **Casimir eigenvalue formula on the all-down state**: same value
+as the all-up case — `(|V|·N/2)·(|V|·N/2 + 1)`, the `J_tot = |V|·S`
+irreducible representation Casimir value. -/
+theorem totalSpinSSquared_mulVec_allAlignedStateS_last_eigenvalue [Nonempty V] :
+    (totalSpinSSquared V N).mulVec
+      (allAlignedStateS V N (Fin.last N)) =
+      ((Fintype.card V : ℂ) * (N : ℂ) / 2 *
+        ((Fintype.card V : ℂ) * (N : ℂ) / 2 + 1)) •
+        allAlignedStateS V N (Fin.last N) := by
+  rw [totalSpinSSquared_mulVec_allAlignedStateS_last,
+    totalSpinSSquared_apply_diag_allAlignedConfigS_last]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
