@@ -2,6 +2,7 @@ import LatticeSystem.Quantum.SpinS.ShiftedDressedMatrix
 import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.RaiseLowerMatrixPow
 import LatticeSystem.Math.PerronFrobeniusMain
+import LatticeSystem.Math.PerronFrobenius
 import Mathlib.LinearAlgebra.Matrix.Irreducible.Defs
 
 /-!
@@ -228,5 +229,38 @@ theorem exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector
   LatticeSystem.Math.PerronFrobeniusMain.exists_positive_eigenvector_of_irreducible
     (isIrreducible_shiftedDressedSReMatrixOnMagSector A N c hJ_real hJ_pos
       hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate)
+
+/-- **Uniqueness of the spin-S Perron eigenvector** (γ-3 FINAL): for the
+sector-restricted shifted dressed Heisenberg matrix, any two strictly
+positive eigenvectors with the same eigenvalue are positive scalar
+multiples of each other.
+
+Direct corollary of `Matrix.IsIrreducible` (#846) and
+`pos_eigenvec_unique` from PF infrastructure. This is the
+non-degeneracy half of Tasaki §2.5 Theorem 2.2 for general spin (the
+ground-state in each magnetization sector is unique up to a positive
+scalar, equivalently 1-dimensional). -/
+theorem pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {μ : ℝ} {v w : magConfigS V N M → ℝ}
+    (hv : (shiftedDressedSReMatrixOnMagSector A J N c M).mulVec v = μ • v)
+    (hv_pos : ∀ σ, 0 < v σ)
+    (hw : (shiftedDressedSReMatrixOnMagSector A J N c M).mulVec w = μ • w)
+    (hw_pos : ∀ σ, 0 < w σ) :
+    ∃ r : ℝ, 0 < r ∧ w = r • v :=
+  LatticeSystem.Math.PerronFrobenius.pos_eigenvec_unique
+    (isIrreducible_shiftedDressedSReMatrixOnMagSector A N c hJ_real hJ_pos
+      hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate)
+    hv hv_pos hw hw_pos
 
 end LatticeSystem.Quantum
