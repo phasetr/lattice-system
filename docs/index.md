@@ -1077,6 +1077,8 @@ Issue #412; assembled in PRs #875–#879. All theorems live in
 | `saturatedFerromagnetEigenvalueS_explicit` | **explicit form**: `saturatedFerromagnetEigenvalueS J N = ∑_x ∑_y J(x,y) · (if x = y then N(N+2)/4 else (N/2)²)` (PR #951, file `Quantum/SpinS/SaturatedEigenvalueExplicit.lean`) |
 | `explicit_uniform_eq_casimir_eigenvalue` | combinatorial simplification: explicit form at `J = 1` equals `m_max(m_max + 1)` (PR #953, file `Quantum/SpinS/SaturatedExplicitUniformSimp.lean`) |
 | `allAlignedStateS_{zero,last}_expectation_heisenbergHamiltonianS_explicit` | explicit H expectation on saturated states: `⟨|σ_⊤/⊥⟩, H · |σ_⊤/⊥⟩⟩ = ∑_x ∑_y J(x,y) · (if x = y then N(N+2)/4 else (N/2)²)` (PR #954, file `Quantum/SpinS/HExpectationExplicit.lean`) |
+| `allAlignedConfigS_injective` / `allAlignedStateS_ne_of_ne` | distinct constants give distinct configurations and distinct states for `[Nonempty V]` (PR #956, file `Quantum/SpinS/AllAlignedStateDistinct.lean`) |
+| `allAlignedConfigS_eigenvalue_injective` / `allAlignedStateS_linearIndependent` | the family `{|c..c⟩ : c ∈ Fin (N+1)}` is `LinearIndependent ℂ` for `[Nonempty V]` via distinct `Ŝ^z_tot` eigenvalues (PR #957, file `Quantum/SpinS/AllAlignedStateLI.lean`) |
 
 References: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.4 (pp. 30–37, spin-1/2 case).
