@@ -5707,6 +5707,30 @@ new file \texttt{Fermion/NumberSpinSBridge.lean} proves
 $n = (1/2)\,I - \hat{S}^{(3)}$, the standard physics identification
 $n = (I - \sigma^z)/2$ lifted to generic spin-`S` at $N = 1$.
 
+\textbf{Per-pair correlation $\hat{S}_x\cdot\hat{S}_y\,|\sigma_\top\rangle
+= (N^2/4)\,|\sigma_\top\rangle$ for $x\neq y$ (PR~\#939)}: the new
+file \texttt{Quantum/SpinS/SpinSDotAllAlignedZero.lean} computes the
+per-pair eigenvalue directly via \texttt{spinSDot\_eq\_plus\_minus}:
+the $(\pm,\mp)$ ladder cross-terms vanish on $|\sigma_\top\rangle$
+(via \#877 highest-weight annihilation
+\texttt{onSiteS\_spinSOpPlus\_mulVec\_allAlignedStateS\_zero})
+and an entrywise off-site agreement analysis killing the residual
+$(+,-)$ contribution; the $(3)(3)$ term gives $(N/2)^2$.
+
+\textbf{Symmetric raising-side per-pair eigenvalue (PR~\#940)}: the
+new file \texttt{Quantum/SpinS/SpinSDotAllAlignedLast.lean} mirrors
+\#939 for $|\sigma_\bot\rangle$ via $\hat{S}^+ \leftrightarrow
+\hat{S}^-$, $0 \leftrightarrow N$ swap. The $(3)(3)$ coefficient
+$(-N/2)^2$ also gives $N^2/4$.
+
+\textbf{Per-pair correlation expectation (PR~\#941)}: the new file
+\texttt{Quantum/SpinS/PerPairCorrelationExpectation.lean} packages
+\#939/\#940 with the normalization (\#913):
+$\langle|\sigma_{\top/\bot}\rangle, \hat{S}_x\cdot\hat{S}_y\,
+|\sigma_{\top/\bot}\rangle\rangle = N^2/4 = S^2$ for $x \neq y$.
+The total off-diagonal sum then equals $|V|\cdot(|V|-1)\cdot S^2$,
+matching \#934.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
