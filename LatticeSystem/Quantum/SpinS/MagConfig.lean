@@ -1,4 +1,6 @@
 import LatticeSystem.Quantum.SpinS.Magnetization
+import LatticeSystem.Quantum.SpinS.RaiseLower
+import Mathlib.Combinatorics.SimpleGraph.Basic
 
 /-!
 # The magnetization-`M` configuration subtype
@@ -37,5 +39,41 @@ instance magConfigS_instFintype {M : ℕ} : Fintype (magConfigS V N M) := by
   unfold magConfigS
   classical
   apply Subtype.fintype
+
+/-! ## Raise/lower step lifted to magConfigS -/
+
+/-- A `RaiseLowerStepS` between two magConfigS in the same sector
+(magnetization automatically preserved by the raise/lower step). -/
+def RaiseLowerStepSMagSector (G : SimpleGraph V) {M : ℕ}
+    (σ τ : magConfigS V N M) : Prop :=
+  RaiseLowerStepS G σ.1 τ.1
+
+/-- The reflexive transitive closure of `RaiseLowerStepSMagSector`. -/
+def RaiseLowerReachableSMagSector (G : SimpleGraph V) {M : ℕ} :
+    magConfigS V N M → magConfigS V N M → Prop :=
+  Relation.ReflTransGen (RaiseLowerStepSMagSector G)
+
+omit [DecidableEq V] in
+/-- Reflexivity of the magConfigS reachability. -/
+theorem RaiseLowerReachableSMagSector.refl
+    (G : SimpleGraph V) {M : ℕ} (σ : magConfigS V N M) :
+    RaiseLowerReachableSMagSector G σ σ :=
+  Relation.ReflTransGen.refl
+
+omit [DecidableEq V] in
+/-- A single step is reachable. -/
+theorem RaiseLowerReachableSMagSector.single {G : SimpleGraph V} {M : ℕ}
+    {σ τ : magConfigS V N M} (h : RaiseLowerStepSMagSector G σ τ) :
+    RaiseLowerReachableSMagSector G σ τ :=
+  Relation.ReflTransGen.single h
+
+omit [DecidableEq V] in
+/-- Transitivity. -/
+theorem RaiseLowerReachableSMagSector.trans {G : SimpleGraph V} {M : ℕ}
+    {σ τ ρ : magConfigS V N M}
+    (h₁ : RaiseLowerReachableSMagSector G σ τ)
+    (h₂ : RaiseLowerReachableSMagSector G τ ρ) :
+    RaiseLowerReachableSMagSector G σ ρ :=
+  Relation.ReflTransGen.trans h₁ h₂
 
 end LatticeSystem.Quantum
