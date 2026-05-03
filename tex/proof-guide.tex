@@ -5201,6 +5201,50 @@ theorem
 \texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
 (\#869).
 
+\subsection*{DONE: Spin-$S$ saturated ferromagnetic state (Tasaki §2.4 generalised)}
+\label{subsec:spin-s-all-aligned}
+
+\textbf{Statement} (spin-$S$ generalisation of Tasaki §2.4 P1i,
+saturated ferromagnet). For a multi-site spin-$S$ system on a finite
+vertex set $V$ with $S = N/2$, the all-aligned (constant-spin) basis
+state $|\sigma_{\!c}\rangle = \otimes_x |c\rangle$ with
+$\sigma\,x = c$ for all $x : V$ is:
+\begin{enumerate}
+\item A $\hat S^z_{\mathrm{tot}}$-eigenvector with eigenvalue
+  $|V|\cdot N/2 - |V|\cdot c$ (any $c$).
+\item For $c = 0$ (\emph{highest weight}, ``all up''): the unique
+  configuration with $\mathrm{magSum} = 0$, hence by
+  $[H,\hat S^z_{\rm tot}] = 0$ a Heisenberg eigenvector for ANY
+  coupling $J$, with eigenvalue
+  $\sum_x J(x,x)\cdot \tfrac{N(N+2)}{4} +
+   \sum_{x\neq y} J(x,y)\cdot \tfrac{N^2}{4}$. Annihilated by
+  $\hat S^+_{\mathrm{tot}}$.
+  $(\hat S_{\mathrm{tot}})^2$-eigenvector with the highest-weight
+  Casimir eigenvalue
+  $(|V|\cdot N/2)\cdot(|V|\cdot N/2 + 1)$.
+\item For $c = N$ (\emph{lowest weight}, ``all down''): symmetric —
+  same eigenvalues (since $(N/2 - N)^2 = (N/2)^2$), annihilated by
+  $\hat S^-_{\mathrm{tot}}$.
+\end{enumerate}
+
+These together identify the all-up and all-down basis states as the
+extremal-weight vectors of the $J_{\mathrm{tot}} = |V|\cdot S
+= |V|\cdot N/2$ irreducible SU(2) representation in the multi-site
+Hilbert space.
+
+\textbf{Status}: Formalized in
+\texttt{LatticeSystem/Quantum/SpinS/AllAlignedState.lean} as PRs
+\#875--\#879 (Issue~\#412). Theorems include
+\texttt{allAlignedConfigS}, \texttt{allAlignedStateS},
+\texttt{magSumS\_pos\_of\_ne\_allAlignedConfigS\_zero}
+(uniqueness in $M=0$ sector),
+\texttt{heisenbergHamiltonianS\_mulVec\_allAlignedStateS\_zero\_eigenvalue}
+(Heisenberg eigenvalue),
+\texttt{totalSpinSOpPlus\_mulVec\_allAlignedStateS\_zero}
+(highest-weight annihilation),
+\texttt{totalSpinSSquared\_mulVec\_allAlignedStateS\_zero\_eigenvalue}
+(Casimir eigenvalue), and the c=N parallels.
+
 \subsection*{DONE: Tasaki Problem 2.2.c}
 
 \textbf{Statement} (Tasaki §2.2, eq.~(2.2.15), p.~24): The
@@ -5271,6 +5315,7 @@ Néel state on bipartite chain / 2D / 3D + per-bond expectation $-1/4$ (Tasaki �
 Generic graph-centric Néel state \texttt{neelStateOf} (Tasaki §2.5 (2.5.2)) & finite-dim & \emph{formalized} \\
 Marshall sign, generic + chain / 2D / 3D, flip + time-reversal bridge (Tasaki §2.5) & finite-dim & \emph{formalized} \\
 Spin-$S$ Marshall--Lieb--Mattis Theorem 2.2 (Tasaki §2.5), magnetization-sector form (real and complex) and full-Hilbert-space form & finite-dim & \emph{formalized} \\
+Spin-$S$ saturated ferromagnetic state (Tasaki §2.4 generalised): all-up/all-down as Heisenberg eigenvector for any coupling, ladder annihilation $\hat S^\pm_{\rm tot}$, Casimir eigenvalue $(|V|\cdot N/2)(|V|\cdot N/2 + 1)$ & finite-dim & \emph{formalized} \\
 Time-reversal map for many-body $S=1/2$ + multi-body Kramers degeneracy (Tasaki §2.3) & finite-dim & \emph{formalized} \\
 Multi-mode fermion via Jordan--Wigner (CAR + number op + Hubbard chain) & finite-dim & \emph{formalized} \\
 Hubbard chain, finite volume (open and periodic BC) & finite-dim & \emph{formalized} \\
