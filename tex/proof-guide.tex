@@ -5319,6 +5319,72 @@ all-up (resp. all-down) configuration, hence
 \texttt{magSumS\_lt\_card\_mul\_of\_ne\_allAlignedConfigS\_last}
 strict bounds; \texttt{Nonempty} instances follow.
 
+\textbf{Magnetization subspaces form an internal direct sum
+(PR~\#889)}: the spin-`S` analog of the spin-1/2
+\texttt{magnetizationSubspace\_isInternal} (in
+\texttt{Quantum/MagnetizationSubspace.lean}). The new file
+\texttt{Quantum/SpinS/MagnetizationDirectSum.lean} proves
+\texttt{magSubspaceS\_eq\_eigenspace} (bridge to
+\texttt{Module.End.eigenspace} of
+$(\hat S^z_{\rm tot}).\texttt{mulVecLin}$), which lets
+\texttt{magSubspaceS\_iSupIndep} inherit from the mathlib
+\texttt{Module.End.eigenspaces\_iSupIndep} (applicable because
+$\mathbb{C}$ is a field, hence \texttt{IsDomain} and
+\texttt{IsTorsionFree}). Combined with the existing
+\texttt{iSup\_magSubspaceS\_eq\_top} (in
+\texttt{Quantum/SpinS/Magnetization.lean}), this gives
+\texttt{magSubspaceS\_isInternal}: the multi-site Hilbert space
+$(\Lambda\to\textsf{Fin}(N+1))\to\mathbb{C}$ decomposes as the
+internal direct sum of the magnetization subspaces. As corollaries,
+the PR~\#887 ladder iterates
+$(\hat S^\mp_{\rm tot})^k\,|\sigma_{\top/\bot}\rangle$ are placed in
+their respective magnetization sectors via
+\texttt{mem\_magSubspaceS\_iff}.
+
+\textbf{Once-lowered/raised state is non-zero on the saturated
+ferromagnet (PR~\#890)}: foundational non-vanishing for the
+saturated-ferromagnet ladder. In the new file
+\texttt{Quantum/SpinS/LadderIterateNonvanishing.lean} the
+configuration \texttt{oneFlippedUpConfig V x\_0 hN} (requires
+$0<N$) flips one site $x_0:V$ from $0$ to $1\in\textsf{Fin}(N+1)$
+and leaves the rest at $0$. The explicit value identity
+\texttt{totalSpinSOpMinus\_mulVec\_allAlignedStateS\_zero\_at\_oneFlippedUpConfig}
+gives $((\hat S^-_{\rm tot}\,|\sigma_\top\rangle))(\texttt{oneFlipped})=\sqrt{N}$:
+distribute $\hat S^-_{\rm tot}=\sum_x\texttt{onSiteS}\,x\,\hat S^-$
+via \texttt{Matrix.sum\_mulVec}, isolate only the pivot $x=x_0$ via
+\texttt{sum\_eq\_single} (off-site agreement fails for
+$x\neq x_0$), reduce via \texttt{spinSOpMinus\_apply\_lower}
+$(0+1=1)=\sqrt{N\cdot 1}$. The corollary
+\texttt{totalSpinSOpMinus\_mulVec\_allAlignedStateS\_zero\_ne\_zero}
+follows for $0<N$ and $[\texttt{Nonempty V}]$ since
+$\sqrt{N}>0$. The symmetric raising side
+\texttt{oneFlippedDownConfig\,/\,..\_at\_oneFlippedDownConfig\,/\,..\_ne\_zero}
+covers $\hat S^+_{\rm tot}\,|\sigma_\bot\rangle$.
+
+\textbf{Linear independence of the first ladder pair (PR~\#891)}:
+combines PRs~\#875, \#886, \#889, \#890 into the smallest
+non-trivial linear-independence statement on the saturated-
+ferromagnet ladder. In the new file
+\texttt{Quantum/SpinS/SaturatedPairLinearIndependent.lean} the
+all-aligned state non-vanishing
+\texttt{allAlignedStateS\_ne\_zero} (its value at the all-aligned
+configuration is $1$) is paired with the eigenspace bridges
+\texttt{allAlignedStateS\_zero\_mem\_eigenspace\_mMax} and
+\texttt{totalSpinSOpMinus\_mulVec\_allAlignedStateS\_zero\_mem\_eigenspace\_mMaxSubOne}
+to satisfy the \texttt{Module.End.HasEigenvector} hypotheses of
+mathlib's \texttt{Module.End.eigenvectors\_linearIndependent'}.
+The eigenvalue pair $(m_{\max},m_{\max}-1)$ is injective, hence
+the family $![|\sigma_\top\rangle,\hat S^-_{\rm tot}|\sigma_\top\rangle]$
+is \texttt{LinearIndependent}~$\mathbb{C}$ for $0<N$ and
+$[\texttt{Nonempty V}]$
+(\texttt{allAlignedStateS\_zero\_totalSpinSOpMinus\_mulVec\_linearIndependent}).
+The symmetric raising-side pair is
+\texttt{allAlignedStateS\_last\_totalSpinSOpPlus\_mulVec\_linearIndependent}.
+Generalises by induction (with the higher-$k$ extension of
+PR~\#890) to the full $(2m_{\max}+1)$-vector family
+$\{(\hat S^\mp_{\rm tot})^k\,|\sigma_{\top/\bot}\rangle:
+ k=0,\ldots,2m_{\max}\}$.
+
 \subsection*{DONE: Tasaki Problem 2.2.c}
 
 \textbf{Statement} (Tasaki §2.2, eq.~(2.2.15), p.~24): The
