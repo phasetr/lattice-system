@@ -462,4 +462,15 @@ theorem sublatticeSpinHalfOpPlus_complement_minus_mulVec_neelStateOf
   rw [sublatticeSpinHalfOpMinus_complement_mulVec_neelStateOf]
   rw [Matrix.mulVec_zero]
 
+/-- `Ŝ_A^- · Ŝ_¬A^- · |Φ_Néel⟩ = 0`. Spin-`1/2` mirror of γ-4 step 83:
+cross-ladder lowering annihilates Néel via `Ŝ_¬A^- · Néel = 0`. -/
+theorem sublatticeSpinHalfOpMinus_complement_minus_mulVec_neelStateOf
+    (A : Λ → Bool) :
+    (sublatticeSpinHalfOpMinus A *
+        sublatticeSpinHalfOpMinus (fun x => ! A x)).mulVec
+        (neelStateOf A) = 0 := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [sublatticeSpinHalfOpMinus_complement_mulVec_neelStateOf]
+  rw [Matrix.mulVec_zero]
+
 end LatticeSystem.Quantum
