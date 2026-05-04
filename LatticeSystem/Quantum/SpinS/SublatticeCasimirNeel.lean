@@ -712,4 +712,17 @@ theorem neelStateOfS_inner_self (A : Λ → Bool) (N : ℕ) :
   unfold neelStateOfS
   exact basisVecS_inner_self _
 
+/-- `<Φ_Néel | Ŝ_tot^(3) | Φ_Néel> = (|A| - |¬A|)·N/2`. The Néel state is
+an `Ŝ_tot^(3)` eigenvector with magnetization `(|A| - |¬A|)·N/2`. -/
+theorem neelStateOfS_totalSpinSOp3_expectation (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((totalSpinSOp3 Λ N).mulVec (neelStateOfS A N)) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+            ((N : ℂ) / 2) -
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+            ((N : ℂ) / 2)) := by
+  rw [totalSpinSOp3_mulVec_neelStateOfS]
+  rw [dotProduct_smul]
+  rw [neelStateOfS_inner_self, smul_eq_mul, mul_one]
+
 end LatticeSystem.Quantum
