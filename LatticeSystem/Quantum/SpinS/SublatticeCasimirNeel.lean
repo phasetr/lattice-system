@@ -824,4 +824,31 @@ theorem neelStateOfS_totalSpinSOp3_expectation (A : Λ → Bool) (N : ℕ) :
   rw [dotProduct_smul]
   rw [neelStateOfS_inner_self, smul_eq_mul, mul_one]
 
+/-- `<Φ_Néel | (Ŝ_tot)² | Φ_Néel> = ((|A|-|¬A|)·N/2)² + (|A|+|¬A|)·N/2`.
+
+The full total-spin Casimir expectation on the Néel state. By the Casimir
+identity `(Ŝ_tot)² = (Ŝ_A)² + 2 (Ŝ_A · Ŝ_¬A) + (Ŝ_¬A)²`:
+- `<Néel|(Ŝ_A)²|Néel> = (|A|·N/2)((|A|·N/2)+1)` (γ-4 step 79 + norm 1)
+- `<Néel|(Ŝ_¬A)²|Néel> = (|¬A|·N/2)((|¬A|·N/2)+1)` (complement)
+- `<Néel|Ŝ_A·Ŝ_¬A|Néel> = -|A|·|¬A|·(N/2)²` (γ-4 step 124)
+
+Sum simplifies to `((|A|-|¬A|)·N/2)² + (|A|+|¬A|)·N/2`. -/
+theorem neelStateOfS_totalSpinSSquared_expectation (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((totalSpinSSquared Λ N).mulVec (neelStateOfS A N)) =
+      ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) *
+          ((N : ℂ) / 2)) ^ 2 +
+        (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) +
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) *
+          ((N : ℂ) / 2) := by
+  rw [totalSpinSSquared_eq_sublattice_casimir N A]
+  simp only [Matrix.add_mulVec, dotProduct_add,
+    sublatticeSpinSquaredS_mulVec_neelStateOfS,
+    sublatticeSpinSquaredS_complement_mulVec_neelStateOfS,
+    Matrix.smul_mulVec, dotProduct_smul,
+    neelStateOfS_sublatticeSpinSDot_expectation,
+    neelStateOfS_inner_self, smul_eq_mul, mul_one]
+  ring
+
 end LatticeSystem.Quantum
