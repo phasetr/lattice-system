@@ -30,6 +30,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.SitePartitionIdentity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsIdempotent
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsDoublyEmpty
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsHermitian
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsUpDown
 
 /-!
 # Multi-mode fermion via Jordan–Wigner mapping
@@ -73,6 +74,7 @@ is now a thin re-import of five sub-files under
 | `Hubbard/SiteProjectionsIdempotent.lean` | `(p_∅)² = p_∅`, `(p_↑)² = p_↑`, `(p_↓)² = p_↓` |
 | `Hubbard/SiteProjectionsDoublyEmpty.lean` | `p_⇈ · p_∅ = 0`, `p_∅ · p_⇈ = 0` |
 | `Hubbard/SiteProjectionsHermitian.lean` | `p_∅`, `p_↑`, `p_↓` Hermitian (companions to PR #1007) |
+| `Hubbard/SiteProjectionsUpDown.lean` | `p_↑ · p_↓ = 0`, `p_↓ · p_↑ = 0` |
 
 Old `import LatticeSystem.Fermion.JordanWigner` continues to
 work unchanged via this façade. Following the convention from
