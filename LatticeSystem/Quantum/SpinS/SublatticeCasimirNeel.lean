@@ -869,4 +869,37 @@ theorem neelStateOfS_totalSpinSSquared_expectation (A : Λ → Bool) (N : ℕ) :
     neelStateOfS_inner_self, smul_eq_mul, mul_one]
   ring
 
+/-- `<Φ_Néel | (Ŝ_tot)² | Φ_Néel> = ((|A|-|¬A|)·N/2)² + |Λ|·N/2`. Reformulation
+of γ-4 step 126 using `|A| + |¬A| = |Λ|`. -/
+theorem neelStateOfS_totalSpinSSquared_expectation_card_Lambda
+    (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((totalSpinSSquared Λ N).mulVec (neelStateOfS A N)) =
+      ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) *
+          ((N : ℂ) / 2)) ^ 2 +
+        (Fintype.card Λ : ℂ) * ((N : ℂ) / 2) := by
+  rw [neelStateOfS_totalSpinSSquared_expectation]
+  congr 1
+  have h : ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) +
+      ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) =
+      (Fintype.card Λ : ℂ) := by
+    have h1 : (Finset.univ.filter (fun x : Λ => A x = true)).card +
+        (Finset.univ.filter (fun x : Λ => (! A x) = true)).card =
+        Finset.univ.card (α := Λ) := by
+      have hfilter_eq : Finset.univ.filter (fun x : Λ => (! A x) = true) =
+          Finset.univ.filter (fun x : Λ => ¬ (A x = true)) := by
+        congr 1
+        funext x
+        by_cases hA : A x = true
+        · simp [hA]
+        · simp [hA]
+      rw [hfilter_eq]
+      exact Finset.card_filter_add_card_filter_not (fun x : Λ => A x = true)
+    have h2 : (Finset.univ.card (α := Λ) : ℂ) = (Fintype.card Λ : ℂ) := by
+      rw [Finset.card_univ]
+    rw [← h2]
+    exact_mod_cast h1
+  rw [h]
+
 end LatticeSystem.Quantum
