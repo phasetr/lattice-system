@@ -6231,6 +6231,18 @@ $(c + c^\dagger)(c - c^\dagger) = \sigma_x \cdot i\sigma_y =
 i^2 \sigma_z = -\sigma_z$; in our convention
 $n = (I - \sigma_z)/2$, so $-\sigma_z = 2n - 1$.
 
+\textbf{Single-mode Pauli-X / iY analog Hermiticity +
+anticommute structure (PR~\#1026)}: in the file
+\texttt{Fermion/CPlusMinusCDaggerHermitian.lean}. Three lemmas:
+$(c + c^\dagger)$ Hermitian, $(c - c^\dagger)^H = -(c -
+c^\dagger)$ (anti-Hermitian), and $\{c + c^\dagger, c -
+c^\dagger\} = 0$ (anticommute). The first two follow from
+$c^H = c^\dagger$ and $(c^\dagger)^H = c$ via
+\texttt{Matrix.conjTranspose\_add/\_sub}; the anticommutator
+follows from PR~\#1025: $(2n - 1) + (1 - 2n) = 0$. Physics
+identification: $\{\sigma_x, \sigma_y\} = 0$ in the spin-$1/2$
+representation.
+
 \textbf{Multi-mode (JW) ladder-on-hole-projection vanishing
 $c_i\,(c_i\,c_i^\dagger) = 0$ and $(c_i\,c_i^\dagger)\,
 c_i^\dagger = 0$ (PR~\#1010)}: multi-mode mirror of PR~\#1009,

@@ -11,6 +11,7 @@ import LatticeSystem.Fermion.CCDaggerSpinSBridge
 import LatticeSystem.Fermion.CMinusCDaggerSq
 import LatticeSystem.Fermion.CPlusCDaggerMulCMinusCDagger
 import LatticeSystem.Fermion.CPlusCDaggerSq
+import LatticeSystem.Fermion.CPlusMinusCDaggerHermitian
 import LatticeSystem.Fermion.CreationNumberIdentities
 import LatticeSystem.Fermion.NumberExpectations
 import LatticeSystem.Fermion.NumberLadderAnticommutators
@@ -30,8 +31,8 @@ import LatticeSystem.Fermion.Traces
 
 **Façade module** re-exporting the full single-mode fermion
 algebra developed during the 2026-05-04 autonomous fermion
-expansion (PRs #988–#1021), on top of the original `Mode.lean`
-core.
+expansion (PRs #988–#1026 and continuing), on top of the
+original `Mode.lean` core.
 
 | sub-file | content |
 |---|---|
@@ -48,6 +49,7 @@ core.
 | `CMinusCDaggerSq.lean` | `(c − c†)² = −1` (iY-Pauli analog) |
 | `CPlusCDaggerMulCMinusCDagger.lean` | `(c+c†)(c−c†) = 2n−1`, `(c−c†)(c+c†) = 1−2n` |
 | `CPlusCDaggerSq.lean` | `(c + c†)² = 1` (X-Pauli analog) |
+| `CPlusMinusCDaggerHermitian.lean` | `c+c†` Hermitian, `c−c†` anti-Hermitian, `{,}=0` |
 | `CreationNumberIdentities.lean` | `c† · n = 0`, `n · c† = c†` |
 | `NumberExpectations.lean` | `⟨n⟩` on basis states |
 | `NumberLadderAnticommutators.lean` | `{n, c} = c`, `{n, c†} = c†` |
