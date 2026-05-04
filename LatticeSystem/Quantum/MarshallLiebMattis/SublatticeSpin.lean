@@ -898,6 +898,24 @@ theorem sublatticeSpinHalfOpMinus_const_true :
   refine Finset.sum_congr rfl fun x _ => ?_
   simp
 
+/-! ## Reverse identities -/
+
+/-- `Ŝ_A^+ + Ŝ_A^- = 2 • Ŝ_A^(1)`. -/
+theorem sublatticeSpinHalfOpPlus_add_sublatticeSpinHalfOpMinus (A : Λ → Bool) :
+    sublatticeSpinHalfOpPlus A + sublatticeSpinHalfOpMinus A =
+      (2 : ℂ) • sublatticeSpinHalfOp1 A := by
+  rw [sublatticeSpinHalfOpPlus_eq_add, sublatticeSpinHalfOpMinus_eq_sub, two_smul]
+  abel
+
+/-- `Ŝ_A^+ - Ŝ_A^- = 2i • Ŝ_A^(2)`. -/
+theorem sublatticeSpinHalfOpPlus_sub_sublatticeSpinHalfOpMinus (A : Λ → Bool) :
+    sublatticeSpinHalfOpPlus A - sublatticeSpinHalfOpMinus A =
+      (2 * Complex.I) • sublatticeSpinHalfOp2 A := by
+  rw [sublatticeSpinHalfOpPlus_eq_add, sublatticeSpinHalfOpMinus_eq_sub]
+  rw [show (2 * Complex.I : ℂ) = Complex.I + Complex.I from by ring]
+  rw [add_smul]
+  abel
+
 /-! ## Sublattice ladder adjoint relations -/
 
 /-- `(Ŝ_A^+)† = Ŝ_A^-`: the spin-`1/2` sublattice raising and lowering
