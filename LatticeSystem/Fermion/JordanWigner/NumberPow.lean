@@ -17,8 +17,6 @@ Tracked as part of Phase 2 fermion infrastructure (Issue #412).
 
 namespace LatticeSystem.Fermion
 
-open LatticeSystem.Quantum
-
 /-- `n_i^(k+1) = n_i` for every `k : ℕ` (multi-mode idempotent
 projection power identity). -/
 theorem fermionMultiNumber_pow_succ (N : ℕ) (i : Fin (N + 1)) (k : ℕ) :
