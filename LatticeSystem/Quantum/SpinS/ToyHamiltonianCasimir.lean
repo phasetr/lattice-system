@@ -1,0 +1,120 @@
+import LatticeSystem.Quantum.SpinS.SublatticeSpinDot
+import LatticeSystem.Quantum.SpinS.ToyHamiltonian
+
+/-!
+# Spin-`S` toy Hamiltonian as a cross-sublattice spin dot product
+
+Spin-`S` analog of the leading section of
+`Quantum/MarshallLiebMattis/ToyHamiltonianCasimir.lean`.
+The spin-`S` MLM toy Hamiltonian (Tasaki §2.5 eq. (2.5.10), without
+the `1/|Λ|` factor)
+
+  `Ĥ_toy_S = Σ_{(x, y) bipartite} Ŝ_x · Ŝ_y`
+
+decomposes through the cross-sublattice spin dot product as
+
+  `Ĥ_toy_S = Ŝ_A · Ŝ_¬A + Ŝ_¬A · Ŝ_A = 2 • Ŝ_A · Ŝ_¬A`,
+
+since the bipartite bond sum splits into the two oriented
+cross-sublattice contributions. This is the bridge from the bond
+sum to the operator-level Casimir form (Tasaki §2.5 (2.5.11)),
+which is assembled in subsequent PRs.
+
+References:
+- H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
+  Springer 2020, §2.5 eqs. (2.5.10)–(2.5.11).
+-/
+
+namespace LatticeSystem.Quantum
+
+open Matrix
+
+variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (N : ℕ)
+
+/-- The spin-`S` cross-sublattice spin dot product is symmetric across
+the bipartition: `Ŝ_A · Ŝ_¬A = Ŝ_¬A · Ŝ_A`. Each axis pair commutes by
+the same-axis cross-sublattice commutativity lemmas (PR #1045). -/
+theorem sublatticeSpinSDot_complement_comm (A : Λ → Bool) :
+    sublatticeSpinSDot N A (fun x => ! A x) =
+      sublatticeSpinSDot N (fun x => ! A x) A := by
+  unfold sublatticeSpinSDot
+  congr 1
+  · congr 1
+    · exact (sublatticeSpinSOp1_cross_commute N A).eq
+    · exact (sublatticeSpinSOp2_cross_commute N A).eq
+  · exact (sublatticeSpinSOp3_cross_commute N A).eq
+
+/-- The spin-`S` MLM toy Hamiltonian decomposes as an oriented
+cross-sublattice spin dot product:
+`Ĥ_toy_S = Ŝ_A · Ŝ_¬A + Ŝ_¬A · Ŝ_A`. -/
+theorem heisenbergToyHamiltonianS_eq_sublatticeSpinSDot_sum (A : Λ → Bool) :
+    heisenbergToyHamiltonianS (Λ := Λ) A N =
+      sublatticeSpinSDot N A (fun x => ! A x) +
+        sublatticeSpinSDot N (fun x => ! A x) A := by
+  unfold heisenbergToyHamiltonianS heisenbergHamiltonianS bipartiteCoupling
+  rw [sublatticeSpinSDot_eq_sum_sum, sublatticeSpinSDot_eq_sum_sum,
+      ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  rw [← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun y _ => ?_
+  by_cases hAx : A x = true
+  · by_cases hAy : A y = true
+    · have hne : ¬ A x ≠ A y := fun h => h (hAx.trans hAy.symm)
+      rw [if_neg hne, zero_smul]
+      have h1 : ¬ (A x ∧ (fun z : Λ => ! A z) y) := by
+        intro ⟨_, h2⟩; rw [show (fun z : Λ => ! A z) y = false from by simp [hAy]] at h2
+        exact Bool.noConfusion h2
+      have h2 : ¬ ((fun z : Λ => ! A z) x ∧ A y) := by
+        intro ⟨h1, _⟩; rw [show (fun z : Λ => ! A z) x = false from by simp [hAx]] at h1
+        exact Bool.noConfusion h1
+      rw [if_neg h1, if_neg h2, add_zero]
+    · have hAy' : A y = false := by
+        cases h : A y
+        · rfl
+        · exact absurd h hAy
+      have hne : A x ≠ A y := by rw [hAx, hAy']; decide
+      rw [if_pos hne, one_smul]
+      have h1 : A x ∧ (fun z : Λ => ! A z) y := by
+        refine ⟨hAx, ?_⟩
+        rw [show (fun z : Λ => ! A z) y = true from by simp [hAy']]
+      have h2 : ¬ ((fun z : Λ => ! A z) x ∧ A y) := by
+        intro ⟨_, h⟩; rw [hAy'] at h; exact Bool.noConfusion h
+      rw [if_pos h1, if_neg h2, add_zero]
+  · have hAx' : A x = false := by
+      cases h : A x
+      · rfl
+      · exact absurd h hAx
+    by_cases hAy : A y = true
+    · have hne : A x ≠ A y := by rw [hAx', hAy]; decide
+      rw [if_pos hne, one_smul]
+      have h1 : ¬ (A x ∧ (fun z : Λ => ! A z) y) := by
+        intro ⟨h, _⟩; rw [hAx'] at h; exact Bool.noConfusion h
+      have h2 : (fun z : Λ => ! A z) x ∧ A y := by
+        refine ⟨?_, hAy⟩
+        rw [show (fun z : Λ => ! A z) x = true from by simp [hAx']]
+      rw [if_neg h1, if_pos h2, zero_add]
+    · have hAy' : A y = false := by
+        cases h : A y
+        · rfl
+        · exact absurd h hAy
+      have hne : ¬ A x ≠ A y := fun h => h (hAx'.trans hAy'.symm)
+      rw [if_neg hne, zero_smul]
+      have h1 : ¬ (A x ∧ (fun z : Λ => ! A z) y) := by
+        intro ⟨h, _⟩; rw [hAx'] at h; exact Bool.noConfusion h
+      have h2 : ¬ ((fun z : Λ => ! A z) x ∧ A y) := by
+        intro ⟨_, h⟩; rw [hAy'] at h; exact Bool.noConfusion h
+      rw [if_neg h1, if_neg h2, add_zero]
+
+/-- The spin-`S` MLM toy Hamiltonian equals twice the cross-sublattice
+spin dot product:
+`Ĥ_toy_S = 2 • Ŝ_A · Ŝ_¬A`. Combines the oriented sum form
+`Ĥ_toy_S = Ŝ_A · Ŝ_¬A + Ŝ_¬A · Ŝ_A` with the cross-sublattice
+symmetry `_complement_comm`. -/
+theorem heisenbergToyHamiltonianS_eq_two_sublatticeSpinSDot (A : Λ → Bool) :
+    heisenbergToyHamiltonianS (Λ := Λ) A N =
+      (2 : ℂ) • sublatticeSpinSDot N A (fun x => ! A x) := by
+  rw [heisenbergToyHamiltonianS_eq_sublatticeSpinSDot_sum]
+  rw [← sublatticeSpinSDot_complement_comm]
+  rw [two_smul]
+
+end LatticeSystem.Quantum
