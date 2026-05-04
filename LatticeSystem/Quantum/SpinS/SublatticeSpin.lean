@@ -179,4 +179,81 @@ theorem sublatticeSpinSquaredS_isHermitian (A : Λ → Bool) :
       (sublatticeSpinSOp3_isHermitian N A)
       (sublatticeSpinSOp3_isHermitian N A) rfl
 
+/-! ## Cross-sublattice commutativity (same axis)
+
+The sublattice-`A` and sublattice-`¬A` operators commute pairwise:
+each pair `(onSiteS x (spinSOp_α N))`, `(onSiteS y (spinSOp_α N))`
+for `x ∈ A`, `y ∉ A` has `x ≠ y`, so the site-embedded operators
+commute (`onSiteS_commute_of_ne`).
+-/
+
+/-- Cross-sublattice commutativity for spin-`S` (axis 1):
+`Ŝ_A^(1)` and `Ŝ_¬A^(1)` commute. -/
+theorem sublatticeSpinSOp1_cross_commute (A : Λ → Bool) :
+    Commute (sublatticeSpinSOp1 N A)
+      (sublatticeSpinSOp1 N (fun x => ! A x)) := by
+  unfold sublatticeSpinSOp1
+  refine Commute.sum_left _ _ _ fun x _ => ?_
+  refine Commute.sum_right _ _ _ fun y _ => ?_
+  by_cases hAx : A x = true
+  · by_cases hAy : A y = true
+    · rw [show (fun z : Λ => ! A z) y = false from by simp [hAy]]
+      simp
+    · have hAy' : A y = false := by
+        cases h : A y
+        · rfl
+        · exact absurd h hAy
+      rw [show (fun z : Λ => ! A z) y = true from by simp [hAy']]
+      have hxy : x ≠ y := fun heq => by
+        subst heq; rw [hAx] at hAy'; exact Bool.noConfusion hAy'
+      rw [if_pos hAx, if_pos rfl]
+      exact onSiteS_commute_of_ne hxy (spinSOp1 N) (spinSOp1 N)
+  · rw [if_neg hAx]; exact Commute.zero_left _
+
+/-- Cross-sublattice commutativity for spin-`S` (axis 2):
+`Ŝ_A^(2)` and `Ŝ_¬A^(2)` commute. -/
+theorem sublatticeSpinSOp2_cross_commute (A : Λ → Bool) :
+    Commute (sublatticeSpinSOp2 N A)
+      (sublatticeSpinSOp2 N (fun x => ! A x)) := by
+  unfold sublatticeSpinSOp2
+  refine Commute.sum_left _ _ _ fun x _ => ?_
+  refine Commute.sum_right _ _ _ fun y _ => ?_
+  by_cases hAx : A x = true
+  · by_cases hAy : A y = true
+    · rw [show (fun z : Λ => ! A z) y = false from by simp [hAy]]
+      simp
+    · have hAy' : A y = false := by
+        cases h : A y
+        · rfl
+        · exact absurd h hAy
+      rw [show (fun z : Λ => ! A z) y = true from by simp [hAy']]
+      have hxy : x ≠ y := fun heq => by
+        subst heq; rw [hAx] at hAy'; exact Bool.noConfusion hAy'
+      rw [if_pos hAx, if_pos rfl]
+      exact onSiteS_commute_of_ne hxy (spinSOp2 N) (spinSOp2 N)
+  · rw [if_neg hAx]; exact Commute.zero_left _
+
+/-- Cross-sublattice commutativity for spin-`S` (axis 3):
+`Ŝ_A^(3)` and `Ŝ_¬A^(3)` commute. -/
+theorem sublatticeSpinSOp3_cross_commute (A : Λ → Bool) :
+    Commute (sublatticeSpinSOp3 N A)
+      (sublatticeSpinSOp3 N (fun x => ! A x)) := by
+  unfold sublatticeSpinSOp3
+  refine Commute.sum_left _ _ _ fun x _ => ?_
+  refine Commute.sum_right _ _ _ fun y _ => ?_
+  by_cases hAx : A x = true
+  · by_cases hAy : A y = true
+    · rw [show (fun z : Λ => ! A z) y = false from by simp [hAy]]
+      simp
+    · have hAy' : A y = false := by
+        cases h : A y
+        · rfl
+        · exact absurd h hAy
+      rw [show (fun z : Λ => ! A z) y = true from by simp [hAy']]
+      have hxy : x ≠ y := fun heq => by
+        subst heq; rw [hAx] at hAy'; exact Bool.noConfusion hAy'
+      rw [if_pos hAx, if_pos rfl]
+      exact onSiteS_commute_of_ne hxy (spinSOp3 N) (spinSOp3 N)
+  · rw [if_neg hAx]; exact Commute.zero_left _
+
 end LatticeSystem.Quantum
