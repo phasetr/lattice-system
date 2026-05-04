@@ -504,4 +504,17 @@ theorem totalSpinSOpMinus_mulVec_neelStateOfS_eq_A
   rw [sublatticeSpinSOpMinus_complement_mulVec_neelStateOfS A N]
   rw [add_zero]
 
+/-- `Ŝ_A^+ · Ŝ_¬A^- · |Φ_Néel⟩ = 0`. The cross product of raising on `A` with
+lowering on `¬A` annihilates the Néel state, since `Ŝ_¬A^- · |Φ_Néel⟩ = 0`.
+Direct ingredient for `(Ŝ_tot)² · |Φ_Néel⟩` (one of the cross-ladder terms
+in the Casimir identity vanishes). -/
+theorem sublatticeSpinSOpPlus_complement_minus_mulVec_neelStateOfS
+    (A : Λ → Bool) (N : ℕ) :
+    (sublatticeSpinSOpPlus N A *
+        sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec
+        (neelStateOfS A N) = 0 := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [sublatticeSpinSOpMinus_complement_mulVec_neelStateOfS]
+  rw [Matrix.mulVec_zero]
+
 end LatticeSystem.Quantum
