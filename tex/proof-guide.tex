@@ -6263,6 +6263,20 @@ PR~\#1014 ($p_\Uparrow\cdot p_\emptyset = 0$) this covers two
 of the six pairs of cross-projection orthogonality for the
 per-site 4-state decomposition (PR~\#1011).
 
+\textbf{Hubbard per-site empty projection orthogonal to both
+single-occupancy projections (PR~\#1017)}: in the file
+\texttt{Fermion/JordanWigner/Hubbard/SiteProjectionsEmptySingle.lean}.
+Four orthogonality lemmas (both orderings):
+$p_\emptyset\cdot p_\uparrow = 0$,
+$p_\uparrow\cdot p_\emptyset = 0$,
+$p_\emptyset\cdot p_\downarrow = 0$,
+$p_\downarrow\cdot p_\emptyset = 0$. Same proof template as
+PRs~\#1014 and \#1016. Together with those PRs this covers
+four of the six pairs of cross-projection orthogonality for
+the per-site 4-state decomposition (PR~\#1011); the remaining
+two ($p_\uparrow\cdot p_\Uparrow$, $p_\downarrow\cdot
+p_\Uparrow$) follow the same template.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-

@@ -31,14 +31,18 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsIdempotent
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsDoublyEmpty
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsHermitian
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsUpDown
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsEmptySingle
 
 /-!
 # Multi-mode fermion via Jordan–Wigner mapping
 
 **Façade module** re-exporting the full Jordan–Wigner machinery.
 Following the refactor plan v4 §3.1 (Phase 2 PR 10–14), this file
-is now a thin re-import of five sub-files under
-`LatticeSystem/Fermion/JordanWigner/`:
+is a thin re-import of the sub-files under
+`LatticeSystem/Fermion/JordanWigner/` (originally five core
+files; further extended with single-mode-mirror and Hubbard
+algebra lemmas during the 2026-05-04 autonomous fermion
+expansion):
 
 | sub-file | content |
 |---|---|
@@ -75,6 +79,7 @@ is now a thin re-import of five sub-files under
 | `Hubbard/SiteProjectionsDoublyEmpty.lean` | `p_⇈ · p_∅ = 0`, `p_∅ · p_⇈ = 0` |
 | `Hubbard/SiteProjectionsHermitian.lean` | `p_∅`, `p_↑`, `p_↓` Hermitian (companions to PR #1007) |
 | `Hubbard/SiteProjectionsUpDown.lean` | `p_↑ · p_↓ = 0`, `p_↓ · p_↑ = 0` |
+| `Hubbard/SiteProjectionsEmptySingle.lean` | `p_∅ ⊥ p_↑`, `p_∅ ⊥ p_↓` (both orderings) |
 
 Old `import LatticeSystem.Fermion.JordanWigner` continues to
 work unchanged via this façade. Following the convention from

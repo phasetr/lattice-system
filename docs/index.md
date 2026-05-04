@@ -1157,6 +1157,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionUpDownNumber_mul_empty_eq_zero` / `empty_mul_fermionUpDownNumber_eq_zero` | `p_⇈ · p_∅ = 0`; `p_∅ · p_⇈ = 0` (Hubbard per-site doubly-occupied and empty projections are mutually orthogonal) | `Fermion/JordanWigner/Hubbard/SiteProjectionsDoublyEmpty.lean` (PR #1014) |
 | `one_sub_fermionUpNumber_mul_one_sub_fermionDownNumber_isHermitian` / `fermionUpNumber_mul_one_sub_fermionDownNumber_isHermitian` / `one_sub_fermionUpNumber_mul_fermionDownNumber_isHermitian` | `(p_∅)`, `(p_↑)`, `(p_↓)` Hermitian (companions to PR #1007 `(p_⇈)` Hermitian; together all four per-site occupation projections are Hermitian) | `Fermion/JordanWigner/Hubbard/SiteProjectionsHermitian.lean` (PR #1015) |
 | `fermionUpProjection_mul_fermionDownProjection_eq_zero` / `fermionDownProjection_mul_fermionUpProjection_eq_zero` | `p_↑ · p_↓ = 0`; `p_↓ · p_↑ = 0` (Hubbard per-site only-up and only-down projections orthogonal) | `Fermion/JordanWigner/Hubbard/SiteProjectionsUpDown.lean` (PR #1016) |
+| `fermionEmptyProjection_mul_fermionUpProjection_eq_zero` / `fermionUpProjection_mul_fermionEmptyProjection_eq_zero` / `fermionEmptyProjection_mul_fermionDownProjection_eq_zero` / `fermionDownProjection_mul_fermionEmptyProjection_eq_zero` | `p_∅ · p_↑ = 0`, `p_↑ · p_∅ = 0`, `p_∅ · p_↓ = 0`, `p_↓ · p_∅ = 0` (Hubbard empty per-site projection orthogonal to both single-occupancy projections) | `Fermion/JordanWigner/Hubbard/SiteProjectionsEmptySingle.lean` (PR #1017) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 
