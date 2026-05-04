@@ -712,6 +712,26 @@ theorem neelStateOfS_inner_self (A : Λ → Bool) (N : ℕ) :
   unfold neelStateOfS
   exact basisVecS_inner_self _
 
+/-- `<Φ_Néel | Ŝ_A^+ · Ŝ_¬A^+ | Φ_Néel> = 0`. Trivially via γ-4 step 89. -/
+theorem neelStateOfS_sublattice_plus_complement_plus_expectation
+    (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((sublatticeSpinSOpPlus N A *
+            sublatticeSpinSOpPlus N (fun x => ! A x)).mulVec
+          (neelStateOfS A N)) = 0 := by
+  rw [sublatticeSpinSOpPlus_complement_plus_mulVec_neelStateOfS]
+  exact dotProduct_zero _
+
+/-- `<Φ_Néel | Ŝ_A^- · Ŝ_¬A^- | Φ_Néel> = 0`. Trivially via γ-4 step 83. -/
+theorem neelStateOfS_sublattice_minus_complement_minus_expectation
+    (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((sublatticeSpinSOpMinus N A *
+            sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec
+          (neelStateOfS A N)) = 0 := by
+  rw [sublatticeSpinSOpMinus_complement_minus_mulVec_neelStateOfS]
+  exact dotProduct_zero _
+
 /-- `<Φ_Néel | Ŝ_A^+ · Ŝ_¬A^- | Φ_Néel> = 0`. Trivially via
 `Ŝ_A^+ · Ŝ_¬A^- · Néel = 0` (γ-4 step 81). -/
 theorem neelStateOfS_sublattice_plus_complement_minus_expectation
