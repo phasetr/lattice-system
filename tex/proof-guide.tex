@@ -6511,6 +6511,21 @@ $\texttt{Commute}\,(p_\alpha(i))\,(p_\beta(j))$ are formalised,
 making the 4-state per-site occupation algebra fully commutative
 across arbitrary site pairs.
 
+\textbf{All-down spin state for the Hubbard model (PR~\#1039)}:
+in the file
+\texttt{Fermion/JordanWigner/Hubbard/AllDownState.lean}. Mirror
+of \texttt{AllUpState.lean}: defines the fully spin-polarised
+all-down state $|\!\downarrow\cdots\downarrow\rangle$ (basis
+vector with occupation $1$ on odd JW indices), and proves
+$n_{i,\downarrow}\,|\!\downarrow\cdots\downarrow\rangle =
+|\!\downarrow\cdots\downarrow\rangle$, $n_{i,\uparrow}\,
+|\!\downarrow\cdots\downarrow\rangle = 0$, plus the no-double-
+occupancy result $H_{\rm int}\,|\!\downarrow\cdots\downarrow
+\rangle = 0$ (and the relevant ladder annihilations). The
+all-down state belongs to the kernel of $H_{\rm int}$ by the
+same argument as for the all-up state, manifesting up/down
+symmetry.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
