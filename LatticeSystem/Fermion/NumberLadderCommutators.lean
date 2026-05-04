@@ -17,9 +17,14 @@ identities of PRs #982 and #984:
 - `[n, c]  = 0 − c  = −c`  via `n · c = 0` and `c · n = c`.
 - `[n, c†] = c† − 0 = c†` via `n · c† = c†` and `c† · n = 0`.
 
-Physically, conjugation by `n` lowers `c` by one unit of fermion
-number and raises `c†` by one unit, mirroring the bosonic ladder
-algebra `[N, a] = -a`, `[N, a†] = a†`.
+Physically, the adjoint action of `n` (commutation with `n`)
+lowers `c` by one unit of fermion number and raises `c†` by one
+unit, mirroring the bosonic ladder algebra `[N, a] = -a`,
+`[N, a†] = a†`.
+
+The naming convention follows the multi-mode
+`fermionMultiNumber_commutator_*` lemmas in
+`Fermion/JordanWigner/Number.lean`.
 
 Tracked as part of Phase 2 fermion infrastructure (Issue #412).
 -/
@@ -28,7 +33,7 @@ namespace LatticeSystem.Fermion
 
 /-- `[n, c] = n · c − c · n = −c` (number-annihilation ladder
 commutator). -/
-theorem fermionNumber_mul_fermionAnnihilation_sub_fermionAnnihilation_mul_fermionNumber :
+theorem fermionNumber_commutator_fermionAnnihilation :
     fermionNumber * fermionAnnihilation
         - fermionAnnihilation * fermionNumber
       = -fermionAnnihilation := by
@@ -38,7 +43,7 @@ theorem fermionNumber_mul_fermionAnnihilation_sub_fermionAnnihilation_mul_fermio
 
 /-- `[n, c†] = n · c† − c† · n = c†` (number-creation ladder
 commutator). -/
-theorem fermionNumber_mul_fermionCreation_sub_fermionCreation_mul_fermionNumber :
+theorem fermionNumber_commutator_fermionCreation :
     fermionNumber * fermionCreation
         - fermionCreation * fermionNumber
       = fermionCreation := by
