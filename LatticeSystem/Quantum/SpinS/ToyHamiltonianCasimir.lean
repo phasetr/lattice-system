@@ -240,4 +240,56 @@ theorem heisenbergToyHamiltonianS_mulVec_allAlignedStateS_zero
       sublatticeSpinSquaredS_mulVec_allAlignedStateS_zero N (fun x => ! A x)]
   rw [← sub_smul, ← sub_smul]
 
+/-- Cardinality of the `A`-sublattice (number of sites with `A x = true`). -/
+private noncomputable def sublatticeCardS (A : Λ → Bool) : ℕ :=
+  (Finset.univ.filter (fun x : Λ => A x = true)).card
+
+/-- Cardinality identity: `|Λ| = |A| + |¬A|` for any sublattice
+indicator `A : Λ → Bool`. -/
+private theorem sublatticeCardS_add_complement (A : Λ → Bool) :
+    sublatticeCardS A + sublatticeCardS (fun x => ! A x) = Fintype.card Λ := by
+  unfold sublatticeCardS
+  have hfilter : Finset.univ.filter (fun x : Λ => (! A x) = true) =
+      Finset.univ.filter (fun x : Λ => ¬ (A x = true)) := by
+    ext x; simp [Bool.not_eq_true]
+  rw [hfilter, Finset.card_filter_add_card_filter_not (s := Finset.univ)
+      (fun x : Λ => A x = true)]
+  exact Finset.card_univ
+
+/-- **Simplified `Ĥ_toy_S` eigenvalue on the all-up state**:
+`Ĥ_toy_S · |σ_⊤⟩ = (|A|·|¬A|·N²/2) · |σ_⊤⟩`.
+
+Algebraic simplification of `heisenbergToyHamiltonianS_mulVec_allAlignedStateS_zero`
+(PR #1060) via `|Λ| = |A| + |¬A|`. Setting `a = |A|·N/2, b = |¬A|·N/2`:
+
+```
+  (a + b)(a + b + 1) − a(a + 1) − b(b + 1) = 2ab,
+```
+
+so the eigenvalue is `2·(|A|·N/2)·(|¬A|·N/2) = |A|·|¬A|·N²/2`.
+Specialises to spin-`1/2` (`N = 1`) eigenvalue `|A|·|¬A|/2`. The
+eigenvalue is non-negative for any bipartite lattice and strictly
+positive when both sublattices are non-empty. -/
+theorem heisenbergToyHamiltonianS_mulVec_allAlignedStateS_zero_simplified
+    [Nonempty Λ] (A : Λ → Bool) :
+    (heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec
+        (allAlignedStateS Λ N (0 : Fin (N + 1))) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) * (N : ℂ)) / 2) •
+        allAlignedStateS Λ N (0 : Fin (N + 1)) := by
+  rw [heisenbergToyHamiltonianS_mulVec_allAlignedStateS_zero N A]
+  congr 1
+  -- Cardinality identity in ℂ: |Λ| = |A| + |¬A|.
+  have hsum := sublatticeCardS_add_complement (Λ := Λ) A
+  unfold sublatticeCardS at hsum
+  have hsumℂ : (Fintype.card Λ : ℂ) =
+      ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) +
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) := by
+    have := congrArg (Nat.cast (R := ℂ)) hsum.symm
+    push_cast at this
+    exact this
+  rw [hsumℂ]
+  ring
+
 end LatticeSystem.Quantum
