@@ -161,6 +161,21 @@ theorem totalSpinSOp3_mulVec_neelStateOfS (A : Λ → Bool) (N : ℕ) :
   push_cast
   ring
 
+/-! ## Néel config under sublattice swap -/
+
+/-- `neelConfigOfS (¬A) N` is the "swapped" Néel configuration: `σ x = N`
+for `A x = true` (i.e., on `A`) and `σ x = 0` for `A x = false` (on `¬A`).
+This is the natural sublattice-swap dual of `neelConfigOfS A N`. -/
+theorem neelConfigOfS_complement (A : Λ → Bool) (N : ℕ) (x : Λ) :
+    neelConfigOfS (fun y => ! A y) N x =
+      if A x then Fin.last N else 0 := by
+  unfold neelConfigOfS
+  by_cases hA : A x = true
+  · simp [hA]
+  · cases h : A x
+    · simp [h]
+    · exact absurd h hA
+
 /-! ## Per-pair `spinSDot` diagonal at the Néel configuration -/
 
 /-- For a cross-sublattice pair `x ∈ A`, `y ∈ ¬A`, the two-site dot
