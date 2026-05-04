@@ -6309,6 +6309,19 @@ projections aggregate to the spin-resolved number operators
 (and their complements), complementing the partition-of-identity
 (PR~\#1011) $\sum_\alpha p_\alpha = 1$.
 
+\textbf{Hubbard same-site per-site projections pairwise commute
+(PR~\#1020)}: in the file
+\texttt{Fermion/JordanWigner/Hubbard/SiteProjectionsCommute.lean}.
+The four per-site occupation projections at the same site $i$
+pairwise commute: $\texttt{Commute}\,p_\alpha(i)\,p_\beta(i)$
+for any $\alpha, \beta \in \{\emptyset, \uparrow, \downarrow,
+\Uparrow\}$. For $\alpha \neq \beta$ trivial from
+PRs~\#1014, \#1016, \#1017, \#1018: both products vanish, so
+the commutator is $0$. Together with the partition / idempotency
+/ Hermiticity / orthogonality results, the per-site projection
+algebra is fully commutative on top of being a complete
+orthogonal partition.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
