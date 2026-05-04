@@ -6295,6 +6295,17 @@ combinations $c_i + c_i^\dagger = \mathrm{jwString}_i \cdot
 \sigma_x_i$ pick up the JW string sign and anticommute across
 sites.
 
+\textbf{Cross-site mixed Pauli anticommutators (PR~\#1032)}: in
+the file
+\texttt{Fermion/JordanWigner/CMinusCDaggerAnticomm.lean}.
+Companion to PR~\#1031: $\{c_i - c_i^\dagger, c_j - c_j^\dagger\}
+= 0$ and $\{c_i + c_i^\dagger, c_j - c_j^\dagger\} = 0$ for
+$i \neq j$. Same expansion technique with appropriate sign
+combinations: $\{X, X\} - \{X, X^\dagger\} - \{X^\dagger, X\}
++ \{X^\dagger, X^\dagger\}$ (resp.\ similar for the mixed
+case). Together with PR~\#1031 covers all four sign
+combinations of cross-site Pauli-X/iY-analog anticommutators.
+
 \textbf{Multi-mode (JW) ladder-on-hole-projection vanishing
 $c_i\,(c_i\,c_i^\dagger) = 0$ and $(c_i\,c_i^\dagger)\,
 c_i^\dagger = 0$ (PR~\#1010)}: multi-mode mirror of PR~\#1009,
