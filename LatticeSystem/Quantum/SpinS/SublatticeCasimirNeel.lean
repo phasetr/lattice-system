@@ -1075,4 +1075,28 @@ theorem neelConfigOfS_ne_allAlignedConfigS_last
   simp [Fin.last] at this
   omega
 
+/-- `<Φ_Néel | (Ŝ_tot^(1))² + (Ŝ_tot^(2))² | Φ_Néel> = |Λ|·N/2`. The
+transverse-axis component of the total-spin Casimir on the Néel state.
+
+Direct subtraction:
+`<(Ŝ_tot^(1))² + (Ŝ_tot^(2))²> = <(Ŝ_tot)²> - <(Ŝ_tot^(3))²>
+                                = (M² + |Λ|·N/2) - M² = |Λ|·N/2`. -/
+theorem neelStateOfS_totalSpinSOp12_sq_expectation (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((totalSpinSOp1 Λ N * totalSpinSOp1 Λ N +
+          totalSpinSOp2 Λ N * totalSpinSOp2 Λ N).mulVec
+          (neelStateOfS A N)) =
+      (Fintype.card Λ : ℂ) * ((N : ℂ) / 2) := by
+  have htotal := neelStateOfS_totalSpinSSquared_expectation_card_Lambda A N
+  have hSq3 := neelStateOfS_totalSpinSOp3_sq_expectation A N
+  rw [totalSpinSSquared_def] at htotal
+  rw [Matrix.add_mulVec, Matrix.add_mulVec] at htotal
+  rw [dotProduct_add, dotProduct_add] at htotal
+  rw [hSq3] at htotal
+  -- htotal: A + B + M² = M² + |Λ|·N/2, where A, B = <S1², S2²>(Néel)
+  rw [Matrix.add_mulVec, dotProduct_add]
+  -- goal: A + B = |Λ|·N/2
+  have h := htotal
+  linear_combination h
+
 end LatticeSystem.Quantum
