@@ -6198,6 +6198,21 @@ decomposition underlying the Hubbard Hilbert-space tensor
 structure $\mathbb{C}^4 = |0,0\rangle \oplus |1,0\rangle
 \oplus |0,1\rangle \oplus |1,1\rangle$.
 
+\textbf{Hubbard empty/up/down per-site projections idempotent
+$(p_\emptyset)^2 = p_\emptyset$, $(p_\uparrow)^2 = p_\uparrow$,
+$(p_\downarrow)^2 = p_\downarrow$ (PR~\#1012)}: in the file
+\texttt{Fermion/JordanWigner/Hubbard/SiteProjectionsIdempotent.lean}.
+Three companion idempotency lemmas to PR~\#1005 ($(p_\Uparrow)^2
+= p_\Uparrow$). Each proof uses the same-site $\texttt{Commute}\,
+n_\uparrow(i)\,n_\downarrow(i)$ (PR~\#1005) to swap the middle
+factors, then applies the squared identities
+\texttt{fermionMultiNumber\_sq} ($n_\sigma^2 = n_\sigma$) and
+\texttt{fermionMultiAnnihilation\_mul\_fermionMultiCreation\_sq}
+together with PR~\#996 ($c_\sigma c_\sigma^\dagger = 1 -
+n_\sigma$) for the complementary $(1 - n_\sigma)^2 = 1 -
+n_\sigma$. Together with PR~\#1005 these establish that all
+four per-site occupation operators are projections.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
