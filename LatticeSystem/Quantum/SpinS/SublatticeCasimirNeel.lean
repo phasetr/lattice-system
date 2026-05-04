@@ -273,4 +273,33 @@ theorem heisenbergToyHamiltonianS_apply_diag_neel (A : Λ → Bool) (N : ℕ) :
   rw [smul_eq_mul]
   ring
 
+/-! ## Ladder annihilation of the Néel state -/
+
+/-- `Ŝ_A^+ · |Φ_Néel⟩ = 0`: the sublattice A raising operator annihilates
+the Néel state, since the Néel state has `σ|_A = 0` (highest weight on
+`A`). -/
+theorem sublatticeSpinSOpPlus_mulVec_neelStateOfS (A : Λ → Bool) (N : ℕ) :
+    (sublatticeSpinSOpPlus N A).mulVec (neelStateOfS A N) = 0 := by
+  unfold neelStateOfS
+  refine sublatticeSpinSOpPlus_mulVec_basisVecS_zero_on N A ?_
+  intro x hAx
+  unfold neelConfigOfS
+  rw [if_pos hAx]
+
+/-- `Ŝ_¬A^- · |Φ_Néel⟩ = 0`: the sublattice ¬A lowering operator
+annihilates the Néel state, since the Néel state has `σ|_¬A = Fin.last N`
+(lowest weight on `¬A`). -/
+theorem sublatticeSpinSOpMinus_complement_mulVec_neelStateOfS
+    (A : Λ → Bool) (N : ℕ) :
+    (sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec (neelStateOfS A N) = 0 := by
+  unfold neelStateOfS
+  refine sublatticeSpinSOpMinus_mulVec_basisVecS_last_on N (fun x => ! A x) ?_
+  intro x hnAx
+  have hAxF : A x = false := by
+    cases h : A x
+    · rfl
+    · simp [h] at hnAx
+  unfold neelConfigOfS
+  rw [if_neg (by rw [hAxF]; decide : ¬ (A x = true))]
+
 end LatticeSystem.Quantum
