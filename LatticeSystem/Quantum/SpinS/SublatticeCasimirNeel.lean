@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.SublatticeSpinDot
 import LatticeSystem.Quantum.SpinS.Magnetization
 import LatticeSystem.Quantum.SpinS.ToyHamiltonianCasimir
+import LatticeSystem.Quantum.SpinS.BasisVecSOrthonormal
 
 /-!
 # Spin-`S` Néel state and sublattice Casimir eigenvalues
@@ -931,5 +932,27 @@ theorem neelStateOfS_heisenbergToyHamiltonianS_expectation
     simp [basisVecS_of_ne hτne]
   · intro h
     exact (h (Finset.mem_univ _)).elim
+
+/-- `<Φ_⊤ | Φ_Néel> = 0` when `|¬A| > 0`. The all-up state and Néel state
+are orthogonal whenever there is at least one site in `¬A`, since they
+correspond to distinct configurations: `allAlignedConfigS V N 0` has all
+sites at `0`, while `neelConfigOfS A N` has `Fin.last N` on the
+non-empty `¬A`. -/
+theorem neelStateOfS_allAlignedStateS_orthogonal
+    (A : Λ → Bool) (N : ℕ)
+    (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = false) :
+    dotProduct (star (allAlignedStateS Λ N (0 : Fin (N + 1))))
+        (neelStateOfS A N) = 0 := by
+  unfold allAlignedStateS neelStateOfS
+  have hne : neelConfigOfS A N ≠ allAlignedConfigS Λ N 0 := by
+    obtain ⟨x, hx⟩ := hA
+    intro heq
+    have h := congrFun heq x
+    unfold neelConfigOfS allAlignedConfigS at h
+    rw [if_neg (by rw [hx]; decide : ¬ A x = true)] at h
+    simp [Fin.last] at h
+    omega
+  exact basisVecS_inner_of_ne hne
 
 end LatticeSystem.Quantum
