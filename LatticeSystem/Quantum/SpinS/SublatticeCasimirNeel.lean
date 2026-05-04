@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SublatticeSpinDot
+import LatticeSystem.Quantum.SpinS.Magnetization
 
 /-!
 # Spin-`S` Néel state and sublattice Casimir eigenvalues
@@ -94,5 +95,69 @@ theorem sublatticeSpinSquaredS_complement_mulVec_neelStateOfS
     · simp [h] at hnAx
   unfold neelConfigOfS
   rw [if_neg (by rw [hAxF]; decide : ¬ (A x = true))]
+
+/-! ## `Ŝ_tot^(3)` eigenvalue on the Néel state -/
+
+/-- `magSumS (neelConfigOfS A N) = |¬A| · N`. The Néel configuration
+contributes `0` on `A` and `N` (i.e., `(Fin.last N).val`) on `¬A`. -/
+theorem magSumS_neelConfigOfS (A : Λ → Bool) (N : ℕ) :
+    magSumS (neelConfigOfS A N) =
+      (Finset.univ.filter (fun x : Λ => (! A x) = true)).card * N := by
+  unfold magSumS neelConfigOfS
+  classical
+  -- Convert each term: if A x then 0 else N.
+  have hterm : ∀ x : Λ, (if A x then (0 : Fin (N + 1)) else Fin.last N).val =
+      if (! A x) = true then N else 0 := by
+    intro x
+    by_cases hAx : A x = true
+    · rw [if_pos hAx]
+      simp [hAx]
+    · cases h : A x
+      · rw [if_neg]
+        · simp [h, Fin.last]
+        · simp [h]
+      · exact absurd h hAx
+  simp_rw [hterm]
+  rw [← Finset.sum_filter, Finset.sum_const]
+  rw [smul_eq_mul]
+
+/-- `Ŝ_tot^(3) · |Φ_Néel⟩ = ((|A| − |¬A|)·N/2) · |Φ_Néel⟩`. The spin-`S`
+Néel state is a `Ŝ_tot^(3)`-eigenvector with magnetization
+`(|A| − |¬A|)·N/2`. For `|A| = |¬A|` the magnetization is zero; for
+`|A| ≠ |¬A|` (the Tasaki §2.5 Theorem 2.3 case) the absolute value
+`||A| − |¬A||·N/2` matches the conjectured ground-state total spin
+`||A| − |¬A||·S`. -/
+theorem totalSpinSOp3_mulVec_neelStateOfS (A : Λ → Bool) (N : ℕ) :
+    (totalSpinSOp3 Λ N).mulVec (neelStateOfS A N) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+            ((N : ℂ) / 2) -
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+            ((N : ℂ) / 2)) •
+        neelStateOfS A N := by
+  unfold neelStateOfS
+  rw [totalSpinSOp3_mulVec_basisVecS]
+  congr 1
+  unfold magEigenvalueS
+  rw [magSumS_neelConfigOfS]
+  -- |Λ| = |A| + |¬A| as ℂ.
+  have hsum : (Fintype.card Λ : ℕ) =
+      (Finset.univ.filter (fun x : Λ => A x = true)).card +
+        (Finset.univ.filter (fun x : Λ => (! A x) = true)).card := by
+    have hfilter : Finset.univ.filter (fun x : Λ => (! A x) = true) =
+        Finset.univ.filter (fun x : Λ => ¬ (A x = true)) := by
+      ext x; simp [Bool.not_eq_true]
+    rw [hfilter]
+    rw [← Finset.card_univ (α := Λ)]
+    exact (Finset.card_filter_add_card_filter_not (s := Finset.univ)
+      (fun x : Λ => A x = true)).symm
+  have hsumℂ : (Fintype.card Λ : ℂ) =
+      ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) +
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) := by
+    have := congrArg (Nat.cast (R := ℂ)) hsum
+    push_cast at this
+    exact this
+  rw [hsumℂ]
+  push_cast
+  ring
 
 end LatticeSystem.Quantum
