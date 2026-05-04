@@ -6475,6 +6475,18 @@ $(1 - n_\sigma)$-complements by ring algebra), and the products
 commute via \texttt{Commute.mul\_left} /
 \texttt{.mul\_right}. Companion to PR~\#1006 for $p_\Uparrow$.
 
+\textbf{Cross-site Hubbard single-occupancy projections commute
+(PR~\#1036)}: in the file
+\texttt{Fermion/JordanWigner/Hubbard/SingleProjectionsCommute.lean}.
+For any $i, j$, $\texttt{Commute}\,(p_\uparrow(i))\,
+(p_\uparrow(j))$ and the analogous $p_\downarrow$ statement.
+Same proof technique as PRs~\#1006 and \#1035, with three
+auxiliary lemmas covering the relevant
+$\texttt{Commute}$ patterns between $n_\sigma$ and
+$(1 - n_\tau)$ at distinct JW positions. Together with
+PRs~\#1006 and \#1035 this completes the cross-site diagonal
+Commute relations for all four per-site occupation projections.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
