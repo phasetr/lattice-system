@@ -982,6 +982,21 @@ theorem neelStateOfS_finrank_span (A : Λ → Bool) (N : ℕ) :
     Module.finrank ℂ (Submodule.span ℂ {neelStateOfS A N}) = 1 :=
   finrank_span_singleton (neelStateOfS_ne_zero A N)
 
+/-- `<Φ_⊤ | Ĥ_toy_S | Φ_⊤> = +|A|·|¬A|·N²/2`. The all-up state's toy
+Hamiltonian expectation. Positive sign (variational signature opposite
+to the Néel state's negative expectation, γ-4 step 131). -/
+theorem allAlignedStateS_zero_heisenbergToyHamiltonianS_expectation
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (allAlignedStateS Λ N (0 : Fin (N + 1))))
+        ((heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec
+          (allAlignedStateS Λ N (0 : Fin (N + 1)))) =
+      ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+        ((N : ℂ) * (N : ℂ)) / 2 := by
+  rw [heisenbergToyHamiltonianS_mulVec_allAlignedStateS_zero_simplified]
+  rw [dotProduct_smul, allAlignedStateS_inner_self]
+  rw [smul_eq_mul, mul_one]
+
 /-- Configuration-level distinctness: the Néel config differs from the
 all-up config when `|¬A| > 0` and `N > 0`. Used to conclude that Néel
 and all-up states span different basis vectors. -/
