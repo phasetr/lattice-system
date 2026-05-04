@@ -963,4 +963,12 @@ def neelMagConfigS (A : Λ → Bool) (N : ℕ) :
     magConfigS Λ N ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card * N) :=
   ⟨neelConfigOfS A N, magSumS_neelConfigOfS A N⟩
 
+/-- The magnetization sector with magSum `|¬A| · N` is non-empty: it
+contains `neelMagConfigS A N`. Useful for typeclass resolution where
+`Nonempty (magConfigS Λ N M)` is required (e.g., `ToyPF.lean`). -/
+instance neelMagConfigS_nonempty (A : Λ → Bool) (N : ℕ) :
+    Nonempty (magConfigS Λ N
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card * N)) :=
+  ⟨neelMagConfigS A N⟩
+
 end LatticeSystem.Quantum
