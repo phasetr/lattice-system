@@ -5945,6 +5945,20 @@ itself. Combined with the commutators of PR~\#988 this is the
 full per-product breakdown of $n\cdot c$, $c\cdot n$,
 $n\cdot c^\dagger$, $c^\dagger\cdot n$.
 
+\textbf{Single-mode trace identities (PR~\#991)}: in the file
+\texttt{Fermion/Traces.lean}. From the explicit matrices
+$c = \texttt{!![0,1;0,0]}$, $c^\dagger = \texttt{!![0,0;1,0]}$,
+$n = \texttt{!![0,0;0,1]}$, and $c\,c^\dagger = 1 - n =
+\texttt{!![1,0;0,0]}$ (PR~\#963), one reads off
+$\operatorname{tr}(c) = 0$, $\operatorname{tr}(c^\dagger) = 0$
+(off-diagonal), $\operatorname{tr}(n) = 1$, and
+$\operatorname{tr}(c\,c^\dagger) = 1$. The trace sum
+$\operatorname{tr}(n) + \operatorname{tr}(c\,c^\dagger) = 2 =
+\operatorname{tr}(I)$ matches the projection-sum identity
+$n + c\,c^\dagger = 1$ (PR~\#972). These are the building blocks
+for the single-mode partition function $Z = 1 + e^{-\beta}$ and
+reduced density matrix entries.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
