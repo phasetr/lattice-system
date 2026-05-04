@@ -222,4 +222,36 @@ theorem dot_marshallDressed_heisenbergHamiltonian_marshallDressed_im_eq_zero
     heisenbergHamiltonian_apply_im_eq_zero hJ,
     zero_mul, mul_zero, add_zero]
 
+/-- A Heisenberg Hamiltonian with real symmetric coupling is matrix-symmetric.
+Direct corollary of `heisenbergHamiltonian_isHermitian_of_real_symm` plus
+realness of matrix entries (`heisenbergHamiltonian_apply_im_eq_zero`).
+
+For a Hermitian complex matrix with real entries, conjTranspose = transpose,
+so IsHermitian implies IsSymm. -/
+theorem heisenbergHamiltonian_isSymm_of_real_symm
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    {J : Λ → Λ → ℂ} (hreal_star : ∀ x y, star (J x y) = J x y)
+    (hsymm : ∀ x y, J x y = J y x) :
+    (heisenbergHamiltonian J).IsSymm := by
+  have hH := heisenbergHamiltonian_isHermitian_of_real_symm hreal_star hsymm
+  have hreal_im : ∀ x y, (J x y).im = 0 := fun x y => by
+    have := hreal_star x y
+    rw [Complex.star_def] at this
+    have him := congrArg Complex.im this
+    rw [Complex.conj_im] at him
+    linarith
+  ext σ σ'
+  rw [Matrix.transpose_apply]
+  have hH_apply : (heisenbergHamiltonian J) σ σ' =
+      star ((heisenbergHamiltonian J) σ' σ) := by
+    have := congrFun (congrFun hH.eq σ) σ'
+    rw [Matrix.conjTranspose_apply] at this
+    exact this.symm
+  rw [hH_apply]
+  rw [Complex.star_def]
+  apply Complex.ext
+  · rw [Complex.conj_re]
+  · rw [Complex.conj_im,
+      heisenbergHamiltonian_apply_im_eq_zero hreal_im σ' σ, neg_zero]
+
 end LatticeSystem.Quantum

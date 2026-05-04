@@ -271,6 +271,17 @@ theorem heisenbergToyHamiltonian_apply_im_eq_zero (A : Λ → Bool)
     ((heisenbergToyHamiltonian A) σ σ').im = 0 :=
   heisenbergHamiltonian_apply_im_eq_zero (bipartiteCoupling_im A) σ σ'
 
+/-- The spin-`1/2` toy Hamiltonian is matrix-symmetric. Direct corollary
+of Hermiticity (PR α-6a) plus realness of entries. -/
+theorem heisenbergToyHamiltonian_isSymm (A : Λ → Bool) :
+    (heisenbergToyHamiltonian A).IsSymm := by
+  unfold heisenbergToyHamiltonian
+  refine heisenbergHamiltonian_isSymm_of_real_symm ?_ (bipartiteCoupling_symm A)
+  intro x y
+  apply Complex.ext
+  · rw [Complex.star_def, Complex.conj_re]
+  · rw [Complex.star_def, Complex.conj_im, bipartiteCoupling_im, neg_zero]
+
 /-! ## Toy Hamiltonian ladder commutators (spin-1/2 mirror of γ-4 step 34) -/
 
 /-- `Commute Ĥ_toy Ŝ^+_tot`. Direct specialisation of

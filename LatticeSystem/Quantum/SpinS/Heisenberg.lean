@@ -56,6 +56,7 @@ theorem heisenbergHamiltonianS_isHermitian_of_real
   rw [Matrix.conjTranspose_smul, (spinSDot_isHermitian x y N).eq]
   rw [hreal]
 
+
 /-! ## SU(2) invariance (Tasaki §2.2 (2.2.13) general S) -/
 
 /-- SU(2) invariance, axis 1: the spin-`S` Heisenberg Hamiltonian
@@ -718,5 +719,35 @@ theorem heisenbergHamiltonianSReMatrix_apply
     (J : Λ → Λ → ℂ) (N : ℕ) (σ τ : Λ → Fin (N + 1)) :
     heisenbergHamiltonianSReMatrix J N σ τ =
       ((heisenbergHamiltonianS J N) σ τ).re := rfl
+
+/-- A spin-`S` Heisenberg Hamiltonian with real coupling is matrix-symmetric.
+Direct corollary of Hermiticity plus realness of matrix entries
+(`heisenbergHamiltonianS_apply_im_zero`).
+
+For a Hermitian complex matrix with real entries, conjTranspose = transpose,
+so IsHermitian implies IsSymm. -/
+theorem heisenbergHamiltonianS_isSymm_of_real
+    {J : Λ → Λ → ℂ} (hreal_star : ∀ x y, star (J x y) = J x y) (N : ℕ) :
+    (heisenbergHamiltonianS (Λ := Λ) J N).IsSymm := by
+  have hH := heisenbergHamiltonianS_isHermitian_of_real (Λ := Λ) hreal_star N
+  have hreal_im : ∀ x y, (J x y).im = 0 := fun x y => by
+    have := hreal_star x y
+    rw [Complex.star_def] at this
+    have him := congrArg Complex.im this
+    rw [Complex.conj_im] at him
+    linarith
+  ext σ σ'
+  rw [Matrix.transpose_apply]
+  have hH_apply : (heisenbergHamiltonianS (Λ := Λ) J N) σ σ' =
+      star ((heisenbergHamiltonianS (Λ := Λ) J N) σ' σ) := by
+    have := congrFun (congrFun hH.eq σ) σ'
+    rw [Matrix.conjTranspose_apply] at this
+    exact this.symm
+  rw [hH_apply]
+  rw [Complex.star_def]
+  apply Complex.ext
+  · rw [Complex.conj_re]
+  · rw [Complex.conj_im,
+      heisenbergHamiltonianS_apply_im_zero N hreal_im σ' σ, neg_zero]
 
 end LatticeSystem.Quantum
