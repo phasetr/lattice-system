@@ -6032,6 +6032,17 @@ $(c_i^\dagger)^H = c_i$
 $(c_i\,c_i^\dagger)^H = (c_i^\dagger)^H \cdot (c_i)^H =
 c_i\,c_i^\dagger$ via \texttt{Matrix.conjTranspose\_mul}.
 
+\textbf{Multi-mode (JW) orthogonal projections
+$n_i\cdot(c_i\,c_i^\dagger) = 0$ and
+$(c_i\,c_i^\dagger)\cdot n_i = 0$ (PR~\#999)}: multi-mode
+mirror of PR~\#976, in the file
+\texttt{Fermion/JordanWigner/ProjectionsOrthogonal.lean}. Direct
+from $c_i^2 = 0$ (\texttt{fermionMultiAnnihilation\_sq}) and
+$(c_i^\dagger)^2 = 0$ (\texttt{fermionMultiCreation\_sq}) using
+the definitional $n_i = c_i^\dagger c_i$:
+$n_i(c_i\,c_i^\dagger) = c_i^\dagger\,c_i^2\,c_i^\dagger = 0$,
+$(c_i\,c_i^\dagger)n_i = c_i\,(c_i^\dagger)^2\,c_i = 0$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
