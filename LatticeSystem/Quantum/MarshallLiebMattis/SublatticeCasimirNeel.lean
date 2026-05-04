@@ -559,4 +559,39 @@ theorem sublatticeSpinHalfOp12sq_mulVec_neelStateOf (A : Λ → Bool) :
   simp only [k]
   ring
 
+/-- `((Ŝ_¬A^(1))² + (Ŝ_¬A^(2))²) · |Φ_Néel⟩ = (|¬A|/2) · |Φ_Néel⟩`.
+Spin-`1/2` complement of γ-4 step 96. -/
+theorem sublatticeSpinHalfOp12sq_complement_mulVec_neelStateOf (A : Λ → Bool) :
+    (sublatticeSpinHalfOp1 (fun x => ! A x) *
+        sublatticeSpinHalfOp1 (fun x => ! A x) +
+      sublatticeSpinHalfOp2 (fun x => ! A x) *
+        sublatticeSpinHalfOp2 (fun x => ! A x)).mulVec
+        (neelStateOf A) =
+      (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) / 2) •
+        neelStateOf A := by
+  have hCasimir := sublatticeSpinHalfSquared_complement_mulVec_neelStateOf A
+  rw [sublatticeSpinHalfSquared_def] at hCasimir
+  rw [Matrix.add_mulVec, Matrix.add_mulVec] at hCasimir
+  have hSq3 := sublatticeSpinHalfOp3_complement_sq_mulVec_neelStateOf A
+  rw [hSq3] at hCasimir
+  set k : ℂ := ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) / 2
+  rw [Matrix.add_mulVec]
+  have h := hCasimir
+  have hab : (sublatticeSpinHalfOp1 (fun x => ! A x) *
+        sublatticeSpinHalfOp1 (fun x => ! A x)).mulVec
+        (neelStateOf A) +
+      (sublatticeSpinHalfOp2 (fun x => ! A x) *
+        sublatticeSpinHalfOp2 (fun x => ! A x)).mulVec
+        (neelStateOf A) =
+      ((((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+        (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) + 2) / 4) -
+        k ^ 2) • neelStateOf A := by
+    rw [sub_smul]
+    rw [eq_sub_iff_add_eq]
+    exact h
+  rw [hab]
+  congr 1
+  simp only [k]
+  ring
+
 end LatticeSystem.Quantum
