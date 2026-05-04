@@ -451,4 +451,15 @@ theorem spinHalfDot_apply_diag_neelConfigOf_of_cross
     decide
   exact spinHalfDot_apply_diag_of_ne_antiparallel hxy _ hne
 
+/-- `Ŝ_A^+ · Ŝ_¬A^- · |Φ_Néel⟩ = 0`. Spin-`1/2` mirror of γ-4 step 81:
+the cross-ladder product annihilates the Néel state via `Ŝ_¬A^- · Néel = 0`. -/
+theorem sublatticeSpinHalfOpPlus_complement_minus_mulVec_neelStateOf
+    (A : Λ → Bool) :
+    (sublatticeSpinHalfOpPlus A *
+        sublatticeSpinHalfOpMinus (fun x => ! A x)).mulVec
+        (neelStateOf A) = 0 := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [sublatticeSpinHalfOpMinus_complement_mulVec_neelStateOf]
+  rw [Matrix.mulVec_zero]
+
 end LatticeSystem.Quantum
