@@ -969,4 +969,16 @@ theorem neelConfigOf_ne_allUp
   rw [if_neg (by rw [hx]; decide : ¬ A x = true)] at h
   exact (by decide : (1 : Fin 2) ≠ 0) h
 
+/-- Configuration-level distinctness for spin-`1/2`: `neelConfigOf A ≠
+fun _ => 1` when `|A| > 0`. Spin-`1/2` mirror of γ-4 step 152. -/
+theorem neelConfigOf_ne_allDown
+    (A : Λ → Bool) (hA : ∃ x : Λ, A x = true) :
+    neelConfigOf A ≠ (fun _ : Λ => (1 : Fin 2)) := by
+  obtain ⟨x, hx⟩ := hA
+  intro heq
+  have h := congrFun heq x
+  unfold neelConfigOf at h
+  rw [if_pos hx] at h
+  exact (by decide : (0 : Fin 2) ≠ 1) h
+
 end LatticeSystem.Quantum
