@@ -6250,6 +6250,19 @@ n_\downarrow$. Closed by
 PR~\#1007 all four per-site occupation projections are
 Hermitian.
 
+\textbf{Hubbard per-site only-up and only-down projections
+orthogonal $p_\uparrow\cdot p_\downarrow = 0$ and
+$p_\downarrow\cdot p_\uparrow = 0$ (PR~\#1016)}: in the file
+\texttt{Fermion/JordanWigner/Hubbard/SiteProjectionsUpDown.lean}.
+Swap the middle factors via the same-site
+$\texttt{Commute}\,(1 - n_\downarrow)\,(1 - n_\uparrow)$
+(propagated from PR~\#1005), then collapse via
+$n_\sigma(1 - n_\sigma) = 0$ (resp.\ $(1 - n_\sigma)
+n_\sigma = 0$) specialised from PR~\#999. Together with
+PR~\#1014 ($p_\Uparrow\cdot p_\emptyset = 0$) this covers two
+of the six pairs of cross-projection orthogonality for the
+per-site 4-state decomposition (PR~\#1011).
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
