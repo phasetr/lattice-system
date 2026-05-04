@@ -9,6 +9,7 @@ import LatticeSystem.Fermion.JordanWigner.CDaggerCIdentity
 import LatticeSystem.Fermion.JordanWigner.CDaggerCProjection
 import LatticeSystem.Fermion.JordanWigner.CDaggerCHermitian
 import LatticeSystem.Fermion.JordanWigner.ProjectionsOrthogonal
+import LatticeSystem.Fermion.JordanWigner.ProjectionsCommute
 import LatticeSystem.Fermion.JordanWigner.Hubbard
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Charges
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Graph
@@ -37,6 +38,7 @@ is now a thin re-import of five sub-files under
 | `CDaggerCProjection.lean` | hole-projection idempotency `(c_i · c_i†)² = c_i · c_i†` + powers |
 | `CDaggerCHermitian.lean` | hole projection Hermitian `(c_i · c_i†)ᴴ = c_i · c_i†` |
 | `ProjectionsOrthogonal.lean` | `n_i · (c_i · c_i†) = 0`, `(c_i · c_i†) · n_i = 0` |
+| `ProjectionsCommute.lean` | `Commute n_i (c_i · c_i†)` (both products zero) |
 | `Hubbard.lean` | spinful wrappers, on-graph Hubbard, 1D open / periodic chain Gibbs |
 | `Hubbard/Charges.lean` | `N_↑`, `N_↓`, `S^z_tot`, vacuum eigenstates, cross-spin commutes |
 | `Hubbard/Graph.lean` | graph-centric wrappers, chain/cycle Hamiltonians + Gibbs families |
