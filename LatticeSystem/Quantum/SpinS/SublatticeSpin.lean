@@ -811,4 +811,63 @@ theorem sublatticeSpinSOp3_commutator_sublatticeSpinSOpMinus (A : Λ → Bool) :
       from by abel]
   abel
 
+/-- Total Cartan relation for sublattice raising:
+`[Ŝ_tot^(3), Ŝ_A^+] = Ŝ_A^+`. The sublattice raising operator shifts
+the total S^z eigenvalue by +1 (since it acts only on A and the ¬A part
+commutes via cross-sublattice commutativity). -/
+theorem totalSpinSOp3_commutator_sublatticeSpinSOpPlus (A : Λ → Bool) :
+    totalSpinSOp3 Λ N * sublatticeSpinSOpPlus N A
+        - sublatticeSpinSOpPlus N A * totalSpinSOp3 Λ N =
+      sublatticeSpinSOpPlus N A := by
+  rw [totalSpinSOp3_eq_sublattice_sum (N := N) A]
+  rw [add_mul, mul_add]
+  -- Goal: Ŝ_A^(3) Ŝ_A^+ + Ŝ_¬A^(3) Ŝ_A^+ - (Ŝ_A^+ Ŝ_A^(3) + Ŝ_A^+ Ŝ_¬A^(3)) = Ŝ_A^+
+  -- Use [Ŝ_¬A^(3), Ŝ_A^+] = 0 and [Ŝ_A^(3), Ŝ_A^+] = Ŝ_A^+.
+  have h_self := sublatticeSpinSOp3_commutator_sublatticeSpinSOpPlus N A
+  -- Ŝ_¬A^(3) commutes with Ŝ_A^+: cross-sublattice via Ŝ_A^+ = Ŝ_A^(1) + i Ŝ_A^(2)
+  have h_cross : sublatticeSpinSOp3 N (fun x => ! A x) * sublatticeSpinSOpPlus N A =
+      sublatticeSpinSOpPlus N A * sublatticeSpinSOp3 N (fun x => ! A x) := by
+    rw [sublatticeSpinSOpPlus_eq_add]
+    rw [mul_add, add_mul, mul_smul_comm, smul_mul_assoc]
+    -- We want: Ŝ_¬A^(3) commutes with Ŝ_A^(1) and Ŝ_A^(2).
+    -- `sublatticeSpinSOp1_cross_commute_op3 A : Commute (Ŝ_A^(1)) (Ŝ_¬A^(3))`.
+    have h31 := (sublatticeSpinSOp1_cross_commute_op3 N A).symm.eq
+    have h32 := (sublatticeSpinSOp2_cross_commute_op3 N A).symm.eq
+    rw [h31, h32]
+  rw [h_cross]
+  -- Goal: Ŝ_A^(3) Ŝ_A^+ + Ŝ_A^+ Ŝ_¬A^(3) - (Ŝ_A^+ Ŝ_A^(3) + Ŝ_A^+ Ŝ_¬A^(3)) = Ŝ_A^+
+  -- = (Ŝ_A^(3) Ŝ_A^+ - Ŝ_A^+ Ŝ_A^(3)) = Ŝ_A^+ ✓
+  rw [show sublatticeSpinSOp3 N A * sublatticeSpinSOpPlus N A +
+        sublatticeSpinSOpPlus N A * sublatticeSpinSOp3 N (fun x => ! A x) -
+      (sublatticeSpinSOpPlus N A * sublatticeSpinSOp3 N A +
+        sublatticeSpinSOpPlus N A * sublatticeSpinSOp3 N (fun x => ! A x)) =
+      sublatticeSpinSOp3 N A * sublatticeSpinSOpPlus N A -
+        sublatticeSpinSOpPlus N A * sublatticeSpinSOp3 N A from by abel]
+  exact h_self
+
+/-- Total Cartan relation for sublattice lowering:
+`[Ŝ_tot^(3), Ŝ_A^-] = -Ŝ_A^-`. -/
+theorem totalSpinSOp3_commutator_sublatticeSpinSOpMinus (A : Λ → Bool) :
+    totalSpinSOp3 Λ N * sublatticeSpinSOpMinus N A
+        - sublatticeSpinSOpMinus N A * totalSpinSOp3 Λ N =
+      -sublatticeSpinSOpMinus N A := by
+  rw [totalSpinSOp3_eq_sublattice_sum (N := N) A]
+  rw [add_mul, mul_add]
+  have h_self := sublatticeSpinSOp3_commutator_sublatticeSpinSOpMinus N A
+  have h_cross : sublatticeSpinSOp3 N (fun x => ! A x) * sublatticeSpinSOpMinus N A =
+      sublatticeSpinSOpMinus N A * sublatticeSpinSOp3 N (fun x => ! A x) := by
+    rw [sublatticeSpinSOpMinus_eq_sub]
+    rw [mul_sub, sub_mul, mul_smul_comm, smul_mul_assoc]
+    have h31 := (sublatticeSpinSOp1_cross_commute_op3 N A).symm.eq
+    have h32 := (sublatticeSpinSOp2_cross_commute_op3 N A).symm.eq
+    rw [h31, h32]
+  rw [h_cross]
+  rw [show sublatticeSpinSOp3 N A * sublatticeSpinSOpMinus N A +
+        sublatticeSpinSOpMinus N A * sublatticeSpinSOp3 N (fun x => ! A x) -
+      (sublatticeSpinSOpMinus N A * sublatticeSpinSOp3 N A +
+        sublatticeSpinSOpMinus N A * sublatticeSpinSOp3 N (fun x => ! A x)) =
+      sublatticeSpinSOp3 N A * sublatticeSpinSOpMinus N A -
+        sublatticeSpinSOpMinus N A * sublatticeSpinSOp3 N A from by abel]
+  exact h_self
+
 end LatticeSystem.Quantum
