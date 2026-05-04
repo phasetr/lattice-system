@@ -6487,6 +6487,15 @@ $(1 - n_\tau)$ at distinct JW positions. Together with
 PRs~\#1006 and \#1035 this completes the cross-site diagonal
 Commute relations for all four per-site occupation projections.
 
+\textbf{Cross-projection $\texttt{Commute}\,(p_\uparrow(i))\,
+(p_\downarrow(j))$ for any $i, j$ (PR~\#1037)}: in the file
+\texttt{Fermion/JordanWigner/Hubbard/UpDownProjectionCommute.lean}.
+Non-diagonal extension of the diagonal cross-site Commute
+relations. Same proof template as PRs~\#1006, \#1035, \#1036:
+the four underlying $n_\sigma$ (and complements) pairwise
+commute, so the products commute via \texttt{Commute.mul\_left}
+/ \texttt{.mul\_right}.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
