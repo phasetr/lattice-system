@@ -1218,6 +1218,39 @@ theorem sublatticeSpinHalfOpPlus_mulVec_mem_magnetizationSubspace_of_mem
   rw [Matrix.mulVec_mulVec, hcomm, Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hv,
     Matrix.mulVec_smul, add_smul, one_smul]
 
+/-! ## Cartan identity for sublattice ladders (spin-`1/2`) -/
+
+/-- Spin-`1/2` mirror of `sublatticeSpinSOpPlus_mul_sublatticeSpinSOpMinus_eq`:
+`Ŝ_A^+·Ŝ_A^- = (Ŝ_A^(1))² + (Ŝ_A^(2))² + Ŝ_A^(3)`. -/
+theorem sublatticeSpinHalfOpPlus_mul_sublatticeSpinHalfOpMinus_eq (A : Λ → Bool) :
+    sublatticeSpinHalfOpPlus A * sublatticeSpinHalfOpMinus A =
+      sublatticeSpinHalfOp1 A * sublatticeSpinHalfOp1 A +
+        sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp2 A +
+        sublatticeSpinHalfOp3 A := by
+  rw [sublatticeSpinHalfOpPlus_eq_add, sublatticeSpinHalfOpMinus_eq_sub]
+  have hcomm := sublatticeSpinHalfOp1_commutator_sublatticeSpinHalfOp2 A
+  set S1 := sublatticeSpinHalfOp1 A
+  set S2 := sublatticeSpinHalfOp2 A
+  set S3 := sublatticeSpinHalfOp3 A
+  have hexp : (S1 + Complex.I • S2) * (S1 - Complex.I • S2) =
+      S1 * S1 - Complex.I • (S1 * S2) + Complex.I • (S2 * S1) -
+        Complex.I • Complex.I • (S2 * S2) := by
+    rw [Matrix.add_mul, Matrix.mul_sub, Matrix.mul_sub, Matrix.smul_mul,
+      Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_smul]
+    abel
+  rw [hexp]
+  rw [show (Complex.I : ℂ) • Complex.I • (S2 * S2) = -(S2 * S2) from by
+    rw [smul_smul, Complex.I_mul_I, neg_one_smul]]
+  have hcommS3 : Complex.I • (S2 * S1) - Complex.I • (S1 * S2) = S3 := by
+    rw [← smul_sub]
+    have hr : (S2 * S1) - (S1 * S2) = -(S1 * S2 - S2 * S1) := by abel
+    rw [hr, hcomm, smul_neg, smul_smul, Complex.I_mul_I, neg_one_smul]
+    abel
+  have : S1 * S1 - Complex.I • (S1 * S2) + Complex.I • (S2 * S1) -
+      -(S2 * S2) =
+    S1 * S1 + S2 * S2 + (Complex.I • (S2 * S1) - Complex.I • (S1 * S2)) := by abel
+  rw [this, hcommS3]
+
 /-! ## Cross-sublattice commute for ladder operators (spin-`1/2`) -/
 
 /-- Spin-`1/2` mirror of `sublatticeSpinSOpPlus_cross_commute`. -/
