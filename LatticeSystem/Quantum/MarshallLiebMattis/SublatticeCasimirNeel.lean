@@ -725,6 +725,32 @@ theorem neelStateOf_sublatticeSpinHalfDot_expectation (A : Λ → Bool) :
   rw [neelStateOf_sublattice_minus_plus_cross_expectation]
   simp
 
+/-- `<Φ_Néel | (Ŝ_tot)² | Φ_Néel> = ((|A|-|¬A|)/2)² + (|A|+|¬A|)/2`. Spin-`1/2`
+mirror of γ-4 step 126. The full total-spin Casimir expectation on Néel. -/
+theorem neelStateOf_totalSpinHalfSquared_expectation (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        ((totalSpinHalfSquared Λ).mulVec (neelStateOf A)) =
+      ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) /
+          2) ^ 2 +
+        (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) +
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) /
+          2 := by
+  rw [totalSpinHalfSquared_eq_sublattice_casimir A]
+  rw [Matrix.add_mulVec, Matrix.add_mulVec]
+  rw [dotProduct_add, dotProduct_add]
+  rw [sublatticeSpinHalfSquared_mulVec_neelStateOf]
+  rw [sublatticeSpinHalfSquared_complement_mulVec_neelStateOf]
+  rw [Matrix.smul_mulVec]
+  rw [show sublatticeSpinDot A (fun x => ! A x) =
+      sublatticeSpinHalfOp1 A * sublatticeSpinHalfOp1 (fun x => ! A x) +
+        sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp2 (fun x => ! A x) +
+        sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp3 (fun x => ! A x) from rfl]
+  simp only [dotProduct_smul, neelStateOf_inner_self,
+    neelStateOf_sublatticeSpinHalfDot_expectation,
+    smul_eq_mul, mul_one]
+  ring
+
 /-- `<Φ_Néel | Ŝ_tot^(3) | Φ_Néel> = (|A| - |¬A|)/2`. Spin-`1/2` mirror of
 γ-4 step 112: Néel state magnetization expectation. -/
 theorem neelStateOf_totalSpinHalfOp3_expectation (A : Λ → Bool) :
