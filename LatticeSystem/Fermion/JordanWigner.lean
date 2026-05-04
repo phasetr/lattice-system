@@ -6,6 +6,7 @@ import LatticeSystem.Fermion.JordanWigner.NumberAnticommutators
 import LatticeSystem.Fermion.JordanWigner.NumberPow
 import LatticeSystem.Fermion.JordanWigner.CDaggerCCommutator
 import LatticeSystem.Fermion.JordanWigner.CDaggerCIdentity
+import LatticeSystem.Fermion.JordanWigner.CDaggerCProjection
 import LatticeSystem.Fermion.JordanWigner.Hubbard
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Charges
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Graph
@@ -31,6 +32,7 @@ is now a thin re-import of five sub-files under
 | `NumberPow.lean` | `n_i^(k+1) = n_i` (idempotent projection power) |
 | `CDaggerCCommutator.lean` | same-site `[c_i, c_i†] = 1 − 2·n_i` |
 | `CDaggerCIdentity.lean` | same-site `c_i · c_i† = 1 − n_i`, `n_i + c_i · c_i† = 1` |
+| `CDaggerCProjection.lean` | hole-projection idempotency `(c_i · c_i†)² = c_i · c_i†` + powers |
 | `Hubbard.lean` | spinful wrappers, on-graph Hubbard, 1D open / periodic chain Gibbs |
 | `Hubbard/Charges.lean` | `N_↑`, `N_↓`, `S^z_tot`, vacuum eigenstates, cross-spin commutes |
 | `Hubbard/Graph.lean` | graph-centric wrappers, chain/cycle Hamiltonians + Gibbs families |
