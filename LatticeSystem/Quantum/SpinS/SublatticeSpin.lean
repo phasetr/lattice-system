@@ -870,6 +870,41 @@ theorem totalSpinSOp3_commutator_sublatticeSpinSOpMinus (A : Λ → Bool) :
         sublatticeSpinSOpMinus N A * sublatticeSpinSOp3 N A from by abel]
   exact h_self
 
+/-! ## Sublattice ladder adjoint relations -/
+
+/-- `(Ŝ_A^+)† = Ŝ_A^-`: the sublattice raising and lowering operators
+are Hermitian conjugates of each other. -/
+theorem sublatticeSpinSOpPlus_conjTranspose (A : Λ → Bool) :
+    (sublatticeSpinSOpPlus N A).conjTranspose = sublatticeSpinSOpMinus N A := by
+  unfold sublatticeSpinSOpPlus sublatticeSpinSOpMinus
+  rw [Matrix.conjTranspose_sum]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  by_cases hA : A x = true
+  · rw [if_pos hA, if_pos hA]
+    rw [onSiteS_conjTranspose, spinSOpPlus_conjTranspose]
+  · cases h : A x
+    · rw [if_neg, if_neg]
+      · rw [Matrix.conjTranspose_zero]
+      · simp
+      · simp
+    · exact absurd h hA
+
+/-- `(Ŝ_A^-)† = Ŝ_A^+`. -/
+theorem sublatticeSpinSOpMinus_conjTranspose (A : Λ → Bool) :
+    (sublatticeSpinSOpMinus N A).conjTranspose = sublatticeSpinSOpPlus N A := by
+  unfold sublatticeSpinSOpPlus sublatticeSpinSOpMinus
+  rw [Matrix.conjTranspose_sum]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  by_cases hA : A x = true
+  · rw [if_pos hA, if_pos hA]
+    rw [onSiteS_conjTranspose, spinSOpMinus_conjTranspose]
+  · cases h : A x
+    · rw [if_neg, if_neg]
+      · rw [Matrix.conjTranspose_zero]
+      · simp
+      · simp
+    · exact absurd h hA
+
 /-! ## Sublattice ladder operators shift the magnetization subspace -/
 
 /-- `Ŝ_A^- · v ∈ magSubspaceS Λ N (M − 1)` for `v ∈ magSubspaceS Λ N M`.

@@ -470,7 +470,7 @@ theorem onSite_commutator_totalOnSite
 /-! ## Adjoint relations and ladder commutator for total raising/lowering -/
 
 /-- The conjugate transpose of `onSite i A` equals `onSite i Aᴴ`. -/
-private lemma onSite_conjTranspose (i : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) :
+theorem onSite_conjTranspose (i : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) :
     (onSite i A).conjTranspose = (onSite i A.conjTranspose : ManyBodyOp Λ) := by
   ext σ' σ
   simp only [Matrix.conjTranspose_apply, onSite_apply]
