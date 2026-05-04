@@ -960,6 +960,24 @@ theorem sublatticeSpinSOpMinus_const_true :
   refine Finset.sum_congr rfl fun x _ => ?_
   simp
 
+/-! ## Reverse identities -/
+
+/-- `Ŝ_A^+ + Ŝ_A^- = 2 • Ŝ_A^(1)`. Direct from `_eq_add` and `_eq_sub`. -/
+theorem sublatticeSpinSOpPlus_add_sublatticeSpinSOpMinus (A : Λ → Bool) :
+    sublatticeSpinSOpPlus N A + sublatticeSpinSOpMinus N A =
+      (2 : ℂ) • sublatticeSpinSOp1 N A := by
+  rw [sublatticeSpinSOpPlus_eq_add, sublatticeSpinSOpMinus_eq_sub, two_smul]
+  abel
+
+/-- `Ŝ_A^+ - Ŝ_A^- = 2i • Ŝ_A^(2)`. Direct from `_eq_add` and `_eq_sub`. -/
+theorem sublatticeSpinSOpPlus_sub_sublatticeSpinSOpMinus (A : Λ → Bool) :
+    sublatticeSpinSOpPlus N A - sublatticeSpinSOpMinus N A =
+      (2 * Complex.I) • sublatticeSpinSOp2 N A := by
+  rw [sublatticeSpinSOpPlus_eq_add, sublatticeSpinSOpMinus_eq_sub]
+  rw [show (2 * Complex.I : ℂ) = Complex.I + Complex.I from by ring]
+  rw [add_smul]
+  abel
+
 /-! ## Sublattice ladder matrix element realness -/
 
 /-- The sublattice raising operator has real matrix elements:
