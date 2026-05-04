@@ -693,6 +693,38 @@ theorem neelStateOf_sublattice_minus_plus_cross_expectation (A : Λ → Bool) :
   rw [star_zero]
   exact zero_dotProduct _
 
+/-- `<Φ_Néel | Ŝ_A · Ŝ_¬A | Φ_Néel> = -|A|·|¬A|/4`. Spin-`1/2` mirror of γ-4
+step 124: cross-sublattice spin dot product expectation. Combines γ-4
+steps 117 (z-axis), 123 (ladder identity), 119 + 115 (cross-flip
+expectations). -/
+theorem neelStateOf_sublatticeSpinHalfDot_expectation (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        ((sublatticeSpinHalfOp1 A * sublatticeSpinHalfOp1 (fun x => ! A x) +
+          sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp2 (fun x => ! A x) +
+          sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp3 (fun x => ! A x)).mulVec
+          (neelStateOf A)) =
+      (-(((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) /
+          4)) := by
+  rw [Matrix.add_mulVec, Matrix.add_mulVec]
+  rw [dotProduct_add, dotProduct_add]
+  rw [neelStateOf_sublattice3_cross_complement3_expectation]
+  rw [show
+      dotProduct (star (neelStateOf A))
+          ((sublatticeSpinHalfOp1 A * sublatticeSpinHalfOp1 (fun x => ! A x)).mulVec
+            (neelStateOf A)) +
+        dotProduct (star (neelStateOf A))
+          ((sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp2 (fun x => ! A x)).mulVec
+            (neelStateOf A)) = 0 from ?_]
+  · ring
+  rw [← dotProduct_add, ← Matrix.add_mulVec]
+  rw [sublatticeSpinHalfOp1_mul_op1_add_op2_mul_op2_eq_ladder]
+  rw [Matrix.smul_mulVec, dotProduct_smul]
+  rw [Matrix.add_mulVec, dotProduct_add]
+  rw [neelStateOf_sublattice_plus_complement_minus_expectation]
+  rw [neelStateOf_sublattice_minus_plus_cross_expectation]
+  simp
+
 /-- `<Φ_Néel | Ŝ_tot^(3) | Φ_Néel> = (|A| - |¬A|)/2`. Spin-`1/2` mirror of
 γ-4 step 112: Néel state magnetization expectation. -/
 theorem neelStateOf_totalSpinHalfOp3_expectation (A : Λ → Bool) :
