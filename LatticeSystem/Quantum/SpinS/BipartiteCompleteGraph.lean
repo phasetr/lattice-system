@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.ConfigDist
 import Mathlib.Combinatorics.SimpleGraph.Basic
+import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
 
 /-!
 # The complete bipartite graph induced by a sublattice indicator
@@ -325,5 +326,66 @@ theorem raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS
         · rw [hmag_2]; exact hmag
         · omega
       exact hreach.trans hIH
+
+/-! ## Preconnectedness of `bipartiteCompleteGraphOf` -/
+
+/-- The bipartite-complete graph `bipartiteCompleteGraphOf A` is
+preconnected when both sublattices are non-empty. Any two `x, y ∈ V`
+are joined by a walk of length ≤ 2:
+
+* If `A x ≠ A y`: direct edge.
+* If `A x = A y`: pick any `z` in the opposite sublattice (exists by
+  non-emptiness of the other side); then `x ~ z ~ y` via two edges.
+
+Spin-`S` mirror of `bipartiteGraphFromA_preconnected` (spin-`1/2`,
+in `Quantum/MarshallLiebMattis/BipartiteGraph.lean`). -/
+theorem bipartiteCompleteGraphOf_preconnected
+    (A : V → Bool)
+    (hA_pos : ∃ x : V, A x = true) (hA_neg : ∃ y : V, A y = false) :
+    (bipartiteCompleteGraphOf A).Preconnected := by
+  intro x y
+  by_cases hAxy : A x = A y
+  · -- Same sublattice: pick a vertex in the opposite sublattice.
+    by_cases hAx : A x = true
+    · -- A x = true, so A y = true; pick z with A z = false.
+      obtain ⟨z, hz⟩ := hA_neg
+      have hxz : (bipartiteCompleteGraphOf A).Adj x z := by
+        rw [bipartiteCompleteGraphOf_adj_iff]
+        refine ⟨?_, ?_⟩
+        · intro heq; rw [heq, hz] at hAx; exact Bool.noConfusion hAx
+        · rw [hAx, hz]; decide
+      have hAyT : A y = true := hAxy ▸ hAx
+      have hyz : (bipartiteCompleteGraphOf A).Adj y z := by
+        rw [bipartiteCompleteGraphOf_adj_iff]
+        refine ⟨?_, ?_⟩
+        · intro heq; rw [heq, hz] at hAyT; exact Bool.noConfusion hAyT
+        · rw [hAyT, hz]; decide
+      exact ⟨(SimpleGraph.Walk.nil.cons hxz).append
+        ((SimpleGraph.Walk.nil.cons hyz).reverse)⟩
+    · -- A x = false, so A y = false; pick z with A z = true.
+      have hAxF : A x = false := by
+        cases h : A x
+        · rfl
+        · exact absurd h hAx
+      obtain ⟨z, hz⟩ := hA_pos
+      have hxz : (bipartiteCompleteGraphOf A).Adj x z := by
+        rw [bipartiteCompleteGraphOf_adj_iff]
+        refine ⟨?_, ?_⟩
+        · intro heq; rw [heq, hz] at hAxF; exact Bool.noConfusion hAxF
+        · rw [hAxF, hz]; decide
+      have hAyF : A y = false := hAxy ▸ hAxF
+      have hyz : (bipartiteCompleteGraphOf A).Adj y z := by
+        rw [bipartiteCompleteGraphOf_adj_iff]
+        refine ⟨?_, ?_⟩
+        · intro heq; rw [heq, hz] at hAyF; exact Bool.noConfusion hAyF
+        · rw [hAyF, hz]; decide
+      exact ⟨(SimpleGraph.Walk.nil.cons hxz).append
+        ((SimpleGraph.Walk.nil.cons hyz).reverse)⟩
+  · -- Different sublattices: direct edge.
+    have hxy : x ≠ y := fun heq => by subst heq; exact hAxy rfl
+    have hxy_adj : (bipartiteCompleteGraphOf A).Adj x y := by
+      rw [bipartiteCompleteGraphOf_adj_iff]
+      exact ⟨hxy, hAxy⟩
+    exact ⟨SimpleGraph.Walk.nil.cons hxy_adj⟩
 
 end LatticeSystem.Quantum
