@@ -690,4 +690,32 @@ theorem sublatticeSpinSOpMinus_eq_sub (A : Λ → Bool) :
       · simp
     · exact absurd h hA
 
+/-- The total raising operator decomposes as a sum over sublattices:
+`Ŝ^+_tot = Ŝ_A^+ + Ŝ_¬A^+`. -/
+theorem totalSpinSOpPlus_eq_sublattice_sum (A : Λ → Bool) :
+    totalSpinSOpPlus Λ N =
+      sublatticeSpinSOpPlus N A + sublatticeSpinSOpPlus N (fun x => ! A x) := by
+  unfold totalSpinSOpPlus sublatticeSpinSOpPlus
+  rw [← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  by_cases hA : A x = true
+  · simp [hA]
+  · cases h : A x
+    · simp [h]
+    · exact absurd h hA
+
+/-- The total lowering operator decomposes as a sum over sublattices:
+`Ŝ^-_tot = Ŝ_A^- + Ŝ_¬A^-`. -/
+theorem totalSpinSOpMinus_eq_sublattice_sum (A : Λ → Bool) :
+    totalSpinSOpMinus Λ N =
+      sublatticeSpinSOpMinus N A + sublatticeSpinSOpMinus N (fun x => ! A x) := by
+  unfold totalSpinSOpMinus sublatticeSpinSOpMinus
+  rw [← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  by_cases hA : A x = true
+  · simp [hA]
+  · cases h : A x
+    · simp [h]
+    · exact absurd h hA
+
 end LatticeSystem.Quantum
