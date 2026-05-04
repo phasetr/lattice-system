@@ -1,6 +1,8 @@
 import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpinDot
 import LatticeSystem.Quantum.MarshallLiebMattis.ToyHamiltonian
 import LatticeSystem.Quantum.TotalSpin.Casimir
+import LatticeSystem.Quantum.SpinDot.Hamiltonian
+import LatticeSystem.Quantum.MagnetizationSubspace
 
 /-!
 # Toy Hamiltonian as a cross-sublattice spin dot product
@@ -206,6 +208,56 @@ theorem heisenbergToyHamiltonian_commute_sublatticeSpinHalfSquared_complement
       (fun x => ! A x)).symm
   · exact sublatticeSpinHalfSquared_cross_commute A
   · exact Commute.refl _
+
+/-! ## SU(2) invariance at the axis level (spin-1/2 mirror of γ-4 step 33) -/
+
+/-- `[Ĥ_toy, Ŝ_tot^{(1)}] = 0`. Direct specialisation of
+`heisenbergHamiltonian_commutator_totalSpinHalfOp1` to
+`J = bipartiteCoupling A`. -/
+theorem heisenbergToyHamiltonian_commutator_totalSpinHalfOp1 (A : Λ → Bool) :
+    heisenbergToyHamiltonian A * totalSpinHalfOp1 Λ -
+        totalSpinHalfOp1 Λ * heisenbergToyHamiltonian A = 0 :=
+  heisenbergHamiltonian_commutator_totalSpinHalfOp1 (bipartiteCoupling A)
+
+/-- `[Ĥ_toy, Ŝ_tot^{(2)}] = 0`. -/
+theorem heisenbergToyHamiltonian_commutator_totalSpinHalfOp2 (A : Λ → Bool) :
+    heisenbergToyHamiltonian A * totalSpinHalfOp2 Λ -
+        totalSpinHalfOp2 Λ * heisenbergToyHamiltonian A = 0 :=
+  heisenbergHamiltonian_commutator_totalSpinHalfOp2 (bipartiteCoupling A)
+
+/-- `[Ĥ_toy, Ŝ_tot^{(3)}] = 0`. The toy Hamiltonian preserves the
+magnetisation sector. -/
+theorem heisenbergToyHamiltonian_commutator_totalSpinHalfOp3 (A : Λ → Bool) :
+    heisenbergToyHamiltonian A * totalSpinHalfOp3 Λ -
+        totalSpinHalfOp3 Λ * heisenbergToyHamiltonian A = 0 :=
+  heisenbergHamiltonian_commutator_totalSpinHalfOp3 (bipartiteCoupling A)
+
+/-- `Commute Ĥ_toy Ŝ_tot^{(1)}`. -/
+theorem heisenbergToyHamiltonian_commute_totalSpinHalfOp1 (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonian A) (totalSpinHalfOp1 Λ) :=
+  sub_eq_zero.mp (heisenbergToyHamiltonian_commutator_totalSpinHalfOp1 A)
+
+/-- `Commute Ĥ_toy Ŝ_tot^{(2)}`. -/
+theorem heisenbergToyHamiltonian_commute_totalSpinHalfOp2 (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonian A) (totalSpinHalfOp2 Λ) :=
+  sub_eq_zero.mp (heisenbergToyHamiltonian_commutator_totalSpinHalfOp2 A)
+
+/-- `Commute Ĥ_toy Ŝ_tot^{(3)}`. -/
+theorem heisenbergToyHamiltonian_commute_totalSpinHalfOp3 (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonian A) (totalSpinHalfOp3 Λ) :=
+  sub_eq_zero.mp (heisenbergToyHamiltonian_commutator_totalSpinHalfOp3 A)
+
+/-! ## Magnetization subspace preservation -/
+
+/-- The spin-`1/2` toy Hamiltonian preserves each magnetization
+subspace: `v ∈ magnetizationSubspace Λ M ⇒ (Ĥ_toy A · v) ∈ magnetizationSubspace Λ M`.
+Direct corollary of `[Ĥ_toy, Ŝ_tot^{(3)}] = 0`. -/
+theorem heisenbergToyHamiltonian_mulVec_mem_magnetizationSubspace_of_mem
+    (A : Λ → Bool) {M : ℂ} {v : (Λ → Fin 2) → ℂ}
+    (hv : v ∈ magnetizationSubspace Λ M) :
+    (heisenbergToyHamiltonian A).mulVec v ∈ magnetizationSubspace Λ M :=
+  heisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem
+    (Λ := Λ) (bipartiteCoupling A) hv
 
 /-! ## Eigenvalue on the all-aligned state -/
 
