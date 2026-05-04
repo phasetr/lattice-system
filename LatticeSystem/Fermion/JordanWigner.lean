@@ -25,6 +25,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinSymmetry
 import LatticeSystem.Fermion.JordanWigner.Hubbard.AllUpState
 import LatticeSystem.Fermion.JordanWigner.Hubbard.AllDownState
 import LatticeSystem.Fermion.JordanWigner.Hubbard.AllDownStateTotalNumber
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinTotHermitian
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SaturatedFerromagnetism
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyProjection
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyCommute
@@ -91,6 +92,7 @@ expansion):
 | `Hubbard/AllUpState.lean` | all-up state: H_kin eigenvalue, no double occupancy |
 | `Hubbard/AllDownState.lean` | all-down state: `H_int · |↓..⟩ = 0` (mirror) |
 | `Hubbard/AllDownStateTotalNumber.lean` | `N_↓ · |↓..⟩ = (N+1)·|↓..⟩`, `S^z·|↓..⟩ = -(N+1)/2·|↓..⟩` |
+| `Hubbard/SpinTotHermitian.lean` | `(Ŝ^-)ᴴ = Ŝ^+`, `(Ŝ^z)`/`(Ŝ²)` Hermitian |
 | `Hubbard/SaturatedFerromagnetism.lean` | spin Casimir, Def 11.1, SU(2) algebra |
 | `Hubbard/DoubleOccupancyProjection.lean` | site-`i` `Commute n_↑ n_↓` + idempotent product |
 | `Hubbard/DoubleOccupancyCommute.lean` | cross-site `Commute (n_↑(i)·n_↓(i)) (n_↑(j)·n_↓(j))` |
