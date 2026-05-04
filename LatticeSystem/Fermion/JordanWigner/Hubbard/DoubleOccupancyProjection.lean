@@ -18,8 +18,9 @@ idempotents (each `n_σ(i)² = n_σ(i)` via
 
 The eigenvalue-`1` subspace is the doubly-occupied site state,
 so the on-site Hubbard interaction
-`U · ∑_i n_↑(i) · n_↓(i)` is `U` times a sum of commuting
-projections.
+`U · ∑_i n_↑(i) · n_↓(i)` is `U` times a sum of projections
+(each summand is a projection by this PR; cross-site
+commutation of summands is not proved here).
 
 Tracked as part of Phase 2 fermion infrastructure (Issue #412).
 -/
