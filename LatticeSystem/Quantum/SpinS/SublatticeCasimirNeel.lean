@@ -997,4 +997,19 @@ theorem neelStateOfS_finrank_span (A : Λ → Bool) (N : ℕ) :
     Module.finrank ℂ (Submodule.span ℂ {neelStateOfS A N}) = 1 :=
   finrank_span_singleton (neelStateOfS_ne_zero A N)
 
+/-- Configuration-level distinctness: the Néel config differs from the
+all-up config when `|¬A| > 0` and `N > 0`. Used to conclude that Néel
+and all-up states span different basis vectors. -/
+theorem neelConfigOfS_ne_allAlignedConfigS
+    (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = false) :
+    neelConfigOfS A N ≠ allAlignedConfigS Λ N 0 := by
+  obtain ⟨x, hx⟩ := hA
+  intro heq
+  have h := congrFun heq x
+  unfold neelConfigOfS allAlignedConfigS at h
+  rw [if_neg (by rw [hx]; decide : ¬ A x = true)] at h
+  simp [Fin.last] at h
+  omega
+
 end LatticeSystem.Quantum
