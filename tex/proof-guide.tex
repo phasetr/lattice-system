@@ -6169,6 +6169,19 @@ with $(c\,c^\dagger)\,c = c$ (PR~\#982) and $c^\dagger\,
 four-way breakdown of left/right multiplication of
 $c\,c^\dagger$ by the ladder operators.
 
+\textbf{Multi-mode (JW) ladder-on-hole-projection vanishing
+$c_i\,(c_i\,c_i^\dagger) = 0$ and $(c_i\,c_i^\dagger)\,
+c_i^\dagger = 0$ (PR~\#1010)}: multi-mode mirror of PR~\#1009,
+in the file
+\texttt{Fermion/JordanWigner/CDaggerCLadderZero.lean}. Direct
+from $c_i^2 = 0$ (\texttt{fermionMultiAnnihilation\_sq}) and
+$(c_i^\dagger)^2 = 0$ (\texttt{fermionMultiCreation\_sq}).
+Together with $(c_i\,c_i^\dagger)\,c_i = c_i$ (PR~\#1001) and
+$c_i^\dagger\,(c_i\,c_i^\dagger) = c_i^\dagger$ (PR~\#1002)
+this is the full four-way breakdown of left/right
+multiplication of the multi-mode hole projection by the
+same-site ladder operators.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
