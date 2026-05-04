@@ -584,4 +584,41 @@ theorem sublatticeSpinSOpComplementPlus_minus_mulVec_neelStateOfS
   rw [sublatticeSpinSOpMinus_complement_mulVec_neelStateOfS]
   rw [Matrix.mulVec_zero]
 
+/-- `((Ŝ_A^(1))² + (Ŝ_A^(2))²) · |Φ_Néel⟩ = (|A|·N/2) · |Φ_Néel⟩`.
+
+Direct from `(Ŝ_A)² = (Ŝ_A^(1))² + (Ŝ_A^(2))² + (Ŝ_A^(3))²` and the
+known eigenvalues:
+- `(Ŝ_A)² · Néel = c_A · Néel` with `c_A = (|A|·N/2)((|A|·N/2)+1)`,
+- `(Ŝ_A^(3))² · Néel = (|A|·N/2)² · Néel`,
+so `((Ŝ_A^(1))² + (Ŝ_A^(2))²) · Néel = (c_A − (|A|·N/2)²) · Néel = (|A|·N/2) · Néel`. -/
+theorem sublatticeSpinSOp12sq_mulVec_neelStateOfS (A : Λ → Bool) (N : ℕ) :
+    (sublatticeSpinSOp1 N A * sublatticeSpinSOp1 N A +
+        sublatticeSpinSOp2 N A * sublatticeSpinSOp2 N A).mulVec
+        (neelStateOfS A N) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2)) •
+        neelStateOfS A N := by
+  have hCasimir := sublatticeSpinSquaredS_mulVec_neelStateOfS A N
+  rw [sublatticeSpinSquaredS_def] at hCasimir
+  rw [Matrix.add_mulVec, Matrix.add_mulVec] at hCasimir
+  have hSq3 := sublatticeSpinSOp3_sq_mulVec_neelStateOfS A N
+  -- hCasimir: ((Ŝ^(1))² + (Ŝ^(2))²).mulVec + (Ŝ^(3))².mulVec = c_A • Néel
+  -- hSq3: (Ŝ^(3))².mulVec = (|A|·N/2)² • Néel
+  rw [hSq3] at hCasimir
+  set k : ℂ := ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+      ((N : ℂ) / 2)
+  -- Need: ((Ŝ^(1))² + (Ŝ^(2))²) · Néel = k · Néel
+  rw [Matrix.add_mulVec]
+  -- hCasimir: (Ŝ^(1))² · Néel + (Ŝ^(2))² · Néel + k² · Néel = (k · (k+1)) · Néel
+  have h := hCasimir
+  have hab : (sublatticeSpinSOp1 N A * sublatticeSpinSOp1 N A).mulVec
+        (neelStateOfS A N) +
+      (sublatticeSpinSOp2 N A * sublatticeSpinSOp2 N A).mulVec
+        (neelStateOfS A N) =
+      (k * (k + 1)) • neelStateOfS A N - k ^ 2 • neelStateOfS A N := by
+    rw [eq_sub_iff_add_eq]; exact h
+  rw [hab, ← sub_smul]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
