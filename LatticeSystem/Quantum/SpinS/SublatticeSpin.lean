@@ -1071,6 +1071,63 @@ theorem sublatticeSpinSOpMinus_apply_im_zero (A : Λ → Bool)
       · simp
     · exact absurd h hA
 
+/-! ## Sublattice ladder annihilates configurations with extreme A-values -/
+
+/-- `Ŝ_A^+ · basisVecS σ = 0` when `σ x = 0` for all `x ∈ A`.
+Generalises `sublatticeSpinSOpPlus_mulVec_allAlignedStateS_zero` (PR #1087)
+to allow σ to be arbitrary on `¬A`. -/
+theorem sublatticeSpinSOpPlus_mulVec_basisVecS_zero_on (A : Λ → Bool)
+    {σ : Λ → Fin (N + 1)} (hσ : ∀ x, A x = true → σ x = 0) :
+    (sublatticeSpinSOpPlus N A).mulVec (basisVecS σ) = 0 := by
+  unfold sublatticeSpinSOpPlus
+  rw [Matrix.sum_mulVec]
+  apply Finset.sum_eq_zero
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    -- Apply on-site raising. For σ x = 0, this annihilates.
+    funext τ
+    rw [onSiteS_mulVec_basisVecS_apply]
+    show (onSiteS x (spinSOpPlus N) : ManyBodyOpS Λ N) τ σ = 0
+    by_cases h_off : ∀ k, k ≠ x → τ k = σ k
+    · rw [onSiteS_apply_of_off_site_agree x _ h_off]
+      change spinSOpPlus N (τ x) (σ x) = 0
+      rw [hσ x hA]
+      apply spinSOpPlus_apply_other
+      show (τ x).val + 1 ≠ ((0 : Fin (N + 1)).val)
+      simp
+    · exact onSiteS_apply_eq_zero_of_off_site_diff x _ h_off
+  · cases h : A x
+    · rw [if_neg, Matrix.zero_mulVec]
+      simp
+    · exact absurd h hA
+
+/-- `Ŝ_A^- · basisVecS σ = 0` when `σ x = Fin.last N` for all `x ∈ A`. -/
+theorem sublatticeSpinSOpMinus_mulVec_basisVecS_last_on (A : Λ → Bool)
+    {σ : Λ → Fin (N + 1)} (hσ : ∀ x, A x = true → σ x = Fin.last N) :
+    (sublatticeSpinSOpMinus N A).mulVec (basisVecS σ) = 0 := by
+  unfold sublatticeSpinSOpMinus
+  rw [Matrix.sum_mulVec]
+  apply Finset.sum_eq_zero
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    funext τ
+    rw [onSiteS_mulVec_basisVecS_apply]
+    show (onSiteS x (spinSOpMinus N) : ManyBodyOpS Λ N) τ σ = 0
+    by_cases h_off : ∀ k, k ≠ x → τ k = σ k
+    · rw [onSiteS_apply_of_off_site_agree x _ h_off]
+      rw [hσ x hA]
+      apply spinSOpMinus_apply_other
+      change ((Fin.last N).val : ℕ) + 1 ≠ (τ x).val
+      have hτ_lt : (τ x).val < N + 1 := (τ x).isLt
+      simp [Fin.last]; omega
+    · exact onSiteS_apply_eq_zero_of_off_site_diff x _ h_off
+  · cases h : A x
+    · rw [if_neg, Matrix.zero_mulVec]
+      simp
+    · exact absurd h hA
+
 /-! ## Sublattice ladder adjoint relations -/
 
 /-- `(Ŝ_A^+)† = Ŝ_A^-`: the sublattice raising and lowering operators
