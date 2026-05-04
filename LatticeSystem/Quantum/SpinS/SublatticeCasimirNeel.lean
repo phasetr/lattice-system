@@ -984,4 +984,11 @@ theorem neelStateOfS_eq_basisVecS_neelMagConfigS (A : Λ → Bool) (N : ℕ) :
   unfold neelStateOfS
   rw [neelMagConfigS_val]
 
+/-- The magnetization sector `magConfigS Λ N (|¬A|·N)` has at least one
+element (the Néel config). -/
+theorem magConfigS_card_pos_via_neel (A : Λ → Bool) (N : ℕ) :
+    1 ≤ Fintype.card (magConfigS Λ N
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card * N)) :=
+  Fintype.card_pos
+
 end LatticeSystem.Quantum
