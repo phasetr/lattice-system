@@ -302,4 +302,28 @@ theorem sublatticeSpinSOpMinus_complement_mulVec_neelStateOfS
   unfold neelConfigOfS
   rw [if_neg (by rw [hAxF]; decide : ¬ (A x = true))]
 
+/-- On the Néel state: `Ŝ_tot^+ · |Φ_Néel⟩ = Ŝ_¬A^+ · |Φ_Néel⟩`.
+The total raising decomposes as `Ŝ_A^+ + Ŝ_¬A^+`, and `Ŝ_A^+` annihilates
+the Néel state (PR #1111). -/
+theorem totalSpinSOpPlus_mulVec_neelStateOfS_eq_complement
+    (A : Λ → Bool) (N : ℕ) :
+    (totalSpinSOpPlus Λ N).mulVec (neelStateOfS A N) =
+      (sublatticeSpinSOpPlus N (fun x => ! A x)).mulVec (neelStateOfS A N) := by
+  rw [totalSpinSOpPlus_eq_sublattice_sum (N := N) A]
+  rw [Matrix.add_mulVec]
+  rw [sublatticeSpinSOpPlus_mulVec_neelStateOfS A N]
+  rw [zero_add]
+
+/-- On the Néel state: `Ŝ_tot^- · |Φ_Néel⟩ = Ŝ_A^- · |Φ_Néel⟩`.
+The total lowering decomposes as `Ŝ_A^- + Ŝ_¬A^-`, and `Ŝ_¬A^-` annihilates
+the Néel state. -/
+theorem totalSpinSOpMinus_mulVec_neelStateOfS_eq_A
+    (A : Λ → Bool) (N : ℕ) :
+    (totalSpinSOpMinus Λ N).mulVec (neelStateOfS A N) =
+      (sublatticeSpinSOpMinus N A).mulVec (neelStateOfS A N) := by
+  rw [totalSpinSOpMinus_eq_sublattice_sum (N := N) A]
+  rw [Matrix.add_mulVec]
+  rw [sublatticeSpinSOpMinus_complement_mulVec_neelStateOfS A N]
+  rw [add_zero]
+
 end LatticeSystem.Quantum
