@@ -218,4 +218,10 @@ theorem totalSpinSSquared_N_zero :
   refine Finset.sum_eq_zero (fun y _ => ?_)
   exact spinSDot_N_zero_total x y
 
+/-- Casimir invariance, `Commute` form: `Commute (Ŝ_tot)² Ŝ_tot^{(3)}`. -/
+theorem totalSpinSSquared_commute_totalSpinSOp3 :
+    Commute (totalSpinSSquared Λ N) (totalSpinSOp3 Λ N) := by
+  unfold Commute SemiconjBy
+  exact sub_eq_zero.mp (totalSpinSSquared_commutator_totalSpinSOp3 (Λ := Λ) (N := N))
+
 end LatticeSystem.Quantum
