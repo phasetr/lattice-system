@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.SublatticeSpinDot
 import LatticeSystem.Quantum.SpinS.ToyHamiltonian
 import LatticeSystem.Quantum.SpinS.AllAlignedState
+import LatticeSystem.Quantum.SpinS.LadderBoundary
 
 /-!
 # Spin-`S` toy Hamiltonian as a cross-sublattice spin dot product
@@ -204,6 +205,22 @@ theorem heisenbergToyHamiltonianS_commute_totalSpinSOp2 (A : Λ → Bool) :
 theorem heisenbergToyHamiltonianS_commute_totalSpinSOp3 (A : Λ → Bool) :
     Commute (heisenbergToyHamiltonianS (Λ := Λ) A N) (totalSpinSOp3 Λ N) :=
   sub_eq_zero.mp (heisenbergToyHamiltonianS_commutator_totalSpinSOp3 N A)
+
+/-- `Commute Ĥ_toy_S Ŝ^+_tot`. The toy Hamiltonian commutes with the
+total raising operator. Direct specialisation of
+`heisenbergHamiltonianS_commute_totalSpinSOpPlus` to
+`J = bipartiteCoupling A`. -/
+theorem heisenbergToyHamiltonianS_commute_totalSpinSOpPlus (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonianS (Λ := Λ) A N) (totalSpinSOpPlus Λ N) :=
+  heisenbergHamiltonianS_commute_totalSpinSOpPlus (bipartiteCoupling A)
+
+/-- `Commute Ĥ_toy_S Ŝ^-_tot`. The toy Hamiltonian commutes with the
+total lowering operator. Direct specialisation of
+`heisenbergHamiltonianS_commute_totalSpinSOpMinus` to
+`J = bipartiteCoupling A`. -/
+theorem heisenbergToyHamiltonianS_commute_totalSpinSOpMinus (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonianS (Λ := Λ) A N) (totalSpinSOpMinus Λ N) :=
+  heisenbergHamiltonianS_commute_totalSpinSOpMinus (bipartiteCoupling A)
 
 /-! ## Commutativity with the total Casimir -/
 
