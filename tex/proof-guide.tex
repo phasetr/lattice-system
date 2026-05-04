@@ -6306,6 +6306,14 @@ combinations: $\{X, X\} - \{X, X^\dagger\} - \{X^\dagger, X\}
 case). Together with PR~\#1031 covers all four sign
 combinations of cross-site Pauli-X/iY-analog anticommutators.
 
+\textbf{Cross-site $\texttt{Commute}\,n_i\,(c_j \pm
+c_j^\dagger)$ for $i \neq j$ (PR~\#1033)}: in the file
+\texttt{Fermion/JordanWigner/NumberCommutePauliOfNe.lean}.
+Direct from the existing
+\texttt{fermionMultiNumber\_commute\_fermionMultiAnnihilation\_of\_ne}
+and \texttt{\_Creation\_of\_ne}, combined via
+\texttt{Commute.add\_right} / \texttt{.sub\_right}.
+
 \textbf{Multi-mode (JW) ladder-on-hole-projection vanishing
 $c_i\,(c_i\,c_i^\dagger) = 0$ and $(c_i\,c_i^\dagger)\,
 c_i^\dagger = 0$ (PR~\#1010)}: multi-mode mirror of PR~\#1009,
