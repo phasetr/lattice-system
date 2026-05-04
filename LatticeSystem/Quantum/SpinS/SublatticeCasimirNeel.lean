@@ -258,6 +258,38 @@ theorem sublatticeSpinSOp3_complement_mulVec_neelStateOfS
   congr 1
   rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
 
+/-- `(Ŝ_A^(3))² · |Φ_Néel⟩ = (|A|·N/2)² · |Φ_Néel⟩`. Square of γ-4 step 73:
+the squared sublattice z-axis acts as `(|A|·N/2)²` on the Néel state. -/
+theorem sublatticeSpinSOp3_sq_mulVec_neelStateOfS
+    (A : Λ → Bool) (N : ℕ) :
+    (sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N A).mulVec (neelStateOfS A N) =
+      ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2)) ^ 2) •
+        neelStateOfS A N := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [sublatticeSpinSOp3_mulVec_neelStateOfS]
+  rw [Matrix.mulVec_smul]
+  rw [sublatticeSpinSOp3_mulVec_neelStateOfS]
+  rw [smul_smul]
+  congr 1
+  ring
+
+/-- `(Ŝ_¬A^(3))² · |Φ_Néel⟩ = (|¬A|·N/2)² · |Φ_Néel⟩`. Square of γ-4 step 74. -/
+theorem sublatticeSpinSOp3_complement_sq_mulVec_neelStateOfS
+    (A : Λ → Bool) (N : ℕ) :
+    (sublatticeSpinSOp3 N (fun x => ! A x) *
+        sublatticeSpinSOp3 N (fun x => ! A x)).mulVec (neelStateOfS A N) =
+      ((((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) ^ 2) •
+        neelStateOfS A N := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [sublatticeSpinSOp3_complement_mulVec_neelStateOfS]
+  rw [Matrix.mulVec_smul]
+  rw [sublatticeSpinSOp3_complement_mulVec_neelStateOfS]
+  rw [smul_smul]
+  congr 1
+  ring
+
 /-! ## Per-pair `spinSDot` diagonal at the Néel configuration -/
 
 /-- For a cross-sublattice pair `x ∈ A`, `y ∈ ¬A`, the two-site dot
