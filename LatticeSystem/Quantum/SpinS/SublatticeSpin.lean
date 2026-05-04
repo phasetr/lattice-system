@@ -996,6 +996,43 @@ theorem sublatticeSpinSOp3_sq_eq_conjTranspose_mul (A : Λ → Bool) :
       (sublatticeSpinSOp3 N A).conjTranspose * sublatticeSpinSOp3 N A := by
   rw [(sublatticeSpinSOp3_isHermitian N A).eq]
 
+/-! ## Sublattice axis-1 / axis-3 matrix element realness -/
+
+/-- The sublattice axis-1 operator has real matrix elements:
+`((sublatticeSpinSOp1 N A) σ' σ).im = 0`. -/
+theorem sublatticeSpinSOp1_apply_im_zero (A : Λ → Bool)
+    (σ' σ : Λ → Fin (N + 1)) :
+    ((sublatticeSpinSOp1 N A) σ' σ).im = 0 := by
+  unfold sublatticeSpinSOp1
+  rw [Matrix.sum_apply, Complex.im_sum]
+  apply Finset.sum_eq_zero
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    exact onSiteS_spinSOp1_apply_im_zero x σ' σ
+  · cases h : A x
+    · rw [if_neg]
+      · simp
+      · simp
+    · exact absurd h hA
+
+/-- The sublattice axis-3 operator has real matrix elements. -/
+theorem sublatticeSpinSOp3_apply_im_zero (A : Λ → Bool)
+    (σ' σ : Λ → Fin (N + 1)) :
+    ((sublatticeSpinSOp3 N A) σ' σ).im = 0 := by
+  unfold sublatticeSpinSOp3
+  rw [Matrix.sum_apply, Complex.im_sum]
+  apply Finset.sum_eq_zero
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    exact onSiteS_spinSOp3_apply_im_zero x σ' σ
+  · cases h : A x
+    · rw [if_neg]
+      · simp
+      · simp
+    · exact absurd h hA
+
 /-! ## Sublattice ladder matrix element realness -/
 
 /-- The sublattice raising operator has real matrix elements:
