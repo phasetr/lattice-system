@@ -1143,6 +1143,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionMultiNumber_commute_fermionMultiAnnihilation_mul_fermionMultiCreation` | `Commute n_i (c_i · c_i†)` (multi-mode JW projections commute, mirror of PR #978) | `Fermion/JordanWigner/ProjectionsCommute.lean` (PR #1000) |
 | `fermionMultiNumber_mul_fermionMultiAnnihilation_eq_zero` / `fermionMultiAnnihilation_mul_fermionMultiNumber_eq_fermionMultiAnnihilation` | `n_i · c_i = 0`; `c_i · n_i = c_i` (multi-mode JW number-annihilation identities, mirror of PR #982) | `Fermion/JordanWigner/AnnihilationNumberIdentities.lean` (PR #1001) |
 | `fermionMultiCreation_mul_fermionMultiNumber_eq_zero` / `fermionMultiNumber_mul_fermionMultiCreation_eq_fermionMultiCreation` | `c_i† · n_i = 0`; `n_i · c_i† = c_i†` (multi-mode JW number-creation identities, mirror of PR #984) | `Fermion/JordanWigner/CreationNumberIdentities.lean` (PR #1002) |
+| `fermionMultiAnnihilation_mul_fermionMultiCreation_mul_fermionMultiAnnihilation` / `fermionMultiCreation_mul_fermionMultiAnnihilation_mul_fermionMultiCreation` | `c_i · c_i† · c_i = c_i`; `c_i† · c_i · c_i† = c_i†` (multi-mode JW partial-isometry identities, mirror of PR #986) | `Fermion/JordanWigner/PartialIsometry.lean` (PR #1003) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 

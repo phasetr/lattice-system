@@ -6072,6 +6072,19 @@ c_i^\dagger(c_i\,c_i^\dagger) = c_i^\dagger(1-n_i) =
 c_i^\dagger - c_i^\dagger\,n_i = c_i^\dagger$ via PR~\#996 and
 the previous.
 
+\textbf{Multi-mode (JW) partial-isometry identities
+$c_i\,c_i^\dagger c_i = c_i$ and $c_i^\dagger c_i\,c_i^\dagger
+= c_i^\dagger$ (PR~\#1003)}: multi-mode mirror of PR~\#986, in
+the file \texttt{Fermion/JordanWigner/PartialIsometry.lean}.
+Direct one-line corollaries of PRs~\#1001 and \#1002 via the
+definitional $n_i = c_i^\dagger c_i$:
+$c_i\,c_i^\dagger c_i = c_i\,(c_i^\dagger c_i) = c_i\,n_i = c_i$
+by PR~\#1001;
+$c_i^\dagger c_i\,c_i^\dagger = (c_i^\dagger c_i)\,c_i^\dagger
+= n_i\,c_i^\dagger = c_i^\dagger$ by PR~\#1002. Standard
+$S\,S^*S = S$ / $S^*S\,S^* = S^*$ partial-isometry identities
+of operator algebra, lifted to JW multi-mode at the same site.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
