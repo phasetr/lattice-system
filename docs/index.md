@@ -1138,6 +1138,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionMultiNumber_pow_succ` | `n_i^(k+1) = n_i` for any `k : ℕ` (multi-mode JW idempotent projection power identity, mirror of PR #992) | `Fermion/JordanWigner/NumberPow.lean` (PR #995) |
 | `fermionMultiAnnihilation_mul_fermionMultiCreation_eq_one_sub_number` / `fermionMultiNumber_add_fermionMultiAnnihilation_mul_fermionMultiCreation_eq_one` | `c_i · c_i† = 1 − n_i`; `n_i + c_i · c_i† = 1` (multi-mode JW hole-occupation + resolution of identity, mirror of PRs #963 and #972) | `Fermion/JordanWigner/CDaggerCIdentity.lean` (PR #996) |
 | `fermionMultiAnnihilation_mul_fermionMultiCreation_sq` / `fermionMultiAnnihilation_mul_fermionMultiCreation_pow_succ` | `(c_i · c_i†)² = c_i · c_i†`; `(c_i · c_i†)^(k+1) = c_i · c_i†` (multi-mode JW hole-projection idempotency + power, mirror of PRs #974 and #992) | `Fermion/JordanWigner/CDaggerCProjection.lean` (PR #997) |
+| `fermionMultiAnnihilation_mul_fermionMultiCreation_isHermitian` | `(c_i · c_i†)ᴴ = c_i · c_i†` (multi-mode JW hole projection Hermitian, mirror of PR #980) | `Fermion/JordanWigner/CDaggerCHermitian.lean` (PR #998) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 
