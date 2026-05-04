@@ -6219,6 +6219,18 @@ expansion using \texttt{fermionMultiAnnihilation\_sq},
 \texttt{fermionMultiCreation\_sq}, and
 \texttt{fermionMultiAnticomm\_self}. Companion to PR~\#1022.
 
+\textbf{Single-mode mixed Pauli-X\,$\cdot$\,iY products
+$(c + c^\dagger)(c - c^\dagger) = 2n - 1$ and
+$(c - c^\dagger)(c + c^\dagger) = 1 - 2n$ (PR~\#1025)}: in the
+file \texttt{Fermion/CPlusCDaggerMulCMinusCDagger.lean}.
+Direct expansion with $c^2 = (c^\dagger)^2 = 0$,
+$c\,c^\dagger = 1 - n$ (PR~\#963), and $c^\dagger c = n$:
+$(c + c^\dagger)(c - c^\dagger) = 0 - (1 - n) + n - 0 =
+2n - 1$. Physics identification:
+$(c + c^\dagger)(c - c^\dagger) = \sigma_x \cdot i\sigma_y =
+i^2 \sigma_z = -\sigma_z$; in our convention
+$n = (I - \sigma_z)/2$, so $-\sigma_z = 2n - 1$.
+
 \textbf{Multi-mode (JW) ladder-on-hole-projection vanishing
 $c_i\,(c_i\,c_i^\dagger) = 0$ and $(c_i\,c_i^\dagger)\,
 c_i^\dagger = 0$ (PR~\#1010)}: multi-mode mirror of PR~\#1009,
