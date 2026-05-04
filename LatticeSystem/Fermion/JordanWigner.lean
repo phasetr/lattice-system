@@ -1,6 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.String
 import LatticeSystem.Fermion.JordanWigner.Operators
 import LatticeSystem.Fermion.JordanWigner.CAR
+import LatticeSystem.Fermion.JordanWigner.CAR.CrossSiteOfNe
 import LatticeSystem.Fermion.JordanWigner.Number
 import LatticeSystem.Fermion.JordanWigner.NumberAnticommutators
 import LatticeSystem.Fermion.JordanWigner.NumberPow
@@ -56,6 +57,7 @@ expansion):
 | `String.lean` | JW string fundamentals |
 | `Operators.lean` | multi-mode `c_i`, `c_i†`, on-site CAR, hermiticity, number op |
 | `CAR.lean` | full canonical anticommutation (same-site + cross-site, factorisations) |
+| `CAR/CrossSiteOfNe.lean` | symmetric `_of_ne` cross-site CAR (4 lemmas) |
 | `Number.lean` | number commutators, Hubbard skeleton, fermion vacuum |
 | `NumberAnticommutators.lean` | same-site `{n_i, c_i}`, `{n_i, c_i†}` anticommutators |
 | `NumberPow.lean` | `n_i^(k+1) = n_i` (idempotent projection power) |
