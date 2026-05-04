@@ -507,4 +507,23 @@ theorem sublatticeSpinHalfOpComplementMinus_plus_mulVec_neelStateOf
   rw [sublatticeSpinHalfOpPlus_mulVec_neelStateOf]
   rw [Matrix.mulVec_zero]
 
+/-- `Ŝ_A^- · Ŝ_A^+ · |Φ_Néel⟩ = 0`. Spin-`1/2` mirror of γ-4 step 93. -/
+theorem sublatticeSpinHalfOpMinus_plus_mulVec_neelStateOf
+    (A : Λ → Bool) :
+    (sublatticeSpinHalfOpMinus A * sublatticeSpinHalfOpPlus A).mulVec
+        (neelStateOf A) = 0 := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [sublatticeSpinHalfOpPlus_mulVec_neelStateOf]
+  rw [Matrix.mulVec_zero]
+
+/-- `Ŝ_¬A^+ · Ŝ_¬A^- · |Φ_Néel⟩ = 0`. Spin-`1/2` mirror of γ-4 step 93. -/
+theorem sublatticeSpinHalfOpComplementPlus_minus_mulVec_neelStateOf
+    (A : Λ → Bool) :
+    (sublatticeSpinHalfOpPlus (fun x => ! A x) *
+        sublatticeSpinHalfOpMinus (fun x => ! A x)).mulVec
+        (neelStateOf A) = 0 := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [sublatticeSpinHalfOpMinus_complement_mulVec_neelStateOf]
+  rw [Matrix.mulVec_zero]
+
 end LatticeSystem.Quantum
