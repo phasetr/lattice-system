@@ -6496,6 +6496,21 @@ the four underlying $n_\sigma$ (and complements) pairwise
 commute, so the products commute via \texttt{Commute.mul\_left}
 / \texttt{.mul\_right}.
 
+\textbf{Remaining 5 cross-projection commute relations (PR~\#1038,
+completes 16/16 commute matrix)}: in the file
+\texttt{Fermion/JordanWigner/Hubbard/RemainingProjectionCommutes.lean}.
+Five remaining pairs:
+$\texttt{Commute}\,(p_\emptyset(i))\,(p_\uparrow(j))$,
+$\texttt{Commute}\,(p_\emptyset(i))\,(p_\downarrow(j))$,
+$\texttt{Commute}\,(p_\emptyset(i))\,(p_\Uparrow(j))$,
+$\texttt{Commute}\,(p_\uparrow(i))\,(p_\Uparrow(j))$,
+$\texttt{Commute}\,(p_\downarrow(i))\,(p_\Uparrow(j))$.
+Same proof template throughout. Combined with PRs~\#1006,
+\#1020, \#1035, \#1036, \#1037, all 16 combinations of
+$\texttt{Commute}\,(p_\alpha(i))\,(p_\beta(j))$ are formalised,
+making the 4-state per-site occupation algebra fully commutative
+across arbitrary site pairs.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
