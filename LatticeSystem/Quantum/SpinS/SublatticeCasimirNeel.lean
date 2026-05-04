@@ -733,6 +733,20 @@ theorem neelStateOfS_sublattice_minus_plus_cross_expectation
   rw [star_zero]
   exact zero_dotProduct _
 
+/-- `<Φ_Néel | Ŝ_A^(3) · Ŝ_¬A^(3) | Φ_Néel> = -|A|·|¬A|·(N/2)²`. Direct from
+γ-4 step 79 (eigenvector property) and norm-squared = 1. -/
+theorem neelStateOfS_sublattice3_cross_complement3_expectation
+    (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N (fun x => ! A x)).mulVec
+          (neelStateOfS A N)) =
+      (-(((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2) ^ 2)) := by
+  rw [sublatticeSpinSOp3_cross_complement_mulVec_neelStateOfS]
+  rw [dotProduct_smul]
+  rw [neelStateOfS_inner_self, smul_eq_mul, mul_one]
+
 /-- `<Φ_Néel | Ŝ_tot^(3) | Φ_Néel> = (|A| - |¬A|)·N/2`. The Néel state is
 an `Ŝ_tot^(3)` eigenvector with magnetization `(|A| - |¬A|)·N/2`. -/
 theorem neelStateOfS_totalSpinSOp3_expectation (A : Λ → Bool) (N : ℕ) :
