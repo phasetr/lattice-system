@@ -827,28 +827,16 @@ theorem neelStateOf_totalSpinHalfSquared_expectation_card_Lambda (A : Λ → Boo
   rw [h]
 
 /-- `<Φ_Néel | Ĥ_toy | Φ_Néel> = -|A|·|¬A|/2`. Spin-`1/2` mirror of γ-4
-step 131. -/
+step 131. Uses the generic basis-vector expectation lemma
+`basisVec_expectation_eq_diagonal` (γ-4 step 132). -/
 theorem neelStateOf_heisenbergToyHamiltonian_expectation (A : Λ → Bool) :
     dotProduct (star (neelStateOf A))
         ((heisenbergToyHamiltonian A : ManyBodyOp Λ).mulVec (neelStateOf A)) =
       - (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
           ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) / 2) := by
-  unfold neelStateOf dotProduct
-  rw [Finset.sum_eq_single (neelConfigOf A)]
-  · simp only [Pi.star_apply, basisVec_self, star_one, one_mul]
-    rw [Matrix.mulVec, dotProduct]
-    rw [Finset.sum_eq_single (neelConfigOf A)]
-    · rw [basisVec_self, mul_one]
-      exact heisenbergToyHamiltonian_apply_diag_neel A
-    · intros τ _ hτne
-      rw [basisVec_of_ne hτne]
-      simp
-    · intro h
-      exact (h (Finset.mem_univ _)).elim
-  · intros τ _ hτne
-    simp [basisVec_of_ne hτne]
-  · intro h
-    exact (h (Finset.mem_univ _)).elim
+  unfold neelStateOf
+  rw [basisVec_expectation_eq_diagonal]
+  exact heisenbergToyHamiltonian_apply_diag_neel A
 
 /-- `<basisVec (fun _ => 0) | Φ_Néel> = 0` when `|¬A| > 0`. Spin-`1/2`
 analog of γ-4 step 133: the all-up basis state is orthogonal to the

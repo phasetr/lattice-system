@@ -905,10 +905,9 @@ theorem neelStateOfS_totalSpinSSquared_expectation_card_Lambda
   rw [h]
 
 /-- `<Φ_Néel | Ĥ_toy_S | Φ_Néel> = -|A|·|¬A|·N²/2`. The toy-Hamiltonian
-expectation value on the Néel state. Direct from
-`heisenbergToyHamiltonianS_apply_diag_neel` (the diagonal matrix element)
-and the property that for a basis vector `|σ⟩ = basisVecS σ`:
-`<σ | M | σ> = M(σ, σ)`. -/
+expectation value on the Néel state. Combines the generic basis-vector
+expectation lemma `basisVecS_expectation_eq_diagonal` (γ-4 step 132) with
+`heisenbergToyHamiltonianS_apply_diag_neel`. -/
 theorem neelStateOfS_heisenbergToyHamiltonianS_expectation
     (A : Λ → Bool) (N : ℕ) :
     dotProduct (star (neelStateOfS A N))
@@ -916,23 +915,9 @@ theorem neelStateOfS_heisenbergToyHamiltonianS_expectation
       - (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
           ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
           ((N : ℂ) * (N : ℂ)) / 2) := by
-  -- For basis vectors: <σ|M|σ> = M(σ, σ).
-  unfold neelStateOfS dotProduct
-  rw [Finset.sum_eq_single (neelConfigOfS A N)]
-  · simp only [Pi.star_apply, basisVecS_self, star_one, one_mul]
-    rw [Matrix.mulVec, dotProduct]
-    rw [Finset.sum_eq_single (neelConfigOfS A N)]
-    · rw [basisVecS_self, mul_one]
-      exact heisenbergToyHamiltonianS_apply_diag_neel A N
-    · intros τ _ hτne
-      rw [basisVecS_of_ne hτne]
-      simp
-    · intro h
-      exact (h (Finset.mem_univ _)).elim
-  · intros τ _ hτne
-    simp [basisVecS_of_ne hτne]
-  · intro h
-    exact (h (Finset.mem_univ _)).elim
+  unfold neelStateOfS
+  rw [basisVecS_expectation_eq_diagonal]
+  exact heisenbergToyHamiltonianS_apply_diag_neel A N
 
 /-- `<Φ_⊤ | Φ_Néel> = 0` when `|¬A| > 0`. The all-up state and Néel state
 are orthogonal whenever there is at least one site in `¬A`, since they
