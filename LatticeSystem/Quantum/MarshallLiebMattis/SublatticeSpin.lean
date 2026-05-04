@@ -1070,6 +1070,46 @@ theorem sublatticeSpinHalfOpMinus_apply_im_eq_zero (A : Λ → Bool)
       · simp
     · exact absurd h hA
 
+/-! ## Sublattice ladder annihilates configurations with extreme A-values -/
+
+/-- `Ŝ_A^+ · basisVec σ = 0` when `σ x = 0` for all `x ∈ A`. -/
+theorem sublatticeSpinHalfOpPlus_mulVec_basisVec_zero_on (A : Λ → Bool)
+    {σ : Λ → Fin 2} (hσ : ∀ x, A x = true → σ x = 0) :
+    (sublatticeSpinHalfOpPlus A).mulVec (basisVec σ) = 0 := by
+  unfold sublatticeSpinHalfOpPlus
+  rw [Matrix.sum_mulVec]
+  apply Finset.sum_eq_zero
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    rw [onSite_spinHalfOpPlus_mulVec_basisVec]
+    rw [if_neg]
+    rw [hσ x hA]
+    decide
+  · cases h : A x
+    · rw [if_neg, Matrix.zero_mulVec]
+      simp
+    · exact absurd h hA
+
+/-- `Ŝ_A^- · basisVec σ = 0` when `σ x = 1` for all `x ∈ A`. -/
+theorem sublatticeSpinHalfOpMinus_mulVec_basisVec_one_on (A : Λ → Bool)
+    {σ : Λ → Fin 2} (hσ : ∀ x, A x = true → σ x = 1) :
+    (sublatticeSpinHalfOpMinus A).mulVec (basisVec σ) = 0 := by
+  unfold sublatticeSpinHalfOpMinus
+  rw [Matrix.sum_mulVec]
+  apply Finset.sum_eq_zero
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    rw [onSite_spinHalfOpMinus_mulVec_basisVec]
+    rw [if_neg]
+    rw [hσ x hA]
+    decide
+  · cases h : A x
+    · rw [if_neg, Matrix.zero_mulVec]
+      simp
+    · exact absurd h hA
+
 /-! ## Sublattice ladder adjoint relations -/
 
 /-- `(Ŝ_A^+)† = Ŝ_A^-`: the spin-`1/2` sublattice raising and lowering

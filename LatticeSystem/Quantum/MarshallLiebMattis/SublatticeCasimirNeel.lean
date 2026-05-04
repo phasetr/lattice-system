@@ -258,4 +258,28 @@ theorem totalSpinHalfOp3_mulVec_neelStateOf (A : Λ → Bool) :
   push_cast
   ring_nf
 
+/-! ## Ladder annihilation of the Néel state -/
+
+/-- `Ŝ_A^+ · |Φ_Néel⟩ = 0` (highest weight on A). Spin-`1/2` mirror of γ-4 step 65. -/
+theorem sublatticeSpinHalfOpPlus_mulVec_neelStateOf (A : Λ → Bool) :
+    (sublatticeSpinHalfOpPlus A).mulVec (neelStateOf A) = 0 := by
+  unfold neelStateOf
+  refine sublatticeSpinHalfOpPlus_mulVec_basisVec_zero_on A ?_
+  intro x hAx
+  unfold neelConfigOf
+  rw [if_pos hAx]
+
+/-- `Ŝ_¬A^- · |Φ_Néel⟩ = 0` (lowest weight on ¬A). -/
+theorem sublatticeSpinHalfOpMinus_complement_mulVec_neelStateOf (A : Λ → Bool) :
+    (sublatticeSpinHalfOpMinus (fun x => ! A x)).mulVec (neelStateOf A) = 0 := by
+  unfold neelStateOf
+  refine sublatticeSpinHalfOpMinus_mulVec_basisVec_one_on (fun x => ! A x) ?_
+  intro x hnAx
+  have hAxF : A x = false := by
+    cases h : A x
+    · rfl
+    · simp [h] at hnAx
+  unfold neelConfigOf
+  rw [if_neg (by rw [hAxF]; decide : ¬ (A x = true))]
+
 end LatticeSystem.Quantum
