@@ -6156,6 +6156,17 @@ expanding $(1-n_i)c_j$ vs $c_j(1-n_i)$ and similarly for
 $c_j^\dagger$ closes both via $n_i\,c_j = c_j\,n_i$ (resp.\ for
 $c_j^\dagger$).
 
+\textbf{Multi-mode (JW) hole projection commutes with number
+$\texttt{Commute}\,(c_i\,c_i^\dagger)\,n_j$ and
+$\texttt{Commute}\,n_i\,(c_j\,c_j^\dagger)$ (PR~\#1013)}:
+mixed-form siblings of PR~\#1004, in the file
+\texttt{Fermion/JordanWigner/HoleProjectionCommuteNumber.lean}.
+Direct from $c_i\,c_i^\dagger = 1 - n_i$ (PR~\#996) and
+$\texttt{Commute}\,n_i\,n_j$
+(\texttt{fermionMultiNumber\_commute}): expand
+$(1 - n_i)\,n_j = n_j - n_i\,n_j = n_j - n_j\,n_i = n_j(1 -
+n_i)$.
+
 \textbf{Single-mode ladder-on-hole-projection vanishing
 $c\,(c\,c^\dagger) = 0$ and $(c\,c^\dagger)\,c^\dagger = 0$
 (PR~\#1009)}: in the file

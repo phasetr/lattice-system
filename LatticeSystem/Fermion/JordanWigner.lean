@@ -15,6 +15,7 @@ import LatticeSystem.Fermion.JordanWigner.CreationNumberIdentities
 import LatticeSystem.Fermion.JordanWigner.PartialIsometry
 import LatticeSystem.Fermion.JordanWigner.HoleProjectionsCommute
 import LatticeSystem.Fermion.JordanWigner.HoleProjectionCommuteLadder
+import LatticeSystem.Fermion.JordanWigner.HoleProjectionCommuteNumber
 import LatticeSystem.Fermion.JordanWigner.CDaggerCLadderZero
 import LatticeSystem.Fermion.JordanWigner.Hubbard
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Charges
@@ -55,6 +56,7 @@ is now a thin re-import of five sub-files under
 | `PartialIsometry.lean` | `c_i · c_i† · c_i = c_i`, `c_i† · c_i · c_i† = c_i†` |
 | `HoleProjectionsCommute.lean` | `Commute (c_i · c_i†) (c_j · c_j†)` for any `i, j` |
 | `HoleProjectionCommuteLadder.lean` | `Commute (c_i · c_i†) c_j` and `…c_j†` for `i ≠ j` |
+| `HoleProjectionCommuteNumber.lean` | `Commute (c_i · c_i†) n_j` for any `i, j` |
 | `CDaggerCLadderZero.lean` | `c_i · (c_i · c_i†) = 0`, `(c_i · c_i†) · c_i† = 0` |
 | `Hubbard.lean` | spinful wrappers, on-graph Hubbard, 1D open / periodic chain Gibbs |
 | `Hubbard/Charges.lean` | `N_↑`, `N_↓`, `S^z_tot`, vacuum eigenstates, cross-spin commutes |
