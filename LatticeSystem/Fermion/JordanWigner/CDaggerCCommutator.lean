@@ -37,10 +37,9 @@ theorem fermionMultiAnnihilation_commutator_fermionMultiCreation_self
   have hac' : fermionMultiAnnihilation N i * fermionMultiCreation N i =
       1 - fermionMultiCreation N i * fermionMultiAnnihilation N i :=
     eq_sub_of_add_eq hac
-  -- n_i = c_i† · c_i (definitional).
-  have hn : fermionMultiNumber N i =
-      fermionMultiCreation N i * fermionMultiAnnihilation N i := rfl
-  rw [hac', ← hn]
+  -- `n_i = c_i† · c_i` is definitional (`fermionMultiNumber`).
+  rw [hac', show fermionMultiCreation N i * fermionMultiAnnihilation N i =
+      fermionMultiNumber N i from rfl]
   -- Goal: (1 - n_i) - n_i = 1 - 2 • n_i.
   rw [show (2 : ℂ) • fermionMultiNumber N i =
       fermionMultiNumber N i + fermionMultiNumber N i from by
