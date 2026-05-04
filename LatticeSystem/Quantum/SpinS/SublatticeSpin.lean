@@ -978,6 +978,24 @@ theorem sublatticeSpinSOpPlus_sub_sublatticeSpinSOpMinus (A : Λ → Bool) :
   rw [add_smul]
   abel
 
+/-! ## Sublattice axis squared as conjTranspose product -/
+
+/-- `(Ŝ_A^(1))² = (Ŝ_A^(1))ᴴ * Ŝ_A^(1)`. Direct from Hermiticity. -/
+theorem sublatticeSpinSOp1_sq_eq_conjTranspose_mul (A : Λ → Bool) :
+    sublatticeSpinSOp1 N A * sublatticeSpinSOp1 N A =
+      (sublatticeSpinSOp1 N A).conjTranspose * sublatticeSpinSOp1 N A := by
+  rw [(sublatticeSpinSOp1_isHermitian N A).eq]
+
+theorem sublatticeSpinSOp2_sq_eq_conjTranspose_mul (A : Λ → Bool) :
+    sublatticeSpinSOp2 N A * sublatticeSpinSOp2 N A =
+      (sublatticeSpinSOp2 N A).conjTranspose * sublatticeSpinSOp2 N A := by
+  rw [(sublatticeSpinSOp2_isHermitian N A).eq]
+
+theorem sublatticeSpinSOp3_sq_eq_conjTranspose_mul (A : Λ → Bool) :
+    sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N A =
+      (sublatticeSpinSOp3 N A).conjTranspose * sublatticeSpinSOp3 N A := by
+  rw [(sublatticeSpinSOp3_isHermitian N A).eq]
+
 /-! ## Sublattice ladder matrix element realness -/
 
 /-- The sublattice raising operator has real matrix elements:
