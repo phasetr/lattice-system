@@ -13,6 +13,7 @@ import LatticeSystem.Fermion.JordanWigner.ProjectionsCommute
 import LatticeSystem.Fermion.JordanWigner.AnnihilationNumberIdentities
 import LatticeSystem.Fermion.JordanWigner.CreationNumberIdentities
 import LatticeSystem.Fermion.JordanWigner.PartialIsometry
+import LatticeSystem.Fermion.JordanWigner.HoleProjectionsCommute
 import LatticeSystem.Fermion.JordanWigner.Hubbard
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Charges
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Graph
@@ -45,6 +46,7 @@ is now a thin re-import of five sub-files under
 | `AnnihilationNumberIdentities.lean` | `n_i · c_i = 0`, `c_i · n_i = c_i` |
 | `CreationNumberIdentities.lean` | `c_i† · n_i = 0`, `n_i · c_i† = c_i†` |
 | `PartialIsometry.lean` | `c_i · c_i† · c_i = c_i`, `c_i† · c_i · c_i† = c_i†` |
+| `HoleProjectionsCommute.lean` | `Commute (c_i · c_i†) (c_j · c_j†)` for any `i, j` |
 | `Hubbard.lean` | spinful wrappers, on-graph Hubbard, 1D open / periodic chain Gibbs |
 | `Hubbard/Charges.lean` | `N_↑`, `N_↓`, `S^z_tot`, vacuum eigenstates, cross-spin commutes |
 | `Hubbard/Graph.lean` | graph-centric wrappers, chain/cycle Hamiltonians + Gibbs families |

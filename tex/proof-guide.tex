@@ -6085,6 +6085,18 @@ $c_i^\dagger c_i\,c_i^\dagger = (c_i^\dagger c_i)\,c_i^\dagger
 $S\,S^*S = S$ / $S^*S\,S^* = S^*$ partial-isometry identities
 of operator algebra, lifted to JW multi-mode at the same site.
 
+\textbf{Multi-mode (JW) hole projections commute
+$\texttt{Commute}\,(c_i\,c_i^\dagger)\,(c_j\,c_j^\dagger)$
+(PR~\#1004)}: in the file
+\texttt{Fermion/JordanWigner/HoleProjectionsCommute.lean}. From
+$c_i\,c_i^\dagger = 1 - n_i$ (PR~\#996) and
+$\texttt{Commute}\,n_i\,n_j$
+(\texttt{fermionMultiNumber\_commute},
+\texttt{Fermion/JordanWigner/CAR/SameSite.lean}), expanding
+$(1 - n_i)(1 - n_j) = 1 - n_j - n_i + n_i\,n_j$ and the
+opposite ordering gives $1 - n_i - n_j + n_j\,n_i$; the two
+agree by $n_i\,n_j = n_j\,n_i$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
