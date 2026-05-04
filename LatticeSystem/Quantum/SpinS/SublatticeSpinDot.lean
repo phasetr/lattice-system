@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.SublatticeSpin
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
+import LatticeSystem.Quantum.SpinS.SpinSDotAllAlignedZero
 
 /-!
 # Spin-`S` cross-sublattice spin dot product (Tasaki §2.5 Theorem 2.3 prep)
@@ -104,6 +105,98 @@ theorem sublatticeSpinSquaredS_eq_sum_dot (A : Λ → Bool) :
       ∑ x : Λ, ∑ y : Λ,
         if A x ∧ A y then spinSDot x y N else 0 :=
   sublatticeSpinSDot_eq_sum_sum N A A
+
+/-! ## Casimir eigenvalue on the all-up state -/
+
+/-- `(Ŝ_A)² · |σ_⊤⟩ = ((|A|·N/2)·(|A|·N/2+1)) · |σ_⊤⟩` for any
+sublattice indicator `A`. The all-up basis state is an eigenvector
+of the `A`-sublattice Casimir at the maximum-spin value `J_A = |A|·N/2`,
+which is the highest-weight Casimir of the `(|A|·N/2)`-irrep of SU(2)
+on the `A`-subsystem.
+
+Proof: from the bilinear expansion
+`(Ŝ_A)² = Σ_{x,y ∈ A} Ŝ_x · Ŝ_y`, the `|A|` diagonal terms contribute
+`N(N+2)/4` each (`spinSDot_self`) and the `|A|² − |A|` off-diagonal
+terms contribute `N²/4` each (`spinSDot_mulVec_allAlignedStateS_zero_of_ne`).
+Algebraic simplification:
+`|A|·N(N+2)/4 + (|A|²-|A|)·N²/4 = (|A|·N/2)·(|A|·N/2 + 1)`. -/
+theorem sublatticeSpinSquaredS_mulVec_allAlignedStateS_zero (A : Λ → Bool) :
+    (sublatticeSpinSquaredS N A).mulVec
+        (allAlignedStateS Λ N (0 : Fin (N + 1))) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2) *
+          (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+              ((N : ℂ) / 2) + 1)) •
+        allAlignedStateS Λ N (0 : Fin (N + 1)) := by
+  rw [sublatticeSpinSquaredS_eq_sum_dot]
+  rw [Matrix.sum_mulVec]
+  simp_rw [Matrix.sum_mulVec]
+  -- Each term `(if A x ∧ A y then spinSDot x y N else 0) · |⊤⟩` is a
+  -- scalar multiple of `|⊤⟩`. Diagonal x = y gives `N(N+2)/4`,
+  -- off-diagonal gives `N²/4`.
+  have hterm : ∀ x y : Λ, (if A x ∧ A y then (spinSDot x y N) else 0).mulVec
+        (allAlignedStateS Λ N (0 : Fin (N + 1))) =
+      (if A x ∧ A y then
+        (if x = y then ((N : ℂ) * (N + 2) / 4) else ((N : ℂ) * (N : ℂ) / 4))
+        else 0) •
+        allAlignedStateS Λ N (0 : Fin (N + 1)) := by
+    intro x y
+    by_cases hAA : A x ∧ A y
+    · rw [if_pos hAA, if_pos hAA]
+      by_cases hxy : x = y
+      · subst hxy
+        rw [if_pos rfl, spinSDot_self]
+        rw [Matrix.smul_mulVec, Matrix.one_mulVec]
+      · rw [if_neg hxy]
+        exact spinSDot_mulVec_allAlignedStateS_zero_of_ne hxy
+    · rw [if_neg hAA, if_neg hAA, Matrix.zero_mulVec, zero_smul]
+  simp_rw [hterm, ← Finset.sum_smul]
+  congr 1
+  -- Helper: ∑_x (if A x then C else 0) = |A| * C.
+  have hindicator_sum : ∀ (C : ℂ),
+      (∑ x : Λ, if A x = true then C else 0) =
+        ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) * C := by
+    intro C
+    rw [← Finset.sum_filter]
+    rw [Finset.sum_const, nsmul_eq_mul]
+  -- Compute the double sum: |A| diagonal at N(N+2)/4 + (|A|² - |A|) off-diagonal at N²/4.
+  have hinner : ∀ x : Λ, (∑ y : Λ,
+        if A x ∧ A y then
+          (if x = y then ((N : ℂ) * (N + 2) / 4) else ((N : ℂ) * (N : ℂ) / 4))
+          else 0) =
+      if A x = true then
+        (((Finset.univ.filter (fun z : Λ => A z = true)).card : ℂ) *
+            ((N : ℂ) * (N : ℂ) / 4) + ((N : ℂ) / 2))
+      else 0 := by
+    intro x
+    by_cases hAx : A x = true
+    · rw [if_pos hAx]
+      have hsplit : ∀ y : Λ,
+          (if A x ∧ A y then
+            (if x = y then ((N : ℂ) * (N + 2) / 4) else ((N : ℂ) * (N : ℂ) / 4))
+            else 0) =
+            (if A y = true then ((N : ℂ) * (N : ℂ) / 4) else 0) +
+              (if x = y then ((N : ℂ) / 2) else 0) := by
+        intro y
+        by_cases hAy : A y = true
+        · rw [if_pos ⟨hAx, hAy⟩, if_pos hAy]
+          by_cases hxy : x = y
+          · simp [hxy]; ring
+          · simp [hxy]
+        · rw [if_neg (fun ⟨_, h⟩ => hAy h), if_neg hAy]
+          have : x ≠ y := fun heq => hAy (heq ▸ hAx)
+          simp [this]
+      simp_rw [hsplit, Finset.sum_add_distrib]
+      rw [hindicator_sum,
+          Finset.sum_ite_eq Finset.univ x (fun _ => ((N : ℂ) / 2))]
+      rw [if_pos (Finset.mem_univ _)]
+    · rw [if_neg hAx]
+      refine Finset.sum_eq_zero fun y _ => ?_
+      rw [if_neg]
+      rintro ⟨h, _⟩; exact hAx h
+  simp_rw [hinner]
+  rw [hindicator_sum]
+  ring
 
 /-! ## Hermiticity of `Ŝ_A · Ŝ_¬A` -/
 
