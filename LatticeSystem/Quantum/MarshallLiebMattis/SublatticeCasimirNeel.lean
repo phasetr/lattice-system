@@ -334,6 +334,53 @@ theorem sublatticeSpinHalfOp3_mulVec_neelStateOf (A : Λ → Bool) :
   rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
   ring
 
+/-- `Ŝ_¬A^(3) · |Φ_Néel⟩ = -(|¬A|/2) · |Φ_Néel⟩`. The complement sublattice
+z-axis acts as `-|¬A|/2` on the spin-`1/2` Néel state (lowest weight on
+¬A: `neelConfigOf A x = 1` for `x ∉ A`, contributing `-1/2`). Spin-`1/2`
+mirror of γ-4 step 74 (`sublatticeSpinSOp3_complement_mulVec_neelStateOfS`). -/
+theorem sublatticeSpinHalfOp3_complement_mulVec_neelStateOf (A : Λ → Bool) :
+    (sublatticeSpinHalfOp3 (fun x => ! A x)).mulVec (neelStateOf A) =
+      (-(((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) / 2)) •
+        neelStateOf A := by
+  unfold sublatticeSpinHalfOp3 neelStateOf
+  rw [Matrix.sum_mulVec]
+  rw [show (∑ x : Λ, (if (! A x) then onSite x spinHalfOp3 else 0 : ManyBodyOp Λ).mulVec
+        (basisVec (neelConfigOf A))) =
+      ∑ x : Λ, (if (! A x) then -((1 : ℂ) / 2) else 0) •
+        basisVec (neelConfigOf A) from by
+    refine Finset.sum_congr rfl fun x _ => ?_
+    by_cases hA : (! A x) = true
+    · rw [if_pos hA, if_pos hA]
+      rw [onSite_spinHalfOp3_mulVec_basisVec]
+      have hAxF : A x = false := by
+        cases h : A x
+        · rfl
+        · simp [h] at hA
+      have hσx : neelConfigOf A x = 1 := by
+        unfold neelConfigOf
+        rw [if_neg (by rw [hAxF]; decide : ¬ A x = true)]
+      rw [hσx]
+      rfl
+    · cases h : (! A x)
+      · rw [if_neg, if_neg]
+        · rw [Matrix.zero_mulVec, zero_smul]
+        · simp
+        · simp
+      · exact absurd h hA]
+  rw [← Finset.sum_smul]
+  congr 1
+  have hrw : ∀ x : Λ, (if (! A x) = true then -((1 : ℂ) / 2) else 0) =
+      -(if (! A x) = true then ((1 : ℂ) / 2) else 0) := by
+    intro x
+    by_cases h : (! A x) = true
+    · rw [if_pos h, if_pos h]
+    · rw [if_neg h, if_neg h, neg_zero]
+  rw [Finset.sum_congr rfl (fun x _ => hrw x)]
+  rw [Finset.sum_neg_distrib]
+  congr 1
+  rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
+  ring
+
 /-! ## Per-pair `spinHalfDot` diagonal at the Néel configuration -/
 
 /-- For a cross-sublattice pair `x ∈ A`, `y ∈ ¬A`, the spin-`1/2`
