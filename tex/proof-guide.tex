@@ -6182,6 +6182,22 @@ this is the full four-way breakdown of left/right
 multiplication of the multi-mode hole projection by the
 same-site ladder operators.
 
+\textbf{Hubbard per-site 4-state partition of identity
+$p_\emptyset(i) + p_\uparrow(i) + p_\downarrow(i) +
+p_\Uparrow(i) = 1$ (PR~\#1011)}: in the file
+\texttt{Fermion/JordanWigner/Hubbard/SitePartitionIdentity.lean}.
+The four occupation projections
+$p_\emptyset(i) := (1 - n_\uparrow(i))(1 - n_\downarrow(i))$,
+$p_\uparrow(i) := n_\uparrow(i)(1 - n_\downarrow(i))$,
+$p_\downarrow(i) := (1 - n_\uparrow(i)) n_\downarrow(i)$,
+$p_\Uparrow(i) := n_\uparrow(i) n_\downarrow(i)$
+sum to the identity by distributing
+$((1 - n_\uparrow) + n_\uparrow)((1 - n_\downarrow) +
+n_\downarrow) = 1\cdot 1 = 1$. Standard 4-state per-site
+decomposition underlying the Hubbard Hilbert-space tensor
+structure $\mathbb{C}^4 = |0,0\rangle \oplus |1,0\rangle
+\oplus |0,1\rangle \oplus |1,1\rangle$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
