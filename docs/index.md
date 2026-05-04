@@ -1140,6 +1140,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionMultiAnnihilation_mul_fermionMultiCreation_sq` / `fermionMultiAnnihilation_mul_fermionMultiCreation_pow_succ` | `(c_i · c_i†)² = c_i · c_i†`; `(c_i · c_i†)^(k+1) = c_i · c_i†` (multi-mode JW hole-projection idempotency + power, mirror of PRs #974 and #992) | `Fermion/JordanWigner/CDaggerCProjection.lean` (PR #997) |
 | `fermionMultiAnnihilation_mul_fermionMultiCreation_isHermitian` | `(c_i · c_i†)ᴴ = c_i · c_i†` (multi-mode JW hole projection Hermitian, mirror of PR #980) | `Fermion/JordanWigner/CDaggerCHermitian.lean` (PR #998) |
 | `fermionMultiNumber_mul_fermionMultiAnnihilation_mul_fermionMultiCreation_eq_zero` / `fermionMultiAnnihilation_mul_fermionMultiCreation_mul_fermionMultiNumber_eq_zero` | `n_i · (c_i · c_i†) = 0`; `(c_i · c_i†) · n_i = 0` (multi-mode JW orthogonal projections, mirror of PR #976) | `Fermion/JordanWigner/ProjectionsOrthogonal.lean` (PR #999) |
+| `fermionMultiNumber_commute_fermionMultiAnnihilation_mul_fermionMultiCreation` | `Commute n_i (c_i · c_i†)` (multi-mode JW projections commute, mirror of PR #978) | `Fermion/JordanWigner/ProjectionsCommute.lean` (PR #1000) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 
