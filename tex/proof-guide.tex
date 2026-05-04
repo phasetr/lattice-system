@@ -5966,11 +5966,10 @@ inductions in $k$ from the squared cases
 $n^2 = n$ (\texttt{fermionNumber\_sq}) and
 $(c\,c^\dagger)^2 = c\,c^\dagger$ (PR~\#974), with the step
 $n^{k+2} = n^{k+1}\cdot n = n\cdot n = n$ (and similarly for
-$c\,c^\dagger$). This establishes the polynomial functional
-calculus on the two rank-one projectors: any non-zero polynomial
-in $n$ collapses to a linear combination of $1$ and $n$, and
-similarly for $c\,c^\dagger$. Useful for matrix-exponential
-expansions and spectral computations.
+$c\,c^\dagger$). These power identities are the building blocks
+for collapsing arbitrary positive-degree polynomials in $n$ (or
+$c\,c^\dagger$) into the basis $\{1, n\}$ (resp.\ $\{1,
+c\,c^\dagger\}$); that linear collapse itself is not proved here.
 
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest

@@ -15,11 +15,10 @@ Both are immediate inductions starting from the squared identities:
 - `(c · c†)² = c · c†`
   (`fermionAnnihilation_mul_fermionCreation_sq`, PR #974).
 
-The result is the polynomial functional calculus on each of the
-two rank-one projectors: any non-zero polynomial in `n` collapses
-to a linear combination of `1` and `n` (constant plus rank-one
-shift), and similarly for `c · c†`. Useful for spectral
-computations and matrix-exponential expansions.
+These power identities are the building blocks for collapsing
+arbitrary positive-degree polynomials in `n` (or `c · c†`) into
+the basis `{1, n}` (resp. `{1, c · c†}`); that linear collapse
+itself is not proved here.
 
 Tracked as part of Phase 2 fermion infrastructure (Issue #412).
 -/
