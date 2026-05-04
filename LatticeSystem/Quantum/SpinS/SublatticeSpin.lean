@@ -523,6 +523,52 @@ theorem sublatticeSpinSquaredS_commute_sublatticeSpinSOp3 (A : Λ → Bool) :
     Commute (sublatticeSpinSquaredS N A) (sublatticeSpinSOp3 N A) :=
   sub_eq_zero.mp (sublatticeSpinSquaredS_commutator_sublatticeSpinSOp3 N A)
 
+/-! ## Sublattice Casimir commutes with `Ŝ_¬A^(α)` (spin-`S`) -/
+
+/-- `Commute (Ŝ_A)² Ŝ_¬A^(1)` (spin-`S`). Each axis-`β` square
+`(Ŝ_A^(β))²` commutes with `Ŝ_¬A^(1)` by `Commute.mul_left`
+applied to the mixed-axes cross-commute. -/
+theorem sublatticeSpinSquaredS_commute_sublatticeSpinSOp1_complement
+    (A : Λ → Bool) :
+    Commute (sublatticeSpinSquaredS N A)
+            (sublatticeSpinSOp1 N (fun x => ! A x)) := by
+  unfold sublatticeSpinSquaredS
+  refine Commute.add_left (Commute.add_left ?_ ?_) ?_
+  · exact (sublatticeSpinSOp1_cross_commute N A).mul_left
+      (sublatticeSpinSOp1_cross_commute N A)
+  · exact (sublatticeSpinSOp2_cross_commute_op1 N A).mul_left
+      (sublatticeSpinSOp2_cross_commute_op1 N A)
+  · exact (sublatticeSpinSOp3_cross_commute_op1 N A).mul_left
+      (sublatticeSpinSOp3_cross_commute_op1 N A)
+
+/-- `Commute (Ŝ_A)² Ŝ_¬A^(2)`. -/
+theorem sublatticeSpinSquaredS_commute_sublatticeSpinSOp2_complement
+    (A : Λ → Bool) :
+    Commute (sublatticeSpinSquaredS N A)
+            (sublatticeSpinSOp2 N (fun x => ! A x)) := by
+  unfold sublatticeSpinSquaredS
+  refine Commute.add_left (Commute.add_left ?_ ?_) ?_
+  · exact (sublatticeSpinSOp1_cross_commute_op2 N A).mul_left
+      (sublatticeSpinSOp1_cross_commute_op2 N A)
+  · exact (sublatticeSpinSOp2_cross_commute N A).mul_left
+      (sublatticeSpinSOp2_cross_commute N A)
+  · exact (sublatticeSpinSOp3_cross_commute_op2 N A).mul_left
+      (sublatticeSpinSOp3_cross_commute_op2 N A)
+
+/-- `Commute (Ŝ_A)² Ŝ_¬A^(3)`. -/
+theorem sublatticeSpinSquaredS_commute_sublatticeSpinSOp3_complement
+    (A : Λ → Bool) :
+    Commute (sublatticeSpinSquaredS N A)
+            (sublatticeSpinSOp3 N (fun x => ! A x)) := by
+  unfold sublatticeSpinSquaredS
+  refine Commute.add_left (Commute.add_left ?_ ?_) ?_
+  · exact (sublatticeSpinSOp1_cross_commute_op3 N A).mul_left
+      (sublatticeSpinSOp1_cross_commute_op3 N A)
+  · exact (sublatticeSpinSOp2_cross_commute_op3 N A).mul_left
+      (sublatticeSpinSOp2_cross_commute_op3 N A)
+  · exact (sublatticeSpinSOp3_cross_commute N A).mul_left
+      (sublatticeSpinSOp3_cross_commute N A)
+
 /-- `Commute (Ŝ_A)² (Ŝ_¬A)²` for spin-`S`. Each pairwise
 component `Commute ((Ŝ_A^(α))²) ((Ŝ_¬A^(β))²)` follows from the
 mixed-axes cross-commute by chaining `Commute.mul_left` /
