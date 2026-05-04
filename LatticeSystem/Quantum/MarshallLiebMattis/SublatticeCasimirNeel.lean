@@ -647,6 +647,24 @@ theorem neelStateOf_sublattice3_cross_complement3_expectation (A : Λ → Bool) 
   rw [dotProduct_smul]
   rw [neelStateOf_inner_self, smul_eq_mul, mul_one]
 
+/-- `<Φ_Néel | Ŝ_A^+ · Ŝ_¬A^+ | Φ_Néel> = 0`. Spin-`1/2` mirror of γ-4 step 120. -/
+theorem neelStateOf_sublattice_plus_complement_plus_expectation (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        ((sublatticeSpinHalfOpPlus A *
+            sublatticeSpinHalfOpPlus (fun x => ! A x)).mulVec
+          (neelStateOf A)) = 0 := by
+  rw [sublatticeSpinHalfOpPlus_complement_plus_mulVec_neelStateOf]
+  exact dotProduct_zero _
+
+/-- `<Φ_Néel | Ŝ_A^- · Ŝ_¬A^- | Φ_Néel> = 0`. Spin-`1/2` mirror of γ-4 step 120. -/
+theorem neelStateOf_sublattice_minus_complement_minus_expectation (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        ((sublatticeSpinHalfOpMinus A *
+            sublatticeSpinHalfOpMinus (fun x => ! A x)).mulVec
+          (neelStateOf A)) = 0 := by
+  rw [sublatticeSpinHalfOpMinus_complement_minus_mulVec_neelStateOf]
+  exact dotProduct_zero _
+
 /-- `<Φ_Néel | Ŝ_A^+ · Ŝ_¬A^- | Φ_Néel> = 0`. Spin-`1/2` mirror of γ-4 step 118:
 trivial via Ŝ_¬A^- annihilation. -/
 theorem neelStateOf_sublattice_plus_complement_minus_expectation
