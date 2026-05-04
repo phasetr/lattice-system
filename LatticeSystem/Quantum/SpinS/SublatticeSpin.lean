@@ -870,4 +870,41 @@ theorem totalSpinSOp3_commutator_sublatticeSpinSOpMinus (A : Λ → Bool) :
         sublatticeSpinSOpMinus N A * sublatticeSpinSOp3 N A from by abel]
   exact h_self
 
+/-! ## Sublattice ladder operators shift the magnetization subspace -/
+
+/-- `Ŝ_A^- · v ∈ magSubspaceS Λ N (M − 1)` for `v ∈ magSubspaceS Λ N M`.
+The sublattice lowering operator shifts the (total) magnetisation by `-1`. -/
+theorem sublatticeSpinSOpMinus_mulVec_mem_magSubspaceS_of_mem
+    (A : Λ → Bool) {M : ℂ} {v : (Λ → Fin (N + 1)) → ℂ}
+    (hv : v ∈ magSubspaceS Λ N M) :
+    (sublatticeSpinSOpMinus N A).mulVec v ∈ magSubspaceS Λ N (M - 1) := by
+  rw [mem_magSubspaceS_iff] at hv ⊢
+  have h := totalSpinSOp3_commutator_sublatticeSpinSOpMinus N A
+  have hcomm : totalSpinSOp3 Λ N * sublatticeSpinSOpMinus N A =
+      sublatticeSpinSOpMinus N A * totalSpinSOp3 Λ N - sublatticeSpinSOpMinus N A := by
+    have hadd : totalSpinSOp3 Λ N * sublatticeSpinSOpMinus N A =
+        (totalSpinSOp3 Λ N * sublatticeSpinSOpMinus N A -
+          sublatticeSpinSOpMinus N A * totalSpinSOp3 Λ N) +
+        sublatticeSpinSOpMinus N A * totalSpinSOp3 Λ N := by abel
+    rw [hadd, h]; abel
+  rw [Matrix.mulVec_mulVec, hcomm, Matrix.sub_mulVec, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul, sub_smul, one_smul]
+
+/-- `Ŝ_A^+ · v ∈ magSubspaceS Λ N (M + 1)` for `v ∈ magSubspaceS Λ N M`. -/
+theorem sublatticeSpinSOpPlus_mulVec_mem_magSubspaceS_of_mem
+    (A : Λ → Bool) {M : ℂ} {v : (Λ → Fin (N + 1)) → ℂ}
+    (hv : v ∈ magSubspaceS Λ N M) :
+    (sublatticeSpinSOpPlus N A).mulVec v ∈ magSubspaceS Λ N (M + 1) := by
+  rw [mem_magSubspaceS_iff] at hv ⊢
+  have h := totalSpinSOp3_commutator_sublatticeSpinSOpPlus N A
+  have hcomm : totalSpinSOp3 Λ N * sublatticeSpinSOpPlus N A =
+      sublatticeSpinSOpPlus N A * totalSpinSOp3 Λ N + sublatticeSpinSOpPlus N A := by
+    have hadd : totalSpinSOp3 Λ N * sublatticeSpinSOpPlus N A =
+        (totalSpinSOp3 Λ N * sublatticeSpinSOpPlus N A -
+          sublatticeSpinSOpPlus N A * totalSpinSOp3 Λ N) +
+        sublatticeSpinSOpPlus N A * totalSpinSOp3 Λ N := by abel
+    rw [hadd, h]; abel
+  rw [Matrix.mulVec_mulVec, hcomm, Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul, add_smul, one_smul]
+
 end LatticeSystem.Quantum
