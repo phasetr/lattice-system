@@ -997,6 +997,27 @@ theorem allAlignedStateS_zero_heisenbergToyHamiltonianS_expectation
   rw [dotProduct_smul, allAlignedStateS_inner_self]
   rw [smul_eq_mul, mul_one]
 
+/-- **Variational spin gap**:
+`<Φ_⊤|Ĥ_toy_S|Φ_⊤> - <Φ_Néel|Ĥ_toy_S|Φ_Néel> = |A|·|¬A|·N²`.
+
+The all-up state has positive toy Hamiltonian expectation `+|A|·|¬A|·N²/2`,
+the Néel state has negative `-|A|·|¬A|·N²/2`. Their difference is
+strictly positive when both sublattices are non-empty, demonstrating
+the variational separation underpinning Tasaki §2.5 Theorem 2.3. -/
+theorem heisenbergToyHamiltonianS_variational_gap
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (allAlignedStateS Λ N (0 : Fin (N + 1))))
+        ((heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec
+          (allAlignedStateS Λ N (0 : Fin (N + 1)))) -
+      dotProduct (star (neelStateOfS A N))
+        ((heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec (neelStateOfS A N)) =
+      ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+        ((N : ℂ) * (N : ℂ)) := by
+  rw [allAlignedStateS_zero_heisenbergToyHamiltonianS_expectation,
+    neelStateOfS_heisenbergToyHamiltonianS_expectation]
+  ring
+
 /-- `<Φ_⊥ | Ĥ_toy_S | Φ_⊥> = +|A|·|¬A|·N²/2`. The all-down state's toy
 Hamiltonian expectation. Same eigenvalue as the all-up state by the
 symmetry of the toy Hamiltonian. -/
