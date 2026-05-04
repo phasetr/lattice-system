@@ -6281,6 +6281,20 @@ $j.\mathrm{val}$: the $\_lt$ form covers $i < j$ directly, and
 $j < i$ follows by swapping $i, j$ and applying \texttt{add\_comm}.
 Foundational for upstream Pauli-analog cross-site lemmas.
 
+\textbf{Cross-site Pauli-X-analog anticommute
+$\{c_i + c_i^\dagger, c_j + c_j^\dagger\} = 0$ for $i \neq j$
+(PR~\#1031)}: in the file
+\texttt{Fermion/JordanWigner/CPlusCDaggerAnticomm.lean}. Direct
+expansion using the four `\_of\_ne` cross-site CAR identities
+(PR~\#1030):
+$\{c_i + c_i^\dagger, c_j + c_j^\dagger\} = \{c_i, c_j\} +
+\{c_i, c_j^\dagger\} + \{c_i^\dagger, c_j\} +
+\{c_i^\dagger, c_j^\dagger\} = 0$. JW-string fingerprint: while
+on-site $\sigma_x$ operators commute, the JW-dressed
+combinations $c_i + c_i^\dagger = \mathrm{jwString}_i \cdot
+\sigma_x_i$ pick up the JW string sign and anticommute across
+sites.
+
 \textbf{Multi-mode (JW) ladder-on-hole-projection vanishing
 $c_i\,(c_i\,c_i^\dagger) = 0$ and $(c_i\,c_i^\dagger)\,
 c_i^\dagger = 0$ (PR~\#1010)}: multi-mode mirror of PR~\#1009,
