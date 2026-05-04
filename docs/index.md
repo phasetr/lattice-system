@@ -1129,6 +1129,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionCreation_mul_fermionNumber_eq_zero` / `fermionNumber_mul_fermionCreation_eq_fermionCreation` | `c† · n = 0`; `n · c† = c†` | `Fermion/CreationNumberIdentities.lean` (PR #984) |
 | `fermionAnnihilation_mul_fermionCreation_mul_fermionAnnihilation` / `fermionCreation_mul_fermionAnnihilation_mul_fermionCreation` | `c · c† · c = c`; `c† · c · c† = c†` (partial-isometry relations) | `Fermion/PartialIsometry.lean` (PR #986) |
 | `fermionNumber_commutator_fermionAnnihilation` / `fermionNumber_commutator_fermionCreation` | `[n, c] = −c`; `[n, c†] = c†` (ladder commutators) | `Fermion/NumberLadderCommutators.lean` (PR #988) |
+| `fermionAnnihilation_commutator_fermionCreation` | `[c, c†] = 1 − 2 · n` (fermion analogue of bosonic `[a, a†] = 1`; ±1 on basis states) | `Fermion/CCDaggerCommutator.lean` (PR #989) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 

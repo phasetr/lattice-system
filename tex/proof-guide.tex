@@ -5919,6 +5919,19 @@ bosonic number-ladder commutators $[N,a] = -a$, $[N,a^\dagger] = a^\dagger$,
 expressing that the adjoint action of $n$ (commutation with $n$)
 shifts the fermion number of $c$ down by one and $c^\dagger$ up by one.
 
+\textbf{$c$--$c^\dagger$ commutator $[c, c^\dagger] = 1 - 2\,n$
+(PR~\#989)}: in the file
+\texttt{Fermion/CCDaggerCommutator.lean}.
+$[c, c^\dagger] = c\,c^\dagger - c^\dagger c = (1 - n) - n = 1 - 2n$
+via PR~\#963 ($c\,c^\dagger = 1 - n$) and
+\texttt{fermionNumber\_eq\_creation\_mul\_annihilation}
+($c^\dagger c = n$). Together with the anticommutator
+$\{c, c^\dagger\} = 1$ (\texttt{fermionAnticomm\_self}) this encodes
+the algebraic difference between fermions and bosons: the bosonic
+commutator $[a, a^\dagger] = 1$ is number-independent, while the
+fermion commutator $1 - 2n$ takes value $+1$ on the vacuum
+($n = 0$) and $-1$ on the occupied state ($n = 1$).
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
