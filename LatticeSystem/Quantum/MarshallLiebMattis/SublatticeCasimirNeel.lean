@@ -794,4 +794,35 @@ theorem sublatticeSpinHalfOpComplementMinus_complement_plus_mulVec_neelStateOf
   congr 1
   ring
 
+/-- `<Φ_Néel | (Ŝ_tot)² | Φ_Néel> = ((|A|-|¬A|)/2)² + |Λ|/2`. Spin-`1/2`
+reformulation of γ-4 step 127 using `|A| + |¬A| = |Λ|`. -/
+theorem neelStateOf_totalSpinHalfSquared_expectation_card_Lambda (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        ((totalSpinHalfSquared Λ).mulVec (neelStateOf A)) =
+      ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) / 2) ^ 2 +
+        (Fintype.card Λ : ℂ) / 2 := by
+  rw [neelStateOf_totalSpinHalfSquared_expectation]
+  congr 1
+  have h : ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) +
+      ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) =
+      (Fintype.card Λ : ℂ) := by
+    have h1 : (Finset.univ.filter (fun x : Λ => A x = true)).card +
+        (Finset.univ.filter (fun x : Λ => (! A x) = true)).card =
+        Finset.univ.card (α := Λ) := by
+      have hfilter_eq : Finset.univ.filter (fun x : Λ => (! A x) = true) =
+          Finset.univ.filter (fun x : Λ => ¬ (A x = true)) := by
+        congr 1
+        funext x
+        by_cases hA : A x = true
+        · simp [hA]
+        · simp [hA]
+      rw [hfilter_eq]
+      exact Finset.card_filter_add_card_filter_not (fun x : Λ => A x = true)
+    have h2 : (Finset.univ.card (α := Λ) : ℂ) = (Fintype.card Λ : ℂ) := by
+      rw [Finset.card_univ]
+    rw [← h2]
+    exact_mod_cast h1
+  rw [h]
+
 end LatticeSystem.Quantum
