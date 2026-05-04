@@ -20,6 +20,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.Graph
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinSymmetry
 import LatticeSystem.Fermion.JordanWigner.Hubbard.AllUpState
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SaturatedFerromagnetism
+import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyProjection
 
 /-!
 # Multi-mode fermion via Jordan–Wigner mapping
@@ -53,6 +54,7 @@ is now a thin re-import of five sub-files under
 | `Hubbard/SpinSymmetry.lean` | U(1)×U(1) charges + S^z_tot commutation with H (Tasaki §9.3.3) |
 | `Hubbard/AllUpState.lean` | all-up state: H_kin eigenvalue, no double occupancy |
 | `Hubbard/SaturatedFerromagnetism.lean` | spin Casimir, Def 11.1, SU(2) algebra |
+| `Hubbard/DoubleOccupancyProjection.lean` | site-`i` `Commute n_↑ n_↓` + idempotent product |
 
 Old `import LatticeSystem.Fermion.JordanWigner` continues to
 work unchanged via this façade. Following the convention from
