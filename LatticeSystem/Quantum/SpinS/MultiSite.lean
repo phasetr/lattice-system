@@ -967,4 +967,27 @@ theorem onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_eq_zero_of_lowering_x
     spinSOpPlus_apply_other N (by omega)]
   ring
 
+/-- For any matrix `M` and basis vector `|σ⟩ = basisVecS σ`:
+`<σ | M | σ> = M σ σ`. The expectation value of a matrix on a basis vector
+equals its diagonal element at that basis. -/
+theorem basisVecS_expectation_eq_diagonal
+    (σ : Λ → Fin (N + 1)) (M : ManyBodyOpS Λ N) :
+    dotProduct (star (basisVecS σ : (Λ → Fin (N + 1)) → ℂ))
+        (M.mulVec (basisVecS σ)) = M σ σ := by
+  unfold dotProduct
+  rw [Finset.sum_eq_single σ]
+  · simp only [Pi.star_apply, basisVecS_self, star_one, one_mul]
+    rw [Matrix.mulVec, dotProduct]
+    rw [Finset.sum_eq_single σ]
+    · rw [basisVecS_self, mul_one]
+    · intros τ _ hτne
+      rw [basisVecS_of_ne hτne]
+      simp
+    · intro h
+      exact (h (Finset.mem_univ _)).elim
+  · intros τ _ hτne
+    simp [basisVecS_of_ne hτne]
+  · intro h
+    exact (h (Finset.mem_univ _)).elim
+
 end LatticeSystem.Quantum
