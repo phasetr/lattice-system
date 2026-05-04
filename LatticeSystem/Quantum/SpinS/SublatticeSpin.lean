@@ -1200,4 +1200,35 @@ theorem sublatticeSpinSOpPlus_mulVec_mem_magSubspaceS_of_mem
   rw [Matrix.mulVec_mulVec, hcomm, Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hv,
     Matrix.mulVec_smul, add_smul, one_smul]
 
+/-! ## Cross-sublattice commute for ladder operators -/
+
+/-- `Ŝ_A^+` commutes with `Ŝ_¬A^+`. Direct from
+`sublatticeSpinSOpGeneric_cross_commute` with `S = T = spinSOpPlus N`. -/
+theorem sublatticeSpinSOpPlus_cross_commute (A : Λ → Bool) :
+    Commute (sublatticeSpinSOpPlus N A)
+      (sublatticeSpinSOpPlus N (fun x => ! A x)) := by
+  unfold sublatticeSpinSOpPlus
+  exact sublatticeSpinSOpGeneric_cross_commute N A (spinSOpPlus N) (spinSOpPlus N)
+
+/-- `Ŝ_A^-` commutes with `Ŝ_¬A^-`. -/
+theorem sublatticeSpinSOpMinus_cross_commute (A : Λ → Bool) :
+    Commute (sublatticeSpinSOpMinus N A)
+      (sublatticeSpinSOpMinus N (fun x => ! A x)) := by
+  unfold sublatticeSpinSOpMinus
+  exact sublatticeSpinSOpGeneric_cross_commute N A (spinSOpMinus N) (spinSOpMinus N)
+
+/-- `Ŝ_A^+` commutes with `Ŝ_¬A^-`. -/
+theorem sublatticeSpinSOpPlus_cross_commute_minus (A : Λ → Bool) :
+    Commute (sublatticeSpinSOpPlus N A)
+      (sublatticeSpinSOpMinus N (fun x => ! A x)) := by
+  unfold sublatticeSpinSOpPlus sublatticeSpinSOpMinus
+  exact sublatticeSpinSOpGeneric_cross_commute N A (spinSOpPlus N) (spinSOpMinus N)
+
+/-- `Ŝ_A^-` commutes with `Ŝ_¬A^+`. -/
+theorem sublatticeSpinSOpMinus_cross_commute_plus (A : Λ → Bool) :
+    Commute (sublatticeSpinSOpMinus N A)
+      (sublatticeSpinSOpPlus N (fun x => ! A x)) := by
+  unfold sublatticeSpinSOpMinus sublatticeSpinSOpPlus
+  exact sublatticeSpinSOpGeneric_cross_commute N A (spinSOpMinus N) (spinSOpPlus N)
+
 end LatticeSystem.Quantum
