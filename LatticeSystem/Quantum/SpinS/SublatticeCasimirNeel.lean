@@ -2,6 +2,7 @@ import LatticeSystem.Quantum.SpinS.SublatticeSpinDot
 import LatticeSystem.Quantum.SpinS.Magnetization
 import LatticeSystem.Quantum.SpinS.ToyHamiltonianCasimir
 import LatticeSystem.Quantum.SpinS.BasisVecSOrthonormal
+import LatticeSystem.Quantum.SpinS.MagConfig
 
 /-!
 # Spin-`S` Néel state and sublattice Casimir eigenvalues
@@ -954,5 +955,12 @@ theorem neelStateOfS_allAlignedStateS_orthogonal
     simp [Fin.last] at h
     omega
   exact basisVecS_inner_of_ne hne
+
+/-- The Néel configuration packaged as an element of the magnetization
+sector `magConfigS Λ N (|¬A| · N)`. The `Ŝ_tot^(3)` eigenvalue is
+`|Λ|·N/2 - |¬A|·N = (|A| − |¬A|)·N/2`. -/
+def neelMagConfigS (A : Λ → Bool) (N : ℕ) :
+    magConfigS Λ N ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card * N) :=
+  ⟨neelConfigOfS A N, magSumS_neelConfigOfS A N⟩
 
 end LatticeSystem.Quantum
