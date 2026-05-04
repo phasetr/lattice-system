@@ -70,7 +70,6 @@ theorem fermionMultiNumber_anticommutator_fermionMultiCreation_self
     fermionMultiAnnihilation_conjTranspose,
     (fermionMultiNumber_isHermitian N i).eq] at h2
   -- h2 : c_i† · n_i + n_i · c_i† = c_i†
-  rw [add_comm (fermionMultiNumber N i * fermionMultiCreation N i) _]
-  exact h2
+  simpa [add_comm] using h2
 
 end LatticeSystem.Fermion
