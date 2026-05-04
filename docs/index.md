@@ -1150,6 +1150,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionUpNumber_isHermitian` / `fermionDownNumber_isHermitian` / `fermionUpNumber_mul_fermionDownNumber_isHermitian` | `(n_↑(i)).IsHermitian`; `(n_↓(i)).IsHermitian`; `(n_↑(i) · n_↓(i)).IsHermitian` (spinful Hubbard number-operator Hermiticity, named-lemma extraction) | `Fermion/JordanWigner/Hubbard/SpinfulNumberHermitian.lean` (PR #1007) |
 | `fermionMultiAnnihilation_mul_fermionMultiCreation_commute_fermionMultiAnnihilation_of_ne` / `fermionMultiAnnihilation_mul_fermionMultiCreation_commute_fermionMultiCreation_of_ne` | `Commute (c_i · c_i†) c_j` and `Commute (c_i · c_i†) c_j†` for `i ≠ j` (cross-site multi-mode hole projection vs ladder operators) | `Fermion/JordanWigner/HoleProjectionCommuteLadder.lean` (PR #1008) |
 | `fermionAnnihilation_mul_fermionAnnihilation_mul_fermionCreation_eq_zero` / `fermionAnnihilation_mul_fermionCreation_mul_fermionCreation_eq_zero` | `c · (c · c†) = 0`; `(c · c†) · c† = 0` (single-mode ladder-on-hole-projection vanishing identities) | `Fermion/CCDaggerLadderZero.lean` (PR #1009) |
+| `fermionMultiAnnihilation_mul_fermionMultiAnnihilation_mul_fermionMultiCreation_eq_zero` / `fermionMultiAnnihilation_mul_fermionMultiCreation_mul_fermionMultiCreation_eq_zero` | `c_i · (c_i · c_i†) = 0`; `(c_i · c_i†) · c_i† = 0` (multi-mode JW ladder-on-hole-projection vanishing, mirror of PR #1009) | `Fermion/JordanWigner/CDaggerCLadderZero.lean` (PR #1010) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 
