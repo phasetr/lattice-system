@@ -705,4 +705,11 @@ theorem neelStateOfS_ne_zero (A : Λ → Bool) (N : ℕ) :
   rw [h1] at h0
   exact one_ne_zero h0
 
+/-- The spin-`S` Néel state has norm-squared 1:
+`<Φ_Néel | Φ_Néel> = 1`. Direct from `basisVecS_inner_self`. -/
+theorem neelStateOfS_inner_self (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N)) (neelStateOfS A N) = 1 := by
+  unfold neelStateOfS
+  exact basisVecS_inner_self _
+
 end LatticeSystem.Quantum
