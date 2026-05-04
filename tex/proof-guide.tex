@@ -5971,6 +5971,17 @@ for collapsing arbitrary positive-degree polynomials in $n$ (or
 $c\,c^\dagger$) into the basis $\{1, n\}$ (resp.\ $\{1,
 c\,c^\dagger\}$); that linear collapse itself is not proved here.
 
+\textbf{Multi-mode (JW) ladder anticommutators $\{n_i,c_i\} = c_i$
+and $\{n_i,c_i^\dagger\} = c_i^\dagger$ (PR~\#993)}: multi-mode
+mirror of PR~\#990, in the file
+\texttt{Fermion/JordanWigner/NumberAnticommutators.lean}. The
+proof reuses the per-product computations $n_i\cdot c_i = 0$
+(from $\sigma^+_i\,\sigma^+_i = 0$) and $c_i\cdot n_i = c_i$
+(from $\sigma^+_i\,\sigma^-_i\,\sigma^+_i = \sigma^+_i$) already
+encapsulated in the commutator proofs of
+\texttt{Fermion/JordanWigner/Number.lean}; the dual pair via
+\texttt{Matrix.conjTranspose}.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
