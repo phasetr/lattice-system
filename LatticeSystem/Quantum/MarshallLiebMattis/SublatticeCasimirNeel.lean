@@ -741,6 +741,16 @@ theorem totalSpinHalfOp3_sq_mulVec_neelStateOf (A : Λ → Bool) :
   congr 1
   ring
 
+/-- `<Φ_Néel | (Ŝ_tot^(3))² | Φ_Néel> = ((|A|-|¬A|)/2)²`. Spin-`1/2` mirror
+of γ-4 step 155. -/
+theorem neelStateOf_totalSpinHalfOp3_sq_expectation (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        ((totalSpinHalfOp3 Λ * totalSpinHalfOp3 Λ).mulVec (neelStateOf A)) =
+      ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) / 2) ^ 2 := by
+  rw [totalSpinHalfOp3_sq_mulVec_neelStateOf]
+  rw [dotProduct_smul, neelStateOf_inner_self, smul_eq_mul, mul_one]
+
 /-- `<Φ_Néel | (Ŝ_tot)² | Φ_Néel> = ((|A|-|¬A|)/2)² + (|A|+|¬A|)/2`. Spin-`1/2`
 mirror of γ-4 step 126. The full total-spin Casimir expectation on Néel. -/
 theorem neelStateOf_totalSpinHalfSquared_expectation (A : Λ → Bool) :
