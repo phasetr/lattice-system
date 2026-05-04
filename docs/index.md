@@ -1145,6 +1145,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionMultiCreation_mul_fermionMultiNumber_eq_zero` / `fermionMultiNumber_mul_fermionMultiCreation_eq_fermionMultiCreation` | `c_i† · n_i = 0`; `n_i · c_i† = c_i†` (multi-mode JW number-creation identities, mirror of PR #984) | `Fermion/JordanWigner/CreationNumberIdentities.lean` (PR #1002) |
 | `fermionMultiAnnihilation_mul_fermionMultiCreation_mul_fermionMultiAnnihilation` / `fermionMultiCreation_mul_fermionMultiAnnihilation_mul_fermionMultiCreation` | `c_i · c_i† · c_i = c_i`; `c_i† · c_i · c_i† = c_i†` (multi-mode JW partial-isometry identities, mirror of PR #986) | `Fermion/JordanWigner/PartialIsometry.lean` (PR #1003) |
 | `fermionMultiAnnihilation_mul_fermionMultiCreation_commute` | `Commute (c_i · c_i†) (c_j · c_j†)` for any `i, j` (multi-mode JW hole projections at any two sites commute) | `Fermion/JordanWigner/HoleProjectionsCommute.lean` (PR #1004) |
+| `fermionUpNumber_commute_fermionDownNumber` / `fermionUpNumber_mul_fermionDownNumber_sq` | `Commute n_↑(i) n_↓(i)`; `(n_↑(i) · n_↓(i))² = n_↑(i) · n_↓(i)` (Hubbard same-site double-occupancy projection: cross-spin number commute + idempotency) | `Fermion/JordanWigner/Hubbard/DoubleOccupancyProjection.lean` (PR #1005) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 

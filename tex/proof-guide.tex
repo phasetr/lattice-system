@@ -6097,6 +6097,25 @@ $(1 - n_i)(1 - n_j) = 1 - n_j - n_i + n_i\,n_j$ and the
 opposite ordering gives $1 - n_i - n_j + n_j\,n_i$; the two
 agree by $n_i\,n_j = n_j\,n_i$.
 
+\textbf{Hubbard same-site double-occupancy operator
+$\texttt{Commute}\,n_\uparrow(i)\,n_\downarrow(i)$ and
+$(n_\uparrow(i)\,n_\downarrow(i))^2 = n_\uparrow(i)\,
+n_\downarrow(i)$ (PR~\#1005)}: in the file
+\texttt{Fermion/JordanWigner/Hubbard/DoubleOccupancyProjection.lean}.
+The two spin-species number operators at site $i$ live at
+distinct underlying JW positions $2i$ and $2i+1$, so they
+commute by \texttt{fermionMultiNumber\_commute}. Their product
+$n_\uparrow n_\downarrow$ is then the on-site
+double-occupancy projection: $(n_\uparrow n_\downarrow)^2 =
+n_\uparrow (n_\downarrow n_\uparrow) n_\downarrow =
+n_\uparrow^2 n_\downarrow^2 = n_\uparrow n_\downarrow$ via the
+commute and \texttt{fermionMultiNumber\_sq} for both factors.
+The eigenvalue-$1$ subspace is the doubly-occupied site
+state, so the on-site Hubbard interaction
+$U \sum_i n_\uparrow(i) n_\downarrow(i)$ is $U$ times a sum
+of projections (each summand is a projection by this PR;
+cross-site commutation of summands is not proved here).
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
