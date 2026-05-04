@@ -4,6 +4,7 @@ import LatticeSystem.Quantum.SpinS.MultiSiteCommutator
 import LatticeSystem.Quantum.SpinS.CyclicCommutator
 import LatticeSystem.Quantum.SpinS.CyclicCommutator23
 import LatticeSystem.Quantum.SpinS.CyclicCommutator31
+import LatticeSystem.Quantum.SpinS.AllAlignedState
 import LatticeSystem.Quantum.ManyBody
 
 /-!
@@ -716,6 +717,40 @@ theorem totalSpinSOpMinus_eq_sublattice_sum (A : Λ → Bool) :
   · simp [hA]
   · cases h : A x
     · simp [h]
+    · exact absurd h hA
+
+/-- `Ŝ_A^+ · |σ_⊤⟩ = 0`: the sublattice raising operator annihilates
+the all-up state (highest weight at each A-site). -/
+theorem sublatticeSpinSOpPlus_mulVec_allAlignedStateS_zero (A : Λ → Bool) :
+    (sublatticeSpinSOpPlus N A).mulVec
+        (allAlignedStateS Λ N (0 : Fin (N + 1))) = 0 := by
+  unfold sublatticeSpinSOpPlus
+  rw [Matrix.sum_mulVec]
+  apply Finset.sum_eq_zero
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    exact onSiteS_spinSOpPlus_mulVec_allAlignedStateS_zero x
+  · cases h : A x
+    · rw [if_neg, Matrix.zero_mulVec]
+      simp
+    · exact absurd h hA
+
+/-- `Ŝ_A^- · |σ_⊥⟩ = 0`: the sublattice lowering operator annihilates
+the all-down state (lowest weight at each A-site). -/
+theorem sublatticeSpinSOpMinus_mulVec_allAlignedStateS_last (A : Λ → Bool) :
+    (sublatticeSpinSOpMinus N A).mulVec
+        (allAlignedStateS Λ N (Fin.last N)) = 0 := by
+  unfold sublatticeSpinSOpMinus
+  rw [Matrix.sum_mulVec]
+  apply Finset.sum_eq_zero
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    exact onSiteS_spinSOpMinus_mulVec_allAlignedStateS_last x
+  · cases h : A x
+    · rw [if_neg, Matrix.zero_mulVec]
+      simp
     · exact absurd h hA
 
 end LatticeSystem.Quantum
