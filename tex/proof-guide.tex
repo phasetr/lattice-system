@@ -5909,6 +5909,16 @@ $c^\dagger c\,c^\dagger = (c^\dagger c)\,c^\dagger = n\,c^\dagger = c^\dagger$
 by PR~\#984. These are the standard $S\,S^*S = S$ /
 $S^*S\,S^* = S^*$ partial-isometry identities of operator algebra.
 
+\textbf{Ladder commutators $[n,c] = -c$ and $[n,c^\dagger] = c^\dagger$
+(PR~\#988)}: in the file
+\texttt{Fermion/NumberLadderCommutators.lean}.
+$[n,c] = n\cdot c - c\cdot n = 0 - c = -c$ by PR~\#982.
+$[n,c^\dagger] = n\cdot c^\dagger - c^\dagger\cdot n = c^\dagger - 0
+= c^\dagger$ by PR~\#984. These are the fermion analogues of the
+bosonic number-ladder commutators $[N,a] = -a$, $[N,a^\dagger] = a^\dagger$,
+expressing that the adjoint action of $n$ (commutation with $n$)
+shifts the fermion number of $c$ down by one and $c^\dagger$ up by one.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
