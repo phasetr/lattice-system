@@ -602,4 +602,28 @@ theorem sublatticeSpinSquaredS_cross_commute (A : Λ → Bool) :
     · exact (hα3β2.mul_left hα3β2).mul_right (hα3β2.mul_left hα3β2)
     · exact (hα3β3.mul_left hα3β3).mul_right (hα3β3.mul_left hα3β3)
 
+/-! ## Sublattice Casimir commutes with the total spin generators -/
+
+/-- `Commute (Ŝ_A)² (Ŝ_tot^(1))`. Combines self-invariance (axis 1) with
+the `Ŝ_¬A^(1)` commutativity, since `Ŝ_tot^(1) = Ŝ_A^(1) + Ŝ_¬A^(1)`. -/
+theorem sublatticeSpinSquaredS_commute_totalSpinSOp1 (A : Λ → Bool) :
+    Commute (sublatticeSpinSquaredS N A) (totalSpinSOp1 Λ N) := by
+  rw [totalSpinSOp1_eq_sublattice_sum (N := N) A]
+  exact (sublatticeSpinSquaredS_commute_sublatticeSpinSOp1 N A).add_right
+    (sublatticeSpinSquaredS_commute_sublatticeSpinSOp1_complement N A)
+
+/-- `Commute (Ŝ_A)² (Ŝ_tot^(2))`. -/
+theorem sublatticeSpinSquaredS_commute_totalSpinSOp2 (A : Λ → Bool) :
+    Commute (sublatticeSpinSquaredS N A) (totalSpinSOp2 Λ N) := by
+  rw [totalSpinSOp2_eq_sublattice_sum (N := N) A]
+  exact (sublatticeSpinSquaredS_commute_sublatticeSpinSOp2 N A).add_right
+    (sublatticeSpinSquaredS_commute_sublatticeSpinSOp2_complement N A)
+
+/-- `Commute (Ŝ_A)² (Ŝ_tot^(3))`. -/
+theorem sublatticeSpinSquaredS_commute_totalSpinSOp3 (A : Λ → Bool) :
+    Commute (sublatticeSpinSquaredS N A) (totalSpinSOp3 Λ N) := by
+  rw [totalSpinSOp3_eq_sublattice_sum (N := N) A]
+  exact (sublatticeSpinSquaredS_commute_sublatticeSpinSOp3 N A).add_right
+    (sublatticeSpinSquaredS_commute_sublatticeSpinSOp3_complement N A)
+
 end LatticeSystem.Quantum
