@@ -920,6 +920,46 @@ theorem sublatticeSpinSOpMinus_const_false :
   intro x _
   simp
 
+/-! ## Edge cases: full sublattice -/
+
+/-- For the full sublattice (`A = const true`), `Ŝ_A^(1)` equals the
+total `Ŝ_tot^(1)`. -/
+theorem sublatticeSpinSOp1_const_true :
+    sublatticeSpinSOp1 (Λ := Λ) N (fun _ => true) = totalSpinSOp1 Λ N := by
+  unfold sublatticeSpinSOp1 totalSpinSOp1
+  refine Finset.sum_congr rfl fun x _ => ?_
+  simp
+
+theorem sublatticeSpinSOp2_const_true :
+    sublatticeSpinSOp2 (Λ := Λ) N (fun _ => true) = totalSpinSOp2 Λ N := by
+  unfold sublatticeSpinSOp2 totalSpinSOp2
+  refine Finset.sum_congr rfl fun x _ => ?_
+  simp
+
+theorem sublatticeSpinSOp3_const_true :
+    sublatticeSpinSOp3 (Λ := Λ) N (fun _ => true) = totalSpinSOp3 Λ N := by
+  unfold sublatticeSpinSOp3 totalSpinSOp3
+  refine Finset.sum_congr rfl fun x _ => ?_
+  simp
+
+theorem sublatticeSpinSquaredS_const_true :
+    sublatticeSpinSquaredS (Λ := Λ) N (fun _ => true) = totalSpinSSquared Λ N := by
+  unfold sublatticeSpinSquaredS totalSpinSSquared
+  rw [sublatticeSpinSOp1_const_true, sublatticeSpinSOp2_const_true,
+      sublatticeSpinSOp3_const_true]
+
+theorem sublatticeSpinSOpPlus_const_true :
+    sublatticeSpinSOpPlus (Λ := Λ) N (fun _ => true) = totalSpinSOpPlus Λ N := by
+  unfold sublatticeSpinSOpPlus totalSpinSOpPlus
+  refine Finset.sum_congr rfl fun x _ => ?_
+  simp
+
+theorem sublatticeSpinSOpMinus_const_true :
+    sublatticeSpinSOpMinus (Λ := Λ) N (fun _ => true) = totalSpinSOpMinus Λ N := by
+  unfold sublatticeSpinSOpMinus totalSpinSOpMinus
+  refine Finset.sum_congr rfl fun x _ => ?_
+  simp
+
 /-! ## Sublattice ladder adjoint relations -/
 
 /-- `(Ŝ_A^+)† = Ŝ_A^-`: the sublattice raising and lowering operators
