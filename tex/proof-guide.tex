@@ -6294,6 +6294,21 @@ complete set of mutually orthogonal Hermitian projections
 summing to the identity (combined with PRs~\#1007, \#1011,
 \#1015).
 
+\textbf{Hubbard per-site projection-aggregation identities
+(PR~\#1019)}: in the file
+\texttt{Fermion/JordanWigner/Hubbard/SiteProjectionsSpinResolved.lean}.
+Four spin-resolved aggregation identities of the per-site
+projections:
+$p_\uparrow + p_\Uparrow = n_\uparrow$,
+$p_\downarrow + p_\Uparrow = n_\downarrow$,
+$p_\emptyset + p_\uparrow = 1 - n_\downarrow$,
+$p_\emptyset + p_\downarrow = 1 - n_\uparrow$.
+Direct factoring out the common left/right factor and using
+$(1 - n_\sigma) + n_\sigma = 1$. Shows how the per-site 4-state
+projections aggregate to the spin-resolved number operators
+(and their complements), complementing the partition-of-identity
+(PR~\#1011) $\sum_\alpha p_\alpha = 1$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
