@@ -6272,6 +6272,15 @@ algebra using \texttt{fermionMultiNumber\_sq}. Together with
 PRs~\#1022 and \#1024 this completes the multi-mode Pauli-trio
 $\sigma_\alpha^2 = \pm 1$ involution identities.
 
+\textbf{Symmetric `\_of\_ne` cross-site CAR (PR~\#1030)}: in
+the file
+\texttt{Fermion/JordanWigner/CAR/CrossSiteOfNe.lean}. Lifts the
+four `\_lt` cross-site CAR identities to the symmetric form
+accepting any $i \neq j$ by trichotomy on $i.\mathrm{val}$ vs
+$j.\mathrm{val}$: the $\_lt$ form covers $i < j$ directly, and
+$j < i$ follows by swapping $i, j$ and applying \texttt{add\_comm}.
+Foundational for upstream Pauli-analog cross-site lemmas.
+
 \textbf{Multi-mode (JW) ladder-on-hole-projection vanishing
 $c_i\,(c_i\,c_i^\dagger) = 0$ and $(c_i\,c_i^\dagger)\,
 c_i^\dagger = 0$ (PR~\#1010)}: multi-mode mirror of PR~\#1009,
