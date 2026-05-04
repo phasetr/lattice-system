@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.TotalSpin
+import LatticeSystem.Quantum.SpinS.TotalSquared
 import LatticeSystem.Quantum.SpinS.MultiSiteCommutator
 import LatticeSystem.Quantum.SpinS.CyclicCommutator
 import LatticeSystem.Quantum.SpinS.CyclicCommutator23
@@ -625,5 +626,16 @@ theorem sublatticeSpinSquaredS_commute_totalSpinSOp3 (A : Λ → Bool) :
   rw [totalSpinSOp3_eq_sublattice_sum (N := N) A]
   exact (sublatticeSpinSquaredS_commute_sublatticeSpinSOp3 N A).add_right
     (sublatticeSpinSquaredS_commute_sublatticeSpinSOp3_complement N A)
+
+/-- `Commute (Ŝ_A)² (Ŝ_tot)²`. The third pairwise commutativity needed
+for the joint eigenbasis of `(Ŝ_tot)²`, `(Ŝ_A)²`, `(Ŝ_¬A)²` (Tasaki §2.5
+toy-Hamiltonian eigenvalue analysis). -/
+theorem sublatticeSpinSquaredS_commute_totalSpinSSquared (A : Λ → Bool) :
+    Commute (sublatticeSpinSquaredS N A) (totalSpinSSquared Λ N) := by
+  unfold totalSpinSSquared
+  have h1 := sublatticeSpinSquaredS_commute_totalSpinSOp1 N A
+  have h2 := sublatticeSpinSquaredS_commute_totalSpinSOp2 N A
+  have h3 := sublatticeSpinSquaredS_commute_totalSpinSOp3 N A
+  exact ((h1.mul_right h1).add_right (h2.mul_right h2)).add_right (h3.mul_right h3)
 
 end LatticeSystem.Quantum
