@@ -271,6 +271,20 @@ theorem heisenbergToyHamiltonian_apply_im_eq_zero (A : Λ → Bool)
     ((heisenbergToyHamiltonian A) σ σ').im = 0 :=
   heisenbergHamiltonian_apply_im_eq_zero (bipartiteCoupling_im A) σ σ'
 
+/-! ## Toy Hamiltonian ladder commutators (spin-1/2 mirror of γ-4 step 34) -/
+
+/-- `Commute Ĥ_toy Ŝ^+_tot`. Direct specialisation of
+`heisenbergHamiltonian_commute_totalSpinHalfOpPlus` to
+`J = bipartiteCoupling A`. -/
+theorem heisenbergToyHamiltonian_commute_totalSpinHalfOpPlus (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonian A) (totalSpinHalfOpPlus Λ) :=
+  heisenbergHamiltonian_commute_totalSpinHalfOpPlus (bipartiteCoupling A)
+
+/-- `Commute Ĥ_toy Ŝ^-_tot`. -/
+theorem heisenbergToyHamiltonian_commute_totalSpinHalfOpMinus (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonian A) (totalSpinHalfOpMinus Λ) :=
+  heisenbergHamiltonian_commute_totalSpinHalfOpMinus (bipartiteCoupling A)
+
 /-! ## Eigenvalue on the all-aligned state -/
 
 /-- Cardinality of the `A`-sublattice (number of sites with `A x = true`). -/
