@@ -1148,6 +1148,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionUpNumber_commute_fermionDownNumber` / `fermionUpNumber_mul_fermionDownNumber_sq` | `Commute n_↑(i) n_↓(i)`; `(n_↑(i) · n_↓(i))² = n_↑(i) · n_↓(i)` (Hubbard same-site double-occupancy projection: cross-spin number commute + idempotency) | `Fermion/JordanWigner/Hubbard/DoubleOccupancyProjection.lean` (PR #1005) |
 | `fermionUpNumber_mul_fermionDownNumber_commute` | `Commute (n_↑(i) · n_↓(i)) (n_↑(j) · n_↓(j))` for any `i, j` (cross-site Hubbard double-occupancy commute, makes the on-site interaction a sum of pairwise commuting projections) | `Fermion/JordanWigner/Hubbard/DoubleOccupancyCommute.lean` (PR #1006) |
 | `fermionUpNumber_isHermitian` / `fermionDownNumber_isHermitian` / `fermionUpNumber_mul_fermionDownNumber_isHermitian` | `(n_↑(i)).IsHermitian`; `(n_↓(i)).IsHermitian`; `(n_↑(i) · n_↓(i)).IsHermitian` (spinful Hubbard number-operator Hermiticity, named-lemma extraction) | `Fermion/JordanWigner/Hubbard/SpinfulNumberHermitian.lean` (PR #1007) |
+| `fermionMultiAnnihilation_mul_fermionMultiCreation_commute_fermionMultiAnnihilation_of_ne` / `fermionMultiAnnihilation_mul_fermionMultiCreation_commute_fermionMultiCreation_of_ne` | `Commute (c_i · c_i†) c_j` and `Commute (c_i · c_i†) c_j†` for `i ≠ j` (cross-site multi-mode hole projection vs ladder operators) | `Fermion/JordanWigner/HoleProjectionCommuteLadder.lean` (PR #1008) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 
