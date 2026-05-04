@@ -559,6 +559,21 @@ theorem sublatticeSpinHalfOp12sq_mulVec_neelStateOf (A : Λ → Bool) :
   simp only [k]
   ring
 
+/-- `Ŝ_A^+·Ŝ_A^- · |Φ_Néel⟩ = |A| · |Φ_Néel⟩`. Spin-`1/2` mirror of
+γ-4 step 100: highest-weight Casimir formula 2s = |A| for s = |A|/2. -/
+theorem sublatticeSpinHalfOpPlus_minus_mulVec_neelStateOf (A : Λ → Bool) :
+    (sublatticeSpinHalfOpPlus A * sublatticeSpinHalfOpMinus A).mulVec
+        (neelStateOf A) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ)) •
+        neelStateOf A := by
+  rw [sublatticeSpinHalfOpPlus_mul_sublatticeSpinHalfOpMinus_eq]
+  rw [Matrix.add_mulVec]
+  rw [sublatticeSpinHalfOp12sq_mulVec_neelStateOf]
+  rw [sublatticeSpinHalfOp3_mulVec_neelStateOf]
+  rw [← add_smul]
+  congr 1
+  ring
+
 /-- `((Ŝ_¬A^(1))² + (Ŝ_¬A^(2))²) · |Φ_Néel⟩ = (|¬A|/2) · |Φ_Néel⟩`.
 Spin-`1/2` complement of γ-4 step 96. -/
 theorem sublatticeSpinHalfOp12sq_complement_mulVec_neelStateOf (A : Λ → Bool) :
