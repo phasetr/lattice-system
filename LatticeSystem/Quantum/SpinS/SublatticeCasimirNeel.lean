@@ -778,6 +778,39 @@ theorem neelStateOfS_sublattice3_cross_complement3_expectation
   rw [dotProduct_smul]
   rw [neelStateOfS_inner_self, smul_eq_mul, mul_one]
 
+/-- `<Φ_Néel | Ŝ_A · Ŝ_¬A | Φ_Néel> = -|A|·|¬A|·(N/2)²`. Combines:
+- `<Néel | Ŝ_A^(3) Ŝ_¬A^(3) | Néel> = -|A|·|¬A|·(N/2)²` (γ-4 step 116)
+- `<Néel | Ŝ_A^(1) Ŝ_¬A^(1) + Ŝ_A^(2) Ŝ_¬A^(2) | Néel>
+    = (1/2)(<...Ŝ_A^+ Ŝ_¬A^-...> + <...Ŝ_A^- Ŝ_¬A^+...>) = 0`
+  (γ-4 step 122 ladder identity + steps 118, 114). -/
+theorem neelStateOfS_sublatticeSpinSDot_expectation (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((sublatticeSpinSDot N A (fun x => ! A x)).mulVec (neelStateOfS A N)) =
+      (-(((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2) ^ 2)) := by
+  unfold sublatticeSpinSDot
+  rw [Matrix.add_mulVec, Matrix.add_mulVec]
+  rw [dotProduct_add, dotProduct_add]
+  rw [neelStateOfS_sublattice3_cross_complement3_expectation]
+  -- Now need <Néel | Ŝ_A^(1) Ŝ_¬A^(1) | Néel> + <Néel | Ŝ_A^(2) Ŝ_¬A^(2) | Néel> = 0
+  rw [show
+      dotProduct (star (neelStateOfS A N))
+          ((sublatticeSpinSOp1 N A * sublatticeSpinSOp1 N (fun x => ! A x)).mulVec
+            (neelStateOfS A N)) +
+        dotProduct (star (neelStateOfS A N))
+          ((sublatticeSpinSOp2 N A * sublatticeSpinSOp2 N (fun x => ! A x)).mulVec
+            (neelStateOfS A N)) = 0 from ?_]
+  · ring
+  -- Use ladder identity: 1·1 + 2·2 = (1/2)(+·- + -·+).
+  rw [← dotProduct_add, ← Matrix.add_mulVec]
+  rw [sublatticeSpinSOp1_mul_op1_add_op2_mul_op2_eq_ladder]
+  rw [Matrix.smul_mulVec, dotProduct_smul]
+  rw [Matrix.add_mulVec, dotProduct_add]
+  rw [neelStateOfS_sublattice_plus_complement_minus_expectation]
+  rw [neelStateOfS_sublattice_minus_plus_cross_expectation]
+  simp
+
 /-- `<Φ_Néel | Ŝ_tot^(3) | Φ_Néel> = (|A| - |¬A|)·N/2`. The Néel state is
 an `Ŝ_tot^(3)` eigenvector with magnetization `(|A| - |¬A|)·N/2`. -/
 theorem neelStateOfS_totalSpinSOp3_expectation (A : Λ → Bool) (N : ℕ) :
