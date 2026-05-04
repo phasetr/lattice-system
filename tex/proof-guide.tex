@@ -6000,6 +6000,16 @@ induction on $k$ from $n_i^2 = n_i$
 (\texttt{fermionMultiNumber\_sq}, in
 \texttt{Fermion/JordanWigner/Operators.lean}).
 
+\textbf{Multi-mode (JW) hole occupation $c_i\,c_i^\dagger = 1 -
+n_i$ and resolution of identity $n_i + c_i\,c_i^\dagger = 1$
+(PR~\#996)}: multi-mode mirror of PRs~\#963 and \#972, in the
+file \texttt{Fermion/JordanWigner/CDaggerCIdentity.lean}. From
+the same-site CAR $c_i\,c_i^\dagger + c_i^\dagger c_i = 1$
+(\texttt{fermionMultiAnticomm\_self}) and the definitional
+$n_i = c_i^\dagger c_i$, one extracts $c_i\,c_i^\dagger = 1 -
+n_i$ via \texttt{eq\_sub\_of\_add\_eq}; rearranging gives the
+projection-sum form $n_i + c_i\,c_i^\dagger = 1$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
