@@ -6180,6 +6180,18 @@ with $(c\,c^\dagger)\,c = c$ (PR~\#982) and $c^\dagger\,
 four-way breakdown of left/right multiplication of
 $c\,c^\dagger$ by the ladder operators.
 
+\textbf{Single-mode $(c + c^\dagger)^2 = 1$ (X-Pauli analog,
+PR~\#1021)}: in the file
+\texttt{Fermion/CPlusCDaggerSq.lean}. The symmetric Hermitian
+combination is an involution. Direct expansion
+$(c + c^\dagger)^2 = c^2 + c\,c^\dagger + c^\dagger c +
+(c^\dagger)^2 = 0 + 1 + 0 = 1$ via $c^2 = (c^\dagger)^2 = 0$
+and $\{c, c^\dagger\} = 1$
+(\texttt{fermionAnticomm\_self}). In the spin-$1/2$ identification
+$c = \sigma^+, c^\dagger = \sigma^-$ this is the algebraic
+shadow of $\sigma_x^2 = I$. Useful for quench dynamics and
+Majorana decompositions.
+
 \textbf{Multi-mode (JW) ladder-on-hole-projection vanishing
 $c_i\,(c_i\,c_i^\dagger) = 0$ and $(c_i\,c_i^\dagger)\,
 c_i^\dagger = 0$ (PR~\#1010)}: multi-mode mirror of PR~\#1009,
