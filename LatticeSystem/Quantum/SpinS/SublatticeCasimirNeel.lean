@@ -210,6 +210,54 @@ theorem sublatticeSpinSOp3_mulVec_neelStateOfS (A : Λ → Bool) (N : ℕ) :
   rw [← Finset.sum_filter]
   rw [Finset.sum_const, nsmul_eq_mul]
 
+/-- `Ŝ_¬A^(3) · |Φ_Néel⟩ = -(|¬A|·N/2) · |Φ_Néel⟩`. The complement
+sublattice z-axis acts as -|¬A|·N/2 on the Néel state (lowest weight on ¬A). -/
+theorem sublatticeSpinSOp3_complement_mulVec_neelStateOfS
+    (A : Λ → Bool) (N : ℕ) :
+    (sublatticeSpinSOp3 N (fun x => ! A x)).mulVec (neelStateOfS A N) =
+      (-(((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2))) •
+        neelStateOfS A N := by
+  unfold sublatticeSpinSOp3 neelStateOfS
+  rw [Matrix.sum_mulVec]
+  rw [show (∑ x : Λ, (if (! A x) then onSiteS x (spinSOp3 N) else 0 : ManyBodyOpS Λ N).mulVec
+        (basisVecS (neelConfigOfS A N))) =
+      ∑ x : Λ, (if (! A x) then -((N : ℂ) / 2) else 0) •
+        basisVecS (neelConfigOfS A N) from by
+    refine Finset.sum_congr rfl fun x _ => ?_
+    by_cases hA : (! A x) = true
+    · rw [if_pos hA, if_pos hA]
+      rw [onSiteS_spinSOp3_mulVec_basisVecS]
+      have hAxF : A x = false := by
+        cases h : A x
+        · rfl
+        · simp [h] at hA
+      have hσx : (neelConfigOfS A N x).val = N := by
+        unfold neelConfigOfS
+        rw [if_neg (by rw [hAxF]; decide : ¬ A x = true)]
+        simp [Fin.last]
+      rw [hσx]
+      congr 1
+      ring
+    · cases h : (! A x)
+      · rw [if_neg, if_neg]
+        · rw [Matrix.zero_mulVec, zero_smul]
+        · simp
+        · simp
+      · exact absurd h hA]
+  rw [← Finset.sum_smul]
+  congr 1
+  have hrw : ∀ x : Λ, (if (! A x) = true then -((N : ℂ) / 2) else 0) =
+      -(if (! A x) = true then ((N : ℂ) / 2) else 0) := by
+    intro x
+    by_cases h : (! A x) = true
+    · rw [if_pos h, if_pos h]
+    · rw [if_neg h, if_neg h, neg_zero]
+  rw [Finset.sum_congr rfl (fun x _ => hrw x)]
+  rw [Finset.sum_neg_distrib]
+  congr 1
+  rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
+
 /-! ## Per-pair `spinSDot` diagonal at the Néel configuration -/
 
 /-- For a cross-sublattice pair `x ∈ A`, `y ∈ ¬A`, the two-site dot
