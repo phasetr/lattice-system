@@ -32,6 +32,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsDoublyEmpty
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsHermitian
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsUpDown
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsEmptySingle
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsSingleDoubly
 
 /-!
 # Multi-mode fermion via Jordan–Wigner mapping
@@ -80,6 +81,7 @@ expansion):
 | `Hubbard/SiteProjectionsHermitian.lean` | `p_∅`, `p_↑`, `p_↓` Hermitian (companions to PR #1007) |
 | `Hubbard/SiteProjectionsUpDown.lean` | `p_↑ · p_↓ = 0`, `p_↓ · p_↑ = 0` |
 | `Hubbard/SiteProjectionsEmptySingle.lean` | `p_∅ ⊥ p_↑`, `p_∅ ⊥ p_↓` (both orderings) |
+| `Hubbard/SiteProjectionsSingleDoubly.lean` | `p_↑ ⊥ p_⇈`, `p_↓ ⊥ p_⇈` (completes 6/6 ortho.) |
 
 Old `import LatticeSystem.Fermion.JordanWigner` continues to
 work unchanged via this façade. Following the convention from
