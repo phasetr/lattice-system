@@ -753,4 +753,62 @@ theorem sublatticeSpinSOpMinus_mulVec_allAlignedStateS_last (A : Λ → Bool) :
       simp
     · exact absurd h hA
 
+/-! ## Sublattice Cartan relations -/
+
+/-- Sublattice Cartan relation: `[Ŝ_A^(3), Ŝ_A^+] = Ŝ_A^+`. The sublattice
+ladder raising operator shifts the A-sublattice S^z eigenvalue by +1.
+
+Derived from the sublattice SU(2) algebra (PR #1048):
+`[Ŝ_A^(3), Ŝ_A^(1)+iŜ_A^(2)] = iŜ_A^(2) + i(-iŜ_A^(1)) = Ŝ_A^(1)+iŜ_A^(2)`. -/
+theorem sublatticeSpinSOp3_commutator_sublatticeSpinSOpPlus (A : Λ → Bool) :
+    sublatticeSpinSOp3 N A * sublatticeSpinSOpPlus N A
+        - sublatticeSpinSOpPlus N A * sublatticeSpinSOp3 N A =
+      sublatticeSpinSOpPlus N A := by
+  rw [sublatticeSpinSOpPlus_eq_add]
+  have h31 := sublatticeSpinSOp3_commutator_sublatticeSpinSOp1 N A
+  have h23 := sublatticeSpinSOp2_commutator_sublatticeSpinSOp3 N A
+  rw [mul_add, add_mul, mul_smul_comm, smul_mul_assoc]
+  -- The goal is: S3 S1 + I•(S3 S2) - (S1 S3 + I•(S2 S3)) = S1 + I•S2
+  -- Reorganize: (S3 S1 - S1 S3) + I•(S3 S2 - S2 S3) = (S3 S1 - S1 S3) - I•(S2 S3 - S3 S2)
+  --           = I•S2 - I•(I•S1)
+  --           = I•S2 - (I*I)•S1 = I•S2 + S1
+  have hI2 : (Complex.I * Complex.I : ℂ) = -1 := Complex.I_mul_I
+  have hkey : sublatticeSpinSOp3 N A * sublatticeSpinSOp1 N A +
+        Complex.I • (sublatticeSpinSOp3 N A * sublatticeSpinSOp2 N A) -
+      (sublatticeSpinSOp1 N A * sublatticeSpinSOp3 N A +
+        Complex.I • (sublatticeSpinSOp2 N A * sublatticeSpinSOp3 N A)) =
+      (sublatticeSpinSOp3 N A * sublatticeSpinSOp1 N A -
+        sublatticeSpinSOp1 N A * sublatticeSpinSOp3 N A) -
+      Complex.I • (sublatticeSpinSOp2 N A * sublatticeSpinSOp3 N A -
+        sublatticeSpinSOp3 N A * sublatticeSpinSOp2 N A) := by
+    rw [smul_sub]; abel
+  rw [hkey, h31, h23, smul_smul, hI2, neg_smul, one_smul, sub_neg_eq_add]
+  abel
+
+/-- Sublattice Cartan relation: `[Ŝ_A^(3), Ŝ_A^-] = -Ŝ_A^-`. The sublattice
+ladder lowering operator shifts the A-sublattice S^z eigenvalue by -1. -/
+theorem sublatticeSpinSOp3_commutator_sublatticeSpinSOpMinus (A : Λ → Bool) :
+    sublatticeSpinSOp3 N A * sublatticeSpinSOpMinus N A
+        - sublatticeSpinSOpMinus N A * sublatticeSpinSOp3 N A =
+      -sublatticeSpinSOpMinus N A := by
+  rw [sublatticeSpinSOpMinus_eq_sub]
+  have h31 := sublatticeSpinSOp3_commutator_sublatticeSpinSOp1 N A
+  have h23 := sublatticeSpinSOp2_commutator_sublatticeSpinSOp3 N A
+  rw [mul_sub, sub_mul, mul_smul_comm, smul_mul_assoc]
+  have hI2 : (Complex.I * Complex.I : ℂ) = -1 := Complex.I_mul_I
+  have hkey : sublatticeSpinSOp3 N A * sublatticeSpinSOp1 N A -
+        Complex.I • (sublatticeSpinSOp3 N A * sublatticeSpinSOp2 N A) -
+      (sublatticeSpinSOp1 N A * sublatticeSpinSOp3 N A -
+        Complex.I • (sublatticeSpinSOp2 N A * sublatticeSpinSOp3 N A)) =
+      (sublatticeSpinSOp3 N A * sublatticeSpinSOp1 N A -
+        sublatticeSpinSOp1 N A * sublatticeSpinSOp3 N A) +
+      Complex.I • (sublatticeSpinSOp2 N A * sublatticeSpinSOp3 N A -
+        sublatticeSpinSOp3 N A * sublatticeSpinSOp2 N A) := by
+    rw [smul_sub]; abel
+  rw [hkey, h31, h23, smul_smul, hI2, neg_smul, one_smul]
+  rw [show -sublatticeSpinSOp1 N A = -(sublatticeSpinSOp1 N A -
+      Complex.I • sublatticeSpinSOp2 N A) - Complex.I • sublatticeSpinSOp2 N A
+      from by abel]
+  abel
+
 end LatticeSystem.Quantum
