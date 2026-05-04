@@ -638,4 +638,56 @@ theorem sublatticeSpinSquaredS_commute_totalSpinSSquared (A : Λ → Bool) :
   have h3 := sublatticeSpinSquaredS_commute_totalSpinSOp3 N A
   exact ((h1.mul_right h1).add_right (h2.mul_right h2)).add_right (h3.mul_right h3)
 
+/-! ## Sublattice ladder operators (raising / lowering on `A`) -/
+
+/-- Sublattice raising operator on `A`:
+`Ŝ_A^+ := Σ_{x : A x} onSiteS x (spinSOpPlus N)`.
+
+Mirror of `totalSpinSOpPlus` restricted to the `A`-sublattice. -/
+noncomputable def sublatticeSpinSOpPlus (A : Λ → Bool) : ManyBodyOpS Λ N :=
+  ∑ x : Λ, if A x then onSiteS x (spinSOpPlus N) else 0
+
+/-- Sublattice lowering operator on `A`:
+`Ŝ_A^- := Σ_{x : A x} onSiteS x (spinSOpMinus N)`. -/
+noncomputable def sublatticeSpinSOpMinus (A : Λ → Bool) : ManyBodyOpS Λ N :=
+  ∑ x : Λ, if A x then onSiteS x (spinSOpMinus N) else 0
+
+/-- `Ŝ_A^+ = Ŝ_A^(1) + i · Ŝ_A^(2)`. -/
+theorem sublatticeSpinSOpPlus_eq_add (A : Λ → Bool) :
+    sublatticeSpinSOpPlus N A =
+      sublatticeSpinSOp1 N A + Complex.I • sublatticeSpinSOp2 N A := by
+  unfold sublatticeSpinSOpPlus sublatticeSpinSOp1 sublatticeSpinSOp2
+  rw [Finset.smul_sum, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA, if_pos hA, if_pos hA]
+    rw [← onSiteS_smul, ← onSiteS_add, spinSOpPlus_eq_one_add_I_smul_two]
+  · cases h : A x
+    · rw [if_neg, if_neg, if_neg]
+      · rw [smul_zero, add_zero]
+      · simp
+      · simp
+      · simp
+    · exact absurd h hA
+
+/-- `Ŝ_A^- = Ŝ_A^(1) − i · Ŝ_A^(2)`. -/
+theorem sublatticeSpinSOpMinus_eq_sub (A : Λ → Bool) :
+    sublatticeSpinSOpMinus N A =
+      sublatticeSpinSOp1 N A - Complex.I • sublatticeSpinSOp2 N A := by
+  unfold sublatticeSpinSOpMinus sublatticeSpinSOp1 sublatticeSpinSOp2
+  rw [Finset.smul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA, if_pos hA, if_pos hA]
+    rw [← onSiteS_smul, ← onSiteS_sub, spinSOpMinus_eq_one_sub_I_smul_two]
+  · cases h : A x
+    · rw [if_neg, if_neg, if_neg]
+      · rw [smul_zero, sub_zero]
+      · simp
+      · simp
+      · simp
+    · exact absurd h hA
+
 end LatticeSystem.Quantum
