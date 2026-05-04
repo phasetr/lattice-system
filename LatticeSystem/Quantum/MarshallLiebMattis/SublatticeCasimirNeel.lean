@@ -939,6 +939,24 @@ theorem allUp_basisVec_heisenbergToyHamiltonian_expectation (A : Λ → Bool) :
     exact h2.symm
   rw [hdiag]
 
+/-- **Variational spin gap** (spin-`1/2` mirror of γ-4 step 150):
+`<basisVec 0|Ĥ_toy|basisVec 0> - <Φ_Néel|Ĥ_toy|Φ_Néel> = |A|·|¬A|`.
+
+The all-up basis state has positive expectation `+|A|·|¬A|/2`, the Néel
+state has negative `-|A|·|¬A|/2`. Their difference is `|A|·|¬A|`,
+strictly positive when both sublattices are non-empty. -/
+theorem heisenbergToyHamiltonian_variational_gap (A : Λ → Bool) :
+    dotProduct (star (basisVec (fun _ : Λ => (0 : Fin 2))))
+        ((heisenbergToyHamiltonian A : ManyBodyOp Λ).mulVec
+          (basisVec (fun _ : Λ => (0 : Fin 2)))) -
+      dotProduct (star (neelStateOf A))
+        ((heisenbergToyHamiltonian A : ManyBodyOp Λ).mulVec (neelStateOf A)) =
+      ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) := by
+  rw [allUp_basisVec_heisenbergToyHamiltonian_expectation,
+    neelStateOf_heisenbergToyHamiltonian_expectation]
+  ring
+
 /-- Configuration-level distinctness for spin-`1/2`: `neelConfigOf A ≠
 fun _ => 0` when `|¬A| > 0`. Spin-`1/2` mirror of γ-4 step 144. -/
 theorem neelConfigOf_ne_allUp
