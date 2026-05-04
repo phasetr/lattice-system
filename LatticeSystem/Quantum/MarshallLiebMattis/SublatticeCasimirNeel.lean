@@ -619,6 +619,20 @@ theorem neelStateOf_ne_zero (A : Λ → Bool) : neelStateOf A ≠ 0 := by
   rw [h1] at h0
   exact one_ne_zero h0
 
+/-- The spin-`1/2` Néel state has norm-squared 1:
+`<Φ_Néel | Φ_Néel> = 1`. Direct from `basisVec_inner` orthonormality. -/
+theorem neelStateOf_inner_self (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A)) (neelStateOf A) = 1 := by
+  unfold neelStateOf dotProduct
+  rw [Finset.sum_eq_single (neelConfigOf A)]
+  · rw [basisVec_self]
+    simp
+  · intros τ _ hτne
+    rw [basisVec_of_ne hτne]
+    simp
+  · intro h
+    exact (h (Finset.mem_univ _)).elim
+
 /-- `Ŝ_¬A^- · Ŝ_¬A^+ · |Φ_Néel⟩ = |¬A| · |Φ_Néel⟩`. Spin-`1/2` mirror of
 γ-4 step 104 via dual Cartan identity. -/
 theorem sublatticeSpinHalfOpComplementMinus_complement_plus_mulVec_neelStateOf
