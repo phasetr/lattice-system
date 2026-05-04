@@ -222,6 +222,22 @@ theorem heisenbergToyHamiltonianS_commute_totalSpinSOpMinus (A : Λ → Bool) :
     Commute (heisenbergToyHamiltonianS (Λ := Λ) A N) (totalSpinSOpMinus Λ N) :=
   heisenbergHamiltonianS_commute_totalSpinSOpMinus (bipartiteCoupling A)
 
+/-! ## Magnetization subspace preservation -/
+
+/-- The spin-`S` toy Hamiltonian preserves each magnetization subspace:
+`v ∈ magSubspaceS Λ N M ⇒ (Ĥ_toy_S A N · v) ∈ magSubspaceS Λ N M`.
+Direct corollary of `[Ĥ_toy_S, Ŝ_tot^(3)] = 0` (PR #1075).
+
+Operator-level statement of magnetisation conservation under the toy
+AFM dynamics, foundation for block-diagonalisation against
+`magConfigS V N M` sectors in the ground-state argument. -/
+theorem heisenbergToyHamiltonianS_mulVec_mem_magSubspaceS
+    (A : Λ → Bool) (M : ℂ)
+    {v : (Λ → Fin (N + 1)) → ℂ}
+    (hv : v ∈ magSubspaceS Λ N M) :
+    (heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec v ∈ magSubspaceS Λ N M :=
+  heisenbergHamiltonianS_mulVec_mem_magSubspaceS (bipartiteCoupling A) N M hv
+
 /-! ## Commutativity with the total Casimir -/
 
 /-- The spin-`S` toy Hamiltonian commutes with the total spin Casimir:
