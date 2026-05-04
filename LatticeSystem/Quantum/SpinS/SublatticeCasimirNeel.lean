@@ -621,4 +621,37 @@ theorem sublatticeSpinSOp12sq_mulVec_neelStateOfS (A : Λ → Bool) (N : ℕ) :
   congr 1
   ring
 
+/-- `((Ŝ_¬A^(1))² + (Ŝ_¬A^(2))²) · |Φ_Néel⟩ = (|¬A|·N/2) · |Φ_Néel⟩`. Complement
+version of `sublatticeSpinSOp12sq_mulVec_neelStateOfS`. -/
+theorem sublatticeSpinSOp12sq_complement_mulVec_neelStateOfS
+    (A : Λ → Bool) (N : ℕ) :
+    (sublatticeSpinSOp1 N (fun x => ! A x) *
+        sublatticeSpinSOp1 N (fun x => ! A x) +
+      sublatticeSpinSOp2 N (fun x => ! A x) *
+        sublatticeSpinSOp2 N (fun x => ! A x)).mulVec
+        (neelStateOfS A N) =
+      (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) •
+        neelStateOfS A N := by
+  have hCasimir := sublatticeSpinSquaredS_complement_mulVec_neelStateOfS A N
+  rw [sublatticeSpinSquaredS_def] at hCasimir
+  rw [Matrix.add_mulVec, Matrix.add_mulVec] at hCasimir
+  have hSq3 := sublatticeSpinSOp3_complement_sq_mulVec_neelStateOfS A N
+  rw [hSq3] at hCasimir
+  set k : ℂ := ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+      ((N : ℂ) / 2)
+  rw [Matrix.add_mulVec]
+  have h := hCasimir
+  have hab : (sublatticeSpinSOp1 N (fun x => ! A x) *
+        sublatticeSpinSOp1 N (fun x => ! A x)).mulVec
+        (neelStateOfS A N) +
+      (sublatticeSpinSOp2 N (fun x => ! A x) *
+        sublatticeSpinSOp2 N (fun x => ! A x)).mulVec
+        (neelStateOfS A N) =
+      (k * (k + 1)) • neelStateOfS A N - k ^ 2 • neelStateOfS A N := by
+    rw [eq_sub_iff_add_eq]; exact h
+  rw [hab, ← sub_smul]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
