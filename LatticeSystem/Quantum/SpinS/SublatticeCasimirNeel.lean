@@ -712,6 +712,27 @@ theorem neelStateOfS_inner_self (A : Λ → Bool) (N : ℕ) :
   unfold neelStateOfS
   exact basisVecS_inner_self _
 
+/-- `<Φ_Néel | Ŝ_A^- · Ŝ_¬A^+ | Φ_Néel> = 0`. The cross-flip expectation
+vanishes by taking the Hermitian conjugate: `<Ŝ_A^+ Φ_Néel | Ŝ_¬A^+ Φ_Néel>`,
+and `Ŝ_A^+ · Φ_Néel = 0`. -/
+theorem neelStateOfS_sublattice_minus_plus_cross_expectation
+    (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((sublatticeSpinSOpMinus N A *
+            sublatticeSpinSOpPlus N (fun x => ! A x)).mulVec
+          (neelStateOfS A N)) = 0 := by
+  -- <Néel | (Ŝ_A^-)(Ŝ_¬A^+) | Néel> = (Ŝ_¬A^+ Néel)ᴴ ⬝ Ŝ_A^- Néelᴴ⁻¹ ... too complex
+  -- Direct route: compute via star_dotProduct and Ŝ_A^- = conjTranspose Ŝ_A^+
+  rw [← Matrix.mulVec_mulVec]
+  rw [Matrix.dotProduct_mulVec]
+  rw [show sublatticeSpinSOpMinus N A =
+      (sublatticeSpinSOpPlus N A).conjTranspose from
+    (sublatticeSpinSOpPlus_conjTranspose N A).symm]
+  rw [← Matrix.star_mulVec]
+  rw [sublatticeSpinSOpPlus_mulVec_neelStateOfS]
+  rw [star_zero]
+  exact zero_dotProduct _
+
 /-- `<Φ_Néel | Ŝ_tot^(3) | Φ_Néel> = (|A| - |¬A|)·N/2`. The Néel state is
 an `Ŝ_tot^(3)` eigenvector with magnetization `(|A| - |¬A|)·N/2`. -/
 theorem neelStateOfS_totalSpinSOp3_expectation (A : Λ → Bool) (N : ℕ) :
