@@ -1177,6 +1177,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionDoublyProjection_pow_succ` / `fermionEmptyProjection_pow_succ` / `fermionUpProjection_pow_succ` / `fermionDownProjection_pow_succ` | `(p_α(i))^(k+1) = p_α(i)` for all 4 per-site projections (induction from PRs #1005, #1012; mirrors PR #992) | `Fermion/JordanWigner/Hubbard/SiteProjectionsPow.lean` (PR #1034) |
 | `fermionEmptyProjection_commute_of_any` | `Commute (p_∅(i)) (p_∅(j))` for any `i, j` (cross-site Hubbard empty projections commute; companion to PR #1006 for `p_⇈`) | `Fermion/JordanWigner/Hubbard/EmptyProjectionCommute.lean` (PR #1035) |
 | `fermionUpProjection_commute_of_any` / `fermionDownProjection_commute_of_any` | `Commute (p_↑(i)) (p_↑(j))`, `Commute (p_↓(i)) (p_↓(j))` for any `i, j` (cross-site Hubbard single-occupancy projections commute; completes diagonal cross-site Commute relations together with PRs #1006, #1035) | `Fermion/JordanWigner/Hubbard/SingleProjectionsCommute.lean` (PR #1036) |
+| `fermionUpProjection_commute_fermionDownProjection_of_any` | `Commute (p_↑(i)) (p_↓(j))` for any `i, j` (cross-projection only-up vs only-down commute; non-diagonal extension) | `Fermion/JordanWigner/Hubbard/UpDownProjectionCommute.lean` (PR #1037) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 
