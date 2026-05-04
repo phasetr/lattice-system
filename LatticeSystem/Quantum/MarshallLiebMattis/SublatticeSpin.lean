@@ -638,4 +638,82 @@ theorem sublatticeSpinHalfSquared_commute_totalSpinHalfSquared (A : Λ → Bool)
   have h3 := sublatticeSpinHalfSquared_commute_totalSpinHalfOp3 A
   exact ((h1.mul_right h1).add_right (h2.mul_right h2)).add_right (h3.mul_right h3)
 
+/-! ## Sublattice ladder operators (raising / lowering on `A`) -/
+
+/-- Sublattice raising operator on `A`: `Ŝ_A^+ := Σ_{x : A x} onSite x spinHalfOpPlus`.
+
+Spin-`1/2` mirror of `sublatticeSpinSOpPlus` (PR #1085). -/
+noncomputable def sublatticeSpinHalfOpPlus (A : Λ → Bool) : ManyBodyOp Λ :=
+  ∑ x : Λ, if A x then onSite x spinHalfOpPlus else 0
+
+/-- Sublattice lowering operator on `A`: `Ŝ_A^- := Σ_{x : A x} onSite x spinHalfOpMinus`. -/
+noncomputable def sublatticeSpinHalfOpMinus (A : Λ → Bool) : ManyBodyOp Λ :=
+  ∑ x : Λ, if A x then onSite x spinHalfOpMinus else 0
+
+/-- `Ŝ_A^+ = Ŝ_A^(1) + i · Ŝ_A^(2)`. -/
+theorem sublatticeSpinHalfOpPlus_eq_add (A : Λ → Bool) :
+    sublatticeSpinHalfOpPlus A =
+      sublatticeSpinHalfOp1 A + Complex.I • sublatticeSpinHalfOp2 A := by
+  unfold sublatticeSpinHalfOpPlus sublatticeSpinHalfOp1 sublatticeSpinHalfOp2
+  rw [Finset.smul_sum, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA, if_pos hA, if_pos hA]
+    rw [← onSite_smul, ← onSite_add, spinHalfOpPlus_eq_add]
+  · cases h : A x
+    · rw [if_neg, if_neg, if_neg]
+      · rw [smul_zero, add_zero]
+      · simp
+      · simp
+      · simp
+    · exact absurd h hA
+
+/-- `Ŝ_A^- = Ŝ_A^(1) − i · Ŝ_A^(2)`. -/
+theorem sublatticeSpinHalfOpMinus_eq_sub (A : Λ → Bool) :
+    sublatticeSpinHalfOpMinus A =
+      sublatticeSpinHalfOp1 A - Complex.I • sublatticeSpinHalfOp2 A := by
+  unfold sublatticeSpinHalfOpMinus sublatticeSpinHalfOp1 sublatticeSpinHalfOp2
+  rw [Finset.smul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl ?_
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA, if_pos hA, if_pos hA]
+    rw [← onSite_smul, ← onSite_sub, spinHalfOpMinus_eq_sub]
+  · cases h : A x
+    · rw [if_neg, if_neg, if_neg]
+      · rw [smul_zero, sub_zero]
+      · simp
+      · simp
+      · simp
+    · exact absurd h hA
+
+/-- The total raising operator decomposes as a sum over sublattices:
+`Ŝ^+_tot = Ŝ_A^+ + Ŝ_¬A^+`. -/
+theorem totalSpinHalfOpPlus_eq_sublattice_sum (A : Λ → Bool) :
+    totalSpinHalfOpPlus Λ =
+      sublatticeSpinHalfOpPlus A + sublatticeSpinHalfOpPlus (fun x => ! A x) := by
+  unfold totalSpinHalfOpPlus sublatticeSpinHalfOpPlus
+  rw [← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  by_cases hA : A x = true
+  · simp [hA]
+  · cases h : A x
+    · simp [h]
+    · exact absurd h hA
+
+/-- The total lowering operator decomposes as a sum over sublattices:
+`Ŝ^-_tot = Ŝ_A^- + Ŝ_¬A^-`. -/
+theorem totalSpinHalfOpMinus_eq_sublattice_sum (A : Λ → Bool) :
+    totalSpinHalfOpMinus Λ =
+      sublatticeSpinHalfOpMinus A + sublatticeSpinHalfOpMinus (fun x => ! A x) := by
+  unfold totalSpinHalfOpMinus sublatticeSpinHalfOpMinus
+  rw [← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  by_cases hA : A x = true
+  · simp [hA]
+  · cases h : A x
+    · simp [h]
+    · exact absurd h hA
+
 end LatticeSystem.Quantum
