@@ -42,6 +42,17 @@ Phase 3 PR 3.) -/
 def neelConfigOf {V : Type*} (A : V → Bool) : V → Fin 2 :=
   fun x => if A x then 0 else 1
 
+/-- `neelConfigOf (¬A) x = if A x then 1 else 0`: the Néel config under
+sublattice swap. The natural sublattice-swap dual of `neelConfigOf A`. -/
+theorem neelConfigOf_complement {V : Type*} (A : V → Bool) (x : V) :
+    neelConfigOf (fun y => ! A y) x = if A x then 1 else 0 := by
+  unfold neelConfigOf
+  by_cases hA : A x = true
+  · simp [hA]
+  · cases h : A x
+    · simp [h]
+    · exact absurd h hA
+
 /-- Generic Néel state: the many-body basis vector at
 `neelConfigOf A`. -/
 noncomputable def neelStateOf {V : Type*} [Fintype V] [DecidableEq V]
