@@ -1218,4 +1218,34 @@ theorem sublatticeSpinHalfOpPlus_mulVec_mem_magnetizationSubspace_of_mem
   rw [Matrix.mulVec_mulVec, hcomm, Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hv,
     Matrix.mulVec_smul, add_smul, one_smul]
 
+/-! ## Cross-sublattice commute for ladder operators (spin-`1/2`) -/
+
+/-- Spin-`1/2` mirror of `sublatticeSpinSOpPlus_cross_commute`. -/
+theorem sublatticeSpinHalfOpPlus_cross_commute (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfOpPlus A)
+      (sublatticeSpinHalfOpPlus (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfOpPlus
+  exact sublatticeSpinHalfOpGeneric_cross_commute A spinHalfOpPlus spinHalfOpPlus
+
+/-- Spin-`1/2` mirror of `sublatticeSpinSOpMinus_cross_commute`. -/
+theorem sublatticeSpinHalfOpMinus_cross_commute (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfOpMinus A)
+      (sublatticeSpinHalfOpMinus (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfOpMinus
+  exact sublatticeSpinHalfOpGeneric_cross_commute A spinHalfOpMinus spinHalfOpMinus
+
+/-- Spin-`1/2` mirror of `sublatticeSpinSOpPlus_cross_commute_minus`. -/
+theorem sublatticeSpinHalfOpPlus_cross_commute_minus (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfOpPlus A)
+      (sublatticeSpinHalfOpMinus (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfOpPlus sublatticeSpinHalfOpMinus
+  exact sublatticeSpinHalfOpGeneric_cross_commute A spinHalfOpPlus spinHalfOpMinus
+
+/-- Spin-`1/2` mirror of `sublatticeSpinSOpMinus_cross_commute_plus`. -/
+theorem sublatticeSpinHalfOpMinus_cross_commute_plus (A : Λ → Bool) :
+    Commute (sublatticeSpinHalfOpMinus A)
+      (sublatticeSpinHalfOpPlus (fun x => ! A x)) := by
+  unfold sublatticeSpinHalfOpMinus sublatticeSpinHalfOpPlus
+  exact sublatticeSpinHalfOpGeneric_cross_commute A spinHalfOpMinus spinHalfOpPlus
+
 end LatticeSystem.Quantum
