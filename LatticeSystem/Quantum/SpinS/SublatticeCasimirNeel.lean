@@ -997,6 +997,21 @@ theorem allAlignedStateS_zero_heisenbergToyHamiltonianS_expectation
   rw [dotProduct_smul, allAlignedStateS_inner_self]
   rw [smul_eq_mul, mul_one]
 
+/-- `<Φ_⊥ | Ĥ_toy_S | Φ_⊥> = +|A|·|¬A|·N²/2`. The all-down state's toy
+Hamiltonian expectation. Same eigenvalue as the all-up state by the
+symmetry of the toy Hamiltonian. -/
+theorem allAlignedStateS_last_heisenbergToyHamiltonianS_expectation
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (allAlignedStateS Λ N (Fin.last N)))
+        ((heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec
+          (allAlignedStateS Λ N (Fin.last N))) =
+      ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+        ((N : ℂ) * (N : ℂ)) / 2 := by
+  rw [heisenbergToyHamiltonianS_mulVec_allAlignedStateS_last_simplified]
+  rw [dotProduct_smul, allAlignedStateS_inner_self]
+  rw [smul_eq_mul, mul_one]
+
 /-- Configuration-level distinctness: the Néel config differs from the
 all-up config when `|¬A| > 0` and `N > 0`. Used to conclude that Néel
 and all-up states span different basis vectors. -/
