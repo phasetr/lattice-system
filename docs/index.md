@@ -1154,6 +1154,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionMultiAnnihilation_mul_fermionMultiAnnihilation_mul_fermionMultiCreation_eq_zero` / `fermionMultiAnnihilation_mul_fermionMultiCreation_mul_fermionMultiCreation_eq_zero` | `c_i · (c_i · c_i†) = 0`; `(c_i · c_i†) · c_i† = 0` (multi-mode JW ladder-on-hole-projection vanishing, mirror of PR #1009) | `Fermion/JordanWigner/CDaggerCLadderZero.lean` (PR #1010) |
 | `fermionUpDownNumber_site_partition_eq_one` | `(1−n_↑)(1−n_↓) + n_↑(1−n_↓) + (1−n_↑)n_↓ + n_↑·n_↓ = 1` (Hubbard per-site 4-state partition of identity: empty, only-up, only-down, doubly-occupied) | `Fermion/JordanWigner/Hubbard/SitePartitionIdentity.lean` (PR #1011) |
 | `one_sub_fermionUpNumber_mul_one_sub_fermionDownNumber_sq` / `fermionUpNumber_mul_one_sub_fermionDownNumber_sq` / `one_sub_fermionUpNumber_mul_fermionDownNumber_sq` | `(p_∅)² = p_∅`, `(p_↑)² = p_↑`, `(p_↓)² = p_↓` (Hubbard empty/only-up/only-down per-site projections idempotent; companions to PR #1005 `(p_⇈)² = p_⇈`) | `Fermion/JordanWigner/Hubbard/SiteProjectionsIdempotent.lean` (PR #1012) |
+| `fermionUpDownNumber_mul_empty_eq_zero` / `empty_mul_fermionUpDownNumber_eq_zero` | `p_⇈ · p_∅ = 0`; `p_∅ · p_⇈ = 0` (Hubbard per-site doubly-occupied and empty projections are mutually orthogonal) | `Fermion/JordanWigner/Hubbard/SiteProjectionsDoublyEmpty.lean` (PR #1014) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 
