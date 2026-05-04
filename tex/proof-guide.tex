@@ -6130,6 +6130,17 @@ on-site Hubbard interaction $U\sum_i n_\uparrow(i)
 n_\downarrow(i)$ is $U$ times a sum of pairwise commuting
 projections, hence simultaneously diagonalisable.
 
+\textbf{Spinful Hubbard number-operator Hermiticity (PR~\#1007)}:
+in the file
+\texttt{Fermion/JordanWigner/Hubbard/SpinfulNumberHermitian.lean}.
+Standalone named Hermiticity lemmas
+$(n_\uparrow(i))^H = n_\uparrow(i)$,
+$(n_\downarrow(i))^H = n_\downarrow(i)$, and
+$(n_\uparrow(i) n_\downarrow(i))^H = n_\uparrow(i)
+n_\downarrow(i)$. Each is a one-line corollary of
+\texttt{fermionMultiNumber\_isHermitian} and
+\texttt{fermionMultiNumber\_mul\_isHermitian}.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-

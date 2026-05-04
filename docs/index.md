@@ -1147,6 +1147,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionMultiAnnihilation_mul_fermionMultiCreation_commute` | `Commute (c_i · c_i†) (c_j · c_j†)` for any `i, j` (multi-mode JW hole projections at any two sites commute) | `Fermion/JordanWigner/HoleProjectionsCommute.lean` (PR #1004) |
 | `fermionUpNumber_commute_fermionDownNumber` / `fermionUpNumber_mul_fermionDownNumber_sq` | `Commute n_↑(i) n_↓(i)`; `(n_↑(i) · n_↓(i))² = n_↑(i) · n_↓(i)` (Hubbard same-site double-occupancy projection: cross-spin number commute + idempotency) | `Fermion/JordanWigner/Hubbard/DoubleOccupancyProjection.lean` (PR #1005) |
 | `fermionUpNumber_mul_fermionDownNumber_commute` | `Commute (n_↑(i) · n_↓(i)) (n_↑(j) · n_↓(j))` for any `i, j` (cross-site Hubbard double-occupancy commute, makes the on-site interaction a sum of pairwise commuting projections) | `Fermion/JordanWigner/Hubbard/DoubleOccupancyCommute.lean` (PR #1006) |
+| `fermionUpNumber_isHermitian` / `fermionDownNumber_isHermitian` / `fermionUpNumber_mul_fermionDownNumber_isHermitian` | `(n_↑(i)).IsHermitian`; `(n_↓(i)).IsHermitian`; `(n_↑(i) · n_↓(i)).IsHermitian` (spinful Hubbard number-operator Hermiticity, named-lemma extraction) | `Fermion/JordanWigner/Hubbard/SpinfulNumberHermitian.lean` (PR #1007) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 

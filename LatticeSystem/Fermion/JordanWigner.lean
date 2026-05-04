@@ -22,6 +22,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.AllUpState
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SaturatedFerromagnetism
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyProjection
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyCommute
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinfulNumberHermitian
 
 /-!
 # Multi-mode fermion via Jordan–Wigner mapping
@@ -57,6 +58,7 @@ is now a thin re-import of five sub-files under
 | `Hubbard/SaturatedFerromagnetism.lean` | spin Casimir, Def 11.1, SU(2) algebra |
 | `Hubbard/DoubleOccupancyProjection.lean` | site-`i` `Commute n_↑ n_↓` + idempotent product |
 | `Hubbard/DoubleOccupancyCommute.lean` | cross-site `Commute (n_↑(i)·n_↓(i)) (n_↑(j)·n_↓(j))` |
+| `Hubbard/SpinfulNumberHermitian.lean` | `n_↑(i)`, `n_↓(i)`, `n_↑(i)·n_↓(i)` Hermitian |
 
 Old `import LatticeSystem.Fermion.JordanWigner` continues to
 work unchanged via this façade. Following the convention from
