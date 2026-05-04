@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.TotalSpin
 import LatticeSystem.Quantum.TotalSpin.Casimir
+import LatticeSystem.Quantum.MagnetizationSubspace
 
 /-!
 # Sublattice spin operators for the MLM toy Hamiltonian
@@ -811,5 +812,42 @@ theorem totalSpinHalfOp3_commutator_sublatticeSpinHalfOpMinus (A : Λ → Bool) 
       sublatticeSpinHalfOp3 A * sublatticeSpinHalfOpMinus A -
         sublatticeSpinHalfOpMinus A * sublatticeSpinHalfOp3 A from by abel]
   exact h_self
+
+/-! ## Sublattice ladder operators shift the magnetization subspace -/
+
+/-- `Ŝ_A^- · v ∈ magnetizationSubspace Λ (M − 1)` for `v ∈ magnetizationSubspace Λ M`.
+Spin-`1/2` mirror of γ-4 step 48. -/
+theorem sublatticeSpinHalfOpMinus_mulVec_mem_magnetizationSubspace_of_mem
+    (A : Λ → Bool) {M : ℂ} {v : (Λ → Fin 2) → ℂ}
+    (hv : v ∈ magnetizationSubspace Λ M) :
+    (sublatticeSpinHalfOpMinus A).mulVec v ∈ magnetizationSubspace Λ (M - 1) := by
+  rw [mem_magnetizationSubspace_iff] at hv ⊢
+  have h := totalSpinHalfOp3_commutator_sublatticeSpinHalfOpMinus A
+  have hcomm : totalSpinHalfOp3 Λ * sublatticeSpinHalfOpMinus A =
+      sublatticeSpinHalfOpMinus A * totalSpinHalfOp3 Λ - sublatticeSpinHalfOpMinus A := by
+    have hadd : totalSpinHalfOp3 Λ * sublatticeSpinHalfOpMinus A =
+        (totalSpinHalfOp3 Λ * sublatticeSpinHalfOpMinus A -
+          sublatticeSpinHalfOpMinus A * totalSpinHalfOp3 Λ) +
+        sublatticeSpinHalfOpMinus A * totalSpinHalfOp3 Λ := by abel
+    rw [hadd, h]; abel
+  rw [Matrix.mulVec_mulVec, hcomm, Matrix.sub_mulVec, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul, sub_smul, one_smul]
+
+/-- `Ŝ_A^+ · v ∈ magnetizationSubspace Λ (M + 1)` for `v ∈ magnetizationSubspace Λ M`. -/
+theorem sublatticeSpinHalfOpPlus_mulVec_mem_magnetizationSubspace_of_mem
+    (A : Λ → Bool) {M : ℂ} {v : (Λ → Fin 2) → ℂ}
+    (hv : v ∈ magnetizationSubspace Λ M) :
+    (sublatticeSpinHalfOpPlus A).mulVec v ∈ magnetizationSubspace Λ (M + 1) := by
+  rw [mem_magnetizationSubspace_iff] at hv ⊢
+  have h := totalSpinHalfOp3_commutator_sublatticeSpinHalfOpPlus A
+  have hcomm : totalSpinHalfOp3 Λ * sublatticeSpinHalfOpPlus A =
+      sublatticeSpinHalfOpPlus A * totalSpinHalfOp3 Λ + sublatticeSpinHalfOpPlus A := by
+    have hadd : totalSpinHalfOp3 Λ * sublatticeSpinHalfOpPlus A =
+        (totalSpinHalfOp3 Λ * sublatticeSpinHalfOpPlus A -
+          sublatticeSpinHalfOpPlus A * totalSpinHalfOp3 Λ) +
+        sublatticeSpinHalfOpPlus A * totalSpinHalfOp3 Λ := by abel
+    rw [hadd, h]; abel
+  rw [Matrix.mulVec_mulVec, hcomm, Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul, add_smul, one_smul]
 
 end LatticeSystem.Quantum
