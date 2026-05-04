@@ -751,6 +751,7 @@ theorem neelStateOf_totalSpinHalfOp3_sq_expectation (A : Λ → Bool) :
   rw [totalSpinHalfOp3_sq_mulVec_neelStateOf]
   rw [dotProduct_smul, neelStateOf_inner_self, smul_eq_mul, mul_one]
 
+
 /-- `<Φ_Néel | (Ŝ_tot)² | Φ_Néel> = ((|A|-|¬A|)/2)² + (|A|+|¬A|)/2`. Spin-`1/2`
 mirror of γ-4 step 126. The full total-spin Casimir expectation on Néel. -/
 theorem neelStateOf_totalSpinHalfSquared_expectation (A : Λ → Bool) :
@@ -1023,5 +1024,22 @@ theorem neelConfigOf_ne_allDown
   unfold neelConfigOf at h
   rw [if_pos hx] at h
   exact (by decide : (0 : Fin 2) ≠ 1) h
+
+/-- `<Φ_Néel | (Ŝ_tot^(1))² + (Ŝ_tot^(2))² | Φ_Néel> = |Λ|/2`. Spin-`1/2`
+mirror of γ-4 step 156. -/
+theorem neelStateOf_totalSpinHalfOp12_sq_expectation (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        ((totalSpinHalfOp1 Λ * totalSpinHalfOp1 Λ +
+          totalSpinHalfOp2 Λ * totalSpinHalfOp2 Λ).mulVec
+          (neelStateOf A)) =
+      (Fintype.card Λ : ℂ) / 2 := by
+  have htotal := neelStateOf_totalSpinHalfSquared_expectation_card_Lambda A
+  have hSq3 := neelStateOf_totalSpinHalfOp3_sq_expectation A
+  unfold totalSpinHalfSquared at htotal
+  rw [Matrix.add_mulVec, Matrix.add_mulVec] at htotal
+  rw [dotProduct_add, dotProduct_add] at htotal
+  rw [hSq3] at htotal
+  rw [Matrix.add_mulVec, dotProduct_add]
+  linear_combination htotal
 
 end LatticeSystem.Quantum
