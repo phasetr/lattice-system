@@ -101,7 +101,7 @@ theorem totalSpinSOpMinus_eq_sub :
 /-! ## Adjoint relations -/
 
 /-- The conjugate transpose of `onSiteS i A` equals `onSiteS i Aᴴ`. -/
-private lemma onSiteS_conjTranspose (i : Λ)
+theorem onSiteS_conjTranspose (i : Λ)
     (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
     (onSiteS i A : ManyBodyOpS Λ N).conjTranspose =
       (onSiteS i A.conjTranspose : ManyBodyOpS Λ N) := by
