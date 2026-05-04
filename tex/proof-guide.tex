@@ -6526,6 +6526,19 @@ all-down state belongs to the kernel of $H_{\rm int}$ by the
 same argument as for the all-up state, manifesting up/down
 symmetry.
 
+\textbf{All-down state total-number / spin operators (PR~\#1040)}:
+in the file
+\texttt{Fermion/JordanWigner/Hubbard/AllDownStateTotalNumber.lean}.
+Mirror of \texttt{SaturatedFerromagnetism.lean}'s all-up
+versions: $\hat N_\downarrow\,|\!\downarrow\cdots\downarrow
+\rangle = (N+1)\,|\!\downarrow\cdots\downarrow\rangle$,
+$\hat N_\uparrow\,|\!\downarrow\cdots\downarrow\rangle = 0$,
+$\hat S^z_{\rm tot}\,|\!\downarrow\cdots\downarrow\rangle =
+-(N+1)/2\,|\!\downarrow\cdots\downarrow\rangle$, and
+$\hat S^-_{\rm tot}\,|\!\downarrow\cdots\downarrow\rangle = 0$.
+The all-down state is the lowest-weight state of the global
+SU(2) spin algebra (lowest $S^z$, annihilated by $S^-$).
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
