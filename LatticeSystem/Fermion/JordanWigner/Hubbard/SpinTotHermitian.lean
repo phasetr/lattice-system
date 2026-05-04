@@ -15,8 +15,9 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.Charges
 `fermionTotalSpinPlus_conjTranspose` by taking `conjTranspose`
 of both sides.
 
-`Ŝ^z = (1/2)(N_↑ − N_↓)` is Hermitian since `N_↑, N_↓` are
-Hermitian and the scalar `1/2` is real.
+`Ŝ^z = (1/2)(N_↑ − N_↓)` is Hermitian since the difference of
+the Hermitian `N_↑, N_↓` is Hermitian and the scalar `1/2` is
+real.
 
 `Ŝ²_tot = Ŝ^- Ŝ^+ + Ŝ^z (Ŝ^z + 1)` is Hermitian:
 - `(Ŝ^- Ŝ^+)ᴴ = (Ŝ^+)ᴴ (Ŝ^-)ᴴ = Ŝ^- Ŝ^+`,
