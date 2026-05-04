@@ -5993,6 +5993,13 @@ last equality uses the definitional
 $n_i = c_i^\dagger c_i$. Subtracting $c_i^\dagger c_i = n_i$
 yields $[c_i,c_i^\dagger] = (1 - n_i) - n_i = 1 - 2 n_i$.
 
+\textbf{Multi-mode (JW) number-operator power $n_i^{k+1} = n_i$
+(PR~\#995)}: multi-mode mirror of (the first half of) PR~\#992,
+in the file \texttt{Fermion/JordanWigner/NumberPow.lean}. Direct
+induction on $k$ from $n_i^2 = n_i$
+(\texttt{fermionMultiNumber\_sq}, in
+\texttt{Fermion/JordanWigner/Operators.lean}).
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-

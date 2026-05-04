@@ -2,6 +2,9 @@ import LatticeSystem.Fermion.JordanWigner.String
 import LatticeSystem.Fermion.JordanWigner.Operators
 import LatticeSystem.Fermion.JordanWigner.CAR
 import LatticeSystem.Fermion.JordanWigner.Number
+import LatticeSystem.Fermion.JordanWigner.NumberAnticommutators
+import LatticeSystem.Fermion.JordanWigner.NumberPow
+import LatticeSystem.Fermion.JordanWigner.CDaggerCCommutator
 import LatticeSystem.Fermion.JordanWigner.Hubbard
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Charges
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Graph
@@ -23,6 +26,9 @@ is now a thin re-import of five sub-files under
 | `Operators.lean` | multi-mode `c_i`, `c_i†`, on-site CAR, hermiticity, number op |
 | `CAR.lean` | full canonical anticommutation (same-site + cross-site, factorisations) |
 | `Number.lean` | number commutators, Hubbard skeleton, fermion vacuum |
+| `NumberAnticommutators.lean` | same-site `{n_i, c_i}`, `{n_i, c_i†}` anticommutators |
+| `NumberPow.lean` | `n_i^(k+1) = n_i` (idempotent projection power) |
+| `CDaggerCCommutator.lean` | same-site `[c_i, c_i†] = 1 − 2·n_i` |
 | `Hubbard.lean` | spinful wrappers, on-graph Hubbard, 1D open / periodic chain Gibbs |
 | `Hubbard/Charges.lean` | `N_↑`, `N_↓`, `S^z_tot`, vacuum eigenstates, cross-spin commutes |
 | `Hubbard/Graph.lean` | graph-centric wrappers, chain/cycle Hamiltonians + Gibbs families |
