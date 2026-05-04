@@ -907,4 +907,10 @@ theorem neelStateOf_span_le_magnetizationSubspace (A : Λ → Bool) :
   rw [Submodule.span_le, Set.singleton_subset_iff]
   exact neelStateOf_mem_magnetizationSubspace A
 
+/-- The line spanned by the Néel state is 1-dimensional:
+`finrank ℂ (ℂ ∙ Φ_Néel) = 1`. -/
+theorem neelStateOf_finrank_span (A : Λ → Bool) :
+    Module.finrank ℂ (Submodule.span ℂ {neelStateOf A}) = 1 :=
+  finrank_span_singleton (neelStateOf_ne_zero A)
+
 end LatticeSystem.Quantum
