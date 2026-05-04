@@ -238,6 +238,34 @@ theorem heisenbergToyHamiltonianS_mulVec_mem_magSubspaceS
     (heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec v ∈ magSubspaceS Λ N M :=
   heisenbergHamiltonianS_mulVec_mem_magSubspaceS (bipartiteCoupling A) N M hv
 
+/-- The spin-`S` total Casimir preserves each magnetization subspace:
+`v ∈ magSubspaceS Λ N M ⇒ ((Ŝ_tot)² · v) ∈ magSubspaceS Λ N M`.
+Direct corollary of `[(Ŝ_tot)², Ŝ_tot^(3)] = 0`. -/
+theorem totalSpinSSquared_mulVec_mem_magSubspaceS
+    (M : ℂ) {v : (Λ → Fin (N + 1)) → ℂ} (hv : v ∈ magSubspaceS Λ N M) :
+    (totalSpinSSquared Λ N).mulVec v ∈ magSubspaceS Λ N M :=
+  mem_magSubspaceS_of_commute M (totalSpinSSquared Λ N)
+    (totalSpinSSquared_commute_totalSpinSOp3 (Λ := Λ) (N := N)).symm hv
+
+/-- The spin-`S` `A`-sublattice Casimir preserves each magnetization
+subspace: `v ∈ magSubspaceS Λ N M ⇒ ((Ŝ_A)² · v) ∈ magSubspaceS Λ N M`.
+Direct corollary of `Commute (Ŝ_A)² Ŝ_tot^(3)` (PR #1051). -/
+theorem sublatticeSpinSquaredS_mulVec_mem_magSubspaceS
+    (A : Λ → Bool) (M : ℂ) {v : (Λ → Fin (N + 1)) → ℂ}
+    (hv : v ∈ magSubspaceS Λ N M) :
+    (sublatticeSpinSquaredS N A).mulVec v ∈ magSubspaceS Λ N M :=
+  mem_magSubspaceS_of_commute M (sublatticeSpinSquaredS N A)
+    (sublatticeSpinSquaredS_commute_totalSpinSOp3 N A).symm hv
+
+/-- The spin-`S` `¬A`-sublattice Casimir preserves each magnetization
+subspace. Symmetric to the `A` case. -/
+theorem sublatticeSpinSquaredS_complement_mulVec_mem_magSubspaceS
+    (A : Λ → Bool) (M : ℂ) {v : (Λ → Fin (N + 1)) → ℂ}
+    (hv : v ∈ magSubspaceS Λ N M) :
+    (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec v ∈ magSubspaceS Λ N M :=
+  mem_magSubspaceS_of_commute M (sublatticeSpinSquaredS N (fun x => ! A x))
+    (sublatticeSpinSquaredS_commute_totalSpinSOp3 N (fun x => ! A x)).symm hv
+
 /-! ## Commutativity with the total Casimir -/
 
 /-- The spin-`S` toy Hamiltonian commutes with the total spin Casimir:
