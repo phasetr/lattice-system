@@ -164,4 +164,44 @@ theorem heisenbergToyHamiltonianS_eq_casimir_diff (A : Λ → Bool) :
       heisenbergToyHamiltonianS_eq_two_sublatticeSpinSDot N A]
   abel
 
+/-! ## Commutativity with the total Casimir -/
+
+/-- The spin-`S` toy Hamiltonian commutes with the total spin Casimir:
+`Commute Ĥ_toy_S (Ŝ_tot)²`. Follows from the general SU(2) invariance
+of any spin-`S` Heisenberg-type Hamiltonian
+(`heisenbergHamiltonianS_commute_totalSpinSSquared`).
+
+This is the standard fact used to project the toy Hamiltonian's
+ground state onto a fixed `(Ŝ_tot)²` eigenspace; combined with the
+Casimir identity, it underpins the `S_tot = ||A| − |B||·S` selection
+in Tasaki §2.5 Theorem 2.3. -/
+theorem heisenbergToyHamiltonianS_commute_totalSpinSSquared (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonianS (Λ := Λ) A N) (totalSpinSSquared Λ N) :=
+  heisenbergHamiltonianS_commute_totalSpinSSquared (bipartiteCoupling A) N
+
+/-- The spin-`S` toy Hamiltonian commutes with the `A`-sublattice
+Casimir: `Commute Ĥ_toy_S (Ŝ_A)²`. Follows from the closed form
+`Ĥ_toy_S = (Ŝ_tot)² − (Ŝ_A)² − (Ŝ_¬A)²` (PR #1056) and the three
+pairwise commutativities of the three Casimir operators (PRs #1047,
+#1052). -/
+theorem heisenbergToyHamiltonianS_commute_sublatticeSpinSquaredS (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonianS (Λ := Λ) A N) (sublatticeSpinSquaredS N A) := by
+  rw [heisenbergToyHamiltonianS_eq_casimir_diff N A]
+  refine Commute.sub_left (Commute.sub_left ?_ ?_) ?_
+  · exact (sublatticeSpinSquaredS_commute_totalSpinSSquared N A).symm
+  · exact Commute.refl _
+  · exact (sublatticeSpinSquaredS_cross_commute N A).symm
+
+/-- The spin-`S` toy Hamiltonian commutes with the `¬A`-sublattice
+Casimir: `Commute Ĥ_toy_S (Ŝ_¬A)²`. Symmetric to the `A` case. -/
+theorem heisenbergToyHamiltonianS_commute_sublatticeSpinSquaredS_complement
+    (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonianS (Λ := Λ) A N)
+            (sublatticeSpinSquaredS N (fun x => ! A x)) := by
+  rw [heisenbergToyHamiltonianS_eq_casimir_diff N A]
+  refine Commute.sub_left (Commute.sub_left ?_ ?_) ?_
+  · exact (sublatticeSpinSquaredS_commute_totalSpinSSquared N (fun x => ! A x)).symm
+  · exact sublatticeSpinSquaredS_cross_commute N A
+  · exact Commute.refl _
+
 end LatticeSystem.Quantum
