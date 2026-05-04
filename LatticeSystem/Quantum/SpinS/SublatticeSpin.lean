@@ -1,4 +1,8 @@
 import LatticeSystem.Quantum.SpinS.TotalSpin
+import LatticeSystem.Quantum.SpinS.MultiSiteCommutator
+import LatticeSystem.Quantum.SpinS.CyclicCommutator
+import LatticeSystem.Quantum.SpinS.CyclicCommutator23
+import LatticeSystem.Quantum.SpinS.CyclicCommutator31
 import LatticeSystem.Quantum.ManyBody
 
 /-!
@@ -326,6 +330,92 @@ theorem sublatticeSpinSOp3_cross_commute_op2 (A : Λ → Bool) :
   exact sublatticeSpinSOpGeneric_cross_commute N A (spinSOp3 N) (spinSOp2 N)
 
 /-! ## Sublattice Casimir cross-commute -/
+
+/-! ## Sublattice SU(2) algebra `[Ŝ_A^α, Ŝ_A^β] = i ε^αβγ Ŝ_A^γ`
+(spin-`S`)
+
+For `x ≠ y`, the cross-pair vanishes (`onSiteS_mul_onSiteS_of_ne`);
+for `x = y` and `A x = true`, the diagonal contribution gives
+`onSiteS x [Sα, Sβ] = i • onSiteS x Sγ`. -/
+
+/-- Generic sublattice-spin commutator (spin-`S`): if
+`Sα * Sβ - Sβ * Sα = Complex.I • Sγ` then
+`[Σ_x∈A onSiteS x Sα, Σ_x∈A onSiteS x Sβ] =
+ i • Σ_x∈A onSiteS x Sγ`. -/
+private lemma sublatticeSpinS_commutator_general
+    (A : Λ → Bool)
+    {Sα Sβ Sγ : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ}
+    (hab : Sα * Sβ - Sβ * Sα = Complex.I • Sγ) :
+    ((∑ x : Λ, if A x then onSiteS x Sα else 0) *
+        (∑ x : Λ, if A x then onSiteS x Sβ else 0) -
+      (∑ x : Λ, if A x then onSiteS x Sβ else 0) *
+        (∑ x : Λ, if A x then onSiteS x Sα else 0) : ManyBodyOpS Λ N) =
+      Complex.I • ∑ x : Λ, if A x then onSiteS x Sγ else 0 := by
+  calc (∑ x : Λ, if A x then onSiteS x Sα else 0) *
+            (∑ x : Λ, if A x then onSiteS x Sβ else 0) -
+          (∑ x : Λ, if A x then onSiteS x Sβ else 0) *
+            (∑ x : Λ, if A x then onSiteS x Sα else 0)
+      = ∑ x : Λ, ∑ y : Λ,
+          ((if A x then onSiteS x Sα else 0) *
+              (if A y then onSiteS y Sβ else 0) -
+            (if A y then onSiteS y Sβ else 0) *
+              (if A x then onSiteS x Sα else 0)) := by
+        rw [Finset.sum_mul, Finset.sum_mul]
+        simp_rw [Finset.mul_sum]
+        rw [Finset.sum_comm
+          (f := fun y x => (if A y then onSiteS y Sβ else 0) *
+              (if A x then onSiteS x Sα else 0))
+          (s := Finset.univ) (t := Finset.univ)]
+        rw [← Finset.sum_sub_distrib]
+        refine Finset.sum_congr rfl fun x _ => ?_
+        rw [← Finset.sum_sub_distrib]
+    _ = ∑ x : Λ, (if A x then Complex.I • onSiteS x Sγ else 0) := by
+        refine Finset.sum_congr rfl fun x _ => ?_
+        rw [Finset.sum_eq_single x]
+        · -- diagonal: y = x.
+          by_cases hAx : A x = true
+          · simp only [if_pos hAx]
+            rw [onSiteS_commutator_same, hab, onSiteS_smul]
+          · simp only [if_neg hAx, mul_zero, sub_zero]
+        · -- off-diagonal: y ≠ x, vanishes.
+          intros y _ hyx
+          by_cases hAx : A x = true
+          · by_cases hAy : A y = true
+            · simp only [if_pos hAx, if_pos hAy]
+              rw [onSiteS_mul_onSiteS_of_ne hyx.symm]; simp
+            · simp only [if_pos hAx, if_neg hAy, mul_zero, zero_mul, sub_zero]
+          · simp only [if_neg hAx, mul_zero, zero_mul, sub_zero]
+        · intro h; exact absurd (Finset.mem_univ x) h
+    _ = Complex.I • ∑ x : Λ, if A x then onSiteS x Sγ else 0 := by
+        rw [Finset.smul_sum]
+        refine Finset.sum_congr rfl fun x _ => ?_
+        by_cases hAx : A x = true
+        · rw [if_pos hAx, if_pos hAx]
+        · rw [if_neg hAx, if_neg hAx, smul_zero]
+
+/-- Sublattice spin-`S` commutator: `[Ŝ_A^(1), Ŝ_A^(2)] = i · Ŝ_A^(3)`. -/
+theorem sublatticeSpinSOp1_commutator_sublatticeSpinSOp2 (A : Λ → Bool) :
+    (sublatticeSpinSOp1 N A * sublatticeSpinSOp2 N A
+        - sublatticeSpinSOp2 N A * sublatticeSpinSOp1 N A : ManyBodyOpS Λ N) =
+      Complex.I • sublatticeSpinSOp3 N A := by
+  unfold sublatticeSpinSOp1 sublatticeSpinSOp2 sublatticeSpinSOp3
+  exact sublatticeSpinS_commutator_general N A (spinSOp1_commutator_spinSOp2 N)
+
+/-- Sublattice spin-`S` commutator: `[Ŝ_A^(2), Ŝ_A^(3)] = i · Ŝ_A^(1)`. -/
+theorem sublatticeSpinSOp2_commutator_sublatticeSpinSOp3 (A : Λ → Bool) :
+    (sublatticeSpinSOp2 N A * sublatticeSpinSOp3 N A
+        - sublatticeSpinSOp3 N A * sublatticeSpinSOp2 N A : ManyBodyOpS Λ N) =
+      Complex.I • sublatticeSpinSOp1 N A := by
+  unfold sublatticeSpinSOp1 sublatticeSpinSOp2 sublatticeSpinSOp3
+  exact sublatticeSpinS_commutator_general N A (spinSOp2_commutator_spinSOp3 N)
+
+/-- Sublattice spin-`S` commutator: `[Ŝ_A^(3), Ŝ_A^(1)] = i · Ŝ_A^(2)`. -/
+theorem sublatticeSpinSOp3_commutator_sublatticeSpinSOp1 (A : Λ → Bool) :
+    (sublatticeSpinSOp3 N A * sublatticeSpinSOp1 N A
+        - sublatticeSpinSOp1 N A * sublatticeSpinSOp3 N A : ManyBodyOpS Λ N) =
+      Complex.I • sublatticeSpinSOp2 N A := by
+  unfold sublatticeSpinSOp1 sublatticeSpinSOp2 sublatticeSpinSOp3
+  exact sublatticeSpinS_commutator_general N A (spinSOp3_commutator_spinSOp1 N)
 
 /-- `Commute (Ŝ_A)² (Ŝ_¬A)²` for spin-`S`. Each pairwise
 component `Commute ((Ŝ_A^(α))²) ((Ŝ_¬A^(β))²)` follows from the
