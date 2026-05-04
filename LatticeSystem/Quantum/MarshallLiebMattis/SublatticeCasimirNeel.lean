@@ -939,6 +939,39 @@ theorem allUp_basisVec_heisenbergToyHamiltonian_expectation (A : Λ → Bool) :
     exact h2.symm
   rw [hdiag]
 
+/-- `<basisVec (fun _ => 1) | Ĥ_toy | basisVec (fun _ => 1)> = +|A|·|¬A|/2`.
+Spin-`1/2` mirror of γ-4 step 148 (all-down spin-S expectation). Same
+positive eigenvalue as the all-up basis state by the Casimir symmetry. -/
+theorem allDown_basisVec_heisenbergToyHamiltonian_expectation (A : Λ → Bool) :
+    dotProduct (star (basisVec (fun _ : Λ => (1 : Fin 2))))
+        ((heisenbergToyHamiltonian A : ManyBodyOp Λ).mulVec
+          (basisVec (fun _ : Λ => (1 : Fin 2)))) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) / 2) := by
+  rw [basisVec_expectation_eq_diagonal]
+  have h := heisenbergToyHamiltonian_mulVec_basisVec_const_simplified A 1
+  have hdiag :
+      (heisenbergToyHamiltonian A : ManyBodyOp Λ)
+          (fun _ : Λ => (1 : Fin 2)) (fun _ : Λ => (1 : Fin 2)) =
+      ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) / 2 := by
+    have h2 : (heisenbergToyHamiltonian A : ManyBodyOp Λ).mulVec
+        (basisVec (fun _ : Λ => (1 : Fin 2))) (fun _ : Λ => (1 : Fin 2)) =
+        (heisenbergToyHamiltonian A : ManyBodyOp Λ)
+          (fun _ : Λ => (1 : Fin 2)) (fun _ : Λ => (1 : Fin 2)) := by
+      rw [Matrix.mulVec, dotProduct]
+      rw [Finset.sum_eq_single (fun _ : Λ => (1 : Fin 2))]
+      · rw [basisVec_self, mul_one]
+      · intros τ _ hτne
+        rw [basisVec_of_ne hτne]
+        simp
+      · intro h
+        exact (h (Finset.mem_univ _)).elim
+    rw [h] at h2
+    rw [Pi.smul_apply, basisVec_self, smul_eq_mul, mul_one] at h2
+    exact h2.symm
+  rw [hdiag]
+
 /-- **Variational spin gap** (spin-`1/2` mirror of γ-4 step 150):
 `<basisVec 0|Ĥ_toy|basisVec 0> - <Φ_Néel|Ĥ_toy|Φ_Néel> = |A|·|¬A|`.
 
