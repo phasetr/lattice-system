@@ -472,4 +472,26 @@ theorem onSite_mulVec_basisVec
     rw [Function.update_of_ne hj] at this
     exact this
 
+/-- For any matrix `M` and basis vector `|σ⟩ = basisVec σ`:
+`<σ | M | σ> = M σ σ`. Spin-`1/2` analog of `basisVecS_expectation_eq_diagonal`. -/
+theorem basisVec_expectation_eq_diagonal
+    (σ : Λ → Fin 2) (M : ManyBodyOp Λ) :
+    dotProduct (star (basisVec σ : (Λ → Fin 2) → ℂ))
+        (M.mulVec (basisVec σ)) = M σ σ := by
+  unfold dotProduct
+  rw [Finset.sum_eq_single σ]
+  · simp only [Pi.star_apply, basisVec_self, star_one, one_mul]
+    rw [Matrix.mulVec, dotProduct]
+    rw [Finset.sum_eq_single σ]
+    · rw [basisVec_self, mul_one]
+    · intros τ _ hτne
+      rw [basisVec_of_ne hτne]
+      simp
+    · intro h
+      exact (h (Finset.mem_univ _)).elim
+  · intros τ _ hτne
+    simp [basisVec_of_ne hτne]
+  · intro h
+    exact (h (Finset.mem_univ _)).elim
+
 end LatticeSystem.Quantum
