@@ -410,6 +410,24 @@ theorem sublatticeSpinHalfOp3_complement_sq_mulVec_neelStateOf (A : Λ → Bool)
   congr 1
   ring
 
+/-- `Ŝ_A^(3) · Ŝ_¬A^(3) · |Φ_Néel⟩ = -|A|·|¬A|/4 · |Φ_Néel⟩`. Spin-`1/2`
+mirror of γ-4 step 79: cross-sublattice z-axis product. -/
+theorem sublatticeSpinHalfOp3_cross_complement_mulVec_neelStateOf
+    (A : Λ → Bool) :
+    (sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp3 (fun x => ! A x)).mulVec
+        (neelStateOf A) =
+      (-(((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+            ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) /
+            4)) •
+        neelStateOf A := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [sublatticeSpinHalfOp3_complement_mulVec_neelStateOf]
+  rw [Matrix.mulVec_smul]
+  rw [sublatticeSpinHalfOp3_mulVec_neelStateOf]
+  rw [smul_smul]
+  congr 1
+  ring
+
 /-! ## Per-pair `spinHalfDot` diagonal at the Néel configuration -/
 
 /-- For a cross-sublattice pair `x ∈ A`, `y ∈ ¬A`, the spin-`1/2`
