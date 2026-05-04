@@ -813,6 +813,51 @@ theorem totalSpinHalfOp3_commutator_sublatticeSpinHalfOpMinus (A : Λ → Bool) 
         sublatticeSpinHalfOpMinus A * sublatticeSpinHalfOp3 A from by abel]
   exact h_self
 
+/-! ## Edge cases: empty sublattice -/
+
+/-- `Ŝ_A^(α)` vanishes on the empty sublattice (`A = const false`). -/
+theorem sublatticeSpinHalfOp1_const_false :
+    sublatticeSpinHalfOp1 (Λ := Λ) (fun _ => false) = 0 := by
+  unfold sublatticeSpinHalfOp1
+  apply Finset.sum_eq_zero
+  intro x _
+  simp
+
+theorem sublatticeSpinHalfOp2_const_false :
+    sublatticeSpinHalfOp2 (Λ := Λ) (fun _ => false) = 0 := by
+  unfold sublatticeSpinHalfOp2
+  apply Finset.sum_eq_zero
+  intro x _
+  simp
+
+theorem sublatticeSpinHalfOp3_const_false :
+    sublatticeSpinHalfOp3 (Λ := Λ) (fun _ => false) = 0 := by
+  unfold sublatticeSpinHalfOp3
+  apply Finset.sum_eq_zero
+  intro x _
+  simp
+
+theorem sublatticeSpinHalfSquared_const_false :
+    sublatticeSpinHalfSquared (Λ := Λ) (fun _ => false) = 0 := by
+  unfold sublatticeSpinHalfSquared
+  rw [sublatticeSpinHalfOp1_const_false, sublatticeSpinHalfOp2_const_false,
+      sublatticeSpinHalfOp3_const_false]
+  simp
+
+theorem sublatticeSpinHalfOpPlus_const_false :
+    sublatticeSpinHalfOpPlus (Λ := Λ) (fun _ => false) = 0 := by
+  unfold sublatticeSpinHalfOpPlus
+  apply Finset.sum_eq_zero
+  intro x _
+  simp
+
+theorem sublatticeSpinHalfOpMinus_const_false :
+    sublatticeSpinHalfOpMinus (Λ := Λ) (fun _ => false) = 0 := by
+  unfold sublatticeSpinHalfOpMinus
+  apply Finset.sum_eq_zero
+  intro x _
+  simp
+
 /-! ## Sublattice ladder adjoint relations -/
 
 /-- `(Ŝ_A^+)† = Ŝ_A^-`: the spin-`1/2` sublattice raising and lowering

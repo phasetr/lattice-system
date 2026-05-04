@@ -870,6 +870,56 @@ theorem totalSpinSOp3_commutator_sublatticeSpinSOpMinus (A : Λ → Bool) :
         sublatticeSpinSOpMinus N A * sublatticeSpinSOp3 N A from by abel]
   exact h_self
 
+/-! ## Edge cases: empty sublattice -/
+
+/-- For the empty sublattice (`A = const false`), `Ŝ_A^(α)` vanishes. -/
+theorem sublatticeSpinSOp1_const_false :
+    sublatticeSpinSOp1 (Λ := Λ) N (fun _ => false) = 0 := by
+  unfold sublatticeSpinSOp1
+  apply Finset.sum_eq_zero
+  intro x _
+  simp
+
+/-- `Ŝ_A^(2)` vanishes on empty `A`. -/
+theorem sublatticeSpinSOp2_const_false :
+    sublatticeSpinSOp2 (Λ := Λ) N (fun _ => false) = 0 := by
+  unfold sublatticeSpinSOp2
+  apply Finset.sum_eq_zero
+  intro x _
+  simp
+
+/-- `Ŝ_A^(3)` vanishes on empty `A`. -/
+theorem sublatticeSpinSOp3_const_false :
+    sublatticeSpinSOp3 (Λ := Λ) N (fun _ => false) = 0 := by
+  unfold sublatticeSpinSOp3
+  apply Finset.sum_eq_zero
+  intro x _
+  simp
+
+/-- `(Ŝ_A)²` vanishes on empty `A`. -/
+theorem sublatticeSpinSquaredS_const_false :
+    sublatticeSpinSquaredS (Λ := Λ) N (fun _ => false) = 0 := by
+  unfold sublatticeSpinSquaredS
+  rw [sublatticeSpinSOp1_const_false, sublatticeSpinSOp2_const_false,
+      sublatticeSpinSOp3_const_false]
+  simp
+
+/-- `Ŝ_A^+` vanishes on empty `A`. -/
+theorem sublatticeSpinSOpPlus_const_false :
+    sublatticeSpinSOpPlus (Λ := Λ) N (fun _ => false) = 0 := by
+  unfold sublatticeSpinSOpPlus
+  apply Finset.sum_eq_zero
+  intro x _
+  simp
+
+/-- `Ŝ_A^-` vanishes on empty `A`. -/
+theorem sublatticeSpinSOpMinus_const_false :
+    sublatticeSpinSOpMinus (Λ := Λ) N (fun _ => false) = 0 := by
+  unfold sublatticeSpinSOpMinus
+  apply Finset.sum_eq_zero
+  intro x _
+  simp
+
 /-! ## Sublattice ladder adjoint relations -/
 
 /-- `(Ŝ_A^+)† = Ŝ_A^-`: the sublattice raising and lowering operators
