@@ -725,6 +725,21 @@ theorem neelStateOf_sublatticeSpinHalfDot_expectation (A : Λ → Bool) :
   rw [neelStateOf_sublattice_minus_plus_cross_expectation]
   simp
 
+/-- `(Ŝ_tot^(3))² · |Φ_Néel⟩ = ((|A|-|¬A|)/2)² · |Φ_Néel⟩`. Spin-`1/2` mirror of
+γ-4 step 128: Néel is exact (Ŝ_tot^(3))²-eigenvector. -/
+theorem totalSpinHalfOp3_sq_mulVec_neelStateOf (A : Λ → Bool) :
+    (totalSpinHalfOp3 Λ * totalSpinHalfOp3 Λ).mulVec (neelStateOf A) =
+      ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) / 2) ^ 2 •
+        neelStateOf A := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [totalSpinHalfOp3_mulVec_neelStateOf]
+  rw [Matrix.mulVec_smul]
+  rw [totalSpinHalfOp3_mulVec_neelStateOf]
+  rw [smul_smul]
+  congr 1
+  ring
+
 /-- `<Φ_Néel | (Ŝ_tot)² | Φ_Néel> = ((|A|-|¬A|)/2)² + (|A|+|¬A|)/2`. Spin-`1/2`
 mirror of γ-4 step 126. The full total-spin Casimir expectation on Néel. -/
 theorem neelStateOf_totalSpinHalfSquared_expectation (A : Λ → Bool) :
