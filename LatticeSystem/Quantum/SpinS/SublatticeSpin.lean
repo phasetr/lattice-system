@@ -1267,9 +1267,33 @@ theorem sublatticeSpinSOpMinus_mul_sublatticeSpinSOpPlus_eq (A : Λ → Bool) :
   rw [this, hcommS3]
   abel
 
-/-- Sublattice Cartan commutator: `[Ŝ_A^+, Ŝ_A^-] = 2 Ŝ_A^(3)`. Direct
-subtraction of `sublatticeSpinSOpPlus_mul_sublatticeSpinSOpMinus_eq` and
-`sublatticeSpinSOpMinus_mul_sublatticeSpinSOpPlus_eq`. -/
+/-- Cross-axis identity: `Ŝ_A^(1)·Ŝ_B^(1) + Ŝ_A^(2)·Ŝ_B^(2) =
+(1/2)(Ŝ_A^+·Ŝ_B^- + Ŝ_A^-·Ŝ_B^+)`. Holds for any two sublattices `A, B`;
+when `B = ¬A` it gives the cross-flip term in the Casimir decomposition. -/
+theorem sublatticeSpinSOp1_mul_op1_add_op2_mul_op2_eq_ladder
+    (A B : Λ → Bool) :
+    sublatticeSpinSOp1 N A * sublatticeSpinSOp1 N B +
+        sublatticeSpinSOp2 N A * sublatticeSpinSOp2 N B =
+      (1 / 2 : ℂ) • (sublatticeSpinSOpPlus N A * sublatticeSpinSOpMinus N B +
+          sublatticeSpinSOpMinus N A * sublatticeSpinSOpPlus N B) := by
+  rw [sublatticeSpinSOpPlus_eq_add, sublatticeSpinSOpMinus_eq_sub,
+    sublatticeSpinSOpPlus_eq_add, sublatticeSpinSOpMinus_eq_sub]
+  set S1A := sublatticeSpinSOp1 N A with hS1A
+  set S2A := sublatticeSpinSOp2 N A with hS2A
+  set S1B := sublatticeSpinSOp1 N B with hS1B
+  set S2B := sublatticeSpinSOp2 N B with hS2B
+  -- (S1A + I S2A)(S1B - I S2B) + (S1A - I S2A)(S1B + I S2B) = 2 (S1A S1B + S2A S2B).
+  -- Cross I-terms cancel pairwise; I·I·(S2A S2B) terms simplify via I·I = -1.
+  have hexp : (S1A + Complex.I • S2A) * (S1B - Complex.I • S2B) +
+      (S1A - Complex.I • S2A) * (S1B + Complex.I • S2B) =
+      (2 : ℂ) • (S1A * S1B + S2A * S2B) := by
+    rw [Matrix.add_mul, Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_sub,
+      Matrix.mul_add, Matrix.mul_add]
+    simp only [Matrix.smul_mul, Matrix.mul_smul, smul_smul, Complex.I_mul_I,
+      neg_one_smul, smul_add, two_smul]
+    abel
+  rw [hexp, smul_smul]
+  norm_num
 theorem sublatticeSpinSOpPlus_commutator_sublatticeSpinSOpMinus (A : Λ → Bool) :
     sublatticeSpinSOpPlus N A * sublatticeSpinSOpMinus N A -
         sublatticeSpinSOpMinus N A * sublatticeSpinSOpPlus N A =
