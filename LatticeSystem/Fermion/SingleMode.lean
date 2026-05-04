@@ -17,6 +17,7 @@ import LatticeSystem.Fermion.NumberExpectations
 import LatticeSystem.Fermion.NumberLadderAnticommutators
 import LatticeSystem.Fermion.NumberLadderCommutators
 import LatticeSystem.Fermion.NumberSpinSBridge
+import LatticeSystem.Fermion.OneSubTwoNumberSq
 import LatticeSystem.Fermion.PartialIsometry
 import LatticeSystem.Fermion.ProjectionPow
 import LatticeSystem.Fermion.ProjectionsCommute
@@ -55,6 +56,7 @@ original `Mode.lean` core.
 | `NumberLadderAnticommutators.lean` | `{n, c} = c`, `{n, c†} = c†` |
 | `NumberLadderCommutators.lean` | `[n, c] = -c`, `[n, c†] = c†` |
 | `NumberSpinSBridge.lean` | `n = (1/2) · I − spinSOp3 1` |
+| `OneSubTwoNumberSq.lean` | `(1 − 2·n)² = 1` (`σ_z` analog involution) |
 | `PartialIsometry.lean` | `c · c† · c = c`, `c† · c · c† = c†` |
 | `ProjectionPow.lean` | `n^(k+1) = n`, `(c · c†)^(k+1) = c · c†` |
 | `ProjectionsCommute.lean` | `Commute n (c · c†)` |

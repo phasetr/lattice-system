@@ -6255,6 +6255,16 @@ PRs~\#996 and the existing
 \texttt{fermionMultiAnnihilation\_conjTranspose} /
 \texttt{fermionMultiCreation\_conjTranspose}.
 
+\textbf{Single-mode $(1 - 2\,n)^2 = 1$ ($\sigma_z$-analog
+involution, PR~\#1028)}: in the file
+\texttt{Fermion/OneSubTwoNumberSq.lean}. Direct from $n^2 = n$
+(\texttt{fermionNumber\_sq}): $(1 - 2n)^2 = 1 - 4n + 4n^2 =
+1 - 4n + 4n = 1$. Physics identification: $1 - 2n = \sigma_z$
+in our convention $n = (I - \sigma_z)/2$, and $\sigma_z^2 = I$.
+Together with PRs~\#1021 ($\sigma_x^2 = 1$) and \#1023
+($(i\sigma_y)^2 = -1$) this completes the single-mode Pauli-trio
+$\sigma_\alpha^2 = \pm 1$ involution identities.
+
 \textbf{Multi-mode (JW) ladder-on-hole-projection vanishing
 $c_i\,(c_i\,c_i^\dagger) = 0$ and $(c_i\,c_i^\dagger)\,
 c_i^\dagger = 0$ (PR~\#1010)}: multi-mode mirror of PR~\#1009,
