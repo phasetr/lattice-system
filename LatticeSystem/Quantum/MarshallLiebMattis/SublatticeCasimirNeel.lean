@@ -609,6 +609,16 @@ theorem sublatticeSpinHalfOp12sq_complement_mulVec_neelStateOf (A : Λ → Bool)
   simp only [k]
   ring
 
+/-- The spin-`1/2` Néel state is non-zero. Direct from `basisVec_self = 1`. -/
+theorem neelStateOf_ne_zero (A : Λ → Bool) : neelStateOf A ≠ 0 := by
+  intro h
+  have h1 : neelStateOf A (neelConfigOf A) = 1 := by
+    unfold neelStateOf
+    exact basisVec_self _
+  have h0 : neelStateOf A (neelConfigOf A) = 0 := by rw [h]; rfl
+  rw [h1] at h0
+  exact one_ne_zero h0
+
 /-- `Ŝ_¬A^- · Ŝ_¬A^+ · |Φ_Néel⟩ = |¬A| · |Φ_Néel⟩`. Spin-`1/2` mirror of
 γ-4 step 104 via dual Cartan identity. -/
 theorem sublatticeSpinHalfOpComplementMinus_complement_plus_mulVec_neelStateOf
