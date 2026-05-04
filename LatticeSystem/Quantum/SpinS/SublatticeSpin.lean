@@ -1200,6 +1200,44 @@ theorem sublatticeSpinSOpPlus_mulVec_mem_magSubspaceS_of_mem
   rw [Matrix.mulVec_mulVec, hcomm, Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hv,
     Matrix.mulVec_smul, add_smul, one_smul]
 
+/-! ## Cartan identity for sublattice ladders -/
+
+/-- `Ŝ_A^+ · Ŝ_A^- = (Ŝ_A^(1))² + (Ŝ_A^(2))² + Ŝ_A^(3)`. Sublattice
+Cartan identity, derived from `Ŝ^± = Ŝ^(1) ± i Ŝ^(2)` and the SU(2)
+commutator `[Ŝ_A^(1), Ŝ_A^(2)] = i Ŝ_A^(3)`. -/
+theorem sublatticeSpinSOpPlus_mul_sublatticeSpinSOpMinus_eq (A : Λ → Bool) :
+    sublatticeSpinSOpPlus N A * sublatticeSpinSOpMinus N A =
+      sublatticeSpinSOp1 N A * sublatticeSpinSOp1 N A +
+        sublatticeSpinSOp2 N A * sublatticeSpinSOp2 N A +
+        sublatticeSpinSOp3 N A := by
+  rw [sublatticeSpinSOpPlus_eq_add, sublatticeSpinSOpMinus_eq_sub]
+  have hcomm := sublatticeSpinSOp1_commutator_sublatticeSpinSOp2 N A
+  set S1 := sublatticeSpinSOp1 N A with hS1
+  set S2 := sublatticeSpinSOp2 N A with hS2
+  set S3 := sublatticeSpinSOp3 N A with hS3
+  -- Expand (S1 + I • S2)(S1 - I • S2) into elementary form.
+  have hexp : (S1 + Complex.I • S2) * (S1 - Complex.I • S2) =
+      S1 * S1 - Complex.I • (S1 * S2) + Complex.I • (S2 * S1) -
+        Complex.I • Complex.I • (S2 * S2) := by
+    rw [Matrix.add_mul, Matrix.mul_sub, Matrix.mul_sub, Matrix.smul_mul,
+      Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_smul]
+    abel
+  rw [hexp]
+  -- I • I • (S2*S2) = -(S2*S2)
+  rw [show (Complex.I : ℂ) • Complex.I • (S2 * S2) = -(S2 * S2) from by
+    rw [smul_smul, Complex.I_mul_I, neg_one_smul]]
+  -- I • (S2*S1) - I • (S1*S2) = -I • [S1, S2] = -I • (I • S3) = S3
+  have hcommS3 : Complex.I • (S2 * S1) - Complex.I • (S1 * S2) = S3 := by
+    rw [← smul_sub]
+    have hr : (S2 * S1) - (S1 * S2) = -(S1 * S2 - S2 * S1) := by abel
+    rw [hr, hcomm, smul_neg, smul_smul, Complex.I_mul_I, neg_one_smul]
+    abel
+  -- Combine
+  have : S1 * S1 - Complex.I • (S1 * S2) + Complex.I • (S2 * S1) -
+      -(S2 * S2) =
+    S1 * S1 + S2 * S2 + (Complex.I • (S2 * S1) - Complex.I • (S1 * S2)) := by abel
+  rw [this, hcommS3]
+
 /-! ## Cross-sublattice commute for ladder operators -/
 
 /-- `Ŝ_A^+` commutes with `Ŝ_¬A^+`. Direct from
