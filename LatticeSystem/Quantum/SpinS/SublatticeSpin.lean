@@ -1267,6 +1267,18 @@ theorem sublatticeSpinSOpMinus_mul_sublatticeSpinSOpPlus_eq (A : Λ → Bool) :
   rw [this, hcommS3]
   abel
 
+/-- Sublattice Cartan commutator: `[Ŝ_A^+, Ŝ_A^-] = 2 Ŝ_A^(3)`. Direct
+subtraction of `sublatticeSpinSOpPlus_mul_sublatticeSpinSOpMinus_eq` and
+`sublatticeSpinSOpMinus_mul_sublatticeSpinSOpPlus_eq`. -/
+theorem sublatticeSpinSOpPlus_commutator_sublatticeSpinSOpMinus (A : Λ → Bool) :
+    sublatticeSpinSOpPlus N A * sublatticeSpinSOpMinus N A -
+        sublatticeSpinSOpMinus N A * sublatticeSpinSOpPlus N A =
+      (2 : ℂ) • sublatticeSpinSOp3 N A := by
+  rw [sublatticeSpinSOpPlus_mul_sublatticeSpinSOpMinus_eq,
+    sublatticeSpinSOpMinus_mul_sublatticeSpinSOpPlus_eq]
+  rw [two_smul]
+  abel
+
 /-! ## Cross-sublattice commute for ladder operators -/
 
 /-- `Ŝ_A^+` commutes with `Ŝ_¬A^+`. Direct from
