@@ -901,6 +901,44 @@ theorem neelStateOf_finrank_span (A : Λ → Bool) :
     Module.finrank ℂ (Submodule.span ℂ {neelStateOf A}) = 1 :=
   finrank_span_singleton (neelStateOf_ne_zero A)
 
+/-- `<basisVec (fun _ => 0) | Ĥ_toy | basisVec (fun _ => 0)> = +|A|·|¬A|/2`.
+Spin-`1/2` mirror of γ-4 step 147 (toy Hamiltonian expectation on the all-up
+basis state). Variational signature opposite to the Néel state. -/
+theorem allUp_basisVec_heisenbergToyHamiltonian_expectation (A : Λ → Bool) :
+    dotProduct (star (basisVec (fun _ : Λ => (0 : Fin 2))))
+        ((heisenbergToyHamiltonian A : ManyBodyOp Λ).mulVec
+          (basisVec (fun _ : Λ => (0 : Fin 2)))) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) / 2) := by
+  rw [basisVec_expectation_eq_diagonal]
+  -- The diagonal at allZeros: use heisenbergToyHamiltonian_mulVec_basisVec_const_simplified
+  -- and basisVec_expectation_eq_diagonal again, or unfold.
+  have h := heisenbergToyHamiltonian_mulVec_basisVec_const_simplified A 0
+  -- h: (H_toy).mulVec (basisVec (fun _ => 0)) = c • basisVec (fun _ => 0)
+  -- diagonal element = ((H_toy).mulVec (basisVec ...)) at (fun _ => 0) = c
+  have hdiag :
+      (heisenbergToyHamiltonian A : ManyBodyOp Λ)
+          (fun _ : Λ => (0 : Fin 2)) (fun _ : Λ => (0 : Fin 2)) =
+      ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) / 2 := by
+    have h2 : (heisenbergToyHamiltonian A : ManyBodyOp Λ).mulVec
+        (basisVec (fun _ : Λ => (0 : Fin 2))) (fun _ : Λ => (0 : Fin 2)) =
+        (heisenbergToyHamiltonian A : ManyBodyOp Λ)
+          (fun _ : Λ => (0 : Fin 2)) (fun _ : Λ => (0 : Fin 2)) := by
+      rw [Matrix.mulVec, dotProduct]
+      rw [Finset.sum_eq_single (fun _ : Λ => (0 : Fin 2))]
+      · rw [basisVec_self, mul_one]
+      · intros τ _ hτne
+        rw [basisVec_of_ne hτne]
+        simp
+      · intro h
+        exact (h (Finset.mem_univ _)).elim
+    rw [h] at h2
+    rw [Pi.smul_apply, basisVec_self, smul_eq_mul, mul_one] at h2
+    -- h2 : c = (H_toy)(allZero, allZero), need other direction
+    exact h2.symm
+  rw [hdiag]
+
 /-- Configuration-level distinctness for spin-`1/2`: `neelConfigOf A ≠
 fun _ => 0` when `|¬A| > 0`. Spin-`1/2` mirror of γ-4 step 144. -/
 theorem neelConfigOf_ne_allUp
