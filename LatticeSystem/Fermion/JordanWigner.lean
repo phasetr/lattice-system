@@ -38,8 +38,11 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsEmptySingle
 
 **Façade module** re-exporting the full Jordan–Wigner machinery.
 Following the refactor plan v4 §3.1 (Phase 2 PR 10–14), this file
-is now a thin re-import of five sub-files under
-`LatticeSystem/Fermion/JordanWigner/`:
+is a thin re-import of the sub-files under
+`LatticeSystem/Fermion/JordanWigner/` (originally five core
+files; further extended with single-mode-mirror and Hubbard
+algebra lemmas during the 2026-05-04 autonomous fermion
+expansion):
 
 | sub-file | content |
 |---|---|
