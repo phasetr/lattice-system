@@ -897,4 +897,14 @@ theorem magnetizationSubspace_nontrivial_via_neel (A : Λ → Bool) :
   rw [hbot, Submodule.mem_bot] at hmem
   exact neelStateOf_ne_zero A hmem
 
+/-- The line spanned by the Néel state is contained in the magnetization
+subspace at `M = (|A|-|¬A|)/2`. -/
+theorem neelStateOf_span_le_magnetizationSubspace (A : Λ → Bool) :
+    Submodule.span ℂ {neelStateOf A} ≤
+      magnetizationSubspace Λ
+        ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) / 2) := by
+  rw [Submodule.span_le, Set.singleton_subset_iff]
+  exact neelStateOf_mem_magnetizationSubspace A
+
 end LatticeSystem.Quantum
