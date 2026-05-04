@@ -256,6 +256,61 @@ private theorem sublatticeCardS_add_complement (A : Λ → Bool) :
       (fun x : Λ => A x = true)]
   exact Finset.card_univ
 
+/-! ## Eigenvalue on the all-down state -/
+
+/-- **Spin-`S` toy Hamiltonian eigenvalue on the all-down state**.
+Symmetric to PR #1060 for the all-up state — same eigenvalue formula
+since both `|σ_⊤⟩` and `|σ_⊥⟩` sit in the maximum-spin irreps of all
+three Casimirs:
+
+  `Ĥ_toy_S · |σ_⊥⟩ =
+    ((|Λ|·N/2)(|Λ|·N/2+1) − (|A|·N/2)(|A|·N/2+1) − (|¬A|·N/2)(|¬A|·N/2+1)) · |σ_⊥⟩`. -/
+theorem heisenbergToyHamiltonianS_mulVec_allAlignedStateS_last
+    [Nonempty Λ] (A : Λ → Bool) :
+    (heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec
+        (allAlignedStateS Λ N (Fin.last N)) =
+      (((Fintype.card Λ : ℂ) * (N : ℂ) / 2 *
+          ((Fintype.card Λ : ℂ) * (N : ℂ) / 2 + 1))
+        - (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+            ((N : ℂ) / 2) *
+            (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+                ((N : ℂ) / 2) + 1))
+        - (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+            ((N : ℂ) / 2) *
+            (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+                ((N : ℂ) / 2) + 1))) •
+        allAlignedStateS Λ N (Fin.last N) := by
+  rw [heisenbergToyHamiltonianS_eq_casimir_diff N A]
+  rw [Matrix.sub_mulVec, Matrix.sub_mulVec]
+  rw [totalSpinSSquared_mulVec_allAlignedStateS_last_eigenvalue (V := Λ),
+      sublatticeSpinSquaredS_mulVec_allAlignedStateS_last N A,
+      sublatticeSpinSquaredS_mulVec_allAlignedStateS_last N (fun x => ! A x)]
+  rw [← sub_smul, ← sub_smul]
+
+/-- **Simplified spin-`S` toy Hamiltonian eigenvalue on the all-down
+state**: `Ĥ_toy_S · |σ_⊥⟩ = (|A|·|¬A|·N²/2) · |σ_⊥⟩`. Same simplified
+form as PR #1061 for the all-up state. -/
+theorem heisenbergToyHamiltonianS_mulVec_allAlignedStateS_last_simplified
+    [Nonempty Λ] (A : Λ → Bool) :
+    (heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec
+        (allAlignedStateS Λ N (Fin.last N)) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) * (N : ℂ)) / 2) •
+        allAlignedStateS Λ N (Fin.last N) := by
+  rw [heisenbergToyHamiltonianS_mulVec_allAlignedStateS_last N A]
+  congr 1
+  have hsum := sublatticeCardS_add_complement (Λ := Λ) A
+  unfold sublatticeCardS at hsum
+  have hsumℂ : (Fintype.card Λ : ℂ) =
+      ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) +
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) := by
+    have := congrArg (Nat.cast (R := ℂ)) hsum.symm
+    push_cast at this
+    exact this
+  rw [hsumℂ]
+  ring
+
 /-- **Simplified `Ĥ_toy_S` eigenvalue on the all-up state**:
 `Ĥ_toy_S · |σ_⊤⟩ = (|A|·|¬A|·N²/2) · |σ_⊤⟩`.
 
