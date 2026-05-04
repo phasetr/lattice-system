@@ -1279,6 +1279,18 @@ theorem sublatticeSpinHalfOpMinus_mul_sublatticeSpinHalfOpPlus_eq (A : Λ → Bo
   rw [this, hcommS3]
   abel
 
+/-- Sublattice Cartan commutator: `[Ŝ_A^+, Ŝ_A^-] = 2 · Ŝ_A^(3)`. Spin-`1/2`
+mirror of γ-4 step 106. -/
+theorem sublatticeSpinHalfOpPlus_commutator_sublatticeSpinHalfOpMinus
+    (A : Λ → Bool) :
+    sublatticeSpinHalfOpPlus A * sublatticeSpinHalfOpMinus A -
+        sublatticeSpinHalfOpMinus A * sublatticeSpinHalfOpPlus A =
+      (2 : ℂ) • sublatticeSpinHalfOp3 A := by
+  rw [sublatticeSpinHalfOpPlus_mul_sublatticeSpinHalfOpMinus_eq,
+    sublatticeSpinHalfOpMinus_mul_sublatticeSpinHalfOpPlus_eq]
+  rw [two_smul]
+  abel
+
 /-! ## Cross-sublattice commute for ladder operators (spin-`1/2`) -/
 
 /-- Spin-`1/2` mirror of `sublatticeSpinSOpPlus_cross_commute`. -/
