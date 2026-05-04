@@ -1178,6 +1178,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionEmptyProjection_commute_of_any` | `Commute (p_∅(i)) (p_∅(j))` for any `i, j` (cross-site Hubbard empty projections commute; companion to PR #1006 for `p_⇈`) | `Fermion/JordanWigner/Hubbard/EmptyProjectionCommute.lean` (PR #1035) |
 | `fermionUpProjection_commute_of_any` / `fermionDownProjection_commute_of_any` | `Commute (p_↑(i)) (p_↑(j))`, `Commute (p_↓(i)) (p_↓(j))` for any `i, j` (cross-site Hubbard single-occupancy projections commute; completes diagonal cross-site Commute relations together with PRs #1006, #1035) | `Fermion/JordanWigner/Hubbard/SingleProjectionsCommute.lean` (PR #1036) |
 | `fermionUpProjection_commute_fermionDownProjection_of_any` | `Commute (p_↑(i)) (p_↓(j))` for any `i, j` (cross-projection only-up vs only-down commute; non-diagonal extension) | `Fermion/JordanWigner/Hubbard/UpDownProjectionCommute.lean` (PR #1037) |
+| (5 remaining cross-projection commutes) | `Commute (p_α(i)) (p_β(j))` for the 5 remaining `(α, β)` pairs (PR #1038, completes the 16/16 cross-projection commute matrix together with PRs #1006, #1020, #1035, #1036, #1037) | `Fermion/JordanWigner/Hubbard/RemainingProjectionCommutes.lean` (PR #1038) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 
