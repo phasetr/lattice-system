@@ -902,4 +902,34 @@ theorem neelStateOfS_totalSpinSSquared_expectation_card_Lambda
     exact_mod_cast h1
   rw [h]
 
+/-- `<Φ_Néel | Ĥ_toy_S | Φ_Néel> = -|A|·|¬A|·N²/2`. The toy-Hamiltonian
+expectation value on the Néel state. Direct from
+`heisenbergToyHamiltonianS_apply_diag_neel` (the diagonal matrix element)
+and the property that for a basis vector `|σ⟩ = basisVecS σ`:
+`<σ | M | σ> = M(σ, σ)`. -/
+theorem neelStateOfS_heisenbergToyHamiltonianS_expectation
+    (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec (neelStateOfS A N)) =
+      - (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) * (N : ℂ)) / 2) := by
+  -- For basis vectors: <σ|M|σ> = M(σ, σ).
+  unfold neelStateOfS dotProduct
+  rw [Finset.sum_eq_single (neelConfigOfS A N)]
+  · simp only [Pi.star_apply, basisVecS_self, star_one, one_mul]
+    rw [Matrix.mulVec, dotProduct]
+    rw [Finset.sum_eq_single (neelConfigOfS A N)]
+    · rw [basisVecS_self, mul_one]
+      exact heisenbergToyHamiltonianS_apply_diag_neel A N
+    · intros τ _ hτne
+      rw [basisVecS_of_ne hτne]
+      simp
+    · intro h
+      exact (h (Finset.mem_univ _)).elim
+  · intros τ _ hτne
+    simp [basisVecS_of_ne hτne]
+  · intro h
+    exact (h (Finset.mem_univ _)).elim
+
 end LatticeSystem.Quantum
