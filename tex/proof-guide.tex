@@ -6224,6 +6224,17 @@ n_\sigma$) for the complementary $(1 - n_\sigma)^2 = 1 -
 n_\sigma$. Together with PR~\#1005 these establish that all
 four per-site occupation operators are projections.
 
+\textbf{Hubbard per-site doubly-occupied and empty projections
+orthogonal $p_\Uparrow\cdot p_\emptyset = 0$ and
+$p_\emptyset\cdot p_\Uparrow = 0$ (PR~\#1014)}: in the file
+\texttt{Fermion/JordanWigner/Hubbard/SiteProjectionsDoublyEmpty.lean}.
+Direct from the same-site $\texttt{Commute}\,n_\uparrow\,
+n_\downarrow$ (PR~\#1005) and $n_\sigma(1 - n_\sigma) =
+(1 - n_\sigma)n_\sigma = 0$ (specialised from PR~\#999 via
+$c_\sigma c_\sigma^\dagger = 1 - n_\sigma$, PR~\#996). Most
+extreme orthogonal pair of the per-site 4-state decomposition
+(PR~\#1011): "doubly occupied" cannot share with "empty".
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
