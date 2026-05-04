@@ -6235,6 +6235,21 @@ $c_\sigma c_\sigma^\dagger = 1 - n_\sigma$, PR~\#996). Most
 extreme orthogonal pair of the per-site 4-state decomposition
 (PR~\#1011): "doubly occupied" cannot share with "empty".
 
+\textbf{Hubbard per-site projections $p_\emptyset$,
+$p_\uparrow$, $p_\downarrow$ Hermitian (PR~\#1015)}: in the
+file
+\texttt{Fermion/JordanWigner/Hubbard/SiteProjectionsHermitian.lean}.
+Three companions to PR~\#1007 ($p_\Uparrow$ Hermitian). Each
+per-site projection is a product of two commuting Hermitian
+factors --- $(1 - n_\sigma)$ Hermitian via
+\texttt{Matrix.IsHermitian.sub} with
+\texttt{Matrix.isHermitian\_one}, and pairs commute by ring
+algebra from PR~\#1005's $\texttt{Commute}\,n_\uparrow\,
+n_\downarrow$. Closed by
+\texttt{Matrix.IsHermitian.mul\_of\_commute}. Together with
+PR~\#1007 all four per-site occupation projections are
+Hermitian.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
