@@ -290,6 +290,24 @@ theorem sublatticeSpinSOp3_complement_sq_mulVec_neelStateOfS
   congr 1
   ring
 
+/-- `Ŝ_A^(3) · Ŝ_¬A^(3) · |Φ_Néel⟩ = -|A|·|¬A|·(N/2)² · |Φ_Néel⟩`.
+Cross-sublattice product of γ-4 steps 73 and 74. -/
+theorem sublatticeSpinSOp3_cross_complement_mulVec_neelStateOfS
+    (A : Λ → Bool) (N : ℕ) :
+    (sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N (fun x => ! A x)).mulVec
+        (neelStateOfS A N) =
+      (-(((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+            ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+            ((N : ℂ) / 2) ^ 2)) •
+        neelStateOfS A N := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [sublatticeSpinSOp3_complement_mulVec_neelStateOfS]
+  rw [Matrix.mulVec_smul]
+  rw [sublatticeSpinSOp3_mulVec_neelStateOfS]
+  rw [smul_smul]
+  congr 1
+  ring
+
 /-! ## Per-pair `spinSDot` diagonal at the Néel configuration -/
 
 /-- For a cross-sublattice pair `x ∈ A`, `y ∈ ¬A`, the two-site dot
