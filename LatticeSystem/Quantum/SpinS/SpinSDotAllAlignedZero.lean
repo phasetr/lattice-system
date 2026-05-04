@@ -129,4 +129,85 @@ theorem spinSDot_mulVec_allAlignedStateS_zero_of_ne
   congr 1
   ring
 
+/-! ## Generalisation: only `σ x = σ y = 0` needed -/
+
+/-- `Ŝ_x · Ŝ_y · basisVecS σ = (N²/4) · basisVecS σ` whenever `x ≠ y`,
+`σ x = 0`, and `σ y = 0`. Generalises
+`spinSDot_mulVec_allAlignedStateS_zero_of_ne` (which requires σ to be
+the constant-0 configuration everywhere) to allow arbitrary σ outside
+of {x, y}. The proof uses the same structure: the off-diagonal
+`Ŝ^+ Ŝ^-` and `Ŝ^- Ŝ^+` terms vanish (highest-weight at x, y), and the
+diagonal `Ŝ^(3) Ŝ^(3)` gives `(N/2)·(N/2) = N²/4`. -/
+theorem spinSDot_mulVec_basisVecS_zero_of_ne
+    {x y : V} (hxy : x ≠ y) (σ : V → Fin (N + 1))
+    (hx : σ x = 0) (hy : σ y = 0) :
+    (spinSDot x y N).mulVec (basisVecS σ) =
+      ((N : ℂ) * (N : ℂ) / 4) • basisVecS σ := by
+  rw [spinSDot_eq_plus_minus]
+  rw [Matrix.add_mulVec, Matrix.smul_mulVec, Matrix.add_mulVec]
+  -- Step 1: ((onSiteS x Ŝ^-) * (onSiteS y Ŝ^+)).mulVec |σ⟩ = 0
+  -- since `Ŝ^+_y` annihilates basisVecS σ when σ y = 0.
+  have h_y_plus : (onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+      (basisVecS σ) = 0 := by
+    funext τ
+    rw [onSiteS_mulVec_basisVecS_apply]
+    change (onSiteS y (spinSOpPlus N) : ManyBodyOpS V N) τ σ = 0
+    by_cases h_off : ∀ k, k ≠ y → τ k = σ k
+    · rw [onSiteS_apply_of_off_site_agree y _ h_off]
+      change spinSOpPlus N (τ y) (σ y) = 0
+      rw [hy]
+      apply spinSOpPlus_apply_other
+      show (τ y).val + 1 ≠ ((0 : Fin (N + 1)).val)
+      simp
+    · exact onSiteS_apply_eq_zero_of_off_site_diff y _ h_off
+  have h_minus_plus : ((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N) *
+      onSiteS y (spinSOpPlus N)).mulVec (basisVecS σ) = 0 := by
+    rw [← Matrix.mulVec_mulVec, h_y_plus, Matrix.mulVec_zero]
+  -- Step 2: ((onSiteS x Ŝ^+) * (onSiteS y Ŝ^-)).mulVec |σ⟩ = 0
+  -- After Ŝ^-_y, configs ρ have ρ x = σ x = 0; then Ŝ^+_x annihilates.
+  have h_plus_minus : ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N) *
+      onSiteS y (spinSOpMinus N)).mulVec (basisVecS σ) = 0 := by
+    rw [← Matrix.mulVec_mulVec]
+    funext τ
+    simp only [Pi.zero_apply]
+    rw [Matrix.mulVec, dotProduct]
+    apply Finset.sum_eq_zero
+    intros ρ _
+    by_cases h_off : ∀ k, k ≠ x → τ k = ρ k
+    · rw [onSiteS_apply_of_off_site_agree x _ h_off]
+      have h_inner : ((onSiteS y (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+          (basisVecS σ)) ρ =
+          (onSiteS y (spinSOpMinus N) : ManyBodyOpS V N) ρ σ :=
+        onSiteS_mulVec_basisVecS_apply y _ σ ρ
+      rw [h_inner]
+      by_cases h_off_y : ∀ k, k ≠ y → ρ k = σ k
+      · rw [onSiteS_apply_of_off_site_agree y _ h_off_y]
+        have hρ_x : ρ x = σ x := h_off_y x hxy
+        rw [hρ_x, hx]
+        have h_zero : (spinSOpPlus N) (τ x) (0 : Fin (N + 1)) = 0 := by
+          apply spinSOpPlus_apply_other
+          show (τ x).val + 1 ≠ ((0 : Fin (N + 1)).val)
+          simp
+        rw [h_zero, zero_mul]
+      · rw [onSiteS_apply_eq_zero_of_off_site_diff y _ h_off_y]
+        rw [mul_zero]
+    · rw [onSiteS_apply_eq_zero_of_off_site_diff x _ h_off]
+      rw [zero_mul]
+  -- Step 3: (Ŝ^(3)_x · Ŝ^(3)_y) · |σ⟩ = (N/2)² · |σ⟩.
+  have h_z_z : ((onSiteS x (spinSOp3 N) : ManyBodyOpS V N) *
+      onSiteS y (spinSOp3 N)).mulVec (basisVecS σ) =
+      ((N : ℂ) / 2 * ((N : ℂ) / 2)) • basisVecS σ := by
+    rw [← Matrix.mulVec_mulVec]
+    rw [onSiteS_spinSOp3_mulVec_basisVecS]
+    rw [Matrix.mulVec_smul]
+    rw [onSiteS_spinSOp3_mulVec_basisVecS]
+    rw [smul_smul]
+    rw [hx, hy]
+    rw [show ((0 : Fin (N + 1)).val : ℂ) = 0 from by simp]
+    ring_nf
+  rw [h_plus_minus, h_minus_plus, h_z_z]
+  rw [add_zero, smul_zero, zero_add]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
