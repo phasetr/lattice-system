@@ -539,4 +539,16 @@ theorem sublatticeSpinSOpComplementPlus_plus_mulVec_neelStateOfS
   rw [sublatticeSpinSOpPlus_mulVec_neelStateOfS]
   rw [Matrix.mulVec_zero]
 
+/-- `Ŝ_A^+ · Ŝ_¬A^+ · |Φ_Néel⟩ = 0`. Uses cross-sublattice commute to move
+`Ŝ_A^+` to the right, then `Ŝ_A^+ · Néel = 0`. -/
+theorem sublatticeSpinSOpPlus_complement_plus_mulVec_neelStateOfS
+    (A : Λ → Bool) (N : ℕ) :
+    (sublatticeSpinSOpPlus N A *
+        sublatticeSpinSOpPlus N (fun x => ! A x)).mulVec
+        (neelStateOfS A N) = 0 := by
+  rw [(sublatticeSpinSOpPlus_cross_commute N A).eq]
+  rw [← Matrix.mulVec_mulVec]
+  rw [sublatticeSpinSOpPlus_mulVec_neelStateOfS]
+  rw [Matrix.mulVec_zero]
+
 end LatticeSystem.Quantum
