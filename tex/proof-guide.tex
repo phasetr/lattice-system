@@ -6141,6 +6141,21 @@ n_\downarrow(i)$. Each is a one-line corollary of
 \texttt{fermionMultiNumber\_isHermitian} and
 \texttt{fermionMultiNumber\_mul\_isHermitian}.
 
+\textbf{Cross-site multi-mode (JW) hole projection commutes
+with ladder operators
+$\texttt{Commute}\,(c_i\,c_i^\dagger)\,c_j$ and
+$\texttt{Commute}\,(c_i\,c_i^\dagger)\,c_j^\dagger$ for $i\neq j$
+(PR~\#1008)}: in the file
+\texttt{Fermion/JordanWigner/HoleProjectionCommuteLadder.lean}.
+From $c_i\,c_i^\dagger = 1 - n_i$ (PR~\#996) and the cross-site
+$\texttt{Commute}\,n_i\,c_j$
+(\texttt{fermionMultiNumber\_commute\_fermionMultiAnnihilation\_of\_ne})
+/ $\texttt{Commute}\,n_i\,c_j^\dagger$
+(\texttt{fermionMultiNumber\_commute\_fermionMultiCreation\_of\_ne}),
+expanding $(1-n_i)c_j$ vs $c_j(1-n_i)$ and similarly for
+$c_j^\dagger$ closes both via $n_i\,c_j = c_j\,n_i$ (resp.\ for
+$c_j^\dagger$).
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
