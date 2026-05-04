@@ -971,4 +971,17 @@ instance neelMagConfigS_nonempty (A : Λ → Bool) (N : ℕ) :
         ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card * N)) :=
   ⟨neelMagConfigS A N⟩
 
+/-- The underlying configuration of `neelMagConfigS A N` is `neelConfigOfS A N`. -/
+@[simp]
+theorem neelMagConfigS_val (A : Λ → Bool) (N : ℕ) :
+    (neelMagConfigS A N).1 = neelConfigOfS A N := rfl
+
+/-- The Néel state equals `basisVecS` of the underlying configuration of
+`neelMagConfigS A N`. Bridges the `neelStateOfS` API and the `magConfigS`
+subtype API. -/
+theorem neelStateOfS_eq_basisVecS_neelMagConfigS (A : Λ → Bool) (N : ℕ) :
+    neelStateOfS A N = basisVecS (neelMagConfigS A N).1 := by
+  unfold neelStateOfS
+  rw [neelMagConfigS_val]
+
 end LatticeSystem.Quantum
