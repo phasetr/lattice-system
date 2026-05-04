@@ -960,6 +960,44 @@ theorem sublatticeSpinSOpMinus_const_true :
   refine Finset.sum_congr rfl fun x _ => ?_
   simp
 
+/-! ## Sublattice ladder matrix element realness -/
+
+/-- The sublattice raising operator has real matrix elements:
+`(Ŝ_A^+) σ' σ` has zero imaginary part. -/
+theorem sublatticeSpinSOpPlus_apply_im_zero (A : Λ → Bool)
+    (σ' σ : Λ → Fin (N + 1)) :
+    ((sublatticeSpinSOpPlus N A) σ' σ).im = 0 := by
+  unfold sublatticeSpinSOpPlus
+  rw [Matrix.sum_apply, Complex.im_sum]
+  apply Finset.sum_eq_zero
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    exact onSiteS_spinSOpPlus_apply_im_zero x σ' σ
+  · cases h : A x
+    · rw [if_neg]
+      · simp
+      · simp
+    · exact absurd h hA
+
+/-- The sublattice lowering operator has real matrix elements:
+`(Ŝ_A^-) σ' σ` has zero imaginary part. -/
+theorem sublatticeSpinSOpMinus_apply_im_zero (A : Λ → Bool)
+    (σ' σ : Λ → Fin (N + 1)) :
+    ((sublatticeSpinSOpMinus N A) σ' σ).im = 0 := by
+  unfold sublatticeSpinSOpMinus
+  rw [Matrix.sum_apply, Complex.im_sum]
+  apply Finset.sum_eq_zero
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    exact onSiteS_spinSOpMinus_apply_im_zero x σ' σ
+  · cases h : A x
+    · rw [if_neg]
+      · simp
+      · simp
+    · exact absurd h hA
+
 /-! ## Sublattice ladder adjoint relations -/
 
 /-- `(Ŝ_A^+)† = Ŝ_A^-`: the sublattice raising and lowering operators
