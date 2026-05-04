@@ -6456,6 +6456,15 @@ the commutator is $0$. Together with the partition / idempotency
 algebra is fully commutative on top of being a complete
 orthogonal partition.
 
+\textbf{Hubbard per-site projection power identities
+(PR~\#1034)}: in the file
+\texttt{Fermion/JordanWigner/Hubbard/SiteProjectionsPow.lean}.
+For every $k : \mathbb{N}$ each of the four per-site occupation
+projections satisfies $(p_\alpha(i))^{k+1} = p_\alpha(i)$.
+Each by direct induction on $k$ from the squared identities of
+PRs~\#1005 and \#1012. Mirrors PR~\#992 (single-mode
+$n^{k+1} = n$ and $(c\,c^\dagger)^{k+1} = c\,c^\dagger$).
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-

@@ -36,6 +36,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsEmptySingle
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsSingleDoubly
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsSpinResolved
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsCommute
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsPow
 import LatticeSystem.Fermion.JordanWigner.CPlusCDaggerSq
 import LatticeSystem.Fermion.JordanWigner.CMinusCDaggerSq
 import LatticeSystem.Fermion.JordanWigner.CPlusMinusCDaggerPauli
@@ -95,6 +96,7 @@ expansion):
 | `Hubbard/SiteProjectionsSingleDoubly.lean` | `p_↑ ⊥ p_⇈`, `p_↓ ⊥ p_⇈` (completes 6/6 ortho.) |
 | `Hubbard/SiteProjectionsSpinResolved.lean` | `p_↑+p_⇈ = n_↑`, `p_∅+p_↑ = 1−n_↓`, etc. |
 | `Hubbard/SiteProjectionsCommute.lean` | same-site `Commute p_α p_β` (all 6 pairs) |
+| `Hubbard/SiteProjectionsPow.lean` | per-site `(p_α)^(k+1) = p_α` (all 4 projections) |
 | `CPlusCDaggerSq.lean` | `(c_i + c_i†)² = 1` (multi-mode `σ_x`-analog) |
 | `CMinusCDaggerSq.lean` | `(c_i − c_i†)² = −1` (multi-mode `iσ_y`-analog) |
 | `CPlusMinusCDaggerPauli.lean` | `(c_i ± c_i†)` Pauli-X/iY-analog full structure |
