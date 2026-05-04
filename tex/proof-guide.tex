@@ -6059,6 +6059,19 @@ via \texttt{fermionMultiAnnihilation\_sq}. $c_i\cdot n_i =
 c_i\,(c_i^\dagger c_i) = (c_i\,c_i^\dagger)c_i = (1-n_i)c_i =
 c_i - n_i\,c_i = c_i$ via PR~\#996 and the previous identity.
 
+\textbf{Multi-mode (JW) number-creation identities
+$c_i^\dagger\cdot n_i = 0$ and $n_i\cdot c_i^\dagger =
+c_i^\dagger$ (PR~\#1002)}: multi-mode mirror of PR~\#984, in
+the file
+\texttt{Fermion/JordanWigner/CreationNumberIdentities.lean}.
+$c_i^\dagger\cdot n_i = c_i^\dagger(c_i^\dagger c_i) =
+(c_i^\dagger)^2\,c_i = 0$ via
+\texttt{fermionMultiCreation\_sq}.
+$n_i\cdot c_i^\dagger = (c_i^\dagger c_i)\,c_i^\dagger =
+c_i^\dagger(c_i\,c_i^\dagger) = c_i^\dagger(1-n_i) =
+c_i^\dagger - c_i^\dagger\,n_i = c_i^\dagger$ via PR~\#996 and
+the previous.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
