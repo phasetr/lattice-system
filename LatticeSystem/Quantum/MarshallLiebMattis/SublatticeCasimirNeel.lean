@@ -192,4 +192,70 @@ theorem heisenbergToyHamiltonian_apply_diag_neel (A : Λ → Bool) :
   rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
   ring
 
+/-! ## Magnetization on the Néel state -/
+
+/-- `magnetization Λ (neelConfigOf A) = |A| − |¬A|`: the Néel
+configuration contributes `+1` on `A` (since `σ x = 0`) and `-1` on
+`¬A` (since `σ x = 1`).
+
+Spin-`1/2` specialisation of `magSumS_neelConfigOfS` (PR #1068). -/
+theorem magnetization_neelConfigOf (A : Λ → Bool) :
+    magnetization Λ (neelConfigOf A) =
+      ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℤ) -
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℤ) := by
+  unfold magnetization neelConfigOf
+  classical
+  -- Each term: spinSign(if A x then 0 else 1) = if A x then 1 else -1.
+  have hterm : ∀ x : Λ,
+      spinSign (if A x then (0 : Fin 2) else 1) =
+        if A x = true then (1 : ℤ) else -1 := by
+    intro x
+    by_cases hAx : A x = true
+    · rw [if_pos hAx, if_pos hAx]; simp [spinSign]
+    · cases h : A x
+      · rw [if_neg, if_neg]
+        · simp [spinSign]
+        · simp [h]
+        · simp [h]
+      · exact absurd h hAx
+  simp_rw [hterm]
+  have hsplit : ∀ x : Λ, (if A x = true then (1 : ℤ) else -1) =
+      (if A x = true then (1 : ℤ) else 0) +
+        (if (! A x) = true then (-1 : ℤ) else 0) := by
+    intro x
+    by_cases hAx : A x = true
+    · rw [if_pos hAx, if_pos hAx]
+      have : (! A x) = false := by simp [hAx]
+      rw [if_neg]
+      · ring
+      · simp [this]
+    · cases h : A x
+      · simp
+      · exact absurd h hAx
+  simp_rw [hsplit]
+  rw [Finset.sum_add_distrib]
+  rw [← Finset.sum_filter, Finset.sum_const]
+  rw [← Finset.sum_filter, Finset.sum_const]
+  push_cast
+  ring
+
+/-- `Ŝ_tot^(3) · |Φ_Néel⟩ = ((|A| − |¬A|)/2) · |Φ_Néel⟩`. The spin-`1/2`
+Néel state is a `Ŝ_tot^(3)`-eigenvector with magnetization
+`(|A| − |¬A|)/2`. For `|A| = |¬A|` the magnetization is zero (e.g.,
+chain / square / cube); for `|A| ≠ |¬A|` (the Tasaki Theorem 2.3 case),
+the absolute value `||A| − |¬A||/2 = ||A| − |¬A||·S` matches the
+conjectured ground-state total spin.
+
+Spin-`1/2` specialisation of `totalSpinSOp3_mulVec_neelStateOfS` (PR #1068). -/
+theorem totalSpinHalfOp3_mulVec_neelStateOf (A : Λ → Bool) :
+    (totalSpinHalfOp3 Λ).mulVec (neelStateOf A) =
+      ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) / 2) •
+        neelStateOf A := by
+  unfold neelStateOf
+  rw [totalSpinHalfOp3_mulVec_basisVec_eq_magnetization]
+  rw [magnetization_neelConfigOf]
+  push_cast
+  ring_nf
+
 end LatticeSystem.Quantum
