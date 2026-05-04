@@ -301,6 +301,39 @@ theorem totalSpinHalfOpMinus_mulVec_neelStateOf_eq_A (A : Λ → Bool) :
   rw [sublatticeSpinHalfOpMinus_complement_mulVec_neelStateOf A]
   rw [add_zero]
 
+/-- `Ŝ_A^(3) · |Φ_Néel⟩ = (|A|/2) · |Φ_Néel⟩`. The sublattice z-axis acts
+as `|A|/2` on the spin-`1/2` Néel state (highest weight on A:
+`neelConfigOf A x = 0` for `x ∈ A`, contributing `+1/2`). Spin-`1/2`
+mirror of γ-4 step 73 (`sublatticeSpinSOp3_mulVec_neelStateOfS`). -/
+theorem sublatticeSpinHalfOp3_mulVec_neelStateOf (A : Λ → Bool) :
+    (sublatticeSpinHalfOp3 A).mulVec (neelStateOf A) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) / 2) •
+        neelStateOf A := by
+  unfold sublatticeSpinHalfOp3 neelStateOf
+  rw [Matrix.sum_mulVec]
+  rw [show (∑ x : Λ, (if A x then onSite x spinHalfOp3 else 0 : ManyBodyOp Λ).mulVec
+        (basisVec (neelConfigOf A))) =
+      ∑ x : Λ, (if A x then ((1 : ℂ) / 2) else 0) •
+        basisVec (neelConfigOf A) from by
+    refine Finset.sum_congr rfl fun x _ => ?_
+    by_cases hA : A x = true
+    · rw [if_pos hA, if_pos hA]
+      rw [onSite_spinHalfOp3_mulVec_basisVec]
+      have hσx : neelConfigOf A x = 0 := by
+        unfold neelConfigOf; rw [if_pos hA]
+      rw [hσx]
+      rfl
+    · cases h : A x
+      · rw [if_neg, if_neg]
+        · rw [Matrix.zero_mulVec, zero_smul]
+        · simp
+        · simp
+      · exact absurd h hA]
+  rw [← Finset.sum_smul]
+  congr 1
+  rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
+  ring
+
 /-! ## Per-pair `spinHalfDot` diagonal at the Néel configuration -/
 
 /-- For a cross-sublattice pair `x ∈ A`, `y ∈ ¬A`, the spin-`1/2`
