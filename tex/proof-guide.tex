@@ -6465,6 +6465,16 @@ Each by direct induction on $k$ from the squared identities of
 PRs~\#1005 and \#1012. Mirrors PR~\#992 (single-mode
 $n^{k+1} = n$ and $(c\,c^\dagger)^{k+1} = c\,c^\dagger$).
 
+\textbf{Cross-site Hubbard empty projection commute (PR~\#1035)}:
+in the file
+\texttt{Fermion/JordanWigner/Hubbard/EmptyProjectionCommute.lean}.
+For any $i, j$,
+$\texttt{Commute}\,(p_\emptyset(i))\,(p_\emptyset(j))$. All four
+underlying $n_\sigma$ pairwise commute (and so do their
+$(1 - n_\sigma)$-complements by ring algebra), and the products
+commute via \texttt{Commute.mul\_left} /
+\texttt{.mul\_right}. Companion to PR~\#1006 for $p_\Uparrow$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
