@@ -5982,6 +5982,17 @@ encapsulated in the commutator proofs of
 \texttt{Fermion/JordanWigner/Number.lean}; the dual pair via
 \texttt{Matrix.conjTranspose}.
 
+\textbf{Multi-mode (JW) $c_i$--$c_i^\dagger$ commutator
+$[c_i,c_i^\dagger] = 1 - 2\,n_i$ (PR~\#994)}: multi-mode mirror
+of PR~\#989, in the file
+\texttt{Fermion/JordanWigner/CDaggerCCommutator.lean}. From the
+same-site CAR $c_i\,c_i^\dagger + c_i^\dagger c_i = 1$
+(\texttt{fermionMultiAnticomm\_self}) one gets
+$c_i\,c_i^\dagger = 1 - c_i^\dagger c_i = 1 - n_i$, where the
+last equality uses the definitional
+$n_i = c_i^\dagger c_i$. Subtracting $c_i^\dagger c_i = n_i$
+yields $[c_i,c_i^\dagger] = (1 - n_i) - n_i = 1 - 2 n_i$.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
