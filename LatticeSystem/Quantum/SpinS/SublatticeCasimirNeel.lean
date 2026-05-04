@@ -528,4 +528,15 @@ theorem sublatticeSpinSOpMinus_complement_minus_mulVec_neelStateOfS
   rw [sublatticeSpinSOpMinus_complement_mulVec_neelStateOfS]
   rw [Matrix.mulVec_zero]
 
+/-- `Ŝ_¬A^+ · Ŝ_A^+ · |Φ_Néel⟩ = 0`. The cross-ladder raising annihilates the
+Néel state via `Ŝ_A^+ · Néel = 0`. -/
+theorem sublatticeSpinSOpComplementPlus_plus_mulVec_neelStateOfS
+    (A : Λ → Bool) (N : ℕ) :
+    (sublatticeSpinSOpPlus N (fun x => ! A x) *
+        sublatticeSpinSOpPlus N A).mulVec
+        (neelStateOfS A N) = 0 := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [sublatticeSpinSOpPlus_mulVec_neelStateOfS]
+  rw [Matrix.mulVec_zero]
+
 end LatticeSystem.Quantum
