@@ -165,6 +165,46 @@ theorem heisenbergToyHamiltonianS_eq_casimir_diff (A : Λ → Bool) :
       heisenbergToyHamiltonianS_eq_two_sublatticeSpinSDot N A]
   abel
 
+/-! ## SU(2) invariance at the axis level -/
+
+/-- `[Ĥ_toy_S, Ŝ_tot^{(1)}] = 0`. Direct specialisation of
+`heisenbergHamiltonianS_commutator_totalSpinSOp1` to
+`J = bipartiteCoupling A`. -/
+theorem heisenbergToyHamiltonianS_commutator_totalSpinSOp1 (A : Λ → Bool) :
+    heisenbergToyHamiltonianS (Λ := Λ) A N * totalSpinSOp1 Λ N -
+        totalSpinSOp1 Λ N * heisenbergToyHamiltonianS (Λ := Λ) A N = 0 :=
+  heisenbergHamiltonianS_commutator_totalSpinSOp1 (bipartiteCoupling A) N
+
+/-- `[Ĥ_toy_S, Ŝ_tot^{(2)}] = 0`. -/
+theorem heisenbergToyHamiltonianS_commutator_totalSpinSOp2 (A : Λ → Bool) :
+    heisenbergToyHamiltonianS (Λ := Λ) A N * totalSpinSOp2 Λ N -
+        totalSpinSOp2 Λ N * heisenbergToyHamiltonianS (Λ := Λ) A N = 0 :=
+  heisenbergHamiltonianS_commutator_totalSpinSOp2 (bipartiteCoupling A) N
+
+/-- `[Ĥ_toy_S, Ŝ_tot^{(3)}] = 0`. The toy Hamiltonian preserves
+the magnetisation sector — the standard SU(2) `S^z` invariance used
+to block-diagonalise against `magConfigS V N M`. -/
+theorem heisenbergToyHamiltonianS_commutator_totalSpinSOp3 (A : Λ → Bool) :
+    heisenbergToyHamiltonianS (Λ := Λ) A N * totalSpinSOp3 Λ N -
+        totalSpinSOp3 Λ N * heisenbergToyHamiltonianS (Λ := Λ) A N = 0 :=
+  heisenbergHamiltonianS_commutator_totalSpinSOp3 (bipartiteCoupling A) N
+
+/-- `Commute Ĥ_toy_S Ŝ_tot^{(1)}`. Reformulation of the axis-1
+commutator in `Commute` form. -/
+theorem heisenbergToyHamiltonianS_commute_totalSpinSOp1 (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonianS (Λ := Λ) A N) (totalSpinSOp1 Λ N) :=
+  sub_eq_zero.mp (heisenbergToyHamiltonianS_commutator_totalSpinSOp1 N A)
+
+/-- `Commute Ĥ_toy_S Ŝ_tot^{(2)}`. -/
+theorem heisenbergToyHamiltonianS_commute_totalSpinSOp2 (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonianS (Λ := Λ) A N) (totalSpinSOp2 Λ N) :=
+  sub_eq_zero.mp (heisenbergToyHamiltonianS_commutator_totalSpinSOp2 N A)
+
+/-- `Commute Ĥ_toy_S Ŝ_tot^{(3)}`. -/
+theorem heisenbergToyHamiltonianS_commute_totalSpinSOp3 (A : Λ → Bool) :
+    Commute (heisenbergToyHamiltonianS (Λ := Λ) A N) (totalSpinSOp3 Λ N) :=
+  sub_eq_zero.mp (heisenbergToyHamiltonianS_commutator_totalSpinSOp3 N A)
+
 /-! ## Commutativity with the total Casimir -/
 
 /-- The spin-`S` toy Hamiltonian commutes with the total spin Casimir:
