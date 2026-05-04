@@ -6277,6 +6277,23 @@ the per-site 4-state decomposition (PR~\#1011); the remaining
 two ($p_\uparrow\cdot p_\Uparrow$, $p_\downarrow\cdot
 p_\Uparrow$) follow the same template.
 
+\textbf{Hubbard single-occupancy $\perp$ doubly-occupied
+per-site projections (PR~\#1018, completes 6/6 orthogonality)}:
+in the file
+\texttt{Fermion/JordanWigner/Hubbard/SiteProjectionsSingleDoubly.lean}.
+Final two pairs:
+$p_\uparrow\cdot p_\Uparrow = p_\Uparrow\cdot p_\uparrow = 0$
+and $p_\downarrow\cdot p_\Uparrow = p_\Uparrow\cdot
+p_\downarrow = 0$. Same proof template; collapse uses
+\texttt{fermionMultiNumber\_sq} ($n_\sigma^2 = n_\sigma$) and
+$n_\sigma(1 - n_\sigma) = 0$. Together with PRs~\#1014,
+\#1016, \#1017 \textbf{all six pairs of cross-projection
+orthogonality are now formalised}, completing the proof that
+$\{p_\emptyset, p_\uparrow, p_\downarrow, p_\Uparrow\}$ is a
+complete set of mutually orthogonal Hermitian projections
+summing to the identity (combined with PRs~\#1007, \#1011,
+\#1015).
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
