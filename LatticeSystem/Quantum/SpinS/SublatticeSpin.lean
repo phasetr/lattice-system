@@ -256,4 +256,73 @@ theorem sublatticeSpinSOp3_cross_commute (A : Λ → Bool) :
       exact onSiteS_commute_of_ne hxy (spinSOp3 N) (spinSOp3 N)
   · rw [if_neg hAx]; exact Commute.zero_left _
 
+/-! ## Generic mixed-axes cross-sublattice commutativity for spin-`S`
+
+Sites in `A` and `¬A` are distinct, so any single-site operators
+embedded at those sites commute via `onSiteS_mul_onSiteS_of_ne`.
+Lifted to the sublattice sums, this gives that `Ŝ_A^(α)` and
+`Ŝ_¬A^(β)` commute for **any** axes `α, β`. -/
+
+/-- Generic helper: the `A`-sublattice sum of `onSiteS x S`
+commutes with the `¬A`-sublattice sum of `onSiteS y T` for
+**any** single-site operators `S, T`. -/
+theorem sublatticeSpinSOpGeneric_cross_commute
+    (A : Λ → Bool) (S T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    Commute
+      (∑ x : Λ, if A x then onSiteS x S else 0)
+      (∑ y : Λ, if (! A y) then onSiteS y T else 0) := by
+  refine Commute.sum_left _ _ _ fun x _ => ?_
+  refine Commute.sum_right _ _ _ fun y _ => ?_
+  by_cases hAx : A x = true
+  · by_cases hAy : A y = true
+    · rw [show (! A y) = false from by simp [hAy]]
+      simp
+    · have hAy' : A y = false := by
+        cases h : A y
+        · rfl
+        · exact absurd h hAy
+      rw [show (! A y) = true from by simp [hAy']]
+      have hxy : x ≠ y := fun heq => by
+        subst heq; rw [hAx] at hAy'; exact Bool.noConfusion hAy'
+      rw [if_pos hAx, if_pos rfl]
+      exact onSiteS_commute_of_ne hxy S T
+  · rw [if_neg hAx]; exact Commute.zero_left _
+
+/-- Mixed-axes cross-sublattice commutativity for spin-`S`:
+`Ŝ_A^(1)` commutes with `Ŝ_¬A^(2)`. -/
+theorem sublatticeSpinSOp1_cross_commute_op2 (A : Λ → Bool) :
+    Commute (sublatticeSpinSOp1 N A) (sublatticeSpinSOp2 N (fun x => ! A x)) := by
+  unfold sublatticeSpinSOp1 sublatticeSpinSOp2
+  exact sublatticeSpinSOpGeneric_cross_commute N A (spinSOp1 N) (spinSOp2 N)
+
+/-- `Ŝ_A^(1)` commutes with `Ŝ_¬A^(3)`. -/
+theorem sublatticeSpinSOp1_cross_commute_op3 (A : Λ → Bool) :
+    Commute (sublatticeSpinSOp1 N A) (sublatticeSpinSOp3 N (fun x => ! A x)) := by
+  unfold sublatticeSpinSOp1 sublatticeSpinSOp3
+  exact sublatticeSpinSOpGeneric_cross_commute N A (spinSOp1 N) (spinSOp3 N)
+
+/-- `Ŝ_A^(2)` commutes with `Ŝ_¬A^(1)`. -/
+theorem sublatticeSpinSOp2_cross_commute_op1 (A : Λ → Bool) :
+    Commute (sublatticeSpinSOp2 N A) (sublatticeSpinSOp1 N (fun x => ! A x)) := by
+  unfold sublatticeSpinSOp2 sublatticeSpinSOp1
+  exact sublatticeSpinSOpGeneric_cross_commute N A (spinSOp2 N) (spinSOp1 N)
+
+/-- `Ŝ_A^(2)` commutes with `Ŝ_¬A^(3)`. -/
+theorem sublatticeSpinSOp2_cross_commute_op3 (A : Λ → Bool) :
+    Commute (sublatticeSpinSOp2 N A) (sublatticeSpinSOp3 N (fun x => ! A x)) := by
+  unfold sublatticeSpinSOp2 sublatticeSpinSOp3
+  exact sublatticeSpinSOpGeneric_cross_commute N A (spinSOp2 N) (spinSOp3 N)
+
+/-- `Ŝ_A^(3)` commutes with `Ŝ_¬A^(1)`. -/
+theorem sublatticeSpinSOp3_cross_commute_op1 (A : Λ → Bool) :
+    Commute (sublatticeSpinSOp3 N A) (sublatticeSpinSOp1 N (fun x => ! A x)) := by
+  unfold sublatticeSpinSOp3 sublatticeSpinSOp1
+  exact sublatticeSpinSOpGeneric_cross_commute N A (spinSOp3 N) (spinSOp1 N)
+
+/-- `Ŝ_A^(3)` commutes with `Ŝ_¬A^(2)`. -/
+theorem sublatticeSpinSOp3_cross_commute_op2 (A : Λ → Bool) :
+    Commute (sublatticeSpinSOp3 N A) (sublatticeSpinSOp2 N (fun x => ! A x)) := by
+  unfold sublatticeSpinSOp3 sublatticeSpinSOp2
+  exact sublatticeSpinSOpGeneric_cross_commute N A (spinSOp3 N) (spinSOp2 N)
+
 end LatticeSystem.Quantum
