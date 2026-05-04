@@ -285,6 +285,35 @@ theorem heisenbergToyHamiltonian_commute_totalSpinHalfOpMinus (A : Λ → Bool) 
     Commute (heisenbergToyHamiltonian A) (totalSpinHalfOpMinus Λ) :=
   heisenbergHamiltonian_commute_totalSpinHalfOpMinus (bipartiteCoupling A)
 
+/-! ## Sublattice Casimir magnetisation subspace preservation -/
+
+/-- `(Ŝ_A)²` preserves every magnetisation subspace `H_M` (consequence of
+`[(Ŝ_A)², Ŝ_tot^(3)] = 0`). Spin-`1/2` mirror back of γ-4 step 36 (PR #1078). -/
+theorem sublatticeSpinHalfSquared_mulVec_mem_magnetizationSubspace_of_mem
+    (A : Λ → Bool) {M : ℂ} {v : (Λ → Fin 2) → ℂ}
+    (hv : v ∈ magnetizationSubspace Λ M) :
+    (sublatticeSpinHalfSquared A).mulVec v ∈ magnetizationSubspace Λ M := by
+  rw [mem_magnetizationSubspace_iff] at hv ⊢
+  have hcomm : totalSpinHalfOp3 Λ * sublatticeSpinHalfSquared A =
+      sublatticeSpinHalfSquared A * totalSpinHalfOp3 Λ :=
+    (sublatticeSpinHalfSquared_commute_totalSpinHalfOp3 A).symm
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hv,
+      Matrix.mulVec_smul]
+
+/-- `(Ŝ_¬A)²` preserves every magnetisation subspace `H_M`. Symmetric
+to the `A` case. -/
+theorem sublatticeSpinHalfSquared_complement_mulVec_mem_magnetizationSubspace_of_mem
+    (A : Λ → Bool) {M : ℂ} {v : (Λ → Fin 2) → ℂ}
+    (hv : v ∈ magnetizationSubspace Λ M) :
+    (sublatticeSpinHalfSquared (fun x => ! A x)).mulVec v ∈
+        magnetizationSubspace Λ M := by
+  rw [mem_magnetizationSubspace_iff] at hv ⊢
+  have hcomm : totalSpinHalfOp3 Λ * sublatticeSpinHalfSquared (fun x => ! A x) =
+      sublatticeSpinHalfSquared (fun x => ! A x) * totalSpinHalfOp3 Λ :=
+    (sublatticeSpinHalfSquared_commute_totalSpinHalfOp3 (fun x => ! A x)).symm
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hv,
+      Matrix.mulVec_smul]
+
 /-! ## Eigenvalue on the all-aligned state -/
 
 /-- Cardinality of the `A`-sublattice (number of sites with `A x = true`). -/
