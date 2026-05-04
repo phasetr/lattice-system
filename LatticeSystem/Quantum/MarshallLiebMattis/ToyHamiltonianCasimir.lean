@@ -3,6 +3,7 @@ import LatticeSystem.Quantum.MarshallLiebMattis.ToyHamiltonian
 import LatticeSystem.Quantum.TotalSpin.Casimir
 import LatticeSystem.Quantum.SpinDot.Hamiltonian
 import LatticeSystem.Quantum.MagnetizationSubspace
+import LatticeSystem.Quantum.MarshallLiebMattis.Realness
 
 /-!
 # Toy Hamiltonian as a cross-sublattice spin dot product
@@ -258,6 +259,17 @@ theorem heisenbergToyHamiltonian_mulVec_mem_magnetizationSubspace_of_mem
     (heisenbergToyHamiltonian A).mulVec v ∈ magnetizationSubspace Λ M :=
   heisenbergHamiltonian_mulVec_mem_magnetizationSubspace_of_mem
     (Λ := Λ) (bipartiteCoupling A) hv
+
+/-! ## Matrix element realness -/
+
+/-- The spin-`1/2` toy Hamiltonian has real matrix elements:
+`(Ĥ_toy A) σ' σ` has zero imaginary part. Direct specialisation of
+`heisenbergHamiltonian_apply_im_eq_zero` to `J = bipartiteCoupling A`,
+using `bipartiteCoupling_im` to discharge realness of the coupling. -/
+theorem heisenbergToyHamiltonian_apply_im_eq_zero (A : Λ → Bool)
+    (σ σ' : Λ → Fin 2) :
+    ((heisenbergToyHamiltonian A) σ σ').im = 0 :=
+  heisenbergHamiltonian_apply_im_eq_zero (bipartiteCoupling_im A) σ σ'
 
 /-! ## Eigenvalue on the all-aligned state -/
 

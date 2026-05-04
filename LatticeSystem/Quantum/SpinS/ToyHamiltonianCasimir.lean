@@ -266,6 +266,16 @@ theorem sublatticeSpinSquaredS_complement_mulVec_mem_magSubspaceS
   mem_magSubspaceS_of_commute M (sublatticeSpinSquaredS N (fun x => ! A x))
     (sublatticeSpinSquaredS_commute_totalSpinSOp3 N (fun x => ! A x)).symm hv
 
+/-! ## Matrix element realness -/
+
+/-- The spin-`S` toy Hamiltonian has real matrix elements:
+`(Ĥ_toy_S A N) σ' σ` has zero imaginary part. Direct specialisation
+of `heisenbergHamiltonianS_apply_im_zero` to `J = bipartiteCoupling A`. -/
+theorem heisenbergToyHamiltonianS_apply_im_zero
+    (A : Λ → Bool) (σ' σ : Λ → Fin (N + 1)) :
+    ((heisenbergToyHamiltonianS (Λ := Λ) A N) σ' σ).im = 0 :=
+  heisenbergHamiltonianS_apply_im_zero N (bipartiteCoupling_im A) σ' σ
+
 /-! ## Commutativity with the total Casimir -/
 
 /-- The spin-`S` toy Hamiltonian commutes with the total spin Casimir:
