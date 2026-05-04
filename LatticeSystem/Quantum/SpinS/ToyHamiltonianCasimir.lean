@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.SublatticeSpinDot
 import LatticeSystem.Quantum.SpinS.ToyHamiltonian
+import LatticeSystem.Quantum.SpinS.AllAlignedState
 
 /-!
 # Spin-`S` toy Hamiltonian as a cross-sublattice spin dot product
@@ -203,5 +204,40 @@ theorem heisenbergToyHamiltonianS_commute_sublatticeSpinSquaredS_complement
   · exact (sublatticeSpinSquaredS_commute_totalSpinSSquared N (fun x => ! A x)).symm
   · exact sublatticeSpinSquaredS_cross_commute N A
   · exact Commute.refl _
+
+/-! ## Eigenvalue on the all-up state -/
+
+/-- **Spin-`S` toy Hamiltonian eigenvalue on the all-up state**
+(Tasaki §2.5 maximum-weight contribution). From the closed form
+`Ĥ_toy_S = (Ŝ_tot)² − (Ŝ_A)² − (Ŝ_¬A)²` (PR #1056) and the three
+Casimir eigenvalue formulas:
+
+  `Ĥ_toy_S · |σ_⊤⟩ =
+    ((|Λ|·N/2)(|Λ|·N/2+1) − (|A|·N/2)(|A|·N/2+1) − (|¬A|·N/2)(|¬A|·N/2+1)) · |σ_⊤⟩`.
+
+This is the maximum-spin eigenvalue contribution: each Casimir
+attains its maximum on the all-up state with `J = |Λ|·N/2`,
+`J_A = |A|·N/2`, `J_{¬A} = |¬A|·N/2`. -/
+theorem heisenbergToyHamiltonianS_mulVec_allAlignedStateS_zero
+    [Nonempty Λ] (A : Λ → Bool) :
+    (heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec
+        (allAlignedStateS Λ N (0 : Fin (N + 1))) =
+      (((Fintype.card Λ : ℂ) * (N : ℂ) / 2 *
+          ((Fintype.card Λ : ℂ) * (N : ℂ) / 2 + 1))
+        - (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+            ((N : ℂ) / 2) *
+            (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+                ((N : ℂ) / 2) + 1))
+        - (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+            ((N : ℂ) / 2) *
+            (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+                ((N : ℂ) / 2) + 1))) •
+        allAlignedStateS Λ N (0 : Fin (N + 1)) := by
+  rw [heisenbergToyHamiltonianS_eq_casimir_diff N A]
+  rw [Matrix.sub_mulVec, Matrix.sub_mulVec]
+  rw [totalSpinSSquared_mulVec_allAlignedStateS_zero_eigenvalue (V := Λ),
+      sublatticeSpinSquaredS_mulVec_allAlignedStateS_zero N A,
+      sublatticeSpinSquaredS_mulVec_allAlignedStateS_zero N (fun x => ! A x)]
+  rw [← sub_smul, ← sub_smul]
 
 end LatticeSystem.Quantum
