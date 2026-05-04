@@ -129,6 +129,13 @@ theorem sublatticeSpinDot_eq_sum_sum (A B : Λ → Bool) :
 
 /-! ## Sublattice spin squared as a double-sum of spin-dot products -/
 
+/-- The cross-sublattice spin dot product with `B = A` equals the
+sublattice Casimir: `Ŝ_A · Ŝ_A = (Ŝ_A)²`. Definitional identity
+since both unfold to `Σ_α Ŝ_A^(α) Ŝ_A^(α)`. Spin-`1/2` mirror of
+`sublatticeSpinSDot_self_eq_sublatticeSpinSquaredS` (γ-4 step 49). -/
+theorem sublatticeSpinDot_self_eq_sublatticeSpinHalfSquared (A : Λ → Bool) :
+    sublatticeSpinDot A A = sublatticeSpinHalfSquared A := rfl
+
 /-- `(Ŝ_A)² = Σ_{x ∈ A} Σ_{y ∈ A} Ŝ_x · Ŝ_y`.  Specialisation of
 `sublatticeSpinDot_eq_sum_sum` to `B = A`, since `(Ŝ_A)² = Ŝ_A · Ŝ_A`
 definitionally. -/
