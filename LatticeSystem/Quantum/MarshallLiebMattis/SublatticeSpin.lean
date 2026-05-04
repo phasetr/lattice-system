@@ -813,6 +813,41 @@ theorem totalSpinHalfOp3_commutator_sublatticeSpinHalfOpMinus (A : Λ → Bool) 
         sublatticeSpinHalfOpMinus A * sublatticeSpinHalfOp3 A from by abel]
   exact h_self
 
+/-! ## Sublattice ladder adjoint relations -/
+
+/-- `(Ŝ_A^+)† = Ŝ_A^-`: the spin-`1/2` sublattice raising and lowering
+operators are Hermitian conjugates. Mirror of γ-4 step 54. -/
+theorem sublatticeSpinHalfOpPlus_conjTranspose (A : Λ → Bool) :
+    (sublatticeSpinHalfOpPlus A).conjTranspose = sublatticeSpinHalfOpMinus A := by
+  unfold sublatticeSpinHalfOpPlus sublatticeSpinHalfOpMinus
+  rw [Matrix.conjTranspose_sum]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  by_cases hA : A x = true
+  · rw [if_pos hA, if_pos hA]
+    rw [onSite_conjTranspose, spinHalfOpPlus_conjTranspose]
+  · cases h : A x
+    · rw [if_neg, if_neg]
+      · rw [Matrix.conjTranspose_zero]
+      · simp
+      · simp
+    · exact absurd h hA
+
+/-- `(Ŝ_A^-)† = Ŝ_A^+`. -/
+theorem sublatticeSpinHalfOpMinus_conjTranspose (A : Λ → Bool) :
+    (sublatticeSpinHalfOpMinus A).conjTranspose = sublatticeSpinHalfOpPlus A := by
+  unfold sublatticeSpinHalfOpPlus sublatticeSpinHalfOpMinus
+  rw [Matrix.conjTranspose_sum]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  by_cases hA : A x = true
+  · rw [if_pos hA, if_pos hA]
+    rw [onSite_conjTranspose, spinHalfOpMinus_conjTranspose]
+  · cases h : A x
+    · rw [if_neg, if_neg]
+      · rw [Matrix.conjTranspose_zero]
+      · simp
+      · simp
+    · exact absurd h hA
+
 /-! ## Sublattice ladder operators annihilate extremal states -/
 
 /-- `Ŝ_A^+ · |0...0⟩ = 0`: the sublattice raising operator annihilates
