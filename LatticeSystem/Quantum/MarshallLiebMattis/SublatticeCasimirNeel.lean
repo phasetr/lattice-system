@@ -609,4 +609,21 @@ theorem sublatticeSpinHalfOp12sq_complement_mulVec_neelStateOf (A : Λ → Bool)
   simp only [k]
   ring
 
+/-- `Ŝ_¬A^- · Ŝ_¬A^+ · |Φ_Néel⟩ = |¬A| · |Φ_Néel⟩`. Spin-`1/2` mirror of
+γ-4 step 104 via dual Cartan identity. -/
+theorem sublatticeSpinHalfOpComplementMinus_complement_plus_mulVec_neelStateOf
+    (A : Λ → Bool) :
+    (sublatticeSpinHalfOpMinus (fun x => ! A x) *
+        sublatticeSpinHalfOpPlus (fun x => ! A x)).mulVec
+        (neelStateOf A) =
+      (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) •
+        neelStateOf A := by
+  rw [sublatticeSpinHalfOpMinus_mul_sublatticeSpinHalfOpPlus_eq]
+  rw [Matrix.sub_mulVec]
+  rw [sublatticeSpinHalfOp12sq_complement_mulVec_neelStateOf]
+  rw [sublatticeSpinHalfOp3_complement_mulVec_neelStateOf]
+  rw [← sub_smul]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum

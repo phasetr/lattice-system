@@ -1251,6 +1251,34 @@ theorem sublatticeSpinHalfOpPlus_mul_sublatticeSpinHalfOpMinus_eq (A : Λ → Bo
     S1 * S1 + S2 * S2 + (Complex.I • (S2 * S1) - Complex.I • (S1 * S2)) := by abel
   rw [this, hcommS3]
 
+/-- Dual: spin-`1/2` mirror of `sublatticeSpinSOpMinus_mul_sublatticeSpinSOpPlus_eq`. -/
+theorem sublatticeSpinHalfOpMinus_mul_sublatticeSpinHalfOpPlus_eq (A : Λ → Bool) :
+    sublatticeSpinHalfOpMinus A * sublatticeSpinHalfOpPlus A =
+      sublatticeSpinHalfOp1 A * sublatticeSpinHalfOp1 A +
+        sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp2 A -
+        sublatticeSpinHalfOp3 A := by
+  rw [sublatticeSpinHalfOpPlus_eq_add, sublatticeSpinHalfOpMinus_eq_sub]
+  have hcomm := sublatticeSpinHalfOp1_commutator_sublatticeSpinHalfOp2 A
+  set S1 := sublatticeSpinHalfOp1 A
+  set S2 := sublatticeSpinHalfOp2 A
+  set S3 := sublatticeSpinHalfOp3 A
+  have hexp : (S1 - Complex.I • S2) * (S1 + Complex.I • S2) =
+      S1 * S1 + Complex.I • (S1 * S2) - Complex.I • (S2 * S1) -
+        Complex.I • Complex.I • (S2 * S2) := by
+    rw [Matrix.sub_mul, Matrix.mul_add, Matrix.mul_add, Matrix.smul_mul,
+      Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_smul]
+    abel
+  rw [hexp]
+  rw [show (Complex.I : ℂ) • Complex.I • (S2 * S2) = -(S2 * S2) from by
+    rw [smul_smul, Complex.I_mul_I, neg_one_smul]]
+  have hcommS3 : Complex.I • (S1 * S2) - Complex.I • (S2 * S1) = -S3 := by
+    rw [← smul_sub, hcomm, smul_smul, Complex.I_mul_I, neg_one_smul]
+  have : S1 * S1 + Complex.I • (S1 * S2) - Complex.I • (S2 * S1) -
+      -(S2 * S2) =
+    S1 * S1 + S2 * S2 + (Complex.I • (S1 * S2) - Complex.I • (S2 * S1)) := by abel
+  rw [this, hcommS3]
+  abel
+
 /-! ## Cross-sublattice commute for ladder operators (spin-`1/2`) -/
 
 /-- Spin-`1/2` mirror of `sublatticeSpinSOpPlus_cross_commute`. -/
