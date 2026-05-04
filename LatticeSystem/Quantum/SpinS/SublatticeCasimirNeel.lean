@@ -161,6 +161,37 @@ theorem totalSpinSOp3_mulVec_neelStateOfS (A : Λ → Bool) (N : ℕ) :
   push_cast
   ring
 
+/-! ## Per-pair `spinSDot` diagonal at the Néel configuration -/
+
+/-- For a cross-sublattice pair `x ∈ A`, `y ∈ ¬A`, the two-site dot
+product diagonal at the Néel configuration is `-N²/4`:
+
+  `(Ŝ_x · Ŝ_y) (neel) (neel) = (N/2)·(-N/2) = -N²/4`.
+
+Direct from `spinSDot_apply_diag_of_ne` with `m_x = N/2` and
+`m_y = -N/2` from the Néel config values. -/
+theorem spinSDot_apply_diag_neelConfigOfS_of_cross
+    (A : Λ → Bool) (N : ℕ)
+    {x y : Λ} (hAx : A x = true) (hAy : A y = false) :
+    (spinSDot x y N : ManyBodyOpS Λ N)
+        (neelConfigOfS A N) (neelConfigOfS A N) =
+      -((N : ℂ) * (N : ℂ) / 4) := by
+  have hxy : x ≠ y := by
+    intro heq
+    rw [heq, hAy] at hAx
+    exact Bool.noConfusion hAx
+  rw [spinSDot_apply_diag_of_ne hxy]
+  -- m_x = N/2 since σ_x = 0; m_y = -N/2 since σ_y = Fin.last N.
+  have hmx : ((N : ℂ) / 2 - (neelConfigOfS A N x).val) = (N : ℂ) / 2 := by
+    unfold neelConfigOfS
+    rw [if_pos hAx]; simp
+  have hmy : ((N : ℂ) / 2 - (neelConfigOfS A N y).val) = -((N : ℂ) / 2) := by
+    unfold neelConfigOfS
+    rw [if_neg (by rw [hAy]; decide : ¬ (A y = true))]
+    push_cast [Fin.last]; ring
+  rw [hmx, hmy]
+  ring
+
 /-! ## Toy Hamiltonian diagonal matrix element on the Néel state -/
 
 /-- The diagonal matrix element of the cross-sublattice spin dot
