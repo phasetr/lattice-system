@@ -35,6 +35,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsEmptySingle
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsSingleDoubly
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsSpinResolved
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsCommute
+import LatticeSystem.Fermion.JordanWigner.CPlusCDaggerSq
 
 /-!
 # Multi-mode fermion via Jordan–Wigner mapping
@@ -86,6 +87,7 @@ expansion):
 | `Hubbard/SiteProjectionsSingleDoubly.lean` | `p_↑ ⊥ p_⇈`, `p_↓ ⊥ p_⇈` (completes 6/6 ortho.) |
 | `Hubbard/SiteProjectionsSpinResolved.lean` | `p_↑+p_⇈ = n_↑`, `p_∅+p_↑ = 1−n_↓`, etc. |
 | `Hubbard/SiteProjectionsCommute.lean` | same-site `Commute p_α p_β` (all 6 pairs) |
+| `CPlusCDaggerSq.lean` | `(c_i + c_i†)² = 1` (multi-mode `σ_x`-analog) |
 
 Old `import LatticeSystem.Fermion.JordanWigner` continues to
 work unchanged via this façade. Following the convention from
