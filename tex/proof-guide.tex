@@ -6116,6 +6116,20 @@ $U \sum_i n_\uparrow(i) n_\downarrow(i)$ is $U$ times a sum
 of projections (each summand is a projection by this PR;
 cross-site commutation of summands is not proved here).
 
+\textbf{Cross-site Hubbard double-occupancy commute
+$\texttt{Commute}\,(n_\uparrow(i) n_\downarrow(i))\,
+(n_\uparrow(j) n_\downarrow(j))$ (PR~\#1006)}: in the file
+\texttt{Fermion/JordanWigner/Hubbard/DoubleOccupancyCommute.lean}.
+The four underlying single-species number operators
+$n_\uparrow(i), n_\downarrow(i), n_\uparrow(j), n_\downarrow(j)$
+live at JW positions $2i$, $2i+1$, $2j$, $2j+1$ and pairwise
+commute by \texttt{fermionMultiNumber\_commute}; the products
+commute by \texttt{Commute.mul\_left} and
+\texttt{Commute.mul\_right}. Combined with PR~\#1005, the
+on-site Hubbard interaction $U\sum_i n_\uparrow(i)
+n_\downarrow(i)$ is $U$ times a sum of pairwise commuting
+projections, hence simultaneously diagonalisable.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
