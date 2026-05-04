@@ -849,4 +849,31 @@ theorem neelStateOf_heisenbergToyHamiltonian_expectation (A : Λ → Bool) :
   · intro h
     exact (h (Finset.mem_univ _)).elim
 
+/-- `<basisVec (fun _ => 0) | Φ_Néel> = 0` when `|¬A| > 0`. Spin-`1/2`
+analog of γ-4 step 133: the all-up basis state is orthogonal to the
+Néel state whenever `¬A` is non-empty. -/
+theorem neelStateOf_allUp_orthogonal
+    (A : Λ → Bool) (hA : ∃ x : Λ, A x = false) :
+    dotProduct (star (basisVec (fun _ : Λ => (0 : Fin 2))))
+        (neelStateOf A) = 0 := by
+  unfold neelStateOf dotProduct
+  have hne : neelConfigOf A ≠ (fun _ : Λ => (0 : Fin 2)) := by
+    obtain ⟨x, hx⟩ := hA
+    intro heq
+    have h := congrFun heq x
+    unfold neelConfigOf at h
+    rw [if_neg (by rw [hx]; decide : ¬ A x = true)] at h
+    exact (by decide : (1 : Fin 2) ≠ 0) h
+  rw [Finset.sum_eq_zero]
+  intro τ _
+  by_cases hτ : τ = neelConfigOf A
+  · -- τ = neelConfigOf A; basisVec (allZero) τ = 0 since neelConfigOf ≠ allZero
+    rw [hτ]
+    have : basisVec (fun _ : Λ => (0 : Fin 2)) (neelConfigOf A) = 0 :=
+      basisVec_of_ne hne
+    simp [Pi.star_apply, this]
+  · -- τ ≠ neelConfigOf A; basisVec (neelConfigOf A) τ = 0
+    rw [basisVec_of_ne hτ]
+    simp
+
 end LatticeSystem.Quantum
