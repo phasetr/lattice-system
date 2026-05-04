@@ -94,6 +94,17 @@ theorem sublatticeSpinSDot_eq_sum_sum (A B : Λ → Bool) :
     rfl
   · simp only [if_neg hAB, add_zero]
 
+/-! ## Sublattice spin squared as a double-sum of spin-dot products -/
+
+/-- `(Ŝ_A)² = Σ_{x ∈ A} Σ_{y ∈ A} Ŝ_x · Ŝ_y`. Specialisation of
+`sublatticeSpinSDot_eq_sum_sum` to `B = A`, since `(Ŝ_A)² = Ŝ_A · Ŝ_A`
+definitionally. -/
+theorem sublatticeSpinSquaredS_eq_sum_dot (A : Λ → Bool) :
+    sublatticeSpinSquaredS N A =
+      ∑ x : Λ, ∑ y : Λ,
+        if A x ∧ A y then spinSDot x y N else 0 :=
+  sublatticeSpinSDot_eq_sum_sum N A A
+
 /-! ## Hermiticity of `Ŝ_A · Ŝ_¬A` -/
 
 /-- The spin-`S` cross-sublattice spin dot product `Ŝ_A · Ŝ_¬A` is
