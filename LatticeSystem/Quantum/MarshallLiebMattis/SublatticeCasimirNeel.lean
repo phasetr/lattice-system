@@ -633,6 +633,17 @@ theorem neelStateOf_inner_self (A : Λ → Bool) :
   · intro h
     exact (h (Finset.mem_univ _)).elim
 
+/-- `<Φ_Néel | Ŝ_tot^(3) | Φ_Néel> = (|A| - |¬A|)/2`. Spin-`1/2` mirror of
+γ-4 step 112: Néel state magnetization expectation. -/
+theorem neelStateOf_totalSpinHalfOp3_expectation (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        ((totalSpinHalfOp3 Λ).mulVec (neelStateOf A)) =
+      ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) / 2) := by
+  rw [totalSpinHalfOp3_mulVec_neelStateOf]
+  rw [dotProduct_smul]
+  rw [neelStateOf_inner_self, smul_eq_mul, mul_one]
+
 /-- `Ŝ_¬A^- · Ŝ_¬A^+ · |Φ_Néel⟩ = |¬A| · |Φ_Néel⟩`. Spin-`1/2` mirror of
 γ-4 step 104 via dual Cartan identity. -/
 theorem sublatticeSpinHalfOpComplementMinus_complement_plus_mulVec_neelStateOf
