@@ -913,4 +913,16 @@ theorem neelStateOf_finrank_span (A : Λ → Bool) :
     Module.finrank ℂ (Submodule.span ℂ {neelStateOf A}) = 1 :=
   finrank_span_singleton (neelStateOf_ne_zero A)
 
+/-- Configuration-level distinctness for spin-`1/2`: `neelConfigOf A ≠
+fun _ => 0` when `|¬A| > 0`. Spin-`1/2` mirror of γ-4 step 144. -/
+theorem neelConfigOf_ne_allUp
+    (A : Λ → Bool) (hA : ∃ x : Λ, A x = false) :
+    neelConfigOf A ≠ (fun _ : Λ => (0 : Fin 2)) := by
+  obtain ⟨x, hx⟩ := hA
+  intro heq
+  have h := congrFun heq x
+  unfold neelConfigOf at h
+  rw [if_neg (by rw [hx]; decide : ¬ A x = true)] at h
+  exact (by decide : (1 : Fin 2) ≠ 0) h
+
 end LatticeSystem.Quantum
