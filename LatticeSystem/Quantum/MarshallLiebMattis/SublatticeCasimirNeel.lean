@@ -381,6 +381,35 @@ theorem sublatticeSpinHalfOp3_complement_mulVec_neelStateOf (A : Λ → Bool) :
   rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
   ring
 
+/-- `(Ŝ_A^(3))² · |Φ_Néel⟩ = (|A|/2)² · |Φ_Néel⟩`. Square of γ-4 step 75.
+Spin-`1/2` mirror of γ-4 step 77. -/
+theorem sublatticeSpinHalfOp3_sq_mulVec_neelStateOf (A : Λ → Bool) :
+    (sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp3 A).mulVec (neelStateOf A) =
+      ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) / 2) ^ 2) •
+        neelStateOf A := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [sublatticeSpinHalfOp3_mulVec_neelStateOf]
+  rw [Matrix.mulVec_smul]
+  rw [sublatticeSpinHalfOp3_mulVec_neelStateOf]
+  rw [smul_smul]
+  congr 1
+  ring
+
+/-- `(Ŝ_¬A^(3))² · |Φ_Néel⟩ = (|¬A|/2)² · |Φ_Néel⟩`. Square of γ-4 step 76.
+Spin-`1/2` mirror of γ-4 step 77 complement. -/
+theorem sublatticeSpinHalfOp3_complement_sq_mulVec_neelStateOf (A : Λ → Bool) :
+    (sublatticeSpinHalfOp3 (fun x => ! A x) *
+        sublatticeSpinHalfOp3 (fun x => ! A x)).mulVec (neelStateOf A) =
+      ((((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) / 2) ^ 2) •
+        neelStateOf A := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [sublatticeSpinHalfOp3_complement_mulVec_neelStateOf]
+  rw [Matrix.mulVec_smul]
+  rw [sublatticeSpinHalfOp3_complement_mulVec_neelStateOf]
+  rw [smul_smul]
+  congr 1
+  ring
+
 /-! ## Per-pair `spinHalfDot` diagonal at the Néel configuration -/
 
 /-- For a cross-sublattice pair `x ∈ A`, `y ∈ ¬A`, the spin-`1/2`
