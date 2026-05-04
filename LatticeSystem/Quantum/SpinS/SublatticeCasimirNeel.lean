@@ -991,4 +991,10 @@ theorem magConfigS_card_pos_via_neel (A : Λ → Bool) (N : ℕ) :
         ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card * N)) :=
   Fintype.card_pos
 
+/-- The line spanned by the spin-`S` Néel state is 1-dimensional:
+`finrank ℂ (ℂ ∙ Φ_Néel_S) = 1`. -/
+theorem neelStateOfS_finrank_span (A : Λ → Bool) (N : ℕ) :
+    Module.finrank ℂ (Submodule.span ℂ {neelStateOfS A N}) = 1 :=
+  finrank_span_singleton (neelStateOfS_ne_zero A N)
+
 end LatticeSystem.Quantum
