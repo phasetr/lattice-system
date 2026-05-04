@@ -6243,6 +6243,18 @@ follows from PR~\#1025: $(2n - 1) + (1 - 2n) = 0$. Physics
 identification: $\{\sigma_x, \sigma_y\} = 0$ in the spin-$1/2$
 representation.
 
+\textbf{Multi-mode (JW) $(c_i \pm c_i^\dagger)$ Pauli-X/iY
+analog full structure (PR~\#1027)}: multi-mode mirror of
+PRs~\#1025 and \#1026, in the file
+\texttt{Fermion/JordanWigner/CPlusMinusCDaggerPauli.lean}.
+Bundles all five identities: mixed products $(c_i + c_i^\dagger)
+(c_i - c_i^\dagger) = 2 n_i - 1$ and the reverse, plus
+Hermiticity / anti-Hermiticity / anticommute. Same proof
+patterns lifted to multi-mode using the per-site identities of
+PRs~\#996 and the existing
+\texttt{fermionMultiAnnihilation\_conjTranspose} /
+\texttt{fermionMultiCreation\_conjTranspose}.
+
 \textbf{Multi-mode (JW) ladder-on-hole-projection vanishing
 $c_i\,(c_i\,c_i^\dagger) = 0$ and $(c_i\,c_i^\dagger)\,
 c_i^\dagger = 0$ (PR~\#1010)}: multi-mode mirror of PR~\#1009,
