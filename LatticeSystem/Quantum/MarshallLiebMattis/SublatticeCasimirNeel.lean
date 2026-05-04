@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpinDot
 import LatticeSystem.Quantum.MarshallLiebMattis.ToyHamiltonianCasimir
 import LatticeSystem.Quantum.NeelState
+import LatticeSystem.Quantum.MagnetizationSubspace
 
 /-!
 # Sublattice Casimir eigenvalues on the Néel state
@@ -875,5 +876,14 @@ theorem neelStateOf_allUp_orthogonal
   · -- τ ≠ neelConfigOf A; basisVec (neelConfigOf A) τ = 0
     rw [basisVec_of_ne hτ]
     simp
+
+/-- The spin-`1/2` Néel state lies in the magnetization-`M` subspace
+where `M = (|A|-|¬A|)/2`. Direct from `totalSpinHalfOp3_mulVec_neelStateOf`. -/
+theorem neelStateOf_mem_magnetizationSubspace (A : Λ → Bool) :
+    neelStateOf A ∈ magnetizationSubspace Λ
+      ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) / 2) := by
+  rw [mem_magnetizationSubspace_iff]
+  exact totalSpinHalfOp3_mulVec_neelStateOf A
 
 end LatticeSystem.Quantum
