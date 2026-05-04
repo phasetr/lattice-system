@@ -117,4 +117,51 @@ theorem heisenbergToyHamiltonianS_eq_two_sublatticeSpinSDot (A : Λ → Bool) :
   rw [← sublatticeSpinSDot_complement_comm]
   rw [two_smul]
 
+/-! ## Casimir identity for the total spin-`S` -/
+
+/-- Helper: for commuting operators, `(a + b)(a + b) = a*a + 2•(a*b) + b*b`. -/
+private lemma square_add_of_commuteS
+    {a b : ManyBodyOpS Λ N} (h : Commute a b) :
+    (a + b) * (a + b) = a * a + (2 : ℂ) • (a * b) + b * b := by
+  rw [add_mul, mul_add, mul_add, h.eq, two_smul]
+  abel
+
+/-- **Casimir identity for spin-`S`** (Tasaki §2.5 (2.5.11)):
+the total spin squared decomposes across the bipartition as
+
+`(Ŝ_tot)² = (Ŝ_A)² + 2 • (Ŝ_A · Ŝ_¬A) + (Ŝ_¬A)²`.
+
+Each axis contributes `(Ŝ_A^α + Ŝ_¬A^α)² = (Ŝ_A^α)² + 2 Ŝ_A^α Ŝ_¬A^α + (Ŝ_¬A^α)²`
+by the cross-sublattice commutativity (PR #1045); summing
+gives the operator identity. -/
+theorem totalSpinSSquared_eq_sublattice_casimir (A : Λ → Bool) :
+    totalSpinSSquared Λ N =
+      sublatticeSpinSquaredS N A
+      + (2 : ℂ) • sublatticeSpinSDot N A (fun x => ! A x)
+      + sublatticeSpinSquaredS N (fun x => ! A x) := by
+  unfold totalSpinSSquared sublatticeSpinSquaredS
+  rw [sublatticeSpinSDot_def]
+  rw [totalSpinSOp1_eq_sublattice_sum (N := N) A,
+      totalSpinSOp2_eq_sublattice_sum (N := N) A,
+      totalSpinSOp3_eq_sublattice_sum (N := N) A]
+  rw [square_add_of_commuteS N (sublatticeSpinSOp1_cross_commute N A),
+      square_add_of_commuteS N (sublatticeSpinSOp2_cross_commute N A),
+      square_add_of_commuteS N (sublatticeSpinSOp3_cross_commute N A)]
+  rw [smul_add, smul_add]
+  abel
+
+/-- **Tasaki §2.5 (2.5.11) closed form for spin-`S`** (without the
+`1/|Λ|` factor): the toy Hamiltonian equals the difference of the
+total Casimir and the two sublattice Casimirs:
+
+`Ĥ_toy_S = (Ŝ_tot)² − (Ŝ_A)² − (Ŝ_¬A)²`. -/
+theorem heisenbergToyHamiltonianS_eq_casimir_diff (A : Λ → Bool) :
+    heisenbergToyHamiltonianS (Λ := Λ) A N =
+      totalSpinSSquared Λ N
+        - sublatticeSpinSquaredS N A
+        - sublatticeSpinSquaredS N (fun x => ! A x) := by
+  rw [totalSpinSSquared_eq_sublattice_casimir N A,
+      heisenbergToyHamiltonianS_eq_two_sublatticeSpinSDot N A]
+  abel
+
 end LatticeSystem.Quantum
