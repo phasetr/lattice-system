@@ -6156,6 +6156,19 @@ expanding $(1-n_i)c_j$ vs $c_j(1-n_i)$ and similarly for
 $c_j^\dagger$ closes both via $n_i\,c_j = c_j\,n_i$ (resp.\ for
 $c_j^\dagger$).
 
+\textbf{Single-mode ladder-on-hole-projection vanishing
+$c\,(c\,c^\dagger) = 0$ and $(c\,c^\dagger)\,c^\dagger = 0$
+(PR~\#1009)}: in the file
+\texttt{Fermion/CCDaggerLadderZero.lean}. Direct from
+$c^2 = 0$ (\texttt{fermionAnnihilation\_sq}) and
+$(c^\dagger)^2 = 0$ (\texttt{fermionCreation\_sq}):
+$c\,(c\,c^\dagger) = c^2\,c^\dagger = 0$ and
+$(c\,c^\dagger)\,c^\dagger = c\,(c^\dagger)^2 = 0$. Together
+with $(c\,c^\dagger)\,c = c$ (PR~\#982) and $c^\dagger\,
+(c\,c^\dagger) = c^\dagger$ (PR~\#984) this is the full
+four-way breakdown of left/right multiplication of
+$c\,c^\dagger$ by the ladder operators.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
