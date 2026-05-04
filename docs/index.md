@@ -1134,6 +1134,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionAnnihilation_trace_eq_zero` / `fermionCreation_trace_eq_zero` / `fermionNumber_trace_eq_one` / `fermionAnnihilation_mul_fermionCreation_trace_eq_one` | `tr(c) = 0`; `tr(c†) = 0`; `tr(n) = 1`; `tr(c · c†) = 1` (single-mode trace identities) | `Fermion/Traces.lean` (PR #991) |
 | `fermionNumber_pow_succ` / `fermionAnnihilation_mul_fermionCreation_pow_succ` | `n^(k+1) = n`; `(c · c†)^(k+1) = c · c†` for any `k : ℕ` (positive-degree power identities of the idempotent projections) | `Fermion/ProjectionPow.lean` (PR #992) |
 | `fermionMultiNumber_anticommutator_fermionMultiAnnihilation_self` / `fermionMultiNumber_anticommutator_fermionMultiCreation_self` | `{n_i, c_i} = c_i`; `{n_i, c_i†} = c_i†` (multi-mode JW same-site ladder anticommutators, mirror of PR #990) | `Fermion/JordanWigner/NumberAnticommutators.lean` (PR #993) |
+| `fermionMultiAnnihilation_commutator_fermionMultiCreation_self` | `[c_i, c_i†] = 1 − 2 · n_i` (multi-mode JW same-site `c_i`–`c_i†` commutator, mirror of PR #989) | `Fermion/JordanWigner/CDaggerCCommutator.lean` (PR #994) |
 
 ### Multi-mode fermion via Jordan–Wigner (P2 backbone)
 
