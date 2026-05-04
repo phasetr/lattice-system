@@ -6202,6 +6202,16 @@ $c_i + c_i^\dagger = \mathrm{jwString}_i \cdot \sigma_x_i$, and
 $(\mathrm{jwString}_i \cdot \sigma_x_i)^2 = 1$ since
 $\mathrm{jwString}_i^2 = 1$ (\texttt{jwString\_sq}).
 
+\textbf{Single-mode $(c - c^\dagger)^2 = -1$ (iY-Pauli analog,
+PR~\#1023)}: in the file
+\texttt{Fermion/CMinusCDaggerSq.lean}. Companion to PR~\#1021.
+The antisymmetric anti-Hermitian combination squares to $-1$.
+$(c - c^\dagger)^2 = c^2 - c\,c^\dagger - c^\dagger c + (c^\dagger)^2
+= -(c\,c^\dagger + c^\dagger c) = -1$ via $c^2 = (c^\dagger)^2 = 0$
+and \texttt{fermionAnticomm\_self}. In spin-$1/2$ identification
+$c - c^\dagger = \sigma^+ - \sigma^- = i\,\sigma_y$ and
+$(i\,\sigma_y)^2 = -\sigma_y^2 = -I$.
+
 \textbf{Multi-mode (JW) ladder-on-hole-projection vanishing
 $c_i\,(c_i\,c_i^\dagger) = 0$ and $(c_i\,c_i^\dagger)\,
 c_i^\dagger = 0$ (PR~\#1010)}: multi-mode mirror of PR~\#1009,
