@@ -813,6 +813,42 @@ theorem totalSpinHalfOp3_commutator_sublatticeSpinHalfOpMinus (A : Λ → Bool) 
         sublatticeSpinHalfOpMinus A * sublatticeSpinHalfOp3 A from by abel]
   exact h_self
 
+/-! ## Sublattice ladder operators annihilate extremal states -/
+
+/-- `Ŝ_A^+ · |0...0⟩ = 0`: the sublattice raising operator annihilates
+the all-up basis vector. Spin-`1/2` mirror of γ-4 step 45. -/
+theorem sublatticeSpinHalfOpPlus_mulVec_basisVec_zero (A : Λ → Bool) :
+    (sublatticeSpinHalfOpPlus A).mulVec (basisVec (fun _ : Λ => (0 : Fin 2))) = 0 := by
+  unfold sublatticeSpinHalfOpPlus
+  rw [Matrix.sum_mulVec]
+  apply Finset.sum_eq_zero
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    rw [onSite_spinHalfOpPlus_mulVec_basisVec]
+    simp
+  · cases h : A x
+    · rw [if_neg, Matrix.zero_mulVec]
+      simp
+    · exact absurd h hA
+
+/-- `Ŝ_A^- · |1...1⟩ = 0`: the sublattice lowering operator annihilates
+the all-down basis vector. -/
+theorem sublatticeSpinHalfOpMinus_mulVec_basisVec_one (A : Λ → Bool) :
+    (sublatticeSpinHalfOpMinus A).mulVec (basisVec (fun _ : Λ => (1 : Fin 2))) = 0 := by
+  unfold sublatticeSpinHalfOpMinus
+  rw [Matrix.sum_mulVec]
+  apply Finset.sum_eq_zero
+  intro x _
+  by_cases hA : A x = true
+  · rw [if_pos hA]
+    rw [onSite_spinHalfOpMinus_mulVec_basisVec]
+    simp
+  · cases h : A x
+    · rw [if_neg, Matrix.zero_mulVec]
+      simp
+    · exact absurd h hA
+
 /-! ## Sublattice ladder operators shift the magnetization subspace -/
 
 /-- `Ŝ_A^- · v ∈ magnetizationSubspace Λ (M − 1)` for `v ∈ magnetizationSubspace Λ M`.
