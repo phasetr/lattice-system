@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.SublatticeSpinDot
 import LatticeSystem.Quantum.SpinS.Magnetization
+import LatticeSystem.Quantum.SpinS.ToyHamiltonianCasimir
 
 /-!
 # Spin-`S` Néel state and sublattice Casimir eigenvalues
@@ -158,6 +159,118 @@ theorem totalSpinSOp3_mulVec_neelStateOfS (A : Λ → Bool) (N : ℕ) :
     exact this
   rw [hsumℂ]
   push_cast
+  ring
+
+/-! ## Toy Hamiltonian diagonal matrix element on the Néel state -/
+
+/-- The diagonal matrix element of the cross-sublattice spin dot
+product `Ŝ_A · Ŝ_¬A` at the spin-`S` Néel configuration:
+
+  `(Ŝ_A · Ŝ_¬A) (neel) (neel) = -|A|·|¬A|·N²/4`.
+
+Each `(x ∈ A, y ∈ ¬A)` pair contributes
+`(spinSDot x y) (neel) (neel) = m_x · m_y = (N/2)·(−N/2) = -N²/4`
+(diagonal formula `spinSDot_apply_diag_of_ne`, since `A x ≠ A y`
+implies `x ≠ y`); summing over the `|A|·|¬A|` such pairs gives the
+result. -/
+theorem sublatticeSpinSDot_apply_diag_neel (A : Λ → Bool) (N : ℕ) :
+    (sublatticeSpinSDot N A (fun x => ! A x))
+        (neelConfigOfS A N) (neelConfigOfS A N) =
+      -(((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) * (N : ℂ)) / 4) := by
+  rw [sublatticeSpinSDot_eq_sum_sum]
+  -- Apply at (neel, neel).
+  rw [show (∑ x : Λ, ∑ y : Λ,
+        if A x ∧ (fun z : Λ => ! A z) y = true then spinSDot x y N else 0)
+        (neelConfigOfS A N) (neelConfigOfS A N) =
+      ∑ x : Λ, ∑ y : Λ,
+        ((if A x ∧ (! A y) = true then spinSDot x y N else 0)
+          (neelConfigOfS A N) (neelConfigOfS A N)) from by
+    rw [Matrix.sum_apply]
+    refine Finset.sum_congr rfl fun x _ => ?_
+    rw [Matrix.sum_apply]]
+  have hterm : ∀ x y : Λ,
+      ((if A x ∧ (! A y) = true then spinSDot x y N else 0)
+          (neelConfigOfS A N) (neelConfigOfS A N) : ℂ) =
+      if A x ∧ (! A y) = true then -((N : ℂ) * (N : ℂ) / 4) else 0 := by
+    intro x y
+    by_cases hAB : A x ∧ (! A y) = true
+    · obtain ⟨hAx, hAy⟩ := hAB
+      rw [if_pos ⟨hAx, hAy⟩, if_pos ⟨hAx, hAy⟩]
+      have hxy : x ≠ y := by
+        intro heq
+        subst heq
+        rw [hAx] at hAy
+        simp at hAy
+      rw [spinSDot_apply_diag_of_ne hxy]
+      -- m_x = N/2 (since A x = true, neel x = 0).
+      have hmx : ((N : ℂ) / 2 - (neelConfigOfS A N x).val) = (N : ℂ) / 2 := by
+        unfold neelConfigOfS
+        rw [if_pos hAx]; simp
+      -- m_y = -N/2 (since A y = false, neel y = Fin.last N).
+      have hAyF : A y = false := by
+        cases h : A y
+        · rfl
+        · simp [h] at hAy
+      have hmy : ((N : ℂ) / 2 - (neelConfigOfS A N y).val) = -((N : ℂ) / 2) := by
+        unfold neelConfigOfS
+        rw [if_neg (by rw [hAyF]; decide : ¬ (A y = true))]
+        push_cast [Fin.last]; ring
+      rw [hmx, hmy]
+      ring
+    · rw [if_neg hAB, if_neg hAB]
+      rfl
+  simp_rw [hterm]
+  -- Sum: |A| · |¬A| · (-N²/4).
+  have hindicator_outer : ∀ (x : Λ) (C : ℂ),
+      (∑ y : Λ, if A x ∧ (! A y) = true then C else 0) =
+        if A x then ((Finset.univ.filter (fun y : Λ => (! A y) = true)).card : ℂ) * C
+        else 0 := by
+    intro x C
+    by_cases hAx : A x = true
+    · rw [if_pos hAx]
+      classical
+      rw [show (∑ y : Λ, if A x ∧ (! A y) = true then C else 0) =
+          ∑ y : Λ, if (! A y) = true then C else 0 from by
+            refine Finset.sum_congr rfl fun y _ => ?_
+            by_cases hAy : (! A y) = true
+            · rw [if_pos ⟨hAx, hAy⟩, if_pos hAy]
+            · rw [if_neg, if_neg hAy]
+              rintro ⟨_, h⟩; exact hAy h]
+      rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
+    · rw [if_neg hAx]
+      apply Finset.sum_eq_zero
+      intro y _
+      rw [if_neg]
+      rintro ⟨h, _⟩; exact hAx h
+  simp_rw [hindicator_outer]
+  classical
+  rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
+  ring
+
+/-- The Néel-state expectation value of the spin-`S` toy Hamiltonian:
+
+  `⟨Φ_Néel | Ĥ_toy_S | Φ_Néel⟩ = -|A|·|¬A|·N²/2`,
+
+i.e., the diagonal matrix element at the Néel configuration is
+`-|A|·|¬A|·N²/2`. This is the **negative** of the all-up state
+eigenvalue (PR #1061), `+|A|·|¬A|·N²/2`.
+
+The negative sign is the variational signature: the Néel state has
+strictly lower toy-Hamiltonian expectation value than the all-up
+state, demonstrating that the ground state has `S_tot < |Λ|·S` —
+consistent with the Tasaki §2.5 Theorem 2.3 prediction
+`S_tot = ||A|−|B||·S`. -/
+theorem heisenbergToyHamiltonianS_apply_diag_neel (A : Λ → Bool) (N : ℕ) :
+    (heisenbergToyHamiltonianS (Λ := Λ) A N) (neelConfigOfS A N)
+        (neelConfigOfS A N) =
+      - (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) * (N : ℂ)) / 2) := by
+  rw [heisenbergToyHamiltonianS_eq_two_sublatticeSpinSDot]
+  rw [Matrix.smul_apply, sublatticeSpinSDot_apply_diag_neel]
+  rw [smul_eq_mul]
   ring
 
 end LatticeSystem.Quantum
