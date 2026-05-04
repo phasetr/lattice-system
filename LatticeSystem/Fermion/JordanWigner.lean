@@ -26,6 +26,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyProjection
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyCommute
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinfulNumberHermitian
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SitePartitionIdentity
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsIdempotent
 
 /-!
 # Multi-mode fermion via Jordan–Wigner mapping
@@ -65,6 +66,7 @@ is now a thin re-import of five sub-files under
 | `Hubbard/DoubleOccupancyCommute.lean` | cross-site `Commute (n_↑(i)·n_↓(i)) (n_↑(j)·n_↓(j))` |
 | `Hubbard/SpinfulNumberHermitian.lean` | `n_↑(i)`, `n_↓(i)`, `n_↑(i)·n_↓(i)` Hermitian |
 | `Hubbard/SitePartitionIdentity.lean` | per-site `p_∅+p_↑+p_↓+p_⇈ = 1` (4-state partition) |
+| `Hubbard/SiteProjectionsIdempotent.lean` | `(p_∅)² = p_∅`, `(p_↑)² = p_↑`, `(p_↓)² = p_↓` |
 
 Old `import LatticeSystem.Fermion.JordanWigner` continues to
 work unchanged via this façade. Following the convention from
