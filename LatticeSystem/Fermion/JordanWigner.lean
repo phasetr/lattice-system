@@ -40,6 +40,7 @@ import LatticeSystem.Fermion.JordanWigner.CPlusCDaggerSq
 import LatticeSystem.Fermion.JordanWigner.CMinusCDaggerSq
 import LatticeSystem.Fermion.JordanWigner.CPlusMinusCDaggerPauli
 import LatticeSystem.Fermion.JordanWigner.OneSubTwoNumberSq
+import LatticeSystem.Fermion.JordanWigner.CPlusCDaggerAnticomm
 
 /-!
 # Multi-mode fermion via Jordan–Wigner mapping
@@ -96,6 +97,7 @@ expansion):
 | `CMinusCDaggerSq.lean` | `(c_i − c_i†)² = −1` (multi-mode `iσ_y`-analog) |
 | `CPlusMinusCDaggerPauli.lean` | `(c_i ± c_i†)` Pauli-X/iY-analog full structure |
 | `OneSubTwoNumberSq.lean` | `(1 − 2·n_i)² = 1` (`σ_z` analog involution) |
+| `CPlusCDaggerAnticomm.lean` | cross-site `{c_i+c_i†, c_j+c_j†} = 0` |
 
 Old `import LatticeSystem.Fermion.JordanWigner` continues to
 work unchanged via this façade. Following the convention from
