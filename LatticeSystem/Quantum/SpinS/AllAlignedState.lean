@@ -1040,4 +1040,51 @@ theorem totalSpinSOp3_mulVec_totalSpinSOpPlus_pow_allAlignedStateS_last
     congr 1
     ring
 
+/-! ## Ladder operators shift the magnetization subspace -/
+
+/-- `Ŝ^-_tot` shifts magnetisation by `-1`: if `v ∈ magSubspaceS Λ N M`
+then `Ŝ^-_tot · v ∈ magSubspaceS Λ N (M − 1)`.
+
+Spin-`S` mirror of `totalSpinHalfOpMinus_mulVec_mem_magnetizationSubspace_of_mem`.
+Uses the Cartan relation `[Ŝ_tot^(3), Ŝ^-_tot] = -Ŝ^-_tot`
+(`totalSpinSOp3_commutator_totalSpinSOpMinus`). -/
+theorem totalSpinSOpMinus_mulVec_mem_magSubspaceS_of_mem
+    {M : ℂ} {v : (V → Fin (N + 1)) → ℂ}
+    (hv : v ∈ magSubspaceS V N M) :
+    (totalSpinSOpMinus V N).mulVec v ∈ magSubspaceS V N (M - 1) := by
+  rw [mem_magSubspaceS_iff] at hv ⊢
+  -- [Ŝtot^(3), Ŝtot^-] = -Ŝtot^- ⟹ Ŝtot^(3) · Ŝtot^- = Ŝtot^- · Ŝtot^(3) - Ŝtot^-
+  have h := totalSpinSOp3_commutator_totalSpinSOpMinus (V := V) (N := N)
+  have hcomm : totalSpinSOp3 V N * totalSpinSOpMinus V N =
+      totalSpinSOpMinus V N * totalSpinSOp3 V N - totalSpinSOpMinus V N := by
+    have hadd : totalSpinSOp3 V N * totalSpinSOpMinus V N =
+        (totalSpinSOp3 V N * totalSpinSOpMinus V N -
+          totalSpinSOpMinus V N * totalSpinSOp3 V N) +
+        totalSpinSOpMinus V N * totalSpinSOp3 V N := by abel
+    rw [hadd, h]; abel
+  rw [Matrix.mulVec_mulVec, hcomm, Matrix.sub_mulVec, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul, sub_smul, one_smul]
+
+/-- `Ŝ^+_tot` shifts magnetisation by `+1`: if `v ∈ magSubspaceS Λ N M`
+then `Ŝ^+_tot · v ∈ magSubspaceS Λ N (M + 1)`.
+
+Spin-`S` mirror of `totalSpinHalfOpPlus_mulVec_mem_magnetizationSubspace_of_mem`.
+Uses `[Ŝ_tot^(3), Ŝ^+_tot] = +Ŝ^+_tot`
+(`totalSpinSOp3_commutator_totalSpinSOpPlus`). -/
+theorem totalSpinSOpPlus_mulVec_mem_magSubspaceS_of_mem
+    {M : ℂ} {v : (V → Fin (N + 1)) → ℂ}
+    (hv : v ∈ magSubspaceS V N M) :
+    (totalSpinSOpPlus V N).mulVec v ∈ magSubspaceS V N (M + 1) := by
+  rw [mem_magSubspaceS_iff] at hv ⊢
+  have h := totalSpinSOp3_commutator_totalSpinSOpPlus (V := V) (N := N)
+  have hcomm : totalSpinSOp3 V N * totalSpinSOpPlus V N =
+      totalSpinSOpPlus V N * totalSpinSOp3 V N + totalSpinSOpPlus V N := by
+    have hadd : totalSpinSOp3 V N * totalSpinSOpPlus V N =
+        (totalSpinSOp3 V N * totalSpinSOpPlus V N -
+          totalSpinSOpPlus V N * totalSpinSOp3 V N) +
+        totalSpinSOpPlus V N * totalSpinSOp3 V N := by abel
+    rw [hadd, h]; abel
+  rw [Matrix.mulVec_mulVec, hcomm, Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul, add_smul, one_smul]
+
 end LatticeSystem.Quantum
