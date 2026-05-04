@@ -96,6 +96,17 @@ theorem heisenbergHamiltonian_commutator_totalSpinHalfOpMinus (J : Λ → Λ →
   rw [Matrix.smul_mul, Matrix.mul_smul, ← smul_sub]
   rw [spinHalfDot_commutator_totalSpinHalfOpMinus, smul_zero]
 
+/-- `Commute (heisenbergHamiltonian J) Ŝ^+_tot`. Reformulation of the
+ladder commutator in `Commute` form. -/
+theorem heisenbergHamiltonian_commute_totalSpinHalfOpPlus (J : Λ → Λ → ℂ) :
+    Commute (heisenbergHamiltonian J) (totalSpinHalfOpPlus Λ) :=
+  sub_eq_zero.mp (heisenbergHamiltonian_commutator_totalSpinHalfOpPlus J)
+
+/-- `Commute (heisenbergHamiltonian J) Ŝ^-_tot`. -/
+theorem heisenbergHamiltonian_commute_totalSpinHalfOpMinus (J : Λ → Λ → ℂ) :
+    Commute (heisenbergHamiltonian J) (totalSpinHalfOpMinus Λ) :=
+  sub_eq_zero.mp (heisenbergHamiltonian_commutator_totalSpinHalfOpMinus J)
+
 /-- A Heisenberg-type Hamiltonian commutes with the Casimir `Ŝtot²`:
 operator-level SU(2)/U(1) invariance at the Casimir level. Follows
 from `[H, Ŝtot^α] = 0` for each axis via `Commute.mul_right` and
