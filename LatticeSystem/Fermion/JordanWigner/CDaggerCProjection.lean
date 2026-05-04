@@ -8,7 +8,7 @@ Multi-mode (Jordan–Wigner) mirror of single-mode PRs #974 and
 `c_i · c_i† = 1 − n_i` is idempotent, and all positive powers
 collapse to it.
 
-  `(c_i · c_i²)² = c_i · c_i†`,
+  `(c_i · c_i†)² = c_i · c_i†`,
   `(c_i · c_i†)^(k+1) = c_i · c_i†`  for every `k : ℕ`.
 
 The squared identity uses
