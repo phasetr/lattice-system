@@ -31,8 +31,8 @@ import LatticeSystem.Fermion.Traces
 
 **Façade module** re-exporting the full single-mode fermion
 algebra developed during the 2026-05-04 autonomous fermion
-expansion (PRs #988–#1021), on top of the original `Mode.lean`
-core.
+expansion (PRs #988–#1026 and continuing), on top of the
+original `Mode.lean` core.
 
 | sub-file | content |
 |---|---|
