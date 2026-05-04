@@ -1238,6 +1238,35 @@ theorem sublatticeSpinSOpPlus_mul_sublatticeSpinSOpMinus_eq (A : Λ → Bool) :
     S1 * S1 + S2 * S2 + (Complex.I • (S2 * S1) - Complex.I • (S1 * S2)) := by abel
   rw [this, hcommS3]
 
+/-- Dual: `Ŝ_A^- · Ŝ_A^+ = (Ŝ_A^(1))² + (Ŝ_A^(2))² - Ŝ_A^(3)`. -/
+theorem sublatticeSpinSOpMinus_mul_sublatticeSpinSOpPlus_eq (A : Λ → Bool) :
+    sublatticeSpinSOpMinus N A * sublatticeSpinSOpPlus N A =
+      sublatticeSpinSOp1 N A * sublatticeSpinSOp1 N A +
+        sublatticeSpinSOp2 N A * sublatticeSpinSOp2 N A -
+        sublatticeSpinSOp3 N A := by
+  rw [sublatticeSpinSOpPlus_eq_add, sublatticeSpinSOpMinus_eq_sub]
+  have hcomm := sublatticeSpinSOp1_commutator_sublatticeSpinSOp2 N A
+  set S1 := sublatticeSpinSOp1 N A
+  set S2 := sublatticeSpinSOp2 N A
+  set S3 := sublatticeSpinSOp3 N A
+  have hexp : (S1 - Complex.I • S2) * (S1 + Complex.I • S2) =
+      S1 * S1 + Complex.I • (S1 * S2) - Complex.I • (S2 * S1) -
+        Complex.I • Complex.I • (S2 * S2) := by
+    rw [Matrix.sub_mul, Matrix.mul_add, Matrix.mul_add, Matrix.smul_mul,
+      Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_smul]
+    abel
+  rw [hexp]
+  rw [show (Complex.I : ℂ) • Complex.I • (S2 * S2) = -(S2 * S2) from by
+    rw [smul_smul, Complex.I_mul_I, neg_one_smul]]
+  -- I • (S1*S2) - I • (S2*S1) = I • [S1, S2] = I • (I • S3) = -S3
+  have hcommS3 : Complex.I • (S1 * S2) - Complex.I • (S2 * S1) = -S3 := by
+    rw [← smul_sub, hcomm, smul_smul, Complex.I_mul_I, neg_one_smul]
+  have : S1 * S1 + Complex.I • (S1 * S2) - Complex.I • (S2 * S1) -
+      -(S2 * S2) =
+    S1 * S1 + S2 * S2 + (Complex.I • (S1 * S2) - Complex.I • (S2 * S1)) := by abel
+  rw [this, hcommS3]
+  abel
+
 /-! ## Cross-sublattice commute for ladder operators -/
 
 /-- `Ŝ_A^+` commutes with `Ŝ_¬A^+`. Direct from
