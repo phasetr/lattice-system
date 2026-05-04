@@ -6192,6 +6192,16 @@ $c = \sigma^+, c^\dagger = \sigma^-$ this is the algebraic
 shadow of $\sigma_x^2 = I$. Useful for quench dynamics and
 Majorana decompositions.
 
+\textbf{Multi-mode (JW) $(c_i + c_i^\dagger)^2 = 1$
+(PR~\#1022)}: multi-mode mirror of PR~\#1021, in the file
+\texttt{Fermion/JordanWigner/CPlusCDaggerSq.lean}. Same
+expansion using \texttt{fermionMultiAnnihilation\_sq},
+\texttt{fermionMultiCreation\_sq}, and
+\texttt{fermionMultiAnticomm\_self}. In the JW representation
+$c_i + c_i^\dagger = \mathrm{jwString}_i \cdot \sigma_x_i$, and
+$(\mathrm{jwString}_i \cdot \sigma_x_i)^2 = 1$ since
+$\mathrm{jwString}_i^2 = 1$ (\texttt{jwString\_sq}).
+
 \textbf{Multi-mode (JW) ladder-on-hole-projection vanishing
 $c_i\,(c_i\,c_i^\dagger) = 0$ and $(c_i\,c_i^\dagger)\,
 c_i^\dagger = 0$ (PR~\#1010)}: multi-mode mirror of PR~\#1009,
