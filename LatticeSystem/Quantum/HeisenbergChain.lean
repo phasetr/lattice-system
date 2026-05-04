@@ -133,6 +133,7 @@ theorem heisenbergHamiltonian_isHermitian_of_real_symm
   rw [Matrix.conjTranspose_smul, (spinHalfDot_isHermitian x y).eq]
   rw [hreal, hsymm, spinHalfDot_comm]
 
+
 /-- Canonical named wrapper for the Heisenberg Hamiltonian with
 hopping pattern derived from a `SimpleGraph G` and uniform complex
 edge weight `J`. Parallel to `isingHamiltonianOnGraph`. -/

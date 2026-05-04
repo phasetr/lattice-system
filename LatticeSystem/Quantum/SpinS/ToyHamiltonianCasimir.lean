@@ -276,6 +276,17 @@ theorem heisenbergToyHamiltonianS_apply_im_zero
     ((heisenbergToyHamiltonianS (Λ := Λ) A N) σ' σ).im = 0 :=
   heisenbergHamiltonianS_apply_im_zero N (bipartiteCoupling_im A) σ' σ
 
+/-- The spin-`S` toy Hamiltonian is matrix-symmetric. Direct corollary
+of Hermiticity (PR #1053) plus realness of entries. -/
+theorem heisenbergToyHamiltonianS_isSymm (A : Λ → Bool) :
+    (heisenbergToyHamiltonianS (Λ := Λ) A N).IsSymm := by
+  unfold heisenbergToyHamiltonianS
+  refine heisenbergHamiltonianS_isSymm_of_real ?_ N
+  intro x y
+  apply Complex.ext
+  · rw [Complex.star_def, Complex.conj_re]
+  · rw [Complex.star_def, Complex.conj_im, bipartiteCoupling_im, neg_zero]
+
 /-! ## Commutativity with the total Casimir -/
 
 /-- The spin-`S` toy Hamiltonian commutes with the total spin Casimir:
