@@ -824,6 +824,24 @@ theorem neelStateOfS_totalSpinSOp3_expectation (A : Λ → Bool) (N : ℕ) :
   rw [dotProduct_smul]
   rw [neelStateOfS_inner_self, smul_eq_mul, mul_one]
 
+/-- `(Ŝ_tot^(3))² · |Φ_Néel⟩ = ((|A|-|¬A|)·N/2)² · |Φ_Néel⟩`. Square of γ-4
+step 68 (`totalSpinSOp3_mulVec_neelStateOfS`); the Néel state is an exact
+eigenvector of `(Ŝ_tot^(3))²` at eigenvalue `M²` where
+`M = (|A|-|¬A|)·N/2`. -/
+theorem totalSpinSOp3_sq_mulVec_neelStateOfS (A : Λ → Bool) (N : ℕ) :
+    (totalSpinSOp3 Λ N * totalSpinSOp3 Λ N).mulVec (neelStateOfS A N) =
+      ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) *
+          ((N : ℂ) / 2)) ^ 2 •
+        neelStateOfS A N := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [totalSpinSOp3_mulVec_neelStateOfS]
+  rw [Matrix.mulVec_smul]
+  rw [totalSpinSOp3_mulVec_neelStateOfS]
+  rw [smul_smul]
+  congr 1
+  ring
+
 /-- `<Φ_Néel | (Ŝ_tot)² | Φ_Néel> = ((|A|-|¬A|)·N/2)² + (|A|+|¬A|)·N/2`.
 
 The full total-spin Casimir expectation on the Néel state. By the Casimir
