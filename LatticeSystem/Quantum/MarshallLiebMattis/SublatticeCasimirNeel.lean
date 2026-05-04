@@ -633,6 +633,23 @@ theorem neelStateOf_inner_self (A : Λ → Bool) :
   · intro h
     exact (h (Finset.mem_univ _)).elim
 
+/-- `<Φ_Néel | Ŝ_A^- · Ŝ_¬A^+ | Φ_Néel> = 0`. Spin-`1/2` mirror of γ-4 step 114:
+cross-flip expectation vanishes via Hermitian conjugate. -/
+theorem neelStateOf_sublattice_minus_plus_cross_expectation (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        ((sublatticeSpinHalfOpMinus A *
+            sublatticeSpinHalfOpPlus (fun x => ! A x)).mulVec
+          (neelStateOf A)) = 0 := by
+  rw [← Matrix.mulVec_mulVec]
+  rw [Matrix.dotProduct_mulVec]
+  rw [show sublatticeSpinHalfOpMinus A =
+      (sublatticeSpinHalfOpPlus A).conjTranspose from
+    (sublatticeSpinHalfOpPlus_conjTranspose A).symm]
+  rw [← Matrix.star_mulVec]
+  rw [sublatticeSpinHalfOpPlus_mulVec_neelStateOf]
+  rw [star_zero]
+  exact zero_dotProduct _
+
 /-- `<Φ_Néel | Ŝ_tot^(3) | Φ_Néel> = (|A| - |¬A|)/2`. Spin-`1/2` mirror of
 γ-4 step 112: Néel state magnetization expectation. -/
 theorem neelStateOf_totalSpinHalfOp3_expectation (A : Λ → Bool) :
