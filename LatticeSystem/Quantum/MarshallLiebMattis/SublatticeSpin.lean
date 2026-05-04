@@ -1279,6 +1279,31 @@ theorem sublatticeSpinHalfOpMinus_mul_sublatticeSpinHalfOpPlus_eq (A : Λ → Bo
   rw [this, hcommS3]
   abel
 
+/-- Cross-axis identity (spin-`1/2` mirror of γ-4 step 122):
+`Ŝ_A^(1)·Ŝ_B^(1) + Ŝ_A^(2)·Ŝ_B^(2) = (1/2)(Ŝ_A^+·Ŝ_B^- + Ŝ_A^-·Ŝ_B^+)`. -/
+theorem sublatticeSpinHalfOp1_mul_op1_add_op2_mul_op2_eq_ladder
+    (A B : Λ → Bool) :
+    sublatticeSpinHalfOp1 A * sublatticeSpinHalfOp1 B +
+        sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp2 B =
+      (1 / 2 : ℂ) • (sublatticeSpinHalfOpPlus A * sublatticeSpinHalfOpMinus B +
+          sublatticeSpinHalfOpMinus A * sublatticeSpinHalfOpPlus B) := by
+  rw [sublatticeSpinHalfOpPlus_eq_add, sublatticeSpinHalfOpMinus_eq_sub,
+    sublatticeSpinHalfOpPlus_eq_add, sublatticeSpinHalfOpMinus_eq_sub]
+  set S1A := sublatticeSpinHalfOp1 A
+  set S2A := sublatticeSpinHalfOp2 A
+  set S1B := sublatticeSpinHalfOp1 B
+  set S2B := sublatticeSpinHalfOp2 B
+  have hexp : (S1A + Complex.I • S2A) * (S1B - Complex.I • S2B) +
+      (S1A - Complex.I • S2A) * (S1B + Complex.I • S2B) =
+      (2 : ℂ) • (S1A * S1B + S2A * S2B) := by
+    rw [Matrix.add_mul, Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_sub,
+      Matrix.mul_add, Matrix.mul_add]
+    simp only [Matrix.smul_mul, Matrix.mul_smul, smul_smul, Complex.I_mul_I,
+      neg_one_smul, smul_add, two_smul]
+    abel
+  rw [hexp, smul_smul]
+  norm_num
+
 /-- Sublattice Cartan commutator: `[Ŝ_A^+, Ŝ_A^-] = 2 · Ŝ_A^(3)`. Spin-`1/2`
 mirror of γ-4 step 106. -/
 theorem sublatticeSpinHalfOpPlus_commutator_sublatticeSpinHalfOpMinus
