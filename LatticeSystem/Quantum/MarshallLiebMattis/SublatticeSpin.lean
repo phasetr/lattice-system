@@ -716,4 +716,100 @@ theorem totalSpinHalfOpMinus_eq_sublattice_sum (A : Λ → Bool) :
     · simp [h]
     · exact absurd h hA
 
+/-! ## Sublattice Cartan relations -/
+
+/-- Sublattice Cartan relation: `[Ŝ_A^(3), Ŝ_A^+] = Ŝ_A^+`. Mirror of
+spin-`S` PR #1088. -/
+theorem sublatticeSpinHalfOp3_commutator_sublatticeSpinHalfOpPlus (A : Λ → Bool) :
+    sublatticeSpinHalfOp3 A * sublatticeSpinHalfOpPlus A
+        - sublatticeSpinHalfOpPlus A * sublatticeSpinHalfOp3 A =
+      sublatticeSpinHalfOpPlus A := by
+  rw [sublatticeSpinHalfOpPlus_eq_add]
+  have h31 := sublatticeSpinHalfOp3_commutator_sublatticeSpinHalfOp1 A
+  have h23 := sublatticeSpinHalfOp2_commutator_sublatticeSpinHalfOp3 A
+  rw [mul_add, add_mul, mul_smul_comm, smul_mul_assoc]
+  have hI2 : (Complex.I * Complex.I : ℂ) = -1 := Complex.I_mul_I
+  have hkey : sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp1 A +
+        Complex.I • (sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp2 A) -
+      (sublatticeSpinHalfOp1 A * sublatticeSpinHalfOp3 A +
+        Complex.I • (sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp3 A)) =
+      (sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp1 A -
+        sublatticeSpinHalfOp1 A * sublatticeSpinHalfOp3 A) -
+      Complex.I • (sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp3 A -
+        sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp2 A) := by
+    rw [smul_sub]; abel
+  rw [hkey, h31, h23, smul_smul, hI2, neg_smul, one_smul, sub_neg_eq_add]
+  abel
+
+/-- Sublattice Cartan relation: `[Ŝ_A^(3), Ŝ_A^-] = -Ŝ_A^-`. -/
+theorem sublatticeSpinHalfOp3_commutator_sublatticeSpinHalfOpMinus (A : Λ → Bool) :
+    sublatticeSpinHalfOp3 A * sublatticeSpinHalfOpMinus A
+        - sublatticeSpinHalfOpMinus A * sublatticeSpinHalfOp3 A =
+      -sublatticeSpinHalfOpMinus A := by
+  rw [sublatticeSpinHalfOpMinus_eq_sub]
+  have h31 := sublatticeSpinHalfOp3_commutator_sublatticeSpinHalfOp1 A
+  have h23 := sublatticeSpinHalfOp2_commutator_sublatticeSpinHalfOp3 A
+  rw [mul_sub, sub_mul, mul_smul_comm, smul_mul_assoc]
+  have hI2 : (Complex.I * Complex.I : ℂ) = -1 := Complex.I_mul_I
+  have hkey : sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp1 A -
+        Complex.I • (sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp2 A) -
+      (sublatticeSpinHalfOp1 A * sublatticeSpinHalfOp3 A -
+        Complex.I • (sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp3 A)) =
+      (sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp1 A -
+        sublatticeSpinHalfOp1 A * sublatticeSpinHalfOp3 A) +
+      Complex.I • (sublatticeSpinHalfOp2 A * sublatticeSpinHalfOp3 A -
+        sublatticeSpinHalfOp3 A * sublatticeSpinHalfOp2 A) := by
+    rw [smul_sub]; abel
+  rw [hkey, h31, h23, smul_smul, hI2, neg_smul, one_smul]
+  rw [show -sublatticeSpinHalfOp1 A = -(sublatticeSpinHalfOp1 A -
+      Complex.I • sublatticeSpinHalfOp2 A) - Complex.I • sublatticeSpinHalfOp2 A
+      from by abel]
+  abel
+
+/-- Total Cartan relation: `[Ŝ_tot^(3), Ŝ_A^+] = Ŝ_A^+`. -/
+theorem totalSpinHalfOp3_commutator_sublatticeSpinHalfOpPlus (A : Λ → Bool) :
+    totalSpinHalfOp3 Λ * sublatticeSpinHalfOpPlus A
+        - sublatticeSpinHalfOpPlus A * totalSpinHalfOp3 Λ =
+      sublatticeSpinHalfOpPlus A := by
+  rw [totalSpinHalfOp3_eq_sublattice_sum A]
+  rw [add_mul, mul_add]
+  have h_self := sublatticeSpinHalfOp3_commutator_sublatticeSpinHalfOpPlus A
+  have h_cross : sublatticeSpinHalfOp3 (fun x => ! A x) * sublatticeSpinHalfOpPlus A =
+      sublatticeSpinHalfOpPlus A * sublatticeSpinHalfOp3 (fun x => ! A x) := by
+    rw [sublatticeSpinHalfOpPlus_eq_add]
+    rw [mul_add, add_mul, mul_smul_comm, smul_mul_assoc]
+    rw [(sublatticeSpinHalfOp1_cross_commute_op3 A).symm.eq,
+        (sublatticeSpinHalfOp2_cross_commute_op3 A).symm.eq]
+  rw [h_cross]
+  rw [show sublatticeSpinHalfOp3 A * sublatticeSpinHalfOpPlus A +
+        sublatticeSpinHalfOpPlus A * sublatticeSpinHalfOp3 (fun x => ! A x) -
+      (sublatticeSpinHalfOpPlus A * sublatticeSpinHalfOp3 A +
+        sublatticeSpinHalfOpPlus A * sublatticeSpinHalfOp3 (fun x => ! A x)) =
+      sublatticeSpinHalfOp3 A * sublatticeSpinHalfOpPlus A -
+        sublatticeSpinHalfOpPlus A * sublatticeSpinHalfOp3 A from by abel]
+  exact h_self
+
+/-- Total Cartan relation: `[Ŝ_tot^(3), Ŝ_A^-] = -Ŝ_A^-`. -/
+theorem totalSpinHalfOp3_commutator_sublatticeSpinHalfOpMinus (A : Λ → Bool) :
+    totalSpinHalfOp3 Λ * sublatticeSpinHalfOpMinus A
+        - sublatticeSpinHalfOpMinus A * totalSpinHalfOp3 Λ =
+      -sublatticeSpinHalfOpMinus A := by
+  rw [totalSpinHalfOp3_eq_sublattice_sum A]
+  rw [add_mul, mul_add]
+  have h_self := sublatticeSpinHalfOp3_commutator_sublatticeSpinHalfOpMinus A
+  have h_cross : sublatticeSpinHalfOp3 (fun x => ! A x) * sublatticeSpinHalfOpMinus A =
+      sublatticeSpinHalfOpMinus A * sublatticeSpinHalfOp3 (fun x => ! A x) := by
+    rw [sublatticeSpinHalfOpMinus_eq_sub]
+    rw [mul_sub, sub_mul, mul_smul_comm, smul_mul_assoc]
+    rw [(sublatticeSpinHalfOp1_cross_commute_op3 A).symm.eq,
+        (sublatticeSpinHalfOp2_cross_commute_op3 A).symm.eq]
+  rw [h_cross]
+  rw [show sublatticeSpinHalfOp3 A * sublatticeSpinHalfOpMinus A +
+        sublatticeSpinHalfOpMinus A * sublatticeSpinHalfOp3 (fun x => ! A x) -
+      (sublatticeSpinHalfOpMinus A * sublatticeSpinHalfOp3 A +
+        sublatticeSpinHalfOpMinus A * sublatticeSpinHalfOp3 (fun x => ! A x)) =
+      sublatticeSpinHalfOp3 A * sublatticeSpinHalfOpMinus A -
+        sublatticeSpinHalfOpMinus A * sublatticeSpinHalfOp3 A from by abel]
+  exact h_self
+
 end LatticeSystem.Quantum
