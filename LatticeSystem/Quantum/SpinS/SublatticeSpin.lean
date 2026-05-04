@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.TotalSpin
+import LatticeSystem.Quantum.ManyBody
 
 /-!
 # Sublattice spin-`S` operators (Tasaki §2.5 Theorem 2.3 prep)
@@ -144,5 +145,38 @@ theorem sublatticeSpinSOp3_isHermitian (A : Λ → Bool) :
       · simp [Matrix.IsHermitian]
       · simp
     · exact absurd h hA
+
+/-! ## Vector spin squared `(Ŝ_A)²` -/
+
+/-- The sublattice-`A` total spin squared (Casimir) for spin-`S`:
+`(Ŝ_A)² := Σ_{α=1,2,3} (Ŝ_A^(α))²`. -/
+noncomputable def sublatticeSpinSquaredS (A : Λ → Bool) : ManyBodyOpS Λ N :=
+  sublatticeSpinSOp1 N A * sublatticeSpinSOp1 N A +
+    sublatticeSpinSOp2 N A * sublatticeSpinSOp2 N A +
+    sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N A
+
+/-- `(Ŝ_A)² = Σ_α (Ŝ_A^(α))²` is the explicit definition. -/
+@[simp] theorem sublatticeSpinSquaredS_def (A : Λ → Bool) :
+    sublatticeSpinSquaredS N A =
+      sublatticeSpinSOp1 N A * sublatticeSpinSOp1 N A +
+        sublatticeSpinSOp2 N A * sublatticeSpinSOp2 N A +
+        sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N A := rfl
+
+/-- `(Ŝ_A)²` is Hermitian. Each `(Ŝ_A^(α))²` is Hermitian as the
+product of a self-commuting Hermitian operator with itself; the
+sum of Hermitian operators is Hermitian. -/
+theorem sublatticeSpinSquaredS_isHermitian (A : Λ → Bool) :
+    (sublatticeSpinSquaredS N A).IsHermitian := by
+  unfold sublatticeSpinSquaredS
+  refine ((?_ : Matrix.IsHermitian _).add ?_).add ?_
+  · exact Matrix.IsHermitian.mul_of_commute
+      (sublatticeSpinSOp1_isHermitian N A)
+      (sublatticeSpinSOp1_isHermitian N A) rfl
+  · exact Matrix.IsHermitian.mul_of_commute
+      (sublatticeSpinSOp2_isHermitian N A)
+      (sublatticeSpinSOp2_isHermitian N A) rfl
+  · exact Matrix.IsHermitian.mul_of_commute
+      (sublatticeSpinSOp3_isHermitian N A)
+      (sublatticeSpinSOp3_isHermitian N A) rfl
 
 end LatticeSystem.Quantum
