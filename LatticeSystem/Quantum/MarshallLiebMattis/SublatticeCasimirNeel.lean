@@ -282,4 +282,23 @@ theorem sublatticeSpinHalfOpMinus_complement_mulVec_neelStateOf (A : Λ → Bool
   unfold neelConfigOf
   rw [if_neg (by rw [hAxF]; decide : ¬ (A x = true))]
 
+/-- On the spin-`1/2` Néel state: `Ŝ_tot^+ · |Φ_Néel⟩ = Ŝ_¬A^+ · |Φ_Néel⟩`.
+Spin-`1/2` mirror of γ-4 step 67. -/
+theorem totalSpinHalfOpPlus_mulVec_neelStateOf_eq_complement (A : Λ → Bool) :
+    (totalSpinHalfOpPlus Λ).mulVec (neelStateOf A) =
+      (sublatticeSpinHalfOpPlus (fun x => ! A x)).mulVec (neelStateOf A) := by
+  rw [totalSpinHalfOpPlus_eq_sublattice_sum A]
+  rw [Matrix.add_mulVec]
+  rw [sublatticeSpinHalfOpPlus_mulVec_neelStateOf A]
+  rw [zero_add]
+
+/-- On the spin-`1/2` Néel state: `Ŝ_tot^- · |Φ_Néel⟩ = Ŝ_A^- · |Φ_Néel⟩`. -/
+theorem totalSpinHalfOpMinus_mulVec_neelStateOf_eq_A (A : Λ → Bool) :
+    (totalSpinHalfOpMinus Λ).mulVec (neelStateOf A) =
+      (sublatticeSpinHalfOpMinus A).mulVec (neelStateOf A) := by
+  rw [totalSpinHalfOpMinus_eq_sublattice_sum A]
+  rw [Matrix.add_mulVec]
+  rw [sublatticeSpinHalfOpMinus_complement_mulVec_neelStateOf A]
+  rw [add_zero]
+
 end LatticeSystem.Quantum
