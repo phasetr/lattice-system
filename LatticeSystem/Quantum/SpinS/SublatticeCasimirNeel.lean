@@ -621,6 +621,24 @@ theorem sublatticeSpinSOp12sq_mulVec_neelStateOfS (A : Λ → Bool) (N : ℕ) :
   congr 1
   ring
 
+/-- `Ŝ_A^+ · Ŝ_A^- · |Φ_Néel⟩ = |A|·N · |Φ_Néel⟩`. Via the Cartan identity
+`Ŝ_A^+·Ŝ_A^- = (Ŝ_A^(1))² + (Ŝ_A^(2))² + Ŝ_A^(3)` (PR #1146):
+`Ŝ_A^+·Ŝ_A^- · Néel = (|A|·N/2) · Néel + (|A|·N/2) · Néel = |A|·N · Néel`. -/
+theorem sublatticeSpinSOpPlus_minus_mulVec_neelStateOfS
+    (A : Λ → Bool) (N : ℕ) :
+    (sublatticeSpinSOpPlus N A * sublatticeSpinSOpMinus N A).mulVec
+        (neelStateOfS A N) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          (N : ℂ)) •
+        neelStateOfS A N := by
+  rw [sublatticeSpinSOpPlus_mul_sublatticeSpinSOpMinus_eq]
+  rw [Matrix.add_mulVec]
+  rw [sublatticeSpinSOp12sq_mulVec_neelStateOfS]
+  rw [sublatticeSpinSOp3_mulVec_neelStateOfS]
+  rw [← add_smul]
+  congr 1
+  ring
+
 /-- `((Ŝ_¬A^(1))² + (Ŝ_¬A^(2))²) · |Φ_Néel⟩ = (|¬A|·N/2) · |Φ_Néel⟩`. Complement
 version of `sublatticeSpinSOp12sq_mulVec_neelStateOfS`. -/
 theorem sublatticeSpinSOp12sq_complement_mulVec_neelStateOfS
