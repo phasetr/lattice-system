@@ -9,6 +9,7 @@ import LatticeSystem.Fermion.CCDaggerIdempotent
 import LatticeSystem.Fermion.CCDaggerLadderZero
 import LatticeSystem.Fermion.CCDaggerSpinSBridge
 import LatticeSystem.Fermion.CMinusCDaggerSq
+import LatticeSystem.Fermion.CPlusCDaggerMulCMinusCDagger
 import LatticeSystem.Fermion.CPlusCDaggerSq
 import LatticeSystem.Fermion.CreationNumberIdentities
 import LatticeSystem.Fermion.NumberExpectations
@@ -45,6 +46,7 @@ core.
 | `CCDaggerLadderZero.lean` | `c · (c · c†) = 0`, `(c · c†) · c† = 0` |
 | `CCDaggerSpinSBridge.lean` | `c · c† = (1/2) · I + spinSOp3 1` |
 | `CMinusCDaggerSq.lean` | `(c − c†)² = −1` (iY-Pauli analog) |
+| `CPlusCDaggerMulCMinusCDagger.lean` | `(c+c†)(c−c†) = 2n−1`, `(c−c†)(c+c†) = 1−2n` |
 | `CPlusCDaggerSq.lean` | `(c + c†)² = 1` (X-Pauli analog) |
 | `CreationNumberIdentities.lean` | `c† · n = 0`, `n · c† = c†` |
 | `NumberExpectations.lean` | `⟨n⟩` on basis states |
