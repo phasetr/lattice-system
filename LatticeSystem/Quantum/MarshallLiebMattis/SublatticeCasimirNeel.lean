@@ -78,7 +78,7 @@ Spin-`1/2` analog of `spinSDot_apply_diag_of_ne` (spin-`S` version
 `m_x · m_y = (1/2)(-1/2) = -1/4`). Extracted from
 `spinHalfDot_mulVec_basisVec_antiparallel` by evaluating both sides
 at `σ`. -/
-private theorem spinHalfDot_apply_diag_of_ne_antiparallel
+theorem spinHalfDot_apply_diag_of_ne_antiparallel
     {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin 2) (h : σ x ≠ σ y) :
     (spinHalfDot x y : ManyBodyOp Λ) σ σ = -(1 / 4 : ℂ) := by
   have hmulVec := spinHalfDot_mulVec_basisVec_antiparallel hxy σ h
@@ -300,5 +300,28 @@ theorem totalSpinHalfOpMinus_mulVec_neelStateOf_eq_A (A : Λ → Bool) :
   rw [Matrix.add_mulVec]
   rw [sublatticeSpinHalfOpMinus_complement_mulVec_neelStateOf A]
   rw [add_zero]
+
+/-! ## Per-pair `spinHalfDot` diagonal at the Néel configuration -/
+
+/-- For a cross-sublattice pair `x ∈ A`, `y ∈ ¬A`, the spin-`1/2`
+two-site dot product diagonal at the Néel configuration is `-1/4`:
+
+  `(Ŝ_x · Ŝ_y) (neel) (neel) = -1/4`.
+
+Spin-`1/2` mirror of γ-4 step 69. -/
+theorem spinHalfDot_apply_diag_neelConfigOf_of_cross
+    (A : Λ → Bool)
+    {x y : Λ} (hAx : A x = true) (hAy : A y = false) :
+    (spinHalfDot x y : ManyBodyOp Λ) (neelConfigOf A) (neelConfigOf A) =
+      -(1 / 4 : ℂ) := by
+  have hxy : x ≠ y := by
+    intro heq
+    rw [heq, hAy] at hAx
+    exact Bool.noConfusion hAx
+  have hne : neelConfigOf A x ≠ neelConfigOf A y := by
+    unfold neelConfigOf
+    rw [if_pos hAx, if_neg (by rw [hAy]; decide : ¬ A y = true)]
+    decide
+  exact spinHalfDot_apply_diag_of_ne_antiparallel hxy _ hne
 
 end LatticeSystem.Quantum
