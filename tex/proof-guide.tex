@@ -6043,6 +6043,13 @@ the definitional $n_i = c_i^\dagger c_i$:
 $n_i(c_i\,c_i^\dagger) = c_i^\dagger\,c_i^2\,c_i^\dagger = 0$,
 $(c_i\,c_i^\dagger)n_i = c_i\,(c_i^\dagger)^2\,c_i = 0$.
 
+\textbf{Multi-mode (JW) projections commute
+$\texttt{Commute}\,n_i\,(c_i\,c_i^\dagger)$ (PR~\#1000)}:
+multi-mode mirror of PR~\#978, in the file
+\texttt{Fermion/JordanWigner/ProjectionsCommute.lean}. Trivially
+from PR~\#999: both products $n_i\cdot(c_i\,c_i^\dagger)$ and
+$(c_i\,c_i^\dagger)\cdot n_i$ are zero, hence equal.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
