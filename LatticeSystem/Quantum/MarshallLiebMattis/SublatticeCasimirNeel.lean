@@ -484,4 +484,16 @@ theorem sublatticeSpinHalfOpComplementPlus_plus_mulVec_neelStateOf
   rw [sublatticeSpinHalfOpPlus_mulVec_neelStateOf]
   rw [Matrix.mulVec_zero]
 
+/-- `Ŝ_A^+ · Ŝ_¬A^+ · |Φ_Néel⟩ = 0`. Spin-`1/2` mirror of γ-4 step 89: uses
+cross-commute to swap factors, then `Ŝ_A^+ · Néel = 0`. -/
+theorem sublatticeSpinHalfOpPlus_complement_plus_mulVec_neelStateOf
+    (A : Λ → Bool) :
+    (sublatticeSpinHalfOpPlus A *
+        sublatticeSpinHalfOpPlus (fun x => ! A x)).mulVec
+        (neelStateOf A) = 0 := by
+  rw [(sublatticeSpinHalfOpPlus_cross_commute A).eq]
+  rw [← Matrix.mulVec_mulVec]
+  rw [sublatticeSpinHalfOpPlus_mulVec_neelStateOf]
+  rw [Matrix.mulVec_zero]
+
 end LatticeSystem.Quantum
