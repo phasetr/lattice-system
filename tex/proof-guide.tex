@@ -6021,6 +6021,17 @@ and $n_i^2 = n_i$ (\texttt{fermionMultiNumber\_sq}) to give
 $(1 - n_i)^2 = 1 - 2n_i + n_i^2 = 1 - n_i$. The power identity
 is then a direct induction in $k$ from the squared case.
 
+\textbf{Multi-mode (JW) hole projection Hermitian
+$(c_i\,c_i^\dagger)^H = c_i\,c_i^\dagger$ (PR~\#998)}:
+multi-mode mirror of PR~\#980, in the file
+\texttt{Fermion/JordanWigner/CDaggerCHermitian.lean}. From
+$(c_i)^H = c_i^\dagger$
+(\texttt{fermionMultiAnnihilation\_conjTranspose}) and
+$(c_i^\dagger)^H = c_i$
+(\texttt{fermionMultiCreation\_conjTranspose}), one has
+$(c_i\,c_i^\dagger)^H = (c_i^\dagger)^H \cdot (c_i)^H =
+c_i\,c_i^\dagger$ via \texttt{Matrix.conjTranspose\_mul}.
+
 \textbf{Linear independence of the first ladder pair (PR~\#891)}:
 combines PRs~\#875, \#886, \#889, \#890 into the smallest
 non-trivial linear-independence statement on the saturated-
