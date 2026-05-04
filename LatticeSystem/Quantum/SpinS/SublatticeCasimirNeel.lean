@@ -1048,4 +1048,20 @@ theorem neelConfigOfS_ne_allAlignedConfigS
   simp [Fin.last] at h
   omega
 
+/-- Configuration-level distinctness: the Néel config differs from the
+all-down config when `|A| > 0` and `N > 0`. -/
+theorem neelConfigOfS_ne_allAlignedConfigS_last
+    (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = true) :
+    neelConfigOfS A N ≠ allAlignedConfigS Λ N (Fin.last N) := by
+  obtain ⟨x, hx⟩ := hA
+  intro heq
+  have h := congrFun heq x
+  unfold neelConfigOfS allAlignedConfigS at h
+  rw [if_pos hx] at h
+  -- h : 0 = Fin.last N (in Fin (N+1))
+  have : (0 : Fin (N + 1)).val = (Fin.last N).val := by rw [h]
+  simp [Fin.last] at this
+  omega
+
 end LatticeSystem.Quantum
