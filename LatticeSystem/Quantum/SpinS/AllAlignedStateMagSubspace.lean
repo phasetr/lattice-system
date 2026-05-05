@@ -33,4 +33,14 @@ theorem allAlignedStateS_mem_magSubspaceS (c : Fin (N + 1)) :
   rw [totalSpinSOp3_mulVec_allAlignedStateS,
     magEigenvalueS_allAlignedConfigS]
 
+/-- The line spanned by `allAlignedStateS V N c` is contained in the
+corresponding magnetization subspace (γ-4 step 195). -/
+theorem allAlignedStateS_span_le_magSubspaceS (c : Fin (N + 1)) :
+    Submodule.span ℂ {(allAlignedStateS V N c : (V → Fin (N + 1)) → ℂ)} ≤
+      magSubspaceS V N
+        ((Fintype.card V : ℂ) * (N : ℂ) / 2 -
+          (Fintype.card V : ℂ) * (c.val : ℂ)) := by
+  rw [Submodule.span_le, Set.singleton_subset_iff]
+  exact allAlignedStateS_mem_magSubspaceS c
+
 end LatticeSystem.Quantum
