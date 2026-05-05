@@ -1187,6 +1187,31 @@ theorem neelStateOfS_allAlignedStateS_last_orthogonal
     omega
   exact basisVecS_inner_of_ne hne
 
+/-- **State-level distinctness** `Φ_Néel(A) ≠ Φ_⊤` (spin-S): when `0 < N`
+and `|¬A| > 0`, the Néel state is distinct from the all-up state.
+Equality would force `<Φ_⊤ | Φ_⊤> = 0`, contradicting norm-squared = 1
+(γ-4 step 184). -/
+theorem neelStateOfS_ne_allAlignedStateS_zero
+    (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hAc : ∃ x : Λ, A x = false) :
+    neelStateOfS A N ≠ allAlignedStateS Λ N (0 : Fin (N + 1)) := by
+  intro h
+  have horth := neelStateOfS_allAlignedStateS_orthogonal A N hN hAc
+  rw [h, allAlignedStateS_inner_self] at horth
+  exact one_ne_zero horth
+
+/-- **State-level distinctness** `Φ_Néel(A) ≠ Φ_⊥` (spin-S): when `0 < N`
+and `|A| > 0`, the Néel state is distinct from the all-down state
+(γ-4 step 184). -/
+theorem neelStateOfS_ne_allAlignedStateS_last
+    (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = true) :
+    neelStateOfS A N ≠ allAlignedStateS Λ N (Fin.last N) := by
+  intro h
+  have horth := neelStateOfS_allAlignedStateS_last_orthogonal A N hN hA
+  rw [h, allAlignedStateS_inner_self] at horth
+  exact one_ne_zero horth
+
 /-- `<Φ_⊤ | Φ_Néel(¬A)> = 0` when `|A| > 0` and `0 < N`. The complement
 Néel state has `Fin.last N` on `A` (the original sublattice with `A x =
 true`), so it differs from `Φ_⊤` (all `0`) at any vertex of `A`. Direct
