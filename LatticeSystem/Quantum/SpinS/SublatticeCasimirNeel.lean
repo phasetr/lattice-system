@@ -1370,8 +1370,9 @@ theorem neelStateOfS_complement_finrank_span
   rfl
 
 /-- **Set form**: `finrank ℂ (span ℂ {Φ_Néel(A), Φ_Néel(¬A)}) = 2`
-(spin-S). Bridge from γ-4 step 186 via `Matrix.range_cons /
-Matrix.range_empty` (γ-4 step 189). -/
+(spin-S). Bridge from γ-4 step 186 via the explicit
+`Set.range ![v0, v1] = {v0, v1}` identity, proved by membership
+(γ-4 step 189). -/
 theorem neelStateOfS_complement_finrank_span_set
     [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N) :
     Module.finrank ℂ
