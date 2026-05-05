@@ -109,4 +109,52 @@ theorem allAlignedStateS_last_expectation_totalSpinSSquared
   rw [h, dotProduct_smul_right, allAlignedStateS_inner_self]
   ring
 
+/-! ## `(Ŝ_{tot}^{(3)})²` expectation values (γ-4 step 202) -/
+
+/-- Helper: `(Ŝ_tot^{(3)})²` acts on the all-aligned state at `c` as
+multiplication by the squared eigenvalue `(magEigenvalueS c)²`. -/
+private theorem totalSpinSOp3_sq_mulVec_allAlignedStateS (c : Fin (N + 1)) :
+    (totalSpinSOp3 V N * totalSpinSOp3 V N).mulVec (allAlignedStateS V N c) =
+      (magEigenvalueS (allAlignedConfigS V N c)) ^ 2 •
+        allAlignedStateS V N c := by
+  rw [← Matrix.mulVec_mulVec, totalSpinSOp3_mulVec_allAlignedStateS,
+    Matrix.mulVec_smul, totalSpinSOp3_mulVec_allAlignedStateS,
+    smul_smul]
+  ring_nf
+
+/-- `(Ŝ_tot^{(3)})²` expectation on the all-aligned state at `c` equals
+`(magEigenvalueS c)² = (|V|·N/2 - |V|·c)²` (γ-4 step 202). -/
+theorem allAlignedStateS_expectation_totalSpinSOp3_sq (c : Fin (N + 1)) :
+    dotProduct (star (allAlignedStateS V N c))
+        ((totalSpinSOp3 V N * totalSpinSOp3 V N).mulVec
+          (allAlignedStateS V N c)) =
+      (magEigenvalueS (allAlignedConfigS V N c)) ^ 2 := by
+  rw [totalSpinSOp3_sq_mulVec_allAlignedStateS,
+    dotProduct_smul_right, allAlignedStateS_inner_self, mul_one]
+
+/-- All-up specialisation of γ-4 step 202: `(Ŝ_tot^{(3)})²` expectation
+equals `(|V|·N/2)²`. -/
+theorem allAlignedStateS_zero_expectation_totalSpinSOp3_sq :
+    dotProduct (star (allAlignedStateS V N (0 : Fin (N + 1))))
+        ((totalSpinSOp3 V N * totalSpinSOp3 V N).mulVec
+          (allAlignedStateS V N (0 : Fin (N + 1)))) =
+      ((Fintype.card V : ℂ) * (N : ℂ) / 2) ^ 2 := by
+  rw [allAlignedStateS_expectation_totalSpinSOp3_sq,
+    magEigenvalueS_allAlignedConfigS]
+  rw [show ((0 : Fin (N + 1)).val : ℂ) = 0 from by simp]
+  ring
+
+/-- All-down specialisation of γ-4 step 202: `(Ŝ_tot^{(3)})²` expectation
+equals `(|V|·N/2)²` (the lowest weight has eigenvalue `-|V|·N/2`, whose
+square coincides with the highest-weight square). -/
+theorem allAlignedStateS_last_expectation_totalSpinSOp3_sq :
+    dotProduct (star (allAlignedStateS V N (Fin.last N)))
+        ((totalSpinSOp3 V N * totalSpinSOp3 V N).mulVec
+          (allAlignedStateS V N (Fin.last N))) =
+      ((Fintype.card V : ℂ) * (N : ℂ) / 2) ^ 2 := by
+  rw [allAlignedStateS_expectation_totalSpinSOp3_sq,
+    magEigenvalueS_allAlignedConfigS]
+  rw [show ((Fin.last N).val : ℂ) = (N : ℂ) from by simp [Fin.last]]
+  ring
+
 end LatticeSystem.Quantum
