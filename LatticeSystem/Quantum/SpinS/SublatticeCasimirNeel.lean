@@ -2689,4 +2689,17 @@ theorem magEigenvalueS_neelConfigOfS_complement_simplified
     simp [Bool.not_not]
   rw [hSet]
 
+omit [DecidableEq Λ] in
+/-- **Negation relation**: `magEigenvalueS (neelConfigOfS (¬A) N) =
+−magEigenvalueS (neelConfigOfS A N)`. Direct from γ-4 step 224 + γ-4 step 230
++ `ring`. The complement Néel sits at the opposite `Ŝ_tot^(3)` eigenvalue
+(γ-4 step 231). -/
+theorem magEigenvalueS_neelConfigOfS_complement_eq_neg
+    (A : Λ → Bool) (N : ℕ) :
+    magEigenvalueS (neelConfigOfS (fun x => ! A x) N) =
+      -magEigenvalueS (neelConfigOfS A N) := by
+  rw [magEigenvalueS_neelConfigOfS_complement_simplified,
+    magEigenvalueS_neelConfigOfS]
+  ring
+
 end LatticeSystem.Quantum
