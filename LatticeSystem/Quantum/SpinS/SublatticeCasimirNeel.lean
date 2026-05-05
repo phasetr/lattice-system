@@ -1398,6 +1398,21 @@ theorem neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite
   rw [basisVecS_expectation_eq_diagonal]
   exact heisenbergHamiltonianOnGraphS_apply_diag_neel_of_bipartite G J A N hG
 
+/-- **Closed-form Heisenberg-on-graph Néel expectation under bipartite
+alignment** (spin-S): `<Φ_Néel | H_G | Φ_Néel> = -J · #G.edgeFinset · N²/2`.
+Combines γ-4 step 166 with `couplingOf_sum = J · 2 · #G.edgeFinset`
+(γ-4 step 167) — the variational upper bound `E_GS ≤ -J·#edges·N²/2`
+on the AFM Heisenberg ground-state energy when J > 0. -/
+theorem neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite_closed
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (A : Λ → Bool) (N : ℕ)
+    (hG : ∀ x y, G.Adj x y → A x ≠ A y) :
+    dotProduct (star (neelStateOfS A N))
+        ((heisenbergHamiltonianOnGraphS G J N).mulVec (neelStateOfS A N)) =
+      -(J * (G.edgeFinset.card : ℂ) * ((N : ℂ) * (N : ℂ)) / 2) := by
+  rw [neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite G J A N hG]
+  rw [LatticeSystem.Lattice.couplingOf_sum]
+  ring
+
 /-- **Real-valued positivity** of the toy Hamiltonian variational gap:
 `0 < Re (<Φ_⊤|Ĥ_toy|Φ_⊤> - <Φ_Néel|Ĥ_toy|Φ_Néel>) = |A|·|¬A|·N²` when
 both sublattices are non-empty and `N ≥ 1`. The all-up state has strictly
