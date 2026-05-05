@@ -2620,4 +2620,43 @@ theorem neelStateOfS_totalSpinSSquared_expectation_via_general
     neelConfigOfS_z_eigenvalue_sq_sum]
   ring
 
+/-- **Spin-`S` allAligned-up Casimir** re-derived via the general
+`basisVecS σ` Casimir formula (γ-4 step 218):
+`<Φ_⊤ | (Ŝ_tot)² | Φ_⊤> = m_max·(m_max + 1)` where `m_max = |V|·N/2`.
+
+Composition of γ-4 step 218 + γ-4 step 222 (at `c = 0`) +
+`magEigenvalueS_allAlignedConfigS` + `ring`. Recovers
+`allAlignedStateS_zero_expectation_totalSpinSSquared` (PR #882) from
+the general framework (γ-4 step 226). -/
+theorem allAlignedStateS_zero_totalSpinSSquared_via_general
+    (N : ℕ) [Nonempty Λ] :
+    dotProduct (star (allAlignedStateS Λ N (0 : Fin (N + 1))))
+        ((totalSpinSSquared Λ N).mulVec
+          (allAlignedStateS Λ N (0 : Fin (N + 1)))) =
+      ((Fintype.card Λ : ℂ) * (N : ℂ) / 2) *
+        ((Fintype.card Λ : ℂ) * (N : ℂ) / 2 + 1) := by
+  unfold allAlignedStateS
+  rw [basisVecS_totalSpinSSquared_expectation_general,
+    magEigenvalueS_allAlignedConfigS,
+    allAlignedConfigS_z_eigenvalue_sq_sum]
+  rw [show ((0 : Fin (N + 1)).val : ℂ) = 0 from by simp]
+  ring
+
+/-- **Spin-`S` allAligned-down Casimir** re-derived via the general
+formula (γ-4 step 226). Same value as allAligned-up since the lowest
+weight has eigenvalue `-|V|·N/2`, whose square equals `(|V|·N/2)²`. -/
+theorem allAlignedStateS_last_totalSpinSSquared_via_general
+    (N : ℕ) [Nonempty Λ] :
+    dotProduct (star (allAlignedStateS Λ N (Fin.last N)))
+        ((totalSpinSSquared Λ N).mulVec
+          (allAlignedStateS Λ N (Fin.last N))) =
+      ((Fintype.card Λ : ℂ) * (N : ℂ) / 2) *
+        ((Fintype.card Λ : ℂ) * (N : ℂ) / 2 + 1) := by
+  unfold allAlignedStateS
+  rw [basisVecS_totalSpinSSquared_expectation_general,
+    magEigenvalueS_allAlignedConfigS,
+    allAlignedConfigS_z_eigenvalue_sq_sum]
+  rw [show ((Fin.last N).val : ℂ) = (N : ℂ) from by simp [Fin.last]]
+  ring
+
 end LatticeSystem.Quantum
