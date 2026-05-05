@@ -2376,6 +2376,24 @@ theorem neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite_re_n
   · exact_mod_cast hE
   · refine mul_pos ?_ ?_ <;> exact_mod_cast hN
 
+/-- **Strict negativity in ℝ** of the Néel expectation on
+`bipartiteCompleteGraphOf A` for real positive coupling, both
+sublattices non-empty, and `0 < N`. Specializes γ-4 step 168 using
+γ-4 step 198's edge count `|A|·|¬A| > 0` (γ-4 step 200). -/
+theorem neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_bipartiteCompleteGraph_re_neg
+    (A : Λ → Bool) (N : ℕ) {J_re : ℝ} (hJ : 0 < J_re)
+    (hA : 0 < (Finset.univ.filter (fun x : Λ => A x = true)).card)
+    (hAc : 0 < (Finset.univ.filter (fun x : Λ => (! A x) = true)).card)
+    (hN : 0 < N) :
+    (dotProduct (star (neelStateOfS A N))
+        ((heisenbergHamiltonianOnGraphS (bipartiteCompleteGraphOf A)
+          (J_re : ℂ) N).mulVec (neelStateOfS A N))).re < 0 := by
+  refine neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite_re_neg
+    (bipartiteCompleteGraphOf A) A N hJ
+    (fun _ _ => bipartiteCompleteGraphOf_adj_sublattice_ne) ?_ hN
+  rw [bipartiteCompleteGraphOf_edgeFinset_card]
+  exact Nat.mul_pos hA hAc
+
 /-- **Real-valued positivity** of the toy Hamiltonian variational gap:
 `0 < Re (<Φ_⊤|Ĥ_toy|Φ_⊤> - <Φ_Néel|Ĥ_toy|Φ_Néel>) = |A|·|¬A|·N²` when
 both sublattices are non-empty and `N ≥ 1`. The all-up state has strictly
