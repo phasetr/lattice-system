@@ -1216,4 +1216,25 @@ theorem neelStateOf_totalSpinHalfOp12_sq_expectation_re_pos
   refine div_pos ?_ two_pos
   exact_mod_cast Fintype.card_pos
 
+/-- **Strict spread** (spin-`1/2` mirror of γ-4 step 162):
+`Re <Φ_Néel | (Ŝ_tot^(3))² | Φ_Néel> < Re <Φ_Néel | (Ŝ_tot)² | Φ_Néel>`
+when `Λ` is non-empty. The Néel state has strictly larger total-spin
+Casimir than the squared magnetization, so it spans multiple
+`S_tot`-sectors. -/
+theorem neelStateOf_totalSpinHalfSquared_expectation_re_gt_OpZ_sq
+    [Nonempty Λ] (A : Λ → Bool) :
+    (dotProduct (star (neelStateOf A))
+        ((totalSpinHalfOp3 Λ * totalSpinHalfOp3 Λ).mulVec
+          (neelStateOf A))).re <
+    (dotProduct (star (neelStateOf A))
+        ((totalSpinHalfSquared Λ).mulVec (neelStateOf A))).re := by
+  have h12pos := neelStateOf_totalSpinHalfOp12_sq_expectation_re_pos A
+  rw [show (totalSpinHalfSquared Λ : ManyBodyOp Λ) =
+        (totalSpinHalfOp1 Λ * totalSpinHalfOp1 Λ +
+          totalSpinHalfOp2 Λ * totalSpinHalfOp2 Λ) +
+          totalSpinHalfOp3 Λ * totalSpinHalfOp3 Λ from by
+      unfold totalSpinHalfSquared; abel]
+  rw [Matrix.add_mulVec, dotProduct_add, Complex.add_re]
+  linarith
+
 end LatticeSystem.Quantum
