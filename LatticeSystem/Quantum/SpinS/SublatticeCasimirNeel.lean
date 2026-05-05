@@ -1603,6 +1603,43 @@ theorem neelStateOfS_allAligned_quad_finrank_span
         (neelStateOfS_allAligned_quad_linearIndependent A N hN hA hAc)]
   rfl
 
+/-- **mathlib `LinearIndependent` form** of the complement-Néel triple LI
+(spin-S): direct conversion of γ-4 step 183 via `Fintype.linearIndependent_iff`
+and `Fin.sum_univ_three` (γ-4 step 192). -/
+theorem neelStateOfS_complement_allAligned_triple_linearIndependent
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false) :
+    LinearIndependent ℂ
+      (![allAlignedStateS Λ N (0 : Fin (N + 1)),
+         allAlignedStateS Λ N (Fin.last N),
+         neelStateOfS (fun x : Λ => ! A x) N] : Fin 3 → _) := by
+  rw [Fintype.linearIndependent_iff]
+  intros g hg
+  rw [Fin.sum_univ_three] at hg
+  simp only [Matrix.cons_val_zero, Matrix.cons_val_one] at hg
+  obtain ⟨h0, h1, h2⟩ :=
+    neelStateOfS_complement_allAligned_triple_independent A N hN hA hAc hg
+  intro i
+  fin_cases i
+  · exact h0
+  · exact h1
+  · exact h2
+
+/-- **`finrank` of the complement-Néel triple span equals 3** (spin-S). -/
+theorem neelStateOfS_complement_allAligned_triple_finrank_span
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false) :
+    Module.finrank ℂ
+      (Submodule.span ℂ
+        (Set.range
+          (![allAlignedStateS Λ N (0 : Fin (N + 1)),
+             allAlignedStateS Λ N (Fin.last N),
+             neelStateOfS (fun x : Λ => ! A x) N] : Fin 3 → _))) = 3 := by
+  rw [finrank_span_eq_card
+        (neelStateOfS_complement_allAligned_triple_linearIndependent
+          A N hN hA hAc)]
+  rfl
+
 /-- **Set form** of the quadruple finrank (spin-S):
 `finrank ℂ (span ℂ {Φ_⊤, Φ_⊥, Φ_Néel(A), Φ_Néel(¬A)}) = 4` (γ-4 step 191). -/
 theorem neelStateOfS_allAligned_quad_finrank_span_set
