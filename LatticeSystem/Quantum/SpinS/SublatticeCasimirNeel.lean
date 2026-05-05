@@ -1344,6 +1344,39 @@ theorem neelStateOfS_allAligned_triple_finrank_span
         (neelStateOfS_allAligned_triple_linearIndependent A N hN hA hAc)]
   rfl
 
+/-- **Set form** of the triple finrank (spin-S):
+`finrank ℂ (span ℂ {Φ_⊤, Φ_⊥, Φ_Néel(A)}) = 3` (γ-4 step 190). -/
+theorem neelStateOfS_allAligned_triple_finrank_span_set
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false) :
+    Module.finrank ℂ
+      (Submodule.span ℂ
+        ({allAlignedStateS Λ N (0 : Fin (N + 1)),
+          allAlignedStateS Λ N (Fin.last N),
+          neelStateOfS A N} : Set _)) = 3 := by
+  have hrange :
+      Set.range
+        (![allAlignedStateS Λ N (0 : Fin (N + 1)),
+           allAlignedStateS Λ N (Fin.last N),
+           neelStateOfS A N] : Fin 3 → _) =
+      ({allAlignedStateS Λ N (0 : Fin (N + 1)),
+        allAlignedStateS Λ N (Fin.last N),
+        neelStateOfS A N} : Set _) := by
+    ext v
+    simp only [Set.mem_range, Set.mem_insert_iff, Set.mem_singleton_iff]
+    constructor
+    · rintro ⟨i, hi⟩
+      fin_cases i
+      · exact Or.inl hi.symm
+      · exact Or.inr (Or.inl hi.symm)
+      · exact Or.inr (Or.inr hi.symm)
+    · rintro (rfl | rfl | rfl)
+      · exact ⟨0, rfl⟩
+      · exact ⟨1, rfl⟩
+      · exact ⟨2, rfl⟩
+  rw [← hrange]
+  exact neelStateOfS_allAligned_triple_finrank_span A N hN hA hAc
+
 /-- **mathlib LinearIndependent** form of the Néel-complement pair LI
 (spin-S): `LinearIndependent ℂ ![Φ_Néel(A), Φ_Néel(¬A)]` when `Λ` is
 non-empty and `0 < N`. Direct conversion of γ-4 step 172 via
