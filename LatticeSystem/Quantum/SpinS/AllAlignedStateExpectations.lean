@@ -227,4 +227,23 @@ theorem basisVecS_off_diagonal_totalSpinSOp3 {σ τ : V → Fin (N + 1)}
     · rw [Pi.star_apply, basisVecS_of_ne hφ, star_zero, zero_mul]
   rw [totalSpinSOp3_mulVec_basisVecS, dotProduct_smul_right, h0, mul_zero]
 
+/-! ## Basis orthogonality (γ-4 step 210) -/
+
+/-- Basis states `basisVecS σ` are pairwise orthogonal under the
+standard inner product `⟨v, w⟩ = star v ⬝ᵥ w`: for `τ ≠ σ`,
+`<basisVecS τ | basisVecS σ> = 0`. Companion to
+`basisVecS_inner_self` (the diagonal `= 1` case) (γ-4 step 210). -/
+theorem basisVecS_dotProduct_basisVecS_of_ne {σ τ : V → Fin (N + 1)}
+    (hστ : τ ≠ σ) :
+    dotProduct (star (basisVecS τ : (V → Fin (N + 1)) → ℂ))
+      (basisVecS σ) = 0 := by
+  unfold dotProduct
+  apply Finset.sum_eq_zero
+  intros φ _
+  by_cases hφ : φ = τ
+  · subst hφ
+    rw [Pi.star_apply, basisVecS_self, star_one,
+      basisVecS_of_ne hστ, mul_zero]
+  · rw [Pi.star_apply, basisVecS_of_ne hφ, star_zero, zero_mul]
+
 end LatticeSystem.Quantum
