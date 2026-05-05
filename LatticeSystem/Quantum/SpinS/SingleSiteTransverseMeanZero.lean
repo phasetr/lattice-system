@@ -114,4 +114,32 @@ theorem allAlignedStateS_expectation_onSiteS_spinSOp2
   unfold allAlignedStateS
   exact basisVecS_expectation_onSiteS_spinSOp2 x _
 
+/-! ## Total `Ŝ_tot^{(1,2)}` zero expectation (γ-4 step 214) -/
+
+/-- The total `Ŝ_tot^{(1)}` operator has zero expectation on every
+basis state `basisVecS σ`. Direct from per-site γ-4 step 134
+(`basisVecS_expectation_onSiteS_spinSOp1`) summed over `Λ` via
+linearity of `dotProduct` and `mulVec` (γ-4 step 214). -/
+theorem basisVecS_expectation_totalSpinSOp1
+    (σ : V → Fin (N + 1)) :
+    dotProduct (star (basisVecS σ : (V → Fin (N + 1)) → ℂ))
+      ((totalSpinSOp1 V N).mulVec (basisVecS σ)) = 0 := by
+  unfold totalSpinSOp1
+  rw [Matrix.sum_mulVec, dotProduct_sum]
+  apply Finset.sum_eq_zero
+  intros x _
+  exact basisVecS_expectation_onSiteS_spinSOp1 x σ
+
+/-- The total `Ŝ_tot^{(2)}` operator has zero expectation on every
+basis state `basisVecS σ` (γ-4 step 214). -/
+theorem basisVecS_expectation_totalSpinSOp2
+    (σ : V → Fin (N + 1)) :
+    dotProduct (star (basisVecS σ : (V → Fin (N + 1)) → ℂ))
+      ((totalSpinSOp2 V N).mulVec (basisVecS σ)) = 0 := by
+  unfold totalSpinSOp2
+  rw [Matrix.sum_mulVec, dotProduct_sum]
+  apply Finset.sum_eq_zero
+  intros x _
+  exact basisVecS_expectation_onSiteS_spinSOp2 x σ
+
 end LatticeSystem.Quantum
