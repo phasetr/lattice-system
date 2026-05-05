@@ -1369,6 +1369,32 @@ theorem neelStateOfS_complement_finrank_span
         (neelStateOfS_complement_linearIndependent A N hN)]
   rfl
 
+/-- **Set form**: `finrank ℂ (span ℂ {Φ_Néel(A), Φ_Néel(¬A)}) = 2`
+(spin-S). Bridge from γ-4 step 186 via the explicit
+`Set.range ![v0, v1] = {v0, v1}` identity, proved by membership
+(γ-4 step 189). -/
+theorem neelStateOfS_complement_finrank_span_set
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N) :
+    Module.finrank ℂ
+      (Submodule.span ℂ
+        ({neelStateOfS A N, neelStateOfS (fun x : Λ => ! A x) N} : Set _)) = 2 := by
+  have hrange :
+      Set.range
+        ![neelStateOfS A N, neelStateOfS (fun x : Λ => ! A x) N] =
+      ({neelStateOfS A N, neelStateOfS (fun x : Λ => ! A x) N} : Set _) := by
+    ext v
+    simp only [Set.mem_range, Set.mem_insert_iff, Set.mem_singleton_iff]
+    constructor
+    · rintro ⟨i, hi⟩
+      fin_cases i
+      · exact Or.inl hi.symm
+      · exact Or.inr hi.symm
+    · rintro (rfl | rfl)
+      · exact ⟨0, rfl⟩
+      · exact ⟨1, rfl⟩
+  rw [← hrange]
+  exact neelStateOfS_complement_finrank_span A N hN
+
 /-- **Triple linear independence** of {`Φ_⊤`, `Φ_⊥`, `Φ_Néel(¬A)`}
 (spin-S, complement variant): direct application of γ-4 step 174 with
 `A := ¬A`, exchanging the existence hypotheses (γ-4 step 183). -/
