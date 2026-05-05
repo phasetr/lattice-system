@@ -1280,6 +1280,26 @@ theorem neelStateOfS_allAligned_triple_independent
     exact this
   exact ⟨hc1, hc2, hc3⟩
 
+/-- **Triple linear independence** of {`Φ_⊤`, `Φ_⊥`, `Φ_Néel(¬A)`}
+(spin-S, complement variant): direct application of γ-4 step 174 with
+`A := ¬A`, exchanging the existence hypotheses (γ-4 step 183). -/
+theorem neelStateOfS_complement_allAligned_triple_independent
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false)
+    {c1 c2 c3 : ℂ}
+    (h : c1 • allAlignedStateS Λ N (0 : Fin (N + 1)) +
+         c2 • allAlignedStateS Λ N (Fin.last N) +
+         c3 • neelStateOfS (fun x : Λ => ! A x) N = 0) :
+    c1 = 0 ∧ c2 = 0 ∧ c3 = 0 := by
+  have hA' : ∃ x : Λ, (! A x) = true := by
+    obtain ⟨x, hx⟩ := hAc
+    exact ⟨x, by simp [hx]⟩
+  have hAc' : ∃ x : Λ, (! A x) = false := by
+    obtain ⟨x, hx⟩ := hA
+    exact ⟨x, by simp [hx]⟩
+  exact neelStateOfS_allAligned_triple_independent
+    (fun x : Λ => ! A x) N hN hA' hAc' h
+
 /-- **Quadruple linear independence** of {`Φ_⊤`, `Φ_⊥`, `Φ_Néel(A)`,
 `Φ_Néel(¬A)`} (spin-S): when `Λ` non-empty, `0 < N`, and both sublattices
 are non-empty, any zero linear combination has all four coefficients
