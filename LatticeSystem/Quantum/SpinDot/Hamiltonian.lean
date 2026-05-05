@@ -200,6 +200,22 @@ theorem totalSpinHalfSquared_mulVec_basisVec_all_down :
         basisVec (fun _ : Λ => (1 : Fin 2)) :=
   totalSpinHalfSquared_mulVec_basisVec_const 1
 
+/-- **`(Ŝ_tot)²` expectation on a constant-spin basis state** (spin-`1/2`):
+`<basisVec(const s) | (Ŝ_tot)² | basisVec(const s)> = |Λ|·(|Λ|+2)/4`,
+the maximum total-spin Casimir value (γ-4 step 201). -/
+theorem basisVec_const_totalSpinHalfSquared_expectation (s : Fin 2) :
+    dotProduct (star (basisVec (fun _ : Λ => s)))
+        ((totalSpinHalfSquared Λ).mulVec (basisVec (fun _ : Λ => s))) =
+      (Fintype.card Λ : ℂ) * (Fintype.card Λ + 2) / 4 := by
+  rw [totalSpinHalfSquared_mulVec_basisVec_const]
+  unfold dotProduct
+  rw [Finset.sum_eq_single (fun _ : Λ => s)]
+  · simp [Pi.star_apply, basisVec_self]
+  · intros τ _ hτ
+    simp [Pi.smul_apply, basisVec_of_ne hτ]
+  · intro hempty
+    exact (hempty (Finset.mem_univ _)).elim
+
 /-! ## Casimir invariance under Ŝ_tot^± on constant configs (Tasaki §2.4)
 
 `(Ŝ_tot)²` commutes with both `Ŝ_tot^+` and `Ŝ_tot^-`
