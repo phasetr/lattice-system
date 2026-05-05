@@ -1406,6 +1406,46 @@ theorem neelStateOf_basisVec_quad_independent
     exact this
   exact ⟨hc1, hc2, hc3, hc4⟩
 
+/-- **Quadruple `LinearIndependent`** (spin-`1/2`):
+`LinearIndependent ℂ ![basisVec(0), basisVec(1), Φ_Néel(A), Φ_Néel(¬A)]`
+when `Λ` non-empty and both sublattices non-empty. Spin-`1/2` mirror of
+γ-4 step 188. -/
+theorem neelStateOf_basisVec_quad_linearIndependent
+    [Nonempty Λ] (A : Λ → Bool)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false) :
+    LinearIndependent ℂ
+      (![basisVec (fun _ : Λ => (0 : Fin 2)),
+         basisVec (fun _ : Λ => (1 : Fin 2)),
+         neelStateOf A,
+         neelStateOf (fun x : Λ => ! A x)] : Fin 4 → _) := by
+  rw [Fintype.linearIndependent_iff]
+  intros g hg
+  rw [Fin.sum_univ_four] at hg
+  simp only [Matrix.cons_val_zero, Matrix.cons_val_one] at hg
+  obtain ⟨h0, h1, h2, h3⟩ :=
+    neelStateOf_basisVec_quad_independent A hA hAc hg
+  intro i
+  fin_cases i
+  · exact h0
+  · exact h1
+  · exact h2
+  · exact h3
+
+/-- **`finrank` of the spin-`1/2` quadruple span equals 4**. -/
+theorem neelStateOf_basisVec_quad_finrank_span
+    [Nonempty Λ] (A : Λ → Bool)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false) :
+    Module.finrank ℂ
+      (Submodule.span ℂ
+        (Set.range
+          (![basisVec (fun _ : Λ => (0 : Fin 2)),
+             basisVec (fun _ : Λ => (1 : Fin 2)),
+             neelStateOf A,
+             neelStateOf (fun x : Λ => ! A x)] : Fin 4 → _))) = 4 := by
+  rw [finrank_span_eq_card
+        (neelStateOf_basisVec_quad_linearIndependent A hA hAc)]
+  rfl
+
 /-- The spin-`1/2` Néel state lies in the magnetization-`M` subspace
 where `M = (|A|-|¬A|)/2`. Direct from `totalSpinHalfOp3_mulVec_neelStateOf`. -/
 theorem neelStateOf_mem_magnetizationSubspace (A : Λ → Bool) :
