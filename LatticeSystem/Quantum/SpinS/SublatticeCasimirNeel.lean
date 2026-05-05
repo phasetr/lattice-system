@@ -1416,9 +1416,9 @@ theorem neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite_clos
 /-- **Strict negativity in ℝ** of the AFM Heisenberg-on-graph Néel
 expectation: when `J = (J_re : ℂ)` is a strictly-positive real, every
 edge of `G` crosses the bipartition, `0 < #G.edgeFinset`, and `0 < N`,
-the Néel expectation has strictly negative real part. The
-real-valued variational upper bound `Re E_GS < 0` for the AFM
-Heisenberg ground-state. -/
+the Néel-trial expectation has strictly negative real part. Combined
+with the variational principle (separately), this gives the AFM
+ground-state energy upper bound `Re E_GS ≤ -J·#edges·N²/2 < 0`. -/
 theorem neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite_re_neg
     (G : SimpleGraph Λ) [DecidableRel G.Adj] (A : Λ → Bool) (N : ℕ)
     {J_re : ℝ} (hJ : 0 < J_re)
