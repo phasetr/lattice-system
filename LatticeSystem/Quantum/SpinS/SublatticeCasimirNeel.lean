@@ -125,6 +125,16 @@ theorem magSumS_neelConfigOfS (A : Λ → Bool) (N : ℕ) :
   rw [← Finset.sum_filter, Finset.sum_const]
   rw [smul_eq_mul]
 
+/-- **Sublattice-swap symmetry**: `magSumS (neelConfigOfS (¬A) N) = |A| · N`.
+The complement Néel configuration sits in the opposite magnetization
+sector to `neelConfigOfS A N` (whose `magSumS = |¬A|·N`), reflecting the
+`A ↔ ¬A` symmetry of the bipartite construction. -/
+theorem magSumS_neelConfigOfS_complement (A : Λ → Bool) (N : ℕ) :
+    magSumS (neelConfigOfS (fun x : Λ => ! A x) N) =
+      (Finset.univ.filter (fun x : Λ => A x = true)).card * N := by
+  rw [magSumS_neelConfigOfS]
+  simp [Bool.not_not]
+
 /-- `Ŝ_tot^(3) · |Φ_Néel⟩ = ((|A| − |¬A|)·N/2) · |Φ_Néel⟩`. The spin-`S`
 Néel state is a `Ŝ_tot^(3)`-eigenvector with magnetization
 `(|A| − |¬A|)·N/2`. For `|A| = |¬A|` the magnetization is zero; for
