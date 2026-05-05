@@ -2332,4 +2332,14 @@ theorem basisVec_const_totalSpinHalfSquared_expectation_via_general
   rw [hsq]
   ring
 
+/-- **Spin-`1/2` negation relation**:
+`magnetization Λ (neelConfigOf (¬A)) = −magnetization Λ (neelConfigOf A)`.
+Direct from `magnetization_neelConfigOf` + `magnetization_neelConfigOf_complement`
++ `ring`. Spin-`1/2` mirror of γ-4 step 231 (γ-4 step 232). -/
+theorem magnetization_neelConfigOf_complement_eq_neg (A : Λ → Bool) :
+    magnetization Λ (neelConfigOf (fun x : Λ => ! A x)) =
+      -magnetization Λ (neelConfigOf A) := by
+  rw [magnetization_neelConfigOf_complement, magnetization_neelConfigOf]
+  ring
+
 end LatticeSystem.Quantum
