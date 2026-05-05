@@ -2303,4 +2303,33 @@ theorem neelStateOf_totalSpinHalfSquared_expectation_via_general
   push_cast
   ring
 
+/-- **Spin-`1/2` const-state Casimir** re-derived via the general
+`basisVec σ` formula (γ-4 step 216):
+`<basisVec(const s) | (Ŝ_tot)² | basisVec(const s)> = |Λ|·(|Λ|+2)/4`
+for any `s : Fin 2`. Composition of γ-4 step 216 +
+`magnetization (const s) = ± |Λ|` + `(spinSign s)² = 1` + `ring`.
+Recovers existing `basisVec_const_totalSpinHalfSquared_expectation`
+(γ-4 step 201) from the general framework (γ-4 step 228, spin-`1/2`
+mirror of γ-4 step 226). -/
+theorem basisVec_const_totalSpinHalfSquared_expectation_via_general
+    (s : Fin 2) :
+    dotProduct (star (basisVec (fun _ : Λ => s)))
+        ((totalSpinHalfSquared Λ).mulVec (basisVec (fun _ : Λ => s))) =
+      (Fintype.card Λ : ℂ) * ((Fintype.card Λ : ℂ) + 2) / 4 := by
+  rw [basisVec_totalSpinHalfSquared_expectation_general]
+  have hMag : (magnetization Λ (fun _ : Λ => s) : ℂ) =
+      (Fintype.card Λ : ℂ) * (spinSign s : ℂ) := by
+    unfold magnetization
+    rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+    push_cast; ring
+  rw [hMag]
+  have hsq : (spinSign s : ℂ) * (spinSign s : ℂ) = 1 :=
+    spinSign_sq s
+  -- ((|Λ| · spinSign s) / 2)² = |Λ|²·(spinSign)²/4 = |Λ|²/4
+  rw [show (((Fintype.card Λ : ℂ) * (spinSign s : ℂ)) / 2) ^ 2 =
+      ((Fintype.card Λ : ℂ)) ^ 2 *
+        ((spinSign s : ℂ) * (spinSign s : ℂ)) / 4 from by ring]
+  rw [hsq]
+  ring
+
 end LatticeSystem.Quantum
