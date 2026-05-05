@@ -2507,4 +2507,36 @@ theorem basisVecS_totalSpinSSquared_expectation_general
     nsmul_eq_mul]
   ring
 
+/-- **Spin-`S` transverse Casimir `(Ŝ_tot^(1))² + (Ŝ_tot^(2))²` on
+arbitrary `basisVecS σ`** equals `|V|·N(N+2)/4 − Σ_x (N/2 − σx.val)²`.
+
+Direct corollary of γ-4 step 218 (full Casimir) and γ-4 step 205
+(z-axis squared = `magEigenvalueS(σ)²`): the `magEigenvalueS²` pieces
+cancel.
+
+For Néel state on a balanced bipartite graph (`|A| = |¬A|`,
+`σx ∈ {0, N}`), this reduces to `|V|·N/2` (matches existing
+`neelStateOfS_totalSpinSOp12_sq_expectation` from γ-4 step 156).
+
+For spin-`1/2` (`N = 1`, `(N/2 - σx.val)² = 1/4` always), reduces to
+`|Λ|·3/4 - |Λ|/4 = |Λ|/2` (γ-4 step 219, `_general` variant)
+(γ-4 step 220). -/
+theorem basisVecS_totalSpinSOp12_sq_expectation_general
+    (N : ℕ) (σ : Λ → Fin (N + 1)) :
+    dotProduct (star (basisVecS σ : (Λ → Fin (N + 1)) → ℂ))
+        ((totalSpinSOp1 Λ N * totalSpinSOp1 Λ N +
+            totalSpinSOp2 Λ N * totalSpinSOp2 Λ N).mulVec
+          (basisVecS σ)) =
+      (Fintype.card Λ : ℂ) * ((N : ℂ) * ((N : ℂ) + 2) / 4) -
+        ∑ x : Λ, ((N : ℂ) / 2 - ((σ x).val : ℂ)) ^ 2 := by
+  have hDecomp : totalSpinSOp1 Λ N * totalSpinSOp1 Λ N +
+        totalSpinSOp2 Λ N * totalSpinSOp2 Λ N =
+      totalSpinSSquared Λ N -
+        totalSpinSOp3 Λ N * totalSpinSOp3 Λ N := by
+    unfold totalSpinSSquared; abel
+  rw [hDecomp, Matrix.sub_mulVec, dotProduct_sub,
+    basisVecS_totalSpinSSquared_expectation_general,
+    basisVecS_expectation_totalSpinSOp3_sq]
+  ring
+
 end LatticeSystem.Quantum
