@@ -113,6 +113,33 @@ theorem spinHalfDot_apply_diag_of_ne_antiparallel
   rw [hLHS] at heval
   rw [heval, hRHS]
 
+/-- Diagonal matrix element of the spin-`1/2` two-site dot product
+`Ŝ_x · Ŝ_y` at a parallel configuration:
+`(Ŝ_x · Ŝ_y) σ σ = +1/4` when `σ x = σ y` (and `x ≠ y`).
+
+Parallel counterpart of `spinHalfDot_apply_diag_of_ne_antiparallel`:
+the eigenvector property `spinHalfDot_mulVec_basisVec_parallel`
+(`(Ŝ_x · Ŝ_y) · |σ⟩ = (1/4) · |σ⟩`) evaluated at `σ` reads off the
+diagonal. -/
+theorem spinHalfDot_apply_diag_of_ne_parallel
+    {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin 2) (h : σ x = σ y) :
+    (spinHalfDot x y : ManyBodyOp Λ) σ σ = (1 / 4 : ℂ) := by
+  have hmulVec := spinHalfDot_mulVec_basisVec_parallel hxy σ h
+  have heval := congrArg (fun v => v σ) hmulVec
+  simp only at heval
+  have hLHS : ((spinHalfDot x y).mulVec (basisVec σ)) σ =
+      (spinHalfDot x y : ManyBodyOp Λ) σ σ := by
+    rw [Matrix.mulVec, dotProduct]
+    rw [Finset.sum_eq_single σ]
+    · rw [basisVec_self, mul_one]
+    · intros τ _ hτ
+      rw [basisVec_of_ne hτ, mul_zero]
+    · intro hempty; exact (hempty (Finset.mem_univ _)).elim
+  have hRHS : ((1 / 4 : ℂ) • basisVec σ) σ = (1 / 4 : ℂ) := by
+    rw [Pi.smul_apply, basisVec_self, smul_eq_mul, mul_one]
+  rw [hLHS] at heval
+  rw [heval, hRHS]
+
 /-- Diagonal of the spin-`1/2` toy Hamiltonian on the Néel
 configuration:
 
@@ -451,6 +478,24 @@ theorem spinHalfDot_apply_diag_neelConfigOf_of_cross
     rw [if_pos hAx, if_neg (by rw [hAy]; decide : ¬ A y = true)]
     decide
   exact spinHalfDot_apply_diag_of_ne_antiparallel hxy _ hne
+
+/-- For a same-sublattice pair `x ≠ y` with `A x = A y` (both in `A`
+or both in `¬A`), the spin-`1/2` two-site dot product diagonal at the
+Néel configuration is `+1/4`:
+
+  `(Ŝ_x · Ŝ_y) (neel) (neel) = +1/4`.
+
+Spin-`1/2` mirror of the same-sublattice case: when `A x = A y`, the
+Néel config gives `σ x = σ y` (both `0` if in `A`, both `1` if in
+`¬A`), so the parallel diagonal lemma `spinHalfDot_apply_diag_of_ne_parallel`
+applies. -/
+theorem spinHalfDot_apply_diag_neelConfigOf_of_same
+    (A : Λ → Bool) {x y : Λ} (hxy : x ≠ y) (h : A x = A y) :
+    (spinHalfDot x y : ManyBodyOp Λ) (neelConfigOf A) (neelConfigOf A) =
+      (1 / 4 : ℂ) := by
+  have hpar : neelConfigOf A x = neelConfigOf A y := by
+    unfold neelConfigOf; rw [h]
+  exact spinHalfDot_apply_diag_of_ne_parallel hxy _ hpar
 
 /-- `Ŝ_A^+ · Ŝ_¬A^- · |Φ_Néel⟩ = 0`. Spin-`1/2` mirror of γ-4 step 81:
 the cross-ladder product annihilates the Néel state via `Ŝ_¬A^- · Néel = 0`. -/
@@ -1055,5 +1100,21 @@ theorem neelStateOf_expectation_spinHalfDot_of_cross
   unfold neelStateOf
   rw [basisVec_expectation_eq_diagonal]
   exact spinHalfDot_apply_diag_neelConfigOf_of_cross A hAx hAy
+
+/-- `<Φ_Néel | Ŝ_x · Ŝ_y | Φ_Néel> = +1/4` for a same-sublattice pair
+`x ≠ y` with `A x = A y` (both in `A` or both in `¬A`). Spin-`1/2`
+mirror of γ-4 step 158: lifts the diagonal matrix element
+`spinHalfDot_apply_diag_neelConfigOf_of_same` via
+`basisVec_expectation_eq_diagonal`. The positive sign matches the
+ferromagnetic alignment of two spins on the same sublattice in the
+Néel state. -/
+theorem neelStateOf_expectation_spinHalfDot_of_same
+    (A : Λ → Bool) {x y : Λ} (hxy : x ≠ y) (h : A x = A y) :
+    dotProduct (star (neelStateOf A))
+        ((spinHalfDot x y : ManyBodyOp Λ).mulVec (neelStateOf A)) =
+      (1 / 4 : ℂ) := by
+  unfold neelStateOf
+  rw [basisVec_expectation_eq_diagonal]
+  exact spinHalfDot_apply_diag_neelConfigOf_of_same A hxy h
 
 end LatticeSystem.Quantum
