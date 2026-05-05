@@ -2747,4 +2747,27 @@ theorem neelStateOfS_totalSpinSOp3_sq_complement_eq
     magEigenvalueS_neelConfigOfS_complement_eq_neg]
   ring
 
+/-- **Spin-`S` transverse Casimir `(Ŝ_tot^(1))²+(Ŝ_tot^(2))²` is
+sublattice-swap invariant on Néel states**:
+`<Φ_Néel(¬A)|(Ŝ^1)²+(Ŝ^2)²|Φ_Néel(¬A)> = <Φ_Néel(A)|(Ŝ^1)²+(Ŝ^2)²|Φ_Néel(A)>`.
+
+Direct corollary of γ-4 step 220 (`= |V|·N(N+2)/4 − Σ_x m_x²`) +
+γ-4 step 221 (`Σ_x m_x² = |V|·(N/2)²` for both A and ¬A): both
+sides reduce to the same `|V|·N/2` (γ-4 step 237). -/
+theorem neelStateOfS_totalSpinSOp12_sq_complement_eq
+    (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+        ((totalSpinSOp1 Λ N * totalSpinSOp1 Λ N +
+            totalSpinSOp2 Λ N * totalSpinSOp2 Λ N).mulVec
+          (neelStateOfS (fun x : Λ => ! A x) N)) =
+      dotProduct (star (neelStateOfS A N))
+        ((totalSpinSOp1 Λ N * totalSpinSOp1 Λ N +
+            totalSpinSOp2 Λ N * totalSpinSOp2 Λ N).mulVec
+          (neelStateOfS A N)) := by
+  unfold neelStateOfS
+  rw [basisVecS_totalSpinSOp12_sq_expectation_general,
+    basisVecS_totalSpinSOp12_sq_expectation_general,
+    neelConfigOfS_z_eigenvalue_sq_sum,
+    neelConfigOfS_z_eigenvalue_sq_sum]
+
 end LatticeSystem.Quantum
