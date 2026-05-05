@@ -341,6 +341,49 @@ theorem spinSDot_apply_diag_neelConfigOfS_of_cross
   rw [hmx, hmy]
   ring
 
+/-- For a same-sublattice pair `x ≠ y` with `A x = A y` (both in `A`
+or both in `¬A`), the two-site dot product diagonal at the spin-`S`
+Néel configuration is `+N²/4`:
+
+  `(Ŝ_x · Ŝ_y) (neel) (neel) = (N/2)² = N²/4` when both in `A`,
+  `(Ŝ_x · Ŝ_y) (neel) (neel) = (-N/2)² = N²/4` when both in `¬A`.
+
+Direct from `spinSDot_apply_diag_of_ne`: the same `Ŝ^{(3)}` eigenvalue
+on both sites yields the squared magnitude `(N/2)² = N²/4`, with sign
+cancelled by the same-sign property. -/
+theorem spinSDot_apply_diag_neelConfigOfS_of_same
+    (A : Λ → Bool) (N : ℕ)
+    {x y : Λ} (hxy : x ≠ y) (h : A x = A y) :
+    (spinSDot x y N : ManyBodyOpS Λ N)
+        (neelConfigOfS A N) (neelConfigOfS A N) =
+      ((N : ℂ) * (N : ℂ) / 4) := by
+  rw [spinSDot_apply_diag_of_ne hxy]
+  by_cases hAx : A x = true
+  · -- Both in A: σ_x = σ_y = 0.
+    have hAy : A y = true := by rw [← h]; exact hAx
+    have hmx : ((N : ℂ) / 2 - (neelConfigOfS A N x).val) = (N : ℂ) / 2 := by
+      unfold neelConfigOfS
+      rw [if_pos hAx]; simp
+    have hmy : ((N : ℂ) / 2 - (neelConfigOfS A N y).val) = (N : ℂ) / 2 := by
+      unfold neelConfigOfS
+      rw [if_pos hAy]; simp
+    rw [hmx, hmy]; ring
+  · -- Both in ¬A: σ_x = σ_y = Fin.last N.
+    have hAxF : A x = false := by
+      cases hAxx : A x with
+      | true => exact absurd hAxx hAx
+      | false => rfl
+    have hAyF : A y = false := by rw [← h]; exact hAxF
+    have hmx : ((N : ℂ) / 2 - (neelConfigOfS A N x).val) = -((N : ℂ) / 2) := by
+      unfold neelConfigOfS
+      rw [if_neg (by rw [hAxF]; decide : ¬ (A x = true))]
+      push_cast [Fin.last]; ring
+    have hmy : ((N : ℂ) / 2 - (neelConfigOfS A N y).val) = -((N : ℂ) / 2) := by
+      unfold neelConfigOfS
+      rw [if_neg (by rw [hAyF]; decide : ¬ (A y = true))]
+      push_cast [Fin.last]; ring
+    rw [hmx, hmy]; ring
+
 /-! ## Toy Hamiltonian diagonal matrix element on the Néel state -/
 
 /-- The diagonal matrix element of the cross-sublattice spin dot
@@ -1116,5 +1159,22 @@ theorem neelStateOfS_expectation_spinSDot_of_cross
   unfold neelStateOfS
   rw [basisVecS_expectation_eq_diagonal]
   exact spinSDot_apply_diag_neelConfigOfS_of_cross A N hAx hAy
+
+/-- `<Φ_Néel | Ŝ_x · Ŝ_y | Φ_Néel> = +N²/4` for a same-sublattice pair
+`x ≠ y` with `A x = A y` (both in `A` or both in `¬A`). The state-level
+expectation lifts the diagonal matrix element
+`spinSDot_apply_diag_neelConfigOfS_of_same` via
+`basisVecS_expectation_eq_diagonal`. The positive sign reflects the
+ferromagnetic alignment of the two sites within the same sublattice in
+the Néel state. -/
+theorem neelStateOfS_expectation_spinSDot_of_same
+    (A : Λ → Bool) (N : ℕ)
+    {x y : Λ} (hxy : x ≠ y) (h : A x = A y) :
+    dotProduct (star (neelStateOfS A N))
+        ((spinSDot x y N : ManyBodyOpS Λ N).mulVec (neelStateOfS A N)) =
+      ((N : ℂ) * (N : ℂ) / 4) := by
+  unfold neelStateOfS
+  rw [basisVecS_expectation_eq_diagonal]
+  exact spinSDot_apply_diag_neelConfigOfS_of_same A N hxy h
 
 end LatticeSystem.Quantum
