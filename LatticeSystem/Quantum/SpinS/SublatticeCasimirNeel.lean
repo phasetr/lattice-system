@@ -856,6 +856,18 @@ theorem neelStateOfS_span_le_magSubspaceS (A : Λ → Bool) (N : ℕ) :
   rw [Submodule.span_le, Set.singleton_subset_iff]
   exact neelStateOfS_mem_magSubspaceS A N
 
+/-- The line spanned by the spin-`S` complement Néel state is contained
+in the magnetization subspace at `-M = (|¬A|-|A|)·N/2` (γ-4 step 194). -/
+theorem neelStateOfS_complement_span_le_magSubspaceS (A : Λ → Bool) (N : ℕ) :
+    Submodule.span ℂ {neelStateOfS (fun x : Λ => ! A x) N} ≤
+      magSubspaceS Λ N
+        (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+            ((N : ℂ) / 2) -
+          ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+            ((N : ℂ) / 2)) := by
+  rw [Submodule.span_le, Set.singleton_subset_iff]
+  exact neelStateOfS_complement_mem_magSubspaceS A N
+
 /-- **Spin-S complement magnetization subspace non-triviality**: the
 opposite-sign sector `(|¬A|-|A|)·N/2` is also non-trivial, witnessed by
 the non-zero complement Néel state `Φ_Néel(¬A)`. Combined with γ-4 step
