@@ -271,4 +271,28 @@ theorem basisVecS_dotProduct_totalSpinSOp3_basisVecS (σ τ : V → Fin (N + 1))
     rw [if_pos rfl, basisVecS_expectation_totalSpinSOp3]
   · rw [if_neg hτσ, basisVecS_off_diagonal_totalSpinSOp3 hτσ]
 
+/-- Off-diagonal `(Ŝ_tot^{(3)})²` matrix elements vanish for `τ ≠ σ`.
+Direct corollary of the `Ŝ_tot^{(3)}` eigenvector identity applied
+twice + basis orthogonality (γ-4 step 213). -/
+theorem basisVecS_off_diagonal_totalSpinSOp3_sq {σ τ : V → Fin (N + 1)}
+    (hστ : τ ≠ σ) :
+    dotProduct (star (basisVecS τ : (V → Fin (N + 1)) → ℂ))
+        ((totalSpinSOp3 V N * totalSpinSOp3 V N).mulVec (basisVecS σ)) = 0 := by
+  rw [← Matrix.mulVec_mulVec, totalSpinSOp3_mulVec_basisVecS,
+    Matrix.mulVec_smul, totalSpinSOp3_mulVec_basisVecS, smul_smul,
+    dotProduct_smul_right,
+    basisVecS_dotProduct_basisVecS_of_ne hστ, mul_zero]
+
+/-- **Combined δ-form for `(Ŝ_tot^{(3)})²` matrix elements**:
+`<basisVecS τ | (Ŝ_tot^{(3)})² | basisVecS σ> = if τ = σ then (magEigenvalueS σ)² else 0`
+(γ-4 step 213). -/
+theorem basisVecS_dotProduct_totalSpinSOp3_sq_basisVecS (σ τ : V → Fin (N + 1)) :
+    dotProduct (star (basisVecS τ : (V → Fin (N + 1)) → ℂ))
+        ((totalSpinSOp3 V N * totalSpinSOp3 V N).mulVec (basisVecS σ)) =
+      if τ = σ then (magEigenvalueS σ) ^ 2 else 0 := by
+  by_cases hτσ : τ = σ
+  · subst hτσ
+    rw [if_pos rfl, basisVecS_expectation_totalSpinSOp3_sq]
+  · rw [if_neg hτσ, basisVecS_off_diagonal_totalSpinSOp3_sq hτσ]
+
 end LatticeSystem.Quantum
