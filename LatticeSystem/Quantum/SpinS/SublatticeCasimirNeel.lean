@@ -1413,6 +1413,31 @@ theorem neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite_clos
   rw [LatticeSystem.Lattice.couplingOf_sum]
   ring
 
+/-- **Strict negativity in ℝ** of the AFM Heisenberg-on-graph Néel
+expectation: when `J = (J_re : ℂ)` is a strictly-positive real, every
+edge of `G` crosses the bipartition, `0 < #G.edgeFinset`, and `0 < N`,
+the Néel-trial expectation has strictly negative real part. Combined
+with the variational principle (separately), this gives the AFM
+ground-state energy upper bound `Re E_GS ≤ -J·#edges·N²/2 < 0`. -/
+theorem neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite_re_neg
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (A : Λ → Bool) (N : ℕ)
+    {J_re : ℝ} (hJ : 0 < J_re)
+    (hG : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hE : 0 < G.edgeFinset.card) (hN : 0 < N) :
+    (dotProduct (star (neelStateOfS A N))
+        ((heisenbergHamiltonianOnGraphS G (J_re : ℂ) N).mulVec
+          (neelStateOfS A N))).re < 0 := by
+  rw [neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite_closed
+        G (J_re : ℂ) A N hG]
+  have hreal :
+      -((J_re : ℂ) * (G.edgeFinset.card : ℂ) * ((N : ℂ) * (N : ℂ)) / 2) =
+        ((-(J_re * (G.edgeFinset.card : ℝ) * ((N : ℝ) * (N : ℝ)) / 2) : ℝ) : ℂ) := by
+    push_cast; ring
+  rw [hreal, Complex.ofReal_re]
+  refine neg_neg_iff_pos.mpr (div_pos (mul_pos (mul_pos hJ ?_) ?_) two_pos)
+  · exact_mod_cast hE
+  · refine mul_pos ?_ ?_ <;> exact_mod_cast hN
+
 /-- **Real-valued positivity** of the toy Hamiltonian variational gap:
 `0 < Re (<Φ_⊤|Ĥ_toy|Φ_⊤> - <Φ_Néel|Ĥ_toy|Φ_Néel>) = |A|·|¬A|·N²` when
 both sublattices are non-empty and `N ≥ 1`. The all-up state has strictly

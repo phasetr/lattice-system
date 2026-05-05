@@ -1329,6 +1329,28 @@ theorem neelStateOf_heisenbergHamiltonianOnGraph_expectation_of_bipartite_closed
   rw [LatticeSystem.Lattice.couplingOf_sum]
   ring
 
+/-- **Strict negativity in ℝ** (spin-`1/2`) of the AFM Heisenberg-on-graph
+Néel expectation: for `J = (J_re : ℂ)` with `0 < J_re`, bipartite
+alignment, and `0 < #G.edgeFinset`, the real part is strictly negative.
+Spin-`1/2` mirror of γ-4 step 168. -/
+theorem neelStateOf_heisenbergHamiltonianOnGraph_expectation_of_bipartite_re_neg
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (A : Λ → Bool)
+    {J_re : ℝ} (hJ : 0 < J_re)
+    (hG : ∀ x y, G.Adj x y → A x ≠ A y)
+    (hE : 0 < G.edgeFinset.card) :
+    (dotProduct (star (neelStateOf A))
+        ((heisenbergHamiltonianOnGraph G (J_re : ℂ) : ManyBodyOp Λ).mulVec
+          (neelStateOf A))).re < 0 := by
+  rw [neelStateOf_heisenbergHamiltonianOnGraph_expectation_of_bipartite_closed
+        G (J_re : ℂ) A hG]
+  have hreal :
+      -((J_re : ℂ) * (G.edgeFinset.card : ℂ) / 2) =
+        ((-(J_re * (G.edgeFinset.card : ℝ) / 2) : ℝ) : ℂ) := by
+    push_cast; ring
+  rw [hreal, Complex.ofReal_re]
+  refine neg_neg_iff_pos.mpr (div_pos (mul_pos hJ ?_) two_pos)
+  exact_mod_cast hE
+
 /-- **Real-valued positivity** of the spin-`1/2` toy Hamiltonian
 variational gap: `0 < Re (<basisVec 0|Ĥ_toy|basisVec 0> -
 <Φ_Néel|Ĥ_toy|Φ_Néel>) = |A|·|¬A|` when both sublattices are non-empty.
