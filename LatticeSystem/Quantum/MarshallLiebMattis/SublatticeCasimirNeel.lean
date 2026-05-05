@@ -1147,6 +1147,17 @@ theorem neelStateOf_mem_magnetizationSubspace (A : Λ → Bool) :
   rw [mem_magnetizationSubspace_iff]
   exact totalSpinHalfOp3_mulVec_neelStateOf A
 
+/-- **Complement Néel sits in the opposite magnetization sector**
+(spin-`1/2`): `Φ_Néel(¬A) ∈ magnetizationSubspace ((|¬A|-|A|)/2)`.
+Direct application of `neelStateOf_mem_magnetizationSubspace` with `A`
+replaced by `¬A`, then simplifying `! ! A x = A x` (γ-4 step 176). -/
+theorem neelStateOf_complement_mem_magnetizationSubspace (A : Λ → Bool) :
+    neelStateOf (fun x : Λ => ! A x) ∈ magnetizationSubspace Λ
+      ((((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) -
+        ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ)) / 2) := by
+  have := neelStateOf_mem_magnetizationSubspace (fun x : Λ => ! A x)
+  simpa [Bool.not_not] using this
+
 /-- The magnetization-`(|A|-|¬A|)/2` subspace is non-trivial: it contains
 the non-zero Néel state. Spin-`1/2` analog of `neelMagConfigS_nonempty`. -/
 theorem magnetizationSubspace_nontrivial_via_neel (A : Λ → Bool) :
