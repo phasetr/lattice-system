@@ -329,6 +329,23 @@ theorem basisVec_dotProduct_basisVec_of_ne {σ τ : Λ → Fin 2}
       basisVec_of_ne hστ, mul_zero]
   · rw [Pi.star_apply, basisVec_of_ne hφ, star_zero, zero_mul]
 
+/-- **Combined δ-form for spin-`1/2` basis dotProduct**:
+`<basisVec τ | basisVec σ> = if τ = σ then 1 else 0` (γ-4 step 211). -/
+theorem basisVec_dotProduct_basisVec (σ τ : Λ → Fin 2) :
+    dotProduct (star (basisVec τ)) (basisVec σ : (Λ → Fin 2) → ℂ) =
+      if τ = σ then 1 else 0 := by
+  by_cases hτσ : τ = σ
+  · subst hτσ
+    rw [if_pos rfl]
+    -- Diagonal case: <σ|σ> = 1.
+    unfold dotProduct
+    rw [Finset.sum_eq_single τ]
+    · rw [Pi.star_apply, basisVec_self, star_one, mul_one]
+    · intros φ _ hφ
+      rw [Pi.star_apply, basisVec_of_ne hφ, star_zero, zero_mul]
+    · intro h; exact (h (Finset.mem_univ _)).elim
+  · rw [if_neg hτσ, basisVec_dotProduct_basisVec_of_ne hτσ]
+
 /-! ## Casimir invariance under Ŝ_tot^± on constant configs (Tasaki §2.4)
 
 `(Ŝ_tot)²` commutes with both `Ŝ_tot^+` and `Ŝ_tot^-`
