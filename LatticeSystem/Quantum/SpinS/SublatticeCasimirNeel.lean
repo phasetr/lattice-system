@@ -136,9 +136,10 @@ theorem magSumS_neelConfigOfS_complement (A : Λ → Bool) (N : ℕ) :
   rw [magSumS_neelConfigOfS]
   simp [Bool.not_not]
 
-/-- The Néel configuration `neelConfigOfS A N` differs from its
-sublattice-complement `neelConfigOfS (¬A) N` at every site, when `0 < N`.
-Each site flips between extremes (`0 ↔ Fin.last N`) under the swap. -/
+/-- The Néel configuration `neelConfigOfS A N` is distinct from its
+sublattice-complement `neelConfigOfS (¬A) N` (as functions `Λ → Fin (N+1)`)
+when `Λ` is non-empty and `0 < N`: at any vertex `x`, the swap takes
+`0 ↔ Fin.last N`, witnessing the inequality. -/
 theorem neelConfigOfS_ne_complement [Nonempty Λ] (A : Λ → Bool) (N : ℕ)
     (hN : 0 < N) :
     neelConfigOfS A N ≠ neelConfigOfS (fun x : Λ => ! A x) N := by
