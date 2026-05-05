@@ -1173,6 +1173,26 @@ theorem neelStateOf_basisVec_triple_independent
     exact this
   exact ⟨hc1, hc2, hc3⟩
 
+/-- **Triple linear independence** (spin-`1/2`) of
+{`basisVec(const 0)`, `basisVec(const 1)`, `Φ_Néel(¬A)`}: spin-`1/2`
+mirror of γ-4 step 183, applies γ-4 step 175 with `A := ¬A`. -/
+theorem neelStateOf_complement_basisVec_triple_independent
+    [Nonempty Λ] (A : Λ → Bool)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false)
+    {c1 c2 c3 : ℂ}
+    (h : c1 • basisVec (fun _ : Λ => (0 : Fin 2)) +
+         c2 • basisVec (fun _ : Λ => (1 : Fin 2)) +
+         c3 • neelStateOf (fun x : Λ => ! A x) = 0) :
+    c1 = 0 ∧ c2 = 0 ∧ c3 = 0 := by
+  have hA' : ∃ x : Λ, (! A x) = true := by
+    obtain ⟨x, hx⟩ := hAc
+    exact ⟨x, by simp [hx]⟩
+  have hAc' : ∃ x : Λ, (! A x) = false := by
+    obtain ⟨x, hx⟩ := hA
+    exact ⟨x, by simp [hx]⟩
+  exact neelStateOf_basisVec_triple_independent
+    (fun x : Λ => ! A x) hA' hAc' h
+
 /-- **Quadruple linear independence** (spin-`1/2`) of
 {`basisVec(const 0)`, `basisVec(const 1)`, `Φ_Néel(A)`, `Φ_Néel(¬A)`}:
 when `Λ` non-empty and both sublattices non-empty, all four coefficients
