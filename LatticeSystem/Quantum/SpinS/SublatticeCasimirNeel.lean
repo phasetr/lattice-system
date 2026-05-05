@@ -868,6 +868,29 @@ theorem neelStateOfS_complement_span_le_magSubspaceS (A : Λ → Bool) (N : ℕ)
   rw [Submodule.span_le, Set.singleton_subset_iff]
   exact neelStateOfS_complement_mem_magSubspaceS A N
 
+/-- The Néel pair span sits inside the supremum of the two opposite-sign
+magnetization subspaces: `span ℂ {Φ_Néel(A), Φ_Néel(¬A)} ≤ magSubspace
+M_pos ⊔ magSubspace M_neg`, with `M_pos = (|A|-|¬A|)·N/2` and
+`M_neg = (|¬A|-|A|)·N/2`. Direct from γ-4 step 176 + 194 via
+`Submodule.mem_sup_left/right` (γ-4 step 197). -/
+theorem neelStateOfS_pair_span_le_magSubspaceS_sup (A : Λ → Bool) (N : ℕ) :
+    Submodule.span ℂ
+        ({neelStateOfS A N, neelStateOfS (fun x : Λ => ! A x) N} : Set _) ≤
+      magSubspaceS Λ N
+          (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+              ((N : ℂ) / 2) -
+            ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+              ((N : ℂ) / 2)) ⊔
+        magSubspaceS Λ N
+          (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+              ((N : ℂ) / 2) -
+            ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+              ((N : ℂ) / 2)) := by
+  rw [Submodule.span_le, Set.insert_subset_iff, Set.singleton_subset_iff]
+  refine ⟨?_, ?_⟩
+  · exact Submodule.mem_sup_left (neelStateOfS_mem_magSubspaceS A N)
+  · exact Submodule.mem_sup_right (neelStateOfS_complement_mem_magSubspaceS A N)
+
 /-- **Spin-S complement magnetization subspace non-triviality**: the
 opposite-sign sector `(|¬A|-|A|)·N/2` is also non-trivial, witnessed by
 the non-zero complement Néel state `Φ_Néel(¬A)`. Combined with γ-4 step

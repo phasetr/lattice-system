@@ -1730,6 +1730,22 @@ theorem neelStateOf_complement_span_le_magnetizationSubspace (A : Λ → Bool) :
   rw [Submodule.span_le, Set.singleton_subset_iff]
   exact neelStateOf_complement_mem_magnetizationSubspace A
 
+/-- Spin-`1/2` Néel pair span ⊆ supremum of opposite-sign magnetization
+subspaces. Spin-`1/2` mirror of γ-4 step 197. -/
+theorem neelStateOf_pair_span_le_magnetizationSubspace_sup (A : Λ → Bool) :
+    Submodule.span ℂ
+        ({neelStateOf A, neelStateOf (fun x : Λ => ! A x)} : Set _) ≤
+      magnetizationSubspace Λ
+          ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+            ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) / 2) ⊔
+        magnetizationSubspace Λ
+          ((((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) -
+            ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ)) / 2) := by
+  rw [Submodule.span_le, Set.insert_subset_iff, Set.singleton_subset_iff]
+  refine ⟨?_, ?_⟩
+  · exact Submodule.mem_sup_left (neelStateOf_mem_magnetizationSubspace A)
+  · exact Submodule.mem_sup_right (neelStateOf_complement_mem_magnetizationSubspace A)
+
 /-- The line spanned by the Néel state is 1-dimensional:
 `finrank ℂ (ℂ ∙ Φ_Néel) = 1`. -/
 theorem neelStateOf_finrank_span (A : Λ → Bool) :
