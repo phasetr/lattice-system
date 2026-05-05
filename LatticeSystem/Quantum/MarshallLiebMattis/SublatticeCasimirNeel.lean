@@ -1498,6 +1498,39 @@ theorem neelStateOf_complement_basisVec_triple_finrank_span
         (neelStateOf_complement_basisVec_triple_linearIndependent A hA hAc)]
   rfl
 
+/-- **Set form** of the spin-`1/2` complement-Néel triple finrank.
+Spin-`1/2` mirror of γ-4 step 193. -/
+theorem neelStateOf_complement_basisVec_triple_finrank_span_set
+    [Nonempty Λ] (A : Λ → Bool)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false) :
+    Module.finrank ℂ
+      (Submodule.span ℂ
+        ({basisVec (fun _ : Λ => (0 : Fin 2)),
+          basisVec (fun _ : Λ => (1 : Fin 2)),
+          neelStateOf (fun x : Λ => ! A x)} : Set _)) = 3 := by
+  have hrange :
+      Set.range
+        (![basisVec (fun _ : Λ => (0 : Fin 2)),
+           basisVec (fun _ : Λ => (1 : Fin 2)),
+           neelStateOf (fun x : Λ => ! A x)] : Fin 3 → _) =
+      ({basisVec (fun _ : Λ => (0 : Fin 2)),
+        basisVec (fun _ : Λ => (1 : Fin 2)),
+        neelStateOf (fun x : Λ => ! A x)} : Set _) := by
+    ext v
+    simp only [Set.mem_range, Set.mem_insert_iff, Set.mem_singleton_iff]
+    constructor
+    · rintro ⟨i, hi⟩
+      fin_cases i
+      · exact Or.inl hi.symm
+      · exact Or.inr (Or.inl hi.symm)
+      · exact Or.inr (Or.inr hi.symm)
+    · rintro (rfl | rfl | rfl)
+      · exact ⟨0, rfl⟩
+      · exact ⟨1, rfl⟩
+      · exact ⟨2, rfl⟩
+  rw [← hrange]
+  exact neelStateOf_complement_basisVec_triple_finrank_span A hA hAc
+
 /-- **Quadruple `LinearIndependent`** (spin-`1/2`):
 `LinearIndependent ℂ ![basisVec(0), basisVec(1), Φ_Néel(A), Φ_Néel(¬A)]`
 when `Λ` non-empty and both sublattices non-empty. Spin-`1/2` mirror of
