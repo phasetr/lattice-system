@@ -2670,4 +2670,23 @@ theorem magEigenvalueS_neelConfigOfS_complement (A : Λ → Bool) (N : ℕ) :
         ((N : ℂ) / 2) := by
   exact magEigenvalueS_neelConfigOfS (fun x => ! A x) N
 
+omit [DecidableEq Λ] in
+/-- **Cleaner form** of γ-4 step 229:
+`magEigenvalueS (neelConfigOfS (¬A) N) = (|¬A| − |A|)·N/2`
+with the `!!A` double-negation simplified to `A` (γ-4 step 230). -/
+theorem magEigenvalueS_neelConfigOfS_complement_simplified
+    (A : Λ → Bool) (N : ℕ) :
+    magEigenvalueS (neelConfigOfS (fun x => ! A x) N) =
+      (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) -
+        ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ)) *
+        ((N : ℂ) / 2) := by
+  rw [magEigenvalueS_neelConfigOfS_complement]
+  congr 2
+  have hSet : (Finset.univ.filter (fun x : Λ => (! ! A x) = true)) =
+      (Finset.univ.filter (fun x : Λ => A x = true)) := by
+    apply Finset.filter_congr
+    intros x _
+    simp [Bool.not_not]
+  rw [hSet]
+
 end LatticeSystem.Quantum
