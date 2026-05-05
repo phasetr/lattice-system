@@ -1187,6 +1187,32 @@ theorem neelStateOfS_allAlignedStateS_last_orthogonal
     omega
   exact basisVecS_inner_of_ne hne
 
+/-- `<Φ_⊤ | Φ_Néel(¬A)> = 0` when `|A| > 0` and `0 < N`. The complement
+Néel state has `Fin.last N` on `A` (the original sublattice with `A x =
+true`), so it differs from `Φ_⊤` (all `0`) at any vertex of `A`. Direct
+application of `neelStateOfS_allAlignedStateS_orthogonal` with `A`
+replaced by `¬A`. -/
+theorem neelStateOfS_complement_allAlignedStateS_orthogonal
+    (A : Λ → Bool) (N : ℕ) (hN : 0 < N) (hA : ∃ x : Λ, A x = true) :
+    dotProduct (star (allAlignedStateS Λ N (0 : Fin (N + 1))))
+        (neelStateOfS (fun x : Λ => ! A x) N) = 0 := by
+  have hAc' : ∃ x : Λ, (! A x) = false := by
+    obtain ⟨x, hx⟩ := hA
+    exact ⟨x, by simp [hx]⟩
+  exact neelStateOfS_allAlignedStateS_orthogonal (fun x : Λ => ! A x) N hN hAc'
+
+/-- `<Φ_⊥ | Φ_Néel(¬A)> = 0` when `|¬A| > 0` and `0 < N`. Symmetric
+counterpart for the all-down state. Direct application of
+`neelStateOfS_allAlignedStateS_last_orthogonal` with `A` replaced by `¬A`. -/
+theorem neelStateOfS_complement_allAlignedStateS_last_orthogonal
+    (A : Λ → Bool) (N : ℕ) (hN : 0 < N) (hAc : ∃ x : Λ, A x = false) :
+    dotProduct (star (allAlignedStateS Λ N (Fin.last N)))
+        (neelStateOfS (fun x : Λ => ! A x) N) = 0 := by
+  have hA' : ∃ x : Λ, (! A x) = true := by
+    obtain ⟨x, hx⟩ := hAc
+    exact ⟨x, by simp [hx]⟩
+  exact neelStateOfS_allAlignedStateS_last_orthogonal (fun x : Λ => ! A x) N hN hA'
+
 /-- **Triple linear independence** of {`Φ_⊤`, `Φ_⊥`, `Φ_Néel(A)`} (spin-S):
 when `Λ` is non-empty, `0 < N`, and both sublattices are non-empty, any
 linear combination equal to `0` has all coefficients `0`. The triple
