@@ -2561,4 +2561,39 @@ theorem neelConfigOfS_z_eigenvalue_sq_sum (A : Λ → Bool) (N : ℕ) :
   simp_rw [hEach]
   rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
 
+omit [DecidableEq Λ] in
+/-- `magEigenvalueS (neelConfigOfS A N) = (|A| − |¬A|)·N/2`. The
+Néel configuration's `Ŝ_tot^{(3)}` eigenvalue is the sublattice
+imbalance times `N/2`. Direct from `magSumS_neelConfigOfS` and the
+filter-card decomposition `|V| = |A| + |¬A|` (γ-4 step 224). -/
+theorem magEigenvalueS_neelConfigOfS (A : Λ → Bool) (N : ℕ) :
+    magEigenvalueS (neelConfigOfS A N) =
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) *
+        ((N : ℂ) / 2) := by
+  classical
+  rw [magEigenvalueS_def, magSumS_neelConfigOfS]
+  have hcard : ((Fintype.card Λ : ℂ)) =
+      ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) +
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) := by
+    have h1 : (Finset.univ.filter (fun x : Λ => A x = true)).card +
+        (Finset.univ.filter (fun x : Λ => (! A x) = true)).card =
+        Finset.univ.card (α := Λ) := by
+      have hfilter_eq : Finset.univ.filter (fun x : Λ => (! A x) = true) =
+          Finset.univ.filter (fun x : Λ => ¬ (A x = true)) := by
+        congr 1
+        funext x
+        by_cases hA : A x = true
+        · simp [hA]
+        · simp [hA]
+      rw [hfilter_eq]
+      exact Finset.card_filter_add_card_filter_not (fun x : Λ => A x = true)
+    have h2 : (Finset.univ.card (α := Λ) : ℂ) = (Fintype.card Λ : ℂ) := by
+      rw [Finset.card_univ]
+    rw [← h2]
+    exact_mod_cast h1.symm
+  rw [hcard]
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
