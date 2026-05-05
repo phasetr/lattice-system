@@ -2254,4 +2254,30 @@ theorem basisVec_totalSpinHalfSquared_expectation_general
   rw [hMag]
   ring
 
+/-- **Spin-`1/2` transverse Casimir `(Ŝ_tot^(1))² + (Ŝ_tot^(2))²` on
+arbitrary `basisVec σ`** equals `|Λ|/2`, **independent of `σ`**.
+
+Direct corollary of γ-4 step 216 (full Casimir) and γ-4 step 204
+(z-axis squared): `(Ŝ_tot^(1))² + (Ŝ_tot^(2))² = (Ŝ_tot)² - (Ŝ_tot^(3))²`,
+so the `M(σ)²/4` z-axis pieces cancel, leaving the constant `|Λ|/2`.
+
+This expresses the per-state transverse contribution as a pure
+combinatorial quantity (γ-4 step 219). -/
+theorem basisVec_totalSpinHalfOp12_sq_expectation_general
+    (σ : Λ → Fin 2) :
+    dotProduct (star (basisVec σ))
+        ((totalSpinHalfOp1 Λ * totalSpinHalfOp1 Λ +
+            totalSpinHalfOp2 Λ * totalSpinHalfOp2 Λ).mulVec
+          (basisVec σ)) =
+      (Fintype.card Λ : ℂ) / 2 := by
+  have hDecomp : totalSpinHalfOp1 Λ * totalSpinHalfOp1 Λ +
+        totalSpinHalfOp2 Λ * totalSpinHalfOp2 Λ =
+      totalSpinHalfSquared Λ -
+        totalSpinHalfOp3 Λ * totalSpinHalfOp3 Λ := by
+    unfold totalSpinHalfSquared; abel
+  rw [hDecomp, Matrix.sub_mulVec, dotProduct_sub,
+    basisVec_totalSpinHalfSquared_expectation_general,
+    basisVec_totalSpinHalfOp3_sq_expectation]
+  ring
+
 end LatticeSystem.Quantum
