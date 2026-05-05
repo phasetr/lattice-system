@@ -1841,6 +1841,7 @@ theorem heisenbergToyHamiltonian_variational_gap (A : Λ → Bool) :
     neelStateOf_heisenbergToyHamiltonian_expectation]
   ring
 
+omit [Fintype Λ] [DecidableEq Λ] in
 /-- Configuration-level distinctness for spin-`1/2`: `neelConfigOf A ≠
 fun _ => 0` when `|¬A| > 0`. Spin-`1/2` mirror of γ-4 step 144. -/
 theorem neelConfigOf_ne_allUp
@@ -1853,6 +1854,7 @@ theorem neelConfigOf_ne_allUp
   rw [if_neg (by rw [hx]; decide : ¬ A x = true)] at h
   exact (by decide : (1 : Fin 2) ≠ 0) h
 
+omit [Fintype Λ] [DecidableEq Λ] in
 /-- Configuration-level distinctness for spin-`1/2`: `neelConfigOf A ≠
 fun _ => 1` when `|A| > 0`. Spin-`1/2` mirror of γ-4 step 152. -/
 theorem neelConfigOf_ne_allDown
