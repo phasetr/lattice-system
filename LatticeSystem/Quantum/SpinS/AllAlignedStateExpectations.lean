@@ -66,7 +66,7 @@ theorem allAlignedStateS_zero_expectation_totalSpinSOp3 :
   rw [totalSpinSOp3_mulVec_allAlignedStateS, magEigenvalueS_allAlignedConfigS]
   rw [show ((0 : Fin (N + 1)).val : ℂ) = 0 from by simp]
   rw [dotProduct_smul_right, allAlignedStateS_inner_self]
-  push_cast; ring
+  ring
 
 /-- The all-down state has `Ŝ^z_{tot}` expectation value `-m_max`. -/
 theorem allAlignedStateS_last_expectation_totalSpinSOp3 :
@@ -76,7 +76,7 @@ theorem allAlignedStateS_last_expectation_totalSpinSOp3 :
   rw [totalSpinSOp3_mulVec_allAlignedStateS, magEigenvalueS_allAlignedConfigS]
   rw [show ((Fin.last N).val : ℂ) = (N : ℂ) from by simp [Fin.last]]
   rw [dotProduct_smul_right, allAlignedStateS_inner_self]
-  push_cast; ring
+  ring
 
 /-! ## `(Ŝ_{tot})²` expectation values (Casimir) -/
 
@@ -245,5 +245,17 @@ theorem basisVecS_dotProduct_basisVecS_of_ne {σ τ : V → Fin (N + 1)}
     rw [Pi.star_apply, basisVecS_self, star_one,
       basisVecS_of_ne hστ, mul_zero]
   · rw [Pi.star_apply, basisVecS_of_ne hφ, star_zero, zero_mul]
+
+/-- Combined δ-form for the basis dotProduct: 1 on the diagonal, 0
+off-diagonal (γ-4 step 211).
+
+`<basisVecS τ | basisVecS σ> = if τ = σ then 1 else 0`. -/
+theorem basisVecS_dotProduct_basisVecS (σ τ : V → Fin (N + 1)) :
+    dotProduct (star (basisVecS τ : (V → Fin (N + 1)) → ℂ))
+      (basisVecS σ) = if τ = σ then 1 else 0 := by
+  by_cases hτσ : τ = σ
+  · subst hτσ
+    rw [if_pos rfl, basisVecS_inner_self]
+  · rw [if_neg hτσ, basisVecS_dotProduct_basisVecS_of_ne hτσ]
 
 end LatticeSystem.Quantum
