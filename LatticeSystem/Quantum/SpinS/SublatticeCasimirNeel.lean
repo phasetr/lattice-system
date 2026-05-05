@@ -6,6 +6,7 @@ import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.SingleSiteCasimirExpectation
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
 import LatticeSystem.Quantum.SpinS.AllAlignedStateOrthogonal
+import LatticeSystem.Quantum.SpinS.SingleSiteTransverseMeanZero
 
 /-!
 # Spin-`S` Néel state and sublattice Casimir eigenvalues
@@ -2787,5 +2788,25 @@ theorem neelStateOfS_totalSpinSOp3_complement_eq_neg
   rw [basisVecS_expectation_totalSpinSOp3,
     basisVecS_expectation_totalSpinSOp3,
     magEigenvalueS_neelConfigOfS_complement_eq_neg]
+
+/-- **Spin-`S` `Ŝ_tot^(1)` zero expectation on Néel**:
+`<Φ_Néel | Ŝ_tot^(1) | Φ_Néel> = 0`. Direct corollary of γ-4 step 214
+applied to `σ = neelConfigOfS A N` (γ-4 step 241). -/
+theorem neelStateOfS_totalSpinSOp1_expectation
+    (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((totalSpinSOp1 Λ N).mulVec (neelStateOfS A N)) = 0 := by
+  unfold neelStateOfS
+  exact basisVecS_expectation_totalSpinSOp1 _
+
+/-- **Spin-`S` `Ŝ_tot^(2)` zero expectation on Néel**:
+`<Φ_Néel | Ŝ_tot^(2) | Φ_Néel> = 0`. Direct corollary of γ-4 step 214
+applied to `σ = neelConfigOfS A N` (γ-4 step 241). -/
+theorem neelStateOfS_totalSpinSOp2_expectation
+    (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((totalSpinSOp2 Λ N).mulVec (neelStateOfS A N)) = 0 := by
+  unfold neelStateOfS
+  exact basisVecS_expectation_totalSpinSOp2 _
 
 end LatticeSystem.Quantum
