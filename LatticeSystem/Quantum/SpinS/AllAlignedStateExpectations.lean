@@ -157,4 +157,21 @@ theorem allAlignedStateS_last_expectation_totalSpinSOp3_sq :
   rw [show ((Fin.last N).val : ℂ) = (N : ℂ) from by simp [Fin.last]]
   ring
 
+/-! ## `(Ŝ_{tot}^{(3)})²` expectation on arbitrary `basisVecS σ` (γ-4 step 205) -/
+
+/-- `(Ŝ_tot^{(3)})²` expectation on `basisVecS σ` equals
+`(magEigenvalueS σ)²` for any `σ : V → Fin (N + 1)`. Direct from
+`totalSpinSOp3_mulVec_basisVecS` (eigenvector identity at eigenvalue
+`magEigenvalueS σ`) applied twice via `Matrix.mulVec_mulVec`
+(γ-4 step 205). The all-aligned case (γ-4 step 202) is the
+specialisation `σ = allAlignedConfigS V N c`. -/
+theorem basisVecS_expectation_totalSpinSOp3_sq (σ : V → Fin (N + 1)) :
+    dotProduct (star (basisVecS σ : (V → Fin (N + 1)) → ℂ))
+        ((totalSpinSOp3 V N * totalSpinSOp3 V N).mulVec (basisVecS σ)) =
+      (magEigenvalueS σ) ^ 2 := by
+  rw [← Matrix.mulVec_mulVec, totalSpinSOp3_mulVec_basisVecS,
+    Matrix.mulVec_smul, totalSpinSOp3_mulVec_basisVecS, smul_smul]
+  rw [dotProduct_smul_right, basisVecS_inner_self, mul_one]
+  ring_nf
+
 end LatticeSystem.Quantum
