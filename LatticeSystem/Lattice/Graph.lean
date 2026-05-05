@@ -90,6 +90,42 @@ theorem couplingOf_real (G : SimpleGraph Λ) [DecidableRel G.Adj]
   · rw [if_pos h, hJ]
   · rw [if_neg h, star_zero]
 
+/-- **Total ordered-pair sum** of `couplingOf G J` over `Λ × Λ`:
+`Σ_{x, y} couplingOf G J x y = J · 2 · #G.edgeFinset`.
+
+Each unordered edge `{u, v}` is counted twice (as `(u, v)` and `(v, u)`)
+with weight `J`, giving `2·#G.edgeFinset` ordered adjacent pairs. The
+factor `2` is exactly what `SimpleGraph.sum_degrees_eq_twice_card_edges`
+provides via the inner-sum-over-`y` reduction to the vertex degree. -/
+theorem couplingOf_sum [Fintype Λ] (G : SimpleGraph Λ)
+    [DecidableRel G.Adj] (J : ℂ) :
+    ∑ x : Λ, ∑ y : Λ, couplingOf G J x y =
+      J * (2 * (G.edgeFinset.card : ℂ)) := by
+  classical
+  unfold couplingOf
+  have h_inner : ∀ x : Λ,
+      (∑ y : Λ, if G.Adj x y then J else (0 : ℂ)) =
+        J * (G.degree x : ℂ) := by
+    intro x
+    rw [show (∑ y : Λ, if G.Adj x y then J else (0 : ℂ)) =
+          ∑ y : Λ, J * (if G.Adj x y then (1 : ℂ) else 0) from by
+      refine Finset.sum_congr rfl fun y _ => ?_
+      by_cases h : G.Adj x y
+      · rw [if_pos h, if_pos h, mul_one]
+      · rw [if_neg h, if_neg h, mul_zero]]
+    rw [← Finset.mul_sum]
+    congr 1
+    rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul, mul_one]
+    congr 1
+    rw [SimpleGraph.degree, ← SimpleGraph.neighborFinset_eq_filter]
+  simp_rw [h_inner]
+  rw [← Finset.mul_sum]
+  rw [show (∑ x : Λ, (G.degree x : ℂ)) =
+        ((∑ x : Λ, G.degree x : ℕ) : ℂ) from by push_cast; rfl]
+  rw [G.sum_degrees_eq_twice_card_edges]
+  push_cast
+  ring
+
 /-! ## Standard one-dimensional chains as path / cycle graphs
 
 The finite open / periodic chains used throughout the codebase are
