@@ -859,9 +859,9 @@ theorem neelStateOfS_span_le_magSubspaceS (A : Λ → Bool) (N : ℕ) :
 /-- **Spin-S complement magnetization subspace non-triviality**: the
 opposite-sign sector `(|¬A|-|A|)·N/2` is also non-trivial, witnessed by
 the non-zero complement Néel state `Φ_Néel(¬A)`. Combined with γ-4 step
-177, when both sublattices are non-empty (so `M_neel ≠ 0`) the original
-and complement Néel states certify two distinct non-trivial sectors
-(γ-4 step 178). -/
+177, when `0 < N` and `|A| ≠ |¬A|` (so the original `M_neel` and its
+negation are distinct), the original and complement Néel states certify
+two distinct non-trivial sectors (γ-4 step 178). -/
 theorem magSubspaceS_complement_nontrivial_via_neel (A : Λ → Bool) (N : ℕ) :
     magSubspaceS Λ N
         (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
