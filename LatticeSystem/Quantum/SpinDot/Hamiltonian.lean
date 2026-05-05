@@ -294,6 +294,27 @@ theorem basisVec_totalSpinHalfOp3_variance_eq_zero (σ : Λ → Fin 2) :
     basisVec_totalSpinHalfOp3_expectation]
   ring
 
+/-- **Off-diagonal `Ŝ_tot^(3)` matrix elements vanish** (spin-`1/2`):
+for distinct basis configurations `σ ≠ τ`,
+`<basisVec τ | Ŝ_tot^(3) | basisVec σ> = 0`. Witnesses that
+`Ŝ_tot^(3)` is diagonal in the computational basis (γ-4 step 209). -/
+theorem basisVec_off_diagonal_totalSpinHalfOp3 {σ τ : Λ → Fin 2}
+    (hστ : τ ≠ σ) :
+    dotProduct (star (basisVec τ))
+        ((totalSpinHalfOp3 Λ).mulVec (basisVec σ)) = 0 := by
+  have h0 : dotProduct (star (basisVec τ))
+      (basisVec σ : (Λ → Fin 2) → ℂ) = 0 := by
+    unfold dotProduct
+    apply Finset.sum_eq_zero
+    intros φ _
+    by_cases hφ : φ = τ
+    · subst hφ
+      rw [Pi.star_apply, basisVec_self, star_one,
+        basisVec_of_ne hστ, mul_zero]
+    · rw [Pi.star_apply, basisVec_of_ne hφ, star_zero, zero_mul]
+  rw [totalSpinHalfOp3_mulVec_basisVec_eq_magnetization, dotProduct_smul,
+    smul_eq_mul, h0, mul_zero]
+
 /-! ## Casimir invariance under Ŝ_tot^± on constant configs (Tasaki §2.4)
 
 `(Ŝ_tot)²` commutes with both `Ŝ_tot^+` and `Ŝ_tot^-`
