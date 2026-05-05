@@ -733,6 +733,18 @@ theorem neelStateOf_inner_self (A : Λ → Bool) :
   · intro h
     exact (h (Finset.mem_univ _)).elim
 
+/-- **State-level distinctness** of `Φ_Néel(A)` and `Φ_Néel(¬A)` (spin-`1/2`):
+when `Λ` is non-empty, the two Néel states are distinct. Spin-`1/2`
+mirror of γ-4 step 179: equality would force inner-self to vanish. -/
+theorem neelStateOf_ne_complement
+    [Nonempty Λ] (A : Λ → Bool) :
+    neelStateOf A ≠ neelStateOf (fun x : Λ => ! A x) := by
+  intro h
+  have horth := neelStateOf_complement_orthogonal A
+  rw [h] at horth
+  rw [neelStateOf_inner_self] at horth
+  exact one_ne_zero horth
+
 /-- **Néel-complement linear independence** (spin-`1/2`):
 `c1 • Φ_Néel(A) + c2 • Φ_Néel(¬A) = 0 → c1 = c2 = 0` when `Λ` is non-empty.
 Spin-`1/2` mirror of γ-4 step 172. -/
