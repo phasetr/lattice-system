@@ -280,6 +280,20 @@ theorem basisVec_totalSpinHalfOp3_expectation (σ : Λ → Fin 2) :
   · intro hempty
     exact (hempty (Finset.mem_univ _)).elim
 
+/-- **`Ŝ_tot^(3)` zero-variance on `basisVec σ`** (spin-`1/2`):
+`basisVec σ` is a sharp `Ŝ_tot^(3)`-eigenstate (zero variance):
+`<(Ŝ_tot^(3))²> - <Ŝ_tot^(3)>² = 0` for any `σ : Λ → Fin 2`.
+Direct corollary of γ-4 step 204 (squared, `M(σ)²/4`) and γ-4 step 207
+(linear, `M(σ)/2`) (γ-4 step 208). -/
+theorem basisVec_totalSpinHalfOp3_variance_eq_zero (σ : Λ → Fin 2) :
+    dotProduct (star (basisVec σ))
+        ((totalSpinHalfOp3 Λ * totalSpinHalfOp3 Λ).mulVec (basisVec σ)) -
+      (dotProduct (star (basisVec σ))
+        ((totalSpinHalfOp3 Λ).mulVec (basisVec σ))) ^ 2 = 0 := by
+  rw [basisVec_totalSpinHalfOp3_sq_expectation,
+    basisVec_totalSpinHalfOp3_expectation]
+  ring
+
 /-! ## Casimir invariance under Ŝ_tot^± on constant configs (Tasaki §2.4)
 
 `(Ŝ_tot)²` commutes with both `Ŝ_tot^+` and `Ŝ_tot^-`
