@@ -2421,4 +2421,22 @@ theorem neelStateOf_totalSpinHalfOp3_complement_eq_neg
   push_cast
   ring
 
+/-- **Spin-`1/2` `Ŝ_tot^(1)` zero expectation on Néel**:
+`<Φ_Néel | Ŝ_tot^(1) | Φ_Néel> = 0`. Direct corollary of γ-4 step 215
+applied to `σ = neelConfigOf A` (γ-4 step 242). -/
+theorem neelStateOf_totalSpinHalfOp1_expectation (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        ((totalSpinHalfOp1 Λ).mulVec (neelStateOf A)) = 0 := by
+  unfold neelStateOf
+  exact basisVec_expectation_totalSpinHalfOp1 _
+
+/-- **Spin-`1/2` `Ŝ_tot^(2)` zero expectation on Néel**:
+`<Φ_Néel | Ŝ_tot^(2) | Φ_Néel> = 0`. Direct corollary of γ-4 step 215
+applied to `σ = neelConfigOf A` (γ-4 step 242). -/
+theorem neelStateOf_totalSpinHalfOp2_expectation (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        ((totalSpinHalfOp2 Λ).mulVec (neelStateOf A)) = 0 := by
+  unfold neelStateOf
+  exact basisVec_expectation_totalSpinHalfOp2 _
+
 end LatticeSystem.Quantum
