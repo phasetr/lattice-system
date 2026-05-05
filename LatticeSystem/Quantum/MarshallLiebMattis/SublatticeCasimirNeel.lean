@@ -1105,6 +1105,62 @@ theorem neelStateOf_complement_allDown_orthogonal
     exact ⟨x, by simp [hx]⟩
   exact neelStateOf_allDown_orthogonal (fun x : Λ => ! A x) hA'
 
+/-- **Reverse direction** (spin-`1/2`): `<Φ_Néel(A) | basisVec(const 0)> = 0`
+when `|¬A| > 0`. Spin-`1/2` mirror of γ-4 step 196. -/
+theorem allUp_neelStateOf_orthogonal
+    (A : Λ → Bool) (hAc : ∃ x : Λ, A x = false) :
+    dotProduct (star (neelStateOf A))
+        (basisVec (fun _ : Λ => (0 : Fin 2))) = 0 := by
+  have := neelStateOf_allUp_orthogonal A hAc
+  rw [show dotProduct (star (basisVec (fun _ : Λ => (0 : Fin 2))))
+          (neelStateOf A) =
+        star (dotProduct (star (neelStateOf A))
+          (basisVec (fun _ : Λ => (0 : Fin 2)))) from by
+      rw [← Matrix.star_dotProduct]] at this
+  exact star_eq_zero.mp this
+
+/-- **Reverse direction** (spin-`1/2`): `<Φ_Néel(A) | basisVec(const 1)> = 0`
+when `|A| > 0`. Spin-`1/2` mirror of γ-4 step 196. -/
+theorem allDown_neelStateOf_orthogonal
+    (A : Λ → Bool) (hA : ∃ x : Λ, A x = true) :
+    dotProduct (star (neelStateOf A))
+        (basisVec (fun _ : Λ => (1 : Fin 2))) = 0 := by
+  have := neelStateOf_allDown_orthogonal A hA
+  rw [show dotProduct (star (basisVec (fun _ : Λ => (1 : Fin 2))))
+          (neelStateOf A) =
+        star (dotProduct (star (neelStateOf A))
+          (basisVec (fun _ : Λ => (1 : Fin 2)))) from by
+      rw [← Matrix.star_dotProduct]] at this
+  exact star_eq_zero.mp this
+
+/-- **Reverse direction** (spin-`1/2`): `<Φ_Néel(¬A) | basisVec(const 0)> = 0`
+when `|A| > 0`. Spin-`1/2` mirror of γ-4 step 196. -/
+theorem allUp_neelStateOf_complement_orthogonal
+    (A : Λ → Bool) (hA : ∃ x : Λ, A x = true) :
+    dotProduct (star (neelStateOf (fun x : Λ => ! A x)))
+        (basisVec (fun _ : Λ => (0 : Fin 2))) = 0 := by
+  have := neelStateOf_complement_allUp_orthogonal A hA
+  rw [show dotProduct (star (basisVec (fun _ : Λ => (0 : Fin 2))))
+          (neelStateOf (fun x : Λ => ! A x)) =
+        star (dotProduct (star (neelStateOf (fun x : Λ => ! A x)))
+          (basisVec (fun _ : Λ => (0 : Fin 2)))) from by
+      rw [← Matrix.star_dotProduct]] at this
+  exact star_eq_zero.mp this
+
+/-- **Reverse direction** (spin-`1/2`): `<Φ_Néel(¬A) | basisVec(const 1)> = 0`
+when `|¬A| > 0`. Spin-`1/2` mirror of γ-4 step 196. -/
+theorem allDown_neelStateOf_complement_orthogonal
+    (A : Λ → Bool) (hAc : ∃ x : Λ, A x = false) :
+    dotProduct (star (neelStateOf (fun x : Λ => ! A x)))
+        (basisVec (fun _ : Λ => (1 : Fin 2))) = 0 := by
+  have := neelStateOf_complement_allDown_orthogonal A hAc
+  rw [show dotProduct (star (basisVec (fun _ : Λ => (1 : Fin 2))))
+          (neelStateOf (fun x : Λ => ! A x)) =
+        star (dotProduct (star (neelStateOf (fun x : Λ => ! A x)))
+          (basisVec (fun _ : Λ => (1 : Fin 2)))) from by
+      rw [← Matrix.star_dotProduct]] at this
+  exact star_eq_zero.mp this
+
 /-- All-up vs all-down basis vectors are orthogonal: `<basisVec(const 0) |
 basisVec(const 1)> = 0` when `Λ` is non-empty. Distinct constant
 configurations on `Fin 2`. -/
