@@ -1303,6 +1303,47 @@ theorem neelStateOfS_totalSpinSSquared_expectation_re_gt_OpZ_sq
   rw [Matrix.add_mulVec, dotProduct_add, Complex.add_re]
   linarith
 
+/-- **Cross-only specialization** of the synthesis (γ-4 step 160): when
+the coupling `J` vanishes on intra-sublattice pairs (`A x = A y →
+J x y = 0`), the Heisenberg Néel diagonal collapses to a single closed
+form, since the same-sublattice and self contributions are killed:
+
+  `<Φ_Néel | H_J | Φ_Néel> = -(N²/4) · Σ_{x, y} J(x, y)`.
+
+Applies to `bipartiteCoupling` via `bipartiteCoupling_eq_zero_of_same_sublattice`. -/
+theorem heisenbergHamiltonianS_apply_diag_neel_of_cross_only
+    (J : Λ → Λ → ℂ) (A : Λ → Bool) (N : ℕ)
+    (hJ : ∀ x y, A x = A y → J x y = 0) :
+    (heisenbergHamiltonianS J N) (neelConfigOfS A N) (neelConfigOfS A N) =
+      -((N : ℂ) * (N : ℂ) / 4) * (∑ x : Λ, ∑ y : Λ, J x y) := by
+  rw [heisenbergHamiltonianS_apply_diag_neel]
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl fun y _ => ?_
+  by_cases hxy : x = y
+  · subst hxy
+    rw [if_pos rfl, hJ x x rfl]; ring
+  · rw [if_neg hxy]
+    by_cases hAxy : A x = A y
+    · rw [if_pos hAxy, hJ x y hAxy]; ring
+    · rw [if_neg hAxy]; ring
+
+/-- State-level cross-only specialization (spin-S): for a coupling
+vanishing on intra-sublattice pairs,
+`<Φ_Néel | H_J | Φ_Néel> = -(N²/4) · Σ J(x,y)`. Lifts
+`heisenbergHamiltonianS_apply_diag_neel_of_cross_only` via
+`basisVecS_expectation_eq_diagonal`. -/
+theorem neelStateOfS_heisenbergHamiltonianS_expectation_of_cross_only
+    (J : Λ → Λ → ℂ) (A : Λ → Bool) (N : ℕ)
+    (hJ : ∀ x y, A x = A y → J x y = 0) :
+    dotProduct (star (neelStateOfS A N))
+        ((heisenbergHamiltonianS J N).mulVec (neelStateOfS A N)) =
+      -((N : ℂ) * (N : ℂ) / 4) * (∑ x : Λ, ∑ y : Λ, J x y) := by
+  unfold neelStateOfS
+  rw [basisVecS_expectation_eq_diagonal]
+  exact heisenbergHamiltonianS_apply_diag_neel_of_cross_only J A N hJ
+
 /-- **Real-valued positivity** of the toy Hamiltonian variational gap:
 `0 < Re (<Φ_⊤|Ĥ_toy|Φ_⊤> - <Φ_Néel|Ĥ_toy|Φ_Néel>) = |A|·|¬A|·N²` when
 both sublattices are non-empty and `N ≥ 1`. The all-up state has strictly
