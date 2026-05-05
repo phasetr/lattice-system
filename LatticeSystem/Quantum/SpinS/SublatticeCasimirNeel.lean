@@ -1303,4 +1303,35 @@ theorem neelStateOfS_totalSpinSSquared_expectation_re_gt_OpZ_sq
   rw [Matrix.add_mulVec, dotProduct_add, Complex.add_re]
   linarith
 
+/-- **Real-valued positivity** of the toy Hamiltonian variational gap:
+`0 < Re (<Φ_⊤|Ĥ_toy|Φ_⊤> - <Φ_Néel|Ĥ_toy|Φ_Néel>) = |A|·|¬A|·N²` when
+both sublattices are non-empty and `N ≥ 1`. The all-up state has strictly
+higher toy-Hamiltonian expectation than the Néel state, witnessing the
+variational separation that underpins Tasaki §2.5 Theorem 2.3. -/
+theorem heisenbergToyHamiltonianS_variational_gap_re_pos
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ)
+    (hA : 0 < (Finset.univ.filter (fun x : Λ => A x = true)).card)
+    (hAc : 0 < (Finset.univ.filter (fun x : Λ => (! A x) = true)).card)
+    (hN : 0 < N) :
+    0 < (dotProduct (star (allAlignedStateS Λ N (0 : Fin (N + 1))))
+        ((heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec
+          (allAlignedStateS Λ N (0 : Fin (N + 1)))) -
+      dotProduct (star (neelStateOfS A N))
+        ((heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec (neelStateOfS A N))).re := by
+  rw [heisenbergToyHamiltonianS_variational_gap]
+  have hreal :
+      ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) * (N : ℂ)) =
+        (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℝ) *
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℝ) *
+          ((N : ℝ) * (N : ℝ)) : ℝ) := by
+    push_cast; ring
+  rw [hreal, Complex.ofReal_re]
+  refine mul_pos (mul_pos ?_ ?_) (mul_pos ?_ ?_)
+  · exact_mod_cast hA
+  · exact_mod_cast hAc
+  · exact_mod_cast hN
+  · exact_mod_cast hN
+
 end LatticeSystem.Quantum

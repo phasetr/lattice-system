@@ -1237,4 +1237,29 @@ theorem neelStateOf_totalSpinHalfSquared_expectation_re_gt_OpZ_sq
   rw [Matrix.add_mulVec, dotProduct_add, Complex.add_re]
   linarith
 
+/-- **Real-valued positivity** of the spin-`1/2` toy Hamiltonian
+variational gap: `0 < Re (<basisVec 0|Ĥ_toy|basisVec 0> -
+<Φ_Néel|Ĥ_toy|Φ_Néel>) = |A|·|¬A|` when both sublattices are non-empty.
+Spin-`1/2` mirror of γ-4 step 163. -/
+theorem heisenbergToyHamiltonian_variational_gap_re_pos
+    (A : Λ → Bool)
+    (hA : 0 < (Finset.univ.filter (fun x : Λ => A x = true)).card)
+    (hAc : 0 < (Finset.univ.filter (fun x : Λ => (! A x) = true)).card) :
+    0 < (dotProduct (star (basisVec (fun _ : Λ => (0 : Fin 2))))
+        ((heisenbergToyHamiltonian A : ManyBodyOp Λ).mulVec
+          (basisVec (fun _ : Λ => (0 : Fin 2)))) -
+      dotProduct (star (neelStateOf A))
+        ((heisenbergToyHamiltonian A : ManyBodyOp Λ).mulVec (neelStateOf A))).re := by
+  rw [heisenbergToyHamiltonian_variational_gap]
+  have hreal :
+      ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) =
+        (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℝ) *
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℝ) : ℝ) := by
+    push_cast; ring
+  rw [hreal, Complex.ofReal_re]
+  refine mul_pos ?_ ?_
+  · exact_mod_cast hA
+  · exact_mod_cast hAc
+
 end LatticeSystem.Quantum
