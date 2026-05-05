@@ -2702,4 +2702,27 @@ theorem magEigenvalueS_neelConfigOfS_complement_eq_neg
     magEigenvalueS_neelConfigOfS]
   ring
 
+/-- **Spin-`S` Casimir is sublattice-swap invariant on Néel states**:
+`<Φ_Néel(¬A) | (Ŝ_tot)² | Φ_Néel(¬A)> = <Φ_Néel(A) | (Ŝ_tot)² | Φ_Néel(A)>`.
+
+Direct corollary of γ-4 step 218 (Casimir general formula) +
+γ-4 step 221 (`Σ_x m_x² = |V|·(N/2)²` valid for both A and ¬A) +
+γ-4 step 231 (`magEigenvalueS (¬A) = −magEigenvalueS A`): the
+`magEigenvalueS²` piece is sign-flip invariant, the rest is
+A-independent. Spin-`S` mirror of γ-4 step 233 (γ-4 step 234). -/
+theorem neelStateOfS_totalSpinSSquared_complement_eq
+    (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+        ((totalSpinSSquared Λ N).mulVec
+          (neelStateOfS (fun x : Λ => ! A x) N)) =
+      dotProduct (star (neelStateOfS A N))
+        ((totalSpinSSquared Λ N).mulVec (neelStateOfS A N)) := by
+  unfold neelStateOfS
+  rw [basisVecS_totalSpinSSquared_expectation_general,
+    basisVecS_totalSpinSSquared_expectation_general,
+    neelConfigOfS_z_eigenvalue_sq_sum,
+    neelConfigOfS_z_eigenvalue_sq_sum,
+    magEigenvalueS_neelConfigOfS_complement_eq_neg]
+  ring
+
 end LatticeSystem.Quantum
