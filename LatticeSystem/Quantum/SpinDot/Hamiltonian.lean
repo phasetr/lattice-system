@@ -315,6 +315,20 @@ theorem basisVec_off_diagonal_totalSpinHalfOp3 {σ τ : Λ → Fin 2}
   rw [totalSpinHalfOp3_mulVec_basisVec_eq_magnetization, dotProduct_smul,
     smul_eq_mul, h0, mul_zero]
 
+/-- **Spin-`1/2` basis states are pairwise orthogonal**: for `τ ≠ σ`,
+`<basisVec τ | basisVec σ> = 0` (γ-4 step 210). -/
+theorem basisVec_dotProduct_basisVec_of_ne {σ τ : Λ → Fin 2}
+    (hστ : τ ≠ σ) :
+    dotProduct (star (basisVec τ)) (basisVec σ : (Λ → Fin 2) → ℂ) = 0 := by
+  unfold dotProduct
+  apply Finset.sum_eq_zero
+  intros φ _
+  by_cases hφ : φ = τ
+  · subst hφ
+    rw [Pi.star_apply, basisVec_self, star_one,
+      basisVec_of_ne hστ, mul_zero]
+  · rw [Pi.star_apply, basisVec_of_ne hφ, star_zero, zero_mul]
+
 /-! ## Casimir invariance under Ŝ_tot^± on constant configs (Tasaki §2.4)
 
 `(Ŝ_tot)²` commutes with both `Ŝ_tot^+` and `Ŝ_tot^-`
