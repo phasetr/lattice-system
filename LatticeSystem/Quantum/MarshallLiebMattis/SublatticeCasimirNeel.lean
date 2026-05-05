@@ -2342,4 +2342,24 @@ theorem magnetization_neelConfigOf_complement_eq_neg (A : Λ → Bool) :
   rw [magnetization_neelConfigOf_complement, magnetization_neelConfigOf]
   ring
 
+/-- **Spin-`1/2` Casimir is sublattice-swap invariant on Néel states**:
+`<Φ_Néel(¬A) | (Ŝ_tot)² | Φ_Néel(¬A)> = <Φ_Néel(A) | (Ŝ_tot)² | Φ_Néel(A)>`.
+
+Direct corollary of γ-4 step 227 (Casimir = `(M/2)² + |Λ|/2`) +
+γ-4 step 232 (`M(¬A) = −M(A)`): the `M(σ)²` is invariant under
+sign-flip, and `|Λ|/2` is `σ`-independent (γ-4 step 233). -/
+theorem neelStateOf_totalSpinHalfSquared_complement_eq
+    (A : Λ → Bool) :
+    dotProduct (star (neelStateOf (fun x : Λ => ! A x)))
+        ((totalSpinHalfSquared Λ).mulVec
+          (neelStateOf (fun x : Λ => ! A x))) =
+      dotProduct (star (neelStateOf A))
+        ((totalSpinHalfSquared Λ).mulVec (neelStateOf A)) := by
+  unfold neelStateOf
+  rw [basisVec_totalSpinHalfSquared_expectation_general,
+    basisVec_totalSpinHalfSquared_expectation_general,
+    magnetization_neelConfigOf_complement_eq_neg]
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
