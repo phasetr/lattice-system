@@ -1117,4 +1117,17 @@ theorem neelStateOf_expectation_spinHalfDot_of_same
   rw [basisVec_expectation_eq_diagonal]
   exact spinHalfDot_apply_diag_neelConfigOf_of_same A hxy h
 
+/-- `<Φ_Néel | Ŝ_x · Ŝ_x | Φ_Néel> = 3/4 = S(S+1)` for `S = 1/2`. Spin-`1/2`
+mirror of γ-4 step 159: the same-site (diagonal) per-pair correlation
+equals the universal local Casimir eigenvalue, here `1/2 · 3/2 = 3/4`.
+Direct from `spinHalfDot_self` (which states `Ŝ_x · Ŝ_x = (3/4) · 1`)
+combined with `neelStateOf_inner_self` (norm² = 1). -/
+theorem neelStateOf_expectation_spinHalfDot_self
+    (A : Λ → Bool) (x : Λ) :
+    dotProduct (star (neelStateOf A))
+        ((spinHalfDot x x : ManyBodyOp Λ).mulVec (neelStateOf A)) =
+      (3 / 4 : ℂ) := by
+  rw [spinHalfDot_self, Matrix.smul_mulVec, Matrix.one_mulVec]
+  rw [dotProduct_smul, smul_eq_mul, neelStateOf_inner_self, mul_one]
+
 end LatticeSystem.Quantum
