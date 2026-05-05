@@ -1028,6 +1028,116 @@ theorem neelStateOf_allDown_orthogonal
   · rw [basisVec_of_ne hτ]
     simp
 
+/-- All-up vs all-down basis vectors are orthogonal: `<basisVec(const 0) |
+basisVec(const 1)> = 0` when `Λ` is non-empty. Distinct constant
+configurations on `Fin 2`. -/
+theorem basisVec_const_zero_const_one_orthogonal [Nonempty Λ] :
+    dotProduct (star (basisVec (fun _ : Λ => (0 : Fin 2))))
+        (basisVec (fun _ : Λ => (1 : Fin 2))) = 0 := by
+  unfold dotProduct
+  obtain ⟨x⟩ := ‹Nonempty Λ›
+  have hne : (fun _ : Λ => (0 : Fin 2)) ≠ (fun _ : Λ => (1 : Fin 2)) := by
+    intro h
+    have := congrFun h x
+    exact (by decide : (0 : Fin 2) ≠ 1) this
+  rw [Finset.sum_eq_zero]
+  intro τ _
+  by_cases hτ : τ = (fun _ : Λ => (0 : Fin 2))
+  · rw [hτ]
+    simp [Pi.star_apply, basisVec_self, basisVec_of_ne hne]
+  · simp [Pi.star_apply, basisVec_of_ne hτ]
+
+/-- All-up basis vector has norm-squared 1. -/
+theorem basisVec_const_zero_inner_self [Nonempty Λ] :
+    dotProduct (star (basisVec (fun _ : Λ => (0 : Fin 2))))
+        (basisVec (fun _ : Λ => (0 : Fin 2))) = 1 := by
+  unfold dotProduct
+  rw [Finset.sum_eq_single (fun _ : Λ => (0 : Fin 2))]
+  · simp [Pi.star_apply, basisVec_self]
+  · intros τ _ hτ
+    simp [Pi.star_apply, basisVec_of_ne hτ]
+  · intro h
+    exact (h (Finset.mem_univ _)).elim
+
+/-- All-down basis vector has norm-squared 1. -/
+theorem basisVec_const_one_inner_self [Nonempty Λ] :
+    dotProduct (star (basisVec (fun _ : Λ => (1 : Fin 2))))
+        (basisVec (fun _ : Λ => (1 : Fin 2))) = 1 := by
+  unfold dotProduct
+  rw [Finset.sum_eq_single (fun _ : Λ => (1 : Fin 2))]
+  · simp [Pi.star_apply, basisVec_self]
+  · intros τ _ hτ
+    simp [Pi.star_apply, basisVec_of_ne hτ]
+  · intro h
+    exact (h (Finset.mem_univ _)).elim
+
+/-- **Triple linear independence** of {`basisVec(const 0)`, `basisVec(const 1)`,
+`Φ_Néel(A)`} (spin-`1/2`): when `Λ` is non-empty and both sublattices are
+non-empty, any zero linear combination has all coefficients zero.
+Spin-`1/2` mirror of γ-4 step 174. -/
+theorem neelStateOf_basisVec_triple_independent
+    [Nonempty Λ] (A : Λ → Bool)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false)
+    {c1 c2 c3 : ℂ}
+    (h : c1 • basisVec (fun _ : Λ => (0 : Fin 2)) +
+         c2 • basisVec (fun _ : Λ => (1 : Fin 2)) +
+         c3 • neelStateOf A = 0) :
+    c1 = 0 ∧ c2 = 0 ∧ c3 = 0 := by
+  have h_top_top := basisVec_const_zero_inner_self (Λ := Λ)
+  have h_bot_bot := basisVec_const_one_inner_self (Λ := Λ)
+  have h_neel_neel := neelStateOf_inner_self A
+  have h_top_bot := basisVec_const_zero_const_one_orthogonal (Λ := Λ)
+  have h_bot_top : dotProduct (star (basisVec (fun _ : Λ => (1 : Fin 2))))
+      (basisVec (fun _ : Λ => (0 : Fin 2))) = 0 := by
+    have := h_top_bot
+    rw [show dotProduct (star (basisVec (fun _ : Λ => (0 : Fin 2))))
+            (basisVec (fun _ : Λ => (1 : Fin 2))) =
+          star (dotProduct (star (basisVec (fun _ : Λ => (1 : Fin 2))))
+            (basisVec (fun _ : Λ => (0 : Fin 2)))) from by
+        rw [← Matrix.star_dotProduct]] at this
+    exact star_eq_zero.mp this
+  have h_top_neel := neelStateOf_allUp_orthogonal A hAc
+  have h_bot_neel := neelStateOf_allDown_orthogonal A hA
+  have h_neel_top : dotProduct (star (neelStateOf A))
+      (basisVec (fun _ : Λ => (0 : Fin 2))) = 0 := by
+    have := h_top_neel
+    rw [show dotProduct (star (basisVec (fun _ : Λ => (0 : Fin 2))))
+            (neelStateOf A) =
+          star (dotProduct (star (neelStateOf A))
+            (basisVec (fun _ : Λ => (0 : Fin 2)))) from by
+        rw [← Matrix.star_dotProduct]] at this
+    exact star_eq_zero.mp this
+  have h_neel_bot : dotProduct (star (neelStateOf A))
+      (basisVec (fun _ : Λ => (1 : Fin 2))) = 0 := by
+    have := h_bot_neel
+    rw [show dotProduct (star (basisVec (fun _ : Λ => (1 : Fin 2))))
+            (neelStateOf A) =
+          star (dotProduct (star (neelStateOf A))
+            (basisVec (fun _ : Λ => (1 : Fin 2)))) from by
+        rw [← Matrix.star_dotProduct]] at this
+    exact star_eq_zero.mp this
+  have hc1 : c1 = 0 := by
+    have := congrArg
+      (dotProduct (star (basisVec (fun _ : Λ => (0 : Fin 2))))) h
+    rw [dotProduct_add, dotProduct_add, dotProduct_smul, dotProduct_smul,
+        dotProduct_smul, h_top_top, h_top_bot, h_top_neel, dotProduct_zero] at this
+    simp at this
+    exact this
+  have hc2 : c2 = 0 := by
+    have := congrArg
+      (dotProduct (star (basisVec (fun _ : Λ => (1 : Fin 2))))) h
+    rw [dotProduct_add, dotProduct_add, dotProduct_smul, dotProduct_smul,
+        dotProduct_smul, h_bot_top, h_bot_bot, h_bot_neel, dotProduct_zero] at this
+    simp at this
+    exact this
+  have hc3 : c3 = 0 := by
+    have := congrArg (dotProduct (star (neelStateOf A))) h
+    rw [dotProduct_add, dotProduct_add, dotProduct_smul, dotProduct_smul,
+        dotProduct_smul, h_neel_top, h_neel_bot, h_neel_neel, dotProduct_zero] at this
+    simp at this
+    exact this
+  exact ⟨hc1, hc2, hc3⟩
+
 /-- The spin-`1/2` Néel state lies in the magnetization-`M` subspace
 where `M = (|A|-|¬A|)/2`. Direct from `totalSpinHalfOp3_mulVec_neelStateOf`. -/
 theorem neelStateOf_mem_magnetizationSubspace (A : Λ → Bool) :
