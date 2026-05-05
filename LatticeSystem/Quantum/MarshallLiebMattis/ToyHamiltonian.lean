@@ -95,6 +95,53 @@ theorem bipartiteCoupling_pos_of_diff_sublattice
   rw [if_pos h]
   simp
 
+/-- **Total ordered pair count** on a bipartite split:
+`Σ_{x, y} bipartiteCoupling A x y = 2 · |A| · |¬A|`.
+
+Each cross-sublattice ordered pair contributes `1`; same-sublattice pairs
+(including the diagonal `x = y`) contribute `0`. The factor `2` reflects
+that each unordered cross pair `{a, b}` is counted twice as `(a, b)` and
+`(b, a)`. -/
+theorem bipartiteCoupling_sum (A : Λ → Bool) :
+    ∑ x : Λ, ∑ y : Λ, bipartiteCoupling A x y =
+      2 * ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) := by
+  classical
+  unfold bipartiteCoupling
+  have h_inner : ∀ x : Λ,
+      (∑ y : Λ, (if A x ≠ A y then (1 : ℂ) else 0)) =
+      (if A x = true
+       then ((Finset.univ.filter (fun y : Λ => (! A y) = true)).card : ℂ)
+       else ((Finset.univ.filter (fun y : Λ => A y = true)).card : ℂ)) := by
+    intro x
+    by_cases hAx : A x = true
+    · rw [if_pos hAx]
+      have heq : ∀ y : Λ, A x ≠ A y ↔ (! A y) = true := by
+        intro y; rw [hAx]; cases A y <;> decide
+      simp_rw [heq]
+      rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul, mul_one]
+    · rw [if_neg hAx]
+      have hAxF : A x = false := by
+        cases h : A x with
+        | true => exact absurd h hAx
+        | false => rfl
+      have heq : ∀ y : Λ, A x ≠ A y ↔ A y = true := by
+        intro y; rw [hAxF]; cases A y <;> decide
+      simp_rw [heq]
+      rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul, mul_one]
+  simp_rw [h_inner]
+  rw [Finset.sum_ite, Finset.sum_const, Finset.sum_const,
+      nsmul_eq_mul, nsmul_eq_mul]
+  have h_filter_eq :
+      (Finset.univ.filter (fun x : Λ => ¬ (A x = true))).card =
+      (Finset.univ.filter (fun x : Λ => (! A x) = true)).card := by
+    congr 1
+    apply Finset.filter_congr
+    intros x _
+    cases A x <;> simp
+  rw [h_filter_eq]
+  ring
+
 /-! ## Toy Hamiltonian -/
 
 /-- The **MLM toy Hamiltonian** (Tasaki §2.5 eq. (2.5.10)

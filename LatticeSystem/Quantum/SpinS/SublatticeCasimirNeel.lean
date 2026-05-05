@@ -1344,6 +1344,27 @@ theorem neelStateOfS_heisenbergHamiltonianS_expectation_of_cross_only
   rw [basisVecS_expectation_eq_diagonal]
   exact heisenbergHamiltonianS_apply_diag_neel_of_cross_only J A N hJ
 
+/-- **Toy Hamiltonian Néel expectation via cross-only synthesis** (spin-S):
+`<Φ_Néel | Ĥ_toy_S A | Φ_Néel> = -(N²/4) · Σ bipartiteCoupling A x y =
+-|A|·|¬A|·N²/2`. Direct application of γ-4 step 164 to
+`heisenbergToyHamiltonianS = heisenbergHamiltonianS (bipartiteCoupling A)`,
+combined with `bipartiteCoupling_sum = 2·|A|·|¬A|`. Reproduces
+`neelStateOfS_heisenbergToyHamiltonianS_expectation` (γ-4 step 131) by an
+independent route through the per-pair correlation trio. -/
+theorem neelStateOfS_heisenbergToyHamiltonianS_expectation_via_cross_only
+    (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec (neelStateOfS A N)) =
+      -(((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) * (N : ℂ)) / 2) := by
+  unfold heisenbergToyHamiltonianS
+  rw [neelStateOfS_heisenbergHamiltonianS_expectation_of_cross_only
+        (bipartiteCoupling A) A N
+        (fun x y h => bipartiteCoupling_eq_zero_of_same_sublattice A h)]
+  rw [bipartiteCoupling_sum]
+  ring
+
 /-- **Real-valued positivity** of the toy Hamiltonian variational gap:
 `0 < Re (<Φ_⊤|Ĥ_toy|Φ_⊤> - <Φ_Néel|Ĥ_toy|Φ_Néel>) = |A|·|¬A|·N²` when
 both sublattices are non-empty and `N ≥ 1`. The all-up state has strictly
