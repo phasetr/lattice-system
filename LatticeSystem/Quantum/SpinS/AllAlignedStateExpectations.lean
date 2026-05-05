@@ -205,4 +205,26 @@ theorem basisVecS_totalSpinSOp3_variance_eq_zero (σ : V → Fin (N + 1)) :
     basisVecS_expectation_totalSpinSOp3]
   ring
 
+/-! ## Off-diagonal `Ŝ_tot^{(3)}` matrix elements (γ-4 step 209) -/
+
+/-- Off-diagonal `Ŝ_tot^{(3)}` matrix elements vanish: for distinct
+basis configurations `σ ≠ τ`,
+`<basisVecS τ | Ŝ_tot^{(3)} | basisVecS σ> = 0`. Witnesses that
+`Ŝ_tot^{(3)}` is diagonal in the computational basis (γ-4 step 209). -/
+theorem basisVecS_off_diagonal_totalSpinSOp3 {σ τ : V → Fin (N + 1)}
+    (hστ : τ ≠ σ) :
+    dotProduct (star (basisVecS τ : (V → Fin (N + 1)) → ℂ))
+        ((totalSpinSOp3 V N).mulVec (basisVecS σ)) = 0 := by
+  have h0 : dotProduct (star (basisVecS τ : (V → Fin (N + 1)) → ℂ))
+      (basisVecS σ) = 0 := by
+    unfold dotProduct
+    apply Finset.sum_eq_zero
+    intros φ _
+    by_cases hφ : φ = τ
+    · subst hφ
+      rw [Pi.star_apply, basisVecS_self, star_one,
+        basisVecS_of_ne hστ, mul_zero]
+    · rw [Pi.star_apply, basisVecS_of_ne hφ, star_zero, zero_mul]
+  rw [totalSpinSOp3_mulVec_basisVecS, dotProduct_smul_right, h0, mul_zero]
+
 end LatticeSystem.Quantum
