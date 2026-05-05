@@ -1237,6 +1237,38 @@ theorem neelStateOf_totalSpinHalfSquared_expectation_re_gt_OpZ_sq
   rw [Matrix.add_mulVec, dotProduct_add, Complex.add_re]
   linarith
 
+/-- **Cross-only specialization** (spin-`1/2` mirror of γ-4 step 164):
+when `J(x, y) = 0` whenever `A x = A y`, the Heisenberg Néel diagonal
+collapses to `-(1/4) · Σ J(x, y)`. -/
+theorem heisenbergHamiltonian_apply_diag_neel_of_cross_only
+    (J : Λ → Λ → ℂ) (A : Λ → Bool)
+    (hJ : ∀ x y, A x = A y → J x y = 0) :
+    (heisenbergHamiltonian J : ManyBodyOp Λ) (neelConfigOf A) (neelConfigOf A) =
+      -(1 / 4 : ℂ) * (∑ x : Λ, ∑ y : Λ, J x y) := by
+  rw [heisenbergHamiltonian_apply_diag_neel]
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl fun y _ => ?_
+  by_cases hxy : x = y
+  · subst hxy
+    rw [if_pos rfl, hJ x x rfl]; ring
+  · rw [if_neg hxy]
+    by_cases hAxy : A x = A y
+    · rw [if_pos hAxy, hJ x y hAxy]; ring
+    · rw [if_neg hAxy]; ring
+
+/-- State-level cross-only specialization (spin-`1/2` mirror of γ-4 step 164). -/
+theorem neelStateOf_heisenbergHamiltonian_expectation_of_cross_only
+    (J : Λ → Λ → ℂ) (A : Λ → Bool)
+    (hJ : ∀ x y, A x = A y → J x y = 0) :
+    dotProduct (star (neelStateOf A))
+        ((heisenbergHamiltonian J : ManyBodyOp Λ).mulVec (neelStateOf A)) =
+      -(1 / 4 : ℂ) * (∑ x : Λ, ∑ y : Λ, J x y) := by
+  unfold neelStateOf
+  rw [basisVec_expectation_eq_diagonal]
+  exact heisenbergHamiltonian_apply_diag_neel_of_cross_only J A hJ
+
 /-- **Real-valued positivity** of the spin-`1/2` toy Hamiltonian
 variational gap: `0 < Re (<basisVec 0|Ĥ_toy|basisVec 0> -
 <Φ_Néel|Ĥ_toy|Φ_Néel>) = |A|·|¬A|` when both sublattices are non-empty.
