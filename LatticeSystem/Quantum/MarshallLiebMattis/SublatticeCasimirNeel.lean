@@ -1273,6 +1273,29 @@ theorem neelStateOf_complement_finrank_span
   rw [finrank_span_eq_card (neelStateOf_complement_linearIndependent A)]
   rfl
 
+/-- **Set form** (spin-`1/2`): `finrank ℂ (span ℂ {Φ_Néel(A), Φ_Néel(¬A)}) = 2`.
+Spin-`1/2` mirror of γ-4 step 189. -/
+theorem neelStateOf_complement_finrank_span_set
+    [Nonempty Λ] (A : Λ → Bool) :
+    Module.finrank ℂ
+      (Submodule.span ℂ
+        ({neelStateOf A, neelStateOf (fun x : Λ => ! A x)} : Set _)) = 2 := by
+  have hrange :
+      Set.range ![neelStateOf A, neelStateOf (fun x : Λ => ! A x)] =
+      ({neelStateOf A, neelStateOf (fun x : Λ => ! A x)} : Set _) := by
+    ext v
+    simp only [Set.mem_range, Set.mem_insert_iff, Set.mem_singleton_iff]
+    constructor
+    · rintro ⟨i, hi⟩
+      fin_cases i
+      · exact Or.inl hi.symm
+      · exact Or.inr hi.symm
+    · rintro (rfl | rfl)
+      · exact ⟨0, rfl⟩
+      · exact ⟨1, rfl⟩
+  rw [← hrange]
+  exact neelStateOf_complement_finrank_span A
+
 /-- **Triple linear independence** (spin-`1/2`) of
 {`basisVec(const 0)`, `basisVec(const 1)`, `Φ_Néel(¬A)`}: spin-`1/2`
 mirror of γ-4 step 183, applies γ-4 step 175 with `A := ¬A`. -/
