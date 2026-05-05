@@ -5,6 +5,7 @@ import LatticeSystem.Quantum.SpinS.BasisVecSOrthonormal
 import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.SingleSiteCasimirExpectation
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
+import LatticeSystem.Quantum.SpinS.AllAlignedStateOrthogonal
 
 /-!
 # Spin-`S` Néel state and sublattice Casimir eigenvalues
@@ -1102,6 +1103,73 @@ theorem neelStateOfS_allAlignedStateS_last_orthogonal
     simp [Fin.last] at hval
     omega
   exact basisVecS_inner_of_ne hne
+
+/-- **Triple linear independence** of {`Φ_⊤`, `Φ_⊥`, `Φ_Néel(A)`} (spin-S):
+when `Λ` is non-empty, `0 < N`, and both sublattices are non-empty, any
+linear combination equal to `0` has all coefficients `0`. The triple
+spans a 3-dimensional subspace of the many-body Hilbert space, derived
+from the pairwise orthogonalities (γ-4 step 173 plus
+`allAlignedStateS_inner_of_ne` and `neelStateOfS_allAlignedStateS_orthogonal`)
+and norm-squared = 1 of each state. -/
+theorem neelStateOfS_allAligned_triple_independent
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false)
+    {c1 c2 c3 : ℂ}
+    (h : c1 • allAlignedStateS Λ N (0 : Fin (N + 1)) +
+         c2 • allAlignedStateS Λ N (Fin.last N) +
+         c3 • neelStateOfS A N = 0) :
+    c1 = 0 ∧ c2 = 0 ∧ c3 = 0 := by
+  have h_zero_ne_last : (0 : Fin (N + 1)) ≠ Fin.last N := by
+    intro hh
+    have : (0 : Fin (N + 1)).val = (Fin.last N).val := by rw [hh]
+    simp [Fin.last] at this
+    omega
+  have h_top_top := allAlignedStateS_inner_self (V := Λ) (N := N) 0
+  have h_bot_bot := allAlignedStateS_inner_self (V := Λ) (N := N) (Fin.last N)
+  have h_neel_neel := neelStateOfS_inner_self A N
+  have h_top_bot := allAlignedStateS_inner_of_ne (V := Λ) (N := N) h_zero_ne_last
+  have h_bot_top := allAlignedStateS_inner_of_ne (V := Λ) (N := N) h_zero_ne_last.symm
+  have h_top_neel := neelStateOfS_allAlignedStateS_orthogonal A N hN hAc
+  have h_bot_neel := neelStateOfS_allAlignedStateS_last_orthogonal A N hN hA
+  have h_neel_top : dotProduct (star (neelStateOfS A N))
+      (allAlignedStateS Λ N (0 : Fin (N + 1))) = 0 := by
+    have := h_top_neel
+    rw [show dotProduct (star (allAlignedStateS Λ N (0 : Fin (N + 1))))
+            (neelStateOfS A N) =
+          star (dotProduct (star (neelStateOfS A N))
+            (allAlignedStateS Λ N (0 : Fin (N + 1)))) from by
+        rw [← Matrix.star_dotProduct]] at this
+    exact star_eq_zero.mp this
+  have h_neel_bot : dotProduct (star (neelStateOfS A N))
+      (allAlignedStateS Λ N (Fin.last N)) = 0 := by
+    have := h_bot_neel
+    rw [show dotProduct (star (allAlignedStateS Λ N (Fin.last N)))
+            (neelStateOfS A N) =
+          star (dotProduct (star (neelStateOfS A N))
+            (allAlignedStateS Λ N (Fin.last N))) from by
+        rw [← Matrix.star_dotProduct]] at this
+    exact star_eq_zero.mp this
+  have hc1 : c1 = 0 := by
+    have := congrArg
+      (dotProduct (star (allAlignedStateS Λ N (0 : Fin (N + 1))))) h
+    rw [dotProduct_add, dotProduct_add, dotProduct_smul, dotProduct_smul,
+        dotProduct_smul, h_top_top, h_top_bot, h_top_neel, dotProduct_zero] at this
+    simp at this
+    exact this
+  have hc2 : c2 = 0 := by
+    have := congrArg
+      (dotProduct (star (allAlignedStateS Λ N (Fin.last N)))) h
+    rw [dotProduct_add, dotProduct_add, dotProduct_smul, dotProduct_smul,
+        dotProduct_smul, h_bot_top, h_bot_bot, h_bot_neel, dotProduct_zero] at this
+    simp at this
+    exact this
+  have hc3 : c3 = 0 := by
+    have := congrArg (dotProduct (star (neelStateOfS A N))) h
+    rw [dotProduct_add, dotProduct_add, dotProduct_smul, dotProduct_smul,
+        dotProduct_smul, h_neel_top, h_neel_bot, h_neel_neel, dotProduct_zero] at this
+    simp at this
+    exact this
+  exact ⟨hc1, hc2, hc3⟩
 
 /-- The Néel configuration packaged as an element of the magnetization
 sector `magConfigS Λ N (|¬A| · N)`. The `Ŝ_tot^(3)` eigenvalue is
