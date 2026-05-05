@@ -1317,6 +1317,19 @@ theorem neelStateOfS_complement_linearIndependent
   intros s t h
   exact neelStateOfS_complement_pair_independent A N hN h
 
+/-- **`finrank` of the Néel-complement pair span equals 2** (spin-S).
+Direct application of `finrank_span_eq_card` to the
+`LinearIndependent` of γ-4 step 185 (γ-4 step 186). -/
+theorem neelStateOfS_complement_finrank_span
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N) :
+    Module.finrank ℂ
+      (Submodule.span ℂ
+        (Set.range
+          ![neelStateOfS A N, neelStateOfS (fun x : Λ => ! A x) N])) = 2 := by
+  rw [finrank_span_eq_card
+        (neelStateOfS_complement_linearIndependent A N hN)]
+  rfl
+
 /-- **Triple linear independence** of {`Φ_⊤`, `Φ_⊥`, `Φ_Néel(¬A)`}
 (spin-S, complement variant): direct application of γ-4 step 174 with
 `A := ¬A`, exchanging the existence hypotheses (γ-4 step 183). -/
