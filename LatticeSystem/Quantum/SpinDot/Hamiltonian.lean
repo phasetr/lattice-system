@@ -384,6 +384,56 @@ theorem basisVec_dotProduct_totalSpinHalfOp3_sq_basisVec (σ τ : Λ → Fin 2) 
     rw [if_pos rfl, basisVec_totalSpinHalfOp3_sq_expectation]
   · rw [if_neg hτσ, basisVec_off_diagonal_totalSpinHalfOp3_sq hτσ]
 
+/-! ## Spin-`1/2` total `Ŝ_tot^{(1,2)}` zero expectation (γ-4 step 215) -/
+
+/-- Per-site spin-`1/2` `Ŝ^(1)_x` has zero expectation on every basis
+state (γ-4 step 215). -/
+private theorem basisVec_expectation_onSite_spinHalfOp1
+    (x : Λ) (σ : Λ → Fin 2) :
+    dotProduct (star (basisVec σ))
+      ((onSite x spinHalfOp1 : ManyBodyOp Λ).mulVec (basisVec σ)) = 0 := by
+  rw [basisVec_expectation_eq_diagonal]
+  rw [onSite_apply, if_pos (fun _ _ => rfl)]
+  unfold spinHalfOp1 pauliX
+  match σ x with
+  | 0 => simp
+  | 1 => simp
+
+/-- Per-site spin-`1/2` `Ŝ^(2)_x` has zero expectation on every basis
+state (γ-4 step 215). -/
+private theorem basisVec_expectation_onSite_spinHalfOp2
+    (x : Λ) (σ : Λ → Fin 2) :
+    dotProduct (star (basisVec σ))
+      ((onSite x spinHalfOp2 : ManyBodyOp Λ).mulVec (basisVec σ)) = 0 := by
+  rw [basisVec_expectation_eq_diagonal]
+  rw [onSite_apply, if_pos (fun _ _ => rfl)]
+  unfold spinHalfOp2 pauliY
+  match σ x with
+  | 0 => simp
+  | 1 => simp
+
+/-- The total `Ŝ_tot^(1)` (spin-`1/2`) has zero expectation on every
+basis state (γ-4 step 215, mirror of γ-4 step 214 for spin-`S`). -/
+theorem basisVec_expectation_totalSpinHalfOp1 (σ : Λ → Fin 2) :
+    dotProduct (star (basisVec σ))
+      ((totalSpinHalfOp1 Λ).mulVec (basisVec σ)) = 0 := by
+  unfold totalSpinHalfOp1
+  rw [Matrix.sum_mulVec, dotProduct_sum]
+  apply Finset.sum_eq_zero
+  intros x _
+  exact basisVec_expectation_onSite_spinHalfOp1 x σ
+
+/-- The total `Ŝ_tot^(2)` (spin-`1/2`) has zero expectation on every
+basis state (γ-4 step 215). -/
+theorem basisVec_expectation_totalSpinHalfOp2 (σ : Λ → Fin 2) :
+    dotProduct (star (basisVec σ))
+      ((totalSpinHalfOp2 Λ).mulVec (basisVec σ)) = 0 := by
+  unfold totalSpinHalfOp2
+  rw [Matrix.sum_mulVec, dotProduct_sum]
+  apply Finset.sum_eq_zero
+  intros x _
+  exact basisVec_expectation_onSite_spinHalfOp2 x σ
+
 /-! ## Casimir invariance under Ŝ_tot^± on constant configs (Tasaki §2.4)
 
 `(Ŝ_tot)²` commutes with both `Ŝ_tot^+` and `Ŝ_tot^-`
