@@ -1215,6 +1215,43 @@ theorem neelStateOf_basisVec_triple_independent
     exact this
   exact ⟨hc1, hc2, hc3⟩
 
+/-- **mathlib `LinearIndependent` form of the triple LI** (spin-`1/2`):
+`LinearIndependent ℂ ![basisVec(0), basisVec(1), Φ_Néel(A)]` when `Λ`
+non-empty and both sublattices non-empty. Spin-`1/2` mirror of γ-4
+step 187. -/
+theorem neelStateOf_basisVec_triple_linearIndependent
+    [Nonempty Λ] (A : Λ → Bool)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false) :
+    LinearIndependent ℂ
+      (![basisVec (fun _ : Λ => (0 : Fin 2)),
+         basisVec (fun _ : Λ => (1 : Fin 2)),
+         neelStateOf A] : Fin 3 → _) := by
+  rw [Fintype.linearIndependent_iff]
+  intros g hg
+  rw [Fin.sum_univ_three] at hg
+  simp only [Matrix.cons_val_zero, Matrix.cons_val_one] at hg
+  obtain ⟨h0, h1, h2⟩ :=
+    neelStateOf_basisVec_triple_independent A hA hAc hg
+  intro i
+  fin_cases i
+  · exact h0
+  · exact h1
+  · exact h2
+
+/-- **`finrank` of the spin-`1/2` triple span equals 3**. -/
+theorem neelStateOf_basisVec_triple_finrank_span
+    [Nonempty Λ] (A : Λ → Bool)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false) :
+    Module.finrank ℂ
+      (Submodule.span ℂ
+        (Set.range
+          (![basisVec (fun _ : Λ => (0 : Fin 2)),
+             basisVec (fun _ : Λ => (1 : Fin 2)),
+             neelStateOf A] : Fin 3 → _))) = 3 := by
+  rw [finrank_span_eq_card
+        (neelStateOf_basisVec_triple_linearIndependent A hA hAc)]
+  rfl
+
 /-- **mathlib LinearIndependent** form of the Néel-complement pair LI
 (spin-`1/2`): `LinearIndependent ℂ ![Φ_Néel(A), Φ_Néel(¬A)]` when `Λ`
 is non-empty. Spin-`1/2` mirror of γ-4 step 185. -/
