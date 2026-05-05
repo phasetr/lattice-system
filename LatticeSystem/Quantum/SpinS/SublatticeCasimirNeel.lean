@@ -880,6 +880,20 @@ theorem neelStateOfS_inner_self (A : Λ → Bool) (N : ℕ) :
   unfold neelStateOfS
   exact basisVecS_inner_self _
 
+/-- **State-level distinctness** of `Φ_Néel(A)` and `Φ_Néel(¬A)` (spin-S):
+when `Λ` is non-empty and `0 < N`, the two Néel states are distinct as
+elements of the multi-site Hilbert space. Direct from γ-4 step 171
+orthogonality combined with norm-squared = 1: equality would force
+`<Φ_Néel(¬A) | Φ_Néel(¬A)> = 0`, contradicting `inner_self = 1`. -/
+theorem neelStateOfS_ne_complement
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N) :
+    neelStateOfS A N ≠ neelStateOfS (fun x : Λ => ! A x) N := by
+  intro h
+  have horth := neelStateOfS_complement_orthogonal A N hN
+  rw [h] at horth
+  rw [neelStateOfS_inner_self] at horth
+  exact one_ne_zero horth
+
 /-- **Néel-complement linear independence** (spin-S): a linear combination
 `c1 • Φ_Néel(A) + c2 • Φ_Néel(¬A) = 0` forces `c1 = c2 = 0`, when `Λ` is
 non-empty and `0 < N`. Direct consequence of γ-4 step 171 (orthogonality)
