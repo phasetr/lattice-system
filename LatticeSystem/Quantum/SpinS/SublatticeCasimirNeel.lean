@@ -4,6 +4,7 @@ import LatticeSystem.Quantum.SpinS.ToyHamiltonianCasimir
 import LatticeSystem.Quantum.SpinS.BasisVecSOrthonormal
 import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.SingleSiteCasimirExpectation
+import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
 
 /-!
 # Spin-`S` Néel state and sublattice Casimir eigenvalues
@@ -1422,6 +1423,36 @@ theorem neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite_clos
   rw [neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite G J A N hG]
   rw [LatticeSystem.Lattice.couplingOf_sum]
   ring
+
+/-- **Specialization to `bipartiteCompleteGraphOf A`**: the spin-S
+Heisenberg-on-graph Néel expectation on the canonical complete bipartite
+graph (every edge crosses sublattices, `Adj x y ↔ x ≠ y ∧ A x ≠ A y`).
+Direct application of γ-4 step 166 via the existing
+`bipartiteCompleteGraphOf_adj_sublattice_ne`. -/
+theorem heisenbergHamiltonianOnGraphS_apply_diag_neel_bipartiteCompleteGraph
+    (A : Λ → Bool) (J : ℂ) (N : ℕ) :
+    (heisenbergHamiltonianOnGraphS (bipartiteCompleteGraphOf A) J N)
+        (neelConfigOfS A N) (neelConfigOfS A N) =
+      -((N : ℂ) * (N : ℂ) / 4) *
+        (∑ x : Λ, ∑ y : Λ,
+          LatticeSystem.Lattice.couplingOf (bipartiteCompleteGraphOf A) J x y) :=
+  heisenbergHamiltonianOnGraphS_apply_diag_neel_of_bipartite
+    (bipartiteCompleteGraphOf A) J A N
+    (fun _ _ => bipartiteCompleteGraphOf_adj_sublattice_ne)
+
+/-- State-level expectation specialization (spin-S): on the
+`bipartiteCompleteGraphOf A`. -/
+theorem neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_bipartiteCompleteGraph
+    (A : Λ → Bool) (J : ℂ) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((heisenbergHamiltonianOnGraphS (bipartiteCompleteGraphOf A) J N).mulVec
+          (neelStateOfS A N)) =
+      -((N : ℂ) * (N : ℂ) / 4) *
+        (∑ x : Λ, ∑ y : Λ,
+          LatticeSystem.Lattice.couplingOf (bipartiteCompleteGraphOf A) J x y) :=
+  neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite
+    (bipartiteCompleteGraphOf A) J A N
+    (fun _ _ => bipartiteCompleteGraphOf_adj_sublattice_ne)
 
 /-- **Strict negativity in ℝ** of the AFM Heisenberg-on-graph Néel
 expectation: when `J = (J_re : ℂ)` is a strictly-positive real, every
