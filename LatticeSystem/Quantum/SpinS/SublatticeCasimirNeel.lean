@@ -1503,6 +1503,47 @@ theorem neelStateOfS_allAligned_quad_independent
     exact this
   exact ⟨hc1, hc2, hc3, hc4⟩
 
+/-- **Quadruple `LinearIndependent`** (spin-S):
+`LinearIndependent ℂ ![Φ_⊤, Φ_⊥, Φ_Néel(A), Φ_Néel(¬A)]` when `Λ` non-empty,
+`0 < N`, and both sublattices non-empty. Direct conversion of γ-4
+step 181 via `Fintype.linearIndependent_iff` and `Fin.sum_univ_four`
+(γ-4 step 188). -/
+theorem neelStateOfS_allAligned_quad_linearIndependent
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false) :
+    LinearIndependent ℂ
+      (![allAlignedStateS Λ N (0 : Fin (N + 1)),
+         allAlignedStateS Λ N (Fin.last N),
+         neelStateOfS A N,
+         neelStateOfS (fun x : Λ => ! A x) N] : Fin 4 → _) := by
+  rw [Fintype.linearIndependent_iff]
+  intros g hg
+  rw [Fin.sum_univ_four] at hg
+  simp only [Matrix.cons_val_zero, Matrix.cons_val_one] at hg
+  obtain ⟨h0, h1, h2, h3⟩ :=
+    neelStateOfS_allAligned_quad_independent A N hN hA hAc hg
+  intro i
+  fin_cases i
+  · exact h0
+  · exact h1
+  · exact h2
+  · exact h3
+
+/-- **`finrank` of the quadruple span equals 4** (spin-S). -/
+theorem neelStateOfS_allAligned_quad_finrank_span
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false) :
+    Module.finrank ℂ
+      (Submodule.span ℂ
+        (Set.range
+          (![allAlignedStateS Λ N (0 : Fin (N + 1)),
+             allAlignedStateS Λ N (Fin.last N),
+             neelStateOfS A N,
+             neelStateOfS (fun x : Λ => ! A x) N] : Fin 4 → _))) = 4 := by
+  rw [finrank_span_eq_card
+        (neelStateOfS_allAligned_quad_linearIndependent A N hN hA hAc)]
+  rfl
+
 /-- The Néel configuration packaged as an element of the magnetization
 sector `magConfigS Λ N (|¬A| · N)`. The `Ŝ_tot^(3)` eigenvalue is
 `|Λ|·N/2 - |¬A|·N = (|A| − |¬A|)·N/2`. -/
