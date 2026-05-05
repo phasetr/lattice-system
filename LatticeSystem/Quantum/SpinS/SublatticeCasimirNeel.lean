@@ -1320,7 +1320,7 @@ theorem neelStateOfS_allAligned_triple_linearIndependent
   rw [Fintype.linearIndependent_iff]
   intros g hg
   rw [Fin.sum_univ_three] at hg
-  simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_fin_one] at hg
+  simp only [Matrix.cons_val_zero, Matrix.cons_val_one] at hg
   obtain ⟨h0, h1, h2⟩ :=
     neelStateOfS_allAligned_triple_independent A N hN hA hAc hg
   intro i

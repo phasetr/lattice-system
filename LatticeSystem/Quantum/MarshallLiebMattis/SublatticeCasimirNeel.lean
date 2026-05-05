@@ -1229,7 +1229,7 @@ theorem neelStateOf_basisVec_triple_linearIndependent
   rw [Fintype.linearIndependent_iff]
   intros g hg
   rw [Fin.sum_univ_three] at hg
-  simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_fin_one] at hg
+  simp only [Matrix.cons_val_zero, Matrix.cons_val_one] at hg
   obtain ⟨h0, h1, h2⟩ :=
     neelStateOf_basisVec_triple_independent A hA hAc hg
   intro i
