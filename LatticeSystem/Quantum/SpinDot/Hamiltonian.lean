@@ -238,6 +238,29 @@ theorem basisVec_const_totalSpinHalfOp3_sq_expectation (s : Fin 2) :
   · intro hempty
     exact (hempty (Finset.mem_univ _)).elim
 
+/-- **`(Ŝ_tot^(3))²` expectation on an arbitrary basis state** (spin-`1/2`):
+`<basisVec σ | (Ŝ_tot^(3))² | basisVec σ> = magnetization(σ)²/4` for any
+`σ : Λ → Fin 2`. Direct from `totalSpinHalfOp3_mulVec_basisVec_eq_magnetization`
+(eigenvector identity at eigenvalue `M(σ)/2`) applied twice via
+`Matrix.mulVec_mulVec` (γ-4 step 204). The `_const` case (γ-4 step 203) is
+the specialisation `σ = fun _ => s` whose magnetization is `±|Λ|`. -/
+theorem basisVec_totalSpinHalfOp3_sq_expectation (σ : Λ → Fin 2) :
+    dotProduct (star (basisVec σ))
+        ((totalSpinHalfOp3 Λ * totalSpinHalfOp3 Λ).mulVec (basisVec σ)) =
+      ((magnetization Λ σ : ℂ) / 2) ^ 2 := by
+  rw [← Matrix.mulVec_mulVec, totalSpinHalfOp3_mulVec_basisVec_eq_magnetization,
+    Matrix.mulVec_smul, totalSpinHalfOp3_mulVec_basisVec_eq_magnetization,
+    smul_smul]
+  unfold dotProduct
+  rw [Finset.sum_eq_single σ]
+  · simp only [Pi.star_apply, basisVec_self, star_one, Pi.smul_apply, smul_eq_mul,
+      mul_one, one_mul]
+    ring
+  · intros τ _ hτ
+    simp [Pi.smul_apply, basisVec_of_ne hτ]
+  · intro hempty
+    exact (hempty (Finset.mem_univ _)).elim
+
 /-! ## Casimir invariance under Ŝ_tot^± on constant configs (Tasaki §2.4)
 
 `(Ŝ_tot)²` commutes with both `Ŝ_tot^+` and `Ŝ_tot^-`
