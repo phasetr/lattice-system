@@ -1195,4 +1195,25 @@ theorem neelStateOf_heisenbergHamiltonian_expectation
   rw [basisVec_expectation_eq_diagonal]
   exact heisenbergHamiltonian_apply_diag_neel J A
 
+/-- The transverse total-spin Casimir expectation on the spin-`1/2`
+Néel state has strictly positive real part when `Λ` is non-empty:
+
+  `0 < Re <Φ_Néel | (Ŝ_tot^(1))² + (Ŝ_tot^(2))² | Φ_Néel>`,
+
+since the value equals `|Λ|/2 > 0`. Spin-`1/2` mirror of γ-4 step 161. -/
+theorem neelStateOf_totalSpinHalfOp12_sq_expectation_re_pos
+    [Nonempty Λ] (A : Λ → Bool) :
+    0 < (dotProduct (star (neelStateOf A))
+        ((totalSpinHalfOp1 Λ * totalSpinHalfOp1 Λ +
+          totalSpinHalfOp2 Λ * totalSpinHalfOp2 Λ).mulVec
+          (neelStateOf A))).re := by
+  rw [neelStateOf_totalSpinHalfOp12_sq_expectation]
+  have hreal :
+      (Fintype.card Λ : ℂ) / 2 =
+        (((Fintype.card Λ : ℝ) / 2 : ℝ) : ℂ) := by
+    push_cast; ring
+  rw [hreal, Complex.ofReal_re]
+  refine div_pos ?_ two_pos
+  exact_mod_cast Fintype.card_pos
+
 end LatticeSystem.Quantum

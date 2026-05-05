@@ -1255,4 +1255,30 @@ theorem neelStateOfS_heisenbergHamiltonianS_expectation
   rw [basisVecS_expectation_eq_diagonal]
   exact heisenbergHamiltonianS_apply_diag_neel J A N
 
+/-- The transverse total-spin Casimir expectation on the Néel state has
+strictly positive real part when `Λ` is non-empty and `N ≥ 1`:
+
+  `0 < Re <Φ_Néel | (Ŝ_tot^(1))² + (Ŝ_tot^(2))² | Φ_Néel>`,
+
+since the value equals `|Λ|·N/2` which is a strictly positive real
+number under those hypotheses. Together with `<(Ŝ_tot^(3))²>_Néel = M²`
+(γ-4 step 155), this proves `<(Ŝ_tot)²>_Néel > M²` strictly: the Néel
+state is spread across multiple `S_tot`-sectors, the foundational
+input for Tasaki §2.5 Theorem 2.3's variational argument. -/
+theorem neelStateOfS_totalSpinSOp12_sq_expectation_re_pos
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N) :
+    0 < (dotProduct (star (neelStateOfS A N))
+        ((totalSpinSOp1 Λ N * totalSpinSOp1 Λ N +
+          totalSpinSOp2 Λ N * totalSpinSOp2 Λ N).mulVec
+          (neelStateOfS A N))).re := by
+  rw [neelStateOfS_totalSpinSOp12_sq_expectation]
+  have hreal :
+      (Fintype.card Λ : ℂ) * ((N : ℂ) / 2) =
+        (((Fintype.card Λ : ℝ) * (N : ℝ) / 2 : ℝ) : ℂ) := by
+    push_cast; ring
+  rw [hreal, Complex.ofReal_re]
+  refine div_pos (mul_pos ?_ ?_) two_pos
+  · exact_mod_cast Fintype.card_pos
+  · exact_mod_cast hN
+
 end LatticeSystem.Quantum
