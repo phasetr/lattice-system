@@ -2659,4 +2659,15 @@ theorem allAlignedStateS_last_totalSpinSSquared_via_general
   rw [show ((Fin.last N).val : ℂ) = (N : ℂ) from by simp [Fin.last]]
   ring
 
+omit [DecidableEq Λ] in
+/-- `magEigenvalueS (neelConfigOfS (¬A) N) = (|¬A| − |A|)·N/2`. The
+sublattice-swap symmetry of the Néel `Ŝ_tot^{(3)}` eigenvalue: flipping
+A ↔ ¬A negates the eigenvalue (γ-4 step 229, complement of γ-4 step 224). -/
+theorem magEigenvalueS_neelConfigOfS_complement (A : Λ → Bool) (N : ℕ) :
+    magEigenvalueS (neelConfigOfS (fun x => ! A x) N) =
+      (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) -
+        ((Finset.univ.filter (fun x : Λ => (! ! A x) = true)).card : ℂ)) *
+        ((N : ℂ) / 2) := by
+  exact magEigenvalueS_neelConfigOfS (fun x => ! A x) N
+
 end LatticeSystem.Quantum
