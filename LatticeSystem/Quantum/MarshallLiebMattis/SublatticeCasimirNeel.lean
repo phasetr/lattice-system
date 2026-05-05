@@ -2403,4 +2403,22 @@ theorem neelStateOf_totalSpinHalfOp12_sq_complement_eq
   rw [basisVec_totalSpinHalfOp12_sq_expectation_general,
     basisVec_totalSpinHalfOp12_sq_expectation_general]
 
+/-- **Spin-`1/2` linear `Ŝ_tot^(3)` expectation negation under sublattice swap**:
+`<Φ_Néel(¬A) | Ŝ_tot^(3) | Φ_Néel(¬A)> = −<Φ_Néel(A) | Ŝ_tot^(3) | Φ_Néel(A)>`.
+
+Direct from γ-4 step 207 + γ-4 step 232. Spin-`1/2` mirror of γ-4 step 239
+(γ-4 step 240). -/
+theorem neelStateOf_totalSpinHalfOp3_complement_eq_neg
+    (A : Λ → Bool) :
+    dotProduct (star (neelStateOf (fun x : Λ => ! A x)))
+        ((totalSpinHalfOp3 Λ).mulVec (neelStateOf (fun x : Λ => ! A x))) =
+      -dotProduct (star (neelStateOf A))
+        ((totalSpinHalfOp3 Λ).mulVec (neelStateOf A)) := by
+  unfold neelStateOf
+  rw [basisVec_totalSpinHalfOp3_expectation,
+    basisVec_totalSpinHalfOp3_expectation,
+    magnetization_neelConfigOf_complement_eq_neg]
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
