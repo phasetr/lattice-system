@@ -2425,4 +2425,86 @@ theorem heisenbergToyHamiltonianS_variational_gap_re_pos
   · exact_mod_cast hN
   · exact_mod_cast hN
 
+/-! ## Spin-`S` `(Ŝ_tot)²` Casimir on arbitrary `basisVecS σ` (γ-4 step 218) -/
+
+/-- Unified diagonal of `spinSDot x y` at `(σ, σ)` (spin-`S`):
+`(spinSDot x y) σ σ = m_x m_y + (N(N+2)/4 - m_x²)·[x=y]` where
+`m_x := N/2 - σ x.val`. Spin-`S` analogue of γ-4 step 216
+helper for spin-`1/2`. -/
+private theorem spinSDot_apply_diag_unified
+    (x y : Λ) (N : ℕ) (σ : Λ → Fin (N + 1)) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ σ =
+      ((N : ℂ) / 2 - ((σ x).val : ℂ)) *
+          ((N : ℂ) / 2 - ((σ y).val : ℂ)) +
+        (if x = y then
+          ((N : ℂ) * ((N : ℂ) + 2) / 4 -
+            ((N : ℂ) / 2 - ((σ x).val : ℂ)) ^ 2) else 0) := by
+  by_cases hxy : x = y
+  · subst hxy
+    rw [if_pos rfl, spinSDot_self]
+    rw [Matrix.smul_apply, Matrix.one_apply_eq, smul_eq_mul, mul_one]
+    ring
+  · rw [if_neg hxy, add_zero, spinSDot_apply_diag_of_ne hxy]
+
+/-- **Spin-`S` `(Ŝ_tot)²` Casimir expectation on arbitrary `basisVecS σ`**:
+`<basisVecS σ | (Ŝ_tot)² | basisVecS σ> =
+  |V|·N(N+2)/4 + magEigenvalueS(σ)² − Σ_x (N/2 − σx.val)²`
+for any `σ : Λ → Fin (N + 1)`. Spin-`S` analogue of γ-4 step 216
+(spin-`1/2` case has constant `(N/2 - σx.val)² = 1/4`, so
+`Σ_x m_x² = |Λ|/4` and `|Λ|·N(N+2)/4 = 3|Λ|/4`, giving the formula
+`(M(σ)/2)² + |Λ|/2`).
+
+The per-site sum-of-squares term `Σ_x (N/2 - σx.val)²` is the
+configuration-dependent "z-axis squared" contribution that doesn't
+collapse for spin-`S` (unlike spin-`1/2`).
+
+Proof: reduce to diagonal matrix element via
+`basisVecS_expectation_eq_diagonal`, expand
+`(Ŝ_tot)² = Σ_{x,y} spinSDot x y`, apply unified per-pair diagonal,
+then split via separability of the double sum (γ-4 step 218). -/
+theorem basisVecS_totalSpinSSquared_expectation_general
+    (N : ℕ) (σ : Λ → Fin (N + 1)) :
+    dotProduct (star (basisVecS σ : (Λ → Fin (N + 1)) → ℂ))
+        ((totalSpinSSquared Λ N).mulVec (basisVecS σ)) =
+      (Fintype.card Λ : ℂ) * ((N : ℂ) * ((N : ℂ) + 2) / 4) +
+        (magEigenvalueS σ) ^ 2 -
+        ∑ x : Λ, ((N : ℂ) / 2 - ((σ x).val : ℂ)) ^ 2 := by
+  rw [basisVecS_expectation_eq_diagonal, totalSpinSSquared_eq_sum_spinSDot]
+  rw [Matrix.sum_apply]
+  simp_rw [Matrix.sum_apply, spinSDot_apply_diag_unified]
+  rw [Finset.sum_congr rfl (fun _ _ => Finset.sum_add_distrib)]
+  rw [Finset.sum_add_distrib]
+  -- Magnetization-squared piece: Σ_x Σ_y m_x m_y = (Σ m_x)² = magEigenvalueS².
+  have hMag : (∑ x : Λ, ((N : ℂ) / 2 - ((σ x).val : ℂ))) =
+      magEigenvalueS σ := by
+    rw [magEigenvalueS_def]
+    unfold magSumS
+    rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ,
+      nsmul_eq_mul]
+    push_cast; ring
+  rw [show (∑ x : Λ, ∑ y : Λ,
+        ((N : ℂ) / 2 - ((σ x).val : ℂ)) *
+          ((N : ℂ) / 2 - ((σ y).val : ℂ))) =
+      (∑ x : Λ, ((N : ℂ) / 2 - ((σ x).val : ℂ))) *
+        (∑ y : Λ, ((N : ℂ) / 2 - ((σ y).val : ℂ))) from by
+    rw [Finset.sum_mul]
+    refine Finset.sum_congr rfl fun x _ => ?_
+    rw [Finset.mul_sum]]
+  rw [hMag]
+  -- Diagonal correction piece: Σ_x Σ_y [if x = y then C - m_x² else 0]
+  --                           = Σ_x (C - m_x²).
+  rw [show (∑ x : Λ, ∑ y : Λ, (if x = y then
+        ((N : ℂ) * ((N : ℂ) + 2) / 4 -
+          ((N : ℂ) / 2 - ((σ x).val : ℂ)) ^ 2) else 0)) =
+      ∑ x : Λ, ((N : ℂ) * ((N : ℂ) + 2) / 4 -
+        ((N : ℂ) / 2 - ((σ x).val : ℂ)) ^ 2) from by
+    refine Finset.sum_congr rfl fun x _ => ?_
+    rw [Finset.sum_ite_eq Finset.univ x (fun _ =>
+      (N : ℂ) * ((N : ℂ) + 2) / 4 -
+        ((N : ℂ) / 2 - ((σ x).val : ℂ)) ^ 2)]
+    simp]
+  rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ,
+    nsmul_eq_mul]
+  ring
+
 end LatticeSystem.Quantum
