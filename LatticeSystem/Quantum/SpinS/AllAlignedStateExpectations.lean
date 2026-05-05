@@ -258,4 +258,17 @@ theorem basisVecS_dotProduct_basisVecS (σ τ : V → Fin (N + 1)) :
     rw [if_pos rfl, basisVecS_inner_self]
   · rw [if_neg hτσ, basisVecS_dotProduct_basisVecS_of_ne hτσ]
 
+/-- **Combined δ-form for `Ŝ_tot^{(3)}` matrix elements**:
+`<basisVecS τ | Ŝ_tot^{(3)} | basisVecS σ> = if τ = σ then magEigenvalueS σ else 0`.
+Diagonal entries equal `magEigenvalueS σ`; off-diagonal entries vanish
+(γ-4 step 212). -/
+theorem basisVecS_dotProduct_totalSpinSOp3_basisVecS (σ τ : V → Fin (N + 1)) :
+    dotProduct (star (basisVecS τ : (V → Fin (N + 1)) → ℂ))
+        ((totalSpinSOp3 V N).mulVec (basisVecS σ)) =
+      if τ = σ then magEigenvalueS σ else 0 := by
+  by_cases hτσ : τ = σ
+  · subst hτσ
+    rw [if_pos rfl, basisVecS_expectation_totalSpinSOp3]
+  · rw [if_neg hτσ, basisVecS_off_diagonal_totalSpinSOp3 hτσ]
+
 end LatticeSystem.Quantum
