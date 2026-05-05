@@ -2385,4 +2385,22 @@ theorem neelStateOf_totalSpinHalfOp3_sq_complement_eq
   push_cast
   ring
 
+/-- **Spin-`1/2` transverse Casimir `(Ŝ_tot^(1))²+(Ŝ_tot^(2))²` is
+sublattice-swap invariant on Néel**:
+both expectations equal `|Λ|/2` from γ-4 step 219 (which is
+`σ`-independent). Spin-`1/2` mirror of γ-4 step 237 (γ-4 step 238). -/
+theorem neelStateOf_totalSpinHalfOp12_sq_complement_eq
+    (A : Λ → Bool) :
+    dotProduct (star (neelStateOf (fun x : Λ => ! A x)))
+        ((totalSpinHalfOp1 Λ * totalSpinHalfOp1 Λ +
+            totalSpinHalfOp2 Λ * totalSpinHalfOp2 Λ).mulVec
+          (neelStateOf (fun x : Λ => ! A x))) =
+      dotProduct (star (neelStateOf A))
+        ((totalSpinHalfOp1 Λ * totalSpinHalfOp1 Λ +
+            totalSpinHalfOp2 Λ * totalSpinHalfOp2 Λ).mulVec
+          (neelStateOf A)) := by
+  unfold neelStateOf
+  rw [basisVec_totalSpinHalfOp12_sq_expectation_general,
+    basisVec_totalSpinHalfOp12_sq_expectation_general]
+
 end LatticeSystem.Quantum
