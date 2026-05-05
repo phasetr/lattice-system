@@ -2255,6 +2255,75 @@ theorem neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_bipartiteComplete
     (bipartiteCompleteGraphOf A) J A N
     (fun _ _ => bipartiteCompleteGraphOf_adj_sublattice_ne)
 
+/-- **Edge count** of `bipartiteCompleteGraphOf A`: the number of edges
+equals `|A| · |¬A|`. Each edge has one endpoint in `A` and one in `¬A`,
+so the unordered count is the product of sublattice sizes. The proof
+chains `couplingOf G 1 = bipartiteCoupling A` (pointwise),
+`couplingOf_sum` (γ-4 step 167), and `bipartiteCoupling_sum`
+(γ-4 step 165), giving `2 · #edges = 2 · |A| · |¬A|` in ℂ which casts
+to ℕ and divides by 2 (γ-4 step 198). -/
+theorem bipartiteCompleteGraphOf_edgeFinset_card (A : Λ → Bool) :
+    (bipartiteCompleteGraphOf A).edgeFinset.card =
+      (Finset.univ.filter (fun x : Λ => A x = true)).card *
+        (Finset.univ.filter (fun x : Λ => (! A x) = true)).card := by
+  classical
+  have h_eq : ∀ x y : Λ,
+      LatticeSystem.Lattice.couplingOf (bipartiteCompleteGraphOf A) (1 : ℂ) x y =
+        bipartiteCoupling A x y := by
+    intros x y
+    unfold LatticeSystem.Lattice.couplingOf bipartiteCoupling
+    by_cases hxy : x = y
+    · subst hxy
+      have h1 : ¬ (bipartiteCompleteGraphOf A).Adj x x :=
+        (bipartiteCompleteGraphOf A).irrefl
+      have h2 : ¬ A x ≠ A x := fun h => h rfl
+      rw [if_neg h1, if_neg h2]
+    · by_cases hA : A x ≠ A y
+      · have hAdj : (bipartiteCompleteGraphOf A).Adj x y := ⟨hxy, hA⟩
+        rw [if_pos hAdj, if_pos hA]
+      · have hAeq : A x = A y := not_ne_iff.mp hA
+        have hNotAdj : ¬ (bipartiteCompleteGraphOf A).Adj x y :=
+          fun ⟨_, h⟩ => h hAeq
+        rw [if_neg hNotAdj, if_neg (fun h => h hAeq)]
+  have h_coupling :=
+    LatticeSystem.Lattice.couplingOf_sum (bipartiteCompleteGraphOf A) (1 : ℂ)
+  have h_sum_eq : ∑ x : Λ, ∑ y : Λ,
+      LatticeSystem.Lattice.couplingOf (bipartiteCompleteGraphOf A) (1 : ℂ) x y =
+      ∑ x : Λ, ∑ y : Λ, bipartiteCoupling A x y :=
+    Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => h_eq x y
+  rw [h_sum_eq, bipartiteCoupling_sum] at h_coupling
+  have h_simp : (2 : ℂ) *
+        (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) =
+      (2 : ℂ) * ((bipartiteCompleteGraphOf A).edgeFinset.card : ℂ) := by
+    linear_combination h_coupling
+  have h_nat : (2 : ℕ) *
+        ((Finset.univ.filter (fun x : Λ => A x = true)).card *
+          (Finset.univ.filter (fun x : Λ => (! A x) = true)).card) =
+      (2 : ℕ) * (bipartiteCompleteGraphOf A).edgeFinset.card := by
+    exact_mod_cast h_simp
+  omega
+
+/-- **Closed form**: Néel expectation on `bipartiteCompleteGraphOf A`
+equals `-J · |A| · |¬A| · N²/2` (spin-S). Combines the
+`bipartiteCompleteGraphOf` Néel expectation with the explicit edge count
+`|A| · |¬A|` (γ-4 step 198) — third independent derivation of the toy
+Hamiltonian Néel expectation, complementing γ-4 steps 131 and 165. -/
+theorem neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_bipartiteCompleteGraph_closed
+    (A : Λ → Bool) (J : ℂ) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((heisenbergHamiltonianOnGraphS (bipartiteCompleteGraphOf A) J N).mulVec
+          (neelStateOfS A N)) =
+      -(J * ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) * (N : ℂ)) / 2) := by
+  rw [neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite_closed
+        (bipartiteCompleteGraphOf A) J A N
+        (fun _ _ => bipartiteCompleteGraphOf_adj_sublattice_ne)]
+  rw [bipartiteCompleteGraphOf_edgeFinset_card]
+  push_cast
+  ring
+
 /-- **Strict negativity in ℝ** of the AFM Heisenberg-on-graph Néel
 expectation: when `J = (J_re : ℂ)` is a strictly-positive real, every
 edge of `G` crosses the bipartition, `0 < #G.edgeFinset`, and `0 < N`,
