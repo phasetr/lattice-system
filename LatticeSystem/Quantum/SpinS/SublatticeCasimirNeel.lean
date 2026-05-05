@@ -2324,6 +2324,33 @@ theorem neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_bipartiteComplete
   push_cast
   ring
 
+/-- **Identification**: `heisenbergToyHamiltonianS A N =
+heisenbergHamiltonianOnGraphS (bipartiteCompleteGraphOf A) 1 N`. The
+toy Hamiltonian is exactly the Heisenberg Hamiltonian on the canonical
+complete bipartite graph at unit coupling, since `bipartiteCoupling A x y
+= couplingOf (bipartiteCompleteGraphOf A) 1 x y` pointwise (γ-4 step 199). -/
+theorem heisenbergToyHamiltonianS_eq_heisenbergHamiltonianOnGraphS_bipartiteCompleteGraph
+    (A : Λ → Bool) (N : ℕ) :
+    heisenbergToyHamiltonianS (Λ := Λ) A N =
+      heisenbergHamiltonianOnGraphS (bipartiteCompleteGraphOf A) (1 : ℂ) N := by
+  unfold heisenbergToyHamiltonianS heisenbergHamiltonianOnGraphS
+  congr 1
+  funext x y
+  unfold LatticeSystem.Lattice.couplingOf bipartiteCoupling
+  by_cases hxy : x = y
+  · subst hxy
+    have h1 : ¬ (bipartiteCompleteGraphOf A).Adj x x :=
+      (bipartiteCompleteGraphOf A).irrefl
+    have h2 : ¬ A x ≠ A x := fun h => h rfl
+    rw [if_neg h1, if_neg h2]
+  · by_cases hA : A x ≠ A y
+    · have hAdj : (bipartiteCompleteGraphOf A).Adj x y := ⟨hxy, hA⟩
+      rw [if_pos hAdj, if_pos hA]
+    · have hAeq : A x = A y := not_ne_iff.mp hA
+      have hNotAdj : ¬ (bipartiteCompleteGraphOf A).Adj x y :=
+        fun ⟨_, h⟩ => h hAeq
+      rw [if_neg hNotAdj, if_neg (fun h => h hAeq)]
+
 /-- **Strict negativity in ℝ** of the AFM Heisenberg-on-graph Néel
 expectation: when `J = (J_re : ℂ)` is a strictly-positive real, every
 edge of `G` crosses the bipartition, `0 < #G.edgeFinset`, and `0 < N`,
