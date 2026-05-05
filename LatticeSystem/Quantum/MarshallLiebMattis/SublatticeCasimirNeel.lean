@@ -1269,6 +1269,23 @@ theorem neelStateOf_heisenbergHamiltonian_expectation_of_cross_only
   rw [basisVec_expectation_eq_diagonal]
   exact heisenbergHamiltonian_apply_diag_neel_of_cross_only J A hJ
 
+/-- **Toy Hamiltonian Néel expectation via cross-only synthesis** (spin-`1/2`):
+`<Φ_Néel | Ĥ_toy A | Φ_Néel> = -(1/4) · Σ bipartiteCoupling A x y =
+-|A|·|¬A|/2`. Spin-`1/2` mirror of γ-4 step 165: independent re-derivation
+through the per-pair correlation trio. -/
+theorem neelStateOf_heisenbergToyHamiltonian_expectation_via_cross_only
+    (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        ((heisenbergToyHamiltonian A : ManyBodyOp Λ).mulVec (neelStateOf A)) =
+      -(((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) / 2) := by
+  unfold heisenbergToyHamiltonian
+  rw [neelStateOf_heisenbergHamiltonian_expectation_of_cross_only
+        (bipartiteCoupling A) A
+        (fun x y h => bipartiteCoupling_eq_zero_of_same_sublattice A h)]
+  rw [bipartiteCoupling_sum]
+  ring
+
 /-- **Real-valued positivity** of the spin-`1/2` toy Hamiltonian
 variational gap: `0 < Re (<basisVec 0|Ĥ_toy|basisVec 0> -
 <Φ_Néel|Ĥ_toy|Φ_Néel>) = |A|·|¬A|` when both sublattices are non-empty.
