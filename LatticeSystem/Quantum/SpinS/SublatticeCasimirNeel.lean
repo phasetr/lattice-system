@@ -856,6 +856,23 @@ theorem neelStateOfS_span_le_magSubspaceS (A : Λ → Bool) (N : ℕ) :
   rw [Submodule.span_le, Set.singleton_subset_iff]
   exact neelStateOfS_mem_magSubspaceS A N
 
+/-- **Spin-S complement magnetization subspace non-triviality**: the
+opposite-sign sector `(|¬A|-|A|)·N/2` is also non-trivial, witnessed by
+the non-zero complement Néel state `Φ_Néel(¬A)`. Combined with γ-4 step
+177, when `0 < N` and `|A| ≠ |¬A|` (so the original `M_neel` and its
+negation are distinct), the original and complement Néel states certify
+two distinct non-trivial sectors (γ-4 step 178). -/
+theorem magSubspaceS_complement_nontrivial_via_neel (A : Λ → Bool) (N : ℕ) :
+    magSubspaceS Λ N
+        (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+            ((N : ℂ) / 2) -
+          ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+            ((N : ℂ) / 2)) ≠ ⊥ := by
+  intro hbot
+  have hmem := neelStateOfS_complement_mem_magSubspaceS A N
+  rw [hbot, Submodule.mem_bot] at hmem
+  exact neelStateOfS_ne_zero (fun x : Λ => ! A x) N hmem
+
 /-- The spin-`S` Néel state has norm-squared 1:
 `<Φ_Néel | Φ_Néel> = 1`. Direct from `basisVecS_inner_self`. -/
 theorem neelStateOfS_inner_self (A : Λ → Bool) (N : ℕ) :
