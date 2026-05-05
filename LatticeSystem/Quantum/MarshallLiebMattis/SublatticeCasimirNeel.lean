@@ -1158,6 +1158,18 @@ theorem neelStateOf_complement_mem_magnetizationSubspace (A : Λ → Bool) :
   have := neelStateOf_mem_magnetizationSubspace (fun x : Λ => ! A x)
   simpa [Bool.not_not] using this
 
+/-- **Spin-`1/2` complement magnetization subspace non-triviality**: the
+opposite-sign sector `(|¬A|-|A|)/2` is also non-trivial, witnessed by
+the non-zero complement Néel state `Φ_Néel(¬A)` (γ-4 step 178). -/
+theorem magnetizationSubspace_complement_nontrivial_via_neel (A : Λ → Bool) :
+    magnetizationSubspace Λ
+        ((((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) -
+          ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ)) / 2) ≠ ⊥ := by
+  intro hbot
+  have hmem := neelStateOf_complement_mem_magnetizationSubspace A
+  rw [hbot, Submodule.mem_bot] at hmem
+  exact neelStateOf_ne_zero (fun x : Λ => ! A x) hmem
+
 /-- The magnetization-`(|A|-|¬A|)/2` subspace is non-trivial: it contains
 the non-zero Néel state. Spin-`1/2` analog of `neelMagConfigS_nonempty`. -/
 theorem magnetizationSubspace_nontrivial_via_neel (A : Λ → Bool) :
