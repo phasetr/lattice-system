@@ -1130,4 +1130,69 @@ theorem neelStateOf_expectation_spinHalfDot_self
   rw [spinHalfDot_self, Matrix.smul_mulVec, Matrix.one_mulVec]
   rw [dotProduct_smul, smul_eq_mul, neelStateOf_inner_self, mul_one]
 
+/-- The spin-`1/2` Heisenberg Hamiltonian's diagonal matrix element at
+the Néel configuration: synthesis of the per-pair correlation trio
+(γ-4 steps 157/158/159 spin-`1/2` mirrors). Each `(x, y)` term contributes
+
+  `J(x,y) · 3/4`     if `x = y`,
+  `J(x,y) · +1/4`    if `x ≠ y` and `A x = A y`,
+  `J(x,y) · -1/4`    if `x ≠ y` and `A x ≠ A y`.
+
+Spin-`1/2` mirror of γ-4 step 160. -/
+theorem heisenbergHamiltonian_apply_diag_neel
+    (J : Λ → Λ → ℂ) (A : Λ → Bool) :
+    (heisenbergHamiltonian J : ManyBodyOp Λ) (neelConfigOf A) (neelConfigOf A) =
+      ∑ x : Λ, ∑ y : Λ,
+        J x y *
+          (if x = y then (3 / 4 : ℂ)
+           else if A x = A y then (1 / 4 : ℂ)
+           else -(1 / 4 : ℂ)) := by
+  unfold heisenbergHamiltonian
+  simp only [Matrix.sum_apply, Matrix.smul_apply, smul_eq_mul]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  refine Finset.sum_congr rfl (fun y _ => ?_)
+  congr 1
+  by_cases hxy : x = y
+  · subst hxy
+    rw [if_pos rfl, spinHalfDot_self, Matrix.smul_apply, Matrix.one_apply_eq,
+      smul_eq_mul, mul_one]
+  · rw [if_neg hxy]
+    by_cases hAxy : A x = A y
+    · rw [if_pos hAxy]
+      exact spinHalfDot_apply_diag_neelConfigOf_of_same A hxy hAxy
+    · rw [if_neg hAxy]
+      by_cases hAx : A x = true
+      · have hAy : A y = false := by
+          cases hAyc : A y with
+          | true => exact absurd (hAx.trans hAyc.symm) hAxy
+          | false => rfl
+        exact spinHalfDot_apply_diag_neelConfigOf_of_cross A hAx hAy
+      · have hAxF : A x = false := by
+          cases hAxc : A x with
+          | true => exact absurd hAxc hAx
+          | false => rfl
+        have hAy : A y = true := by
+          cases hAyc : A y with
+          | true => rfl
+          | false => exact absurd (hAxF.trans hAyc.symm) hAxy
+        rw [show (spinHalfDot x y : ManyBodyOp Λ) = spinHalfDot y x from
+              spinHalfDot_comm x y]
+        exact spinHalfDot_apply_diag_neelConfigOf_of_cross A hAy hAxF
+
+/-- State-level expectation of the spin-`1/2` Heisenberg Hamiltonian on
+the Néel state: lifts `heisenbergHamiltonian_apply_diag_neel` via
+`basisVec_expectation_eq_diagonal`. Spin-`1/2` mirror of γ-4 step 160. -/
+theorem neelStateOf_heisenbergHamiltonian_expectation
+    (J : Λ → Λ → ℂ) (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        ((heisenbergHamiltonian J : ManyBodyOp Λ).mulVec (neelStateOf A)) =
+      ∑ x : Λ, ∑ y : Λ,
+        J x y *
+          (if x = y then (3 / 4 : ℂ)
+           else if A x = A y then (1 / 4 : ℂ)
+           else -(1 / 4 : ℂ)) := by
+  unfold neelStateOf
+  rw [basisVec_expectation_eq_diagonal]
+  exact heisenbergHamiltonian_apply_diag_neel J A
+
 end LatticeSystem.Quantum
