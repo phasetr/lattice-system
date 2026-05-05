@@ -2362,4 +2362,27 @@ theorem neelStateOf_totalSpinHalfSquared_complement_eq
   push_cast
   ring
 
+/-- **Spin-`1/2` `(Ŝ_tot^(3))²` is sublattice-swap invariant on Néel
+states**:
+`<Φ_Néel(¬A) | (Ŝ_tot^(3))² | Φ_Néel(¬A)> = <Φ_Néel(A) | (Ŝ_tot^(3))² | Φ_Néel(A)>`.
+
+Direct from γ-4 step 204 (`<basisVec σ|(Ŝ_tot^(3))²|basisVec σ>` =
+`(M(σ)/2)²`) + γ-4 step 232 (`magnetization (¬A) = −(...)`):
+the squared magnetization is sign-flip invariant. Spin-`1/2` mirror of
+γ-4 step 235 (γ-4 step 236). -/
+theorem neelStateOf_totalSpinHalfOp3_sq_complement_eq
+    (A : Λ → Bool) :
+    dotProduct (star (neelStateOf (fun x : Λ => ! A x)))
+        ((totalSpinHalfOp3 Λ * totalSpinHalfOp3 Λ).mulVec
+          (neelStateOf (fun x : Λ => ! A x))) =
+      dotProduct (star (neelStateOf A))
+        ((totalSpinHalfOp3 Λ * totalSpinHalfOp3 Λ).mulVec
+          (neelStateOf A)) := by
+  unfold neelStateOf
+  rw [basisVec_totalSpinHalfOp3_sq_expectation,
+    basisVec_totalSpinHalfOp3_sq_expectation,
+    magnetization_neelConfigOf_complement_eq_neg]
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
