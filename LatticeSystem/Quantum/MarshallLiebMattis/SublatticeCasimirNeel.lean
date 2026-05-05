@@ -2280,4 +2280,27 @@ theorem basisVec_totalSpinHalfOp12_sq_expectation_general
     basisVec_totalSpinHalfOp3_sq_expectation]
   ring
 
+/-- **Spin-`1/2` Néel Casimir** re-derived via the general
+`basisVec σ` Casimir formula (γ-4 step 216):
+`<Φ_Néel | (Ŝ_tot)² | Φ_Néel> = ((|A|−|¬A|)/2)² + |Λ|/2`.
+
+Composition: γ-4 step 216 + `magnetization_neelConfigOf` + `ring`.
+
+Direct corollary recovering the existing closed-form
+`neelStateOf_totalSpinHalfSquared_expectation` from the general
+framework (γ-4 step 227, spin-`1/2` mirror of γ-4 step 225). -/
+theorem neelStateOf_totalSpinHalfSquared_expectation_via_general
+    (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        ((totalSpinHalfSquared Λ).mulVec (neelStateOf A)) =
+      ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) /
+          2) ^ 2 +
+        (Fintype.card Λ : ℂ) / 2 := by
+  unfold neelStateOf
+  rw [basisVec_totalSpinHalfSquared_expectation_general,
+    magnetization_neelConfigOf]
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
