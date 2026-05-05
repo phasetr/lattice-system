@@ -278,6 +278,49 @@ theorem magnetization_neelConfigOf_complement (A : Λ → Bool) :
   rw [magnetization_neelConfigOf]
   simp [Bool.not_not]
 
+/-- The spin-`1/2` Néel configuration `neelConfigOf A` is distinct from
+its sublattice-complement `neelConfigOf (¬A)` (as functions `Λ → Fin 2`)
+when `Λ` is non-empty: at any vertex `x` the swap exchanges `0 ↔ 1`,
+witnessing the inequality. Spin-`1/2` mirror of γ-4 step 171's
+distinctness witness. -/
+theorem neelConfigOf_ne_complement [Nonempty Λ] (A : Λ → Bool) :
+    neelConfigOf A ≠ neelConfigOf (fun x : Λ => ! A x) := by
+  obtain ⟨x⟩ := ‹Nonempty Λ›
+  intro h
+  have hx := congr_fun h x
+  unfold neelConfigOf at hx
+  by_cases hAx : A x = true
+  · rw [if_pos hAx] at hx
+    have hnAxF : (! A x) = false := by simp [hAx]
+    rw [if_neg (by rw [hnAxF]; decide : ¬ ((! A x) = true))] at hx
+    exact (by decide : (0 : Fin 2) ≠ 1) hx
+  · have hAxF : A x = false := by
+      cases h' : A x with
+      | true => exact absurd h' hAx
+      | false => rfl
+    rw [if_neg hAx] at hx
+    have hnAx : (! A x) = true := by simp [hAxF]
+    rw [if_pos hnAx] at hx
+    exact (by decide : (1 : Fin 2) ≠ 0) hx
+
+/-- **Néel-complement orthogonality** (spin-`1/2`):
+`<Φ_Néel(A) | Φ_Néel(¬A)> = 0` when `Λ` is non-empty. Spin-`1/2`
+mirror of γ-4 step 171: the two Néel basis vectors are orthogonal
+because they are basis vectors of distinct configurations. -/
+theorem neelStateOf_complement_orthogonal
+    [Nonempty Λ] (A : Λ → Bool) :
+    dotProduct (star (neelStateOf A))
+        (neelStateOf (fun x : Λ => ! A x)) = 0 := by
+  unfold neelStateOf dotProduct
+  apply Finset.sum_eq_zero
+  intros τ _
+  by_cases h1 : τ = neelConfigOf A
+  · rw [h1]
+    have hne : neelConfigOf A ≠ neelConfigOf (fun x : Λ => ! A x) :=
+      neelConfigOf_ne_complement A
+    simp [Pi.star_apply, basisVec_self, basisVec_of_ne hne]
+  · simp [Pi.star_apply, basisVec_of_ne h1]
+
 /-- `Ŝ_tot^(3) · |Φ_Néel⟩ = ((|A| − |¬A|)/2) · |Φ_Néel⟩`. The spin-`1/2`
 Néel state is a `Ŝ_tot^(3)`-eigenvector with magnetization
 `(|A| − |¬A|)/2`. For `|A| = |¬A|` the magnetization is zero (e.g.,
