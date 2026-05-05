@@ -1224,6 +1224,38 @@ theorem neelStateOfS_ne_allAlignedStateS_last
   rw [h, allAlignedStateS_inner_self] at horth
   exact one_ne_zero horth
 
+/-- **Reverse direction** of γ-4 step 133: `<Φ_Néel(A) | Φ_⊤> = 0`
+when `0 < N` and `|¬A| > 0`. Derived from
+`neelStateOfS_allAlignedStateS_orthogonal` via
+`Matrix.star_dotProduct` (γ-4 step 196). -/
+theorem allAlignedStateS_zero_neelStateOfS_orthogonal
+    (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hAc : ∃ x : Λ, A x = false) :
+    dotProduct (star (neelStateOfS A N))
+        (allAlignedStateS Λ N (0 : Fin (N + 1))) = 0 := by
+  have := neelStateOfS_allAlignedStateS_orthogonal A N hN hAc
+  rw [show dotProduct (star (allAlignedStateS Λ N (0 : Fin (N + 1))))
+          (neelStateOfS A N) =
+        star (dotProduct (star (neelStateOfS A N))
+          (allAlignedStateS Λ N (0 : Fin (N + 1)))) from by
+      rw [← Matrix.star_dotProduct]] at this
+  exact star_eq_zero.mp this
+
+/-- **Reverse direction** of γ-4 step 173: `<Φ_Néel(A) | Φ_⊥> = 0`
+when `0 < N` and `|A| > 0` (γ-4 step 196). -/
+theorem allAlignedStateS_last_neelStateOfS_orthogonal
+    (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = true) :
+    dotProduct (star (neelStateOfS A N))
+        (allAlignedStateS Λ N (Fin.last N)) = 0 := by
+  have := neelStateOfS_allAlignedStateS_last_orthogonal A N hN hA
+  rw [show dotProduct (star (allAlignedStateS Λ N (Fin.last N)))
+          (neelStateOfS A N) =
+        star (dotProduct (star (neelStateOfS A N))
+          (allAlignedStateS Λ N (Fin.last N))) from by
+      rw [← Matrix.star_dotProduct]] at this
+  exact star_eq_zero.mp this
+
 /-- `<Φ_⊤ | Φ_Néel(¬A)> = 0` when `|A| > 0` and `0 < N`. The complement
 Néel state has `Fin.last N` on `A` (the original sublattice with `A x =
 true`), so it differs from `Φ_⊤` (all `0`) at any vertex of `A`. Direct
@@ -1249,6 +1281,36 @@ theorem neelStateOfS_complement_allAlignedStateS_last_orthogonal
     obtain ⟨x, hx⟩ := hAc
     exact ⟨x, by simp [hx]⟩
   exact neelStateOfS_allAlignedStateS_last_orthogonal (fun x : Λ => ! A x) N hN hA'
+
+/-- **Reverse direction**: `<Φ_Néel(¬A) | Φ_⊤> = 0` when `0 < N` and
+`|A| > 0` (γ-4 step 196). -/
+theorem allAlignedStateS_zero_neelStateOfS_complement_orthogonal
+    (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = true) :
+    dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+        (allAlignedStateS Λ N (0 : Fin (N + 1))) = 0 := by
+  have := neelStateOfS_complement_allAlignedStateS_orthogonal A N hN hA
+  rw [show dotProduct (star (allAlignedStateS Λ N (0 : Fin (N + 1))))
+          (neelStateOfS (fun x : Λ => ! A x) N) =
+        star (dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+          (allAlignedStateS Λ N (0 : Fin (N + 1)))) from by
+      rw [← Matrix.star_dotProduct]] at this
+  exact star_eq_zero.mp this
+
+/-- **Reverse direction**: `<Φ_Néel(¬A) | Φ_⊥> = 0` when `0 < N` and
+`|¬A| > 0` (γ-4 step 196). -/
+theorem allAlignedStateS_last_neelStateOfS_complement_orthogonal
+    (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hAc : ∃ x : Λ, A x = false) :
+    dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+        (allAlignedStateS Λ N (Fin.last N)) = 0 := by
+  have := neelStateOfS_complement_allAlignedStateS_last_orthogonal A N hN hAc
+  rw [show dotProduct (star (allAlignedStateS Λ N (Fin.last N)))
+          (neelStateOfS (fun x : Λ => ! A x) N) =
+        star (dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+          (allAlignedStateS Λ N (Fin.last N))) from by
+      rw [← Matrix.star_dotProduct]] at this
+  exact star_eq_zero.mp this
 
 /-- **Triple linear independence** of {`Φ_⊤`, `Φ_⊥`, `Φ_Néel(A)`} (spin-S):
 when `Λ` is non-empty, `0 < N`, and both sublattices are non-empty, any
