@@ -358,6 +358,32 @@ theorem basisVec_dotProduct_totalSpinHalfOp3_basisVec (σ τ : Λ → Fin 2) :
     rw [if_pos rfl, basisVec_totalSpinHalfOp3_expectation]
   · rw [if_neg hτσ, basisVec_off_diagonal_totalSpinHalfOp3 hτσ]
 
+/-- Off-diagonal spin-`1/2` `(Ŝ_tot^(3))²` matrix elements vanish for
+`τ ≠ σ`: `<basisVec τ | (Ŝ_tot^(3))² | basisVec σ> = 0`
+(γ-4 step 213). -/
+theorem basisVec_off_diagonal_totalSpinHalfOp3_sq {σ τ : Λ → Fin 2}
+    (hστ : τ ≠ σ) :
+    dotProduct (star (basisVec τ))
+        ((totalSpinHalfOp3 Λ * totalSpinHalfOp3 Λ).mulVec (basisVec σ)) = 0 := by
+  have h0 : dotProduct (star (basisVec τ))
+      (basisVec σ : (Λ → Fin 2) → ℂ) = 0 :=
+    basisVec_dotProduct_basisVec_of_ne hστ
+  rw [← Matrix.mulVec_mulVec, totalSpinHalfOp3_mulVec_basisVec_eq_magnetization,
+    Matrix.mulVec_smul, totalSpinHalfOp3_mulVec_basisVec_eq_magnetization,
+    smul_smul, dotProduct_smul, smul_eq_mul, h0, mul_zero]
+
+/-- **Spin-`1/2` combined δ-form for `(Ŝ_tot^(3))²` matrix elements**:
+`<basisVec τ | (Ŝ_tot^(3))² | basisVec σ> = if τ = σ then (magnetization(σ)/2)² else 0`
+(γ-4 step 213). -/
+theorem basisVec_dotProduct_totalSpinHalfOp3_sq_basisVec (σ τ : Λ → Fin 2) :
+    dotProduct (star (basisVec τ))
+        ((totalSpinHalfOp3 Λ * totalSpinHalfOp3 Λ).mulVec (basisVec σ)) =
+      if τ = σ then ((magnetization Λ σ : ℂ) / 2) ^ 2 else 0 := by
+  by_cases hτσ : τ = σ
+  · subst hτσ
+    rw [if_pos rfl, basisVec_totalSpinHalfOp3_sq_expectation]
+  · rw [if_neg hτσ, basisVec_off_diagonal_totalSpinHalfOp3_sq hτσ]
+
 /-! ## Casimir invariance under Ŝ_tot^± on constant configs (Tasaki §2.4)
 
 `(Ŝ_tot)²` commutes with both `Ŝ_tot^+` and `Ŝ_tot^-`
