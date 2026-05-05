@@ -2171,4 +2171,85 @@ theorem heisenbergToyHamiltonian_variational_gap_re_pos
   · exact_mod_cast hA
   · exact_mod_cast hAc
 
+/-! ## `(Ŝ_tot)²` Casimir on arbitrary `basisVec σ` (γ-4 step 216) -/
+
+/-- Helper: `(spinSign s)² = 1` for any `s : Fin 2`. -/
+private theorem spinSign_sq (s : Fin 2) :
+    (spinSign s : ℂ) * (spinSign s : ℂ) = 1 := by
+  fin_cases s <;> simp [spinSign]
+
+/-- Unified diagonal of `spinHalfDot x y` at `(σ, σ)`:
+`(spinHalfDot x y) σ σ = (spinSign(σx))(spinSign(σy))/4 + (1/2)·[x=y]`.
+Encodes the three cases (`x=y`, parallel `x≠y`, antiparallel `x≠y`) in
+one closed form using the fact that `(spinSign s)² = 1` (γ-4 step 216). -/
+private theorem spinHalfDot_apply_diag_unified
+    (x y : Λ) (σ : Λ → Fin 2) :
+    (spinHalfDot x y : ManyBodyOp Λ) σ σ =
+      (spinSign (σ x) : ℂ) * (spinSign (σ y) : ℂ) / 4 +
+        (if x = y then (1 / 2 : ℂ) else 0) := by
+  by_cases hxy : x = y
+  · subst hxy
+    rw [if_pos rfl, spinHalfDot_self]
+    rw [Matrix.smul_apply, Matrix.one_apply_eq, smul_eq_mul, mul_one,
+      spinSign_sq]
+    ring
+  · rw [if_neg hxy, add_zero]
+    by_cases hpar : σ x = σ y
+    · -- Parallel case: spinHalfDot σ σ = 1/4. Match m_x m_y / 4 = 1/4 since m² = 1.
+      rw [spinHalfDot_apply_diag_of_ne_parallel hxy σ hpar, hpar, spinSign_sq]
+    · rw [spinHalfDot_apply_diag_of_ne_antiparallel hxy σ hpar]
+      have h_antipar : (spinSign (σ x) : ℂ) * (spinSign (σ y) : ℂ) = -1 := by
+        unfold spinSign
+        match hsx : σ x, hsy : σ y with
+        | 0, 0 => exact absurd (hsx.trans hsy.symm) hpar
+        | 0, 1 => push_cast; ring
+        | 1, 0 => push_cast; ring
+        | 1, 1 => exact absurd (hsx.trans hsy.symm) hpar
+      rw [h_antipar]; ring
+
+/-- **Spin-`1/2` `(Ŝ_tot)²` Casimir expectation on arbitrary `basisVec σ`**:
+`<basisVec σ | (Ŝ_tot)² | basisVec σ> = |Λ|/2 + (M(σ)/2)²` for any
+`σ : Λ → Fin 2`. Generalises γ-4 step 201 (the constant case where
+`M(σ) = ±|Λ|` gives `|Λ|/2 + |Λ|²/4 = |Λ|·(|Λ|+2)/4`).
+
+Proof: reduce to diagonal matrix element via `basisVec_expectation_eq_diagonal`,
+expand `(Ŝ_tot)² = Σ_{x,y} spinHalfDot x y`, apply the unified
+diagonal formula, then split the sum into the magnetization-squared
+piece `(Σ_x spinSign(σ x))²/4 = M(σ)²/4` and the `(1/2)·[x=y]` piece
+contributing `|Λ|/2` (γ-4 step 216). -/
+theorem basisVec_totalSpinHalfSquared_expectation_general
+    (σ : Λ → Fin 2) :
+    dotProduct (star (basisVec σ))
+        ((totalSpinHalfSquared Λ).mulVec (basisVec σ)) =
+      (Fintype.card Λ : ℂ) / 2 + ((magnetization Λ σ : ℂ) / 2) ^ 2 := by
+  rw [basisVec_expectation_eq_diagonal, totalSpinHalfSquared_eq_sum_dot]
+  rw [Matrix.sum_apply]
+  simp_rw [Matrix.sum_apply, spinHalfDot_apply_diag_unified]
+  -- ∑ x, ∑ y, (m_x m_y / 4 + (if x = y then 1/2 else 0))
+  rw [Finset.sum_congr rfl (fun x _ => Finset.sum_add_distrib)]
+  rw [Finset.sum_add_distrib]
+  -- Diagonal piece: ∑ x, ∑ y, (if x = y then 1/2 else 0) = |Λ|/2.
+  have hDiag : (∑ x : Λ, ∑ y : Λ, (if x = y then (1/2 : ℂ) else 0)) =
+      (Fintype.card Λ : ℂ) / 2 := by
+    have hInner : ∀ x : Λ, (∑ y : Λ, (if x = y then (1/2 : ℂ) else 0)) = 1/2 := by
+      intro x
+      rw [Finset.sum_ite_eq Finset.univ x (fun _ => (1/2 : ℂ))]
+      simp
+    simp_rw [hInner]
+    rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+    ring
+  rw [hDiag]
+  -- Off-diagonal piece: ∑ x, ∑ y, m_x m_y / 4 = M²/4.
+  have hSepProd : ∀ a b : Λ → ℂ,
+      (∑ x : Λ, ∑ y : Λ, a x * b y / 4) =
+        (∑ x : Λ, a x) * (∑ y : Λ, b y) / 4 := fun a b => by
+    rw [Finset.sum_mul, Finset.sum_div]
+    refine Finset.sum_congr rfl fun x _ => ?_
+    rw [Finset.mul_sum, Finset.sum_div]
+  rw [hSepProd]
+  have hMag : (∑ x : Λ, (spinSign (σ x) : ℂ)) = (magnetization Λ σ : ℂ) := by
+    unfold magnetization; push_cast; rfl
+  rw [hMag]
+  ring
+
 end LatticeSystem.Quantum
