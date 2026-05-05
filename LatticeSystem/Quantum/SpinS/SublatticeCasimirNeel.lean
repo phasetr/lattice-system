@@ -232,6 +232,31 @@ theorem neelConfigOfS_complement (A : Λ → Bool) (N : ℕ) (x : Λ) :
     · simp [h]
     · exact absurd h hA
 
+/-- The spin-`S` Néel state lies in the magnetization-`M` subspace where
+`M = (|A|-|¬A|)·N/2`. Direct from `totalSpinSOp3_mulVec_neelStateOfS`.
+Spin-`S` analog of `neelStateOf_mem_magnetizationSubspace`. -/
+theorem neelStateOfS_mem_magSubspaceS (A : Λ → Bool) (N : ℕ) :
+    neelStateOfS A N ∈ magSubspaceS Λ N
+      (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2) -
+        ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) := by
+  rw [mem_magSubspaceS_iff]
+  exact totalSpinSOp3_mulVec_neelStateOfS A N
+
+/-- **Complement Néel sits in the opposite magnetization sector**
+(spin-`S`): `Φ_Néel(¬A) ∈ magSubspaceS ((|¬A|-|A|)·N/2)` (γ-4 step 176).
+Direct application of `neelStateOfS_mem_magSubspaceS` with `A` replaced
+by `¬A`, then simplifying `! ! A x = A x`. -/
+theorem neelStateOfS_complement_mem_magSubspaceS (A : Λ → Bool) (N : ℕ) :
+    neelStateOfS (fun x : Λ => ! A x) N ∈ magSubspaceS Λ N
+      (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2) -
+        ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2)) := by
+  have := neelStateOfS_mem_magSubspaceS (fun x : Λ => ! A x) N
+  simpa [Bool.not_not] using this
+
 /-! ## Sublattice axis-3 on the Néel state -/
 
 /-- `Ŝ_A^(3) · |Φ_Néel⟩ = (|A|·N/2) · |Φ_Néel⟩`. The sublattice
