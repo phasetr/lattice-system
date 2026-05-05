@@ -1003,6 +1003,31 @@ theorem neelStateOf_allUp_orthogonal
     rw [basisVec_of_ne hτ]
     simp
 
+/-- `<basisVec (fun _ => 1) | Φ_Néel> = 0` when `|A| > 0`. Spin-`1/2`
+mirror of γ-4 step 173: the all-down basis state is orthogonal to the
+Néel state whenever `A` is non-empty. -/
+theorem neelStateOf_allDown_orthogonal
+    (A : Λ → Bool) (hA : ∃ x : Λ, A x = true) :
+    dotProduct (star (basisVec (fun _ : Λ => (1 : Fin 2))))
+        (neelStateOf A) = 0 := by
+  unfold neelStateOf dotProduct
+  have hne : neelConfigOf A ≠ (fun _ : Λ => (1 : Fin 2)) := by
+    obtain ⟨x, hx⟩ := hA
+    intro heq
+    have h := congrFun heq x
+    unfold neelConfigOf at h
+    rw [if_pos hx] at h
+    exact (by decide : (0 : Fin 2) ≠ 1) h
+  rw [Finset.sum_eq_zero]
+  intro τ _
+  by_cases hτ : τ = neelConfigOf A
+  · rw [hτ]
+    have : basisVec (fun _ : Λ => (1 : Fin 2)) (neelConfigOf A) = 0 :=
+      basisVec_of_ne hne
+    simp [Pi.star_apply, this]
+  · rw [basisVec_of_ne hτ]
+    simp
+
 /-- The spin-`1/2` Néel state lies in the magnetization-`M` subspace
 where `M = (|A|-|¬A|)/2`. Direct from `totalSpinHalfOp3_mulVec_neelStateOf`. -/
 theorem neelStateOf_mem_magnetizationSubspace (A : Λ → Bool) :
