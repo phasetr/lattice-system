@@ -1226,6 +1226,16 @@ theorem neelStateOf_complement_linearIndependent
   intros s t h
   exact neelStateOf_complement_pair_independent A h
 
+/-- **`finrank` of the Néel-complement pair span equals 2** (spin-`1/2`).
+Spin-`1/2` mirror of γ-4 step 186. -/
+theorem neelStateOf_complement_finrank_span
+    [Nonempty Λ] (A : Λ → Bool) :
+    Module.finrank ℂ
+      (Submodule.span ℂ
+        (Set.range ![neelStateOf A, neelStateOf (fun x : Λ => ! A x)])) = 2 := by
+  rw [finrank_span_eq_card (neelStateOf_complement_linearIndependent A)]
+  rfl
+
 /-- **Triple linear independence** (spin-`1/2`) of
 {`basisVec(const 0)`, `basisVec(const 1)`, `Φ_Néel(¬A)`}: spin-`1/2`
 mirror of γ-4 step 183, applies γ-4 step 175 with `A := ¬A`. -/
