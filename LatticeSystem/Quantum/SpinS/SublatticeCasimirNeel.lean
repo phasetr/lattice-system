@@ -2770,4 +2770,22 @@ theorem neelStateOfS_totalSpinSOp12_sq_complement_eq
     neelConfigOfS_z_eigenvalue_sq_sum,
     neelConfigOfS_z_eigenvalue_sq_sum]
 
+/-- **Spin-`S` linear `Ŝ_tot^(3)` expectation negation under sublattice swap**:
+`<Φ_Néel(¬A) | Ŝ_tot^(3) | Φ_Néel(¬A)> = −<Φ_Néel(A) | Ŝ_tot^(3) | Φ_Néel(A)>`.
+
+Direct from γ-4 step 206 (general expectation = `magEigenvalueS σ`) +
+γ-4 step 231 (`magEigenvalueS (¬A) = −magEigenvalueS A`)
+(γ-4 step 239). -/
+theorem neelStateOfS_totalSpinSOp3_complement_eq_neg
+    (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+        ((totalSpinSOp3 Λ N).mulVec
+          (neelStateOfS (fun x : Λ => ! A x) N)) =
+      -dotProduct (star (neelStateOfS A N))
+        ((totalSpinSOp3 Λ N).mulVec (neelStateOfS A N)) := by
+  unfold neelStateOfS
+  rw [basisVecS_expectation_totalSpinSOp3,
+    basisVecS_expectation_totalSpinSOp3,
+    magEigenvalueS_neelConfigOfS_complement_eq_neg]
+
 end LatticeSystem.Quantum
