@@ -189,4 +189,20 @@ theorem basisVecS_expectation_totalSpinSOp3_sq (σ : V → Fin (N + 1)) :
   rw [dotProduct_smul_right, basisVecS_inner_self, mul_one]
   ring_nf
 
+/-! ## `Ŝ_tot^{(3)}` zero-variance on `basisVecS σ` (γ-4 step 208) -/
+
+/-- `basisVecS σ` is a sharp `Ŝ_tot^{(3)}`-eigenstate (zero variance):
+`<(Ŝ_tot^{(3)})²> = <Ŝ_tot^{(3)}>²` for any `σ : V → Fin (N + 1)`.
+Equivalently `Var_σ(Ŝ_tot^{(3)}) = 0`. Direct corollary of γ-4 step 205
+(squared, `(magEigenvalueS σ)²`) and γ-4 step 206 (linear,
+`magEigenvalueS σ`). -/
+theorem basisVecS_totalSpinSOp3_variance_eq_zero (σ : V → Fin (N + 1)) :
+    dotProduct (star (basisVecS σ : (V → Fin (N + 1)) → ℂ))
+        ((totalSpinSOp3 V N * totalSpinSOp3 V N).mulVec (basisVecS σ)) -
+      (dotProduct (star (basisVecS σ : (V → Fin (N + 1)) → ℂ))
+        ((totalSpinSOp3 V N).mulVec (basisVecS σ))) ^ 2 = 0 := by
+  rw [basisVecS_expectation_totalSpinSOp3_sq,
+    basisVecS_expectation_totalSpinSOp3]
+  ring
+
 end LatticeSystem.Quantum
