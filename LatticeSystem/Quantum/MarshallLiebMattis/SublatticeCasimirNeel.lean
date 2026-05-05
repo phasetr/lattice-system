@@ -1503,6 +1503,45 @@ theorem neelStateOf_basisVec_quad_finrank_span
         (neelStateOf_basisVec_quad_linearIndependent A hA hAc)]
   rfl
 
+/-- **Set form** of the spin-`1/2` quadruple finrank: `finrank ℂ (span ℂ
+{basisVec(0), basisVec(1), Φ_Néel(A), Φ_Néel(¬A)}) = 4`. Spin-`1/2`
+mirror of γ-4 step 191. -/
+theorem neelStateOf_basisVec_quad_finrank_span_set
+    [Nonempty Λ] (A : Λ → Bool)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false) :
+    Module.finrank ℂ
+      (Submodule.span ℂ
+        ({basisVec (fun _ : Λ => (0 : Fin 2)),
+          basisVec (fun _ : Λ => (1 : Fin 2)),
+          neelStateOf A,
+          neelStateOf (fun x : Λ => ! A x)} : Set _)) = 4 := by
+  have hrange :
+      Set.range
+        (![basisVec (fun _ : Λ => (0 : Fin 2)),
+           basisVec (fun _ : Λ => (1 : Fin 2)),
+           neelStateOf A,
+           neelStateOf (fun x : Λ => ! A x)] : Fin 4 → _) =
+      ({basisVec (fun _ : Λ => (0 : Fin 2)),
+        basisVec (fun _ : Λ => (1 : Fin 2)),
+        neelStateOf A,
+        neelStateOf (fun x : Λ => ! A x)} : Set _) := by
+    ext v
+    simp only [Set.mem_range, Set.mem_insert_iff, Set.mem_singleton_iff]
+    constructor
+    · rintro ⟨i, hi⟩
+      fin_cases i
+      · exact Or.inl hi.symm
+      · exact Or.inr (Or.inl hi.symm)
+      · exact Or.inr (Or.inr (Or.inl hi.symm))
+      · exact Or.inr (Or.inr (Or.inr hi.symm))
+    · rintro (rfl | rfl | rfl | rfl)
+      · exact ⟨0, rfl⟩
+      · exact ⟨1, rfl⟩
+      · exact ⟨2, rfl⟩
+      · exact ⟨3, rfl⟩
+  rw [← hrange]
+  exact neelStateOf_basisVec_quad_finrank_span A hA hAc
+
 /-- The spin-`1/2` Néel state lies in the magnetization-`M` subspace
 where `M = (|A|-|¬A|)/2`. Direct from `totalSpinHalfOp3_mulVec_neelStateOf`. -/
 theorem neelStateOf_mem_magnetizationSubspace (A : Λ → Bool) :

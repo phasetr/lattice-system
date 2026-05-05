@@ -1603,6 +1603,44 @@ theorem neelStateOfS_allAligned_quad_finrank_span
         (neelStateOfS_allAligned_quad_linearIndependent A N hN hA hAc)]
   rfl
 
+/-- **Set form** of the quadruple finrank (spin-S):
+`finrank ℂ (span ℂ {Φ_⊤, Φ_⊥, Φ_Néel(A), Φ_Néel(¬A)}) = 4` (γ-4 step 191). -/
+theorem neelStateOfS_allAligned_quad_finrank_span_set
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false) :
+    Module.finrank ℂ
+      (Submodule.span ℂ
+        ({allAlignedStateS Λ N (0 : Fin (N + 1)),
+          allAlignedStateS Λ N (Fin.last N),
+          neelStateOfS A N,
+          neelStateOfS (fun x : Λ => ! A x) N} : Set _)) = 4 := by
+  have hrange :
+      Set.range
+        (![allAlignedStateS Λ N (0 : Fin (N + 1)),
+           allAlignedStateS Λ N (Fin.last N),
+           neelStateOfS A N,
+           neelStateOfS (fun x : Λ => ! A x) N] : Fin 4 → _) =
+      ({allAlignedStateS Λ N (0 : Fin (N + 1)),
+        allAlignedStateS Λ N (Fin.last N),
+        neelStateOfS A N,
+        neelStateOfS (fun x : Λ => ! A x) N} : Set _) := by
+    ext v
+    simp only [Set.mem_range, Set.mem_insert_iff, Set.mem_singleton_iff]
+    constructor
+    · rintro ⟨i, hi⟩
+      fin_cases i
+      · exact Or.inl hi.symm
+      · exact Or.inr (Or.inl hi.symm)
+      · exact Or.inr (Or.inr (Or.inl hi.symm))
+      · exact Or.inr (Or.inr (Or.inr hi.symm))
+    · rintro (rfl | rfl | rfl | rfl)
+      · exact ⟨0, rfl⟩
+      · exact ⟨1, rfl⟩
+      · exact ⟨2, rfl⟩
+      · exact ⟨3, rfl⟩
+  rw [← hrange]
+  exact neelStateOfS_allAligned_quad_finrank_span A N hN hA hAc
+
 /-- The Néel configuration packaged as an element of the magnetization
 sector `magConfigS Λ N (|¬A| · N)`. The `Ŝ_tot^(3)` eigenvalue is
 `|Λ|·N/2 - |¬A|·N = (|A| − |¬A|)·N/2`. -/
