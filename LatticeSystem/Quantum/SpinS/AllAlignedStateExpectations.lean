@@ -157,6 +157,21 @@ theorem allAlignedStateS_last_expectation_totalSpinSOp3_sq :
   rw [show ((Fin.last N).val : ℂ) = (N : ℂ) from by simp [Fin.last]]
   ring
 
+/-! ## `Ŝ_tot^{(3)}` linear expectation on arbitrary `basisVecS σ` (γ-4 step 206) -/
+
+/-- `Ŝ_tot^{(3)}` linear expectation on `basisVecS σ` equals
+`magEigenvalueS σ` for any `σ : V → Fin (N + 1)`. Direct from
+`totalSpinSOp3_mulVec_basisVecS` (eigenvector identity at eigenvalue
+`magEigenvalueS σ`) + `dotProduct_smul_right` + `basisVecS_inner_self`
+(γ-4 step 206). The all-aligned cases (`c = 0` / `c = Fin.last N`) are
+the existing γ-4 step 91 specialisations. -/
+theorem basisVecS_expectation_totalSpinSOp3 (σ : V → Fin (N + 1)) :
+    dotProduct (star (basisVecS σ : (V → Fin (N + 1)) → ℂ))
+        ((totalSpinSOp3 V N).mulVec (basisVecS σ)) =
+      magEigenvalueS σ := by
+  rw [totalSpinSOp3_mulVec_basisVecS, dotProduct_smul_right,
+    basisVecS_inner_self, mul_one]
+
 /-! ## `(Ŝ_{tot}^{(3)})²` expectation on arbitrary `basisVecS σ` (γ-4 step 205) -/
 
 /-- `(Ŝ_tot^{(3)})²` expectation on `basisVecS σ` equals
