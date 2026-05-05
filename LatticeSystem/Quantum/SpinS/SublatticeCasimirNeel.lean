@@ -2539,4 +2539,26 @@ theorem basisVecS_totalSpinSOp12_sq_expectation_general
     basisVecS_expectation_totalSpinSOp3_sq]
   ring
 
+omit [DecidableEq Λ] in
+/-- The per-site `(N/2 − σx.val)²` sum on the Néel configuration is
+constant `|V|·(N/2)²`. Direct evaluation: `neelConfigOfS A N x` is
+either `0` (giving `(N/2)²`) or `Fin.last N` (giving `(N/2 − N)² =
+(N/2)²`); both contribute equally (γ-4 step 221). -/
+theorem neelConfigOfS_z_eigenvalue_sq_sum (A : Λ → Bool) (N : ℕ) :
+    (∑ x : Λ, ((N : ℂ) / 2 - ((neelConfigOfS A N x).val : ℂ)) ^ 2) =
+      (Fintype.card Λ : ℂ) * ((N : ℂ) / 2) ^ 2 := by
+  have hEach : ∀ x : Λ,
+      ((N : ℂ) / 2 - ((neelConfigOfS A N x).val : ℂ)) ^ 2 =
+        ((N : ℂ) / 2) ^ 2 := by
+    intro x
+    unfold neelConfigOfS
+    by_cases hAx : A x
+    · rw [if_pos hAx]
+      simp
+    · rw [if_neg hAx]
+      have : ((Fin.last N).val : ℂ) = (N : ℂ) := by simp [Fin.last]
+      rw [this]; ring
+  simp_rw [hEach]
+  rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+
 end LatticeSystem.Quantum
