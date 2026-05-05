@@ -1040,6 +1040,29 @@ theorem neelStateOf_allDown_orthogonal
   · rw [basisVec_of_ne hτ]
     simp
 
+/-- `<basisVec(const 0) | Φ_Néel(¬A)> = 0` when `|A| > 0`. Spin-`1/2`
+mirror of γ-4 step 180: complement Néel orthogonal to all-up via
+sublattice swap. -/
+theorem neelStateOf_complement_allUp_orthogonal
+    (A : Λ → Bool) (hA : ∃ x : Λ, A x = true) :
+    dotProduct (star (basisVec (fun _ : Λ => (0 : Fin 2))))
+        (neelStateOf (fun x : Λ => ! A x)) = 0 := by
+  have hAc' : ∃ x : Λ, (! A x) = false := by
+    obtain ⟨x, hx⟩ := hA
+    exact ⟨x, by simp [hx]⟩
+  exact neelStateOf_allUp_orthogonal (fun x : Λ => ! A x) hAc'
+
+/-- `<basisVec(const 1) | Φ_Néel(¬A)> = 0` when `|¬A| > 0`. Spin-`1/2`
+mirror of γ-4 step 180: complement Néel orthogonal to all-down. -/
+theorem neelStateOf_complement_allDown_orthogonal
+    (A : Λ → Bool) (hAc : ∃ x : Λ, A x = false) :
+    dotProduct (star (basisVec (fun _ : Λ => (1 : Fin 2))))
+        (neelStateOf (fun x : Λ => ! A x)) = 0 := by
+  have hA' : ∃ x : Λ, (! A x) = true := by
+    obtain ⟨x, hx⟩ := hAc
+    exact ⟨x, by simp [hx]⟩
+  exact neelStateOf_allDown_orthogonal (fun x : Λ => ! A x) hA'
+
 /-- All-up vs all-down basis vectors are orthogonal: `<basisVec(const 0) |
 basisVec(const 1)> = 0` when `Λ` is non-empty. Distinct constant
 configurations on `Fin 2`. -/
