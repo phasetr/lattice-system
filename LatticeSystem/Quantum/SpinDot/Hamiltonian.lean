@@ -216,6 +216,28 @@ theorem basisVec_const_totalSpinHalfSquared_expectation (s : Fin 2) :
   · intro hempty
     exact (hempty (Finset.mem_univ _)).elim
 
+/-- **`(Ŝ_tot^(3))²` expectation on a constant-spin basis state** (spin-`1/2`):
+`<basisVec(const s) | (Ŝ_tot^(3))² | basisVec(const s)> = |Λ|²/4` for any `s : Fin 2`.
+The constant state is an `Ŝ_tot^(3)`-eigenvector with eigenvalue `±|Λ|/2`,
+whose square is `|Λ|²/4` (γ-4 step 203). -/
+theorem basisVec_const_totalSpinHalfOp3_sq_expectation (s : Fin 2) :
+    dotProduct (star (basisVec (fun _ : Λ => s)))
+        ((totalSpinHalfOp3 Λ * totalSpinHalfOp3 Λ).mulVec
+          (basisVec (fun _ : Λ => s))) =
+      ((Fintype.card Λ : ℂ) / 2) ^ 2 := by
+  rw [← Matrix.mulVec_mulVec, totalSpinHalfOp3_mulVec_basisVec_const,
+    Matrix.mulVec_smul, totalSpinHalfOp3_mulVec_basisVec_const,
+    smul_smul]
+  unfold dotProduct
+  rw [Finset.sum_eq_single (fun _ : Λ => s)]
+  · simp only [Pi.star_apply, basisVec_self, star_one, Pi.smul_apply, smul_eq_mul,
+      mul_one, one_mul]
+    fin_cases s <;> simp [spinHalfSign] <;> ring
+  · intros τ _ hτ
+    simp [Pi.smul_apply, basisVec_of_ne hτ]
+  · intro hempty
+    exact (hempty (Finset.mem_univ _)).elim
+
 /-! ## Casimir invariance under Ŝ_tot^± on constant configs (Tasaki §2.4)
 
 `(Ŝ_tot)²` commutes with both `Ŝ_tot^+` and `Ŝ_tot^-`
