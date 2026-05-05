@@ -3,6 +3,7 @@ import LatticeSystem.Quantum.SpinS.Magnetization
 import LatticeSystem.Quantum.SpinS.ToyHamiltonianCasimir
 import LatticeSystem.Quantum.SpinS.BasisVecSOrthonormal
 import LatticeSystem.Quantum.SpinS.MagConfig
+import LatticeSystem.Quantum.SpinS.SingleSiteCasimirExpectation
 
 /-!
 # Spin-`S` Néel state and sublattice Casimir eigenvalues
@@ -1176,5 +1177,17 @@ theorem neelStateOfS_expectation_spinSDot_of_same
   unfold neelStateOfS
   rw [basisVecS_expectation_eq_diagonal]
   exact spinSDot_apply_diag_neelConfigOfS_of_same A N hxy h
+
+/-- `<Φ_Néel | Ŝ_x · Ŝ_x | Φ_Néel> = N(N+2)/4 = S(S+1)`. The same-site
+(diagonal) per-pair correlation is the universal single-site Casimir
+eigenvalue `S(S+1)` on the spin-`S` irrep, evaluated against the
+normalized Néel state. Direct application of
+`spinSDot_self_expectation_normalized` with `neelStateOfS_inner_self`. -/
+theorem neelStateOfS_expectation_spinSDot_self
+    (A : Λ → Bool) (N : ℕ) (x : Λ) :
+    dotProduct (star (neelStateOfS A N))
+        ((spinSDot x x N : ManyBodyOpS Λ N).mulVec (neelStateOfS A N)) =
+      ((N : ℂ) * (N + 2) / 4) :=
+  spinSDot_self_expectation_normalized x (neelStateOfS_inner_self A N)
 
 end LatticeSystem.Quantum
