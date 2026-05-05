@@ -295,4 +295,15 @@ theorem basisVecS_dotProduct_totalSpinSOp3_sq_basisVecS (σ τ : V → Fin (N + 
     rw [if_pos rfl, basisVecS_expectation_totalSpinSOp3_sq]
   · rw [if_neg hτσ, basisVecS_off_diagonal_totalSpinSOp3_sq hτσ]
 
+/-- The per-site `(N/2 − σx.val)²` sum on the all-aligned config at
+constant `c` is `|V|·(N/2 − c.val)²`. Trivial direct computation
+(γ-4 step 222). -/
+theorem allAlignedConfigS_z_eigenvalue_sq_sum
+    (c : Fin (N + 1)) :
+    (∑ x : V, ((N : ℂ) / 2 -
+        ((allAlignedConfigS V N c x).val : ℂ)) ^ 2) =
+      (Fintype.card V : ℂ) * ((N : ℂ) / 2 - (c.val : ℂ)) ^ 2 := by
+  simp only [allAlignedConfigS]
+  rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+
 end LatticeSystem.Quantum
