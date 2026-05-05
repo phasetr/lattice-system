@@ -1316,6 +1316,19 @@ theorem neelStateOf_heisenbergHamiltonianOnGraph_expectation_of_bipartite
   rw [basisVec_expectation_eq_diagonal]
   exact heisenbergHamiltonianOnGraph_apply_diag_neel_of_bipartite G J A hG
 
+/-- **Closed-form Heisenberg-on-graph Néel expectation** (spin-`1/2`)
+under bipartite alignment: `<Φ_Néel | H_G | Φ_Néel> = -J · #G.edgeFinset / 2`.
+Spin-`1/2` mirror of γ-4 step 167. -/
+theorem neelStateOf_heisenbergHamiltonianOnGraph_expectation_of_bipartite_closed
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (A : Λ → Bool)
+    (hG : ∀ x y, G.Adj x y → A x ≠ A y) :
+    dotProduct (star (neelStateOf A))
+        ((heisenbergHamiltonianOnGraph G J : ManyBodyOp Λ).mulVec (neelStateOf A)) =
+      -(J * (G.edgeFinset.card : ℂ) / 2) := by
+  rw [neelStateOf_heisenbergHamiltonianOnGraph_expectation_of_bipartite G J A hG]
+  rw [LatticeSystem.Lattice.couplingOf_sum]
+  ring
+
 /-- **Real-valued positivity** of the spin-`1/2` toy Hamiltonian
 variational gap: `0 < Re (<basisVec 0|Ĥ_toy|basisVec 0> -
 <Φ_Néel|Ĥ_toy|Φ_Néel>) = |A|·|¬A|` when both sublattices are non-empty.
