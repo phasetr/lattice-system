@@ -1280,6 +1280,120 @@ theorem neelStateOfS_allAligned_triple_independent
     exact this
   exact ⟨hc1, hc2, hc3⟩
 
+/-- **Quadruple linear independence** of {`Φ_⊤`, `Φ_⊥`, `Φ_Néel(A)`,
+`Φ_Néel(¬A)`} (spin-S): when `Λ` non-empty, `0 < N`, and both sublattices
+are non-empty, any zero linear combination has all four coefficients
+zero. The quadruple spans a 4-dimensional subspace, derived from the six
+pairwise orthogonalities (γ-4 steps 133/171/173/180 and
+`allAlignedStateS_inner_of_ne`) and norm-squared = 1. -/
+theorem neelStateOfS_allAligned_quad_independent
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    (hA : ∃ x : Λ, A x = true) (hAc : ∃ x : Λ, A x = false)
+    {c1 c2 c3 c4 : ℂ}
+    (h : c1 • allAlignedStateS Λ N (0 : Fin (N + 1)) +
+         c2 • allAlignedStateS Λ N (Fin.last N) +
+         c3 • neelStateOfS A N +
+         c4 • neelStateOfS (fun x : Λ => ! A x) N = 0) :
+    c1 = 0 ∧ c2 = 0 ∧ c3 = 0 ∧ c4 = 0 := by
+  have h_zero_ne_last : (0 : Fin (N + 1)) ≠ Fin.last N := by
+    intro hh
+    have : (0 : Fin (N + 1)).val = (Fin.last N).val := by rw [hh]
+    simp [Fin.last] at this
+    omega
+  have h_top_top := allAlignedStateS_inner_self (V := Λ) (N := N) 0
+  have h_bot_bot := allAlignedStateS_inner_self (V := Λ) (N := N) (Fin.last N)
+  have h_neelA_neelA := neelStateOfS_inner_self A N
+  have h_neelcA_neelcA := neelStateOfS_inner_self (fun x : Λ => ! A x) N
+  have h_top_bot := allAlignedStateS_inner_of_ne (V := Λ) (N := N) h_zero_ne_last
+  have h_bot_top := allAlignedStateS_inner_of_ne (V := Λ) (N := N) h_zero_ne_last.symm
+  have h_top_neelA := neelStateOfS_allAlignedStateS_orthogonal A N hN hAc
+  have h_bot_neelA := neelStateOfS_allAlignedStateS_last_orthogonal A N hN hA
+  have h_top_neelcA :=
+    neelStateOfS_complement_allAlignedStateS_orthogonal A N hN hA
+  have h_bot_neelcA :=
+    neelStateOfS_complement_allAlignedStateS_last_orthogonal A N hN hAc
+  have h_neelA_neelcA := neelStateOfS_complement_orthogonal A N hN
+  -- Reverse orthogonalities (Néel-allAligned and Néel(¬A)-allAligned, etc.) by symmetry:
+  have h_neelA_top : dotProduct (star (neelStateOfS A N))
+      (allAlignedStateS Λ N (0 : Fin (N + 1))) = 0 := by
+    have := h_top_neelA
+    rw [show dotProduct (star (allAlignedStateS Λ N (0 : Fin (N + 1))))
+            (neelStateOfS A N) =
+          star (dotProduct (star (neelStateOfS A N))
+            (allAlignedStateS Λ N (0 : Fin (N + 1)))) from by
+        rw [← Matrix.star_dotProduct]] at this
+    exact star_eq_zero.mp this
+  have h_neelA_bot : dotProduct (star (neelStateOfS A N))
+      (allAlignedStateS Λ N (Fin.last N)) = 0 := by
+    have := h_bot_neelA
+    rw [show dotProduct (star (allAlignedStateS Λ N (Fin.last N)))
+            (neelStateOfS A N) =
+          star (dotProduct (star (neelStateOfS A N))
+            (allAlignedStateS Λ N (Fin.last N))) from by
+        rw [← Matrix.star_dotProduct]] at this
+    exact star_eq_zero.mp this
+  have h_neelcA_top : dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+      (allAlignedStateS Λ N (0 : Fin (N + 1))) = 0 := by
+    have := h_top_neelcA
+    rw [show dotProduct (star (allAlignedStateS Λ N (0 : Fin (N + 1))))
+            (neelStateOfS (fun x : Λ => ! A x) N) =
+          star (dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+            (allAlignedStateS Λ N (0 : Fin (N + 1)))) from by
+        rw [← Matrix.star_dotProduct]] at this
+    exact star_eq_zero.mp this
+  have h_neelcA_bot : dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+      (allAlignedStateS Λ N (Fin.last N)) = 0 := by
+    have := h_bot_neelcA
+    rw [show dotProduct (star (allAlignedStateS Λ N (Fin.last N)))
+            (neelStateOfS (fun x : Λ => ! A x) N) =
+          star (dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+            (allAlignedStateS Λ N (Fin.last N))) from by
+        rw [← Matrix.star_dotProduct]] at this
+    exact star_eq_zero.mp this
+  have h_neelcA_neelA : dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+      (neelStateOfS A N) = 0 := by
+    have := h_neelA_neelcA
+    rw [show dotProduct (star (neelStateOfS A N))
+            (neelStateOfS (fun x : Λ => ! A x) N) =
+          star (dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+            (neelStateOfS A N)) from by
+        rw [← Matrix.star_dotProduct]] at this
+    exact star_eq_zero.mp this
+  have hc1 : c1 = 0 := by
+    have := congrArg
+      (dotProduct (star (allAlignedStateS Λ N (0 : Fin (N + 1))))) h
+    rw [dotProduct_add, dotProduct_add, dotProduct_add,
+        dotProduct_smul, dotProduct_smul, dotProduct_smul, dotProduct_smul,
+        h_top_top, h_top_bot, h_top_neelA, h_top_neelcA, dotProduct_zero] at this
+    simp at this
+    exact this
+  have hc2 : c2 = 0 := by
+    have := congrArg
+      (dotProduct (star (allAlignedStateS Λ N (Fin.last N)))) h
+    rw [dotProduct_add, dotProduct_add, dotProduct_add,
+        dotProduct_smul, dotProduct_smul, dotProduct_smul, dotProduct_smul,
+        h_bot_top, h_bot_bot, h_bot_neelA, h_bot_neelcA, dotProduct_zero] at this
+    simp at this
+    exact this
+  have hc3 : c3 = 0 := by
+    have := congrArg (dotProduct (star (neelStateOfS A N))) h
+    rw [dotProduct_add, dotProduct_add, dotProduct_add,
+        dotProduct_smul, dotProduct_smul, dotProduct_smul, dotProduct_smul,
+        h_neelA_top, h_neelA_bot, h_neelA_neelA, h_neelA_neelcA,
+        dotProduct_zero] at this
+    simp at this
+    exact this
+  have hc4 : c4 = 0 := by
+    have := congrArg
+      (dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))) h
+    rw [dotProduct_add, dotProduct_add, dotProduct_add,
+        dotProduct_smul, dotProduct_smul, dotProduct_smul, dotProduct_smul,
+        h_neelcA_top, h_neelcA_bot, h_neelcA_neelA, h_neelcA_neelcA,
+        dotProduct_zero] at this
+    simp at this
+    exact this
+  exact ⟨hc1, hc2, hc3, hc4⟩
+
 /-- The Néel configuration packaged as an element of the magnetization
 sector `magConfigS Λ N (|¬A| · N)`. The `Ŝ_tot^(3)` eigenvalue is
 `|Λ|·N/2 - |¬A|·N = (|A| − |¬A|)·N/2`. -/
