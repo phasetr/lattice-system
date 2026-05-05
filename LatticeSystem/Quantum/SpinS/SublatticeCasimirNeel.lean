@@ -1099,4 +1099,22 @@ theorem neelStateOfS_totalSpinSOp12_sq_expectation (A : Λ → Bool) (N : ℕ) :
   have h := htotal
   linear_combination h
 
+/-- `<Φ_Néel | Ŝ_x · Ŝ_y | Φ_Néel> = -N²/4` for a cross-sublattice pair
+`x ∈ A`, `y ∈ ¬A`. The state-level expectation lifts the diagonal matrix
+element `spinSDot_apply_diag_neelConfigOfS_of_cross` via
+`basisVecS_expectation_eq_diagonal`, since `Φ_Néel = basisVecS
+(neelConfigOfS A N)`.
+
+This is the antiferromagnetic per-bond Néel correlation, the variational
+input to Tasaki §2.5 Theorem 2.3. -/
+theorem neelStateOfS_expectation_spinSDot_of_cross
+    (A : Λ → Bool) (N : ℕ)
+    {x y : Λ} (hAx : A x = true) (hAy : A y = false) :
+    dotProduct (star (neelStateOfS A N))
+        ((spinSDot x y N : ManyBodyOpS Λ N).mulVec (neelStateOfS A N)) =
+      -((N : ℂ) * (N : ℂ) / 4) := by
+  unfold neelStateOfS
+  rw [basisVecS_expectation_eq_diagonal]
+  exact spinSDot_apply_diag_neelConfigOfS_of_cross A N hAx hAy
+
 end LatticeSystem.Quantum
