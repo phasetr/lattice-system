@@ -1365,6 +1365,39 @@ theorem neelStateOfS_heisenbergToyHamiltonianS_expectation_via_cross_only
   rw [bipartiteCoupling_sum]
   ring
 
+/-- **Heisenberg-on-graph diagonal Néel matrix element** under bipartite
+alignment: when every edge of the SimpleGraph `G` crosses the
+sublattice partition `(A, ¬A)`, the coupling `couplingOf G J` satisfies
+the cross-only hypothesis, and the synthesis collapses to
+`-(N²/4) · Σ couplingOf G J`. Spin-S generalization of the toy
+expectation, applicable to any bipartite-aligned graph (e.g. a path
+graph on a bipartite-coloured chain). -/
+theorem heisenbergHamiltonianOnGraphS_apply_diag_neel_of_bipartite
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (A : Λ → Bool) (N : ℕ)
+    (hG : ∀ x y, G.Adj x y → A x ≠ A y) :
+    (heisenbergHamiltonianOnGraphS G J N) (neelConfigOfS A N) (neelConfigOfS A N) =
+      -((N : ℂ) * (N : ℂ) / 4) *
+        (∑ x : Λ, ∑ y : Λ, LatticeSystem.Lattice.couplingOf G J x y) := by
+  unfold heisenbergHamiltonianOnGraphS
+  refine heisenbergHamiltonianS_apply_diag_neel_of_cross_only _ A N ?_
+  intros x y h
+  unfold LatticeSystem.Lattice.couplingOf
+  rw [if_neg (fun hAdj => hG x y hAdj h)]
+
+/-- State-level Heisenberg-on-graph Néel expectation under bipartite
+alignment: lifts `heisenbergHamiltonianOnGraphS_apply_diag_neel_of_bipartite`
+via `basisVecS_expectation_eq_diagonal`. -/
+theorem neelStateOfS_heisenbergHamiltonianOnGraphS_expectation_of_bipartite
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (A : Λ → Bool) (N : ℕ)
+    (hG : ∀ x y, G.Adj x y → A x ≠ A y) :
+    dotProduct (star (neelStateOfS A N))
+        ((heisenbergHamiltonianOnGraphS G J N).mulVec (neelStateOfS A N)) =
+      -((N : ℂ) * (N : ℂ) / 4) *
+        (∑ x : Λ, ∑ y : Λ, LatticeSystem.Lattice.couplingOf G J x y) := by
+  unfold neelStateOfS
+  rw [basisVecS_expectation_eq_diagonal]
+  exact heisenbergHamiltonianOnGraphS_apply_diag_neel_of_bipartite G J A N hG
+
 /-- **Real-valued positivity** of the toy Hamiltonian variational gap:
 `0 < Re (<Φ_⊤|Ĥ_toy|Φ_⊤> - <Φ_Néel|Ĥ_toy|Φ_Néel>) = |A|·|¬A|·N²` when
 both sublattices are non-empty and `N ≥ 1`. The all-up state has strictly

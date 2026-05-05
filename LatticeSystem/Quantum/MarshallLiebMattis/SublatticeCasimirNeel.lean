@@ -1286,6 +1286,36 @@ theorem neelStateOf_heisenbergToyHamiltonian_expectation_via_cross_only
   rw [bipartiteCoupling_sum]
   ring
 
+/-- **Heisenberg-on-graph diagonal Néel matrix element** (spin-`1/2`)
+under bipartite alignment: when every edge of `G` crosses `(A, ¬A)`,
+`(heisenbergHamiltonianOnGraph G J)(neel)(neel) = -(1/4) · Σ couplingOf G J`.
+Spin-`1/2` mirror of γ-4 step 166. -/
+theorem heisenbergHamiltonianOnGraph_apply_diag_neel_of_bipartite
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (A : Λ → Bool)
+    (hG : ∀ x y, G.Adj x y → A x ≠ A y) :
+    (heisenbergHamiltonianOnGraph G J : ManyBodyOp Λ)
+        (neelConfigOf A) (neelConfigOf A) =
+      -(1 / 4 : ℂ) *
+        (∑ x : Λ, ∑ y : Λ, LatticeSystem.Lattice.couplingOf G J x y) := by
+  unfold heisenbergHamiltonianOnGraph
+  refine heisenbergHamiltonian_apply_diag_neel_of_cross_only _ A ?_
+  intros x y h
+  unfold LatticeSystem.Lattice.couplingOf
+  rw [if_neg (fun hAdj => hG x y hAdj h)]
+
+/-- State-level spin-`1/2` Heisenberg-on-graph Néel expectation under
+bipartite alignment. Spin-`1/2` mirror of γ-4 step 166. -/
+theorem neelStateOf_heisenbergHamiltonianOnGraph_expectation_of_bipartite
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (A : Λ → Bool)
+    (hG : ∀ x y, G.Adj x y → A x ≠ A y) :
+    dotProduct (star (neelStateOf A))
+        ((heisenbergHamiltonianOnGraph G J : ManyBodyOp Λ).mulVec (neelStateOf A)) =
+      -(1 / 4 : ℂ) *
+        (∑ x : Λ, ∑ y : Λ, LatticeSystem.Lattice.couplingOf G J x y) := by
+  unfold neelStateOf
+  rw [basisVec_expectation_eq_diagonal]
+  exact heisenbergHamiltonianOnGraph_apply_diag_neel_of_bipartite G J A hG
+
 /-- **Real-valued positivity** of the spin-`1/2` toy Hamiltonian
 variational gap: `0 < Re (<basisVec 0|Ĥ_toy|basisVec 0> -
 <Φ_Néel|Ĥ_toy|Φ_Néel>) = |A|·|¬A|` when both sublattices are non-empty.
