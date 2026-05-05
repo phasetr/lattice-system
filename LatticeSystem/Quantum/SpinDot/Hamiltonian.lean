@@ -346,6 +346,18 @@ theorem basisVec_dotProduct_basisVec (σ τ : Λ → Fin 2) :
     · intro h; exact (h (Finset.mem_univ _)).elim
   · rw [if_neg hτσ, basisVec_dotProduct_basisVec_of_ne hτσ]
 
+/-- **Spin-`1/2` combined δ-form for `Ŝ_tot^(3)` matrix elements**:
+`<basisVec τ | Ŝ_tot^(3) | basisVec σ> = if τ = σ then magnetization(σ)/2 else 0`
+(γ-4 step 212). -/
+theorem basisVec_dotProduct_totalSpinHalfOp3_basisVec (σ τ : Λ → Fin 2) :
+    dotProduct (star (basisVec τ))
+        ((totalSpinHalfOp3 Λ).mulVec (basisVec σ)) =
+      if τ = σ then (magnetization Λ σ : ℂ) / 2 else 0 := by
+  by_cases hτσ : τ = σ
+  · subst hτσ
+    rw [if_pos rfl, basisVec_totalSpinHalfOp3_expectation]
+  · rw [if_neg hτσ, basisVec_off_diagonal_totalSpinHalfOp3 hτσ]
+
 /-! ## Casimir invariance under Ŝ_tot^± on constant configs (Tasaki §2.4)
 
 `(Ŝ_tot)²` commutes with both `Ŝ_tot^+` and `Ŝ_tot^-`
