@@ -2725,4 +2725,26 @@ theorem neelStateOfS_totalSpinSSquared_complement_eq
     magEigenvalueS_neelConfigOfS_complement_eq_neg]
   ring
 
+/-- **Spin-`S` `(Ŝ_tot^(3))²` is sublattice-swap invariant on Néel
+states**:
+`<Φ_Néel(¬A) | (Ŝ_tot^(3))² | Φ_Néel(¬A)> = <Φ_Néel(A) | (Ŝ_tot^(3))² | Φ_Néel(A)>`.
+
+Direct corollary of γ-4 step 205 (`(Ŝ_tot^(3))² | basisVecS σ⟩` =
+`(magEigenvalueS σ)² | σ⟩`) + γ-4 step 231
+(`magEigenvalueS (¬A) = −magEigenvalueS A`): the squared eigenvalue
+is sign-flip invariant (γ-4 step 235). -/
+theorem neelStateOfS_totalSpinSOp3_sq_complement_eq
+    (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+        ((totalSpinSOp3 Λ N * totalSpinSOp3 Λ N).mulVec
+          (neelStateOfS (fun x : Λ => ! A x) N)) =
+      dotProduct (star (neelStateOfS A N))
+        ((totalSpinSOp3 Λ N * totalSpinSOp3 Λ N).mulVec
+          (neelStateOfS A N)) := by
+  unfold neelStateOfS
+  rw [basisVecS_expectation_totalSpinSOp3_sq,
+    basisVecS_expectation_totalSpinSOp3_sq,
+    magEigenvalueS_neelConfigOfS_complement_eq_neg]
+  ring
+
 end LatticeSystem.Quantum
