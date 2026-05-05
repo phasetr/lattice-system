@@ -2281,10 +2281,10 @@ theorem bipartiteCompleteGraphOf_edgeFinset_card (A : Λ → Bool) :
     · by_cases hA : A x ≠ A y
       · have hAdj : (bipartiteCompleteGraphOf A).Adj x y := ⟨hxy, hA⟩
         rw [if_pos hAdj, if_pos hA]
-      · push_neg at hA
+      · have hAeq : A x = A y := not_ne_iff.mp hA
         have hNotAdj : ¬ (bipartiteCompleteGraphOf A).Adj x y :=
-          fun ⟨_, h⟩ => h hA
-        rw [if_neg hNotAdj, if_neg (fun h => h hA)]
+          fun ⟨_, h⟩ => h hAeq
+        rw [if_neg hNotAdj, if_neg (fun h => h hAeq)]
   have h_coupling :=
     LatticeSystem.Lattice.couplingOf_sum (bipartiteCompleteGraphOf A) (1 : ℂ)
   have h_sum_eq : ∑ x : Λ, ∑ y : Λ,
