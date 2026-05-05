@@ -1042,4 +1042,18 @@ theorem neelStateOf_totalSpinHalfOp12_sq_expectation (A : Λ → Bool) :
   rw [Matrix.add_mulVec, dotProduct_add]
   linear_combination htotal
 
+/-- `<Φ_Néel | Ŝ_x · Ŝ_y | Φ_Néel> = -1/4` for a cross-sublattice pair
+`x ∈ A`, `y ∈ ¬A`. Spin-`1/2` mirror of γ-4 step 157: lifts the diagonal
+matrix element `spinHalfDot_apply_diag_neelConfigOf_of_cross` via
+`basisVec_expectation_eq_diagonal`, since `Φ_Néel = basisVec
+(neelConfigOf A)`. -/
+theorem neelStateOf_expectation_spinHalfDot_of_cross
+    (A : Λ → Bool) {x y : Λ} (hAx : A x = true) (hAy : A y = false) :
+    dotProduct (star (neelStateOf A))
+        ((spinHalfDot x y : ManyBodyOp Λ).mulVec (neelStateOf A)) =
+      -(1 / 4 : ℂ) := by
+  unfold neelStateOf
+  rw [basisVec_expectation_eq_diagonal]
+  exact spinHalfDot_apply_diag_neelConfigOf_of_cross A hAx hAy
+
 end LatticeSystem.Quantum
