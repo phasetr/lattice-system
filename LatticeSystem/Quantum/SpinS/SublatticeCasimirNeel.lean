@@ -829,6 +829,33 @@ theorem neelStateOfS_ne_zero (A : Λ → Bool) (N : ℕ) :
   rw [h1] at h0
   exact one_ne_zero h0
 
+/-- The spin-`S` magnetization-`(|A|-|¬A|)·N/2` subspace is non-trivial:
+it contains the non-zero Néel state. Spin-`S` analog of
+`magnetizationSubspace_nontrivial_via_neel` (γ-4 step 177). -/
+theorem magSubspaceS_nontrivial_via_neel (A : Λ → Bool) (N : ℕ) :
+    magSubspaceS Λ N
+        (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+            ((N : ℂ) / 2) -
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+            ((N : ℂ) / 2)) ≠ ⊥ := by
+  intro hbot
+  have hmem := neelStateOfS_mem_magSubspaceS A N
+  rw [hbot, Submodule.mem_bot] at hmem
+  exact neelStateOfS_ne_zero A N hmem
+
+/-- The line spanned by the spin-`S` Néel state is contained in the
+magnetization subspace at `M = (|A|-|¬A|)·N/2`. Spin-`S` analog of
+`neelStateOf_span_le_magnetizationSubspace`. -/
+theorem neelStateOfS_span_le_magSubspaceS (A : Λ → Bool) (N : ℕ) :
+    Submodule.span ℂ {neelStateOfS A N} ≤
+      magSubspaceS Λ N
+        (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
+            ((N : ℂ) / 2) -
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
+            ((N : ℂ) / 2)) := by
+  rw [Submodule.span_le, Set.singleton_subset_iff]
+  exact neelStateOfS_mem_magSubspaceS A N
+
 /-- The spin-`S` Néel state has norm-squared 1:
 `<Φ_Néel | Φ_Néel> = 1`. Direct from `basisVecS_inner_self`. -/
 theorem neelStateOfS_inner_self (A : Λ → Bool) (N : ℕ) :
