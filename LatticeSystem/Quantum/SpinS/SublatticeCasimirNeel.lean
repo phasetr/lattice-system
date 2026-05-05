@@ -1281,4 +1281,26 @@ theorem neelStateOfS_totalSpinSOp12_sq_expectation_re_pos
   · exact_mod_cast Fintype.card_pos
   · exact_mod_cast hN
 
+/-- **Strict spread**: `Re <Φ_Néel | (Ŝ_tot^(3))² | Φ_Néel> < Re <Φ_Néel | (Ŝ_tot)² | Φ_Néel>`
+when `Λ` is non-empty and `N ≥ 1`. The Néel state has a strictly larger
+total-spin Casimir than its (Ŝ_tot^(3))²-eigenvalue, so it is **not**
+concentrated in a single `S_tot`-sector. Combines γ-4 step 161
+(transverse positivity) with the operator decomposition `(Ŝ_tot)² =
+(Ŝ_tot^(1))² + (Ŝ_tot^(2))² + (Ŝ_tot^(3))²`. -/
+theorem neelStateOfS_totalSpinSSquared_expectation_re_gt_OpZ_sq
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N) :
+    (dotProduct (star (neelStateOfS A N))
+        ((totalSpinSOp3 Λ N * totalSpinSOp3 Λ N).mulVec
+          (neelStateOfS A N))).re <
+    (dotProduct (star (neelStateOfS A N))
+        ((totalSpinSSquared Λ N).mulVec (neelStateOfS A N))).re := by
+  have h12pos := neelStateOfS_totalSpinSOp12_sq_expectation_re_pos A N hN
+  rw [show totalSpinSSquared Λ N =
+        (totalSpinSOp1 Λ N * totalSpinSOp1 Λ N +
+          totalSpinSOp2 Λ N * totalSpinSOp2 Λ N) +
+          totalSpinSOp3 Λ N * totalSpinSOp3 Λ N from
+      totalSpinSSquared_def Λ N]
+  rw [Matrix.add_mulVec, dotProduct_add, Complex.add_re]
+  linarith
+
 end LatticeSystem.Quantum
