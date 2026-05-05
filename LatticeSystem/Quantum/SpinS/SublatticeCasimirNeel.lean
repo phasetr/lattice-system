@@ -2596,4 +2596,28 @@ theorem magEigenvalueS_neelConfigOfS (A : Λ → Bool) (N : ℕ) :
   push_cast
   ring
 
+/-- **Spin-`S` Néel Casimir** re-derived via the general
+`basisVecS σ` Casimir formula (γ-4 step 218): combining γ-4 step 218
++ γ-4 step 221 + γ-4 step 224 yields
+`<Φ_Néel | (Ŝ_tot)² | Φ_Néel> = ((|A|−|¬A|)·N/2)² + |V|·N/2`,
+matching the existing closed-form
+`neelStateOfS_totalSpinSSquared_expectation_card_Lambda` (γ-4 step 127).
+
+Useful as a unification check: the general formula's `magEigenvalueS²
++ |V|·N(N+2)/4 − Σ_x m_x²` correctly reduces to the Néel-specific
+result when applied to `neelConfigOfS A N` (γ-4 step 225). -/
+theorem neelStateOfS_totalSpinSSquared_expectation_via_general
+    (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((totalSpinSSquared Λ N).mulVec (neelStateOfS A N)) =
+      ((((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
+          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ)) *
+          ((N : ℂ) / 2)) ^ 2 +
+        (Fintype.card Λ : ℂ) * ((N : ℂ) / 2) := by
+  unfold neelStateOfS
+  rw [basisVecS_totalSpinSSquared_expectation_general,
+    magEigenvalueS_neelConfigOfS,
+    neelConfigOfS_z_eigenvalue_sq_sum]
+  ring
+
 end LatticeSystem.Quantum
