@@ -1040,6 +1040,48 @@ theorem neelStateOf_allDown_orthogonal
   · rw [basisVec_of_ne hτ]
     simp
 
+/-- **State-level distinctness** (spin-`1/2`): `Φ_Néel(A) ≠ basisVec(const 0)`
+when `|¬A| > 0`. Spin-`1/2` mirror of γ-4 step 184. Equality would force
+the all-up basis vector's norm-squared to vanish, contradicting it being
+`1`. -/
+theorem neelStateOf_ne_basisVec_const_zero
+    (A : Λ → Bool) (hAc : ∃ x : Λ, A x = false) :
+    neelStateOf A ≠ basisVec (fun _ : Λ => (0 : Fin 2)) := by
+  intro h
+  have horth := neelStateOf_allUp_orthogonal A hAc
+  rw [h] at horth
+  have hself : dotProduct (star (basisVec (fun _ : Λ => (0 : Fin 2))))
+        (basisVec (fun _ : Λ => (0 : Fin 2))) = 1 := by
+    unfold dotProduct
+    rw [Finset.sum_eq_single (fun _ : Λ => (0 : Fin 2))]
+    · simp [Pi.star_apply, basisVec_self]
+    · intros τ _ hτ
+      simp [Pi.star_apply, basisVec_of_ne hτ]
+    · intro hempty
+      exact (hempty (Finset.mem_univ _)).elim
+  rw [hself] at horth
+  exact one_ne_zero horth
+
+/-- **State-level distinctness** (spin-`1/2`): `Φ_Néel(A) ≠ basisVec(const 1)`
+when `|A| > 0`. Spin-`1/2` mirror of γ-4 step 184. -/
+theorem neelStateOf_ne_basisVec_const_one
+    (A : Λ → Bool) (hA : ∃ x : Λ, A x = true) :
+    neelStateOf A ≠ basisVec (fun _ : Λ => (1 : Fin 2)) := by
+  intro h
+  have horth := neelStateOf_allDown_orthogonal A hA
+  rw [h] at horth
+  have hself : dotProduct (star (basisVec (fun _ : Λ => (1 : Fin 2))))
+        (basisVec (fun _ : Λ => (1 : Fin 2))) = 1 := by
+    unfold dotProduct
+    rw [Finset.sum_eq_single (fun _ : Λ => (1 : Fin 2))]
+    · simp [Pi.star_apply, basisVec_self]
+    · intros τ _ hτ
+      simp [Pi.star_apply, basisVec_of_ne hτ]
+    · intro hempty
+      exact (hempty (Finset.mem_univ _)).elim
+  rw [hself] at horth
+  exact one_ne_zero horth
+
 /-- `<basisVec(const 0) | Φ_Néel(¬A)> = 0` when `|A| > 0`. Spin-`1/2`
 mirror of γ-4 step 180: complement Néel orthogonal to all-up via
 sublattice swap. -/
