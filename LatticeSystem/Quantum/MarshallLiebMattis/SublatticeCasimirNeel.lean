@@ -1215,6 +1215,17 @@ theorem neelStateOf_basisVec_triple_independent
     exact this
   exact ⟨hc1, hc2, hc3⟩
 
+/-- **mathlib LinearIndependent** form of the Néel-complement pair LI
+(spin-`1/2`): `LinearIndependent ℂ ![Φ_Néel(A), Φ_Néel(¬A)]` when `Λ`
+is non-empty. Spin-`1/2` mirror of γ-4 step 185. -/
+theorem neelStateOf_complement_linearIndependent
+    [Nonempty Λ] (A : Λ → Bool) :
+    LinearIndependent ℂ
+      ![neelStateOf A, neelStateOf (fun x : Λ => ! A x)] := by
+  rw [LinearIndependent.pair_iff]
+  intros s t h
+  exact neelStateOf_complement_pair_independent A h
+
 /-- **Triple linear independence** (spin-`1/2`) of
 {`basisVec(const 0)`, `basisVec(const 1)`, `Φ_Néel(¬A)`}: spin-`1/2`
 mirror of γ-4 step 183, applies γ-4 step 175 with `A := ¬A`. -/

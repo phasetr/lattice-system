@@ -1305,6 +1305,18 @@ theorem neelStateOfS_allAligned_triple_independent
     exact this
   exact ⟨hc1, hc2, hc3⟩
 
+/-- **mathlib LinearIndependent** form of the Néel-complement pair LI
+(spin-S): `LinearIndependent ℂ ![Φ_Néel(A), Φ_Néel(¬A)]` when `Λ` is
+non-empty and `0 < N`. Direct conversion of γ-4 step 172 via
+`LinearIndependent.pair_iff` (γ-4 step 185). -/
+theorem neelStateOfS_complement_linearIndependent
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N) :
+    LinearIndependent ℂ
+      ![neelStateOfS A N, neelStateOfS (fun x : Λ => ! A x) N] := by
+  rw [LinearIndependent.pair_iff]
+  intros s t h
+  exact neelStateOfS_complement_pair_independent A N hN h
+
 /-- **Triple linear independence** of {`Φ_⊤`, `Φ_⊥`, `Φ_Néel(¬A)`}
 (spin-S, complement variant): direct application of γ-4 step 174 with
 `A := ¬A`, exchanging the existence hypotheses (γ-4 step 183). -/
