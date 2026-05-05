@@ -176,6 +176,7 @@ theorem neelStateOfS_complement_orthogonal
   unfold neelStateOfS
   exact basisVecS_inner_of_ne (fun h => neelConfigOfS_ne_complement A N hN h.symm)
 
+
 /-- `Ŝ_tot^(3) · |Φ_Néel⟩ = ((|A| − |¬A|)·N/2) · |Φ_Néel⟩`. The spin-`S`
 Néel state is a `Ŝ_tot^(3)`-eigenvector with magnetization
 `(|A| − |¬A|)·N/2`. For `|A| = |¬A|` the magnetization is zero; for
@@ -808,6 +809,37 @@ theorem neelStateOfS_inner_self (A : Λ → Bool) (N : ℕ) :
     dotProduct (star (neelStateOfS A N)) (neelStateOfS A N) = 1 := by
   unfold neelStateOfS
   exact basisVecS_inner_self _
+
+/-- **Néel-complement linear independence** (spin-S): a linear combination
+`c1 • Φ_Néel(A) + c2 • Φ_Néel(¬A) = 0` forces `c1 = c2 = 0`, when `Λ` is
+non-empty and `0 < N`. Direct consequence of γ-4 step 171 (orthogonality)
+plus norm-squared = 1 (`neelStateOfS_inner_self`). The pair spans a
+2-dimensional subspace of the many-body Hilbert space. -/
+theorem neelStateOfS_complement_pair_independent
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N)
+    {c1 c2 : ℂ}
+    (h : c1 • neelStateOfS A N + c2 • neelStateOfS (fun x : Λ => ! A x) N = 0) :
+    c1 = 0 ∧ c2 = 0 := by
+  have horth_AcA := neelStateOfS_complement_orthogonal A N hN
+  have horth_cAA :
+      dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))
+          (neelStateOfS A N) = 0 := by
+    have := neelStateOfS_complement_orthogonal (fun x : Λ => ! A x) N hN
+    simpa [Bool.not_not] using this
+  have hc1 : c1 = 0 := by
+    have := congrArg (dotProduct (star (neelStateOfS A N))) h
+    rw [dotProduct_add, dotProduct_smul, dotProduct_smul,
+        neelStateOfS_inner_self, horth_AcA, dotProduct_zero] at this
+    simp at this
+    exact this
+  have hc2 : c2 = 0 := by
+    have := congrArg
+      (dotProduct (star (neelStateOfS (fun x : Λ => ! A x) N))) h
+    rw [dotProduct_add, dotProduct_smul, dotProduct_smul,
+        neelStateOfS_inner_self, horth_cAA, dotProduct_zero] at this
+    simp at this
+    exact this
+  exact ⟨hc1, hc2⟩
 
 /-- `<Φ_Néel | Ŝ_A^+ · Ŝ_¬A^+ | Φ_Néel> = 0`. Trivially via γ-4 step 89. -/
 theorem neelStateOfS_sublattice_plus_complement_plus_expectation

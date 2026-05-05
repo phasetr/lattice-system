@@ -733,6 +733,34 @@ theorem neelStateOf_inner_self (A : Λ → Bool) :
   · intro h
     exact (h (Finset.mem_univ _)).elim
 
+/-- **Néel-complement linear independence** (spin-`1/2`):
+`c1 • Φ_Néel(A) + c2 • Φ_Néel(¬A) = 0 → c1 = c2 = 0` when `Λ` is non-empty.
+Spin-`1/2` mirror of γ-4 step 172. -/
+theorem neelStateOf_complement_pair_independent
+    [Nonempty Λ] (A : Λ → Bool)
+    {c1 c2 : ℂ}
+    (h : c1 • neelStateOf A + c2 • neelStateOf (fun x : Λ => ! A x) = 0) :
+    c1 = 0 ∧ c2 = 0 := by
+  have horth_AcA := neelStateOf_complement_orthogonal A
+  have horth_cAA :
+      dotProduct (star (neelStateOf (fun x : Λ => ! A x))) (neelStateOf A) = 0 := by
+    have := neelStateOf_complement_orthogonal (fun x : Λ => ! A x)
+    simpa [Bool.not_not] using this
+  have hc1 : c1 = 0 := by
+    have := congrArg (dotProduct (star (neelStateOf A))) h
+    rw [dotProduct_add, dotProduct_smul, dotProduct_smul,
+        neelStateOf_inner_self, horth_AcA, dotProduct_zero] at this
+    simp at this
+    exact this
+  have hc2 : c2 = 0 := by
+    have := congrArg
+      (dotProduct (star (neelStateOf (fun x : Λ => ! A x)))) h
+    rw [dotProduct_add, dotProduct_smul, dotProduct_smul,
+        neelStateOf_inner_self, horth_cAA, dotProduct_zero] at this
+    simp at this
+    exact this
+  exact ⟨hc1, hc2⟩
+
 /-- `<Φ_Néel | Ŝ_A^(3)·Ŝ_¬A^(3) | Φ_Néel> = -|A|·|¬A|/4`. Spin-`1/2` mirror of
 γ-4 step 116. -/
 theorem neelStateOf_sublattice3_cross_complement3_expectation (A : Λ → Bool) :
