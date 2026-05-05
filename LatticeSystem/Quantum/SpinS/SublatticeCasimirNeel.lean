@@ -1079,10 +1079,11 @@ theorem neelStateOfS_allAlignedStateS_orthogonal
     omega
   exact basisVecS_inner_of_ne hne
 
-/-- `<Φ_⊥ | Φ_Néel> = 0` when `|A| > 0`. The all-down state and Néel state
-are orthogonal whenever there is at least one site in `A`: at any
-`x ∈ A`, `allAlignedConfigS V N (Fin.last N) x = Fin.last N` while
-`neelConfigOfS A N x = 0`, witnessing the configuration distinctness.
+/-- `<Φ_⊥ | Φ_Néel> = 0` when `|A| > 0` and `0 < N`. The all-down state
+and Néel state are orthogonal whenever there is at least one site in
+`A` and the spin label is non-trivial: at any `x ∈ A`,
+`allAlignedConfigS V N (Fin.last N) x = Fin.last N` while
+`neelConfigOfS A N x = 0`, and `0 ≠ Fin.last N` precisely when `0 < N`.
 Symmetric counterpart of `neelStateOfS_allAlignedStateS_orthogonal`. -/
 theorem neelStateOfS_allAlignedStateS_last_orthogonal
     (A : Λ → Bool) (N : ℕ)
