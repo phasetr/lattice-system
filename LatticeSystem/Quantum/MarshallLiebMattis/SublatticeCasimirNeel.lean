@@ -267,6 +267,17 @@ theorem magnetization_neelConfigOf (A : Λ → Bool) :
   push_cast
   ring
 
+/-- **Sublattice-swap symmetry** of the spin-`1/2` Néel magnetization:
+`magnetization Λ (neelConfigOf (¬A)) = |¬A| - |A|`. Spin-`1/2` mirror of
+γ-4 step 169: the complement Néel sits in the opposite magnetization
+sector. -/
+theorem magnetization_neelConfigOf_complement (A : Λ → Bool) :
+    magnetization Λ (neelConfigOf (fun x : Λ => ! A x)) =
+      ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℤ) -
+        ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℤ) := by
+  rw [magnetization_neelConfigOf]
+  simp [Bool.not_not]
+
 /-- `Ŝ_tot^(3) · |Φ_Néel⟩ = ((|A| − |¬A|)/2) · |Φ_Néel⟩`. The spin-`1/2`
 Néel state is a `Ŝ_tot^(3)`-eigenvector with magnetization
 `(|A| − |¬A|)/2`. For `|A| = |¬A|` the magnetization is zero (e.g.,
