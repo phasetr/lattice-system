@@ -136,6 +136,46 @@ theorem magSumS_neelConfigOfS_complement (A : Λ → Bool) (N : ℕ) :
   rw [magSumS_neelConfigOfS]
   simp [Bool.not_not]
 
+/-- The Néel configuration `neelConfigOfS A N` is distinct from its
+sublattice-complement `neelConfigOfS (¬A) N` (as functions `Λ → Fin (N+1)`)
+when `Λ` is non-empty and `0 < N`: at any vertex `x`, the swap takes
+`0 ↔ Fin.last N`, witnessing the inequality. -/
+theorem neelConfigOfS_ne_complement [Nonempty Λ] (A : Λ → Bool) (N : ℕ)
+    (hN : 0 < N) :
+    neelConfigOfS A N ≠ neelConfigOfS (fun x : Λ => ! A x) N := by
+  obtain ⟨x⟩ := ‹Nonempty Λ›
+  intro h
+  have hx := congr_fun h x
+  unfold neelConfigOfS at hx
+  by_cases hAx : A x = true
+  · rw [if_pos hAx] at hx
+    have hnAxF : (! A x) = false := by simp [hAx]
+    rw [if_neg (by rw [hnAxF]; decide : ¬ ((! A x) = true))] at hx
+    have hval : (0 : Fin (N + 1)).val = (Fin.last N).val := by rw [hx]
+    simp [Fin.last] at hval
+    omega
+  · have hAxF : A x = false := by
+      cases h' : A x with
+      | true => exact absurd h' hAx
+      | false => rfl
+    rw [if_neg hAx] at hx
+    have hnAx : (! A x) = true := by simp [hAxF]
+    rw [if_pos hnAx] at hx
+    have hval : (Fin.last N).val = (0 : Fin (N + 1)).val := by rw [hx]
+    simp [Fin.last] at hval
+    omega
+
+/-- **Néel-complement orthogonality** (spin-S):
+`<Φ_Néel(A) | Φ_Néel(¬A)> = 0` when `Λ` is non-empty and `0 < N`. The
+two Néel states are basis vectors of distinct configurations, hence
+orthogonal. -/
+theorem neelStateOfS_complement_orthogonal
+    [Nonempty Λ] (A : Λ → Bool) (N : ℕ) (hN : 0 < N) :
+    dotProduct (star (neelStateOfS A N))
+        (neelStateOfS (fun x : Λ => ! A x) N) = 0 := by
+  unfold neelStateOfS
+  exact basisVecS_inner_of_ne (fun h => neelConfigOfS_ne_complement A N hN h.symm)
+
 /-- `Ŝ_tot^(3) · |Φ_Néel⟩ = ((|A| − |¬A|)·N/2) · |Φ_Néel⟩`. The spin-`S`
 Néel state is a `Ŝ_tot^(3)`-eigenvector with magnetization
 `(|A| − |¬A|)·N/2`. For `|A| = |¬A|` the magnetization is zero; for
