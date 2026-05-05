@@ -1190,4 +1190,69 @@ theorem neelStateOfS_expectation_spinSDot_self
       ((N : ℂ) * (N + 2) / 4) :=
   spinSDot_self_expectation_normalized x (neelStateOfS_inner_self A N)
 
+/-- The Heisenberg Hamiltonian's diagonal matrix element at the spin-`S`
+Néel configuration: synthesis of the per-pair correlation trio (γ-4
+steps 157/158/159) over the full coupling. Each `(x, y)` term contributes
+`J(x,y) · v(x,y)` where
+
+  `v(x,y) = N(N+2)/4`     if `x = y` (local Casimir),
+  `v(x,y) = +N²/4`        if `x ≠ y` and `A x = A y` (same sublattice),
+  `v(x,y) = -N²/4`        if `x ≠ y` and `A x ≠ A y` (cross sublattice).
+
+For the bipartite AFM Heisenberg (J supported only on `A`–`¬A` bonds),
+the same-sublattice and self contributions vanish, recovering the
+toy Hamiltonian Néel expectation. -/
+theorem heisenbergHamiltonianS_apply_diag_neel
+    (J : Λ → Λ → ℂ) (A : Λ → Bool) (N : ℕ) :
+    (heisenbergHamiltonianS J N) (neelConfigOfS A N) (neelConfigOfS A N) =
+      ∑ x : Λ, ∑ y : Λ,
+        J x y *
+          (if x = y then ((N : ℂ) * (N + 2) / 4)
+           else if A x = A y then ((N : ℂ) * (N : ℂ) / 4)
+           else -((N : ℂ) * (N : ℂ) / 4)) := by
+  rw [heisenbergHamiltonianS_apply]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  refine Finset.sum_congr rfl (fun y _ => ?_)
+  congr 1
+  by_cases hxy : x = y
+  · subst hxy; rw [if_pos rfl, spinSDot_self_apply_diag]
+  · rw [if_neg hxy]
+    by_cases hAxy : A x = A y
+    · rw [if_pos hAxy]
+      exact spinSDot_apply_diag_neelConfigOfS_of_same A N hxy hAxy
+    · rw [if_neg hAxy]
+      by_cases hAx : A x = true
+      · have hAy : A y = false := by
+          cases hAyc : A y with
+          | true => exact absurd (hAx.trans hAyc.symm) hAxy
+          | false => rfl
+        exact spinSDot_apply_diag_neelConfigOfS_of_cross A N hAx hAy
+      · have hAxF : A x = false := by
+          cases hAxc : A x with
+          | true => exact absurd hAxc hAx
+          | false => rfl
+        have hAy : A y = true := by
+          cases hAyc : A y with
+          | true => rfl
+          | false => exact absurd (hAxF.trans hAyc.symm) hAxy
+        rw [show (spinSDot x y N : ManyBodyOpS Λ N) = spinSDot y x N from
+              spinSDot_comm x y N]
+        exact spinSDot_apply_diag_neelConfigOfS_of_cross A N hAy hAxF
+
+/-- State-level expectation of the spin-`S` Heisenberg Hamiltonian on
+the Néel state: lifts `heisenbergHamiltonianS_apply_diag_neel` via
+`basisVecS_expectation_eq_diagonal`. -/
+theorem neelStateOfS_heisenbergHamiltonianS_expectation
+    (J : Λ → Λ → ℂ) (A : Λ → Bool) (N : ℕ) :
+    dotProduct (star (neelStateOfS A N))
+        ((heisenbergHamiltonianS J N).mulVec (neelStateOfS A N)) =
+      ∑ x : Λ, ∑ y : Λ,
+        J x y *
+          (if x = y then ((N : ℂ) * (N + 2) / 4)
+           else if A x = A y then ((N : ℂ) * (N : ℂ) / 4)
+           else -((N : ℂ) * (N : ℂ) / 4)) := by
+  unfold neelStateOfS
+  rw [basisVecS_expectation_eq_diagonal]
+  exact heisenbergHamiltonianS_apply_diag_neel J A N
+
 end LatticeSystem.Quantum
