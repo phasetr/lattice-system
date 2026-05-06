@@ -1682,4 +1682,33 @@ theorem singleClusterHamiltonianS_eigenvalue_pentamer
   congr 1
   ring
 
+/-- **Pentamer GS-sector eigenvalue at GS energy** (γ-5 step 314):
+for `z = 4`, if `v` is a joint eigenvector of `Stot²` at
+`Stot²·v = (3N/2)(3N/2+1)·v` (i.e. `s_tot = 3N/2 = (z-1)N/2`) and the
+6-pair leaf-leaf sum at `(3N²/2)·v` (corresponding to leaves at the
+maximum total leaf-spin `s_R = 2N`), then `v` is an `H`-eigenvector
+at the predicted GS energy
+`singleClusterGSEnergyS 4 N = -N(2N+1)/2`.
+
+Pentamer analogue of γ-5 steps 294 (trimer GS) and 305 (quartet GS).
+The hypotheses correspond to the Tasaki Problem 2.5.a GS Casimir
+sector for `z = 4`: leaves form max leaf-spin sector and couple with
+the central spin to give `s_tot = (z-1)N/2 = 3N/2`. -/
+theorem singleClusterHamiltonianS_eigenvalue_pentamer_gs
+    (N : ℕ) {v : (Fin 5 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 5) N).mulVec v =
+        ((3 : ℂ) * (N : ℂ) / 2 * ((3 : ℂ) * (N : ℂ) / 2 + 1)) • v)
+    (hLeafSum :
+        (spinSDot (1 : Fin 5) 2 N + spinSDot (1 : Fin 5) 3 N +
+            spinSDot (1 : Fin 5) 4 N + spinSDot (2 : Fin 5) 3 N +
+            spinSDot (2 : Fin 5) 4 N + spinSDot (3 : Fin 5) 4 N).mulVec v =
+          (3 * (N : ℂ) ^ 2 / 2) • v) :
+    (singleClusterHamiltonianS 4 N).mulVec v =
+      singleClusterGSEnergyS 4 N • v := by
+  unfold singleClusterGSEnergyS
+  have h := singleClusterHamiltonianS_eigenvalue_pentamer N htot hLeafSum
+  rw [h]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
