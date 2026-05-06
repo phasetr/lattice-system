@@ -1816,4 +1816,32 @@ theorem singleClusterHamiltonianS_eigenvalue_pentamer_top
   push_cast
   ring
 
+/-- **Quartet leaf-singlet sector eigenvalue = 0** (γ-5 step 321):
+for `z = 3`, if `v` is a joint eigenvector of `Stot²` at
+`Stot²·v = (N(N+2)/4)·v` (i.e. `s_tot = N/2`, central spin alone)
+and the leaf-leaf sum at
+`(spinSDot 1 2 + spinSDot 1 3 + spinSDot 2 3)·v = (-3N(N+2)/8)·v`
+(corresponding to leaves in a singlet, `s_R = 0`), then `H · v = 0`.
+
+The leaf-singlet sector decouples: with the three leaves combined
+into a total-spin-zero singlet, the central spin couples trivially.
+A leaf-singlet exists for `S = 1, 3/2, 2, ...` (3 spins of magnitude S
+admit s_R = 0 when S is integer or some half-integers).
+
+Quartet analogue of γ-5 step 296 (trimer leaf-singlet decoupling). -/
+theorem singleClusterHamiltonianS_eigenvalue_quartet_leaf_singlet
+    (N : ℕ) {v : (Fin 4 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 4) N).mulVec v =
+        ((N : ℂ) * ((N : ℂ) + 2) / 4) • v)
+    (hLeafSum :
+        (spinSDot (1 : Fin 4) 2 N + spinSDot (1 : Fin 4) 3 N +
+            spinSDot (2 : Fin 4) 3 N).mulVec v =
+          (-3 * (N : ℂ) * ((N : ℂ) + 2) / 8) • v) :
+    (singleClusterHamiltonianS 3 N).mulVec v = 0 := by
+  have h := singleClusterHamiltonianS_eigenvalue_quartet N htot hLeafSum
+  rw [h]
+  rw [show ((N : ℂ) * ((N : ℂ) + 2) / 4 - (N : ℂ) * ((N : ℂ) + 2) -
+        2 * (-3 * (N : ℂ) * ((N : ℂ) + 2) / 8)) / 2 = 0 from by ring]
+  rw [zero_smul]
+
 end LatticeSystem.Quantum
