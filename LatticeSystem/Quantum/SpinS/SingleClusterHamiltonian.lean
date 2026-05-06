@@ -349,4 +349,21 @@ theorem spinSDot_self_expectation_general
   rw [spinSDot_self, Matrix.smul_mulVec, Matrix.one_mulVec,
     dotProduct_smul, smul_eq_mul]
 
+/-- **Simplified Casimir expectation form** (γ-5 step 258):
+`2 · <v | H | v> = <v | Ŝ_tot² | v> − (N(N+2)/4)·<v|v> − <v | Ŝ_R² | v>`.
+
+Combines γ-5 step 256 (Casimir decomposition expectation) with γ-5 step 257
+(`<v|S0²|v> = (N(N+2)/4)·<v|v>`). The `Ŝ_0²` term is now a fixed scalar
+multiple of the norm-squared. -/
+theorem singleClusterHamiltonianS_two_mul_expectation_simplified
+    (N : ℕ) (v : (Fin (z + 1) → Fin (N + 1)) → ℂ) :
+    2 * dotProduct (star v)
+        ((singleClusterHamiltonianS z N).mulVec v) =
+      dotProduct (star v)
+        ((totalSpinSSquared (Fin (z + 1)) N).mulVec v) -
+      ((N : ℂ) * ((N : ℂ) + 2) / 4) * dotProduct (star v) v -
+      dotProduct (star v) ((leafSpinSSquared z N).mulVec v) := by
+  rw [singleClusterHamiltonianS_two_mul_expectation,
+    spinSDot_self_expectation_general]
+
 end LatticeSystem.Quantum
