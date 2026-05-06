@@ -106,4 +106,35 @@ theorem singleClusterHamiltonianS_allUp_expectation (N : ℕ) :
   push_cast
   ring
 
+/-- The all-aligned-`c` expectation of the single-cluster Hamiltonian:
+`<Φ_aligned(c) | H | Φ_aligned(c)> = z·(N/2 − c.val)²`. Generalises
+γ-5 step 246 (the `c = 0` case, all-up). For `c = Fin.last N` (all-down)
+gives the same `z·(N/2)²` since the squared `Ŝ^(3)` eigenvalue is
+sign-flip invariant (γ-5 step 247). -/
+theorem singleClusterHamiltonianS_allAligned_expectation
+    (N : ℕ) (c : Fin (N + 1)) :
+    dotProduct (star (allAlignedStateS (Fin (z + 1)) N c))
+        ((singleClusterHamiltonianS z N).mulVec
+          (allAlignedStateS (Fin (z + 1)) N c)) =
+      (z : ℂ) * ((N : ℂ) / 2 - (c.val : ℂ)) ^ 2 := by
+  unfold singleClusterHamiltonianS allAlignedStateS
+  rw [Matrix.sum_mulVec, dotProduct_sum]
+  have hEach : ∀ j ∈ Finset.univ.erase (0 : Fin (z + 1)),
+      dotProduct (star (basisVecS (allAlignedConfigS (Fin (z + 1)) N c)))
+          ((spinSDot 0 j N).mulVec
+            (basisVecS (allAlignedConfigS (Fin (z + 1)) N c))) =
+        ((N : ℂ) / 2 - (c.val : ℂ)) ^ 2 := by
+    intro j hj
+    rw [basisVecS_expectation_eq_diagonal]
+    have h0j : (0 : Fin (z + 1)) ≠ j := (Finset.ne_of_mem_erase hj).symm
+    rw [spinSDot_apply_diag_of_ne h0j]
+    unfold allAlignedConfigS
+    ring
+  rw [Finset.sum_congr rfl hEach]
+  rw [Finset.sum_const,
+    Finset.card_erase_of_mem (Finset.mem_univ (0 : Fin (z + 1))),
+    Finset.card_univ, Fintype.card_fin]
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
