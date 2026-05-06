@@ -785,4 +785,30 @@ theorem singleClusterMaxEnergyS_re_nonneg (z N : ℕ) :
   rw [hcast, Complex.ofReal_re]
   positivity
 
+/-- **GS energy ≤ Max energy** (γ-5 step 273):
+`Re(singleClusterGSEnergyS z N) ≤ Re(singleClusterMaxEnergyS z N)`.
+
+Consistency check that the two named eigenvalues from γ-5 steps 268, 269
+sit in the correct order: the GS-sector eigenvalue lies (weakly) below
+the maximum-Casimir-sector eigenvalue. The gap closes only at `N = 0`
+(spin-`0` trivial case). -/
+theorem singleClusterGSEnergyS_re_le_singleClusterMaxEnergyS_re (z N : ℕ) :
+    (singleClusterGSEnergyS z N).re ≤ (singleClusterMaxEnergyS z N).re := by
+  have hg : (singleClusterGSEnergyS z N).re =
+      -((N : ℝ) / 2) * ((z : ℝ) * (N : ℝ) / 2 + 1) := by
+    have hcast : singleClusterGSEnergyS z N =
+        ((-((N : ℝ) / 2) * ((z : ℝ) * (N : ℝ) / 2 + 1) : ℝ) : ℂ) := by
+      unfold singleClusterGSEnergyS; push_cast; ring
+    rw [hcast, Complex.ofReal_re]
+  have hm : (singleClusterMaxEnergyS z N).re =
+      (z : ℝ) * (N : ℝ) ^ 2 / 4 := by
+    have hcast : singleClusterMaxEnergyS z N =
+        (((z : ℝ) * (N : ℝ) ^ 2 / 4 : ℝ) : ℂ) := by
+      unfold singleClusterMaxEnergyS; push_cast; ring
+    rw [hcast, Complex.ofReal_re]
+  rw [hg, hm]
+  have h1 : (0 : ℝ) ≤ (N : ℝ) := by positivity
+  have h2 : (0 : ℝ) ≤ (z : ℝ) * (N : ℝ) + 1 := by positivity
+  nlinarith [mul_nonneg h1 h2]
+
 end LatticeSystem.Quantum
