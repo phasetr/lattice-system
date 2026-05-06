@@ -834,4 +834,26 @@ theorem singleClusterMaxEnergyS_im_zero (z N : ℕ) :
     ring
   rw [hcast, Complex.ofReal_im]
 
+/-- **Dimer (z=1) ground-state energy** (γ-5 step 275):
+`singleClusterGSEnergyS 1 N = −(N/2)·(N/2 + 1) = −S(S+1)` for `S = N/2`.
+
+The canonical singlet eigenvalue of `Ŝ_0 · Ŝ_1` for two spin-`S` sites,
+specialisation of γ-5 step 270 at `z = 1`. -/
+theorem singleClusterGSEnergyS_one_eq (N : ℕ) :
+    singleClusterGSEnergyS 1 N = -((N : ℂ) / 2) * ((N : ℂ) / 2 + 1) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Dimer (z=1) maximum-Casimir-sector energy** (γ-5 step 275):
+`singleClusterMaxEnergyS 1 N = (N/2)² = S²` for `S = N/2`.
+
+The canonical triplet eigenvalue of `Ŝ_0 · Ŝ_1` for two spin-`S` sites,
+specialisation of γ-5 step 271 at `z = 1`. -/
+theorem singleClusterMaxEnergyS_one_eq (N : ℕ) :
+    singleClusterMaxEnergyS 1 N = ((N : ℂ) / 2) ^ 2 := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
