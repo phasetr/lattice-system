@@ -1905,4 +1905,20 @@ theorem singleClusterHamiltonianS_eigenvalue_leaf_singlet
         0 from by ring]
   rw [zero_smul]
 
+/-- **Spin-3/2 5-vertex-star ground-state energy** (γ-5 step 324):
+`singleClusterGSEnergyS 4 3 = -21/2 = -S(1+zS)` for `S = 3/2, z = 4`. -/
+@[simp] theorem singleClusterGSEnergyS_four_three :
+    singleClusterGSEnergyS 4 3 = (-21 / 2 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-3/2 5-vertex-star maximum-Casimir-sector energy** (γ-5 step 324):
+`singleClusterMaxEnergyS 4 3 = 9 = zS²` for `S = 3/2, z = 4`. -/
+@[simp] theorem singleClusterMaxEnergyS_four_three :
+    singleClusterMaxEnergyS 4 3 = (9 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
