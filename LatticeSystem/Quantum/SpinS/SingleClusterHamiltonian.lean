@@ -1015,4 +1015,26 @@ Concrete numerical value of `−S(1+zS)` for two spin-1 sites coupled by
   push_cast
   ring
 
+/-- **Strict GS energy negativity** (γ-5 step 283):
+`Re(singleClusterGSEnergyS z N) < 0` for `N ≥ 1`. Strengthens γ-5 step
+272 to strict for non-trivial spin. -/
+theorem singleClusterGSEnergyS_re_neg_of_pos
+    (z : ℕ) {N : ℕ} (hN : 1 ≤ N) :
+    (singleClusterGSEnergyS z N).re < 0 := by
+  rw [singleClusterGSEnergyS_re_eq]
+  have h1 : (1 : ℝ) ≤ (N : ℝ) := by exact_mod_cast hN
+  have h2 : (0 : ℝ) ≤ (z : ℝ) := by positivity
+  nlinarith [mul_nonneg h2 (by linarith : (0 : ℝ) ≤ (N : ℝ))]
+
+/-- **Strict max-Casimir-sector energy positivity** (γ-5 step 283):
+`0 < Re(singleClusterMaxEnergyS z N)` for `z ≥ 1, N ≥ 1`. Strengthens
+γ-5 step 272 to strict when both `z` and `N` are non-trivial. -/
+theorem singleClusterMaxEnergyS_re_pos_of_pos
+    {z N : ℕ} (hz : 1 ≤ z) (hN : 1 ≤ N) :
+    0 < (singleClusterMaxEnergyS z N).re := by
+  rw [singleClusterMaxEnergyS_re_eq]
+  have h1 : (1 : ℝ) ≤ (z : ℝ) := by exact_mod_cast hz
+  have h2 : (1 : ℝ) ≤ (N : ℝ) := by exact_mod_cast hN
+  nlinarith [sq_nonneg ((N : ℝ) - 1)]
+
 end LatticeSystem.Quantum
