@@ -314,4 +314,26 @@ theorem singleClusterHamiltonianS_two_smul_eq_casimir_diff (N : ℕ) :
     rw [two_mul, two_smul]]
   exact h
 
+/-- **Casimir decomposition expectation form** (γ-5 step 256):
+`2 · <v | H | v> = <v | Ŝ_tot² | v> − <v | Ŝ_0² | v> − <v | Ŝ_R² | v>`
+
+for any vector `v`. Direct corollary of γ-5 step 255 (ℂ-smul form) +
+linearity of `dotProduct` and `mulVec` over `smul` and subtraction.
+Bridges the operator-level Casimir decomposition to
+expectation-value calculations. -/
+theorem singleClusterHamiltonianS_two_mul_expectation
+    (N : ℕ) (v : (Fin (z + 1) → Fin (N + 1)) → ℂ) :
+    2 * dotProduct (star v)
+        ((singleClusterHamiltonianS z N).mulVec v) =
+      dotProduct (star v)
+        ((totalSpinSSquared (Fin (z + 1)) N).mulVec v) -
+      dotProduct (star v) ((spinSDot 0 0 N).mulVec v) -
+      dotProduct (star v) ((leafSpinSSquared z N).mulVec v) := by
+  have h := singleClusterHamiltonianS_two_smul_eq_casimir_diff (z := z) N
+  have hv := congrArg (fun M => dotProduct (star v) (M.mulVec v)) h
+  simp only at hv
+  rw [Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul] at hv
+  rw [Matrix.sub_mulVec, Matrix.sub_mulVec, dotProduct_sub, dotProduct_sub] at hv
+  exact hv
+
 end LatticeSystem.Quantum
