@@ -1613,4 +1613,41 @@ theorem singleClusterHamiltonianS_eigenvalue_quartet_top
   push_cast
   ring
 
+/-- **Pentamer (z=4) leaf-Casimir decomposition** (γ-5 step 312):
+`leafSpinSSquared 4 N = (N(N+2)) • 1 + 2 • (Σ_{1 ≤ j < k ≤ 4} spinSDot j k N)`
+on `Fin 5`.
+
+For four leaves (`erase 0 = {1, 2, 3, 4}`), the leaf-Casimir double sum
+`Σ_{j,k ∈ {1,...,4}} spinSDot j k` decomposes into four diagonal
+`spinSDot j j` terms (each scalar `N(N+2)/4 • 1`) and twelve
+off-diagonal terms grouped into six `spinSDot j k` pairs related by
+`spinSDot_comm`. Generalises γ-5 step 303 (z=3 quartet) to the
+pentamer. -/
+theorem leafSpinSSquared_four (N : ℕ) :
+    (leafSpinSSquared 4 N : ManyBodyOpS (Fin 5) N) =
+      ((N : ℂ) * ((N : ℂ) + 2)) • 1 +
+        (2 : ℂ) • (spinSDot 1 2 N + spinSDot 1 3 N + spinSDot 1 4 N +
+          spinSDot 2 3 N + spinSDot 2 4 N + spinSDot 3 4 N) := by
+  rw [leafSpinSSquared_eq_sum_spinSDot]
+  have h1234 : (Finset.univ.erase (0 : Fin 5)) = {1, 2, 3, 4} := by decide
+  rw [h1234]
+  have hne1 : (1 : Fin 5) ∉ ({2, 3, 4} : Finset (Fin 5)) := by decide
+  have hne2 : (2 : Fin 5) ∉ ({3, 4} : Finset (Fin 5)) := by decide
+  have hne3 : (3 : Fin 5) ∉ ({4} : Finset (Fin 5)) := by decide
+  rw [show ({1, 2, 3, 4} : Finset (Fin 5)) = insert 1 (insert 2 (insert 3 {4}))
+        from rfl]
+  simp_rw [Finset.sum_insert hne1, Finset.sum_insert hne2,
+    Finset.sum_insert hne3, Finset.sum_singleton]
+  rw [spinSDot_self 1 N, spinSDot_self 2 N, spinSDot_self 3 N, spinSDot_self 4 N]
+  rw [spinSDot_comm 2 1, spinSDot_comm 3 1, spinSDot_comm 4 1]
+  rw [spinSDot_comm 3 2, spinSDot_comm 4 2]
+  rw [spinSDot_comm 4 3]
+  conv_rhs =>
+    rw [show ((N : ℂ) * ((N : ℂ) + 2) : ℂ) =
+          ((N : ℂ) * ((N : ℂ) + 2) / 4) + ((N : ℂ) * ((N : ℂ) + 2) / 4) +
+            ((N : ℂ) * ((N : ℂ) + 2) / 4) + ((N : ℂ) * ((N : ℂ) + 2) / 4)
+            from by ring]
+    rw [add_smul, add_smul, add_smul, two_smul]
+  abel
+
 end LatticeSystem.Quantum
