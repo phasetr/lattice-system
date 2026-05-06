@@ -221,4 +221,12 @@ theorem totalSpinSOp3_eq_onSite_zero_add_leafSpinSOp3 (N : ℕ) :
     (Finset.mem_univ 0)]
   exact add_comm _ _
 
+/-- Leaf-spin Casimir: `Ŝ_R² := (Ŝ_R^(1))² + (Ŝ_R^(2))² + (Ŝ_R^(3))²`,
+the total-spin-squared operator restricted to the leaves
+`j ∈ univ.erase 0` of `Fin (z + 1)` (γ-5 step 252). -/
+noncomputable def leafSpinSSquared (N : ℕ) : ManyBodyOpS (Fin (z + 1)) N :=
+  leafSpinSOp1 z N * leafSpinSOp1 z N +
+    leafSpinSOp2 z N * leafSpinSOp2 z N +
+    leafSpinSOp3 z N * leafSpinSOp3 z N
+
 end LatticeSystem.Quantum
