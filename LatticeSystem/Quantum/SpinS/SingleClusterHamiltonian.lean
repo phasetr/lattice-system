@@ -1825,8 +1825,10 @@ and the leaf-leaf sum at
 
 The leaf-singlet sector decouples: with the three leaves combined
 into a total-spin-zero singlet, the central spin couples trivially.
-A leaf-singlet exists for `S = 1, 3/2, 2, ...` (3 spins of magnitude S
-admit s_R = 0 when S is integer or some half-integers).
+A 3-leaf singlet exists only for **integer** spin `S` (i.e. `N` even):
+three half-integer spins sum to a half-integer total, never zero.
+For `S = 1, 2, 3, ...` (i.e. `N = 2, 4, 6, ...`), three spins admit
+`s_R = 0` with multiplicity `≥ 1`.
 
 Quartet analogue of γ-5 step 296 (trimer leaf-singlet decoupling). -/
 theorem singleClusterHamiltonianS_eigenvalue_quartet_leaf_singlet
