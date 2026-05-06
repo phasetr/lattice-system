@@ -1846,4 +1846,33 @@ theorem singleClusterHamiltonianS_eigenvalue_quartet_leaf_singlet
         2 * (-3 * (N : ℂ) * ((N : ℂ) + 2) / 8)) / 2 = 0 from by ring]
   rw [zero_smul]
 
+/-- **Pentamer leaf-singlet sector eigenvalue = 0** (γ-5 step 322):
+for `z = 4`, if `v` is a joint eigenvector of `Stot²` at
+`Stot²·v = (N(N+2)/4)·v` (i.e. `s_tot = N/2`, central spin alone)
+and the 6-pair leaf-leaf sum at
+`(spinSDot 1 2 + ... + spinSDot 3 4)·v = (-N(N+2)/2)·v`
+(corresponding to leaves in a singlet, `s_R = 0`), then `H · v = 0`.
+
+The leaf-singlet sector decouples. A 4-leaf singlet exists for any
+spin `S`: four spins of any magnitude can combine to total spin 0
+(since four half-integers also sum to integer 0).
+
+Pentamer analogue of γ-5 step 296 (trimer) and step 321 (quartet). -/
+theorem singleClusterHamiltonianS_eigenvalue_pentamer_leaf_singlet
+    (N : ℕ) {v : (Fin 5 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 5) N).mulVec v =
+        ((N : ℂ) * ((N : ℂ) + 2) / 4) • v)
+    (hLeafSum :
+        (spinSDot (1 : Fin 5) 2 N + spinSDot (1 : Fin 5) 3 N +
+            spinSDot (1 : Fin 5) 4 N + spinSDot (2 : Fin 5) 3 N +
+            spinSDot (2 : Fin 5) 4 N + spinSDot (3 : Fin 5) 4 N).mulVec v =
+          (-((N : ℂ) * ((N : ℂ) + 2) / 2)) • v) :
+    (singleClusterHamiltonianS 4 N).mulVec v = 0 := by
+  have h := singleClusterHamiltonianS_eigenvalue_pentamer N htot hLeafSum
+  rw [h]
+  rw [show ((N : ℂ) * ((N : ℂ) + 2) / 4 -
+        5 * (N : ℂ) * ((N : ℂ) + 2) / 4 -
+        2 * (-((N : ℂ) * ((N : ℂ) + 2) / 2))) / 2 = 0 from by ring]
+  rw [zero_smul]
+
 end LatticeSystem.Quantum
