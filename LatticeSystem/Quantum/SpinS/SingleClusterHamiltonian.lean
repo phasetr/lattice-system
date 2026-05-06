@@ -1037,4 +1037,36 @@ theorem singleClusterMaxEnergyS_re_pos_of_pos
   have h2 : (1 : ℝ) ≤ (N : ℝ) := by exact_mod_cast hN
   nlinarith [sq_nonneg ((N : ℝ) - 1)]
 
+/-- **Spin-3/2 dimer ground-state energy** (γ-5 step 284):
+`singleClusterGSEnergyS 1 3 = -15/4 = -S(S+1)` for `S = 3/2`. -/
+@[simp] theorem singleClusterGSEnergyS_one_three :
+    singleClusterGSEnergyS 1 3 = (-15 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-3/2 dimer maximum-Casimir-sector energy** (γ-5 step 284):
+`singleClusterMaxEnergyS 1 3 = 9/4 = S²` for `S = 3/2`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_three :
+    singleClusterMaxEnergyS 1 3 = (9 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-3/2 3-vertex-star ground-state energy** (γ-5 step 284):
+`singleClusterGSEnergyS 2 3 = -6 = -S(1+2S)` for `S = 3/2, z = 2`. -/
+@[simp] theorem singleClusterGSEnergyS_two_three :
+    singleClusterGSEnergyS 2 3 = (-6 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-3/2 3-vertex-star maximum-Casimir-sector energy** (γ-5 step 284):
+`singleClusterMaxEnergyS 2 3 = 9/2 = zS²` for `S = 3/2, z = 2`. -/
+@[simp] theorem singleClusterMaxEnergyS_two_three :
+    singleClusterMaxEnergyS 2 3 = (9 / 2 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
