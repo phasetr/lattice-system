@@ -1711,4 +1711,29 @@ theorem singleClusterHamiltonianS_eigenvalue_pentamer_gs
   congr 1
   ring
 
+/-- **Pentamer top-spin sector eigenvalue at Max energy** (γ-5 step 315):
+for `z = 4`, if `v` is a joint eigenvector of `Stot²` at the maximum
+total-spin sector (`Stot²·v = (5N/2)(5N/2+1)·v`, i.e. `s_tot = 5N/2 =
+(z+1)N/2`) and the 6-pair leaf-leaf sum at `(3N²/2)·v` (max leaf-spin
+`s_R = 2N`), then `v` is an `H`-eigenvector at the predicted maximum
+Casimir-sector energy `singleClusterMaxEnergyS 4 N = N²`.
+
+Pentamer companion to γ-5 steps 295 (trimer top) and 306 (quartet top). -/
+theorem singleClusterHamiltonianS_eigenvalue_pentamer_top
+    (N : ℕ) {v : (Fin 5 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 5) N).mulVec v =
+        ((5 : ℂ) * (N : ℂ) / 2 * ((5 : ℂ) * (N : ℂ) / 2 + 1)) • v)
+    (hLeafSum :
+        (spinSDot (1 : Fin 5) 2 N + spinSDot (1 : Fin 5) 3 N +
+            spinSDot (1 : Fin 5) 4 N + spinSDot (2 : Fin 5) 3 N +
+            spinSDot (2 : Fin 5) 4 N + spinSDot (3 : Fin 5) 4 N).mulVec v =
+          (3 * (N : ℂ) ^ 2 / 2) • v) :
+    (singleClusterHamiltonianS 4 N).mulVec v =
+      singleClusterMaxEnergyS 4 N • v := by
+  unfold singleClusterMaxEnergyS
+  have h := singleClusterHamiltonianS_eigenvalue_pentamer N htot hLeafSum
+  rw [h]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
