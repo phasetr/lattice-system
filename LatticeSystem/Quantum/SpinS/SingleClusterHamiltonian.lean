@@ -856,4 +856,29 @@ theorem singleClusterMaxEnergyS_one_eq (N : ℕ) :
   push_cast
   ring
 
+/-- **Trivial GS energy at N=0** (γ-5 step 276):
+`singleClusterGSEnergyS z 0 = 0`. The spin-0 trivial case. -/
+@[simp] theorem singleClusterGSEnergyS_zero_right (z : ℕ) :
+    singleClusterGSEnergyS z 0 = 0 := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Trivial max-Casimir-sector energy at N=0** (γ-5 step 276):
+`singleClusterMaxEnergyS z 0 = 0`. The spin-0 trivial case. -/
+@[simp] theorem singleClusterMaxEnergyS_zero_right (z : ℕ) :
+    singleClusterMaxEnergyS z 0 = 0 := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Trivial max-Casimir-sector energy at z=0** (γ-5 step 276):
+`singleClusterMaxEnergyS 0 N = 0`. The single-site cluster (no leaves)
+case. -/
+@[simp] theorem singleClusterMaxEnergyS_zero_left (N : ℕ) :
+    singleClusterMaxEnergyS 0 N = 0 := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
