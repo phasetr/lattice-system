@@ -415,4 +415,36 @@ theorem spinSDot_self_mulVec_eq_smul
       ((N : ℂ) * ((N : ℂ) + 2) / 4) • v := by
   rw [spinSDot_self, Matrix.smul_mulVec, Matrix.one_mulVec]
 
+/-- Edge case: `leafSpinSOp1 0 N = 0` (no leaves on `Fin 1`) (γ-5 step 261). -/
+theorem leafSpinSOp1_zero_z (N : ℕ) :
+    (leafSpinSOp1 0 N : ManyBodyOpS (Fin 1) N) = 0 := by
+  unfold leafSpinSOp1
+  rw [show (Finset.univ.erase (0 : Fin 1) : Finset (Fin 1)) = ∅ by
+    ext j; simp [Fin.fin_one_eq_zero]]
+  exact Finset.sum_empty
+
+/-- Edge case: `leafSpinSOp2 0 N = 0` (γ-5 step 261). -/
+theorem leafSpinSOp2_zero_z (N : ℕ) :
+    (leafSpinSOp2 0 N : ManyBodyOpS (Fin 1) N) = 0 := by
+  unfold leafSpinSOp2
+  rw [show (Finset.univ.erase (0 : Fin 1) : Finset (Fin 1)) = ∅ by
+    ext j; simp [Fin.fin_one_eq_zero]]
+  exact Finset.sum_empty
+
+/-- Edge case: `leafSpinSOp3 0 N = 0` (γ-5 step 261). -/
+theorem leafSpinSOp3_zero_z (N : ℕ) :
+    (leafSpinSOp3 0 N : ManyBodyOpS (Fin 1) N) = 0 := by
+  unfold leafSpinSOp3
+  rw [show (Finset.univ.erase (0 : Fin 1) : Finset (Fin 1)) = ∅ by
+    ext j; simp [Fin.fin_one_eq_zero]]
+  exact Finset.sum_empty
+
+/-- Edge case: `leafSpinSSquared 0 N = 0` for the single-vertex
+configuration (no leaves). Direct from γ-5 step 261 axis-wise vanishing. -/
+theorem leafSpinSSquared_zero_z (N : ℕ) :
+    (leafSpinSSquared 0 N : ManyBodyOpS (Fin 1) N) = 0 := by
+  unfold leafSpinSSquared
+  rw [leafSpinSOp1_zero_z, leafSpinSOp2_zero_z, leafSpinSOp3_zero_z]
+  simp
+
 end LatticeSystem.Quantum
