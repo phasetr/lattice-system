@@ -41,4 +41,16 @@ noncomputable def singleClusterHamiltonianS (N : ℕ) :
     ManyBodyOpS (Fin (z + 1)) N :=
   ∑ j ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0, spinSDot 0 j N
 
+/-- The single-cluster Hamiltonian is Hermitian: sum of Hermitian
+two-site dot products `spinSDot 0 j N` (γ-5 step 244). -/
+theorem singleClusterHamiltonianS_isHermitian (N : ℕ) :
+    (singleClusterHamiltonianS z N : ManyBodyOpS (Fin (z + 1)) N).IsHermitian := by
+  unfold singleClusterHamiltonianS
+  classical
+  induction (Finset.univ.erase (0 : Fin (z + 1))) using Finset.induction_on with
+  | empty => simp [Matrix.IsHermitian]
+  | @insert a t hns ih =>
+    rw [Finset.sum_insert hns]
+    exact Matrix.IsHermitian.add (spinSDot_isHermitian 0 a N) ih
+
 end LatticeSystem.Quantum
