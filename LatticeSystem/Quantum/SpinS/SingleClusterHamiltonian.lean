@@ -53,4 +53,17 @@ theorem singleClusterHamiltonianS_isHermitian (N : ℕ) :
     rw [Finset.sum_insert hns]
     exact Matrix.IsHermitian.add (spinSDot_isHermitian 0 a N) ih
 
+/-- At `z = 0` (single-vertex configuration), the Hamiltonian is zero
+since there are no leaves to couple to: `Finset.univ.erase 0 = ∅` in
+`Fin 1`. The expected ground-state energy `−S(1 + 0·S) = −S` is
+**not** matched by `0`; this discrepancy reflects that Tasaki's
+formula is intended for `z ≥ 1` (γ-5 step 245). -/
+theorem singleClusterHamiltonianS_zero_z (N : ℕ) :
+    (singleClusterHamiltonianS 0 N : ManyBodyOpS (Fin 1) N) = 0 := by
+  unfold singleClusterHamiltonianS
+  rw [show (Finset.univ.erase (0 : Fin 1) : Finset (Fin 1)) = ∅ by
+    ext j
+    simp [Fin.fin_one_eq_zero]]
+  exact Finset.sum_empty
+
 end LatticeSystem.Quantum
