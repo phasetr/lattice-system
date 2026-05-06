@@ -1084,4 +1084,41 @@ theorem leafSpinSSquared_one (N : ℕ) :
   rw [h]
   simp [Finset.sum_singleton]
 
+/-- **Single-leaf leaf-Casimir scalar action** (γ-5 step 286, helper):
+`leafSpinSSquared 1 N · v = (N(N+2)/4) • v` for any `v` on `Fin 2`.
+
+Direct corollary of γ-5 step 285 + `spinSDot_self_mulVec_eq_smul`. The
+single-leaf leaf-Casimir is the constant scalar `N(N+2)/4 = S(S+1)`. -/
+theorem leafSpinSSquared_one_mulVec
+    (N : ℕ) (v : (Fin 2 → Fin (N + 1)) → ℂ) :
+    (leafSpinSSquared 1 N).mulVec v =
+      ((N : ℂ) * ((N : ℂ) + 2) / 4) • v := by
+  rw [leafSpinSSquared_one]
+  exact spinSDot_self_mulVec_eq_smul N 1 v
+
+/-- **Dimer eigenvalue from total Casimir alone** (γ-5 step 286):
+for `z = 1`, the leaf-Casimir is the constant `N(N+2)/4` (γ-5 step 285),
+so any total-Casimir eigenvector is automatically a joint eigenvector.
+The H-eigenvalue depends only on the total-Casimir eigenvalue:
+if `Ŝ_tot² · v = α · v`, then
+`H · v = ((α − N(N+2)/2) / 2) • v`
+on the dimer.
+
+Specialisation of γ-5 step 259 to z=1, removing the SR² hypothesis. -/
+theorem singleClusterHamiltonianS_eigenvalue_dimer
+    (N : ℕ) {α : ℂ} {v : (Fin 2 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 2) N).mulVec v = α • v) :
+    (singleClusterHamiltonianS 1 N).mulVec v =
+      ((α - (N : ℂ) * ((N : ℂ) + 2) / 2) / 2) • v := by
+  have hR : (leafSpinSSquared 1 N).mulVec v =
+      ((1 : ℂ) * (N : ℂ) / 2 * ((1 : ℂ) * (N : ℂ) / 2 + 1)) • v := by
+    rw [leafSpinSSquared_one_mulVec]
+    congr 1
+    ring
+  have h := singleClusterHamiltonianS_eigenvalue_of_joint_casimir_eigenvec
+    (z := 1) N htot hR
+  rw [h]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
