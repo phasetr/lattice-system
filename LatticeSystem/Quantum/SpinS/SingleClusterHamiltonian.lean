@@ -1480,4 +1480,32 @@ theorem singleClusterHamiltonianS_eigenvalue_quartet
   congr 1
   ring
 
+/-- **Quartet GS-sector eigenvalue at GS energy** (γ-5 step 305):
+for `z = 3`, if `v` is a joint eigenvector of `Stot²` at
+`Stot²·v = N(N+1)·v` (i.e. `s_tot = N`) and the leaf-leaf sum at
+`(spinSDot 1 2 + spinSDot 1 3 + spinSDot 2 3)·v = (3N²/4)·v`
+(corresponding to leaves at the maximum total leaf-spin
+`s_R = 3N/2`), then `v` is an `H`-eigenvector at the predicted GS
+energy `singleClusterGSEnergyS 3 N = -N(3N+2)/4`.
+
+Quartet analogue of γ-5 step 294 (trimer GS sector). The hypotheses
+correspond to the Tasaki Problem 2.5.a GS Casimir sector for `z = 3`:
+leaves form the maximum leaf-spin sector `(s_R = 3N/2)` and couple
+with the central spin to give `s_tot = (z−1)N/2 = N`. -/
+theorem singleClusterHamiltonianS_eigenvalue_quartet_gs
+    (N : ℕ) {v : (Fin 4 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 4) N).mulVec v =
+        ((N : ℂ) * ((N : ℂ) + 1)) • v)
+    (hLeafSum :
+        (spinSDot (1 : Fin 4) 2 N + spinSDot (1 : Fin 4) 3 N +
+            spinSDot (2 : Fin 4) 3 N).mulVec v =
+          (3 * (N : ℂ) ^ 2 / 4) • v) :
+    (singleClusterHamiltonianS 3 N).mulVec v =
+      singleClusterGSEnergyS 3 N • v := by
+  unfold singleClusterGSEnergyS
+  have h := singleClusterHamiltonianS_eigenvalue_quartet N htot hLeafSum
+  rw [h]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
