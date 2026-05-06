@@ -1241,4 +1241,32 @@ theorem leafSpinSSquared_two (N : ℕ) :
   rw [add_smul, two_smul]
   abel
 
+/-- **Trimer eigenvalue from `Stot²` + leaf-leaf coupling** (γ-5 step 293):
+for `z = 2`, if `v` is a joint eigenvector of `Ŝ_tot²` (eigenvalue `α`)
+and the leaf-leaf coupling `spinSDot 1 2 N` (eigenvalue `β`), then `v`
+is an `H`-eigenvector with eigenvalue
+`(α − 3·N(N+2)/4 − 2β) / 2`.
+
+Specialisation of γ-5 step 259 to z=2 using the trimer leaf-Casimir
+decomposition (γ-5 step 292): `SR² = (N(N+2)/2)·I + 2·(Ŝ_1·Ŝ_2)`.
+Substituting `Ŝ_1 · Ŝ_2 · v = β·v` gives `SR² · v = (N(N+2)/2 + 2β)·v`,
+which combined with `S0² · v = (N(N+2)/4)·v` and the Casimir
+decomposition `2H = Stot² − S0² − SR²` yields the formula. -/
+theorem singleClusterHamiltonianS_eigenvalue_trimer
+    (N : ℕ) {α β : ℂ} {v : (Fin 3 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 3) N).mulVec v = α • v)
+    (hLeafLeaf : (spinSDot 1 2 N).mulVec v = β • v) :
+    (singleClusterHamiltonianS 2 N).mulVec v =
+      ((α - 3 * (N : ℂ) * ((N : ℂ) + 2) / 4 - 2 * β) / 2) • v := by
+  have hR : (leafSpinSSquared 2 N).mulVec v =
+      ((N : ℂ) * ((N : ℂ) + 2) / 2 + 2 * β) • v := by
+    rw [leafSpinSSquared_two, Matrix.add_mulVec]
+    rw [Matrix.smul_mulVec, Matrix.one_mulVec, Matrix.smul_mulVec, hLeafLeaf]
+    rw [smul_smul, ← add_smul]
+  have h := singleClusterHamiltonianS_eigenvalue_of_joint_casimir_eigenvec
+    (z := 2) N htot hR
+  rw [h]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
