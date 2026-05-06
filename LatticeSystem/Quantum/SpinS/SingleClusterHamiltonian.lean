@@ -301,4 +301,17 @@ theorem singleClusterHamiltonianS_two_mul_eq_casimir_diff
   unfold spinSDot
   noncomm_ring
 
+/-- **Casimir decomposition** ℂ-smul form:
+`(2 : ℂ) • H = (Ŝ_tot)² − Ŝ_0² − Ŝ_R²`.
+Direct corollary of γ-5 step 254 (γ-5 step 255). -/
+theorem singleClusterHamiltonianS_two_smul_eq_casimir_diff (N : ℕ) :
+    (2 : ℂ) • (singleClusterHamiltonianS z N : ManyBodyOpS (Fin (z + 1)) N) =
+      totalSpinSSquared (Fin (z + 1)) N -
+        spinSDot 0 0 N - leafSpinSSquared z N := by
+  have h := singleClusterHamiltonianS_two_mul_eq_casimir_diff (z := z) N
+  rw [show (2 : ℂ) • (singleClusterHamiltonianS z N : ManyBodyOpS (Fin (z + 1)) N) =
+      (2 : ManyBodyOpS (Fin (z + 1)) N) * singleClusterHamiltonianS z N from by
+    rw [two_mul, two_smul]]
+  exact h
+
 end LatticeSystem.Quantum
