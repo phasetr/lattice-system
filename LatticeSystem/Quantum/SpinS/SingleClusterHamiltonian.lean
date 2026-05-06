@@ -616,4 +616,32 @@ theorem singleClusterHamiltonianS_mulVec_allAlignedStateS_last (N : ℕ) :
       ((z : ℂ) * (N : ℂ) ^ 2 / 4 : ℂ) from by
     rw [nsmul_eq_mul]; ring]
 
+/-- **Eigenvector form on allDown** (γ-5 step 267, allDown mirror of γ-5 step 265):
+`leafSpinSSquared z N · |Φ_⊥⟩ = (zN/2)·(zN/2 + 1) · |Φ_⊥⟩`.
+
+Same Casimir eigenvalue as `|Φ_⊤⟩` (both states are in the
+maximum-leaf-spin Casimir sector `s_R = zN/2`, just differing by total
+`Ŝ_tot^(3)` magnetization). -/
+theorem leafSpinSSquared_mulVec_allAlignedStateS_last
+    (N : ℕ) [Nonempty (Fin (z + 1))] :
+    (leafSpinSSquared z N).mulVec
+        (allAlignedStateS (Fin (z + 1)) N (Fin.last N)) =
+      ((z : ℂ) * (N : ℂ) / 2 * ((z : ℂ) * (N : ℂ) / 2 + 1)) •
+        allAlignedStateS (Fin (z + 1)) N (Fin.last N) := by
+  have h := singleClusterHamiltonianS_two_smul_eq_casimir_diff (z := z) N
+  have hSR : leafSpinSSquared z N =
+      totalSpinSSquared (Fin (z + 1)) N - spinSDot 0 0 N -
+        (2 : ℂ) • singleClusterHamiltonianS z N := by
+    rw [eq_sub_iff_add_eq, ← eq_sub_iff_add_eq']
+    exact h
+  rw [hSR, Matrix.sub_mulVec, Matrix.sub_mulVec, Matrix.smul_mulVec]
+  rw [totalSpinSSquared_mulVec_allAlignedStateS_last_eigenvalue,
+    spinSDot_self_mulVec_eq_smul,
+    singleClusterHamiltonianS_mulVec_allAlignedStateS_last]
+  rw [Fintype.card_fin]
+  rw [smul_smul, ← sub_smul, ← sub_smul]
+  congr 1
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
