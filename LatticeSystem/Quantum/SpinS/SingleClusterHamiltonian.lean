@@ -1736,4 +1736,20 @@ theorem singleClusterHamiltonianS_eigenvalue_pentamer_top
   congr 1
   ring
 
+/-- **Spin-3 4-vertex-star ground-state energy** (γ-5 step 316):
+`singleClusterGSEnergyS 3 6 = -30 = -S(1+zS)` for `S = 3, z = 3`. -/
+@[simp] theorem singleClusterGSEnergyS_three_six :
+    singleClusterGSEnergyS 3 6 = (-30 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-3 4-vertex-star maximum-Casimir-sector energy** (γ-5 step 316):
+`singleClusterMaxEnergyS 3 6 = 27 = zS²` for `S = 3, z = 3`. -/
+@[simp] theorem singleClusterMaxEnergyS_three_six :
+    singleClusterMaxEnergyS 3 6 = (27 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
