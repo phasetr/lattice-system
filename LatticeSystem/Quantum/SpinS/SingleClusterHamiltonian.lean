@@ -1121,4 +1121,26 @@ theorem singleClusterHamiltonianS_eigenvalue_dimer
   congr 1
   ring
 
+/-- **Dimer singlet attains GS energy** (γ-5 step 287):
+for `z = 1`, any `Stot² = 0` eigenvector is an `H`-eigenvector at the
+predicted GS energy: `H · v = singleClusterGSEnergyS 1 N • v`.
+
+Combines γ-5 step 286 (dimer eigenvalue from `Stot²` alone) with γ-5
+step 275 (`singleClusterGSEnergyS 1 N = −(N/2)(N/2+1)` closed form).
+
+This is the strongest concrete realisation of Tasaki Problem 2.5.a in
+the dimer case: any singlet is an explicit GS eigenvector at the
+predicted energy. The existence of a singlet (Clebsch–Gordan
+construction) remains separate. -/
+theorem singleClusterHamiltonianS_eigenvalue_dimer_singlet
+    (N : ℕ) {v : (Fin 2 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 2) N).mulVec v = (0 : ℂ) • v) :
+    (singleClusterHamiltonianS 1 N).mulVec v =
+      singleClusterGSEnergyS 1 N • v := by
+  rw [singleClusterGSEnergyS_one_eq]
+  have h := singleClusterHamiltonianS_eigenvalue_dimer N htot
+  rw [h]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
