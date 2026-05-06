@@ -1269,4 +1269,28 @@ theorem singleClusterHamiltonianS_eigenvalue_trimer
   congr 1
   ring
 
+/-- **Trimer GS-sector eigenvalue** (γ-5 step 294):
+for `z = 2`, if `v` is a joint eigenvector of `Stot²` at
+`Stot²·v = (N(N+2)/4)·v` (i.e. `s_tot = N/2`) and the leaf-leaf
+coupling `spinSDot 1 2 · v = (N²/4)·v` (i.e. leaf-pair at max coupling
+in the triplet sector `s_R = N`), then `v` is an `H`-eigenvector at
+the predicted GS energy `singleClusterGSEnergyS 2 N = -N(N+1)/2`.
+
+This is the trimer analogue of γ-5 step 287 (dimer singlet attains GS).
+The hypotheses correspond to the Tasaki Problem 2.5.a GS Casimir
+sector for `z = 2`: leaves form a triplet (`s_R = N`, max), and the
+total spin couples to the central spin to give `s_tot = (z−1)N/2 = N/2`. -/
+theorem singleClusterHamiltonianS_eigenvalue_trimer_gs
+    (N : ℕ) {v : (Fin 3 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 3) N).mulVec v =
+        ((N : ℂ) * ((N : ℂ) + 2) / 4) • v)
+    (hLeafLeaf : (spinSDot 1 2 N).mulVec v = ((N : ℂ) ^ 2 / 4) • v) :
+    (singleClusterHamiltonianS 2 N).mulVec v =
+      singleClusterGSEnergyS 2 N • v := by
+  unfold singleClusterGSEnergyS
+  have h := singleClusterHamiltonianS_eigenvalue_trimer N htot hLeafLeaf
+  rw [h]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
