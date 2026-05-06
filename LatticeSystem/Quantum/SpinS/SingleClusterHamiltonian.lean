@@ -1069,4 +1069,19 @@ theorem singleClusterMaxEnergyS_re_pos_of_pos
   push_cast
   ring
 
+/-- **Single-leaf leaf-Casimir reduces to single-site spinSDot** (γ-5 step 285):
+`leafSpinSSquared 1 N = spinSDot 1 1 N` on `Fin 2`.
+
+For the dimer (z=1), the leaf set is `{1}`, so each leaf-spin operator
+`Ŝ_R^(α) = Σ_{j ∈ erase 0} onSiteS j Ŝ^(α)` reduces to a single
+`onSiteS 1 Ŝ^(α)` term, and the leaf-Casimir
+`Ŝ_R² = Σ_α (Ŝ_R^(α))²` collapses to the single-site Casimir
+`spinSDot 1 1 = Σ_α (onSiteS 1 Ŝ^(α))²`. -/
+theorem leafSpinSSquared_one (N : ℕ) :
+    (leafSpinSSquared 1 N : ManyBodyOpS (Fin 2) N) = spinSDot 1 1 N := by
+  unfold leafSpinSSquared leafSpinSOp1 leafSpinSOp2 leafSpinSOp3 spinSDot
+  have h : (Finset.univ.erase (0 : Fin 2)) = {1} := by decide
+  rw [h]
+  simp [Finset.sum_singleton]
+
 end LatticeSystem.Quantum
