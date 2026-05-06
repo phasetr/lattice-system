@@ -173,4 +173,21 @@ on `Fin (z + 1)`. -/
 noncomputable def leafSpinSOp3 (N : ℕ) : ManyBodyOpS (Fin (z + 1)) N :=
   ∑ j ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0, onSiteS j (spinSOp3 N)
 
+/-- **`Ŝ_0 · Ŝ_R` decomposition** of the single-cluster Hamiltonian:
+`H = onSiteS 0 (Ŝ^(1)) * Ŝ_R^(1) + onSiteS 0 (Ŝ^(2)) * Ŝ_R^(2) +
+     onSiteS 0 (Ŝ^(3)) * Ŝ_R^(3)`
+
+where `Ŝ_R^(α)` are the leaf-spin operators (γ-5 step 249). Direct
+distribution of left multiplication over the sum
+`Σ_j (A * B_j) = A * (Σ_j B_j)` (γ-5 step 250). -/
+theorem singleClusterHamiltonianS_eq_dot_leaves (N : ℕ) :
+    (singleClusterHamiltonianS z N : ManyBodyOpS (Fin (z + 1)) N) =
+      onSiteS 0 (spinSOp1 N) * leafSpinSOp1 z N +
+        onSiteS 0 (spinSOp2 N) * leafSpinSOp2 z N +
+        onSiteS 0 (spinSOp3 N) * leafSpinSOp3 z N := by
+  unfold singleClusterHamiltonianS leafSpinSOp1 leafSpinSOp2 leafSpinSOp3
+  simp_rw [spinSDot_def]
+  rw [Finset.sum_add_distrib, Finset.sum_add_distrib]
+  rw [← Finset.mul_sum, ← Finset.mul_sum, ← Finset.mul_sum]
+
 end LatticeSystem.Quantum
