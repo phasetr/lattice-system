@@ -753,4 +753,36 @@ theorem singleClusterHamiltonianS_mulVec_eq_max_energy_smul
   exact singleClusterHamiltonianS_eigenvalue_at_max_casimir_sector
     (z := z) N htot hR
 
+/-- **GS energy real-part sign** (γ-5 step 272):
+`Re(singleClusterGSEnergyS z N) ≤ 0` for all `z, N : ℕ`.
+
+This is the physical AFM ground-state energy bound: an antiferromagnetic
+Heisenberg cluster has a non-positive ground-state energy. -/
+theorem singleClusterGSEnergyS_re_le_zero (z N : ℕ) :
+    (singleClusterGSEnergyS z N).re ≤ 0 := by
+  have hcast : singleClusterGSEnergyS z N =
+      ((-((N : ℝ) / 2) * ((z : ℝ) * (N : ℝ) / 2 + 1) : ℝ) : ℂ) := by
+    unfold singleClusterGSEnergyS
+    push_cast
+    ring
+  rw [hcast, Complex.ofReal_re]
+  have h1 : (0 : ℝ) ≤ (N : ℝ) / 2 := by positivity
+  have h2 : (0 : ℝ) ≤ (z : ℝ) * (N : ℝ) / 2 + 1 := by positivity
+  nlinarith [mul_nonneg h1 h2]
+
+/-- **Max-Casimir-sector energy real-part sign** (γ-5 step 272):
+`0 ≤ Re(singleClusterMaxEnergyS z N)` for all `z, N : ℕ`.
+
+The maximum Casimir sector contains the extremal aligned states `|Φ_⊤⟩`,
+`|Φ_⊥⟩`, whose `H`-eigenvalue `z·(N/2)²` is non-negative. -/
+theorem singleClusterMaxEnergyS_re_nonneg (z N : ℕ) :
+    0 ≤ (singleClusterMaxEnergyS z N).re := by
+  have hcast : singleClusterMaxEnergyS z N =
+      (((z : ℝ) * (N : ℝ) ^ 2 / 4 : ℝ) : ℂ) := by
+    unfold singleClusterMaxEnergyS
+    push_cast
+    ring
+  rw [hcast, Complex.ofReal_re]
+  positivity
+
 end LatticeSystem.Quantum
