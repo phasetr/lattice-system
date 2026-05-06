@@ -278,8 +278,8 @@ where `Ŝ_0² := spinSDot 0 0 N` is the single-site Casimir at the
 central vertex and `Ŝ_R² := leafSpinSSquared z N` is the leaf Casimir.
 
 Proof: expand `Σ_α totalSpinSOp_α² = Σ_α (onSite 0 + leaf_α)²` using
-γ-4 step 251 and γ-4 step 253 (commutativity); the cross term sums to
-`2 · H` via γ-4 step 250 (`Ŝ_0 · Ŝ_R` decomposition); the squared
+γ-5 step 251 and γ-5 step 253 (commutativity); the cross term sums to
+`2 · H` via γ-5 step 250 (`Ŝ_0 · Ŝ_R` decomposition); the squared
 center term sums to `spinSDot 0 0` by definition. -/
 theorem singleClusterHamiltonianS_two_mul_eq_casimir_diff
     (N : ℕ) :
