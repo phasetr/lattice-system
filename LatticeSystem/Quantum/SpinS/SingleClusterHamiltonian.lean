@@ -2721,4 +2721,20 @@ theorem singleClusterHamiltonianS_eigenvalue_leaf_singlet
   push_cast
   ring
 
+/-- **Spin-8 dimer ground-state energy** (γ-5 step 375):
+`singleClusterGSEnergyS 1 16 = -72 = -S(S+1)` for `S = 8`. -/
+@[simp] theorem singleClusterGSEnergyS_one_sixteen :
+    singleClusterGSEnergyS 1 16 = (-72 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-8 dimer maximum-Casimir-sector energy** (γ-5 step 375):
+`singleClusterMaxEnergyS 1 16 = 64 = S²` for `S = 8`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_sixteen :
+    singleClusterMaxEnergyS 1 16 = (64 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
