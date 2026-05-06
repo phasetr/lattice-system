@@ -549,4 +549,39 @@ theorem singleClusterHamiltonianS_mulVec_allAlignedStateS_zero (N : ℕ) :
       ((z : ℂ) * (N : ℂ) ^ 2 / 4 : ℂ) from by
     rw [nsmul_eq_mul]; ring]
 
+/-- **Eigenvector form on allUp** (γ-5 step 265):
+`leafSpinSSquared z N · |Φ_⊤⟩ = (zN/2)·(zN/2 + 1) · |Φ_⊤⟩`.
+
+Witnesses that `|Φ_⊤⟩` is in the maximum-leaf-spin Casimir sector
+`s_R = zN/2`. Combined with γ-5 step 264 and existing `Stot²`
+eigenvector identity, confirms `|Φ_⊤⟩` is a joint eigenstate of
+`H, Stot², S_0², S_R²`.
+
+Proof: rearrange γ-5 step 255 (ℂ-smul Casimir form) to express
+`SR² = Stot² − S0² − (2:ℂ) • H`, apply to `|Φ_⊤⟩` using existing
+eigenvector identities, then collect scalar coefficients via
+`smul_smul + sub_smul`. -/
+theorem leafSpinSSquared_mulVec_allAlignedStateS_zero
+    (N : ℕ) [Nonempty (Fin (z + 1))] :
+    (leafSpinSSquared z N).mulVec
+        (allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1))) =
+      ((z : ℂ) * (N : ℂ) / 2 * ((z : ℂ) * (N : ℂ) / 2 + 1)) •
+        allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1)) := by
+  have h := singleClusterHamiltonianS_two_smul_eq_casimir_diff (z := z) N
+  -- Rearrange: (2:ℂ)•H = Stot² − S0² − SR² → SR² = Stot² − S0² − (2:ℂ)•H.
+  have hSR : leafSpinSSquared z N =
+      totalSpinSSquared (Fin (z + 1)) N - spinSDot 0 0 N -
+        (2 : ℂ) • singleClusterHamiltonianS z N := by
+    rw [eq_sub_iff_add_eq, ← eq_sub_iff_add_eq']
+    exact h
+  rw [hSR, Matrix.sub_mulVec, Matrix.sub_mulVec, Matrix.smul_mulVec]
+  rw [totalSpinSSquared_mulVec_allAlignedStateS_zero_eigenvalue,
+    spinSDot_self_mulVec_eq_smul,
+    singleClusterHamiltonianS_mulVec_allAlignedStateS_zero]
+  rw [Fintype.card_fin]
+  rw [smul_smul, ← sub_smul, ← sub_smul]
+  congr 1
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
