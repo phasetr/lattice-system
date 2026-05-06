@@ -1650,4 +1650,36 @@ theorem leafSpinSSquared_four (N : ℕ) :
     rw [add_smul, add_smul, add_smul, two_smul]
   abel
 
+/-- **Pentamer eigenvalue from `Stot²` + leaf-leaf sum** (γ-5 step 313):
+for `z = 4`, if `v` is a joint eigenvector of `Ŝ_tot²` (eigenvalue `α`)
+and the leaf-leaf sum
+`spinSDot 1 2 + spinSDot 1 3 + spinSDot 1 4 + spinSDot 2 3 +
+spinSDot 2 4 + spinSDot 3 4` (eigenvalue `γ`), then `v` is an
+`H`-eigenvector with eigenvalue `(α − 5N(N+2)/4 − 2γ)/2`.
+
+Specialisation of γ-5 step 259 to z=4 using the pentamer leaf-Casimir
+decomposition (γ-5 step 312): `SR² = N(N+2)·I + 2·(sum-of-6-pair-couplings)`.
+-/
+theorem singleClusterHamiltonianS_eigenvalue_pentamer
+    (N : ℕ) {α γ : ℂ} {v : (Fin 5 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 5) N).mulVec v = α • v)
+    (hLeafSum :
+        (spinSDot (1 : Fin 5) 2 N + spinSDot (1 : Fin 5) 3 N +
+            spinSDot (1 : Fin 5) 4 N + spinSDot (2 : Fin 5) 3 N +
+            spinSDot (2 : Fin 5) 4 N + spinSDot (3 : Fin 5) 4 N).mulVec v =
+          γ • v) :
+    (singleClusterHamiltonianS 4 N).mulVec v =
+      ((α - 5 * (N : ℂ) * ((N : ℂ) + 2) / 4 - 2 * γ) / 2) • v := by
+  have hR : (leafSpinSSquared 4 N).mulVec v =
+      ((N : ℂ) * ((N : ℂ) + 2) + 2 * γ) • v := by
+    rw [leafSpinSSquared_four]
+    rw [Matrix.add_mulVec, Matrix.smul_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec]
+    rw [hLeafSum]
+    rw [smul_smul, ← add_smul]
+  have h := singleClusterHamiltonianS_eigenvalue_of_joint_casimir_eigenvec
+    (z := 4) N htot hR
+  rw [h]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
