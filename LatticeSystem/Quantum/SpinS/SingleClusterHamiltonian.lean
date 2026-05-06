@@ -150,4 +150,27 @@ theorem singleClusterHamiltonianS_allDown_expectation (N : ℕ) :
   rw [show ((Fin.last N).val : ℂ) = (N : ℂ) from by simp [Fin.last]]
   ring
 
+/-! ## Leaf-spin operators (γ-5 step 249)
+
+Define `Ŝ_R^{(α)}`: sum of single-site `Ŝ^{(α)}` over the leaves
+`j ∈ univ.erase 0`. These are needed to express the Hamiltonian as
+`Ŝ_0 · Ŝ_R = Σ_α onSiteS 0 (Ŝ^(α)) · Ŝ_R^{(α)}` for the Casimir
+decomposition `H = (Ŝ_tot² − Ŝ_0² − Ŝ_R²)/2` (subsequent γ-5 steps).
+-/
+
+/-- Leaf-spin operator in the 1-axis: `Ŝ_R^(1) = Σ_{j ≠ 0} onSiteS j Ŝ^(1)`
+on `Fin (z + 1)`. -/
+noncomputable def leafSpinSOp1 (N : ℕ) : ManyBodyOpS (Fin (z + 1)) N :=
+  ∑ j ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0, onSiteS j (spinSOp1 N)
+
+/-- Leaf-spin operator in the 2-axis: `Ŝ_R^(2) = Σ_{j ≠ 0} onSiteS j Ŝ^(2)`
+on `Fin (z + 1)`. -/
+noncomputable def leafSpinSOp2 (N : ℕ) : ManyBodyOpS (Fin (z + 1)) N :=
+  ∑ j ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0, onSiteS j (spinSOp2 N)
+
+/-- Leaf-spin operator in the 3-axis: `Ŝ_R^(3) = Σ_{j ≠ 0} onSiteS j Ŝ^(3)`
+on `Fin (z + 1)`. -/
+noncomputable def leafSpinSOp3 (N : ℕ) : ManyBodyOpS (Fin (z + 1)) N :=
+  ∑ j ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0, onSiteS j (spinSOp3 N)
+
 end LatticeSystem.Quantum
