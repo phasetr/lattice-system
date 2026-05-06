@@ -726,4 +726,31 @@ theorem singleClusterHamiltonianS_mulVec_eq_gs_energy_smul
   exact singleClusterHamiltonianS_eigenvalue_at_gs_casimir_sector
     (z := z) N htot hR
 
+/-- **Predicted maximum-Casimir-sector energy** (γ-5 step 271):
+`singleClusterMaxEnergyS z N := z·(N/2)² = zS²` for spin `S = N/2`.
+
+The `H`-eigenvalue at the maximum Casimir sector
+`(s_R, s_tot) = (zN/2, (z+1)N/2)` containing both extremal aligned
+states `|Φ_⊤⟩, |Φ_⊥⟩` (γ-5 steps 264, 266). -/
+@[simp] noncomputable def singleClusterMaxEnergyS (z N : ℕ) : ℂ :=
+  (z : ℂ) * (N : ℂ) ^ 2 / 4
+
+/-- **Named max-Casimir-sector eigenvalue identity** (γ-5 step 271):
+restate γ-5 step 269 using `singleClusterMaxEnergyS`. For a joint
+eigenvector `v` at `Stot² = ((z+1)N/2)((z+1)N/2+1)`,
+`SR² = (zN/2)(zN/2+1)`:
+`H · v = singleClusterMaxEnergyS z N • v`. -/
+theorem singleClusterHamiltonianS_mulVec_eq_max_energy_smul
+    (N : ℕ) {v : (Fin (z + 1) → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin (z + 1)) N).mulVec v =
+        (((z : ℂ) + 1) * (N : ℂ) / 2 *
+            (((z : ℂ) + 1) * (N : ℂ) / 2 + 1)) • v)
+    (hR : (leafSpinSSquared z N).mulVec v =
+        ((z : ℂ) * (N : ℂ) / 2 * ((z : ℂ) * (N : ℂ) / 2 + 1)) • v) :
+    (singleClusterHamiltonianS z N).mulVec v =
+      singleClusterMaxEnergyS z N • v := by
+  unfold singleClusterMaxEnergyS
+  exact singleClusterHamiltonianS_eigenvalue_at_max_casimir_sector
+    (z := z) N htot hR
+
 end LatticeSystem.Quantum
