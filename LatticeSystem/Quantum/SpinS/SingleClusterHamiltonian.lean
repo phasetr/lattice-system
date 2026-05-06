@@ -954,4 +954,17 @@ spin-1/2 sites. -/
   push_cast
   ring
 
+/-- **GS-Max energy gap** (γ-5 step 280):
+`singleClusterMaxEnergyS z N - singleClusterGSEnergyS z N = (N/2)(zN+1) = S(2zS+1)`
+for spin `S = N/2`.
+
+Closed form for the energy difference between the two named eigenvalues
+of γ-5 steps 270, 271. The gap is non-negative and grows linearly in
+both `z` and `N²`. -/
+theorem singleClusterMaxEnergyS_sub_singleClusterGSEnergyS (z N : ℕ) :
+    singleClusterMaxEnergyS z N - singleClusterGSEnergyS z N =
+      ((N : ℂ) / 2) * ((z : ℂ) * (N : ℂ) + 1) := by
+  unfold singleClusterMaxEnergyS singleClusterGSEnergyS
+  ring
+
 end LatticeSystem.Quantum
