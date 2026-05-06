@@ -1875,4 +1875,34 @@ theorem singleClusterHamiltonianS_eigenvalue_pentamer_leaf_singlet
         2 * (-((N : ℂ) * ((N : ℂ) + 2) / 2))) / 2 = 0 from by ring]
   rw [zero_smul]
 
+/-- **Generic leaf-singlet sector eigenvalue = 0** (γ-5 step 323):
+for any `z : ℕ`, if `v` is a joint eigenvector of `Stot²` at
+`Stot²·v = (N(N+2)/4)·v` (i.e. `s_tot = N/2`, central spin alone)
+and the leaf-Casimir at `leafSpinSSquared z N · v = 0` (leaves in a
+total-spin-zero singlet), then `H · v = 0`.
+
+The leaf-singlet sector decouples: with the leaves combined into a
+total-spin-zero singlet, the central spin couples trivially via the
+Casimir formula. Generalises γ-5 step 296 (z=2 trimer), γ-5 step 321
+(z=3 quartet), γ-5 step 322 (z=4 pentamer) to arbitrary cluster size.
+
+A `z`-leaf singlet exists when total spin 0 is achievable from `z`
+spins of magnitude `S = N/2`: always for **even** `z`, and for **odd**
+`z` only when `S` is integer (since odd-many half-integer spins sum
+to a half-integer, never zero). -/
+theorem singleClusterHamiltonianS_eigenvalue_leaf_singlet
+    (N : ℕ) {v : (Fin (z + 1) → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin (z + 1)) N).mulVec v =
+        ((N : ℂ) * ((N : ℂ) + 2) / 4) • v)
+    (hR : (leafSpinSSquared z N).mulVec v = 0) :
+    (singleClusterHamiltonianS z N).mulVec v = 0 := by
+  have hR' : (leafSpinSSquared z N).mulVec v = (0 : ℂ) • v := by
+    rw [hR, zero_smul]
+  have h := singleClusterHamiltonianS_eigenvalue_of_joint_casimir_eigenvec
+    (z := z) N htot hR'
+  rw [h]
+  rw [show ((N : ℂ) * ((N : ℂ) + 2) / 4 - (N : ℂ) * ((N : ℂ) + 2) / 4 - 0) / 2 =
+        0 from by ring]
+  rw [zero_smul]
+
 end LatticeSystem.Quantum
