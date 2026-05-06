@@ -260,4 +260,45 @@ theorem onSiteS_zero_commute_leafSpinSOp3 (N : ℕ) :
   exact Commute.sum_right _ _ _ (fun j hj =>
     onSiteS_commute_of_ne (Finset.ne_of_mem_erase hj).symm _ _)
 
+/-- Helper: `(a + b)² = a² + 2(a·b) + b²` when `Commute a b`, in the
+matrix algebra `ManyBodyOpS`. Pure non-commutative algebra. -/
+private theorem add_mul_self_of_commute
+    {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
+    {a b : ManyBodyOpS V N} (hab : Commute a b) :
+    (a + b) * (a + b) = a * a + 2 * (a * b) + b * b := by
+  rw [add_mul, mul_add, mul_add]
+  rw [show b * a = a * b from hab.symm.eq]
+  noncomm_ring
+
+/-- **Casimir decomposition** of the single-cluster Hamiltonian
+(γ-5 step 254):
+`2 · H = (Ŝ_tot)² − Ŝ_0² − Ŝ_R²`
+
+where `Ŝ_0² := spinSDot 0 0 N` is the single-site Casimir at the
+central vertex and `Ŝ_R² := leafSpinSSquared z N` is the leaf Casimir.
+
+Proof: expand `Σ_α totalSpinSOp_α² = Σ_α (onSite 0 + leaf_α)²` using
+γ-4 step 251 and γ-4 step 253 (commutativity); the cross term sums to
+`2 · H` via γ-4 step 250 (`Ŝ_0 · Ŝ_R` decomposition); the squared
+center term sums to `spinSDot 0 0` by definition. -/
+theorem singleClusterHamiltonianS_two_mul_eq_casimir_diff
+    (N : ℕ) :
+    2 * singleClusterHamiltonianS z N =
+      totalSpinSSquared (Fin (z + 1)) N -
+        spinSDot 0 0 N - leafSpinSSquared z N := by
+  rw [singleClusterHamiltonianS_eq_dot_leaves]
+  unfold totalSpinSSquared leafSpinSSquared
+  rw [totalSpinSOp1_eq_onSite_zero_add_leafSpinSOp1,
+    totalSpinSOp2_eq_onSite_zero_add_leafSpinSOp2,
+    totalSpinSOp3_eq_onSite_zero_add_leafSpinSOp3]
+  rw [add_mul_self_of_commute (onSiteS_zero_commute_leafSpinSOp1 (z := z) N),
+    add_mul_self_of_commute (onSiteS_zero_commute_leafSpinSOp2 (z := z) N),
+    add_mul_self_of_commute (onSiteS_zero_commute_leafSpinSOp3 (z := z) N)]
+  -- Now LHS = 2 · (onSite 0 Ŝ^1 · leaf_1 + onSite 0 Ŝ^2 · leaf_2 + onSite 0 Ŝ^3 · leaf_3)
+  -- RHS = (Σ_α (onSite 0 Ŝ^α)² + 2(onSite 0 Ŝ^α · leaf_α) + leaf_α²)
+  --      − (onSite 0 Ŝ^1·onSite 0 Ŝ^1 + onSite 0 Ŝ^2·onSite 0 Ŝ^2 + onSite 0 Ŝ^3·onSite 0 Ŝ^3)
+  --      − (leaf_1² + leaf_2² + leaf_3²)
+  unfold spinSDot
+  noncomm_ring
+
 end LatticeSystem.Quantum
