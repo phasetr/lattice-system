@@ -3,6 +3,7 @@ import LatticeSystem.Quantum.SpinS.AllAlignedState
 import LatticeSystem.Quantum.SpinS.MultiSite
 import LatticeSystem.Quantum.SpinS.TotalSpin
 import LatticeSystem.Quantum.SpinS.AllAlignedStateExpectations
+import LatticeSystem.Quantum.SpinS.SpinSDotAllAlignedZero
 
 /-!
 # Single-cluster (star-graph) Heisenberg Hamiltonian (Tasaki Problem 2.5.a)
@@ -516,5 +517,36 @@ theorem leafSpinSSquared_allUp_expectation (N : ℕ) [Nonempty (Fin (z + 1))] :
   have h := singleClusterHamiltonianS_two_mul_expectation (z := z) N
     (allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1)))
   linear_combination h + hStot - hS0 - 2 * hH
+
+/-- **Eigenvector form on allUp**: `singleClusterHamiltonianS z N · |Φ_⊤⟩ =
+z·(N/2)² · |Φ_⊤⟩`. The all-up state is an `H`-eigenvector with
+eigenvalue `z·(N/2)²` (γ-5 step 264).
+
+Proof: each `spinSDot 0 j` for `j ≠ 0` acts as `(N/2)²·1` on `|Φ_⊤⟩`
+(via `spinSDot_mulVec_allAlignedStateS_zero_of_ne`); sum over `z` leaves. -/
+theorem singleClusterHamiltonianS_mulVec_allAlignedStateS_zero (N : ℕ) :
+    (singleClusterHamiltonianS z N).mulVec
+        (allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1))) =
+      ((z : ℂ) * (N : ℂ) ^ 2 / 4) •
+        allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1)) := by
+  unfold singleClusterHamiltonianS
+  rw [Matrix.sum_mulVec]
+  have hEach : ∀ j ∈ Finset.univ.erase (0 : Fin (z + 1)),
+      (spinSDot 0 j N).mulVec
+          (allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1))) =
+        ((N : ℂ) * (N : ℂ) / 4) •
+          allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1)) := by
+    intros j hj
+    have h0j : (0 : Fin (z + 1)) ≠ j := (Finset.ne_of_mem_erase hj).symm
+    exact spinSDot_mulVec_allAlignedStateS_zero_of_ne h0j
+  rw [Finset.sum_congr rfl hEach]
+  rw [← Finset.sum_smul]
+  rw [Finset.sum_const,
+    Finset.card_erase_of_mem (Finset.mem_univ (0 : Fin (z + 1))),
+    Finset.card_univ, Fintype.card_fin]
+  rw [show z + 1 - 1 = z from by omega]
+  rw [show (z : ℕ) • ((N : ℂ) * (N : ℂ) / 4) =
+      ((z : ℂ) * (N : ℂ) ^ 2 / 4 : ℂ) from by
+    rw [nsmul_eq_mul]; ring]
 
 end LatticeSystem.Quantum
