@@ -4,6 +4,7 @@ import LatticeSystem.Quantum.SpinS.MultiSite
 import LatticeSystem.Quantum.SpinS.TotalSpin
 import LatticeSystem.Quantum.SpinS.AllAlignedStateExpectations
 import LatticeSystem.Quantum.SpinS.SpinSDotAllAlignedZero
+import LatticeSystem.Quantum.SpinS.SpinSDotAllAlignedLast
 
 /-!
 # Single-cluster (star-graph) Heisenberg Hamiltonian (Tasaki Problem 2.5.a)
@@ -583,5 +584,36 @@ theorem leafSpinSSquared_mulVec_allAlignedStateS_zero
   congr 1
   push_cast
   ring
+
+/-- **Eigenvector form on allDown** (γ-5 step 266):
+`singleClusterHamiltonianS z N · |Φ_⊥⟩ = z·(N/2)² · |Φ_⊥⟩`.
+
+The all-down state is also an `H`-eigenvector with the same eigenvalue
+`z·(N/2)²` as `|Φ_⊤⟩` (γ-5 step 264). This reflects the spin-flip
+symmetry of the Heisenberg Hamiltonian. -/
+theorem singleClusterHamiltonianS_mulVec_allAlignedStateS_last (N : ℕ) :
+    (singleClusterHamiltonianS z N).mulVec
+        (allAlignedStateS (Fin (z + 1)) N (Fin.last N)) =
+      ((z : ℂ) * (N : ℂ) ^ 2 / 4) •
+        allAlignedStateS (Fin (z + 1)) N (Fin.last N) := by
+  unfold singleClusterHamiltonianS
+  rw [Matrix.sum_mulVec]
+  have hEach : ∀ j ∈ Finset.univ.erase (0 : Fin (z + 1)),
+      (spinSDot 0 j N).mulVec
+          (allAlignedStateS (Fin (z + 1)) N (Fin.last N)) =
+        ((N : ℂ) * (N : ℂ) / 4) •
+          allAlignedStateS (Fin (z + 1)) N (Fin.last N) := by
+    intros j hj
+    have h0j : (0 : Fin (z + 1)) ≠ j := (Finset.ne_of_mem_erase hj).symm
+    exact spinSDot_mulVec_allAlignedStateS_last_of_ne h0j
+  rw [Finset.sum_congr rfl hEach]
+  rw [← Finset.sum_smul]
+  rw [Finset.sum_const,
+    Finset.card_erase_of_mem (Finset.mem_univ (0 : Fin (z + 1))),
+    Finset.card_univ, Fintype.card_fin]
+  rw [show z + 1 - 1 = z from by omega]
+  rw [show (z : ℕ) • ((N : ℂ) * (N : ℂ) / 4) =
+      ((z : ℂ) * (N : ℂ) ^ 2 / 4 : ℂ) from by
+    rw [nsmul_eq_mul]; ring]
 
 end LatticeSystem.Quantum
