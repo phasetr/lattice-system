@@ -1143,4 +1143,24 @@ theorem singleClusterHamiltonianS_eigenvalue_dimer_singlet
   congr 1
   ring
 
+/-- **Dimer top-spin attains Max energy** (γ-5 step 288):
+for `z = 1`, any `Stot² = N(N+1)` eigenvector (i.e. total spin
+`s_tot = N = 2S`) is an `H`-eigenvector at the predicted maximum
+Casimir-sector energy: `H · v = singleClusterMaxEnergyS 1 N • v`.
+
+Companion to γ-5 step 287 (singlet at the GS energy). Combines γ-5
+step 286 with γ-5 step 275 (`singleClusterMaxEnergyS 1 N = (N/2)²`).
+-/
+theorem singleClusterHamiltonianS_eigenvalue_dimer_top
+    (N : ℕ) {v : (Fin 2 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 2) N).mulVec v =
+        ((N : ℂ) * ((N : ℂ) + 1)) • v) :
+    (singleClusterHamiltonianS 1 N).mulVec v =
+      singleClusterMaxEnergyS 1 N • v := by
+  rw [singleClusterMaxEnergyS_one_eq]
+  have h := singleClusterHamiltonianS_eigenvalue_dimer N htot
+  rw [h]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
