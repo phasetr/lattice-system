@@ -1293,4 +1293,25 @@ theorem singleClusterHamiltonianS_eigenvalue_trimer_gs
   congr 1
   ring
 
+/-- **Trimer top-spin sector eigenvalue at Max energy** (γ-5 step 295):
+for `z = 2`, if `v` is a joint eigenvector of `Stot²` at the maximum
+total-spin sector (`Stot²·v = (3N/2)(3N/2+1)·v`, i.e. `s_tot = 3N/2`)
+and the leaf-leaf coupling `spinSDot 1 2·v = (N²/4)·v` (leaf triplet,
+`s_R = N`), then `v` is an `H`-eigenvector at the predicted maximum
+Casimir-sector energy `singleClusterMaxEnergyS 2 N = N²/2`.
+
+Trimer companion to γ-5 step 288 (dimer top-spin attains Max). -/
+theorem singleClusterHamiltonianS_eigenvalue_trimer_top
+    (N : ℕ) {v : (Fin 3 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 3) N).mulVec v =
+        ((3 : ℂ) * (N : ℂ) / 2 * ((3 : ℂ) * (N : ℂ) / 2 + 1)) • v)
+    (hLeafLeaf : (spinSDot 1 2 N).mulVec v = ((N : ℂ) ^ 2 / 4) • v) :
+    (singleClusterHamiltonianS 2 N).mulVec v =
+      singleClusterMaxEnergyS 2 N • v := by
+  unfold singleClusterMaxEnergyS
+  have h := singleClusterHamiltonianS_eigenvalue_trimer N htot hLeafLeaf
+  rw [h]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
