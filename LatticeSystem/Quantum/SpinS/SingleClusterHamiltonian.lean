@@ -137,4 +137,17 @@ theorem singleClusterHamiltonianS_allAligned_expectation
   push_cast
   ring
 
+/-- The all-down state expectation of the single-cluster Hamiltonian:
+`<Φ_⊥ | H | Φ_⊥> = z·(N/2)²`. Direct specialisation of γ-5 step 247
+at `c = Fin.last N`; the squared `(N/2 − N)² = (N/2)²` matches the
+all-up case (γ-5 step 246) (γ-5 step 248). -/
+theorem singleClusterHamiltonianS_allDown_expectation (N : ℕ) :
+    dotProduct (star (allAlignedStateS (Fin (z + 1)) N (Fin.last N)))
+        ((singleClusterHamiltonianS z N).mulVec
+          (allAlignedStateS (Fin (z + 1)) N (Fin.last N))) =
+      (z : ℂ) * ((N : ℂ) / 2) ^ 2 := by
+  rw [singleClusterHamiltonianS_allAligned_expectation]
+  rw [show ((Fin.last N).val : ℂ) = (N : ℂ) from by simp [Fin.last]]
+  ring
+
 end LatticeSystem.Quantum
