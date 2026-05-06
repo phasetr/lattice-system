@@ -644,4 +644,31 @@ theorem leafSpinSSquared_mulVec_allAlignedStateS_last
   push_cast
   ring
 
+/-- **GS-sector eigenvalue specialisation** (γ-5 step 268):
+if `v` is a joint eigenvector of `Ŝ_tot²` (eigenvalue
+`((z−1)·N/2)·((z−1)·N/2 + 1)`) and `Ŝ_R²` (eigenvalue
+`(z·N/2)·(z·N/2 + 1)`), then `v` is an `H`-eigenvector with eigenvalue
+`−(N/2)·(z·N/2 + 1) = −S(1 + zS)` where `S = N/2`.
+
+Specialisation of γ-5 step 259 to the ground-state Casimir sector
+predicted by Tasaki Problem 2.5.a. The eigenvector is *not* one of the
+extremal aligned states `|Φ_⊤⟩, |Φ_⊥⟩` (which sit at `s_tot = (z+1)N/2`,
+the maximum sector). Constructing an actual joint eigenstate at this
+sector requires SU(2) representation theory (Clebsch–Gordan
+decomposition), deferred to a later γ-5 phase. -/
+theorem singleClusterHamiltonianS_eigenvalue_at_gs_casimir_sector
+    (N : ℕ) {v : (Fin (z + 1) → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin (z + 1)) N).mulVec v =
+        (((z : ℂ) - 1) * (N : ℂ) / 2 *
+            (((z : ℂ) - 1) * (N : ℂ) / 2 + 1)) • v)
+    (hR : (leafSpinSSquared z N).mulVec v =
+        ((z : ℂ) * (N : ℂ) / 2 * ((z : ℂ) * (N : ℂ) / 2 + 1)) • v) :
+    (singleClusterHamiltonianS z N).mulVec v =
+      (-((N : ℂ) / 2) * ((z : ℂ) * (N : ℂ) / 2 + 1)) • v := by
+  have h := singleClusterHamiltonianS_eigenvalue_of_joint_casimir_eigenvec
+    (z := z) N htot hR
+  rw [h]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
