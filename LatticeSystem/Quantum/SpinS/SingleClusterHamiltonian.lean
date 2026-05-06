@@ -980,4 +980,39 @@ theorem singleClusterGSEnergyS_re_lt_singleClusterMaxEnergyS_re_of_pos
   have h3 : (0 : ℝ) ≤ (z : ℝ) * (N : ℝ) := mul_nonneg h2 (by linarith)
   nlinarith [mul_nonneg h2 (sq_nonneg ((N : ℝ) - 1))]
 
+/-- **Spin-1 dimer ground-state energy** (γ-5 step 282):
+`singleClusterGSEnergyS 1 2 = -2 = -S(S+1)` for `S = 1`.
+
+Concrete numerical value of `−S(1+zS)` for two spin-1 sites coupled by
+`Ŝ_0 · Ŝ_1`. The well-known Haldane-chain dimer baseline. -/
+@[simp] theorem singleClusterGSEnergyS_one_two :
+    singleClusterGSEnergyS 1 2 = (-2 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-1 dimer maximum-Casimir-sector energy** (γ-5 step 282):
+`singleClusterMaxEnergyS 1 2 = 1 = S²` for `S = 1`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_two :
+    singleClusterMaxEnergyS 1 2 = (1 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-1 3-vertex-star ground-state energy** (γ-5 step 282):
+`singleClusterGSEnergyS 2 2 = -3 = -S(1 + 2S)` for `S = 1, z = 2`. -/
+@[simp] theorem singleClusterGSEnergyS_two_two :
+    singleClusterGSEnergyS 2 2 = (-3 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-1 3-vertex-star maximum-Casimir-sector energy** (γ-5 step 282):
+`singleClusterMaxEnergyS 2 2 = 2 = zS²` for `S = 1, z = 2`. -/
+@[simp] theorem singleClusterMaxEnergyS_two_two :
+    singleClusterMaxEnergyS 2 2 = (2 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
