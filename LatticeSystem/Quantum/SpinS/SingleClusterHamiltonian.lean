@@ -967,4 +967,17 @@ theorem singleClusterMaxEnergyS_sub_singleClusterGSEnergyS (z N : ℕ) :
   unfold singleClusterMaxEnergyS singleClusterGSEnergyS
   ring
 
+/-- **Strict GS < Max gap** (γ-5 step 281):
+`Re(singleClusterGSEnergyS z N) < Re(singleClusterMaxEnergyS z N)` for
+`N ≥ 1`. The Casimir spectrum is non-degenerate at the GS / Max
+sectors whenever the spin is non-trivial (`S ≥ 1/2`). -/
+theorem singleClusterGSEnergyS_re_lt_singleClusterMaxEnergyS_re_of_pos
+    (z : ℕ) {N : ℕ} (hN : 1 ≤ N) :
+    (singleClusterGSEnergyS z N).re < (singleClusterMaxEnergyS z N).re := by
+  rw [singleClusterGSEnergyS_re_eq, singleClusterMaxEnergyS_re_eq]
+  have h1 : (1 : ℝ) ≤ (N : ℝ) := by exact_mod_cast hN
+  have h2 : (0 : ℝ) ≤ (z : ℝ) := by positivity
+  have h3 : (0 : ℝ) ≤ (z : ℝ) * (N : ℝ) := mul_nonneg h2 (by linarith)
+  nlinarith [mul_nonneg h2 (sq_nonneg ((N : ℝ) - 1))]
+
 end LatticeSystem.Quantum
