@@ -1314,4 +1314,28 @@ theorem singleClusterHamiltonianS_eigenvalue_trimer_top
   congr 1
   ring
 
+/-- **Trimer leaf-singlet sector eigenvalue = 0** (γ-5 step 296):
+for `z = 2`, if `v` is a joint eigenvector of `Stot²` at
+`Stot²·v = (N(N+2)/4)·v` (i.e. `s_tot = N/2`, the central spin alone)
+and the leaf-leaf coupling at `spinSDot 1 2·v = -(N(N+2)/4)·v` (leaf
+singlet, `s_R = 0`), then `H · v = 0`.
+
+The leaf-singlet sector decouples: with leaves combined into a
+total-spin-zero singlet, the central spin couples trivially to give
+H = 0. The spin-1/2 trimer spectrum `{-1, 0, 1/2}` includes `0` from
+exactly this sector. -/
+theorem singleClusterHamiltonianS_eigenvalue_trimer_leaf_singlet
+    (N : ℕ) {v : (Fin 3 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 3) N).mulVec v =
+        ((N : ℂ) * ((N : ℂ) + 2) / 4) • v)
+    (hLeafLeaf : (spinSDot 1 2 N).mulVec v =
+        (-((N : ℂ) * ((N : ℂ) + 2) / 4)) • v) :
+    (singleClusterHamiltonianS 2 N).mulVec v = 0 := by
+  have h := singleClusterHamiltonianS_eigenvalue_trimer N htot hLeafLeaf
+  rw [h]
+  rw [show ((N : ℂ) * ((N : ℂ) + 2) / 4 -
+        3 * (N : ℂ) * ((N : ℂ) + 2) / 4 -
+        2 * -((N : ℂ) * ((N : ℂ) + 2) / 4)) / 2 = 0 from by ring]
+  rw [zero_smul]
+
 end LatticeSystem.Quantum
