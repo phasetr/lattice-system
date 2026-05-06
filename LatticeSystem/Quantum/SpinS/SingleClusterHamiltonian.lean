@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 import LatticeSystem.Quantum.SpinS.AllAlignedState
 import LatticeSystem.Quantum.SpinS.MultiSite
+import LatticeSystem.Quantum.SpinS.TotalSpin
 
 /-!
 # Single-cluster (star-graph) Heisenberg Hamiltonian (Tasaki Problem 2.5.a)
@@ -189,5 +190,35 @@ theorem singleClusterHamiltonianS_eq_dot_leaves (N : ℕ) :
   simp_rw [spinSDot_def]
   rw [Finset.sum_add_distrib, Finset.sum_add_distrib]
   rw [← Finset.mul_sum, ← Finset.mul_sum, ← Finset.mul_sum]
+
+/-- **Total = central + leaves** (axis 1):
+`totalSpinSOp1 (Fin (z + 1)) N = onSiteS 0 (Ŝ^(1)) + leafSpinSOp1 z N`.
+Direct from `Finset.sum_eq_sum_diff_singleton_add` on `Finset.univ` with
+the singleton `{0}` (γ-5 step 251). -/
+theorem totalSpinSOp1_eq_onSite_zero_add_leafSpinSOp1 (N : ℕ) :
+    (totalSpinSOp1 (Fin (z + 1)) N : ManyBodyOpS (Fin (z + 1)) N) =
+      onSiteS 0 (spinSOp1 N) + leafSpinSOp1 z N := by
+  unfold totalSpinSOp1 leafSpinSOp1
+  rw [← Finset.sum_erase_add (Finset.univ : Finset (Fin (z + 1))) _
+    (Finset.mem_univ 0)]
+  exact add_comm _ _
+
+/-- **Total = central + leaves** (axis 2). Spin-`S` mirror of step 251 axis 1. -/
+theorem totalSpinSOp2_eq_onSite_zero_add_leafSpinSOp2 (N : ℕ) :
+    (totalSpinSOp2 (Fin (z + 1)) N : ManyBodyOpS (Fin (z + 1)) N) =
+      onSiteS 0 (spinSOp2 N) + leafSpinSOp2 z N := by
+  unfold totalSpinSOp2 leafSpinSOp2
+  rw [← Finset.sum_erase_add (Finset.univ : Finset (Fin (z + 1))) _
+    (Finset.mem_univ 0)]
+  exact add_comm _ _
+
+/-- **Total = central + leaves** (axis 3). -/
+theorem totalSpinSOp3_eq_onSite_zero_add_leafSpinSOp3 (N : ℕ) :
+    (totalSpinSOp3 (Fin (z + 1)) N : ManyBodyOpS (Fin (z + 1)) N) =
+      onSiteS 0 (spinSOp3 N) + leafSpinSOp3 z N := by
+  unfold totalSpinSOp3 leafSpinSOp3
+  rw [← Finset.sum_erase_add (Finset.univ : Finset (Fin (z + 1))) _
+    (Finset.mem_univ 0)]
+  exact add_comm _ _
 
 end LatticeSystem.Quantum
