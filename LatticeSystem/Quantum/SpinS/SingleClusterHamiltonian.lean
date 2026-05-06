@@ -229,4 +229,35 @@ noncomputable def leafSpinSSquared (N : ℕ) : ManyBodyOpS (Fin (z + 1)) N :=
     leafSpinSOp2 z N * leafSpinSOp2 z N +
     leafSpinSOp3 z N * leafSpinSOp3 z N
 
+/-! ## Center-leaf commutativity (γ-5 step 253)
+
+`onSiteS 0 (Ŝ^(α))` commutes with `leafSpinSOp_α z N` since each leaf
+operator `onSiteS j (Ŝ^(α))` for `j ≠ 0` acts on a disjoint site.
+Crucial for expanding the squared sum `(onSite 0 + leaf)²` in the
+Casimir decomposition. -/
+
+/-- `onSiteS 0 (Ŝ^(1))` commutes with `leafSpinSOp1 z N` (γ-5 step 253). -/
+theorem onSiteS_zero_commute_leafSpinSOp1 (N : ℕ) :
+    Commute (onSiteS 0 (spinSOp1 N) : ManyBodyOpS (Fin (z + 1)) N)
+      (leafSpinSOp1 z N) := by
+  unfold leafSpinSOp1
+  exact Commute.sum_right _ _ _ (fun j hj =>
+    onSiteS_commute_of_ne (Finset.ne_of_mem_erase hj).symm _ _)
+
+/-- `onSiteS 0 (Ŝ^(2))` commutes with `leafSpinSOp2 z N` (γ-5 step 253). -/
+theorem onSiteS_zero_commute_leafSpinSOp2 (N : ℕ) :
+    Commute (onSiteS 0 (spinSOp2 N) : ManyBodyOpS (Fin (z + 1)) N)
+      (leafSpinSOp2 z N) := by
+  unfold leafSpinSOp2
+  exact Commute.sum_right _ _ _ (fun j hj =>
+    onSiteS_commute_of_ne (Finset.ne_of_mem_erase hj).symm _ _)
+
+/-- `onSiteS 0 (Ŝ^(3))` commutes with `leafSpinSOp3 z N` (γ-5 step 253). -/
+theorem onSiteS_zero_commute_leafSpinSOp3 (N : ℕ) :
+    Commute (onSiteS 0 (spinSOp3 N) : ManyBodyOpS (Fin (z + 1)) N)
+      (leafSpinSOp3 z N) := by
+  unfold leafSpinSOp3
+  exact Commute.sum_right _ _ _ (fun j hj =>
+    onSiteS_commute_of_ne (Finset.ne_of_mem_erase hj).symm _ _)
+
 end LatticeSystem.Quantum
