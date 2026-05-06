@@ -447,4 +447,33 @@ theorem leafSpinSSquared_zero_z (N : ℕ) :
   rw [leafSpinSOp1_zero_z, leafSpinSOp2_zero_z, leafSpinSOp3_zero_z]
   simp
 
+/-- **`leafSpinSSquared` as double sum**:
+`leafSpinSSquared z N = Σ_{j,k ∈ univ.erase 0} spinSDot j k N` on
+`Fin (z + 1)`. Direct expansion of `Σ_α (Σ_j onSite j Ŝ^α)²` using
+`spinSDot_def` (γ-5 step 262). -/
+theorem leafSpinSSquared_eq_sum_spinSDot (N : ℕ) :
+    (leafSpinSSquared z N : ManyBodyOpS (Fin (z + 1)) N) =
+      ∑ j ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0,
+        ∑ k ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0,
+          spinSDot j k N := by
+  unfold leafSpinSSquared leafSpinSOp1 leafSpinSOp2 leafSpinSOp3
+  simp_rw [spinSDot_def]
+  rw [Finset.sum_mul, Finset.sum_mul, Finset.sum_mul]
+  simp_rw [Finset.mul_sum]
+  rw [show (∑ j ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0,
+        ∑ k ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0,
+          (onSiteS j (spinSOp1 N) * onSiteS k (spinSOp1 N) +
+            onSiteS j (spinSOp2 N) * onSiteS k (spinSOp2 N) +
+            onSiteS j (spinSOp3 N) * onSiteS k (spinSOp3 N))) =
+      (∑ j ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0,
+        ∑ k ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0,
+          onSiteS j (spinSOp1 N) * onSiteS k (spinSOp1 N)) +
+      (∑ j ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0,
+        ∑ k ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0,
+          onSiteS j (spinSOp2 N) * onSiteS k (spinSOp2 N)) +
+      (∑ j ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0,
+        ∑ k ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0,
+          onSiteS j (spinSOp3 N) * onSiteS k (spinSOp3 N)) from by
+    simp_rw [Finset.sum_add_distrib]]
+
 end LatticeSystem.Quantum
