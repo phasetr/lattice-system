@@ -904,4 +904,29 @@ sites. -/
   push_cast
   ring
 
+/-- **GS energy real-part closed form** (γ-5 step 278):
+`Re(singleClusterGSEnergyS z N) = -(N/2)·(zN/2 + 1)` as an `ℝ` value.
+
+Useful as a simp lemma for downstream real comparisons. -/
+theorem singleClusterGSEnergyS_re_eq (z N : ℕ) :
+    (singleClusterGSEnergyS z N).re =
+      -((N : ℝ) / 2) * ((z : ℝ) * (N : ℝ) / 2 + 1) := by
+  have hcast : singleClusterGSEnergyS z N =
+      ((-((N : ℝ) / 2) * ((z : ℝ) * (N : ℝ) / 2 + 1) : ℝ) : ℂ) := by
+    unfold singleClusterGSEnergyS
+    push_cast
+    ring
+  rw [hcast, Complex.ofReal_re]
+
+/-- **Max-Casimir-sector energy real-part closed form** (γ-5 step 278):
+`Re(singleClusterMaxEnergyS z N) = z·N²/4` as an `ℝ` value. -/
+theorem singleClusterMaxEnergyS_re_eq (z N : ℕ) :
+    (singleClusterMaxEnergyS z N).re = (z : ℝ) * (N : ℝ) ^ 2 / 4 := by
+  have hcast : singleClusterMaxEnergyS z N =
+      (((z : ℝ) * (N : ℝ) ^ 2 / 4 : ℝ) : ℂ) := by
+    unfold singleClusterMaxEnergyS
+    push_cast
+    ring
+  rw [hcast, Complex.ofReal_re]
+
 end LatticeSystem.Quantum
