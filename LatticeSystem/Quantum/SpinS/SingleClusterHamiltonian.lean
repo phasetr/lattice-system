@@ -671,4 +671,30 @@ theorem singleClusterHamiltonianS_eigenvalue_at_gs_casimir_sector
   congr 1
   ring
 
+/-- **Max-Casimir-sector eigenvalue specialisation** (γ-5 step 269):
+if `v` is a joint eigenvector of `Ŝ_tot²` (eigenvalue
+`((z+1)·N/2)·((z+1)·N/2 + 1)`) and `Ŝ_R²` (eigenvalue
+`(z·N/2)·(z·N/2 + 1)`), then `v` is an `H`-eigenvector with eigenvalue
+`z·(N/2)² = zS²` where `S = N/2`.
+
+Specialisation of γ-5 step 259 to the maximum Casimir sector — the
+sector containing both extremal aligned states `|Φ_⊤⟩, |Φ_⊥⟩` (cf. γ-5
+steps 264–267). This is the *highest* `H`-eigenvalue compatible with
+the maximum `Ŝ_R²` Casimir; the *lowest* (Tasaki Problem 2.5.a target)
+is at the `(z−1)·N/2` total-spin sector and given by γ-5 step 268. -/
+theorem singleClusterHamiltonianS_eigenvalue_at_max_casimir_sector
+    (N : ℕ) {v : (Fin (z + 1) → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin (z + 1)) N).mulVec v =
+        (((z : ℂ) + 1) * (N : ℂ) / 2 *
+            (((z : ℂ) + 1) * (N : ℂ) / 2 + 1)) • v)
+    (hR : (leafSpinSSquared z N).mulVec v =
+        ((z : ℂ) * (N : ℂ) / 2 * ((z : ℂ) * (N : ℂ) / 2 + 1)) • v) :
+    (singleClusterHamiltonianS z N).mulVec v =
+      ((z : ℂ) * (N : ℂ) ^ 2 / 4) • v := by
+  have h := singleClusterHamiltonianS_eigenvalue_of_joint_casimir_eigenvec
+    (z := z) N htot hR
+  rw [h]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
