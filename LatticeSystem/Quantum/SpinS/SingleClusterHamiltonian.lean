@@ -1,4 +1,6 @@
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
+import LatticeSystem.Quantum.SpinS.AllAlignedState
+import LatticeSystem.Quantum.SpinS.MultiSite
 
 /-!
 # Single-cluster (star-graph) Heisenberg Hamiltonian (Tasaki Problem 2.5.a)
@@ -65,5 +67,43 @@ theorem singleClusterHamiltonianS_zero_z (N : ℕ) :
     ext j
     simp [Fin.fin_one_eq_zero]]
   exact Finset.sum_empty
+
+/-- The all-up state expectation of the single-cluster Hamiltonian:
+`<Φ_⊤ | H | Φ_⊤> = z·(N/2)²` for `H = Σ_{j ≠ 0} Ŝ_0 · Ŝ_j` on
+`Fin (z + 1)`.
+
+Each two-site dot product `Ŝ_0 · Ŝ_j` at `j ≠ 0` evaluated on the
+constant-`0` (all-up) configuration gives `(N/2 − 0)(N/2 − 0) = (N/2)²`
+(via `spinSDot_apply_diag_of_ne`). Sum over `z` leaves gives `z·(N/2)²`.
+
+This is far above Tasaki's true GS energy `−S(1 + zS) = −(N/2)(1 + zN/2)`
+since the all-up state is in the maximum-`s_tot` sector (the highest
+Casimir energy), not the minimum `s_tot = (z−1)S` sector
+(γ-5 step 246). -/
+theorem singleClusterHamiltonianS_allUp_expectation (N : ℕ) :
+    dotProduct (star (allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1))))
+        ((singleClusterHamiltonianS z N).mulVec
+          (allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1)))) =
+      (z : ℂ) * ((N : ℂ) / 2) ^ 2 := by
+  unfold singleClusterHamiltonianS allAlignedStateS
+  rw [Matrix.sum_mulVec, dotProduct_sum]
+  have hEach : ∀ j ∈ Finset.univ.erase (0 : Fin (z + 1)),
+      dotProduct (star (basisVecS (allAlignedConfigS (Fin (z + 1)) N 0)))
+          ((spinSDot 0 j N).mulVec
+            (basisVecS (allAlignedConfigS (Fin (z + 1)) N 0))) =
+        ((N : ℂ) / 2) ^ 2 := by
+    intro j hj
+    rw [basisVecS_expectation_eq_diagonal]
+    have h0j : (0 : Fin (z + 1)) ≠ j := (Finset.ne_of_mem_erase hj).symm
+    rw [spinSDot_apply_diag_of_ne h0j]
+    unfold allAlignedConfigS
+    simp
+    ring
+  rw [Finset.sum_congr rfl hEach]
+  rw [Finset.sum_const,
+    Finset.card_erase_of_mem (Finset.mem_univ (0 : Fin (z + 1))),
+    Finset.card_univ, Fintype.card_fin]
+  push_cast
+  ring
 
 end LatticeSystem.Quantum
