@@ -1887,8 +1887,9 @@ Casimir formula. Generalises γ-5 step 296 (z=2 trimer), γ-5 step 321
 (z=3 quartet), γ-5 step 322 (z=4 pentamer) to arbitrary cluster size.
 
 A `z`-leaf singlet exists when total spin 0 is achievable from `z`
-spins of magnitude `S = N/2`: always for `z ≥ 2`, conditional on `S`
-parity for `z = 3` (integer-S only). -/
+spins of magnitude `S = N/2`: always for **even** `z`, and for **odd**
+`z` only when `S` is integer (since odd-many half-integer spins sum
+to a half-integer, never zero). -/
 theorem singleClusterHamiltonianS_eigenvalue_leaf_singlet
     (N : ℕ) {v : (Fin (z + 1) → Fin (N + 1)) → ℂ}
     (htot : (totalSpinSSquared (Fin (z + 1)) N).mulVec v =
