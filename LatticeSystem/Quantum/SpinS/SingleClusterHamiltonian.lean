@@ -1508,4 +1508,29 @@ theorem singleClusterHamiltonianS_eigenvalue_quartet_gs
   congr 1
   ring
 
+/-- **Quartet top-spin sector eigenvalue at Max energy** (γ-5 step 306):
+for `z = 3`, if `v` is a joint eigenvector of `Stot²` at the maximum
+total-spin sector (`Stot²·v = 2N(2N+1)·v`, i.e. `s_tot = 2N = (z+1)N/2`)
+and the leaf-leaf sum at `(spinSDot 1 2 + spinSDot 1 3 + spinSDot 2 3)·v
+= (3N²/4)·v` (max leaf-spin `s_R = 3N/2`), then `v` is an `H`-eigenvector
+at the predicted maximum Casimir-sector energy
+`singleClusterMaxEnergyS 3 N = 3N²/4`.
+
+Quartet companion to γ-5 step 295 (trimer top sector). -/
+theorem singleClusterHamiltonianS_eigenvalue_quartet_top
+    (N : ℕ) {v : (Fin 4 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 4) N).mulVec v =
+        ((2 : ℂ) * (N : ℂ) * ((2 : ℂ) * (N : ℂ) + 1)) • v)
+    (hLeafSum :
+        (spinSDot (1 : Fin 4) 2 N + spinSDot (1 : Fin 4) 3 N +
+            spinSDot (2 : Fin 4) 3 N).mulVec v =
+          (3 * (N : ℂ) ^ 2 / 4) • v) :
+    (singleClusterHamiltonianS 3 N).mulVec v =
+      singleClusterMaxEnergyS 3 N • v := by
+  unfold singleClusterMaxEnergyS
+  have h := singleClusterHamiltonianS_eigenvalue_quartet N htot hLeafSum
+  rw [h]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
