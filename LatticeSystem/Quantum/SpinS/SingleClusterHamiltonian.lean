@@ -3249,4 +3249,20 @@ theorem singleClusterHamiltonianS_eigenvalue_leaf_singlet
   push_cast
   ring
 
+/-- **Spin-19/2 dimer ground-state energy** (γ-5 step 408):
+`singleClusterGSEnergyS 1 19 = -399/4 = -S(S+1)` for `S = 19/2`. -/
+@[simp] theorem singleClusterGSEnergyS_one_nineteen :
+    singleClusterGSEnergyS 1 19 = (-399 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-19/2 dimer maximum-Casimir-sector energy** (γ-5 step 408):
+`singleClusterMaxEnergyS 1 19 = 361/4 = S²` for `S = 19/2`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_nineteen :
+    singleClusterMaxEnergyS 1 19 = (361 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
