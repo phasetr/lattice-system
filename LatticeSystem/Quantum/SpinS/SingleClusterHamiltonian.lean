@@ -336,4 +336,17 @@ theorem singleClusterHamiltonianS_two_mul_expectation
   rw [Matrix.sub_mulVec, Matrix.sub_mulVec, dotProduct_sub, dotProduct_sub] at hv
   exact hv
 
+/-- **Single-site Casimir expectation** (γ-5 step 257):
+`<v | spinSDot x x N | v> = (N(N+2)/4) · <v | v>` for any vector `v`
+and any site `x`. Direct from `spinSDot_self : spinSDot x x N =
+(N(N+2)/4) • 1` + linearity. -/
+theorem spinSDot_self_expectation_general
+    {V : Type*} [Fintype V] [DecidableEq V] (N : ℕ)
+    (x : V) (v : (V → Fin (N + 1)) → ℂ) :
+    dotProduct (star v) ((spinSDot x x N).mulVec v) =
+      ((N : ℂ) * ((N : ℂ) + 2) / 4) *
+        dotProduct (star v) v := by
+  rw [spinSDot_self, Matrix.smul_mulVec, Matrix.one_mulVec,
+    dotProduct_smul, smul_eq_mul]
+
 end LatticeSystem.Quantum
