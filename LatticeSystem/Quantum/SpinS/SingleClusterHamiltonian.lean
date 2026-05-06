@@ -404,4 +404,15 @@ theorem singleClusterHamiltonianS_eigenvalue_of_joint_casimir_eigenvec
   congr 1
   ring
 
+/-- **Single-site Casimir as scalar action** (γ-5 step 260):
+`spinSDot x x N · v = (N(N+2)/4) • v` for any vector `v` and any
+site `x`. Direct from `spinSDot_self : spinSDot x x N = (N(N+2)/4) • 1`
++ `Matrix.smul_mulVec` + `Matrix.one_mulVec`. -/
+theorem spinSDot_self_mulVec_eq_smul
+    {V : Type*} [Fintype V] [DecidableEq V] (N : ℕ)
+    (x : V) (v : (V → Fin (N + 1)) → ℂ) :
+    (spinSDot x x N).mulVec v =
+      ((N : ℂ) * ((N : ℂ) + 2) / 4) • v := by
+  rw [spinSDot_self, Matrix.smul_mulVec, Matrix.one_mulVec]
+
 end LatticeSystem.Quantum
