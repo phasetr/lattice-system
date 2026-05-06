@@ -366,4 +366,42 @@ theorem singleClusterHamiltonianS_two_mul_expectation_simplified
   rw [singleClusterHamiltonianS_two_mul_expectation,
     spinSDot_self_expectation_general]
 
+/-- **H eigenvalue from Casimir eigenvalues** (γ-5 step 259):
+if `v` is a joint eigenvector of `Ŝ_tot²` (eigenvalue `α`) and `Ŝ_R²`
+(eigenvalue `β`), then `v` is an `H`-eigenvector with eigenvalue
+`(α − N(N+2)/4 − β)/2`.
+
+Direct from γ-5 step 255 (ℂ-smul Casimir form) + linearity of `mulVec`. -/
+theorem singleClusterHamiltonianS_eigenvalue_of_joint_casimir_eigenvec
+    (N : ℕ) {α β : ℂ} {v : (Fin (z + 1) → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin (z + 1)) N).mulVec v = α • v)
+    (hR : (leafSpinSSquared z N).mulVec v = β • v) :
+    (singleClusterHamiltonianS z N).mulVec v =
+      ((α - (N : ℂ) * ((N : ℂ) + 2) / 4 - β) / 2) • v := by
+  have h := singleClusterHamiltonianS_two_smul_eq_casimir_diff (z := z) N
+  have hv := congrArg (fun M => M.mulVec v) h
+  simp only at hv
+  rw [Matrix.smul_mulVec] at hv
+  rw [Matrix.sub_mulVec, Matrix.sub_mulVec] at hv
+  rw [htot, hR] at hv
+  -- v · spinSDot 0 0 = (N(N+2)/4) • v
+  rw [show (spinSDot (0 : Fin (z + 1)) 0 N).mulVec v =
+      ((N : ℂ) * ((N : ℂ) + 2) / 4) • v from by
+    rw [spinSDot_self, Matrix.smul_mulVec, Matrix.one_mulVec]] at hv
+  -- hv: 2 • H.mulVec v = α • v - (N(N+2)/4) • v - β • v
+  rw [show ((α : ℂ) • v - ((N : ℂ) * ((N : ℂ) + 2) / 4) • v - β • v) =
+      (α - (N : ℂ) * ((N : ℂ) + 2) / 4 - β) • v from by
+    rw [sub_smul, sub_smul]] at hv
+  -- hv: (2 : ℂ) • H.mulVec v = (α - (N(N+2)/4) - β) • v
+  -- Goal: H.mulVec v = ((α - (N(N+2)/4) - β) / 2) • v.
+  -- Multiply both sides of hv by (1/2 : ℂ).
+  have hv' := congrArg (((1 / 2 : ℂ)) • ·) hv
+  simp only at hv'
+  rw [smul_smul, smul_smul] at hv'
+  rw [show ((1 / 2 : ℂ) * 2) = 1 from by norm_num] at hv'
+  rw [one_smul] at hv'
+  rw [hv']
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
