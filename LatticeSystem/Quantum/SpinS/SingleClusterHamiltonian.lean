@@ -929,4 +929,29 @@ theorem singleClusterMaxEnergyS_re_eq (z N : ℕ) :
     ring
   rw [hcast, Complex.ofReal_re]
 
+/-- **Spin-1/2 3-vertex-star ground-state energy** (γ-5 step 279):
+`singleClusterGSEnergyS 2 1 = -1`.
+
+Concrete numerical value of `−S(1+zS)` for `z=2, N=1` (i.e. `S=1/2`).
+The simplest non-dimer cluster: a central spin-1/2 with two leaves.
+Direct check: spectrum of `Ŝ_0·Ŝ_1 + Ŝ_0·Ŝ_2` for three spin-1/2 sites
+is `{−1, 0, 1/2}` (multiplicities 2, 2, 4 from the `1/2 ⊗ 1 = 1/2 ⊕ 3/2`
+plus `1/2 ⊗ 0 = 1/2` decomposition); the ground state energy is `−1`. -/
+@[simp] theorem singleClusterGSEnergyS_two_one :
+    singleClusterGSEnergyS 2 1 = (-1 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-1/2 3-vertex-star max-Casimir-sector energy** (γ-5 step 279):
+`singleClusterMaxEnergyS 2 1 = 1/2`.
+
+Top eigenvalue (spin-`3/2` quadruplet) of `Ŝ_0·Ŝ_1 + Ŝ_0·Ŝ_2` for three
+spin-1/2 sites. -/
+@[simp] theorem singleClusterMaxEnergyS_two_one :
+    singleClusterMaxEnergyS 2 1 = (1 / 2 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
