@@ -2609,4 +2609,20 @@ theorem singleClusterHamiltonianS_eigenvalue_leaf_singlet
   push_cast
   ring
 
+/-- **Spin-6 4-vertex-star ground-state energy** (γ-5 step 368):
+`singleClusterGSEnergyS 3 12 = -114 = -S(1+zS)` for `S = 6, z = 3`. -/
+@[simp] theorem singleClusterGSEnergyS_three_twelve :
+    singleClusterGSEnergyS 3 12 = (-114 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-6 4-vertex-star maximum-Casimir-sector energy** (γ-5 step 368):
+`singleClusterMaxEnergyS 3 12 = 108 = zS²` for `S = 6, z = 3`. -/
+@[simp] theorem singleClusterMaxEnergyS_three_twelve :
+    singleClusterMaxEnergyS 3 12 = (108 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
