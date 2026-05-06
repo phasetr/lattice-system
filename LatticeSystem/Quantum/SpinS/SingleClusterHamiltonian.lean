@@ -697,4 +697,33 @@ theorem singleClusterHamiltonianS_eigenvalue_at_max_casimir_sector
   congr 1
   ring
 
+/-- **Predicted ground-state energy** (γ-5 step 270, Tasaki Problem 2.5.a):
+`singleClusterGSEnergyS z N = −(N/2)·(z·N/2 + 1) = −S(1 + zS)` for
+spin `S = N/2`.
+
+This is the target eigenvalue of the single-cluster Heisenberg
+Hamiltonian `H = Σ_{j=1}^z Ŝ_0 · Ŝ_j` at the GS Casimir sector
+`(s_0, s_R, s_tot) = (N/2, zN/2, (z−1)N/2)` (cf. γ-5 step 268).
+-/
+@[simp] noncomputable def singleClusterGSEnergyS (z N : ℕ) : ℂ :=
+  -((N : ℂ) / 2) * ((z : ℂ) * (N : ℂ) / 2 + 1)
+
+/-- **Named GS-sector eigenvalue identity** (γ-5 step 270):
+restate γ-5 step 268 using the predicted GS energy
+`singleClusterGSEnergyS`. For a joint eigenvector `v` at
+`Stot² = ((z−1)N/2)((z−1)N/2+1)`, `SR² = (zN/2)(zN/2+1)`:
+`H · v = singleClusterGSEnergyS z N • v`. -/
+theorem singleClusterHamiltonianS_mulVec_eq_gs_energy_smul
+    (N : ℕ) {v : (Fin (z + 1) → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin (z + 1)) N).mulVec v =
+        (((z : ℂ) - 1) * (N : ℂ) / 2 *
+            (((z : ℂ) - 1) * (N : ℂ) / 2 + 1)) • v)
+    (hR : (leafSpinSSquared z N).mulVec v =
+        ((z : ℂ) * (N : ℂ) / 2 * ((z : ℂ) * (N : ℂ) / 2 + 1)) • v) :
+    (singleClusterHamiltonianS z N).mulVec v =
+      singleClusterGSEnergyS z N • v := by
+  unfold singleClusterGSEnergyS
+  exact singleClusterHamiltonianS_eigenvalue_at_gs_casimir_sector
+    (z := z) N htot hR
+
 end LatticeSystem.Quantum
