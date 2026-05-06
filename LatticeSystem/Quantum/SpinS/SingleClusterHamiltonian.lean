@@ -811,4 +811,27 @@ theorem singleClusterGSEnergyS_re_le_singleClusterMaxEnergyS_re (z N : ℕ) :
   have h2 : (0 : ℝ) ≤ (z : ℝ) * (N : ℝ) + 1 := by positivity
   nlinarith [mul_nonneg h1 h2]
 
+/-- **GS energy is real** (γ-5 step 274):
+`Im(singleClusterGSEnergyS z N) = 0`. The Hermitian Hamiltonian has
+real eigenvalues, in particular the Tasaki Problem 2.5.a target. -/
+theorem singleClusterGSEnergyS_im_zero (z N : ℕ) :
+    (singleClusterGSEnergyS z N).im = 0 := by
+  have hcast : singleClusterGSEnergyS z N =
+      ((-((N : ℝ) / 2) * ((z : ℝ) * (N : ℝ) / 2 + 1) : ℝ) : ℂ) := by
+    unfold singleClusterGSEnergyS
+    push_cast
+    ring
+  rw [hcast, Complex.ofReal_im]
+
+/-- **Max-Casimir-sector energy is real** (γ-5 step 274):
+`Im(singleClusterMaxEnergyS z N) = 0`. -/
+theorem singleClusterMaxEnergyS_im_zero (z N : ℕ) :
+    (singleClusterMaxEnergyS z N).im = 0 := by
+  have hcast : singleClusterMaxEnergyS z N =
+      (((z : ℝ) * (N : ℝ) ^ 2 / 4 : ℝ) : ℂ) := by
+    unfold singleClusterMaxEnergyS
+    push_cast
+    ring
+  rw [hcast, Complex.ofReal_im]
+
 end LatticeSystem.Quantum
