@@ -1447,4 +1447,37 @@ theorem leafSpinSSquared_three (N : ℕ) :
   rw [add_smul, add_smul, two_smul]
   abel
 
+/-- **Quartet eigenvalue from `Stot²` + leaf-leaf sum** (γ-5 step 304):
+for `z = 3`, if `v` is a joint eigenvector of `Ŝ_tot²` (eigenvalue `α`)
+and the leaf-leaf sum
+`spinSDot 1 2 + spinSDot 1 3 + spinSDot 2 3` (eigenvalue `γ`), then
+`v` is an `H`-eigenvector with eigenvalue
+`(α − N(N+2) − 2γ)/2`.
+
+Specialisation of γ-5 step 259 to z=3 using the quartet leaf-Casimir
+decomposition (γ-5 step 303): `SR² = (3N(N+2)/4)·I +
+2·(Ŝ_1·Ŝ_2 + Ŝ_1·Ŝ_3 + Ŝ_2·Ŝ_3)`. Substituting the hypothesis on
+the leaf-leaf sum gives the leaf-Casimir eigenvalue
+`3N(N+2)/4 + 2γ`, which combined with the central-Casimir scalar
+action and the Casimir decomposition yields the formula. -/
+theorem singleClusterHamiltonianS_eigenvalue_quartet
+    (N : ℕ) {α γ : ℂ} {v : (Fin 4 → Fin (N + 1)) → ℂ}
+    (htot : (totalSpinSSquared (Fin 4) N).mulVec v = α • v)
+    (hLeafSum :
+        (spinSDot (1 : Fin 4) 2 N + spinSDot (1 : Fin 4) 3 N +
+            spinSDot (2 : Fin 4) 3 N).mulVec v = γ • v) :
+    (singleClusterHamiltonianS 3 N).mulVec v =
+      ((α - (N : ℂ) * ((N : ℂ) + 2) - 2 * γ) / 2) • v := by
+  have hR : (leafSpinSSquared 3 N).mulVec v =
+      (3 * (N : ℂ) * ((N : ℂ) + 2) / 4 + 2 * γ) • v := by
+    rw [leafSpinSSquared_three]
+    rw [Matrix.add_mulVec, Matrix.smul_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec]
+    rw [hLeafSum]
+    rw [smul_smul, ← add_smul]
+  have h := singleClusterHamiltonianS_eigenvalue_of_joint_casimir_eigenvec
+    (z := 3) N htot hR
+  rw [h]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
