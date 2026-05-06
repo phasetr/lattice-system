@@ -2,6 +2,7 @@ import LatticeSystem.Quantum.SpinS.MultiSiteDot
 import LatticeSystem.Quantum.SpinS.AllAlignedState
 import LatticeSystem.Quantum.SpinS.MultiSite
 import LatticeSystem.Quantum.SpinS.TotalSpin
+import LatticeSystem.Quantum.SpinS.AllAlignedStateExpectations
 
 /-!
 # Single-cluster (star-graph) Heisenberg Hamiltonian (Tasaki Problem 2.5.a)
@@ -475,5 +476,45 @@ theorem leafSpinSSquared_eq_sum_spinSDot (N : ℕ) :
         ∑ k ∈ (Finset.univ : Finset (Fin (z + 1))).erase 0,
           onSiteS j (spinSOp3 N) * onSiteS k (spinSOp3 N)) from by
     simp_rw [Finset.sum_add_distrib]]
+
+/-- **All-up expectation of `leafSpinSSquared`**:
+`<Φ_⊤ | leafSpinSSquared z N | Φ_⊤> = (zN/2)·(zN/2 + 1) = s_R(s_R+1)`
+where `s_R = z·(N/2)` is the maximum total leaf spin (γ-5 step 263).
+
+Computed via rearranging γ-5 step 254 (Casimir decomposition):
+`SR² = Stot² − S0² − 2·H`, and applying:
+- existing `totalSpinSSquared_mulVec_allAlignedStateS_zero_eigenvalue`:
+  `<Φ_⊤|Stot²|Φ_⊤> = m_max(m_max+1)` with `m_max = (z+1)·N/2`.
+- γ-5 step 257: `<Φ_⊤|S0²|Φ_⊤> = N(N+2)/4 · <Φ_⊤|Φ_⊤> = N(N+2)/4`.
+- γ-5 step 246: `<Φ_⊤|H|Φ_⊤> = z·(N/2)²`.
+
+Verifying: `m_max(m_max+1) − N(N+2)/4 − 2·z·(N/2)²
+  = ((z+1)N/2)((z+1)N/2+1) − N(N+2)/4 − zN²/2 = (zN/2)(zN/2+1)`. -/
+theorem leafSpinSSquared_allUp_expectation (N : ℕ) [Nonempty (Fin (z + 1))] :
+    dotProduct (star (allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1))))
+        ((leafSpinSSquared z N).mulVec
+          (allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1)))) =
+      ((z : ℂ) * (N : ℂ) / 2) * ((z : ℂ) * (N : ℂ) / 2 + 1) := by
+  -- From step 256 expectation form: 2 <H> = <Stot²> - <S0²> - <SR²>.
+  -- Compute each closed form, then combine.
+  have hStot : dotProduct (star (allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1))))
+        ((totalSpinSSquared (Fin (z + 1)) N).mulVec
+          (allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1)))) =
+      (((z : ℂ) + 1) * (N : ℂ) / 2) *
+        (((z : ℂ) + 1) * (N : ℂ) / 2 + 1) := by
+    have := allAlignedStateS_zero_expectation_totalSpinSSquared
+      (V := Fin (z + 1)) (N := N)
+    rw [Fintype.card_fin] at this
+    push_cast at this
+    exact this
+  have hS0 : dotProduct (star (allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1))))
+        ((spinSDot 0 0 N).mulVec
+          (allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1)))) =
+      (N : ℂ) * ((N : ℂ) + 2) / 4 := by
+    rw [spinSDot_self_expectation_general, allAlignedStateS_inner_self, mul_one]
+  have hH := singleClusterHamiltonianS_allUp_expectation (z := z) N
+  have h := singleClusterHamiltonianS_two_mul_expectation (z := z) N
+    (allAlignedStateS (Fin (z + 1)) N (0 : Fin (N + 1)))
+  linear_combination h + hStot - hS0 - 2 * hH
 
 end LatticeSystem.Quantum
