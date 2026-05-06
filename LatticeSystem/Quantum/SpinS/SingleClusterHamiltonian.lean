@@ -1370,4 +1370,20 @@ theorem singleClusterHamiltonianS_eigenvalue_trimer_leaf_singlet
   push_cast
   ring
 
+/-- **Spin-3 dimer ground-state energy** (γ-5 step 300):
+`singleClusterGSEnergyS 1 6 = -12 = -S(S+1)` for `S = 3`. -/
+@[simp] theorem singleClusterGSEnergyS_one_six :
+    singleClusterGSEnergyS 1 6 = (-12 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-3 dimer maximum-Casimir-sector energy** (γ-5 step 300):
+`singleClusterMaxEnergyS 1 6 = 9 = S²` for `S = 3`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_six :
+    singleClusterMaxEnergyS 1 6 = (9 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
