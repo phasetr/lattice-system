@@ -1418,4 +1418,33 @@ theorem singleClusterHamiltonianS_eigenvalue_trimer_leaf_singlet
   push_cast
   ring
 
+/-- **Quartet (z=3) leaf-Casimir decomposition** (γ-5 step 303):
+`leafSpinSSquared 3 N = (3·N(N+2)/4) • 1 + 2 • (spinSDot 1 2 + spinSDot 1 3 + spinSDot 2 3)`
+on `Fin 4`.
+
+For three leaves (`erase 0 = {1, 2, 3}`), the leaf-Casimir double sum
+`Σ_{j,k ∈ {1,2,3}} spinSDot j k` decomposes into three diagonal
+`spinSDot j j` terms (each scalar `N(N+2)/4 • 1`) and six off-diagonal
+terms grouped into three `spinSDot j k` pairs (`(j,k) = (1,2), (1,3),
+(2,3)`) related by `spinSDot_comm`. Generalises γ-5 step 292 (z=2) to
+the quartet. -/
+theorem leafSpinSSquared_three (N : ℕ) :
+    (leafSpinSSquared 3 N : ManyBodyOpS (Fin 4) N) =
+      (3 * (N : ℂ) * ((N : ℂ) + 2) / 4) • 1 +
+        (2 : ℂ) • (spinSDot 1 2 N + spinSDot 1 3 N + spinSDot 2 3 N) := by
+  rw [leafSpinSSquared_eq_sum_spinSDot]
+  have h123 : (Finset.univ.erase (0 : Fin 4)) = {1, 2, 3} := by decide
+  rw [h123]
+  have hne12 : (1 : Fin 4) ∉ ({2, 3} : Finset (Fin 4)) := by decide
+  have hne23 : (2 : Fin 4) ∉ ({3} : Finset (Fin 4)) := by decide
+  rw [show ({1, 2, 3} : Finset (Fin 4)) = insert 1 (insert 2 {3}) from rfl]
+  simp_rw [Finset.sum_insert hne12, Finset.sum_insert hne23, Finset.sum_singleton]
+  rw [spinSDot_self 1 N, spinSDot_self 2 N, spinSDot_self 3 N]
+  rw [spinSDot_comm 2 1, spinSDot_comm 3 1, spinSDot_comm 3 2]
+  rw [show (3 * (N : ℂ) * ((N : ℂ) + 2) / 4 : ℂ) =
+        ((N : ℂ) * ((N : ℂ) + 2) / 4) + ((N : ℂ) * ((N : ℂ) + 2) / 4) +
+          ((N : ℂ) * ((N : ℂ) + 2) / 4) from by ring]
+  rw [add_smul, add_smul, two_smul]
+  abel
+
 end LatticeSystem.Quantum
