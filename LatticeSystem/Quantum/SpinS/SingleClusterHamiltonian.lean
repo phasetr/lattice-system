@@ -1211,4 +1211,34 @@ theorem singleClusterHamiltonianS_eigenvalue_dimer_top
   push_cast
   ring
 
+/-- **Trimer (z=2) leaf-Casimir decomposition** (γ-5 step 292):
+`leafSpinSSquared 2 N = (N(N+2)/2) • 1 + 2 • spinSDot 1 2 N` on `Fin 3`.
+
+For two leaves (`erase 0 = {1, 2}`), the leaf-Casimir double sum
+`Σ_{j,k ∈ {1,2}} spinSDot j k` decomposes into two diagonal terms
+(`spinSDot 1 1`, `spinSDot 2 2`, each scalar `N(N+2)/4 • 1`) and two
+off-diagonal terms (`spinSDot 1 2`, `spinSDot 2 1`, equal by
+`spinSDot_comm`). Bridges the leaf-Casimir machinery to direct
+two-leaf coupling. -/
+theorem leafSpinSSquared_two (N : ℕ) :
+    (leafSpinSSquared 2 N : ManyBodyOpS (Fin 3) N) =
+      ((N : ℂ) * ((N : ℂ) + 2) / 2) • 1 +
+        (2 : ℂ) • spinSDot 1 2 N := by
+  rw [leafSpinSSquared_eq_sum_spinSDot]
+  have h12 : (Finset.univ.erase (0 : Fin 3)) = {1, 2} := by decide
+  rw [h12]
+  rw [show ({1, 2} : Finset (Fin 3)) = insert 1 {2} from rfl]
+  rw [Finset.sum_insert (by decide : (1 : Fin 3) ∉ ({2} : Finset (Fin 3)))]
+  rw [Finset.sum_singleton]
+  rw [Finset.sum_insert (by decide : (1 : Fin 3) ∉ ({2} : Finset (Fin 3)))]
+  rw [Finset.sum_singleton]
+  rw [Finset.sum_insert (by decide : (1 : Fin 3) ∉ ({2} : Finset (Fin 3)))]
+  rw [Finset.sum_singleton]
+  rw [spinSDot_self 1 N, spinSDot_self 2 N]
+  rw [spinSDot_comm 2 1]
+  rw [show ((N : ℂ) * ((N : ℂ) + 2) / 2 : ℂ) =
+        ((N : ℂ) * ((N : ℂ) + 2) / 4) + ((N : ℂ) * ((N : ℂ) + 2) / 4) from by ring]
+  rw [add_smul, two_smul]
+  abel
+
 end LatticeSystem.Quantum
