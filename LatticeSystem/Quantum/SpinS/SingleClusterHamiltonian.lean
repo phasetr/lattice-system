@@ -881,4 +881,27 @@ case. -/
   push_cast
   ring
 
+/-- **Spin-1/2 dimer ground-state energy** (γ-5 step 277):
+`singleClusterGSEnergyS 1 1 = -3/4`.
+
+The canonical singlet eigenvalue `−3/4` of `Ŝ_0 · Ŝ_1` for two spin-`1/2`
+sites: the most familiar concrete case of the Tasaki Problem 2.5.a
+formula, doubly-specialised at `z = 1`, `N = 1` (so `S = 1/2`). -/
+@[simp] theorem singleClusterGSEnergyS_one_one :
+    singleClusterGSEnergyS 1 1 = (-3 / 4 : ℂ) := by
+  rw [singleClusterGSEnergyS_one_eq]
+  push_cast
+  ring
+
+/-- **Spin-1/2 dimer maximum-Casimir-sector energy** (γ-5 step 277):
+`singleClusterMaxEnergyS 1 1 = 1/4`.
+
+The canonical triplet eigenvalue `1/4` of `Ŝ_0 · Ŝ_1` for two spin-`1/2`
+sites. -/
+@[simp] theorem singleClusterMaxEnergyS_one_one :
+    singleClusterMaxEnergyS 1 1 = (1 / 4 : ℂ) := by
+  rw [singleClusterMaxEnergyS_one_eq]
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
