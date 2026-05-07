@@ -2728,4 +2728,20 @@ Concrete numerical value of `−S(1+zS)` for two spin-1 sites coupled by
   push_cast
   ring
 
+/-- **Spin-29/2 dimer ground-state energy** (γ-5 step 468):
+`singleClusterGSEnergyS 1 29 = -899/4 = -S(S+1)` for `S = 29/2`. -/
+@[simp] theorem singleClusterGSEnergyS_one_twentynine :
+    singleClusterGSEnergyS 1 29 = (-899 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-29/2 dimer maximum-Casimir-sector energy** (γ-5 step 468):
+`singleClusterMaxEnergyS 1 29 = 841/4 = S²` for `S = 29/2`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_twentynine :
+    singleClusterMaxEnergyS 1 29 = (841 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
