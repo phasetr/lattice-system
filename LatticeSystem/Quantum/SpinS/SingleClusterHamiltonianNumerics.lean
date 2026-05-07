@@ -2680,4 +2680,20 @@ Concrete numerical value of `−S(1+zS)` for two spin-1 sites coupled by
   push_cast
   ring
 
+/-- **Spin-14 5-vertex-star ground-state energy** (γ-5 step 465):
+`singleClusterGSEnergyS 4 28 = -798 = -S(1+zS)` for `S = 14, z = 4`. -/
+@[simp] theorem singleClusterGSEnergyS_four_twentyeight :
+    singleClusterGSEnergyS 4 28 = (-798 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-14 5-vertex-star maximum-Casimir-sector energy** (γ-5 step 465):
+`singleClusterMaxEnergyS 4 28 = 784 = zS²` for `S = 14, z = 4`. -/
+@[simp] theorem singleClusterMaxEnergyS_four_twentyeight :
+    singleClusterMaxEnergyS 4 28 = (784 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
