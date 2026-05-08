@@ -1462,4 +1462,20 @@ namespace LatticeSystem.Quantum
   push_cast
   ring
 
+/-- **Spin-22 2-vertex (dimer) ground-state energy** (γ-5 step 558):
+`singleClusterGSEnergyS 1 44 = -506 = -S(S+1)` for `S = 22`. -/
+@[simp] theorem singleClusterGSEnergyS_one_fortyfour :
+    singleClusterGSEnergyS 1 44 = (-506 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-22 2-vertex (dimer) maximum-Casimir-sector energy** (γ-5 step 558):
+`singleClusterMaxEnergyS 1 44 = 484 = S²` for `S = 22`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_fortyfour :
+    singleClusterMaxEnergyS 1 44 = (484 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
