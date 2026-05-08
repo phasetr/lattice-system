@@ -1030,4 +1030,20 @@ namespace LatticeSystem.Quantum
   push_cast
   ring
 
+/-- **Spin-39/2 5-vertex-star ground-state energy** (γ-5 step 531):
+`singleClusterGSEnergyS 4 39 = -3081/2 = -S(1+zS)` for `S = 39/2, z = 4`. -/
+@[simp] theorem singleClusterGSEnergyS_four_thirtynine :
+    singleClusterGSEnergyS 4 39 = (-3081 / 2 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-39/2 5-vertex-star maximum-Casimir-sector energy** (γ-5 step 531):
+`singleClusterMaxEnergyS 4 39 = 1521 = zS²` for `S = 39/2, z = 4`. -/
+@[simp] theorem singleClusterMaxEnergyS_four_thirtynine :
+    singleClusterMaxEnergyS 4 39 = (1521 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
