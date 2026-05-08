@@ -1,0 +1,795 @@
+/-
+Copyright (c) 2026 Yoshitsugu Sekine. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yoshitsugu Sekine
+-/
+import LatticeSystem.Quantum.SpinS.SingleClusterHamiltonian
+
+/-!
+# Ultra-high-spin numerical specialisations of single-cluster Heisenberg energies
+
+This file holds fixed-`(z, N)` numerical specialisations of
+`singleClusterGSEnergyS` and `singleClusterMaxEnergyS` for `N ≥ 48`
+(spin `S = N/2 ≥ 24`). The `N = 1..28` specialisations live in
+`SingleClusterHamiltonianNumerics.lean`, the `N = 29..38` in
+`SingleClusterHamiltonianNumericsHigh.lean`, and the `N = 39..47` in
+`SingleClusterHamiltonianNumericsVeryHigh.lean`.
+
+This file imports the main `SingleClusterHamiltonian` directly (not
+the lower-N numerics files) so all four numerics files can elaborate
+in parallel after the main file. Splitting was introduced as part of
+the 50-PR build-performance cadence (see
+`.self-local/docs/refactoring-plan-2026-04-22.md` §A).
+-/
+
+namespace LatticeSystem.Quantum
+
+/-- **Spin-24 2-vertex (dimer) ground-state energy** (γ-5 step 582):
+`singleClusterGSEnergyS 1 48 = -600 = -S(S+1)` for `S = 24`. -/
+@[simp] theorem singleClusterGSEnergyS_one_fortyeight :
+    singleClusterGSEnergyS 1 48 = (-600 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-24 2-vertex (dimer) maximum-Casimir-sector energy** (γ-5 step 582):
+`singleClusterMaxEnergyS 1 48 = 576 = S²` for `S = 24`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_fortyeight :
+    singleClusterMaxEnergyS 1 48 = (576 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-24 3-vertex (trimer) ground-state energy** (γ-5 step 583):
+`singleClusterGSEnergyS 2 48 = -1176 = -S(1+zS)` for `S = 24, z = 2`. -/
+@[simp] theorem singleClusterGSEnergyS_two_fortyeight :
+    singleClusterGSEnergyS 2 48 = (-1176 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-24 3-vertex (trimer) maximum-Casimir-sector energy** (γ-5 step 583):
+`singleClusterMaxEnergyS 2 48 = 1152 = zS²` for `S = 24, z = 2`. -/
+@[simp] theorem singleClusterMaxEnergyS_two_fortyeight :
+    singleClusterMaxEnergyS 2 48 = (1152 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-24 4-vertex (quartet) ground-state energy** (γ-5 step 584):
+`singleClusterGSEnergyS 3 48 = -1752 = -S(1+zS)` for `S = 24, z = 3`. -/
+@[simp] theorem singleClusterGSEnergyS_three_fortyeight :
+    singleClusterGSEnergyS 3 48 = (-1752 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-24 4-vertex (quartet) maximum-Casimir-sector energy** (γ-5 step 584):
+`singleClusterMaxEnergyS 3 48 = 1728 = zS²` for `S = 24, z = 3`. -/
+@[simp] theorem singleClusterMaxEnergyS_three_fortyeight :
+    singleClusterMaxEnergyS 3 48 = (1728 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-24 5-vertex (pentamer) ground-state energy** (γ-5 step 585):
+`singleClusterGSEnergyS 4 48 = -2328 = -S(1+zS)` for `S = 24, z = 4`. -/
+@[simp] theorem singleClusterGSEnergyS_four_fortyeight :
+    singleClusterGSEnergyS 4 48 = (-2328 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-24 5-vertex (pentamer) maximum-Casimir-sector energy** (γ-5 step 585):
+`singleClusterMaxEnergyS 4 48 = 2304 = zS²` for `S = 24, z = 4`. -/
+@[simp] theorem singleClusterMaxEnergyS_four_fortyeight :
+    singleClusterMaxEnergyS 4 48 = (2304 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-24 6-vertex (hexamer) ground-state energy** (γ-5 step 586):
+`singleClusterGSEnergyS 5 48 = -2904 = -S(1+zS)` for `S = 24, z = 5`. -/
+@[simp] theorem singleClusterGSEnergyS_five_fortyeight :
+    singleClusterGSEnergyS 5 48 = (-2904 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-24 6-vertex (hexamer) maximum-Casimir-sector energy** (γ-5 step 586):
+`singleClusterMaxEnergyS 5 48 = 2880 = zS²` for `S = 24, z = 5`. -/
+@[simp] theorem singleClusterMaxEnergyS_five_fortyeight :
+    singleClusterMaxEnergyS 5 48 = (2880 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-24 7-vertex (heptamer) ground-state energy** (γ-5 step 587):
+`singleClusterGSEnergyS 6 48 = -3480 = -S(1+zS)` for `S = 24, z = 6`. -/
+@[simp] theorem singleClusterGSEnergyS_six_fortyeight :
+    singleClusterGSEnergyS 6 48 = (-3480 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-24 7-vertex (heptamer) maximum-Casimir-sector energy** (γ-5 step 587):
+`singleClusterMaxEnergyS 6 48 = 3456 = zS²` for `S = 24, z = 6`. -/
+@[simp] theorem singleClusterMaxEnergyS_six_fortyeight :
+    singleClusterMaxEnergyS 6 48 = (3456 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-49/2 2-vertex (dimer) ground-state energy** (γ-5 step 588):
+`singleClusterGSEnergyS 1 49 = -2499/4 = -S(S+1)` for `S = 49/2`. -/
+@[simp] theorem singleClusterGSEnergyS_one_fortynine :
+    singleClusterGSEnergyS 1 49 = (-2499 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-49/2 2-vertex (dimer) maximum-Casimir-sector energy** (γ-5 step 588):
+`singleClusterMaxEnergyS 1 49 = 2401/4 = S²` for `S = 49/2`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_fortynine :
+    singleClusterMaxEnergyS 1 49 = (2401 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-49/2 3-vertex (trimer) ground-state energy** (γ-5 step 589):
+`singleClusterGSEnergyS 2 49 = -1225 = -S(1+zS)` for `S = 49/2, z = 2`. -/
+@[simp] theorem singleClusterGSEnergyS_two_fortynine :
+    singleClusterGSEnergyS 2 49 = (-1225 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-49/2 3-vertex (trimer) maximum-Casimir-sector energy** (γ-5 step 589):
+`singleClusterMaxEnergyS 2 49 = 2401/2 = zS²` for `S = 49/2, z = 2`. -/
+@[simp] theorem singleClusterMaxEnergyS_two_fortynine :
+    singleClusterMaxEnergyS 2 49 = (2401 / 2 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-49/2 4-vertex (quartet) ground-state energy** (γ-5 step 590):
+`singleClusterGSEnergyS 3 49 = -7301/4 = -S(1+zS)` for `S = 49/2, z = 3`. -/
+@[simp] theorem singleClusterGSEnergyS_three_fortynine :
+    singleClusterGSEnergyS 3 49 = (-7301 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-49/2 4-vertex (quartet) maximum-Casimir-sector energy** (γ-5 step 590):
+`singleClusterMaxEnergyS 3 49 = 7203/4 = zS²` for `S = 49/2, z = 3`. -/
+@[simp] theorem singleClusterMaxEnergyS_three_fortynine :
+    singleClusterMaxEnergyS 3 49 = (7203 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-49/2 5-vertex (pentamer) ground-state energy** (γ-5 step 591):
+`singleClusterGSEnergyS 4 49 = -4851/2 = -S(1+zS)` for `S = 49/2, z = 4`. -/
+@[simp] theorem singleClusterGSEnergyS_four_fortynine :
+    singleClusterGSEnergyS 4 49 = (-4851 / 2 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-49/2 5-vertex (pentamer) maximum-Casimir-sector energy** (γ-5 step 591):
+`singleClusterMaxEnergyS 4 49 = 2401 = zS²` for `S = 49/2, z = 4`. -/
+@[simp] theorem singleClusterMaxEnergyS_four_fortynine :
+    singleClusterMaxEnergyS 4 49 = (2401 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-49/2 6-vertex (hexamer) ground-state energy** (γ-5 step 592):
+`singleClusterGSEnergyS 5 49 = -12103/4 = -S(1+zS)` for `S = 49/2, z = 5`. -/
+@[simp] theorem singleClusterGSEnergyS_five_fortynine :
+    singleClusterGSEnergyS 5 49 = (-12103 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-49/2 6-vertex (hexamer) maximum-Casimir-sector energy** (γ-5 step 592):
+`singleClusterMaxEnergyS 5 49 = 12005/4 = zS²` for `S = 49/2, z = 5`. -/
+@[simp] theorem singleClusterMaxEnergyS_five_fortynine :
+    singleClusterMaxEnergyS 5 49 = (12005 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-49/2 7-vertex (heptamer) ground-state energy** (γ-5 step 593):
+`singleClusterGSEnergyS 6 49 = -3626 = -S(1+zS)` for `S = 49/2, z = 6`. -/
+@[simp] theorem singleClusterGSEnergyS_six_fortynine :
+    singleClusterGSEnergyS 6 49 = (-3626 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-49/2 7-vertex (heptamer) maximum-Casimir-sector energy** (γ-5 step 593):
+`singleClusterMaxEnergyS 6 49 = 7203/2 = zS²` for `S = 49/2, z = 6`. -/
+@[simp] theorem singleClusterMaxEnergyS_six_fortynine :
+    singleClusterMaxEnergyS 6 49 = (7203 / 2 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-25 2-vertex (dimer) ground-state energy** (γ-5 step 594):
+`singleClusterGSEnergyS 1 50 = -650 = -S(S+1)` for `S = 25`. -/
+@[simp] theorem singleClusterGSEnergyS_one_fifty :
+    singleClusterGSEnergyS 1 50 = (-650 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-25 2-vertex (dimer) maximum-Casimir-sector energy** (γ-5 step 594):
+`singleClusterMaxEnergyS 1 50 = 625 = S²` for `S = 25`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_fifty :
+    singleClusterMaxEnergyS 1 50 = (625 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-25 3-vertex (trimer) ground-state energy** (γ-5 step 595):
+`singleClusterGSEnergyS 2 50 = -1275 = -S(1+zS)` for `S = 25, z = 2`. -/
+@[simp] theorem singleClusterGSEnergyS_two_fifty :
+    singleClusterGSEnergyS 2 50 = (-1275 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-25 3-vertex (trimer) maximum-Casimir-sector energy** (γ-5 step 595):
+`singleClusterMaxEnergyS 2 50 = 1250 = zS²` for `S = 25, z = 2`. -/
+@[simp] theorem singleClusterMaxEnergyS_two_fifty :
+    singleClusterMaxEnergyS 2 50 = (1250 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-25 4-vertex (quartet) ground-state energy** (γ-5 step 596):
+`singleClusterGSEnergyS 3 50 = -1900 = -S(1+zS)` for `S = 25, z = 3`. -/
+@[simp] theorem singleClusterGSEnergyS_three_fifty :
+    singleClusterGSEnergyS 3 50 = (-1900 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-25 4-vertex (quartet) maximum-Casimir-sector energy** (γ-5 step 596):
+`singleClusterMaxEnergyS 3 50 = 1875 = zS²` for `S = 25, z = 3`. -/
+@[simp] theorem singleClusterMaxEnergyS_three_fifty :
+    singleClusterMaxEnergyS 3 50 = (1875 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-25 5-vertex (pentamer) ground-state energy** (γ-5 step 597):
+`singleClusterGSEnergyS 4 50 = -2525 = -S(1+zS)` for `S = 25, z = 4`. -/
+@[simp] theorem singleClusterGSEnergyS_four_fifty :
+    singleClusterGSEnergyS 4 50 = (-2525 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-25 5-vertex (pentamer) maximum-Casimir-sector energy** (γ-5 step 597):
+`singleClusterMaxEnergyS 4 50 = 2500 = zS²` for `S = 25, z = 4`. -/
+@[simp] theorem singleClusterMaxEnergyS_four_fifty :
+    singleClusterMaxEnergyS 4 50 = (2500 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-25 6-vertex (hexamer) ground-state energy** (γ-5 step 598):
+`singleClusterGSEnergyS 5 50 = -3150 = -S(1+zS)` for `S = 25, z = 5`. -/
+@[simp] theorem singleClusterGSEnergyS_five_fifty :
+    singleClusterGSEnergyS 5 50 = (-3150 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-25 6-vertex (hexamer) maximum-Casimir-sector energy** (γ-5 step 598):
+`singleClusterMaxEnergyS 5 50 = 3125 = zS²` for `S = 25, z = 5`. -/
+@[simp] theorem singleClusterMaxEnergyS_five_fifty :
+    singleClusterMaxEnergyS 5 50 = (3125 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-25 7-vertex (heptamer) ground-state energy** (γ-5 step 599):
+`singleClusterGSEnergyS 6 50 = -3775 = -S(1+zS)` for `S = 25, z = 6`. -/
+@[simp] theorem singleClusterGSEnergyS_six_fifty :
+    singleClusterGSEnergyS 6 50 = (-3775 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-25 7-vertex (heptamer) maximum-Casimir-sector energy** (γ-5 step 599):
+`singleClusterMaxEnergyS 6 50 = 3750 = zS²` for `S = 25, z = 6`. -/
+@[simp] theorem singleClusterMaxEnergyS_six_fifty :
+    singleClusterMaxEnergyS 6 50 = (3750 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-51/2 2-vertex (dimer) ground-state energy** (γ-5 step 600):
+`singleClusterGSEnergyS 1 51 = -2703/4 = -S(S+1)` for `S = 51/2`. -/
+@[simp] theorem singleClusterGSEnergyS_one_fiftyone :
+    singleClusterGSEnergyS 1 51 = (-2703 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-51/2 2-vertex (dimer) maximum-Casimir-sector energy** (γ-5 step 600):
+`singleClusterMaxEnergyS 1 51 = 2601/4 = S²` for `S = 51/2`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_fiftyone :
+    singleClusterMaxEnergyS 1 51 = (2601 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-51/2 3-vertex (trimer) ground-state energy** (γ-5 step 601):
+`singleClusterGSEnergyS 2 51 = -1326 = -S(1+zS)` for `S = 51/2, z = 2`. -/
+@[simp] theorem singleClusterGSEnergyS_two_fiftyone :
+    singleClusterGSEnergyS 2 51 = (-1326 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-51/2 3-vertex (trimer) maximum-Casimir-sector energy** (γ-5 step 601):
+`singleClusterMaxEnergyS 2 51 = 2601/2 = zS²` for `S = 51/2, z = 2`. -/
+@[simp] theorem singleClusterMaxEnergyS_two_fiftyone :
+    singleClusterMaxEnergyS 2 51 = (2601 / 2 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-51/2 4-vertex (quartet) ground-state energy** (γ-5 step 602):
+`singleClusterGSEnergyS 3 51 = -7905/4 = -S(1+zS)` for `S = 51/2, z = 3`. -/
+@[simp] theorem singleClusterGSEnergyS_three_fiftyone :
+    singleClusterGSEnergyS 3 51 = (-7905 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-51/2 4-vertex (quartet) maximum-Casimir-sector energy** (γ-5 step 602):
+`singleClusterMaxEnergyS 3 51 = 7803/4 = zS²` for `S = 51/2, z = 3`. -/
+@[simp] theorem singleClusterMaxEnergyS_three_fiftyone :
+    singleClusterMaxEnergyS 3 51 = (7803 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-51/2 5-vertex (pentamer) ground-state energy** (γ-5 step 603):
+`singleClusterGSEnergyS 4 51 = -5253/2 = -S(1+zS)` for `S = 51/2, z = 4`. -/
+@[simp] theorem singleClusterGSEnergyS_four_fiftyone :
+    singleClusterGSEnergyS 4 51 = (-5253 / 2 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-51/2 5-vertex (pentamer) maximum-Casimir-sector energy** (γ-5 step 603):
+`singleClusterMaxEnergyS 4 51 = 2601 = zS²` for `S = 51/2, z = 4`. -/
+@[simp] theorem singleClusterMaxEnergyS_four_fiftyone :
+    singleClusterMaxEnergyS 4 51 = (2601 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-51/2 6-vertex (hexamer) ground-state energy** (γ-5 step 604):
+`singleClusterGSEnergyS 5 51 = -13107/4 = -S(1+zS)` for `S = 51/2, z = 5`. -/
+@[simp] theorem singleClusterGSEnergyS_five_fiftyone :
+    singleClusterGSEnergyS 5 51 = (-13107 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-51/2 6-vertex (hexamer) maximum-Casimir-sector energy** (γ-5 step 604):
+`singleClusterMaxEnergyS 5 51 = 13005/4 = zS²` for `S = 51/2, z = 5`. -/
+@[simp] theorem singleClusterMaxEnergyS_five_fiftyone :
+    singleClusterMaxEnergyS 5 51 = (13005 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-51/2 7-vertex (heptamer) ground-state energy** (γ-5 step 605):
+`singleClusterGSEnergyS 6 51 = -3927 = -S(1+zS)` for `S = 51/2, z = 6`. -/
+@[simp] theorem singleClusterGSEnergyS_six_fiftyone :
+    singleClusterGSEnergyS 6 51 = (-3927 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-51/2 7-vertex (heptamer) maximum-Casimir-sector energy** (γ-5 step 605):
+`singleClusterMaxEnergyS 6 51 = 7803/2 = zS²` for `S = 51/2, z = 6`. -/
+@[simp] theorem singleClusterMaxEnergyS_six_fiftyone :
+    singleClusterMaxEnergyS 6 51 = (7803 / 2 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-26 2-vertex (dimer) ground-state energy** (γ-5 step 606):
+`singleClusterGSEnergyS 1 52 = -702 = -S(S+1)` for `S = 26`. -/
+@[simp] theorem singleClusterGSEnergyS_one_fiftytwo :
+    singleClusterGSEnergyS 1 52 = (-702 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-26 2-vertex (dimer) maximum-Casimir-sector energy** (γ-5 step 606):
+`singleClusterMaxEnergyS 1 52 = 676 = S²` for `S = 26`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_fiftytwo :
+    singleClusterMaxEnergyS 1 52 = (676 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-26 3-vertex (trimer) ground-state energy** (γ-5 step 607):
+`singleClusterGSEnergyS 2 52 = -1378 = -S(1+zS)` for `S = 26, z = 2`. -/
+@[simp] theorem singleClusterGSEnergyS_two_fiftytwo :
+    singleClusterGSEnergyS 2 52 = (-1378 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-26 3-vertex (trimer) maximum-Casimir-sector energy** (γ-5 step 607):
+`singleClusterMaxEnergyS 2 52 = 1352 = zS²` for `S = 26, z = 2`. -/
+@[simp] theorem singleClusterMaxEnergyS_two_fiftytwo :
+    singleClusterMaxEnergyS 2 52 = (1352 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-26 4-vertex (quartet) ground-state energy** (γ-5 step 608):
+`singleClusterGSEnergyS 3 52 = -2054 = -S(1+zS)` for `S = 26, z = 3`. -/
+@[simp] theorem singleClusterGSEnergyS_three_fiftytwo :
+    singleClusterGSEnergyS 3 52 = (-2054 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-26 4-vertex (quartet) maximum-Casimir-sector energy** (γ-5 step 608):
+`singleClusterMaxEnergyS 3 52 = 2028 = zS²` for `S = 26, z = 3`. -/
+@[simp] theorem singleClusterMaxEnergyS_three_fiftytwo :
+    singleClusterMaxEnergyS 3 52 = (2028 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-26 5-vertex (pentamer) ground-state energy** (γ-5 step 609):
+`singleClusterGSEnergyS 4 52 = -2730 = -S(1+zS)` for `S = 26, z = 4`. -/
+@[simp] theorem singleClusterGSEnergyS_four_fiftytwo :
+    singleClusterGSEnergyS 4 52 = (-2730 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-26 5-vertex (pentamer) maximum-Casimir-sector energy** (γ-5 step 609):
+`singleClusterMaxEnergyS 4 52 = 2704 = zS²` for `S = 26, z = 4`. -/
+@[simp] theorem singleClusterMaxEnergyS_four_fiftytwo :
+    singleClusterMaxEnergyS 4 52 = (2704 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-26 6-vertex (hexamer) ground-state energy** (γ-5 step 610):
+`singleClusterGSEnergyS 5 52 = -3406 = -S(1+zS)` for `S = 26, z = 5`. -/
+@[simp] theorem singleClusterGSEnergyS_five_fiftytwo :
+    singleClusterGSEnergyS 5 52 = (-3406 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-26 6-vertex (hexamer) maximum-Casimir-sector energy** (γ-5 step 610):
+`singleClusterMaxEnergyS 5 52 = 3380 = zS²` for `S = 26, z = 5`. -/
+@[simp] theorem singleClusterMaxEnergyS_five_fiftytwo :
+    singleClusterMaxEnergyS 5 52 = (3380 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-26 7-vertex (heptamer) ground-state energy** (γ-5 step 611):
+`singleClusterGSEnergyS 6 52 = -4082 = -S(1+zS)` for `S = 26, z = 6`. -/
+@[simp] theorem singleClusterGSEnergyS_six_fiftytwo :
+    singleClusterGSEnergyS 6 52 = (-4082 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-26 7-vertex (heptamer) maximum-Casimir-sector energy** (γ-5 step 611):
+`singleClusterMaxEnergyS 6 52 = 4056 = zS²` for `S = 26, z = 6`. -/
+@[simp] theorem singleClusterMaxEnergyS_six_fiftytwo :
+    singleClusterMaxEnergyS 6 52 = (4056 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-53/2 2-vertex (dimer) ground-state energy** (γ-5 step 612):
+`singleClusterGSEnergyS 1 53 = -2915/4 = -S(S+1)` for `S = 53/2`. -/
+@[simp] theorem singleClusterGSEnergyS_one_fiftythree :
+    singleClusterGSEnergyS 1 53 = (-2915 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-53/2 2-vertex (dimer) maximum-Casimir-sector energy** (γ-5 step 612):
+`singleClusterMaxEnergyS 1 53 = 2809/4 = S²` for `S = 53/2`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_fiftythree :
+    singleClusterMaxEnergyS 1 53 = (2809 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-53/2 3-vertex (trimer) ground-state energy** (γ-5 step 613):
+`singleClusterGSEnergyS 2 53 = -1431 = -S(1+zS)` for `S = 53/2, z = 2`. -/
+@[simp] theorem singleClusterGSEnergyS_two_fiftythree :
+    singleClusterGSEnergyS 2 53 = (-1431 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-53/2 3-vertex (trimer) maximum-Casimir-sector energy** (γ-5 step 613):
+`singleClusterMaxEnergyS 2 53 = 2809/2 = zS²` for `S = 53/2, z = 2`. -/
+@[simp] theorem singleClusterMaxEnergyS_two_fiftythree :
+    singleClusterMaxEnergyS 2 53 = (2809 / 2 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-53/2 4-vertex (quartet) ground-state energy** (γ-5 step 614):
+`singleClusterGSEnergyS 3 53 = -8533/4 = -S(1+zS)` for `S = 53/2, z = 3`. -/
+@[simp] theorem singleClusterGSEnergyS_three_fiftythree :
+    singleClusterGSEnergyS 3 53 = (-8533 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-53/2 4-vertex (quartet) maximum-Casimir-sector energy** (γ-5 step 614):
+`singleClusterMaxEnergyS 3 53 = 8427/4 = zS²` for `S = 53/2, z = 3`. -/
+@[simp] theorem singleClusterMaxEnergyS_three_fiftythree :
+    singleClusterMaxEnergyS 3 53 = (8427 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-53/2 5-vertex (pentamer) ground-state energy** (γ-5 step 615):
+`singleClusterGSEnergyS 4 53 = -5671/2 = -S(1+zS)` for `S = 53/2, z = 4`. -/
+@[simp] theorem singleClusterGSEnergyS_four_fiftythree :
+    singleClusterGSEnergyS 4 53 = (-5671 / 2 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-53/2 5-vertex (pentamer) maximum-Casimir-sector energy** (γ-5 step 615):
+`singleClusterMaxEnergyS 4 53 = 2809 = zS²` for `S = 53/2, z = 4`. -/
+@[simp] theorem singleClusterMaxEnergyS_four_fiftythree :
+    singleClusterMaxEnergyS 4 53 = (2809 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-53/2 6-vertex (hexamer) ground-state energy** (γ-5 step 616):
+`singleClusterGSEnergyS 5 53 = -14151/4 = -S(1+zS)` for `S = 53/2, z = 5`. -/
+@[simp] theorem singleClusterGSEnergyS_five_fiftythree :
+    singleClusterGSEnergyS 5 53 = (-14151 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-53/2 6-vertex (hexamer) maximum-Casimir-sector energy** (γ-5 step 616):
+`singleClusterMaxEnergyS 5 53 = 14045/4 = zS²` for `S = 53/2, z = 5`. -/
+@[simp] theorem singleClusterMaxEnergyS_five_fiftythree :
+    singleClusterMaxEnergyS 5 53 = (14045 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-53/2 7-vertex (heptamer) ground-state energy** (γ-5 step 617):
+`singleClusterGSEnergyS 6 53 = -4240 = -S(1+zS)` for `S = 53/2, z = 6`. -/
+@[simp] theorem singleClusterGSEnergyS_six_fiftythree :
+    singleClusterGSEnergyS 6 53 = (-4240 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-53/2 7-vertex (heptamer) maximum-Casimir-sector energy** (γ-5 step 617):
+`singleClusterMaxEnergyS 6 53 = 8427/2 = zS²` for `S = 53/2, z = 6`. -/
+@[simp] theorem singleClusterMaxEnergyS_six_fiftythree :
+    singleClusterMaxEnergyS 6 53 = (8427 / 2 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-27 2-vertex (dimer) ground-state energy** (γ-5 step 618):
+`singleClusterGSEnergyS 1 54 = -756 = -S(S+1)` for `S = 27`. -/
+@[simp] theorem singleClusterGSEnergyS_one_fiftyfour :
+    singleClusterGSEnergyS 1 54 = (-756 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-27 2-vertex (dimer) maximum-Casimir-sector energy** (γ-5 step 618):
+`singleClusterMaxEnergyS 1 54 = 729 = S²` for `S = 27`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_fiftyfour :
+    singleClusterMaxEnergyS 1 54 = (729 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-27 3-vertex (trimer) ground-state energy** (γ-5 step 619):
+`singleClusterGSEnergyS 2 54 = -1485 = -S(1+zS)` for `S = 27, z = 2`. -/
+@[simp] theorem singleClusterGSEnergyS_two_fiftyfour :
+    singleClusterGSEnergyS 2 54 = (-1485 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-27 3-vertex (trimer) maximum-Casimir-sector energy** (γ-5 step 619):
+`singleClusterMaxEnergyS 2 54 = 1458 = zS²` for `S = 27, z = 2`. -/
+@[simp] theorem singleClusterMaxEnergyS_two_fiftyfour :
+    singleClusterMaxEnergyS 2 54 = (1458 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-27 4-vertex (quartet) ground-state energy** (γ-5 step 620):
+`singleClusterGSEnergyS 3 54 = -2214 = -S(1+zS)` for `S = 27, z = 3`. -/
+@[simp] theorem singleClusterGSEnergyS_three_fiftyfour :
+    singleClusterGSEnergyS 3 54 = (-2214 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-27 4-vertex (quartet) maximum-Casimir-sector energy** (γ-5 step 620):
+`singleClusterMaxEnergyS 3 54 = 2187 = zS²` for `S = 27, z = 3`. -/
+@[simp] theorem singleClusterMaxEnergyS_three_fiftyfour :
+    singleClusterMaxEnergyS 3 54 = (2187 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-27 5-vertex (pentamer) ground-state energy** (γ-5 step 621):
+`singleClusterGSEnergyS 4 54 = -2943 = -S(1+zS)` for `S = 27, z = 4`. -/
+@[simp] theorem singleClusterGSEnergyS_four_fiftyfour :
+    singleClusterGSEnergyS 4 54 = (-2943 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-27 5-vertex (pentamer) maximum-Casimir-sector energy** (γ-5 step 621):
+`singleClusterMaxEnergyS 4 54 = 2916 = zS²` for `S = 27, z = 4`. -/
+@[simp] theorem singleClusterMaxEnergyS_four_fiftyfour :
+    singleClusterMaxEnergyS 4 54 = (2916 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-27 6-vertex (hexamer) ground-state energy** (γ-5 step 622):
+`singleClusterGSEnergyS 5 54 = -3672 = -S(1+zS)` for `S = 27, z = 5`. -/
+@[simp] theorem singleClusterGSEnergyS_five_fiftyfour :
+    singleClusterGSEnergyS 5 54 = (-3672 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-27 6-vertex (hexamer) maximum-Casimir-sector energy** (γ-5 step 622):
+`singleClusterMaxEnergyS 5 54 = 3645 = zS²` for `S = 27, z = 5`. -/
+@[simp] theorem singleClusterMaxEnergyS_five_fiftyfour :
+    singleClusterMaxEnergyS 5 54 = (3645 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-27 7-vertex (heptamer) ground-state energy** (γ-5 step 623):
+`singleClusterGSEnergyS 6 54 = -4401 = -S(1+zS)` for `S = 27, z = 6`. -/
+@[simp] theorem singleClusterGSEnergyS_six_fiftyfour :
+    singleClusterGSEnergyS 6 54 = (-4401 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-27 7-vertex (heptamer) maximum-Casimir-sector energy** (γ-5 step 623):
+`singleClusterMaxEnergyS 6 54 = 4374 = zS²` for `S = 27, z = 6`. -/
+@[simp] theorem singleClusterMaxEnergyS_six_fiftyfour :
+    singleClusterMaxEnergyS 6 54 = (4374 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-55/2 2-vertex (dimer) ground-state energy** (γ-5 step 624):
+`singleClusterGSEnergyS 1 55 = -3135/4 = -S(S+1)` for `S = 55/2`. -/
+@[simp] theorem singleClusterGSEnergyS_one_fiftyfive :
+    singleClusterGSEnergyS 1 55 = (-3135 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-55/2 2-vertex (dimer) maximum-Casimir-sector energy** (γ-5 step 624):
+`singleClusterMaxEnergyS 1 55 = 3025/4 = S²` for `S = 55/2`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_fiftyfive :
+    singleClusterMaxEnergyS 1 55 = (3025 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-55/2 3-vertex (trimer) ground-state energy** (γ-5 step 625):
+`singleClusterGSEnergyS 2 55 = -1540 = -S(1+zS)` for `S = 55/2, z = 2`. -/
+@[simp] theorem singleClusterGSEnergyS_two_fiftyfive :
+    singleClusterGSEnergyS 2 55 = (-1540 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-55/2 3-vertex (trimer) maximum-Casimir-sector energy** (γ-5 step 625):
+`singleClusterMaxEnergyS 2 55 = 3025/2 = zS²` for `S = 55/2, z = 2`. -/
+@[simp] theorem singleClusterMaxEnergyS_two_fiftyfive :
+    singleClusterMaxEnergyS 2 55 = (3025 / 2 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-55/2 4-vertex (quartet) ground-state energy** (γ-5 step 626):
+`singleClusterGSEnergyS 3 55 = -9185/4 = -S(1+zS)` for `S = 55/2, z = 3`. -/
+@[simp] theorem singleClusterGSEnergyS_three_fiftyfive :
+    singleClusterGSEnergyS 3 55 = (-9185 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-55/2 4-vertex (quartet) maximum-Casimir-sector energy** (γ-5 step 626):
+`singleClusterMaxEnergyS 3 55 = 9075/4 = zS²` for `S = 55/2, z = 3`. -/
+@[simp] theorem singleClusterMaxEnergyS_three_fiftyfive :
+    singleClusterMaxEnergyS 3 55 = (9075 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-55/2 5-vertex (pentamer) ground-state energy** (γ-5 step 627):
+`singleClusterGSEnergyS 4 55 = -6105/2 = -S(1+zS)` for `S = 55/2, z = 4`. -/
+@[simp] theorem singleClusterGSEnergyS_four_fiftyfive :
+    singleClusterGSEnergyS 4 55 = (-6105 / 2 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-55/2 5-vertex (pentamer) maximum-Casimir-sector energy** (γ-5 step 627):
+`singleClusterMaxEnergyS 4 55 = 3025 = zS²` for `S = 55/2, z = 4`. -/
+@[simp] theorem singleClusterMaxEnergyS_four_fiftyfive :
+    singleClusterMaxEnergyS 4 55 = (3025 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-55/2 6-vertex (hexamer) ground-state energy** (γ-5 step 628):
+`singleClusterGSEnergyS 5 55 = -15235/4 = -S(1+zS)` for `S = 55/2, z = 5`. -/
+@[simp] theorem singleClusterGSEnergyS_five_fiftyfive :
+    singleClusterGSEnergyS 5 55 = (-15235 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-55/2 6-vertex (hexamer) maximum-Casimir-sector energy** (γ-5 step 628):
+`singleClusterMaxEnergyS 5 55 = 15125/4 = zS²` for `S = 55/2, z = 5`. -/
+@[simp] theorem singleClusterMaxEnergyS_five_fiftyfive :
+    singleClusterMaxEnergyS 5 55 = (15125 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+/-- **Spin-55/2 7-vertex (heptamer) ground-state energy** (γ-5 step 629):
+`singleClusterGSEnergyS 6 55 = -4565 = -S(1+zS)` for `S = 55/2, z = 6`. -/
+@[simp] theorem singleClusterGSEnergyS_six_fiftyfive :
+    singleClusterGSEnergyS 6 55 = (-4565 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-55/2 7-vertex (heptamer) maximum-Casimir-sector energy** (γ-5 step 629):
+`singleClusterMaxEnergyS 6 55 = 9075/2 = zS²` for `S = 55/2, z = 6`. -/
+@[simp] theorem singleClusterMaxEnergyS_six_fiftyfive :
+    singleClusterMaxEnergyS 6 55 = (9075 / 2 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
+end LatticeSystem.Quantum
