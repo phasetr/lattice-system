@@ -10,9 +10,11 @@ import LatticeSystem.Quantum.SpinS.SingleClusterHamiltonian
 
 This file holds fixed-`(z, N)` numerical specialisations of
 `singleClusterGSEnergyS` and `singleClusterMaxEnergyS` for
-`29 ≤ N ≤ 38` (spin `29/2 ≤ S ≤ 19`). The pre-`N=29` specialisations
-live in `SingleClusterHamiltonianNumerics.lean`, and the `N ≥ 39`
-specialisations in `SingleClusterHamiltonianNumericsVeryHigh.lean`.
+`29 ≤ N ≤ 38` (spin `29/2 ≤ S ≤ 19`). The pre-`N=29`
+specialisations live in `SingleClusterHamiltonianNumerics.lean`,
+the `N = 39..47` in `SingleClusterHamiltonianNumericsVeryHigh.lean`,
+the `N = 48..59` in `SingleClusterHamiltonianNumericsUltraHigh.lean`,
+and the `N ≥ 60` in `SingleClusterHamiltonianNumericsExtremeHigh.lean`.
 
 This file imports the main `SingleClusterHamiltonian` directly (not
 the lower-N numerics file) so all numerics files can elaborate in
