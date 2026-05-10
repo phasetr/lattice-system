@@ -3514,4 +3514,20 @@ namespace LatticeSystem.Quantum
   push_cast
   ring
 
+/-- **Spin-48 4-vertex (quartet) ground-state energy** (γ-5 step 872):
+`singleClusterGSEnergyS 3 96 = -6960 = -S(1+zS)` for `S = 48, z = 3`. -/
+@[simp] theorem singleClusterGSEnergyS_three_ninetysix :
+    singleClusterGSEnergyS 3 96 = (-6960 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-48 4-vertex (quartet) maximum-Casimir-sector energy** (γ-5 step 872):
+`singleClusterMaxEnergyS 3 96 = 6912 = zS²` for `S = 48, z = 3`. -/
+@[simp] theorem singleClusterMaxEnergyS_three_ninetysix :
+    singleClusterMaxEnergyS 3 96 = (6912 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
