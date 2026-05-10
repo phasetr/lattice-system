@@ -16,7 +16,8 @@ This file holds fixed-`(z, N)` numerical specialisations of
 `SingleClusterHamiltonianNumericsVeryHigh.lean`, the `N = 48..59`
 in `SingleClusterHamiltonianNumericsUltraHigh.lean`, the
 `N = 60..77` in `SingleClusterHamiltonianNumericsExtremeHigh.lean`,
-and the `N ≥ 99` in `SingleClusterHamiltonianNumericsHyperHigh.lean`.
+the `N = 99..115` in `SingleClusterHamiltonianNumericsHyperHigh.lean`,
+and the `N ≥ 116` in `SingleClusterHamiltonianNumericsInfiniteHigh.lean`.
 
 This file imports the main `SingleClusterHamiltonian` directly (not
 the lower-N numerics files) so all seven numerics files can elaborate
