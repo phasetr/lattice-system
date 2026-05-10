@@ -14,16 +14,14 @@ This file holds fixed-`(z, N)` numerical specialisations of
 specialisations live in `SingleClusterHamiltonianNumerics.lean`,
 the `N = 29..38` in `SingleClusterHamiltonianNumericsHigh.lean`,
 the `N = 39..47` in `SingleClusterHamiltonianNumericsVeryHigh.lean`,
-and the `N ≥ 60` in `SingleClusterHamiltonianNumericsExtremeHigh.lean`.
+the `N = 60..77` in `SingleClusterHamiltonianNumericsExtremeHigh.lean`,
+and the `N ≥ 78` in `SingleClusterHamiltonianNumericsMaxHigh.lean`.
 
 This file imports the main `SingleClusterHamiltonian` directly (not
-the lower-N numerics files) so all five numerics files can elaborate
+the lower-N numerics files) so all six numerics files can elaborate
 in parallel after the main file. Splitting was introduced as part of
 the 50-PR build-performance cadence (see
-`.self-local/docs/refactoring-plan-2026-04-22.md` §A); the
-`UltraHigh → ExtremeHigh` boundary at `N = 60` was the refactor #7
-split when `UltraHigh` reached ~19 s elaboration time after the
-N=60..81 entries had been appended.
+`.self-local/docs/refactoring-plan-2026-04-22.md` §A).
 -/
 
 namespace LatticeSystem.Quantum

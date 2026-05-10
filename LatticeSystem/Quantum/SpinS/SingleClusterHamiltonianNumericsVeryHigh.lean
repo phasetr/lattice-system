@@ -14,10 +14,11 @@ This file holds fixed-`(z, N)` numerical specialisations of
 specialisations live in `SingleClusterHamiltonianNumerics.lean`,
 the `N = 29..38` in `SingleClusterHamiltonianNumericsHigh.lean`,
 the `N = 48..59` in `SingleClusterHamiltonianNumericsUltraHigh.lean`,
-and the `N ≥ 60` in `SingleClusterHamiltonianNumericsExtremeHigh.lean`.
+the `N = 60..77` in `SingleClusterHamiltonianNumericsExtremeHigh.lean`,
+and the `N ≥ 78` in `SingleClusterHamiltonianNumericsMaxHigh.lean`.
 
 This file imports the main `SingleClusterHamiltonian` directly (not
-the lower-N numerics files) so all five numerics files can elaborate
+the lower-N numerics files) so all six numerics files can elaborate
 in parallel after the main file. Splitting was introduced as part of
 the 50-PR build-performance cadence (see
 `.self-local/docs/refactoring-plan-2026-04-22.md` §A).
