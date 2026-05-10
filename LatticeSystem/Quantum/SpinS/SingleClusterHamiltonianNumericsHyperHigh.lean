@@ -25,6 +25,14 @@ in parallel after the main file. The split from `MaxHigh` to
 refactor #11 when `MaxHigh` reached ~9.8 s user CPU after the
 N=99..115 entries had been appended (see
 `.self-local/docs/refactoring-plan-2026-04-22.md` §A).
+
+The next 50-PR cadence checkpoint (refactor #12, after spin-123/2
+row close at γ-5 step 1037) was an evaluate-only iteration:
+`HyperHigh` measured ~7.0 s user CPU at 2432 lines (N=99..123),
+still well under the historical ~10 s split trigger, so no further
+file split was required at that point. The next split (to a new
+`InfiniteHigh.lean` or similar) is anticipated when `HyperHigh`
+crosses ~9 s, expected around N≈140.
 -/
 
 namespace LatticeSystem.Quantum
