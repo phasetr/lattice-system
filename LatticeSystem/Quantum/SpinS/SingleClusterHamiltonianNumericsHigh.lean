@@ -15,8 +15,9 @@ specialisations live in `SingleClusterHamiltonianNumerics.lean`,
 the `N = 39..47` in `SingleClusterHamiltonianNumericsVeryHigh.lean`,
 the `N = 48..59` in `SingleClusterHamiltonianNumericsUltraHigh.lean`,
 the `N = 60..77` in `SingleClusterHamiltonianNumericsExtremeHigh.lean`,
-and the `N = 78..98` in `SingleClusterHamiltonianNumericsMaxHigh.lean`,
-  and the `N ≥ 99` in `SingleClusterHamiltonianNumericsHyperHigh.lean`.
+the `N = 78..98` in `SingleClusterHamiltonianNumericsMaxHigh.lean`,
+the `N = 99..115` in `SingleClusterHamiltonianNumericsHyperHigh.lean`,
+and the `N ≥ 116` in `SingleClusterHamiltonianNumericsInfiniteHigh.lean`.
 
 This file imports the main `SingleClusterHamiltonian` directly (not
 the lower-N numerics file) so all numerics files can elaborate in
