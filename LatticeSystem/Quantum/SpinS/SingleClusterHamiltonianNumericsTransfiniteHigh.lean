@@ -27,6 +27,14 @@ in parallel after the main file. The split from `InfiniteHigh` to
 cadence refactor #15 when `InfiniteHigh` reached ~8.6 s user CPU
 after the N=116..148 entries had been appended (see
 `.self-local/docs/refactoring-plan-2026-04-22.md` §A).
+
+Refactor #16 (after spin-157/2 trimer at γ-5 step 1237) was an
+evaluate-only iteration: `TransfiniteHigh` measured ~7.6 s user CPU
+at 2466 lines (N=132..157, 50 γ-5 sweep PRs since refactor #15
+PR #2249), still well under the historical ~8.6 s split trigger.
+Growth rate ~60 ms / N matches the refactor #15 projection, so the
+next split (to a new file taking the high-N tail) will be needed
+around N ≈ 170 ± 5.
 -/
 
 namespace LatticeSystem.Quantum
