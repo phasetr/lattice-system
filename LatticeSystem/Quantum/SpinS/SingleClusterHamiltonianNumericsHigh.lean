@@ -18,7 +18,8 @@ the `N = 60..77` in `SingleClusterHamiltonianNumericsExtremeHigh.lean`,
 the `N = 78..98` in `SingleClusterHamiltonianNumericsMaxHigh.lean`,
 the `N = 99..115` in `SingleClusterHamiltonianNumericsHyperHigh.lean`,
 the `N = 116..131` in `SingleClusterHamiltonianNumericsInfiniteHigh.lean`,
-and the `N ≥ 132` in `SingleClusterHamiltonianNumericsTransfiniteHigh.lean`.
+the `N = 132..148` in `SingleClusterHamiltonianNumericsTransfiniteHigh.lean`,
+and the `N ≥ 149` in `SingleClusterHamiltonianNumericsAbsoluteHigh.lean`.
 
 This file imports the main `SingleClusterHamiltonian` directly (not
 the lower-N numerics file) so all numerics files can elaborate in
