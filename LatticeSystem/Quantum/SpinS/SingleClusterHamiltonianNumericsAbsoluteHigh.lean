@@ -30,12 +30,14 @@ N=132..165 entries had been appended (see
 `.self-local/docs/refactoring-plan-2026-04-22.md` §A).
 
 **Refactor #18 (evaluate-only, γ-5 step 1340):** measured
-`AbsoluteHigh` at 2483 lines / 7.15 s user CPU after N=149..174 entries
-had been appended. Below the refactor #17 split threshold
-(3274 lines / 8.7 s); kept as a single file. Matches refactor #16
-precedent (TransfiniteHigh 2466 lines / 7.6 s — evaluate-only). Future
-split (refactor #19 or later) anticipated once `AbsoluteHigh`
-approaches ~3200 lines / ~8.5 s.
+`AbsoluteHigh` at ~2491 lines after N=149..174 entries had been
+appended. `lake env lean` user CPU varies 7.15–8.88 s across runs
+(environmental noise — pre-docstring measurement 7.15 s; codex
+re-measurement 8.51–8.88 s). Median ~8.5 s is approaching but still
+below the refactor #17 split threshold (3274 lines / 8.7 s). Kept as
+a single file; refactor #19 will likely need to be a split rather
+than evaluate-only. Future split target: once `AbsoluteHigh`
+approaches ~2800–3000 lines / steady-state ~8.5 s.
 -/
 
 namespace LatticeSystem.Quantum
