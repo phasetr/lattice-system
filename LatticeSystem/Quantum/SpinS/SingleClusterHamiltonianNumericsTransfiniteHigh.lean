@@ -1775,4 +1775,20 @@ namespace LatticeSystem.Quantum
   push_cast
   ring
 
+/-- **Spin-75 3-vertex (trimer) ground-state energy** (γ-5 step 1195):
+`singleClusterGSEnergyS 2 150 = -11325 = -S(1+zS)` for `S = 75, z = 2`. -/
+@[simp] theorem singleClusterGSEnergyS_two_hundredfifty :
+    singleClusterGSEnergyS 2 150 = (-11325 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-75 3-vertex (trimer) maximum-Casimir-sector energy** (γ-5 step 1195):
+`singleClusterMaxEnergyS 2 150 = 11250 = zS²` for `S = 75, z = 2`. -/
+@[simp] theorem singleClusterMaxEnergyS_two_hundredfifty :
+    singleClusterMaxEnergyS 2 150 = (11250 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
