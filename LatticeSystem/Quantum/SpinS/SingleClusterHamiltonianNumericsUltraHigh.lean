@@ -21,7 +21,7 @@ the `N = 116..131` in `SingleClusterHamiltonianNumericsInfiniteHigh.lean`,
 and the `N ≥ 132` in `SingleClusterHamiltonianNumericsTransfiniteHigh.lean`.
 
 This file imports the main `SingleClusterHamiltonian` directly (not
-the lower-N numerics files) so all six numerics files can elaborate
+the lower-N numerics files) so all nine numerics files can elaborate
 in parallel after the main file. Splitting was introduced as part of
 the 50-PR build-performance cadence (see
 `.self-local/docs/refactoring-plan-2026-04-22.md` §A).
