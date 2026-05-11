@@ -1807,4 +1807,20 @@ namespace LatticeSystem.Quantum
   push_cast
   ring
 
+/-- **Spin-75 5-vertex (pentamer) ground-state energy** (γ-5 step 1197):
+`singleClusterGSEnergyS 4 150 = -22575 = -S(1+zS)` for `S = 75, z = 4`. -/
+@[simp] theorem singleClusterGSEnergyS_four_hundredfifty :
+    singleClusterGSEnergyS 4 150 = (-22575 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-75 5-vertex (pentamer) maximum-Casimir-sector energy** (γ-5 step 1197):
+`singleClusterMaxEnergyS 4 150 = 22500 = zS²` for `S = 75, z = 4`. -/
+@[simp] theorem singleClusterMaxEnergyS_four_hundredfifty :
+    singleClusterMaxEnergyS 4 150 = (22500 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
