@@ -28,6 +28,14 @@ in parallel after the main file. The split from `TransfiniteHigh` to
 refactor #17 when `TransfiniteHigh` reached ~8.7 s user CPU after the
 N=132..165 entries had been appended (see
 `.self-local/docs/refactoring-plan-2026-04-22.md` §A).
+
+**Refactor #18 (evaluate-only, γ-5 step 1340):** measured
+`AbsoluteHigh` at 2483 lines / 7.15 s user CPU after N=149..174 entries
+had been appended. Below the refactor #17 split threshold
+(3274 lines / 8.7 s); kept as a single file. Matches refactor #16
+precedent (TransfiniteHigh 2466 lines / 7.6 s — evaluate-only). Future
+split (refactor #19 or later) anticipated once `AbsoluteHigh`
+approaches ~3200 lines / ~8.5 s.
 -/
 
 namespace LatticeSystem.Quantum
