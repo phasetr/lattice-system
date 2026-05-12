@@ -30,6 +30,14 @@ in parallel after the main file. The split from `OmegaHigh` to
 refactor #21 when `OmegaHigh` reached 3211 lines / ~9.3 s user CPU
 after the N=166..198 entries had been appended (see
 `.self-local/docs/refactoring-plan-2026-04-22.md` §A).
+
+**Refactor #22 (evaluate-only, γ-5 step 1535 close):** measured
+`ApexHigh` at 805 lines / 3.58 s user CPU after N=199..206 entries
+had been appended. Well below the refactor #17/#19 split threshold
+(3213–3274 lines / 8.7–9.1 s); kept as a single file. Matches
+refactor #16/#18/#20 evaluate-only precedent. Future split
+(refactor #23 or later) anticipated once `ApexHigh` approaches
+~3000 lines (around N=230+).
 -/
 
 namespace LatticeSystem.Quantum
