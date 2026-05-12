@@ -19,10 +19,11 @@ in `SingleClusterHamiltonianNumericsUltraHigh.lean`, the
 the `N = 78..98` in `SingleClusterHamiltonianNumericsMaxHigh.lean`,
 the `N = 116..131` in `SingleClusterHamiltonianNumericsInfiniteHigh.lean`,
 the `N = 132..148` in `SingleClusterHamiltonianNumericsTransfiniteHigh.lean`,
-and the `N ≥ 149` in `SingleClusterHamiltonianNumericsAbsoluteHigh.lean`.
+the `N = 149..165` in `SingleClusterHamiltonianNumericsAbsoluteHigh.lean`,
+and the `N ≥ 166` in `SingleClusterHamiltonianNumericsOmegaHigh.lean`.
 
 This file imports the main `SingleClusterHamiltonian` directly (not
-the lower-N numerics files) so all ten numerics files can elaborate
+the lower-N numerics files) so all eleven numerics files can elaborate
 in parallel after the main file. The split from `MaxHigh` to
 `HyperHigh` was introduced as the 50-PR build-performance cadence
 refactor #11 when `MaxHigh` reached ~9.8 s user CPU after the
