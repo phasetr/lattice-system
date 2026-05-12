@@ -29,6 +29,13 @@ in parallel after the main file. The split from `AbsoluteHigh` to
 refactor #19 when `AbsoluteHigh` reached 3213 lines / ~9.08 s user CPU
 after the N=149..181 entries had been appended (see
 `.self-local/docs/refactoring-plan-2026-04-22.md` §A).
+
+**Refactor #20 (evaluate-only, γ-5 step 1439):** measured `OmegaHigh`
+at 2436 lines / 7.00 s user CPU after N=166..190 entries had been
+appended. Below the refactor #17/#19 split threshold
+(3274 lines / 8.7-9.1 s); kept as a single file. Matches refactor
+#16/#18 evaluate-only precedent. Future split (refactor #21 or later)
+anticipated once `OmegaHigh` approaches ~2800-3000 lines.
 -/
 
 namespace LatticeSystem.Quantum
