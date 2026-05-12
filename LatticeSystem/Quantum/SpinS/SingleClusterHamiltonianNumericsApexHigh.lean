@@ -34,4 +34,20 @@ after the N=166..198 entries had been appended (see
 
 namespace LatticeSystem.Quantum
 
+/-- **Spin-199/2 2-vertex (dimer) ground-state energy** (γ-5 step 1488):
+`singleClusterGSEnergyS 1 199 = -39999/4 = -S(S+1)` for `S = 199/2, z = 1`. -/
+@[simp] theorem singleClusterGSEnergyS_one_hundredninetynine :
+    singleClusterGSEnergyS 1 199 = (-39999 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-199/2 2-vertex (dimer) maximum-Casimir-sector energy** (γ-5 step 1488):
+`singleClusterMaxEnergyS 1 199 = 39601/4 = S²` for `S = 199/2, z = 1`. -/
+@[simp] theorem singleClusterMaxEnergyS_one_hundredninetynine :
+    singleClusterMaxEnergyS 1 199 = (39601 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
