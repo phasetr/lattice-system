@@ -9,8 +9,9 @@ import LatticeSystem.Quantum.SpinS.SingleClusterHamiltonian
 # Omega-spin numerical specialisations of single-cluster Heisenberg energies
 
 This file holds fixed-`(z, N)` numerical specialisations of
-`singleClusterGSEnergyS` and `singleClusterMaxEnergyS` for `N ≥ 166`
-(spin `S = N/2 ≥ 83`). The `N = 1..28` specialisations live in
+`singleClusterGSEnergyS` and `singleClusterMaxEnergyS` for `N = 166..198`
+(spin `S = N/2 ∈ {83, .., 99}`). Frozen since refactor #21.
+The `N = 1..28` specialisations live in
 `SingleClusterHamiltonianNumerics.lean`, the `N = 29..38` in
 `SingleClusterHamiltonianNumericsHigh.lean`, the `N = 39..47` in
 `SingleClusterHamiltonianNumericsVeryHigh.lean`, the `N = 48..59`
@@ -20,10 +21,11 @@ the `N = 78..98` in `SingleClusterHamiltonianNumericsMaxHigh.lean`,
 the `N = 99..115` in `SingleClusterHamiltonianNumericsHyperHigh.lean`,
 the `N = 116..131` in `SingleClusterHamiltonianNumericsInfiniteHigh.lean`,
 the `N = 132..148` in `SingleClusterHamiltonianNumericsTransfiniteHigh.lean`,
-and the `N = 149..165` in `SingleClusterHamiltonianNumericsAbsoluteHigh.lean`.
+the `N = 149..165` in `SingleClusterHamiltonianNumericsAbsoluteHigh.lean`,
+and the `N ≥ 199` in `SingleClusterHamiltonianNumericsApexHigh.lean`.
 
 This file imports the main `SingleClusterHamiltonian` directly (not
-the lower-N numerics files) so all eleven numerics files can elaborate
+the lower-N numerics files) so all twelve numerics files can elaborate
 in parallel after the main file. The split from `AbsoluteHigh` to
 `OmegaHigh` was introduced as the 50-PR build-performance cadence
 refactor #19 when `AbsoluteHigh` reached 3213 lines / ~9.08 s user CPU
@@ -34,8 +36,14 @@ after the N=149..181 entries had been appended (see
 at 2436 lines / 7.00 s user CPU after N=166..190 entries had been
 appended. Below the refactor #17/#19 split threshold
 (3274 lines / 8.7-9.1 s); kept as a single file. Matches refactor
-#16/#18 evaluate-only precedent. Future split (refactor #21 or later)
-anticipated once `OmegaHigh` approaches ~2800-3000 lines.
+#16/#18 evaluate-only precedent.
+
+**Refactor #21 (split, γ-5 step 1487 close):** `OmegaHigh` reached
+3211 lines / 9.3 s user CPU after N=166..198 had been appended — at
+the refactor #17/#19 split threshold. Split at row boundary (N=199,
+after spin-99 row closed at step 1487, before spin-199/2 opens at
+step 1488). Frozen `OmegaHigh`: 33 N values / N=166..198.
+New `ApexHigh`: N=199+ active growth target.
 -/
 
 namespace LatticeSystem.Quantum
