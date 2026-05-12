@@ -35,9 +35,14 @@ after the N=166..198 entries had been appended (see
 `ApexHigh` at 805 lines / 3.58 s user CPU after N=199..206 entries
 had been appended. Well below the refactor #17/#19 split threshold
 (3213–3274 lines / 8.7–9.1 s); kept as a single file. Matches
-refactor #16/#18/#20 evaluate-only precedent. Future split
-(refactor #23 or later) anticipated once `ApexHigh` approaches
-~3000 lines (around N=230+).
+refactor #16/#18/#20 evaluate-only precedent.
+
+**Refactor #23 (evaluate-only, γ-5 step 1583 close):** measured
+`ApexHigh` at 1581 lines / 5.45 s user CPU after N=199..214 entries
+had been appended (16 spin rows). Still well below the split
+threshold; kept as a single file. Future split (refactor #24 or
+later) anticipated once `ApexHigh` approaches ~3000 lines
+(~12-14 more spin rows of growth, around N=230+).
 -/
 
 namespace LatticeSystem.Quantum
