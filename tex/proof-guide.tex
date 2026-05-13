@@ -5229,6 +5229,119 @@ algebra, toy Hamiltonian Casimir identity, and the eigenvalue
 analysis on $|A| \neq |B|$ leading to $S_{\rm tot} =
 \bigl||A| - |B|\bigr|\,S$.
 
+\subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
+                single-cluster star-graph ground-state energy)}
+\label{subsec:tasaki-problem-2-5-a}
+
+\textbf{Goal} (Tasaki §2.5 Problem 2.5.a, p.~43). For a single
+$(z+1)$-vertex star graph with one central spin and $z$ leaves, all of
+spin $S = N/2$, with antiferromagnetic Heisenberg coupling
+$\hat H = \sum_{j=1}^{z} \hat{\boldsymbol S}_0 \cdot
+\hat{\boldsymbol S}_j$, the ground-state energy is
+$E_{\rm GS} = -S(1 + zS)$.
+
+\textbf{Strategy.} The Hamiltonian admits a Casimir decomposition
+\[
+  2 \hat H = (\hat S_{\rm tot})^2 - (\hat S_0)^2 - (\hat S_R)^2,
+\]
+where $\hat S_R^{(\alpha)} := \sum_{j=1}^{z}
+\mathrm{onSiteS}\,j\,\hat S_j^{(\alpha)}$ is the leaf-spin operator.
+The three Casimirs $(\hat S_{\rm tot})^2, (\hat S_0)^2,
+(\hat S_R)^2$ pairwise commute (proven via on-site / cross-site
+commutativity), giving a joint eigenbasis. On a joint
+$(\alpha, \beta)$-eigenstate of $((\hat S_{\rm tot})^2,
+(\hat S_R)^2)$ the $\hat H$-eigenvalue is
+\[
+  E(\alpha, \beta) = \tfrac{1}{2}\bigl(\alpha
+    - \tfrac{N(N+2)}{4} - \beta\bigr),
+\]
+where the central Casimir $(\hat S_0)^2$ acts as the scalar
+$N(N+2)/4 = S(S+1)$. Minimising $E$ corresponds to maximising
+$\beta$ and minimising $\alpha$ subject to angular-momentum
+addition constraints; the ground state lies at $s_R = z N/2$ (max
+leaf spin) with $s_{\rm tot} = (z-1)N/2$, giving
+$E_{\rm GS} = -S(1 + zS)$.
+
+\textbf{Formalisation status} ($\gamma$-5, in progress, $\sim$50 PRs
+through PR~\#1345):
+
+\begin{itemize}
+  \item Single-cluster Hamiltonian
+        \texttt{singleClusterHamiltonianS z N} on $\mathrm{Fin}(z+1)$
+        with Hermiticity, $z=0$ edge case, all-aligned
+        expectation $\langle \Phi_c | \hat H | \Phi_c\rangle =
+        z(N/2 - c)^2$ ($\gamma$-5 steps 243--248).
+  \item Leaf operators $\hat S_R^{(\alpha)}$, leaf Casimir
+        $(\hat S_R)^2 := \sum_\alpha (\hat S_R^{(\alpha)})^2$,
+        and the $\hat S_0 \cdot \hat S_R$ decomposition
+        ($\gamma$-5 steps 249--252).
+  \item Center-leaf commutativity and the Casimir decomposition
+        $2 \hat H = (\hat S_{\rm tot})^2 - (\hat S_0)^2
+        - (\hat S_R)^2$ ($\gamma$-5 steps 253--256).
+  \item Single-site Casimir scalar action and the joint-Casimir
+        eigenvalue formula
+        \texttt{singleClusterHamiltonianS\_eigenvalue\_of\_joint\_casimir\_eigenvec}
+        giving $\hat H \cdot v = ((\alpha - N(N+2)/4 - \beta)/2) \cdot v$
+        ($\gamma$-5 steps 257--261).
+  \item Eigenvector forms on extremal aligned states
+        $|\Phi_\top\rangle, |\Phi_\bot\rangle$:
+        $\hat H \cdot |\Phi_\top\rangle =
+        z(N/2)^2 \cdot |\Phi_\top\rangle$ and
+        $(\hat S_R)^2 \cdot |\Phi_\top\rangle =
+        (zN/2)(zN/2+1) \cdot |\Phi_\top\rangle$
+        (analogues for $|\Phi_\bot\rangle$); these confirm the
+        extremal states are joint eigenstates at the maximum
+        Casimir sector $(s_R, s_{\rm tot}) = (zN/2, (z+1)N/2)$
+        ($\gamma$-5 steps 264--267).
+  \item Named ground-state and maximum-Casimir-sector energies
+        \texttt{singleClusterGSEnergyS z N := -(N/2)(zN/2+1)} and
+        \texttt{singleClusterMaxEnergyS z N := z (N/2)$^2$},
+        with conditional eigenvalue identities
+        \texttt{singleClusterHamiltonianS\_mulVec\_eq\_gs\_energy\_smul}
+        and the corresponding maximum-sector identity
+        ($\gamma$-5 steps 268--271).
+  \item Energy hygiene: real-part sign / order / reality / strict
+        gap / strict negativity ($\gamma$-5 steps 272--283).
+  \item Spin-specific numerical values for dimer / trimer /
+        quartet at $S \in \{1/2, 1, 3/2, 2, 5/2\}$
+        ($\gamma$-5 steps 277, 279, 282, 284, 289, 290, 291,
+        297, 298).
+  \item Dimer ($z=1$) concrete attainability: the leaf-Casimir
+        collapses to the scalar $N(N+2)/4 \cdot 1$, so any
+        $(\hat S_{\rm tot})^2$-eigenvector at $\alpha = 0$
+        (singlet) is automatically an $\hat H$-eigenvector at
+        \texttt{singleClusterGSEnergyS 1 N} = $-S(S+1)$, and at
+        $\alpha = N(N+1)$ (top spin $s_{\rm tot} = 2S$) at
+        \texttt{singleClusterMaxEnergyS 1 N} = $S^2$. This is the
+        strongest concrete realisation of Tasaki Problem 2.5.a in
+        the dimer case ($\gamma$-5 steps 285--288).
+  \item Trimer ($z=2$) analysis: explicit leaf-Casimir
+        decomposition $(\hat S_R)^2 = (N(N+2)/2) \cdot 1
+        + 2 \cdot (\hat{\boldsymbol S}_1 \cdot \hat{\boldsymbol S}_2)$,
+        eigenvalue formula $\hat H \cdot v
+        = ((\alpha - 3N(N+2)/4 - 2\beta)/2) \cdot v$ at joint
+        $(\hat S_{\rm tot}^2, \hat{\boldsymbol S}_1 \cdot
+        \hat{\boldsymbol S}_2)$-eigenvector with eigenvalues
+        $(\alpha, \beta)$, and three concrete sector eigenvalues:
+        GS sector ($s_{\rm tot} = N/2$, leaf triplet) at
+        \texttt{singleClusterGSEnergyS 2 N} $= -N(N+1)/2$, top
+        sector ($s_{\rm tot} = 3N/2$, leaf triplet) at
+        \texttt{singleClusterMaxEnergyS 2 N} $= N^2/2$, and
+        leaf-singlet decoupling sector at $0$. Together these give
+        the complete $S=1/2$ trimer spectrum
+        $\{-1, 0, 1/2\}$ analytically ($\gamma$-5 steps 292--296).
+\end{itemize}
+
+\textbf{Strategic gaps.} The deferred pieces are:
+(a) constructing an actual joint-Casimir eigenvector at the GS
+sector $(s_R, s_{\rm tot}) = (zN/2, (z-1)N/2)$ via Clebsch--Gordan
+decomposition; (b) showing the spectrum is exhausted by the joint
+Casimir sectors (variational principle / spectral theorem). Both
+require substantial multi-PR effort (SU(2) representation theory or
+spin-$S$ Perron--Frobenius on the dressed Hamiltonian extending the
+spin-$1/2$ work in
+\texttt{Quantum/MarshallLiebMattis/H0PFApplication.lean}).
+
 \subsection*{DONE: Spin-$S$ saturated ferromagnetic state (Tasaki §2.4 generalised)}
 \label{subsec:spin-s-all-aligned}
 
