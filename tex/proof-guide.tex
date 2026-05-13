@@ -5731,12 +5731,27 @@ $\texttt{magEigenvalueS}~\sigma = M$ and zeros it out otherwise.
 The companion theorem
 \texttt{magProjFn\_mem\_magSubspaceS} shows
 $\texttt{magProjFn M v} \in \texttt{magSubspaceS V N M}$ by the
-diagonal $\hat S^z_{\rm tot}$-eigenvalue equation. This is the
-framework piece for the per-sector decomposition; subsequent PRs
-will prove (i) commutation with $\hat H$ and
-$(\hat S_{\rm tot})^2$, (ii) joint preservation
+diagonal $\hat S^z_{\rm tot}$-eigenvalue equation.
+
+\textbf{magProjFn linearity + commutation with H (PR~\#2766)}:
+extends the framework with
+(i) the magnetisation-subspace support property
+\texttt{magSubspaceS\_apply\_eq\_zero\_of\_magEigenvalueS\_ne}
+(vectors in $\texttt{magSubspaceS V N M}$ vanish at any
+configuration with $\texttt{magEigenvalueS} \neq M$),
+(ii) linearity \texttt{magProjFn\_add} / \texttt{magProjFn\_smul},
+(iii) generic off-magnetisation matrix-entry vanishing
+\texttt{matrix\_entry\_eq\_zero\_of\_mulVec\_basisVecS\_mem\_magSubspaceS},
+and (iv) the Heisenberg commutation
+\texttt{heisenbergHamiltonianS\_mulVec\_magProjFn\_eq}:
+$\hat H \cdot \texttt{magProjFn M v} =
+\texttt{magProjFn M} (\hat H \cdot v)$,
+proved by case analysis on $\texttt{magEigenvalueS}~\sigma = M$
+together with the matrix-entry vanishing for
+$\hat H \cdot \texttt{basisVecS}~\tau$ (PR~\#1078). Subsequent PRs
+will prove (v) Casimir commutation, (vi) joint preservation
 $\texttt{magProjFn M v} \in \texttt{joint}$ for $v \in \texttt{joint}$,
-and (iii) the decomposition
+and (vii) the decomposition
 $v = \sum_k \texttt{magProjFn}(m_{\max} - k.\textrm{val})~v$,
 closing $\texttt{joint} \subseteq \texttt{span}(\texttt{ladderIterateUp})$
 and hence $\texttt{joint} = \texttt{span}(\texttt{ladderIterateUp})$
