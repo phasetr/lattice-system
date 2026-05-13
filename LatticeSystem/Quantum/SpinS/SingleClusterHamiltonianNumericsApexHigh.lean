@@ -49,8 +49,8 @@ later) anticipated once `ApexHigh` approaches ~3000 lines
 had been appended (24 spin rows; closes spin-111 row at z=6, N=222).
 Still below the refactor #17/#19/#21 split threshold of
 ~3211 lines / ~9.3 s, but approaching the trend point. The 50-PR
-cadence aligned cleanly to the spin-111 row boundary (49 numerics
-PRs since refactor #23 PR #2653). Kept as a single file; next
+cadence aligned cleanly to the spin-111 row boundary (48 numerics
+PRs since refactor #23: PRs #2654..#2701). Kept as a single file; next
 refactor #25 will likely reassess at a closer row-boundary, with
 the actual split (refactor #26 or #27) anticipated near N≈230
 once `ApexHigh` crosses ~3000 lines / ~9 s user CPU.
