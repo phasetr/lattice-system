@@ -2970,4 +2970,20 @@ namespace LatticeSystem.Quantum
   push_cast
   ring
 
+/-- **Spin-229/2 quartet ground-state energy** (γ-5 step 1670):
+`singleClusterGSEnergyS 3 229 = -157781/4 = -S(1+zS)` for `S = 229/2, z = 3`. -/
+@[simp] theorem singleClusterGSEnergyS_three_twohundredtwentynine :
+    singleClusterGSEnergyS 3 229 = (-157781 / 4 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-229/2 quartet maximum-Casimir-sector energy** (γ-5 step 1670):
+`singleClusterMaxEnergyS 3 229 = 157323/4 = zS²` for `S = 229/2, z = 3`. -/
+@[simp] theorem singleClusterMaxEnergyS_three_twohundredtwentynine :
+    singleClusterMaxEnergyS 3 229 = (157323 / 4 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
