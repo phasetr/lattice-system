@@ -5717,11 +5717,30 @@ joint-magnetisation sectors and apply mathlib's
 \texttt{LinearMap.finrank\_le\_finrank\_of\_injective} to derive
 $\dim_\mathbb{C}(\texttt{joint} \sqcap H_M) \le
 \dim_\mathbb{C}(\texttt{joint} \sqcap H_{M+1})$ for every
-$M \neq m_{\max}$. The final step (subsequent PR) iterates this
-chain from $M = -m_{\max}$ upward and sums the per-sector $\le 1$
-bounds across the $(2m_{\max}+1)$ values of $M$ in the spectrum,
-using the magnetisation direct-sum decomposition (\#889) and the
-$H_{m_{\max}}$ base case (\#2759).
+$M \neq m_{\max}$. PR \#2763 iterates this chain from $M = -m_{\max}$ upward, giving
+the per-sector $\le 1$ bound at every $M$ in the spectrum; the
+subsequent PR sums the $(2m_{\max}+1)$ such bounds via the
+magnetisation direct-sum decomposition (\#889) to derive the final
+$\dim_\mathbb{C}(\texttt{joint}) \le 2m_{\max}+1$.
+
+\textbf{Per-sector $\dim \le 1$ (PR~\#2763)}: the theorem
+\texttt{saturatedFerromagnetJointEigenspace\_inf\_magSubspaceS\_finrank\_le\_one}
+states that for every $k \in \mathbb{N}$,
+$\dim_\mathbb{C}(\texttt{joint} \sqcap H_{m_{\max} - k}) \le 1$.
+The proof is by induction on $k$: base case $k = 0$ uses \#2759
+to identify $\texttt{joint} \sqcap H_{m_{\max}} = \mathbb{C}\,|\sigma_\top\rangle$
+and \texttt{finrank\_span\_singleton} to conclude $\dim = 1$;
+the step case uses the finrank chain of \#2762 to bound
+$\dim_\mathbb{C}(\texttt{joint} \sqcap H_{m_{\max} - (k+1)}) \le
+\dim_\mathbb{C}(\texttt{joint} \sqcap H_{m_{\max} - k}) \le 1$ by
+the inductive hypothesis. The $2m_{\max}+1$ spectrum values
+$M = m_{\max} - k$ for $k \in \{0, 1, \ldots, 2m_{\max}\}$ now each
+contribute at most $1$ to $\dim_\mathbb{C}(\texttt{joint})$; the
+final summation step (next PR) uses the magnetisation direct-sum
+decomposition (\#889) to derive
+$\dim_\mathbb{C}(\texttt{joint}) \le 2m_{\max} + 1$, closing the
+upper bound on the joint eigenspace and completing Tasaki §2.4
+Theorem 2.1.
 
 \textbf{Ladder span finrank (PR~\#904)}: the new file
 \texttt{Quantum/SpinS/SaturatedLadderSpan.lean} applies mathlib's
