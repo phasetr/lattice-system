@@ -454,4 +454,35 @@ theorem saturatedFerromagnetJointEigenspace_inf_magSubspaceS_eq_span_ladderItera
     · unfold ladderIterateUp
       exact totalSpinSOpMinus_pow_allAlignedStateS_zero_mem_magSubspaceS k.val
 
+/-! ## Magnetisation projection (pointwise)
+
+Concrete projector `magProjFn M v` mapping each component of `v`
+through the magnetisation filter. Used to decompose elements of
+`joint` into the per-sector pieces identified by PR #2764. -/
+
+/-- Pointwise magnetisation projector: keeps `v σ` when
+`magEigenvalueS σ = M` and zeros it out otherwise. -/
+noncomputable def magProjFn (M : ℂ) (v : (V → Fin (N + 1)) → ℂ) :
+    (V → Fin (N + 1)) → ℂ :=
+  fun σ => if magEigenvalueS σ = M then v σ else 0
+
+/-- The pointwise magnetisation projector lands in
+`magSubspaceS V N M`. -/
+theorem magProjFn_mem_magSubspaceS (M : ℂ) (v : (V → Fin (N + 1)) → ℂ) :
+    magProjFn (V := V) (N := N) M v ∈ magSubspaceS V N M := by
+  rw [mem_magSubspaceS_iff]
+  funext σ
+  -- Compute (Ŝ^z_tot · magProjFn M v) σ at the diagonal.
+  rw [Matrix.mulVec, dotProduct, Finset.sum_eq_single σ]
+  · rw [totalSpinSOp3_apply_diag]
+    by_cases hmag : magEigenvalueS σ = M
+    · -- magProjFn M v σ = v σ; product gives magEigenvalueS σ · v σ = M · v σ.
+      simp [magProjFn, hmag]
+    · -- magProjFn M v σ = 0; both sides 0.
+      simp [magProjFn, hmag]
+  · intros τ _ hτσ
+    rw [totalSpinSOp3_apply_off_diag (Ne.symm hτσ), zero_mul]
+  · intro h
+    exact (h (Finset.mem_univ _)).elim
+
 end LatticeSystem.Quantum
