@@ -5465,6 +5465,20 @@ $\dim(\texttt{predicted GS subspace}) \ge 2 s_A + 1$ at the
 saturated edge case, matching the Theorem 2.3 prediction
 $2 S_{\rm tot} + 1$.
 
+\textbf{Step 15 (PR~\#2786)}: §2.4 $\leftrightarrow$ γ-4 bridge
+at the saturated case in
+\texttt{LatticeSystem/Quantum/SpinS/SaturatedFMJointLePredictedGS.lean}.
+For $|\neg A| = 0$ and any coupling $J$,
+$\texttt{saturatedFerromagnetJointEigenspace } J N \le
+\texttt{bipartiteToyGroundStateSubspacePredicted A N}$.
+Direct corollary of PR \#2785 applied to the
+$(\hat S_{\rm tot})^2$-eigenspace component of the §2.4 joint
+eigenspace, with $m_{\max} = s_A$ (forced by $|V| = |A|$).
+Together with PRs \#2768 (joint = span ladder) and \#2769
+($\dim = 2 m_{\max}+1$), this realises the dimension lower bound
+$\dim(\texttt{predicted GS subspace}) \ge 2 s_A + 1$ concretely
+at the saturated edge case.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
