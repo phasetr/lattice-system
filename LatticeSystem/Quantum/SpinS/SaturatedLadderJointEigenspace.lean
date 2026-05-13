@@ -466,6 +466,76 @@ noncomputable def magProjFn (M : ℂ) (v : (V → Fin (N + 1)) → ℂ) :
     (V → Fin (N + 1)) → ℂ :=
   fun σ => if magEigenvalueS σ = M then v σ else 0
 
+/-- **Support property of `magSubspaceS V N M`**: a vector in
+`magSubspaceS V N M` vanishes at every configuration whose
+magnetisation eigenvalue differs from `M`.
+
+Direct consequence of the eigenvalue equation
+`(Ŝ^z_tot · w) σ = magEigenvalueS σ · w σ` evaluated at `σ`. -/
+theorem magSubspaceS_apply_eq_zero_of_magEigenvalueS_ne
+    {M : ℂ} {w : (V → Fin (N + 1)) → ℂ}
+    (hw : w ∈ magSubspaceS V N M) {σ : V → Fin (N + 1)}
+    (hσ : magEigenvalueS σ ≠ M) : w σ = 0 := by
+  rw [mem_magSubspaceS_iff] at hw
+  have hτ_lhs : (totalSpinSOp3 V N).mulVec w σ = magEigenvalueS σ * w σ := by
+    rw [Matrix.mulVec, dotProduct]
+    rw [Finset.sum_eq_single σ]
+    · rw [totalSpinSOp3_apply_diag]
+    · intros τ _ hτσ
+      rw [totalSpinSOp3_apply_off_diag (Ne.symm hτσ), zero_mul]
+    · intro h
+      exact (h (Finset.mem_univ _)).elim
+  have hτ_rhs : (M • w) σ = M * w σ := by
+    simp [Pi.smul_apply, smul_eq_mul]
+  have hτ_eq : magEigenvalueS σ * w σ = M * w σ := by
+    rw [← hτ_lhs, hw, hτ_rhs]
+  have hsub : (magEigenvalueS σ - M) * w σ = 0 := by
+    rw [sub_mul, hτ_eq, sub_self]
+  have hne : magEigenvalueS σ - M ≠ 0 := sub_ne_zero.mpr hσ
+  exact (mul_eq_zero.mp hsub).resolve_left hne
+
+omit [DecidableEq V] in
+/-- `magProjFn` is additive in its vector argument. -/
+theorem magProjFn_add (M : ℂ) (v w : (V → Fin (N + 1)) → ℂ) :
+    magProjFn (V := V) (N := N) M (v + w) =
+      magProjFn (V := V) (N := N) M v +
+      magProjFn (V := V) (N := N) M w := by
+  funext σ
+  unfold magProjFn
+  by_cases h : magEigenvalueS σ = M
+  · simp [h]
+  · simp [h]
+
+omit [DecidableEq V] in
+/-- `magProjFn` is homogeneous in its vector argument. -/
+theorem magProjFn_smul (M : ℂ) (c : ℂ) (v : (V → Fin (N + 1)) → ℂ) :
+    magProjFn (V := V) (N := N) M (c • v) =
+      c • magProjFn (V := V) (N := N) M v := by
+  funext σ
+  unfold magProjFn
+  by_cases h : magEigenvalueS σ = M
+  · simp [h]
+  · simp [h]
+
+/-- **Matrix-element vanishing for magnetisation-preserving operators**:
+if a matrix `A` sends every `basisVecS τ` into
+`magSubspaceS V N (magEigenvalueS τ)`, then its off-magnetisation matrix
+entries vanish: `A σ τ = 0` whenever `magEigenvalueS σ ≠ magEigenvalueS τ`. -/
+theorem matrix_entry_eq_zero_of_mulVec_basisVecS_mem_magSubspaceS
+    {A : ManyBodyOpS V N} {σ τ : V → Fin (N + 1)}
+    (hA : A.mulVec (basisVecS τ) ∈ magSubspaceS V N (magEigenvalueS τ))
+    (hne : magEigenvalueS σ ≠ magEigenvalueS τ) :
+    A σ τ = 0 := by
+  -- (A · basisVecS τ) σ = A σ τ.
+  have happ : A.mulVec (basisVecS τ) σ = A σ τ := by
+    rw [Matrix.mulVec, dotProduct, Finset.sum_eq_single τ]
+    · rw [basisVecS_self, mul_one]
+    · intros ρ _ hρτ
+      rw [basisVecS_of_ne hρτ, mul_zero]
+    · intro h; exact (h (Finset.mem_univ _)).elim
+  rw [← happ]
+  exact magSubspaceS_apply_eq_zero_of_magEigenvalueS_ne hA hne
+
 /-- The pointwise magnetisation projector lands in
 `magSubspaceS V N M`. -/
 theorem magProjFn_mem_magSubspaceS (M : ℂ) (v : (V → Fin (N + 1)) → ℂ) :
@@ -484,5 +554,79 @@ theorem magProjFn_mem_magSubspaceS (M : ℂ) (v : (V → Fin (N + 1)) → ℂ) :
     rw [totalSpinSOp3_apply_off_diag (Ne.symm hτσ), zero_mul]
   · intro h
     exact (h (Finset.mem_univ _)).elim
+
+/-- **Commutation `H · magProjFn M v = magProjFn M (H · v)`**.
+
+The Heisenberg Hamiltonian commutes with the pointwise magnetisation
+projector. Argument via the matrix-entry vanishing property: for
+any `σ` and `τ` with `magEigenvalueS σ ≠ magEigenvalueS τ`, the
+matrix entry `(heisenbergHamiltonianS J N) σ τ = 0` (since
+`H · basisVecS τ ∈ magSubspaceS V N (magEigenvalueS τ)` by
+PR #1078 / `heisenbergHamiltonianS_mulVec_basisVecS_mem_magSubspaceS`,
+and applying the support property). -/
+theorem heisenbergHamiltonianS_mulVec_magProjFn_eq
+    (J : V → V → ℂ) (M : ℂ) (v : (V → Fin (N + 1)) → ℂ) :
+    (heisenbergHamiltonianS J N).mulVec (magProjFn (V := V) (N := N) M v) =
+      magProjFn (V := V) (N := N) M
+        ((heisenbergHamiltonianS J N).mulVec v) := by
+  funext σ
+  -- LHS σ = Σ_τ H_{στ} · magProjFn M v τ.
+  -- magProjFn M v τ = v τ if magEigenvalueS τ = M, else 0.
+  -- So LHS σ = Σ_{τ : magEigenvalueS τ = M} H_{στ} · v τ.
+  by_cases hσM : magEigenvalueS σ = M
+  · -- magProjFn M (H · v) σ = (H · v) σ.
+    -- Need: Σ_{τ : magEigenvalueS τ = M} H_{στ} · v τ = Σ_τ H_{στ} · v τ.
+    -- For τ with magEigenvalueS τ ≠ M: magEigenvalueS σ = M ≠ magEigenvalueS τ,
+    -- so H_{στ} = 0 by matrix-entry vanishing.
+    have hRHS : magProjFn M ((heisenbergHamiltonianS J N).mulVec v) σ =
+        (heisenbergHamiltonianS J N).mulVec v σ := by
+      unfold magProjFn
+      simp [hσM]
+    rw [hRHS]
+    rw [Matrix.mulVec, dotProduct, Matrix.mulVec, dotProduct]
+    apply Finset.sum_congr rfl
+    intro τ _
+    by_cases hτM : magEigenvalueS τ = M
+    · -- magProjFn M v τ = v τ.
+      show heisenbergHamiltonianS J N σ τ * magProjFn M v τ =
+        heisenbergHamiltonianS J N σ τ * v τ
+      unfold magProjFn
+      rw [if_pos hτM]
+    · -- magProjFn M v τ = 0; need to show H_{στ} · 0 = H_{στ} · v τ via H_{στ} = 0.
+      show heisenbergHamiltonianS J N σ τ * magProjFn M v τ =
+        heisenbergHamiltonianS J N σ τ * v τ
+      have h_basis_mem : (heisenbergHamiltonianS J N).mulVec (basisVecS τ) ∈
+          magSubspaceS V N (magEigenvalueS τ) :=
+        heisenbergHamiltonianS_mulVec_basisVecS_mem_magSubspaceS J N τ
+      have hne : magEigenvalueS σ ≠ magEigenvalueS τ := by
+        rw [hσM]
+        exact Ne.symm hτM
+      rw [matrix_entry_eq_zero_of_mulVec_basisVecS_mem_magSubspaceS h_basis_mem hne]
+      ring
+  · -- magProjFn M (H · v) σ = 0.
+    -- Need: Σ_{τ : magEigenvalueS τ = M} H_{στ} · v τ = 0.
+    -- For τ with magEigenvalueS τ = M: magEigenvalueS σ ≠ M = magEigenvalueS τ,
+    -- so H_{στ} = 0.
+    have hRHS : magProjFn M ((heisenbergHamiltonianS J N).mulVec v) σ = 0 := by
+      unfold magProjFn
+      simp [hσM]
+    rw [hRHS]
+    rw [Matrix.mulVec, dotProduct]
+    apply Finset.sum_eq_zero
+    intro τ _
+    by_cases hτM : magEigenvalueS τ = M
+    · -- magProjFn M v τ = v τ, but H_{στ} = 0.
+      have h_basis_mem : (heisenbergHamiltonianS J N).mulVec (basisVecS τ) ∈
+          magSubspaceS V N (magEigenvalueS τ) :=
+        heisenbergHamiltonianS_mulVec_basisVecS_mem_magSubspaceS J N τ
+      have hne : magEigenvalueS σ ≠ magEigenvalueS τ := by
+        rw [hτM]; exact hσM
+      show heisenbergHamiltonianS J N σ τ * magProjFn M v τ = 0
+      rw [matrix_entry_eq_zero_of_mulVec_basisVecS_mem_magSubspaceS h_basis_mem hne,
+        zero_mul]
+    · -- magProjFn M v τ = 0.
+      show heisenbergHamiltonianS J N σ τ * magProjFn M v τ = 0
+      unfold magProjFn
+      rw [if_neg hτM, mul_zero]
 
 end LatticeSystem.Quantum
