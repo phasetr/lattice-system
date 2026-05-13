@@ -5233,7 +5233,13 @@ analysis on $|A| \neq |B|$ leading to $S_{\rm tot} =
 weight in
 \texttt{LatticeSystem/Quantum/SpinS/NeelBipartiteWeight.lean}.
 Defines \texttt{bipartiteImbalanceWeight A N}~:=~$(|A| - |\neg A|)
-\cdot N/2$ — the predicted Theorem 2.3 weight under $S = N/2$.
+\cdot N/2$ — the \emph{signed} $\hat S_{\rm tot}^{(3)}$
+magnetization eigenvalue of the Néel orientation
+\texttt{neelStateOfS A N}. Its absolute value
+$\bigl||A| - |\neg A|\bigr|\cdot N/2 = \bigl||A| - |\neg A|\bigr|\cdot S$
+agrees with the Theorem 2.3 prediction under $S = N/2$; the signed
+weight equals the predicted total spin in the $|A| \ge |\neg A|$
+orientation and is its negative in the opposite orientation.
 Packages: bridge with the existing
 \texttt{magEigenvalueS\_neelConfigOfS} (the Néel configuration's
 $\hat S_{\rm tot}^{(3)}$ eigenvalue equals the imbalance weight);

@@ -8,9 +8,13 @@ vertex set, the **bipartite imbalance weight** is
 
   `bipartiteImbalanceWeight A N := (|A| − |¬A|) · N / 2 : ℂ`.
 
-In Tasaki §2.5 Theorem 2.3 (`|A| ≠ |¬A|` case), this is the
-predicted ground-state total-spin eigenvalue `S_tot = (|A| − |¬A|)·S`
-under the standard convention `S = N/2`.
+This is the **signed** `Ŝ_tot^(3)` magnetization eigenvalue of the
+Néel orientation `neelStateOfS A N`. In Tasaki §2.5 Theorem 2.3
+(`|A| ≠ |¬A|` case), under the standard convention `S = N/2`, the
+absolute value `||A| − |¬A||·N/2 = ||A| − |¬A||·S` is the predicted
+ground-state total-spin eigenvalue. The signed weight here agrees
+with the total-spin value in the `|A| ≥ |¬A|` orientation, and is
+its negative in the opposite orientation.
 
 This file packages three foundational facts about this weight that
 underpin the formalisation of Theorem 2.3 (γ-4):
@@ -32,10 +36,15 @@ namespace LatticeSystem.Quantum
 
 variable {Λ : Type*} [Fintype Λ] {N : ℕ}
 
-/-- **Bipartite imbalance weight**: the predicted ground-state
-total-spin eigenvalue in Tasaki §2.5 Theorem 2.3, given by
-`(|A| − |¬A|) · N / 2`. For balanced bipartite (`|A| = |¬A|`) this
-is zero; for saturated bipartite (`|¬A| = 0`) this equals
+/-- **Bipartite imbalance weight**: the **signed** `Ŝ_tot^(3)`
+magnetization eigenvalue of the Néel orientation `neelStateOfS A N`,
+given by `(|A| − |¬A|) · N / 2`. Its absolute value
+`||A| − |¬A||·N/2 = ||A| − |¬A||·S` is the predicted Tasaki §2.5
+Theorem 2.3 ground-state total-spin eigenvalue (under `S = N/2`).
+The signed weight agrees with the total-spin value in the
+`|A| ≥ |¬A|` orientation, and is its negative in the opposite
+orientation. For balanced bipartite (`|A| = |¬A|`) this is zero;
+for saturated bipartite (`|¬A| = 0`) this equals
 `m_max = |V|·N/2`. -/
 noncomputable def bipartiteImbalanceWeight (A : Λ → Bool) (N : ℕ) : ℂ :=
   (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) -
