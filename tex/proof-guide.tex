@@ -5841,6 +5841,39 @@ $\dim_\mathbb{C} \texttt{Submodule.span} = |V|\cdot N + 1 =
 2m_{\max} + 1$. The span is contained in the joint eigenspace
 of \#903 via \texttt{Submodule.span\_le}.
 
+\textbf{Finrank-equality corollary (PR~\#2769)}: in
+\texttt{Quantum/SpinS/SaturatedLadderSpan.lean},
+\texttt{saturatedFerromagnetJointEigenspace\_finrank\_eq} promotes
+the lower bound of \#903 to the operator-level equality
+$\dim_\mathbb{C}(\texttt{joint J N}) = |V|\cdot N + 1 = 2m_{\max}+1$
+by rewriting through \#2768's \texttt{\_eq\_span\_ladderIterateUp}
+and applying the span-finrank result of \#904. Identifies the
+saturated-ferromagnet joint eigenspace as the unique
+$(2m_{\max}+1)$-dimensional irreducible $SU(2)$ representation at
+the operator level.
+
+\textbf{$\hat S^-_{\rm tot}$ invariance (PR~\#2770)}: the new file
+\texttt{Quantum/SpinS/SaturatedLadderLoweringInvariant.lean} adds
+the operational lowering-side $su(2)$ statement.
+Per-iterate action:
+\texttt{totalSpinSOpMinus\_mulVec\_ladderIterateUp\_interior} gives
+$\hat S^-_{\rm tot}\cdot\texttt{ladderIterateUp V N }k =
+\texttt{ladderIterateUp V N }\langle k+1, \cdot\rangle$ for $k+1 <
+|V|\cdot N + 1$ (definitionally from the iterate definition plus
+$\texttt{pow\_succ'}$);
+\texttt{totalSpinSOpMinus\_mulVec\_ladderIterateUp\_last} gives
+$\hat S^-_{\rm tot}\cdot\texttt{ladderIterateUp V N }(\texttt{Fin.last})
+= 0$ (boundary annihilation via \#905). Lifted via
+\texttt{Submodule.map\_span} + \texttt{Submodule.span\_le} on
+\#2768's $\texttt{joint} = \texttt{span}(\texttt{ladderIterateUp})$
+to the global invariance
+$\texttt{Submodule.map}\,\hat S^-_{\rm tot}.\texttt{mulVecLin}\,
+(\texttt{joint J N}) \le \texttt{joint J N}$. Combined with the
+finrank equality of \#2769 and the raising-side annihilation of
+\#907, this identifies the joint eigenspace as the
+$(2m_{\max}+1)$-dimensional spin-$m_{\max}$ representation of
+$su(2)$ under the total-spin generators.
+
 \textbf{Boundary annihilation (PR~\#905)}: the new file
 \texttt{Quantum/SpinS/LadderBoundaryAnnihilation.lean} caps the
 ladder at exactly $2m_{\max}+1$ non-zero terms by proving
