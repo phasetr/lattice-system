@@ -5492,6 +5492,18 @@ Direct corollary of PR \#2786 + PR \#2769's
 Theorem 2.3 degeneracy lower bound $2 S_{\rm tot} + 1$ at the
 saturated edge case where $S_{\rm tot} = m_{\max} = |V|\cdot S$.
 
+\textbf{Step 17 (PR~\#2788)}: opposite saturated edge case
+($|A| = 0$) in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSFinrankOppositeSaturated.lean}.
+\texttt{bipartiteToyGroundStateSubspacePredicted\_complement\_finrank\_ge\_succ\_card\_mul\_N\_of\_cardA\_zero}:
+when $|A| = 0$, the complement-orientation predicted GS subspace
+$\texttt{bipartiteToyGroundStateSubspacePredicted ($\neg$A) N}$
+has finrank $\ge |V|\cdot N + 1$. Application of PR \#2787 to the
+flipped sublattice, reducing $|\neg\neg A| = 0$ to $|A| = 0$ via
+filter congruence. Together with PR \#2787, both saturated edge
+cases now have the dimension lower bound, with the natural
+orientation chosen automatically.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
