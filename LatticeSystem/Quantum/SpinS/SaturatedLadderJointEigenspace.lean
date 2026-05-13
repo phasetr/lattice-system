@@ -4,6 +4,8 @@ import LatticeSystem.Quantum.SpinS.MagSubspaceExtremalDim
 import LatticeSystem.Quantum.SpinS.SaturatedEigenvalueExplicit
 import LatticeSystem.Quantum.SpinS.CasimirRearrangement
 import LatticeSystem.Quantum.SpinS.LadderBoundaryAnnihilation
+import LatticeSystem.Quantum.SpinS.MagnetizationDirectSum
+import LatticeSystem.Quantum.SpinS.IterateInductiveNonvanishing
 
 /-!
 # The saturated-ferromagnet ladder lies in the joint
@@ -379,5 +381,77 @@ theorem saturatedFerromagnetJointEigenspace_inf_magSubspaceS_finrank_le_one
       ring
     rw [h_succ_eq] at h_chain
     exact le_trans h_chain ih
+
+/-- **Per-sector identification**: for `k ∈ Fin (|V|·N + 1)`,
+`joint ⊓ H_{m_max − k} = span {ladderIterateUp V N k}`.
+
+The 1-dim subspace `joint ⊓ H_{m_max − k}` (from PR #2763) is
+spanned by the non-zero ladder iterate
+`ladderIterateUp V N k = (Ŝ^-_tot)^k · |σ_⊤⟩` (non-zero from
+PR #895). Since `ladderIterateUp V N k` lies in the subspace
+(as a member of joint by `ladderIterateUp_mem_saturatedFerromagnetJointEigenspace`,
+and of `H_{m_max − k}` by `totalSpinSOpMinus_pow_allAlignedStateS_zero_mem_magSubspaceS`),
+the singleton-span and the subspace coincide.
+
+The 2m_max + 1 spectrum values `k ∈ {0, ..., 2m_max}` together with
+the magnetization direct-sum decomposition (PR #889) will identify
+`joint = span(ladderIterateUp)` (subsequent PR) and complete
+Tasaki §2.4 Theorem 2.1. -/
+theorem saturatedFerromagnetJointEigenspace_inf_magSubspaceS_eq_span_ladderIterateUp
+    [Nonempty V] (J : V → V → ℂ) (k : Fin (Fintype.card V * N + 1)) :
+    saturatedFerromagnetJointEigenspace (V := V) J N
+        ⊓ magSubspaceS V N
+          (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (k.val : ℂ)) =
+    Submodule.span ℂ {ladderIterateUp V N k} := by
+  apply le_antisymm
+  · -- LHS ⊆ span {ladderIterateUp V N k}.
+    -- The subspace is ≤ 1-dim and contains a non-zero ladder iterate.
+    have h_le_one := saturatedFerromagnetJointEigenspace_inf_magSubspaceS_finrank_le_one
+      (V := V) (N := N) J k.val
+    have h_mem : ladderIterateUp V N k ∈
+        saturatedFerromagnetJointEigenspace (V := V) J N
+          ⊓ magSubspaceS V N
+            (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (k.val : ℂ)) := by
+      refine Submodule.mem_inf.mpr ⟨?_, ?_⟩
+      · exact ladderIterateUp_mem_saturatedFerromagnetJointEigenspace J k
+      · -- ladderIterateUp V N k ∈ magSubspaceS V N (m_max - k.val).
+        unfold ladderIterateUp
+        exact totalSpinSOpMinus_pow_allAlignedStateS_zero_mem_magSubspaceS k.val
+    have h_ne : ladderIterateUp V N k ≠ 0 := by
+      unfold ladderIterateUp
+      have hk_le : k.val ≤ Fintype.card V * N := by
+        have := k.isLt
+        omega
+      exact totalSpinSOpMinus_pow_allAlignedStateS_zero_ne_zero hk_le
+    have h_span_le :
+        Submodule.span ℂ {ladderIterateUp V N k} ≤
+        saturatedFerromagnetJointEigenspace (V := V) J N
+          ⊓ magSubspaceS V N
+            (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (k.val : ℂ)) := by
+      rw [Submodule.span_le, Set.singleton_subset_iff]
+      exact h_mem
+    -- finrank of `Submodule.span ℂ {ladderIterateUp V N k}` is 1.
+    have h_span_finrank :
+        Module.finrank ℂ
+          (Submodule.span ℂ {ladderIterateUp V N k} :
+            Submodule ℂ ((V → Fin (N + 1)) → ℂ)) = 1 :=
+      finrank_span_singleton h_ne
+    -- finrank ≥ 1 from the containment; finrank ≤ 1 from h_le_one.
+    -- Hence finrank = 1 and span = LHS.
+    have h_finrank_le : Module.finrank ℂ
+          (saturatedFerromagnetJointEigenspace (V := V) J N
+            ⊓ magSubspaceS V N
+              (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (k.val : ℂ)) :
+            Submodule ℂ ((V → Fin (N + 1)) → ℂ)) ≤ 1 := h_le_one
+    -- Apply Submodule.eq_of_le_of_finrank_le: span ≤ LHS and finrank LHS ≤ finrank span give span = LHS.
+    refine le_of_eq (Submodule.eq_of_le_of_finrank_le h_span_le ?_).symm
+    rw [h_span_finrank]
+    exact h_finrank_le
+  · -- span {ladderIterateUp V N k} ⊆ LHS.
+    rw [Submodule.span_le, Set.singleton_subset_iff]
+    refine Submodule.mem_inf.mpr ⟨?_, ?_⟩
+    · exact ladderIterateUp_mem_saturatedFerromagnetJointEigenspace J k
+    · unfold ladderIterateUp
+      exact totalSpinSOpMinus_pow_allAlignedStateS_zero_mem_magSubspaceS k.val
 
 end LatticeSystem.Quantum
