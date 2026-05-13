@@ -1951,4 +1951,20 @@ namespace LatticeSystem.Quantum
   push_cast
   ring
 
+/-- **Spin-109 7-vertex (heptamer) ground-state energy** (γ-5 step 1607):
+`singleClusterGSEnergyS 6 218 = -71395 = -S(1+zS)` for `S = 109, z = 6`. Closes spin-109 row. -/
+@[simp] theorem singleClusterGSEnergyS_six_twohundredeighteen :
+    singleClusterGSEnergyS 6 218 = (-71395 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-109 7-vertex (heptamer) maximum-Casimir-sector energy** (γ-5 step 1607):
+`singleClusterMaxEnergyS 6 218 = 71286 = zS²` for `S = 109, z = 6`. Closes spin-109 row. -/
+@[simp] theorem singleClusterMaxEnergyS_six_twohundredeighteen :
+    singleClusterMaxEnergyS 6 218 = (71286 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
