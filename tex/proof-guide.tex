@@ -5427,6 +5427,25 @@ $(2 s_A + 1)$-dim irrep sits inside for any $N$, confirming the
 subspace has the correct $(2 m_{\max} + 1)$ dimension in the
 saturated case.
 
+\textbf{Step 13 (PR~\#2784)}: sublattice $\leftrightarrow$ total
+spin identities at the saturated edge case in
+\texttt{LatticeSystem/Quantum/SpinS/SublatticeEqTotalOfCardZero.lean}.
+When $|\neg A| = 0$:
+\begin{itemize}
+\item $\hat S_{\neg A}^{(\alpha)} = 0$ and $\hat S_{\neg A}^2 = 0$
+(empty-sum vanishing).
+\item $\hat S_A^{(\alpha)} = \hat S_{\rm tot}^{(\alpha)}$ for each
+$\alpha$ (via the decomposition
+$\hat S_{\rm tot}^{(\alpha)} = \hat S_A^{(\alpha)} +
+\hat S_{\neg A}^{(\alpha)}$ + empty-sum vanishing).
+\item $\hat S_A^2 = \hat S_{\rm tot}^2$.
+\end{itemize}
+Foundation for the dimension bound on the predicted GS subspace
+in the saturated case:
+$\texttt{eigenspace}(\hat S_{\rm tot}^2)_\alpha \le
+\texttt{bipartiteToyGroundStateSubspacePredicted A N}$ whenever
+$|\neg A| = 0$ and $\alpha = s_A(s_A+1)$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
