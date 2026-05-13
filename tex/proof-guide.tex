@@ -5535,6 +5535,27 @@ form $-|A|\cdot|\neg A|\cdot N^2/2 - |\neg A|\cdot N$ (PR \#2779),
 both terms non-positive. Sanity check consistent with
 antiferromagnetic energy lowering.
 
+\textbf{Step 21 (PR~\#2792)}: predicted GS subspace finrank
+\emph{equality} at saturated case in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSFinrankEqSaturated.lean}.
+Two theorems:
+\begin{itemize}
+\item Reverse bridge:
+\texttt{bipartiteToyGroundStateSubspacePredicted A N $\le$
+saturatedFerromagnetJointEigenspace 0 N} when $|\neg A| = 0$,
+since $H_0 = 0$ and the eigenvalues match.
+\item Finrank equality:
+$\dim(\texttt{bipartiteToyGroundStateSubspacePredicted A N}) =
+|V|\cdot N + 1$ when $|\neg A| = 0$. Combines the reverse bridge
+(with PR \#2769's finrank equality on the saturated FM joint)
+with PR \#2787's lower bound via \texttt{le\_antisymm}.
+\end{itemize}
+Operator-level confirmation that the predicted GS subspace is
+\emph{exactly} the $(2 m_{\max}+1)$-dim spin-$m_{\max}$
+irreducible representation at the saturated edge case, with
+equality matching the Tasaki §2.5 Theorem 2.3 degeneracy
+$2 S_{\rm tot} + 1$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
