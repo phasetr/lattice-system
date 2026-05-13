@@ -49,7 +49,7 @@ theorem totalSpinSOpPlus_mulVec_ladderIterateUp_zero
       = ((j + 1) · (|V|·N − j)) • ladderIterateUp V N ⟨j, h'⟩`
 
 via the Casimir-rearrangement scalar identity of PR #894 (composed
-with PR #882 / PR #887 / PR #909) packaged as
+with PR #882 / PR #887) packaged as PR #895's
 `totalSpinSOpPlus_mulVec_totalSpinSOpMinus_pow_succ_allAlignedStateS_zero`. -/
 theorem totalSpinSOpPlus_mulVec_ladderIterateUp_succ
     [Nonempty V] (j : ℕ) (h : j + 1 < Fintype.card V * N + 1) :
