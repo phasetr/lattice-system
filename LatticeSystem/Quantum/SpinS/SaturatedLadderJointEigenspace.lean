@@ -266,4 +266,67 @@ theorem totalSpinSOpPlus_mulVec_eq_zero_imp_eq_zero_of_mem_saturatedFerromagnetJ
       exact (Submodule.mem_bot _).mp hMmem
   · exact h
 
+/-- The raising operator `Ŝ^+_tot` as a linear map from
+`joint ⊓ H_M` into `joint ⊓ H_{M+1}`, packaged via
+`totalSpinSOpPlus_mulVec_mem_saturatedFerromagnetJointEigenspace_inf_magSubspaceS`. -/
+noncomputable def totalSpinSOpPlusJointMagShift
+    (J : V → V → ℂ) (M : ℂ) :
+    (saturatedFerromagnetJointEigenspace (V := V) J N
+        ⊓ magSubspaceS V N M : Submodule ℂ ((V → Fin (N + 1)) → ℂ))
+      →ₗ[ℂ]
+    (saturatedFerromagnetJointEigenspace (V := V) J N
+        ⊓ magSubspaceS V N (M + 1) : Submodule ℂ ((V → Fin (N + 1)) → ℂ)) where
+  toFun v := ⟨(totalSpinSOpPlus V N).mulVec v.val,
+    totalSpinSOpPlus_mulVec_mem_saturatedFerromagnetJointEigenspace_inf_magSubspaceS
+      v.property⟩
+  map_add' a b := by
+    ext
+    simp [Matrix.mulVec_add]
+  map_smul' c v := by
+    ext
+    simp [Matrix.mulVec_smul]
+
+/-- **`Ŝ^+_tot` is injective on `joint ⊓ H_M` away from the highest
+weight, as a linear map between the joint-magnetisation sectors**.
+
+Direct consequence of the kernel-trivial result
+`totalSpinSOpPlus_mulVec_eq_zero_imp_eq_zero_of_mem_saturatedFerromagnetJointEigenspace_inf_magSubspaceS`. -/
+theorem totalSpinSOpPlusJointMagShift_injective [Nonempty V]
+    (J : V → V → ℂ) {M : ℂ}
+    (hMne : M ≠ (Fintype.card V : ℂ) * (N : ℂ) / 2) :
+    Function.Injective (totalSpinSOpPlusJointMagShift (V := V) (N := N) J M) := by
+  intro a b hab
+  apply Subtype.ext
+  have hsub :
+      (totalSpinSOpPlus V N).mulVec (a.val - b.val) = 0 := by
+    rw [Matrix.mulVec_sub]
+    have := Subtype.ext_iff.mp hab
+    simp [totalSpinSOpPlusJointMagShift] at this
+    rw [this]
+    simp
+  have hmem : a.val - b.val ∈
+      saturatedFerromagnetJointEigenspace (V := V) J N
+        ⊓ magSubspaceS V N M := by
+    exact Submodule.sub_mem _ a.property b.property
+  have h0 :=
+    totalSpinSOpPlus_mulVec_eq_zero_imp_eq_zero_of_mem_saturatedFerromagnetJointEigenspace_inf_magSubspaceS
+      hMne hmem hsub
+  exact sub_eq_zero.mp h0
+
+/-- **`dim(joint ⊓ H_M) ≤ dim(joint ⊓ H_{M+1})` for `M ≠ m_max`**.
+The chain inequality propagating the 1-dim bound from `H_{m_max}`
+(PR #2759) up the magnetisation ladder (toward Tasaki §2.4
+Theorem 2.1). -/
+theorem saturatedFerromagnetJointEigenspace_inf_magSubspaceS_finrank_le_succ
+    [Nonempty V] (J : V → V → ℂ) {M : ℂ}
+    (hMne : M ≠ (Fintype.card V : ℂ) * (N : ℂ) / 2) :
+    Module.finrank ℂ
+      (saturatedFerromagnetJointEigenspace (V := V) J N
+        ⊓ magSubspaceS V N M : Submodule ℂ ((V → Fin (N + 1)) → ℂ)) ≤
+    Module.finrank ℂ
+      (saturatedFerromagnetJointEigenspace (V := V) J N
+        ⊓ magSubspaceS V N (M + 1) : Submodule ℂ ((V → Fin (N + 1)) → ℂ)) :=
+  LinearMap.finrank_le_finrank_of_injective
+    (totalSpinSOpPlusJointMagShift_injective J hMne)
+
 end LatticeSystem.Quantum
