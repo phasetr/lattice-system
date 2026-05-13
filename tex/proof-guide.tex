@@ -5256,6 +5256,30 @@ magnetisation level. Subsequent steps will address the lower
 bound via the toy-Hamiltonian Casimir decomposition (using
 PR~\#1042's sublattice operators) and the variational argument.
 
+\textbf{Step 3 (PR~\#2774)}: toy-Hamiltonian eigenvalue on
+simultaneous Casimir eigenvectors, in
+\texttt{LatticeSystem/Quantum/SpinS/ToyHamiltonianJointEigenvalue.lean}.
+The closed form
+$\hat H_{\rm toy_S} = (\hat S_{\rm tot})^2 - (\hat S_A)^2 -
+(\hat S_{\neg A})^2$ (PR \#1056) gives: for any joint eigenvector
+$v$ of $(\hat S_{\rm tot})^2, (\hat S_A)^2, (\hat S_{\neg A})^2$ at
+eigenvalues $(\alpha, \beta_A, \beta_B)$, $\hat H_{\rm toy_S}\cdot
+v = (\alpha - \beta_A - \beta_B)\cdot v$
+(\texttt{heisenbergToyHamiltonianS\_mulVec\_of\_jointCasimirEigenvector})
+and $\langle v\,|\,\hat H_{\rm toy_S}\,v\rangle = (\alpha - \beta_A
+- \beta_B)\,\langle v, v\rangle$
+(\texttt{neelStateOfS\_heisenbergToyHamiltonianS\_expectation\_via\_joint}).
+This is the eigenvalue identity used in Tasaki's Theorem 2.3
+proof: minimising the toy energy over admissible joint
+$(\alpha, \beta_A, \beta_B)$ subject to the angular-momentum
+addition constraints gives the predicted ground state at
+$S_{\rm tot} = \bigl||A| - |\neg A|\bigr|\,S$. Subsequent γ-4 PRs
+will package the explicit Casimir-eigenvalue upper bounds
+$\beta_A \le s_A(s_A+1)$, $\beta_B \le s_B(s_B+1)$ with
+$s_A = |A|\cdot N/2$, $s_B = |\neg A|\cdot N/2$, the triangle-
+inequality lower bound on $\alpha$, and the variational extraction
+of the Theorem 2.3 ground-state energy and total spin.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
