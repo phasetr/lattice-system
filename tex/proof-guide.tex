@@ -5446,6 +5446,25 @@ $\texttt{eigenspace}(\hat S_{\rm tot}^2)_\alpha \le
 \texttt{bipartiteToyGroundStateSubspacePredicted A N}$ whenever
 $|\neg A| = 0$ and $\alpha = s_A(s_A+1)$.
 
+\textbf{Step 14 (PR~\#2785)}: eigenspace bridge for the
+saturated case in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSEigenspaceBridge.lean}.
+\texttt{totalSpinSSquaredEigenspace\_le\_bipartiteToyGroundStateSubspacePredicted\_of\_cardNotA\_zero}:
+$\texttt{eigenspace}((\hat S_{\rm tot})^2)_{s_A(s_A+1)} \le
+\texttt{bipartiteToyGroundStateSubspacePredicted A N}$ when
+$|\neg A| = 0$. Each of the three joint Casimir conditions is
+verified: (i) the $(\hat S_{\rm tot})^2$ condition is by
+hypothesis; (ii) the $(\hat S_A)^2$ condition reduces to the
+$(\hat S_{\rm tot})^2$ condition via PR \#2784's
+$\hat S_A^2 = \hat S_{\rm tot}^2$; (iii) the $(\hat S_{\neg A})^2$
+condition is trivial since the operator is the zero matrix.
+Combined with PR \#2768's
+\texttt{saturatedFerromagnetJointEigenspace = span(ladderIterateUp)}
+and the finrank $2 m_{\max}+1$, this gives the dimension bound
+$\dim(\texttt{predicted GS subspace}) \ge 2 s_A + 1$ at the
+saturated edge case, matching the Theorem 2.3 prediction
+$2 S_{\rm tot} + 1$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
