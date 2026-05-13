@@ -5479,6 +5479,19 @@ Together with PRs \#2768 (joint = span ladder) and \#2769
 $\dim(\texttt{predicted GS subspace}) \ge 2 s_A + 1$ concretely
 at the saturated edge case.
 
+\textbf{Step 16 (PR~\#2787)}: predicted GS subspace finrank lower
+bound at the saturated case in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSFinrankSaturated.lean}.
+\texttt{bipartiteToyGroundStateSubspacePredicted\_finrank\_ge\_succ\_card\_mul\_N\_of\_cardNotA\_zero}:
+when $|\neg A| = 0$,
+$|V|\cdot N + 1 \le
+\dim_\mathbb{C}(\texttt{bipartiteToyGroundStateSubspacePredicted A N})$.
+Direct corollary of PR \#2786 + PR \#2769's
+\texttt{saturatedFerromagnetJointEigenspace\_finrank\_eq} via
+\texttt{Submodule.finrank\_mono}. This realises the Tasaki §2.5
+Theorem 2.3 degeneracy lower bound $2 S_{\rm tot} + 1$ at the
+saturated edge case where $S_{\rm tot} = m_{\max} = |V|\cdot S$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
