@@ -5280,6 +5280,18 @@ $s_A = |A|\cdot N/2$, $s_B = |\neg A|\cdot N/2$, the triangle-
 inequality lower bound on $\alpha$, and the variational extraction
 of the Theorem 2.3 ground-state energy and total spin.
 
+\textbf{Step 4 (PR~\#2775)}: subspace-level form of Step 3 in
+\texttt{LatticeSystem/Quantum/SpinS/ToyHamiltonianJointEigenspace.lean}.
+Lifts PR \#2774's pointwise identity to the
+\texttt{Submodule}-inclusion
+$\texttt{eigenspace}((\hat S_{\rm tot})^2)_\alpha \sqcap
+\texttt{eigenspace}((\hat S_A)^2)_{\beta_A} \sqcap
+\texttt{eigenspace}((\hat S_{\neg A})^2)_{\beta_B} \le
+\texttt{eigenspace}(\hat H_{\rm toy_S})_{\alpha - \beta_A - \beta_B}$
+via \texttt{Module.End.mem\_eigenspace\_iff}. This is the natural
+operator-level form that the upcoming γ-4 spectrum analysis will
+chain through.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
