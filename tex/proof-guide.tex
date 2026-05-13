@@ -5526,6 +5526,15 @@ $\ge |V|\cdot N + 1$. Since the toy Hamiltonian is sublattice-
 swap invariant, this also applies to the original-orientation
 toy Hamiltonian.
 
+\textbf{Step 20 (PR~\#2791)}: non-positivity of the predicted
+min energy in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergyNonpos.lean}.
+$(\texttt{bipartiteToyMinEnergyPredicted A N}).\texttt{re} \le 0$
+for any sublattice $A$ and any $N$. Direct from the simplified
+form $-|A|\cdot|\neg A|\cdot N^2/2 - |\neg A|\cdot N$ (PR \#2779),
+both terms non-positive. Sanity check consistent with
+antiferromagnetic energy lowering.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
