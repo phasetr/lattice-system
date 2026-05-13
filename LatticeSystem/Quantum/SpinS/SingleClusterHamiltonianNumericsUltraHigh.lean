@@ -21,10 +21,10 @@ the `N = 116..131` in `SingleClusterHamiltonianNumericsInfiniteHigh.lean`,
 the `N = 132..148` in `SingleClusterHamiltonianNumericsTransfiniteHigh.lean`,
 the `N = 149..165` in `SingleClusterHamiltonianNumericsAbsoluteHigh.lean`,
 the `N = 166..198` in `SingleClusterHamiltonianNumericsOmegaHigh.lean`,
-and the `N ≥ 199` in `SingleClusterHamiltonianNumericsApexHigh.lean`.
+the `N = 199..214` in `SingleClusterHamiltonianNumericsApexHigh.lean`, and the `N ≥ 215` in `SingleClusterHamiltonianNumericsZenithHigh.lean`.
 
 This file imports the main `SingleClusterHamiltonian` directly (not
-the lower-N numerics files) so all twelve numerics files can elaborate
+the lower-N numerics files) so all thirteen numerics files can elaborate
 in parallel after the main file. Splitting was introduced as part of
 the 50-PR build-performance cadence (see
 `.self-local/docs/refactoring-plan-2026-04-22.md` §A).
