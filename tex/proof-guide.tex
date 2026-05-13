@@ -5723,6 +5723,24 @@ subsequent PR sums the $(2m_{\max}+1)$ such bounds via the
 magnetisation direct-sum decomposition (\#889) to derive the final
 $\dim_\mathbb{C}(\texttt{joint}) \le 2m_{\max}+1$.
 
+\textbf{Per-sector identification (PR~\#2764)}: the theorem
+\texttt{saturatedFerromagnetJointEigenspace\_inf\_magSubspaceS\_eq\_span\_ladderIterateUp}
+states that for every $k \in \mathrm{Fin}(|V|\cdot N + 1)$,
+\[
+  \texttt{joint} \sqcap H_{m_{\max} - k}
+  = \mathbb{C}\,\texttt{ladderIterateUp V N k}.
+\]
+Argument: the LHS is $\le 1$-dim (\#2763) and contains the non-zero
+ladder iterate $(\hat S^-_{\rm tot})^k |\sigma_\top\rangle$
+(membership: \#2762 for the joint side, \texttt{\_mem\_magSubspaceS}
+for the magnetisation side; non-vanishing: \#895). Conclude by
+\texttt{Submodule.eq\_of\_le\_of\_finrank\_le}. Each ladder iterate
+is thereby identified as the unique (up to scaling) non-zero
+vector in its joint-magnetisation sector. Summing over the
+$2m_{\max}+1$ values of $k$ via PR~\#889 will identify
+$\texttt{joint} = \texttt{span}(\texttt{ladderIterateUp})$ (next
+PR), completing Tasaki §2.4 Theorem 2.1.
+
 \textbf{Per-sector $\dim \le 1$ (PR~\#2763)}: the theorem
 \texttt{saturatedFerromagnetJointEigenspace\_inf\_magSubspaceS\_finrank\_le\_one}
 states that for every $k \in \mathbb{N}$,
