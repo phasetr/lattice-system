@@ -5504,6 +5504,18 @@ filter congruence. Together with PR \#2787, both saturated edge
 cases now have the dimension lower bound, with the natural
 orientation chosen automatically.
 
+\textbf{Step 18 (PR~\#2789)}: $\hat H_{\rm toy_S}$-eigenspace
+finrank lower bound at the saturated case in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyEigenspaceFinrankSaturated.lean}.
+When $|\neg A| = 0$, the $\hat H_{\rm toy_S}$-eigenspace at
+\texttt{bipartiteToyMinEnergyPredicted A N} has finrank
+$\ge |V|\cdot N + 1$. Direct chain of PR \#2775
+(\texttt{predicted GS} $\subseteq$ \texttt{eigenspace}) and
+PR \#2787 (\texttt{predicted GS} finrank $\ge |V|\cdot N + 1$)
+via \texttt{Submodule.finrank\_mono}. This is the operator-level
+version of the Theorem 2.3 degeneracy $2 S_{\rm tot} + 1$ lower
+bound, applied directly to the $\hat H_{\rm toy_S}$-eigenspace.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
