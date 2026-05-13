@@ -710,4 +710,104 @@ theorem magProjFn_mem_saturatedFerromagnetJointEigenspace
   · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
     rw [totalSpinSSquared_mulVec_magProjFn_eq, hCas, magProjFn_smul]
 
+omit [DecidableEq V] in
+/-- **Pointwise magnetisation decomposition of any vector**:
+`v = ∑_{k : Fin (Fintype.card V * N + 1)} magProjFn (m_max - k.val) v`.
+
+Every configuration `σ` has `magEigenvalueS σ = m_max - magSumS σ`
+with `magSumS σ ∈ {0, ..., Fintype.card V * N}`, so exactly one
+index `k = magSumS σ` in `Fin (Fintype.card V * N + 1)` selects
+`v σ` (and the other indices contribute zero). -/
+theorem sum_magProjFn_eq (v : (V → Fin (N + 1)) → ℂ) :
+    (∑ k : Fin (Fintype.card V * N + 1),
+      magProjFn (V := V) (N := N)
+        (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (k.val : ℂ)) v) = v := by
+  funext σ
+  rw [Finset.sum_apply]
+  -- Identify the unique index `k₀ = magSumS σ`.
+  let k₀ : Fin (Fintype.card V * N + 1) :=
+    ⟨magSumS σ, Nat.lt_succ_of_le (magSumS_le σ)⟩
+  rw [Finset.sum_eq_single k₀]
+  · -- At `k = k₀`, magEigenvalueS σ = m_max - k₀.val.
+    unfold magProjFn
+    have hmag : magEigenvalueS σ =
+        (Fintype.card V : ℂ) * (N : ℂ) / 2 - (k₀.val : ℂ) := by
+      unfold magEigenvalueS
+      simp [k₀]
+    rw [if_pos hmag]
+  · -- For `k ≠ k₀`, magEigenvalueS σ ≠ m_max - k.val.
+    intros k _ hkne
+    unfold magProjFn
+    rw [if_neg]
+    intro hmag
+    -- From `magEigenvalueS σ = m_max - k.val` derive `k.val = magSumS σ`.
+    have hsum : (magSumS σ : ℂ) = (k.val : ℂ) := by
+      unfold magEigenvalueS at hmag
+      exact sub_right_inj.mp hmag
+    have hnat : k.val = magSumS σ := by
+      have : (k.val : ℂ) = (magSumS σ : ℂ) := hsum.symm
+      exact_mod_cast this
+    have : k = k₀ := Fin.ext hnat
+    exact hkne this
+  · intro h; exact (h (Finset.mem_univ _)).elim
+
+/-- **`joint ⊆ span (Set.range ladderIterateUp)`** — the joint
+eigenspace decomposes into the linear span of the ladder iterates.
+
+For any `v ∈ joint`, the magnetisation decomposition
+`v = ∑_k magProjFn (m_max - k.val) v` (PR #2768) lifts each
+component into `joint ⊓ H_{m_max - k.val} = span {ladderIterateUp V N k}`
+(PR #2764). Summing across the `2m_max + 1` sectors yields
+`v ∈ span (Set.range ladderIterateUp)`. -/
+theorem saturatedFerromagnetJointEigenspace_le_span_ladderIterateUp
+    [Nonempty V] (J : V → V → ℂ) :
+    saturatedFerromagnetJointEigenspace (V := V) J N ≤
+      Submodule.span ℂ (Set.range (ladderIterateUp V N)) := by
+  intro v hv
+  -- Decompose v as the sum of its magnetisation components.
+  rw [← sum_magProjFn_eq (V := V) (N := N) v]
+  -- Each component lies in `joint ⊓ H_{m_max - k.val} = span {ladderIterateUp V N k}`.
+  refine Submodule.sum_mem _ ?_
+  intro k _
+  have h_in_joint : magProjFn (V := V) (N := N)
+      ((Fintype.card V : ℂ) * (N : ℂ) / 2 - (k.val : ℂ)) v ∈
+      saturatedFerromagnetJointEigenspace (V := V) J N :=
+    magProjFn_mem_saturatedFerromagnetJointEigenspace hv
+  have h_in_mag : magProjFn (V := V) (N := N)
+      ((Fintype.card V : ℂ) * (N : ℂ) / 2 - (k.val : ℂ)) v ∈
+      magSubspaceS V N
+        ((Fintype.card V : ℂ) * (N : ℂ) / 2 - (k.val : ℂ)) :=
+    magProjFn_mem_magSubspaceS _ v
+  have h_in_inter : magProjFn (V := V) (N := N)
+      ((Fintype.card V : ℂ) * (N : ℂ) / 2 - (k.val : ℂ)) v ∈
+      saturatedFerromagnetJointEigenspace (V := V) J N
+        ⊓ magSubspaceS V N
+          ((Fintype.card V : ℂ) * (N : ℂ) / 2 - (k.val : ℂ)) :=
+    Submodule.mem_inf.mpr ⟨h_in_joint, h_in_mag⟩
+  rw [saturatedFerromagnetJointEigenspace_inf_magSubspaceS_eq_span_ladderIterateUp
+    J k] at h_in_inter
+  -- Now `h_in_inter : magProjFn ... v ∈ span {ladderIterateUp V N k}`.
+  -- Embed into the larger `span (Set.range (ladderIterateUp V N))`.
+  exact Submodule.span_mono
+    (Set.singleton_subset_iff.mpr (Set.mem_range_self k)) h_in_inter
+
+/-- **Tasaki §2.4 Theorem 2.1**:
+`saturatedFerromagnetJointEigenspace J N = span (Set.range (ladderIterateUp V N))`.
+
+The joint `(H, (Ŝ_tot)²)`-eigenspace at the saturated-ferromagnet
+eigenvalues coincides with the `(2m_max + 1)`-dimensional linear
+span of the ladder iterates. Combined with the linear independence
+(PR #896) and dimension (PR #904), this identifies the joint
+eigenspace as the `J_tot = m_max` irreducible SU(2) representation. -/
+theorem saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp
+    [Nonempty V] (J : V → V → ℂ) :
+    saturatedFerromagnetJointEigenspace (V := V) J N =
+      Submodule.span ℂ (Set.range (ladderIterateUp V N)) := by
+  apply le_antisymm
+  · exact saturatedFerromagnetJointEigenspace_le_span_ladderIterateUp J
+  · -- Reverse inclusion: span ⊆ joint (PR #904).
+    rw [Submodule.span_le, Set.range_subset_iff]
+    intro k
+    exact ladderIterateUp_mem_saturatedFerromagnetJointEigenspace J k
+
 end LatticeSystem.Quantum
