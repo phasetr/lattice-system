@@ -2,6 +2,8 @@ import LatticeSystem.Quantum.SpinS.SaturatedLadderHEigenspace
 import LatticeSystem.Quantum.SpinS.SaturatedLadderCasimirEigenspace
 import LatticeSystem.Quantum.SpinS.MagSubspaceExtremalDim
 import LatticeSystem.Quantum.SpinS.SaturatedEigenvalueExplicit
+import LatticeSystem.Quantum.SpinS.CasimirRearrangement
+import LatticeSystem.Quantum.SpinS.LadderBoundaryAnnihilation
 
 /-!
 # The saturated-ferromagnet ladder lies in the joint
@@ -174,5 +176,94 @@ theorem totalSpinSOpPlus_mulVec_mem_saturatedFerromagnetJointEigenspace_inf_magS
         totalSpinSSquared_commute_totalSpinSOpPlus hCas
   · rw [mem_magSubspaceS_iff]
     exact totalSpinSOp3_mulVec_totalSpinSOpPlus_mulVec_eigenvec hM
+
+/-- **Injectivity of `Ŝ^+_tot` on `joint ⊓ H_M` away from the highest
+weight**: for any `v ∈ saturatedFerromagnetJointEigenspace J N ⊓
+magSubspaceS V N M` with `M ≠ m_max = |V|·N/2`, if
+`Ŝ^+_tot · v = 0` then `v = 0`.
+
+Argument via the MinusPlus Casimir rearrangement
+`Ŝ^-_tot · Ŝ^+_tot = (Ŝ_tot)² − (Ŝ^z_tot)² − Ŝ^z_tot` (PR #894):
+applying both sides to `v` gives
+`Ŝ^-_tot · Ŝ^+_tot · v = (m_max(m_max+1) − M² − M) · v
+                         = (m_max − M)(m_max + M + 1) · v`.
+If `Ŝ^+_tot · v = 0`, the LHS is `0`, so the scalar factor must
+annihilate `v`. The case `M = -m_max - 1` is ruled out because
+`magSubspaceS V N (-m_max - 1) = ⊥` (PR #905), and `M ≠ m_max`
+is the hypothesis; together they force `v = 0`.
+
+This is the kernel-trivial step for the chain
+`dim(joint ⊓ H_M) ≤ dim(joint ⊓ H_{M+1})` toward Tasaki §2.4
+Theorem 2.1. -/
+theorem totalSpinSOpPlus_mulVec_eq_zero_imp_eq_zero_of_mem_saturatedFerromagnetJointEigenspace_inf_magSubspaceS
+    [Nonempty V]
+    {J : V → V → ℂ} {M : ℂ}
+    (hMne : M ≠ (Fintype.card V : ℂ) * (N : ℂ) / 2)
+    {v : (V → Fin (N + 1)) → ℂ}
+    (hv : v ∈ saturatedFerromagnetJointEigenspace (V := V) J N
+        ⊓ magSubspaceS V N M)
+    (h_ker : (totalSpinSOpPlus V N).mulVec v = 0) :
+    v = 0 := by
+  rw [Submodule.mem_inf] at hv
+  obtain ⟨hjoint, hMmem⟩ := hv
+  unfold saturatedFerromagnetJointEigenspace at hjoint
+  rw [Submodule.mem_inf] at hjoint
+  obtain ⟨_hH, hCas⟩ := hjoint
+  rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hCas
+  have hM := (mem_magSubspaceS_iff (Λ := V) (N := N) M v).mp hMmem
+  -- `Ŝ^-_tot · Ŝ^+_tot · v = ((Ŝ_tot)² − (Ŝ^z_tot)² − Ŝ^z_tot) · v`.
+  have hRearr := totalSpinSOpMinus_mul_totalSpinSOpPlus_eq_casimir_minus_z_sq_sub_z
+    (V := V) (N := N)
+  -- Apply both sides to v.
+  have hLHS : ((totalSpinSOpMinus V N) * (totalSpinSOpPlus V N)).mulVec v
+      = 0 := by
+    rw [← Matrix.mulVec_mulVec, h_ker, Matrix.mulVec_zero]
+  have hRHS : ((totalSpinSSquared V N - totalSpinSOp3 V N * totalSpinSOp3 V N -
+        totalSpinSOp3 V N) : ManyBodyOpS V N).mulVec v =
+        (saturatedFerromagnetCasimirEigenvalueS V N - M * M - M) • v := by
+    rw [show (totalSpinSSquared V N - totalSpinSOp3 V N * totalSpinSOp3 V N -
+      totalSpinSOp3 V N : ManyBodyOpS V N) =
+      totalSpinSSquared V N - (totalSpinSOp3 V N * totalSpinSOp3 V N +
+        totalSpinSOp3 V N) from by abel]
+    rw [Matrix.sub_mulVec, hCas, Matrix.add_mulVec]
+    have h_sq : (totalSpinSOp3 V N * totalSpinSOp3 V N).mulVec v =
+        (M * M) • v := by
+      rw [← Matrix.mulVec_mulVec, hM, Matrix.mulVec_smul, hM, smul_smul]
+    rw [h_sq, hM, ← sub_sub, ← sub_smul, ← sub_smul]
+  have hzero : (saturatedFerromagnetCasimirEigenvalueS V N - M * M - M) • v = 0 := by
+    rw [← hRHS, ← hRearr]
+    exact hLHS
+  -- Factor: saturatedFerromagnetCasimirEigenvalueS - M² - M = (m_max - M)(m_max + M + 1).
+  unfold saturatedFerromagnetCasimirEigenvalueS at hzero
+  set mmax : ℂ := (Fintype.card V : ℂ) * (N : ℂ) / 2 with hmmax_def
+  have hfactor : mmax * (mmax + 1) - M * M - M = (mmax - M) * (mmax + M + 1) := by
+    ring
+  rw [hfactor] at hzero
+  rcases smul_eq_zero.mp hzero with h | h
+  · -- (mmax - M)(mmax + M + 1) = 0. Two cases.
+    rcases mul_eq_zero.mp h with h1 | h2
+    · -- mmax - M = 0, contradicting hMne.
+      exact (hMne (sub_eq_zero.mp h1).symm).elim
+    · -- mmax + M + 1 = 0, i.e., M = -mmax - 1. magSubspaceS V N M = ⊥.
+      have hMeq : M = -mmax - 1 := by linear_combination h2
+      -- Show magSubspaceS V N (-mmax - 1) = ⊥.
+      have hbot : magSubspaceS V N M = ⊥ := by
+        rw [hMeq]
+        apply magSubspaceS_eq_bot_of_not_in_spectrum
+        intro σ
+        have := magEigenvalueS_ne_neg_mMax_sub_one (V := V) (N := N) σ
+        -- this : magEigenvalueS σ ≠ (|V|·N : ℂ)/2 - ((|V|·N : ℕ) + 1 : ℕ)
+        -- We need : magEigenvalueS σ ≠ -mmax - 1
+        -- mmax = (|V|·N : ℂ)/2, so -mmax - 1 = -(|V|·N : ℂ)/2 - 1
+        -- = (|V|·N : ℂ)/2 - (|V|·N : ℂ) - 1 = (|V|·N : ℂ)/2 - ((|V|·N : ℕ) + 1 : ℕ)
+        -- (after push_cast).
+        intro heq
+        apply this
+        rw [heq]
+        push_cast
+        ring
+      rw [hbot] at hMmem
+      exact (Submodule.mem_bot _).mp hMmem
+  · exact h
 
 end LatticeSystem.Quantum

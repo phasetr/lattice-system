@@ -5676,6 +5676,36 @@ induction skeleton that propagates the 1-dim bound to every sector
 once the raising-operator injectivity on
 $\texttt{joint} \sqcap H_{M}$ for $M < m_{\max}$ is added (next PR).
 
+\textbf{Raising-operator injectivity (PR~\#2761, kernel-trivial
+step)}: the next theorem
+\texttt{totalSpinSOpPlus\_mulVec\_eq\_zero\_imp\_eq\_zero\_of\_mem\_saturatedFerromagnetJointEigenspace\_inf\_magSubspaceS}
+states that, for any
+$v \in \texttt{joint} \sqcap H_M$ with $M \neq m_{\max}$, if
+$\hat S^+_{\rm tot} \cdot v = 0$ then $v = 0$. Argument: the
+MinusPlus Casimir rearrangement
+$\hat S^-_{\rm tot} \cdot \hat S^+_{\rm tot} =
+\hat S_{\rm tot}^2 - (\hat S^z_{\rm tot})^2 - \hat S^z_{\rm tot}$
+of \#894, applied to $v$ on the joint eigenspace with the
+$\hat S^z_{\rm tot}$-eigenvalue $M$, gives
+\[
+  \hat S^-_{\rm tot} \cdot \hat S^+_{\rm tot} \cdot v
+  = (m_{\max}(m_{\max}+1) - M^2 - M)\,v
+  = (m_{\max} - M)(m_{\max} + M + 1)\,v.
+\]
+With $\hat S^+_{\rm tot} v = 0$, the LHS vanishes, so the scalar
+factor annihilates $v$. The case $M = -m_{\max} - 1$ is ruled out by
+PR~\#905 ($\texttt{magSubspaceS V N (-m\_max - 1) = \bot}$), and
+$M \neq m_{\max}$ is the hypothesis; together they force $v = 0$.
+Combined with the joint-magnetisation shift of \#2760, this means
+$\hat S^+_{\rm tot}$ restricted to
+$\texttt{joint} \sqcap H_M$ is an injective linear map into
+$\texttt{joint} \sqcap H_{M+1}$ for every $M \neq m_{\max}$, hence
+$\dim_\mathbb{C}(\texttt{joint} \sqcap H_M) \le
+\dim_\mathbb{C}(\texttt{joint} \sqcap H_{M+1})$. Iterating from
+$M = -m_{\max}$ upward propagates the 1-dim bound at $H_{m_{\max}}$
+(from \#2759) down to every sector — the final summation step is
+the next PR.
+
 \textbf{Ladder span finrank (PR~\#904)}: the new file
 \texttt{Quantum/SpinS/SaturatedLadderSpan.lean} applies mathlib's
 \texttt{finrank\_span\_eq\_card} to the LI family of \#896,
