@@ -123,9 +123,56 @@ theorem magSubspaceS_neg_mMax_inf_saturatedFerromagnetJointEigenspace
     · rw [SetLike.mem_coe, Module.End.mem_eigenspace_iff,
         Matrix.mulVecLin_apply, saturatedFerromagnetEigenvalueS_explicit,
         heisenbergHamiltonianS_mulVec_allAlignedStateS_last_eigenvalue]
-    · rw [SetLike.mem_coe, Module.End.mem_eigenspace_iff,
-        Matrix.mulVecLin_apply]
+    · rw [SetLike.mem_coe, Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
       simp [totalSpinSSquared_mulVec_allAlignedStateS_last_eigenvalue,
         saturatedFerromagnetCasimirEigenvalueS]
+
+/-- Spin-`S` analogue of `mulVec_preserves_eigenvalue_of_commute`:
+generic eigenvalue preservation under commuting operators. If
+`Commute A B` and `A.mulVec v = λ • v`, then `A.mulVec (B.mulVec v)
+= λ • B.mulVec v`. -/
+theorem mulVec_preserves_eigenvalue_of_commuteS
+    {A B : ManyBodyOpS V N} (h : Commute A B)
+    {lam : ℂ} {v : (V → Fin (N + 1)) → ℂ}
+    (hv : A.mulVec v = lam • v) :
+    A.mulVec (B.mulVec v) = lam • B.mulVec v := by
+  rw [Matrix.mulVec_mulVec, h, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul]
+
+/-- **`Ŝ^+_tot` maps `joint ⊓ H_M` into `joint ⊓ H_{M+1}`**: for any
+`v ∈ saturatedFerromagnetJointEigenspace J N ⊓ magSubspaceS V N M`,
+the vector `Ŝ^+_tot · v` lies in the next-higher magnetisation sector
+of the joint eigenspace.
+
+This is the inductive step in the chain
+`dim(joint ⊓ H_M) ≤ dim(joint ⊓ H_{M+1})` for `M < m_max` (via
+injectivity of `Ŝ^+_tot` on the joint eigenspace away from the
+highest-weight sector), which propagates the `dim = 1` bound from
+`H_{m_max}` (PR #2759) down to every sector. -/
+theorem totalSpinSOpPlus_mulVec_mem_saturatedFerromagnetJointEigenspace_inf_magSubspaceS
+    {J : V → V → ℂ} {M : ℂ} {v : (V → Fin (N + 1)) → ℂ}
+    (hv : v ∈ saturatedFerromagnetJointEigenspace (V := V) J N
+        ⊓ magSubspaceS V N M) :
+    (totalSpinSOpPlus V N).mulVec v ∈
+      saturatedFerromagnetJointEigenspace (V := V) J N
+        ⊓ magSubspaceS V N (M + 1) := by
+  rw [Submodule.mem_inf] at hv
+  obtain ⟨hjoint, hM⟩ := hv
+  unfold saturatedFerromagnetJointEigenspace at hjoint
+  rw [Submodule.mem_inf] at hjoint
+  obtain ⟨hH, hCas⟩ := hjoint
+  rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hH hCas
+  rw [mem_magSubspaceS_iff] at hM
+  refine Submodule.mem_inf.mpr ⟨?_, ?_⟩
+  · unfold saturatedFerromagnetJointEigenspace
+    refine Submodule.mem_inf.mpr ⟨?_, ?_⟩
+    · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+      exact mulVec_preserves_eigenvalue_of_commuteS
+        (heisenbergHamiltonianS_commute_totalSpinSOpPlus J) hH
+    · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+      exact mulVec_preserves_eigenvalue_of_commuteS
+        totalSpinSSquared_commute_totalSpinSOpPlus hCas
+  · rw [mem_magSubspaceS_iff]
+    exact totalSpinSOp3_mulVec_totalSpinSOpPlus_mulVec_eigenvec hM
 
 end LatticeSystem.Quantum
