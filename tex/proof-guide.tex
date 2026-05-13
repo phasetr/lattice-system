@@ -5706,6 +5706,23 @@ $M = -m_{\max}$ upward propagates the 1-dim bound at $H_{m_{\max}}$
 (from \#2759) down to every sector — the final summation step is
 the next PR.
 
+\textbf{Linear-map packaging and finrank chain (PR~\#2762)}: the
+three theorems
+\texttt{totalSpinSOpPlusJointMagShift J M},
+\texttt{totalSpinSOpPlusJointMagShift\_injective}, and
+\texttt{saturatedFerromagnetJointEigenspace\_inf\_magSubspaceS\_finrank\_le\_succ}
+package PR \#2760 (joint-magnetisation shift) and PR \#2761
+(kernel-trivial) into a single \texttt{LinearMap} between the
+joint-magnetisation sectors and apply mathlib's
+\texttt{LinearMap.finrank\_le\_finrank\_of\_injective} to derive
+$\dim_\mathbb{C}(\texttt{joint} \sqcap H_M) \le
+\dim_\mathbb{C}(\texttt{joint} \sqcap H_{M+1})$ for every
+$M \neq m_{\max}$. The final step (subsequent PR) iterates this
+chain from $M = -m_{\max}$ upward and sums the per-sector $\le 1$
+bounds across the $(2m_{\max}+1)$ values of $M$ in the spectrum,
+using the magnetisation direct-sum decomposition (\#889) and the
+$H_{m_{\max}}$ base case (\#2759).
+
 \textbf{Ladder span finrank (PR~\#904)}: the new file
 \texttt{Quantum/SpinS/SaturatedLadderSpan.lean} applies mathlib's
 \texttt{finrank\_span\_eq\_card} to the LI family of \#896,
