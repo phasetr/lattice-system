@@ -329,4 +329,55 @@ theorem saturatedFerromagnetJointEigenspace_inf_magSubspaceS_finrank_le_succ
   LinearMap.finrank_le_finrank_of_injective
     (totalSpinSOpPlusJointMagShift_injective J hMne)
 
+/-- **`dim(joint ⊓ H_{m_max - k}) ≤ 1` for every `k : ℕ`**.
+
+Per-sector bound on the joint eigenspace dimension, parameterised by
+the integer offset `k` from the highest-weight magnetisation
+`m_max = |V|·N/2`. Proved by induction on `k`:
+- `k = 0`: `joint ⊓ H_{m_max} = span {|σ_⊤⟩}` is 1-dim (PR #2759).
+- `k → k + 1`: at `M = m_max - (k + 1)` we have `M ≠ m_max`, so the
+  finrank chain (`saturatedFerromagnetJointEigenspace_inf_magSubspaceS_finrank_le_succ`)
+  gives `finrank(joint ⊓ H_M) ≤ finrank(joint ⊓ H_{M + 1})
+                                = finrank(joint ⊓ H_{m_max - k}) ≤ 1` by IH.
+
+This is the iterated form of the chain. Summing over the
+`2m_max + 1` values of `k ∈ {0, 1, ..., 2m_max}` corresponding to
+the spectrum of `Ŝ^z_tot` yields `dim(joint) ≤ 2m_max + 1`, the
+final ingredient for Tasaki §2.4 Theorem 2.1. -/
+theorem saturatedFerromagnetJointEigenspace_inf_magSubspaceS_finrank_le_one
+    [Nonempty V] (J : V → V → ℂ) (k : ℕ) :
+    Module.finrank ℂ
+      (saturatedFerromagnetJointEigenspace (V := V) J N
+        ⊓ magSubspaceS V N
+          (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (k : ℂ))
+        : Submodule ℂ ((V → Fin (N + 1)) → ℂ)) ≤ 1 := by
+  induction k with
+  | zero =>
+    -- Base: M = m_max - 0 = m_max. Use PR #2759.
+    have h_eq : ((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((0 : ℕ) : ℂ) =
+        (Fintype.card V : ℂ) * (N : ℂ) / 2 := by
+      push_cast
+      ring
+    rw [h_eq, inf_comm,
+      magSubspaceS_mMax_inf_saturatedFerromagnetJointEigenspace J]
+    -- finrank (span {|σ_⊤⟩}) = 1.
+    rw [finrank_span_singleton]
+    · exact allAlignedStateS_ne_zero (0 : Fin (N + 1))
+  | succ n ih =>
+    -- Step: M = m_max - (n+1). Apply chain to get ≤ finrank at m_max - n ≤ 1 by IH.
+    have hMne : ((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((n + 1 : ℕ) : ℂ) ≠
+        (Fintype.card V : ℂ) * (N : ℂ) / 2 := by
+      intro h
+      have : ((n + 1 : ℕ) : ℂ) = 0 := by linear_combination -h
+      have hh : (n + 1 : ℝ) = 0 := by exact_mod_cast this
+      linarith
+    have h_chain := saturatedFerromagnetJointEigenspace_inf_magSubspaceS_finrank_le_succ
+      (V := V) (N := N) J hMne
+    have h_succ_eq : (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((n + 1 : ℕ) : ℂ)) + 1 =
+        ((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((n : ℕ) : ℂ) := by
+      push_cast
+      ring
+    rw [h_succ_eq] at h_chain
+    exact le_trans h_chain ih
+
 end LatticeSystem.Quantum
