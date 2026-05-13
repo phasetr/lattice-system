@@ -5874,6 +5874,31 @@ finrank equality of \#2769 and the raising-side annihilation of
 $(2m_{\max}+1)$-dimensional spin-$m_{\max}$ representation of
 $su(2)$ under the total-spin generators.
 
+\textbf{$\hat S^+_{\rm tot}$ invariance (PR~\#2771)}: the new file
+\texttt{Quantum/SpinS/SaturatedLadderRaisingInvariant.lean}
+completes the operational $su(2)$ statement on the raising side.
+Per-iterate action:
+\texttt{totalSpinSOpPlus\_mulVec\_ladderIterateUp\_zero} gives
+$\hat S^+_{\rm tot}\cdot\texttt{ladderIterateUp V N }\langle 0,
+\cdot\rangle = 0$ (top-weight annihilation, via PR \#877's
+\texttt{totalSpinSOpPlus\_mulVec\_allAlignedStateS\_zero});
+\texttt{totalSpinSOpPlus\_mulVec\_ladderIterateUp\_succ} gives
+$\hat S^+_{\rm tot}\cdot\texttt{ladderIterateUp V N }\langle j+1,
+\cdot\rangle = ((j+1)\cdot(|V|\cdot N - j))\cdot
+\texttt{ladderIterateUp V N }\langle j, \cdot\rangle$ (Casimir-
+rearrangement scalar identity from PRs \#882, \#887, \#894 packaged
+as
+\texttt{totalSpinSOpPlus\_mulVec\_totalSpinSOpMinus\_pow\_succ\_allAlignedStateS\_zero}).
+Lifted via the same
+\texttt{Submodule.map\_span} + \texttt{Submodule.span\_le} pattern
+of PR \#2770 to the global invariance
+$\texttt{Submodule.map}\,\hat S^+_{\rm tot}.\texttt{mulVecLin}\,
+(\texttt{joint J N}) \le \texttt{joint J N}$. Together with
+\#2770, this establishes invariance of \texttt{joint J N} under
+both $su(2)$ ladder generators, completing the operational
+identification with the $(2m_{\max}+1)$-dim spin-$m_{\max}$
+irreducible representation.
+
 \textbf{Boundary annihilation (PR~\#905)}: the new file
 \texttt{Quantum/SpinS/LadderBoundaryAnnihilation.lean} caps the
 ladder at exactly $2m_{\max}+1$ non-zero terms by proving
