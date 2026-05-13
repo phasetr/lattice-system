@@ -5732,8 +5732,9 @@ states that for every $k \in \mathrm{Fin}(|V|\cdot N + 1)$,
 \]
 Argument: the LHS is $\le 1$-dim (\#2763) and contains the non-zero
 ladder iterate $(\hat S^-_{\rm tot})^k |\sigma_\top\rangle$
-(membership: \#2762 for the joint side, \texttt{\_mem\_magSubspaceS}
-for the magnetisation side; non-vanishing: \#895). Conclude by
+(joint membership: \#903 \texttt{ladderIterateUp\_mem\_saturatedFerromagnetJointEigenspace};
+magnetisation membership: \#889 via \#887 \texttt{totalSpinSOpMinus\_pow\_allAlignedStateS\_zero\_mem\_magSubspaceS};
+non-vanishing: \#895). Conclude by
 \texttt{Submodule.eq\_of\_le\_of\_finrank\_le}. Each ladder iterate
 is thereby identified as the unique (up to scaling) non-zero
 vector in its joint-magnetisation sector. Summing over the
