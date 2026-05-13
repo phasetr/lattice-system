@@ -5748,10 +5748,20 @@ $\hat H \cdot \texttt{magProjFn M v} =
 \texttt{magProjFn M} (\hat H \cdot v)$,
 proved by case analysis on $\texttt{magEigenvalueS}~\sigma = M$
 together with the matrix-entry vanishing for
-$\hat H \cdot \texttt{basisVecS}~\tau$ (PR~\#1078). Subsequent PRs
-will prove (v) Casimir commutation, (vi) joint preservation
+$\hat H \cdot \texttt{basisVecS}~\tau$ (PR~\#1078). \textbf{Casimir commutation + joint preservation (PR~\#2767)}:
+extends the framework with (v) the Casimir commutation
+\texttt{totalSpinSSquared\_mulVec\_magProjFn\_eq}:
+$(\hat S_{\rm tot})^2 \cdot \texttt{magProjFn M v} =
+\texttt{magProjFn M} ((\hat S_{\rm tot})^2 \cdot v)$
+(same matrix-entry-vanishing argument as the Heisenberg case),
+and (vi) the joint preservation
+\texttt{magProjFn\_mem\_saturatedFerromagnetJointEigenspace}:
 $\texttt{magProjFn M v} \in \texttt{joint}$ for $v \in \texttt{joint}$,
-and (vii) the decomposition
+by combining the two commutations with \texttt{magProjFn\_smul} —
+the H- and Casimir-eigenvalues factor through the projector since
+$\texttt{magProjFn M}(c \cdot v) = c \cdot \texttt{magProjFn M v}$.
+
+The remaining subsequent PR will prove (vii) the decomposition
 $v = \sum_k \texttt{magProjFn}(m_{\max} - k.\textrm{val})~v$,
 closing $\texttt{joint} \subseteq \texttt{span}(\texttt{ladderIterateUp})$
 and hence $\texttt{joint} = \texttt{span}(\texttt{ladderIterateUp})$

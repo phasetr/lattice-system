@@ -6,6 +6,7 @@ import LatticeSystem.Quantum.SpinS.CasimirRearrangement
 import LatticeSystem.Quantum.SpinS.LadderBoundaryAnnihilation
 import LatticeSystem.Quantum.SpinS.MagnetizationDirectSum
 import LatticeSystem.Quantum.SpinS.IterateInductiveNonvanishing
+import LatticeSystem.Quantum.SpinS.ToyHamiltonianCasimir
 
 /-!
 # The saturated-ferromagnet ladder lies in the joint
@@ -628,5 +629,85 @@ theorem heisenbergHamiltonianS_mulVec_magProjFn_eq
       show heisenbergHamiltonianS J N σ τ * magProjFn M v τ = 0
       unfold magProjFn
       rw [if_neg hτM, mul_zero]
+
+/-- **Commutation `(Ŝ_tot)² · magProjFn M v = magProjFn M ((Ŝ_tot)² · v)`**.
+
+Same matrix-entry-vanishing argument as the Heisenberg case
+(PR #2766), now applied to `(Ŝ_tot)² · basisVecS τ`
+(`totalSpinSSquared_mulVec_mem_magSubspaceS` from PR #1078). -/
+theorem totalSpinSSquared_mulVec_magProjFn_eq
+    (M : ℂ) (v : (V → Fin (N + 1)) → ℂ) :
+    (totalSpinSSquared V N).mulVec (magProjFn (V := V) (N := N) M v) =
+      magProjFn (V := V) (N := N) M
+        ((totalSpinSSquared V N).mulVec v) := by
+  funext σ
+  by_cases hσM : magEigenvalueS σ = M
+  · have hRHS : magProjFn M ((totalSpinSSquared V N).mulVec v) σ =
+        (totalSpinSSquared V N).mulVec v σ := by
+      unfold magProjFn
+      simp [hσM]
+    rw [hRHS]
+    rw [Matrix.mulVec, dotProduct, Matrix.mulVec, dotProduct]
+    apply Finset.sum_congr rfl
+    intro τ _
+    by_cases hτM : magEigenvalueS τ = M
+    · show totalSpinSSquared V N σ τ * magProjFn M v τ =
+        totalSpinSSquared V N σ τ * v τ
+      unfold magProjFn
+      rw [if_pos hτM]
+    · show totalSpinSSquared V N σ τ * magProjFn M v τ =
+        totalSpinSSquared V N σ τ * v τ
+      have h_basis_mem : (totalSpinSSquared V N).mulVec (basisVecS τ) ∈
+          magSubspaceS V N (magEigenvalueS τ) :=
+        totalSpinSSquared_mulVec_mem_magSubspaceS (Λ := V) N
+          (magEigenvalueS τ) (basisVecS_mem_magSubspaceS τ)
+      have hne : magEigenvalueS σ ≠ magEigenvalueS τ := by
+        rw [hσM]; exact Ne.symm hτM
+      rw [matrix_entry_eq_zero_of_mulVec_basisVecS_mem_magSubspaceS
+        h_basis_mem hne]
+      ring
+  · have hRHS : magProjFn M ((totalSpinSSquared V N).mulVec v) σ = 0 := by
+      unfold magProjFn
+      simp [hσM]
+    rw [hRHS]
+    rw [Matrix.mulVec, dotProduct]
+    apply Finset.sum_eq_zero
+    intro τ _
+    by_cases hτM : magEigenvalueS τ = M
+    · have h_basis_mem : (totalSpinSSquared V N).mulVec (basisVecS τ) ∈
+          magSubspaceS V N (magEigenvalueS τ) :=
+        totalSpinSSquared_mulVec_mem_magSubspaceS (Λ := V) N
+          (magEigenvalueS τ) (basisVecS_mem_magSubspaceS τ)
+      have hne : magEigenvalueS σ ≠ magEigenvalueS τ := by
+        rw [hτM]; exact hσM
+      show totalSpinSSquared V N σ τ * magProjFn M v τ = 0
+      rw [matrix_entry_eq_zero_of_mulVec_basisVecS_mem_magSubspaceS
+        h_basis_mem hne, zero_mul]
+    · show totalSpinSSquared V N σ τ * magProjFn M v τ = 0
+      unfold magProjFn
+      rw [if_neg hτM, mul_zero]
+
+/-- **`magProjFn M v ∈ joint` for `v ∈ joint`**: the pointwise
+magnetisation projector preserves the saturated-ferromagnet joint
+eigenspace.
+
+Direct from the H and Casimir commutations
+(`heisenbergHamiltonianS_mulVec_magProjFn_eq`,
+`totalSpinSSquared_mulVec_magProjFn_eq`) plus the linearity
+`magProjFn_smul`. -/
+theorem magProjFn_mem_saturatedFerromagnetJointEigenspace
+    {J : V → V → ℂ} {M : ℂ} {v : (V → Fin (N + 1)) → ℂ}
+    (hv : v ∈ saturatedFerromagnetJointEigenspace (V := V) J N) :
+    magProjFn (V := V) (N := N) M v ∈
+      saturatedFerromagnetJointEigenspace (V := V) J N := by
+  unfold saturatedFerromagnetJointEigenspace at hv ⊢
+  rw [Submodule.mem_inf] at hv
+  obtain ⟨hH, hCas⟩ := hv
+  rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hH hCas
+  refine Submodule.mem_inf.mpr ⟨?_, ?_⟩
+  · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+    rw [heisenbergHamiltonianS_mulVec_magProjFn_eq, hH, magProjFn_smul]
+  · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+    rw [totalSpinSSquared_mulVec_magProjFn_eq, hCas, magProjFn_smul]
 
 end LatticeSystem.Quantum
