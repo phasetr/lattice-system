@@ -5516,6 +5516,16 @@ via \texttt{Submodule.finrank\_mono}. This is the operator-level
 version of the Theorem 2.3 degeneracy $2 S_{\rm tot} + 1$ lower
 bound, applied directly to the $\hat H_{\rm toy_S}$-eigenspace.
 
+\textbf{Step 19 (PR~\#2790)}: opposite saturated case
+$\hat H_{\rm toy_S}(\neg A)$-eigenspace finrank lower bound in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyEigenspaceFinrankOppositeSaturated.lean}.
+Mirror of PR \#2789 via PR \#2788. When $|A| = 0$, the
+$\hat H_{\rm toy_S}(\neg A)$-eigenspace at
+\texttt{bipartiteToyMinEnergyPredicted ($\neg$A) N} has finrank
+$\ge |V|\cdot N + 1$. Since the toy Hamiltonian is sublattice-
+swap invariant, this also applies to the original-orientation
+toy Hamiltonian.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
