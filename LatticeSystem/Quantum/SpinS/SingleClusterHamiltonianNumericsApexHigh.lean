@@ -43,6 +43,17 @@ had been appended (16 spin rows). Still well below the split
 threshold; kept as a single file. Future split (refactor #24 or
 later) anticipated once `ApexHigh` approaches ~3000 lines
 (~12-14 more spin rows of growth, around N=230+).
+
+**Refactor #24 (evaluate-only, γ-5 step 1631 close):** measured
+`ApexHigh` at 2354 lines / 6.94 s user CPU after N=199..222 entries
+had been appended (24 spin rows; closes spin-111 row at z=6, N=222).
+Still below the refactor #17/#19/#21 split threshold of
+~3211 lines / ~9.3 s, but approaching the trend point. The 50-PR
+cadence aligned cleanly to the spin-111 row boundary (49 numerics
+PRs since refactor #23 PR #2653). Kept as a single file; next
+refactor #25 will likely reassess at a closer row-boundary, with
+the actual split (refactor #26 or #27) anticipated near N≈230
+once `ApexHigh` crosses ~3000 lines / ~9 s user CPU.
 -/
 
 namespace LatticeSystem.Quantum
