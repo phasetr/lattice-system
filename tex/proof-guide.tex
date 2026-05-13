@@ -5368,6 +5368,17 @@ vanishes, predicted energy $= -2 s_A(s_A+1)$ (the
 ``anti-ferromagnetic-saturation'' value).
 \end{itemize}
 
+\textbf{Step 9 (PR~\#2780)}: complement-orientation gap identity
+in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergyComplement.lean}.
+\texttt{bipartiteToyMinEnergyPredicted A N -
+bipartiteToyMinEnergyPredicted ($\neg$A) N $=$
+$(|A| - |\neg A|)\cdot N$}. The signed-difference imbalance in
+PR \#2778 is orientation-dependent; the actual Tasaki prediction
+$\min(E(A), E(\neg A))$ uses the orientation with the larger
+sublattice. Direct ring computation from PR \#2779's simplified
+form via filter congruence $\neg\neg A = A$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
