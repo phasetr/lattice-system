@@ -2666,4 +2666,20 @@ namespace LatticeSystem.Quantum
   push_cast
   ring
 
+/-- **Spin-113 trimer ground-state energy** (γ-5 step 1651):
+`singleClusterGSEnergyS 2 226 = -25651 = -S(1+zS)` for `S = 113, z = 2`. -/
+@[simp] theorem singleClusterGSEnergyS_two_twohundredtwentysix :
+    singleClusterGSEnergyS 2 226 = (-25651 : ℂ) := by
+  unfold singleClusterGSEnergyS
+  push_cast
+  ring
+
+/-- **Spin-113 trimer maximum-Casimir-sector energy** (γ-5 step 1651):
+`singleClusterMaxEnergyS 2 226 = 25538 = zS²` for `S = 113, z = 2`. -/
+@[simp] theorem singleClusterMaxEnergyS_two_twohundredtwentysix :
+    singleClusterMaxEnergyS 2 226 = (25538 : ℂ) := by
+  unfold singleClusterMaxEnergyS
+  push_cast
+  ring
+
 end LatticeSystem.Quantum
