@@ -5656,6 +5656,26 @@ SU(2) representation). The intermediate sectors $M$ with
 $-m_{\max} < M < m_{\max}$ require the $\hat S^\mp_{\rm tot}$
 lowering-injectivity argument (subsequent PR).
 
+\textbf{Raising-operator joint-magnetisation shift (PR~\#2760,
+inductive step)}: the next theorem
+\texttt{totalSpinSOpPlus\_mulVec\_mem\_saturatedFerromagnetJointEigenspace\_inf\_magSubspaceS}
+states that, for any
+$v \in \texttt{joint} \sqcap H_M$,
+$\hat S^+_{\rm tot} \cdot v \in \texttt{joint} \sqcap H_{M+1}$.
+Argument: $[\hat H, \hat S^+_{\rm tot}] = [\hat S_{\rm tot}^2,
+\hat S^+_{\rm tot}] = 0$ (\#881, \#882) preserve the joint
+eigenvalues, while
+$[\hat S^z_{\rm tot}, \hat S^+_{\rm tot}] = +\hat S^+_{\rm tot}$
+shifts the magnetic quantum number by $+1$
+(\#887 \texttt{\_OpPlus\_mulVec\_eigenvec}). The companion lemma
+\texttt{mulVec\_preserves\_eigenvalue\_of\_commuteS} is the spin-$S$
+analogue of the generic eigenvalue propagation lemma in
+\texttt{Quantum/TotalSpin/Casimir.lean}. Combined with the
+$M = m_{\max}$ extremal 1-dim result of \#2759, this establishes the
+induction skeleton that propagates the 1-dim bound to every sector
+once the raising-operator injectivity on
+$\texttt{joint} \sqcap H_{M}$ for $M < m_{\max}$ is added (next PR).
+
 \textbf{Ladder span finrank (PR~\#904)}: the new file
 \texttt{Quantum/SpinS/SaturatedLadderSpan.lean} applies mathlib's
 \texttt{finrank\_span\_eq\_card} to the LI family of \#896,
