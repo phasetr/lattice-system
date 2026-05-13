@@ -5412,6 +5412,18 @@ s_A(s_A+1)\cdot|\sigma_\top\rangle$ (PR \#1067).
 collapsing the eigenvalue formula).
 \end{itemize}
 
+\textbf{Step 12 (PR~\#2783)}: all-down version of Step 11 in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGroundStateSaturatedLast.lean}.
+For $|\neg A| = 0$, $|\sigma_\bot\rangle$ is also in
+\texttt{bipartiteToyGroundStateSubspacePredicted A N}, via the
+`\_last` variants of the same three eigenvector lemmas (PR \#879
+total Casimir on all-down, PR \#1067 sublattice Casimir on
+all-down). Together with PR \#2782, gives two distinct elements
+of the predicted GS subspace (and via the saturated-ferromagnet
+ladder of PRs \#896 / \#2768, the entire $(2 s_A + 1)$-dim irrep
+sits inside, confirming the subspace has the correct
+$(2 m_{\max} + 1)$ dimension in the saturated case).
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
