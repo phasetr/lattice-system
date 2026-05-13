@@ -5395,6 +5395,23 @@ congruence). Sublattice-swap invariant:
 \texttt{Symm ($\neg$A) N $=$ Symm A N} via
 \texttt{Nat.min\_comm}.
 
+\textbf{Step 11 (PR~\#2782)}: non-emptiness of the predicted GS
+subspace in the saturated edge case ($|\neg A| = 0$) in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGroundStateSaturated.lean}.
+For $|\neg A| = 0$, the all-up state $|\sigma_\top\rangle$ is in
+\texttt{bipartiteToyGroundStateSubspacePredicted A N}, the first
+concrete realisation of PR \#2778's predicted ground-state
+subspace. Three eigenvector witnesses:
+\begin{itemize}
+\item $(\hat S_{\rm tot})^2\cdot|\sigma_\top\rangle =
+s_A(s_A+1)\cdot|\sigma_\top\rangle$ (PR \#878 with $|V| = |A|$).
+\item $(\hat S_A)^2\cdot|\sigma_\top\rangle =
+s_A(s_A+1)\cdot|\sigma_\top\rangle$ (PR \#1067).
+\item $(\hat S_{\neg A})^2\cdot|\sigma_\top\rangle =
+0\cdot|\sigma_\top\rangle$ (PR \#1067 with $|\neg A| = 0$
+collapsing the eigenvalue formula).
+\end{itemize}
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
