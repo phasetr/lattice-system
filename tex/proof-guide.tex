@@ -5899,6 +5899,40 @@ both $su(2)$ ladder generators, completing the operational
 identification with the $(2m_{\max}+1)$-dim spin-$m_{\max}$
 irreducible representation.
 
+\textbf{Full Cartesian $su(2)$ closure (PR~\#2772)}: the new file
+\texttt{Quantum/SpinS/SaturatedLadderCartesianInvariant.lean}
+completes the operational $su(2)$-module structure of the
+saturated joint eigenspace. Two total-operator identities lift the
+single-site definitions of \texttt{spinSOp1} / \texttt{spinSOp2}:
+$\hat S^{(1)}_{\rm tot} = (1/2)(\hat S^+_{\rm tot} +
+\hat S^-_{\rm tot})$
+(\texttt{totalSpinSOp1\_eq\_one\_half\_smul\_plus\_add\_minus}) and
+$\hat S^{(2)}_{\rm tot} = (1/(2 i))(\hat S^+_{\rm tot} -
+\hat S^-_{\rm tot})$
+(\texttt{totalSpinSOp2\_eq\_one\_over\_two\_I\_smul\_plus\_sub\_minus}),
+both via \texttt{onSiteS\_smul} + \texttt{onSiteS\_add/sub}.
+The $\hat S^{(1)}_{\rm tot}$ and $\hat S^{(2)}_{\rm tot}$
+invariances
+(\texttt{saturatedFerromagnetJointEigenspace\_totalSpinSOp\{1,2\}\_invariant})
+reduce via these decompositions to the ladder invariances of PRs
+\#2770 / \#2771 plus submodule add/sub/smul closure. The
+$\hat S^{(3)}_{\rm tot}$ case
+(\texttt{saturatedFerromagnetJointEigenspace\_totalSpinSOp3\_invariant})
+is independent: each ladder iterate is an
+$\hat S^z_{\rm tot}$-eigenvector at eigenvalue $m_{\max}-k$
+(\texttt{ladderIterateUp\_mem\_eigenspace}), so its
+$\hat S^z_{\rm tot}$-image is a scalar multiple of the same
+iterate, still in $\texttt{span}(\texttt{ladderIterateUp}) =
+\texttt{joint J N}$ (\#2768). The three together establish
+invariance under all $su(2)$ generators acting through the
+total-spin operators, completing the operational identification of
+the saturated joint eigenspace with the $(2m_{\max}+1)$-dim
+irreducible representation of $su(2)$ at top weight $m_{\max}$.
+This finishes the operational closure of Tasaki §2.4 Theorem 2.1
+on top of \#2768 (joint = span ladder), \#2769 (finrank
+$= 2m_{\max}+1$), \#2770 ($\hat S^-_{\rm tot}$ invariance), and
+\#2771 ($\hat S^+_{\rm tot}$ invariance).
+
 \textbf{Boundary annihilation (PR~\#905)}: the new file
 \texttt{Quantum/SpinS/LadderBoundaryAnnihilation.lean} caps the
 ladder at exactly $2m_{\max}+1$ non-zero terms by proving
