@@ -5379,6 +5379,22 @@ $\min(E(A), E(\neg A))$ uses the orientation with the larger
 sublattice. Direct ring computation from PR \#2779's simplified
 form via filter congruence $\neg\neg A = A$.
 
+\textbf{Step 10 (PR~\#2781)}: sublattice-swap symmetric predicted
+min energy in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymm.lean}.
+\texttt{bipartiteToyMinEnergyPredictedSymm A N}~:=~
+$-|A|\cdot|\neg A|\cdot N^2/2 - \min(|A|, |\neg A|)\cdot N$, the
+true Tasaki §2.5 Theorem 2.3 prediction independent of
+orientation. Bridges:
+\texttt{bipartiteToyMinEnergyPredictedSymm}~$=$~
+\texttt{bipartiteToyMinEnergyPredicted A N} when
+$|\neg A| \le |A|$ (via \texttt{Nat.min\_eq\_right}); equals
+\texttt{bipartiteToyMinEnergyPredicted ($\neg$A) N} when
+$|A| \le |\neg A|$ (via \texttt{Nat.min\_eq\_left} + filter
+congruence). Sublattice-swap invariant:
+\texttt{Symm ($\neg$A) N $=$ Symm A N} via
+\texttt{Nat.min\_comm}.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
