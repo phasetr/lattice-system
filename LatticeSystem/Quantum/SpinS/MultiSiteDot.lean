@@ -37,6 +37,13 @@ noncomputable def spinSDot (x y : Λ) (N : ℕ) : ManyBodyOpS Λ N :=
     onSiteS x (spinSOp2 N) * onSiteS y (spinSOp2 N) +
     onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
 
+/-- Definitional unfolding of `spinSDot`. -/
+theorem spinSDot_def (x y : Λ) (N : ℕ) :
+    spinSDot x y N =
+      onSiteS x (spinSOp1 N) * onSiteS y (spinSOp1 N) +
+        onSiteS x (spinSOp2 N) * onSiteS y (spinSOp2 N) +
+        onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N) := rfl
+
 /-- Symmetry of the two-site dot product: `Ŝ_x · Ŝ_y = Ŝ_y · Ŝ_x`. -/
 theorem spinSDot_comm (x y : Λ) (N : ℕ) :
     (spinSDot x y N : ManyBodyOpS Λ N) = spinSDot y x N := by
@@ -100,6 +107,163 @@ theorem sum_spinSDot_self {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (N : ℕ) :
   rw [← Nat.cast_smul_eq_nsmul ℂ (Fintype.card Λ)]
   rw [smul_smul]
 
+/-- Symmetry of the spin-`S` two-site dot product (alternative form):
+`spinSDot x y N = spinSDot y x N` for any `x, y` (no `≠` required). -/
+theorem spinSDot_swap {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (x y : Λ) (N : ℕ) :
+    spinSDot x y N = spinSDot y x N :=
+  spinSDot_comm x y N
+
+/-- The two-site spin-`S` dot product is Hermitian (`Matrix.IsHermitian`)
+specifically: `(spinSDot x y N).IsHermitian`. Restated form of β-3g
+for direct use. -/
+theorem spinSDot_isHermitian_restated {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (x y : Λ) (N : ℕ) :
+    (spinSDot x y N : ManyBodyOpS Λ N).IsHermitian :=
+  spinSDot_isHermitian x y N
+
+/-- `spinSDot x y N` and `spinSDot y x N` are the same Hermitian
+operator (combining `spinSDot_comm` with Hermiticity). -/
+theorem spinSDot_swap_isHermitian
+    {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (x y : Λ) (N : ℕ) :
+    (spinSDot y x N : ManyBodyOpS Λ N).IsHermitian := by
+  rw [← spinSDot_comm x y N]
+  exact spinSDot_isHermitian x y N
+
+/-- For `x = y`, the same-site dot product equals `(N(N+2)/4) • 1`
+(restated for emphasis). -/
+theorem spinSDot_self_eq {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (x : Λ) (N : ℕ) :
+    (spinSDot x x N : ManyBodyOpS Λ N) =
+      ((N : ℂ) * (N + 2) / 4) • 1 :=
+  spinSDot_self x N
+
+/-- `spinSDot x x 0` (trivial spin) equals zero. -/
+theorem spinSDot_self_N_zero {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (x : Λ) :
+    (spinSDot x x 0 : ManyBodyOpS Λ 0) = 0 := by
+  rw [spinSDot_self]
+  simp
+
+
+/-- `spinSDot x x N` is a scalar multiple of the identity, hence
+commutes with every operator. -/
+theorem spinSDot_self_commute (x : Λ) (N : ℕ) (B : ManyBodyOpS Λ N) :
+    Commute (spinSDot x x N) B := by
+  rw [spinSDot_self]
+  unfold Commute SemiconjBy
+  rw [Matrix.smul_mul, Matrix.mul_smul, Matrix.one_mul, Matrix.mul_one]
+
+/-- The same-site dot product matrix element on basis configurations:
+`(spinSDot x x N) σ τ = (N(N+2)/4) δ_{σ,τ}` (delta-diagonal). -/
+theorem spinSDot_self_apply (x : Λ) (N : ℕ) (σ τ : Λ → Fin (N + 1)) :
+    (spinSDot x x N : ManyBodyOpS Λ N) σ τ =
+      ((N : ℂ) * (N + 2) / 4) * (if σ = τ then 1 else 0) := by
+  rw [spinSDot_self]
+  rw [Matrix.smul_apply]
+  rw [Matrix.one_apply]
+  rw [smul_eq_mul]
+
+/-- For `σ ≠ τ`, the same-site dot product matrix element vanishes. -/
+theorem spinSDot_self_apply_eq_zero_of_ne (x : Λ) (N : ℕ)
+    {σ τ : Λ → Fin (N + 1)} (hne : σ ≠ τ) :
+    (spinSDot x x N : ManyBodyOpS Λ N) σ τ = 0 := by
+  rw [spinSDot_self_apply, if_neg hne, mul_zero]
+
+/-- The diagonal same-site dot product matrix element. -/
+theorem spinSDot_self_apply_diag (x : Λ) (N : ℕ) (σ : Λ → Fin (N + 1)) :
+    (spinSDot x x N : ManyBodyOpS Λ N) σ σ = (N : ℂ) * (N + 2) / 4 := by
+  rw [spinSDot_self_apply, if_pos rfl, mul_one]
+
+/-- The same-site dot product diagonal value `N(N+2)/4` is non-negative. -/
+theorem spinSDot_self_apply_diag_re_nonneg (x : Λ) (N : ℕ)
+    (σ : Λ → Fin (N + 1)) :
+    0 ≤ ((spinSDot x x N : ManyBodyOpS Λ N) σ σ).re := by
+  rw [spinSDot_self_apply_diag]
+  rw [show (((N : ℂ) * (N + 2) / 4)).re = ((N : ℝ) * (N + 2) / 4) from by simp]
+  positivity
+
+/-- For `σ' ≠ σ`, the same-site dot product real-part vanishes. -/
+theorem spinSDot_self_apply_re_eq_zero_of_ne (x : Λ) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)} (hne : σ' ≠ σ) :
+    ((spinSDot x x N : ManyBodyOpS Λ N) σ' σ).re = 0 := by
+  rw [spinSDot_self_apply_eq_zero_of_ne x N hne]
+  simp
+
+/-- For `x ≠ y`, the matrix element of `Ŝ_x · Ŝ_y` between
+configurations differing off the two-site set `{x, y}` is zero
+(the operator only acts on `x` and `y`). -/
+theorem spinSDot_apply_eq_zero_of_off_two_site_diff
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ¬ ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ = 0 := by
+  unfold spinSDot
+  simp only [Matrix.add_apply]
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, onSiteS_mul_onSiteS_apply_eq hxy,
+      onSiteS_mul_onSiteS_apply_eq hxy]
+  rw [if_neg h, if_neg h, if_neg h]
+  ring
+
+/-- For `x ≠ y`, the diagonal matrix element of `Ŝ_x · Ŝ_y` reduces
+to the product of the two `Ŝ^{(3)}` eigenvalues:
+`(Ŝ_x · Ŝ_y) σ σ = (N/2 - σ_x.val)(N/2 - σ_y.val)`.
+
+The `Ŝ^{(1)} ⊗ Ŝ^{(1)}` and `Ŝ^{(2)} ⊗ Ŝ^{(2)}` parts vanish on the
+diagonal (their factors are off-diagonal). -/
+theorem spinSDot_apply_diag_of_ne
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ) (σ : Λ → Fin (N + 1)) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ σ =
+      ((N : ℂ) / 2 - (σ x).val) * ((N : ℂ) / 2 - (σ y).val) := by
+  unfold spinSDot
+  simp only [Matrix.add_apply]
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, onSiteS_mul_onSiteS_apply_eq hxy,
+      onSiteS_mul_onSiteS_apply_eq hxy]
+  have hagree : ∀ k : Λ, k ≠ x → k ≠ y → σ k = σ k := fun _ _ _ => rfl
+  rw [if_pos hagree, if_pos hagree, if_pos hagree]
+  rw [spinSOp1_apply_diag, spinSOp2_apply_diag,
+      spinSOp3_apply_diag, spinSOp3_apply_diag]
+  ring
+
+/-- The same-site dot product matrix element has zero imaginary part:
+the matrix is a real scalar multiple of the identity. -/
+theorem spinSDot_self_apply_im_zero (x : Λ) (N : ℕ)
+    (σ' σ : Λ → Fin (N + 1)) :
+    ((spinSDot x x N : ManyBodyOpS Λ N) σ' σ).im = 0 := by
+  rw [spinSDot_self_apply]
+  by_cases h : σ' = σ
+  · rw [if_pos h]; simp
+  · rw [if_neg h]; simp
+
+/-- For `x ≠ y`, the matrix element of `Ŝ_x · Ŝ_y` always has zero
+imaginary part. The three axis contributions are `real × real`,
+`pure imag × pure imag`, and `real × real` respectively. -/
+theorem spinSDot_apply_im_zero_of_ne
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ) (σ' σ : Λ → Fin (N + 1)) :
+    ((spinSDot x y N : ManyBodyOpS Λ N) σ' σ).im = 0 := by
+  unfold spinSDot
+  simp only [Matrix.add_apply]
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, onSiteS_mul_onSiteS_apply_eq hxy,
+      onSiteS_mul_onSiteS_apply_eq hxy]
+  by_cases h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k
+  · rw [if_pos h, if_pos h, if_pos h]
+    -- Sum of three terms, each has im = 0.
+    have h1 : ((spinSOp1 N (σ' x) (σ x)) * (spinSOp1 N (σ' y) (σ y))).im = 0 := by
+      rw [Complex.mul_im]
+      rw [spinSOp1_apply_im_zero, spinSOp1_apply_im_zero]
+      ring
+    have h2 : ((spinSOp2 N (σ' x) (σ x)) * (spinSOp2 N (σ' y) (σ y))).im = 0 := by
+      rw [Complex.mul_im]
+      rw [spinSOp2_apply_re_zero, spinSOp2_apply_re_zero]
+      ring
+    have h3 : ((spinSOp3 N (σ' x) (σ x)) * (spinSOp3 N (σ' y) (σ y))).im = 0 := by
+      rw [Complex.mul_im]
+      rw [spinSOp3_apply_im_zero, spinSOp3_apply_im_zero]
+      ring
+    rw [Complex.add_im, Complex.add_im, h1, h2, h3]
+    ring
+  · rw [if_neg h, if_neg h, if_neg h]; simp
+
 /-- **Raising/lowering decomposition** of the two-site spin-`S` dot
 product (Tasaki §2.2 eq. (2.2.16) for arbitrary spin):
 
@@ -144,5 +308,135 @@ theorem spinSDot_eq_plus_minus (x y : Λ) (N : ℕ) :
     with hr
   rw [key p r, smul_smul]
   norm_num
+
+/-- The matrix element of `Ŝ_x · Ŝ_y` always has zero imaginary part
+(unified version, no `x ≠ y` assumption). -/
+theorem spinSDot_apply_im_zero (x y : Λ) (N : ℕ)
+    (σ' σ : Λ → Fin (N + 1)) :
+    ((spinSDot x y N : ManyBodyOpS Λ N) σ' σ).im = 0 := by
+  by_cases hxy : x = y
+  · subst hxy; exact spinSDot_self_apply_im_zero x N σ' σ
+  · exact spinSDot_apply_im_zero_of_ne hxy N σ' σ
+
+/-- For real coupling, the matrix element of `Ŝ_x · Ŝ_y` always
+equals its own real-part embedding. -/
+theorem spinSDot_apply_eq_ofReal_re (x y : Λ) (N : ℕ)
+    (σ' σ : Λ → Fin (N + 1)) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ =
+      (((spinSDot x y N : ManyBodyOpS Λ N) σ' σ).re : ℂ) := by
+  apply Complex.ext
+  · simp
+  · rw [Complex.ofReal_im]
+    exact spinSDot_apply_im_zero x y N σ' σ
+
+/-- For `x ≠ y`, when `σ' = σ` the spinSDot value is its own
+real-part embedding (matches the diagonal formula). -/
+theorem spinSDot_apply_diag_eq_ofReal_re_of_ne
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ) (σ : Λ → Fin (N + 1)) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ σ =
+      ((((spinSDot x y N : ManyBodyOpS Λ N) σ σ).re : ℝ) : ℂ) := by
+  apply Complex.ext
+  · simp
+  · rw [Complex.ofReal_im]
+    exact spinSDot_apply_im_zero_of_ne hxy N σ σ
+
+/-- For `x ≠ y`, the diagonal real part of `spinSDot` equals
+`(N/2 - σ_x.val)(N/2 - σ_y.val)` (a real number). -/
+theorem spinSDot_apply_diag_re_of_ne
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ) (σ : Λ → Fin (N + 1)) :
+    ((spinSDot x y N : ManyBodyOpS Λ N) σ σ).re =
+      ((N : ℝ) / 2 - (σ x).val) * ((N : ℝ) / 2 - (σ y).val) := by
+  rw [spinSDot_apply_diag_of_ne hxy]
+  rw [Complex.mul_re]
+  push_cast
+  simp
+
+/-- For the same-site case, the diagonal real part is `N(N+2)/4`. -/
+theorem spinSDot_self_apply_diag_re (x : Λ) (N : ℕ)
+    (σ : Λ → Fin (N + 1)) :
+    ((spinSDot x x N : ManyBodyOpS Λ N) σ σ).re =
+      (N : ℝ) * (N + 2) / 4 := by
+  rw [spinSDot_self_apply_diag]
+  simp
+
+/-- The same-site `spinSDot x x N σ σ` equals its real-part embedding. -/
+theorem spinSDot_self_apply_diag_eq_ofReal_re (x : Λ) (N : ℕ)
+    (σ : Λ → Fin (N + 1)) :
+    (spinSDot x x N : ManyBodyOpS Λ N) σ σ =
+      (((((spinSDot x x N : ManyBodyOpS Λ N) σ σ).re : ℝ) : ℂ)) := by
+  apply Complex.ext
+  · simp
+  · rw [Complex.ofReal_im]
+    exact spinSDot_self_apply_im_zero x N σ σ
+
+/-- The matrix-element form of the raising/lowering decomposition of
+`spinSDot`: combines the `(1/2)(S+S- + S-S+)` ladder part with the
+`S^3 ⊗ S^3` diagonal part. -/
+theorem spinSDot_apply_eq_pm_3 (x y : Λ) (N : ℕ)
+    (σ' σ : Λ → Fin (N + 1)) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ =
+      ((1 / 2 : ℂ) •
+        (onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N) +
+          onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)) +
+        onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
+          : ManyBodyOpS Λ N) σ' σ := by
+  rw [spinSDot_eq_plus_minus]
+
+/-- For `x ≠ y` and configurations differing off the two-site set
+`{x, y}`, the matrix element of `Ŝ_x · Ŝ_y` is zero (already
+established as `spinSDot_apply_eq_zero_of_off_two_site_diff`). The
+real part trivially has zero. -/
+theorem spinSDot_apply_re_eq_zero_of_off_two_site_diff
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ¬ ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    ((spinSDot x y N : ManyBodyOpS Λ N) σ' σ).re = 0 := by
+  rw [spinSDot_apply_eq_zero_of_off_two_site_diff hxy N h]
+  simp
+
+/-- For `x ≠ y` and `σ', σ` agreeing off `{x, y}`, the dot-product
+matrix element factors via the per-site spinSOp_α matrix elements:
+`(Ŝ_x · Ŝ_y) σ' σ = Σ_α S^α(σ'_x)(σ_x) * S^α(σ'_y)(σ_y)`. -/
+theorem spinSDot_apply_of_off_two_site_agree
+    {x y : Λ} (hxy : x ≠ y) (N : ℕ)
+    {σ' σ : Λ → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    (spinSDot x y N : ManyBodyOpS Λ N) σ' σ =
+      spinSOp1 N (σ' x) (σ x) * spinSOp1 N (σ' y) (σ y) +
+      spinSOp2 N (σ' x) (σ x) * spinSOp2 N (σ' y) (σ y) +
+      spinSOp3 N (σ' x) (σ x) * spinSOp3 N (σ' y) (σ y) := by
+  unfold spinSDot
+  simp only [Matrix.add_apply]
+  rw [onSiteS_mul_onSiteS_apply_eq hxy, onSiteS_mul_onSiteS_apply_eq hxy,
+      onSiteS_mul_onSiteS_apply_eq hxy]
+  rw [if_pos h, if_pos h, if_pos h]
+
+/-- `spinSDot x y 0` (trivial spin, distinct sites) equals zero. -/
+theorem spinSDot_N_zero_of_ne {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    {x y : Λ} (hxy : x ≠ y) :
+    (spinSDot x y 0 : ManyBodyOpS Λ 0) = 0 := by
+  ext σ' σ
+  rw [Matrix.zero_apply]
+  by_cases h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k
+  · have hσ'x : σ' x = 0 := by apply Fin.ext; have := (σ' x).isLt; omega
+    have hσx : σ x = 0 := by apply Fin.ext; have := (σ x).isLt; omega
+    have hσ'y : σ' y = 0 := by apply Fin.ext; have := (σ' y).isLt; omega
+    have hσy : σ y = 0 := by apply Fin.ext; have := (σ y).isLt; omega
+    unfold spinSDot
+    simp only [Matrix.add_apply]
+    rw [onSiteS_mul_onSiteS_apply_eq hxy, onSiteS_mul_onSiteS_apply_eq hxy,
+        onSiteS_mul_onSiteS_apply_eq hxy]
+    rw [if_pos h, if_pos h, if_pos h]
+    rw [hσ'x, hσx, hσ'y, hσy, spinSOp1_apply_diag, spinSOp2_apply_diag]
+    simp
+  · exact spinSDot_apply_eq_zero_of_off_two_site_diff hxy 0 h
+
+/-- Unified `spinSDot x y 0 = 0` (any sites). -/
+theorem spinSDot_N_zero_total {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (x y : Λ) :
+    (spinSDot x y 0 : ManyBodyOpS Λ 0) = 0 := by
+  by_cases hxy : x = y
+  · subst hxy; exact spinSDot_self_N_zero x
+  · exact spinSDot_N_zero_of_ne hxy
 
 end LatticeSystem.Quantum

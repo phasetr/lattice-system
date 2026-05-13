@@ -56,6 +56,67 @@ theorem marshallSignS_eq_neg_one_pow_of_A_true (σ : V → Fin (N + 1)) :
   simp only [if_true]
   rw [← Finset.prod_pow_eq_pow_sum]
 
+/-- Marshall sign over an empty lattice is `1`. -/
+theorem marshallSignS_of_isEmpty [IsEmpty V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ = 1 := by
+  unfold marshallSignS
+  rw [show (Finset.univ : Finset V) = ∅ from Finset.eq_empty_of_isEmpty _]
+  exact Finset.prod_empty
+
+/-- For `N = 0` (`S = 0`), the only configuration is the constant
+zero, so the Marshall sign is always `1`. -/
+theorem marshallSignS_N_zero (A : V → Bool) (σ : V → Fin 1) :
+    marshallSignS A σ = 1 := by
+  have : σ = (fun _ => (0 : Fin 1)) := by
+    funext x; apply Fin.ext; have := (σ x).isLt; omega
+  rw [this, marshallSignS_const_zero]
+
+/-- The Marshall sign at `σ'` and `σ` are equal when σ' = σ. -/
+theorem marshallSignS_eq_of_eq (A : V → Bool)
+    {σ' σ : V → Fin (N + 1)} (h : σ' = σ) :
+    marshallSignS A σ' = marshallSignS A σ := by rw [h]
+
+/-- Symmetric form of the Marshall sign product:
+`marshallSignS A σ' * marshallSignS A σ = marshallSignS A σ * marshallSignS A σ'`. -/
+theorem marshallSignS_mul_swap (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
+    marshallSignS A σ * marshallSignS A σ' =
+      marshallSignS A σ' * marshallSignS A σ :=
+  mul_comm _ _
+
+
+/-- For a constant configuration `σ ≡ s` and `s.val` even, the
+Marshall sign is `+1`. (Each `(-1)^(s.val)` factor is `+1`.) -/
+theorem marshallSignS_const_of_even
+    (A : V → Bool) {s : Fin (N + 1)} (hs : Even s.val) :
+    marshallSignS A (fun _ : V => s) = 1 := by
+  unfold marshallSignS
+  apply Finset.prod_eq_one
+  intro x _
+  by_cases hAx : A x
+  · simp [hAx]
+    exact Even.neg_one_pow hs
+  · simp [hAx]
+
+
+/-- The Marshall sign restricted to `A`-sites: factors away the
+trivial `1` contributions from non-`A` sites. -/
+theorem marshallSignS_eq_prod_A_filter
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ =
+      ∏ x ∈ Finset.univ.filter (fun x : V => A x = true),
+        ((-1 : ℂ) ^ (σ x).val) := by
+  classical
+  unfold marshallSignS
+  rw [Finset.prod_filter]
+
+
+/-- Definitional unfolding of `marshallSignS`. -/
+theorem marshallSignS_def (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ =
+      ∏ x : V, if A x then ((-1 : ℂ) ^ (σ x).val) else 1 := rfl
+
+
 /-- Product of two Marshall signs at the same sublattice indicator
 factors site-wise: each `A`-site contributes `(-1)^((σ x).val + (σ' x).val)`. -/
 theorem marshallSignS_mul (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
@@ -96,6 +157,126 @@ theorem marshallSignS_sq (A : V → Bool) (σ : V → Fin (N + 1)) :
     rw [one_pow]
   · simp [hAx]
 
+/-- The Marshall sign is either `1` or `-1`: a corollary of
+`marshallSignS_sq` in the field ℂ. -/
+theorem marshallSignS_eq_one_or_neg_one
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ = 1 ∨ marshallSignS A σ = -1 := by
+  have hsq := marshallSignS_sq A σ
+  -- `x² = 1 ↔ (x - 1)(x + 1) = 0`, then field property.
+  have h : (marshallSignS A σ - 1) * (marshallSignS A σ + 1) = 0 := by
+    rw [show (marshallSignS A σ - 1) * (marshallSignS A σ + 1) =
+        marshallSignS A σ * marshallSignS A σ - 1 from by ring]
+    rw [hsq, sub_self]
+  rcases mul_eq_zero.mp h with h1 | h2
+  · left; exact sub_eq_zero.mp h1
+  · right
+    have := add_eq_zero_iff_eq_neg.mp h2
+    rw [this]
+
+/-- The norm of the Marshall sign is `1`. -/
+theorem marshallSignS_norm (A : V → Bool) (σ : V → Fin (N + 1)) :
+    ‖marshallSignS A σ‖ = 1 := by
+  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
+  · rw [h, norm_one]
+  · rw [h]; simp
+
+/-- Even powers of the Marshall sign are `1`. -/
+theorem marshallSignS_pow_two_mul (A : V → Bool) (σ : V → Fin (N + 1))
+    (k : ℕ) :
+    marshallSignS A σ ^ (2 * k) = 1 := by
+  rw [pow_mul]
+  rw [show marshallSignS A σ ^ 2 = 1 from by
+    rw [pow_two]; exact marshallSignS_sq A σ]
+  rw [one_pow]
+
+/-- Cube of the Marshall sign equals itself: `(σ_M)^3 = σ_M`. -/
+theorem marshallSignS_pow_three (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ ^ 3 = marshallSignS A σ := by
+  rw [show (3 : ℕ) = 2 + 1 from rfl]
+  rw [pow_succ, pow_two, marshallSignS_sq, one_mul]
+
+/-- The Marshall sign equals its inverse: `(marshallSignS A σ)⁻¹ = marshallSignS A σ`. -/
+theorem marshallSignS_inv (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallSignS A σ)⁻¹ = marshallSignS A σ := by
+  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
+  · rw [h]; simp
+  · rw [h]; simp
+
+/-- `(marshallSignS A σ)⁻¹ * marshallSignS A σ = 1`. -/
+theorem marshallSignS_inv_mul_self (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallSignS A σ)⁻¹ * marshallSignS A σ = 1 := by
+  rw [marshallSignS_inv, marshallSignS_sq]
+
+/-- `marshallSignS A σ * (marshallSignS A σ)⁻¹ = 1`. -/
+theorem marshallSignS_mul_self_inv (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ * (marshallSignS A σ)⁻¹ = 1 := by
+  rw [marshallSignS_inv, marshallSignS_sq]
+
+/-- The Marshall sign is `±1` valued in `ℝ` (after embedding into ℂ). -/
+theorem marshallSignS_re (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallSignS A σ).re = 1 ∨ (marshallSignS A σ).re = -1 := by
+  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
+  · left; rw [h]; rfl
+  · right; rw [h]; rfl
+
+/-- Imaginary part of the Marshall sign is zero. -/
+theorem marshallSignS_im (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallSignS A σ).im = 0 := by
+  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
+  · rw [h]; simp
+  · rw [h]; simp
+
+/-- `marshallSignS A σ = ((marshallSignS A σ).re : ℂ)`: the Marshall
+sign is real-valued (always ±1, both real), so it equals its embedded
+real part. -/
+theorem marshallSignS_eq_ofReal_re (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ = ((marshallSignS A σ).re : ℂ) := by
+  apply Complex.ext
+  · simp
+  · rw [Complex.ofReal_im]
+    exact marshallSignS_im A σ
+
+/-- The real part of the Marshall sign is `±1`. -/
+theorem marshallSignS_re_eq_one_or_neg_one (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallSignS A σ).re = 1 ∨ (marshallSignS A σ).re = -1 := by
+  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
+  · left; rw [h]; simp
+  · right; rw [h]; simp
+
+/-- The absolute value of the Marshall sign's real part is exactly 1. -/
+theorem marshallSignS_re_abs (A : V → Bool) (σ : V → Fin (N + 1)) :
+    |(marshallSignS A σ).re| = 1 := by
+  rcases marshallSignS_re_eq_one_or_neg_one A σ with h | h
+  · rw [h]; simp
+  · rw [h]; simp
+
+/-- The square of the Marshall sign's real part equals 1. -/
+theorem marshallSignS_re_sq (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallSignS A σ).re * (marshallSignS A σ).re = 1 := by
+  rcases marshallSignS_re_eq_one_or_neg_one A σ with h | h
+  · rw [h]; norm_num
+  · rw [h]; norm_num
+
+/-- Marshall sign multiplication is commutative (trivially in ℂ). -/
+theorem marshallSignS_mul_comm (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
+    marshallSignS A σ * marshallSignS A σ' =
+      marshallSignS A σ' * marshallSignS A σ :=
+  mul_comm _ _
+
+/-- Restated form: `marshallSignS A σ * marshallSignS A σ = 1`. -/
+theorem marshallSignS_mul_self (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ * marshallSignS A σ = 1 :=
+  marshallSignS_sq A σ
+
+/-- The Marshall sign belongs to the set `{1, -1}`. -/
+theorem marshallSignS_mem_pm_one
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallSignS A σ ∈ ({1, -1} : Set ℂ) := by
+  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
+  · left; exact h
+  · right; rw [Set.mem_singleton_iff]; exact h
+
 /-- The Marshall sign is real: its complex conjugate is itself. Each
 factor `(-1)^k` is real, so the star/conjugation acts as identity on
 the product. -/
@@ -129,6 +310,11 @@ Generalises the spin-1/2 `marshallDressedBasis`
 noncomputable def marshallDressedBasisS [DecidableEq V]
     (A : V → Bool) (σ : V → Fin (N + 1)) : (V → Fin (N + 1)) → ℂ :=
   marshallSignS A σ • basisVecS σ
+
+/-- Definitional unfolding of `marshallDressedBasisS`. -/
+theorem marshallDressedBasisS_def [DecidableEq V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallDressedBasisS A σ = marshallSignS A σ • basisVecS σ := rfl
 
 /-- Component formula: `marshallDressedBasisS A σ τ` is
 `marshallSignS A σ` if `τ = σ`, else `0`. -/
@@ -164,6 +350,22 @@ theorem marshallDressedBasisS_const_zero [DecidableEq V]
       basisVecS (fun _ : V => (0 : Fin (N + 1))) := by
   unfold marshallDressedBasisS
   rw [marshallSignS_const_zero, one_smul]
+
+/-- For `N = 0` (`S = 0`), the Marshall-dressed basis vector equals
+the plain basis vector. -/
+theorem marshallDressedBasisS_N_zero [DecidableEq V]
+    (A : V → Bool) (σ : V → Fin 1) :
+    marshallDressedBasisS A σ = basisVecS σ := by
+  unfold marshallDressedBasisS
+  rw [marshallSignS_N_zero, one_smul]
+
+/-- For an empty lattice, the Marshall-dressed basis vector equals
+the plain basis vector (Marshall sign is `1`). -/
+theorem marshallDressedBasisS_of_isEmpty [DecidableEq V] [IsEmpty V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallDressedBasisS A σ = basisVecS σ := by
+  unfold marshallDressedBasisS
+  rw [marshallSignS_of_isEmpty, one_smul]
 
 /-- **Orthonormality of the Marshall-dressed basis**:
 
@@ -227,5 +429,70 @@ theorem marshallDressedBasisS_ne_zero [DecidableEq V]
   have h0 : marshallDressedBasisS A σ σ = 0 := by rw [h]; rfl
   rw [marshallDressedBasisS_self] at h0
   exact marshallSignS_ne_zero A σ h0
+
+/-- The Marshall-dressed basis vector at its own configuration has
+norm 1: `‖marshallDressedBasisS A σ σ‖ = 1`. -/
+theorem marshallDressedBasisS_self_norm [DecidableEq V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    ‖marshallDressedBasisS A σ σ‖ = 1 := by
+  rw [marshallDressedBasisS_self, marshallSignS_norm]
+
+/-- Component-wise norm of the Marshall-dressed basis equals the
+component-wise norm of the plain basis (since dressing only changes
+sign): `‖marshallDressedBasisS A σ τ‖ = ‖basisVecS σ τ‖`. -/
+theorem marshallDressedBasisS_norm_eq_basisVecS [DecidableEq V]
+    (A : V → Bool) (σ τ : V → Fin (N + 1)) :
+    ‖marshallDressedBasisS A σ τ‖ = ‖(basisVecS σ τ : ℂ)‖ := by
+  unfold marshallDressedBasisS
+  rw [Pi.smul_apply, smul_eq_mul, norm_mul]
+  rw [marshallSignS_norm, one_mul]
+
+/-- The Marshall-dressed basis vector lies in the supremum of all
+magnetization subspaces (since it lies in `magSubspaceS V N (magEigenvalueS σ)`
+which is included in `⨆ M, magSubspaceS V N M`). -/
+theorem marshallDressedBasisS_mem_iSup_magSubspaceS [DecidableEq V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (marshallDressedBasisS A σ : (V → Fin (N + 1)) → ℂ) ∈
+      ⨆ M : ℂ, magSubspaceS V N M :=
+  Submodule.mem_iSup_of_mem (magEigenvalueS σ)
+    (marshallDressedBasisS_mem_magSubspaceS A σ)
+
+/-- **Marshall-dressed basis is `±basisVecS`**: depending on whether
+the Marshall sign is `+1` or `-1`, the dressed basis vector equals
+`+basisVecS σ` or `-basisVecS σ`. -/
+theorem marshallDressedBasisS_eq_or [DecidableEq V]
+    (A : V → Bool) (σ : V → Fin (N + 1)) :
+    marshallDressedBasisS A σ = basisVecS σ ∨
+      marshallDressedBasisS A σ = -basisVecS σ := by
+  unfold marshallDressedBasisS
+  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
+  · left; rw [h, one_smul]
+  · right; rw [h, neg_smul, one_smul]
+
+/-- **Inverse decomposition**: every plain basis vector is
+`marshallSignS A σ` times the corresponding Marshall-dressed basis
+vector. (This is `marshallSignS_smul_marshallDressedBasisS` restated
+with sides swapped for use as a rewrite from `basisVecS` toward
+`marshallDressedBasisS`.) -/
+theorem basisVecS_eq_marshallSignS_smul_marshallDressedBasisS
+    [DecidableEq V] (A : V → Bool) (σ : V → Fin (N + 1)) :
+    (basisVecS σ : (V → Fin (N + 1)) → ℂ) =
+      marshallSignS A σ • marshallDressedBasisS A σ :=
+  (marshallSignS_smul_marshallDressedBasisS A σ).symm
+
+/-- **Marshall-dressed basis decomposition** of any vector:
+`v = Σ_σ (marshallSignS A σ * v(σ)) • marshallDressedBasisS A σ`.
+Substituting `basisVecS σ = marshallSignS A σ • marshallDressedBasisS A σ`
+into `fun_eq_sum_smul_basisVecS`. -/
+theorem fun_eq_sum_smul_marshallDressedBasisS [DecidableEq V]
+    (A : V → Bool) (v : (V → Fin (N + 1)) → ℂ) :
+    v = ∑ σ : V → Fin (N + 1),
+      (marshallSignS A σ * v σ) • marshallDressedBasisS A σ := by
+  conv_lhs => rw [fun_eq_sum_smul_basisVecS v]
+  refine Finset.sum_congr rfl ?_
+  intro σ _
+  rw [basisVecS_eq_marshallSignS_smul_marshallDressedBasisS A σ]
+  rw [smul_smul]
+  rw [mul_comm (v σ) (marshallSignS A σ)]
 
 end LatticeSystem.Quantum

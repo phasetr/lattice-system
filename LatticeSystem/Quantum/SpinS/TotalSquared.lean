@@ -28,6 +28,22 @@ noncomputable def totalSpinSSquared : ManyBodyOpS Λ N :=
     totalSpinSOp2 Λ N * totalSpinSOp2 Λ N +
     totalSpinSOp3 Λ N * totalSpinSOp3 Λ N
 
+/-- Definitional unfolding. -/
+theorem totalSpinSSquared_def :
+    totalSpinSSquared Λ N =
+      totalSpinSOp1 Λ N * totalSpinSOp1 Λ N +
+        totalSpinSOp2 Λ N * totalSpinSOp2 Λ N +
+        totalSpinSOp3 Λ N * totalSpinSOp3 Λ N := rfl
+
+/-- Re-expression of `totalSpinSSquared` as a finite sum of squares
+of total operators (matching the definition with `^2` instead of
+`mul` self). -/
+theorem totalSpinSSquared_eq_pow_sum :
+    totalSpinSSquared Λ N =
+      totalSpinSOp1 Λ N ^ 2 + totalSpinSOp2 Λ N ^ 2 + totalSpinSOp3 Λ N ^ 2 := by
+  unfold totalSpinSSquared
+  simp only [pow_two]
+
 /-- `(Ŝ_tot)²` is Hermitian. -/
 theorem totalSpinSSquared_isHermitian :
     (totalSpinSSquared Λ N).IsHermitian := by
@@ -192,5 +208,14 @@ theorem totalSpinSSquared_eq_sum_spinSDot :
              onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)) from by
     simp [Finset.sum_add_distrib]]
   rfl
+
+/-- For trivial spin (`N = 0`), `(Ŝ_tot)² = 0` (every per-site
+contribution vanishes). -/
+theorem totalSpinSSquared_N_zero :
+    (totalSpinSSquared Λ 0 : ManyBodyOpS Λ 0) = 0 := by
+  rw [totalSpinSSquared_eq_sum_spinSDot]
+  refine Finset.sum_eq_zero (fun x _ => ?_)
+  refine Finset.sum_eq_zero (fun y _ => ?_)
+  exact spinSDot_N_zero_total x y
 
 end LatticeSystem.Quantum
