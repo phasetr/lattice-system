@@ -5717,11 +5717,11 @@ joint-magnetisation sectors and apply mathlib's
 \texttt{LinearMap.finrank\_le\_finrank\_of\_injective} to derive
 $\dim_\mathbb{C}(\texttt{joint} \sqcap H_M) \le
 \dim_\mathbb{C}(\texttt{joint} \sqcap H_{M+1})$ for every
-$M \neq m_{\max}$. The final step (subsequent PR) iterates this
-chain from $M = -m_{\max}$ upward and sums the per-sector $\le 1$
-bounds across the $(2m_{\max}+1)$ values of $M$ in the spectrum,
-using the magnetisation direct-sum decomposition (\#889) and the
-$H_{m_{\max}}$ base case (\#2759).
+$M \neq m_{\max}$. PR \#2763 iterates this chain from $M = -m_{\max}$ upward, giving
+the per-sector $\le 1$ bound at every $M$ in the spectrum; the
+subsequent PR sums the $(2m_{\max}+1)$ such bounds via the
+magnetisation direct-sum decomposition (\#889) to derive the final
+$\dim_\mathbb{C}(\texttt{joint}) \le 2m_{\max}+1$.
 
 \textbf{Per-sector $\dim \le 1$ (PR~\#2763)}: the theorem
 \texttt{saturatedFerromagnetJointEigenspace\_inf\_magSubspaceS\_finrank\_le\_one}
