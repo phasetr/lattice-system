@@ -58,4 +58,20 @@ theorem ladderIterateUp_span_le_saturatedFerromagnetJointEigenspace
   rintro v ⟨k, rfl⟩
   exact ladderIterateUp_mem_saturatedFerromagnetJointEigenspace J k
 
+/-- **`Module.finrank ℂ (saturatedFerromagnetJointEigenspace J N) =
+|V|·N + 1`** — the operator-level dimension formula for the
+saturated-ferromagnet ground-state subspace in Tasaki §2.4
+Theorem 2.1.
+
+Direct corollary of the Theorem 2.1 closure (PR #2768): the joint
+eigenspace equals the linear span of the ladder iterates, whose
+finrank is `|V|·N + 1 = 2m_max + 1` (this file). -/
+theorem saturatedFerromagnetJointEigenspace_finrank_eq
+    [Nonempty V] (J : V → V → ℂ) :
+    Module.finrank ℂ
+      (saturatedFerromagnetJointEigenspace (V := V) J N) =
+        Fintype.card V * N + 1 := by
+  rw [saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp J]
+  exact ladderIterateUp_span_finrank_eq_succ_card_mul_N
+
 end LatticeSystem.Quantum
