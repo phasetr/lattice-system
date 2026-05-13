@@ -5349,6 +5349,25 @@ Minimality of \texttt{bipartiteToyMinEnergyPredicted} (variational
 lower bound + non-emptiness of the joint subspace) is the next
 γ-4 milestone, not yet established.
 
+\textbf{Step 8 (PR~\#2779)}: structural properties of
+\texttt{bipartiteToyMinEnergyPredicted} in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergyProperties.lean}.
+Three edge cases / structural identities:
+\begin{itemize}
+\item \emph{Saturated edge case} $|\neg A| = 0$: predicted energy
+$= 0$ (trivial empty-cross-bond limit).
+\item \emph{Néel-state gap}:
+\texttt{bipartiteToyMinEnergyPredicted}~$=$
+$\langle\Phi_{\rm N\acute eel}|\hat H_{\rm toy_S}|\Phi_{\rm N\acute eel}\rangle
+- |\neg A|\cdot N$. The Néel expectation
+$-|A|\cdot|\neg A|\cdot N^2/2$ exceeds the predicted minimum by
+$|\neg A|\cdot N \ge 0$ — Néel is \emph{not} the toy-H ground
+state in the non-degenerate regime.
+\item \emph{Balanced edge case} $|A| = |\neg A|$: imbalance term
+vanishes, predicted energy $= -2 s_A(s_A+1)$ (the
+``anti-ferromagnetic-saturation'' value).
+\end{itemize}
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
