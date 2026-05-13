@@ -5229,6 +5229,27 @@ algebra, toy Hamiltonian Casimir identity, and the eigenvalue
 analysis on $|A| \neq |B|$ leading to $S_{\rm tot} =
 \bigl||A| - |B|\bigr|\,S$.
 
+\textbf{Step 2 (PR~\#2773, foundation)}: bipartite imbalance
+weight in
+\texttt{LatticeSystem/Quantum/SpinS/NeelBipartiteWeight.lean}.
+Defines \texttt{bipartiteImbalanceWeight A N}~:=~$(|A| - |\neg A|)
+\cdot N/2$ — the predicted Theorem 2.3 weight under $S = N/2$.
+Packages: bridge with the existing
+\texttt{magEigenvalueS\_neelConfigOfS} (the Néel configuration's
+$\hat S_{\rm tot}^{(3)}$ eigenvalue equals the imbalance weight);
+membership
+\texttt{neelStateOfS A N $\in$ magSubspaceS $\Lambda$ N (bipartiteImbalanceWeight A N)}
+via \texttt{basisVecS\_mem\_magSubspaceS}; two edge cases
+(balanced $|A|=|\neg A| \Rightarrow$ weight $=0$, recovering the
+$\gamma$-3 sector; saturated $|\neg A| = 0 \Rightarrow$ weight
+$= m_{\max}$, recovering the all-up sector); and
+real-part non-negativity when $|A| \ge |\neg A|$. This is the
+first foundational step toward formalising the §2.5 Theorem 2.3
+prediction $S_{\rm tot} = \bigl||A| - |B|\bigr|\,S$ at the
+magnetisation level. Subsequent steps will address the lower
+bound via the toy-Hamiltonian Casimir decomposition (using
+PR~\#1042's sublattice operators) and the variational argument.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
