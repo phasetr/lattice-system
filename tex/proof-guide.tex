@@ -5956,6 +5956,13 @@ N^2 / 2 - |A| \cdot N$. Cross term collapses to $|A|^2$ and
 $\min(|A|, |\neg A|) = |A|$. Symmetric-form mirror of the
 asymmetric balanced form.
 
+\textbf{Step 67 (PR~\#2853)}: balanced-case symm-energy norm in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmNormBalanced.lean}.
+When $|A| = |\neg A|$,
+$\|\texttt{bipartiteToyMinEnergyPredictedSymm A N}\| = |A|^2 \cdot
+N^2 / 2 + |A| \cdot N$. Direct from PR \#2848 balanced
+specialisation.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
