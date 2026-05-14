@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SublatticeSpinDot
+import LatticeSystem.Quantum.SpinS.MultiSiteMatrixElement
 import LatticeSystem.Quantum.SpinS.Magnetization
 import LatticeSystem.Quantum.SpinS.ToyHamiltonianCasimir
 import LatticeSystem.Quantum.SpinS.BasisVecSOrthonormal

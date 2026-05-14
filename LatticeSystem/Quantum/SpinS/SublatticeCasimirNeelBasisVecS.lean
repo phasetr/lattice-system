@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeel
+import LatticeSystem.Quantum.SpinS.MultiSiteMatrixElement
 
 /-!
 # Spin-`S` `(Ŝ_tot)²` Casimir on arbitrary `basisVecS σ`

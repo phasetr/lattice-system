@@ -1,4 +1,5 @@
 import Mathlib.Data.Complex.Basic
+import LatticeSystem.Quantum.SpinS.MultiSiteMatrixElement
 import Mathlib.LinearAlgebra.Matrix.Hermitian
 
 /-!
