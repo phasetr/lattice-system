@@ -5886,6 +5886,14 @@ is real in
 taken in $\mathbb R$ after \texttt{Nat.cast\_min}). Mirrors PR
 \#2825 for the asymmetric form.
 
+\textbf{Step 58 (PR~\#2844)}: non-positivity of the predicted
+symmetric min energy in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmNonpos.lean}.
+$(\texttt{bipartiteToyMinEnergyPredictedSymm A N}).\texttt{re} \le 0$.
+Both contributions $-|A| \cdot |\neg A| \cdot N^2 / 2$ and
+$-\min(|A|, |\neg A|) \cdot N$ are non-positive. Symmetric-form
+mirror of PR \#2791.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
