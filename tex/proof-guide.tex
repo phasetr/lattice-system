@@ -6020,6 +6020,14 @@ and $N \ge 1$ in
 \texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightNormPos.lean}.
 Contrapositive of PR \#2855.
 
+\textbf{Step 76 (PR~\#2862)}: norm = real part when $|A| \ge |\neg A|$
+in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightNormEqRe.lean}.
+$\|\texttt{bipartiteImbalanceWeight A N}\| =
+(\texttt{bipartiteImbalanceWeight A N}).\texttt{re}$. The value
+is real (PR \#2825) and non-negative when $|A| \ge |\neg A|$ (PR
+\#2773), so $\texttt{norm} = \texttt{.re}$ directly.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
