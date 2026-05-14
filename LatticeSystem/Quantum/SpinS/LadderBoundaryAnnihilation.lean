@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.IterateInductiveNonvanishing
+import LatticeSystem.Quantum.SpinS.AllAlignedStateMagShift
 import LatticeSystem.Quantum.SpinS.MagnetizationDirectSum
 
 /-!
@@ -64,6 +65,7 @@ theorem magSubspaceS_eq_bot_of_not_in_spectrum {M : ℂ}
 
 /-! ## Eigenvalue −m_max − 1 is outside the spectrum -/
 
+omit [DecidableEq V] in
 /-- The eigenvalue `−m_max − 1 = −|V|·N/2 − 1` is below the lowest
 eigenvalue `−m_max` of `Ŝ^z_{tot}` on `basisVecS`-basis states,
 hence not equal to `magEigenvalueS σ` for any `σ`. -/
@@ -121,6 +123,7 @@ theorem totalSpinSOpMinus_pow_succ_card_mul_N_allAlignedStateS_zero
 
 /-! ## Symmetric boundary annihilation (raising side) -/
 
+omit [DecidableEq V] in
 /-- The eigenvalue `m_max + 1 = |V|·N/2 + 1` is above the highest
 eigenvalue `m_max` of `Ŝ^z_{tot}` on `basisVecS`-basis states,
 hence not equal to `magEigenvalueS σ` for any `σ`. -/

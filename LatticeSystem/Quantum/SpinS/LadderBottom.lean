@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MagSubspaceExtremalDim
+import LatticeSystem.Quantum.SpinS.AllAlignedStateMagShift
 import LatticeSystem.Quantum.SpinS.IterateInductiveNonvanishing
 
 /-!
