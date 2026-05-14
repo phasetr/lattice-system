@@ -5916,6 +5916,15 @@ witness via PR \#2801 and PR \#2814.
 \mathbb C)$ $N$. Same chain (PR \#2801 + PR \#2814 all-down
 branch).
 
+\textbf{Step 62 (PR~\#2848)}: norm of the predicted symmetric
+min energy in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmNorm.lean}.
+$\|\texttt{bipartiteToyMinEnergyPredictedSymm A N}\| = |A| \cdot
+|\neg A| \cdot N^2 / 2 + \min(|A|, |\neg A|) \cdot N$. Combines PR
+\#2843 (\texttt{im = 0} + \texttt{re} explicit) with PR \#2844
+(\texttt{re} non-positive): norm $= |\texttt{re}| = -\texttt{re}$
+for a non-positive real, then expand.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
