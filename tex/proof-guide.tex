@@ -6007,6 +6007,13 @@ $\|\texttt{magEigenvalueS (neelConfigOfS A N)}\| = |\Lambda|
 \cdot N / 2 = m_{\rm max}$. Saturated-limit specialisation of
 PR \#2857.
 
+\textbf{Step 74 (PR~\#2860)}: strict positivity of the symm-energy
+norm (non-degenerate case) in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmNormPos.lean}.
+$0 < \|\texttt{bipartiteToyMinEnergyPredictedSymm A N}\|$ when
+$|A| \ge 1$, $|\neg A| \ge 1$, $N \ge 1$. Direct from PR \#2845's
+strict negativity of the real part.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
