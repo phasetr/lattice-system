@@ -5598,6 +5598,14 @@ predicted GS subspace with the §2.4 saturated-ferromagnet
 ground-state subspace at the saturated edge case (specialised to
 $J = 0$).
 
+\textbf{Step 26 (PR~\#2797)}: opposite-orientation submodule
+equality in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSEqOppositeSaturatedJointZero.lean}.
+When $|A| = 0$, \texttt{bipartiteToyGroundStateSubspacePredicted
+($\neg$A) N $=$ saturatedFerromagnetJointEigenspace 0 N}. Mirror of
+PR \#2796 via the orientation flip and $\neg\neg A = A$ filter
+congruence.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
