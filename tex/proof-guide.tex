@@ -5566,6 +5566,16 @@ saturated edge cases now have the equality form, confirming the
 predicted GS subspace dimension matches the Theorem 2.3 prediction
 with equality in both orientations.
 
+\textbf{Step 23 (PR~\#2794)}: $\hat H_{\rm toy_S}$-invariance of
+the predicted GS subspace in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSToyInvariant.lean}.
+$\texttt{Submodule.map}\,\hat H_{\rm toy_S}.\texttt{mulVecLin}\,
+(\texttt{predicted GS}) \le \texttt{predicted GS}$. Direct from
+PR \#2775 (\texttt{predicted GS} $\subseteq$ \texttt{eigenspace} at
+predicted min) + scalar-multiplication closure of the submodule.
+Structural sanity check: the predicted GS subspace is
+$\hat H_{\rm toy_S}$-invariant.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
