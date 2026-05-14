@@ -41,6 +41,7 @@ theorem allAlignedStateS_last_heisenbergToyHamiltonianS_expectation
   rw [dotProduct_smul, allAlignedStateS_inner_self]
   rw [smul_eq_mul, mul_one]
 
+omit [Fintype Λ] [DecidableEq Λ] in
 /-- Configuration-level distinctness: the Néel config differs from the
 all-up config when `|¬A| > 0` and `N > 0`. Used to conclude that Néel
 and all-up states span different basis vectors. -/
@@ -56,6 +57,7 @@ theorem neelConfigOfS_ne_allAlignedConfigS
   simp [Fin.last] at h
   omega
 
+omit [Fintype Λ] [DecidableEq Λ] in
 /-- Configuration-level distinctness: the Néel config differs from the
 all-down config when `|A| > 0` and `N > 0`. -/
 theorem neelConfigOfS_ne_allAlignedConfigS_last
@@ -567,4 +569,3 @@ theorem heisenbergToyHamiltonianS_variational_gap_re_pos
   · exact_mod_cast hN
 
 end LatticeSystem.Quantum
-
