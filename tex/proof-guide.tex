@@ -5792,6 +5792,16 @@ $\texttt{Module.End.eigenspace}\,(\hat S_{\rm tot})^2_{\rm
 maxCasimir} \ne \bot$. Contains $|\sigma_\top\rangle$ (PR \#2814)
 which is non-zero. A-independent, J-independent existence.
 
+\textbf{Step 48 (PR~\#2820)}: predicted GS subspace at the
+saturated case is non-trivial in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSSaturatedNeBot.lean}.
+\texttt{bipartiteToyGroundStateSubspacePredicted A N} $\ne \bot$
+when $|\neg A| = 0$, and the mirror statement when $|A| = 0$ for
+the complement orientation. Direct rewrite via the saturated
+collapse (PR \#2802 / PR \#2803) into PR \#2818's max-Casimir
+non-emptiness. First non-emptiness statement of the predicted
+$\gamma$-4 ground-state subspace.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
