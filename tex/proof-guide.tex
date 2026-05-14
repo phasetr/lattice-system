@@ -5925,6 +5925,13 @@ $\|\texttt{bipartiteToyMinEnergyPredictedSymm A N}\| = |A| \cdot
 (\texttt{re} non-positive): norm $= |\texttt{re}| = -\texttt{re}$
 for a non-positive real, then expand.
 
+\textbf{Step 63 (PR~\#2849)}: symmetric predicted min energy
+vanishes at saturated edges in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmSaturated.lean}.
+At $|\neg A| = 0$ or $|A| = 0$,
+\texttt{bipartiteToyMinEnergyPredictedSymm A N} $= 0$. Symmetric-
+form mirror of PR \#2779.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
