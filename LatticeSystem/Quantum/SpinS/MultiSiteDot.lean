@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MultiSite
+import LatticeSystem.Quantum.SpinS.MultiSiteMatrixElement
 import LatticeSystem.Quantum.SpinS.Casimir
 import LatticeSystem.Quantum.SpinS.PMAsOneTwo
 import LatticeSystem.Quantum.SpinS.Hermitian

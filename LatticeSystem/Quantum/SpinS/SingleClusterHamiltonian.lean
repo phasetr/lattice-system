@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
+import LatticeSystem.Quantum.SpinS.MultiSiteMatrixElement
 import LatticeSystem.Quantum.SpinS.AllAlignedState
 import LatticeSystem.Quantum.SpinS.MultiSite
 import LatticeSystem.Quantum.SpinS.TotalSpin
