@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeel
+import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelExpectations
 import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelAllAlignedOrtho
 
 /-!

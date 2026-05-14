@@ -135,6 +135,7 @@ theorem sublatticeSpinSOpComplementMinus_complement_plus_mulVec_neelStateOfS
   congr 1
   ring
 
+omit [DecidableEq Λ] in
 /-- The spin-`S` Néel state is non-zero. Direct from `basisVecS_self = 1`. -/
 theorem neelStateOfS_ne_zero (A : Λ → Bool) (N : ℕ) :
     neelStateOfS A N ≠ 0 := by
