@@ -5670,6 +5670,15 @@ When $|A| = 0$, \texttt{bipartiteToyGroundStateSubspacePredicted
 saturatedFerromagnetCasimirEigenvalueS}. Apply PR \#2802 to
 $\neg A$ with $|\neg\neg A| = 0$ reducing to $|A| = 0$.
 
+\textbf{Step 33 (PR~\#2804)}: concrete basis identification in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSEqSpanLadderSaturated.lean}.
+When $|\neg A| = 0$,
+\texttt{bipartiteToyGroundStateSubspacePredicted A N $=$ Submodule.span
+$\mathbb{C}$ (Set.range (ladderIterateUp $\Lambda$ N))}. Composition
+of PR \#2796 + PR \#2768. The saturated-case predicted GS subspace
+is precisely the linear span of the $(2 m_{\max}+1)$ ladder
+iterates $\{(\hat S^-_{\rm tot})^k\,|\sigma_\top\rangle\}_k$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
