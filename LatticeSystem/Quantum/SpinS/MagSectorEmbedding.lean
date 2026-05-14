@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.MagConfig
+import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorMarshall
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSector
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorEigenvalueUnique
 
