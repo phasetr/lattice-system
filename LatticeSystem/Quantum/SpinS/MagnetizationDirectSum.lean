@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.Magnetization
 import LatticeSystem.Quantum.SpinS.AllAlignedState
+import LatticeSystem.Quantum.SpinS.AllAlignedStateMagShift
 import Mathlib.LinearAlgebra.Eigenspace.Basic
 
 /-!
