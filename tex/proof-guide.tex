@@ -5810,6 +5810,15 @@ $J = 0$ is non-trivial in
 \#2818's max-Casimir non-emptiness. J-, A-independent existence at
 the trivial-coupling endpoint.
 
+\textbf{Step 50 (PR~\#2823)}: predicted GS subspace at either
+saturated edge is non-trivial in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSSaturatedOrComplementNeBot.lean}.
+If $|A| = 0 \lor |\neg A| = 0$, then either
+\texttt{bipartiteToyGroundStateSubspacePredicted A N} $\ne \bot$
+(when $|\neg A| = 0$) or its complement orientation
+\texttt{(fun x => ! A x)} version is $\ne \bot$ (when $|A| = 0$).
+Disjunctive unification of PR \#2820.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
