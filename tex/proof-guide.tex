@@ -5851,6 +5851,15 @@ $||A| - |\neg A|| \cdot S$ predicted total spin appearing in
 Tasaki §2.5 Theorem 2.3 (recall $S = N/2$). Direct from
 PR \#2825's ofReal realisation and \texttt{Complex.norm\_real}.
 
+\textbf{Step 54 (PR~\#2840)}: integer-imbalance form of
+\texttt{bipartiteImbalanceWeight} in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightInt.lean}.
+\texttt{bipartiteImbalanceWeight A N} $=
+(((|A| - |\neg A|) : \mathbb Z) : \mathbb C) \cdot N / 2$. Lifts
+the signed sublattice imbalance through $\mathbb Z \to \mathbb C$;
+useful for orientation-flip arithmetic without going through the
+real-axis representation.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
