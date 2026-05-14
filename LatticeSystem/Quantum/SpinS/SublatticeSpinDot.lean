@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SublatticeSpin
+import LatticeSystem.Quantum.SpinS.SublatticeSpinLadder
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 import LatticeSystem.Quantum.SpinS.SpinSDotAllAlignedZero
 import LatticeSystem.Quantum.SpinS.SpinSDotAllAlignedLast
