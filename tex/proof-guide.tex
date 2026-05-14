@@ -5819,6 +5819,17 @@ If $|A| = 0 \lor |\neg A| = 0$, then either
 \texttt{(fun x => ! A x)} version is $\ne \bot$ (when $|A| = 0$).
 Disjunctive unification of PR \#2820.
 
+\textbf{Step 51 (PR~\#2824)}: complement mirror of PR \#2782's
+saturated-edge witness in
+\texttt{LatticeSystem/Quantum/SpinS/AllAlignedStateMemBipartiteToyGSSaturated.lean}.
+At $|A| = 0$,
+\texttt{allAlignedStateS}\,$\Lambda$\,$N$\,$0 \in$
+\texttt{bipartiteToyGroundStateSubspacePredicted (fun x => ! A x)
+N}. Applies PR \#2782's original-orientation theorem to the
+complement orientation via the $\neg\neg A = A$ filter
+congruence. Pairs with PR \#2820's complement ne\_bot to give the
+explicit witness $|\sigma_\top\rangle$ at the $|A| = 0$ edge.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
