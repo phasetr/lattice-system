@@ -5977,6 +5977,13 @@ At $N \ge 1$, $\|\texttt{bipartiteImbalanceWeight A N}\| = 0
 \Leftrightarrow |A| = |\neg A|$. Direct from \texttt{norm\_eq\_zero}
 and PR \#2854.
 
+\textbf{Step 70 (PR~\#2856)}: strict sign of the imbalance-weight
+real part in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightReStrictSign.lean}.
+At $N \ge 1$: $|A| > |\neg A|$ implies $(\texttt{bipartiteImbalanceWeight
+A N}).\texttt{re} > 0$; $|A| < |\neg A|$ implies $< 0$. Strict-
+inequality variants of PR \#2773.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
