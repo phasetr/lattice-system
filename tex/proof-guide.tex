@@ -5585,6 +5585,19 @@ eigenspace membership components + scalar closure. Confirms the
 predicted GS is closed under all three Casimirs, consistent with
 its definition as their joint eigenspace.
 
+\textbf{Step 25 (PR~\#2796)}: submodule equality
+\texttt{predicted GS = saturated FM joint at $J = 0$} in the
+saturated case in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSEqSaturatedJointZero.lean}.
+When $|\neg A| = 0$,
+\texttt{bipartiteToyGroundStateSubspacePredicted A N $=$
+saturatedFerromagnetJointEigenspace 0 N}. Combines PR \#2786
+(saturated FM joint $\subseteq$ predicted GS) with PR \#2792's
+reverse bridge via \texttt{le\_antisymm}. Identifies the γ-4
+predicted GS subspace with the §2.4 saturated-ferromagnet
+ground-state subspace at the saturated edge case (specialised to
+$J = 0$).
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
