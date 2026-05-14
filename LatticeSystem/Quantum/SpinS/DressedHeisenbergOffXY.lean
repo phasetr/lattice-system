@@ -18,7 +18,8 @@ arguments should import this companion.
 
 References:
 - H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
-  Springer 2020, §2.5 Theorem 2.3 (Marshall–Lieb–Mattis).
+  Springer 2020, §2.5 Theorem 2.2 (Marshall–Lieb–Mattis),
+  pp. 39–43.
 -/
 
 namespace LatticeSystem.Quantum
@@ -79,6 +80,7 @@ theorem dressedHeisenbergS_apply_eq_zero_of_off_two_site_agree_diff_at_y_not_pm1
     hxy N h hσy hyp hym]
   ring
 
+omit [DecidableEq V] in
 /-- Helper: configurations agreeing off `{x, y}` have equal
 magnetizations iff `(σ x).val + (σ y).val = (σ' x).val + (σ' y).val`. -/
 private theorem magEigenvalueS_eq_iff_of_off_two_site_agree
