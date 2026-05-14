@@ -5651,6 +5651,17 @@ Casimir eigenspace alone. Combined with PR \#2796, identifies the
 saturated-case predicted GS subspace as the maximum-Casimir
 eigenspace.
 
+\textbf{Step 31 (PR~\#2802)}: composition of PRs \#2796 and \#2801
+in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSEqCasimirEigenspaceSaturated.lean}.
+When $|\neg A| = 0$,
+\texttt{bipartiteToyGroundStateSubspacePredicted A N $=$
+Module.End.eigenspace ($\hat S_{\rm tot})^2$.mulVecLin
+saturatedFerromagnetCasimirEigenvalueS}. The saturated-case
+predicted GS is \emph{just} the maximum-Casimir
+$(\hat S_{\rm tot})^2$-eigenspace, free from any auxiliary
+Hamiltonian.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
