@@ -139,7 +139,6 @@ theorem spinSDot_apply_eq_raising_lowering_explicit
   rw [onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_of_off_two_site_agree
     hxy h]
   rw [spinSOpPlus_apply_raise N hx, spinSOpMinus_apply_lower N hy]
-  push_cast
   ring
 
 /-- Symmetric: lowering at `x` and raising at `y`. -/
@@ -166,7 +165,6 @@ theorem spinSDot_apply_eq_lowering_raising_explicit
   rw [onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_of_off_two_site_agree
     hxy h]
   rw [spinSOpMinus_apply_lower N hx, spinSOpPlus_apply_raise N hy]
-  push_cast
   ring
 
 
@@ -433,3 +431,5 @@ theorem spinSDot_apply_eq_zero_of_off_two_site_agree_diff_at_y_not_pm1
   rw [spinSOpPlus_apply_other N hp]
   ring
 
+
+end LatticeSystem.Quantum
