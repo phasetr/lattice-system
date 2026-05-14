@@ -5984,6 +5984,14 @@ At $N \ge 1$: $|A| > |\neg A|$ implies $(\texttt{bipartiteImbalanceWeight
 A N}).\texttt{re} > 0$; $|A| < |\neg A|$ implies $< 0$. Strict-
 inequality variants of PR \#2773.
 
+\textbf{Step 71 (PR~\#2857)}: Néel-state magnetization norm =
+Theorem 2.3 predicted spin in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateMagNormEqPredicted.lean}.
+$\|\texttt{magEigenvalueS (neelConfigOfS A N)}\| = ||A| - |\neg A||
+\cdot N / 2 = ||A| - |\neg A|| \cdot S$. Quantitative connection
+from the Néel variational input to Theorem 2.3's predicted total
+spin magnitude.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
