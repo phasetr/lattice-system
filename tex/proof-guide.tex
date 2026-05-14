@@ -5963,6 +5963,14 @@ $\|\texttt{bipartiteToyMinEnergyPredictedSymm A N}\| = |A|^2 \cdot
 N^2 / 2 + |A| \cdot N$. Direct from PR \#2848 balanced
 specialisation.
 
+\textbf{Step 68 (PR~\#2854)}: characterisation of
+\texttt{bipartiteImbalanceWeight} $= 0$ in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightEqZeroIff.lean}.
+At $N \ge 1$, \texttt{bipartiteImbalanceWeight A N} $= 0
+\Leftrightarrow |A| = |\neg A|$. The forward direction is PR
+\#2773; the reverse uses the real-part formula and the strict
+positivity $N / 2 > 0$ at $N \ge 1$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
