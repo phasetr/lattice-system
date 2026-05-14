@@ -21,7 +21,7 @@ References:
 
 namespace LatticeSystem.Quantum
 
-variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
+variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] (N : ℕ)
 
 /-! ## Sublattice axis-1 / axis-3 matrix element realness -/
 
@@ -115,13 +115,11 @@ theorem sublatticeSpinSOpPlus_mulVec_basisVecS_zero_on (A : Λ → Bool)
     -- Apply on-site raising. For σ x = 0, this annihilates.
     funext τ
     rw [onSiteS_mulVec_basisVecS_apply]
-    show (onSiteS x (spinSOpPlus N) : ManyBodyOpS Λ N) τ σ = 0
     by_cases h_off : ∀ k, k ≠ x → τ k = σ k
     · rw [onSiteS_apply_of_off_site_agree x _ h_off]
-      change spinSOpPlus N (τ x) (σ x) = 0
       rw [hσ x hA]
       apply spinSOpPlus_apply_other
-      show (τ x).val + 1 ≠ ((0 : Fin (N + 1)).val)
+      change (τ x).val + 1 ≠ ((0 : Fin (N + 1)).val)
       simp
     · exact onSiteS_apply_eq_zero_of_off_site_diff x _ h_off
   · cases h : A x
@@ -141,7 +139,6 @@ theorem sublatticeSpinSOpMinus_mulVec_basisVecS_last_on (A : Λ → Bool)
   · rw [if_pos hA]
     funext τ
     rw [onSiteS_mulVec_basisVecS_apply]
-    show (onSiteS x (spinSOpMinus N) : ManyBodyOpS Λ N) τ σ = 0
     by_cases h_off : ∀ k, k ≠ x → τ k = σ k
     · rw [onSiteS_apply_of_off_site_agree x _ h_off]
       rw [hσ x hA]
