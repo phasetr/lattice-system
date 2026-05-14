@@ -5860,6 +5860,15 @@ the signed sublattice imbalance through $\mathbb Z \to \mathbb C$;
 useful for orientation-flip arithmetic without going through the
 real-axis representation.
 
+\textbf{Step 55 (PR~\#2841)}: orientation flip negates
+\texttt{bipartiteImbalanceWeight} in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightComplement.lean}.
+\texttt{bipartiteImbalanceWeight (fun x => ! A x) N}
+$= -$\texttt{bipartiteImbalanceWeight A N}. Algebraic statement
+that the complement orientation has the opposite sign; building
+block for orientation independence of the Theorem 2.3 predicted
+total-spin magnitude $||A| - |\neg A|| \cdot S$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
