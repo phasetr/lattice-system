@@ -5641,6 +5641,16 @@ operator. Together with PRs \#2798 / \#2799, full $su(2)$ algebra
 closure: predicted GS is invariant under Cartan and ladders, hence
 under the entire Lie algebra.
 
+\textbf{Step 30 (PR~\#2801)}: simplification
+\texttt{saturatedFerromagnetJointEigenspace 0 N $=$
+($\hat S_{\rm tot})^2$ eigenspace} in
+\texttt{LatticeSystem/Quantum/SpinS/SaturatedFMJointZeroEqTotalSpinSSquaredEigenspace.lean}.
+With $J=0$, the H-eigenspace component trivialises (every vector
+satisfies $0\cdot v = 0\cdot v$), so the joint reduces to the
+Casimir eigenspace alone. Combined with PR \#2796, identifies the
+saturated-case predicted GS subspace as the maximum-Casimir
+eigenspace.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
