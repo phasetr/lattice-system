@@ -5686,6 +5686,14 @@ When $|A| = 0$,
 \texttt{bipartiteToyGroundStateSubspacePredicted ($\neg$A) N $=$
 Submodule.span $\mathbb{C}$ (Set.range (ladderIterateUp $\Lambda$ N))}.
 
+\textbf{Step 35 (PR~\#2806)}: toy Hamiltonian vanishes at the
+saturated case in
+\texttt{LatticeSystem/Quantum/SpinS/HeisenbergToyHamiltonianZeroSaturated.lean}.
+$\hat H_{\rm toy_S}(A, N) = 0$ when $|\neg A| = 0$ — no cross-
+sublattice bonds. Direct from
+\texttt{heisenbergToyHamiltonianS\_eq\_two\_sublatticeSpinSDot} +
+the three axis-vanishing lemmas of PR \#2784.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
