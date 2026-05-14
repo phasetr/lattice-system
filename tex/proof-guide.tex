@@ -5737,6 +5737,15 @@ the operator level, A-independent and J-independent. Composition
 of PR \#2801 ($=$ saturated FM joint at $J=0$) and PR \#2768 ($=$
 span ladder).
 
+\textbf{Step 41 (PR~\#2812)}: max-Casimir $(\hat S_{\rm tot})^2$
+eigenspace invariance under any $H_J$ in
+\texttt{LatticeSystem/Quantum/SpinS/TotalSpinSSquaredMaxEigenspaceHeisenbergInvariant.lean}.
+For any $J$, $\texttt{Submodule.map H\_J.mulVecLin}\,(\text{max-
+Casimir eigenspace}) \le \text{max-Casimir eigenspace}$. Direct
+from $[\hat H_J, (\hat S_{\rm tot})^2] = 0$ (SU(2) invariance).
+A-independent, J-independent invariance underlying PRs \#2808 /
+\#2809.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
