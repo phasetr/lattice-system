@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeel
+import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelAllAlignedOrtho
 
 /-!
 # Heisenberg / toy-Hamiltonian expectation on the Néel state and
