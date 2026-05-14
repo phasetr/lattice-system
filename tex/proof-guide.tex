@@ -5746,6 +5746,16 @@ from $[\hat H_J, (\hat S_{\rm tot})^2] = 0$ (SU(2) invariance).
 A-independent, J-independent invariance underlying PRs \#2808 /
 \#2809.
 
+\textbf{Step 42 (PR~\#2813)}: max-Casimir $(\hat S_{\rm tot})^2$
+eigenspace is closed under all $su(2)$ generators in
+\texttt{LatticeSystem/Quantum/SpinS/TotalSpinSSquaredMaxEigenspaceSU2Invariant.lean}.
+Each of $\hat S^{(\alpha)}_{\rm tot}$ ($\alpha = 1, 2, 3$) and
+$\hat S^\pm_{\rm tot}$ preserves the max-Casimir eigenspace, via
+$[\hat T, (\hat S_{\rm tot})^2] = 0$. A general helper
+\texttt{totalSpinSSquaredEigenspace\_invariant\_of\_commute}
+packages ``any commuting operator preserves any
+$(\hat S_{\rm tot})^2$-eigenspace''.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
