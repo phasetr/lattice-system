@@ -13,10 +13,14 @@ mirrors used by `NeelBipartiteWeight.lean` and
 `NeelToyHamiltonianViaCasimir.lean`.
 
 Splitting this trailing section out drops the parent file from
-~2812 lines to ~2428 lines, with no impact on the API (downstream
-files keep their existing import surface; clients that only want
-these `basisVecS`/Néel-expectation lemmas can import this file
-directly).
+~2812 lines to ~2428 lines. The 16 theorems plus the private
+helper `spinSDot_apply_diag_unified` are physically relocated
+here, so consumers that previously did
+`import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeel` and
+referred to these names must now import this companion module
+instead. All in-repo callers
+(`NeelBipartiteWeight.lean`, `NeelToyHamiltonianViaCasimir.lean`)
+were updated in the same PR.
 
 References:
 - H. Tasaki, *Physics and Mathematics of Quantum Many-Body
