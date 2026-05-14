@@ -5971,6 +5971,12 @@ At $N \ge 1$, \texttt{bipartiteImbalanceWeight A N} $= 0
 \#2773; the reverse uses the real-part formula and the strict
 positivity $N / 2 > 0$ at $N \ge 1$.
 
+\textbf{Step 69 (PR~\#2855)}: norm-zero characterisation in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightNormEqZero.lean}.
+At $N \ge 1$, $\|\texttt{bipartiteImbalanceWeight A N}\| = 0
+\Leftrightarrow |A| = |\neg A|$. Direct from \texttt{norm\_eq\_zero}
+and PR \#2854.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
