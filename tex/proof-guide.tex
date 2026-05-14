@@ -5606,6 +5606,17 @@ When $|A| = 0$, \texttt{bipartiteToyGroundStateSubspacePredicted
 PR \#2796 via the orientation flip and $\neg\neg A = A$ filter
 congruence.
 
+\textbf{Step 27 (PR~\#2798)}: $\hat S^z_{\rm tot}$-invariance of
+the predicted GS subspace in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSTotalSpinSOp3Invariant.lean}.
+$\texttt{Submodule.map}\,\hat S^z_{\rm tot}.\texttt{mulVecLin}\,
+(\texttt{predicted GS}) \le \texttt{predicted GS}$. The
+$\hat S^z_{\rm tot}$ operator commutes with all three Casimirs
+($(\hat S_{\rm tot})^2$, $(\hat S_A)^2$, $(\hat S_{\neg A})^2$), so
+it preserves each Casimir eigenspace and hence their meet.
+Standard ``magnetization-preserving operator acts within each
+Casimir subspace'' picture.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
