@@ -5992,6 +5992,13 @@ $\|\texttt{magEigenvalueS (neelConfigOfS A N)}\| = ||A| - |\neg A||
 from the Néel variational input to Theorem 2.3's predicted total
 spin magnitude.
 
+\textbf{Step 72 (PR~\#2858)}: complement Néel-state magnetization
+norm = same predicted spin in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateComplementMagNormEqPredicted.lean}.
+$\|\texttt{magEigenvalueS (neelConfigOfS (}\neg A\texttt{) N)}\| =
+||A| - |\neg A|| \cdot N / 2$. Complement orientation has the
+negated magnetization eigenvalue, so its norm is the same.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
