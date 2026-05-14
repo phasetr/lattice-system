@@ -6,10 +6,13 @@ import LatticeSystem.Quantum.SpinS.BipartiteToyGSSaturatedNeBot
 Unifies PR #2820's two ne_bot statements (saturated at `|¬A| = 0`
 and complement at `|A| = 0`) into a single disjunctive lemma:
 
-  `|A| = 0 ∨ |¬A| = 0 → bipartiteToyGroundStateSubspacePredicted A N ≠ ⊥`.
+  `|A| = 0 ∨ |¬A| = 0 →
+     bipartiteToyGroundStateSubspacePredicted A N ≠ ⊥
+   ∨ bipartiteToyGroundStateSubspacePredicted (fun x => ! A x) N ≠ ⊥`.
 
-The complement orientation is handled by selecting `(fun x => ! A x)`
-when `|A| = 0`.
+The `|¬A| = 0` branch uses the original orientation (left
+disjunct); the `|A| = 0` branch uses the complement orientation
+`(fun x => ! A x)` (right disjunct).
 
 Tracked as part of Tasaki §2.5 Theorem 2.3 / γ-4 (Issue #412).
 -/
