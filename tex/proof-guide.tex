@@ -5999,6 +5999,14 @@ $\|\texttt{magEigenvalueS (neelConfigOfS (}\neg A\texttt{) N)}\| =
 ||A| - |\neg A|| \cdot N / 2$. Complement orientation has the
 negated magnetization eigenvalue, so its norm is the same.
 
+\textbf{Step 73 (PR~\#2859)}: Néel-state mag norm at saturated
+edges $= m_{\rm max}$ in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateMagNormSaturated.lean}.
+At $|\neg A| = 0$ or $|A| = 0$,
+$\|\texttt{magEigenvalueS (neelConfigOfS A N)}\| = |\Lambda|
+\cdot N / 2 = m_{\rm max}$. Saturated-limit specialisation of
+PR \#2857.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
