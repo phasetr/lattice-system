@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.DressedHeisenberg
+import LatticeSystem.Quantum.SpinS.MultiSiteDotOffDiag
 
 /-!
 # Off-`{x, y}`-agree vanishing variants of the dressed-Heisenberg matrix
