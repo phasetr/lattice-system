@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.DressedHeisenberg
+import LatticeSystem.Quantum.SpinS.DressedHeisenbergMarshall
 import LatticeSystem.Quantum.SpinS.MultiSiteDotOffDiag
 
 /-!
