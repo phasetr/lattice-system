@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSector
+import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorMarshall
 
 /-!
 # Eigenvalue uniqueness for the dressed / Heisenberg sector matrices
