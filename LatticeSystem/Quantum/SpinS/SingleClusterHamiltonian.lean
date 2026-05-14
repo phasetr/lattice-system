@@ -27,6 +27,27 @@ star graph (which would double-count each edge at unit coupling).
 Tracked as part of γ-5 (Problem 2.5.a) toward Tasaki §2.5
 (Issue #412).
 
+## Refactor #26 measurement (evaluate-only, 2026-05-14)
+
+After the γ-5 commit compression (`07909dee`) eliminated the
+`SingleClusterHamiltonianNumerics*High` companion files, this
+framework file is the largest active γ-5 artifact in the
+single-cluster chain. Cold-cache build:
+
+  `SingleClusterHamiltonian.lean`: 1505 lines / 15.0 s wall.
+
+Largest peer files in `LatticeSystem/Quantum/SpinS/` (cold cache):
+
+  - `SublatticeCasimirNeel.lean`:   2812 lines / 17.2 s wall.
+  - `DressedHeisenberg.lean`:       1362 lines.
+  - `SublatticeSpin.lean`:          1337 lines.
+  - `DressedMatrixOnMagSector.lean`:1145 lines.
+  - `AllAlignedState.lean`:         1090 lines.
+
+All below the refactor #17/#19/#21/#25 split threshold (~3000 lines /
+~9 s user CPU). No split scheduled. The 50-PR cadence since refactor
+#25 (PR #2751) is satisfied by this evaluate-only checkpoint.
+
 References:
 - H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
   Springer 2020, §2.5 Problem 2.5.a, p. 38.
