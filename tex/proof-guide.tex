@@ -5717,6 +5717,16 @@ GS is invariant under
 \texttt{heisenbergHamiltonianS J N}. Apply PR \#2808 to $\neg A$
 via filter congruence.
 
+\textbf{Step 39 (PR~\#2810)}: max-Casimir $(\hat S_{\rm tot})^2$
+eigenspace dimension in
+\texttt{LatticeSystem/Quantum/SpinS/TotalSpinSSquaredMaxEigenspaceFinrank.lean}.
+$\dim_\mathbb{C} \texttt{Module.End.eigenspace}((\hat S_{\rm tot})^2)
+_{\rm maxCasimir} = |V|\cdot N + 1 = 2 m_{\max}+1$. Operator-level
+dimension of the spin-$m_{\max}$ irreducible representation at the
+top weight, A-independent and J-independent. Composition of PR
+\#2801 ($=$ saturated FM joint at $J=0$) and PR \#2769 ($=$
+finrank).
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
