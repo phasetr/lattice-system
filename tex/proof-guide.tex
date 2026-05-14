@@ -5901,6 +5901,14 @@ $(\texttt{bipartiteToyMinEnergyPredictedSymm A N}).\texttt{re} < 0$
 when $|A| \ge 1$, $|\neg A| \ge 1$, $N \ge 1$. Symmetric-form
 mirror of PR \#2817.
 
+\textbf{Step 60 (PR~\#2846)}: explicit witness of the saturated-FM
+joint eigenspace at $J = 0$ in
+\texttt{LatticeSystem/Quantum/SpinS/AllAlignedStateMemSaturatedFMJointZero.lean}.
+\texttt{allAlignedStateS V N 0} $\in$
+\texttt{saturatedFerromagnetJointEigenspace} $(0 : V \to V \to
+\mathbb C)$ $N$. Strengthens PR \#2821's ne\_bot into a concrete
+witness via PR \#2801 and PR \#2814.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
