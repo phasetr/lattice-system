@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSector
+import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorEigenvalueUnique
 
 /-!
 # Magnetization-sector embedding for spin-`S` configuration vectors

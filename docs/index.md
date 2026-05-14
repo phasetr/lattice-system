@@ -1271,8 +1271,12 @@ Generic-spin (`N = 2S`) version of Tasaki §2.5 Theorem 2.2 applied to the
 Heisenberg Hamiltonian on a bipartite graph. The sector subtype
 `magConfigS V N M := { σ : V → Fin (N + 1) // magSumS σ = M }` is the
 natural index type since the dressed Heisenberg matrix is irreducible
-on each sector. All theorems live in
-`Quantum/SpinS/DressedMatrixOnMagSector.lean`. Tracked in Issue #412.
+on each sector. The core sector-matrix API lives in
+`Quantum/SpinS/DressedMatrixOnMagSector.lean`; the trailing
+eigenvalue-uniqueness + complex-form MLM Theorem 2.2 statements
+were moved to the companion
+`Quantum/SpinS/DressedMatrixOnMagSectorEigenvalueUnique.lean` in
+refactor #30 (PR #2829). Tracked in Issue #412.
 
 | Lean name | Statement |
 |---|---|
