@@ -5679,6 +5679,13 @@ of PR \#2796 + PR \#2768. The saturated-case predicted GS subspace
 is precisely the linear span of the $(2 m_{\max}+1)$ ladder
 iterates $\{(\hat S^-_{\rm tot})^k\,|\sigma_\top\rangle\}_k$.
 
+\textbf{Step 34 (PR~\#2805)}: opposite saturated case mirror of
+PR \#2804 in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSEqSpanLadderOppositeSaturated.lean}.
+When $|A| = 0$,
+\texttt{bipartiteToyGroundStateSubspacePredicted ($\neg$A) N $=$
+Submodule.span $\mathbb{C}$ (Set.range (ladderIterateUp $\Lambda$ N))}.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
