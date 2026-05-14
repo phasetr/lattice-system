@@ -5629,6 +5629,18 @@ Cartesian generators — the full SU(2) symmetry at the operator
 level, a necessary structural condition for the irreducible-
 representation interpretation of Theorem 2.3.
 
+\textbf{Step 29 (PR~\#2800)}: $\hat S^+_{\rm tot}$ /
+$\hat S^-_{\rm tot}$ invariance of the predicted GS subspace in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSLadderInvariant.lean}.
+Derived commutations
+$[(\hat S_A)^2, \hat S^\pm_{\rm tot}] = 0$ via
+$\hat S^\pm_{\rm tot} = \hat S^{(1)}_{\rm tot} \pm i \hat S^{(2)}_{\rm tot}$
+and the Cartesian commutations of PR \#2799. Same proof pattern as
+PR \#2798 gives the predicted-GS invariance under each ladder
+operator. Together with PRs \#2798 / \#2799, full $su(2)$ algebra
+closure: predicted GS is invariant under Cartan and ladders, hence
+under the entire Lie algebra.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
