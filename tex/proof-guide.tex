@@ -5830,6 +5830,18 @@ complement orientation via the $\neg\neg A = A$ filter
 congruence. Pairs with PR \#2820's complement ne\_bot to give the
 explicit witness $|\sigma_\top\rangle$ at the $|A| = 0$ edge.
 
+\textbf{Step 52 (PR~\#2825)}: \texttt{bipartiteImbalanceWeight}
+is real in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightImZero.lean}.
+Realises \texttt{bipartiteImbalanceWeight A N} as the lift of the
+real-axis imbalance times $N/2$:
+$\texttt{bipartiteImbalanceWeight A N} =
+((|A| - |\neg A|) \cdot N / 2 : \mathbb R)$.
+Corollaries: imaginary part is $0$ and real part is
+$(|A| - |\neg A|) \cdot N / 2 : \mathbb R$. Cleans up
+Tasaki §2.5 Theorem 2.3's real-axis comparisons by eliminating
+the implicit $\mathbb R \to \mathbb C$ coercion.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
