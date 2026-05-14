@@ -232,4 +232,3 @@ theorem singleClusterMaxEnergyS_re_pos_of_pos
 
 end LatticeSystem.Quantum
 
-end LatticeSystem.Quantum
