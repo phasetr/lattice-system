@@ -45,6 +45,7 @@ noncomputable def ladderEigenvalueUp (V : Type*) (N : ℕ) [Fintype V]
     (k : Fin (Fintype.card V * N + 1)) : ℂ :=
   ((Fintype.card V : ℂ) * (N : ℂ) / 2) - (k.val : ℂ)
 
+omit [DecidableEq V] in
 /-- The eigenvalue function is injective. -/
 theorem ladderEigenvalueUp_injective :
     Function.Injective (ladderEigenvalueUp V N) := by
