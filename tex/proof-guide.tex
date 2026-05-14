@@ -5947,6 +5947,15 @@ At $|\neg A| = 0$ or $|A| = 0$,
 $\|\texttt{bipartiteToyMinEnergyPredictedSymm A N}\| = 0$.
 Direct from PR \#2849 and \texttt{norm\_zero}.
 
+\textbf{Step 66 (PR~\#2852)}: balanced-case symm-predicted min
+energy in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmBalanced.lean}.
+When $|A| = |\neg A|$,
+\texttt{bipartiteToyMinEnergyPredictedSymm A N} $= -|A|^2 \cdot
+N^2 / 2 - |A| \cdot N$. Cross term collapses to $|A|^2$ and
+$\min(|A|, |\neg A|) = |A|$. Symmetric-form mirror of the
+asymmetric balanced form.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
