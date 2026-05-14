@@ -5932,6 +5932,14 @@ At $|\neg A| = 0$ or $|A| = 0$,
 \texttt{bipartiteToyMinEnergyPredictedSymm A N} $= 0$. Symmetric-
 form mirror of PR \#2779.
 
+\textbf{Step 64 (PR~\#2850)}: imbalance-weight norm at saturated
+edges equals $|\Lambda| \cdot N / 2$ in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightNormSaturated.lean}.
+At $|\neg A| = 0$ or $|A| = 0$,
+$\|\texttt{bipartiteImbalanceWeight A N}\| = |\Lambda| \cdot N / 2
+= m_{\rm max}$. Matches the maximum total spin attained at the
+all-aligned ferromagnetic state.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
