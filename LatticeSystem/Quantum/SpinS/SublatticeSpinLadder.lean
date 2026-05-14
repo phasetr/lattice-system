@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SublatticeSpin
+import LatticeSystem.Quantum.SpinS.SublatticeSpinLadderDef
 
 /-!
 # Sublattice ladder API (build-speed companion)
