@@ -32,7 +32,7 @@ theorem cardA_or_cardNotA_zero_of_bipartiteToyMinEnergyPredictedSymm_eq_zero
       (Finset.univ.filter (fun x : Λ => (! A x) = true)).card = 0 := by
   -- Contrapositive: if both are ≥ 1, then the value is strictly negative.
   by_contra hcon
-  push_neg at hcon
+  push Not at hcon
   obtain ⟨hA_ne, hAc_ne⟩ := hcon
   have hA_pos : 0 < (Finset.univ.filter (fun x : Λ => A x = true)).card :=
     Nat.pos_of_ne_zero hA_ne

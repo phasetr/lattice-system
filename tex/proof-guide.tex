@@ -6039,8 +6039,10 @@ Opposite-orientation mirror of PR \#2862 via \texttt{abs\_of\_nonpos}.
 symm-predicted min energy at $N \ge 1$ in
 \texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmEqZeroIff.lean}.
 $\texttt{bipartiteToyMinEnergyPredictedSymm A N} = 0
-\Leftrightarrow |A| = 0 \lor |\neg A| = 0$. Forward direction from
-PR \#2849, converse via contrapositive of PR \#2845.
+\Leftrightarrow |A| = 0 \lor |\neg A| = 0$. Reverse direction
+(saturated edge $\to$ energy 0) from PR \#2849; forward direction
+(energy 0 $\to$ saturated edge) via the contrapositive of PR
+\#2845's strict negativity.
 
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
