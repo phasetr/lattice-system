@@ -5699,6 +5699,16 @@ the three axis-vanishing lemmas of PR \#2784.
 $\hat H_{\rm toy_S}(A, N) = 0$ when $|A| = 0$. Apply the
 axis-vanishing lemmas of PR \#2784 to $A$ directly.
 
+\textbf{Step 37 (PR~\#2808)}: predicted GS at saturated case is
+invariant under any Heisenberg Hamiltonian in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyGSSaturatedAnyJInvariant.lean}.
+For any coupling $J$, at $|\neg A| = 0$,
+\texttt{Submodule.map H\_J.mulVecLin (predicted GS) $\le$
+predicted GS}. Combines PR \#2802 (predicted GS $=$
+$(\hat S_{\rm tot})^2$ eigenspace) with the SU(2) invariance of
+any Heisenberg Hamiltonian. Generalises PR \#2794 (toy-H
+invariance) to any coupling at the saturated case.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
