@@ -5940,6 +5940,13 @@ $\|\texttt{bipartiteImbalanceWeight A N}\| = |\Lambda| \cdot N / 2
 = m_{\rm max}$. Matches the maximum total spin attained at the
 all-aligned ferromagnetic state.
 
+\textbf{Step 65 (PR~\#2851)}: symm-energy norm vanishes at
+saturated edges in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmNormSaturated.lean}.
+At $|\neg A| = 0$ or $|A| = 0$,
+$\|\texttt{bipartiteToyMinEnergyPredictedSymm A N}\| = 0$.
+Direct from PR \#2849 and \texttt{norm\_zero}.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
