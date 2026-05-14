@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.SpinS.ToyHamiltonianJointEigenvalue
-import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeel
+import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelBasisVecS
 
 /-!
 # Néel-state toy Hamiltonian expectation via the Casimir decomposition

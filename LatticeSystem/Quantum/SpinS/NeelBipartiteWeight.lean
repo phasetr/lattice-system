@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeel
+import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelBasisVecS
 
 /-!
 # Néel state and the bipartite imbalance weight (Tasaki §2.5 Theorem 2.3 foundation)
