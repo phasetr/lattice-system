@@ -6058,6 +6058,15 @@ $0 < \|\texttt{bipartiteToyMinEnergyPredictedSymm A N}\|$ when
 $N \ge 1$, $|A| \ne 0$, $|\neg A| \ne 0$. Contrapositive of
 PR \#2865.
 
+\textbf{Step 81 (PR~\#2867)}: positive forms of the imbalance-
+weight norm in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightNormPositive.lean}.
+At $|\neg A| \le |A|$:
+$\|\texttt{bipartiteImbalanceWeight A N}\| = (|A| - |\neg A|)
+\cdot N / 2$. At $|A| \le |\neg A|$:
+$\|\texttt{bipartiteImbalanceWeight A N}\| = (|\neg A| - |A|)
+\cdot N / 2$. Drops the absolute-value bars case-specifically.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
