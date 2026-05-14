@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Heisenberg
+import LatticeSystem.Quantum.SpinS.MultiSiteDotOffDiag
 import LatticeSystem.Quantum.SpinS.MarshallSign
 import LatticeSystem.Lattice.Graph
 import Mathlib.Combinatorics.SimpleGraph.Basic

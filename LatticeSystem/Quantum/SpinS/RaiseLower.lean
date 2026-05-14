@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Magnetization
+import LatticeSystem.Quantum.SpinS.MultiSiteDotOffDiag
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 import Mathlib.Combinatorics.SimpleGraph.Basic
 
