@@ -5842,6 +5842,15 @@ $(|A| - |\neg A|) \cdot N / 2 : \mathbb R$. Cleans up
 Tasaki §2.5 Theorem 2.3's real-axis comparisons by eliminating
 the implicit $\mathbb R \to \mathbb C$ coercion.
 
+\textbf{Step 53 (PR~\#2826)}: norm of
+\texttt{bipartiteImbalanceWeight} in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightAbs.lean}.
+$\|\texttt{bipartiteImbalanceWeight A N}\| =
+||A| - |\neg A|| \cdot N / 2$. This is exactly the
+$||A| - |\neg A|| \cdot S$ predicted total spin appearing in
+Tasaki §2.5 Theorem 2.3 (recall $S = N/2$). Direct from
+PR \#2825's ofReal realisation and \texttt{Complex.norm\_real}.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
