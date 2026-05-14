@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeel
+import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelExpectations
 
 /-!
 # Néel-vs-all-aligned orthogonality, linear independence, and finrank
