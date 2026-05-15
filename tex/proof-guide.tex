@@ -7030,6 +7030,17 @@ $+$ Step 178 ($\|\mathrm{biw}\| = m_{\rm max} \Leftrightarrow$ saturated)
 using polynomial factoring. Unifies Steps 158/166 via the physical
 $\max$ quantity.
 
+\textbf{Step 180 (PR~\#2971)}: unified max iff
+$\max(\mathrm{canonical}, \mathrm{complement}) > 0 \Leftrightarrow$
+unbalanced at $N \ge 1$ in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMaxPosIffUnbalanced.lean}.
+The \emph{physical} predicted $(\widehat S_{\rm tot})^2$ eigenvalue is
+strictly positive iff $|A| \ne |\neg A|$. Direct from Step 175
+($\max = \|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$) + Step 81
+($\|\mathrm{biw}\| = 0 \Leftrightarrow$ balanced at $N \ge 1$). Unifies
+Step 147 (canonical) and Step 164 (complement) via the
+physical-quantity iff.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
