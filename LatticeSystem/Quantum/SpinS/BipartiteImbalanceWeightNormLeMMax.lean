@@ -30,8 +30,6 @@ theorem bipartiteImbalanceWeight_norm_le_mMax :
       ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℝ) +
         ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℝ) =
         (Fintype.card Λ : ℝ) := by
-    have h := hsum
-    push_cast
     exact_mod_cast hsum
   have hA_nn : (0 : ℝ) ≤
       ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℝ) :=
