@@ -6500,6 +6500,20 @@ Direct from $\langle\widehat H_{\rm toy}^S\rangle_{\rm N\acute{e}el} =
 -|A|\cdot|\neg A|\cdot N^2/2$ ($\gamma$-4 step 131) +
 $|A|\cdot|\neg A|\cdot N^2 > 0$ at non-degenerate.
 
+\textbf{Step 124 (PR~\#2912)}: N\'eel sublattice Casimir expectations
+in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSSublatticeSpinSquaredSExpectation.lean}.
+$\langle\Phi_{\rm N\acute{e}el} |\,(\widehat S_A)^2\,
+   | \Phi_{\rm N\acute{e}el}\rangle = s_A\cdot(s_A+1)$ and
+$\langle\Phi_{\rm N\acute{e}el} |\,(\widehat S_{\neg A})^2\,
+   | \Phi_{\rm N\acute{e}el}\rangle = s_B\cdot(s_B+1)$
+where $s_A = |A|\cdot N/2$, $s_B = |\neg A|\cdot N/2$. Direct from
+existing eigenvector relations + $\langle\Phi_{\rm N\acute{e}el}|
+\Phi_{\rm N\acute{e}el}\rangle = 1$. Confirms N\'eel has maximum
+spin on both sublattices --- a key input to Tasaki §2.5
+Theorem 2.3 (γ-4): the N\'eel state matches the predicted GS
+subspace's sublattice Casimir constraints.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
