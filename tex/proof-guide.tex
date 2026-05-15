@@ -6527,6 +6527,17 @@ $(\widehat S_{\rm tot})^2$ expectation ($\|\mathrm{biw}\|^2 +
 $\|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$ by $\min\cdot N$
 (Step 113).
 
+\textbf{Step 126 (PR~\#2914)}: N\'eel = all-aligned + GS membership
+at saturated $|\neg A| = 0$ in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSEqAllAlignedStateAtSaturated.lean}.
+At $|\neg A| = 0$:
+$\mathtt{neelConfigOfS}\,A\,N = (\lambda \_, 0)$, hence
+$\Phi_{\rm N\acute{e}el}(A, N) = \mathtt{allAlignedStateS}\,\Lambda\,N\,0$.
+Combined with the existing all-up GS witness (PR \#2782) yields
+$\Phi_{\rm N\acute{e}el}(A, N) \in
+   \mathtt{bipartiteToyGroundStateSubspacePredicted}\,A\,N$ at
+saturated. The N\'eel state IS the predicted GS at saturated edges.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
