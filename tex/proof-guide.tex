@@ -7106,6 +7106,14 @@ since $\max - \min = |\mathrm{canonical} - \mathrm{complement}|$.
 Expanded polynomial form of Step 175. Convenient for \texttt{nlinarith}
 and arithmetic.
 
+\textbf{Step 189 (PR~\#2980)}: $\min(\mathrm{canonical}, \mathrm{complement})
+= \|\mathrm{biw}\|^2 - \|\mathrm{biw}\|$ \emph{unconditionally} in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMinEqNormSqSub.lean}.
+Expanded polynomial form of Step 176. Companion of Step 188 — together
+makes the affine parameterisation
+$\max = \|\mathrm{biw}\|^2 + \|\mathrm{biw}\|$,
+$\min = \|\mathrm{biw}\|^2 - \|\mathrm{biw}\|$ explicit.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
