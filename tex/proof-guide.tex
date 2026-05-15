@@ -6894,6 +6894,17 @@ is an orientation-specialised consequence at $|A| \le |\neg A|$ where
 $\mathrm{biw.re} \le 0$ so $-\mathrm{biw.re} = \|\mathrm{biw}\|$. Allows
 orientation-free reasoning about the complement form.
 
+\textbf{Step 166 (PR~\#2956)}: unified iff complement predicted
+$(\widehat S_{\rm tot})^2$ eigenvalue
+$= m_{\rm max}(m_{\rm max}+1) \Leftrightarrow |A| = 0$ at $N \ge 1$
+(\emph{no} orientation hypothesis) in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueComplementEqMMaxQuadIffCardAZeroUnified.lean}.
+Generalises Step 159. Direct from Step 165 (signed complement form
+$\mathrm{biw.re}\cdot(\mathrm{biw.re}-1)$) + $|\mathrm{biw.re}| \le m_{\rm max}$:
+factoring $(\mathrm{biw.re}-(m_{\rm max}+1))(\mathrm{biw.re}+m_{\rm max}) = 0$
+and using $\mathrm{biw.re} \le m_{\rm max} < m_{\rm max}+1$ forces
+$\mathrm{biw.re} = -m_{\rm max}$, hence $|A| = 0$ at $N \ge 1$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
