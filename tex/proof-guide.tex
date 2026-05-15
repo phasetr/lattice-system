@@ -6801,6 +6801,16 @@ predicted GS Casimir is strictly below the fully-polarised
 ferromagnetic value; this completes the "saturated iff equality"
 characterisation.
 
+\textbf{Step 156 (PR~\#2946)}: strict upper bound on complement
+predicted $(\widehat S_{\rm tot})^2$ eigenvalue
+$< m_{\rm max}(m_{\rm max}+1)$ \emph{at non-degenerate}
+($|A| \le |\neg A|$, $|A| \ge 1$, $|\neg A| \ge 1$, $N \ge 1$) in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueComplementLtMMaxQuadNondegenerate.lean}.
+Mirror of Step 155 strengthening Step 153 from $\le$ to $<$. Direct
+from Step 142 (complement $= \|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$)
++ Step 144 ($\|\mathrm{biw}\| < m_{\rm max}$ at non-degenerate) +
+monotonicity of $x(x+1)$ on $[0, m_{\rm max})$ via \texttt{nlinarith}.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
