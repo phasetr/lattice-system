@@ -7196,6 +7196,15 @@ $\min(\mathrm{canonical}, \mathrm{complement}) \le \mathrm{complement}$
 \texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMinLeComplement.lean}.
 Companion of Step 200. Trivial corollary of \texttt{min\_le\_right}.
 
+\textbf{Step 202 (PR~\#2994)}: predicted min energy decomposition
+$(bipartiteToyMinEnergyPredicted\ A\ N).\mathrm{re} =
+\mathrm{canonical\_eigenvalue.re} -
+\mathrm{Re}(s_A\cdot(s_A+1)) - \mathrm{Re}(s_B\cdot(s_B+1))$ in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergyPredictedReViaEigenvalue.lean}.
+Direct from the definition via \texttt{Complex.sub\_re}. Makes
+explicit the relationship between predicted min energy of $H_{\rm toy}$
+and the canonical predicted $(\widehat S_{\rm tot})^2$ eigenvalue.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
