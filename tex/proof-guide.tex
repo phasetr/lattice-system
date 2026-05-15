@@ -6592,6 +6592,16 @@ Direct from Step 99 ($\|\mathrm{biw}\|^2/2 - |\Lambda|^2\cdot N^2/8$)
 + $\|\mathrm{biw}\| = 0$ at balanced. Variational benchmark for
 the actual GS energy.
 
+\textbf{Step 133 (PR~\#2922)}: saturated-edge N\'eel toy-Hamiltonian
+expectation $= 0$ in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSHeisenbergToyExpectationReSaturated.lean}.
+At $|\neg A| = 0$ (or $|A| = 0$):
+$(\langle\Phi_{\rm N\acute{e}el} |\,\widehat H_{\rm toy}^S\,
+   | \Phi_{\rm N\acute{e}el}\rangle).\mathrm{re} = 0$.
+N\'eel achieves zero energy at saturated edges, matching the
+predicted GS energy --- confirming N\'eel IS a GS at saturated
+edges.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
