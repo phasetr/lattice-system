@@ -7001,6 +7001,16 @@ edges where $\|\mathrm{biw}\| = m_{\rm max}$, this equals
 $m_{\rm max}(m_{\rm max}-1)$ (matching Steps 168/169
 alternative-orientation values).
 
+\textbf{Step 177 (PR~\#2968)}: $\max - \min$ of canonical/complement
+predicted $(\widehat S_{\rm tot})^2$ eigenvalues $= 2\cdot\|\mathrm{biw}\|$
+\emph{unconditionally} in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMaxMinDiff.lean}.
+Companion of Step 170 (canonical $-$ complement $= 2\cdot\mathrm{biw.re}$)
+using $\|\mathrm{biw}\|$ instead of signed $\mathrm{biw.re}$. Direct
+from Step 175 $-$ Step 176 $= \|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1) -
+\|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|-1) = 2\cdot\|\mathrm{biw}\|$ via
+\texttt{ring}. The max-min gap is non-negative since $\|\mathrm{biw}\| \ge 0$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
