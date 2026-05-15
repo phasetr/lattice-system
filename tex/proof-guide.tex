@@ -6811,6 +6811,19 @@ from Step 142 (complement $= \|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$)
 + Step 144 ($\|\mathrm{biw}\| < m_{\rm max}$ at non-degenerate) +
 monotonicity of $x(x+1)$ on $[0, m_{\rm max})$ via \texttt{nlinarith}.
 
+\textbf{Step 157 (PR~\#2947)}: generalised strict predicted
+$(\widehat S_{\rm tot})^2$ eigenvalue $< m_{\rm max}(m_{\rm max}+1)$
+at $|\neg A| \ge 1$, $N \ge 1$ (\emph{without} $|A| \ge 1$) in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueLtMMaxQuadOfCardNotAPos.lean}.
+Generalises Step 155 by removing the $|A| \ge 1$ hypothesis. Direct
+from Step 143 + strict $\mathrm{biw.re} < m_{\rm max}$ (since
+$|A| - |\neg A| < |\Lambda|$ when $|\neg A| \ge 1$, scaled by
+$N \ge 1$) + unconditional $-m_{\rm max} \le \mathrm{biw.re}$ (from
+$\|\mathrm{biw}\| \le m_{\rm max}$ + $\mathrm{biw.im} = 0$), then
+\texttt{nlinarith}. Sets up the equality characterisation
+$\mathrm{eigenvalue} = m_{\rm max}(m_{\rm max}+1) \Leftrightarrow
+|\neg A| = 0$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
