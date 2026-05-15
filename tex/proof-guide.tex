@@ -6565,6 +6565,12 @@ $(\mathrm{symm}).\mathrm{re} + |\Lambda|^2\cdot N^2/8 + |\Lambda|\cdot N/2
 Quadratic in $\|\mathrm{biw}\|$. Vanishes at balanced; equals
 $m_{\rm max}\cdot(m_{\rm max}+2)/2$ at saturated.
 
+\textbf{Step 130 (PR~\#2918)}: squared $m_{\rm max}$ upper bound on
+imbalance norm in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightNormSqLeMMaxSq.lean}.
+$\|\mathtt{bipartiteImbalanceWeight}\,A\,N\|^2 \le |\Lambda|^2\cdot N^2/4
+= m_{\rm max}^2$. Direct from the linear $m_{\rm max}$ bound squared.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
