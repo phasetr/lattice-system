@@ -6401,6 +6401,17 @@ $\|\mathrm{biw}\|^2 + \|\mathrm{biw}\| <
 Strict version of Step 113; demonstrates the N\'eel state spans multiple
 $S_{\rm tot}$ sectors (not the GS) at non-degenerate.
 
+\textbf{Step 115 (PR~\#2903)}: quantitative N\'eel-vs-predicted
+$(\widehat S_{\rm tot})^2$ gap lower bound at non-degenerate in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSTotalSpinSSquaredVsPredictedGapGeN.lean}.
+At $|A| \ge 1$, $|\neg A| \ge 1$:
+$N \le (\langle\Phi_{\rm N\acute{e}el} |\,(\widehat S_{\rm tot})^2\,
+   | \Phi_{\rm N\acute{e}el}\rangle).\mathrm{re}
+   - (\|\mathrm{biw}\|^2 + \|\mathrm{biw}\|)$.
+Parallel of Step 112 (energy quantitative gap) for the
+$(\widehat S_{\rm tot})^2$ Casimir: $\min \ge 1$ at non-degenerate,
+gap $= \min\cdot N \ge N$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
