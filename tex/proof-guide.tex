@@ -6660,6 +6660,17 @@ $\mathrm{finrank}(\mathtt{jointSublatticeCasimirEigenspace}\,
    (\lambda x, !A\,x)\,N) = |\Lambda|\cdot N + 1$.
 Mirror of Step 138 via $|\neg\neg A| = |A| = 0$.
 
+\textbf{Step 140 (PR~\#2929)}: joint Casimir $=$ $(\widehat S_{\rm tot})^2$
+eigenspace at saturated in
+\texttt{LatticeSystem/Quantum/SpinS/JointCasimirEqTotalSpinSSquaredEigenspaceSaturated.lean}.
+At $|\neg A| = 0$:
+$\mathtt{jointSublatticeCasimirEigenspace}\,A\,N =
+\mathrm{eigenspace}(\widehat S_{\rm tot}^2, \mathtt{saturatedFerromagnetCasimirEigenvalueS}\,\Lambda\,N)$.
+Composes Step 136 (predicted GS = joint Casimir at saturated) +
+the existing predicted GS = $(\widehat S_{\rm tot})^2$ eigenspace at
+max Casimir at saturated. The joint Casimir IS the fully-polarised
+ferromagnetic SU(2) multiplet at saturated.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
