@@ -7041,6 +7041,16 @@ strictly positive iff $|A| \ne |\neg A|$. Direct from Step 175
 Step 147 (canonical) and Step 164 (complement) via the
 physical-quantity iff.
 
+\textbf{Step 181 (PR~\#2972)}: range Icc for the physical predicted
+$(\widehat S_{\rm tot})^2$ eigenvalue:
+$\max(\mathrm{canonical}, \mathrm{complement}) \in [0, m_{\rm max}(m_{\rm max}+1)]$
+\emph{unconditionally} in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMaxMemIcc.lean}.
+Direct from Step 175 ($\max = \|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$)
++ $0 \le \|\mathrm{biw}\| \le m_{\rm max}$ + monotonicity. Unifies the
+orientation-specialised range Icc (Steps 160/162) via the physical
+$\max$ quantity.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
