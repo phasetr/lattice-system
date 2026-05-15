@@ -15,8 +15,9 @@ gives the **lower bound**
      ≥ −|Λ|²·N²/8 − min(|A|, |¬A|)·N`.
 
 Combined with PR #2844's upper bound `(symm).re ≤ 0`, this is a
-sandwich. Equality in the lower bound is achieved exactly at
-balanced sublattices (`‖biw‖ = 0`, i.e. `|A| = |¬A|`).
+sandwich. Equality in the lower bound is achieved iff
+`‖biw‖ = 0`; for `N ≥ 1` this characterises balanced sublattices
+(`|A| = |¬A|`).
 
 Tracked as part of Tasaki §2.5 Theorem 2.3 / γ-4 (Issue #412).
 -/
