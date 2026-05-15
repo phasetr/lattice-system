@@ -6868,6 +6868,14 @@ $|A| \le |\neg A|$ in
 Mirror of Step 160. Combines Step 161 ($\ge 0$) and Step 153
 ($\le m_{\rm max}(m_{\rm max}+1)$).
 
+\textbf{Step 163 (PR~\#2953)}: complement predicted $(\widehat S_{\rm tot})^2$
+eigenvalue $= 0 \Leftrightarrow |A| = |\neg A|$ at $|A| \le |\neg A|$,
+$N \ge 1$ in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueComplementEqZeroIffBalanced.lean}.
+Mirror of Step 146. Direct from Step 142 + Step 81
+($\|\mathrm{biw}\| = 0 \Leftrightarrow |A|=|\neg A|$ at $N \ge 1$) +
+$\|\mathrm{biw}\| + 1 \ge 1 > 0$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
