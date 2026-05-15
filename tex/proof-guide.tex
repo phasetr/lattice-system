@@ -6104,6 +6104,13 @@ $(|A| = 0 \land |\neg A| = 0) \Leftrightarrow
 $[\texttt{Nonempty}\,\Lambda] \to 0 < |A| \lor 0 < |\neg A|$.
 Direct corollary of PR \#2872.
 
+\textbf{Step 88 (PR~\#2874)}: upper bound by $m_{\rm max}$ in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightNormLeMMax.lean}.
+$\|\texttt{bipartiteImbalanceWeight A N}\| \le |\Lambda| \cdot N / 2
+= m_{\rm max}$. The predicted Theorem 2.3 spin magnitude is
+bounded above by the maximum total spin. Direct from
+$||A| - |\neg A|| \le |A| + |\neg A| = |\Lambda|$ (PR \#2870).
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
