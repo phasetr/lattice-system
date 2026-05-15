@@ -6703,6 +6703,15 @@ $\mathrm{gap} = 0 \iff |A| = 0 \vee |\neg A| = 0$.
 Direct from Step 113 (gap $= \min\cdot N$) + $\min\cdot N = 0 \iff
 \min = 0$ at $N \ge 1$.
 
+\textbf{Step 145 (PR~\#2934)}: energy gap iff characterisation at
+$N \ge 1$ in
+\texttt{LatticeSystem/Quantum/SpinS/NeelToyEnergyGapEqZeroIffSaturated.lean}.
+$(\langle\Phi_{\rm N\acute{e}el}|\widehat H_{\rm toy}^S|\Phi_{\rm N\acute{e}el}\rangle
+   - \texttt{bipartiteToyMinEnergyPredictedSymm}\,A\,N).\mathrm{re} = 0
+   \iff |A| = 0 \vee |\neg A| = 0$.
+Energy parallel of Step 144; both gaps vanish simultaneously at
+saturated edges.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
