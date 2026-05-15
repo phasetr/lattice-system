@@ -6368,6 +6368,16 @@ saturated edges (PR \#2851/2852). The N\'eel state at saturated
 edges is a $(\widehat S_{\rm tot})^2$ eigenvector at the
 fully-polarised ferromagnetic maximum-spin eigenvalue.
 
+\textbf{Step 112 (PR~\#2899)}: quantitative N\'eel-vs-predictedSymm
+gap lower bound at non-degenerate in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSPredictedSymmGapGeN.lean}.
+At $|A| \ge 1$, $|\neg A| \ge 1$:
+$N \le (\langle\Phi_{\rm N\acute{e}el} |\, \widehat H_{\rm toy}^S\,
+   | \Phi_{\rm N\acute{e}el}\rangle
+   - \texttt{bipartiteToyMinEnergyPredictedSymm A N}).\mathrm{re}$.
+Refines Step 106 strict positivity: since $\min(|A|, |\neg A|) \ge 1$
+at non-degenerate, gap $= \min\cdot N \ge N$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
