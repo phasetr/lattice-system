@@ -12,8 +12,8 @@ manipulations.
   unconditionally.
 
 Together with the complement signed form (`biw.re² − biw.re`,
-PR #2965 below), this gives the symmetric affine
-parameterisation of both eigenvalues.
+future companion), this gives the symmetric affine parameterisation
+of both eigenvalues.
 
 Tracked as part of Tasaki §2.5 Theorem 2.3 / γ-4 (Issue #412).
 -/
