@@ -6081,6 +6081,12 @@ $(\texttt{symm}).\texttt{re} = -(|A| \cdot |\neg A| \cdot N^2 / 2
 + \min(|A|, |\neg A|) \cdot N)$. Sign-normalised expression of
 PR \#2843's \texttt{\_re\_eq}.
 
+\textbf{Step 84 (PR~\#2870)}: bipartition cardinality sum in
+\texttt{LatticeSystem/Quantum/SpinS/CardSumEqFintype.lean}.
+$|A| + |\neg A| = \texttt{Fintype.card}\,\Lambda$ via
+\texttt{Finset.card\_filter\_add\_card\_filter\_not}. Foundational
+identity used across the $\gamma$-4 chain.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
