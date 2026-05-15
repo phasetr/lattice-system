@@ -27,7 +27,7 @@ theorem filter_notA_eq_filter_not_A_eq_true :
   classical
   congr 1
   funext x
-  rcases hA : A x <;> simp [hA]
+  rcases A x <;> simp
 
 /-- **Bipartition cardinality sum**: `|A| + |¬A| = Fintype.card Λ`. -/
 theorem cardA_add_cardNotA_eq_card :
