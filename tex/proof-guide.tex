@@ -6571,6 +6571,17 @@ imbalance norm in
 $\|\mathtt{bipartiteImbalanceWeight}\,A\,N\|^2 \le |\Lambda|^2\cdot N^2/4
 = m_{\rm max}^2$. Direct from the linear $m_{\rm max}$ bound squared.
 
+\textbf{Step 131 (PR~\#2919)}: N\'eel $\notin$ predicted GS at
+non-degenerate in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSNotMemBipartiteToyGSPredictedNondegenerate.lean}.
+At $|A| \ge 1$, $|\neg A| \ge 1$, $N \ge 1$, $|\neg A| \le |A|$:
+$\Phi_{\rm N\acute{e}el}(A, N) \notin
+\mathtt{bipartiteToyGroundStateSubspacePredicted}\,A\,N$. By
+contradiction: GS membership would force
+$\langle(\widehat S_{\rm tot})^2\rangle_{\rm N\acute{e}el} =
+\|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$, but Step 114 shows
+strict $>$. Complements Step 126 (saturated case: N\'eel $\in$ GS).
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
