@@ -6278,6 +6278,17 @@ Strict version of the $m_{\rm max}$ bound; via Step 100's identity
 $\min\cdot N = |\Lambda|\cdot N/2 - \|\mathrm{biw}\|$, strictness
 reduces to $\min\cdot N > 0$ at non-degeneracy.
 
+\textbf{Step 103 (PR~\#2890)}: monotonicity of $\mathrm{symm.re}$ in
+$\|\mathrm{biw}\|$ in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmReMonoInImbalanceNorm.lean}.
+For $A_1, A_2 : \Lambda \to \mathrm{Bool}$,
+$\|\mathrm{biw}(A_1, N)\| \le \|\mathrm{biw}(A_2, N)\|
+   \implies (\mathrm{symm}(A_1, N)).\mathrm{re} \le
+            (\mathrm{symm}(A_2, N)).\mathrm{re}$.
+Direct from Step 101 univariate form + monotonicity of
+$x \mapsto x^2/2 + x$ on $[0, \infty)$. Characterises balanced as
+the global energy minimiser and saturated as the maximiser.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
