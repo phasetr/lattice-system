@@ -7019,6 +7019,17 @@ The imbalance norm hits its maximum exactly at saturated edges
 contrapositive of Step 144 (strict $\|\mathrm{biw}\| < m_{\rm max}$ at
 non-degenerate).
 
+\textbf{Step 179 (PR~\#2970)}: unified max iff
+$\max(\mathrm{canonical}, \mathrm{complement}) = m_{\rm max}(m_{\rm max}+1)
+\Leftrightarrow$ saturated edge at $N \ge 1$ in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMaxEqMMaxQuadIff.lean}.
+The \emph{physical} predicted (max over orientations) $(\widehat S_{\rm tot})^2$
+eigenvalue attains the fully-polarised ferromagnetic value iff at a
+saturated edge. Direct from Step 175 ($\max = \|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$)
+$+$ Step 178 ($\|\mathrm{biw}\| = m_{\rm max} \Leftrightarrow$ saturated)
+using polynomial factoring. Unifies Steps 158/166 via the physical
+$\max$ quantity.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
