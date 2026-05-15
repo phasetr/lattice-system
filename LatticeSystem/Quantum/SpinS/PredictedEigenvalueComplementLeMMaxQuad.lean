@@ -26,6 +26,7 @@ namespace LatticeSystem.Quantum
 
 variable {Λ : Type*} [Fintype Λ]
 
+set_option linter.style.longLine false in
 /-- **Upper bound on complement predicted (Ŝ_tot)² eigenvalue**:
 ≤ `m_max·(m_max + 1)` at `|A| ≤ |¬A|`. Mirror of PR #2942 via PR #2931
 + PR #2874. -/
