@@ -6991,6 +6991,16 @@ on sign of $\mathrm{biw.re}$ and $\mathrm{biw.im} = 0 \Rightarrow
 $|\neg A| \le |A|$) and Step 142 (complement at $|A| \le |\neg A|$) into a
 single orientation-free statement.
 
+\textbf{Step 176 (PR~\#2967)}: $\min(\mathrm{canonical}, \mathrm{complement})$
+predicted $(\widehat S_{\rm tot})^2$ eigenvalue
+$= \|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|-1)$ \emph{unconditionally} in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMinCanonicalComplement.lean}.
+Companion of Step 175 (max). The $\min$ is the "wrong"-orientation
+eigenvalue, strictly below the physical predicted value. At saturated
+edges where $\|\mathrm{biw}\| = m_{\rm max}$, this equals
+$m_{\rm max}(m_{\rm max}-1)$ (matching Steps 168/169
+alternative-orientation values).
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
