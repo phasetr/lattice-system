@@ -18,11 +18,12 @@ function of three quantities: the predicted spin magnitude squared
 count `min(|A|, |¬A|)`.
 
 The form is convenient for Tasaki §2.5 Theorem 2.3 (γ-4): for
-balanced sublattices (`‖biw‖ = 0`) the energy is
-`−|Λ|²·N²/8 − |Λ|·N/4` (matching the symmetric balanced GS
-prediction), while saturated edges (`‖biw‖ = |Λ|·N/2`) give
+balanced sublattices (`‖biw‖ = 0`, so `|A| = |¬A| = |Λ|/2` and
+`min·N = |Λ|·N/2`) the energy is `−|Λ|²·N²/8 − |Λ|·N/2`
+(matching the symmetric balanced GS prediction), while saturated
+edges (`‖biw‖ = |Λ|·N/2` and `min = 0`) give
 `+|Λ|²·N²/8 − |Λ|²·N²/8 = 0` (matching the saturated GS
-prediction with `min = 0`).
+prediction).
 
 Tracked as part of Tasaki §2.5 Theorem 2.3 / γ-4 (Issue #412).
 -/
