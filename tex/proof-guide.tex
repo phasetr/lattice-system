@@ -6212,6 +6212,19 @@ Step 93 gives the tight $\min$-aware sandwich
 $-|\Lambda|^2\cdot N^2/8 - \min\cdot N \le \mathrm{symm.re} \le
   -\min\cdot N$.
 
+\textbf{Step 97 (PR~\#2884)}: Néel-to-predicted-min energy gap in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSPredictedSymmGap.lean}.
+$\langle\Phi_{\rm N\acute{e}el}(A,N) |\, \widehat H_{\rm toy}^S\,
+   | \Phi_{\rm N\acute{e}el}(A,N)\rangle
+   - \texttt{bipartiteToyMinEnergyPredictedSymm A N}
+   = \min(|A|, |\neg A|)\cdot N$.
+The N\'eel state's energy expectation is above the symmetric
+predicted minimum by exactly $\min(|A|,|\neg A|)\cdot N$ (a
+non-negative gap that vanishes at saturated edges and is maximised
+at balanced sublattices). Consistent with Tasaki §2.5 Theorem 2.3:
+the N\'eel state is a candidate ground state but the true GS energy
+is lower by the sublattice-Casimir diagonal contribution.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
