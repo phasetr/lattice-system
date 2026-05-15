@@ -6844,6 +6844,15 @@ with $|A| \le |\neg A|$ to derive $|\neg A| \ge 1$ from $|A| \ge 1$);
 backward = Step 151. Completes the complement equality
 characterisation.
 
+\textbf{Step 160 (PR~\#2950)}: range characterisation predicted
+$(\widehat S_{\rm tot})^2$ eigenvalue
+$\in [0, m_{\rm max}(m_{\rm max}+1)]$ at proper orientation
+$|\neg A| \le |A|$ in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueRangeIcc.lean}.
+Combines Step 145 ($\ge 0$) and Step 152 ($\le m_{\rm max}(m_{\rm max}+1)$)
+into a single closed-interval statement. Endpoints attained at
+balanced (lower) and saturated (upper).
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
