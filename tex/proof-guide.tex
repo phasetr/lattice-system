@@ -6067,6 +6067,13 @@ $\|\texttt{bipartiteImbalanceWeight A N}\| = (|A| - |\neg A|)
 $\|\texttt{bipartiteImbalanceWeight A N}\| = (|\neg A| - |A|)
 \cdot N / 2$. Drops the absolute-value bars case-specifically.
 
+\textbf{Step 82 (PR~\#2868)}: case-specific symm-energy norm in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmNormCardA.lean}.
+At $|A| \le |\neg A|$: $\|\texttt{symm}\| = |A| \cdot |\neg A|
+\cdot N^2 / 2 + |A| \cdot N$. At $|\neg A| \le |A|$:
+$\|\texttt{symm}\| = |A| \cdot |\neg A| \cdot N^2 / 2 + |\neg A|
+\cdot N$. Drops the $\min$ from PR \#2848.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
