@@ -6547,6 +6547,16 @@ hence $\Phi_{\rm N\acute{e}el}(A, N) =
 \mathtt{allAlignedStateS}\,\Lambda\,N\,(\mathrm{Fin.last}\,N)$.
 Companion of Step 126.
 
+\textbf{Step 128 (PR~\#2916)}: N\'eel $\in$ predicted GS subspace
+(complement orientation) at $|A| = 0$ in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSMemBipartiteToyGSPredictedComplementSaturated.lean}.
+$\Phi_{\rm N\acute{e}el}(A, N) \in
+\mathtt{bipartiteToyGroundStateSubspacePredicted}\,(\lambda x, !A\,x)\,N$
+at $|A| = 0$. Combines Step 127 (N\'eel = all-down) + the existing
+all-down GS witness (PR \#2783). The N\'eel state IS the predicted
+GS at the saturated complement edge under the complement
+orientation.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
