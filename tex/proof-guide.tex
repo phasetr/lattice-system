@@ -6634,6 +6634,14 @@ and $(\widehat S_A)^2 = (\widehat S_{\rm tot})^2$ makes the
 $(\widehat S_A)^2$ condition imply the $(\widehat S_{\rm tot})^2$
 condition.
 
+\textbf{Step 137 (PR~\#2926)}: complement-orientation analog of
+Step 136 in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedGSEqJointCasimirEigenspaceSaturatedComplement.lean}.
+At $|A| = 0$:
+$\mathtt{bipartiteToyGroundStateSubspacePredicted}\,(\lambda x, !A\,x)\,N =
+\mathtt{jointSublatticeCasimirEigenspace}\,(\lambda x, !A\,x)\,N$.
+Direct from Step 136 via $|\neg\neg A| = |A| = 0$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
