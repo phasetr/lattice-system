@@ -6712,6 +6712,14 @@ $(\langle\Phi_{\rm N\acute{e}el}|\widehat H_{\rm toy}^S|\Phi_{\rm N\acute{e}el}\
 Energy parallel of Step 144; both gaps vanish simultaneously at
 saturated edges.
 
+\textbf{Step 146 (PR~\#2935)}: non-negativity of predicted
+$(\widehat S_{\rm tot})^2$ eigenvalue at $|\neg A| \le |A|$ in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedTotalSpinSquaredEigenvalueReNonneg.lean}.
+$0 \le ((s_A - s_B)\cdot((s_A - s_B) + 1)).\mathrm{re}$.
+Direct from Step 141 ($= \|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$)
+$+ \|\mathrm{biw}\| \ge 0$. The predicted Casimir eigenvalue is
+physical under the proper orientation.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
