@@ -6269,6 +6269,15 @@ Direct from Step 92 (closed form with $\min\cdot N$) + Step 100
 parameterising the predicted GS energy as a univariate quadratic
 in the predicted spin magnitude $\|\mathrm{biw}\|$.
 
+\textbf{Step 102 (PR~\#2889)}: strict $m_{\rm max}$ upper bound on
+imbalance norm at non-degenerate configurations in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightNormLtMMaxNondegenerate.lean}.
+When $|A| \ge 1$, $|\neg A| \ge 1$, $N \ge 1$:
+$\|\texttt{bipartiteImbalanceWeight A N}\| < |\Lambda|\cdot N/2$.
+Strict version of the $m_{\rm max}$ bound; via Step 100's identity
+$\min\cdot N = |\Lambda|\cdot N/2 - \|\mathrm{biw}\|$, strictness
+reduces to $\min\cdot N > 0$ at non-degeneracy.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
