@@ -7171,6 +7171,13 @@ orientation $|A| \le |\neg A|$ in
 Mirror of the existing `\_re\_nonneg\_of\_cardA\_ge\_cardNotA` lemma.
 Direct from $\mathrm{biw.re}$-eq + orientation + $N \ge 0$.
 
+\textbf{Step 198 (PR~\#2990)}: $\mathrm{canonical} \le
+\max(\mathrm{canonical}, \mathrm{complement})$ \emph{unconditionally}
+in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueCanonicalLeMax.lean}.
+Trivial corollary of \texttt{le\_max\_left}. Useful for chaining
+inequalities.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
