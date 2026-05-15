@@ -6297,6 +6297,16 @@ $\|\mathrm{biw}(A_1, N)\| < \|\mathrm{biw}(A_2, N)\|
             (\mathrm{symm}(A_2, N)).\mathrm{re}$.
 Strict version of Step 103.
 
+\textbf{Step 105 (PR~\#2892)}: AFM cross-term bridge in
+\texttt{LatticeSystem/Quantum/SpinS/CardATimesCardNotATimesNSqViaImbalanceNormSq.lean}.
+$|A|\cdot|\neg A|\cdot N^2 = |\Lambda|^2\cdot N^2/4
+   - \|\texttt{bipartiteImbalanceWeight A N}\|^2$.
+Direct from Step 90 (bridge $8\cdot(\mathrm{symm.re}+\min\cdot N)
++ |\Lambda|^2 N^2 = 4\cdot(\mathrm{biw.re})^2$) + Step 91
+($\|\mathrm{biw}\|^2 = (\mathrm{biw.re})^2$) + the closed form
+$\mathrm{symm.re} = -|A|\cdot|\neg A|\cdot N^2/2 - \min\cdot N$.
+Expresses the Néel expectation magnitude in imbalance-norm form.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
