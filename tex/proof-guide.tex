@@ -6652,6 +6652,14 @@ Casimir at saturated) + existing saturated finrank result. The
 dimension matches the SU(2) multiplet $2m_{\rm max} + 1$ at
 saturated edges.
 
+\textbf{Step 139 (PR~\#2928)}: complement saturated joint Casimir
+finrank in
+\texttt{LatticeSystem/Quantum/SpinS/JointCasimirEigenspaceFinrankSaturatedComplement.lean}.
+At $|A| = 0$:
+$\mathrm{finrank}(\mathtt{jointSublatticeCasimirEigenspace}\,
+   (\lambda x, !A\,x)\,N) = |\Lambda|\cdot N + 1$.
+Mirror of Step 138 via $|\neg\neg A| = |A| = 0$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
