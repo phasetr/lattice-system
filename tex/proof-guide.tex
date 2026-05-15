@@ -6614,6 +6614,14 @@ Casimir eigenspace (Step 125) but not in the predicted GS
 (Step 131). The "extra" states have maximum sublattice spins but
 wrong total spin.
 
+\textbf{Step 135 (PR~\#2924)}: predicted GS finrank $<$ joint Casimir
+finrank at non-deg in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedGSFinrankLtJointCasimirFinrank.lean}.
+$\mathrm{finrank}(\mathtt{bipartiteToyGroundStateSubspacePredicted}\,A\,N)
+   < \mathrm{finrank}(\mathtt{jointSublatticeCasimirEigenspace}\,A\,N)$.
+Direct from Step 134's strict subspace inclusion in finite-dim
+space. Quantifies the "extra" subspace beyond the predicted GS.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
