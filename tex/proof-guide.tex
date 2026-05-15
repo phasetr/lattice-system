@@ -6681,6 +6681,14 @@ Identifies Tasaki's predicted $S_{\rm tot}(S_{\rm tot}+1)$ with the
 imbalance-norm quadratic, with $\|\mathrm{biw}\| = ||A|-|\neg A||\cdot N/2$
 playing the role of $S_{\rm tot}$.
 
+\textbf{Step 142 (PR~\#2931)}: complement-orientation predicted
+$(\widehat S_{\rm tot})^2$ eigenvalue in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedTotalSpinSquaredEigenvalueViaImbalanceNormComplement.lean}.
+At $|A| \le |\neg A|$:
+$((s_B - s_A)\cdot((s_B - s_A) + 1)).\mathrm{re} =
+\|\mathrm{biw}\|\cdot(\|\mathrm{biw}\| + 1)$.
+Same eigenvalue as Step 141 via complement-norm invariance.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
