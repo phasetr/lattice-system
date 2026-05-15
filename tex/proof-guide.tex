@@ -6111,6 +6111,13 @@ $\|\texttt{bipartiteImbalanceWeight A N}\| \le |\Lambda| \cdot N / 2
 bounded above by the maximum total spin. Direct from
 $||A| - |\neg A|| \le |A| + |\neg A| = |\Lambda|$ (PR \#2870).
 
+\textbf{Step 89 (PR~\#2875)}: symm-energy norm upper bound in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmNormLeBound.lean}.
+$\|\texttt{bipartiteToyMinEnergyPredictedSymm A N}\| \le
+|\Lambda|^2 \cdot N^2 / 8 + |\Lambda| \cdot N / 2$. Via AM-GM
+$|A| \cdot |\neg A| \le (|\Lambda|/2)^2$ and $\min(|A|, |\neg A|)
+\le |\Lambda|/2$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
