@@ -6412,6 +6412,18 @@ Parallel of Step 112 (energy quantitative gap) for the
 $(\widehat S_{\rm tot})^2$ Casimir: $\min \ge 1$ at non-degenerate,
 gap $= \min\cdot N \ge N$.
 
+\textbf{Step 116 (PR~\#2904)}: N\'eel-state $(\widehat S_{\rm tot}^{(3)})^2$
+expectation real part in $\|\mathrm{biw}\|^2$ form in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSTotalSpinSOp3SqReViaImbalanceNormSq.lean}.
+$(\langle\Phi_{\rm N\acute{e}el} |\,(\widehat S_{\rm tot}^{(3)})^2\,
+   | \Phi_{\rm N\acute{e}el}\rangle).\mathrm{re} = \|\mathrm{biw}\|^2$.
+Direct from $\gamma$-4 step 128 ($= ((|A|-|\neg A|)\cdot N/2)^2$) +
+Step 91 ($\|\mathrm{biw}\|^2 = (\mathrm{biw.re})^2$). Identifies the
+z-axis Casimir expectation with the predicted $S_{\rm tot}^2$;
+transverse Casimir expectation
+$(\widehat S_{\rm tot}^{(1)})^2 + (\widehat S_{\rm tot}^{(2)})^2 =
+|\Lambda|\cdot N/2$ (bipartition-independent) by subtraction.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
