@@ -6161,6 +6161,18 @@ predicted symmetric ground-state energy as a function of the spin
 magnitude squared, the lattice cardinality, and the minor
 sublattice count.
 
+\textbf{Step 93 (PR~\#2880)}: lower bound on the symm-energy real
+part in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmReGeNegBalanced.lean}.
+$-|\Lambda|^2\cdot N^2/8 - \min(|A|, |\neg A|)\cdot N \le
+   (\texttt{bipartiteToyMinEnergyPredictedSymm A N}).\mathrm{re}$.
+Direct from Step 92 by dropping the non-negative
+$\|\mathrm{biw}\|^2/2$ term. Combined with the existing upper bound
+$(\mathrm{symm}).\mathrm{re} \le 0$, gives the sandwich
+$-|\Lambda|^2\cdot N^2/8 - \min\cdot N \le \mathrm{symm.re} \le 0$;
+equality at the lower bound iff $\|\mathrm{biw}\| = 0$
+(for $N \ge 1$ this characterises balanced sublattices).
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
