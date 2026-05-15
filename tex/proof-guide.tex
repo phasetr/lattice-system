@@ -6333,6 +6333,17 @@ Direct from Step 101 univariate form: $\|\mathrm{biw}\|^2/2
 + \|\mathrm{biw}\| > 0$ at $\|\mathrm{biw}\| > 0$. Strict version
 of Step 95 (the global lower bound).
 
+\textbf{Step 109 (PR~\#2896)}: Néel-state $(\widehat S_{\rm tot})^2$
+expectation real part in $\|\mathrm{biw}\|^2$ form in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSTotalSpinSSquaredReViaImbalanceNormSq.lean}.
+$(\langle\Phi_{\rm N\acute{e}el} |\, (\widehat S_{\rm tot})^2\,
+   | \Phi_{\rm N\acute{e}el}\rangle).\mathrm{re}
+   = \|\mathrm{biw}\|^2 + |\Lambda|\cdot N/2$.
+Connects the N\'eel-state Casimir expectation to the predicted
+spin magnitude squared $\|\mathrm{biw}\|^2 = (\mathrm{predicted}\,
+S_{\rm tot})^2$ plus the lattice-size offset
+$m_{\rm max} = |\Lambda|\cdot N/2$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
