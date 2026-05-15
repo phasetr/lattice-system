@@ -6424,6 +6424,16 @@ transverse Casimir expectation
 $(\widehat S_{\rm tot}^{(1)})^2 + (\widehat S_{\rm tot}^{(2)})^2 =
 |\Lambda|\cdot N/2$ (bipartition-independent) by subtraction.
 
+\textbf{Step 117 (PR~\#2905)}: linear N\'eel-state
+$\widehat S_{\rm tot}^{(3)}$ expectation real part = $\mathrm{biw.re}$
+in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSTotalSpinSOp3ReEqBiwRe.lean}.
+$(\langle\Phi_{\rm N\acute{e}el} |\,\widehat S_{\rm tot}^{(3)}\,
+   | \Phi_{\rm N\acute{e}el}\rangle).\mathrm{re} =
+   (\texttt{bipartiteImbalanceWeight A N}).\mathrm{re}$.
+Both equal $(|A|-|\neg A|)\cdot N/2$. The signed analog of the
+squared form (Step 116) $\|\mathrm{biw}\|^2$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
