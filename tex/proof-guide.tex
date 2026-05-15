@@ -7084,6 +7084,14 @@ predicted $(\widehat S_{\rm tot})^2$ eigenvalues $= 2\cdot\|\mathrm{biw}\|^2$
 Companion of Step 177 (max $-$ min $= 2\cdot\|\mathrm{biw}\|$). Direct
 from Step 175 $+$ Step 176 via \texttt{ring}.
 
+\textbf{Step 186 (PR~\#2977)}: iff $\max - \min > 0 \Leftrightarrow$
+unbalanced at $N \ge 1$ in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMaxSubMinPosIffUnbalanced.lean}.
+The canonical-complement eigenvalue gap (proportional to $\|\mathrm{biw}\|$)
+vanishes iff balanced. Direct from Step 177 (gap $= 2\cdot\|\mathrm{biw}\|$)
++ Step 81 ($\|\mathrm{biw}\| = 0 \Leftrightarrow$ balanced). Companion
+of Step 180 ($\max > 0 \Leftrightarrow$ unbalanced).
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
