@@ -6344,6 +6344,17 @@ spin magnitude squared $\|\mathrm{biw}\|^2 = (\mathrm{predicted}\,
 S_{\rm tot})^2$ plus the lattice-size offset
 $m_{\rm max} = |\Lambda|\cdot N/2$.
 
+\textbf{Step 110 (PR~\#2897)}: balanced-case N\'eel
+$(\widehat S_{\rm tot})^2$ expectation in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSTotalSpinSSquaredBalanced.lean}.
+At $|A| = |\neg A|$ and $N \ge 1$:
+$(\langle\Phi_{\rm N\acute{e}el} |\, (\widehat S_{\rm tot})^2\,
+   | \Phi_{\rm N\acute{e}el}\rangle).\mathrm{re}
+   = |\Lambda|\cdot N/2$.
+Direct from Step 109 + $\|\mathrm{biw}\| = 0$ at balanced
+(PR \#2854). Minimum value of the $(\widehat S_{\rm tot})^2$
+expectation across all bipartitions.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
