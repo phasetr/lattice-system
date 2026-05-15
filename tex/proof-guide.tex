@@ -6289,6 +6289,14 @@ Direct from Step 101 univariate form + monotonicity of
 $x \mapsto x^2/2 + x$ on $[0, \infty)$. Characterises balanced as
 the global energy minimiser and saturated as the maximiser.
 
+\textbf{Step 104 (PR~\#2891)}: strict monotonicity of
+$\mathrm{symm.re}$ in $\|\mathrm{biw}\|$ in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmReStrictMonoInImbalanceNorm.lean}.
+$\|\mathrm{biw}(A_1, N)\| < \|\mathrm{biw}(A_2, N)\|
+   \implies (\mathrm{symm}(A_1, N)).\mathrm{re} <
+            (\mathrm{symm}(A_2, N)).\mathrm{re}$.
+Strict version of Step 103.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
