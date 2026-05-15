@@ -6478,6 +6478,17 @@ $\langle(\widehat S_{\rm tot}^{(3)})^2\rangle_{\rm N\acute{e}el}.\mathrm{re}
 Combines Step 116 ($= \|\mathrm{biw}\|^2$) + Step 102
 ($\|\mathrm{biw}\| < m_{\rm max}$) squared.
 
+\textbf{Step 122 (PR~\#2910)}: strict bound on
+$\langle(\widehat S_{\rm tot})^2\rangle_{\rm N\acute{e}el}.\mathrm{re}$
+at non-degenerate in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSTotalSpinSSquaredLtMMaxTimesMMaxPlusOneNondegenerate.lean}.
+At $|A| \ge 1$, $|\neg A| \ge 1$, $N \ge 1$:
+$\langle(\widehat S_{\rm tot})^2\rangle_{\rm N\acute{e}el}.\mathrm{re}
+   < m_{\rm max}\cdot(m_{\rm max} + 1) = (|\Lambda|\cdot N/2)\cdot
+   (|\Lambda|\cdot N/2 + 1)$.
+Combines Step 109 + Step 102 squared. Strictly below the
+fully-polarised ferromagnetic eigenvalue at non-degenerate.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
