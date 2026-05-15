@@ -7077,6 +7077,13 @@ below the fully-polarised ferromagnetic value at non-saturated. Unifies
 Steps 155/156 (orientation-specialised strict bounds) via the physical
 $\max$ quantity.
 
+\textbf{Step 185 (PR~\#2976)}: $\max + \min$ of canonical/complement
+predicted $(\widehat S_{\rm tot})^2$ eigenvalues $= 2\cdot\|\mathrm{biw}\|^2$
+\emph{unconditionally} in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMaxAddMin.lean}.
+Companion of Step 177 (max $-$ min $= 2\cdot\|\mathrm{biw}\|$). Direct
+from Step 175 $+$ Step 176 via \texttt{ring}.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
