@@ -7,7 +7,8 @@ import LatticeSystem.Quantum.SpinS.BipartiteToyMinEnergySymm
 We compare two quantities both expressible in closed form:
 
 - `<Φ_Néel(A, N) | Ĥ_toy_S | Φ_Néel(A, N)> = −|A|·|¬A|·N²/2`
-  (PR #1369 `neelStateOfS_heisenbergToyHamiltonianS_expectation`).
+  (`neelStateOfS_heisenbergToyHamiltonianS_expectation`, originally
+  PR #1178, refactored in PR #1193).
 - `bipartiteToyMinEnergyPredictedSymm A N
    = −|A|·|¬A|·N²/2 − min(|A|, |¬A|)·N`.
 
