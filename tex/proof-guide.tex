@@ -6316,6 +6316,14 @@ $0 < (\langle\Phi_{\rm N\acute{e}el} |\,\widehat H_{\rm toy}^S\,
    - \texttt{bipartiteToyMinEnergyPredictedSymm A N}).\mathrm{re}$.
 Strict version of Step 97 (gap $= \min\cdot N$) under non-degeneracy.
 
+\textbf{Step 107 (PR~\#2894)}: real-part iff form of
+$\mathrm{symm.re} = 0$ at $N \ge 1$ in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmReEqZeroIff.lean}.
+$(\mathrm{symm}(A, N)).\mathrm{re} = 0 \iff |A| = 0 \vee |\neg A| = 0$.
+Real-part mirror of the complex iff form. Forward direction is the
+contrapositive of strict negativity at non-degenerate; reverse is
+the saturated-edge zero.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
