@@ -7165,6 +7165,12 @@ Iff form combining $\|\mathrm{biw}\| \ge 0$ and Step 81 ($\|\mathrm{biw}\|
 = 0 \Leftrightarrow$ balanced). Convenient for switching between strict
 positivity and balanced/unbalanced predicates.
 
+\textbf{Step 197 (PR~\#2989)}: $\mathrm{biw.re} \le 0$ at complement
+orientation $|A| \le |\neg A|$ in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightReNonpos.lean}.
+Mirror of the existing `\_re\_nonneg\_of\_cardA\_ge\_cardNotA` lemma.
+Direct from $\mathrm{biw.re}$-eq + orientation + $N \ge 0$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
