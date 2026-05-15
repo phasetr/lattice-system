@@ -6235,6 +6235,18 @@ Strict version of Step 96; immediate from Step 92's
 $\mathrm{re} = -|A|\cdot|\neg A|\cdot N^2/2 - \min\cdot N$ since
 $|A|\cdot|\neg A|\cdot N^2 > 0$ under non-degeneracy.
 
+\textbf{Step 99 (PR~\#2886)}: Néel-state expectation real part in
+$\|\mathrm{biw}\|^2$ form in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSExpectationReViaImbalanceNormSq.lean}.
+$(\langle\Phi_{\rm N\acute{e}el} |\, \widehat H_{\rm toy}^S\,
+   | \Phi_{\rm N\acute{e}el}\rangle).\mathrm{re}
+   = \|\texttt{bipartiteImbalanceWeight A N}\|^2/2
+   - |\Lambda|^2\cdot N^2/8$.
+Combines Step 97 (Néel--predicted-min gap $= \min\cdot N$) with
+Step 92 (predicted-symm closed form): the $\min\cdot N$ terms cancel,
+leaving a clean form depending only on the predicted spin magnitude
+squared and the lattice cardinality.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
