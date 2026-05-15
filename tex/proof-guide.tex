@@ -6788,6 +6788,19 @@ $|\mathrm{biw.re}| \le m_{\rm max}$, then \texttt{nlinarith} on
 $x(x+1)$ over $[-m_{\rm max}, m_{\rm max}]$. Unifies Step 152
 ($|\neg A| \le |A|$) and Step 153 ($|A| \le |\neg A|$ complement).
 
+\textbf{Step 155 (PR~\#2945)}: strict upper bound on predicted
+$(\widehat S_{\rm tot})^2$ eigenvalue $< m_{\rm max}(m_{\rm max}+1)$
+\emph{at non-degenerate} ($|A| \ge 1$, $|\neg A| \ge 1$, $N \ge 1$) in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueLtMMaxQuadNondegenerate.lean}.
+Strengthens Step 154 from $\le$ to $<$. Direct from Step 143 + the
+strict imbalance-norm bound $\|\mathrm{biw}\| < m_{\rm max}$
+(non-degenerate) + $\mathrm{biw.im} = 0$ giving
+$|\mathrm{biw.re}| < m_{\rm max}$, then \texttt{nlinarith} on
+$x(x+1)$ over $(-m_{\rm max}, m_{\rm max})$. At non-degenerate, the
+predicted GS Casimir is strictly below the fully-polarised
+ferromagnetic value; this completes the "saturated iff equality"
+characterisation.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
