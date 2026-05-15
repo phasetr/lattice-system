@@ -7051,6 +7051,13 @@ Direct from Step 175 ($\max = \|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$)
 orientation-specialised range Icc (Steps 160/162) via the physical
 $\max$ quantity.
 
+\textbf{Step 182 (PR~\#2973)}: lower bound
+$\min(\mathrm{canonical}, \mathrm{complement}) \ge -1/4$ \emph{unconditionally}
+in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMinGeNegOneFourth.lean}.
+The parabola $x(x-1)$ has minimum $-1/4$ at $x = 1/2$. Direct from
+Step 176 (min $= \|\mathrm{biw}\|(\|\mathrm{biw}\|-1)$) + $(x - 1/2)^2 \ge 0$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
