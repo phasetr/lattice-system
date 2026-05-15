@@ -6258,6 +6258,17 @@ elementary identity $2\cdot\min = (|A|+|\neg A|) - ||A|{-}|\neg A||$.
 Enables $\min\cdot N$-free reformulations of all Tasaki §2.5
 Theorem 2.3 (γ-4) energy bounds.
 
+\textbf{Step 101 (PR~\#2888)}: univariate $\|\mathrm{biw}\|$-parameterisation
+of the symm-energy real part in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmReViaImbalanceNormOnly.lean}.
+$(\texttt{bipartiteToyMinEnergyPredictedSymm A N}).\mathrm{re}
+   = \|\mathrm{biw}\|^2/2 + \|\mathrm{biw}\|
+   - |\Lambda|^2\cdot N^2/8 - |\Lambda|\cdot N/2$.
+Direct from Step 92 (closed form with $\min\cdot N$) + Step 100
+($\min\cdot N$ identity): eliminates $\min$-dependence,
+parameterising the predicted GS energy as a univariate quadratic
+in the predicted spin magnitude $\|\mathrm{biw}\|$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
