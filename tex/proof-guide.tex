@@ -6118,6 +6118,20 @@ $\|\texttt{bipartiteToyMinEnergyPredictedSymm A N}\| \le
 $|A| \cdot |\neg A| \le (|\Lambda|/2)^2$ and $\min(|A|, |\neg A|)
 \le |\Lambda|/2$.
 
+\textbf{Step 90 (PR~\#2876)}: bridge identity in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmViaImbalance.lean}.
+$8 \cdot ((\texttt{bipartiteToyMinEnergyPredictedSymm A N}).\mathrm{re}
+   + \min(|A|, |\neg A|) \cdot N)
+   + |\Lambda|^2 \cdot N^2
+   = 4 \cdot ((\texttt{bipartiteImbalanceWeight A N}).\mathrm{re})^2$.
+Algebraic consequence of $4 \cdot |A| \cdot |\neg A| =
+(|A|+|\neg A|)^2 - (|A|-|\neg A|)^2$ combined with the
+cardinality identity $|A| + |\neg A| = |\Lambda|$ (PR \#2870).
+The predicted symmetric ground-state energy and the predicted
+spin magnitude $||A| - |\neg A|| \cdot N / 2$ are linked by a
+simple quadratic constraint involving only the lattice
+cardinality.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
