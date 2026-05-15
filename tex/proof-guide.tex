@@ -6391,6 +6391,16 @@ predicted Tasaki $S_{\rm tot}\cdot(S_{\rm tot}+1) =
 \|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$ eigenvalue. Gap vanishes at
 saturated edges.
 
+\textbf{Step 114 (PR~\#2902)}: strict positive N\'eel-vs-predicted
+$(\widehat S_{\rm tot})^2$ gap at non-degenerate in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSTotalSpinSSquaredVsPredictedGapPosNondegenerate.lean}.
+At $|A| \ge 1$, $|\neg A| \ge 1$, $N \ge 1$:
+$\|\mathrm{biw}\|^2 + \|\mathrm{biw}\| <
+   (\langle\Phi_{\rm N\acute{e}el} |\,(\widehat S_{\rm tot})^2\,
+   | \Phi_{\rm N\acute{e}el}\rangle).\mathrm{re}$.
+Strict version of Step 113; demonstrates the N\'eel state spans multiple
+$S_{\rm tot}$ sectors (not the GS) at non-degenerate.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
