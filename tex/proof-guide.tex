@@ -6765,6 +6765,16 @@ Direct from Step 141 + $\|\mathrm{biw}\| \le m_{\rm max}$ +
 monotonicity of $x\cdot(x+1)$ on $[0, \infty)$. Equality is attained
 at saturated edges (Step 149).
 
+\textbf{Step 153 (PR~\#2943)}: upper bound on complement predicted
+$(\widehat S_{\rm tot})^2$ eigenvalue $\le m_{\rm max}(m_{\rm max}+1)$
+at $|A| \le |\neg A|$ in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueComplementLeMMaxQuad.lean}.
+$((s_B-s_A)\cdot((s_B-s_A)+1)).\mathrm{re} \le
+(|\Lambda|\cdot N/2)(|\Lambda|\cdot N/2 + 1)$. Mirror of Step 152 via
+Step 142 + $\|\mathrm{biw}\| \le m_{\rm max}$ + monotonicity of
+$x\cdot(x+1)$ on $[0, \infty)$. Equality is attained at saturated
+complement (Step 151).
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
