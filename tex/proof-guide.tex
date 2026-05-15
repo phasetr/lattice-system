@@ -6834,6 +6834,16 @@ The predicted Casimir hits the fully-polarised ferromagnetic value
 \emph{iff} all sites are in $A$ (saturated edge in the
 $(s_A - s_B)$ orientation).
 
+\textbf{Step 159 (PR~\#2949)}: iff characterisation (complement)
+complement predicted $(\widehat S_{\rm tot})^2$ eigenvalue
+$= m_{\rm max}(m_{\rm max}+1) \Leftrightarrow |A| = 0$ at
+$|A| \le |\neg A|$, $N \ge 1$ in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueComplementEqMMaxQuadIffCardAZero.lean}.
+Mirror of Step 158. Forward = contrapositive of Step 156 (combined
+with $|A| \le |\neg A|$ to derive $|\neg A| \ge 1$ from $|A| \ge 1$);
+backward = Step 151. Completes the complement equality
+characterisation.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
