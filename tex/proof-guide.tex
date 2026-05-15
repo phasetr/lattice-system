@@ -7121,6 +7121,14 @@ The canonical orientation gives the physical predicted eigenvalue
 exactly at proper orientation. Direct from Step 173 + Step 174 +
 $\mathrm{biw.re} \ge 0$ at proper orientation.
 
+\textbf{Step 191 (PR~\#2983)}: iff
+$\max(\mathrm{canonical}, \mathrm{complement}) < m_{\rm max}(m_{\rm max}+1)
+\Leftrightarrow$ non-saturated at $N \ge 1$ in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMaxLtMMaxQuadIff.lean}.
+Iff form of Step 184. Direct combine of Step 179
+($\max = m_{\rm max}(m_{\rm max}+1) \Leftrightarrow$ saturated) +
+Step 181 ($\max \le m_{\rm max}(m_{\rm max}+1)$).
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
