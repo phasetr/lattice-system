@@ -7092,6 +7092,14 @@ vanishes iff balanced. Direct from Step 177 (gap $= 2\cdot\|\mathrm{biw}\|$)
 + Step 81 ($\|\mathrm{biw}\| = 0 \Leftrightarrow$ balanced). Companion
 of Step 180 ($\max > 0 \Leftrightarrow$ unbalanced).
 
+\textbf{Step 187 (PR~\#2978)}: $|\mathrm{canonical} - \mathrm{complement}|
+= 2\cdot\|\mathrm{biw}\|$ \emph{unconditionally} in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueAbsDiff.lean}.
+Unsigned version of Step 170. Direct from
+$|2\cdot\mathrm{biw.re}| = 2\cdot|\mathrm{biw.re}| = 2\cdot\|\mathrm{biw}\|$
+(using $\mathrm{biw.im} = 0$). Equivalent to Step 177 ($\max - \min$)
+since $\max - \min = |\mathrm{canonical} - \mathrm{complement}|$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
