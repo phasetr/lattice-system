@@ -6937,6 +6937,15 @@ Direct from Step 165 (signed complement form
 $\mathrm{biw.re}\cdot(\mathrm{biw.re}-1)$) + $\mathrm{biw.re} = m_{\rm max}$
 at $|\neg A| = 0$.
 
+\textbf{Step 170 (PR~\#2960)}: canonical − complement predicted
+$(\widehat S_{\rm tot})^2$ eigenvalue difference $= 2 \cdot \mathrm{biw.re}$
+\emph{unconditionally} in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueCanonicalComplementDiff.lean}.
+Direct from Step 143 (canonical $= \mathrm{biw.re}\cdot(\mathrm{biw.re}+1)$)
+$-$ Step 165 (complement $= \mathrm{biw.re}\cdot(\mathrm{biw.re}-1)$)
+$= 2\cdot\mathrm{biw.re}$ via \texttt{ring}. The canonical-complement
+gap measures twice the signed imbalance; vanishes at balanced.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
