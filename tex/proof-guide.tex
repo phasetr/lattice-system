@@ -6378,6 +6378,19 @@ $N \le (\langle\Phi_{\rm N\acute{e}el} |\, \widehat H_{\rm toy}^S\,
 Refines Step 106 strict positivity: since $\min(|A|, |\neg A|) \ge 1$
 at non-degenerate, gap $= \min\cdot N \ge N$.
 
+\textbf{Step 113 (PR~\#2901)}: N\'eel-vs-predicted $(\widehat S_{\rm tot})^2$
+gap $= \min\cdot N$ in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSTotalSpinSSquaredVsPredictedGap.lean}.
+$(\langle\Phi_{\rm N\acute{e}el} |\,(\widehat S_{\rm tot})^2\,
+   | \Phi_{\rm N\acute{e}el}\rangle).\mathrm{re}
+   - (\|\mathrm{biw}\|^2 + \|\mathrm{biw}\|)
+   = \min(|A|,|\neg A|)\cdot N$.
+Direct parallel of energy gap (Step 97) to the $(\widehat S_{\rm tot})^2$
+Casimir: the N\'eel state's expectation is exactly $\min\cdot N$ above the
+predicted Tasaki $S_{\rm tot}\cdot(S_{\rm tot}+1) =
+\|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$ eigenvalue. Gap vanishes at
+saturated edges.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
