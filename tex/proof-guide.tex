@@ -6514,6 +6514,19 @@ spin on both sublattices --- a key input to Tasaki §2.5
 Theorem 2.3 (γ-4): the N\'eel state matches the predicted GS
 subspace's sublattice Casimir constraints.
 
+\textbf{Step 125 (PR~\#2913)}: N\'eel state in joint sublattice-Casimir
+eigenspace in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSMemJointSublatticeCasimirEigenspace.lean}.
+$\Phi_{\rm N\acute{e}el}(A, N) \in
+   \mathrm{eigenspace}((\widehat S_A)^2, s_A\cdot(s_A+1)) \cap
+   \mathrm{eigenspace}((\widehat S_{\neg A})^2, s_B\cdot(s_B+1))$.
+Two-thirds of the predicted GS subspace conditions. The N\'eel
+state is NOT in the full predicted GS subspace because its
+$(\widehat S_{\rm tot})^2$ expectation ($\|\mathrm{biw}\|^2 +
+|\Lambda|\cdot N/2$, Step 109) exceeds the predicted eigenvalue
+$\|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$ by $\min\cdot N$
+(Step 113).
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
