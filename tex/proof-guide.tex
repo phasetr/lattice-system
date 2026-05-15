@@ -6247,6 +6247,17 @@ Step 92 (predicted-symm closed form): the $\min\cdot N$ terms cancel,
 leaving a clean form depending only on the predicted spin magnitude
 squared and the lattice cardinality.
 
+\textbf{Step 100 (PR~\#2887)}: linear identity bridging $\min\cdot N$
+and $\|\mathrm{biw}\|$ in
+\texttt{LatticeSystem/Quantum/SpinS/MinNEqHalfCardTimesNMinusImbalanceNorm.lean}.
+$\min(|A|, |\neg A|)\cdot N = |\Lambda|\cdot N/2 -
+   \|\texttt{bipartiteImbalanceWeight A N}\|$.
+Direct from $\|\mathrm{biw}\| = ||A|{-}|\neg A||\cdot N/2$
+(PR \#2826) and $|A|+|\neg A| = |\Lambda|$ (PR \#2870), via the
+elementary identity $2\cdot\min = (|A|+|\neg A|) - ||A|{-}|\neg A||$.
+Enables $\min\cdot N$-free reformulations of all Tasaki §2.5
+Theorem 2.3 (γ-4) energy bounds.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
