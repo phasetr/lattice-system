@@ -6582,6 +6582,16 @@ $\langle(\widehat S_{\rm tot})^2\rangle_{\rm N\acute{e}el} =
 \|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$, but Step 114 shows
 strict $>$. Complements Step 126 (saturated case: N\'eel $\in$ GS).
 
+\textbf{Step 132 (PR~\#2921)}: balanced-case N\'eel toy-Hamiltonian
+expectation in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSHeisenbergToyExpectationReBalanced.lean}.
+At $|A| = |\neg A|$, $N \ge 1$:
+$(\langle\Phi_{\rm N\acute{e}el} |\,\widehat H_{\rm toy}^S\,
+   | \Phi_{\rm N\acute{e}el}\rangle).\mathrm{re} = -|\Lambda|^2\cdot N^2/8$.
+Direct from Step 99 ($\|\mathrm{biw}\|^2/2 - |\Lambda|^2\cdot N^2/8$)
++ $\|\mathrm{biw}\| = 0$ at balanced. Variational benchmark for
+the actual GS energy.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
