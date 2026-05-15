@@ -7,6 +7,20 @@ import LatticeSystem.Quantum.MagnetizationSubspace
 /-!
 # Sublattice Casimir eigenvalues on the Néel state
 
+**Build-speed evaluation (refactor #45 cadence, 2026-05-16)**: this
+file is 1294 lines, ~5.2s incremental build (touched), ~12 min from
+clean across full dependency graph (2453 jobs). Natural split candidates:
+- Magnetization subspace section (lines 1208-1294, 87 lines).
+- Orthogonality with basis vectors (lines 992-1206, ~215 lines).
+- Néel state expectations (lines 951-994, ~45 lines).
+A future cadence should extract the orthogonality + magnetization
+trailing section (~300 lines) into a companion file
+`SublatticeCasimirNeelOrthogonality.lean`; the 4 known consumers
+(SublatticeCasimirNeelIndependence + 2 SpinS sibling files + this file)
+would need import updates. Deferred this cadence to avoid coupling the
+split with the 20-PR canonical/complement eigenvalue characterization
+sweep that just landed (#2941–#2960).
+
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
 on a bipartite graph `(Λ, A)` (Tasaki §2.5 eq. (2.5.2)) sets
 `σ x = 0` for `A x = true` and `σ x = 1` for `A x = false` — it is
