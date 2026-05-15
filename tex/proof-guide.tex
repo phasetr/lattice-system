@@ -6225,6 +6225,16 @@ at balanced sublattices). Consistent with Tasaki §2.5 Theorem 2.3:
 the N\'eel state is a candidate ground state but the true GS energy
 is lower by the sublattice-Casimir diagonal contribution.
 
+\textbf{Step 98 (PR~\#2885)}: strict refined upper bound at
+non-degenerate configurations in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmReLtNegMinStrict.lean}.
+When $|A| \ge 1$, $|\neg A| \ge 1$, $N \ge 1$:
+$(\texttt{bipartiteToyMinEnergyPredictedSymm A N}).\mathrm{re}
+   < -\min(|A|, |\neg A|)\cdot N$.
+Strict version of Step 96; immediate from Step 92's
+$\mathrm{re} = -|A|\cdot|\neg A|\cdot N^2/2 - \min\cdot N$ since
+$|A|\cdot|\neg A|\cdot N^2 > 0$ under non-degeneracy.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
