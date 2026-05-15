@@ -7150,6 +7150,14 @@ Companion of Step 193 ($\max = \mathrm{complement}$ at complement
 orientation). Direct from Step 173 + Step 174 + $\mathrm{biw.re} \le 0$
 at complement orientation.
 
+\textbf{Step 195 (PR~\#2987)}:
+$\min(\mathrm{canonical}, \mathrm{complement}) \le
+\max(\mathrm{canonical}, \mathrm{complement})$ \emph{unconditionally}
+in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMinLeMax.lean}.
+Trivial corollary of \texttt{min\_le\_max}; convenient for combining
+with other inequalities.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
