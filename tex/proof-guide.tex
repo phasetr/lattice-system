@@ -6915,6 +6915,18 @@ $\mathrm{biw.re} > -m_{\rm max}$ (since $|A| - |\neg A| > -|\Lambda|$
 when $|A| \ge 1$, scaled by $N \ge 1$) + unconditional
 $\mathrm{biw.re} \le m_{\rm max}$, then \texttt{nlinarith}.
 
+\textbf{Step 168 (PR~\#2958)}: canonical predicted $(\widehat S_{\rm tot})^2$
+eigenvalue value at complement-saturated $|A| = 0$:
+$\mathrm{eigenvalue.re} = m_{\rm max}(m_{\rm max} - 1)$ (NOT the
+ferromagnetic $m_{\rm max}(m_{\rm max} + 1)$) in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueCanonicalAtComplementSaturated.lean}.
+Mirror of Step 149 in the wrong orientation. Direct from Step 143
+(signed canonical $\mathrm{biw.re}\cdot(\mathrm{biw.re}+1)$) +
+$\mathrm{biw.re} = -m_{\rm max}$ at $|A| = 0$. The canonical form at
+complement-saturated has Casimir strictly below the ferromagnetic
+value — wrong orientation; the complement form (Step 151) gives the
+correct value.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
