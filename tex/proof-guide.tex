@@ -6307,6 +6307,15 @@ Direct from Step 90 (bridge $8\cdot(\mathrm{symm.re}+\min\cdot N)
 $\mathrm{symm.re} = -|A|\cdot|\neg A|\cdot N^2/2 - \min\cdot N$.
 Expresses the Néel expectation magnitude in imbalance-norm form.
 
+\textbf{Step 106 (PR~\#2893)}: strict positive Néel-vs-predicted-min
+gap at non-degenerate in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSPredictedSymmGapPosNondegenerate.lean}.
+When $|A| \ge 1$, $|\neg A| \ge 1$, $N \ge 1$:
+$0 < (\langle\Phi_{\rm N\acute{e}el} |\,\widehat H_{\rm toy}^S\,
+   | \Phi_{\rm N\acute{e}el}\rangle
+   - \texttt{bipartiteToyMinEnergyPredictedSymm A N}).\mathrm{re}$.
+Strict version of Step 97 (gap $= \min\cdot N$) under non-degeneracy.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
