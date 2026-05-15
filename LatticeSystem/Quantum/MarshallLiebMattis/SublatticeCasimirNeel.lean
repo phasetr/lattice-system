@@ -18,7 +18,7 @@ trailing section (~300 lines) into a companion file
 `SublatticeCasimirNeelOrthogonality.lean`; the 4 known consumers
 (SublatticeCasimirNeelIndependence + 2 SpinS sibling files + this file)
 would need import updates. Deferred this cadence to avoid coupling the
-split with the 11-PR canonical/complement eigenvalue characterization
+split with the 20-PR canonical/complement eigenvalue characterization
 sweep that just landed (#2941–#2960).
 
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
