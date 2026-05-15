@@ -7114,6 +7114,13 @@ makes the affine parameterisation
 $\max = \|\mathrm{biw}\|^2 + \|\mathrm{biw}\|$,
 $\min = \|\mathrm{biw}\|^2 - \|\mathrm{biw}\|$ explicit.
 
+\textbf{Step 190 (PR~\#2981)}: $\max(\mathrm{canonical}, \mathrm{complement})
+= \mathrm{canonical}$ at proper orientation $|\neg A| \le |A|$ in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMaxEqCanonical.lean}.
+The canonical orientation gives the physical predicted eigenvalue
+exactly at proper orientation. Direct from Step 173 + Step 174 +
+$\mathrm{biw.re} \ge 0$ at proper orientation.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
