@@ -6074,6 +6074,13 @@ At $|A| \le |\neg A|$: $\|\texttt{symm}\| = |A| \cdot |\neg A|
 $\|\texttt{symm}\| = |A| \cdot |\neg A| \cdot N^2 / 2 + |\neg A|
 \cdot N$. Drops the $\min$ from PR \#2848.
 
+\textbf{Step 83 (PR~\#2869)}: negated-form of the symm-energy real
+part in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmReNonpos.lean}.
+$(\texttt{symm}).\texttt{re} = -(|A| \cdot |\neg A| \cdot N^2 / 2
++ \min(|A|, |\neg A|) \cdot N)$. Sign-normalised expression of
+PR \#2843's \texttt{\_re\_eq}.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
