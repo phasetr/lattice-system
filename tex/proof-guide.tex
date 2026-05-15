@@ -6132,6 +6132,19 @@ spin magnitude $||A| - |\neg A|| \cdot N / 2$ are linked by a
 simple quadratic constraint involving only the lattice
 cardinality.
 
+\textbf{Step 91 (PR~\#2877)}: bridge identity in $\|\mathrm{biw}\|^2$
+form in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmReViaImbalanceNormSq.lean}.
+$8 \cdot ((\texttt{bipartiteToyMinEnergyPredictedSymm A N}).\mathrm{re}
+   + \min(|A|, |\neg A|) \cdot N)
+   + |\Lambda|^2 \cdot N^2
+   = 4 \cdot \|\texttt{bipartiteImbalanceWeight A N}\|^2$.
+Substitutes $(\mathrm{biw}.\mathrm{re})^2 = \|\mathrm{biw}\|^2$
+(since $\mathrm{biw}$ is real, PR \#2825) into Step 90;
+the natural form for Tasaki §2.5 Theorem 2.3 where the
+predicted spin magnitude
+$\|\mathrm{biw}\| = ||A| - |\neg A||\cdot N/2$ appears directly.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
