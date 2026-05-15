@@ -6734,6 +6734,13 @@ $0 < ((s_A - s_B)\cdot((s_A - s_B) + 1)).\mathrm{re}$.
 The predicted GS has strictly positive $S_{\rm tot}(S_{\rm tot}+1)$
 at strict unbalanced --- non-singlet.
 
+\textbf{Step 149 (PR~\#2938)}: saturated-edge predicted
+$(\widehat S_{\rm tot})^2$ eigenvalue $= m_{\rm max}(m_{\rm max}+1)$ in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueSaturatedEqMMaxQuad.lean}.
+At $|\neg A| = 0$: predicted eigenvalue $=
+(|\Lambda|\cdot N/2)\cdot(|\Lambda|\cdot N/2 + 1)$. Direct from
+Step 141 $+ \|\mathrm{biw}\| = m_{\rm max}$ at saturated.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
