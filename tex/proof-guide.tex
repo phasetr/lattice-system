@@ -6173,6 +6173,17 @@ $-|\Lambda|^2\cdot N^2/8 - \min\cdot N \le \mathrm{symm.re} \le 0$;
 equality at the lower bound iff $\|\mathrm{biw}\| = 0$
 (for $N \ge 1$ this characterises balanced sublattices).
 
+\textbf{Step 94 (PR~\#2881)}: balanced-case symm-energy real part in
+$|\Lambda|$ form in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmBalancedReEqCardinality.lean}.
+When $|A| = |\neg A|$,
+$(\texttt{bipartiteToyMinEnergyPredictedSymm A N}).\mathrm{re}
+   = -|\Lambda|^2\cdot N^2/8 - |\Lambda|\cdot N/2$.
+Combines the existing balanced complex form
+($= -|A|^2\cdot N^2/2 - |A|\cdot N$, PR \#2842) with the cardinality
+identity $2\cdot|A| = |\Lambda|$ (PR \#2870). Saturates the
+Step 93 lower bound at balanced sublattices.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
