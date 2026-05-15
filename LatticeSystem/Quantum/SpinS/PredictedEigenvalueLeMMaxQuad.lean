@@ -15,7 +15,7 @@ bounded above by `m_max·(m_max + 1)`:
   at `|¬A| ≤ |A|`.
 
 The predicted GS subspace's Casimir eigenvalue cannot exceed the
-fully-polarised ferromagnetic value, with equality only at the
+fully-polarised ferromagnetic value. Equality is attained at the
 saturated edge (PR #2938).
 
 Tracked as part of Tasaki §2.5 Theorem 2.3 / γ-4 (Issue #412).
