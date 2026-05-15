@@ -6980,6 +6980,17 @@ gives the symmetric affine parameterisation
 $\mathrm{canonical} = \mathrm{biw.re}^2 + \mathrm{biw.re}$,
 $\mathrm{complement} = \mathrm{biw.re}^2 - \mathrm{biw.re}$.
 
+\textbf{Step 175 (PR~\#2966)}: $\max(\mathrm{canonical}, \mathrm{complement})$
+predicted $(\widehat S_{\rm tot})^2$ eigenvalue
+$= \|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$ \emph{unconditionally} in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMaxCanonicalComplement.lean}.
+The \emph{physical} predicted $(\widehat S_{\rm tot})^2$ eigenvalue is the
+max over both orientations. Direct from Step 173 + Step 174 by case-split
+on sign of $\mathrm{biw.re}$ and $\mathrm{biw.im} = 0 \Rightarrow
+\|\mathrm{biw}\| = |\mathrm{biw.re}|$. Unifies Step 141 (canonical at
+$|\neg A| \le |A|$) and Step 142 (complement at $|A| \le |\neg A|$) into a
+single orientation-free statement.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
