@@ -6197,6 +6197,21 @@ elementary inequality $\min \le (|A|+|\neg A|)/2 = |\Lambda|/2$
 balanced configurations realise the global minimum of the
 symm-predicted energy real part.
 
+\textbf{Step 96 (PR~\#2883)}: refined upper bound on the symm-energy
+real part in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmReLeNegMin.lean}.
+$(\texttt{bipartiteToyMinEnergyPredictedSymm A N}).\mathrm{re}
+   \le -\min(|A|, |\neg A|)\cdot N$.
+Direct from Step 92 closed form together with the squared form of
+the imbalance-norm $m_{\rm max}$ upper bound
+$\|\mathrm{biw}\| \le |\Lambda|\cdot N/2$ (giving
+$\|\mathrm{biw}\|^2/2 \le |\Lambda|^2\cdot N^2/8$, hence the first
+two terms of the closed form contribute non-positively).
+Refines the existing $\le 0$ bound when $\min > 0$; combined with
+Step 93 gives the tight $\min$-aware sandwich
+$-|\Lambda|^2\cdot N^2/8 - \min\cdot N \le \mathrm{symm.re} \le
+  -\min\cdot N$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
