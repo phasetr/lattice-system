@@ -6622,6 +6622,18 @@ $\mathrm{finrank}(\mathtt{bipartiteToyGroundStateSubspacePredicted}\,A\,N)
 Direct from Step 134's strict subspace inclusion in finite-dim
 space. Quantifies the "extra" subspace beyond the predicted GS.
 
+\textbf{Step 136 (PR~\#2925)}: predicted GS $=$ joint Casimir
+eigenspace at saturated in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedGSEqJointCasimirEigenspaceSaturated.lean}.
+At $|\neg A| = 0$:
+$\mathtt{bipartiteToyGroundStateSubspacePredicted}\,A\,N =
+   \mathtt{jointSublatticeCasimirEigenspace}\,A\,N$.
+Complement of Step 134's strict inclusion at non-deg. At saturated,
+$(\widehat S_{\neg A})^2 = 0$ makes that eigenspace condition vacuous,
+and $(\widehat S_A)^2 = (\widehat S_{\rm tot})^2$ makes the
+$(\widehat S_A)^2$ condition imply the $(\widehat S_{\rm tot})^2$
+condition.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
