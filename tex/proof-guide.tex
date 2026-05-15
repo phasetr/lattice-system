@@ -6149,6 +6149,18 @@ into Step 90; the natural form for Tasaki §2.5 Theorem 2.3 where
 the predicted spin magnitude
 $\|\mathrm{biw}\| = ||A| - |\neg A||\cdot N/2$ appears directly.
 
+\textbf{Step 92 (PR~\#2878)}: explicit closed form of the
+symm-energy real part in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmReEqHalfImbalanceNormSq.lean}.
+$(\texttt{bipartiteToyMinEnergyPredictedSymm A N}).\mathrm{re}
+   = \|\texttt{bipartiteImbalanceWeight A N}\|^2 / 2
+   - |\Lambda|^2 \cdot N^2 / 8
+   - \min(|A|, |\neg A|) \cdot N$.
+Direct \texttt{linarith} rearrangement of Step 91. Expresses the
+predicted symmetric ground-state energy as a function of the spin
+magnitude squared, the lattice cardinality, and the minor
+sublattice count.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
