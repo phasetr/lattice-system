@@ -6642,6 +6642,16 @@ $\mathtt{bipartiteToyGroundStateSubspacePredicted}\,(\lambda x, !A\,x)\,N =
 \mathtt{jointSublatticeCasimirEigenspace}\,(\lambda x, !A\,x)\,N$.
 Direct from Step 136 via $|\neg\neg A| = |A| = 0$.
 
+\textbf{Step 138 (PR~\#2927)}: joint Casimir eigenspace finrank at
+saturated in
+\texttt{LatticeSystem/Quantum/SpinS/JointCasimirEigenspaceFinrankSaturated.lean}.
+At $|\neg A| = 0$:
+$\mathrm{finrank}(\mathtt{jointSublatticeCasimirEigenspace}\,A\,N) =
+|\Lambda|\cdot N + 1$. Direct from Step 136 (predicted GS = joint
+Casimir at saturated) + existing saturated finrank result. The
+dimension matches the SU(2) multiplet $2m_{\rm max} + 1$ at
+saturated edges.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
