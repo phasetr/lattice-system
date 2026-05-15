@@ -6905,6 +6905,16 @@ factoring $(\mathrm{biw.re}-(m_{\rm max}+1))(\mathrm{biw.re}+m_{\rm max}) = 0$
 and using $\mathrm{biw.re} \le m_{\rm max} < m_{\rm max}+1$ forces
 $\mathrm{biw.re} = -m_{\rm max}$, hence $|A| = 0$ at $N \ge 1$.
 
+\textbf{Step 167 (PR~\#2957)}: generalised strict complement predicted
+$(\widehat S_{\rm tot})^2$ eigenvalue $< m_{\rm max}(m_{\rm max}+1)$
+at $|A| \ge 1$, $N \ge 1$ (\emph{no} $|\neg A| \ge 1$, no orientation)
+in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueComplementLtMMaxQuadOfCardAPos.lean}.
+Mirror of Step 157. Direct from Step 165 + strict
+$\mathrm{biw.re} > -m_{\rm max}$ (since $|A| - |\neg A| > -|\Lambda|$
+when $|A| \ge 1$, scaled by $N \ge 1$) + unconditional
+$\mathrm{biw.re} \le m_{\rm max}$, then \texttt{nlinarith}.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
