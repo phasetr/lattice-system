@@ -6184,6 +6184,19 @@ Combines the existing balanced complex form
 identity $2\cdot|A| = |\Lambda|$ (PR \#2870). Saturates the
 Step 93 lower bound at balanced sublattices.
 
+\textbf{Step 95 (PR~\#2882)}: configuration-independent global lower
+bound on the symm-energy real part in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergySymmReGeGlobalMin.lean}.
+For any $A$:
+$-|\Lambda|^2\cdot N^2/8 - |\Lambda|\cdot N/2 \le
+   (\texttt{bipartiteToyMinEnergyPredictedSymm A N}).\mathrm{re}$.
+Combines Step 93 ($A$-dependent lower bound
+$-|\Lambda|^2\cdot N^2/8 - \min(|A|, |\neg A|)\cdot N$) with the
+elementary inequality $\min \le (|A|+|\neg A|)/2 = |\Lambda|/2$
+(from PR \#2870). Saturated at balanced sublattices (Step 94):
+balanced configurations realise the global minimum of the
+symm-predicted energy real part.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
