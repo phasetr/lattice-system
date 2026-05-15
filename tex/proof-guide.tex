@@ -6538,6 +6538,15 @@ $\Phi_{\rm N\acute{e}el}(A, N) \in
    \mathtt{bipartiteToyGroundStateSubspacePredicted}\,A\,N$ at
 saturated. The N\'eel state IS the predicted GS at saturated edges.
 
+\textbf{Step 127 (PR~\#2915)}: N\'eel = all-down at saturated
+complement $|A| = 0$ in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSEqAllAlignedStateAtSaturatedComplement.lean}.
+At $|A| = 0$:
+$\mathtt{neelConfigOfS}\,A\,N = (\lambda \_, \mathrm{Fin.last}\,N)$,
+hence $\Phi_{\rm N\acute{e}el}(A, N) =
+\mathtt{allAlignedStateS}\,\Lambda\,N\,(\mathrm{Fin.last}\,N)$.
+Companion of Step 126.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
