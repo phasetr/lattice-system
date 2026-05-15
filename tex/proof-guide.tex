@@ -6883,6 +6883,17 @@ $|A| < |\neg A|$, $N \ge 1$ in
 Mirror of Step 147. Direct from Step 142 + $\|\mathrm{biw}\| > 0$
 (strict unbalanced norm bound) via \texttt{nlinarith}.
 
+\textbf{Step 165 (PR~\#2955)}: unified signed-form complement predicted
+$(\widehat S_{\rm tot})^2$ eigenvalue
+$((s_B - s_A)\cdot((s_B - s_A) + 1)).\mathrm{re} =
+\mathrm{biw.re}\cdot(\mathrm{biw.re} - 1)$ \emph{without orientation
+hypothesis} in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedTotalSpinSquaredEigenvalueViaImbalanceReComplement.lean}.
+Mirror of Step 143. Step 142 ($\|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1)$)
+is an orientation-specialised consequence at $|A| \le |\neg A|$ where
+$\mathrm{biw.re} \le 0$ so $-\mathrm{biw.re} = \|\mathrm{biw}\|$. Allows
+orientation-free reasoning about the complement form.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
