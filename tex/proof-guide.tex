@@ -7011,6 +7011,14 @@ from Step 175 $-$ Step 176 $= \|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|+1) -
 \|\mathrm{biw}\|\cdot(\|\mathrm{biw}\|-1) = 2\cdot\|\mathrm{biw}\|$ via
 \texttt{ring}. The max-min gap is non-negative since $\|\mathrm{biw}\| \ge 0$.
 
+\textbf{Step 178 (PR~\#2969)}: iff $\|\mathrm{biw}\| = m_{\rm max}
+\Leftrightarrow$ saturated edge at $N \ge 1$ in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteImbalanceWeightNormEqMMaxIff.lean}.
+The imbalance norm hits its maximum exactly at saturated edges
+($|A| = 0 \vee |\neg A| = 0$). Backward via Step 90/91; forward via
+contrapositive of Step 144 (strict $\|\mathrm{biw}\| < m_{\rm max}$ at
+non-degenerate).
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
