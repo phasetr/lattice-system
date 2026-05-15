@@ -7058,6 +7058,15 @@ in
 The parabola $x(x-1)$ has minimum $-1/4$ at $x = 1/2$. Direct from
 Step 176 (min $= \|\mathrm{biw}\|(\|\mathrm{biw}\|-1)$) + $(x - 1/2)^2 \ge 0$.
 
+\textbf{Step 183 (PR~\#2974)}: unified max iff
+$\max(\mathrm{canonical}, \mathrm{complement}) = 0 \Leftrightarrow$ balanced
+at $N \ge 1$ in
+\texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueMaxEqZeroIffBalanced.lean}.
+The \emph{physical} predicted $(\widehat S_{\rm tot})^2$ eigenvalue vanishes
+(singlet $S_{\rm tot} = 0$) exactly at balanced sublattices. Complements
+Step 180 ($\max > 0 \Leftrightarrow$ unbalanced). Unifies Steps 146/163
+(orientation-specialised balanced iffs) via the physical $\max$ quantity.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
