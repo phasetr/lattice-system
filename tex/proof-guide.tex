@@ -6446,6 +6446,17 @@ dependence of $\langle(\widehat S_{\rm tot})^2\rangle_{\rm N\acute{e}el}$
 is fully concentrated in the z-axis $(\widehat S_{\rm tot}^{(3)})^2$
 component.
 
+\textbf{Step 119 (PR~\#2907)}: linear transverse N\'eel expectations
+vanish in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSTotalSpinSOp1Op2ReEqZero.lean}.
+$(\langle\Phi_{\rm N\acute{e}el} |\,\widehat S_{\rm tot}^{(1)}\,
+   | \Phi_{\rm N\acute{e}el}\rangle).\mathrm{re} = 0$ and
+$(\langle\Phi_{\rm N\acute{e}el} |\,\widehat S_{\rm tot}^{(2)}\,
+   | \Phi_{\rm N\acute{e}el}\rangle).\mathrm{re} = 0$.
+Direct from $\gamma$-4 step 241 (complex form $= 0$) +
+\texttt{Complex.zero\_re}. Completes the linear part of the N\'eel
+operator-level decomposition: z-axis = $\mathrm{biw.re}$, transverse = 0.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
