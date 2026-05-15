@@ -6468,6 +6468,16 @@ Combines Step 116 ($\langle(\widehat S_{\rm tot}^{(3)})^2\rangle =
 Formally confirms the N\'eel state is an exact $\widehat S_{\rm tot}^{(3)}$
 eigenvector at eigenvalue $\mathrm{biw.re} = (|A|-|\neg A|)\cdot N/2$.
 
+\textbf{Step 121 (PR~\#2909)}: strict bound on
+$\langle(\widehat S_{\rm tot}^{(3)})^2\rangle_{\rm N\acute{e}el}.\mathrm{re}$
+at non-degenerate in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSTotalSpinSOp3SqLtMMaxSqNondegenerate.lean}.
+At $|A| \ge 1$, $|\neg A| \ge 1$, $N \ge 1$:
+$\langle(\widehat S_{\rm tot}^{(3)})^2\rangle_{\rm N\acute{e}el}.\mathrm{re}
+   < |\Lambda|^2\cdot N^2/4 = m_{\rm max}^2$.
+Combines Step 116 ($= \|\mathrm{biw}\|^2$) + Step 102
+($\|\mathrm{biw}\| < m_{\rm max}$) squared.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
