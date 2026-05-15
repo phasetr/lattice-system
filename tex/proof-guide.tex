@@ -6355,6 +6355,19 @@ Direct from Step 109 + $\|\mathrm{biw}\| = 0$ at balanced
 (PR \#2854). Minimum value of the $(\widehat S_{\rm tot})^2$
 expectation across all bipartitions.
 
+\textbf{Step 111 (PR~\#2898)}: saturated-case N\'eel
+$(\widehat S_{\rm tot})^2$ expectation in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSTotalSpinSSquaredSaturated.lean}.
+At $|\neg A| = 0$ (or $|A| = 0$):
+$(\langle\Phi_{\rm N\acute{e}el} |\, (\widehat S_{\rm tot})^2\,
+   | \Phi_{\rm N\acute{e}el}\rangle).\mathrm{re}
+   = (|\Lambda|\cdot N/2)\cdot(|\Lambda|\cdot N/2 + 1)
+   = m_{\rm max}\cdot(m_{\rm max} + 1)$.
+Direct from Step 109 + $\|\mathrm{biw}\| = |\Lambda|\cdot N/2$ at
+saturated edges (PR \#2851/2852). The N\'eel state at saturated
+edges is a $(\widehat S_{\rm tot})^2$ eigenvector at the
+fully-polarised ferromagnetic maximum-spin eigenvalue.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
