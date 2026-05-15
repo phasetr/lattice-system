@@ -6457,6 +6457,17 @@ Direct from $\gamma$-4 step 241 (complex form $= 0$) +
 \texttt{Complex.zero\_re}. Completes the linear part of the N\'eel
 operator-level decomposition: z-axis = $\mathrm{biw.re}$, transverse = 0.
 
+\textbf{Step 120 (PR~\#2908)}: zero $\widehat S_{\rm tot}^{(3)}$
+variance on N\'eel in
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSTotalSpinSOp3ZeroVariance.lean}.
+$\langle(\widehat S_{\rm tot}^{(3)})^2\rangle_{\rm N\acute{e}el}.\mathrm{re}
+   = (\langle\widehat S_{\rm tot}^{(3)}\rangle_{\rm N\acute{e}el}.\mathrm{re})^2$.
+Combines Step 116 ($\langle(\widehat S_{\rm tot}^{(3)})^2\rangle =
+\|\mathrm{biw}\|^2$) with Step 117 ($\langle\widehat S_{\rm tot}^{(3)}\rangle =
+\mathrm{biw.re}$) + Step 91 ($\|\mathrm{biw}\|^2 = (\mathrm{biw.re})^2$).
+Formally confirms the N\'eel state is an exact $\widehat S_{\rm tot}^{(3)}$
+eigenvector at eigenvalue $\mathrm{biw.re} = (|A|-|\neg A|)\cdot N/2$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
