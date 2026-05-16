@@ -34,6 +34,16 @@ import LatticeSystem.Quantum.MagnetizationSubspace
       file. No further split planned this cadence.
   Conclusion: build-speed remains healthy; deferring orthogonality
   split to a later refactor when it would yield ≥10% improvement.
+- **Refactor #49 (PR #3044, evaluate-only)**: post-#3043 measurement.
+  File 1236 lines, incremental rebuild **7.6s wall** (1.8s user +
+  3.4s system, 68% CPU). The system-time fraction has grown; the
+  wall time is approaching the ~5s evaluation threshold. The 20-PR
+  orientation-sandwich sweep (#3024-#3043) added 20 small files in
+  `Quantum/SpinS/BipartiteToyMinEnergyPredicted*.lean` (each 35-75
+  lines) without touching this file directly. Peer measurements
+  unchanged. Orthogonality section (~215 lines) remains the most
+  promising future split candidate; current 7.6s is still below the
+  ~10s threshold for forced action. Deferring to refactor #50.
 
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
 on a bipartite graph `(Λ, A)` (Tasaki §2.5 eq. (2.5.2)) sets
