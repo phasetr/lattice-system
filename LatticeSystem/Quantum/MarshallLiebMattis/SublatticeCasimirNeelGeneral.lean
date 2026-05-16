@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeCasimirNeel
+import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeCasimirNeelExpectations
 
 /-!
 # Spin-`1/2` `(Ŝ_tot)²` Casimir on arbitrary `basisVec σ`

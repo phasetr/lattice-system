@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeCasimirNeel
+import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeCasimirNeelExpectations
 
 /-!
 # Spin-`1/2` Heisenberg Hamiltonian expectations on the Néel state
