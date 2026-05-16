@@ -7250,6 +7250,15 @@ the symmetric (min-aware) form. Difference $= (|\neg A| -
 \min(|A|, |\neg A|))\cdot N \ge 0$. Equality at $|\neg A| \le |A|$;
 strict at $|A| < |\neg A|$ and $N \ge 1$.
 
+\textbf{Step 208 (PR~\#3000)}: $(predicted\_min\ \neg A).\mathrm{re} \le
+(predictedSymm\ A).\mathrm{re}$ \emph{unconditionally} in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergyPredictedComplementReLeSymmRe.lean}.
+Mirror of Step 207. The complement-orientation predicted min energy
+is bounded above by the symmetric form. Difference $= (|A| -
+\min(|A|, |\neg A|))\cdot N \ge 0$. Equality at $|A| \le |\neg A|$;
+strict at $|\neg A| < |A|$ and $N \ge 1$. Together with Step 207
+confirms $predictedSymm$ as upper bound on both orientations.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
