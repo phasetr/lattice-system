@@ -73,6 +73,19 @@ import LatticeSystem.Quantum.MagnetizationSubspace
   but still below. Next refactor cycle should consider an actual
   split if the trajectory continues; current target remains the
   Casimir cross-term block.
+- **Refactor #53 (PR #3128, evaluate-only)**: post-#3127 measurement.
+  Parent 1059 lines (19 lines drift since #52), incremental rebuild
+  **18.0s wall** (7.3s user + 6.6s system, 77% CPU) — **past the
+  ~10s forced-split threshold**. The PRs #3108-#3127 sweep
+  (unconditional Néel-bridge iffs, sublattice-swap symmetries,
+  ‖biw‖-form theorems) didn't touch this file directly, but their
+  import surface continued growing the transitive cost.
+  Next refactor cycle MUST do an actual split. Target:
+  Néel-expectation block (lines ~815-1029, ~215 lines covering
+  sublattice spin operator expectations + cross-terms + total spin
+  squared expectations + Heisenberg toy expectation). Deferring this
+  cadence to gather more measurement data before committing to a
+  specific cut.
 
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
 on a bipartite graph `(Λ, A)` (Tasaki §2.5 eq. (2.5.2)) sets
