@@ -7225,6 +7225,15 @@ Companion of Step 203. Combines Step 202 + Step 194. At complement
 orientation, the canonical-formula uses the smaller $\min$ eigenvalue,
 underestimating the physical min energy.
 
+\textbf{Step 205 (PR~\#2997)}: complement-orientation sum identity
+$bipartiteToyMinEnergyPredicted\ A\ N + bipartiteToyMinEnergyPredicted\ (\neg A)\ N
+= -|A|\cdot|\neg A|\cdot N^2 - |\Lambda|\cdot N$ in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergyPredictedAddComplement.lean}.
+Companion of the existing `\_sub\_complement` gap identity. Together
+gives the affine sandwich: $predicted\_min\ A = -|A|\cdot|\neg A|\cdot N^2/2
+- |\neg A|\cdot N$ and $predicted\_min\ (\neg A) = -|A|\cdot|\neg A|\cdot N^2/2
+- |A|\cdot N$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
