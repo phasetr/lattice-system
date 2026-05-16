@@ -7303,6 +7303,12 @@ $(predicted\_min\ A).\mathrm{re} < (predictedSymm\ A).\mathrm{re}
 Companion strict version of Step 207. Via case-split on
 $|A| < |\neg A|$ vs $|\neg A| \le |A|$.
 
+\textbf{Step 215 (PR~\#3008)}: iff strict (complement)
+$(predicted\_min\ \neg A).\mathrm{re} < (predictedSymm\ A).\mathrm{re}
+\Leftrightarrow |\neg A| < |A|$ at $N \ge 1$ in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergyPredictedComplementLtSymmIff.lean}.
+Mirror of Step 214. Companion strict version of Step 208.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
