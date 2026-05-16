@@ -64,6 +64,15 @@ import LatticeSystem.Quantum.MagnetizationSubspace
   this cadence; the next candidate region (Casimir cross-terms,
   lines ~535-720, ~185 lines) is structurally tightly coupled and
   would not yield a clean cut yet.
+- **Refactor #52 (PR #3107, evaluate-only)**: post-#3106 measurement.
+  Parent 1040 lines (10-line history additions from #51), incremental
+  rebuild **8.4s wall** (2.1s user + 4.1s system, 73% CPU). Another
+  uptick from 4.1s due to PRs #3087-#3106's 20-PR sweep of
+  unconditional `= 0` iffs + Néel-bridge iff completions adding new
+  import dependencies through this file. Approaching ~10s threshold
+  but still below. Next refactor cycle should consider an actual
+  split if the trajectory continues; current target remains the
+  Casimir cross-term block.
 
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
 on a bipartite graph `(Λ, A)` (Tasaki §2.5 eq. (2.5.2)) sets
