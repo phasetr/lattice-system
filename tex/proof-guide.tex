@@ -7259,6 +7259,16 @@ is bounded above by the symmetric form. Difference $= (|A| -
 strict at $|\neg A| < |A|$ and $N \ge 1$. Together with Step 207
 confirms $predictedSymm$ as upper bound on both orientations.
 
+\textbf{Step 209 (PR~\#3001)}: $\max((predicted\_min\ A).\mathrm{re},
+(predicted\_min\ \neg A).\mathrm{re}) = (predictedSymm\ A).\mathrm{re}$
+\emph{unconditionally} in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergyPredictedMaxEqPredictedSymm.lean}.
+Identifies $bipartiteToyMinEnergyPredictedSymm$ as the \emph{max} of
+orientation-specific predicted min energies. Direct from Steps 207/208
+(upper bounds) plus equality at the orientation matching
+$\min(|A|, |\neg A|)$. The symmetric form is the physical Tasaki §2.5
+Theorem 2.3 prediction.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
