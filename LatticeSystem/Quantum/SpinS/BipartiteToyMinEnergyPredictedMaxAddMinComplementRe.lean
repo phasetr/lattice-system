@@ -6,7 +6,7 @@ import LatticeSystem.Quantum.SpinS.CardSumEqFintype
 # `max(...) + min(...) = −|A|·|¬A|·N² − |Λ|·N`
 
 `max x y + min x y = x + y` is a standard identity for any two reals.
-Combined with PR #3035-ish sum identity at the complex level:
+Combined with PR #2997 sum identity at the complex level:
 
   `(predicted_min A) + (predicted_min ¬A) = −|A|·|¬A|·N² − |Λ|·N`,
 
@@ -29,7 +29,7 @@ variable {Λ : Type*} [Fintype Λ]
 set_option linter.style.longLine false in
 /-- **`max + min` of orientation-specific predicted min energies**:
 `= −|A|·|¬A|·N² − |Λ|·N` unconditionally. Direct from the
-sum identity (PR #3035-ish) + `max + min = sum`. -/
+sum identity (PR #2997) + `max + min = sum`. -/
 theorem bipartiteToyMinEnergyPredicted_max_add_min_complement_re_eq
     (A : Λ → Bool) (N : ℕ) :
     max (bipartiteToyMinEnergyPredicted (Λ := Λ) A N).re
