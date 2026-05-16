@@ -21,6 +21,19 @@ import LatticeSystem.Quantum.MagnetizationSubspace
   `SublatticeCasimirNeelOrthogonality.lean` companion. Deferred this
   cadence to avoid coupling with the 20-PR predicted-min-energy /
   predictedSymm bridge sweep (#2962-#3001).
+- **Refactor #48 (PR #3023, evaluate-only)**: post-#3022 measurement.
+  File 1222 → 1223 lines (one line drift), incremental rebuild
+  **3.6s wall** (1.7s user + 2.5s system, 116% CPU). Below the ~5s
+  threshold; no urgent need to split. The 20-PR predicted-min-energy
+  sweep (#3003-#3022) added 20 small files (each 30-90 lines) in
+  `Quantum/SpinS/BipartiteToyMinEnergyPredicted*.lean` without
+  touching this file. Peer measurements (incremental rebuild):
+    - `SublatticeSpin.lean` (1074 lines): 3.35s.
+    - `SingleClusterHamiltonian.lean` (779 lines): 12s — known
+      heavy theorem, already split via refactor #25's companion
+      file. No further split planned this cadence.
+  Conclusion: build-speed remains healthy; deferring orthogonality
+  split to a later refactor when it would yield ≥10% improvement.
 
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
 on a bipartite graph `(Λ, A)` (Tasaki §2.5 eq. (2.5.2)) sets
