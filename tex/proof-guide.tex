@@ -7330,6 +7330,49 @@ Companion of Step 209 ($\max = predictedSymm$). The $\min$ is the
 "unphysical" lower predicted min energy, strictly below $predictedSymm$
 at unbalanced.
 
+\textbf{Steps 219--261 (PRs~\#3012--\#3054)}: orientation-sandwich
+algebraic closure + operator-algebraic bridges.
+
+PRs~\#3012--\#3050 systematically complete the algebraic framework
+for the four orientation-pair points
+\begin{equation*}
+  \min \;\le\; \mathrm{avg} \;\le\; predictedSymm = \max,
+\end{equation*}
+all linked by the half-spread $\frac{1}{2}\bigl||A| - |\neg A|\bigr|\,N$.
+The framework establishes:
+\begin{itemize}
+  \item the explicit sum identity $\max + \min = -|A|\cdot|\neg A|\cdot N^2 - |\Lambda|\cdot N$ (PR~\#3031);
+  \item the spread formula $\max - \min = \bigl||A| - |\neg A|\bigr|\,N$ (PR~\#3012)
+        together with its sign trichotomy at $N \ge 1$ (PRs~\#3013/\#3014);
+  \item the half-spread separations $predictedSymm - \mathrm{avg} = \mathrm{avg} - \min
+        = \frac{1}{2}\bigl||A| - |\neg A|\bigr|\,N$ (PRs~\#3034/\#3039);
+  \item the three endpoint formulas in terms of midpoint $\pm$ half-spread
+        (PRs~\#3032/\#3043/\#3045);
+  \item equality and strict iffs at balanced / unbalanced for every pair
+        of sandwich points (PRs~\#3037/\#3038/\#3040/\#3041/\#3046--\#3049);
+  \item non-positivity of $\min$, $\max$ and avg, plus strict negativity
+        of avg at non-degenerate (PRs~\#3029/\#3030/\#3042/\#3050).
+\end{itemize}
+
+PRs~\#3051--\#3054 add four operator-algebraic bridges connecting the
+Néel-state toy-Hamiltonian expectation $\langle \Phi_{\rm N\acute eel}|
+\hat H_{\rm toy}|\Phi_{\rm N\acute eel}\rangle = -|A|\cdot|\neg A|\cdot
+N^2/2$ to the algebraic orientation-pair:
+\begin{align*}
+  \langle \Phi_{\rm N\acute eel}|\hat H_{\rm toy}|\Phi_{\rm N\acute eel}\rangle.\mathrm{re} - \mathrm{avg} &= \tfrac{|\Lambda|\cdot N}{2}, \\
+  \langle \Phi_{\rm N\acute eel}|\hat H_{\rm toy}|\Phi_{\rm N\acute eel}\rangle.\mathrm{re} - \min &= \max(|A|, |\neg A|)\cdot N, \\
+  \langle \Phi_{\rm N\acute eel}|\hat H_{\rm toy}|\Phi_{\rm N\acute eel}\rangle.\mathrm{re} - (predicted\_min\ A).\mathrm{re} &= |\neg A|\cdot N, \\
+  \langle \Phi_{\rm N\acute eel}|\hat H_{\rm toy}|\Phi_{\rm N\acute eel}\rangle.\mathrm{re} - (predicted\_min\ \neg A).\mathrm{re} &= |A|\cdot N.
+\end{align*}
+Together with the existing gap to $predictedSymm$ (Tasaki §2.5
+Theorem 2.3 prediction = $\min(|A|, |\neg A|)\cdot N$, PR~\#3000-area),
+these bridges pin down the Néel-state expectation against every
+sandwich point. Individual files are in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergyPredicted*.lean}
+and
+\texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSExpectation*.lean};
+see \texttt{docs/index.md} for the full list with per-PR provenance.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
