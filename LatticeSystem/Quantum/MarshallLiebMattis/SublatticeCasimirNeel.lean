@@ -54,6 +54,16 @@ import LatticeSystem.Quantum.MagnetizationSubspace
   1246 → 1030 lines, **3.2s wall** — **77% speedup**. Clean cut:
   the extracted block is downstream of `heisenbergToyHamiltonian_expectation`
   (last theorem retained) with no upstream-into-parent dependencies.
+- **Refactor #51 (PR #3086, evaluate-only)**: post-#3085 measurement.
+  Parent 1030 lines, incremental rebuild **4.1s wall** (1.8s user +
+  2.8s system, 111% CPU). Slight uptick from 3.2s at refactor #50
+  due to the PRs #3066-#3085 sweep (20 PRs adding orientation-pair
+  iffs + strict negativity iffs + degeneracy iffs) growing the
+  import surface, but still well below the ~5s evaluation threshold
+  and far below the ~10s forced-split threshold. No split needed
+  this cadence; the next candidate region (Casimir cross-terms,
+  lines ~535-720, ~185 lines) is structurally tightly coupled and
+  would not yield a clean cut yet.
 
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
 on a bipartite graph `(Λ, A)` (Tasaki §2.5 eq. (2.5.2)) sets
