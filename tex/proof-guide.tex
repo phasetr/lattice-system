@@ -7205,6 +7205,15 @@ Direct from the definition via \texttt{Complex.sub\_re}. Makes
 explicit the relationship between predicted min energy of $H_{\rm toy}$
 and the canonical predicted $(\widehat S_{\rm tot})^2$ eigenvalue.
 
+\textbf{Step 203 (PR~\#2995)}: predicted min energy via max (physical)
+eigenvalue at proper orientation: at $|\neg A| \le |A|$,
+$(bipartiteToyMinEnergyPredicted\ A\ N).\mathrm{re} =
+\max(\mathrm{canonical}, \mathrm{complement}) -
+\mathrm{Re}(s_A\cdot(s_A+1)) - \mathrm{Re}(s_B\cdot(s_B+1))$ in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergyPredictedReAtProperOrientation.lean}.
+Combines Step 202 + Step 190 (proper orientation $\max = \mathrm{canonical}$).
+Uses the physical predicted $(\widehat S_{\rm tot})^2$ eigenvalue.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
