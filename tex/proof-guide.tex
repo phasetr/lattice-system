@@ -7234,6 +7234,14 @@ gives the affine sandwich: $predicted\_min\ A = -|A|\cdot|\neg A|\cdot N^2/2
 - |\neg A|\cdot N$ and $predicted\_min\ (\neg A) = -|A|\cdot|\neg A|\cdot N^2/2
 - |A|\cdot N$.
 
+\textbf{Step 206 (PR~\#2998)}: iff $predicted\_min\_energy\ A =
+predicted\_min\_energy\ (\neg A) \Leftrightarrow$ balanced at $N \ge 1$
+in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergyPredictedEqComplementIffBalanced.lean}.
+The two orientations give the same predicted min energy \emph{iff}
+balanced sublattices. Direct from the existing `\_sub\_complement`
+gap identity $= (|A| - |\neg A|)\cdot N$ + $N \ge 1$ cancellation.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
