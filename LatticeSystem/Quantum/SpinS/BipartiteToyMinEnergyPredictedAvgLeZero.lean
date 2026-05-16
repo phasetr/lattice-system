@@ -1,10 +1,9 @@
 import LatticeSystem.Quantum.SpinS.BipartiteToyMinEnergyNonpos
-import LatticeSystem.Quantum.SpinS.BipartiteToyMinEnergy
 
 /-!
 # `avg ≤ 0` unconditionally
 
-Direct from PR #3029 (`min ≤ 0`) and PR #3030 (`max ≤ 0`):
+Direct from PR #2791 (`(pmA).re ≤ 0`) applied to both orientations:
 
   `((predicted_min A).re + (predicted_min ¬A).re) / 2 ≤ 0`
 
