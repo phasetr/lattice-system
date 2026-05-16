@@ -7242,6 +7242,14 @@ The two orientations give the same predicted min energy \emph{iff}
 balanced sublattices. Direct from the existing `\_sub\_complement`
 gap identity $= (|A| - |\neg A|)\cdot N$ + $N \ge 1$ cancellation.
 
+\textbf{Step 207 (PR~\#2999)}: $(predicted\_min\ A).\mathrm{re} \le
+(predictedSymm\ A).\mathrm{re}$ \emph{unconditionally} in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergyPredictedReLeSymmRe.lean}.
+The canonical-orientation predicted min energy is bounded above by
+the symmetric (min-aware) form. Difference $= (|\neg A| -
+\min(|A|, |\neg A|))\cdot N \ge 0$. Equality at $|\neg A| \le |A|$;
+strict at $|A| < |\neg A|$ and $N \ge 1$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
