@@ -7296,6 +7296,13 @@ in
 Mirror of Step 212. The complement-orientation predicted min energy
 vanishes at complement-saturated.
 
+\textbf{Step 214 (PR~\#3007)}: iff strict
+$(predicted\_min\ A).\mathrm{re} < (predictedSymm\ A).\mathrm{re}
+\Leftrightarrow |A| < |\neg A|$ at $N \ge 1$ in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergyPredictedLtSymmIff.lean}.
+Companion strict version of Step 207. Via case-split on
+$|A| < |\neg A|$ vs $|\neg A| \le |A|$.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
