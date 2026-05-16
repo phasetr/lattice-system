@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeCasimirNeel
+import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeCasimirNeelBasisOrthogonality
 
 /-!
 # Spin-`1/2` Néel-basisVec triple/quad linear independence
