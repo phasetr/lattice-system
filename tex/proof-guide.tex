@@ -7214,6 +7214,17 @@ $(bipartiteToyMinEnergyPredicted\ A\ N).\mathrm{re} =
 Combines Step 202 + Step 190 (proper orientation $\max = \mathrm{canonical}$).
 Uses the physical predicted $(\widehat S_{\rm tot})^2$ eigenvalue.
 
+\textbf{Step 204 (PR~\#2996)}: predicted min energy via min
+(wrong-orientation) eigenvalue at complement orientation: at
+$|A| \le |\neg A|$,
+$(bipartiteToyMinEnergyPredicted\ A\ N).\mathrm{re} =
+\min(\mathrm{canonical}, \mathrm{complement}) -
+\mathrm{Re}(s_A\cdot(s_A+1)) - \mathrm{Re}(s_B\cdot(s_B+1))$ in
+\texttt{LatticeSystem/Quantum/SpinS/BipartiteToyMinEnergyPredictedReAtComplementOrientation.lean}.
+Companion of Step 203. Combines Step 202 + Step 194. At complement
+orientation, the canonical-formula uses the smaller $\min$ eigenvalue,
+underestimating the physical min energy.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
