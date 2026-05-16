@@ -17,7 +17,7 @@ Hence
 
 The canonical-orientation predicted min energy is bounded above by the
 symmetric (min-aware) form. Equality at `|¬A| ≤ |A|` (where
-`min = |¬A|`); strict at `|A| < |¬A|`.
+`min = |¬A|`); strict at `|A| < |¬A|` and `N ≥ 1`.
 
 Tracked as part of Tasaki §2.5 Theorem 2.3 / γ-4 (Issue #412).
 -/
