@@ -7451,6 +7451,35 @@ multiplet; the remaining proof work is the non-vanishing and
 Marshall-sign compatibility needed to feed the laddered vector into
 the per-sector uniqueness theorem.
 
+\textbf{Sector-support bridge and lowering-sector shift}: the same PR
+also records the support side of the adjacent-sector comparison.  First,
+\texttt{totalSpinSOp3\_mulVec\_apply\_eq\_magEigenvalueS\_mul} gives the
+pointwise diagonal action
+\[
+  (\hat S^{(3)}_{\rm tot}\Psi)(\sigma)
+  = \mathrm{magEigenvalueS}(\sigma)\,\Psi(\sigma)
+\]
+for arbitrary full spin-$S$ vectors.  Hence
+\texttt{magSectorEmbedding\_mem\_magSubspaceS} says that a zero-extended
+\(\mathrm{magSumS}=M\) sector vector lies in the
+\(\hat S^{(3)}_{\rm tot}\)-eigenspace with eigenvalue
+\(|V|N/2 - M\), and
+\texttt{magSubspaceS\_apply\_eq\_zero\_of\_magSumS\_ne} gives the converse
+support statement.  Combining these with the existing commutator
+shift lemma for \(\hat S^-_{\rm tot}\) proves
+\[
+  \hat S^-_{\rm tot}\,
+    \mathrm{magSectorEmbedding}(\Phi_M)
+  \quad\text{is supported on}\quad
+  \mathrm{magSumS}=M+1,
+\]
+formalised as
+\texttt{totalSpinSOpMinus\_mulVec\_magSectorEmbedding\_supported\_succ}.
+Together with the eigenvalue-preservation lemma above, this shows that
+the lowered vector, when nonzero, is an eigenvector in the neighbouring
+sector at the same Heisenberg eigenvalue.  This is the next direct step
+toward identifying the sector energies in Tasaki §2.5 Theorem 2.3.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
