@@ -110,6 +110,21 @@ import LatticeSystem.Quantum.MagnetizationSubspace
   LadderActions instead of parent). Downstream caller
   (`SublatticeCasimirNeelExpectations.lean`) updated to import the
   new companion file (no caller code changes).
+- **Refactor #55 (PR #3170, evaluate-only)**: post-#3169 measurement.
+  Parent 700 lines (unchanged since #54), incremental rebuild
+  **11.9s wall** (2.2s user + 4.3s system, 54% CPU). Just past the
+  ~10s forced-split threshold (up from 4.3s at #54). The PRs
+  #3150-#3169 sweep added 20 small files in `Quantum/SpinS/` covering
+  biw.re sign classification (positivity/negativity/vanishing/non-neg/
+  non-pos iffs) + canonical/complement vs symm gap iffs +
+  Néel-vs-sandwich gap positivity iffs; none touched this file
+  directly. Remaining candidate cuts (basic ladder/S3 actions
+  lines 419-580, ~160 lines, 9 theorems) are tightly coupled with
+  the existing LadderActions companion (which imports parent). A
+  three-file split structure would require either circular import
+  avoidance via a base companion or re-arrangement. Deferring to
+  refactor #56 to commit to a cleaner three-file structure; the
+  ~11.9s overshoot is modest and tolerable for one more cadence.
 
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
 on a bipartite graph `(Λ, A)` (Tasaki §2.5 eq. (2.5.2)) sets
