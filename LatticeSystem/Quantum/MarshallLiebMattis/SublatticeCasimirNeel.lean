@@ -174,6 +174,17 @@ import LatticeSystem.Quantum.MagnetizationSubspace
   packaged norm inequalities + biw norm iff family (>0, =0, doubled
   bounds). None touched this file directly. Steady-state 5.1s
   comfortably below 10s threshold; healthy.
+- **Refactor #60 (PR #3275, evaluate-only)**: post-#3274 measurement.
+  Parent 700 lines (unchanged). Initial **17.1s wall** (cold cache),
+  steady-state **3.2s wall** (1.6s user + 2.1s system, 113% CPU).
+  PRs #3254-#3274 sweep added doubled biw norm iffs + 4·gap = (|Λ|·N)²
+  − (2·‖biw‖)² + 8·⟨Φ_↑⟩.re = same + −8·⟨Φ_Néel⟩.re mirror +
+  8·⟨Φ_↓⟩.re mirror + 4·sat-sum = same + (pmA + allUp + |Λ|·N/2)
+  = biw.re + complement mirror + sum identities + 4·X.re² = gap²
+  family for X in {Néel, allUp, allDown} + cross-equalities
+  ⟨Φ_↑⟩² = ⟨Φ_Néel⟩², ⟨Φ_↓⟩² = ⟨Φ_Néel⟩², ⟨Φ_↑⟩² = ⟨Φ_↓⟩² +
+  packaged ⟨Φ_↑⟩².re ≥ 0, ⟨Φ_Néel⟩².re ≥ 0. None touched this file
+  directly. Healthy.
 
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
 on a bipartite graph `(Λ, A)` (Tasaki §2.5 eq. (2.5.2)) sets
