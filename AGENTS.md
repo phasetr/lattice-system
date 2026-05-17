@@ -25,7 +25,8 @@ the following on-disk files and obey their instructions:
    - `.self-local/docs/4-workflow.md` — workflow (PR/branch/merge)
    - `.self-local/docs/5-coding-conventions.md` — coding conventions
    - `.self-local/docs/refactoring-plan-2026-04-22.md` — refactor plan
-     and the 20-PR cadence history (§A.4)
+     and cadence history (§A.4; `CLAUDE.local.md` supersedes any stale
+     threshold text there, and the current threshold is 20 PRs)
    - `.self-local/SESSION-RESUME.md` — current in-flight state and the
      "Next concrete step" marker; **read first when resuming**
 
