@@ -7480,6 +7480,31 @@ the lowered vector, when nonzero, is an eigenvector in the neighbouring
 sector at the same Heisenberg eigenvalue.  This is the next direct step
 toward identifying the sector energies in Tasaki §2.5 Theorem 2.3.
 
+\textbf{Adjacent-sector energy identification, conditional lowering step}:
+the next bridge isolates exactly how the lowered vector will be used once
+its Marshall positivity is proved.  Suppose
+\[
+  \hat H\,\mathrm{magSectorEmbedding}(\Phi_M)
+    = \mu\,\mathrm{magSectorEmbedding}(\Phi_M)
+\]
+and suppose the lowered vector
+\(\hat S^-_{\rm tot}\mathrm{magSectorEmbedding}(\Phi_M)\) satisfies the
+Marshall-positive hypothesis in the adjacent sector \(M+1\).  The previous
+support lemma gives sector \(M+1\) support, and the ladder-commutation lemma
+gives
+\[
+  \hat H\bigl(\hat S^-_{\rm tot}\mathrm{magSectorEmbedding}(\Phi_M)\bigr)
+    =
+  \mu\,\hat S^-_{\rm tot}\mathrm{magSectorEmbedding}(\Phi_M).
+\]
+Applying the full-Hilbert-space Theorem 2.2 uniqueness clause in sector
+\(M+1\) then identifies the target sector ground-state eigenvalue with
+\(\mu\).  This is formalised as
+\texttt{tasaki23\_lowering\_identifies\_adjacent\_sector\_energy} in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23.lean}.  The remaining
+critical-path work is to prove the non-vanishing and Marshall-positivity
+input for this lowered vector.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
