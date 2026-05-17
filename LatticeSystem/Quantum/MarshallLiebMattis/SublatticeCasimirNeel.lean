@@ -137,6 +137,20 @@ import LatticeSystem.Quantum.MagnetizationSubspace
   for both orientations). None touched this file directly; the cost
   reduction since #55 suggests the transitive import surface has
   stabilised. No split needed this cadence; trajectory healthy.
+- **Refactor #57 (PR #3212, evaluate-only)**: post-#3211 measurement.
+  Parent 700 lines (still unchanged since refactor #54). Initial
+  measurement was **15.8s wall** (5.3s user + 5.8s system, 70% CPU)
+  — past threshold; immediate re-measurement gave **3.4s wall**
+  (1.6s user + 2.4s system, 117% CPU). System fluctuation (likely
+  cold cache or background contention) caused the first reading;
+  the steady-state cost is ~3.4s, comfortably below the threshold.
+  The PRs #3191-#3211 sweep added 20 small files in `Quantum/SpinS/`
+  covering Néel-biw-norm forms + variational gap iff family
+  (positivity / equality / non-negativity for ⟨Φ_↑⟩−⟨Φ_Néel⟩ and
+  the all-down companion theorems via PR #3202's symmetry
+  `⟨Φ_↑⟩.re = ⟨Φ_↓⟩.re`). None touched this file directly. The
+  3.4s steady-state confirms the import surface remains stable.
+  No split needed.
 
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
 on a bipartite graph `(Λ, A)` (Tasaki §2.5 eq. (2.5.2)) sets
