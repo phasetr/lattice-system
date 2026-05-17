@@ -125,6 +125,18 @@ import LatticeSystem.Quantum.MagnetizationSubspace
   avoidance via a base companion or re-arrangement. Deferring to
   refactor #56 to commit to a cleaner three-file structure; the
   ~11.9s overshoot is modest and tolerable for one more cadence.
+- **Refactor #56 (PR #3191, evaluate-only)**: post-#3190 measurement.
+  Parent 700 lines (still unchanged since refactor #54),
+  incremental rebuild **5.7s wall** (1.7s user + 2.4s system, 70% CPU).
+  Comfortably below the ~10s forced-split threshold — significant
+  improvement from #55's 11.9s. The PRs #3171-#3190 sweep added 20
+  small files in `Quantum/SpinS/` covering biw-form / biw-norm form
+  reformulations of existing gap identities (using `bipartiteImbalanceWeight`
+  signed real part and norm in place of the raw filter cardinalities)
+  + unconditional companion iffs for avg comparisons (≤/</=/≥/>
+  for both orientations). None touched this file directly; the cost
+  reduction since #55 suggests the transitive import surface has
+  stabilised. No split needed this cadence; trajectory healthy.
 
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
 on a bipartite graph `(Λ, A)` (Tasaki §2.5 eq. (2.5.2)) sets
