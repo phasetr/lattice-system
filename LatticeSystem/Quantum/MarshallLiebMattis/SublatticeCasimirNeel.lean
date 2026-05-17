@@ -164,6 +164,16 @@ import LatticeSystem.Quantum.MagnetizationSubspace
   family for biw bounds, difference-of-squares factorization, and
   max·N closed form. None touched this file directly. Trajectory
   healthy.
+- **Refactor #59 (PR #3254, evaluate-only)**: post-#3253 measurement.
+  Parent 700 lines (still unchanged). Initial **21.4s wall**
+  (5.7s user + 6.8s system, 58% CPU) — cold cache fluctuation;
+  steady-state re-measurement **5.1s wall** (1.9s user + 2.9s system,
+  93% CPU). PRs #3234-#3253 sweep added min/max closed forms +
+  saturated state non-negativity + Néel non-positivity + iff family
+  for ⟨Φ_↑⟩.re = 0/>0 + ⟨Φ_↓⟩.re mirrors + Néel iff (=0/<0) +
+  packaged norm inequalities + biw norm iff family (>0, =0, doubled
+  bounds). None touched this file directly. Steady-state 5.1s
+  comfortably below 10s threshold; healthy.
 
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
 on a bipartite graph `(Λ, A)` (Tasaki §2.5 eq. (2.5.2)) sets
