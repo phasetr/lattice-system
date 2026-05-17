@@ -1,3 +1,4 @@
+import LatticeSystem.Quantum.SpinS.AllAlignedState
 import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
 import LatticeSystem.Quantum.SpinS.NeelBipartiteWeight
 
@@ -37,6 +38,45 @@ Tracked in Issue #412 (Tasaki §2.5: Marshall–Lieb–Mattis theorem).
 namespace LatticeSystem.Quantum
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
+
+/-! ## Ladder eigenvalue preservation -/
+
+/-- **Tasaki §2.5 Theorem 2.3 ladder step, lowering direction**:
+if `Ψ` is a Heisenberg eigenvector at real eigenvalue `μ`, then
+`Ŝ^-_tot Ψ` is a Heisenberg eigenvector at the same eigenvalue.
+
+This is the operator identity used to compare adjacent magnetization
+sectors in the proof of Tasaki §2.5 Theorem 2.3, p. 42: the
+Hamiltonian commutes with `Ŝ^-_tot`, so applying the lowering ladder
+does not change the Heisenberg eigenvalue. -/
+theorem heisenbergHamiltonianS_mulVec_totalSpinSOpMinus_of_eigenvec
+    (J : V → V → ℂ) (N : ℕ) {μ : ℝ}
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : (heisenbergHamiltonianS J N).mulVec Ψ = (μ : ℂ) • Ψ) :
+    (heisenbergHamiltonianS J N).mulVec ((totalSpinSOpMinus V N).mulVec Ψ) =
+      (μ : ℂ) • ((totalSpinSOpMinus V N).mulVec Ψ) := by
+  have hcomm : heisenbergHamiltonianS J N * totalSpinSOpMinus V N =
+      totalSpinSOpMinus V N * heisenbergHamiltonianS J N :=
+    heisenbergHamiltonianS_commute_totalSpinSOpMinus J
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hΨ, Matrix.mulVec_smul]
+
+/-- **Tasaki §2.5 Theorem 2.3 ladder step, raising direction**:
+if `Ψ` is a Heisenberg eigenvector at real eigenvalue `μ`, then
+`Ŝ^+_tot Ψ` is a Heisenberg eigenvector at the same eigenvalue.
+
+Together with the lowering-direction statement, this is the SU(2)
+ladder mechanism for proving that the sector ground-state eigenvalues
+in the Theorem 2.3 multiplet coincide. -/
+theorem heisenbergHamiltonianS_mulVec_totalSpinSOpPlus_of_eigenvec
+    (J : V → V → ℂ) (N : ℕ) {μ : ℝ}
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : (heisenbergHamiltonianS J N).mulVec Ψ = (μ : ℂ) • Ψ) :
+    (heisenbergHamiltonianS J N).mulVec ((totalSpinSOpPlus V N).mulVec Ψ) =
+      (μ : ℂ) • ((totalSpinSOpPlus V N).mulVec Ψ) := by
+  have hcomm : heisenbergHamiltonianS J N * totalSpinSOpPlus V N =
+      totalSpinSOpPlus V N * heisenbergHamiltonianS J N :=
+    heisenbergHamiltonianS_commute_totalSpinSOpPlus J
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hΨ, Matrix.mulVec_smul]
 
 /-- **Tasaki §2.5 Theorem 2.3 predicted total-spin magnitude**
 `S_tot = ||A| − |¬A|| · (N/2)` (the real-valued half-integer

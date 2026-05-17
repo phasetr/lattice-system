@@ -5273,7 +5273,7 @@ This is the eigenvalue identity used in Tasaki's Theorem 2.3
 proof: minimising the toy energy over admissible joint
 $(\alpha, \beta_A, \beta_B)$ subject to the angular-momentum
 addition constraints gives the predicted ground state at
-$S_{\rm tot} = \bigl||A| - |\neg A|\bigr|\,S$. Subsequent γ-4 PRs
+$S_{\rm tot} = \bigl||A| - |\neg A|\bigr|\,S$. Subsequent $\gamma$-4 PRs
 will package the explicit Casimir-eigenvalue upper bounds
 $\beta_A \le s_A(s_A+1)$, $\beta_B \le s_B(s_B+1)$ with
 $s_A = |A|\cdot N/2$, $s_B = |\neg A|\cdot N/2$, the triangle-
@@ -5289,7 +5289,7 @@ $\texttt{eigenspace}((\hat S_{\rm tot})^2)_\alpha \sqcap
 \texttt{eigenspace}((\hat S_{\neg A})^2)_{\beta_B} \le
 \texttt{eigenspace}(\hat H_{\rm toy_S})_{\alpha - \beta_A - \beta_B}$
 via \texttt{Module.End.mem\_eigenspace\_iff}. This is the natural
-operator-level form that the upcoming γ-4 spectrum analysis will
+operator-level form that the upcoming $\gamma$-4 spectrum analysis will
 chain through.
 
 \textbf{Step 5 (PR~\#2776)}: Néel-state toy-Hamiltonian
@@ -5347,7 +5347,7 @@ direct application of PR \#2775's
 \end{itemize}
 Minimality of \texttt{bipartiteToyMinEnergyPredicted} (variational
 lower bound + non-emptiness of the joint subspace) is the next
-γ-4 milestone, not yet established.
+$\gamma$-4 milestone, not yet established.
 
 \textbf{Step 8 (PR~\#2779)}: structural properties of
 \texttt{bipartiteToyMinEnergyPredicted} in
@@ -5465,7 +5465,7 @@ $\dim(\texttt{predicted GS subspace}) \ge 2 s_A + 1$ at the
 saturated edge case, matching the Theorem 2.3 prediction
 $2 S_{\rm tot} + 1$.
 
-\textbf{Step 15 (PR~\#2786)}: §2.4 $\leftrightarrow$ γ-4 bridge
+\textbf{Step 15 (PR~\#2786)}: §2.4 $\leftrightarrow$ $\gamma$-4 bridge
 at the saturated case in
 \texttt{LatticeSystem/Quantum/SpinS/SaturatedFMJointLePredictedGS.lean}.
 For $|\neg A| = 0$ and any coupling $J$,
@@ -5593,7 +5593,7 @@ When $|\neg A| = 0$,
 \texttt{bipartiteToyGroundStateSubspacePredicted A N $=$
 saturatedFerromagnetJointEigenspace 0 N}. Combines PR \#2786
 (saturated FM joint $\subseteq$ predicted GS) with PR \#2792's
-reverse bridge via \texttt{le\_antisymm}. Identifies the γ-4
+reverse bridge via \texttt{le\_antisymm}. Identifies the $\gamma$-4
 predicted GS subspace with the §2.4 saturated-ferromagnet
 ground-state subspace at the saturated edge case (specialised to
 $J = 0$).
@@ -6256,7 +6256,7 @@ Direct from $\|\mathrm{biw}\| = ||A|{-}|\neg A||\cdot N/2$
 (PR \#2826) and $|A|+|\neg A| = |\Lambda|$ (PR \#2870), via the
 elementary identity $2\cdot\min = (|A|+|\neg A|) - ||A|{-}|\neg A||$.
 Enables $\min\cdot N$-free reformulations of all Tasaki §2.5
-Theorem 2.3 (γ-4) energy bounds.
+Theorem 2.3 ($\gamma$-4) energy bounds.
 
 \textbf{Step 101 (PR~\#2888)}: univariate $\|\mathrm{biw}\|$-parameterisation
 of the symm-energy real part in
@@ -6511,7 +6511,7 @@ where $s_A = |A|\cdot N/2$, $s_B = |\neg A|\cdot N/2$. Direct from
 existing eigenvector relations + $\langle\Phi_{\rm N\acute{e}el}|
 \Phi_{\rm N\acute{e}el}\rangle = 1$. Confirms N\'eel has maximum
 spin on both sublattices --- a key input to Tasaki §2.5
-Theorem 2.3 (γ-4): the N\'eel state matches the predicted GS
+Theorem 2.3 ($\gamma$-4): the N\'eel state matches the predicted GS
 subspace's sublattice Casimir constraints.
 
 \textbf{Step 125 (PR~\#2913)}: N\'eel state in joint sublattice-Casimir
@@ -7428,6 +7428,29 @@ $\mathrm{tasaki23GroundStateSectors}\,A\,N$. Reference: H.~Tasaki,
 \emph{Physics and Mathematics of Quantum Many-Body Systems},
 Springer 2020, §2.5 Theorem 2.3, p.~42.
 
+\textbf{Ladder eigenvalue preservation}: the next proof step packages
+the SU(2) ladder comparison used to identify neighbouring sector
+eigenvalues.  If
+\[
+  \hat H\Psi = \mu\Psi,
+\]
+then the existing commutators
+$[\hat H,\hat S^-_{\rm tot}]=0$ and
+$[\hat H,\hat S^+_{\rm tot}]=0$ give
+\[
+  \hat H(\hat S^-_{\rm tot}\Psi) = \mu\,\hat S^-_{\rm tot}\Psi,
+  \qquad
+  \hat H(\hat S^+_{\rm tot}\Psi) = \mu\,\hat S^+_{\rm tot}\Psi .
+\]
+Lean names:
+\texttt{heisenbergHamiltonianS\_mulVec\_totalSpinSOpMinus\_of\_eigenvec}
+and
+\texttt{heisenbergHamiltonianS\_mulVec\_totalSpinSOpPlus\_of\_eigenvec}.
+These are the one-step sector-linking identities for the Theorem 2.3
+multiplet; the remaining proof work is the non-vanishing and
+Marshall-sign compatibility needed to feed the laddered vector into
+the per-sector uniqueness theorem.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
@@ -7701,7 +7724,7 @@ $\sqrt{N}>0$. The symmetric raising side
 \texttt{oneFlippedDownConfig\,/\,..\_at\_oneFlippedDownConfig\,/\,..\_ne\_zero}
 covers $\hat S^+_{\rm tot}\,|\sigma_\bot\rangle$.
 
-\textbf{Multi-site Cartan ⁺⁻ relation (PR~\#893)}: completes the
+\textbf{Multi-site Cartan \(+\)/\(-\) relation (PR~\#893)}: completes the
 SU(2) algebra of total operators with
 $[\hat S^+_{\rm tot}, \hat S^-_{\rm tot}] = 2\,\hat S^z_{\rm tot}$
 (and the antisymmetric corollary $-2\,\hat S^z_{\rm tot}$). The
@@ -7709,7 +7732,7 @@ new file \texttt{Quantum/SpinS/MultiSiteCartanPlusMinus.lean}
 lifts the single-site \texttt{spinSOpPlus\_commutator\_spinSOpMinus}
 to multi-site via \texttt{onSiteS\_commutator\_totalOnSiteS}
 (off-site terms cancel via cross-site commutativity, on-site reduces
-to \texttt{onSiteS x ((2:ℂ) • spinSOp3 N)}), then applies linearity
+to \texttt{onSiteS x ((2:C) • spinSOp3 N)}), then applies linearity
 of \texttt{onSiteS} in the matrix argument and \texttt{Finset.smul\_sum}.
 
 \textbf{Casimir rearrangement (PR~\#894)}: the standard SU(2)
@@ -7722,7 +7745,7 @@ the sum identity
 $\hat S^+ \hat S^- + \hat S^- \hat S^+ = 2\,((\hat S^{(1)}_{\rm tot})
 ^2 + (\hat S^{(2)}_{\rm tot})^2)$ by expanding both
 $(A \pm iB)(A \mp iB)$ products — the $\pm i [A, B]$ cross terms
-cancel — then combines with the Cartan ⁺⁻ (\#893) and divides by
+cancel — then combines with the Cartan \(+\)/\(-\) (\#893) and divides by
 2 via \texttt{smul\_right\_injective}. Substituting
 $(\hat S^{(1)}_{\rm tot})^2 + (\hat S^{(2)}_{\rm tot})^2 =
  (\hat S_{\rm tot})^2 - (\hat S^{(3)}_{\rm tot})^2$
@@ -7961,7 +7984,7 @@ by combining the two commutations with \texttt{magProjFn\_smul} —
 the H- and Casimir-eigenvalues factor through the projector since
 $\texttt{magProjFn M}(c \cdot v) = c \cdot \texttt{magProjFn M v}$.
 
-\textbf{🎯 Tasaki §2.4 Theorem 2.1 closure (PR~\#2768)}:
+\textbf{Tasaki §2.4 Theorem 2.1 closure (PR~\#2768)}:
 the closure combines three theorems.
 (i) \texttt{sum\_magProjFn\_eq}: every $v$ decomposes as
 $v = \sum_{k : \mathrm{Fin}(|V|\cdot N + 1)}
@@ -8251,7 +8274,7 @@ combines \texttt{spinSDot\_self} ($\hat{S}_x \cdot \hat{S}_x =
 \texttt{spinSDot\_self\_expectation\_normalized}: $\langle\Phi,
 \hat{S}_x \cdot \hat{S}_x\,\Phi\rangle = S(S+1)$ for any normalized
 $\Phi$, independent of state — the universal single-site Casimir
-identity. Foundation for Tasaki Problem 2.5.c (γ-7).
+identity. Foundation for Tasaki Problem 2.5.c ($\gamma$-7).
 
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
