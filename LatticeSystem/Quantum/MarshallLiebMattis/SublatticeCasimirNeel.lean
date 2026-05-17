@@ -185,6 +185,25 @@ import LatticeSystem.Quantum.MagnetizationSubspace
   ⟨Φ_↑⟩² = ⟨Φ_Néel⟩², ⟨Φ_↓⟩² = ⟨Φ_Néel⟩², ⟨Φ_↑⟩² = ⟨Φ_↓⟩² +
   packaged ⟨Φ_↑⟩².re ≥ 0, ⟨Φ_Néel⟩².re ≥ 0. None touched this file
   directly. Healthy.
+- **Refactor #61 (PR #3296, evaluate-only)**: post-#3295 measurement.
+  Parent 798 lines (slight drift from 700 via doc-comment additions
+  during the sweep; no new theorems added). Initial **37.1s wall**
+  (5.96s user + 9.25s system, 40% CPU) — heavy cold-cache fluctuation;
+  steady-state re-measurement **4.94s wall** (1.79s user + 2.85s
+  system, 94% CPU). PRs #3276-#3295 sweep added bounds:
+    - sq-nonneg packaged: ⟨Φ_↓⟩².re ≥ 0, gap² ≥ 0
+    - gap-family upper bounds: gap.re ≤ (|Λ|·N/2)², 4·gap ≤ (|Λ|·N)²
+    - 2× saturated/Néel bounds: 2·⟨Φ_↑⟩, 2·⟨Φ_↓⟩, −2·⟨Φ_Néel⟩
+    - 4× scaled forms with (|Λ|·N)²
+    - 8× saturated/Néel scaled bounds
+    - (⟨Φ_↑⟩+⟨Φ_↓⟩) sum bounds
+    - biw.re sign bounds: biw.re ≤ |Λ|·N/2, −biw.re ≤ |Λ|·N/2,
+      |biw.re| ≤ |Λ|·N/2
+    - ‖biw‖ = |biw.re| (purely real)
+    - gap.re = (|Λ|·N/2)² − biw.re² (real-axis variant of #3196)
+  None touched this file directly. Peer measurements: SublatticeSpin
+  4.02s, NeelState 3.53s — all healthy. Trajectory remains stable
+  below the ~10s forced-split threshold.
 
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
 on a bipartite graph `(Λ, A)` (Tasaki §2.5 eq. (2.5.2)) sets
