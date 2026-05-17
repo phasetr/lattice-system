@@ -94,7 +94,7 @@ theorem magSectorEmbedding_add {M : ℕ}
     (Φ Ψ : magConfigS V N M → ℂ) :
     magSectorEmbedding (Φ + Ψ) = magSectorEmbedding Φ + magSectorEmbedding Ψ := by
   funext σ
-  show magSectorEmbedding (Φ + Ψ) σ = magSectorEmbedding Φ σ + magSectorEmbedding Ψ σ
+  change magSectorEmbedding (Φ + Ψ) σ = magSectorEmbedding Φ σ + magSectorEmbedding Ψ σ
   by_cases h : magSumS σ = M
   · rw [magSectorEmbedding_apply_of_mem _ h,
       magSectorEmbedding_apply_of_mem Φ h,
@@ -109,7 +109,7 @@ theorem magSectorEmbedding_smul {M : ℕ}
     (c : ℂ) (Φ : magConfigS V N M → ℂ) :
     magSectorEmbedding (c • Φ) = c • magSectorEmbedding Φ := by
   funext σ
-  show magSectorEmbedding (c • Φ) σ = c • magSectorEmbedding Φ σ
+  change magSectorEmbedding (c • Φ) σ = c • magSectorEmbedding Φ σ
   by_cases h : magSumS σ = M
   · rw [magSectorEmbedding_apply_of_mem _ h,
       magSectorEmbedding_apply_of_mem Φ h]
@@ -311,7 +311,7 @@ theorem magSectorSlice_apply_of_not_mem (M : ℕ)
 theorem magSectorSlice_supported (M : ℕ)
     (f : (V → Fin (N + 1)) → ℂ) :
     ∀ σ, magSumS σ ≠ M → magSectorSlice M f σ = 0 :=
-  fun σ h => magSectorSlice_apply_of_not_mem M f h
+  fun _ h => magSectorSlice_apply_of_not_mem M f h
 
 /-- The sector slice equals the embedding of the sector restriction. -/
 theorem magSectorSlice_eq_magSectorEmbedding (M : ℕ)
@@ -354,11 +354,94 @@ theorem eq_sum_magSectorEmbedding_magSectorRestriction
   rw [Finset.sum_congr rfl (fun M _ => magSectorSlice_eq_magSectorEmbedding M f)] at h
   exact h.symm
 
+/-! ## Sector support and magnetization eigenspaces -/
+
+section Support
+variable [DecidableEq V]
+
+/-- Pointwise diagonal action of `Ŝ_tot^(3)` on an arbitrary full
+spin-`S` configuration vector.
+
+This is the full-vector form of the computational-basis identity
+`Ŝ_tot^(3) |σ⟩ = magEigenvalueS σ • |σ⟩`, used to pass between
+`magSumS`-sector support and `magSubspaceS` eigenvector membership. -/
+theorem totalSpinSOp3_mulVec_apply_eq_magEigenvalueS_mul
+    (Ψ : (V → Fin (N + 1)) → ℂ) (σ : V → Fin (N + 1)) :
+    (totalSpinSOp3 V N).mulVec Ψ σ = magEigenvalueS σ * Ψ σ := by
+  rw [Matrix.mulVec, dotProduct]
+  rw [Finset.sum_eq_single σ]
+  · rw [totalSpinSOp3_apply_diag]
+  · intro τ _ hτσ
+    rw [totalSpinSOp3_apply_off_diag (Ne.symm hτσ), zero_mul]
+  · intro h
+    exact (h (Finset.mem_univ _)).elim
+
+/-- A zero-extended `magSumS = M` sector vector lies in the corresponding
+`Ŝ_tot^(3)` eigenspace, whose eigenvalue is
+`|V| * N / 2 - M`. -/
+theorem magSectorEmbedding_mem_magSubspaceS {M : ℕ}
+    (Φ : magConfigS V N M → ℂ) :
+    magSectorEmbedding Φ ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) := by
+  rw [mem_magSubspaceS_iff]
+  funext σ
+  rw [totalSpinSOp3_mulVec_apply_eq_magEigenvalueS_mul]
+  by_cases h : magSumS σ = M
+  · have hmag :
+        magEigenvalueS σ =
+          ((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ) := by
+      unfold magEigenvalueS
+      rw [h]
+    rw [hmag]
+    simp [Pi.smul_apply, smul_eq_mul]
+  · have hz : magSectorEmbedding Φ σ = 0 :=
+      magSectorEmbedding_apply_of_not_mem Φ h
+    simp [Pi.smul_apply, smul_eq_mul, hz]
+
+/-- A vector in the `Ŝ_tot^(3)` eigenspace labelled by `magSumS = M`
+vanishes on configurations outside that `magSumS` sector. -/
+theorem magSubspaceS_apply_eq_zero_of_magSumS_ne {M : ℕ}
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)))
+    {σ : V → Fin (N + 1)} (hσ : magSumS σ ≠ M) :
+    Ψ σ = 0 := by
+  rw [mem_magSubspaceS_iff] at hΨ
+  have hτ_lhs :
+      (totalSpinSOp3 V N).mulVec Ψ σ = magEigenvalueS σ * Ψ σ :=
+    totalSpinSOp3_mulVec_apply_eq_magEigenvalueS_mul Ψ σ
+  have hτ_rhs :
+      ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) • Ψ) σ =
+        (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) * Ψ σ := by
+    simp [Pi.smul_apply, smul_eq_mul]
+  have hτ_eq :
+      magEigenvalueS σ * Ψ σ =
+        (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) * Ψ σ := by
+    rw [← hτ_lhs, hΨ, hτ_rhs]
+  have hsub :
+      (magEigenvalueS σ -
+          (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ))) * Ψ σ = 0 := by
+    rw [sub_mul, hτ_eq, sub_self]
+  have hne :
+      magEigenvalueS σ -
+          (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) ≠ 0 := by
+    apply sub_ne_zero.mpr
+    intro hmag
+    apply hσ
+    have hcast : (magSumS σ : ℂ) = (M : ℂ) := by
+      unfold magEigenvalueS at hmag
+      linear_combination -hmag
+    exact_mod_cast hcast
+  exact (mul_eq_zero.mp hsub).resolve_left hne
+
+end Support
+
 /-! ## Heisenberg matrix element vanishes between different sectors -/
 
 section
 variable [DecidableEq V]
 
+omit [DecidableEq V] in
 /-- `magSumS σ = magSumS σ' ↔ magEigenvalueS σ = magEigenvalueS σ'`.
 The two notions of magnetization differ only by an `(|V| · N) / 2` shift,
 hence carry the same equality information. -/
@@ -503,7 +586,6 @@ form (PRs #847–#865). -/
 theorem exists_marshallSign_eigenvector_heisenbergHamiltonianS_full
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
-    [DecidableEq V]
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
     (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -593,7 +675,6 @@ sector form (PRs #847–#865). -/
 theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
-    [DecidableEq V]
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
     (hJ_real' : ∀ x y, star (J x y) = J x y)
@@ -667,8 +748,6 @@ theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full
         A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
         h_intermediate hsec_ground (by
           intro τ
-          change 0 < (marshallSignS A τ.1).re *
-            (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ).re
           rw [Complex.ofReal_re]
           have hsq : (marshallSignS A τ.1).re * (marshallSignS A τ.1).re = 1 :=
             marshallSignS_re_sq A τ.1
