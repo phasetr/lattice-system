@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeCasimirNeel
+import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeCasimirNeelLadderActions
 
 /-!
 # Sublattice Casimir expectations on the Néel state
