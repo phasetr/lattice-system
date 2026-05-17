@@ -125,4 +125,53 @@ def tasaki_2_5_theorem_2_3
       (heisenbergHamiltonianS J N).mulVec Ψ' = (μ' : ℂ) • Ψ' →
       μ ≤ μ')
 
+/-- **Per-sector existence step (toward Tasaki §2.5 Theorem 2.3 proof)**.
+
+For each admissible magnetization sector `M ∈ tasaki23GroundStateSectors A N`
+with `Nonempty (magConfigS V N M)`, the per-sector bundled Theorem 2.2
+`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` (#869)
+gives a Marshall-positive ground state of the spin-`S` antiferromagnetic
+Heisenberg Hamiltonian (Tasaki (2.5.4) with `σ = M`) at some sector
+eigenvalue `μ_M < c`, plus within-sector uniqueness up to positive scalar.
+
+This is the first step of the Tasaki §2.5 Theorem 2.3 proof
+("essentially a straightforward modification of that of Theorem 2.2"):
+the proof of `tasaki_2_5_theorem_2_3` then iterates this per-sector
+existence across the admissible range and shows the sector eigenvalues
+`μ_M` coincide (constancy via the SU(2) ladder
+`heisenbergHamiltonianS_commute_totalSpinSOpMinus`) and that the common
+value is the global minimum.
+
+Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
+Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42. -/
+theorem tasaki_2_5_theorem_2_3_sector_existence
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N) :
+    ∃ (μ : ℝ) (v : magConfigS V N M → ℝ),
+      μ < c ∧ (∀ σ, 0 < v σ) ∧
+      (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μ : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+      (∀ σ, magSumS σ ≠ M →
+        magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) σ = 0) ∧
+      (∀ {μ' : ℝ} {Ψ' : (V → Fin (N + 1)) → ℂ},
+        (heisenbergHamiltonianS J N).mulVec Ψ' = (μ' : ℂ) • Ψ' →
+        (∀ σ, magSumS σ ≠ M → Ψ' σ = 0) →
+        (∀ τ : magConfigS V N M, 0 < (marshallSignS A τ.1).re * (Ψ' τ.1).re) →
+        μ' = μ ∧ ∃ r : ℝ, 0 < r ∧
+          ∀ τ : magConfigS V N M,
+            (Ψ' τ.1).re = r * ((marshallSignS A τ.1).re * v τ)) :=
+  marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full
+    A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
+
 end LatticeSystem.Quantum
