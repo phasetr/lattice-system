@@ -151,6 +151,19 @@ import LatticeSystem.Quantum.MagnetizationSubspace
   `⟨Φ_↑⟩.re = ⟨Φ_↓⟩.re`). None touched this file directly. The
   3.4s steady-state confirms the import surface remains stable.
   No split needed.
+- **Refactor #58 (PR #3233, evaluate-only)**: post-#3232 measurement.
+  Parent 700 lines (still unchanged). Initial reading **18.0s wall**
+  (5.3s user + 5.3s system, 58% CPU) — system fluctuation again;
+  steady-state re-measurement **3.4s wall** (1.6s user + 2.2s system,
+  114% CPU). Confirms healthy trajectory. The PRs #3213-#3232 sweep
+  added 20 small files in `Quantum/SpinS/` covering all-up ≤ Néel
+  packaged form, three-state sum identities, saturated-sum vs gap
+  chain, biw quadratic identities (4 PRs: Néel / allUp / allDown /
+  saturated-sum form), biw bound inequalities (3 PRs: ‖biw‖² ≤
+  (|Λ|·N/2)², ‖biw‖ ≤ |Λ|·N/2, saturation iff), squared/strict iff
+  family for biw bounds, difference-of-squares factorization, and
+  max·N closed form. None touched this file directly. Trajectory
+  healthy.
 
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
 on a bipartite graph `(Λ, A)` (Tasaki §2.5 eq. (2.5.2)) sets
