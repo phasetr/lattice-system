@@ -7373,6 +7373,38 @@ and
 \texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSExpectation*.lean};
 see \texttt{docs/index.md} for the full list with per-PR provenance.
 
+\textbf{Final statement (PR \#3337)}: the Tasaki §2.5 Theorem 2.3
+conclusion is now packaged as a \texttt{Prop}-valued definition
+\texttt{tasaki\_2\_5\_theorem\_2\_3} in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23.lean}. Given a
+sublattice indicator $A : V \to \mathrm{Bool}$ with $|A| \ge 1$,
+$|\neg A| \ge 1$, a real symmetric coupling $J$ supported and
+positive on the bipartite complete graph
+$\mathrm{bipartiteCompleteGraphOf}\,A$, the statement asserts the
+existence of a common ground-state energy $\mu$ such that:
+\begin{itemize}
+  \item (existence) for every magnetisation sector $M$ in
+    $\mathrm{tasaki23GroundStateSectors}\,A\,N \;=\;
+    [\min(|A|, |\neg A|)\cdot N,\, \max(|A|, |\neg A|)\cdot N]$
+    (in $\mathrm{magSumS}$ units), the spin-$S$ Heisenberg
+    Hamiltonian $\hat H = \sum_{x,y} J(x,y)\,\hat
+    {\boldsymbol S}_x \cdot \hat{\boldsymbol S}_y$ admits a
+    non-zero eigenvector $\Psi$ of eigenvalue $\mu$ supported on
+    sector $M$;
+  \item (minimality) no eigenvalue of $\hat H$ is strictly less
+    than $\mu$.
+\end{itemize}
+The set $\mathrm{tasaki23GroundStateSectors}\,A\,N$ has cardinality
+$\mathrm{tasaki23PredictedDegeneracy}\,A\,N = \bigl||A| - |\neg A|
+\bigr|\cdot N + 1 = 2\,S_{\rm tot} + 1$, recovering the predicted
+$2 S_{\rm tot} + 1$-fold degeneracy with $S_{\rm tot} =
+\mathrm{tasaki23PredictedTotalSpin}\,A\,N = \bigl||A| - |\neg A|
+\bigr|\cdot N/2$. The proof iterates the sector-level Theorem 2.2
+result \texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
+(\#869) across the admissible magnetisation range. Reference:
+H.~Tasaki, \emph{Physics and Mathematics of Quantum Many-Body
+Systems}, Springer 2020, §2.5 Theorem 2.3, p.~42.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
