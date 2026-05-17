@@ -204,6 +204,22 @@ import LatticeSystem.Quantum.MagnetizationSubspace
   None touched this file directly. Peer measurements: SublatticeSpin
   4.02s, NeelState 3.53s — all healthy. Trajectory remains stable
   below the ~10s forced-split threshold.
+- **Refactor #62 (PR #3317, evaluate-only)**: post-#3316 measurement.
+  Parent 817 lines (refactor #61 doc-comment growth). Initial
+  **6.0s wall** (1.72s user + 2.61s system, 71% CPU); immediate
+  re-measurement **3.26s wall** (1.68s user + 2.39s system, 125% CPU).
+  Steady-state ~3s — significantly cleaner than recent cadences.
+  PRs #3296-#3316 sweep added real-axis biw.re² closed-form family:
+    - gap.re = (|Λ|·N/2)² − biw.re² (PR #3295's real-axis form)
+    - 2·⟨Φ_↑⟩, 2·⟨Φ_↓⟩, −2·⟨Φ_Néel⟩, 8·⟨Φ_↑⟩, 8·⟨Φ_↓⟩,
+      −8·⟨Φ_Néel⟩, 4·gap, 4·(⟨Φ_↑⟩+⟨Φ_↓⟩) closed forms in biw.re²
+    - Difference-of-squares factored forms for both half-card and
+      card scales: `(|Λ|·N/2 − biw.re)·(|Λ|·N/2 + biw.re) = X.re`
+      family (gap, 2·⟨↑⟩, 2·⟨↓⟩, −2·⟨Néel⟩) + doubled
+      `(|Λ|·N − 2·biw.re)·(|Λ|·N + 2·biw.re) = X.re` (8·⟨↑⟩,
+      8·⟨↓⟩, −8·⟨Néel⟩, 4·gap, 4·(⟨↑⟩+⟨↓⟩))
+    - Factor non-negativity: 0 ≤ |Λ|·N/2 ± biw.re, 0 ≤ |Λ|·N − 2·biw.re
+  None touched this file directly. Trajectory remains healthy.
 
 The graph-centric Néel state `Φ_Néel(A) := basisVec (neelConfigOf A)`
 on a bipartite graph `(Λ, A)` (Tasaki §2.5 eq. (2.5.2)) sets
