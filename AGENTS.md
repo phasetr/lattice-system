@@ -60,6 +60,15 @@ the following on-disk files and obey their instructions:
 - **No CI watching**: do not poll `gh pr checks --watch` or sleep waiting
   for CI. Push, run codex review in the background, then check CI once
   before merging.
+- **Use sandbox-stable command forms before giving up.** For TeX builds,
+  route LuaTeX caches to writable roots:
+  `TEXMFVAR=/private/tmp/texmf-var TEXMFCONFIG=/private/tmp/texmf-config latexmk -g -lualatex <file>.tex`.
+  If `codex exec ... < /dev/null` fails with `Operation not permitted` or
+  app-server initialization errors, rerun the same command with the
+  environment's escalation mechanism and persist a scoped `codex exec`
+  approval rule when available. If GitHub CLI bodies contain backticks, use
+  single-quoted bodies or `--body-file` so the shell does not execute the
+  backtick content.
 - **Codex cross-check is a single review at squash-merge time**, not
   per-commit / per-CI.
 - **All committed prose (commit messages, PR titles/bodies, doc strings,
