@@ -7373,6 +7373,61 @@ and
 \texttt{LatticeSystem/Quantum/SpinS/NeelStateOfSExpectation*.lean};
 see \texttt{docs/index.md} for the full list with per-PR provenance.
 
+\textbf{Final statement (PR \#3337)}: the Tasaki §2.5 Theorem 2.3
+conclusion is now packaged as a \texttt{Prop}-valued definition
+\texttt{tasaki\_2\_5\_theorem\_2\_3} in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23.lean}. The hypothesis
+bundle and conclusion are aligned exactly with the per-sector
+bundled Theorem 2.2
+\texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
+(\#869). Given:
+\begin{itemize}
+  \item real symmetric coupling $J$
+    ($\mathrm{Im}\,J(x,y) = 0$, $\overline{J(x,y)} = J(x,y)$,
+    $J(x,y) = J(y,x)$, $0 \le \mathrm{Re}\,J(x,y)$);
+  \item bipartite support ($A(x) = A(y) \Rightarrow J(x,y) = 0$)
+    and positivity on the bipartite complete graph
+    $\mathrm{bipartiteCompleteGraphOf}\,A$;
+  \item non-empty sublattices $|A| \ge 1$, $|\neg A| \ge 1$;
+  \item a spectral shift $c \in \mathbb{R}$ strictly above the
+    dressed diagonal,
+    $\mathrm{dressedHeisenbergSReMatrix}(A, J, N)(\sigma, \sigma)
+    < c$ for every $\sigma$;
+  \item the \#869 intermediate-existence hypothesis $\forall \tau,
+    x.\ \exists z.\ A(z) \neq A(x) \wedge (\tau(z)).\mathrm{val}
+    < N$;
+  \item sector non-emptiness $\mathrm{Nonempty}\,(\mathrm{magConfigS}\,
+    V\,N\,M)$ for each admissible $M$;
+\end{itemize}
+the conclusion asserts existence of a common ground-state energy
+$\mu$ such that:
+\begin{itemize}
+  \item (Marshall-positive sector existence) for every $M \in
+    \mathrm{tasaki23GroundStateSectors}\,A\,N \;=\;
+    [\min(|A|, |\neg A|)\cdot N,\, \max(|A|, |\neg A|)\cdot N]$
+    (in $\mathrm{magSumS}$ units), there exists a Marshall-positive
+    sector eigenvector
+    $\Psi = \mathrm{magSectorEmbedding}\,(\sigma \mapsto
+    (\mathrm{marshallSignS}\,A\,\sigma).\mathrm{re}\cdot v(\sigma))$
+    with $v > 0$ realising eigenvalue $\mu$;
+  \item (within-sector uniqueness) any $\mu'$-eigenvector $\Psi'$
+    supported on the same sector $M$ with positive Marshall product
+    satisfies $\mu' = \mu$ and is a positive scalar multiple of
+    the Marshall-positive $\Psi$;
+  \item (global minimality) no eigenvalue of $\hat H = \sum_{x,y}
+    J(x,y)\,\hat{\boldsymbol S}_x \cdot \hat{\boldsymbol S}_y$
+    is strictly less than $\mu$.
+\end{itemize}
+The set $\mathrm{tasaki23GroundStateSectors}\,A\,N$ has cardinality
+$\mathrm{tasaki23PredictedDegeneracy}\,A\,N = \bigl||A| - |\neg A|
+\bigr|\cdot N + 1 = 2\,S_{\rm tot} + 1$, recovering the predicted
+$2 S_{\rm tot} + 1$-fold degeneracy with $S_{\rm tot} =
+\mathrm{tasaki23PredictedTotalSpin}\,A\,N = \bigl||A| - |\neg A|
+\bigr|\cdot N/2$. The proof iterates \#869 across
+$\mathrm{tasaki23GroundStateSectors}\,A\,N$. Reference: H.~Tasaki,
+\emph{Physics and Mathematics of Quantum Many-Body Systems},
+Springer 2020, §2.5 Theorem 2.3, p.~42.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
