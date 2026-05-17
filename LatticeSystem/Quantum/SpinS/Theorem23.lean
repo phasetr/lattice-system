@@ -14,18 +14,19 @@ This file states the final form of Tasaki §2.5 Theorem 2.3 (p. 42):
 > `σ = M`, where `M = −S_tot, …, S_tot − 1, S_tot`.
 
 The statement is encoded as a `Prop`-valued definition
-`tasaki_2_5_theorem_2_3`. The actual proof reuses the sector-level
-Theorem 2.2 result
+`tasaki_2_5_theorem_2_3` whose hypothesis bundle and conclusion
+match the per-sector bundled Theorem 2.2
 `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`
-applied independently to each magnetization sector
-`M ∈ {|V|·N/2 − S_tot, …, |V|·N/2 + S_tot}` in `magSumS` units
-(centered units: `m = M − |V|·N/2 ∈ {−S_tot, …, S_tot}`).
+(file `MagSectorEmbedding.lean`, PR #869), iterated across the range
+of admissible magnetization sectors
+`M ∈ tasaki23GroundStateSectors A N` (= the closed integer interval
+`[min(|A|, |¬A|)·N, max(|A|, |¬A|)·N]` in `magSumS` units; centered
+units `m = M − |V|·N/2 ∈ {−S_tot, …, S_tot}`).
 
-Sketch of proof per Tasaki: "essentially a straightforward
-modification of that of Theorem 2.2" — the Marshall sign + PF +
-toy-Hamiltonian argument carries through with `H_M` replacing `H_0`,
-yielding `2 S_tot + 1` sector-unique ground states sharing the same
-energy `μ`. The degeneracy is determined by Theorem A.16 (p. 473).
+Per Tasaki ("essentially a straightforward modification of that of
+Theorem 2.2"), the proof reuses the Marshall sign + Perron–Frobenius
++ toy-Hamiltonian argument with `H_M` replacing `H_0` to obtain
+`2 S_tot + 1` sector-unique ground states sharing energy `μ`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
@@ -56,7 +57,7 @@ the set of `magSumS` values `M` whose centered magnetization
 `m = M − |V|·N/2` satisfies `m ∈ {−S_tot, …, S_tot}`. In `magSumS`
 (non-negative integer) units this is the closed integer interval
 `[min(|A|, |¬A|) · N, max(|A|, |¬A|) · N]`, of cardinality
-`2 S_tot + 1 = ||A| − |¬A|| · N + 1`. -/
+`2 S_tot + 1 = ||A| − |¬A|| · N + 1` (= `tasaki23PredictedDegeneracy`). -/
 def tasaki23GroundStateSectors (A : V → Bool) (N : ℕ) : Finset ℕ :=
   let cA := (Finset.univ.filter (fun x : V => A x = true)).card
   let cB := (Finset.univ.filter (fun x : V => (! A x) = true)).card
@@ -65,45 +66,60 @@ def tasaki23GroundStateSectors (A : V → Bool) (N : ℕ) : Finset ℕ :=
 /-- **Tasaki §2.5 Theorem 2.3 (Marshall–Lieb–Mattis general spin-S), final
 statement** as a `Prop`.
 
-For a connected bipartite spin-`S` antiferromagnetic Heisenberg system
-(encoded by sublattice indicator `A : V → Bool` and positive coupling
-`J` on the bipartite complete graph `bipartiteCompleteGraphOf A`),
-there exists a common ground-state energy `μ` such that:
+The hypothesis bundle matches the per-sector bundled Theorem 2.2
+`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`
+(PR #869) exactly. Given:
+- real symmetric coupling `J` (`(J x y).im = 0`, `star (J x y) = J x y`,
+  `J x y = J y x`, `0 ≤ (J x y).re`);
+- bipartite support (`A x = A y → J x y = 0`);
+- positive on the bipartite complete graph (`Adj → 0 < (J x y).re`);
+- non-empty sublattices (`|A| ≥ 1`, `|¬A| ≥ 1`);
+- a uniform spectral shift `c` strictly above the dressed diagonal;
+- the intermediate-existence hypothesis from Theorem 2.2 (#869);
+- each admissible sector `M` is non-empty;
 
-- (existence) for every admissible magnetization sector `M ∈
-  tasaki23GroundStateSectors A N` the spin-`S` Heisenberg Hamiltonian
-  has an eigenvector of eigenvalue `μ` supported on sector `M` with
-  the Marshall-dressed expansion (2.5.4);
-- (sector uniqueness) within each admissible sector the `μ`-eigenvector
-  is unique up to positive scalar;
-- (degeneracy) the multiplicity of `μ` equals
-  `tasaki23PredictedDegeneracy A N = 2 · S_tot + 1`;
-- (minimality) no eigenvalue of the Heisenberg Hamiltonian is strictly
-  less than `μ`.
+the conclusion asserts existence of a common ground-state energy `μ`
+realised on every admissible sector by a Marshall-positive
+eigenvector (Tasaki (2.5.4) with `σ = M`), with within-sector
+uniqueness up to positive scalar, plus global minimality of `μ`.
 
-The statement bundles existence + uniqueness across all admissible
-sectors into a single `Prop`. The proof (per Tasaki) iterates the
-Theorem 2.2 sector argument over `tasaki23GroundStateSectors A N`. -/
+The proof iterates #869 sector-by-sector across
+`tasaki23GroundStateSectors A N`. -/
 def tasaki_2_5_theorem_2_3
-    (A : V → Bool) (N : ℕ) (J : V → V → ℂ) : Prop :=
-  -- Hypotheses (analogous to Theorem 2.2's hypothesis bundle).
+    (A : V → Bool) (N : ℕ) (J : V → V → ℂ) (c : ℝ) : Prop :=
+  -- Coupling hypotheses (matching #869's bundle).
   (∀ x y, (J x y).im = 0) →
+  (∀ x y, star (J x y) = J x y) →
   (∀ x y, J x y = J y x) →
   (∀ x y, 0 ≤ (J x y).re) →
   (∀ x y, A x = A y → J x y = 0) →
   (∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re) →
+  -- Spectral shift strictly above the dressed diagonal (matching #869).
+  (∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c) →
+  -- Intermediate-existence hypothesis (matching #869).
+  (∀ τ : V → Fin (N + 1), ∀ x : V, ∃ z, A z ≠ A x ∧ (τ z).val < N) →
+  -- Non-empty sublattices (Tasaki Theorem 2.3 hypothesis `|A| ≥ 1`, `|¬A| ≥ 1`).
   (1 ≤ (Finset.univ.filter (fun x : V => A x = true)).card) →
   (1 ≤ (Finset.univ.filter (fun x : V => (! A x) = true)).card) →
-  -- Conclusion: existence of a common GS energy μ realised on every
-  -- admissible sector, with sector-uniqueness, and minimality globally.
+  -- Conclusion.
   ∃ μ : ℝ,
-    -- Existence on every admissible sector.
+    -- (Existence + Marshall expansion + sector uniqueness) per admissible sector.
     (∀ M ∈ tasaki23GroundStateSectors (V := V) A N,
-      ∃ Ψ : (V → Fin (N + 1)) → ℂ,
-        Ψ ≠ 0 ∧
-        (heisenbergHamiltonianS J N).mulVec Ψ = (μ : ℂ) • Ψ ∧
-        (∀ σ, magSumS σ ≠ M → Ψ σ = 0)) ∧
-    -- Global minimality of μ.
+      [Nonempty (magConfigS V N M)] →
+      ∃ v : magConfigS V N M → ℝ,
+        μ < c ∧ (∀ σ, 0 < v σ) ∧
+        (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+          (μ : ℂ) • magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+        (∀ {μ' : ℝ} {Ψ' : (V → Fin (N + 1)) → ℂ},
+          (heisenbergHamiltonianS J N).mulVec Ψ' = (μ' : ℂ) • Ψ' →
+          (∀ σ, magSumS σ ≠ M → Ψ' σ = 0) →
+          (∀ τ : magConfigS V N M, 0 < (marshallSignS A τ.1).re * (Ψ' τ.1).re) →
+          μ' = μ ∧ ∃ r : ℝ, 0 < r ∧
+            ∀ τ : magConfigS V N M,
+              (Ψ' τ.1).re = r * ((marshallSignS A τ.1).re * v τ))) ∧
+    -- Global minimality of μ across all eigenvalues.
     (∀ {μ' : ℝ} {Ψ' : (V → Fin (N + 1)) → ℂ},
       Ψ' ≠ 0 →
       (heisenbergHamiltonianS J N).mulVec Ψ' = (μ' : ℂ) • Ψ' →
