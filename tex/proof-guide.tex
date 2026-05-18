@@ -8452,6 +8452,29 @@ using
 The dominance estimate is still an explicit hypothesis; the wrappers
 only connect it to the predicted-Casimir adjacent-chain machinery.
 
+\textbf{Predicted-GS sector-existence dominance wrappers}: in the
+canonical orientation \(|\neg A|\le |A|\), the explicit
+predicted-Casimir callback in the preceding sector-existence wrappers
+can be replaced by a predicted-GS membership callback.  The Lean
+theorems
+\[
+\begin{gathered}
+\texttt{tasaki23\_successor\_sector\_existence}\\
+\texttt{\_with\_lowered\_predictedGS\_of\_onA\_neg\_lt\_offA},\\
+\texttt{tasaki23\_predecessor\_sector\_existence}\\
+\texttt{\_with\_raised\_predictedGS\_of\_onA\_neg\_lt\_offA}
+\end{gathered}
+\]
+apply
+\[
+\texttt{tasaki23\_totalSpinSSquared\_mulVec\_of\_mem}\\
+\texttt{\_bipartiteToyGroundStateSubspacePredicted}
+\]
+to the source-sector vector selected by Theorem~2.2.  This supplies the
+\(C_{\mathrm{pred}}\) total-Casimir identity required by the
+dominance-form predicted-Casimir sector-existence wrappers, while the
+lowered or raised off-\(A\) dominance estimate remains explicit.
+
 \textbf{Predicted-Casimir adjacent common-energy wrappers}: the
 Casimir endpoint mismatch is now connected directly to the one-step
 sector chain.  The Lean theorems
