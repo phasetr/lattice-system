@@ -617,6 +617,75 @@ theorem tasaki23_signed_lowering_onA_sum_nonpos
   exact tasaki23_signed_single_site_lowering_component_nonpos_of_A_true
     A Φ τ x hAx hΦ_pos
 
+/-- **Tasaki §2.5 Theorem 2.3 signed local lowering contribution**:
+the real signed contribution of the `x`-summand in the lowered
+site-sum at a target-sector configuration.
+
+This packages the repeated real expression used to split the lowered
+site-sum into its off-`A` and on-`A` filtered pieces. -/
+noncomputable def tasaki23SignedLoweringSiteContribution
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1)) (x : V) : ℝ :=
+  (marshallSignS A τ.1).re *
+    ((((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+      (magSectorEmbedding Φ)) τ.1).re)
+
+/-- **Tasaki §2.5 Theorem 2.3 lowered site-sum decomposition**:
+the full signed lowered site-sum is the sum of its off-`A` and on-`A`
+filtered signed pieces.
+
+This is the exact Boolean partition needed before comparing the
+non-negative off-`A` part with the non-positive on-`A` part. -/
+theorem tasaki23_signed_lowering_site_sum_eq_offA_add_onA
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1)) :
+    (marshallSignS A τ.1).re *
+        (∑ x : V,
+          (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+            (magSectorEmbedding Φ)) τ.1).re) =
+      (∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+        tasaki23SignedLoweringSiteContribution A Φ τ x) +
+      (∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+        tasaki23SignedLoweringSiteContribution A Φ τ x) := by
+  classical
+  unfold tasaki23SignedLoweringSiteContribution
+  rw [Finset.mul_sum]
+  rw [← Finset.sum_filter_add_sum_filter_not
+    (s := Finset.univ) (p := fun x : V => A x = false)
+    (f := fun x : V =>
+      (marshallSignS A τ.1).re *
+        ((((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ.1).re))]
+  congr 1
+  apply Finset.sum_congr
+  · ext x
+    by_cases hAx : A x = false
+    · simp [hAx]
+    · cases hA : A x <;> simp [hA] at hAx ⊢
+  · intro x _hx
+    rfl
+
+/-- **Tasaki §2.5 Theorem 2.3 lowered site-sum positivity from
+sublattice dominance**: if the negative of the on-`A` signed sum is
+strictly smaller than the off-`A` signed sum, then the full signed
+lowered site-sum is strictly positive.
+
+This packages the remaining dominance obligation in the site-sum proof. -/
+theorem tasaki23_signed_lowering_site_sum_pos_of_onA_neg_lt_offA
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1))
+    (hdominates :
+      -(∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+          tasaki23SignedLoweringSiteContribution A Φ τ x) <
+        ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+          tasaki23SignedLoweringSiteContribution A Φ τ x) :
+    0 < (marshallSignS A τ.1).re *
+      (∑ x : V,
+        (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ.1).re) := by
+  rw [tasaki23_signed_lowering_site_sum_eq_offA_add_onA A Φ τ]
+  linarith
+
 /-- **Tasaki §2.5 Theorem 2.3 zero local raising component**:
 if the target configuration already has local value `N` at `x`, the
 single-site raising summand at `x` contributes zero to that target
@@ -873,6 +942,29 @@ theorem tasaki23_lowered_marshall_pos_of_site_sum_pos
   intro τ
   rw [totalSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_site_sum Φ τ.1]
   simpa [map_sum] using hlowered_site_sum_pos τ
+
+/-- **Tasaki §2.5 Theorem 2.3 lowered-vector Marshall positivity from
+sublattice dominance**: a pointwise dominance of the off-`A` signed
+lowered sum over the negative on-`A` signed sum implies the
+Marshall-positive lowered-vector hypothesis.
+
+This feeds the dominance bridge into
+`tasaki23_lowered_marshall_pos_of_site_sum_pos`. -/
+theorem tasaki23_lowered_marshall_pos_of_onA_neg_lt_offA
+    (A : V → Bool) {M : ℕ} (Φ : magConfigS V N M → ℂ)
+    (hdominates :
+      ∀ τ : magConfigS V N (M + 1),
+        -(∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+            tasaki23SignedLoweringSiteContribution A Φ τ x) <
+          ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+            tasaki23SignedLoweringSiteContribution A Φ τ x) :
+    ∀ τ : magConfigS V N (M + 1),
+      0 < (marshallSignS A τ.1).re *
+        (((totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ)) τ.1).re := by
+  exact tasaki23_lowered_marshall_pos_of_site_sum_pos A Φ
+    (fun τ =>
+      tasaki23_signed_lowering_site_sum_pos_of_onA_neg_lt_offA
+        A Φ τ (hdominates τ))
 
 /-- **Tasaki §2.5 Theorem 2.3 raised-vector Marshall positivity from
 site-sum positivity**: to prove the Marshall positivity required by the

@@ -7783,6 +7783,42 @@ positivity problem into the non-negative off-\(A\) part and the
 non-positive on-\(A\) part, without yet proving that the former
 dominates the latter.
 
+\textbf{Lowered site-sum dominance bridge}: Lean now names the signed
+local contribution
+\[
+  T_x(\tau)=
+  \mathrm{Re}\,\mathrm{marshallSignS}(A,\tau)\,
+  \mathrm{Re}\,
+  \bigl(\hat S^-_x\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau)
+\]
+as \texttt{tasaki23SignedLoweringSiteContribution}.  Since \(A(x)\) is
+Boolean, the full signed site-sum splits exactly as
+\[
+  \mathrm{Re}\,\mathrm{marshallSignS}(A,\tau)
+  \sum_{x\in V}
+  \mathrm{Re}\,
+  \bigl(\hat S^-_x\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau)
+  =
+  \sum_{x:A(x)=\mathrm{false}} T_x(\tau)
+  +
+  \sum_{x:A(x)=\mathrm{true}} T_x(\tau).
+\]
+This is
+\texttt{tasaki23\_signed\_lowering\_site\_sum\_eq\_offA\_add\_onA}.
+Consequently the pointwise dominance condition
+\[
+  -\sum_{x:A(x)=\mathrm{true}} T_x(\tau)
+  <
+  \sum_{x:A(x)=\mathrm{false}} T_x(\tau)
+\]
+implies the strict site-sum positivity hypothesis.  Lean records this
+as
+\texttt{tasaki23\_signed\_lowering\_site\_sum\_pos\_of\_onA\_neg\_lt\_offA}
+and wraps it into lowered-vector Marshall positivity as
+\texttt{tasaki23\_lowered\_marshall\_pos\_of\_onA\_neg\_lt\_offA}.  This
+still leaves the dominance inequality itself as the remaining
+substantive proof obligation.
+
 \textbf{Raising-direction local component package}: the same
 adjacent-sector bookkeeping is now available for the raising ladder.
 First, the support bridge
