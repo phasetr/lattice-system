@@ -7590,6 +7590,52 @@ and
 These are the local sign facts needed before proving positivity of the
 single-site lowering summands.
 
+\textbf{Single-site lowering component formula}: the local lowering
+summand has an explicit predecessor description.  Let
+\(\tau\in\mathrm{magConfigS}(V,N,M+1)\) and fix \(x\in V\).  If
+\(\tau_x=0\), then there is no source configuration whose value at
+\(x\) is lowered into \(\tau_x\), and Lean proves
+\[
+  \bigl(\hat S^-_x\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau)=0.
+\]
+This is
+\[
+\begin{gathered}
+\texttt{onSiteS\_spinSOpMinus\_mulVec\_magSectorEmbedding\_apply}\\
+\texttt{\_eq\_zero\_of\_target\_zero}.
+\end{gathered}
+\]
+If instead \(\tau_x>0\), define the predecessor
+\[
+  \rho = \tau[x \mapsto \tau_x-1].
+\]
+The private bookkeeping lemma
+\[
+\begin{gathered}
+\texttt{magSumS\_single\_site}\\
+\texttt{\_lowering\_predecessor}
+\end{gathered}
+\]
+proves
+\(\mathrm{magSumS}(\rho)=M\), and the matrix-vector product collapses to
+the single non-zero column
+\[
+  \bigl(\hat S^-_x\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau)
+  =
+  (\hat S^-_N)_{\tau_x,\rho_x}\,\Phi_M(\rho).
+\]
+This is formalised as
+\[
+\begin{gathered}
+\texttt{onSiteS\_spinSOpMinus\_mulVec\_magSectorEmbedding\_apply}\\
+\texttt{\_single\_site\_pred}.
+\end{gathered}
+\]
+Together with the preceding Marshall-sign predecessor identities, this
+reduces the remaining lowered-vector positivity proof to signed sums of
+strictly positive source-sector coefficients and positive local lowering
+matrix entries.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
