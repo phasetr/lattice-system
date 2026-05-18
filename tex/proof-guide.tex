@@ -8435,6 +8435,23 @@ on the actual ladder image.  Thus the final Theorem~2.3 iteration can
 work with sector-existence data rather than externally supplied
 source-sector eigenvectors.
 
+The dominance-form sector-existence companions are
+\[
+\begin{gathered}
+\texttt{tasaki23\_successor\_sector\_existence}\\
+\texttt{\_with\_lowered\_predictedCasimir\_of\_onA\_neg\_lt\_offA},\\
+\texttt{tasaki23\_predecessor\_sector\_existence}\\
+\texttt{\_with\_raised\_predictedCasimir\_of\_onA\_neg\_lt\_offA}.
+\end{gathered}
+\]
+They first choose the sector representative by the same per-sector
+Theorem~2.2 existence wrapper, then convert the lowered or raised
+off-\(A\) dominance hypothesis into the strict site-sum positivity input
+using
+\(\texttt{tasaki23\_signed\_\{lowering,raising\}\_site\_sum\_pos\_of\_onA\_neg\_lt\_offA}\).
+The dominance estimate is still an explicit hypothesis; the wrappers
+only connect it to the predicted-Casimir adjacent-chain machinery.
+
 \textbf{Predicted-Casimir adjacent common-energy wrappers}: the
 Casimir endpoint mismatch is now connected directly to the one-step
 sector chain.  The Lean theorems
