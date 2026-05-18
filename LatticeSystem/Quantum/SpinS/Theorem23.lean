@@ -70,6 +70,34 @@ theorem totalSpinSOpMinus_mulVec_magSectorEmbedding_supported_succ {M : ℕ}
     ring_nf
   exact magSubspaceS_apply_eq_zero_of_magSumS_ne hshift' hσ
 
+/-- **Tasaki §2.5 Theorem 2.3 sector shift, raising direction**:
+if a vector is embedded from the `magSumS = M + 1` sector, then
+applying `Ŝ^+_tot` gives a full vector supported on the adjacent sector
+`magSumS = M`.
+
+This is the raising-direction support half of the neighboring-sector
+comparison, complementing
+`totalSpinSOpMinus_mulVec_magSectorEmbedding_supported_succ`. -/
+theorem totalSpinSOpPlus_mulVec_magSectorEmbedding_supported_pred {M : ℕ}
+    (Φ : magConfigS V N (M + 1) → ℂ) :
+    ∀ σ : V → Fin (N + 1), magSumS σ ≠ M →
+      (totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ) σ = 0 := by
+  intro σ hσ
+  have hshift :
+      (totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ) ∈
+        magSubspaceS V N
+          ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) + 1) :=
+    totalSpinSOpPlus_mulVec_mem_magSubspaceS_of_mem
+      (magSectorEmbedding_mem_magSubspaceS Φ)
+  have hshift' :
+      (totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ) ∈
+        magSubspaceS V N
+          (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) := by
+    convert hshift using 1
+    norm_num
+    ring_nf
+  exact magSubspaceS_apply_eq_zero_of_magSumS_ne hshift' hσ
+
 /-- **Tasaki §2.5 Theorem 2.3 ladder step, lowering direction**:
 if `Ψ` is a Heisenberg eigenvector at real eigenvalue `μ`, then
 `Ŝ^-_tot Ψ` is a Heisenberg eigenvector at the same eigenvalue.
@@ -148,6 +176,21 @@ theorem totalSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_site_sum {M : ℕ}
   rw [totalSpinSOpMinus_def, Matrix.sum_mulVec]
   simp [Finset.sum_apply]
 
+/-- **Tasaki §2.5 Theorem 2.3 raised-vector site-sum expansion**:
+the `Ŝ^+_tot`-raised embedded sector vector is the sum of its
+single-site raising contributions at each target configuration.
+
+This is the raising-direction companion to
+`totalSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_site_sum`. -/
+theorem totalSpinSOpPlus_mulVec_magSectorEmbedding_apply_eq_site_sum {M : ℕ}
+    (Φ : magConfigS V N (M + 1) → ℂ) (τ : V → Fin (N + 1)) :
+    ((totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ)) τ =
+      ∑ x : V,
+        ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ := by
+  rw [totalSpinSOpPlus_def, Matrix.sum_mulVec]
+  simp [Finset.sum_apply]
+
 /-- **Tasaki §2.5 Theorem 2.3 single-site lowering predecessor**:
 if a target configuration `τ` in sector `M + 1` has positive local
 value at `x`, lowering that local value by one gives a configuration
@@ -187,6 +230,43 @@ private theorem magSumS_single_site_lowering_predecessor {M : ℕ}
       omega
     omega
   have hτ : magSumS τ.1 = M + 1 := τ.2
+  omega
+
+/-- **Tasaki §2.5 Theorem 2.3 single-site raising successor**:
+if a target configuration `τ` in sector `M` has local value below `N`
+at `x`, raising that local value by one gives a configuration in
+sector `M + 1`.
+
+This is the magnetization bookkeeping behind the raising-direction
+local component formula for a single summand in `Ŝ^+_tot`. -/
+private theorem magSumS_single_site_raising_successor {M : ℕ}
+    (τ : magConfigS V N M) (x : V) (hx : (τ.1 x).val < N) :
+    magSumS
+        (Function.update τ.1 x
+          ⟨(τ.1 x).val + 1, by omega⟩) = M + 1 := by
+  classical
+  have hsum :
+      magSumS
+          (Function.update τ.1 x
+            ⟨(τ.1 x).val + 1, by omega⟩) =
+        magSumS τ.1 + 1 := by
+    unfold magSumS
+    rw [Finset.sum_eq_add_sum_diff_singleton_of_mem (Finset.mem_univ x)]
+    rw [Finset.sum_eq_add_sum_diff_singleton_of_mem (Finset.mem_univ x)]
+    simp only [Function.update_self]
+    have hrest :
+        (∑ y ∈ (Finset.univ : Finset V) \ {x},
+            (Function.update τ.1 x
+              ⟨(τ.1 x).val + 1, by omega⟩ y).val) =
+          ∑ y ∈ (Finset.univ : Finset V) \ {x}, (τ.1 y).val := by
+      apply Finset.sum_congr rfl
+      intro y hy
+      have hyx : y ≠ x := by
+        simpa using hy
+      rw [Function.update_of_ne hyx]
+    rw [hrest]
+    omega
+  have hτ : magSumS τ.1 = M := τ.2
   omega
 
 /-- **Tasaki §2.5 Theorem 2.3 zero local lowering component**:
@@ -415,6 +495,240 @@ theorem tasaki23_signed_single_site_lowering_component_neg_of_A_true
             (Φ ⟨pred, hpredM⟩).re) =
         (spinSOpMinus N (τ.1 x) predVal).re *
           ((marshallSignS A τ.1).re * (Φ ⟨pred, hpredM⟩).re) := by
+    ring
+  rw [hrearrange]
+  exact mul_neg_of_pos_of_neg hcoef_pos htarget_src
+
+/-- **Tasaki §2.5 Theorem 2.3 zero local raising component**:
+if the target configuration already has local value `N` at `x`, the
+single-site raising summand at `x` contributes zero to that target
+component.
+
+This is the boundary case for the raising-direction local successor
+analysis of the `Ŝ^+_tot` site-sum expansion. -/
+theorem onSiteS_spinSOpPlus_mulVec_magSectorEmbedding_apply_eq_zero_of_target_top
+    {M : ℕ} (Φ : magConfigS V N (M + 1) → ℂ) (τ : magConfigS V N M)
+    (x : V) (hx : (τ.1 x).val = N) :
+    (((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+      (magSectorEmbedding Φ)) τ.1) = 0 := by
+  classical
+  rw [Matrix.mulVec, dotProduct]
+  apply Finset.sum_eq_zero
+  intro σ _hσ
+  by_cases hoff : ∀ k, k ≠ x → τ.1 k = σ k
+  · rw [onSiteS_apply_of_off_site_agree x _ hoff]
+    have hnot_raise : (τ.1 x).val + 1 ≠ (σ x).val := by
+      have hσx : (σ x).val ≤ N := by have := (σ x).isLt; omega
+      omega
+    rw [spinSOpPlus_apply_other N hnot_raise, zero_mul]
+  · rw [onSiteS_apply_eq_zero_of_off_site_diff x _ hoff, zero_mul]
+
+/-- **Tasaki §2.5 Theorem 2.3 single-site raising component**:
+if a target sector configuration `τ` has local value below `N` at
+`x`, then the `x`-summand of `Ŝ^+_tot` at `τ` is exactly the raising
+matrix coefficient times the source-sector coefficient at the unique
+successor configuration obtained by increasing `τ x` by one.
+
+This is the raising-direction companion to
+`onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_single_site_pred`. -/
+theorem onSiteS_spinSOpPlus_mulVec_magSectorEmbedding_apply_single_site_succ
+    {M : ℕ} (Φ : magConfigS V N (M + 1) → ℂ) (τ : magConfigS V N M)
+    (x : V) (hx : (τ.1 x).val < N) :
+    let succVal : Fin (N + 1) :=
+      ⟨(τ.1 x).val + 1, by omega⟩
+    let succ : V → Fin (N + 1) := Function.update τ.1 x succVal
+    (((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+      (magSectorEmbedding Φ)) τ.1) =
+        spinSOpPlus N (τ.1 x) succVal *
+          Φ ⟨succ, magSumS_single_site_raising_successor τ x hx⟩ := by
+  classical
+  dsimp only
+  rw [Matrix.mulVec, dotProduct]
+  rw [Finset.sum_eq_single
+    (Function.update τ.1 x
+      ⟨(τ.1 x).val + 1, by omega⟩)]
+  · rw [onSiteS_apply_of_off_site_agree]
+    · rw [magSectorEmbedding_apply_of_mem Φ
+        (magSumS_single_site_raising_successor τ x hx)]
+      simp
+    · intro y hy
+      rw [Function.update_of_ne hy]
+  · intro σ _hσ hσ_ne
+    by_cases hoff : ∀ k, k ≠ x → τ.1 k = σ k
+    · rw [onSiteS_apply_of_off_site_agree x _ hoff]
+      have hnot_raise : (τ.1 x).val + 1 ≠ (σ x).val := by
+        intro h_raise
+        apply hσ_ne
+        funext y
+        by_cases hy : y = x
+        · subst y
+          apply Fin.ext
+          simp
+          omega
+        · rw [Function.update_of_ne hy]
+          exact (hoff y hy).symm
+      rw [spinSOpPlus_apply_other N hnot_raise, zero_mul]
+    · rw [onSiteS_apply_eq_zero_of_off_site_diff x _ hoff, zero_mul]
+  · intro hnot_mem
+    exact False.elim (hnot_mem (Finset.mem_univ _))
+
+/-- **Tasaki §2.5 Theorem 2.3 single-site raising real part**:
+at a target configuration whose local value is below `N`, the real
+part of the single-site raising summand is the product of the positive
+raising matrix coefficient and the real part of the successor
+coefficient.
+
+This is the real-valued raising-direction companion to
+`onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_single_site_pred_re`. -/
+theorem onSiteS_spinSOpPlus_mulVec_magSectorEmbedding_apply_single_site_succ_re
+    {M : ℕ} (Φ : magConfigS V N (M + 1) → ℂ) (τ : magConfigS V N M)
+    (x : V) (hx : (τ.1 x).val < N) :
+    let succVal : Fin (N + 1) :=
+      ⟨(τ.1 x).val + 1, by omega⟩
+    let succ : V → Fin (N + 1) := Function.update τ.1 x succVal
+    ((((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+      (magSectorEmbedding Φ)) τ.1).re) =
+        (spinSOpPlus N (τ.1 x) succVal).re *
+          (Φ ⟨succ, magSumS_single_site_raising_successor τ x hx⟩).re := by
+  classical
+  dsimp only
+  rw [onSiteS_spinSOpPlus_mulVec_magSectorEmbedding_apply_single_site_succ
+    Φ τ x hx]
+  rw [Complex.mul_re, spinSOpPlus_apply_im_zero]
+  ring
+
+/-- **Tasaki §2.5 Theorem 2.3 off-`A` single-site raising positivity**:
+if the raised site lies outside `A`, then the signed real part of its
+single-site raising contribution is strictly positive whenever the
+source-sector vector is Marshall-positive.
+
+This is the raising-direction counterpart of
+`tasaki23_signed_single_site_lowering_component_pos_of_A_false`. -/
+theorem tasaki23_signed_single_site_raising_component_pos_of_A_false
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N (M + 1) → ℂ)
+    (τ : magConfigS V N M) (x : V)
+    (hx : (τ.1 x).val < N) (hAx : A x = false)
+    (hΦ_pos : ∀ σ : magConfigS V N (M + 1),
+      0 < (marshallSignS A σ.1).re * (Φ σ).re) :
+    0 < (marshallSignS A τ.1).re *
+      ((((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+        (magSectorEmbedding Φ)) τ.1).re) := by
+  classical
+  let succVal : Fin (N + 1) := ⟨(τ.1 x).val + 1, by omega⟩
+  let succ : V → Fin (N + 1) := Function.update τ.1 x succVal
+  have hsuccM : magSumS succ = M + 1 :=
+    magSumS_single_site_raising_successor τ x hx
+  have hcomponent :
+      ((((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+        (magSectorEmbedding Φ)) τ.1).re) =
+          (spinSOpPlus N (τ.1 x) succVal).re *
+            (Φ ⟨succ, hsuccM⟩).re := by
+    simpa [succVal, succ, hsuccM]
+      using
+        onSiteS_spinSOpPlus_mulVec_magSectorEmbedding_apply_single_site_succ_re
+          Φ τ x hx
+  have hcoef_raise : (τ.1 x).val + 1 = succVal.val := by
+    dsimp [succVal]
+  have hcoef_pos : 0 < (spinSOpPlus N (τ.1 x) succVal).re :=
+    spinSOpPlus_apply_re_pos_of_raise N hcoef_raise
+  have hoff : ∀ k, k ≠ x → succ k = τ.1 k := by
+    intro k hk
+    dsimp [succ]
+    rw [Function.update_of_ne hk]
+  have hsign_raise : (τ.1 x).val + 1 = (succ x).val := by
+    dsimp [succ, succVal]
+    simp
+  have hsign :
+      (marshallSignS A succ).re * (marshallSignS A τ.1).re = 1 :=
+    marshallSignS_re_mul_re_of_agree_off_site_A_false_lower
+      A hAx hoff hsign_raise
+  have hsign_target :
+      (marshallSignS A τ.1).re * (marshallSignS A succ).re = 1 := by
+    rw [mul_comm]
+    exact hsign
+  have hsq : (marshallSignS A succ).re * (marshallSignS A succ).re = 1 :=
+    marshallSignS_re_sq A succ
+  have hsrc :
+      0 < (marshallSignS A succ).re * (Φ ⟨succ, hsuccM⟩).re :=
+    hΦ_pos ⟨succ, hsuccM⟩
+  have htarget_src :
+      0 < (marshallSignS A τ.1).re * (Φ ⟨succ, hsuccM⟩).re := by
+    nlinarith [hsign_target, hsq, hsrc]
+  rw [hcomponent]
+  have hrearrange :
+      (marshallSignS A τ.1).re *
+          ((spinSOpPlus N (τ.1 x) succVal).re *
+            (Φ ⟨succ, hsuccM⟩).re) =
+        (spinSOpPlus N (τ.1 x) succVal).re *
+          ((marshallSignS A τ.1).re * (Φ ⟨succ, hsuccM⟩).re) := by
+    ring
+  rw [hrearrange]
+  exact mul_pos hcoef_pos htarget_src
+
+/-- **Tasaki §2.5 Theorem 2.3 on-`A` single-site raising negativity**:
+if the raised site lies in `A`, then the signed real part of its
+single-site raising contribution is strictly negative whenever the
+source-sector vector is Marshall-positive.
+
+This is the raising-direction counterpart of
+`tasaki23_signed_single_site_lowering_component_neg_of_A_true`. -/
+theorem tasaki23_signed_single_site_raising_component_neg_of_A_true
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N (M + 1) → ℂ)
+    (τ : magConfigS V N M) (x : V)
+    (hx : (τ.1 x).val < N) (hAx : A x = true)
+    (hΦ_pos : ∀ σ : magConfigS V N (M + 1),
+      0 < (marshallSignS A σ.1).re * (Φ σ).re) :
+    (marshallSignS A τ.1).re *
+        ((((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ.1).re) < 0 := by
+  classical
+  let succVal : Fin (N + 1) := ⟨(τ.1 x).val + 1, by omega⟩
+  let succ : V → Fin (N + 1) := Function.update τ.1 x succVal
+  have hsuccM : magSumS succ = M + 1 :=
+    magSumS_single_site_raising_successor τ x hx
+  have hcomponent :
+      ((((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+        (magSectorEmbedding Φ)) τ.1).re) =
+          (spinSOpPlus N (τ.1 x) succVal).re *
+            (Φ ⟨succ, hsuccM⟩).re := by
+    simpa [succVal, succ, hsuccM]
+      using
+        onSiteS_spinSOpPlus_mulVec_magSectorEmbedding_apply_single_site_succ_re
+          Φ τ x hx
+  have hcoef_raise : (τ.1 x).val + 1 = succVal.val := by
+    dsimp [succVal]
+  have hcoef_pos : 0 < (spinSOpPlus N (τ.1 x) succVal).re :=
+    spinSOpPlus_apply_re_pos_of_raise N hcoef_raise
+  have hoff : ∀ k, k ≠ x → succ k = τ.1 k := by
+    intro k hk
+    dsimp [succ]
+    rw [Function.update_of_ne hk]
+  have hsign_raise : (τ.1 x).val + 1 = (succ x).val := by
+    dsimp [succ, succVal]
+    simp
+  have hsign :
+      (marshallSignS A succ).re * (marshallSignS A τ.1).re = -1 :=
+    marshallSignS_re_mul_re_of_agree_off_site_A_true_lower
+      A hAx hoff hsign_raise
+  have hsign_target :
+      (marshallSignS A τ.1).re * (marshallSignS A succ).re = -1 := by
+    rw [mul_comm]
+    exact hsign
+  have hsq : (marshallSignS A succ).re * (marshallSignS A succ).re = 1 :=
+    marshallSignS_re_sq A succ
+  have hsrc :
+      0 < (marshallSignS A succ).re * (Φ ⟨succ, hsuccM⟩).re :=
+    hΦ_pos ⟨succ, hsuccM⟩
+  have htarget_src :
+      (marshallSignS A τ.1).re * (Φ ⟨succ, hsuccM⟩).re < 0 := by
+    nlinarith [hsign_target, hsq, hsrc]
+  rw [hcomponent]
+  have hrearrange :
+      (marshallSignS A τ.1).re *
+          ((spinSOpPlus N (τ.1 x) succVal).re *
+            (Φ ⟨succ, hsuccM⟩).re) =
+        (spinSOpPlus N (τ.1 x) succVal).re *
+          ((marshallSignS A τ.1).re * (Φ ⟨succ, hsuccM⟩).re) := by
     ring
   rw [hrearrange]
   exact mul_neg_of_pos_of_neg hcoef_pos htarget_src

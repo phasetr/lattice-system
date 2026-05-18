@@ -7694,6 +7694,103 @@ the full site-sum positivity proof must control: lowered sites off
 \(A\) contribute with the Marshall-positive sign, while lowered sites
 on \(A\) contribute with the opposite sign.
 
+\textbf{Raising-direction local component package}: the same
+adjacent-sector bookkeeping is now available for the raising ladder.
+First, the support bridge
+\[
+\begin{gathered}
+\texttt{totalSpinSOpPlus\_mulVec}\\
+\texttt{\_magSectorEmbedding\_supported\_pred}
+\end{gathered}
+\]
+states that if \(\Phi_{M+1}\) is embedded from the
+\(\mathrm{magSumS}=M+1\) sector, then
+\(\hat S^+_{\rm tot}\,\mathrm{magSectorEmbedding}(\Phi_{M+1})\) is
+supported on the adjacent sector \(\mathrm{magSumS}=M\).  Componentwise,
+Lean expands
+\[
+  \bigl(\hat S^+_{\rm tot}\,\mathrm{magSectorEmbedding}(\Phi_{M+1})\bigr)(\tau)
+  =
+  \sum_{x\in V}
+  \bigl(\hat S^+_x\,\mathrm{magSectorEmbedding}(\Phi_{M+1})\bigr)(\tau)
+\]
+as
+\[
+\begin{gathered}
+\texttt{totalSpinSOpPlus\_mulVec\_magSectorEmbedding\_apply}\\
+\texttt{\_eq\_site\_sum}.
+\end{gathered}
+\]
+
+For a target \(\tau\in\mathrm{magConfigS}(V,N,M)\), the local
+raising summand vanishes at a saturated site \(\tau_x=N\):
+\[
+\begin{gathered}
+\texttt{onSiteS\_spinSOpPlus\_mulVec\_magSectorEmbedding\_apply}\\
+\texttt{\_eq\_zero\_of\_target\_top}.
+\end{gathered}
+\]
+If \(\tau_x<N\), the unique source successor is
+\[
+  \sigma = \tau[x \mapsto \tau_x+1],
+  \qquad
+  \mathrm{magSumS}(\sigma)=M+1,
+\]
+and Lean proves
+\[
+  \bigl(\hat S^+_x\,\mathrm{magSectorEmbedding}(\Phi_{M+1})\bigr)(\tau)
+  =
+  (\hat S^+_N)_{\tau_x,\sigma_x}\,\Phi_{M+1}(\sigma).
+\]
+The theorem names are
+\[
+\begin{gathered}
+\texttt{onSiteS\_spinSOpPlus\_mulVec\_magSectorEmbedding\_apply}\\
+\texttt{\_single\_site\_succ}
+\end{gathered}
+\]
+and its real-part form
+\[
+\begin{gathered}
+\texttt{onSiteS\_spinSOpPlus\_mulVec\_magSectorEmbedding\_apply}\\
+\texttt{\_single\_site\_succ\_re}.
+\end{gathered}
+\]
+Since the raising matrix coefficient has positive real part on this
+successor pair, source-sector Marshall positivity gives the same local
+sign split:
+\[
+  A(x)=\mathrm{false}
+  \Rightarrow
+  0 <
+  \mathrm{Re}\,\mathrm{marshallSignS}(A,\tau)\,
+  \mathrm{Re}\,
+  \bigl(\hat S^+_x\,\mathrm{magSectorEmbedding}(\Phi_{M+1})\bigr)(\tau),
+\]
+and
+\[
+  A(x)=\mathrm{true}
+  \Rightarrow
+  \mathrm{Re}\,\mathrm{marshallSignS}(A,\tau)\,
+  \mathrm{Re}\,
+  \bigl(\hat S^+_x\,\mathrm{magSectorEmbedding}(\Phi_{M+1})\bigr)(\tau)
+  < 0 .
+\]
+These are formalised as
+\[
+\begin{gathered}
+\texttt{tasaki23\_signed\_single\_site\_raising\_component}\\
+\texttt{\_pos\_of\_A\_false}
+\end{gathered}
+\]
+and
+\[
+\begin{gathered}
+\texttt{tasaki23\_signed\_single\_site\_raising\_component}\\
+\texttt{\_neg\_of\_A\_true}.
+\end{gathered}
+\]
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
