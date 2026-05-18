@@ -7526,6 +7526,43 @@ vanished adjacent-sector ladder move, and are the structural
 alternative to treating the still-open local dominance inequality as a
 stand-alone positivity fact.
 
+\textbf{Casimir-based ladder non-vanishing}: the previous kernel
+alternative is also packaged in the contrapositive form needed for the
+sector interval argument.  Suppose \(\Psi\ne0\) lies in the
+\(\hat S^{(3)}_{\rm tot}\)-eigenspace of value \(m\), and
+\[
+  \hat{\boldsymbol S}_{\rm tot}^2\Psi=\gamma\Psi.
+\]
+If \(\gamma\ne m(m-1)\), then
+\[
+  \hat S^-_{\rm tot}\Psi\ne0.
+\]
+Otherwise the lowering kernel theorem would force the same Casimir
+action to equal \(m(m-1)\Psi\), so
+\((\gamma-m(m-1))\Psi=0\), contradicting \(\Psi\ne0\) and
+\(\gamma\ne m(m-1)\).  The raising companion is identical: if
+\(\gamma\ne m(m+1)\), then
+\[
+  \hat S^+_{\rm tot}\Psi\ne0.
+\]
+Lean names these two non-vanishing criteria
+\[
+\begin{gathered}
+\texttt{tasaki23\_totalSpinSOpMinus\_mulVec\_ne\_zero}\\
+\texttt{\_of\_casimir\_ne\_kernel\_value}
+\end{gathered}
+\]
+and
+\[
+\begin{gathered}
+\texttt{tasaki23\_totalSpinSOpPlus\_mulVec\_ne\_zero}\\
+\texttt{\_of\_casimir\_ne\_kernel\_value}.
+\end{gathered}
+\]
+They are the direct bridge from the SU(2) Casimir obstruction to the
+claim that an adjacent-sector ladder move can vanish only at the
+corresponding representation endpoint.
+
 \textbf{Sector-support bridge and lowering-sector shift}: the same PR
 also records the support side of the adjacent-sector comparison.  First,
 \texttt{totalSpinSOp3\_mulVec\_apply\_eq\_magEigenvalueS\_mul} gives the

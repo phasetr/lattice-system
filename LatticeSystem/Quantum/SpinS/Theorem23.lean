@@ -189,6 +189,66 @@ theorem tasaki23_totalSpinSSquared_mulVec_of_totalSpinSOpPlus_eq_zero_of_mem_mag
   congr 1
   ring
 
+/-- **Tasaki §2.5 Theorem 2.3 Casimir-based ladder non-vanishing,
+lowering direction**: if a non-zero vector in the `Ŝ_tot^(3)`
+eigenspace of value `m` has total-Casimir eigenvalue `γ ≠ m * (m - 1)`,
+then its `Ŝ^-_tot` image is non-zero.
+
+This is the contrapositive use of
+`tasaki23_totalSpinSSquared_mulVec_of_totalSpinSOpMinus_eq_zero_of_mem_magSubspaceS`:
+away from the forced kernel Casimir value, the lowering step cannot
+vanish. -/
+theorem tasaki23_totalSpinSOpMinus_mulVec_ne_zero_of_casimir_ne_kernel_value
+    {N : ℕ} {m γ : ℂ} {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ_mag : Ψ ∈ magSubspaceS V N m)
+    (hΨ_cas : (totalSpinSSquared V N).mulVec Ψ = γ • Ψ)
+    (hγ_ne : γ ≠ m * (m - 1))
+    (hΨ_ne : Ψ ≠ 0) :
+    (totalSpinSOpMinus V N).mulVec Ψ ≠ 0 := by
+  intro hker
+  have hforced :
+      (totalSpinSSquared V N).mulVec Ψ = (m * (m - 1)) • Ψ :=
+    tasaki23_totalSpinSSquared_mulVec_of_totalSpinSOpMinus_eq_zero_of_mem_magSubspaceS
+      hΨ_mag hker
+  have hzero : (γ - m * (m - 1)) • Ψ = 0 := by
+    calc
+      (γ - m * (m - 1)) • Ψ = γ • Ψ - (m * (m - 1)) • Ψ := by
+        rw [sub_smul]
+      _ = 0 := by
+        rw [← hΨ_cas, ← hforced, sub_self]
+  rcases smul_eq_zero.mp hzero with hscalar | hvec
+  · exact hγ_ne (sub_eq_zero.mp hscalar)
+  · exact hΨ_ne hvec
+
+/-- **Tasaki §2.5 Theorem 2.3 Casimir-based ladder non-vanishing,
+raising direction**: if a non-zero vector in the `Ŝ_tot^(3)`
+eigenspace of value `m` has total-Casimir eigenvalue `γ ≠ m * (m + 1)`,
+then its `Ŝ^+_tot` image is non-zero.
+
+This is the raising companion to
+`tasaki23_totalSpinSOpMinus_mulVec_ne_zero_of_casimir_ne_kernel_value`. -/
+theorem tasaki23_totalSpinSOpPlus_mulVec_ne_zero_of_casimir_ne_kernel_value
+    {N : ℕ} {m γ : ℂ} {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ_mag : Ψ ∈ magSubspaceS V N m)
+    (hΨ_cas : (totalSpinSSquared V N).mulVec Ψ = γ • Ψ)
+    (hγ_ne : γ ≠ m * (m + 1))
+    (hΨ_ne : Ψ ≠ 0) :
+    (totalSpinSOpPlus V N).mulVec Ψ ≠ 0 := by
+  intro hker
+  have hforced :
+      (totalSpinSSquared V N).mulVec Ψ = (m * (m + 1)) • Ψ :=
+    tasaki23_totalSpinSSquared_mulVec_of_totalSpinSOpPlus_eq_zero_of_mem_magSubspaceS
+      hΨ_mag hker
+  have hzero : (γ - m * (m + 1)) • Ψ = 0 := by
+    calc
+      (γ - m * (m + 1)) • Ψ = γ • Ψ - (m * (m + 1)) • Ψ := by
+        rw [sub_smul]
+      _ = 0 := by
+        rw [← hΨ_cas, ← hforced, sub_self]
+  rcases smul_eq_zero.mp hzero with hscalar | hvec
+  · exact hγ_ne (sub_eq_zero.mp hscalar)
+  · exact hΨ_ne hvec
+
 /-- **Tasaki §2.5 Theorem 2.3 ladder step, lowering direction**:
 if `Ψ` is a Heisenberg eigenvector at real eigenvalue `μ`, then
 `Ŝ^-_tot Ψ` is a Heisenberg eigenvector at the same eigenvalue.
