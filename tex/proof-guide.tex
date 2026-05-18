@@ -8524,6 +8524,31 @@ The wrappers do not prove those dominance inequalities; they keep the
 final chain API in the form needed once the dominance estimate is
 available.
 
+\textbf{Predicted-GS dominance common-energy wrappers}: in the
+canonical orientation \(|\neg A|\le |A|\), membership in the predicted
+toy ground-state subspace can now replace the explicit total-Casimir
+hypothesis in the dominance common-energy step.  The Lean theorems
+\[
+\begin{gathered}
+\texttt{tasaki23\_successor\_sector\_common\_energy}\\
+\texttt{\_of\_onA\_neg\_lt\_offA\_of\_mem}\\
+\texttt{\_bipartiteToyGroundStateSubspacePredicted},\\
+\texttt{tasaki23\_predecessor\_sector\_common\_energy}\\
+\texttt{\_of\_onA\_neg\_lt\_offA\_of\_mem}\\
+\texttt{\_bipartiteToyGroundStateSubspacePredicted}
+\end{gathered}
+\]
+first apply
+\[
+\texttt{tasaki23\_totalSpinSSquared\_mulVec\_of\_mem}\\
+\texttt{\_bipartiteToyGroundStateSubspacePredicted}
+\]
+to obtain the \(C_{\mathrm{pred}}\) total-Casimir identity for the
+source-sector zero-extension.  They then invoke the predicted-Casimir
+dominance wrappers above.  Thus the remaining source-sector inputs are
+membership in the predicted toy ground-state subspace and the same
+explicit lowered or raised dominance inequality.
+
 \textbf{Predicted-GS total-Casimir bridge}: the total-Casimir component
 of the predicted toy ground-state subspace has now been put into the
 same notation as the adjacent-sector chain.  In the canonical
