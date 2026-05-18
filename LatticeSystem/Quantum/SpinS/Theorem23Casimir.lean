@@ -220,4 +220,99 @@ theorem tasaki23_totalSpinSOpPlus_mulVec_magSectorEmbedding_ne_zero_of_casimir_n
       (magSectorEmbedding_mem_magSubspaceS (V := V) (N := N) (M := M) Φ)
       hΦ_cas hγ_ne hΦ_ne
 
+/-! ## Marshall-positive sector vectors -/
+
+omit [DecidableEq V] in
+/-- **Tasaki §2.5 Theorem 2.3 Marshall-positive sector vector
+non-vanishing**: the zero-extension of a sector vector with strictly
+positive Marshall coefficients is non-zero.
+
+This supplies the non-zero vector hypothesis needed to apply the
+sector-embedded Casimir ladder non-vanishing criteria to the
+Theorem 2.2 sector ground-state vector. -/
+theorem tasaki23_marshallPositive_magSectorEmbedding_ne_zero
+    (A : V → Bool) {N M : ℕ} [Nonempty (magConfigS V N M)]
+    {v : magConfigS V N M → ℝ}
+    (hv_pos : ∀ τ, 0 < v τ) :
+    magSectorEmbedding
+      (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ≠ 0 := by
+  intro hzero
+  let τ : magConfigS V N M := Classical.choice inferInstance
+  have happly := congrFun hzero τ.1
+  rw [magSectorEmbedding_apply_subtype] at happly
+  have hpos :
+      0 <
+        (marshallSignS A τ.1).re *
+          ((marshallSignS A τ.1).re * v τ) := by
+    have hsq : (marshallSignS A τ.1).re * (marshallSignS A τ.1).re = 1 :=
+      marshallSignS_re_sq A τ.1
+    rw [← mul_assoc, hsq, one_mul]
+    exact hv_pos τ
+  have hreal_ne : (marshallSignS A τ.1).re * v τ ≠ 0 := by
+    intro hreal_zero
+    have hprod_zero :
+        (marshallSignS A τ.1).re *
+          ((marshallSignS A τ.1).re * v τ) = 0 := by
+      rw [hreal_zero, mul_zero]
+    exact (ne_of_gt hpos) hprod_zero
+  exact (Complex.ofReal_ne_zero.mpr hreal_ne) happly
+
+/-- **Tasaki §2.5 Theorem 2.3 Marshall-positive sector Casimir
+non-vanishing, lowering direction**: a Marshall-positive sector vector
+with a non-endpoint total-Casimir eigenvalue has non-zero total-lowering
+image after zero-extension.
+
+This is the lowering sector-embedded Casimir criterion with the
+non-zero hypothesis discharged from strict Marshall positivity. -/
+theorem tasaki23_totalSpinSOpMinus_mulVec_marshallPositive_magSectorEmbedding_ne_zero_of_casimir_ne_kernel_value
+    (A : V → Bool) {N M : ℕ} [Nonempty (magConfigS V N M)]
+    {γ : ℂ} {v : magConfigS V N M → ℝ}
+    (hΦ_cas :
+      (totalSpinSSquared V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        γ • magSectorEmbedding
+          (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (hγ_ne :
+      γ ≠
+        ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) *
+          ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) - 1)))
+    (hv_pos : ∀ τ, 0 < v τ) :
+    (totalSpinSOpMinus V N).mulVec
+        (magSectorEmbedding
+          (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ≠ 0 := by
+  exact
+    tasaki23_totalSpinSOpMinus_mulVec_magSectorEmbedding_ne_zero_of_casimir_ne_kernel_value
+      hΦ_cas hγ_ne (tasaki23_marshallPositive_magSectorEmbedding_ne_zero A hv_pos)
+
+/-- **Tasaki §2.5 Theorem 2.3 Marshall-positive sector Casimir
+non-vanishing, raising direction**: a Marshall-positive sector vector
+with a non-endpoint total-Casimir eigenvalue has non-zero total-raising
+image after zero-extension.
+
+This is the raising companion to
+`tasaki23_totalSpinSOpMinus_mulVec_marshallPositive_magSectorEmbedding_ne_zero_of_casimir_ne_kernel_value`. -/
+theorem tasaki23_totalSpinSOpPlus_mulVec_marshallPositive_magSectorEmbedding_ne_zero_of_casimir_ne_kernel_value
+    (A : V → Bool) {N M : ℕ} [Nonempty (magConfigS V N M)]
+    {γ : ℂ} {v : magConfigS V N M → ℝ}
+    (hΦ_cas :
+      (totalSpinSSquared V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        γ • magSectorEmbedding
+          (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (hγ_ne :
+      γ ≠
+        ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) *
+          ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) + 1)))
+    (hv_pos : ∀ τ, 0 < v τ) :
+    (totalSpinSOpPlus V N).mulVec
+        (magSectorEmbedding
+          (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ≠ 0 := by
+  exact
+    tasaki23_totalSpinSOpPlus_mulVec_magSectorEmbedding_ne_zero_of_casimir_ne_kernel_value
+      hΦ_cas hγ_ne (tasaki23_marshallPositive_magSectorEmbedding_ne_zero A hv_pos)
+
 end LatticeSystem.Quantum
