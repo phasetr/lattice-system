@@ -923,6 +923,178 @@ theorem tasaki23_signed_single_site_raising_component_neg_of_A_true
   rw [hrearrange]
   exact mul_neg_of_pos_of_neg hcoef_pos htarget_src
 
+/-- **Tasaki §2.5 Theorem 2.3 off-`A` local raising non-negativity**:
+including the boundary case where the target local value is already
+`N`, the signed single-site raising contribution is non-negative at
+every site outside `A`.
+
+This is the weak boundary-inclusive form of
+`tasaki23_signed_single_site_raising_component_pos_of_A_false`. -/
+theorem tasaki23_signed_single_site_raising_component_nonneg_of_A_false
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N (M + 1) → ℂ)
+    (τ : magConfigS V N M) (x : V)
+    (hAx : A x = false)
+    (hΦ_pos : ∀ σ : magConfigS V N (M + 1),
+      0 < (marshallSignS A σ.1).re * (Φ σ).re) :
+    0 ≤ (marshallSignS A τ.1).re *
+      ((((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+        (magSectorEmbedding Φ)) τ.1).re) := by
+  by_cases hx : (τ.1 x).val < N
+  · exact le_of_lt
+      (tasaki23_signed_single_site_raising_component_pos_of_A_false
+        A Φ τ x hx hAx hΦ_pos)
+  · have htop : (τ.1 x).val = N := by
+      have hle : (τ.1 x).val ≤ N := by
+        have := (τ.1 x).isLt
+        omega
+      omega
+    rw [onSiteS_spinSOpPlus_mulVec_magSectorEmbedding_apply_eq_zero_of_target_top
+      Φ τ x htop]
+    simp
+
+/-- **Tasaki §2.5 Theorem 2.3 on-`A` local raising non-positivity**:
+including the boundary case where the target local value is already
+`N`, the signed single-site raising contribution is non-positive at
+every site inside `A`.
+
+This is the weak boundary-inclusive form of
+`tasaki23_signed_single_site_raising_component_neg_of_A_true`. -/
+theorem tasaki23_signed_single_site_raising_component_nonpos_of_A_true
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N (M + 1) → ℂ)
+    (τ : magConfigS V N M) (x : V)
+    (hAx : A x = true)
+    (hΦ_pos : ∀ σ : magConfigS V N (M + 1),
+      0 < (marshallSignS A σ.1).re * (Φ σ).re) :
+    (marshallSignS A τ.1).re *
+        ((((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ.1).re) ≤ 0 := by
+  by_cases hx : (τ.1 x).val < N
+  · exact le_of_lt
+      (tasaki23_signed_single_site_raising_component_neg_of_A_true
+        A Φ τ x hx hAx hΦ_pos)
+  · have htop : (τ.1 x).val = N := by
+      have hle : (τ.1 x).val ≤ N := by
+        have := (τ.1 x).isLt
+        omega
+      omega
+    rw [onSiteS_spinSOpPlus_mulVec_magSectorEmbedding_apply_eq_zero_of_target_top
+      Φ τ x htop]
+    simp
+
+/-- **Tasaki §2.5 Theorem 2.3 off-`A` raised sign-sum bound**:
+the filtered sum of signed single-site raising contributions over
+sites outside `A` is non-negative.
+
+This is the finite-sum form of
+`tasaki23_signed_single_site_raising_component_nonneg_of_A_false`. -/
+theorem tasaki23_signed_raising_offA_sum_nonneg
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N (M + 1) → ℂ)
+    (τ : magConfigS V N M)
+    (hΦ_pos : ∀ σ : magConfigS V N (M + 1),
+      0 < (marshallSignS A σ.1).re * (Φ σ).re) :
+    0 ≤ ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+      (marshallSignS A τ.1).re *
+        ((((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ.1).re) := by
+  apply Finset.sum_nonneg
+  intro x hx
+  have hAx : A x = false := by
+    simpa using (Finset.mem_filter.mp hx).2
+  exact tasaki23_signed_single_site_raising_component_nonneg_of_A_false
+    A Φ τ x hAx hΦ_pos
+
+/-- **Tasaki §2.5 Theorem 2.3 on-`A` raised sign-sum bound**:
+the filtered sum of signed single-site raising contributions over
+sites inside `A` is non-positive.
+
+This is the finite-sum form of
+`tasaki23_signed_single_site_raising_component_nonpos_of_A_true`. -/
+theorem tasaki23_signed_raising_onA_sum_nonpos
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N (M + 1) → ℂ)
+    (τ : magConfigS V N M)
+    (hΦ_pos : ∀ σ : magConfigS V N (M + 1),
+      0 < (marshallSignS A σ.1).re * (Φ σ).re) :
+    (∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+      (marshallSignS A τ.1).re *
+        ((((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ.1).re)) ≤ 0 := by
+  apply Finset.sum_nonpos
+  intro x hx
+  have hAx : A x = true := by
+    simpa using (Finset.mem_filter.mp hx).2
+  exact tasaki23_signed_single_site_raising_component_nonpos_of_A_true
+    A Φ τ x hAx hΦ_pos
+
+/-- **Tasaki §2.5 Theorem 2.3 signed local raising contribution**:
+the real signed contribution of the `x`-summand in the raised
+site-sum at a target predecessor-sector configuration.
+
+This packages the repeated real expression used to split the raised
+site-sum into its off-`A` and on-`A` filtered pieces. -/
+noncomputable def tasaki23SignedRaisingSiteContribution
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N (M + 1) → ℂ)
+    (τ : magConfigS V N M) (x : V) : ℝ :=
+  (marshallSignS A τ.1).re *
+    ((((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+      (magSectorEmbedding Φ)) τ.1).re)
+
+/-- **Tasaki §2.5 Theorem 2.3 raised site-sum decomposition**:
+the full signed raised site-sum is the sum of its off-`A` and on-`A`
+filtered signed pieces.
+
+This is the exact Boolean partition needed before comparing the
+non-negative off-`A` part with the non-positive on-`A` part. -/
+theorem tasaki23_signed_raising_site_sum_eq_offA_add_onA
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N (M + 1) → ℂ)
+    (τ : magConfigS V N M) :
+    (marshallSignS A τ.1).re *
+        (∑ x : V,
+          (((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+            (magSectorEmbedding Φ)) τ.1).re) =
+      (∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+        tasaki23SignedRaisingSiteContribution A Φ τ x) +
+      (∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+        tasaki23SignedRaisingSiteContribution A Φ τ x) := by
+  classical
+  unfold tasaki23SignedRaisingSiteContribution
+  rw [Finset.mul_sum]
+  rw [← Finset.sum_filter_add_sum_filter_not
+    (s := Finset.univ) (p := fun x : V => A x = false)
+    (f := fun x : V =>
+      (marshallSignS A τ.1).re *
+        ((((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ.1).re))]
+  congr 1
+  apply Finset.sum_congr
+  · ext x
+    by_cases hAx : A x = false
+    · simp [hAx]
+    · cases hA : A x <;> simp [hA] at hAx ⊢
+  · intro x _hx
+    rfl
+
+/-- **Tasaki §2.5 Theorem 2.3 raised site-sum positivity from
+sublattice dominance**: if the negative of the on-`A` signed sum is
+strictly smaller than the off-`A` signed sum, then the full signed
+raised site-sum is strictly positive.
+
+This is the raising-direction companion to
+`tasaki23_signed_lowering_site_sum_pos_of_onA_neg_lt_offA`. -/
+theorem tasaki23_signed_raising_site_sum_pos_of_onA_neg_lt_offA
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N (M + 1) → ℂ)
+    (τ : magConfigS V N M)
+    (hdominates :
+      -(∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+          tasaki23SignedRaisingSiteContribution A Φ τ x) <
+        ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+          tasaki23SignedRaisingSiteContribution A Φ τ x) :
+    0 < (marshallSignS A τ.1).re *
+      (∑ x : V,
+        (((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ.1).re) := by
+  rw [tasaki23_signed_raising_site_sum_eq_offA_add_onA A Φ τ]
+  linarith
+
 /-- **Tasaki §2.5 Theorem 2.3 lowered-vector Marshall positivity from
 site-sum positivity**: to prove the Marshall positivity required by the
 adjacent-sector comparison, it suffices to prove the corresponding
@@ -991,6 +1163,29 @@ theorem tasaki23_raised_marshall_pos_of_site_sum_pos
   intro τ
   rw [totalSpinSOpPlus_mulVec_magSectorEmbedding_apply_eq_site_sum Φ τ.1]
   simpa [map_sum] using hraised_site_sum_pos τ
+
+/-- **Tasaki §2.5 Theorem 2.3 raised-vector Marshall positivity from
+sublattice dominance**: a pointwise dominance of the off-`A` signed
+raised sum over the negative on-`A` signed sum implies the
+Marshall-positive raised-vector hypothesis.
+
+This feeds the raising-direction dominance bridge into
+`tasaki23_raised_marshall_pos_of_site_sum_pos`. -/
+theorem tasaki23_raised_marshall_pos_of_onA_neg_lt_offA
+    (A : V → Bool) {M : ℕ} (Φ : magConfigS V N (M + 1) → ℂ)
+    (hdominates :
+      ∀ τ : magConfigS V N M,
+        -(∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+            tasaki23SignedRaisingSiteContribution A Φ τ x) <
+          ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+            tasaki23SignedRaisingSiteContribution A Φ τ x) :
+    ∀ τ : magConfigS V N M,
+      0 < (marshallSignS A τ.1).re *
+        (((totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ)) τ.1).re := by
+  exact tasaki23_raised_marshall_pos_of_site_sum_pos A Φ
+    (fun τ =>
+      tasaki23_signed_raising_site_sum_pos_of_onA_neg_lt_offA
+        A Φ τ (hdominates τ))
 
 /-- **Tasaki §2.5 Theorem 2.3 adjacent-sector energy step, lowering
 direction**: if a source-sector eigenvector is embedded from
@@ -2804,6 +2999,77 @@ theorem tasaki23_successor_sector_common_energy_of_onA_neg_lt_offA
     hc_strict h_intermediate hM hMlt hμ_lt hv_pos hΦ
     (fun τ =>
       tasaki23_signed_lowering_site_sum_pos_of_onA_neg_lt_offA
+        A (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+        τ (hdominates τ))
+
+/-- **Tasaki §2.5 Theorem 2.3 adjacent common-energy predecessor step from
+raised dominance**: inside the admissible sector interval, the pointwise
+dominance of the off-`A` raised signed sum over the negative on-`A`
+signed sum supplies the strict site-sum positivity input and hence
+produces the predecessor-sector common-energy conclusion.
+
+This is the raising-direction dominance-form wrapper around
+`tasaki23_predecessor_sector_common_energy_of_site_sum_pos`. The
+substantive remaining proof obligation is the dominance hypothesis
+itself. -/
+theorem tasaki23_predecessor_sector_common_energy_of_onA_neg_lt_offA
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hM : M + 1 ∈ tasaki23GroundStateSectors (V := V) A N)
+    (hMlt :
+      min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N <
+          M + 1)
+    {μ : ℝ} {v : magConfigS V N (M + 1) → ℝ}
+    (hμ_lt : μ < c)
+    (hv_pos : ∀ τ, 0 < v τ)
+    (hΦ : (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+      (μ : ℂ) • magSectorEmbedding
+        (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (hdominates :
+      ∀ τ : magConfigS V N M,
+        -(∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+            tasaki23SignedRaisingSiteContribution A
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) τ x) <
+          ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+            tasaki23SignedRaisingSiteContribution A
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) τ x) :
+    M ∈ tasaki23GroundStateSectors (V := V) A N ∧
+    μ < c ∧ (∀ τ, 0 < v τ) ∧
+    (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+      (μ : ℂ) • magSectorEmbedding
+        (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+    (totalSpinSOpPlus V N).mulVec
+        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ≠ 0 ∧
+    ∃ v_pred : magConfigS V N M → ℝ,
+      μ < c ∧ (∀ τ, 0 < v_pred τ) ∧
+      (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v_pred τ : ℝ) : ℂ))) =
+        (μ : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v_pred τ : ℝ) : ℂ)) ∧
+      ∃ r : ℝ, 0 < r ∧
+        ∀ τ : magConfigS V N M,
+          (((totalSpinSOpPlus V N).mulVec
+            (magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re =
+            r * ((marshallSignS A τ.1).re * v_pred τ) := by
+  exact tasaki23_predecessor_sector_common_energy_of_site_sum_pos
+    A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+    hc_strict h_intermediate hM hMlt hμ_lt hv_pos hΦ
+    (fun τ =>
+      tasaki23_signed_raising_site_sum_pos_of_onA_neg_lt_offA
         A (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
         τ (hdominates τ))
 
