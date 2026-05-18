@@ -8255,6 +8255,38 @@ multiplet.  The remaining substantive input is still the proof of the
 strict site-sum positivity hypothesis for the actual sector ground
 states.
 
+\textbf{Predicted-Casimir ladder preservation}: the predicted
+total-Casimir eigenspace is now packaged as stable under one
+application of the total ladder operators.  The Lean theorems
+\[
+\begin{gathered}
+\texttt{tasaki23\_totalSpinSOpMinus\_preserves\_predictedCasimirValue},\\
+\texttt{tasaki23\_totalSpinSOpPlus\_preserves\_predictedCasimirValue}
+\end{gathered}
+\]
+state that if a full spin-\(S\) vector \(\Psi\) satisfies
+\[
+  \hat S_{\mathrm{tot}}^2 \Psi
+    =
+  C_{\mathrm{pred}}\Psi,
+\]
+then \(\hat S^-_{\mathrm{tot}}\Psi\) and
+\(\hat S^+_{\mathrm{tot}}\Psi\) satisfy the same total-Casimir
+eigenvalue equation.  The proof is the standard SU(2) Casimir
+commutation relation
+\[
+  [\hat S_{\mathrm{tot}}^2,\hat S^\pm_{\mathrm{tot}}]=0,
+\]
+formalised as
+\texttt{totalSpinSSquared\_commute\_totalSpinSOpMinus} and
+\texttt{totalSpinSSquared\_commute\_totalSpinSOpPlus}.  These
+wrappers let the final Theorem~2.3 sector chain propagate the
+predicted-Casimir hypothesis along adjacent ladder moves, while the
+initial predicted-Casimir input and the local site-sum positivity
+remain separate proof obligations.  Reference: H.~Tasaki,
+\emph{Physics and Mathematics of Quantum Many-Body Systems}, Springer
+2020, \S2.5 Theorem 2.3, p.~42.
+
 \textbf{Predicted-Casimir adjacent common-energy wrappers}: the
 Casimir endpoint mismatch is now connected directly to the one-step
 sector chain.  The Lean theorems

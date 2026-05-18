@@ -1828,6 +1828,49 @@ theorem tasaki23_predictedCasimirValue_ne_raising_kernel_value_of_mem_of_left_lt
   rw [hM1] at hlt
   nlinarith
 
+/-- **Tasaki §2.5 Theorem 2.3 predicted-Casimir preservation under
+lowering**: if a full spin-`S` vector has the Theorem 2.3 predicted
+total-Casimir eigenvalue, then its image under `Ŝ^-_tot` has the same
+total-Casimir eigenvalue.
+
+This is the one-step Casimir stability needed when the admissible-sector
+chain propagates Theorem 2.3 ground states by the total lowering
+operator. -/
+theorem tasaki23_totalSpinSOpMinus_preserves_predictedCasimirValue
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ_cas :
+      (totalSpinSSquared V N).mulVec Ψ =
+        (tasaki23PredictedCasimirValue (V := V) A N : ℂ) • Ψ) :
+    (totalSpinSSquared V N).mulVec ((totalSpinSOpMinus V N).mulVec Ψ) =
+      (tasaki23PredictedCasimirValue (V := V) A N : ℂ) •
+        (totalSpinSOpMinus V N).mulVec Ψ := by
+  have hcomm : totalSpinSSquared V N * totalSpinSOpMinus V N =
+      totalSpinSOpMinus V N * totalSpinSSquared V N :=
+    (totalSpinSSquared_commute_totalSpinSOpMinus (V := V) (N := N)).eq
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hΨ_cas, Matrix.mulVec_smul]
+
+/-- **Tasaki §2.5 Theorem 2.3 predicted-Casimir preservation under
+raising**: if a full spin-`S` vector has the Theorem 2.3 predicted
+total-Casimir eigenvalue, then its image under `Ŝ^+_tot` has the same
+total-Casimir eigenvalue.
+
+This is the raising-direction companion to
+`tasaki23_totalSpinSOpMinus_preserves_predictedCasimirValue`, used when
+the admissible-sector chain is traversed toward smaller `magSumS`
+sectors. -/
+theorem tasaki23_totalSpinSOpPlus_preserves_predictedCasimirValue
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ_cas :
+      (totalSpinSSquared V N).mulVec Ψ =
+        (tasaki23PredictedCasimirValue (V := V) A N : ℂ) • Ψ) :
+    (totalSpinSSquared V N).mulVec ((totalSpinSOpPlus V N).mulVec Ψ) =
+      (tasaki23PredictedCasimirValue (V := V) A N : ℂ) •
+        (totalSpinSOpPlus V N).mulVec Ψ := by
+  have hcomm : totalSpinSSquared V N * totalSpinSOpPlus V N =
+      totalSpinSOpPlus V N * totalSpinSSquared V N :=
+    (totalSpinSSquared_commute_totalSpinSOpPlus (V := V) (N := N)).eq
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hΨ_cas, Matrix.mulVec_smul]
+
 /-- **Tasaki §2.5 Theorem 2.3 adjacent common-energy successor step**:
 inside the admissible sector interval, a source-sector
 Marshall-positive eigenvector in sector `M`, together with the lowered
