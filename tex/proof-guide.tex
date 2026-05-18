@@ -7862,6 +7862,35 @@ allows the same comparison to be invoked from the local hypothesis
 obtained by expanding \(\hat S^+_{\rm tot}\) as
 \(\sum_x \hat S^+_x\).
 
+\textbf{Adjacent common-energy successor link}: the interval
+combinatorics and the lowered site-sum comparison are now packaged in
+the Lean theorem
+\[
+\texttt{tasaki23\_successor\_sector\_common\_energy\_of\_site\_sum\_pos}.
+\]
+If \(M\) belongs to the admissible interval
+\[
+  [\min(|A|,|B|)N,\ \max(|A|,|B|)N]
+\]
+and is not its right endpoint, then
+\[
+  M+1 \in
+  [\min(|A|,|B|)N,\ \max(|A|,|B|)N]
+\]
+by \texttt{tasaki23GroundStateSectors\_succ\_mem\_of\_mem\_of\_lt\_right}.
+Given a Marshall-positive source-sector eigenvector
+\[
+  \Psi_M(\tau)=\operatorname{sgn}_A(\tau)v_M(\tau), \qquad v_M(\tau)>0,
+\]
+with eigenvalue \(\mu<c\), and the strict site-sum positivity hypothesis
+for \(\hat S^-_{\rm tot}\Psi_M\) in sector \(M+1\), the theorem returns
+non-vanishing of the lowered vector and a Marshall-positive vector in
+sector \(M+1\) at the same eigenvalue \(\mu\).  This is the one-step
+successor link needed to iterate Theorem~2.2 across the Theorem~2.3
+multiplet.  The remaining substantive input is still the proof of the
+strict site-sum positivity hypothesis for the actual sector ground
+states.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
