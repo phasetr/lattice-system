@@ -8572,6 +8572,35 @@ dominance wrappers above.  Thus the remaining source-sector inputs are
 membership in the predicted toy ground-state subspace and the same
 explicit lowered or raised dominance inequality.
 
+\textbf{Predicted-GS energy interval chain}: the canonical-orientation
+lowering chain has now been assembled over the whole admissible
+magnetization interval.  The Lean theorem
+\[
+\texttt{tasaki23\_energy\_interval\_chain\_of\_left\_endpoint}\\
+\texttt{\_predictedGS\_of\_onA\_neg\_lt\_offA}
+\]
+starts at the left endpoint
+\[
+  L=\min(|A|,|\neg A|)\,N
+\]
+using the per-sector Theorem~2.2 existence wrapper, obtaining a
+Marshall-positive eigenvector with energy \(\mu\).  For each
+successor step \(M\mapsto M+1\) with \(M<R\), where
+\[
+  R=\max(|A|,|\neg A|)\,N,
+\]
+it invokes the predicted-GS lowered dominance common-energy wrapper.
+Induction by \texttt{Nat.le\_induction} therefore yields, for every
+\(M\in[L,R]\), a Marshall-positive sector vector with the same energy
+\(\mu\).
+
+This is still a conditional chain, not the final Theorem~2.3 proof:
+for each currently chosen sector vector it assumes exactly the two
+remaining source-sector callbacks, namely membership in
+\(\texttt{bipartiteToyGroundStateSubspacePredicted}\) and the lowered
+off-\(A\) dominance estimate.  The purpose is to separate the discrete
+interval propagation from those remaining analytic inputs.
+
 \textbf{Predicted-GS total-Casimir bridge}: the total-Casimir component
 of the predicted toy ground-state subspace has now been put into the
 same notation as the adjacent-sector chain.  In the canonical
