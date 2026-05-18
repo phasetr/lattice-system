@@ -1916,6 +1916,54 @@ theorem tasaki23_totalSpinSOpPlus_mulVec_mem_bipartiteToyGroundStateSubspacePred
     bipartiteToyGroundStateSubspacePredicted_totalSpinSOpPlus_invariant
       (Λ := V) A N ⟨Ψ, hΨ, by simp⟩
 
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS lowered Casimir bridge**:
+in the canonical orientation, a vector in the predicted toy ground-state
+subspace has a total-lowering image with the Theorem 2.3 predicted
+total-Casimir eigenvalue.
+
+This combines predicted-GS lowering closure with the predicted-GS
+total-Casimir bridge, so no separate Casimir hypothesis is needed for
+the lowered ladder image. -/
+theorem tasaki23_lowered_predictedCasimirValue_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (totalSpinSSquared V N).mulVec ((totalSpinSOpMinus V N).mulVec Ψ) =
+      (tasaki23PredictedCasimirValue (V := V) A N : ℂ) •
+        ((totalSpinSOpMinus V N).mulVec Ψ) := by
+  exact
+    tasaki23_totalSpinSSquared_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+      (V := V) A N hBA
+      (tasaki23_totalSpinSOpMinus_mulVec_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΨ)
+
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS raised Casimir bridge**:
+in the canonical orientation, a vector in the predicted toy ground-state
+subspace has a total-raising image with the Theorem 2.3 predicted
+total-Casimir eigenvalue.
+
+This is the raising-direction companion to
+`tasaki23_lowered_predictedCasimirValue_of_mem_bipartiteToyGroundStateSubspacePredicted`.
+-/
+theorem tasaki23_raised_predictedCasimirValue_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (totalSpinSSquared V N).mulVec ((totalSpinSOpPlus V N).mulVec Ψ) =
+      (tasaki23PredictedCasimirValue (V := V) A N : ℂ) •
+        ((totalSpinSOpPlus V N).mulVec Ψ) := by
+  exact
+    tasaki23_totalSpinSSquared_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+      (V := V) A N hBA
+      (tasaki23_totalSpinSOpPlus_mulVec_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΨ)
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-Casimir preservation under
 lowering**: if a full spin-`S` vector has the Theorem 2.3 predicted
 total-Casimir eigenvalue, then its image under `Ŝ^-_tot` has the same
