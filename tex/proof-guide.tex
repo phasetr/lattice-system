@@ -8031,9 +8031,17 @@ records the strict off-\(A\) witness form
 \]
 It uses \texttt{Finset.sum\_pos'}: every off-\(A\) term is
 non-negative, and any site \(x\notin A\) with \(\tau_x>0\) supplies a
-strictly positive summand.  These bounds decompose the remaining strict
-site-sum positivity problem into the non-negative off-\(A\) part and
-the non-positive on-\(A\) part, without yet proving that the former
+strictly positive summand.  The aggregate version
+\[
+\begin{gathered}
+\texttt{tasaki23\_exists\_lowerable\_offA\_of\_offA\_occupation\_pos},\\
+\texttt{tasaki23\_signed\_lowering\_offA\_sum\_pos\_of\_offA\_occupation\_pos}
+\end{gathered}
+\]
+extracts this witness from a positive off-\(A\) occupation sum.  These
+bounds decompose the remaining strict site-sum positivity problem into
+the non-negative off-\(A\) part and the non-positive on-\(A\) part,
+without yet proving that the former
 dominates the latter.
 
 \textbf{Lowered site-sum dominance bridge}: Lean now names the signed
@@ -8261,6 +8269,15 @@ The strict off-\(A\) witness companion is
 If \(x\notin A\) and \(\tau_x<N\), the strict single-site raising
 positivity theorem supplies one positive summand, while all other
 off-\(A\) summands remain non-negative.
+The aggregate vacancy form is
+\[
+\begin{gathered}
+\texttt{tasaki23\_exists\_raiseable\_offA\_of\_offA\_vacancy\_pos},\\
+\texttt{tasaki23\_signed\_raising\_offA\_sum\_pos\_of\_offA\_vacancy\_pos}.
+\end{gathered}
+\]
+It extracts a raiseable witness from a positive off-\(A\) vacancy sum
+\(\sum_{x\notin A}(N-\tau_x)>0\).
 Lean names the local raised contribution as
 \texttt{tasaki23SignedRaisingSiteContribution} and decomposes the full
 signed site-sum as
