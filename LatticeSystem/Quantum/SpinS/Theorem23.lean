@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.AllAlignedStateMagShift
 import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
+import LatticeSystem.Quantum.SpinS.MarshallSign
 import LatticeSystem.Quantum.SpinS.NeelBipartiteWeight
 
 /-!
@@ -259,6 +260,164 @@ theorem onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_single_site_pred
     · rw [onSiteS_apply_eq_zero_of_off_site_diff x _ hoff, zero_mul]
   · intro hnot_mem
     exact False.elim (hnot_mem (Finset.mem_univ _))
+
+/-- **Tasaki §2.5 Theorem 2.3 single-site lowering real part**:
+at a target configuration with positive local value, the real part of
+the single-site lowering summand is the product of the positive
+lowering matrix coefficient and the real part of the predecessor
+coefficient.
+
+This is the real-valued form of
+`onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_single_site_pred`,
+using that every `Ŝ^-` matrix entry is real. -/
+theorem onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_single_site_pred_re
+    {M : ℕ} (Φ : magConfigS V N M → ℂ) (τ : magConfigS V N (M + 1))
+    (x : V) (hx : 0 < (τ.1 x).val) :
+    let predVal : Fin (N + 1) :=
+      ⟨(τ.1 x).val - 1, by omega⟩
+    let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+    ((((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+      (magSectorEmbedding Φ)) τ.1).re) =
+        (spinSOpMinus N (τ.1 x) predVal).re *
+          (Φ ⟨pred, magSumS_single_site_lowering_predecessor τ x hx⟩).re := by
+  classical
+  dsimp only
+  rw [onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_single_site_pred
+    Φ τ x hx]
+  rw [Complex.mul_re, spinSOpMinus_apply_im_zero]
+  ring
+
+/-- **Tasaki §2.5 Theorem 2.3 off-`A` single-site positivity**:
+if the lowered site lies outside `A`, then the signed real part of its
+single-site lowering contribution is strictly positive whenever the
+source-sector vector is Marshall-positive.
+
+This combines the predecessor component formula with the off-`A`
+Marshall sign preservation under a one-step lowering. -/
+theorem tasaki23_signed_single_site_lowering_component_pos_of_A_false
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1)) (x : V)
+    (hx : 0 < (τ.1 x).val) (hAx : A x = false)
+    (hΦ_pos : ∀ σ : magConfigS V N M,
+      0 < (marshallSignS A σ.1).re * (Φ σ).re) :
+    0 < (marshallSignS A τ.1).re *
+      ((((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+        (magSectorEmbedding Φ)) τ.1).re) := by
+  classical
+  let predVal : Fin (N + 1) := ⟨(τ.1 x).val - 1, by omega⟩
+  let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+  have hpredM : magSumS pred = M :=
+    magSumS_single_site_lowering_predecessor τ x hx
+  have hcomponent :
+      ((((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+        (magSectorEmbedding Φ)) τ.1).re) =
+          (spinSOpMinus N (τ.1 x) predVal).re *
+            (Φ ⟨pred, hpredM⟩).re := by
+    simpa [predVal, pred, hpredM]
+      using
+        onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_single_site_pred_re
+          Φ τ x hx
+  have hcoef_lower : predVal.val + 1 = (τ.1 x).val := by
+    dsimp [predVal]
+    omega
+  have hcoef_pos : 0 < (spinSOpMinus N (τ.1 x) predVal).re :=
+    spinSOpMinus_apply_re_pos_of_lower N hcoef_lower
+  have hoff : ∀ k, k ≠ x → τ.1 k = pred k := by
+    intro k hk
+    dsimp [pred]
+    rw [Function.update_of_ne hk]
+  have hsign_lower : (pred x).val + 1 = (τ.1 x).val := by
+    dsimp [pred, predVal]
+    simp
+    omega
+  have hsign :
+      (marshallSignS A τ.1).re * (marshallSignS A pred).re = 1 :=
+    marshallSignS_re_mul_re_of_agree_off_site_A_false_lower
+      A hAx hoff hsign_lower
+  have hsq : (marshallSignS A pred).re * (marshallSignS A pred).re = 1 :=
+    marshallSignS_re_sq A pred
+  have hsrc :
+      0 < (marshallSignS A pred).re * (Φ ⟨pred, hpredM⟩).re :=
+    hΦ_pos ⟨pred, hpredM⟩
+  have htarget_src :
+      0 < (marshallSignS A τ.1).re * (Φ ⟨pred, hpredM⟩).re := by
+    nlinarith [hsign, hsq, hsrc]
+  rw [hcomponent]
+  have hrearrange :
+      (marshallSignS A τ.1).re *
+          ((spinSOpMinus N (τ.1 x) predVal).re *
+            (Φ ⟨pred, hpredM⟩).re) =
+        (spinSOpMinus N (τ.1 x) predVal).re *
+          ((marshallSignS A τ.1).re * (Φ ⟨pred, hpredM⟩).re) := by
+    ring
+  rw [hrearrange]
+  exact mul_pos hcoef_pos htarget_src
+
+/-- **Tasaki §2.5 Theorem 2.3 on-`A` single-site negativity**:
+if the lowered site lies in `A`, then the signed real part of its
+single-site lowering contribution is strictly negative whenever the
+source-sector vector is Marshall-positive.
+
+The sign reversal is the complementary local case to
+`tasaki23_signed_single_site_lowering_component_pos_of_A_false`. -/
+theorem tasaki23_signed_single_site_lowering_component_neg_of_A_true
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1)) (x : V)
+    (hx : 0 < (τ.1 x).val) (hAx : A x = true)
+    (hΦ_pos : ∀ σ : magConfigS V N M,
+      0 < (marshallSignS A σ.1).re * (Φ σ).re) :
+    (marshallSignS A τ.1).re *
+        ((((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ.1).re) < 0 := by
+  classical
+  let predVal : Fin (N + 1) := ⟨(τ.1 x).val - 1, by omega⟩
+  let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+  have hpredM : magSumS pred = M :=
+    magSumS_single_site_lowering_predecessor τ x hx
+  have hcomponent :
+      ((((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+        (magSectorEmbedding Φ)) τ.1).re) =
+          (spinSOpMinus N (τ.1 x) predVal).re *
+            (Φ ⟨pred, hpredM⟩).re := by
+    simpa [predVal, pred, hpredM]
+      using
+        onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_single_site_pred_re
+          Φ τ x hx
+  have hcoef_lower : predVal.val + 1 = (τ.1 x).val := by
+    dsimp [predVal]
+    omega
+  have hcoef_pos : 0 < (spinSOpMinus N (τ.1 x) predVal).re :=
+    spinSOpMinus_apply_re_pos_of_lower N hcoef_lower
+  have hoff : ∀ k, k ≠ x → τ.1 k = pred k := by
+    intro k hk
+    dsimp [pred]
+    rw [Function.update_of_ne hk]
+  have hsign_lower : (pred x).val + 1 = (τ.1 x).val := by
+    dsimp [pred, predVal]
+    simp
+    omega
+  have hsign :
+      (marshallSignS A τ.1).re * (marshallSignS A pred).re = -1 :=
+    marshallSignS_re_mul_re_of_agree_off_site_A_true_lower
+      A hAx hoff hsign_lower
+  have hsq : (marshallSignS A pred).re * (marshallSignS A pred).re = 1 :=
+    marshallSignS_re_sq A pred
+  have hsrc :
+      0 < (marshallSignS A pred).re * (Φ ⟨pred, hpredM⟩).re :=
+    hΦ_pos ⟨pred, hpredM⟩
+  have htarget_src :
+      (marshallSignS A τ.1).re * (Φ ⟨pred, hpredM⟩).re < 0 := by
+    nlinarith [hsign, hsq, hsrc]
+  rw [hcomponent]
+  have hrearrange :
+      (marshallSignS A τ.1).re *
+          ((spinSOpMinus N (τ.1 x) predVal).re *
+            (Φ ⟨pred, hpredM⟩).re) =
+        (spinSOpMinus N (τ.1 x) predVal).re *
+          ((marshallSignS A τ.1).re * (Φ ⟨pred, hpredM⟩).re) := by
+    ring
+  rw [hrearrange]
+  exact mul_neg_of_pos_of_neg hcoef_pos htarget_src
 
 /-- **Tasaki §2.5 Theorem 2.3 lowered-vector Marshall positivity from
 site-sum positivity**: to prove the Marshall positivity required by the
