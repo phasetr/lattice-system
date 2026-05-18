@@ -147,6 +147,119 @@ theorem totalSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_site_sum {M : ℕ}
   rw [totalSpinSOpMinus_def, Matrix.sum_mulVec]
   simp [Finset.sum_apply]
 
+/-- **Tasaki §2.5 Theorem 2.3 single-site lowering predecessor**:
+if a target configuration `τ` in sector `M + 1` has positive local
+value at `x`, lowering that local value by one gives a configuration
+in sector `M`.
+
+This is the magnetization bookkeeping behind the local component
+formula for a single summand in `Ŝ^-_tot`. -/
+private theorem magSumS_single_site_lowering_predecessor {M : ℕ}
+    (τ : magConfigS V N (M + 1)) (x : V) (hx : 0 < (τ.1 x).val) :
+    magSumS
+        (Function.update τ.1 x
+          ⟨(τ.1 x).val - 1, by omega⟩) = M := by
+  classical
+  have hsum_succ :
+      magSumS
+          (Function.update τ.1 x
+            ⟨(τ.1 x).val - 1, by omega⟩) + 1 = magSumS τ.1 := by
+    unfold magSumS
+    rw [Finset.sum_eq_add_sum_diff_singleton_of_mem (Finset.mem_univ x)]
+    rw [Finset.sum_eq_add_sum_diff_singleton_of_mem (Finset.mem_univ x)]
+    simp only [Function.update_self]
+    have hrest :
+        (∑ y ∈ (Finset.univ : Finset V) \ {x},
+            (Function.update τ.1 x
+              ⟨(τ.1 x).val - 1, by omega⟩ y).val) =
+          ∑ y ∈ (Finset.univ : Finset V) \ {x}, (τ.1 y).val := by
+      apply Finset.sum_congr rfl
+      intro y hy
+      have hyx : y ≠ x := by
+        simpa using hy
+      rw [Function.update_of_ne hyx]
+    rw [hrest]
+    have hpred_val :
+        (⟨(τ.1 x).val - 1, by
+          omega⟩ : Fin (N + 1)).val + 1 = (τ.1 x).val := by
+      simp
+      omega
+    omega
+  have hτ : magSumS τ.1 = M + 1 := τ.2
+  omega
+
+/-- **Tasaki §2.5 Theorem 2.3 zero local lowering component**:
+if the target configuration already has local value `0` at `x`, the
+single-site lowering summand at `x` contributes zero to that target
+component.
+
+This is the boundary case for the local predecessor analysis of the
+`Ŝ^-_tot` site-sum expansion. -/
+theorem onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_eq_zero_of_target_zero
+    {M : ℕ} (Φ : magConfigS V N M → ℂ) (τ : magConfigS V N (M + 1))
+    (x : V) (hx : (τ.1 x).val = 0) :
+    (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+      (magSectorEmbedding Φ)) τ.1) = 0 := by
+  classical
+  rw [Matrix.mulVec, dotProduct]
+  apply Finset.sum_eq_zero
+  intro σ _hσ
+  by_cases hoff : ∀ k, k ≠ x → τ.1 k = σ k
+  · rw [onSiteS_apply_of_off_site_agree x _ hoff]
+    have hnot_lower : (σ x).val + 1 ≠ (τ.1 x).val := by omega
+    rw [spinSOpMinus_apply_other N hnot_lower, zero_mul]
+  · rw [onSiteS_apply_eq_zero_of_off_site_diff x _ hoff, zero_mul]
+
+/-- **Tasaki §2.5 Theorem 2.3 single-site lowering component**:
+if a target sector configuration `τ` has positive local value at `x`,
+then the `x`-summand of `Ŝ^-_tot` at `τ` is exactly the lowering matrix
+coefficient times the source-sector coefficient at the unique
+predecessor configuration obtained by decreasing `τ x` by one.
+
+This is the local component formula needed before applying the
+single-site Marshall predecessor sign lemmas in the adjacent-sector
+positivity argument. -/
+theorem onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_single_site_pred
+    {M : ℕ} (Φ : magConfigS V N M → ℂ) (τ : magConfigS V N (M + 1))
+    (x : V) (hx : 0 < (τ.1 x).val) :
+    let predVal : Fin (N + 1) :=
+      ⟨(τ.1 x).val - 1, by omega⟩
+    let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+    (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+      (magSectorEmbedding Φ)) τ.1) =
+        spinSOpMinus N (τ.1 x) predVal *
+          Φ ⟨pred, magSumS_single_site_lowering_predecessor τ x hx⟩ := by
+  classical
+  dsimp only
+  rw [Matrix.mulVec, dotProduct]
+  rw [Finset.sum_eq_single
+    (Function.update τ.1 x
+      ⟨(τ.1 x).val - 1, by omega⟩)]
+  · rw [onSiteS_apply_of_off_site_agree]
+    · rw [magSectorEmbedding_apply_of_mem Φ
+        (magSumS_single_site_lowering_predecessor τ x hx)]
+      simp
+    · intro y hy
+      rw [Function.update_of_ne hy]
+  · intro σ _hσ hσ_ne
+    by_cases hoff : ∀ k, k ≠ x → τ.1 k = σ k
+    · rw [onSiteS_apply_of_off_site_agree x _ hoff]
+      have hnot_lower : (σ x).val + 1 ≠ (τ.1 x).val := by
+        intro h_lower
+        apply hσ_ne
+        funext y
+        by_cases hy : y = x
+        · subst y
+          apply Fin.ext
+          simp
+          omega
+        · rw [Function.update_of_ne hy]
+          exact (hoff y hy).symm
+      rw [spinSOpMinus_apply_other N hnot_lower, zero_mul]
+    · rw [onSiteS_apply_eq_zero_of_off_site_diff x _ hoff, zero_mul]
+  · intro hnot_mem
+    exact False.elim (hnot_mem (Finset.mem_univ _))
+
 /-- **Tasaki §2.5 Theorem 2.3 lowered-vector Marshall positivity from
 site-sum positivity**: to prove the Marshall positivity required by the
 adjacent-sector comparison, it suffices to prove the corresponding
