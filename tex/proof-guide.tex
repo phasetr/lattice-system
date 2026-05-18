@@ -8498,6 +8498,32 @@ hypothesis and the local site-sum positivity input; their role is to
 remove the now-solved endpoint mismatch from the final Theorem~2.3
 chain assembly.
 
+\textbf{Predicted-Casimir dominance common-energy wrappers}: the
+local site-sum positivity input in the preceding wrappers can now be
+supplied directly from the lowered or raised dominance hypotheses.  The
+Lean theorems
+\[
+\begin{gathered}
+\texttt{tasaki23\_successor\_sector\_common\_energy}\\
+\texttt{\_of\_onA\_neg\_lt\_offA\_of\_predictedCasimirValue},\\
+\texttt{tasaki23\_predecessor\_sector\_common\_energy}\\
+\texttt{\_of\_onA\_neg\_lt\_offA\_of\_predictedCasimirValue}
+\end{gathered}
+\]
+combine the predicted-Casimir common-energy wrappers with
+\(\texttt{tasaki23\_signed\_\{lowering,raising\}\_site\_sum\_pos\_of\_onA\_neg\_lt\_offA}\).
+For a source sector vector already known to have total-Casimir
+eigenvalue \(C_{\mathrm{pred}}\), the remaining positivity input is
+therefore the pointwise comparison
+\[
+  -\sum_{x\in A} L_x(\tau) < \sum_{x\notin A} L_x(\tau)
+  \quad\text{or}\quad
+  -\sum_{x\in A} R_x(\tau) < \sum_{x\notin A} R_x(\tau).
+\]
+The wrappers do not prove those dominance inequalities; they keep the
+final chain API in the form needed once the dominance estimate is
+available.
+
 \textbf{Predicted-GS total-Casimir bridge}: the total-Casimir component
 of the predicted toy ground-state subspace has now been put into the
 same notation as the adjacent-sector chain.  In the canonical
