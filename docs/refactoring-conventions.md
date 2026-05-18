@@ -337,6 +337,19 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-19 (PR #3381)**: Refactor checkpoint after the 20
+  post-#3360 Tasaki §2.5 Theorem 2.3 feature PRs. Build-speed
+  evaluation for the active module:
+  `lake env lean LatticeSystem/Quantum/SpinS/Theorem23.lean`
+  completed in `real 18.40s` (`user 19.60s`, `sys 4.23s`);
+  cached `lake build LatticeSystem.Quantum.SpinS.Theorem23`
+  completed in `real 3.60s` (`user 1.70s`, `sys 2.40s`). No
+  module split was performed: `Theorem23.lean` is large
+  (4400 lines), but the current proof is still in-flight and the
+  latest additions are tightly coupled interval-chain wrappers.
+  Splitting now would add import churn without a measured
+  build-speed win. Revisit extraction once the remaining
+  predicted-GS membership or lowered-dominance input is proved.
 - **2026-04-22**: Initial version. Codifies the methods and
   conventions established in refactor plan v4 (Phase 0, Phase 1,
   early Phase 2). Origin: discussion during the §2.5 burst
