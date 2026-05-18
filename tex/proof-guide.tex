@@ -7723,6 +7723,66 @@ the full site-sum positivity proof must control: lowered sites off
 \(A\) contribute with the Marshall-positive sign, while lowered sites
 on \(A\) contribute with the opposite sign.
 
+\textbf{Boundary-inclusive lowered sign-sum bounds}: the local split is
+now extended to the boundary case \(\tau_x=0\).  In that case the
+single-site lowering contribution vanishes, while for \(\tau_x>0\) the
+strict local alternatives above apply.  Hence Lean proves the weak
+single-site bounds
+\[
+  A(x)=\mathrm{false}
+  \quad\Rightarrow\quad
+  0 \le
+  \mathrm{Re}\,\mathrm{marshallSignS}(A,\tau)\,
+  \mathrm{Re}\,
+  \bigl(\hat S^-_x\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau),
+\]
+and
+\[
+  A(x)=\mathrm{true}
+  \quad\Rightarrow\quad
+  \mathrm{Re}\,\mathrm{marshallSignS}(A,\tau)\,
+  \mathrm{Re}\,
+  \bigl(\hat S^-_x\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau)
+  \le 0 .
+\]
+The Lean names are
+\[
+\begin{gathered}
+\texttt{tasaki23\_signed\_single\_site\_lowering\_component}\\
+\texttt{\_nonneg\_of\_A\_false}
+\end{gathered}
+\]
+and
+\[
+\begin{gathered}
+\texttt{tasaki23\_signed\_single\_site\_lowering\_component}\\
+\texttt{\_nonpos\_of\_A\_true}.
+\end{gathered}
+\]
+Summing over the two filtered sublattices gives
+\[
+  0 \le
+  \sum_{x:A(x)=\mathrm{false}}
+  \mathrm{Re}\,\mathrm{marshallSignS}(A,\tau)\,
+  \mathrm{Re}\,
+  \bigl(\hat S^-_x\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau),
+\]
+and
+\[
+  \sum_{x:A(x)=\mathrm{true}}
+  \mathrm{Re}\,\mathrm{marshallSignS}(A,\tau)\,
+  \mathrm{Re}\,
+  \bigl(\hat S^-_x\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau)
+  \le 0 .
+\]
+These are formalised as
+\texttt{tasaki23\_signed\_lowering\_offA\_sum\_nonneg} and
+\texttt{tasaki23\_signed\_lowering\_onA\_sum\_nonpos}.  These bounds
+are deliberately weak: they decompose the remaining strict site-sum
+positivity problem into the non-negative off-\(A\) part and the
+non-positive on-\(A\) part, without yet proving that the former
+dominates the latter.
+
 \textbf{Raising-direction local component package}: the same
 adjacent-sector bookkeeping is now available for the raising ladder.
 First, the support bridge
