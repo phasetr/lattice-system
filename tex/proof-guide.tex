@@ -7564,6 +7564,19 @@ claim that an adjacent-sector ladder move can vanish only at the
 corresponding representation endpoint.  The Casimir obstruction and
 contrapositive non-vanishing criteria are collected in
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Casimir.lean}.
+The same file also contains the sector-embedded wrappers
+\[
+\begin{gathered}
+\texttt{tasaki23\_totalSpinSOpMinus\_mulVec\_magSectorEmbedding}\\
+\texttt{\_ne\_zero\_of\_casimir\_ne\_kernel\_value},\\
+\texttt{tasaki23\_totalSpinSOpPlus\_mulVec\_magSectorEmbedding}\\
+\texttt{\_ne\_zero\_of\_casimir\_ne\_kernel\_value}.
+\end{gathered}
+\]
+They combine the abstract Casimir obstruction with
+\texttt{magSectorEmbedding\_mem\_magSubspaceS}, so a sector vector
+\(\Phi\) can be used directly after zero extension to the full
+Hilbert space.
 
 \textbf{Sector-support bridge and lowering-sector shift}: the same PR
 also records the support side of the adjacent-sector comparison.  First,

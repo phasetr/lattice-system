@@ -168,4 +168,56 @@ theorem tasaki23_totalSpinSOpPlus_mulVec_ne_zero_of_casimir_ne_kernel_value
   · exact hγ_ne (sub_eq_zero.mp hscalar)
   · exact hΨ_ne hvec
 
+/-! ## Sector-embedded Casimir non-vanishing -/
+
+/-- **Tasaki §2.5 Theorem 2.3 sector-embedded Casimir non-vanishing,
+lowering direction**: if a zero-extended `magSumS = M` sector vector is
+a total-Casimir eigenvector at a value different from the lowering
+kernel value for that sector magnetization, then its total-lowering
+image is non-zero.
+
+This packages
+`tasaki23_totalSpinSOpMinus_mulVec_ne_zero_of_casimir_ne_kernel_value`
+with `magSectorEmbedding_mem_magSubspaceS`, so the criterion applies
+directly to sector vectors used in the adjacent-sector chain. -/
+theorem tasaki23_totalSpinSOpMinus_mulVec_magSectorEmbedding_ne_zero_of_casimir_ne_kernel_value
+    {N M : ℕ} {γ : ℂ} {Φ : magConfigS V N M → ℂ}
+    (hΦ_cas :
+      (totalSpinSSquared V N).mulVec (magSectorEmbedding Φ) =
+        γ • magSectorEmbedding Φ)
+    (hγ_ne :
+      γ ≠
+        ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) *
+          ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) - 1)))
+    (hΦ_ne : magSectorEmbedding Φ ≠ 0) :
+    (totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ) ≠ 0 := by
+  exact
+    tasaki23_totalSpinSOpMinus_mulVec_ne_zero_of_casimir_ne_kernel_value
+      (magSectorEmbedding_mem_magSubspaceS (V := V) (N := N) (M := M) Φ)
+      hΦ_cas hγ_ne hΦ_ne
+
+/-- **Tasaki §2.5 Theorem 2.3 sector-embedded Casimir non-vanishing,
+raising direction**: if a zero-extended `magSumS = M` sector vector is
+a total-Casimir eigenvector at a value different from the raising
+kernel value for that sector magnetization, then its total-raising
+image is non-zero.
+
+This is the raising companion to
+`tasaki23_totalSpinSOpMinus_mulVec_magSectorEmbedding_ne_zero_of_casimir_ne_kernel_value`. -/
+theorem tasaki23_totalSpinSOpPlus_mulVec_magSectorEmbedding_ne_zero_of_casimir_ne_kernel_value
+    {N M : ℕ} {γ : ℂ} {Φ : magConfigS V N M → ℂ}
+    (hΦ_cas :
+      (totalSpinSSquared V N).mulVec (magSectorEmbedding Φ) =
+        γ • magSectorEmbedding Φ)
+    (hγ_ne :
+      γ ≠
+        ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) *
+          ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) + 1)))
+    (hΦ_ne : magSectorEmbedding Φ ≠ 0) :
+    (totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ) ≠ 0 := by
+  exact
+    tasaki23_totalSpinSOpPlus_mulVec_ne_zero_of_casimir_ne_kernel_value
+      (magSectorEmbedding_mem_magSubspaceS (V := V) (N := N) (M := M) Φ)
+      hΦ_cas hγ_ne hΦ_ne
+
 end LatticeSystem.Quantum
