@@ -8287,6 +8287,26 @@ remain separate proof obligations.  Reference: H.~Tasaki,
 \emph{Physics and Mathematics of Quantum Many-Body Systems}, Springer
 2020, \S2.5 Theorem 2.3, p.~42.
 
+\textbf{Sector-embedded predicted-Casimir ladder preservation}: the
+full-space preservation wrappers have also been specialized to the
+Marshall-signed sector vectors used in the adjacent-sector chain.  The Lean
+theorems
+\[
+\begin{gathered}
+\texttt{tasaki23\_totalSpinSOpMinus\_marshallSignedEmbedding}\\
+\texttt{\_preserves\_predictedCasimirValue},\\
+\texttt{tasaki23\_totalSpinSOpPlus\_marshallSignedEmbedding}\\
+\texttt{\_preserves\_predictedCasimirValue}
+\end{gathered}
+\]
+state that if the zero-extension of
+\(\operatorname{sgn}_A(\tau)v(\tau)\), \(v(\tau)\in\mathbb R\), has
+total-Casimir eigenvalue \(C_{\mathrm{pred}}\), then the lowered or raised
+full-space image has the same total-Casimir eigenvalue.  This keeps the
+Casimir propagation in the exact sector-embedded form needed before the
+later Theorem~2.2 uniqueness comparison identifies a normalized adjacent
+sector representative.
+
 \textbf{Predicted-Casimir adjacent common-energy wrappers}: the
 Casimir endpoint mismatch is now connected directly to the one-step
 sector chain.  The Lean theorems

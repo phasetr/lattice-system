@@ -1871,6 +1871,75 @@ theorem tasaki23_totalSpinSOpPlus_preserves_predictedCasimirValue
     (totalSpinSSquared_commute_totalSpinSOpPlus (V := V) (N := N)).eq
   rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hΨ_cas, Matrix.mulVec_smul]
 
+/-- **Tasaki §2.5 Theorem 2.3 sector-embedded predicted-Casimir
+preservation under lowering**: if a Marshall-signed sector vector has the
+Theorem 2.3 predicted total-Casimir eigenvalue after zero-extension to the
+full spin-`S` Hilbert space, then its image under `Ŝ^-_tot` has the same
+total-Casimir eigenvalue.
+
+This is the sector-vector form used in the adjacent-sector chain, before the
+lowered vector is compared with the target sector's Theorem 2.2
+Marshall-positive representative. -/
+theorem
+    tasaki23_totalSpinSOpMinus_marshallSignedEmbedding_preserves_predictedCasimirValue
+    (A : V → Bool) (N : ℕ) {M : ℕ} {v : magConfigS V N M → ℝ}
+    (hΦ_cas :
+      (totalSpinSSquared V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (tasaki23PredictedCasimirValue (V := V) A N : ℂ) •
+          magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) :
+    (totalSpinSSquared V N).mulVec
+        ((totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) =
+      (tasaki23PredictedCasimirValue (V := V) A N : ℂ) •
+        ((totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) := by
+  exact
+    tasaki23_totalSpinSOpMinus_preserves_predictedCasimirValue
+      (V := V) A N hΦ_cas
+
+/-- **Tasaki §2.5 Theorem 2.3 sector-embedded predicted-Casimir
+preservation under raising**: if a Marshall-signed sector vector has the
+Theorem 2.3 predicted total-Casimir eigenvalue after zero-extension to the
+full spin-`S` Hilbert space, then its image under `Ŝ^+_tot` has the same
+total-Casimir eigenvalue.
+
+This is the raising-direction companion to
+the corresponding lowering theorem above. -/
+theorem
+    tasaki23_totalSpinSOpPlus_marshallSignedEmbedding_preserves_predictedCasimirValue
+    (A : V → Bool) (N : ℕ) {M : ℕ} {v : magConfigS V N M → ℝ}
+    (hΦ_cas :
+      (totalSpinSSquared V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (tasaki23PredictedCasimirValue (V := V) A N : ℂ) •
+          magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) :
+    (totalSpinSSquared V N).mulVec
+        ((totalSpinSOpPlus V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) =
+      (tasaki23PredictedCasimirValue (V := V) A N : ℂ) •
+        ((totalSpinSOpPlus V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) := by
+  exact
+    tasaki23_totalSpinSOpPlus_preserves_predictedCasimirValue
+      (V := V) A N hΦ_cas
+
 /-- **Tasaki §2.5 Theorem 2.3 adjacent common-energy successor step**:
 inside the admissible sector interval, a source-sector
 Marshall-positive eigenvector in sector `M`, together with the lowered
