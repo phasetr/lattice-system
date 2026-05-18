@@ -7645,6 +7645,33 @@ lemma.  Thus the one-step chain can now carry both pieces of data
 needed later: the successor sector belongs to the predicted interval,
 and the ladder vector is nonzero for the SU(2) Casimir reason rather
 than merely because strict target-sector positivity implies nonzero.
+The raising-direction interval wrapper is now recorded as well.  If
+the source sector \(M+1\) belongs to the admissible interval and is not
+the left endpoint, then
+\[
+\begin{gathered}
+\texttt{tasaki23\_predecessor\_sector\_common\_energy}\\
+\texttt{\_of\_site\_sum\_pos}
+\end{gathered}
+\]
+uses \texttt{tasaki23GroundStateSectors\_pred\_mem\_of\_left\_lt\_of\_mem}
+and the already isolated raised-vector site-sum positivity package to
+produce a Marshall-positive eigenvector in sector \(M\) at the same
+energy.  Its Casimir endpoint-mismatch form,
+\[
+\begin{gathered}
+\texttt{tasaki23\_predecessor\_sector\_common\_energy}\\
+\texttt{\_of\_site\_sum\_pos\_of\_casimir\_ne\_kernel\_value},
+\end{gathered}
+\]
+adds the hypothesis that the source Casimir value is not
+\[
+  \left(|V|N/2-(M+1)\right)
+  \left(|V|N/2-(M+1)+1\right),
+\]
+so that the nonzero raised-vector conclusion comes from the same
+SU(2) obstruction rather than from the target-sector positivity
+hypothesis alone.
 
 \textbf{Sector-support bridge and lowering-sector shift}: the same PR
 also records the support side of the adjacent-sector comparison.  First,
