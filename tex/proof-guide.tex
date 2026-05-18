@@ -7559,6 +7559,37 @@ identification package.  The remaining critical-path proof can now
 focus on the predecessor configurations appearing in each single-site
 lowering term.
 
+\textbf{Single-site Marshall sign for lowering predecessors}: after the
+site-sum expansion, each non-zero single-site lowering contribution
+comes from a predecessor configuration \(\rho\) which agrees with the
+target \(\tau\) away from one site \(x\) and satisfies
+\[
+  \rho_x + 1 = \tau_x .
+\]
+For such one-site differences, the Marshall-sign product factors as
+\[
+  \mathrm{marshallSignS}(A,\tau)\,
+  \mathrm{marshallSignS}(A,\rho)
+  =
+  \begin{cases}
+    (-1)^{\tau_x+\rho_x}, & A(x),\\
+    1, & \neg A(x).
+  \end{cases}
+\]
+The predecessor relation makes \(\tau_x+\rho_x\) odd, hence the product
+is \(-1\) on \(A\)-sites and \(1\) off \(A\).  Since the Marshall signs
+are real, the same identities hold for the products of their real
+parts.  The Lean names are
+\texttt{marshallSignS\_mul\_of\_agree\_off\_site},
+\texttt{marshallSignS\_mul\_of\_agree\_off\_site\_A\_true\_lower},
+\texttt{marshallSignS\_mul\_of\_agree\_off\_site\_A\_false\_lower}, and
+their real-part variants
+\texttt{marshallSignS\_re\_mul\_re\_of\_agree\_off\_site\_A\_true\_lower}
+and
+\texttt{marshallSignS\_re\_mul\_re\_of\_agree\_off\_site\_A\_false\_lower}.
+These are the local sign facts needed before proving positivity of the
+single-site lowering summands.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
