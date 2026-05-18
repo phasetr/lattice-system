@@ -63,12 +63,23 @@ the following on-disk files and obey their instructions:
 - **Use sandbox-stable command forms before giving up.** For TeX builds,
   route LuaTeX caches to writable roots:
   `TEXMFVAR=/private/tmp/texmf-var TEXMFCONFIG=/private/tmp/texmf-config latexmk -g -lualatex <file>.tex`.
-  If `codex exec ... < /dev/null` fails with `Operation not permitted` or
-  app-server initialization errors, rerun the same command with the
-  environment's escalation mechanism and persist a scoped `codex exec`
-  approval rule when available. If GitHub CLI bodies contain backticks, use
-  single-quoted bodies or `--body-file` so the shell does not execute the
-  backtick content.
+  Codex/Codex CLI agents must run `codex exec ...` cross-checks with the
+  environment's escalation mechanism on the first attempt, not after a failed
+  sandboxed attempt, and persist a scoped `codex exec` approval rule when
+  available. Avoid shell redirection and pipes in `codex exec` commands so
+  the persistent rule can match `codex exec` broadly. If GitHub CLI bodies
+  contain backticks, use single-quoted bodies or `--body-file` so the shell
+  does not execute the backtick content.
+- **Codex/Codex CLI only: do not ask conversational permission for routine
+  workflow commands.** Claude Code already auto-executes routine commands;
+  this rule is for Codex agents that otherwise tend to stop for redundant
+  permission. For normal PR work, GitHub CLI updates, TeX builds, codex
+  cross-checks, one-shot CI checks, and sandbox/network retries, execute
+  directly. If the environment requires escalation, use the escalation
+  mechanism immediately with a concise justification and, when available, a
+  narrow persistent prefix rule. Direct user questions are reserved for
+  destructive git operations, repository settings changes, or genuine
+  specification ambiguities that cannot be resolved from local documents.
 - **Codex cross-check is a single review at squash-merge time**, not
   per-commit / per-CI.
 - **All committed prose (commit messages, PR titles/bodies, doc strings,
@@ -97,8 +108,12 @@ the following on-disk files and obey their instructions:
 Typical pattern from this repo:
 
 ```
-codex exec '<PR number, what changed, what to verify>' < /dev/null 2>&1 | tail -10
+codex exec '<PR number, what changed, what to verify>'
 ```
+
+Codex/Codex CLI agents must run that command through the environment's
+escalation mechanism on the first attempt, as described above, and should not
+wrap it in shell redirection or pipes.
 
 Keep reviews terse:
 1. Confirm the named theorems exist and match the claimed values.
