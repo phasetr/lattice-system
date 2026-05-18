@@ -90,6 +90,14 @@ the following on-disk files and obey their instructions:
   likely to fail. This rule does not authorize destructive git operations or
   GitHub repository settings changes; those still require explicit approval
   when the environment or repository policy demands it.
+- **Codex/Codex CLI only: keep `gh ...` command strings prefix-rule friendly.**
+  Do not wrap routine GitHub CLI operations in shell redirection (`>`, `>>`,
+  `<`), pipes (`|`), command substitutions (`$(...)`), or wildcard-heavy shell
+  forms. Those shell features prevent the environment from matching a broad
+  `gh` prefix rule and cause repeated approval stops. Run commands such as
+  `gh issue view 412 --json body --jq .body` directly, then create or edit
+  any local body files separately with the normal file-editing tools. Prefer
+  `--body-file` for GitHub writes once the file already exists.
 - **Codex cross-check is a single review at squash-merge time**, not
   per-commit / per-CI.
 - **All committed prose (commit messages, PR titles/bodies, doc strings,
