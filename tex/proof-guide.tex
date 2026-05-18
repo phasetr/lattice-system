@@ -8226,6 +8226,57 @@ allows the same comparison to be invoked from the local hypothesis
 obtained by expanding \(\hat S^+_{\rm tot}\) as
 \(\sum_x \hat S^+_x\).
 
+\textbf{Raised sign-sum bounds and dominance bridge}: the raising
+direction now has the same boundary-inclusive local sign-sum package as
+the lowering direction.  Away from the top boundary, the existing
+single-site raising formula shows that the signed local contribution is
+strictly positive off \(A\) and strictly negative on \(A\).  At the top
+boundary, the one-site raising summand is zero.  Lean records the
+boundary-inclusive local forms as
+\[
+\begin{gathered}
+\texttt{tasaki23\_signed\_single\_site\_raising\_component}\\
+\texttt{\_nonneg\_of\_A\_false},\\
+\texttt{tasaki23\_signed\_single\_site\_raising\_component}\\
+\texttt{\_nonpos\_of\_A\_true}.
+\end{gathered}
+\]
+Summing over the two Boolean sublattices gives
+\[
+\begin{gathered}
+\texttt{tasaki23\_signed\_raising\_offA\_sum\_nonneg},\\
+\texttt{tasaki23\_signed\_raising\_onA\_sum\_nonpos}.
+\end{gathered}
+\]
+Lean names the local raised contribution as
+\texttt{tasaki23SignedRaisingSiteContribution} and decomposes the full
+signed site-sum as
+\[
+  \mathrm{Re}\,\mathrm{marshallSignS}(A,\tau)
+  \sum_{x\in V}
+  \mathrm{Re}\,
+  \bigl(\hat S^+_x\,\mathrm{magSectorEmbedding}(\Phi_{M+1})\bigr)(\tau)
+  =
+  \sum_{x:A(x)=\mathrm{false}} R_x(\tau)
+  +
+  \sum_{x:A(x)=\mathrm{true}} R_x(\tau),
+\]
+where \(R_x(\tau)\) denotes the named raised contribution.  This is
+\texttt{tasaki23\_signed\_raising\_site\_sum\_eq\_offA\_add\_onA}.
+Consequently the dominance condition
+\[
+  -\sum_{x:A(x)=\mathrm{true}} R_x(\tau)
+  <
+  \sum_{x:A(x)=\mathrm{false}} R_x(\tau)
+\]
+implies the strict raised site-sum positivity hypothesis:
+\texttt{tasaki23\_signed\_raising\_site\_sum\_pos\_of\_onA\_neg\_lt\_offA}.
+It is then wrapped into raised-vector Marshall positivity as
+\texttt{tasaki23\_raised\_marshall\_pos\_of\_onA\_neg\_lt\_offA}.
+The predecessor-sector common-energy step can now be invoked directly
+from the same dominance hypothesis through
+\texttt{tasaki23\_predecessor\_sector\_common\_energy\_of\_onA\_neg\_lt\_offA}.
+
 \textbf{Adjacent common-energy successor link}: the interval
 combinatorics and the lowered site-sum comparison are now packaged in
 the Lean theorem
