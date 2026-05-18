@@ -7501,9 +7501,34 @@ Applying the full-Hilbert-space Theorem 2.2 uniqueness clause in sector
 \(M+1\) then identifies the target sector ground-state eigenvalue with
 \(\mu\).  This is formalised as
 \texttt{tasaki23\_lowering\_identifies\_adjacent\_sector\_energy} in
-\texttt{LatticeSystem/Quantum/SpinS/Theorem23.lean}.  The remaining
-critical-path work is to prove the non-vanishing and Marshall-positivity
-input for this lowered vector.
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23.lean}.  The next
+bookkeeping step is to separate the non-vanishing consequence of strict
+Marshall positivity from the still-missing proof of that positivity.
+
+\textbf{Lowered-vector non-vanishing from strict Marshall positivity}:
+the next Lean step makes the non-vanishing part explicit.  If the
+adjacent sector \(M+1\) is non-empty and the lowered vector
+\[
+  \Psi^- =
+  \hat S^-_{\rm tot}\,\mathrm{magSectorEmbedding}(\Phi_M)
+\]
+satisfies
+\[
+  0 <
+  (\mathrm{marshallSignS}\,A\,\tau).\mathrm{re}\,
+  (\Psi^-(\tau)).\mathrm{re}
+  \qquad
+  \text{for every }\tau\in\mathrm{magConfigS}(V,N,M+1),
+\]
+then choosing any \(\tau\) in the non-empty sector shows
+\(\Psi^-(\tau)\neq 0\), hence \(\Psi^-\neq 0\) as a full-space vector.
+This is formalised as
+\texttt{tasaki23\_lowered\_ne\_zero\_of\_marshall\_pos}.  The wrapper
+\texttt{tasaki23\_lowering\_identifies\_adjacent\_sector\_energy\_with\_nonzero}
+packages this non-zero conclusion together with the conditional
+adjacent-sector energy identification above.  The remaining
+critical-path input is now the proof that the lowered sector vector
+indeed satisfies the Marshall-positive hypothesis.
 
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}

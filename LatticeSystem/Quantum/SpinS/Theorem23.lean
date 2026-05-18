@@ -108,6 +108,29 @@ theorem heisenbergHamiltonianS_mulVec_totalSpinSOpPlus_of_eigenvec
 
 /-! ## Adjacent-sector energy comparison -/
 
+/-- **Tasaki §2.5 Theorem 2.3 lowered-vector non-vanishing**:
+strict Marshall positivity of the lowered vector in the adjacent sector
+implies that `Ŝ^-_tot Ψ_M` is not the zero full-space vector.
+
+This is the non-vanishing bookkeeping needed before the lowered vector
+can serve as the sector-linking eigenvector in the adjacent-sector
+comparison. -/
+theorem tasaki23_lowered_ne_zero_of_marshall_pos
+    (A : V → Bool) {M : ℕ} [Nonempty (magConfigS V N (M + 1))]
+    (Φ : magConfigS V N M → ℂ)
+    (hlowered_marshall_pos :
+      ∀ τ : magConfigS V N (M + 1),
+        0 < (marshallSignS A τ.1).re *
+          (((totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ)) τ.1).re) :
+    (totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ) ≠ 0 := by
+  classical
+  intro hzero
+  let τ : magConfigS V N (M + 1) := Classical.choice inferInstance
+  have hτ := hlowered_marshall_pos τ
+  have hcomponent := congrFun hzero τ.1
+  rw [hcomponent] at hτ
+  simp at hτ
+
 /-- **Tasaki §2.5 Theorem 2.3 adjacent-sector energy step, lowering
 direction**: if a source-sector eigenvector is embedded from
 `magSumS = M`, and its lowered vector `Ŝ^-_tot Ψ` is Marshall-positive
@@ -167,6 +190,52 @@ theorem tasaki23_lowering_identifies_adjacent_sector_energy
     huniq_succ hlowered_eigen hlowered_supp hlowered_marshall_pos
   exact ⟨μ_succ, v_succ, hμ_succ_lt, hv_succ_pos, hmul_succ, hμ_eq,
     r, hr_pos, hrel⟩
+
+/-- **Tasaki §2.5 Theorem 2.3 adjacent-sector package with
+non-vanishing**: the strict Marshall-positive lowered vector is
+non-zero, and the adjacent target sector has the same Theorem 2.2
+ground-state eigenvalue as the source sector.
+
+This is the same conditional comparison as
+`tasaki23_lowering_identifies_adjacent_sector_energy`, with the
+non-zero lowered-vector conclusion made explicit for the sector-linking
+proof of Theorem 2.3. -/
+theorem tasaki23_lowering_identifies_adjacent_sector_energy_with_nonzero
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N (M + 1))]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {μ : ℝ} {Φ : magConfigS V N M → ℂ}
+    (hΦ : (heisenbergHamiltonianS J N).mulVec (magSectorEmbedding Φ) =
+      (μ : ℂ) • magSectorEmbedding Φ)
+    (hlowered_marshall_pos :
+      ∀ τ : magConfigS V N (M + 1),
+        0 < (marshallSignS A τ.1).re *
+          (((totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ)) τ.1).re) :
+    (totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ) ≠ 0 ∧
+    ∃ (μ_succ : ℝ) (v_succ : magConfigS V N (M + 1) → ℝ),
+      μ_succ < c ∧ (∀ τ, 0 < v_succ τ) ∧
+      (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ))) =
+        (μ_succ : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) ∧
+      μ = μ_succ ∧
+      ∃ r : ℝ, 0 < r ∧
+        ∀ τ : magConfigS V N (M + 1),
+          (((totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ)) τ.1).re =
+            r * ((marshallSignS A τ.1).re * v_succ τ) := by
+  exact ⟨tasaki23_lowered_ne_zero_of_marshall_pos A Φ hlowered_marshall_pos,
+    tasaki23_lowering_identifies_adjacent_sector_energy A N c hJ_real hJ_real'
+      hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate hΦ
+      hlowered_marshall_pos⟩
 
 /-- **Tasaki §2.5 Theorem 2.3 predicted total-spin magnitude**
 `S_tot = ||A| − |¬A|| · (N/2)` (the real-valued half-integer
