@@ -8255,6 +8255,52 @@ multiplet.  The remaining substantive input is still the proof of the
 strict site-sum positivity hypothesis for the actual sector ground
 states.
 
+\textbf{Predicted-Casimir adjacent common-energy wrappers}: the
+Casimir endpoint mismatch is now connected directly to the one-step
+sector chain.  The Lean theorems
+\[
+\begin{gathered}
+\texttt{tasaki23\_successor\_sector\_common\_energy}\\
+\texttt{\_of\_site\_sum\_pos\_of\_predictedCasimirValue},\\
+\texttt{tasaki23\_predecessor\_sector\_common\_energy}\\
+\texttt{\_of\_site\_sum\_pos\_of\_predictedCasimirValue}
+\end{gathered}
+\]
+specialize the preceding Casimir non-vanishing wrappers to
+\[
+  C_{\mathrm{pred}}
+  =
+  S_{\mathrm{tot}}(S_{\mathrm{tot}}+1),
+  \qquad
+  S_{\mathrm{tot}}
+  =
+  \frac{\bigl||A|-|\neg A|\bigr|N}{2}.
+\]
+For the lowering direction, if the source-sector vector in sector
+\(M\) has total-Casimir eigenvalue \(C_{\mathrm{pred}}\) and
+\(M\) is not the right endpoint, then
+\[
+  C_{\mathrm{pred}}
+  \ne
+  (|\Lambda|N/2-M)(|\Lambda|N/2-M-1)
+\]
+by
+\texttt{tasaki23\_predictedCasimirValue\_ne\_lowering\_kernel\_value\_of\_mem\_of\_lt\_right}.
+Thus the abstract endpoint-mismatch hypothesis in the lowering
+Casimir wrapper is discharged automatically.  The raising theorem does
+the same for a source vector in sector \(M+1\), using
+\[
+  C_{\mathrm{pred}}
+  \ne
+  (|\Lambda|N/2-(M+1))(|\Lambda|N/2-(M+1)+1)
+\]
+and
+\texttt{tasaki23\_predictedCasimirValue\_ne\_raising\_kernel\_value\_of\_mem\_of\_left\_lt}.
+These wrappers still assume the predicted-Casimir eigenvector
+hypothesis and the local site-sum positivity input; their role is to
+remove the now-solved endpoint mismatch from the final Theorem~2.3
+chain assembly.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
