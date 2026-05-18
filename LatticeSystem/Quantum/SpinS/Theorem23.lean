@@ -1,5 +1,6 @@
 import Mathlib.Data.Nat.Lattice
 import LatticeSystem.Quantum.SpinS.AllAlignedStateMagShift
+import LatticeSystem.Quantum.SpinS.BipartiteToyGSLeTotalSpinSSquaredEigenspace
 import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
 import LatticeSystem.Quantum.SpinS.MarshallSign
 import LatticeSystem.Quantum.SpinS.NeelBipartiteWeight
@@ -1827,6 +1828,60 @@ theorem tasaki23_predictedCasimirValue_ne_raising_kernel_value_of_mem_of_left_lt
   have hM1 : (((M + 1 : ℕ) : ℝ)) = (M : ℝ) + 1 := by norm_num
   rw [hM1] at hlt
   nlinarith
+
+omit [DecidableEq V] in
+/-- **Tasaki §2.5 Theorem 2.3 predicted Casimir value, canonical
+orientation**: if the complement sublattice is no larger than `A`, then
+the absolute value in `tasaki23PredictedTotalSpin` drops to
+`|A| - |¬A|`, and `tasaki23PredictedCasimirValue` is the canonical
+joint-Casimir target used in `bipartiteToyGroundStateSubspacePredicted`.
+-/
+theorem tasaki23PredictedCasimirValue_eq_canonical_of_card_notA_le_cardA
+    (A : V → Bool) (N : ℕ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card) :
+    tasaki23PredictedCasimirValue (V := V) A N =
+      ((((Finset.univ.filter (fun x : V => A x = true)).card : ℝ) *
+              ((N : ℝ) / 2) -
+            ((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℝ) *
+              ((N : ℝ) / 2)) *
+        ((((Finset.univ.filter (fun x : V => A x = true)).card : ℝ) *
+              ((N : ℝ) / 2) -
+            ((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℝ) *
+              ((N : ℝ) / 2)) + 1)) := by
+  have hnonneg :
+      0 ≤ ((Finset.univ.filter (fun x : V => A x = true)).card : ℝ) -
+        ((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℝ) := by
+    exact sub_nonneg.mpr (by exact_mod_cast hBA)
+  unfold tasaki23PredictedCasimirValue tasaki23PredictedTotalSpin
+  rw [abs_of_nonneg hnonneg]
+  ring
+
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS total-Casimir bridge**:
+in the canonical orientation `|¬A| ≤ |A|`, membership in the predicted
+toy ground-state subspace gives exactly the
+`tasaki23PredictedCasimirValue` total-Casimir eigenvector hypothesis.
+
+This packages the definitional total-Casimir component of
+`bipartiteToyGroundStateSubspacePredicted` in the form used by the
+adjacent-sector Theorem 2.3 chain. -/
+theorem tasaki23_totalSpinSSquared_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (totalSpinSSquared V N).mulVec Ψ =
+      (tasaki23PredictedCasimirValue (V := V) A N : ℂ) • Ψ := by
+  have hmem :=
+    bipartiteToyGroundStateSubspacePredicted_le_totalSpinSSquaredEigenspace
+      (Λ := V) A N hΨ
+  rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hmem
+  rw [tasaki23PredictedCasimirValue_eq_canonical_of_card_notA_le_cardA
+    (V := V) A N hBA]
+  simpa using hmem
 
 /-- **Tasaki §2.5 Theorem 2.3 predicted-Casimir preservation under
 lowering**: if a full spin-`S` vector has the Theorem 2.3 predicted
