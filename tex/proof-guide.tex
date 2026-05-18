@@ -7819,6 +7819,27 @@ and wraps it into lowered-vector Marshall positivity as
 still leaves the dominance inequality itself as the remaining
 substantive proof obligation.
 
+\textbf{Dominance-form successor common-energy link}: the same
+dominance condition is now wired directly into the adjacent-sector
+successor package.  Lean records this as
+\texttt{tasaki23\_successor\_sector\_common\_energy\_of\_onA\_neg\_lt\_offA}.
+Given a source-sector Marshall-positive eigenvector in an admissible
+sector \(M\), the interval hypothesis \(M < \max(|A|,|\neg A|)N\),
+and the pointwise condition
+\[
+  -\sum_{x:A(x)=\mathrm{true}} T_x(\tau)
+  <
+  \sum_{x:A(x)=\mathrm{false}} T_x(\tau),
+\]
+the theorem first invokes the dominance-to-site-sum bridge above and
+then applies
+\texttt{tasaki23\_successor\_sector\_common\_energy\_of\_site\_sum\_pos}.
+The conclusion is the same one-step common-energy result: \(M+1\) is
+admissible, \(S^-_{\mathrm{tot}}\Psi_M\ne 0\), and the successor sector
+has a Marshall-positive eigenvector at the same eigenvalue \(\mu\).
+Thus the remaining local task is sharply isolated as the proof of the
+displayed dominance inequality.
+
 \textbf{Raising-direction local component package}: the same
 adjacent-sector bookkeeping is now available for the raising ladder.
 First, the support bridge
