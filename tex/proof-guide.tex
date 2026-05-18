@@ -7673,6 +7673,60 @@ so that the nonzero raised-vector conclusion comes from the same
 SU(2) obstruction rather than from the target-sector positivity
 hypothesis alone.
 
+\textbf{Predicted-Casimir endpoint mismatch}: the predicted total
+spin in Tasaki's theorem is now connected to the concrete Casimir
+kernel values that occur in the adjacent-sector wrappers.  Lean names
+\[
+  S_{\rm pred}(A,N)
+    = \bigl||A|-|\neg A|\bigr|\,N/2
+\]
+as \texttt{tasaki23PredictedTotalSpin} and records
+\[
+  \Gamma_{\rm pred}(A,N)
+    = S_{\rm pred}(S_{\rm pred}+1)
+\]
+as \texttt{tasaki23PredictedCasimirValue}.  The half-width identity
+\[
+  S_{\rm pred}
+  = \frac{\max(|A|,|\neg A|)N-\min(|A|,|\neg A|)N}{2}
+\]
+is formalised as
+\texttt{tasaki23PredictedTotalSpin\_eq\_sector\_half\_width}; the
+partition identity \(|A|+|\neg A|=|V|\) is recorded as
+\texttt{tasaki23\_card\_filter\_A\_add\_card\_notA}.  If
+\(M\) lies in the admissible interval and is not the right endpoint,
+then \(m=|V|N/2-M\) satisfies \(-S_{\rm pred}<m\le S_{\rm pred}\).
+Hence
+\[
+  m(m-1)<S_{\rm pred}(S_{\rm pred}+1),
+\]
+because
+\[
+  S_{\rm pred}(S_{\rm pred}+1)-m(m-1)
+  =(S_{\rm pred}+m)(S_{\rm pred}-m+1)>0.
+\]
+Lean first records the corresponding real strict inequality as
+\texttt{tasaki23\_lowering\_kernel\_value\_lt\_predictedCasimirValue\_of\_mem\_of\_lt\_right}
+and then the complex non-equality as
+\texttt{tasaki23\_predictedCasimirValue\_ne\_lowering\_kernel\_value\_of\_mem\_of\_lt\_right}.
+The raising direction is dual: if the source sector \(M+1\) lies in
+the admissible interval and is not the left endpoint, then
+\(-S_{\rm pred}\le m<S_{\rm pred}\), and
+\[
+  S_{\rm pred}(S_{\rm pred}+1)-m(m+1)
+  =(S_{\rm pred}-m)(S_{\rm pred}+m+1)>0.
+\]
+This yields the real strict inequality
+\texttt{tasaki23\_raising\_kernel\_value\_lt\_predictedCasimirValue\_of\_mem\_of\_left\_lt}
+and its complex non-equality form
+\texttt{tasaki23\_predictedCasimirValue\_ne\_raising\_kernel\_value\_of\_mem\_of\_left\_lt}.
+These endpoint mismatch lemmas are precisely the arithmetic input
+needed to turn a predicted total-Casimir eigenvalue into the
+\texttt{h\(\gamma\)\_ne} hypotheses used by the successor and
+predecessor Casimir non-vanishing chain links.  Reference: H.~Tasaki,
+\emph{Physics and Mathematics of Quantum Many-Body Systems}, Springer
+2020, \S2.5 Theorem 2.3, p.~42.
+
 \textbf{Sector-support bridge and lowering-sector shift}: the same PR
 also records the support side of the adjacent-sector comparison.  First,
 \texttt{totalSpinSOp3\_mulVec\_apply\_eq\_magEigenvalueS\_mul} gives the
