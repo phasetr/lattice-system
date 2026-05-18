@@ -1,5 +1,6 @@
 import Mathlib.Data.Nat.Lattice
 import LatticeSystem.Quantum.SpinS.AllAlignedStateMagShift
+import LatticeSystem.Quantum.SpinS.CasimirRearrangement
 import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
 import LatticeSystem.Quantum.SpinS.MarshallSign
 import LatticeSystem.Quantum.SpinS.NeelBipartiteWeight
@@ -98,6 +99,95 @@ theorem totalSpinSOpPlus_mulVec_magSectorEmbedding_supported_pred {M : ℕ}
     norm_num
     ring_nf
   exact magSubspaceS_apply_eq_zero_of_magSumS_ne hshift' hσ
+
+/-! ## Ladder-kernel Casimir consequences -/
+
+/-- **Tasaki §2.5 Theorem 2.3 ladder-kernel Casimir consequence,
+lowering direction**: if a vector in the `Ŝ_tot^(3)` eigenspace of
+eigenvalue `m` is killed by `Ŝ^-_tot`, then it is a total-Casimir
+eigenvector with eigenvalue `m * (m - 1)`.
+
+This is the SU(2) obstruction behind the remaining Theorem 2.3
+adjacent-sector step: a failed lowering move forces the source vector
+to be a lowest-weight vector for the total-spin representation. -/
+theorem tasaki23_totalSpinSSquared_mulVec_of_totalSpinSOpMinus_eq_zero_of_mem_magSubspaceS
+    {N : ℕ} {m : ℂ} {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ magSubspaceS V N m)
+    (hker : (totalSpinSOpMinus V N).mulVec Ψ = 0) :
+    (totalSpinSSquared V N).mulVec Ψ = (m * (m - 1)) • Ψ := by
+  rw [mem_magSubspaceS_iff] at hΨ
+  have hRearr :=
+    totalSpinSOpPlus_mul_totalSpinSOpMinus_eq_casimir_minus_z_sq_add_z
+      (V := V) (N := N)
+  have hLHS :
+      ((totalSpinSOpPlus V N : ManyBodyOpS V N) * totalSpinSOpMinus V N).mulVec Ψ =
+        0 := by
+    rw [← Matrix.mulVec_mulVec, hker, Matrix.mulVec_zero]
+  have hzero :
+      ((totalSpinSSquared V N - totalSpinSOp3 V N * totalSpinSOp3 V N +
+          totalSpinSOp3 V N : ManyBodyOpS V N).mulVec Ψ) = 0 := by
+    rw [← hRearr]
+    exact hLHS
+  rw [Matrix.add_mulVec, Matrix.sub_mulVec] at hzero
+  have h_sq :
+      ((totalSpinSOp3 V N * totalSpinSOp3 V N : ManyBodyOpS V N).mulVec Ψ) =
+        (m * m) • Ψ := by
+    rw [← Matrix.mulVec_mulVec, hΨ, Matrix.mulVec_smul, hΨ, smul_smul]
+  rw [h_sq, hΨ] at hzero
+  have hmove :
+      (totalSpinSSquared V N).mulVec Ψ = (m * m) • Ψ - m • Ψ := by
+    calc
+      (totalSpinSSquared V N).mulVec Ψ =
+          ((totalSpinSSquared V N).mulVec Ψ - (m * m) • Ψ + m • Ψ) +
+              (m * m) • Ψ - m • Ψ := by abel
+      _ = 0 + (m * m) • Ψ - m • Ψ := by rw [hzero]
+      _ = (m * m) • Ψ - m • Ψ := by simp
+  rw [hmove, ← sub_smul]
+  congr 1
+  ring
+
+/-- **Tasaki §2.5 Theorem 2.3 ladder-kernel Casimir consequence,
+raising direction**: if a vector in the `Ŝ_tot^(3)` eigenspace of
+eigenvalue `m` is killed by `Ŝ^+_tot`, then it is a total-Casimir
+eigenvector with eigenvalue `m * (m + 1)`.
+
+This is the raising-direction companion to the lowering kernel
+obstruction, using the `Ŝ^-_tot Ŝ^+_tot` Casimir rearrangement. -/
+theorem tasaki23_totalSpinSSquared_mulVec_of_totalSpinSOpPlus_eq_zero_of_mem_magSubspaceS
+    {N : ℕ} {m : ℂ} {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ magSubspaceS V N m)
+    (hker : (totalSpinSOpPlus V N).mulVec Ψ = 0) :
+    (totalSpinSSquared V N).mulVec Ψ = (m * (m + 1)) • Ψ := by
+  rw [mem_magSubspaceS_iff] at hΨ
+  have hRearr :=
+    totalSpinSOpMinus_mul_totalSpinSOpPlus_eq_casimir_minus_z_sq_sub_z
+      (V := V) (N := N)
+  have hLHS :
+      ((totalSpinSOpMinus V N : ManyBodyOpS V N) * totalSpinSOpPlus V N).mulVec Ψ =
+        0 := by
+    rw [← Matrix.mulVec_mulVec, hker, Matrix.mulVec_zero]
+  have hzero :
+      ((totalSpinSSquared V N - totalSpinSOp3 V N * totalSpinSOp3 V N -
+          totalSpinSOp3 V N : ManyBodyOpS V N).mulVec Ψ) = 0 := by
+    rw [← hRearr]
+    exact hLHS
+  rw [Matrix.sub_mulVec, Matrix.sub_mulVec] at hzero
+  have h_sq :
+      ((totalSpinSOp3 V N * totalSpinSOp3 V N : ManyBodyOpS V N).mulVec Ψ) =
+        (m * m) • Ψ := by
+    rw [← Matrix.mulVec_mulVec, hΨ, Matrix.mulVec_smul, hΨ, smul_smul]
+  rw [h_sq, hΨ] at hzero
+  have hmove :
+      (totalSpinSSquared V N).mulVec Ψ = (m * m) • Ψ + m • Ψ := by
+    calc
+      (totalSpinSSquared V N).mulVec Ψ =
+          ((totalSpinSSquared V N).mulVec Ψ - (m * m) • Ψ - m • Ψ) +
+              (m * m) • Ψ + m • Ψ := by abel
+      _ = 0 + (m * m) • Ψ + m • Ψ := by rw [hzero]
+      _ = (m * m) • Ψ + m • Ψ := by simp
+  rw [hmove, ← add_smul]
+  congr 1
+  ring
 
 /-- **Tasaki §2.5 Theorem 2.3 ladder step, lowering direction**:
 if `Ψ` is a Heisenberg eigenvector at real eigenvalue `μ`, then

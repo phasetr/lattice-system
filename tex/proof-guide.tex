@@ -7480,6 +7480,52 @@ multiplet; the remaining proof work is the non-vanishing and
 Marshall-sign compatibility needed to feed the laddered vector into
 the per-sector uniqueness theorem.
 
+\textbf{Ladder-kernel Casimir consequences}: the complementary
+SU(2) obstruction is now recorded.  Let \(\Psi\) lie in the
+\(\hat S^{(3)}_{\rm tot}\)-eigenspace with eigenvalue \(m\).  The
+total-spin Casimir rearrangements give
+\[
+  \hat S^+_{\rm tot}\hat S^-_{\rm tot}
+  =
+  \hat{\boldsymbol S}_{\rm tot}^2
+  -(\hat S^{(3)}_{\rm tot})^2
+  +\hat S^{(3)}_{\rm tot}
+\]
+and
+\[
+  \hat S^-_{\rm tot}\hat S^+_{\rm tot}
+  =
+  \hat{\boldsymbol S}_{\rm tot}^2
+  -(\hat S^{(3)}_{\rm tot})^2
+  -\hat S^{(3)}_{\rm tot}.
+\]
+Hence, if \(\hat S^-_{\rm tot}\Psi=0\), then
+\[
+  \hat{\boldsymbol S}_{\rm tot}^2\Psi=m(m-1)\Psi,
+\]
+while if \(\hat S^+_{\rm tot}\Psi=0\), then
+\[
+  \hat{\boldsymbol S}_{\rm tot}^2\Psi=m(m+1)\Psi.
+\]
+Lean names these two consequences
+\[
+\begin{gathered}
+\texttt{tasaki23\_totalSpinSSquared\_mulVec\_of}\\
+\texttt{\_totalSpinSOpMinus\_eq\_zero\_of\_mem\_magSubspaceS}
+\end{gathered}
+\]
+and
+\[
+\begin{gathered}
+\texttt{tasaki23\_totalSpinSSquared\_mulVec\_of}\\
+\texttt{\_totalSpinSOpPlus\_eq\_zero\_of\_mem\_magSubspaceS}.
+\end{gathered}
+\]
+These statements identify the total-spin representation forced by a
+vanished adjacent-sector ladder move, and are the structural
+alternative to treating the still-open local dominance inequality as a
+stand-alone positivity fact.
+
 \textbf{Sector-support bridge and lowering-sector shift}: the same PR
 also records the support side of the adjacent-sector comparison.  First,
 \texttt{totalSpinSOp3\_mulVec\_apply\_eq\_magEigenvalueS\_mul} gives the
