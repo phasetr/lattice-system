@@ -273,6 +273,64 @@ theorem marshallSignS_mul_of_agree_off_two_site_bipartite_y
   rw [if_neg (by simp [hAx])]
   simp [hAy, Odd.neg_one_pow hyod]
 
+/-- **Marshall sign factorization on a single-site difference**:
+when configurations `σ'` and `σ` agree away from `x`, the product of
+their Marshall signs only sees the possible change at `x`. -/
+theorem marshallSignS_mul_of_agree_off_site
+    (A : V → Bool) (x : V) {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → σ' k = σ k) :
+    marshallSignS A σ' * marshallSignS A σ =
+      if A x then ((-1 : ℂ) ^ ((σ' x).val + (σ x).val)) else 1 := by
+  classical
+  rw [marshallSignS_mul]
+  have hsplit :
+      (Finset.univ : Finset V) = {x} ∪ (Finset.univ \ {x}) := by
+    ext z
+    simp
+  rw [hsplit]
+  rw [Finset.prod_union (by
+    rw [Finset.disjoint_iff_inter_eq_empty]
+    ext z; simp)]
+  rw [Finset.prod_singleton]
+  have hrest : ∏ z ∈ (Finset.univ \ {x} : Finset V),
+      (if A z then ((-1 : ℂ) ^ ((σ' z).val + (σ z).val)) else 1) = 1 := by
+    refine Finset.prod_eq_one (fun z hz => ?_)
+    rw [Finset.mem_sdiff] at hz
+    have hzx : z ≠ x := fun heq => hz.2 (by simp [heq])
+    rw [h z hzx]
+    by_cases hAz : A z
+    · simp [hAz, ← two_mul, pow_mul]
+    · simp [hAz]
+  rw [hrest, mul_one]
+
+/-- **Single-site lowering predecessor sign on `A`**: if `σ'` is
+obtained from `σ` by raising the index at the single `A`-site `x` by
+one and agreeing off `x`, then the Marshall signs multiply to `-1`. -/
+theorem marshallSignS_mul_of_agree_off_site_A_true_lower
+    (A : V → Bool) {x : V} (hAx : A x = true)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → σ' k = σ k)
+    (hx : (σ x).val + 1 = (σ' x).val) :
+    marshallSignS A σ' * marshallSignS A σ = -1 := by
+  rw [marshallSignS_mul_of_agree_off_site A x h]
+  rw [if_pos hAx]
+  have hxodd : Odd ((σ' x).val + (σ x).val) := by
+    refine ⟨(σ x).val, ?_⟩
+    omega
+  exact Odd.neg_one_pow hxodd
+
+/-- **Single-site lowering predecessor sign off `A`**: if `σ'` and
+`σ` agree off a site `x ∉ A`, their Marshall signs multiply to `1`;
+in particular this applies to single-site lowering predecessor pairs. -/
+theorem marshallSignS_mul_of_agree_off_site_A_false_lower
+    (A : V → Bool) {x : V} (hAx : A x = false)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → σ' k = σ k)
+    (_hx : (σ x).val + 1 = (σ' x).val) :
+    marshallSignS A σ' * marshallSignS A σ = 1 := by
+  rw [marshallSignS_mul_of_agree_off_site A x h]
+  rw [if_neg (by simp [hAx])]
+
 /-- The Marshall sign equals its inverse: `(marshallSignS A σ)⁻¹ = marshallSignS A σ`. -/
 theorem marshallSignS_inv (A : V → Bool) (σ : V → Fin (N + 1)) :
     (marshallSignS A σ)⁻¹ = marshallSignS A σ := by
@@ -303,6 +361,44 @@ theorem marshallSignS_im (A : V → Bool) (σ : V → Fin (N + 1)) :
   rcases marshallSignS_eq_one_or_neg_one A σ with h | h
   · rw [h]; simp
   · rw [h]; simp
+
+/-- Real-part form of
+`marshallSignS_mul_of_agree_off_site_A_true_lower`. -/
+theorem marshallSignS_re_mul_re_of_agree_off_site_A_true_lower
+    (A : V → Bool) {x : V} (hAx : A x = true)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → σ' k = σ k)
+    (hx : (σ x).val + 1 = (σ' x).val) :
+    (marshallSignS A σ').re * (marshallSignS A σ).re = -1 := by
+  have hmul :=
+    marshallSignS_mul_of_agree_off_site_A_true_lower A hAx h hx
+  have hre :
+      (marshallSignS A σ' * marshallSignS A σ).re =
+        (marshallSignS A σ').re * (marshallSignS A σ).re := by
+    rw [Complex.mul_re, marshallSignS_im, marshallSignS_im]
+    ring
+  rw [hmul] at hre
+  norm_num at hre
+  exact hre.symm
+
+/-- Real-part form of
+`marshallSignS_mul_of_agree_off_site_A_false_lower`. -/
+theorem marshallSignS_re_mul_re_of_agree_off_site_A_false_lower
+    (A : V → Bool) {x : V} (hAx : A x = false)
+    {σ' σ : V → Fin (N + 1)}
+    (h : ∀ k, k ≠ x → σ' k = σ k)
+    (hx : (σ x).val + 1 = (σ' x).val) :
+    (marshallSignS A σ').re * (marshallSignS A σ).re = 1 := by
+  have hmul :=
+    marshallSignS_mul_of_agree_off_site_A_false_lower A hAx h hx
+  have hre :
+      (marshallSignS A σ' * marshallSignS A σ).re =
+        (marshallSignS A σ').re * (marshallSignS A σ).re := by
+    rw [Complex.mul_re, marshallSignS_im, marshallSignS_im]
+    ring
+  rw [hmul] at hre
+  norm_num at hre
+  exact hre.symm
 
 /-- `marshallSignS A σ = ((marshallSignS A σ).re : ℂ)`: the Marshall
 sign is real-valued (always ±1, both real), so it equals its embedded
