@@ -80,6 +80,12 @@ the following on-disk files and obey their instructions:
   narrow persistent prefix rule. Direct user questions are reserved for
   destructive git operations, repository settings changes, or genuine
   specification ambiguities that cannot be resolved from local documents.
+- **Codex/Codex CLI only: run `gh issue ...` through escalation on the first
+  attempt.** Issue view/list/edit/comment operations are routine workflow
+  commands for this repository. Use the environment's escalation mechanism
+  immediately for `gh issue ...` commands and persist a narrow `gh issue`
+  prefix rule when available, instead of first trying a sandboxed network
+  command that is likely to fail.
 - **Codex cross-check is a single review at squash-merge time**, not
   per-commit / per-CI.
 - **All committed prose (commit messages, PR titles/bodies, doc strings,
