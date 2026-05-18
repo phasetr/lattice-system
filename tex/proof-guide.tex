@@ -8400,6 +8400,31 @@ hypothesis and the local site-sum positivity input; their role is to
 remove the now-solved endpoint mismatch from the final Theorem~2.3
 chain assembly.
 
+\textbf{Predicted-GS total-Casimir bridge}: the total-Casimir component
+of the predicted toy ground-state subspace has now been put into the
+same notation as the adjacent-sector chain.  In the canonical
+orientation \(|\neg A|\le |A|\), the Lean theorem
+\[
+\texttt{tasaki23PredictedCasimirValue\_eq\_canonical\_of\_card\_notA\_le\_cardA}
+\]
+identifies \(C_{\mathrm{pred}}\) with the canonical joint-Casimir target
+appearing in \(\texttt{bipartiteToyGroundStateSubspacePredicted}\).  Thus
+\[
+\texttt{tasaki23\_totalSpinSSquared\_mulVec\_of\_mem}\\
+\texttt{\_bipartiteToyGroundStateSubspacePredicted}
+\]
+states that any vector in that predicted toy ground-state subspace
+satisfies
+\[
+  \hat S_{\mathrm{tot}}^2\Phi
+    =
+  C_{\mathrm{pred}}\Phi .
+\]
+This supplies the exact source-sector Casimir hypothesis required by
+the successor/predecessor predicted-Casimir chain once the sector
+ground-state vector is known to lie in the predicted toy ground-state
+subspace.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
