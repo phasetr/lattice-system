@@ -8425,6 +8425,52 @@ the successor/predecessor predicted-Casimir chain once the sector
 ground-state vector is known to lie in the predicted toy ground-state
 subspace.
 
+\textbf{Predicted-GS ladder closure}: the predicted toy ground-state
+subspace is also closed under the total ladder operators in the exact
+pointwise form needed by the adjacent-sector chain.  The Lean theorems
+\[
+\begin{gathered}
+\texttt{tasaki23\_totalSpinSOpMinus\_mulVec\_mem}\\
+\texttt{\_bipartiteToyGroundStateSubspacePredicted},\\
+\texttt{tasaki23\_totalSpinSOpPlus\_mulVec\_mem}\\
+\texttt{\_bipartiteToyGroundStateSubspacePredicted}
+\end{gathered}
+\]
+state that
+\[
+  \Phi\in\mathcal G_{\mathrm{pred}}
+  \quad\Longrightarrow\quad
+  \hat S^-_{\mathrm{tot}}\Phi\in\mathcal G_{\mathrm{pred}},
+  \qquad
+  \hat S^+_{\mathrm{tot}}\Phi\in\mathcal G_{\mathrm{pred}} .
+\]
+These are direct uses of the previously formalized submodule
+invariance of \(\mathcal G_{\mathrm{pred}}\).  Together with the
+predicted-GS total-Casimir bridge, they carry both membership in the
+predicted toy ground-state subspace and the corresponding
+\(C_{\mathrm{pred}}\) total-Casimir identity through a ladder move,
+without adding a separate membership assumption for the ladder image.
+In the canonical orientation \(|\neg A|\le |A|\), the combined Lean
+theorems
+\[
+\begin{gathered}
+\texttt{tasaki23\_lowered\_predictedCasimirValue}\\
+\texttt{\_of\_mem}\\
+\texttt{\_bipartiteToyGroundStateSubspacePredicted},\\
+\texttt{tasaki23\_raised\_predictedCasimirValue}\\
+\texttt{\_of\_mem}\\
+\texttt{\_bipartiteToyGroundStateSubspacePredicted}
+\end{gathered}
+\]
+therefore give directly
+\[
+  \hat S_{\mathrm{tot}}^2(\hat S^\pm_{\mathrm{tot}}\Phi)
+    =
+  C_{\mathrm{pred}}\,\hat S^\pm_{\mathrm{tot}}\Phi
+\]
+from \(\Phi\in\mathcal G_{\mathrm{pred}}\), with no separate
+predicted-Casimir hypothesis for the ladder image.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
