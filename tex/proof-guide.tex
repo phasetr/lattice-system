@@ -7791,6 +7791,48 @@ and
 \end{gathered}
 \]
 
+\textbf{Raising-direction adjacent-sector energy package}: the
+raising local component package now feeds the same sector-uniqueness
+machinery as the lowering direction.  If
+\(\Phi_{M+1}\) is an embedded eigenvector with eigenvalue \(\mu\), then
+commutation of the Hamiltonian with \(\hat S^+_{\rm tot}\) gives
+\[
+  H\,\hat S^+_{\rm tot}\Psi_{M+1}
+  = \mu\,\hat S^+_{\rm tot}\Psi_{M+1}.
+\]
+The support bridge places this raised vector in sector \(M\).  Hence,
+under the Marshall-positive hypothesis
+\[
+  0 <
+  \mathrm{Re}\,\mathrm{marshallSignS}(A,\tau)\,
+  \mathrm{Re}\,
+  \bigl(\hat S^+_{\rm tot}\Psi_{M+1}\bigr)(\tau)
+  \qquad(\tau\in\mathrm{magConfigS}(V,N,M)),
+\]
+the sector-\(M\) Theorem~2.2 uniqueness theorem identifies the
+sector-\(M\) eigenvalue with \(\mu\).  The non-zero conclusion follows
+by evaluating the strict positive inequality at any target sector
+configuration.  Lean packages these facts as
+\[
+\begin{gathered}
+\texttt{tasaki23\_raised\_ne\_zero\_of\_marshall\_pos},\\
+\texttt{tasaki23\_raising\_identifies\_adjacent\_sector\_energy},\\
+\texttt{tasaki23\_raising\_identifies\_adjacent\_sector\_energy}\\
+\texttt{\_with\_nonzero}.
+\end{gathered}
+\]
+The site-sum bridge
+\[
+\begin{gathered}
+\texttt{tasaki23\_raised\_marshall\_pos\_of\_site\_sum\_pos},\\
+\texttt{tasaki23\_raising\_identifies\_adjacent\_sector\_energy}\\
+\texttt{\_of\_site\_sum\_pos}
+\end{gathered}
+\]
+allows the same comparison to be invoked from the local hypothesis
+obtained by expanding \(\hat S^+_{\rm tot}\) as
+\(\sum_x \hat S^+_x\).
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
