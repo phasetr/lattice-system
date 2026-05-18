@@ -7577,6 +7577,27 @@ They combine the abstract Casimir obstruction with
 \texttt{magSectorEmbedding\_mem\_magSubspaceS}, so a sector vector
 \(\Phi\) can be used directly after zero extension to the full
 Hilbert space.
+The follow-up wrappers discharge the nonzero-vector hypothesis for the
+actual Theorem 2.2 sector vector.  If \(v_\tau>0\) for every sector
+configuration \(\tau\), then
+\[
+  \mathrm{magSectorEmbedding}
+    \left(\tau\mapsto
+      \bigl((\mathrm{marshallSignS}(A,\tau))_{\rm re} v_\tau\bigr)
+    \right)\ne0,
+\]
+because the Marshall sign has real part \(\pm1\).  Lean records this as
+\texttt{tasaki23\_marshallPositive\_magSectorEmbedding\_ne\_zero} and
+then packages the lowering and raising Casimir criteria for this
+Marshall-positive vector as
+\[
+\begin{gathered}
+\texttt{tasaki23\_totalSpinSOpMinus\_mulVec\_marshallPositive}\\
+\texttt{\_magSectorEmbedding\_ne\_zero\_of\_casimir\_ne\_kernel\_value},\\
+\texttt{tasaki23\_totalSpinSOpPlus\_mulVec\_marshallPositive}\\
+\texttt{\_magSectorEmbedding\_ne\_zero\_of\_casimir\_ne\_kernel\_value}.
+\end{gathered}
+\]
 
 \textbf{Sector-support bridge and lowering-sector shift}: the same PR
 also records the support side of the adjacent-sector comparison.  First,
