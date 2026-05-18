@@ -633,6 +633,37 @@ noncomputable def tasaki23SignedLoweringSiteContribution
     ((((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
       (magSectorEmbedding Φ)) τ.1).re)
 
+/-- **Tasaki §2.5 Theorem 2.3 strict off-`A` lowered sign-sum witness**:
+if at least one site outside `A` can be lowered in the target
+configuration, then the off-`A` filtered signed lowering sum is strictly
+positive.
+
+This is the strict companion to
+`tasaki23_signed_lowering_offA_sum_nonneg`: all off-`A` terms are
+non-negative, and the witness site contributes strictly positively. -/
+theorem tasaki23_signed_lowering_offA_sum_pos_of_exists_lowerable_offA
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1))
+    (hΦ_pos : ∀ σ : magConfigS V N M,
+      0 < (marshallSignS A σ.1).re * (Φ σ).re)
+    (hwitness : ∃ x : V, A x = false ∧ 0 < (τ.1 x).val) :
+    0 < ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+      tasaki23SignedLoweringSiteContribution A Φ τ x := by
+  classical
+  obtain ⟨x, hAx, hx⟩ := hwitness
+  apply Finset.sum_pos'
+  · intro y hy
+    unfold tasaki23SignedLoweringSiteContribution
+    have hAy : A y = false := by
+      simpa using (Finset.mem_filter.mp hy).2
+    exact tasaki23_signed_single_site_lowering_component_nonneg_of_A_false
+      A Φ τ y hAy hΦ_pos
+  · refine ⟨x, ?_, ?_⟩
+    · exact Finset.mem_filter.mpr ⟨Finset.mem_univ x, hAx⟩
+    · unfold tasaki23SignedLoweringSiteContribution
+      exact tasaki23_signed_single_site_lowering_component_pos_of_A_false
+        A Φ τ x hx hAx hΦ_pos
+
 /-- **Tasaki §2.5 Theorem 2.3 lowered site-sum decomposition**:
 the full signed lowered site-sum is the sum of its off-`A` and on-`A`
 filtered signed pieces.
@@ -1037,6 +1068,36 @@ noncomputable def tasaki23SignedRaisingSiteContribution
   (marshallSignS A τ.1).re *
     ((((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
       (magSectorEmbedding Φ)) τ.1).re)
+
+/-- **Tasaki §2.5 Theorem 2.3 strict off-`A` raised sign-sum witness**:
+if at least one site outside `A` can be raised in the target predecessor
+configuration, then the off-`A` filtered signed raising sum is strictly
+positive.
+
+This is the raising-direction companion to
+`tasaki23_signed_lowering_offA_sum_pos_of_exists_lowerable_offA`. -/
+theorem tasaki23_signed_raising_offA_sum_pos_of_exists_raiseable_offA
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N (M + 1) → ℂ)
+    (τ : magConfigS V N M)
+    (hΦ_pos : ∀ σ : magConfigS V N (M + 1),
+      0 < (marshallSignS A σ.1).re * (Φ σ).re)
+    (hwitness : ∃ x : V, A x = false ∧ (τ.1 x).val < N) :
+    0 < ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+      tasaki23SignedRaisingSiteContribution A Φ τ x := by
+  classical
+  obtain ⟨x, hAx, hx⟩ := hwitness
+  apply Finset.sum_pos'
+  · intro y hy
+    unfold tasaki23SignedRaisingSiteContribution
+    have hAy : A y = false := by
+      simpa using (Finset.mem_filter.mp hy).2
+    exact tasaki23_signed_single_site_raising_component_nonneg_of_A_false
+      A Φ τ y hAy hΦ_pos
+  · refine ⟨x, ?_, ?_⟩
+    · exact Finset.mem_filter.mpr ⟨Finset.mem_univ x, hAx⟩
+    · unfold tasaki23SignedRaisingSiteContribution
+      exact tasaki23_signed_single_site_raising_component_pos_of_A_false
+        A Φ τ x hx hAx hΦ_pos
 
 /-- **Tasaki §2.5 Theorem 2.3 raised site-sum decomposition**:
 the full signed raised site-sum is the sum of its off-`A` and on-`A`
