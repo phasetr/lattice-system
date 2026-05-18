@@ -8329,6 +8329,31 @@ Thus the non-zero ladder image used to enter the adjacent sector keeps
 its predicted-Casimir information available before the later
 sector-representative comparison.
 
+\textbf{Sector-existence predicted-Casimir chain link}: the preceding
+package is now connected to the per-sector Theorem~2.2 existence wrapper.
+The Lean theorems
+\[
+\begin{gathered}
+\texttt{tasaki23\_successor\_sector\_existence}\\
+\texttt{\_with\_lowered\_predictedCasimir},\\
+\texttt{tasaki23\_predecessor\_sector\_existence}\\
+\texttt{\_with\_raised\_predictedCasimir}
+\end{gathered}
+\]
+first choose the Marshall-positive sector ground-state vector supplied
+by \texttt{tasaki\_2\_5\_theorem\_2\_3\_sector\_existence}.  Assuming the
+remaining predicted-Casimir identity and the appropriate site-sum
+positivity for that chosen vector, they return the successor or
+predecessor common-energy package and keep the identity
+\[
+  \hat S_{\mathrm{tot}}^2(\hat S^\pm_{\mathrm{tot}}\Phi)
+    =
+  C_{\mathrm{pred}}\,\hat S^\pm_{\mathrm{tot}}\Phi
+\]
+on the actual ladder image.  Thus the final Theorem~2.3 iteration can
+work with sector-existence data rather than externally supplied
+source-sector eigenvectors.
+
 \textbf{Predicted-Casimir adjacent common-energy wrappers}: the
 Casimir endpoint mismatch is now connected directly to the one-step
 sector chain.  The Lean theorems
