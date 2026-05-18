@@ -7530,6 +7530,35 @@ adjacent-sector energy identification above.  The remaining
 critical-path input is now the proof that the lowered sector vector
 indeed satisfies the Marshall-positive hypothesis.
 
+\textbf{Lowered-vector site-sum positivity form}: the next Lean step
+opens the total lowering operator at a target configuration:
+\[
+  \bigl(\hat S^-_{\rm tot}\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau)
+  =
+  \sum_{x\in V}
+  \bigl(\hat S^-_x\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau).
+\]
+This is formalised as
+\texttt{totalSpinSOpMinus\_mulVec\_magSectorEmbedding\_apply\_eq\_site\_sum}.
+It converts the remaining Marshall-positivity obligation into the
+single-site sum form
+\[
+  0 <
+  (\mathrm{marshallSignS}\,A\,\tau).\mathrm{re}\,
+  \sum_{x\in V}
+  \mathrm{Re}\,
+  \bigl(\hat S^-_x\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau).
+\]
+The bridge
+\texttt{tasaki23\_lowered\_marshall\_pos\_of\_site\_sum\_pos} turns this
+local site-sum hypothesis back into the global lowered-vector
+Marshall-positivity hypothesis, and
+\texttt{tasaki23\_lowering\_identifies\_adjacent\_sector\_energy\_of\_site\_sum\_pos}
+feeds it directly into the non-vanishing plus adjacent-sector energy
+identification package.  The remaining critical-path proof can now
+focus on the predecessor configurations appearing in each single-site
+lowering term.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
