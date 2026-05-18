@@ -7636,6 +7636,64 @@ reduces the remaining lowered-vector positivity proof to signed sums of
 strictly positive source-sector coefficients and positive local lowering
 matrix entries.
 
+\textbf{Local signed single-site contribution split}: Lean also records
+the real-part form of the predecessor component formula.  Since every
+\(\hat S^-_N\) matrix entry is real, the non-zero local contribution
+satisfies
+\[
+  \mathrm{Re}\,
+  \bigl(\hat S^-_x\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau)
+  =
+  \mathrm{Re}\,(\hat S^-_N)_{\tau_x,\rho_x}\,
+  \mathrm{Re}\,\Phi_M(\rho).
+\]
+This is formalised as
+\[
+\begin{gathered}
+\texttt{onSiteS\_spinSOpMinus\_mulVec\_magSectorEmbedding\_apply}\\
+\texttt{\_single\_site\_pred\_re}.
+\end{gathered}
+\]
+Combining this identity with
+\texttt{spinSOpMinus\_apply\_re\_pos\_of\_lower}, source-sector
+Marshall positivity, and the one-site Marshall sign product gives the
+two local signed alternatives:
+\[
+  A(x)=\mathrm{false}
+  \quad\Rightarrow\quad
+  0 <
+  \mathrm{Re}\,\mathrm{marshallSignS}(A,\tau)\,
+  \mathrm{Re}\,
+  \bigl(\hat S^-_x\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau),
+\]
+whereas
+\[
+  A(x)=\mathrm{true}
+  \quad\Rightarrow\quad
+  \mathrm{Re}\,\mathrm{marshallSignS}(A,\tau)\,
+  \mathrm{Re}\,
+  \bigl(\hat S^-_x\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau)
+  < 0 .
+\]
+The Lean names are
+\[
+\begin{gathered}
+\texttt{tasaki23\_signed\_single\_site\_lowering\_component}\\
+\texttt{\_pos\_of\_A\_false}
+\end{gathered}
+\]
+and
+\[
+\begin{gathered}
+\texttt{tasaki23\_signed\_single\_site\_lowering\_component}\\
+\texttt{\_neg\_of\_A\_true}.
+\end{gathered}
+\]
+Thus the formal local analysis now exposes the sign obstruction that
+the full site-sum positivity proof must control: lowered sites off
+\(A\) contribute with the Marshall-positive sign, while lowered sites
+on \(A\) contribute with the opposite sign.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
