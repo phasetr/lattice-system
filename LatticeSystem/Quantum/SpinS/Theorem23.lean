@@ -1,3 +1,4 @@
+import Mathlib.Data.Nat.Lattice
 import LatticeSystem.Quantum.SpinS.AllAlignedStateMagShift
 import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
 import LatticeSystem.Quantum.SpinS.MarshallSign
@@ -1131,6 +1132,101 @@ def tasaki23GroundStateSectors (A : V → Bool) (N : ℕ) : Finset ℕ :=
   let cA := (Finset.univ.filter (fun x : V => A x = true)).card
   let cB := (Finset.univ.filter (fun x : V => (! A x) = true)).card
   Finset.Icc (min cA cB * N) (max cA cB * N)
+
+omit [DecidableEq V] in
+/-- **Tasaki §2.5 Theorem 2.3 admissible-sector membership**:
+membership in `tasaki23GroundStateSectors A N` is exactly the closed
+integer interval between `min(|A|, |¬A|)·N` and `max(|A|, |¬A|)·N`. -/
+theorem tasaki23GroundStateSectors_mem_iff (A : V → Bool) (N M : ℕ) :
+    M ∈ tasaki23GroundStateSectors (V := V) A N ↔
+      min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+          (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N ≤ M ∧
+        M ≤ max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+          (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N := by
+  simp [tasaki23GroundStateSectors]
+
+omit [DecidableEq V] in
+/-- **Tasaki §2.5 Theorem 2.3 left endpoint sector**:
+the lower endpoint `min(|A|, |¬A|)·N` belongs to the admissible
+sector interval. -/
+theorem tasaki23GroundStateSectors_left_mem (A : V → Bool) (N : ℕ) :
+    min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+      (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N ∈
+      tasaki23GroundStateSectors (V := V) A N := by
+  rw [tasaki23GroundStateSectors_mem_iff]
+  exact ⟨le_rfl, Nat.mul_le_mul_right N min_le_max⟩
+
+omit [DecidableEq V] in
+/-- **Tasaki §2.5 Theorem 2.3 right endpoint sector**:
+the upper endpoint `max(|A|, |¬A|)·N` belongs to the admissible
+sector interval. -/
+theorem tasaki23GroundStateSectors_right_mem (A : V → Bool) (N : ℕ) :
+    max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+      (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N ∈
+      tasaki23GroundStateSectors (V := V) A N := by
+  rw [tasaki23GroundStateSectors_mem_iff]
+  exact ⟨Nat.mul_le_mul_right N min_le_max, le_rfl⟩
+
+omit [DecidableEq V] in
+/-- **Tasaki §2.5 Theorem 2.3 successor sector closure**:
+inside the admissible interval, any non-right-endpoint sector has its
+successor in the same interval. This is the combinatorial form needed
+to apply the lowering-direction adjacent-sector ladder step. -/
+theorem tasaki23GroundStateSectors_succ_mem_of_mem_of_lt_right (A : V → Bool) (N : ℕ)
+    {M : ℕ}
+    (hM : M ∈ tasaki23GroundStateSectors (V := V) A N)
+    (hMlt : M <
+      max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N) :
+    M + 1 ∈ tasaki23GroundStateSectors (V := V) A N := by
+  rw [tasaki23GroundStateSectors_mem_iff] at hM ⊢
+  omega
+
+omit [DecidableEq V] in
+/-- **Tasaki §2.5 Theorem 2.3 predecessor sector closure**:
+inside the admissible interval, any non-left-endpoint sector has its
+predecessor in the same interval. This is the combinatorial form needed
+to apply the raising-direction adjacent-sector ladder step. -/
+theorem tasaki23GroundStateSectors_pred_mem_of_left_lt_of_mem (A : V → Bool) (N : ℕ)
+    {M : ℕ}
+    (hMlt :
+      min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N < M)
+    (hM : M ∈ tasaki23GroundStateSectors (V := V) A N) :
+    M - 1 ∈ tasaki23GroundStateSectors (V := V) A N := by
+  rw [tasaki23GroundStateSectors_mem_iff] at hM ⊢
+  omega
+
+omit [DecidableEq V] in
+/-- **Tasaki §2.5 Theorem 2.3 admissible-sector cardinality**:
+the interval of ground-state magnetization sectors has the predicted
+degeneracy `||A| - |¬A||·N + 1 = 2 S_tot + 1`. -/
+theorem tasaki23GroundStateSectors_card (A : V → Bool) (N : ℕ) :
+    (tasaki23GroundStateSectors (V := V) A N).card =
+      tasaki23PredictedDegeneracy (V := V) A N := by
+  let cA := (Finset.univ.filter (fun x : V => A x = true)).card
+  let cB := (Finset.univ.filter (fun x : V => (! A x) = true)).card
+  change (Finset.Icc (min cA cB * N) (max cA cB * N)).card =
+    Int.natAbs ((cA : ℤ) - (cB : ℤ)) * N + 1
+  rcases le_total cA cB with h | h
+  · have hmin : min cA cB = cA := min_eq_left h
+    have hmax : max cA cB = cB := max_eq_right h
+    have habs : Int.natAbs ((cA : ℤ) - (cB : ℤ)) = cB - cA := by
+      omega
+    rw [hmin, hmax, Nat.card_Icc, habs]
+    have hmul : cA * N ≤ cB * N := Nat.mul_le_mul_right N h
+    have hcard : cB * N + 1 - cA * N = (cB * N - cA * N) + 1 := by
+      omega
+    rw [hcard, ← Nat.sub_mul]
+  · have hmin : min cA cB = cB := min_eq_right h
+    have hmax : max cA cB = cA := max_eq_left h
+    have habs : Int.natAbs ((cA : ℤ) - (cB : ℤ)) = cA - cB := by
+      omega
+    rw [hmin, hmax, Nat.card_Icc, habs]
+    have hmul : cB * N ≤ cA * N := Nat.mul_le_mul_right N h
+    have hcard : cA * N + 1 - cB * N = (cA * N - cB * N) + 1 := by
+      omega
+    rw [hcard, ← Nat.sub_mul]
 
 /-- **Tasaki §2.5 Theorem 2.3 (Marshall–Lieb–Mattis general spin-S), final
 statement** as a `Prop`.

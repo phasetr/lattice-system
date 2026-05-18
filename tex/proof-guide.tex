@@ -7428,6 +7428,35 @@ $\mathrm{tasaki23GroundStateSectors}\,A\,N$. Reference: H.~Tasaki,
 \emph{Physics and Mathematics of Quantum Many-Body Systems},
 Springer 2020, §2.5 Theorem 2.3, p.~42.
 
+\textbf{Admissible-sector interval combinatorics}: the sector range is
+now formalised as a closed finite interval.  Lean proves the membership
+characterisation
+\[
+  M \in \mathrm{tasaki23GroundStateSectors}\,A\,N
+  \quad\Longleftrightarrow\quad
+  \min(|A|,|\neg A|)N \le M \le \max(|A|,|\neg A|)N
+\]
+as \texttt{tasaki23GroundStateSectors\_mem\_iff}.  The endpoint lemmas
+\texttt{tasaki23GroundStateSectors\_left\_mem} and
+\texttt{tasaki23GroundStateSectors\_right\_mem} put the two boundary
+sectors into the range, while
+\texttt{tasaki23GroundStateSectors\_succ\_mem\_of\_mem\_of\_lt\_right}
+and
+\texttt{tasaki23GroundStateSectors\_pred\_mem\_of\_left\_lt\_of\_mem}
+record the one-step successor/predecessor closure inside the interval.
+Finally,
+\[
+  |\mathrm{tasaki23GroundStateSectors}\,A\,N|
+  =
+  \mathrm{tasaki23PredictedDegeneracy}\,A\,N
+  =
+  \bigl||A|-|\neg A|\bigr|\,N+1
+\]
+is formalised as \texttt{tasaki23GroundStateSectors\_card}.  These
+lemmas provide the finite-range bookkeeping used to iterate the
+lowering and raising adjacent-sector energy comparisons across the
+Theorem 2.3 multiplet.
+
 \textbf{Ladder eigenvalue preservation}: the next proof step packages
 the SU(2) ladder comparison used to identify neighbouring sector
 eigenvalues.  If
