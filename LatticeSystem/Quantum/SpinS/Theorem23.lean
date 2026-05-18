@@ -1,6 +1,7 @@
 import Mathlib.Data.Nat.Lattice
 import LatticeSystem.Quantum.SpinS.AllAlignedStateMagShift
 import LatticeSystem.Quantum.SpinS.BipartiteToyGSLeTotalSpinSSquaredEigenspace
+import LatticeSystem.Quantum.SpinS.BipartiteToyGSLadderInvariant
 import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
 import LatticeSystem.Quantum.SpinS.MarshallSign
 import LatticeSystem.Quantum.SpinS.NeelBipartiteWeight
@@ -1882,6 +1883,38 @@ theorem tasaki23_totalSpinSSquared_mulVec_of_mem_bipartiteToyGroundStateSubspace
   rw [tasaki23PredictedCasimirValue_eq_canonical_of_card_notA_le_cardA
     (V := V) A N hBA]
   simpa using hmem
+
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS lowering closure**:
+if a full spin-`S` vector lies in the predicted toy ground-state
+subspace, then its total-lowering image also lies in that subspace.
+
+This packages the existing predicted-GS ladder invariance in the
+pointwise form used by the adjacent-sector Theorem 2.3 chain, without
+adding a new membership hypothesis for the lowered vector. -/
+theorem tasaki23_totalSpinSOpMinus_mulVec_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (totalSpinSOpMinus V N).mulVec Ψ ∈
+      bipartiteToyGroundStateSubspacePredicted (Λ := V) A N := by
+  exact
+    bipartiteToyGroundStateSubspacePredicted_totalSpinSOpMinus_invariant
+      (Λ := V) A N ⟨Ψ, hΨ, by simp⟩
+
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS raising closure**:
+if a full spin-`S` vector lies in the predicted toy ground-state
+subspace, then its total-raising image also lies in that subspace.
+
+This is the raising-direction companion to
+`tasaki23_totalSpinSOpMinus_mulVec_mem_bipartiteToyGroundStateSubspacePredicted`.
+-/
+theorem tasaki23_totalSpinSOpPlus_mulVec_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (totalSpinSOpPlus V N).mulVec Ψ ∈
+      bipartiteToyGroundStateSubspacePredicted (Λ := V) A N := by
+  exact
+    bipartiteToyGroundStateSubspacePredicted_totalSpinSOpPlus_invariant
+      (Λ := V) A N ⟨Ψ, hΨ, by simp⟩
 
 /-- **Tasaki §2.5 Theorem 2.3 predicted-Casimir preservation under
 lowering**: if a full spin-`S` vector has the Theorem 2.3 predicted
