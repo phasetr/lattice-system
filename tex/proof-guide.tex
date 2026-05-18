@@ -7598,6 +7598,53 @@ Marshall-positive vector as
 \texttt{\_magSectorEmbedding\_ne\_zero\_of\_casimir\_ne\_kernel\_value}.
 \end{gathered}
 \]
+The adjacent-sector energy comparison now has a Casimir-nonvanishing
+entry point.  For a Marshall-positive source vector
+\[
+  \Psi_M=
+  \mathrm{magSectorEmbedding}
+    \left(\tau\mapsto
+      \bigl((\mathrm{marshallSignS}(A,\tau))_{\rm re} v_\tau\bigr)
+    \right)
+\]
+with \(v_\tau>0\), suppose
+\[
+  \hat S_{\rm tot}^2\Psi_M=\gamma\Psi_M
+  \qquad\text{and}\qquad
+  \gamma\ne m(m-1),
+  \quad m=|V|N/2-M .
+\]
+Then the lowering image \(\hat S^-_{\rm tot}\Psi_M\) is nonzero by
+the Marshall-positive Casimir criterion.  If the same lowered vector
+also satisfies the already isolated Marshall-positivity hypothesis in
+sector \(M+1\), Theorem~2.2 uniqueness in that sector identifies the
+successor ground-state energy with the source energy.  Lean records
+this as
+\[
+\begin{gathered}
+\texttt{tasaki23\_lowering\_identifies\_adjacent\_sector\_energy}\\
+\texttt{\_with\_casimir\_nonzero}.
+\end{gathered}
+\]
+The raising companion uses the endpoint value \(m(m+1)\) and is named
+\[
+\begin{gathered}
+\texttt{tasaki23\_raising\_identifies\_adjacent\_sector\_energy}\\
+\texttt{\_with\_casimir\_nonzero}.
+\end{gathered}
+\]
+Finally,
+\[
+\begin{gathered}
+\texttt{tasaki23\_successor\_sector\_common\_energy}\\
+\texttt{\_of\_site\_sum\_pos\_of\_casimir\_ne\_kernel\_value}
+\end{gathered}
+\]
+packages the lowering direction with the admissible-sector successor
+lemma.  Thus the one-step chain can now carry both pieces of data
+needed later: the successor sector belongs to the predicted interval,
+and the ladder vector is nonzero for the SU(2) Casimir reason rather
+than merely because strict target-sector positivity implies nonzero.
 
 \textbf{Sector-support bridge and lowering-sector shift}: the same PR
 also records the support side of the adjacent-sector comparison.  First,

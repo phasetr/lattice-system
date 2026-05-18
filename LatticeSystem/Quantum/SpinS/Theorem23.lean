@@ -1199,6 +1199,143 @@ theorem tasaki23_raising_identifies_adjacent_sector_energy_with_nonzero
       hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate hΦ
       hraised_marshall_pos⟩
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 adjacent-sector package with Casimir
+non-vanishing, lowering direction**: for a Marshall-positive source
+sector vector, a non-endpoint total-Casimir eigenvalue gives the
+non-zero lowered-vector conclusion, while the existing
+Marshall-positive lowered-vector hypothesis identifies the adjacent
+sector energy.
+
+This connects the Casimir obstruction package to the adjacent-sector
+energy comparison used in the Theorem 2.3 chain. -/
+theorem tasaki23_lowering_identifies_adjacent_sector_energy_with_casimir_nonzero
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)] [Nonempty (magConfigS V N (M + 1))]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {μ : ℝ} {γ : ℂ} {v : magConfigS V N M → ℝ}
+    (hΦ_cas :
+      (totalSpinSSquared V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        γ • magSectorEmbedding
+          (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (hγ_ne :
+      γ ≠
+        ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) *
+          ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) - 1)))
+    (hv_pos : ∀ τ, 0 < v τ)
+    (hΦ : (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+      (μ : ℂ) • magSectorEmbedding
+        (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (hlowered_marshall_pos :
+      ∀ τ : magConfigS V N (M + 1),
+        0 < (marshallSignS A τ.1).re *
+          (((totalSpinSOpMinus V N).mulVec
+            (magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re) :
+    (totalSpinSOpMinus V N).mulVec
+        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ≠ 0 ∧
+    ∃ (μ_succ : ℝ) (v_succ : magConfigS V N (M + 1) → ℝ),
+      μ_succ < c ∧ (∀ τ, 0 < v_succ τ) ∧
+      (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ))) =
+        (μ_succ : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) ∧
+      μ = μ_succ ∧
+      ∃ r : ℝ, 0 < r ∧
+        ∀ τ : magConfigS V N (M + 1),
+          (((totalSpinSOpMinus V N).mulVec
+            (magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re =
+            r * ((marshallSignS A τ.1).re * v_succ τ) := by
+  exact
+    ⟨tasaki23_totalSpinSOpMinus_mulVec_marshallPositive_magSectorEmbedding_ne_zero_of_casimir_ne_kernel_value
+        A hΦ_cas hγ_ne hv_pos,
+      tasaki23_lowering_identifies_adjacent_sector_energy A N c hJ_real
+        hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+        h_intermediate hΦ hlowered_marshall_pos⟩
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 adjacent-sector package with Casimir
+non-vanishing, raising direction**: for a Marshall-positive source
+sector vector, a non-endpoint total-Casimir eigenvalue gives the
+non-zero raised-vector conclusion, while the existing
+Marshall-positive raised-vector hypothesis identifies the adjacent
+predecessor-sector energy.
+
+This is the raising-direction companion to
+`tasaki23_lowering_identifies_adjacent_sector_energy_with_casimir_nonzero`. -/
+theorem tasaki23_raising_identifies_adjacent_sector_energy_with_casimir_nonzero
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)] [Nonempty (magConfigS V N (M + 1))]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {μ : ℝ} {γ : ℂ} {v : magConfigS V N (M + 1) → ℝ}
+    (hΦ_cas :
+      (totalSpinSSquared V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N (M + 1) =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        γ • magSectorEmbedding
+          (fun τ : magConfigS V N (M + 1) =>
+            (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (hγ_ne :
+      γ ≠
+        ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) *
+          ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) + 1)))
+    (hv_pos : ∀ τ, 0 < v τ)
+    (hΦ : (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+      (μ : ℂ) • magSectorEmbedding
+        (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (hraised_marshall_pos :
+      ∀ τ : magConfigS V N M,
+        0 < (marshallSignS A τ.1).re *
+          (((totalSpinSOpPlus V N).mulVec
+            (magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re) :
+    (totalSpinSOpPlus V N).mulVec
+        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ≠ 0 ∧
+    ∃ (μ_pred : ℝ) (v_pred : magConfigS V N M → ℝ),
+      μ_pred < c ∧ (∀ τ, 0 < v_pred τ) ∧
+      (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v_pred τ : ℝ) : ℂ))) =
+        (μ_pred : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v_pred τ : ℝ) : ℂ)) ∧
+      μ = μ_pred ∧
+      ∃ r : ℝ, 0 < r ∧
+        ∀ τ : magConfigS V N M,
+          (((totalSpinSOpPlus V N).mulVec
+            (magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re =
+            r * ((marshallSignS A τ.1).re * v_pred τ) := by
+  exact
+    ⟨tasaki23_totalSpinSOpPlus_mulVec_marshallPositive_magSectorEmbedding_ne_zero_of_casimir_ne_kernel_value
+        A hΦ_cas hγ_ne hv_pos,
+      tasaki23_raising_identifies_adjacent_sector_energy A N c hJ_real
+        hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+        h_intermediate hΦ hraised_marshall_pos⟩
+
 /-- **Tasaki §2.5 Theorem 2.3 adjacent-sector package from site-sum
 positivity**: a site-sum Marshall-positivity proof for the lowered
 vector is enough to obtain both non-vanishing and the adjacent-sector
@@ -1484,6 +1621,92 @@ theorem tasaki23_successor_sector_common_energy_of_site_sum_pos
     tasaki23_lowering_identifies_adjacent_sector_energy_of_site_sum_pos
       A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
       hc_strict h_intermediate hΦ hlowered_site_sum_pos
+  subst μ_succ
+  exact ⟨hsucc_mem, hμ_lt, hv_pos, hΦ, hlowered_ne, v_succ,
+    hμ_succ_lt, hv_succ_pos, hmul_succ, r, hr_pos, hrel⟩
+
+/-- **Tasaki §2.5 Theorem 2.3 adjacent common-energy successor step from
+Casimir non-vanishing**: inside the admissible sector interval, a
+Marshall-positive source-sector Casimir eigenvector whose Casimir value
+is not the lowering endpoint value has a non-zero lowered image, and a
+site-sum positivity proof identifies the successor-sector ground-state
+energy with the source energy.
+
+This connects the Casimir endpoint obstruction to the one-step
+successor link used in the final Theorem 2.3 chain. -/
+theorem tasaki23_successor_sector_common_energy_of_site_sum_pos_of_casimir_ne_kernel_value
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)] [Nonempty (magConfigS V N (M + 1))]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hM : M ∈ tasaki23GroundStateSectors (V := V) A N)
+    (hMlt : M <
+      max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N)
+    {μ : ℝ} {γ : ℂ} {v : magConfigS V N M → ℝ}
+    (hμ_lt : μ < c)
+    (hv_pos : ∀ τ, 0 < v τ)
+    (hΦ : (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+      (μ : ℂ) • magSectorEmbedding
+        (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (hΦ_cas :
+      (totalSpinSSquared V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        γ • magSectorEmbedding
+          (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (hγ_ne :
+      γ ≠
+        ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) *
+          ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) - 1)))
+    (hlowered_site_sum_pos :
+      ∀ τ : magConfigS V N (M + 1),
+        0 < (marshallSignS A τ.1).re *
+          (∑ x : V,
+            (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re)) :
+    M + 1 ∈ tasaki23GroundStateSectors (V := V) A N ∧
+    μ < c ∧ (∀ τ, 0 < v τ) ∧
+    (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+      (μ : ℂ) • magSectorEmbedding
+        (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+    (totalSpinSOpMinus V N).mulVec
+        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ≠ 0 ∧
+    ∃ v_succ : magConfigS V N (M + 1) → ℝ,
+      μ < c ∧ (∀ τ, 0 < v_succ τ) ∧
+      (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ))) =
+        (μ : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) ∧
+      ∃ r : ℝ, 0 < r ∧
+        ∀ τ : magConfigS V N (M + 1),
+          (((totalSpinSOpMinus V N).mulVec
+            (magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re =
+            r * ((marshallSignS A τ.1).re * v_succ τ) := by
+  have hsucc_mem :
+      M + 1 ∈ tasaki23GroundStateSectors (V := V) A N :=
+    tasaki23GroundStateSectors_succ_mem_of_mem_of_lt_right A N hM hMlt
+  obtain ⟨hlowered_ne, μ_succ, v_succ, hμ_succ_lt, hv_succ_pos,
+      hmul_succ, hμ_eq, r, hr_pos, hrel⟩ :=
+    tasaki23_lowering_identifies_adjacent_sector_energy_with_casimir_nonzero
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hΦ_cas hγ_ne hv_pos hΦ
+      (tasaki23_lowered_marshall_pos_of_site_sum_pos A
+        (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+        hlowered_site_sum_pos)
   subst μ_succ
   exact ⟨hsucc_mem, hμ_lt, hv_pos, hΦ, hlowered_ne, v_succ,
     hμ_succ_lt, hv_succ_pos, hmul_succ, r, hr_pos, hrel⟩
