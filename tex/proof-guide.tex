@@ -8307,6 +8307,28 @@ Casimir propagation in the exact sector-embedded form needed before the
 later Theorem~2.2 uniqueness comparison identifies a normalized adjacent
 sector representative.
 
+\textbf{Adjacent ladder-image predicted-Casimir package}: the sector
+preservation facts are now combined with the adjacent common-energy
+wrappers.  The Lean theorems
+\[
+\begin{gathered}
+\texttt{tasaki23\_successor\_common\_energy}\\
+\texttt{\_with\_lowered\_predictedCasimir},\\
+\texttt{tasaki23\_predecessor\_common\_energy}\\
+\texttt{\_with\_raised\_predictedCasimir}
+\end{gathered}
+\]
+return the usual successor/predecessor common-energy data and, in the
+same package, the identity
+\[
+  \hat S_{\mathrm{tot}}^2(\hat S^\pm_{\mathrm{tot}}\Phi)
+    =
+  C_{\mathrm{pred}}\,\hat S^\pm_{\mathrm{tot}}\Phi .
+\]
+Thus the non-zero ladder image used to enter the adjacent sector keeps
+its predicted-Casimir information available before the later
+sector-representative comparison.
+
 \textbf{Predicted-Casimir adjacent common-energy wrappers}: the
 Casimir endpoint mismatch is now connected directly to the one-step
 sector chain.  The Lean theorems
