@@ -92,6 +92,181 @@ theorem pos_eigenvec_eigenvalue_unique_dressedHeisenbergSReMatrixOnMagSector
     (dressedHeisenbergSReMatrixOnMagSector_isSymm A N M hJ_real)
     hv hv_pos hw hw_pos
 
+/-- **Upper bound from a positive Perron vector**: if a non-negative
+symmetric real matrix has a strictly positive eigenvector at eigenvalue
+`r`, then every real eigenvalue `s` is bounded above by `r`.
+
+This is the elementary Collatz-Wielandt comparison used to turn the
+positive Perron vector of the shifted dressed matrix into a lower bound
+for the corresponding dressed/Heisenberg eigenvalues. -/
+theorem eigenvalue_le_of_nonnegative_isSymm_of_positive_eigenvec
+    {n : Type*} [Fintype n] [Nonempty n]
+    {B : Matrix n n ℝ}
+    (hB_nonneg : ∀ i j, 0 ≤ B i j)
+    (hB_symm : B.IsSymm)
+    {r s : ℝ} {v w : n → ℝ}
+    (hv_pos : ∀ i, 0 < v i)
+    (hv : B.mulVec v = r • v)
+    (hw_ne : w ≠ 0)
+    (hw : B.mulVec w = s • w) :
+    s ≤ r := by
+  classical
+  have hr_nonneg : 0 ≤ r := by
+    have hrow_nonneg : 0 ≤ B.mulVec v (Classical.arbitrary n) := by
+      change 0 ≤ ∑ j, B (Classical.arbitrary n) j * v j
+      exact Finset.sum_nonneg fun j _ => mul_nonneg (hB_nonneg _ j) (le_of_lt (hv_pos j))
+    have hrow := congrFun hv (Classical.arbitrary n)
+    change B.mulVec v (Classical.arbitrary n) = r * v (Classical.arbitrary n) at hrow
+    nlinarith [hv_pos (Classical.arbitrary n)]
+  by_cases hs_nonpos : s ≤ 0
+  · exact hs_nonpos.trans hr_nonneg
+  have hs_pos : 0 < s := lt_of_not_ge hs_nonpos
+  let y : n → ℝ := fun i => |w i|
+  have hy_nonneg : ∀ i, 0 ≤ y i := fun i => abs_nonneg (w i)
+  have hy_ne : y ≠ 0 := by
+    intro hy_zero
+    apply hw_ne
+    funext i
+    have hi := congrFun hy_zero i
+    exact abs_eq_zero.mp hi
+  have hy_pos_some : ∃ i, 0 < y i := by
+    by_contra hnone
+    simp only [not_exists, not_lt] at hnone
+    exact hy_ne (funext fun i => le_antisymm (hnone i) (hy_nonneg i))
+  have hBy_ge : ∀ i, s * y i ≤ B.mulVec y i := by
+    intro i
+    have hrow_abs : |B.mulVec w i| ≤ B.mulVec y i := by
+      calc
+        |B.mulVec w i| = |∑ j, B i j * w j| := by rfl
+        _ ≤ ∑ j, |B i j * w j| := Finset.abs_sum_le_sum_abs _ _
+        _ = ∑ j, B i j * y j := by
+          apply Finset.sum_congr rfl
+          intro j _hj
+          rw [abs_mul, abs_of_nonneg (hB_nonneg i j)]
+        _ = B.mulVec y i := by rfl
+    have hrow := congrFun hw i
+    change B.mulVec w i = s * w i at hrow
+    calc
+      s * y i = |s * w i| := by
+        rw [abs_mul, abs_of_pos hs_pos]
+      _ = |B.mulVec w i| := by rw [hrow]
+      _ ≤ B.mulVec y i := hrow_abs
+  have hdot_pos : 0 < v ⬝ᵥ y := by
+    refine Finset.sum_pos' (fun i _ => mul_nonneg (le_of_lt (hv_pos i)) (hy_nonneg i)) ?_
+    obtain ⟨i, hi⟩ := hy_pos_some
+    exact ⟨i, Finset.mem_univ i, mul_pos (hv_pos i) hi⟩
+  have hweighted_le : s * (v ⬝ᵥ y) ≤ v ⬝ᵥ B.mulVec y := by
+    calc
+      s * (v ⬝ᵥ y) = ∑ i, v i * (s * y i) := by
+        rw [dotProduct, Finset.mul_sum]
+        apply Finset.sum_congr rfl
+        intro i _hi
+        ring
+      _ ≤ ∑ i, v i * B.mulVec y i := by
+        exact Finset.sum_le_sum fun i _ =>
+          mul_le_mul_of_nonneg_left (hBy_ge i) (le_of_lt (hv_pos i))
+      _ = v ⬝ᵥ B.mulVec y := by rfl
+  have hsym_vec : Matrix.vecMul v B = B.mulVec v := by
+    funext i
+    change ∑ j, v j * B j i = ∑ j, B i j * v j
+    refine Finset.sum_congr rfl (fun j _ => ?_)
+    rw [hB_symm.apply i j, mul_comm]
+  have hweighted_eq : v ⬝ᵥ B.mulVec y = r * (v ⬝ᵥ y) := by
+    rw [Matrix.dotProduct_mulVec, hsym_vec, hv, smul_dotProduct, smul_eq_mul]
+  nlinarith [hweighted_le, hweighted_eq, hdot_pos]
+
+/-- **Shifted dressed-sector eigenvalue upper bound**: the positive
+eigenvector of the shifted dressed matrix gives an upper bound on all
+real shifted-sector eigenvalues. -/
+theorem shiftedDressedSReMatrixOnMagSector_eigenvalue_le_of_positive_eigenvec
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    {r s : ℝ} {v w : magConfigS V N M → ℝ}
+    (hv_pos : ∀ σ, 0 < v σ)
+    (hv : (shiftedDressedSReMatrixOnMagSector A J N c M).mulVec v = r • v)
+    (hw_ne : w ≠ 0)
+    (hw : (shiftedDressedSReMatrixOnMagSector A J N c M).mulVec w = s • w) :
+    s ≤ r := by
+  have hB_nonneg :
+      ∀ σ τ,
+        0 ≤ shiftedDressedSReMatrixOnMagSector A J N c M σ τ :=
+    shiftedDressedSReMatrixOnMagSector_nonneg A N c M hJ_real hJ_nn hJ_sym
+      hJ_bipartite (fun σ => le_of_lt (hc_strict σ))
+  have hB_symm :
+      (shiftedDressedSReMatrixOnMagSector A J N c M).IsSymm := by
+    rw [shiftedDressedSReMatrixOnMagSector_eq_smul_sub_dressed]
+    exact ((Matrix.isSymm_one (n := magConfigS V N M)).smul c).sub
+      (dressedHeisenbergSReMatrixOnMagSector_isSymm A N M hJ_real')
+  exact eigenvalue_le_of_nonnegative_isSymm_of_positive_eigenvec
+    hB_nonneg hB_symm hv_pos hv hw_ne hw
+
+/-- **Real-sector spectral lower bound from a Marshall-positive sector
+ground state**: if a sector contains a Marshall-positive real eigenvector
+at energy `μ`, then every real eigenvalue in that sector is at least
+`μ`.
+
+The proof Marshall-conjugates to the dressed matrix, shifts by `c`, and
+applies the positive-eigenvector upper bound to the non-negative shifted
+dressed matrix. -/
+theorem heisenbergHamiltonianSReMatrixOnMagSector_eigenvalue_ge_of_marshallPositive
+    (A : V → Bool)
+    {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    {μ μ' : ℝ} {w φ : magConfigS V N M → ℝ}
+    (hw : (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec w = μ • w)
+    (hw_marshall_pos : ∀ σ, 0 < (marshallSignS A σ.1).re * w σ)
+    (hφ_ne : φ ≠ 0)
+    (hφ : (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec φ = μ' • φ) :
+    μ ≤ μ' := by
+  let wD : magConfigS V N M → ℝ := fun σ => (marshallSignS A σ.1).re * w σ
+  let φD : magConfigS V N M → ℝ := fun σ => (marshallSignS A σ.1).re * φ σ
+  have hwD_pos : ∀ σ, 0 < wD σ := hw_marshall_pos
+  have hwD_dressed :
+      (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec wD = μ • wD := by
+    exact dressedHeisenbergSReMatrixOnMagSector_mulVec_of_heis_eigenvec
+      A N hJ_real hw
+  have hφD_ne : φD ≠ 0 := by
+    intro hzero
+    apply hφ_ne
+    funext σ
+    have hσ := congrFun hzero σ
+    have hsq : (marshallSignS A σ.1).re * (marshallSignS A σ.1).re = 1 :=
+      marshallSignS_re_sq A σ.1
+    dsimp [φD] at hσ
+    calc
+      φ σ = 1 * φ σ := by ring
+      _ = ((marshallSignS A σ.1).re * (marshallSignS A σ.1).re) * φ σ := by rw [hsq]
+      _ = (marshallSignS A σ.1).re * ((marshallSignS A σ.1).re * φ σ) := by ring
+      _ = 0 := by rw [hσ, mul_zero]
+  have hφD_dressed :
+      (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec φD = μ' • φD := by
+    exact dressedHeisenbergSReMatrixOnMagSector_mulVec_of_heis_eigenvec
+      A N hJ_real hφ
+  have hwD_shifted :
+      (shiftedDressedSReMatrixOnMagSector A J N c M).mulVec wD = (c - μ) • wD :=
+    shiftedDressedSReMatrixOnMagSector_mulVec_of_dressed_eigenvec A J N c hwD_dressed
+  have hφD_shifted :
+      (shiftedDressedSReMatrixOnMagSector A J N c M).mulVec φD = (c - μ') • φD :=
+    shiftedDressedSReMatrixOnMagSector_mulVec_of_dressed_eigenvec A J N c hφD_dressed
+  have hle : c - μ' ≤ c - μ :=
+    shiftedDressedSReMatrixOnMagSector_eigenvalue_le_of_positive_eigenvec
+      A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hwD_pos hwD_shifted hφD_ne hφD_shifted
+  linarith
+
 /-- **Eigenvalue uniqueness for the Heisenberg sector matrix on
 Marshall-positive eigenvectors** (Tasaki §2.5 Theorem 2.2 strengthening):
 any two real eigenvectors with strictly positive Marshall conjugates
