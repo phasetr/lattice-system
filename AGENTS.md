@@ -98,6 +98,13 @@ the following on-disk files and obey their instructions:
   `gh issue view 412 --json body --jq .body` directly, then create or edit
   any local body files separately with the normal file-editing tools. Prefer
   `--body-file` for GitHub writes once the file already exists.
+- **Codex/Codex CLI only: keep workflow temporary files repo-local.** Do not
+  write PR bodies, Issue bodies, Issue comments, review prompts, or similar
+  routine workflow scratch files to `/private/tmp`. Put them under the
+  gitignored repo-local directory `.self-local/tmp/`; create it with
+  `mkdir -p .self-local/tmp` and continue without asking if it is missing.
+  `/private/tmp` is reserved only for tool caches such as the TeX
+  `TEXMFVAR` / `TEXMFCONFIG` directories described above.
 - **Codex cross-check is a single review at squash-merge time**, not
   per-commit / per-CI.
 - **All committed prose (commit messages, PR titles/bodies, doc strings,
