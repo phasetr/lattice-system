@@ -8851,6 +8851,51 @@ This does not prove the quantitative dominance estimate; it removes the
 signed local contribution notation from the remaining local input and
 leaves a pure predecessor-coefficient comparison.
 
+\textbf{Sublattice lowered coefficient components}: the coefficient
+comparison is now connected to the actual sublattice lowering
+operators.  Lean first expands
+\[
+  \hat S_A^- \Phi
+  \quad\hbox{and}\quad
+  \hat S_{\bar A}^- \Phi
+\]
+as the filtered sums of the single-site lowering contributions over
+\(A\) and \(\bar A\):
+\[
+\texttt{sublatticeSpinSOpMinus\_mulVec\_magSectorEmbedding\_apply\_eq\_onA\_site\_sum}
+\]
+and
+\[
+\texttt{sublatticeSpinSOpMinus\_complement\_mulVec\_magSectorEmbedding\_apply\_eq\_offA\_site\_sum}.
+\]
+Combining those expansions with the coefficient split gives
+\[
+  \operatorname{sgn}_A(\tau)
+  \operatorname{Re}((\hat S_{\bar A}^- \Phi)_\tau)
+  =
+  \sum_{x\notin A} C_x(\tau),
+\]
+and
+\[
+  \operatorname{sgn}_A(\tau)
+  \operatorname{Re}((\hat S_A^- \Phi)_\tau)
+  =
+  -\sum_{x\in A} C_x(\tau).
+\]
+The corresponding Lean names are
+\[
+\texttt{tasaki23\_signed\_lowering\_offA\_sublattice\_component\_eq\_coefficient\_sum}
+\]
+and
+\[
+\texttt{tasaki23\_signed\_lowering\_onA\_sublattice\_component\_eq\_neg\_coefficient\_sum}.
+\]
+This places the remaining dominance estimate at the operator level:
+one has to compare the Marshall-signed real components of
+\(\hat S_A^- \Phi\) and \(\hat S_{\bar A}^- \Phi\), which is the form
+needed to use the predicted ground-state and sublattice-Casimir
+structure in Tasaki, Springer 2020, Section 2.5, Theorem 2.3, p. 42.
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}
