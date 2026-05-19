@@ -8563,6 +8563,42 @@ Casimir callback required by the threaded interval-chain final wrappers.
 Thus the final conditional statement now asks for predicted-GS membership
 only at the left endpoint, rather than a direct Casimir identity.
 
+\textbf{Lowered site-sum final wrappers}: the dominance inequality used
+above is a sufficient way to prove the strict positivity of the lowered
+Marshall-signed site-sum, but the adjacent-sector comparison only needs
+that strict site-sum positivity itself.  Lean therefore also provides the
+site-sum form
+\[
+\begin{gathered}
+\texttt{tasaki23\_successor\_sector\_common\_energy}\\
+\texttt{\_of\_site\_sum\_pos\_of\_mem}\\
+\texttt{\_bipartiteToyGroundStateSubspacePredicted},
+\\
+\texttt{tasaki23\_energy\_interval\_chain\_of\_left\_endpoint}\\
+\texttt{\_predictedGS\_of\_lowered\_site\_sum\_pos}.
+\end{gathered}
+\]
+The first theorem combines predicted toy-ground-state membership with
+the direct strict lowered site-sum input; the second iterates this step
+through the admissible sector interval.  The final wrappers
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_predictedGS\_of\_lowered\_site\_sum\_pos},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_predictedGS\_of\_lowered\_site\_sum\_pos}\\
+\texttt{\_of\_sector\_minimality},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_predictedGS\_of\_lowered\_site\_sum\_pos}\\
+\texttt{\_of\_real\_sector\_minimality}
+\end{gathered}
+\]
+then reuse the common-energy packaging and the existing sector and
+real-sector minimality bridges.  This moves the remaining local
+positivity obligation from the stronger dominance statement to the
+actual strict site-sum positivity needed for Marshall positivity of
+\(S^-_{\mathrm{tot}}\Phi\).
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}
