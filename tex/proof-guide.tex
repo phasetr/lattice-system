@@ -8677,6 +8677,50 @@ sector eigenvectors.  The wrapper
 therefore leaves the remaining spectral lower-bound input entirely in
 the real sector matrix.
 
+\textbf{Predicted-Casimir final chain}: the final interval chain also has a
+form that no longer asks for predicted toy ground-state membership.  The
+Lean theorem
+\[
+\begin{gathered}
+\texttt{tasaki23\_energy\_interval\_chain}\\
+\texttt{\_of\_left\_endpoint\_predictedCasimir}\\
+\texttt{\_of\_onA\_neg\_lt\_offA}
+\end{gathered}
+\]
+uses the same lowered off-\(A\) dominance step, but its source-vector input
+is the predicted total-Casimir identity itself.  The helper
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_common\_energy\_chain}
+\end{gathered}
+\]
+then factors the final uniqueness packaging common to all interval-chain
+wrappers.  The intermediate wrapper
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_predictedCasimir}\\
+\texttt{\_of\_onA\_neg\_lt\_offA}\\
+\texttt{\_of\_sector}\\
+\texttt{\_minimality}
+\end{gathered}
+\]
+uses the sectorwise minimality bridge for the global lower bound.
+Consequently
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_predictedCasimir}\\
+\texttt{\_of\_onA\_neg\_lt\_offA}\\
+\texttt{\_of\_real\_sector}\\
+\texttt{\_minimality}
+\end{gathered}
+\]
+reduces the remaining final inputs to the source predicted-Casimir identity,
+the lowered off-\(A\) dominance estimate, and the real-sector spectral lower
+bound.
+
 \textbf{Predicted-GS total-Casimir bridge}: the total-Casimir component
 of the predicted toy ground-state subspace has now been put into the
 same notation as the adjacent-sector chain.  In the canonical
