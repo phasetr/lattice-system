@@ -8534,6 +8534,35 @@ source-Casimir callback in every non-right-endpoint sector; it only
 requires the predicted-Casimir identity for the left-endpoint
 representative selected by Theorem~2.2.
 
+\textbf{Left-endpoint predicted-GS final wrappers}: in the canonical
+orientation \(|\neg A|\le |A|\), the remaining left-endpoint
+predicted-Casimir input can itself be obtained from predicted
+toy-ground-state membership.  The Lean theorems
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint}\\
+\texttt{\_threaded\_predictedGS\_of\_onA\_neg\_lt\_offA},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint}\\
+\texttt{\_threaded\_predictedGS\_of\_onA\_neg\_lt\_offA}\\
+\texttt{\_of\_sector\_minimality},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint}\\
+\texttt{\_threaded\_predictedGS\_of\_onA\_neg\_lt\_offA}\\
+\texttt{\_of\_real\_sector\_minimality}
+\end{gathered}
+\]
+use
+\[
+\begin{gathered}
+\texttt{tasaki23\_totalSpinSSquared\_mulVec}\\
+\texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted}
+\end{gathered}
+\]
+to turn left-endpoint membership in
+\(\texttt{bipartiteToyGroundStateSubspacePredicted}\,A\,N\) into the
+Casimir callback required by the threaded interval-chain final wrappers.
+Thus the final conditional statement now asks for predicted-GS membership
+only at the left endpoint, rather than a direct Casimir identity.
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}
