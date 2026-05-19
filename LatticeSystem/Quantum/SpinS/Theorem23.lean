@@ -877,6 +877,134 @@ noncomputable def tasaki23SignedLoweringSiteContribution
     ((((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
       (magSectorEmbedding Φ)) τ.1).re)
 
+/-- **Tasaki §2.5 Theorem 2.3 lowered predecessor signed coefficient**:
+the boundary-inclusive coefficient obtained from the predecessor
+configuration of `τ` at `x`.
+
+If the target value `(τ.1 x).val` is positive, this is the positive
+`Ŝ^-` matrix coefficient times the Marshall-signed predecessor
+coefficient. If the target value is zero, the single-site lowering
+summand is zero and this coefficient is defined to be zero as well. -/
+noncomputable def tasaki23LoweringPredecessorSignedCoefficient
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1)) (x : V) : ℝ :=
+  if hx : 0 < (τ.1 x).val then
+    let predVal : Fin (N + 1) :=
+      ⟨(τ.1 x).val - 1, by omega⟩
+    let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+    let hpredM : magSumS pred = M :=
+      magSumS_single_site_lowering_predecessor τ x hx
+    (spinSOpMinus N (τ.1 x) predVal).re *
+      ((marshallSignS A pred).re * (Φ ⟨pred, hpredM⟩).re)
+  else
+    0
+
+/-- **Tasaki §2.5 Theorem 2.3 off-`A` lowered contribution split**:
+outside `A`, the signed single-site lowering contribution is exactly
+the boundary-inclusive signed predecessor coefficient.
+
+This packages the off-`A` coefficient identity in a form that can be
+summed without carrying a separate lowerability proof for every site. -/
+theorem tasaki23_signed_lowering_site_contribution_eq_coefficient_of_A_false
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1)) (x : V)
+    (hAx : A x = false) :
+    tasaki23SignedLoweringSiteContribution A Φ τ x =
+      tasaki23LoweringPredecessorSignedCoefficient A Φ τ x := by
+  classical
+  by_cases hx : 0 < (τ.1 x).val
+  · simpa [tasaki23SignedLoweringSiteContribution,
+      tasaki23LoweringPredecessorSignedCoefficient, hx]
+      using
+        tasaki23_signed_single_site_lowering_component_eq_of_A_false
+          A Φ τ x hx hAx
+  · have hzero : (τ.1 x).val = 0 := by omega
+    rw [tasaki23SignedLoweringSiteContribution,
+      tasaki23LoweringPredecessorSignedCoefficient]
+    rw [onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_eq_zero_of_target_zero
+      Φ τ x hzero]
+    simp [hx]
+
+/-- **Tasaki §2.5 Theorem 2.3 on-`A` lowered contribution split**:
+inside `A`, the signed single-site lowering contribution is the
+negative of the boundary-inclusive signed predecessor coefficient.
+
+This is the on-`A` companion to
+`tasaki23_signed_lowering_site_contribution_eq_coefficient_of_A_false`
+and isolates the exact term whose total size must be dominated by the
+off-`A` contribution in the final lowered Marshall-positivity proof. -/
+theorem tasaki23_signed_lowering_site_contribution_eq_neg_coefficient_of_A_true
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1)) (x : V)
+    (hAx : A x = true) :
+    tasaki23SignedLoweringSiteContribution A Φ τ x =
+      -tasaki23LoweringPredecessorSignedCoefficient A Φ τ x := by
+  classical
+  by_cases hx : 0 < (τ.1 x).val
+  · simpa [tasaki23SignedLoweringSiteContribution,
+      tasaki23LoweringPredecessorSignedCoefficient, hx]
+      using
+        tasaki23_signed_single_site_lowering_component_eq_neg_of_A_true
+          A Φ τ x hx hAx
+  · have hzero : (τ.1 x).val = 0 := by omega
+    rw [tasaki23SignedLoweringSiteContribution,
+      tasaki23LoweringPredecessorSignedCoefficient]
+    rw [onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_eq_zero_of_target_zero
+      Φ τ x hzero]
+    simp [hx]
+
+/-- **Tasaki §2.5 Theorem 2.3 off-`A` coefficient-sum split**:
+the off-`A` filtered signed lowering sum is exactly the corresponding
+sum of boundary-inclusive predecessor coefficients.
+
+This is the finite-sum form of
+`tasaki23_signed_lowering_site_contribution_eq_coefficient_of_A_false`
+and is the off-`A` side of the coefficient-level dominance comparison. -/
+theorem tasaki23_signed_lowering_offA_sum_eq_coefficient_sum
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1)) :
+    (∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+      tasaki23SignedLoweringSiteContribution A Φ τ x) =
+    ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+      tasaki23LoweringPredecessorSignedCoefficient A Φ τ x := by
+  apply Finset.sum_congr rfl
+  intro x hx
+  have hAx : A x = false := by
+    simpa using (Finset.mem_filter.mp hx).2
+  exact tasaki23_signed_lowering_site_contribution_eq_coefficient_of_A_false
+    A Φ τ x hAx
+
+/-- **Tasaki §2.5 Theorem 2.3 on-`A` coefficient-sum split**:
+the on-`A` filtered signed lowering sum is the negative of the
+corresponding boundary-inclusive predecessor coefficient sum.
+
+This is the finite-sum form of
+`tasaki23_signed_lowering_site_contribution_eq_neg_coefficient_of_A_true`
+and isolates the negative sublattice contribution that must be
+controlled in the final lowered Marshall-positivity proof. -/
+theorem tasaki23_signed_lowering_onA_sum_eq_neg_coefficient_sum
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1)) :
+    (∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+      tasaki23SignedLoweringSiteContribution A Φ τ x) =
+    -∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+      tasaki23LoweringPredecessorSignedCoefficient A Φ τ x := by
+  calc
+    (∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+      tasaki23SignedLoweringSiteContribution A Φ τ x) =
+        ∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+          -tasaki23LoweringPredecessorSignedCoefficient A Φ τ x := by
+          apply Finset.sum_congr rfl
+          intro x hx
+          have hAx : A x = true := by
+            simpa using (Finset.mem_filter.mp hx).2
+          exact
+            tasaki23_signed_lowering_site_contribution_eq_neg_coefficient_of_A_true
+              A Φ τ x hAx
+    _ = -∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+          tasaki23LoweringPredecessorSignedCoefficient A Φ τ x := by
+          rw [Finset.sum_neg_distrib]
+
 /-- **Tasaki §2.5 Theorem 2.3 strict off-`A` lowered sign-sum witness**:
 if at least one site outside `A` can be lowered in the target
 configuration, then the off-`A` filtered signed lowering sum is strictly

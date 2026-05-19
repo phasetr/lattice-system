@@ -8793,6 +8793,36 @@ site-sum dominance argument has to sum.  This is the local ladder
 coefficient analysis used in Tasaki, Springer 2020, Section 2.5,
 Theorem 2.3, p. 42.
 
+\textbf{Boundary-inclusive lowered coefficient split}: the same
+coefficient relation is now packaged in a form suitable for finite sums.
+Define \(C_x(\tau)\) to be the preceding coefficient when
+\(\tau_x>0\), and \(0\) when \(\tau_x=0\).  Lean names this
+\[
+\texttt{tasaki23LoweringPredecessorSignedCoefficient}.
+\]
+Then
+\[
+\texttt{tasaki23\_signed\_lowering\_site\_contribution\_eq\_coefficient\_of\_A\_false}
+\]
+states that the signed \(x\)-contribution is \(C_x(\tau)\) for
+\(x\notin A\), while
+\[
+\texttt{tasaki23\_signed\_lowering\_site\_contribution\_eq\_neg\_coefficient\_of\_A\_true}
+\]
+states that it is \(-C_x(\tau)\) for \(x\in A\).  Summing these
+pointwise identities gives
+\[
+\texttt{tasaki23\_signed\_lowering\_offA\_sum\_eq\_coefficient\_sum}
+\]
+and
+\[
+\texttt{tasaki23\_signed\_lowering\_onA\_sum\_eq\_neg\_coefficient\_sum}.
+\]
+Thus the remaining lowered-site-sum positivity input has been reduced
+to a coefficient-level comparison between the two sublattice sums,
+still within the ladder step of Tasaki, Springer 2020, Section 2.5,
+Theorem 2.3, p. 42.
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}
