@@ -2416,6 +2416,34 @@ theorem tasaki23_totalSpinSOpPlus_mulVec_mem_bipartiteToyGroundStateSubspacePred
     bipartiteToyGroundStateSubspacePredicted_totalSpinSOpPlus_invariant
       (Λ := V) A N ⟨Ψ, hΨ, by simp⟩
 
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS transfer across a non-zero
+real scalar**: if a vector in the predicted toy ground-state subspace is
+a non-zero real scalar multiple of another vector, then the second vector
+also lies in the predicted toy ground-state subspace.
+
+This is the membership analogue of
+`tasaki23_totalSpinSSquared_predictedCasimirValue_of_real_smul_eq`, used
+after the lowered ladder image is identified with the successor-sector
+representative up to a positive real scalar. -/
+theorem tasaki23_mem_bipartiteToyGroundStateSubspacePredicted_of_real_smul_eq
+    (A : V → Bool) (N : ℕ) {r : ℝ}
+    {Ψ Φ : (V → Fin (N + 1)) → ℂ}
+    (hr : r ≠ 0)
+    (hrel : Ψ = (r : ℂ) • Φ)
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    Φ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N := by
+  have hrC : (r : ℂ) ≠ 0 := by exact_mod_cast hr
+  have hsmul :
+      (r : ℂ) • Φ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N := by
+    simpa [← hrel] using hΨ
+  have hinv :
+      ((r : ℂ)⁻¹) • ((r : ℂ) • Φ) ∈
+        bipartiteToyGroundStateSubspacePredicted (Λ := V) A N :=
+    Submodule.smul_mem _ _ hsmul
+  have hscale : ((r : ℂ)⁻¹) • ((r : ℂ) • Φ) = Φ := by
+    rw [smul_smul, inv_mul_cancel₀ hrC, one_smul]
+  rwa [hscale] at hinv
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS lowered Casimir bridge**:
 in the canonical orientation, a vector in the predicted toy ground-state
 subspace has a total-lowering image with the Theorem 2.3 predicted
@@ -3981,6 +4009,117 @@ theorem
       hlowered_site_sum_pos
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 adjacent successor step with successor
+predicted-GS membership from lowered site-sum positivity**: if the source
+representative lies in the predicted toy ground-state subspace, then the
+successor representative produced by the lowered adjacent-sector step
+lies in the same predicted subspace.
+
+The proof uses predicted-GS invariance under `Ŝ^-_tot` and then cancels
+the positive real scalar relating the lowered image to the successor
+Marshall-positive representative. -/
+theorem
+    tasaki23_successor_sector_common_energy_with_successor_predictedGS_of_site_sum_pos
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)] [Nonempty (magConfigS V N (M + 1))]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hM : M ∈ tasaki23GroundStateSectors (V := V) A N)
+    (hMlt : M <
+      max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N)
+    {μ : ℝ} {v : magConfigS V N M → ℝ}
+    (hμ_lt : μ < c)
+    (hv_pos : ∀ τ, 0 < v τ)
+    (hΦ : (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+      (μ : ℂ) • magSectorEmbedding
+        (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (hΦ_pred :
+      magSectorEmbedding
+          (fun τ : magConfigS V N M =>
+            (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+        bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hlowered_site_sum_pos :
+      ∀ τ : magConfigS V N (M + 1),
+        0 < (marshallSignS A τ.1).re *
+          (∑ x : V,
+            (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re)) :
+    M + 1 ∈ tasaki23GroundStateSectors (V := V) A N ∧
+    μ < c ∧ (∀ τ, 0 < v τ) ∧
+    (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+      (μ : ℂ) • magSectorEmbedding
+        (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+    (totalSpinSOpMinus V N).mulVec
+        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ≠ 0 ∧
+    ∃ v_succ : magConfigS V N (M + 1) → ℝ,
+      μ < c ∧ (∀ τ, 0 < v_succ τ) ∧
+      (heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ))) =
+        (μ : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) ∧
+      magSectorEmbedding
+          (fun τ : magConfigS V N (M + 1) =>
+            (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) ∈
+        bipartiteToyGroundStateSubspacePredicted (Λ := V) A N ∧
+      ∃ r : ℝ, 0 < r ∧
+        ∀ τ : magConfigS V N (M + 1),
+          (((totalSpinSOpMinus V N).mulVec
+            (magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re =
+            r * ((marshallSignS A τ.1).re * v_succ τ) := by
+  have hstep :=
+    tasaki23_successor_sector_common_energy_of_site_sum_pos_of_mem_bipartiteToyGroundStateSubspacePredicted
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hBA hM hMlt hμ_lt hv_pos hΦ hΦ_pred
+      hlowered_site_sum_pos
+  rcases hstep with ⟨hsucc_mem, hμ_lt', hv_pos', hΦ', hlowered_ne,
+    v_succ, hμ_succ_lt, hv_succ_pos, hΦ_succ, r, hr_pos, hrel⟩
+  have hsmul :
+      (totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (r : ℂ) •
+          magSectorEmbedding
+            (fun τ : magConfigS V N (M + 1) =>
+              (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) :=
+    totalSpinSOpMinus_marshallSignedEmbedding_eq_smul_successor_of_re
+      A hrel
+  have hlowered_pred :
+      (totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ∈
+        bipartiteToyGroundStateSubspacePredicted (Λ := V) A N :=
+    tasaki23_totalSpinSOpMinus_mulVec_mem_bipartiteToyGroundStateSubspacePredicted
+      A N hΦ_pred
+  have hsucc_pred :
+      magSectorEmbedding
+          (fun τ : magConfigS V N (M + 1) =>
+            (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) ∈
+        bipartiteToyGroundStateSubspacePredicted (Λ := V) A N :=
+    tasaki23_mem_bipartiteToyGroundStateSubspacePredicted_of_real_smul_eq
+      A N (ne_of_gt hr_pos) hsmul hlowered_pred
+  exact ⟨hsucc_mem, hμ_lt', hv_pos', hΦ', hlowered_ne,
+    v_succ, hμ_succ_lt, hv_succ_pos, hΦ_succ, hsucc_pred,
+    r, hr_pos, hrel⟩
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 adjacent predicted-GS predecessor step from
 raised dominance**: in the canonical orientation `|¬A| ≤ |A|`,
 membership of the sector-`M+1` source vector in the predicted toy
@@ -5276,6 +5415,245 @@ theorem tasaki23_energy_interval_chain_of_left_endpoint_predictedGS_of_lowered_m
     tasaki23_energy_interval_chain_of_left_endpoint_predictedGS_of_lowered_site_sum_pos
       A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
       hc_strict h_intermediate hBA hsector_nonempty hsource_pred
+      (fun {M : ℕ} hM hMlt {μ : ℝ} {v : magConfigS V N M → ℝ}
+          hμ_lt hv_pos hΦ =>
+        tasaki23_lowered_site_sum_pos_of_marshall_pos A
+          (fun τ : magConfigS V N M =>
+            (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+          (hsource_lowered_marshall_pos hM hMlt hμ_lt hv_pos hΦ))
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 interval chain threading predicted-GS
+membership from lowered site-sum positivity**: in the canonical
+orientation `|¬A| ≤ |A|`, left-endpoint predicted-GS membership
+propagates to every representative produced by the lowered site-sum
+interval chain.
+
+The successor step uses `Ŝ^-_tot`-invariance of
+`bipartiteToyGroundStateSubspacePredicted` and scalar cancellation, so
+the all-source predicted-GS membership callback is no longer needed. -/
+theorem
+    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_lowered_site_sum_pos
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      ∀ {μ : ℝ}
+        {v : magConfigS V N
+          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+              N) → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N
+                (min
+                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+                  (Finset.card
+                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+                    N) =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hsource_site_sum_pos :
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        M <
+          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          ∀ τ : magConfigS V N (M + 1),
+            0 < (marshallSignS A τ.1).re *
+              (∑ x : V,
+                (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+                  (magSectorEmbedding
+                    (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re)) :
+    ∃ μ : ℝ,
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        ∃ v : magConfigS V N M → ℝ,
+          μ < c ∧ (∀ τ, 0 < v τ) ∧
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+          magSectorEmbedding
+              (fun τ : magConfigS V N M =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N := by
+  let left : ℕ :=
+    min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+      (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N
+  let right : ℕ :=
+    max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+      (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N
+  have hleft_mem : left ∈ tasaki23GroundStateSectors (V := V) A N := by
+    simpa [left] using tasaki23GroundStateSectors_left_mem (V := V) A N
+  letI : Nonempty (magConfigS V N left) := hsector_nonempty left hleft_mem
+  obtain ⟨μ, v_left, hμ_left_lt, hv_left_pos, hΦ_left, _hsupport, _huniq⟩ :=
+    tasaki_2_5_theorem_2_3_sector_existence
+      (M := left) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate
+  have hpred_left :
+      magSectorEmbedding
+          (fun τ : magConfigS V N left =>
+            (((marshallSignS A τ.1).re * v_left τ : ℝ) : ℂ)) ∈
+        bipartiteToyGroundStateSubspacePredicted (Λ := V) A N := by
+    simpa [left] using hleft_predictedGS hμ_left_lt hv_left_pos hΦ_left
+  refine ⟨μ, ?_⟩
+  have hchain :
+      ∀ M, left ≤ M → M ≤ right →
+        ∃ v : magConfigS V N M → ℝ,
+          μ < c ∧ (∀ τ, 0 < v τ) ∧
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+          magSectorEmbedding
+              (fun τ : magConfigS V N M =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N := by
+    intro M hleft_le hright_le
+    induction M, hleft_le using Nat.le_induction with
+    | base =>
+        exact ⟨v_left, hμ_left_lt, hv_left_pos, hΦ_left, hpred_left⟩
+    | succ M hleft_le ih =>
+        have hM_le_right : M ≤ right := Nat.le_of_succ_le hright_le
+        have hMlt : M < right := Nat.lt_of_succ_le hright_le
+        have hM_mem : M ∈ tasaki23GroundStateSectors (V := V) A N := by
+          rw [tasaki23GroundStateSectors_mem_iff]
+          simpa [left, right] using And.intro hleft_le hM_le_right
+        have hsucc_mem : M + 1 ∈ tasaki23GroundStateSectors (V := V) A N := by
+          rw [tasaki23GroundStateSectors_mem_iff]
+          have hleft_succ : left ≤ M + 1 := hleft_le.trans (Nat.le_succ M)
+          simpa [left, right] using And.intro hleft_succ hright_le
+        letI : Nonempty (magConfigS V N M) :=
+          hsector_nonempty M hM_mem
+        letI : Nonempty (magConfigS V N (M + 1)) :=
+          hsector_nonempty (M + 1) hsucc_mem
+        obtain ⟨v, hμ_lt, hv_pos, hΦ, hpred⟩ := ih hM_le_right
+        have hstep :=
+          tasaki23_successor_sector_common_energy_with_successor_predictedGS_of_site_sum_pos
+            A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+            hc_strict h_intermediate hBA hM_mem (by simpa [right] using hMlt)
+            hμ_lt hv_pos hΦ hpred
+            (hsource_site_sum_pos hM_mem (by simpa [right] using hMlt)
+              hμ_lt hv_pos hΦ)
+        rcases hstep with ⟨_hsucc_mem, _hμ_lt, _hv_pos, _hΦ, _hne,
+          v_succ, hμ_succ_lt, hv_succ_pos, hΦ_succ, hsucc_pred, _hr⟩
+        exact ⟨v_succ, hμ_succ_lt, hv_succ_pos, hΦ_succ, hsucc_pred⟩
+  intro M hM
+  have hbounds := (tasaki23GroundStateSectors_mem_iff (V := V) A N M).mp hM
+  exact hchain M (by simpa [left] using hbounds.1) (by simpa [right] using hbounds.2)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 interval chain threading predicted-GS
+membership from lowered vector Marshall positivity**: this is the
+vector-positivity form of
+`tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_lowered_site_sum_pos`.
+The bridge `tasaki23_lowered_site_sum_pos_of_marshall_pos` converts the
+lowered ladder-vector positivity hypothesis into the site-sum callback. -/
+theorem
+    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_lowered_marshall_pos
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      ∀ {μ : ℝ}
+        {v : magConfigS V N
+          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+              N) → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N
+                (min
+                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+                  (Finset.card
+                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+                    N) =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hsource_lowered_marshall_pos :
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        M <
+          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          ∀ τ : magConfigS V N (M + 1),
+            0 < (marshallSignS A τ.1).re *
+              (((totalSpinSOpMinus V N).mulVec
+                (magSectorEmbedding
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re) :
+    ∃ μ : ℝ,
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        ∃ v : magConfigS V N M → ℝ,
+          μ < c ∧ (∀ τ, 0 < v τ) ∧
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+          magSectorEmbedding
+              (fun τ : magConfigS V N M =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N := by
+  exact
+    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_lowered_site_sum_pos
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hBA hsector_nonempty hleft_predictedGS
       (fun {M : ℕ} hM hMlt {μ : ℝ} {v : magConfigS V N M → ℝ}
           hμ_lt hv_pos hΦ =>
         tasaki23_lowered_site_sum_pos_of_marshall_pos A

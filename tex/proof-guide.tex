@@ -8683,6 +8683,45 @@ These wrappers remove the all-source predicted-GS membership callback from
 the lowered-Marshall formulation; the remaining local hypothesis is the
 pointwise Marshall positivity of \(S^-_{\mathrm{tot}}\Phi\).
 
+\textbf{Predicted-GS membership threading}: the same scalar relation also
+threads actual membership in the predicted toy ground-state subspace.  If
+\(\Psi_M\in\mathcal G_{\mathrm{pred}}(A,N)\), then the already formalized
+ladder invariance gives
+\[
+  S^-_{\mathrm{tot}}\Psi_M\in\mathcal G_{\mathrm{pred}}(A,N).
+\]
+The adjacent-sector uniqueness step identifies this lowered image with a
+positive real scalar multiple of the successor representative:
+\[
+  S^-_{\mathrm{tot}}\Psi_M = r\,\Psi_{M+1},\qquad r>0.
+\]
+Since \(\mathcal G_{\mathrm{pred}}(A,N)\) is a complex subspace,
+scalar cancellation gives \(\Psi_{M+1}\in
+\mathcal G_{\mathrm{pred}}(A,N)\).  Lean records the scalar-cancellation
+lemma as
+\[
+\texttt{tasaki23\_mem\_bipartiteToyGroundStateSubspacePredicted}
+\texttt{\_of\_real\_smul\_eq}
+\]
+and the successor package as
+\[
+\texttt{tasaki23\_successor\_sector\_common\_energy}
+\texttt{\_with\_successor\_predictedGS\_of\_site\_sum\_pos}.
+\]
+Consequently the interval chains
+\[
+\begin{gathered}
+\texttt{tasaki23\_energy\_interval\_chain\_with\_predictedGS}\\
+\texttt{\_of\_left\_endpoint\_predictedGS\_of\_lowered\_site\_sum\_pos},\\
+\texttt{tasaki23\_energy\_interval\_chain\_with\_predictedGS}\\
+\texttt{\_of\_left\_endpoint\_predictedGS\_of\_lowered\_marshall\_pos}
+\end{gathered}
+\]
+carry predicted-GS membership from the left endpoint through the whole
+admissible interval.  This is still conditional on the local lowered
+site-sum or lowered-Marshall positivity input, exactly as in Tasaki,
+Springer 2020, Section 2.5, Theorem 2.3, p. 42.
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}
