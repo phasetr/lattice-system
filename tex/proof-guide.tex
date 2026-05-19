@@ -8896,6 +8896,30 @@ one has to compare the Marshall-signed real components of
 needed to use the predicted ground-state and sublattice-Casimir
 structure in Tasaki, Springer 2020, Section 2.5, Theorem 2.3, p. 42.
 
+\textbf{Sublattice lowered dominance bridge}: the coefficient
+dominance hypothesis is now replaced by the operator-component
+comparison
+\[
+  -\operatorname{sgn}_A(\tau)
+  \operatorname{Re}((\hat S_A^- \Phi)_\tau)
+  <
+  \operatorname{sgn}_A(\tau)
+  \operatorname{Re}((\hat S_{\bar A}^- \Phi)_\tau).
+\]
+Using the two sublattice coefficient identities above, this is exactly
+the predecessor-coefficient dominance hypothesis.  Lean packages the
+strict site-sum version as
+\[
+\texttt{tasaki23\_signed\_lowering\_site\_sum\_pos\_of\_sublattice\_component\_lt}
+\]
+and the corresponding lowered-vector Marshall-positivity wrapper as
+\[
+\texttt{tasaki23\_lowered\_marshall\_pos\_of\_sublattice\_component\_lt}.
+\]
+Thus the remaining local input for the lowered adjacent-sector step has
+the same form as the sublattice-ladder comparison appearing in Tasaki,
+Springer 2020, Section 2.5, Theorem 2.3, p. 42.
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}

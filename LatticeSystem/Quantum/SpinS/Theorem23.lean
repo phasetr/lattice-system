@@ -1275,6 +1275,47 @@ theorem tasaki23_signed_lowering_site_sum_pos_of_onA_coefficient_lt_offA
           tasaki23_signed_lowering_offA_sum_eq_coefficient_sum A Φ τ]
         simpa using hdominates)
 
+/-- **Tasaki §2.5 Theorem 2.3 lowered site-sum positivity from sublattice
+component dominance**: if the negative Marshall-signed `Ŝ_A^-` component
+is strictly smaller than the Marshall-signed `Ŝ_¬A^-` component, then the
+full signed lowered site-sum is strictly positive.
+
+This is the operator-component form of
+`tasaki23_signed_lowering_site_sum_pos_of_onA_coefficient_lt_offA`. -/
+theorem tasaki23_signed_lowering_site_sum_pos_of_sublattice_component_lt
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1))
+    (hdominates :
+      -((marshallSignS A τ.1).re *
+          (((sublatticeSpinSOpMinus N A).mulVec
+            (magSectorEmbedding Φ)) τ.1).re) <
+        (marshallSignS A τ.1).re *
+          (((sublatticeSpinSOpMinus N (fun x => !A x)).mulVec
+            (magSectorEmbedding Φ)) τ.1).re) :
+    0 < (marshallSignS A τ.1).re *
+      (∑ x : V,
+        (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ.1).re) := by
+  exact
+    tasaki23_signed_lowering_site_sum_pos_of_onA_coefficient_lt_offA
+      A Φ τ (by
+        have honA :=
+          tasaki23_signed_lowering_onA_sublattice_component_eq_neg_coefficient_sum
+            A Φ τ
+        have hoffA :=
+          tasaki23_signed_lowering_offA_sublattice_component_eq_coefficient_sum
+            A Φ τ
+        rw [← hoffA]
+        rw [← show
+          -((marshallSignS A τ.1).re *
+            (((sublatticeSpinSOpMinus N A).mulVec
+              (magSectorEmbedding Φ)) τ.1).re) =
+              ∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+                tasaki23LoweringPredecessorSignedCoefficient A Φ τ x from by
+                rw [honA]
+                simp]
+        exact hdominates)
+
 /-- **Tasaki §2.5 Theorem 2.3 zero local raising component**:
 if the target configuration already has local value `N` at `x`, the
 single-site raising summand at `x` contributes zero to that target
@@ -1853,6 +1894,32 @@ theorem tasaki23_lowered_marshall_pos_of_onA_coefficient_lt_offA
   exact tasaki23_lowered_marshall_pos_of_site_sum_pos A Φ
     (fun τ =>
       tasaki23_signed_lowering_site_sum_pos_of_onA_coefficient_lt_offA
+        A Φ τ (hdominates τ))
+
+/-- **Tasaki §2.5 Theorem 2.3 lowered-vector Marshall positivity from
+sublattice component dominance**: a pointwise operator-level dominance
+of the Marshall-signed `Ŝ_¬A^-` component over the negative
+Marshall-signed `Ŝ_A^-` component implies the Marshall-positive
+lowered-vector hypothesis.
+
+This is the sublattice-operator version of
+`tasaki23_lowered_marshall_pos_of_onA_coefficient_lt_offA`. -/
+theorem tasaki23_lowered_marshall_pos_of_sublattice_component_lt
+    (A : V → Bool) {M : ℕ} (Φ : magConfigS V N M → ℂ)
+    (hdominates :
+      ∀ τ : magConfigS V N (M + 1),
+        -((marshallSignS A τ.1).re *
+            (((sublatticeSpinSOpMinus N A).mulVec
+              (magSectorEmbedding Φ)) τ.1).re) <
+          (marshallSignS A τ.1).re *
+            (((sublatticeSpinSOpMinus N (fun x => !A x)).mulVec
+              (magSectorEmbedding Φ)) τ.1).re) :
+    ∀ τ : magConfigS V N (M + 1),
+      0 < (marshallSignS A τ.1).re *
+        (((totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ)) τ.1).re := by
+  exact tasaki23_lowered_marshall_pos_of_site_sum_pos A Φ
+    (fun τ =>
+      tasaki23_signed_lowering_site_sum_pos_of_sublattice_component_lt
         A Φ τ (hdominates τ))
 
 /-- **Tasaki §2.5 Theorem 2.3 raised-vector Marshall positivity from
