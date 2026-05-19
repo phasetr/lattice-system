@@ -1298,7 +1298,7 @@ formalization of Tasaki \S2.1 and \S2.2.
   decomposition $\mathcal H = \bigoplus_M \mathcal H_M$
   (Tasaki eq.~(2.2.9)/(2.2.10)).
 \item \texttt{totalSpinHalfRot\{1,2,3\}Pi},
-  \texttt{totalSpinHalfRot\{1,2,3\}\,\theta},
+  \texttt{totalSpinHalfRot\{1,2,3\}\_theta},
   \texttt{totalSpinHalfRot\{1,2,3\}\_zero},
   \texttt{totalSpinHalfRot\{1,2,3\}Pi\_eq}: global rotation
   $\hat U^{(\alpha)}_{\rm tot,\theta}$ via \texttt{Finset.noncommProd}
@@ -6937,7 +6937,7 @@ Direct from Step 165 (signed complement form
 $\mathrm{biw.re}\cdot(\mathrm{biw.re}-1)$) + $\mathrm{biw.re} = m_{\rm max}$
 at $|\neg A| = 0$.
 
-\textbf{Step 170 (PR~\#2960)}: canonical − complement predicted
+\textbf{Step 170 (PR~\#2960)}: canonical-minus-complement predicted
 $(\widehat S_{\rm tot})^2$ eigenvalue difference $= 2 \cdot \mathrm{biw.re}$
 \emph{unconditionally} in
 \texttt{LatticeSystem/Quantum/SpinS/PredictedEigenvalueCanonicalComplementDiff.lean}.
@@ -8642,6 +8642,47 @@ therefore take the natural remaining mathematical input, namely
 Marshall positivity of \(S^-_{\mathrm{tot}}\Phi\), and hide the
 site-sum conversion internally.
 
+\textbf{Left-endpoint threading for lowered Marshall positivity}: the
+lowered site-sum successor step also transfers the predicted total-Casimir
+identity to the successor representative.  Lean records this as
+\[
+\texttt{tasaki23\_successor\_sector\_common\_energy}
+\texttt{\_with\_successor\_predictedCasimir\_of\_site\_sum\_pos}.
+\]
+The proof first obtains the usual successor package from the direct
+site-sum step.  The lowered vector has the predicted Casimir by ladder
+preservation, and the successor vector is a nonzero positive real scalar
+multiple of that lowered vector in Marshall coordinates; scalar cancellation
+therefore gives the successor predicted-Casimir identity.  Consequently the
+interval chains
+\[
+\begin{gathered}
+\texttt{tasaki23\_energy\_interval\_chain\_with\_predictedCasimir}\\
+\texttt{\_of\_left\_endpoint\_predictedCasimir\_of\_lowered\_site\_sum\_pos},\\
+\texttt{tasaki23\_energy\_interval\_chain\_with\_predictedCasimir}\\
+\texttt{\_of\_left\_endpoint\_predictedCasimir\_of\_lowered\_marshall\_pos}
+\end{gathered}
+\]
+need the predicted-Casimir callback only at the left endpoint.  Under
+\(|A^c|\le |A|\), left-endpoint membership in
+\(\mathcal G_{\mathrm{pred}}(A,N)\) supplies that Casimir identity, giving
+the final wrappers
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_threaded\_predictedGS\_of\_lowered\_marshall\_pos},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_threaded\_predictedGS\_of\_lowered\_marshall\_pos}\\
+\texttt{\_of\_sector\_minimality},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_threaded\_predictedGS\_of\_lowered\_marshall\_pos}\\
+\texttt{\_of\_real\_sector\_minimality}.
+\end{gathered}
+\]
+These wrappers remove the all-source predicted-GS membership callback from
+the lowered-Marshall formulation; the remaining local hypothesis is the
+pointwise Marshall positivity of \(S^-_{\mathrm{tot}}\Phi\).
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}
@@ -9457,7 +9498,7 @@ $\hat S^z_{\rm tot}$-eigenvalue $M$, gives
 \]
 With $\hat S^+_{\rm tot} v = 0$, the LHS vanishes, so the scalar
 factor annihilates $v$. The case $M = -m_{\max} - 1$ is ruled out by
-PR~\#905 ($\texttt{magSubspaceS V N (-m\_max - 1) = \bot}$), and
+PR~\#905 (\texttt{magSubspaceS V N (-m\_max - 1) = bottom}), and
 $M \neq m_{\max}$ is the hypothesis; together they force $v = 0$.
 Combined with the joint-magnetisation shift of \#2760, this means
 $\hat S^+_{\rm tot}$ restricted to
