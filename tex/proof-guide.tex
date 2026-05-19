@@ -8480,6 +8480,37 @@ to thread predicted-Casimir information along the admissible-sector
 interval, rather than asking for a fresh source-sector callback at every
 successor sector.
 
+\textbf{Threaded predicted-Casimir interval chain}: the preceding scalar
+transfer is now wired into the dominance-form common-energy step itself.
+The Lean theorem
+\[
+\begin{gathered}
+\texttt{tasaki23\_successor\_sector\_common\_energy}\\
+\texttt{\_with\_successor\_predictedCasimir\_of\_onA\_neg\_lt\_offA}
+\end{gathered}
+\]
+returns the usual successor common-energy package and, in the same
+successor representative package, the identity
+\[
+  \hat S_{\mathrm{tot}}^2\Phi_{M+1}
+    =
+  C_{\mathrm{pred}}\Phi_{M+1}.
+\]
+Consequently
+\[
+\begin{gathered}
+\texttt{tasaki23\_energy\_interval\_chain}\\
+\texttt{\_with\_predictedCasimir\_of\_left\_endpoint}\\
+\texttt{\_predictedCasimir\_of\_onA\_neg\_lt\_offA}
+\end{gathered}
+\]
+strengthens the interval induction invariant from merely carrying a
+common energy to carrying both the common energy and the predicted
+Casimir.  The predicted-Casimir input is needed only for the left endpoint
+representative selected by Theorem~2.2; each successor step obtains the
+next Casimir identity from the induction hypothesis and the dominance-form
+successor comparison.
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}
