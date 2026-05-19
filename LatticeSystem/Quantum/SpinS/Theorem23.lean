@@ -1133,6 +1133,33 @@ theorem tasaki23_signed_lowering_site_sum_pos_of_onA_neg_lt_offA
   rw [tasaki23_signed_lowering_site_sum_eq_offA_add_onA A Φ τ]
   linarith
 
+/-- **Tasaki §2.5 Theorem 2.3 lowered site-sum positivity from
+coefficient dominance**: if the on-`A` predecessor-coefficient sum is
+strictly smaller than the off-`A` predecessor-coefficient sum, then
+the full signed lowered site-sum is strictly positive.
+
+This rewrites the earlier signed-contribution dominance callback using
+the coefficient-sum split, leaving the remaining proof obligation in
+the direct coefficient form. -/
+theorem tasaki23_signed_lowering_site_sum_pos_of_onA_coefficient_lt_offA
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1))
+    (hdominates :
+      (∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+          tasaki23LoweringPredecessorSignedCoefficient A Φ τ x) <
+        ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+          tasaki23LoweringPredecessorSignedCoefficient A Φ τ x) :
+    0 < (marshallSignS A τ.1).re *
+      (∑ x : V,
+        (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ.1).re) := by
+  exact
+    tasaki23_signed_lowering_site_sum_pos_of_onA_neg_lt_offA
+      A Φ τ (by
+        rw [tasaki23_signed_lowering_onA_sum_eq_neg_coefficient_sum A Φ τ,
+          tasaki23_signed_lowering_offA_sum_eq_coefficient_sum A Φ τ]
+        simpa using hdominates)
+
 /-- **Tasaki §2.5 Theorem 2.3 zero local raising component**:
 if the target configuration already has local value `N` at `x`, the
 single-site raising summand at `x` contributes zero to that target
@@ -1686,6 +1713,31 @@ theorem tasaki23_lowered_marshall_pos_of_onA_neg_lt_offA
   exact tasaki23_lowered_marshall_pos_of_site_sum_pos A Φ
     (fun τ =>
       tasaki23_signed_lowering_site_sum_pos_of_onA_neg_lt_offA
+        A Φ τ (hdominates τ))
+
+/-- **Tasaki §2.5 Theorem 2.3 lowered-vector Marshall positivity from
+coefficient dominance**: a pointwise coefficient dominance of the
+off-`A` lowered predecessor sum over the on-`A` lowered predecessor sum
+implies the Marshall-positive lowered-vector hypothesis.
+
+This is the coefficient-level version of
+`tasaki23_lowered_marshall_pos_of_onA_neg_lt_offA`, using the
+coefficient-sum split to remove the signed-contribution notation from
+the remaining callback. -/
+theorem tasaki23_lowered_marshall_pos_of_onA_coefficient_lt_offA
+    (A : V → Bool) {M : ℕ} (Φ : magConfigS V N M → ℂ)
+    (hdominates :
+      ∀ τ : magConfigS V N (M + 1),
+        (∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+            tasaki23LoweringPredecessorSignedCoefficient A Φ τ x) <
+          ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+            tasaki23LoweringPredecessorSignedCoefficient A Φ τ x) :
+    ∀ τ : magConfigS V N (M + 1),
+      0 < (marshallSignS A τ.1).re *
+        (((totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ)) τ.1).re := by
+  exact tasaki23_lowered_marshall_pos_of_site_sum_pos A Φ
+    (fun τ =>
+      tasaki23_signed_lowering_site_sum_pos_of_onA_coefficient_lt_offA
         A Φ τ (hdominates τ))
 
 /-- **Tasaki §2.5 Theorem 2.3 raised-vector Marshall positivity from
