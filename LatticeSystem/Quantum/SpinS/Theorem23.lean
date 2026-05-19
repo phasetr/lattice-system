@@ -204,6 +204,72 @@ theorem totalSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_site_sum {M : ℕ}
   rw [totalSpinSOpMinus_def, Matrix.sum_mulVec]
   simp [Finset.sum_apply]
 
+/-- **Tasaki §2.5 Theorem 2.3 on-`A` lowered sublattice expansion**:
+the `Ŝ_A^-` component of an embedded sector vector is the sum of
+single-site lowering contributions over sites in `A`.
+
+This is the sublattice analogue of
+`totalSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_site_sum`, used
+to connect the coefficient split to the actual sublattice ladder
+operators in the remaining lowered-vector Marshall-positivity proof. -/
+theorem sublatticeSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_onA_site_sum
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : V → Fin (N + 1)) :
+    ((sublatticeSpinSOpMinus N A).mulVec (magSectorEmbedding Φ)) τ =
+      ∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+        ((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ := by
+  classical
+  rw [sublatticeSpinSOpMinus, Matrix.sum_mulVec, Finset.sum_apply]
+  calc
+    (∑ c : V,
+      Matrix.mulVec (if A c = true then onSiteS c (spinSOpMinus N) else 0)
+        (magSectorEmbedding Φ) τ) =
+        ∑ c : V, if A c = true then
+          Matrix.mulVec (onSiteS c (spinSOpMinus N)) (magSectorEmbedding Φ) τ
+        else 0 := by
+          apply Finset.sum_congr rfl
+          intro x _hx
+          by_cases hA : A x = true
+          · simp [hA]
+          · cases hx : A x <;> simp [hx] at hA ⊢
+    _ = ∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+        ((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ := by
+          rw [Finset.sum_filter]
+
+/-- **Tasaki §2.5 Theorem 2.3 off-`A` lowered sublattice expansion**:
+the `Ŝ_¬A^-` component of an embedded sector vector is the sum of
+single-site lowering contributions over sites outside `A`.
+
+This packages the complement sublattice with the same `A x = false`
+filter used by the lowered coefficient split. -/
+theorem sublatticeSpinSOpMinus_complement_mulVec_magSectorEmbedding_apply_eq_offA_site_sum
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : V → Fin (N + 1)) :
+    ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec
+        (magSectorEmbedding Φ)) τ =
+      ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+        ((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ := by
+  classical
+  rw [sublatticeSpinSOpMinus, Matrix.sum_mulVec, Finset.sum_apply]
+  calc
+    (∑ c : V,
+      Matrix.mulVec
+        (if (!A c) = true then onSiteS c (spinSOpMinus N) else 0)
+        (magSectorEmbedding Φ) τ) =
+        ∑ c : V, if A c = false then
+          Matrix.mulVec (onSiteS c (spinSOpMinus N)) (magSectorEmbedding Φ) τ
+        else 0 := by
+          apply Finset.sum_congr rfl
+          intro x _hx
+          cases A x <;> simp
+    _ = ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+        ((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ := by
+          rw [Finset.sum_filter]
+
 /-- **Tasaki §2.5 Theorem 2.3 lowered Marshall-signed vector realness**:
 lowering a real Marshall-signed sector representative gives a real-valued
 full vector.
@@ -1004,6 +1070,55 @@ theorem tasaki23_signed_lowering_onA_sum_eq_neg_coefficient_sum
     _ = -∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
           tasaki23LoweringPredecessorSignedCoefficient A Φ τ x := by
           rw [Finset.sum_neg_distrib]
+
+/-- **Tasaki §2.5 Theorem 2.3 off-`A` lowered sublattice coefficient
+component**: the Marshall-signed real component of `Ŝ_¬A^- Φ` at a
+target configuration is the off-`A` predecessor-coefficient sum.
+
+This turns the off-sublattice half of the coefficient split into a
+statement about the actual complement-sublattice lowering operator. -/
+theorem tasaki23_signed_lowering_offA_sublattice_component_eq_coefficient_sum
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1)) :
+    (marshallSignS A τ.1).re *
+        (((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec
+          (magSectorEmbedding Φ)) τ.1).re =
+      ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+        tasaki23LoweringPredecessorSignedCoefficient A Φ τ x := by
+  rw [sublatticeSpinSOpMinus_complement_mulVec_magSectorEmbedding_apply_eq_offA_site_sum
+    A Φ τ.1]
+  rw [Complex.re_sum, Finset.mul_sum]
+  change
+    (∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+      tasaki23SignedLoweringSiteContribution A Φ τ x) =
+      ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+        tasaki23LoweringPredecessorSignedCoefficient A Φ τ x
+  exact tasaki23_signed_lowering_offA_sum_eq_coefficient_sum A Φ τ
+
+/-- **Tasaki §2.5 Theorem 2.3 on-`A` lowered sublattice coefficient
+component**: the Marshall-signed real component of `Ŝ_A^- Φ` at a
+target configuration is the negative of the on-`A`
+predecessor-coefficient sum.
+
+This is the operator-level form of the on-sublattice half of the
+coefficient split. -/
+theorem tasaki23_signed_lowering_onA_sublattice_component_eq_neg_coefficient_sum
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1)) :
+    (marshallSignS A τ.1).re *
+        (((sublatticeSpinSOpMinus N A).mulVec
+          (magSectorEmbedding Φ)) τ.1).re =
+      -∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+        tasaki23LoweringPredecessorSignedCoefficient A Φ τ x := by
+  rw [sublatticeSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_onA_site_sum
+    A Φ τ.1]
+  rw [Complex.re_sum, Finset.mul_sum]
+  change
+    (∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+      tasaki23SignedLoweringSiteContribution A Φ τ x) =
+      -∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+        tasaki23LoweringPredecessorSignedCoefficient A Φ τ x
+  exact tasaki23_signed_lowering_onA_sum_eq_neg_coefficient_sum A Φ τ
 
 /-- **Tasaki §2.5 Theorem 2.3 strict off-`A` lowered sign-sum witness**:
 if at least one site outside `A` can be lowered in the target
