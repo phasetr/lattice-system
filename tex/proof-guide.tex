@@ -8642,6 +8642,30 @@ therefore replaces the previous full-space global-minimality callback
 by a sharper sector-minimality callback, while leaving the predicted-GS
 membership and lowered off-\(A\) dominance inputs explicit.
 
+The sector-minimality callback is reduced one step further to a real
+sector statement.  For real coupling, the existing real-part extraction
+lemma and the new Lean theorem
+\[
+\texttt{heisenbergHamiltonianSReMatrixOnMagSector\_mulVec\_im}\\
+\texttt{\_of\_complex\_eigenvec}
+\]
+show that the real and imaginary parts of any complex sector eigenvector
+at a real eigenvalue are real-form sector eigenvectors at the same
+eigenvalue.  Since a nonzero complex vector has a nonzero real or
+imaginary component,
+\[
+\texttt{tasaki23\_sector\_minimality\_of\_real\_sector\_minimality}
+\]
+proves complex sector minimality from lower bounds on nonzero real-form
+sector eigenvectors.  The wrapper
+\[
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint}\\
+\texttt{\_predictedGS\_of\_onA\_neg\_lt\_offA}\\
+\texttt{\_of\_real\_sector\_minimality}
+\]
+therefore leaves the remaining spectral lower-bound input entirely in
+the real sector matrix.
+
 \textbf{Predicted-GS total-Casimir bridge}: the total-Casimir component
 of the predicted toy ground-state subspace has now been put into the
 same notation as the adjacent-sector chain.  In the canonical

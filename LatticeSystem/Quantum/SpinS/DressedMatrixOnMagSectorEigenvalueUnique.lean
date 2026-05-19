@@ -200,6 +200,44 @@ theorem heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
     (fun σ => (W σ).re) σ = μ * (W σ).re
   exact hRe_eq
 
+/-- **Imaginary part extraction**: for real coupling, the imaginary part of
+a complex eigenvector of the complex Heisenberg sector matrix at a real
+eigenvalue `μ` is a real eigenvector of the real-form sector matrix at
+the same `μ`.
+
+Together with
+`heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec`,
+this reduces arbitrary complex sector eigenvectors to real sector
+eigenvectors componentwise. -/
+theorem heisenbergHamiltonianSReMatrixOnMagSector_mulVec_im_of_complex_eigenvec
+    {J : V → V → ℂ} (N : ℕ) {M : ℕ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    {μ : ℝ} {W : magConfigS V N M → ℂ}
+    (hW : (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec W =
+      (μ : ℂ) • W) :
+    (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+      (fun σ => (W σ).im) = μ • (fun σ => (W σ).im) := by
+  funext σ
+  have hσ := congrFun hW σ
+  have hIm_eq : ((heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec W σ).im =
+      (((μ : ℂ) • W) σ).im := by rw [hσ]
+  have hLHS : ((heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec W σ).im =
+      ∑ τ, heisenbergHamiltonianSReMatrixOnMagSector J N M σ τ * (W τ).im := by
+    change (∑ τ, heisenbergHamiltonianSMatrixOnMagSector J N M σ τ * W τ).im = _
+    rw [Complex.im_sum]
+    refine Finset.sum_congr rfl (fun τ _ => ?_)
+    rw [heisenbergHamiltonianSMatrixOnMagSector_apply_eq_ofReal _ _ hJ_real]
+    rw [Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im]
+    ring
+  have hRHS : (((μ : ℂ) • W) σ).im = μ * (W σ).im := by
+    change ((μ : ℂ) * W σ).im = _
+    rw [Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im]
+    ring
+  rw [hLHS, hRHS] at hIm_eq
+  change (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+    (fun σ => (W σ).im) σ = μ * (W σ).im
+  exact hIm_eq
+
 /-- **Complex-form uniqueness for Marshall-positive eigenvectors of the
 real-coupling complex Heisenberg sector matrix at real eigenvalues**:
 any two complex sector eigenvectors `W₁, W₂` with strictly positive

@@ -4444,6 +4444,52 @@ theorem tasaki23_global_minimality_of_sector_minimality
   exact hsector_min M hrestr_ne hrestr_eigen
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 sector-minimality bridge from real sectors**:
+for real coupling, it is enough to prove the sector lower bound for
+nonzero real-form sector eigenvectors.
+
+An arbitrary nonzero complex sector eigenvector has either nonzero real
+part or nonzero imaginary part.  Since the complex sector matrix has real
+entries under `hJ_real`, that nonzero component is an eigenvector of the
+real-form sector matrix at the same real eigenvalue. -/
+theorem tasaki23_sector_minimality_of_real_sector_minimality
+    {J : V → V → ℂ} (N : ℕ) {μ : ℝ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hreal_sector_min :
+      ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+        ∀ {μ' : ℝ} {φ : magConfigS V N M → ℝ},
+          φ ≠ 0 →
+          (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec φ = μ' • φ →
+          μ ≤ μ') :
+    ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+      ∀ {μ' : ℝ} {Φ : magConfigS V N M → ℂ},
+        Φ ≠ 0 →
+        (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φ =
+          (μ' : ℂ) • Φ →
+        μ ≤ μ' := by
+  intro M _ μ' Φ hΦ_ne hΦ_eigen
+  classical
+  by_cases hRe_ne : (fun σ : magConfigS V N M => (Φ σ).re) ≠ 0
+  · exact hreal_sector_min M hRe_ne
+      (heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
+        N hJ_real hΦ_eigen)
+  · have hRe_zero : (fun σ : magConfigS V N M => (Φ σ).re) = 0 := by
+      by_contra h
+      exact hRe_ne h
+    have hIm_ne : (fun σ : magConfigS V N M => (Φ σ).im) ≠ 0 := by
+      intro hIm_zero
+      apply hΦ_ne
+      funext σ
+      apply Complex.ext
+      · have h := congrFun hRe_zero σ
+        simpa using h
+      · have h := congrFun hIm_zero σ
+        simpa using h
+    exact hreal_sector_min M hIm_ne
+      (heisenbergHamiltonianSReMatrixOnMagSector_mulVec_im_of_complex_eigenvec
+        N hJ_real hΦ_eigen)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 conditional final wrapper**:
 under the canonical orientation `|¬A| ≤ |A|`, the predicted-GS
 left-endpoint interval chain supplies one common energy `μ` on every
@@ -4643,5 +4689,91 @@ theorem
       A N c hBA hsector_nonempty hsource_pred hsource_dominance ?_
   intro μ hcommon
   exact tasaki23_global_minimality_of_sector_minimality N (hsector_min hcommon)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 conditional final wrapper from real-sector
+minimality**: this refines the sector-minimality wrapper by replacing the
+complex sectorwise minimality callback with a real-form sectorwise
+minimality callback.
+
+The bridge `tasaki23_sector_minimality_of_real_sector_minimality` extracts
+a nonzero real or imaginary component of any complex sector eigenvector,
+then `tasaki23_global_minimality_of_sector_minimality` upgrades the result
+to the full-Hilbert-space global-minimality clause. -/
+theorem
+    tasaki_2_5_theorem_2_3_of_left_endpoint_predictedGS_of_onA_neg_lt_offA_of_real_sector_minimality
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hsource_pred :
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        M <
+          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N M =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hsource_dominance :
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        M <
+          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          ∀ τ : magConfigS V N (M + 1),
+            -(∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+                tasaki23SignedLoweringSiteContribution A
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) τ x) <
+              ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+                tasaki23SignedLoweringSiteContribution A
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) τ x)
+    (hreal_sector_min :
+      ∀ {μ : ℝ},
+        (∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+          ∃ v : magConfigS V N M → ℝ,
+            μ < c ∧ (∀ τ, 0 < v τ) ∧
+            (heisenbergHamiltonianS J N).mulVec
+                (magSectorEmbedding
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+              (μ : ℂ) • magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) →
+        ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+          ∀ {μ' : ℝ} {φ : magConfigS V N M → ℝ},
+            φ ≠ 0 →
+            (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec φ =
+              μ' • φ →
+            μ ≤ μ') :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
+    hc_strict h_intermediate hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_left_endpoint_predictedGS_of_onA_neg_lt_offA_of_sector_minimality
+      A N c hBA hsector_nonempty hsource_pred hsource_dominance
+      (fun hcommon =>
+        tasaki23_sector_minimality_of_real_sector_minimality N hJ_real
+          (hreal_sector_min hcommon))
+      hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
+      hc_strict h_intermediate hA_nonempty hnotA_nonempty
 
 end LatticeSystem.Quantum
