@@ -656,6 +656,52 @@ theorem heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction
   rw [hΨ]
   rfl
 
+/-- **Sector restriction of a full eigenvector**: because the spin-`S`
+Heisenberg Hamiltonian preserves `magSumS`, restricting any full-space
+eigenvector to the magnetization-`M` sector gives an eigenvector of the
+sector matrix at the same eigenvalue.
+
+Unlike `heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction`,
+this version does not require the full vector to be supported on one
+sector; the off-sector terms vanish by the magnetization-conservation
+matrix-entry lemma. -/
+theorem heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen
+    (J : V → V → ℂ) {M : ℕ}
+    {μ : ℝ} {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : (heisenbergHamiltonianS J N).mulVec Ψ = (μ : ℂ) • Ψ) :
+    (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec
+      (magSectorRestriction (M := M) Ψ) =
+      (μ : ℂ) • magSectorRestriction (M := M) Ψ := by
+  funext τ
+  change (∑ τ', heisenbergHamiltonianSMatrixOnMagSector J N M τ τ' * Ψ τ'.1) =
+    ((μ : ℂ) • magSectorRestriction (M := M) Ψ) τ
+  have hrhs : ((μ : ℂ) • magSectorRestriction (M := M) Ψ) τ = (μ : ℂ) * Ψ τ.1 := rfl
+  rw [hrhs]
+  have hsec : (∑ τ' : magConfigS V N M,
+      heisenbergHamiltonianSMatrixOnMagSector J N M τ τ' * Ψ τ'.1) =
+    ∑ ρ ∈ Finset.univ.filter (fun ρ : V → Fin (N + 1) => magSumS ρ = M),
+      (heisenbergHamiltonianS J N) τ.1 ρ * Ψ ρ := by
+    rw [Finset.sum_subtype (Finset.univ.filter (fun ρ : V → Fin (N + 1) => magSumS ρ = M))
+      (p := fun ρ => magSumS ρ = M)
+      (fun ρ => by simp [Finset.mem_filter])
+      (fun ρ => (heisenbergHamiltonianS J N) τ.1 ρ * Ψ ρ)]
+    rfl
+  rw [hsec]
+  have hfull : ∑ ρ ∈ Finset.univ.filter (fun ρ : V → Fin (N + 1) => magSumS ρ = M),
+      (heisenbergHamiltonianS J N) τ.1 ρ * Ψ ρ =
+    ∑ ρ : V → Fin (N + 1), (heisenbergHamiltonianS J N) τ.1 ρ * Ψ ρ := by
+    refine Finset.sum_filter_of_ne (p := fun ρ => magSumS ρ = M) ?_
+    intro ρ _ hne
+    by_contra hρM
+    apply hne
+    have hmag_ne : magSumS ρ ≠ magSumS τ.1 := fun hEq => hρM (hEq.trans τ.2)
+    rw [heisenbergHamiltonianS_apply_eq_zero_of_magSumS_ne (V := V) J N hmag_ne,
+      zero_mul]
+  rw [hfull]
+  change (heisenbergHamiltonianS J N).mulVec Ψ τ.1 = _
+  rw [hΨ]
+  rfl
+
 /-- **Tasaki §2.5 Theorem 2.2 (Marshall–Lieb–Mattis), full-Hilbert-
 space form, BUNDLED**: bundles existence (lift of #860 via #869) with
 uniqueness (sector restriction + #862) into the textbook statement of
