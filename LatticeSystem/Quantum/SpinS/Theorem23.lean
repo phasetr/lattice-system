@@ -500,6 +500,144 @@ theorem onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_single_site_pred_re
   rw [Complex.mul_re, spinSOpMinus_apply_im_zero]
   ring
 
+/-- **Tasaki §2.5 Theorem 2.3 off-`A` lowered coefficient identity**:
+if the lowered site lies outside `A`, then the signed real single-site
+lowering contribution is the positive lowering coefficient times the
+Marshall-signed predecessor coefficient.
+
+This is the coefficient-level form behind
+`tasaki23_signed_single_site_lowering_component_pos_of_A_false`; it is
+the exact identity needed before summing the off-`A` contributions in
+the lowered-vector Marshall-positivity argument. -/
+theorem tasaki23_signed_single_site_lowering_component_eq_of_A_false
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1)) (x : V)
+    (hx : 0 < (τ.1 x).val) (hAx : A x = false) :
+    let predVal : Fin (N + 1) :=
+      ⟨(τ.1 x).val - 1, by omega⟩
+    let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+    let hpredM : magSumS pred = M :=
+      magSumS_single_site_lowering_predecessor τ x hx
+    (marshallSignS A τ.1).re *
+        ((((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ.1).re) =
+      (spinSOpMinus N (τ.1 x) predVal).re *
+        ((marshallSignS A pred).re * (Φ ⟨pred, hpredM⟩).re) := by
+  classical
+  dsimp only
+  let predVal : Fin (N + 1) := ⟨(τ.1 x).val - 1, by omega⟩
+  let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+  have hpredM : magSumS pred = M :=
+    magSumS_single_site_lowering_predecessor τ x hx
+  have hcomponent :
+      ((((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+        (magSectorEmbedding Φ)) τ.1).re) =
+          (spinSOpMinus N (τ.1 x) predVal).re *
+            (Φ ⟨pred, hpredM⟩).re := by
+    simpa [predVal, pred, hpredM]
+      using
+        onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_single_site_pred_re
+          Φ τ x hx
+  have hoff : ∀ k, k ≠ x → τ.1 k = pred k := by
+    intro k hk
+    dsimp [pred]
+    rw [Function.update_of_ne hk]
+  have hsign_lower : (pred x).val + 1 = (τ.1 x).val := by
+    dsimp [pred, predVal]
+    simp
+    omega
+  have hsign :
+      (marshallSignS A τ.1).re * (marshallSignS A pred).re = 1 :=
+    marshallSignS_re_mul_re_of_agree_off_site_A_false_lower
+      A hAx hoff hsign_lower
+  have hsq : (marshallSignS A pred).re * (marshallSignS A pred).re = 1 :=
+    marshallSignS_re_sq A pred
+  have hsign_eq : (marshallSignS A τ.1).re = (marshallSignS A pred).re := by
+    calc
+      (marshallSignS A τ.1).re =
+          (marshallSignS A τ.1).re * 1 := by ring
+      _ =
+          (marshallSignS A τ.1).re *
+            ((marshallSignS A pred).re * (marshallSignS A pred).re) := by
+          rw [hsq]
+      _ =
+          ((marshallSignS A τ.1).re * (marshallSignS A pred).re) *
+            (marshallSignS A pred).re := by ring
+      _ = 1 * (marshallSignS A pred).re := by rw [hsign]
+      _ = (marshallSignS A pred).re := by ring
+  rw [hcomponent]
+  rw [hsign_eq]
+  ring
+
+/-- **Tasaki §2.5 Theorem 2.3 on-`A` lowered coefficient identity**:
+if the lowered site lies inside `A`, then the signed real single-site
+lowering contribution is the negative of the positive lowering
+coefficient times the Marshall-signed predecessor coefficient.
+
+This is the exact sign-reversal identity behind
+`tasaki23_signed_single_site_lowering_component_neg_of_A_true`, and it
+isolates the coefficient relation that the later dominance proof must
+control after summing over sites in `A`. -/
+theorem tasaki23_signed_single_site_lowering_component_eq_neg_of_A_true
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N M → ℂ)
+    (τ : magConfigS V N (M + 1)) (x : V)
+    (hx : 0 < (τ.1 x).val) (hAx : A x = true) :
+    let predVal : Fin (N + 1) :=
+      ⟨(τ.1 x).val - 1, by omega⟩
+    let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+    let hpredM : magSumS pred = M :=
+      magSumS_single_site_lowering_predecessor τ x hx
+    (marshallSignS A τ.1).re *
+        ((((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ.1).re) =
+      -((spinSOpMinus N (τ.1 x) predVal).re *
+        ((marshallSignS A pred).re * (Φ ⟨pred, hpredM⟩).re)) := by
+  classical
+  dsimp only
+  let predVal : Fin (N + 1) := ⟨(τ.1 x).val - 1, by omega⟩
+  let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+  have hpredM : magSumS pred = M :=
+    magSumS_single_site_lowering_predecessor τ x hx
+  have hcomponent :
+      ((((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+        (magSectorEmbedding Φ)) τ.1).re) =
+          (spinSOpMinus N (τ.1 x) predVal).re *
+            (Φ ⟨pred, hpredM⟩).re := by
+    simpa [predVal, pred, hpredM]
+      using
+        onSiteS_spinSOpMinus_mulVec_magSectorEmbedding_apply_single_site_pred_re
+          Φ τ x hx
+  have hoff : ∀ k, k ≠ x → τ.1 k = pred k := by
+    intro k hk
+    dsimp [pred]
+    rw [Function.update_of_ne hk]
+  have hsign_lower : (pred x).val + 1 = (τ.1 x).val := by
+    dsimp [pred, predVal]
+    simp
+    omega
+  have hsign :
+      (marshallSignS A τ.1).re * (marshallSignS A pred).re = -1 :=
+    marshallSignS_re_mul_re_of_agree_off_site_A_true_lower
+      A hAx hoff hsign_lower
+  have hsq : (marshallSignS A pred).re * (marshallSignS A pred).re = 1 :=
+    marshallSignS_re_sq A pred
+  have hsign_eq : (marshallSignS A τ.1).re = - (marshallSignS A pred).re := by
+    calc
+      (marshallSignS A τ.1).re =
+          (marshallSignS A τ.1).re * 1 := by ring
+      _ =
+          (marshallSignS A τ.1).re *
+            ((marshallSignS A pred).re * (marshallSignS A pred).re) := by
+          rw [hsq]
+      _ =
+          ((marshallSignS A τ.1).re * (marshallSignS A pred).re) *
+            (marshallSignS A pred).re := by ring
+      _ = (-1) * (marshallSignS A pred).re := by rw [hsign]
+      _ = - (marshallSignS A pred).re := by ring
+  rw [hcomponent]
+  rw [hsign_eq]
+  ring
+
 /-- **Tasaki §2.5 Theorem 2.3 off-`A` single-site positivity**:
 if the lowered site lies outside `A`, then the signed real part of its
 single-site lowering contribution is strictly positive whenever the
