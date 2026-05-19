@@ -8616,6 +8616,32 @@ remaining source-sector callbacks, namely membership in
 off-\(A\) dominance estimate.  The purpose is to separate the discrete
 interval propagation from those remaining analytic inputs.
 
+\textbf{Global minimality from sector minimality}: the remaining
+global-minimality callback has been reduced to a sectorwise statement.
+The Lean theorem
+\[
+\texttt{heisenbergHamiltonianSMatrixOnMagSector\_mulVec}\\
+\texttt{\_magSectorRestriction\_of\_full\_eigen}
+\]
+states that the restriction of any full-space eigenvector to a
+magnetization sector is a sector-matrix eigenvector at the same
+eigenvalue, without assuming the full vector is supported in that
+sector.  If the full eigenvector is nonzero, choosing a configuration
+where it has a nonzero coefficient gives a nonzero restriction to the
+corresponding \(\texttt{magSumS}\) sector.  Hence
+\[
+\texttt{tasaki23\_global\_minimality\_of\_sector\_minimality}
+\]
+proves the full global-minimality clause from lower bounds on all
+sector eigenvalues.  The wrapper
+\[
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint}\\
+\texttt{\_predictedGS\_of\_onA\_neg\_lt\_offA\_of\_sector\_minimality}
+\]
+therefore replaces the previous full-space global-minimality callback
+by a sharper sector-minimality callback, while leaving the predicted-GS
+membership and lowered off-\(A\) dominance inputs explicit.
+
 \textbf{Predicted-GS total-Casimir bridge}: the total-Casimir component
 of the predicted toy ground-state subspace has now been put into the
 same notation as the adjacent-sector chain.  In the canonical
