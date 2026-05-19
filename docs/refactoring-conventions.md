@@ -337,6 +337,20 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-19 (PR pending)**: Refactor checkpoint after the 20
+  post-#3381 Tasaki §2.5 Theorem 2.3 feature PRs (#3382--#3401).
+  Build-speed evaluation for the active module:
+  `lake env lean LatticeSystem/Quantum/SpinS/Theorem23.lean`
+  completed in `real 22.50s` (`user 34.64s`, `sys 4.83s`);
+  cached `lake build LatticeSystem.Quantum.SpinS.Theorem23`
+  completed in `real 3.55s` (`user 1.70s`, `sys 2.46s`). No
+  module split was performed: `Theorem23.lean` is large
+  (8837 lines), but the current proof still has one critical
+  lowered-Marshall-positivity callback in flight, and the newest
+  predicted-GS/Casimir bridges are tightly coupled to the adjacent
+  sublattice-lowering chain. Splitting now would add import churn
+  without a measured build-speed win. Revisit extraction after the
+  lowered-sector Marshall positivity step lands.
 - **2026-05-19 (PR #3381)**: Refactor checkpoint after the 20
   post-#3360 Tasaki §2.5 Theorem 2.3 feature PRs. Build-speed
   evaluation for the active module:
