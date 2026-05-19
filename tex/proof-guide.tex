@@ -8823,6 +8823,34 @@ to a coefficient-level comparison between the two sublattice sums,
 still within the ladder step of Tasaki, Springer 2020, Section 2.5,
 Theorem 2.3, p. 42.
 
+\textbf{Lowered coefficient dominance bridge}: the coefficient split
+also gives the direct callback form used by the lowered Marshall
+positivity wrappers.  Since the on-\(A\) signed contribution is
+\(-\sum_{x\in A}C_x(\tau)\) and the off-\(A\) contribution is
+\(\sum_{x\notin A}C_x(\tau)\), the old condition
+\[
+  -\sum_{x\in A}\operatorname{contribution}_x(\tau)
+  <
+  \sum_{x\notin A}\operatorname{contribution}_x(\tau)
+\]
+is rewritten as the coefficient inequality
+\[
+  \sum_{x\in A} C_x(\tau)
+  <
+  \sum_{x\notin A} C_x(\tau).
+\]
+Lean packages this as
+\[
+\texttt{tasaki23\_signed\_lowering\_site\_sum\_pos\_of\_onA\_coefficient\_lt\_offA}
+\]
+and then as the lowered-vector Marshall-positivity wrapper
+\[
+\texttt{tasaki23\_lowered\_marshall\_pos\_of\_onA\_coefficient\_lt\_offA}.
+\]
+This does not prove the quantitative dominance estimate; it removes the
+signed local contribution notation from the remaining local input and
+leaves a pure predecessor-coefficient comparison.
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}
