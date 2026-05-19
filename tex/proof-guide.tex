@@ -8599,6 +8599,49 @@ positivity obligation from the stronger dominance statement to the
 actual strict site-sum positivity needed for Marshall positivity of
 \(S^-_{\mathrm{tot}}\Phi\).
 
+\textbf{Lowered vector Marshall-positivity final wrappers}: the
+site-sum formulation is only a technical expansion of the total lowering
+operator.  Lean therefore also records the reverse conversion
+\[
+\begin{gathered}
+\texttt{tasaki23\_lowered\_site\_sum\_pos\_of\_marshall\_pos},\\
+\texttt{tasaki23\_raised\_site\_sum\_pos\_of\_marshall\_pos}.
+\end{gathered}
+\]
+For example, if the lowered full-space vector satisfies
+\[
+  0 <
+  \operatorname{Re}(\operatorname{MarshallSign}_A(\tau))\,
+  \operatorname{Re}\bigl((S^-_{\mathrm{tot}}\Phi)(\tau)\bigr)
+\]
+for every target-sector configuration \(\tau\), then the expansion
+\[
+  (S^-_{\mathrm{tot}}\Phi)(\tau)
+    = \sum_x (S^-_x\Phi)(\tau)
+\]
+immediately gives the strict lowered site-sum positivity used by the
+successor step.  The interval chain
+\[
+\texttt{tasaki23\_energy\_interval\_chain\_of\_left\_endpoint}
+\texttt{\_predictedGS\_of\_lowered\_marshall\_pos}
+\]
+and the final wrappers
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_predictedGS\_of\_lowered\_marshall\_pos},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_predictedGS\_of\_lowered\_marshall\_pos}\\
+\texttt{\_of\_sector\_minimality},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_predictedGS\_of\_lowered\_marshall\_pos}\\
+\texttt{\_of\_real\_sector\_minimality}
+\end{gathered}
+\]
+therefore take the natural remaining mathematical input, namely
+Marshall positivity of \(S^-_{\mathrm{tot}}\Phi\), and hide the
+site-sum conversion internally.
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}
