@@ -8722,6 +8722,43 @@ admissible interval.  This is still conditional on the local lowered
 site-sum or lowered-Marshall positivity input, exactly as in Tasaki,
 Springer 2020, Section 2.5, Theorem 2.3, p. 42.
 
+\textbf{Real-sector interval lower bound}: the common-energy chain also
+discharges the real-sector spectral lower bound on the admissible
+interval.  The matrix input is the elementary Perron comparison: if a
+non-negative symmetric real matrix has a strictly positive eigenvector
+with eigenvalue \(r\), then every real eigenvalue \(s\) satisfies
+\(s\le r\).  In Lean this is
+\[
+\texttt{eigenvalue\_le\_of\_nonnegative\_isSymm\_of\_positive\_eigenvec}.
+\]
+Applying it to the shifted dressed sector matrix
+\(cI-H_{\mathrm{dress},M}\) gives
+\[
+\texttt{shiftedDressedSReMatrixOnMagSector\_eigenvalue\_le\_of\_positive\_eigenvec}
+\]
+and, after undoing the Marshall sign conjugation,
+\[
+\texttt{heisenbergHamiltonianSReMatrixOnMagSector\_eigenvalue\_ge\_of\_marshallPositive}.
+\]
+Thus any Marshall-positive representative at the common energy \(\mu\)
+proves \(\mu\le\mu'\) for every real-form eigenvector in the same
+admissible sector.  The theorem
+\[
+\texttt{tasaki23\_real\_sector\_minimality\_on\_groundStateSectors\_of\_common\_energy\_chain}
+\]
+packages this for all \(M\in\texttt{tasaki23GroundStateSectors}\).
+The final lowered-Marshall wrapper
+\[
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint\_threaded\_predictedGS}\\
+\texttt{\_of\_lowered\_marshall\_pos\_of\_outside\_real\_sector\_minimality}
+\]
+therefore leaves only the sectors outside the admissible interval as the
+remaining real-sector spectral input.  This is the finite-dimensional
+Perron-Frobenius comparison used in Tasaki, Springer 2020,
+Section 2.5, Theorem 2.3, p. 42; for the non-negative-matrix
+background see Seneta, \emph{Non-negative Matrices and Markov Chains},
+3rd ed., Springer 2006, Section 1.2, pp. 27--28.
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}

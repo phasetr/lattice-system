@@ -2,6 +2,7 @@ import Mathlib.Data.Nat.Lattice
 import LatticeSystem.Quantum.SpinS.AllAlignedStateMagShift
 import LatticeSystem.Quantum.SpinS.BipartiteToyGSLeTotalSpinSSquaredEigenspace
 import LatticeSystem.Quantum.SpinS.BipartiteToyGSLadderInvariant
+import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorEigenvalueUnique
 import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
 import LatticeSystem.Quantum.SpinS.MarshallSign
 import LatticeSystem.Quantum.SpinS.NeelBipartiteWeight
@@ -6291,6 +6292,70 @@ theorem tasaki23_sector_minimality_of_real_sector_minimality
         N hJ_real hΦ_eigen)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 real-sector lower bound on admissible
+sectors**: once the common-energy chain has produced a Marshall-positive
+sector representative at energy `μ` in an admissible sector, the
+Perron-Frobenius shifted-matrix comparison makes `μ` a lower bound for
+every real-form eigenvalue in that same sector.
+
+This proves the real-sector spectral-minimality callback on the
+`tasaki23GroundStateSectors` interval; sectors outside the interval remain
+the separate global spectral input for the final Theorem 2.3 wrapper. -/
+theorem tasaki23_real_sector_minimality_on_groundStateSectors_of_common_energy_chain
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    {μ : ℝ}
+    (hcommon :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        ∃ v : magConfigS V N M → ℝ,
+          μ < c ∧ (∀ τ, 0 < v τ) ∧
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) :
+    ∀ M : ℕ, M ∈ tasaki23GroundStateSectors (V := V) A N →
+      [Nonempty (magConfigS V N M)] →
+        ∀ {μ' : ℝ} {φ : magConfigS V N M → ℝ},
+          φ ≠ 0 →
+          (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec φ = μ' • φ →
+          μ ≤ μ' := by
+  intro M hM _ μ' φ hφ_ne hφ_eigen
+  obtain ⟨v, _hμ_lt, hv_pos, hfull⟩ := hcommon M hM
+  let Φ : magConfigS V N M → ℂ :=
+    fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)
+  have hsector_complex :
+      (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φ =
+        (μ : ℂ) • Φ := by
+    have hrestrict :=
+      heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen
+        (M := M) J hfull
+    rw [magSectorRestriction_magSectorEmbedding] at hrestrict
+    exact hrestrict
+  have hsector_real :
+      (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+          (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * v τ) =
+        μ • (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * v τ) := by
+    have hre :=
+      heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
+        N hJ_real hsector_complex
+    simpa [Φ] using hre
+  exact
+    heisenbergHamiltonianSReMatrixOnMagSector_eigenvalue_ge_of_marshallPositive
+      A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hsector_real
+      (fun τ => by
+        have hsq : (marshallSignS A τ.1).re * (marshallSignS A τ.1).re = 1 :=
+          marshallSignS_re_sq A τ.1
+        nlinarith [hv_pos τ])
+      hφ_ne hφ_eigen
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 final wrapper from a common interval energy**:
 if one real energy `μ` is already realised by Marshall-positive sector
 eigenvectors in every admissible sector, then the per-sector Theorem 2.2
@@ -7615,6 +7680,100 @@ theorem
       (fun hcommon =>
         tasaki23_sector_minimality_of_real_sector_minimality N hJ_real
           (hreal_sector_min hcommon))
+      hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
+      hc_strict h_intermediate hA_nonempty hnotA_nonempty
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint predicted-GS lowered-Marshall
+final wrapper from outside-interval real-sector minimality**: the
+admissible-sector part of the real-sector spectral lower bound is proved
+from the common Marshall-positive energy chain, so the remaining
+real-sector callback only has to handle sectors outside
+`tasaki23GroundStateSectors`.
+
+This is the lowered-Marshall final wrapper with the interval spectral
+minimality discharged by
+`tasaki23_real_sector_minimality_on_groundStateSectors_of_common_energy_chain`. -/
+theorem
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_lowered_marshall_pos_of_outside_real_sector_minimality
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      ∀ {μ : ℝ}
+        {v : magConfigS V N
+          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+              N) → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N
+                (min
+                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+                  (Finset.card
+                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+                    N) =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hsource_lowered_marshall_pos :
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        M <
+          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          ∀ τ : magConfigS V N (M + 1),
+            0 < (marshallSignS A τ.1).re *
+              (((totalSpinSOpMinus V N).mulVec
+                (magSectorEmbedding
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re)
+    (houtside_real_sector_min :
+      ∀ {μ : ℝ},
+        (∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+          ∃ v : magConfigS V N M → ℝ,
+            μ < c ∧ (∀ τ, 0 < v τ) ∧
+            (heisenbergHamiltonianS J N).mulVec
+                (magSectorEmbedding
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+              (μ : ℂ) • magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) →
+        ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+          M ∉ tasaki23GroundStateSectors (V := V) A N →
+          ∀ {μ' : ℝ} {φ : magConfigS V N M → ℝ},
+            φ ≠ 0 →
+            (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec φ =
+              μ' • φ →
+            μ ≤ μ') :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
+    hc_strict h_intermediate hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_lowered_marshall_pos_of_real_sector_minimality
+      A N c hBA hsector_nonempty hleft_predictedGS hsource_lowered_marshall_pos
+      (fun hcommon M => by
+        by_cases hM : M ∈ tasaki23GroundStateSectors (V := V) A N
+        · exact
+            tasaki23_real_sector_minimality_on_groundStateSectors_of_common_energy_chain
+              A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+              hcommon M hM
+        · exact houtside_real_sector_min hcommon M hM)
       hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
       hc_strict h_intermediate hA_nonempty hnotA_nonempty
 
