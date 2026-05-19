@@ -8759,6 +8759,40 @@ Section 2.5, Theorem 2.3, p. 42; for the non-negative-matrix
 background see Seneta, \emph{Non-negative Matrices and Markov Chains},
 3rd ed., Springer 2006, Section 1.2, pp. 27--28.
 
+\textbf{Lowered Marshall coefficient identities}: the remaining local
+input is the strict Marshall positivity of the lowered ladder image.
+For this, the single-site predecessor formula is now recorded in its
+Marshall-signed coefficient form.  If \(\tau\in H_{M+1}\) and
+\(\tau^{x-}\in H_M\) is obtained by lowering \(\tau_x\), then the real
+single-site contribution satisfies
+\[
+  \operatorname{sgn}_A(\tau)\,
+    \operatorname{Re}\bigl((S_x^-\Phi)_\tau\bigr)
+  =
+  \begin{cases}
+    c_x(\tau)\,
+      \operatorname{sgn}_A(\tau^{x-})
+      \operatorname{Re}\Phi(\tau^{x-}), & A(x)=\mathrm{false},\\
+    -c_x(\tau)\,
+      \operatorname{sgn}_A(\tau^{x-})
+      \operatorname{Re}\Phi(\tau^{x-}), & A(x)=\mathrm{true}.
+  \end{cases}
+\]
+Here \(c_x(\tau)>0\) is the real lowering matrix coefficient.  Lean
+records the two cases as
+\[
+\texttt{tasaki23\_signed\_single\_site\_lowering\_component\_eq\_of\_A\_false}
+\]
+and
+\[
+\texttt{tasaki23\_signed\_single\_site\_lowering\_component\_eq\_neg\_of\_A\_true}.
+\]
+These identities do not by themselves prove positivity; they isolate the
+coefficient-level sublattice sign relation that the final strict
+site-sum dominance argument has to sum.  This is the local ladder
+coefficient analysis used in Tasaki, Springer 2020, Section 2.5,
+Theorem 2.3, p. 42.
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}
