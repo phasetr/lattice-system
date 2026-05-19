@@ -8635,8 +8635,12 @@ corresponding \(\texttt{magSumS}\) sector.  Hence
 proves the full global-minimality clause from lower bounds on all
 sector eigenvalues.  The wrapper
 \[
-\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint}\\
-\texttt{\_predictedGS\_of\_onA\_neg\_lt\_offA\_of\_sector\_minimality}
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_predictedGS}\\
+\texttt{\_of\_onA\_neg\_lt\_offA}\\
+\texttt{\_of\_sector\_minimality}
+\end{gathered}
 \]
 therefore replaces the previous full-space global-minimality callback
 by a sharper sector-minimality callback, while leaving the predicted-GS
@@ -8646,8 +8650,11 @@ The sector-minimality callback is reduced one step further to a real
 sector statement.  For real coupling, the existing real-part extraction
 lemma and the new Lean theorem
 \[
-\texttt{heisenbergHamiltonianSReMatrixOnMagSector\_mulVec\_im}\\
+\begin{gathered}
+\texttt{heisenbergHamiltonianSReMatrix}\\
+\texttt{OnMagSector\_mulVec\_im}\\
 \texttt{\_of\_complex\_eigenvec}
+\end{gathered}
 \]
 show that the real and imaginary parts of any complex sector eigenvector
 at a real eigenvalue are real-form sector eigenvectors at the same
@@ -8659,9 +8666,13 @@ imaginary component,
 proves complex sector minimality from lower bounds on nonzero real-form
 sector eigenvectors.  The wrapper
 \[
-\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint}\\
-\texttt{\_predictedGS\_of\_onA\_neg\_lt\_offA}\\
-\texttt{\_of\_real\_sector\_minimality}
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_predictedGS}\\
+\texttt{\_of\_onA\_neg\_lt\_offA}\\
+\texttt{\_of\_real\_sector}\\
+\texttt{\_minimality}
+\end{gathered}
 \]
 therefore leaves the remaining spectral lower-bound input entirely in
 the real sector matrix.
@@ -8671,13 +8682,20 @@ of the predicted toy ground-state subspace has now been put into the
 same notation as the adjacent-sector chain.  In the canonical
 orientation \(|\neg A|\le |A|\), the Lean theorem
 \[
-\texttt{tasaki23PredictedCasimirValue\_eq\_canonical\_of\_card\_notA\_le\_cardA}
+\begin{gathered}
+\texttt{tasaki23PredictedCasimirValue}\\
+\texttt{\_eq\_canonical}\\
+\texttt{\_of\_card\_notA\_le\_cardA}
+\end{gathered}
 \]
 identifies \(C_{\mathrm{pred}}\) with the canonical joint-Casimir target
-appearing in \(\texttt{bipartiteToyGroundStateSubspacePredicted}\).  Thus
+appearing in the predicted toy ground-state subspace.  Thus
 \[
-\texttt{tasaki23\_totalSpinSSquared\_mulVec\_of\_mem}\\
+\begin{gathered}
+\texttt{tasaki23\_totalSpinSSquared\_mulVec}\\
+\texttt{\_of\_mem}\\
 \texttt{\_bipartiteToyGroundStateSubspacePredicted}
+\end{gathered}
 \]
 states that any vector in that predicted toy ground-state subspace
 satisfies
