@@ -38,13 +38,13 @@ the following on-disk files and obey their instructions:
 ## Hard rules (echoed from `CLAUDE.local.md`; obey even if it is missing)
 
 - **All changes go through pull requests.** Never push directly to `main`.
-- **Do not stop at a refactor-checkpoint resume just because a prior note says
-  the user should run `/clear`.** If the execution environment exposes a
-  callable session-clear operation, the agent must perform it. If it does not,
-  the agent must emulate a fresh session by rereading `CLAUDE.local.md`,
-  `.self-local/SESSION-RESUME.md`, the referenced `.self-local/docs/*` files,
-  `README.md`, `docs/index.md`, and `tex/proof-guide.tex`, then continue from
-  the recorded "Next concrete step" without asking the user to run `/clear`.
+- **Do not stop at a refactor-checkpoint resume.** If the execution
+  environment exposes an AI-callable session-clear operation, the agent must
+  invoke it itself. If it does not, the agent must emulate a fresh session by
+  rereading `CLAUDE.local.md`, `.self-local/SESSION-RESUME.md`, the referenced
+  `.self-local/docs/*` files, `README.md`, `docs/index.md`, and
+  `tex/proof-guide.tex`, then continue from the recorded "Next concrete step".
+  Never ask the user to perform the clear action.
 - **Do not skip pre-commit / pre-push hooks** (`--no-verify` etc.) unless
   the user explicitly asks for it.
 - **Do not run destructive git operations** (`push --force`, `reset --hard`,
