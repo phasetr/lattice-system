@@ -7428,6 +7428,21 @@ $\mathrm{tasaki23GroundStateSectors}\,A\,N$. Reference: H.~Tasaki,
 \emph{Physics and Mathematics of Quantum Many-Body Systems},
 Springer 2020, §2.5 Theorem 2.3, p.~42.
 
+\textbf{Conditional final wrapper}: in the canonical orientation
+$|\neg A| \le |A|$, Lean now proves
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint\_predictedGS\_of\_onA\_neg\_lt\_offA}.
+It first invokes the predicted-GS left-endpoint interval-chain theorem
+to obtain one common energy $\mu$ across all admissible sectors, then
+uses the per-sector Theorem 2.2 wrapper to replace each interval-chain
+witness by a sector ground-state witness carrying the final
+within-sector uniqueness clause.  The statement keeps exactly the
+remaining mathematical inputs explicit: predicted-GS membership for
+the source vector, the lowered off-$A$ dominance estimate, and global
+minimality of the common value.  Once these callbacks are supplied, the
+wrapper proves the final \texttt{tasaki\_2\_5\_theorem\_2\_3} proposition
+for Tasaki, \emph{Physics and Mathematics of Quantum Many-Body Systems},
+Springer 2020, \S2.5 Theorem 2.3, p.~42.
+
 \textbf{Admissible-sector interval combinatorics}: the sector range is
 now formalised as a closed finite interval.  Lean proves the membership
 characterisation
