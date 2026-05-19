@@ -6469,7 +6469,7 @@ theorem
       hc_strict h_intermediate hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
-/-- **Tasaki §2.5 Theorem 2.3 left-endpoint predicted-GS final wrapper from
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS final wrapper from
 lowered site-sum positivity**: this replaces the lowered off-`A` dominance
 callback by the direct strict site-sum positivity callback needed to prove
 Marshall positivity of the lowered vector.
