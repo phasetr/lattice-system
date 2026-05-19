@@ -203,6 +203,111 @@ theorem totalSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_site_sum {M : ℕ}
   rw [totalSpinSOpMinus_def, Matrix.sum_mulVec]
   simp [Finset.sum_apply]
 
+/-- **Tasaki §2.5 Theorem 2.3 lowered Marshall-signed vector realness**:
+lowering a real Marshall-signed sector representative gives a real-valued
+full vector.
+
+This is the imaginary-part half needed to upgrade the sector-uniqueness
+relation, which is stated on real parts, to an equality of full complex
+vectors. -/
+theorem totalSpinSOpMinus_mulVec_marshallSignedEmbedding_im_zero
+    (A : V → Bool) {M : ℕ} (v : magConfigS V N M → ℝ)
+    (σ : V → Fin (N + 1)) :
+    (((totalSpinSOpMinus V N).mulVec
+      (magSectorEmbedding
+        (fun τ : magConfigS V N M =>
+          (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) σ).im = 0 := by
+  rw [totalSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_site_sum]
+  rw [Complex.im_sum]
+  refine Finset.sum_eq_zero (fun x _ => ?_)
+  rw [Matrix.mulVec, dotProduct, Complex.im_sum]
+  refine Finset.sum_eq_zero (fun τ _ => ?_)
+  have hτ_im :
+      (magSectorEmbedding
+        (fun τ : magConfigS V N M =>
+          (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) τ).im = 0 := by
+    by_cases hτM : magSumS τ = M
+    · rw [magSectorEmbedding_apply_of_mem
+        (fun τ : magConfigS V N M =>
+          (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) hτM]
+      simp
+    · rw [magSectorEmbedding_apply_of_not_mem
+        (fun τ : magConfigS V N M =>
+          (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) hτM]
+      simp
+  rw [Complex.mul_im]
+  rw [onSiteS_spinSOpMinus_apply_im_zero, hτ_im]
+  ring
+
+/-- **Tasaki §2.5 Theorem 2.3 lowered-vector scalar identification**:
+if the real parts of the lowered Marshall-signed source vector agree with
+a positive real scalar multiple of the successor representative in the
+target sector, then the full lowered vector is that scalar multiple of
+the zero-extended successor representative.
+
+The proof uses sector support for the lowered vector and the realness of
+both sides. -/
+theorem totalSpinSOpMinus_marshallSignedEmbedding_eq_smul_successor_of_re
+    (A : V → Bool) {M : ℕ} {v : magConfigS V N M → ℝ}
+    {v_succ : magConfigS V N (M + 1) → ℝ} {r : ℝ}
+    (hrel :
+      ∀ τ : magConfigS V N (M + 1),
+        (((totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re =
+          r * ((marshallSignS A τ.1).re * v_succ τ)) :
+    (totalSpinSOpMinus V N).mulVec
+        (magSectorEmbedding
+          (fun τ : magConfigS V N M =>
+            (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+      (r : ℂ) •
+        magSectorEmbedding
+          (fun τ : magConfigS V N (M + 1) =>
+            (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) := by
+  funext σ
+  by_cases hσ : magSumS σ = M + 1
+  · let τ : magConfigS V N (M + 1) := ⟨σ, hσ⟩
+    have hleft_im :
+        (((totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) σ).im = 0 :=
+      totalSpinSOpMinus_mulVec_marshallSignedEmbedding_im_zero A v σ
+    have hleft_re :
+        (((totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) σ).re =
+          r * ((marshallSignS A σ).re * v_succ τ) := by
+      simpa [τ] using hrel τ
+    change (totalSpinSOpMinus V N).mulVec
+        (magSectorEmbedding
+          (fun τ : magConfigS V N M =>
+            (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) σ =
+      (r : ℂ) *
+        magSectorEmbedding
+          (fun τ : magConfigS V N (M + 1) =>
+            (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) σ
+    rw [magSectorEmbedding_apply_of_mem
+      (fun τ : magConfigS V N (M + 1) =>
+        (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) hσ]
+    apply Complex.ext
+    · simpa using hleft_re
+    · simpa using hleft_im
+  · rw [totalSpinSOpMinus_mulVec_magSectorEmbedding_supported_succ
+      (fun τ : magConfigS V N M =>
+        (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) σ hσ]
+    change (0 : ℂ) =
+      (r : ℂ) *
+        magSectorEmbedding
+          (fun τ : magConfigS V N (M + 1) =>
+            (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) σ
+    rw [magSectorEmbedding_apply_of_not_mem
+      (fun τ : magConfigS V N (M + 1) =>
+        (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) hσ]
+    simp
+
 /-- **Tasaki §2.5 Theorem 2.3 raised-vector site-sum expansion**:
 the `Ŝ^+_tot`-raised embedded sector vector is the sum of its
 single-site raising contributions at each target configuration.
@@ -2420,6 +2525,44 @@ theorem
     tasaki23_totalSpinSOpPlus_preserves_predictedCasimirValue
       (V := V) A N hΦ_cas
 
+/-- **Tasaki §2.5 Theorem 2.3 predicted-Casimir transfer across a
+non-zero real scalar**: if a vector with the predicted total-Casimir
+eigenvalue is a non-zero real scalar multiple of another vector, then
+the second vector has the same predicted total-Casimir eigenvalue.
+
+This is the cancellation step used after identifying a lowered ladder
+image with the adjacent-sector Marshall-positive representative up to a
+positive real scalar. -/
+theorem tasaki23_totalSpinSSquared_predictedCasimirValue_of_real_smul_eq
+    (A : V → Bool) (N : ℕ) {r : ℝ}
+    {Ψ Φ : (V → Fin (N + 1)) → ℂ}
+    (hr : r ≠ 0)
+    (hrel : Ψ = (r : ℂ) • Φ)
+    (hΨ_cas :
+      (totalSpinSSquared V N).mulVec Ψ =
+        (tasaki23PredictedCasimirValue (V := V) A N : ℂ) • Ψ) :
+    (totalSpinSSquared V N).mulVec Φ =
+      (tasaki23PredictedCasimirValue (V := V) A N : ℂ) • Φ := by
+  have hrC : (r : ℂ) ≠ 0 := by exact_mod_cast hr
+  rw [hrel, Matrix.mulVec_smul] at hΨ_cas
+  funext σ
+  have hσ := congrFun hΨ_cas σ
+  change (r : ℂ) * ((totalSpinSSquared V N).mulVec Φ) σ =
+      (tasaki23PredictedCasimirValue (V := V) A N : ℂ) *
+        ((r : ℂ) * Φ σ) at hσ
+  change ((totalSpinSSquared V N).mulVec Φ) σ =
+      (tasaki23PredictedCasimirValue (V := V) A N : ℂ) * Φ σ
+  have hσ' :
+      (r : ℂ) * ((totalSpinSSquared V N).mulVec Φ) σ =
+        (r : ℂ) * ((tasaki23PredictedCasimirValue (V := V) A N : ℂ) * Φ σ) := by
+    calc
+      (r : ℂ) * ((totalSpinSSquared V N).mulVec Φ) σ =
+          (tasaki23PredictedCasimirValue (V := V) A N : ℂ) *
+            ((r : ℂ) * Φ σ) := hσ
+      _ = (r : ℂ) * ((tasaki23PredictedCasimirValue (V := V) A N : ℂ) * Φ σ) := by
+        ring
+  exact mul_left_cancel₀ hrC hσ'
+
 /-- **Tasaki §2.5 Theorem 2.3 adjacent common-energy successor step**:
 inside the admissible sector interval, a source-sector
 Marshall-positive eigenvector in sector `M`, together with the lowered
@@ -3750,6 +3893,152 @@ theorem tasaki23_successor_sector_existence_with_lowered_predictedCasimir
       hc_strict h_intermediate hM hMlt hμ_lt hv_pos hΦ
       (hsource_cas hμ_lt hv_pos hΦ)
       (hsource_site_sum hμ_lt hv_pos hΦ)⟩
+
+/-- **Tasaki §2.5 Theorem 2.3 successor predicted-Casimir
+propagation**: in the lowering-direction sector-existence step, the
+successor representative returned by the adjacent-sector comparison also
+has the Theorem 2.3 predicted total-Casimir eigenvalue.
+
+The existing package already proves that the lowered source vector has
+the predicted Casimir eigenvalue and that its real parts are a positive
+real scalar multiple of the successor representative in Marshall
+coordinates.  Since both vectors are real and supported in the successor
+sector, this is a full scalar equality, so the Casimir eigenvector
+equation cancels the scalar. -/
+theorem
+    tasaki23_successor_sector_existence_with_successor_predictedCasimir
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)] [Nonempty (magConfigS V N (M + 1))]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hM : M ∈ tasaki23GroundStateSectors (V := V) A N)
+    (hMlt : M <
+      max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N)
+    (hsource_cas :
+      ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+        μ < c →
+        (∀ τ, 0 < v τ) →
+        (heisenbergHamiltonianS J N).mulVec
+            (magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+          (μ : ℂ) • magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+        (totalSpinSSquared V N).mulVec
+            (magSectorEmbedding
+              (fun τ : magConfigS V N M =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+          (tasaki23PredictedCasimirValue (V := V) A N : ℂ) •
+            magSectorEmbedding
+              (fun τ : magConfigS V N M =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (hsource_site_sum :
+      ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+        μ < c →
+        (∀ τ, 0 < v τ) →
+        (heisenbergHamiltonianS J N).mulVec
+            (magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+          (μ : ℂ) • magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+        ∀ τ : magConfigS V N (M + 1),
+          0 < (marshallSignS A τ.1).re *
+            (∑ x : V,
+              (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+                (magSectorEmbedding
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re)) :
+    ∃ (μ : ℝ) (v : magConfigS V N M → ℝ),
+      (M + 1 ∈ tasaki23GroundStateSectors (V := V) A N ∧
+        μ < c ∧ (∀ τ, 0 < v τ) ∧
+        (heisenbergHamiltonianS J N).mulVec
+            (magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+          (μ : ℂ) • magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+        (totalSpinSOpMinus V N).mulVec
+            (magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ≠ 0 ∧
+        ∃ v_succ : magConfigS V N (M + 1) → ℝ,
+          μ < c ∧ (∀ τ, 0 < v_succ τ) ∧
+          (heisenbergHamiltonianS J N).mulVec
+            (magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) ∧
+          (totalSpinSSquared V N).mulVec
+            (magSectorEmbedding
+              (fun τ : magConfigS V N (M + 1) =>
+                (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ))) =
+            (tasaki23PredictedCasimirValue (V := V) A N : ℂ) •
+              magSectorEmbedding
+                (fun τ : magConfigS V N (M + 1) =>
+                  (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) ∧
+          ∃ r : ℝ, 0 < r ∧
+            ∀ τ : magConfigS V N (M + 1),
+              (((totalSpinSOpMinus V N).mulVec
+                (magSectorEmbedding
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re =
+                r * ((marshallSignS A τ.1).re * v_succ τ)) ∧
+        (totalSpinSSquared V N).mulVec
+            ((totalSpinSOpMinus V N).mulVec
+              (magSectorEmbedding
+                (fun τ : magConfigS V N M =>
+                  (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) =
+          (tasaki23PredictedCasimirValue (V := V) A N : ℂ) •
+            ((totalSpinSOpMinus V N).mulVec
+              (magSectorEmbedding
+                (fun τ : magConfigS V N M =>
+                  (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) := by
+  obtain ⟨μ, v, hpack⟩ :=
+    tasaki23_successor_sector_existence_with_lowered_predictedCasimir
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hM hMlt hsource_cas hsource_site_sum
+  have hM_succ := hpack.1.1
+  have hμ_lt := hpack.1.2.1
+  have hv_pos := hpack.1.2.2.1
+  have hΦ := hpack.1.2.2.2.1
+  have hlowered_ne := hpack.1.2.2.2.2.1
+  have hsucc := hpack.1.2.2.2.2.2
+  have hcas_lowered := hpack.2
+  obtain ⟨v_succ, hsucc_pack⟩ := hsucc
+  have hμ_succ_lt := hsucc_pack.1
+  have hv_succ_pos := hsucc_pack.2.1
+  have hΦ_succ := hsucc_pack.2.2.1
+  obtain ⟨r, hr_pos, hrel⟩ := hsucc_pack.2.2.2
+  have hsmul :
+      (totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (r : ℂ) •
+          magSectorEmbedding
+            (fun τ : magConfigS V N (M + 1) =>
+              (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) :=
+    totalSpinSOpMinus_marshallSignedEmbedding_eq_smul_successor_of_re
+      A hrel
+  have hsucc_cas :
+      (totalSpinSSquared V N).mulVec
+          (magSectorEmbedding
+            (fun τ : magConfigS V N (M + 1) =>
+              (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ))) =
+        (tasaki23PredictedCasimirValue (V := V) A N : ℂ) •
+          magSectorEmbedding
+            (fun τ : magConfigS V N (M + 1) =>
+              (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) :=
+    tasaki23_totalSpinSSquared_predictedCasimirValue_of_real_smul_eq
+      A N (ne_of_gt hr_pos) hsmul hcas_lowered
+  exact ⟨μ, v,
+    ⟨hM_succ, hμ_lt, hv_pos, hΦ, hlowered_ne,
+      ⟨v_succ, hμ_succ_lt, hv_succ_pos, hΦ_succ, hsucc_cas,
+        ⟨r, hr_pos, hrel⟩⟩⟩,
+    hcas_lowered⟩
 
 /-- **Tasaki §2.5 Theorem 2.3 sector-existence predecessor chain link
 with predicted Casimir**: choose the sector-`M+1` Marshall-positive

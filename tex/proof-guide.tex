@@ -8450,6 +8450,36 @@ on the actual ladder image.  Thus the final Theorem~2.3 iteration can
 work with sector-existence data rather than externally supplied
 source-sector eigenvectors.
 
+\textbf{Successor predicted-Casimir propagation}: the lowering-direction
+sector-existence package is sharpened by
+\[
+\begin{gathered}
+\texttt{totalSpinSOpMinus\_mulVec}\\
+\texttt{\_marshallSignedEmbedding\_im\_zero},\\
+\texttt{totalSpinSOpMinus}\\
+\texttt{\_marshallSignedEmbedding\_eq\_smul\_successor\_of\_re},\\
+\texttt{tasaki23\_totalSpinSSquared}\\
+\texttt{\_predictedCasimirValue\_of\_real\_smul\_eq},\\
+\texttt{tasaki23\_successor\_sector\_existence}\\
+\texttt{\_with\_successor\_predictedCasimir}.
+\end{gathered}
+\]
+The lowered image of a real Marshall-signed source-sector
+representative is real-valued, because the entries of
+\(\hat S^-_{\mathrm{tot}}\) are real.  Therefore the adjacent-sector
+uniqueness relation, originally stated only for real parts, upgrades to
+a full equality
+\[
+  \hat S^-_{\mathrm{tot}}\Phi_M = r\,\Phi_{M+1},
+  \qquad r>0.
+\]
+The predicted-Casimir identity on the lowered image then cancels this
+non-zero scalar and transfers to the successor representative
+\(\Phi_{M+1}\).  This is the lowering-direction propagation step needed
+to thread predicted-Casimir information along the admissible-sector
+interval, rather than asking for a fresh source-sector callback at every
+successor sector.
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}
