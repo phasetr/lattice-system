@@ -2885,6 +2885,48 @@ theorem tasaki23_totalSpinSSquared_mulVec_of_mem_bipartiteToyGroundStateSubspace
     (V := V) A N hBA]
   simpa using hmem
 
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS `A`-sublattice Casimir
+bridge**: membership in the predicted toy ground-state subspace gives
+the maximum `A`-sublattice Casimir eigenvector identity.
+
+This packages the definitional `(Ŝ_A)^2` component of
+`bipartiteToyGroundStateSubspacePredicted` for the later sublattice
+ladder comparison. -/
+theorem tasaki23_sublatticeSpinSquaredS_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (sublatticeSpinSquaredS N A).mulVec Ψ =
+      ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2)) *
+        ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2)) + 1)) • Ψ := by
+  have hmem :=
+    bipartiteToyGroundStateSubspacePredicted_le_sublatticeSpinSquaredSEigenspace
+      (Λ := V) A N hΨ
+  rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hmem
+  simpa using hmem
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS complement-sublattice Casimir
+bridge**: membership in the predicted toy ground-state subspace gives
+the maximum `¬A`-sublattice Casimir eigenvector identity.
+
+This is the complement companion to
+`tasaki23_sublatticeSpinSquaredS_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted`. -/
+theorem tasaki23_sublatticeSpinSquaredS_complement_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (sublatticeSpinSquaredS N (fun x => !A x)).mulVec Ψ =
+      ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) *
+        ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) + 1)) • Ψ := by
+  have hmem :=
+    bipartiteToyGroundStateSubspacePredicted_le_sublatticeSpinSquaredS_complementEigenspace
+      (Λ := V) A N hΨ
+  rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hmem
+  simpa using hmem
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS lowering closure**:
 if a full spin-`S` vector lies in the predicted toy ground-state
 subspace, then its total-lowering image also lies in that subspace.
@@ -2916,6 +2958,48 @@ theorem tasaki23_totalSpinSOpPlus_mulVec_mem_bipartiteToyGroundStateSubspacePred
   exact
     bipartiteToyGroundStateSubspacePredicted_totalSpinSOpPlus_invariant
       (Λ := V) A N ⟨Ψ, hΨ, by simp⟩
+
+/-- **Tasaki §2.5 Theorem 2.3 lowered predicted-GS `A`-sublattice
+Casimir bridge**: the total-lowering image of a predicted toy ground
+state still has the maximum `A`-sublattice Casimir eigenvalue.
+
+This combines predicted-GS lowering closure with the `A`-sublattice
+Casimir bridge. -/
+theorem tasaki23_lowered_sublatticeSpinSquaredS_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (sublatticeSpinSquaredS N A).mulVec ((totalSpinSOpMinus V N).mulVec Ψ) =
+      ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2)) *
+        ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2)) + 1)) • ((totalSpinSOpMinus V N).mulVec Ψ) := by
+  exact
+    tasaki23_sublatticeSpinSquaredS_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+      (V := V) A N
+      (tasaki23_totalSpinSOpMinus_mulVec_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΨ)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowered predicted-GS complement-sublattice
+Casimir bridge**: the total-lowering image of a predicted toy ground
+state still has the maximum `¬A`-sublattice Casimir eigenvalue.
+
+This is the complement companion to
+`tasaki23_lowered_sublatticeSpinSquaredS_of_mem_bipartiteToyGroundStateSubspacePredicted`. -/
+theorem tasaki23_lowered_sublatticeSpinSquaredS_complement_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (sublatticeSpinSquaredS N (fun x => !A x)).mulVec
+        ((totalSpinSOpMinus V N).mulVec Ψ) =
+      ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) *
+        ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) + 1)) • ((totalSpinSOpMinus V N).mulVec Ψ) := by
+  exact
+    tasaki23_sublatticeSpinSquaredS_complement_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+      (V := V) A N
+      (tasaki23_totalSpinSOpMinus_mulVec_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΨ)
 
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS transfer across a non-zero
 real scalar**: if a vector in the predicted toy ground-state subspace is

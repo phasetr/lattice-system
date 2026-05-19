@@ -8920,6 +8920,36 @@ Thus the remaining local input for the lowered adjacent-sector step has
 the same form as the sublattice-ladder comparison appearing in Tasaki,
 Springer 2020, Section 2.5, Theorem 2.3, p. 42.
 
+\textbf{Predicted-GS sublattice Casimir bridges}: the predicted toy
+ground-state subspace is defined as the joint eigenspace for
+\((\hat S_{\mathrm{tot}})^2\), \((\hat S_A)^2\), and
+\((\hat S_{\bar A})^2\).  In addition to the already used total-Casimir
+bridge, Lean now exposes the two sublattice components:
+\[
+\begin{gathered}
+\texttt{tasaki23\_sublatticeSpinSquaredS\_mulVec}\\
+\texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted},\\
+\texttt{tasaki23\_sublatticeSpinSquaredS\_complement\_mulVec}\\
+\texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted}.
+\end{gathered}
+\]
+These state that a predicted-GS vector is an eigenvector of
+\((\hat S_A)^2\) at \(s_A(s_A+1)\) and of
+\((\hat S_{\bar A})^2\) at \(s_B(s_B+1)\), where
+\(s_A=|A|N/2\) and \(s_B=|\bar A|N/2\).  Combining these with the
+predicted-GS lowering closure gives the lowered-image companions
+\[
+\begin{gathered}
+\texttt{tasaki23\_lowered\_sublatticeSpinSquaredS}\\
+\texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted},\\
+\texttt{tasaki23\_lowered\_sublatticeSpinSquaredS\_complement}\\
+\texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted}.
+\end{gathered}
+\]
+This is the Casimir-side input needed for the next comparison of
+\(\hat S_A^- \Phi\) and \(\hat S_{\bar A}^- \Phi\) in the proof of
+Tasaki, Springer 2020, Section 2.5, Theorem 2.3, p. 42.
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}
