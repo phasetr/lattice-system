@@ -50,6 +50,17 @@ noncomputable def sublatticeSpinSDot (A B : Λ → Bool) : ManyBodyOpS Λ N :=
         sublatticeSpinSOp2 N A * sublatticeSpinSOp2 N B +
         sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N B := rfl
 
+/-- Ladder expansion of the cross-sublattice spin dot product:
+`Ŝ_A · Ŝ_B = Ŝ_A^3 Ŝ_B^3 + (1/2)(Ŝ_A^+ Ŝ_B^- + Ŝ_A^- Ŝ_B^+)`. -/
+theorem sublatticeSpinSDot_eq_op3_add_ladder
+    (A B : Λ → Bool) :
+    sublatticeSpinSDot N A B =
+      sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N B +
+        (1 / 2 : ℂ) • (sublatticeSpinSOpPlus N A * sublatticeSpinSOpMinus N B +
+          sublatticeSpinSOpMinus N A * sublatticeSpinSOpPlus N B) := by
+  rw [sublatticeSpinSDot_def, sublatticeSpinSOp1_mul_op1_add_op2_mul_op2_eq_ladder]
+  abel
+
 /-! ## Bilinear expansion (helper) -/
 
 /-- Per-axis expansion: a single product

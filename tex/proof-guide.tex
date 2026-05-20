@@ -9082,6 +9082,40 @@ and
 obtaining the joint-component comparison required by the preceding
 final wrapper.
 
+\textbf{Predicted-GS toy cross-dot bridge}: predicted toy ground-state
+membership also gives the pointwise toy-Hamiltonian identity recorded in
+\[
+\begin{gathered}
+\texttt{tasaki23\_heisenbergToyHamiltonianS\_mulVec}\\
+\texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted}
+\end{gathered}
+\]
+Combining this with the Casimir identity
+\(\hat H_{\mathrm{toy},S}=2\,\hat S_A\cdot \hat S_{\bar A}\) gives
+\[
+\begin{gathered}
+\texttt{tasaki23\_two\_sublatticeSpinSDot\_mulVec}\\
+\texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted}
+\end{gathered}
+\]
+The general identity
+\[
+\texttt{sublatticeSpinSDot\_eq\_op3\_add\_ladder}
+\]
+rewrites the dot product as
+\(\hat S_A^3\hat S_{\bar A}^3+
+\frac12(\hat S_A^+\hat S_{\bar A}^-+
+\hat S_A^-\hat S_{\bar A}^+)\), yielding
+\[
+\begin{gathered}
+\texttt{tasaki23\_two\_cross\_ladder\_mulVec}\\
+\texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted}
+\end{gathered}
+\]
+Thus the cross-sublattice spin-dot constraint is available in the
+ladder-term form needed for the remaining comparison between
+\(\hat S_A^-\Phi\) and \(\hat S_{\bar A}^-\Phi\).
+
 \textbf{Sublattice-component final wrapper}: the final theorem wrapper can
 now consume that sublattice comparison directly.  The Lean theorem
 \[
