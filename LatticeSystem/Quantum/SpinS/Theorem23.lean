@@ -3839,6 +3839,75 @@ theorem
   ring_nf
   exact Or.inl trivial
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 real predecessor source-weight identity**:
+the complex predecessor source-weight equality can be read on the real
+axis for a Marshall-positive sector embedding.
+
+This combines `Complex.re` of the predecessor-specialized cross-ladder
+equation with
+`tasaki23_cross_ladder_reembedded_source_weight_lowering_predecessor_rhs_re_eq`,
+so the remaining local comparison may use the real scalar coefficient
+directly. -/
+theorem
+    tasaki23_cross_ladder_reembedded_source_weight_lowering_predecessor_re_eq
+    (A : V → Bool) (N : ℕ) {M : ℕ} {v : magConfigS V N M → ℝ}
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ_eq :
+      Ψ =
+        magSectorEmbedding
+          (fun ρ : magConfigS V N M =>
+            (((marshallSignS A ρ.1).re * v ρ : ℝ) : ℂ)))
+    (τ : magConfigS V N (M + 1)) (x : V) (hx : 0 < (τ.1 x).val)
+    (hpred :
+      let predVal : Fin (N + 1) :=
+        ⟨(τ.1 x).val - 1, by omega⟩
+      let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+      (∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
+          ((onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+            (magSectorEmbedding
+              (magSectorRestriction (M := M + 1)
+                ((sublatticeSpinSOpMinus N (fun y => ! A y)).mulVec Ψ)))) pred) +
+        ∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
+          ((onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+            (magSectorEmbedding
+              (magSectorRestriction (M := M + 1)
+                ((sublatticeSpinSOpMinus N A).mulVec Ψ)))) pred =
+        (bipartiteToyMinEnergyPredicted (Λ := V) A N -
+          (2 : ℂ) *
+            ((∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
+                ((N : ℂ) / 2 - ((pred y).val : ℂ))) *
+              (∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
+                ((N : ℂ) / 2 - ((pred y).val : ℂ))))) * Ψ pred) :
+    let predVal : Fin (N + 1) :=
+      ⟨(τ.1 x).val - 1, by omega⟩
+    let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+    ((∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
+        ((onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding
+            (magSectorRestriction (M := M + 1)
+              ((sublatticeSpinSOpMinus N (fun y => ! A y)).mulVec Ψ)))) pred) +
+      ∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
+        ((onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding
+            (magSectorRestriction (M := M + 1)
+              ((sublatticeSpinSOpMinus N A).mulVec Ψ)))) pred).re =
+      ((bipartiteToyMinEnergyPredicted (Λ := V) A N).re -
+          2 *
+            ((∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
+                ((N : ℝ) / 2 - ((pred y).val : ℝ))) *
+              (∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
+                ((N : ℝ) / 2 - ((pred y).val : ℝ))))) *
+        ((marshallSignS A pred).re *
+          v ⟨pred, magSumS_single_site_lowering_predecessor τ x hx⟩) := by
+  classical
+  dsimp only at hpred ⊢
+  have hre := congrArg Complex.re hpred
+  rw [
+    tasaki23_cross_ladder_reembedded_source_weight_lowering_predecessor_rhs_re_eq
+      (V := V) A N hΨ_eq τ x hx] at hre
+  exact hre
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS lowering closure**:
 if a full spin-`S` vector lies in the predicted toy ground-state
 subspace, then its total-lowering image also lies in that subspace.
