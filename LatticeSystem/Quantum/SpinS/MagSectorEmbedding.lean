@@ -434,6 +434,21 @@ theorem magSubspaceS_apply_eq_zero_of_magSumS_ne {M : ℕ}
     exact_mod_cast hcast
   exact (mul_eq_zero.mp hsub).resolve_left hne
 
+/-- A vector in the `magSumS = M` magnetization eigenspace is exactly
+the zero-extension of its sector restriction.
+
+This is the inverse support bridge to `magSectorEmbedding_mem_magSubspaceS`:
+once a full vector is known to lie in `magSubspaceS V N (|V|·N/2 - M)`,
+it can be handled by the sector-vector APIs after restricting it to
+`magConfigS V N M`. -/
+theorem magSectorEmbedding_magSectorRestriction_of_mem_magSubspaceS {M : ℕ}
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ))) :
+    magSectorEmbedding (magSectorRestriction (M := M) Ψ) = Ψ :=
+  magSectorEmbedding_magSectorRestriction_of_supported
+    (fun _ hσ => magSubspaceS_apply_eq_zero_of_magSumS_ne hΨ hσ)
+
 end Support
 
 /-! ## Heisenberg matrix element vanishes between different sectors -/
