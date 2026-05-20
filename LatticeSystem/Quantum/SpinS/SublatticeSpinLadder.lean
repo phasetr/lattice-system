@@ -359,5 +359,60 @@ theorem sublatticeSpinSOpMinus_cross_commute_plus (A : Λ → Bool) :
   unfold sublatticeSpinSOpMinus sublatticeSpinSOpPlus
   exact sublatticeSpinSOpGeneric_cross_commute N A (spinSOpMinus N) (spinSOpPlus N)
 
+/-! ## Sublattice-Casimir commute for ladder operators -/
+
+/-- The sublattice Casimir `(Ŝ_A)^2` commutes with the raising ladder
+operator `Ŝ_A^+`.
+
+This is the same SU(2) invariance as the Cartesian-axis commutation
+lemmas, rewritten in the ladder basis for the Tasaki §2.5 Theorem 2.3
+sublattice-component comparison. -/
+theorem sublatticeSpinSquaredS_commute_sublatticeSpinSOpPlus (A : Λ → Bool) :
+    Commute (sublatticeSpinSquaredS N A) (sublatticeSpinSOpPlus N A) := by
+  rw [sublatticeSpinSOpPlus_eq_add]
+  exact (sublatticeSpinSquaredS_commute_sublatticeSpinSOp1 N A).add_right
+    ((sublatticeSpinSquaredS_commute_sublatticeSpinSOp2 N A).smul_right
+      Complex.I)
+
+/-- The sublattice Casimir `(Ŝ_A)^2` commutes with the lowering ladder
+operator `Ŝ_A^-`.
+
+This lets the maximum sublattice-Casimir eigenvector identity be
+transported from a predicted toy ground state to its `A`-sublattice
+lowering component. -/
+theorem sublatticeSpinSquaredS_commute_sublatticeSpinSOpMinus (A : Λ → Bool) :
+    Commute (sublatticeSpinSquaredS N A) (sublatticeSpinSOpMinus N A) := by
+  rw [sublatticeSpinSOpMinus_eq_sub]
+  exact (sublatticeSpinSquaredS_commute_sublatticeSpinSOp1 N A).sub_right
+    ((sublatticeSpinSquaredS_commute_sublatticeSpinSOp2 N A).smul_right
+      Complex.I)
+
+/-- The sublattice Casimir `(Ŝ_A)^2` commutes with the complement
+lowering ladder `Ŝ_¬A^-`.
+
+This cross-sublattice companion records that lowering on the opposite
+sublattice does not change the `A`-sublattice Casimir eigenspace. -/
+theorem sublatticeSpinSquaredS_commute_sublatticeSpinSOpMinus_complement
+    (A : Λ → Bool) :
+    Commute (sublatticeSpinSquaredS N A)
+      (sublatticeSpinSOpMinus N (fun x => ! A x)) := by
+  rw [sublatticeSpinSOpMinus_eq_sub]
+  exact (sublatticeSpinSquaredS_commute_sublatticeSpinSOp1_complement N A).sub_right
+    ((sublatticeSpinSquaredS_commute_sublatticeSpinSOp2_complement N A).smul_right
+      Complex.I)
+
+/-- A commuting operator preserves a full-space `mulVec` eigenvalue
+after applying a sublattice ladder or any other many-body operator.
+
+This local helper avoids importing the saturated-ladder module just to
+reuse its generic preservation lemma in the Tasaki §2.5 Theorem 2.3
+sublattice-component chain. -/
+theorem mulVec_preserves_eigenvalue_of_commuteS_ladder
+    {A B : ManyBodyOpS Λ N} (h : Commute A B)
+    {γ : ℂ} {Ψ : (Λ → Fin (N + 1)) → ℂ}
+    (hΨ : A.mulVec Ψ = γ • Ψ) :
+    A.mulVec (B.mulVec Ψ) = γ • B.mulVec Ψ := by
+  rw [Matrix.mulVec_mulVec, h, ← Matrix.mulVec_mulVec, hΨ, Matrix.mulVec_smul]
+
 
 end LatticeSystem.Quantum
