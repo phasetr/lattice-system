@@ -2928,6 +2928,64 @@ theorem tasaki23_sublatticeSpinSquaredS_complement_mulVec_of_mem_bipartiteToyGro
   rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hmem
   simpa using hmem
 
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS toy-Hamiltonian bridge**:
+membership in the predicted toy ground-state subspace gives the
+predicted toy-Hamiltonian eigenvector identity.
+
+This packages the Casimir-decomposition eigenspace inclusion in pointwise
+`mulVec` form, so the later sublattice comparison can use the cross
+spin-dot part of the toy Hamiltonian without reopening the joint
+eigenspace definition. -/
+theorem tasaki23_heisenbergToyHamiltonianS_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (heisenbergToyHamiltonianS (Λ := V) A N).mulVec Ψ =
+      bipartiteToyMinEnergyPredicted (Λ := V) A N • Ψ := by
+  have hmem :=
+    bipartiteToyGroundStateSubspacePredicted_le_heisenbergToyHamiltonianS_eigenspace
+      (Λ := V) A N hΨ
+  rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hmem
+  simpa using hmem
+
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS cross-dot bridge**:
+membership in the predicted toy ground-state subspace gives the pointwise
+eigenvector identity for `2 • Ŝ_A · Ŝ_¬A`.
+
+Together with the ladder expansion of `Ŝ_A · Ŝ_¬A`, this is the operator
+identity that connects the predicted-GS Casimir structure to the
+remaining comparison between the `A` and `¬A` lowering components. -/
+theorem tasaki23_two_sublatticeSpinSDot_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    ((2 : ℂ) • sublatticeSpinSDot N A (fun x => ! A x)).mulVec Ψ =
+      bipartiteToyMinEnergyPredicted (Λ := V) A N • Ψ := by
+  rw [← heisenbergToyHamiltonianS_eq_two_sublatticeSpinSDot (Λ := V) (N := N) A]
+  exact
+    tasaki23_heisenbergToyHamiltonianS_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+      (V := V) A N hΨ
+
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS cross-ladder bridge**:
+membership in the predicted toy ground-state subspace gives the pointwise
+eigenvector identity for twice the ladder-expanded cross spin-dot
+operator.
+
+This is the exact operator form used to separate the `Ŝ_A^+ Ŝ_¬A^-` and
+`Ŝ_A^- Ŝ_¬A^+` terms in the remaining sublattice lowering comparison. -/
+theorem tasaki23_two_cross_ladder_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    ((2 : ℂ) •
+      (sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N (fun x => ! A x) +
+        (1 / 2 : ℂ) •
+          (sublatticeSpinSOpPlus N A * sublatticeSpinSOpMinus N (fun x => ! A x) +
+            sublatticeSpinSOpMinus N A *
+              sublatticeSpinSOpPlus N (fun x => ! A x)))).mulVec Ψ =
+      bipartiteToyMinEnergyPredicted (Λ := V) A N • Ψ := by
+  rw [← sublatticeSpinSDot_eq_op3_add_ladder (Λ := V) (N := N) A (fun x => ! A x)]
+  exact
+    tasaki23_two_sublatticeSpinSDot_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+      (V := V) A N hΨ
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS lowering closure**:
 if a full spin-`S` vector lies in the predicted toy ground-state
 subspace, then its total-lowering image also lies in that subspace.
