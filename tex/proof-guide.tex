@@ -9019,6 +9019,31 @@ just \texttt{Submodule.mem\_inf} applied to the same-side and opposite-side
 Casimir bridges above.  This removes an API layer before the remaining
 pointwise comparison of the Marshall-signed real parts.
 
+\textbf{Lowered component joint-Casimir successor-sector membership}: for
+a sector-\(M\) representative, the lowered components also carry the
+successor-sector support.  The named subspace
+\[
+\texttt{tasaki23LoweredJointMagSubspace}
+\]
+is the intersection of
+\(\texttt{tasaki23JointSublatticeCasimirEigenspace}(A,N)\) with the
+magnetisation subspace corresponding to \(\texttt{magSumS}=M+1\).  The
+two bridges
+\[
+\begin{gathered}
+\texttt{tasaki23\_sublatticeSpinSOpMinus}\\
+\texttt{\_mem\_lowered\_joint\_magSubspace}\\
+\texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted},\\
+\texttt{tasaki23\_sublatticeSpinSOpMinus\_complement}\\
+\texttt{\_mem\_lowered\_joint\_magSubspace}\\
+\texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted}
+\end{gathered}
+\]
+combine the joint-Casimir membership above with the standard
+sublattice-lowering magnetisation shift.  Thus both lowered components
+are available as successor-sector vectors with the joint-Casimir
+structure needed for the next component comparison.
+
 \textbf{Joint-component callback}: the joint maximum sublattice-Casimir
 eigenspace used above is now named as
 \[
