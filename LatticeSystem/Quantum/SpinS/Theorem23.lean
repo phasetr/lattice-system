@@ -391,6 +391,72 @@ theorem totalSpinSOpPlus_mulVec_magSectorEmbedding_apply_eq_site_sum {M : ℕ}
   rw [totalSpinSOpPlus_def, Matrix.sum_mulVec]
   simp [Finset.sum_apply]
 
+/-- **Tasaki §2.5 Theorem 2.3 on-`A` raised sublattice expansion**:
+the `Ŝ_A^+` component of an embedded successor-sector vector is the sum
+of single-site raising contributions over sites in `A`.
+
+This is the raising-direction companion to
+`sublatticeSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_onA_site_sum`
+and is used after re-embedding lowered components in the cross-ladder
+identity. -/
+theorem sublatticeSpinSOpPlus_mulVec_magSectorEmbedding_apply_eq_onA_site_sum
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N (M + 1) → ℂ)
+    (τ : V → Fin (N + 1)) :
+    ((sublatticeSpinSOpPlus N A).mulVec (magSectorEmbedding Φ)) τ =
+      ∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+        ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ := by
+  classical
+  rw [sublatticeSpinSOpPlus, Matrix.sum_mulVec, Finset.sum_apply]
+  calc
+    (∑ c : V,
+      Matrix.mulVec (if A c = true then onSiteS c (spinSOpPlus N) else 0)
+        (magSectorEmbedding Φ) τ) =
+        ∑ c : V, if A c = true then
+          Matrix.mulVec (onSiteS c (spinSOpPlus N)) (magSectorEmbedding Φ) τ
+        else 0 := by
+          apply Finset.sum_congr rfl
+          intro x _hx
+          by_cases hA : A x = true
+          · simp [hA]
+          · cases hx : A x <;> simp [hx] at hA ⊢
+    _ = ∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+        ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ := by
+          rw [Finset.sum_filter]
+
+/-- **Tasaki §2.5 Theorem 2.3 off-`A` raised sublattice expansion**:
+the `Ŝ_¬A^+` component of an embedded successor-sector vector is the sum
+of single-site raising contributions over sites outside `A`.
+
+This packages the complement sublattice with the same `A x = false`
+filter used by the local coefficient comparison. -/
+theorem sublatticeSpinSOpPlus_complement_mulVec_magSectorEmbedding_apply_eq_offA_site_sum
+    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N (M + 1) → ℂ)
+    (τ : V → Fin (N + 1)) :
+    ((sublatticeSpinSOpPlus N (fun x => ! A x)).mulVec
+        (magSectorEmbedding Φ)) τ =
+      ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+        ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ := by
+  classical
+  rw [sublatticeSpinSOpPlus, Matrix.sum_mulVec, Finset.sum_apply]
+  calc
+    (∑ c : V,
+      Matrix.mulVec
+        (if (!A c) = true then onSiteS c (spinSOpPlus N) else 0)
+        (magSectorEmbedding Φ) τ) =
+        ∑ c : V, if A c = false then
+          Matrix.mulVec (onSiteS c (spinSOpPlus N)) (magSectorEmbedding Φ) τ
+        else 0 := by
+          apply Finset.sum_congr rfl
+          intro x _hx
+          cases A x <;> simp
+    _ = ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+        ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding Φ)) τ := by
+          rw [Finset.sum_filter]
+
 /-- **Tasaki §2.5 Theorem 2.3 single-site lowering predecessor**:
 if a target configuration `τ` in sector `M + 1` has positive local
 value at `x`, lowering that local value by one gives a configuration
@@ -3089,6 +3155,69 @@ theorem
     rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
     rw [← hcomm]
   rw [hterm]
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 re-embedded source-sector cross-ladder
+site sums**: after the two lowered components are known to lie in the
+successor magnetization eigenspace, re-embed their sector restrictions
+and evaluate the raised-lowered cross-ladder identity at a source-sector
+configuration.
+
+The left-hand side is now expressed as the on-`A` and off-`A`
+single-site raising sums applied to the sector restrictions of
+`Ŝ_¬A^- Ψ` and `Ŝ_A^- Ψ`.  This is the component form needed before the
+remaining local Marshall-signed coefficient comparison. -/
+theorem
+    tasaki23_cross_ladder_reembedded_source_site_sum_eq_energy_sub_two_op3_of_predictedGS
+    (A : V → Bool) (N : ℕ) {M : ℕ} {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hA_mag :
+      ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
+        magSubspaceS V N
+          (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)))
+    (hB_mag :
+      ((sublatticeSpinSOpMinus N (fun x => !A x)).mulVec Ψ) ∈
+        magSubspaceS V N
+          (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)))
+    (σ : magConfigS V N M) :
+    (∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+        ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding
+            (magSectorRestriction (M := M + 1)
+              ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ)))) σ.1) +
+      ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+        ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding
+            (magSectorRestriction (M := M + 1)
+              ((sublatticeSpinSOpMinus N A).mulVec Ψ)))) σ.1 =
+      (bipartiteToyMinEnergyPredicted (Λ := V) A N • Ψ -
+        ((2 : ℂ) •
+          (sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N (fun x => ! A x))).mulVec Ψ)
+        σ.1 := by
+  have hcross :=
+    tasaki23_cross_ladder_raised_lowered_components_eq_energy_sub_two_op3_of_predictedGS
+      (V := V) A N hΨ
+  have hA_embed :
+      magSectorEmbedding
+          (magSectorRestriction (M := M + 1)
+            ((sublatticeSpinSOpMinus N A).mulVec Ψ)) =
+        (sublatticeSpinSOpMinus N A).mulVec Ψ :=
+    magSectorEmbedding_magSectorRestriction_of_mem_magSubspaceS
+      (V := V) (N := N) (M := M + 1) hA_mag
+  have hB_embed :
+      magSectorEmbedding
+          (magSectorRestriction (M := M + 1)
+            ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ)) =
+        (sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ :=
+    magSectorEmbedding_magSectorRestriction_of_mem_magSubspaceS
+      (V := V) (N := N) (M := M + 1) hB_mag
+  have hcomponent := congrFun hcross σ.1
+  rw [← hB_embed, ← hA_embed] at hcomponent
+  rw [Pi.add_apply] at hcomponent
+  rw [sublatticeSpinSOpPlus_mulVec_magSectorEmbedding_apply_eq_onA_site_sum,
+    sublatticeSpinSOpPlus_complement_mulVec_magSectorEmbedding_apply_eq_offA_site_sum]
+    at hcomponent
+  simpa [Pi.add_apply] using hcomponent
 
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS lowering closure**:
 if a full spin-`S` vector lies in the predicted toy ground-state

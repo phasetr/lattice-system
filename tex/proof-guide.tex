@@ -9141,6 +9141,31 @@ The companion coefficient wrapper rewrites predecessor coefficient
 dominance through the existing on/off sublattice component formulas and
 then invokes this unpacked component wrapper.
 
+\textbf{Re-embedded cross-ladder source-sector site sums}: the
+successor \texttt{magSubspaceS} support can now be used to replace each
+lowered component by the zero-extension of its sector restriction.  The
+theorem
+\begin{Verbatim}
+tasaki23_cross_ladder_reembedded_source_site_sum_eq_energy_sub_two_op3_of_predictedGS
+\end{Verbatim}
+evaluates the raised-lowered cross-ladder identity at a source-sector
+configuration and rewrites the two raised terms as
+\[
+\begin{aligned}
+  &\sum_{x\in A}
+    \hat S_x^+\,\iota_{M+1}\bigl((\hat S_{\bar A}^-\Phi)|_{H_{M+1}}\bigr)
+  +\sum_{x\notin A}
+    \hat S_x^+\,\iota_{M+1}\bigl((\hat S_A^-\Phi)|_{H_{M+1}}\bigr).
+\end{aligned}
+\]
+The supporting sublattice expansions are
+\begin{Verbatim}
+sublatticeSpinSOpPlus_mulVec_magSectorEmbedding_apply_eq_onA_site_sum
+sublatticeSpinSOpPlus_complement_mulVec_magSectorEmbedding_apply_eq_offA_site_sum
+\end{Verbatim}
+This is the site-sum form needed before converting the cross-ladder
+equation into the local Marshall-signed coefficient comparison.
+
 \textbf{Joint-component callback}: the joint maximum sublattice-Casimir
 eigenspace used above is now named as
 \[
