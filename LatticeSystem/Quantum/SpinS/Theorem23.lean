@@ -2986,6 +2986,49 @@ theorem tasaki23_two_cross_ladder_mulVec_of_mem_bipartiteToyGroundStateSubspaceP
     tasaki23_two_sublatticeSpinSDot_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
       (V := V) A N hΨ
 
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS cross-ladder isolation**:
+membership in the predicted toy ground-state subspace isolates the sum
+of the two cross-ladder products as the predicted toy energy term minus
+twice the `S^3_A S^3_¬A` contribution.
+
+This is the algebraic form used after the cross-dot bridge: the remaining
+component comparison can now refer directly to
+`Ŝ_A^+ Ŝ_¬A^- + Ŝ_A^- Ŝ_¬A^+` instead of the full dot product. -/
+theorem
+    tasaki23_cross_ladder_sum_mulVec_eq_energy_sub_two_op3_of_predictedGS
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (sublatticeSpinSOpPlus N A * sublatticeSpinSOpMinus N (fun x => ! A x) +
+        sublatticeSpinSOpMinus N A * sublatticeSpinSOpPlus N (fun x => ! A x)).mulVec Ψ =
+      bipartiteToyMinEnergyPredicted (Λ := V) A N • Ψ -
+        ((2 : ℂ) •
+          (sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N (fun x => ! A x))).mulVec Ψ := by
+  let Z : ManyBodyOpS V N :=
+    sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N (fun x => ! A x)
+  let L : ManyBodyOpS V N :=
+    sublatticeSpinSOpPlus N A * sublatticeSpinSOpMinus N (fun x => ! A x) +
+      sublatticeSpinSOpMinus N A * sublatticeSpinSOpPlus N (fun x => ! A x)
+  change L.mulVec Ψ =
+    bipartiteToyMinEnergyPredicted (Λ := V) A N • Ψ - ((2 : ℂ) • Z).mulVec Ψ
+  have hbridge :
+      ((2 : ℂ) • (Z + (1 / 2 : ℂ) • L)).mulVec Ψ =
+        bipartiteToyMinEnergyPredicted (Λ := V) A N • Ψ := by
+    dsimp [Z, L]
+    exact
+      tasaki23_two_cross_ladder_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΨ
+  rw [← hbridge]
+  have hop : (2 : ℂ) • (Z + (1 / 2 : ℂ) • L) = (2 : ℂ) • Z + L := by
+    ext σ τ
+    simp [Z, L]
+    ring
+  rw [hop]
+  ext σ
+  rw [Matrix.add_mulVec]
+  rw [Matrix.add_mulVec]
+  rw [Matrix.add_mulVec]
+  simp [Matrix.smul_mulVec]
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS lowering closure**:
 if a full spin-`S` vector lies in the predicted toy ground-state
 subspace, then its total-lowering image also lies in that subspace.

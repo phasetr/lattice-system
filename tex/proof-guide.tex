@@ -9112,9 +9112,21 @@ rewrites the dot product as
 \texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted}
 \end{gathered}
 \]
-Thus the cross-sublattice spin-dot constraint is available in the
-ladder-term form needed for the remaining comparison between
-\(\hat S_A^-\Phi\) and \(\hat S_{\bar A}^-\Phi\).
+The follow-up corollary
+\[
+\begin{gathered}
+\texttt{tasaki23\_cross\_ladder\_sum\_mulVec\_eq}\\
+\texttt{\_energy\_sub\_two\_op3}\\
+\texttt{\_of\_predictedGS}
+\end{gathered}
+\]
+isolates
+\(\hat S_A^+\hat S_{\bar A}^-+\hat S_A^-\hat S_{\bar A}^+\)
+as the predicted toy-energy term minus
+\(2\hat S_A^3\hat S_{\bar A}^3\).  Thus the cross-sublattice spin-dot
+constraint is available in the ladder-term form needed for the remaining
+comparison between \(\hat S_A^-\Phi\) and
+\(\hat S_{\bar A}^-\Phi\).
 
 \textbf{Sublattice-component final wrapper}: the final theorem wrapper can
 now consume that sublattice comparison directly.  The Lean theorem
