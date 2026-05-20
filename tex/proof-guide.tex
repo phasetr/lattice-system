@@ -8981,6 +8981,19 @@ and its strict-dominance wrapper
 These theorems move the remaining local estimate from explicit
 lowerable coefficient notation to the predecessor raising-source sums
 that occur in the real source-weight identity.
+Lean also records the sign information for these sums:
+\[
+\begin{gathered}
+\texttt{tasaki23\_raising\_predecessor\_source\_summand\_pos},\\
+\texttt{tasaki23\_raising\_predecessor\_source\_attach\_sum\_nonneg}.
+\end{gathered}
+\]
+For every lowerable successor site, the real \(S^+\) coefficient from
+the lowering predecessor back to the successor is strictly positive, and
+the source coefficient \(v(\tau^{x-})\) is strictly positive by the
+Marshall-positive real-sector representative.  Therefore every
+predecessor raising-source summand is positive, and the attached sums
+appearing in the remaining dominance callback are non-negative.
 The corresponding final wrapper
 \[
 \begin{gathered}

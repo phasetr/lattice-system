@@ -1297,6 +1297,68 @@ theorem tasaki23_lowerable_positive_source_attach_sum_lt_of_raising_predecessor_
       (V := V) (N := N) v τ (Finset.univ.filter (fun x : V => A x = false))]
   exact hdominates
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 positive predecessor raising-source
+summand**: at a lowerable successor site, the real raising coefficient
+from the lowering predecessor back to the successor is strictly positive,
+so multiplying by the strictly positive source coefficient gives a
+strictly positive raising-source summand.
+
+This is the sign-side input for extracting dominance from the real
+predecessor source-weight equation. -/
+theorem tasaki23_raising_predecessor_source_summand_pos
+    {M : ℕ} (v : magConfigS V N M → ℝ)
+    (τ : magConfigS V N (M + 1)) (x : V) (hx : 0 < (τ.1 x).val)
+    (hv_pos : ∀ σ : magConfigS V N M, 0 < v σ) :
+    0 <
+      (let predVal : Fin (N + 1) :=
+        ⟨(τ.1 x).val - 1, by omega⟩
+      let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+      (spinSOpPlus N predVal (τ.1 x)).re *
+        v ⟨pred, magSumS_single_site_lowering_predecessor τ x hx⟩) := by
+  classical
+  let predVal : Fin (N + 1) := ⟨(τ.1 x).val - 1, by omega⟩
+  let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+  have hstep : predVal.val + 1 = (τ.1 x).val := by
+    dsimp [predVal]
+    omega
+  have hcoef_pos : 0 < (spinSOpPlus N predVal (τ.1 x)).re :=
+    spinSOpPlus_apply_re_pos_of_raise N hstep
+  change 0 <
+    (spinSOpPlus N predVal (τ.1 x)).re *
+      v ⟨pred, magSumS_single_site_lowering_predecessor τ x hx⟩
+  exact mul_pos hcoef_pos
+    (hv_pos ⟨pred, magSumS_single_site_lowering_predecessor τ x hx⟩)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 non-negative predecessor raising-source
+sum**: every attached predecessor raising-source sum over lowerable
+successor sites is non-negative for a strictly positive real source
+vector.
+
+This packages summand positivity in the exact finite-sum shape used by
+the final raising-source dominance callback. -/
+theorem tasaki23_raising_predecessor_source_attach_sum_nonneg
+    {M : ℕ} (v : magConfigS V N M → ℝ)
+    (τ : magConfigS V N (M + 1)) (s : Finset V)
+    (hv_pos : ∀ σ : magConfigS V N M, 0 < v σ) :
+    0 ≤
+      ((s.filter (fun x : V => 0 < (τ.1 x).val)).attach.sum
+        (fun x =>
+          let predVal : Fin (N + 1) :=
+            ⟨(τ.1 x.1).val - 1, by omega⟩
+          let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+          (spinSOpPlus N predVal (τ.1 x.1)).re *
+            v ⟨pred,
+              magSumS_single_site_lowering_predecessor
+                τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) := by
+  classical
+  apply Finset.sum_nonneg
+  intro x _hx
+  exact le_of_lt
+    (tasaki23_raising_predecessor_source_summand_pos
+      (V := V) (N := N) v τ x.1 ((Finset.mem_filter.mp x.2).2) hv_pos)
+
 /-- **Tasaki §2.5 Theorem 2.3 boundary coefficient as lowerable
 coefficient**: at a lowerable site, the boundary-inclusive positive-source
 coefficient is the explicit lowerable coefficient. -/
