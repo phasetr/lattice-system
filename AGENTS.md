@@ -61,8 +61,14 @@ the following on-disk files and obey their instructions:
   for CI. Push, run codex review in the background, then check CI once
   before merging.
 - **Use sandbox-stable command forms before giving up.** For TeX builds,
-  route LuaTeX caches to writable roots:
-  `TEXMFVAR=/private/tmp/texmf-var TEXMFCONFIG=/private/tmp/texmf-config latexmk -g -lualatex <file>.tex`.
+  route LuaTeX caches to writable roots on the first attempt and do not
+  preemptively request escalation:
+  `env TEXMFSYSVAR=/private/tmp/texmf-sysvar TEXMFVAR=/private/tmp/texmf-var TEXMFCONFIG=/private/tmp/texmf-config TEXMFCACHE=/private/tmp/texmf-cache latexmk -g -lualatex <file>.tex`.
+  Use the same `/private/tmp` cache paths from `.self-local/tex/`; avoid
+  repo-local relative cache paths for LuaTeX because `luaotfload` may fail
+  to discover them. If a TeX build still reports `no writeable cache path`,
+  first fix `TEXMFSYSVAR` / `TEXMFCACHE` / absolute cache paths and rerun
+  sandboxed instead of stopping for a TeX approval prompt.
   Codex/Codex CLI agents must run `codex exec ...` cross-checks with the
   environment's escalation mechanism on the first attempt, not after a failed
   sandboxed attempt, and persist a scoped `codex exec` approval rule when

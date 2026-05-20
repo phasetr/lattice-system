@@ -1214,6 +1214,89 @@ theorem tasaki23_lowerable_positive_source_coefficient_eq_raising_predecessor_so
   rw [tasaki23_spinSOpPlus_lowering_predecessor_re_eq_spinSOpMinus
     (V := V) N τ x hx]
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowerable coefficient sums as predecessor
+raising-source sums**: an attached sum of explicit lowerable
+positive-source coefficients can be read as the attached sum of the
+matching predecessor raising coefficients times the positive predecessor
+source values.
+
+This is the finite-sum form of
+`tasaki23_lowerable_positive_source_coefficient_eq_raising_predecessor_source`.
+-/
+theorem tasaki23_lowerable_positive_source_attach_sum_eq_raising_predecessor_source_sum
+    {M : ℕ} (v : magConfigS V N M → ℝ)
+    (τ : magConfigS V N (M + 1)) (s : Finset V) :
+    ((s.filter (fun x : V => 0 < (τ.1 x).val)).attach.sum
+      (fun x =>
+        tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+          v τ x.1 ((Finset.mem_filter.mp x.2).2))) =
+      ((s.filter (fun x : V => 0 < (τ.1 x).val)).attach.sum
+        (fun x =>
+          let predVal : Fin (N + 1) :=
+            ⟨(τ.1 x.1).val - 1, by omega⟩
+          let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+          (spinSOpPlus N predVal (τ.1 x.1)).re *
+            v ⟨pred,
+              magSumS_single_site_lowering_predecessor
+                τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) := by
+  classical
+  apply Finset.sum_congr rfl
+  intro x _hx
+  exact
+    tasaki23_lowerable_positive_source_coefficient_eq_raising_predecessor_source
+      (V := V) (N := N) v τ x.1 ((Finset.mem_filter.mp x.2).2)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowerable coefficient dominance from
+predecessor raising-source dominance**: strict dominance of the attached
+predecessor raising-source sums implies strict dominance of the attached
+explicit lowerable positive-source coefficient sums.
+
+This removes the coefficient notation from the remaining local estimate
+and exposes the same real raising coefficients that occur in the
+predecessor source-weight identity. -/
+theorem tasaki23_lowerable_positive_source_attach_sum_lt_of_raising_predecessor_source_sum_lt
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
+    (τ : magConfigS V N (M + 1))
+    (hdominates :
+      (((Finset.univ.filter (fun x : V => A x = true)).filter
+            (fun x : V => 0 < (τ.1 x).val)).attach.sum
+          (fun x =>
+            let predVal : Fin (N + 1) :=
+              ⟨(τ.1 x.1).val - 1, by omega⟩
+            let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+            (spinSOpPlus N predVal (τ.1 x.1)).re *
+              v ⟨pred,
+                magSumS_single_site_lowering_predecessor
+                  τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) <
+        (((Finset.univ.filter (fun x : V => A x = false)).filter
+            (fun x : V => 0 < (τ.1 x).val)).attach.sum
+          (fun x =>
+            let predVal : Fin (N + 1) :=
+              ⟨(τ.1 x.1).val - 1, by omega⟩
+            let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+            (spinSOpPlus N predVal (τ.1 x.1)).re *
+              v ⟨pred,
+                magSumS_single_site_lowering_predecessor
+                  τ x.1 ((Finset.mem_filter.mp x.2).2)⟩))) :
+    (((Finset.univ.filter (fun x : V => A x = true)).filter
+          (fun x : V => 0 < (τ.1 x).val)).attach.sum
+        (fun x =>
+          tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+            v τ x.1 ((Finset.mem_filter.mp x.2).2))) <
+      (((Finset.univ.filter (fun x : V => A x = false)).filter
+          (fun x : V => 0 < (τ.1 x).val)).attach.sum
+        (fun x =>
+          tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+            v τ x.1 ((Finset.mem_filter.mp x.2).2))) := by
+  rw [
+    tasaki23_lowerable_positive_source_attach_sum_eq_raising_predecessor_source_sum
+      (V := V) (N := N) v τ (Finset.univ.filter (fun x : V => A x = true)),
+    tasaki23_lowerable_positive_source_attach_sum_eq_raising_predecessor_source_sum
+      (V := V) (N := N) v τ (Finset.univ.filter (fun x : V => A x = false))]
+  exact hdominates
+
 /-- **Tasaki §2.5 Theorem 2.3 boundary coefficient as lowerable
 coefficient**: at a lowerable site, the boundary-inclusive positive-source
 coefficient is the explicit lowerable coefficient. -/

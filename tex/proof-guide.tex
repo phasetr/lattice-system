@@ -8964,6 +8964,23 @@ rewrites the attached coefficient summand as the matching predecessor
 raising coefficient times the positive predecessor source value.  This
 aligns the explicit lowerable sums with the real source-weight
 raising sums.
+Lean also records the attached finite-sum version
+\[
+\begin{gathered}
+\texttt{tasaki23\_lowerable\_positive\_source\_attach\_sum}\\
+\texttt{\_eq\_raising\_predecessor\_source\_sum}
+\end{gathered}
+\]
+and its strict-dominance wrapper
+\[
+\begin{gathered}
+\texttt{tasaki23\_lowerable\_positive\_source\_attach\_sum\_lt}\\
+\texttt{\_of\_raising\_predecessor\_source\_sum\_lt}.
+\end{gathered}
+\]
+These theorems move the remaining local estimate from explicit
+lowerable coefficient notation to the predecessor raising-source sums
+that occur in the real source-weight identity.
 
 \textbf{Lowered coefficient dominance bridge}: the coefficient split
 also gives the direct callback form used by the lowered Marshall
