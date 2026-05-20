@@ -9135,7 +9135,17 @@ then rewrites the same left hand side as
 \hat S_A^-(\hat S_{\bar A}^+\Phi)\).  Thus the cross-sublattice
 spin-dot constraint is available in the ladder-term form needed for the
 remaining comparison between \(\hat S_A^-\Phi\) and
-\(\hat S_{\bar A}^-\Phi\).
+\(\hat S_{\bar A}^-\Phi\).  The raised-lowered component variant
+\[
+\begin{gathered}
+\texttt{tasaki23\_cross\_ladder\_raised\_lowered}\\
+\texttt{\_components\_eq\_energy\_sub\_two\_op3}\\
+\texttt{\_of\_predictedGS}
+\end{gathered}
+\]
+commutes the second term to
+\(\hat S_{\bar A}^+(\hat S_A^-\Phi)\), so the two summands act directly
+on the two lowered components.
 
 \textbf{Sublattice-component final wrapper}: the final theorem wrapper can
 now consume that sublattice comparison directly.  The Lean theorem

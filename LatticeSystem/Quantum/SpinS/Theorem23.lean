@@ -3055,6 +3055,41 @@ theorem
   rw [Matrix.mulVec_mulVec]
   rw [Matrix.mulVec_mulVec]
 
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS raised-lowered component
+identity**: the sequential cross-ladder identity can be read as applying
+the opposite sublattice raising operators to the two lowered components
+`Ŝ_¬A^- Ψ` and `Ŝ_A^- Ψ`.
+
+This is the component-comparison form used before the remaining
+Marshall-positivity step: both summands now act directly on one of the
+two lowered sublattice components whose pointwise sizes must be compared.
+-/
+theorem
+    tasaki23_cross_ladder_raised_lowered_components_eq_energy_sub_two_op3_of_predictedGS
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (sublatticeSpinSOpPlus N A).mulVec
+        ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) +
+      (sublatticeSpinSOpPlus N (fun x => ! A x)).mulVec
+        ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
+      bipartiteToyMinEnergyPredicted (Λ := V) A N • Ψ -
+        ((2 : ℂ) •
+          (sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N (fun x => ! A x))).mulVec Ψ := by
+  rw [← tasaki23_cross_ladder_sequential_mulVec_eq_energy_sub_two_op3_of_predictedGS
+    (V := V) A N hΨ]
+  have hterm :
+      (sublatticeSpinSOpPlus N (fun x => ! A x)).mulVec
+          ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
+        (sublatticeSpinSOpMinus N A).mulVec
+          ((sublatticeSpinSOpPlus N (fun x => ! A x)).mulVec Ψ) := by
+    have hcomm :
+        sublatticeSpinSOpMinus N A * sublatticeSpinSOpPlus N (fun x => ! A x) =
+          sublatticeSpinSOpPlus N (fun x => ! A x) * sublatticeSpinSOpMinus N A :=
+      (sublatticeSpinSOpMinus_cross_commute_plus N A).eq
+    rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
+    rw [← hcomm]
+  rw [hterm]
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS lowering closure**:
 if a full spin-`S` vector lies in the predicted toy ground-state
 subspace, then its total-lowering image also lies in that subspace.
