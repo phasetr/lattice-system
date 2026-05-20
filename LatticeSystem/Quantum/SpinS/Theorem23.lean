@@ -3370,6 +3370,54 @@ theorem
   simp [smul_eq_mul]
   ring_nf
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 source-weight identity at a lowering
+predecessor**: the re-embedded scalar cross-ladder identity can be
+specialized to the source-sector predecessor obtained from a successor
+configuration `τ` by lowering a site `x`.
+
+This aligns the source-weight equation with the exact predecessor
+configuration used in `tasaki23LoweringPredecessorSignedCoefficient`. -/
+theorem
+    tasaki23_cross_ladder_reembedded_source_weight_eq_lowering_predecessor_of_predictedGS
+    (A : V → Bool) (N : ℕ) {M : ℕ} {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hA_mag :
+      ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
+        magSubspaceS V N
+          (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)))
+    (hB_mag :
+      ((sublatticeSpinSOpMinus N (fun x => !A x)).mulVec Ψ) ∈
+        magSubspaceS V N
+          (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)))
+    (τ : magConfigS V N (M + 1)) (x : V) (hx : 0 < (τ.1 x).val) :
+    let predVal : Fin (N + 1) :=
+      ⟨(τ.1 x).val - 1, by omega⟩
+    let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+    (∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
+        ((onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding
+            (magSectorRestriction (M := M + 1)
+              ((sublatticeSpinSOpMinus N (fun y => ! A y)).mulVec Ψ)))) pred) +
+      ∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
+        ((onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding
+            (magSectorRestriction (M := M + 1)
+              ((sublatticeSpinSOpMinus N A).mulVec Ψ)))) pred =
+      (bipartiteToyMinEnergyPredicted (Λ := V) A N -
+        (2 : ℂ) *
+          ((∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
+              ((N : ℂ) / 2 - ((pred y).val : ℂ))) *
+            (∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
+              ((N : ℂ) / 2 - ((pred y).val : ℂ))))) * Ψ pred := by
+  classical
+  dsimp only
+  exact
+    tasaki23_cross_ladder_reembedded_source_site_sum_eq_energy_sub_two_sublattice_weight_product_of_predictedGS
+      (V := V) A N hΨ hA_mag hB_mag
+      ⟨Function.update τ.1 x ⟨(τ.1 x).val - 1, by omega⟩,
+        magSumS_single_site_lowering_predecessor τ x hx⟩
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS lowering closure**:
 if a full spin-`S` vector lies in the predicted toy ground-state
 subspace, then its total-lowering image also lies in that subspace.
