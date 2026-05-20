@@ -8911,6 +8911,24 @@ This wrapper keeps the predecessor source-weight identity, the four
 sublattice-Casimir equations, and the two successor-sector support facts,
 but asks the remaining local estimate only for the lowerable-site
 positive-source coefficient comparison.
+Lean then removes the last boundary-inclusive notation from that
+callback.  The finite-sum identity
+\[
+\texttt{tasaki23\_positive\_source\_lowerable\_filter\_sum\_eq\_lowerable\_attach\_sum}
+\]
+rewrites each lowerable-filtered coefficient sum as an attached sum of
+the explicit branch
+\(\texttt{tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient}\).
+The final wrapper
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_source\_weight\_predecessor}\\
+\texttt{\_explicit\_lowerable\_positive\_source\_coefficient\_lt\_of\_sector\_minimality}
+\end{gathered}
+\]
+therefore exposes the remaining comparison directly as a strict
+inequality between explicit lowerable predecessor coefficient sums.
 
 \textbf{Lowered coefficient dominance bridge}: the coefficient split
 also gives the direct callback form used by the lowered Marshall
