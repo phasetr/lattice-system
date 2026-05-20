@@ -9218,6 +9218,16 @@ to the scalar right-hand side
 This removes \(\hat S_A^3\hat S_{\bar A}^3\) from the local
 cross-ladder comparison and leaves only the two re-embedded
 successor-sector raising sums against an explicit source coefficient.
+The local predecessor specialization
+\begin{Verbatim}
+tasaki23_cross_ladder_reembedded_source_weight_eq_lowering_predecessor_of_predictedGS
+\end{Verbatim}
+then evaluates this scalar identity at the configuration obtained from
+a successor-sector \(\tau\in\mathcal H_{M+1}\) by lowering a chosen
+site \(x\).  This is the same source configuration used in
+\texttt{tasaki23LoweringPredecessorSignedCoefficient}, so the
+source-weight equation is now aligned with the coefficient comparison
+over successor configurations and sites.
 The final callback boundary is updated by
 \begin{Verbatim}
 tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_reembedded_source_weight_coefficient_lt_of_sector_minimality
