@@ -1879,6 +1879,95 @@ theorem tasaki23_signed_lowering_onA_sublattice_component_eq_neg_coefficient_sum
         tasaki23LoweringPredecessorSignedCoefficient A Φ τ x
   exact tasaki23_signed_lowering_onA_sum_eq_neg_coefficient_sum A Φ τ
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 predecessor raising-source difference as a
+lowered component**: for a Marshall-signed positive source vector, the
+off-`A` minus on-`A` predecessor raising-source difference is exactly the
+Marshall-signed real component of the full lowered vector
+`Ŝ^-_tot Ψ`.
+
+This identifies the difference-form callback with the operator-level
+lowered-vector positivity statement used in the adjacent-sector
+comparison. -/
+theorem tasaki23_raising_predecessor_source_difference_eq_lowered_marshall_component
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
+    (τ : magConfigS V N (M + 1)) :
+    (∑ x ∈ Finset.univ.filter (fun x : V => A x = false),
+        tasaki23RaisingPredecessorSourceCoefficient v τ x) -
+      (∑ x ∈ Finset.univ.filter (fun x : V => A x = true),
+        tasaki23RaisingPredecessorSourceCoefficient v τ x) =
+      (marshallSignS A τ.1).re *
+        (((totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun σ : magConfigS V N M =>
+              (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)))) τ.1).re := by
+  classical
+  let Φ : magConfigS V N M → ℂ :=
+    fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)
+  have hoff :
+      (marshallSignS A τ.1).re *
+          (((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec
+            (magSectorEmbedding Φ)) τ.1).re =
+        ∑ x ∈ Finset.univ.filter (fun x : V => A x = false),
+          tasaki23RaisingPredecessorSourceCoefficient v τ x := by
+    rw [tasaki23_signed_lowering_offA_sublattice_component_eq_coefficient_sum
+      A Φ τ]
+    rw [show
+        (∑ x ∈ Finset.univ.filter (fun x : V => A x = false),
+          tasaki23LoweringPredecessorSignedCoefficient A Φ τ x) =
+        ∑ x ∈ Finset.univ.filter (fun x : V => A x = false),
+          tasaki23LoweringPredecessorSignedCoefficient A
+            (fun σ : magConfigS V N M =>
+              (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) τ x from by
+        rfl]
+    rw [
+      tasaki23_lowering_predecessor_coefficient_sum_eq_positive_source_sum
+        A v τ (Finset.univ.filter (fun x : V => A x = false)),
+      tasaki23_positive_source_coefficient_sum_eq_lowerable_sum
+        v τ (Finset.univ.filter (fun x : V => A x = false)),
+      tasaki23_positive_source_lowerable_filter_sum_eq_lowerable_attach_sum
+        v τ (Finset.univ.filter (fun x : V => A x = false)),
+      tasaki23_lowerable_positive_source_attach_sum_eq_raising_predecessor_source_sum
+        (V := V) (N := N) v τ (Finset.univ.filter (fun x : V => A x = false)),
+      tasaki23_raising_predecessor_source_attach_sum_eq_boundary_sum
+        (V := V) (N := N) v τ (Finset.univ.filter (fun x : V => A x = false))]
+  have hon :
+      (marshallSignS A τ.1).re *
+          (((sublatticeSpinSOpMinus N A).mulVec
+            (magSectorEmbedding Φ)) τ.1).re =
+        -∑ x ∈ Finset.univ.filter (fun x : V => A x = true),
+          tasaki23RaisingPredecessorSourceCoefficient v τ x := by
+    rw [tasaki23_signed_lowering_onA_sublattice_component_eq_neg_coefficient_sum
+      A Φ τ]
+    rw [show
+        (∑ x ∈ Finset.univ.filter (fun x : V => A x = true),
+          tasaki23LoweringPredecessorSignedCoefficient A Φ τ x) =
+        ∑ x ∈ Finset.univ.filter (fun x : V => A x = true),
+          tasaki23LoweringPredecessorSignedCoefficient A
+            (fun σ : magConfigS V N M =>
+              (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) τ x from by
+        rfl]
+    rw [
+      tasaki23_lowering_predecessor_coefficient_sum_eq_positive_source_sum
+        A v τ (Finset.univ.filter (fun x : V => A x = true)),
+      tasaki23_positive_source_coefficient_sum_eq_lowerable_sum
+        v τ (Finset.univ.filter (fun x : V => A x = true)),
+      tasaki23_positive_source_lowerable_filter_sum_eq_lowerable_attach_sum
+        v τ (Finset.univ.filter (fun x : V => A x = true)),
+      tasaki23_lowerable_positive_source_attach_sum_eq_raising_predecessor_source_sum
+        (V := V) (N := N) v τ (Finset.univ.filter (fun x : V => A x = true)),
+      tasaki23_raising_predecessor_source_attach_sum_eq_boundary_sum
+        (V := V) (N := N) v τ (Finset.univ.filter (fun x : V => A x = true))]
+  rw [show
+      (totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ) =
+        ((sublatticeSpinSOpMinus N A).mulVec (magSectorEmbedding Φ)) +
+          ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec
+            (magSectorEmbedding Φ)) from by
+      rw [totalSpinSOpMinus_eq_sublattice_sum (N := N) A]
+      rw [Matrix.add_mulVec]]
+  rw [Pi.add_apply, Complex.add_re, mul_add, hon, hoff]
+  ring
+
 /-- **Tasaki §2.5 Theorem 2.3 strict off-`A` lowered sign-sum witness**:
 if at least one site outside `A` can be lowered in the target
 configuration, then the off-`A` filtered signed lowering sum is strictly

@@ -9039,6 +9039,30 @@ callback form
 passes this conversion pointwise for every successor configuration.
 This is the form that matches the real predecessor source-weight
 identity before the remaining sign estimate is discharged.
+Lean also identifies the boundary-sum version of this difference with
+the actual full lowering component:
+\[
+\begin{gathered}
+\texttt{tasaki23\_raising\_predecessor\_source\_difference}\\
+\texttt{\_eq\_lowered\_marshall\_component}.
+\end{gathered}
+\]
+For the Marshall-signed representative
+\(\Psi_\sigma=\operatorname{sgn}_A(\sigma)v_\sigma\), the theorem
+rewrites
+\[
+  \sum_{x\notin A} R_x(\tau)-\sum_{x\in A}R_x(\tau)
+\]
+as
+\[
+  \operatorname{sgn}_A(\tau)\,
+  \operatorname{Re}\bigl((\hat S^-_{\rm tot}\Psi)_\tau\bigr).
+\]
+The proof combines the on/off sublattice lowering-component coefficient
+splits with the positive-source and raising-source sum bridges.  Thus
+the difference-form callback is now linked directly to the
+operator-level lowered-vector positivity required in Tasaki's adjacent
+sector step.
 The corresponding final wrapper
 \[
 \begin{gathered}
