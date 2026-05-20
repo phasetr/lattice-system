@@ -9044,6 +9044,39 @@ sublattice-lowering magnetisation shift.  Thus both lowered components
 are available as successor-sector vectors with the joint-Casimir
 structure needed for the next component comparison.
 
+\textbf{Lowered joint-magnetisation callback threading}: the interval
+chain now exposes the stronger lowered-component package directly to the
+remaining local comparison callback.  The wrapper
+\[
+\begin{gathered}
+\texttt{tasaki23\_energy\_interval\_chain\_with\_predictedGS}\\
+\texttt{\_of\_left\_endpoint\_predictedGS}\\
+\texttt{\_of\_lowered\_joint\_magSubspace\_component\_lt}\\
+\texttt{\_of\_predictedGS}
+\end{gathered}
+\]
+threads, for each source sector \(M\), the memberships
+\[
+  \hat S_A^-\Phi,\ \hat S_{\bar A}^-\Phi
+    \in \texttt{tasaki23LoweredJointMagSubspace}(A,N,M).
+\]
+Thus the callback sees both the joint-Casimir structure and the
+successor-sector support at once.  The final wrappers
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint\_threaded}\\
+\texttt{\_predictedGS\_of\_lowered\_joint\_magSubspace}\\
+\texttt{\_component\_lt\_of\_sector\_minimality},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint\_threaded}\\
+\texttt{\_predictedGS\_of\_lowered\_joint\_magSubspace}\\
+\texttt{\_coefficient\_lt\_of\_sector\_minimality}
+\end{gathered}
+\]
+make the same stronger callback available at the final theorem
+boundary.  The coefficient form rewrites on/off predecessor coefficient
+dominance into the strict Marshall-signed sublattice-component
+comparison using the existing component formulas.
+
 \textbf{Joint-component callback}: the joint maximum sublattice-Casimir
 eigenspace used above is now named as
 \[

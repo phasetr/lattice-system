@@ -6974,6 +6974,134 @@ theorem
             Ψ hΨ_def hpredΨ hA_joint hB_joint τ))
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 interval chain from lowered joint
+magnetization structure**: in the threaded predicted-GS interval
+induction, the local sublattice comparison callback receives the two
+lowered components as members of the combined joint-Casimir and
+successor-sector subspace.
+
+This is the direct consumer-facing form of
+`tasaki23LoweredJointMagSubspace`: the remaining strict comparison can
+assume each lowered component carries both the joint maximum
+sublattice-Casimir structure and the `M + 1` magnetization support. -/
+theorem
+    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_lowered_joint_magSubspace_component_lt_of_predictedGS
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      ∀ {μ : ℝ}
+        {v : magConfigS V N
+          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+              N) → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N
+                (min
+                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+                  (Finset.card
+                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+                    N) =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hsource_lowered_joint_magSubspace_component_lt :
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        M <
+          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          ∀ Ψ : (V → Fin (N + 1)) → ℂ,
+            Ψ =
+              magSectorEmbedding
+                (fun τ : magConfigS V N M =>
+                  (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+            Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N →
+            ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
+              tasaki23LoweredJointMagSubspace (V := V) A N M →
+            ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) ∈
+              tasaki23LoweredJointMagSubspace (V := V) A N M →
+            ∀ τ : magConfigS V N (M + 1),
+              -((marshallSignS A τ.1).re *
+                  (((sublatticeSpinSOpMinus N A).mulVec Ψ) τ.1).re) <
+                (marshallSignS A τ.1).re *
+                  (((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ)
+                    τ.1).re) :
+    ∃ μ : ℝ,
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        ∃ v : magConfigS V N M → ℝ,
+          μ < c ∧ (∀ τ, 0 < v τ) ∧
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+          magSectorEmbedding
+              (fun τ : magConfigS V N M =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N := by
+  exact
+    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_sublattice_component_lt_of_predictedGS
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hBA hsector_nonempty hleft_predictedGS
+      (fun {M : ℕ} hM hMlt {μ : ℝ} {v : magConfigS V N M → ℝ}
+          hμ_lt hv_pos hΦ hpred τ => by
+        let Ψ : (V → Fin (N + 1)) → ℂ :=
+          magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+        have hΨ_def :
+            Ψ =
+              magSectorEmbedding
+                (fun τ : magConfigS V N M =>
+                  (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) := rfl
+        have hpredΨ :
+            Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N := by
+          simpa [Ψ] using hpred
+        have hA_lowered :
+            ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
+              tasaki23LoweredJointMagSubspace (V := V) A N M := by
+          simpa [Ψ] using
+            (tasaki23_sublatticeSpinSOpMinus_mem_lowered_joint_magSubspace_of_mem_bipartiteToyGroundStateSubspacePredicted
+              (V := V) A N hpred)
+        have hB_lowered :
+            ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) ∈
+              tasaki23LoweredJointMagSubspace (V := V) A N M := by
+          simpa [Ψ] using
+            (tasaki23_sublatticeSpinSOpMinus_complement_mem_lowered_joint_magSubspace_of_mem_bipartiteToyGroundStateSubspacePredicted
+              (V := V) A N hpred)
+        simpa [Ψ] using
+          (hsource_lowered_joint_magSubspace_component_lt hM hMlt hμ_lt hv_pos hΦ
+            Ψ hΨ_def hpredΨ hA_lowered hB_lowered τ))
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 predicted-Casimir energy interval chain**:
 in the canonical orientation `|¬A| ≤ |A|`, choose the left endpoint sector
 by the per-sector Theorem 2.2 wrapper and propagate its energy through the
@@ -9402,6 +9530,236 @@ theorem
         have hcoeff :=
           hsource_joint_sublattice_coefficient_lt hM hMlt hμ_lt hv_pos hΦ
             Ψ hΨ_eq hΨ_pred hA_joint hB_joint τ
+        subst Ψ
+        have honA :=
+          tasaki23_signed_lowering_onA_sublattice_component_eq_neg_coefficient_sum
+            A
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) τ
+        have hoffA :=
+          tasaki23_signed_lowering_offA_sublattice_component_eq_coefficient_sum
+            A
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) τ
+        rw [honA, hoffA]
+        simpa using hcoeff)
+      hsector_min
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 final wrapper from lowered joint
+magnetization structure**: the final theorem may consume the local
+strict comparison callback in the form where both lowered components
+are provided as members of `tasaki23LoweredJointMagSubspace`.
+
+This is the final-wrapper companion to
+`tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_lowered_joint_magSubspace_component_lt_of_predictedGS`.
+It keeps the remaining local task focused on proving the strict
+Marshall-signed comparison after the predicted-GS, joint-Casimir, and
+successor-sector support facts have already been threaded. -/
+theorem
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_lowered_joint_magSubspace_component_lt_of_sector_minimality
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      ∀ {μ : ℝ}
+        {v : magConfigS V N
+          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+              N) → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N
+                (min
+                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+                  (Finset.card
+                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+                    N) =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hsource_lowered_joint_magSubspace_component_lt :
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        M <
+          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          ∀ Ψ : (V → Fin (N + 1)) → ℂ,
+            Ψ =
+              magSectorEmbedding
+                (fun τ : magConfigS V N M =>
+                  (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+            Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N →
+            ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
+              tasaki23LoweredJointMagSubspace (V := V) A N M →
+            ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) ∈
+              tasaki23LoweredJointMagSubspace (V := V) A N M →
+            ∀ τ : magConfigS V N (M + 1),
+              -((marshallSignS A τ.1).re *
+                  (((sublatticeSpinSOpMinus N A).mulVec Ψ) τ.1).re) <
+                (marshallSignS A τ.1).re *
+                  (((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ)
+                    τ.1).re)
+    (hsector_min :
+      ∀ {μ : ℝ},
+        (∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+          ∃ v : magConfigS V N M → ℝ,
+            μ < c ∧ (∀ τ, 0 < v τ) ∧
+            (heisenbergHamiltonianS J N).mulVec
+                (magSectorEmbedding
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+              (μ : ℂ) • magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) →
+        ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+          ∀ {μ' : ℝ} {Φ : magConfigS V N M → ℂ},
+            Φ ≠ 0 →
+            (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φ =
+              (μ' : ℂ) • Φ →
+            μ ≤ μ') :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
+    hc_strict h_intermediate hA_nonempty hnotA_nonempty
+  obtain ⟨μ, hcommon_pred⟩ :=
+    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_lowered_joint_magSubspace_component_lt_of_predictedGS
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hBA hsector_nonempty hleft_predictedGS
+      hsource_lowered_joint_magSubspace_component_lt
+  have hcommon :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        ∃ v : magConfigS V N M → ℝ,
+          μ < c ∧ (∀ τ, 0 < v τ) ∧
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) := by
+    intro M hM
+    obtain ⟨v, hμ_lt, hv_pos, hΦ, _hpred⟩ := hcommon_pred M hM
+    exact ⟨v, hμ_lt, hv_pos, hΦ⟩
+  exact
+    tasaki_2_5_theorem_2_3_of_common_energy_chain
+      A N c hcommon
+      (tasaki23_global_minimality_of_sector_minimality N (hsector_min hcommon))
+      hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
+      hc_strict h_intermediate hA_nonempty hnotA_nonempty
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 final wrapper from lowered joint
+magnetization coefficient dominance**: the final theorem boundary can
+consume the remaining local comparison as a strict dominance of the
+on-`A` predecessor coefficient sum by the off-`A` predecessor
+coefficient sum, while exposing the stronger lowered joint-magnetization
+subspace memberships to the callback.
+
+The proof rewrites coefficient dominance into the strict
+Marshall-signed sublattice-component comparison and then applies the
+lowered joint-magnetization component wrapper. -/
+theorem
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_lowered_joint_magSubspace_coefficient_lt_of_sector_minimality
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      ∀ {μ : ℝ}
+        {v : magConfigS V N
+          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+              N) → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N
+                (min
+                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+                  (Finset.card
+                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+                    N) =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hsource_lowered_joint_magSubspace_coefficient_lt :
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        M <
+          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          ∀ Ψ : (V → Fin (N + 1)) → ℂ,
+            Ψ =
+              magSectorEmbedding
+                (fun τ : magConfigS V N M =>
+                  (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+            Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N →
+            ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
+              tasaki23LoweredJointMagSubspace (V := V) A N M →
+            ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) ∈
+              tasaki23LoweredJointMagSubspace (V := V) A N M →
+            ∀ τ : magConfigS V N (M + 1),
+              (∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+                tasaki23LoweringPredecessorSignedCoefficient A
+                  (fun τ : magConfigS V N M =>
+                    (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) τ x) <
+                ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+                  tasaki23LoweringPredecessorSignedCoefficient A
+                    (fun τ : magConfigS V N M =>
+                      (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) τ x)
+    (hsector_min :
+      ∀ {μ : ℝ},
+        (∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+          ∃ v : magConfigS V N M → ℝ,
+            μ < c ∧ (∀ τ, 0 < v τ) ∧
+            (heisenbergHamiltonianS J N).mulVec
+                (magSectorEmbedding
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+              (μ : ℂ) • magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) →
+        ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+          ∀ {μ' : ℝ} {Φ : magConfigS V N M → ℂ},
+            Φ ≠ 0 →
+            (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φ =
+              (μ' : ℂ) • Φ →
+            μ ≤ μ') :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  exact
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_lowered_joint_magSubspace_component_lt_of_sector_minimality
+      A N c hBA hsector_nonempty hleft_predictedGS
+      (by
+        intro M hM hMlt μ v hμ_lt hv_pos hΦ Ψ hΨ_eq hΨ_pred hA_lowered hB_lowered τ
+        have hcoeff :=
+          hsource_lowered_joint_magSubspace_coefficient_lt hM hMlt hμ_lt hv_pos hΦ
+            Ψ hΨ_eq hΨ_pred hA_lowered hB_lowered τ
         subst Ψ
         have honA :=
           tasaki23_signed_lowering_onA_sublattice_component_eq_neg_coefficient_sum
