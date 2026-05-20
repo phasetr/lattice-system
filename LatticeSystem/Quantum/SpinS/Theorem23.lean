@@ -3787,6 +3787,58 @@ theorem
       ⟨Function.update τ.1 x ⟨(τ.1 x).val - 1, by omega⟩,
         magSumS_single_site_lowering_predecessor τ x hx⟩
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 real source-weight RHS at a lowering
+predecessor**: for a Marshall-positive sector embedding, the real part
+of the predecessor source-weight right-hand side is the real predicted
+toy energy minus twice the real on-`A`/off-`A` source-weight product,
+times the signed positive sector coefficient at the predecessor.
+
+This is the real-valued form of the scalar RHS exposed by
+`tasaki23_cross_ladder_reembedded_source_weight_eq_lowering_predecessor_of_predictedGS`.
+-/
+theorem
+    tasaki23_cross_ladder_reembedded_source_weight_lowering_predecessor_rhs_re_eq
+    (A : V → Bool) (N : ℕ) {M : ℕ} {v : magConfigS V N M → ℝ}
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ_eq :
+      Ψ =
+        magSectorEmbedding
+          (fun ρ : magConfigS V N M =>
+            (((marshallSignS A ρ.1).re * v ρ : ℝ) : ℂ)))
+    (τ : magConfigS V N (M + 1)) (x : V) (hx : 0 < (τ.1 x).val) :
+    let predVal : Fin (N + 1) :=
+      ⟨(τ.1 x).val - 1, by omega⟩
+    let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+    (((bipartiteToyMinEnergyPredicted (Λ := V) A N -
+        (2 : ℂ) *
+          ((∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
+              ((N : ℂ) / 2 - ((pred y).val : ℂ))) *
+            (∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
+              ((N : ℂ) / 2 - ((pred y).val : ℂ))))) * Ψ pred).re =
+      ((bipartiteToyMinEnergyPredicted (Λ := V) A N).re -
+          2 *
+            ((∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
+                ((N : ℝ) / 2 - ((pred y).val : ℝ))) *
+              (∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
+                ((N : ℝ) / 2 - ((pred y).val : ℝ))))) *
+        ((marshallSignS A pred).re *
+          v ⟨pred, magSumS_single_site_lowering_predecessor τ x hx⟩)) := by
+  classical
+  dsimp only
+  subst Ψ
+  rw [magSectorEmbedding_apply_of_mem _
+    (magSumS_single_site_lowering_predecessor τ x hx)]
+  rw [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]
+  simp only [mul_zero, sub_zero]
+  simp only [Complex.sub_re, Complex.sub_im, Complex.mul_re, Complex.mul_im,
+    Complex.re_sum, Complex.im_sum, Complex.natCast_re, Complex.natCast_im,
+    Complex.re_ofNat, Complex.im_ofNat, Complex.div_re, Complex.div_im,
+    zero_mul, mul_zero, sub_zero]
+  norm_num [Complex.normSq]
+  ring_nf
+  exact Or.inl trivial
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS lowering closure**:
 if a full spin-`S` vector lies in the predicted toy ground-state
 subspace, then its total-lowering image also lies in that subspace.
