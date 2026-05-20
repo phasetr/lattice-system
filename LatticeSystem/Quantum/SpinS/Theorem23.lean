@@ -6,6 +6,7 @@ import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorEigenvalueUnique
 import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
 import LatticeSystem.Quantum.SpinS.MarshallSign
 import LatticeSystem.Quantum.SpinS.NeelBipartiteWeight
+import LatticeSystem.Quantum.SpinS.SublatticeSpinLadder
 import LatticeSystem.Quantum.SpinS.Theorem23Casimir
 
 /-!
@@ -2999,6 +3000,57 @@ theorem tasaki23_lowered_sublatticeSpinSquaredS_complement_of_mem_bipartiteToyGr
     tasaki23_sublatticeSpinSquaredS_complement_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
       (V := V) A N
       (tasaki23_totalSpinSOpMinus_mulVec_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΨ)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS `A`-lowered
+sublattice-Casimir bridge**: the `A`-sublattice lowering component of
+a predicted toy ground state remains in the maximum `A`-sublattice
+Casimir eigenspace.
+
+This is the component-level version needed for comparing
+`Ŝ_A^- Ψ` with `Ŝ_¬A^- Ψ` in the remaining lowered-Marshall positivity
+argument. -/
+theorem
+    tasaki23_sublatticeSpinSquaredS_sublatticeSpinSOpMinus_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (sublatticeSpinSquaredS N A).mulVec ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
+      ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2)) *
+        ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2)) + 1)) • ((sublatticeSpinSOpMinus N A).mulVec Ψ) := by
+  exact
+    mulVec_preserves_eigenvalue_of_commuteS_ladder
+      N
+      (sublatticeSpinSquaredS_commute_sublatticeSpinSOpMinus N A)
+      (tasaki23_sublatticeSpinSquaredS_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΨ)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS complement-lowered
+sublattice-Casimir bridge**: the `¬A`-sublattice lowering component of
+a predicted toy ground state remains in the maximum complement
+sublattice-Casimir eigenspace.
+
+This is the complement companion to
+`tasaki23_sublatticeSpinSquaredS_sublatticeSpinSOpMinus_of_mem_bipartiteToyGroundStateSubspacePredicted`. -/
+theorem
+    tasaki23_sublatticeSpinSquaredS_complement_sublatticeSpinSOpMinus_complement_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (sublatticeSpinSquaredS N (fun x => !A x)).mulVec
+        ((sublatticeSpinSOpMinus N (fun x => !A x)).mulVec Ψ) =
+      ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) *
+        ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) + 1)) •
+        ((sublatticeSpinSOpMinus N (fun x => !A x)).mulVec Ψ) := by
+  exact
+    mulVec_preserves_eigenvalue_of_commuteS_ladder
+      N
+      (sublatticeSpinSquaredS_commute_sublatticeSpinSOpMinus N (fun x => !A x))
+      (tasaki23_sublatticeSpinSquaredS_complement_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
         (V := V) A N hΨ)
 
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS transfer across a non-zero
