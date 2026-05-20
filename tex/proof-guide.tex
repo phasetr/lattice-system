@@ -9249,6 +9249,17 @@ equations, and the two successor-sector
 local comparison can use both the explicit coefficient
 \(E_{\rm toy}-2W_A(\sigma)W_{\bar A}(\sigma)\) and the fact that the two
 lowered components are already restricted to the successor sector.
+The predecessor-specialized boundary
+\begin{Verbatim}
+tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_source_weight_predecessor_coefficient_lt_of_sector_minimality
+\end{Verbatim}
+pushes this one step further.  It instantiates the source-weight identity
+at each predecessor obtained from a successor \(\tau\) by lowering a
+site \(x\), and passes those predecessor identities directly to the
+coefficient-comparison callback.  The callback therefore receives the
+filtered raising sums and the scalar coefficient
+\((E_{\rm toy}-2W_AW_{\bar A})\Psi\) already evaluated at the same
+configuration used by the lowered predecessor coefficient.
 
 \textbf{Joint-component callback}: the joint maximum sublattice-Casimir
 eigenspace used above is now named as
