@@ -8994,6 +8994,31 @@ the source coefficient \(v(\tau^{x-})\) is strictly positive by the
 Marshall-positive real-sector representative.  Therefore every
 predecessor raising-source summand is positive, and the attached sums
 appearing in the remaining dominance callback are non-negative.
+For the finite-set partition step, Lean introduces the boundary-inclusive
+coefficient
+\[
+\texttt{tasaki23RaisingPredecessorSourceCoefficient},
+\]
+which agrees with the lowerable predecessor raising-source summand when
+\(\tau_x>0\) and is zero otherwise.  The bridge
+\[
+\begin{gathered}
+\texttt{tasaki23\_raising\_predecessor\_source\_attach\_sum}\\
+\texttt{\_eq\_boundary\_sum}
+\end{gathered}
+\]
+rewrites the attached lowerable-site sum as an ambient finite-set sum of
+this boundary coefficient.  The partition theorem
+\[
+\begin{gathered}
+\texttt{tasaki23\_raising\_predecessor\_source\_univ\_attach\_sum}\\
+\texttt{\_eq\_onA\_add\_offA}
+\end{gathered}
+\]
+then splits the total predecessor raising-source sum into the on-\(A\)
+and off-\(A\) attached sums.  This is the Boolean finite-set partition
+needed before the real predecessor source-weight identity is applied to
+the two sublattice raising-source sums.
 The corresponding final wrapper
 \[
 \begin{gathered}
