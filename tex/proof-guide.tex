@@ -8828,6 +8828,28 @@ to a coefficient-level comparison between the two sublattice sums,
 still within the ladder step of Tasaki, Springer 2020, Section 2.5,
 Theorem 2.3, p. 42.
 
+For the Marshall-signed real source vector
+\(\Phi_\sigma=\operatorname{sgn}_A(\sigma)v_\sigma\), the coefficient
+\(C_x(\tau)\) has a sign-normalized form.  At a lowerable site the two
+Marshall signs cancel, and Lean records
+\[
+\texttt{tasaki23\_lowering\_predecessor\_signed\_coefficient\_eq\_positive\_source}
+\]
+as
+\[
+  C_x(\tau)=c_x(\tau)v_{\tau^{x-}} .
+\]
+Since \(c_x(\tau)>0\), the companion lemmas
+\[
+\texttt{tasaki23\_lowering\_predecessor\_signed\_coefficient\_pos\_of\_lowerable}
+\]
+and
+\[
+\texttt{tasaki23\_lowering\_predecessor\_signed\_coefficient\_nonneg}
+\]
+show strict positivity at lowerable sites and non-negativity in the
+boundary-inclusive convention.
+
 \textbf{Lowered coefficient dominance bridge}: the coefficient split
 also gives the direct callback form used by the lowered Marshall
 positivity wrappers.  Since the on-\(A\) signed contribution is
