@@ -3349,6 +3349,85 @@ theorem
       tasaki23_sublatticeSpinSquaredS_complement_sublatticeSpinSOpMinus_complement_of_mem_bipartiteToyGroundStateSubspacePredicted
         (V := V) A N hΨ
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowered component joint-magnetization
+subspace**: the structural target for a lowered component of a
+sector-`M` source vector.
+
+It combines the joint maximum sublattice-Casimir eigenspace with the
+successor magnetization subspace `magSumS = M + 1`, in centered
+magnetization units.  The remaining comparison can then use one
+submodule membership carrying both the Casimir and sector-support
+facts for the lowered components. -/
+noncomputable def tasaki23LoweredJointMagSubspace
+    (A : V → Bool) (N M : ℕ) : Submodule ℂ ((V → Fin (N + 1)) → ℂ) :=
+  tasaki23JointSublatticeCasimirEigenspace (V := V) A N ⊓
+    magSubspaceS V N
+      (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ))
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 `A`-lowered joint-magnetization bridge**:
+if a sector-`M` representative is in the predicted toy ground-state
+subspace, then its `A`-sublattice lowering component lies in the
+combined joint-Casimir and successor-sector subspace.
+
+This packages the PR #3408 joint-Casimir membership together with the
+standard sublattice-lowering magnetization shift. -/
+theorem
+    tasaki23_sublatticeSpinSOpMinus_mem_lowered_joint_magSubspace_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {M : ℕ} {Φ : magConfigS V N M → ℂ}
+    (hΦ : magSectorEmbedding Φ ∈
+      bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    ((sublatticeSpinSOpMinus N A).mulVec (magSectorEmbedding Φ)) ∈
+      tasaki23LoweredJointMagSubspace (V := V) A N M := by
+  unfold tasaki23LoweredJointMagSubspace
+  refine Submodule.mem_inf.mpr ⟨?_, ?_⟩
+  · exact
+      tasaki23_sublatticeSpinSOpMinus_mem_joint_sublattice_casimir_eigenspace_of_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΦ
+  · have hshift :
+        (sublatticeSpinSOpMinus N A).mulVec (magSectorEmbedding Φ) ∈
+          magSubspaceS V N
+            ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) - 1) :=
+      sublatticeSpinSOpMinus_mulVec_mem_magSubspaceS_of_mem
+        N A (magSectorEmbedding_mem_magSubspaceS Φ)
+    convert hshift using 1
+    norm_num
+    ring_nf
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 complement-lowered joint-magnetization
+bridge**: if a sector-`M` representative is in the predicted toy
+ground-state subspace, then its complement-sublattice lowering component
+lies in the combined joint-Casimir and successor-sector subspace.
+
+This is the complement component version of
+`tasaki23_sublatticeSpinSOpMinus_mem_lowered_joint_magSubspace_of_mem_bipartiteToyGroundStateSubspacePredicted`.
+-/
+theorem
+    tasaki23_sublatticeSpinSOpMinus_complement_mem_lowered_joint_magSubspace_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {M : ℕ} {Φ : magConfigS V N M → ℂ}
+    (hΦ : magSectorEmbedding Φ ∈
+      bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec
+        (magSectorEmbedding Φ)) ∈
+      tasaki23LoweredJointMagSubspace (V := V) A N M := by
+  unfold tasaki23LoweredJointMagSubspace
+  refine Submodule.mem_inf.mpr ⟨?_, ?_⟩
+  · exact
+      tasaki23_sublatticeSpinSOpMinus_complement_mem_joint_sublattice_casimir_eigenspace_of_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΦ
+  · have hshift :
+        (sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec
+            (magSectorEmbedding Φ) ∈
+          magSubspaceS V N
+            ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) - 1) :=
+      sublatticeSpinSOpMinus_mulVec_mem_magSubspaceS_of_mem
+        N (fun x => ! A x) (magSectorEmbedding_mem_magSubspaceS Φ)
+    convert hshift using 1
+    norm_num
+    ring_nf
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS transfer across a non-zero
 real scalar**: if a vector in the predicted toy ground-state subspace is
 a non-zero real scalar multiple of another vector, then the second vector
