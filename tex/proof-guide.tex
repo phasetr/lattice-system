@@ -8999,6 +8999,26 @@ component-Casimir package required before proving the strict
 Marshall-signed comparison in Tasaki, Springer 2020, Section 2.5,
 Theorem 2.3, p. 42.
 
+\textbf{Lowered component joint-eigenspace membership}: the preceding
+four component Casimir identities are also packaged in the submodule
+language used by the later comparison step.  The Lean bridges
+\[
+\begin{gathered}
+\texttt{tasaki23\_sublatticeSpinSOpMinus}\\
+\texttt{\_mem\_joint\_sublattice\_casimir\_eigenspace}\\
+\texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted},\\
+\texttt{tasaki23\_sublatticeSpinSOpMinus\_complement}\\
+\texttt{\_mem\_joint\_sublattice\_casimir\_eigenspace}\\
+\texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted}
+\end{gathered}
+\]
+state directly that both \(\hat S_A^-\Phi\) and
+\(\hat S_{\bar A}^-\Phi\) belong to the intersection of the maximum
+\((\hat S_A)^2\)- and \((\hat S_{\bar A})^2\)-eigenspaces.  The proof is
+just \texttt{Submodule.mem\_inf} applied to the same-side and opposite-side
+Casimir bridges above.  This removes an API layer before the remaining
+pointwise comparison of the Marshall-signed real parts.
+
 \textbf{Sublattice-component final wrapper}: the final theorem wrapper can
 now consume that sublattice comparison directly.  The Lean theorem
 \[

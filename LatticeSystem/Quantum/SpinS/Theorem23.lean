@@ -3113,6 +3113,76 @@ theorem
       (tasaki23_sublatticeSpinSquaredS_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
         (V := V) A N hΨ)
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS `A`-lowered joint
+sublattice-Casimir eigenspace bridge**: the `A`-sublattice lowering
+component of a predicted toy ground state lies in the joint maximum
+sublattice-Casimir eigenspace.
+
+This packages the same-side and cross-side Casimir identities for
+`Ŝ_A^- Ψ` in the exact intersection form needed by the remaining
+component comparison. -/
+theorem
+    tasaki23_sublatticeSpinSOpMinus_mem_joint_sublattice_casimir_eigenspace_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
+      Module.End.eigenspace (sublatticeSpinSquaredS N A).mulVecLin
+          ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+            ((N : ℂ) / 2)) *
+          ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+            ((N : ℂ) / 2)) + 1))
+        ⊓ Module.End.eigenspace
+            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVecLin
+            ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+              ((N : ℂ) / 2)) *
+            ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+              ((N : ℂ) / 2)) + 1)) := by
+  refine Submodule.mem_inf.mpr ⟨?_, ?_⟩
+  · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+    exact
+      tasaki23_sublatticeSpinSquaredS_sublatticeSpinSOpMinus_of_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΨ
+  · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+    exact
+      tasaki23_sublatticeSpinSquaredS_complement_sublatticeSpinSOpMinus_of_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΨ
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS complement-lowered joint
+sublattice-Casimir eigenspace bridge**: the complement-sublattice
+lowering component of a predicted toy ground state lies in the joint
+maximum sublattice-Casimir eigenspace.
+
+This packages the same-side and cross-side Casimir identities for
+`Ŝ_¬A^- Ψ` in the exact intersection form needed by the remaining
+component comparison. -/
+theorem
+    tasaki23_sublatticeSpinSOpMinus_complement_mem_joint_sublattice_casimir_eigenspace_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) ∈
+      Module.End.eigenspace (sublatticeSpinSquaredS N A).mulVecLin
+          ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+            ((N : ℂ) / 2)) *
+          ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+            ((N : ℂ) / 2)) + 1))
+        ⊓ Module.End.eigenspace
+            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVecLin
+            ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+              ((N : ℂ) / 2)) *
+            ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+              ((N : ℂ) / 2)) + 1)) := by
+  refine Submodule.mem_inf.mpr ⟨?_, ?_⟩
+  · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+    exact
+      tasaki23_sublatticeSpinSquaredS_sublatticeSpinSOpMinus_complement_of_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΨ
+  · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+    exact
+      tasaki23_sublatticeSpinSquaredS_complement_sublatticeSpinSOpMinus_complement_of_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΨ
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS transfer across a non-zero
 real scalar**: if a vector in the predicted toy ground-state subspace is
 a non-zero real scalar multiple of another vector, then the second vector
