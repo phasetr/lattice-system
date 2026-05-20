@@ -8975,6 +8975,28 @@ outside-interval real-sector minimality.  Thus the remaining local input is
 exactly the sublattice-ladder comparison above, rather than the more
 abstract positivity of the total lowered vector.
 
+\textbf{Predicted-GS-aware sublattice-component interval chain}: the local
+comparison can now be restricted to source vectors already known to lie in
+the predicted toy ground-state subspace.  The Lean theorem
+\[
+\begin{gathered}
+\texttt{tasaki23\_energy\_interval\_chain\_with\_predictedGS}\\
+\texttt{\_of\_left\_endpoint\_predictedGS}\\
+\texttt{\_of\_sublattice\_component\_lt\_of\_predictedGS}
+\end{gathered}
+\]
+uses the same left-endpoint induction as the predicted-GS threading
+wrapper, but in each successor step it passes the propagated membership
+\(\Phi\in\texttt{bipartiteToyGroundStateSubspacePredicted}(A,N)\)
+to the component comparison callback.  After applying
+\(\texttt{tasaki23\_signed\_lowering\_site\_sum\_pos\_of\_sublattice\_component\_lt}\),
+the ordinary strict site-sum successor step supplies the next
+Marshall-positive representative and the existing scalar-cancellation
+argument transports predicted-GS membership forward.  This leaves the
+remaining Casimir calculation in the natural form: prove the inequality
+between \(\hat S_A^-\Phi\) and \(\hat S_{\bar A}^-\Phi\) for predicted-GS
+source vectors only.
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}
