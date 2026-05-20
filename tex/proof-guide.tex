@@ -8873,6 +8873,27 @@ and
 \]
 allow the remaining dominance callback to be stated directly in terms of
 the positive real source coefficients \(v_{\tau^{x-}}\).
+Since the boundary-inclusive coefficient is zero when \(\tau_x=0\), Lean
+also records the lowerable-site restriction
+\[
+\texttt{tasaki23\_positive\_source\_coefficient\_sum\_eq\_lowerable\_sum}.
+\]
+Together with
+\[
+\begin{gathered}
+\texttt{tasaki23\_signed\_lowering\_site\_sum\_pos}\\
+\texttt{\_of\_positive\_source\_lowerable\_coefficient\_lt}
+\end{gathered}
+\]
+and
+\[
+\begin{gathered}
+\texttt{tasaki23\_lowered\_marshall\_pos}\\
+\texttt{\_of\_positive\_source\_lowerable\_coefficient\_lt},
+\end{gathered}
+\]
+the remaining comparison may be stated after filtering both sublattice
+sums to the lowerable sites of the successor configuration.
 
 \textbf{Lowered coefficient dominance bridge}: the coefficient split
 also gives the direct callback form used by the lowered Marshall
