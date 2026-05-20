@@ -1126,6 +1126,63 @@ theorem tasaki23_lowering_predecessor_signed_coefficient_nonneg
         A v τ x hx hv_pos)
   · simp [tasaki23LoweringPredecessorSignedCoefficient, hx]
 
+/-- **Tasaki §2.5 Theorem 2.3 positive-source predecessor coefficient**:
+the boundary-inclusive lowered predecessor coefficient after the
+Marshall signs have been cancelled.
+
+At a lowerable site this is the positive single-site lowering matrix
+coefficient times the real positive source coefficient at the predecessor;
+at the lower boundary it is zero. -/
+noncomputable def tasaki23LoweringPredecessorPositiveSourceCoefficient
+    {M : ℕ} (v : magConfigS V N M → ℝ)
+    (τ : magConfigS V N (M + 1)) (x : V) : ℝ :=
+  if hx : 0 < (τ.1 x).val then
+    let predVal : Fin (N + 1) :=
+      ⟨(τ.1 x).val - 1, by omega⟩
+    let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+    let hpredM : magSumS pred = M :=
+      magSumS_single_site_lowering_predecessor τ x hx
+    (spinSOpMinus N (τ.1 x) predVal).re * v ⟨pred, hpredM⟩
+  else
+    0
+
+/-- **Tasaki §2.5 Theorem 2.3 signed coefficient as positive-source
+coefficient**: for a Marshall-signed real source vector, the
+boundary-inclusive signed predecessor coefficient is exactly the
+sign-normalized positive-source coefficient. -/
+theorem tasaki23_lowering_predecessor_signed_coefficient_eq_positive_source_coefficient
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
+    (τ : magConfigS V N (M + 1)) (x : V) :
+    tasaki23LoweringPredecessorSignedCoefficient A
+        (fun σ : magConfigS V N M =>
+          (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) τ x =
+      tasaki23LoweringPredecessorPositiveSourceCoefficient v τ x := by
+  classical
+  by_cases hx : 0 < (τ.1 x).val
+  · rw [tasaki23_lowering_predecessor_signed_coefficient_eq_positive_source
+      A v τ x hx]
+    simp [tasaki23LoweringPredecessorPositiveSourceCoefficient, hx]
+  · simp [tasaki23LoweringPredecessorSignedCoefficient,
+      tasaki23LoweringPredecessorPositiveSourceCoefficient, hx]
+
+/-- **Tasaki §2.5 Theorem 2.3 signed coefficient sum as positive-source
+coefficient sum**: over any finite site set, the Marshall-signed
+predecessor coefficient sum for a Marshall-signed real source vector is
+the corresponding sign-normalized positive-source coefficient sum. -/
+theorem tasaki23_lowering_predecessor_coefficient_sum_eq_positive_source_sum
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
+    (τ : magConfigS V N (M + 1)) (s : Finset V) :
+    (∑ x ∈ s,
+      tasaki23LoweringPredecessorSignedCoefficient A
+        (fun σ : magConfigS V N M =>
+          (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) τ x) =
+      ∑ x ∈ s, tasaki23LoweringPredecessorPositiveSourceCoefficient v τ x := by
+  apply Finset.sum_congr rfl
+  intro x _hx
+  exact
+    tasaki23_lowering_predecessor_signed_coefficient_eq_positive_source_coefficient
+      A v τ x
+
 /-- **Tasaki §2.5 Theorem 2.3 off-`A` lowered contribution split**:
 outside `A`, the signed single-site lowering contribution is exactly
 the boundary-inclusive signed predecessor coefficient.
@@ -1435,6 +1492,37 @@ theorem tasaki23_signed_lowering_site_sum_pos_of_onA_coefficient_lt_offA
         rw [tasaki23_signed_lowering_onA_sum_eq_neg_coefficient_sum A Φ τ,
           tasaki23_signed_lowering_offA_sum_eq_coefficient_sum A Φ τ]
         simpa using hdominates)
+
+/-- **Tasaki §2.5 Theorem 2.3 lowered site-sum positivity from
+positive-source coefficient dominance**: after cancelling the Marshall
+signs in the local predecessor coefficients, it is enough to compare the
+positive-source coefficient sums over the two sublattices. -/
+theorem tasaki23_signed_lowering_site_sum_pos_of_positive_source_coefficient_lt
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
+    (τ : magConfigS V N (M + 1))
+    (hdominates :
+      (∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+          tasaki23LoweringPredecessorPositiveSourceCoefficient v τ x) <
+        ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+          tasaki23LoweringPredecessorPositiveSourceCoefficient v τ x) :
+    0 < (marshallSignS A τ.1).re *
+      (∑ x : V,
+        (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding
+            (fun σ : magConfigS V N M =>
+              (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)))) τ.1).re) := by
+  exact
+    tasaki23_signed_lowering_site_sum_pos_of_onA_coefficient_lt_offA
+      A
+      (fun σ : magConfigS V N M =>
+        (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) τ
+      (by
+        rw [
+          tasaki23_lowering_predecessor_coefficient_sum_eq_positive_source_sum
+            A v τ (Finset.univ.filter (fun x : V => A x = true)),
+          tasaki23_lowering_predecessor_coefficient_sum_eq_positive_source_sum
+            A v τ (Finset.univ.filter (fun x : V => A x = false))]
+        exact hdominates)
 
 /-- **Tasaki §2.5 Theorem 2.3 lowered site-sum positivity from sublattice
 component dominance**: if the negative Marshall-signed `Ŝ_A^-` component
@@ -2056,6 +2144,32 @@ theorem tasaki23_lowered_marshall_pos_of_onA_coefficient_lt_offA
     (fun τ =>
       tasaki23_signed_lowering_site_sum_pos_of_onA_coefficient_lt_offA
         A Φ τ (hdominates τ))
+
+/-- **Tasaki §2.5 Theorem 2.3 lowered-vector Marshall positivity from
+positive-source coefficient dominance**: a pointwise dominance of the
+sign-normalized positive-source predecessor coefficient sum over `A` by
+the corresponding sum over `¬A` implies Marshall positivity of the
+lowered vector. -/
+theorem tasaki23_lowered_marshall_pos_of_positive_source_coefficient_lt
+    (A : V → Bool) {M : ℕ} (v : magConfigS V N M → ℝ)
+    (hdominates :
+      ∀ τ : magConfigS V N (M + 1),
+        (∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient v τ x) <
+          ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient v τ x) :
+    ∀ τ : magConfigS V N (M + 1),
+      0 < (marshallSignS A τ.1).re *
+        (((totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun σ : magConfigS V N M =>
+              (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)))) τ.1).re := by
+  exact tasaki23_lowered_marshall_pos_of_site_sum_pos A
+    (fun σ : magConfigS V N M =>
+      (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))
+    (fun τ =>
+      tasaki23_signed_lowering_site_sum_pos_of_positive_source_coefficient_lt
+        A v τ (hdominates τ))
 
 /-- **Tasaki §2.5 Theorem 2.3 lowered-vector Marshall positivity from
 sublattice component dominance**: a pointwise operator-level dominance
