@@ -8950,6 +8950,31 @@ This is the Casimir-side input needed for the next comparison of
 \(\hat S_A^- \Phi\) and \(\hat S_{\bar A}^- \Phi\) in the proof of
 Tasaki, Springer 2020, Section 2.5, Theorem 2.3, p. 42.
 
+\textbf{Sublattice-component final wrapper}: the final theorem wrapper can
+now consume that sublattice comparison directly.  The Lean theorem
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint\_threaded}\\
+\texttt{\_predictedGS\_of\_sublattice\_component\_lt}\\
+\texttt{\_of\_outside\_real\_sector\_minimality}
+\end{gathered}
+\]
+assumes, for each source-sector Marshall-positive representative \(\Phi\),
+the pointwise inequality
+\[
+  -\operatorname{sgn}_A(\tau)
+    \operatorname{Re}\bigl((\hat S_A^-\Phi)_\tau\bigr)
+  <
+  \operatorname{sgn}_A(\tau)
+    \operatorname{Re}\bigl((\hat S_{\bar A}^-\Phi)_\tau\bigr).
+\]
+It converts this hypothesis to lowered-vector Marshall positivity using
+\(\texttt{tasaki23\_lowered\_marshall\_pos\_of\_sublattice\_component\_lt}\)
+and then invokes the existing left-endpoint predicted-GS final wrapper with
+outside-interval real-sector minimality.  Thus the remaining local input is
+exactly the sublattice-ladder comparison above, rather than the more
+abstract positivity of the total lowered vector.
+
 The dominance-form sector-existence companions are
 \[
 \begin{gathered}
