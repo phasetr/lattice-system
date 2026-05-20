@@ -1162,6 +1162,58 @@ noncomputable def tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
     magSumS_single_site_lowering_predecessor τ x hx
   (spinSOpMinus N (τ.1 x) predVal).re * v ⟨pred, hpredM⟩
 
+set_option linter.style.longLine false in
+omit [DecidableEq V] in
+/-- **Tasaki §2.5 Theorem 2.3 predecessor ladder coefficient mirror**:
+the raising coefficient from the lowering predecessor back to the
+successor configuration equals the lowering coefficient used in the
+explicit lowerable positive-source predecessor coefficient.
+
+Both sides are the real ladder coefficient
+`sqrt (τ_x * (N - τ_x + 1))`. -/
+theorem tasaki23_spinSOpPlus_lowering_predecessor_re_eq_spinSOpMinus
+    {M : ℕ} (N : ℕ) (τ : magConfigS V N (M + 1)) (x : V)
+    (hx : 0 < (τ.1 x).val) :
+    let predVal : Fin (N + 1) :=
+      ⟨(τ.1 x).val - 1, by omega⟩
+    (spinSOpPlus N predVal (τ.1 x)).re =
+      (spinSOpMinus N (τ.1 x) predVal).re := by
+  classical
+  let predVal : Fin (N + 1) := ⟨(τ.1 x).val - 1, by omega⟩
+  change (spinSOpPlus N predVal (τ.1 x)).re =
+    (spinSOpMinus N (τ.1 x) predVal).re
+  have hpredVal : predVal.val = (τ.1 x).val - 1 := rfl
+  have hstep : predVal.val + 1 = (τ.1 x).val := by omega
+  rw [spinSOpPlus_apply_raise N hstep, spinSOpMinus_apply_lower N hstep]
+  simp only [Complex.ofReal_re]
+  congr 1
+  have hxle : 1 ≤ (τ.1 x).val := Nat.succ_le_of_lt hx
+  rw [hpredVal, Nat.cast_sub hxle]
+  ring
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowerable coefficient as predecessor
+raising coefficient**: the explicit lowerable positive-source coefficient
+can be read with the matching raising matrix coefficient at the lowering
+predecessor.
+
+This is the coefficient bridge needed to compare the real predecessor
+source-weight raising sums with the attached lowerable positive-source
+coefficient sums. -/
+theorem tasaki23_lowerable_positive_source_coefficient_eq_raising_predecessor_source
+    {M : ℕ} (v : magConfigS V N M → ℝ)
+    (τ : magConfigS V N (M + 1)) (x : V) (hx : 0 < (τ.1 x).val) :
+    let predVal : Fin (N + 1) :=
+      ⟨(τ.1 x).val - 1, by omega⟩
+    let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+    tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient v τ x hx =
+      (spinSOpPlus N predVal (τ.1 x)).re *
+        v ⟨pred, magSumS_single_site_lowering_predecessor τ x hx⟩ := by
+  classical
+  dsimp only [tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient]
+  rw [tasaki23_spinSOpPlus_lowering_predecessor_re_eq_spinSOpMinus
+    (V := V) N τ x hx]
+
 /-- **Tasaki §2.5 Theorem 2.3 boundary coefficient as lowerable
 coefficient**: at a lowerable site, the boundary-inclusive positive-source
 coefficient is the explicit lowerable coefficient. -/
