@@ -8977,6 +8977,28 @@ maximum \(A\)- and \(\bar A\)-sublattice Casimir eigenspaces,
 respectively.  This is the component-level Casimir input for the
 remaining comparison between the two lowered sublattice pieces.
 
+\textbf{Joint sublattice-Casimir preservation for lowered components}:
+the same cross-sublattice commutation also gives the missing opposite
+Casimir identities.  The Lean bridges
+\[
+\begin{gathered}
+\texttt{tasaki23\_sublatticeSpinSquaredS\_complement}\\
+\texttt{\_sublatticeSpinSOpMinus}\\
+\texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted},\\
+\texttt{tasaki23\_sublatticeSpinSquaredS}\\
+\texttt{\_sublatticeSpinSOpMinus\_complement}\\
+\texttt{\_of\_mem\_bipartiteToyGroundStateSubspacePredicted}
+\end{gathered}
+\]
+show that \(\hat S_A^-\Phi\) also has the maximum
+\(\bar A\)-sublattice Casimir eigenvalue, and that
+\(\hat S_{\bar A}^-\Phi\) also has the maximum \(A\)-sublattice Casimir
+eigenvalue.  Hence both individual lowered components lie in the joint
+maximum sublattice-Casimir eigenspace.  This is the precise
+component-Casimir package required before proving the strict
+Marshall-signed comparison in Tasaki, Springer 2020, Section 2.5,
+Theorem 2.3, p. 42.
+
 \textbf{Sublattice-component final wrapper}: the final theorem wrapper can
 now consume that sublattice comparison directly.  The Lean theorem
 \[
