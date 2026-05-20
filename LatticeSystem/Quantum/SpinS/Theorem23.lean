@@ -1032,6 +1032,100 @@ noncomputable def tasaki23LoweringPredecessorSignedCoefficient
   else
     0
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 positive predecessor coefficient value**:
+for a Marshall-signed real sector vector, the boundary-inclusive lowered
+predecessor coefficient at a lowerable site is just the positive
+single-site lowering matrix coefficient times the positive real source
+coefficient at the predecessor.
+
+The two Marshall signs cancel by `marshallSignS_re_sq`; this is the
+local positivity normalization used before comparing the on-`A` and
+off-`A` predecessor coefficient sums. -/
+theorem tasaki23_lowering_predecessor_signed_coefficient_eq_positive_source
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
+    (τ : magConfigS V N (M + 1)) (x : V) (hx : 0 < (τ.1 x).val) :
+    let predVal : Fin (N + 1) :=
+      ⟨(τ.1 x).val - 1, by omega⟩
+    let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+    let hpredM : magSumS pred = M :=
+      magSumS_single_site_lowering_predecessor τ x hx
+    tasaki23LoweringPredecessorSignedCoefficient A
+        (fun σ : magConfigS V N M =>
+          (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) τ x =
+      (spinSOpMinus N (τ.1 x) predVal).re * v ⟨pred, hpredM⟩ := by
+  classical
+  dsimp only
+  let predVal : Fin (N + 1) := ⟨(τ.1 x).val - 1, by omega⟩
+  let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+  let hpredM : magSumS pred = M :=
+    magSumS_single_site_lowering_predecessor τ x hx
+  have hsq : (marshallSignS A pred).re * (marshallSignS A pred).re = 1 :=
+    marshallSignS_re_sq A pred
+  rw [tasaki23LoweringPredecessorSignedCoefficient]
+  simp only [hx, ↓reduceDIte, Complex.ofReal_re]
+  change
+    (spinSOpMinus N (τ.1 x) predVal).re *
+        ((marshallSignS A pred).re *
+          ((marshallSignS A pred).re * v ⟨pred, hpredM⟩)) =
+      (spinSOpMinus N (τ.1 x) predVal).re * v ⟨pred, hpredM⟩
+  have hcancel :
+      (marshallSignS A pred).re *
+          ((marshallSignS A pred).re * v ⟨pred, hpredM⟩) =
+        v ⟨pred, hpredM⟩ := by
+    calc
+      (marshallSignS A pred).re *
+          ((marshallSignS A pred).re * v ⟨pred, hpredM⟩) =
+          ((marshallSignS A pred).re * (marshallSignS A pred).re) *
+            v ⟨pred, hpredM⟩ := by ring
+      _ = 1 * v ⟨pred, hpredM⟩ := by rw [hsq]
+      _ = v ⟨pred, hpredM⟩ := by ring
+  rw [hcancel]
+
+/-- **Tasaki §2.5 Theorem 2.3 positive predecessor coefficient at a
+lowerable site**: if the real source coefficients are strictly positive,
+then every lowerable predecessor coefficient is strictly positive. -/
+theorem tasaki23_lowering_predecessor_signed_coefficient_pos_of_lowerable
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
+    (τ : magConfigS V N (M + 1)) (x : V) (hx : 0 < (τ.1 x).val)
+    (hv_pos : ∀ σ : magConfigS V N M, 0 < v σ) :
+    0 <
+      tasaki23LoweringPredecessorSignedCoefficient A
+        (fun σ : magConfigS V N M =>
+          (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) τ x := by
+  classical
+  let predVal : Fin (N + 1) := ⟨(τ.1 x).val - 1, by omega⟩
+  let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
+  have hpredM : magSumS pred = M :=
+    magSumS_single_site_lowering_predecessor τ x hx
+  have hcoef_lower : predVal.val + 1 = (τ.1 x).val := by
+    dsimp [predVal]
+    omega
+  have hcoef_pos : 0 < (spinSOpMinus N (τ.1 x) predVal).re :=
+    spinSOpMinus_apply_re_pos_of_lower N hcoef_lower
+  rw [tasaki23_lowering_predecessor_signed_coefficient_eq_positive_source
+    A v τ x hx]
+  exact mul_pos hcoef_pos (hv_pos ⟨pred, hpredM⟩)
+
+/-- **Tasaki §2.5 Theorem 2.3 non-negative predecessor coefficient**:
+for a strictly positive real source vector, the boundary-inclusive
+predecessor coefficient is non-negative at every site, with the
+non-lowerable boundary case contributing zero. -/
+theorem tasaki23_lowering_predecessor_signed_coefficient_nonneg
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
+    (τ : magConfigS V N (M + 1)) (x : V)
+    (hv_pos : ∀ σ : magConfigS V N M, 0 < v σ) :
+    0 ≤
+      tasaki23LoweringPredecessorSignedCoefficient A
+        (fun σ : magConfigS V N M =>
+          (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) τ x := by
+  classical
+  by_cases hx : 0 < (τ.1 x).val
+  · exact le_of_lt
+      (tasaki23_lowering_predecessor_signed_coefficient_pos_of_lowerable
+        A v τ x hx hv_pos)
+  · simp [tasaki23LoweringPredecessorSignedCoefficient, hx]
+
 /-- **Tasaki §2.5 Theorem 2.3 off-`A` lowered contribution split**:
 outside `A`, the signed single-site lowering contribution is exactly
 the boundary-inclusive signed predecessor coefficient.
