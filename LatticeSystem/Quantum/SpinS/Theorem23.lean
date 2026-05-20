@@ -1541,6 +1541,66 @@ theorem tasaki23_raising_predecessor_source_sum_lt_of_offA_sub_onA_pos
                 τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) := by
   linarith
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 predecessor raising-source dominance
+callback from positive differences**: a pointwise callback proving
+positivity of the off-`A` minus on-`A` predecessor raising-source sums
+supplies the strict dominance callback used by the final theorem
+boundary.
+
+This is the quantified callback form of
+`tasaki23_raising_predecessor_source_sum_lt_of_offA_sub_onA_pos`. -/
+theorem tasaki23_raising_predecessor_source_sum_lt_callback_of_offA_sub_onA_pos
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
+    (hdiff :
+      ∀ τ : magConfigS V N (M + 1),
+        0 <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              let predVal : Fin (N + 1) :=
+                ⟨(τ.1 x.1).val - 1, by omega⟩
+              let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+              (spinSOpPlus N predVal (τ.1 x.1)).re *
+                v ⟨pred,
+                  magSumS_single_site_lowering_predecessor
+                    τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) -
+            (((Finset.univ.filter (fun x : V => A x = true)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                let predVal : Fin (N + 1) :=
+                  ⟨(τ.1 x.1).val - 1, by omega⟩
+                let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+                (spinSOpPlus N predVal (τ.1 x.1)).re *
+                  v ⟨pred,
+                    magSumS_single_site_lowering_predecessor
+                      τ x.1 ((Finset.mem_filter.mp x.2).2)⟩))) :
+    ∀ τ : magConfigS V N (M + 1),
+      (((Finset.univ.filter (fun x : V => A x = true)).filter
+            (fun x : V => 0 < (τ.1 x).val)).attach.sum
+          (fun x =>
+            let predVal : Fin (N + 1) :=
+              ⟨(τ.1 x.1).val - 1, by omega⟩
+            let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+            (spinSOpPlus N predVal (τ.1 x.1)).re *
+              v ⟨pred,
+                magSumS_single_site_lowering_predecessor
+                  τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) <
+        (((Finset.univ.filter (fun x : V => A x = false)).filter
+            (fun x : V => 0 < (τ.1 x).val)).attach.sum
+          (fun x =>
+            let predVal : Fin (N + 1) :=
+              ⟨(τ.1 x.1).val - 1, by omega⟩
+            let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+            (spinSOpPlus N predVal (τ.1 x.1)).re *
+              v ⟨pred,
+                magSumS_single_site_lowering_predecessor
+                  τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) := by
+  intro τ
+  exact
+    tasaki23_raising_predecessor_source_sum_lt_of_offA_sub_onA_pos
+      (V := V) (N := N) A v τ (hdiff τ)
+
 /-- **Tasaki §2.5 Theorem 2.3 boundary coefficient as lowerable
 coefficient**: at a lowerable site, the boundary-inclusive positive-source
 coefficient is the explicit lowerable coefficient. -/

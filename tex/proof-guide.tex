@@ -9028,9 +9028,17 @@ The local comparison is also recorded in the difference form
 \]
 It converts positivity of the off-\(A\) attached predecessor
 raising-source sum minus the on-\(A\) attached sum into the strict
-dominance inequality required by the final callback.  This is the form
-that matches the real predecessor source-weight identity before the
-remaining sign estimate is discharged.
+dominance inequality required by the final callback.  Its quantified
+callback form
+\[
+\begin{gathered}
+\texttt{tasaki23\_raising\_predecessor\_source\_sum\_lt\_callback}\\
+\texttt{\_of\_offA\_sub\_onA\_pos}
+\end{gathered}
+\]
+passes this conversion pointwise for every successor configuration.
+This is the form that matches the real predecessor source-weight
+identity before the remaining sign estimate is discharged.
 The corresponding final wrapper
 \[
 \begin{gathered}
