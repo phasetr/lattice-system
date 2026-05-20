@@ -3114,6 +3114,28 @@ theorem
         (V := V) A N hΨ)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 joint sublattice-Casimir eigenspace**:
+the intersection of the maximum `A`- and `¬A`-sublattice Casimir
+eigenspaces.
+
+This names the structural target used by the component-lowering chain,
+where both `Ŝ_A^- Ψ` and `Ŝ_¬A^- Ψ` are compared after being shown to
+remain in the joint maximum sublattice-Casimir eigenspace. -/
+noncomputable def tasaki23JointSublatticeCasimirEigenspace
+    (A : V → Bool) (N : ℕ) : Submodule ℂ ((V → Fin (N + 1)) → ℂ) :=
+  Module.End.eigenspace (sublatticeSpinSquaredS N A).mulVecLin
+      ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+        ((N : ℂ) / 2)) *
+      ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+        ((N : ℂ) / 2)) + 1))
+    ⊓ Module.End.eigenspace
+        (sublatticeSpinSquaredS N (fun x => ! A x)).mulVecLin
+        ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) *
+        ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) + 1))
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS `A`-lowered joint
 sublattice-Casimir eigenspace bridge**: the `A`-sublattice lowering
 component of a predicted toy ground state lies in the joint maximum
@@ -3127,17 +3149,8 @@ theorem
     (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
     (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
     ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
-      Module.End.eigenspace (sublatticeSpinSquaredS N A).mulVecLin
-          ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-            ((N : ℂ) / 2)) *
-          ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-            ((N : ℂ) / 2)) + 1))
-        ⊓ Module.End.eigenspace
-            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVecLin
-            ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-              ((N : ℂ) / 2)) *
-            ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-              ((N : ℂ) / 2)) + 1)) := by
+      tasaki23JointSublatticeCasimirEigenspace (V := V) A N := by
+  unfold tasaki23JointSublatticeCasimirEigenspace
   refine Submodule.mem_inf.mpr ⟨?_, ?_⟩
   · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
     exact
@@ -3162,17 +3175,8 @@ theorem
     (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
     (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
     ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) ∈
-      Module.End.eigenspace (sublatticeSpinSquaredS N A).mulVecLin
-          ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-            ((N : ℂ) / 2)) *
-          ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-            ((N : ℂ) / 2)) + 1))
-        ⊓ Module.End.eigenspace
-            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVecLin
-            ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-              ((N : ℂ) / 2)) *
-            ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-              ((N : ℂ) / 2)) + 1)) := by
+      tasaki23JointSublatticeCasimirEigenspace (V := V) A N := by
+  unfold tasaki23JointSublatticeCasimirEigenspace
   refine Submodule.mem_inf.mpr ⟨?_, ?_⟩
   · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
     exact
@@ -6600,6 +6604,133 @@ theorem
   intro M hM
   have hbounds := (tasaki23GroundStateSectors_mem_iff (V := V) A N M).mp hM
   exact hchain M (by simpa [left] using hbounds.1) (by simpa [right] using hbounds.2)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 interval chain from joint component
+structure**: in the threaded predicted-GS interval induction, the local
+sublattice comparison callback receives the propagated predicted-GS
+membership and the two lowered-component joint sublattice-Casimir
+memberships.
+
+This is the direct consumer-facing form of the PR #3408 joint-eigenspace
+bridges: the remaining strict comparison can now assume exactly the
+structural facts already proved for `Ŝ_A^- Φ` and `Ŝ_¬A^- Φ`. -/
+theorem
+    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_joint_sublattice_component_lt_of_predictedGS
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      ∀ {μ : ℝ}
+        {v : magConfigS V N
+          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+              N) → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N
+                (min
+                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+                  (Finset.card
+                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+                    N) =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hsource_joint_sublattice_component_lt :
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        M <
+          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          ∀ Ψ : (V → Fin (N + 1)) → ℂ,
+            Ψ =
+              magSectorEmbedding
+                (fun τ : magConfigS V N M =>
+                  (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+            Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N →
+            ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
+              tasaki23JointSublatticeCasimirEigenspace (V := V) A N →
+            ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) ∈
+              tasaki23JointSublatticeCasimirEigenspace (V := V) A N →
+            ∀ τ : magConfigS V N (M + 1),
+              -((marshallSignS A τ.1).re *
+                  (((sublatticeSpinSOpMinus N A).mulVec Ψ) τ.1).re) <
+                (marshallSignS A τ.1).re *
+                  (((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ)
+                    τ.1).re) :
+    ∃ μ : ℝ,
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        ∃ v : magConfigS V N M → ℝ,
+          μ < c ∧ (∀ τ, 0 < v τ) ∧
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+          magSectorEmbedding
+              (fun τ : magConfigS V N M =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N := by
+  exact
+    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_sublattice_component_lt_of_predictedGS
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hBA hsector_nonempty hleft_predictedGS
+      (fun {M : ℕ} hM hMlt {μ : ℝ} {v : magConfigS V N M → ℝ}
+          hμ_lt hv_pos hΦ hpred τ => by
+        let Ψ : (V → Fin (N + 1)) → ℂ :=
+          magSectorEmbedding
+            (fun τ : magConfigS V N M =>
+              (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+        have hΨ_def :
+            Ψ =
+              magSectorEmbedding
+                (fun τ : magConfigS V N M =>
+                  (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) := rfl
+        have hpredΨ :
+            Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N := by
+          simpa [Ψ] using hpred
+        have hA_joint :
+            ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
+              tasaki23JointSublatticeCasimirEigenspace (V := V) A N := by
+          simpa [Ψ] using
+            (tasaki23_sublatticeSpinSOpMinus_mem_joint_sublattice_casimir_eigenspace_of_mem_bipartiteToyGroundStateSubspacePredicted
+              (V := V) A N hpred)
+        have hB_joint :
+            ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) ∈
+              tasaki23JointSublatticeCasimirEigenspace (V := V) A N := by
+          simpa [Ψ] using
+            (tasaki23_sublatticeSpinSOpMinus_complement_mem_joint_sublattice_casimir_eigenspace_of_mem_bipartiteToyGroundStateSubspacePredicted
+              (V := V) A N hpred)
+        simpa [Ψ] using
+          (hsource_joint_sublattice_component_lt hM hMlt hμ_lt hv_pos hΦ
+            Ψ hΨ_def hpredΨ hA_joint hB_joint τ))
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 predicted-Casimir energy interval chain**:

@@ -9019,6 +9019,31 @@ just \texttt{Submodule.mem\_inf} applied to the same-side and opposite-side
 Casimir bridges above.  This removes an API layer before the remaining
 pointwise comparison of the Marshall-signed real parts.
 
+\textbf{Joint-component callback}: the joint maximum sublattice-Casimir
+eigenspace used above is now named as
+\[
+\texttt{tasaki23JointSublatticeCasimirEigenspace}.
+\]
+The interval-chain wrapper
+\[
+\begin{gathered}
+\texttt{tasaki23\_energy\_interval\_chain\_with\_predictedGS}\\
+\texttt{\_of\_left\_endpoint\_predictedGS}\\
+\texttt{\_of\_joint\_sublattice\_component\_lt}\\
+\texttt{\_of\_predictedGS}
+\end{gathered}
+\]
+threads, at each successor step, the propagated membership
+\(\Phi\in\mathcal G_{\mathrm{pred}}(A,N)\) together with
+\[
+  \hat S_A^-\Phi,\ \hat S_{\bar A}^-\Phi
+    \in \texttt{tasaki23JointSublatticeCasimirEigenspace}(A,N)
+\]
+into the local comparison callback.  The remaining local task is
+therefore exactly the strict pointwise inequality between the
+Marshall-signed real parts of the two lowered sublattice components,
+under the predicted-GS and joint-Casimir hypotheses already available.
+
 \textbf{Sublattice-component final wrapper}: the final theorem wrapper can
 now consume that sublattice comparison directly.  The Lean theorem
 \[
