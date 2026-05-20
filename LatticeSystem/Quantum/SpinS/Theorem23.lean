@@ -1968,6 +1968,60 @@ theorem tasaki23_raising_predecessor_source_difference_eq_lowered_marshall_compo
   rw [Pi.add_apply, Complex.add_re, mul_add, hon, hoff]
   ring
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowered Marshall positivity from
+predecessor raising-source differences**: positivity of the off-`A`
+minus on-`A` predecessor raising-source difference proves the
+Marshall-positive lowered-vector component.
+
+The proof first rewrites the lowerable attached sums as boundary sums
+and then applies
+`tasaki23_raising_predecessor_source_difference_eq_lowered_marshall_component`.
+This connects the real source-weight difference callback to the
+lowered-sector Marshall-positivity hypothesis used by the adjacent-sector
+energy comparison. -/
+theorem tasaki23_lowered_marshall_pos_of_raising_predecessor_source_difference_pos
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
+    (hdiff :
+      ∀ τ : magConfigS V N (M + 1),
+        0 <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              let predVal : Fin (N + 1) :=
+                ⟨(τ.1 x.1).val - 1, by omega⟩
+              let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+              (spinSOpPlus N predVal (τ.1 x.1)).re *
+                v ⟨pred,
+                  magSumS_single_site_lowering_predecessor
+                    τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) -
+            (((Finset.univ.filter (fun x : V => A x = true)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                let predVal : Fin (N + 1) :=
+                  ⟨(τ.1 x.1).val - 1, by omega⟩
+                let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+                (spinSOpPlus N predVal (τ.1 x.1)).re *
+                  v ⟨pred,
+                    magSumS_single_site_lowering_predecessor
+                      τ x.1 ((Finset.mem_filter.mp x.2).2)⟩))) :
+    ∀ τ : magConfigS V N (M + 1),
+      0 < (marshallSignS A τ.1).re *
+        (((totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun σ : magConfigS V N M =>
+              (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)))) τ.1).re := by
+  intro τ
+  have hτ := hdiff τ
+  rw [
+    tasaki23_raising_predecessor_source_attach_sum_eq_boundary_sum
+      (V := V) (N := N) v τ (Finset.univ.filter (fun x : V => A x = false)),
+    tasaki23_raising_predecessor_source_attach_sum_eq_boundary_sum
+      (V := V) (N := N) v τ (Finset.univ.filter (fun x : V => A x = true)),
+    tasaki23_raising_predecessor_source_difference_eq_lowered_marshall_component
+      A v τ] at hτ
+  exact hτ
+
 /-- **Tasaki §2.5 Theorem 2.3 strict off-`A` lowered sign-sum witness**:
 if at least one site outside `A` can be lowered in the target
 configuration, then the off-`A` filtered signed lowering sum is strictly
