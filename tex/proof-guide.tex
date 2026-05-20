@@ -9105,6 +9105,34 @@ callback at the Theorem 2.3 boundary.  Thus the remaining local
 comparison is isolated under precisely the cross-ladder equation and
 successor-sector joint-Casimir structure already formalised.
 
+\textbf{Unpacked lowered joint cross-ladder callback}: the packed
+membership
+\[
+  \hat S_A^-\Phi,\ \hat S_{\bar A}^-\Phi
+  \in \texttt{tasaki23LoweredJointMagSubspace}(A,N,M)
+\]
+is now unpacked before the local comparison callback is invoked.  The
+extraction lemmas expose, for each lowered component, the two maximum
+sub\-lattice-Casimir eigenvector equations for \((\hat S_A)^2\) and
+\((\hat S_{\bar A})^2\), together with membership in the successor
+magnetization subspace
+\[
+  \texttt{magSubspaceS}\bigl(|\Lambda|N/2-(M+1)\bigr).
+\]
+The interval wrapper
+\[
+\begin{gathered}
+\texttt{tasaki23\_energy\_interval\_chain\_with\_predictedGS}\\
+\texttt{\_of\_left\_endpoint\_predictedGS}\\
+\texttt{\_of\_unpacked\_lowered\_joint\_cross\_ladder}\\
+\texttt{\_component\_lt\_of\_predictedGS}
+\end{gathered}
+\]
+and the corresponding final wrapper pass these unpacked equations
+alongside the raised-lowered cross-ladder identity.  The remaining
+component comparison can therefore work directly with the equations and
+sector support rather than reopening the packed submodule membership.
+
 \textbf{Joint-component callback}: the joint maximum sublattice-Casimir
 eigenspace used above is now named as
 \[

@@ -3428,6 +3428,81 @@ theorem
     norm_num
     ring_nf
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowered joint-magnetization Casimir
+projection**: membership in `tasaki23LoweredJointMagSubspace` exposes
+the joint maximum sublattice-Casimir component.
+
+This is an unpacking lemma for the cross-ladder comparison callback. -/
+theorem tasaki23_mem_joint_sublattice_casimir_eigenspace_of_mem_lowered_joint_magSubspace
+    (A : V → Bool) (N M : ℕ) {w : (V → Fin (N + 1)) → ℂ}
+    (hw : w ∈ tasaki23LoweredJointMagSubspace (V := V) A N M) :
+    w ∈ tasaki23JointSublatticeCasimirEigenspace (V := V) A N := by
+  unfold tasaki23LoweredJointMagSubspace at hw
+  exact (Submodule.mem_inf.mp hw).1
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowered joint-magnetization sector
+projection**: membership in `tasaki23LoweredJointMagSubspace` exposes
+the successor magnetization support.
+
+This is the sector-support companion to
+`tasaki23_mem_joint_sublattice_casimir_eigenspace_of_mem_lowered_joint_magSubspace`. -/
+theorem tasaki23_mem_magSubspaceS_of_mem_lowered_joint_magSubspace
+    (A : V → Bool) (N M : ℕ) {w : (V → Fin (N + 1)) → ℂ}
+    (hw : w ∈ tasaki23LoweredJointMagSubspace (V := V) A N M) :
+    w ∈ magSubspaceS V N
+      (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) := by
+  unfold tasaki23LoweredJointMagSubspace at hw
+  exact (Submodule.mem_inf.mp hw).2
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowered joint-magnetization `A`-Casimir
+equation**: a vector in `tasaki23LoweredJointMagSubspace` satisfies the
+maximum `A`-sublattice Casimir eigenvector identity.
+
+This turns the packed subspace membership used by the interval chain
+into the explicit equation needed by the remaining representation-
+theoretic comparison. -/
+theorem tasaki23_sublatticeSpinSquaredS_eq_of_mem_lowered_joint_magSubspace
+    (A : V → Bool) (N M : ℕ) {w : (V → Fin (N + 1)) → ℂ}
+    (hw : w ∈ tasaki23LoweredJointMagSubspace (V := V) A N M) :
+    (sublatticeSpinSquaredS N A).mulVec w =
+      ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2)) *
+        ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2)) + 1)) • w := by
+  have hjoint :=
+    tasaki23_mem_joint_sublattice_casimir_eigenspace_of_mem_lowered_joint_magSubspace
+      (V := V) A N M hw
+  unfold tasaki23JointSublatticeCasimirEigenspace at hjoint
+  have hA := (Submodule.mem_inf.mp hjoint).1
+  rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hA
+  exact hA
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowered joint-magnetization complement
+Casimir equation**: a vector in `tasaki23LoweredJointMagSubspace`
+satisfies the maximum `¬A`-sublattice Casimir eigenvector identity.
+
+This is the complement-sublattice companion to
+`tasaki23_sublatticeSpinSquaredS_eq_of_mem_lowered_joint_magSubspace`. -/
+theorem tasaki23_sublatticeSpinSquaredS_complement_eq_of_mem_lowered_joint_magSubspace
+    (A : V → Bool) (N M : ℕ) {w : (V → Fin (N + 1)) → ℂ}
+    (hw : w ∈ tasaki23LoweredJointMagSubspace (V := V) A N M) :
+    (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec w =
+      ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) *
+        ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) + 1)) • w := by
+  have hjoint :=
+    tasaki23_mem_joint_sublattice_casimir_eigenspace_of_mem_lowered_joint_magSubspace
+      (V := V) A N M hw
+  unfold tasaki23JointSublatticeCasimirEigenspace at hjoint
+  have hB := (Submodule.mem_inf.mp hjoint).2
+  rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hB
+  exact hB
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS transfer across a non-zero
 real scalar**: if a vector in the predicted toy ground-state subspace is
 a non-zero real scalar multiple of another vector, then the second vector
@@ -7224,6 +7299,166 @@ theorem
             Ψ hΨ_eq hΨ_pred hcross hA_lowered hB_lowered τ)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS interval chain with
+unpacked lowered joint cross-ladder data**: refine the cross-ladder-aware
+callback so it receives the lowered components' explicit sublattice
+Casimir equations and successor-sector support, rather than the packed
+`tasaki23LoweredJointMagSubspace` memberships.
+
+This is the form needed for the remaining representation-theoretic
+comparison: the callback has the cross-ladder equation, the two maximum
+Casimir equations for each lowered component, and the common successor
+magnetization support. -/
+theorem
+    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_unpacked_lowered_joint_cross_ladder_component_lt_of_predictedGS
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      ∀ {μ : ℝ}
+        {v : magConfigS V N
+          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+              N) → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N
+                (min
+                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+                  (Finset.card
+                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+                    N) =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hsource_unpacked_lowered_joint_cross_ladder_component_lt :
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        M <
+          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          ∀ Ψ : (V → Fin (N + 1)) → ℂ,
+            Ψ =
+              magSectorEmbedding
+                (fun τ : magConfigS V N M =>
+                  (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+            Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N →
+            (sublatticeSpinSOpPlus N A).mulVec
+                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) +
+              (sublatticeSpinSOpPlus N (fun x => ! A x)).mulVec
+                ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
+              bipartiteToyMinEnergyPredicted (Λ := V) A N • Ψ -
+                ((2 : ℂ) •
+                  (sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N (fun x => ! A x))).mulVec Ψ →
+            (sublatticeSpinSquaredS N A).mulVec
+                ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
+              ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) *
+                ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) + 1)) •
+                ((sublatticeSpinSOpMinus N A).mulVec Ψ) →
+            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec
+                ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
+              ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) *
+                ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) + 1)) •
+                ((sublatticeSpinSOpMinus N A).mulVec Ψ) →
+            ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
+              magSubspaceS V N
+                (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) →
+            (sublatticeSpinSquaredS N A).mulVec
+                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) =
+              ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) *
+                ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) + 1)) •
+                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) →
+            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec
+                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) =
+              ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) *
+                ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) + 1)) •
+                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) →
+            ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) ∈
+              magSubspaceS V N
+                (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) →
+            ∀ τ : magConfigS V N (M + 1),
+              -((marshallSignS A τ.1).re *
+                  (((sublatticeSpinSOpMinus N A).mulVec Ψ) τ.1).re) <
+                (marshallSignS A τ.1).re *
+                  (((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ)
+                    τ.1).re) :
+    ∃ μ : ℝ,
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        ∃ v : magConfigS V N M → ℝ,
+          μ < c ∧ (∀ τ, 0 < v τ) ∧
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+          magSectorEmbedding
+              (fun τ : magConfigS V N M =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N := by
+  exact
+    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_lowered_joint_cross_ladder_component_lt_of_predictedGS
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hBA hsector_nonempty hleft_predictedGS
+      (fun {M : ℕ} hM hMlt {μ : ℝ} {v : magConfigS V N M → ℝ}
+          hμ_lt hv_pos hΦ Ψ hΨ_eq hΨ_pred hcross hA_lowered hB_lowered τ => by
+        have hA_A :=
+          tasaki23_sublatticeSpinSquaredS_eq_of_mem_lowered_joint_magSubspace
+            (V := V) A N M hA_lowered
+        have hA_B :=
+          tasaki23_sublatticeSpinSquaredS_complement_eq_of_mem_lowered_joint_magSubspace
+            (V := V) A N M hA_lowered
+        have hA_mag :=
+          tasaki23_mem_magSubspaceS_of_mem_lowered_joint_magSubspace
+            (V := V) A N M hA_lowered
+        have hB_A :=
+          tasaki23_sublatticeSpinSquaredS_eq_of_mem_lowered_joint_magSubspace
+            (V := V) A N M hB_lowered
+        have hB_B :=
+          tasaki23_sublatticeSpinSquaredS_complement_eq_of_mem_lowered_joint_magSubspace
+            (V := V) A N M hB_lowered
+        have hB_mag :=
+          tasaki23_mem_magSubspaceS_of_mem_lowered_joint_magSubspace
+            (V := V) A N M hB_lowered
+        exact
+          hsource_unpacked_lowered_joint_cross_ladder_component_lt hM hMlt hμ_lt
+            hv_pos hΦ Ψ hΨ_eq hΨ_pred hcross hA_A hA_B hA_mag hB_A hB_B
+            hB_mag τ)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 predicted-Casimir energy interval chain**:
 in the canonical orientation `|¬A| ≤ |A|`, choose the left endpoint sector
 by the per-sector Theorem 2.2 wrapper and propagate its energy through the
@@ -10132,6 +10367,159 @@ theorem
               (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) τ
         rw [honA, hoffA]
         simpa using hcoeff)
+      hsector_min
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 final wrapper from unpacked lowered joint
+cross-ladder data**: the final theorem may consume the local strict
+comparison callback after the lowered joint-magnetization memberships
+have been unpacked into explicit sublattice-Casimir equations and
+successor-sector support.
+
+This is the final-theorem counterpart of
+`tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_unpacked_lowered_joint_cross_ladder_component_lt_of_predictedGS`. -/
+theorem
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_lowered_joint_cross_ladder_component_lt_of_sector_minimality
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      ∀ {μ : ℝ}
+        {v : magConfigS V N
+          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+              N) → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N
+                (min
+                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+                  (Finset.card
+                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+                    N) =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hsource_unpacked_lowered_joint_cross_ladder_component_lt :
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        M <
+          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          ∀ Ψ : (V → Fin (N + 1)) → ℂ,
+            Ψ =
+              magSectorEmbedding
+                (fun τ : magConfigS V N M =>
+                  (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+            Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N →
+            (sublatticeSpinSOpPlus N A).mulVec
+                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) +
+              (sublatticeSpinSOpPlus N (fun x => ! A x)).mulVec
+                ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
+              bipartiteToyMinEnergyPredicted (Λ := V) A N • Ψ -
+                ((2 : ℂ) •
+                  (sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N (fun x => ! A x))).mulVec Ψ →
+            (sublatticeSpinSquaredS N A).mulVec
+                ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
+              ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) *
+                ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) + 1)) •
+                ((sublatticeSpinSOpMinus N A).mulVec Ψ) →
+            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec
+                ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
+              ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) *
+                ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) + 1)) •
+                ((sublatticeSpinSOpMinus N A).mulVec Ψ) →
+            ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
+              magSubspaceS V N
+                (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) →
+            (sublatticeSpinSquaredS N A).mulVec
+                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) =
+              ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) *
+                ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) + 1)) •
+                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) →
+            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec
+                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) =
+              ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) *
+                ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+                  ((N : ℂ) / 2)) + 1)) •
+                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) →
+            ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) ∈
+              magSubspaceS V N
+                (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) →
+            ∀ τ : magConfigS V N (M + 1),
+              -((marshallSignS A τ.1).re *
+                  (((sublatticeSpinSOpMinus N A).mulVec Ψ) τ.1).re) <
+                (marshallSignS A τ.1).re *
+                  (((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ)
+                    τ.1).re)
+    (hsector_min :
+      ∀ {μ : ℝ},
+        (∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+          ∃ v : magConfigS V N M → ℝ,
+            μ < c ∧ (∀ τ, 0 < v τ) ∧
+            (heisenbergHamiltonianS J N).mulVec
+                (magSectorEmbedding
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+              (μ : ℂ) • magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) →
+        ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+          ∀ {μ' : ℝ} {Φ : magConfigS V N M → ℂ},
+            Φ ≠ 0 →
+            (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φ =
+              (μ' : ℂ) • Φ →
+            μ ≤ μ') :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  exact
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_lowered_joint_cross_ladder_component_lt_of_sector_minimality
+      A N c hBA hsector_nonempty hleft_predictedGS
+      (by
+        intro M hM hMlt μ v hμ_lt hv_pos hΦ Ψ hΨ_eq hΨ_pred hcross hA_lowered hB_lowered τ
+        have hA_A :=
+          tasaki23_sublatticeSpinSquaredS_eq_of_mem_lowered_joint_magSubspace
+            (V := V) A N M hA_lowered
+        have hA_B :=
+          tasaki23_sublatticeSpinSquaredS_complement_eq_of_mem_lowered_joint_magSubspace
+            (V := V) A N M hA_lowered
+        have hA_mag :=
+          tasaki23_mem_magSubspaceS_of_mem_lowered_joint_magSubspace
+            (V := V) A N M hA_lowered
+        have hB_A :=
+          tasaki23_sublatticeSpinSquaredS_eq_of_mem_lowered_joint_magSubspace
+            (V := V) A N M hB_lowered
+        have hB_B :=
+          tasaki23_sublatticeSpinSquaredS_complement_eq_of_mem_lowered_joint_magSubspace
+            (V := V) A N M hB_lowered
+        have hB_mag :=
+          tasaki23_mem_magSubspaceS_of_mem_lowered_joint_magSubspace
+            (V := V) A N M hB_lowered
+        exact
+          hsource_unpacked_lowered_joint_cross_ladder_component_lt hM hMlt hμ_lt
+            hv_pos hΦ Ψ hΨ_eq hΨ_pred hcross hA_A hA_B hA_mag hB_A hB_B
+            hB_mag τ)
       hsector_min
 
 set_option linter.style.longLine false in
