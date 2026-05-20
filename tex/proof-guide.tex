@@ -8873,8 +8873,13 @@ and
 \]
 allow the remaining dominance callback to be stated directly in terms of
 the positive real source coefficients \(v_{\tau^{x-}}\).
+Lean first names the explicit lowerable branch and records that the
+boundary-inclusive coefficient agrees with it at lowerable sites:
+\[
+\texttt{tasaki23\_positive\_source\_coefficient\_eq\_lowerable\_coefficient}.
+\]
 Since the boundary-inclusive coefficient is zero when \(\tau_x=0\), Lean
-also records the lowerable-site restriction
+also records the finite-sum lowerable-site restriction
 \[
 \texttt{tasaki23\_positive\_source\_coefficient\_sum\_eq\_lowerable\_sum}.
 \]
