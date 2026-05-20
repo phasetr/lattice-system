@@ -9177,6 +9177,32 @@ step; it can compare the two successor-sector restrictions using the
 filtered \(A\) and \(\bar A\) raising sums and the already-unpacked
 sublattice-Casimir equations.
 
+\textbf{Sublattice \(S^3\) source weights}: the right-hand side of the
+same source-sector identity also contains
+\(\hat S_A^3\hat S_{\bar A}^3\Phi\).  The local diagonal bridge
+\begin{Verbatim}
+onSiteS_spinSOp3_mulVec_apply
+\end{Verbatim}
+states that \(\hat S_x^3\) acts on a configuration \(\sigma\) by the
+scalar \(N/2-\sigma_x\).  Summing this identity over the two Boolean
+sublattices gives
+\begin{Verbatim}
+sublatticeSpinSOp3_mulVec_apply_eq_onA_weight
+sublatticeSpinSOp3_complement_mulVec_apply_eq_offA_weight
+\end{Verbatim}
+and applying the two diagonal actions in sequence gives
+\begin{Verbatim}
+sublatticeSpinSOp3_mul_complement_mulVec_apply_eq_onA_offA_weight
+\end{Verbatim}
+Thus the source-sector component of
+\(\hat S_A^3\hat S_{\bar A}^3\Phi\) is
+\[
+  \left(\sum_{x\in A}\left(\frac N2-\sigma_x\right)\right)
+  \left(\sum_{x\notin A}\left(\frac N2-\sigma_x\right)\right)\Phi_\sigma,
+\]
+which turns the non-ladder term in the re-embedded cross-ladder equation
+into an explicit scalar multiple of the source coefficient.
+
 \textbf{Joint-component callback}: the joint maximum sublattice-Casimir
 eigenspace used above is now named as
 \[
