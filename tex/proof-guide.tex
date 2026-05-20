@@ -8850,6 +8850,30 @@ and
 show strict positivity at lowerable sites and non-negativity in the
 boundary-inclusive convention.
 
+Lean also packages this sign-normalized quantity as
+\[
+\texttt{tasaki23LoweringPredecessorPositiveSourceCoefficient}.
+\]
+The bridge
+\[
+\texttt{tasaki23\_lowering\_predecessor\_signed\_coefficient\_eq\_positive\_source\_coefficient}
+\]
+identifies the original signed predecessor coefficient for the
+Marshall-signed source vector with this positive-source coefficient, and
+\[
+\texttt{tasaki23\_lowering\_predecessor\_coefficient\_sum\_eq\_positive\_source\_sum}
+\]
+does the same for finite site sums.  Thus
+\[
+\texttt{tasaki23\_signed\_lowering\_site\_sum\_pos\_of\_positive\_source\_coefficient\_lt}
+\]
+and
+\[
+\texttt{tasaki23\_lowered\_marshall\_pos\_of\_positive\_source\_coefficient\_lt}
+\]
+allow the remaining dominance callback to be stated directly in terms of
+the positive real source coefficients \(v_{\tau^{x-}}\).
+
 \textbf{Lowered coefficient dominance bridge}: the coefficient split
 also gives the direct callback form used by the lowered Marshall
 positivity wrappers.  Since the on-\(A\) signed contribution is
