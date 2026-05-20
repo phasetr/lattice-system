@@ -9061,6 +9061,27 @@ wrapper can now assume the strict component inequality only in the
 context where predicted-GS membership and the two joint-Casimir
 memberships have already been provided.
 
+\textbf{Joint-coefficient final wrapper}: the Lean theorem
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint\_threaded}\\
+\texttt{\_predictedGS\_of\_joint\_sublattice\_coefficient\_lt}\\
+\texttt{\_of\_sector\_minimality}
+\end{gathered}
+\]
+lowers the same final callback from operator components to the
+predecessor coefficient sums.  The callback still receives the
+predicted-GS membership of the source vector and the two joint
+sublattice-Casimir memberships for \(\hat S_A^-\Phi\) and
+\(\hat S_{\bar A}^-\Phi\).  It then proves the strict inequality
+between the on-\(A\) and off-\(A\) predecessor coefficient sums.  The
+wrapper rewrites this coefficient inequality using
+\texttt{tasaki23\_signed\_lowering\_onA\_sublattice\_component\_eq\_neg\_coefficient\_sum}
+and
+\texttt{tasaki23\_signed\_lowering\_offA\_sublattice\_component\_eq\_coefficient\_sum},
+obtaining the joint-component comparison required by the preceding
+final wrapper.
+
 \textbf{Sublattice-component final wrapper}: the final theorem wrapper can
 now consume that sublattice comparison directly.  The Lean theorem
 \[
