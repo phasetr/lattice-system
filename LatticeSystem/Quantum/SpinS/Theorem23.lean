@@ -3053,6 +3053,66 @@ theorem
       (tasaki23_sublatticeSpinSquaredS_complement_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
         (V := V) A N hΨ)
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS `A`-lowered complement
+sublattice-Casimir bridge**: the `A`-sublattice lowering component of
+a predicted toy ground state also remains in the maximum complement
+sublattice-Casimir eigenspace.
+
+Together with
+`tasaki23_sublatticeSpinSquaredS_sublatticeSpinSOpMinus_of_mem_bipartiteToyGroundStateSubspacePredicted`,
+this places `Ŝ_A^- Ψ` in the joint maximum sublattice-Casimir
+eigenspace needed for the remaining component comparison. -/
+theorem
+    tasaki23_sublatticeSpinSquaredS_complement_sublatticeSpinSOpMinus_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (sublatticeSpinSquaredS N (fun x => !A x)).mulVec
+        ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
+      ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) *
+        ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
+          ((N : ℂ) / 2)) + 1)) • ((sublatticeSpinSOpMinus N A).mulVec Ψ) := by
+  have hcomm :
+      Commute (sublatticeSpinSquaredS N (fun x => ! A x))
+        (sublatticeSpinSOpMinus N A) := by
+    simpa using
+      (sublatticeSpinSquaredS_commute_sublatticeSpinSOpMinus_complement
+        N (fun x : V => ! A x))
+  exact
+    mulVec_preserves_eigenvalue_of_commuteS_ladder
+      N hcomm
+      (tasaki23_sublatticeSpinSquaredS_complement_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΨ)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS complement-lowered `A`
+sublattice-Casimir bridge**: the `¬A`-sublattice lowering component of
+a predicted toy ground state also remains in the maximum `A`-sublattice
+Casimir eigenspace.
+
+Together with
+`tasaki23_sublatticeSpinSquaredS_complement_sublatticeSpinSOpMinus_complement_of_mem_bipartiteToyGroundStateSubspacePredicted`,
+this places `Ŝ_¬A^- Ψ` in the joint maximum sublattice-Casimir
+eigenspace needed for the remaining component comparison. -/
+theorem
+    tasaki23_sublatticeSpinSquaredS_sublatticeSpinSOpMinus_complement_of_mem_bipartiteToyGroundStateSubspacePredicted
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (sublatticeSpinSquaredS N A).mulVec
+        ((sublatticeSpinSOpMinus N (fun x => !A x)).mulVec Ψ) =
+      ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2)) *
+        ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
+          ((N : ℂ) / 2)) + 1)) •
+        ((sublatticeSpinSOpMinus N (fun x => !A x)).mulVec Ψ) := by
+  exact
+    mulVec_preserves_eigenvalue_of_commuteS_ladder
+      N
+      (sublatticeSpinSquaredS_commute_sublatticeSpinSOpMinus_complement N A)
+      (tasaki23_sublatticeSpinSquaredS_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+        (V := V) A N hΨ)
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS transfer across a non-zero
 real scalar**: if a vector in the predicted toy ground-state subspace is
 a non-zero real scalar multiple of another vector, then the second vector
