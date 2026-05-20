@@ -3029,6 +3029,32 @@ theorem
   rw [Matrix.add_mulVec]
   simp [Matrix.smul_mulVec]
 
+/-- **Tasaki §2.5 Theorem 2.3 predicted-GS sequential cross-ladder
+identity**: the isolated cross-ladder sum can be read as the sum of the
+two sequential actions `Ŝ_A^+ (Ŝ_¬A^- Ψ)` and
+`Ŝ_A^- (Ŝ_¬A^+ Ψ)`.
+
+This is the component-comparison form of the predicted-GS cross-ladder
+constraint: it exposes the two lowered pieces that the remaining
+Marshall-positivity argument compares. -/
+theorem
+    tasaki23_cross_ladder_sequential_mulVec_eq_energy_sub_two_op3_of_predictedGS
+    (A : V → Bool) (N : ℕ) {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :
+    (sublatticeSpinSOpPlus N A).mulVec
+        ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) +
+      (sublatticeSpinSOpMinus N A).mulVec
+        ((sublatticeSpinSOpPlus N (fun x => ! A x)).mulVec Ψ) =
+      bipartiteToyMinEnergyPredicted (Λ := V) A N • Ψ -
+        ((2 : ℂ) •
+          (sublatticeSpinSOp3 N A * sublatticeSpinSOp3 N (fun x => ! A x))).mulVec Ψ := by
+  rw [← tasaki23_cross_ladder_sum_mulVec_eq_energy_sub_two_op3_of_predictedGS
+    (V := V) A N hΨ]
+  ext σ
+  rw [Matrix.add_mulVec]
+  rw [Matrix.mulVec_mulVec]
+  rw [Matrix.mulVec_mulVec]
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS lowering closure**:
 if a full spin-`S` vector lies in the predicted toy ground-state
 subspace, then its total-lowering image also lies in that subspace.
