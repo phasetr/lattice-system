@@ -9044,6 +9044,23 @@ therefore exactly the strict pointwise inequality between the
 Marshall-signed real parts of the two lowered sublattice components,
 under the predicted-GS and joint-Casimir hypotheses already available.
 
+\textbf{Joint-component final wrapper}: the Lean theorem
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint\_threaded}\\
+\texttt{\_predictedGS\_of\_joint\_sublattice\_component\_lt}\\
+\texttt{\_of\_sector\_minimality}
+\end{gathered}
+\]
+exposes the same local callback at the final theorem boundary.  It
+invokes the joint-component interval chain above, discards the threaded
+predicted-GS field after extracting the common sector energy, and then
+uses the existing sector-minimality bridge to supply the global
+minimality clause in the final Theorem 2.3 statement.  Thus the final
+wrapper can now assume the strict component inequality only in the
+context where predicted-GS membership and the two joint-Casimir
+memberships have already been provided.
+
 \textbf{Sublattice-component final wrapper}: the final theorem wrapper can
 now consume that sublattice comparison directly.  The Lean theorem
 \[
