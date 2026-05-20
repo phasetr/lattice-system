@@ -7756,8 +7756,13 @@ for arbitrary full spin-$S$ vectors.  Hence
 \(\hat S^{(3)}_{\rm tot}\)-eigenspace with eigenvalue
 \(|V|N/2 - M\), and
 \texttt{magSubspaceS\_apply\_eq\_zero\_of\_magSumS\_ne} gives the converse
-support statement.  Combining these with the existing commutator
-shift lemma for \(\hat S^-_{\rm tot}\) proves
+support statement.  The re-embedding bridge
+\texttt{magSectorEmbedding\_magSectorRestriction\_of\_mem\_magSubspaceS}
+then says that any full vector in this eigenspace is exactly the
+zero-extension of its sector restriction, so later component arguments
+can reuse the sector-embedding formulas for vectors obtained from
+successor \texttt{magSubspaceS} support.  Combining these with the
+existing commutator shift lemma for \(\hat S^-_{\rm tot}\) proves
 \[
   \hat S^-_{\rm tot}\,
     \mathrm{magSectorEmbedding}(\Phi_M)
