@@ -9330,6 +9330,39 @@ site \(x\).  This is the same source configuration used in
 \texttt{tasaki23LoweringPredecessorSignedCoefficient}, so the
 source-weight equation is now aligned with the coefficient comparison
 over successor configurations and sites.
+For a Marshall-positive sector embedding
+\(\Psi(\rho)=\operatorname{sgn}_A(\rho)v_\rho\), Lean also records the
+real-part form of this predecessor right-hand side:
+\[
+\begin{gathered}
+\texttt{tasaki23\_cross\_ladder\_reembedded\_source\_weight}\\
+\texttt{\_lowering\_predecessor\_rhs\_re\_eq}.
+\end{gathered}
+\]
+It rewrites
+\[
+  \operatorname{Re}\bigl((E_{\rm toy}-2W_A(\rho)W_{\bar A}(\rho))
+    \Psi(\rho)\bigr)
+\]
+as
+\[
+  \bigl(E_{\rm toy}^{\rm re}-2W_A(\rho)W_{\bar A}(\rho)\bigr)
+  \operatorname{sgn}_A(\rho)_{\rm re}v_\rho,
+\]
+where the two \(W\)-terms are the real filtered sums of
+\(N/2-\rho_y\).  This is the real scalar form needed before comparing
+positive-source predecessor coefficients.
+The companion theorem
+\[
+\begin{gathered}
+\texttt{tasaki23\_cross\_ladder\_reembedded\_source\_weight}\\
+\texttt{\_lowering\_predecessor\_re\_eq}
+\end{gathered}
+\]
+applies this RHS rewrite after taking real parts of the full
+predecessor source-weight equality.  It exposes the real part of the
+two filtered raising sums as the same real scalar coefficient times the
+Marshall-signed positive source coefficient at \(\rho\).
 The final callback boundary is updated by
 \begin{Verbatim}
 tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_reembedded_source_weight_coefficient_lt_of_sector_minimality
