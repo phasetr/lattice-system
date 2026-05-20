@@ -3325,6 +3325,51 @@ theorem
   rw [sublatticeSpinSOp3_complement_mulVec_apply_eq_offA_weight]
   ring
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 re-embedded cross-ladder source-weight RHS**:
+the re-embedded source-sector cross-ladder site-sum identity can be
+rewritten with the explicit `Ŝ_A^3 Ŝ_¬A^3` source-weight product on the
+right-hand side.
+
+This substitutes the diagonal `S^3` source-weight evaluation into the
+non-ladder term, leaving a scalar multiple of the source coefficient
+`Ψ σ`. -/
+theorem
+    tasaki23_cross_ladder_reembedded_source_site_sum_eq_energy_sub_two_sublattice_weight_product_of_predictedGS
+    (A : V → Bool) (N : ℕ) {M : ℕ} {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hA_mag :
+      ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
+        magSubspaceS V N
+          (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)))
+    (hB_mag :
+      ((sublatticeSpinSOpMinus N (fun x => !A x)).mulVec Ψ) ∈
+        magSubspaceS V N
+          (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)))
+    (σ : magConfigS V N M) :
+    (∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+        ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding
+            (magSectorRestriction (M := M + 1)
+              ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ)))) σ.1) +
+      ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+        ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
+          (magSectorEmbedding
+            (magSectorRestriction (M := M + 1)
+              ((sublatticeSpinSOpMinus N A).mulVec Ψ)))) σ.1 =
+      (bipartiteToyMinEnergyPredicted (Λ := V) A N -
+        (2 : ℂ) *
+          ((∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
+              ((N : ℂ) / 2 - ((σ.1 x).val : ℂ))) *
+            (∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
+              ((N : ℂ) / 2 - ((σ.1 x).val : ℂ))))) * Ψ σ.1 := by
+  rw [tasaki23_cross_ladder_reembedded_source_site_sum_eq_energy_sub_two_op3_of_predictedGS
+    (V := V) A N hΨ hA_mag hB_mag σ]
+  rw [Pi.sub_apply, Pi.smul_apply, Matrix.smul_mulVec, Pi.smul_apply]
+  rw [sublatticeSpinSOp3_mul_complement_mulVec_apply_eq_onA_offA_weight]
+  simp [smul_eq_mul]
+  ring_nf
+
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS lowering closure**:
 if a full spin-`S` vector lies in the predicted toy ground-state
 subspace, then its total-lowering image also lies in that subspace.
