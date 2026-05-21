@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23Interval
+import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 
 /-!
 # Tasaki §2.5 Theorem 2.3 outside-ground API
