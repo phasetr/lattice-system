@@ -8699,6 +8699,21 @@ complex sector bridge, so the remaining spectral input for the final
 global-minimality argument is only the estimate \(\mu\le\mu_M\) for the
 Marshall-positive Theorem 2.2 ground state in each outside sector.
 
+The corresponding common-energy final wrapper is
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_common\_energy\_chain}\\
+\texttt{\_and\_outside\_sector\_ground\_energy\_lower\_bound}.
+\end{gathered}
+\]
+Once the adjacent-sector chain has produced a common energy \(\mu\)
+on the admissible interval, this wrapper uses the sector-minimality
+package above and then the sector-to-global minimality bridge.  Thus
+the final full-space theorem can be reached from the common-energy
+chain while leaving only outside-sector estimates of the form
+\(\mu\le\mu_M\) for the Marshall-positive representatives supplied by
+the sector Theorem 2.2 wrapper.
+
 \textbf{Lowered vector Marshall-positivity final wrappers}: the
 site-sum formulation is only a technical expansion of the total lowering
 operator.  Lean therefore also records the reverse conversion

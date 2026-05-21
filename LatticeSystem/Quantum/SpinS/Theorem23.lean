@@ -10543,6 +10543,63 @@ theorem tasaki_2_5_theorem_2_3_of_common_energy_chain
     exact ⟨by rw [hμ'_eq_μM, ← hμ_eq_μM], hr⟩
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 final wrapper from common interval energy and
+outside-sector ground energies**: once the adjacent-sector chain has
+produced a common Marshall-positive energy on the admissible interval, it
+is enough to prove lower bounds only for the Marshall-positive
+ground-state representatives in outside sectors.
+
+The sector-minimality bridge packages the admissible and outside sectors,
+and the global-minimality bridge then supplies the final full-space
+minimality callback required by the textbook statement. -/
+theorem
+    tasaki_2_5_theorem_2_3_of_common_energy_chain_and_outside_sector_ground_energy_lower_bound
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {μ : ℝ}
+    (hcommon :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        ∃ v : magConfigS V N M → ℝ,
+          μ < c ∧ (∀ τ, 0 < v τ) ∧
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (houtside_ground_energy_lower :
+      ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+        M ∉ tasaki23GroundStateSectors (V := V) A N →
+        ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+          μM < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μM : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          μ ≤ μM) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro _hJ_real _hJ_real' _hJ_sym _hJ_nn _hJ_bipartite _hJ_pos
+    _hc_strict _h_intermediate hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_common_energy_chain
+      A N c hcommon
+      (tasaki23_global_minimality_of_sector_minimality N
+        (tasaki23_sector_minimality_of_common_energy_chain_and_outside_sector_ground_energy_lower_bound
+          A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+          hc_strict h_intermediate hcommon houtside_ground_energy_lower))
+      hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
+      hc_strict h_intermediate hA_nonempty hnotA_nonempty
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 conditional final wrapper**:
 under the canonical orientation `|¬A| ≤ |A|`, the predicted-GS
 left-endpoint interval chain supplies one common energy `μ` on every
