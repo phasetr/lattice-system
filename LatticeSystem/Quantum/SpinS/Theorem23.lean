@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23Predicted
-import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
+import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceEnergy
 
 
 /-!
