@@ -69,6 +69,12 @@ the following on-disk files and obey their instructions:
   to discover them. If a TeX build still reports `no writeable cache path`,
   first fix `TEXMFSYSVAR` / `TEXMFCACHE` / absolute cache paths and rerun
   sandboxed instead of stopping for a TeX approval prompt.
+  For `tex/proof-guide.tex`, use `latexmk -g -pdf proof-guide.tex` as the
+  routine verification command: the document does not use Lua-only packages,
+  and TeX Live 2026 LuaHBTeX/luaotfload can mis-detect writable cache
+  directories even when `TEXMFCACHE` resolves to a writable absolute path.
+  Keep the LuaLaTeX cache command above for TeX files that actually depend on
+  LuaTeX or LuaTeX-ja.
   Codex/Codex CLI agents must run `codex exec ...` cross-checks with the
   environment's escalation mechanism on the first attempt, not after a failed
   sandboxed attempt, and persist a scoped `codex exec` approval rule when

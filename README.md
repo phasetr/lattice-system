@@ -62,11 +62,15 @@ LaTeX source files. To compile:
 
 ```sh
 cd tex
-latexmk -lualatex -f -interaction=nonstopmode proof-guide.tex
+latexmk -pdf proof-guide.tex
 ```
 
-Requires a TeX Live installation with LuaLaTeX. PDFs are not committed
-to the repository.
+Requires a TeX Live installation. The public proof guide currently uses
+portable LaTeX packages and is verified with pdfLaTeX. LuaLaTeX remains
+appropriate for documents that actually use LuaTeX/LuaTeX-ja features, but
+TeX Live 2026 LuaHBTeX/luaotfload can mis-detect writable cache directories
+on some sandboxed runs even when `TEXMFCACHE` points at a writable absolute
+path. PDFs are not committed to the repository.
 
 | File                  | Description                                       |
 |-----------------------|---------------------------------------------------|
