@@ -8670,6 +8670,21 @@ Perron--Frobenius comparison used above for the shifted dressed real
 sector matrix; see Seneta, \emph{Non-negative Matrices and Markov
 Chains}, 3rd ed., Springer 2006, \S1.2, pp.~27--28.
 
+The outside-sector callback is further reduced by
+\[
+\begin{gathered}
+\texttt{tasaki23\_outside\_real\_sector\_minimality}\\
+\texttt{\_of\_outside\_sector\_ground\_energy\_lower\_bound}.
+\end{gathered}
+\]
+For an outside sector \(M\), the per-sector Theorem 2.2 wrapper supplies
+a Marshall-positive sector ground state at energy \(\mu_M<c\).  The
+same shifted dressed real-sector Perron--Frobenius comparison gives
+\(\mu_M\le \mu'\) for every nonzero real-form eigenvector in that
+sector.  Hence the final outside-sector task may focus only on proving
+\(\mu\le\mu_M\) for these Theorem 2.2 ground-state representatives,
+rather than for arbitrary real eigenvectors directly.
+
 \textbf{Lowered vector Marshall-positivity final wrappers}: the
 site-sum formulation is only a technical expansion of the total lowering
 operator.  Lean therefore also records the reverse conversion
