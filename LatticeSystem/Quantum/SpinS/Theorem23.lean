@@ -14432,6 +14432,111 @@ theorem
       hc_strict h_intermediate hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint predicted-GS site-sum final
+wrapper from sector minimality**: this packages the direct lowered
+site-sum interval chain into the final theorem while requiring predicted
+toy ground-state membership only at the left endpoint.
+
+This is the final-wrapper counterpart of
+`tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_lowered_site_sum_pos`.
+It is the direct site-sum analogue of the lowered-Marshall final wrapper
+used later in the chain. -/
+theorem
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_lowered_site_sum_pos_of_sector_minimality
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      ∀ {μ : ℝ}
+        {v : magConfigS V N
+          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+              N) → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N
+                (min
+                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+                  (Finset.card
+                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+                    N) =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hsource_site_sum_pos :
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        M <
+          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          ∀ τ : magConfigS V N (M + 1),
+            0 < (marshallSignS A τ.1).re *
+              (∑ x : V,
+                (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+                  (magSectorEmbedding
+                    (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re))
+    (hsector_min :
+      ∀ {μ : ℝ},
+        (∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+          ∃ v : magConfigS V N M → ℝ,
+            μ < c ∧ (∀ τ, 0 < v τ) ∧
+            (heisenbergHamiltonianS J N).mulVec
+                (magSectorEmbedding
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+              (μ : ℂ) • magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) →
+        ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+          ∀ {μ' : ℝ} {Φ : magConfigS V N M → ℂ},
+            Φ ≠ 0 →
+            (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φ =
+              (μ' : ℂ) • Φ →
+            μ ≤ μ') :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
+    hc_strict h_intermediate hA_nonempty hnotA_nonempty
+  obtain ⟨μ, hcommon_pred⟩ :=
+    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_lowered_site_sum_pos
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hBA hsector_nonempty hleft_predictedGS
+      hsource_site_sum_pos
+  have hcommon :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        ∃ v : magConfigS V N M → ℝ,
+          μ < c ∧ (∀ τ, 0 < v τ) ∧
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) := by
+    intro M hM
+    obtain ⟨v, hμ_lt, hv_pos, hΦ, _hpred⟩ := hcommon_pred M hM
+    exact ⟨v, hμ_lt, hv_pos, hΦ⟩
+  exact
+    tasaki_2_5_theorem_2_3_of_common_energy_chain
+      A N c hcommon
+      (tasaki23_global_minimality_of_sector_minimality N
+        (hsector_min hcommon))
+      hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
+      hc_strict h_intermediate hA_nonempty hnotA_nonempty
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 final wrapper from lowered vector Marshall
 positivity**: this replaces the direct site-sum positivity callback by
 the natural vector-level Marshall positivity of the lowered ladder image
