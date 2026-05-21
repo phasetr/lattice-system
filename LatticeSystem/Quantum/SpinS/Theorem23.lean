@@ -10089,6 +10089,47 @@ theorem tasaki23_sector_minimality_of_real_sector_minimality
         N hJ_real hΦ_eigen)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 common-energy chain callback**:
+the adjacent-sector chain has produced one real energy `μ` realised by a
+strictly positive Marshall representative in every admissible
+`tasaki23GroundStateSectors` sector.
+
+This names the central interval-chain output used by the final global
+minimality wrappers. -/
+def tasaki23CommonEnergyChain
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c μ : ℝ) : Prop :=
+  ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+    ∃ v : magConfigS V N M → ℝ,
+      μ < c ∧ (∀ τ, 0 < v τ) ∧
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μ : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-sector ground-energy lower callback**:
+for each nonempty sector outside the admissible interval, the common energy
+`μ` is no larger than the Marshall-positive sector ground-representative
+energy supplied by the per-sector Theorem 2.2 wrapper.
+
+The Perron-Frobenius bridge turns this callback into a full outside-sector
+real spectral lower bound. -/
+def tasaki23OutsideGroundEnergyLowerCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c μ : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    M ∉ tasaki23GroundStateSectors (V := V) A N →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      μ ≤ μM
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 real-sector lower bound on admissible
 sectors**: once the common-energy chain has produced a Marshall-positive
 sector representative at energy `μ` in an admissible sector, the
@@ -10107,15 +10148,7 @@ theorem tasaki23_real_sector_minimality_on_groundStateSectors_of_common_energy_c
     (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
     (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
     {μ : ℝ}
-    (hcommon :
-      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-        ∃ v : magConfigS V N M → ℝ,
-          μ < c ∧ (∀ τ, 0 < v τ) ∧
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) :
+    (hcommon : tasaki23CommonEnergyChain (V := V) A J N c μ) :
     ∀ M : ℕ, M ∈ tasaki23GroundStateSectors (V := V) A N →
       [Nonempty (magConfigS V N M)] →
         ∀ {μ' : ℝ} {φ : magConfigS V N M → ℝ},
@@ -10176,17 +10209,7 @@ theorem tasaki23_outside_real_sector_minimality_of_outside_sector_ground_energy_
       ∃ z, A z ≠ A x ∧ (τ z).val < N)
     {μ : ℝ}
     (houtside_ground_energy_lower :
-      ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
-        M ∉ tasaki23GroundStateSectors (V := V) A N →
-        ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
-          μM < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μM : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          μ ≤ μM) :
+      tasaki23OutsideGroundEnergyLowerCallback (V := V) A J N c μ) :
     ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
       M ∉ tasaki23GroundStateSectors (V := V) A N →
       ∀ {μ' : ℝ} {φ : magConfigS V N M → ℝ},
@@ -10253,27 +10276,9 @@ theorem
     (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
       ∃ z, A z ≠ A x ∧ (τ z).val < N)
     {μ : ℝ}
-    (hcommon :
-      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-        ∃ v : magConfigS V N M → ℝ,
-          μ < c ∧ (∀ τ, 0 < v τ) ∧
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (hcommon : tasaki23CommonEnergyChain (V := V) A J N c μ)
     (houtside_ground_energy_lower :
-      ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
-        M ∉ tasaki23GroundStateSectors (V := V) A N →
-        ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
-          μM < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μM : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          μ ≤ μM) :
+      tasaki23OutsideGroundEnergyLowerCallback (V := V) A J N c μ) :
     ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
       ∀ {μ' : ℝ} {Φ : magConfigS V N M → ℂ},
         Φ ≠ 0 →
@@ -10305,15 +10310,7 @@ used to construct the common sector energy. -/
 theorem tasaki_2_5_theorem_2_3_of_common_energy_chain
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
     {μ : ℝ}
-    (hcommon :
-      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-        ∃ v : magConfigS V N M → ℝ,
-          μ < c ∧ (∀ τ, 0 < v τ) ∧
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (hcommon : tasaki23CommonEnergyChain (V := V) A J N c μ)
     (hglobal_min :
       ∀ {μ' : ℝ} {Ψ' : (V → Fin (N + 1)) → ℂ},
         Ψ' ≠ 0 →
@@ -10379,27 +10376,9 @@ theorem
     (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
       ∃ z, A z ≠ A x ∧ (τ z).val < N)
     {μ : ℝ}
-    (hcommon :
-      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-        ∃ v : magConfigS V N M → ℝ,
-          μ < c ∧ (∀ τ, 0 < v τ) ∧
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (hcommon : tasaki23CommonEnergyChain (V := V) A J N c μ)
     (houtside_ground_energy_lower :
-      ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
-        M ∉ tasaki23GroundStateSectors (V := V) A N →
-        ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
-          μM < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μM : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          μ ≤ μM) :
+      tasaki23OutsideGroundEnergyLowerCallback (V := V) A J N c μ) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c := by
   intro _hJ_real _hJ_real' _hJ_sym _hJ_nn _hJ_bipartite _hJ_pos
     _hc_strict _h_intermediate hA_nonempty hnotA_nonempty
