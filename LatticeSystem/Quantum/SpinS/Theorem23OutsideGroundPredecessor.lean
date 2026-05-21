@@ -1,13 +1,13 @@
-import LatticeSystem.Quantum.SpinS.Theorem23OutsideGround
+import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadder
 
 /-!
 # Tasaki §2.5 Theorem 2.3 outside-ground predecessor final wrappers
 
 This module contains the predecessor-specialized outside-ground final
-wrapper tail for the Tasaki §2.5 Theorem 2.3 proof chain. It is split
-from `Theorem23OutsideGround.lean` so the outside-ground lower-bound and
-common-energy wrappers can be elaborated without the final predecessor
-API tail.
+wrapper tail for the Tasaki §2.5 Theorem 2.3 proof chain. It imports the
+cross-ladder final-wrapper tail split from `Theorem23OutsideGround.lean`,
+so the base outside-ground lower-bound API can be elaborated without the
+predecessor-specific API tail.
 -/
 
 namespace LatticeSystem.Quantum
