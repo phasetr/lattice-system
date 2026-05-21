@@ -7380,6 +7380,11 @@ conclusion is now packaged as a \texttt{Prop}-valued definition
 spin, predicted Casimir, and admissible-sector interval API used by this
 definition are factored into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Sectors.lean}. The
+local ladder, signed site-contribution, and adjacent-sector energy
+comparison layer is factored into
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23Local.lean}; the main
+\texttt{Theorem23.lean} module now starts from the endpoint mismatch
+and interval-chain layer while importing that local API. The
 hypothesis bundle and conclusion are aligned exactly with the per-sector
 bundled Theorem 2.2
 \texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
@@ -7801,7 +7806,7 @@ Applying the full-Hilbert-space Theorem 2.2 uniqueness clause in sector
 \(M+1\) then identifies the target sector ground-state eigenvalue with
 \(\mu\).  This is formalised as
 \texttt{tasaki23\_lowering\_identifies\_adjacent\_sector\_energy} in
-\texttt{LatticeSystem/Quantum/SpinS/Theorem23.lean}.  The next
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23Local.lean}.  The next
 bookkeeping step is to separate the non-vanishing consequence of strict
 Marshall positivity from the still-missing proof of that positivity.
 
