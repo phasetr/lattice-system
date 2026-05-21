@@ -7377,14 +7377,17 @@ see \texttt{docs/index.md} for the full list with per-PR provenance.
 conclusion is now packaged as a \texttt{Prop}-valued definition
 \texttt{tasaki\_2\_5\_theorem\_2\_3} in
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23.lean}.  The predicted
-spin, predicted Casimir, and admissible-sector interval API used by this
-definition are factored into
-\texttt{LatticeSystem/Quantum/SpinS/Theorem23Sectors.lean}. The
+spin and admissible-sector interval API used by this definition are
+factored into
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23Sectors.lean}.  The
+predicted-Casimir, predicted-GS, cross-ladder, and source-weight bridge
+layer is factored into
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23Predicted.lean}.  The
 local ladder, signed site-contribution, and adjacent-sector energy
 comparison layer is factored into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Local.lean}; the main
-\texttt{Theorem23.lean} module now starts from the endpoint mismatch
-and interval-chain layer while importing that local API. The
+\texttt{Theorem23.lean} module now starts from the adjacent common-energy
+chain while importing those APIs. The
 hypothesis bundle and conclusion are aligned exactly with the per-sector
 bundled Theorem 2.2
 \texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
@@ -8705,7 +8708,9 @@ The quantified callback shapes used in this final bridge are now named:
 \texttt{tasaki23PredecessorDifferenceCallback}.
 \end{gathered}
 \]
-The interval-chain callbacks are isolated in
+The predicted-data bridge layer is isolated in
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Predicted}\).  The
+interval-chain callbacks are isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Interval}\), while the
 outside-ground lower-bound callbacks and the final packaging wrappers
 are isolated in
@@ -8791,7 +8796,8 @@ predicted-GS, site-sum, and sector-minimality inputs without changing
 the mathematical hypotheses.  These public final-boundary aliases now
 live in the Lean module
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Final}\), while
-\(\texttt{Theorem23}\) keeps the main interval-chain development.
+\(\texttt{Theorem23Predicted}\) carries the predicted-data bridges and
+\(\texttt{Theorem23}\) keeps the adjacent common-energy chain.
 
 Lean packages the resulting sectorwise minimality statement as
 \[
