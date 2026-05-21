@@ -7388,8 +7388,12 @@ local ladder and single-site calculation layer is factored into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Local.lean}.  The lowered
 coefficient and predecessor raising-source layer is isolated in
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalCoefficient.lean}, with
-the predecessor-difference and raised/lowered site-sum tail split into
+the predecessor-difference and lowered site-sum layer split into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalDifference.lean}; the
+raising-direction site-sum layer is split into
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalDifferenceRaising.lean}, and
+the Marshall-positivity wrapper layer is split into
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalDifferenceMarshall.lean}.  The
 main \texttt{Theorem23.lean} module now starts from the adjacent
 common-energy chain while importing those APIs.  The local adjacent-sector
 energy comparison suffix is isolated in
@@ -8724,9 +8728,12 @@ The predicted-data bridge layer is isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Predicted}\).  The
 local coefficient layer is isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient}\).  The
-local predecessor-difference and adjacent-sector energy tail is isolated
-in
-\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalDifference}\), with
+local predecessor-difference and lowered site-sum layer is isolated in
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalDifference}\).  The
+raising-direction site-sum layer is isolated in
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceRaising}\), and
+the Marshall-positivity wrapper layer is isolated in
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall}\), with
 the adjacent-sector energy comparison wrappers split further into
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceEnergy}\).  The
 sector-existence and final-statement layer is isolated in
