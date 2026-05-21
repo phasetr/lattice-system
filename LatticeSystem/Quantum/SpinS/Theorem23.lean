@@ -8346,6 +8346,31 @@ theorem
   exact hchain M (by simpa [left] using hbounds.1) (by simpa [right] using hbounds.2)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 source predicted-GS callback**:
+every admissible source-sector Marshall-positive representative selected
+below the spectral shift belongs to the predicted toy ground-state
+subspace.
+
+This names the uniform predicted-GS input left visible at the final
+outside-ground boundary. -/
+def tasaki23SourcePredictedGSCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N M =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 predecessor-difference callback**:
 for each non-right-endpoint admissible sector, the local predecessor
 raising-source difference is strictly positive after the interval-chain
@@ -14718,20 +14743,7 @@ abbrev
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hsource_predictedGS :
-      ∀ {M : ℕ},
-        M ∈ tasaki23GroundStateSectors (V := V) A N →
-        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N M =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :=
+      tasaki23SourcePredictedGSCallback (V := V) A J N c) :=
   tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
     (V := V) A (J := J) N c hBA hsector_nonempty
     (fun {μ : ℝ}
@@ -14766,20 +14778,7 @@ abbrev
     (hphysical_nonempty :
       ∀ M, M ≤ Fintype.card V * N → Nonempty (magConfigS V N M))
     (hsource_predictedGS :
-      ∀ {M : ℕ},
-        M ∈ tasaki23GroundStateSectors (V := V) A N →
-        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N M =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :=
+      tasaki23SourcePredictedGSCallback (V := V) A J N c) :=
   tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
     (V := V) A (J := J) N c hBA
     (fun M hM =>
@@ -14801,20 +14800,7 @@ abbrev
       (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
         (Finset.univ.filter (fun x : V => A x = true)).card)
     (hsource_predictedGS :
-      ∀ {M : ℕ},
-        M ∈ tasaki23GroundStateSectors (V := V) A N →
-        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N M =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :=
+      tasaki23SourcePredictedGSCallback (V := V) A J N c) :=
   tasaki_2_5_theorem_2_3_of_physical_range_nonempty_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
     (V := V) A (J := J) N c hBA
     (fun _M hM => magConfigS_nonempty_of_le_card_mul (V := V) (N := N) hM)
