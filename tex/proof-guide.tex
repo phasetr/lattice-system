@@ -8648,6 +8648,28 @@ converted to strict lowered site-sum positivity and passed directly to
 the site-sum successor chain.  This avoids first restating the same local
 boundary as a raising-source dominance final callback.
 
+The same direct site-sum route now has an outside-interval real-sector
+minimality wrapper:
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_via\_lowered\_site\_sum}\\
+\texttt{\_of\_outside\_real\_sector\_minimality}.
+\end{gathered}
+\]
+It uses the common Marshall-positive energy chain together with
+\(\texttt{tasaki23\_real\_sector\_minimality\_on\_groundStateSectors}\)
+\(\texttt{\_of\_common\_energy\_chain}\) to prove the real-sector
+lower bound on every admissible sector.  The remaining spectral
+callback therefore only covers sectors outside
+\(\texttt{tasaki23GroundStateSectors}\).  This is the same
+Perron--Frobenius comparison used above for the shifted dressed real
+sector matrix; see Seneta, \emph{Non-negative Matrices and Markov
+Chains}, 3rd ed., Springer 2006, \S1.2, pp.~27--28.
+
 \textbf{Lowered vector Marshall-positivity final wrappers}: the
 site-sum formulation is only a technical expansion of the total lowering
 operator.  Lean therefore also records the reverse conversion
