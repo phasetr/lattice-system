@@ -8742,6 +8742,22 @@ It is an alias for the current threaded predicted-GS, predecessor-
 difference, and outside-sector lower-bound route; no extra mathematical
 hypothesis is added.
 
+The variant
+\[
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint\_named\_callbacks}
+\]
+uses the weaker left-endpoint predicted-GS callback instead of the
+uniform source-sector callback.  Its other two visible inputs are still
+\[
+\begin{gathered}
+\texttt{tasaki23PredecessorDifferenceCallback},\\
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}.
+\end{gathered}
+\]
+The admissible-sector non-emptiness input is discharged by the
+physical-range construction
+\(\texttt{magConfigS\_nonempty\_of\_le\_card\_mul}\).
+
 Lean packages the resulting sectorwise minimality statement as
 \[
 \begin{gathered}

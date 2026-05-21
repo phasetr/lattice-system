@@ -14118,6 +14118,36 @@ abbrev tasaki_2_5_theorem_2_3_of_named_callbacks
     hpredecessor_difference houtside_ground_energy_lower
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback final
+boundary**: this public boundary avoids the uniform source-sector
+predicted-GS callback when only the current outside-ground route is
+needed.  It supplies the admissible-sector `magConfigS` non-emptiness
+from the physical-range construction and reuses the left-endpoint
+outside-ground theorem directly.
+
+The remaining visible inputs are therefore the weaker left-endpoint
+predicted-GS callback, the predecessor-difference local comparison, and
+outside-sector ground-energy lower bounds. -/
+abbrev tasaki_2_5_theorem_2_3_of_left_endpoint_named_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (houtside_ground_energy_lower :
+      tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
+    (V := V) A (J := J) N c hBA
+    (fun _M hM =>
+      magConfigS_nonempty_of_le_card_mul (V := V) (N := N)
+        (tasaki23GroundStateSectors_le_card_mul (V := V) A N hM))
+    hleft_predictedGS hpredecessor_difference houtside_ground_energy_lower
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS final wrapper from
 lowered site-sum positivity**: this replaces the lowered off-`A` dominance
 callback by the direct strict site-sum positivity callback needed to prove
