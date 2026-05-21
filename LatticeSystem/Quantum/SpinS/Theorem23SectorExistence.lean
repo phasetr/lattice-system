@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23
+import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 
 /-!
 # Tasaki §2.5 Theorem 2.3 sector-existence API
