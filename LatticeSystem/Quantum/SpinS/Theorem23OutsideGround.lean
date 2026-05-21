@@ -1,12 +1,13 @@
-import LatticeSystem.Quantum.SpinS.Theorem23
+import LatticeSystem.Quantum.SpinS.Theorem23Interval
 
 /-!
 # Tasaki §2.5 Theorem 2.3 outside-ground API
 
 This module contains outside-ground lower-bound callbacks and common-energy
 final packaging wrappers for the Tasaki §2.5 Theorem 2.3 proof chain. It
-is split out from `Theorem23.lean` so the main interval-chain module does
-not accumulate the outside-ground and final-packaging API tail.
+imports the interval-chain API split from `Theorem23.lean` so the main
+theorem-development module does not accumulate the outside-ground and
+final-packaging API tail.
 -/
 
 namespace LatticeSystem.Quantum
