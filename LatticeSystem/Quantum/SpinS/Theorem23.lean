@@ -2997,6 +2997,37 @@ theorem tasaki23_lowered_site_sum_pos_of_marshall_pos
   rw [totalSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_site_sum Φ τ.1] at hτ
   simpa [map_sum] using hτ
 
+/-- **Tasaki §2.5 Theorem 2.3 source-form lowered site-sum positivity from
+lowered Marshall positivity**: for a Marshall-signed positive real source
+representative, vector-level Marshall positivity of the total lowered
+image supplies the explicit single-site lowering sum positivity consumed
+by the adjacent-sector chain.
+
+This is the source-representative specialization of
+`tasaki23_lowered_site_sum_pos_of_marshall_pos`, matching the output shape
+of the predecessor raising-source difference bridge. -/
+theorem tasaki23_lowered_site_sum_pos_of_source_lowered_marshall_pos
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
+    (hlowered_marshall_pos :
+      ∀ τ : magConfigS V N (M + 1),
+        0 < (marshallSignS A τ.1).re *
+          (((totalSpinSOpMinus V N).mulVec
+            (magSectorEmbedding
+              (fun σ : magConfigS V N M =>
+                (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)))) τ.1).re) :
+    ∀ τ : magConfigS V N (M + 1),
+      0 < (marshallSignS A τ.1).re *
+        (∑ x : V,
+          (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+            (magSectorEmbedding
+              (fun σ : magConfigS V N M =>
+                (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)))) τ.1).re) := by
+  exact
+    tasaki23_lowered_site_sum_pos_of_marshall_pos (V := V) (N := N) A
+      (fun σ : magConfigS V N M =>
+        (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))
+      hlowered_marshall_pos
+
 /-- **Tasaki §2.5 Theorem 2.3 lowered-vector Marshall positivity from
 sublattice dominance**: a pointwise dominance of the off-`A` signed
 lowered sum over the negative on-`A` signed sum implies the
