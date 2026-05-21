@@ -8714,6 +8714,30 @@ chain while leaving only outside-sector estimates of the form
 \(\mu\le\mu_M\) for the Marshall-positive representatives supplied by
 the sector Theorem 2.2 wrapper.
 
+The predecessor-difference lowered-site-sum boundary can now use this
+outside-sector ground-energy form directly:
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_via\_lowered\_site\_sum}\\
+\texttt{\_of\_outside\_sector\_ground\_energy\_lower\_bound}.
+\end{gathered}
+\]
+It first runs the same predecessor-difference interval chain to obtain
+the common Marshall-positive energy on
+\(\texttt{tasaki23GroundStateSectors}\).  The remaining outside-sector
+input is then the ground-representative estimate
+\(\mu\le\mu_M\); the already proved outside-sector bridge turns this into
+the outside-real-sector minimality callback, and the previous final
+wrapper completes the Tasaki Theorem 2.3 package.  This is still the
+same Tasaki §2.5 Theorem 2.3, p.~42 Perron--Frobenius endpoint, with
+the non-negative-matrix comparison following Seneta, \emph{Non-negative
+Matrices and Markov Chains}, 3rd ed., Springer 2006, \S1.2,
+pp.~27--28.
+
 \textbf{Lowered vector Marshall-positivity final wrappers}: the
 site-sum formulation is only a technical expansion of the total lowering
 operator.  Lean therefore also records the reverse conversion
