@@ -8725,6 +8725,23 @@ the Perron--Frobenius comparison of Tasaki, Springer 2020, Section 2.5,
 Theorem 2.3, p.~42, with Seneta, \emph{Non-negative Matrices and Markov
 Chains}, 3rd ed., Springer 2006, \S1.2, pp.~27--28.
 
+The short final boundary
+\[
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_named\_callbacks}
+\]
+collects the same discharged outside-ground theorem behind exactly the
+three remaining named callbacks:
+\[
+\begin{gathered}
+\texttt{tasaki23SourcePredictedGSCallback},\\
+\texttt{tasaki23PredecessorDifferenceCallback},\\
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}.
+\end{gathered}
+\]
+It is an alias for the current threaded predicted-GS, predecessor-
+difference, and outside-sector lower-bound route; no extra mathematical
+hypothesis is added.
+
 Lean packages the resulting sectorwise minimality statement as
 \[
 \begin{gathered}
