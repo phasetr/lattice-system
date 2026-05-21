@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23
+import LatticeSystem.Quantum.SpinS.Theorem23Dominance
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
 
@@ -8,8 +8,8 @@ import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
 This module contains the final `tasaki_2_5_theorem_2_3` statement,
 the per-sector Theorem 2.2 reuse wrapper, and the sector-existence
 interval-chain wrappers split from `Theorem23.lean`. Keeping this layer
-separate lets the adjacent common-energy API elaborate without the
-sector-existence/final-statement tail.
+separate lets the adjacent common-energy and dominance APIs elaborate without
+the sector-existence/final-statement tail.
 -/
 
 namespace LatticeSystem.Quantum

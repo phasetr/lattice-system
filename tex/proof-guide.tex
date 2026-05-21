@@ -7394,9 +7394,11 @@ raising-direction site-sum layer is split into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalDifferenceRaising.lean}, and
 the Marshall-positivity wrapper layer is split into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalDifferenceMarshall.lean}.  The
-main \texttt{Theorem23.lean} module now starts from the adjacent
-common-energy chain while importing those APIs.  The local adjacent-sector
-energy comparison suffix is isolated in
+main \texttt{Theorem23.lean} module now keeps the site-sum and
+predicted-Casimir adjacent common-energy chain, while the dominance-form
+common-energy wrappers are isolated in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23Dominance.lean}.  The local
+adjacent-sector energy comparison suffix is isolated in
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalDifferenceEnergy.lean}.
 The final statement and sector-existence wrappers are isolated in
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23SectorExistence.lean}; the

@@ -337,6 +337,15 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-22 (PR #3489)**: Refactored the Tasaki §2.5 Theorem 2.3
+  common-energy API after the dominance and predicted-GS wrappers became a
+  stable suffix. `Theorem23.lean` now keeps the site-sum and
+  predicted-Casimir common-energy links (709 lines), while
+  `Theorem23Dominance.lean` contains the dominance-form and predicted-GS
+  common-energy wrappers (916 lines). Focused checks covered `Theorem23`,
+  `Theorem23Dominance`, `Theorem23SectorExistence`, `Theorem23Interval`,
+  `Theorem23IntervalCasimir`, the outside-ground downstream modules, and
+  `LatticeSystem.lean`.
 - **2026-05-21 (PR #3453)**: Refactor checkpoint after the 50
   post-#3402 Tasaki §2.5 Theorem 2.3 PRs (#3403--#3452).
   Build-speed evaluation for the active module:
