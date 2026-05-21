@@ -15269,6 +15269,24 @@ theorem
       hc_strict h_intermediate hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 final predecessor-difference boundary from
+outside-sector ground energies**: this names the final API obtained from
+the lowered-site-sum route.  The remaining inputs are exactly the
+left-endpoint predicted-GS callback, the local predecessor-difference
+callback, and outside-sector lower bounds for the Marshall-positive
+Theorem 2.2 ground-state representatives.
+
+The proof content is supplied by
+`tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_via_lowered_site_sum_of_outside_sector_ground_energy_lower_bound`;
+this alias keeps the public boundary independent of the technical
+site-sum route used internally. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_via_lowered_site_sum_of_outside_sector_ground_energy_lower_bound
+    (V := V) A (J := J) N c
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS final wrapper from
 lowered site-sum positivity**: this replaces the lowered off-`A` dominance
 callback by the direct strict site-sum positivity callback needed to prove
