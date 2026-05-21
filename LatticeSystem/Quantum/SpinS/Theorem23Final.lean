@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23OutsideGround
+import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundPredecessor
 
 /-!
 # Tasaki §2.5 Theorem 2.3 final-boundary API
