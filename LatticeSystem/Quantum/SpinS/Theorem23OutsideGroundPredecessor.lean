@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadder
+import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 
 /-!
 # Tasaki §2.5 Theorem 2.3 outside-ground predecessor final wrappers

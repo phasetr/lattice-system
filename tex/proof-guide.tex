@@ -7384,14 +7384,15 @@ factored into
 predicted-Casimir, predicted-GS, cross-ladder, and source-weight bridge
 layer is factored into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Predicted.lean}.  The
-local ladder, signed site-contribution, and adjacent-sector energy
-comparison layer is factored into
-\texttt{LatticeSystem/Quantum/SpinS/Theorem23Local.lean}, with the
-predecessor-difference and raised/lowered site-sum tail split into
+local ladder and single-site calculation layer is factored into
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23Local.lean}.  The lowered
+coefficient and predecessor raising-source layer is isolated in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalCoefficient.lean}, with
+the predecessor-difference and raised/lowered site-sum tail split into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalDifference.lean}; the
 main \texttt{Theorem23.lean} module now starts from the adjacent
-common-energy chain while importing those APIs.  The local
-adjacent-sector energy comparison suffix is isolated in
+common-energy chain while importing those APIs.  The local adjacent-sector
+energy comparison suffix is isolated in
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalDifferenceEnergy.lean}.
 The final statement and sector-existence wrappers are isolated in
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23SectorExistence.lean}; the
@@ -8093,7 +8094,9 @@ local contribution
   \mathrm{Re}\,
   \bigl(\hat S^-_x\,\mathrm{magSectorEmbedding}(\Phi_M)\bigr)(\tau)
 \]
-as \texttt{tasaki23SignedLoweringSiteContribution}.  Since \(A(x)\) is
+as \texttt{tasaki23SignedLoweringSiteContribution} in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalCoefficient.lean}.
+Since \(A(x)\) is
 Boolean, the full signed site-sum splits exactly as
 \[
   \mathrm{Re}\,\mathrm{marshallSignS}(A,\tau)
@@ -8719,6 +8722,8 @@ The quantified callback shapes used in this final bridge are now named:
 \]
 The predicted-data bridge layer is isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Predicted}\).  The
+local coefficient layer is isolated in
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient}\).  The
 local predecessor-difference and adjacent-sector energy tail is isolated
 in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalDifference}\), with
