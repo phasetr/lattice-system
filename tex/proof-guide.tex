@@ -7376,8 +7376,11 @@ see \texttt{docs/index.md} for the full list with per-PR provenance.
 \textbf{Final statement (PR \#3337)}: the Tasaki §2.5 Theorem 2.3
 conclusion is now packaged as a \texttt{Prop}-valued definition
 \texttt{tasaki\_2\_5\_theorem\_2\_3} in
-\texttt{LatticeSystem/Quantum/SpinS/Theorem23.lean}. The hypothesis
-bundle and conclusion are aligned exactly with the per-sector
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23.lean}.  The predicted
+spin, predicted Casimir, and admissible-sector interval API used by this
+definition are factored into
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23Sectors.lean}. The
+hypothesis bundle and conclusion are aligned exactly with the per-sector
 bundled Theorem 2.2
 \texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
 (\#869). Given:
@@ -7468,9 +7471,10 @@ Finally,
   \bigl||A|-|\neg A|\bigr|\,N+1
 \]
 is formalised as \texttt{tasaki23GroundStateSectors\_card}.  These
-lemmas provide the finite-range bookkeeping used to iterate the
-lowering and raising adjacent-sector energy comparisons across the
-Theorem 2.3 multiplet.
+lemmas now live in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23Sectors.lean} and provide
+the finite-range bookkeeping used to iterate the lowering and raising
+adjacent-sector energy comparisons across the Theorem 2.3 multiplet.
 
 \textbf{Ladder eigenvalue preservation}: the next proof step packages
 the SU(2) ladder comparison used to identify neighbouring sector
@@ -8778,6 +8782,7 @@ admissible-interval-specific non-emptiness callback.  The lemma
 \[
   \texttt{tasaki23GroundStateSectors\_le\_card\_mul}
 \]
+in \texttt{LatticeSystem/Quantum/SpinS/Theorem23Sectors.lean}
 states that if \(M\in\mathcal G(A,N)\), then
 \[
   M \le |V|N.
