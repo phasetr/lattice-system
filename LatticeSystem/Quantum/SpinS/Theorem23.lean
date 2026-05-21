@@ -10168,6 +10168,20 @@ def tasaki23OutsideGroundEnergyLowerCallback
       μ ≤ μM
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-sector ground-energy lower family**:
+after the adjacent-sector chain chooses the common energy `μ`, this
+callback supplies the outside-sector lower-bound API at that same `μ`.
+
+This names the final higher-level input used by the threaded
+outside-ground wrappers, where `μ` is not an explicit argument but is
+produced by the common-energy chain. -/
+def tasaki23OutsideGroundEnergyLowerFamilyCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ {μ : ℝ},
+    tasaki23CommonEnergyChain (V := V) A J N c μ →
+      tasaki23OutsideGroundEnergyLowerCallback (V := V) A J N c μ
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 real-sector lower bound on admissible
 sectors**: once the common-energy chain has produced a Marshall-positive
 sector representative at energy `μ` in an admissible sector, the
@@ -14668,26 +14682,7 @@ theorem
     (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
       tasaki23PredecessorDifferenceCallback (V := V) A J N c)
     (houtside_ground_energy_lower :
-      ∀ {μ : ℝ},
-        (∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-          ∃ v : magConfigS V N M → ℝ,
-            μ < c ∧ (∀ τ, 0 < v τ) ∧
-            (heisenbergHamiltonianS J N).mulVec
-                (magSectorEmbedding
-                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-              (μ : ℂ) • magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) →
-        ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
-          M ∉ tasaki23GroundStateSectors (V := V) A N →
-          ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
-            μM < c →
-            (∀ τ, 0 < v τ) →
-            (heisenbergHamiltonianS J N).mulVec
-                (magSectorEmbedding
-                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-              (μM : ℂ) • magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-            μ ≤ μM) :
+      tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c := by
   intro hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
     hc_strict h_intermediate hA_nonempty hnotA_nonempty
