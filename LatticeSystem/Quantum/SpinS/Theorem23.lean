@@ -15402,6 +15402,39 @@ abbrev
     hsource_predictedGS
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 discharged physical non-empty
+outside-ground boundary**: the `magConfigS` non-emptiness input is now
+derived from the general physical-range sector construction.  The
+remaining visible inputs are the uniform predicted-GS callback, the
+local predecessor-difference comparison, and outside-sector
+ground-energy lower bounds. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound_discharge_nonempty
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N M =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :=
+  tasaki_2_5_theorem_2_3_of_physical_range_nonempty_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
+    (V := V) A (J := J) N c hBA
+    (fun _M hM => magConfigS_nonempty_of_le_card_mul (V := V) (N := N) hM)
+    hsource_predictedGS
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS final wrapper from
 lowered site-sum positivity**: this replaces the lowered off-`A` dominance
 callback by the direct strict site-sum positivity callback needed to prove
