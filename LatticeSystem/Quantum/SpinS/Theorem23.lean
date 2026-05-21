@@ -3028,6 +3028,54 @@ theorem tasaki23_lowered_site_sum_pos_of_source_lowered_marshall_pos
         (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))
       hlowered_marshall_pos
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowered site-sum positivity from predecessor
+raising-source positive differences**: for a Marshall-signed positive
+source representative, positivity of the off-`A` minus on-`A` predecessor
+raising-source difference supplies the strict single-site lowered sum
+positivity consumed by the adjacent-sector chain.
+
+This composes
+`tasaki23_lowered_marshall_pos_of_raising_predecessor_source_difference_pos`
+with the source-form site-sum bridge
+`tasaki23_lowered_site_sum_pos_of_source_lowered_marshall_pos`. -/
+theorem tasaki23_lowered_site_sum_pos_of_raising_predecessor_source_difference_pos
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
+    (hdiff :
+      ∀ τ : magConfigS V N (M + 1),
+        0 <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              let predVal : Fin (N + 1) :=
+                ⟨(τ.1 x.1).val - 1, by omega⟩
+              let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+              (spinSOpPlus N predVal (τ.1 x.1)).re *
+                v ⟨pred,
+                  magSumS_single_site_lowering_predecessor
+                    τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) -
+            (((Finset.univ.filter (fun x : V => A x = true)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                let predVal : Fin (N + 1) :=
+                  ⟨(τ.1 x.1).val - 1, by omega⟩
+                let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+                (spinSOpPlus N predVal (τ.1 x.1)).re *
+                  v ⟨pred,
+                    magSumS_single_site_lowering_predecessor
+                      τ x.1 ((Finset.mem_filter.mp x.2).2)⟩))) :
+    ∀ τ : magConfigS V N (M + 1),
+      0 < (marshallSignS A τ.1).re *
+        (∑ x : V,
+          (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+            (magSectorEmbedding
+              (fun σ : magConfigS V N M =>
+                (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)))) τ.1).re) := by
+  exact
+    tasaki23_lowered_site_sum_pos_of_source_lowered_marshall_pos A v
+      (tasaki23_lowered_marshall_pos_of_raising_predecessor_source_difference_pos
+        (V := V) (N := N) A v hdiff)
+
 /-- **Tasaki §2.5 Theorem 2.3 lowered-vector Marshall positivity from
 sublattice dominance**: a pointwise dominance of the off-`A` signed
 lowered sum over the negative on-`A` signed sum implies the
