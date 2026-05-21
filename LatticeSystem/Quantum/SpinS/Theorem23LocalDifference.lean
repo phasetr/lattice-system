@@ -4,9 +4,11 @@ import LatticeSystem.Quantum.SpinS.Theorem23Local
 # Tasaki §2.5 Theorem 2.3 local predecessor-difference API
 
 This module contains the predecessor-difference, raised/lowered site-sum,
-Marshall-positivity, and adjacent-sector energy comparison API split from
-`Theorem23Local.lean`. Keeping this suffix in its own module reduces the
-core local ladder elaboration unit while preserving the public theorem names.
+and Marshall-positivity API split from `Theorem23Local.lean`. Keeping this
+suffix in its own module reduces the core local ladder elaboration unit
+while preserving the public theorem names. The adjacent-sector energy
+comparison wrappers downstream of this layer are isolated in
+`Theorem23LocalDifferenceEnergy.lean`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
