@@ -8492,6 +8492,36 @@ def tasaki23PredecessorDifferenceCallback
                             τ x.1 ((Finset.mem_filter.mp x.2).2)⟩))
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowered-site-sum callback**:
+for each non-right-endpoint admissible sector, the lowered total-spin
+site-sum expression is strictly Marshall positive after applying it to
+the selected Marshall-positive representative.
+
+This names the direct interval-chain local positivity input used before
+the later predecessor-difference route refines it. -/
+def tasaki23LoweredSiteSumCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        M <
+          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          ∀ τ : magConfigS V N (M + 1),
+            0 < (marshallSignS A τ.1).re *
+              (∑ x : V,
+                (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+                  (magSectorEmbedding
+                    (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 interval chain from unpacked real
 predecessor-difference data through lowered site sums**: this is the
 direct site-sum version of the fully threaded predecessor-difference
@@ -10013,6 +10043,25 @@ def tasaki23CommonEnergyChain
             (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
         (μ : ℂ) • magSectorEmbedding
           (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 sector-minimality callback**:
+after the common-energy chain has selected `μ`, this callback states that
+`μ` is a lower bound for every nonzero complex eigenvector in every
+magnetization sector.
+
+This names the sectorwise global-minimality input used by the direct
+lowered-site-sum final wrappers. -/
+def tasaki23SectorMinimalityCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ {μ : ℝ},
+    tasaki23CommonEnergyChain (V := V) A J N c μ →
+      ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+        ∀ {μ' : ℝ} {Φ : magConfigS V N M → ℂ},
+          Φ ≠ 0 →
+          (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φ =
+            (μ' : ℂ) • Φ →
+          μ ≤ μ'
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-sector ground-energy lower callback**:
@@ -14468,6 +14517,60 @@ theorem
         (hsector_min hcommon))
       hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
       hc_strict h_intermediate hA_nonempty hnotA_nonempty
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowered-site-sum named-callback final
+boundary**: this exposes the direct lowered-site-sum route through named
+callbacks for source predicted-GS membership, lowered site-sum
+positivity, and sectorwise global minimality.
+
+The theorem is a short alias for the direct lowered-site-sum final
+wrapper from sector minimality and adds no extra mathematical input. -/
+abbrev tasaki_2_5_theorem_2_3_of_lowered_site_sum_named_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hsource_pred :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hlowered_site_sum :
+      tasaki23LoweredSiteSumCallback (V := V) A J N c)
+    (hsector_min :
+      tasaki23SectorMinimalityCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_predictedGS_of_lowered_site_sum_pos_of_sector_minimality
+    (V := V) A (J := J) N c hBA hsector_nonempty
+    (fun hM _hMlt => hsource_pred hM)
+    hlowered_site_sum hsector_min
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint lowered-site-sum named
+boundary**: this is the left-endpoint version of the direct
+lowered-site-sum named-callback boundary.
+
+It requires only the left-endpoint predicted-GS callback, the lowered
+site-sum positivity callback, and the sector-minimality callback. -/
+abbrev tasaki_2_5_theorem_2_3_of_left_endpoint_lowered_site_sum_named_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hlowered_site_sum :
+      tasaki23LoweredSiteSumCallback (V := V) A J N c)
+    (hsector_min :
+      tasaki23SectorMinimalityCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_lowered_site_sum_pos_of_sector_minimality
+    (V := V) A (J := J) N c hBA hsector_nonempty hleft_predictedGS
+    hlowered_site_sum hsector_min
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 final wrapper from lowered vector Marshall
