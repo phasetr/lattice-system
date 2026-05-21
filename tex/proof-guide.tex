@@ -8615,6 +8615,22 @@ positivity obligation from the stronger dominance statement to the
 actual strict site-sum positivity needed for Marshall positivity of
 \(S^-_{\mathrm{tot}}\Phi\).
 
+The predecessor-difference route has also been exposed at this same
+site-sum boundary.  Lean names the callback-level adapter
+\[
+\begin{gathered}
+\texttt{tasaki23\_lowered\_site\_sum\_pos\_callback}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}.
+\end{gathered}
+\]
+It is the site-sum API form of the already proved bridge from the
+off-\(A\) minus on-\(A\) predecessor raising-source difference to
+strict positivity of the lowered single-site sum.  Thus the next final
+wrapper can feed the fully threaded predecessor-difference callback
+directly into the lowered site-sum successor chain, rather than first
+restating it as a raising-source dominance callback.
+
 \textbf{Lowered vector Marshall-positivity final wrappers}: the
 site-sum formulation is only a technical expansion of the total lowering
 operator.  Lean therefore also records the reverse conversion
