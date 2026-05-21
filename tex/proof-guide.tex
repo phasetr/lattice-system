@@ -7385,9 +7385,12 @@ layer is factored into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Predicted.lean}.  The
 local ladder, signed site-contribution, and adjacent-sector energy
 comparison layer is factored into
-\texttt{LatticeSystem/Quantum/SpinS/Theorem23Local.lean}; the main
-\texttt{Theorem23.lean} module now starts from the adjacent common-energy
-chain while importing those APIs. The
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23Local.lean}, with the
+predecessor-difference, raised/lowered site-sum, and adjacent-sector
+energy tail split into
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalDifference.lean}; the
+main \texttt{Theorem23.lean} module now starts from the adjacent
+common-energy chain while importing those APIs. The
 hypothesis bundle and conclusion are aligned exactly with the per-sector
 bundled Theorem 2.2
 \texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
@@ -8710,6 +8713,9 @@ The quantified callback shapes used in this final bridge are now named:
 \]
 The predicted-data bridge layer is isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Predicted}\).  The
+local predecessor-difference and adjacent-sector energy tail is isolated
+in
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalDifference}\).  The
 interval-chain callbacks are isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Interval}\), while the
 outside-ground lower-bound callbacks and common final packaging wrappers
