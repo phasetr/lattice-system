@@ -8346,58 +8346,16 @@ theorem
   exact hchain M (by simpa [left] using hbounds.1) (by simpa [right] using hbounds.2)
 
 set_option linter.style.longLine false in
-/-- **Tasaki §2.5 Theorem 2.3 interval chain from unpacked real
-predecessor-difference data through lowered site sums**: this is the
-direct site-sum version of the fully threaded predecessor-difference
-route.
+/-- **Tasaki §2.5 Theorem 2.3 predecessor-difference callback**:
+for each non-right-endpoint admissible sector, the local predecessor
+raising-source difference is strictly positive after the interval-chain
+representative is unpacked through the re-embedded real source-weight
+identity and the lowered sublattice-Casimir/support data.
 
-At each successor step, predicted-GS membership supplies the re-embedded
-source-weight cross-ladder identity and the lowered sublattice Casimir
-data. The predecessor-difference callback is then converted by
-`tasaki23_lowered_site_sum_pos_callback_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos`
-to the strict lowered site-sum input consumed by the site-sum successor
-chain. -/
-theorem
-    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
-    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
-    (hJ_real : ∀ x y, (J x y).im = 0)
-    (hJ_real' : ∀ x y, star (J x y) = J x y)
-    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
-    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
-    (hJ_sym : ∀ x y, J x y = J y x)
-    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
-    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
-    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
-      ∃ z, A z ≠ A x ∧ (τ z).val < N)
-    (hBA :
-      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
-        (Finset.univ.filter (fun x : V => A x = true)).card)
-    (hsector_nonempty :
-      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-        Nonempty (magConfigS V N M))
-    (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
-    (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
+This names the remaining local adjacent-sector comparison used by the
+outside-ground final boundary. -/
+def tasaki23PredecessorDifferenceCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
         M <
@@ -8497,7 +8455,62 @@ theorem
                       (spinSOpPlus N predVal (τ.1 x.1)).re *
                         v ⟨pred,
                           magSumS_single_site_lowering_predecessor
-                            τ x.1 ((Finset.mem_filter.mp x.2).2)⟩))) :
+                            τ x.1 ((Finset.mem_filter.mp x.2).2)⟩))
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 interval chain from unpacked real
+predecessor-difference data through lowered site sums**: this is the
+direct site-sum version of the fully threaded predecessor-difference
+route.
+
+At each successor step, predicted-GS membership supplies the re-embedded
+source-weight cross-ladder identity and the lowered sublattice Casimir
+data. The predecessor-difference callback is then converted by
+`tasaki23_lowered_site_sum_pos_callback_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos`
+to the strict lowered site-sum input consumed by the site-sum successor
+chain. -/
+theorem
+    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      ∀ {μ : ℝ}
+        {v : magConfigS V N
+          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+              N) → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N
+                (min
+                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+                  (Finset.card
+                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+                    N) =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c) :
     ∃ μ : ℝ,
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         ∃ v : magConfigS V N M → ℝ,
@@ -14386,106 +14399,7 @@ theorem
                 (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
             bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
     (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
-      ∀ {M : ℕ},
-        M ∈ tasaki23GroundStateSectors (V := V) A N →
-        M <
-          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
-        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          ∀ Ψ : (V → Fin (N + 1)) → ℂ,
-            Ψ =
-              magSectorEmbedding
-                (fun τ : magConfigS V N M =>
-                  (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-            Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N →
-            (∀ τ : magConfigS V N (M + 1), ∀ x : V,
-              ∀ hx : 0 < (τ.1 x).val,
-                let predVal : Fin (N + 1) :=
-                  ⟨(τ.1 x).val - 1, by omega⟩
-                let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
-                ((∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
-                    ((onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
-                      (magSectorEmbedding
-                        (magSectorRestriction (M := M + 1)
-                          ((sublatticeSpinSOpMinus N (fun y => ! A y)).mulVec Ψ)))) pred) +
-                  ∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
-                    ((onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
-                      (magSectorEmbedding
-                        (magSectorRestriction (M := M + 1)
-                          ((sublatticeSpinSOpMinus N A).mulVec Ψ)))) pred).re =
-                  ((bipartiteToyMinEnergyPredicted (Λ := V) A N).re -
-                      2 *
-                        ((∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
-                            ((N : ℝ) / 2 - ((pred y).val : ℝ))) *
-                          (∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
-                            ((N : ℝ) / 2 - ((pred y).val : ℝ))))) *
-                    ((marshallSignS A pred).re *
-                      v ⟨pred, magSumS_single_site_lowering_predecessor τ x hx⟩)) →
-            (sublatticeSpinSquaredS N A).mulVec
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) →
-            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) →
-            ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
-              magSubspaceS V N
-                (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) →
-            (sublatticeSpinSquaredS N A).mulVec
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) →
-            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) →
-            ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) ∈
-              magSubspaceS V N
-                (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) →
-            ∀ τ : magConfigS V N (M + 1),
-              0 <
-                (((Finset.univ.filter (fun x : V => A x = false)).filter
-                    (fun x : V => 0 < (τ.1 x).val)).attach.sum
-                  (fun x =>
-                    let predVal : Fin (N + 1) :=
-                      ⟨(τ.1 x.1).val - 1, by omega⟩
-                    let pred : V → Fin (N + 1) :=
-                      Function.update τ.1 x.1 predVal
-                    (spinSOpPlus N predVal (τ.1 x.1)).re *
-                      v ⟨pred,
-                        magSumS_single_site_lowering_predecessor
-                          τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) -
-                  (((Finset.univ.filter (fun x : V => A x = true)).filter
-                      (fun x : V => 0 < (τ.1 x).val)).attach.sum
-                    (fun x =>
-                      let predVal : Fin (N + 1) :=
-                        ⟨(τ.1 x.1).val - 1, by omega⟩
-                      let pred : V → Fin (N + 1) :=
-                        Function.update τ.1 x.1 predVal
-                      (spinSOpPlus N predVal (τ.1 x.1)).re *
-                        v ⟨pred,
-                          magSumS_single_site_lowering_predecessor
-                            τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)))
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
     (hsector_min :
       ∀ {μ : ℝ},
         (∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -14560,106 +14474,7 @@ theorem
                 (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
             bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
     (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
-      ∀ {M : ℕ},
-        M ∈ tasaki23GroundStateSectors (V := V) A N →
-        M <
-          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
-        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          ∀ Ψ : (V → Fin (N + 1)) → ℂ,
-            Ψ =
-              magSectorEmbedding
-                (fun τ : magConfigS V N M =>
-                  (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-            Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N →
-            (∀ τ : magConfigS V N (M + 1), ∀ x : V,
-              ∀ hx : 0 < (τ.1 x).val,
-                let predVal : Fin (N + 1) :=
-                  ⟨(τ.1 x).val - 1, by omega⟩
-                let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
-                ((∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
-                    ((onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
-                      (magSectorEmbedding
-                        (magSectorRestriction (M := M + 1)
-                          ((sublatticeSpinSOpMinus N (fun y => ! A y)).mulVec Ψ)))) pred) +
-                  ∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
-                    ((onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
-                      (magSectorEmbedding
-                        (magSectorRestriction (M := M + 1)
-                          ((sublatticeSpinSOpMinus N A).mulVec Ψ)))) pred).re =
-                  ((bipartiteToyMinEnergyPredicted (Λ := V) A N).re -
-                      2 *
-                        ((∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
-                            ((N : ℝ) / 2 - ((pred y).val : ℝ))) *
-                          (∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
-                            ((N : ℝ) / 2 - ((pred y).val : ℝ))))) *
-                    ((marshallSignS A pred).re *
-                      v ⟨pred, magSumS_single_site_lowering_predecessor τ x hx⟩)) →
-            (sublatticeSpinSquaredS N A).mulVec
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) →
-            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) →
-            ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
-              magSubspaceS V N
-                (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) →
-            (sublatticeSpinSquaredS N A).mulVec
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) →
-            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) →
-            ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) ∈
-              magSubspaceS V N
-                (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) →
-            ∀ τ : magConfigS V N (M + 1),
-              0 <
-                (((Finset.univ.filter (fun x : V => A x = false)).filter
-                    (fun x : V => 0 < (τ.1 x).val)).attach.sum
-                  (fun x =>
-                    let predVal : Fin (N + 1) :=
-                      ⟨(τ.1 x.1).val - 1, by omega⟩
-                    let pred : V → Fin (N + 1) :=
-                      Function.update τ.1 x.1 predVal
-                    (spinSOpPlus N predVal (τ.1 x.1)).re *
-                      v ⟨pred,
-                        magSumS_single_site_lowering_predecessor
-                          τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) -
-                  (((Finset.univ.filter (fun x : V => A x = true)).filter
-                      (fun x : V => 0 < (τ.1 x).val)).attach.sum
-                    (fun x =>
-                      let predVal : Fin (N + 1) :=
-                        ⟨(τ.1 x.1).val - 1, by omega⟩
-                      let pred : V → Fin (N + 1) :=
-                        Function.update τ.1 x.1 predVal
-                      (spinSOpPlus N predVal (τ.1 x.1)).re *
-                        v ⟨pred,
-                          magSumS_single_site_lowering_predecessor
-                            τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)))
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
     (hsector_min :
       ∀ {μ : ℝ},
         (∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -14745,106 +14560,7 @@ theorem
                 (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
             bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
     (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
-      ∀ {M : ℕ},
-        M ∈ tasaki23GroundStateSectors (V := V) A N →
-        M <
-          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
-        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          ∀ Ψ : (V → Fin (N + 1)) → ℂ,
-            Ψ =
-              magSectorEmbedding
-                (fun τ : magConfigS V N M =>
-                  (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-            Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N →
-            (∀ τ : magConfigS V N (M + 1), ∀ x : V,
-              ∀ hx : 0 < (τ.1 x).val,
-                let predVal : Fin (N + 1) :=
-                  ⟨(τ.1 x).val - 1, by omega⟩
-                let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
-                ((∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
-                    ((onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
-                      (magSectorEmbedding
-                        (magSectorRestriction (M := M + 1)
-                          ((sublatticeSpinSOpMinus N (fun y => ! A y)).mulVec Ψ)))) pred) +
-                  ∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
-                    ((onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
-                      (magSectorEmbedding
-                        (magSectorRestriction (M := M + 1)
-                          ((sublatticeSpinSOpMinus N A).mulVec Ψ)))) pred).re =
-                  ((bipartiteToyMinEnergyPredicted (Λ := V) A N).re -
-                      2 *
-                        ((∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
-                            ((N : ℝ) / 2 - ((pred y).val : ℝ))) *
-                          (∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
-                            ((N : ℝ) / 2 - ((pred y).val : ℝ))))) *
-                    ((marshallSignS A pred).re *
-                      v ⟨pred, magSumS_single_site_lowering_predecessor τ x hx⟩)) →
-            (sublatticeSpinSquaredS N A).mulVec
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) →
-            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) →
-            ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
-              magSubspaceS V N
-                (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) →
-            (sublatticeSpinSquaredS N A).mulVec
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) →
-            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) →
-            ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) ∈
-              magSubspaceS V N
-                (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) →
-            ∀ τ : magConfigS V N (M + 1),
-              0 <
-                (((Finset.univ.filter (fun x : V => A x = false)).filter
-                    (fun x : V => 0 < (τ.1 x).val)).attach.sum
-                  (fun x =>
-                    let predVal : Fin (N + 1) :=
-                      ⟨(τ.1 x.1).val - 1, by omega⟩
-                    let pred : V → Fin (N + 1) :=
-                      Function.update τ.1 x.1 predVal
-                    (spinSOpPlus N predVal (τ.1 x.1)).re *
-                      v ⟨pred,
-                        magSumS_single_site_lowering_predecessor
-                          τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) -
-                  (((Finset.univ.filter (fun x : V => A x = true)).filter
-                      (fun x : V => 0 < (τ.1 x).val)).attach.sum
-                    (fun x =>
-                      let predVal : Fin (N + 1) :=
-                        ⟨(τ.1 x.1).val - 1, by omega⟩
-                      let pred : V → Fin (N + 1) :=
-                        Function.update τ.1 x.1 predVal
-                      (spinSOpPlus N predVal (τ.1 x.1)).re *
-                        v ⟨pred,
-                          magSumS_single_site_lowering_predecessor
-                            τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)))
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
     (houtside_real_sector_min :
       ∀ {μ : ℝ},
         (∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -14925,106 +14641,7 @@ theorem
                 (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
             bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
     (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
-      ∀ {M : ℕ},
-        M ∈ tasaki23GroundStateSectors (V := V) A N →
-        M <
-          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
-        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          ∀ Ψ : (V → Fin (N + 1)) → ℂ,
-            Ψ =
-              magSectorEmbedding
-                (fun τ : magConfigS V N M =>
-                  (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-            Ψ ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N →
-            (∀ τ : magConfigS V N (M + 1), ∀ x : V,
-              ∀ hx : 0 < (τ.1 x).val,
-                let predVal : Fin (N + 1) :=
-                  ⟨(τ.1 x).val - 1, by omega⟩
-                let pred : V → Fin (N + 1) := Function.update τ.1 x predVal
-                ((∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
-                    ((onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
-                      (magSectorEmbedding
-                        (magSectorRestriction (M := M + 1)
-                          ((sublatticeSpinSOpMinus N (fun y => ! A y)).mulVec Ψ)))) pred) +
-                  ∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
-                    ((onSiteS y (spinSOpPlus N) : ManyBodyOpS V N).mulVec
-                      (magSectorEmbedding
-                        (magSectorRestriction (M := M + 1)
-                          ((sublatticeSpinSOpMinus N A).mulVec Ψ)))) pred).re =
-                  ((bipartiteToyMinEnergyPredicted (Λ := V) A N).re -
-                      2 *
-                        ((∑ y ∈ (Finset.univ.filter (fun y : V => A y = true)),
-                            ((N : ℝ) / 2 - ((pred y).val : ℝ))) *
-                          (∑ y ∈ (Finset.univ.filter (fun y : V => A y = false)),
-                            ((N : ℝ) / 2 - ((pred y).val : ℝ))))) *
-                    ((marshallSignS A pred).re *
-                      v ⟨pred, magSumS_single_site_lowering_predecessor τ x hx⟩)) →
-            (sublatticeSpinSquaredS N A).mulVec
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) →
-            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N A).mulVec Ψ) →
-            ((sublatticeSpinSOpMinus N A).mulVec Ψ) ∈
-              magSubspaceS V N
-                (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) →
-            (sublatticeSpinSquaredS N A).mulVec
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => A x = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) →
-            (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) =
-              ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) *
-                ((((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℂ) *
-                  ((N : ℂ) / 2)) + 1)) •
-                ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) →
-            ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec Ψ) ∈
-              magSubspaceS V N
-                (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) →
-            ∀ τ : magConfigS V N (M + 1),
-              0 <
-                (((Finset.univ.filter (fun x : V => A x = false)).filter
-                    (fun x : V => 0 < (τ.1 x).val)).attach.sum
-                  (fun x =>
-                    let predVal : Fin (N + 1) :=
-                      ⟨(τ.1 x.1).val - 1, by omega⟩
-                    let pred : V → Fin (N + 1) :=
-                      Function.update τ.1 x.1 predVal
-                    (spinSOpPlus N predVal (τ.1 x.1)).re *
-                      v ⟨pred,
-                        magSumS_single_site_lowering_predecessor
-                          τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) -
-                  (((Finset.univ.filter (fun x : V => A x = true)).filter
-                      (fun x : V => 0 < (τ.1 x).val)).attach.sum
-                    (fun x =>
-                      let predVal : Fin (N + 1) :=
-                        ⟨(τ.1 x.1).val - 1, by omega⟩
-                      let pred : V → Fin (N + 1) :=
-                        Function.update τ.1 x.1 predVal
-                      (spinSOpPlus N predVal (τ.1 x.1)).re *
-                        v ⟨pred,
-                          magSumS_single_site_lowering_predecessor
-                            τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)))
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
     (houtside_ground_energy_lower :
       ∀ {μ : ℝ},
         (∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →

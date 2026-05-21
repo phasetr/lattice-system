@@ -8689,11 +8689,12 @@ sector.  Hence the final outside-sector task may focus only on proving
 \(\mu\le\mu_M\) for these Theorem 2.2 ground-state representatives,
 rather than for arbitrary real eigenvectors directly.
 
-The two quantified callback shapes used in this final bridge are now named:
+The quantified callback shapes used in this final bridge are now named:
 \[
 \begin{gathered}
 \texttt{tasaki23CommonEnergyChain},\\
-\texttt{tasaki23OutsideGroundEnergyLowerCallback}.
+\texttt{tasaki23OutsideGroundEnergyLowerCallback},\\
+\texttt{tasaki23PredecessorDifferenceCallback}.
 \end{gathered}
 \]
 The first records the adjacent-sector output: one common Marshall-positive
@@ -8701,7 +8702,13 @@ energy on every admissible
 \(\texttt{tasaki23GroundStateSectors}\) sector.  The second records the
 remaining outside-sector estimate \(\mu\le\mu_M\) for the
 Marshall-positive representatives supplied by the per-sector Theorem 2.2
-wrapper.  This is only an API naming step; the mathematical bridge remains
+wrapper.  The third records the local predecessor raising-source
+difference positivity used by the direct lowered-site-sum interval chain:
+for each non-right-endpoint admissible sector, the re-embedded real
+source-weight identity and lowered sublattice-Casimir/support data are
+unpacked before proving that the off-\(A\) predecessor sum strictly
+dominates the on-\(A\) predecessor sum.  This is only an API naming step;
+the mathematical bridge remains
 the Perron--Frobenius comparison of Tasaki, Springer 2020, Section 2.5,
 Theorem 2.3, p.~42, with Seneta, \emph{Non-negative Matrices and Markov
 Chains}, 3rd ed., Springer 2006, \S1.2, pp.~27--28.
