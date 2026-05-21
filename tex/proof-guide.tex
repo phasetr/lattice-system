@@ -8626,10 +8626,27 @@ site-sum boundary.  Lean names the callback-level adapter
 \]
 It is the site-sum API form of the already proved bridge from the
 off-\(A\) minus on-\(A\) predecessor raising-source difference to
-strict positivity of the lowered single-site sum.  Thus the next final
-wrapper can feed the fully threaded predecessor-difference callback
-directly into the lowered site-sum successor chain, rather than first
-restating it as a raising-source dominance callback.
+strict positivity of the lowered single-site sum.  The final wrapper now
+uses this API directly:
+\[
+\begin{gathered}
+\texttt{tasaki23\_energy\_interval\_chain\_with\_predictedGS}\\
+\texttt{\_of\_left\_endpoint\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_via\_lowered\_site\_sum\_of\_sector\_minimality}.
+\end{gathered}
+\]
+At each successor step, predicted-GS membership supplies the
+re-embedded source-weight identity and the lowered sublattice
+Casimir/support facts; the predecessor-difference callback is then
+converted to strict lowered site-sum positivity and passed directly to
+the site-sum successor chain.  This avoids first restating the same local
+boundary as a raising-source dominance final callback.
 
 \textbf{Lowered vector Marshall-positivity final wrappers}: the
 site-sum formulation is only a technical expansion of the total lowering
