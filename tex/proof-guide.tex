@@ -8685,6 +8685,20 @@ sector.  Hence the final outside-sector task may focus only on proving
 \(\mu\le\mu_M\) for these Theorem 2.2 ground-state representatives,
 rather than for arbitrary real eigenvectors directly.
 
+Lean packages the resulting sectorwise minimality statement as
+\[
+\begin{gathered}
+\texttt{tasaki23\_sector\_minimality\_of\_common\_energy\_chain}\\
+\texttt{\_and\_outside\_sector\_ground\_energy\_lower\_bound}.
+\end{gathered}
+\]
+On admissible sectors it uses the common-energy chain to obtain the
+real-sector lower bound.  On outside sectors it applies the preceding
+outside-sector ground-energy bridge.  Finally, it invokes the real-to-
+complex sector bridge, so the remaining spectral input for the final
+global-minimality argument is only the estimate \(\mu\le\mu_M\) for the
+Marshall-positive Theorem 2.2 ground state in each outside sector.
+
 \textbf{Lowered vector Marshall-positivity final wrappers}: the
 site-sum formulation is only a technical expansion of the total lowering
 operator.  Lean therefore also records the reverse conversion

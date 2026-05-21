@@ -10417,6 +10417,69 @@ theorem tasaki23_outside_real_sector_minimality_of_outside_sector_ground_energy_
   exact hμ_le_μM.trans hμM_le_μ'
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 sector minimality from common interval energy
+and outside-sector ground energies**: combine the admissible-sector
+minimality supplied by the common-energy chain with the outside-sector
+ground-energy bridge, then pass from real-form sector eigenvectors to
+complex sector eigenvectors.
+
+This is the sectorwise spectral-minimality package needed to turn the
+outside-sector ground-energy lower-bound callback into the final global
+minimality callback for Theorem 2.3. -/
+theorem
+    tasaki23_sector_minimality_of_common_energy_chain_and_outside_sector_ground_energy_lower_bound
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {μ : ℝ}
+    (hcommon :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        ∃ v : magConfigS V N M → ℝ,
+          μ < c ∧ (∀ τ, 0 < v τ) ∧
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))
+    (houtside_ground_energy_lower :
+      ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+        M ∉ tasaki23GroundStateSectors (V := V) A N →
+        ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+          μM < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μM : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          μ ≤ μM) :
+    ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+      ∀ {μ' : ℝ} {Φ : magConfigS V N M → ℂ},
+        Φ ≠ 0 →
+        (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φ =
+          (μ' : ℂ) • Φ →
+        μ ≤ μ' := by
+  exact
+    tasaki23_sector_minimality_of_real_sector_minimality N hJ_real
+      (fun M => by
+        by_cases hM : M ∈ tasaki23GroundStateSectors (V := V) A N
+        · exact
+            tasaki23_real_sector_minimality_on_groundStateSectors_of_common_energy_chain
+              A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+              hcommon M hM
+        · exact
+            tasaki23_outside_real_sector_minimality_of_outside_sector_ground_energy_lower_bound
+              A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+              hc_strict h_intermediate houtside_ground_energy_lower M hM)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 final wrapper from a common interval energy**:
 if one real energy `μ` is already realised by Marshall-positive sector
 eigenvectors in every admissible sector, then the per-sector Theorem 2.2
