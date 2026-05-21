@@ -8048,9 +8048,10 @@ image.
 
 This is the vector-positivity version of
 `tasaki23_energy_interval_chain_of_left_endpoint_predictedGS_of_lowered_site_sum_pos`.
-The bridge `tasaki23_lowered_site_sum_pos_of_marshall_pos` converts the
-vector-level input into the site-sum callback consumed by the existing
-successor step. -/
+The source-form bridge
+`tasaki23_lowered_site_sum_pos_of_source_lowered_marshall_pos` converts
+the Marshall-signed positive real representative input into the site-sum
+callback consumed by the existing successor step. -/
 theorem tasaki23_energy_interval_chain_of_left_endpoint_predictedGS_of_lowered_marshall_pos
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -8120,9 +8121,7 @@ theorem tasaki23_energy_interval_chain_of_left_endpoint_predictedGS_of_lowered_m
       hc_strict h_intermediate hBA hsector_nonempty hsource_pred
       (fun {M : ℕ} hM hMlt {μ : ℝ} {v : magConfigS V N M → ℝ}
           hμ_lt hv_pos hΦ =>
-        tasaki23_lowered_site_sum_pos_of_marshall_pos A
-          (fun τ : magConfigS V N M =>
-            (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+        tasaki23_lowered_site_sum_pos_of_source_lowered_marshall_pos A v
           (hsource_lowered_marshall_pos hM hMlt hμ_lt hv_pos hΦ))
 
 set_option linter.style.longLine false in
@@ -8279,8 +8278,10 @@ set_option linter.style.longLine false in
 membership from lowered vector Marshall positivity**: this is the
 vector-positivity form of
 `tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_lowered_site_sum_pos`.
-The bridge `tasaki23_lowered_site_sum_pos_of_marshall_pos` converts the
-lowered ladder-vector positivity hypothesis into the site-sum callback. -/
+The source-form bridge
+`tasaki23_lowered_site_sum_pos_of_source_lowered_marshall_pos` converts
+the lowered ladder-vector positivity hypothesis for the Marshall-signed
+positive real representative into the site-sum callback. -/
 theorem
     tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_lowered_marshall_pos
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -8359,9 +8360,7 @@ theorem
       hc_strict h_intermediate hBA hsector_nonempty hleft_predictedGS
       (fun {M : ℕ} hM hMlt {μ : ℝ} {v : magConfigS V N M → ℝ}
           hμ_lt hv_pos hΦ =>
-        tasaki23_lowered_site_sum_pos_of_marshall_pos A
-          (fun τ : magConfigS V N M =>
-            (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+        tasaki23_lowered_site_sum_pos_of_source_lowered_marshall_pos A v
           (hsource_lowered_marshall_pos hM hMlt hμ_lt hv_pos hΦ))
 
 set_option linter.style.longLine false in
@@ -9526,8 +9525,10 @@ set_option linter.style.longLine false in
 from lowered vector Marshall positivity**: this is the vector-positivity
 version of
 `tasaki23_energy_interval_chain_with_predictedCasimir_of_left_endpoint_predictedCasimir_of_lowered_site_sum_pos`.
-The bridge `tasaki23_lowered_site_sum_pos_of_marshall_pos` converts the
-lowered ladder-vector positivity hypothesis into the site-sum callback. -/
+The source-form bridge
+`tasaki23_lowered_site_sum_pos_of_source_lowered_marshall_pos` converts
+the lowered ladder-vector positivity hypothesis for the Marshall-signed
+positive real representative into the site-sum callback. -/
 theorem
     tasaki23_energy_interval_chain_with_predictedCasimir_of_left_endpoint_predictedCasimir_of_lowered_marshall_pos
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -9606,9 +9607,7 @@ theorem
       hc_strict h_intermediate hsector_nonempty hleft_casimir
       (fun {M : ℕ} hM hMlt {μ : ℝ} {v : magConfigS V N M → ℝ}
           hμ_lt hv_pos hΦ =>
-        tasaki23_lowered_site_sum_pos_of_marshall_pos A
-          (fun τ : magConfigS V N M =>
-            (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+        tasaki23_lowered_site_sum_pos_of_source_lowered_marshall_pos A v
           (hsource_lowered_marshall_pos hM hMlt hμ_lt hv_pos hΦ))
 
 set_option linter.style.longLine false in
