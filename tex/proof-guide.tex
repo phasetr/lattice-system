@@ -8695,6 +8695,7 @@ The quantified callback shapes used in this final bridge are now named:
 \texttt{tasaki23CommonEnergyChain},\\
 \texttt{tasaki23OutsideGroundEnergyLowerCallback},\\
 \texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback},\\
+\texttt{tasaki23LeftEndpointPredictedGSCallback},\\
 \texttt{tasaki23SourcePredictedGSCallback},\\
 \texttt{tasaki23PredecessorDifferenceCallback}.
 \end{gathered}
@@ -8705,7 +8706,10 @@ energy on every admissible
 remaining outside-sector estimate \(\mu\le\mu_M\) for the
 Marshall-positive representatives supplied by the per-sector Theorem 2.2
 wrapper, and the family callback records the same estimate after the
-interval chain has produced the common energy \(\mu\).  The predecessor
+interval chain has produced the common energy \(\mu\).  The left-endpoint
+predicted-GS callback records the lower endpoint membership input before
+the uniform source callback feeds the same endpoint into the interval
+chain.  The predecessor
 callback records the local predecessor
 raising-source difference positivity used by the direct lowered-site-sum
 interval chain:
