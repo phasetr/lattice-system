@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.Theorem23IntervalCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
+import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
 
 /-!
 # Tasaki §2.5 Theorem 2.3 outside-ground API

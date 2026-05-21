@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.Theorem23Predicted
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceEnergy
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
+import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
 
 
 /-!

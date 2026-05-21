@@ -1,13 +1,12 @@
-import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
+import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
 
 /-!
 # Tasaki §2.5 Theorem 2.3 local-difference energy API
 
 This module contains the adjacent-sector energy comparison packages
-split from `Theorem23LocalDifference.lean`. Keeping this suffix in
-its own module lets the local predecessor-difference, site-sum, and
-Marshall-positivity bridges elaborate separately from the energy
-identification wrappers.
+split from `Theorem23LocalDifferenceMarshall.lean`. Keeping this suffix in
+its own module lets the local predecessor-difference, raising site-sum,
+Marshall-positivity, and energy identification layers elaborate separately.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.

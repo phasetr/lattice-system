@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.Theorem23SectorExistence
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
+import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
 
 /-!
 # Tasaki §2.5 Theorem 2.3 interval-chain API

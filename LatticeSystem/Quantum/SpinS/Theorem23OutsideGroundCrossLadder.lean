@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.Theorem23OutsideGround
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
+import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
 
 /-!
 # Tasaki §2.5 Theorem 2.3 outside-ground cross-ladder final wrappers
