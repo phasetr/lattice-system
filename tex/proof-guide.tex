@@ -8797,6 +8797,29 @@ therefore asks only for non-emptiness of \(\texttt{magConfigS}\) on
 the physical range \(M\le |V|N\), and derives the previous
 admissible-sector non-emptiness callback from this range lemma.
 
+The physical-range non-emptiness input is itself discharged by
+\[
+  \texttt{magConfigS\_nonempty\_of\_le\_card\_mul}.
+\]
+For \(M\le |V|N\), choose a subset of cardinality \(M\) in the
+elementary slot set \(V\times\{0,\ldots,N-1\}\).  At each site \(x\),
+count the chosen slots over \(x\); this count is at most \(N\), hence
+gives a value in \(\texttt{Fin}(N+1)\).  Summing these fiber
+cardinalities over \(V\) recovers the cardinality \(M\) of the chosen
+slot set.  The wrapper
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_outside\_sector\_ground\_energy\_lower\_bound}\\
+\texttt{\_discharge\_nonempty}
+\end{gathered}
+\]
+therefore removes the explicit `\texttt{magConfigS}` non-emptiness
+callback from this boundary.
+
 \textbf{Lowered vector Marshall-positivity final wrappers}: the
 site-sum formulation is only a technical expansion of the total lowering
 operator.  Lean therefore also records the reverse conversion

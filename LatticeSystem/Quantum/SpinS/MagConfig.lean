@@ -41,6 +41,47 @@ instance magConfigS_instFintype {M : ℕ} : Fintype (magConfigS V N M) := by
   classical
   apply Subtype.fintype
 
+omit [DecidableEq V] in
+/-- Every physical magnetization value labels a non-empty spin-`S`
+configuration sector.  The construction chooses `M` positions from the
+`|V| * N` elementary slots `V × Fin N`, then records for each site how
+many chosen slots lie over it. -/
+theorem magConfigS_nonempty_of_le_card_mul {M : ℕ}
+    (hM : M ≤ Fintype.card V * N) : Nonempty (magConfigS V N M) := by
+  classical
+  let slots : Finset (V × Fin N) := Finset.univ
+  have hslots : M ≤ slots.card := by
+    simpa [slots, Fintype.card_prod, Fintype.card_fin] using hM
+  obtain ⟨chosen, _hchosen_subset, hchosen_card⟩ :=
+    Finset.exists_subset_card_eq (s := slots) hslots
+  let count : V → ℕ := fun x => (chosen.filter fun p : V × Fin N => p.1 = x).card
+  have hcount_le : ∀ x, count x ≤ N := by
+    intro x
+    have hcard :
+        (chosen.filter fun p : V × Fin N => p.1 = x).card ≤
+          (Finset.univ : Finset (Fin N)).card := by
+      refine Finset.card_le_card_of_injOn (fun p : V × Fin N => p.2) ?_ ?_
+      · intro p hp
+        simp
+      · intro p hp q hq hpq
+        have hp_first : p.1 = x := (Finset.mem_filter.mp hp).2
+        have hq_first : q.1 = x := (Finset.mem_filter.mp hq).2
+        exact Prod.ext (hp_first.trans hq_first.symm) hpq
+    simpa [count, Fintype.card_fin] using hcard
+  let σ : V → Fin (N + 1) := fun x => ⟨count x, Nat.lt_succ_of_le (hcount_le x)⟩
+  have hsum : magSumS σ = M := by
+    have hfiber :
+        chosen.card =
+          ∑ x : V, (chosen.filter fun p : V × Fin N => p.1 = x).card := by
+      simpa using
+        (Finset.card_eq_sum_card_fiberwise
+          (s := chosen) (t := (Finset.univ : Finset V))
+          (f := fun p : V × Fin N => p.1)
+          (by intro p hp; simp))
+    unfold magSumS σ count
+    simpa [hchosen_card] using hfiber.symm
+  exact ⟨⟨σ, hsum⟩⟩
+
 /-! ## Raise/lower step lifted to magConfigS -/
 
 /-- A `RaiseLowerStepS` between two magConfigS in the same sector
