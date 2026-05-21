@@ -7376,7 +7376,8 @@ see \texttt{docs/index.md} for the full list with per-PR provenance.
 \textbf{Final statement (PR \#3337)}: the Tasaki §2.5 Theorem 2.3
 conclusion is now packaged as a \texttt{Prop}-valued definition
 \texttt{tasaki\_2\_5\_theorem\_2\_3} in
-\texttt{LatticeSystem/Quantum/SpinS/Theorem23.lean}.  The predicted
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23SectorExistence.lean}.
+The predicted
 spin and admissible-sector interval API used by this definition are
 factored into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Sectors.lean}.  The
@@ -7390,7 +7391,9 @@ predecessor-difference, raised/lowered site-sum, and adjacent-sector
 energy tail split into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalDifference.lean}; the
 main \texttt{Theorem23.lean} module now starts from the adjacent
-common-energy chain while importing those APIs. The
+common-energy chain while importing those APIs.  The final statement and
+sector-existence wrappers are isolated in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23SectorExistence.lean}. The
 hypothesis bundle and conclusion are aligned exactly with the per-sector
 bundled Theorem 2.2
 \texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
@@ -8716,6 +8719,8 @@ The predicted-data bridge layer is isolated in
 local predecessor-difference and adjacent-sector energy tail is isolated
 in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalDifference}\).  The
+sector-existence and final-statement layer is isolated in
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23SectorExistence}\).  The
 interval-chain callbacks are isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Interval}\), while the
 outside-ground lower-bound callbacks and common final packaging wrappers
