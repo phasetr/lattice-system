@@ -1,14 +1,15 @@
-import LatticeSystem.Quantum.SpinS.Theorem23
+import LatticeSystem.Quantum.SpinS.Theorem23SectorExistence
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 
 /-!
 # Tasaki §2.5 Theorem 2.3 interval-chain API
 
-This module contains the named callback propositions, interval-chain
-wrappers, and sector-minimality bridges used by the final Tasaki §2.5
-Theorem 2.3 packaging modules. It is split out from `Theorem23.lean` so
-the main theorem-development module can stay focused on the core
-endpoint-mismatch and adjacent-sector machinery.
+This module contains the named callback propositions, downstream
+interval-chain wrappers, and sector-minimality bridges used by the final
+Tasaki §2.5 Theorem 2.3 packaging modules. It imports the
+sector-existence/final-statement layer split from `Theorem23.lean`, so
+the main theorem-development module can stay focused on the adjacent
+common-energy machinery.
 -/
 
 namespace LatticeSystem.Quantum
