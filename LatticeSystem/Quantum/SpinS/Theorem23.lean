@@ -2399,6 +2399,24 @@ theorem
         (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) τ.1] at hτ
   simpa [map_sum] using hτ
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 callback adapter from unpacked real
+predecessor differences to lowered site sums**: the fully threaded
+predecessor-difference callback can be consumed directly as the strict
+single-site lowered sum positivity callback used by the site-sum
+successor chain.
+
+This names the callback-level API of
+`tasaki23_lowered_site_sum_pos_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos`
+so later final wrappers can route the predecessor-difference boundary to
+the lowered site-sum chain without first passing through the
+raising-source dominance final wrapper. -/
+abbrev
+    tasaki23_lowered_site_sum_pos_callback_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ) :=
+  tasaki23_lowered_site_sum_pos_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+    (V := V) (N := N) A v
+
 /-- **Tasaki §2.5 Theorem 2.3 strict off-`A` lowered sign-sum witness**:
 if at least one site outside `A` can be lowered in the target
 configuration, then the off-`A` filtered signed lowering sum is strictly
