@@ -7394,7 +7394,9 @@ common-energy chain while importing those APIs.  The local
 adjacent-sector energy comparison suffix is isolated in
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalDifferenceEnergy.lean}.
 The final statement and sector-existence wrappers are isolated in
-\texttt{LatticeSystem/Quantum/SpinS/Theorem23SectorExistence.lean}. The
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23SectorExistence.lean}; the
+predicted-Casimir interval-chain and minimality callback suffix is isolated in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23IntervalCasimir.lean}. The
 hypothesis bundle and conclusion are aligned exactly with the per-sector
 bundled Theorem 2.2
 \texttt{marshallLiebMattis\_spinS\_heisenbergHamiltonianS\_groundState\_full}
@@ -8725,7 +8727,10 @@ the adjacent-sector energy comparison wrappers split further into
 sector-existence and final-statement layer is isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23SectorExistence}\).  The
 interval-chain callbacks are isolated in
-\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Interval}\), while the
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Interval}\), with the
+predicted-Casimir interval-chain and minimality callback suffix split
+further into
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23IntervalCasimir}\).  The
 outside-ground lower-bound callbacks and common final packaging wrappers
 are isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23OutsideGround}\).  The

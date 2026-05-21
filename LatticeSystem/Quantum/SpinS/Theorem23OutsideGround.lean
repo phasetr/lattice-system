@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23Interval
+import LatticeSystem.Quantum.SpinS.Theorem23IntervalCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 
 /-!
@@ -6,8 +6,8 @@ import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 
 This module contains outside-ground lower-bound callbacks and common-energy
 final packaging wrappers for the Tasaki §2.5 Theorem 2.3 proof chain. It
-imports the interval-chain API split from `Theorem23.lean` so the main
-theorem-development module does not accumulate the outside-ground and
+imports the interval-Casimir API split from `Theorem23Interval.lean` so the
+base interval-chain module does not accumulate the outside-ground and
 final-packaging API tail.
 -/
 
