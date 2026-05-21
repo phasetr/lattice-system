@@ -4083,6 +4083,30 @@ theorem tasaki23GroundStateSectors_pred_mem_of_left_lt_of_mem (A : V → Bool) (
   omega
 
 omit [DecidableEq V] in
+/-- **Tasaki §2.5 Theorem 2.3 admissible-sector physical range**:
+every admissible sector lies within the full spin-`S` magnetization
+range `0 ≤ M ≤ |V| * N`.  This is the upper-bound half needed to
+replace interval-specific non-emptiness callbacks by a canonical
+physical-range non-emptiness callback for `magConfigS`. -/
+theorem tasaki23GroundStateSectors_le_card_mul (A : V → Bool) (N : ℕ) {M : ℕ}
+    (hM : M ∈ tasaki23GroundStateSectors (V := V) A N) :
+    M ≤ Fintype.card V * N := by
+  let cA := (Finset.univ.filter (fun x : V => A x = true)).card
+  let cB := (Finset.univ.filter (fun x : V => (! A x) = true)).card
+  have hbounds := (tasaki23GroundStateSectors_mem_iff (V := V) A N M).mp hM
+  have hmax_le_sum : max cA cB ≤ cA + cB := by
+    exact max_le (Nat.le_add_right cA cB) (Nat.le_add_left cB cA)
+  have hright_le_total : max cA cB * N ≤ (cA + cB) * N :=
+    Nat.mul_le_mul_right N hmax_le_sum
+  have hcard_sum : cA + cB = Fintype.card V := by
+    simpa [cA, cB] using tasaki23_card_filter_A_add_card_notA (V := V) A
+  calc
+    M ≤ max cA cB * N := by
+      simpa [cA, cB] using hbounds.2
+    _ ≤ (cA + cB) * N := hright_le_total
+    _ = Fintype.card V * N := by rw [hcard_sum]
+
+omit [DecidableEq V] in
 /-- **Tasaki §2.5 Theorem 2.3 admissible-sector cardinality**:
 the interval of ground-state magnetization sectors has the predicted
 degeneracy `||A| - |¬A||·N + 1 = 2 S_tot + 1`. -/
@@ -15337,6 +15361,45 @@ abbrev
         (by
           simpa using tasaki23GroundStateSectors_left_mem (V := V) A N)
         hμ_lt hv_pos hΦ)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 physical-range non-empty outside-ground
+boundary**: this replaces the interval-specific non-emptiness callback
+for admissible sectors by a canonical non-emptiness callback on the
+physical magnetization range `M ≤ |V| * N`.  The admissible-sector range
+bound supplies the required `magConfigS` instance for each sector, and
+the remaining inputs are the uniform predicted-GS callback, the local
+predecessor-difference comparison, and outside-sector ground-energy
+lower bounds. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_physical_range_nonempty_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hphysical_nonempty :
+      ∀ M, M ≤ Fintype.card V * N → Nonempty (magConfigS V N M))
+    (hsource_predictedGS :
+      ∀ {M : ℕ},
+        M ∈ tasaki23GroundStateSectors (V := V) A N →
+        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
+          μ < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μ : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          magSectorEmbedding
+              (fun τ : magConfigS V N M =>
+                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N) :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
+    (V := V) A (J := J) N c hBA
+    (fun M hM =>
+      hphysical_nonempty M
+        (tasaki23GroundStateSectors_le_card_mul (V := V) A N hM))
+    hsource_predictedGS
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 predicted-GS final wrapper from

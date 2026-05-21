@@ -8773,6 +8773,30 @@ callback at the left endpoint
 predecessor-difference boundary above.  Thus the visible remaining local
 work is no longer tied to a bespoke left-endpoint predicted-GS callback.
 
+Lean also records the range step needed to remove the
+admissible-interval-specific non-emptiness callback.  The lemma
+\[
+  \texttt{tasaki23GroundStateSectors\_le\_card\_mul}
+\]
+states that if \(M\in\mathcal G(A,N)\), then
+\[
+  M \le |V|N.
+\]
+Indeed \(M\le \max(|A|,|A^c|)N\), while
+\(\max(|A|,|A^c|)\le |A|+|A^c|=|V|\).  The boundary
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_physical\_range\_nonempty\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_outside\_sector\_ground\_energy\_lower\_bound}
+\end{gathered}
+\]
+therefore asks only for non-emptiness of \(\texttt{magConfigS}\) on
+the physical range \(M\le |V|N\), and derives the previous
+admissible-sector non-emptiness callback from this range lemma.
+
 \textbf{Lowered vector Marshall-positivity final wrappers}: the
 site-sum formulation is only a technical expansion of the total lowering
 operator.  Lean therefore also records the reverse conversion
