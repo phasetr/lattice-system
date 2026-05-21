@@ -10339,6 +10339,84 @@ theorem tasaki23_real_sector_minimality_on_groundStateSectors_of_common_energy_c
       hφ_ne hφ_eigen
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-sector real lower bound from
+outside-sector ground energies**: for sectors outside the admissible
+Theorem 2.3 interval, it is enough to prove the lower bound against the
+Marshall-positive sector ground-state representative supplied by the
+per-sector Theorem 2.2 wrapper.
+
+The Perron-Frobenius comparison for the shifted dressed real sector matrix
+then places that sector ground energy below every real-form sector
+eigenvalue, giving the full outside-real-sector callback needed by the
+final global-minimality step. -/
+theorem tasaki23_outside_real_sector_minimality_of_outside_sector_ground_energy_lower_bound
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {μ : ℝ}
+    (houtside_ground_energy_lower :
+      ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+        M ∉ tasaki23GroundStateSectors (V := V) A N →
+        ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+          μM < c →
+          (∀ τ, 0 < v τ) →
+          (heisenbergHamiltonianS J N).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+            (μM : ℂ) • magSectorEmbedding
+              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+          μ ≤ μM) :
+    ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+      M ∉ tasaki23GroundStateSectors (V := V) A N →
+      ∀ {μ' : ℝ} {φ : magConfigS V N M → ℝ},
+        φ ≠ 0 →
+        (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec φ = μ' • φ →
+        μ ≤ μ' := by
+  intro M _ hM_out μ' φ hφ_ne hφ_eigen
+  obtain ⟨μM, vM, hμM_lt, hvM_pos, hΦM, _hsupportM, _huniqM⟩ :=
+    tasaki_2_5_theorem_2_3_sector_existence
+      (M := M) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate
+  let Φ : magConfigS V N M → ℂ :=
+    fun τ => (((marshallSignS A τ.1).re * vM τ : ℝ) : ℂ)
+  have hsector_complex :
+      (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φ =
+        (μM : ℂ) • Φ := by
+    have hrestrict :=
+      heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen
+        (M := M) J hΦM
+    rw [magSectorRestriction_magSectorEmbedding] at hrestrict
+    exact hrestrict
+  have hsector_real :
+      (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+          (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * vM τ) =
+        μM • (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * vM τ) := by
+    have hre :=
+      heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
+        N hJ_real hsector_complex
+    simpa [Φ] using hre
+  have hμ_le_μM : μ ≤ μM :=
+    houtside_ground_energy_lower M hM_out hμM_lt hvM_pos hΦM
+  have hμM_le_μ' : μM ≤ μ' :=
+    heisenbergHamiltonianSReMatrixOnMagSector_eigenvalue_ge_of_marshallPositive
+      A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hsector_real
+      (fun τ => by
+        have hsq : (marshallSignS A τ.1).re * (marshallSignS A τ.1).re = 1 :=
+          marshallSignS_re_sq A τ.1
+        have hv := hvM_pos τ
+        nlinarith [hv])
+      hφ_ne hφ_eigen
+  exact hμ_le_μM.trans hμM_le_μ'
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 final wrapper from a common interval energy**:
 if one real energy `μ` is already realised by Marshall-positive sector
 eigenvectors in every admissible sector, then the per-sector Theorem 2.2
