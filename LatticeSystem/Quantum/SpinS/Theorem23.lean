@@ -8197,6 +8197,35 @@ theorem tasaki23_energy_interval_chain_of_left_endpoint_predictedGS_of_lowered_m
           (hsource_lowered_marshall_pos hM hMlt hμ_lt hv_pos hΦ))
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint predicted-GS callback**:
+the Marshall-positive representative selected in the left endpoint sector
+belongs to the predicted toy-Hamiltonian ground-state subspace.
+
+This names the left-endpoint input used before the uniform source-sector
+predicted-GS callback feeds that same endpoint into the interval chain. -/
+def tasaki23LeftEndpointPredictedGSCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ {μ : ℝ}
+    {v : magConfigS V N
+      (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+          N) → ℝ},
+      μ < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μ : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      magSectorEmbedding
+          (fun τ : magConfigS V N
+            (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+              (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+                N) =>
+            (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+        bipartiteToyGroundStateSubspacePredicted (Λ := V) A N
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 interval chain threading predicted-GS
 membership from lowered site-sum positivity**: in the canonical
 orientation `|¬A| ≤ |A|`, left-endpoint predicted-GS membership
@@ -8225,27 +8254,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_site_sum_pos :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -8513,27 +8522,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
       tasaki23PredecessorDifferenceCallback (V := V) A J N c) :
     ∃ μ : ℝ,
@@ -8725,27 +8714,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_lowered_marshall_pos :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -8817,27 +8786,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_sublattice_component_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -8989,27 +8938,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_joint_sublattice_component_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -9117,27 +9046,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_lowered_joint_magSubspace_component_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -9246,27 +9155,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_lowered_joint_cross_ladder_component_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -9367,27 +9256,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_lowered_joint_cross_ladder_component_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -11216,27 +11085,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_dominance :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -11296,27 +11145,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_dominance :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -11376,27 +11205,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_dominance :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -11467,27 +11276,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_lowered_marshall_pos :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -11564,27 +11353,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_lowered_marshall_pos :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -11641,27 +11410,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_lowered_marshall_pos :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -11730,27 +11479,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_lowered_marshall_pos :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -11823,27 +11552,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_sublattice_component_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -11924,27 +11633,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_joint_sublattice_component_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -12038,27 +11727,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_joint_sublattice_coefficient_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -12153,27 +11822,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_lowered_joint_magSubspace_component_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -12268,27 +11917,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_lowered_joint_magSubspace_coefficient_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -12383,27 +12012,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_lowered_joint_cross_ladder_component_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -12498,27 +12107,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_lowered_joint_cross_ladder_coefficient_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -12618,27 +12207,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_lowered_joint_cross_ladder_component_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -12773,27 +12342,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_lowered_joint_cross_ladder_coefficient_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -12927,27 +12476,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_reembedded_cross_ladder_coefficient_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -13088,27 +12617,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_reembedded_source_weight_coefficient_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -13255,27 +12764,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_reembedded_source_weight_coefficient_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -13431,27 +12920,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_reembedded_source_weight_predecessor_coefficient_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -13610,27 +13079,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_reembedded_source_weight_predecessor_positive_source_coefficient_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -13766,27 +13215,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_reembedded_source_weight_predecessor_lowerable_positive_source_coefficient_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -13923,27 +13352,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_reembedded_source_weight_predecessor_explicit_lowerable_positive_source_coefficient_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -14081,27 +13490,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_reembedded_real_source_weight_predecessor_explicit_lowerable_positive_source_coefficient_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -14244,27 +13633,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_reembedded_real_source_weight_predecessor_raising_source_sum_lt :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
@@ -14416,27 +13785,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
       tasaki23PredecessorDifferenceCallback (V := V) A J N c)
     (hsector_min :
@@ -14491,27 +13840,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
       tasaki23PredecessorDifferenceCallback (V := V) A J N c)
     (hsector_min :
@@ -14577,27 +13906,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
       tasaki23PredecessorDifferenceCallback (V := V) A J N c)
     (houtside_real_sector_min :
@@ -14658,27 +13967,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
       tasaki23PredecessorDifferenceCallback (V := V) A J N c)
     (houtside_ground_energy_lower :
@@ -15058,27 +14347,7 @@ theorem
       ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
         Nonempty (magConfigS V N M))
     (hleft_predictedGS :
-      ∀ {μ : ℝ}
-        {v : magConfigS V N
-          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-              N) → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N
-                (min
-                  (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-                  (Finset.card
-                    (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
-                    N) =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
     (hsource_site_sum_pos :
       ∀ {M : ℕ},
         M ∈ tasaki23GroundStateSectors (V := V) A N →
