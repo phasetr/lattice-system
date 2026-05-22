@@ -337,7 +337,7 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
-- **2026-05-23 (PR pending)**: Refactored the Tasaki §2.5 Theorem 2.3
+- **2026-05-23 (PR #3511)**: Refactored the Tasaki §2.5 Theorem 2.3
   base adjacent-energy API after the predicted-Casimir adjacent common-energy
   wrappers became a stable suffix. `Theorem23.lean` now keeps the site-sum and
   Casimir-nonvanishing adjacent common-energy links, while
