@@ -337,6 +337,15 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-22 (PR #3490)**: Refactored the Tasaki §2.5 Theorem 2.3
+  predicted ladder API after the predicted-GS ladder-closure,
+  lowered-joint-subspace, and scalar-cancellation wrappers became a stable
+  suffix. `Theorem23Predicted.lean` now keeps the predicted-Casimir,
+  predicted-GS, cross-ladder, and source-weight bridge layer (919 lines),
+  while `Theorem23PredictedLadder.lean` contains the ladder-closure and
+  scalar-transfer suffix (662 lines). Focused checks cover the split modules,
+  `Theorem23`, dominance, sector-existence, interval, and outside-ground
+  downstream modules.
 - **2026-05-22 (PR #3489)**: Refactored the Tasaki §2.5 Theorem 2.3
   common-energy API after the dominance and predicted-GS wrappers became a
   stable suffix. `Theorem23.lean` now keeps the site-sum and
