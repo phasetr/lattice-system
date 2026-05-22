@@ -337,6 +337,14 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3510)**: Refactored the Tasaki §2.5 Theorem 2.3 local
+  predecessor-difference API after the unpacked real predecessor-difference
+  callback adapters became a stable suffix. `Theorem23LocalDifference.lean`
+  now keeps the sublattice coefficient and predecessor raising-source
+  difference identities, while `Theorem23LocalDifferenceUnpacked.lean`
+  contains the fully threaded unpacked callback adapters consumed by the
+  interval and outside-ground wrappers. Focused checks cover the split local
+  difference modules and the interval / outside-ground downstream consumers.
 - **2026-05-23 (PR #3509)**: Refactored the Tasaki §2.5 Theorem 2.3
   cross-ladder final-wrapper API after the lowered-joint magnetization and
   lowered-joint cross-ladder wrappers became a stable suffix.
