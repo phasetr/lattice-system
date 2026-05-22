@@ -341,7 +341,7 @@ mechanically** and catch most regressions / drift.
   sector-existence interval API after the predicted-GS interval-chain wrappers
   became a stable suffix. `Theorem23SectorExistence.lean` now keeps the final
   statement, per-sector Theorem 2.2 reuse wrapper, and adjacent
-  sector-existence wrappers (891 lines), while
+  sector-existence wrappers (892 lines), while
   `Theorem23SectorExistenceInterval.lean` contains the predicted-GS
   interval-chain suffix (371 lines). Focused checks cover the split modules
   and the outside-ground / final downstream modules.
