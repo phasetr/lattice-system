@@ -337,6 +337,14 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3501)**: Refactored the Tasaki §2.5 Theorem 2.3
+  predicted-data API after the source-weight and lowering-predecessor
+  bridges became a stable suffix. `Theorem23Predicted.lean` now keeps the
+  predicted-Casimir, predicted-GS, and cross-ladder bridge layer (559 lines),
+  while `Theorem23PredictedSourceWeight.lean` contains the diagonal
+  source-weight and lowering-predecessor bridge suffix (384 lines). Focused
+  checks cover the split modules and the interval / outside-ground downstream
+  modules.
 - **2026-05-23 (PR #3500)**: Refactored the Tasaki §2.5 Theorem 2.3
   outside-ground predecessor API after the real predecessor source-weight and
   raising-source final wrappers became a stable suffix.

@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadderUnpacked
+import LatticeSystem.Quantum.SpinS.Theorem23PredictedSourceWeight
 
 /-!
 # Tasaki §2.5 Theorem 2.3 re-embedded cross-ladder final wrappers
