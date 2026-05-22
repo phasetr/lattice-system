@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundPredecessor
+import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundPredecessorLowerable
 import LatticeSystem.Quantum.SpinS.Theorem23PredictedSourceWeight
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficientRaisingSource
 
@@ -6,11 +6,11 @@ import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficientRaisingSource
 # Tasaki §2.5 Theorem 2.3 predecessor raising-source final wrappers
 
 This module contains the real predecessor source-weight and raising-source
-final-wrapper suffix split from `Theorem23OutsideGroundPredecessor.lean`. The
-base predecessor module keeps the source-weight, positive-source, lowerable,
-and explicit lowerable final-wrapper layers, while this module packages the
-real source-weight and raising-source boundaries consumed by the
-predecessor-difference tail.
+final-wrapper suffix split from `Theorem23OutsideGroundPredecessorLowerable.lean`.
+The base predecessor module keeps the source-weight and positive-source
+final-wrapper layers, the lowerable module keeps the lowerable and explicit
+lowerable wrappers, and this module packages the real source-weight and
+raising-source boundaries consumed by the predecessor-difference tail.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.

@@ -337,6 +337,15 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3512)**: Refactored the Tasaki §2.5 Theorem 2.3
+  outside-ground predecessor API after the lowerable and explicit lowerable
+  positive-source final wrappers became a stable suffix.
+  `Theorem23OutsideGroundPredecessor.lean` now keeps the source-weight and
+  positive-source final-wrapper layers, while
+  `Theorem23OutsideGroundPredecessorLowerable.lean` contains the lowerable and
+  explicit lowerable final-wrapper suffix consumed by the real source-weight
+  and raising-source downstream module. Focused checks cover the split
+  predecessor modules and the predecessor-difference downstream module.
 - **2026-05-23 (PR #3511)**: Refactored the Tasaki §2.5 Theorem 2.3
   base adjacent-energy API after the predicted-Casimir adjacent common-energy
   wrappers became a stable suffix. `Theorem23.lean` now keeps the site-sum and
