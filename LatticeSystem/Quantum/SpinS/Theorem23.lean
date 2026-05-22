@@ -34,9 +34,10 @@ Theorem 2.2"), the proof reuses the Marshall sign + Perron–Frobenius
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
 
-The dominance-form wrappers are split into `Theorem23Dominance.lean` so this
-module can stay focused on the site-sum and predicted-Casimir common-energy
-links.
+The dominance-form wrappers are split into `Theorem23Dominance.lean`, with
+the predicted-GS dominance suffix in `Theorem23DominancePredictedGS.lean`, so
+this module can stay focused on the site-sum and predicted-Casimir
+common-energy links.
 
 Tracked in Issue #412 (Tasaki §2.5: Marshall–Lieb–Mattis theorem).
 -/
