@@ -7409,8 +7409,10 @@ raising-direction site-sum layer is split into
 the Marshall-positivity wrapper layer is split into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalDifferenceMarshall.lean}.  The
 main \texttt{Theorem23.lean} module now keeps the site-sum and
-predicted-Casimir adjacent common-energy chain, while the dominance-form
-common-energy wrappers are isolated in
+Casimir-nonvanishing adjacent common-energy chain, while the predicted-Casimir
+adjacent common-energy suffix is isolated in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23PredictedCasimirEnergy.lean}.
+The dominance-form common-energy wrappers are isolated in
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Dominance.lean}, with the
 predicted-GS dominance suffix isolated in
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23DominancePredictedGS.lean}.  The local
@@ -8480,7 +8482,10 @@ same package, the identity
 \]
 Thus the non-zero ladder image used to enter the adjacent sector keeps
 its predicted-Casimir information available before the later
-sector-representative comparison.
+sector-representative comparison.  The package is implemented in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23PredictedCasimirEnergy.lean},
+which contains the predicted-Casimir adjacent common-energy suffix split from
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23.lean}.
 
 \textbf{Sector-existence predicted-Casimir chain link}: the preceding
 package is now connected to the per-sector Theorem~2.2 existence wrapper.
@@ -8751,6 +8756,10 @@ The quantified callback shapes used in this final bridge are now named:
 \]
 The predicted-data bridge layer is isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Predicted}\).  The local
+site-sum and Casimir-nonvanishing adjacent common-energy layer is isolated in
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23}\), with the predicted-Casimir
+adjacent common-energy suffix split into
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23PredictedCasimirEnergy}\).  The local
 lowering component layer is isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalLowering}\).  The
 local coefficient layer is isolated in

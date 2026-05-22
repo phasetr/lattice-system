@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23DominancePredictedGS
+import LatticeSystem.Quantum.SpinS.Theorem23PredictedCasimirEnergy
 import LatticeSystem.Quantum.SpinS.Theorem23PredictedLadderCasimirTransfer
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
@@ -8,9 +9,9 @@ import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
 
 This module contains the final `tasaki_2_5_theorem_2_3` statement, the
 per-sector Theorem 2.2 reuse wrapper, and the predicted-Casimir existential
-successor/predecessor packages split from `Theorem23.lean`. Keeping this layer
-separate lets the adjacent common-energy and dominance APIs elaborate without
-the sector-existence/final-statement tail. The dominance-form
+successor/predecessor packages using `Theorem23PredictedCasimirEnergy.lean`.
+Keeping this layer separate lets the adjacent common-energy and dominance APIs
+elaborate without the sector-existence/final-statement tail. The dominance-form
 sector-existence suffix is split into `Theorem23SectorExistenceDominance.lean`,
 and the predicted-GS interval-chain suffix is split further into
 `Theorem23SectorExistenceInterval.lean`.
