@@ -350,7 +350,7 @@ mechanically** and catch most regressions / drift.
   and source-weight final wrappers became a stable suffix.
   `Theorem23OutsideGroundCrossLadder.lean` now keeps the sublattice-component,
   joint-component, lowered-joint, and unpacked lowered-joint final-wrapper
-  layers (947 lines), while `Theorem23OutsideGroundCrossLadderReembedded.lean`
+  layers (948 lines), while `Theorem23OutsideGroundCrossLadderReembedded.lean`
   contains the re-embedded / source-weight final-wrapper suffix (466 lines).
   Focused checks cover the split modules and the predecessor / final
   downstream modules.
