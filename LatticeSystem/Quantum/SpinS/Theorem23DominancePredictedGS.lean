@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23Dominance
+import LatticeSystem.Quantum.SpinS.Theorem23PredictedLadderCasimirTransfer
 
 /-!
 # Tasaki §2.5 Theorem 2.3 predicted-GS dominance API

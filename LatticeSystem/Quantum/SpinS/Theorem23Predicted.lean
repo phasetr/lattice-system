@@ -10,10 +10,11 @@ Tasaki §2.5 Theorem 2.3.
 
 It is split from `Theorem23.lean` so the adjacent common-energy chain
 can import the predicted-data API without keeping these bridge proofs in
-the same elaboration unit. The predicted-GS ladder-closure and
-scalar-cancellation suffix is split into `Theorem23PredictedLadder.lean`,
-and the source-weight / lowering-predecessor suffix is split into
-`Theorem23PredictedSourceWeight.lean`.
+the same elaboration unit. The predicted-GS ladder-closure and joint
+sublattice-Casimir layer is split into `Theorem23PredictedLadder.lean`,
+the real-scalar and predicted-Casimir transfer suffix is split into
+`Theorem23PredictedLadderCasimirTransfer.lean`, and the source-weight /
+lowering-predecessor suffix is split into `Theorem23PredictedSourceWeight.lean`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
