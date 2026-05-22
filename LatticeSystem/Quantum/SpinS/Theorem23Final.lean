@@ -1,3 +1,4 @@
+import LatticeSystem.Quantum.SpinS.Theorem23SectorExistenceInterval
 import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundPredecessor
 
 /-!
