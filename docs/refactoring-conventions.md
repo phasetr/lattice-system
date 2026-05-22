@@ -337,6 +337,14 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-22 (PR #3491)**: Refactored the Tasaki §2.5 Theorem 2.3
+  outside-ground predicted-GS final API after the left-endpoint predicted-GS
+  and lowered-Marshall final wrappers became a stable suffix.
+  `Theorem23OutsideGround.lean` now keeps the outside-sector lower-bound,
+  sector-minimality, and predicted-Casimir final-wrapper layers (1073 lines),
+  while `Theorem23OutsideGroundPredictedGS.lean` contains the predicted-GS and
+  lowered-Marshall final-wrapper suffix (488 lines). Focused checks cover the
+  split modules and the cross-ladder / predecessor / final downstream modules.
 - **2026-05-22 (PR #3490)**: Refactored the Tasaki §2.5 Theorem 2.3
   predicted ladder API after the predicted-GS ladder-closure,
   lowered-joint-subspace, and scalar-cancellation wrappers became a stable
