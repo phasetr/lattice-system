@@ -337,12 +337,20 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-22 (PR #3493)**: Refactored the Tasaki §2.5 Theorem 2.3
+  interval-chain API after the joint-component and lowered-joint cross-ladder
+  interval wrappers became a stable suffix. `Theorem23Interval.lean` now keeps
+  the named callbacks plus the basic predecessor-difference, lowered-Marshall,
+  and predicted-GS sublattice-component interval chains (805 lines), while
+  `Theorem23IntervalJoint.lean` contains the joint-component and lowered-joint
+  cross-ladder interval-wrapper suffix (474 lines). Focused checks cover the
+  split modules and the interval-Casimir / outside-ground downstream modules.
 - **2026-05-22 (PR #3492)**: Refactored the Tasaki §2.5 Theorem 2.3
   outside-ground cross-ladder final API after the re-embedded cross-ladder
   and source-weight final wrappers became a stable suffix.
   `Theorem23OutsideGroundCrossLadder.lean` now keeps the sublattice-component,
   joint-component, lowered-joint, and unpacked lowered-joint final-wrapper
-  layers (947 lines), while `Theorem23OutsideGroundCrossLadderReembedded.lean`
+  layers (948 lines), while `Theorem23OutsideGroundCrossLadderReembedded.lean`
   contains the re-embedded / source-weight final-wrapper suffix (466 lines).
   Focused checks cover the split modules and the predecessor / final
   downstream modules.
