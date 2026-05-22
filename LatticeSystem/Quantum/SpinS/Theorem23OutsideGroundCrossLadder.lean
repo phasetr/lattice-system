@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundPredictedGS
+import LatticeSystem.Quantum.SpinS.Theorem23IntervalJoint
 import LatticeSystem.Quantum.SpinS.Theorem23PredictedLadder
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
