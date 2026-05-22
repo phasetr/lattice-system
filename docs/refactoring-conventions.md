@@ -337,6 +337,14 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3504)**: Refactored the Tasaki §2.5 Theorem 2.3
+  sector-existence API after the dominance-form successor/predecessor wrappers
+  became a stable suffix. `Theorem23SectorExistence.lean` now keeps the final
+  theorem proposition, per-sector Theorem 2.2 wrapper, and predicted-Casimir
+  existential packages (483 lines), while
+  `Theorem23SectorExistenceDominance.lean` contains the dominance-form
+  sector-existence suffix (433 lines). Focused checks cover the split modules
+  and interval-chain downstream modules.
 - **2026-05-23 (PR #3503)**: Refactored the Tasaki §2.5 Theorem 2.3 local
   coefficient API after the predecessor raising-source wrappers became a stable
   suffix. `Theorem23LocalCoefficient.lean` now keeps the lowered signed and
