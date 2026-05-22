@@ -337,6 +337,15 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-22 (PR #3492)**: Refactored the Tasaki §2.5 Theorem 2.3
+  outside-ground cross-ladder final API after the re-embedded cross-ladder
+  and source-weight final wrappers became a stable suffix.
+  `Theorem23OutsideGroundCrossLadder.lean` now keeps the sublattice-component,
+  joint-component, lowered-joint, and unpacked lowered-joint final-wrapper
+  layers (948 lines), while `Theorem23OutsideGroundCrossLadderReembedded.lean`
+  contains the re-embedded / source-weight final-wrapper suffix (465 lines).
+  Focused checks cover the split modules and the predecessor / final
+  downstream modules.
 - **2026-05-22 (PR #3491)**: Refactored the Tasaki §2.5 Theorem 2.3
   outside-ground predicted-GS final API after the left-endpoint predicted-GS
   and lowered-Marshall final wrappers became a stable suffix.
