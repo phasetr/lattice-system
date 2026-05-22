@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23Interval
+import LatticeSystem.Quantum.SpinS.Theorem23DominancePredictedCasimirTransfer
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
 
