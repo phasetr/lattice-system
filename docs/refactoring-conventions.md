@@ -337,6 +337,14 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3506)**: Refactored the Tasaki §2.5 Theorem 2.3
+  interval-chain API after the lowered-vector-Marshall and predicted-GS-aware
+  sublattice-component interval wrappers became a stable suffix.
+  `Theorem23Interval.lean` now keeps the named callbacks and direct
+  interval-chain wrappers (543 lines), while
+  `Theorem23IntervalPredictedGS.lean` contains the predicted-GS-aware interval
+  suffix (242 lines). Focused checks cover the split interval modules and the
+  joint interval downstream consumer.
 - **2026-05-23 (PR #3504)**: Refactored the Tasaki §2.5 Theorem 2.3
   sector-existence API after the dominance-form successor/predecessor wrappers
   became a stable suffix. `Theorem23SectorExistence.lean` now keeps the final
