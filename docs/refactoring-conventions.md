@@ -337,7 +337,7 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
-- **2026-05-23 (PR pending)**: Refactored the Tasaki §2.5 Theorem 2.3
+- **2026-05-23 (PR #3509)**: Refactored the Tasaki §2.5 Theorem 2.3
   cross-ladder final-wrapper API after the lowered-joint magnetization and
   lowered-joint cross-ladder wrappers became a stable suffix.
   `Theorem23OutsideGroundCrossLadder.lean` now keeps the sublattice-component,
