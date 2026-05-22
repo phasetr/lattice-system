@@ -5,8 +5,10 @@ import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 
 This module contains the raising-direction site-sum API split from
 `Theorem23LocalDifference.lean`. The lowered predecessor-difference API
-remains in `Theorem23LocalDifference.lean`, the lowered site-sum dominance
-API is isolated in `Theorem23LocalDifferenceSiteSum.lean`, and final
+remains in `Theorem23LocalDifference.lean`, the unpacked
+predecessor-difference callback adapters are isolated in
+`Theorem23LocalDifferenceUnpacked.lean`, the lowered site-sum dominance API is
+isolated in `Theorem23LocalDifferenceSiteSum.lean`, and final
 Marshall-positivity wrappers are isolated in
 `Theorem23LocalDifferenceMarshall.lean`.
 

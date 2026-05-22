@@ -5,9 +5,9 @@ import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 
 This module contains the strict off-`A` lowering witnesses and lowered
 site-sum dominance bridges split from `Theorem23LocalDifference.lean`.
-The predecessor-difference callbacks remain in `Theorem23LocalDifference.lean`,
-while final Marshall-positivity wrappers are isolated in
-`Theorem23LocalDifferenceMarshall.lean`.
+The unpacked predecessor-difference callback adapters are isolated in
+`Theorem23LocalDifferenceUnpacked.lean`, while final Marshall-positivity
+wrappers are isolated in `Theorem23LocalDifferenceMarshall.lean`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
