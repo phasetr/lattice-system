@@ -337,6 +337,13 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3505)**: Refactored the Tasaki §2.5 Theorem 2.3 final
+  boundary API after the lowered-vector-Marshall final wrappers became a stable
+  suffix. `Theorem23Final.lean` now keeps the outside-ground and direct
+  lowered-site-sum final boundaries (536 lines), while
+  `Theorem23FinalLoweredMarshall.lean` contains the lowered-vector-Marshall
+  final suffix (256 lines). Focused checks cover the split final modules and
+  downstream outside-ground predicted-GS documentation references.
 - **2026-05-23 (PR #3506)**: Refactored the Tasaki §2.5 Theorem 2.3
   interval-chain API after the lowered-vector-Marshall and predicted-GS-aware
   sublattice-component interval wrappers became a stable suffix.
