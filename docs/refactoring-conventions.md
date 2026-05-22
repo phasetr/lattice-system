@@ -337,6 +337,13 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3498)**: Refactored the Tasaki §2.5 Theorem 2.3
+  local-difference site-sum API after the strict off-`A` witness and lowered
+  site-sum dominance bridges became a stable suffix.
+  `Theorem23LocalDifference.lean` now keeps the predecessor-difference
+  callback layer (689 lines), while `Theorem23LocalDifferenceSiteSum.lean`
+  contains the lowered site-sum dominance suffix (280 lines). Focused checks
+  cover the split modules and the Marshall wrapper downstream module.
 - **2026-05-22 (PR #3497)**: Refactored the Tasaki §2.5 Theorem 2.3
   local lowering API after the single-site lowering component formula,
   Marshall-signed local identities, and off-`A`/on-`A` filtered sign-sum
