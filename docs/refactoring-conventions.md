@@ -342,7 +342,7 @@ mechanically** and catch most regressions / drift.
   raising-source final wrappers became a stable suffix.
   `Theorem23OutsideGroundPredecessor.lean` now keeps the source-weight,
   positive-source, lowerable, and explicit lowerable final-wrapper layers
-  (588 lines), while `Theorem23OutsideGroundPredecessorRaising.lean` contains
+  (589 lines), while `Theorem23OutsideGroundPredecessorRaising.lean` contains
   the real source-weight and raising-source final-wrapper suffix (357 lines).
   Focused checks cover the split modules and the predecessor-difference
   downstream module.
