@@ -337,6 +337,14 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR pending)**: Refactored the Tasaki §2.5 Theorem 2.3
+  cross-ladder final-wrapper API after the lowered-joint magnetization and
+  lowered-joint cross-ladder wrappers became a stable suffix.
+  `Theorem23OutsideGroundCrossLadder.lean` now keeps the sublattice-component,
+  joint-component, and joint-coefficient final-wrapper layers, while
+  `Theorem23OutsideGroundCrossLadderLoweredJoint.lean` contains the
+  lowered-joint suffix. Focused checks cover the split cross-ladder modules and
+  the unpacked / re-embedded downstream modules.
 - **2026-05-23 (PR #3508)**: Refactored the Tasaki §2.5 Theorem 2.3
   interval-Casimir API after the global / sector minimality bridges and named
   callbacks became a stable suffix. `Theorem23IntervalCasimir.lean` now keeps

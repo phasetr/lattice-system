@@ -1,14 +1,15 @@
-import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadder
+import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadderLoweredJoint
 
 /-!
 # Tasaki §2.5 Theorem 2.3 unpacked cross-ladder final wrappers
 
 This module contains the unpacked lowered-joint cross-ladder final-wrapper
-suffix split from `Theorem23OutsideGroundCrossLadder.lean`. The base
-cross-ladder module keeps the sublattice-component, joint-component,
-lowered-joint, and packed cross-ladder final-wrapper layers, while this
-module packages the unpacked Casimir/support callback boundary consumed by
-the re-embedded cross-ladder tail.
+suffix split from `Theorem23OutsideGroundCrossLadderLoweredJoint.lean`. The
+base cross-ladder module keeps the sublattice-component, joint-component, and
+joint-coefficient final-wrapper layers, the lowered-joint module keeps the
+packed lowered-joint wrappers, and this module packages the unpacked
+Casimir/support callback boundary consumed by the re-embedded cross-ladder
+tail.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.

@@ -6,11 +6,12 @@ import LatticeSystem.Quantum.SpinS.Theorem23PredictedSourceWeight
 
 This module contains the re-embedded cross-ladder and source-weight
 final-wrapper suffix split from `Theorem23OutsideGroundCrossLadder.lean`. The
-base cross-ladder module keeps the sublattice-component, joint-component,
-lowered-joint, and packed cross-ladder final-wrapper layers, the unpacked
-callback boundary is isolated in `Theorem23OutsideGroundCrossLadderUnpacked.lean`,
-and this module packages the re-embedded source-sector final boundaries consumed
-by the predecessor-specialized tail.
+base cross-ladder module keeps the sublattice-component, joint-component, and
+joint-coefficient final-wrapper layers, the lowered-joint suffix is isolated in
+`Theorem23OutsideGroundCrossLadderLoweredJoint.lean`, the unpacked callback
+boundary is isolated in `Theorem23OutsideGroundCrossLadderUnpacked.lean`, and
+this module packages the re-embedded source-sector final boundaries consumed by
+the predecessor-specialized tail.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
