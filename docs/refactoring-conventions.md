@@ -337,6 +337,15 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-22 (PR #3495)**: Refactored the Tasaki §2.5 Theorem 2.3
+  outside-ground predecessor-difference boundary API after the
+  predecessor-difference and outside-sector final wrappers became a stable
+  suffix. `Theorem23OutsideGroundPredecessor.lean` now keeps the
+  predecessor-specialized source-weight and raising-source final-wrapper
+  layers (924 lines), while
+  `Theorem23OutsideGroundPredecessorDifference.lean` contains the
+  predecessor-difference outside-sector boundary suffix (258 lines).
+  Focused checks cover the split modules and the final downstream module.
 - **2026-05-22 (PR #3494)**: Refactored the Tasaki §2.5 Theorem 2.3
   sector-existence interval API after the predicted-GS interval-chain wrappers
   became a stable suffix. `Theorem23SectorExistence.lean` now keeps the final
