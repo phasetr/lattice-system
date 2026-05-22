@@ -1,11 +1,11 @@
-import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundPredecessor
+import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundPredecessorRaising
 
 /-!
 # Tasaki §2.5 Theorem 2.3 predecessor-difference outside-ground boundary
 
 This module contains the predecessor-difference and outside-sector final
 boundary tail for the Tasaki §2.5 Theorem 2.3 proof chain. It imports the
-predecessor-specialized final-wrapper module so downstream files can depend
+raising-source predecessor final-wrapper suffix so downstream files can depend
 directly on the final predecessor-difference API without elaborating the
 earlier predecessor source-weight wrappers in the same file.
 -/

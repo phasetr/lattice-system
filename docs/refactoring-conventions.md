@@ -337,6 +337,15 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3500)**: Refactored the Tasaki §2.5 Theorem 2.3
+  outside-ground predecessor API after the real predecessor source-weight and
+  raising-source final wrappers became a stable suffix.
+  `Theorem23OutsideGroundPredecessor.lean` now keeps the source-weight,
+  positive-source, lowerable, and explicit lowerable final-wrapper layers
+  (589 lines), while `Theorem23OutsideGroundPredecessorRaising.lean` contains
+  the real source-weight and raising-source final-wrapper suffix (357 lines).
+  Focused checks cover the split modules and the predecessor-difference
+  downstream module.
 - **2026-05-23 (PR #3499)**: Refactored the Tasaki §2.5 Theorem 2.3
   outside-ground cross-ladder API after the unpacked lowered-joint
   cross-ladder final wrappers became a stable suffix.
