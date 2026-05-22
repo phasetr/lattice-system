@@ -425,7 +425,7 @@ mechanically** and catch most regressions / drift.
   `Theorem23LocalCoefficientRaisingSource.lean` contains the predecessor
   raising-source suffix (459 lines). Focused checks cover the split modules and
   the local-difference / outside-ground predecessor downstream modules.
-- **2026-05-23 (PR pending)**: Refactored the Tasaki §2.5 Theorem 2.3
+- **2026-05-23 (PR #3514)**: Refactored the Tasaki §2.5 Theorem 2.3
   dominance API after the successor predicted-Casimir transfer wrappers became
   a stable suffix. `Theorem23Dominance.lean` now keeps the base and
   predicted-Casimir dominance layers (323 lines), while
