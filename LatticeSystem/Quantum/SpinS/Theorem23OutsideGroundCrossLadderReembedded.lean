@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadder
+import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadderUnpacked
 
 /-!
 # Tasaki §2.5 Theorem 2.3 re-embedded cross-ladder final wrappers
@@ -6,9 +6,10 @@ import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadder
 This module contains the re-embedded cross-ladder and source-weight
 final-wrapper suffix split from `Theorem23OutsideGroundCrossLadder.lean`. The
 base cross-ladder module keeps the sublattice-component, joint-component,
-lowered-joint, and unpacked lowered-joint final-wrapper layers, while this
-module packages the re-embedded source-sector final boundaries consumed by the
-predecessor-specialized tail.
+lowered-joint, and packed cross-ladder final-wrapper layers, the unpacked
+callback boundary is isolated in `Theorem23OutsideGroundCrossLadderUnpacked.lean`,
+and this module packages the re-embedded source-sector final boundaries consumed
+by the predecessor-specialized tail.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
