@@ -337,6 +337,14 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-22 (PR #3496)**: Refactored the Tasaki §2.5 Theorem 2.3
+  outside-ground predicted-Casimir API after the predicted-Casimir final
+  wrappers became a stable suffix. `Theorem23OutsideGround.lean` now keeps
+  the outside-sector lower-bound, sector-minimality, and common-energy
+  final-packaging layers (580 lines), while
+  `Theorem23OutsideGroundPredictedCasimir.lean` contains the
+  predicted-Casimir final-wrapper suffix (512 lines). Focused checks cover
+  the split modules and the predicted-GS downstream module.
 - **2026-05-22 (PR #3495)**: Refactored the Tasaki §2.5 Theorem 2.3
   outside-ground predecessor-difference boundary API after the
   predecessor-difference and outside-sector final wrappers became a stable
