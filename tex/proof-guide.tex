@@ -7386,8 +7386,10 @@ layer is factored into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Predicted.lean}, with the
 predicted-GS ladder-closure and scalar-cancellation layer split into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23PredictedLadder.lean}.  The
-local ladder and single-site calculation layer is factored into
-\texttt{LatticeSystem/Quantum/SpinS/Theorem23Local.lean}.  The lowered
+local ladder and site-sum expansion layer is factored into
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23Local.lean}.  The single-site
+lowering component and filtered local sign-sum layer is isolated in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalLowering.lean}.  The lowered
 coefficient and predecessor raising-source layer is isolated in
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalCoefficient.lean}, with
 the predecessor-difference and lowered site-sum layer split into
@@ -8729,7 +8731,9 @@ The quantified callback shapes used in this final bridge are now named:
 \end{gathered}
 \]
 The predicted-data bridge layer is isolated in
-\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Predicted}\).  The
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Predicted}\).  The local
+lowering component layer is isolated in
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalLowering}\).  The
 local coefficient layer is isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient}\).  The
 local predecessor-difference and lowered site-sum layer is isolated in

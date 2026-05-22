@@ -1,12 +1,13 @@
-import LatticeSystem.Quantum.SpinS.Theorem23Local
+import LatticeSystem.Quantum.SpinS.Theorem23LocalLowering
 
 /-!
 # Tasaki §2.5 Theorem 2.3 local coefficient API
 
 This module contains the lowered coefficient and predecessor raising-source
 API used by the local-difference and outside-ground layers of Tasaki
-§2.5 Theorem 2.3. It is split from `Theorem23Local.lean` so the core
-local ladder and single-site calculation layer can elaborate separately.
+§2.5 Theorem 2.3. It sits downstream of `Theorem23LocalLowering.lean`
+so the core local ladder and lowering component layers can elaborate
+separately from the coefficient comparison layer.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
