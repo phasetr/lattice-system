@@ -337,6 +337,15 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR pending)**: Refactored the Tasaki §2.5 Theorem 2.3
+  base adjacent-energy API after the predicted-Casimir adjacent common-energy
+  wrappers became a stable suffix. `Theorem23.lean` now keeps the site-sum and
+  Casimir-nonvanishing adjacent common-energy links, while
+  `Theorem23PredictedCasimirEnergy.lean` contains the predicted-Casimir
+  adjacent common-energy and ladder-image packages consumed by the dominance
+  and sector-existence layers. Focused checks cover the split base /
+  predicted-Casimir modules and the dominance / sector-existence downstream
+  consumers.
 - **2026-05-23 (PR #3510)**: Refactored the Tasaki §2.5 Theorem 2.3 local
   predecessor-difference API after the unpacked real predecessor-difference
   callback adapters became a stable suffix. `Theorem23LocalDifference.lean`
