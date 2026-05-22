@@ -7392,9 +7392,11 @@ local ladder and site-sum expansion layer is factored into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Local.lean}.  The single-site
 lowering component and filtered local sign-sum layer is isolated in
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalLowering.lean}.  The lowered
-coefficient and predecessor raising-source layer is isolated in
-\texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalCoefficient.lean}, with
-the predecessor-difference callback layer split into
+coefficient layer is isolated in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalCoefficient.lean}, with the
+predecessor raising-source suffix isolated in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalCoefficientRaisingSource.lean}; the
+predecessor-difference callback layer is split into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalDifference.lean}; the
 strict lowered site-sum dominance layer is split into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalDifferenceSiteSum.lean}; the
@@ -8741,7 +8743,9 @@ The predicted-data bridge layer is isolated in
 lowering component layer is isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalLowering}\).  The
 local coefficient layer is isolated in
-\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient}\).  The
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient}\), with the
+predecessor raising-source suffix in
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficientRaisingSource}\).  The
 local predecessor-difference layer is isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalDifference}\).  The
 strict lowered site-sum dominance layer is isolated in

@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundPredecessorRaising
+import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficientRaisingSource
 
 /-!
 # Tasaki §2.5 Theorem 2.3 predecessor-difference outside-ground boundary

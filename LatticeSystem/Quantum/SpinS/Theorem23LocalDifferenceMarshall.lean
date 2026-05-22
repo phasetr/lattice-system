@@ -17,47 +17,6 @@ namespace LatticeSystem.Quantum
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
-/-- **Tasaki §2.5 Theorem 2.3 single-site lowering predecessor**:
-if a target configuration `τ` in sector `M + 1` has positive local
-value at `x`, lowering that local value by one gives a configuration
-in sector `M`.
-
-This private copy keeps the split Marshall wrapper module from exporting
-local magnetization bookkeeping. -/
-private theorem magSumS_single_site_lowering_predecessor {M : ℕ}
-    (τ : magConfigS V N (M + 1)) (x : V) (hx : 0 < (τ.1 x).val) :
-    magSumS
-        (Function.update τ.1 x
-          ⟨(τ.1 x).val - 1, by omega⟩) = M := by
-  classical
-  have hsum_succ :
-      magSumS
-          (Function.update τ.1 x
-            ⟨(τ.1 x).val - 1, by omega⟩) + 1 = magSumS τ.1 := by
-    unfold magSumS
-    rw [Finset.sum_eq_add_sum_diff_singleton_of_mem (Finset.mem_univ x)]
-    rw [Finset.sum_eq_add_sum_diff_singleton_of_mem (Finset.mem_univ x)]
-    simp only [Function.update_self]
-    have hrest :
-        (∑ y ∈ (Finset.univ : Finset V) \ {x},
-            (Function.update τ.1 x
-              ⟨(τ.1 x).val - 1, by omega⟩ y).val) =
-          ∑ y ∈ (Finset.univ : Finset V) \ {x}, (τ.1 y).val := by
-      apply Finset.sum_congr rfl
-      intro y hy
-      have hyx : y ≠ x := by
-        simpa using hy
-      rw [Function.update_of_ne hyx]
-    rw [hrest]
-    have hpred_val :
-        (⟨(τ.1 x).val - 1, by
-          omega⟩ : Fin (N + 1)).val + 1 = (τ.1 x).val := by
-      simp
-      omega
-    omega
-  have hτ : magSumS τ.1 = M + 1 := τ.2
-  omega
-
 /-- **Tasaki §2.5 Theorem 2.3 lowered-vector Marshall positivity from
 site-sum positivity**: to prove the Marshall positivity required by the
 adjacent-sector comparison, it suffices to prove the corresponding
