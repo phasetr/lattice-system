@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadderReembedded
+import LatticeSystem.Quantum.SpinS.Theorem23PredictedSourceWeight
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 
 /-!

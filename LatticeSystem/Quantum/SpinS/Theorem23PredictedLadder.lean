@@ -6,9 +6,10 @@ import LatticeSystem.Quantum.SpinS.Theorem23Predicted
 This module contains the predicted-GS ladder-closure, lowered joint
 subspace, and scalar-cancellation bridge layer split from
 `Theorem23Predicted.lean`. The base predicted module keeps the
-predicted-Casimir, predicted-GS, cross-ladder, and source-weight bridges,
-while this module packages ladder stability and scalar transfer results
-used by the adjacent-sector chain.
+predicted-Casimir, predicted-GS, and cross-ladder bridges, while
+`Theorem23PredictedSourceWeight.lean` contains the source-weight suffix.
+This module packages ladder stability and scalar transfer results used by
+the adjacent-sector chain.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
