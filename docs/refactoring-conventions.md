@@ -337,6 +337,15 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3507)**: Refactored the Tasaki §2.5 Theorem 2.3
+  predicted-ladder API after the real-scalar and predicted-Casimir transfer
+  wrappers became a stable suffix. `Theorem23PredictedLadder.lean` now keeps
+  the predicted-GS ladder closure, joint sublattice-Casimir structure, and
+  lowered joint-magnetization package (437 lines), while
+  `Theorem23PredictedLadderCasimirTransfer.lean` contains the
+  scalar-cancellation and total-Casimir transfer suffix (249 lines). Focused
+  checks cover the split predicted-ladder modules and the dominance /
+  sector-existence downstream consumers.
 - **2026-05-23 (PR #3505)**: Refactored the Tasaki §2.5 Theorem 2.3 final
   boundary API after the lowered-vector-Marshall final wrappers became a stable
   suffix. `Theorem23Final.lean` now keeps the outside-ground and direct

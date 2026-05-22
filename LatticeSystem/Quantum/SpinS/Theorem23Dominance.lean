@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23
-import LatticeSystem.Quantum.SpinS.Theorem23PredictedLadder
+import LatticeSystem.Quantum.SpinS.Theorem23PredictedLadderCasimirTransfer
 
 /-!
 # Tasaki §2.5 Theorem 2.3 dominance common-energy API

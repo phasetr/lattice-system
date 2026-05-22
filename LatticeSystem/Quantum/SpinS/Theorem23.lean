@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23PredictedLadder
+import LatticeSystem.Quantum.SpinS.Theorem23PredictedLadderCasimirTransfer
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceEnergy
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall

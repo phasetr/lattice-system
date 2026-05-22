@@ -7384,9 +7384,11 @@ factored into
 predicted-Casimir, predicted-GS, and cross-ladder bridge layer is factored
 into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Predicted.lean}, with the
-predicted-GS ladder-closure and scalar-cancellation layer split into
-\texttt{LatticeSystem/Quantum/SpinS/Theorem23PredictedLadder.lean}, and
-the source-weight / lowering-predecessor bridge layer split into
+predicted-GS ladder-closure and joint sublattice-Casimir layer split into
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23PredictedLadder.lean}, the
+real-scalar and predicted-Casimir transfer suffix split into
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23PredictedLadderCasimirTransfer.lean},
+and the source-weight / lowering-predecessor bridge layer split into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23PredictedSourceWeight.lean}.  The
 local ladder and site-sum expansion layer is factored into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Local.lean}.  The single-site
@@ -8428,7 +8430,9 @@ formalised as
 wrappers let the final Theorem~2.3 sector chain propagate the
 predicted-Casimir hypothesis along adjacent ladder moves, while the
 initial predicted-Casimir input and the local site-sum positivity
-remain separate proof obligations.  Reference: H.~Tasaki,
+remain separate proof obligations.  The Lean module
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23PredictedLadderCasimirTransfer.lean}
+contains these real-scalar and total-Casimir transfer wrappers.  Reference: H.~Tasaki,
 \emph{Physics and Mathematics of Quantum Many-Body Systems}, Springer
 2020, \S2.5 Theorem 2.3, p.~42.
 
@@ -8527,7 +8531,8 @@ non-zero scalar and transfers to the successor representative
 \(\Phi_{M+1}\).  This is the lowering-direction propagation step needed
 to thread predicted-Casimir information along the admissible-sector
 interval, rather than asking for a fresh source-sector callback at every
-successor sector.
+successor sector.  The scalar-cancellation theorem used here is kept in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23PredictedLadderCasimirTransfer.lean}.
 
 \textbf{Threaded predicted-Casimir interval chain}: the preceding scalar
 transfer is now wired into the dominance-form common-energy step itself.
