@@ -337,6 +337,13 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3503)**: Refactored the Tasaki §2.5 Theorem 2.3 local
+  coefficient API after the predecessor raising-source wrappers became a stable
+  suffix. `Theorem23LocalCoefficient.lean` now keeps the lowered signed and
+  positive-source coefficient layers (457 lines), while
+  `Theorem23LocalCoefficientRaisingSource.lean` contains the predecessor
+  raising-source suffix (459 lines). Focused checks cover the split modules and
+  the local-difference / outside-ground predecessor downstream modules.
 - **2026-05-23 (PR #3502)**: Refactored the Tasaki §2.5 Theorem 2.3
   dominance API after the predicted-GS dominance wrappers became a stable
   suffix. `Theorem23Dominance.lean` now keeps the base dominance and
