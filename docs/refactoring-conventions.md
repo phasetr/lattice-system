@@ -337,6 +337,13 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3508)**: Refactored the Tasaki §2.5 Theorem 2.3
+  interval-Casimir API after the global / sector minimality bridges and named
+  callbacks became a stable suffix. `Theorem23IntervalCasimir.lean` now keeps
+  the predicted-Casimir interval-chain wrappers (559 lines), while
+  `Theorem23IntervalCasimirMinimality.lean` contains the minimality bridge and
+  named callback suffix (152 lines). Focused checks cover the split
+  interval-Casimir modules and the outside-ground / final downstream modules.
 - **2026-05-23 (PR #3507)**: Refactored the Tasaki §2.5 Theorem 2.3
   predicted-ladder API after the real-scalar and predicted-Casimir transfer
   wrappers became a stable suffix. `Theorem23PredictedLadder.lean` now keeps

@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23SectorExistenceInterval
-import LatticeSystem.Quantum.SpinS.Theorem23IntervalCasimir
+import LatticeSystem.Quantum.SpinS.Theorem23IntervalCasimirMinimality
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
@@ -9,10 +9,11 @@ import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
 
 This module contains outside-ground lower-bound callbacks and common-energy
 final packaging wrappers for the Tasaki §2.5 Theorem 2.3 proof chain. It
-imports the interval-Casimir API split from `Theorem23Interval.lean` so the
-base interval-chain module does not accumulate the outside-ground and
-final-packaging API tail. The predicted-Casimir final-wrapper suffix is split
-into `Theorem23OutsideGroundPredictedCasimir.lean`, and the left-endpoint
+imports the interval-Casimir minimality suffix split from
+`Theorem23IntervalCasimir.lean` so the base interval-chain module does not
+accumulate the outside-ground and final-packaging API tail. The
+predicted-Casimir final-wrapper suffix is split into
+`Theorem23OutsideGroundPredictedCasimir.lean`, and the left-endpoint
 predicted-GS and lowered-Marshall final-wrapper suffix is split into
 `Theorem23OutsideGroundPredictedGS.lean`.
 -/
