@@ -3,7 +3,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23SectorExistence
 import LatticeSystem.Quantum.SpinS.Theorem23DominancePredictedGS
 import LatticeSystem.Quantum.SpinS.Theorem23PredictedLadderJointExtract
 import LatticeSystem.Quantum.SpinS.Theorem23PredictedSourceWeight
-import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceUnpacked
+import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceUnpackedSiteSum
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
 
 /-!

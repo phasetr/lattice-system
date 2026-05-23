@@ -1,16 +1,15 @@
-import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
+import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceUnpacked
 
 /-!
-# Tasaki §2.5 Theorem 2.3 unpacked predecessor-difference callback API
+# Tasaki §2.5 Theorem 2.3 unpacked site-sum positivity
 
-This module contains the fully threaded unpacked real predecessor-difference
-callback adapters split from `Theorem23LocalDifference.lean`. The base
-module keeps the sublattice coefficient and predecessor raising-source
-difference identities, while this module exposes the final callback-shaped
-bridges consumed by the interval and outside-ground wrappers. It keeps the
-lowered Marshall positivity theorem; the strict lowered site-sum positivity
-theorem and its callback abbrev are split into
-`Theorem23LocalDifferenceUnpackedSiteSum.lean`.
+This module contains the strict lowered site-sum positivity theorem from the
+unpacked re-embedded real source-weight predecessor-difference hypothesis, and
+the callback-adapter abbrev that routes the predecessor-difference boundary to
+the lowered site-sum successor chain, split as a stable suffix from
+`Theorem23LocalDifferenceUnpacked.lean`. The parent module keeps the
+corresponding lowered Marshall positivity theorem, which this site-sum theorem
+reuses.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
@@ -21,19 +20,19 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
 set_option linter.style.longLine false in
-/-- **Tasaki §2.5 Theorem 2.3 lowered Marshall positivity from the
-unpacked real predecessor difference callback**: the fully threaded local
-callback used by the final theorem boundary can be read as a
-lowered-sector Marshall-positivity proof.
+/-- **Tasaki §2.5 Theorem 2.3 strict site-sum positivity from the
+unpacked real predecessor difference callback**: the same fully threaded
+local callback also supplies the single-site lowered sum positivity used
+directly by the adjacent-sector chain.
 
-This is the callback-shaped version of
-`tasaki23_lowered_marshall_pos_of_raising_predecessor_source_difference_pos`:
+This is the site-sum analogue of
+`tasaki23_lowered_marshall_pos_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos`.
+It applies the predecessor raising-source difference to site-sum bridge
 after the predicted-GS, real source-weight, sublattice-Casimir, and
-successor-support data have produced the off-`A` minus on-`A`
-predecessor raising-source positive difference, the result is converted
-directly into the lowered-vector Marshall-positive component. -/
+successor-support data have produced the positive off-`A` minus on-`A`
+difference. -/
 theorem
-    tasaki23_lowered_marshall_pos_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+    tasaki23_lowered_site_sum_pos_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
     {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
     (hsource_difference_pos :
       ∀ Ψ : (V → Fin (N + 1)) → ℂ,
@@ -196,13 +195,38 @@ theorem
           (((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ))) :
     ∀ τ : magConfigS V N (M + 1),
       0 < (marshallSignS A τ.1).re *
-        (((totalSpinSOpMinus V N).mulVec
-          (magSectorEmbedding
-            (fun σ : magConfigS V N M =>
-              (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)))) τ.1).re := by
-  exact
-    tasaki23_lowered_marshall_pos_of_raising_predecessor_source_difference_pos
-      (V := V) (N := N) A v
-      (hsource_difference_pos Ψ hΨ_eq hΨ_pred hpred hA_A hA_B hA_mag hB_A hB_B hB_mag)
+        (∑ x : V,
+          (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+            (magSectorEmbedding
+              (fun σ : magConfigS V N M =>
+                (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)))) τ.1).re) := by
+  intro τ
+  have hτ :=
+    tasaki23_lowered_marshall_pos_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+      (V := V) (N := N) A v hsource_difference_pos hΨ_eq hΨ_pred hpred
+      hA_A hA_B hA_mag hB_A hB_B hB_mag τ
+  rw [
+    totalSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_site_sum
+      (fun σ : magConfigS V N M =>
+        (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) τ.1] at hτ
+  simpa [map_sum] using hτ
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 callback adapter from unpacked real
+predecessor differences to lowered site sums**: the fully threaded
+predecessor-difference callback can be consumed directly as the strict
+single-site lowered sum positivity callback used by the site-sum
+successor chain.
+
+This names the callback-level API of
+`tasaki23_lowered_site_sum_pos_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos`
+so later final wrappers can route the predecessor-difference boundary to
+the lowered site-sum chain without first passing through the
+raising-source dominance final wrapper. -/
+abbrev
+    tasaki23_lowered_site_sum_pos_callback_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ) :=
+  tasaki23_lowered_site_sum_pos_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+    (V := V) (N := N) A v
 
 end LatticeSystem.Quantum
