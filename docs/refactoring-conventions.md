@@ -337,6 +337,13 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3520)**: Refactored the Tasaki §2.5 Theorem 2.3
+  final-boundary API after the direct lowered-site-sum final wrappers became a
+  stable suffix. `Theorem23Final.lean` now keeps the outside-ground
+  final-boundary aliases (161 lines), while
+  `Theorem23FinalLoweredSiteSum.lean` contains the direct lowered-site-sum
+  final wrappers and named-callback aliases (395 lines). Focused checks cover
+  the split final modules and the lowered-Marshall downstream module.
 - **2026-05-23 (PR #3519)**: Refactored the Tasaki §2.5 Theorem 2.3
   outside-ground predicted-Casimir API after the left-endpoint threaded
   predicted-Casimir final wrappers became a stable suffix.
