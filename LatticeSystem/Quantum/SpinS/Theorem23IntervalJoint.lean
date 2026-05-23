@@ -6,7 +6,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23IntervalPredictedGS
 This module contains the joint-component, lowered-joint, cross-ladder, and
 unpacked cross-ladder interval-chain wrappers split from
 `Theorem23Interval.lean`. Keeping this suffix separate lets the basic
-interval-chain callbacks elaborate without replaying the later cross-ladder
+interval-chain wrappers elaborate without replaying the later cross-ladder
 API layer.
 -/
 

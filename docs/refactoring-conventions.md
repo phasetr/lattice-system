@@ -337,6 +337,14 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3518)**: Refactored the Tasaki §2.5 Theorem 2.3
+  interval callback API after the named interval callback propositions became a
+  stable boundary. `Theorem23Interval.lean` now keeps the direct interval-chain
+  wrappers (349 lines), while `Theorem23IntervalCallbacks.lean` contains the
+  named left-endpoint predicted-GS, source predicted-GS,
+  predecessor-difference, and lowered-site-sum callback propositions (217
+  lines). Focused checks cover the split interval modules and representative
+  downstream final-boundary consumers.
 - **2026-05-23 (PR #3517)**: Refactored the Tasaki §2.5 Theorem 2.3
   interval-Casimir API after the direct lowered site-sum and lowered Marshall
   predicted-Casimir interval-chain wrappers became a stable suffix.
@@ -414,8 +422,8 @@ mechanically** and catch most regressions / drift.
 - **2026-05-23 (PR #3506)**: Refactored the Tasaki §2.5 Theorem 2.3
   interval-chain API after the lowered-vector-Marshall and predicted-GS-aware
   sublattice-component interval wrappers became a stable suffix.
-  `Theorem23Interval.lean` now keeps the named callbacks and direct
-  interval-chain wrappers (543 lines), while
+  `Theorem23Interval.lean` kept the named callbacks and direct
+  interval-chain wrappers at that point (543 lines), while
   `Theorem23IntervalPredictedGS.lean` contains the predicted-GS-aware interval
   suffix (242 lines). Focused checks cover the split interval modules and the
   joint interval downstream consumer.
