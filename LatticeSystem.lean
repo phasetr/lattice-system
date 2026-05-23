@@ -63,6 +63,15 @@ import LatticeSystem.Fermion.Mode
 import LatticeSystem.Fermion.SingleMode
 import LatticeSystem.Fermion.JordanWigner
 import LatticeSystem.Fermion.JWAbstract
+-- Tasaki §2.5 Theorem 2.3 (spin-S Marshall–Lieb–Mattis) tree.
+-- These are the in-progress final-wrapper "tip" modules; importing them here
+-- pulls the whole §2.5 module tree into the build root so the default
+-- `lake build` (and CI) elaborates it, rather than leaving it reachable only
+-- via per-module builds.
+import LatticeSystem.Quantum.SpinS.Theorem23FinalLoweredMarshall
+import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundConditional
+import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadderReembedded
+import LatticeSystem.Quantum.SpinS.Theorem23SectorExistenceDominancePredictedGS
 
 /-!
 # `lattice-system` library root
