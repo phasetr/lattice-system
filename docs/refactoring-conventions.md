@@ -337,6 +337,15 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3517)**: Refactored the Tasaki §2.5 Theorem 2.3
+  interval-Casimir API after the direct lowered site-sum and lowered Marshall
+  predicted-Casimir interval-chain wrappers became a stable suffix.
+  `Theorem23IntervalCasimir.lean` now keeps the dominance-form
+  predicted-Casimir interval chains (314 lines), while
+  `Theorem23IntervalCasimirSiteSum.lean` contains the lowered site-sum and
+  lowered Marshall suffix (267 lines). Focused checks cover the split
+  interval-Casimir modules and the outside-ground predicted-GS downstream
+  module.
 - **2026-05-23 (PR #3513)**: Refactored the Tasaki §2.5 Theorem 2.3
   outside-ground base API after the conditional left-endpoint predicted-GS
   final wrappers became a stable suffix. `Theorem23OutsideGround.lean` now

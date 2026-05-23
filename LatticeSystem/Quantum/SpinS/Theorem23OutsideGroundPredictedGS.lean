@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundPredictedCasimir
+import LatticeSystem.Quantum.SpinS.Theorem23IntervalCasimirSiteSum
 
 /-!
 # Tasaki §2.5 Theorem 2.3 outside-ground predicted-GS final wrappers
@@ -8,8 +9,10 @@ final-wrapper suffix split from `Theorem23OutsideGround.lean`. The base
 outside-ground module keeps the outside-sector lower-bound, sector-minimality,
 and common-energy final-packaging layers, while
 `Theorem23OutsideGroundPredictedCasimir.lean` contains the predicted-Casimir
-boundary consumed by this module. This module packages the predicted-GS and
-lowered-Marshall final boundaries consumed by the cross-ladder tail.
+boundary consumed by this module. The lowered-Marshall predicted-Casimir
+interval chain is supplied by `Theorem23IntervalCasimirSiteSum.lean`. This
+module packages the predicted-GS and lowered-Marshall final boundaries
+consumed by the cross-ladder tail.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
