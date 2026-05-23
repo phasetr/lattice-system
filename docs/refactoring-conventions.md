@@ -337,6 +337,14 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-23 (PR #3519)**: Refactored the Tasaki §2.5 Theorem 2.3
+  outside-ground predicted-Casimir API after the left-endpoint threaded
+  predicted-Casimir final wrappers became a stable suffix.
+  `Theorem23OutsideGroundPredictedCasimir.lean` now keeps the source
+  predicted-Casimir final wrappers (259 lines), while
+  `Theorem23OutsideGroundPredictedCasimirThreaded.lean` contains the
+  left-endpoint threaded predicted-Casimir final wrappers (269 lines). Focused
+  checks cover the split modules and the predicted-GS downstream module.
 - **2026-05-23 (PR #3518)**: Refactored the Tasaki §2.5 Theorem 2.3
   interval callback API after the named interval callback propositions became a
   stable boundary. `Theorem23Interval.lean` now keeps the direct interval-chain

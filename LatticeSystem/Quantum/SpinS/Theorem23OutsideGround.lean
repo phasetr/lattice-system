@@ -11,12 +11,14 @@ This module contains outside-ground lower-bound callbacks and common-energy
 final packaging wrappers for the Tasaki §2.5 Theorem 2.3 proof chain. It
 imports the interval-Casimir minimality suffix split from
 `Theorem23IntervalCasimir.lean` so the base interval-chain module does not
-accumulate the outside-ground and final-packaging API tail. The
+accumulate the outside-ground and final-packaging API tail. The source
 predicted-Casimir final-wrapper suffix is split into
-`Theorem23OutsideGroundPredictedCasimir.lean`, the conditional left-endpoint
-predicted-GS final-wrapper suffix is split into
-`Theorem23OutsideGroundConditional.lean`, and the left-endpoint
-threaded predicted-GS and lowered-Marshall final-wrapper suffix is split into
+`Theorem23OutsideGroundPredictedCasimir.lean`, the threaded predicted-Casimir
+final-wrapper suffix is split into
+`Theorem23OutsideGroundPredictedCasimirThreaded.lean`, the conditional
+left-endpoint predicted-GS final-wrapper suffix is split into
+`Theorem23OutsideGroundConditional.lean`, and the left-endpoint threaded
+predicted-GS and lowered-Marshall final-wrapper suffix is split into
 `Theorem23OutsideGroundPredictedGS.lean`.
 -/
 
