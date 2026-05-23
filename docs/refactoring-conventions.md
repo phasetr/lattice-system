@@ -337,6 +337,17 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3529)**: Refactored the Tasaki §2.5 Theorem 2.3
+  predicted-ladder API after the lowered joint-magnetization extractor lemmas
+  became a stable suffix. `Theorem23PredictedLadder.lean` now keeps the
+  predicted-GS lowering/raising closures, the lowered sublattice-Casimir
+  bridges, and the joint sublattice-Casimir / lowered joint-magnetization
+  definitions (365 lines), while `Theorem23PredictedLadderJointExtract.lean`
+  contains the four extractor lemmas unpacking `tasaki23LoweredJointMagSubspace`
+  membership (98 lines). Focused checks cover the split modules and the
+  interval / cross-ladder unpacked downstream modules. Build-speed: the parent
+  module's focused `lake env lean` dropped to ~6.9s (it was the heaviest
+  active Theorem 2.3 module).
 - **2026-05-24 (PR #3528)**: Refactored the Tasaki §2.5 Theorem 2.3
   local-coefficient API after the signed-coefficient identities became a
   stable downstream-facing suffix.
