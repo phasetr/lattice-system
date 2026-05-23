@@ -9,8 +9,10 @@ raising-source difference identities downstream of
 predecessor-difference callback adapters are isolated in
 `Theorem23LocalDifferenceUnpacked.lean`, the lowered site-sum dominance layer
 is isolated in `Theorem23LocalDifferenceSiteSum.lean`, the raising-direction
-site-sum layer is isolated in `Theorem23LocalDifferenceRaising.lean`, and the
-final Marshall-positivity wrappers are isolated in
+component layer is isolated in `Theorem23LocalDifferenceRaising.lean`, the
+raised site-sum contribution/decomposition suffix is isolated in
+`Theorem23LocalDifferenceRaisingSiteSum.lean`, and the final
+Marshall-positivity wrappers are isolated in
 `Theorem23LocalDifferenceMarshall.lean`. The adjacent-sector energy comparison
 wrappers downstream of those layers are isolated in
 `Theorem23LocalDifferenceEnergy.lean`.
