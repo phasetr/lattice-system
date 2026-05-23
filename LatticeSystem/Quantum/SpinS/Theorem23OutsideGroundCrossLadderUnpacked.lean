@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadderLoweredJoint
+import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadderLoweredJointCross
 import LatticeSystem.Quantum.SpinS.Theorem23IntervalJointUnpacked
 
 /-!
