@@ -12,9 +12,11 @@ joint-coefficient final-wrapper layers split from
 `Theorem23OutsideGround.lean`. The lowered-joint cross-ladder suffix is split
 into `Theorem23OutsideGroundCrossLadderLoweredJoint.lean`, the unpacked
 lowered-joint callback boundary is isolated in
-`Theorem23OutsideGroundCrossLadderUnpacked.lean`, and the re-embedded
-cross-ladder and source-weight tail is split further into
-`Theorem23OutsideGroundCrossLadderReembedded.lean`. This lets each
+`Theorem23OutsideGroundCrossLadderUnpacked.lean`, the re-embedded
+cross-ladder source-sector site-sum and source-weight tail is split further
+into `Theorem23OutsideGroundCrossLadderReembedded.lean`, and the unpacked
+re-embedded source-weight final-wrapper suffix is split further into
+`Theorem23OutsideGroundCrossLadderReembeddedUnpacked.lean`. This lets each
 cross-ladder API layer elaborate separately from the later final-wrapper tails.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
