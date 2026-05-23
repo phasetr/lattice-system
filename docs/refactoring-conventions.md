@@ -337,6 +337,15 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3522)**: Refactored the Tasaki §2.5 Theorem 2.3
+  outside-ground predicted-GS API after the left-endpoint threaded
+  predicted-GS lowered-Marshall final wrappers became a stable suffix.
+  `Theorem23OutsideGroundPredictedGS.lean` now keeps the source predicted-GS
+  and direct lowered-Marshall final wrappers (213 lines), while
+  `Theorem23OutsideGroundPredictedGSLoweredMarshall.lean` contains the
+  left-endpoint threaded predicted-GS lowered-Marshall final wrappers and the
+  outside-real-sector wrapper (298 lines). Focused checks cover the split
+  modules and the outside-ground cross-ladder downstream module.
 - **2026-05-23 (PR #3520)**: Refactored the Tasaki §2.5 Theorem 2.3
   final-boundary API after the direct lowered-site-sum final wrappers became a
   stable suffix. `Theorem23Final.lean` now keeps the outside-ground
