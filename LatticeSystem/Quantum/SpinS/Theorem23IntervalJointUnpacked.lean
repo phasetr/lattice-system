@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23IntervalJoint
+import LatticeSystem.Quantum.SpinS.Theorem23PredictedLadderJointExtract
 
 /-!
 # Tasaki §2.5 Theorem 2.3 unpacked joint interval-chain wrapper
