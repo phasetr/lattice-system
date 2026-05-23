@@ -337,6 +337,16 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3534)**: Refactored the Tasaki §2.5 Theorem 2.3 local
+  ladder API after the raised-direction site-sum expansion theorems became a
+  stable suffix. `Theorem23Local.lean` now keeps the lowered-direction
+  ladder/site-sum machinery (361 lines), while
+  `Theorem23LocalRaisedSiteSum.lean` contains the three raised-direction
+  site-sum expansion theorems (total + on-`A` + off-`A`) (101 lines). The new
+  module imports the parent. Consumers `Theorem23LocalDifferenceMarshall`
+  (total raised expansion) and `Theorem23Predicted` (two sublattice raised
+  expansions) each add a direct import of the new module (they previously
+  reached the theorems transitively through the parent).
 - **2026-05-24 (PR #3533)**: Refactored the Tasaki §2.5 Theorem 2.3
   unpacked predecessor-difference API after the strict lowered site-sum
   positivity theorem and its callback abbrev became a stable suffix.

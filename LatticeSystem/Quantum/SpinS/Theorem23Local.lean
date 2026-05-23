@@ -16,7 +16,9 @@ This module contains the local ladder, adjacent-sector energy comparison,
 and site-sum expansion API used by the Tasaki §2.5 Theorem 2.3
 interval-chain module. The single-site lowering component and local sign
 bound suffix is split into `Theorem23LocalLowering.lean`, so this core
-local layer can elaborate separately from the lowering component API.
+local layer can elaborate separately from the lowering component API. The
+raised-direction site-sum expansion theorems are split into
+`Theorem23LocalRaisedSiteSum.lean`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
@@ -355,86 +357,5 @@ theorem totalSpinSOpMinus_marshallSignedEmbedding_eq_smul_successor_of_re
       (fun τ : magConfigS V N (M + 1) =>
         (((marshallSignS A τ.1).re * v_succ τ : ℝ) : ℂ)) hσ]
     simp
-
-/-- **Tasaki §2.5 Theorem 2.3 raised-vector site-sum expansion**:
-the `Ŝ^+_tot`-raised embedded sector vector is the sum of its
-single-site raising contributions at each target configuration.
-
-This is the raising-direction companion to
-`totalSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_site_sum`. -/
-theorem totalSpinSOpPlus_mulVec_magSectorEmbedding_apply_eq_site_sum {M : ℕ}
-    (Φ : magConfigS V N (M + 1) → ℂ) (τ : V → Fin (N + 1)) :
-    ((totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ)) τ =
-      ∑ x : V,
-        ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
-          (magSectorEmbedding Φ)) τ := by
-  rw [totalSpinSOpPlus_def, Matrix.sum_mulVec]
-  simp [Finset.sum_apply]
-
-/-- **Tasaki §2.5 Theorem 2.3 on-`A` raised sublattice expansion**:
-the `Ŝ_A^+` component of an embedded successor-sector vector is the sum
-of single-site raising contributions over sites in `A`.
-
-This is the raising-direction companion to
-`sublatticeSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_onA_site_sum`
-and is used after re-embedding lowered components in the cross-ladder
-identity. -/
-theorem sublatticeSpinSOpPlus_mulVec_magSectorEmbedding_apply_eq_onA_site_sum
-    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N (M + 1) → ℂ)
-    (τ : V → Fin (N + 1)) :
-    ((sublatticeSpinSOpPlus N A).mulVec (magSectorEmbedding Φ)) τ =
-      ∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
-        ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
-          (magSectorEmbedding Φ)) τ := by
-  classical
-  rw [sublatticeSpinSOpPlus, Matrix.sum_mulVec, Finset.sum_apply]
-  calc
-    (∑ c : V,
-      Matrix.mulVec (if A c = true then onSiteS c (spinSOpPlus N) else 0)
-        (magSectorEmbedding Φ) τ) =
-        ∑ c : V, if A c = true then
-          Matrix.mulVec (onSiteS c (spinSOpPlus N)) (magSectorEmbedding Φ) τ
-        else 0 := by
-          apply Finset.sum_congr rfl
-          intro x _hx
-          by_cases hA : A x = true
-          · simp [hA]
-          · cases hx : A x <;> simp [hx] at hA ⊢
-    _ = ∑ x ∈ (Finset.univ.filter (fun x : V => A x = true)),
-        ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
-          (magSectorEmbedding Φ)) τ := by
-          rw [Finset.sum_filter]
-
-/-- **Tasaki §2.5 Theorem 2.3 off-`A` raised sublattice expansion**:
-the `Ŝ_¬A^+` component of an embedded successor-sector vector is the sum
-of single-site raising contributions over sites outside `A`.
-
-This packages the complement sublattice with the same `A x = false`
-filter used by the local coefficient comparison. -/
-theorem sublatticeSpinSOpPlus_complement_mulVec_magSectorEmbedding_apply_eq_offA_site_sum
-    {M : ℕ} (A : V → Bool) (Φ : magConfigS V N (M + 1) → ℂ)
-    (τ : V → Fin (N + 1)) :
-    ((sublatticeSpinSOpPlus N (fun x => ! A x)).mulVec
-        (magSectorEmbedding Φ)) τ =
-      ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
-        ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
-          (magSectorEmbedding Φ)) τ := by
-  classical
-  rw [sublatticeSpinSOpPlus, Matrix.sum_mulVec, Finset.sum_apply]
-  calc
-    (∑ c : V,
-      Matrix.mulVec
-        (if (!A c) = true then onSiteS c (spinSOpPlus N) else 0)
-        (magSectorEmbedding Φ) τ) =
-        ∑ c : V, if A c = false then
-          Matrix.mulVec (onSiteS c (spinSOpPlus N)) (magSectorEmbedding Φ) τ
-        else 0 := by
-          apply Finset.sum_congr rfl
-          intro x _hx
-          cases A x <;> simp
-    _ = ∑ x ∈ (Finset.univ.filter (fun x : V => A x = false)),
-        ((onSiteS x (spinSOpPlus N) : ManyBodyOpS V N).mulVec
-          (magSectorEmbedding Φ)) τ := by
-          rw [Finset.sum_filter]
 
 end LatticeSystem.Quantum
