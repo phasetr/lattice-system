@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceRaising
+import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceRaisingPositivity
 
 /-!
 # Tasaki §2.5 Theorem 2.3 raised site-sum API
