@@ -337,6 +337,17 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3528)**: Refactored the Tasaki §2.5 Theorem 2.3
+  local-coefficient API after the signed-coefficient identities became a
+  stable downstream-facing suffix.
+  `Theorem23LocalCoefficient.lean` now keeps the predecessor/coefficient
+  definitions and the positive-source coefficient theorems (317 lines), while
+  `Theorem23LocalCoefficientSignedSum.lean` contains the signed-coefficient
+  identities (signed predecessor coefficient = positive-source coefficient,
+  signed lowering site-contribution = ±coefficient, and the off-`A`/on-`A`
+  filtered signed-lowering sum identities) (166 lines). Focused checks cover
+  the split modules and the local-difference / outside-ground predecessor
+  downstream modules.
 - **2026-05-24 (PR #3527)**: Refactored the Tasaki §2.5 Theorem 2.3
   local-coefficient raising-source API after the boundary-inclusive
   raising-source coefficient definition and the raising-predecessor-source
