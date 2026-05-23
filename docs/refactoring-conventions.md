@@ -337,6 +337,15 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3526)**: Refactored the Tasaki §2.5 Theorem 2.3
+  local-difference adjacent-sector energy API after the Casimir-non-vanishing
+  and site-sum-positivity packages became a stable suffix.
+  `Theorem23LocalDifferenceEnergy.lean` now keeps the base adjacent-sector
+  energy step and the with-nonzero packages (232 lines), while
+  `Theorem23LocalDifferenceEnergyCasimir.lean` contains the
+  Casimir-non-vanishing and site-sum-positivity adjacent-sector packages
+  (254 lines). Focused checks cover the split modules and the `Theorem23.lean`
+  downstream module.
 - **2026-05-24 (PR #3525)**: Refactored the Tasaki §2.5 Theorem 2.3 joint
   interval-chain API after the unpacked lowered-joint cross-ladder
   predicted-GS interval-chain wrapper became a stable suffix.
