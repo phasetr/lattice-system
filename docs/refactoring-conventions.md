@@ -337,6 +337,18 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3535)**: Refactored the Tasaki §2.5 Theorem 2.3
+  outside-ground cross-ladder lowered-joint API after the lowered-joint
+  cross-ladder final wrappers became a stable suffix.
+  `Theorem23OutsideGroundCrossLadderLoweredJoint.lean` now keeps the
+  lowered-joint magnetization-subspace component / coefficient final wrappers
+  (212 lines), while
+  `Theorem23OutsideGroundCrossLadderLoweredJointCross.lean` contains the
+  lowered-joint cross-ladder component / coefficient final wrappers (218
+  lines). The new module imports the parent (the cross-ladder wrappers reuse
+  the magSubspace-component final wrapper). Only
+  `Theorem23OutsideGroundCrossLadderUnpacked` consumes a moved wrapper; it
+  switches its import to the new module.
 - **2026-05-24 (PR #3534)**: Refactored the Tasaki §2.5 Theorem 2.3 local
   ladder API after the raised-direction site-sum expansion theorems became a
   stable suffix. `Theorem23Local.lean` now keeps the lowered-direction
