@@ -337,6 +337,20 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3532)**: Refactored the Tasaki §2.5 Theorem 2.3
+  local-lowering API after the single-site positivity/negativity theorems
+  became a stable suffix. `Theorem23LocalLowering.lean` now keeps the raw
+  single-site lowering component formulas and the signed coefficient identities
+  (303 lines), while `Theorem23LocalLoweringPositivity.lean` contains the
+  single-site positivity (off-`A`) / negativity (on-`A`) theorems (194 lines).
+  The new module imports the parent. The `private`
+  `magSumS_single_site_lowering_predecessor` helper is duplicated into the new
+  module (the existing codebase already keeps per-module private copies in
+  `Theorem23LocalLowering`, `Theorem23PredictedSourceWeight`, and
+  `Theorem23LocalCoefficient`), since a `private` declaration is not visible
+  across the new module boundary. Consumers: `Theorem23LocalLoweringSignSum`
+  switches its import to the new module; `Theorem23LocalDifferenceRaising` adds
+  an import; `Theorem23LocalDifferenceSiteSum` reaches it transitively.
 - **2026-05-24 (PR #3530)**: Refactored the Tasaki §2.5 Theorem 2.3
   sector-existence dominance API after the predicted-GS dominance variants
   became a stable suffix. `Theorem23SectorExistenceDominance.lean` now keeps

@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23LocalLowering
+import LatticeSystem.Quantum.SpinS.Theorem23LocalLoweringPositivity
 
 /-!
 # Tasaki §2.5 Theorem 2.3 local lowering sign-sum API
