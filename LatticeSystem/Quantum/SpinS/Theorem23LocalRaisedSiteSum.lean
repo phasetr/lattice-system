@@ -4,8 +4,8 @@ import LatticeSystem.Quantum.SpinS.Theorem23Local
 # Tasaki §2.5 Theorem 2.3 raised-vector site-sum expansions
 
 This module contains the raised-direction site-sum expansion theorems, split
-as a stable suffix from `Theorem23Local.lean`: the total `Ŝ^+_tot` lowered
-(raised) site-sum expansion and its on-`A` / off-`A` sublattice variants. The
+as a stable suffix from `Theorem23Local.lean`: the total `Ŝ^+_tot` raised
+site-sum expansion and its on-`A` / off-`A` sublattice variants. The
 parent module keeps the lowered-direction ladder/site-sum machinery these are
 the raising-direction companions to.
 
