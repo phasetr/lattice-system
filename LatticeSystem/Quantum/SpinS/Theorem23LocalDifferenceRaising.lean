@@ -3,7 +3,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 /-!
 # Tasaki §2.5 Theorem 2.3 local-difference raising API
 
-This module contains the raising-direction site-sum API split from
+This module contains the raising-direction single-site component API split from
 `Theorem23LocalDifference.lean`. The lowered predecessor-difference API
 remains in `Theorem23LocalDifference.lean`, the unpacked
 predecessor-difference callback adapters are isolated in
