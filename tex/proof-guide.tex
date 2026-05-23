@@ -7393,8 +7393,10 @@ and the source-weight / lowering-predecessor bridge layer split into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23PredictedSourceWeight.lean}.  The
 local ladder and site-sum expansion layer is factored into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Local.lean}.  The single-site
-lowering component and filtered local sign-sum layer is isolated in
-\texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalLowering.lean}.  The lowered
+lowering component layer is isolated in
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalLowering.lean}, with the
+boundary-inclusive filtered local sign-sum layer split into
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalLoweringSignSum.lean}.  The lowered
 coefficient layer is isolated in
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23LocalCoefficient.lean}, with the
 predecessor raising-source suffix isolated in
@@ -8768,7 +8770,9 @@ site-sum and Casimir-nonvanishing adjacent common-energy layer is isolated in
 adjacent common-energy suffix split into
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23PredictedCasimirEnergy}\).  The local
 lowering component layer is isolated in
-\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalLowering}\).  The
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalLowering}\), with the
+boundary-inclusive local sign-sum layer in
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalLoweringSignSum}\).  The
 local coefficient layer is isolated in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient}\), with the
 predecessor raising-source suffix in
