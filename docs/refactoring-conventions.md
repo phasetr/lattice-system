@@ -337,6 +337,17 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3530)**: Refactored the Tasaki §2.5 Theorem 2.3
+  sector-existence dominance API after the predicted-GS dominance variants
+  became a stable suffix. `Theorem23SectorExistenceDominance.lean` now keeps
+  the successor/predecessor predicted-Casimir dominance wrappers (230 lines),
+  while `Theorem23SectorExistenceDominancePredictedGS.lean` contains the
+  successor/predecessor predicted-GS dominance wrappers (228 lines). The new
+  module imports the parent and is itself a leaf endpoint; the parent has no
+  other Lean consumer than this new suffix. Focused per-module
+  `lake build` / `lake env lean` checks verify both (these tip modules are not
+  in the default `lake build` closure, so per-module checks are the real
+  verification).
 - **2026-05-24 (PR #3529)**: Refactored the Tasaki §2.5 Theorem 2.3
   predicted-ladder API after the lowered joint-magnetization extractor lemmas
   became a stable suffix. `Theorem23PredictedLadder.lean` now keeps the
