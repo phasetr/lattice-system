@@ -340,8 +340,8 @@ mechanically** and catch most regressions / drift.
 - **2026-05-24 (PR #3522)**: Refactored the Tasaki §2.5 Theorem 2.3
   outside-ground predicted-GS API after the left-endpoint threaded
   predicted-GS lowered-Marshall final wrappers became a stable suffix.
-  `Theorem23OutsideGroundPredictedGS.lean` now keeps the source predicted-GS
-  and direct lowered-Marshall final wrappers (213 lines), while
+  `Theorem23OutsideGroundPredictedGS.lean` now keeps the left-endpoint
+  predicted-GS off-`A`/on-`A` dominance final wrappers (213 lines), while
   `Theorem23OutsideGroundPredictedGSLoweredMarshall.lean` contains the
   left-endpoint threaded predicted-GS lowered-Marshall final wrappers and the
   outside-real-sector wrapper (298 lines). Focused checks cover the split
