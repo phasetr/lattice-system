@@ -3,10 +3,14 @@ import LatticeSystem.Quantum.SpinS.Theorem23Final
 /-!
 # Tasaki §2.5 Theorem 2.3 final lowered-site-sum API
 
-This module contains the direct lowered-site-sum final wrappers split from
+This module contains the source predicted-GS lowered-site-sum final wrappers
+(plain / sector-minimality / real-sector-minimality) split from
 `Theorem23Final.lean`. The base final-boundary module keeps the outside-ground
 final-boundary aliases, while this module exposes the final theorem boundary
-whose local positivity input is the strict lowered single-site sum.
+whose local positivity input is the strict lowered single-site sum. The
+left-endpoint threaded predicted-GS lowered-site-sum final wrapper and the
+lowered-site-sum named-callback abbrevs are split into
+`Theorem23FinalLoweredSiteSumLeft.lean`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
@@ -252,144 +256,5 @@ theorem
           (hreal_sector_min hcommon))
       hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
       hc_strict h_intermediate hA_nonempty hnotA_nonempty
-
-set_option linter.style.longLine false in
-/-- **Tasaki §2.5 Theorem 2.3 left-endpoint predicted-GS site-sum final
-wrapper from sector minimality**: this packages the direct lowered
-site-sum interval chain into the final theorem while requiring predicted
-toy ground-state membership only at the left endpoint.
-
-This is the final-wrapper counterpart of
-`tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_lowered_site_sum_pos`.
-It is the direct site-sum analogue of the lowered-Marshall final wrapper
-used later in the chain. -/
-theorem
-    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_lowered_site_sum_pos_of_sector_minimality
-    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
-    (hBA :
-      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
-        (Finset.univ.filter (fun x : V => A x = true)).card)
-    (hsector_nonempty :
-      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-        Nonempty (magConfigS V N M))
-    (hleft_predictedGS :
-      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
-    (hsource_site_sum_pos :
-      ∀ {M : ℕ},
-        M ∈ tasaki23GroundStateSectors (V := V) A N →
-        M <
-          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
-        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          ∀ τ : magConfigS V N (M + 1),
-            0 < (marshallSignS A τ.1).re *
-              (∑ x : V,
-                (((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
-                  (magSectorEmbedding
-                    (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re))
-    (hsector_min :
-      ∀ {μ : ℝ},
-        (∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-          ∃ v : magConfigS V N M → ℝ,
-            μ < c ∧ (∀ τ, 0 < v τ) ∧
-            (heisenbergHamiltonianS J N).mulVec
-                (magSectorEmbedding
-                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-              (μ : ℂ) • magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) →
-        ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
-          ∀ {μ' : ℝ} {Φ : magConfigS V N M → ℂ},
-            Φ ≠ 0 →
-            (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φ =
-              (μ' : ℂ) • Φ →
-            μ ≤ μ') :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
-  intro hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
-    hc_strict h_intermediate hA_nonempty hnotA_nonempty
-  obtain ⟨μ, hcommon_pred⟩ :=
-    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_lowered_site_sum_pos
-      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
-      hc_strict h_intermediate hBA hsector_nonempty hleft_predictedGS
-      hsource_site_sum_pos
-  have hcommon :
-      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-        ∃ v : magConfigS V N M → ℝ,
-          μ < c ∧ (∀ τ, 0 < v τ) ∧
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) := by
-    intro M hM
-    obtain ⟨v, hμ_lt, hv_pos, hΦ, _hpred⟩ := hcommon_pred M hM
-    exact ⟨v, hμ_lt, hv_pos, hΦ⟩
-  exact
-    tasaki_2_5_theorem_2_3_of_common_energy_chain
-      A N c hcommon
-      (tasaki23_global_minimality_of_sector_minimality N
-        (hsector_min hcommon))
-      hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
-      hc_strict h_intermediate hA_nonempty hnotA_nonempty
-
-set_option linter.style.longLine false in
-/-- **Tasaki §2.5 Theorem 2.3 lowered-site-sum named-callback final
-boundary**: this exposes the direct lowered-site-sum route through named
-callbacks for source predicted-GS membership, lowered site-sum
-positivity, and sectorwise global minimality.
-
-The theorem is a short alias for the direct lowered-site-sum final
-wrapper from sector minimality and adds no extra mathematical input. -/
-abbrev tasaki_2_5_theorem_2_3_of_lowered_site_sum_named_callbacks
-    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
-    (hBA :
-      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
-        (Finset.univ.filter (fun x : V => A x = true)).card)
-    (hsector_nonempty :
-      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-        Nonempty (magConfigS V N M))
-    (hsource_pred :
-      tasaki23SourcePredictedGSCallback (V := V) A J N c)
-    (hlowered_site_sum :
-      tasaki23LoweredSiteSumCallback (V := V) A J N c)
-    (hsector_min :
-      tasaki23SectorMinimalityCallback (V := V) A J N c) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_predictedGS_of_lowered_site_sum_pos_of_sector_minimality
-    (V := V) A (J := J) N c hBA hsector_nonempty
-    (fun hM _hMlt => hsource_pred hM)
-    hlowered_site_sum hsector_min
-
-set_option linter.style.longLine false in
-/-- **Tasaki §2.5 Theorem 2.3 left-endpoint lowered-site-sum named
-boundary**: this is the left-endpoint version of the direct
-lowered-site-sum named-callback boundary.
-
-It requires only the left-endpoint predicted-GS callback, the lowered
-site-sum positivity callback, and the sector-minimality callback. -/
-abbrev tasaki_2_5_theorem_2_3_of_left_endpoint_lowered_site_sum_named_callbacks
-    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
-    (hBA :
-      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
-        (Finset.univ.filter (fun x : V => A x = true)).card)
-    (hsector_nonempty :
-      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-        Nonempty (magConfigS V N M))
-    (hleft_predictedGS :
-      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
-    (hlowered_site_sum :
-      tasaki23LoweredSiteSumCallback (V := V) A J N c)
-    (hsector_min :
-      tasaki23SectorMinimalityCallback (V := V) A J N c) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_lowered_site_sum_pos_of_sector_minimality
-    (V := V) A (J := J) N c hBA hsector_nonempty hleft_predictedGS
-    hlowered_site_sum hsector_min
 
 end LatticeSystem.Quantum
