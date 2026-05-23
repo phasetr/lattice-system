@@ -441,6 +441,13 @@ mechanically** and catch most regressions / drift.
   contribution, strict off-`A` witness, vacancy bridge, and dominance-form
   raised site-sum positivity wrapper (168 lines). Focused checks cover the
   split modules and dominance / sector-existence downstream modules.
+- **2026-05-23 (PR #3516)**: Refactored the Tasaki §2.5 Theorem 2.3
+  predicted-data API after the predicted-Casimir endpoint mismatch layer
+  became a stable prefix. `Theorem23Predicted.lean` now keeps the canonical
+  predicted-GS and cross-ladder bridges, while
+  `Theorem23PredictedEndpoint.lean` contains the lowering/raising real
+  endpoint inequalities and complex endpoint-mismatch wrappers. Focused checks
+  cover the split modules and the predicted-Casimir adjacent-energy consumer.
 - **2026-05-23 (PR #3502)**: Refactored the Tasaki §2.5 Theorem 2.3
   dominance API after the predicted-GS dominance wrappers became a stable
   suffix. `Theorem23Dominance.lean` now keeps the base dominance and

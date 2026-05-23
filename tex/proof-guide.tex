@@ -7381,8 +7381,9 @@ The predicted
 spin and admissible-sector interval API used by this definition are
 factored into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Sectors.lean}.  The
-predicted-Casimir, predicted-GS, and cross-ladder bridge layer is factored
-into
+predicted-Casimir endpoint mismatch layer is factored into
+\texttt{LatticeSystem/Quantum/SpinS/Theorem23PredictedEndpoint.lean}.  The
+predicted-GS and cross-ladder bridge layer is factored into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23Predicted.lean}, with the
 predicted-GS ladder-closure and joint sublattice-Casimir layer split into
 \texttt{LatticeSystem/Quantum/SpinS/Theorem23PredictedLadder.lean}, the
@@ -8913,7 +8914,10 @@ live in the Lean module
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Final}\), with the
 lowered-vector-Marshall final suffix split into
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23FinalLoweredMarshall}\), while
-\(\texttt{Theorem23Predicted}\) carries the predicted-data bridges and
+\(\texttt{Theorem23PredictedEndpoint}\) carries the predicted-Casimir
+endpoint mismatch bridges,
+\(\texttt{Theorem23Predicted}\) carries the predicted-GS and cross-ladder
+bridges, and
 \(\texttt{Theorem23}\) keeps the adjacent common-energy chain.
 
 Lean packages the resulting sectorwise minimality statement as
