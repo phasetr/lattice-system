@@ -432,6 +432,15 @@ mechanically** and catch most regressions / drift.
   `Theorem23DominancePredictedCasimirTransfer.lean` contains the successor
   predicted-Casimir transfer suffix (269 lines). Focused checks cover the split
   modules and the interval-Casimir downstream module.
+- **2026-05-23 (PR #3515)**: Refactored the Tasaki §2.5 Theorem 2.3
+  local-difference raising API after the raised site-sum contribution and
+  decomposition wrappers became a stable suffix.
+  `Theorem23LocalDifferenceRaising.lean` now keeps the single-site raising
+  components and weak filtered sign bounds (398 lines), while
+  `Theorem23LocalDifferenceRaisingSiteSum.lean` contains the named
+  contribution, strict off-`A` witness, vacancy bridge, and dominance-form
+  raised site-sum positivity wrapper (168 lines). Focused checks cover the
+  split modules and dominance / sector-existence downstream modules.
 - **2026-05-23 (PR #3502)**: Refactored the Tasaki §2.5 Theorem 2.3
   dominance API after the predicted-GS dominance wrappers became a stable
   suffix. `Theorem23Dominance.lean` now keeps the base dominance and
