@@ -337,6 +337,17 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3527)**: Refactored the Tasaki §2.5 Theorem 2.3
+  local-coefficient raising-source API after the boundary-inclusive
+  raising-source coefficient definition and the raising-predecessor-source
+  sum / positivity / dominance machinery became an independent suffix.
+  `Theorem23LocalCoefficientRaisingSource.lean` now keeps the
+  lowerable-positive-source coefficient bridges (158 lines), while
+  `Theorem23LocalCoefficientRaisingSourceSum.lean` contains the
+  `tasaki23RaisingPredecessorSourceCoefficient` definition and the
+  raising-predecessor-source sum / positivity / dominance machinery and final
+  callback (326 lines). Focused checks cover the split modules and the local
+  difference / outside-ground predecessor difference downstream modules.
 - **2026-05-24 (PR #3526)**: Refactored the Tasaki §2.5 Theorem 2.3
   local-difference adjacent-sector energy API after the Casimir-non-vanishing
   and site-sum-positivity packages became a stable suffix.
