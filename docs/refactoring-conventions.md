@@ -342,9 +342,9 @@ mechanically** and catch most regressions / drift.
   the raised predicted-Casimir variant became a stable suffix.
   `Theorem23SectorExistence.lean` now keeps the Theorem 2.3 statement, the
   base per-sector existence step, and the successor sector-existence chain
-  links (381 lines), while `Theorem23SectorExistencePredecessor.lean` contains
+  links (384 lines), while `Theorem23SectorExistencePredecessor.lean` contains
   the predecessor sector-existence chain link with the raised
-  predicted-Casimir variant (122 lines). Focused checks cover the split
+  predicted-Casimir variant (123 lines). Focused checks cover the split
   modules and the sector-existence dominance downstream module.
 - **2026-05-24 (PR #3523)**: Refactored the Tasaki §2.5 Theorem 2.3
   outside-ground re-embedded cross-ladder API after the unpacked re-embedded
