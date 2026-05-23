@@ -337,6 +337,18 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3533)**: Refactored the Tasaki §2.5 Theorem 2.3
+  unpacked predecessor-difference API after the strict lowered site-sum
+  positivity theorem and its callback abbrev became a stable suffix.
+  `Theorem23LocalDifferenceUnpacked.lean` now keeps the lowered Marshall
+  positivity theorem (208 lines), while
+  `Theorem23LocalDifferenceUnpackedSiteSum.lean` contains the strict lowered
+  site-sum positivity theorem and the callback-adapter abbrev (232 lines). The
+  new module imports the parent (the site-sum theorem reuses the lowered
+  Marshall positivity theorem). Only `Theorem23Interval` consumes the moved
+  declarations; it switches its import to the new module.
+  `Theorem23IntervalCallbacks` imports the parent but uses none of its
+  declarations and is left unchanged.
 - **2026-05-24 (PR #3532)**: Refactored the Tasaki §2.5 Theorem 2.3
   local-lowering API after the single-site positivity/negativity theorems
   became a stable suffix. `Theorem23LocalLowering.lean` now keeps the raw
