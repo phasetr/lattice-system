@@ -528,6 +528,14 @@ mechanically** and catch most regressions / drift.
   `Theorem23LocalLowering.lean` contains the lowering component suffix
   (527 lines). Focused checks cover the split modules and the local
   coefficient downstream module.
+- **2026-05-23 (PR #3521)**: Refactored the Tasaki §2.5 Theorem 2.3
+  local lowering sign-sum API after the weak boundary-inclusive sign bounds
+  became a stable suffix of the lowering component layer.
+  `Theorem23LocalLowering.lean` now keeps the single-site component formulas
+  and strict local Marshall sign identities, while
+  `Theorem23LocalLoweringSignSum.lean` contains the non-negative/non-positive
+  boundary-inclusive sign-sum bounds. Focused checks cover the split modules
+  and the local-difference site-sum downstream module.
 - **2026-05-22 (PR #3496)**: Refactored the Tasaki §2.5 Theorem 2.3
   outside-ground predicted-Casimir API after the predicted-Casimir final
   wrappers became a stable suffix. `Theorem23OutsideGround.lean` now keeps
