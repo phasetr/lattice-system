@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23SectorExistence
+import LatticeSystem.Quantum.SpinS.Theorem23SectorExistencePredecessor
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceRaisingSiteSum
 
 /-!
