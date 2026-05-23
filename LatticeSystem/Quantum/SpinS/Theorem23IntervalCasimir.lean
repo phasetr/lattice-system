@@ -10,7 +10,7 @@ wrappers split from `Theorem23Interval.lean`. The direct lowered site-sum
 suffix is split further into `Theorem23IntervalCasimirSiteSum.lean`, and the
 global / sector minimality bridge and named callback suffix is split into
 `Theorem23IntervalCasimirMinimality.lean`. Keeping these modules separate lets
-the base interval-chain callback API elaborate without replaying the
+the base interval-chain wrapper API elaborate without replaying the
 predicted-Casimir suffix layers.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body

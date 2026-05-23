@@ -4,9 +4,10 @@ import LatticeSystem.Quantum.SpinS.Theorem23Interval
 # Tasaki §2.5 Theorem 2.3 predicted-GS interval suffix
 
 This module contains the predicted-GS-aware interval-chain suffix split from
-`Theorem23Interval.lean`. The base interval module keeps the named callbacks
-and direct interval-chain wrappers, while this module exposes the lowered-vector
-Marshall and predicted-GS-aware local-comparison interval wrappers.
+`Theorem23Interval.lean`. The named callback propositions live in
+`Theorem23IntervalCallbacks.lean`; the base interval module keeps the direct
+interval-chain wrappers, while this module exposes the lowered-vector Marshall
+and predicted-GS-aware local-comparison interval wrappers.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
