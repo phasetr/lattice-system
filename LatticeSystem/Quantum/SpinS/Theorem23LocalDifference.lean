@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficientRaisingSourceSum
+import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficientSignedSum
 
 /-!
 # Tasaki §2.5 Theorem 2.3 local predecessor-difference API

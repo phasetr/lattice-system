@@ -1,6 +1,6 @@
 import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadderReembeddedUnpacked
 import LatticeSystem.Quantum.SpinS.Theorem23PredictedSourceWeight
-import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
+import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficientSignedSum
 
 /-!
 # Tasaki §2.5 Theorem 2.3 outside-ground predecessor final wrappers
