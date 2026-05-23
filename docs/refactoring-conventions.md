@@ -337,6 +337,15 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3525)**: Refactored the Tasaki §2.5 Theorem 2.3 joint
+  interval-chain API after the unpacked lowered-joint cross-ladder
+  predicted-GS interval-chain wrapper became a stable suffix.
+  `Theorem23IntervalJoint.lean` now keeps the joint-component, lowered-joint
+  magSubspace-component, and lowered-joint cross-ladder-component wrappers
+  (335 lines), while `Theorem23IntervalJointUnpacked.lean` contains the
+  unpacked lowered-joint cross-ladder wrapper (161 lines). Focused checks
+  cover the split modules and the outside-ground cross-ladder unpacked
+  downstream module.
 - **2026-05-24 (PR #3524)**: Refactored the Tasaki §2.5 Theorem 2.3
   sector-existence API after the predecessor sector-existence chain link with
   the raised predicted-Casimir variant became a stable suffix.

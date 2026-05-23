@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadderLoweredJoint
+import LatticeSystem.Quantum.SpinS.Theorem23IntervalJointUnpacked
 
 /-!
 # Tasaki §2.5 Theorem 2.3 unpacked cross-ladder final wrappers
