@@ -5,9 +5,11 @@ import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceRaisingPositivity
 
 This module contains the raised site-sum contribution and decomposition API
 split from `Theorem23LocalDifferenceRaising.lean`. The base raising module
-keeps the single-site raising components and weak filtered sign bounds, while
-this module packages the strict off-`A` witness, vacancy bridge, and
-dominance-form strict site-sum positivity wrapper.
+keeps the single-site raising components; the single-site raising positivity
+group and weak filtered sign bounds live in
+`Theorem23LocalDifferenceRaisingPositivity.lean`; while this module packages
+the strict off-`A` witness, vacancy bridge, and dominance-form strict
+site-sum positivity wrapper.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
