@@ -337,6 +337,18 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3536)**: Refactored the Tasaki §2.5 Theorem 2.3
+  local-difference-raising API after the single-site raising positivity group
+  became a stable suffix (raising-direction companion to PR #3532).
+  `Theorem23LocalDifferenceRaising.lean` now keeps the raw single-site raising
+  component formulas (165 lines), while
+  `Theorem23LocalDifferenceRaisingPositivity.lean` contains the single-site
+  raising positivity/negativity, non-negativity/non-positivity, and the
+  off-`A`/on-`A` raised sign-sum bounds (298 lines). The new module imports the
+  parent. The `private` `magSumS_single_site_raising_successor` helper is
+  duplicated into the new module (same per-module private-copy pattern as in
+  PR #3532). Only `Theorem23LocalDifferenceRaisingSiteSum` consumes the moved
+  theorems; it switches its import to the new module.
 - **2026-05-24 (PR #3535)**: Refactored the Tasaki §2.5 Theorem 2.3
   outside-ground cross-ladder lowered-joint API after the lowered-joint
   cross-ladder final wrappers became a stable suffix.
