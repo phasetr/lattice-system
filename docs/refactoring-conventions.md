@@ -342,9 +342,9 @@ mechanically** and catch most regressions / drift.
   became a stable suffix. `Theorem23SectorExistenceDominance.lean` now keeps
   the successor/predecessor predicted-Casimir dominance wrappers (230 lines),
   while `Theorem23SectorExistenceDominancePredictedGS.lean` contains the
-  successor/predecessor predicted-GS dominance wrappers (228 lines). The
-  parent and new module are both leaf endpoints (no other Lean module imports
-  them); the new module imports the parent. Focused per-module
+  successor/predecessor predicted-GS dominance wrappers (228 lines). The new
+  module imports the parent and is itself a leaf endpoint; the parent has no
+  other Lean consumer than this new suffix. Focused per-module
   `lake build` / `lake env lean` checks verify both (these tip modules are not
   in the default `lake build` closure, so per-module checks are the real
   verification).
