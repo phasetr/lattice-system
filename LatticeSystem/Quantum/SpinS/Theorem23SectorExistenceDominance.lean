@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23SectorExistence
+import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceRaisingSiteSum
 
 /-!
 # Tasaki §2.5 Theorem 2.3 sector-existence dominance API

@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23Dominance
+import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceRaisingSiteSum
 import LatticeSystem.Quantum.SpinS.Theorem23PredictedCasimirEnergy
 import LatticeSystem.Quantum.SpinS.Theorem23PredictedLadderCasimirTransfer
 

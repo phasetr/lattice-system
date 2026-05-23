@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceRaising
+import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceRaisingSiteSum
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceSiteSum
 
 /-!
@@ -7,7 +7,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceSiteSum
 This module contains the final lowered/raised Marshall-positivity wrappers
 split from `Theorem23LocalDifference.lean`. It depends on the lowered
 site-sum API in `Theorem23LocalDifferenceSiteSum.lean` and the
-raising-direction site-sum API in `Theorem23LocalDifferenceRaising.lean`.
+raised site-sum API in `Theorem23LocalDifferenceRaisingSiteSum.lean`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
