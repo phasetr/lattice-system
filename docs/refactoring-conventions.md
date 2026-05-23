@@ -344,7 +344,7 @@ mechanically** and catch most regressions / drift.
   re-embedded cross-ladder source-sector site-sum and source-weight final
   wrappers (315 lines), while
   `Theorem23OutsideGroundCrossLadderReembeddedUnpacked.lean` contains the
-  unpacked re-embedded source-weight final wrapper (181 lines). Focused checks
+  unpacked re-embedded source-weight final wrapper (178 lines). Focused checks
   cover the split modules and the outside-ground predecessor downstream module.
 - **2026-05-24 (PR #3522)**: Refactored the Tasaki §2.5 Theorem 2.3
   outside-ground predicted-GS API after the left-endpoint threaded
