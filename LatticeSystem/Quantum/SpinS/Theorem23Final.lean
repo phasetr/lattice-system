@@ -216,4 +216,76 @@ abbrev tasaki_2_5_theorem_2_3_of_left_endpoint_predecessor_difference_named_call
     (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_sector_minimality
       (V := V) A N c hsector_min)
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 predecessor-difference named-callback
+admissible-reach boundary**: this public boundary replaces the
+outside-sector ground-energy lower family in
+`tasaki_2_5_theorem_2_3_of_named_callbacks` by the ladder-style
+admissible-reach callback.
+
+The outside-family input is supplied by
+`tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach`, so
+the remaining named hypotheses are source predicted-GS membership, the
+predecessor-difference local comparison, real-coupling hypotheses, and
+the admissible-reach callback for outside-sector representatives. -/
+abbrev tasaki_2_5_theorem_2_3_of_admissible_reach_named_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hreach :
+      tasaki23OutsideGroundAdmissibleReachCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS
+    hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+      (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hreach)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint predecessor-difference
+named-callback admissible-reach boundary**: this is the left-endpoint
+version of
+`tasaki_2_5_theorem_2_3_of_admissible_reach_named_callbacks`.
+
+It keeps the final public hypotheses in the same named-callback family:
+left-endpoint predicted-GS membership, predecessor-difference local
+comparison, real-coupling hypotheses, and the ladder-style
+admissible-reach callback. -/
+abbrev tasaki_2_5_theorem_2_3_of_left_endpoint_admissible_reach_named_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hreach :
+      tasaki23OutsideGroundAdmissibleReachCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_named_callbacks
+    (V := V) A (J := J) N c hBA hleft_predictedGS
+    hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+      (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hreach)
+
 end LatticeSystem.Quantum
