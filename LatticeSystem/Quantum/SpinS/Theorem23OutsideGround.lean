@@ -1050,6 +1050,57 @@ theorem tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientSu
     · simp [hsucc_im]
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated-ladder-iterate coefficient
+induction boundary**: a positive coefficient formula at the top sector,
+together with lowerable positive-source coefficient dominance at every
+successor step, supplies strictly positive Marshall-signed coefficients for
+every saturated ladder iterate.
+
+This packages the successor theorem into the whole ladder chain.  The base
+case is the all-up sector supplied by a separate normalization input, and the
+successor step is exactly
+`tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientSucc_of_positive_source_lowerable_coefficient_lt`. -/
+theorem tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientFamily_of_zero_and_successor_dominance
+    (A : V → Bool) (N : ℕ)
+    (hzero :
+      ∃ w0 : magConfigS V N 0 → ℝ,
+        (∀ τ : magConfigS V N 0, 0 < w0 τ) ∧
+          ∀ τ : magConfigS V N 0,
+            ladderIterateUp V N ⟨0, Nat.succ_pos (Fintype.card V * N)⟩ τ.1 =
+              (((marshallSignS A τ.1).re * w0 τ : ℝ) : ℂ))
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (∑ x ∈ ((Finset.univ.filter (fun x : V => A x = true)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) <
+          ∑ x ∈ ((Finset.univ.filter (fun x : V => A x = false)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) :
+    ∀ M : ℕ, (hM_range : M < Fintype.card V * N + 1) →
+      ∃ w : magConfigS V N M → ℝ,
+        (∀ τ : magConfigS V N M, 0 < w τ) ∧
+          ∀ τ : magConfigS V N M,
+            ladderIterateUp V N ⟨M, hM_range⟩ τ.1 =
+              (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ) := by
+  intro M
+  induction M with
+  | zero =>
+      intro hM_range
+      simpa using hzero
+  | succ M ih =>
+      intro hM_succ
+      obtain ⟨w, hw_pos, hcoeff⟩ := ih (Nat.lt_of_succ_lt hM_succ)
+      exact
+        tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientSucc_of_positive_source_lowerable_coefficient_lt
+          (V := V) (A := A) (N := N) (M := M) hM_succ w hcoeff
+          (hdominates M hM_succ w hcoeff)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left singleton-span iterate reference from a
 Marshall-positive ladder iterate equality**: equality with the sector
 `ladderIterateUp` vector places the reference embedding in its singleton
