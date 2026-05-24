@@ -317,6 +317,30 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
         N hJ_real hΦK_eigen)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from side admissible
+reach**: left and right directional outside-sector reach callbacks supply
+the outside-sector ground-energy lower family by first recombining into the
+full admissible-reach callback and then applying
+`tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach`. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_side_admissible_reach
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleft :
+      tasaki23OutsideGroundLeftAdmissibleReachCallback (V := V) A J N c)
+    (hright :
+      tasaki23OutsideGroundRightAdmissibleReachCallback (V := V) A J N c) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+    (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundAdmissibleReachCallback_of_side_callbacks
+      (V := V) A (J := J) N c hleft hright)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-sector real lower bound from
 outside-sector ground energies**: for sectors outside the admissible
 Theorem 2.3 interval, it is enough to prove the lower bound against the
