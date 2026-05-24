@@ -9165,6 +9165,33 @@ left-endpoint predicted-GS membership, the local predecessor-difference
 comparison, and the outside-sector ground-representative estimates
 \(\mu\le\mu_M\).
 
+The same outside-sector mechanism is also recorded one layer earlier,
+before passing through the predecessor-difference callback.  Lean records
+\[
+\begin{gathered}
+\texttt{tasaki23\_common\_energy\_chain}\\
+\texttt{\_of\_left\_endpoint\_predictedGS}\\
+\texttt{\_of\_unpacked\_lowered\_joint\_cross\_ladder}\\
+\texttt{\_component\_lt}
+\end{gathered}
+\]
+by forgetting the predicted-ground-state membership carried by the
+unpacked cross-ladder interval chain.  The corresponding final wrapper
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_lowered\_joint\_cross\_ladder}\\
+\texttt{\_component\_lt}\\
+\texttt{\_of\_outside\_sector\_ground\_energy\_lower\_bound}
+\end{gathered}
+\]
+combines that common-energy chain with
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}.  This boundary
+therefore proves the final theorem from the unpacked cross-ladder local
+component comparison and the outside-sector lower family, without using
+\texttt{tasaki23PredecessorDifferenceCallback}.
+
 The next boundary removes the special left-endpoint shape from the
 public API.  Lean records
 \[
