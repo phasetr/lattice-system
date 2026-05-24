@@ -9773,8 +9773,19 @@ for realness and
 \texttt{\_of\_positive\_source\_lowerable\_coefficient\_lt}
 \]
 for strict positivity.
-Lean also packages this one-step result into the full coefficient chain.  The
-new induction boundary
+The base of the coefficient chain is also explicit:
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundSaturatedLadderIterate}\\
+\texttt{MarshallPositiveCoefficientZero}.
+\end{gathered}
+\]
+It uses the uniqueness of the \(M=0\) sector,
+\(\texttt{magConfigS\_zero\_eq\_allAlignedConfigS}\), and the identity
+\(\texttt{marshallSignS\_const\_zero}\) to give the constant positive weight
+\(w_0=1\) for \(\texttt{ladderIterateUp}\ V\ N\ \langle0,\_\rangle\).
+Lean then packages this base and the one-step result into the full coefficient
+chain.  The intermediate induction boundary
 \[
 \begin{gathered}
 \texttt{tasaki23OutsideGroundSaturatedLadderIterate}\\
@@ -9786,6 +9797,16 @@ takes a positive coefficient representation at \(M=0\), plus the same
 lowerable positive-source dominance input at each successor step, and returns
 strictly positive Marshall-signed coefficients for every
 \(\texttt{ladderIterateUp}\ V\ N\ \langle M,\_\rangle\) in the saturated range.
+The closed form
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundSaturatedLadderIterate}\\
+\texttt{MarshallPositiveCoefficientFamily}\\
+\texttt{\_of\_successor\_dominance}
+\end{gathered}
+\]
+discharges the \(M=0\) input with the zero-sector theorem, so successor
+dominance is the only remaining coefficient input.
 This is the explicit induction closure of the coefficient recursion used at
 the Tasaki §2.5 Theorem~2.3 outside-ground boundary (Tasaki, Springer 2020,
 §2.5 Theorem~2.3, p.~42).

@@ -1050,6 +1050,42 @@ theorem tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientSu
     · simp [hsucc_im]
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated-ladder-iterate top coefficient**:
+the top saturated ladder iterate `ladderIterateUp V N ⟨0, _⟩` has the
+Marshall-positive coefficient form on the `M = 0` sector, with the constant
+weight `1`.
+
+The `M = 0` sector contains only the all-up configuration, whose Marshall sign
+is `+1`.  This is the base case for the coefficient induction along the
+saturated total-spin lowering ladder. -/
+theorem tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientZero
+    (A : V → Bool) (N : ℕ) :
+    ∃ w0 : magConfigS V N 0 → ℝ,
+      (∀ τ : magConfigS V N 0, 0 < w0 τ) ∧
+        ∀ τ : magConfigS V N 0,
+          ladderIterateUp V N ⟨0, Nat.succ_pos (Fintype.card V * N)⟩ τ.1 =
+            (((marshallSignS A τ.1).re * w0 τ : ℝ) : ℂ) := by
+  refine ⟨fun _ => 1, ?_, ?_⟩
+  · intro τ
+    norm_num
+  · intro τ
+    have hτ : τ.1 = allAlignedConfigS V N 0 :=
+      magConfigS_zero_eq_allAlignedConfigS τ
+    calc
+      ladderIterateUp V N ⟨0, Nat.succ_pos (Fintype.card V * N)⟩ τ.1 =
+          allAlignedStateS V N (0 : Fin (N + 1)) τ.1 := by
+        simp [ladderIterateUp]
+      _ = 1 := by
+        rw [hτ]
+        simp [allAlignedStateS]
+      _ = (((marshallSignS A τ.1).re * (1 : ℝ) : ℝ) : ℂ) := by
+        rw [hτ]
+        have hsign : marshallSignS A (allAlignedConfigS V N 0) = 1 := by
+          simpa [allAlignedConfigS] using
+            (marshallSignS_const_zero (V := V) (N := N) A)
+        simp [hsign]
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 saturated-ladder-iterate coefficient
 induction boundary**: a positive coefficient formula at the top sector,
 together with lowerable positive-source coefficient dominance at every
@@ -1099,6 +1135,42 @@ theorem tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientFa
         tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientSucc_of_positive_source_lowerable_coefficient_lt
           (V := V) (A := A) (N := N) (M := M) hM_succ w hcoeff
           (hdominates M hM_succ w hcoeff)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated-ladder-iterate coefficient
+family from successor dominance**: lowerable positive-source coefficient
+dominance at every successor step is enough to construct strictly positive
+Marshall-signed coefficients for every saturated ladder iterate.
+
+This is the closed induction form: the top-sector coefficient is discharged by
+`tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientZero`,
+and all remaining sectors are handled by the successor dominance step. -/
+theorem tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientFamily_of_successor_dominance
+    (A : V → Bool) (N : ℕ)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (∑ x ∈ ((Finset.univ.filter (fun x : V => A x = true)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) <
+          ∑ x ∈ ((Finset.univ.filter (fun x : V => A x = false)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) :
+    ∀ M : ℕ, (hM_range : M < Fintype.card V * N + 1) →
+      ∃ w : magConfigS V N M → ℝ,
+        (∀ τ : magConfigS V N M, 0 < w τ) ∧
+          ∀ τ : magConfigS V N M,
+            ladderIterateUp V N ⟨M, hM_range⟩ τ.1 =
+              (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ) :=
+  tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientFamily_of_zero_and_successor_dominance
+    (V := V) A N
+    (tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientZero
+      (V := V) A N)
+    hdominates
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left singleton-span iterate reference from a
