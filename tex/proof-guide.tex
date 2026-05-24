@@ -8993,7 +8993,24 @@ This bridge converts a sector-minimality callback into the
 Marshall-positive outside-sector representative is restricted to its
 magnetization sector, non-zeroness follows from positivity and
 \((\operatorname{Re}\mathrm{MarshallSign})^2=1\), and sector minimality
-then gives the required \(\mu\le\mu_M\).  The final named predecessor-difference
+then gives the required \(\mu\le\mu_M\).  A second bridge records the
+remaining ladder-reach form as
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundAdmissibleReachCallback},\\
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_admissible\_reach}.
+\end{gathered}
+\]
+Here the local input is no longer a sectorwise lower bound: for each
+Marshall-positive Theorem 2.2 representative outside the admissible
+interval, it supplies a nonzero eigenvector at the same eigenvalue
+inside some admissible sector.  The common-energy chain already gives
+the real-sector lower bound on admissible sectors.  The reached complex
+eigenvector is converted to that real-form statement by taking its real
+part, or, if the real part vanishes, by taking its nonzero imaginary
+part.  This proves \(\mu\le\mu_M\) and hence the same outside-ground
+lower-family callback.  The final named predecessor-difference
 boundaries
 \[
 \begin{gathered}
