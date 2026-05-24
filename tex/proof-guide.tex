@@ -9192,6 +9192,21 @@ therefore proves the final theorem from the unpacked cross-ladder local
 component comparison and the outside-sector lower family, without using
 \texttt{tasaki23PredecessorDifferenceCallback}.
 
+The coefficient form of the same outside-sector boundary is also available:
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_lowered\_joint\_cross\_ladder}\\
+\texttt{\_coefficient\_lt}\\
+\texttt{\_of\_outside\_sector\_ground\_energy\_lower\_bound}.
+\end{gathered}
+\]
+It first uses the existing coefficient wrapper to rewrite the signed
+lowered-component comparison into strict dominance between the on-\(A\) and
+off-\(A\) predecessor coefficient sums.  The common-energy/outside-sector
+bridge is then applied exactly as in the component boundary.
+
 The next boundary removes the special left-endpoint shape from the
 public API.  Lean records
 \[
