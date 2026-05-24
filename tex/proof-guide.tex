@@ -9082,6 +9082,33 @@ an admissible sector with \(M=K+k\) and proves
 \end{gathered}
 \]
 then feeds these non-zeroness callbacks through the full-reach bridge.
+The non-zeroness input has a Casimir-based discharge:
+\[
+\begin{gathered}
+\texttt{totalSpinSOpMinus\_pow\_mulVec\_ne\_zero}\\
+\texttt{\_of\_casimir\_ne\_kernel\_values},\\
+\texttt{totalSpinSOpPlus\_pow\_mulVec\_ne\_zero}\\
+\texttt{\_of\_casimir\_ne\_kernel\_values},\\
+\texttt{tasaki23OutsideGroundAdmissibleFullReachCallback}\\
+\texttt{\_of\_iterated\_ladder\_casimir\_callbacks}.
+\end{gathered}
+\]
+For each intermediate ladder step, these lemmas compare the preserved
+total-Casimir eigenvalue with the one-step kernel value
+\(m(m-1)\) in the lowering direction, respectively \(m(m+1)\) in the
+raising direction.  The final predecessor-difference boundary
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_iterated\_ladder\_casimir\_full\_reach}\\
+\texttt{\_discharge\_nonempty}
+\end{gathered}
+\]
+therefore replaces the raw iterated-ladder non-zeroness hypotheses by
+left and right Casimir-avoidance callbacks.
 The outside reach task is also split into its
 two endpoint directions by
 \[

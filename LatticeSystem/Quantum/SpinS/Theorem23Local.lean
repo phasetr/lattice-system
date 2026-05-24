@@ -194,6 +194,116 @@ theorem totalSpinSOpPlus_pow_mulVec_mem_magSubspaceS_of_mem
     push_cast
     ring_nf
 
+/-! ## Iterated ladder Casimir non-vanishing -/
+
+/-- **Tasaki §2.5 Theorem 2.3 iterated Casimir preservation, lowering
+direction**: if `Ψ` is a total-Casimir eigenvector at eigenvalue `γ`,
+then `(Ŝ^-_tot)^k Ψ` has the same total-Casimir eigenvalue. -/
+theorem totalSpinSSquared_mulVec_totalSpinSOpMinus_pow_of_eigenvec
+    (N : ℕ) (k : ℕ) {γ : ℂ}
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : (totalSpinSSquared V N).mulVec Ψ = γ • Ψ) :
+    (totalSpinSSquared V N).mulVec
+        (((totalSpinSOpMinus V N) ^ k).mulVec Ψ) =
+      γ • (((totalSpinSOpMinus V N) ^ k).mulVec Ψ) := by
+  have hcomm : totalSpinSSquared V N * ((totalSpinSOpMinus V N) ^ k) =
+      ((totalSpinSOpMinus V N) ^ k) * totalSpinSSquared V N :=
+    totalSpinSSquared_commute_totalSpinSOpMinus_pow k
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hΨ, Matrix.mulVec_smul]
+
+/-- **Tasaki §2.5 Theorem 2.3 iterated Casimir preservation, raising
+direction**: if `Ψ` is a total-Casimir eigenvector at eigenvalue `γ`,
+then `(Ŝ^+_tot)^k Ψ` has the same total-Casimir eigenvalue. -/
+theorem totalSpinSSquared_mulVec_totalSpinSOpPlus_pow_of_eigenvec
+    (N : ℕ) (k : ℕ) {γ : ℂ}
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : (totalSpinSSquared V N).mulVec Ψ = γ • Ψ) :
+    (totalSpinSSquared V N).mulVec
+        (((totalSpinSOpPlus V N) ^ k).mulVec Ψ) =
+      γ • (((totalSpinSOpPlus V N) ^ k).mulVec Ψ) := by
+  have hcomm : totalSpinSSquared V N * ((totalSpinSOpPlus V N) ^ k) =
+      ((totalSpinSOpPlus V N) ^ k) * totalSpinSSquared V N :=
+    totalSpinSSquared_commute_totalSpinSOpPlus_pow k
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hΨ, Matrix.mulVec_smul]
+
+/-- **Tasaki §2.5 Theorem 2.3 iterated Casimir non-vanishing, lowering
+direction**: a total-Casimir eigenvector remains nonzero through `k`
+lowering steps when every intermediate magnetization avoids the
+one-step lowering-kernel Casimir value. -/
+theorem totalSpinSOpMinus_pow_mulVec_ne_zero_of_casimir_ne_kernel_values
+    (k : ℕ) {m γ : ℂ} {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ_mag : Ψ ∈ magSubspaceS V N m)
+    (hΨ_cas : (totalSpinSSquared V N).mulVec Ψ = γ • Ψ)
+    (hΨ_ne : Ψ ≠ 0)
+    (hγ_ne :
+      ∀ j : ℕ, j < k →
+        γ ≠ (m - (j : ℂ)) * ((m - (j : ℂ)) - 1)) :
+    (((totalSpinSOpMinus V N) ^ k).mulVec Ψ) ≠ 0 := by
+  induction k with
+  | zero =>
+      simpa using hΨ_ne
+  | succ k ih =>
+      have hprev_ne :
+          (((totalSpinSOpMinus V N) ^ k).mulVec Ψ) ≠ 0 :=
+        ih (fun j hj => hγ_ne j (Nat.lt_trans hj (Nat.lt_succ_self k)))
+      have hprev_mag :
+          (((totalSpinSOpMinus V N) ^ k).mulVec Ψ) ∈
+            magSubspaceS V N (m - (k : ℂ)) :=
+        totalSpinSOpMinus_pow_mulVec_mem_magSubspaceS_of_mem
+          (V := V) (N := N) k hΨ_mag
+      have hprev_cas :
+          (totalSpinSSquared V N).mulVec
+              (((totalSpinSOpMinus V N) ^ k).mulVec Ψ) =
+            γ • (((totalSpinSOpMinus V N) ^ k).mulVec Ψ) :=
+        totalSpinSSquared_mulVec_totalSpinSOpMinus_pow_of_eigenvec
+          (V := V) N k hΨ_cas
+      have hstep :
+          (totalSpinSOpMinus V N).mulVec
+              (((totalSpinSOpMinus V N) ^ k).mulVec Ψ) ≠ 0 :=
+        tasaki23_totalSpinSOpMinus_mulVec_ne_zero_of_casimir_ne_kernel_value
+          hprev_mag hprev_cas (hγ_ne k (Nat.lt_succ_self k)) hprev_ne
+      rw [pow_succ', ← Matrix.mulVec_mulVec]
+      exact hstep
+
+/-- **Tasaki §2.5 Theorem 2.3 iterated Casimir non-vanishing, raising
+direction**: a total-Casimir eigenvector remains nonzero through `k`
+raising steps when every intermediate magnetization avoids the one-step
+raising-kernel Casimir value. -/
+theorem totalSpinSOpPlus_pow_mulVec_ne_zero_of_casimir_ne_kernel_values
+    (k : ℕ) {m γ : ℂ} {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ_mag : Ψ ∈ magSubspaceS V N m)
+    (hΨ_cas : (totalSpinSSquared V N).mulVec Ψ = γ • Ψ)
+    (hΨ_ne : Ψ ≠ 0)
+    (hγ_ne :
+      ∀ j : ℕ, j < k →
+        γ ≠ (m + (j : ℂ)) * ((m + (j : ℂ)) + 1)) :
+    (((totalSpinSOpPlus V N) ^ k).mulVec Ψ) ≠ 0 := by
+  induction k with
+  | zero =>
+      simpa using hΨ_ne
+  | succ k ih =>
+      have hprev_ne :
+          (((totalSpinSOpPlus V N) ^ k).mulVec Ψ) ≠ 0 :=
+        ih (fun j hj => hγ_ne j (Nat.lt_trans hj (Nat.lt_succ_self k)))
+      have hprev_mag :
+          (((totalSpinSOpPlus V N) ^ k).mulVec Ψ) ∈
+            magSubspaceS V N (m + (k : ℂ)) :=
+        totalSpinSOpPlus_pow_mulVec_mem_magSubspaceS_of_mem
+          (V := V) (N := N) k hΨ_mag
+      have hprev_cas :
+          (totalSpinSSquared V N).mulVec
+              (((totalSpinSOpPlus V N) ^ k).mulVec Ψ) =
+            γ • (((totalSpinSOpPlus V N) ^ k).mulVec Ψ) :=
+        totalSpinSSquared_mulVec_totalSpinSOpPlus_pow_of_eigenvec
+          (V := V) N k hΨ_cas
+      have hstep :
+          (totalSpinSOpPlus V N).mulVec
+              (((totalSpinSOpPlus V N) ^ k).mulVec Ψ) ≠ 0 :=
+        tasaki23_totalSpinSOpPlus_mulVec_ne_zero_of_casimir_ne_kernel_value
+          hprev_mag hprev_cas (hγ_ne k (Nat.lt_succ_self k)) hprev_ne
+      rw [pow_succ', ← Matrix.mulVec_mulVec]
+      exact hstep
+
 /-! ## Adjacent-sector energy comparison -/
 
 /-- **Tasaki §2.5 Theorem 2.3 lowered-vector non-vanishing**:
