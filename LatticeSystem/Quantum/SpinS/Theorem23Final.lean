@@ -58,6 +58,47 @@ abbrev
         hμ_lt hv_pos hΦ)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 threaded predicted-GS admissible-reach
+boundary**: this replaces the outside-sector ground-energy lower family in
+the threaded public predecessor-difference boundary by the ladder-style
+admissible-reach callback.
+
+The bridge
+`tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach`
+supplies the outside-sector ground-energy lower family, so the visible
+remaining inputs are the uniform predicted-GS callback, the local
+predecessor-difference comparison, the real-coupling hypotheses, and
+admissible reach for outside-sector representatives. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hreach :
+      tasaki23OutsideGroundAdmissibleReachCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
+    (V := V) A (J := J) N c hBA hsector_nonempty hsource_predictedGS
+    hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+      (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hreach)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 physical-range non-empty outside-ground
 boundary**: this replaces the interval-specific non-emptiness callback
 for admissible sectors by a canonical non-emptiness callback on the
@@ -84,6 +125,43 @@ abbrev
     hsource_predictedGS
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 physical-range non-empty admissible-reach
+boundary**: this is the physical-range non-empty version of
+`tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach`.
+
+It derives the admissible-sector `magConfigS` non-emptiness callback from
+the physical range and supplies outside-sector ground-energy lower bounds
+from admissible reach. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_physical_range_nonempty_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hphysical_nonempty :
+      ∀ M, M ≤ Fintype.card V * N → Nonempty (magConfigS V N M))
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hreach :
+      tasaki23OutsideGroundAdmissibleReachCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach
+    (V := V) A (J := J) N c hBA
+    (fun M hM =>
+      hphysical_nonempty M
+        (tasaki23GroundStateSectors_le_card_mul (V := V) A N hM))
+    hsource_predictedGS hpredecessor_difference hJ_real hJ_real' hJ_nn hJ_sym
+    hJ_bipartite hc_strict hreach
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 discharged physical non-empty
 outside-ground boundary**: the `magConfigS` non-emptiness input is now
 derived from the general physical-range sector construction.  The
@@ -102,6 +180,40 @@ abbrev
     (V := V) A (J := J) N c hBA
     (fun _M hM => magConfigS_nonempty_of_le_card_mul (V := V) (N := N) hM)
     hsource_predictedGS
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 discharged non-empty admissible-reach
+boundary**: this removes both the explicit physical-range non-emptiness
+callback and the outside-sector ground-energy lower-family callback from
+the threaded predecessor-difference boundary.
+
+Non-emptiness comes from `magConfigS_nonempty_of_le_card_mul`, while the
+outside-sector ground-energy lower family is supplied by the admissible
+reach bridge. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach_discharge_nonempty
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hreach :
+      tasaki23OutsideGroundAdmissibleReachCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_physical_range_nonempty_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach
+    (V := V) A (J := J) N c hBA
+    (fun _M hM => magConfigS_nonempty_of_le_card_mul (V := V) (N := N) hM)
+    hsource_predictedGS hpredecessor_difference hJ_real hJ_real' hJ_nn hJ_sym
+    hJ_bipartite hc_strict hreach
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 named-callback final boundary**: this
