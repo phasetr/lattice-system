@@ -9581,6 +9581,19 @@ This wrapper keeps the predecessor source-weight identity, the four
 sublattice-Casimir equations, and the two successor-sector support facts,
 but asks the remaining local estimate only for the lowerable-site
 positive-source coefficient comparison.
+Its outside-sector companion
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_source\_weight\_predecessor}\\
+\texttt{\_lowerable\_positive\_source\_coefficient\_lt}\\
+\texttt{\_of\_outside\_sector\_ground\_energy\_lower\_bound}
+\end{gathered}
+\]
+combines the lowerable wrapper with
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}.  Sector minimality
+is supplied by the same common-energy/outside-sector bridge, while the
+remaining local comparison is now lowerable-site filtered.
 Lean then removes the last boundary-inclusive notation from that
 callback.  The finite-sum identity
 \[
