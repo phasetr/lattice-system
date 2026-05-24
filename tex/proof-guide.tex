@@ -9050,6 +9050,24 @@ the non-negative-matrix comparison following Seneta, \emph{Non-negative
 Matrices and Markov Chains}, 3rd ed., Springer 2006, \S1.2,
 pp.~27--28.
 
+For the next proof stage Lean also exposes the common-energy output
+itself, separated from the final outside-sector estimate:
+\[
+\begin{gathered}
+\texttt{tasaki23\_common\_energy\_chain}\\
+\texttt{\_of\_left\_endpoint\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}.
+\end{gathered}
+\]
+This theorem invokes the predecessor-difference interval chain, obtains
+one real energy \(\mu\) and Marshall-positive representatives in every
+admissible sector, and then forgets the extra predicted-GS membership
+field carried by the interval induction.  Its conclusion is exactly
+\(\exists \mu,\texttt{tasaki23CommonEnergyChain}~A~J~N~c~\mu\), the first
+of the two remaining callback outputs needed by the common-energy plus
+outside-sector final wrapper.
+
 Lean also records the same endpoint under the public boundary name
 \[
 \begin{gathered}
