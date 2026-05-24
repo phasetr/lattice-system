@@ -9024,7 +9024,20 @@ use the sector-minimality bridge above to replace the outside-ground
 lower-family hypothesis by
 \texttt{tasaki23SectorMinimalityCallback}, leaving only predicted-GS
 membership and the predecessor-difference local comparison as the other
-named inputs; they live in
+named inputs.  The corresponding admissible-reach final boundaries
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_admissible\_reach}\\
+\texttt{\_named\_callbacks},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint}\\
+\texttt{\_admissible\_reach\_named\_callbacks}
+\end{gathered}
+\]
+use
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback\_of\_admissible\_reach}
+instead, so the final public boundary can consume the ladder-reach
+callback together with the real-coupling and strict diagonal-shift
+hypotheses.  These final boundaries live in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Final}\).  The lowered-site-sum
 public final-boundary aliases now
 live in the Lean module
