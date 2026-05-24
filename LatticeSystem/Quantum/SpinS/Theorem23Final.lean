@@ -504,6 +504,45 @@ abbrev
       (V := V) A (J := J) N hright_ref)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated ladder-iterate reference discharged
+boundary**: this version accepts sectorwise singleton ladder-iterate reference
+callbacks directly.  They first become saturated ladder references by the
+singleton-span inclusion, then the saturated ladder-reference discharged final
+boundary closes the route. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_references_discharge_nonempty
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateReferenceCallback (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderIterateReferenceCallback (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_references_discharge_nonempty
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderReferenceCallback_of_saturated_ladder_iterate_reference
+      (V := V) A (J := J) N hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedLadderReferenceCallback_of_saturated_ladder_iterate_reference
+      (V := V) A (J := J) N hright_ref)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 saturated eigen-source discharged boundary**:
 this version of the discharged final predecessor-difference boundary accepts
 left and right source callbacks at the saturated Heisenberg eigenvalue plus
@@ -704,6 +743,46 @@ abbrev
     (tasaki23OutsideGroundLeftSaturatedJointReferenceCallback_of_saturated_ladder_reference
       (V := V) A (J := J) N hleft_ref)
     (tasaki23OutsideGroundRightSaturatedJointReferenceCallback_of_saturated_ladder_reference
+      (V := V) A (J := J) N hright_ref)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated ladder-iterate reference extraction
+discharged boundary**: this version accepts singleton ladder-iterate references
+at the source-eigen callback extraction final boundary.  The iterate references
+first become saturated ladder references, then the existing ladder-reference
+extraction boundary supplies the scalar saturated source-energy and
+saturated-Casimir callbacks. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_references_extract_source_eigen_callbacks_discharge_nonempty
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateReferenceCallback (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderIterateReferenceCallback (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_references_extract_source_eigen_callbacks_discharge_nonempty
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderReferenceCallback_of_saturated_ladder_iterate_reference
+      (V := V) A (J := J) N hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedLadderReferenceCallback_of_saturated_ladder_iterate_reference
       (V := V) A (J := J) N hright_ref)
 
 set_option linter.style.longLine false in
@@ -1172,6 +1251,44 @@ abbrev
       (V := V) A (J := J) N hright_ref)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated
+ladder-iterate reference extraction**: sectorwise singleton ladder-iterate
+references first produce saturated ladder references.  The resulting ladder
+references then feed the uniform saturated source-eigen extraction route. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_references_extract_source_eigen_callbacks_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateReferenceCallback (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderIterateReferenceCallback (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_saturated_ladder_references_extract_source_eigen_callbacks_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderReferenceCallback_of_saturated_ladder_iterate_reference
+      (V := V) A (J := J) N hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedLadderReferenceCallback_of_saturated_ladder_iterate_reference
+      (V := V) A (J := J) N hright_ref)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback final
 boundary**: this public boundary avoids the uniform source-sector
 predicted-GS callback when only the current outside-ground route is
@@ -1610,6 +1727,45 @@ abbrev
     (tasaki23OutsideGroundLeftSaturatedJointReferenceCallback_of_saturated_ladder_reference
       (V := V) A (J := J) N hleft_ref)
     (tasaki23OutsideGroundRightSaturatedJointReferenceCallback_of_saturated_ladder_reference
+      (V := V) A (J := J) N hright_ref)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
+saturated ladder-iterate reference extraction**: left-endpoint analogue of
+`tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_references_extract_source_eigen_callbacks_named_callbacks`.
+The singleton ladder-iterate references first become saturated ladder
+references, then reuse the left-endpoint ladder-reference extraction route. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_references_extract_source_eigen_callbacks_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateReferenceCallback (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderIterateReferenceCallback (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_references_extract_source_eigen_callbacks_named_callbacks
+    (V := V) A (J := J) N c hBA hleft_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderReferenceCallback_of_saturated_ladder_iterate_reference
+      (V := V) A (J := J) N hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedLadderReferenceCallback_of_saturated_ladder_iterate_reference
       (V := V) A (J := J) N hright_ref)
 
 set_option linter.style.longLine false in

@@ -9587,6 +9587,37 @@ Composing these inclusions with the saturated ladder-reference route gives
 Thus the public named-callback boundary can now be stated using a single
 explicit sector ladder iterate, with the span inclusion handling the
 conversion to the earlier ladder-span API.
+The same singleton-ladder input is now exposed at the discharged and
+source-eigen extraction final boundaries:
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_saturated\_ladder\_iterate\_references}\\
+\texttt{\_discharge\_nonempty},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_saturated\_ladder\_iterate\_references}\\
+\texttt{\_extract\_source\_eigen\_callbacks}\\
+\texttt{\_discharge\_nonempty},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_saturated\_ladder\_iterate\_references}\\
+\texttt{\_extract\_source\_eigen\_callbacks}\\
+\texttt{\_named\_callbacks},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint}\\
+\texttt{\_saturated\_ladder\_iterate\_references}\\
+\texttt{\_extract\_source\_eigen\_callbacks}\\
+\texttt{\_named\_callbacks}.
+\end{gathered}
+\]
+These wrappers first convert singleton ladder-iterate references to saturated
+ladder references and then reuse the corresponding saturated ladder-reference
+final boundary.
 The left-endpoint named boundary also has the extracted reference-vector
 form
 \[
