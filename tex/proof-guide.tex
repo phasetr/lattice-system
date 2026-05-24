@@ -9401,6 +9401,27 @@ ladder-span, saturated-Heisenberg, scalar source-energy, and joint-source
 extraction bridges with the left-endpoint final boundary.  Thus the weaker
 left-endpoint predicted-GS hypothesis can be used at every saturated-source
 outside-ground layer.
+The source-vector side of the saturated joint callback is now connected to a
+sectorwise saturated reference-vector API:
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedJointReferenceCallback},\\
+\texttt{tasaki23OutsideGroundRightSaturatedJointReferenceCallback},\\
+\texttt{tasaki23OutsideGroundLeftSaturatedJointSourceCallback}\\
+\texttt{\_of\_saturated\_joint\_reference},\\
+\texttt{tasaki23OutsideGroundRightSaturatedJointSourceCallback}\\
+\texttt{\_of\_saturated\_joint\_reference}.
+\end{gathered}
+\]
+For each outside sector, the reference callback supplies a strictly
+Marshall-positive real sector vector whose full embedding lies in
+\(\texttt{saturatedFerromagnetJointEigenspace}\), together with a real
+representative of the saturated Heisenberg eigenvalue.  The bridge restricts
+the source and reference full eigenvectors to the sector, uses the
+Marshall-positive eigenvalue-uniqueness theorem to identify the source energy
+with the saturated energy, and then uses sector eigenvector uniqueness to show
+that the source embedding is a positive scalar multiple of the saturated joint
+reference.
 The outside reach task is also split into its
 two endpoint directions by
 \[
