@@ -605,6 +605,41 @@ abbrev tasaki_2_5_theorem_2_3_of_named_callbacks
     hpredecessor_difference houtside_ground_energy_lower
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated joint
+sources**: this public boundary replaces the named outside-sector
+lower-family callback by the saturated joint source-vector callbacks.  The
+callback-level bridge
+`tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_joint_sources`
+supplies the outside family before reusing
+`tasaki_2_5_theorem_2_3_of_named_callbacks`. -/
+abbrev tasaki_2_5_theorem_2_3_of_saturated_joint_sources_named_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleftJoint :
+      tasaki23OutsideGroundLeftSaturatedJointSourceCallback (V := V) A J N c)
+    (hrightJoint :
+      tasaki23OutsideGroundRightSaturatedJointSourceCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS
+    hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_joint_sources
+      (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hleftJoint hrightJoint)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback final
 boundary**: this public boundary avoids the uniform source-sector
 predicted-GS callback when only the current outside-ground route is
