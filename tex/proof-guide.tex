@@ -9335,6 +9335,19 @@ The corresponding final boundary is
 \texttt{\_discharge\_nonempty}.
 \end{gathered}
 \]
+At the callback level, the same projection gives the lower-family bridge
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_saturated\_joint\_sources}.
+\end{gathered}
+\]
+It projects the left and right saturated joint source-vector callbacks to
+their saturated total-Casimir source components, then reuses
+\(\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\)
+\(\texttt{\_of\_saturated\_casimir\_sources}\).  Thus the joint
+source-vector API now supplies the outside-sector lower-family callback
+directly, not only the final theorem boundary.
 The outside reach task is also split into its
 two endpoint directions by
 \[
