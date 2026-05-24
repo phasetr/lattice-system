@@ -337,6 +337,16 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3541)**: Refactored the Tasaki §2.5 Theorem 2.3
+  predicted-GS dominance API after the adjacent predicted-GS predecessor
+  common-energy step became a stable suffix (was the heaviest §2.5 module at
+  ~38s focused elaboration). `Theorem23DominancePredictedGS.lean` now keeps the
+  three adjacent predicted-GS successor common-energy steps (293 lines), while
+  `Theorem23DominancePredictedGSPredecessor.lean` contains the predecessor
+  common-energy step (100 lines). The new module imports the parent (the
+  predecessor step reuses a successor step). The predecessor step has no Lean
+  importer, so the new module is wired into `LatticeSystem.lean` per
+  [[tasaki23-tree-wired-into-build-root]] (job count 3292 → 3293).
 - **2026-05-24 (PR #3540)**: Refactored the Tasaki §2.5 Theorem 2.3
   sector-existence interval API after the lowered-vector-Marshall predicted-GS
   interval chain became a stable suffix (was the heaviest remaining §2.5
