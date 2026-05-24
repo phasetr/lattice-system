@@ -463,6 +463,48 @@ abbrev
       A (J := J) N c hrightH hrightCas)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated source-energy discharged
+boundary**: this version of the discharged final predecessor-difference
+boundary accepts left and right scalar callbacks identifying each outside
+source energy with the saturated-ferromagnet Heisenberg energy, plus the
+existing saturated-Casimir source callbacks.  The scalar callbacks supply the
+saturated-Heisenberg source equations before reusing the saturated
+eigen-source final boundary. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_source_energy_discharge_nonempty
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleftEnergy :
+      tasaki23OutsideGroundLeftSaturatedEnergySourceCallback A J N c)
+    (hrightEnergy :
+      tasaki23OutsideGroundRightSaturatedEnergySourceCallback A J N c)
+    (hleftCas :
+      tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback A J N c)
+    (hrightCas :
+      tasaki23OutsideGroundRightSaturatedCasimirSourceCallback A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_eigen_sources_discharge_nonempty
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftSaturatedHeisenbergSourceCallback_of_saturated_energy_source
+      A (J := J) N c hleftEnergy)
+    (tasaki23OutsideGroundRightSaturatedHeisenbergSourceCallback_of_saturated_energy_source
+      A (J := J) N c hrightEnergy)
+    hleftCas hrightCas
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 side-admissible-reach discharged boundary**:
 this version of the discharged final predecessor-difference boundary accepts
 separate left and right directional outside-sector reach callbacks.  The side

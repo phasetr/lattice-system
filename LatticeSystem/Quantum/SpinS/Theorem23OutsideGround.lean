@@ -411,6 +411,83 @@ def tasaki23OutsideGroundRightSaturatedHeisenbergSourceCallback
             (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated source-energy callback**:
+for an outside sector left of the admissible interval, the source
+Marshall-positive eigenvalue `μM` is the saturated-ferromagnet Heisenberg
+energy.  Combined with the source eigenvector equation, this scalar
+identification supplies the left saturated-Heisenberg source callback. -/
+def tasaki23OutsideGroundLeftSaturatedEnergySourceCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    M <
+        min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+          (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+          N →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      (μM : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated source-energy callback**:
+for an outside sector right of the admissible interval, the source
+Marshall-positive eigenvalue `μM` is the saturated-ferromagnet Heisenberg
+energy.  Combined with the source eigenvector equation, this scalar
+identification supplies the right saturated-Heisenberg source callback. -/
+def tasaki23OutsideGroundRightSaturatedEnergySourceCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+        N < M →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      (μM : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated-Heisenberg source from
+saturated source energy**: the source eigenvector equation at `μM` becomes
+the saturated-Heisenberg source equation once `μM` is identified with the
+saturated-ferromagnet Heisenberg energy. -/
+theorem tasaki23OutsideGroundLeftSaturatedHeisenbergSourceCallback_of_saturated_energy_source
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hleft :
+      tasaki23OutsideGroundLeftSaturatedEnergySourceCallback (V := V) A J N c) :
+    tasaki23OutsideGroundLeftSaturatedHeisenbergSourceCallback (V := V) A J N c := by
+  intro M _ hM_left μM v hμM_lt hv_pos hΦ
+  have hμ :
+      (μM : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N :=
+    hleft M hM_left hμM_lt hv_pos hΦ
+  simpa [hμ] using hΦ
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated-Heisenberg source from
+saturated source energy**: the source eigenvector equation at `μM` becomes
+the saturated-Heisenberg source equation once `μM` is identified with the
+saturated-ferromagnet Heisenberg energy. -/
+theorem tasaki23OutsideGroundRightSaturatedHeisenbergSourceCallback_of_saturated_energy_source
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hright :
+      tasaki23OutsideGroundRightSaturatedEnergySourceCallback (V := V) A J N c) :
+    tasaki23OutsideGroundRightSaturatedHeisenbergSourceCallback (V := V) A J N c := by
+  intro M _ hM_right μM v hμM_lt hv_pos hΦ
+  have hμ :
+      (μM : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N :=
+    hright M hM_right hμM_lt hv_pos hΦ
+  simpa [hμ] using hΦ
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left saturated-ladder-span source callback**:
 for an outside sector left of the admissible interval, the source
 Marshall-positive vector lies in the span of the saturated ferromagnetic

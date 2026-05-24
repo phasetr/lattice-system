@@ -9261,6 +9261,41 @@ Thus the final boundary
 \]
 exposes the remaining source-vector task as the two saturated eigenvalue
 equations for \(H_J\) and \((\hat S_{\mathrm{tot}})^2\).
+The Heisenberg half can be reduced one step further.  The source
+eigenvector equation already has the form
+\[
+  H_J\Phi = \mu_M\Phi.
+\]
+Lean packages the remaining scalar identification
+\((\mu_M:\mathbb C)=E_{\mathrm{sat}}(J,N)\), where
+\(E_{\mathrm{sat}}\) is
+\texttt{saturatedFerromagnetEigenvalueS}, as
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedEnergySourceCallback},\\
+\texttt{tasaki23OutsideGroundRightSaturatedEnergySourceCallback}.
+\end{gathered}
+\]
+Rewriting the source eigenvector equation along this scalar equality proves
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedHeisenbergSourceCallback}\\
+\texttt{\_of\_saturated\_energy\_source},\\
+\texttt{tasaki23OutsideGroundRightSaturatedHeisenbergSourceCallback}\\
+\texttt{\_of\_saturated\_energy\_source}.
+\end{gathered}
+\]
+The corresponding final boundary is
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_saturated\_source\_energy}\\
+\texttt{\_discharge\_nonempty}.
+\end{gathered}
+\]
 The outside reach task is also split into its
 two endpoint directions by
 \[
