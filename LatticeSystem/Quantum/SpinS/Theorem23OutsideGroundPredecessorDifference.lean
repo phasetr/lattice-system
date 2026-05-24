@@ -238,6 +238,47 @@ theorem
       hc_strict h_intermediate hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 predecessor-difference boundary through
+explicit lowerable coefficients and outside-sector ground energies**:
+the predecessor-difference callback also discharges the explicit
+lowerable positive-source coefficient dominance required by the
+explicit-lowerable outside-ground route.
+
+The proof first converts each off-`A` minus on-`A` positive difference
+into strict dominance of attached explicit lowerable coefficients, then
+reuses the outside-sector ground-energy wrapper for that
+explicit-lowerable boundary. -/
+theorem
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_via_explicit_lowerable_of_outside_sector_ground_energy_lower_bound
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (houtside_ground_energy_lower :
+      tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  exact
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_explicit_lowerable_positive_source_coefficient_lt_of_outside_sector_ground_energy_lower_bound
+      A N c hBA hsector_nonempty hleft_predictedGS
+      (by
+        intro M hM hMlt μ v hμ_lt hv_pos hΦ Ψ hΨ_eq hΨ_pred hpred hA_A hA_B
+          hA_mag hB_A hB_B hB_mag
+        exact
+          tasaki23_lowerable_positive_source_attach_sum_lt_callback_of_offA_sub_onA_pos
+            (V := V) (N := N) A v
+            (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+              hM hMlt hμ_lt hv_pos hΦ Ψ hΨ_eq hΨ_pred hpred hA_A hA_B hA_mag
+              hB_A hB_B hB_mag))
+      houtside_ground_energy_lower
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 final predecessor-difference boundary from
 outside-sector ground energies**: this names the final API obtained from
 the lowered-site-sum route.  The remaining inputs are exactly the
