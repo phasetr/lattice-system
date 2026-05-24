@@ -9197,6 +9197,40 @@ corresponding final boundary is
 \texttt{\_discharge\_nonempty}.
 \end{gathered}
 \]
+Lean also records the same input in the saturated-ferromagnet joint
+eigenspace form.  The callbacks
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedJointSourceCallback},\\
+\texttt{tasaki23OutsideGroundRightSaturatedJointSourceCallback}
+\end{gathered}
+\]
+ask the source vector to lie in
+\(\texttt{saturatedFerromagnetJointEigenspace}\ J\ N\).  The Tasaki
+\S2.4 ladder-span identification
+\[
+\texttt{saturatedFerromagnetJointEigenspace\_eq\_span\_ladderIterateUp}
+\]
+then proves
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedLadderSpanSourceCallback}\\
+\texttt{\_of\_saturated\_joint\_source},\\
+\texttt{tasaki23OutsideGroundRightSaturatedLadderSpanSourceCallback}\\
+\texttt{\_of\_saturated\_joint\_source}.
+\end{gathered}
+\]
+The corresponding final boundary is
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_saturated\_joint\_sources}\\
+\texttt{\_discharge\_nonempty}.
+\end{gathered}
+\]
 The outside reach task is also split into its
 two endpoint directions by
 \[

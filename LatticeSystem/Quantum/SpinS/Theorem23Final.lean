@@ -387,6 +387,42 @@ abbrev
       (V := V) A (J := J) N c hright)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated-joint source discharged boundary**:
+this version of the discharged final predecessor-difference boundary accepts
+left and right source callbacks in the saturated-ferromagnet joint eigenspace.
+The Tasaki §2.4 ladder-span identification converts those source-vector
+callbacks to saturated-ladder-span callbacks before reusing the saturated
+ladder-span final boundary. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_joint_sources_discharge_nonempty
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleft :
+      tasaki23OutsideGroundLeftSaturatedJointSourceCallback A J N c)
+    (hright :
+      tasaki23OutsideGroundRightSaturatedJointSourceCallback A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_span_sources_discharge_nonempty
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftSaturatedLadderSpanSourceCallback_of_saturated_joint_source
+      A (J := J) N c hleft)
+    (tasaki23OutsideGroundRightSaturatedLadderSpanSourceCallback_of_saturated_joint_source
+      A (J := J) N c hright)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 side-admissible-reach discharged boundary**:
 this version of the discharged final predecessor-difference boundary accepts
 separate left and right directional outside-sector reach callbacks.  The side
