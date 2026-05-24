@@ -9847,7 +9847,13 @@ successor induction.  The left and right coefficient callbacks have the same
 attached-sum variants, with suffix
 \(\texttt{\_of\_lowerable\_attach\_sum\_dominance}\), so the outside-ground
 boundary no longer needs to mention the boundary-inclusive filtered sum
-directly.  Finally,
+directly.  Their real-coupling variants, with suffix
+\[
+\texttt{\_of\_real\_couplings},
+\]
+use \(\texttt{saturatedFerromagnetEigenvalueS\_exists\_real}\) to discharge
+the saturated-energy real-scalar input at the left and right coefficient
+callback level.  Finally,
 \[
 \begin{gathered}
 \texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
