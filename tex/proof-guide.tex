@@ -9109,6 +9109,60 @@ raising direction.  The final predecessor-difference boundary
 \]
 therefore replaces the raw iterated-ladder non-zeroness hypotheses by
 left and right Casimir-avoidance callbacks.
+The saturated-ferromagnet total-Casimir value gives a further endpoint
+bridge.  Lean records the elementary mismatches
+\[
+\begin{gathered}
+\texttt{saturatedFerromagnetCasimirEigenvalueS\_ne}\\
+\texttt{\_lowering\_kernel\_value\_of\_lt\_card\_mul},\\
+\texttt{saturatedFerromagnetCasimirEigenvalueS\_ne}\\
+\texttt{\_raising\_kernel\_value\_of\_pos\_of\_le\_card\_mul}.
+\end{gathered}
+\]
+In magnetization coordinate \(n\), these are the two facts that
+\[
+  m_{\max}(m_{\max}+1)
+  \ne (m_{\max}-n)(m_{\max}-n-1)
+  \quad (n<|V|N),
+\]
+and
+\[
+  m_{\max}(m_{\max}+1)
+  \ne (m_{\max}-n)(m_{\max}-n+1)
+  \quad (0<n\le |V|N).
+\]
+Thus a source vector already known to have the saturated total-Casimir
+eigenvalue automatically avoids every intermediate kernel value on the
+way to the left or right endpoint of the admissible interval.  The
+callbacks
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback},\\
+\texttt{tasaki23OutsideGroundRightSaturatedCasimirSourceCallback}
+\end{gathered}
+\]
+package this remaining max-Casimir source input, and
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftIteratedLadderCasimirFullReachCallback}\\
+\texttt{\_of\_saturated\_casimir\_source},\\
+\texttt{tasaki23OutsideGroundRightIteratedLadderCasimirFullReachCallback}\\
+\texttt{\_of\_saturated\_casimir\_source}
+\end{gathered}
+\]
+choose the left or right interval endpoint and discharge all
+intermediate Casimir-avoidance obligations.  The corresponding final
+wrapper is
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_saturated\_casimir\_sources}\\
+\texttt{\_discharge\_nonempty}.
+\end{gathered}
+\]
 The outside reach task is also split into its
 two endpoint directions by
 \[
