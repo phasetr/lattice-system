@@ -9231,6 +9231,36 @@ The corresponding final boundary is
 \texttt{\_discharge\_nonempty}.
 \end{gathered}
 \]
+The next boundary splits this joint membership into its two defining
+eigenvalue equations.  Lean names the Heisenberg half by
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedHeisenbergSourceCallback},\\
+\texttt{tasaki23OutsideGroundRightSaturatedHeisenbergSourceCallback},
+\end{gathered}
+\]
+and combines it with the existing saturated-Casimir source callbacks via
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedJointSourceCallback}\\
+\texttt{\_of\_saturated\_eigen\_sources},\\
+\texttt{tasaki23OutsideGroundRightSaturatedJointSourceCallback}\\
+\texttt{\_of\_saturated\_eigen\_sources}.
+\end{gathered}
+\]
+Thus the final boundary
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_saturated\_eigen\_sources}\\
+\texttt{\_discharge\_nonempty}
+\end{gathered}
+\]
+exposes the remaining source-vector task as the two saturated eigenvalue
+equations for \(H_J\) and \((\hat S_{\mathrm{tot}})^2\).
 The outside reach task is also split into its
 two endpoint directions by
 \[
