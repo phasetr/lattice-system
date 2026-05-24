@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23
+import LatticeSystem.Quantum.SpinS.Theorem23CommonEnergyPredecessor
 
 /-!
 # Tasaki §2.5 Theorem 2.3 predicted-Casimir adjacent-energy API

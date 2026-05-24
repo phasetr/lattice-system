@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23
+import LatticeSystem.Quantum.SpinS.Theorem23CommonEnergyPredecessor
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceRaisingSiteSum
 import LatticeSystem.Quantum.SpinS.Theorem23PredictedCasimirEnergy
 import LatticeSystem.Quantum.SpinS.Theorem23PredictedLadderCasimirTransfer
