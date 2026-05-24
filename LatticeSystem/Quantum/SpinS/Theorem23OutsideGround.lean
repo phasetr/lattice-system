@@ -586,6 +586,124 @@ def tasaki23OutsideGroundRightSaturatedJointSourceCallback
         saturatedFerromagnetJointEigenspace (V := V) J N
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated source-energy from joint
+source**: the saturated joint source-vector input gives the
+`H_J`-eigenvalue equation at the saturated ferromagnet energy.  Comparing it
+with the existing source eigenvector equation and using strict
+Marshall-positivity to rule out the zero vector identifies the scalar source
+energy. -/
+theorem tasaki23OutsideGroundLeftSaturatedEnergySourceCallback_of_saturated_joint_source
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hleft :
+      tasaki23OutsideGroundLeftSaturatedJointSourceCallback (V := V) A J N c) :
+    tasaki23OutsideGroundLeftSaturatedEnergySourceCallback (V := V) A J N c := by
+  intro M _ hM_left μM v hμM_lt hv_pos hΦ
+  let Φ : (V → Fin (N + 1)) → ℂ :=
+    magSectorEmbedding
+      (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+  have hjoint : Φ ∈ saturatedFerromagnetJointEigenspace (V := V) J N :=
+    hleft M hM_left hμM_lt hv_pos hΦ
+  have hHmem :
+      Φ ∈ Module.End.eigenspace (heisenbergHamiltonianS J N).mulVecLin
+        (saturatedFerromagnetEigenvalueS (V := V) J N) :=
+    (Submodule.mem_inf.mp hjoint).1
+  have hH : (heisenbergHamiltonianS J N).mulVec Φ =
+      saturatedFerromagnetEigenvalueS (V := V) J N • Φ := by
+    rwa [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hHmem
+  have hsmul : (μM : ℂ) • Φ =
+      saturatedFerromagnetEigenvalueS (V := V) J N • Φ :=
+    hΦ.symm.trans hH
+  by_contra hne
+  have hΦ_ne : Φ ≠ 0 :=
+    tasaki23_marshallPositive_magSectorEmbedding_ne_zero (V := V) A hv_pos
+  apply hΦ_ne
+  have hzero :
+      ((μM : ℂ) - saturatedFerromagnetEigenvalueS (V := V) J N) • Φ = 0 := by
+    rw [sub_smul, hsmul, sub_self]
+  exact (smul_eq_zero.mp hzero).resolve_left (sub_ne_zero.mpr hne)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated source-energy from joint
+source**: the saturated joint source-vector input gives the
+`H_J`-eigenvalue equation at the saturated ferromagnet energy.  Comparing it
+with the existing source eigenvector equation and using strict
+Marshall-positivity to rule out the zero vector identifies the scalar source
+energy. -/
+theorem tasaki23OutsideGroundRightSaturatedEnergySourceCallback_of_saturated_joint_source
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hright :
+      tasaki23OutsideGroundRightSaturatedJointSourceCallback (V := V) A J N c) :
+    tasaki23OutsideGroundRightSaturatedEnergySourceCallback (V := V) A J N c := by
+  intro M _ hM_right μM v hμM_lt hv_pos hΦ
+  let Φ : (V → Fin (N + 1)) → ℂ :=
+    magSectorEmbedding
+      (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+  have hjoint : Φ ∈ saturatedFerromagnetJointEigenspace (V := V) J N :=
+    hright M hM_right hμM_lt hv_pos hΦ
+  have hHmem :
+      Φ ∈ Module.End.eigenspace (heisenbergHamiltonianS J N).mulVecLin
+        (saturatedFerromagnetEigenvalueS (V := V) J N) :=
+    (Submodule.mem_inf.mp hjoint).1
+  have hH : (heisenbergHamiltonianS J N).mulVec Φ =
+      saturatedFerromagnetEigenvalueS (V := V) J N • Φ := by
+    rwa [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hHmem
+  have hsmul : (μM : ℂ) • Φ =
+      saturatedFerromagnetEigenvalueS (V := V) J N • Φ :=
+    hΦ.symm.trans hH
+  by_contra hne
+  have hΦ_ne : Φ ≠ 0 :=
+    tasaki23_marshallPositive_magSectorEmbedding_ne_zero (V := V) A hv_pos
+  apply hΦ_ne
+  have hzero :
+      ((μM : ℂ) - saturatedFerromagnetEigenvalueS (V := V) J N) • Φ = 0 := by
+    rw [sub_smul, hsmul, sub_self]
+  exact (smul_eq_zero.mp hzero).resolve_left (sub_ne_zero.mpr hne)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated-Casimir source from joint
+source**: the saturated joint source-vector input contains the
+`(Ŝ_tot)^2` eigenspace component, which is exactly the left saturated-Casimir
+source callback after expanding eigenspace membership. -/
+theorem tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback_of_saturated_joint_source
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hleft :
+      tasaki23OutsideGroundLeftSaturatedJointSourceCallback (V := V) A J N c) :
+    tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback (V := V) A J N c := by
+  intro M _ hM_left μM v hμM_lt hv_pos hΦ
+  let Φ : (V → Fin (N + 1)) → ℂ :=
+    magSectorEmbedding
+      (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+  have hjoint : Φ ∈ saturatedFerromagnetJointEigenspace (V := V) J N :=
+    hleft M hM_left hμM_lt hv_pos hΦ
+  have hCas :
+      Φ ∈ Module.End.eigenspace (totalSpinSSquared V N).mulVecLin
+        (saturatedFerromagnetCasimirEigenvalueS V N) :=
+    (Submodule.mem_inf.mp hjoint).2
+  rwa [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hCas
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated-Casimir source from joint
+source**: the saturated joint source-vector input contains the
+`(Ŝ_tot)^2` eigenspace component, which is exactly the right
+saturated-Casimir source callback after expanding eigenspace membership. -/
+theorem tasaki23OutsideGroundRightSaturatedCasimirSourceCallback_of_saturated_joint_source
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hright :
+      tasaki23OutsideGroundRightSaturatedJointSourceCallback (V := V) A J N c) :
+    tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c := by
+  intro M _ hM_right μM v hμM_lt hv_pos hΦ
+  let Φ : (V → Fin (N + 1)) → ℂ :=
+    magSectorEmbedding
+      (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+  have hjoint : Φ ∈ saturatedFerromagnetJointEigenspace (V := V) J N :=
+    hright M hM_right hμM_lt hv_pos hΦ
+  have hCas :
+      Φ ∈ Module.End.eigenspace (totalSpinSSquared V N).mulVecLin
+        (saturatedFerromagnetCasimirEigenvalueS V N) :=
+    (Submodule.mem_inf.mp hjoint).2
+  rwa [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hCas
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left saturated-joint source from saturated
 eigen-source callbacks**: the saturated-Heisenberg source callback supplies
 the `H_J` eigenspace half and the saturated-Casimir source callback supplies
