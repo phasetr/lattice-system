@@ -183,6 +183,82 @@ def tasaki23OutsideGroundRightIteratedLadderFullReachCallback
                 (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ≠ 0
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left iterated-ladder Casimir callback**:
+for an outside sector left of the admissible interval, the chosen admissible
+target and ladder length come with a total-Casimir eigenvalue for the source
+Marshall-positive vector that avoids every intermediate lowering-kernel
+Casimir value.  The local Casimir ladder lemma then proves the required
+iterated non-zeroness. -/
+def tasaki23OutsideGroundLeftIteratedLadderCasimirFullReachCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    M <
+        min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+          (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+          N →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      ∃ K : ℕ,
+        K ∈ tasaki23GroundStateSectors (V := V) A N ∧
+        Nonempty (magConfigS V N K) ∧
+        ∃ k : ℕ,
+          K = M + k ∧
+          ∃ γ : ℂ,
+            (totalSpinSSquared V N).mulVec
+                (magSectorEmbedding
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+              γ • magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+            ∀ j : ℕ, j < k →
+              γ ≠
+                ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) - (j : ℂ)) *
+                  (((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) -
+                      (j : ℂ)) - 1)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right iterated-ladder Casimir callback**:
+for an outside sector right of the admissible interval, the chosen admissible
+target and ladder length come with a total-Casimir eigenvalue for the source
+Marshall-positive vector that avoids every intermediate raising-kernel
+Casimir value. -/
+def tasaki23OutsideGroundRightIteratedLadderCasimirFullReachCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+        N < M →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      ∃ K : ℕ,
+        K ∈ tasaki23GroundStateSectors (V := V) A N ∧
+        Nonempty (magConfigS V N K) ∧
+        ∃ k : ℕ,
+          M = K + k ∧
+          ∃ γ : ℂ,
+            (totalSpinSSquared V N).mulVec
+                (magSectorEmbedding
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+              γ • magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
+            ∀ j : ℕ, j < k →
+              γ ≠
+                ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) + (j : ℂ)) *
+                  (((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) +
+                      (j : ℂ)) + 1)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left outside-sector admissible-reach
 callback**: for an outside-sector Marshall-positive representative below
 the left endpoint of `tasaki23GroundStateSectors A N`, the lowering ladder
@@ -358,6 +434,93 @@ theorem tasaki23OutsideGroundAdmissibleFullReachCallback_of_iterated_ladder_call
     · exact
         heisenbergHamiltonianS_mulVec_totalSpinSOpPlus_pow_of_eigenvec
           (V := V) J N k hΨM_eigen
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left iterated full reach from Casimir
+avoidance**: the left Casimir callback discharges the left iterated
+ladder non-zeroness callback by applying the local iterated lowering
+non-vanishing lemma to the Marshall-positive source vector. -/
+theorem tasaki23OutsideGroundLeftIteratedLadderFullReachCallback_of_iterated_ladder_casimir_callback
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hleft :
+      tasaki23OutsideGroundLeftIteratedLadderCasimirFullReachCallback (V := V) A J N c) :
+    tasaki23OutsideGroundLeftIteratedLadderFullReachCallback (V := V) A J N c := by
+  intro M _ hM_left μM v hμM_lt hv_pos hΦ
+  let ΨM : (V → Fin (N + 1)) → ℂ :=
+    magSectorEmbedding
+      (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+  obtain ⟨K, hK_mem, hK_nonempty, k, hK_eq, γ, hΨM_cas, hγ_ne⟩ :=
+    hleft M hM_left hμM_lt hv_pos hΦ
+  refine ⟨K, hK_mem, hK_nonempty, k, hK_eq, ?_⟩
+  have hΨM_mag :
+      ΨM ∈ magSubspaceS V N
+        (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) := by
+    simpa [ΨM] using
+      magSectorEmbedding_mem_magSubspaceS
+        (fun τ : magConfigS V N M =>
+          (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+  have hΨM_ne : ΨM ≠ 0 := by
+    simpa [ΨM] using
+      tasaki23_marshallPositive_magSectorEmbedding_ne_zero (V := V) A hv_pos
+  have hΨM_cas' :
+      (totalSpinSSquared V N).mulVec ΨM = γ • ΨM := by
+    simpa [ΨM] using hΨM_cas
+  simpa [ΨM] using
+    totalSpinSOpMinus_pow_mulVec_ne_zero_of_casimir_ne_kernel_values
+      (V := V) (N := N) k hΨM_mag hΨM_cas' hΨM_ne hγ_ne
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right iterated full reach from Casimir
+avoidance**: the right Casimir callback discharges the right iterated
+ladder non-zeroness callback by applying the local iterated raising
+non-vanishing lemma to the Marshall-positive source vector. -/
+theorem tasaki23OutsideGroundRightIteratedLadderFullReachCallback_of_iterated_ladder_casimir_callback
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hright :
+      tasaki23OutsideGroundRightIteratedLadderCasimirFullReachCallback (V := V) A J N c) :
+    tasaki23OutsideGroundRightIteratedLadderFullReachCallback (V := V) A J N c := by
+  intro M _ hM_right μM v hμM_lt hv_pos hΦ
+  let ΨM : (V → Fin (N + 1)) → ℂ :=
+    magSectorEmbedding
+      (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+  obtain ⟨K, hK_mem, hK_nonempty, k, hM_eq, γ, hΨM_cas, hγ_ne⟩ :=
+    hright M hM_right hμM_lt hv_pos hΦ
+  refine ⟨K, hK_mem, hK_nonempty, k, hM_eq, ?_⟩
+  have hΨM_mag :
+      ΨM ∈ magSubspaceS V N
+        (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) := by
+    simpa [ΨM] using
+      magSectorEmbedding_mem_magSubspaceS
+        (fun τ : magConfigS V N M =>
+          (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+  have hΨM_ne : ΨM ≠ 0 := by
+    simpa [ΨM] using
+      tasaki23_marshallPositive_magSectorEmbedding_ne_zero (V := V) A hv_pos
+  have hΨM_cas' :
+      (totalSpinSSquared V N).mulVec ΨM = γ • ΨM := by
+    simpa [ΨM] using hΨM_cas
+  simpa [ΨM] using
+    totalSpinSOpPlus_pow_mulVec_ne_zero_of_casimir_ne_kernel_values
+      (V := V) (N := N) k hΨM_mag hΨM_cas' hΨM_ne hγ_ne
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 full reach from iterated Casimir
+avoidance**: left and right Casimir callbacks discharge the iterated
+ladder full-reach callbacks and hence supply the full-space admissible
+reach callback. -/
+theorem tasaki23OutsideGroundAdmissibleFullReachCallback_of_iterated_ladder_casimir_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hleft :
+      tasaki23OutsideGroundLeftIteratedLadderCasimirFullReachCallback (V := V) A J N c)
+    (hright :
+      tasaki23OutsideGroundRightIteratedLadderCasimirFullReachCallback (V := V) A J N c) :
+    tasaki23OutsideGroundAdmissibleFullReachCallback (V := V) A J N c :=
+  tasaki23OutsideGroundAdmissibleFullReachCallback_of_iterated_ladder_callbacks
+    (V := V) A (J := J) N c
+    (tasaki23OutsideGroundLeftIteratedLadderFullReachCallback_of_iterated_ladder_casimir_callback
+      (V := V) A (J := J) N c hleft)
+    (tasaki23OutsideGroundRightIteratedLadderFullReachCallback_of_iterated_ladder_casimir_callback
+      (V := V) A (J := J) N c hright)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-sector lower family from sector
@@ -548,6 +711,29 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_iterated_ladder_full_r
   tasaki23OutsideGroundEnergyLowerFamilyCallback_of_full_admissible_reach
     (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
     (tasaki23OutsideGroundAdmissibleFullReachCallback_of_iterated_ladder_callbacks
+      (V := V) A (J := J) N c hleft hright)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from iterated
+Casimir full reach**: iterated left and right Casimir callbacks first
+produce the iterated ladder full-reach callbacks, then the existing
+full-reach bridge supplies the outside-sector lower family. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_iterated_ladder_casimir_full_reach
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleft :
+      tasaki23OutsideGroundLeftIteratedLadderCasimirFullReachCallback (V := V) A J N c)
+    (hright :
+      tasaki23OutsideGroundRightIteratedLadderCasimirFullReachCallback (V := V) A J N c) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_full_admissible_reach
+    (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundAdmissibleFullReachCallback_of_iterated_ladder_casimir_callbacks
       (V := V) A (J := J) N c hleft hright)
 
 set_option linter.style.longLine false in
