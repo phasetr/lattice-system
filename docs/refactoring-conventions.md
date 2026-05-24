@@ -337,6 +337,18 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3537)**: Refactored the Tasaki §2.5 Theorem 2.3 final
+  lowered-site-sum API after the left-endpoint threaded wrapper and the
+  named-callback abbrevs became a stable suffix.
+  `Theorem23FinalLoweredSiteSum.lean` now keeps the source predicted-GS
+  lowered-site-sum final wrappers (260 lines), while
+  `Theorem23FinalLoweredSiteSumLeft.lean` contains the left-endpoint threaded
+  predicted-GS lowered-site-sum final wrapper and the two named-callback
+  abbrevs (159 lines). The new module imports the parent (the named-callback
+  abbrev reuses a source final wrapper). The new module is an orphan tip (no
+  Lean importer), so it is wired into `LatticeSystem.lean` per
+  [[tasaki23-tree-wired-into-build-root]] so the default `lake build` / CI
+  elaborates it (job count 3288 → 3289).
 - **2026-05-24 (PR #3536)**: Refactored the Tasaki §2.5 Theorem 2.3
   local-difference-raising API after the single-site raising positivity group
   became a stable suffix (raising-direction companion to PR #3532).
