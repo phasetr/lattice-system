@@ -505,6 +505,46 @@ abbrev
     hleftCas hrightCas
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated joint-source extraction
+boundary**: this version accepts the saturated joint source-vector callbacks,
+extracts their scalar saturated source-energy and saturated-Casimir
+components, and routes through the saturated source-energy final boundary.
+This records that the remaining eigenvalue callbacks are consequences of the
+joint source-vector API. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_joint_sources_extract_source_eigen_callbacks_discharge_nonempty
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleftJoint :
+      tasaki23OutsideGroundLeftSaturatedJointSourceCallback A J N c)
+    (hrightJoint :
+      tasaki23OutsideGroundRightSaturatedJointSourceCallback A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_source_energy_discharge_nonempty
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftSaturatedEnergySourceCallback_of_saturated_joint_source
+      A (J := J) N c hleftJoint)
+    (tasaki23OutsideGroundRightSaturatedEnergySourceCallback_of_saturated_joint_source
+      A (J := J) N c hrightJoint)
+    (tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback_of_saturated_joint_source
+      A (J := J) N c hleftJoint)
+    (tasaki23OutsideGroundRightSaturatedCasimirSourceCallback_of_saturated_joint_source
+      A (J := J) N c hrightJoint)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 side-admissible-reach discharged boundary**:
 this version of the discharged final predecessor-difference boundary accepts
 separate left and right directional outside-sector reach callbacks.  The side

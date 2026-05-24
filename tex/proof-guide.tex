@@ -9296,6 +9296,45 @@ The corresponding final boundary is
 \texttt{\_discharge\_nonempty}.
 \end{gathered}
 \]
+Conversely, the saturated joint source-vector input already contains both
+eigenvalue components.  Lean records this extraction by projecting
+membership in
+\(\texttt{saturatedFerromagnetJointEigenspace}\) to the
+\(H_J\)- and \((\widehat S_{\rm tot})^2\)-eigenspace factors.  The
+Casimir projection directly gives
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback}\\
+\texttt{\_of\_saturated\_joint\_source},\\
+\texttt{tasaki23OutsideGroundRightSaturatedCasimirSourceCallback}\\
+\texttt{\_of\_saturated\_joint\_source}.
+\end{gathered}
+\]
+For the scalar source-energy callback, the saturated \(H_J\) equation is
+compared with the already available source equation
+\(H_J\Phi=\mu_M\Phi\).  Since strict Marshall positivity implies
+\(\Phi\neq0\), Lean cancels the nonzero vector from
+\((\mu_M-E_{\rm sat})\Phi=0\) and obtains
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedEnergySourceCallback}\\
+\texttt{\_of\_saturated\_joint\_source},\\
+\texttt{tasaki23OutsideGroundRightSaturatedEnergySourceCallback}\\
+\texttt{\_of\_saturated\_joint\_source}.
+\end{gathered}
+\]
+The corresponding final boundary is
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_saturated\_joint\_sources}\\
+\texttt{\_extract\_source\_eigen\_callbacks}\\
+\texttt{\_discharge\_nonempty}.
+\end{gathered}
+\]
 The outside reach task is also split into its
 two endpoint directions by
 \[
