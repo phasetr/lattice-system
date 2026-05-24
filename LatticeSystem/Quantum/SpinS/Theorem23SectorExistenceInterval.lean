@@ -7,7 +7,9 @@ import LatticeSystem.Quantum.SpinS.Theorem23DominancePredictedGS
 This module contains the predicted-GS energy interval-chain wrappers split
 from `Theorem23SectorExistence.lean`. Keeping this suffix separate lets the
 base sector-existence module elaborate without replaying the interval-induction
-wrappers.
+wrappers. It keeps the off-`A`/on-`A` dominance and lowered-site-sum interval
+chains; the lowered-vector-Marshall interval chain is split into
+`Theorem23SectorExistenceIntervalMarshall.lean`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.
@@ -281,92 +283,5 @@ theorem tasaki23_energy_interval_chain_of_left_endpoint_predictedGS_of_lowered_s
   intro M hM
   have hbounds := (tasaki23GroundStateSectors_mem_iff (V := V) A N M).mp hM
   exact hchain M (by simpa [left] using hbounds.1) (by simpa [right] using hbounds.2)
-
-set_option linter.style.longLine false in
-/-- **Tasaki §2.5 Theorem 2.3 predicted-GS energy interval chain from
-lowered vector Marshall positivity**: in the canonical orientation
-`|¬A| ≤ |A|`, choose the left endpoint sector by the per-sector
-Theorem 2.2 wrapper and propagate its energy through the admissible
-interval using the actual Marshall positivity of the lowered ladder
-image.
-
-This is the vector-positivity version of
-`tasaki23_energy_interval_chain_of_left_endpoint_predictedGS_of_lowered_site_sum_pos`.
-The source-form bridge
-`tasaki23_lowered_site_sum_pos_of_source_lowered_marshall_pos` converts
-the Marshall-signed positive real representative input into the site-sum
-callback consumed by the existing successor step. -/
-theorem tasaki23_energy_interval_chain_of_left_endpoint_predictedGS_of_lowered_marshall_pos
-    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
-    (hJ_real : ∀ x y, (J x y).im = 0)
-    (hJ_real' : ∀ x y, star (J x y) = J x y)
-    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
-    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
-    (hJ_sym : ∀ x y, J x y = J y x)
-    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
-    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
-    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
-      ∃ z, A z ≠ A x ∧ (τ z).val < N)
-    (hBA :
-      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
-        (Finset.univ.filter (fun x : V => A x = true)).card)
-    (hsector_nonempty :
-      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-        Nonempty (magConfigS V N M))
-    (hsource_pred :
-      ∀ {M : ℕ},
-        M ∈ tasaki23GroundStateSectors (V := V) A N →
-        M <
-          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
-        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          magSectorEmbedding
-              (fun τ : magConfigS V N M =>
-                (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
-            bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
-    (hsource_lowered_marshall_pos :
-      ∀ {M : ℕ},
-        M ∈ tasaki23GroundStateSectors (V := V) A N →
-        M <
-          max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
-            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N →
-        ∀ {μ : ℝ} {v : magConfigS V N M → ℝ},
-          μ < c →
-          (∀ τ, 0 < v τ) →
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
-          ∀ τ : magConfigS V N (M + 1),
-            0 < (marshallSignS A τ.1).re *
-              (((totalSpinSOpMinus V N).mulVec
-                (magSectorEmbedding
-                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)))) τ.1).re) :
-    ∃ μ : ℝ,
-      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-        ∃ v : magConfigS V N M → ℝ,
-          μ < c ∧ (∀ τ, 0 < v τ) ∧
-          (heisenbergHamiltonianS J N).mulVec
-              (magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-            (μ : ℂ) • magSectorEmbedding
-              (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) := by
-  exact
-    tasaki23_energy_interval_chain_of_left_endpoint_predictedGS_of_lowered_site_sum_pos
-      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
-      hc_strict h_intermediate hBA hsector_nonempty hsource_pred
-      (fun {M : ℕ} hM hMlt {μ : ℝ} {v : magConfigS V N M → ℝ}
-          hμ_lt hv_pos hΦ =>
-        tasaki23_lowered_site_sum_pos_of_source_lowered_marshall_pos A v
-          (hsource_lowered_marshall_pos hM hMlt hμ_lt hv_pos hΦ))
-
 
 end LatticeSystem.Quantum

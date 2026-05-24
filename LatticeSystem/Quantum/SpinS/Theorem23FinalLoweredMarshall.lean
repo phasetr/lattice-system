@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23FinalLoweredSiteSum
+import LatticeSystem.Quantum.SpinS.Theorem23SectorExistenceIntervalMarshall
 
 /-!
 # Tasaki §2.5 Theorem 2.3 final lowered-Marshall API
