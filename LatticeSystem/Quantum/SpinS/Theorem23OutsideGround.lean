@@ -6,6 +6,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
 import LatticeSystem.Quantum.SpinS.SaturatedLadderCasimirEigenspace
+import LatticeSystem.Quantum.SpinS.SaturatedLadderLoweringInvariant
 import LatticeSystem.Quantum.SpinS.TotalSpinSSquaredMaxEigenspaceEqSpanLadder
 
 /-!
@@ -882,6 +883,171 @@ theorem tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenc
   rw [hsector]
   exact magSectorEmbedding_magSectorRestriction_of_mem_magSubspaceS
     (V := V) (N := N) (M := M) hΨ_mem
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated-ladder-iterate coefficient
+successor site-sum formula**: if the `M`-sector iterate has the
+Marshall-signed coefficient form, then the next iterate is obtained by
+applying `Ŝ^-_tot` to the corresponding zero-extended sector vector and
+expanding that action as a sum of single-site lowering contributions.
+
+This is the recursive coefficient boundary immediately preceding the
+strict-positivity argument for the weights of `ladderIterateUp V N ⟨M+1, _⟩`. -/
+theorem tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientSuccSiteSum
+    (A : V → Bool) (N M : ℕ)
+    (hM_succ : M + 1 < Fintype.card V * N + 1)
+    (w : magConfigS V N M → ℝ)
+    (hcoeff : ∀ τ : magConfigS V N M,
+      ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ τ.1 =
+        (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ)) :
+    ∀ τ : magConfigS V N (M + 1),
+      ladderIterateUp V N ⟨M + 1, hM_succ⟩ τ.1 =
+        ∑ x : V,
+          ((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+            (magSectorEmbedding
+              (fun σ : magConfigS V N M =>
+                (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)))) τ.1 := by
+  intro τ
+  let Ψ : (V → Fin (N + 1)) → ℂ :=
+    ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩
+  have hΨ_mem :
+      Ψ ∈ magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) := by
+    change ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ))
+    unfold ladderIterateUp
+    exact totalSpinSOpMinus_pow_allAlignedStateS_zero_mem_magSubspaceS (V := V) (N := N) M
+  have hsector :
+      (fun σ : magConfigS V N M =>
+        (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) =
+        magSectorRestriction (M := M) Ψ := by
+    funext σ
+    exact (hcoeff σ).symm
+  have hfull :
+      magSectorEmbedding
+          (fun σ : magConfigS V N M =>
+            (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) =
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ := by
+    rw [hsector]
+    exact magSectorEmbedding_magSectorRestriction_of_mem_magSubspaceS
+      (V := V) (N := N) (M := M) hΨ_mem
+  calc
+    ladderIterateUp V N ⟨M + 1, hM_succ⟩ τ.1 =
+        ((totalSpinSOpMinus V N).mulVec
+          (ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩)) τ.1 := by
+      rw [totalSpinSOpMinus_mulVec_ladderIterateUp_interior
+        (V := V) (N := N) ⟨M, Nat.lt_of_succ_lt hM_succ⟩ hM_succ]
+    _ =
+        ((totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun σ : magConfigS V N M =>
+              (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)))) τ.1 := by
+      rw [hfull]
+    _ = ∑ x : V,
+          ((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+            (magSectorEmbedding
+              (fun σ : magConfigS V N M =>
+                (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)))) τ.1 := by
+      exact totalSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_site_sum
+        (V := V) (N := N)
+        (fun σ : magConfigS V N M =>
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) τ.1
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated-ladder-iterate successor
+Marshall-positive coefficients**: lowerable positive-source coefficient
+dominance for the `M`-sector weights produces strictly positive
+Marshall-signed weights for the successor iterate
+`ladderIterateUp V N ⟨M+1, _⟩`.
+
+This packages the strict-positivity half after the successor site-sum
+recursion. The new weight is the signed real part of the successor
+coefficient; realness follows from lowering a real Marshall-signed
+embedding, and positivity follows from the existing lowerable
+coefficient-dominance bridge. -/
+theorem tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientSucc_of_positive_source_lowerable_coefficient_lt
+    (A : V → Bool) (N M : ℕ)
+    (hM_succ : M + 1 < Fintype.card V * N + 1)
+    (w : magConfigS V N M → ℝ)
+    (hcoeff : ∀ σ : magConfigS V N M,
+      ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+        (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ))
+    (hdominates : ∀ τ : magConfigS V N (M + 1),
+      (∑ x ∈ ((Finset.univ.filter (fun x : V => A x = true)).filter
+          (fun x : V => 0 < (τ.1 x).val)),
+          tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) <
+        ∑ x ∈ ((Finset.univ.filter (fun x : V => A x = false)).filter
+          (fun x : V => 0 < (τ.1 x).val)),
+          tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) :
+    ∃ w_succ : magConfigS V N (M + 1) → ℝ,
+      (∀ τ : magConfigS V N (M + 1), 0 < w_succ τ) ∧
+        ∀ τ : magConfigS V N (M + 1),
+          ladderIterateUp V N ⟨M + 1, hM_succ⟩ τ.1 =
+            (((marshallSignS A τ.1).re * w_succ τ : ℝ) : ℂ) := by
+  let Φ : magConfigS V N M → ℂ :=
+    fun σ => (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)
+  let Ψ : (V → Fin (N + 1)) → ℂ :=
+    ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩
+  have hΨ_mem :
+      Ψ ∈ magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) := by
+    change ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ))
+    unfold ladderIterateUp
+    exact totalSpinSOpMinus_pow_allAlignedStateS_zero_mem_magSubspaceS (V := V) (N := N) M
+  have hsector :
+      Φ = magSectorRestriction (M := M) Ψ := by
+    funext σ
+    exact (hcoeff σ).symm
+  have hfull :
+      magSectorEmbedding Φ =
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ := by
+    rw [hsector]
+    exact magSectorEmbedding_magSectorRestriction_of_mem_magSubspaceS
+      (V := V) (N := N) (M := M) hΨ_mem
+  have hsucc_full :
+      (totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ) =
+        ladderIterateUp V N ⟨M + 1, hM_succ⟩ := by
+    rw [hfull]
+    exact totalSpinSOpMinus_mulVec_ladderIterateUp_interior
+      (V := V) (N := N) ⟨M, Nat.lt_of_succ_lt hM_succ⟩ hM_succ
+  let w_succ : magConfigS V N (M + 1) → ℝ :=
+    fun τ => (marshallSignS A τ.1).re *
+      (ladderIterateUp V N ⟨M + 1, hM_succ⟩ τ.1).re
+  refine ⟨w_succ, ?_, ?_⟩
+  · intro τ
+    have hpos :
+        0 < (marshallSignS A τ.1).re *
+          (((totalSpinSOpMinus V N).mulVec
+            (magSectorEmbedding
+              (fun σ : magConfigS V N M =>
+                (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)))) τ.1).re :=
+      tasaki23_lowered_marshall_pos_of_positive_source_lowerable_coefficient_lt
+        (V := V) (N := N) A w hdominates τ
+    change 0 < (marshallSignS A τ.1).re *
+      (ladderIterateUp V N ⟨M + 1, hM_succ⟩ τ.1).re
+    simpa [Φ] using hpos.trans_eq (by rw [hsucc_full])
+  · intro τ
+    have hsucc_im :
+        (ladderIterateUp V N ⟨M + 1, hM_succ⟩ τ.1).im = 0 := by
+      rw [← hsucc_full]
+      exact totalSpinSOpMinus_mulVec_marshallSignedEmbedding_im_zero
+        (V := V) (N := N) A w τ.1
+    have hsign_sq : (marshallSignS A τ.1).re * (marshallSignS A τ.1).re = 1 :=
+      marshallSignS_re_sq A τ.1
+    apply Complex.ext
+    · simp only [Complex.ofReal_mul, Complex.mul_re, Complex.ofReal_re,
+        Complex.ofReal_im, mul_zero, sub_zero]
+      calc
+        (ladderIterateUp V N ⟨M + 1, hM_succ⟩ τ.1).re =
+            1 * (ladderIterateUp V N ⟨M + 1, hM_succ⟩ τ.1).re := by ring
+        _ =
+            ((marshallSignS A τ.1).re * (marshallSignS A τ.1).re) *
+              (ladderIterateUp V N ⟨M + 1, hM_succ⟩ τ.1).re := by
+            rw [hsign_sq]
+        _ =
+            (marshallSignS A τ.1).re *
+              ((marshallSignS A τ.1).re *
+                (ladderIterateUp V N ⟨M + 1, hM_succ⟩ τ.1).re) := by ring
+    · simp [hsucc_im]
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left singleton-span iterate reference from a

@@ -9707,6 +9707,72 @@ Composing once more with the reference route gives
 \]
 Thus the remaining positivity task is now purely coefficient-wise on the
 sector restriction of the unnormalised total-spin ladder iterate.
+The first recursive coefficient boundary is the successor site-sum formula.
+Assume the \(M\)-sector iterate has the pointwise form
+\[
+\texttt{ladderIterateUp}\ V\ N\ \langle M,\_\rangle\ \sigma.1
+=
+((\texttt{marshallSignS}\ A\ \sigma.1).\texttt{re})\,w(\sigma).
+\]
+If \(M+1\) is still in the ladder range, then
+\[
+\begin{aligned}
+&\texttt{ladderIterateUp}\ V\ N\ \langle M+1,\_\rangle\ \tau.1 \\
+&\quad =
+\sum_{x\in V}
+\Bigl(
+\texttt{onSiteS}\ x\ (\texttt{spinSOpMinus}\ N)
+\Bigr)
+\Bigl(
+\texttt{magSectorEmbedding}
+  (\lambda \sigma.\,
+   ((\texttt{marshallSignS}\ A\ \sigma.1).\texttt{re})w(\sigma))
+\Bigr)(\tau.1).
+\end{aligned}
+\]
+Lean names this as
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundSaturatedLadderIterate}\\
+\texttt{MarshallPositiveCoefficientSuccSiteSum}.
+\end{gathered}
+\]
+The proof uses the iterate identity
+\[
+\texttt{totalSpinSOpMinus\_mulVec\_ladderIterateUp\_interior}
+\]
+to rewrite the successor iterate as \( \hat S^-_{\mathrm{tot}}\) applied to
+the previous iterate, reuses the coefficient-to-zero-extension bridge above,
+and finally applies
+\[
+\texttt{totalSpinSOpMinus\_mulVec\_magSectorEmbedding\_apply\_eq\_site\_sum}.
+\]
+Thus the remaining strict-positivity step is localized to the single-site
+lowering summands in Tasaki §2.5 Theorem~2.3 (Tasaki, Springer 2020,
+§2.5 Theorem~2.3, p.~42).
+The next boundary packages that localized positivity into the successor
+coefficient form.  If the lowerable positive-source predecessor coefficient
+sum over \(A\) is strictly dominated by the corresponding sum over
+\(\neg A\), then the successor coefficients admit strictly positive weights
+\(w_{\mathrm{succ}}\):
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundSaturatedLadderIterate}\\
+\texttt{MarshallPositiveCoefficientSucc}\\
+\texttt{\_of\_positive\_source\_lowerable\_coefficient\_lt}.
+\end{gathered}
+\]
+Here \(w_{\mathrm{succ}}(\tau)\) is the Marshall sign times the real part of
+the successor coefficient.  The proof uses
+\[
+\texttt{totalSpinSOpMinus\_mulVec\_marshallSignedEmbedding\_im\_zero}
+\]
+for realness and
+\[
+\texttt{tasaki23\_lowered\_marshall\_pos}\\
+\texttt{\_of\_positive\_source\_lowerable\_coefficient\_lt}
+\]
+for strict positivity.
 The left-endpoint named boundary also has the extracted reference-vector
 form
 \[
