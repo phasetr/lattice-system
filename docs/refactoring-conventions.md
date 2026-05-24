@@ -337,7 +337,7 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
-- **2026-05-24 (PR pending)**: Refactor checkpoint after the 20
+- **2026-05-24 (PR #3563)**: Refactor checkpoint after the 20
   post-#3541 Tasaki §2.5 Theorem 2.3 feature PRs (#3543--#3562).
   Build-speed evaluation for the active outside-ground/final wrapper layer:
   `lake env lean LatticeSystem/Quantum/SpinS/Theorem23OutsideGround.lean`
