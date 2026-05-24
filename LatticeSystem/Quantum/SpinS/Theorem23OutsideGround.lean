@@ -1423,6 +1423,32 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_casimir_sour
       (V := V) A (J := J) N c hright)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from saturated joint
+sources**: left and right saturated joint source-vector callbacks already
+contain the saturated total-Casimir source equations.  Projecting those
+Casimir components and reusing the saturated-Casimir bridge supplies the
+outside-sector lower family. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_joint_sources
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleft :
+      tasaki23OutsideGroundLeftSaturatedJointSourceCallback (V := V) A J N c)
+    (hright :
+      tasaki23OutsideGroundRightSaturatedJointSourceCallback (V := V) A J N c) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_casimir_sources
+    (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback_of_saturated_joint_source
+      (V := V) A (J := J) N c hleft)
+    (tasaki23OutsideGroundRightSaturatedCasimirSourceCallback_of_saturated_joint_source
+      (V := V) A (J := J) N c hright)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-ground family from side admissible
 reach**: left and right directional outside-sector reach callbacks supply
 the outside-sector ground-energy lower family by first recombining into the
