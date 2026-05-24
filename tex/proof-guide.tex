@@ -9750,6 +9750,29 @@ and finally applies
 Thus the remaining strict-positivity step is localized to the single-site
 lowering summands in Tasaki §2.5 Theorem~2.3 (Tasaki, Springer 2020,
 §2.5 Theorem~2.3, p.~42).
+The next boundary packages that localized positivity into the successor
+coefficient form.  If the lowerable positive-source predecessor coefficient
+sum over \(A\) is strictly dominated by the corresponding sum over
+\(\neg A\), then the successor coefficients admit strictly positive weights
+\(w_{\mathrm{succ}}\):
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundSaturatedLadderIterate}\\
+\texttt{MarshallPositiveCoefficientSucc}\\
+\texttt{\_of\_positive\_source\_lowerable\_coefficient\_lt}.
+\end{gathered}
+\]
+Here \(w_{\mathrm{succ}}(\tau)\) is the Marshall sign times the real part of
+the successor coefficient.  The proof uses
+\[
+\texttt{totalSpinSOpMinus\_mulVec\_marshallSignedEmbedding\_im\_zero}
+\]
+for realness and
+\[
+\texttt{tasaki23\_lowered\_marshall\_pos}\\
+\texttt{\_of\_positive\_source\_lowerable\_coefficient\_lt}
+\]
+for strict positivity.
 The left-endpoint named boundary also has the extracted reference-vector
 form
 \[
