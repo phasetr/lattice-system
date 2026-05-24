@@ -181,6 +181,7 @@ theorem totalSpinSOpPlus_mulVec_mem_saturatedFerromagnetJointEigenspace_inf_magS
   · rw [mem_magSubspaceS_iff]
     exact totalSpinSOp3_mulVec_totalSpinSOpPlus_mulVec_eigenvec hM
 
+set_option linter.style.longLine false in
 /-- **Injectivity of `Ŝ^+_tot` on `joint ⊓ H_M` away from the highest
 weight**: for any `v ∈ saturatedFerromagnetJointEigenspace J N ⊓
 magSubspaceS V N M` with `M ≠ m_max = |V|·N/2`, if
@@ -290,6 +291,7 @@ noncomputable def totalSpinSOpPlusJointMagShift
     ext
     simp [Matrix.mulVec_smul]
 
+set_option linter.style.longLine false in
 /-- **`Ŝ^+_tot` is injective on `joint ⊓ H_M` away from the highest
 weight, as a linear map between the joint-magnetisation sectors**.
 
@@ -304,9 +306,11 @@ theorem totalSpinSOpPlusJointMagShift_injective [Nonempty V]
   have hsub :
       (totalSpinSOpPlus V N).mulVec (a.val - b.val) = 0 := by
     rw [Matrix.mulVec_sub]
-    have := Subtype.ext_iff.mp hab
-    simp [totalSpinSOpPlusJointMagShift] at this
-    rw [this]
+    have hval :
+        (totalSpinSOpPlus V N).mulVec a.val =
+          (totalSpinSOpPlus V N).mulVec b.val := by
+      simpa only [totalSpinSOpPlusJointMagShift] using congrArg Subtype.val hab
+    rw [hval]
     simp
   have hmem : a.val - b.val ∈
       saturatedFerromagnetJointEigenspace (V := V) J N
@@ -445,7 +449,7 @@ theorem saturatedFerromagnetJointEigenspace_inf_magSubspaceS_eq_span_ladderItera
             ⊓ magSubspaceS V N
               (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (k.val : ℂ)) :
             Submodule ℂ ((V → Fin (N + 1)) → ℂ)) ≤ 1 := h_le_one
-    -- Apply Submodule.eq_of_le_of_finrank_le: span ≤ LHS and finrank LHS ≤ finrank span give span = LHS.
+    -- Apply `Submodule.eq_of_le_of_finrank_le`: span ≤ LHS and finrank comparison.
     refine le_of_eq (Submodule.eq_of_le_of_finrank_le h_span_le ?_).symm
     rw [h_span_finrank]
     exact h_finrank_le
@@ -590,12 +594,12 @@ theorem heisenbergHamiltonianS_mulVec_magProjFn_eq
     intro τ _
     by_cases hτM : magEigenvalueS τ = M
     · -- magProjFn M v τ = v τ.
-      show heisenbergHamiltonianS J N σ τ * magProjFn M v τ =
+      change heisenbergHamiltonianS J N σ τ * magProjFn M v τ =
         heisenbergHamiltonianS J N σ τ * v τ
       unfold magProjFn
       rw [if_pos hτM]
     · -- magProjFn M v τ = 0; need to show H_{στ} · 0 = H_{στ} · v τ via H_{στ} = 0.
-      show heisenbergHamiltonianS J N σ τ * magProjFn M v τ =
+      change heisenbergHamiltonianS J N σ τ * magProjFn M v τ =
         heisenbergHamiltonianS J N σ τ * v τ
       have h_basis_mem : (heisenbergHamiltonianS J N).mulVec (basisVecS τ) ∈
           magSubspaceS V N (magEigenvalueS τ) :=
@@ -623,11 +627,11 @@ theorem heisenbergHamiltonianS_mulVec_magProjFn_eq
         heisenbergHamiltonianS_mulVec_basisVecS_mem_magSubspaceS J N τ
       have hne : magEigenvalueS σ ≠ magEigenvalueS τ := by
         rw [hτM]; exact hσM
-      show heisenbergHamiltonianS J N σ τ * magProjFn M v τ = 0
+      change heisenbergHamiltonianS J N σ τ * magProjFn M v τ = 0
       rw [matrix_entry_eq_zero_of_mulVec_basisVecS_mem_magSubspaceS h_basis_mem hne,
         zero_mul]
     · -- magProjFn M v τ = 0.
-      show heisenbergHamiltonianS J N σ τ * magProjFn M v τ = 0
+      change heisenbergHamiltonianS J N σ τ * magProjFn M v τ = 0
       unfold magProjFn
       rw [if_neg hτM, mul_zero]
 
@@ -652,11 +656,11 @@ theorem totalSpinSSquared_mulVec_magProjFn_eq
     apply Finset.sum_congr rfl
     intro τ _
     by_cases hτM : magEigenvalueS τ = M
-    · show totalSpinSSquared V N σ τ * magProjFn M v τ =
+    · change totalSpinSSquared V N σ τ * magProjFn M v τ =
         totalSpinSSquared V N σ τ * v τ
       unfold magProjFn
       rw [if_pos hτM]
-    · show totalSpinSSquared V N σ τ * magProjFn M v τ =
+    · change totalSpinSSquared V N σ τ * magProjFn M v τ =
         totalSpinSSquared V N σ τ * v τ
       have h_basis_mem : (totalSpinSSquared V N).mulVec (basisVecS τ) ∈
           magSubspaceS V N (magEigenvalueS τ) :=
@@ -681,10 +685,10 @@ theorem totalSpinSSquared_mulVec_magProjFn_eq
           (magEigenvalueS τ) (basisVecS_mem_magSubspaceS τ)
       have hne : magEigenvalueS σ ≠ magEigenvalueS τ := by
         rw [hτM]; exact hσM
-      show totalSpinSSquared V N σ τ * magProjFn M v τ = 0
+      change totalSpinSSquared V N σ τ * magProjFn M v τ = 0
       rw [matrix_entry_eq_zero_of_mulVec_basisVecS_mem_magSubspaceS
         h_basis_mem hne, zero_mul]
-    · show totalSpinSSquared V N σ τ * magProjFn M v τ = 0
+    · change totalSpinSSquared V N σ τ * magProjFn M v τ = 0
       unfold magProjFn
       rw [if_neg hτM, mul_zero]
 
@@ -752,6 +756,14 @@ theorem sum_magProjFn_eq (v : (V → Fin (N + 1)) → ℂ) :
     exact hkne this
   · intro h; exact (h (Finset.mem_univ _)).elim
 
+/-- **Sector ladder singleton span into full ladder span**: the span of one
+`ladderIterateUp` vector is contained in the span of the full ladder range. -/
+theorem ladderIterateUp_singleton_span_le_span_range (N : ℕ)
+    (k : Fin (Fintype.card V * N + 1)) :
+    Submodule.span ℂ {ladderIterateUp V N k} ≤
+      Submodule.span ℂ (Set.range (ladderIterateUp V N)) := by
+  exact Submodule.span_mono (Set.singleton_subset_iff.mpr (Set.mem_range_self k))
+
 /-- **`joint ⊆ span (Set.range ladderIterateUp)`** — the joint
 eigenspace decomposes into the linear span of the ladder iterates.
 
@@ -789,8 +801,7 @@ theorem saturatedFerromagnetJointEigenspace_le_span_ladderIterateUp
     J k] at h_in_inter
   -- Now `h_in_inter : magProjFn ... v ∈ span {ladderIterateUp V N k}`.
   -- Embed into the larger `span (Set.range (ladderIterateUp V N))`.
-  exact Submodule.span_mono
-    (Set.singleton_subset_iff.mpr (Set.mem_range_self k)) h_in_inter
+  exact (ladderIterateUp_singleton_span_le_span_range (V := V) N k) h_in_inter
 
 /-- **Tasaki §2.4 Theorem 2.1**:
 `saturatedFerromagnetJointEigenspace J N = span (Set.range (ladderIterateUp V N))`.
