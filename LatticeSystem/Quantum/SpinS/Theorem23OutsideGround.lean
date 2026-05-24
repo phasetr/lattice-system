@@ -700,14 +700,6 @@ theorem tasaki23OutsideGroundRightSaturatedJointReferenceCallback_of_saturated_l
   rwa [saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp
     (V := V) (N := N) J]
 
-/-- **Sector ladder singleton span into full ladder span**: the span of one
-`ladderIterateUp` vector is contained in the span of the full ladder range. -/
-theorem ladderIterateUp_singleton_span_le_span_range (N : ℕ)
-    (k : Fin (Fintype.card V * N + 1)) :
-    Submodule.span ℂ {ladderIterateUp V N k} ≤
-      Submodule.span ℂ (Set.range (ladderIterateUp V N)) := by
-  exact Submodule.span_mono (Set.singleton_subset_iff.mpr (Set.mem_range_self k))
-
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left saturated-ladder-iterate reference
 callback**: left-side saturated reference callback in which the reference
