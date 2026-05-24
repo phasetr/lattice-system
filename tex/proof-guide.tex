@@ -9011,6 +9011,37 @@ eigenvector is converted to that real-form statement by taking its real
 part, or, if the real part vanishes, by taking its nonzero imaginary
 part.  This proves \(\mu\le\mu_M\) and hence the same outside-ground
 lower-family callback.  The outside reach task is then split into its
+full-space and directional forms.  The full-space ladder form is named by
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundAdmissibleFullReachCallback},\\
+\texttt{tasaki23OutsideGroundAdmissibleReachCallback\_of\_full\_reach},\\
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_full\_admissible\_reach}.
+\end{gathered}
+\]
+This form asks the ladder argument for a nonzero full-space eigenvector
+whose magnetization lies in an admissible sector.  Lean then restricts it
+to sector coordinates with \(\texttt{magSectorRestriction}\).  The support
+round-trip lemma
+\(\texttt{magSectorEmbedding\_magSectorRestriction\_of\_mem\_magSubspaceS}\)
+preserves non-zeroness, and
+\(\texttt{heisenbergHamiltonianSMatrixOnMagSector\_mulVec\_magSectorRestriction\_of\_full\_eigen}\)
+transfers the full eigen equation to the admissible sector matrix.  The
+discharged final boundary
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_full\_admissible\_reach}\\
+\texttt{\_discharge\_nonempty}
+\end{gathered}
+\]
+therefore exposes the remaining outside-reach input in the same
+full-space form produced by total-spin ladder operators.
+The outside reach task is also split into its
 two endpoint directions by
 \[
 \begin{gathered}
