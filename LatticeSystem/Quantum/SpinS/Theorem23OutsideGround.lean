@@ -63,6 +63,42 @@ def tasaki23OutsideGroundEnergyLowerFamilyCallback
       tasaki23OutsideGroundEnergyLowerCallback (V := V) A J N c μ
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-sector lower family from sector
+minimality**: a sector-minimality callback immediately supplies the
+outside-sector ground-energy lower family.  The Marshall-positive
+outside-sector representative is restricted to its magnetization sector,
+where sector minimality gives `μ ≤ μM`. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_sector_minimality
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hsector_min : tasaki23SectorMinimalityCallback (V := V) A J N c) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c := by
+  intro μ hcommon M _ hM_out μM v _hμM_lt hv_pos hΦ
+  let Φ : magConfigS V N M → ℂ :=
+    fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)
+  have hsector_complex :
+      (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φ =
+        (μM : ℂ) • Φ := by
+    have hrestrict :=
+      heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen
+        (M := M) J hΦ
+    rw [magSectorRestriction_magSectorEmbedding] at hrestrict
+    exact hrestrict
+  have hΦ_ne : Φ ≠ 0 := by
+    intro hzero
+    obtain ⟨τ⟩ := (inferInstance : Nonempty (magConfigS V N M))
+    have hτ_complex : (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ) = 0 := by
+      simpa [Φ] using congrFun hzero τ
+    have hτ_real : (marshallSignS A τ.1).re * v τ = 0 := by
+      exact_mod_cast hτ_complex
+    have hsq : (marshallSignS A τ.1).re * (marshallSignS A τ.1).re = 1 :=
+      marshallSignS_re_sq A τ.1
+    have hv := hv_pos τ
+    rcases mul_eq_zero.mp hτ_real with ha | hv_zero
+    · nlinarith
+    · nlinarith
+  exact hsector_min hcommon M hΦ_ne hsector_complex
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 real-sector lower bound on admissible
 sectors**: once the common-energy chain has produced a Marshall-positive
 sector representative at energy `μ` in an admissible sector, the
