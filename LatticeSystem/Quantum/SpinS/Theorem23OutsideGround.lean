@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.Theorem23SectorExistenceInterval
 import LatticeSystem.Quantum.SpinS.Theorem23Sectors
 import LatticeSystem.Quantum.SpinS.Theorem23IntervalCasimirMinimality
+import LatticeSystem.Quantum.SpinS.Theorem23Local
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
@@ -123,6 +124,65 @@ def tasaki23OutsideGroundAdmissibleFullReachCallback
           (heisenbergHamiltonianS J N).mulVec Ψ = (μM : ℂ) • Ψ
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left iterated-ladder full-reach callback**:
+for an outside sector left of the admissible interval, the total-spin
+lowering ladder can be iterated until it reaches a nonzero full-space
+vector in an admissible magnetization sector.  The Lean bridge proves the
+magnetization support and eigenvalue preservation from this non-zeroness
+input. -/
+def tasaki23OutsideGroundLeftIteratedLadderFullReachCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    M <
+        min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+          (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+          N →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      ∃ K : ℕ,
+        K ∈ tasaki23GroundStateSectors (V := V) A N ∧
+        Nonempty (magConfigS V N K) ∧
+        ∃ k : ℕ,
+          K = M + k ∧
+          ((totalSpinSOpMinus V N) ^ k).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ≠ 0
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right iterated-ladder full-reach callback**:
+for an outside sector right of the admissible interval, the total-spin
+raising ladder can be iterated until it reaches a nonzero full-space
+vector in an admissible magnetization sector. -/
+def tasaki23OutsideGroundRightIteratedLadderFullReachCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+        N < M →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      ∃ K : ℕ,
+        K ∈ tasaki23GroundStateSectors (V := V) A N ∧
+        Nonempty (magConfigS V N K) ∧
+        ∃ k : ℕ,
+          M = K + k ∧
+          ((totalSpinSOpPlus V N) ^ k).mulVec
+              (magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) ≠ 0
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left outside-sector admissible-reach
 callback**: for an outside-sector Marshall-positive representative below
 the left endpoint of `tasaki23GroundStateSectors A N`, the lowering ladder
@@ -235,6 +295,69 @@ theorem tasaki23OutsideGroundAdmissibleReachCallback_of_full_reach
   · exact
       heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen
         (V := V) (N := N) (M := K) J hΨ_eigen
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 full reach from iterated total-spin ladders**:
+left and right iterated ladder non-zeroness callbacks supply the full-space
+admissible-reach callback.  The proof uses the commutation of the Heisenberg
+Hamiltonian with `(Ŝ^-_tot)^k` and `(Ŝ^+_tot)^k`, plus the corresponding
+magnetization-subspace shift lemmas, to turn the nonzero ladder output into
+the full-space reached eigenvector required by
+`tasaki23OutsideGroundAdmissibleFullReachCallback`. -/
+theorem tasaki23OutsideGroundAdmissibleFullReachCallback_of_iterated_ladder_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hleft :
+      tasaki23OutsideGroundLeftIteratedLadderFullReachCallback (V := V) A J N c)
+    (hright :
+      tasaki23OutsideGroundRightIteratedLadderFullReachCallback (V := V) A J N c) :
+    tasaki23OutsideGroundAdmissibleFullReachCallback (V := V) A J N c := by
+  intro M _ hM_out μM v hμM_lt hv_pos hΦ
+  let ΨM : (V → Fin (N + 1)) → ℂ :=
+    magSectorEmbedding
+      (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+  have hΨM_eigen :
+      (heisenbergHamiltonianS J N).mulVec ΨM = (μM : ℂ) • ΨM := by
+    simpa [ΨM] using hΦ
+  have hΨM_mag :
+      ΨM ∈ magSubspaceS V N
+        (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) := by
+    simpa [ΨM] using
+      magSectorEmbedding_mem_magSubspaceS
+        (fun τ : magConfigS V N M =>
+          (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+  rcases
+      (tasaki23GroundStateSectors_not_mem_iff_lt_left_or_right_lt
+        (V := V) A N M).mp hM_out with hM_left | hM_right
+  · obtain ⟨K, hK_mem, hK_nonempty, k, hK_eq, hpow_ne⟩ :=
+      hleft M hM_left hμM_lt hv_pos hΦ
+    refine ⟨K, hK_mem, hK_nonempty,
+      ((totalSpinSOpMinus V N) ^ k).mulVec ΨM, ?_, ?_, ?_⟩
+    · simpa [ΨM] using hpow_ne
+    · have hmag :=
+        totalSpinSOpMinus_pow_mulVec_mem_magSubspaceS_of_mem
+          (V := V) (N := N) k hΨM_mag
+      convert hmag using 1
+      rw [hK_eq]
+      push_cast
+      ring_nf
+    · exact
+        heisenbergHamiltonianS_mulVec_totalSpinSOpMinus_pow_of_eigenvec
+          (V := V) J N k hΨM_eigen
+  · obtain ⟨K, hK_mem, hK_nonempty, k, hM_eq, hpow_ne⟩ :=
+      hright M hM_right hμM_lt hv_pos hΦ
+    refine ⟨K, hK_mem, hK_nonempty,
+      ((totalSpinSOpPlus V N) ^ k).mulVec ΨM, ?_, ?_, ?_⟩
+    · simpa [ΨM] using hpow_ne
+    · have hmag :=
+        totalSpinSOpPlus_pow_mulVec_mem_magSubspaceS_of_mem
+          (V := V) (N := N) k hΨM_mag
+      convert hmag using 1
+      rw [hM_eq]
+      push_cast
+      ring_nf
+    · exact
+        heisenbergHamiltonianS_mulVec_totalSpinSOpPlus_pow_of_eigenvec
+          (V := V) J N k hΨM_eigen
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-sector lower family from sector
@@ -403,6 +526,29 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_full_admissible_reach
     (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
     (tasaki23OutsideGroundAdmissibleReachCallback_of_full_reach
       (V := V) A (J := J) N c hfull)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from iterated ladder
+full reach**: iterated left and right total-spin ladder callbacks first
+produce the full-space admissible-reach callback, then the existing
+full-reach bridge supplies the outside-sector lower family. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_iterated_ladder_full_reach
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleft :
+      tasaki23OutsideGroundLeftIteratedLadderFullReachCallback (V := V) A J N c)
+    (hright :
+      tasaki23OutsideGroundRightIteratedLadderFullReachCallback (V := V) A J N c) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_full_admissible_reach
+    (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundAdmissibleFullReachCallback_of_iterated_ladder_callbacks
+      (V := V) A (J := J) N c hleft hright)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-ground family from side admissible

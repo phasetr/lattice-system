@@ -9041,6 +9041,47 @@ discharged final boundary
 \]
 therefore exposes the remaining outside-reach input in the same
 full-space form produced by total-spin ladder operators.
+Lean further narrows this full-space reach input to non-zeroness of
+iterated total-spin ladder outputs.  The local ladder layer records
+\[
+\begin{gathered}
+\texttt{heisenbergHamiltonianS\_mulVec\_totalSpinSOpMinus}\\
+\texttt{\_pow\_of\_eigenvec},\\
+\texttt{heisenbergHamiltonianS\_mulVec\_totalSpinSOpPlus}\\
+\texttt{\_pow\_of\_eigenvec},\\
+\texttt{totalSpinSOpMinus\_pow\_mulVec\_mem\_magSubspaceS\_of\_mem},\\
+\texttt{totalSpinSOpPlus\_pow\_mulVec\_mem\_magSubspaceS\_of\_mem}.
+\end{gathered}
+\]
+Thus \((\hat S^-_{\rm tot})^k\) and \((\hat S^+_{\rm tot})^k\)
+preserve the Heisenberg eigenvalue and shift the magnetization
+subspace by \(-k\) and \(+k\), respectively.  The remaining directional
+inputs can therefore be stated as
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftIteratedLadderFullReachCallback},\\
+\texttt{tasaki23OutsideGroundRightIteratedLadderFullReachCallback},\\
+\texttt{tasaki23OutsideGroundAdmissibleFullReachCallback}\\
+\texttt{\_of\_iterated\_ladder\_callbacks},\\
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_iterated\_ladder\_full\_reach}.
+\end{gathered}
+\]
+The left callback chooses an admissible sector \(K=M+k\) and proves
+that \((\hat S^-_{\rm tot})^k\Psi_M\ne0\); the right callback chooses
+an admissible sector with \(M=K+k\) and proves
+\((\hat S^+_{\rm tot})^k\Psi_M\ne0\).  The discharged final boundary
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_iterated\_ladder\_full\_reach}\\
+\texttt{\_discharge\_nonempty}
+\end{gathered}
+\]
+then feeds these non-zeroness callbacks through the full-reach bridge.
 The outside reach task is also split into its
 two endpoint directions by
 \[
