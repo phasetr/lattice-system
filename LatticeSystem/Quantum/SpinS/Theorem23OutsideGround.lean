@@ -740,6 +740,79 @@ def tasaki23OutsideGroundRightSaturatedLadderIterateReferenceCallback
         Submodule.span ℂ {ladderIterateUp V N ⟨M, hM_range⟩}
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated-ladder-iterate
+Marshall-positive reference callback**: left-side concrete reference-vector
+callback asserting that the strictly Marshall-positive sector embedding is
+exactly the sector ladder iterate `ladderIterateUp V N ⟨M, _⟩`.  This is the
+coordinate-level boundary for discharging the singleton-span iterate reference
+callback. -/
+def tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    M <
+        min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+          (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+          N →
+    ∃ (hM_range : M < Fintype.card V * N + 1) (μsat : ℝ)
+        (w : magConfigS V N M → ℝ),
+      (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N ∧
+      (∀ τ, 0 < w τ) ∧
+      magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ)) =
+        ladderIterateUp V N ⟨M, hM_range⟩
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated-ladder-iterate
+Marshall-positive reference callback**: right-side analogue of
+`tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback`. -/
+def tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+        N < M →
+    ∃ (hM_range : M < Fintype.card V * N + 1) (μsat : ℝ)
+        (w : magConfigS V N M → ℝ),
+      (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N ∧
+      (∀ τ, 0 < w τ) ∧
+      magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ)) =
+        ladderIterateUp V N ⟨M, hM_range⟩
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left singleton-span iterate reference from a
+Marshall-positive ladder iterate equality**: equality with the sector
+`ladderIterateUp` vector places the reference embedding in its singleton
+span. -/
+theorem tasaki23OutsideGroundLeftSaturatedLadderIterateReferenceCallback_of_marshall_positive_reference
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hleft :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback
+        (V := V) A J N) :
+    tasaki23OutsideGroundLeftSaturatedLadderIterateReferenceCallback (V := V) A J N := by
+  intro M _ hM_left
+  obtain ⟨hM_range, μsat, w, hμsat, hw_pos, hw_eq⟩ := hleft M hM_left
+  refine ⟨hM_range, μsat, w, hμsat, hw_pos, ?_⟩
+  rw [hw_eq]
+  exact Submodule.subset_span (Set.mem_singleton _)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right singleton-span iterate reference from a
+Marshall-positive ladder iterate equality**: right-side analogue of
+`tasaki23OutsideGroundLeftSaturatedLadderIterateReferenceCallback_of_marshall_positive_reference`. -/
+theorem tasaki23OutsideGroundRightSaturatedLadderIterateReferenceCallback_of_marshall_positive_reference
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hright :
+      tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback
+        (V := V) A J N) :
+    tasaki23OutsideGroundRightSaturatedLadderIterateReferenceCallback (V := V) A J N := by
+  intro M _ hM_right
+  obtain ⟨hM_range, μsat, w, hμsat, hw_pos, hw_eq⟩ := hright M hM_right
+  refine ⟨hM_range, μsat, w, hμsat, hw_pos, ?_⟩
+  rw [hw_eq]
+  exact Submodule.subset_span (Set.mem_singleton _)
+
+set_option linter.style.longLine false in
 set_option maxHeartbeats 800000 in
 -- Expanding the callback target with a dependent singleton ladder span needs extra reduction.
 /-- **Tasaki §2.5 Theorem 2.3 left saturated ladder reference from a sector
@@ -1961,6 +2034,38 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_itera
     (tasaki23OutsideGroundLeftSaturatedLadderReferenceCallback_of_saturated_ladder_iterate_reference
       (V := V) A (J := J) N hleft_ref)
     (tasaki23OutsideGroundRightSaturatedLadderReferenceCallback_of_saturated_ladder_iterate_reference
+      (V := V) A (J := J) N hright_ref)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from saturated
+ladder-iterate Marshall-positive references**: concrete equality with the
+sector ladder iterates first supplies the singleton-span iterate reference
+callbacks, and the existing ladder-iterate reference route then supplies the
+outside-sector lower family. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_marshall_positive_references
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback
+        (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback
+        (V := V) A J N) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_references
+    (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+    hc_strict h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateReferenceCallback_of_marshall_positive_reference
+      (V := V) A (J := J) N hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateReferenceCallback_of_marshall_positive_reference
       (V := V) A (J := J) N hright_ref)
 
 set_option linter.style.longLine false in
