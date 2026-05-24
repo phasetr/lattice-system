@@ -337,6 +337,24 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3563)**: Refactor checkpoint after the 20
+  post-#3541 Tasaki §2.5 Theorem 2.3 feature PRs (#3543--#3562).
+  Build-speed evaluation for the active outside-ground/final wrapper layer:
+  `lake env lean LatticeSystem/Quantum/SpinS/Theorem23OutsideGround.lean`
+  completed in `real 17.13s` (`user 3.29s`, `sys 4.10s`);
+  `lake env lean LatticeSystem/Quantum/SpinS/Theorem23Final.lean`
+  completed in `real 6.93s` (`user 2.43s`, `sys 3.15s`);
+  `lake env lean LatticeSystem/Quantum/SpinS/Theorem23Sectors.lean`
+  completed in `real 9.07s` (`user 3.13s`, `sys 2.88s`);
+  cached `lake build LatticeSystem.Quantum.SpinS.Theorem23OutsideGround`
+  completed in `real 3.71s` (`user 1.68s`, `sys 2.37s`). No module
+  split was performed: the active wrapper files are modest in size
+  (`Theorem23OutsideGround.lean` 526 lines, `Theorem23Final.lean`
+  403 lines, `Theorem23Sectors.lean` 262 lines), and the newest side-case
+  callbacks are still close to the final admissible-reach boundary. The
+  next extraction should wait until the outside-sector callback chain either
+  lands in the final Theorem 2.3 proof body or exposes a stable heavier
+  suffix.
 - **2026-05-24 (PR #3541)**: Refactored the Tasaki §2.5 Theorem 2.3
   predicted-GS dominance API after the adjacent predicted-GS predecessor
   common-energy step became a stable suffix (was the heaviest §2.5 module at
