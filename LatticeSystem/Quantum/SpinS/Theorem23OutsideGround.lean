@@ -6,6 +6,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
 import LatticeSystem.Quantum.SpinS.SaturatedLadderCasimirEigenspace
+import LatticeSystem.Quantum.SpinS.TotalSpinSSquaredMaxEigenspaceEqSpanLadder
 
 /-!
 # Tasaki §2.5 Theorem 2.3 outside-ground API
@@ -351,6 +352,103 @@ def tasaki23OutsideGroundRightSaturatedCasimirSourceCallback
         saturatedFerromagnetCasimirEigenvalueS V N •
           magSectorEmbedding
             (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated-ladder-span source callback**:
+for an outside sector left of the admissible interval, the source
+Marshall-positive vector lies in the span of the saturated ferromagnetic
+total-spin ladder.  The maximum-Casimir eigenspace identification converts
+this concrete span input to the saturated-Casimir source callback. -/
+def tasaki23OutsideGroundLeftSaturatedLadderSpanSourceCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    M <
+        min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+          (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+          N →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+        Submodule.span ℂ (Set.range (ladderIterateUp V N))
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated-ladder-span source callback**:
+for an outside sector right of the admissible interval, the source
+Marshall-positive vector lies in the span of the saturated ferromagnetic
+total-spin ladder.  The maximum-Casimir eigenspace identification converts
+this concrete span input to the saturated-Casimir source callback. -/
+def tasaki23OutsideGroundRightSaturatedLadderSpanSourceCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+        N < M →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+        Submodule.span ℂ (Set.range (ladderIterateUp V N))
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated-Casimir source from ladder
+span**: the maximum-Casimir eigenspace equals the saturated ladder span,
+so a left outside-sector source in that span has the saturated
+total-Casimir eigenvalue. -/
+theorem tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback_of_ladder_span_source
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hleft :
+      tasaki23OutsideGroundLeftSaturatedLadderSpanSourceCallback (V := V) A J N c) :
+    tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback (V := V) A J N c := by
+  intro M _ hM_left μM v hμM_lt hv_pos hΦ
+  have hspan :
+      magSectorEmbedding
+          (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+        Submodule.span ℂ (Set.range (ladderIterateUp V N)) :=
+    hleft M hM_left hμM_lt hv_pos hΦ
+  have heig :
+      magSectorEmbedding
+          (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+        Module.End.eigenspace (totalSpinSSquared V N).mulVecLin
+          (saturatedFerromagnetCasimirEigenvalueS V N) := by
+    rwa [totalSpinSSquaredEigenspace_max_eq_span_ladderIterateUp (V := V) (N := N)]
+  rwa [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at heig
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated-Casimir source from ladder
+span**: the maximum-Casimir eigenspace equals the saturated ladder span,
+so a right outside-sector source in that span has the saturated
+total-Casimir eigenvalue. -/
+theorem tasaki23OutsideGroundRightSaturatedCasimirSourceCallback_of_ladder_span_source
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hright :
+      tasaki23OutsideGroundRightSaturatedLadderSpanSourceCallback (V := V) A J N c) :
+    tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c := by
+  intro M _ hM_right μM v hμM_lt hv_pos hΦ
+  have hspan :
+      magSectorEmbedding
+          (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+        Submodule.span ℂ (Set.range (ladderIterateUp V N)) :=
+    hright M hM_right hμM_lt hv_pos hΦ
+  have heig :
+      magSectorEmbedding
+          (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∈
+        Module.End.eigenspace (totalSpinSSquared V N).mulVecLin
+          (saturatedFerromagnetCasimirEigenvalueS V N) := by
+    rwa [totalSpinSSquaredEigenspace_max_eq_span_ladderIterateUp (V := V) (N := N)]
+  rwa [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at heig
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left Casimir full reach from saturated
