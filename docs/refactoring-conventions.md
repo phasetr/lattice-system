@@ -337,6 +337,16 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3540)**: Refactored the Tasaki §2.5 Theorem 2.3
+  sector-existence interval API after the lowered-vector-Marshall predicted-GS
+  interval chain became a stable suffix (was the heaviest remaining §2.5
+  module at ~14s). `Theorem23SectorExistenceInterval.lean` now keeps the
+  off-`A`/on-`A` dominance and lowered-site-sum interval chains (287 lines),
+  while `Theorem23SectorExistenceIntervalMarshall.lean` contains the
+  lowered-vector-Marshall interval chain (106 lines). The new module imports
+  the parent (the Marshall chain reuses the lowered-site-sum chain). The sole
+  consumer (`Theorem23FinalLoweredMarshall`) adds a direct import of the new
+  module.
 - **2026-05-24 (PR #3539)**: Refactored the Tasaki §2.5 Theorem 2.3 adjacent
   common-energy API after the predecessor (raising-direction) common-energy
   steps became a stable suffix (was the heaviest remaining §2.5 module at
