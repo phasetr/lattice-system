@@ -586,6 +586,51 @@ def tasaki23OutsideGroundRightSaturatedJointSourceCallback
         saturatedFerromagnetJointEigenspace (V := V) J N
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated-joint reference callback**:
+for an outside sector left of the admissible interval, provide a strictly
+Marshall-positive real sector vector whose full embedding lies in the
+saturated-ferromagnet joint eigenspace, together with a real representative of
+the saturated Heisenberg eigenvalue.
+
+The source-vector/eigenvalue bridge below uses this reference and the
+Marshall-positive uniqueness theorem in the sector to prove that any
+Marshall-positive source eigenvector in the same sector is itself in the
+saturated joint eigenspace. -/
+def tasaki23OutsideGroundLeftSaturatedJointReferenceCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    M <
+        min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+          (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+          N →
+    ∃ (μsat : ℝ) (w : magConfigS V N M → ℝ),
+      (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N ∧
+      (∀ τ, 0 < w τ) ∧
+      magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ)) ∈
+        saturatedFerromagnetJointEigenspace (V := V) J N
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated-joint reference callback**:
+right-side analogue of
+`tasaki23OutsideGroundLeftSaturatedJointReferenceCallback`.  It supplies a
+Marshall-positive saturated joint reference vector in each nonempty sector
+right of the admissible interval, with a real representative of the saturated
+Heisenberg eigenvalue. -/
+def tasaki23OutsideGroundRightSaturatedJointReferenceCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+        N < M →
+    ∃ (μsat : ℝ) (w : magConfigS V N M → ℝ),
+      (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N ∧
+      (∀ τ, 0 < w τ) ∧
+      magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ)) ∈
+        saturatedFerromagnetJointEigenspace (V := V) J N
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left saturated source-energy from joint
 source**: the saturated joint source-vector input gives the
 `H_J`-eigenvalue equation at the saturated ferromagnet energy.  Comparing it
@@ -699,9 +744,245 @@ theorem tasaki23OutsideGroundRightSaturatedCasimirSourceCallback_of_saturated_jo
     hright M hM_right hμM_lt hv_pos hΦ
   have hCas :
       Φ ∈ Module.End.eigenspace (totalSpinSSquared V N).mulVecLin
-        (saturatedFerromagnetCasimirEigenvalueS V N) :=
+      (saturatedFerromagnetCasimirEigenvalueS V N) :=
     (Submodule.mem_inf.mp hjoint).2
   rwa [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hCas
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated-joint source from a
+saturated-joint reference**: a Marshall-positive saturated joint reference in
+the same left outside sector forces every Marshall-positive source
+eigenvector to be the same sector ground state up to a positive scalar.
+Consequently the source vector also lies in the saturated-ferromagnet joint
+eigenspace.
+
+This is the source-vector/eigenvalue bridge from the reference-vector API to
+the left saturated-joint source callback. -/
+theorem tasaki23OutsideGroundLeftSaturatedJointSourceCallback_of_saturated_joint_reference
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedJointReferenceCallback (V := V) A J N) :
+    tasaki23OutsideGroundLeftSaturatedJointSourceCallback (V := V) A J N c := by
+  intro M _ hM_left μM v _hμM_lt hv_pos hΦ
+  obtain ⟨μsat, w, hμsat, hw_pos, hw_joint⟩ := hleft_ref M hM_left
+  let Φv : magConfigS V N M → ℂ :=
+    fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)
+  let Φw : magConfigS V N M → ℂ :=
+    fun τ => (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ)
+  have hΦv_sec_complex :
+      (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φv =
+        (μM : ℂ) • Φv := by
+    have hrestrict :=
+      heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen
+        (M := M) J hΦ
+    rwa [magSectorRestriction_magSectorEmbedding] at hrestrict
+  have hΦv_sec_real :
+      (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+          (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * v τ) =
+        μM • (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * v τ) := by
+    have hre :=
+      heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
+        N hJ_real hΦv_sec_complex
+    simpa [Φv] using hre
+  have hHw_mem :
+      magSectorEmbedding Φw ∈
+        Module.End.eigenspace (heisenbergHamiltonianS J N).mulVecLin
+          (saturatedFerromagnetEigenvalueS (V := V) J N) :=
+    (Submodule.mem_inf.mp hw_joint).1
+  have hHw_full :
+      (heisenbergHamiltonianS J N).mulVec (magSectorEmbedding Φw) =
+        (μsat : ℂ) • magSectorEmbedding Φw := by
+    have h :=
+      (show (heisenbergHamiltonianS J N).mulVec (magSectorEmbedding Φw) =
+          saturatedFerromagnetEigenvalueS (V := V) J N • magSectorEmbedding Φw by
+        rwa [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hHw_mem)
+    rwa [← hμsat] at h
+  have hΦw_sec_complex :
+      (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φw =
+        (μsat : ℂ) • Φw := by
+    have hrestrict :=
+      heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen
+        (M := M) J hHw_full
+    rwa [magSectorRestriction_magSectorEmbedding] at hrestrict
+  have hΦw_sec_real :
+      (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+          (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * w τ) =
+        μsat • (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * w τ) := by
+    have hre :=
+      heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
+        N hJ_real hΦw_sec_complex
+    simpa [Φw] using hre
+  have hΦv_marshall_pos :
+      ∀ τ : magConfigS V N M,
+        0 < (marshallSignS A τ.1).re * ((marshallSignS A τ.1).re * v τ) := fun τ => by
+    have hsq : (marshallSignS A τ.1).re * (marshallSignS A τ.1).re = 1 :=
+      marshallSignS_re_sq A τ.1
+    rw [← mul_assoc, hsq, one_mul]
+    exact hv_pos τ
+  have hΦw_marshall_pos :
+      ∀ τ : magConfigS V N M,
+        0 < (marshallSignS A τ.1).re * ((marshallSignS A τ.1).re * w τ) := fun τ => by
+    have hsq : (marshallSignS A τ.1).re * (marshallSignS A τ.1).re = 1 :=
+      marshallSignS_re_sq A τ.1
+    rw [← mul_assoc, hsq, one_mul]
+    exact hw_pos τ
+  have hμ_eq : μsat = μM :=
+    marshallPositive_eigenvec_eigenvalue_unique_heisenbergHamiltonianSReMatrixOnMagSector
+      A N hJ_real hJ_real' hΦw_sec_real hΦw_marshall_pos
+      hΦv_sec_real hΦv_marshall_pos
+  have hΦv_sec_real_sat :
+      (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+          (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * v τ) =
+        μsat • (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * v τ) := by
+    rw [hμ_eq]
+    exact hΦv_sec_real
+  obtain ⟨r, _hr_pos, hrel⟩ :=
+    marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector
+      A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+      h_intermediate hΦw_sec_real hΦw_marshall_pos
+      hΦv_sec_real_sat hΦv_marshall_pos
+  have hfull_eq : magSectorEmbedding Φv = (r : ℂ) • magSectorEmbedding Φw := by
+    funext σ
+    by_cases hσ : magSumS σ = M
+    · let τ : magConfigS V N M := ⟨σ, hσ⟩
+      have hτ := congrFun hrel τ
+      change (marshallSignS A τ.1).re * v τ =
+        r * ((marshallSignS A τ.1).re * w τ) at hτ
+      rw [Pi.smul_apply, magSectorEmbedding_apply_of_mem Φv hσ,
+        magSectorEmbedding_apply_of_mem Φw hσ]
+      change (((marshallSignS A σ).re * v τ : ℝ) : ℂ) =
+        (r : ℂ) * (((marshallSignS A σ).re * w τ : ℝ) : ℂ)
+      exact_mod_cast hτ
+    · rw [Pi.smul_apply, magSectorEmbedding_apply_of_not_mem Φv hσ,
+        magSectorEmbedding_apply_of_not_mem Φw hσ, smul_zero]
+  rw [hfull_eq]
+  exact Submodule.smul_mem _ _ hw_joint
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated-joint source from a
+saturated-joint reference**: right-side analogue of
+`tasaki23OutsideGroundLeftSaturatedJointSourceCallback_of_saturated_joint_reference`.
+The proof uses sector eigenvalue uniqueness to identify the source energy
+with the saturated reference energy, then sector eigenvector uniqueness to
+show the source embedding is a positive scalar multiple of the saturated
+joint reference. -/
+theorem tasaki23OutsideGroundRightSaturatedJointSourceCallback_of_saturated_joint_reference
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedJointReferenceCallback (V := V) A J N) :
+    tasaki23OutsideGroundRightSaturatedJointSourceCallback (V := V) A J N c := by
+  intro M _ hM_right μM v hμM_lt hv_pos hΦ
+  obtain ⟨μsat, w, hμsat, hw_pos, hw_joint⟩ := hright_ref M hM_right
+  let Φv : magConfigS V N M → ℂ :=
+    fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)
+  let Φw : magConfigS V N M → ℂ :=
+    fun τ => (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ)
+  have hΦv_sec_complex :
+      (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φv =
+        (μM : ℂ) • Φv := by
+    have hrestrict :=
+      heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen
+        (M := M) J hΦ
+    rwa [magSectorRestriction_magSectorEmbedding] at hrestrict
+  have hΦv_sec_real :
+      (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+          (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * v τ) =
+        μM • (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * v τ) := by
+    have hre :=
+      heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
+        N hJ_real hΦv_sec_complex
+    simpa [Φv] using hre
+  have hHw_mem :
+      magSectorEmbedding Φw ∈
+        Module.End.eigenspace (heisenbergHamiltonianS J N).mulVecLin
+          (saturatedFerromagnetEigenvalueS (V := V) J N) :=
+    (Submodule.mem_inf.mp hw_joint).1
+  have hHw_full :
+      (heisenbergHamiltonianS J N).mulVec (magSectorEmbedding Φw) =
+        (μsat : ℂ) • magSectorEmbedding Φw := by
+    have h :=
+      (show (heisenbergHamiltonianS J N).mulVec (magSectorEmbedding Φw) =
+          saturatedFerromagnetEigenvalueS (V := V) J N • magSectorEmbedding Φw by
+        rwa [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hHw_mem)
+    rwa [← hμsat] at h
+  have hΦw_sec_complex :
+      (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φw =
+        (μsat : ℂ) • Φw := by
+    have hrestrict :=
+      heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen
+        (M := M) J hHw_full
+    rwa [magSectorRestriction_magSectorEmbedding] at hrestrict
+  have hΦw_sec_real :
+      (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+          (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * w τ) =
+        μsat • (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * w τ) := by
+    have hre :=
+      heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
+        N hJ_real hΦw_sec_complex
+    simpa [Φw] using hre
+  have hΦv_marshall_pos :
+      ∀ τ : magConfigS V N M,
+        0 < (marshallSignS A τ.1).re * ((marshallSignS A τ.1).re * v τ) := fun τ => by
+    have hsq : (marshallSignS A τ.1).re * (marshallSignS A τ.1).re = 1 :=
+      marshallSignS_re_sq A τ.1
+    rw [← mul_assoc, hsq, one_mul]
+    exact hv_pos τ
+  have hΦw_marshall_pos :
+      ∀ τ : magConfigS V N M,
+        0 < (marshallSignS A τ.1).re * ((marshallSignS A τ.1).re * w τ) := fun τ => by
+    have hsq : (marshallSignS A τ.1).re * (marshallSignS A τ.1).re = 1 :=
+      marshallSignS_re_sq A τ.1
+    rw [← mul_assoc, hsq, one_mul]
+    exact hw_pos τ
+  have hμ_eq : μsat = μM :=
+    marshallPositive_eigenvec_eigenvalue_unique_heisenbergHamiltonianSReMatrixOnMagSector
+      A N hJ_real hJ_real' hΦw_sec_real hΦw_marshall_pos
+      hΦv_sec_real hΦv_marshall_pos
+  have hΦv_sec_real_sat :
+      (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+          (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * v τ) =
+        μsat • (fun τ : magConfigS V N M => (marshallSignS A τ.1).re * v τ) := by
+    rw [hμ_eq]
+    exact hΦv_sec_real
+  obtain ⟨r, _hr_pos, hrel⟩ :=
+    marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector
+      A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+      h_intermediate hΦw_sec_real hΦw_marshall_pos
+      hΦv_sec_real_sat hΦv_marshall_pos
+  have hfull_eq : magSectorEmbedding Φv = (r : ℂ) • magSectorEmbedding Φw := by
+    funext σ
+    by_cases hσ : magSumS σ = M
+    · let τ : magConfigS V N M := ⟨σ, hσ⟩
+      have hτ := congrFun hrel τ
+      change (marshallSignS A τ.1).re * v τ =
+        r * ((marshallSignS A τ.1).re * w τ) at hτ
+      rw [Pi.smul_apply, magSectorEmbedding_apply_of_mem Φv hσ,
+        magSectorEmbedding_apply_of_mem Φw hσ]
+      change (((marshallSignS A σ).re * v τ : ℝ) : ℂ) =
+        (r : ℂ) * (((marshallSignS A σ).re * w τ : ℝ) : ℂ)
+      exact_mod_cast hτ
+    · rw [Pi.smul_apply, magSectorEmbedding_apply_of_not_mem Φv hσ,
+        magSectorEmbedding_apply_of_not_mem Φw hσ, smul_zero]
+  rw [hfull_eq]
+  exact Submodule.smul_mem _ _ hw_joint
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left saturated-joint source from saturated
