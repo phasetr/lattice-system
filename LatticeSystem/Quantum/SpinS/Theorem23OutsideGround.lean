@@ -5,6 +5,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23Local
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
+import LatticeSystem.Quantum.SpinS.SaturatedLadderCasimirEigenspace
 
 /-!
 # Tasaki §2.5 Theorem 2.3 outside-ground API
@@ -257,6 +258,171 @@ def tasaki23OutsideGroundRightIteratedLadderCasimirFullReachCallback
                 ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) + (j : ℂ)) *
                   (((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) +
                       (j : ℂ)) + 1)
+
+omit [DecidableEq V] in
+/-- **Saturated total-Casimir lowering endpoint mismatch**: before the
+bottom magnetization `|V| * N`, the saturated-ferromagnet total-Casimir
+value cannot equal the lowering-kernel value at sector coordinate `M`. -/
+theorem saturatedFerromagnetCasimirEigenvalueS_ne_lowering_kernel_value_of_lt_card_mul
+    (N M : ℕ) (hM : M < Fintype.card V * N) :
+    saturatedFerromagnetCasimirEigenvalueS V N ≠
+      ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) *
+        ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) - 1)) := by
+  intro h
+  have hre := congrArg Complex.re h
+  unfold saturatedFerromagnetCasimirEigenvalueS at hre
+  norm_num at hre
+  have hM_nonneg : 0 ≤ (M : ℝ) := by positivity
+  have hM_lt : (M : ℝ) < (Fintype.card V * N : ℕ) := by
+    exact_mod_cast hM
+  nlinarith [show ((Fintype.card V : ℝ) * (N : ℝ)) =
+      (Fintype.card V * N : ℕ) by norm_num]
+
+omit [DecidableEq V] in
+/-- **Saturated total-Casimir raising endpoint mismatch**: after the top
+magnetization `0`, the saturated-ferromagnet total-Casimir value cannot
+equal the raising-kernel value at sector coordinate `M`. -/
+theorem saturatedFerromagnetCasimirEigenvalueS_ne_raising_kernel_value_of_pos_of_le_card_mul
+    (N M : ℕ) (hM : 0 < M) (hM_le : M ≤ Fintype.card V * N) :
+    saturatedFerromagnetCasimirEigenvalueS V N ≠
+      ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) *
+        ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) + 1)) := by
+  intro h
+  have hre := congrArg Complex.re h
+  unfold saturatedFerromagnetCasimirEigenvalueS at hre
+  norm_num at hre
+  have hM_pos : 0 < (M : ℝ) := by exact_mod_cast hM
+  have hM_le : (M : ℝ) ≤ (Fintype.card V * N : ℕ) := by
+    exact_mod_cast hM_le
+  nlinarith [show ((Fintype.card V : ℝ) * (N : ℝ)) =
+      (Fintype.card V * N : ℕ) by norm_num]
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated-Casimir source callback**:
+for an outside sector left of the admissible interval, the source
+Marshall-positive vector lies in the saturated-ferromagnet total-Casimir
+eigenspace.  This is the max-Casimir input needed to discharge the left
+iterated-ladder Casimir full-reach callback. -/
+def tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    M <
+        min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+          (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+          N →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      (totalSpinSSquared V N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        saturatedFerromagnetCasimirEigenvalueS V N •
+          magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated-Casimir source callback**:
+for an outside sector right of the admissible interval, the source
+Marshall-positive vector lies in the saturated-ferromagnet total-Casimir
+eigenspace.  This is the max-Casimir input needed to discharge the right
+iterated-ladder Casimir full-reach callback. -/
+def tasaki23OutsideGroundRightSaturatedCasimirSourceCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+        N < M →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      (totalSpinSSquared V N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        saturatedFerromagnetCasimirEigenvalueS V N •
+          magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left Casimir full reach from saturated
+Casimir**: the left saturated-Casimir source callback supplies the existing
+iterated-ladder Casimir full-reach callback by choosing the left endpoint as
+target and using the saturated endpoint-mismatch arithmetic for every
+intermediate lowering step. -/
+theorem tasaki23OutsideGroundLeftIteratedLadderCasimirFullReachCallback_of_saturated_casimir_source
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hleft :
+      tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback (V := V) A J N c) :
+    tasaki23OutsideGroundLeftIteratedLadderCasimirFullReachCallback (V := V) A J N c := by
+  intro M _ hM_left μM v hμM_lt hv_pos hΦ
+  let K :=
+    min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+      (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+      N
+  have hK_mem : K ∈ tasaki23GroundStateSectors (V := V) A N := by
+    simpa [K] using tasaki23GroundStateSectors_left_mem (V := V) A N
+  have hK_le_card : K ≤ Fintype.card V * N :=
+    tasaki23GroundStateSectors_le_card_mul (V := V) A N hK_mem
+  have hM_le_K : M ≤ K := Nat.le_of_lt hM_left
+  refine ⟨K, hK_mem, magConfigS_nonempty_of_le_card_mul (V := V) (N := N) hK_le_card,
+    K - M, ?_, saturatedFerromagnetCasimirEigenvalueS V N, ?_, ?_⟩
+  · omega
+  · simpa [K] using hleft M hM_left hμM_lt hv_pos hΦ
+  · intro j hj
+    have hMj_lt_K : M + j < K := by omega
+    convert
+      saturatedFerromagnetCasimirEigenvalueS_ne_lowering_kernel_value_of_lt_card_mul
+        (V := V) N (M + j) (Nat.lt_of_lt_of_le hMj_lt_K hK_le_card) using 1
+    · norm_num [Nat.cast_add]
+      ring
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right Casimir full reach from saturated
+Casimir**: the right saturated-Casimir source callback supplies the existing
+iterated-ladder Casimir full-reach callback by choosing the right endpoint as
+target and using the saturated endpoint-mismatch arithmetic for every
+intermediate raising step. -/
+theorem tasaki23OutsideGroundRightIteratedLadderCasimirFullReachCallback_of_saturated_casimir_source
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hright :
+      tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c) :
+    tasaki23OutsideGroundRightIteratedLadderCasimirFullReachCallback (V := V) A J N c := by
+  intro M _ hM_right μM v hμM_lt hv_pos hΦ
+  let K :=
+    max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+      (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+      N
+  have hK_mem : K ∈ tasaki23GroundStateSectors (V := V) A N := by
+    simpa [K] using tasaki23GroundStateSectors_right_mem (V := V) A N
+  have hK_le_card : K ≤ Fintype.card V * N :=
+    tasaki23GroundStateSectors_le_card_mul (V := V) A N hK_mem
+  obtain ⟨τ⟩ := (inferInstance : Nonempty (magConfigS V N M))
+  have hM_le_card : M ≤ Fintype.card V * N := by
+    simpa [τ.2] using magSumS_le (Λ := V) (N := N) τ.1
+  refine ⟨K, hK_mem, magConfigS_nonempty_of_le_card_mul (V := V) (N := N) hK_le_card,
+    M - K, ?_, saturatedFerromagnetCasimirEigenvalueS V N, ?_, ?_⟩
+  · omega
+  · simpa [K] using hright M hM_right hμM_lt hv_pos hΦ
+  · intro j hj
+    have hK_lt_M_sub_j : K < M - j := by omega
+    have hM_sub_j_pos : 0 < M - j := by omega
+    have hM_sub_j_le : M - j ≤ Fintype.card V * N := by omega
+    exact fun hEq => by
+      apply
+        saturatedFerromagnetCasimirEigenvalueS_ne_raising_kernel_value_of_pos_of_le_card_mul
+          (V := V) N (M - j) hM_sub_j_pos hM_sub_j_le
+      convert hEq using 1
+      · norm_num [Nat.cast_sub (show j ≤ M by omega)]
+        ring
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left outside-sector admissible-reach
@@ -735,6 +901,31 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_iterated_ladder_casimi
     (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
     (tasaki23OutsideGroundAdmissibleFullReachCallback_of_iterated_ladder_casimir_callbacks
       (V := V) A (J := J) N c hleft hright)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from saturated
+Casimir sources**: left and right saturated total-Casimir source callbacks
+first supply the iterated-ladder Casimir full-reach callbacks, and the
+existing full-reach bridge then supplies the outside-sector lower family. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_casimir_sources
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleft :
+      tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback (V := V) A J N c)
+    (hright :
+      tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_iterated_ladder_casimir_full_reach
+    (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftIteratedLadderCasimirFullReachCallback_of_saturated_casimir_source
+      (V := V) A (J := J) N c hleft)
+    (tasaki23OutsideGroundRightIteratedLadderCasimirFullReachCallback_of_saturated_casimir_source
+      (V := V) A (J := J) N c hright)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-ground family from side admissible
