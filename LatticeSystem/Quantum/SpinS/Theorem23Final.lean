@@ -759,6 +759,227 @@ abbrev tasaki_2_5_theorem_2_3_of_saturated_joint_references_named_callbacks
       hc_strict h_intermediate hleft_ref hright_ref)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated Casimir
+sources**: the public named final boundary can consume left and right
+saturated total-Casimir source callbacks directly.  These callbacks supply
+the outside-sector lower-family callback through the saturated-Casimir
+outside-ground bridge. -/
+abbrev tasaki_2_5_theorem_2_3_of_saturated_casimir_sources_named_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleftCas :
+      tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback (V := V) A J N c)
+    (hrightCas :
+      tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_casimir_sources
+      (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hleftCas hrightCas)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated
+ladder-span sources**: source callbacks in the saturated total-spin ladder
+span first become saturated-Casimir source callbacks, then feed the uniform
+named final boundary through the saturated-Casimir outside-ground bridge. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_saturated_ladder_span_sources_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleftSpan :
+      tasaki23OutsideGroundLeftSaturatedLadderSpanSourceCallback (V := V) A J N c)
+    (hrightSpan :
+      tasaki23OutsideGroundRightSaturatedLadderSpanSourceCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_saturated_casimir_sources_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback_of_ladder_span_source
+      A (J := J) N c hleftSpan)
+    (tasaki23OutsideGroundRightSaturatedCasimirSourceCallback_of_ladder_span_source
+      A (J := J) N c hrightSpan)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated eigen
+sources**: saturated-Heisenberg source callbacks together with
+saturated-Casimir source callbacks assemble saturated joint source-vector
+callbacks, which then supply the uniform named final theorem. -/
+abbrev tasaki_2_5_theorem_2_3_of_saturated_eigen_sources_named_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleftH :
+      tasaki23OutsideGroundLeftSaturatedHeisenbergSourceCallback (V := V) A J N c)
+    (hrightH :
+      tasaki23OutsideGroundRightSaturatedHeisenbergSourceCallback (V := V) A J N c)
+    (hleftCas :
+      tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback (V := V) A J N c)
+    (hrightCas :
+      tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_saturated_joint_sources_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftSaturatedJointSourceCallback_of_saturated_eigen_sources
+      A (J := J) N c hleftH hleftCas)
+    (tasaki23OutsideGroundRightSaturatedJointSourceCallback_of_saturated_eigen_sources
+      A (J := J) N c hrightH hrightCas)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated source
+energies**: scalar source-energy identifications supply the saturated
+Heisenberg source callbacks.  Together with saturated-Casimir source
+callbacks, they route the uniform named theorem through the saturated joint
+source-vector API. -/
+abbrev tasaki_2_5_theorem_2_3_of_saturated_source_energy_named_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleftEnergy :
+      tasaki23OutsideGroundLeftSaturatedEnergySourceCallback (V := V) A J N c)
+    (hrightEnergy :
+      tasaki23OutsideGroundRightSaturatedEnergySourceCallback (V := V) A J N c)
+    (hleftCas :
+      tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback (V := V) A J N c)
+    (hrightCas :
+      tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_saturated_eigen_sources_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftSaturatedHeisenbergSourceCallback_of_saturated_energy_source
+      A (J := J) N c hleftEnergy)
+    (tasaki23OutsideGroundRightSaturatedHeisenbergSourceCallback_of_saturated_energy_source
+      A (J := J) N c hrightEnergy)
+    hleftCas hrightCas
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated
+joint-source extraction**: saturated joint source-vector callbacks already
+carry the scalar saturated source-energy and saturated-Casimir source
+callbacks.  This uniform boundary records that extraction route before
+reusing the saturated source-energy named-callback boundary. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_saturated_joint_sources_extract_source_eigen_callbacks_named_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleftJoint :
+      tasaki23OutsideGroundLeftSaturatedJointSourceCallback (V := V) A J N c)
+    (hrightJoint :
+      tasaki23OutsideGroundRightSaturatedJointSourceCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_saturated_source_energy_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftSaturatedEnergySourceCallback_of_saturated_joint_source
+      A (J := J) N c hleftJoint)
+    (tasaki23OutsideGroundRightSaturatedEnergySourceCallback_of_saturated_joint_source
+      A (J := J) N c hrightJoint)
+    (tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback_of_saturated_joint_source
+      A (J := J) N c hleftJoint)
+    (tasaki23OutsideGroundRightSaturatedCasimirSourceCallback_of_saturated_joint_source
+      A (J := J) N c hrightJoint)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated
+joint-reference extraction**: sectorwise saturated joint references first
+produce saturated joint source-vector callbacks by Marshall-positive
+eigenvalue/eigenvector uniqueness.  The resulting source callbacks then feed
+the uniform saturated source-eigen extraction route. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_saturated_joint_references_extract_source_eigen_callbacks_named_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedJointReferenceCallback (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedJointReferenceCallback (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_saturated_joint_sources_extract_source_eigen_callbacks_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftSaturatedJointSourceCallback_of_saturated_joint_reference
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedJointSourceCallback_of_saturated_joint_reference
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hright_ref)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback final
 boundary**: this public boundary avoids the uniform source-sector
 predicted-GS callback when only the current outside-ground route is
