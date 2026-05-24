@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundPredecessorLowerable
-import LatticeSystem.Quantum.SpinS.Theorem23PredictedSourceWeight
+import LatticeSystem.Quantum.SpinS.Theorem23PredictedSourceWeightCross
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficientRaisingSource
 
 /-!

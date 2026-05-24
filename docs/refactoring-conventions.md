@@ -337,6 +337,21 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3538)**: Refactored the Tasaki §2.5 Theorem 2.3
+  predicted source-weight API after the re-embedded cross-ladder source-weight
+  identities became a stable suffix (was the heaviest remaining §2.5 module at
+  ~17s). `Theorem23PredictedSourceWeight.lean` now keeps the `Ŝ^3`
+  source-weight building blocks (172 lines), while
+  `Theorem23PredictedSourceWeightCross.lean` contains the four re-embedded
+  cross-ladder source-weight identities at a lowering predecessor (278 lines).
+  The new module imports the parent. The `private`
+  `magSumS_single_site_lowering_predecessor` helper is duplicated into the new
+  module (same per-module private-copy pattern). Consumers of the moved
+  identities (`Theorem23OutsideGroundPredecessorRaising`, `Theorem23Interval`,
+  `Theorem23OutsideGroundPredecessor`) switch their import to the new module;
+  the `Ŝ^3` building-block consumers
+  (`Theorem23OutsideGroundCrossLadderReembedded` and its Unpacked) keep
+  importing the parent.
 - **2026-05-24 (PR #3537)**: Refactored the Tasaki §2.5 Theorem 2.3 final
   lowered-site-sum API after the left-endpoint threaded wrapper and the
   named-callback abbrevs became a stable suffix.
