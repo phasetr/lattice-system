@@ -9133,6 +9133,22 @@ sector-minimality callback no longer appears at this boundary; the
 remaining visible mathematical inputs are the explicit lowerable local
 dominance and the outside-sector ground-energy lower family.
 
+The predecessor-difference callback now also feeds this
+explicit-lowerable outside-sector route.  Lean records
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_via\_explicit\_lowerable}\\
+\texttt{\_of\_outside\_sector\_ground\_energy\_lower\_bound}.
+\end{gathered}
+\]
+It converts the predecessor positive-difference callback to the attached
+explicit lowerable coefficient dominance callback before invoking the
+outside-sector ground-energy wrapper above.
+
 Lean also records the same endpoint under the public boundary name
 \[
 \begin{gathered}
@@ -9651,6 +9667,17 @@ callback form
 passes this conversion pointwise for every successor configuration.
 This is the form that matches the real predecessor source-weight
 identity before the remaining sign estimate is discharged.
+Composing this bridge with the lowerable coefficient mirror also gives
+\[
+\begin{gathered}
+\texttt{tasaki23\_lowerable\_positive\_source\_attach\_sum\_lt}\\
+\texttt{\_of\_offA\_sub\_onA\_pos}
+\end{gathered}
+\]
+and its callback form.  Hence a positive off-\(A\) minus on-\(A\)
+predecessor raising-source difference supplies the same strict dominance
+of attached explicit lowerable positive-source coefficient sums that the
+explicit-lowerable boundary expects.
 Lean also identifies the boundary-sum version of this difference with
 the actual full lowering component:
 \[

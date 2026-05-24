@@ -323,4 +323,104 @@ theorem tasaki23_raising_predecessor_source_sum_lt_callback_of_offA_sub_onA_pos
     tasaki23_raising_predecessor_source_sum_lt_of_offA_sub_onA_pos
       (V := V) (N := N) A v τ (hdiff τ)
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowerable coefficient dominance from
+positive predecessor differences**: positivity of the off-`A` minus
+on-`A` predecessor raising-source attached sums implies strict
+dominance of the matching explicit lowerable positive-source coefficient
+sums.
+
+This composes the difference-form dominance bridge with the lowerable
+coefficient mirror, so the explicit lowerable callback can consume the
+same local comparison shape as the predecessor-difference boundary. -/
+theorem tasaki23_lowerable_positive_source_attach_sum_lt_of_offA_sub_onA_pos
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
+    (τ : magConfigS V N (M + 1))
+    (hdiff :
+      0 <
+        (((Finset.univ.filter (fun x : V => A x = false)).filter
+            (fun x : V => 0 < (τ.1 x).val)).attach.sum
+          (fun x =>
+            let predVal : Fin (N + 1) :=
+              ⟨(τ.1 x.1).val - 1, by omega⟩
+            let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+            (spinSOpPlus N predVal (τ.1 x.1)).re *
+              v ⟨pred,
+                magSumS_single_site_lowering_predecessor
+                  τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) -
+          (((Finset.univ.filter (fun x : V => A x = true)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              let predVal : Fin (N + 1) :=
+                ⟨(τ.1 x.1).val - 1, by omega⟩
+              let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+              (spinSOpPlus N predVal (τ.1 x.1)).re *
+                v ⟨pred,
+                  magSumS_single_site_lowering_predecessor
+                    τ x.1 ((Finset.mem_filter.mp x.2).2)⟩))) :
+    (((Finset.univ.filter (fun x : V => A x = true)).filter
+          (fun x : V => 0 < (τ.1 x).val)).attach.sum
+        (fun x =>
+          tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+            v τ x.1 ((Finset.mem_filter.mp x.2).2))) <
+      (((Finset.univ.filter (fun x : V => A x = false)).filter
+          (fun x : V => 0 < (τ.1 x).val)).attach.sum
+        (fun x =>
+          tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+            v τ x.1 ((Finset.mem_filter.mp x.2).2))) := by
+  exact
+    tasaki23_lowerable_positive_source_attach_sum_lt_of_raising_predecessor_source_sum_lt
+      (V := V) (N := N) A v τ
+      (tasaki23_raising_predecessor_source_sum_lt_of_offA_sub_onA_pos
+        (V := V) (N := N) A v τ hdiff)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 lowerable coefficient dominance callback
+from positive predecessor differences**: a pointwise off-`A` minus
+on-`A` predecessor raising-source positive-difference callback supplies
+the explicit lowerable positive-source coefficient dominance callback.
+
+This is the quantified form of
+`tasaki23_lowerable_positive_source_attach_sum_lt_of_offA_sub_onA_pos`. -/
+theorem tasaki23_lowerable_positive_source_attach_sum_lt_callback_of_offA_sub_onA_pos
+    {M : ℕ} (A : V → Bool) (v : magConfigS V N M → ℝ)
+    (hdiff :
+      ∀ τ : magConfigS V N (M + 1),
+        0 <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              let predVal : Fin (N + 1) :=
+                ⟨(τ.1 x.1).val - 1, by omega⟩
+              let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+              (spinSOpPlus N predVal (τ.1 x.1)).re *
+                v ⟨pred,
+                  magSumS_single_site_lowering_predecessor
+                    τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) -
+            (((Finset.univ.filter (fun x : V => A x = true)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                let predVal : Fin (N + 1) :=
+                  ⟨(τ.1 x.1).val - 1, by omega⟩
+                let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+                (spinSOpPlus N predVal (τ.1 x.1)).re *
+                  v ⟨pred,
+                    magSumS_single_site_lowering_predecessor
+                      τ x.1 ((Finset.mem_filter.mp x.2).2)⟩))) :
+    ∀ τ : magConfigS V N (M + 1),
+      (((Finset.univ.filter (fun x : V => A x = true)).filter
+            (fun x : V => 0 < (τ.1 x).val)).attach.sum
+          (fun x =>
+            tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+              v τ x.1 ((Finset.mem_filter.mp x.2).2))) <
+        (((Finset.univ.filter (fun x : V => A x = false)).filter
+            (fun x : V => 0 < (τ.1 x).val)).attach.sum
+          (fun x =>
+            tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+              v τ x.1 ((Finset.mem_filter.mp x.2).2))) := by
+  intro τ
+  exact
+    tasaki23_lowerable_positive_source_attach_sum_lt_of_offA_sub_onA_pos
+      (V := V) (N := N) A v τ (hdiff τ)
+
 end LatticeSystem.Quantum
