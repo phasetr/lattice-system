@@ -9441,6 +9441,29 @@ boundaries:
 Thus the reference-vector API can now be used directly at both public
 named-callback final boundaries, not only at the intermediate saturated
 joint source-vector callback.
+The same reference-vector API is also exposed at the discharged
+predecessor-difference final boundary by
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_saturated\_joint\_references}\\
+\texttt{\_discharge\_nonempty},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_saturated\_joint\_references}\\
+\texttt{\_extract\_source\_eigen\_callbacks}\\
+\texttt{\_discharge\_nonempty}.
+\end{gathered}
+\]
+Both wrappers first turn the saturated joint references into saturated joint
+source-vector callbacks.  The direct wrapper then reuses the saturated
+joint-source final boundary, while the extracted wrapper reuses the route
+through the scalar source-energy and saturated-Casimir extraction layer.
 The outside reach task is also split into its
 two endpoint directions by
 \[
