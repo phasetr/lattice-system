@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23SectorExistenceInterval
+import LatticeSystem.Quantum.SpinS.Theorem23Sectors
 import LatticeSystem.Quantum.SpinS.Theorem23IntervalCasimirMinimality
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
@@ -91,6 +92,82 @@ def tasaki23OutsideGroundAdmissibleReachCallback
           Φ ≠ 0 ∧
           (heisenbergHamiltonianSMatrixOnMagSector J N K).mulVec Φ =
             (μM : ℂ) • Φ
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left outside-sector admissible-reach
+callback**: for an outside-sector Marshall-positive representative below
+the left endpoint of `tasaki23GroundStateSectors A N`, the lowering ladder
+direction reaches a nonzero eigenvector at the same eigenvalue in some
+admissible sector. -/
+def tasaki23OutsideGroundLeftAdmissibleReachCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    M <
+        min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+          (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+          N →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      ∃ K : ℕ,
+        K ∈ tasaki23GroundStateSectors (V := V) A N ∧
+        Nonempty (magConfigS V N K) ∧
+        ∃ Φ : magConfigS V N K → ℂ,
+          Φ ≠ 0 ∧
+          (heisenbergHamiltonianSMatrixOnMagSector J N K).mulVec Φ =
+            (μM : ℂ) • Φ
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right outside-sector admissible-reach
+callback**: for an outside-sector Marshall-positive representative above
+the right endpoint of `tasaki23GroundStateSectors A N`, the raising ladder
+direction reaches a nonzero eigenvector at the same eigenvalue in some
+admissible sector. -/
+def tasaki23OutsideGroundRightAdmissibleReachCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+        N < M →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      ∃ K : ℕ,
+        K ∈ tasaki23GroundStateSectors (V := V) A N ∧
+        Nonempty (magConfigS V N K) ∧
+        ∃ Φ : magConfigS V N K → ℂ,
+          Φ ≠ 0 ∧
+          (heisenbergHamiltonianSMatrixOnMagSector J N K).mulVec Φ =
+            (μM : ℂ) • Φ
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-sector admissible reach from side
+callbacks**: the full outside-sector reach callback follows by splitting an
+outside magnetization sector into the left-of-interval and right-of-interval
+cases, then applying the corresponding directional ladder-reach callback. -/
+theorem tasaki23OutsideGroundAdmissibleReachCallback_of_side_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hleft :
+      tasaki23OutsideGroundLeftAdmissibleReachCallback (V := V) A J N c)
+    (hright :
+      tasaki23OutsideGroundRightAdmissibleReachCallback (V := V) A J N c) :
+    tasaki23OutsideGroundAdmissibleReachCallback (V := V) A J N c := by
+  intro M _ hM_out μM v hμM_lt hv_pos hΦ
+  rcases
+      (tasaki23GroundStateSectors_not_mem_iff_lt_left_or_right_lt
+        (V := V) A N M).mp hM_out with hM_left | hM_right
+  · exact hleft M hM_left hμM_lt hv_pos hΦ
+  · exact hright M hM_right hμM_lt hv_pos hΦ
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-sector lower family from sector

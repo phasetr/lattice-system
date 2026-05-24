@@ -9010,7 +9010,23 @@ the real-sector lower bound on admissible sectors.  The reached complex
 eigenvector is converted to that real-form statement by taking its real
 part, or, if the real part vanishes, by taking its nonzero imaginary
 part.  This proves \(\mu\le\mu_M\) and hence the same outside-ground
-lower-family callback.  The final named predecessor-difference
+lower-family callback.  The outside reach task is then split into its
+two endpoint directions by
+\[
+\begin{gathered}
+\texttt{tasaki23GroundStateSectors\_not\_mem\_iff\_lt\_left\_or\_right\_lt},\\
+\texttt{tasaki23OutsideGroundLeftAdmissibleReachCallback},\\
+\texttt{tasaki23OutsideGroundRightAdmissibleReachCallback},\\
+\texttt{tasaki23OutsideGroundAdmissibleReachCallback\_of\_side\_callbacks}.
+\end{gathered}
+\]
+The first statement is the arithmetic fact that a sector outside the
+closed interval
+\([\min(|A|,|\neg A|)N,\max(|A|,|\neg A|)N]\) is either strictly left of
+the interval or strictly right of it.  The two side callbacks then name
+the corresponding lowering and raising ladder-reach tasks, and the
+composition wrapper recovers the full outside admissible-reach callback
+by case splitting on that arithmetic alternative.  The final named predecessor-difference
 boundaries
 \[
 \begin{gathered}
