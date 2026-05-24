@@ -123,6 +123,36 @@ theorem tasaki23GroundStateSectors_mem_iff (A : V → Bool) (N M : ℕ) :
   simp [tasaki23GroundStateSectors]
 
 omit [DecidableEq V] in
+/-- **Tasaki §2.5 Theorem 2.3 outside-sector side split**:
+a magnetization sector lies outside `tasaki23GroundStateSectors A N`
+exactly when it is strictly below the left endpoint or strictly above the
+right endpoint.  This is the arithmetic split used before applying the
+lowering or raising ladder direction to an outside-sector representative. -/
+theorem tasaki23GroundStateSectors_not_mem_iff_lt_left_or_right_lt
+    (A : V → Bool) (N M : ℕ) :
+    M ∉ tasaki23GroundStateSectors (V := V) A N ↔
+      M <
+          min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+            N ∨
+        max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+            N < M := by
+  let left :=
+    min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+      (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+      N
+  let right :=
+    max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+      (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+      N
+  have hleft_le_right : left ≤ right := by
+    exact Nat.mul_le_mul_right N min_le_max
+  rw [tasaki23GroundStateSectors_mem_iff]
+  change ¬ (left ≤ M ∧ M ≤ right) ↔ M < left ∨ right < M
+  omega
+
+omit [DecidableEq V] in
 /-- **Tasaki §2.5 Theorem 2.3 left endpoint sector**:
 the lower endpoint `min(|A|, |¬A|)·N` belongs to the admissible
 sector interval. -/
