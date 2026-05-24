@@ -9659,6 +9659,54 @@ with the saturated ladder-iterate reference route yields
 This is still a Tasaki §2.5 Theorem~2.3 boundary (Tasaki, Springer 2020,
 §2.5 Theorem~2.3, p.~42): it isolates the remaining task as a concrete
 strict-positivity formula for the sector total-spin ladder iterate.
+Lean then exposes that formula as a pointwise sector-coefficient boundary.
+The callbacks
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedLadderIterate}\\
+\texttt{MarshallPositiveCoefficientCallback},\\
+\texttt{tasaki23OutsideGroundRightSaturatedLadderIterate}\\
+\texttt{MarshallPositiveCoefficientCallback}
+\end{gathered}
+\]
+require, for every sector configuration \(\tau\),
+\[
+\texttt{ladderIterateUp}\ V\ N\ \langle M,\_\rangle\ \tau.1
+=
+((\texttt{marshallSignS}\ A\ \tau.1).\texttt{re})\,w(\tau),
+\qquad w(\tau)>0.
+\]
+The full-vector equality follows because the ladder iterate belongs to the
+magnetization subspace with label
+\((|V|N/2)-M\):
+\[
+\texttt{totalSpinSOpMinus\_pow\_allAlignedStateS\_zero\_mem\_magSubspaceS}.
+\]
+Using the zero-extension inverse
+\[
+\texttt{magSectorEmbedding\_magSectorRestriction\_of\_mem\_magSubspaceS},
+\]
+Lean proves
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedLadderIterate}\\
+\texttt{MarshallPositiveReferenceCallback}\\
+\texttt{\_of\_marshall\_positive\_coefficients},\\
+\texttt{tasaki23OutsideGroundRightSaturatedLadderIterate}\\
+\texttt{MarshallPositiveReferenceCallback}\\
+\texttt{\_of\_marshall\_positive\_coefficients}.
+\end{gathered}
+\]
+Composing once more with the reference route gives
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_saturated\_ladder\_iterate}\\
+\texttt{\_marshall\_positive\_coefficients}.
+\end{gathered}
+\]
+Thus the remaining positivity task is now purely coefficient-wise on the
+sector restriction of the unnormalised total-spin ladder iterate.
 The left-endpoint named boundary also has the extracted reference-vector
 form
 \[

@@ -780,6 +780,110 @@ def tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCal
         ladderIterateUp V N ⟨M, hM_range⟩
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated-ladder-iterate
+Marshall-positive coefficient callback**: left-side coordinate-level
+reference callback asserting that every sector coefficient of
+`ladderIterateUp V N ⟨M, _⟩` is the corresponding Marshall sign times a
+strictly positive real weight.  The magnetization-subspace support of the
+ladder iterate then upgrades this pointwise sector equality to the full
+zero-extended reference-vector equality. -/
+def tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    M <
+        min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+          (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+          N →
+    ∃ (hM_range : M < Fintype.card V * N + 1) (μsat : ℝ)
+        (w : magConfigS V N M → ℝ),
+      (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N ∧
+      (∀ τ, 0 < w τ) ∧
+      ∀ τ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, hM_range⟩ τ.1 =
+          (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated-ladder-iterate
+Marshall-positive coefficient callback**: right-side analogue of
+`tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback`. -/
+def tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+        N < M →
+    ∃ (hM_range : M < Fintype.card V * N + 1) (μsat : ℝ)
+        (w : magConfigS V N M → ℝ),
+      (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N ∧
+      (∀ τ, 0 < w τ) ∧
+      ∀ τ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, hM_range⟩ τ.1 =
+          (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left Marshall-positive reference from
+Marshall-positive coefficients**: pointwise sector coefficients of the
+ladder iterate determine the zero-extended sector embedding because the
+iterate lies in the corresponding magnetization subspace. -/
+theorem tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback_of_marshall_positive_coefficients
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hleft :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback
+        (V := V) A J N) :
+    tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback
+        (V := V) A J N := by
+  intro M _ hM_left
+  obtain ⟨hM_range, μsat, w, hμsat, hw_pos, hcoeff⟩ := hleft M hM_left
+  refine ⟨hM_range, μsat, w, hμsat, hw_pos, ?_⟩
+  let Ψ : (V → Fin (N + 1)) → ℂ := ladderIterateUp V N ⟨M, hM_range⟩
+  have hΨ_mem :
+      Ψ ∈ magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) := by
+    change ladderIterateUp V N ⟨M, hM_range⟩ ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ))
+    unfold ladderIterateUp
+    exact totalSpinSOpMinus_pow_allAlignedStateS_zero_mem_magSubspaceS (V := V) (N := N) M
+  have hsector :
+      (fun τ : magConfigS V N M =>
+        (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ)) =
+        magSectorRestriction (M := M) Ψ := by
+    funext τ
+    exact (hcoeff τ).symm
+  rw [hsector]
+  exact magSectorEmbedding_magSectorRestriction_of_mem_magSubspaceS
+    (V := V) (N := N) (M := M) hΨ_mem
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right Marshall-positive reference from
+Marshall-positive coefficients**: right-side analogue of
+`tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback_of_marshall_positive_coefficients`. -/
+theorem tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback_of_marshall_positive_coefficients
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hright :
+      tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback
+        (V := V) A J N) :
+    tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback
+        (V := V) A J N := by
+  intro M _ hM_right
+  obtain ⟨hM_range, μsat, w, hμsat, hw_pos, hcoeff⟩ := hright M hM_right
+  refine ⟨hM_range, μsat, w, hμsat, hw_pos, ?_⟩
+  let Ψ : (V → Fin (N + 1)) → ℂ := ladderIterateUp V N ⟨M, hM_range⟩
+  have hΨ_mem :
+      Ψ ∈ magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) := by
+    change ladderIterateUp V N ⟨M, hM_range⟩ ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ))
+    unfold ladderIterateUp
+    exact totalSpinSOpMinus_pow_allAlignedStateS_zero_mem_magSubspaceS (V := V) (N := N) M
+  have hsector :
+      (fun τ : magConfigS V N M =>
+        (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ)) =
+        magSectorRestriction (M := M) Ψ := by
+    funext τ
+    exact (hcoeff τ).symm
+  rw [hsector]
+  exact magSectorEmbedding_magSectorRestriction_of_mem_magSubspaceS
+    (V := V) (N := N) (M := M) hΨ_mem
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left singleton-span iterate reference from a
 Marshall-positive ladder iterate equality**: equality with the sector
 `ladderIterateUp` vector places the reference embedding in its singleton
@@ -2066,6 +2170,38 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_itera
     (tasaki23OutsideGroundLeftSaturatedLadderIterateReferenceCallback_of_marshall_positive_reference
       (V := V) A (J := J) N hleft_ref)
     (tasaki23OutsideGroundRightSaturatedLadderIterateReferenceCallback_of_marshall_positive_reference
+      (V := V) A (J := J) N hright_ref)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from saturated
+ladder-iterate Marshall-positive coefficients**: pointwise Marshall-positive
+sector coefficients first supply full zero-extended Marshall-positive
+reference callbacks, and the existing equality-reference route then supplies
+the outside-sector lower family. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_marshall_positive_coefficients
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback
+        (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback
+        (V := V) A J N) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_marshall_positive_references
+    (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+    hc_strict h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback_of_marshall_positive_coefficients
+      (V := V) A (J := J) N hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback_of_marshall_positive_coefficients
       (V := V) A (J := J) N hright_ref)
 
 set_option linter.style.longLine false in
