@@ -9348,6 +9348,17 @@ their saturated total-Casimir source components, then reuses
 \(\texttt{\_of\_saturated\_casimir\_sources}\).  Thus the joint
 source-vector API now supplies the outside-sector lower-family callback
 directly, not only the final theorem boundary.
+The public named-callback final theorem also consumes this bridge through
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_saturated\_joint\_sources}\\
+\texttt{\_named\_callbacks}.
+\end{gathered}
+\]
+It keeps the common-energy side in the existing source predicted-GS and
+predecessor-difference callbacks, while the outside-sector input is supplied
+directly by the left and right saturated joint source-vector callbacks.
 The outside reach task is also split into its
 two endpoint directions by
 \[
