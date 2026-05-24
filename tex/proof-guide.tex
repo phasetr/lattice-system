@@ -8993,7 +8993,22 @@ This bridge converts a sector-minimality callback into the
 Marshall-positive outside-sector representative is restricted to its
 magnetization sector, non-zeroness follows from positivity and
 \((\operatorname{Re}\mathrm{MarshallSign})^2=1\), and sector minimality
-then gives the required \(\mu\le\mu_M\).  These public final-boundary aliases now
+then gives the required \(\mu\le\mu_M\).  The final named predecessor-difference
+boundaries
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_predecessor\_difference}\\
+\texttt{\_named\_callbacks},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint}\\
+\texttt{\_predecessor\_difference\_named\_callbacks}
+\end{gathered}
+\]
+use this bridge to replace the outside-ground lower-family hypothesis by
+\texttt{tasaki23SectorMinimalityCallback}, leaving only predicted-GS
+membership and the predecessor-difference local comparison as the other
+named inputs; they live in
+\(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Final}\).  The lowered-site-sum
+public final-boundary aliases now
 live in the Lean module
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23FinalLoweredSiteSumLeft}\)
 (split from
