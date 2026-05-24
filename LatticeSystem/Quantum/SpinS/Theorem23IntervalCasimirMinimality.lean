@@ -130,6 +130,48 @@ def tasaki23CommonEnergyChain
           (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 common-energy chain from predecessor
+difference positivity**: the left-endpoint predicted-GS input together
+with the fully threaded predecessor-difference callback produces the
+named common-energy chain used by the outside-sector final wrapper.
+
+This packages the existing interval-chain route and forgets the extra
+predicted toy ground-state membership carried by
+`tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos`. -/
+theorem
+    tasaki23_common_energy_chain_of_left_endpoint_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c) :
+    ∃ μ : ℝ, tasaki23CommonEnergyChain (V := V) A J N c μ := by
+  obtain ⟨μ, hchain_pred⟩ :=
+    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hBA hsector_nonempty hleft_predictedGS
+      hpredecessor_difference
+  refine ⟨μ, ?_⟩
+  intro M hM
+  obtain ⟨v, hμ_lt, hv_pos, hΦ, _hpredictedGS⟩ := hchain_pred M hM
+  exact ⟨v, hμ_lt, hv_pos, hΦ⟩
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 sector-minimality callback**:
 after the common-energy chain has selected `μ`, this callback states that
 `μ` is a lower bound for every nonzero complex eigenvector in every
