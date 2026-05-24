@@ -9512,8 +9512,38 @@ Composing with the joint-reference route gives
 \texttt{\_named\_callbacks}.
 \end{gathered}
 \]
-This pushes the remaining reference construction toward explicit
-total-spin ladder vectors rather than abstract joint-eigenspace membership.
+The same ladder-reference inputs are also exposed at the discharged and
+source-eigen extraction final boundaries:
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_saturated\_ladder\_references}\\
+\texttt{\_discharge\_nonempty},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_saturated\_ladder\_references}\\
+\texttt{\_extract\_source\_eigen\_callbacks}\\
+\texttt{\_discharge\_nonempty},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_saturated\_ladder\_references}\\
+\texttt{\_extract\_source\_eigen\_callbacks}\\
+\texttt{\_named\_callbacks},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint}\\
+\texttt{\_saturated\_ladder\_references}\\
+\texttt{\_extract\_source\_eigen\_callbacks}\\
+\texttt{\_named\_callbacks}.
+\end{gathered}
+\]
+These wrappers first convert ladder references to saturated joint references
+and then reuse the corresponding saturated joint-reference final boundary.
+This pushes the remaining reference construction toward explicit total-spin
+ladder vectors rather than abstract joint-eigenspace membership.
 Lean also records the sectorwise singleton-ladder version of this input.
 The callbacks
 \[
