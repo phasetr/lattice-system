@@ -1287,6 +1287,68 @@ theorem tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficie
         (V := V) (N := N) A w τ (hdominates M hM_succ w hcoeff τ))
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated-ladder-iterate coefficient
+callback from successor dominance with real couplings**: real couplings
+provide the saturated-ferromagnet energy as a real scalar, so the left
+coefficient callback no longer needs a separate `hμsat` input. -/
+theorem
+    tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance_of_real_couplings
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (∑ x ∈ ((Finset.univ.filter (fun x : V => A x = true)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) <
+          ∑ x ∈ ((Finset.univ.filter (fun x : V => A x = false)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) :
+    tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback
+      (V := V) A J N :=
+  tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance
+    (V := V) A (J := J) N
+    (saturatedFerromagnetEigenvalueS_exists_real (V := V) (N := N) J hJ_real)
+    hdominates
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated-ladder-iterate coefficient
+callback from explicit lowerable dominance with real couplings**: real
+couplings discharge the saturated-energy real-scalar input for the left
+lowerable attach-sum dominance boundary. -/
+theorem
+    tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance_of_real_couplings
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (((Finset.univ.filter (fun x : V => A x = true)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                w τ x.1 ((Finset.mem_filter.mp x.2).2))) <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                  w τ x.1 ((Finset.mem_filter.mp x.2).2)))) :
+    tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback
+      (V := V) A J N :=
+  tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance
+    (V := V) A (J := J) N
+    (saturatedFerromagnetEigenvalueS_exists_real (V := V) (N := N) J hJ_real)
+    hdominates
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 right saturated-ladder-iterate coefficient
 callback from successor dominance**: right-side analogue of
 `tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance`.
@@ -1355,6 +1417,68 @@ theorem tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoeffici
     (fun M hM_succ w hcoeff τ =>
       tasaki23_positive_source_lowerable_coefficient_lt_of_attach_sum_lt
         (V := V) (N := N) A w τ (hdominates M hM_succ w hcoeff τ))
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated-ladder-iterate coefficient
+callback from successor dominance with real couplings**: right-side analogue
+of
+`tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance_of_real_couplings`. -/
+theorem
+    tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance_of_real_couplings
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (∑ x ∈ ((Finset.univ.filter (fun x : V => A x = true)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) <
+          ∑ x ∈ ((Finset.univ.filter (fun x : V => A x = false)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) :
+    tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback
+      (V := V) A J N :=
+  tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance
+    (V := V) A (J := J) N
+    (saturatedFerromagnetEigenvalueS_exists_real (V := V) (N := N) J hJ_real)
+    hdominates
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated-ladder-iterate coefficient
+callback from explicit lowerable dominance with real couplings**: right-side
+analogue of
+`tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance_of_real_couplings`. -/
+theorem
+    tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance_of_real_couplings
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (((Finset.univ.filter (fun x : V => A x = true)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                w τ x.1 ((Finset.mem_filter.mp x.2).2))) <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                  w τ x.1 ((Finset.mem_filter.mp x.2).2)))) :
+    tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback
+      (V := V) A J N :=
+  tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance
+    (V := V) A (J := J) N
+    (saturatedFerromagnetEigenvalueS_exists_real (V := V) (N := N) J hJ_real)
+    hdominates
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left singleton-span iterate reference from a
@@ -2720,6 +2844,47 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_itera
       (V := V) A (J := J) N hμsat hdominates)
     (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance
       (V := V) A (J := J) N hμsat hdominates)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from explicit lowerable
+coefficient dominance with real couplings**: real couplings discharge the
+saturated-energy real-scalar input for the lowerable attach-sum outside-ground
+boundary. -/
+theorem
+    tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_lowerable_attach_sum_dominance_of_real_couplings
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (((Finset.univ.filter (fun x : V => A x = true)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                w τ x.1 ((Finset.mem_filter.mp x.2).2))) <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                  w τ x.1 ((Finset.mem_filter.mp x.2).2)))) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_lowerable_attach_sum_dominance
+    (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+    hc_strict h_intermediate
+    (saturatedFerromagnetEigenvalueS_exists_real (V := V) (N := N) J hJ_real)
+    hdominates
 
 set_option linter.style.longLine false in
 /-- **Saturated ladder-iterate predecessor-difference positivity callback**:

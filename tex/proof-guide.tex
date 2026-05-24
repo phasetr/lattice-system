@@ -9847,7 +9847,13 @@ successor induction.  The left and right coefficient callbacks have the same
 attached-sum variants, with suffix
 \(\texttt{\_of\_lowerable\_attach\_sum\_dominance}\), so the outside-ground
 boundary no longer needs to mention the boundary-inclusive filtered sum
-directly.  Finally,
+directly.  Their real-coupling variants, with suffix
+\[
+\texttt{\_of\_real\_couplings},
+\]
+use \(\texttt{saturatedFerromagnetEigenvalueS\_exists\_real}\) to discharge
+the saturated-energy real-scalar input at the left and right coefficient
+callback level.  Finally,
 \[
 \begin{gathered}
 \texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
@@ -9859,7 +9865,10 @@ combines the left and right attached-sum coefficient callbacks with the
 existing saturated ladder-iterate coefficient bridge.  Thus, once the
 saturated ferromagnetic energy is represented by a real scalar, the same
 explicit lowerable dominance input supplies the outside-sector lower-energy
-family used by the final Tasaki Theorem~2.3 boundary.  The companion theorem
+family used by the final Tasaki Theorem~2.3 boundary.  The real-coupling
+variant of this lower-family theorem discharges the same saturated-energy
+real-scalar input internally from the realness of the couplings.  The
+companion theorem
 \[
 \begin{gathered}
 \texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
