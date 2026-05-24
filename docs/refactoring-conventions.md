@@ -337,6 +337,17 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-24 (PR #3539)**: Refactored the Tasaki §2.5 Theorem 2.3 adjacent
+  common-energy API after the predecessor (raising-direction) common-energy
+  steps became a stable suffix (was the heaviest remaining §2.5 module at
+  ~18s). `Theorem23.lean` now keeps the adjacent common-energy successor steps
+  (212 lines), while `Theorem23CommonEnergyPredecessor.lean` contains the two
+  predecessor common-energy steps (site-sum / Casimir-non-kernel) (186 lines).
+  The new module imports the parent (the predecessor steps are independent of
+  the successor steps but reuse the same upstream API). Both consumers
+  (`Theorem23Dominance`, `Theorem23PredictedCasimirEnergy`) also use the
+  successor steps, so they switch their `Theorem23` import to the new module
+  (which re-exports the parent transitively).
 - **2026-05-24 (PR #3538)**: Refactored the Tasaki §2.5 Theorem 2.3
   predicted source-weight API after the re-embedded cross-ladder source-weight
   identities became a stable suffix (was the heaviest remaining §2.5 module at
