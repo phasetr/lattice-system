@@ -6,6 +6,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
 import LatticeSystem.Quantum.SpinS.SaturatedLadderCasimirEigenspace
+import LatticeSystem.Quantum.SpinS.SaturatedLadderLoweringInvariant
 import LatticeSystem.Quantum.SpinS.TotalSpinSSquaredMaxEigenspaceEqSpanLadder
 
 /-!
@@ -882,6 +883,74 @@ theorem tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenc
   rw [hsector]
   exact magSectorEmbedding_magSectorRestriction_of_mem_magSubspaceS
     (V := V) (N := N) (M := M) hΨ_mem
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated-ladder-iterate coefficient
+successor site-sum formula**: if the `M`-sector iterate has the
+Marshall-signed coefficient form, then the next iterate is obtained by
+applying `Ŝ^-_tot` to the corresponding zero-extended sector vector and
+expanding that action as a sum of single-site lowering contributions.
+
+This is the recursive coefficient boundary immediately preceding the
+strict-positivity argument for the weights of `ladderIterateUp V N ⟨M+1, _⟩`. -/
+theorem tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientSuccSiteSum
+    (A : V → Bool) (N M : ℕ)
+    (hM_succ : M + 1 < Fintype.card V * N + 1)
+    (w : magConfigS V N M → ℝ)
+    (hcoeff : ∀ τ : magConfigS V N M,
+      ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ τ.1 =
+        (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ)) :
+    ∀ τ : magConfigS V N (M + 1),
+      ladderIterateUp V N ⟨M + 1, hM_succ⟩ τ.1 =
+        ∑ x : V,
+          ((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+            (magSectorEmbedding
+              (fun σ : magConfigS V N M =>
+                (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)))) τ.1 := by
+  intro τ
+  let Ψ : (V → Fin (N + 1)) → ℂ :=
+    ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩
+  have hΨ_mem :
+      Ψ ∈ magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) := by
+    change ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ))
+    unfold ladderIterateUp
+    exact totalSpinSOpMinus_pow_allAlignedStateS_zero_mem_magSubspaceS (V := V) (N := N) M
+  have hsector :
+      (fun σ : magConfigS V N M =>
+        (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) =
+        magSectorRestriction (M := M) Ψ := by
+    funext σ
+    exact (hcoeff σ).symm
+  have hfull :
+      magSectorEmbedding
+          (fun σ : magConfigS V N M =>
+            (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) =
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ := by
+    rw [hsector]
+    exact magSectorEmbedding_magSectorRestriction_of_mem_magSubspaceS
+      (V := V) (N := N) (M := M) hΨ_mem
+  calc
+    ladderIterateUp V N ⟨M + 1, hM_succ⟩ τ.1 =
+        ((totalSpinSOpMinus V N).mulVec
+          (ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩)) τ.1 := by
+      rw [totalSpinSOpMinus_mulVec_ladderIterateUp_interior
+        (V := V) (N := N) ⟨M, Nat.lt_of_succ_lt hM_succ⟩ hM_succ]
+    _ =
+        ((totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun σ : magConfigS V N M =>
+              (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)))) τ.1 := by
+      rw [hfull]
+    _ = ∑ x : V,
+          ((onSiteS x (spinSOpMinus N) : ManyBodyOpS V N).mulVec
+            (magSectorEmbedding
+              (fun σ : magConfigS V N M =>
+                (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)))) τ.1 := by
+      exact totalSpinSOpMinus_mulVec_magSectorEmbedding_apply_eq_site_sum
+        (V := V) (N := N)
+        (fun σ : magConfigS V N M =>
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) τ.1
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left singleton-span iterate reference from a
