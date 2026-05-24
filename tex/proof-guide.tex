@@ -9859,7 +9859,43 @@ combines the left and right attached-sum coefficient callbacks with the
 existing saturated ladder-iterate coefficient bridge.  Thus, once the
 saturated ferromagnetic energy is represented by a real scalar, the same
 explicit lowerable dominance input supplies the outside-sector lower-energy
-family used by the final Tasaki Theorem~2.3 boundary.
+family used by the final Tasaki Theorem~2.3 boundary.  The companion theorem
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_saturated\_ladder\_iterate}\\
+\texttt{\_predecessor\_difference\_pos}
+\end{gathered}
+\]
+uses
+\(\texttt{tasaki23\_lowerable\_positive\_source\_attach\_sum\_lt\_callback\_of\_offA\_sub\_onA\_pos}\)
+to obtain that attached-sum dominance from the off-\(A\) minus on-\(A\)
+predecessor raising-source positive-difference form.  This is the same local
+comparison shape used by the predecessor-difference boundary, now connected
+directly to the saturated ladder-iterate outside-ground route.  The final API
+wrapper
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_saturated\_ladder\_iterate}\\
+\texttt{\_predecessor\_difference\_pos\_named\_callbacks}
+\end{gathered}
+\]
+passes this lower-family callback into
+\(\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_named\_callbacks}\), keeping the
+threaded predicted-GS and common-energy predecessor-difference inputs unchanged
+while discharging the outside-sector lower bounds from the saturated
+ladder-iterate predecessor-difference route.  Its left-endpoint analogue
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint}\\
+\texttt{\_saturated\_ladder\_iterate}\\
+\texttt{\_predecessor\_difference\_pos\_named\_callbacks}
+\end{gathered}
+\]
+does the same for
+\(\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint\_named\_callbacks}\).
 The left-endpoint named boundary also has the extracted reference-vector
 form
 \[

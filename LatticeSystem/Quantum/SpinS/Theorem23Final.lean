@@ -991,6 +991,70 @@ abbrev tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_references_named_callb
       hc_strict h_intermediate hleft_ref hright_ref)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated
+ladder-iterate predecessor differences**: the public named final boundary can
+use the saturated ladder-iterate predecessor-difference positivity input
+directly as its outside-sector lower-family source.  The wrapper first turns
+that local difference form into explicit lowerable attach-sum dominance, then
+uses the saturated ladder-iterate coefficient route to discharge the
+outside-ground lower-family callback. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_predecessor_difference_pos_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hμsat :
+      ∃ μsat : ℝ, (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N)
+    (hdiff : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        0 <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              let predVal : Fin (N + 1) :=
+                ⟨(τ.1 x.1).val - 1, by omega⟩
+              let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+              (spinSOpPlus N predVal (τ.1 x.1)).re *
+                w ⟨pred,
+                  magSumS_single_site_lowering_predecessor
+                    τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) -
+            (((Finset.univ.filter (fun x : V => A x = true)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                let predVal : Fin (N + 1) :=
+                  ⟨(τ.1 x.1).val - 1, by omega⟩
+                let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+                (spinSOpPlus N predVal (τ.1 x.1)).re *
+                  w ⟨pred,
+                    magSumS_single_site_lowering_predecessor
+                      τ x.1 ((Finset.mem_filter.mp x.2).2)⟩))) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_predecessor_difference_pos
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hμsat hdiff)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated Casimir
 sources**: the public named final boundary can consume left and right
 saturated total-Casimir source callbacks directly.  These callbacks supply
@@ -1461,6 +1525,69 @@ abbrev
     (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_references
       (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
       hc_strict h_intermediate hleft_ref hright_ref)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
+saturated ladder-iterate predecessor differences**: left-endpoint analogue of
+`tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_predecessor_difference_pos_named_callbacks`.
+The weaker left-endpoint predicted-GS input is combined with the saturated
+ladder-iterate predecessor-difference positivity route, which supplies the
+outside-sector lower-family callback. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_predecessor_difference_pos_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hμsat :
+      ∃ μsat : ℝ, (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N)
+    (hdiff : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        0 <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              let predVal : Fin (N + 1) :=
+                ⟨(τ.1 x.1).val - 1, by omega⟩
+              let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+              (spinSOpPlus N predVal (τ.1 x.1)).re *
+                w ⟨pred,
+                  magSumS_single_site_lowering_predecessor
+                    τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) -
+            (((Finset.univ.filter (fun x : V => A x = true)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                let predVal : Fin (N + 1) :=
+                  ⟨(τ.1 x.1).val - 1, by omega⟩
+                let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+                (spinSOpPlus N predVal (τ.1 x.1)).re *
+                  w ⟨pred,
+                    magSumS_single_site_lowering_predecessor
+                      τ x.1 ((Finset.mem_filter.mp x.2).2)⟩))) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_named_callbacks
+    (V := V) A (J := J) N c hBA hleft_predictedGS hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_predecessor_difference_pos
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hμsat hdiff)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
