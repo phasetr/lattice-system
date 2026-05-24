@@ -9808,7 +9808,26 @@ The closed form
 discharges the \(M=0\) input with the zero-sector theorem, so successor
 dominance is the only remaining coefficient input.
 This is the explicit induction closure of the coefficient recursion used at
-the Tasaki §2.5 Theorem~2.3 outside-ground boundary (Tasaki, Springer 2020,
+the Tasaki §2.5 Theorem~2.3 outside-ground boundary.  Lean also records the
+left and right callback forms
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedLadderIterate}\\
+\texttt{MarshallPositiveCoefficientCallback}\\
+\texttt{\_of\_successor\_dominance},\\
+\texttt{tasaki23OutsideGroundRightSaturatedLadderIterate}\\
+\texttt{MarshallPositiveCoefficientCallback}\\
+\texttt{\_of\_successor\_dominance}.
+\end{gathered}
+\]
+These wrappers feed the closed coefficient family into the existing
+outside-sector coefficient callbacks once the saturated Heisenberg eigenvalue
+has been represented by a real scalar.  On the left, the endpoint hypothesis
+gives \(M<|V|N+1\) by the cardinality bound on the smaller sublattice.  On the
+right, nonemptiness of \(\texttt{magConfigS}\ V\ N\ M\) gives a configuration
+with magnetization \(M\), and \(\texttt{magSumS\_le}\) yields
+\(M\le |V|N\), hence \(M<|V|N+1\).  This is the coefficient-level discharge
+needed by the Marshall-positive reference bridge (Tasaki, Springer 2020,
 §2.5 Theorem~2.3, p.~42).
 The left-endpoint named boundary also has the extracted reference-vector
 form
