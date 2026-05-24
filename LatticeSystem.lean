@@ -70,6 +70,7 @@ import LatticeSystem.Fermion.JWAbstract
 -- via per-module builds.
 import LatticeSystem.Quantum.SpinS.Theorem23FinalLoweredMarshall
 import LatticeSystem.Quantum.SpinS.Theorem23FinalLoweredSiteSumLeft
+import LatticeSystem.Quantum.SpinS.Theorem23DominancePredictedGSPredecessor
 import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundConditional
 import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadderReembedded
 import LatticeSystem.Quantum.SpinS.Theorem23SectorExistenceDominancePredictedGS
