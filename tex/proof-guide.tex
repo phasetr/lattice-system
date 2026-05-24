@@ -9163,6 +9163,40 @@ wrapper is
 \texttt{\_discharge\_nonempty}.
 \end{gathered}
 \]
+The next wrapper replaces the saturated-Casimir source equation by the
+more concrete ladder-span input.  Lean uses
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedLadderSpanSourceCallback},\\
+\texttt{tasaki23OutsideGroundRightSaturatedLadderSpanSourceCallback}
+\end{gathered}
+\]
+together with the maximum-Casimir eigenspace identification
+\[
+\texttt{totalSpinSSquaredEigenspace\_max\_eq\_span\_ladderIterateUp}
+\]
+to prove
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback}\\
+\texttt{\_of\_ladder\_span\_source},\\
+\texttt{tasaki23OutsideGroundRightSaturatedCasimirSourceCallback}\\
+\texttt{\_of\_ladder\_span\_source}.
+\end{gathered}
+\]
+Thus it is enough to show that the outside-sector source vector lies in
+the span of the saturated ferromagnetic total-spin ladder.  The
+corresponding final boundary is
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_saturated\_ladder\_span\_sources}\\
+\texttt{\_discharge\_nonempty}.
+\end{gathered}
+\]
 The outside reach task is also split into its
 two endpoint directions by
 \[
