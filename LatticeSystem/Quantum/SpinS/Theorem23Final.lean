@@ -1055,6 +1055,40 @@ abbrev
       hc_strict h_intermediate hμsat hdiff)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated
+ladder-iterate predecessor differences with real couplings**: real couplings
+discharge the saturated-ferromagnet energy realness input, so the public named
+boundary only needs the predecessor-difference positivity callback for the
+saturated ladder iterates. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hdiff :
+      tasaki23SaturatedLadderIteratePredecessorDifferencePosCallback (V := V) A N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hdiff)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated Casimir
 sources**: the public named final boundary can consume left and right
 saturated total-Casimir source callbacks directly.  These callbacks supply
@@ -1588,6 +1622,41 @@ abbrev
     (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_predecessor_difference_pos
       (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
       hc_strict h_intermediate hμsat hdiff)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
+saturated ladder-iterate predecessor differences with real couplings**:
+left-endpoint analogue of
+`tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings_named_callbacks`.
+The real-coupling hypothesis supplies the saturated-energy real scalar needed
+by the outside-sector ladder-iterate coefficient route. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hdiff :
+      tasaki23SaturatedLadderIteratePredecessorDifferencePosCallback (V := V) A N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_named_callbacks
+    (V := V) A (J := J) N c hBA hleft_predictedGS hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hdiff)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
