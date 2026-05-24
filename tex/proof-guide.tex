@@ -9514,6 +9514,49 @@ Composing with the joint-reference route gives
 \]
 This pushes the remaining reference construction toward explicit
 total-spin ladder vectors rather than abstract joint-eigenspace membership.
+Lean also records the sectorwise singleton-ladder version of this input.
+The callbacks
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedLadderIterateReferenceCallback},\\
+\texttt{tasaki23OutsideGroundRightSaturatedLadderIterateReferenceCallback}
+\end{gathered}
+\]
+ask only that the Marshall-positive reference embedding lie in the singleton
+span of the sector iterate
+\(\texttt{ladderIterateUp}\ V\ N\ \langle M,\_\rangle\).  Since this
+singleton is contained in the full range of
+\(\texttt{ladderIterateUp}\ V\ N\), Lean first records the span-inclusion
+helper
+\[
+\texttt{ladderIterateUp\_singleton\_span\_le\_span\_range}.
+\]
+It then proves
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedLadderReferenceCallback}\\
+\texttt{\_of\_saturated\_ladder\_iterate\_reference},\\
+\texttt{tasaki23OutsideGroundRightSaturatedLadderReferenceCallback}\\
+\texttt{\_of\_saturated\_ladder\_iterate\_reference}.
+\end{gathered}
+\]
+Composing these inclusions with the saturated ladder-reference route gives
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_saturated\_ladder\_iterate\_references},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_saturated\_ladder\_iterate\_references}\\
+\texttt{\_named\_callbacks},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint}\\
+\texttt{\_saturated\_ladder\_iterate\_references}\\
+\texttt{\_named\_callbacks}.
+\end{gathered}
+\]
+Thus the public named-callback boundary can now be stated using a single
+explicit sector ladder iterate, with the span inclusion handling the
+conversion to the earlier ladder-span API.
 The left-endpoint named boundary also has the extracted reference-vector
 form
 \[
