@@ -1173,6 +1173,42 @@ theorem tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientFa
     hdominates
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated-ladder-iterate coefficient
+family from explicit lowerable dominance**: dominance of the attached sums of
+explicit lowerable positive-source predecessor coefficients supplies the
+successor-dominance input for the closed coefficient induction. -/
+theorem tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientFamily_of_lowerable_attach_sum_dominance
+    (A : V → Bool) (N : ℕ)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (((Finset.univ.filter (fun x : V => A x = true)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                w τ x.1 ((Finset.mem_filter.mp x.2).2))) <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                  w τ x.1 ((Finset.mem_filter.mp x.2).2)))) :
+    ∀ M : ℕ, (hM_range : M < Fintype.card V * N + 1) →
+      ∃ w : magConfigS V N M → ℝ,
+        (∀ τ : magConfigS V N M, 0 < w τ) ∧
+          ∀ τ : magConfigS V N M,
+            ladderIterateUp V N ⟨M, hM_range⟩ τ.1 =
+              (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ) :=
+  tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientFamily_of_successor_dominance
+    (V := V) A N
+    (fun M hM_succ w hcoeff τ =>
+      tasaki23_positive_source_lowerable_coefficient_lt_of_attach_sum_lt
+        (V := V) (N := N) A w τ (hdominates M hM_succ w hcoeff τ))
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left saturated-ladder-iterate coefficient
 callback from successor dominance**: the closed coefficient induction supplies
 the left outside-sector coefficient callback once the saturated
@@ -1216,6 +1252,40 @@ theorem tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficie
   exact ⟨hM_range, μsat, w, hμsat_eq, hw_pos, hcoeff⟩
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated-ladder-iterate coefficient
+callback from explicit lowerable dominance**: left-side callback wrapper using
+attached sums of explicit lowerable predecessor coefficients as the remaining
+coefficient-dominance input. -/
+theorem tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hμsat :
+      ∃ μsat : ℝ, (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (((Finset.univ.filter (fun x : V => A x = true)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                w τ x.1 ((Finset.mem_filter.mp x.2).2))) <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                  w τ x.1 ((Finset.mem_filter.mp x.2).2)))) :
+    tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback
+      (V := V) A J N :=
+  tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance
+    (V := V) A (J := J) N hμsat
+    (fun M hM_succ w hcoeff τ =>
+      tasaki23_positive_source_lowerable_coefficient_lt_of_attach_sum_lt
+        (V := V) (N := N) A w τ (hdominates M hM_succ w hcoeff τ))
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 right saturated-ladder-iterate coefficient
 callback from successor dominance**: right-side analogue of
 `tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance`.
@@ -1251,6 +1321,39 @@ theorem tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoeffici
     tasaki23OutsideGroundSaturatedLadderIterateMarshallPositiveCoefficientFamily_of_successor_dominance
       (V := V) A N hdominates M hM_range
   exact ⟨hM_range, μsat, w, hμsat_eq, hw_pos, hcoeff⟩
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated-ladder-iterate coefficient
+callback from explicit lowerable dominance**: right-side analogue of
+`tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance`. -/
+theorem tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hμsat :
+      ∃ μsat : ℝ, (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (((Finset.univ.filter (fun x : V => A x = true)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                w τ x.1 ((Finset.mem_filter.mp x.2).2))) <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                  w τ x.1 ((Finset.mem_filter.mp x.2).2)))) :
+    tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback
+      (V := V) A J N :=
+  tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance
+    (V := V) A (J := J) N hμsat
+    (fun M hM_succ w hcoeff τ =>
+      tasaki23_positive_source_lowerable_coefficient_lt_of_attach_sum_lt
+        (V := V) (N := N) A w τ (hdominates M hM_succ w hcoeff τ))
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left singleton-span iterate reference from a
@@ -2572,6 +2675,50 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_itera
       (V := V) A (J := J) N hleft_ref)
     (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback_of_marshall_positive_coefficients
       (V := V) A (J := J) N hright_ref)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from explicit lowerable
+coefficient dominance**: attached-sum dominance for the explicit lowerable
+predecessor coefficients supplies the left and right saturated ladder-iterate
+coefficient callbacks, and hence the outside-sector lower-energy family. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_lowerable_attach_sum_dominance
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hμsat :
+      ∃ μsat : ℝ, (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (((Finset.univ.filter (fun x : V => A x = true)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                w τ x.1 ((Finset.mem_filter.mp x.2).2))) <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                  w τ x.1 ((Finset.mem_filter.mp x.2).2)))) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_marshall_positive_coefficients
+    (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+    hc_strict h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance
+      (V := V) A (J := J) N hμsat hdominates)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance
+      (V := V) A (J := J) N hμsat hdominates)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-ground family from side admissible

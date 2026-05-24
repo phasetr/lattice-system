@@ -9829,6 +9829,37 @@ with magnetization \(M\), and \(\texttt{magSumS\_le}\) yields
 \(M\le |V|N\), hence \(M<|V|N+1\).  This is the coefficient-level discharge
 needed by the Marshall-positive reference bridge (Tasaki, Springer 2020,
 §2.5 Theorem~2.3, p.~42).
+The remaining dominance input can also be stated in the explicit lowerable
+attached-sum form already used in the local coefficient API.  The theorem
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundSaturatedLadderIterate}\\
+\texttt{MarshallPositiveCoefficientFamily}\\
+\texttt{\_of\_lowerable\_attach\_sum\_dominance}
+\end{gathered}
+\]
+uses
+\(\texttt{tasaki23\_positive\_source\_lowerable\_coefficient\_lt\_of\_attach\_sum\_lt}\)
+to turn dominance of attached sums of
+\(\texttt{tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient}\)
+into the filtered positive-source coefficient dominance required by the
+successor induction.  The left and right coefficient callbacks have the same
+attached-sum variants, with suffix
+\(\texttt{\_of\_lowerable\_attach\_sum\_dominance}\), so the outside-ground
+boundary no longer needs to mention the boundary-inclusive filtered sum
+directly.  Finally,
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_saturated\_ladder\_iterate}\\
+\texttt{\_lowerable\_attach\_sum\_dominance}
+\end{gathered}
+\]
+combines the left and right attached-sum coefficient callbacks with the
+existing saturated ladder-iterate coefficient bridge.  Thus, once the
+saturated ferromagnetic energy is represented by a real scalar, the same
+explicit lowerable dominance input supplies the outside-sector lower-energy
+family used by the final Tasaki Theorem~2.3 boundary.
 The left-endpoint named boundary also has the extracted reference-vector
 form
 \[
