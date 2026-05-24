@@ -296,5 +296,47 @@ abbrev
   tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_via_explicit_lowerable_of_outside_sector_ground_energy_lower_bound
     (V := V) A (J := J) N c
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 final predecessor-difference boundary from
+admissible reach**: this public boundary replaces the outside-sector
+ground-energy lower family in
+`tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound`
+by the ladder-style admissible-reach callback.
+
+The bridge
+`tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach`
+supplies the outside-sector ground-energy lower family, so the remaining
+inputs are the left-endpoint predicted-GS callback, the local
+predecessor-difference callback, the real-coupling hypotheses needed by
+the real-sector comparison, and the admissible-reach callback for
+outside-sector representatives. -/
+theorem
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hreach :
+      tasaki23OutsideGroundAdmissibleReachCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
+    (V := V) A (J := J) N c hBA hsector_nonempty hleft_predictedGS
+    hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+      (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hreach)
 
 end LatticeSystem.Quantum
