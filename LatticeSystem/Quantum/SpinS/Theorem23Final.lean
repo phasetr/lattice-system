@@ -216,6 +216,39 @@ abbrev
     hJ_bipartite hc_strict hreach
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 side-admissible-reach discharged boundary**:
+this version of the discharged final predecessor-difference boundary accepts
+separate left and right directional outside-sector reach callbacks.  The side
+callbacks are recombined into the full admissible-reach callback before reusing
+the existing admissible-reach discharged boundary. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_side_admissible_reach_discharge_nonempty
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleft :
+      tasaki23OutsideGroundLeftAdmissibleReachCallback (V := V) A J N c)
+    (hright :
+      tasaki23OutsideGroundRightAdmissibleReachCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach_discharge_nonempty
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundAdmissibleReachCallback_of_side_callbacks
+      (V := V) A (J := J) N c hleft hright)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 named-callback final boundary**: this
 short alias exposes the discharged outside-ground theorem through the
 three named callback propositions that remain on the current proof
