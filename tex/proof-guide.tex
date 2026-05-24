@@ -9104,6 +9104,21 @@ same Tasaki §2.5 Theorem 2.3, p.~42 Perron--Frobenius endpoint, with
 the non-negative-matrix comparison following Seneta, \emph{Non-negative
 Matrices and Markov Chains}, 3rd ed., Springer 2006, \S1.2,
 pp.~27--28.
+The corresponding admissible-reach predecessor-difference boundary
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_admissible\_reach}
+\end{gathered}
+\]
+uses
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback\_of\_admissible\_reach}
+to supply that outside-sector ground-energy input from the
+ladder-reach callback, together with the real-coupling and strict
+diagonal-shift hypotheses.
 
 For the next proof stage Lean also exposes the common-energy output
 itself, separated from the final outside-sector estimate:
