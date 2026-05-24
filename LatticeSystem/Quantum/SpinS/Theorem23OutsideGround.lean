@@ -5,6 +5,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23Local
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifference
 import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
 import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
+import LatticeSystem.Quantum.SpinS.SaturatedEigenvalueExplicit
 import LatticeSystem.Quantum.SpinS.SaturatedLadderCasimirEigenspace
 import LatticeSystem.Quantum.SpinS.SaturatedLadderLoweringInvariant
 import LatticeSystem.Quantum.SpinS.TotalSpinSSquaredMaxEigenspaceEqSpanLadder
@@ -2721,6 +2722,42 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_itera
       (V := V) A (J := J) N hμsat hdominates)
 
 set_option linter.style.longLine false in
+/-- **Saturated ladder-iterate predecessor-difference positivity callback**:
+for every successor sector and every Marshall-signed coefficient
+representation of the previous ladder iterate, the off-`A` predecessor
+raising-source attached sum strictly dominates the on-`A` sum. -/
+def tasaki23SaturatedLadderIteratePredecessorDifferencePosCallback
+    (A : V → Bool) (N : ℕ) : Prop :=
+  ∀ (M : ℕ)
+      (hM_succ : M + 1 < Fintype.card V * N + 1)
+      (w : magConfigS V N M → ℝ),
+    (∀ σ : magConfigS V N M,
+      ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+        (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+    ∀ τ : magConfigS V N (M + 1),
+      0 <
+        (((Finset.univ.filter (fun x : V => A x = false)).filter
+            (fun x : V => 0 < (τ.1 x).val)).attach.sum
+          (fun x =>
+            let predVal : Fin (N + 1) :=
+              ⟨(τ.1 x.1).val - 1, by omega⟩
+            let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+            (spinSOpPlus N predVal (τ.1 x.1)).re *
+              w ⟨pred,
+                magSumS_single_site_lowering_predecessor
+                  τ x.1 ((Finset.mem_filter.mp x.2).2)⟩)) -
+          (((Finset.univ.filter (fun x : V => A x = true)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              let predVal : Fin (N + 1) :=
+                ⟨(τ.1 x.1).val - 1, by omega⟩
+              let pred : V → Fin (N + 1) := Function.update τ.1 x.1 predVal
+              (spinSOpPlus N predVal (τ.1 x.1)).re *
+                w ⟨pred,
+                  magSumS_single_site_lowering_predecessor
+                    τ x.1 ((Finset.mem_filter.mp x.2).2)⟩))
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-ground family from predecessor
 differences**: pointwise positivity of the off-`A` minus on-`A` predecessor
 raising-source attached sums supplies the explicit lowerable coefficient
@@ -2774,6 +2811,32 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_itera
     (fun M hM_succ w hcoeff =>
       tasaki23_lowerable_positive_source_attach_sum_lt_callback_of_offA_sub_onA_pos
         (V := V) (N := N) A w (hdiff M hM_succ w hcoeff))
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from predecessor
+differences with real couplings**: real couplings represent the saturated
+ferromagnetic energy by a real scalar, so the predecessor-difference route no
+longer needs a separate saturated-energy realness hypothesis. -/
+theorem
+    tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hdiff :
+      tasaki23SaturatedLadderIteratePredecessorDifferencePosCallback (V := V) A N) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_predecessor_difference_pos
+    (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+    hc_strict h_intermediate
+    (saturatedFerromagnetEigenvalueS_exists_real (V := V) (N := N) J hJ_real)
+    hdiff
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-ground family from side admissible

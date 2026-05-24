@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.SaturatedHeisenbergSymmetric
+import Mathlib.Data.Complex.BigOperators
 
 /-!
 # Explicit form of `saturatedFerromagnetEigenvalueS J N`
@@ -68,5 +69,33 @@ theorem saturatedFerromagnetEigenvalueS_explicit (J : V → V → ℂ) :
       (sub_eq_zero.mp h).symm
     exact h_neq this
   · exact hne h
+
+/-- If all couplings are real, then the saturated-ferromagnet Heisenberg
+eigenvalue is real in the sense that its imaginary part vanishes. -/
+theorem saturatedFerromagnetEigenvalueS_im_zero (J : V → V → ℂ)
+    (hJ_real : ∀ x y, (J x y).im = 0) :
+    (saturatedFerromagnetEigenvalueS (V := V) J N).im = 0 := by
+  rw [saturatedFerromagnetEigenvalueS_explicit]
+  rw [Complex.im_sum]
+  apply Finset.sum_eq_zero
+  intro x _hx
+  rw [Complex.im_sum]
+  apply Finset.sum_eq_zero
+  intro y _hy
+  by_cases hxy : x = y
+  · subst y
+    rw [Complex.mul_im, hJ_real x x]
+    simp
+  · rw [Complex.mul_im, hJ_real x y]
+    simp [hxy]
+
+/-- If all couplings are real, then the saturated-ferromagnet Heisenberg
+eigenvalue is represented by a real scalar. -/
+theorem saturatedFerromagnetEigenvalueS_exists_real (J : V → V → ℂ)
+    (hJ_real : ∀ x y, (J x y).im = 0) :
+    ∃ μsat : ℝ, (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N := by
+  refine ⟨(saturatedFerromagnetEigenvalueS (V := V) J N).re, ?_⟩
+  apply Complex.ext <;>
+    simp [saturatedFerromagnetEigenvalueS_im_zero (V := V) (N := N) J hJ_real]
 
 end LatticeSystem.Quantum

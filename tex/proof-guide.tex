@@ -9872,8 +9872,25 @@ uses
 to obtain that attached-sum dominance from the off-\(A\) minus on-\(A\)
 predecessor raising-source positive-difference form.  This is the same local
 comparison shape used by the predecessor-difference boundary, now connected
-directly to the saturated ladder-iterate outside-ground route.  The final API
-wrapper
+directly to the saturated ladder-iterate outside-ground route.  Lean packages
+that pointwise input as
+\[
+\texttt{tasaki23SaturatedLadderIteratePredecessorDifferencePosCallback}
+\]
+and also records the real-coupling variant
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_saturated\_ladder\_iterate}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_real\_couplings}.
+\end{gathered}
+\]
+Here the separate real-scalar hypothesis for the saturated ferromagnetic
+energy is supplied by
+\(\texttt{saturatedFerromagnetEigenvalueS\_exists\_real}\), whose proof uses
+the explicit saturated-energy formula and the realness of every \(J(x,y)\).
+The final API wrapper
 \[
 \begin{gathered}
 \texttt{tasaki\_2\_5\_theorem\_2\_3}\\
@@ -9896,6 +9913,24 @@ ladder-iterate predecessor-difference route.  Its left-endpoint analogue
 \]
 does the same for
 \(\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_left\_endpoint\_named\_callbacks}\).
+The real-coupling named variants
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_saturated\_ladder\_iterate}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_real\_couplings\_named\_callbacks},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint}\\
+\texttt{\_saturated\_ladder\_iterate}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_real\_couplings\_named\_callbacks}
+\end{gathered}
+\]
+remove the visible saturated-energy real-scalar input from both public named
+boundaries.  This is still a boundary for Tasaki, Springer 2020, §2.5
+Theorem~2.3, p.~42; it only replaces an explicit scalar-realness premise by
+the real-coupling hypothesis already present in the theorem.
 The left-endpoint named boundary also has the extracted reference-vector
 form
 \[
@@ -12930,6 +12965,12 @@ $\texttt{saturatedFerromagnetEigenvalueS}\,J\,N = \sum_x \sum_y
 J(x,y) \cdot
 (\textsf{if}\ x=y\ \textsf{then}\ N(N+2)/4\ \textsf{else}\ (N/2)^2)$.
 Direct application of \#875 + \#899 uniqueness on $|\sigma_\top\rangle \neq 0$.
+In the Tasaki §2.5 Theorem~2.3 chain, the same explicit formula gives
+\(\texttt{saturatedFerromagnetEigenvalueS\_im\_zero}\) and
+\(\texttt{saturatedFerromagnetEigenvalueS\_exists\_real}\): if every coupling
+\(J(x,y)\) has zero imaginary part, each summand has zero imaginary part, so
+the saturated ferromagnetic energy is represented by its real part as a real
+scalar.
 
 \textbf{Explicit uniform-J eigenvalue simplification (PR~\#953)}:
 the new file
