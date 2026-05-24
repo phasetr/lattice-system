@@ -105,6 +105,24 @@ theorem heisenbergHamiltonianS_mulVec_totalSpinSOpMinus_of_eigenvec
     heisenbergHamiltonianS_commute_totalSpinSOpMinus J
   rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hΨ, Matrix.mulVec_smul]
 
+/-- **Tasaki §2.5 Theorem 2.3 iterated ladder step, lowering
+direction**: if `Ψ` is a Heisenberg eigenvector at real eigenvalue `μ`,
+then `(Ŝ^-_tot)^k Ψ` is a Heisenberg eigenvector at the same eigenvalue.
+
+This is the iterated version used for outside sectors that are more than
+one magnetization step away from the admissible Theorem 2.3 interval. -/
+theorem heisenbergHamiltonianS_mulVec_totalSpinSOpMinus_pow_of_eigenvec
+    (J : V → V → ℂ) (N : ℕ) (k : ℕ) {μ : ℝ}
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : (heisenbergHamiltonianS J N).mulVec Ψ = (μ : ℂ) • Ψ) :
+    (heisenbergHamiltonianS J N).mulVec
+        (((totalSpinSOpMinus V N) ^ k).mulVec Ψ) =
+      (μ : ℂ) • (((totalSpinSOpMinus V N) ^ k).mulVec Ψ) := by
+  have hcomm : heisenbergHamiltonianS J N * ((totalSpinSOpMinus V N) ^ k) =
+      ((totalSpinSOpMinus V N) ^ k) * heisenbergHamiltonianS J N :=
+    heisenbergHamiltonianS_commute_totalSpinSOpMinus_pow J k
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hΨ, Matrix.mulVec_smul]
+
 /-- **Tasaki §2.5 Theorem 2.3 ladder step, raising direction**:
 if `Ψ` is a Heisenberg eigenvector at real eigenvalue `μ`, then
 `Ŝ^+_tot Ψ` is a Heisenberg eigenvector at the same eigenvalue.
@@ -122,6 +140,59 @@ theorem heisenbergHamiltonianS_mulVec_totalSpinSOpPlus_of_eigenvec
       totalSpinSOpPlus V N * heisenbergHamiltonianS J N :=
     heisenbergHamiltonianS_commute_totalSpinSOpPlus J
   rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hΨ, Matrix.mulVec_smul]
+
+/-- **Tasaki §2.5 Theorem 2.3 iterated ladder step, raising direction**:
+if `Ψ` is a Heisenberg eigenvector at real eigenvalue `μ`, then
+`(Ŝ^+_tot)^k Ψ` is a Heisenberg eigenvector at the same eigenvalue. -/
+theorem heisenbergHamiltonianS_mulVec_totalSpinSOpPlus_pow_of_eigenvec
+    (J : V → V → ℂ) (N : ℕ) (k : ℕ) {μ : ℝ}
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ : (heisenbergHamiltonianS J N).mulVec Ψ = (μ : ℂ) • Ψ) :
+    (heisenbergHamiltonianS J N).mulVec
+        (((totalSpinSOpPlus V N) ^ k).mulVec Ψ) =
+      (μ : ℂ) • (((totalSpinSOpPlus V N) ^ k).mulVec Ψ) := by
+  have hcomm : heisenbergHamiltonianS J N * ((totalSpinSOpPlus V N) ^ k) =
+      ((totalSpinSOpPlus V N) ^ k) * heisenbergHamiltonianS J N :=
+    heisenbergHamiltonianS_commute_totalSpinSOpPlus_pow J k
+  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hΨ, Matrix.mulVec_smul]
+
+/-! ## Iterated ladder magnetization shifts -/
+
+/-- `k` lowering steps shift a vector in `magSubspaceS V N M` to
+`magSubspaceS V N (M - k)`. -/
+theorem totalSpinSOpMinus_pow_mulVec_mem_magSubspaceS_of_mem
+    (k : ℕ) {M : ℂ} {v : (V → Fin (N + 1)) → ℂ}
+    (hv : v ∈ magSubspaceS V N M) :
+    (((totalSpinSOpMinus V N) ^ k).mulVec v) ∈
+      magSubspaceS V N (M - (k : ℂ)) := by
+  induction k with
+  | zero =>
+    simpa using hv
+  | succ k ih =>
+    rw [pow_succ', ← Matrix.mulVec_mulVec]
+    have hshift :=
+      totalSpinSOpMinus_mulVec_mem_magSubspaceS_of_mem (V := V) (N := N) ih
+    convert hshift using 1
+    push_cast
+    ring_nf
+
+/-- `k` raising steps shift a vector in `magSubspaceS V N M` to
+`magSubspaceS V N (M + k)`. -/
+theorem totalSpinSOpPlus_pow_mulVec_mem_magSubspaceS_of_mem
+    (k : ℕ) {M : ℂ} {v : (V → Fin (N + 1)) → ℂ}
+    (hv : v ∈ magSubspaceS V N M) :
+    (((totalSpinSOpPlus V N) ^ k).mulVec v) ∈
+      magSubspaceS V N (M + (k : ℂ)) := by
+  induction k with
+  | zero =>
+    simpa using hv
+  | succ k ih =>
+    rw [pow_succ', ← Matrix.mulVec_mulVec]
+    have hshift :=
+      totalSpinSOpPlus_mulVec_mem_magSubspaceS_of_mem (V := V) (N := N) ih
+    convert hshift using 1
+    push_cast
+    ring_nf
 
 /-! ## Adjacent-sector energy comparison -/
 
@@ -287,7 +358,7 @@ theorem totalSpinSOpMinus_mulVec_marshallSignedEmbedding_im_zero
       simp
   rw [Complex.mul_im]
   rw [onSiteS_spinSOpMinus_apply_im_zero, hτ_im]
-  ring
+  ring_nf
 
 /-- **Tasaki §2.5 Theorem 2.3 lowered-vector scalar identification**:
 if the real parts of the lowered Marshall-signed source vector agree with
