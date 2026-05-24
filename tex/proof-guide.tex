@@ -9469,6 +9469,51 @@ boundaries:
 Thus the reference-vector API can now be used directly at both public
 named-callback final boundaries, not only at the intermediate saturated
 joint source-vector callback.
+The reference-vector input is also exposed in the more concrete saturated
+ladder-span form.  Lean names the callbacks
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedLadderReferenceCallback},\\
+\texttt{tasaki23OutsideGroundRightSaturatedLadderReferenceCallback}.
+\end{gathered}
+\]
+They keep the real saturated Heisenberg eigenvalue witness and strict
+Marshall positivity from the joint-reference callback, but replace
+membership in
+\(\texttt{saturatedFerromagnetJointEigenspace}\) by membership in
+\[
+  \operatorname{span}_{\mathbb C}
+    \{\texttt{ladderIterateUp}\ V\ N\ k\}.
+\]
+The Tasaki \S2.4 identification
+\[
+\texttt{saturatedFerromagnetJointEigenspace\_eq\_span\_ladderIterateUp}
+\]
+proves
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundLeftSaturatedJointReferenceCallback}\\
+\texttt{\_of\_saturated\_ladder\_reference},\\
+\texttt{tasaki23OutsideGroundRightSaturatedJointReferenceCallback}\\
+\texttt{\_of\_saturated\_ladder\_reference}.
+\end{gathered}
+\]
+Composing with the joint-reference route gives
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_saturated\_ladder\_references},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_saturated\_ladder\_references}\\
+\texttt{\_named\_callbacks},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint}\\
+\texttt{\_saturated\_ladder\_references}\\
+\texttt{\_named\_callbacks}.
+\end{gathered}
+\]
+This pushes the remaining reference construction toward explicit
+total-spin ladder vectors rather than abstract joint-eigenspace membership.
 The left-endpoint named boundary also has the extracted reference-vector
 form
 \[

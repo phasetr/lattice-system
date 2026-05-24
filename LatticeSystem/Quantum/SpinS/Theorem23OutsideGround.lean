@@ -631,6 +631,76 @@ def tasaki23OutsideGroundRightSaturatedJointReferenceCallback
         saturatedFerromagnetJointEigenspace (V := V) J N
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated-ladder reference callback**:
+left-side saturated reference callback with the joint-eigenspace membership
+replaced by concrete membership in the span of the saturated total-spin
+ladder.  The Tasaki §2.4 saturated joint-eigenspace/span identification turns
+this into the saturated joint reference callback. -/
+def tasaki23OutsideGroundLeftSaturatedLadderReferenceCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    M <
+        min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+          (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+          N →
+    ∃ (μsat : ℝ) (w : magConfigS V N M → ℝ),
+      (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N ∧
+      (∀ τ, 0 < w τ) ∧
+      magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ)) ∈
+        Submodule.span ℂ (Set.range (ladderIterateUp V N))
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated-ladder reference callback**:
+right-side analogue of
+`tasaki23OutsideGroundLeftSaturatedLadderReferenceCallback`.  It asks for a
+strictly Marshall-positive saturated reference vector in the concrete ladder
+span in every outside sector right of the admissible interval. -/
+def tasaki23OutsideGroundRightSaturatedLadderReferenceCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+        (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+        N < M →
+    ∃ (μsat : ℝ) (w : magConfigS V N M → ℝ),
+      (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N ∧
+      (∀ τ, 0 < w τ) ∧
+      magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * w τ : ℝ) : ℂ)) ∈
+        Submodule.span ℂ (Set.range (ladderIterateUp V N))
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left saturated joint reference from ladder
+reference**: the saturated-ferromagnet joint eigenspace is the span of
+`ladderIterateUp`, so a left outside-sector saturated ladder reference is a
+saturated joint reference. -/
+theorem tasaki23OutsideGroundLeftSaturatedJointReferenceCallback_of_saturated_ladder_reference
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hleft :
+      tasaki23OutsideGroundLeftSaturatedLadderReferenceCallback (V := V) A J N) :
+    tasaki23OutsideGroundLeftSaturatedJointReferenceCallback (V := V) A J N := by
+  intro M _ hM_left
+  obtain ⟨μsat, w, hμsat, hw_pos, hw_span⟩ := hleft M hM_left
+  refine ⟨μsat, w, hμsat, hw_pos, ?_⟩
+  rwa [saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp
+    (V := V) (N := N) J]
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 right saturated joint reference from ladder
+reference**: right-side analogue of
+`tasaki23OutsideGroundLeftSaturatedJointReferenceCallback_of_saturated_ladder_reference`. -/
+theorem tasaki23OutsideGroundRightSaturatedJointReferenceCallback_of_saturated_ladder_reference
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
+    (hright :
+      tasaki23OutsideGroundRightSaturatedLadderReferenceCallback (V := V) A J N) :
+    tasaki23OutsideGroundRightSaturatedJointReferenceCallback (V := V) A J N := by
+  intro M _ hM_right
+  obtain ⟨μsat, w, hμsat, hw_pos, hw_span⟩ := hright M hM_right
+  refine ⟨μsat, w, hμsat, hw_pos, ?_⟩
+  rwa [saturatedFerromagnetJointEigenspace_eq_span_ladderIterateUp
+    (V := V) (N := N) J]
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left saturated source-energy from joint
 source**: the saturated joint source-vector input gives the
 `H_J`-eigenvalue equation at the saturated ferromagnet energy.  Comparing it
@@ -1759,6 +1829,36 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_joint_refere
     (tasaki23OutsideGroundRightSaturatedJointSourceCallback_of_saturated_joint_reference
       (V := V) A (J := J) N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym
       hJ_bipartite hc_strict h_intermediate hright_ref)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from saturated ladder
+references**: left and right saturated ladder reference callbacks are first
+converted to saturated joint reference callbacks by the Tasaki §2.4
+joint-eigenspace/span identification.  The saturated joint-reference route
+then supplies the outside-sector lower family. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_references
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderReferenceCallback (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderReferenceCallback (V := V) A J N) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_joint_references
+    (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+    hc_strict h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedJointReferenceCallback_of_saturated_ladder_reference
+      (V := V) A (J := J) N hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedJointReferenceCallback_of_saturated_ladder_reference
+      (V := V) A (J := J) N hright_ref)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-ground family from side admissible
