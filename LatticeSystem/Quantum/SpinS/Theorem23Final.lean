@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23SectorExistenceInterval
+import LatticeSystem.Quantum.SpinS.Theorem23OutsideGround
 import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundPredecessorDifference
 
 /-!
@@ -158,5 +159,61 @@ abbrev tasaki_2_5_theorem_2_3_of_left_endpoint_named_callbacks
       magConfigS_nonempty_of_le_card_mul (V := V) (N := N)
         (tasaki23GroundStateSectors_le_card_mul (V := V) A N hM))
     hleft_predictedGS hpredecessor_difference houtside_ground_energy_lower
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 predecessor-difference named-callback
+sector-minimality boundary**: this public boundary replaces the
+outside-sector ground-energy lower family in
+`tasaki_2_5_theorem_2_3_of_named_callbacks` by the stronger named
+sector-minimality callback.
+
+The outside-family input is supplied by
+`tasaki23OutsideGroundEnergyLowerFamilyCallback_of_sector_minimality`, so
+the remaining named hypotheses are source predicted-GS membership, the
+predecessor-difference local comparison, and sectorwise minimality. -/
+abbrev tasaki_2_5_theorem_2_3_of_predecessor_difference_named_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hsector_min :
+      tasaki23SectorMinimalityCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS
+    hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_sector_minimality
+      (V := V) A N c hsector_min)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint predecessor-difference
+named-callback sector-minimality boundary**: this is the left-endpoint
+version of
+`tasaki_2_5_theorem_2_3_of_predecessor_difference_named_callbacks`.
+
+It keeps the final public hypotheses in the same named-callback family:
+left-endpoint predicted-GS membership, predecessor-difference local
+comparison, and sectorwise minimality. -/
+abbrev tasaki_2_5_theorem_2_3_of_left_endpoint_predecessor_difference_named_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hsector_min :
+      tasaki23SectorMinimalityCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_named_callbacks
+    (V := V) A (J := J) N c hBA hleft_predictedGS
+    hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_sector_minimality
+      (V := V) A N c hsector_min)
 
 end LatticeSystem.Quantum
