@@ -423,6 +423,47 @@ abbrev
       A (J := J) N c hright)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated-joint reference discharged
+boundary**: this version of the discharged final predecessor-difference
+boundary accepts sectorwise saturated joint reference callbacks directly.
+The reference callbacks first produce the saturated joint source-vector
+callbacks by Marshall-positive eigenvalue/eigenvector uniqueness, then the
+existing saturated-joint source final boundary closes the route. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_joint_references_discharge_nonempty
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedJointReferenceCallback (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedJointReferenceCallback (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_joint_sources_discharge_nonempty
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftSaturatedJointSourceCallback_of_saturated_joint_reference
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedJointSourceCallback_of_saturated_joint_reference
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hright_ref)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 saturated eigen-source discharged boundary**:
 this version of the discharged final predecessor-difference boundary accepts
 left and right source callbacks at the saturated Heisenberg eigenvalue plus
@@ -543,6 +584,47 @@ abbrev
       A (J := J) N c hleftJoint)
     (tasaki23OutsideGroundRightSaturatedCasimirSourceCallback_of_saturated_joint_source
       A (J := J) N c hrightJoint)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated-joint reference extraction
+discharged boundary**: this version combines the reference-vector API with
+the source-eigen callback extraction route.  The saturated joint references
+first discharge the saturated joint source-vector callbacks, and those source
+callbacks then supply the scalar saturated source-energy and saturated-Casimir
+inputs used by the existing extracted final boundary. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_joint_references_extract_source_eigen_callbacks_discharge_nonempty
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedJointReferenceCallback (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedJointReferenceCallback (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_joint_sources_extract_source_eigen_callbacks_discharge_nonempty
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftSaturatedJointSourceCallback_of_saturated_joint_reference
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedJointSourceCallback_of_saturated_joint_reference
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hright_ref)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 side-admissible-reach discharged boundary**:
