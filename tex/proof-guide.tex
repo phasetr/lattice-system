@@ -9068,6 +9068,25 @@ field carried by the interval induction.  Its conclusion is exactly
 of the two remaining callback outputs needed by the common-energy plus
 outside-sector final wrapper.
 
+The common-energy boundary has also been pushed one step closer to the
+local comparison now used in the predecessor-source wrappers:
+\[
+\begin{gathered}
+\texttt{tasaki23\_common\_energy\_chain}\\
+\texttt{\_of\_left\_endpoint\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_raising\_source\_sum\_lt}.
+\end{gathered}
+\]
+Instead of assuming the named predecessor-difference callback, this
+theorem assumes the fully threaded dominance statement saying that the
+on-\(A\) predecessor raising-source sum is strictly smaller than the
+off-\(A\) sum.  Lean converts this inequality to the difference form
+\(0<\text{offA}-\text{onA}\) by linear arithmetic and then invokes the
+predecessor-difference common-energy wrapper above.  Thus the first
+callback output is now available directly from the same raising-source
+dominance shape used by the predecessor final boundary.
+
 Lean also records the same endpoint under the public boundary name
 \[
 \begin{gathered}
