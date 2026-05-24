@@ -63,6 +63,36 @@ def tasaki23OutsideGroundEnergyLowerFamilyCallback
       tasaki23OutsideGroundEnergyLowerCallback (V := V) A J N c μ
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-sector admissible-reach callback**:
+for each Marshall-positive Theorem 2.2 representative in a sector outside
+`tasaki23GroundStateSectors`, the ladder construction reaches a nonzero
+sector eigenvector at the same eigenvalue in some admissible sector.
+
+This names the remaining ladder-reach task separately from the final
+outside-ground lower-bound comparison: once such an admissible-sector
+eigenvector at `μM` is available, the common-energy chain on admissible
+sectors proves `μ ≤ μM`. -/
+def tasaki23OutsideGroundAdmissibleReachCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    M ∉ tasaki23GroundStateSectors (V := V) A N →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      ∃ K : ℕ,
+        K ∈ tasaki23GroundStateSectors (V := V) A N ∧
+        Nonempty (magConfigS V N K) ∧
+        ∃ Φ : magConfigS V N K → ℂ,
+          Φ ≠ 0 ∧
+          (heisenbergHamiltonianSMatrixOnMagSector J N K).mulVec Φ =
+            (μM : ℂ) • Φ
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-sector lower family from sector
 minimality**: a sector-minimality callback immediately supplies the
 outside-sector ground-energy lower family.  The Marshall-positive
@@ -153,6 +183,61 @@ theorem tasaki23_real_sector_minimality_on_groundStateSectors_of_common_energy_c
           marshallSignS_re_sq A τ.1
         nlinarith [hv_pos τ])
       hφ_ne hφ_eigen
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from admissible
+reach**: if every outside-sector Marshall-positive ground representative
+can be transported to a nonzero eigenvector in an admissible sector at
+the same eigenvalue, then the outside-sector ground-energy lower family
+follows.
+
+The proof applies the admissible-sector real spectral lower bound coming
+from the common-energy chain.  The reached complex sector eigenvector has
+either nonzero real part or nonzero imaginary part, and the real-coupling
+complex-to-real eigenvector bridge supplies the real-form eigen equation
+at the same `μM`. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hreach : tasaki23OutsideGroundAdmissibleReachCallback (V := V) A J N c) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c := by
+  intro μ hcommon M _ hM_out μM v hμM_lt hv_pos hΦ
+  obtain ⟨K, hK_mem, hK_nonempty, ΦK, hΦK_ne, hΦK_eigen⟩ :=
+    hreach M hM_out hμM_lt hv_pos hΦ
+  letI : Nonempty (magConfigS V N K) := hK_nonempty
+  have hadm_real_min :
+      ∀ {μ' : ℝ} {φ : magConfigS V N K → ℝ},
+        φ ≠ 0 →
+        (heisenbergHamiltonianSReMatrixOnMagSector J N K).mulVec φ = μ' • φ →
+        μ ≤ μ' :=
+    tasaki23_real_sector_minimality_on_groundStateSectors_of_common_energy_chain
+      A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hcommon K hK_mem
+  classical
+  by_cases hRe_ne : (fun τ : magConfigS V N K => (ΦK τ).re) ≠ 0
+  · exact hadm_real_min (μ' := μM) (φ := fun τ => (ΦK τ).re) hRe_ne
+      (heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec
+        N hJ_real hΦK_eigen)
+  · have hRe_zero : (fun τ : magConfigS V N K => (ΦK τ).re) = 0 := by
+      by_contra h
+      exact hRe_ne h
+    have hIm_ne : (fun τ : magConfigS V N K => (ΦK τ).im) ≠ 0 := by
+      intro hIm_zero
+      apply hΦK_ne
+      funext τ
+      apply Complex.ext
+      · have h := congrFun hRe_zero τ
+        simpa using h
+      · have h := congrFun hIm_zero τ
+        simpa using h
+    exact hadm_real_min (μ' := μM) (φ := fun τ => (ΦK τ).im) hIm_ne
+      (heisenbergHamiltonianSReMatrixOnMagSector_mulVec_im_of_complex_eigenvec
+        N hJ_real hΦK_eigen)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-sector real lower bound from
