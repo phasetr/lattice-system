@@ -1730,6 +1730,37 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_joint_source
       (V := V) A (J := J) N c hright)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from saturated joint
+references**: left and right saturated joint reference callbacks first supply
+the saturated joint source-vector callbacks by the Marshall-positive
+source-vector/eigenvalue uniqueness bridge.  The existing saturated
+joint-source bridge then produces the outside-sector lower family. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_joint_references
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedJointReferenceCallback (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedJointReferenceCallback (V := V) A J N) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_joint_sources
+    (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftSaturatedJointSourceCallback_of_saturated_joint_reference
+      (V := V) A (J := J) N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym
+      hJ_bipartite hc_strict h_intermediate hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedJointSourceCallback_of_saturated_joint_reference
+      (V := V) A (J := J) N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym
+      hJ_bipartite hc_strict h_intermediate hright_ref)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-ground family from side admissible
 reach**: left and right directional outside-sector reach callbacks supply
 the outside-sector ground-energy lower family by first recombining into the
