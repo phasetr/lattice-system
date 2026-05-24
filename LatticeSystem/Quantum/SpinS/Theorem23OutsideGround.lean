@@ -94,6 +94,35 @@ def tasaki23OutsideGroundAdmissibleReachCallback
             (μM : ℂ) • Φ
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-sector admissible full-reach
+callback**: this variant records the ladder output before projecting it
+back to a magnetization-sector coordinate space.  For each outside-sector
+Marshall-positive representative, the ladder construction reaches a
+nonzero full-space eigenvector at the same eigenvalue whose magnetization
+belongs to an admissible sector. -/
+def tasaki23OutsideGroundAdmissibleFullReachCallback
+    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (c : ℝ) : Prop :=
+  ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+    M ∉ tasaki23GroundStateSectors (V := V) A N →
+    ∀ {μM : ℝ} {v : magConfigS V N M → ℝ},
+      μM < c →
+      (∀ τ, 0 < v τ) →
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+        (μM : ℂ) • magSectorEmbedding
+          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) →
+      ∃ K : ℕ,
+        K ∈ tasaki23GroundStateSectors (V := V) A N ∧
+        Nonempty (magConfigS V N K) ∧
+        ∃ Ψ : (V → Fin (N + 1)) → ℂ,
+          Ψ ≠ 0 ∧
+          Ψ ∈
+            magSubspaceS V N
+              (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (K : ℂ)) ∧
+          (heisenbergHamiltonianS J N).mulVec Ψ = (μM : ℂ) • Ψ
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left outside-sector admissible-reach
 callback**: for an outside-sector Marshall-positive representative below
 the left endpoint of `tasaki23GroundStateSectors A N`, the lowering ladder
@@ -168,6 +197,44 @@ theorem tasaki23OutsideGroundAdmissibleReachCallback_of_side_callbacks
         (V := V) A N M).mp hM_out with hM_left | hM_right
   · exact hleft M hM_left hμM_lt hv_pos hΦ
   · exact hright M hM_right hμM_lt hv_pos hΦ
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 sector reach from full reach**:
+restricting the full-space ladder output in an admissible magnetization
+subspace gives the sector-coordinate eigenvector required by
+`tasaki23OutsideGroundAdmissibleReachCallback`.  Nonzeroness is preserved
+because a vector in the target `magSubspaceS` is recovered by embedding its
+sector restriction. -/
+theorem tasaki23OutsideGroundAdmissibleReachCallback_of_full_reach
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hfull :
+      tasaki23OutsideGroundAdmissibleFullReachCallback (V := V) A J N c) :
+    tasaki23OutsideGroundAdmissibleReachCallback (V := V) A J N c := by
+  intro M _ hM_out μM v hμM_lt hv_pos hΦ
+  obtain ⟨K, hK_mem, hK_nonempty, Ψ, hΨ_ne, hΨ_mag, hΨ_eigen⟩ :=
+    hfull M hM_out hμM_lt hv_pos hΦ
+  refine ⟨K, hK_mem, hK_nonempty, magSectorRestriction (M := K) Ψ, ?_, ?_⟩
+  · intro hrestrict_zero
+    have hroundtrip :
+        magSectorEmbedding (magSectorRestriction (M := K) Ψ) = Ψ :=
+      magSectorEmbedding_magSectorRestriction_of_mem_magSubspaceS
+        (V := V) (N := N) (M := K) hΨ_mag
+    rw [hrestrict_zero] at hroundtrip
+    have hzero_embed :
+        magSectorEmbedding (0 : magConfigS V N K → ℂ) =
+          (0 : (V → Fin (N + 1)) → ℂ) := by
+      funext σ
+      unfold magSectorEmbedding
+      by_cases hσ : magSumS σ = K
+      · rw [dif_pos hσ]
+        rfl
+      · rw [dif_neg hσ]
+        rfl
+    rw [hzero_embed] at hroundtrip
+    exact hΨ_ne hroundtrip.symm
+  · exact
+      heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen
+        (V := V) (N := N) (M := K) J hΨ_eigen
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-sector lower family from sector
@@ -315,6 +382,27 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
     exact hadm_real_min (μ' := μM) (φ := fun τ => (ΦK τ).im) hIm_ne
       (heisenbergHamiltonianSReMatrixOnMagSector_mulVec_im_of_complex_eigenvec
         N hJ_real hΦK_eigen)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from full admissible
+reach**: a full-space admissible-reach callback supplies the sector
+admissible-reach callback by restriction, and hence gives the
+outside-sector ground-energy lower family. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_full_admissible_reach
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hfull :
+      tasaki23OutsideGroundAdmissibleFullReachCallback (V := V) A J N c) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+    (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundAdmissibleReachCallback_of_full_reach
+      (V := V) A (J := J) N c hfull)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-ground family from side admissible
