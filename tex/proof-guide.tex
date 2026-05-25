@@ -5302,6 +5302,19 @@ transfer the predicted total spin from the toy-Hamiltonian ground state to
 the antiferromagnetic Perron--Frobenius ground state, completing the
 total-spin determination.
 
+\paragraph{One-dimensionality of the sector ground eigenspace
+(\texttt{tasaki23\_heis\_sector\_eigenvec\_proportional\_of\_marshallPositive}).}
+The shifted dressed Heisenberg sector matrix is irreducible, so by geometric
+simplicity of the Perron eigenvalue any real eigenvector at the Perron value
+is a scalar multiple of the positive Perron eigenvector. Marshall-conjugating,
+a Marshall-positive Heisenberg sector eigenvector $\varphi$ at $\mu$ has the
+property that \emph{every} real Heisenberg sector eigenvector at $\mu$ is
+$s\cdot\varphi$. Hence the per-sector Marshall-positive ground state is the
+unique eigenvector (up to scale) at its energy; applying $(\hat S_{\rm tot})^2$
+to it (which commutes with $\hat H$) therefore yields a scalar multiple of it,
+i.e.\ it is a $(\hat S_{\rm tot})^2$ eigenvector — the step that pins its total
+spin.
+
 \textbf{Goal} (Tasaki §2.5 Theorem 2.3, p.~42). For a connected
 bipartite lattice $(\Lambda, B)$ with $|A| \ge 1$ and $|B| \ge 1$,
 the AFM Heisenberg ground states have total spin $S_{\rm tot} =
