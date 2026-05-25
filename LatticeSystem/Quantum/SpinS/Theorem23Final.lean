@@ -116,7 +116,10 @@ The bridge
 supplies the outside-sector ground-energy lower family, so the visible
 remaining inputs are the uniform predicted-GS callback, the local
 predecessor-difference comparison, the real-coupling hypotheses, and
-admissible reach for outside-sector representatives. -/
+admissible reach for outside-sector representatives.
+
+Internally this now feeds the admissible-reach lower family directly into the
+source common-energy final boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -138,13 +141,22 @@ abbrev
     (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
     (hreach :
       tasaki23OutsideGroundAdmissibleReachCallback (V := V) A J N c) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
-    (V := V) A (J := J) N c hBA hsector_nonempty hsource_predictedGS
-    hpredecessor_difference
-    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
-      (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
-      hreach)
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+    hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+    hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound
+      (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
+      hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
+      h_intermediate_final hBA hsector_nonempty
+      hsource_predictedGS hpredecessor_difference
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+        (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite
+        hc_strict hreach)
+      hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+      hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+      hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 physical-range non-empty outside-ground
@@ -154,7 +166,10 @@ physical magnetization range `M ≤ |V| * N`.  The admissible-sector range
 bound supplies the required `magConfigS` instance for each sector, and
 the remaining inputs are the uniform predicted-GS callback, the local
 predecessor-difference comparison, and outside-sector ground-energy
-lower bounds. -/
+lower bounds.
+
+The route now discharges the non-emptiness input and then invokes the explicit
+source common-energy final boundary directly. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_physical_range_nonempty_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -164,13 +179,23 @@ abbrev
     (hphysical_nonempty :
       ∀ M, M ≤ Fintype.card V * N → Nonempty (magConfigS V N M))
     (hsource_predictedGS :
-      tasaki23SourcePredictedGSCallback (V := V) A J N c) :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
-    (V := V) A (J := J) N c hBA
-    (fun M hM =>
-      hphysical_nonempty M
-        (tasaki23GroundStateSectors_le_card_mul (V := V) A N hM))
-    hsource_predictedGS
+      tasaki23SourcePredictedGSCallback (V := V) A J N c) :
+    tasaki23PredecessorDifferenceCallback (V := V) A J N c →
+      tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c →
+        tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hpredecessor_difference houtside_ground_energy_lower hJ_real hJ_real'
+    hJ_sym hJ_nn hJ_bipartite hJ_pos hc_strict h_intermediate hA_nonempty
+    hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound
+      (V := V) A (J := J) N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym
+      hJ_bipartite hc_strict h_intermediate hBA
+      (fun M hM =>
+        hphysical_nonempty M
+          (tasaki23GroundStateSectors_le_card_mul (V := V) A N hM))
+      hsource_predictedGS hpredecessor_difference houtside_ground_energy_lower
+      hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos hc_strict
+      h_intermediate hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 physical-range non-empty admissible-reach
