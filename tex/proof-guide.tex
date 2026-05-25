@@ -9829,6 +9829,32 @@ with magnetization \(M\), and \(\texttt{magSumS\_le}\) yields
 \(M\le |V|N\), hence \(M<|V|N+1\).  This is the coefficient-level discharge
 needed by the Marshall-positive reference bridge (Tasaki, Springer 2020,
 §2.5 Theorem~2.3, p.~42).
+Lean also packages this coefficient-level discharge as an outside-sector
+lower-family theorem:
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_saturated\_ladder\_iterate}\\
+\texttt{\_successor\_dominance}.
+\end{gathered}
+\]
+It supplies the left and right successor-dominance coefficient callbacks to the
+Marshall-positive coefficient bridge, thereby producing the full
+\(\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\) without requiring
+callers to package the two sides separately.  The real-coupling variant uses
+\(\texttt{saturatedFerromagnetEigenvalueS\_exists\_real}\) to discharge the
+saturated-energy real-scalar input.  The discharged final wrappers with suffixes
+\[
+\begin{gathered}
+\texttt{\_of\_saturated\_ladder\_iterate}\\
+\texttt{\_successor\_dominance\_discharge\_nonempty},\\
+\texttt{\_of\_saturated\_ladder\_iterate}\\
+\texttt{\_successor\_dominance}\\
+\texttt{\_of\_real\_couplings\_discharge\_nonempty}
+\end{gathered}
+\]
+feed the same lower-family route into the threaded predicted-GS and
+predecessor-difference final boundary.
 The remaining dominance input can also be stated in the explicit lowerable
 attached-sum form already used in the local coefficient API.  The theorem
 \[
