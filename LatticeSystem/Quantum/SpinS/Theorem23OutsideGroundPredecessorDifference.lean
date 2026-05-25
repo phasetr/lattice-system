@@ -297,6 +297,38 @@ abbrev
     (V := V) A (J := J) N c
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 discharged predecessor-difference boundary from
+outside-sector ground energies**: this is the physical-range nonempty
+companion to
+`tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound`.
+
+The public inputs are the left-endpoint predicted-GS callback, the local
+predecessor-difference comparison, and the outside-sector lower family; the
+admissible-sector `magConfigS` non-emptiness proof is supplied internally from
+the Theorem 2.3 physical range. -/
+theorem
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound_discharge_nonempty
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (houtside_ground_energy_lower :
+      tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
+    (V := V) A (J := J) N c hBA
+    (fun _M hM =>
+      magConfigS_nonempty_of_le_card_mul (V := V) (N := N)
+        (tasaki23GroundStateSectors_le_card_mul (V := V) A N hM))
+    hleft_predictedGS
+    hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+    houtside_ground_energy_lower
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 final predecessor-difference boundary from
 admissible reach**: this public boundary replaces the outside-sector
 ground-energy lower family in
@@ -338,5 +370,41 @@ theorem
     (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
       (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
       hreach)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 discharged predecessor-difference boundary from
+admissible reach**: this is the physical-range nonempty companion to
+`tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach`.
+
+The admissible-sector `magConfigS` non-emptiness callback is supplied
+internally, while admissible reach supplies the outside-sector lower-family
+callback. -/
+theorem
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach_discharge_nonempty
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hreach :
+      tasaki23OutsideGroundAdmissibleReachCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach
+    (V := V) A (J := J) N c hBA
+    (fun _M hM =>
+      magConfigS_nonempty_of_le_card_mul (V := V) (N := N)
+        (tasaki23GroundStateSectors_le_card_mul (V := V) A N hM))
+    hleft_predictedGS
+    hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict hreach
 
 end LatticeSystem.Quantum
