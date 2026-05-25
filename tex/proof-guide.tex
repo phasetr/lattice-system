@@ -10540,6 +10540,22 @@ variant also supplies admissible-sector non-emptiness from
 \(\texttt{magConfigS\_nonempty\_of\_le\_card\_mul}\), so the visible
 inputs are the uniform predicted-GS callback and the
 predecessor-difference callback.
+Conversely, the source-callback closure
+\[
+\begin{gathered}
+\texttt{tasaki23\_source\_predictedGSCallback}\\
+\texttt{\_of\_left\_endpoint\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}
+\end{gathered}
+\]
+derives the uniform source callback from the left-endpoint route itself.
+The interval chain first supplies one predicted-GS representative in each
+admissible sector.  The per-sector Theorem 2.2 uniqueness statement then
+identifies any other Marshall-positive source eigenvector in that sector as
+a positive real scalar multiple of the threaded representative, so
+submodule closure under scalar multiplication transfers membership in
+\(\texttt{bipartiteToyGroundStateSubspacePredicted}\).
 The final boundary
 \[
 \begin{gathered}

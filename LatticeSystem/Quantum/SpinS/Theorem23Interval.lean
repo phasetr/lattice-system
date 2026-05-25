@@ -346,4 +346,144 @@ theorem
   have hbounds := (tasaki23GroundStateSectors_mem_iff (V := V) A N M).mp hM
   exact hchain M (by simpa [left] using hbounds.1) (by simpa [right] using hbounds.2)
 
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 source predicted-GS callback from the
+left-endpoint interval chain**: once the predecessor-difference interval chain
+has produced one predicted-GS representative in every admissible sector,
+Marshall-positive sector uniqueness transfers predicted-GS membership to every
+other Marshall-positive source eigenvector below the spectral shift.
+
+This closes the gap between the weaker left-endpoint predicted-GS callback used
+by the interval induction and the uniform source predicted-GS callback exposed
+at older final-boundary wrappers. -/
+theorem
+    tasaki23_source_predictedGSCallback_of_left_endpoint_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c) :
+    tasaki23SourcePredictedGSCallback (V := V) A J N c := by
+  obtain ⟨_μ_chain, hchain_pred⟩ :=
+    tasaki23_energy_interval_chain_with_predictedGS_of_left_endpoint_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hBA hsector_nonempty hleft_predictedGS
+      hpredecessor_difference
+  intro M hM μ v _hμ_lt hv_pos hΦ
+  letI : Nonempty (magConfigS V N M) := hsector_nonempty M hM
+  obtain ⟨v_chain, _hμ_chain_lt, hv_chain_pos, hΦ_chain, hpred_chain⟩ :=
+    hchain_pred M hM
+  obtain ⟨_μM, vM, _hμM_lt, _hvM_pos, _hΦM, _hsupportM, huniqM⟩ :=
+    tasaki_2_5_theorem_2_3_sector_existence
+      (M := M) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate
+  let Φv : (V → Fin (N + 1)) → ℂ :=
+    magSectorEmbedding
+      (fun τ : magConfigS V N M => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))
+  let Φchain : (V → Fin (N + 1)) → ℂ :=
+    magSectorEmbedding
+      (fun τ : magConfigS V N M =>
+        (((marshallSignS A τ.1).re * v_chain τ : ℝ) : ℂ))
+  have hsupport_v :
+      ∀ σ, magSumS σ ≠ M → Φv σ = 0 := by
+    intro σ hσ
+    exact magSectorEmbedding_apply_of_not_mem _ hσ
+  have hsupport_chain :
+      ∀ σ, magSumS σ ≠ M → Φchain σ = 0 := by
+    intro σ hσ
+    exact magSectorEmbedding_apply_of_not_mem _ hσ
+  have hpos_v_full :
+      ∀ τ : magConfigS V N M, 0 < (marshallSignS A τ.1).re * (Φv τ.1).re := by
+    intro τ
+    change 0 < (marshallSignS A τ.1).re *
+      (magSectorEmbedding
+        (fun τ : magConfigS V N M =>
+          (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) τ.1).re
+    rw [magSectorEmbedding_apply_subtype, Complex.ofReal_re]
+    have hsq : (marshallSignS A τ.1).re * (marshallSignS A τ.1).re = 1 :=
+      marshallSignS_re_sq A τ.1
+    rw [← mul_assoc, hsq, one_mul]
+    exact hv_pos τ
+  have hpos_chain_full :
+      ∀ τ : magConfigS V N M, 0 < (marshallSignS A τ.1).re * (Φchain τ.1).re := by
+    intro τ
+    change 0 < (marshallSignS A τ.1).re *
+      (magSectorEmbedding
+        (fun τ : magConfigS V N M =>
+          (((marshallSignS A τ.1).re * v_chain τ : ℝ) : ℂ)) τ.1).re
+    rw [magSectorEmbedding_apply_subtype, Complex.ofReal_re]
+    have hsq : (marshallSignS A τ.1).re * (marshallSignS A τ.1).re = 1 :=
+      marshallSignS_re_sq A τ.1
+    rw [← mul_assoc, hsq, one_mul]
+    exact hv_chain_pos τ
+  have hΦv : (heisenbergHamiltonianS J N).mulVec Φv = (μ : ℂ) • Φv := by
+    simpa [Φv] using hΦ
+  have hΦchain :
+      (heisenbergHamiltonianS J N).mulVec Φchain =
+        (_μ_chain : ℂ) • Φchain := by
+    simpa [Φchain] using hΦ_chain
+  obtain ⟨_hμ_eq, r, _hr_pos, hrel⟩ :=
+    huniqM hΦv hsupport_v hpos_v_full
+  obtain ⟨_hμ_chain_eq, r_chain, hr_chain_pos, hrel_chain⟩ :=
+    huniqM hΦchain hsupport_chain hpos_chain_full
+  have hr_chain_ne : r_chain ≠ 0 := ne_of_gt hr_chain_pos
+  have hfull_eq : Φv = (((r / r_chain : ℝ) : ℂ) • Φchain) := by
+    funext σ
+    by_cases hσ : magSumS σ = M
+    · let τ : magConfigS V N M := ⟨σ, hσ⟩
+      have hτ := hrel τ
+      have hτ_chain := hrel_chain τ
+      change
+        (magSectorEmbedding
+          (fun τ : magConfigS V N M =>
+            (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) τ.1).re =
+          r * ((marshallSignS A τ.1).re * vM τ) at hτ
+      change
+        (magSectorEmbedding
+          (fun τ : magConfigS V N M =>
+            (((marshallSignS A τ.1).re * v_chain τ : ℝ) : ℂ)) τ.1).re =
+          r_chain * ((marshallSignS A τ.1).re * vM τ) at hτ_chain
+      rw [magSectorEmbedding_apply_subtype, Complex.ofReal_re] at hτ
+      rw [magSectorEmbedding_apply_subtype, Complex.ofReal_re] at hτ_chain
+      have hreal :
+          (marshallSignS A σ).re * v τ =
+            (r / r_chain) * ((marshallSignS A σ).re * v_chain τ) := by
+        change (marshallSignS A τ.1).re * v τ =
+          (r / r_chain) * ((marshallSignS A τ.1).re * v_chain τ)
+        rw [hτ, hτ_chain]
+        field_simp [hr_chain_ne]
+      change
+        (magSectorEmbedding
+          (fun τ : magConfigS V N M =>
+            (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) σ) =
+          (((r / r_chain : ℝ) : ℂ) •
+            magSectorEmbedding
+              (fun τ : magConfigS V N M =>
+                (((marshallSignS A τ.1).re * v_chain τ : ℝ) : ℂ))) σ
+      rw [Pi.smul_apply, magSectorEmbedding_apply_of_mem _ hσ,
+        magSectorEmbedding_apply_of_mem _ hσ]
+      change (((marshallSignS A σ).re * v τ : ℝ) : ℂ) =
+        ((r / r_chain : ℝ) : ℂ) *
+          (((marshallSignS A σ).re * v_chain τ : ℝ) : ℂ)
+      exact_mod_cast hreal
+    · rw [Pi.smul_apply, hsupport_v σ hσ, hsupport_chain σ hσ, smul_zero]
+  change Φv ∈ bipartiteToyGroundStateSubspacePredicted (Λ := V) A N
+  rw [hfull_eq]
+  exact Submodule.smul_mem _ _ hpred_chain
+
 end LatticeSystem.Quantum
