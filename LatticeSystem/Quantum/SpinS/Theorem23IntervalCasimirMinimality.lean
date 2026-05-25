@@ -172,6 +172,95 @@ theorem
   exact ⟨v, hμ_lt, hv_pos, hΦ⟩
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 common-energy chain from uniform predicted-GS
+callbacks**: the uniform source predicted-GS callback supplies the left-endpoint
+predicted-GS input needed by the predecessor-difference interval chain.
+
+This wrapper keeps the visible predicted-GS hypothesis in the canonical
+source-sector form used by the adjacent-sector chain and reuses
+`tasaki23_common_energy_chain_of_left_endpoint_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos`
+for the actual common-energy construction. -/
+theorem
+    tasaki23_common_energy_chain_of_source_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c) :
+    ∃ μ : ℝ, tasaki23CommonEnergyChain (V := V) A J N c μ :=
+  tasaki23_common_energy_chain_of_left_endpoint_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+    A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+    hc_strict h_intermediate hBA hsector_nonempty
+    (fun {μ : ℝ}
+        {v : magConfigS V N
+          (min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+              N) → ℝ} hμ_lt hv_pos hΦ =>
+      hsource_predictedGS
+        (M :=
+          min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+            (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) *
+              N)
+        (by
+          simpa using tasaki23GroundStateSectors_left_mem (V := V) A N)
+        hμ_lt hv_pos hΦ)
+    hpredecessor_difference
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 common-energy chain with discharged
+admissible-sector non-emptiness**: the uniform source predicted-GS callback and
+predecessor-difference callback imply the named common-energy chain, while
+sector non-emptiness is supplied from the physical range of
+`tasaki23GroundStateSectors`.
+
+This is the same source predicted-GS common-energy boundary as
+`tasaki23_common_energy_chain_of_source_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos`,
+but with the admissible-sector `Nonempty` callback discharged by
+`magConfigS_nonempty_of_le_card_mul`. -/
+theorem
+    tasaki23_common_energy_chain_of_source_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_discharge_nonempty
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c) :
+    ∃ μ : ℝ, tasaki23CommonEnergyChain (V := V) A J N c μ :=
+  tasaki23_common_energy_chain_of_source_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+    A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+    hc_strict h_intermediate hBA
+    (fun _M hM =>
+      magConfigS_nonempty_of_le_card_mul (V := V) (N := N)
+        (tasaki23GroundStateSectors_le_card_mul (V := V) A N hM))
+    hsource_predictedGS hpredecessor_difference
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 common-energy chain from predecessor
 raising-source dominance**: the left-endpoint predicted-GS input together
 with the fully threaded strict dominance of the on-`A` predecessor
