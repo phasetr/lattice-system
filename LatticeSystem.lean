@@ -78,6 +78,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23SectorExistence
 import LatticeSystem.Quantum.SpinS.Theorem23PFLadderLink
 import LatticeSystem.Quantum.SpinS.Theorem23PFConstancy
 import LatticeSystem.Quantum.SpinS.Theorem23PFTotalSpin
+import LatticeSystem.Quantum.SpinS.Theorem23PFCasimirEigenvector
 
 /-!
 # `lattice-system` library root
