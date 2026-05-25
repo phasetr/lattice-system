@@ -9166,8 +9166,9 @@ wrapper is
 \texttt{\_discharge\_nonempty}.
 \end{gathered}
 \]
-It converts the saturated-Casimir callbacks to the full-reach lower family and
-passes that lower family directly to the source predicted-GS common-energy
+It now obtains the outside-sector lower family through
+\(\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback\_of\_saturated\_casimir\_sources}\)
+and passes that lower family directly to the source predicted-GS common-energy
 final boundary.
 The next wrapper replaces the saturated-Casimir source equation by the
 more concrete ladder-span input.  Lean uses
@@ -9203,9 +9204,10 @@ corresponding final boundary is
 \texttt{\_discharge\_nonempty}.
 \end{gathered}
 \]
-It performs the ladder-span to saturated-Casimir conversion internally and then
-passes the resulting lower family directly to the source predicted-GS
-common-energy final boundary.
+It now obtains the outside-sector lower family through
+\(\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback\_of\_saturated\_ladder\_span\_sources}\)
+and passes that lower family directly to the source predicted-GS common-energy
+final boundary.
 Lean also records the same input in the saturated-ferromagnet joint
 eigenspace form.  The callbacks
 \[
@@ -9240,9 +9242,10 @@ The corresponding final boundary is
 \texttt{\_discharge\_nonempty}.
 \end{gathered}
 \]
-It performs the joint-eigenspace to ladder-span conversion internally and then
-passes the resulting lower family directly to the source predicted-GS
-common-energy final boundary.
+It now obtains the outside-sector lower family through
+\(\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback\_of\_saturated\_joint\_sources}\)
+and passes that lower family directly to the source predicted-GS common-energy
+final boundary.
 The next boundary splits this joint membership into its two defining
 eigenvalue equations.  Lean names the Heisenberg half by
 \[
