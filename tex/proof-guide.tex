@@ -9081,7 +9081,9 @@ an admissible sector with \(M=K+k\) and proves
 \texttt{\_discharge\_nonempty}
 \end{gathered}
 \]
-then feeds these non-zeroness callbacks through the full-reach bridge.
+then feeds these non-zeroness callbacks through the full-reach bridge and
+passes the resulting lower family directly to the source predicted-GS
+common-energy final boundary.
 The non-zeroness input has a Casimir-based discharge:
 \[
 \begin{gathered}
@@ -9108,7 +9110,8 @@ raising direction.  The final predecessor-difference boundary
 \end{gathered}
 \]
 therefore replaces the raw iterated-ladder non-zeroness hypotheses by
-left and right Casimir-avoidance callbacks.
+left and right Casimir-avoidance callbacks, then enters the same source
+predicted-GS common-energy final boundary directly.
 The saturated-ferromagnet total-Casimir value gives a further endpoint
 bridge.  Lean records the elementary mismatches
 \[
@@ -9163,6 +9166,9 @@ wrapper is
 \texttt{\_discharge\_nonempty}.
 \end{gathered}
 \]
+It converts the saturated-Casimir callbacks to the full-reach lower family and
+passes that lower family directly to the source predicted-GS common-energy
+final boundary.
 The next wrapper replaces the saturated-Casimir source equation by the
 more concrete ladder-span input.  Lean uses
 \[
@@ -9197,6 +9203,9 @@ corresponding final boundary is
 \texttt{\_discharge\_nonempty}.
 \end{gathered}
 \]
+It performs the ladder-span to saturated-Casimir conversion internally and then
+passes the resulting lower family directly to the source predicted-GS
+common-energy final boundary.
 Lean also records the same input in the saturated-ferromagnet joint
 eigenspace form.  The callbacks
 \[
@@ -9231,6 +9240,9 @@ The corresponding final boundary is
 \texttt{\_discharge\_nonempty}.
 \end{gathered}
 \]
+It performs the joint-eigenspace to ladder-span conversion internally and then
+passes the resulting lower family directly to the source predicted-GS
+common-energy final boundary.
 The next boundary splits this joint membership into its two defining
 eigenvalue equations.  Lean names the Heisenberg half by
 \[
