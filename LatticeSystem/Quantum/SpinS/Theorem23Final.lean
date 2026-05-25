@@ -1111,6 +1111,49 @@ abbrev tasaki_2_5_theorem_2_3_of_named_callbacks
     hpredecessor_difference houtside_ground_energy_lower
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 source common-energy final boundary**:
+this public boundary routes the source predicted-GS and predecessor-difference
+callbacks through the named common-energy chain before applying the final
+outside-sector ground-energy theorem.
+
+Unlike `tasaki_2_5_theorem_2_3_of_named_callbacks`, this theorem makes the
+reduced proof route explicit: first construct `tasaki23CommonEnergyChain` from
+the source predicted-GS callback with admissible-sector non-emptiness discharged,
+then feed that common energy to
+`tasaki_2_5_theorem_2_3_of_common_energy_chain_and_outside_sector_ground_energy_lower_bound`. -/
+theorem
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (houtside_ground_energy_lower :
+      tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  obtain ⟨μ, hcommon⟩ :=
+    tasaki23_common_energy_chain_of_source_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_discharge_nonempty
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hBA hsource_predictedGS hpredecessor_difference
+  exact
+    tasaki_2_5_theorem_2_3_of_common_energy_chain_and_outside_sector_ground_energy_lower_bound
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hcommon
+      (houtside_ground_energy_lower (μ := μ) hcommon)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated joint
 sources**: this public boundary replaces the named outside-sector
 lower-family callback by the saturated joint source-vector callbacks.  The
