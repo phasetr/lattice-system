@@ -10329,6 +10329,26 @@ Marshall-positive inputs to singleton ladder-iterate references and then
 reuse the source-eigen extraction route.  Thus the scalar saturated
 source-energy and saturated-Casimir callbacks remain internal for the
 discharged, uniform named, and left-endpoint named final surfaces.
+Under real couplings this extraction layer is also exposed directly at the
+saturated ladder-iterate dominance level.  The wrappers with suffixes
+\[
+\begin{gathered}
+\texttt{\_saturated\_ladder\_iterate\_successor\_dominance}\\
+\texttt{\_of\_real\_couplings\_extract\_source\_eigen\_callbacks},\\
+\texttt{\_saturated\_ladder\_iterate\_lowerable\_attach\_sum}\\
+\texttt{\_dominance\_of\_real\_couplings}\\
+\texttt{\_extract\_source\_eigen\_callbacks},\\
+\texttt{\_saturated\_ladder\_iterate\_predecessor\_difference\_pos}\\
+\texttt{\_of\_real\_couplings\_extract\_source\_eigen\_callbacks}
+\end{gathered}
+\]
+are provided for the discharged, uniform named, and left-endpoint named final
+surfaces.  They first build the left and right pointwise
+Marshall-positive coefficient callbacks from the corresponding dominance
+input, using real couplings to discharge the saturated-energy real-scalar
+witness, and then reuse the coefficient source-eigen extraction boundary.
+Consequently the public final statements expose the dominance input rather
+than the intermediate coefficient or scalar source-eigen callbacks.
 The same explicit sector non-emptiness layer reaches the saturated
 ladder-iterate dominance inputs:
 \[

@@ -2169,6 +2169,142 @@ abbrev
       (V := V) A (J := J) N hright_ref)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 discharged source-eigen extraction boundary
+from saturated ladder-iterate successor dominance with real couplings**: real
+couplings supply the saturated-energy real scalar needed by the coefficient
+callbacks, and the resulting pointwise Marshall-positive coefficient callbacks
+enter the source-eigen extraction route internally. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_successor_dominance_of_real_couplings_extract_source_eigen_callbacks_discharge_nonempty
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (∑ x ∈ ((Finset.univ.filter (fun x : V => A x = true)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) <
+          ∑ x ∈ ((Finset.univ.filter (fun x : V => A x = false)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_marshall_positive_coefficients_extract_source_eigen_callbacks_discharge_nonempty
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance_of_real_couplings
+      (V := V) A (J := J) N hJ_real hdominates)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance_of_real_couplings
+      (V := V) A (J := J) N hJ_real hdominates)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 discharged source-eigen extraction boundary
+from explicit lowerable attach-sum dominance with real couplings**: the
+lowerable dominance input is converted to left and right pointwise
+Marshall-positive coefficient callbacks internally before reusing the
+source-eigen extraction route. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_lowerable_attach_sum_dominance_of_real_couplings_extract_source_eigen_callbacks_discharge_nonempty
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (((Finset.univ.filter (fun x : V => A x = true)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                w τ x.1 ((Finset.mem_filter.mp x.2).2))) <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                  w τ x.1 ((Finset.mem_filter.mp x.2).2)))) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_marshall_positive_coefficients_extract_source_eigen_callbacks_discharge_nonempty
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance_of_real_couplings
+      (V := V) A (J := J) N hJ_real hdominates)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance_of_real_couplings
+      (V := V) A (J := J) N hJ_real hdominates)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 discharged source-eigen extraction boundary
+from saturated ladder-iterate predecessor differences with real couplings**:
+the predecessor-difference positivity callback is converted to explicit
+lowerable dominance and then to pointwise Marshall-positive coefficient
+callbacks internally before entering the source-eigen extraction route. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings_extract_source_eigen_callbacks_discharge_nonempty
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hdiff :
+      tasaki23SaturatedLadderIteratePredecessorDifferencePosCallback (V := V) A N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_lowerable_attach_sum_dominance_of_real_couplings_extract_source_eigen_callbacks_discharge_nonempty
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (fun M hM_succ w hcoeff =>
+      tasaki23_lowerable_positive_source_attach_sum_lt_callback_of_offA_sub_onA_pos
+        (V := V) (N := N) A w (hdiff M hM_succ w hcoeff))
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 side-admissible-reach discharged boundary**:
 this version of the discharged final predecessor-difference boundary accepts
 separate left and right directional outside-sector reach callbacks.  The side
@@ -3495,6 +3631,141 @@ abbrev
       (V := V) A (J := J) N hright_ref)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback source-eigen extraction
+boundary from saturated ladder-iterate successor dominance with real
+couplings**: the uniform named final route can consume successor dominance
+directly, with the pointwise Marshall-positive coefficient callbacks produced
+internally before reusing the source-eigen extraction boundary. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_successor_dominance_of_real_couplings_extract_source_eigen_callbacks_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (∑ x ∈ ((Finset.univ.filter (fun x : V => A x = true)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) <
+          ∑ x ∈ ((Finset.univ.filter (fun x : V => A x = false)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_marshall_positive_coefficients_extract_source_eigen_callbacks_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance_of_real_couplings
+      (V := V) A (J := J) N hJ_real hdominates)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance_of_real_couplings
+      (V := V) A (J := J) N hJ_real hdominates)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback source-eigen extraction
+boundary from explicit lowerable attach-sum dominance with real couplings**:
+the uniform extraction route builds the saturated ladder-iterate
+Marshall-positive coefficient callbacks from lowerable dominance internally. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_lowerable_attach_sum_dominance_of_real_couplings_extract_source_eigen_callbacks_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (((Finset.univ.filter (fun x : V => A x = true)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                w τ x.1 ((Finset.mem_filter.mp x.2).2))) <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                  w τ x.1 ((Finset.mem_filter.mp x.2).2)))) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_marshall_positive_coefficients_extract_source_eigen_callbacks_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance_of_real_couplings
+      (V := V) A (J := J) N hJ_real hdominates)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance_of_real_couplings
+      (V := V) A (J := J) N hJ_real hdominates)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback source-eigen extraction
+boundary from saturated ladder-iterate predecessor differences with real
+couplings**: the predecessor-difference positivity callback is routed through
+the lowerable dominance extraction wrapper, so the uniform source-eigen
+surface no longer exposes pointwise coefficient callbacks. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings_extract_source_eigen_callbacks_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hdiff :
+      tasaki23SaturatedLadderIteratePredecessorDifferencePosCallback (V := V) A N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_lowerable_attach_sum_dominance_of_real_couplings_extract_source_eigen_callbacks_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (fun M hM_succ w hcoeff =>
+      tasaki23_lowerable_positive_source_attach_sum_lt_callback_of_offA_sub_onA_pos
+        (V := V) (N := N) A w (hdiff M hM_succ w hcoeff))
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback final
 boundary**: this public boundary avoids the uniform source-sector
 predicted-GS callback when only the current outside-ground route is
@@ -4324,6 +4595,141 @@ abbrev
       (V := V) A (J := J) N hleft_ref)
     (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback_of_marshall_positive_coefficients
       (V := V) A (J := J) N hright_ref)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint source-eigen extraction boundary
+from saturated ladder-iterate successor dominance with real couplings**: the
+left-endpoint route builds the pointwise Marshall-positive coefficient
+callbacks from successor dominance internally, then reuses the source-eigen
+extraction boundary. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_successor_dominance_of_real_couplings_extract_source_eigen_callbacks_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (∑ x ∈ ((Finset.univ.filter (fun x : V => A x = true)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) <
+          ∑ x ∈ ((Finset.univ.filter (fun x : V => A x = false)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_marshall_positive_coefficients_extract_source_eigen_callbacks_named_callbacks
+    (V := V) A (J := J) N c hBA hleft_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance_of_real_couplings
+      (V := V) A (J := J) N hJ_real hdominates)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance_of_real_couplings
+      (V := V) A (J := J) N hJ_real hdominates)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint source-eigen extraction boundary
+from explicit lowerable attach-sum dominance with real couplings**: the
+left-endpoint extraction route converts lowerable dominance to the coefficient
+callbacks internally before extracting the scalar source-eigen data. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_lowerable_attach_sum_dominance_of_real_couplings_extract_source_eigen_callbacks_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (((Finset.univ.filter (fun x : V => A x = true)).filter
+              (fun x : V => 0 < (τ.1 x).val)).attach.sum
+            (fun x =>
+              tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                w τ x.1 ((Finset.mem_filter.mp x.2).2))) <
+          (((Finset.univ.filter (fun x : V => A x = false)).filter
+                (fun x : V => 0 < (τ.1 x).val)).attach.sum
+              (fun x =>
+                tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
+                  w τ x.1 ((Finset.mem_filter.mp x.2).2)))) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_marshall_positive_coefficients_extract_source_eigen_callbacks_named_callbacks
+    (V := V) A (J := J) N c hBA hleft_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance_of_real_couplings
+      (V := V) A (J := J) N hJ_real hdominates)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_lowerable_attach_sum_dominance_of_real_couplings
+      (V := V) A (J := J) N hJ_real hdominates)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint source-eigen extraction boundary
+from saturated ladder-iterate predecessor differences with real couplings**:
+the predecessor-difference positivity input is converted through the
+lowerable dominance extraction route, so the left-endpoint surface no longer
+exposes pointwise coefficient callbacks. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings_extract_source_eigen_callbacks_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hdiff :
+      tasaki23SaturatedLadderIteratePredecessorDifferencePosCallback (V := V) A N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_lowerable_attach_sum_dominance_of_real_couplings_extract_source_eigen_callbacks_named_callbacks
+    (V := V) A (J := J) N c hBA hleft_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (fun M hM_succ w hcoeff =>
+      tasaki23_lowerable_positive_source_attach_sum_lt_callback_of_offA_sub_onA_pos
+        (V := V) (N := N) A w (hdiff M hM_succ w hcoeff))
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
