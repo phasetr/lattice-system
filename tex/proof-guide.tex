@@ -10302,8 +10302,10 @@ common-energy final boundary directly.  Thus downstream discharged wrappers
 also share the reduced common-energy plus outside-sector final route.
 The admissible-reach entry point follows the same pattern: it converts the
 reach callback to the outside-sector lower-family callback and feeds that
-family directly into the explicit source common-energy final boundary, with
-the physical-range and discharged reach wrappers inheriting this route.
+family directly into the explicit source common-energy final boundary.  The
+physical-range and discharged reach wrappers now use the same reduced
+common-energy plus outside-sector route without changing their public
+hypotheses.
 
 The common-energy boundary has also been pushed one step closer to the
 local comparison now used in the predecessor-source wrappers:
@@ -10534,7 +10536,7 @@ The same three public boundary levels also have admissible-reach versions:
 Each wrapper obtains the outside-sector ground-energy lower family from
 \texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback\_of\_admissible\_reach}
 using the real-coupling and strict diagonal-shift hypotheses, and then
-reuses the corresponding outside-sector ground-energy boundary.
+passes it directly to the corresponding source common-energy final boundary.
 
 \textbf{Lowered vector Marshall-positivity final wrappers}: the
 site-sum formulation is only a technical expansion of the total lowering

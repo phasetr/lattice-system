@@ -318,7 +318,8 @@ the threaded predecessor-difference boundary.
 
 Non-emptiness comes from `magConfigS_nonempty_of_le_card_mul`, while the
 outside-sector ground-energy lower family is supplied by the admissible
-reach bridge. -/
+reach bridge.  Internally this directly invokes the source predicted-GS
+common-energy final boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach_discharge_nonempty
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -337,19 +338,28 @@ abbrev
     (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
     (hreach :
       tasaki23OutsideGroundAdmissibleReachCallback (V := V) A J N c) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_physical_range_nonempty_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach
-    (V := V) A (J := J) N c hBA
-    (fun _M hM => magConfigS_nonempty_of_le_card_mul (V := V) (N := N) hM)
-    hsource_predictedGS hpredecessor_difference hJ_real hJ_real' hJ_nn hJ_sym
-    hJ_bipartite hc_strict hreach
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+    hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+    hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+      (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
+      hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
+      h_intermediate_final hBA hsource_predictedGS hpredecessor_difference
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+        (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite
+        hc_strict hreach)
+      hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+      hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+      hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 full-admissible-reach discharged boundary**:
 this version of the discharged final predecessor-difference boundary accepts
 a full-space ladder-reach callback.  The full-space callback is restricted to
-the sector-coordinate admissible-reach callback before reusing the existing
-admissible-reach discharged boundary. -/
+the sector-coordinate admissible-reach callback, then the resulting lower
+family is fed directly into the common-energy final boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_full_admissible_reach_discharge_nonempty
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -368,12 +378,23 @@ abbrev
     (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
     (hfull :
       tasaki23OutsideGroundAdmissibleFullReachCallback (V := V) A J N c) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach_discharge_nonempty
-    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
-    (tasaki23OutsideGroundAdmissibleReachCallback_of_full_reach
-      (V := V) A (J := J) N c hfull)
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+    hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+    hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+      (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
+      hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
+      h_intermediate_final hBA hsource_predictedGS hpredecessor_difference
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+        (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite
+        hc_strict
+        (tasaki23OutsideGroundAdmissibleReachCallback_of_full_reach
+          (V := V) A (J := J) N c hfull))
+      hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+      hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+      hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 iterated-ladder full-reach discharged
@@ -918,8 +939,8 @@ set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 side-admissible-reach discharged boundary**:
 this version of the discharged final predecessor-difference boundary accepts
 separate left and right directional outside-sector reach callbacks.  The side
-callbacks are recombined into the full admissible-reach callback before reusing
-the existing admissible-reach discharged boundary. -/
+callbacks are recombined into the full admissible-reach callback before the
+resulting lower family is fed directly into the common-energy final boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_side_admissible_reach_discharge_nonempty
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -940,12 +961,23 @@ abbrev
       tasaki23OutsideGroundLeftAdmissibleReachCallback (V := V) A J N c)
     (hright :
       tasaki23OutsideGroundRightAdmissibleReachCallback (V := V) A J N c) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach_discharge_nonempty
-    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
-    (tasaki23OutsideGroundAdmissibleReachCallback_of_side_callbacks
-      (V := V) A (J := J) N c hleft hright)
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+    hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+    hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+      (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
+      hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
+      h_intermediate_final hBA hsource_predictedGS hpredecessor_difference
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+        (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite
+        hc_strict
+        (tasaki23OutsideGroundAdmissibleReachCallback_of_side_callbacks
+          (V := V) A (J := J) N c hleft hright))
+      hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+      hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+      hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 discharged boundary from saturated
