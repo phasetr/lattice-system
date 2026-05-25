@@ -8948,6 +8948,28 @@ predecessor raising-source sum is less than the off-\(A\) sum, and returns
 comparison as positivity of the off-\(A\) minus on-\(A\) difference.  The
 common-energy theorem with predecessor raising-source dominance now calls this
 named bridge instead of carrying that `linarith` conversion anonymously.
+The explicit lowerable coefficient comparison has the analogous direct bridge
+\[
+\begin{gathered}
+\texttt{tasaki23PredecessorDifferenceCallback}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_explicit\_lowerable}\\
+\texttt{\_positive\_source\_coefficient\_lt}.
+\end{gathered}
+\]
+It first uses the local coefficient mirror
+\[
+\begin{gathered}
+\texttt{tasaki23\_raising\_predecessor\_source\_sum\_lt}\\
+\texttt{\_of\_lowerable\_positive\_source\_attach\_sum\_lt}
+\end{gathered}
+\]
+to convert attached sums of
+\(\texttt{tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient}\)
+to predecessor raising-source dominance, then returns the same
+predecessor-difference callback.  The common-energy theorem from explicit
+lowerable coefficients now enters the predecessor-difference common-energy
+route through this named bridge.
 
 The short final boundary
 \[
