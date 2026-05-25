@@ -1,6 +1,7 @@
 import LatticeSystem.Math.PerronFrobeniusPrimitive
 import LatticeSystem.Math.CollatzWielandt
 import LatticeSystem.Math.PerronFrobeniusMain
+import LatticeSystem.Math.PerronFrobeniusSimple
 import LatticeSystem.Math.PerronFrobenius
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
