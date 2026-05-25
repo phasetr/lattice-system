@@ -1941,8 +1941,9 @@ abbrev tasaki_2_5_theorem_2_3_of_saturated_casimir_sources_named_callbacks
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated
 ladder-span sources**: source callbacks in the saturated total-spin ladder
-span first become saturated-Casimir source callbacks, then feed the uniform
-named final boundary through the saturated-Casimir outside-ground bridge. -/
+span feed the outside-sector lower-family callback through the saturated
+ladder-span outside-ground bridge before entering the uniform named final
+boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_saturated_ladder_span_sources_named_callbacks
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -1964,13 +1965,11 @@ abbrev
     (hrightSpan :
       tasaki23OutsideGroundRightSaturatedLadderSpanSourceCallback (V := V) A J N c) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_saturated_casimir_sources_named_callbacks
+  tasaki_2_5_theorem_2_3_of_named_callbacks
     (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
-    (tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback_of_ladder_span_source
-      A (J := J) N c hleftSpan)
-    (tasaki23OutsideGroundRightSaturatedCasimirSourceCallback_of_ladder_span_source
-      A (J := J) N c hrightSpan)
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_span_sources
+      (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hleftSpan hrightSpan)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated eigen
@@ -2606,8 +2605,8 @@ set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
 saturated ladder-span sources**: the left-endpoint final boundary can consume
 left and right source callbacks in the saturated total-spin ladder span.  The
-ladder-span inputs are first converted to saturated-Casimir source callbacks,
-then to the outside-sector lower-family callback. -/
+saturated ladder-span outside-ground bridge converts those callbacks directly
+to the outside-sector lower-family callback. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_span_sources_named_callbacks
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -2629,13 +2628,11 @@ abbrev
     (hrightSpan :
       tasaki23OutsideGroundRightSaturatedLadderSpanSourceCallback (V := V) A J N c) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_casimir_sources_named_callbacks
+  tasaki_2_5_theorem_2_3_of_left_endpoint_named_callbacks
     (V := V) A (J := J) N c hBA hleft_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
-    (tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback_of_ladder_span_source
-      A (J := J) N c hleftSpan)
-    (tasaki23OutsideGroundRightSaturatedCasimirSourceCallback_of_ladder_span_source
-      A (J := J) N c hrightSpan)
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_span_sources
+      (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hleftSpan hrightSpan)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
