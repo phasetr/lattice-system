@@ -10189,7 +10189,37 @@ use
 \texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback\_of\_admissible\_reach}
 instead, so the final public boundary can consume the ladder-reach
 callback together with the real-coupling and strict diagonal-shift
-hypotheses.  These final boundaries live in
+hypotheses.  The same named-callback layer also exposes the stronger
+reach inputs
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_full\_admissible\_reach}\\
+\texttt{\_named\_callbacks},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_iterated\_ladder\_full\_reach}\\
+\texttt{\_named\_callbacks},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_iterated\_ladder\_casimir}\\
+\texttt{\_full\_reach\_named\_callbacks},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_side\_admissible\_reach}\\
+\texttt{\_named\_callbacks}
+\end{gathered}
+\]
+and their left-endpoint analogues.  These wrappers use the direct bridges
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_full\_admissible\_reach},\\
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_iterated\_ladder\_full\_reach},\\
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_iterated\_ladder\_casimir\_full\_reach},\\
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_side\_admissible\_reach}
+\end{gathered}
+\]
+before reusing the uniform or left-endpoint named final boundary.  Thus the
+named public API can state the remaining outside-ground task directly as
+full-space reach, iterated-ladder reach, Casimir-certified ladder reach, or
+left/right side reach.  These final boundaries live in
 \(\texttt{LatticeSystem.Quantum.SpinS.Theorem23Final}\).  The lowered-site-sum
 public final-boundary aliases now
 live in the Lean module
