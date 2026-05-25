@@ -1,6 +1,8 @@
 import LatticeSystem.Quantum.SpinS.Theorem23Casimir
 import LatticeSystem.Quantum.SpinS.SaturatedLadderJointEigenspace
 import LatticeSystem.Quantum.SpinS.AllAlignedStateMagShift
+import LatticeSystem.Quantum.SpinS.Theorem23Predicted
+import LatticeSystem.Quantum.SpinS.Theorem23PredictedEndpoint
 
 /-!
 # Tasaki §2.5 Theorem 2.3 — Perron–Frobenius adjacent-sector ladder link
@@ -73,5 +75,55 @@ theorem tasaki23_pf_ladder_link_succ
       hCas hγ hΦ
   · exact totalSpinSOpMinus_mulVec_mem_magSubspaceS_of_mem
       (magSectorEmbedding_mem_magSubspaceS (V := V) (N := N) (M := M) Φ)
+
+/-- **Tasaki §2.5 Theorem 2.3 Perron–Frobenius adjacent-sector ladder
+link from predicted-GS membership**: the Casimir hypotheses of
+`tasaki23_pf_ladder_link_succ` are discharged for any sector vector that
+lies in the predicted toy ground-state subspace.
+
+In the canonical orientation `|¬A| ≤ |A|`, membership in
+`bipartiteToyGroundStateSubspacePredicted A N` pins the total-Casimir
+eigenvalue to `tasaki23PredictedCasimirValue A N`
+(`tasaki23_totalSpinSSquared_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted`),
+and that predicted value differs from the lowering-kernel value of any
+admissible sector below the right endpoint
+(`tasaki23_predictedCasimirValue_ne_lowering_kernel_value_of_mem_of_lt_right`).
+
+Hence, for a predicted-GS Heisenberg eigenvector at energy `μ` in an
+admissible sector `M` below the right endpoint, `Ŝ⁻_tot · Ψ` is a non-zero
+Heisenberg eigenvector at the **same** `μ` in sector `M + 1`.  This is the
+energy-preserving chaining step specialised to the physical (predicted)
+ground-state line, with no remaining abstract Casimir input. -/
+theorem tasaki23_pf_ladder_link_succ_of_mem_predictedGS
+    (A : V → Bool) {N M : ℕ} {J : V → V → ℂ} {μ : ℝ}
+    {Φ : magConfigS V N M → ℂ}
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hM : M ∈ tasaki23GroundStateSectors (V := V) A N)
+    (hMlt :
+      M <
+        max (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+          (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N)
+    (hΨ_pred :
+      magSectorEmbedding Φ ∈
+        bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hH :
+      (heisenbergHamiltonianS J N).mulVec (magSectorEmbedding Φ) =
+        (μ : ℂ) • magSectorEmbedding Φ)
+    (hΦ : magSectorEmbedding Φ ≠ 0) :
+    (heisenbergHamiltonianS J N).mulVec
+        ((totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ)) =
+        (μ : ℂ) • (totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ) ∧
+      (totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ) ≠ 0 ∧
+      (totalSpinSOpMinus V N).mulVec (magSectorEmbedding Φ) ∈
+        magSubspaceS V N
+          ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) - 1) :=
+  tasaki23_pf_ladder_link_succ hH
+    (tasaki23_totalSpinSSquared_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+      A N hBA hΨ_pred)
+    (tasaki23_predictedCasimirValue_ne_lowering_kernel_value_of_mem_of_lt_right
+      A N hM hMlt)
+    hΦ
 
 end LatticeSystem.Quantum
