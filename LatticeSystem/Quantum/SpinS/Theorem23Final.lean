@@ -1629,10 +1629,11 @@ abbrev
     (hdiff :
       tasaki23SaturatedLadderIteratePredecessorDifferencePosCallback (V := V) A N) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings_discharge_nonempty
+  tasaki_2_5_theorem_2_3_of_named_callbacks
     (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
-    h_intermediate hdiff
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hdiff)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated Casimir
