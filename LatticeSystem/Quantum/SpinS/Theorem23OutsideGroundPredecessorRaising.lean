@@ -429,14 +429,15 @@ theorem
     tasaki_2_5_theorem_2_3 (V := V) A N J c := by
   intro hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
     hc_strict h_intermediate hA_nonempty hnotA_nonempty
-  exact
-    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_explicit_lowerable_positive_source_coefficient_lt_of_sector_minimality
-      A N c hBA hsector_nonempty hleft_predictedGS
+  obtain ⟨μ, hcommon⟩ :=
+    tasaki23_common_energy_chain_of_left_endpoint_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_explicit_lowerable_positive_source_coefficient_lt
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hBA hsector_nonempty hleft_predictedGS
       hsource_unpacked_reembedded_real_source_weight_predecessor_explicit_lowerable_positive_source_coefficient_lt
-      (fun {μ} hcommon =>
-        tasaki23_sector_minimality_of_common_energy_chain_and_outside_sector_ground_energy_lower_bound
-          A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
-          hc_strict h_intermediate hcommon (houtside_ground_energy_lower hcommon))
+  exact
+    tasaki_2_5_theorem_2_3_of_common_energy_chain_and_outside_sector_ground_energy_lower_bound
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hcommon (houtside_ground_energy_lower hcommon)
       hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
       hc_strict h_intermediate hA_nonempty hnotA_nonempty
 
