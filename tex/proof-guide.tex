@@ -10084,9 +10084,28 @@ predecessor-difference final boundary by
 \end{gathered}
 \]
 Both wrappers first turn the saturated joint references into saturated joint
-source-vector callbacks.  The direct wrapper then reuses the saturated
-joint-source final boundary, while the extracted wrapper reuses the route
-through the scalar source-energy and saturated-Casimir extraction layer.
+source-vector callbacks.  The direct wrapper then converts those callbacks to
+the outside-sector lower family and feeds that family directly into the
+source predicted-GS common-energy final boundary, while the extracted wrapper
+reuses the route through the scalar source-energy and saturated-Casimir
+extraction layer.
+Lean also exposes the same direct lower-family step one layer earlier:
+\[
+\begin{gathered}
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_saturated\_eigen\_sources},\\
+\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback}\\
+\texttt{\_of\_saturated\_source\_energy}.
+\end{gathered}
+\]
+The first theorem combines the saturated \(H_J\)-source and saturated-Casimir
+source callbacks into saturated joint source-vector callbacks, then applies
+the joint-source outside-ground bridge.  The second first turns scalar
+source-energy callbacks into the saturated \(H_J\)-source equations and then
+uses the same bridge.  Consequently the discharged saturated eigen-source and
+scalar source-energy final wrappers now keep their public hypotheses but pass
+the resulting outside-sector lower family directly to the source predicted-GS
+common-energy final boundary.
 The outside reach task is also split into its
 two endpoint directions by
 \[
