@@ -1704,6 +1704,7 @@ The sorry in `exists_pos_eigenvec_max` is eliminated via the Collatz-Wielandt po
 | `exists_nonneg_eigenvec_max` | (**sorry**, retained for docs) symmetric nonneg max eigenvalue has nonneg eigenvector | `Math/PerronFrobenius.lean` |
 | `exists_pos_eigenvec_max` | (**sorry-free**) irreducible nonneg Hermitian ⟹ max eigenvalue has strictly positive eigenvector | `Math/PerronFrobenius.lean` |
 | `pos_eigenvec_unique` | strictly positive eigenvector unique up to positive scalar | `Math/PerronFrobenius.lean` |
+| `PerronFrobenius.eigenvec_proportional_of_pos_eigenvec` | **geometric simplicity of the Perron eigenvalue**: irreducible nonneg with a strictly positive eigenvector `v` at `μ` ⟹ every real eigenvector at `μ` is `s • v` for some scalar `s` (the `μ`-eigenspace is 1-dimensional). Perturbation trick: `v + t • u > 0` for small `t > 0` is an eigenvector at `μ`, hence `∝ v` by `pos_eigenvec_unique`, forcing `u ∝ v`. Used to show a Perron ground state is a joint eigenvector of any commuting operator (e.g. the total Casimir) | `Math/PerronFrobeniusSimple.lean` |
 
 References: E. Seneta, *Non-negative Matrices and Markov Chains* (3rd ed.), Springer 2006, §1.2 (pp. 27–28);
 or4nge19/MCMC: `MCMC/PF/LinearAlgebra/Matrix/PerronFrobenius/`.
