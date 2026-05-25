@@ -3732,9 +3732,11 @@ abbrev
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 named-callback source-eigen extraction
 boundary from saturated ladder-iterate predecessor differences with real
-couplings**: the predecessor-difference positivity callback is routed through
-the lowerable dominance extraction wrapper, so the uniform source-eigen
-surface no longer exposes pointwise coefficient callbacks. -/
+couplings**: the source-eigen extraction surface is an alias for the
+corresponding named predecessor-difference real-coupling boundary.  The
+outside-ground lower-family callback is supplied there from the saturated
+ladder-iterate predecessor-difference positivity input, so this wrapper no
+longer detours through the lowerable dominance extraction suffix. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings_extract_source_eigen_callbacks_named_callbacks
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -3757,13 +3759,10 @@ abbrev
     (hdiff :
       tasaki23SaturatedLadderIteratePredecessorDifferencePosCallback (V := V) A N) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_lowerable_attach_sum_dominance_of_real_couplings_extract_source_eigen_callbacks_named_callbacks
+  tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings_named_callbacks
     (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
-    h_intermediate
-    (fun M hM_succ w hcoeff =>
-      tasaki23_lowerable_positive_source_attach_sum_lt_callback_of_offA_sub_onA_pos
-        (V := V) (N := N) A w (hdiff M hM_succ w hcoeff))
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
+    hdiff
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback final
@@ -4691,9 +4690,11 @@ abbrev
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint source-eigen extraction boundary
 from saturated ladder-iterate predecessor differences with real couplings**:
-the predecessor-difference positivity input is converted through the
-lowerable dominance extraction route, so the left-endpoint surface no longer
-exposes pointwise coefficient callbacks. -/
+the left-endpoint extraction surface is an alias for the corresponding
+left-endpoint named predecessor-difference real-coupling boundary.  The
+outside-ground lower-family callback is supplied there from the saturated
+ladder-iterate predecessor-difference positivity input, so this wrapper no
+longer detours through the lowerable dominance extraction suffix. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings_extract_source_eigen_callbacks_named_callbacks
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -4716,13 +4717,10 @@ abbrev
     (hdiff :
       tasaki23SaturatedLadderIteratePredecessorDifferencePosCallback (V := V) A N) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_lowerable_attach_sum_dominance_of_real_couplings_extract_source_eigen_callbacks_named_callbacks
+  tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings_named_callbacks
     (V := V) A (J := J) N c hBA hleft_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
-    h_intermediate
-    (fun M hM_succ w hcoeff =>
-      tasaki23_lowerable_positive_source_attach_sum_lt_callback_of_offA_sub_onA_pos
-        (V := V) (N := N) A w (hdiff M hM_succ w hcoeff))
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
+    hdiff
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
