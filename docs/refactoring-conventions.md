@@ -337,7 +337,7 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
-- **2026-05-25 (PR pending)**: Refactor checkpoint after the 20
+- **2026-05-25 (PR #3605)**: Refactor checkpoint after the 20
   post-#3584 Tasaki §2.5 Theorem 2.3 feature PRs (#3585--#3604).
   Build-speed evaluation for the active outside-ground/common-energy final
   wrapper layer:
