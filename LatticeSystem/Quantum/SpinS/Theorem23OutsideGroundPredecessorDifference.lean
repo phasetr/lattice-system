@@ -16,60 +16,6 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
 set_option linter.style.longLine false in
-/-- **Tasaki §2.5 Theorem 2.3 final wrapper from predecessor
-raising-source positive differences**: this threads the real predecessor
-source-weight data into a callback stated as positivity of the off-`A`
-minus on-`A` predecessor raising-source difference.
-
-The wrapper converts the difference-form callback to the strict
-raising-source dominance callback by
-`tasaki23_raising_predecessor_source_sum_lt_callback_of_offA_sub_onA_pos`
-and then reuses the preceding final wrapper. -/
-theorem
-    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_sector_minimality
-    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
-    (hBA :
-      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
-        (Finset.univ.filter (fun x : V => A x = true)).card)
-    (hsector_nonempty :
-      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-        Nonempty (magConfigS V N M))
-    (hleft_predictedGS :
-      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
-    (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
-      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
-    (hsector_min :
-      ∀ {μ : ℝ},
-        (∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
-          ∃ v : magConfigS V N M → ℝ,
-            μ < c ∧ (∀ τ, 0 < v τ) ∧
-            (heisenbergHamiltonianS J N).mulVec
-                (magSectorEmbedding
-                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-              (μ : ℂ) • magSectorEmbedding
-                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) →
-        ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
-          ∀ {μ' : ℝ} {Φ : magConfigS V N M → ℂ},
-            Φ ≠ 0 →
-            (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φ =
-              (μ' : ℂ) • Φ →
-            μ ≤ μ') :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
-  exact
-    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_raising_source_sum_lt_of_sector_minimality
-      A N c hBA hsector_nonempty hleft_predictedGS
-      (by
-        intro M hM hMlt μ v hμ_lt hv_pos hΦ Ψ hΨ_eq hΨ_pred hpred hA_A hA_B
-          hA_mag hB_A hB_B hB_mag
-        exact
-          tasaki23_raising_predecessor_source_sum_lt_callback_of_offA_sub_onA_pos
-            (V := V) (N := N) A v
-            (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos
-              hM hMlt hμ_lt hv_pos hΦ Ψ hΨ_eq hΨ_pred hpred hA_A hA_B hA_mag
-              hB_A hB_B hB_mag))
-      hsector_min
-
-set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 final wrapper from predecessor positive
 differences through lowered site sums**: this routes the fully threaded
 predecessor-difference callback through the lowered site-sum successor
@@ -136,6 +82,51 @@ theorem
         (hsector_min hcommon))
       hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
       hc_strict h_intermediate hA_nonempty hnotA_nonempty
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 final wrapper from predecessor
+raising-source positive differences**: this threads the real predecessor
+source-weight data into a callback stated as positivity of the off-`A`
+minus on-`A` predecessor raising-source difference.
+
+The wrapper routes the difference-form callback through the direct
+lowered-site-sum common-energy route and then applies the usual
+sector-minimality final packaging. -/
+theorem
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_sector_minimality
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hsector_min :
+      ∀ {μ : ℝ},
+        (∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+          ∃ v : magConfigS V N M → ℝ,
+            μ < c ∧ (∀ τ, 0 < v τ) ∧
+            (heisenbergHamiltonianS J N).mulVec
+                (magSectorEmbedding
+                  (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
+              (μ : ℂ) • magSectorEmbedding
+                (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) →
+        ∀ M : ℕ, [Nonempty (magConfigS V N M)] →
+          ∀ {μ' : ℝ} {Φ : magConfigS V N M → ℂ},
+            Φ ≠ 0 →
+            (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec Φ =
+              (μ' : ℂ) • Φ →
+            μ ≤ μ') :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  exact
+    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_via_lowered_site_sum_of_sector_minimality
+      A N c hBA hsector_nonempty hleft_predictedGS
+      hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+      hsector_min
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 final wrapper from predecessor positive
