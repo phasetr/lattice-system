@@ -123,7 +123,7 @@ theorem spinSDot_mulVec_allAlignedStateS_zero_of_ne
     rw [onSiteS_spinSOp3_mulVec_allAlignedStateS]
     rw [smul_smul]
     rw [show ((0 : Fin (N + 1)).val : ℂ) = 0 from by simp]
-    push_cast; ring_nf
+    ring_nf
   rw [h_plus_minus, h_minus_plus, h_z_z]
   rw [add_zero, smul_zero, zero_add]
   congr 1
@@ -154,7 +154,6 @@ theorem spinSDot_mulVec_basisVecS_zero_of_ne
     change (onSiteS y (spinSOpPlus N) : ManyBodyOpS V N) τ σ = 0
     by_cases h_off : ∀ k, k ≠ y → τ k = σ k
     · rw [onSiteS_apply_of_off_site_agree y _ h_off]
-      change spinSOpPlus N (τ y) (σ y) = 0
       rw [hy]
       apply spinSOpPlus_apply_other
       show (τ y).val + 1 ≠ ((0 : Fin (N + 1)).val)

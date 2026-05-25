@@ -371,7 +371,6 @@ theorem spinSDot_apply_diag_re_of_ne
       ((N : ℝ) / 2 - (σ x).val) * ((N : ℝ) / 2 - (σ y).val) := by
   rw [spinSDot_apply_diag_of_ne hxy]
   rw [Complex.mul_re]
-  push_cast
   simp
 
 /-- For the same-site case, the diagonal real part is `N(N+2)/4`. -/

@@ -494,7 +494,7 @@ theorem magSumS_pos_iff (σ : Λ → Fin (N + 1)) :
     0 < magSumS σ ↔ ∃ x : Λ, σ x ≠ 0 := by
   rw [Nat.pos_iff_ne_zero]
   rw [Ne, magSumS_eq_zero_iff]
-  push_neg
+  push Not
   rfl
 
 omit [DecidableEq Λ] in
