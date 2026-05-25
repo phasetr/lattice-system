@@ -10250,6 +10250,27 @@ The saturated eigen/source-energy inputs are available at the same layer:
 They keep the same explicit sector non-emptiness callback while replacing the
 outside-ground lower-family input by the saturated eigen-source or scalar
 saturated source-energy bridge.
+Sectorwise saturated references are also exposed without discharging sector
+non-emptiness:
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos\_of\_saturated\_joint}\\
+\texttt{\_references},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos\_of\_saturated\_ladder}\\
+\texttt{\_references},\\
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos\_of\_saturated\_ladder}\\
+\texttt{\_iterate\_references}.
+\end{gathered}
+\]
+These wrappers keep the same explicit sector non-emptiness callback while
+using the saturated joint-reference, ladder-reference, or singleton
+ladder-iterate reference bridge to build the outside-ground lower family.
 The same named-callback layer also exposes the stronger
 reach inputs
 \[
