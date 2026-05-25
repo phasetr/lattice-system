@@ -2086,6 +2086,89 @@ abbrev
       (V := V) A (J := J) N hright_ref)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated ladder-iterate Marshall-positive
+reference extraction discharged boundary**: this version feeds concrete
+Marshall-positive ladder-iterate reference callbacks into the source-eigen
+extraction final route.  The concrete equality callbacks first become
+singleton ladder-iterate references, and the existing extraction boundary then
+supplies the scalar saturated source-energy and saturated-Casimir callbacks. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_marshall_positive_references_extract_source_eigen_callbacks_discharge_nonempty
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback
+        (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback
+        (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_references_extract_source_eigen_callbacks_discharge_nonempty
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateReferenceCallback_of_marshall_positive_reference
+      (V := V) A (J := J) N hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateReferenceCallback_of_marshall_positive_reference
+      (V := V) A (J := J) N hright_ref)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated ladder-iterate Marshall-positive
+coefficient extraction discharged boundary**: this version feeds pointwise
+Marshall-positive coefficient callbacks into the source-eigen extraction final
+route.  The coefficient callbacks first supply the concrete Marshall-positive
+reference callbacks, which then enter the extraction boundary above. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_marshall_positive_coefficients_extract_source_eigen_callbacks_discharge_nonempty
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback
+        (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback
+        (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_marshall_positive_references_extract_source_eigen_callbacks_discharge_nonempty
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback_of_marshall_positive_coefficients
+      (V := V) A (J := J) N hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback_of_marshall_positive_coefficients
+      (V := V) A (J := J) N hright_ref)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 side-admissible-reach discharged boundary**:
 this version of the discharged final predecessor-difference boundary accepts
 separate left and right directional outside-sector reach callbacks.  The side
@@ -3330,6 +3413,88 @@ abbrev
       (V := V) A (J := J) N hright_ref)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated
+ladder-iterate Marshall-positive reference extraction**: concrete
+Marshall-positive ladder-iterate references first become singleton
+ladder-iterate references, then reuse the uniform source-eigen extraction
+route for saturated ladder-iterate references. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_marshall_positive_references_extract_source_eigen_callbacks_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback
+        (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback
+        (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_references_extract_source_eigen_callbacks_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateReferenceCallback_of_marshall_positive_reference
+      (V := V) A (J := J) N hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateReferenceCallback_of_marshall_positive_reference
+      (V := V) A (J := J) N hright_ref)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated
+ladder-iterate Marshall-positive coefficient extraction**: pointwise
+Marshall-positive coefficient callbacks first provide the concrete
+Marshall-positive reference callbacks, then reuse the uniform reference
+extraction route above. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_marshall_positive_coefficients_extract_source_eigen_callbacks_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback
+        (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback
+        (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_marshall_positive_references_extract_source_eigen_callbacks_named_callbacks
+    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback_of_marshall_positive_coefficients
+      (V := V) A (J := J) N hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback_of_marshall_positive_coefficients
+      (V := V) A (J := J) N hright_ref)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback final
 boundary**: this public boundary avoids the uniform source-sector
 predicted-GS callback when only the current outside-ground route is
@@ -4073,6 +4238,91 @@ abbrev
     (tasaki23OutsideGroundLeftSaturatedLadderReferenceCallback_of_saturated_ladder_iterate_reference
       (V := V) A (J := J) N hleft_ref)
     (tasaki23OutsideGroundRightSaturatedLadderReferenceCallback_of_saturated_ladder_iterate_reference
+      (V := V) A (J := J) N hright_ref)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
+saturated ladder-iterate Marshall-positive reference extraction**:
+left-endpoint analogue of
+`tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_marshall_positive_references_extract_source_eigen_callbacks_named_callbacks`.
+The concrete Marshall-positive reference callbacks first become singleton
+ladder-iterate references, then reuse the left-endpoint source-eigen
+extraction route. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_marshall_positive_references_extract_source_eigen_callbacks_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback
+        (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback
+        (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_references_extract_source_eigen_callbacks_named_callbacks
+    (V := V) A (J := J) N c hBA hleft_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateReferenceCallback_of_marshall_positive_reference
+      (V := V) A (J := J) N hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateReferenceCallback_of_marshall_positive_reference
+      (V := V) A (J := J) N hright_ref)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
+saturated ladder-iterate Marshall-positive coefficient extraction**:
+left-endpoint analogue of
+`tasaki_2_5_theorem_2_3_of_saturated_ladder_iterate_marshall_positive_coefficients_extract_source_eigen_callbacks_named_callbacks`.
+The coefficient callbacks first provide concrete Marshall-positive references,
+then reuse the left-endpoint reference extraction route above. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_marshall_positive_coefficients_extract_source_eigen_callbacks_named_callbacks
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hleft_predictedGS :
+      tasaki23LeftEndpointPredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback
+        (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback
+        (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_ladder_iterate_marshall_positive_references_extract_source_eigen_callbacks_named_callbacks
+    (V := V) A (J := J) N c hBA hleft_predictedGS hpredecessor_difference
+    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
+    h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback_of_marshall_positive_coefficients
+      (V := V) A (J := J) N hleft_ref)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback_of_marshall_positive_coefficients
       (V := V) A (J := J) N hright_ref)
 
 set_option linter.style.longLine false in
