@@ -8933,6 +8933,22 @@ the Perron--Frobenius comparison of Tasaki, Springer 2020, Section 2.5,
 Theorem 2.3, p.~42, with Seneta, \emph{Non-negative Matrices and Markov
 Chains}, 3rd ed., Springer 2006, \S1.2, pp.~27--28.
 
+The predecessor raising-source comparison is also exposed as the reusable
+callback bridge
+\[
+\begin{gathered}
+\texttt{tasaki23PredecessorDifferenceCallback}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_raising\_source\_sum\_lt}.
+\end{gathered}
+\]
+It takes the fully threaded strict inequality saying that the on-\(A\)
+predecessor raising-source sum is less than the off-\(A\) sum, and returns
+\(\texttt{tasaki23PredecessorDifferenceCallback}\) by rewriting the same
+comparison as positivity of the off-\(A\) minus on-\(A\) difference.  The
+common-energy theorem with predecessor raising-source dominance now calls this
+named bridge instead of carrying that `linarith` conversion anonymously.
+
 The short final boundary
 \[
 \texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_named\_callbacks}
