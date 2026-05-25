@@ -9910,7 +9910,12 @@ Here the separate real-scalar hypothesis for the saturated ferromagnetic
 energy is supplied by
 \(\texttt{saturatedFerromagnetEigenvalueS\_exists\_real}\), whose proof uses
 the explicit saturated-energy formula and the realness of every \(J(x,y)\).
-The final API wrapper
+Lean also exposes a discharged final wrapper with the same suffix but without
+\(\texttt{\_of\_real\_couplings}\).  That wrapper keeps the saturated-energy
+real-scalar witness as an explicit input and feeds
+\(\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback\_of\_saturated\_ladder\_iterate\_predecessor\_difference\_pos}\)
+into the non-empty discharged final boundary.  The real-coupling final API
+wrapper
 \[
 \begin{gathered}
 \texttt{tasaki\_2\_5\_theorem\_2\_3}\\
@@ -9924,10 +9929,12 @@ The final API wrapper
 \texttt{\_discharge\_nonempty}
 \end{gathered}
 \]
-feeds this real-coupling lower-family callback directly into the discharged
-final predecessor-difference boundary, so the public discharged route no
-longer exposes either the outside-sector lower-family hypothesis or the
-saturated-energy real-scalar hypothesis.  The shorter named wrapper
+specializes that explicit wrapper by supplying the saturated-energy witness
+from
+\(\texttt{saturatedFerromagnetEigenvalueS\_exists\_real}\), so the
+real-coupling discharged route no longer exposes either the outside-sector
+lower-family hypothesis or the saturated-energy real-scalar hypothesis.  The
+shorter named wrapper
 \[
 \begin{gathered}
 \texttt{tasaki\_2\_5\_theorem\_2\_3}\\
