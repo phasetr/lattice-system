@@ -10220,6 +10220,25 @@ field carried by the interval induction.  Its conclusion is exactly
 \(\exists \mu,\texttt{tasaki23CommonEnergyChain}~A~J~N~c~\mu\), the first
 of the two remaining callback outputs needed by the common-energy plus
 outside-sector final wrapper.
+The source-callback variants
+\[
+\begin{gathered}
+\texttt{tasaki23\_common\_energy\_chain}\\
+\texttt{\_of\_source\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}
+\end{gathered}
+\]
+and its \(\texttt{\_discharge\_nonempty}\) variant keep the same
+common-energy construction but accept the uniform
+\(\texttt{tasaki23SourcePredictedGSCallback}\).  The first wrapper
+derives the left-endpoint predicted-GS input from
+\(\texttt{tasaki23GroundStateSectors\_left\_mem}\).  The discharged
+variant also supplies admissible-sector non-emptiness from
+\(\texttt{tasaki23GroundStateSectors\_le\_card\_mul}\) and
+\(\texttt{magConfigS\_nonempty\_of\_le\_card\_mul}\), so the visible
+inputs are the uniform predicted-GS callback and the
+predecessor-difference callback.
 
 The common-energy boundary has also been pushed one step closer to the
 local comparison now used in the predecessor-source wrappers:
