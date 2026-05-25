@@ -68,12 +68,12 @@ import LatticeSystem.Fermion.JWAbstract
 -- pulls the whole §2.5 module tree into the build root so the default
 -- `lake build` (and CI) elaborates it, rather than leaving it reachable only
 -- via per-module builds.
-import LatticeSystem.Quantum.SpinS.Theorem23FinalLoweredMarshall
-import LatticeSystem.Quantum.SpinS.Theorem23FinalLoweredSiteSumLeft
-import LatticeSystem.Quantum.SpinS.Theorem23DominancePredictedGSPredecessor
-import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundConditional
-import LatticeSystem.Quantum.SpinS.Theorem23OutsideGroundCrossLadderReembedded
-import LatticeSystem.Quantum.SpinS.Theorem23SectorExistenceDominancePredictedGS
+-- Tasaki §2.5 Theorem 2.3: the saturated-ladder-iterate route was found unsound
+-- (the `hdominates` leaf is false; the ferromagnetic ladder iterate is not the
+-- Marshall-positive AFM ground state — see .self-local/docs/tasaki-2-5-pf-route-design.md).
+-- The sound per-sector Perron–Frobenius ground state is kept; the unsound conditional
+-- wrapper tree (40 modules) is removed.  Issue #3542.
+import LatticeSystem.Quantum.SpinS.Theorem23SectorExistence
 
 /-!
 # `lattice-system` library root

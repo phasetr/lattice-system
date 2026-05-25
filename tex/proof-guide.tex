@@ -5204,6 +5204,23 @@ theorem
 \subsection*{In progress: Tasaki §2.5 Theorem 2.3 ($\gamma$-4, $|A| \neq |B|$ case)}
 \label{subsec:mlm-theorem-2-3}
 
+\paragraph{Route correction (2026-05-26).} An earlier
+``saturated-ladder-iterate'' route toward
+\texttt{tasaki\_2\_5\_theorem\_2\_3} was found \emph{unsound}: it reduced
+the theorem to a leaf hypothesis (lowerable attach-sum dominance) that is
+false, because the ferromagnetic ladder iterate
+$(\hat S^-_{\rm tot})^M\lvert\uparrow\cdots\uparrow\rangle$ is not the
+Marshall-positive antiferromagnetic ground state (counterexample:
+spin-$1/2$, $V=\{a,b\}$, $A=\{a\}$, $B=\{b\}$, step $M=0\to1$). Its $40$
+conditional-wrapper Lean modules were removed. The \emph{sound} route keeps
+the per-sector Perron--Frobenius ground state
+(\texttt{tasaki\_2\_5\_theorem\_2\_3\_sector\_existence}, sorry-free) and
+chains sectors by SU(2) invariance $[\hat H,\hat S^-_{\rm tot}]=0$; the
+outside-sector lower bound comes from the toy-Hamiltonian Casimir argument.
+See \texttt{.self-local/docs/tasaki-2-5-pf-route-design.md} and Issue \#3542.
+Some passages below describe the toy/Casimir prediction machinery that is
+retained; references to the removed conditional wrappers are obsolete.
+
 \textbf{Goal} (Tasaki §2.5 Theorem 2.3, p.~42). For a connected
 bipartite lattice $(\Lambda, B)$ with $|A| \ge 1$ and $|B| \ge 1$,
 the AFM Heisenberg ground states have total spin $S_{\rm tot} =
