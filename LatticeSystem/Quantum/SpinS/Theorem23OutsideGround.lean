@@ -2802,6 +2802,82 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_itera
       (V := V) A (J := J) N hright_ref)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from successor
+dominance**: the closed saturated ladder-iterate coefficient induction supplies
+the left and right coefficient callbacks directly from successor dominance, and
+hence supplies the outside-sector lower-energy family. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_successor_dominance
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hμsat :
+      ∃ μsat : ℝ, (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (∑ x ∈ ((Finset.univ.filter (fun x : V => A x = true)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) <
+          ∑ x ∈ ((Finset.univ.filter (fun x : V => A x = false)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_marshall_positive_coefficients
+    (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+    hc_strict h_intermediate
+    (tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance
+      (V := V) A (J := J) N hμsat hdominates)
+    (tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback_of_successor_dominance
+      (V := V) A (J := J) N hμsat hdominates)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from successor dominance
+with real couplings**: real couplings discharge the saturated-energy real-scalar
+input for the successor-dominance outside-ground boundary. -/
+theorem
+    tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_successor_dominance_of_real_couplings
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hdominates : ∀ (M : ℕ)
+        (hM_succ : M + 1 < Fintype.card V * N + 1)
+        (w : magConfigS V N M → ℝ),
+      (∀ σ : magConfigS V N M,
+        ladderIterateUp V N ⟨M, Nat.lt_of_succ_lt hM_succ⟩ σ.1 =
+          (((marshallSignS A σ.1).re * w σ : ℝ) : ℂ)) →
+      ∀ τ : magConfigS V N (M + 1),
+        (∑ x ∈ ((Finset.univ.filter (fun x : V => A x = true)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) <
+          ∑ x ∈ ((Finset.univ.filter (fun x : V => A x = false)).filter
+            (fun x : V => 0 < (τ.1 x).val)),
+            tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_successor_dominance
+    (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+    hc_strict h_intermediate
+    (saturatedFerromagnetEigenvalueS_exists_real (V := V) (N := N) J hJ_real)
+    hdominates
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-ground family from explicit lowerable
 coefficient dominance**: attached-sum dominance for the explicit lowerable
 predecessor coefficients supplies the left and right saturated ladder-iterate
