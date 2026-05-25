@@ -779,8 +779,8 @@ set_option linter.style.longLine false in
 this version of the discharged final predecessor-difference boundary accepts
 left and right source callbacks at the saturated Heisenberg eigenvalue plus
 the existing saturated-Casimir source callbacks.  These two eigenspace
-inputs assemble the saturated joint source callbacks before reusing the
-saturated-joint final boundary. -/
+inputs assemble the outside-sector lower family and feed it directly into the
+source common-energy final boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_eigen_sources_discharge_nonempty
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -805,14 +805,21 @@ abbrev
       tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback A J N c)
     (hrightCas :
       tasaki23OutsideGroundRightSaturatedCasimirSourceCallback A J N c) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_joint_sources_discharge_nonempty
-    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
-    (tasaki23OutsideGroundLeftSaturatedJointSourceCallback_of_saturated_eigen_sources
-      A (J := J) N c hleftH hleftCas)
-    (tasaki23OutsideGroundRightSaturatedJointSourceCallback_of_saturated_eigen_sources
-      A (J := J) N c hrightH hrightCas)
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+    hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+    hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+      (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
+      hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
+      h_intermediate_final hBA hsource_predictedGS hpredecessor_difference
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_eigen_sources
+        (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite
+        hc_strict hleftH hrightH hleftCas hrightCas)
+      hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+      hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+      hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 saturated source-energy discharged
@@ -820,8 +827,8 @@ boundary**: this version of the discharged final predecessor-difference
 boundary accepts left and right scalar callbacks identifying each outside
 source energy with the saturated-ferromagnet Heisenberg energy, plus the
 existing saturated-Casimir source callbacks.  The scalar callbacks supply the
-saturated-Heisenberg source equations before reusing the saturated
-eigen-source final boundary. -/
+saturated-Heisenberg source equations before the resulting lower family is
+fed directly into the source common-energy final boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_source_energy_discharge_nonempty
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -846,15 +853,21 @@ abbrev
       tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback A J N c)
     (hrightCas :
       tasaki23OutsideGroundRightSaturatedCasimirSourceCallback A J N c) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_eigen_sources_discharge_nonempty
-    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
-    (tasaki23OutsideGroundLeftSaturatedHeisenbergSourceCallback_of_saturated_energy_source
-      A (J := J) N c hleftEnergy)
-    (tasaki23OutsideGroundRightSaturatedHeisenbergSourceCallback_of_saturated_energy_source
-      A (J := J) N c hrightEnergy)
-    hleftCas hrightCas
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+    hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+    hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+      (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
+      hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
+      h_intermediate_final hBA hsource_predictedGS hpredecessor_difference
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_source_energy
+        (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite
+        hc_strict hleftEnergy hrightEnergy hleftCas hrightCas)
+      hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+      hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+      hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 saturated joint-source extraction

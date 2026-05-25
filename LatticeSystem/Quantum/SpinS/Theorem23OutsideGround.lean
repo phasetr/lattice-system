@@ -2647,6 +2647,66 @@ theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_joint_source
       (V := V) A (J := J) N c hright)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from saturated eigen
+sources**: left and right saturated-Heisenberg source callbacks combine with
+saturated-Casimir source callbacks to form the saturated joint source-vector
+callbacks, and the existing joint-source bridge supplies the outside-sector
+lower family. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_eigen_sources
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleftH :
+      tasaki23OutsideGroundLeftSaturatedHeisenbergSourceCallback (V := V) A J N c)
+    (hrightH :
+      tasaki23OutsideGroundRightSaturatedHeisenbergSourceCallback (V := V) A J N c)
+    (hleftCas :
+      tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback (V := V) A J N c)
+    (hrightCas :
+      tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_joint_sources
+    (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftSaturatedJointSourceCallback_of_saturated_eigen_sources
+      (V := V) A (J := J) N c hleftH hleftCas)
+    (tasaki23OutsideGroundRightSaturatedJointSourceCallback_of_saturated_eigen_sources
+      (V := V) A (J := J) N c hrightH hrightCas)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 outside-ground family from saturated source
+energies**: scalar source-energy callbacks first supply the saturated
+Heisenberg source equations, then the saturated eigen-source lower-family
+bridge combines them with saturated-Casimir source callbacks. -/
+theorem tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_source_energy
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleftEnergy :
+      tasaki23OutsideGroundLeftSaturatedEnergySourceCallback (V := V) A J N c)
+    (hrightEnergy :
+      tasaki23OutsideGroundRightSaturatedEnergySourceCallback (V := V) A J N c)
+    (hleftCas :
+      tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback (V := V) A J N c)
+    (hrightCas :
+      tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c) :
+    tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c :=
+  tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_eigen_sources
+    (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+    (tasaki23OutsideGroundLeftSaturatedHeisenbergSourceCallback_of_saturated_energy_source
+      (V := V) A (J := J) N c hleftEnergy)
+    (tasaki23OutsideGroundRightSaturatedHeisenbergSourceCallback_of_saturated_energy_source
+      (V := V) A (J := J) N c hrightEnergy)
+    hleftCas hrightCas
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 outside-ground family from saturated joint
 references**: left and right saturated joint reference callbacks first supply
 the saturated joint source-vector callbacks by the Marshall-positive
