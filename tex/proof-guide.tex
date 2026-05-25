@@ -10106,6 +10106,11 @@ uses the same bridge.  Consequently the discharged saturated eigen-source and
 scalar source-energy final wrappers now keep their public hypotheses but pass
 the resulting outside-sector lower family directly to the source predicted-GS
 common-energy final boundary.
+The uniform and left-endpoint named-callback wrappers for the same saturated
+eigen-source and scalar source-energy inputs now reuse these two lower-family
+bridges as well before entering
+\(\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_named\_callbacks}\) or its
+left-endpoint analogue.
 The outside reach task is also split into its
 two endpoint directions by
 \[
