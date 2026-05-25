@@ -3770,14 +3770,15 @@ set_option linter.style.longLine false in
 boundary**: this public boundary avoids the uniform source-sector
 predicted-GS callback when only the current outside-ground route is
 needed.  It supplies the admissible-sector `magConfigS` non-emptiness
-from the physical-range construction and reuses the left-endpoint
-outside-ground theorem directly.
+from the physical-range construction, derives the uniform source predicted-GS
+callback from the left endpoint plus the predecessor-difference interval
+chain, and then reuses the uniform named final boundary.
 
 The remaining visible inputs are therefore the weaker left-endpoint
 predicted-GS callback, the predecessor-difference local comparison, and
 outside-sector ground-energy lower bounds.  Internally this boundary now uses
-the reduced common-energy plus outside-sector theorem through the explicit
-left-endpoint common-energy wrapper. -/
+the source-callback closure so the left-endpoint route and the uniform route
+share the same final named-callback suffix. -/
 abbrev tasaki_2_5_theorem_2_3_of_left_endpoint_named_callbacks
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
     (hBA :
@@ -3793,9 +3794,15 @@ abbrev tasaki_2_5_theorem_2_3_of_left_endpoint_named_callbacks
   intro hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
     hc_strict h_intermediate hA_nonempty hnotA_nonempty
   exact
-    tasaki_2_5_theorem_2_3_of_left_endpoint_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
-      (V := V) A (J := J) N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym
-      hJ_bipartite hc_strict h_intermediate hBA hleft_predictedGS
+    tasaki_2_5_theorem_2_3_of_named_callbacks
+      (V := V) A (J := J) N c hBA
+      (tasaki23_source_predictedGSCallback_of_left_endpoint_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos
+        (V := V) A (J := J) N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym
+        hJ_bipartite hc_strict h_intermediate hBA
+        (fun _M hM =>
+          magConfigS_nonempty_of_le_card_mul (V := V) (N := N)
+            (tasaki23GroundStateSectors_le_card_mul (V := V) A N hM))
+        hleft_predictedGS hpredecessor_difference)
       hpredecessor_difference houtside_ground_energy_lower hJ_real hJ_real'
       hJ_sym hJ_nn hJ_bipartite hJ_pos hc_strict h_intermediate hA_nonempty
       hnotA_nonempty
