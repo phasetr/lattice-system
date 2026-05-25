@@ -10503,6 +10503,39 @@ uses
 to supply that outside-sector ground-energy input from the
 ladder-reach callback, together with the real-coupling and strict
 diagonal-shift hypotheses.
+The discharged companions
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_outside\_sector\_ground\_energy\_lower\_bound}\\
+\texttt{\_discharge\_nonempty}
+\end{gathered}
+\]
+and
+\[
+\begin{gathered}
+\texttt{tasaki\_2\_5\_theorem\_2\_3}\\
+\texttt{\_of\_left\_endpoint\_threaded\_predictedGS}\\
+\texttt{\_of\_unpacked\_reembedded\_real\_source\_weight}\\
+\texttt{\_predecessor\_difference\_pos}\\
+\texttt{\_of\_admissible\_reach}\\
+\texttt{\_discharge\_nonempty}
+\end{gathered}
+\]
+remove the explicit admissible-sector non-emptiness callback from these
+left-endpoint predecessor-difference boundaries.  The proof uses
+\(\texttt{tasaki23GroundStateSectors\_le\_card\_mul}\) to place each
+admissible sector in the physical range and then applies
+\(\texttt{magConfigS\_nonempty\_of\_le\_card\_mul}\).  The mathematical
+content is unchanged: the local input is still the predecessor-difference
+comparison, and the outside-sector input is either the ground-energy lower
+family or the admissible-reach callback.  References are Tasaki,
+Springer 2020, \S2.5 Theorem 2.3, p.~42, and Seneta,
+\emph{Non-negative Matrices and Markov Chains}, 3rd ed., Springer 2006,
+\S1.2, pp.~27--28 for the non-negative-matrix comparison.
 
 For the next proof stage Lean also exposes the common-energy output
 itself, separated from the final outside-sector estimate:
