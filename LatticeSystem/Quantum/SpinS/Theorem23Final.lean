@@ -1748,6 +1748,88 @@ abbrev
       hc_strict h_intermediate hleft_ref hright_ref)
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated ladder-iterate Marshall-positive
+reference discharged boundary**: this version removes the explicit
+admissible-sector non-emptiness hypothesis from the threaded Marshall-positive
+reference boundary.  The concrete Marshall-positive reference callbacks build
+the outside-sector lower family through the direct bridge before the source
+common-energy final boundary discharges sector non-emptiness internally. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_marshall_positive_references_discharge_nonempty
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveReferenceCallback
+        (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveReferenceCallback
+        (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+    (V := V) A (J := J) N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym
+    hJ_bipartite hc_strict h_intermediate hBA hsource_predictedGS
+    hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_marshall_positive_references
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hleft_ref hright_ref)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 saturated ladder-iterate Marshall-positive
+coefficient discharged boundary**: this version removes the explicit
+admissible-sector non-emptiness hypothesis from the threaded Marshall-positive
+coefficient boundary.  The pointwise Marshall-positive coefficient callbacks
+build the outside-sector lower family through the direct bridge before the
+source common-energy final boundary discharges sector non-emptiness internally. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_marshall_positive_coefficients_discharge_nonempty
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hleft_ref :
+      tasaki23OutsideGroundLeftSaturatedLadderIterateMarshallPositiveCoefficientCallback
+        (V := V) A J N)
+    (hright_ref :
+      tasaki23OutsideGroundRightSaturatedLadderIterateMarshallPositiveCoefficientCallback
+        (V := V) A J N) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
+  tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+    (V := V) A (J := J) N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym
+    hJ_bipartite hc_strict h_intermediate hBA hsource_predictedGS
+    hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_marshall_positive_coefficients
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hleft_ref hright_ref)
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 saturated eigen-source discharged boundary**:
 this version of the discharged final predecessor-difference boundary accepts
 left and right source callbacks at the saturated Heisenberg eigenvalue plus
