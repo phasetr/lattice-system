@@ -10266,6 +10266,9 @@ The companion without the \(\texttt{\_discharge\_nonempty}\) suffix keeps the
 admissible-sector non-emptiness callback explicit, and the older uniform
 threaded outside-ground entry point now calls this companion directly while
 preserving its public hypotheses.
+The physical-range non-empty outside-ground entry point now discharges this
+non-emptiness callback and calls the same companion directly, rather than
+passing through the older threaded wrapper.
 The left-endpoint analogue
 \[
 \begin{gathered}
@@ -10297,6 +10300,10 @@ The discharged uniform outside-ground entry point
 now keeps the same public hypotheses while calling the source predicted-GS
 common-energy final boundary directly.  Thus downstream discharged wrappers
 also share the reduced common-energy plus outside-sector final route.
+The admissible-reach entry point follows the same pattern: it converts the
+reach callback to the outside-sector lower-family callback and feeds that
+family directly into the explicit source common-energy final boundary, with
+the physical-range and discharged reach wrappers inheriting this route.
 
 The common-energy boundary has also been pushed one step closer to the
 local comparison now used in the predecessor-source wrappers:
