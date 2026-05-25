@@ -1084,33 +1084,6 @@ abbrev
     hdiff
 
 set_option linter.style.longLine false in
-/-- **Tasaki §2.5 Theorem 2.3 named-callback final boundary**: this
-short alias exposes the discharged outside-ground theorem through the
-three named callback propositions that remain on the current proof
-boundary: uniform predicted-GS membership, the predecessor-difference
-local comparison, and outside-sector ground-energy lower bounds.
-
-The underlying theorem is
-`tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound_discharge_nonempty`;
-this wrapper keeps the public API stable while the internal site-sum and
-outside-sector route continues to be shortened. -/
-abbrev tasaki_2_5_theorem_2_3_of_named_callbacks
-    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
-    (hBA :
-      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
-        (Finset.univ.filter (fun x : V => A x = true)).card)
-    (hsource_predictedGS :
-      tasaki23SourcePredictedGSCallback (V := V) A J N c)
-    (hpredecessor_difference :
-      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
-    (houtside_ground_energy_lower :
-      tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound_discharge_nonempty
-    (V := V) A (J := J) N c hBA hsource_predictedGS
-    hpredecessor_difference houtside_ground_energy_lower
-
-set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 source common-energy final boundary**:
 this public boundary routes the source predicted-GS and predecessor-difference
 callbacks through the named common-energy chain before applying the final
@@ -1197,6 +1170,39 @@ theorem
       A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
       hc_strict h_intermediate hcommon
       (houtside_ground_energy_lower (μ := μ) hcommon)
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 named-callback final boundary**: this
+short alias exposes the discharged outside-ground theorem through the
+three named callback propositions that remain on the current proof
+boundary: uniform predicted-GS membership, the predecessor-difference
+local comparison, and outside-sector ground-energy lower bounds.
+
+The underlying route now factors through
+`tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty`;
+this wrapper keeps the public API stable while the internal proof is expressed
+through the reduced common-energy plus outside-sector boundary. -/
+abbrev tasaki_2_5_theorem_2_3_of_named_callbacks
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (houtside_ground_energy_lower :
+      tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
+    hc_strict h_intermediate hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+      (V := V) A (J := J) N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym
+      hJ_bipartite hc_strict h_intermediate hBA hsource_predictedGS
+      hpredecessor_difference houtside_ground_energy_lower hJ_real hJ_real'
+      hJ_sym hJ_nn hJ_bipartite hJ_pos hc_strict h_intermediate hA_nonempty
+      hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated joint
@@ -1936,7 +1942,9 @@ outside-ground theorem directly.
 
 The remaining visible inputs are therefore the weaker left-endpoint
 predicted-GS callback, the predecessor-difference local comparison, and
-outside-sector ground-energy lower bounds. -/
+outside-sector ground-energy lower bounds.  Internally this boundary now uses
+the reduced common-energy plus outside-sector theorem through the explicit
+left-endpoint common-energy wrapper. -/
 abbrev tasaki_2_5_theorem_2_3_of_left_endpoint_named_callbacks
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
     (hBA :
@@ -1948,13 +1956,16 @@ abbrev tasaki_2_5_theorem_2_3_of_left_endpoint_named_callbacks
       tasaki23PredecessorDifferenceCallback (V := V) A J N c)
     (houtside_ground_energy_lower :
       tasaki23OutsideGroundEnergyLowerFamilyCallback (V := V) A J N c) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound
-    (V := V) A (J := J) N c hBA
-    (fun _M hM =>
-      magConfigS_nonempty_of_le_card_mul (V := V) (N := N)
-        (tasaki23GroundStateSectors_le_card_mul (V := V) A N hM))
-    hleft_predictedGS hpredecessor_difference houtside_ground_energy_lower
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
+    hc_strict h_intermediate hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_left_endpoint_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+      (V := V) A (J := J) N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym
+      hJ_bipartite hc_strict h_intermediate hBA hleft_predictedGS
+      hpredecessor_difference houtside_ground_energy_lower hJ_real hJ_real'
+      hJ_sym hJ_nn hJ_bipartite hJ_pos hc_strict h_intermediate hA_nonempty
+      hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
