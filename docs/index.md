@@ -1737,6 +1737,7 @@ refactor #30 (PR #2829). Tracked in Issue #412.
 
 | Lean name | Statement |
 |---|---|
+| `tasaki23_pf_ladder_link_succ` | **Sound PF adjacent-sector ladder link (lowering)**: if a magnetization-`M` sector vector `magSectorEmbedding Φ` is a Heisenberg eigenvector at energy `μ` and a total-Casimir eigenvector at `γ` away from the sector's lowering-kernel value `(card·N/2−M)(card·N/2−M−1)`, then `Ŝ⁻_tot · magSectorEmbedding Φ` is a Heisenberg eigenvector at the **same** `μ` (via `[Ĥ, Ŝ⁻_tot]=0`), is non-zero (total-Casimir non-vanishing criterion), and lies in the next magnetization sector. This is the energy-preserving step that chains the per-sector Perron–Frobenius ground states (`tasaki_2_5_theorem_2_3_sector_existence`) across the admissible range; it uses **no** Marshall positivity of the lowered vector (the false hypothesis of the removed ferromagnetic-ladder route). Tasaki, Springer 2020, §2.5 Theorem 2.3, p. 42 (file `Quantum/SpinS/Theorem23PFLadderLink.lean`) |
 | `magConfigS V N M` | sector subtype of magnetization-`M` configurations (`Quantum/SpinS/MagConfig.lean`) |
 | `RaiseLowerStepSMagSector G σ τ` / `RaiseLowerReachableSMagSector G` | bipartite raise/lower step lifted to `magConfigS` and its reflexive transitive closure (`Quantum/SpinS/MagConfig.lean`) |
 | `raiseLowerReachableSMagSector_bipartiteCompleteGraph` | any two configurations in the same sector are reachable via raise/lower steps under the bipartite-intermediate hypothesis (Tasaki §2.5 Property (iii) generic-S form) |

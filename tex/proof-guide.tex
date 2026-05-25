@@ -5221,6 +5221,23 @@ See \texttt{.self-local/docs/tasaki-2-5-pf-route-design.md} and Issue \#3542.
 Some passages below describe the toy/Casimir prediction machinery that is
 retained; references to the removed conditional wrappers are obsolete.
 
+\paragraph{Sound adjacent-sector ladder link
+(\texttt{tasaki23\_pf\_ladder\_link\_succ}).} The first reconstructed
+step. If $\Psi=\mathtt{magSectorEmbedding}\,\Phi$ is a Heisenberg
+eigenvector at energy $\mu$ in magnetization sector $M$ and a
+total-Casimir eigenvector at a value $\gamma$ away from the
+lowering-kernel value
+$\bigl(\tfrac{|V|N}{2}-M\bigr)\bigl(\tfrac{|V|N}{2}-M-1\bigr)$, then
+$\hat S^-_{\rm tot}\Psi$ is again a Heisenberg eigenvector at the
+\emph{same} $\mu$ (because $[\hat H,\hat S^-_{\rm tot}]=0$, via
+\texttt{mulVec\_preserves\_eigenvalue\_of\_commuteS}), is non-zero (by
+the total-Casimir non-vanishing criterion
+\texttt{tasaki23\_totalSpinSOpMinus\_mulVec\_magSectorEmbedding\_ne\_zero\_of\_casimir\_ne\_kernel\_value}),
+and lies in sector $M+1$. Crucially this uses no Marshall positivity of
+$\hat S^-_{\rm tot}\Psi$, so it sidesteps the false leaf of the removed
+route. Iterating it across the admissible range gives the constancy of
+the sector ground energies (the common-energy chain).
+
 \textbf{Goal} (Tasaki §2.5 Theorem 2.3, p.~42). For a connected
 bipartite lattice $(\Lambda, B)$ with $|A| \ge 1$ and $|B| \ge 1$,
 the AFM Heisenberg ground states have total spin $S_{\rm tot} =
