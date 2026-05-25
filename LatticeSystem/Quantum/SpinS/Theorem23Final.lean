@@ -985,7 +985,8 @@ ladder-iterate successor dominance**: this public discharged final
 predecessor-difference boundary replaces the outside-sector ground-energy lower
 family by the saturated ladder-iterate successor-dominance route.  The
 saturated ferromagnetic energy is supplied as an explicit real scalar for the
-outside-ground coefficient callbacks. -/
+outside-ground coefficient callbacks.  Internally this now feeds the resulting
+lower family directly into the source common-energy final boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_successor_dominance_discharge_nonempty
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -1020,19 +1021,28 @@ abbrev
           ∑ x ∈ ((Finset.univ.filter (fun x : V => A x = false)).filter
             (fun x : V => 0 < (τ.1 x).val)),
             tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound_discharge_nonempty
-    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_successor_dominance
-      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
-      hc_strict h_intermediate hμsat hdominates)
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+    hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+    hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+      (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
+      hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
+      h_intermediate_final hBA hsource_predictedGS hpredecessor_difference
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_successor_dominance
+        (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+        hc_strict h_intermediate hμsat hdominates)
+      hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+      hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+      hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 discharged boundary from saturated
 ladder-iterate successor dominance with real couplings**: real couplings supply
 the saturated-energy real scalar needed internally, so the public discharged
 boundary exposes only the successor-dominance input for the saturated ladder
-iterates. -/
+iterates and then enters the source common-energy final boundary directly. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_successor_dominance_of_real_couplings_discharge_nonempty
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -1065,19 +1075,28 @@ abbrev
           ∑ x ∈ ((Finset.univ.filter (fun x : V => A x = false)).filter
             (fun x : V => 0 < (τ.1 x).val)),
             tasaki23LoweringPredecessorPositiveSourceCoefficient w τ x) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_successor_dominance_discharge_nonempty
-    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
-    (saturatedFerromagnetEigenvalueS_exists_real (V := V) (N := N) J hJ_real)
-    hdominates
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+    hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+    hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+      (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
+      hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
+      h_intermediate_final hBA hsource_predictedGS hpredecessor_difference
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_successor_dominance_of_real_couplings
+        (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+        hc_strict h_intermediate hdominates)
+      hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+      hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+      hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 discharged boundary from saturated
 ladder-iterate lowerable attach-sum dominance**: this public discharged final
 predecessor-difference boundary replaces the outside-sector ground-energy lower
 family by the saturated ladder-iterate explicit lowerable attach-sum dominance
-route. -/
+route and then enters the source common-energy final boundary directly. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_lowerable_attach_sum_dominance_discharge_nonempty
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -1116,19 +1135,29 @@ abbrev
               (fun x =>
                 tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
                   w τ x.1 ((Finset.mem_filter.mp x.2).2)))) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound_discharge_nonempty
-    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_lowerable_attach_sum_dominance
-      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
-      hc_strict h_intermediate hμsat hdominates)
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+    hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+    hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+      (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
+      hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
+      h_intermediate_final hBA hsource_predictedGS hpredecessor_difference
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_lowerable_attach_sum_dominance
+        (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+        hc_strict h_intermediate hμsat hdominates)
+      hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+      hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+      hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 discharged boundary from saturated
 ladder-iterate lowerable attach-sum dominance with real couplings**: real
 couplings supply the saturated-energy real scalar needed internally, so the
 public discharged boundary exposes only the explicit lowerable attach-sum
-dominance input for the saturated ladder iterates. -/
+dominance input for the saturated ladder iterates and then enters the source
+common-energy final boundary directly. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_lowerable_attach_sum_dominance_of_real_couplings_discharge_nonempty
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -1165,12 +1194,21 @@ abbrev
               (fun x =>
                 tasaki23LoweringPredecessorPositiveSourceLowerableCoefficient
                   w τ x.1 ((Finset.mem_filter.mp x.2).2)))) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound_discharge_nonempty
-    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_lowerable_attach_sum_dominance_of_real_couplings
-      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
-      hc_strict h_intermediate hdominates)
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+    hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+    hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+      (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
+      hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
+      h_intermediate_final hBA hsource_predictedGS hpredecessor_difference
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_lowerable_attach_sum_dominance_of_real_couplings
+        (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+        hc_strict h_intermediate hdominates)
+      hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+      hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+      hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 discharged boundary from saturated
@@ -1178,7 +1216,8 @@ ladder-iterate predecessor differences**: this public discharged final
 predecessor-difference boundary replaces the outside-sector ground-energy lower
 family by the saturated ladder-iterate predecessor-difference positivity route.
 The saturated ferromagnetic energy is still supplied as an explicit real scalar,
-matching the lower-family callback used by the outside-ground layer. -/
+matching the lower-family callback used before entering the source common-energy
+final boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_predecessor_difference_pos_discharge_nonempty
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -1202,12 +1241,21 @@ abbrev
       ∃ μsat : ℝ, (μsat : ℂ) = saturatedFerromagnetEigenvalueS (V := V) J N)
     (hdiff :
       tasaki23SaturatedLadderIteratePredecessorDifferencePosCallback (V := V) A N) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound_discharge_nonempty
-    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_predecessor_difference_pos
-      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
-      hc_strict h_intermediate hμsat hdiff)
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+    hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+    hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+      (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
+      hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
+      h_intermediate_final hBA hsource_predictedGS hpredecessor_difference
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_predecessor_difference_pos
+        (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+        hc_strict h_intermediate hμsat hdiff)
+      hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+      hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+      hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 discharged boundary from saturated
@@ -1215,7 +1263,8 @@ ladder-iterate predecessor differences with real couplings**: this public
 discharged final predecessor-difference boundary replaces the outside-sector
 ground-energy lower family by the saturated ladder-iterate predecessor-
 difference positivity route.  Real couplings supply the saturated-energy
-real scalar needed internally, so no separate `hμsat` input remains. -/
+real scalar needed internally, so no separate `hμsat` input remains before the
+source common-energy final boundary is invoked. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings_discharge_nonempty
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -1237,12 +1286,21 @@ abbrev
       ∃ z, A z ≠ A x ∧ (τ z).val < N)
     (hdiff :
       tasaki23SaturatedLadderIteratePredecessorDifferencePosCallback (V := V) A N) :
-    tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_predecessor_difference_pos_discharge_nonempty
-    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
-    (saturatedFerromagnetEigenvalueS_exists_real (V := V) (N := N) J hJ_real)
-    hdiff
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+    hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+    hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+      (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
+      hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
+      h_intermediate_final hBA hsource_predictedGS hpredecessor_difference
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_predecessor_difference_pos_of_real_couplings
+        (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+        hc_strict h_intermediate hdiff)
+      hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+      hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+      hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint common-energy final boundary**:
