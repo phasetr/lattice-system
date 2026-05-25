@@ -337,6 +337,24 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-05-25 (PR pending)**: Refactor checkpoint after the 20
+  post-#3584 Tasaki §2.5 Theorem 2.3 feature PRs (#3585--#3604).
+  Build-speed evaluation for the active outside-ground/common-energy final
+  wrapper layer:
+  `lake env lean LatticeSystem/Quantum/SpinS/Theorem23Final.lean`
+  completed in `real 9.02s` (`user 4.39s`, `sys 3.68s`);
+  `lake env lean LatticeSystem/Quantum/SpinS/Theorem23OutsideGround.lean`
+  completed in `real 7.99s` (`user 9.93s`, `sys 3.74s`);
+  `lake env lean LatticeSystem/Quantum/SpinS/Theorem23IntervalCasimirMinimality.lean`
+  completed in `real 7.77s` (`user 3.02s`, `sys 3.62s`);
+  `lake env lean LatticeSystem/Quantum/SpinS/SaturatedLadderJointEigenspace.lean`
+  completed in `real 6.33s` (`user 4.48s`, `sys 3.43s`);
+  cached `lake build LatticeSystem.Quantum.SpinS.Theorem23Final`
+  completed in `real 3.73s` (`user 1.76s`, `sys 2.60s`). No module split
+  was performed: the newest work routed public final wrappers through the
+  common-energy boundary, but the measured focused elaboration times remain
+  below the previous split trigger range and the remaining public route audit
+  is still actively moving.
 - **2026-05-24 (PR #3563)**: Refactor checkpoint after the 20
   post-#3541 Tasaki §2.5 Theorem 2.3 feature PRs (#3543--#3562).
   Build-speed evaluation for the active outside-ground/final wrapper layer:
