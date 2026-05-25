@@ -482,6 +482,108 @@ abbrev
       hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 threaded saturated eigen-source boundary**:
+this non-discharged threaded final boundary accepts saturated-Heisenberg source
+callbacks together with saturated-Casimir source callbacks while keeping
+admissible-sector non-emptiness explicit.  The saturated eigen-source
+outside-ground bridge supplies the lower family before the wrapper invokes the
+source predicted-GS common-energy final boundary. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_eigen_sources
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleftH :
+      tasaki23OutsideGroundLeftSaturatedHeisenbergSourceCallback (V := V) A J N c)
+    (hrightH :
+      tasaki23OutsideGroundRightSaturatedHeisenbergSourceCallback (V := V) A J N c)
+    (hleftCas :
+      tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback (V := V) A J N c)
+    (hrightCas :
+      tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+    hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+    hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound
+      (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
+      hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
+      h_intermediate_final hBA hsector_nonempty hsource_predictedGS
+      hpredecessor_difference
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_eigen_sources
+        (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite
+        hc_strict hleftH hrightH hleftCas hrightCas)
+      hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+      hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+      hA_nonempty hnotA_nonempty
+
+set_option linter.style.longLine false in
+/-- **Tasaki §2.5 Theorem 2.3 threaded saturated source-energy boundary**:
+this non-discharged threaded final boundary accepts scalar saturated
+source-energy callbacks together with saturated-Casimir source callbacks while
+keeping admissible-sector non-emptiness explicit.  The saturated source-energy
+outside-ground bridge supplies the lower family before the wrapper invokes the
+source predicted-GS common-energy final boundary. -/
+abbrev
+    tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_source_energy
+    [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hsector_nonempty :
+      ∀ M, M ∈ tasaki23GroundStateSectors (V := V) A N →
+        Nonempty (magConfigS V N M))
+    (hsource_predictedGS :
+      tasaki23SourcePredictedGSCallback (V := V) A J N c)
+    (hpredecessor_difference :
+      tasaki23PredecessorDifferenceCallback (V := V) A J N c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hleftEnergy :
+      tasaki23OutsideGroundLeftSaturatedEnergySourceCallback (V := V) A J N c)
+    (hrightEnergy :
+      tasaki23OutsideGroundRightSaturatedEnergySourceCallback (V := V) A J N c)
+    (hleftCas :
+      tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback (V := V) A J N c)
+    (hrightCas :
+      tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c) :
+    tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+    hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+    hA_nonempty hnotA_nonempty
+  exact
+    tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound
+      (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
+      hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
+      h_intermediate_final hBA hsector_nonempty hsource_predictedGS
+      hpredecessor_difference
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_source_energy
+        (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite
+        hc_strict hleftEnergy hrightEnergy hleftCas hrightCas)
+      hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
+      hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
+      hA_nonempty hnotA_nonempty
+
+set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 physical-range non-empty outside-ground
 boundary**: this replaces the interval-specific non-emptiness callback
 for admissible sectors by a canonical non-emptiness callback on the
