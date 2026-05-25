@@ -495,9 +495,9 @@ set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 saturated-Casimir source discharged
 boundary**: this version of the discharged final predecessor-difference
 boundary accepts left and right saturated total-Casimir source callbacks.
-Those callbacks choose the interval endpoints, discharge every intermediate
-Casimir kernel-avoidance obligation, and then feed the resulting lower family
-directly into the source common-energy final boundary. -/
+Those callbacks feed the saturated-Casimir outside-ground bridge, and the
+resulting lower family enters the source common-energy final boundary
+directly. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_casimir_sources_discharge_nonempty
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -527,17 +527,9 @@ abbrev
       (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
       hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
       h_intermediate_final hBA hsource_predictedGS hpredecessor_difference
-      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_casimir_sources
         (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite
-        hc_strict
-        (tasaki23OutsideGroundAdmissibleReachCallback_of_full_reach
-          (V := V) A (J := J) N c
-          (tasaki23OutsideGroundAdmissibleFullReachCallback_of_iterated_ladder_casimir_callbacks
-            (V := V) A (J := J) N c
-            (tasaki23OutsideGroundLeftIteratedLadderCasimirFullReachCallback_of_saturated_casimir_source
-              (V := V) A (J := J) N c hleft)
-            (tasaki23OutsideGroundRightIteratedLadderCasimirFullReachCallback_of_saturated_casimir_source
-              (V := V) A (J := J) N c hright))))
+        hc_strict hleft hright)
       hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
       hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
       hA_nonempty hnotA_nonempty
@@ -547,9 +539,9 @@ set_option linter.style.longLine false in
 boundary**: this version of the discharged final predecessor-difference
 boundary accepts left and right source callbacks in the concrete span of the
 saturated ferromagnetic total-spin ladder.  The maximum-Casimir eigenspace
-identification converts those span callbacks to saturated-Casimir source
-callbacks before the resulting lower family is fed directly into the source
-common-energy final boundary. -/
+identification is packaged by the saturated-ladder-span outside-ground bridge,
+whose lower family is fed directly into the source common-energy final
+boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_span_sources_discharge_nonempty
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -579,21 +571,9 @@ abbrev
       (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
       hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
       h_intermediate_final hBA hsource_predictedGS hpredecessor_difference
-      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_span_sources
         (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite
-        hc_strict
-        (tasaki23OutsideGroundAdmissibleReachCallback_of_full_reach
-          (V := V) A (J := J) N c
-          (tasaki23OutsideGroundAdmissibleFullReachCallback_of_iterated_ladder_casimir_callbacks
-            (V := V) A (J := J) N c
-            (tasaki23OutsideGroundLeftIteratedLadderCasimirFullReachCallback_of_saturated_casimir_source
-              (V := V) A (J := J) N c
-              (tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback_of_ladder_span_source
-                (V := V) A (J := J) N c hleft))
-            (tasaki23OutsideGroundRightIteratedLadderCasimirFullReachCallback_of_saturated_casimir_source
-              (V := V) A (J := J) N c
-              (tasaki23OutsideGroundRightSaturatedCasimirSourceCallback_of_ladder_span_source
-                (V := V) A (J := J) N c hright)))))
+        hc_strict hleft hright)
       hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
       hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
       hA_nonempty hnotA_nonempty
@@ -603,8 +583,8 @@ set_option linter.style.longLine false in
 this version of the discharged final predecessor-difference boundary accepts
 left and right source callbacks in the saturated-ferromagnet joint eigenspace.
 The Tasaki §2.4 ladder-span identification converts those source-vector
-callbacks to saturated-ladder-span callbacks before the resulting lower family
-is fed directly into the source common-energy final boundary. -/
+callbacks through the saturated joint-source outside-ground bridge, whose
+lower family is fed directly into the source common-energy final boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_joint_sources_discharge_nonempty
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -634,25 +614,9 @@ abbrev
       (V := V) A (J := J) N c hJ_real_final hJ_real'_final hJ_pos_final
       hJ_nn_final hJ_sym_final hJ_bipartite_final hc_strict_final
       h_intermediate_final hBA hsource_predictedGS hpredecessor_difference
-      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+      (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_joint_sources
         (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite
-        hc_strict
-        (tasaki23OutsideGroundAdmissibleReachCallback_of_full_reach
-          (V := V) A (J := J) N c
-          (tasaki23OutsideGroundAdmissibleFullReachCallback_of_iterated_ladder_casimir_callbacks
-            (V := V) A (J := J) N c
-            (tasaki23OutsideGroundLeftIteratedLadderCasimirFullReachCallback_of_saturated_casimir_source
-              (V := V) A (J := J) N c
-              (tasaki23OutsideGroundLeftSaturatedCasimirSourceCallback_of_ladder_span_source
-                (V := V) A (J := J) N c
-                (tasaki23OutsideGroundLeftSaturatedLadderSpanSourceCallback_of_saturated_joint_source
-                  A (J := J) N c hleft)))
-            (tasaki23OutsideGroundRightIteratedLadderCasimirFullReachCallback_of_saturated_casimir_source
-              (V := V) A (J := J) N c
-              (tasaki23OutsideGroundRightSaturatedCasimirSourceCallback_of_ladder_span_source
-                (V := V) A (J := J) N c
-                (tasaki23OutsideGroundRightSaturatedLadderSpanSourceCallback_of_saturated_joint_source
-                  A (J := J) N c hright))))))
+        hc_strict hleft hright)
       hJ_real_final hJ_real'_final hJ_sym_final hJ_nn_final
       hJ_bipartite_final hJ_pos_final hc_strict_final h_intermediate_final
       hA_nonempty hnotA_nonempty
