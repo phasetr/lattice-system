@@ -9081,9 +9081,10 @@ an admissible sector with \(M=K+k\) and proves
 \texttt{\_discharge\_nonempty}
 \end{gathered}
 \]
-then feeds these non-zeroness callbacks through the full-reach bridge and
-passes the resulting lower family directly to the source predicted-GS
-common-energy final boundary.
+then obtains the outside-sector lower family through
+\(\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback\_of\_iterated\_ladder\_full\_reach}\)
+and passes that lower family directly to the source predicted-GS common-energy
+final boundary.
 The non-zeroness input has a Casimir-based discharge:
 \[
 \begin{gathered}
@@ -9110,8 +9111,10 @@ raising direction.  The final predecessor-difference boundary
 \end{gathered}
 \]
 therefore replaces the raw iterated-ladder non-zeroness hypotheses by
-left and right Casimir-avoidance callbacks, then enters the same source
-predicted-GS common-energy final boundary directly.
+left and right Casimir-avoidance callbacks, obtains the outside-sector lower
+family through
+\(\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback\_of\_iterated\_ladder\_casimir\_full\_reach}\),
+and enters the same source predicted-GS common-energy final boundary directly.
 The saturated-ferromagnet total-Casimir value gives a further endpoint
 bridge.  Lean records the elementary mismatches
 \[
@@ -10156,8 +10159,10 @@ admissible-reach lower-family bridge.  The discharged final boundary
 \texttt{\_discharge\_nonempty}
 \end{gathered}
 \]
-therefore exposes the final proof boundary directly in terms of the two
-directional outside-sector reach tasks.  The final named predecessor-difference
+therefore obtains the outside-sector lower family through
+\(\texttt{tasaki23OutsideGroundEnergyLowerFamilyCallback\_of\_side\_admissible\_reach}\)
+and exposes the final proof boundary directly in terms of the two directional
+outside-sector reach tasks.  The final named predecessor-difference
 boundaries
 \[
 \begin{gathered}
