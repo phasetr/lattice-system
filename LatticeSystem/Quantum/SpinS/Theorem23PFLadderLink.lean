@@ -126,4 +126,79 @@ theorem tasaki23_pf_ladder_link_succ_of_mem_predictedGS
       A N hM hMlt)
     hΦ
 
+/-- **Tasaki §2.5 Theorem 2.3 Perron–Frobenius adjacent-sector ladder
+link (raising direction)**: the raising companion of
+`tasaki23_pf_ladder_link_succ`.  If a magnetization-`K` sector vector
+`magSectorEmbedding Φ` is a Heisenberg eigenvector at `μ` and a
+total-Casimir eigenvector at `γ` away from the sector's raising-kernel
+value, then `Ŝ⁺_tot · magSectorEmbedding Φ` is a Heisenberg eigenvector at
+the **same** `μ`, non-zero, and supported in the previous magnetization
+sector. -/
+theorem tasaki23_pf_ladder_link_pred
+    {N K : ℕ} {J : V → V → ℂ} {μ : ℝ} {γ : ℂ}
+    {Φ : magConfigS V N K → ℂ}
+    (hH :
+      (heisenbergHamiltonianS J N).mulVec (magSectorEmbedding Φ) =
+        (μ : ℂ) • magSectorEmbedding Φ)
+    (hCas :
+      (totalSpinSSquared V N).mulVec (magSectorEmbedding Φ) =
+        γ • magSectorEmbedding Φ)
+    (hγ :
+      γ ≠
+        ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (K : ℂ)) *
+          ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (K : ℂ)) + 1)))
+    (hΦ : magSectorEmbedding Φ ≠ 0) :
+    (heisenbergHamiltonianS J N).mulVec
+        ((totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ)) =
+        (μ : ℂ) • (totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ) ∧
+      (totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ) ≠ 0 ∧
+      (totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ) ∈
+        magSubspaceS V N
+          ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (K : ℂ)) + 1) := by
+  refine ⟨?_, ?_, ?_⟩
+  · exact mulVec_preserves_eigenvalue_of_commuteS
+      (heisenbergHamiltonianS_commute_totalSpinSOpPlus J) hH
+  · exact tasaki23_totalSpinSOpPlus_mulVec_magSectorEmbedding_ne_zero_of_casimir_ne_kernel_value
+      hCas hγ hΦ
+  · exact totalSpinSOpPlus_mulVec_mem_magSubspaceS_of_mem
+      (magSectorEmbedding_mem_magSubspaceS (V := V) (N := N) (M := K) Φ)
+
+/-- **Tasaki §2.5 Theorem 2.3 raising ladder link from predicted-GS
+membership**: discharges the Casimir hypotheses of
+`tasaki23_pf_ladder_link_pred` for a predicted toy ground-state sector
+vector in sector `M + 1` strictly above the left endpoint.  The total
+Casimir eigenvalue is pinned to `tasaki23PredictedCasimirValue A N`, which
+differs from the raising-kernel value of that sector. -/
+theorem tasaki23_pf_ladder_link_pred_of_mem_predictedGS
+    (A : V → Bool) {N M : ℕ} {J : V → V → ℂ} {μ : ℝ}
+    {Φ : magConfigS V N (M + 1) → ℂ}
+    (hBA :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hM : M + 1 ∈ tasaki23GroundStateSectors (V := V) A N)
+    (hMlt :
+      min (Finset.card (Finset.filter (fun x : V => A x = true) Finset.univ))
+          (Finset.card (Finset.filter (fun x : V => (! A x) = true) Finset.univ)) * N <
+        M + 1)
+    (hΨ_pred :
+      magSectorEmbedding Φ ∈
+        bipartiteToyGroundStateSubspacePredicted (Λ := V) A N)
+    (hH :
+      (heisenbergHamiltonianS J N).mulVec (magSectorEmbedding Φ) =
+        (μ : ℂ) • magSectorEmbedding Φ)
+    (hΦ : magSectorEmbedding Φ ≠ 0) :
+    (heisenbergHamiltonianS J N).mulVec
+        ((totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ)) =
+        (μ : ℂ) • (totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ) ∧
+      (totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ) ≠ 0 ∧
+      (totalSpinSOpPlus V N).mulVec (magSectorEmbedding Φ) ∈
+        magSubspaceS V N
+          ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - ((M + 1 : ℕ) : ℂ)) + 1) :=
+  tasaki23_pf_ladder_link_pred hH
+    (tasaki23_totalSpinSSquared_mulVec_of_mem_bipartiteToyGroundStateSubspacePredicted
+      A N hBA hΨ_pred)
+    (tasaki23_predictedCasimirValue_ne_raising_kernel_value_of_mem_of_left_lt
+      A N hM hMlt)
+    hΦ
+
 end LatticeSystem.Quantum
