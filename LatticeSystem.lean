@@ -76,6 +76,7 @@ import LatticeSystem.Fermion.JWAbstract
 import LatticeSystem.Quantum.SpinS.Theorem23SectorExistence
 import LatticeSystem.Quantum.SpinS.Theorem23PFLadderLink
 import LatticeSystem.Quantum.SpinS.Theorem23PFConstancy
+import LatticeSystem.Quantum.SpinS.Theorem23PFTotalSpin
 
 /-!
 # `lattice-system` library root
