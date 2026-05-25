@@ -301,19 +301,19 @@ theorem
               (μ' : ℂ) • Φ →
             μ ≤ μ') :
     tasaki_2_5_theorem_2_3 (V := V) A N J c := by
+  intro hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
+    hc_strict h_intermediate hA_nonempty hnotA_nonempty
+  obtain ⟨μ, hcommon⟩ :=
+    tasaki23_common_energy_chain_of_left_endpoint_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_raising_source_sum_lt
+      A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hBA hsector_nonempty hleft_predictedGS
+      hsource_unpacked_reembedded_real_source_weight_predecessor_raising_source_sum_lt
   exact
-    tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_explicit_lowerable_positive_source_coefficient_lt_of_sector_minimality
-      A N c hBA hsector_nonempty hleft_predictedGS
-      (by
-        intro M hM hMlt μ v hμ_lt hv_pos hΦ Ψ hΨ_eq hΨ_pred hpred hA_A hA_B
-          hA_mag hB_A hB_B hB_mag τ
-        exact
-          tasaki23_lowerable_positive_source_attach_sum_lt_of_raising_predecessor_source_sum_lt
-            (V := V) (N := N) A v τ
-            (hsource_unpacked_reembedded_real_source_weight_predecessor_raising_source_sum_lt
-              hM hMlt hμ_lt hv_pos hΦ Ψ hΨ_eq hΨ_pred hpred hA_A hA_B hA_mag
-              hB_A hB_B hB_mag τ))
-      hsector_min
+    tasaki_2_5_theorem_2_3_of_common_energy_chain
+      A N c hcommon
+      (tasaki23_global_minimality_of_sector_minimality N (hsector_min hcommon))
+      hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos
+      hc_strict h_intermediate hA_nonempty hnotA_nonempty
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 final wrapper from explicit lowerable
