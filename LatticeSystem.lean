@@ -74,6 +74,7 @@ import LatticeSystem.Fermion.JWAbstract
 -- The sound per-sector Perron–Frobenius ground state is kept; the unsound conditional
 -- wrapper tree (40 modules) is removed.  Issue #3542.
 import LatticeSystem.Quantum.SpinS.Theorem23SectorExistence
+import LatticeSystem.Quantum.SpinS.Theorem23PFLadderLink
 
 /-!
 # `lattice-system` library root
