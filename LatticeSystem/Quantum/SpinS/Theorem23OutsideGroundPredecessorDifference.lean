@@ -389,13 +389,11 @@ theorem
     (hreach :
       tasaki23OutsideGroundAdmissibleReachCallback (V := V) A J N c) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_admissible_reach
+  tasaki_2_5_theorem_2_3_of_left_endpoint_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_outside_sector_ground_energy_lower_bound_discharge_nonempty
     (V := V) A (J := J) N c hBA
-    (fun _M hM =>
-      magConfigS_nonempty_of_le_card_mul (V := V) (N := N)
-        (tasaki23GroundStateSectors_le_card_mul (V := V) A N hM))
     hleft_predictedGS
     hsource_unpacked_reembedded_real_source_weight_predecessor_difference_pos
-    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict hreach
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_admissible_reach
+      (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict hreach)
 
 end LatticeSystem.Quantum
