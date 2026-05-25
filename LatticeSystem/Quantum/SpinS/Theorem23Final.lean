@@ -1975,8 +1975,8 @@ abbrev
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated eigen
 sources**: saturated-Heisenberg source callbacks together with
-saturated-Casimir source callbacks assemble saturated joint source-vector
-callbacks, which then supply the uniform named final theorem. -/
+saturated-Casimir source callbacks supply the outside-sector lower-family
+callback directly before entering the uniform named final theorem. -/
 abbrev tasaki_2_5_theorem_2_3_of_saturated_eigen_sources_named_callbacks
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
     (hBA :
@@ -2001,20 +2001,18 @@ abbrev tasaki_2_5_theorem_2_3_of_saturated_eigen_sources_named_callbacks
     (hrightCas :
       tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_saturated_joint_sources_named_callbacks
+  tasaki_2_5_theorem_2_3_of_named_callbacks
     (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
-    (tasaki23OutsideGroundLeftSaturatedJointSourceCallback_of_saturated_eigen_sources
-      A (J := J) N c hleftH hleftCas)
-    (tasaki23OutsideGroundRightSaturatedJointSourceCallback_of_saturated_eigen_sources
-      A (J := J) N c hrightH hrightCas)
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_eigen_sources
+      (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hleftH hrightH hleftCas hrightCas)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated source
 energies**: scalar source-energy identifications supply the saturated
 Heisenberg source callbacks.  Together with saturated-Casimir source
-callbacks, they route the uniform named theorem through the saturated joint
-source-vector API. -/
+callbacks, they produce the outside-sector lower-family callback directly for
+the uniform named final theorem. -/
 abbrev tasaki_2_5_theorem_2_3_of_saturated_source_energy_named_callbacks
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
     (hBA :
@@ -2039,14 +2037,11 @@ abbrev tasaki_2_5_theorem_2_3_of_saturated_source_energy_named_callbacks
     (hrightCas :
       tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_saturated_eigen_sources_named_callbacks
+  tasaki_2_5_theorem_2_3_of_named_callbacks
     (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
-    (tasaki23OutsideGroundLeftSaturatedHeisenbergSourceCallback_of_saturated_energy_source
-      A (J := J) N c hleftEnergy)
-    (tasaki23OutsideGroundRightSaturatedHeisenbergSourceCallback_of_saturated_energy_source
-      A (J := J) N c hrightEnergy)
-    hleftCas hrightCas
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_source_energy
+      (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hleftEnergy hrightEnergy hleftCas hrightCas)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 named-callback boundary from saturated
@@ -2645,9 +2640,8 @@ abbrev
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
 saturated eigen sources**: saturated-Heisenberg source callbacks together
-with saturated-Casimir source callbacks assemble the saturated joint source
-callbacks, which then supply the outside-sector lower-family callback for the
-left-endpoint final boundary. -/
+with saturated-Casimir source callbacks supply the outside-sector lower-family
+callback directly for the left-endpoint final boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_eigen_sources_named_callbacks
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -2673,20 +2667,18 @@ abbrev
     (hrightCas :
       tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_joint_sources_named_callbacks
+  tasaki_2_5_theorem_2_3_of_left_endpoint_named_callbacks
     (V := V) A (J := J) N c hBA hleft_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
-    (tasaki23OutsideGroundLeftSaturatedJointSourceCallback_of_saturated_eigen_sources
-      A (J := J) N c hleftH hleftCas)
-    (tasaki23OutsideGroundRightSaturatedJointSourceCallback_of_saturated_eigen_sources
-      A (J := J) N c hrightH hrightCas)
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_eigen_sources
+      (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hleftH hrightH hleftCas hrightCas)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
 saturated source energies**: scalar source-energy identifications supply the
 saturated-Heisenberg source callbacks.  Together with saturated-Casimir source
-callbacks, they route the left-endpoint final theorem through the saturated
-joint source-vector API. -/
+callbacks, they produce the outside-sector lower-family callback directly for
+the left-endpoint final theorem. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_source_energy_named_callbacks
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -2712,14 +2704,11 @@ abbrev
     (hrightCas :
       tasaki23OutsideGroundRightSaturatedCasimirSourceCallback (V := V) A J N c) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_left_endpoint_saturated_eigen_sources_named_callbacks
+  tasaki_2_5_theorem_2_3_of_left_endpoint_named_callbacks
     (V := V) A (J := J) N c hBA hleft_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
-    (tasaki23OutsideGroundLeftSaturatedHeisenbergSourceCallback_of_saturated_energy_source
-      A (J := J) N c hleftEnergy)
-    (tasaki23OutsideGroundRightSaturatedHeisenbergSourceCallback_of_saturated_energy_source
-      A (J := J) N c hrightEnergy)
-    hleftCas hrightCas
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_source_energy
+      (V := V) A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
+      hleftEnergy hrightEnergy hleftCas hrightCas)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 left-endpoint named-callback boundary from
