@@ -662,8 +662,9 @@ set_option linter.style.longLine false in
 boundary**: this version of the discharged final predecessor-difference
 boundary accepts sectorwise saturated joint reference callbacks directly.
 The reference callbacks first produce the saturated joint source-vector
-callbacks by Marshall-positive eigenvalue/eigenvector uniqueness, then the
-existing saturated-joint source final boundary closes the route. -/
+callbacks by Marshall-positive eigenvalue/eigenvector uniqueness; the resulting
+lower family is then passed directly to the source common-energy final
+boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_joint_references_discharge_nonempty
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -688,23 +689,21 @@ abbrev
     (hright_ref :
       tasaki23OutsideGroundRightSaturatedJointReferenceCallback (V := V) A J N) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_joint_sources_discharge_nonempty
-    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
-    (tasaki23OutsideGroundLeftSaturatedJointSourceCallback_of_saturated_joint_reference
+  tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+    (V := V) A (J := J) N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym
+    hJ_bipartite hc_strict h_intermediate hBA hsource_predictedGS
+    hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_joint_references
       (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
-      hc_strict h_intermediate hleft_ref)
-    (tasaki23OutsideGroundRightSaturatedJointSourceCallback_of_saturated_joint_reference
-      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
-      hc_strict h_intermediate hright_ref)
+      hc_strict h_intermediate hleft_ref hright_ref)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 saturated ladder-reference discharged
 boundary**: this version of the discharged final predecessor-difference
 boundary accepts sectorwise saturated ladder-reference callbacks directly.
 The ladder references first become saturated joint references through the
-Tasaki §2.4 joint-eigenspace/ladder-span equality, then the existing
-saturated-joint reference final boundary closes the route. -/
+Tasaki §2.4 joint-eigenspace/ladder-span equality; the resulting lower family
+is then passed directly to the source common-energy final boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_references_discharge_nonempty
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -729,21 +728,20 @@ abbrev
     (hright_ref :
       tasaki23OutsideGroundRightSaturatedLadderReferenceCallback (V := V) A J N) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_joint_references_discharge_nonempty
-    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
-    h_intermediate
-    (tasaki23OutsideGroundLeftSaturatedJointReferenceCallback_of_saturated_ladder_reference
-      (V := V) A (J := J) N hleft_ref)
-    (tasaki23OutsideGroundRightSaturatedJointReferenceCallback_of_saturated_ladder_reference
-      (V := V) A (J := J) N hright_ref)
+  tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+    (V := V) A (J := J) N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym
+    hJ_bipartite hc_strict h_intermediate hBA hsource_predictedGS
+    hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_references
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hleft_ref hright_ref)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 saturated ladder-iterate reference discharged
 boundary**: this version accepts sectorwise singleton ladder-iterate reference
 callbacks directly.  They first become saturated ladder references by the
-singleton-span inclusion, then the saturated ladder-reference discharged final
-boundary closes the route. -/
+singleton-span inclusion; the resulting lower family is then passed directly to
+the source common-energy final boundary. -/
 abbrev
     tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_iterate_references_discharge_nonempty
     [Nonempty V] (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ)
@@ -768,14 +766,13 @@ abbrev
     (hright_ref :
       tasaki23OutsideGroundRightSaturatedLadderIterateReferenceCallback (V := V) A J N) :
     tasaki_2_5_theorem_2_3 (V := V) A N J c :=
-  tasaki_2_5_theorem_2_3_of_threaded_predictedGS_of_unpacked_reembedded_real_source_weight_predecessor_difference_pos_of_saturated_ladder_references_discharge_nonempty
-    (V := V) A (J := J) N c hBA hsource_predictedGS hpredecessor_difference
-    hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
-    h_intermediate
-    (tasaki23OutsideGroundLeftSaturatedLadderReferenceCallback_of_saturated_ladder_iterate_reference
-      (V := V) A (J := J) N hleft_ref)
-    (tasaki23OutsideGroundRightSaturatedLadderReferenceCallback_of_saturated_ladder_iterate_reference
-      (V := V) A (J := J) N hright_ref)
+  tasaki_2_5_theorem_2_3_of_source_predictedGS_common_energy_chain_and_outside_sector_ground_energy_lower_bound_discharge_nonempty
+    (V := V) A (J := J) N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym
+    hJ_bipartite hc_strict h_intermediate hBA hsource_predictedGS
+    hpredecessor_difference
+    (tasaki23OutsideGroundEnergyLowerFamilyCallback_of_saturated_ladder_iterate_references
+      (V := V) A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict h_intermediate hleft_ref hright_ref)
 
 set_option linter.style.longLine false in
 /-- **Tasaki §2.5 Theorem 2.3 saturated eigen-source discharged boundary**:
