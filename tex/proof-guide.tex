@@ -5253,6 +5253,21 @@ The remaining physics input is that the per-sector Perron--Frobenius ground
 state itself lies in the predicted subspace (the total-spin determination,
 to be supplied from the toy-Hamiltonian Casimir minimisation).
 
+\paragraph{Adjacent-sector ground-energy bound
+(\texttt{tasaki23\_pf\_sector\_energy\_succ\_le}).} Combining the ladder
+link with the per-sector spectral lower bound for Marshall-positive ground
+states
+(\texttt{heisenbergHamiltonianSReMatrixOnMagSector\_eigenvalue\_ge\_of\_marshallPositive}):
+if a predicted-GS eigenvector sits at $\mu$ in admissible sector $M$ below
+the right endpoint and sector $M+1$ carries a Marshall-positive ground
+state at $\mu'$, then $\mu'\le\mu$. The non-zero lowered image
+$\hat S^-_{\rm tot}\Psi$ restricts to a non-zero complex sector eigenvector
+at $\mu$, hence a non-zero real-form sector eigenvector at $\mu$ (real or
+imaginary part), which the Marshall-positive ground state bounds below by
+$\mu'$. With the raising companion this gives the constancy of the sector
+ground energies (the common-energy chain), using no Marshall positivity of
+the lowered vector.
+
 \textbf{Goal} (Tasaki §2.5 Theorem 2.3, p.~42). For a connected
 bipartite lattice $(\Lambda, B)$ with $|A| \ge 1$ and $|B| \ge 1$,
 the AFM Heisenberg ground states have total spin $S_{\rm tot} =
