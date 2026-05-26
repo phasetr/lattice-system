@@ -915,3 +915,20 @@ mechanically** and catch most regressions / drift.
   JordanWigner facades; TotalSpin, HeisenbergChain,
   SpinHalfRotation, GibbsState, TimeReversalMulti content +
   extensions). PRs #335–#372.
+- **2026-05-26 (PR #3686, 20-PR cadence checkpoint, evaluate-only)**:
+  Build-speed + import-hygiene checkpoint for the §2.5 Theorem 2.3
+  Casimir-spectral-bound and minimal-total-spin-state chains
+  (Issue #3658 / #3674, PRs #3667–#3685). New modules rebuild in
+  2.7–3.0s each (`SublatticeMagWeightComponent` 2.73s,
+  `SublatticeMagProjection` 3.00s, `Theorem23ToyWitness` 2.86s,
+  `JointCasimirEigenspaceLadderInvariant` 2.82s,
+  `CasimirSpectralLowerBound` 2.84s) — well under the historical
+  split trigger (~16s); each file is small (40–130 lines) and split
+  at the one-theorem / few-theorem grain, so **no split warranted**.
+  A `lake exe shake` import audit flagged several "remove"
+  suggestions on the chain, but each was build-verified to be
+  **wrong** (the flagged imports — e.g. `SublatticeSpinLadder` in
+  `SublatticeMagShift`, `ToyHamiltonian` in
+  `Theorem23ToyGroundEnergyBound` — are genuinely required), so the
+  chain's imports are already minimal. Both build-speed and import
+  hygiene healthy; no code change.
