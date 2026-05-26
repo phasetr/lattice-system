@@ -94,6 +94,7 @@ import LatticeSystem.Quantum.SpinS.SublatticeMagProjection
 import LatticeSystem.Quantum.SpinS.SublatticeMagWeightComponent
 import LatticeSystem.Quantum.SpinS.SublatticeHighestWeightExistence
 import LatticeSystem.Quantum.SpinS.SublatticeCasimirSpectralBound
+import LatticeSystem.Quantum.SpinS.ToyHamiltonianJointEnergy
 
 /-!
 # `lattice-system` library root
