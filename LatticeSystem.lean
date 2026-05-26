@@ -119,6 +119,7 @@ import LatticeSystem.Quantum.SpinS.JointLadderRaiseBoundary
 import LatticeSystem.Quantum.SpinS.JointDiagonalRaiseImage
 import LatticeSystem.Quantum.SpinS.JointDiagonalKernel
 import LatticeSystem.Quantum.SpinS.JointDiagonalPredictedEigenvector
+import LatticeSystem.Quantum.SpinS.JointPredictedSectorEigenvector
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateMag
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIdentity
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateNonvanishing
