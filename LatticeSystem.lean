@@ -100,6 +100,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23ToyCasimirPin
 import LatticeSystem.Quantum.SpinS.Theorem23ToySublatticeBounds
 import LatticeSystem.Quantum.SpinS.Theorem23ExtremalSector
 import LatticeSystem.Quantum.SpinS.Theorem23ToyWitness
+import LatticeSystem.Quantum.SpinS.Theorem23ToyGroundEnergyBound
 
 /-!
 # `lattice-system` library root
