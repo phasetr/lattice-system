@@ -95,6 +95,7 @@ import LatticeSystem.Quantum.SpinS.SublatticeMagWeightComponent
 import LatticeSystem.Quantum.SpinS.SublatticeHighestWeightExistence
 import LatticeSystem.Quantum.SpinS.SublatticeCasimirSpectralBound
 import LatticeSystem.Quantum.SpinS.ToyHamiltonianJointEnergy
+import LatticeSystem.Quantum.SpinS.CasimirSpectralLowerBound
 
 /-!
 # `lattice-system` library root
