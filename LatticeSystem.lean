@@ -84,6 +84,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23PFToyJointCasimir
 import LatticeSystem.Quantum.SpinS.MagEigenvalueBound
 import LatticeSystem.Quantum.SpinS.SublatticeSzBound
 import LatticeSystem.Quantum.SpinS.CasimirWeightComponent
+import LatticeSystem.Quantum.SpinS.CasimirSpectralBound
 
 /-!
 # `lattice-system` library root
