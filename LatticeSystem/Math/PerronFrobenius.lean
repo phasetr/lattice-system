@@ -1,7 +1,6 @@
 import LatticeSystem.Math.PerronFrobeniusMain
 import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.LinearAlgebra.Matrix.Irreducible.Defs
-import Mathlib.LinearAlgebra.Matrix.PosDef
 import Mathlib.LinearAlgebra.UnitaryGroup
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 

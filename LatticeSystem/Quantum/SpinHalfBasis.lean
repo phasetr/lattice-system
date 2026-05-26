@@ -1,5 +1,4 @@
 import LatticeSystem.Quantum.SpinHalf
-import Mathlib.Tactic.LinearCombination
 
 /-!
 # Basis states and raising/lowering operators for S = 1/2
