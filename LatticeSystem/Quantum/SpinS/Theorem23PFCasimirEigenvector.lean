@@ -6,6 +6,7 @@ import LatticeSystem.Quantum.SpinS.SaturatedLadderJointEigenspace
 import LatticeSystem.Quantum.SpinS.Heisenberg
 import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
 import LatticeSystem.Quantum.SpinS.AllAlignedState
+import LatticeSystem.Quantum.SpinS.Theorem23PFLadderLink
 
 /-!
 # Tasaki §2.5 Theorem 2.3 — the Perron ground state is a total-Casimir eigenvector
@@ -241,5 +242,68 @@ theorem tasaki23_pf_groundState_casimir_eigenvector
     rw [hΨ_supp ρ hρ]
     simp only [Pi.smul_apply, smul_eq_mul]
     rw [hΦ_supp ρ hρ, mul_zero]
+
+/-- **Adjacent-sector ladder link for the Perron ground state from
+Casimir non-vanishing**: the per-sector Marshall-positive Heisenberg ground
+state `Φ = magSectorEmbedding (marshallSignS · v)` (`v > 0`, `Ĥ Φ = μ Φ`)
+satisfies the adjacent-sector ladder link as soon as its (automatically
+existing) total-Casimir eigenvalue is away from the lowering-kernel value:
+`Ŝ⁻_tot · Φ` is a non-zero Heisenberg eigenvector at the same `μ` in the next
+magnetization sector.
+
+This replaces the predicted-GS-membership hypothesis of
+`tasaki23_pf_ladder_link_succ_of_mem_predictedGS` by the minimal
+Casimir-non-vanishing condition, using that the ground state is a
+total-Casimir eigenvector (`tasaki23_pf_groundState_casimir_eigenvector`).
+It is the form in which the sound chain applies directly to the actual
+Perron–Frobenius ground state. -/
+theorem tasaki23_pf_groundState_ladder_link_of_casimir_ne_kernel
+    (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    {μ : ℝ} {v : magConfigS V N M → ℝ}
+    (hv_pos : ∀ σ, 0 < v σ)
+    (hH :
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) =
+        (μ : ℂ) • magSectorEmbedding
+          (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)))
+    (hγ_ne : ∀ γ : ℂ,
+      (totalSpinSSquared V N).mulVec
+          (magSectorEmbedding
+            (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) =
+        γ • magSectorEmbedding
+          (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) →
+      γ ≠
+        ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) *
+          ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) - 1))) :
+    (heisenbergHamiltonianS J N).mulVec
+        ((totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)))) =
+        (μ : ℂ) • (totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) ∧
+      (totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) ≠ 0 ∧
+      (totalSpinSOpMinus V N).mulVec
+          (magSectorEmbedding
+            (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) ∈
+        magSubspaceS V N
+          ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) - 1) := by
+  obtain ⟨γ, hγ⟩ :=
+    tasaki23_pf_groundState_casimir_eigenvector A N c hJ_real hJ_pos hJ_nn
+      hJ_sym hJ_bipartite hc_strict h_intermediate hv_pos hH
+  exact tasaki23_pf_ladder_link_succ hH hγ (hγ_ne γ hγ)
+    (tasaki23_marshallPositive_magSectorEmbedding_ne_zero A hv_pos)
 
 end LatticeSystem.Quantum
