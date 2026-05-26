@@ -110,6 +110,7 @@ import LatticeSystem.Quantum.SpinS.SublatticeMaxCasimirEigenspaceLadderInvariant
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterate
 import LatticeSystem.Quantum.SpinS.JointLadderIterate
 import LatticeSystem.Quantum.SpinS.JointLadderIterateMag
+import LatticeSystem.Quantum.SpinS.JointLadderIterateSublatticeMag
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateMag
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIdentity
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateNonvanishing
