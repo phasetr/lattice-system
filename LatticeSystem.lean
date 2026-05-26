@@ -98,6 +98,7 @@ import LatticeSystem.Quantum.SpinS.ToyHamiltonianJointEnergy
 import LatticeSystem.Quantum.SpinS.CasimirSpectralLowerBound
 import LatticeSystem.Quantum.SpinS.Theorem23ToyCasimirPin
 import LatticeSystem.Quantum.SpinS.Theorem23ToySublatticeBounds
+import LatticeSystem.Quantum.SpinS.Theorem23ExtremalSector
 
 /-!
 # `lattice-system` library root
