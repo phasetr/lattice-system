@@ -114,6 +114,7 @@ import LatticeSystem.Quantum.SpinS.JointLadderIterateSublatticeMag
 import LatticeSystem.Quantum.SpinS.JointLadderRaiseA
 import LatticeSystem.Quantum.SpinS.JointLadderRaiseB
 import LatticeSystem.Quantum.SpinS.JointLadderIterateNonvanishing
+import LatticeSystem.Quantum.SpinS.JointDiagonalLI
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateMag
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIdentity
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateNonvanishing
