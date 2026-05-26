@@ -932,3 +932,15 @@ mechanically** and catch most regressions / drift.
   `Theorem23ToyGroundEnergyBound` — are genuinely required), so the
   chain's imports are already minimal. Both build-speed and import
   hygiene healthy; no code change.
+- **2026-05-27 (PR #3708, 20-PR cadence checkpoint, evaluate-only)**:
+  Build-speed checkpoint for the sublattice-symmetric-subspace
+  dimension-theory chain (Issue #3687, PRs #3688–#3707: NeBots,
+  ladder invariances, joint 2D ladder iterates, raising identities,
+  non-vanishing, diagonal LI, rank–nullity `Ŝ⁺_tot`-kernel = the
+  minimal-total-spin highest-weight state). The ~20 new modules each
+  rebuild in ~2.4s (`JointDiagonalKernel` 2.42s, `JointDiagonalRaiseImage`
+  2.41s, `JointLadderRaiseA` 2.40s, `SublatticeLadderLI` 2.39s,
+  `JointLadderIterateSublatticeMag` 2.41s) — well under the historical
+  split trigger (~16s); each file is small (one-/few-theorem grain), so
+  **no split warranted**. The chain is well-factored; build-speed healthy;
+  no code change.
