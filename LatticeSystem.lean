@@ -89,6 +89,7 @@ import LatticeSystem.Quantum.SpinS.SublatticeHighestWeight
 import LatticeSystem.Quantum.SpinS.SublatticeMagnetization
 import LatticeSystem.Quantum.SpinS.SublatticeMagShift
 import LatticeSystem.Quantum.SpinS.SublatticeMagSpectrum
+import LatticeSystem.Quantum.SpinS.SublatticeCasimirHighestWeightBound
 
 /-!
 # `lattice-system` library root
