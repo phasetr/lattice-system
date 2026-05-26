@@ -5336,6 +5336,19 @@ directly to the actual Perron--Frobenius ground state; the single remaining
 input is that the ground-state Casimir value equals the predicted value
 (hence $\neq$ the kernel value), supplied by the toy-Hamiltonian overlap.
 
+\paragraph{Overlap pin
+(\texttt{tasaki23\_pf\_groundState\_casimir\_eq\_predicted\_of\_witness}).}
+Tasaki's overlap step (eq.~2.5.12): given a Marshall-positive total-Casimir
+eigenvector at the predicted value in sector $M$ (the toy-Hamiltonian ground
+state), the per-sector Perron--Frobenius ground state is a total-Casimir
+eigenvector at exactly the predicted value. The ground state is a Casimir
+eigenvector at some \emph{real} $\gamma$ (the eigenvalue is real because
+$(\hat S_{\rm tot})^2$ is Hermitian, lemma
+\texttt{isHermitian\_eigenvalue\_star\_eq}); the Marshall-positive overlap with
+the witness is non-zero, so the total-Casimir transfer forces
+$\gamma=\gamma_{\rm pred}$. This pins the ground-state total spin, leaving only
+the existence of the predicted-Casimir witness (the toy ground state) as input.
+
 \textbf{Goal} (Tasaki §2.5 Theorem 2.3, p.~42). For a connected
 bipartite lattice $(\Lambda, B)$ with $|A| \ge 1$ and $|B| \ge 1$,
 the AFM Heisenberg ground states have total spin $S_{\rm tot} =
