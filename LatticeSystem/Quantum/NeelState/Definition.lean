@@ -1,6 +1,5 @@
 import LatticeSystem.Quantum.MagnetizationSubspace
 import LatticeSystem.Quantum.SpinDot
-import LatticeSystem.Quantum.HeisenbergChain
 
 /-!
 # Néel state definition (Tasaki §2.5)

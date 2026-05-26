@@ -2,7 +2,6 @@ import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Real.Sqrt
 import Mathlib.LinearAlgebra.Matrix.Hermitian
 import Mathlib.LinearAlgebra.Matrix.Notation
-import Mathlib.Tactic.LinearCombination
 
 /-!
 # Spin-1 operators following Tasaki §2.1
