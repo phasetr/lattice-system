@@ -81,6 +81,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23PFTotalSpin
 import LatticeSystem.Quantum.SpinS.Theorem23PFCasimirEigenvector
 import LatticeSystem.Quantum.SpinS.Theorem23PFCasimirPredicted
 import LatticeSystem.Quantum.SpinS.Theorem23PFToyJointCasimir
+import LatticeSystem.Quantum.SpinS.MagEigenvalueBound
 
 /-!
 # `lattice-system` library root
