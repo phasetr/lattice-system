@@ -86,6 +86,7 @@ import LatticeSystem.Quantum.SpinS.SublatticeSzBound
 import LatticeSystem.Quantum.SpinS.CasimirWeightComponent
 import LatticeSystem.Quantum.SpinS.CasimirSpectralBound
 import LatticeSystem.Quantum.SpinS.SublatticeHighestWeight
+import LatticeSystem.Quantum.SpinS.SublatticeLowestWeight
 import LatticeSystem.Quantum.SpinS.SublatticeMagnetization
 import LatticeSystem.Quantum.SpinS.SublatticeMagShift
 import LatticeSystem.Quantum.SpinS.SublatticeMagSpectrum
