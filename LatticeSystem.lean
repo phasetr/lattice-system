@@ -104,6 +104,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23ExtremalSector
 import LatticeSystem.Quantum.SpinS.Theorem23ExtremalHighestWeight
 import LatticeSystem.Quantum.SpinS.JointCasimirEigenspaceLadderInvariant
 import LatticeSystem.Quantum.SpinS.JointCasimirEigenspaceMagInvariant
+import LatticeSystem.Quantum.SpinS.SublatticeMaxCasimirEigenspaceNeBot
 import LatticeSystem.Quantum.SpinS.Theorem23ToyWitness
 import LatticeSystem.Quantum.SpinS.Theorem23ToyGroundEnergyBound
 
