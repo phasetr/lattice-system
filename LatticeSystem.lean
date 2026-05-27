@@ -126,6 +126,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23PFConstancyCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23JointPredictedLowering
 import LatticeSystem.Quantum.SpinS.Theorem23JointPredictedSectors
 import LatticeSystem.Quantum.SpinS.Theorem23ToyMinEnergyArith
+import LatticeSystem.Quantum.SpinS.Theorem23SublatticeCasimirSzBound
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateMag
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIdentity
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateNonvanishing
