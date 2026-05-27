@@ -184,10 +184,7 @@ import LatticeSystem.Quantum.SpinS.DressedAxisSwapHermitian
 import LatticeSystem.Quantum.SpinS.ParityDegeneracyBound
 import LatticeSystem.Quantum.SpinS.ParityConfig
 import LatticeSystem.Quantum.SpinS.DressedParityBlockMatrix
-import LatticeSystem.Quantum.SpinS.DressedAxisSwapReMatrix
-import LatticeSystem.Quantum.SpinS.ShiftedDressedAxisSwapReMatrix
-import LatticeSystem.Quantum.SpinS.ShiftedDressedAxisSwapParityBlock
-import LatticeSystem.Quantum.SpinS.ShiftedDressedAxisSwapDiagPos
+import LatticeSystem.Quantum.SpinS.DressedAxisSwapPFMatrix
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateMag
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIdentity
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateNonvanishing
