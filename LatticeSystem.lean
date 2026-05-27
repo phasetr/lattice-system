@@ -133,6 +133,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23SublatticeBottomComponent
 import LatticeSystem.Quantum.SpinS.Theorem23SublatticeMagBoundOneSide
 import LatticeSystem.Quantum.SpinS.Theorem23TotalLowestWeightExistence
 import LatticeSystem.Quantum.SpinS.Theorem23CoupledLowerBound
+import LatticeSystem.Quantum.SpinS.Theorem23SublatticeCasimirNonneg
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateMag
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIdentity
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateNonvanishing
