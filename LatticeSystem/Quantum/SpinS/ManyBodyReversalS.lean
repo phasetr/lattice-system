@@ -27,6 +27,7 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 def revConfigS (σ : Λ → Fin (N + 1)) : Λ → Fin (N + 1) := fun x => Fin.rev (σ x)
 
 omit [Fintype Λ] [DecidableEq Λ] in
+/-- The configuration reversal is an involution. -/
 theorem revConfigS_involutive (σ : Λ → Fin (N + 1)) : revConfigS (revConfigS σ) = σ := by
   funext x; simp [revConfigS, Fin.rev_rev]
 
@@ -35,6 +36,7 @@ noncomputable def manyBodyReversalS (Λ : Type*) [Fintype Λ] [DecidableEq Λ] (
     ManyBodyOpS Λ N :=
   Matrix.of fun σ' σ => if σ' = revConfigS σ then (1 : ℂ) else 0
 
+/-- Matrix entry of the many-body reversal: `Θ σ' σ = 1` iff `σ' = revConfigS σ`. -/
 theorem manyBodyReversalS_apply (σ' σ : Λ → Fin (N + 1)) :
     manyBodyReversalS Λ N σ' σ = if σ' = revConfigS σ then (1 : ℂ) else 0 := rfl
 

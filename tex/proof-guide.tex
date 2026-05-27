@@ -12820,6 +12820,19 @@ cannot be applied directly; Theorem~2.4 instead argues sector-by-sector
 (even/odd Perron--Frobenius for at-most-double degeneracy) plus a deformation
 from the \(SU(2)\) point \((\lambda,D)=(1,0)\). (Issue \#3739, in progress.)
 
+The single-site spin reversal \(F\) (permutation matrix of \texttt{Fin.rev},
+\(k\mapsto N-k\); the \(\pi\)-rotation about axis~1) conjugates
+\(F\hat S^3F=-\hat S^3\), \(F\hat S^\pm F=\hat S^\mp\)
+(\texttt{spinReversalS\_conj\_*}).  The many-body product
+\(\Theta=\bigotimes_xF\) (\texttt{manyBodyReversalS}, the configuration
+reversal \(\sigma\mapsto\mathrm{rev}\circ\sigma\)) is an involution with
+\(\Theta(\texttt{onSiteS}\,z\,A)\Theta=\texttt{onSiteS}\,z\,(FAF)\), giving the
+\(M\leftrightarrow-M\) magnetization reflection
+\(\Theta\hat S^3_{\mathrm{tot}}\Theta=-\hat S^3_{\mathrm{tot}}\)
+(\texttt{manyBodyReversalS\_conj\_totalSpinSOp3}).  This reflection yields
+\(E_M=E_{-M}\) for the crossing argument and, with the ground state in
+\(\mathcal H_0\), the conclusion \(\hat S^3_{\mathrm{tot}}\Phi_{\mathrm{GS}}=0\).
+
 Reference: H.\ Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, Springer 2020, §2.5 Theorem 2.4, p.~43--44.
 
