@@ -12833,6 +12833,16 @@ reversal \(\sigma\mapsto\mathrm{rev}\circ\sigma\)) is an involution with
 \(E_M=E_{-M}\) for the crossing argument and, with the ground state in
 \(\mathcal H_0\), the conclusion \(\hat S^3_{\mathrm{tot}}\Phi_{\mathrm{GS}}=0\).
 
+For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
+\(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
+Perron--Frobenius).  Only the ground-state degeneracy count must be
+transferred, so a \emph{similarity} suffices:
+\texttt{matrix\_similar\_eigenspace\_finrank\_eq} shows that for invertible
+\(U\), each \(\mu\)-eigenspace of \(U^{-1}\hat HU\) and of \(\hat H\) has equal
+\texttt{finrank} (via \(v\mapsto U\,v\), a linear equivalence of eigenspaces).
+This lets the explicit gauge unitary (a Wigner \(d\)-matrix \(\exp(-i\pi\hat
+S^1/2)\) for general spin) be isolated behind an interface.
+
 Reference: H.\ Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, Springer 2020, §2.5 Theorem 2.4, p.~43--44.
 
