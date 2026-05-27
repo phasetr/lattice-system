@@ -12795,6 +12795,34 @@ Reference: H.\ Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, Springer 2020, §2.5 Theorem 2.3, p.~42;
 E.\ Lieb, D.\ Mattis, \emph{J. Math. Phys.}\ \textbf{3} (1962) 749.
 
+\subsection*{In progress: Tasaki §2.5 Theorem 2.4 (Mattis--Nishimori)}
+\label{subsec:tasaki-2-5-theorem-2-4}
+
+Tasaki's anisotropic Hamiltonian (2.5.14)
+\[
+  \hat H = \sum_{\{x,y\}\in B} \bigl(\hat S^{(1)}_x\hat S^{(1)}_y
+    + \hat S^{(2)}_x\hat S^{(2)}_y + \lambda\,\hat S^{(3)}_x\hat S^{(3)}_y\bigr)
+    + D\sum_{x}(\hat S^{(3)}_x)^2
+\]
+(Ising anisotropy \(\lambda\), crystal field \(D\)) is formalized as
+\texttt{anisotropicHeisenbergS} (with two-site term \texttt{spinSDotXXZ} and
+single-ion term \texttt{singleIonAnisotropyS}).  It is Hermitian for real
+parameters and reduces to the isotropic Heisenberg Hamiltonian at
+\(\lambda=1,\ D=0\).  Unlike the isotropic model it is only
+\(U(1)\)-invariant: \texttt{anisotropicHeisenbergS\_commute\_totalSpinSOp3}
+shows \([\hat H,\hat S^3_{\mathrm{tot}}]=0\) (each site \(\hat S^3\) commutes
+with \(\hat S^3_{\mathrm{tot}}\), and
+\(\texttt{spinSDotXXZ}=\texttt{spinSDot}+(\lambda-1)\hat S^3_x\hat S^3_y\)),
+so \(\hat H\) preserves every magnetization sector
+(\texttt{anisotropicHeisenbergS\_mulVec\_mem\_magSubspaceS\_of\_mem}).  It does
+\emph{not} commute with \((\hat S_{\mathrm{tot}})^2\), so Marshall--Lieb--Mattis
+cannot be applied directly; Theorem~2.4 instead argues sector-by-sector
+(even/odd Perron--Frobenius for at-most-double degeneracy) plus a deformation
+from the \(SU(2)\) point \((\lambda,D)=(1,0)\). (Issue \#3739, in progress.)
+
+Reference: H.\ Tasaki, \emph{Physics and Mathematics of Quantum
+Many-Body Systems}, Springer 2020, §2.5 Theorem 2.4, p.~43--44.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
