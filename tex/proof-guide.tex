@@ -12865,6 +12865,19 @@ and commutes with \(\hat H\), hence carries the magnetization sector \(M\) onto
 (\texttt{manyBodyReversalS\_anisotropic\_sector\_eigenspace\_finrank\_eq})
 underlies the ``first crossing forces \(\ge3\)-fold degeneracy'' step.
 
+Dressing \(\hat H'\) by the Marshall sign matrix \(\Theta_A=\operatorname{diag}(\text{marshallSignS}\,A)\)
+(a similarity, since the signs are \(\pm1\)) makes the off-diagonal entries
+sign-definite.  For a bipartite antiferromagnetic coupling (\(J\ge0\) real, no
+self-bonds, cross-sublattice support) and case~(i) (\(-1\le\lambda\le1\),
+\(D\ge0\)) every off-diagonal entry of \(\hat H'_{\mathrm{dressed}}\) is
+\(\le0\) (\texttt{dressedAxisSwappedAnisotropicHeisenbergS\_offdiag\_re\_nonpos}):
+on a bipartite bond any \(\pm1\) move on the \(A\)-site gives Marshall sign
+\(-1\), flipping the real non-negative transverse/parity bond entries, while the
+single-ion \(\pm2\) moves are even (Marshall \(+1\)) with coefficient
+\(-D/4\le0\).  Thus \(-\hat H'_{\mathrm{dressed}}\) is entrywise real with
+non-negative off-diagonal part --- the Perron--Frobenius input for the
+parity-block degeneracy bound.
+
 Reference: H.\ Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, Springer 2020, §2.5 Theorem 2.4, p.~43--44 (eq.~2.5.16).
 
