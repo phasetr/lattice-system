@@ -12753,6 +12753,22 @@ monotonicity \texttt{hOutside} for an arbitrary bipartite \(J\) --- the
 single remaining hypothesis of the minimality engine.  The symmetric
 orientation \(|A|<|\bar A|\) is the mirror image.
 
+\textbf{General-\(J\) \texttt{hOutside} route (in progress).} Codex-validated,
+this needs only the SU(2) \emph{inward ladder}, not reflection positivity:
+an eigenvector in a non-admissible sector is moved to the admissible band
+edge by \(\hat S^\mp_{\mathrm{tot}}\) (which commutes with \(H\), so the
+energy is preserved), where the Collatz--Wielandt band-edge bound gives
+\(\mu\le\mu_M\).  The non-vanishing of that ladder step is the magnitude
+identity (\texttt{totalSpinSOpMinus\_mulVec\_normSq\_eq}), valid on any
+weight-\(w\) vector \(\Phi\) (\(\hat S^3_{\mathrm{tot}}\Phi=w\Phi\)):
+\[
+  \|\hat S^-_{\mathrm{tot}}\Phi\|^2
+    = \|\hat S^+_{\mathrm{tot}}\Phi\|^2 + 2\,w\,\|\Phi\|^2,
+\]
+from \(\hat S^+\hat S^- = \hat S^-\hat S^+ + 2\hat S^3\) and
+\((\hat S^-)^\dagger=\hat S^+\).  Hence \(\hat S^-_{\mathrm{tot}}\Phi\neq0\)
+when \(\Phi\neq0\) and \(w_{\mathrm{re}}>0\) (dually for \(\hat S^+\)).
+
 Reference: H.\ Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, Springer 2020, §2.5 Theorem 2.3, p.~42;
 E.\ Lieb, D.\ Mattis, \emph{J. Math. Phys.}\ \textbf{3} (1962) 749.
