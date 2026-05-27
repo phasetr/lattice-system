@@ -189,6 +189,7 @@ import LatticeSystem.Quantum.SpinS.ParityReachable
 import LatticeSystem.Quantum.SpinS.ParityReachableMagSum
 import LatticeSystem.Quantum.SpinS.ParityReachableMatrixPow
 import LatticeSystem.Quantum.SpinS.ShiftedDressedAxisSwapBlockDiag
+import LatticeSystem.Quantum.SpinS.ShiftedDressedAxisSwapBlockPow
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateMag
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIdentity
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateNonvanishing
