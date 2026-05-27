@@ -153,6 +153,7 @@ import LatticeSystem.Quantum.SpinS.SpinSTransverseLadder
 import LatticeSystem.Quantum.SpinS.SpinSReversal
 import LatticeSystem.Quantum.SpinS.ManyBodyReversalS
 import LatticeSystem.Quantum.SpinS.AnisotropicReflectionSymmetry
+import LatticeSystem.Quantum.SpinS.GaugeEigenspaceFinrank
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateMag
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIdentity
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateNonvanishing
