@@ -12692,6 +12692,71 @@ therefore give directly
 from \(\Phi\in\mathcal G_{\mathrm{pred}}\), with no separate
 predicted-Casimir hypothesis for the ladder image.
 
+\subsection*{DONE: Tasaki §2.5 Theorem 2.3 for the standard bipartite
+                coupling (sound Perron--Frobenius route, option (a))}
+\label{subsec:tasaki-2-5-theorem-2-3-toy-done}
+
+After the earlier saturated-ladder route was found unsound and removed,
+the final statement \texttt{tasaki\_2\_5\_theorem\_2\_3} was closed for
+the standard bipartite antiferromagnetic coupling
+\(J=\texttt{bipartiteCoupling}\,A\) (canonical orientation
+\(|\bar A|\le|A|\)) along the sound Perron--Frobenius route.  The proof
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_bipartiteToy} is sorry-free
+(\texttt{\#print axioms} reports only \texttt{propext},
+\texttt{Classical.choice}, \texttt{Quot.sound}).  Its four tiers are:
+
+\begin{itemize}
+\item \textbf{Per-sector existence} (Theorem 2.2, \#869): every
+admissible magnetisation sector
+\(M\in\texttt{tasaki23GroundStateSectors}\,A\,N
+  =[\,\min(|A|,|\bar A|)N,\ \max(|A|,|\bar A|)N\,]\)
+hosts a Marshall-positive Perron--Frobenius ground state
+\(\sum_\sigma \varepsilon_\sigma v_\sigma\,|\sigma\rangle\),
+\(v_\sigma>0\) (Tasaki (2.5.4)).
+
+\item \textbf{TIER 4 --- common energy.}
+\texttt{tasaki23\_common\_groundEnergy} fixes one energy
+\(\mu\) realised in \emph{every} admissible sector.  Each sector ground
+state carries the predicted total Casimir
+\(C_{\mathrm{pred}}=|s_A-s_B|(|s_A-s_B|+1)\)
+(per-sector overlap pin, \#3731), and the Casimir-only adjacent-sector
+constancy \texttt{tasaki23\_pf\_sector\_energy\_eq\_of\_casimir} (\#3713)
+propagates \(\mu\) across the interval by \(\le\)-induction.  This
+consumes \emph{only} the predicted total Casimir, never the lowered
+Marshall \texttt{site\_sum} positivity.
+
+\item \textbf{TIER 5 --- global minimality.}
+\texttt{tasaki23\_eigenvalue\_ge\_common} is a sector min--max engine: a
+non-zero full-space eigenvector has a non-zero magnetisation-sector
+restriction, whose real or imaginary part is a non-zero real sector
+eigenvector; the Collatz--Wielandt per-sector bound
+(\texttt{\_eigenvalue\_ge\_of\_marshallPositive}) closes the admissible
+case, and the non-admissible bound \texttt{hOutside} the rest.  For the
+toy coupling \texttt{hOutside} is the Lieb--Mattis lower bound
+\texttt{tasaki23\_toy\_sector\_energy\_ge\_predicted} (\#3734): the
+Marshall-positive sector ground state is a joint
+\((\hat S^2_{\mathrm{tot}},\hat S^2_A,\hat S^2_{\bar A})\) eigenvector, so
+the universal minimum-energy bound
+\(E_{\mathrm{pred}}\le(\gamma_{\mathrm{tot}}-\gamma_A-\gamma_B)_{\mathrm{re}}\)
+(\#3725) holds in \emph{every} sector.
+
+\item \textbf{TIER 6 --- capstone.}
+\(\mu=(\texttt{bipartiteToyMinEnergyPredicted}\,A\,N)_{\mathrm{re}}
+   =E_{\mathrm{pred}}\); each sector energy is pinned to \(E_{\mathrm{pred}}\)
+from below by the toy bound and from above by the predicted-energy
+witness (\#3729 / \#3680), and the minimality engine closes the global
+clause.
+\end{itemize}
+
+The only gap to the fully general coupling is the Lieb--Mattis energy
+monotonicity \texttt{hOutside} for an arbitrary bipartite \(J\) --- the
+single remaining hypothesis of the minimality engine.  The symmetric
+orientation \(|A|<|\bar A|\) is the mirror image.
+
+Reference: H.\ Tasaki, \emph{Physics and Mathematics of Quantum
+Many-Body Systems}, Springer 2020, §2.5 Theorem 2.3, p.~42;
+E.\ Lieb, D.\ Mattis, \emph{J. Math. Phys.}\ \textbf{3} (1962) 749.
+
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
