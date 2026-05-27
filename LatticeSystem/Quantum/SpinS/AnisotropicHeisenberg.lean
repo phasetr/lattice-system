@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.Heisenberg
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 
 /-!
@@ -14,8 +13,9 @@ isotropic Heisenberg model it is only U(1)-invariant (commutes with `Ŝ³_tot`, 
 
 This file introduces the two-site XXZ term `spinSDotXXZ`, the single-ion term
 `singleIonAnisotropyS`, and the full Hamiltonian `anisotropicHeisenbergS`, and proves it is
-Hermitian for real parameters and reduces to the isotropic Heisenberg Hamiltonian at
-`λ = 1, D = 0`.
+Hermitian for real parameters.  (The reduction to the isotropic Heisenberg Hamiltonian at
+`λ = 1, D = 0` is in `AnisotropicHeisenbergReduction.lean`, kept separate so this core does
+not import the heavy `Heisenberg` module.)
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.4, p. 43 (eq. 2.5.14).
@@ -93,13 +93,6 @@ noncomputable def anisotropicHeisenbergS (J : Λ → Λ → ℂ) (lam D : ℂ) (
 theorem anisotropicHeisenbergS_def (J : Λ → Λ → ℂ) (lam D : ℂ) (N : ℕ) :
     anisotropicHeisenbergS (Λ := Λ) J lam D N =
       (∑ x : Λ, ∑ y : Λ, J x y • spinSDotXXZ x y lam N) + singleIonAnisotropyS D N := rfl
-
-/-- At `λ = 1, D = 0` the anisotropic Hamiltonian is the isotropic Heisenberg Hamiltonian. -/
-theorem anisotropicHeisenbergS_one_zero (J : Λ → Λ → ℂ) (N : ℕ) :
-    anisotropicHeisenbergS (Λ := Λ) J 1 0 N = heisenbergHamiltonianS J N := by
-  rw [anisotropicHeisenbergS_def, singleIonAnisotropyS_zero, add_zero, heisenbergHamiltonianS_def]
-  refine Finset.sum_congr rfl (fun x _ => Finset.sum_congr rfl (fun y _ => ?_))
-  rw [spinSDotXXZ_one]
 
 /-- The anisotropic Hamiltonian is Hermitian for real coupling, anisotropy, and crystal
 field (`star (J x y) = J x y`, `star λ = λ`, `star D = D`). -/
