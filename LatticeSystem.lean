@@ -152,6 +152,7 @@ import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergReduction
 import LatticeSystem.Quantum.SpinS.AxisSwappedAnisotropicHeisenberg
 import LatticeSystem.Quantum.SpinS.ManyBodyTensorS
 import LatticeSystem.Quantum.SpinS.ManyBodyTensorConj
+import LatticeSystem.Quantum.SpinS.AxisSwapGaugeEquiv
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergU1
 import LatticeSystem.Quantum.SpinS.SpinSTransverseLadder
 import LatticeSystem.Quantum.SpinS.TwoSiteTransverseLadder
