@@ -12841,10 +12841,32 @@ transferred, so a \emph{similarity} suffices:
 \(U\), each \(\mu\)-eigenspace of \(U^{-1}\hat HU\) and of \(\hat H\) has equal
 \texttt{finrank} (via \(v\mapsto U\,v\), a linear equivalence of eigenspaces).
 This lets the explicit gauge unitary (a Wigner \(d\)-matrix \(\exp(-i\pi\hat
-S^1/2)\) for general spin) be isolated behind an interface.
+S^1/2)\) for general spin) be isolated behind an interface
+(\texttt{AxisSwapUnitaryS}), and at spin-\(1/2\) it is instantiated concretely
+by the \(\pi/2\) rotation about axis~1 (\texttt{axisSwapUnitarySpinHalf}, using
+the existing \texttt{spinHalfRot1} conjugation lemmas), giving the spin-\(1/2\)
+equal-degeneracy milestone.
+
+The axis-swapped bond rewrites in ladder form (2.5.16),
+\[
+\hat S^1_x\hat S^1_y+\lambda\hat S^2_x\hat S^2_y+\hat S^3_x\hat S^3_y
+=\tfrac{1+\lambda}{4}\bigl(\hat S^+_x\hat S^-_y+\hat S^-_x\hat S^+_y\bigr)
++\tfrac{1-\lambda}{4}\bigl(\hat S^+_x\hat S^+_y+\hat S^-_x\hat S^-_y\bigr)
++\hat S^3_x\hat S^3_y,
+\]
+(\texttt{spinSDotXXZSwap\_ladder\_form}): the \(\tfrac{1-\lambda}{4}(\hat
+S^+\hat S^++\hat S^-\hat S^-)\) term shifts the magnetization by \(\pm2\),
+coupling the \(\hat S^3_{\mathrm{tot}}\) sectors into the two even/odd parity
+blocks.  A complementary symmetry is the spin reversal \(\Theta\)
+(\texttt{manyBodyReversalS}), which anticommutes with \(\hat S^3_{\mathrm{tot}}\)
+and commutes with \(\hat H\), hence carries the magnetization sector \(M\) onto
+\(-M\) while preserving every \(\hat H\)-eigenspace; the resulting
+\(E_M=E_{-M}\) per-sector degeneracy symmetry
+(\texttt{manyBodyReversalS\_anisotropic\_sector\_eigenspace\_finrank\_eq})
+underlies the ``first crossing forces \(\ge3\)-fold degeneracy'' step.
 
 Reference: H.\ Tasaki, \emph{Physics and Mathematics of Quantum
-Many-Body Systems}, Springer 2020, §2.5 Theorem 2.4, p.~43--44.
+Many-Body Systems}, Springer 2020, §2.5 Theorem 2.4, p.~43--44 (eq.~2.5.16).
 
 \subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
