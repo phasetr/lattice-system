@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23PFConstancy
+import LatticeSystem.Quantum.SpinS.Theorem23PFLadderLink
 
 /-!
 # Adjacent-sector ground-energy constancy from the predicted total Casimir alone

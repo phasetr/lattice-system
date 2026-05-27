@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.CasimirSpectralLowerBound
+import LatticeSystem.Quantum.SpinS.SaturatedLadderJointEigenspace
 import LatticeSystem.Quantum.SpinS.BipartiteToyGSLadderInvariant
 
 /-!
