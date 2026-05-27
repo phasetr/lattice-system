@@ -30,14 +30,15 @@ noncomputable def manyBodyTensorS (W : Λ → Matrix (Fin (N + 1)) (Fin (N + 1))
   Matrix.of fun σ' σ => ∏ x : Λ, W x (σ' x) (σ x)
 
 omit [DecidableEq Λ] in
+/-- Matrix entry of the many-body tensor: `(⊗ W) σ' σ = ∏_x (W x) (σ' x) (σ x)`. -/
 theorem manyBodyTensorS_apply (W : Λ → Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
     (σ' σ : Λ → Fin (N + 1)) :
     manyBodyTensorS W σ' σ = ∏ x : Λ, W x (σ' x) (σ x) := rfl
 
 omit [DecidableEq Λ] in
 /-- The all-identity tensor is the identity operator. -/
-theorem manyBodyTensorS_one : manyBodyTensorS (fun _ : Λ => (1 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ))
-    = 1 := by
+theorem manyBodyTensorS_one :
+    manyBodyTensorS (fun _ : Λ => (1 : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)) = 1 := by
   ext σ' σ
   rw [manyBodyTensorS_apply, Matrix.one_apply]
   by_cases h : σ' = σ
