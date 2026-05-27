@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.Heisenberg
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 
 /-!
@@ -93,13 +92,6 @@ noncomputable def anisotropicHeisenbergS (J : Λ → Λ → ℂ) (lam D : ℂ) (
 theorem anisotropicHeisenbergS_def (J : Λ → Λ → ℂ) (lam D : ℂ) (N : ℕ) :
     anisotropicHeisenbergS (Λ := Λ) J lam D N =
       (∑ x : Λ, ∑ y : Λ, J x y • spinSDotXXZ x y lam N) + singleIonAnisotropyS D N := rfl
-
-/-- At `λ = 1, D = 0` the anisotropic Hamiltonian is the isotropic Heisenberg Hamiltonian. -/
-theorem anisotropicHeisenbergS_one_zero (J : Λ → Λ → ℂ) (N : ℕ) :
-    anisotropicHeisenbergS (Λ := Λ) J 1 0 N = heisenbergHamiltonianS J N := by
-  rw [anisotropicHeisenbergS_def, singleIonAnisotropyS_zero, add_zero, heisenbergHamiltonianS_def]
-  refine Finset.sum_congr rfl (fun x _ => Finset.sum_congr rfl (fun y _ => ?_))
-  rw [spinSDotXXZ_one]
 
 /-- The anisotropic Hamiltonian is Hermitian for real coupling, anisotropy, and crystal
 field (`star (J x y) = J x y`, `star λ = λ`, `star D = D`). -/
