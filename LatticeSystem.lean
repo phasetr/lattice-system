@@ -180,6 +180,7 @@ import LatticeSystem.Quantum.SpinS.AxisSwapParityBlock
 import LatticeSystem.Quantum.SpinS.MagParityOperator
 import LatticeSystem.Quantum.SpinS.MagParityEigenspaceDecomp
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapHermitian
+import LatticeSystem.Quantum.SpinS.ParityDegeneracyBound
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateMag
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIdentity
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateNonvanishing
