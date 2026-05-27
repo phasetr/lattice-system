@@ -12769,6 +12769,16 @@ from \(\hat S^+\hat S^- = \hat S^-\hat S^+ + 2\hat S^3\) and
 \((\hat S^-)^\dagger=\hat S^+\).  Hence \(\hat S^-_{\mathrm{tot}}\Phi\neq0\)
 when \(\Phi\neq0\) and \(w_{\mathrm{re}}>0\) (dually for \(\hat S^+\)).
 
+Iterating this (\texttt{raise\_iterate\_ne\_zero},
+\texttt{lower\_iterate\_ne\_zero}) carries a non-admissible-sector
+eigenvector to the admissible band edge --- non-zero, weight-shifted, and
+at the same energy --- and the Collatz--Wielandt band-edge bound
+(\texttt{tasaki23\_admissible\_eigenvector\_ge}) then yields
+\(\mu\le\mu_M\).  This is \texttt{tasaki23\_general\_hOutside}, which
+discharges \texttt{hOutside} for an arbitrary bipartite \(J\); feeding it
+to the minimality engine extends Theorem~2.3 from the standard coupling to
+every connected bipartite antiferromagnetic coupling.
+
 Reference: H.\ Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, Springer 2020, §2.5 Theorem 2.3, p.~42;
 E.\ Lieb, D.\ Mattis, \emph{J. Math. Phys.}\ \textbf{3} (1962) 749.
