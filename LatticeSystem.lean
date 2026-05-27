@@ -146,6 +146,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23ToySectorEnergyLowerBound
 import LatticeSystem.Quantum.SpinS.Theorem23ToyFinal
 import LatticeSystem.Quantum.SpinS.Theorem23TotalLoweringNonvanishing
 import LatticeSystem.Quantum.SpinS.Theorem23GeneralHOutside
+import LatticeSystem.Quantum.SpinS.Theorem23GeneralFinal
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateMag
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIdentity
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateNonvanishing

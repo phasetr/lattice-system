@@ -12779,6 +12779,18 @@ discharges \texttt{hOutside} for an arbitrary bipartite \(J\); feeding it
 to the minimality engine extends Theorem~2.3 from the standard coupling to
 every connected bipartite antiferromagnetic coupling.
 
+\textbf{General-\(J\) capstone (DONE).}
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_bipartiteCompletePositive} assembles
+the full statement for an arbitrary real symmetric non-negative bipartite
+coupling positive on the complete bipartite graph: the common energy
+\(\mu\) (TIER~4), the per-sector Theorem~2.2 ground state (\#869) with its
+eigenvalue reconciled to \(\mu\) by the two-sided Collatz--Wielandt bound,
+and global minimality from the engine plus the general-\(J\)
+\texttt{hOutside}.  It is sorry-free (\texttt{\#print axioms} =
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}).  The only
+residual restrictions are the canonical orientation \(|\bar A|\le|A|\) (the
+mirror case is \(A\leftrightarrow\bar A\)) and \(s_B>0\) (non-degeneracy).
+
 Reference: H.\ Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, Springer 2020, §2.5 Theorem 2.3, p.~42;
 E.\ Lieb, D.\ Mattis, \emph{J. Math. Phys.}\ \textbf{3} (1962) 749.
