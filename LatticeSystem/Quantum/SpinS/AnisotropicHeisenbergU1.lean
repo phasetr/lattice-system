@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenberg
 import LatticeSystem.Quantum.SpinS.MultiSiteDotComm
+import LatticeSystem.Quantum.SpinS.Magnetization
 
 /-!
 # U(1) invariance of the anisotropic Heisenberg Hamiltonian
