@@ -150,6 +150,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23GeneralFinal
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenberg
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergU1
 import LatticeSystem.Quantum.SpinS.SpinSTransverseLadder
+import LatticeSystem.Quantum.SpinS.TwoSiteTransverseLadder
 import LatticeSystem.Quantum.SpinS.SpinSReversal
 import LatticeSystem.Quantum.SpinS.ManyBodyReversalS
 import LatticeSystem.Quantum.SpinS.AnisotropicReflectionSymmetry
