@@ -122,6 +122,7 @@ import LatticeSystem.Quantum.SpinS.JointDiagonalPredictedEigenvector
 import LatticeSystem.Quantum.SpinS.JointPredictedSectorEigenvector
 import LatticeSystem.Quantum.SpinS.Theorem23ToyWitnessPredicted
 import LatticeSystem.Quantum.SpinS.Theorem23PFBaseCasimir
+import LatticeSystem.Quantum.SpinS.Theorem23PFConstancyCasimir
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateMag
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIdentity
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateNonvanishing
