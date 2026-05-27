@@ -138,6 +138,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23ToyMinEnergyBound
 import LatticeSystem.Quantum.SpinS.Theorem23ToyMinEnergyArithEq
 import LatticeSystem.Quantum.SpinS.Theorem23ToyGSPredictedCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23PredictedEnergySectorAll
+import LatticeSystem.Quantum.SpinS.Theorem23ToyGSPredictedCasimirAt
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateMag
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIdentity
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIterateNonvanishing
