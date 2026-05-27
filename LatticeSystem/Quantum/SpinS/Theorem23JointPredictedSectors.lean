@@ -26,12 +26,12 @@ namespace LatticeSystem.Quantum
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- Abbreviation: the maximal sublattice-`A` Casimir eigenvalue `s_A(s_A+1)`. -/
-private noncomputable def maxCasA (A : Λ → Bool) (N : ℕ) : ℂ :=
+noncomputable def maxCasA (A : Λ → Bool) (N : ℕ) : ℂ :=
   ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) * ((N : ℂ) / 2) *
     (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) * ((N : ℂ) / 2) + 1)
 
 /-- Abbreviation: the maximal sublattice-`¬A` Casimir eigenvalue `s_B(s_B+1)`. -/
-private noncomputable def maxCasB (A : Λ → Bool) (N : ℕ) : ℂ :=
+noncomputable def maxCasB (A : Λ → Bool) (N : ℕ) : ℂ :=
   ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) * ((N : ℂ) / 2) *
     (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) * ((N : ℂ) / 2) + 1)
 
