@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23PFLadderLink
+import LatticeSystem.Quantum.SpinS.Theorem23PredictedEndpoint
 import LatticeSystem.Quantum.SpinS.BipartiteToyGSLadderInvariant
 import LatticeSystem.Quantum.SpinS.SaturatedLadderJointEigenspace
 
