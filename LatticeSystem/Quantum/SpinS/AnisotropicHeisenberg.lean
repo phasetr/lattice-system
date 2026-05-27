@@ -13,8 +13,9 @@ isotropic Heisenberg model it is only U(1)-invariant (commutes with `Ŝ³_tot`, 
 
 This file introduces the two-site XXZ term `spinSDotXXZ`, the single-ion term
 `singleIonAnisotropyS`, and the full Hamiltonian `anisotropicHeisenbergS`, and proves it is
-Hermitian for real parameters and reduces to the isotropic Heisenberg Hamiltonian at
-`λ = 1, D = 0`.
+Hermitian for real parameters.  (The reduction to the isotropic Heisenberg Hamiltonian at
+`λ = 1, D = 0` is in `AnisotropicHeisenbergReduction.lean`, kept separate so this core does
+not import the heavy `Heisenberg` module.)
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.4, p. 43 (eq. 2.5.14).
