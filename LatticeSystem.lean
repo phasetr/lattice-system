@@ -194,6 +194,7 @@ import LatticeSystem.Quantum.SpinS.ParityReachCanonicalTransfer
 import LatticeSystem.Quantum.SpinS.ParityReachCanonicalMagShift
 import LatticeSystem.Quantum.SpinS.ParityReachCanonicalSingleIonIter
 import LatticeSystem.Quantum.SpinS.ParityReachCanonicalSingleIonBoth
+import LatticeSystem.Quantum.SpinS.ParityReachCanonicalAligned
 import LatticeSystem.Quantum.SpinS.AxisSwapBondVanish
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBondSign
 import LatticeSystem.Quantum.SpinS.SingleIonOffDiag
