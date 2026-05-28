@@ -189,6 +189,7 @@ import LatticeSystem.Quantum.SpinS.AxisSwapAnisotropicImZero
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapImZero
 import LatticeSystem.Quantum.SpinS.ComplexDressedParityBlockFinrank
 import LatticeSystem.Quantum.SpinS.BlockDiagSubmatrixBridge
+import LatticeSystem.Quantum.SpinS.InvolutionEigenspaceDecompEq
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapDegeneracyBound
 import LatticeSystem.Quantum.SpinS.DressedFullEigInterParityLeOne
 import LatticeSystem.Quantum.SpinS.GaugeIntersectionEigenspaceFinrank
