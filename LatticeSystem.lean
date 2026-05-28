@@ -192,6 +192,7 @@ import LatticeSystem.Quantum.SpinS.BlockDiagSubmatrixBridge
 import LatticeSystem.Quantum.SpinS.BlockDiagSubmatrixEmbed
 import LatticeSystem.Quantum.SpinS.InvolutionEigenspaceDecompEq
 import LatticeSystem.Quantum.SpinS.BlockSumFinrankEq
+import LatticeSystem.Quantum.SpinS.SubmatrixSimpleEigLeTwo
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapDegeneracyBound
 import LatticeSystem.Quantum.SpinS.DressedFullEigInterParityLeOne
 import LatticeSystem.Quantum.SpinS.GaugeIntersectionEigenspaceFinrank
