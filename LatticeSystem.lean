@@ -191,6 +191,7 @@ import LatticeSystem.Quantum.SpinS.ComplexDressedParityBlockFinrank
 import LatticeSystem.Quantum.SpinS.BlockDiagSubmatrixBridge
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapDegeneracyBound
 import LatticeSystem.Quantum.SpinS.DressedFullEigInterParityLeOne
+import LatticeSystem.Quantum.SpinS.GaugeIntersectionEigenspaceFinrank
 import LatticeSystem.Quantum.SpinS.ParityReachWitness
 import LatticeSystem.Quantum.SpinS.MagSumStepDown
 import LatticeSystem.Quantum.SpinS.ParityReachStepDown
