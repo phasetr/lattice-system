@@ -184,6 +184,7 @@ import LatticeSystem.Quantum.SpinS.ParityReachWitness
 import LatticeSystem.Quantum.SpinS.MagSumStepDown
 import LatticeSystem.Quantum.SpinS.ParityReachStepDown
 import LatticeSystem.Quantum.SpinS.ParityReachStepDownHard
+import LatticeSystem.Quantum.SpinS.ParityReachStepDownFull
 import LatticeSystem.Quantum.SpinS.ParityReachShuffle
 import LatticeSystem.Quantum.SpinS.ParityReachShuffleIter
 import LatticeSystem.Quantum.SpinS.ParityReachTransferIter
