@@ -173,6 +173,7 @@ import LatticeSystem.Quantum.SpinS.AxisSwapBondOffDiag
 import LatticeSystem.Quantum.SpinS.AxisSwapBondReNonneg
 import LatticeSystem.Quantum.SpinS.AxisSwapBondReStrictPos
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBondReStrictNeg
+import LatticeSystem.Quantum.SpinS.DressedAxisSwapRaiseLowerStrictNeg
 import LatticeSystem.Quantum.SpinS.AxisSwapBondVanish
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBondSign
 import LatticeSystem.Quantum.SpinS.SingleIonOffDiag
