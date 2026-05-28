@@ -184,6 +184,7 @@ import LatticeSystem.Quantum.SpinS.ParityReachWitness
 import LatticeSystem.Quantum.SpinS.ParityReachShuffle
 import LatticeSystem.Quantum.SpinS.ParityReachShuffleIter
 import LatticeSystem.Quantum.SpinS.ParityReachTransferIter
+import LatticeSystem.Quantum.SpinS.ParityReachBondIter
 import LatticeSystem.Quantum.SpinS.ParityReachDrainOne
 import LatticeSystem.Quantum.SpinS.ParityReachConcentrate
 import LatticeSystem.Quantum.SpinS.ParityReachConcentrateA
