@@ -2,7 +2,6 @@ import LatticeSystem.Quantum.SpinS.MagParityOperator
 import LatticeSystem.Quantum.SpinS.ParityConfig
 import Mathlib.LinearAlgebra.Eigenspace.Basic
 import Mathlib.LinearAlgebra.Matrix.ToLin
-import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 
 /-!
 # Block-diagonal submatrix bridge: full eigenspace ⊓ ker(P) → submatrix eigenspace
