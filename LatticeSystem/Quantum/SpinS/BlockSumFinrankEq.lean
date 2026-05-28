@@ -1,7 +1,6 @@
 import LatticeSystem.Quantum.SpinS.BlockDiagSubmatrixEmbed
 import LatticeSystem.Quantum.SpinS.InvolutionEigenspaceDecompEq
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapDegeneracyBound
-import LatticeSystem.Quantum.SpinS.BareAxisSwapFullEigInterParityLeOne
 
 /-!
 # Block-sum finrank equality: `finrank ℂ (eig M μ) = ∑_p finrank ℂ (eig M.submatrix_p μ)`
