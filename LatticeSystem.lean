@@ -195,6 +195,7 @@ import LatticeSystem.Quantum.SpinS.BlockSumFinrankEq
 import LatticeSystem.Quantum.SpinS.SubmatrixSimpleEigLeTwo
 import LatticeSystem.Quantum.SpinS.ParityBlockSubmatrixHermitian
 import LatticeSystem.Quantum.SpinS.SubmatrixEigenvalueReal
+import LatticeSystem.Quantum.SpinS.SubmatrixMinEigenvalue
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapDegeneracyBound
 import LatticeSystem.Quantum.SpinS.DressedFullEigInterParityLeOne
 import LatticeSystem.Quantum.SpinS.GaugeIntersectionEigenspaceFinrank
