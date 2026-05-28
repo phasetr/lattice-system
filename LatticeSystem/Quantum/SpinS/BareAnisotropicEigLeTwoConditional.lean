@@ -1,6 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AxisSwapUnitarySpinHalf
 import LatticeSystem.Quantum.SpinS.AxisSwapDegeneracy
-import LatticeSystem.Quantum.SpinS.BareAxisSwapFullEigInterParityLeOne
 import LatticeSystem.Quantum.SpinS.ParityDegeneracyBound
 
 /-!
