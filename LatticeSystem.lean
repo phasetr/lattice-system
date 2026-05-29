@@ -17,6 +17,7 @@ import LatticeSystem.Math.HermitianSpectrumShift
 import LatticeSystem.Math.HermitianMinEqOfShiftPF
 import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPF
 import LatticeSystem.Quantum.SpinS.BareSubmatrixFinrankLeOneAtMin
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfUnconditional
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
