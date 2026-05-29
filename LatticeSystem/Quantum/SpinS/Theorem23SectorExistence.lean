@@ -1,18 +1,16 @@
 import LatticeSystem.Quantum.SpinS.Theorem23Predicted
 
 /-!
-# Tasaki §2.5 Theorem 2.3 sector-existence API
+# Tasaki §2.5 Theorem 2.3 — `Prop` statement
 
-This module contains the final `tasaki_2_5_theorem_2_3` statement, the
-per-sector Theorem 2.2 reuse wrapper, and the successor predicted-Casimir
-existential packages using `Theorem23PredictedCasimirEnergy.lean`.
-Keeping this layer separate lets the adjacent common-energy and dominance APIs
-elaborate without the sector-existence/final-statement tail. The dominance-form
-sector-existence suffix is split into `Theorem23SectorExistenceDominance.lean`,
-the predicted-GS interval-chain suffix is split further into
-`Theorem23SectorExistenceInterval.lean`, and the predecessor sector-existence
-chain link with the raised predicted-Casimir variant is split further into
-`Theorem23SectorExistencePredecessor.lean`.
+This module holds only the `Prop` definition `tasaki_2_5_theorem_2_3` (the
+final-statement form of Tasaki §2.5 Theorem 2.3). The proof witness lives
+in `Theorem23StructuralBipartiteToy.lean` (toy coupling) and
+`Theorem23StructuralGeneralFinal.lean` (general bipartite coupling) under
+the structural-variant Prop `tasaki_2_5_theorem_2_3_structural`. The
+original h_intermediate-threaded chain that used to live in this module
+was removed in PR #3918 because every theorem in it was unreachable from
+any consumer.
 -/
 
 namespace LatticeSystem.Quantum
