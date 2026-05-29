@@ -200,6 +200,7 @@ import LatticeSystem.Quantum.SpinS.HermitianMinSimilarInvariance
 import LatticeSystem.Quantum.SpinS.MatrixSimilaritySpectrum
 import LatticeSystem.Quantum.SpinS.MarshallSubmatrixMinEq
 import LatticeSystem.Quantum.SpinS.BareSubmatrixMinLePF
+import LatticeSystem.Quantum.SpinS.BareSubmatrixPFFinrank
 import LatticeSystem.Quantum.SpinS.HermitianEigenspaceBotBelowMin
 import LatticeSystem.Quantum.SpinS.HermitianMinLeOfEigenvector
 import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFAtMin
