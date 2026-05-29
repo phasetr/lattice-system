@@ -23,13 +23,17 @@ open Matrix Module
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-/-- **Three-LI family from admissible + non-admissible eigenvectors**: at the
-same energy μ, the admissible-sector eigenvector Φ (at `Ŝ³_tot = 0`) and the
-non-admissible-sector eigenvector Ψ (at `Ŝ³_tot = M' ≠ 0`), together with the
-reflected eigenvector `Θ Ψ` (at `Ŝ³_tot = -M'`), form a linearly independent
-family. -/
+/-- **Three-LI from admissible + non-admissible vectors via reflection**: a non-zero
+admissible-sector vector Φ (at `Ŝ³_tot = 0`) and a non-zero non-admissible-sector
+vector Ψ (at `Ŝ³_tot = M' ≠ 0`), together with the reflected vector
+`Θ Ψ ∈ magSubspaceS Λ N (-M')`, form a linearly independent family.
+
+Sector-membership-only — the lemma does not require Φ, Ψ to be H-eigenvectors,
+though the intended use case is: Φ, Ψ both H-eigenvectors at the same energy μ,
+in which case `Θ Ψ` is also at energy μ (since `Θ` commutes with H via #3745),
+making the family a 3-LI subset of the μ-eigenspace and giving the contradiction
+lever `finrank(eigenspace at μ) ≥ 3` against obligation (1) `finrank ≤ 2`. -/
 theorem anisotropicHeisenbergS_threeLI_of_admis_and_nonadmis
-    (J : Λ → Λ → ℂ) (lam D : ℂ)
     {Φ Ψ : (Λ → Fin (N + 1)) → ℂ}
     (hΦ_admis : Φ ∈ magSubspaceS Λ N 0) (hΦ_ne : Φ ≠ 0)
     {M' : ℂ} (hM'_ne : M' ≠ 0)
