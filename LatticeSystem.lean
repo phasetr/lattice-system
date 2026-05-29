@@ -4,6 +4,7 @@ import LatticeSystem.Math.PerronFrobeniusMain
 import LatticeSystem.Math.PerronFrobeniusSimple
 import LatticeSystem.Math.PerronFrobeniusFinrank
 import LatticeSystem.Math.PerronFrobenius
+import LatticeSystem.Math.RayleighAtEigenvector
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
