@@ -1,8 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23DominancePredictedGS
-import LatticeSystem.Quantum.SpinS.Theorem23PredictedCasimirEnergy
-import LatticeSystem.Quantum.SpinS.Theorem23PredictedLadderCasimirTransfer
-import LatticeSystem.Quantum.SpinS.Theorem23LocalCoefficient
-import LatticeSystem.Quantum.SpinS.Theorem23LocalDifferenceMarshall
+import LatticeSystem.Quantum.SpinS.Theorem23Predicted
 
 /-!
 # Tasaki §2.5 Theorem 2.3 sector-existence API
