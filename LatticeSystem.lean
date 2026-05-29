@@ -25,6 +25,7 @@ import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFEigenvectorStructural
 import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPFStructural
 import LatticeSystem.Quantum.SpinS.BareSubmatrixFinrankLeOneAtMinStructural
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfStructural
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergStructuralGeneralN
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
