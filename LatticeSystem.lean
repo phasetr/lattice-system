@@ -39,6 +39,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralUniqueness
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralMLMFull
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralSectorExistence
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralToySectorLowerBound
+import LatticeSystem.Quantum.SpinS.Theorem23StructuralToySectorGroundState
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
