@@ -12883,6 +12883,18 @@ sectors.  Combined with three nonzero vectors in three pairwise distinct
 sectors, this contradicts Theorem 2.4 obligation (1)'s \(\dim\le2\) bound — the
 contradiction lever in the sector decomposition + reflection argument.
 
+The application
+\texttt{anisotropicHeisenbergS\_threeLI\_of\_admis\_and\_nonadmis} (PR \#3902)
+specialises the triple-LI to the symmetric \(|A|=|\neg A|\) configuration: given
+an admissible-sector eigenvector \(\Phi\) (at \(\hat S^3_{\mathrm{tot}}=0\)) and
+a non-admissible-sector eigenvector \(\Psi\) (at \(\hat S^3_{\mathrm{tot}}=M'\ne
+0\)) at the same energy, the family \(\{\Phi,\Psi,\Theta\Psi\}\) is linearly
+independent.  The reflected eigenvector \(\Theta\Psi\) lies in the
+\(-M'\)-eigenspace via
+\texttt{manyBodyReversalS\_mulVec\_mem\_magSubspaceS\_neg}; nonzeroness of
+\(\Theta\Psi\) follows from \(\Theta^2=1\) and \(\Psi\ne0\); and the three
+sectors \(0,M',-M'\) are pairwise distinct precisely because \(M'\ne0\).
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
