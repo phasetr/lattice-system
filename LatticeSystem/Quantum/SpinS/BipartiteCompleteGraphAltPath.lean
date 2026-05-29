@@ -80,31 +80,31 @@ theorem exists_raiseLowerReachableS_bipartite_of_over_under_eq_sublattice_alt
       ⟨(σ z).val - 1, hz_lower_bound⟩
   -- σ_1 site values.
   have hσ_1_z : (σ_1 z).val = (σ z).val - 1 := by
-    show (Function.update (Function.update σ y _) z _ z).val = _
+    change (Function.update (Function.update σ y _) z _ z).val = _
     rw [Function.update_self]
   have hσ_1_y : (σ_1 y).val = (σ y).val + 1 := by
-    show (Function.update (Function.update σ y _) z _ y).val = _
+    change (Function.update (Function.update σ y _) z _ y).val = _
     rw [Function.update_of_ne hzy.symm, Function.update_self]
   have hσ_1_x_eq : σ_1 x = σ x := by
-    show Function.update (Function.update σ y _) z _ x = σ x
+    change Function.update (Function.update σ y _) z _ x = σ x
     rw [Function.update_of_ne hzx.symm, Function.update_of_ne hxy]
   have hσ_1_off : ∀ k, k ≠ y → k ≠ z → σ_1 k = σ k := by
     intro k hky hkz
-    show Function.update (Function.update σ y _) z _ k = σ k
+    change Function.update (Function.update σ y _) z _ k = σ k
     rw [Function.update_of_ne hkz, Function.update_of_ne hky]
   -- σ_2 site values.
   have hσ_2_x : (σ_2 x).val = (σ x).val - 1 := by
-    show (Function.update (Function.update σ x _) y _ x).val = _
+    change (Function.update (Function.update σ x _) y _ x).val = _
     rw [Function.update_of_ne hxy, Function.update_self]
   have hσ_2_y : (σ_2 y).val = (σ y).val + 1 := by
-    show (Function.update (Function.update σ x _) y _ y).val = _
+    change (Function.update (Function.update σ x _) y _ y).val = _
     rw [Function.update_self]
   have hσ_2_z : σ_2 z = σ z := by
-    show (Function.update (Function.update σ x _) y _) z = σ z
+    change (Function.update (Function.update σ x _) y _) z = σ z
     rw [Function.update_of_ne hzy, Function.update_of_ne hzx]
   have hσ_2_off : ∀ k, k ≠ x → k ≠ y → σ_2 k = σ k := by
     intro k hkx hky
-    show (Function.update (Function.update σ x _) y _) k = σ k
+    change (Function.update (Function.update σ x _) y _) k = σ k
     rw [Function.update_of_ne hky, Function.update_of_ne hkx]
   refine ⟨σ_2, ?_, ?_⟩
   · -- Reachability via 2 steps σ → σ_1 → σ_2.
