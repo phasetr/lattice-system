@@ -13031,6 +13031,17 @@ connects the existing Theorem 2.3 chain's sector-matrix PF uniqueness to the
 abstract PR \#3906 / PR \#3907 \(\dim\le1\) machinery for the SU(2) symmetric
 capstone.
 
+The bridge to the existing Theorem 2.3 chain output is supplied by
+\texttt{heisenbergHamiltonianS\_finrank\_le\_one\_at\_SU2\_from\_sector\_pf}
+(PR \#3915): under the hypotheses (i) \(\dim_{\mathbb C}E\le2\), (ii)
+admissible eigenvector \(\Phi\), (iii) symmetric sector index \(M\) with
+\(2M=|\Lambda|\cdot N\), (iv) within-admissible sector-matrix PF
+\(\dim_{\mathbb C}\le1\), the isotropic Heisenberg \(\mu\)-eigenspace has
+\(\dim_{\mathbb C}\le1\).  PR \#3913 turns (iv) into the form needed by PR
+\#3907; the sector index equality
+\((|\Lambda|\cdot N/2 - M : \mathbb C)=0\) follows from (iii) by
+\texttt{push\_cast} + \texttt{linear\_combination}.
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
