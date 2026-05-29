@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.Theorem23PFToyJointCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralCasimirEigenvec
+import LatticeSystem.Quantum.SpinS.SublatticeCasimirSpectralBound
 
 /-!
 # Structural Theorem 2.3 PF ground state commuting + joint Casimir eigenvector (no `h_intermediate`)
@@ -182,5 +183,41 @@ theorem tasaki23_toy_groundState_joint_casimir_eigenvector_structural
       (heisenbergToyHamiltonianS_commute_sublatticeSpinSquaredS_complement (N := N) (A := A))
       (sublatticeSpinSquaredS_commute_totalSpinSOp3 (Λ := V) (N := N) (fun x => ! A x)).symm
       hv_pos hH
+
+/-- **Structural toy ground state sublattice Casimir bounds (no `h_intermediate`)**. -/
+theorem tasaki23_toy_groundState_sublattice_casimir_re_le_structural
+    (A : V → Bool) (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hc_strict : ∀ σ,
+      dressedHeisenbergSReMatrix A (bipartiteCoupling A) N σ σ < c)
+    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false) (hN : 1 ≤ N)
+    {μ : ℝ} {v : magConfigS V N M → ℝ}
+    (hv_pos : ∀ σ, 0 < v σ)
+    (hH :
+      (heisenbergHamiltonianS (bipartiteCoupling A) N).mulVec
+          (magSectorEmbedding
+            (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) =
+        (μ : ℂ) • magSectorEmbedding
+          (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) :
+    (∃ γ_A : ℂ,
+        (sublatticeSpinSquaredS N A).mulVec
+            (magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) =
+          γ_A • magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) ∧
+        γ_A.re ≤
+          ((Finset.univ.filter (fun x : V => A x = true)).card : ℝ) * (N : ℝ) / 2 *
+            (((Finset.univ.filter (fun x : V => A x = true)).card : ℝ) * (N : ℝ) / 2 + 1)) ∧
+    (∃ γ_B : ℂ,
+        (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec
+            (magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) =
+          γ_B • magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) ∧
+        γ_B.re ≤
+          ((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℝ) * (N : ℝ) / 2 *
+            (((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℝ) * (N : ℝ) / 2 + 1)) := by
+  obtain ⟨_, ⟨γ_A, hγ_A⟩, ⟨γ_B, hγ_B⟩⟩ :=
+    tasaki23_toy_groundState_joint_casimir_eigenvector_structural A c hc_strict
+      hA_ne hB_ne hN hv_pos hH
+  have hne := tasaki23_marshallPositive_magSectorEmbedding_ne_zero A hv_pos
+  exact ⟨⟨γ_A, hγ_A, sublatticeSpinSquaredS_eigenvalue_re_le_sA A hne hγ_A⟩,
+    ⟨γ_B, hγ_B, sublatticeSpinSquaredS_eigenvalue_re_le_sA (fun x => ! A x) hne hγ_B⟩⟩
 
 end LatticeSystem.Quantum
