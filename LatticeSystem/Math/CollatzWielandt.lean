@@ -168,6 +168,20 @@ lemma lt_of_all_ratios_gt [Nonempty n] {A : Matrix n n ℝ} {x : n → ℝ} {c :
   rw [dif_pos h_supp, Finset.lt_inf'_iff h_supp]
   exact fun i hi => h i
 
+/-- **CW lower bound from support-ratio bound**: if `c ≤ (Ax)_i / x_i` for every `i` with
+`x_i > 0`, and at least one `x_j > 0`, then `c ≤ CW(x)`.
+
+Used by (j.13.e) to bound `|λ| ≤ CW(|w|)` for eigenvectors `w` (Issue #3871). -/
+lemma le_collatzWielandtFn_of_all_supp_ratios_le
+    {A : Matrix n n ℝ} {x : n → ℝ} {c : ℝ}
+    (hx : ∃ j, 0 < x j) (h : ∀ i, 0 < x i → c ≤ (A *ᵥ x) i / x i) :
+    c ≤ collatzWielandtFn A x := by
+  unfold collatzWielandtFn
+  obtain ⟨j, hj⟩ := hx
+  have h_supp : (supp x).Nonempty := ⟨j, mem_supp.mpr hj⟩
+  rw [dif_pos h_supp, Finset.le_inf'_iff]
+  exact fun i hi => h i (mem_supp.mp hi)
+
 /-! ## Upper-semicontinuity -/
 
 /-- The CW function is upper-semicontinuous on the standard simplex.
