@@ -5,6 +5,7 @@ import LatticeSystem.Math.PerronFrobeniusSimple
 import LatticeSystem.Math.PerronFrobeniusFinrank
 import LatticeSystem.Math.PerronFrobenius
 import LatticeSystem.Math.RayleighAtEigenvector
+import LatticeSystem.Math.HermitianMaxEigenvalue
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
