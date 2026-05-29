@@ -201,6 +201,7 @@ import LatticeSystem.Quantum.SpinS.BlockEigBotBelowJointMin
 import LatticeSystem.Quantum.SpinS.BlockMinLeTwo
 import LatticeSystem.Quantum.SpinS.BareAxisSwapMinLeTwo
 import LatticeSystem.Quantum.SpinS.BareAnisotropicMinLeTwo
+import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFEigenvector
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapDegeneracyBound
 import LatticeSystem.Quantum.SpinS.DressedFullEigInterParityLeOne
 import LatticeSystem.Quantum.SpinS.GaugeIntersectionEigenspaceFinrank
