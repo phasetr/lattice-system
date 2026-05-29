@@ -11,9 +11,8 @@ Issue #3739 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori).
 to the complex form via `Complex.ofReal`. Uses the matrix identity
 `(dressed_re.submatrix).map ((↑) : ℝ → ℂ) = dressed_complex.submatrix` (#3831).
 
-Then derives the one-direction bound `hermitianMinEigenvalue submatrix_Herm ≤ ν`
-(where ν is the PF eigenvalue from (j.1)) using the spectrum-eigenvalues bridge
-(`spectrum_real_eq_range_eigenvalues` + `hasEigenvalue_iff_mem_spectrum`).
+This existence is consumed by (j.3) to derive `hermitianMinEigenvalue ≤ ν` via the
+contrapositive of (i.4) #3849.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020,
 §2.5 Theorem 2.4, p. 43–44.
