@@ -54,6 +54,7 @@ import LatticeSystem.Quantum.SpinS.MagSubspaceDistinctLI
 import LatticeSystem.Quantum.SpinS.MagSubspaceDistinctTripleLI
 import LatticeSystem.Quantum.SpinS.Theorem24ThreeLIFromNonAdmis
 import LatticeSystem.Quantum.SpinS.Theorem24FinrankLeTwoContradiction
+import LatticeSystem.Quantum.SpinS.Theorem24EigvecNonadmisProjectionZero
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli

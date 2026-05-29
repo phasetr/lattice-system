@@ -12907,6 +12907,20 @@ PR \#3902 lifts to the eigenspace as a subtype-valued LI family via
 \texttt{LinearIndependent.fintype\_card\_le\_finrank} then gives \(3\le\dim E\),
 contradicting \(\dim E\le 2\).
 
+The contrapositive
+\texttt{anisotropicHeisenbergS\_eigvec\_nonadmis\_projection\_zero} (PR \#3904)
+phrases this in projection form: under the same \(\dim E\le 2\) + admissible
+eigenvector hypothesis, any other eigenvector \(\Psi\) at the same energy has
+zero \texttt{magSectorEmbedding}\((\texttt{magSectorRestriction}_{(M)}\Psi)\) for
+every non-admissible sector index \(M\) (i.e.\ \(2M\ne|\Lambda|\cdot N\)).  The
+projection itself is again a \(\mu\)-eigenvector by PR \#3899, and lives in
+\texttt{magSubspaceS}\(_\Lambda^N\) at eigenvalue \(M'=|\Lambda|\cdot N/2 - M\ne0\);
+non-zeroness would activate PR \#3903 and give \texttt{False}, so the projection
+vanishes.  Combined with the magnetization-sector decomposition
+\texttt{eq\_sum\_magSectorEmbedding\_magSectorRestriction}, this places the
+entire \(\mu\)-eigenspace inside the admissible sector — the last step before
+the SU(2) symmetric \(\dim\le1\) conclusion.
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
