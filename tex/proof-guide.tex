@@ -12994,6 +12994,16 @@ sector-zero lemma
 eigenvalue-independent).  This matches \texttt{End.eigenspace}'s
 \(\mathbb C\)-valued eigenvalue convention used by the finrank infrastructure.
 
+The companion embedding direction
+\texttt{heisenbergHamiltonianS\_mulVec\_magSectorEmbedding\_complex} (PR \#3911)
+is the dual \(\mu\in\mathbb C\) generalisation of
+\texttt{heisenbergHamiltonianS\_mulVec\_magSectorEmbedding}: the embedding of a
+sector \(\mathbb C\)-eigenvector is a full Hilbert-space
+\(\mathbb C\)-eigenvector at the same \(\mu\).  Together these two PRs give the
+two-sided \(\mu\in\mathbb C\) correspondence between the sector matrix and the
+full Hilbert space, on which the within-admissible PF \(\dim\le1\) transfer
+relies.
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
