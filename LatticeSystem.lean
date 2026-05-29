@@ -36,6 +36,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralPFSectorCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralComplexSectorEigenvec
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralFullHilbertEigenvec
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralUniqueness
+import LatticeSystem.Quantum.SpinS.Theorem23StructuralMLMFull
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
