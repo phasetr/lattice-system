@@ -12832,6 +12832,18 @@ reversal \(\sigma\mapsto\mathrm{rev}\circ\sigma\)) is an involution with
 (\texttt{manyBodyReversalS\_conj\_totalSpinSOp3}).  This reflection yields
 \(E_M=E_{-M}\) for the crossing argument and, with the ground state in
 \(\mathcal H_0\), the conclusion \(\hat S^3_{\mathrm{tot}}\Phi_{\mathrm{GS}}=0\).
+The \(\hat S^3_{\mathrm{tot}}\Phi_{\mathrm{GS}}=0\) half is formalized as
+\texttt{anisotropicHeisenbergS\_unique\_groundState\_has\_zero\_magnetization}
+(PR \#3896): given \(\dim_{\mathbb C}(\text{GS-eigenspace})\le 1\), every nonzero
+GS \(\Phi\) lies in a one-dimensional eigenspace, both \(\hat
+S^3_{\mathrm{tot}}\Phi\) and \(\Theta\Phi\) lie there too, so
+\(\hat S^3_{\mathrm{tot}}\Phi=\gamma\Phi\) and \(\Theta\Phi=\delta\Phi\) for some
+scalars \(\gamma,\delta\in\mathbb C\); \(\Theta^2=1\) gives \(\delta^2=1\), and the
+anticommutation \(\Theta\hat S^3_{\mathrm{tot}}=-\hat S^3_{\mathrm{tot}}\Theta\)
+applied to \(\Phi\) gives \(\delta\gamma=-\gamma\delta\), i.e.\ \(2\delta\gamma=0\);
+since \(\delta\ne 0\), \(\gamma=0\) and \(\hat S^3_{\mathrm{tot}}\Phi=0\).  The
+uniqueness hypothesis itself (\(\dim\le 1\)) awaits the deformation argument from
+\((\lambda,D)=(1,0)\) — separate forthcoming work.
 
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
