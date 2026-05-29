@@ -12874,11 +12874,14 @@ that two nonzero vectors in distinct \(\hat S^3_{\mathrm{tot}}\) eigenspaces
 \(M_1\ne M_2\) are linearly independent: from \(a\,\Phi_1 + b\,\Phi_2 = 0\), the
 combination \(a\,\Phi_1\) lies in
 \texttt{magSubspaceS}\(_{M_1}\cap\texttt{magSubspaceS}\(_{M_2}=\{0\}\)
-(\texttt{magSubspaceS\_disjoint}), forcing each scalar to vanish.  Applied to
-three nonzero vectors in three pairwise distinct sectors, the same argument
-extends to a 3-element linearly independent family, contradicting Theorem 2.4
-obligation (1)'s \(\dim\le2\) bound — the contradiction lever in the sector
-decomposition + reflection argument.
+(\texttt{magSubspaceS\_disjoint}), forcing each scalar to vanish.  The triple
+extension \texttt{linearIndependent\_triple\_of\_magSubspaceS\_distinct} (PR
+\#3901) applies mathlib's \texttt{Module.End.eigenvectors\_linearIndependent'} to
+the linear endomorphism \texttt{Matrix.toLin'\,(totalSpinSOp3\,\(\Lambda\)\,N)}
+to get a three-element linearly independent family for three pairwise distinct
+sectors.  Combined with three nonzero vectors in three pairwise distinct
+sectors, this contradicts Theorem 2.4 obligation (1)'s \(\dim\le2\) bound — the
+contradiction lever in the sector decomposition + reflection argument.
 
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
