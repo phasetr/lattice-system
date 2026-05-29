@@ -31,6 +31,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralCasimirEigenvec
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralPFJointCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralPFCasimirPredicted
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralMagSectorPF
+import LatticeSystem.Quantum.SpinS.Theorem23StructuralToyGSPredictedCasimirAt
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
