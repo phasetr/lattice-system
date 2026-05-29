@@ -45,6 +45,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralSectorLiftCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralCommonEnergyStep
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralCommonGroundEnergy
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralGeneralFinal
+import LatticeSystem.Quantum.SpinS.SpinSRotation1
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
