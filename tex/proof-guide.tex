@@ -12856,6 +12856,18 @@ yields \(\langle\sigma'|\hat H|\sigma\rangle(M_\sigma-M_{\sigma'})=0\); when
 and hence the matrix element vanishes.  This is the key building block for sector
 decompositions in the eventual Theorem 2.4 obligation (2.a) uniqueness argument.
 
+The vector-level corollary,
+\texttt{anisotropicHeisenbergS\_magSectorProjection\_eigen} (PR \#3899), states
+that for an \(\hat H\)-eigenvector \(v\) at \(\mu\), the sector projection
+\(w := \texttt{magSectorEmbedding}(\texttt{magSectorRestriction}_{(M)}\,v)\) (\(v\)
+on sector \(M\), zero elsewhere) is also an \(\hat H\)-eigenvector at \(\mu\).  In
+the \texttt{mulVec} expansion of \(\hat H\,w\), the cross-sector matrix entries
+vanish by PR \#3898, so only same-sector entries survive; combined with
+\(w=v\) on sector \(M\) and \(\hat H\,v=\mu v\), this gives \(\hat H\,w=\mu w\)
+both on sector \(M\) and off it (where both sides are zero).  This is the
+vector-level enabler of sector-by-sector spectral analysis used in the
+forthcoming uniqueness step of Theorem 2.4 obligation (2.a).
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
