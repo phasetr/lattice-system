@@ -58,7 +58,9 @@ theorem collatzWielandtFn_le_of_pos_eigenvector
     rw [Finset.mul_sum]
     apply Finset.sum_congr rfl
     intros; ring
-  -- Step 4: RHS = ∑_i v_i (∑_j A_ij x_j) = (by symmetry A_ij = A_ji) ∑_j x_j (A v)_j = μ * ∑ v_i x_i.
+  -- Step 4: RHS = ∑_i v_i (∑_j A_ij x_j)
+  --             = (by symmetry A_ij = A_ji) ∑_j x_j (A v)_j
+  --             = μ * ∑ v_i x_i.
   have h_rhs : ∑ i, v i * (A *ᵥ x) i = μ * ∑ i, v i * x i := by
     -- ∑_i v_i ∑_j A_ij x_j = ∑_i ∑_j v_i A_ij x_j = ∑_j ∑_i v_i A_ij x_j
     -- = ∑_j x_j ∑_i A_ij v_i = (by symmetry A_ij = A_ji) ∑_j x_j ∑_i A_ji v_i
