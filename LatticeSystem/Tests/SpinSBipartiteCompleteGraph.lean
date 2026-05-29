@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
+import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
 
 /-!
 # Test coverage for the spin-`S` bipartite complete graph
@@ -65,26 +66,27 @@ example {N : ℕ} [Fintype V] [DecidableEq V] {A : V → Bool}
   exists_raiseLowerReachableS_bipartite_of_over_under_eq_sublattice
     hxy hAeq hover hunder hAz hzN
 
-/-- Unified bipartite over/under reduction. -/
+/-- Unified bipartite over/under reduction (structural variant). -/
 example {N : ℕ} [Fintype V] [DecidableEq V] {A : V → Bool}
     {σ σ' : V → Fin (N + 1)}
     {x y : V} (hxy : x ≠ y)
     (hover : (σ' x).val < (σ x).val)
     (hunder : (σ y).val < (σ' y).val)
-    (h_intermediate : A x = A y →
-      ∃ z, A z ≠ A x ∧ (σ z).val < N) :
+    (hOppExists : A x = A y → ∃ z, A z ≠ A x)
+    (hN : 1 ≤ N) :
     ∃ σ'' : V → Fin (N + 1),
       RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ σ'' ∧
         configDistS σ'' σ' + 2 = configDistS σ σ' :=
-  exists_raiseLowerReachableS_bipartite_of_over_under hxy hover hunder
-    h_intermediate
+  exists_raiseLowerReachableS_bipartite_of_over_under_structural
+    hxy hover hunder hOppExists hN
 
-/-- Bipartite reachability for equal-magnetization configurations. -/
+/-- Bipartite reachability for equal-magnetization configurations
+(structural variant). -/
 example {N : ℕ} [Fintype V] [DecidableEq V] (A : V → Bool)
-    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
-      ∃ z, A z ≠ A x ∧ (τ z).val < N)
+    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false) (hN : 1 ≤ N)
     {σ σ' : V → Fin (N + 1)} (hmag : magSumS σ = magSumS σ') :
     RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ σ' :=
-  raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS A h_intermediate hmag
+  raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_structural
+    A hA_ne hB_ne hN hmag
 
 end LatticeSystem.Tests.SpinSBipartiteCompleteGraph

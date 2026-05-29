@@ -30,6 +30,7 @@ namespace LatticeSystem.Quantum
 
 variable {V : Type*} {N : ℕ}
 
+set_option linter.unusedDecidableInType false in
 /-- **Structural bipartite over/under transport (no `h_intermediate`)**.
 
 For an over site `x` and under site `y` with `x ≠ y`, given an opposite-color
@@ -80,6 +81,7 @@ theorem oppExists_of_hA_hB
   · obtain ⟨a, ha⟩ := hA_ne; exact ⟨a, by simp [ha]⟩
   · obtain ⟨b, hb⟩ := hB_ne; exact ⟨b, by simp [hb]⟩
 
+set_option linter.unusedDecidableInType false in
 /-- **Structural within-sector reachability (no `h_intermediate`)**: for any two
 same-magnetization configurations of the same complete bipartite graph,
 `RaiseLowerReachableS` connects them, using only `hA_ne + hB_ne + 1 ≤ N`. -/
@@ -125,6 +127,7 @@ theorem raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_structural
 
 /-! ## Structural `parityReachableS` totality -/
 
+set_option linter.unusedDecidableInType false in
 /-- **Structural `ParityReachableS` totality (no `h_intermediate`)**: any two
 configurations of the same total-magnetization parity are connected, using only
 `hA_ne + hB_ne + 1 ≤ N`. -/
