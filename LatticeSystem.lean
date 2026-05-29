@@ -27,6 +27,7 @@ import LatticeSystem.Quantum.SpinS.BareSubmatrixFinrankLeOneAtMinStructural
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfStructural
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergStructuralGeneralN
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralReach
+import LatticeSystem.Quantum.SpinS.Theorem23StructuralCasimirEigenvec
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
