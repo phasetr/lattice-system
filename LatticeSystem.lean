@@ -10,6 +10,7 @@ import LatticeSystem.Math.HermitianEigenspaceBotAboveMax
 import LatticeSystem.Math.HermitianMaxGeOfEigenvector
 import LatticeSystem.Math.CollatzWielandtUpperBoundSymmetric
 import LatticeSystem.Math.CollatzWielandtLowerBoundEigenvec
+import LatticeSystem.Math.RealEigenvalueLePF
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
