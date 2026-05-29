@@ -49,4 +49,10 @@ theorem spinSRot1_neg_mul (N : ℕ) (θ : ℝ) :
     spinSRot1 N (-θ) * spinSRot1 N θ = 1 := by
   rw [spinSRot1_mul, neg_add_cancel, spinSRot1_zero]
 
+/-- **Commutes with `Ŝ¹`**: `spinSRot1 N θ * spinSOp1 N = spinSOp1 N * spinSRot1 N θ`. -/
+theorem spinSRot1_commute_spinSOp1 (N : ℕ) (θ : ℝ) :
+    Commute (spinSRot1 N θ) (spinSOp1 N) := by
+  unfold spinSRot1
+  exact Commute.exp_left ((Commute.refl (spinSOp1 N)).smul_left _)
+
 end LatticeSystem.Quantum
