@@ -62,6 +62,7 @@ import LatticeSystem.Quantum.SpinS.MagSectorLinearEquiv
 import LatticeSystem.Quantum.SpinS.SectorFinrankTransfer
 import LatticeSystem.Quantum.SpinS.SectorRestrictionComplexEigval
 import LatticeSystem.Quantum.SpinS.SectorEmbeddingComplexEigval
+import LatticeSystem.Quantum.SpinS.EigenspaceSectorFinrankEq
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
