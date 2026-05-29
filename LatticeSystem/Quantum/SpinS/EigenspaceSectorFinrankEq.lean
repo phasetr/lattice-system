@@ -3,16 +3,16 @@ import LatticeSystem.Quantum.SpinS.SectorRestrictionComplexEigval
 import LatticeSystem.Quantum.SpinS.MagSectorLinearEquiv
 
 /-!
-# Sector matrix eigenspace と full Hilbert eigenspace ⊓ sector subspace の finrank 等式
+# Sector matrix eigenspace and full Hilbert eigenspace ⊓ sector subspace: finrank equality
 
-(PR #3912, Issue #3739): sector matrix `heisenbergHamiltonianSMatrixOnMagSector`
-の μ-eigenspace と, full Hilbert `heisenbergHamiltonianS` の μ-eigenspace ⊓
-sector subspace の `finrank` 等式. PR #3908 (`magSectorLinearEquiv`),
-PR #3910 (ℂ restriction), PR #3911 (ℂ embedding) を組み合わせ.
+(PR #3912, Issue #3739): finrank equality between the sector matrix
+`heisenbergHamiltonianSMatrixOnMagSector`'s μ-eigenspace and the full Hilbert
+`heisenbergHamiltonianS`'s μ-eigenspace ⊓ sector subspace. Combines PR #3908
+(`magSectorLinearEquiv`), PR #3910 (ℂ restriction), and PR #3911 (ℂ embedding).
 
-これは within-admissible PF input の transfer に必要な lemma で,
-SU(2) symmetric `finrank ≤ 1` capstone へ向かう Tasaki §2.5 Theorem 2.4
-obligation (2.a) の chain の最終仕上げ.
+This is the within-admissible PF input transfer lemma, the final piece of the
+SU(2) symmetric `finrank ≤ 1` capstone chain toward Tasaki §2.5 Theorem 2.4
+obligation (2.a).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.4, p. 43-44.
@@ -24,7 +24,7 @@ open Matrix Module Submodule
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-/-- **Sector matrix と full Hilbert ⊓ sector の eigenspace finrank 等式**. -/
+/-- **Eigenspace finrank equality between sector matrix and full Hilbert ⊓ sector**. -/
 theorem heisenbergHamiltonianS_sector_matrix_eigenspace_finrank_eq
     (J : Λ → Λ → ℂ) (M : ℕ) (μ : ℂ) :
     finrank ℂ ↥(End.eigenspace (Matrix.toLin'
@@ -60,10 +60,12 @@ theorem heisenbergHamiltonianS_sector_matrix_eigenspace_finrank_eq
       ↥(End.eigenspace (Matrix.toLin'
         (heisenbergHamiltonianSMatrixOnMagSector (V := Λ) J N M)) μ) := {
     toFun := fun f => ⟨magSectorRestriction (M := M) f.val, by
-      simp only [SetLike.mem_coe, End.mem_eigenspace_iff, Matrix.toLin'_apply]
-      have hf_in := f.property.1
-      simp only [SetLike.mem_coe, End.mem_eigenspace_iff, Matrix.toLin'_apply] at hf_in
-      exact heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen_complex
+      simp only [End.mem_eigenspace_iff, Matrix.toLin'_apply]
+      have hf_in : Matrix.toLin' (heisenbergHamiltonianS J N) f.val = μ • f.val :=
+        End.mem_eigenspace_iff.mp f.property.1
+      rw [Matrix.toLin'_apply] at hf_in
+      exact
+        heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen_complex
         J hf_in⟩
     map_add' := fun f g => by
       apply Subtype.ext
