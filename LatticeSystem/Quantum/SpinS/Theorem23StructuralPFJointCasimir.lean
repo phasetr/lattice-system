@@ -220,4 +220,35 @@ theorem tasaki23_toy_groundState_sublattice_casimir_re_le_structural
   exact ⟨⟨γ_A, hγ_A, sublatticeSpinSquaredS_eigenvalue_re_le_sA A hne hγ_A⟩,
     ⟨γ_B, hγ_B, sublatticeSpinSquaredS_eigenvalue_re_le_sA (fun x => ! A x) hne hγ_B⟩⟩
 
+/-- **Structural PF GS Casimir eigenvector (no `h_intermediate`)**: specialisation of
+`tasaki23_pf_groundState_commuting_eigenvector_structural` to `B = (Ŝ_tot)²`. -/
+theorem tasaki23_pf_groundState_casimir_eigenvector_structural
+    (A : V → Bool) {J : V → V → ℂ} (c : ℝ) {M : ℕ}
+    [Nonempty (magConfigS V N M)]
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false) (hN : 1 ≤ N)
+    {μ : ℝ} {v : magConfigS V N M → ℝ}
+    (hv_pos : ∀ σ, 0 < v σ)
+    (hH :
+      (heisenbergHamiltonianS J N).mulVec
+          (magSectorEmbedding
+            (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) =
+        (μ : ℂ) • magSectorEmbedding
+          (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) :
+    ∃ γ : ℂ,
+      (totalSpinSSquared V N).mulVec
+          (magSectorEmbedding
+            (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) =
+        γ • magSectorEmbedding
+          (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) :=
+  tasaki23_pf_groundState_commuting_eigenvector_structural A c hJ_real hJ_pos hJ_nn
+    hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN (totalSpinSSquared V N)
+    (heisenbergHamiltonianS_commute_totalSpinSSquared J N)
+    (totalSpinSSquared_commute_totalSpinSOp3 (Λ := V) (N := N)).symm hv_pos hH
+
 end LatticeSystem.Quantum
