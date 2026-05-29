@@ -43,6 +43,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralToySectorGroundState
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralBipartiteToy
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralSectorLiftCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralCommonEnergyStep
+import LatticeSystem.Quantum.SpinS.Theorem23StructuralCommonGroundEnergy
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
