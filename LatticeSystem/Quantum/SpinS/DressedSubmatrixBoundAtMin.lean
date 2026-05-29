@@ -24,32 +24,24 @@ open Matrix Module
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-/-- **Per-block PF bound at `hermitianMinEigenvalue` (conditional)**: under the assumption
-`ν_PF = hermitianMinEigenvalue submatrix_Herm`, the bound `finrank ≤ 1` at `(ν_PF : ℂ)`
-from #3831 transfers to a bound at `(hermitianMinEigenvalue : ℂ)`. -/
+/-- **Per-block PF bound at `hermitianMinEigenvalue` (conditional)**: given a specific
+`ν : ℝ` that (i) satisfies the PF bound `finrank ≤ 1` and (ii) equals `hermitianMinEigenvalue`,
+the bound transfers to `(hermitianMinEigenvalue : ℂ)`.
+
+The hypothesis `hν_eq_min : ν = hermitianMinEigenvalue` is the substantive part — it
+captures the missing Collatz-Wielandt identification. -/
 theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_min_conditional
-    (A : Λ → Bool) {J : Λ → Λ → ℂ}
-    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
-    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
-    (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
-    {lam : ℂ} (hlam : lam.im = 0) (hlb : -1 < lam.re) (hub : lam.re < 1)
-    {D : ℂ} (hDim : D.im = 0) (hDpos : 0 < D.re)
-    {c : ℝ}
-    (hc_strict : ∀ σ : Λ → Fin (N + 1),
-      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
-    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
-    (h_intermediate : ∀ τ : Λ → Fin (N + 1), ∀ x : Λ,
-      ∃ z, A z ≠ A x ∧ (τ z).val < N)
-    (p : ℕ)
-    [Nonempty (parityConfigS Λ N p)]
-    (hPF_eq_min : ∀ ν : ℝ,
-      (finrank ℂ ↥(End.eigenspace (Matrix.toLin'
-        ((dressedAxisSwappedAnisotropicHeisenbergS A J lam D N).submatrix
-          (fun σ : parityConfigS Λ N p => σ.1)
-          (fun σ : parityConfigS Λ N p => σ.1))) (ν : ℂ)) ≤ 1) →
-      ν = hermitianMinEigenvalue
-        (dressedAxisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
-          (Λ := Λ) (N := N) A hJim hlam hDim p)) :
+    (A : Λ → Bool) {J : Λ → Λ → ℂ} {lam D : ℂ}
+    (hJim : ∀ x y, (J x y).im = 0) (hlam : lam.im = 0) (hDim : D.im = 0)
+    (p : ℕ) [Nonempty (parityConfigS Λ N p)]
+    (ν : ℝ)
+    (hν_bound : finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+      ((dressedAxisSwappedAnisotropicHeisenbergS A J lam D N).submatrix
+        (fun σ : parityConfigS Λ N p => σ.1)
+        (fun σ : parityConfigS Λ N p => σ.1))) (ν : ℂ)) ≤ 1)
+    (hν_eq_min : ν = hermitianMinEigenvalue
+      (dressedAxisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
+        (Λ := Λ) (N := N) A hJim hlam hDim p)) :
     finrank ℂ ↥(End.eigenspace (Matrix.toLin'
       ((dressedAxisSwappedAnisotropicHeisenbergS A J lam D N).submatrix
         (fun σ : parityConfigS Λ N p => σ.1)
@@ -57,12 +49,7 @@ theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_min
       ((hermitianMinEigenvalue
         (dressedAxisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
           (Λ := Λ) (N := N) A hJim hlam hDim p) : ℂ))) ≤ 1 := by
-  obtain ⟨ν, hν_bound⟩ :=
-    complex_dressed_parity_block_submatrix_eigenspace_finrank_le_one
-      A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict
-      hA_ne hB_ne h_intermediate p
-  have hν_eq := hPF_eq_min ν hν_bound
-  rw [← hν_eq]
+  rw [← hν_eq_min]
   exact hν_bound
 
 end LatticeSystem.Quantum
