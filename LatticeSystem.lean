@@ -21,6 +21,7 @@ import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfUnconditional
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphAltPath
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducibleStructural
+import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFEigenvectorStructural
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
