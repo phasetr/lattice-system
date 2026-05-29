@@ -199,6 +199,7 @@ import LatticeSystem.Quantum.SpinS.SubmatrixMinEigenvalue
 import LatticeSystem.Quantum.SpinS.HermitianEigenspaceBotBelowMin
 import LatticeSystem.Quantum.SpinS.HermitianMinLeOfEigenvector
 import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFAtMin
+import LatticeSystem.Quantum.SpinS.DressedSubmatrixBoundAtMin
 import LatticeSystem.Quantum.SpinS.BlockEigBotBelowJointMin
 import LatticeSystem.Quantum.SpinS.BlockMinLeTwo
 import LatticeSystem.Quantum.SpinS.BareAxisSwapMinLeTwo
