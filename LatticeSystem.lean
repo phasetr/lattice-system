@@ -50,6 +50,7 @@ import LatticeSystem.Quantum.SpinS.Theorem24ZeroMagnetizationFromUniqueness
 import LatticeSystem.Quantum.SpinS.Theorem24SU2BaseCase
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSectorZero
 import LatticeSystem.Quantum.SpinS.AnisotropicSectorProjectionEigenvector
+import LatticeSystem.Quantum.SpinS.MagSubspaceDistinctLI
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
