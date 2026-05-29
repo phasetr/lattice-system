@@ -21,7 +21,13 @@ namespace LatticeSystem.Quantum
 
 open Matrix Module
 
-/-- **Hermitian eigenspace = `⊥` below the minimum eigenvalue** (generic, on `(μ : ℂ)`). -/
+/-- **Hermitian eigenspace = `⊥` below the minimum eigenvalue** (generic, on `(μ : ℂ)`).
+
+For a Hermitian matrix `M` on a finite-dim complex space, if `μ < hermitianMinEigenvalue M`,
+then the eigenspace at `(μ : ℂ)` is `⊥` (no eigenvectors below the spectrum minimum).
+
+Used by (i.5) (#3850) to bound the full block-diagonal eigenspace below the joint per-block
+minimum. -/
 theorem hermitian_eigenspace_eq_bot_of_real_lt_min
     {n : Type*} [Fintype n] [DecidableEq n] [Nonempty n]
     {M : Matrix n n ℂ} (hM : M.IsHermitian)
