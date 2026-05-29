@@ -48,6 +48,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralGeneralFinal
 import LatticeSystem.Quantum.SpinS.SpinSRotation1
 import LatticeSystem.Quantum.SpinS.Theorem24ZeroMagnetizationFromUniqueness
 import LatticeSystem.Quantum.SpinS.Theorem24SU2BaseCase
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSectorZero
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli

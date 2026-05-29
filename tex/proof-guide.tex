@@ -12845,6 +12845,17 @@ since \(\delta\ne 0\), \(\gamma=0\) and \(\hat S^3_{\mathrm{tot}}\Phi=0\).  The
 uniqueness hypothesis itself (\(\dim\le 1\)) awaits the deformation argument from
 \((\lambda,D)=(1,0)\) — separate forthcoming work.
 
+The matrix-element form of the U(1) block-diagonality,
+\texttt{anisotropicHeisenbergS\_apply\_eq\_zero\_of\_magSumS\_ne} (PR \#3898),
+states \(\langle\sigma'|\hat H|\sigma\rangle=0\) whenever \texttt{magSumS}
+\(\sigma'\ne\) \texttt{magSumS} \(\sigma\): evaluate the matrix commutation
+\([\hat H,\hat S^3_{\mathrm{tot}}]=0\) at \((\sigma',\sigma)\), using diagonality
+of \(\hat S^3_{\mathrm{tot}}\) with eigenvalues \texttt{magEigenvalueS},
+yields \(\langle\sigma'|\hat H|\sigma\rangle(M_\sigma-M_{\sigma'})=0\); when
+\texttt{magSumS} differs, \texttt{Nat} cast injectivity forces \(M_\sigma\ne M_{\sigma'}\)
+and hence the matrix element vanishes.  This is the key building block for sector
+decompositions in the eventual Theorem 2.4 obligation (2.a) uniqueness argument.
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
