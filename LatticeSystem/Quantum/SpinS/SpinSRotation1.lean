@@ -27,4 +27,16 @@ theorem spinSRot1_zero (N : ℕ) : spinSRot1 N 0 = 1 := by
   unfold spinSRot1
   simp [exp_zero]
 
+/-- **Addition formula**: `spinSRot1 N θ * spinSRot1 N φ = spinSRot1 N (θ + φ)`. -/
+theorem spinSRot1_mul (N : ℕ) (θ φ : ℝ) :
+    spinSRot1 N θ * spinSRot1 N φ = spinSRot1 N (θ + φ) := by
+  unfold spinSRot1
+  have hcomm : Commute (-(((θ : ℂ) * Complex.I)) • spinSOp1 N)
+      (-(((φ : ℂ) * Complex.I)) • spinSOp1 N) := by
+    exact (Commute.refl (spinSOp1 N)).smul_left _ |>.smul_right _
+  rw [← Matrix.exp_add_of_commute _ _ hcomm]
+  congr 1
+  push_cast
+  module
+
 end LatticeSystem.Quantum
