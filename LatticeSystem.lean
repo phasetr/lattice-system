@@ -18,6 +18,13 @@ import LatticeSystem.Math.HermitianMinEqOfShiftPF
 import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPF
 import LatticeSystem.Quantum.SpinS.BareSubmatrixFinrankLeOneAtMin
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfUnconditional
+import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphAltPath
+import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
+import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducibleStructural
+import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFEigenvectorStructural
+import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPFStructural
+import LatticeSystem.Quantum.SpinS.BareSubmatrixFinrankLeOneAtMinStructural
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfStructural
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
