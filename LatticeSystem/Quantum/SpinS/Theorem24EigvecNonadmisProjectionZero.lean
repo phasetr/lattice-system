@@ -57,14 +57,12 @@ theorem anisotropicHeisenbergS_eigvec_nonadmis_projection_zero
     intro h_eq
     apply hM_nonadmis
     rw [hM'def] at h_eq
-    have h_eq' : ((Fintype.card Λ : ℂ) * (N : ℂ)) / 2 = (M : ℂ) := by linear_combination h_eq
     have h_double : ((Fintype.card Λ : ℂ) * (N : ℂ)) = 2 * (M : ℂ) := by
-      linear_combination 2 * h_eq'
-    have : (2 * M : ℂ) = (Fintype.card Λ * N : ℂ) := by
-      rw [show (2 * M : ℂ) = 2 * (M : ℂ) by push_cast; ring]
-      rw [show (Fintype.card Λ * N : ℂ) = (Fintype.card Λ : ℂ) * (N : ℂ) by push_cast; ring]
-      exact h_double.symm
-    exact_mod_cast this
+      linear_combination 2 * h_eq
+    have h_cplx : ((2 * M : ℕ) : ℂ) = ((Fintype.card Λ * N : ℕ) : ℂ) := by
+      push_cast
+      linear_combination -h_double
+    exact_mod_cast h_cplx
   -- Suppose w ≠ 0 for contradiction.
   by_contra hw_ne
   -- Apply PR #3903 with Ψ := w to get False.
