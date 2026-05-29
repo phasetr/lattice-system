@@ -12981,6 +12981,19 @@ obtained from \texttt{magSectorLinearEquiv} via
 \texttt{LinearEquiv.finrank\_eq}.  This is the basic dimension-matching lemma
 on which the eigenspace-level transfer of PF \(\dim\le1\) is built.
 
+The eigenvalue side of the transfer requires the sector-restriction lemma at
+arbitrary \(\mu\in\mathbb C\): the existing
+\texttt{heisenbergHamiltonianSMatrixOnMagSector\_mulVec\_magSectorRestriction\_of\_full\_eigen}
+takes \(\mu\in\mathbb R\) and lifts via the coercion \((\mu:\mathbb C)\); the
+generalisation
+\texttt{heisenbergHamiltonianSMatrixOnMagSector\_mulVec\_magSectorRestriction\_of\_full\_eigen\_complex}
+(PR \#3910) is the \(\mu\in\mathbb C\) variant with the same proof structure
+(the eigenvalue appears only as a scalar multiplier on \(\Psi\), and the matrix-entry
+sector-zero lemma
+\texttt{heisenbergHamiltonianS\_apply\_eq\_zero\_of\_magSumS\_ne} is
+eigenvalue-independent).  This matches \texttt{End.eigenspace}'s
+\(\mathbb C\)-valued eigenvalue convention used by the finrank infrastructure.
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
