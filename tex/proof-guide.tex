@@ -12973,6 +12973,14 @@ This bridge transfers within-sector-matrix Perron–Frobenius
 \(\dim\le1\) results to the full-Hilbert-space \(\cap\)-sector form required by
 PR \#3906.
 
+The immediate finrank consequence
+\texttt{magSubspaceS\_finrank\_eq\_sector} (PR \#3909) records the dimension
+identity \(\dim_{\mathbb C}\,\texttt{magSubspaceS}\,\Lambda\,N\,(|\Lambda|\cdot
+N/2 - M) = \dim_{\mathbb C}(\texttt{magConfigS}\,\Lambda\,N\,M\to\mathbb C)\),
+obtained from \texttt{magSectorLinearEquiv} via
+\texttt{LinearEquiv.finrank\_eq}.  This is the basic dimension-matching lemma
+on which the eigenspace-level transfer of PF \(\dim\le1\) is built.
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
