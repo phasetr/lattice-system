@@ -63,6 +63,7 @@ import LatticeSystem.Quantum.SpinS.SectorFinrankTransfer
 import LatticeSystem.Quantum.SpinS.SectorRestrictionComplexEigval
 import LatticeSystem.Quantum.SpinS.SectorEmbeddingComplexEigval
 import LatticeSystem.Quantum.SpinS.EigenspaceSectorFinrankEq
+import LatticeSystem.Quantum.SpinS.EigenspaceFinrankLeOneTransfer
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
