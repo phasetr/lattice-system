@@ -12947,6 +12947,18 @@ hypothesis transfers to \(\dim_{\mathbb C}E\le1\).  Once the within-admissible
 admissible sector matrix), the SU(2) symmetric \(\dim\le1\) capstone is
 immediate.
 
+The SU(2) specialisation
+\texttt{heisenbergHamiltonianS\_finrank\_le\_one\_at\_SU2\_conditional} (PR
+\#3907) bundles PR \#3906 with PR \#3897's eigenspace identification
+\(\texttt{anisotropicHeisenbergS}\,J\,1\,0\,N=\texttt{heisenbergHamiltonianS}\,J\,N\):
+under the same three hypotheses (\(\dim_{\mathbb C}E\le2\) at \(\mu\),
+admissible eigenvector at \(\mu\), within-admissible \(\dim\le1\)) the
+isotropic Heisenberg Hamiltonian's \(\mu\)-eigenspace has
+\(\dim_{\mathbb C}\le1\).  This is the SU(2) endpoint of the deformation
+argument: combined with PR \#3888's spin-\(1/2\) obligation (1) and Theorem 2.3's
+within-admissible PF, the SU(2)-symmetric ground state is unique, and the
+deformation can propagate.
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be

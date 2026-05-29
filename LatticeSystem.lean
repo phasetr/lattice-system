@@ -57,6 +57,7 @@ import LatticeSystem.Quantum.SpinS.Theorem24FinrankLeTwoContradiction
 import LatticeSystem.Quantum.SpinS.Theorem24EigvecNonadmisProjectionZero
 import LatticeSystem.Quantum.SpinS.Theorem24EigvecInAdmisSector
 import LatticeSystem.Quantum.SpinS.Theorem24FinrankLeOneFromAdmisPF
+import LatticeSystem.Quantum.SpinS.Theorem24SU2SymmetricFinrankLeOneConditional
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
