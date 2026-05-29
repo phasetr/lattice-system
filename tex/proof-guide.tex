@@ -12895,6 +12895,18 @@ independent.  The reflected eigenvector \(\Theta\Psi\) lies in the
 \(\Theta\Psi\) follows from \(\Theta^2=1\) and \(\Psi\ne0\); and the three
 sectors \(0,M',-M'\) are pairwise distinct precisely because \(M'\ne0\).
 
+The final contradiction step
+\texttt{anisotropicHeisenbergS\_finrank\_le\_two\_no\_admis\_plus\_nonadmis} (PR
+\#3903) packages this into the direct dichotomy: if the \(\mu\)-eigenspace has
+\(\dim_{\mathbb C}\le 2\) and contains both an admissible-sector eigenvector
+\(\Phi\) and a non-admissible-sector eigenvector \(\Psi\), then \texttt{False}.
+The reflected vector \(\Theta\Psi\) is at the same energy via
+\texttt{anisotropicHeisenbergS\_mul\_manyBodyReversalS}; the 3-LI family from
+PR \#3902 lifts to the eigenspace as a subtype-valued LI family via
+\texttt{LinearIndependent.of\_comp E.subtype}; mathlib's
+\texttt{LinearIndependent.fintype\_card\_le\_finrank} then gives \(3\le\dim E\),
+contradicting \(\dim E\le 2\).
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
