@@ -39,4 +39,14 @@ theorem spinSRot1_mul (N : ℕ) (θ φ : ℝ) :
   push_cast
   module
 
+/-- **Invertibility (right)**: `spinSRot1 N θ * spinSRot1 N (-θ) = 1`. -/
+theorem spinSRot1_mul_neg (N : ℕ) (θ : ℝ) :
+    spinSRot1 N θ * spinSRot1 N (-θ) = 1 := by
+  rw [spinSRot1_mul, add_neg_cancel, spinSRot1_zero]
+
+/-- **Invertibility (left)**: `spinSRot1 N (-θ) * spinSRot1 N θ = 1`. -/
+theorem spinSRot1_neg_mul (N : ℕ) (θ : ℝ) :
+    spinSRot1 N (-θ) * spinSRot1 N θ = 1 := by
+  rw [spinSRot1_mul, neg_add_cancel, spinSRot1_zero]
+
 end LatticeSystem.Quantum
