@@ -13042,6 +13042,15 @@ admissible eigenvector \(\Phi\), (iii) symmetric sector index \(M\) with
 \((|\Lambda|\cdot N/2 - M : \mathbb C)=0\) follows from (iii) by
 \texttt{push\_cast} + \texttt{linear\_combination}.
 
+The natural physical packaging
+\texttt{heisenbergHamiltonianS\_finrank\_le\_one\_at\_SU2\_symmetric\_card\_eq}
+(PR \#3916) replaces the abstract sector-index hypothesis (iii) by the
+sublattice card equality \(|A|=|\neg A|\): with \(M:=|A|\cdot N\), the
+constraint \(2M=|\Lambda|\cdot N\) follows from
+\texttt{tasaki23\_card\_filter\_A\_add\_card\_notA} and the card equality.
+This is the standard physical statement form of the SU(2) symmetric
+\(\dim\le1\) capstone.
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
