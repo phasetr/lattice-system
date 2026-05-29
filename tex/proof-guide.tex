@@ -12936,6 +12936,17 @@ via \texttt{magSectorEmbedding\_mem\_magSubspaceS}; closure under sums gives
 Perron–Frobenius \(\dim=1\), this completes the SU(2) symmetric \(\dim\le1\)
 chain.
 
+The abstract finrank counting step
+\texttt{anisotropicHeisenbergS\_finrank\_le\_one\_from\_admis\_pf} (PR \#3906)
+finishes the dimension argument: given a within-admissible-sector hypothesis
+\(\dim_{\mathbb C}(E\cap A)\le1\) (where
+\(A=\texttt{magSubspaceS}\,\Lambda\,N\,0\) and \(E\) is the \(\mu\)-eigenspace
+of \(\hat H\)), PR \#3905 gives \(E\subseteq A\), hence \(E\cap A=E\), and the
+hypothesis transfers to \(\dim_{\mathbb C}E\le1\).  Once the within-admissible
+\(\dim\le1\) is supplied (e.g.\ from the Perron–Frobenius argument on the
+admissible sector matrix), the SU(2) symmetric \(\dim\le1\) capstone is
+immediate.
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
