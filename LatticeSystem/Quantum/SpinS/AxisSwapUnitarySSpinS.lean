@@ -151,4 +151,35 @@ theorem spinSRot1_partial_sum_mul_spinSLadder1Minus
       rw [smul_mul_assoc, smul_mul_assoc, spinSOp1_pow_mul_spinSLadder1Minus,
           mul_smul_comm, mul_smul_comm]
 
+-- The following intertwining bridge uses the mathlib pattern (see
+-- `Matrix.exp_add_of_commute` in `Mathlib/Analysis/Normed/Algebra/MatrixExponential.lean`)
+-- of disabling `respectTransparency` and the `SpecialLinearGroup` coercion instance to
+-- avoid the lean4#10414 typeclass-synthesis timeout on `Matrix.exp` lemmas.
+set_option backward.isDefEq.respectTransparency false in
+attribute [-instance] Matrix.SpecialLinearGroup.hasCoeToGeneralLinearGroup in
+/-- **Intertwining: `exp A * X = X * exp B`** whenever `A^n * X = X * B^n` for all
+`n`. The standard "ad → Ad" bridge specialised to the case where the right-multiplication-by-X
+moves the powers across without needing X to be invertible. -/
+nonrec theorem matrix_exp_intertwine_of_pow_intertwine
+    {nIdx : Type*} [Fintype nIdx] [DecidableEq nIdx]
+    {A B X : Matrix nIdx nIdx ℂ}
+    (h : ∀ n : ℕ, A ^ n * X = X * B ^ n) :
+    exp A * X = X * exp B := by
+  open scoped Matrix.Norms.Operator in
+  have hA : HasSum (fun n : ℕ => ((n.factorial : ℚ)⁻¹ : ℚ) • A ^ n) (exp A) :=
+    NormedSpace.exp_series_hasSum_exp' (𝕂 := ℚ) A
+  open scoped Matrix.Norms.Operator in
+  have hB : HasSum (fun n : ℕ => ((n.factorial : ℚ)⁻¹ : ℚ) • B ^ n) (exp B) :=
+    NormedSpace.exp_series_hasSum_exp' (𝕂 := ℚ) B
+  have hA' : HasSum (fun n : ℕ => ((n.factorial : ℚ)⁻¹ : ℚ) • A ^ n * X) (exp A * X) :=
+    hA.mul_right X
+  have hB' : HasSum (fun n : ℕ => X * (((n.factorial : ℚ)⁻¹ : ℚ) • B ^ n)) (X * exp B) :=
+    hB.mul_left X
+  have hfun_eq : (fun n : ℕ => ((n.factorial : ℚ)⁻¹ : ℚ) • A ^ n * X) =
+      fun n : ℕ => X * (((n.factorial : ℚ)⁻¹ : ℚ) • B ^ n) := by
+    funext n
+    rw [smul_mul_assoc, h n, mul_smul_comm]
+  rw [hfun_eq] at hA'
+  exact hA'.unique hB'
+
 end LatticeSystem.Quantum
