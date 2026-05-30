@@ -18,7 +18,7 @@ This module discharges the `hsource_cas` hypothesis of
 `tasaki23_successor_sector_existence_with_lowered_predictedCasimir` at the base
 extremal sector `M = min(|A|,|¬A|)·N`: the toy witness
 `tasaki23_toy_groundState_casimir_eq_predicted` (#3711) supplies `hw_cas`, and the
-overlap pin `tasaki23_pf_groundState_casimir_eq_predicted_of_witness` transfers the
+overlap pin `tasaki23_pf_groundState_casimir_eq_predicted_of_witness_legacy` transfers the
 predicted Casimir to the `J`-ground state.  The adjacent-sector ladder chain then
 propagates the predicted value to the remaining sectors via `Ŝ⁻_tot`.
 
@@ -37,7 +37,7 @@ coupling `J` is a `(Ŝ_tot)²`-eigenvector at the predicted value
 `tasaki23PredictedCasimirValue A N`.
 
 The toy Hamiltonian's ground-state witness (#3711) supplies the predicted-Casimir
-state in the same sector, and `tasaki23_pf_groundState_casimir_eq_predicted_of_witness`
+state in the same sector, and `tasaki23_pf_groundState_casimir_eq_predicted_of_witness_legacy`
 transfers the value to the `J`-ground state.  This discharges the `hsource_cas`
 hypothesis of the sector-existence chain at the base sector. -/
 theorem tasaki23_pf_groundState_casimir_eq_predicted_base
@@ -78,7 +78,7 @@ theorem tasaki23_pf_groundState_casimir_eq_predicted_base
   obtain ⟨w, hw_pos, hw_cas⟩ :=
     tasaki23_toy_groundState_casimir_eq_predicted A N c_toy horient hc_strict_toy
       h_intermediate
-  exact tasaki23_pf_groundState_casimir_eq_predicted_of_witness A N c hJ_real hJ_pos
+  exact tasaki23_pf_groundState_casimir_eq_predicted_of_witness_legacy A N c hJ_real hJ_pos
     hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate hv_pos hw_pos hH hw_cas
 
 end LatticeSystem.Quantum

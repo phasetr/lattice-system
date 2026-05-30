@@ -5,7 +5,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23PFConstancyCasimir
 /-!
 # Structural adjacent-sector common-energy step (no `h_intermediate`)
 
-(PR #3893): structural variant of `tasaki23_common_energy_step` (TIER 4 step) using
+(PR #3893): structural variant of `tasaki23_common_energy_step_legacy` (TIER 4 step) using
 - `tasaki23_sector_lift_and_casimir_structural` (Step 1)
 - `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector`
   (Thm23-#3887.9)
@@ -20,7 +20,7 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural adjacent-sector common-energy step (no `h_intermediate`)**. -/
-theorem tasaki23_common_energy_step_structural
+theorem tasaki23_common_energy_step
     (A : V → Bool) (c c_toy : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)

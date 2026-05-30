@@ -7,7 +7,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralPFCasimirPredicted
 
 (Thm23-#3887.11): structural variant of `tasaki23_pf_groundState_casimir_eq_predicted_sector`
 using `tasaki23_toy_groundState_casimir_eq_predicted_at_structural` (Thm23-#3887.10) +
-`tasaki23_pf_groundState_casimir_eq_predicted_of_witness_structural` (Thm23-#3887.8).
+`tasaki23_pf_groundState_casimir_eq_predicted_of_witness` (Thm23-#3887.8).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.3, p. 42.
@@ -49,7 +49,7 @@ theorem tasaki23_pf_groundState_casimir_eq_predicted_sector_structural
   obtain ⟨w, hw_pos, hw_cas⟩ :=
     tasaki23_toy_groundState_casimir_eq_predicted_at_structural
       (N := N) (M := M) A c_toy horient hsB hM hc_strict_toy hA_ne hB_ne hN
-  exact tasaki23_pf_groundState_casimir_eq_predicted_of_witness_structural
+  exact tasaki23_pf_groundState_casimir_eq_predicted_of_witness
     (N := N) (M := M) A c hJ_real hJ_pos
     hJ_nn hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN hv_pos hw_pos hH hw_cas
 

@@ -76,7 +76,7 @@ theorem tasaki23_sector_lift_and_casimir
 Perron–Frobenius ground state in admissible sector `M` has energy `μ`, and `M` is not the
 right endpoint of the admissible interval, then the Marshall-positive ground state in the
 next sector `M + 1` also has energy `μ`. -/
-theorem tasaki23_common_energy_step
+theorem tasaki23_common_energy_step_legacy
     (A : V → Bool) (N : ℕ) (c c_toy : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
@@ -137,7 +137,7 @@ theorem tasaki23_common_energy_step
 There is a single energy `μ` such that in *every* admissible sector
 `M ∈ tasaki23GroundStateSectors A N` the connected bipartite antiferromagnetic coupling `J`
 has a Marshall-positive Perron–Frobenius ground state of energy `μ`. -/
-theorem tasaki23_common_groundEnergy
+theorem tasaki23_common_groundEnergy_legacy
     (A : V → Bool) (N : ℕ) (c c_toy : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
@@ -198,7 +198,7 @@ theorem tasaki23_common_groundEnergy
         magConfigS_nonempty_of_le_card_mul (le_trans hM_le hmax_le)
       haveI : Nonempty (magConfigS V N (M + 1)) :=
         magConfigS_nonempty_of_le_card_mul (le_trans hM1_le hmax_le)
-      exact tasaki23_common_energy_step A N c c_toy horient hsB hJ_real hJ_real' hJ_pos hJ_nn
+      exact tasaki23_common_energy_step_legacy A N c c_toy horient hsB hJ_real hJ_real' hJ_pos hJ_nn
         hJ_sym hJ_bipartite hc_strict hc_strict_toy h_intermediate hM_mem hM_lt hvM_pos hReEig_M
   intro M hM
   rw [tasaki23GroundStateSectors_mem_iff] at hM

@@ -69,7 +69,7 @@ Marshall-conjugates `φ` and `w` to eigenvectors of the shifted dressed sector
 matrix (where `marshallSignS · φ > 0` is the strictly positive Perron
 eigenvector), applies the geometric simplicity
 `tasaki23_shiftedDressed_sector_eigenvec_proportional`, and conjugates back. -/
-theorem tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive
+theorem tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_legacy
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -117,10 +117,10 @@ Since `[Ĥ, (Ŝtot)²] = 0`, `(Ŝtot)² Φ` is a Heisenberg eigenvector at the s
 `μ` supported in the same magnetization sector; its real and imaginary parts
 are real Heisenberg sector eigenvectors at `μ`, each a scalar multiple of the
 Marshall-positive ground state by the one-dimensionality
-`tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive`.  Recombining,
+`tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_legacy`.  Recombining,
 `(Ŝtot)² Φ = γ Φ`.  This pins the total spin of the ground state (total-spin
 determination, Tasaki §2.5 p.42). -/
-theorem tasaki23_pf_groundState_casimir_eigenvector
+theorem tasaki23_pf_groundState_casimir_eigenvector_legacy
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -208,10 +208,10 @@ theorem tasaki23_pf_groundState_casimir_eigenvector
       N hJ_real hΨr_eig
   -- one-dimensionality ⟹ re, im parts are scalar multiples of φ
   obtain ⟨a, ha⟩ :=
-    tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive A N c hJ_real
+    tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_legacy A N c hJ_real
       hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate hφ_eig hφ_pos hΨr_re
   obtain ⟨b, hb⟩ :=
-    tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive A N c hJ_real
+    tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_legacy A N c hJ_real
       hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate hφ_eig hφ_pos hΨr_im
   -- assemble γ = a + b i
   refine ⟨⟨a, b⟩, ?_⟩
@@ -254,7 +254,7 @@ magnetization sector.
 This replaces the predicted-GS-membership hypothesis of
 `tasaki23_pf_ladder_link_succ_of_mem_predictedGS` by the minimal
 Casimir-non-vanishing condition, using that the ground state is a
-total-Casimir eigenvector (`tasaki23_pf_groundState_casimir_eigenvector`).
+total-Casimir eigenvector (`tasaki23_pf_groundState_casimir_eigenvector_legacy`).
 It is the form in which the sound chain applies directly to the actual
 Perron–Frobenius ground state. -/
 theorem tasaki23_pf_groundState_ladder_link_of_casimir_ne_kernel
@@ -301,7 +301,7 @@ theorem tasaki23_pf_groundState_ladder_link_of_casimir_ne_kernel
         magSubspaceS V N
           ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) - 1) := by
   obtain ⟨γ, hγ⟩ :=
-    tasaki23_pf_groundState_casimir_eigenvector A N c hJ_real hJ_pos hJ_nn
+    tasaki23_pf_groundState_casimir_eigenvector_legacy A N c hJ_real hJ_pos hJ_nn
       hJ_sym hJ_bipartite hc_strict h_intermediate hv_pos hH
   exact tasaki23_pf_ladder_link_succ hH hγ (hγ_ne γ hγ)
     (tasaki23_marshallPositive_magSectorEmbedding_ne_zero A hv_pos)
