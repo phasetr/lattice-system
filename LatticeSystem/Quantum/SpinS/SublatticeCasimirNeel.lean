@@ -10,6 +10,8 @@ import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
 import LatticeSystem.Quantum.SpinS.AllAlignedStateOrthogonal
 import LatticeSystem.Quantum.SpinS.SingleSiteTransverseMeanZero
 
+set_option linter.unusedSectionVars false
+
 /-!
 # Spin-`S` Néel state and sublattice Casimir eigenvalues
 

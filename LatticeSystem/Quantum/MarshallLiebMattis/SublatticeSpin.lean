@@ -2,6 +2,8 @@ import LatticeSystem.Quantum.TotalSpin
 import LatticeSystem.Quantum.TotalSpin.Casimir
 import LatticeSystem.Quantum.MagnetizationSubspace
 
+set_option linter.unusedSectionVars false
+
 /-!
 # Sublattice spin operators for the MLM toy Hamiltonian
 

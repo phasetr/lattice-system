@@ -5,6 +5,8 @@ import LatticeSystem.Quantum.SpinDot.Hamiltonian
 import LatticeSystem.Quantum.MagnetizationSubspace
 import LatticeSystem.Quantum.MarshallLiebMattis.Realness
 
+set_option linter.unusedSectionVars false
+
 /-!
 # Toy Hamiltonian as a cross-sublattice spin dot product
 

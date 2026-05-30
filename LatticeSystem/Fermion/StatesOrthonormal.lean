@@ -1,5 +1,7 @@
 import LatticeSystem.Fermion.Mode
 
+set_option linter.unusedSectionVars false
+
 /-!
 # Fermion vacuum and occupied basis states are orthonormal
 

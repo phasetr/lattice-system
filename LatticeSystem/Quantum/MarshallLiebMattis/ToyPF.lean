@@ -2,6 +2,8 @@ import LatticeSystem.Quantum.MarshallLiebMattis.ToyHamiltonian
 import LatticeSystem.Quantum.MarshallLiebMattis.BipartiteGraph
 import LatticeSystem.Quantum.MarshallLiebMattis.H0PFApplication
 
+set_option linter.unusedSectionVars false
+
 /-!
 # MLM matrix-level Tasaki (2.5.4) for the toy Hamiltonian
 

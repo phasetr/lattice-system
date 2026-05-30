@@ -4,6 +4,8 @@ import LatticeSystem.Quantum.MarshallLiebMattis.ToyHamiltonianCasimir
 import LatticeSystem.Quantum.NeelState
 import LatticeSystem.Quantum.MagnetizationSubspace
 
+set_option linter.unusedSectionVars false
+
 /-!
 # Sublattice Casimir eigenvalues on the Néel state
 
