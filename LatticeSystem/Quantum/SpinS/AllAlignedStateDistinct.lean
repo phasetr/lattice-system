@@ -20,6 +20,7 @@ namespace LatticeSystem.Quantum
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
+set_option linter.unusedSectionVars false in
 /-- `allAlignedConfigS V N c₁ ≠ allAlignedConfigS V N c₂` when
 `c₁ ≠ c₂` and `V` is non-empty. -/
 theorem allAlignedConfigS_injective [Nonempty V] :
