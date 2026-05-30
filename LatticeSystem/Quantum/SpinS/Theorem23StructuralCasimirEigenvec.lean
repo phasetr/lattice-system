@@ -6,7 +6,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralReach
 
 Extension of #3887 fix to `tasaki23_shiftedDressed_sector_eigenvec_proportional` /
 `tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive` via
-`isIrreducible_shiftedDressedSReMatrixOnMagSector_structural`.
+`isIrreducible_shiftedDressedSReMatrixOnMagSector`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.3, p. 42.
@@ -35,7 +35,7 @@ theorem tasaki23_shiftedDressed_sector_eigenvec_proportional_structural
     (hw : (shiftedDressedSReMatrixOnMagSector A J N c M).mulVec w = r • w) :
     ∃ s : ℝ, w = s • v :=
   eigenvec_proportional_of_pos_eigenvec
-    (isIrreducible_shiftedDressedSReMatrixOnMagSector_structural A c hJ_real hJ_pos
+    (isIrreducible_shiftedDressedSReMatrixOnMagSector A c hJ_real hJ_pos
       hJ_nn hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN)
     hv hv_pos hw
 

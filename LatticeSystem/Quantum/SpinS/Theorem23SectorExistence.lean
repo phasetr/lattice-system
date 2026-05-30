@@ -21,7 +21,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 statement** as a `Prop`.
 
 The hypothesis bundle matches the per-sector bundled Theorem 2.2
-`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`
+`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full_legacy`
 (PR #869) exactly. Given:
 - real symmetric coupling `J` (`(J x y).im = 0`, `star (J x y) = J x y`,
   `J x y = J y x`, `0 ≤ (J x y).re`);

@@ -8,7 +8,7 @@ Issue #3739 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori).
 
 Discharges the `hreach_total` reachability-totality hypothesis of
 `shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_parityReachable_total`
-(#3797) using `parityReachableS_total` (#3823): any two same-parity configurations on the
+(#3797) using `parityReachableS_total_legacy` (#3823): any two same-parity configurations on the
 bipartite complete graph are `ParityReachableS`-connected.
 
 This closes **(e) PR5** of Tasaki §2.5 Theorem 2.4 obligation (1): the parity-block shifted PF
@@ -26,7 +26,7 @@ open Matrix
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **Parity-block shifted PF matrix is irreducible** (unconditional under case (i.2) strict).
-Discharges the totality hypothesis of #3797 via #3823 `parityReachableS_total`. -/
+Discharges the totality hypothesis of #3797 via #3823 `parityReachableS_total_legacy`. -/
 theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
@@ -46,7 +46,7 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible
   refine shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_parityReachable_total
     A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict p ?_
   intro σ' σ _hne
-  refine parityReachableS_total A hA_ne hB_ne h_intermediate ?_
+  refine parityReachableS_total_legacy A hA_ne hB_ne h_intermediate ?_
   -- magSumS σ.1 % 2 = p = magSumS σ'.1 % 2 from parityConfigS membership.
   have hp_σ : magSumS σ.1 % 2 = p := σ.2
   have hp_σ' : magSumS σ'.1 % 2 = p := σ'.2

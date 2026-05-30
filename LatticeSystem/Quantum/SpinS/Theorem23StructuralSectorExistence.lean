@@ -8,7 +8,7 @@ set_option linter.unusedVariables false
 # Structural Tasaki §2.5 Theorem 2.3 sector-existence wrapper (no `h_intermediate`)
 
 (Thm23-#3887.16): structural variant of `tasaki_2_5_theorem_2_3_sector_existence`
-wrapping `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full_structural`
+wrapping `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`
 (Thm23-#3887.15).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
@@ -46,7 +46,7 @@ theorem tasaki_2_5_theorem_2_3_sector_existence
         μ' = μ ∧ ∃ r : ℝ, 0 < r ∧
           ∀ τ : magConfigS V N M,
             (Ψ' τ.1).re = r * ((marshallSignS A τ.1).re * v τ)) :=
-  marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full_structural
+  marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full
     (N := N) (M := M) A c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
     hA_ne hB_ne hN
 

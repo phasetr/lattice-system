@@ -56,7 +56,7 @@ theorem tasaki23_shiftedDressed_sector_eigenvec_proportional
     (hw : (shiftedDressedSReMatrixOnMagSector A J N c M).mulVec w = r • w) :
     ∃ s : ℝ, w = s • v :=
   eigenvec_proportional_of_pos_eigenvec
-    (isIrreducible_shiftedDressedSReMatrixOnMagSector A N c hJ_real hJ_pos
+    (isIrreducible_shiftedDressedSReMatrixOnMagSector_legacy A N c hJ_real hJ_pos
       hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate)
     hv hv_pos hw
 

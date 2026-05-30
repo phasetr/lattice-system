@@ -5,7 +5,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralReach
 # Structural sector PF positive eigenvector wrappers (no `h_intermediate`)
 
 (Thm23-#3887.9): structural variants of the sector PF positive-eigenvector
-existence theorems using `isIrreducible_shiftedDressedSReMatrixOnMagSector_structural`
+existence theorems using `isIrreducible_shiftedDressedSReMatrixOnMagSector`
 (Thm23-#3887.1).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
@@ -33,7 +33,7 @@ theorem exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector
       0 < r ∧ (∀ σ, 0 < v σ) ∧
       (shiftedDressedSReMatrixOnMagSector A J N c M).mulVec v = r • v := by
   have hIrred : (shiftedDressedSReMatrixOnMagSector A J N c M).IsIrreducible :=
-    isIrreducible_shiftedDressedSReMatrixOnMagSector_structural (N := N) (M := M)
+    isIrreducible_shiftedDressedSReMatrixOnMagSector (N := N) (M := M)
       A c hJ_real hJ_pos hJ_nn
       hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN
   exact LatticeSystem.Math.PerronFrobeniusMain.exists_positive_eigenvector_of_irreducible hIrred

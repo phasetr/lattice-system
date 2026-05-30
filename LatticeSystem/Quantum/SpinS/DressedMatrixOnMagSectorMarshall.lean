@@ -414,7 +414,7 @@ Reduction: by inverse Marshall conjugation, the conjugates `vᵢ := sign · wᵢ
 are positive eigenvectors of the dressed sector matrix at `μ`. By dressed
 sector uniqueness (this PR) `v₂ = r • v₁` for some `r > 0`. Multiplying
 both sides by `sign` (which squares to 1) gives `w₂ = r • w₁`. -/
-theorem marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector
+theorem marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -483,7 +483,7 @@ scalar multiple of it.
 Bundles the existence theorem
 (`exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy`,
 PR #853) with the same-eigenvalue uniqueness theorem
-(`marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector`,
+(`marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector_legacy`,
 PR #854) into the form most directly usable downstream. -/
 theorem marshallLiebMattis_spinS_heisenbergSector_groundState
     (A : V → Bool)
@@ -520,7 +520,7 @@ theorem marshallLiebMattis_spinS_heisenbergSector_groundState
       marshallSignS_re_sq A σ.1
     rw [← mul_assoc, hsq, one_mul]
     exact hv_pos σ
-  exact marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector
+  exact marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector_legacy
     A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
     hmul hsign_v_pos hw hw_pos
 

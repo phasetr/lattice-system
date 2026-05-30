@@ -82,7 +82,7 @@ theorem exists_matrixPow_pos_length_of_magConfigS_bipartite
   · exact hkpos
 
 /-- **Structural sector-irreducibility (no `h_intermediate`)**. -/
-theorem isIrreducible_shiftedDressedSReMatrixOnMagSector_structural
+theorem isIrreducible_shiftedDressedSReMatrixOnMagSector
     (A : V → Bool)
     {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     (hJ_real : ∀ x y, (J x y).im = 0)

@@ -131,7 +131,7 @@ set_option linter.unusedDecidableInType false in
 /-- **Structural `ParityReachableS` totality (no `h_intermediate`)**: any two
 configurations of the same total-magnetization parity are connected, using only
 `hA_ne + hB_ne + 1 ≤ N`. -/
-theorem parityReachableS_total_structural
+theorem parityReachableS_total
     [Fintype V] [DecidableEq V]
     (A : V → Bool)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
