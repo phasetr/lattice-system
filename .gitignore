@@ -9,3 +9,6 @@
 *.toc
 *.synctex.gz
 *.pdf
+
+# sed/perl backup files
+*.bak
