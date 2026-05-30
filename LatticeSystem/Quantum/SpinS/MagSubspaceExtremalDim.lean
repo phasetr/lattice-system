@@ -31,6 +31,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-! ## Eigenvalue characterisation of the extremal configurations -/
 
+set_option linter.unusedSectionVars false in
 /-- `magEigenvalueS σ = m_max` iff `σ = allAlignedConfigS V N 0`. -/
 theorem magEigenvalueS_eq_mMax_iff_allAlignedConfigS_zero
     (σ : V → Fin (N + 1)) :
@@ -59,6 +60,7 @@ theorem magEigenvalueS_eq_mMax_iff_allAlignedConfigS_zero
     rw [show ((0 : Fin (N + 1)).val : ℂ) = 0 from by simp]
     push_cast; ring
 
+set_option linter.unusedSectionVars false in
 /-- `magEigenvalueS σ = −m_max` iff `σ = allAlignedConfigS V N (Fin.last N)`. -/
 theorem magEigenvalueS_eq_neg_mMax_iff_allAlignedConfigS_last
     (σ : V → Fin (N + 1)) :
