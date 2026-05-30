@@ -118,4 +118,37 @@ theorem spinSOp1_pow_mul_spinSLadder1Minus (N n : ℕ) :
       rw [pow_succ, Matrix.mul_assoc, spinSOp1_mul_spinSLadder1Minus,
           ← Matrix.mul_assoc, ih, Matrix.mul_assoc, ← pow_succ]
 
+/-- **Finite-sum intertwining for L⁺**: for every `N`, the partial sum of the
+exponential series intertwines L⁺ with shifted Ŝ¹. Builds towards the full
+`exp(-iθ Ŝ¹) L⁺ exp(iθ Ŝ¹) = e^{-iθ} L⁺` formula by taking N → ∞ along the
+series. -/
+theorem spinSRot1_partial_sum_mul_spinSLadder1Plus
+    (N : ℕ) (θ : ℂ) (k : ℕ) :
+    (∑ n ∈ Finset.range k, ((n.factorial : ℂ)⁻¹ : ℂ) • (-(θ * Complex.I)) ^ n • spinSOp1 N ^ n) *
+      spinSLadder1Plus N =
+    spinSLadder1Plus N * (∑ n ∈ Finset.range k,
+      ((n.factorial : ℂ)⁻¹ : ℂ) • (-(θ * Complex.I)) ^ n • (spinSOp1 N + 1) ^ n) := by
+  induction k with
+  | zero => simp
+  | succ m ih =>
+      rw [Finset.sum_range_succ, Finset.sum_range_succ, Matrix.add_mul, Matrix.mul_add, ih]
+      congr 1
+      rw [smul_mul_assoc, smul_mul_assoc, spinSOp1_pow_mul_spinSLadder1Plus,
+          mul_smul_comm, mul_smul_comm]
+
+/-- **Finite-sum intertwining for L⁻**. -/
+theorem spinSRot1_partial_sum_mul_spinSLadder1Minus
+    (N : ℕ) (θ : ℂ) (k : ℕ) :
+    (∑ n ∈ Finset.range k, ((n.factorial : ℂ)⁻¹ : ℂ) • (-(θ * Complex.I)) ^ n • spinSOp1 N ^ n) *
+      spinSLadder1Minus N =
+    spinSLadder1Minus N * (∑ n ∈ Finset.range k,
+      ((n.factorial : ℂ)⁻¹ : ℂ) • (-(θ * Complex.I)) ^ n • (spinSOp1 N - 1) ^ n) := by
+  induction k with
+  | zero => simp
+  | succ m ih =>
+      rw [Finset.sum_range_succ, Finset.sum_range_succ, Matrix.add_mul, Matrix.mul_add, ih]
+      congr 1
+      rw [smul_mul_assoc, smul_mul_assoc, spinSOp1_pow_mul_spinSLadder1Minus,
+          mul_smul_comm, mul_smul_comm]
+
 end LatticeSystem.Quantum
