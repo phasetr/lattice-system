@@ -21,7 +21,7 @@ namespace LatticeSystem.Quantum
 
 open Matrix
 
-variable {n : Type*} [Fintype n] [Nonempty n]
+variable {n : Type*} [Fintype n]
 
 /-- The Rayleigh quotient of `M` at a vector `ψ : n → ℂ` (no normalisation),
 defined as `re (∑ i j, conj (ψ i) * M i j * ψ j) = re ⟨ψ, M ψ⟩`. -/
@@ -39,5 +39,20 @@ theorem continuous_rayleighOnVec_matrix (ψ : n → ℂ) :
   refine continuous_const.mul ?_
   refine continuous_finset_sum _ (fun j _ => ?_)
   exact (continuous_apply_apply i j).mul continuous_const
+
+/-- The Rayleigh-on-vec quotient is jointly continuous in `(M, ψ)` (as a function
+of `Matrix n n ℂ × (n → ℂ)`). -/
+theorem continuous_rayleighOnVec :
+    Continuous (fun p : Matrix n n ℂ × (n → ℂ) => rayleighOnVec p.1 p.2) := by
+  unfold rayleighOnVec
+  refine Complex.continuous_re.comp ?_
+  refine continuous_finset_sum _ (fun i _ => ?_)
+  refine Continuous.mul ?_ ?_
+  · refine continuous_star.comp ?_
+    exact (continuous_apply i).comp continuous_snd
+  · refine continuous_finset_sum _ (fun j _ => ?_)
+    refine Continuous.mul ?_ ?_
+    · exact (continuous_apply_apply i j).comp continuous_fst
+    · exact (continuous_apply j).comp continuous_snd
 
 end LatticeSystem.Quantum
