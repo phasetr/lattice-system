@@ -31,4 +31,11 @@ theorem rayleighOnVec_eq_re_of_eigenvector
   unfold rayleighOnVec
   rw [heig, dotProduct_smul, hunit, smul_eq_mul, mul_one]
 
+/-- The Rayleigh quotient vanishes at the zero vector. -/
+theorem rayleighOnVec_zero_vec (M : Matrix n n ℂ) :
+    rayleighOnVec M 0 = 0 := by
+  unfold rayleighOnVec
+  rw [Matrix.mulVec_zero, dotProduct_zero, Complex.zero_re]
+
+
 end LatticeSystem.Quantum
