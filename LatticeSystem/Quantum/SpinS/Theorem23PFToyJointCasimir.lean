@@ -38,6 +38,8 @@ The proof is the same one-dimensionality argument: `B Φ` is a Heisenberg
 eigenvector at the same `μ` (commutation with `Ĥ`) supported in the same
 magnetization sector (commutation with `Ŝ_tot^(3)`), so its real/imaginary parts
 are scalar multiples of the Marshall-positive ground state, giving `B Φ = γ Φ`. -/
+@[deprecated (since := "2026-05-30")]
+
 theorem tasaki23_pf_groundState_commuting_eigenvector_legacy
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -160,6 +162,8 @@ eigenvector.  All three Casimirs commute with `Ĥ_toy` (it is their linear
 combination) and with `Ŝ_tot^(3)`, so the one-dimensionality of the ground
 eigenspace makes the ground state an eigenvector of each.  Pinning the three
 eigenvalues to the predicted values is the remaining variational obligation. -/
+@[deprecated (since := "2026-05-30")]
+
 theorem tasaki23_toy_groundState_joint_casimir_eigenvector_legacy
     (A : V → Bool) (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]

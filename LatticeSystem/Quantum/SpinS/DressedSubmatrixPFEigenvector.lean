@@ -33,6 +33,8 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **Existence of a strictly positive eigenvector for the unshifted dressed-`Ĥ'` parity-block
 submatrix**, derived from PF on the shifted matrix. -/
+@[deprecated (since := "2026-05-30")]
+
 theorem dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists_legacy
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)

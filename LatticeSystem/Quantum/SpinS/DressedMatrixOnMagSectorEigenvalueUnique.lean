@@ -311,6 +311,8 @@ Composition of:
   (PR #853, real-form existence).
 - `heisenbergHamiltonianSMatrixOnMagSector_mulVec_ofReal`
   (PR #858, real → complex eigenvector lift). -/
+@[deprecated (since := "2026-05-30")]
+
 theorem exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
@@ -421,6 +423,8 @@ and their real parts are positive scalar multiples of each other.
 
 Proof: extract real parts via PR #861 to reduce to the real-form
 Marshall-positive uniqueness theorems (PRs #854, #856). -/
+@[deprecated (since := "2026-05-30")]
+
 theorem marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}

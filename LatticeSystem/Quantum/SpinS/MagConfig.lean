@@ -169,6 +169,8 @@ chain in the bipartite complete graph.
 
 Proof: combine the full-type bipartite reachability theorem (#823)
 with the subtype lifting (#840). -/
+@[deprecated (since := "2026-05-30")]
+
 theorem raiseLowerReachableSMagSector_bipartiteCompleteGraph_legacy
     (A : V → Bool) {M : ℕ}
     (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,

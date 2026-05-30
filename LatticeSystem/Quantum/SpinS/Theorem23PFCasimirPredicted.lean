@@ -81,6 +81,8 @@ Tasaki's overlap argument: `Φ` is a total-Casimir eigenvector at some real `γ`
 (`tasaki23_pf_groundState_casimir_eigenvector_legacy` + `isHermitian_eigenvalue_star_eq`);
 the Marshall-positive overlap with `w` is non-zero, so
 `tasaki23_marshallPositive_casimir_eigenvalue_eq` forces `γ = predicted`. -/
+@[deprecated (since := "2026-05-30")]
+
 theorem tasaki23_pf_groundState_casimir_eq_predicted_of_witness_legacy
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]

@@ -27,6 +27,8 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **Parity-block shifted PF matrix is irreducible** (unconditional under case (i.2) strict).
 Discharges the totality hypothesis of #3797 via #3823 `parityReachableS_total_legacy`. -/
+@[deprecated (since := "2026-05-30")]
+
 theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_legacy
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
