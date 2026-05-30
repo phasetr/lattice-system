@@ -1,5 +1,7 @@
 import LatticeSystem.Quantum.MarshallLiebMattis.EqMagnetization
 
+set_option linter.unusedSectionVars false
+
 /-!
 # Equal-magnetisation reachability (Tasaki §2.5 p. 42 Proposition)
 
