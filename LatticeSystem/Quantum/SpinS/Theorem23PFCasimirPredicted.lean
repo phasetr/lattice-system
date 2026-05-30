@@ -78,10 +78,10 @@ toy-Hamiltonian ground state), the per-sector Perron–Frobenius ground state
 total-Casimir eigenvector at exactly the predicted value.
 
 Tasaki's overlap argument: `Φ` is a total-Casimir eigenvector at some real `γ`
-(`tasaki23_pf_groundState_casimir_eigenvector` + `isHermitian_eigenvalue_star_eq`);
+(`tasaki23_pf_groundState_casimir_eigenvector_legacy` + `isHermitian_eigenvalue_star_eq`);
 the Marshall-positive overlap with `w` is non-zero, so
 `tasaki23_marshallPositive_casimir_eigenvalue_eq` forces `γ = predicted`. -/
-theorem tasaki23_pf_groundState_casimir_eq_predicted_of_witness
+theorem tasaki23_pf_groundState_casimir_eq_predicted_of_witness_legacy
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -114,7 +114,7 @@ theorem tasaki23_pf_groundState_casimir_eq_predicted_of_witness
         magSectorEmbedding
           (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) := by
   obtain ⟨γ, hγ⟩ :=
-    tasaki23_pf_groundState_casimir_eigenvector A N c hJ_real hJ_pos hJ_nn
+    tasaki23_pf_groundState_casimir_eigenvector_legacy A N c hJ_real hJ_pos hJ_nn
       hJ_sym hJ_bipartite hc_strict h_intermediate hv_pos hH
   have hγ_real : star γ = γ :=
     isHermitian_eigenvalue_star_eq (totalSpinSSquared_isHermitian V N) hγ

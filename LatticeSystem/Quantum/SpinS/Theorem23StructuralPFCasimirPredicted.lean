@@ -5,8 +5,8 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralPFJointCasimir
 # Structural Theorem 2.3 PF GS Casimir = predicted (no `h_intermediate`)
 
 (Thm23-#3887.8): structural variant of
-`tasaki23_pf_groundState_casimir_eq_predicted_of_witness` using
-`tasaki23_pf_groundState_casimir_eigenvector_structural` (Thm23-#3887.7).
+`tasaki23_pf_groundState_casimir_eq_predicted_of_witness_legacy` using
+`tasaki23_pf_groundState_casimir_eigenvector` (Thm23-#3887.7).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.3, p. 42.
@@ -17,7 +17,7 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural PF GS Casimir = predicted via witness (no `h_intermediate`)**. -/
-theorem tasaki23_pf_groundState_casimir_eq_predicted_of_witness_structural
+theorem tasaki23_pf_groundState_casimir_eq_predicted_of_witness
     (A : V → Bool) {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -49,7 +49,7 @@ theorem tasaki23_pf_groundState_casimir_eq_predicted_of_witness_structural
         magSectorEmbedding
           (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) := by
   obtain ⟨γ, hγ⟩ :=
-    tasaki23_pf_groundState_casimir_eigenvector_structural A c hJ_real hJ_pos hJ_nn
+    tasaki23_pf_groundState_casimir_eigenvector A c hJ_real hJ_pos hJ_nn
       hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN hv_pos hH
   have hγ_real : star γ = γ :=
     isHermitian_eigenvalue_star_eq (totalSpinSSquared_isHermitian V N) hγ

@@ -5,7 +5,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralReach
 # Structural Theorem 2.3 eigenvector proportionality (no `h_intermediate`)
 
 Extension of #3887 fix to `tasaki23_shiftedDressed_sector_eigenvec_proportional` /
-`tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive` via
+`tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_legacy` via
 `isIrreducible_shiftedDressedSReMatrixOnMagSector`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
@@ -40,7 +40,7 @@ theorem tasaki23_shiftedDressed_sector_eigenvec_proportional_structural
     hv hv_pos hw
 
 /-- **Structural Heisenberg sector eigenvector proportionality (no `h_intermediate`)**. -/
-theorem tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_structural
+theorem tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive
     (A : V → Bool) {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)

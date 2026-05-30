@@ -9,7 +9,7 @@ Extension of #3887 fix to:
 - `tasaki23_pf_groundState_commuting_eigenvector`
 - `tasaki23_toy_groundState_joint_casimir_eigenvector`
 
-Both use `tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_structural`
+Both use `tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive`
 (Thm23-#3887.3) instead of the original h_intermediate-bearing variant.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
@@ -103,10 +103,10 @@ theorem tasaki23_pf_groundState_commuting_eigenvector_structural
     heisenbergHamiltonianSReMatrixOnMagSector_mulVec_im_of_complex_eigenvec
       N hJ_real hΨr_eig
   obtain ⟨a, ha⟩ :=
-    tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_structural A c hJ_real
+    tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive A c hJ_real
       hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN hφ_eig hφ_pos hΨr_re
   obtain ⟨b, hb⟩ :=
-    tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_structural A c hJ_real
+    tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive A c hJ_real
       hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN hφ_eig hφ_pos hΨr_im
   refine ⟨⟨a, b⟩, ?_⟩
   funext ρ
@@ -222,7 +222,7 @@ theorem tasaki23_toy_groundState_sublattice_casimir_re_le_structural
 
 /-- **Structural PF GS Casimir eigenvector (no `h_intermediate`)**: specialisation of
 `tasaki23_pf_groundState_commuting_eigenvector_structural` to `B = (Ŝ_tot)²`. -/
-theorem tasaki23_pf_groundState_casimir_eigenvector_structural
+theorem tasaki23_pf_groundState_casimir_eigenvector
     (A : V → Bool) {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)

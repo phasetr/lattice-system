@@ -24,7 +24,7 @@ Assembly (for `|¬A| ≤ |A|`, so the extremal sector is `M = min(|A|,|¬A|)·N 
   #3656) pins the total Casimir of the embedded PF ground state to the predicted value.
 
 This is exactly the `hw_cas` witness consumed by the overlap pin
-`tasaki23_pf_groundState_casimir_eq_predicted_of_witness` (#3656's downstream), which
+`tasaki23_pf_groundState_casimir_eq_predicted_of_witness_legacy` (#3656's downstream), which
 transfers the predicted total Casimir to the actual antiferromagnetic ground state.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body

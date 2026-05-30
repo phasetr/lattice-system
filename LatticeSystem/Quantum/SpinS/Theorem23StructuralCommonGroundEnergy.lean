@@ -4,11 +4,11 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralCommonEnergyStep
 # Structural common ground-state energy across all admissible sectors
 (no `h_intermediate`)
 
-(PR #3893): structural variant of `tasaki23_common_groundEnergy` (TIER 4 constancy)
+(PR #3893): structural variant of `tasaki23_common_groundEnergy_legacy` (TIER 4 constancy)
 using
 - `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector`
   (Thm23-#3887.9 from PR #3891)
-- `tasaki23_common_energy_step_structural` (Step 2 of this PR)
+- `tasaki23_common_energy_step` (Step 2 of this PR)
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.3, p. 42.
@@ -19,7 +19,7 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural common ground-state energy (no `h_intermediate`)**. -/
-theorem tasaki23_common_groundEnergy_structural
+theorem tasaki23_common_groundEnergy
     (A : V → Bool) (c c_toy : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
@@ -76,7 +76,7 @@ theorem tasaki23_common_groundEnergy_structural
         magConfigS_nonempty_of_le_card_mul (le_trans hM_le hmax_le)
       haveI : Nonempty (magConfigS V N (M + 1)) :=
         magConfigS_nonempty_of_le_card_mul (le_trans hM1_le hmax_le)
-      exact tasaki23_common_energy_step_structural (N := N) A c c_toy horient hsB hJ_real
+      exact tasaki23_common_energy_step (N := N) A c c_toy horient hsB hJ_real
         hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hc_strict_toy
         hA_ne hB_ne hN hM_mem hM_lt hvM_pos hReEig_M
   intro M hM

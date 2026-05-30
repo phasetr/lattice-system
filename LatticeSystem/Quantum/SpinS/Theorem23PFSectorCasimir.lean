@@ -12,7 +12,7 @@ Tasaki's overlap step (§2.5, eq. 2.5.12): in any admissible sector `M`, the toy
 Hamiltonian's Marshall-positive ground state carries the predicted total Casimir
 (#3730), so the Marshall-positive Perron–Frobenius ground state of an *arbitrary*
 connected bipartite antiferromagnetic coupling `J` inherits it through the non-zero
-Marshall overlap (`tasaki23_pf_groundState_casimir_eq_predicted_of_witness`).  This
+Marshall overlap (`tasaki23_pf_groundState_casimir_eq_predicted_of_witness_legacy`).  This
 discharges `hsource_cas` of the sector-existence chain at every admissible sector.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
@@ -60,7 +60,7 @@ theorem tasaki23_pf_groundState_casimir_eq_predicted_sector
   obtain ⟨w, hw_pos, hw_cas⟩ :=
     tasaki23_toy_groundState_casimir_eq_predicted_at A N c_toy horient hsB hM hc_strict_toy
       h_intermediate
-  exact tasaki23_pf_groundState_casimir_eq_predicted_of_witness A N c hJ_real hJ_pos
+  exact tasaki23_pf_groundState_casimir_eq_predicted_of_witness_legacy A N c hJ_real hJ_pos
     hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate hv_pos hw_pos hH hw_cas
 
 end LatticeSystem.Quantum

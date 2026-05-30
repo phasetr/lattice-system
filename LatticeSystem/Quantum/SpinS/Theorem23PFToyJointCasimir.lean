@@ -7,12 +7,12 @@ import LatticeSystem.Quantum.SpinS.SublatticeSpin
 
 Sound Perron–Frobenius route (Issue #3542; see
 `.self-local/docs/tasaki-2-5-pf-route-design.md`).  The previous overlap pin
-(`tasaki23_pf_groundState_casimir_eq_predicted_of_witness`) reduced Theorem 2.3
+(`tasaki23_pf_groundState_casimir_eq_predicted_of_witness_legacy`) reduced Theorem 2.3
 to constructing a Marshall-positive total-Casimir witness at the predicted value,
 namely the toy-Hamiltonian ground state.
 
 This module generalises
-`tasaki23_pf_groundState_casimir_eigenvector` to an arbitrary operator commuting
+`tasaki23_pf_groundState_casimir_eigenvector_legacy` to an arbitrary operator commuting
 with the Heisenberg Hamiltonian and with `Ŝ_tot^(3)`, then instantiates it at the
 toy Hamiltonian `Ĥ_toy = heisenbergHamiltonianS (bipartiteCoupling A)` for the
 three Casimirs `(Ŝ_tot)²`, `(Ŝ_A)²`, `(Ŝ_¬A)²` (which all commute with `Ĥ_toy`,
@@ -31,7 +31,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 
 /-- **The per-sector Perron–Frobenius ground state is an eigenvector of any
 operator commuting with `Ĥ` and `Ŝ_tot^(3)`**: generalisation of
-`tasaki23_pf_groundState_casimir_eigenvector` from the total Casimir to an
+`tasaki23_pf_groundState_casimir_eigenvector_legacy` from the total Casimir to an
 arbitrary `B` with `Commute Ĥ B` and `Commute Ŝ_tot^(3) B`.
 
 The proof is the same one-dimensionality argument: `B Φ` is a Heisenberg
@@ -121,10 +121,10 @@ theorem tasaki23_pf_groundState_commuting_eigenvector
     heisenbergHamiltonianSReMatrixOnMagSector_mulVec_im_of_complex_eigenvec
       N hJ_real hΨr_eig
   obtain ⟨a, ha⟩ :=
-    tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive A N c hJ_real
+    tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_legacy A N c hJ_real
       hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate hφ_eig hφ_pos hΨr_re
   obtain ⟨b, hb⟩ :=
-    tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive A N c hJ_real
+    tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_legacy A N c hJ_real
       hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate hφ_eig hφ_pos hΨr_im
   refine ⟨⟨a, b⟩, ?_⟩
   funext ρ

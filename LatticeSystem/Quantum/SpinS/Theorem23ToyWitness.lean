@@ -25,7 +25,7 @@ This threads: the joint Casimir eigenvector (#3657), the sublattice Casimir
 bounds (#3677), the toy energy formula (#3673, eigenvalue uniqueness against
 `Ĥ_toy Ψ = μ Ψ`), the extremal-sector magnetization (#3678), the two-sided pin
 (#3676), and the Hermitian realness of the eigenvalue.  It is exactly the witness
-required by `tasaki23_pf_groundState_casimir_eq_predicted_of_witness` (#3656).
+required by `tasaki23_pf_groundState_casimir_eq_predicted_of_witness_legacy` (#3656).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body
 Systems*, Springer 2020, §2.5 Theorem 2.3, p. 42.

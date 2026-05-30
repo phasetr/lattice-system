@@ -70,7 +70,7 @@ theorem tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive
     · rfl
     · rw [hAb] at hbf; cases hbf
   obtain ⟨μ, hcommon⟩ :=
-    tasaki23_common_groundEnergy_structural (N := N) A c c_toy horient hsB
+    tasaki23_common_groundEnergy (N := N) A c c_toy horient hsB
       hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hc_strict_toy
       hA_ne hB_ne hN
   refine ⟨μ, ?_, ?_⟩
