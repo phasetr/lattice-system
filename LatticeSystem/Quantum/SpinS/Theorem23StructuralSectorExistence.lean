@@ -16,7 +16,7 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural per-sector existence step toward Tasaki §2.5 Theorem 2.3 (no `h_intermediate`)**. -/
-theorem tasaki_2_5_theorem_2_3_sector_existence_structural
+theorem tasaki_2_5_theorem_2_3_sector_existence
     (A : V → Bool) {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
