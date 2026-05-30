@@ -60,12 +60,12 @@ theorem spinHalf_anisotropicHeisenbergS_eigenspace_finrank_le_two_truly_uncondit
   have hN : (1 : ℕ) ≤ 1 := le_refl 1
   -- (#3887.7) at parity 0.
   have h0 :=
-    axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue_structural
+    axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict hA_ne hB_ne
       hN 0
   -- (#3887.7) at parity 1.
   have h1 :=
-    axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue_structural
+    axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict hA_ne hB_ne
       hN 1
   -- (j.12) capstone for spin-1/2.

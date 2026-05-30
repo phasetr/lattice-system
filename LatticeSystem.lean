@@ -16,7 +16,6 @@ import LatticeSystem.Math.HermitianMaxEqPF
 import LatticeSystem.Math.HermitianSpectrumShift
 import LatticeSystem.Math.HermitianMinEqOfShiftPF
 import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPF
-import LatticeSystem.Quantum.SpinS.BareSubmatrixFinrankLeOneAtMin
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphAltPath
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducibleStructural

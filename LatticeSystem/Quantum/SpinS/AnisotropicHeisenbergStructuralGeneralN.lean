@@ -58,12 +58,12 @@ theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_truly_unconditional
               (Λ := Λ) (N := N) hJim hlam hDim 1)) : ℝ) : ℂ)) ≤ 2 := by
   -- (#3887.7) at parity 0.
   have h0 :=
-    axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue_structural
+    axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict hA_ne hB_ne
       hN 0
   -- (#3887.7) at parity 1.
   have h1 :=
-    axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue_structural
+    axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict hA_ne hB_ne
       hN 1
   -- (j.12) general capstone via AxisSwapUnitaryS N.
