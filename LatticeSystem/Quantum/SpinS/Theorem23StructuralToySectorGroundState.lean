@@ -10,7 +10,7 @@ import LatticeSystem.Quantum.SpinS.BipartiteToyMinEnergy
 (Thm23-#3887.19): structural variant of the per-sector toy ground-state
 at predicted-energy package (the original `toy_sector_groundState_at_predicted`
 witness was removed together with `Theorem23ToyFinal.lean` in PR #3917). Uses
-- `tasaki_2_5_theorem_2_3_sector_existence_structural` (Thm23-#3887.16)
+- `tasaki_2_5_theorem_2_3_sector_existence` (Thm23-#3887.16)
 - `tasaki23_toy_sector_energy_ge_predicted_structural` (Thm23-#3887.17)
 - `tasaki23_toy_sector_groundEnergy_le_of_witness` (already h_intermediate-free)
 - `exists_predictedEnergy_sector_eigenvector_of_mem` (already h_intermediate-free)
@@ -25,7 +25,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural per-sector toy ground state at the predicted minimum energy
 (no `h_intermediate`)**. -/
-theorem toy_sector_groundState_at_predicted_structural
+theorem toy_sector_groundState_at_predicted
     (A : V → Bool) (c : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
@@ -53,7 +53,7 @@ theorem toy_sector_groundState_at_predicted_structural
   classical
   set E := (bipartiteToyMinEnergyPredicted (Λ := V) A N).re with hEdef
   obtain ⟨μM, vM, hμM_lt, hvM_pos, hH_M, _hsupp, huniq⟩ :=
-    tasaki_2_5_theorem_2_3_sector_existence_structural (M := M) A c (bipartiteCoupling_im A)
+    tasaki_2_5_theorem_2_3_sector_existence (M := M) A c (bipartiteCoupling_im A)
       (fun x y => by
         rw [Complex.star_def, Complex.conj_eq_iff_im]; exact bipartiteCoupling_im A x y)
       (fun x y hadj => by

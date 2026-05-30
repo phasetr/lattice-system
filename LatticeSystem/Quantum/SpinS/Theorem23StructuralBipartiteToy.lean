@@ -79,7 +79,7 @@ coupling — at spin-1/2 (N=1) the original `tasaki_2_5_theorem_2_3_bipartiteToy
 vacuous because `h_intermediate` is unsatisfiable when `τ ≡ Fin.last 1`. The structural
 variant proves the same conclusion from `(hA_ne, hB_ne, hN)`, which are the genuine
 physical hypotheses. -/
-theorem tasaki_2_5_theorem_2_3_bipartiteToy_structural
+theorem tasaki_2_5_theorem_2_3_bipartiteToy
     (A : V → Bool) (N : ℕ) (c : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card) :
@@ -101,7 +101,7 @@ theorem tasaki_2_5_theorem_2_3_bipartiteToy_structural
   refine ⟨(bipartiteToyMinEnergyPredicted (Λ := V) A N).re, ?_, ?_⟩
   · intro M hM _hNe
     obtain ⟨vM, hE_lt, hvM_pos, hH_M, _hReEig, huniq⟩ :=
-      toy_sector_groundState_at_predicted_structural (N := N) A c horient hc_strict
+      toy_sector_groundState_at_predicted (N := N) A c horient hc_strict
         hA_ne hB_ne hN hM
     exact ⟨vM, hE_lt, hvM_pos, hH_M, huniq⟩
   · refine tasaki23_eigenvalue_ge_common A N c (bipartiteCoupling_im A)
@@ -119,7 +119,7 @@ theorem tasaki_2_5_theorem_2_3_bipartiteToy_structural
             (by rw [← tasaki23_card_filter_A_add_card_notA A]
                 exact max_le (Nat.le_add_right _ _) (Nat.le_add_left _ _))))
       obtain ⟨vM, _hE_lt, hvM_pos, _hH_M, hReEig, _huniq⟩ :=
-        toy_sector_groundState_at_predicted_structural (N := N) A c horient hc_strict
+        toy_sector_groundState_at_predicted (N := N) A c horient hc_strict
           hA_ne hB_ne hN hM
       exact ⟨vM, hvM_pos, hReEig⟩
     · intro M _hM_non μM φ hφ_ne hφ

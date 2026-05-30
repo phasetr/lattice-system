@@ -38,13 +38,13 @@ the full `tasaki_2_5_theorem_2_3_structural` statement holds for any real symmet
 non-negative bipartite coupling `J` positive on the complete bipartite graph.
 
 This removes both:
-- the toy-coupling restriction of PR #3891's `tasaki_2_5_theorem_2_3_bipartiteToy_structural`,
+- the toy-coupling restriction of PR #3891's `tasaki_2_5_theorem_2_3_bipartiteToy`,
 - the vacuous-at-`N=1` `h_intermediate` restriction of PR #3738's
   `tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`.
 
 At spin-1/2 (`N = 1`) this is the first truly-unconditional Tasaki §2.5 Theorem 2.3
 closure for general bipartite J. -/
-theorem tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive_structural
+theorem tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive
     (A : V → Bool) (N : ℕ) (c c_toy : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
@@ -72,7 +72,7 @@ theorem tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive_structural
   refine ⟨μ, ?_, ?_⟩
   · intro M hM _hNe
     obtain ⟨μM, vM, hμM_lt, hvM_pos, hH_M, _hsupp, huniq⟩ :=
-      tasaki_2_5_theorem_2_3_sector_existence_structural (N := N) (M := M) A c
+      tasaki_2_5_theorem_2_3_sector_existence (N := N) (M := M) A c
         hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN
     have hReEig_M : (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
         (fun σ => (marshallSignS A σ.1).re * vM σ) =
