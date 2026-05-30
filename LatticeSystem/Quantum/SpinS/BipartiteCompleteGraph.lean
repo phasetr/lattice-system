@@ -329,6 +329,7 @@ theorem raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS
 
 /-! ## Preconnectedness of `bipartiteCompleteGraphOf` -/
 
+set_option linter.unusedSectionVars false in
 /-- The bipartite-complete graph `bipartiteCompleteGraphOf A` is
 preconnected when both sublattices are non-empty. Any two `x, y ∈ V`
 are joined by a walk of length ≤ 2:
