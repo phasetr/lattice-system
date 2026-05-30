@@ -49,7 +49,7 @@ theorem tasaki23_toy_sector_energy_ge_predicted
   classical
   -- Marshall-positive Perron–Frobenius ground state of the toy matrix in sector M.
   obtain ⟨μGS, v, _hμGS_lt, hv_pos, hReEig⟩ :=
-    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
+    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy
       (M := M) A N c (bipartiteCoupling_im A)
       (fun x y hadj => by
         rw [bipartiteCompleteGraphOf_adj_iff] at hadj

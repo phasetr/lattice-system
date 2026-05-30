@@ -11,7 +11,7 @@ set_option linter.unusedVariables false
 
 (Thm23-#3887.10): structural variant of
 `tasaki23_toy_groundState_casimir_eq_predicted_at` using
-- `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_structural` (Thm23-#3887.9)
+- `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector` (Thm23-#3887.9)
 - `tasaki23_toy_groundState_joint_casimir_eigenvector_structural` (Thm23-#3887.5)
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
@@ -40,7 +40,7 @@ theorem tasaki23_toy_groundState_casimir_eq_predicted_at_structural
           magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) := by
   classical
   obtain ⟨μ, v, _hμ_lt_c, hv_pos, hReEig⟩ :=
-    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_structural
+    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
       (N := N) (M := M) A c (bipartiteCoupling_im A)
       (fun x y hadj => by
         rw [bipartiteCompleteGraphOf_adj_iff] at hadj

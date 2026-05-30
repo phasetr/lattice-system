@@ -9,7 +9,7 @@ import LatticeSystem.Quantum.SpinS.BipartiteToyMinEnergy
 # Structural toy sector energy lower bound (no `h_intermediate`)
 
 (Thm23-#3887.17): structural variant of `tasaki23_toy_sector_energy_ge_predicted`
-using `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_structural`
+using `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector`
 (Thm23-#3887.9) and `tasaki23_toy_groundState_joint_casimir_eigenvector_structural`
 (Thm23-#3887.5).
 
@@ -37,7 +37,7 @@ theorem tasaki23_toy_sector_energy_ge_predicted_structural
     (bipartiteToyMinEnergyPredicted (Λ := V) A N).re ≤ μM := by
   classical
   obtain ⟨μGS, v, _hμGS_lt, hv_pos, hReEig⟩ :=
-    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_structural
+    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
       (N := N) (M := M) A c (bipartiteCoupling_im A)
       (fun x y hadj => by
         rw [bipartiteCompleteGraphOf_adj_iff] at hadj

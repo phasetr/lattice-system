@@ -5,8 +5,8 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralComplexSectorEigenvec
 # Structural full-Hilbert-space Marshall eigenvector (no `h_intermediate`)
 
 (Thm23-#3887.13): structural variant of
-`exists_marshallSign_eigenvector_heisenbergHamiltonianS_full` lifting
-`exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector_structural`
+`exists_marshallSign_eigenvector_heisenbergHamiltonianS_full_legacy` lifting
+`exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector`
 (Thm23-#3887.12) via `heisenbergHamiltonianS_mulVec_magSectorEmbedding`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
@@ -18,7 +18,7 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural full-Hilbert-space Marshall ground-state existence (no `h_intermediate`)**. -/
-theorem exists_marshallSign_eigenvector_heisenbergHamiltonianS_full_structural
+theorem exists_marshallSign_eigenvector_heisenbergHamiltonianS_full
     (A : V → Bool)
     {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -36,7 +36,7 @@ theorem exists_marshallSign_eigenvector_heisenbergHamiltonianS_full_structural
         (μ : ℂ) • magSectorEmbedding
           (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) := by
   obtain ⟨μ, v, hμ, hv_pos, hmul⟩ :=
-    exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector_structural
+    exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector
       (N := N) (M := M) A c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
       hA_ne hB_ne hN
   exact ⟨μ, v, hμ, hv_pos,

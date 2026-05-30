@@ -49,7 +49,7 @@ theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalu
         (dressedAxisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
           (Λ := Λ) (N := N) A hJim hlam hDim p) := by
   obtain ⟨ν, v, hv_pos, hAv⟩ :=
-    dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists_structural
+    dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists
       (N := N) A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos
       hc_strict hA_ne hB_ne hN p
   refine ⟨ν, v, hv_pos, hAv, ?_⟩
@@ -109,7 +109,7 @@ theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalu
   linarith [h_min_lift, h_min_bridge]
 
 /-- **(#3887.6-bare) Bare submatrix hermitianMinEigenvalue identification (no `h_intermediate`)**. -/
-theorem axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_structural
+theorem axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)

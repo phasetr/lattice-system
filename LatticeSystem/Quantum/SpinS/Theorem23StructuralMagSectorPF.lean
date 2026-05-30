@@ -59,7 +59,7 @@ theorem exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector_struct
   exact dressedHeisenbergSReMatrixOnMagSector_mulVec_of_shifted_eigenvec A J N c hmul
 
 /-- **Structural Heisenberg sector Marshall-sign eigenvector (no `h_intermediate`)**. -/
-theorem exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_structural
+theorem exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
     (A : V → Bool) {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)

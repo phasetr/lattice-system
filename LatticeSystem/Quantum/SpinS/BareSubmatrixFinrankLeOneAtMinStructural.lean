@@ -48,7 +48,7 @@ theorem axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianM
           (Λ := Λ) (N := N) hJim hlam hDim p) : ℂ))) ≤ 1 := by
   -- Step 1: (j.13.h.2-bare structural).
   obtain ⟨ν, v, hv_pos, hAv, hν_eq⟩ :=
-    axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_structural
+    axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict hA_ne hB_ne
       hN p
   -- Step 2: shifted v = (c - ν) v.

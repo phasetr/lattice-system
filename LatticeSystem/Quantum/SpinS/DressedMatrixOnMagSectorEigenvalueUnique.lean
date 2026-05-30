@@ -307,11 +307,11 @@ strictly Marshall-positive complex ground-state eigenvector
 sign at `σ`) at some real eigenvalue `μ < c`.
 
 Composition of:
-- `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector`
+- `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy`
   (PR #853, real-form existence).
 - `heisenbergHamiltonianSMatrixOnMagSector_mulVec_ofReal`
   (PR #858, real → complex eigenvector lift). -/
-theorem exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector
+theorem exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -329,7 +329,7 @@ theorem exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMag
         (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) =
         (μ : ℂ) • (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) := by
   obtain ⟨μ, v, hμ, hv_pos, hmul⟩ :=
-    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
+    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy
       (M := M) A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
       h_intermediate
   exact ⟨μ, v, hμ, hv_pos,
@@ -495,7 +495,7 @@ theorem marshallLiebMattis_spinS_heisenbergSector_complexGroundState_full
         μ' = μ ∧ ∃ r : ℝ, 0 < r ∧
           ∀ σ, (W σ).re = r * ((marshallSignS A σ.1).re * v σ)) := by
   obtain ⟨μ, v, hμ_lt, hv_pos, hmul⟩ :=
-    exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector
+    exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector_legacy
       (M := M) A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
       h_intermediate
   refine ⟨μ, v, hμ_lt, hv_pos, hmul, ?_⟩
