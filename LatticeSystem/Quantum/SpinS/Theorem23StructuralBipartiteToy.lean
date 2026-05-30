@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralToySectorGroundState
-import LatticeSystem.Quantum.SpinS.Theorem23ToyFinal
+import LatticeSystem.Quantum.SpinS.Theorem23GlobalMinimality
 
 /-!
 # Tasaki §2.5 Theorem 2.3 for the standard bipartite coupling — structural
