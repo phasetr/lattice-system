@@ -12,7 +12,7 @@ Issue #3887 (Tasaki §2.5 Theorem 2.4, `h_intermediate` vacuous-at-N=1 fix).
 
 (#3887.5): Structural variant of (j.1)
 `dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists_legacy`
-that uses `shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_structural`
+that uses `shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible`
 (#3887.4) instead of the h_intermediate-bearing original.
 
 Drops `h_intermediate`; requires `hA_ne + hB_ne + 1 ≤ N`. Otherwise identical
@@ -57,7 +57,7 @@ theorem dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenv
     unfold Matrix.IsHermitian
     rw [Matrix.conjTranspose_eq_transpose_of_trivial]
     exact hSymm
-  have hIrred := shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_structural
+  have hIrred := shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible
     A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict
     hA_ne hB_ne hN p
   obtain ⟨μ, v, hAv, _hvne, hv_pos⟩ := exists_pos_eigenvec_max hHerm hIrred

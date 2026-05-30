@@ -85,7 +85,7 @@ set_option linter.unusedDecidableInType false in
 /-- **Structural within-sector reachability (no `h_intermediate`)**: for any two
 same-magnetization configurations of the same complete bipartite graph,
 `RaiseLowerReachableS` connects them, using only `hA_ne + hB_ne + 1 ≤ N`. -/
-theorem raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_structural
+theorem raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS
     [Fintype V] [DecidableEq V]
     (A : V → Bool)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false) (hN : 1 ≤ N)
@@ -149,7 +149,7 @@ theorem parityReachableS_total
     omega
   have h_within :=
     parityReachableS_of_raiseLowerReachableS
-      (raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_structural
+      (raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS
         A hA_ne hB_ne hN h_par_min)
   have h_back := parityReachableS_symm h'_reach_min
   exact (h_reach_min.trans h_within).trans h_back

@@ -372,11 +372,11 @@ any two strictly positive eigenvectors of the dressed Heisenberg sector
 matrix with the same eigenvalue `μ` are positive scalar multiples of
 each other.
 
-Reduction to `pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector`
+Reduction to `pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector_legacy`
 (#848): convert both `dressed_sec`-eigenvectors to `shifted_sec`-
 eigenvectors at the shifted eigenvalue `c - μ`, then apply PF
 uniqueness on the shifted matrix. -/
-theorem pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector
+theorem pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -399,7 +399,7 @@ theorem pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector
     A J N c hv
   have hw' := shiftedDressedSReMatrixOnMagSector_mulVec_of_dressed_eigenvec
     A J N c hw
-  exact pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector A N c
+  exact pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector_legacy A N c
     hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
     hv' hv_pos hw' hw_pos
 
@@ -439,7 +439,7 @@ theorem marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSect
     A N hJ_real hw₂
   -- Apply dressed uniqueness.
   obtain ⟨r, hr_pos, hrel⟩ :=
-    pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector
+    pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector_legacy
       A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
       hv₁ hw₁_marshall_pos hv₂ hw₂_marshall_pos
   -- hrel : (fun σ => sign σ.1.re * w₂ σ) = r • (fun σ => sign σ.1.re * w₁ σ).

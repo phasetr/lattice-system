@@ -51,7 +51,7 @@ theorem parityReachableS_of_raiseLowerReachableS {G : SimpleGraph V} {σ σ' : V
 /-- **Within-sector ParityReachableS on the bipartite complete graph**: any two
 configurations sharing the same total magnetization are `ParityReachableS`-connected.
 
-Lifts `raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS` through the inclusion
+Lifts `raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_legacy` through the inclusion
 `RaiseLowerStepS ⊆ ParityStepS`. -/
 theorem parityReachableS_bipartiteCompleteGraph_of_eq_magSumS
     (A : V → Bool)
@@ -60,6 +60,6 @@ theorem parityReachableS_bipartiteCompleteGraph_of_eq_magSumS
     {σ σ' : V → Fin (N + 1)} (hmag : magSumS σ = magSumS σ') :
     ParityReachableS (bipartiteCompleteGraphOf A) σ σ' :=
   parityReachableS_of_raiseLowerReachableS
-    (raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS A h_intermediate hmag)
+    (raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_legacy A h_intermediate hmag)
 
 end LatticeSystem.Quantum

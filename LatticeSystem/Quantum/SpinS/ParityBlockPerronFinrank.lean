@@ -59,7 +59,7 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_perron_eigenspace_finrank
     rw [Matrix.conjTranspose_eq_transpose_of_trivial]
     exact hSymm
   -- Irreducibility unconditional via #3824.
-  have hIrred := shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible
+  have hIrred := shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_legacy
     A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict
     hA_ne hB_ne h_intermediate p
   -- Perron positive eigenvector + finrank ≤ 1 (#3779).

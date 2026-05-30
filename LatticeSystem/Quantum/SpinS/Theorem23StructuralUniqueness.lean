@@ -14,8 +14,8 @@ uniqueness chain, swapping `pos_eigenvec_unique` at the bottom from the
 `isIrreducible_shiftedDressedSReMatrixOnMagSector` (Thm23-#3887.1).
 
 Provides four wrappers (bottom-up):
-- `pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector_structural`
-- `pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector_structural`
+- `pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector`
+- `pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector`
 - `marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector`
 - `marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector`
 
@@ -32,7 +32,7 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural shifted-dressed PF positive eigenvector uniqueness (no `h_intermediate`)**. -/
-theorem pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector_structural
+theorem pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector
     (A : V → Bool)
     {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -55,7 +55,7 @@ theorem pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector_structural
     hv hv_pos hw hw_pos
 
 /-- **Structural dressed Heisenberg PF positive eigenvector uniqueness (no `h_intermediate`)**. -/
-theorem pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector_structural
+theorem pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector
     (A : V → Bool)
     {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -76,7 +76,7 @@ theorem pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector_structural
     A J N c hv
   have hw' := shiftedDressedSReMatrixOnMagSector_mulVec_of_dressed_eigenvec
     A J N c hw
-  exact pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector_structural
+  exact pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector
     (N := N) (M := M) A c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
     hA_ne hB_ne hN hv' hv_pos hw' hw_pos
 
@@ -104,7 +104,7 @@ theorem marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSect
   have hv₂ := dressedHeisenbergSReMatrixOnMagSector_mulVec_of_heis_eigenvec
     A N hJ_real hw₂
   obtain ⟨r, hr_pos, hrel⟩ :=
-    pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector_structural
+    pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector
       (N := N) (M := M) A c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
       hA_ne hB_ne hN hv₁ hw₁_marshall_pos hv₂ hw₂_marshall_pos
   refine ⟨r, hr_pos, ?_⟩

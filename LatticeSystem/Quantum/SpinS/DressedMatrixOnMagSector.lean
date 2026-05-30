@@ -129,7 +129,7 @@ theorem exists_matrixPow_pos_of_magConfigS_bipartite_legacy
   · intro σ τ hstep
     exact shiftedDressedSReMatrixOnMagSector_apply_pos_of_raiseLowerStepSMagSector
       A N c M hJ_real hJ_pos hJ_sym hstep
-  · exact raiseLowerReachableSMagSector_bipartiteCompleteGraph A
+  · exact raiseLowerReachableSMagSector_bipartiteCompleteGraph_legacy A
       h_intermediate σ σ'
 
 /-- **Strict positive-length matrix-power positivity** on the sector
@@ -240,7 +240,7 @@ Direct corollary of `Matrix.IsIrreducible` (#846) and
 non-degeneracy half of Tasaki §2.5 Theorem 2.2 for general spin (the
 ground-state in each magnetization sector is unique up to a positive
 scalar, equivalently 1-dimensional). -/
-theorem pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector
+theorem pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
