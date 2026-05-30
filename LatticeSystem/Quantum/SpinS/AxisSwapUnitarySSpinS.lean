@@ -3,6 +3,7 @@ import LatticeSystem.Quantum.SpinS.AxisSwapGaugeEquiv
 import LatticeSystem.Quantum.SpinS.Hermitian
 import LatticeSystem.Quantum.SpinS.CyclicCommutator
 import LatticeSystem.Quantum.SpinS.CyclicCommutator31
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergStructuralGeneralN
 import Mathlib.Analysis.SpecialFunctions.Exponential
 
 /-!
@@ -316,5 +317,139 @@ nonrec theorem exp_smul_spinSOp1_conj_spinSLadder1Minus (N : ℕ) (α : ℂ) :
         rw [exp_smul_spinSOp1_mul_neg]
     _ = Complex.exp (-α) • spinSLadder1Minus N := by
         rw [Matrix.mul_one]
+
+-- `spinSRot1` conjugation of L⁺ specialised to θ.
+theorem spinSRot1_conj_spinSLadder1Plus (N : ℕ) (θ : ℝ) :
+    spinSRot1 N θ * spinSLadder1Plus N * spinSRot1 N (-θ) =
+      Complex.exp (-((θ : ℂ) * Complex.I)) • spinSLadder1Plus N := by
+  unfold spinSRot1
+  convert exp_smul_spinSOp1_conj_spinSLadder1Plus N (-((θ : ℂ) * Complex.I)) using 2
+  · push_cast; ring_nf
+
+-- `spinSRot1` conjugation of L⁻ specialised to θ.
+theorem spinSRot1_conj_spinSLadder1Minus (N : ℕ) (θ : ℝ) :
+    spinSRot1 N θ * spinSLadder1Minus N * spinSRot1 N (-θ) =
+      Complex.exp (((θ : ℂ) * Complex.I)) • spinSLadder1Minus N := by
+  unfold spinSRot1
+  convert exp_smul_spinSOp1_conj_spinSLadder1Minus N (-((θ : ℂ) * Complex.I)) using 2
+  · push_cast; ring_nf
+  · push_cast; ring_nf
+
+-- `Complex.exp(-((π/2 : ℝ) : ℂ) * I) = -I` (axis-1 rotation by π/2 about ladder L⁺ scales by -i).
+theorem cexp_neg_pi_half_mul_I :
+    Complex.exp (-(((Real.pi / 2 : ℝ) : ℂ) * Complex.I)) = -Complex.I := by
+  rw [show -(((Real.pi / 2 : ℝ) : ℂ) * Complex.I) =
+         ((-(Real.pi / 2) : ℝ) : ℂ) * Complex.I from by push_cast; ring,
+      Complex.exp_mul_I]
+  simp [Real.cos_neg, Real.sin_neg, Real.cos_pi_div_two, Real.sin_pi_div_two]
+
+-- `Complex.exp(((π/2 : ℝ) : ℂ) * I) = I`.
+theorem cexp_pi_half_mul_I :
+    Complex.exp (((Real.pi / 2 : ℝ) : ℂ) * Complex.I) = Complex.I := by
+  rw [Complex.exp_mul_I]
+  simp [Real.cos_pi_div_two, Real.sin_pi_div_two]
+
+-- Conjugation of Ŝ² at θ = π/2: `spinSRot1 N (π/2) * Ŝ² * spinSRot1 N (-π/2) = Ŝ³`.
+theorem spinSRot1_pi_half_conj_spinSOp2 (N : ℕ) :
+    spinSRot1 N (Real.pi / 2) * spinSOp2 N * spinSRot1 N (-(Real.pi / 2)) = spinSOp3 N := by
+  -- 2 Ŝ² = L⁺ + L⁻ via spinSLadder1Plus_add_Minus.
+  -- Therefore 2 • (spinSRot1 Ŝ² spinSRot1) = spinSRot1 (L⁺ + L⁻) spinSRot1 = 2 Ŝ³.
+  have h2 : (2 : ℂ) • spinSOp2 N = spinSLadder1Plus N + spinSLadder1Minus N :=
+    (spinSLadder1Plus_add_Minus N).symm
+  have hL : spinSRot1 N (Real.pi / 2) *
+      (spinSLadder1Plus N + spinSLadder1Minus N) * spinSRot1 N (-(Real.pi / 2)) =
+      ((2 : ℂ) • spinSOp3 N) := by
+    rw [Matrix.mul_add, Matrix.add_mul,
+        spinSRot1_conj_spinSLadder1Plus, spinSRot1_conj_spinSLadder1Minus,
+        cexp_neg_pi_half_mul_I, cexp_pi_half_mul_I]
+    -- -I • (Ŝ² + I Ŝ³) + I • (Ŝ² - I Ŝ³) = 2 Ŝ³
+    unfold spinSLadder1Plus spinSLadder1Minus
+    match_scalars
+    all_goals (try simp); try ring
+  -- Now `2 • (spinSRot1 Ŝ² spinSRot1) = 2 Ŝ³`, so cancel the 2.
+  have hcancel : (2 : ℂ) • (spinSRot1 N (Real.pi / 2) * spinSOp2 N *
+      spinSRot1 N (-(Real.pi / 2))) = (2 : ℂ) • spinSOp3 N := by
+    rw [← hL, ← h2]
+    rw [Matrix.mul_smul, Matrix.smul_mul]
+  -- Cancel by dividing by 2 (or apply smul-cancel for a non-zero scalar).
+  have h2ne : (2 : ℂ) ≠ 0 := by norm_num
+  exact smul_right_injective _ h2ne hcancel
+
+-- Conjugation of Ŝ³ at θ = π/2: `spinSRot1 N (π/2) * Ŝ³ * spinSRot1 N (-π/2) = -Ŝ²`.
+theorem spinSRot1_pi_half_conj_spinSOp3 (N : ℕ) :
+    spinSRot1 N (Real.pi / 2) * spinSOp3 N * spinSRot1 N (-(Real.pi / 2)) = -spinSOp2 N := by
+  -- 2I Ŝ³ = L⁺ - L⁻; so 2I • (spinSRot1 Ŝ³ spinSRot1) = spinSRot1 (L⁺ - L⁻) spinSRot1 = -2I Ŝ².
+  have h2I : (2 * Complex.I) • spinSOp3 N = spinSLadder1Plus N - spinSLadder1Minus N :=
+    (spinSLadder1Plus_sub_Minus N).symm
+  have hL : spinSRot1 N (Real.pi / 2) *
+      (spinSLadder1Plus N - spinSLadder1Minus N) * spinSRot1 N (-(Real.pi / 2)) =
+      ((2 * Complex.I) • (-spinSOp2 N)) := by
+    rw [Matrix.mul_sub, Matrix.sub_mul,
+        spinSRot1_conj_spinSLadder1Plus, spinSRot1_conj_spinSLadder1Minus,
+        cexp_neg_pi_half_mul_I, cexp_pi_half_mul_I]
+    unfold spinSLadder1Plus spinSLadder1Minus
+    match_scalars
+    all_goals (try simp); try ring
+  have hcancel : (2 * Complex.I) • (spinSRot1 N (Real.pi / 2) * spinSOp3 N *
+      spinSRot1 N (-(Real.pi / 2))) = (2 * Complex.I) • (-spinSOp2 N) := by
+    rw [← hL, ← h2I]
+    rw [Matrix.mul_smul, Matrix.smul_mul]
+  have h2Ine : (2 * Complex.I) ≠ 0 := by
+    simp [Complex.I_ne_zero]
+  exact smul_right_injective _ h2Ine hcancel
+
+-- Conjugation of Ŝ¹ at θ = π/2: `spinSRot1 N (π/2) * Ŝ¹ * spinSRot1 N (-π/2) = Ŝ¹` (since Ŝ¹ commutes
+-- with spinSRot1).
+theorem spinSRot1_pi_half_conj_spinSOp1 (N : ℕ) :
+    spinSRot1 N (Real.pi / 2) * spinSOp1 N * spinSRot1 N (-(Real.pi / 2)) = spinSOp1 N := by
+  have hcomm := spinSRot1_commute_spinSOp1 N (Real.pi / 2)
+  rw [show spinSRot1 N (Real.pi / 2) * spinSOp1 N = spinSOp1 N * spinSRot1 N (Real.pi / 2) from
+        hcomm,
+      Matrix.mul_assoc, spinSRot1_mul_neg, Matrix.mul_one]
+
+/-- **General spin-S axis-swap unitary** — the `π/2` rotation about spin-axis 1.
+This is the central object of the Tasaki §2.5 Theorem 2.4 obligation (1) general spin-S
+gauge transformation: it fixes Ŝ¹, sends Ŝ² ↦ Ŝ³, and Ŝ³ ↦ −Ŝ². At N = 1 this specialises
+to `axisSwapUnitarySpinHalf`. -/
+noncomputable def axisSwapUnitarySSpinS (N : ℕ) : AxisSwapUnitaryS N where
+  U := spinSRot1 N (Real.pi / 2)
+  Uinv := spinSRot1 N (-(Real.pi / 2))
+  U_mul_Uinv := spinSRot1_mul_neg N (Real.pi / 2)
+  Uinv_mul_U := spinSRot1_neg_mul N (Real.pi / 2)
+  conj_spinSOp1 := spinSRot1_pi_half_conj_spinSOp1 N
+  conj_spinSOp2 := spinSRot1_pi_half_conj_spinSOp2 N
+  conj_spinSOp3 := spinSRot1_pi_half_conj_spinSOp3 N
+
+variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+
+/-- **Tasaki §2.5 Theorem 2.4 obligation (1) general spin-S, TRULY UNCONDITIONAL closure.**
+For every `N ≥ 1`, the bare anisotropic Hamiltonian on a general bipartite lattice has eigenspace
+`finrank ℂ ≤ 2` at `min(ν_0, ν_1)`, unconditional on any `AxisSwapUnitaryS N` hypothesis — supplied
+by the `axisSwapUnitarySSpinS N` instance above. -/
+theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_unconditional_general
+    {N : ℕ} (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
+    {lam : ℂ} (hlam : lam.im = 0) (hlb : -1 < lam.re) (hub : lam.re < 1)
+    {D : ℂ} (hDim : D.im = 0) (hDpos : 0 < D.re)
+    {c : ℝ}
+    (hc_strict : ∀ σ : Λ → Fin (N + 1),
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ σ < c)
+    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
+    (hN : 1 ≤ N)
+    [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)] :
+    Module.finrank ℂ (Module.End.eigenspace (Matrix.toLin'
+      (anisotropicHeisenbergS (Λ := Λ) J lam D N))
+      ((min
+          (hermitianMinEigenvalue
+            (axisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
+              (Λ := Λ) (N := N) hJim hlam hDim 0))
+          (hermitianMinEigenvalue
+            (axisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
+              (Λ := Λ) (N := N) hJim hlam hDim 1)) : ℝ) : ℂ)) ≤ 2 :=
+  anisotropicHeisenbergS_eigenspace_finrank_le_two_truly_unconditional
+    (axisSwapUnitarySSpinS N) A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos
+    hc_strict hA_ne hB_ne hN
 
 end LatticeSystem.Quantum
