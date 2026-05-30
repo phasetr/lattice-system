@@ -3,6 +3,7 @@ import LatticeSystem.Quantum.SpinS.AxisSwapGaugeEquiv
 import LatticeSystem.Quantum.SpinS.Hermitian
 import LatticeSystem.Quantum.SpinS.CyclicCommutator
 import LatticeSystem.Quantum.SpinS.CyclicCommutator31
+import Mathlib.Analysis.SpecialFunctions.Exponential
 
 /-!
 # General spin-S axis-swap unitary (Tasaki §2.5 Theorem 2.4)
@@ -181,5 +182,139 @@ nonrec theorem matrix_exp_intertwine_of_pow_intertwine
     rw [smul_mul_assoc, h n, mul_smul_comm]
   rw [hfun_eq] at hA'
   exact hA'.unique hB'
+
+/-- **Auxiliary**: `(α • A)^n * X = X * (α • B)^n` follows from `A^n * X = X * B^n` for any
+scalar `α`. -/
+theorem pow_smul_mul_of_pow_mul
+    {nIdx : Type*} [Fintype nIdx] [DecidableEq nIdx]
+    {A B X : Matrix nIdx nIdx ℂ} (α : ℂ)
+    (h : ∀ n : ℕ, A ^ n * X = X * B ^ n) (n : ℕ) :
+    (α • A) ^ n * X = X * (α • B) ^ n := by
+  rw [smul_pow, smul_pow, smul_mul_assoc, h n, mul_smul_comm]
+
+-- `spinSRot1` action on L⁺: `exp(α Ŝ¹) L⁺ = L⁺ exp(α (Ŝ¹+1))` for any scalar `α`.
+attribute [-instance] Matrix.SpecialLinearGroup.hasCoeToGeneralLinearGroup in
+set_option backward.isDefEq.respectTransparency false in
+nonrec theorem exp_smul_spinSOp1_mul_spinSLadder1Plus (N : ℕ) (α : ℂ) :
+    NormedSpace.exp (α • spinSOp1 N) * spinSLadder1Plus N =
+      spinSLadder1Plus N * NormedSpace.exp (α • (spinSOp1 N + 1)) :=
+  matrix_exp_intertwine_of_pow_intertwine
+    (pow_smul_mul_of_pow_mul α (spinSOp1_pow_mul_spinSLadder1Plus N))
+
+-- `spinSRot1` action on L⁻: `exp(α Ŝ¹) L⁻ = L⁻ exp(α (Ŝ¹-1))`.
+attribute [-instance] Matrix.SpecialLinearGroup.hasCoeToGeneralLinearGroup in
+set_option backward.isDefEq.respectTransparency false in
+nonrec theorem exp_smul_spinSOp1_mul_spinSLadder1Minus (N : ℕ) (α : ℂ) :
+    NormedSpace.exp (α • spinSOp1 N) * spinSLadder1Minus N =
+      spinSLadder1Minus N * NormedSpace.exp (α • (spinSOp1 N - 1)) :=
+  matrix_exp_intertwine_of_pow_intertwine
+    (pow_smul_mul_of_pow_mul α (spinSOp1_pow_mul_spinSLadder1Minus N))
+
+-- Auxiliary: scalar-matrix exponential `exp(c • 1) = Complex.exp c • 1`.
+attribute [-instance] Matrix.SpecialLinearGroup.hasCoeToGeneralLinearGroup in
+set_option backward.isDefEq.respectTransparency false in
+nonrec theorem exp_smul_one_eq (n : ℕ) (c : ℂ) :
+    NormedSpace.exp (c • (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)) =
+      Complex.exp c • 1 := by
+  have hdiag : (c • (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)) =
+      Matrix.diagonal (fun _ => c) := by
+    ext i j; by_cases h : i = j <;> simp [h, Matrix.one_apply]
+  rw [hdiag, Matrix.exp_diagonal]
+  ext i j
+  by_cases h : i = j
+  · simp only [h, Matrix.diagonal_apply_eq, Matrix.smul_apply, Matrix.one_apply_eq,
+               smul_eq_mul, mul_one, Pi.exp_def]
+    rw [← Complex.exp_eq_exp_ℂ]
+  · simp [h, Matrix.diagonal_apply_ne _ h, Matrix.smul_apply, Matrix.one_apply_ne h]
+
+-- `exp(α • (Ŝ¹ + 1)) = Complex.exp α • exp(α • Ŝ¹)`. Combines additivity
+-- (since `α•Ŝ¹` and `α•1` commute) with the scalar-matrix exp formula.
+attribute [-instance] Matrix.SpecialLinearGroup.hasCoeToGeneralLinearGroup in
+set_option backward.isDefEq.respectTransparency false in
+nonrec theorem exp_smul_spinSOp1_succ (N : ℕ) (α : ℂ) :
+    NormedSpace.exp (α • (spinSOp1 N + 1)) =
+      Complex.exp α • NormedSpace.exp (α • spinSOp1 N) := by
+  have hcomm : Commute (α • spinSOp1 N) (α • (1 : Matrix (Fin (N+1)) (Fin (N+1)) ℂ)) :=
+    (Commute.one_right (spinSOp1 N)).smul_left α |>.smul_right α
+  rw [show α • (spinSOp1 N + 1) = α • spinSOp1 N + α • 1 from smul_add _ _ _]
+  rw [Matrix.exp_add_of_commute _ _ hcomm, exp_smul_one_eq]
+  rw [Matrix.mul_smul, Matrix.mul_one]
+
+-- `exp(α • (Ŝ¹ - 1)) = Complex.exp (-α) • exp(α • Ŝ¹)`.
+attribute [-instance] Matrix.SpecialLinearGroup.hasCoeToGeneralLinearGroup in
+set_option backward.isDefEq.respectTransparency false in
+nonrec theorem exp_smul_spinSOp1_pred (N : ℕ) (α : ℂ) :
+    NormedSpace.exp (α • (spinSOp1 N - 1)) =
+      Complex.exp (-α) • NormedSpace.exp (α • spinSOp1 N) := by
+  have hcomm : Commute (α • spinSOp1 N) ((-α) • (1 : Matrix (Fin (N+1)) (Fin (N+1)) ℂ)) :=
+    (Commute.one_right (spinSOp1 N)).smul_left α |>.smul_right (-α)
+  rw [show α • (spinSOp1 N - 1) = α • spinSOp1 N + (-α) • 1 from by
+    rw [smul_sub, neg_smul]; abel]
+  rw [Matrix.exp_add_of_commute _ _ hcomm, exp_smul_one_eq,
+      Matrix.mul_smul, Matrix.mul_one]
+
+-- Inverse pair `exp(α Ŝ¹) exp(-α Ŝ¹) = 1`.
+attribute [-instance] Matrix.SpecialLinearGroup.hasCoeToGeneralLinearGroup in
+set_option backward.isDefEq.respectTransparency false in
+nonrec theorem exp_smul_spinSOp1_mul_neg (N : ℕ) (α : ℂ) :
+    NormedSpace.exp (α • spinSOp1 N) * NormedSpace.exp ((-α) • spinSOp1 N) = 1 := by
+  have hcomm : Commute (α • spinSOp1 N) ((-α) • spinSOp1 N) :=
+    (Commute.refl (spinSOp1 N)).smul_left α |>.smul_right (-α)
+  rw [← Matrix.exp_add_of_commute _ _ hcomm,
+      show α • spinSOp1 N + (-α) • spinSOp1 N = (0 : Matrix _ _ ℂ) by
+        rw [← add_smul, add_neg_cancel, zero_smul]]
+  exact NormedSpace.exp_zero
+
+-- Conjugation L⁺: `exp(α Ŝ¹) L⁺ exp(-α Ŝ¹) = Complex.exp α • L⁺`.
+attribute [-instance] Matrix.SpecialLinearGroup.hasCoeToGeneralLinearGroup in
+set_option backward.isDefEq.respectTransparency false in
+nonrec theorem exp_smul_spinSOp1_conj_spinSLadder1Plus (N : ℕ) (α : ℂ) :
+    NormedSpace.exp (α • spinSOp1 N) * spinSLadder1Plus N *
+      NormedSpace.exp ((-α) • spinSOp1 N) =
+    Complex.exp α • spinSLadder1Plus N := by
+  calc NormedSpace.exp (α • spinSOp1 N) * spinSLadder1Plus N *
+          NormedSpace.exp ((-α) • spinSOp1 N)
+      = spinSLadder1Plus N * NormedSpace.exp (α • (spinSOp1 N + 1)) *
+          NormedSpace.exp ((-α) • spinSOp1 N) := by
+        rw [exp_smul_spinSOp1_mul_spinSLadder1Plus]
+    _ = spinSLadder1Plus N * (Complex.exp α • NormedSpace.exp (α • spinSOp1 N)) *
+          NormedSpace.exp ((-α) • spinSOp1 N) := by
+        rw [exp_smul_spinSOp1_succ]
+    _ = Complex.exp α • (spinSLadder1Plus N * NormedSpace.exp (α • spinSOp1 N) *
+          NormedSpace.exp ((-α) • spinSOp1 N)) := by
+        rw [Matrix.mul_smul, Matrix.smul_mul]
+    _ = Complex.exp α • (spinSLadder1Plus N *
+          (NormedSpace.exp (α • spinSOp1 N) * NormedSpace.exp ((-α) • spinSOp1 N))) := by
+        rw [Matrix.mul_assoc]
+    _ = Complex.exp α • (spinSLadder1Plus N * 1) := by
+        rw [exp_smul_spinSOp1_mul_neg]
+    _ = Complex.exp α • spinSLadder1Plus N := by
+        rw [Matrix.mul_one]
+
+-- Conjugation L⁻: `exp(α Ŝ¹) L⁻ exp(-α Ŝ¹) = Complex.exp (-α) • L⁻`.
+attribute [-instance] Matrix.SpecialLinearGroup.hasCoeToGeneralLinearGroup in
+set_option backward.isDefEq.respectTransparency false in
+nonrec theorem exp_smul_spinSOp1_conj_spinSLadder1Minus (N : ℕ) (α : ℂ) :
+    NormedSpace.exp (α • spinSOp1 N) * spinSLadder1Minus N *
+      NormedSpace.exp ((-α) • spinSOp1 N) =
+    Complex.exp (-α) • spinSLadder1Minus N := by
+  calc NormedSpace.exp (α • spinSOp1 N) * spinSLadder1Minus N *
+          NormedSpace.exp ((-α) • spinSOp1 N)
+      = spinSLadder1Minus N * NormedSpace.exp (α • (spinSOp1 N - 1)) *
+          NormedSpace.exp ((-α) • spinSOp1 N) := by
+        rw [exp_smul_spinSOp1_mul_spinSLadder1Minus]
+    _ = spinSLadder1Minus N * (Complex.exp (-α) • NormedSpace.exp (α • spinSOp1 N)) *
+          NormedSpace.exp ((-α) • spinSOp1 N) := by
+        rw [exp_smul_spinSOp1_pred]
+    _ = Complex.exp (-α) • (spinSLadder1Minus N * NormedSpace.exp (α • spinSOp1 N) *
+          NormedSpace.exp ((-α) • spinSOp1 N)) := by
+        rw [Matrix.mul_smul, Matrix.smul_mul]
+    _ = Complex.exp (-α) • (spinSLadder1Minus N *
+          (NormedSpace.exp (α • spinSOp1 N) * NormedSpace.exp ((-α) • spinSOp1 N))) := by
+        rw [Matrix.mul_assoc]
+    _ = Complex.exp (-α) • (spinSLadder1Minus N * 1) := by
+        rw [exp_smul_spinSOp1_mul_neg]
+    _ = Complex.exp (-α) • spinSLadder1Minus N := by
+        rw [Matrix.mul_one]
 
 end LatticeSystem.Quantum
