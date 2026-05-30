@@ -77,7 +77,7 @@ example {N : ℕ} [Fintype V] [DecidableEq V] {A : V → Bool}
     ∃ σ'' : V → Fin (N + 1),
       RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ σ'' ∧
         configDistS σ'' σ' + 2 = configDistS σ σ' :=
-  exists_raiseLowerReachableS_bipartite_of_over_under_structural
+  exists_raiseLowerReachableS_bipartite_of_over_under
     hxy hover hunder hOppExists hN
 
 /-- Bipartite reachability for equal-magnetization configurations

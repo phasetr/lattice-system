@@ -190,7 +190,7 @@ Marshall-sign-conjugated vector
 is an eigenvector of the (un-dressed) Heisenberg sector matrix with the
 same eigenvalue `μ`.
 
-Combined with `exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector`
+Combined with `exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector_legacy`
 (γ-3 dressed-form, #850) this gives the Heisenberg-form ground state
 on the magnetization sector with the Marshall sign structure. -/
 theorem heisenbergHamiltonianSReMatrixOnMagSector_mulVec_of_dressed_eigenvec
@@ -252,7 +252,7 @@ with eigenvalue `μ < c` and the Marshall sign structure
 `w τ = (marshallSignS A τ.1).re * (positive function of τ)`.
 
 Composition of:
-- `exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector`
+- `exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector_legacy`
   (#850, γ-3 dressed-form): ∃ μ < c, ∃ v > 0, dressed_sec.mulVec v = μ • v.
 - `heisenbergHamiltonianSReMatrixOnMagSector_mulVec_of_dressed_eigenvec`
   (Marshall-conjugation, this PR).
@@ -279,7 +279,7 @@ theorem exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSecto
         (fun σ => (marshallSignS A σ.1).re * v σ) =
         μ • (fun σ => (marshallSignS A σ.1).re * v σ) := by
   obtain ⟨μ, v, hμ, hv_pos, hmul⟩ :=
-    exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector
+    exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector_legacy
       (M := M) A N c
       hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
   exact ⟨μ, v, hμ, hv_pos,

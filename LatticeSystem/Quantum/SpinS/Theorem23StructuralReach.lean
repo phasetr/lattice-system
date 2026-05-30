@@ -36,7 +36,7 @@ theorem raiseLowerReachableSMagSector_bipartiteCompleteGraph_structural
   exact raiseLowerReachableSMagSector_of_raiseLowerReachableS σ.2 σ'.2 hreach
 
 /-- **Structural matrix-power positivity (no `h_intermediate`)**. -/
-theorem exists_matrixPow_pos_of_magConfigS_bipartite_structural
+theorem exists_matrixPow_pos_of_magConfigS_bipartite
     (A : V → Bool)
     {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -59,7 +59,7 @@ theorem exists_matrixPow_pos_of_magConfigS_bipartite_structural
       hA_ne hB_ne hN σ σ'
 
 /-- **Structural strict-positive-length matrix-power positivity**. -/
-theorem exists_matrixPow_pos_length_of_magConfigS_bipartite_structural
+theorem exists_matrixPow_pos_length_of_magConfigS_bipartite
     (A : V → Bool)
     {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -72,7 +72,7 @@ theorem exists_matrixPow_pos_length_of_magConfigS_bipartite_structural
     {σ σ' : magConfigS V N M} (hne : σ ≠ σ') :
     ∃ k : ℕ, 1 ≤ k ∧
       0 < (shiftedDressedSReMatrixOnMagSector A J N c M ^ k) σ' σ := by
-  obtain ⟨k, hpos⟩ := exists_matrixPow_pos_of_magConfigS_bipartite_structural A c
+  obtain ⟨k, hpos⟩ := exists_matrixPow_pos_of_magConfigS_bipartite A c
     hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc hA_ne hB_ne hN σ σ'
   refine ⟨k, ?_, hpos⟩
   rcases Nat.eq_zero_or_pos k with hk0 | hkpos
@@ -104,7 +104,7 @@ theorem isIrreducible_shiftedDressedSReMatrixOnMagSector_structural
       shiftedDressedSReMatrix_apply_diag]
     linarith [hc_strict σ.1]
   · obtain ⟨k, hk_pos, hpos⟩ :=
-      exists_matrixPow_pos_length_of_magConfigS_bipartite_structural A c hJ_real hJ_pos
+      exists_matrixPow_pos_length_of_magConfigS_bipartite A c hJ_real hJ_pos
         hJ_nn hJ_sym hJ_bipartite (fun σ => le_of_lt (hc_strict σ))
         hA_ne hB_ne hN (Ne.symm hne)
     exact ⟨k, hk_pos, hpos⟩

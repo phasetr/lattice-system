@@ -19,7 +19,7 @@ open LatticeSystem.Math.PerronFrobeniusMain
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural shifted-dressed sector PF positive eigenvector (no `h_intermediate`)**. -/
-theorem exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector_structural
+theorem exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector
     (A : V → Bool) {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -39,7 +39,7 @@ theorem exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector_structura
   exact LatticeSystem.Math.PerronFrobeniusMain.exists_positive_eigenvector_of_irreducible hIrred
 
 /-- **Structural dressed Heisenberg sector PF positive eigenvector (no `h_intermediate`)**. -/
-theorem exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector_structural
+theorem exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector
     (A : V → Bool) {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -53,7 +53,7 @@ theorem exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector_struct
       μ < c ∧ (∀ σ, 0 < v σ) ∧
       (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v = μ • v := by
   obtain ⟨r, v, hr_pos, hv_pos, hmul⟩ :=
-    exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector_structural
+    exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector
       (N := N) (M := M) A c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN
   refine ⟨c - r, v, by linarith, hv_pos, ?_⟩
   exact dressedHeisenbergSReMatrixOnMagSector_mulVec_of_shifted_eigenvec A J N c hmul
@@ -75,7 +75,7 @@ theorem exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSecto
         (fun σ => (marshallSignS A σ.1).re * v σ) =
         μ • (fun σ => (marshallSignS A σ.1).re * v σ) := by
   obtain ⟨μ, v, hμ, hv_pos, hmul⟩ :=
-    exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector_structural
+    exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector
       (N := N) (M := M) A c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN
   exact ⟨μ, v, hμ, hv_pos,
     heisenbergHamiltonianSReMatrixOnMagSector_mulVec_of_dressed_eigenvec

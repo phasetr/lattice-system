@@ -109,7 +109,7 @@ input on the subtype). Composition of:
 - Sector matrix-pow lift from reachability (#843).
 - Sector matrix non-negativity (#834).
 - Sector matrix step positivity (#842). -/
-theorem exists_matrixPow_pos_of_magConfigS_bipartite
+theorem exists_matrixPow_pos_of_magConfigS_bipartite_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -135,7 +135,7 @@ theorem exists_matrixPow_pos_of_magConfigS_bipartite
 /-- **Strict positive-length matrix-power positivity** on the sector
 for distinct configurations: for σ ≠ σ' in the same sector, the
 matrix-power is positive at some k ≥ 1 (excluding the trivial k = 0). -/
-theorem exists_matrixPow_pos_length_of_magConfigS_bipartite
+theorem exists_matrixPow_pos_length_of_magConfigS_bipartite_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -149,7 +149,7 @@ theorem exists_matrixPow_pos_length_of_magConfigS_bipartite
     {σ σ' : magConfigS V N M} (hne : σ ≠ σ') :
     ∃ k : ℕ, 1 ≤ k ∧
       0 < (shiftedDressedSReMatrixOnMagSector A J N c M ^ k) σ' σ := by
-  obtain ⟨k, hpos⟩ := exists_matrixPow_pos_of_magConfigS_bipartite A N c
+  obtain ⟨k, hpos⟩ := exists_matrixPow_pos_of_magConfigS_bipartite_legacy A N c
     hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc h_intermediate σ σ'
   refine ⟨k, ?_, hpos⟩
   rcases Nat.eq_zero_or_pos k with hk0 | hkpos
@@ -195,7 +195,7 @@ theorem isIrreducible_shiftedDressedSReMatrixOnMagSector
     linarith [hc_strict σ.1]
   · -- Off-diagonal: use #845.
     obtain ⟨k, hk_pos, hpos⟩ :=
-      exists_matrixPow_pos_length_of_magConfigS_bipartite A N c hJ_real hJ_pos
+      exists_matrixPow_pos_length_of_magConfigS_bipartite_legacy A N c hJ_real hJ_pos
         hJ_nn hJ_sym hJ_bipartite (fun σ => le_of_lt (hc_strict σ))
         h_intermediate (Ne.symm hne)
     exact ⟨k, hk_pos, hpos⟩
@@ -211,7 +211,7 @@ and a strictly positive eigenvector `v > 0` (componentwise) with
 Direct corollary of `Matrix.IsIrreducible` (#846) +
 `exists_positive_eigenvector_of_irreducible` from the project's
 Perron–Frobenius infrastructure. -/
-theorem exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector
+theorem exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -344,7 +344,7 @@ eigenvalue `c - r < c` (where `r > 0` is the Perron eigenvalue of
 the shifted matrix).
 
 Combines #847 (existence) with #849 (eigenvalue conversion). -/
-theorem exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector
+theorem exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -360,7 +360,7 @@ theorem exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector
       μ < c ∧ (∀ σ, 0 < v σ) ∧
       (dressedHeisenbergSReMatrixOnMagSector A J N M).mulVec v = μ • v := by
   obtain ⟨r, v, hr_pos, hv_pos, hmul⟩ :=
-    exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector
+    exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector_legacy
       (M := M) A N c
       hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
   refine ⟨c - r, v, by linarith, hv_pos, ?_⟩
