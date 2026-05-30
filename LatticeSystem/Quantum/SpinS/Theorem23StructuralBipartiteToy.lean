@@ -124,7 +124,7 @@ theorem tasaki_2_5_theorem_2_3_bipartiteToy
       exact ⟨vM, hvM_pos, hReEig⟩
     · intro M _hM_non μM φ hφ_ne hφ
       haveI : Nonempty (magConfigS V N M) := nonempty_magConfigS_of_fn_ne_zero_structural hφ_ne
-      exact tasaki23_toy_sector_energy_ge_predicted_structural (N := N) A c horient hc_strict
+      exact tasaki23_toy_sector_energy_ge_predicted (N := N) A c horient hc_strict
         hA_ne hB_ne hN hφ_ne hφ
 
 end LatticeSystem.Quantum

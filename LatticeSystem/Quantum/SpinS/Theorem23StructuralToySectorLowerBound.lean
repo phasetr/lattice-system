@@ -8,9 +8,9 @@ import LatticeSystem.Quantum.SpinS.BipartiteToyMinEnergy
 /-!
 # Structural toy sector energy lower bound (no `h_intermediate`)
 
-(Thm23-#3887.17): structural variant of `tasaki23_toy_sector_energy_ge_predicted`
+(Thm23-#3887.17): structural variant of `tasaki23_toy_sector_energy_ge_predicted_legacy`
 using `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector`
-(Thm23-#3887.9) and `tasaki23_toy_groundState_joint_casimir_eigenvector_structural`
+(Thm23-#3887.9) and `tasaki23_toy_groundState_joint_casimir_eigenvector`
 (Thm23-#3887.5).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
@@ -22,7 +22,7 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural toy sector energy lower bound (every sector, no `h_intermediate`)**. -/
-theorem tasaki23_toy_sector_energy_ge_predicted_structural
+theorem tasaki23_toy_sector_energy_ge_predicted
     (A : V → Bool) (c : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
@@ -58,7 +58,7 @@ theorem tasaki23_toy_sector_energy_ge_predicted_structural
   have hH := heisenbergHamiltonianS_mulVec_magSectorEmbedding (bipartiteCoupling A)
     (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) hComplex
   obtain ⟨⟨γ_tot, htot⟩, ⟨γ_A, hA⟩, ⟨γ_B, hB⟩⟩ :=
-    tasaki23_toy_groundState_joint_casimir_eigenvector_structural A c hc_strict
+    tasaki23_toy_groundState_joint_casimir_eigenvector A c hc_strict
       hA_ne hB_ne hN hv_pos hH
   have hEnergy := heisenbergToyHamiltonianS_mulVec_of_joint_casimir_eigenvector A htot hA hB
   have hμGS_eq : γ_tot - γ_A - γ_B = (μGS : ℂ) :=

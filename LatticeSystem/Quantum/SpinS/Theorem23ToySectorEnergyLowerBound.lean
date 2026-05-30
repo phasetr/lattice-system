@@ -32,7 +32,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 `J = bipartiteCoupling A` (with `|¬A| ≤ |A|`), in *any* magnetisation sector `M` the
 predicted minimum energy `(bipartiteToyMinEnergyPredicted A N).re` is below every
 eigenvalue `μM` of the dressed sector matrix. -/
-theorem tasaki23_toy_sector_energy_ge_predicted
+theorem tasaki23_toy_sector_energy_ge_predicted_legacy
     (A : V → Bool) (N : ℕ) (c : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
@@ -72,7 +72,7 @@ theorem tasaki23_toy_sector_energy_ge_predicted
   have hH := heisenbergHamiltonianS_mulVec_magSectorEmbedding (bipartiteCoupling A)
     (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) hComplex
   obtain ⟨⟨γ_tot, htot⟩, ⟨γ_A, hA⟩, ⟨γ_B, hB⟩⟩ :=
-    tasaki23_toy_groundState_joint_casimir_eigenvector A N c hc_strict h_intermediate hv_pos hH
+    tasaki23_toy_groundState_joint_casimir_eigenvector_legacy A N c hc_strict h_intermediate hv_pos hH
   -- The ground-state energy equals the Casimir combination `(γ_tot − γ_A − γ_B).re`.
   have hEnergy := heisenbergToyHamiltonianS_mulVec_of_joint_casimir_eigenvector A htot hA hB
   have hμGS_eq : γ_tot - γ_A - γ_B = (μGS : ℂ) :=

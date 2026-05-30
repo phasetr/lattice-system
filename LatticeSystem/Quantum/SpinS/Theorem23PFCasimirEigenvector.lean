@@ -39,7 +39,7 @@ eigenvalue `r` (with strictly positive Perron eigenvector `v`) is a scalar
 multiple of `v`.  Specialisation of
 `PerronFrobenius.eigenvec_proportional_of_pos_eigenvec` to the irreducible
 shifted dressed sector matrix. -/
-theorem tasaki23_shiftedDressed_sector_eigenvec_proportional
+theorem tasaki23_shiftedDressed_sector_eigenvec_proportional_legacy
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -68,7 +68,7 @@ same sector matrix at the same `μ` is a scalar multiple of `φ`.
 Marshall-conjugates `φ` and `w` to eigenvectors of the shifted dressed sector
 matrix (where `marshallSignS · φ > 0` is the strictly positive Perron
 eigenvector), applies the geometric simplicity
-`tasaki23_shiftedDressed_sector_eigenvec_proportional`, and conjugates back. -/
+`tasaki23_shiftedDressed_sector_eigenvec_proportional_legacy`, and conjugates back. -/
 theorem tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_legacy
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -92,7 +92,7 @@ theorem tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_legacy
     shiftedDressedSReMatrixOnMagSector_mulVec_of_dressed_eigenvec A J N c
       (dressedHeisenbergSReMatrixOnMagSector_mulVec_of_heis_eigenvec A N hJ_real hw)
   obtain ⟨s, hs⟩ :=
-    tasaki23_shiftedDressed_sector_eigenvec_proportional A N c hJ_real hJ_pos
+    tasaki23_shiftedDressed_sector_eigenvec_proportional_legacy A N c hJ_real hJ_pos
       hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate hφs hφ_pos hws
   refine ⟨s, ?_⟩
   funext σ

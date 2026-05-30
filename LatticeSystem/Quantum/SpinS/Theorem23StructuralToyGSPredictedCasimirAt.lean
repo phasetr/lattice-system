@@ -10,9 +10,9 @@ set_option linter.unusedVariables false
 # Structural toy ground state has predicted total Casimir (no `h_intermediate`)
 
 (Thm23-#3887.10): structural variant of
-`tasaki23_toy_groundState_casimir_eq_predicted_at` using
+`tasaki23_toy_groundState_casimir_eq_predicted_at_legacy` using
 - `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector` (Thm23-#3887.9)
-- `tasaki23_toy_groundState_joint_casimir_eigenvector_structural` (Thm23-#3887.5)
+- `tasaki23_toy_groundState_joint_casimir_eigenvector` (Thm23-#3887.5)
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.3, p. 42.
@@ -23,7 +23,7 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural toy GS has predicted total Casimir at admissible sector (no `h_intermediate`)**. -/
-theorem tasaki23_toy_groundState_casimir_eq_predicted_at_structural
+theorem tasaki23_toy_groundState_casimir_eq_predicted_at
     (A : V → Bool) (c : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
@@ -69,7 +69,7 @@ theorem tasaki23_toy_groundState_casimir_eq_predicted_at_structural
   have hH := heisenbergHamiltonianS_mulVec_magSectorEmbedding (bipartiteCoupling A)
     (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) hComplex
   obtain ⟨⟨γ_tot, htot⟩, ⟨γ_A, hA⟩, ⟨γ_B, hB⟩⟩ :=
-    tasaki23_toy_groundState_joint_casimir_eigenvector_structural A c hc_strict
+    tasaki23_toy_groundState_joint_casimir_eigenvector A c hc_strict
       hA_ne hB_ne hN hv_pos hH
   set w : (V → Fin (N + 1)) → ℂ :=
     magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) with hw

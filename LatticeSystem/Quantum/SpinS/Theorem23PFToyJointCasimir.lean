@@ -38,7 +38,7 @@ The proof is the same one-dimensionality argument: `B Φ` is a Heisenberg
 eigenvector at the same `μ` (commutation with `Ĥ`) supported in the same
 magnetization sector (commutation with `Ŝ_tot^(3)`), so its real/imaginary parts
 are scalar multiples of the Marshall-positive ground state, giving `B Φ = γ Φ`. -/
-theorem tasaki23_pf_groundState_commuting_eigenvector
+theorem tasaki23_pf_groundState_commuting_eigenvector_legacy
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -160,7 +160,7 @@ eigenvector.  All three Casimirs commute with `Ĥ_toy` (it is their linear
 combination) and with `Ŝ_tot^(3)`, so the one-dimensionality of the ground
 eigenspace makes the ground state an eigenvector of each.  Pinning the three
 eigenvalues to the predicted values is the remaining variational obligation. -/
-theorem tasaki23_toy_groundState_joint_casimir_eigenvector
+theorem tasaki23_toy_groundState_joint_casimir_eigenvector_legacy
     (A : V → Bool) (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hc_strict : ∀ σ,
@@ -195,15 +195,15 @@ theorem tasaki23_toy_groundState_joint_casimir_eigenvector
   have hJ_bipartite : ∀ x y, A x = A y → bipartiteCoupling A x y = 0 :=
     fun _ _ h => bipartiteCoupling_eq_zero_of_same_sublattice A h
   refine ⟨?_, ?_, ?_⟩
-  · exact tasaki23_pf_groundState_commuting_eigenvector A N c hJ_real hJ_pos hJ_nn
+  · exact tasaki23_pf_groundState_commuting_eigenvector_legacy A N c hJ_real hJ_pos hJ_nn
       hJ_sym hJ_bipartite hc_strict h_intermediate (totalSpinSSquared V N)
       (heisenbergToyHamiltonianS_commute_totalSpinSSquared (N := N) (A := A))
       (totalSpinSSquared_commute_totalSpinSOp3 (Λ := V) (N := N)).symm hv_pos hH
-  · exact tasaki23_pf_groundState_commuting_eigenvector A N c hJ_real hJ_pos hJ_nn
+  · exact tasaki23_pf_groundState_commuting_eigenvector_legacy A N c hJ_real hJ_pos hJ_nn
       hJ_sym hJ_bipartite hc_strict h_intermediate (sublatticeSpinSquaredS N A)
       (heisenbergToyHamiltonianS_commute_sublatticeSpinSquaredS (N := N) (A := A))
       (sublatticeSpinSquaredS_commute_totalSpinSOp3 (Λ := V) (N := N) A).symm hv_pos hH
-  · exact tasaki23_pf_groundState_commuting_eigenvector A N c hJ_real hJ_pos hJ_nn
+  · exact tasaki23_pf_groundState_commuting_eigenvector_legacy A N c hJ_real hJ_pos hJ_nn
       hJ_sym hJ_bipartite hc_strict h_intermediate (sublatticeSpinSquaredS N (fun x => ! A x))
       (heisenbergToyHamiltonianS_commute_sublatticeSpinSquaredS_complement (N := N) (A := A))
       (sublatticeSpinSquaredS_commute_totalSpinSOp3 (Λ := V) (N := N) (fun x => ! A x)).symm

@@ -4,7 +4,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralReach
 /-!
 # Structural Theorem 2.3 eigenvector proportionality (no `h_intermediate`)
 
-Extension of #3887 fix to `tasaki23_shiftedDressed_sector_eigenvec_proportional` /
+Extension of #3887 fix to `tasaki23_shiftedDressed_sector_eigenvec_proportional_legacy` /
 `tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_legacy` via
 `isIrreducible_shiftedDressedSReMatrixOnMagSector`.
 
@@ -19,7 +19,7 @@ open LatticeSystem.Math.PerronFrobenius
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural shifted-dressed sector eigenvector proportionality (no `h_intermediate`)**. -/
-theorem tasaki23_shiftedDressed_sector_eigenvec_proportional_structural
+theorem tasaki23_shiftedDressed_sector_eigenvec_proportional
     (A : V → Bool) {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -62,7 +62,7 @@ theorem tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive
     shiftedDressedSReMatrixOnMagSector_mulVec_of_dressed_eigenvec A J N c
       (dressedHeisenbergSReMatrixOnMagSector_mulVec_of_heis_eigenvec A N hJ_real hw)
   obtain ⟨s, hs⟩ :=
-    tasaki23_shiftedDressed_sector_eigenvec_proportional_structural A c hJ_real hJ_pos
+    tasaki23_shiftedDressed_sector_eigenvec_proportional A c hJ_real hJ_pos
       hJ_nn hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN hφs hφ_pos hws
   refine ⟨s, ?_⟩
   funext σ
