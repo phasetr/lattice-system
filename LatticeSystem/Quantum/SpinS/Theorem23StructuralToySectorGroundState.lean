@@ -7,8 +7,9 @@ import LatticeSystem.Quantum.SpinS.BipartiteToyMinEnergy
 /-!
 # Structural toy sector ground state at predicted energy (no `h_intermediate`)
 
-(Thm23-#3887.19): structural variant of `toy_sector_groundState_at_predicted`
-(in Theorem23ToyFinal.lean) using
+(Thm23-#3887.19): structural variant of the per-sector toy ground-state
+at predicted-energy package (the original `toy_sector_groundState_at_predicted`
+witness was removed together with `Theorem23ToyFinal.lean` in PR #3917). Uses
 - `tasaki_2_5_theorem_2_3_sector_existence_structural` (Thm23-#3887.16)
 - `tasaki23_toy_sector_energy_ge_predicted_structural` (Thm23-#3887.17)
 - `tasaki23_toy_sector_groundEnergy_le_of_witness` (already h_intermediate-free)
