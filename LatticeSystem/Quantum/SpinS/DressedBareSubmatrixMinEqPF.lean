@@ -35,7 +35,7 @@ Combining (j.1) positive PF eigenvector existence + (j.13.h.1) generic shift
 identification + matrix-identity bridge between real-lifted and complex submatrix,
 the dressed submatrix's `hermitianMinEigenvalue` equals the un-shifted PF value
 `ν = c - μ_PF`. -/
-theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf
+theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_legacy
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -155,7 +155,7 @@ theorem axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf
         (axisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
           (Λ := Λ) (N := N) hJim hlam hDim p) := by
   obtain ⟨ν, v, hv_pos, hAv, hν_eq⟩ :=
-    dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf
+    dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_legacy
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict hA_ne hB_ne
       h_intermediate p
   refine ⟨ν, v, hv_pos, hAv, ?_⟩
