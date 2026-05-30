@@ -11,7 +11,7 @@ set_option linter.unusedVariables false
 
 (Thm23-#3887.15): structural variant of
 `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` bundling
-- existence (Thm23-#3887.13 `exists_marshallSign_eigenvector_heisenbergHamiltonianS_full_structural`)
+- existence (Thm23-#3887.13 `exists_marshallSign_eigenvector_heisenbergHamiltonianS_full`)
 - support (zero outside sector — direct from `magSectorEmbedding_apply_of_not_mem`)
 - uniqueness (Thm23-#3887.14
   `marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector_structural`)
@@ -54,7 +54,7 @@ theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full_structu
           ∀ τ : magConfigS V N M,
             (Ψ' τ.1).re = r * ((marshallSignS A τ.1).re * v τ)) := by
   obtain ⟨μ, v, hμ, hv_pos, hmul⟩ :=
-    exists_marshallSign_eigenvector_heisenbergHamiltonianS_full_structural
+    exists_marshallSign_eigenvector_heisenbergHamiltonianS_full
       (N := N) (M := M) A c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
       hA_ne hB_ne hN
   refine ⟨μ, v, hμ, hv_pos, hmul, ?_, ?_⟩

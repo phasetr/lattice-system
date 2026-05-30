@@ -13,7 +13,7 @@ Assembly (for `|¬A| ≤ |A|`, so the extremal sector is `M = min(|A|,|¬A|)·N 
 
 * The Perron–Frobenius ground state of the bipartite toy Hamiltonian on the sector
   `M` exists and is Marshall positive
-  (`exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector`),
+  (`exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy`),
   giving `v > 0` with `Ĥ_re (sign·v) = μ (sign·v)`.
 * The predicted-energy sector eigenvector `φ` (#3710) sits at
   `E = predicted − s_A(s_A+1) − s_B(s_B+1)`; by Marshall positivity of the PF ground
@@ -66,7 +66,7 @@ theorem tasaki23_toy_groundState_casimir_eq_predicted
       (Finset.univ.filter (fun x : V => (! A x) = true)).card * N with hM
   -- The Perron–Frobenius ground state of the bipartite toy Hamiltonian on sector M.
   obtain ⟨μ, v, _hμ_lt_c, hv_pos, hReEig⟩ :=
-    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
+    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy
       (M := M) A N c (bipartiteCoupling_im A)
       (fun x y hadj => by
         rw [bipartiteCompleteGraphOf_adj_iff] at hadj

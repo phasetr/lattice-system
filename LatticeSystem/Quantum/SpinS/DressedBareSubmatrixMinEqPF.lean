@@ -61,7 +61,7 @@ theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalu
           (Λ := Λ) (N := N) A hJim hlam hDim p) := by
   -- (j.1): extract positive PF eigenvector v at ν of dressed.submatrix.
   obtain ⟨ν, v, hv_pos, hAv⟩ :=
-    dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists
+    dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists_legacy
       (N := N) A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos
       hc_strict hA_ne hB_ne h_intermediate p
   refine ⟨ν, v, hv_pos, hAv, ?_⟩
@@ -130,7 +130,7 @@ theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalu
 /-- **(j.13.h.2-bare) Bare submatrix hermitianMinEigenvalue identification**.
 
 Transfer (j.13.h.2-dressed) via Marshall similarity (j.8) #3865. -/
-theorem axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf
+theorem axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_legacy
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)

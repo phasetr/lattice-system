@@ -261,7 +261,7 @@ The eigenvector `w τ := sign A τ.1 .re * v τ` has `|w τ| = v τ > 0`,
 so `w` is everywhere non-zero. The sign of `w` matches the Marshall sign
 structure. This is the ground-state half of Tasaki §2.5 Theorem 2.2 in
 the magnetization sector. -/
-theorem exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
+theorem exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -481,7 +481,7 @@ Marshall-positive eigenvector at the SAME eigenvalue `μ` is a positive
 scalar multiple of it.
 
 Bundles the existence theorem
-(`exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector`,
+(`exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy`,
 PR #853) with the same-eigenvalue uniqueness theorem
 (`marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector`,
 PR #854) into the form most directly usable downstream. -/
@@ -509,7 +509,7 @@ theorem marshallLiebMattis_spinS_heisenbergSector_groundState
         ∃ r : ℝ, 0 < r ∧
           w = r • (fun σ => (marshallSignS A σ.1).re * v σ)) := by
   obtain ⟨μ, v, hμ_lt, hv_pos, hmul⟩ :=
-    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
+    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy
       (M := M) A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
       h_intermediate
   refine ⟨μ, v, hμ_lt, hv_pos, hmul, ?_⟩

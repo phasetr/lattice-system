@@ -6,7 +6,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralCommonEnergyStep
 
 (PR #3893): structural variant of `tasaki23_common_groundEnergy` (TIER 4 constancy)
 using
-- `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_structural`
+- `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector`
   (Thm23-#3887.9 from PR #3891)
 - `tasaki23_common_energy_step_structural` (Step 2 of this PR)
 
@@ -51,7 +51,7 @@ theorem tasaki23_common_groundEnergy_structural
     magConfigS_nonempty_of_le_card_mul
       (le_trans (Nat.mul_le_mul_right N (min_le_max)) hmax_le)
   obtain ⟨μ, v₀, _hμ_lt, hv₀_pos, hReEig₀⟩ :=
-    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_structural
+    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
       (N := N) (M := min cardA cardB * N) A c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
       hA_ne hB_ne hN
   refine ⟨μ, ?_⟩

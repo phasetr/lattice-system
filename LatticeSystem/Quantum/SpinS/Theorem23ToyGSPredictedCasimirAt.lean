@@ -49,7 +49,7 @@ theorem tasaki23_toy_groundState_casimir_eq_predicted_at
   classical
   -- The Perron–Frobenius ground state of the bipartite toy Hamiltonian on sector M.
   obtain ⟨μ, v, _hμ_lt_c, hv_pos, hReEig⟩ :=
-    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
+    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy
       (M := M) A N c (bipartiteCoupling_im A)
       (fun x y hadj => by
         rw [bipartiteCompleteGraphOf_adj_iff] at hadj

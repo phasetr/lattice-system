@@ -51,7 +51,7 @@ theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_complex_eigenvector_e
           (fun σ : parityConfigS Λ N p => σ.1)) w = (ν : ℂ) • w := by
   -- (j.1): get positive real eigenvector.
   obtain ⟨ν, v, hv_pos, hvEq⟩ :=
-    dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists
+    dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists_legacy
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict
       hA_ne hB_ne h_intermediate p
   refine ⟨ν, fun i => (v i : ℂ), ?_, ?_⟩

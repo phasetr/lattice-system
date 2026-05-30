@@ -7,7 +7,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23PFConstancyCasimir
 
 (PR #3893): structural variant of `tasaki23_common_energy_step` (TIER 4 step) using
 - `tasaki23_sector_lift_and_casimir_structural` (Step 1)
-- `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_structural`
+- `exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector`
   (Thm23-#3887.9)
 - `tasaki23_pf_sector_energy_eq_of_casimir` (already h_intermediate-free)
 
@@ -57,7 +57,7 @@ theorem tasaki23_common_energy_step_structural
     hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hc_strict_toy
     hA_ne hB_ne hN hvM_pos hReEig_M
   obtain ⟨μ', vM1, _hμ'_lt, hvM1_pos, hReEig_M1⟩ :=
-    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_structural
+    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
       (N := N) (M := M + 1) A c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
       hA_ne hB_ne hN
   obtain ⟨hH_M1, hCas_M1⟩ := tasaki23_sector_lift_and_casimir_structural

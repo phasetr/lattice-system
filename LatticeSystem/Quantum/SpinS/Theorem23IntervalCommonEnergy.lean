@@ -9,7 +9,7 @@ Issue #3542 (sound Perron–Frobenius route to Tasaki §2.5 Theorem 2.3), option
 
 For a connected bipartite antiferromagnetic coupling `J` the Marshall-positive
 Perron–Frobenius ground state of the dressed sector matrix exists in every magnetisation
-sector (`exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector`).  In
+sector (`exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy`).  In
 every *admissible* sector `M ∈ tasaki23GroundStateSectors A N` that ground state carries
 the predicted total Casimir (#3731), and the adjacent-sector Casimir constancy (#3713)
 then forces equal energies between neighbouring admissible sectors.  Iterating along the
@@ -115,7 +115,7 @@ theorem tasaki23_common_energy_step
     hReEig_M
   -- Marshall-positive ground state in sector M + 1, with its full-space lift and Casimir.
   obtain ⟨μ', vM1, _hμ'_lt, hvM1_pos, hReEig_M1⟩ :=
-    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
+    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy
       (M := M + 1) A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
   obtain ⟨hH_M1, hCas_M1⟩ := tasaki23_sector_lift_and_casimir A N c c_toy horient hsB hM1_mem
     hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hc_strict_toy h_intermediate hvM1_pos
@@ -172,7 +172,7 @@ theorem tasaki23_common_groundEnergy
     magConfigS_nonempty_of_le_card_mul
       (le_trans (Nat.mul_le_mul_right N (min_le_max)) hmax_le)
   obtain ⟨μ, v₀, _hμ_lt, hv₀_pos, hReEig₀⟩ :=
-    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
+    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy
       (M := min cardA cardB * N) A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
       h_intermediate
   refine ⟨μ, ?_⟩

@@ -11,7 +11,7 @@ set_option linter.unusedVariables false
 Issue #3887 (Tasaki §2.5 Theorem 2.4, `h_intermediate` vacuous-at-N=1 fix).
 
 (#3887.5): Structural variant of (j.1)
-`dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists`
+`dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists_legacy`
 that uses `shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_structural`
 (#3887.4) instead of the h_intermediate-bearing original.
 
@@ -30,7 +30,7 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **(#3887.5) (j.1) structural variant: PF positive eigenvector for the un-shifted
 dressed-`Ĥ'` parity-block submatrix without `h_intermediate`**. -/
-theorem dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists_structural
+theorem dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)

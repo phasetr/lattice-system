@@ -590,7 +590,7 @@ some real eigenvalue `μ < c`, supported entirely on the magnetization-
 with `v > 0` componentwise on the sector.
 
 Composition of:
-- `exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector`
+- `exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector_legacy`
   (PR #860, complex sector existence).
 - `heisenbergHamiltonianS_mulVec_magSectorEmbedding`
   (this PR, sector → full lift).
@@ -598,7 +598,7 @@ Composition of:
 This is the COMPLEX-Hilbert-space form of Tasaki §2.5 Theorem 2.2 on
 the actual quantum Heisenberg Hamiltonian, lifted from the sector
 form (PRs #847–#865). -/
-theorem exists_marshallSign_eigenvector_heisenbergHamiltonianS_full
+theorem exists_marshallSign_eigenvector_heisenbergHamiltonianS_full_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -616,7 +616,7 @@ theorem exists_marshallSign_eigenvector_heisenbergHamiltonianS_full
         (magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) =
         (μ : ℂ) • magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) := by
   obtain ⟨μ, v, hμ, hv_pos, hmul⟩ :=
-    exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector
+    exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector_legacy
       (M := M) A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
       h_intermediate
   exact ⟨μ, v, hμ, hv_pos,
@@ -762,7 +762,7 @@ theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full
             (Ψ' τ.1).re = r * ((marshallSignS A τ.1).re * v τ)) := by
   -- Existence half (combining sector existence + lift).
   obtain ⟨μ, v, hμ, hv_pos, hmul⟩ :=
-    exists_marshallSign_eigenvector_heisenbergHamiltonianS_full
+    exists_marshallSign_eigenvector_heisenbergHamiltonianS_full_legacy
       (M := M) A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
       h_intermediate
   refine ⟨μ, v, hμ, hv_pos, hmul, ?_, ?_⟩
@@ -783,7 +783,7 @@ theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full
           (μ : ℂ) • (fun τ : magConfigS V N M =>
             (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) := by
       -- This is exactly what `exists_marshallSign_complexEigenvector...` gave us.
-      have := exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector
+      have := exists_marshallSign_complexEigenvector_heisenbergHamiltonianSMatrixOnMagSector_legacy
         (M := M) A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
         h_intermediate
       -- We need to show that the SAME (μ, v) witnesses also satisfy the sector
