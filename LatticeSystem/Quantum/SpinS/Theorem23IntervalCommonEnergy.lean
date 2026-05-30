@@ -33,7 +33,7 @@ Given the Marshall-positive real sector eigen-equation `hReEig` of a connected b
 antiferromagnetic coupling `J` in an admissible sector `M`, the embedded vector is a
 full-space `H`-eigenvector at the same energy and a `(Ŝ_tot)²`-eigenvector at
 `tasaki23PredictedCasimirValue A N`. -/
-theorem tasaki23_sector_lift_and_casimir
+theorem tasaki23_sector_lift_and_casimir_legacy
     (A : V → Bool) (N : ℕ) (c c_toy : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
@@ -69,7 +69,7 @@ theorem tasaki23_sector_lift_and_casimir
   have hH := heisenbergHamiltonianS_mulVec_magSectorEmbedding J
     (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) hComplex
   refine ⟨hH, ?_⟩
-  exact tasaki23_pf_groundState_casimir_eq_predicted_sector A N c c_toy horient hsB hM
+  exact tasaki23_pf_groundState_casimir_eq_predicted_sector_legacy A N c c_toy horient hsB hM
     hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hc_strict_toy h_intermediate hv_pos hH
 
 /-- **Adjacent-sector common-energy step (Casimir route).** If the Marshall-positive
@@ -110,14 +110,14 @@ theorem tasaki23_common_energy_step_legacy
   have hM1_mem : M + 1 ∈ tasaki23GroundStateSectors (V := V) A N :=
     tasaki23GroundStateSectors_succ_mem_of_mem_of_lt_right A N hM_mem hM_lt
   -- Full-space lift and predicted Casimir for sector M.
-  obtain ⟨hH_M, hCas_M⟩ := tasaki23_sector_lift_and_casimir A N c c_toy horient hsB hM_mem
+  obtain ⟨hH_M, hCas_M⟩ := tasaki23_sector_lift_and_casimir_legacy A N c c_toy horient hsB hM_mem
     hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hc_strict_toy h_intermediate hvM_pos
     hReEig_M
   -- Marshall-positive ground state in sector M + 1, with its full-space lift and Casimir.
   obtain ⟨μ', vM1, _hμ'_lt, hvM1_pos, hReEig_M1⟩ :=
     exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy
       (M := M + 1) A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
-  obtain ⟨hH_M1, hCas_M1⟩ := tasaki23_sector_lift_and_casimir A N c c_toy horient hsB hM1_mem
+  obtain ⟨hH_M1, hCas_M1⟩ := tasaki23_sector_lift_and_casimir_legacy A N c c_toy horient hsB hM1_mem
     hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hc_strict_toy h_intermediate hvM1_pos
     hReEig_M1
   -- Casimir constancy forces equal energies.

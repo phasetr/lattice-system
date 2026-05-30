@@ -27,7 +27,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 Marshall-positive ground state of `Ĥ_toy` is a joint Casimir eigenvector whose
 `(Ŝ_A)²` and `(Ŝ_¬A)²` eigenvalues `γ_A, γ_B` obey `γ_A.re ≤ s_A(s_A+1)` and
 `γ_B.re ≤ s_B(s_B+1)` (`s_A = |A|·N/2`, `s_B = |¬A|·N/2`). -/
-theorem tasaki23_toy_groundState_sublattice_casimir_re_le
+theorem tasaki23_toy_groundState_sublattice_casimir_re_le_legacy
     (A : V → Bool) (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hc_strict : ∀ σ,
@@ -57,7 +57,7 @@ theorem tasaki23_toy_groundState_sublattice_casimir_re_le
           ((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℝ) * (N : ℝ) / 2 *
             (((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℝ) * (N : ℝ) / 2 + 1)) := by
   obtain ⟨_, ⟨γ_A, hγ_A⟩, ⟨γ_B, hγ_B⟩⟩ :=
-    tasaki23_toy_groundState_joint_casimir_eigenvector A N c hc_strict h_intermediate hv_pos hH
+    tasaki23_toy_groundState_joint_casimir_eigenvector_legacy A N c hc_strict h_intermediate hv_pos hH
   have hne := tasaki23_marshallPositive_magSectorEmbedding_ne_zero A hv_pos
   exact ⟨⟨γ_A, hγ_A, sublatticeSpinSquaredS_eigenvalue_re_le_sA A hne hγ_A⟩,
     ⟨γ_B, hγ_B, sublatticeSpinSquaredS_eigenvalue_re_le_sA (fun x => ! A x) hne hγ_B⟩⟩

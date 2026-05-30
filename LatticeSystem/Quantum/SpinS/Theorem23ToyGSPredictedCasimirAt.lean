@@ -30,7 +30,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 `M ∈ tasaki23GroundStateSectors A N` there is a Marshall-positive `v > 0` whose embedding
 `magSectorEmbedding (sign · v)` is a `(Ŝ_tot)²`-eigenvector at
 `tasaki23PredictedCasimirValue A N`. -/
-theorem tasaki23_toy_groundState_casimir_eq_predicted_at
+theorem tasaki23_toy_groundState_casimir_eq_predicted_at_legacy
     (A : V → Bool) (N : ℕ) (c : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
@@ -81,7 +81,7 @@ theorem tasaki23_toy_groundState_casimir_eq_predicted_at
     (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) hComplex
   -- The toy ground state is a joint Casimir eigenvector (#3657).
   obtain ⟨⟨γ_tot, htot⟩, ⟨γ_A, hA⟩, ⟨γ_B, hB⟩⟩ :=
-    tasaki23_toy_groundState_joint_casimir_eigenvector A N c hc_strict h_intermediate hv_pos hH
+    tasaki23_toy_groundState_joint_casimir_eigenvector_legacy A N c hc_strict h_intermediate hv_pos hH
   set w : (V → Fin (N + 1)) → ℂ :=
     magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) with hw
   -- Energy: μ = γ_tot − γ_A − γ_B, so (γ_tot − γ_A − γ_B).re ≤ E.

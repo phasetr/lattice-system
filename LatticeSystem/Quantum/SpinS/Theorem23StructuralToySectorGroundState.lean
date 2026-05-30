@@ -11,7 +11,7 @@ import LatticeSystem.Quantum.SpinS.BipartiteToyMinEnergy
 at predicted-energy package (the original `toy_sector_groundState_at_predicted`
 witness was removed together with `Theorem23ToyFinal.lean` in PR #3917). Uses
 - `tasaki_2_5_theorem_2_3_sector_existence` (Thm23-#3887.16)
-- `tasaki23_toy_sector_energy_ge_predicted_structural` (Thm23-#3887.17)
+- `tasaki23_toy_sector_energy_ge_predicted` (Thm23-#3887.17)
 - `tasaki23_toy_sector_groundEnergy_le_of_witness` (already h_intermediate-free)
 - `exists_predictedEnergy_sector_eigenvector_of_mem` (already h_intermediate-free)
 
@@ -78,7 +78,7 @@ theorem toy_sector_groundState_at_predicted
     rw [← mul_assoc, marshallSignS_re_sq, one_mul]
     exact hvM_pos σ
   have hge : E ≤ μM :=
-    tasaki23_toy_sector_energy_ge_predicted_structural (N := N) A c horient hc_strict
+    tasaki23_toy_sector_energy_ge_predicted (N := N) A c horient hc_strict
       hA_ne hB_ne hN
       (φ := fun σ => (marshallSignS A σ.1).re * vM σ)
       (by

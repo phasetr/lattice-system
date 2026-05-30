@@ -4,9 +4,9 @@ import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorMarshall
 /-!
 # Structural per-sector lift + predicted Casimir (no `h_intermediate`)
 
-(PR #3893): structural variant of `tasaki23_sector_lift_and_casimir`
+(PR #3893): structural variant of `tasaki23_sector_lift_and_casimir_legacy`
 (in `Theorem23IntervalCommonEnergy.lean`) using
-`tasaki23_pf_groundState_casimir_eq_predicted_sector_structural` (Thm23-#3887.11).
+`tasaki23_pf_groundState_casimir_eq_predicted_sector` (Thm23-#3887.11).
 
 Lifts a Marshall-positive real sector eigenvector to the full Hilbert space
 (`heisenbergHamiltonianSMatrixOnMagSector_mulVec_ofReal` +
@@ -23,7 +23,7 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural per-sector lift + predicted Casimir (no `h_intermediate`)**. -/
-theorem tasaki23_sector_lift_and_casimir_structural
+theorem tasaki23_sector_lift_and_casimir
     (A : V → Bool) (c c_toy : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
@@ -58,7 +58,7 @@ theorem tasaki23_sector_lift_and_casimir_structural
   have hH := heisenbergHamiltonianS_mulVec_magSectorEmbedding J
     (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) hComplex
   refine ⟨hH, ?_⟩
-  exact tasaki23_pf_groundState_casimir_eq_predicted_sector_structural
+  exact tasaki23_pf_groundState_casimir_eq_predicted_sector
     (N := N) (M := M) A c c_toy horient hsB hM
     hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hc_strict_toy
     hA_ne hB_ne hN hv_pos hH

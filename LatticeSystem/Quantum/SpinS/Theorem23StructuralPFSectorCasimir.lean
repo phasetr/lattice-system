@@ -5,8 +5,8 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralPFCasimirPredicted
 /-!
 # Structural PF GS Casimir = predicted at admissible sector (no `h_intermediate`)
 
-(Thm23-#3887.11): structural variant of `tasaki23_pf_groundState_casimir_eq_predicted_sector`
-using `tasaki23_toy_groundState_casimir_eq_predicted_at_structural` (Thm23-#3887.10) +
+(Thm23-#3887.11): structural variant of `tasaki23_pf_groundState_casimir_eq_predicted_sector_legacy`
+using `tasaki23_toy_groundState_casimir_eq_predicted_at` (Thm23-#3887.10) +
 `tasaki23_pf_groundState_casimir_eq_predicted_of_witness` (Thm23-#3887.8).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
@@ -18,7 +18,7 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural PF GS Casimir = predicted at admissible sector (no `h_intermediate`)**. -/
-theorem tasaki23_pf_groundState_casimir_eq_predicted_sector_structural
+theorem tasaki23_pf_groundState_casimir_eq_predicted_sector
     (A : V → Bool) (c c_toy : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
@@ -47,7 +47,7 @@ theorem tasaki23_pf_groundState_casimir_eq_predicted_sector_structural
       ((tasaki23PredictedCasimirValue (V := V) A N : ℝ) : ℂ) •
         magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) := by
   obtain ⟨w, hw_pos, hw_cas⟩ :=
-    tasaki23_toy_groundState_casimir_eq_predicted_at_structural
+    tasaki23_toy_groundState_casimir_eq_predicted_at
       (N := N) (M := M) A c_toy horient hsB hM hc_strict_toy hA_ne hB_ne hN
   exact tasaki23_pf_groundState_casimir_eq_predicted_of_witness
     (N := N) (M := M) A c hJ_real hJ_pos
