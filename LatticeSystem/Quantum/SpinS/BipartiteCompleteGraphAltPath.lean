@@ -10,7 +10,7 @@ set_option linter.unusedVariables false
 Issue #3887 (Tasaki §2.5 Theorem 2.4, `h_intermediate` vacuous-at-N=1 fix).
 
 This file provides the **alternative path** for the same-sublattice over/under
-case in `exists_raiseLowerReachableS_bipartite_of_over_under`. The original path
+case in `exists_raiseLowerReachableS_bipartite_of_over_under_legacy`. The original path
 (`exists_raiseLowerReachableS_bipartite_of_over_under_eq_sublattice`,
 `LatticeSystem/Quantum/SpinS/BipartiteCompleteGraph.lean:152`) requires
 `(σ z).val < N` (z raisable). The alternative requires `(σ z).val > 0` (z

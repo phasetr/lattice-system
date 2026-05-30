@@ -252,7 +252,7 @@ For an over site `x` and under site `y` with `x ≠ y`, the intermediate-
 existence hypothesis `h_intermediate` guarantees a transport when
 `A x = A y` (only used in the hard case). The conclusion combines
 both cases as a `RaiseLowerReachableS` (which subsumes a single step). -/
-theorem exists_raiseLowerReachableS_bipartite_of_over_under
+theorem exists_raiseLowerReachableS_bipartite_of_over_under_legacy
     {A : V → Bool} {σ σ' : V → Fin (N + 1)}
     {x y : V} (hxy : x ≠ y)
     (hover : (σ' x).val < (σ x).val)
@@ -290,7 +290,7 @@ subspace with balanced sublattices, away from the "all-saturated"
 extreme).
 
 Proof: strong induction on `configDistS`, using
-`exists_raiseLowerReachableS_bipartite_of_over_under` (PR #821) at
+`exists_raiseLowerReachableS_bipartite_of_over_under_legacy` (PR #821) at
 each step (which combines the easy and hard cases). -/
 theorem raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS
     (A : V → Bool)
@@ -321,7 +321,7 @@ theorem raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS
       have hint : A x = A y → ∃ z, A z ≠ A x ∧ (σ z).val < N :=
         fun _ => h_intermediate σ x
       obtain ⟨σ_2, hreach, hreduce⟩ :=
-        exists_raiseLowerReachableS_bipartite_of_over_under
+        exists_raiseLowerReachableS_bipartite_of_over_under_legacy
           hxy hover hunder hint
       have hmag_2 : magSumS σ_2 = magSumS σ :=
         magSumS_eq_of_raiseLowerReachableS hreach

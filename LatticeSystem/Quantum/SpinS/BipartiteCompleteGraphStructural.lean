@@ -10,7 +10,7 @@ import LatticeSystem.Quantum.SpinS.ParityReachableMagSum
 Issue #3887 (Tasaki §2.5 Theorem 2.4, `h_intermediate` vacuous-at-N=1 fix).
 
 This file provides the **structural** version of
-`exists_raiseLowerReachableS_bipartite_of_over_under` that drops `h_intermediate`
+`exists_raiseLowerReachableS_bipartite_of_over_under_legacy` that drops `h_intermediate`
 entirely. Instead, it branches on whether the opposite-color site `z` has
 `(σ z).val < N` (use original `_eq_sublattice`) or `(σ z).val > 0` (use
 `_eq_sublattice_alt`). At any `N ≥ 1`, at least one of these holds for every
@@ -40,7 +40,7 @@ the alternative path (uses `σ z > 0`), at least one of which is satisfied.
 
 In the easy case `A x ≠ A y`, falls through to the direct step (no `z` needed).
 In the hard case `A x = A y`, picks the path based on `σ z`. -/
-theorem exists_raiseLowerReachableS_bipartite_of_over_under_structural
+theorem exists_raiseLowerReachableS_bipartite_of_over_under
     [Fintype V] [DecidableEq V]
     {A : V → Bool} {σ σ' : V → Fin (N + 1)}
     {x y : V} (hxy : x ≠ y)
@@ -115,7 +115,7 @@ theorem raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_structural
       have hOppExists : A x = A y → ∃ z, A z ≠ A x :=
         fun _ => oppExists_of_hA_hB A hA_ne hB_ne x
       obtain ⟨σ_2, hreach, hreduce⟩ :=
-        exists_raiseLowerReachableS_bipartite_of_over_under_structural
+        exists_raiseLowerReachableS_bipartite_of_over_under
           hxy hover hunder hOppExists hN
       have hmag_2 : magSumS σ_2 = magSumS σ :=
         magSumS_eq_of_raiseLowerReachableS hreach
