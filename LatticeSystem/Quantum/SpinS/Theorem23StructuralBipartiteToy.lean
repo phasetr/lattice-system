@@ -6,12 +6,12 @@ import LatticeSystem.Quantum.SpinS.Theorem23GlobalMinimality
 (no `h_intermediate`)
 
 (Thm23-#3887.21): structural variant of `tasaki_2_5_theorem_2_3_bipartiteToy`
-closing the truly-unconditional `tasaki_2_5_theorem_2_3_structural` statement
+closing the truly-unconditional `tasaki_2_5_theorem_2_3` statement
 for the canonical toy coupling `J = bipartiteCoupling A` with `(hA_ne, hB_ne, hN)`
 instead of the vacuous-at-N=1 `h_intermediate`.
 
 This is the **capstone** of the #3887-extension structural-fix chain:
-the spin-1/2 (N=1) instance is no longer vacuous — `tasaki_2_5_theorem_2_3_structural`
+the spin-1/2 (N=1) instance is no longer vacuous — `tasaki_2_5_theorem_2_3`
 genuinely produces a Marshall-positive ground state and its uniqueness across all admissible
 sectors, plus global minimality, for the bipartite antiferromagnetic Heisenberg
 Hamiltonian.
@@ -37,7 +37,7 @@ private theorem nonempty_magConfigS_of_fn_ne_zero_structural {N M : ℕ}
 `Prop`. Differs from `tasaki_2_5_theorem_2_3` in dropping `h_intermediate` and adding
 `1 ≤ N`. The `|A| ≥ 1` / `|¬A| ≥ 1` cardinality hypotheses already imply
 `(∃ a, A a = true)` / `(∃ b, A b = false)`, so no extra existence hypotheses are needed. -/
-def tasaki_2_5_theorem_2_3_structural
+def tasaki_2_5_theorem_2_3
     (A : V → Bool) (N : ℕ) (J : V → V → ℂ) (c : ℝ) : Prop :=
   (∀ x y, (J x y).im = 0) →
   (∀ x y, star (J x y) = J x y) →
@@ -72,7 +72,7 @@ def tasaki_2_5_theorem_2_3_structural
 
 /-- **Structural Tasaki §2.5 Theorem 2.3 for the standard bipartite antiferromagnetic
 coupling** (orientation `|¬A| ≤ |A|`, no `h_intermediate`): the full
-`tasaki_2_5_theorem_2_3_structural` statement holds for `J = bipartiteCoupling A`.
+`tasaki_2_5_theorem_2_3` statement holds for `J = bipartiteCoupling A`.
 
 This is the **truly-unconditional** §2.5 Theorem 2.3 closure for the bipartite toy
 coupling — at spin-1/2 (N=1) the original `tasaki_2_5_theorem_2_3_bipartiteToy` is
@@ -83,7 +83,7 @@ theorem tasaki_2_5_theorem_2_3_bipartiteToy
     (A : V → Bool) (N : ℕ) (c : ℝ)
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card) :
-    tasaki_2_5_theorem_2_3_structural A N (bipartiteCoupling A) c := by
+    tasaki_2_5_theorem_2_3 A N (bipartiteCoupling A) c := by
   classical
   intro _hJ_real _hJ_real' _hJ_sym _hJ_nn _hJ_bipartite _hJ_pos hc_strict hN hcardA hcardB
   have hA_ne : ∃ a, A a = true := by

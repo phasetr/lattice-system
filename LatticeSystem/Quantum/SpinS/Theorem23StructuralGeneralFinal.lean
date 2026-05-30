@@ -17,7 +17,7 @@ non-negative bipartite couplings positive on the complete bipartite graph.
 
 Combines Step 3 (common ground-state energy) + Step 2 of PR #3891 (structural sector
 existence) + already-`h_intermediate`-free `tasaki23_general_hOutside` / `tasaki23_eigenvalue_ge_common`
-to close `tasaki_2_5_theorem_2_3_structural A N J c` for general bipartite J at any N ≥ 1.
+to close `tasaki_2_5_theorem_2_3 A N J c` for general bipartite J at any N ≥ 1.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.3, p. 42; E. Lieb, D. Mattis,
@@ -38,7 +38,7 @@ private theorem nonempty_magConfigS_of_fn_ne_zero_general_structural {N M : ℕ}
 
 /-- **Truly-unconditional Tasaki §2.5 Theorem 2.3 for a general connected bipartite
 antiferromagnetic coupling** (canonical orientation `|¬A| ≤ |A|`, `s_B > 0`, `N ≥ 1`):
-the full `tasaki_2_5_theorem_2_3_structural` statement holds for any real symmetric
+the full `tasaki_2_5_theorem_2_3` statement holds for any real symmetric
 non-negative bipartite coupling `J` positive on the complete bipartite graph.
 
 This removes both:
@@ -56,7 +56,7 @@ theorem tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive
     (hc_strict_toy : ∀ σ,
       dressedHeisenbergSReMatrix A (bipartiteCoupling A) N σ σ < c_toy)
     {J : V → V → ℂ} :
-    tasaki_2_5_theorem_2_3_structural A N J c := by
+    tasaki_2_5_theorem_2_3 A N J c := by
   classical
   intro hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos hc_strict hN hcardA hcardB
   have hA_ne : ∃ a, A a = true := by
