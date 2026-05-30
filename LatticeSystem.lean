@@ -136,7 +136,6 @@ import LatticeSystem.Fermion.JWAbstract
 -- Marshall-positive AFM ground state — see .self-local/docs/tasaki-2-5-pf-route-design.md).
 -- The sound per-sector Perron–Frobenius ground state is kept; the unsound conditional
 -- wrapper tree (40 modules) is removed.  Issue #3542.
-import LatticeSystem.Quantum.SpinS.Theorem23SectorExistence
 import LatticeSystem.Quantum.SpinS.Theorem23PFLadderLink
 import LatticeSystem.Quantum.SpinS.Theorem23PFConstancy
 import LatticeSystem.Quantum.SpinS.Theorem23PFTotalSpin
