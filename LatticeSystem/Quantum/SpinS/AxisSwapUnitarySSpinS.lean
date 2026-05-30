@@ -347,7 +347,7 @@ theorem cexp_neg_pi_half_mul_I :
 theorem cexp_pi_half_mul_I :
     Complex.exp (((Real.pi / 2 : ℝ) : ℂ) * Complex.I) = Complex.I := by
   rw [Complex.exp_mul_I]
-  simp [Real.cos_pi_div_two, Real.sin_pi_div_two]
+  simp
 
 -- Conjugation of Ŝ² at θ = π/2: `spinSRot1 N (π/2) * Ŝ² * spinSRot1 N (-π/2) = Ŝ³`.
 theorem spinSRot1_pi_half_conj_spinSOp2 (N : ℕ) :
@@ -398,8 +398,8 @@ theorem spinSRot1_pi_half_conj_spinSOp3 (N : ℕ) :
     simp [Complex.I_ne_zero]
   exact smul_right_injective _ h2Ine hcancel
 
--- Conjugation of Ŝ¹ at θ = π/2: `spinSRot1 N (π/2) * Ŝ¹ * spinSRot1 N (-π/2) = Ŝ¹` (since Ŝ¹ commutes
--- with spinSRot1).
+-- Conjugation of Ŝ¹ at θ = π/2: `spinSRot1 N (π/2) * Ŝ¹ * spinSRot1 N (-π/2) = Ŝ¹`
+-- (since Ŝ¹ commutes with spinSRot1).
 theorem spinSRot1_pi_half_conj_spinSOp1 (N : ℕ) :
     spinSRot1 N (Real.pi / 2) * spinSOp1 N * spinSRot1 N (-(Real.pi / 2)) = spinSOp1 N := by
   have hcomm := spinSRot1_commute_spinSOp1 N (Real.pi / 2)
