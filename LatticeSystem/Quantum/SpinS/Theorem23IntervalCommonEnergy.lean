@@ -33,7 +33,7 @@ Given the Marshall-positive real sector eigen-equation `hReEig` of a connected b
 antiferromagnetic coupling `J` in an admissible sector `M`, the embedded vector is a
 full-space `H`-eigenvector at the same energy and a `(Ŝ_tot)²`-eigenvector at
 `tasaki23PredictedCasimirValue A N`. -/
-@[deprecated (since := "2026-05-30")]
+@[deprecated "Superseded by the h_intermediate-free canonical variant (Phase E refactor #3921); retained for backwards compatibility" (since := "2026-05-30")]
 
 theorem tasaki23_sector_lift_and_casimir_legacy
     (A : V → Bool) (N : ℕ) (c c_toy : ℝ)
@@ -78,7 +78,7 @@ theorem tasaki23_sector_lift_and_casimir_legacy
 Perron–Frobenius ground state in admissible sector `M` has energy `μ`, and `M` is not the
 right endpoint of the admissible interval, then the Marshall-positive ground state in the
 next sector `M + 1` also has energy `μ`. -/
-@[deprecated (since := "2026-05-30")]
+@[deprecated "Superseded by the h_intermediate-free canonical variant (Phase E refactor #3921); retained for backwards compatibility" (since := "2026-05-30")]
 
 theorem tasaki23_common_energy_step_legacy
     (A : V → Bool) (N : ℕ) (c c_toy : ℝ)
@@ -141,7 +141,7 @@ theorem tasaki23_common_energy_step_legacy
 There is a single energy `μ` such that in *every* admissible sector
 `M ∈ tasaki23GroundStateSectors A N` the connected bipartite antiferromagnetic coupling `J`
 has a Marshall-positive Perron–Frobenius ground state of energy `μ`. -/
-@[deprecated (since := "2026-05-30")]
+@[deprecated "Superseded by the h_intermediate-free canonical variant (Phase E refactor #3921); retained for backwards compatibility" (since := "2026-05-30")]
 
 theorem tasaki23_common_groundEnergy_legacy
     (A : V → Bool) (N : ℕ) (c c_toy : ℝ)

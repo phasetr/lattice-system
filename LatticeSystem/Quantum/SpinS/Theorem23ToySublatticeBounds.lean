@@ -27,7 +27,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 Marshall-positive ground state of `Ĥ_toy` is a joint Casimir eigenvector whose
 `(Ŝ_A)²` and `(Ŝ_¬A)²` eigenvalues `γ_A, γ_B` obey `γ_A.re ≤ s_A(s_A+1)` and
 `γ_B.re ≤ s_B(s_B+1)` (`s_A = |A|·N/2`, `s_B = |¬A|·N/2`). -/
-@[deprecated (since := "2026-05-30")]
+@[deprecated "Superseded by the h_intermediate-free canonical variant (Phase E refactor #3921); retained for backwards compatibility" (since := "2026-05-30")]
 
 theorem tasaki23_toy_groundState_sublattice_casimir_re_le_legacy
     (A : V → Bool) (N : ℕ) (c : ℝ) {M : ℕ}

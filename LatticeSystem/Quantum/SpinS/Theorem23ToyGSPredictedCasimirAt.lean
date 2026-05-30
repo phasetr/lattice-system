@@ -30,7 +30,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 `M ∈ tasaki23GroundStateSectors A N` there is a Marshall-positive `v > 0` whose embedding
 `magSectorEmbedding (sign · v)` is a `(Ŝ_tot)²`-eigenvector at
 `tasaki23PredictedCasimirValue A N`. -/
-@[deprecated (since := "2026-05-30")]
+@[deprecated "Superseded by the h_intermediate-free canonical variant (Phase E refactor #3921); retained for backwards compatibility" (since := "2026-05-30")]
 
 theorem tasaki23_toy_groundState_casimir_eq_predicted_at_legacy
     (A : V → Bool) (N : ℕ) (c : ℝ)
