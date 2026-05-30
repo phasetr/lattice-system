@@ -55,4 +55,12 @@ theorem continuous_rayleighOnVec :
     · exact (continuous_apply_apply i j).comp continuous_fst
     · exact (continuous_apply j).comp continuous_snd
 
+/-- The Rayleigh quotient is `ℝ`-additive in `M` (since `dotProduct` and `mulVec` are linear in
+the matrix and `Complex.re` is linear). -/
+theorem rayleighOnVec_add_matrix (M N : Matrix n n ℂ) (ψ : n → ℂ) :
+    rayleighOnVec (M + N) ψ = rayleighOnVec M ψ + rayleighOnVec N ψ := by
+  unfold rayleighOnVec
+  rw [Matrix.add_mulVec, dotProduct_add, Complex.add_re]
+
+
 end LatticeSystem.Quantum
