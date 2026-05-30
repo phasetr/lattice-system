@@ -3,6 +3,10 @@ import LatticeSystem.Quantum.SpinS.Theorem23PFCasimirEigenvector
 import LatticeSystem.Quantum.SpinS.TotalSquared
 import LatticeSystem.Quantum.SpinS.Theorem23Sectors
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Tasaki §2.5 Theorem 2.3 — pinning the ground-state Casimir value via overlap
 

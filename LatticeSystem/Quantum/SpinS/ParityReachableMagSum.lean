@@ -1,6 +1,10 @@
 import LatticeSystem.Quantum.SpinS.ParityReachable
 import LatticeSystem.Quantum.SpinS.AxisSwapParityBlock
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Parity-block reachability preserves the magnetization parity
 

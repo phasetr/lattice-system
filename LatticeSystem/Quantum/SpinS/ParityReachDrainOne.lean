@@ -1,5 +1,9 @@
 import LatticeSystem.Quantum.SpinS.ParityReachShuffleIter
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Drain a single A-site into the target via the iterated shuffle
 

@@ -1,6 +1,10 @@
 import LatticeSystem.Quantum.SpinS.AxisSwapBondReNonneg
 import LatticeSystem.Quantum.SpinS.MultiSiteMatrixElement
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Strict positivity of the axis-swapped bond off-diagonal entry on a transverse step (case (i) strict)
 

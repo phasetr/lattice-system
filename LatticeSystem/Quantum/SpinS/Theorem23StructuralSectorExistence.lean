@@ -1,5 +1,9 @@
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralMLMFull
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Structural Tasaki §2.5 Theorem 2.3 sector-existence wrapper (no `h_intermediate`)
 

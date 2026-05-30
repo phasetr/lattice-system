@@ -2,6 +2,10 @@ import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSector
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Structural `MagSector` reachability for the Theorem 2.3 chain (no `h_intermediate`)
 

@@ -1,6 +1,10 @@
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorEigenvalueUnique
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralReach
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Structural Marshall-positive sector eigenvector uniqueness (no `h_intermediate`)
 

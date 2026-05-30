@@ -3,6 +3,10 @@ import LatticeSystem.Quantum.SpinS.RaiseLower
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
 import Mathlib.Combinatorics.SimpleGraph.Basic
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # The magnetization-`M` configuration subtype
 (Tasaki §2.5 Phase B-γ γ-3 final prep)

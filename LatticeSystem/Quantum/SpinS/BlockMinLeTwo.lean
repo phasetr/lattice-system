@@ -1,5 +1,9 @@
 import LatticeSystem.Quantum.SpinS.BlockEigBotBelowJointMin
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Full eigenspace `≤ 2` at the minimum of the per-block min eigenvalues
 

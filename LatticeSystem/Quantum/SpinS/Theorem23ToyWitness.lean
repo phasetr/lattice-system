@@ -5,6 +5,10 @@ import LatticeSystem.Quantum.SpinS.ToyHamiltonianJointEnergy
 import LatticeSystem.Quantum.SpinS.Theorem23PFCasimirPredicted
 import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Toy ground state is the predicted total-Casimir witness (modulo the energy bound)
 

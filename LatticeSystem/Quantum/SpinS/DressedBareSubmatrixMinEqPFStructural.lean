@@ -1,6 +1,10 @@
 import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPF
 import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFEigenvectorStructural
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Structural (j.13.h.2) dressed/bare hermitianMinEigenvalue identification (no `h_intermediate`)
 

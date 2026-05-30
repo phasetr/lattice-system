@@ -1,5 +1,9 @@
 import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeel
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Sublattice 12sq / cross-pair expectations and Néel norm/span
 properties (build-speed companion)

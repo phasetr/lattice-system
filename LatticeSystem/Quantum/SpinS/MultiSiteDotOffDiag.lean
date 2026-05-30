@@ -1,5 +1,9 @@
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # `spinSDot` off-diagonal matrix elements on raising/lowering pairs
 (build-speed companion)

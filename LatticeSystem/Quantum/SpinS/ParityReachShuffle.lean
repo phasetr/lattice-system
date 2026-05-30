@@ -1,5 +1,9 @@
 import LatticeSystem.Quantum.SpinS.ParityReachWitness
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Two-step parity reachability: intra-sublattice shuffles via the other sublattice
 

@@ -1,6 +1,10 @@
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSectorZero
 import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Sector projection of an anisotropic-Hamiltonian eigenvector is an eigenvector
 

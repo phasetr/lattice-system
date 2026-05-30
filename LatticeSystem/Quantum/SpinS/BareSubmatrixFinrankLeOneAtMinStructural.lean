@@ -2,6 +2,10 @@ import LatticeSystem.Quantum.SpinS.BareSubmatrixBoundAtMin
 import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPFStructural
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducibleStructural
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Structural (j.13.h.3) bare submatrix `finrank ≤ 1` at `hermitianMinEigenvalue` (no `h_intermediate`)
 

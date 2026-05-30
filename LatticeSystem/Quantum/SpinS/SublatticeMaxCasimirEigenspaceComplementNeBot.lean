@@ -1,5 +1,9 @@
 import LatticeSystem.Quantum.SpinS.SublatticeMaxCasimirEigenspaceNeBot
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # The complement maximal-Casimir eigenspace is non-trivial
 

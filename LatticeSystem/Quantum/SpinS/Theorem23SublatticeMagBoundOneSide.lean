@@ -1,6 +1,10 @@
 import LatticeSystem.Quantum.SpinS.Theorem23SublatticeBottomComponent
 import LatticeSystem.Quantum.SpinS.Theorem23SublatticeLowestWeightSign
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # One-sided total-magnetization bound for a total lowest weight
 

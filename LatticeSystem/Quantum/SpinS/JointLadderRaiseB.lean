@@ -1,6 +1,10 @@
 import LatticeSystem.Quantum.SpinS.JointLadderRaiseA
 import LatticeSystem.Quantum.SpinS.SublatticeLadderIdentity
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Raising the `¬A`-index of the joint ladder iterate
 

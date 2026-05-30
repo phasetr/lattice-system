@@ -1,5 +1,9 @@
 import LatticeSystem.Quantum.SpinS.AxisSwapBondOffDiag
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Non-negativity of the axis-swapped bond off-diagonal entry (case (i))
 

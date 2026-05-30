@@ -2,6 +2,10 @@ import LatticeSystem.Quantum.SpinS.DressedAxisSwapParityBondStrictPos
 import LatticeSystem.Quantum.SpinS.SingleIonOffDiag
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBondSign
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Strict positivity of the shifted PF matrix on a single-ion step (case (i.2), `D.re > 0`)
 
