@@ -74,4 +74,12 @@ theorem continuous_anisotropicHeisenbergS_magSector_submatrix
   unfold anisotropicHeisenbergS_magSector_submatrix
   exact (continuous_anisotropicHeisenbergS J N).matrix_submatrix _ _
 
+/-- The magnetisation-sector restriction of `anisotropicHeisenbergS` is Hermitian
+under real coupling `J`, anisotropy `lam`, and crystal field `D`. -/
+theorem anisotropicHeisenbergS_magSector_submatrix_isHermitian_of_real
+    {J : Λ → Λ → ℂ} (hJ : ∀ x y, star (J x y) = J x y)
+    {lam : ℂ} (hlam : star lam = lam) {D : ℂ} (hD : star D = D) (N M : ℕ) :
+    (anisotropicHeisenbergS_magSector_submatrix (Λ := Λ) J lam D N M).IsHermitian :=
+  (anisotropicHeisenbergS_isHermitian_of_real hJ hlam hD N).submatrix _
+
 end LatticeSystem.Quantum
