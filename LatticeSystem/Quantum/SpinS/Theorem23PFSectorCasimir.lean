@@ -28,7 +28,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 `M ∈ tasaki23GroundStateSectors A N`, the Marshall-positive Perron–Frobenius ground state
 of an arbitrary connected bipartite antiferromagnetic coupling `J` is a `(Ŝ_tot)²`-
 eigenvector at `tasaki23PredictedCasimirValue A N`. -/
-@[deprecated "Superseded by the h_intermediate-free canonical variant (Phase E refactor #3921); retained for backwards compatibility" (since := "2026-05-30")]
+@[deprecated "Use canonical (h_intermediate-free) variant" (since := "2026-05-30")]
 
 theorem tasaki23_pf_groundState_casimir_eq_predicted_sector_legacy
     (A : V → Bool) (N : ℕ) (c c_toy : ℝ)
