@@ -58,4 +58,33 @@ theorem rayleighOnVec_diagonal_real (lam : n → ℝ) (v : n → ℂ) :
   refine Finset.sum_congr rfl (fun i _ => ?_)
   rw [Complex.ofReal_re]
 
+variable [Nonempty n]
+
+/-- Finite-sum lower bound: `Σ_i (‖v_i‖² · lam_i) ≥ (min_i lam_i) · Σ_i ‖v_i‖²`. -/
+theorem sum_normSq_mul_real_ge_min_mul_sum (lam : n → ℝ) (v : n → ℂ) :
+    (Finset.univ.image lam).min' (Finset.image_nonempty.mpr Finset.univ_nonempty) *
+        (∑ i, ‖v i‖ ^ 2) ≤
+      ∑ i, ‖v i‖ ^ 2 * lam i := by
+  rw [Finset.mul_sum]
+  refine Finset.sum_le_sum (fun i _ => ?_)
+  have hmin_le : (Finset.univ.image lam).min'
+      (Finset.image_nonempty.mpr Finset.univ_nonempty) ≤ lam i :=
+    Finset.min'_le _ _ (Finset.mem_image.mpr ⟨i, Finset.mem_univ _, rfl⟩)
+  have hnonneg : 0 ≤ ‖v i‖ ^ 2 := sq_nonneg _
+  calc _ * _ = ‖v i‖ ^ 2 *
+        ((Finset.univ.image lam).min'
+          (Finset.image_nonempty.mpr Finset.univ_nonempty)) := by ring
+    _ ≤ ‖v i‖ ^ 2 * lam i := by
+        exact mul_le_mul_of_nonneg_left hmin_le hnonneg
+
+/-- Variational lower bound for the diagonal Rayleigh quotient: with `lam : n → ℝ` and any
+`v : n → ℂ`,
+`rayleighOnVec (diagonal (↑lam)) v ≥ (min_i lam_i) · Σ_i ‖v_i‖²`. -/
+theorem rayleighOnVec_diagonal_real_ge_min_mul_normSq (lam : n → ℝ) (v : n → ℂ) :
+    (Finset.univ.image lam).min' (Finset.image_nonempty.mpr Finset.univ_nonempty) *
+        (∑ i, ‖v i‖ ^ 2) ≤
+      rayleighOnVec (Matrix.diagonal (fun i => (lam i : ℂ))) v := by
+  rw [rayleighOnVec_diagonal_real]
+  exact sum_normSq_mul_real_ge_min_mul_sum lam v
+
 end LatticeSystem.Quantum
