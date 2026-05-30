@@ -25,7 +25,7 @@ open Matrix Module
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **(#3887.6-dressed) Dressed submatrix hermitianMinEigenvalue identification (no `h_intermediate`)**. -/
-theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_structural
+theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
     (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
@@ -133,7 +133,7 @@ theorem axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf
         (axisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
           (Λ := Λ) (N := N) hJim hlam hDim p) := by
   obtain ⟨ν, v, hv_pos, hAv, hν_eq⟩ :=
-    dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf_structural
+    dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict hA_ne hB_ne
       hN p
   refine ⟨ν, v, hv_pos, hAv, ?_⟩
