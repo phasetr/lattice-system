@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenberg
+import LatticeSystem.Quantum.SpinS.MagConfig
 import Mathlib.Topology.Instances.Matrix
 
 /-!
@@ -54,5 +55,23 @@ theorem continuous_anisotropicHeisenbergS (J : Λ → Λ → ℂ) (N : ℕ) :
     exact Continuous.smul continuous_const
       ((continuous_spinSDotXXZ x y N).comp continuous_fst)
   · exact (continuous_singleIonAnisotropyS N).comp continuous_snd
+
+/-- **Sector restriction** of the anisotropic Hamiltonian to the
+magnetisation-`M` configuration subspace, obtained as a Matrix submatrix
+indexed by `magConfigS Λ N M` (the subtype of magnetisation-`M` configurations). -/
+noncomputable def anisotropicHeisenbergS_magSector_submatrix
+    (J : Λ → Λ → ℂ) (lam D : ℂ) (N M : ℕ) :
+    Matrix (magConfigS Λ N M) (magConfigS Λ N M) ℂ :=
+  (anisotropicHeisenbergS (Λ := Λ) J lam D N).submatrix Subtype.val Subtype.val
+
+/-- **The magnetisation-sector restriction of Ĥ is jointly continuous in
+`(lam, D)`**. Immediate from `continuous_anisotropicHeisenbergS` + the matrix
+submatrix functoriality. -/
+theorem continuous_anisotropicHeisenbergS_magSector_submatrix
+    (J : Λ → Λ → ℂ) (N M : ℕ) :
+    Continuous (fun p : ℂ × ℂ =>
+      anisotropicHeisenbergS_magSector_submatrix (Λ := Λ) J p.1 p.2 N M) := by
+  unfold anisotropicHeisenbergS_magSector_submatrix
+  exact (continuous_anisotropicHeisenbergS J N).matrix_submatrix _ _
 
 end LatticeSystem.Quantum
