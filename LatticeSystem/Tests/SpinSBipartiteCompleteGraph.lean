@@ -86,7 +86,7 @@ example {N : ℕ} [Fintype V] [DecidableEq V] (A : V → Bool)
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false) (hN : 1 ≤ N)
     {σ σ' : V → Fin (N + 1)} (hmag : magSumS σ = magSumS σ') :
     RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ σ' :=
-  raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_structural
+  raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS
     A hA_ne hB_ne hN hmag
 
 end LatticeSystem.Tests.SpinSBipartiteCompleteGraph

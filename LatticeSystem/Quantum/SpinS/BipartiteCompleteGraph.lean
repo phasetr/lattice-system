@@ -292,7 +292,7 @@ extreme).
 Proof: strong induction on `configDistS`, using
 `exists_raiseLowerReachableS_bipartite_of_over_under_legacy` (PR #821) at
 each step (which combines the easy and hard cases). -/
-theorem raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS
+theorem raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_legacy
     (A : V → Bool)
     (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
       ∃ z, A z ≠ A x ∧ (τ z).val < N)

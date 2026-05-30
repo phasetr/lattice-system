@@ -60,7 +60,7 @@ theorem axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianM
     rw [Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec, hAv, sub_smul]
   -- Step 3: shifted is irreducible (structural).
   have hIrred :=
-    shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_structural
+    shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict
       hA_ne hB_ne hN p
   -- Step 4: finrank ℝ eigenspace shifted (c - ν) ≤ 1 via Perron.

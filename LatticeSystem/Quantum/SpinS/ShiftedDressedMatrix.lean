@@ -295,7 +295,7 @@ theorem exists_matrixPow_pos_length_of_eq_magSumS_bipartite
     (hmag : magSumS σ = magSumS σ') :
     ∃ k : ℕ, 1 ≤ k ∧ 0 < (shiftedDressedSReMatrix A J N c ^ k) σ' σ := by
   have hreach : RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ σ' :=
-    raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS A
+    raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_legacy A
       h_intermediate hmag
   exact exists_matrixPow_pos_length_of_raiseLowerReachableS_bipartite A N c
     hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc hne hreach

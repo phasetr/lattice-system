@@ -11,8 +11,8 @@ set_option linter.unusedVariables false
 
 Extension of #3887 fix to the Tasaki §2.5 Theorem 2.3 dressed-Heisenberg chain.
 
-Provides `raiseLowerReachableSMagSector_bipartiteCompleteGraph_structural`
-using `raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_structural`
+Provides `raiseLowerReachableSMagSector_bipartiteCompleteGraph`
+using `raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS`
 (#3887.3) — drops `h_intermediate`, requires only `hA_ne + hB_ne + 1 ≤ N`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
@@ -24,14 +24,14 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural MagSector reachability (no `h_intermediate`)**. -/
-theorem raiseLowerReachableSMagSector_bipartiteCompleteGraph_structural
+theorem raiseLowerReachableSMagSector_bipartiteCompleteGraph
     (A : V → Bool) {M : ℕ}
     (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
     (hN : 1 ≤ N)
     (σ σ' : magConfigS V N M) :
     RaiseLowerReachableSMagSector (bipartiteCompleteGraphOf A) σ σ' := by
   have hreach : RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ.1 σ'.1 :=
-    raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_structural A
+    raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS A
       hA_ne hB_ne hN (σ.2.trans σ'.2.symm)
   exact raiseLowerReachableSMagSector_of_raiseLowerReachableS σ.2 σ'.2 hreach
 
@@ -55,7 +55,7 @@ theorem exists_matrixPow_pos_of_magConfigS_bipartite
   · intro σ τ hstep
     exact shiftedDressedSReMatrixOnMagSector_apply_pos_of_raiseLowerStepSMagSector
       A N c M hJ_real hJ_pos hJ_sym hstep
-  · exact raiseLowerReachableSMagSector_bipartiteCompleteGraph_structural A
+  · exact raiseLowerReachableSMagSector_bipartiteCompleteGraph A
       hA_ne hB_ne hN σ σ'
 
 /-- **Structural strict-positive-length matrix-power positivity**. -/

@@ -169,14 +169,14 @@ chain in the bipartite complete graph.
 
 Proof: combine the full-type bipartite reachability theorem (#823)
 with the subtype lifting (#840). -/
-theorem raiseLowerReachableSMagSector_bipartiteCompleteGraph
+theorem raiseLowerReachableSMagSector_bipartiteCompleteGraph_legacy
     (A : V → Bool) {M : ℕ}
     (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
       ∃ z, A z ≠ A x ∧ (τ z).val < N)
     (σ σ' : magConfigS V N M) :
     RaiseLowerReachableSMagSector (bipartiteCompleteGraphOf A) σ σ' := by
   have hreach : RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ.1 σ'.1 :=
-    raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS A
+    raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_legacy A
       h_intermediate (σ.2.trans σ'.2.symm)
   -- Lift to subtype.
   have := raiseLowerReachableSMagSector_of_raiseLowerReachableS σ.2 σ'.2 hreach
