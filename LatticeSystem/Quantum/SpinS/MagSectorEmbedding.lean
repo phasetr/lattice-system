@@ -598,6 +598,8 @@ Composition of:
 This is the COMPLEX-Hilbert-space form of Tasaki §2.5 Theorem 2.2 on
 the actual quantum Heisenberg Hamiltonian, lifted from the sector
 form (PRs #847–#865). -/
+@[deprecated (since := "2026-05-30")]
+
 theorem exists_marshallSign_eigenvector_heisenbergHamiltonianS_full_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
@@ -733,6 +735,8 @@ the §2.5 ground state on the actual quantum Heisenberg Hamiltonian.
 This is the COMPLEX-Hilbert-space form of Tasaki §2.5 Theorem 2.2 on
 the actual quantum Heisenberg Hamiltonian, lifted from the magnetization
 sector form (PRs #847–#865). -/
+@[deprecated (since := "2026-05-30")]
+
 theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}

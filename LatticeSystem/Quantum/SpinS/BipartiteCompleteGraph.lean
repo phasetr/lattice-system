@@ -252,6 +252,8 @@ For an over site `x` and under site `y` with `x ≠ y`, the intermediate-
 existence hypothesis `h_intermediate` guarantees a transport when
 `A x = A y` (only used in the hard case). The conclusion combines
 both cases as a `RaiseLowerReachableS` (which subsumes a single step). -/
+@[deprecated (since := "2026-05-30")]
+
 theorem exists_raiseLowerReachableS_bipartite_of_over_under_legacy
     {A : V → Bool} {σ σ' : V → Fin (N + 1)}
     {x y : V} (hxy : x ≠ y)
@@ -292,6 +294,8 @@ extreme).
 Proof: strong induction on `configDistS`, using
 `exists_raiseLowerReachableS_bipartite_of_over_under_legacy` (PR #821) at
 each step (which combines the easy and hard cases). -/
+@[deprecated (since := "2026-05-30")]
+
 theorem raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_legacy
     (A : V → Bool)
     (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,

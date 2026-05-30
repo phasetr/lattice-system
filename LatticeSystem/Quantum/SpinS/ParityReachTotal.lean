@@ -37,6 +37,8 @@ set_option linter.unusedDecidableInType false in
 /-- **`ParityReachableS` totality on the bipartite complete graph**: any two configurations of
 the same total-magnetization parity are `ParityReachableS`-connected.  Discharges the
 `hreach_total` hypothesis of the parity-block matrix irreducibility theorem #3797. -/
+@[deprecated (since := "2026-05-30")]
+
 theorem parityReachableS_total_legacy
     (A : V → Bool)
     (hA_ne : ∃ a, A a = true)

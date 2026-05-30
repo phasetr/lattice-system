@@ -39,6 +39,8 @@ eigenvalue `r` (with strictly positive Perron eigenvector `v`) is a scalar
 multiple of `v`.  Specialisation of
 `PerronFrobenius.eigenvec_proportional_of_pos_eigenvec` to the irreducible
 shifted dressed sector matrix. -/
+@[deprecated (since := "2026-05-30")]
+
 theorem tasaki23_shiftedDressed_sector_eigenvec_proportional_legacy
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -69,6 +71,8 @@ Marshall-conjugates `φ` and `w` to eigenvectors of the shifted dressed sector
 matrix (where `marshallSignS · φ > 0` is the strictly positive Perron
 eigenvector), applies the geometric simplicity
 `tasaki23_shiftedDressed_sector_eigenvec_proportional_legacy`, and conjugates back. -/
+@[deprecated (since := "2026-05-30")]
+
 theorem tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_legacy
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -120,6 +124,8 @@ Marshall-positive ground state by the one-dimensionality
 `tasaki23_heis_sector_eigenvec_proportional_of_marshallPositive_legacy`.  Recombining,
 `(Ŝtot)² Φ = γ Φ`.  This pins the total spin of the ground state (total-spin
 determination, Tasaki §2.5 p.42). -/
+@[deprecated (since := "2026-05-30")]
+
 theorem tasaki23_pf_groundState_casimir_eigenvector_legacy
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]

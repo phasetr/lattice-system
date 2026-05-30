@@ -261,6 +261,8 @@ The eigenvector `w τ := sign A τ.1 .re * v τ` has `|w τ| = v τ > 0`,
 so `w` is everywhere non-zero. The sign of `w` matches the Marshall sign
 structure. This is the ground-state half of Tasaki §2.5 Theorem 2.2 in
 the magnetization sector. -/
+@[deprecated (since := "2026-05-30")]
+
 theorem exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
@@ -376,6 +378,8 @@ Reduction to `pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector_legacy`
 (#848): convert both `dressed_sec`-eigenvectors to `shifted_sec`-
 eigenvectors at the shifted eigenvalue `c - μ`, then apply PF
 uniqueness on the shifted matrix. -/
+@[deprecated (since := "2026-05-30")]
+
 theorem pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
@@ -414,6 +418,8 @@ Reduction: by inverse Marshall conjugation, the conjugates `vᵢ := sign · wᵢ
 are positive eigenvectors of the dressed sector matrix at `μ`. By dressed
 sector uniqueness (this PR) `v₂ = r • v₁` for some `r > 0`. Multiplying
 both sides by `sign` (which squares to 1) gives `w₂ = r • w₁`. -/
+@[deprecated (since := "2026-05-30")]
+
 theorem marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
