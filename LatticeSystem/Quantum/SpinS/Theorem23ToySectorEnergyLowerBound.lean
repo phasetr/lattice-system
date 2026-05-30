@@ -32,7 +32,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 `J = bipartiteCoupling A` (with `|¬A| ≤ |A|`), in *any* magnetisation sector `M` the
 predicted minimum energy `(bipartiteToyMinEnergyPredicted A N).re` is below every
 eigenvalue `μM` of the dressed sector matrix. -/
-@[deprecated (since := "2026-05-30")]
+@[deprecated "Use canonical (h_intermediate-free) variant" (since := "2026-05-30")]
 
 theorem tasaki23_toy_sector_energy_ge_predicted_legacy
     (A : V → Bool) (N : ℕ) (c : ℝ)

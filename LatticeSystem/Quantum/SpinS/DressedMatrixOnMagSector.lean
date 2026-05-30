@@ -109,7 +109,7 @@ input on the subtype). Composition of:
 - Sector matrix-pow lift from reachability (#843).
 - Sector matrix non-negativity (#834).
 - Sector matrix step positivity (#842). -/
-@[deprecated (since := "2026-05-30")]
+@[deprecated "Use canonical (h_intermediate-free) variant" (since := "2026-05-30")]
 
 theorem exists_matrixPow_pos_of_magConfigS_bipartite_legacy
     (A : V → Bool)
@@ -137,7 +137,7 @@ theorem exists_matrixPow_pos_of_magConfigS_bipartite_legacy
 /-- **Strict positive-length matrix-power positivity** on the sector
 for distinct configurations: for σ ≠ σ' in the same sector, the
 matrix-power is positive at some k ≥ 1 (excluding the trivial k = 0). -/
-@[deprecated (since := "2026-05-30")]
+@[deprecated "Use canonical (h_intermediate-free) variant" (since := "2026-05-30")]
 
 theorem exists_matrixPow_pos_length_of_magConfigS_bipartite_legacy
     (A : V → Bool)
@@ -174,7 +174,7 @@ Proof: combines the matrix-power positivity for distinct σ ≠ σ'
 (#845) with the diagonal positivity (`M σ σ = c - dressed σ σ > 0`
 when `c > dressed σ σ`) via the
 `Matrix.isIrreducible_iff_exists_pow_pos` characterization. -/
-@[deprecated (since := "2026-05-30")]
+@[deprecated "Use canonical (h_intermediate-free) variant" (since := "2026-05-30")]
 
 theorem isIrreducible_shiftedDressedSReMatrixOnMagSector_legacy
     (A : V → Bool)
@@ -217,7 +217,7 @@ and a strictly positive eigenvector `v > 0` (componentwise) with
 Direct corollary of `Matrix.IsIrreducible` (#846) +
 `exists_positive_eigenvector_of_irreducible` from the project's
 Perron–Frobenius infrastructure. -/
-@[deprecated (since := "2026-05-30")]
+@[deprecated "Use canonical (h_intermediate-free) variant" (since := "2026-05-30")]
 
 theorem exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector_legacy
     (A : V → Bool)
@@ -248,7 +248,7 @@ Direct corollary of `Matrix.IsIrreducible` (#846) and
 non-degeneracy half of Tasaki §2.5 Theorem 2.2 for general spin (the
 ground-state in each magnetization sector is unique up to a positive
 scalar, equivalently 1-dimensional). -/
-@[deprecated (since := "2026-05-30")]
+@[deprecated "Use canonical (h_intermediate-free) variant" (since := "2026-05-30")]
 
 theorem pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector_legacy
     (A : V → Bool)
@@ -354,7 +354,7 @@ eigenvalue `c - r < c` (where `r > 0` is the Perron eigenvalue of
 the shifted matrix).
 
 Combines #847 (existence) with #849 (eigenvalue conversion). -/
-@[deprecated (since := "2026-05-30")]
+@[deprecated "Use canonical (h_intermediate-free) variant" (since := "2026-05-30")]
 
 theorem exists_positive_eigenvector_dressedHeisenbergSReMatrixOnMagSector_legacy
     (A : V → Bool)
