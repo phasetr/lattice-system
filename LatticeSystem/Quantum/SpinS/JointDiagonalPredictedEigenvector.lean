@@ -3,6 +3,10 @@ import LatticeSystem.Quantum.SpinS.JointLadderIterateMag
 import LatticeSystem.Quantum.SpinS.Theorem23ExtremalHighestWeight
 import LatticeSystem.Quantum.SpinS.PredictedGSFinrankLtJointCasimirFinrank
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # The minimal-total-spin joint predicted-Casimir eigenvector
 

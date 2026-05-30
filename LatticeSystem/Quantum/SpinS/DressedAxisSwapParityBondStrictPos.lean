@@ -2,6 +2,10 @@ import LatticeSystem.Quantum.SpinS.AxisSwapBondReStrictPos
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapRaiseLowerStrictNeg
 import LatticeSystem.Quantum.SpinS.ParityReachable
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Strict positivity of the shifted PF matrix on a bond parity step (case (i) strict²)
 

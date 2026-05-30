@@ -2,6 +2,10 @@ import LatticeSystem.Quantum.SpinS.SublatticeHighestWeight
 import LatticeSystem.Quantum.SpinS.SublatticeLowestWeight
 import LatticeSystem.Quantum.SpinS.SublatticeSzBound
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # The anti-aligned product state realizes the maximal sublattice Casimirs
 

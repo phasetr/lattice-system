@@ -2,6 +2,10 @@ import LatticeSystem.Quantum.SpinS.MagConfigExtremalCardinality
 import LatticeSystem.Quantum.SpinS.AllAlignedState
 import LatticeSystem.Quantum.SpinS.LadderBoundaryAnnihilation
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # The two extremal magnetization subspaces are 1-dimensional
 

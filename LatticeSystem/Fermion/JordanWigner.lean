@@ -52,6 +52,10 @@ import LatticeSystem.Fermion.JordanWigner.CPlusCDaggerAnticomm
 import LatticeSystem.Fermion.JordanWigner.CMinusCDaggerAnticomm
 import LatticeSystem.Fermion.JordanWigner.NumberCommutePauliOfNe
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Multi-mode fermion via Jordan–Wigner mapping
 

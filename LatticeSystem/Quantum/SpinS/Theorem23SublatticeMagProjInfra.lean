@@ -1,5 +1,9 @@
 import LatticeSystem.Quantum.SpinS.SublatticeMagWeightComponent
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Sublattice magnetization-projection infrastructure
 

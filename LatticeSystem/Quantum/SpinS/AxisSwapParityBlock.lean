@@ -2,6 +2,10 @@ import LatticeSystem.Quantum.SpinS.AxisSwapBondParity
 import LatticeSystem.Quantum.SpinS.SingleIonOffDiag
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapOffDiag
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Parity block-diagonality of the axis-swapped Hamiltonian
 

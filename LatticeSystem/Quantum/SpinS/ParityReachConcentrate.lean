@@ -1,5 +1,9 @@
 import LatticeSystem.Quantum.SpinS.ParityReachDrainOne
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Multi-site concentration via iterated drain
 

@@ -2,6 +2,10 @@ import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralFullHilbertEigenvec
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralUniqueness
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Structural Tasaki §2.5 Theorem 2.2 bundled full-Hilbert form (no `h_intermediate`)
 

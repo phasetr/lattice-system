@@ -2,6 +2,10 @@ import LatticeSystem.Quantum.SpinS.HeisenbergRaiseLower
 import LatticeSystem.Quantum.SpinS.DressedHeisenberg
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Marshall-dressed Heisenberg matrix elements on raise/lower steps
 (Tasaki §2.5 Phase B-γ γ-3 irreducibility prep)

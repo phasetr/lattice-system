@@ -4,6 +4,10 @@ import LatticeSystem.Quantum.SpinS.DressedAxisSwapPFMatrix
 import LatticeSystem.Quantum.SpinS.HeisenbergRaiseLower
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Strict negativity of the full dressed `Ĥ'` on a transverse step (bipartite, case (i) strict)
 

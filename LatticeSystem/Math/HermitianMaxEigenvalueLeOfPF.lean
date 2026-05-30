@@ -3,6 +3,10 @@ import LatticeSystem.Math.HermitianMaxEigenvalue
 import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.LinearAlgebra.Matrix.Symmetric
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Complex Hermitian max eigenvalue ≤ PF eigenvalue for real symmetric nonneg matrices
 

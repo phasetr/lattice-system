@@ -1,5 +1,9 @@
 import LatticeSystem.Quantum.SpinS.JointSublatticeCasimirStrictSupsetPredictedGS
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Predicted GS subspace finrank < joint sublattice-Casimir eigenspace
 finrank at non-degenerate

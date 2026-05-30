@@ -1,6 +1,10 @@
 import LatticeSystem.Quantum.SpinS.AllAlignedState
 import LatticeSystem.Quantum.SpinS.MagConfig
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Cardinality of extremal magnetization sectors for spin-`S`
 (Tasaki §2.5 / §2.4 setup)

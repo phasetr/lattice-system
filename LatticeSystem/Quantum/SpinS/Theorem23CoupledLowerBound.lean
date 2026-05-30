@@ -2,6 +2,10 @@ import LatticeSystem.Quantum.SpinS.Theorem23TotalLowestWeightExistence
 import LatticeSystem.Quantum.SpinS.Theorem23SublatticeMagBoundOneSide
 import LatticeSystem.Quantum.SpinS.Theorem23Casimir
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # The coupled total-spin lower bound `(Ŝ_tot)² ≥ |a−b|(|a−b|+1)`
 

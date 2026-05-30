@@ -1,5 +1,9 @@
 import LatticeSystem.Quantum.SpinS.ParityReachConcentrateB
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Combined A+B concentration to a two-site canonical form
 

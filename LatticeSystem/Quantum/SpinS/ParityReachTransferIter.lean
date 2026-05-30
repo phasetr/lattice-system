@@ -1,5 +1,9 @@
 import LatticeSystem.Quantum.SpinS.ParityReachWitness
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Iterated cross-sublattice transfer at a single bond
 

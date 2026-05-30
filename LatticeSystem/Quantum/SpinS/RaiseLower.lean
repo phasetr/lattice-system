@@ -3,6 +3,10 @@ import LatticeSystem.Quantum.SpinS.MultiSiteDotOffDiag
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 import Mathlib.Combinatorics.SimpleGraph.Basic
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Spin-`S` raising/lowering step relation
 (Tasaki §2.5 Phase B-γ γ-3 connectivity infrastructure)

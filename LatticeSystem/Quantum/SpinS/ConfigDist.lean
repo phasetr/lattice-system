@@ -1,6 +1,10 @@
 import LatticeSystem.Quantum.SpinS.RaiseLower
 import Mathlib.Data.Nat.Dist
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Spin-`S` configuration distance
 (Tasaki §2.5 Phase B-γ γ-3 connectivity prep)

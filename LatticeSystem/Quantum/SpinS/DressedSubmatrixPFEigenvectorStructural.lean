@@ -1,6 +1,10 @@
 import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFEigenvector
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducibleStructural
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Structural (j.1) PF positive eigenvector (no `h_intermediate`)
 

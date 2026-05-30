@@ -1,5 +1,9 @@
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapSingleIonStrictPos
 
+set_option linter.unusedSectionVars false
+set_option linter.unusedSimpArgs false
+set_option linter.unusedVariables false
+
 /-!
 # Strict positivity of the shifted PF matrix on every `ParityStepS` move
 
