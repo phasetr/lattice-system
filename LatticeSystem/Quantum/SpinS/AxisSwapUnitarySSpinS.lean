@@ -341,7 +341,7 @@ theorem cexp_neg_pi_half_mul_I :
   rw [show -(((Real.pi / 2 : ℝ) : ℂ) * Complex.I) =
          ((-(Real.pi / 2) : ℝ) : ℂ) * Complex.I from by push_cast; ring,
       Complex.exp_mul_I]
-  simp [Real.cos_neg, Real.sin_neg, Real.cos_pi_div_two, Real.sin_pi_div_two]
+  simp
 
 -- `Complex.exp(((π/2 : ℝ) : ℂ) * I) = I`.
 theorem cexp_pi_half_mul_I :
