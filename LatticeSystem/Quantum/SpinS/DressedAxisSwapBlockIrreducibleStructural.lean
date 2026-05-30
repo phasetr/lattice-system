@@ -8,7 +8,7 @@ Issue #3887 (Tasaki §2.5 Theorem 2.4, `h_intermediate` vacuous-at-N=1 fix).
 
 (#3887.4): Structural variant of
 `shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible` that uses
-`parityReachableS_total_structural` (#3887.3) instead of `parityReachableS_total`.
+`parityReachableS_total` (#3887.3) instead of `parityReachableS_total_legacy`.
 
 Drops `h_intermediate`; requires `hA_ne + hB_ne + 1 ≤ N` instead. The result is
 identical in conclusion — irreducibility of the shifted parity-block matrix —
@@ -42,7 +42,7 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_structural
   refine shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_of_parityReachable_total
     A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict p ?_
   intro σ' σ _hne
-  refine parityReachableS_total_structural A hA_ne hB_ne hN ?_
+  refine parityReachableS_total A hA_ne hB_ne hN ?_
   -- magSumS σ.1 % 2 = p = magSumS σ'.1 % 2 from parityConfigS membership.
   have hp_σ : magSumS σ.1 % 2 = p := σ.2
   have hp_σ' : magSumS σ'.1 % 2 = p := σ'.2

@@ -733,7 +733,7 @@ the §2.5 ground state on the actual quantum Heisenberg Hamiltonian.
 This is the COMPLEX-Hilbert-space form of Tasaki §2.5 Theorem 2.2 on
 the actual quantum Heisenberg Hamiltonian, lifted from the magnetization
 sector form (PRs #847–#865). -/
-theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full
+theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -805,7 +805,7 @@ theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full
       rw [Pi.smul_apply, magSectorEmbedding_apply_subtype, smul_eq_mul]
     -- Apply complex sector uniqueness (#862).
     obtain ⟨hμ_eq, r, hr_pos, hrel⟩ :=
-      marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector
+      marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector_legacy
         A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
         h_intermediate hsec_ground (by
           intro τ

@@ -10,11 +10,11 @@ set_option linter.unusedVariables false
 # Structural Tasaki §2.5 Theorem 2.2 bundled full-Hilbert form (no `h_intermediate`)
 
 (Thm23-#3887.15): structural variant of
-`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` bundling
+`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full_legacy` bundling
 - existence (Thm23-#3887.13 `exists_marshallSign_eigenvector_heisenbergHamiltonianS_full`)
 - support (zero outside sector — direct from `magSectorEmbedding_apply_of_not_mem`)
 - uniqueness (Thm23-#3887.14
-  `marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector_structural`)
+  `marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector`)
 into the textbook statement of the §2.5 Theorem 2.2 ground state on the actual quantum
 Heisenberg Hamiltonian, with `(hA_ne, hB_ne, hN)` instead of `h_intermediate`.
 
@@ -27,7 +27,7 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-- **Structural Tasaki §2.5 Theorem 2.2 bundled (no `h_intermediate`)**. -/
-theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full_structural
+theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full
     (A : V → Bool)
     {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -82,7 +82,7 @@ theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full_structu
         (μ : ℂ) * (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)
       rw [Pi.smul_apply, magSectorEmbedding_apply_subtype, smul_eq_mul]
     obtain ⟨hμ_eq, r, hr_pos, hrel⟩ :=
-      marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector_structural
+      marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector
         (N := N) (M := M) A c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
         hA_ne hB_ne hN hsec_ground (by
           intro τ

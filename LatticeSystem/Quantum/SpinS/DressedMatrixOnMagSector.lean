@@ -170,7 +170,7 @@ Proof: combines the matrix-power positivity for distinct σ ≠ σ'
 (#845) with the diagonal positivity (`M σ σ = c - dressed σ σ > 0`
 when `c > dressed σ σ`) via the
 `Matrix.isIrreducible_iff_exists_pow_pos` characterization. -/
-theorem isIrreducible_shiftedDressedSReMatrixOnMagSector
+theorem isIrreducible_shiftedDressedSReMatrixOnMagSector_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -227,7 +227,7 @@ theorem exists_positive_eigenvector_shiftedDressedSReMatrixOnMagSector_legacy
       0 < r ∧ (∀ σ, 0 < v σ) ∧
       (shiftedDressedSReMatrixOnMagSector A J N c M).mulVec v = r • v :=
   LatticeSystem.Math.PerronFrobeniusMain.exists_positive_eigenvector_of_irreducible
-    (isIrreducible_shiftedDressedSReMatrixOnMagSector A N c hJ_real hJ_pos
+    (isIrreducible_shiftedDressedSReMatrixOnMagSector_legacy A N c hJ_real hJ_pos
       hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate)
 
 /-- **Uniqueness of the spin-S Perron eigenvector** (γ-3 FINAL): for the
@@ -259,7 +259,7 @@ theorem pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector
     (hw_pos : ∀ σ, 0 < w σ) :
     ∃ r : ℝ, 0 < r ∧ w = r • v :=
   LatticeSystem.Math.PerronFrobenius.pos_eigenvec_unique
-    (isIrreducible_shiftedDressedSReMatrixOnMagSector A N c hJ_real hJ_pos
+    (isIrreducible_shiftedDressedSReMatrixOnMagSector_legacy A N c hJ_real hJ_pos
       hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate)
     hv hv_pos hw hw_pos
 

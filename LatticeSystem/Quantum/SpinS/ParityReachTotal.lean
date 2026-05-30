@@ -8,7 +8,7 @@ import LatticeSystem.Quantum.SpinS.ParityReachableMagSum
 
 Issue #3739 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori).
 
-`parityReachableS_total`: for any two configurations sharing the same total-magnetization parity
+`parityReachableS_total_legacy`: for any two configurations sharing the same total-magnetization parity
 (`magSumS σ ≡ magSumS σ' (mod 2)`), `ParityReachableS` connects them.
 
 This closes the (d.3) reachability totality plan by chaining:
@@ -37,7 +37,7 @@ set_option linter.unusedDecidableInType false in
 /-- **`ParityReachableS` totality on the bipartite complete graph**: any two configurations of
 the same total-magnetization parity are `ParityReachableS`-connected.  Discharges the
 `hreach_total` hypothesis of the parity-block matrix irreducibility theorem #3797. -/
-theorem parityReachableS_total
+theorem parityReachableS_total_legacy
     (A : V → Bool)
     (hA_ne : ∃ a, A a = true)
     (hB_ne : ∃ b, A b = false)

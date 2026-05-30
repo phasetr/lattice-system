@@ -11,13 +11,13 @@ set_option linter.unusedVariables false
 (Thm23-#3887.14): structural variants of the Marshall-positive sector eigenvector
 uniqueness chain, swapping `pos_eigenvec_unique` at the bottom from the
 `h_intermediate`-dependent irreducibility to the structural irreducibility
-`isIrreducible_shiftedDressedSReMatrixOnMagSector_structural` (Thm23-#3887.1).
+`isIrreducible_shiftedDressedSReMatrixOnMagSector` (Thm23-#3887.1).
 
 Provides four wrappers (bottom-up):
 - `pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector_structural`
 - `pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector_structural`
-- `marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector_structural`
-- `marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector_structural`
+- `marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector`
+- `marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector`
 
 The eigenvalue-uniqueness side (`pos_eigenvec_eigenvalue_unique_*`,
 `marshallPositive_eigenvec_eigenvalue_unique_*`) already does NOT use `h_intermediate`,
@@ -50,7 +50,7 @@ theorem pos_eigenvec_unique_shiftedDressedSReMatrixOnMagSector_structural
     (hw_pos : ∀ σ, 0 < w σ) :
     ∃ r : ℝ, 0 < r ∧ w = r • v :=
   LatticeSystem.Math.PerronFrobenius.pos_eigenvec_unique
-    (isIrreducible_shiftedDressedSReMatrixOnMagSector_structural (N := N) (M := M)
+    (isIrreducible_shiftedDressedSReMatrixOnMagSector (N := N) (M := M)
       A c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN)
     hv hv_pos hw hw_pos
 
@@ -82,7 +82,7 @@ theorem pos_eigenvec_unique_dressedHeisenbergSReMatrixOnMagSector_structural
 
 /-- **Structural Marshall-positive Heisenberg sector eigenvector uniqueness
 (no `h_intermediate`)**. -/
-theorem marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector_structural
+theorem marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector
     (A : V → Bool)
     {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -135,7 +135,7 @@ theorem marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSect
 
 /-- **Structural Marshall-positive complex sector eigenvector uniqueness
 (no `h_intermediate`)**. -/
-theorem marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector_structural
+theorem marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector
     (A : V → Bool)
     {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -168,7 +168,7 @@ theorem marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixO
   refine ⟨hμ_eq, ?_⟩
   subst hμ_eq
   obtain ⟨r, hr_pos, hrel⟩ :=
-    marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector_structural
+    marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector
       (N := N) (M := M) A c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
       hA_ne hB_ne hN hW₁_re hW₁_marshall_pos hW₂_re hW₂_marshall_pos
   exact ⟨r, hr_pos, fun σ => congrFun hrel σ⟩

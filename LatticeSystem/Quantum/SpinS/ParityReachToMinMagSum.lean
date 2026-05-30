@@ -10,7 +10,7 @@ every configuration reaches some `σ_min` with `magSumS σ_min < 2` — i.e. eit
 config (for even parity) or a single-1-site config (for odd parity).
 
 Combined with the within-sector reachability lift (#3817) and `ParityReachableS` symmetry
-(#3816), this is the penultimate step before the full `parityReachableS_total` discharging the
+(#3816), this is the penultimate step before the full `parityReachableS_total_legacy` discharging the
 parity-block matrix irreducibility theorem (#3797).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020,

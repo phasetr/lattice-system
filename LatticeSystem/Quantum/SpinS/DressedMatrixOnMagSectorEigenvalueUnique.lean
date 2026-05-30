@@ -421,7 +421,7 @@ and their real parts are positive scalar multiples of each other.
 
 Proof: extract real parts via PR #861 to reduce to the real-form
 Marshall-positive uniqueness theorems (PRs #854, #856). -/
-theorem marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector
+theorem marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector_legacy
     (A : V → Bool)
     {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
@@ -458,7 +458,7 @@ theorem marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixO
   subst hμ_eq
   -- Same-eigenvalue eigenvector uniqueness on heis_sec.
   obtain ⟨r, hr_pos, hrel⟩ :=
-    marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector
+    marshallPositive_eigenvec_unique_heisenbergHamiltonianSReMatrixOnMagSector_legacy
       A N c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate
       hW₁_re hW₁_marshall_pos hW₂_re hW₂_marshall_pos
   exact ⟨r, hr_pos, fun σ => congrFun hrel σ⟩
@@ -510,7 +510,7 @@ theorem marshallLiebMattis_spinS_heisenbergSector_complexGroundState_full
     rw [← mul_assoc, hsq, one_mul]
     exact hv_pos σ
   obtain ⟨hμ_eq, r, hr_pos, hrel⟩ :=
-    marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector
+    marshallPositive_complexEigenvec_re_unique_heisenbergHamiltonianSMatrixOnMagSector_legacy
       A N c hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict
       h_intermediate hmul hΦ_marshall_pos hW hW_marshall_pos
   refine ⟨hμ_eq.symm, r, hr_pos, fun σ => ?_⟩
