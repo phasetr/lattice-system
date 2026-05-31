@@ -1,6 +1,6 @@
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralGeneralFinal
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralSectorLiftCasimir
-import LatticeSystem.Quantum.SpinS.Theorem24SU2SymmetricFinrankLeOneFromSectorPF
+import LatticeSystem.Quantum.SpinS.EigenspaceFinrankLeOneTransfer
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import LatticeSystem.Quantum.SpinS.HermitianMinLeOfEigenvector
 
