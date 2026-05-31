@@ -1293,6 +1293,15 @@ Systems*, §2.2 eqs. (2.2.7) and (2.2.8), p. 22.
 | `neelStateOf_totalSpinHalfOp3_complement_eq_neg` | **Spin-`1/2` linear `Ŝ_tot^(3)` negates under sublattice swap on Néel**. Direct from γ-4 step 207 + 232 + `ring`. Spin-`1/2` mirror of γ-4 step 239 (γ-4 step 240) | `Quantum/MarshallLiebMattis/SublatticeCasimirNeelGeneral.lean` (moved in refactor #41, PR #2879) (PR #1287) |
 | `neelStateOfS_totalSpinSOp1/2_expectation` | **Spin-`S` Néel transverse linear expectations vanish**: `<Φ_Néel\|Ŝ_tot^(1,2)\|Φ_Néel> = 0`. Trivial corollary of γ-4 step 214 applied to `σ = neelConfigOfS A N` (γ-4 step 241). Together with γ-4 step 91 (`<Ŝ_tot^(3)> = magEigenvalueS_neelConfigOfS`), gives the complete per-axis profile `(0, 0, (\|A\|−\|¬A\|)·N/2)` | `Quantum/SpinS/SublatticeCasimirNeel.lean` (PR #1288) |
 | `neelStateOf_totalSpinHalfOp1/2_expectation` | **Spin-`1/2` Néel transverse linear expectations vanish**: same as γ-4 step 241 for spin-`1/2`, derived from γ-4 step 215 (γ-4 step 242) | `Quantum/MarshallLiebMattis/SublatticeCasimirNeel.lean` (PR #1289) |
+
+The single-cluster Problem 2.5.a modules below are imported from the
+build root again after the 2026-05-30 orphan-module sweep had removed
+the earlier implementation.  The restored import tip is
+`Quantum/SpinS/SingleClusterHamiltonianConcreteClusters.lean`, which
+keeps the abstract Hamiltonian, energy hygiene, and concrete
+dimer/trimer/quartet/pentamer eigenvalue formulas live in the default
+Lean build (PR pending).
+
 | `singleClusterHamiltonianS` | **Single-cluster (star-graph) Heisenberg Hamiltonian** (Tasaki Problem 2.5.a, p. 38): `H = Σ_{j=1}^z Ŝ_0 · Ŝ_j` on `Fin (z + 1)` with central vertex `0` and `z` leaves. Ground-state energy `−S(1 + zS)` (γ-5 step 243) | `Quantum/SpinS/SingleClusterHamiltonian.lean` (PR #1290) |
 | `singleClusterHamiltonianS_isHermitian` | **Hermiticity** of the single-cluster Heisenberg Hamiltonian. Sum of Hermitian `spinSDot 0 j N` over `j ∈ univ.erase 0` (γ-5 step 244) | `Quantum/SpinS/SingleClusterHamiltonian.lean` (PR #1291) |
 | `singleClusterHamiltonianS_zero_z` | **Edge case `z = 0`**: `singleClusterHamiltonianS 0 N = 0` since `univ.erase 0 = ∅` in `Fin 1`. Tasaki's formula `−S(1 + zS)` is intended for `z ≥ 1` (γ-5 step 245) | `Quantum/SpinS/SingleClusterHamiltonian.lean` (PR #1292) |
@@ -2641,7 +2650,13 @@ mathematical work):
   argument on the Marshall-rotated basis.
 - **Problem 2.5.a** (single-cluster ground-state energy
   `-S(1+zS)` for general spin `S` and coordination `z`).
-  Requires general-spin infrastructure (P1d''' above is now done in PR #490; this remains for the §2.5-specific cluster argument).
+  The single-cluster Hamiltonian, Casimir decomposition, named
+  GS/max energies, and dimer/trimer/quartet/pentamer conditional
+  eigenvalue formulas are live again under
+  `Quantum/SpinS/SingleClusterHamiltonian*.lean`; the remaining
+  mathematical gaps are the Clebsch--Gordan existence of the
+  predicted GS-sector eigenvectors and the spectral/variational
+  exhaustion argument.
 - **Problem 2.5.b** (lower bound on `E_GS` via 2.5.a).
 - **Problem 2.5.c** (single-site expectation `⟨Ŝ_x⟩ = 0` in the
   AFM ground state).
