@@ -999,4 +999,158 @@ theorem exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace
       (V := V) (N := N) J M0 hJ_real hstrict hpf
   exact ⟨μ, hmin_eq, by simpa [M0, hM0def] using hsectors_singleton, huniq⟩
 
+/-- **Packaged MLM-to-SU(2) uniqueness endpoint from the Casimir ladder
+obstruction**: the preceding endpoint no longer needs an abstract strict
+outside-sector callback once the balanced zero-Casimir ladder obstruction is
+available.  The structural Theorem 2.3 data provide the common energy and the
+balanced PF vector; the balanced PF/Casimir lift makes that vector a non-zero
+zero-Casimir full eigenvector; and
+`tasaki23_strict_hOutside_of_card_eq_zero_casimir_ladder_obstruction` constructs
+the strict outside-sector ordering consumed by the PR #4020 endpoint. -/
+theorem exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder
+    (A : V → Bool) (N : ℕ) {J : V → V → ℂ} (c c_toy : ℝ)
+    (hT23 : tasaki_2_5_theorem_2_3 A N J c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hJ_pos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hc_strict_toy : ∀ σ,
+      dressedHeisenbergSReMatrix A (bipartiteCoupling A) N σ σ < c_toy)
+    (h_card_eq : (Finset.univ.filter (fun x : V => A x = true)).card =
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card)
+    (hN : 1 ≤ N)
+    (hcardA : 1 ≤ (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hcardB : 1 ≤ (Finset.univ.filter (fun x : V => (! A x) = true)).card)
+    (h_sector_pf : ∀ μ : ℝ,
+      hermitianMinEigenvalue (heisenbergHamiltonianS_isHermitian_of_real
+        (Λ := V) hJ_real' N) = μ →
+      finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+        (heisenbergHamiltonianSMatrixOnMagSector (V := V) J N
+          ((Finset.univ.filter (fun x : V => A x = true)).card * N))) (μ : ℂ)) ≤ 1) :
+    ∃ μ : ℝ,
+      hermitianMinEigenvalue (heisenbergHamiltonianS_isHermitian_of_real
+        (Λ := V) hJ_real' N) = μ ∧
+      tasaki23GroundStateSectors (V := V) A N =
+        {((Finset.univ.filter (fun x : V => A x = true)).card * N)} ∧
+      finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+        (heisenbergHamiltonianS (Λ := V) J N)) (μ : ℂ)) ≤ 1 := by
+  classical
+  set M0 := (Finset.univ.filter (fun x : V => A x = true)).card * N with hM0def
+  obtain ⟨μ, hmin_eq, hsector, _hglobal⟩ :=
+    exists_tasaki23_common_energy_eq_hermitianMinEigenvalue A N c hT23
+      hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos hc_strict
+      hN hcardA hcardB
+  have hM0_mem : M0 ∈ tasaki23GroundStateSectors (V := V) A N := by
+    rw [hM0def, tasaki23GroundStateSectors_mem_iff_eq_of_card_eq A N _ h_card_eq]
+  haveI : Nonempty (magConfigS V N M0) :=
+    magConfigS_nonempty_of_le_card_mul (tasaki23GroundStateSectors_le_card_mul A N hM0_mem)
+  obtain ⟨v0, _hμ_lt, hv0_pos, hΦ0_eig_embed, _huniq0⟩ := hsector M0 hM0_mem
+  set Φ0 : (V → Fin (N + 1)) → ℂ :=
+    magSectorEmbedding (fun τ : magConfigS V N M0 =>
+      (((marshallSignS A τ.1).re * v0 τ : ℝ) : ℂ))
+    with hΦ0def
+  have hΦ0_eig : (heisenbergHamiltonianS J N).mulVec Φ0 = (μ : ℂ) • Φ0 := by
+    simpa [Φ0, hΦ0def] using hΦ0_eig_embed
+  have hΦ0_ne : Φ0 ≠ 0 := by
+    intro hzero
+    let τ : magConfigS V N M0 := Classical.arbitrary _
+    have hτ_zero := congrFun hzero τ.1
+    rw [hΦ0def, magSectorEmbedding_apply_subtype] at hτ_zero
+    have hreal_zero : (marshallSignS A τ.1).re * v0 τ = 0 := by
+      exact_mod_cast congrArg Complex.re hτ_zero
+    have hsq : (marshallSignS A τ.1).re * (marshallSignS A τ.1).re = 1 :=
+      marshallSignS_re_sq A τ.1
+    have hv0_zero : v0 τ = 0 := by
+      calc
+        v0 τ = ((marshallSignS A τ.1).re * (marshallSignS A τ.1).re) * v0 τ := by
+          rw [hsq, one_mul]
+        _ = (marshallSignS A τ.1).re * ((marshallSignS A τ.1).re * v0 τ) := by ring
+        _ = 0 := by rw [hreal_zero, mul_zero]
+    exact (ne_of_gt (hv0_pos τ)) hv0_zero
+  have hΦ0_mem : Φ0 ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M0 : ℂ)) := by
+    rw [hΦ0def]
+    exact magSectorEmbedding_mem_magSubspaceS _
+  have hA_ne : ∃ a, A a = true := by
+    obtain ⟨a, ha⟩ := Finset.card_pos.mp (lt_of_lt_of_le Nat.zero_lt_one hcardA)
+    exact ⟨a, (Finset.mem_filter.mp ha).2⟩
+  have hB_ne : ∃ b, A b = false := by
+    obtain ⟨b, hb⟩ := Finset.card_pos.mp (lt_of_lt_of_le Nat.zero_lt_one hcardB)
+    have hb_not := (Finset.mem_filter.mp hb).2
+    cases hAb : A b
+    · exact ⟨b, hAb⟩
+    · rw [hAb] at hb_not
+      cases hb_not
+  have hsB : 0 < ((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℝ) *
+      (N : ℝ) / 2 := by
+    have hBpos : 0 < ((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℝ) := by
+      exact_mod_cast (lt_of_lt_of_le Nat.zero_lt_one hcardB)
+    have hNpos : 0 < (N : ℝ) := by
+      exact_mod_cast (lt_of_lt_of_le Nat.zero_lt_one hN)
+    nlinarith
+  have hReEig0 : (heisenbergHamiltonianSReMatrixOnMagSector J N M0).mulVec
+      (fun σ => (marshallSignS A σ.1).re * v0 σ) =
+      μ • (fun σ => (marshallSignS A σ.1).re * v0 σ) := by
+    have hc := heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen
+      J (M := M0) hΦ0_eig
+    rw [hΦ0def, magSectorRestriction_magSectorEmbedding] at hc
+    have hre := heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec N
+      hJ_real hc
+    simpa only [Complex.ofReal_re] using hre
+  obtain ⟨_hΦ0_eig_lift, hΦ0_cas_lift⟩ :=
+    tasaki23_sector_lift_and_casimir_zero_of_card_eq A N c c_toy h_card_eq hsB hM0_mem
+      hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hc_strict_toy
+      hA_ne hB_ne hN hv0_pos hReEig0
+  have hΦ0_cas : (totalSpinSSquared V N).mulVec Φ0 = 0 := by
+    rw [hΦ0def]
+    simpa using hΦ0_cas_lift
+  have hcommon : ∀ M ∈ tasaki23GroundStateSectors (V := V) A N,
+      ∃ vM : magConfigS V N M → ℝ, (∀ σ, 0 < vM σ) ∧
+        (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+            (fun σ => (marshallSignS A σ.1).re * vM σ) =
+          μ • (fun σ => (marshallSignS A σ.1).re * vM σ) := by
+    intro M hM
+    haveI : Nonempty (magConfigS V N M) :=
+      magConfigS_nonempty_of_le_card_mul (tasaki23GroundStateSectors_le_card_mul A N hM)
+    obtain ⟨vM, _hμ_lt_M, hvM_pos, hΦM_eig_embed, _huniqM⟩ := hsector M hM
+    refine ⟨vM, hvM_pos, ?_⟩
+    set ΦM : (V → Fin (N + 1)) → ℂ :=
+      magSectorEmbedding (fun τ : magConfigS V N M =>
+        (((marshallSignS A τ.1).re * vM τ : ℝ) : ℂ))
+      with hΦMdef
+    have hΦM_eig : (heisenbergHamiltonianS J N).mulVec ΦM = (μ : ℂ) • ΦM := by
+      simpa [ΦM, hΦMdef] using hΦM_eig_embed
+    have hc := heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen
+      J (M := M) hΦM_eig
+    rw [hΦMdef, magSectorRestriction_magSectorEmbedding] at hc
+    have hre := heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec N
+      hJ_real hc
+    simpa only [Complex.ofReal_re] using hre
+  have hstrict : ∀ μ' : ℝ,
+      hermitianMinEigenvalue (heisenbergHamiltonianS_isHermitian_of_real
+        (Λ := V) hJ_real' N) = μ' →
+      ∀ M : ℕ,
+        M ≠ (Finset.univ.filter (fun x : V => A x = true)).card * N →
+        [Nonempty (magConfigS V N M)] →
+        ∀ {μM : ℝ} {φ : magConfigS V N M → ℝ}, φ ≠ 0 →
+          (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec φ = μM • φ →
+          μ' < μM := by
+    intro μ' hmin_eq' M hM_ne _ μM φ hφ_ne hφ
+    have hμ' : μ' = μ := by
+      rw [hmin_eq] at hmin_eq'
+      exact hmin_eq'.symm
+    have hlt : μ < μM :=
+      tasaki23_strict_hOutside_of_card_eq_zero_casimir_ladder_obstruction
+        A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict h_card_eq
+        hcommon hΦ0_ne hΦ0_eig
+        (by simpa [M0, hM0def] using hΦ0_mem)
+        hΦ0_cas (h_sector_pf μ hmin_eq) hM_ne hφ_ne hφ
+    simpa [hμ'] using hlt
+  exact exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one
+    A N c hT23 hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos hc_strict
+    h_card_eq hN hcardA hcardB h_sector_pf hstrict
+
 end LatticeSystem.Quantum
