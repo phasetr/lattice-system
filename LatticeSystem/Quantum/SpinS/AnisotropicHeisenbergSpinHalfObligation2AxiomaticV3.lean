@@ -45,6 +45,7 @@ the per-`M` first-crossing sup analysis, under:
 - "below-sInf balanced IS GS" hypothesis (argmin choice).
 
 The conclusion is `False` (since we assumed obligation 2 violated). -/
+@[deprecated "Use the canonical capstone spinHalf_anisotropicHeisenbergS_obligation_2_single_axiom (PR #4014); for hne-parameterised use spinHalf_anisotropicHeisenbergS_obligation_2_axiomatic_sup_crossing_hne (PR #4009). This v3 capstone is an orphan in the final dependency chain." (since := "2026-05-31")]
 theorem spinHalf_anisotropicHeisenbergS_obligation_2_axiomatic_sup_crossing
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)

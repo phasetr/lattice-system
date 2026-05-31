@@ -36,6 +36,7 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 /-- **Spin-1/2 obligation (2) capstone v2 (strict-gap path-wide)**: under the
 spin-1/2 obligation (1) hypotheses and a **path-wide strict gap** axiom (replacing
 PR #3980's two separate axioms), the obligation (2) conclusion holds at `(λ', D')`. -/
+@[deprecated "Use the canonical capstone spinHalf_anisotropicHeisenbergS_obligation_2_single_axiom (PR #4014). This v2 capstone is an orphan in the final dependency chain." (since := "2026-05-31")]
 theorem spinHalf_anisotropicHeisenbergS_obligation_2_axiomatic_path_wide
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)

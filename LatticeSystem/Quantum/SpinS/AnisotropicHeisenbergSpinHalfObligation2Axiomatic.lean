@@ -43,6 +43,7 @@ hypotheses + the (2-IVT-c) strict gap + the first-crossing energy identification
 for any sector `M` with non-trivial centered magnetization, the per-sector min
 eigenvalue at `(λ', D')` is strictly greater than the `M_balanced`-sector min
 eigenvalue. -/
+@[deprecated "Use the canonical capstone spinHalf_anisotropicHeisenbergS_obligation_2_single_axiom (PR #4014). This v1 capstone is an orphan in the final dependency chain." (since := "2026-05-31")]
 theorem spinHalf_anisotropicHeisenbergS_obligation_2_axiomatic
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
