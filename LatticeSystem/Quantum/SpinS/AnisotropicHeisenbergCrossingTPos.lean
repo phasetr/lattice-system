@@ -70,8 +70,9 @@ theorem anisotropicHeisenbergS_parametric_gap_crossing_t_pos
     subst h0_eq
     have hγ0 := anisotropicHeisenbergParametricPath_zero lam' D'
     rw [hγ0] at heq
-    simp at heq
+    simp only at heq
     -- heq : E_{M_0}(1, 0) = E_M(1, 0). But h0 : E_{M_0}(1, 0) < E_M(1, 0).
-    exact (lt_irrefl _ (heq ▸ h0))
+    rw [heq] at h0
+    exact lt_irrefl _ h0
 
 end LatticeSystem.Quantum
