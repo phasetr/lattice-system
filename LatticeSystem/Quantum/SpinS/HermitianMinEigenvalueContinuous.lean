@@ -30,7 +30,7 @@ variable {n : Type*} [Fintype n] [DecidableEq n] [Nonempty n]
 variable {X : Type*} [PseudoMetricSpace X]
 
 /-- Entry-norm sum is continuous in the matrix parameter. -/
-theorem continuous_sum_entryNorms :
+theorem continuous_sum_entryNorms {n : Type*} [Fintype n] :
     Continuous (fun M : Matrix n n ℂ => ∑ i, ∑ j, ‖M i j‖) := by
   refine continuous_finset_sum _ (fun i _ => ?_)
   refine continuous_finset_sum _ (fun j _ => ?_)
