@@ -12971,13 +12971,24 @@ imports the abstract Hamiltonian and energy companion, and
         prove that if the leaves have total spin zero and the total
         Casimir is the central-spin value $N(N+2)/4$, then
         $\hat H \cdot v = 0$ ($\gamma$-5 steps 296, 321--323).
+  \item Minimum-eigenvalue upper-bound bridge:
+        \texttt{singleClusterHamiltonianS\_hermitianMinEigenvalue\_le\_gs\_of\_gs\_sector}
+        shows that any non-zero vector in the predicted GS Casimir
+        sector gives
+        $\lambda_{\min}(\hat H) \le \operatorname{Re}
+        \texttt{singleClusterGSEnergyS z N}$.  The companion
+        \texttt{...\_of\_exists\_gs\_sector} packages the
+        Clebsch--Gordan vector construction as the remaining
+        hypothesis ($\gamma$-5 step 324).
 \end{itemize}
 
 \textbf{Strategic gaps.} The deferred pieces are:
 (a) constructing an actual joint-Casimir eigenvector at the GS
 sector $(s_R, s_{\rm tot}) = (zN/2, (z-1)N/2)$ via Clebsch--Gordan
-decomposition; (b) showing the spectrum is exhausted by the joint
-Casimir sectors (variational principle / spectral theorem). Both
+decomposition; (b) proving the matching lower bound, equivalently
+showing the spectrum is exhausted by joint Casimir sectors and that
+no sector lies below the predicted value (variational principle /
+spectral theorem). Both
 require substantial multi-PR effort (SU(2) representation theory or
 spin-$S$ Perron--Frobenius on the dressed Hamiltonian extending the
 spin-$1/2$ work in
