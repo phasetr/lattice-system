@@ -12594,6 +12594,7 @@ heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_outside_projection_zero
 heisenbergHamiltonianS_outside_projection_zero_of_strict_sector_lower
 heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_strict_sector_lower
 exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one
+exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder
 \end{Verbatim}
 The first name records the balanced-cardinality arithmetic: when
 \(|A|=|\Lambda\setminus A|\), the Tasaki Theorem~2.3 admissible sector interval
@@ -12652,13 +12653,14 @@ The strict-ordering interface says that if every real eigenvalue in every
 sector \(M\ne |A|N\) is strictly above \(\mu\), then a full eigenvector at
 \(\mu\) has zero outside projections: a non-zero outside projection would give
 a real or imaginary sector eigenvector at the same \(\mu\), contradicting
-strictness.  Consequently the final packaged theorem assembles the consumer
+strictness.  Consequently the first packaged theorem assembles the consumer
 boundary: Theorem~2.3 supplies the common energy and full lower bound, balanced
 cardinality supplies the singleton sector band, and the two remaining callbacks
 are exactly balanced-sector PF simplicity and strict outside-sector ordering.
-The only missing ingredient is now precisely that strict outside-sector lower
-bound from the MLM/Casimir ladder, not any strict-gap theorem from the
-anisotropic deformation chain.  References: H.~Tasaki, \emph{Physics and
+The final packaged theorem removes the strict-ordering callback by constructing
+it from the balanced zero-Casimir vector and the total-ladder obstruction above.
+The remaining callback is only balanced-sector PF simplicity.  References:
+H.~Tasaki, \emph{Physics and
 Mathematics of Quantum Many-Body Systems}, Springer 2020, §2.5
 Theorems~2.3--2.4, pp.~42--44; E.~Lieb and D.~Mattis, J. Math. Phys. 3 (1962),
 749.
