@@ -195,6 +195,92 @@ theorem heisenbergHamiltonianS_totalSpinSSquared_mulVec_eq_zero_of_sector_pf_zer
     rw [hscalar]
   rw [hΨ_eq, Matrix.mulVec_smul, hΦ0_cas, smul_zero]
 
+/-- **Lowering-landed zero-Casimir bridge**: suppose a non-zero full
+Heisenberg eigenvector `Φ` starts in sector `M`, and `k` valid total-lowering
+steps land it in sector `M + k` without changing the energy.  If sector PF
+simplicity pins the landed sector to a known non-zero zero-Casimir vector
+`Φ0`, then the landed vector is still non-zero and has total-Casimir image
+`0`.
+
+This packages the equality-case endpoint of the inward ladder used in the
+MLM/Casimir strict outside-sector argument. -/
+theorem heisenbergHamiltonianS_totalSpinSSquared_mulVec_lower_landed_eq_zero_of_sector_pf
+    (J : V → V → ℂ) (M k : ℕ) (μ : ℝ)
+    {Φ0 Φ : (V → Fin (N + 1)) → ℂ}
+    (hΦ0_ne : Φ0 ≠ 0)
+    (hΦ0_eig : (heisenbergHamiltonianS J N).mulVec Φ0 = (μ : ℂ) • Φ0)
+    (hΦ0_mem : Φ0 ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - ((M + k : ℕ) : ℂ)))
+    (hΦ0_cas : (totalSpinSSquared V N).mulVec Φ0 = 0)
+    (hΦ_ne : Φ ≠ 0)
+    (hΦ_mem : Φ ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ)))
+    (hΦ_eig : (heisenbergHamiltonianS J N).mulVec Φ = (μ : ℂ) • Φ)
+    (hpos : ∀ j : ℕ, j < k →
+      0 < ((((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ)) - (j : ℂ)).re)
+    (h_sector_pf : finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+      (heisenbergHamiltonianSMatrixOnMagSector (V := V) J N (M + k))) (μ : ℂ)) ≤ 1) :
+    ((totalSpinSOpMinus V N ^ k).mulVec Φ ≠ 0) ∧
+      (totalSpinSSquared V N).mulVec ((totalSpinSOpMinus V N ^ k).mulVec Φ) = 0 := by
+  classical
+  obtain ⟨hland_ne, hland_mem, hland_eig⟩ :=
+    lower_iterate_ne_zero (V := V) (N := N) (J := J) (lam := μ) k
+      hΦ_ne hΦ_mem hΦ_eig hpos
+  have hland_mem' :
+      (totalSpinSOpMinus V N ^ k).mulVec Φ ∈
+        magSubspaceS V N
+          (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - ((M + k : ℕ) : ℂ)) := by
+    convert hland_mem using 1
+    push_cast
+    ring_nf
+  refine ⟨hland_ne, ?_⟩
+  exact heisenbergHamiltonianS_totalSpinSSquared_mulVec_eq_zero_of_sector_pf_zero_casimir
+    (V := V) (N := N) J (M + k) (μ : ℂ)
+    hΦ0_ne hΦ0_eig hΦ0_mem hΦ0_cas hland_eig hland_mem' h_sector_pf
+
+/-- **Raising-landed zero-Casimir bridge**: suppose a non-zero full
+Heisenberg eigenvector `Φ` starts in sector `M + k`, and `k` valid
+total-raising steps land it in sector `M` without changing the energy.  If
+sector PF simplicity pins the landed sector to a known non-zero zero-Casimir
+vector `Φ0`, then the landed vector is still non-zero and has total-Casimir
+image `0`.
+
+This is the raising-side companion to
+`heisenbergHamiltonianS_totalSpinSSquared_mulVec_lower_landed_eq_zero_of_sector_pf`. -/
+theorem heisenbergHamiltonianS_totalSpinSSquared_mulVec_raise_landed_eq_zero_of_sector_pf
+    (J : V → V → ℂ) (M k : ℕ) (μ : ℝ)
+    {Φ0 Φ : (V → Fin (N + 1)) → ℂ}
+    (hΦ0_ne : Φ0 ≠ 0)
+    (hΦ0_eig : (heisenbergHamiltonianS J N).mulVec Φ0 = (μ : ℂ) • Φ0)
+    (hΦ0_mem : Φ0 ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ)))
+    (hΦ0_cas : (totalSpinSSquared V N).mulVec Φ0 = 0)
+    (hΦ_ne : Φ ≠ 0)
+    (hΦ_mem : Φ ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - ((M + k : ℕ) : ℂ)))
+    (hΦ_eig : (heisenbergHamiltonianS J N).mulVec Φ = (μ : ℂ) • Φ)
+    (hneg : ∀ j : ℕ, j < k →
+      ((((Fintype.card V : ℂ) * (N : ℂ)) / 2 - ((M + k : ℕ) : ℂ)) + (j : ℂ)).re < 0)
+    (h_sector_pf : finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+      (heisenbergHamiltonianSMatrixOnMagSector (V := V) J N M)) (μ : ℂ)) ≤ 1) :
+    ((totalSpinSOpPlus V N ^ k).mulVec Φ ≠ 0) ∧
+      (totalSpinSSquared V N).mulVec ((totalSpinSOpPlus V N ^ k).mulVec Φ) = 0 := by
+  classical
+  obtain ⟨hland_ne, hland_mem, hland_eig⟩ :=
+    raise_iterate_ne_zero (V := V) (N := N) (J := J) (lam := μ) k
+      hΦ_ne hΦ_mem hΦ_eig hneg
+  have hland_mem' :
+      (totalSpinSOpPlus V N ^ k).mulVec Φ ∈
+        magSubspaceS V N
+          (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ)) := by
+    convert hland_mem using 1
+    push_cast
+    ring_nf
+  refine ⟨hland_ne, ?_⟩
+  exact heisenbergHamiltonianS_totalSpinSSquared_mulVec_eq_zero_of_sector_pf_zero_casimir
+    (V := V) (N := N) J M (μ : ℂ)
+    hΦ0_ne hΦ0_eig hΦ0_mem hΦ0_cas hland_eig hland_mem' h_sector_pf
+
 /-- **Common-energy lower bound identifies the Hermitian minimum**: if a
 Hermitian matrix has a non-zero eigenvector at a real energy `μ`, and every
 non-zero real-energy eigenvector has energy at least `μ`, then its Hermitian

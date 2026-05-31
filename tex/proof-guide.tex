@@ -12579,6 +12579,8 @@ tasaki23PredictedTotalSpin_eq_zero_of_card_eq
 tasaki23PredictedCasimirValue_eq_zero_of_card_eq
 tasaki23_sector_lift_and_casimir_zero_of_card_eq
 heisenbergHamiltonianS_totalSpinSSquared_mulVec_eq_zero_of_sector_pf_zero_casimir
+heisenbergHamiltonianS_totalSpinSSquared_mulVec_lower_landed_eq_zero_of_sector_pf
+heisenbergHamiltonianS_totalSpinSSquared_mulVec_raise_landed_eq_zero_of_sector_pf
 hermitianMinEigenvalue_eq_common_of_eigenvector_and_global_lower
 exists_tasaki23_common_energy_eq_hermitianMinEigenvalue
 heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_outside_projection_zero
@@ -12599,8 +12601,13 @@ sector-supported full eigenspace: if sector PF simplicity gives
 \((\hat S_{\rm tot})^2\Phi=0\), then every other full eigenvector at the same
 \(\mu\) supported in the same sector also has zero total-Casimir image.  This is
 the equality-case pin needed after the outside-sector ladder lands in the
-balanced sector.  The following
-two
+balanced sector.  The lowering- and raising-landed variants combine this pin
+with the existing non-vanishing inward-ladder iterates: if a non-zero
+Heisenberg eigenvector reaches a sector whose ground line is already pinned by
+sector PF simplicity to a zero-Casimir vector, then the landed vector is both
+non-zero and killed by \((\hat S_{\rm tot})^2\).  These two bridges isolate the
+left- and right-outside equality cases of \texttt{tasaki23\_general\_hOutside}.
+The following two theorems
 identify the MLM common energy \(\mu\) with the Hermitian minimum of the full
 Heisenberg Hamiltonian: the sector ground-state existence gives
 \(\lambda_{\min}\le\mu\), while Theorem~2.3's global lower-bound callback
