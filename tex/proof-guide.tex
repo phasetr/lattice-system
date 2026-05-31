@@ -12573,11 +12573,17 @@ mathematical input: full ground eigenspace uniqueness at \(E_{\rm full}\).
 The non-circular route to that endpoint uniqueness is started in the new
 endpoint file.  Its main Lean entry points are:
 \begin{Verbatim}
+Theorem24SectorPFFromTheorem23.lean
 Theorem24SU2GlobalUniquenessFromMLM.lean
+marshallDiagonalOnMagSector
+marshallDiagonalOnMagSector_mul_self
+dressedHeisenbergSReMatrixOnMagSector_map_eq_marshall_conj_heisenberg
+heisenbergHamiltonianSMatrixOnMagSector_finrank_le_one_of_marshall_positive
 tasaki23GroundStateSectors_eq_singleton_of_card_eq
 tasaki23PredictedTotalSpin_eq_zero_of_card_eq
 tasaki23PredictedCasimirValue_eq_zero_of_card_eq
 tasaki23_sector_lift_and_casimir_zero_of_card_eq
+tasaki23_balanced_sector_matrix_finrank_le_one_of_common_min
 heisenbergHamiltonianS_totalSpinSSquared_mulVec_eq_zero_of_sector_pf_zero_casimir
 heisenbergHamiltonianS_totalSpinSSquared_mulVec_lower_landed_eq_zero_of_sector_pf
 heisenbergHamiltonianS_totalSpinSSquared_mulVec_raise_landed_eq_zero_of_sector_pf
@@ -12595,9 +12601,24 @@ heisenbergHamiltonianS_outside_projection_zero_of_strict_sector_lower
 heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_strict_sector_lower
 exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one
 exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder
+exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder_t23_pf
 spinHalf_anisotropicHeisenbergS_obligation_2_of_MLM_casimir_ladder
+spinHalf_anisotropicHeisenbergS_obligation_2_of_MLM_casimir_ladder_t23_pf
 \end{Verbatim}
-The first name records the balanced-cardinality arithmetic: when
+The first group packages the sector Perron--Frobenius callback itself.  The
+Marshall diagonal on a magnetization sector is involutive, and conjugating the
+bare complex sector Hamiltonian by it gives the complexification of the
+dressed real sector matrix.  A Theorem~2.3 Marshall-positive real sector
+witness therefore becomes a positive eigenvector of the shifted dressed
+non-negative irreducible sector matrix.  Perron--Frobenius geometric
+simplicity, the shift correspondence, real-to-complex transfer, and the
+Marshall similarity then give
+\(\dim\ker(H_M-\mu)\le1\) for the bare complex sector matrix at the common
+energy.  This is the new
+\texttt{tasaki23\_balanced\_sector\_matrix\_finrank\_le\_one\_of\_common\_min}
+bridge.
+
+The next arithmetic name records the balanced-cardinality arithmetic: when
 \(|A|=|\Lambda\setminus A|\), the Tasaki Theorem~2.3 admissible sector interval
 \([\min(|A|,|B|)N,\max(|A|,|B|)N]\) is the singleton \(\{|A|N\}\).  The next
 three names record the corresponding total-spin simplification:
@@ -12660,7 +12681,10 @@ cardinality supplies the singleton sector band, and the two remaining callbacks
 are exactly balanced-sector PF simplicity and strict outside-sector ordering.
 The final packaged theorem removes the strict-ordering callback by constructing
 it from the balanced zero-Casimir vector and the total-ladder obstruction above.
-The remaining callback is only balanced-sector PF simplicity.  References:
+The \(t23\_pf\) endpoint then supplies the balanced-sector PF callback from the
+Theorem~2.3 witness described above, so the full SU(2)-endpoint uniqueness no
+longer exposes either strict outside-sector ordering or balanced-sector PF
+simplicity as a callback.  References:
 H.~Tasaki, \emph{Physics and
 Mathematics of Quantum Many-Body Systems}, Springer 2020, §2.5
 Theorems~2.3--2.4, pp.~42--44; E.~Lieb and D.~Mattis, J. Math. Phys. 3 (1962),
@@ -12677,8 +12701,11 @@ Heisenberg Hamiltonian, formalized by
 Thus the Heisenberg Hermitian-minimum eigenspace bound
 \(\dim E_{\min}\le1\) transports to \(\hat H(1,0)\), supplying the last
 abstract SU(2)-global-uniqueness input of the spin-\(1/2\) obligation
-boundary.  The remaining explicit callback is the balanced-sector
-Perron--Frobenius simplicity at the Theorem~2.3 common Hermitian minimum.
+boundary.  The \(t23\_pf\) wrapper also constructs that balanced-sector
+Perron--Frobenius simplicity from the structural Theorem~2.3 witness, leaving
+only the Theorem~2.3 predicate, the coupling and strict diagonal hypotheses,
+balanced-cardinality arithmetic, and the deformation-path hypotheses at the
+current spin-\(1/2\) obligation boundary.
 
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
