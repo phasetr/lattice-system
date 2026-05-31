@@ -70,6 +70,7 @@ import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfObligation2SU2Un
 import LatticeSystem.Quantum.SpinS.Theorem24SectorPFFromTheorem23
 import LatticeSystem.Quantum.SpinS.Theorem24SU2GlobalUniquenessFromMLM
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfObligation2FromMLM
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfBalancedGSFromMLM
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli

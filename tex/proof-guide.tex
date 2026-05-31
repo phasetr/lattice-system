@@ -12725,6 +12725,27 @@ Thus the PR~\#4027 contradiction form and the strict-gap public form are
 mathematically equivalent at this boundary; the latter is the cleaner consumer
 surface for obligation~(2).
 
+The next packaging step removes the last per-sector bookkeeping from that
+consumer surface.  The theorem
+\texttt{spinHalf\_anisotropicHeisenbergS\_strict\_gap\_all\_M\_of\_MLM\_casimir\_ladder\_t23\_pf}
+states the same target strict gap uniformly for every non-empty
+\(M\ne M_{\rm balanced}\).  A non-empty sector contains a configuration
+\(\sigma\), hence \(M=\texttt{magSumS}\,\sigma\le |\Lambda|N\), so \(M\) lies in
+the finite range required by the centered-nonzero hypothesis; the previous
+strict-gap theorem then applies to this arbitrary \(M\).  The theorem
+\texttt{spinHalf\_anisotropicHeisenbergS\_balanced\_eq\_full\_of\_MLM\_casimir\_ladder\_t23\_pf}
+uses this uniform strict gap with
+\texttt{hermitianMinEigenvalue\_balanced\_eq\_full\_of\_strict\_gap} and rewrites
+the path endpoint \(t=1\) by
+\texttt{anisotropicHeisenbergParametricPath\_one}.  It gives the target ground
+energy identity
+\[
+  E_{M_{\rm balanced}}(\lambda',D')
+  = \lambda_{\min}(\hat H(\lambda',D')).
+\]
+No new mathematical callback is introduced; the theorem is a consumer wrapper
+around the Theorem~2.3/Perron--Frobenius strict-gap endpoint.
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
