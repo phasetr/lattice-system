@@ -1300,7 +1300,7 @@ the earlier implementation.  The restored import tip is
 `Quantum/SpinS/SingleClusterHamiltonianConcreteClusters.lean`, which
 keeps the abstract Hamiltonian, energy hygiene, and concrete
 dimer/trimer/quartet/pentamer eigenvalue formulas live in the default
-Lean build (PR pending).
+Lean build (PR #4032).
 
 | `singleClusterHamiltonianS` | **Single-cluster (star-graph) Heisenberg Hamiltonian** (Tasaki Problem 2.5.a, p. 38): `H = Σ_{j=1}^z Ŝ_0 · Ŝ_j` on `Fin (z + 1)` with central vertex `0` and `z` leaves. Ground-state energy `−S(1 + zS)` (γ-5 step 243) | `Quantum/SpinS/SingleClusterHamiltonian.lean` (PR #1290) |
 | `singleClusterHamiltonianS_isHermitian` | **Hermiticity** of the single-cluster Heisenberg Hamiltonian. Sum of Hermitian `spinSDot 0 j N` over `j ∈ univ.erase 0` (γ-5 step 244) | `Quantum/SpinS/SingleClusterHamiltonian.lean` (PR #1291) |
