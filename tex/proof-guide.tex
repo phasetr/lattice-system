@@ -12567,6 +12567,46 @@ in \texttt{AnisotropicHeisenbergSpinHalfObligation2SU2UniqueOnly.lean}.  The
 spin-\(1/2\) obligation~(2) boundary now has one remaining SU(2)-endpoint
 mathematical input: full ground eigenspace uniqueness at \(E_{\rm full}\).
 
+The non-circular route to that endpoint uniqueness is started in
+\texttt{Theorem24SU2GlobalUniquenessFromMLM.lean}.  First,
+\texttt{tasaki23GroundStateSectors\_eq\_singleton\_of\_card\_eq} records the
+balanced-cardinality arithmetic: when \(|A|=|\Lambda\setminus A|\), the
+Tasaki Theorem~2.3 admissible sector interval
+\([\min(|A|,|B|)N,\max(|A|,|B|)N]\) is the singleton \(\{|A|N\}\).  Second,
+\texttt{hermitianMinEigenvalue\_eq\_common\_of\_eigenvector\_and\_global\_lower}
+and
+\texttt{exists\_tasaki23\_common\_energy\_eq\_hermitianMinEigenvalue}
+identify the MLM common energy \(\mu\) with the Hermitian minimum of the full
+Heisenberg Hamiltonian: the sector ground-state existence gives
+\(\lambda_{\min}\le\mu\), while Theorem~2.3's global lower-bound callback
+applied to a minimum eigenvector gives \(\mu\le\lambda_{\min}\).  Finally,
+\texttt{heisenbergHamiltonianS\_full\_eigenspace\_finrank\_le\_one\_of\_outside\_projection\_zero}
+isolates the remaining mathematical task.  Once every full ground eigenvector
+has zero projection to sectors outside the singleton balanced sector, the
+existing sector-matrix/sector-subspace finrank bridge transfers the
+Perron--Frobenius sector simplicity to the full Hilbert-space eigenspace.  The
+strict-ordering interface is made explicit by
+\texttt{heisenbergHamiltonianS\_outside\_projection\_zero\_of\_strict\_sector\_lower}:
+if every real eigenvalue in every sector \(M\ne |A|N\) is strictly above
+\(\mu\), then a full eigenvector at \(\mu\) has zero outside projections (a
+non-zero outside projection would give a real or imaginary sector eigenvector
+at the same \(\mu\), contradicting strictness).  Consequently
+\texttt{heisenbergHamiltonianS\_full\_eigenspace\_finrank\_le\_one\_of\_strict\_sector\_lower}
+is the final non-circular bridge from strict MLM/Casimir outside ordering plus
+balanced-sector Perron--Frobenius simplicity to full SU(2) ground-state
+uniqueness.  The packaged theorem
+\texttt{exists\_tasaki23\_common\_energy\_and\_heisenbergHamiltonianS\_full\_eigenspace\_finrank\_le\_one}
+assembles these pieces at the consumer boundary: Theorem~2.3 supplies the
+common energy and full lower bound, balanced cardinality supplies the singleton
+sector band, and the two remaining callbacks are exactly balanced-sector PF
+simplicity and strict outside-sector ordering.  The only missing ingredient is
+now precisely that strict
+outside-sector lower bound from the MLM/Casimir ladder, not any strict-gap
+theorem from the anisotropic deformation chain.  References: H.~Tasaki,
+\emph{Physics and Mathematics of Quantum Many-Body Systems}, Springer 2020,
+§2.5 Theorems~2.3--2.4, pp.~42--44; E.~Lieb and D.~Mattis, J. Math. Phys. 3
+(1962), 749.
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
