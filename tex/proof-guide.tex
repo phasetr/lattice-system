@@ -12581,6 +12581,12 @@ tasaki23_sector_lift_and_casimir_zero_of_card_eq
 heisenbergHamiltonianS_totalSpinSSquared_mulVec_eq_zero_of_sector_pf_zero_casimir
 heisenbergHamiltonianS_totalSpinSSquared_mulVec_lower_landed_eq_zero_of_sector_pf
 heisenbergHamiltonianS_totalSpinSSquared_mulVec_raise_landed_eq_zero_of_sector_pf
+totalSpinSOpPlus_mulVec_eq_zero_of_totalSpinSSquared_mulVec_eq_zero_of_mem_zero_magSubspaceS
+totalSpinSOpMinus_mulVec_eq_zero_of_totalSpinSSquared_mulVec_eq_zero_of_mem_zero_magSubspaceS
+not_exists_totalSpinSOpMinus_image_of_zero_casimir_zero_magSubspaceS
+not_exists_totalSpinSOpPlus_image_of_zero_casimir_zero_magSubspaceS
+not_totalSpinSOpMinus_pow_mulVec_ne_zero_of_zero_casimir_zero_magSubspaceS
+not_totalSpinSOpPlus_pow_mulVec_ne_zero_of_zero_casimir_zero_magSubspaceS
 hermitianMinEigenvalue_eq_common_of_eigenvector_and_global_lower
 exists_tasaki23_common_energy_eq_hermitianMinEigenvalue
 heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_outside_projection_zero
@@ -12607,6 +12613,20 @@ Heisenberg eigenvector reaches a sector whose ground line is already pinned by
 sector PF simplicity to a zero-Casimir vector, then the landed vector is both
 non-zero and killed by \((\hat S_{\rm tot})^2\).  These two bridges isolate the
 left- and right-outside equality cases of \texttt{tasaki23\_general\_hOutside}.
+The next six names formalize the representation-theoretic obstruction on the
+balanced zero-magnetization line.  A vector with
+\((\hat S_{\rm tot})^2\Phi=0\) and \(\hat S^3_{\rm tot}\Phi=0\) is killed by
+both \(\hat S^+_{\rm tot}\) and \(\hat S^-_{\rm tot}\), using
+\(\hat S^-_{\rm tot}\hat S^+_{\rm tot}
+= (\hat S_{\rm tot})^2-(\hat S^3_{\rm tot})^2-\hat S^3_{\rm tot}\) and
+\(\hat S^+_{\rm tot}\hat S^-_{\rm tot}
+= (\hat S_{\rm tot})^2-(\hat S^3_{\rm tot})^2+\hat S^3_{\rm tot}\).  Since
+\(\hat S^+_{\rm tot}\) and \(\hat S^-_{\rm tot}\) are adjoints, a non-zero
+vector cannot simultaneously lie in the range of one total ladder and in the
+kernel of the other.  Thus no positive total-ladder iterate can land as a
+non-zero zero-Casimir vector in the zero magnetization sector, which is the
+contradiction used after the landed vector is pinned to the balanced
+zero-Casimir line.
 The following two theorems
 identify the MLM common energy \(\mu\) with the Hermitian minimum of the full
 Heisenberg Hamiltonian: the sector ground-state existence gives
