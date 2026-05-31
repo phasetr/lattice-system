@@ -281,6 +281,174 @@ theorem heisenbergHamiltonianS_totalSpinSSquared_mulVec_raise_landed_eq_zero_of_
     (V := V) (N := N) J M (μ : ℂ)
     hΦ0_ne hΦ0_eig hΦ0_mem hΦ0_cas hland_eig hland_mem' h_sector_pf
 
+/-! ## Zero-Casimir singlet image obstruction -/
+
+omit [DecidableEq V] in
+/-- The conjugate-symmetric norm identity
+`⟪M v, M v⟫ = ⟪v, Mᴴ M v⟫`, written as a sum of complex norm squares. -/
+private theorem star_dotProduct_conjTranspose_mul_mulVec_eq_normSq
+    {n : Type*} [Fintype n] (M : Matrix n n ℂ) (v : n → ℂ) :
+    star v ⬝ᵥ (M.conjTranspose * M).mulVec v =
+      ((∑ i, Complex.normSq ((M.mulVec v) i) : ℝ) : ℂ) := by
+  rw [← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, ← Matrix.star_mulVec, dotProduct,
+    Complex.ofReal_sum]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
+
+omit [DecidableEq V] in
+/-- If a vector is in the range of `M` and is killed by `Mᴴ`, then the vector is
+zero.  This is the finite-dimensional Hilbert-space fact `range M ⟂ ker Mᴴ`. -/
+private theorem eq_zero_of_eq_mulVec_and_conjTranspose_mulVec_eq_zero
+    {n : Type*} [Fintype n] (M : Matrix n n ℂ) {u w : n → ℂ}
+    (hw_eq : w = M.mulVec u)
+    (hstar : M.conjTranspose.mulVec w = 0) :
+    w = 0 := by
+  have hnorm :
+      ((∑ i, Complex.normSq (w i) : ℝ) : ℂ) = 0 := by
+    calc
+      ((∑ i, Complex.normSq (w i) : ℝ) : ℂ) =
+          star u ⬝ᵥ (M.conjTranspose * M).mulVec u := by
+            rw [star_dotProduct_conjTranspose_mul_mulVec_eq_normSq]
+            simp [hw_eq]
+      _ = star u ⬝ᵥ M.conjTranspose.mulVec w := by
+            rw [hw_eq, ← Matrix.mulVec_mulVec]
+      _ = 0 := by rw [hstar, dotProduct_zero]
+  have hsum : ∑ i, Complex.normSq (w i) = 0 := Complex.ofReal_eq_zero.mp hnorm
+  have hnorm_all :
+      ∀ i ∈ (Finset.univ : Finset n), Complex.normSq (w i) = 0 :=
+    (Finset.sum_eq_zero_iff_of_nonneg (s := Finset.univ)
+      (fun j _ => Complex.normSq_nonneg (w j))).mp (by simpa using hsum)
+  funext i
+  exact Complex.normSq_eq_zero.mp (hnorm_all i (Finset.mem_univ i))
+
+/-- A zero-total-Casimir vector in the zero magnetization sector is killed by
+`Ŝ⁺_tot`.  This is the singlet highest-weight half of the equality-case
+obstruction. -/
+theorem totalSpinSOpPlus_mulVec_eq_zero_of_totalSpinSSquared_mulVec_eq_zero_of_mem_zero_magSubspaceS
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ_mem : Ψ ∈ magSubspaceS V N 0)
+    (hΨ_cas : (totalSpinSSquared V N).mulVec Ψ = 0) :
+    (totalSpinSOpPlus V N).mulVec Ψ = 0 := by
+  have hz : (totalSpinSOp3 V N).mulVec Ψ = 0 := by
+    have hz' := (mem_magSubspaceS_iff (Λ := V) (N := N) 0 Ψ).mp hΨ_mem
+    simpa using hz'
+  have hZsq : ((totalSpinSOp3 V N * totalSpinSOp3 V N : ManyBodyOpS V N).mulVec Ψ) = 0 := by
+    rw [← Matrix.mulVec_mulVec, hz, Matrix.mulVec_zero]
+  have hMP :
+      ((totalSpinSOpMinus V N : ManyBodyOpS V N) * totalSpinSOpPlus V N).mulVec Ψ = 0 := by
+    rw [totalSpinSOpMinus_mul_totalSpinSOpPlus_eq_casimir_minus_z_sq_sub_z,
+      Matrix.sub_mulVec, Matrix.sub_mulVec, hΨ_cas, hZsq, hz]
+    simp
+  exact eq_zero_of_eq_mulVec_and_conjTranspose_mulVec_eq_zero
+    (totalSpinSOpPlus V N)
+    (u := Ψ) (w := (totalSpinSOpPlus V N).mulVec Ψ) rfl
+    (by
+      rw [totalSpinSOpPlus_conjTranspose (Λ := V) (N := N)]
+      rw [Matrix.mulVec_mulVec]
+      exact hMP)
+
+/-- A zero-total-Casimir vector in the zero magnetization sector is killed by
+`Ŝ⁻_tot`.  This is the singlet lowest-weight half of the equality-case
+obstruction. -/
+theorem totalSpinSOpMinus_mulVec_eq_zero_of_totalSpinSSquared_mulVec_eq_zero_of_mem_zero_magSubspaceS
+    {Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ_mem : Ψ ∈ magSubspaceS V N 0)
+    (hΨ_cas : (totalSpinSSquared V N).mulVec Ψ = 0) :
+    (totalSpinSOpMinus V N).mulVec Ψ = 0 := by
+  have hz : (totalSpinSOp3 V N).mulVec Ψ = 0 := by
+    have hz' := (mem_magSubspaceS_iff (Λ := V) (N := N) 0 Ψ).mp hΨ_mem
+    simpa using hz'
+  have hZsq : ((totalSpinSOp3 V N * totalSpinSOp3 V N : ManyBodyOpS V N).mulVec Ψ) = 0 := by
+    rw [← Matrix.mulVec_mulVec, hz, Matrix.mulVec_zero]
+  have hPM :
+      ((totalSpinSOpPlus V N : ManyBodyOpS V N) * totalSpinSOpMinus V N).mulVec Ψ = 0 := by
+    rw [totalSpinSOpPlus_mul_totalSpinSOpMinus_eq_casimir_minus_z_sq_add_z,
+      Matrix.add_mulVec, Matrix.sub_mulVec, hΨ_cas, hZsq, hz]
+    simp
+  exact eq_zero_of_eq_mulVec_and_conjTranspose_mulVec_eq_zero
+    (totalSpinSOpMinus V N)
+    (u := Ψ) (w := (totalSpinSOpMinus V N).mulVec Ψ) rfl
+    (by
+      rw [totalSpinSOpMinus_conjTranspose (Λ := V) (N := N)]
+      rw [Matrix.mulVec_mulVec]
+      exact hPM)
+
+/-- A non-zero vector in the zero-Casimir, zero-magnetization line cannot be a
+total-lowering image. -/
+theorem not_exists_totalSpinSOpMinus_image_of_zero_casimir_zero_magSubspaceS
+    {Υ Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ_eq : Ψ = (totalSpinSOpMinus V N).mulVec Υ)
+    (hΨ_ne : Ψ ≠ 0)
+    (hΨ_mem : Ψ ∈ magSubspaceS V N 0)
+    (hΨ_cas : (totalSpinSSquared V N).mulVec Ψ = 0) :
+    False := by
+  have hplus :
+      (totalSpinSOpPlus V N).mulVec Ψ = 0 :=
+    totalSpinSOpPlus_mulVec_eq_zero_of_totalSpinSSquared_mulVec_eq_zero_of_mem_zero_magSubspaceS
+      hΨ_mem hΨ_cas
+  exact hΨ_ne (eq_zero_of_eq_mulVec_and_conjTranspose_mulVec_eq_zero
+    (totalSpinSOpMinus V N) (u := Υ) (w := Ψ) hΨ_eq
+    (by
+      rw [totalSpinSOpMinus_conjTranspose (Λ := V) (N := N)]
+      exact hplus))
+
+/-- A non-zero vector in the zero-Casimir, zero-magnetization line cannot be a
+total-raising image. -/
+theorem not_exists_totalSpinSOpPlus_image_of_zero_casimir_zero_magSubspaceS
+    {Υ Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΨ_eq : Ψ = (totalSpinSOpPlus V N).mulVec Υ)
+    (hΨ_ne : Ψ ≠ 0)
+    (hΨ_mem : Ψ ∈ magSubspaceS V N 0)
+    (hΨ_cas : (totalSpinSSquared V N).mulVec Ψ = 0) :
+    False := by
+  have hminus :
+      (totalSpinSOpMinus V N).mulVec Ψ = 0 :=
+    totalSpinSOpMinus_mulVec_eq_zero_of_totalSpinSSquared_mulVec_eq_zero_of_mem_zero_magSubspaceS
+      hΨ_mem hΨ_cas
+  exact hΨ_ne (eq_zero_of_eq_mulVec_and_conjTranspose_mulVec_eq_zero
+    (totalSpinSOpPlus V N) (u := Υ) (w := Ψ) hΨ_eq
+    (by
+      rw [totalSpinSOpPlus_conjTranspose (Λ := V) (N := N)]
+      exact hminus))
+
+/-- A positive number of total-lowering steps cannot produce a non-zero
+zero-Casimir vector in the zero magnetization sector. -/
+theorem not_totalSpinSOpMinus_pow_mulVec_ne_zero_of_zero_casimir_zero_magSubspaceS
+    (k : ℕ) (hk : 0 < k) {Φ : (V → Fin (N + 1)) → ℂ}
+    (hland_ne : (totalSpinSOpMinus V N ^ k).mulVec Φ ≠ 0)
+    (hland_mem : (totalSpinSOpMinus V N ^ k).mulVec Φ ∈ magSubspaceS V N 0)
+    (hland_cas : (totalSpinSSquared V N).mulVec ((totalSpinSOpMinus V N ^ k).mulVec Φ) = 0) :
+    False := by
+  obtain ⟨r, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt hk)
+  set Υ := (totalSpinSOpMinus V N ^ r).mulVec Φ
+  have hstep :
+      (totalSpinSOpMinus V N ^ (r + 1)).mulVec Φ =
+        (totalSpinSOpMinus V N).mulVec Υ := by
+    rw [pow_succ', Matrix.mulVec_mulVec]
+  exact not_exists_totalSpinSOpMinus_image_of_zero_casimir_zero_magSubspaceS
+    (V := V) (N := N) (Υ := Υ)
+    (Ψ := (totalSpinSOpMinus V N ^ (r + 1)).mulVec Φ)
+    hstep hland_ne hland_mem hland_cas
+
+/-- A positive number of total-raising steps cannot produce a non-zero
+zero-Casimir vector in the zero magnetization sector. -/
+theorem not_totalSpinSOpPlus_pow_mulVec_ne_zero_of_zero_casimir_zero_magSubspaceS
+    (k : ℕ) (hk : 0 < k) {Φ : (V → Fin (N + 1)) → ℂ}
+    (hland_ne : (totalSpinSOpPlus V N ^ k).mulVec Φ ≠ 0)
+    (hland_mem : (totalSpinSOpPlus V N ^ k).mulVec Φ ∈ magSubspaceS V N 0)
+    (hland_cas : (totalSpinSSquared V N).mulVec ((totalSpinSOpPlus V N ^ k).mulVec Φ) = 0) :
+    False := by
+  obtain ⟨r, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt hk)
+  set Υ := (totalSpinSOpPlus V N ^ r).mulVec Φ
+  have hstep :
+      (totalSpinSOpPlus V N ^ (r + 1)).mulVec Φ =
+        (totalSpinSOpPlus V N).mulVec Υ := by
+    rw [pow_succ', Matrix.mulVec_mulVec]
+  exact not_exists_totalSpinSOpPlus_image_of_zero_casimir_zero_magSubspaceS
+    (V := V) (N := N) (Υ := Υ)
+    (Ψ := (totalSpinSOpPlus V N ^ (r + 1)).mulVec Φ)
+    hstep hland_ne hland_mem hland_cas
+
 /-- **Common-energy lower bound identifies the Hermitian minimum**: if a
 Hermitian matrix has a non-zero eigenvector at a real energy `μ`, and every
 non-zero real-energy eigenvector has energy at least `μ`, then its Hermitian
