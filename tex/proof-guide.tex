@@ -12546,6 +12546,27 @@ expected from the Marshall--Lieb--Mattis/Casimir chain.  Reference: H.~Tasaki,
 \emph{Physics and Mathematics of Quantum Many-Body Systems}, Springer 2020,
 §2.5 Theorem 2.4, pp.~43--44.
 
+The next refinement removes the balanced-ground-sector equality as an
+independent input.  The theorem
+\texttt{hermitianMinEigenvalue\_balanced\_eq\_full\_at\_SU2\_of\_global\_unique}
+takes a full ground eigenvector \(\Phi\) of \(\hat H(1,0)\) at
+\(E_{\rm full}\).  Global uniqueness and the already-formalized
+zero-magnetization theorem imply
+\(\hat S^3_{\rm tot}\Phi=0\).  If \(M_{\rm balanced}\) has zero centered
+magnetization, then \(\Phi\) belongs to that magnetization sector, so the
+sector restriction is non-zero and remains an eigenvector at \(E_{\rm full}\)
+by the inverse-lift lemma.  Hence \(E_{M_{\rm balanced}}\le E_{\rm full}\).
+The opposite inequality is the existing sector lower-bound
+\texttt{hermitianMinEigenvalue\_anisotropicHeisenbergS\_full\_le\_sector},
+so the two minima are equal.  This is implemented in
+\texttt{AnisotropicHeisenbergBalancedFromGlobalUniqueness.lean}.
+
+Composing this bridge with the PR~\#4018 capstone gives
+\texttt{spinHalf\_anisotropicHeisenbergS\_obligation\_2\_of\_SU2\_global\_unique\_only}
+in \texttt{AnisotropicHeisenbergSpinHalfObligation2SU2UniqueOnly.lean}.  The
+spin-\(1/2\) obligation~(2) boundary now has one remaining SU(2)-endpoint
+mathematical input: full ground eigenspace uniqueness at \(E_{\rm full}\).
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
