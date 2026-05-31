@@ -12604,6 +12604,7 @@ exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank
 exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder_t23_pf
 spinHalf_anisotropicHeisenbergS_obligation_2_of_MLM_casimir_ladder
 spinHalf_anisotropicHeisenbergS_obligation_2_of_MLM_casimir_ladder_t23_pf
+spinHalf_anisotropicHeisenbergS_obligation_2_strict_gap_of_MLM_casimir_ladder_t23_pf
 \end{Verbatim}
 The first group packages the sector Perron--Frobenius callback itself.  The
 Marshall diagonal on a magnetization sector is involutive, and conjugating the
@@ -12706,6 +12707,23 @@ Perron--Frobenius simplicity from the structural Theorem~2.3 witness, leaving
 only the Theorem~2.3 predicate, the coupling and strict diagonal hypotheses,
 balanced-cardinality arithmetic, and the deformation-path hypotheses at the
 current spin-\(1/2\) obligation boundary.
+
+The strict-gap wrapper
+\texttt{spinHalf\_anisotropicHeisenbergS\_obligation\_2\_strict\_gap\_of\_MLM\_casimir\_ladder\_t23\_pf}
+then exposes the same result in the direct Theorem~2.4 obligation form:
+\[
+  E_{M_{\rm balanced}}(\lambda',D')
+  < E_M(\lambda',D')
+  \qquad (M\ne M_{\rm balanced}).
+\]
+Its proof is only the final order-theoretic packaging step.  If this strict
+inequality failed, then \(E_M(\lambda',D')\le
+E_{M_{\rm balanced}}(\lambda',D')\), which is exactly the concrete violation
+hypothesis ruled out by
+\texttt{spinHalf\_anisotropicHeisenbergS\_obligation\_2\_of\_MLM\_casimir\_ladder\_t23\_pf}.
+Thus the PR~\#4027 contradiction form and the strict-gap public form are
+mathematically equivalent at this boundary; the latter is the cleaner consumer
+surface for obligation~(2).
 
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
