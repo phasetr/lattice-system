@@ -34,6 +34,7 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
 /-- **Spin-1/2 obligation (2) capstone v4 (argmin discharged)**: derives False
 under the contradiction hypothesis + obligation (1) hypotheses + 3 axioms. -/
+@[deprecated "Use the canonical capstone spinHalf_anisotropicHeisenbergS_obligation_2_single_axiom (PR #4014); the argmin extraction is performed automatically there. This v4 capstone is an orphan in the final dependency chain." (since := "2026-05-31")]
 theorem spinHalf_anisotropicHeisenbergS_obligation_2_axiomatic_argmin
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
