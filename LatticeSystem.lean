@@ -78,6 +78,7 @@ import LatticeSystem.Quantum.SpinS.DressedAnisotropicMatrixOnMagSector
 import LatticeSystem.Quantum.SpinS.AnisotropicSectorPFAtMin
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfTargetUniquenessFromBalancedPF
 import LatticeSystem.Quantum.SpinS.SingleClusterHamiltonianConcreteClusters
+import LatticeSystem.Quantum.SpinS.SingleClusterHamiltonianMin
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
