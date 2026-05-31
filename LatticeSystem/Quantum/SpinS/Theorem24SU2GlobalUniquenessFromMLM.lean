@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralGeneralFinal
+import LatticeSystem.Quantum.SpinS.Theorem23StructuralSectorLiftCasimir
 import LatticeSystem.Quantum.SpinS.Theorem24SU2SymmetricFinrankLeOneFromSectorPF
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import LatticeSystem.Quantum.SpinS.HermitianMinLeOfEigenvector
@@ -49,6 +50,79 @@ theorem tasaki23GroundStateSectors_eq_singleton_of_card_eq
   ext M
   rw [tasaki23GroundStateSectors_mem_iff_eq_of_card_eq A N M h_card_eq,
     Finset.mem_singleton]
+
+omit [DecidableEq V] in
+/-- **Symmetric sublattice predicted total spin is zero**: in the balanced
+cardinality case, Tasaki Theorem 2.3's predicted total-spin magnitude
+`||A| - |not A|| * N / 2` vanishes. -/
+theorem tasaki23PredictedTotalSpin_eq_zero_of_card_eq
+    (A : V → Bool) (N : ℕ)
+    (h_card_eq : (Finset.univ.filter (fun x : V => A x = true)).card =
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card) :
+    tasaki23PredictedTotalSpin (V := V) A N = 0 := by
+  unfold tasaki23PredictedTotalSpin
+  rw [h_card_eq, sub_self, abs_zero, zero_mul]
+
+omit [DecidableEq V] in
+/-- **Symmetric sublattice predicted Casimir is zero**: in the balanced
+cardinality case, the predicted total spin is `0`, so the predicted
+total-Casimir value `S(S+1)` is also `0`. -/
+theorem tasaki23PredictedCasimirValue_eq_zero_of_card_eq
+    (A : V → Bool) (N : ℕ)
+    (h_card_eq : (Finset.univ.filter (fun x : V => A x = true)).card =
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card) :
+    tasaki23PredictedCasimirValue (V := V) A N = 0 := by
+  rw [tasaki23PredictedCasimirValue,
+    tasaki23PredictedTotalSpin_eq_zero_of_card_eq A N h_card_eq]
+  ring
+
+/-- **Symmetric-sector lift with zero total Casimir**: the structural
+Theorem 2.3 PF/Casimir lift specializes in the balanced-cardinality case to a
+full Heisenberg eigenvector whose total-Casimir eigenvalue is `0`.  This is
+the equality-case input needed for the strict outside-sector MLM endpoint. -/
+theorem tasaki23_sector_lift_and_casimir_zero_of_card_eq
+    (A : V → Bool) (N : ℕ) (c c_toy : ℝ)
+    (h_card_eq : (Finset.univ.filter (fun x : V => A x = true)).card =
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card)
+    (hsB : 0 < ((Finset.univ.filter (fun x : V => (! A x) = true)).card : ℝ) *
+      (N : ℝ) / 2)
+    {M : ℕ} (hM : M ∈ tasaki23GroundStateSectors (V := V) A N)
+    [Nonempty (magConfigS V N M)]
+    {J : V → V → ℂ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hc_strict_toy : ∀ σ,
+      dressedHeisenbergSReMatrix A (bipartiteCoupling A) N σ σ < c_toy)
+    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false) (hN : 1 ≤ N)
+    {μ : ℝ} {v : magConfigS V N M → ℝ}
+    (hv_pos : ∀ σ, 0 < v σ)
+    (hReEig : (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+        (fun σ => (marshallSignS A σ.1).re * v σ) =
+      μ • (fun σ => (marshallSignS A σ.1).re * v σ)) :
+    ((heisenbergHamiltonianS J N).mulVec
+        (magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) =
+      (μ : ℂ) • magSectorEmbedding
+        (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) ∧
+    ((totalSpinSSquared V N).mulVec
+        (magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) =
+      (0 : ℂ) •
+        magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) := by
+  classical
+  have horient :
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
+        (Finset.univ.filter (fun x : V => A x = true)).card := by
+    rw [← h_card_eq]
+  obtain ⟨hH, hCas⟩ :=
+    tasaki23_sector_lift_and_casimir (N := N) A c c_toy horient hsB hM
+      hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hc_strict_toy
+      hA_ne hB_ne hN hv_pos hReEig
+  refine ⟨hH, ?_⟩
+  have hpred0 := tasaki23PredictedCasimirValue_eq_zero_of_card_eq (V := V) A N h_card_eq
+  simpa [hpred0] using hCas
 
 /-- **Common-energy lower bound identifies the Hermitian minimum**: if a
 Hermitian matrix has a non-zero eigenvector at a real energy `μ`, and every
