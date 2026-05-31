@@ -12769,8 +12769,32 @@ full ground-state uniqueness.  Finally
 composes this uniqueness bound with
 \texttt{anisotropicHeisenbergS\_unique\_groundState\_has\_zero\_magnetization}
 to obtain \(\hat S^3_{\rm tot}\Phi=0\) for every non-zero target ground state.
-The only remaining mathematical input at this boundary is the target balanced
-sector PF simplicity itself.
+
+The target balanced-sector Perron--Frobenius input is then discharged at the
+anisotropic point itself.  The file
+\texttt{DressedAnisotropicMatrixOnMagSector.lean} defines the real
+sector matrix, its Marshall-dressed conjugate, and the shifted matrix
+\(B=cI-M_{\rm dressed}\).  Off the diagonal the anisotropic \(\lambda\)- and
+\(D\)-terms agree with the Heisenberg exchange part, so the existing spin-\(S\)
+bipartite reachability theorem gives positivity of a power of \(B\), hence
+irreducibility.  The file \texttt{AnisotropicSectorPFAtMin.lean} applies
+Perron--Frobenius to \(B\), uses the Collatz--Wielandt identification of the
+PF eigenvalue with the spectral maximum of \(B\), and translates through the
+strict shift, real-to-complex comparison, and Marshall similarity to prove
+\[
+  \dim_{\mathbb C}\ker
+  \bigl(\hat H_M(\lambda,D)-\lambda_{\min}(\hat H_M(\lambda,D))I\bigr)
+  \le 1 .
+\]
+For spin \(1/2\), the wrapper
+\texttt{spinHalf\_anisotropicHeisenbergS\_balanced\_sector\_pf\_at\_target}
+chooses the shift \(c\) strictly above all dressed diagonal entries and supplies
+this sector PF bound at the balanced target sector.  The public wrappers
+\texttt{spinHalf\_anisotropicHeisenbergS\_target\_finrank\_le\_one\_of\_MLM\_casimir\_ladder\_t23\_pf}
+and
+\texttt{spinHalf\_anisotropicHeisenbergS\_target\_groundState\_zero\_magnetization\_of\_MLM\_casimir\_ladder\_t23\_pf}
+therefore remove the explicit balanced-sector PF callback from the current
+spin-\(1/2\) Theorem~2.4 target boundary.
 
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for

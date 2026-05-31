@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AnisotropicEigenspaceSectorFinrankEq
+import LatticeSystem.Quantum.SpinS.AnisotropicSectorPFAtMin
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergGlobalMinFinrankLeTwo
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfBalancedGSFromMLM
 import LatticeSystem.Quantum.SpinS.Theorem24FinrankLeOneFromAdmisPF
@@ -29,6 +30,76 @@ namespace LatticeSystem.Quantum
 open Matrix Module
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+
+set_option linter.style.longLine false in
+/-- **Spin-1/2 balanced-sector Perron--Frobenius simplicity at the target point**:
+the anisotropic target sector matrix has a one-dimensional ground eigenspace in
+the balanced magnetization sector. -/
+theorem spinHalf_anisotropicHeisenbergS_balanced_sector_pf_at_target
+    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
+    (hJ_star : ∀ x y, star (J x y) = J x y)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
+    (M_balanced : ℕ)
+    [Nonempty (magConfigS Λ 1 M_balanced)]
+    {lam' D' : ℝ} :
+    finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+      (anisotropicHeisenbergS_magSector_submatrix (Λ := Λ) J (lam' : ℂ) (D' : ℂ)
+        1 M_balanced))
+      ((hermitianMinEigenvalue
+        (anisotropicHeisenbergS_magSector_submatrix_isHermitian_real
+          (Λ := Λ) (N := 1) (M := M_balanced) hJ_star lam' D') : ℝ) : ℂ)) ≤ 1 := by
+  classical
+  let c : ℝ :=
+    Finset.univ.sup' Finset.univ_nonempty
+      (fun σ : magConfigS Λ 1 M_balanced =>
+        dressedAnisotropicHeisenbergSReMatrixOnMagSector
+          A J (lam' : ℂ) (D' : ℂ) 1 M_balanced σ σ) + 1
+  have hc_strict : ∀ σ : magConfigS Λ 1 M_balanced,
+      dressedAnisotropicHeisenbergSReMatrixOnMagSector
+        A J (lam' : ℂ) (D' : ℂ) 1 M_balanced σ σ < c := by
+    intro σ
+    have hle :
+        dressedAnisotropicHeisenbergSReMatrixOnMagSector
+          A J (lam' : ℂ) (D' : ℂ) 1 M_balanced σ σ ≤
+        Finset.univ.sup' Finset.univ_nonempty
+          (fun τ : magConfigS Λ 1 M_balanced =>
+            dressedAnisotropicHeisenbergSReMatrixOnMagSector
+              A J (lam' : ℂ) (D' : ℂ) 1 M_balanced τ τ) :=
+      Finset.le_sup'
+        (fun τ : magConfigS Λ 1 M_balanced =>
+          dressedAnisotropicHeisenbergSReMatrixOnMagSector
+            A J (lam' : ℂ) (D' : ℂ) 1 M_balanced τ τ)
+        (Finset.mem_univ σ)
+    dsimp [c]
+    linarith
+  have hJ_bipartite : ∀ x y, A x = A y → J x y = 0 := by
+    intro x y hAeq
+    by_contra hne
+    exact (hJbip x y hne) hAeq
+  have hraw :=
+    anisotropicHeisenbergS_magSector_submatrix_finrank_le_one_at_hermitianMinEigenvalue
+      (Λ := Λ) (N := 1) A (J := J) (lam := (lam' : ℂ)) (D := (D' : ℂ))
+      (M := M_balanced) hJim hJnn hJpos hJ_sym hJ_bipartite
+      (by simp) (by simp) (c := c) hc_strict hA_ne hB_ne (by omega)
+  have hmin_eq :
+      hermitianMinEigenvalue
+        (anisotropicHeisenbergS_magSector_submatrix_isHermitian_real
+          (Λ := Λ) (N := 1) (M := M_balanced) hJ_star lam' D') =
+      hermitianMinEigenvalue
+        (anisotropicHeisenbergS_magSector_submatrix_isHermitian_of_real
+          (Λ := Λ) (N := 1) (M := M_balanced) (lam := (lam' : ℂ)) (D := (D' : ℂ))
+          (fun x y => by
+            rw [Complex.star_def, Complex.conj_eq_iff_im]
+            exact hJim x y)
+          (by rw [Complex.star_def, Complex.conj_ofReal])
+          (by rw [Complex.star_def, Complex.conj_ofReal])) :=
+    hermitianMinEigenvalue_eq_of_spectrum_eq _ _ rfl
+  rw [hmin_eq]
+  exact hraw
 
 set_option linter.style.longLine false in
 /-- **Spin-1/2 target ground eigenspace `finrank <= 1` from balanced-sector PF**:
@@ -194,5 +265,103 @@ theorem spinHalf_anisotropicHeisenbergS_target_groundState_zero_magnetization_of
     ((hermitianMinEigenvalue
       (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star 1 lam' D') : ℝ) : ℂ)
     huniq hΦ_ne hΦ_gs
+
+set_option linter.style.longLine false in
+/-- **Spin-1/2 target ground eigenspace `finrank <= 1` without a balanced-sector
+PF callback**: the callback is supplied by
+`spinHalf_anisotropicHeisenbergS_balanced_sector_pf_at_target`. -/
+theorem spinHalf_anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf
+    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
+    (hJ_star : ∀ x y, star (J x y) = J x y)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    {c_axis : ℝ}
+    (hc_axis_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (1 + 1)),
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D 1 σ σ < c_axis)
+    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
+    [Nonempty (parityConfigS Λ 1 0)] [Nonempty (parityConfigS Λ 1 1)]
+    (c_mlm c_toy : ℝ)
+    (hT23 : tasaki_2_5_theorem_2_3 A 1 J c_mlm)
+    (hc_heis_strict : ∀ σ, dressedHeisenbergSReMatrix A J 1 σ σ < c_mlm)
+    (hc_toy_strict : ∀ σ,
+      dressedHeisenbergSReMatrix A (bipartiteCoupling A) 1 σ σ < c_toy)
+    (h_card_eq : (Finset.univ.filter (fun x : Λ => A x = true)).card =
+      (Finset.univ.filter (fun x : Λ => (! A x) = true)).card)
+    (M_balanced : ℕ)
+    [Nonempty (magConfigS Λ 1 M_balanced)]
+    [Nonempty (Λ → Fin (1 + 1))]
+    (h_balanced : ((Fintype.card Λ : ℂ) * ((1 : ℕ) : ℂ) / 2) - (M_balanced : ℂ) = 0)
+    (h_centered_nonzero :
+      ∀ M' : ℕ, M' ∈ Finset.range (Fintype.card Λ * 1 + 1) → M' ≠ M_balanced →
+        (((Fintype.card Λ : ℂ) * ((1 : ℕ) : ℂ) / 2) - (M' : ℂ)) ≠ 0)
+    {lam' D' : ℝ}
+    (hlam'_lb : -1 < lam') (hlam'_ub : lam' < 1) (hD' : 0 < D') :
+    finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+      (anisotropicHeisenbergS (Λ := Λ) J (lam' : ℂ) (D' : ℂ) 1))
+      ((hermitianMinEigenvalue
+        (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star 1 lam' D') : ℝ) : ℂ)) ≤
+      1 := by
+  classical
+  have hpf :=
+    spinHalf_anisotropicHeisenbergS_balanced_sector_pf_at_target
+      A hJim hJnn hJpos hJbip hJ_star hJ_sym hA_ne hB_ne M_balanced
+      (lam' := lam') (D' := D')
+  exact
+    spinHalf_anisotropicHeisenbergS_target_finrank_le_one_of_balanced_sector_pf_and_MLM_casimir_ladder_t23_pf
+      A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hc_axis_strict hA_ne hB_ne
+      c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq
+      M_balanced h_balanced h_centered_nonzero hlam'_lb hlam'_ub hD' hpf
+
+set_option linter.style.longLine false in
+/-- **Spin-1/2 target ground state has zero magnetization without a
+balanced-sector PF callback**. -/
+theorem spinHalf_anisotropicHeisenbergS_target_groundState_zero_magnetization_of_MLM_casimir_ladder_t23_pf
+    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJself : ∀ x, J x x = 0) (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
+    (hJ_star : ∀ x y, star (J x y) = J x y)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    {c_axis : ℝ}
+    (hc_axis_strict : ∀ (lam D : ℂ) (σ : Λ → Fin (1 + 1)),
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D 1 σ σ < c_axis)
+    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
+    [Nonempty (parityConfigS Λ 1 0)] [Nonempty (parityConfigS Λ 1 1)]
+    (c_mlm c_toy : ℝ)
+    (hT23 : tasaki_2_5_theorem_2_3 A 1 J c_mlm)
+    (hc_heis_strict : ∀ σ, dressedHeisenbergSReMatrix A J 1 σ σ < c_mlm)
+    (hc_toy_strict : ∀ σ,
+      dressedHeisenbergSReMatrix A (bipartiteCoupling A) 1 σ σ < c_toy)
+    (h_card_eq : (Finset.univ.filter (fun x : Λ => A x = true)).card =
+      (Finset.univ.filter (fun x : Λ => (! A x) = true)).card)
+    (M_balanced : ℕ)
+    [Nonempty (magConfigS Λ 1 M_balanced)]
+    [Nonempty (Λ → Fin (1 + 1))]
+    (h_balanced : ((Fintype.card Λ : ℂ) * ((1 : ℕ) : ℂ) / 2) - (M_balanced : ℂ) = 0)
+    (h_centered_nonzero :
+      ∀ M' : ℕ, M' ∈ Finset.range (Fintype.card Λ * 1 + 1) → M' ≠ M_balanced →
+        (((Fintype.card Λ : ℂ) * ((1 : ℕ) : ℂ) / 2) - (M' : ℂ)) ≠ 0)
+    {lam' D' : ℝ}
+    (hlam'_lb : -1 < lam') (hlam'_ub : lam' < 1) (hD' : 0 < D')
+    {Φ : (Λ → Fin (1 + 1)) → ℂ}
+    (hΦ_ne : Φ ≠ 0)
+    (hΦ_gs : (anisotropicHeisenbergS J (lam' : ℂ) (D' : ℂ) 1).mulVec Φ =
+      ((hermitianMinEigenvalue
+        (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star 1 lam' D') : ℝ) : ℂ) •
+        Φ) :
+    (totalSpinSOp3 Λ 1).mulVec Φ = 0 := by
+  classical
+  have hpf :=
+    spinHalf_anisotropicHeisenbergS_balanced_sector_pf_at_target
+      A hJim hJnn hJpos hJbip hJ_star hJ_sym hA_ne hB_ne M_balanced
+      (lam' := lam') (D' := D')
+  exact
+    spinHalf_anisotropicHeisenbergS_target_groundState_zero_magnetization_of_balanced_sector_pf_and_MLM_casimir_ladder_t23_pf
+      A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hc_axis_strict hA_ne hB_ne
+      c_mlm c_toy hT23 hc_heis_strict hc_toy_strict h_card_eq
+      M_balanced h_balanced h_centered_nonzero hlam'_lb hlam'_ub hD' hpf
+      hΦ_ne hΦ_gs
 
 end LatticeSystem.Quantum
