@@ -449,6 +449,226 @@ theorem not_totalSpinSOpPlus_pow_mulVec_ne_zero_of_zero_casimir_zero_magSubspace
     (Ψ := (totalSpinSOpPlus V N ^ (r + 1)).mulVec Φ)
     hstep hland_ne hland_mem hland_cas
 
+omit [DecidableEq V] in
+/-- In the balanced-cardinality case, the centered magnetization of the
+balanced sector `|A| * N` is zero. -/
+private theorem centered_weight_cardA_mul_eq_zero_of_card_eq
+    (A : V → Bool) (N : ℕ)
+    (h_card_eq : (Finset.univ.filter (fun x : V => A x = true)).card =
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card) :
+    ((Fintype.card V : ℂ) * (N : ℂ)) / 2 -
+      (((Finset.univ.filter (fun x : V => A x = true)).card * N : ℕ) : ℂ) = 0 := by
+  have hsum := tasaki23_card_filter_A_add_card_notA A
+  have hcard :
+      Fintype.card V =
+        2 * (Finset.univ.filter (fun x : V => A x = true)).card := by
+    rw [← hsum, h_card_eq]
+    omega
+  rw [hcard]
+  push_cast
+  ring
+
+/-- **Strict outside-sector ordering from the zero-Casimir ladder obstruction**:
+in the balanced-cardinality case, the non-strict `hOutside` bound from Theorem
+2.3 is strict once the balanced sector is pinned by PF simplicity to a non-zero
+zero-Casimir vector.
+
+If an outside-sector eigenvalue equalled the common energy `μ`, the corresponding
+sector eigenvector could be lifted to the full Hilbert space and moved by a
+positive number of total ladder steps into the balanced sector.  PR #4022 pins
+that landed vector to total Casimir zero, while the zero-Casimir image
+obstruction above forbids such a non-zero positive-step ladder image. -/
+theorem tasaki23_strict_hOutside_of_card_eq_zero_casimir_ladder_obstruction
+    (A : V → Bool) (N : ℕ) (c : ℝ)
+    {J : V → V → ℂ}
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_card_eq : (Finset.univ.filter (fun x : V => A x = true)).card =
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card)
+    {μ : ℝ}
+    (hcommon : ∀ M ∈ tasaki23GroundStateSectors (V := V) A N,
+      ∃ vM : magConfigS V N M → ℝ, (∀ σ, 0 < vM σ) ∧
+        (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
+            (fun σ => (marshallSignS A σ.1).re * vM σ) =
+          μ • (fun σ => (marshallSignS A σ.1).re * vM σ))
+    {Φ0 : (V → Fin (N + 1)) → ℂ}
+    (hΦ0_ne : Φ0 ≠ 0)
+    (hΦ0_eig : (heisenbergHamiltonianS J N).mulVec Φ0 = (μ : ℂ) • Φ0)
+    (hΦ0_mem : Φ0 ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 -
+        (((Finset.univ.filter (fun x : V => A x = true)).card * N : ℕ) : ℂ)))
+    (hΦ0_cas : (totalSpinSSquared V N).mulVec Φ0 = 0)
+    (h_sector_pf : finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+      (heisenbergHamiltonianSMatrixOnMagSector (V := V) J N
+        ((Finset.univ.filter (fun x : V => A x = true)).card * N))) (μ : ℂ)) ≤ 1)
+    {M : ℕ}
+    (hM_ne : M ≠ (Finset.univ.filter (fun x : V => A x = true)).card * N)
+    [Nonempty (magConfigS V N M)]
+    {μM : ℝ} {φ : magConfigS V N M → ℝ}
+    (hφ_ne : φ ≠ 0)
+    (hφ : (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec φ = μM • φ) :
+    μ < μM := by
+  classical
+  set M0 := (Finset.univ.filter (fun x : V => A x = true)).card * N with hM0def
+  have hM_non : M ∉ tasaki23GroundStateSectors (V := V) A N := by
+    rw [tasaki23GroundStateSectors_mem_iff_eq_of_card_eq A N M h_card_eq]
+    exact hM_ne
+  have hle : μ ≤ μM :=
+    tasaki23_general_hOutside A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite
+      hc_strict hcommon hM_non hφ_ne hφ
+  have hne : μ ≠ μM := by
+    intro hμ_eq
+    have hComplex :=
+      heisenbergHamiltonianSMatrixOnMagSector_mulVec_ofReal (J := J) N hJ_real hφ
+    have hHμM := heisenbergHamiltonianS_mulVec_magSectorEmbedding J
+      (fun σ => ((φ σ : ℝ) : ℂ)) hComplex
+    set Φ : (V → Fin (N + 1)) → ℂ :=
+      magSectorEmbedding (fun σ => ((φ σ : ℝ) : ℂ)) with hΦdef
+    have hΦ_ne : Φ ≠ 0 := by
+      obtain ⟨τ, hτ⟩ := Function.ne_iff.mp hφ_ne
+      intro h0
+      apply hτ
+      have happ : Φ τ.1 = ((φ τ : ℝ) : ℂ) := by
+        rw [hΦdef]
+        exact magSectorEmbedding_apply_subtype _ τ
+      rw [h0] at happ
+      simp only [Pi.zero_apply] at happ
+      have := congrArg Complex.re happ
+      simpa using this.symm
+    have hΦ_mem :
+        Φ ∈ magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) := by
+      rw [hΦdef]
+      exact magSectorEmbedding_mem_magSubspaceS (fun σ => ((φ σ : ℝ) : ℂ))
+    have hΦ_eig : (heisenbergHamiltonianS J N).mulVec Φ = (μ : ℂ) • Φ := by
+      rw [hΦdef]
+      simpa [hμ_eq] using hHμM
+    have hzero :
+        ((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M0 : ℂ) = 0 := by
+      rw [hM0def]
+      exact centered_weight_cardA_mul_eq_zero_of_card_eq (V := V) A N h_card_eq
+    rcases lt_or_gt_of_ne hM_ne with hlt | hgt
+    · set k := M0 - M with hk
+      have hk_pos : 0 < k := by rw [hk]; omega
+      have hkval : M0 = M + k := by rw [hk]; omega
+      have hpos : ∀ j : ℕ, j < k →
+          0 < ((((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ)) - (j : ℂ)).re := by
+        intro j hj
+        have hjlt : (j : ℝ) < (k : ℝ) := by exact_mod_cast hj
+        have hrewrite :
+            (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ) - (j : ℂ)).re =
+              (k : ℝ) - (j : ℝ) := by
+          have hweight :
+              ((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ) =
+                (k : ℂ) := by
+            calc
+              ((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ)
+                  = (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M0 : ℂ)) +
+                    (k : ℂ) := by
+                      rw [hkval]
+                      push_cast
+                      ring
+              _ = (k : ℂ) := by rw [hzero, zero_add]
+          rw [hweight]
+          simp
+        rw [hrewrite]
+        linarith
+      obtain ⟨_hland_ne', hland_mem, _hland_eig⟩ :=
+        lower_iterate_ne_zero (V := V) (N := N) (J := J) (lam := μ) k
+          hΦ_ne hΦ_mem hΦ_eig hpos
+      have hsector_pf' : finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+          (heisenbergHamiltonianSMatrixOnMagSector (V := V) J N (M + k))) (μ : ℂ)) ≤ 1 := by
+        rw [← hkval, hM0def]
+        exact h_sector_pf
+      have hΦ0_mem' : Φ0 ∈
+          magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 -
+            ((M + k : ℕ) : ℂ)) := by
+        rw [← hkval, hM0def]
+        exact hΦ0_mem
+      obtain ⟨hland_ne, hland_cas⟩ :=
+        heisenbergHamiltonianS_totalSpinSSquared_mulVec_lower_landed_eq_zero_of_sector_pf
+          (V := V) (N := N) J M k μ
+          hΦ0_ne hΦ0_eig hΦ0_mem' hΦ0_cas hΦ_ne hΦ_mem hΦ_eig hpos hsector_pf'
+      have hland_mem_zero :
+          (totalSpinSOpMinus V N ^ k).mulVec Φ ∈ magSubspaceS V N 0 := by
+        have hweight0 :
+            (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ)) - (k : ℂ) = 0 := by
+          calc
+            (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ)) - (k : ℂ)
+                = ((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M0 : ℂ) := by
+                  rw [hkval]
+                  push_cast
+                  ring
+            _ = 0 := hzero
+        rwa [← hweight0]
+      exact not_totalSpinSOpMinus_pow_mulVec_ne_zero_of_zero_casimir_zero_magSubspaceS
+        (V := V) (N := N) k hk_pos hland_ne hland_mem_zero hland_cas
+    · set k := M - M0 with hk
+      have hk_pos : 0 < k := by rw [hk]; omega
+      have hkval : M = M0 + k := by rw [hk]; omega
+      have hneg : ∀ j : ℕ, j < k →
+          ((((Fintype.card V : ℂ) * (N : ℂ)) / 2 - ((M0 + k : ℕ) : ℂ)) +
+              (j : ℂ)).re < 0 := by
+        intro j hj
+        have hjlt : (j : ℝ) < (k : ℝ) := by exact_mod_cast hj
+        have hrewrite :
+            ((((Fintype.card V : ℂ) * (N : ℂ)) / 2 - ((M0 + k : ℕ) : ℂ)) +
+                (j : ℂ)).re =
+              (j : ℝ) - (k : ℝ) := by
+          have hweight :
+              ((Fintype.card V : ℂ) * (N : ℂ)) / 2 - ((M0 + k : ℕ) : ℂ) =
+                -(k : ℂ) := by
+            calc
+              ((Fintype.card V : ℂ) * (N : ℂ)) / 2 - ((M0 + k : ℕ) : ℂ)
+                  = (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M0 : ℂ)) -
+                    (k : ℂ) := by
+                      push_cast
+                      ring
+              _ = -(k : ℂ) := by rw [hzero, zero_sub]
+          rw [hweight]
+          simp
+          ring
+        rw [hrewrite]
+        linarith
+      have hΦ_mem' :
+          Φ ∈ magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 -
+            ((M0 + k : ℕ) : ℂ)) := by
+        rw [← hkval]
+        exact hΦ_mem
+      obtain ⟨_hland_ne', hland_mem, _hland_eig⟩ :=
+        raise_iterate_ne_zero (V := V) (N := N) (J := J) (lam := μ) k
+          hΦ_ne hΦ_mem' hΦ_eig hneg
+      have hsector_pf' : finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+          (heisenbergHamiltonianSMatrixOnMagSector (V := V) J N M0)) (μ : ℂ)) ≤ 1 := by
+        rw [hM0def]
+        exact h_sector_pf
+      have hΦ0_mem' : Φ0 ∈
+          magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M0 : ℂ)) := by
+        rw [hM0def]
+        exact hΦ0_mem
+      obtain ⟨hland_ne, hland_cas⟩ :=
+        heisenbergHamiltonianS_totalSpinSSquared_mulVec_raise_landed_eq_zero_of_sector_pf
+          (V := V) (N := N) J M0 k μ
+          hΦ0_ne hΦ0_eig hΦ0_mem' hΦ0_cas hΦ_ne hΦ_mem' hΦ_eig hneg hsector_pf'
+      have hland_mem_zero :
+          (totalSpinSOpPlus V N ^ k).mulVec Φ ∈ magSubspaceS V N 0 := by
+        have hweight0 :
+            ((Fintype.card V : ℂ) * (N : ℂ)) / 2 - ((M0 + k : ℕ) : ℂ) + (k : ℂ) =
+              0 := by
+          calc
+            ((Fintype.card V : ℂ) * (N : ℂ)) / 2 - ((M0 + k : ℕ) : ℂ) + (k : ℂ)
+                = ((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M0 : ℂ) := by
+                  push_cast
+                  ring
+            _ = 0 := hzero
+        rwa [← hweight0]
+      exact not_totalSpinSOpPlus_pow_mulVec_ne_zero_of_zero_casimir_zero_magSubspaceS
+        (V := V) (N := N) k hk_pos hland_ne hland_mem_zero hland_cas
+  exact lt_of_le_of_ne hle hne
+
 /-- **Common-energy lower bound identifies the Hermitian minimum**: if a
 Hermitian matrix has a non-zero eigenvector at a real energy `μ`, and every
 non-zero real-energy eigenvector has energy at least `μ`, then its Hermitian
