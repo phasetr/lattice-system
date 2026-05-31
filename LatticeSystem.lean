@@ -62,6 +62,7 @@ import LatticeSystem.Quantum.SpinS.SectorRestrictionComplexEigval
 import LatticeSystem.Quantum.SpinS.SectorEmbeddingComplexEigval
 import LatticeSystem.Quantum.SpinS.EigenspaceSectorFinrankEq
 import LatticeSystem.Quantum.SpinS.EigenspaceFinrankLeOneTransfer
+import LatticeSystem.Quantum.SpinS.AnisotropicEigenspaceSectorFinrankEq
 import LatticeSystem.Quantum.SpinS.Theorem24SU2SymmetricFinrankLeOneFromSectorPF
 import LatticeSystem.Quantum.SpinS.Theorem24SU2SymmetricFinrankLeOneCardEq
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfObligation2SU2Unique
@@ -71,6 +72,7 @@ import LatticeSystem.Quantum.SpinS.Theorem24SectorPFFromTheorem23
 import LatticeSystem.Quantum.SpinS.Theorem24SU2GlobalUniquenessFromMLM
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfObligation2FromMLM
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfBalancedGSFromMLM
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfTargetUniquenessFromBalancedPF
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
