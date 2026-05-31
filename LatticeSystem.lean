@@ -65,6 +65,8 @@ import LatticeSystem.Quantum.SpinS.EigenspaceFinrankLeOneTransfer
 import LatticeSystem.Quantum.SpinS.Theorem24SU2SymmetricFinrankLeOneFromSectorPF
 import LatticeSystem.Quantum.SpinS.Theorem24SU2SymmetricFinrankLeOneCardEq
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfObligation2SU2Unique
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergBalancedFromGlobalUniqueness
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfObligation2SU2UniqueOnly
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
