@@ -12508,6 +12508,44 @@ constraint \(2M=|\Lambda|\cdot N\) follows from
 This is the standard physical statement form of the SU(2) symmetric
 \(\dim\le1\) capstone.
 
+The later deformation chain reduces spin-\(1/2\) obligation~(2) to a single
+strict-gap input at the SU(2) point:
+\[
+  E_{M_{\mathrm{balanced}}}(1,0) < E_M(1,0)
+  \qquad (M\ne M_{\mathrm{balanced}}).
+\]
+The capstone
+\texttt{spinHalf\_anisotropicHeisenbergS\_obligation\_2\_single\_axiom}
+packages the first-crossing/argmin argument and shows that this pointwise
+strict gap is enough to contradict any proposed non-balanced ground-state
+violation along the path from \((1,0)\) to \((\lambda',D')\).
+
+The current structural refinement is
+\texttt{strict\_gap\_at\_SU2\_of\_global\_unique} and its path-named form
+\texttt{strict\_gap\_at\_path\_zero\_of\_global\_unique}.  Assume that the full
+SU(2)-point ground eigenspace at \(E_{\rm full}\) has
+\(\dim_{\mathbb C}\le1\), that the balanced sector attains the global minimum
+\(E_{M_{\rm balanced}}=E_{\rm full}\), and that every non-balanced sector under
+consideration has non-zero centered magnetization.  The general sector-minimum
+bound gives \(E_{\rm full}\le E_M\).  If equality held for a non-balanced
+sector, the sector-ground-vector construction would give two non-zero full
+eigenvectors at \(E_{\rm full}\): one in centered magnetization \(0\), and one
+in a non-zero centered-magnetization sector.  The existing two-sector/reflection
+contradiction forbids this under \(\dim\le2\), hence certainly under
+\(\dim\le1\).  Therefore \(E_{\rm full}<E_M\), and the balanced-sector equality
+turns this into the strict gap.  This is implemented in
+\texttt{AnisotropicHeisenbergStrictGapFromGlobalUniqueness.lean}.
+
+Finally,
+\texttt{spinHalf\_anisotropicHeisenbergS\_obligation\_2\_of\_SU2\_global\_unique}
+uses this structural strict-gap theorem for every valid \(M\ne
+M_{\rm balanced}\), then invokes the single-axiom capstone.  The remaining
+mathematical input is therefore no longer the pointwise strict-gap family
+itself, but the SU(2) global uniqueness plus balanced-ground-sector equality
+expected from the Marshall--Lieb--Mattis/Casimir chain.  Reference: H.~Tasaki,
+\emph{Physics and Mathematics of Quantum Many-Body Systems}, Springer 2020,
+§2.5 Theorem 2.4, pp.~43--44.
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
