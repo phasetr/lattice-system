@@ -1,5 +1,8 @@
-import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfObligation2AxiomaticV3
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergBalancedMinEqFullAtSInf
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergCrossingDualSectorGroundExplicit
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergPerMCrossingEqualityAtSInf
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfFinrankLeTwoAtPath
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergCrossingContradictionConditional
 
 /-!
 # Spin-1/2 Tasaki §2.5 Theorem 2.4 obligation (2) — capstone v3' (hne hypothesis)
