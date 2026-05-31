@@ -12746,6 +12746,32 @@ energy identity
 No new mathematical callback is introduced; the theorem is a consumer wrapper
 around the Theorem~2.3/Perron--Frobenius strict-gap endpoint.
 
+The next consumer theorem separates the last target-point PF input from the
+linear-algebra packaging.  First,
+\texttt{anisotropicHeisenbergS\_sector\_matrix\_eigenspace\_finrank\_eq} is the
+anisotropic analogue of the Heisenberg sector-transfer theorem: zero-extension
+and restriction give a linear equivalence between the eigenspace of the sector
+matrix \(\hat H_M(\lambda,D)\) and the full eigenspace of
+\(\hat H(\lambda,D)\) intersected with the corresponding magnetization
+subspace.  Consequently
+\texttt{anisotropicHeisenbergS\_eigenspace\_inf\_magSubspaceS\_finrank\_le\_one\_of\_sector}
+transfers a sector-matrix \( \texttt{finrank}\le 1 \) hypothesis to the
+admissible-intersection form used by the existing abstract theorem
+\texttt{anisotropicHeisenbergS\_finrank\_le\_one\_from\_admis\_pf}.
+At the target point, the theorem
+\texttt{spinHalf\_anisotropicHeisenbergS\_target\_finrank\_le\_one\_of\_balanced\_sector\_pf\_and\_MLM\_casimir\_ladder\_t23\_pf}
+combines this transfer with the global \( \texttt{finrank}\le 2 \) bound, the
+balanced-sector ground vector, and the PR~\#4029 identity
+\(E_{M_{\rm balanced}}(\lambda',D')=\lambda_{\min}(\hat H(\lambda',D'))\).
+Thus balanced-sector Perron--Frobenius simplicity at the target point implies
+full ground-state uniqueness.  Finally
+\texttt{spinHalf\_anisotropicHeisenbergS\_target\_groundState\_zero\_magnetization\_of\_balanced\_sector\_pf\_and\_MLM\_casimir\_ladder\_t23\_pf}
+composes this uniqueness bound with
+\texttt{anisotropicHeisenbergS\_unique\_groundState\_has\_zero\_magnetization}
+to obtain \(\hat S^3_{\rm tot}\Phi=0\) for every non-zero target ground state.
+The only remaining mathematical input at this boundary is the target balanced
+sector PF simplicity itself.
+
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
 Perron--Frobenius).  Only the ground-state degeneracy count must be
