@@ -124,6 +124,77 @@ theorem tasaki23_sector_lift_and_casimir_zero_of_card_eq
   have hpred0 := tasaki23PredictedCasimirValue_eq_zero_of_card_eq (V := V) A N h_card_eq
   simpa [hpred0] using hCas
 
+/-- **Zero-Casimir transfer along a one-dimensional sector ground line**: suppose the
+full Heisenberg `μ`-eigenspace, restricted to sector `M`, has dimension at most
+one, and it contains a non-zero sector-supported vector `Φ0` with total-Casimir
+eigenvalue `0`.  Then every other sector-supported full eigenvector `Ψ` at the
+same eigenvalue also has total-Casimir image `0`.
+
+This is the equality-case bridge for the MLM endpoint: once the outside-sector
+ladder lands in the balanced sector at the common energy, sector PF simplicity
+pins the landed vector to the zero-Casimir PF line. -/
+theorem heisenbergHamiltonianS_totalSpinSSquared_mulVec_eq_zero_of_sector_pf_zero_casimir
+    (J : V → V → ℂ) (M : ℕ) (μ : ℂ)
+    {Φ0 Ψ : (V → Fin (N + 1)) → ℂ}
+    (hΦ0_ne : Φ0 ≠ 0)
+    (hΦ0_eig : (heisenbergHamiltonianS J N).mulVec Φ0 = μ • Φ0)
+    (hΦ0_mem : Φ0 ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ)))
+    (hΦ0_cas : (totalSpinSSquared V N).mulVec Φ0 = 0)
+    (hΨ_eig : (heisenbergHamiltonianS J N).mulVec Ψ = μ • Ψ)
+    (hΨ_mem : Ψ ∈
+      magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ)))
+    (h_sector_pf : finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+      (heisenbergHamiltonianSMatrixOnMagSector (V := V) J N M)) μ) ≤ 1) :
+    (totalSpinSSquared V N).mulVec Ψ = 0 := by
+  classical
+  set E := End.eigenspace (Matrix.toLin' (heisenbergHamiltonianS (Λ := V) J N)) μ
+    with hEdef
+  set A :=
+    magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ)) / 2 - (M : ℂ))
+    with hAdef
+  have hline :
+      finrank ℂ ↥(E ⊓ A) ≤ 1 := by
+    subst E
+    subst A
+    exact heisenbergHamiltonianS_eigenspace_inf_magSubspaceS_finrank_le_one_of_sector
+      (Λ := V) (N := N) J M μ h_sector_pf
+  have hΦ0_in : Φ0 ∈ E ⊓ A := by
+    refine ⟨?_, ?_⟩
+    · change Φ0 ∈ End.eigenspace
+        (Matrix.toLin' (heisenbergHamiltonianS (Λ := V) J N)) μ
+      rw [End.mem_eigenspace_iff, Matrix.toLin'_apply]
+      exact hΦ0_eig
+    · rw [hAdef]
+      exact hΦ0_mem
+  have hΨ_in : Ψ ∈ E ⊓ A := by
+    refine ⟨?_, ?_⟩
+    · change Ψ ∈ End.eigenspace
+        (Matrix.toLin' (heisenbergHamiltonianS (Λ := V) J N)) μ
+      rw [End.mem_eigenspace_iff, Matrix.toLin'_apply]
+      exact hΨ_eig
+    · rw [hAdef]
+      exact hΨ_mem
+  obtain ⟨v, hv⟩ := finrank_le_one_iff.mp hline
+  obtain ⟨a, ha⟩ := hv ⟨Φ0, hΦ0_in⟩
+  obtain ⟨b, hb⟩ := hv ⟨Ψ, hΨ_in⟩
+  have ha' : a • (v : (V → Fin (N + 1)) → ℂ) = Φ0 := by
+    have h := congrArg ((↑) : ↥(E ⊓ A) → (V → Fin (N + 1)) → ℂ) ha
+    simpa using h
+  have hb' : b • (v : (V → Fin (N + 1)) → ℂ) = Ψ := by
+    have h := congrArg ((↑) : ↥(E ⊓ A) → (V → Fin (N + 1)) → ℂ) hb
+    simpa using h
+  have ha_ne : a ≠ 0 := by
+    intro h0
+    apply hΦ0_ne
+    rw [← ha', h0, zero_smul]
+  have hΨ_eq : Ψ = (b * a⁻¹) • Φ0 := by
+    rw [← hb', ← ha', smul_smul]
+    have hscalar : (b * a⁻¹) * a = b := by
+      rw [mul_assoc, inv_mul_cancel₀ ha_ne, mul_one]
+    rw [hscalar]
+  rw [hΨ_eq, Matrix.mulVec_smul, hΦ0_cas, smul_zero]
+
 /-- **Common-energy lower bound identifies the Hermitian minimum**: if a
 Hermitian matrix has a non-zero eigenvector at a real energy `μ`, and every
 non-zero real-energy eigenvector has energy at least `μ`, then its Hermitian

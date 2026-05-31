@@ -12578,6 +12578,7 @@ tasaki23GroundStateSectors_eq_singleton_of_card_eq
 tasaki23PredictedTotalSpin_eq_zero_of_card_eq
 tasaki23PredictedCasimirValue_eq_zero_of_card_eq
 tasaki23_sector_lift_and_casimir_zero_of_card_eq
+heisenbergHamiltonianS_totalSpinSSquared_mulVec_eq_zero_of_sector_pf_zero_casimir
 hermitianMinEigenvalue_eq_common_of_eigenvector_and_global_lower
 exists_tasaki23_common_energy_eq_hermitianMinEigenvalue
 heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_outside_projection_zero
@@ -12591,7 +12592,14 @@ The first name records the balanced-cardinality arithmetic: when
 three names record the corresponding total-spin simplification:
 the predicted total spin and total-Casimir value are both zero, and the
 structural PF/Casimir lift of an admissible sector ground state specializes to
-a full Heisenberg eigenvector with total-Casimir eigenvalue zero.  The following
+a full Heisenberg eigenvector with total-Casimir eigenvalue zero.  The next
+bridge transfers this zero-Casimir property along any one-dimensional
+sector-supported full eigenspace: if sector PF simplicity gives
+\(\dim(E_\mu\cap\mathcal H_M)\le1\), and one non-zero vector on that line has
+\((\hat S_{\rm tot})^2\Phi=0\), then every other full eigenvector at the same
+\(\mu\) supported in the same sector also has zero total-Casimir image.  This is
+the equality-case pin needed after the outside-sector ladder lands in the
+balanced sector.  The following
 two
 identify the MLM common energy \(\mu\) with the Hermitian minimum of the full
 Heisenberg Hamiltonian: the sector ground-state existence gives
