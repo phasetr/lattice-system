@@ -12561,51 +12561,53 @@ The opposite inequality is the existing sector lower-bound
 so the two minima are equal.  This is implemented in
 \texttt{AnisotropicHeisenbergBalancedFromGlobalUniqueness.lean}.
 
-Composing this bridge with the PR~\#4018 capstone gives
-\texttt{spinHalf\_anisotropicHeisenbergS\_obligation\_2\_of\_SU2\_global\_unique\_only}
-in \texttt{AnisotropicHeisenbergSpinHalfObligation2SU2UniqueOnly.lean}.  The
-spin-\(1/2\) obligation~(2) boundary now has one remaining SU(2)-endpoint
+Composing this bridge with the PR~\#4018 capstone gives the one-input wrapper
+shown below, implemented in
+\path{AnisotropicHeisenbergSpinHalfObligation2SU2UniqueOnly.lean}.
+\begin{Verbatim}
+spinHalf_anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_only
+\end{Verbatim}
+The spin-\(1/2\) obligation~(2) boundary now has one remaining SU(2)-endpoint
 mathematical input: full ground eigenspace uniqueness at \(E_{\rm full}\).
 
-The non-circular route to that endpoint uniqueness is started in
-\texttt{Theorem24SU2GlobalUniquenessFromMLM.lean}.  First,
-\texttt{tasaki23GroundStateSectors\_eq\_singleton\_of\_card\_eq} records the
-balanced-cardinality arithmetic: when \(|A|=|\Lambda\setminus A|\), the
-Tasaki Theorem~2.3 admissible sector interval
-\([\min(|A|,|B|)N,\max(|A|,|B|)N]\) is the singleton \(\{|A|N\}\).  Second,
-\texttt{hermitianMinEigenvalue\_eq\_common\_of\_eigenvector\_and\_global\_lower}
-and
-\texttt{exists\_tasaki23\_common\_energy\_eq\_hermitianMinEigenvalue}
+The non-circular route to that endpoint uniqueness is started in the new
+endpoint file.  Its main Lean entry points are:
+\begin{Verbatim}
+Theorem24SU2GlobalUniquenessFromMLM.lean
+tasaki23GroundStateSectors_eq_singleton_of_card_eq
+hermitianMinEigenvalue_eq_common_of_eigenvector_and_global_lower
+exists_tasaki23_common_energy_eq_hermitianMinEigenvalue
+heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_outside_projection_zero
+heisenbergHamiltonianS_outside_projection_zero_of_strict_sector_lower
+heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_strict_sector_lower
+exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one
+\end{Verbatim}
+The first name records the balanced-cardinality arithmetic: when
+\(|A|=|\Lambda\setminus A|\), the Tasaki Theorem~2.3 admissible sector interval
+\([\min(|A|,|B|)N,\max(|A|,|B|)N]\) is the singleton \(\{|A|N\}\).  The next two
 identify the MLM common energy \(\mu\) with the Hermitian minimum of the full
 Heisenberg Hamiltonian: the sector ground-state existence gives
 \(\lambda_{\min}\le\mu\), while Theorem~2.3's global lower-bound callback
-applied to a minimum eigenvector gives \(\mu\le\lambda_{\min}\).  Finally,
-\texttt{heisenbergHamiltonianS\_full\_eigenspace\_finrank\_le\_one\_of\_outside\_projection\_zero}
-isolates the remaining mathematical task.  Once every full ground eigenvector
-has zero projection to sectors outside the singleton balanced sector, the
-existing sector-matrix/sector-subspace finrank bridge transfers the
-Perron--Frobenius sector simplicity to the full Hilbert-space eigenspace.  The
-strict-ordering interface is made explicit by
-\texttt{heisenbergHamiltonianS\_outside\_projection\_zero\_of\_strict\_sector\_lower}:
-if every real eigenvalue in every sector \(M\ne |A|N\) is strictly above
-\(\mu\), then a full eigenvector at \(\mu\) has zero outside projections (a
-non-zero outside projection would give a real or imaginary sector eigenvector
-at the same \(\mu\), contradicting strictness).  Consequently
-\texttt{heisenbergHamiltonianS\_full\_eigenspace\_finrank\_le\_one\_of\_strict\_sector\_lower}
-is the final non-circular bridge from strict MLM/Casimir outside ordering plus
-balanced-sector Perron--Frobenius simplicity to full SU(2) ground-state
-uniqueness.  The packaged theorem
-\texttt{exists\_tasaki23\_common\_energy\_and\_heisenbergHamiltonianS\_full\_eigenspace\_finrank\_le\_one}
-assembles these pieces at the consumer boundary: Theorem~2.3 supplies the
-common energy and full lower bound, balanced cardinality supplies the singleton
-sector band, and the two remaining callbacks are exactly balanced-sector PF
-simplicity and strict outside-sector ordering.  The only missing ingredient is
-now precisely that strict
-outside-sector lower bound from the MLM/Casimir ladder, not any strict-gap
-theorem from the anisotropic deformation chain.  References: H.~Tasaki,
-\emph{Physics and Mathematics of Quantum Many-Body Systems}, Springer 2020,
-§2.5 Theorems~2.3--2.4, pp.~42--44; E.~Lieb and D.~Mattis, J. Math. Phys. 3
-(1962), 749.
+applied to a minimum eigenvector gives \(\mu\le\lambda_{\min}\).  The projection
+bridge then isolates the remaining mathematical task.  Once every full ground
+eigenvector has zero projection to sectors outside the singleton balanced
+sector, the existing sector-matrix/sector-subspace finrank bridge transfers the
+Perron--Frobenius sector simplicity to the full Hilbert-space eigenspace.
+
+The strict-ordering interface says that if every real eigenvalue in every
+sector \(M\ne |A|N\) is strictly above \(\mu\), then a full eigenvector at
+\(\mu\) has zero outside projections: a non-zero outside projection would give
+a real or imaginary sector eigenvector at the same \(\mu\), contradicting
+strictness.  Consequently the final packaged theorem assembles the consumer
+boundary: Theorem~2.3 supplies the common energy and full lower bound, balanced
+cardinality supplies the singleton sector band, and the two remaining callbacks
+are exactly balanced-sector PF simplicity and strict outside-sector ordering.
+The only missing ingredient is now precisely that strict outside-sector lower
+bound from the MLM/Casimir ladder, not any strict-gap theorem from the
+anisotropic deformation chain.  References: H.~Tasaki, \emph{Physics and
+Mathematics of Quantum Many-Body Systems}, Springer 2020, §2.5
+Theorems~2.3--2.4, pp.~42--44; E.~Lieb and D.~Mattis, J. Math. Phys. 3 (1962),
+749.
 
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
