@@ -12595,6 +12595,7 @@ heisenbergHamiltonianS_outside_projection_zero_of_strict_sector_lower
 heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_strict_sector_lower
 exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one
 exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder
+spinHalf_anisotropicHeisenbergS_obligation_2_of_MLM_casimir_ladder
 \end{Verbatim}
 The first name records the balanced-cardinality arithmetic: when
 \(|A|=|\Lambda\setminus A|\), the Tasaki Theorem~2.3 admissible sector interval
@@ -12664,6 +12665,20 @@ H.~Tasaki, \emph{Physics and
 Mathematics of Quantum Many-Body Systems}, Springer 2020, §2.5
 Theorems~2.3--2.4, pp.~42--44; E.~Lieb and D.~Mattis, J. Math. Phys. 3 (1962),
 749.
+
+The spin-\(1/2\) wrapper
+\texttt{spinHalf\_anisotropicHeisenbergS\_obligation\_2\_of\_MLM\_casimir\_ladder}
+then composes this Heisenberg endpoint with the deformation capstone
+\texttt{spinHalf\_anisotropicHeisenbergS\_obligation\_2\_of\_SU2\_global\_unique\_only}.
+At the SU(2) point the anisotropic Hamiltonian is exactly the isotropic
+Heisenberg Hamiltonian, formalized by
+\texttt{anisotropicHeisenbergS\_one\_zero} and the eigenspace bridge
+\texttt{anisotropicHeisenbergS\_at\_SU2\_eigenspace\_eq\_heisenbergHamiltonianS}.
+Thus the Heisenberg Hermitian-minimum eigenspace bound
+\(\dim E_{\min}\le1\) transports to \(\hat H(1,0)\), supplying the last
+abstract SU(2)-global-uniqueness input of the spin-\(1/2\) obligation
+boundary.  The remaining explicit callback is the balanced-sector
+Perron--Frobenius simplicity at the Theorem~2.3 common Hermitian minimum.
 
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for

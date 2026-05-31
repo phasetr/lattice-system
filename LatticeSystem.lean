@@ -68,6 +68,7 @@ import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfObligation2SU2Un
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergBalancedFromGlobalUniqueness
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfObligation2SU2UniqueOnly
 import LatticeSystem.Quantum.SpinS.Theorem24SU2GlobalUniquenessFromMLM
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfObligation2FromMLM
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
