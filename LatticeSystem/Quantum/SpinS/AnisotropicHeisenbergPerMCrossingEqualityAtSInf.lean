@@ -75,7 +75,8 @@ theorem anisotropicHeisenbergS_per_M_crossing_equality_at_sInf
     -- show t_first ∈ closure { t | strict gap at t }.
     -- Even simpler: use that the strict-gap-below holds on [0, t_first), and take limit.
     -- Use IsClosed.mem_of_tendsto or the direct: filter argument with sub-sequence.
-    -- Cleanest: { t | f(t) ≤ g(t) } is closed; show t_first is a limit point of this set from below.
+    -- Cleanest: { t | f(t) ≤ g(t) } is closed; show t_first is a limit point of this set
+    -- from below.
     -- From PR #3995, [0, t_first) ⊆ { t | f(t) < g(t) } ⊆ { t | f(t) ≤ g(t) }.
     -- Hence closure ([0, t_first)) ⊆ closure { f ≤ g } = { f ≤ g }.
     -- t_first ∈ closure ([0, t_first)) IF t_first > 0; else t_first = 0 and we handle directly.
