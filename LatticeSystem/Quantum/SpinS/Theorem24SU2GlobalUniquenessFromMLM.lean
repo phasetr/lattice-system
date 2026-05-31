@@ -3,6 +3,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralSectorLiftCasimir
 import LatticeSystem.Quantum.SpinS.EigenspaceFinrankLeOneTransfer
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import LatticeSystem.Quantum.SpinS.HermitianMinLeOfEigenvector
+import LatticeSystem.Quantum.SpinS.Theorem24SectorPFFromTheorem23
 
 /-!
 # SU(2)-point global uniqueness from the MLM endpoint
@@ -347,6 +348,7 @@ theorem totalSpinSOpPlus_mulVec_eq_zero_of_totalSpinSSquared_mulVec_eq_zero_of_m
       rw [Matrix.mulVec_mulVec]
       exact hMP)
 
+set_option linter.style.longLine false in
 /-- A zero-total-Casimir vector in the zero magnetization sector is killed by
 `Ŝ⁻_tot`.  This is the singlet lowest-weight half of the equality-case
 obstruction. -/
@@ -922,6 +924,79 @@ theorem heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_strict_sector_l
         (V := V) (N := N) J M0 hJ_real h_strict_outside hΨ M hM_ne)
     h_sector_pf
 
+/-- **Balanced-sector PF simplicity from the Theorem 2.3 common-minimum
+witness**: in the balanced-cardinality case, the structural Theorem 2.3 sector
+witness for `M0 = |A| * N` gives a Marshall-positive sector eigenvector at the
+common energy.  Perron--Frobenius geometric simplicity then gives the
+sector-matrix `finrank <= 1` bound at the full Heisenberg Hermitian minimum. -/
+theorem tasaki23_balanced_sector_matrix_finrank_le_one_of_common_min
+    (A : V → Bool) (N : ℕ) {J : V → V → ℂ} (c : ℝ)
+    (hT23 : tasaki_2_5_theorem_2_3 A N J c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hJ_pos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (h_card_eq : (Finset.univ.filter (fun x : V => A x = true)).card =
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card)
+    (hN : 1 ≤ N)
+    (hcardA : 1 ≤ (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hcardB : 1 ≤ (Finset.univ.filter (fun x : V => (! A x) = true)).card)
+    {μ : ℝ}
+    (hmin_eq : hermitianMinEigenvalue (heisenbergHamiltonianS_isHermitian_of_real
+      (Λ := V) hJ_real' N) = μ) :
+    finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+      (heisenbergHamiltonianSMatrixOnMagSector (V := V) J N
+        ((Finset.univ.filter (fun x : V => A x = true)).card * N))) (μ : ℂ)) ≤ 1 := by
+  classical
+  set M0 := (Finset.univ.filter (fun x : V => A x = true)).card * N with hM0def
+  obtain ⟨μ0, hmin_eq0, hsector, _hglobal⟩ :=
+    exists_tasaki23_common_energy_eq_hermitianMinEigenvalue A N c hT23
+      hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos hc_strict
+      hN hcardA hcardB
+  have hμ_eq : μ0 = μ := by
+    rw [← hmin_eq0, hmin_eq]
+  have hM0_mem : M0 ∈ tasaki23GroundStateSectors (V := V) A N := by
+    rw [hM0def, tasaki23GroundStateSectors_mem_iff_eq_of_card_eq A N _ h_card_eq]
+  haveI : Nonempty (magConfigS V N M0) :=
+    magConfigS_nonempty_of_le_card_mul (tasaki23GroundStateSectors_le_card_mul A N hM0_mem)
+  obtain ⟨v0, _hμ_lt, hv0_pos, hΦ0_eig_embed, _huniq0⟩ := hsector M0 hM0_mem
+  set Φ0 : (V → Fin (N + 1)) → ℂ :=
+    magSectorEmbedding (fun τ : magConfigS V N M0 =>
+      (((marshallSignS A τ.1).re * v0 τ : ℝ) : ℂ))
+    with hΦ0def
+  have hΦ0_eig : (heisenbergHamiltonianS J N).mulVec Φ0 = (μ0 : ℂ) • Φ0 := by
+    simpa [Φ0, hΦ0def] using hΦ0_eig_embed
+  have hReEig0 : (heisenbergHamiltonianSReMatrixOnMagSector J N M0).mulVec
+      (fun σ => (marshallSignS A σ.1).re * v0 σ) =
+      μ0 • (fun σ => (marshallSignS A σ.1).re * v0 σ) := by
+    have hc := heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen
+      J (M := M0) hΦ0_eig
+    rw [hΦ0def, magSectorRestriction_magSectorEmbedding] at hc
+    have hre := heisenbergHamiltonianSReMatrixOnMagSector_mulVec_re_of_complex_eigenvec N
+      hJ_real hc
+    simpa only [Complex.ofReal_re] using hre
+  have hA_ne : ∃ a, A a = true := by
+    obtain ⟨a, ha⟩ := Finset.card_pos.mp (lt_of_lt_of_le Nat.zero_lt_one hcardA)
+    exact ⟨a, (Finset.mem_filter.mp ha).2⟩
+  have hB_ne : ∃ b, A b = false := by
+    obtain ⟨b, hb⟩ := Finset.card_pos.mp (lt_of_lt_of_le Nat.zero_lt_one hcardB)
+    have hb_not := (Finset.mem_filter.mp hb).2
+    cases hAb : A b
+    · exact ⟨b, hAb⟩
+    · rw [hAb] at hb_not
+      cases hb_not
+  have hpf_mu0 :
+      finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+        (heisenbergHamiltonianSMatrixOnMagSector (V := V) J N M0)) (μ0 : ℂ)) ≤ 1 :=
+    heisenbergHamiltonianSMatrixOnMagSector_finrank_le_one_of_marshall_positive
+      (V := V) (N := N) A c hJ_real hJ_pos hJ_nn hJ_sym hJ_bipartite
+      hc_strict hA_ne hB_ne hN hv0_pos hReEig0
+  rw [hμ_eq] at hpf_mu0
+  simpa [M0, hM0def] using hpf_mu0
+
 /-- **Packaged MLM-to-SU(2) uniqueness endpoint**: under balanced sublattice
 cardinality, the structural Theorem 2.3 predicate identifies its common energy
 with the full Heisenberg Hermitian minimum and collapses the admissible band to
@@ -999,6 +1074,7 @@ theorem exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace
       (V := V) (N := N) J M0 hJ_real hstrict hpf
   exact ⟨μ, hmin_eq, by simpa [M0, hM0def] using hsectors_singleton, huniq⟩
 
+set_option linter.style.longLine false in
 /-- **Packaged MLM-to-SU(2) uniqueness endpoint from the Casimir ladder
 obstruction**: the preceding endpoint no longer needs an abstract strict
 outside-sector callback once the balanced zero-Casimir ladder obstruction is
@@ -1152,5 +1228,45 @@ theorem exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace
   exact exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one
     A N c hT23 hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite hJ_pos hc_strict
     h_card_eq hN hcardA hcardB h_sector_pf hstrict
+
+set_option linter.style.longLine false in
+/-- **Packaged MLM-to-SU(2) uniqueness endpoint with sector PF constructed
+from Theorem 2.3**: this removes the final balanced-sector PF simplicity
+callback from the preceding Casimir-ladder endpoint.
+The balanced sector matrix `finrank <= 1` bound is obtained directly from the
+Theorem 2.3 Marshall-positive sector witness by Perron--Frobenius geometric
+simplicity. -/
+theorem exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder_t23_pf
+    (A : V → Bool) (N : ℕ) {J : V → V → ℂ} (c c_toy : ℝ)
+    (hT23 : tasaki_2_5_theorem_2_3 A N J c)
+    (hJ_real : ∀ x y, (J x y).im = 0)
+    (hJ_real' : ∀ x y, star (J x y) = J x y)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
+    (hJ_bipartite : ∀ x y, A x = A y → J x y = 0)
+    (hJ_pos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hc_strict : ∀ σ, dressedHeisenbergSReMatrix A J N σ σ < c)
+    (hc_strict_toy : ∀ σ,
+      dressedHeisenbergSReMatrix A (bipartiteCoupling A) N σ σ < c_toy)
+    (h_card_eq : (Finset.univ.filter (fun x : V => A x = true)).card =
+      (Finset.univ.filter (fun x : V => (! A x) = true)).card)
+    (hN : 1 ≤ N)
+    (hcardA : 1 ≤ (Finset.univ.filter (fun x : V => A x = true)).card)
+    (hcardB : 1 ≤ (Finset.univ.filter (fun x : V => (! A x) = true)).card) :
+    ∃ μ : ℝ,
+      hermitianMinEigenvalue (heisenbergHamiltonianS_isHermitian_of_real
+        (Λ := V) hJ_real' N) = μ ∧
+      tasaki23GroundStateSectors (V := V) A N =
+        {((Finset.univ.filter (fun x : V => A x = true)).card * N)} ∧
+      finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+        (heisenbergHamiltonianS (Λ := V) J N)) (μ : ℂ)) ≤ 1 := by
+  exact
+    exists_tasaki23_common_energy_and_heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_casimir_ladder
+      (V := V) A N c c_toy hT23 hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite
+      hJ_pos hc_strict hc_strict_toy h_card_eq hN hcardA hcardB
+      (fun μ hmin_eq =>
+        tasaki23_balanced_sector_matrix_finrank_le_one_of_common_min
+          (V := V) A N c hT23 hJ_real hJ_real' hJ_sym hJ_nn hJ_bipartite
+          hJ_pos hc_strict h_card_eq hN hcardA hcardB hmin_eq)
 
 end LatticeSystem.Quantum
