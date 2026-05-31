@@ -1293,6 +1293,15 @@ Systems*, §2.2 eqs. (2.2.7) and (2.2.8), p. 22.
 | `neelStateOf_totalSpinHalfOp3_complement_eq_neg` | **Spin-`1/2` linear `Ŝ_tot^(3)` negates under sublattice swap on Néel**. Direct from γ-4 step 207 + 232 + `ring`. Spin-`1/2` mirror of γ-4 step 239 (γ-4 step 240) | `Quantum/MarshallLiebMattis/SublatticeCasimirNeelGeneral.lean` (moved in refactor #41, PR #2879) (PR #1287) |
 | `neelStateOfS_totalSpinSOp1/2_expectation` | **Spin-`S` Néel transverse linear expectations vanish**: `<Φ_Néel\|Ŝ_tot^(1,2)\|Φ_Néel> = 0`. Trivial corollary of γ-4 step 214 applied to `σ = neelConfigOfS A N` (γ-4 step 241). Together with γ-4 step 91 (`<Ŝ_tot^(3)> = magEigenvalueS_neelConfigOfS`), gives the complete per-axis profile `(0, 0, (\|A\|−\|¬A\|)·N/2)` | `Quantum/SpinS/SublatticeCasimirNeel.lean` (PR #1288) |
 | `neelStateOf_totalSpinHalfOp1/2_expectation` | **Spin-`1/2` Néel transverse linear expectations vanish**: same as γ-4 step 241 for spin-`1/2`, derived from γ-4 step 215 (γ-4 step 242) | `Quantum/MarshallLiebMattis/SublatticeCasimirNeel.lean` (PR #1289) |
+
+The single-cluster Problem 2.5.a modules below are imported from the
+build root again after the 2026-05-30 orphan-module sweep had removed
+the earlier implementation.  The restored import tip is
+`Quantum/SpinS/SingleClusterHamiltonianConcreteClusters.lean`, which
+keeps the abstract Hamiltonian, energy hygiene, and concrete
+dimer/trimer/quartet/pentamer eigenvalue formulas live in the default
+Lean build (PR #4032).
+
 | `singleClusterHamiltonianS` | **Single-cluster (star-graph) Heisenberg Hamiltonian** (Tasaki Problem 2.5.a, p. 38): `H = Σ_{j=1}^z Ŝ_0 · Ŝ_j` on `Fin (z + 1)` with central vertex `0` and `z` leaves. Ground-state energy `−S(1 + zS)` (γ-5 step 243) | `Quantum/SpinS/SingleClusterHamiltonian.lean` (PR #1290) |
 | `singleClusterHamiltonianS_isHermitian` | **Hermiticity** of the single-cluster Heisenberg Hamiltonian. Sum of Hermitian `spinSDot 0 j N` over `j ∈ univ.erase 0` (γ-5 step 244) | `Quantum/SpinS/SingleClusterHamiltonian.lean` (PR #1291) |
 | `singleClusterHamiltonianS_zero_z` | **Edge case `z = 0`**: `singleClusterHamiltonianS 0 N = 0` since `univ.erase 0 = ∅` in `Fin 1`. Tasaki's formula `−S(1 + zS)` is intended for `z ≥ 1` (γ-5 step 245) | `Quantum/SpinS/SingleClusterHamiltonian.lean` (PR #1292) |
@@ -1326,7 +1335,7 @@ Systems*, §2.2 eqs. (2.2.7) and (2.2.8), p. 22.
 | `singleClusterGSEnergyS_re_le_singleClusterMaxEnergyS_re` | **Energy ordering**: `Re(GS) ≤ Re(Max)`. Consistency check between γ-5 steps 268 and 269 (γ-5 step 273) | `Quantum/SpinS/SingleClusterHamiltonianEnergy.lean` (PR #1320) |
 | `singleClusterGSEnergyS_im_zero` / `singleClusterMaxEnergyS_im_zero` | **Energies are real**: imaginary parts of both named single-cluster energies vanish (γ-5 step 274) | `Quantum/SpinS/SingleClusterHamiltonianEnergy.lean` (PR #1321) |
 | `singleClusterGSEnergyS_one_eq` / `singleClusterMaxEnergyS_one_eq` | **Dimer (z=1) closed forms**: `singleClusterGSEnergyS 1 N = −(N/2)(N/2+1) = −S(S+1)` (canonical singlet eigenvalue of `Ŝ_0·Ŝ_1`); `singleClusterMaxEnergyS 1 N = (N/2)² = S²` (canonical triplet eigenvalue) (γ-5 step 275) | `Quantum/SpinS/SingleClusterHamiltonianEnergy.lean` (PR #1322) |
-| `singleClusterGSEnergyS_zero_right` / `singleClusterMaxEnergyS_zero_right` / `singleClusterMaxEnergyS_zero_left` | **Trivial edge cases**: `GS z 0 = 0` (spin-0), `Max z 0 = 0` (spin-0), `Max 0 N = 0` (single-site, no leaves) (γ-5 step 276) | `Quantum/SpinS/SingleClusterHamiltonian.lean` (PR #1323) |
+| `singleClusterGSEnergyS_zero_right` / `singleClusterMaxEnergyS_zero_right` / `singleClusterMaxEnergyS_zero_left` | **Trivial edge cases**: `GS z 0 = 0` (spin-0), `Max z 0 = 0` (spin-0), `Max 0 N = 0` (single-site, no leaves) (γ-5 step 276) | `Quantum/SpinS/SingleClusterHamiltonianEnergy.lean` (PR #1323) |
 | `singleClusterGSEnergyS_re_eq` / `singleClusterMaxEnergyS_re_eq` | **Explicit `.re` forms** as `ℝ` values: `Re(GS) = -(N/2)(zN/2+1)`, `Re(Max) = z·N²/4`. Useful for downstream real comparisons (γ-5 step 278) | `Quantum/SpinS/SingleClusterHamiltonianEnergy.lean` (PR #1325) |
 | `singleClusterMaxEnergyS_sub_singleClusterGSEnergyS` | **GS-Max energy gap**: `Max − GS = (N/2)(zN+1) = S(2zS+1)`. Closed-form difference between the two named eigenvalues (γ-5 step 280) | `Quantum/SpinS/SingleClusterHamiltonianEnergy.lean` (PR #1327) |
 | `singleClusterGSEnergyS_re_lt_singleClusterMaxEnergyS_re_of_pos` | **Strict gap for `N ≥ 1`**: `Re(GS) < Re(Max)` whenever spin is non-trivial (γ-5 step 281) | `Quantum/SpinS/SingleClusterHamiltonianEnergy.lean` (PR #1328) |
@@ -1350,7 +1359,7 @@ Systems*, §2.2 eqs. (2.2.7) and (2.2.8), p. 22.
 | `singleClusterHamiltonianS_eigenvalue_pentamer_top` | **Pentamer top-spin sector at Max energy**: for z=4, joint eigenvector at `Stot²·v=(5N/2)(5N/2+1)·v` (`s_tot=5N/2=(z+1)N/2`) and 6-pair sum `(3N²/2)·v` (max leaf-spin `s_R=2N`) gives `H · v = singleClusterMaxEnergyS 4 N · v = N² · v` (γ-5 step 315) | `Quantum/SpinS/SingleClusterHamiltonianConcreteClusters.lean` (PR #1362) |
 | `singleClusterHamiltonianS_eigenvalue_quartet_leaf_singlet` | **Quartet leaf-singlet sector eigenvalue = 0**: for z=3, joint eigenvector at `s_tot=N/2` and 3-pair sum `(-3N(N+2)/8)·v` (leaves in singlet `s_R=0`) gives `H · v = 0`. Decoupling sector (γ-5 step 321) | `Quantum/SpinS/SingleClusterHamiltonianConcreteClusters.lean` (PR #1368) |
 | `singleClusterHamiltonianS_eigenvalue_pentamer_leaf_singlet` | **Pentamer leaf-singlet sector eigenvalue = 0**: for z=4, joint eigenvector at `s_tot=N/2` and 6-pair sum `(-N(N+2)/2)·v` (leaves in singlet `s_R=0`) gives `H · v = 0`. Decoupling sector; 4-leaf singlet exists for any S (γ-5 step 322) | `Quantum/SpinS/SingleClusterHamiltonianConcreteClusters.lean` (PR #1369) |
-| `singleClusterHamiltonianS_eigenvalue_leaf_singlet` | **Generic leaf-singlet decoupling (any z)**: if `Stot²·v = (N(N+2)/4)·v` (s_tot=N/2) and `leafSpinSSquared z N · v = 0` (leaves in singlet), then `H · v = 0`. Generalises γ-5 steps 296 (z=2), 321 (z=3), 322 (z=4) (γ-5 step 323) | `Quantum/SpinS/SingleClusterHamiltonian.lean` (PR #1370) |
+| `singleClusterHamiltonianS_eigenvalue_leaf_singlet` | **Generic leaf-singlet decoupling (any z)**: if `Stot²·v = (N(N+2)/4)·v` (s_tot=N/2) and `leafSpinSSquared z N · v = 0` (leaves in singlet), then `H · v = 0`. Generalises γ-5 steps 296 (z=2), 321 (z=3), 322 (z=4) (γ-5 step 323) | `Quantum/SpinS/SingleClusterHamiltonianConcreteClusters.lean` (PR #1370) |
 | `totalSpinHalfOp{1,2,3}_eq_sublattice_sum` | total spin decomposition: `Ŝ_tot^(α) = Ŝ_A^(α) + Ŝ_¬A^(α)` for `α ∈ {1, 2, 3}`. Direct from the partition `Λ = A ∪ ¬A` | `Quantum/MarshallLiebMattis/SublatticeSpin.lean` |
 | `sublatticeSpinHalfSquared` / `sublatticeSpinHalfSquared_isHermitian` | sublattice spin Casimir: `(Ŝ_A)² := Σ_α (Ŝ_A^(α))²`. Hermitian (each `(Ŝ_A^(α))²` is the square of a Hermitian operator). Foundation for the Casimir identity `Ĥ_toy = (1/(2|Λ|))((Ŝ_tot)² − (Ŝ_A)² − (Ŝ_B)²)` (Tasaki §2.5 (2.5.11)) | `Quantum/MarshallLiebMattis/SublatticeSpin.lean` |
 | `sublatticeSpinHalfOpGeneric_cross_commute` / `sublatticeSpinHalfOp{1,2,3}_cross_commute_op{1,2,3}` | mixed-axes cross-sublattice commutativity: `Commute (Ŝ_A^(α)) (Ŝ_¬A^(β))` for any axes `α, β ∈ {1, 2, 3}`. Generic helper expresses this for arbitrary single-site operators `S, T`; the six mixed-axis specialisations follow as one-line corollaries | `Quantum/MarshallLiebMattis/SublatticeSpin.lean` |
@@ -2641,7 +2650,13 @@ mathematical work):
   argument on the Marshall-rotated basis.
 - **Problem 2.5.a** (single-cluster ground-state energy
   `-S(1+zS)` for general spin `S` and coordination `z`).
-  Requires general-spin infrastructure (P1d''' above is now done in PR #490; this remains for the §2.5-specific cluster argument).
+  The single-cluster Hamiltonian, Casimir decomposition, named
+  GS/max energies, and dimer/trimer/quartet/pentamer conditional
+  eigenvalue formulas are live again under
+  `Quantum/SpinS/SingleClusterHamiltonian*.lean`; the remaining
+  mathematical gaps are the Clebsch--Gordan existence of the
+  predicted GS-sector eigenvectors and the spectral/variational
+  exhaustion argument.
 - **Problem 2.5.b** (lower bound on `E_GS` via 2.5.a).
 - **Problem 2.5.c** (single-site expectation `⟨Ŝ_x⟩ = 0` in the
   AFM ground state).

@@ -12848,7 +12848,7 @@ Many-Body Systems}, Springer 2020, §2.5 Theorem 2.4, p.~43--44 (eq.~2.5.16).
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
 
-\textbf{Goal} (Tasaki §2.5 Problem 2.5.a, p.~43). For a single
+\textbf{Goal} (Tasaki §2.5 Problem 2.5.a, p.~38). For a single
 $(z+1)$-vertex star graph with one central spin and $z$ leaves, all of
 spin $S = N/2$, with antiferromagnetic Heisenberg coupling
 $\hat H = \sum_{j=1}^{z} \hat{\boldsymbol S}_0 \cdot
@@ -12877,8 +12877,11 @@ addition constraints; the ground state lies at $s_R = z N/2$ (max
 leaf spin) with $s_{\rm tot} = (z-1)N/2$, giving
 $E_{\rm GS} = -S(1 + zS)$.
 
-\textbf{Formalisation status} ($\gamma$-5, in progress, $\sim$50 PRs
-through PR~\#1345):
+\textbf{Formalisation status} ($\gamma$-5, in progress).  The
+single-cluster modules are live again in the default Lean import graph:
+\texttt{LatticeSystem.Quantum.SpinS.SingleClusterHamiltonianConcreteClusters}
+imports the abstract Hamiltonian and energy companion, and
+\texttt{LatticeSystem.lean} imports that tip module.
 
 \begin{itemize}
   \item Single-cluster Hamiltonian
@@ -12945,6 +12948,29 @@ through PR~\#1345):
         leaf-singlet decoupling sector at $0$. Together these give
         the complete $S=1/2$ trimer spectrum
         $\{-1, 0, 1/2\}$ analytically ($\gamma$-5 steps 292--296).
+  \item Quartet ($z=3$) and pentamer ($z=4$) concrete formulas:
+        \texttt{leafSpinSSquared\_three} and
+        \texttt{leafSpinSSquared\_four} decompose the leaf Casimir
+        into the scalar diagonal contribution plus twice the sum of
+        unordered leaf--leaf couplings.  The corresponding
+        \texttt{singleClusterHamiltonianS\_eigenvalue\_quartet}
+        and \texttt{...\_pentamer} theorems turn joint eigenvectors
+        of $(\hat S_{\rm tot})^2$ and the leaf--leaf sum into
+        $\hat H$-eigenvectors.  The GS-sector and top-sector
+        specialisations recover
+        \texttt{singleClusterGSEnergyS 3 N},
+        \texttt{singleClusterMaxEnergyS 3 N},
+        \texttt{singleClusterGSEnergyS 4 N}, and
+        \texttt{singleClusterMaxEnergyS 4 N}
+        ($\gamma$-5 steps 303--306 and 312--315).
+  \item Leaf-singlet decoupling:
+        \texttt{singleClusterHamiltonianS\_eigenvalue\_trimer\_leaf\_singlet},
+        \texttt{...\_quartet\_leaf\_singlet},
+        \texttt{...\_pentamer\_leaf\_singlet}, and the generic
+        \texttt{singleClusterHamiltonianS\_eigenvalue\_leaf\_singlet}
+        prove that if the leaves have total spin zero and the total
+        Casimir is the central-spin value $N(N+2)/4$, then
+        $\hat H \cdot v = 0$ ($\gamma$-5 steps 296, 321--323).
 \end{itemize}
 
 \textbf{Strategic gaps.} The deferred pieces are:
