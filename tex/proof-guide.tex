@@ -14817,6 +14817,24 @@ positivity for this concrete PF vector.  Reference: Tasaki, Springer 2020,
 Problem~2.5.d, p.~40, solution pp.~498--499, equations (S.22)--(S.23), with
 Theorems~2.3--2.4, pp.~42--44.
 
+\textbf{Problem 2.5.d balanced Perron--Frobenius sign cases (PR~\#4079)}.
+The file \path{Quantum/SpinS/Problem25dBalancedPFSignCases.lean} applies the
+final bipartite-gauge sign conversion from PR~\#4068 to the concrete balanced
+PF endpoint from PR~\#4078.  The new theorem
+\path{twoSpinCorrelationS_sign_cases_of_tasaki23_balanced_pf_cross} preserves
+the output package from
+\path{twoSpinCorrelationS_bipartite_signed_re_pos_of_tasaki23_balanced_pf_cross}:
+the Hermitian minimum, the strictly positive balanced sector coefficients, the
+non-zero sector-embedded eigenvector, and the full eigenspace
+\(\mathrm{finrank}\le1\).  Its last field replaces the signed positivity
+hypothesis by the four Boolean conclusions of
+\path{twoSpinCorrelationS_sign_cases_of_bipartite_signed_re_pos}: positive
+real two-spin correlation on the same Boolean sublattice and negative real
+two-spin correlation on opposite Boolean sublattices, after the corresponding
+Boolean assumptions are supplied.  Reference: Tasaki, Springer 2020,
+Problem~2.5.d, p.~40, solution pp.~498--499, equations (S.22)--(S.23), with
+Theorems~2.3--2.4, pp.~42--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
