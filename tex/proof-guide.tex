@@ -14510,6 +14510,25 @@ single-site Casimir identity yields
 Reference: Tasaki, Springer 2020, Problem~2.5.c, p.~43, and
 Theorems~2.3--2.4, pp.~42--44.
 
+\textbf{Problem 2.5.d correlation sign bridge (PR~\#4068)}:
+the new file \texttt{Quantum/SpinS/Problem25dCorrelationSignBridge.lean}
+starts Tasaki Problem~2.5.d, p.~40, following the sign conversion in the
+solution on p.~498, equations (S.22)--(S.23).  It defines
+\[
+  C_{xy}(\Phi)=
+  \langle\Phi,\hat S_x\cdot\hat S_y\,\Phi\rangle
+\]
+as \texttt{twoSpinCorrelationS}, and the bipartite Marshall-gauge sign
+\(\epsilon_A(x)=1\) on \(A\), \(\epsilon_A(x)=-1\) off \(A\), as
+\texttt{bipartiteGaugeSign}.  The theorem
+\texttt{twoSpinCorrelationS\_sign\_cases\_of\_bipartite\_signed\_re\_pos}
+proves the elementary last step:
+if \(\operatorname{Re}(\epsilon_A(x)\epsilon_A(y)C_{xy}(\Phi))>0\), then
+\(\operatorname{Re} C_{xy}(\Phi)>0\) for same-sublattice pairs and
+\(\operatorname{Re} C_{xy}(\Phi)<0\) for cross-sublattice pairs.  The remaining
+Problem~2.5.d input is the Marshall-positive coefficient expansion that
+supplies the signed positivity hypothesis.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
