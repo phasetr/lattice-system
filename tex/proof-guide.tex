@@ -5134,16 +5134,20 @@ Marshall sign machinery + time-reversal action; see
   \texttt{twoSpinCorrelationS\_re\_neg\_of\_tasaki23\_balanced\_pf\_cross}
   extracts the concrete cross-sublattice negative real correlation from the
   balanced Perron--Frobenius package.
-\item \textbf{Theorem~2.4 status}.  The spin-$1/2$ case-(i)
-  (\(-1<\lambda<1\), \(D\ge 0\)) target uniqueness and zero-magnetization
-  wrappers are live as
+\item \textbf{Theorem~2.4 status}.  The spin-$1/2$ case-(i) target uniqueness
+  and zero-magnetization wrappers are live for
+  \(-1<\lambda<1\), \(D\ge 0\) as
   \texttt{spinHalf\_anisotropicHeisenbergS\_target\_finrank\_le\_one\_of\_MLM\_casimir\_ladder\_t23\_pf}
   and
   \texttt{spinHalf\_anisotropicHeisenbergS\_target\_groundState\_zero\_magnetization\_of\_MLM\_casimir\_ladder\_t23\_pf}
   in the strict-interior \(D>0\) form, and as the suffixed
   \texttt{\_D\_nonneg} declarations for the \(D=0\) boundary.  The
-  \(\lambda=1\) edge of case~(i), Tasaki's case~(ii) route, and broader
-  spin-$S$ axis-swap-unitary instances remain separate future extensions.
+  \(\lambda=1\) scalar-shift boundary is live as
+  \texttt{spinHalf\_anisotropicHeisenbergS\_lambda\_one\_finrank\_le\_one\_of\_MLM\_casimir\_ladder\_t23\_pf}
+  and
+  \texttt{spinHalf\_anisotropicHeisenbergS\_lambda\_one\_groundState\_zero\_magnetization\_of\_MLM\_casimir\_ladder\_t23\_pf}.
+  Tasaki's case~(ii) route and broader spin-$S$ axis-swap-unitary instances
+  remain separate future extensions.
 \end{itemize}
 
 The generic graph-centric \texttt{neelStateOf} (PR \#331) remains the
@@ -12844,8 +12848,35 @@ positivity inputs only require \(D\ge0\).  The resulting wrappers
 and
 \texttt{spinHalf\_anisotropicHeisenbergS\_target\_groundState\_zero\_magnetization\_of\_MLM\_casimir\_ladder\_t23\_pf\_D\_nonneg}
 extend the final spin-\(1/2\) target conclusion to
-\(-1<\lambda<1\), \(D\ge0\).  The \(\lambda=1\) edge of case~(i), case~(ii),
-and broader spin-\(S\) axis-swap-unitary extensions remain separate tasks.
+\(-1<\lambda<1\), \(D\ge0\).
+
+The \(\lambda=1\) edge of case~(i) is handled separately in
+\texttt{AnisotropicHeisenbergSpinHalfLambdaOneBoundary.lean}.  This edge is
+not a limit of the strict parity-bond Perron--Frobenius proof: the
+same-direction parity-bond coefficient is \((1-\lambda)/4\), hence vanishes at
+\(\lambda=1\).  Instead, at spin \(1/2\),
+\[
+  (S^{(3)})^2 = \frac14 I,
+\]
+so
+\[
+  \texttt{singleIonAnisotropyS}\;D\;1
+    = \frac{D|\Lambda|}{4} I.
+\]
+The formal statements
+\texttt{spinSOp3\_one\_sq\_eq\_quarter\_smul\_one},
+\texttt{singleIonAnisotropyS\_spinHalf\_eq\_scalar}, and
+\texttt{anisotropicHeisenbergS\_one\_D\_spinHalf\_eq\_heisenberg\_add\_scalar}
+therefore identify \(\hat H(J,1,D)\) with the Heisenberg Hamiltonian plus a
+scalar shift.  The generic scalar-shift lemmas
+\texttt{eigenspace\_add\_smul\_one\_eq} and
+\texttt{hermitianMinEigenvalue\_add\_smul\_one} transfer the Theorem~2.3/MLM
+SU(2)-endpoint uniqueness to
+\texttt{spinHalf\_anisotropicHeisenbergS\_lambda\_one\_finrank\_le\_one\_of\_MLM\_casimir\_ladder\_t23\_pf},
+and the existing uniqueness-to-zero-magnetization theorem gives
+\texttt{spinHalf\_anisotropicHeisenbergS\_lambda\_one\_groundState\_zero\_magnetization\_of\_MLM\_casimir\_ladder\_t23\_pf}.
+Case~(ii) and broader spin-\(S\) axis-swap-unitary extensions remain separate
+tasks.
 
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
