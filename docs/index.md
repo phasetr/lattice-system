@@ -1301,7 +1301,8 @@ the earlier implementation.  The restored concrete tip is
 minimum-eigenvalue bridge in `Quantum/SpinS/SingleClusterHamiltonianMin.lean`
 keeps the abstract Hamiltonian, energy hygiene, concrete
 dimer/trimer/quartet/pentamer eigenvalue formulas, and variational
-upper-bound consumer live in the default Lean build (PR #4032; PR #4033).
+upper/lower-bound consumers live in the default Lean build
+(PR #4032; PR #4033; PR #4034).
 
 | `singleClusterHamiltonianS` | **Single-cluster (star-graph) Heisenberg Hamiltonian** (Tasaki Problem 2.5.a, p. 38): `H = Σ_{j=1}^z Ŝ_0 · Ŝ_j` on `Fin (z + 1)` with central vertex `0` and `z` leaves. Ground-state energy `−S(1 + zS)` (γ-5 step 243) | `Quantum/SpinS/SingleClusterHamiltonian.lean` (PR #1290) |
 | `singleClusterHamiltonianS_isHermitian` | **Hermiticity** of the single-cluster Heisenberg Hamiltonian. Sum of Hermitian `spinSDot 0 j N` over `j ∈ univ.erase 0` (γ-5 step 244) | `Quantum/SpinS/SingleClusterHamiltonian.lean` (PR #1291) |
@@ -1362,6 +1363,7 @@ upper-bound consumer live in the default Lean build (PR #4032; PR #4033).
 | `singleClusterHamiltonianS_eigenvalue_pentamer_leaf_singlet` | **Pentamer leaf-singlet sector eigenvalue = 0**: for z=4, joint eigenvector at `s_tot=N/2` and 6-pair sum `(-N(N+2)/2)·v` (leaves in singlet `s_R=0`) gives `H · v = 0`. Decoupling sector; 4-leaf singlet exists for any S (γ-5 step 322) | `Quantum/SpinS/SingleClusterHamiltonianConcreteClusters.lean` (PR #1369) |
 | `singleClusterHamiltonianS_eigenvalue_leaf_singlet` | **Generic leaf-singlet decoupling (any z)**: if `Stot²·v = (N(N+2)/4)·v` (s_tot=N/2) and `leafSpinSSquared z N · v = 0` (leaves in singlet), then `H · v = 0`. Generalises γ-5 steps 296 (z=2), 321 (z=3), 322 (z=4) (γ-5 step 323) | `Quantum/SpinS/SingleClusterHamiltonianConcreteClusters.lean` (PR #1370) |
 | `singleClusterHamiltonianS_hermitianMinEigenvalue_le_gs_of_gs_sector` / `singleClusterHamiltonianS_hermitianMinEigenvalue_le_gs_of_exists_gs_sector` | **Single-cluster variational upper-bound bridge**: a non-zero vector in the predicted GS Casimir sector (`s_R = zN/2`, `s_tot = (z−1)N/2`) gives `hermitianMinEigenvalue H ≤ Re (singleClusterGSEnergyS z N)`. The existential form packages the Clebsch--Gordan vector construction as the remaining hypothesis for Problem 2.5.a (γ-5 step 324) | `Quantum/SpinS/SingleClusterHamiltonianMin.lean` (PR #4033) |
+| `singleClusterGSEnergyS_re_le_hermitianMinEigenvalue_of_global_eigenvalue_lower` / `singleClusterHamiltonianS_hermitianMinEigenvalue_eq_gs_of_gs_sector_and_global_lower` / `singleClusterHamiltonianS_hermitianMinEigenvalue_eq_gs_of_exists_gs_sector_and_global_lower` | **Single-cluster lower-bound and equality bridge**: a global lower-bound callback for all non-zero real-energy eigenvectors gives `Re (singleClusterGSEnergyS z N) ≤ hermitianMinEigenvalue H`; combined with a predicted GS-sector witness (or its existential package) this identifies `hermitianMinEigenvalue H = Re (singleClusterGSEnergyS z N)`. The remaining mathematical work is to prove the lower callback from joint-Casimir spectral exhaustion and the GS-sector witness from Clebsch--Gordan theory (γ-5 step 325) | `Quantum/SpinS/SingleClusterHamiltonianMin.lean` (PR #4034) |
 | `totalSpinHalfOp{1,2,3}_eq_sublattice_sum` | total spin decomposition: `Ŝ_tot^(α) = Ŝ_A^(α) + Ŝ_¬A^(α)` for `α ∈ {1, 2, 3}`. Direct from the partition `Λ = A ∪ ¬A` | `Quantum/MarshallLiebMattis/SublatticeSpin.lean` |
 | `sublatticeSpinHalfSquared` / `sublatticeSpinHalfSquared_isHermitian` | sublattice spin Casimir: `(Ŝ_A)² := Σ_α (Ŝ_A^(α))²`. Hermitian (each `(Ŝ_A^(α))²` is the square of a Hermitian operator). Foundation for the Casimir identity `Ĥ_toy = (1/(2|Λ|))((Ŝ_tot)² − (Ŝ_A)² − (Ŝ_B)²)` (Tasaki §2.5 (2.5.11)) | `Quantum/MarshallLiebMattis/SublatticeSpin.lean` |
 | `sublatticeSpinHalfOpGeneric_cross_commute` / `sublatticeSpinHalfOp{1,2,3}_cross_commute_op{1,2,3}` | mixed-axes cross-sublattice commutativity: `Commute (Ŝ_A^(α)) (Ŝ_¬A^(β))` for any axes `α, β ∈ {1, 2, 3}`. Generic helper expresses this for arbitrary single-site operators `S, T`; the six mixed-axis specialisations follow as one-line corollaries | `Quantum/MarshallLiebMattis/SublatticeSpin.lean` |
@@ -2654,11 +2656,12 @@ mathematical work):
   `-S(1+zS)` for general spin `S` and coordination `z`).
   The single-cluster Hamiltonian, Casimir decomposition, named
   GS/max energies, dimer/trimer/quartet/pentamer conditional
-  eigenvalue formulas, and min-eigenvalue upper-bound bridge are live
-  under `Quantum/SpinS/SingleClusterHamiltonian*.lean`; the remaining
-  mathematical gaps are the Clebsch--Gordan existence of the predicted
-  GS-sector eigenvectors and the spectral/variational lower-bound
-  exhaustion argument.
+  eigenvalue formulas, and min-eigenvalue upper/lower-bound bridges are
+  live under `Quantum/SpinS/SingleClusterHamiltonian*.lean`; the
+  remaining mathematical gaps are the Clebsch--Gordan existence of the
+  predicted GS-sector eigenvectors and the proof of the global
+  spectral/variational lower-bound callback from joint-Casimir
+  exhaustion.
 - **Problem 2.5.b** (lower bound on `E_GS` via 2.5.a).
 - **Problem 2.5.c** (single-site expectation `⟨Ŝ_x⟩ = 0` in the
   AFM ground state).
