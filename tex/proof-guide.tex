@@ -14220,6 +14220,24 @@ This PR deliberately leaves the equal-axis ground-state symmetry as an
 explicit hypothesis.  Reference: Tasaki, Springer 2020, Problem~2.5.c,
 p.~43.
 
+\textbf{Problem 2.5.c unitary symmetry input (PR~\#4057)}: the
+next module records the generic symmetry mechanism behind the equal-axis
+input.  If a many-body unitary \(T\) has inverse \(T^{-1}=T^\dagger\),
+conjugates a single-site component \(\hat S_x^{(a)}\) to
+\(\hat S_x^{(b)}\), and fixes the state through \(T^{-1}\Phi=\Phi\), then
+\[
+  \langle\Phi,(\hat S_x^{(b)})^2\Phi\rangle
+  =
+  \langle\Phi,(\hat S_x^{(a)})^2\Phi\rangle .
+\]
+The proof expands \((\hat S_x^{(b)})^2=T(\hat S_x^{(a)})^2T^{-1}\),
+uses the state-invariance hypothesis on the ket side, and moves \(T\) to
+the bra side as \(T^\dagger=T^{-1}\).  The existing axis-swap API can
+supply such a conjugation hypothesis for axes \(2\) and \(3\); the remaining
+work is the AFM ground-state invariance or fuller SU(2) rotation input.
+Reference: Tasaki, Springer 2020, Problem~2.5.c, p.~43, and the
+Theorem~2.4 symmetry context, pp.~43--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
