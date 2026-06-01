@@ -83,6 +83,7 @@ import LatticeSystem.Quantum.SpinS.SingleClusterCoupledSectorEnergy
 import LatticeSystem.Quantum.SpinS.SingleClusterMagnetizationProjection
 import LatticeSystem.Quantum.SpinS.SingleClusterHamiltonianMin
 import LatticeSystem.Quantum.SpinS.SingleClusterLeafCasimirBound
+import LatticeSystem.Quantum.SpinS.SingleClusterCasimirInvariance
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
