@@ -98,9 +98,9 @@ theorem marshallSignS_const_of_even
   apply Finset.prod_eq_one
   intro x _
   by_cases hAx : A x
-  · simp [hAx]
+  · rw [if_pos hAx]
     exact Even.neg_one_pow hs
-  · simp [hAx]
+  · rw [if_neg hAx]
 
 
 /-- The Marshall sign restricted to `A`-sites: factors away the

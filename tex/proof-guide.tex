@@ -14529,6 +14529,33 @@ if \(\operatorname{Re}(\epsilon_A(x)\epsilon_A(y)C_{xy}(\Phi))>0\), then
 Problem~2.5.d input is the Marshall-positive coefficient expansion that
 supplies the signed positivity hypothesis.
 
+\textbf{Problem 2.5.d ladder positivity expansion (PR~\#4069)}:
+the new file \texttt{Quantum/SpinS/Problem25dLadderPositivity.lean}
+packages the finite-sum positivity step in Tasaki's solution of
+Problem~2.5.d, p.~40, solution p.~498, equations (S.22)--(S.23).  It defines
+\[
+  C^{+-}_{xy}(\Phi)=
+  \langle\Phi,\hat S_x^+\hat S_y^-\,\Phi\rangle
+\]
+as \texttt{twoSpinPlusMinusCorrelationS}.  The theorem
+\texttt{signedExpectation\_re\_eq\_sum} expands a signed expectation
+\[
+  \operatorname{Re}\bigl(g\langle \Phi,O\Phi\rangle\bigr)
+\]
+into the configuration-basis double sum of the signed terms, and
+\texttt{signedExpectation\_re\_pos\_of\_term\_re\_nonneg\_exists\_pos}
+proves the elementary positivity principle: all terms non-negative and one
+term strictly positive imply a strictly positive signed expectation.  The
+coefficient form
+\texttt{signedExpectation\_re\_pos\_of\_positive\_coefficients} makes the
+strictly positive factors \(c_\sigma c_\tau\) in (S.23) explicit.  The
+Problem~2.5.d wrapper
+\texttt{twoSpinPlusMinusCorrelationS\_bipartite\_signed\_re\_pos\_of\_marshall\_coefficients}
+specializes this to the bipartite gauge sign and the lifted
+\(\hat S_x^+\hat S_y^-\) operator.  The remaining input is the concrete
+Marshall-gauge matrix-entry non-negativity and strict witness for the
+ground-state vector.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
