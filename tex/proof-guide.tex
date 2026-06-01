@@ -14238,6 +14238,35 @@ work is the AFM ground-state invariance or fuller SU(2) rotation input.
 Reference: Tasaki, Springer 2020, Problem~2.5.c, p.~43, and the
 Theorem~2.4 symmetry context, pp.~43--44.
 
+\textbf{Problem 2.5.c lifted axis-swap adjoint input (PR~\#4058)}:
+the next module supplies the concrete adjoint data needed to instantiate the
+unitary bridge with the spin-\(S\) axis swap from the Theorem~2.4
+infrastructure.  Entrywise,
+\[
+  (\Theta_W^\dagger)_{\sigma',\sigma}
+  =
+  \overline{\prod_x W_x(\sigma_x,\sigma'_x)}
+  =
+  \prod_x W_x^\dagger(\sigma'_x,\sigma_x),
+\]
+so \((\otimes_x W_x)^\dagger=\otimes_x W_x^\dagger\).  Applying this to
+the rotation \(U=\exp(-i\pi\hat S^{(1)}/2)\), together with the existing
+single-site theorem \(U^\dagger=U^{-1}\), gives
+\((\otimes_x U)^\dagger=\otimes_x U^{-1}\).  The module then combines this
+with the existing conjugation identity
+\((\otimes_x U)\hat S_x^{(2)}(\otimes_x U^{-1})=\hat S_x^{(3)}\) and the
+PR~\#4057 bridge to prove
+\[
+  \langle\Phi,(\hat S_x^{(3)})^2\Phi\rangle
+  =
+  \langle\Phi,(\hat S_x^{(2)})^2\Phi\rangle
+\]
+under the explicit invariance hypothesis \((\otimes_x U^{-1})\Phi=\Phi\).
+The AFM ground-state invariance and the additional rotation data needed to
+equate all three axes remain separate inputs.  Reference: Tasaki, Springer
+2020, Problem~2.5.c, p.~43, and the Theorem~2.4 symmetry context,
+pp.~43--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
