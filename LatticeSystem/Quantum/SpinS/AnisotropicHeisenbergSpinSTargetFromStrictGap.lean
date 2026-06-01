@@ -10,7 +10,7 @@ This file composes the existing strict-gap-to-balanced/full equality theorem
 with the balanced-sector Perron--Frobenius target wrappers.  It does not prove
 the strict-gap input; it only replaces the explicit balanced/full equality
 hypothesis at the target boundary by the standard strict-gap callback over all
-non-balanced magnetization sectors.
+non-balanced non-empty magnetization sectors.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.4, pp. 43--44.
