@@ -13070,12 +13070,19 @@ imports the abstract Hamiltonian and energy companion, and
         eigenvectors decompose into magnetization and joint total/leaf
         Casimir sectors ($\gamma$-5 step 330).
   \item Single-cluster magnetization projection bridge:
+        \texttt{mulVec\_magProjFn\_eq\_of\_mulVec\_basisVecS\_mem\_magSubspaceS}
+        abstracts the existing matrix-entry argument: any operator that sends
+        each computational basis vector to its own magnetization subspace
+        commutes with the pointwise magnetization projection \texttt{magProjFn}.
         \texttt{singleClusterHamiltonianS\_commute\_totalSpinSOp3}
         follows by summing the two-site commutators
         $[\hat{\boldsymbol S}_0\cdot\hat{\boldsymbol S}_j,
         \hat S^3_{\rm tot}]=0$ over all leaves.  Therefore
         \texttt{singleClusterHamiltonianS\_mulVec\_mem\_magSubspaceS\_of\_mem}
         shows that the Hamiltonian preserves each magnetization subspace.
+        The basis-vector form
+        \texttt{singleClusterHamiltonianS\_mulVec\_basisVecS\_mem\_magSubspaceS}
+        supplies the hypothesis of the generic projection helper.
         The pointwise magnetization projection theorem
         \texttt{singleClusterHamiltonianS\_mulVec\_magProjFn\_eq}
         then gives
