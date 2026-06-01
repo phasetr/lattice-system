@@ -13139,6 +13139,39 @@ imports the abstract Hamiltonian and energy companion, and
         such submodule, producing simultaneous total/leaf Casimir eigenvector
         data under the explicit algebraically closed field hypothesis
         \texttt{[IsAlgClosed \(\mathbb C\)]} ($\gamma$-5 step 334).
+  \item Same-energy joint-Casimir lower bridge:
+        \texttt{singleCluster\_global\_eigenvalue\_lower\_of\_exists\_joint\_casimir\_energy\_lower}
+        weakens the earlier lower-bound callback.  The original non-zero
+        real-energy eigenvector \(v\) of \(\hat H\) no longer needs to be a
+        joint total/leaf Casimir eigenvector.  It is enough to find another
+        non-zero vector \(w\) with the same Hamiltonian eigenvalue
+        \(\mu\), together with
+        \[
+          \hat S_{\rm tot}^2 w=\alpha w,\qquad
+          \hat S_R^2 w=\beta w
+        \]
+        and the Casimir-energy lower bound
+        \[
+          \operatorname{Re} E_{\rm GS}
+          \le
+          \operatorname{Re}\left(
+            \frac{\alpha-N(N+2)/4-\beta}{2}\right).
+        \]
+        The existing joint-Casimir Hamiltonian eigenvalue theorem applied to
+        \(w\) gives
+        \[
+          \hat H w =
+            \frac{\alpha-N(N+2)/4-\beta}{2}\,w.
+        \]
+        Since \(w\ne0\), scalar cancellation identifies this Casimir energy
+        with the original real eigenvalue \(\mu\), and taking real parts gives
+        the global lower callback.  The companion declarations
+        \texttt{singleClusterGSEnergyS\_re\_le\_hermitianMinEigenvalue\_of\_exists\_joint\_casimir\_energy\_lower},
+        \texttt{singleClusterHamiltonianS\_hermitianMinEigenvalue\_eq\_gs\_of\_gs\_sector\_and\_exists\_joint\_lower},
+        and
+        \texttt{singleClusterHamiltonianS\_minEigenvalue\_eq\_gs\_of\_exists\_gs\_sector\_and\_exists\_joint\_lower}
+        package the Hermitian-min lower bound and conditional equality
+        endpoints ($\gamma$-5 step 335).
 \end{itemize}
 
 \textbf{Strategic gaps.} The deferred pieces are:

@@ -189,6 +189,72 @@ theorem singleClusterGSEnergyS_re_le_hermitianMinEigenvalue_of_joint_casimir_ene
     (singleCluster_global_eigenvalue_lower_of_joint_casimir_energy_lower
       (z := z) N hjoint)
 
+/-- **Same-energy joint-Casimir witness gives the global lower-bound callback**:
+if every non-zero real-energy eigenvector of the single-cluster Hamiltonian
+admits a non-zero same-energy witness `w` which is a simultaneous eigenvector
+of `Ŝ_tot²` and `Ŝ_R²`, and whose Casimir energy is at least
+`Re (singleClusterGSEnergyS z N)`, then the original eigenvector satisfies the
+global real-eigenvalue lower-bound callback.
+
+This is weaker than asking the original eigenvector itself to be a joint
+Casimir eigenvector.  It matches the invariant-submodule route: first extract a
+non-zero magnetization/Hamiltonian component, then find a joint Casimir
+eigenvector inside that same Hamiltonian eigenspace. -/
+theorem singleCluster_global_eigenvalue_lower_of_exists_joint_casimir_energy_lower
+    (N : ℕ)
+    (hjoint : ∀ {μ : ℝ} {v : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      v ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec v = (μ : ℂ) • v →
+      ∃ α β : ℂ, ∃ w : (Fin (z + 1) → Fin (N + 1)) → ℂ,
+        w ≠ 0 ∧
+        (singleClusterHamiltonianS z N).mulVec w = (μ : ℂ) • w ∧
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec w = α • w ∧
+        (leafSpinSSquared z N).mulVec w = β • w ∧
+        (singleClusterGSEnergyS z N).re ≤
+          ((α - (N : ℂ) * ((N : ℂ) + 2) / 4 - β) / 2).re) :
+    ∀ {μ : ℝ} {v : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      v ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec v = (μ : ℂ) • v →
+      (singleClusterGSEnergyS z N).re ≤ μ := by
+  intro μ v hv_ne hH
+  rcases hjoint hv_ne hH with ⟨α, β, w, hw_ne, hwH, htot, hR, hlower⟩
+  have hH_joint :
+      (singleClusterHamiltonianS z N).mulVec w =
+        ((α - (N : ℂ) * ((N : ℂ) + 2) / 4 - β) / 2) • w :=
+    singleClusterHamiltonianS_eigenvalue_of_joint_casimir_eigenvec
+      (z := z) N htot hR
+  have hμ :
+      (μ : ℂ) = (α - (N : ℂ) * ((N : ℂ) + 2) / 4 - β) / 2 :=
+    smul_left_injective ℂ hw_ne (hwH.symm.trans hH_joint)
+  have hμ_re :
+      (((α - (N : ℂ) * ((N : ℂ) + 2) / 4 - β) / 2).re) = μ := by
+    rw [← hμ]
+    simp
+  exact hlower.trans_eq hμ_re
+
+/-- **Single-cluster min-energy lower bound from same-energy joint-Casimir
+witnesses**: the existential same-energy joint-Casimir witness callback implies
+`Re (singleClusterGSEnergyS z N) ≤ hermitianMinEigenvalue H`. -/
+theorem
+    singleClusterGSEnergyS_re_le_hermitianMinEigenvalue_of_exists_joint_casimir_energy_lower
+    (N : ℕ)
+    (hjoint : ∀ {μ : ℝ} {v : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      v ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec v = (μ : ℂ) • v →
+      ∃ α β : ℂ, ∃ w : (Fin (z + 1) → Fin (N + 1)) → ℂ,
+        w ≠ 0 ∧
+        (singleClusterHamiltonianS z N).mulVec w = (μ : ℂ) • w ∧
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec w = α • w ∧
+        (leafSpinSSquared z N).mulVec w = β • w ∧
+        (singleClusterGSEnergyS z N).re ≤
+          ((α - (N : ℂ) * ((N : ℂ) + 2) / 4 - β) / 2).re) :
+    (singleClusterGSEnergyS z N).re ≤
+      hermitianMinEigenvalue (singleClusterHamiltonianS_isHermitian z N) := by
+  exact singleClusterGSEnergyS_re_le_hermitianMinEigenvalue_of_global_eigenvalue_lower
+    (z := z) N
+    (singleCluster_global_eigenvalue_lower_of_exists_joint_casimir_energy_lower
+      (z := z) N hjoint)
+
 /-- **Single-cluster Casimir-sector arithmetic lower bound**:
 if a joint sector has total-Casimir real part at least the predicted
 `s_tot = (z - 1)N/2` value and leaf-Casimir real part at most the maximum
@@ -473,6 +539,69 @@ theorem singleClusterHamiltonianS_hermitianMinEigenvalue_eq_gs_of_exists_gs_sect
   rcases hexists with ⟨v, hv_ne, htot, hR⟩
   exact singleClusterHamiltonianS_hermitianMinEigenvalue_eq_gs_of_gs_sector_and_joint_lower
     (z := z) N hv_ne htot hR hjoint
+
+/-- **Single-cluster conditional equality from same-energy joint-Casimir
+witnesses**: a concrete predicted GS-sector vector gives the upper bound,
+while the existential same-energy joint-Casimir witness callback gives the
+reverse inequality. -/
+theorem
+    singleClusterHamiltonianS_hermitianMinEigenvalue_eq_gs_of_gs_sector_and_exists_joint_lower
+    (N : ℕ) {v : (Fin (z + 1) → Fin (N + 1)) → ℂ}
+    (hv_ne : v ≠ 0)
+    (htot : (totalSpinSSquared (Fin (z + 1)) N).mulVec v =
+        (((z : ℂ) - 1) * (N : ℂ) / 2 *
+          (((z : ℂ) - 1) * (N : ℂ) / 2 + 1)) • v)
+    (hR : (leafSpinSSquared z N).mulVec v =
+        ((z : ℂ) * (N : ℂ) / 2 *
+          ((z : ℂ) * (N : ℂ) / 2 + 1)) • v)
+    (hjoint : ∀ {μ : ℝ} {w : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      w ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec w = (μ : ℂ) • w →
+      ∃ α β : ℂ, ∃ u : (Fin (z + 1) → Fin (N + 1)) → ℂ,
+        u ≠ 0 ∧
+        (singleClusterHamiltonianS z N).mulVec u = (μ : ℂ) • u ∧
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec u = α • u ∧
+        (leafSpinSSquared z N).mulVec u = β • u ∧
+        (singleClusterGSEnergyS z N).re ≤
+          ((α - (N : ℂ) * ((N : ℂ) + 2) / 4 - β) / 2).re) :
+    hermitianMinEigenvalue (singleClusterHamiltonianS_isHermitian z N) =
+      (singleClusterGSEnergyS z N).re := by
+  exact singleClusterHamiltonianS_hermitianMinEigenvalue_eq_gs_of_gs_sector_and_global_lower
+    (z := z) N hv_ne htot hR
+    (singleCluster_global_eigenvalue_lower_of_exists_joint_casimir_energy_lower
+      (z := z) N hjoint)
+
+/-- **Existential conditional equality from same-energy joint-Casimir
+witnesses**: the Clebsch--Gordan witness package gives the upper bound, while
+the existential same-energy joint-Casimir witness callback gives the reverse
+inequality. -/
+theorem
+    singleClusterHamiltonianS_minEigenvalue_eq_gs_of_exists_gs_sector_and_exists_joint_lower
+    (N : ℕ)
+    (hexists : ∃ v : (Fin (z + 1) → Fin (N + 1)) → ℂ,
+      v ≠ 0 ∧
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec v =
+          (((z : ℂ) - 1) * (N : ℂ) / 2 *
+            (((z : ℂ) - 1) * (N : ℂ) / 2 + 1)) • v ∧
+        (leafSpinSSquared z N).mulVec v =
+          ((z : ℂ) * (N : ℂ) / 2 *
+            ((z : ℂ) * (N : ℂ) / 2 + 1)) • v)
+    (hjoint : ∀ {μ : ℝ} {w : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      w ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec w = (μ : ℂ) • w →
+      ∃ α β : ℂ, ∃ u : (Fin (z + 1) → Fin (N + 1)) → ℂ,
+        u ≠ 0 ∧
+        (singleClusterHamiltonianS z N).mulVec u = (μ : ℂ) • u ∧
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec u = α • u ∧
+        (leafSpinSSquared z N).mulVec u = β • u ∧
+        (singleClusterGSEnergyS z N).re ≤
+          ((α - (N : ℂ) * ((N : ℂ) + 2) / 4 - β) / 2).re) :
+    hermitianMinEigenvalue (singleClusterHamiltonianS_isHermitian z N) =
+      (singleClusterGSEnergyS z N).re := by
+  rcases hexists with ⟨v, hv_ne, htot, hR⟩
+  exact
+    singleClusterHamiltonianS_hermitianMinEigenvalue_eq_gs_of_gs_sector_and_exists_joint_lower
+      (z := z) N hv_ne htot hR hjoint
 
 /-- **Single-cluster conditional equality from a GS-sector witness and
 joint-Casimir sector bounds**: the witness gives the upper bound, while the
