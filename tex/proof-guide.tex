@@ -13260,20 +13260,57 @@ imports the abstract Hamiltonian and energy companion, and
         explicit hypotheses \(1\le z\) and
         \texttt{[IsAlgClosed \(\mathbb C\)]}
         ($\gamma$-5 step 337).
+  \item Single-cluster predicted GS joint-Casimir witness:
+        \texttt{singleCluster\_exists\_gs\_joint\_casimir\_witness}
+        specializes the bipartite predicted joint-Casimir eigenvector
+        \texttt{exists\_jointPredictedCasimir\_eigenvector} to the leaf/center
+        partition of \(\operatorname{Fin}(z+1)\).  The leaf predicate is
+        \(A(x)=\operatorname{decide}(x\ne0)\).  For \(1\le z\),
+        \[
+          |\neg A|=1\le z=|A|,
+        \]
+        so the canonical orientation hypothesis of the bipartite construction
+        is available.  The theorem then returns a non-zero vector \(v\) with
+        \[
+          \hat S_{\rm tot}^2v
+            =
+            \left(\frac{(z-1)N}{2}\right)
+            \left(\frac{(z-1)N}{2}+1\right)v,
+          \qquad
+          \hat S_R^2v
+            =
+            \left(\frac{zN}{2}\right)
+            \left(\frac{zN}{2}+1\right)v.
+        \]
+        In Lean, the total-Casimir scalar is simplified using
+        \texttt{tasaki23PredictedCasimirValue\_eq\_sub},
+        \texttt{singleCluster\_leaf\_bool\_card}, and
+        \texttt{singleCluster\_compl\_leaf\_bool\_card}; the leaf-Casimir
+        equation is obtained by rewriting the sublattice equation with
+        \texttt{leafSpinSSquared\_eq\_sublatticeSpinSquaredS\_leaf}.
+        Feeding this existential package into
+        \texttt{singleClusterHamiltonianS\_minEigenvalue\_eq\_gs\_of}
+        \texttt{\_exists\_gs\_sector\_and\_extracted\_coupled}
+        gives
+        \texttt{singleClusterHamiltonianS\_minEigenvalue\_eq\_gs\_of}
+        \texttt{\_predicted\_joint\_witness}:
+        for \(1\le z\),
+        \[
+          \lambda_{\min}(\hat H)
+          =
+          \operatorname{Re}E_{\rm GS}
+        \]
+        under the explicit hypothesis
+        \texttt{[IsAlgClosed \(\mathbb C\)]}
+        ($\gamma$-5 step 338).
 \end{itemize}
 
-\textbf{Strategic gaps.} The deferred pieces are:
-(a) constructing an actual joint-Casimir eigenvector at the GS sector
-$(s_R, s_{\rm tot}) = (zN/2, (z-1)N/2)$ via Clebsch--Gordan decomposition,
-and (b) discharging the explicit algebraic-closedness hypothesis if a more
-constructive finite-dimensional spectral decomposition is later preferred.
-The global lower-bound callback itself now follows from magnetization
-extraction, joint-Casimir extraction inside the Hamiltonian/magnetization
-submodule, and the coupled leaf/center sector-energy bridge. The remaining
-GS-sector witness work still requires substantial multi-PR effort
-(SU(2) representation theory or spin-$S$ Perron--Frobenius on the dressed
-Hamiltonian extending the spin-$1/2$ work in
-\texttt{Quantum/MarshallLiebMattis/H0PFApplication.lean}).
+\textbf{Strategic gaps.} The single-cluster Problem 2.5.a equality is now
+available for \(1\le z\) under the explicit
+\texttt{[IsAlgClosed \(\mathbb C\)]} hypothesis.  The remaining optional
+cleanup is to discharge that hypothesis by replacing the algebraically closed
+eigenvector-extraction bridge with a constructive finite-dimensional spectral
+decomposition if that later becomes useful.
 
 \subsection*{DONE: Spin-$S$ saturated ferromagnetic state (Tasaki §2.4 generalised)}
 \label{subsec:spin-s-all-aligned}
