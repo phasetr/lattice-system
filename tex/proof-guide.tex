@@ -13333,6 +13333,33 @@ imports the abstract Hamiltonian and energy companion, and
         once the global bipartite Hamiltonian is decomposed as
         \(\hat H=\sum_{x\in A}\hat h_x\) (Tasaki, Springer 2020,
         Problem~2.5.b, p.~38; solution p.~497; Lemma~A.5, p.~468).
+  \item Problem 2.5.b graph-local decomposition.  The declaration
+        \texttt{graphLocalClusterHamiltonianS} defines, on the full
+        Hilbert space over the graph vertex set,
+        \[
+          h_x=\sum_{y\in N_G(x)}
+            \hat{\mathbf S}_x\cdot\hat{\mathbf S}_y .
+        \]
+        The theorem
+        \texttt{heisenbergHamiltonianOnGraphS\_one\_eq\_sum}
+        \texttt{\_graphLocalClusterHamiltonianS} records the repository's
+        ordered-pair convention:
+        \[
+          \hat H_G(1)=\sum_x h_x .
+        \]
+        The bipartite refinement
+        \texttt{heisenbergHamiltonianOnGraphS\_half\_eq\_sum}
+        \texttt{\_filter\_graphLocalClusterHamiltonianS} proves that, if every
+        edge crosses the chosen side \(A\),
+        \[
+          \hat H_G(1/2)=\sum_{x\in A}h_x .
+        \]
+        The proof splits the all-vertex sum into \(A\) and its complement,
+        swaps each oriented adjacent pair, and uses
+        \(\hat{\mathbf S}_x\cdot\hat{\mathbf S}_y
+        =\hat{\mathbf S}_y\cdot\hat{\mathbf S}_x\).  This fixes the coefficient
+        convention for Tasaki's local-cluster decomposition (Tasaki, Springer
+        2020, Problem~2.5.b, p.~38; solution p.~497).
 \end{itemize}
 
 \textbf{Strategic gaps.} The single-cluster Problem 2.5.a equality is now
@@ -13341,9 +13368,10 @@ available for \(1\le z\) under the explicit
 cleanup is to discharge that hypothesis by replacing the algebraically closed
 eigenvector-extraction bridge with a constructive finite-dimensional spectral
 decomposition if that later becomes useful.  For Problem~2.5.b, the remaining
-formal work is the graph-local decomposition
-\(\hat H=\sum_{x\in A}\hat h_x\) with the project's ordered-pair
-\texttt{heisenbergHamiltonianOnGraphS} convention.
+formal work is to identify each same-Hilbert-space graph-local star \(h_x\)
+with a copy of the abstract single-cluster Hamiltonian on
+\(\mathrm{Fin}(\deg(x)+1)\), so that the Problem~2.5.a minimum-eigenvalue
+formula can be fed into the finite-sum lower-bound bridge.
 
 \subsection*{DONE: Spin-$S$ saturated ferromagnetic state (Tasaki §2.4 generalised)}
 \label{subsec:spin-s-all-aligned}
