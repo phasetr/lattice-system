@@ -2262,6 +2262,7 @@ Issue #412; assembled in PRs #875–#879. All theorems live in
 | `multiSiteSpinS_finrank` | **`Module.finrank ℂ ((V → Fin (N+1)) → ℂ) = (N + 1)^|V|`** (the standard quantum-mechanical dimension `(2S + 1)^|Λ|`, PR #918, file `Quantum/SpinS/MultiSiteFinrank.lean`) |
 | `basisSpinS V N` / `basisSpinS_apply` | the standard basis packaged as `Module.Basis (V → Fin (N + 1)) ℂ ((V → Fin (N + 1)) → ℂ)` via `Module.Basis.mk` (PR #919, file `Quantum/SpinS/BasisSpinS.lean`) |
 | `spinSDot_self_mulVec` / `_expectation` / `_expectation_normalized` / `_expectation_allAlignedStateS` | **universal single-site Casimir expectation `⟨Φ, Ŝ_x · Ŝ_x · Φ⟩ = S(S+1)`** for normalized `Φ`. Direct from `spinSDot_self`. Foundation for Tasaki Problem 2.5.c (γ-7) (PR #920, file `Quantum/SpinS/SingleSiteCasimirExpectation.lean`) |
+| `singleSiteSpinSquareExpectationS` / `_axis_sum` / `_axis_sum_normalized` / `_axis1_eq_of_axes_equal_normalized` / `_all_axes_eq_of_axes_equal_normalized` | **Problem 2.5.c single-site squared-expectation bridge**: packages `⟨Φ,(Ŝ_x^(α))² Φ⟩`, proves the three-axis sum is the universal single-site Casimir expectation, and under normalized-state plus equal-axis hypotheses returns `N(N+2)/12 = S(S+1)/3` for each Cartesian axis. This isolates the algebraic reduction while leaving the AFM ground-state SU(2)-symmetry input explicit. Tasaki, Springer 2020, Problem 2.5.c, p. 43 (PR #4056, file `Quantum/SpinS/Problem25cSingleSiteSquared.lean`) |
 | `spinSOpPlus_one_eq_spinHalfOpPlus` / `_Minus_` / `_Op1_` / `_Op2_` / `_Op3_` | **spin-`S` ↔ spin-`1/2` bridge at `N = 1`**: `spinSOp{Plus, Minus, 1, 2, 3} 1 = spinHalfOp{Plus, Minus, 1, 2, 3}` (each is the corresponding half-Pauli matrix) (PRs #922 + #923, file `Quantum/SpinS/SpinHalfSpecialization.lean`) |
 | `onSiteS_spinSOp3_mulVec_allAlignedStateS` / `allAlignedStateS_expectation_onSiteS_spinSOp3` / `_sq` / `onSiteS_spinSOp3_sq_mulVec_allAlignedStateS` | **single-site `Ŝ^(3)_x` and `(Ŝ^(3)_x)²` on `|c..c⟩`**: `Ŝ^(3)_x · |c..c⟩ = (N/2 − c.val) · |c..c⟩` and expectation of `(Ŝ^(3)_x)²` is `(N/2 − c.val)²` (PR #925, file `Quantum/SpinS/SingleSiteZExpectation.lean`) |
 | `allAlignedStateS_expectation_onSiteS_spinSOp1_sq_add_spinSOp2_sq` | **xy-plane Casimir expectation**: `⟨((Ŝ^(1)_x)² + (Ŝ^(2)_x)²) · |c..c⟩⟩ = N(N+2)/4 − (N/2 − c.val)²`. From #920 minus #925; for `c=0` gives `S/2` (PR #926, file `Quantum/SpinS/SingleSiteXYExpectation.lean`) |
@@ -2693,8 +2694,11 @@ mathematical work):
   specialization using Problem 2.5.a, the graph-local finite-sum wrapper, and
   the closed-form `G.degree` variants are live under
   `Quantum/SpinS/GraphLocalStarSumWrapper.lean`.
-- **Problem 2.5.c** (single-site expectation `⟨Ŝ_x⟩ = 0` in the
-  AFM ground state).
+- **Problem 2.5.c** (single-site squared expectation
+  `⟨Φ_GS|(Ŝ_x^(α))²|Φ_GS⟩ = S(S+1)/3` in the AFM ground state).  The
+  Casimir-to-equal-axes algebraic bridge is live under
+  `Quantum/SpinS/Problem25cSingleSiteSquared.lean`; the remaining input is the
+  AFM ground-state SU(2)-symmetry/equal-axis hypothesis.
 - **Problem 2.5.d** (two-spin correlation under MLM).
 
 The generic graph-centric `neelStateOf` (Phase 3 PR #331) is the
