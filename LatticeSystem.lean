@@ -371,6 +371,7 @@ import LatticeSystem.Quantum.SpinS.Problem25dLadderPositivity
 import LatticeSystem.Quantum.SpinS.Problem25dLadderEntrySign
 import LatticeSystem.Quantum.SpinS.Problem25dLadderDotReduction
 import LatticeSystem.Quantum.SpinS.Problem25dLadderAdjointEquality
+import LatticeSystem.Quantum.SpinS.Problem25dLongitudinalComponentEquality
 
 /-!
 # `lattice-system` library root
