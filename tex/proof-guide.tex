@@ -13101,6 +13101,18 @@ imports the abstract Hamiltonian and energy companion, and
         with \(f v=\mu v\).  This is intended for the next joint total/leaf
         Casimir eigensector extraction after the single-cluster
         magnetization-component step ($\gamma$-5 step 332).
+  \item Joint invariant-submodule eigenvector bridge:
+        \texttt{exists\_joint\_eigenvector\_in\_invariant\_submodule}
+        iterates the preceding bridge for two commuting endomorphisms.  If
+        \(p\) is non-zero and invariant under \(f\) and \(g\), and \(fg=gf\),
+        first choose a non-zero \(f\)-eigenvector in \(p\).  The intersection
+        of \(p\) with that \(f\)-eigenspace is non-zero and is preserved by
+        \(g\); commutativity gives \(f(gx)=g(fx)=\lambda gx\).  Applying the
+        one-operator bridge again gives \(0\ne v\in p\) with
+        \(f v=\lambda v\) and \(g v=\mu v\).  This packages the linear-algebra
+        step needed to extract simultaneous total/leaf Casimir data inside the
+        single-cluster magnetization/Hamiltonian component ($\gamma$-5 step
+        333).
 \end{itemize}
 
 \textbf{Strategic gaps.} The deferred pieces are:

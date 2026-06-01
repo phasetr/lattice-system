@@ -53,4 +53,47 @@ theorem exists_eigenvector_in_invariant_submodule
     have hsub : (LinearMap.restrict f hp) w = μ • w := happ
     simpa [LinearMap.restrict_apply] using congrArg Subtype.val hsub
 
+/-- **Joint eigenvector in a non-zero invariant submodule**: if a non-zero
+submodule is invariant under two commuting endomorphisms, then it contains a
+non-zero simultaneous eigenvector for both endomorphisms. -/
+theorem exists_joint_eigenvector_in_invariant_submodule
+    (f g : Module.End K E) (p : Submodule K E)
+    (hf : p ≤ p.comap f)
+    (hg : p ≤ p.comap g)
+    (hcomm : Commute f g)
+    (hne : p ≠ ⊥) :
+    ∃ lam μ : K, ∃ v : E, v ∈ p ∧ v ≠ 0 ∧ f v = lam • v ∧ g v = μ • v := by
+  obtain ⟨lam, w, hw_mem, hw_ne, hw_f⟩ :=
+    exists_eigenvector_in_invariant_submodule f p hf hne
+  let q : Submodule K E := p ⊓ Module.End.eigenspace f lam
+  have hw_q : w ∈ q := by
+    refine ⟨hw_mem, ?_⟩
+    exact (Module.End.mem_eigenspace_iff).mpr hw_f
+  have hq_ne : q ≠ ⊥ := by
+    intro hq
+    have hw_zero : w = 0 := by
+      have : w ∈ (⊥ : Submodule K E) := by
+        simpa [hq] using hw_q
+      simpa using this
+    exact hw_ne hw_zero
+  have hgq : q ≤ q.comap g := by
+    intro x hx
+    obtain ⟨hx_p, hx_eig⟩ := hx
+    refine ⟨hg hx_p, ?_⟩
+    have hx_eig_eq : f x = lam • x :=
+      (Module.End.mem_eigenspace_iff).mp hx_eig
+    exact (Module.End.mem_eigenspace_iff).mpr <| by
+      calc
+        f (g x) = (f * g) x := rfl
+        _ = (g * f) x := by rw [hcomm.eq]
+        _ = g (f x) := rfl
+        _ = g (lam • x) := by rw [hx_eig_eq]
+        _ = lam • g x := by rw [map_smul]
+  obtain ⟨μ, v, hv_q, hv_ne, hv_g⟩ :=
+    exists_eigenvector_in_invariant_submodule g q hgq hq_ne
+  obtain ⟨hv_p, hv_f_mem⟩ := hv_q
+  have hv_f : f v = lam • v := by
+    exact (Module.End.mem_eigenspace_iff).mp hv_f_mem
+  exact ⟨lam, μ, v, hv_p, hv_ne, hv_f, hv_g⟩
+
 end LatticeSystem.Math
