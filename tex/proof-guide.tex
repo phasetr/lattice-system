@@ -13396,6 +13396,26 @@ imports the abstract Hamiltonian and energy companion, and
         outside restrictions do not couple, and the block-equality theorem,
         identifying each fixed-outside block with the option-star Hamiltonian.
         The exact Lean names are listed in \texttt{docs/index.md}.
+  \item Problem 2.5.b graph-local product lower-bound bridge.  The full
+        configuration space around \(x\) is reindexed as
+        \[
+          (\mathrm{Option}(N_G(x))\to\{0,\ldots,N\})
+          \times
+          (O_x\to\{0,\ldots,N\}),
+        \]
+        where \(O_x\) is the subtype of sites outside the center and its
+        graph neighbours.  In these product coordinates, the graph-local star
+        is block diagonal in the outside coordinate, and each diagonal block is
+        the option-star Hamiltonian.  The product-coordinate multiplication
+        formula gives a Rayleigh-numerator decomposition as a sum over outside
+        blocks, and the corresponding norm decomposition gives the abstract
+        lower-bound lift: any common Rayleigh lower bound for the option-star
+        blocks is also a Hermitian minimum-eigenvalue lower bound for the
+        product-coordinate graph-local star.  Reindex-invariance lemmas for
+        matrix-vector multiplication, norms, and Rayleigh numerators transfer
+        the same lower bound back to the original same-Hilbert-space
+        graph-local star.  The exact Lean names are listed in
+        \texttt{docs/index.md}.
 \end{itemize}
 
 \textbf{Strategic gaps.} The single-cluster Problem 2.5.a equality is now
@@ -13404,10 +13424,8 @@ available for \(1\le z\) under the explicit
 cleanup is to discharge that hypothesis by replacing the algebraically closed
 eigenvector-extraction bridge with a constructive finite-dimensional spectral
 decomposition if that later becomes useful.  For Problem~2.5.b, the remaining
-formal work is to lift the fixed-outside block identities for each
-same-Hilbert-space graph-local star \(h_x\) to a full operator lower bound, so
-that the Problem~2.5.a minimum-eigenvalue formula can be fed into the
-finite-sum lower-bound bridge.
+formal work is to specialize the option-star block lower bound using
+Problem~2.5.a and feed the result into the finite-sum lower-bound bridge.
 
 \subsection*{DONE: Spin-$S$ saturated ferromagnetic state (Tasaki §2.4 generalised)}
 \label{subsec:spin-s-all-aligned}
