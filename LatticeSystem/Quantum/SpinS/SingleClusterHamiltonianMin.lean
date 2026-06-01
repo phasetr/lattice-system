@@ -187,6 +187,83 @@ theorem singleClusterGSEnergyS_re_le_hermitianMinEigenvalue_of_joint_casimir_ene
     (singleCluster_global_eigenvalue_lower_of_joint_casimir_energy_lower
       (z := z) N hjoint)
 
+/-- **Single-cluster Casimir-sector arithmetic lower bound**:
+if a joint sector has total-Casimir real part at least the predicted
+`s_tot = (z - 1)N/2` value and leaf-Casimir real part at most the maximum
+`s_R = zN/2` value, then its Casimir energy
+`(α - N(N+2)/4 - β)/2` is at least `Re (singleClusterGSEnergyS z N)`.
+
+This is the arithmetic part of the joint-Casimir lower callback; the remaining
+spectral work is to justify these sector bounds for every `H`-eigenvector. -/
+theorem singleClusterGSEnergyS_re_le_casimir_energy_of_joint_bounds
+    (N : ℕ) {α β : ℂ}
+    (htot_lower :
+      ((z : ℝ) - 1) * (N : ℝ) / 2 *
+          (((z : ℝ) - 1) * (N : ℝ) / 2 + 1) ≤ α.re)
+    (hR_upper :
+      β.re ≤ (z : ℝ) * (N : ℝ) / 2 *
+          ((z : ℝ) * (N : ℝ) / 2 + 1)) :
+    (singleClusterGSEnergyS z N).re ≤
+      ((α - (N : ℂ) * ((N : ℂ) + 2) / 4 - β) / 2).re := by
+  rw [singleClusterGSEnergyS_re_eq]
+  norm_num [Complex.sub_re, Complex.div_re, Complex.mul_re, Complex.add_re,
+    Complex.normSq]
+  nlinarith
+
+/-- **Joint-Casimir sector bounds give the global lower-bound callback**:
+if every non-zero real-energy eigenvector has joint Casimir eigenvalues
+`α, β` satisfying the predicted total-Casimir lower bound and leaf-Casimir
+upper bound, then it satisfies the global real-eigenvalue lower callback.
+
+This packages the spectral statement needed after the arithmetic lower bound:
+the remaining work is to prove that every `H`-eigenvector admits such
+joint-Casimir sector bounds. -/
+theorem singleCluster_global_eigenvalue_lower_of_joint_casimir_bounds
+    (N : ℕ)
+    (hjoint_bounds : ∀ {μ : ℝ} {v : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      v ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec v = (μ : ℂ) • v →
+      ∃ α β : ℂ,
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec v = α • v ∧
+        (leafSpinSSquared z N).mulVec v = β • v ∧
+        ((z : ℝ) - 1) * (N : ℝ) / 2 *
+            (((z : ℝ) - 1) * (N : ℝ) / 2 + 1) ≤ α.re ∧
+        β.re ≤ (z : ℝ) * (N : ℝ) / 2 *
+            ((z : ℝ) * (N : ℝ) / 2 + 1)) :
+    ∀ {μ : ℝ} {v : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      v ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec v = (μ : ℂ) • v →
+      (singleClusterGSEnergyS z N).re ≤ μ := by
+  exact singleCluster_global_eigenvalue_lower_of_joint_casimir_energy_lower
+    (z := z) N (by
+      intro μ v hv_ne hH
+      rcases hjoint_bounds hv_ne hH with ⟨α, β, htot, hR, htot_lower, hR_upper⟩
+      exact ⟨α, β, htot, hR,
+        singleClusterGSEnergyS_re_le_casimir_energy_of_joint_bounds
+          (z := z) N htot_lower hR_upper⟩)
+
+/-- **Single-cluster min-energy lower bound from joint-Casimir sector bounds**:
+the joint-Casimir sector bounds imply
+`Re (singleClusterGSEnergyS z N) ≤ hermitianMinEigenvalue H`. -/
+theorem singleClusterGSEnergyS_re_le_hermitianMinEigenvalue_of_joint_casimir_bounds
+    (N : ℕ)
+    (hjoint_bounds : ∀ {μ : ℝ} {v : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      v ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec v = (μ : ℂ) • v →
+      ∃ α β : ℂ,
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec v = α • v ∧
+        (leafSpinSSquared z N).mulVec v = β • v ∧
+        ((z : ℝ) - 1) * (N : ℝ) / 2 *
+            (((z : ℝ) - 1) * (N : ℝ) / 2 + 1) ≤ α.re ∧
+        β.re ≤ (z : ℝ) * (N : ℝ) / 2 *
+            ((z : ℝ) * (N : ℝ) / 2 + 1)) :
+    (singleClusterGSEnergyS z N).re ≤
+      hermitianMinEigenvalue (singleClusterHamiltonianS_isHermitian z N) := by
+  exact singleClusterGSEnergyS_re_le_hermitianMinEigenvalue_of_global_eigenvalue_lower
+    (z := z) N
+    (singleCluster_global_eigenvalue_lower_of_joint_casimir_bounds
+      (z := z) N hjoint_bounds)
+
 /-- **Single-cluster conditional min-energy equality from a GS-sector witness and
 global lower bound**: a concrete non-zero vector in the predicted GS Casimir
 sector gives the upper bound, while the global real-eigenvalue lower-bound
