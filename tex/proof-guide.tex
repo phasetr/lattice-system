@@ -14633,6 +14633,31 @@ combines this reduction with the PR~\#4071 Marshall-coefficient signed ladder
 positivity on cross-sublattice pairs.  The remaining input is to discharge the
 two component equalities from the ground-state SU(2) phase invariance.
 
+\textbf{Problem 2.5.d ladder adjoint equality (PR pending)}.
+The file \path{Quantum/SpinS/Problem25dLadderAdjointEquality.lean}
+discharges the first component equality left by PR~\#4072.  For distinct
+sites, the two-site ladder operator satisfies
+\[
+  (\hat S_x^+\hat S_y^-)^\dagger=\hat S_x^-\hat S_y^+,
+\]
+formalized as \texttt{twoSpinPlusMinus\_ladder\_conjTranspose}.  Therefore
+\[
+  C^{-+}_{xy}=\overline{C^{+-}_{xy}},
+\]
+and, because the cross-sublattice bipartite gauge product is the real scalar
+\(-1\), the signed real parts agree:
+\[
+  \operatorname{Re}(g C^{-+}_{xy})
+  =\operatorname{Re}(g C^{+-}_{xy}).
+\]
+The wrapper
+\texttt{twoSpinCorrelationS\_bipartite\_signed\_re\_pos\_of\_marshall\_cross\_ladderAdjoint}
+combines this equality with the PR~\#4071 ladder positivity and the PR~\#4072
+ladder-to-dot reduction.  The only remaining component-equality input for the
+Problem~2.5.d sign theorem is now the longitudinal
+\(\operatorname{Re}(gC^{33}_{xy})=\frac12\operatorname{Re}(gC^{+-}_{xy})\)
+identity from ground-state SU(2) phase invariance.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
