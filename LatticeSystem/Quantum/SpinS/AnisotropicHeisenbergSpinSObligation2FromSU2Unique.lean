@@ -30,7 +30,6 @@ open Matrix Module Set
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
-set_option linter.style.longLine false in
 /-- **General spin-S anisotropic `Ĥ` eigenspace `≤ 2` at its global minimum**:
 the concrete spin-`S` axis-swap unitary turns the unconditional parity-block
 bound at the axis-swapped block minimum into the corresponding bound at
@@ -76,7 +75,6 @@ theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_general
   rw [henergy_eq] at hbound
   exact hbound
 
-set_option linter.style.longLine false in
 /-- **General spin-S anisotropic `Ĥ` eigenspace `≤ 2` along the deformation
 path**: for target `(λ', D')` in strict case (i) and `0 < t ≤ 1`, the
 eigenspace of `Ĥ(γ(t))` at its global minimum has `finrank ≤ 2`. -/
@@ -130,7 +128,6 @@ theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_path_gene
     hlam_t_im hlb_t hub_t hD_t_im hDpos_t
     (hc_strict lam_t D_t) hA_ne hB_ne hN hJ_star hlam_t_star hD_t_star
 
-set_option linter.style.longLine false in
 /-- **General spin-S obligation (2), first-crossing capstone**: a non-empty
 crossing set for a non-balanced sector contradicts the strict SU(2) endpoint
 gap, the SU(2) balanced-ground equality, the path-wide balanced-ground
@@ -232,7 +229,6 @@ theorem anisotropicHeisenbergS_obligation_2_axiomatic_sup_crossing_hne_general
     h_finrank hΦ_bal_ne h_balanced hΦ_bal_eig
     hΦ_M_ne hM_ne_balanced hΦ_M_eig
 
-set_option linter.style.longLine false in
 /-- **General spin-S obligation (2) under a single SU(2)-point strict-gap
 axiom**: any target violation contradicts the first-crossing chain. -/
 theorem anisotropicHeisenbergS_obligation_2_single_axiom_general
@@ -333,7 +329,6 @@ theorem anisotropicHeisenbergS_obligation_2_single_axiom_general
     M_balanced M_chosen h_balanced hM_chosen_centered_ne hlam'_lb hlam'_ub hD'
     hM_chosen_cross h_strict_chosen axiom_GS_at_SU2 h_below
 
-set_option linter.style.longLine false in
 /-- **General spin-S obligation (2) from SU(2) global uniqueness**: the
 SU(2)-point global one-dimensional ground eigenspace supplies the strict-gap
 axiom used by the single-axiom first-crossing capstone. -/
@@ -401,7 +396,6 @@ theorem anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_general
     M_balanced M_orig h_balanced hM_orig_ne h_centered_nonzero
     hlam'_lb hlam'_ub hD' h_violation_orig h_strict_gap_at_SU2
 
-set_option linter.style.longLine false in
 /-- **General spin-S obligation (2) from only SU(2) global uniqueness**:
 the balanced SU(2)-sector/full-ground equality is derived from the same global
 uniqueness input, leaving one public SU(2) endpoint hypothesis. -/
@@ -448,7 +442,6 @@ theorem anisotropicHeisenbergS_obligation_2_of_SU2_global_unique_only_general
     M_balanced M_orig h_balanced hM_orig_ne h_centered_nonzero
     hlam'_lb hlam'_ub hD' h_violation_orig h_SU2_global_unique h_GS_at_SU2
 
-set_option linter.style.longLine false in
 /-- **General spin-S target strict gap from SU(2) global uniqueness**: at the
 target point of the deformation path, every non-balanced non-empty sector has
 strictly larger minimum energy than the balanced sector. -/
@@ -501,7 +494,6 @@ theorem anisotropicHeisenbergS_strict_gap_all_M_of_SU2_global_unique_general
   simp only [anisotropicHeisenbergParametricPath_one] at hpath
   exact hpath
 
-set_option linter.style.longLine false in
 /-- **General spin-S target uniqueness from SU(2) global uniqueness**: the
 SU(2) global uniqueness input supplies the target strict-gap callback consumed
 by `anisotropicHeisenbergS_target_finrank_le_one_of_strict_gap`. -/
@@ -576,7 +568,6 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_SU2_global_unique_genera
     A hJim hJnn hJpos hJbip hJ_star hJ_sym hA_ne hB_ne hN
     M_balanced h_balanced h_strict_gap h_global_two
 
-set_option linter.style.longLine false in
 /-- **General spin-S target ground states have zero magnetization from SU(2)
 global uniqueness**: the uniqueness wrapper above feeds the existing
 zero-magnetization theorem. -/

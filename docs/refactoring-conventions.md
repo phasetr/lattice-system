@@ -337,6 +337,20 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-06-02 (PR #4091)**: Refactor checkpoint after the 20 post-#4070
+  Tasaki Theorem 2.4 / Problem 2.5 feature PRs (#4071--#4090).
+  Build-speed evaluation rechecked the largest current Theorem 2.4 SU(2)
+  endpoint module and the newly added general spin-S obligation-(2) wrapper:
+  `lake env lean LatticeSystem/Quantum/SpinS/Theorem24SU2GlobalUniquenessFromMLM.lean`
+  completed in `real 5.59s` (`user 8.22s`, `sys 1.65s`), and
+  `lake env lean LatticeSystem/Quantum/SpinS/AnisotropicHeisenbergSpinSObligation2FromSU2Unique.lean`
+  completed in `real 3.82s` (`user 2.88s`, `sys 1.53s`).  Both are below the
+  prior PR #4070 measurement and well below the recorded roughly-18s threshold
+  for reconsidering a split of `Theorem24SU2GlobalUniquenessFromMLM.lean`, so
+  no module split was performed.  The PR also removed unnecessary
+  `set_option linter.style.longLine false in` wrappers from the recent general
+  spin-S target/obligation modules after focused Lean checks showed they were
+  no longer needed.
 - **2026-06-01 (PR #4070)**: Refactor checkpoint after the 20 post-#4049
   Tasaki Problem 2.5.b--d feature PRs (#4050--#4069). Build-speed evaluation
   focused on the largest current `Quantum/SpinS` module:

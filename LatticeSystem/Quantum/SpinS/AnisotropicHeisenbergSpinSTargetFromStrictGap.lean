@@ -22,7 +22,6 @@ open Matrix Module
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-set_option linter.style.longLine false in
 /-- **General spin-S target ground eigenspace `finrank <= 1` from strict sector
 gap**: the strict gap over every non-balanced non-empty magnetization sector
 supplies balanced/full equality, and the PR #4088 balanced-sector PF target
@@ -67,7 +66,6 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_strict_gap
       (Λ := Λ) (N := N) A hJim hJnn hJpos hJbip hJ_star hJ_sym hA_ne hB_ne hN
       M_balanced h_balanced h_balanced_eq_full h_full_le_two
 
-set_option linter.style.longLine false in
 /-- **General spin-S target ground states have zero total magnetization from
 strict sector gap**: target uniqueness follows from the strict-gap wrapper, then
 the existing uniqueness-implies-zero-magnetization theorem applies. -/

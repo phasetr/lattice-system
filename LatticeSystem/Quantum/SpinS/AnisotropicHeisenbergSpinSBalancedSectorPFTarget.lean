@@ -24,7 +24,6 @@ open Matrix Module
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-set_option linter.style.longLine false in
 /-- **General spin-S balanced-sector Perron--Frobenius simplicity at the target
 point**: the anisotropic target sector matrix has a one-dimensional ground
 eigenspace in the chosen magnetization sector. -/
@@ -95,7 +94,6 @@ theorem anisotropicHeisenbergS_balanced_sector_pf_at_target
   rw [hmin_eq]
   exact hraw
 
-set_option linter.style.longLine false in
 /-- **General spin-S target ground eigenspace `finrank <= 1` with balanced-sector
 PF discharged**: the remaining explicit inputs are the full target
 `finrank <= 2` bound and balanced-sector/full-ground equality. -/
@@ -138,7 +136,6 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_balanced_eq_full
       (Λ := Λ) (N := N) (J := J) hJ_star M_balanced h_balanced
       h_balanced_eq_full h_full_le_two hpf
 
-set_option linter.style.longLine false in
 /-- **General spin-S target ground states have zero total magnetization with
 balanced-sector PF discharged**. -/
 theorem anisotropicHeisenbergS_target_groundState_zero_magnetization_of_balanced_eq_full
