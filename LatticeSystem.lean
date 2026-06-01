@@ -367,6 +367,7 @@ import LatticeSystem.Quantum.SpinS.SublatticeMaxCasimirFinrankGeComplement
 import LatticeSystem.Quantum.SpinS.Theorem23ToyWitness
 import LatticeSystem.Quantum.SpinS.Theorem23ToyGroundEnergyBound
 import LatticeSystem.Quantum.SpinS.Problem25dCorrelationSignBridge
+import LatticeSystem.Quantum.SpinS.Problem25dLadderPositivity
 
 /-!
 # `lattice-system` library root
