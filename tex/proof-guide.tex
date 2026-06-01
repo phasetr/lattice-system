@@ -14421,6 +14421,39 @@ rotation into the one-dimensional eigenspace phase bridge.  Reference:
 Tasaki, Springer 2020, Problem~2.5.c, p.~43, and the Theorem~2.4 symmetry
 context, pp.~43--44.
 
+\textbf{Problem 2.5.c z-axis ground-state phase input (PR pending)}:
+the new file
+\texttt{Quantum/SpinS/Problem25cZAxisGroundStatePhase.lean} connects the
+abstract one-dimensional eigenspace phase bridge with the concrete z-axis
+rotation commutation theorem.  First, the lifted z-axis rotation is unitary:
+\[
+  \left(\bigotimes_{x\in V}\exp(-i\theta \hat S^{(3)})\right)^\dagger
+  \left(\bigotimes_{x\in V}\exp(-i\theta \hat S^{(3)})\right)=1.
+\]
+The proof uses the tensor adjoint formula, the single-site adjoint identity
+\[
+  \exp(-i\theta\hat S^{(3)})^\dagger
+  = \exp(i\theta\hat S^{(3)}),
+\]
+and tensor functoriality.  If $\Phi$ is a normalized non-zero eigenvector of
+$\hat H_J$ in a one-dimensional eigenspace at energy $\mu$, then the
+commutation
+\[
+  [\hat H_J,\bigotimes_{x\in V}\exp(-i\theta \hat S^{(3)})]=0
+\]
+and the abstract bridge from PR~\#4063 give a phase $c$ such that
+\[
+  \left(\bigotimes_{x\in V}\exp(-i\theta \hat S^{(3)})\right)\Phi=c\Phi,
+  \qquad \overline c c=1.
+\]
+At $\theta=\pi/2$, this supplies the exact phase input required by the
+Problem~2.5.c squared-expectation wrapper from PR~\#4062.  The resulting
+theorem still keeps the lifted axis-swap state invariance as an explicit
+hypothesis; the next remaining state-side input is the corresponding
+axis-swap ground-state invariance or ray-invariance.  Reference: Tasaki,
+Springer 2020, Problem~2.5.c, p.~43, and the Theorem~2.4 symmetry context,
+pp.~43--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
