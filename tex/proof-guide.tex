@@ -13416,6 +13416,40 @@ imports the abstract Hamiltonian and energy companion, and
         the same lower bound back to the original same-Hilbert-space
         graph-local star.  The exact Lean names are listed in
         \texttt{docs/index.md}.
+  \item Problem 2.5.b option-star and graph-local sum wrapper.  The canonical
+        option-star Hamiltonian is Hermitian because it is the transported
+        single-cluster Hamiltonian along
+        \(\mathrm{Fin}(|s|+1)\simeq\mathrm{Option}(s)\).  The forward
+        Rayleigh reindexing lemmas identify the Rayleigh quotient of the
+        option-star matrix with the Rayleigh quotient of the abstract
+        single-cluster matrix after precomposition by the configuration
+        equivalence.  Therefore the Problem~2.5.a equality
+        \[
+          \lambda_{\min}(\hat h_{\rm cl}(|s|))
+          =
+          \operatorname{Re}E_{\rm GS}(|s|)
+        \]
+        for \(1\le |s|\), under \texttt{[IsAlgClosed \(\mathbb C\)]}, gives
+        the option-star Rayleigh lower bound with
+        \(\operatorname{Re}E_{\rm GS}(|s|)\).
+
+        Applying the graph-local product lower-bound bridge yields
+        \[
+          \operatorname{Re}E_{\rm GS}(|N_G(x)|)
+          \le
+          \lambda_{\min}(h_x)
+        \]
+        whenever the center has at least one graph neighbour.  Summing these
+        local lower bounds and using the one-sided bipartite decomposition
+        \(\hat H_G(1/2)=\sum_{x\in A}h_x\) gives the formal lower bound
+        \[
+          \sum_{x\in A}\operatorname{Re}E_{\rm GS}(|N_G(x)|)
+          \le
+          \lambda_{\min}(\hat H_G(1/2)).
+        \]
+        The exact Lean names are listed in \texttt{docs/index.md}.  This is
+        the graph-local form of Tasaki's Problem~2.5.b lower-bound argument
+        (Tasaki, Springer 2020, Problem~2.5.b, p.~38; solution p.~497).
 \end{itemize}
 
 \textbf{Strategic gaps.} The single-cluster Problem 2.5.a equality is now
@@ -13423,9 +13457,10 @@ available for \(1\le z\) under the explicit
 \texttt{[IsAlgClosed \(\mathbb C\)]} hypothesis.  The remaining optional
 cleanup is to discharge that hypothesis by replacing the algebraically closed
 eigenvector-extraction bridge with a constructive finite-dimensional spectral
-decomposition if that later becomes useful.  For Problem~2.5.b, the remaining
-formal work is to specialize the option-star block lower bound using
-Problem~2.5.a and feed the result into the finite-sum lower-bound bridge.
+decomposition if that later becomes useful.  For Problem~2.5.b, the graph-local
+finite-sum lower bound is now available for the half-coupling graph Hamiltonian
+under the same algebraically closed-field hypothesis and a positive local-degree
+assumption on the chosen bipartition side.
 
 \subsection*{DONE: Spin-$S$ saturated ferromagnetic state (Tasaki §2.4 generalised)}
 \label{subsec:spin-s-all-aligned}
