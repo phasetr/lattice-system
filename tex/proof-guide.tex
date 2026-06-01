@@ -14769,10 +14769,10 @@ For the sector witness, take
 \[
   \sum_z \eta_z = |A|N
 \]
-by \path{magSumS_neelConfigOfS_complement}.  If \(x\in A\) and \(y\notin A\),
-use \(\tau=\eta\) and update \(\sigma\) by setting
-\(\sigma_x=N-1,\sigma_y=1\).  If \(x\notin A\) and \(y\in A\), reverse the
-orientation: use \(\sigma=\eta\) and update \(\tau_x=1,\tau_y=N-1\).
+by \path{magSumS_neelConfigOfS_complement}.  If \(x\notin A\) and \(y\in A\),
+use \(\sigma=\eta\) and update \(\tau\) by setting
+\(\tau_x=1,\tau_y=N-1\).  If \(x\in A\) and \(y\notin A\), reverse the
+orientation: use \(\tau=\eta\) and update \(\sigma_x=N-1,\sigma_y=1\).
 The two-site sum identity \path{magSumS_configUpdateTwo_eq} keeps both
 configurations in \(M_0\), and the raise/lower equalities above feed the
 strict-entry lemma.  The theorem
