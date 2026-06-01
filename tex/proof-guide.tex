@@ -13091,6 +13091,16 @@ imports the abstract Hamiltonian and energy companion, and
         extracts a non-zero magnetization component from any non-zero
         single-cluster eigenvector, preserving the same energy
         ($\gamma$-5 step 331).
+  \item Invariant-submodule eigenvector bridge:
+        \texttt{exists\_eigenvector\_in\_invariant\_submodule}
+        is the finite-dimensional linear-algebra bridge for the next
+        sector-decomposition layer.  If a non-zero submodule \(p\) is invariant
+        under an endomorphism \(f\), then the restriction \(f|_p\) has an
+        eigenvector by Mathlib's algebraically closed finite-dimensional
+        eigenvalue theorem.  Forgetting the subtype gives \(0\ne v\in p\)
+        with \(f v=\mu v\).  This is intended for the next joint total/leaf
+        Casimir eigensector extraction after the single-cluster
+        magnetization-component step ($\gamma$-5 step 332).
 \end{itemize}
 
 \textbf{Strategic gaps.} The deferred pieces are:
