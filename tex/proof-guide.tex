@@ -14784,6 +14784,39 @@ sector no longer needs an explicit strict-entry hypothesis.  Reference:
 Tasaki, Springer 2020, Problem~2.5.d, p.~40, solution pp.~498--499, equations
 (S.22)--(S.23), with Theorems~2.3--2.4, pp.~42--44.
 
+\textbf{Problem 2.5.d balanced Perron--Frobenius endpoint (PR~\#4078)}.
+The file \path{Quantum/SpinS/Problem25dBalancedPFEndpoint.lean}
+connects the balanced-sector PF vector produced by the Theorem~2.3 common
+energy endpoint to the sector-supported Problem~2.5.d positivity chain.
+The Theorem~2.3 data return the embedded vector in the real-sign form
+\[
+  \Psi_v=\iota_{M_0}\bigl(\sigma\mapsto
+    ((m_A(\sigma))_{\mathrm{re}}v_\sigma:\mathbb R):\mathbb C\bigr).
+\]
+Since \path{marshallSignS_eq_ofReal_re} says that the Marshall sign is the
+complex embedding of its real part, extensionality of
+\path{magSectorEmbedding} identifies this vector with
+\[
+  \Phi_v=\iota_{M_0}\bigl(\sigma\mapsto m_A(\sigma)v_\sigma\bigr),
+  \qquad v_\sigma>0.
+\]
+The new non-normalized phase bridge
+\path{phase_unit_of_unitary_mulVec_eq_smul_of_ne_zero} avoids introducing a
+separate normalized PF vector: if a unitary \(U\) satisfies
+\(U\Phi=c\Phi\) and \(\Phi\ne0\), then norm preservation gives
+\((\bar c c)\langle\Phi,\Phi\rangle=\langle\Phi,\Phi\rangle\), and the
+non-zero norm cancels to \(\bar c c=1\).  Together with the existing
+one-dimensional eigenspace scalar-multiple bridge, this supplies the
+axis-swap and \(z\)-rotation phases consumed by the PR~\#4076
+sector-supported axis-phase wrapper.  The endpoint
+\path{twoSpinCorrelationS_bipartite_signed_re_pos_of_tasaki23_balanced_pf_cross}
+returns the Hermitian minimum energy, the strictly positive balanced
+coefficients, the non-zero embedded eigenvector, full eigenspace
+\(\mathrm{finrank}\le1\), and signed cross-sublattice two-spin correlation
+positivity for this concrete PF vector.  Reference: Tasaki, Springer 2020,
+Problem~2.5.d, p.~40, solution pp.~498--499, equations (S.22)--(S.23), with
+Theorems~2.3--2.4, pp.~42--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
