@@ -86,6 +86,7 @@ import LatticeSystem.Quantum.SpinS.SingleClusterLeafCasimirBound
 import LatticeSystem.Quantum.SpinS.SingleClusterCasimirInvariance
 import LatticeSystem.Quantum.SpinS.SingleClusterJointCasimirWitness
 import LatticeSystem.Quantum.SpinS.SingleClusterExtractedCoupledLower
+import LatticeSystem.Quantum.SpinS.SingleClusterGSJointWitness
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
