@@ -14721,9 +14721,33 @@ into the PR~\#4074 axis-phase wrapper gives
 \]
 for cross-sublattice pairs \(A(x)\ne A(y)\).  The companion balanced MLM
 wrapper uses the Theorem~2.3/SU(2) endpoint to supply the one-dimensional
-ground eigenspace at the Hermitian minimum.  The remaining packaging task is to
-extract the full-space Marshall-positive coefficient vector from the sector
-Perron--Frobenius construction.  Reference: Tasaki, Springer 2020,
+ground eigenspace at the Hermitian minimum.  This wrapper is for a full-space
+coefficient function; the sector-supported Perron--Frobenius ground-state
+shape is handled by the next wrapper.  Reference: Tasaki, Springer 2020,
+Problem~2.5.d, p.~40, solution pp.~498--499, equations (S.22)--(S.23), with
+Theorems~2.3--2.4, pp.~42--44.
+
+\textbf{Problem 2.5.d sector-supported wrapper (PR~\#4076)}.
+The file \path{Quantum/SpinS/Problem25dSectorSupportedWrapper.lean}
+adapts the PR~\#4069--\#4075 positivity chain to the actual
+Perron--Frobenius ground-state shape.  Let \(M\) be a magnetization sector and
+let
+\[
+  \Phi=\iota_M(\sigma\mapsto m_A(\sigma)c_\sigma),
+  \qquad c_\sigma>0\quad(\sigma\in M),
+\]
+where \(\iota_M\) is zero-extension from the sector.  In the finite-basis
+expansion of
+\(\langle\Phi,\hat S_x^+\hat S_y^-\Phi\rangle\), every term with an
+off-sector configuration vanishes.  Every on-sector term is
+\(c_\sigma c_\tau\) times the signed matrix-entry expression already
+controlled by PR~\#4071.  Thus a sector-local strict ladder-entry witness
+supplies the same positive signed ladder correlation used by PR~\#4072.
+Combining this with the PR~\#4073 adjoint equality and PR~\#4074 longitudinal
+axis-phase equality gives the sector-supported signed dot-product positivity
+wrapper.  Finally, a normalized non-zero sector-supported eigenvector in a
+one-dimensional Heisenberg eigenspace obtains the same axis-swap and
+z-rotation phases as in PR~\#4075.  Reference: Tasaki, Springer 2020,
 Problem~2.5.d, p.~40, solution pp.~498--499, equations (S.22)--(S.23), with
 Theorems~2.3--2.4, pp.~42--44.
 

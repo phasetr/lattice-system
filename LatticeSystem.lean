@@ -373,6 +373,7 @@ import LatticeSystem.Quantum.SpinS.Problem25dLadderDotReduction
 import LatticeSystem.Quantum.SpinS.Problem25dLadderAdjointEquality
 import LatticeSystem.Quantum.SpinS.Problem25dLongitudinalComponentEquality
 import LatticeSystem.Quantum.SpinS.Problem25dGroundStatePhaseWrapper
+import LatticeSystem.Quantum.SpinS.Problem25dSectorSupportedWrapper
 
 /-!
 # `lattice-system` library root
