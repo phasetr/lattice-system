@@ -337,6 +337,22 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-06-01 (PR #4070)**: Refactor checkpoint after the 20 post-#4049
+  Tasaki Problem 2.5.b--d feature PRs (#4050--#4069). Build-speed evaluation
+  focused on the largest current `Quantum/SpinS` module:
+  `lake env lean LatticeSystem/Quantum/SpinS/Theorem24SU2GlobalUniquenessFromMLM.lean`
+  completed in `real 15.83s` (`user 9.13s`, `sys 3.29s`) on updated
+  `main`. A preliminary size survey also measured the next largest
+  `Quantum/SpinS` files at roughly 4--5s focused elaboration, so
+  `Theorem24SU2GlobalUniquenessFromMLM.lean` is the only near-threshold file.
+  No module split was performed: the consumer-facing SU(2)-endpoint theorems
+  are a suffix of the same proof chain, but they depend on the zero-Casimir,
+  outside-sector, common-energy, and sector-PF infrastructure earlier in the
+  file. A suffix extraction would therefore create a serial parent/suffix
+  dependency rather than an independent parallel build target, while adding
+  import churn to the active Theorem 2.4 / Problem 2.5.c consumers. Revisit a
+  real split if this file persistently exceeds about 18s or if a future theorem
+  creates an independent downstream-facing endpoint cluster.
 - **2026-05-25 (PR #3605)**: Refactor checkpoint after the 20
   post-#3584 Tasaki §2.5 Theorem 2.3 feature PRs (#3585--#3604).
   Build-speed evaluation for the active outside-ground/common-energy final
