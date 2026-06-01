@@ -98,6 +98,7 @@ import LatticeSystem.Quantum.SpinS.Problem25cAxisSwapEqualAxes
 import LatticeSystem.Quantum.SpinS.Problem25cSingleSiteSquared
 import LatticeSystem.Quantum.SpinS.Problem25cTwoSymmetryAxisInput
 import LatticeSystem.Quantum.SpinS.Problem25cUnitaryAxisInput
+import LatticeSystem.Quantum.SpinS.Problem25cZAxisRotationInput
 import LatticeSystem.Quantum.SpinS.SingleSiteXYExpectation
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale

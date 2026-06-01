@@ -14310,6 +14310,31 @@ state is fixed by such a symmetry, remains the open mathematical input.
 Reference: Tasaki, Springer 2020, Problem~2.5.c, p.~43, and the
 Theorem~2.4 symmetry context, pp.~43--44.
 
+\textbf{Problem 2.5.c z-axis rotation input (PR~\#4061)}:
+the next module instantiates the abstract second unitary of PR~\#4060 by a
+concrete general spin-\(S\) rotation about axis \(3\).  Put
+\[
+  R_3(\theta)=\exp(-i\theta\hat S^{(3)}).
+\]
+Using the ladder identities
+\[
+  \hat S^+=\hat S^{(1)}+i\hat S^{(2)},\qquad
+  \hat S^-=\hat S^{(1)}-i\hat S^{(2)}
+\]
+and the Cartan relations, the module proves
+\[
+  R_3(-\pi/2)\hat S^{(2)}R_3(\pi/2)=\hat S^{(1)}.
+\]
+Tensoring over all sites then gives
+\[
+  (\otimes_x R_3(-\pi/2))\hat S_x^{(2)}
+  (\otimes_x R_3(\pi/2))=\hat S_x^{(1)}.
+\]
+Thus PR~\#4060 applies with this concrete rotation.  The remaining input is
+that the AFM ground state is fixed by the inverse lifted z-axis rotation, along
+with the existing lifted axis-swap invariance.  Reference: Tasaki, Springer
+2020, Problem~2.5.c, p.~43, and the Theorem~2.4 symmetry context, pp.~43--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
