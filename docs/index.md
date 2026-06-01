@@ -2267,6 +2267,7 @@ Issue #412; assembled in PRs #875–#879. All theorems live in
 | `manyBodyTensorS_conjTranspose` / `AxisSwapUnitaryS.tensor_conjTranspose` / `axisSwapUnitarySSpinS_tensor_conjTranspose` / `singleSiteSpinSquareExpectationS_axis3_eq_axis2_of_axisSwapInvariant` | **Problem 2.5.c lifted axis-swap adjoint input**: proves `(⊗_x W_x)† = ⊗_x W_x†`, specializes `U† = U⁻¹` to the many-body spin-`S` axis-swap tensor, and uses the PR #4057 bridge plus `AxisSwapUnitaryS.tensor_conj_onSiteS` to equate the axis-3 and axis-2 squared single-site expectations under an explicit lifted-axis-swap invariance hypothesis. Tasaki, Springer 2020, Problem 2.5.c, p. 43 and Theorem 2.4 context, pp. 43-44 (PR #4058, file `Quantum/SpinS/Problem25cAxisSwapAdjointInput.lean`) |
 | `singleSiteSpinSquareExpectationS_all_axes_eq_of_axisSwapInvariant_axis1_eq_axis2` | **Problem 2.5.c axis-swap equal-axes wrapper**: combines PR #4058's axis-swap equality `E_3 = E_2` with PR #4056's all-axis algebraic bridge. For a normalized state fixed by the inverse lifted axis swap, one remaining explicit equality `E_1 = E_2` implies `E_1 = E_2 = E_3 = N(N+2)/12`. This leaves the missing axis-1/axis-2 SU(2) or rotation input explicit. Tasaki, Springer 2020, Problem 2.5.c, p. 43 and Theorem 2.4 context, pp. 43-44 (PR #4059, file `Quantum/SpinS/Problem25cAxisSwapEqualAxes.lean`) |
 | `singleSiteSpinSquareExpectationS_axis1_eq_axis2_of_unitaryInvariant` / `_all_axes_eq_of_axisSwapInvariant_unitary_axis12` | **Problem 2.5.c two-symmetry axis input**: derives the remaining equality `E_1 = E_2` from an explicit abstract unitary conjugation `T Ŝ_x^(2) T⁻¹ = Ŝ_x^(1)` plus `T⁻¹Φ = Φ`, then combines it with PR #4059's lifted-axis-swap wrapper to conclude `E_1 = E_2 = E_3 = N(N+2)/12`. The concrete general spin-`S` rotation or AFM ground-state SU(2) invariance theorem remains explicit. Tasaki, Springer 2020, Problem 2.5.c, p. 43 and Theorem 2.4 context, pp. 43-44 (PR #4060, file `Quantum/SpinS/Problem25cTwoSymmetryAxisInput.lean`) |
+| `spinSRot3` / `spinSRot3_neg_pi_half_conj_spinSOp2` / `manyBodySpinSRot3_neg_pi_half_conj_onSiteS_spinSOp2` / `singleSiteSpinSquareExpectationS_all_axes_eq_of_axisSwapInvariant_zAxisRot` | **Problem 2.5.c concrete z-axis rotation input**: constructs the general spin-`S` rotation `exp(-iθŜ³)`, proves the `-π/2` conjugation `Ŝ² ↦ Ŝ¹`, lifts it to a many-body single-site conjugation, and feeds it into PR #4060. The remaining input is invariance of the AFM ground state under the inverse lifted z-axis rotation, together with the existing lifted axis-swap invariance. Tasaki, Springer 2020, Problem 2.5.c, p. 43 and Theorem 2.4 context, pp. 43-44 (PR #4061, file `Quantum/SpinS/Problem25cZAxisRotationInput.lean`) |
 | `spinSOpPlus_one_eq_spinHalfOpPlus` / `_Minus_` / `_Op1_` / `_Op2_` / `_Op3_` | **spin-`S` ↔ spin-`1/2` bridge at `N = 1`**: `spinSOp{Plus, Minus, 1, 2, 3} 1 = spinHalfOp{Plus, Minus, 1, 2, 3}` (each is the corresponding half-Pauli matrix) (PRs #922 + #923, file `Quantum/SpinS/SpinHalfSpecialization.lean`) |
 | `onSiteS_spinSOp3_mulVec_allAlignedStateS` / `allAlignedStateS_expectation_onSiteS_spinSOp3` / `_sq` / `onSiteS_spinSOp3_sq_mulVec_allAlignedStateS` | **single-site `Ŝ^(3)_x` and `(Ŝ^(3)_x)²` on `|c..c⟩`**: `Ŝ^(3)_x · |c..c⟩ = (N/2 − c.val) · |c..c⟩` and expectation of `(Ŝ^(3)_x)²` is `(N/2 − c.val)²` (PR #925, file `Quantum/SpinS/SingleSiteZExpectation.lean`) |
 | `allAlignedStateS_expectation_onSiteS_spinSOp1_sq_add_spinSOp2_sq` | **xy-plane Casimir expectation**: `⟨((Ŝ^(1)_x)² + (Ŝ^(2)_x)²) · |c..c⟩⟩ = N(N+2)/4 − (N/2 − c.val)²`. From #920 minus #925; for `c=0` gives `S/2` (PR #926, file `Quantum/SpinS/SingleSiteXYExpectation.lean`) |
@@ -2708,10 +2709,12 @@ mathematical work):
   `Quantum/SpinS/Problem25cAxisSwapAdjointInput.lean`; the wrapper reducing the
   all-axis conclusion to lifted axis-swap invariance plus the remaining
   axis-1/axis-2 equality is live under
-  `Quantum/SpinS/Problem25cAxisSwapEqualAxes.lean`; and the wrapper reducing
-  that remaining equality to an abstract second unitary symmetry input is live
-  under `Quantum/SpinS/Problem25cTwoSymmetryAxisInput.lean`. The remaining input
-  is the concrete AFM ground-state SU(2)-symmetry/equal-axis theorem.
+  `Quantum/SpinS/Problem25cAxisSwapEqualAxes.lean`; the wrapper reducing that
+  remaining equality to an abstract second unitary symmetry input is live under
+  `Quantum/SpinS/Problem25cTwoSymmetryAxisInput.lean`; and the concrete z-axis
+  rotation input is live under
+  `Quantum/SpinS/Problem25cZAxisRotationInput.lean`. The remaining input is the
+  concrete AFM ground-state invariance under the lifted rotations.
 - **Problem 2.5.d** (two-spin correlation under MLM).
 
 The generic graph-centric `neelStateOf` (Phase 3 PR #331) is the
