@@ -91,6 +91,7 @@ import LatticeSystem.Quantum.SpinS.SingleClusterTransport
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueSumLower
 import LatticeSystem.Quantum.SpinS.HeisenbergGraphLocal
 import LatticeSystem.Quantum.SpinS.GraphLocalStarBlock
+import LatticeSystem.Quantum.SpinS.GraphLocalStarLowerBound
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
 import LatticeSystem.Quantum.Pauli
