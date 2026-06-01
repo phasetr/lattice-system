@@ -2741,8 +2741,8 @@ follows:
   `anisotropicHeisenbergS_eigenspace_finrank_le_two_unconditional_general`;
   the general spin-`S` target conditional bridge and balanced-sector PF input
   are now packaged, and the target wrappers from strict sector gap reduce the
-  remaining energy input to the strict gap over non-balanced sectors.  Tasaki's
-  case (ii) route remains separate future work.
+  remaining energy input to the strict gap over non-balanced non-empty sectors.
+  Tasaki's case (ii) route remains separate future work.
 
 ### TODO — remove remaining 7 per-theorem linter suppressions (issue [#377](https://github.com/phasetr/lattice-system/issues/377))
 
