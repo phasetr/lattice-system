@@ -13069,15 +13069,38 @@ imports the abstract Hamiltonian and energy companion, and
         reduce the remaining lower-bound work to proving that real-energy
         eigenvectors decompose into magnetization and joint total/leaf
         Casimir sectors ($\gamma$-5 step 330).
+  \item Single-cluster magnetization projection bridge:
+        \texttt{mulVec\_magProjFn\_eq\_of\_mulVec\_basisVecS\_mem\_magSubspaceS}
+        abstracts the existing matrix-entry argument: any operator that sends
+        each computational basis vector to its own magnetization subspace
+        commutes with the pointwise magnetization projection \texttt{magProjFn}.
+        \texttt{singleClusterHamiltonianS\_commute\_totalSpinSOp3}
+        follows by summing the two-site commutators
+        $[\hat{\boldsymbol S}_0\cdot\hat{\boldsymbol S}_j,
+        \hat S^3_{\rm tot}]=0$ over all leaves.  Therefore
+        \texttt{singleClusterHamiltonianS\_mulVec\_mem\_magSubspaceS\_of\_mem}
+        shows that the Hamiltonian preserves each magnetization subspace.
+        The basis-vector form
+        \texttt{singleClusterHamiltonianS\_mulVec\_basisVecS\_mem\_magSubspaceS}
+        supplies the hypothesis of the generic projection helper.
+        The pointwise magnetization projection theorem
+        \texttt{singleClusterHamiltonianS\_mulVec\_magProjFn\_eq}
+        then gives
+        $\hat H P_M v = P_M \hat H v$.  Consequently
+        \texttt{singleClusterHamiltonianS\_eigenvec\_exists\_weight\_component}
+        extracts a non-zero magnetization component from any non-zero
+        single-cluster eigenvector, preserving the same energy
+        ($\gamma$-5 step 331).
 \end{itemize}
 
 \textbf{Strategic gaps.} The deferred pieces are:
 (a) constructing an actual joint-Casimir eigenvector at the GS
 sector $(s_R, s_{\rm tot}) = (zN/2, (z-1)N/2)$ via Clebsch--Gordan
 decomposition; (b) proving the global lower-bound callback, equivalently
-showing the spectrum is exhausted by magnetization and joint total/leaf
-Casimir sectors, then applying the coupled leaf/center sector-energy
-bridge. The older raw target $\operatorname{Re}\alpha\ge\alpha_{\rm pred}$
+first using the single-cluster magnetization projection bridge to pass to a
+non-zero weight component, then showing the projected spectrum is exhausted by
+joint total/leaf Casimir sectors and applying the coupled leaf/center
+sector-energy bridge. The older raw target $\operatorname{Re}\alpha\ge\alpha_{\rm pred}$
 is too strong as an all-sector design goal; the lower-bound route should
 use the actual leaf spin parameter supplied by the sector decomposition.
 Both
