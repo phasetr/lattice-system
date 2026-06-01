@@ -12980,15 +12980,26 @@ imports the abstract Hamiltonian and energy companion, and
         \texttt{...\_of\_exists\_gs\_sector} packages the
         Clebsch--Gordan vector construction as the remaining
         hypothesis ($\gamma$-5 step 324).
+  \item Minimum-eigenvalue lower/equality bridge:
+        \texttt{singleClusterGSEnergyS\_re\_le\_hermitianMinEigenvalue\_of\_global\_eigenvalue\_lower}
+        says that a global lower-bound callback for every non-zero
+        real-energy eigenvector of $\hat H$ gives
+        $\operatorname{Re}\texttt{singleClusterGSEnergyS z N}
+        \le \lambda_{\min}(\hat H)$.  The equality wrappers
+        \texttt{singleClusterHamiltonianS\_hermitianMinEigenvalue\_eq\_gs\_of\_gs\_sector\_and\_global\_lower}
+        and \texttt{...\_of\_exists\_gs\_sector\_and\_global\_lower}
+        combine this lower bound with the GS-sector upper-bound
+        witness to identify the Hermitian minimum eigenvalue with
+        the predicted GS energy ($\gamma$-5 step 325).
 \end{itemize}
 
 \textbf{Strategic gaps.} The deferred pieces are:
 (a) constructing an actual joint-Casimir eigenvector at the GS
 sector $(s_R, s_{\rm tot}) = (zN/2, (z-1)N/2)$ via Clebsch--Gordan
-decomposition; (b) proving the matching lower bound, equivalently
-showing the spectrum is exhausted by joint Casimir sectors and that
-no sector lies below the predicted value (variational principle /
-spectral theorem). Both
+decomposition; (b) proving the global lower-bound callback, equivalently
+showing the spectrum is exhausted by joint Casimir sectors and that no
+sector lies below the predicted value (variational principle / spectral
+theorem). Both
 require substantial multi-PR effort (SU(2) representation theory or
 spin-$S$ Perron--Frobenius on the dressed Hamiltonian extending the
 spin-$1/2$ work in
