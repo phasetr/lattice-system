@@ -368,4 +368,65 @@ theorem singleClusterHamiltonianS_hermitianMinEigenvalue_eq_gs_of_exists_gs_sect
   exact singleClusterHamiltonianS_hermitianMinEigenvalue_eq_gs_of_gs_sector_and_joint_lower
     (z := z) N hv_ne htot hR hjoint
 
+/-- **Single-cluster conditional equality from a GS-sector witness and
+joint-Casimir sector bounds**: the witness gives the upper bound, while the
+joint-Casimir sector-bounds callback gives the reverse inequality through the
+arithmetic lower-bound bridge. -/
+theorem singleClusterHamiltonianS_minEigenvalue_eq_gs_of_gs_sector_and_joint_casimir_bounds
+    (N : ℕ) {v : (Fin (z + 1) → Fin (N + 1)) → ℂ}
+    (hv_ne : v ≠ 0)
+    (htot : (totalSpinSSquared (Fin (z + 1)) N).mulVec v =
+        (((z : ℂ) - 1) * (N : ℂ) / 2 *
+          (((z : ℂ) - 1) * (N : ℂ) / 2 + 1)) • v)
+    (hR : (leafSpinSSquared z N).mulVec v =
+        ((z : ℂ) * (N : ℂ) / 2 *
+          ((z : ℂ) * (N : ℂ) / 2 + 1)) • v)
+    (hjoint_bounds : ∀ {μ : ℝ} {w : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      w ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec w = (μ : ℂ) • w →
+      ∃ α β : ℂ,
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec w = α • w ∧
+        (leafSpinSSquared z N).mulVec w = β • w ∧
+        ((z : ℝ) - 1) * (N : ℝ) / 2 *
+            (((z : ℝ) - 1) * (N : ℝ) / 2 + 1) ≤ α.re ∧
+        β.re ≤ (z : ℝ) * (N : ℝ) / 2 *
+            ((z : ℝ) * (N : ℝ) / 2 + 1)) :
+    hermitianMinEigenvalue (singleClusterHamiltonianS_isHermitian z N) =
+      (singleClusterGSEnergyS z N).re := by
+  exact singleClusterHamiltonianS_hermitianMinEigenvalue_eq_gs_of_gs_sector_and_global_lower
+    (z := z) N hv_ne htot hR
+    (singleCluster_global_eigenvalue_lower_of_joint_casimir_bounds
+      (z := z) N hjoint_bounds)
+
+/-- **Existential conditional equality from joint-Casimir sector bounds**:
+the Clebsch--Gordan witness package gives the upper bound, while the
+joint-Casimir sector-bounds callback gives the reverse inequality through the
+arithmetic lower-bound bridge. -/
+theorem singleClusterHamiltonianS_minEigenvalue_eq_gs_of_exists_gs_sector_and_joint_casimir_bounds
+    (N : ℕ)
+    (hexists : ∃ v : (Fin (z + 1) → Fin (N + 1)) → ℂ,
+      v ≠ 0 ∧
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec v =
+          (((z : ℂ) - 1) * (N : ℂ) / 2 *
+            (((z : ℂ) - 1) * (N : ℂ) / 2 + 1)) • v ∧
+        (leafSpinSSquared z N).mulVec v =
+          ((z : ℂ) * (N : ℂ) / 2 *
+            ((z : ℂ) * (N : ℂ) / 2 + 1)) • v)
+    (hjoint_bounds : ∀ {μ : ℝ} {w : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      w ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec w = (μ : ℂ) • w →
+      ∃ α β : ℂ,
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec w = α • w ∧
+        (leafSpinSSquared z N).mulVec w = β • w ∧
+        ((z : ℝ) - 1) * (N : ℝ) / 2 *
+            (((z : ℝ) - 1) * (N : ℝ) / 2 + 1) ≤ α.re ∧
+        β.re ≤ (z : ℝ) * (N : ℝ) / 2 *
+            ((z : ℝ) * (N : ℝ) / 2 + 1)) :
+    hermitianMinEigenvalue (singleClusterHamiltonianS_isHermitian z N) =
+      (singleClusterGSEnergyS z N).re := by
+  rcases hexists with ⟨v, hv_ne, htot, hR⟩
+  exact
+    singleClusterHamiltonianS_minEigenvalue_eq_gs_of_gs_sector_and_joint_casimir_bounds
+      (z := z) N hv_ne htot hR hjoint_bounds
+
 end LatticeSystem.Quantum

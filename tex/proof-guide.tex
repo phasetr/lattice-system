@@ -13026,6 +13026,16 @@ imports the abstract Hamiltonian and energy companion, and
         turn these sector bounds for every non-zero real-energy
         $\hat H$-eigenvector into the global lower callback and
         Hermitian-min lower bound ($\gamma$-5 step 327).
+  \item Conditional equality from joint-Casimir sector bounds:
+        \texttt{singleClusterHamiltonianS\_minEigenvalue\_eq\_gs\_of\_gs\_sector\_and\_joint\_casimir\_bounds}
+        combines a concrete predicted GS-sector witness with the
+        joint-Casimir sector-bounds callback to obtain
+        $\lambda_{\min}(\hat H)=
+        \operatorname{Re}\texttt{singleClusterGSEnergyS z N}$.
+        The existential companion
+        \texttt{...\_minEigenvalue\_eq\_gs\_of\_exists\_gs\_sector\_and\_joint\_casimir\_bounds}
+        packages the Clebsch--Gordan witness as the remaining
+        existence hypothesis ($\gamma$-5 step 328).
 \end{itemize}
 
 \textbf{Strategic gaps.} The deferred pieces are:
