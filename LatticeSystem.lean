@@ -101,6 +101,7 @@ import LatticeSystem.Quantum.SpinS.Problem25cUnitaryAxisInput
 import LatticeSystem.Quantum.SpinS.Problem25cZAxisRotationInput
 import LatticeSystem.Quantum.SpinS.Problem25cPhaseInvariantAxisInput
 import LatticeSystem.Quantum.SpinS.Problem25cEigenspacePhaseBridge
+import LatticeSystem.Quantum.SpinS.Problem25cZAxisRotationCommutation
 import LatticeSystem.Quantum.SpinS.SingleSiteXYExpectation
 import LatticeSystem.Lattice.Graph
 import LatticeSystem.Lattice.Scale
