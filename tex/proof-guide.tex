@@ -5146,8 +5146,11 @@ Marshall sign machinery + time-reversal action; see
   \texttt{spinHalf\_anisotropicHeisenbergS\_lambda\_one\_finrank\_le\_one\_of\_MLM\_casimir\_ladder\_t23\_pf}
   and
   \texttt{spinHalf\_anisotropicHeisenbergS\_lambda\_one\_groundState\_zero\_magnetization\_of\_MLM\_casimir\_ladder\_t23\_pf}.
-  Tasaki's case~(ii) route and broader spin-$S$ axis-swap-unitary instances
-  remain separate future extensions.
+  The general spin-$S$ axis-swap unitary instance is now discharged for the
+  strict case~(i) degeneracy chain by \texttt{axisSwapUnitarySSpinS} and
+  \texttt{anisotropicHeisenbergS\_eigenspace\_finrank\_le\_two\_unconditional\_general}.
+  Tasaki's case~(ii) route and final spin-$S$ target uniqueness remain
+  separate future extensions.
 \end{itemize}
 
 The generic graph-centric \texttt{neelStateOf} (PR \#331) remains the
@@ -12875,8 +12878,7 @@ SU(2)-endpoint uniqueness to
 \texttt{spinHalf\_anisotropicHeisenbergS\_lambda\_one\_finrank\_le\_one\_of\_MLM\_casimir\_ladder\_t23\_pf},
 and the existing uniqueness-to-zero-magnetization theorem gives
 \texttt{spinHalf\_anisotropicHeisenbergS\_lambda\_one\_groundState\_zero\_magnetization\_of\_MLM\_casimir\_ladder\_t23\_pf}.
-Case~(ii) and broader spin-\(S\) axis-swap-unitary extensions remain separate
-tasks.
+Case~(ii) and final spin-\(S\) target uniqueness remain separate tasks.
 
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
@@ -12885,12 +12887,15 @@ transferred, so a \emph{similarity} suffices:
 \texttt{matrix\_similar\_eigenspace\_finrank\_eq} shows that for invertible
 \(U\), each \(\mu\)-eigenspace of \(U^{-1}\hat HU\) and of \(\hat H\) has equal
 \texttt{finrank} (via \(v\mapsto U\,v\), a linear equivalence of eigenspaces).
-This lets the explicit gauge unitary (a Wigner \(d\)-matrix \(\exp(-i\pi\hat
-S^1/2)\) for general spin) be isolated behind an interface
-(\texttt{AxisSwapUnitaryS}), and at spin-\(1/2\) it is instantiated concretely
-by the \(\pi/2\) rotation about axis~1 (\texttt{axisSwapUnitarySpinHalf}, using
-the existing \texttt{spinHalfRot1} conjugation lemmas), giving the spin-\(1/2\)
-equal-degeneracy milestone.
+This lets the explicit gauge unitary be isolated behind the
+\texttt{AxisSwapUnitaryS} interface.  The concrete general spin-\(S\)
+instance is now \texttt{axisSwapUnitarySSpinS}, the \(\pi/2\) rotation about
+axis~1 built from \(\texttt{spinSRot1}\).  Specializing existing
+\texttt{AxisSwapUnitaryS}-parameterized wrappers with this instance gives
+\texttt{axisSwapUnitarySSpinS\_anisotropic\_axisSwapped\_eigenspace\_finrank\_eq},
+the corresponding conditional block and minimum-eigenvalue wrappers, and the
+strict case~(i) general-\(N\) degeneracy capstone
+\texttt{anisotropicHeisenbergS\_eigenspace\_finrank\_le\_two\_unconditional\_general}.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
