@@ -13036,6 +13036,24 @@ imports the abstract Hamiltonian and energy companion, and
         \texttt{...\_minEigenvalue\_eq\_gs\_of\_exists\_gs\_sector\_and\_joint\_casimir\_bounds}
         packages the Clebsch--Gordan witness as the remaining
         existence hypothesis ($\gamma$-5 step 328).
+  \item Leaf-Casimir spectral maximum bound:
+        \texttt{leafSpinSSquared\_eq\_sublatticeSpinSquaredS\_leaf}
+        identifies the leaf Casimir with the sublattice Casimir for
+        $\{x:\operatorname{Fin}(z+1)\mid x\ne 0\}$, and
+        \texttt{leafSpinSSquared\_eigenvalue\_re\_le\_max}
+        applies the general sublattice bound to get
+        $\operatorname{Re}\beta \le (zN/2)(zN/2+1)$ for every
+        non-zero $\hat S_R^2$ eigenvector.  The callback forms
+        \texttt{singleCluster\_global\_eigenvalue\_lower\_of\_joint\_casimir\_total\_lower}
+        and
+        \texttt{singleClusterGSEnergyS\_re\_le\_hermitianMinEigenvalue\_of\_joint\_casimir\_total\_lower}
+        remove the leaf upper-bound hypothesis from the lower-bound
+        bridge, and the companion wrappers
+        \texttt{singleClusterHamiltonianS\_minEigenvalue\_eq\_gs\_of\_gs\_sector\_and\_joint\_casimir\_total\_lower}
+        and
+        \texttt{singleClusterHamiltonianS\_minEigenvalue\_eq\_gs\_of\_exists\_gs\_sector\_and\_joint\_casimir\_total\_lower}
+        package the corresponding conditional equality endpoints
+        ($\gamma$-5 step 329).
 \end{itemize}
 
 \textbf{Strategic gaps.} The deferred pieces are:
@@ -13043,9 +13061,10 @@ imports the abstract Hamiltonian and energy companion, and
 sector $(s_R, s_{\rm tot}) = (zN/2, (z-1)N/2)$ via Clebsch--Gordan
 decomposition; (b) proving the global lower-bound callback, equivalently
 showing the spectrum is exhausted by joint Casimir sectors and proving
-the remaining sector bounds that place $\alpha$ above
-$\alpha_{\rm pred}$ and $\beta$ below $\beta_{\max}$ for every sector
-(variational principle / spectral theorem). Both
+the remaining total-Casimir sector bound that places $\alpha$ above
+$\alpha_{\rm pred}$ for every sector (the leaf bound
+$\beta \le \beta_{\max}$ now follows from the sublattice spectral maximum
+bound). Both
 require substantial multi-PR effort (SU(2) representation theory or
 spin-$S$ Perron--Frobenius on the dressed Hamiltonian extending the
 spin-$1/2$ work in
