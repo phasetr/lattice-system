@@ -14835,6 +14835,27 @@ Boolean assumptions are supplied.  Reference: Tasaki, Springer 2020,
 Problem~2.5.d, p.~40, solution pp.~498--499, equations (S.22)--(S.23), with
 Theorems~2.3--2.4, pp.~42--44.
 
+\textbf{Problem 2.5.d balanced Perron--Frobenius cross sign (PR~\#4080)}.
+The file \path{Quantum/SpinS/Problem25dBalancedPFCrossSign.lean} extracts the
+non-vacuous cross-sublattice conclusion from the Boolean sign cases of
+PR~\#4079.  The theorem
+\path{twoSpinCorrelationS_re_neg_of_tasaki23_balanced_pf_cross} assumes
+\(A(x)\ne A(y)\), obtains the balanced PF package from
+\path{twoSpinCorrelationS_sign_cases_of_tasaki23_balanced_pf_cross}, and
+performs a Boolean case split on \(A(x)\).  If \(A(x)=\mathrm{true}\), then
+the cross hypothesis forces \(A(y)=\mathrm{false}\); otherwise
+\(A(x)=\mathrm{false}\) and it forces \(A(y)=\mathrm{true}\).  In both cases
+the appropriate cross-sublattice field of the PR~\#4079 theorem gives
+\[
+  \operatorname{Re}\langle \Phi_v,
+    \widehat{\mathbf S}_x\cdot\widehat{\mathbf S}_y\Phi_v\rangle < 0 .
+\]
+The Hermitian minimum, strictly positive balanced coefficients, non-zero
+embedded eigenvector, and full eigenspace \(\mathrm{finrank}\le1\) are
+preserved unchanged.  Reference: Tasaki, Springer 2020, Problem~2.5.d, p.~40,
+solution pp.~498--499, equations (S.22)--(S.23), with Theorems~2.3--2.4,
+pp.~42--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
