@@ -13362,8 +13362,10 @@ imports the abstract Hamiltonian and energy companion, and
         2020, Problem~2.5.b, p.~38; solution p.~497).
   \item Problem 2.5.b single-cluster transport bridge.  The declaration
         \texttt{siteConfigEquiv} lifts a site equivalence \(e:\alpha\simeq\beta\)
-        to the corresponding equivalence of spin-configuration spaces.  The
-        theorems \texttt{reindex\_onSiteS\_siteEquiv} and
+        to the corresponding equivalence of spin-configuration spaces, with
+        simp rules \texttt{siteConfigEquiv\_apply} and
+        \texttt{siteConfigEquiv\_symm\_apply}.  The theorems
+        \texttt{reindex\_onSiteS\_siteEquiv} and
         \texttt{reindex\_spinSDot\_siteEquiv} show that matrix reindexing along
         this configuration equivalence simply transports the site labels:
         \[
@@ -13377,7 +13379,9 @@ imports the abstract Hamiltonian and energy companion, and
         transported center-leaf dot products.  The canonical equivalence
         \(\mathrm{Fin}(|s|+1)\simeq\mathrm{Option}(s)\), sending \(0\) to
         \(\mathrm{none}\) and successors to \(\mathrm{some}\) leaves via
-        \texttt{Finset.equivFin}, yields the named option-star identity
+        \texttt{Finset.equivFin}, uses the finite-sum reindexing helper
+        \texttt{sum\_fin\_erase\_zero\_eq\_sum\_succ}, and yields the named
+        option-star identity
         \texttt{transportedSingleClusterHamiltonianS\_option\_eq}.
 \end{itemize}
 
