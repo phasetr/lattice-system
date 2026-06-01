@@ -13172,6 +13172,48 @@ imports the abstract Hamiltonian and energy companion, and
         \texttt{singleClusterHamiltonianS\_minEigenvalue\_eq\_gs\_of\_exists\_gs\_sector\_and\_exists\_joint\_lower}
         package the Hermitian-min lower bound and conditional equality
         endpoints ($\gamma$-5 step 335).
+  \item Single-cluster joint-Casimir witness bridge:
+        \texttt{singleCluster\_exists\_joint\_casimir\_energy\_lower\_of\_mag\_component\_joint\_lower}
+        composes the magnetization projection bridge with the invariant
+        submodule Casimir bridge.  Given a non-zero real-energy Hamiltonian
+        eigenvector \(v\),
+        \[
+          \hat H v=\mu v,\qquad \mu\in\mathbb R ,
+        \]
+        the theorem
+        \texttt{singleClusterHamiltonianS\_eigenvec\_exists\_weight\_component}
+        provides a magnetization value \(M\) and a non-zero component
+        \(v_M=\texttt{magProjFn}\,M\,v\) with the same Hamiltonian eigenvalue:
+        \[
+          v_M\ne0,\qquad \hat H v_M=\mu v_M,\qquad v_M\in\mathcal H_M .
+        \]
+        Thus \(v_M\) lies in
+        \[
+          \operatorname{Eig}(\hat H,\mu)\cap\mathcal H_M,
+        \]
+        proving that the corresponding
+        \texttt{singleClusterHamiltonianMagEigenspaceSubmodule} is non-zero.
+        Under the explicit hypothesis
+        \texttt{[IsAlgClosed \(\mathbb C\)]},
+        \texttt{exists\_joint\_casimir\_eigenvector\_in\_singleClusterHamiltonianMagEigenspaceSubmodule}
+        then returns a non-zero vector \(w\) in the same submodule such that
+        \[
+          \hat S_{\rm tot}^2w=\alpha w,\qquad
+          \hat S_R^2w=\beta w .
+        \]
+        The submodule membership also contains the Hamiltonian eigenspace
+        membership, so Lean recovers \(\hat H w=\mu w\) by rewriting
+        \texttt{Module.End.eigenspace} membership through
+        \texttt{Matrix.mulVecLin\_apply}.  Therefore any remaining lower-bound
+        callback for such extracted joint vectors supplies the same-energy
+        witness callback introduced in the previous item.  The companion
+        declarations
+        \texttt{singleClusterGSEnergyS\_re\_le\_hermitianMinEigenvalue\_of\_mag\_component\_joint\_lower},
+        \texttt{singleClusterHamiltonianS\_minEigenvalue\_eq\_gs\_of\_gs\_sector\_and\_mag\_joint\_lower},
+        and
+        \texttt{singleClusterHamiltonianS\_minEigenvalue\_eq\_gs\_of\_exists\_gs\_sector\_and\_mag\_joint\_lower}
+        pass this witness callback into the PR~\#4044 lower/equality wrappers
+        ($\gamma$-5 step 336).
 \end{itemize}
 
 \textbf{Strategic gaps.} The deferred pieces are:
