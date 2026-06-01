@@ -2264,6 +2264,7 @@ Issue #412; assembled in PRs #875–#879. All theorems live in
 | `spinSDot_self_mulVec` / `_expectation` / `_expectation_normalized` / `_expectation_allAlignedStateS` | **universal single-site Casimir expectation `⟨Φ, Ŝ_x · Ŝ_x · Φ⟩ = S(S+1)`** for normalized `Φ`. Direct from `spinSDot_self`. Foundation for Tasaki Problem 2.5.c (γ-7) (PR #920, file `Quantum/SpinS/SingleSiteCasimirExpectation.lean`) |
 | `singleSiteSpinSquareExpectationS` / `_axis_sum` / `_axis_sum_normalized` / `_axis1_eq_of_axes_equal_normalized` / `_all_axes_eq_of_axes_equal_normalized` | **Problem 2.5.c single-site squared-expectation bridge**: packages `⟨Φ,(Ŝ_x^(α))² Φ⟩`, proves the three-axis sum is the universal single-site Casimir expectation, and under normalized-state plus equal-axis hypotheses returns `N(N+2)/12 = S(S+1)/3` for each Cartesian axis. This isolates the algebraic reduction while leaving the AFM ground-state SU(2)-symmetry input explicit. Tasaki, Springer 2020, Problem 2.5.c, p. 43 (PR #4056, file `Quantum/SpinS/Problem25cSingleSiteSquared.lean`) |
 | `dotProduct_star_mulVec_eq_dotProduct_star_conjTranspose_mulVec` / `singleSiteSpinSquareExpectationS_eq_of_conj_invariant` | **Problem 2.5.c unitary symmetry input**: if a many-body unitary `T` conjugates a single-site spin component `A` to `B`, `T† = T⁻¹`, and the state is fixed by `T⁻¹`, then the squared single-site expectations of `A` and `B` are equal. This turns future SU(2)/axis-swap ground-state invariance into the equal-axis hypothesis required by PR #4056. Tasaki, Springer 2020, Problem 2.5.c, p. 43 and Theorem 2.4 context, pp. 43-44 (PR #4057, file `Quantum/SpinS/Problem25cUnitaryAxisInput.lean`) |
+| `manyBodyTensorS_conjTranspose` / `AxisSwapUnitaryS.tensor_conjTranspose` / `axisSwapUnitarySSpinS_tensor_conjTranspose` / `singleSiteSpinSquareExpectationS_axis3_eq_axis2_of_axisSwapInvariant` | **Problem 2.5.c lifted axis-swap adjoint input**: proves `(⊗_x W_x)† = ⊗_x W_x†`, specializes `U† = U⁻¹` to the many-body spin-`S` axis-swap tensor, and uses the PR #4057 bridge plus `AxisSwapUnitaryS.tensor_conj_onSiteS` to equate the axis-3 and axis-2 squared single-site expectations under an explicit lifted-axis-swap invariance hypothesis. Tasaki, Springer 2020, Problem 2.5.c, p. 43 and Theorem 2.4 context, pp. 43-44 (PR #4058, file `Quantum/SpinS/Problem25cAxisSwapAdjointInput.lean`) |
 | `spinSOpPlus_one_eq_spinHalfOpPlus` / `_Minus_` / `_Op1_` / `_Op2_` / `_Op3_` | **spin-`S` ↔ spin-`1/2` bridge at `N = 1`**: `spinSOp{Plus, Minus, 1, 2, 3} 1 = spinHalfOp{Plus, Minus, 1, 2, 3}` (each is the corresponding half-Pauli matrix) (PRs #922 + #923, file `Quantum/SpinS/SpinHalfSpecialization.lean`) |
 | `onSiteS_spinSOp3_mulVec_allAlignedStateS` / `allAlignedStateS_expectation_onSiteS_spinSOp3` / `_sq` / `onSiteS_spinSOp3_sq_mulVec_allAlignedStateS` | **single-site `Ŝ^(3)_x` and `(Ŝ^(3)_x)²` on `|c..c⟩`**: `Ŝ^(3)_x · |c..c⟩ = (N/2 − c.val) · |c..c⟩` and expectation of `(Ŝ^(3)_x)²` is `(N/2 − c.val)²` (PR #925, file `Quantum/SpinS/SingleSiteZExpectation.lean`) |
 | `allAlignedStateS_expectation_onSiteS_spinSOp1_sq_add_spinSOp2_sq` | **xy-plane Casimir expectation**: `⟨((Ŝ^(1)_x)² + (Ŝ^(2)_x)²) · |c..c⟩⟩ = N(N+2)/4 − (N/2 − c.val)²`. From #920 minus #925; for `c=0` gives `S/2` (PR #926, file `Quantum/SpinS/SingleSiteXYExpectation.lean`) |
@@ -2700,8 +2701,10 @@ mathematical work):
   Casimir-to-equal-axes algebraic bridge is live under
   `Quantum/SpinS/Problem25cSingleSiteSquared.lean`, and the unitary-conjugation
   expectation input is live under
-  `Quantum/SpinS/Problem25cUnitaryAxisInput.lean`. The remaining input is the
-  AFM ground-state SU(2)-symmetry/equal-axis hypothesis.
+  `Quantum/SpinS/Problem25cUnitaryAxisInput.lean`. The lifted axis-swap adjoint
+  and axis-2/axis-3 expectation equality input is live under
+  `Quantum/SpinS/Problem25cAxisSwapAdjointInput.lean`. The remaining input is
+  the AFM ground-state SU(2)-symmetry/equal-axis hypothesis.
 - **Problem 2.5.d** (two-spin correlation under MLM).
 
 The generic graph-centric `neelStateOf` (Phase 3 PR #331) is the

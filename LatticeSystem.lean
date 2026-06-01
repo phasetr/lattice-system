@@ -93,6 +93,7 @@ import LatticeSystem.Quantum.SpinS.HeisenbergGraphLocal
 import LatticeSystem.Quantum.SpinS.GraphLocalStarBlock
 import LatticeSystem.Quantum.SpinS.GraphLocalStarLowerBound
 import LatticeSystem.Quantum.SpinS.GraphLocalStarSumWrapper
+import LatticeSystem.Quantum.SpinS.Problem25cAxisSwapAdjointInput
 import LatticeSystem.Quantum.SpinS.Problem25cSingleSiteSquared
 import LatticeSystem.Quantum.SpinS.Problem25cUnitaryAxisInput
 import LatticeSystem.Quantum.SpinS.SingleSiteXYExpectation
