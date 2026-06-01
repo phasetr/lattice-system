@@ -96,6 +96,7 @@ import LatticeSystem.Quantum.SpinS.GraphLocalStarSumWrapper
 import LatticeSystem.Quantum.SpinS.Problem25cAxisSwapAdjointInput
 import LatticeSystem.Quantum.SpinS.Problem25cAxisSwapEqualAxes
 import LatticeSystem.Quantum.SpinS.Problem25cSingleSiteSquared
+import LatticeSystem.Quantum.SpinS.Problem25cTwoSymmetryAxisInput
 import LatticeSystem.Quantum.SpinS.Problem25cUnitaryAxisInput
 import LatticeSystem.Quantum.SpinS.SingleSiteXYExpectation
 import LatticeSystem.Lattice.Graph

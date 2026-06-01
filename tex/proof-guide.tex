@@ -14288,6 +14288,28 @@ spin-\(S\) rotation infrastructure only supplies the axis-1 rotation used to
 swap axes \(2\) and \(3\).  Reference: Tasaki, Springer 2020,
 Problem~2.5.c, p.~43, and the Theorem~2.4 symmetry context, pp.~43--44.
 
+\textbf{Problem 2.5.c two-symmetry axis input (PR~\#4060)}:
+the next module replaces the bare equality \(E_1=E_2\) in PR~\#4059 by an
+explicit second unitary-symmetry input.  Suppose a many-body unitary \(T\) and
+its inverse \(T^{-1}\) satisfy
+\[
+  T^\dagger=T^{-1},\qquad T^{-1}T=1,\qquad T^{-1}\Phi=\Phi,
+\]
+and that the local spin components are conjugate at site \(x\):
+\[
+  T\hat S_x^{(2)}T^{-1}=\hat S_x^{(1)}.
+\]
+The PR~\#4057 unitary bridge gives \(E_1(x,\Phi)=E_2(x,\Phi)\).  Feeding this
+into PR~\#4059, together with the lifted axis-swap invariance
+\((\otimes_x U^{-1})\Phi=\Phi\), proves
+\[
+  E_1(x,\Phi)=E_2(x,\Phi)=E_3(x,\Phi)=\frac{N(N+2)}{12}.
+\]
+The concrete construction of \(T\), or a theorem saying that the AFM ground
+state is fixed by such a symmetry, remains the open mathematical input.
+Reference: Tasaki, Springer 2020, Problem~2.5.c, p.~43, and the
+Theorem~2.4 symmetry context, pp.~43--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
