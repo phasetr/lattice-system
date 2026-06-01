@@ -14640,7 +14640,10 @@ sites, the two-site ladder operator satisfies
 \[
   (\hat S_x^+\hat S_y^-)^\dagger=\hat S_x^-\hat S_y^+,
 \]
-formalized as \texttt{twoSpinPlusMinus\_ladder\_conjTranspose}.  Therefore
+formalized as \texttt{twoSpinPlusMinus\_ladder\_conjTranspose}.  The generic
+bridge \path{dotProduct_star_conjTranspose_mulVec_eq_star} identifies
+the expectation of \(M^\dagger\) with the complex conjugate of the expectation
+of \(M\), so
 \[
   C^{-+}_{xy}=\overline{C^{+-}_{xy}},
 \]
