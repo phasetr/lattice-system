@@ -13113,6 +13113,32 @@ imports the abstract Hamiltonian and energy companion, and
         step needed to extract simultaneous total/leaf Casimir data inside the
         single-cluster magnetization/Hamiltonian component ($\gamma$-5 step
         333).
+  \item Single-cluster Casimir invariance bridge:
+        \texttt{singleClusterHamiltonianS\_commute\_totalSpinSSquared}
+        and
+        \texttt{singleClusterHamiltonianS\_commute\_leafSpinSSquared}
+        turn the Casimir decomposition
+        \[
+          (2:\mathbb C)\,\hat H
+          = \hat S_{\rm tot}^2 - \hat S_0^2 - \hat S_R^2
+        \]
+        into concrete commutation theorems.  The central-site term
+        \(\hat S_0^2\) is scalar, and the total/leaf commutation follows from
+        the general sublattice-Casimir API after identifying
+        \(\hat S_R^2\) with the sublattice Casimir of the predicate \(x\ne 0\).
+        Hence the submodule
+        \[
+          \operatorname{Eig}(\hat H,\mu) \cap \mathcal H_M
+        \]
+        is invariant under both \(\hat S_{\rm tot}^2\) and \(\hat S_R^2\):
+        the eigenspace part is preserved by commutation with \(\hat H\), and
+        the magnetization part is preserved by the existing total and
+        sublattice Casimir magnetization-preservation theorems.  The theorem
+        \texttt{exists\_joint\_casimir\_eigenvector\_in\_singleClusterHamiltonianMagEigenspaceSubmodule}
+        then applies the joint invariant-submodule bridge to any non-zero
+        such submodule, producing simultaneous total/leaf Casimir eigenvector
+        data under the explicit algebraically closed field hypothesis
+        \texttt{[IsAlgClosed \(\mathbb C\)]} ($\gamma$-5 step 334).
 \end{itemize}
 
 \textbf{Strategic gaps.} The deferred pieces are:
