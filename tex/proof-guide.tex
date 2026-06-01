@@ -14380,6 +14380,47 @@ remaining concrete input is to show that the lifted rotations commute with the
 AFM Hamiltonian.  Reference: Tasaki, Springer 2020, Problem~2.5.c, p.~43, and
 the Theorem~2.4 symmetry context, pp.~43--44.
 
+\textbf{Problem 2.5.c lifted z-axis rotation commutation (PR pending)}:
+the new file
+\texttt{Quantum/SpinS/Problem25cZAxisRotationCommutation.lean} supplies the
+concrete Hamiltonian-side commutation input for the phase bridge.  The
+single-site rotation of PR~\#4061 is diagonal:
+\[
+  \exp(-i\theta \hat S^{(3)})_{kk}
+    = \exp\!\left(-i\theta\left(\frac N2-k\right)\right).
+\]
+Therefore the lifted tensor rotation has diagonal entry
+\[
+  \prod_{x\in V}
+  \exp\!\left(-i\theta\left(\frac N2-\sigma_x\right)\right)
+  =
+  \exp\!\left(-i\theta\left(\frac{|V|N}{2}
+    -\sum_{x\in V}\sigma_x\right)\right),
+\]
+which is exactly the diagonal entry of
+\[
+  \exp(-i\theta\,\hat S^{(3)}_{\mathrm{tot}}).
+\]
+This proves
+\[
+  \bigotimes_{x\in V}\exp(-i\theta \hat S^{(3)})
+  =
+  \exp(-i\theta\,\hat S^{(3)}_{\mathrm{tot}}).
+\]
+The existing SU(2)-invariance theorem gives
+\[
+  [\hat H_J,\hat S^{(3)}_{\mathrm{tot}}]=0,
+\]
+and the standard exponential commutation lemma then yields
+\[
+  \left[\hat H_J,
+    \bigotimes_{x\in V}\exp(-i\theta \hat S^{(3)})\right]=0.
+\]
+This is the concrete commutation theorem needed to feed the lifted z-axis
+rotation into the one-dimensional eigenspace phase bridge.  Reference:
+Tasaki, Springer 2020, Problem~2.5.c, p.~43, and the Theorem~2.4 symmetry
+context, pp.~43--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
