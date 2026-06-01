@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.HermitianMinLeOfEigenvector
 import LatticeSystem.Quantum.SpinS.SingleClusterHamiltonianEnergy
+import LatticeSystem.Quantum.SpinS.SingleClusterLeafCasimirBound
 
 /-!
 # Minimum-eigenvalue bridge for the single-cluster Hamiltonian
@@ -264,6 +265,59 @@ theorem singleClusterGSEnergyS_re_le_hermitianMinEigenvalue_of_joint_casimir_bou
     (singleCluster_global_eigenvalue_lower_of_joint_casimir_bounds
       (z := z) N hjoint_bounds)
 
+/-- **Joint total-Casimir lower bounds give the global lower-bound callback**:
+if every non-zero real-energy eigenvector has joint Casimir eigenvalues
+`α, β` and the total-Casimir eigenvalue satisfies the predicted lower bound,
+then it satisfies the global real-eigenvalue lower callback.
+
+The leaf-Casimir upper bound is no longer a hypothesis: it follows from
+`leafSpinSSquared_eigenvalue_re_le_max`, the sublattice spectral maximum bound
+specialized to the leaf set. -/
+theorem singleCluster_global_eigenvalue_lower_of_joint_casimir_total_lower
+    (N : ℕ)
+    (hjoint_total_lower : ∀ {μ : ℝ} {v : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      v ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec v = (μ : ℂ) • v →
+      ∃ α β : ℂ,
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec v = α • v ∧
+        (leafSpinSSquared z N).mulVec v = β • v ∧
+        ((z : ℝ) - 1) * (N : ℝ) / 2 *
+          (((z : ℝ) - 1) * (N : ℝ) / 2 + 1) ≤ α.re) :
+    ∀ {μ : ℝ} {v : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      v ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec v = (μ : ℂ) • v →
+      (singleClusterGSEnergyS z N).re ≤ μ := by
+  exact singleCluster_global_eigenvalue_lower_of_joint_casimir_bounds
+    (z := z) N (by
+      intro μ v hv_ne hH
+      rcases hjoint_total_lower hv_ne hH with ⟨α, β, htot, hR, htot_lower⟩
+      exact ⟨α, β, htot, hR, htot_lower,
+        leafSpinSSquared_eigenvalue_re_le_max (z := z) N hv_ne hR⟩)
+
+/-- **Single-cluster min-energy lower bound from joint total-Casimir lower
+data**: joint Casimir eigenvalues plus the predicted lower bound on the total
+Casimir eigenvalue imply
+`Re (singleClusterGSEnergyS z N) ≤ hermitianMinEigenvalue H`.
+
+The leaf-Casimir upper bound is supplied internally by the single-cluster
+leaf-Casimir spectral maximum theorem. -/
+theorem singleClusterGSEnergyS_re_le_hermitianMinEigenvalue_of_joint_casimir_total_lower
+    (N : ℕ)
+    (hjoint_total_lower : ∀ {μ : ℝ} {v : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      v ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec v = (μ : ℂ) • v →
+      ∃ α β : ℂ,
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec v = α • v ∧
+        (leafSpinSSquared z N).mulVec v = β • v ∧
+        ((z : ℝ) - 1) * (N : ℝ) / 2 *
+          (((z : ℝ) - 1) * (N : ℝ) / 2 + 1) ≤ α.re) :
+    (singleClusterGSEnergyS z N).re ≤
+      hermitianMinEigenvalue (singleClusterHamiltonianS_isHermitian z N) := by
+  exact singleClusterGSEnergyS_re_le_hermitianMinEigenvalue_of_global_eigenvalue_lower
+    (z := z) N
+    (singleCluster_global_eigenvalue_lower_of_joint_casimir_total_lower
+      (z := z) N hjoint_total_lower)
+
 /-- **Single-cluster conditional min-energy equality from a GS-sector witness and
 global lower bound**: a concrete non-zero vector in the predicted GS Casimir
 sector gives the upper bound, while the global real-eigenvalue lower-bound
@@ -428,5 +482,65 @@ theorem singleClusterHamiltonianS_minEigenvalue_eq_gs_of_exists_gs_sector_and_jo
   exact
     singleClusterHamiltonianS_minEigenvalue_eq_gs_of_gs_sector_and_joint_casimir_bounds
       (z := z) N hv_ne htot hR hjoint_bounds
+
+/-- **Single-cluster conditional equality from a GS-sector witness and joint
+total-Casimir lower data**: the witness gives the upper bound, while joint
+Casimir spectral data plus the total-Casimir lower bound gives the reverse
+inequality.  The leaf-Casimir upper bound is derived automatically from the
+leaf spectral maximum theorem. -/
+theorem singleClusterHamiltonianS_minEigenvalue_eq_gs_of_gs_sector_and_joint_casimir_total_lower
+    (N : ℕ) {v : (Fin (z + 1) → Fin (N + 1)) → ℂ}
+    (hv_ne : v ≠ 0)
+    (htot : (totalSpinSSquared (Fin (z + 1)) N).mulVec v =
+        (((z : ℂ) - 1) * (N : ℂ) / 2 *
+          (((z : ℂ) - 1) * (N : ℂ) / 2 + 1)) • v)
+    (hR : (leafSpinSSquared z N).mulVec v =
+        ((z : ℂ) * (N : ℂ) / 2 *
+          ((z : ℂ) * (N : ℂ) / 2 + 1)) • v)
+    (hjoint_total_lower : ∀ {μ : ℝ} {w : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      w ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec w = (μ : ℂ) • w →
+      ∃ α β : ℂ,
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec w = α • w ∧
+        (leafSpinSSquared z N).mulVec w = β • w ∧
+        ((z : ℝ) - 1) * (N : ℝ) / 2 *
+          (((z : ℝ) - 1) * (N : ℝ) / 2 + 1) ≤ α.re) :
+    hermitianMinEigenvalue (singleClusterHamiltonianS_isHermitian z N) =
+      (singleClusterGSEnergyS z N).re := by
+  exact singleClusterHamiltonianS_hermitianMinEigenvalue_eq_gs_of_gs_sector_and_global_lower
+    (z := z) N hv_ne htot hR
+    (singleCluster_global_eigenvalue_lower_of_joint_casimir_total_lower
+      (z := z) N hjoint_total_lower)
+
+/-- **Existential conditional equality from joint total-Casimir lower data**:
+the Clebsch--Gordan witness package gives the upper bound, while joint
+Casimir spectral data plus the total-Casimir lower bound gives the reverse
+inequality.  The leaf-Casimir upper bound is derived automatically from the
+leaf spectral maximum theorem. -/
+theorem
+    singleClusterHamiltonianS_minEigenvalue_eq_gs_of_exists_gs_sector_and_joint_casimir_total_lower
+    (N : ℕ)
+    (hexists : ∃ v : (Fin (z + 1) → Fin (N + 1)) → ℂ,
+      v ≠ 0 ∧
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec v =
+          (((z : ℂ) - 1) * (N : ℂ) / 2 *
+            (((z : ℂ) - 1) * (N : ℂ) / 2 + 1)) • v ∧
+        (leafSpinSSquared z N).mulVec v =
+          ((z : ℂ) * (N : ℂ) / 2 *
+            ((z : ℂ) * (N : ℂ) / 2 + 1)) • v)
+    (hjoint_total_lower : ∀ {μ : ℝ} {w : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      w ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec w = (μ : ℂ) • w →
+      ∃ α β : ℂ,
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec w = α • w ∧
+        (leafSpinSSquared z N).mulVec w = β • w ∧
+        ((z : ℝ) - 1) * (N : ℝ) / 2 *
+          (((z : ℝ) - 1) * (N : ℝ) / 2 + 1) ≤ α.re) :
+    hermitianMinEigenvalue (singleClusterHamiltonianS_isHermitian z N) =
+      (singleClusterGSEnergyS z N).re := by
+  rcases hexists with ⟨v, hv_ne, htot, hR⟩
+  exact
+    singleClusterHamiltonianS_minEigenvalue_eq_gs_of_gs_sector_and_joint_casimir_total_lower
+      (z := z) N hv_ne htot hR hjoint_total_lower
 
 end LatticeSystem.Quantum
