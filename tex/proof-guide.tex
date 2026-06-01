@@ -14751,6 +14751,39 @@ z-rotation phases as in PR~\#4075.  Reference: Tasaki, Springer 2020,
 Problem~2.5.d, p.~40, solution pp.~498--499, equations (S.22)--(S.23), with
 Theorems~2.3--2.4, pp.~42--44.
 
+\textbf{Problem 2.5.d balanced-sector ladder witness (PR~\#4077)}.
+The file \path{Quantum/SpinS/Problem25dBalancedSectorWitness.lean}
+supplies the sector-local strict ladder entry required by PR~\#4076 at the
+balanced sector \(M_0=|A|N\).  First,
+\path{twoSpinPlusMinus_ladder_signed_entry_re_pos_of_off_two_site_raise_lower}
+isolates the strict-entry calculation: for \(A(x)\ne A(y)\), agreement away
+from \(x,y\) together with
+\[
+  \sigma_x+1=\tau_x,\qquad \tau_y+1=\sigma_y
+\]
+makes the bare \(\hat S_x^+\hat S_y^-\) matrix entry strictly positive, while
+the Marshall sign and bipartite gauge sign cancel to \(+1\).
+
+For the sector witness, take
+\(\eta=\texttt{neelConfigOfS}(\neg A,N)\).  Then
+\[
+  \sum_z \eta_z = |A|N
+\]
+by \path{magSumS_neelConfigOfS_complement}.  If \(x\notin A\) and \(y\in A\),
+use \(\sigma=\eta\) and update \(\tau\) by setting
+\(\tau_x=1,\tau_y=N-1\).  If \(x\in A\) and \(y\notin A\), reverse the
+orientation: use \(\tau=\eta\) and update \(\sigma_x=N-1,\sigma_y=1\).
+The two-site sum identity \path{magSumS_configUpdateTwo_eq} keeps both
+configurations in \(M_0\), and the raise/lower equalities above feed the
+strict-entry lemma.  The theorem
+\path{exists_twoSpinPlusMinus_ladder_signed_entry_re_pos_of_bipartite_ne_balanced_sector}
+packages this witness, and
+\path{twoSpinCorrelationS_bipartite_signed_re_pos_of_marshall_balanced_sector_cross_eigenphase}
+feeds it into the sector-supported eigenspace-phase wrapper so the balanced
+sector no longer needs an explicit strict-entry hypothesis.  Reference:
+Tasaki, Springer 2020, Problem~2.5.d, p.~40, solution pp.~498--499, equations
+(S.22)--(S.23), with Theorems~2.3--2.4, pp.~42--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
