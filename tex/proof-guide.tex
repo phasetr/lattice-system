@@ -14267,6 +14267,27 @@ equate all three axes remain separate inputs.  Reference: Tasaki, Springer
 2020, Problem~2.5.c, p.~43, and the Theorem~2.4 symmetry context,
 pp.~43--44.
 
+\textbf{Problem 2.5.c axis-swap equal-axes wrapper (PR~\#4059)}:
+the next module combines the preceding two Problem~2.5.c inputs.  Write
+\[
+  E_\alpha(x,\Phi)=
+  \langle\Phi,(\hat S_x^{(\alpha)})^2\Phi\rangle .
+\]
+For normalized \(\Phi\), PR~\#4056 proves the desired value from
+\(E_1=E_2=E_3\).  PR~\#4058 supplies \(E_3=E_2\) whenever the inverse
+lifted axis-swap unitary fixes \(\Phi\).  Therefore the wrapper records that
+\[
+  (\otimes_x U^{-1})\Phi=\Phi,\qquad E_1(x,\Phi)=E_2(x,\Phi)
+\]
+together imply
+\[
+  E_1(x,\Phi)=E_2(x,\Phi)=E_3(x,\Phi)=\frac{N(N+2)}{12}.
+\]
+The remaining equality \(E_1=E_2\) is still explicit: current general
+spin-\(S\) rotation infrastructure only supplies the axis-1 rotation used to
+swap axes \(2\) and \(3\).  Reference: Tasaki, Springer 2020,
+Problem~2.5.c, p.~43, and the Theorem~2.4 symmetry context, pp.~43--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
