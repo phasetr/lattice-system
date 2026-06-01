@@ -14454,6 +14454,39 @@ axis-swap ground-state invariance or ray-invariance.  Reference: Tasaki,
 Springer 2020, Problem~2.5.c, p.~43, and the Theorem~2.4 symmetry context,
 pp.~43--44.
 
+\textbf{Problem 2.5.c axis-swap ground-state phase input (PR~\#4066)}:
+the new file
+\texttt{Quantum/SpinS/Problem25cAxisSwapGroundStatePhase.lean} removes the
+last exact axis-swap state-invariance hypothesis from the previous wrapper.
+At the SU(2) point $\lambda=1$, $D=0$, the axis-swapped Hamiltonian
+\[
+  \sum_{x,y}J_{x,y}\left(\hat S_x^{(1)}\hat S_y^{(1)}
+    +\lambda\hat S_x^{(2)}\hat S_y^{(2)}
+    +\hat S_x^{(3)}\hat S_y^{(3)}\right)
+  +D\sum_x(\hat S_x^{(2)})^2
+\]
+also reduces to the isotropic Heisenberg Hamiltonian $\hat H_J$.  Combined
+with the existing axis-swap gauge equivalence, this gives
+\[
+  \hat H_J\Theta^{-1}=\Theta^{-1}\hat H_J
+\]
+for the inverse lifted axis-swap unitary $\Theta^{-1}$.  Since
+$(\Theta^{-1})^\dagger\Theta^{-1}=1$, the one-dimensional eigenspace phase
+bridge from PR~\#4063 gives a unit-modulus phase $c_{\mathrm{swap}}$ with
+\[
+  \Theta^{-1}\Phi=c_{\mathrm{swap}}\Phi,\qquad
+  \overline{c_{\mathrm{swap}}}c_{\mathrm{swap}}=1.
+\]
+The phase-invariant expectation bridge then gives the axis-swap equality
+$E_3=E_2$.  Together with the z-axis phase equality $E_1=E_2$ from
+PR~\#4065 and the single-site Casimir identity, a normalized non-zero vector
+in a one-dimensional Heisenberg eigenspace satisfies
+\[
+  E_1=E_2=E_3=\frac{N(N+2)}{12}.
+\]
+Reference: Tasaki, Springer 2020, Problem~2.5.c, p.~43, and the
+Theorem~2.4 symmetry context, pp.~43--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
