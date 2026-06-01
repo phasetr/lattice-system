@@ -13447,6 +13447,25 @@ imports the abstract Hamiltonian and energy companion, and
           \le
           \lambda_{\min}(\hat H_G(1/2)).
         \]
+        The closed-form wrappers substitute the Problem~2.5.a formula
+        \[
+          \operatorname{Re}E_{\rm GS}(z)
+          =
+          -\frac{N}{2}\left(\frac{zN}{2}+1\right)
+        \]
+        and use the graph identity \(|N_G(x)|=\deg_G(x)\).  Thus the
+        one-sided graph-Hamiltonian theorem is stated in the expected
+        degree form
+        \[
+          \sum_{x\in A}
+          -\frac{N}{2}\left(\frac{\deg_G(x)N}{2}+1\right)
+          \le
+          \lambda_{\min}(\hat H_G(1/2)),
+        \]
+        still under the explicit positive-degree assumption on the selected
+        side.  Isolated centers are intentionally excluded because their
+        local star Hamiltonian is zero, whereas the closed formula would
+        contribute a negative number.
         The exact Lean names are listed in \texttt{docs/index.md}.  This is
         the graph-local form of Tasaki's Problem~2.5.b lower-bound argument
         (Tasaki, Springer 2020, Problem~2.5.b, p.~38; solution p.~497).

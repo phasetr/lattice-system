@@ -120,6 +120,38 @@ theorem tasaki25b_graphLocalCluster_sum_lower_bound
   exact graphLocalClusterHamiltonianS_minEigenvalue_lower_singleClusterGSEnergy
     G x N (hdeg x hx)
 
+/-- Closed-form finite-sum Problem 2.5.b lower bound for any chosen family of
+graph-local stars with positive local degree. -/
+theorem tasaki25b_graphLocalCluster_sum_lower_bound_closed_form
+    [IsAlgClosed ℂ] (G : SimpleGraph Λ) [DecidableRel G.Adj]
+    (s : Finset Λ) (N : ℕ)
+    (hdeg : ∀ x ∈ s, 1 ≤ (G.neighborFinset x).card) :
+    ∑ x ∈ s,
+        -((N : ℝ) / 2) *
+          (((G.neighborFinset x).card : ℝ) * (N : ℝ) / 2 + 1) ≤
+      hermitianMinEigenvalue
+        (isHermitian_sum s (fun x => graphLocalClusterHamiltonianS G x N)
+          (fun x _hx => graphLocalClusterHamiltonianS_isHermitian G x N)) := by
+  simpa [singleClusterGSEnergyS_re_eq] using
+    tasaki25b_graphLocalCluster_sum_lower_bound G s N hdeg
+
+/-- Closed-form finite-sum Problem 2.5.b lower bound with the local size stated
+as the graph degree. -/
+theorem tasaki25b_graphLocalCluster_sum_lower_bound_degree_closed_form
+    [IsAlgClosed ℂ] (G : SimpleGraph Λ) [DecidableRel G.Adj]
+    (s : Finset Λ) (N : ℕ)
+    (hdeg : ∀ x ∈ s, 1 ≤ G.degree x) :
+    ∑ x ∈ s,
+        -((N : ℝ) / 2) * ((G.degree x : ℝ) * (N : ℝ) / 2 + 1) ≤
+      hermitianMinEigenvalue
+        (isHermitian_sum s (fun x => graphLocalClusterHamiltonianS G x N)
+          (fun x _hx => graphLocalClusterHamiltonianS_isHermitian G x N)) := by
+  have hcard : ∀ x ∈ s, 1 ≤ (G.neighborFinset x).card := by
+    intro x hx
+    simpa using hdeg x hx
+  simpa using
+    tasaki25b_graphLocalCluster_sum_lower_bound_closed_form G s N hcard
+
 /-- One-sided bipartite Problem 2.5.b lower bound for the half-coupling graph
 Hamiltonian, using the decomposition into graph-local stars over one side of the
 bipartition. -/
@@ -171,5 +203,43 @@ theorem tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound
     _ = rayleighOnVec (heisenbergHamiltonianOnGraphS G ((1 : ℂ) / 2) N) v := by
         rw [hdecomp]
     _ = hermitianMinEigenvalue hGraph := hv
+
+/-- Closed-form one-sided bipartite Problem 2.5.b lower bound for the
+half-coupling graph Hamiltonian. -/
+theorem tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_closed_form
+    [IsAlgClosed ℂ] (G : SimpleGraph Λ) [DecidableRel G.Adj]
+    {A : Λ → Prop} [DecidablePred A]
+    (hA : ∀ {x y : Λ}, G.Adj x y → A x ≠ A y) (N : ℕ)
+    (hdeg : ∀ x ∈ (Finset.univ : Finset Λ).filter A,
+      1 ≤ (G.neighborFinset x).card) :
+    ∑ x ∈ (Finset.univ : Finset Λ).filter A,
+        -((N : ℝ) / 2) *
+          (((G.neighborFinset x).card : ℝ) * (N : ℝ) / 2 + 1) ≤
+      hermitianMinEigenvalue
+        (heisenbergHamiltonianOnGraphS_isHermitian G
+          (by norm_num : star ((1 : ℂ) / 2) = (1 : ℂ) / 2) N) := by
+  simpa [singleClusterGSEnergyS_re_eq] using
+    tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound G hA N hdeg
+
+/-- Closed-form one-sided bipartite Problem 2.5.b lower bound for the
+half-coupling graph Hamiltonian, with the local size stated as the graph degree.
+-/
+theorem tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_degree_closed_form
+    [IsAlgClosed ℂ] (G : SimpleGraph Λ) [DecidableRel G.Adj]
+    {A : Λ → Prop} [DecidablePred A]
+    (hA : ∀ {x y : Λ}, G.Adj x y → A x ≠ A y) (N : ℕ)
+    (hdeg : ∀ x ∈ (Finset.univ : Finset Λ).filter A, 1 ≤ G.degree x) :
+    ∑ x ∈ (Finset.univ : Finset Λ).filter A,
+        -((N : ℝ) / 2) * ((G.degree x : ℝ) * (N : ℝ) / 2 + 1) ≤
+      hermitianMinEigenvalue
+        (heisenbergHamiltonianOnGraphS_isHermitian G
+          (by norm_num : star ((1 : ℂ) / 2) = (1 : ℂ) / 2) N) := by
+  have hcard : ∀ x ∈ (Finset.univ : Finset Λ).filter A,
+      1 ≤ (G.neighborFinset x).card := by
+    intro x hx
+    simpa using hdeg x hx
+  simpa using
+    tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_closed_form
+      G hA N hcard
 
 end LatticeSystem.Quantum
