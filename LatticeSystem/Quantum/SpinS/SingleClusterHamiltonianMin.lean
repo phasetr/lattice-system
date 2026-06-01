@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.HermitianMinLeOfEigenvector
 import LatticeSystem.Quantum.SpinS.SingleClusterHamiltonianEnergy
+import LatticeSystem.Quantum.SpinS.SingleClusterCoupledSectorEnergy
 import LatticeSystem.Quantum.SpinS.SingleClusterLeafCasimirBound
 
 /-!
@@ -317,6 +318,57 @@ theorem singleClusterGSEnergyS_re_le_hermitianMinEigenvalue_of_joint_casimir_tot
     (z := z) N
     (singleCluster_global_eigenvalue_lower_of_joint_casimir_total_lower
       (z := z) N hjoint_total_lower)
+
+/-- **Coupled leaf/center sector data give the global lower-bound callback**:
+if `1 ≤ z` and every non-zero real-energy `H`-eigenvector belongs to a
+magnetization level and is a joint eigenvector of the total and leaf Casimirs,
+then it satisfies the single-cluster ground-energy lower bound.
+
+This is the single-cluster specialization of the Clebsch--Gordan coupled-sector
+energy lower bound.  It avoids assuming the raw all-sector total-Casimir lower
+bound directly; the remaining spectral work is to provide the sector data for
+each real-energy eigenvector. -/
+theorem singleCluster_global_eigenvalue_lower_of_coupled_leaf_sector
+    (N : ℕ) (hz : 1 ≤ z)
+    (hsector : ∀ {μ : ℝ} {v : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      v ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec v = (μ : ℂ) • v →
+      ∃ k : ℕ, ∃ α β : ℂ,
+        v ∈ magSubspaceS (Fin (z + 1)) N
+          ((k : ℂ) - ((Fintype.card (Fin (z + 1)) : ℂ) * (N : ℂ) / 2)) ∧
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec v = α • v ∧
+        (leafSpinSSquared z N).mulVec v = β • v) :
+    ∀ {μ : ℝ} {v : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      v ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec v = (μ : ℂ) • v →
+      (singleClusterGSEnergyS z N).re ≤ μ := by
+  exact singleCluster_global_eigenvalue_lower_of_joint_casimir_energy_lower
+    (z := z) N (by
+      intro μ v hv_ne hH
+      rcases hsector hv_ne hH with ⟨k, α, β, hv_mem, htot, hR⟩
+      exact ⟨α, β, htot, hR,
+        singleClusterGSEnergyS_re_le_casimir_energy_of_coupled_leaf_sector
+          (z := z) N hz k hv_ne hv_mem htot hR⟩)
+
+/-- **Single-cluster min-energy lower bound from coupled leaf/center sectors**:
+the coupled leaf/center sector data imply
+`Re (singleClusterGSEnergyS z N) ≤ hermitianMinEigenvalue H`. -/
+theorem singleClusterGSEnergyS_re_le_hermitianMinEigenvalue_of_coupled_leaf_sector
+    (N : ℕ) (hz : 1 ≤ z)
+    (hsector : ∀ {μ : ℝ} {v : (Fin (z + 1) → Fin (N + 1)) → ℂ},
+      v ≠ 0 →
+      (singleClusterHamiltonianS z N).mulVec v = (μ : ℂ) • v →
+      ∃ k : ℕ, ∃ α β : ℂ,
+        v ∈ magSubspaceS (Fin (z + 1)) N
+          ((k : ℂ) - ((Fintype.card (Fin (z + 1)) : ℂ) * (N : ℂ) / 2)) ∧
+        (totalSpinSSquared (Fin (z + 1)) N).mulVec v = α • v ∧
+        (leafSpinSSquared z N).mulVec v = β • v) :
+    (singleClusterGSEnergyS z N).re ≤
+      hermitianMinEigenvalue (singleClusterHamiltonianS_isHermitian z N) := by
+  exact singleClusterGSEnergyS_re_le_hermitianMinEigenvalue_of_global_eigenvalue_lower
+    (z := z) N
+    (singleCluster_global_eigenvalue_lower_of_coupled_leaf_sector
+      (z := z) N hz hsector)
 
 /-- **Single-cluster conditional min-energy equality from a GS-sector witness and
 global lower bound**: a concrete non-zero vector in the predicted GS Casimir
