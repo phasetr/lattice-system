@@ -45,6 +45,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23StructuralCommonEnergyStep
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralCommonGroundEnergy
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralGeneralFinal
 import LatticeSystem.Quantum.SpinS.SpinSRotation1
+import LatticeSystem.Quantum.SpinS.AxisSwapUnitarySSpinS
 import LatticeSystem.Quantum.SpinS.Theorem24ZeroMagnetizationFromUniqueness
 import LatticeSystem.Quantum.SpinS.Theorem24SU2BaseCase
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSectorZero

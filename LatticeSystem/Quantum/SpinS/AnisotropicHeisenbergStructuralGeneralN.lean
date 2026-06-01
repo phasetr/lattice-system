@@ -14,9 +14,9 @@ the Collatz-Wielandt PF=min identification.
 Specialises to spin-1/2 via `axisSwapUnitarySpinHalf` (already in
 `AnisotropicHeisenbergSpinHalfStructural.lean` as a separate theorem).
 
-For spin-S with S > 1/2 (N ≥ 2), application requires constructing an
-`AxisSwapUnitaryS N` instance (Wigner d-matrix `exp(-iπŜ¹/2)`) — currently
-only spin-1/2 has an instance.
+For concrete general spin-S, `AxisSwapUnitarySSpinS.lean` now supplies the
+`π/2` axis-1 rotation instance `axisSwapUnitarySSpinS N` and a no-argument
+wrapper for this capstone.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.4, p. 43-44.

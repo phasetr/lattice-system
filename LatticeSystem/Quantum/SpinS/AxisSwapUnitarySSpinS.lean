@@ -4,6 +4,9 @@ import LatticeSystem.Quantum.SpinS.Hermitian
 import LatticeSystem.Quantum.SpinS.CyclicCommutator
 import LatticeSystem.Quantum.SpinS.CyclicCommutator31
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergStructuralGeneralN
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergAxisSwapMinEigenvalue
+import LatticeSystem.Quantum.SpinS.BareAnisotropicEigLeTwoConditional
+import LatticeSystem.Quantum.SpinS.SubmatrixSimpleEigLeTwo
 import Mathlib.Analysis.SpecialFunctions.Exponential
 
 /-!
@@ -219,14 +222,14 @@ nonrec theorem exp_smul_one_eq (n : ℕ) (c : ℂ) :
       Complex.exp c • 1 := by
   have hdiag : (c • (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)) =
       Matrix.diagonal (fun _ => c) := by
-    ext i j; by_cases h : i = j <;> simp [h, Matrix.one_apply]
+    ext i j; by_cases h : i = j <;> simp [h]
   rw [hdiag, Matrix.exp_diagonal]
   ext i j
   by_cases h : i = j
   · simp only [h, Matrix.diagonal_apply_eq, Matrix.smul_apply, Matrix.one_apply_eq,
                smul_eq_mul, mul_one, Pi.exp_def]
     rw [← Complex.exp_eq_exp_ℂ]
-  · simp [h, Matrix.diagonal_apply_ne _ h, Matrix.smul_apply, Matrix.one_apply_ne h]
+  · simp [h, Matrix.smul_apply, Matrix.one_apply_ne h]
 
 -- `exp(α • (Ŝ¹ + 1)) = Complex.exp α • exp(α • Ŝ¹)`. Combines additivity
 -- (since `α•Ŝ¹` and `α•1` commute) with the scalar-matrix exp formula.
@@ -333,7 +336,7 @@ theorem spinSRot1_conj_spinSLadder1Minus (N : ℕ) (θ : ℝ) :
   unfold spinSRot1
   convert exp_smul_spinSOp1_conj_spinSLadder1Minus N (-((θ : ℂ) * Complex.I)) using 2
   · push_cast; ring_nf
-  · push_cast; ring_nf
+  · ring_nf
 
 -- `Complex.exp(-((π/2 : ℝ) : ℂ) * I) = -I` (axis-1 rotation by π/2 about ladder L⁺ scales by -i).
 theorem cexp_neg_pi_half_mul_I :
@@ -421,6 +424,96 @@ noncomputable def axisSwapUnitarySSpinS (N : ℕ) : AxisSwapUnitaryS N where
   conj_spinSOp3 := spinSRot1_pi_half_conj_spinSOp3 N
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+
+/-- **General spin-S axis-swap degeneracy equality**: the concrete
+`axisSwapUnitarySSpinS N` instance identifies every `μ`-eigenspace dimension of
+the anisotropic Hamiltonian and its axis-swapped image. -/
+theorem axisSwapUnitarySSpinS_anisotropic_axisSwapped_eigenspace_finrank_eq
+    {N : ℕ} (J : Λ → Λ → ℂ) (lam D μ : ℂ) :
+    Module.finrank ℂ (Module.End.eigenspace
+        (Matrix.toLin' (axisSwappedAnisotropicHeisenbergS (Λ := Λ) J lam D N)) μ) =
+      Module.finrank ℂ (Module.End.eigenspace
+        (Matrix.toLin' (anisotropicHeisenbergS (Λ := Λ) J lam D N)) μ) :=
+  (axisSwapUnitarySSpinS N).anisotropic_axisSwapped_eigenspace_finrank_eq J lam D μ
+
+/-- **General spin-S conditional bare `Ĥ` `≤ 2` bound from parity-block intersections**:
+specializes the `AxisSwapUnitaryS N`-parameterized wrapper to the concrete
+`axisSwapUnitarySSpinS N` rotation. -/
+theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_of_blocks_le_one_general
+    {N : ℕ} {J : Λ → Λ → ℂ} (hJself : ∀ x, J x x = 0) (lam D μ : ℂ)
+    (heven : Module.finrank ℂ ↥(Module.End.eigenspace
+        (Matrix.toLin' (axisSwappedAnisotropicHeisenbergS J lam D N)) μ ⊓
+      Module.End.eigenspace (Matrix.toLin' (magParityDiagS Λ N)) 1) ≤ 1)
+    (hodd : Module.finrank ℂ ↥(Module.End.eigenspace
+        (Matrix.toLin' (axisSwappedAnisotropicHeisenbergS J lam D N)) μ ⊓
+      Module.End.eigenspace (Matrix.toLin' (magParityDiagS Λ N)) (-1)) ≤ 1) :
+    Module.finrank ℂ (Module.End.eigenspace
+        (Matrix.toLin' (anisotropicHeisenbergS (Λ := Λ) J lam D N)) μ) ≤ 2 :=
+  anisotropicHeisenbergS_eigenspace_finrank_le_two_of_blocks_le_one
+    (axisSwapUnitarySSpinS N) hJself lam D μ heven hodd
+
+/-- **General spin-S conditional bare `Ĥ` `≤ 2` bound from submatrix block simplicity**:
+specializes the submatrix-block wrapper to the concrete `axisSwapUnitarySSpinS N`
+rotation. -/
+theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_of_submatrix_blocks_le_one_general
+    {N : ℕ} {J : Λ → Λ → ℂ} (hJself : ∀ x, J x x = 0) (lam D μ : ℂ)
+    (h0 : Module.finrank ℂ ↥(Module.End.eigenspace (Matrix.toLin'
+        ((axisSwappedAnisotropicHeisenbergS (Λ := Λ) J lam D N).submatrix
+          (fun σ : parityConfigS Λ N 0 => σ.1)
+          (fun σ : parityConfigS Λ N 0 => σ.1))) μ) ≤ 1)
+    (h1 : Module.finrank ℂ ↥(Module.End.eigenspace (Matrix.toLin'
+        ((axisSwappedAnisotropicHeisenbergS (Λ := Λ) J lam D N).submatrix
+          (fun σ : parityConfigS Λ N 1 => σ.1)
+          (fun σ : parityConfigS Λ N 1 => σ.1))) μ) ≤ 1) :
+    Module.finrank ℂ (Module.End.eigenspace
+        (Matrix.toLin' (anisotropicHeisenbergS (Λ := Λ) J lam D N)) μ) ≤ 2 :=
+  anisotropicHeisenbergS_eigenspace_finrank_le_two_of_submatrix_blocks_le_one
+    (axisSwapUnitarySSpinS N) hJself lam D μ h0 h1
+
+/-- **General spin-S bare `Ĥ` `≤ 2` bound at `min(per-block mins)`**: specializes the
+axis-swap min-block wrapper to the concrete `axisSwapUnitarySSpinS N` rotation. -/
+theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_at_min_block_mins_general
+    {N : ℕ} {J : Λ → Λ → ℂ} {lam D : ℂ}
+    (hJ : ∀ x y, (J x y).im = 0) (hlam : lam.im = 0) (hD : D.im = 0)
+    (hJself : ∀ x, J x x = 0)
+    [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
+    (h0 : Module.finrank ℂ ↥(Module.End.eigenspace (Matrix.toLin'
+        ((axisSwappedAnisotropicHeisenbergS (Λ := Λ) J lam D N).submatrix
+          (fun σ : parityConfigS Λ N 0 => σ.1)
+          (fun σ : parityConfigS Λ N 0 => σ.1)))
+          ((hermitianMinEigenvalue
+            (axisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
+              (Λ := Λ) (N := N) hJ hlam hD 0) : ℂ))) ≤ 1)
+    (h1 : Module.finrank ℂ ↥(Module.End.eigenspace (Matrix.toLin'
+        ((axisSwappedAnisotropicHeisenbergS (Λ := Λ) J lam D N).submatrix
+          (fun σ : parityConfigS Λ N 1 => σ.1)
+          (fun σ : parityConfigS Λ N 1 => σ.1)))
+          ((hermitianMinEigenvalue
+            (axisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
+              (Λ := Λ) (N := N) hJ hlam hD 1) : ℂ))) ≤ 1) :
+    Module.finrank ℂ (Module.End.eigenspace (Matrix.toLin'
+      (anisotropicHeisenbergS (Λ := Λ) J lam D N))
+      ((min
+          (hermitianMinEigenvalue
+            (axisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
+              (Λ := Λ) (N := N) hJ hlam hD 0))
+          (hermitianMinEigenvalue
+            (axisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
+              (Λ := Λ) (N := N) hJ hlam hD 1)) : ℝ) : ℂ)) ≤ 2 :=
+  anisotropicHeisenbergS_eigenspace_finrank_le_two_at_min_block_mins
+    (axisSwapUnitarySSpinS N) hJ hlam hD hJself h0 h1
+
+/-- **General spin-S Hermitian minimum equality under axis swap**: specializes the
+`AxisSwapUnitaryS N` minimum-eigenvalue bridge to `axisSwapUnitarySSpinS N`. -/
+theorem axisSwapUnitarySSpinS_hermitianMinEigenvalue_anisotropic_eq_axisSwapped
+    {N : ℕ} {J : Λ → Λ → ℂ} (hJ : ∀ x y, star (J x y) = J x y)
+    {lam : ℂ} (hlam : star lam = lam) {D : ℂ} (hD : star D = D)
+    [Nonempty (Λ → Fin (N + 1))] :
+    hermitianMinEigenvalue
+        (anisotropicHeisenbergS_isHermitian_of_real (Λ := Λ) hJ hlam hD N) =
+      hermitianMinEigenvalue
+        (axisSwappedAnisotropicHeisenbergS_isHermitian_of_real (Λ := Λ) hJ hlam hD N) :=
+  (axisSwapUnitarySSpinS N).hermitianMinEigenvalue_anisotropic_eq_axisSwapped hJ hlam hD
 
 /-- **Tasaki §2.5 Theorem 2.4 obligation (1) general spin-S, TRULY UNCONDITIONAL closure.**
 For every `N ≥ 1`, the bare anisotropic Hamiltonian on a general bipartite lattice has eigenspace

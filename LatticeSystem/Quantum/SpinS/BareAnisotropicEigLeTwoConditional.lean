@@ -18,8 +18,8 @@ each parity sector's PF eigenvalue ν_p separately by (g.4) #3836, but the per-s
 ν_p may differ, so the unconditional ≤ 2 still awaits a ν-sector matching argument
 (equality of the two PF ground-state energies, deferrable to subsequent work).
 
-The spin-1/2 instance is established via `axisSwapUnitarySpinHalf`; for general S, the
-caller must provide an `AxisSwapUnitaryS N` instance.
+The spin-1/2 instance is established via `axisSwapUnitarySpinHalf`; the concrete
+general spin-S instance is supplied by `axisSwapUnitarySSpinS N`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, Springer 2020,
 §2.5 Theorem 2.4, p. 43–44.

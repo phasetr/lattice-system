@@ -11,7 +11,9 @@ Issue #3739 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori).
 equivalence (`anisotropic_axisSwapped_eigenspace_finrank_eq`, #3753 family) to lift
 the bound to the bare anisotropic Hamiltonian `Ĥ`.
 
-- General `N` version requires an `AxisSwapUnitaryS N` instance.
+- General `N` version is parameterized by an `AxisSwapUnitaryS N` instance;
+  `AxisSwapUnitarySSpinS.lean` instantiates it with the concrete spin-S
+  `π/2` axis-1 rotation.
 - Spin-1/2 (`N = 1`) instance via `axisSwapUnitarySpinHalf`.
 
 This is the analogue of (g.5) #3837 with the per-block-min hypotheses (which feed
