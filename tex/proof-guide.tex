@@ -5150,11 +5150,12 @@ Marshall sign machinery + time-reversal action; see
   strict case~(i) degeneracy chain by \texttt{axisSwapUnitarySSpinS} and
   \texttt{anisotropicHeisenbergS\_eigenspace\_finrank\_le\_two\_unconditional\_general};
   the general spin-$S$ target conditional bridge and balanced-sector PF input
-  are now packaged, and the target wrappers from SU(2)-endpoint global
-  uniqueness supply the strict gap over non-balanced non-empty sectors and the
-  general spin-$S$ target uniqueness/zero-magnetization endpoint conditionally
-  on that SU(2) uniqueness input.  Proving the SU(2)-endpoint global uniqueness
-  input itself and Tasaki's case~(ii) route remain separate future work.
+  are now packaged, the target wrappers from SU(2)-endpoint global uniqueness
+  supply the strict gap over non-balanced non-empty sectors, and the new
+  MLM/Casimir endpoint wrappers construct that SU(2) uniqueness input from the
+  general Theorem~2.3 Perron--Frobenius endpoint.  Tasaki's case~(ii), the
+  general spin-$S$ \(D=0\) edge, and the general spin-$S$ \(\lambda=1\) edge
+  remain separate future work.
 \end{itemize}
 
 The generic graph-centric \texttt{neelStateOf} (PR \#331) remains the
@@ -12951,9 +12952,24 @@ and the final wrappers
 \texttt{anisotropicHeisenbergS\_target\_finrank\_le\_one\_of\_SU2\_global\_unique\_general}
 and
 \texttt{anisotropicHeisenbergS\_target\_groundState\_zero\_magnetization\_of\_SU2\_global\_unique\_general}
-feed this strict gap to the PF-free target endpoint.  These statements are
-still conditional on the SU(2)-endpoint global uniqueness input; they do not
-prove Tasaki case~(ii).
+feed this strict gap to the PF-free target endpoint.
+
+The general spin-\(S\) MLM endpoint file removes this remaining SU(2)
+uniqueness callback in strict case~(i).  The transport theorem
+\texttt{anisotropicHeisenbergS\_SU2\_ground\_eigenspace\_finrank\_le\_one\_of\_heisenberg\_general}
+rewrites \(\hat H(1,0)\) to the isotropic Heisenberg Hamiltonian and transfers
+the Heisenberg Hermitian-minimum eigenspace bound to the anisotropic
+SU(2)-point eigenspace.  The wrappers
+\texttt{anisotropicHeisenbergS\_target\_finrank\_le\_one\_of\_MLM\_casimir\_ladder\_t23\_pf\_general}
+and
+\texttt{anisotropicHeisenbergS\_target\_zero\_magnetization\_of\_MLM\_casimir\_ladder\_t23\_pf\_general}
+compose that transport with
+\texttt{exists\_tasaki23\_common\_energy\_and\_heisenbergHamiltonianS\_full\_eigenspace\_finrank\_le\_one\_of\_casimir\_ladder\_t23\_pf}
+and the SU(2)-global-uniqueness target wrappers above.  Thus the general
+spin-\(S\) strict case~(i) target uniqueness and zero-magnetization endpoint no
+longer exposes an abstract SU(2)-endpoint uniqueness hypothesis.  Tasaki
+case~(ii), the general spin-\(S\) \(D=0\) edge, and the general spin-\(S\)
+\(\lambda=1\) edge remain separate tasks.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
