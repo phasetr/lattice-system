@@ -14510,6 +14510,30 @@ single-site Casimir identity yields
 Reference: Tasaki, Springer 2020, Problem~2.5.c, p.~43, and
 Theorems~2.3--2.4, pp.~42--44.
 
+\textbf{Problem 2.5.c balanced structural wrapper (PR pending)}:
+the file
+\texttt{Quantum/SpinS/Problem25cBalancedStructuralWrapper.lean} removes the
+explicit Theorem~2.3 witness from the preceding MLM ground-state wrapper.
+In the balanced case \(|A|=|\bar A|\), the orientation
+\(|\bar A|\le |A|\) is immediate, and the hypotheses
+\(|\bar A|\ge 1\) and \(N\ge 1\) give
+\[
+  0 < |\bar A|\,N/2 .
+\]
+These are exactly the extra inputs needed by the structural theorem
+\texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_bipartiteCompletePositive}, which
+supplies the \texttt{hT23} witness for the general real symmetric
+non-negative bipartite coupling \(J\).  Feeding that witness to
+\texttt{singleSiteSpinSquareExpectationS\_all\_axes\_eq\_of\_tasaki23\_balanced\_MLM\_groundState}
+proves that every normalized non-zero Heisenberg ground-state eigenvector
+satisfies
+\[
+  E_1=E_2=E_3=\frac{N(N+2)}{12}
+\]
+under the standard balanced bipartite antiferromagnetic hypotheses.
+Reference: Tasaki, Springer 2020, Problem~2.5.c, p.~43, and
+Theorems~2.3--2.4, pp.~42--44.
+
 \textbf{Problem 2.5.d correlation sign bridge (PR~\#4068)}:
 the new file \texttt{Quantum/SpinS/Problem25dCorrelationSignBridge.lean}
 starts Tasaki Problem~2.5.d, p.~40, following the sign conversion in the
