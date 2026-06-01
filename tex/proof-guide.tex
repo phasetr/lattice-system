@@ -5071,7 +5071,7 @@ earlier concrete-case modules \texttt{pauliBasis} ($S = 1/2$) and
 \texttt{spinOne\_decomposition} ($S = 1$) remain as illustrative
 specialisations.
 
-\subsection*{DONE / partial: Tasaki §2.5 antiferromagnetic deferred items (issue \#240, \#412)}
+\subsection*{DONE / partial: Tasaki §2.5 antiferromagnetic status (issues \#240, \#412)}
 
 The antiferromagnetic Heisenberg / Néel state machinery in Tasaki
 §2.5 is largely formalised (chain / 2D / 3D Néel states + per-bond
@@ -5105,19 +5105,47 @@ Marshall sign machinery + time-reversal action; see
     scalar in the real part, sector-restricted to the
     magnetization-$M$ sector.
   \end{itemize}
-\item Problem 2.5.a (single-cluster ground-state energy
-  $-S(1+zS)$ for general spin $S$ and coordination $z$).
-  Requires general-spin infrastructure (P1d''' above is now done in
-  PR~\#490; this remains for the §2.5-specific cluster argument).
-\item Problem 2.5.b (lower bound on $E_{\mathrm{GS}}$ via 2.5.a).
-\item Problem 2.5.c (single-site squared expectation
+\item \textbf{DONE} Theorem~2.3.  The current public statement is
+  \texttt{tasaki\_2\_5\_theorem\_2\_3}, with structural proof witnesses
+  \texttt{tasaki\_2\_5\_theorem\_2\_3\_bipartiteToy} and
+  \texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_bipartiteCompletePositive}.
+  PR~\#4082 synchronized the public status rows with these canonical names.
+\item \textbf{DONE} Problem 2.5.a (single-cluster ground-state energy
+  $-S(1+zS)$ for general spin $S$ and coordination $z$).  The final
+  equality wrapper
+  \texttt{singleClusterHamiltonianS\_minEigenvalue\_eq\_gs\_of\_predicted\_joint\_witness}
+  identifies the Hermitian minimum with the predicted ground-state energy for
+  $1\le z$, under the explicit \texttt{[IsAlgClosed \(\mathbb C\)]}
+  hypothesis.
+\item \textbf{DONE} Problem 2.5.b (lower bound on $E_{\mathrm{GS}}$ via
+  2.5.a).  The graph-local chain reaches the closed-form degree wrappers
+  \texttt{tasaki25b\_heisenbergHamiltonianOnGraphS\_half\_lower\_bound\_closed\_form}
+  and
+  \texttt{tasaki25b\_heisenbergHamiltonianOnGraphS\_half\_lower\_bound\_degree\_closed\_form}.
+\item \textbf{DONE} Problem 2.5.c (single-site squared expectation
   $\langle\Phi_{\mathrm{GS}},(\hat S_x^{(\alpha)})^2
-  \Phi_{\mathrm{GS}}\rangle = S(S+1)/3$ in the AFM ground state).
-\item Problem 2.5.d (two-spin correlation under MLM).
+  \Phi_{\mathrm{GS}}\rangle = S(S+1)/3$ in the AFM ground state).  The
+  balanced structural wrapper
+  \texttt{singleSiteSpinSquareExpectationS\_all\_axes\_eq\_of\_balanced\_bipartiteCompletePositive}
+  proves the all-axis value $N(N+2)/12$ for normalized non-zero Heisenberg
+  ground states under the standard balanced bipartite hypotheses.
+\item \textbf{DONE} Problem 2.5.d (two-spin correlation under MLM).  The
+  endpoint
+  \texttt{twoSpinCorrelationS\_re\_neg\_of\_tasaki23\_balanced\_pf\_cross}
+  extracts the concrete cross-sublattice negative real correlation from the
+  balanced Perron--Frobenius package.
+\item \textbf{Theorem~2.4 status}.  The spin-$1/2$ case-(i) target uniqueness
+  and zero-magnetization wrappers are live as
+  \texttt{spinHalf\_anisotropicHeisenbergS\_target\_finrank\_le\_one\_of\_MLM\_casimir\_ladder\_t23\_pf}
+  and
+  \texttt{spinHalf\_anisotropicHeisenbergS\_target\_groundState\_zero\_magnetization\_of\_MLM\_casimir\_ladder\_t23\_pf}.
+  Tasaki's case~(ii) route and broader spin-$S$ axis-swap-unitary instances
+  remain separate future extensions.
 \end{itemize}
 
-The generic graph-centric \texttt{neelStateOf} (PR \#331) is the
-foundation on which these will be built when the time comes.
+The generic graph-centric \texttt{neelStateOf} (PR \#331) remains the
+foundation for the older Néel-state examples, while the later spin-$S$
+Marshall--Lieb--Mattis work is tracked by Issue~\#412.
 
 \subsection*{Marshall--Lieb--Mattis Theorem 2.2 (Tasaki §2.5)
               — formalisation outline}
@@ -12253,7 +12281,7 @@ Reference: H.\ Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, Springer 2020, §2.5 Theorem 2.3, p.~42;
 E.\ Lieb, D.\ Mattis, \emph{J. Math. Phys.}\ \textbf{3} (1962) 749.
 
-\subsection*{In progress: Tasaki §2.5 Theorem 2.4 (Mattis--Nishimori)}
+\subsection*{Status: Tasaki §2.5 Theorem 2.4 (Mattis--Nishimori)}
 \label{subsec:tasaki-2-5-theorem-2-4}
 
 Tasaki's anisotropic Hamiltonian (2.5.14)
@@ -12845,7 +12873,7 @@ parity-block degeneracy bound.
 Reference: H.\ Tasaki, \emph{Physics and Mathematics of Quantum
 Many-Body Systems}, Springer 2020, §2.5 Theorem 2.4, p.~43--44 (eq.~2.5.16).
 
-\subsection*{In progress: Tasaki Problem 2.5.a ($\gamma$-5,
+\subsection*{DONE / status: Tasaki Problem 2.5.a ($\gamma$-5,
                 single-cluster star-graph ground-state energy)}
 \label{subsec:tasaki-problem-2-5-a}
 

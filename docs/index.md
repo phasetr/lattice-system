@@ -102,7 +102,7 @@ recommended replacement, and earliest-removal window.
 | P1l (Tasaki §2.5, 2D / 3D Heisenberg) | 2D square-lattice + 2D torus + 3D cubic-lattice Heisenberg Hamiltonians via graph products `pathGraph (N+1) □ pathGraph (N+1)` and `cycleGraph (N+2) □ cycleGraph (N+2)`; Hermiticity + Gibbs state companion families (full 11-companion family per variant: `_isHermitian`, `_commute_hamiltonian`, `_GibbsExpectation_zero`, `_im_of_isHermitian`, `_commutator_hamiltonian`, `_mul_hamiltonian_im`, `_hamiltonian_sq_im`, `_hamiltonian_pow_im`, `_anticommutator_im`, `_commutator_re`, `_HamiltonianVariance_im`, `_partitionFn_im`, `_ofReal_re_eq`, `_pow_trace`) at parity with the 1D open / periodic chain | Done |
 | P1m (Tasaki §2.5, generic-S sector form) | **Spin-S Marshall–Lieb–Mattis Theorem 2.2 on the magnetization sector**: generalisation of P1k from spin-1/2 / `H_0` to general spin `S` (`N = 2S`) and arbitrary magnetization sector `M` via the subtype `magConfigS V N M`. Sector matrices: shifted dressed (`shiftedDressedSReMatrixOnMagSector`), dressed (`dressedHeisenbergSReMatrixOnMagSector`), un-dressed real-form (`heisenbergHamiltonianSReMatrixOnMagSector`), and un-dressed complex-form (`heisenbergHamiltonianSMatrixOnMagSector`). Bipartite raise/lower reachability (γ-3 connectivity for general spin) lifted to the sector subtype. PF application: `IsIrreducible` (#846), positive Perron eigenvector existence (#847) and uniqueness (#848) on the shifted sector matrix. Marshall sign conjugation forward (#853) + inverse (#854) gives a real-form sector eigenvector existence with Marshall sign structure. Eigenvector uniqueness (#854) at fixed `μ` and eigenvalue uniqueness (#856, via dressed-sector symmetry + Rayleigh identity). Bundled real-form ground-state theorems: same-`μ` form (#855) and forced-eigenvalue form (#859). Complex-form bridge: complex sector matrix Hermiticity + real-↔-complex eigenvector correspondence (#857, #858, #861). Complex-form existence (#860), Marshall-positive uniqueness (#862), and **strongest bundled COMPLEX ground-state theorem** `marshallLiebMattis_spinS_heisenbergSector_complexGroundState_full` (#865) — the COMPLEX-Hilbert-space form of Tasaki §2.5 Theorem 2.2 in the magnetization sector. Generic spin `S`, arbitrary bipartite-antiferromagnetic Heisenberg coupling supported on a connected bipartite graph, with the intermediate-existence hypothesis. The next step is the lift from the magnetization sector to the FULL Hilbert space — comparing ground-state energies across magnetization sectors. | Done |
 | P1n (Tasaki §2.5 Theorem 2.3, final statement) | **Tasaki §2.5 Theorem 2.3 (Lieb–Mattis, general spin-S, `\|A\| ≠ \|¬A\|`) — final statement.** The current `Prop` definition `tasaki_2_5_theorem_2_3` is the structural, `h_intermediate`-free statement: it closes the conclusion from the physical hypotheses `(1 ≤ N, 1 ≤ \|A\|, 1 ≤ \|¬A\|)` rather than the older vacuous-at-`N=1` intermediate-support hypothesis. The canonical proof witnesses are `tasaki_2_5_theorem_2_3_bipartiteToy` (PR #3891, toy coupling) and `tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive` (PR #3893, general bipartite `J` positive on the complete bipartite graph). These declarations are the structurally repaired replacements for the older `h_intermediate` capstones removed in PR #3917. Tasaki, Springer 2020, §2.5 Theorem 2.3, p. 42 | Truly-unconditional closure at all `N ≥ 1` (PR #3891 toy, PR #3893 general) |
-| P1o (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori anisotropic) | **Tasaki §2.5 Theorem 2.4 (Mattis–Nishimori)**: ground-state uniqueness + `Ŝ³_tot \|Φ_GS⟩ = 0` for the anisotropic XXZ + single-ion Hamiltonian (2.5.14) on a connected bipartite lattice with `\|A\| = \|B\|`, under (i) `−1 < λ ≤ 1, D ≥ 0` or (ii) `λ ≥ 1, D ≤ 0`. The model is only U(1)-invariant (not SU(2)), so the proof uses even/odd-sector Perron–Frobenius (at most double degeneracy) + a deformation argument from the SU(2) point `(λ,D)=(1,0)` rather than MLM directly. Foundation laid (#3740): `anisotropicHeisenbergS` definition + Hermiticity + reduction to isotropic Heisenberg at `λ=1, D=0`. **(e)-(g) chain: ground-state degeneracy ≤ 2 CONDITIONAL** (#3824–#3837): (e) parity-block matrix irreducibility (#3824), (f) bridge layer giving complex dressed parity-block submatrix `finrank ℂ ≤ 1` (#3825–#3831) + block-diag bridge (#3832), (g) dressed-and-bare assembly + axis-swap (#3833–#3837), giving `anisotropicHeisenbergS_eigenspace_finrank_le_two_of_blocks_le_one` for general `N` (with `AxisSwapUnitaryS`) and `spinHalf_anisotropicHeisenbergS_eigenspace_finrank_le_two_of_blocks_le_one` for `N = 1`. **(h) chain: block-sum finrank EQUALITY infrastructure** (#3840–#3844): (h.1) #3840 reverse block-diag bridge giving per-block submatrix-full intersection finrank equality, (h.2) #3841 strengthens involution decomposition to finrank equality, (h.3) #3842 combines (h.1)+(h.2) into `finrank ℂ (eig M μ) = ∑_p finrank ℂ (eig M.submatrix_p μ)` for parity-block-diagonal `M` commuting with `P`, (h.4) #3844 submatrix-based ≤ 2 wrappers. **(i) chain: Hermitian spectral chain** (#3846–#3855): (i.1) #3846 submatrix Hermiticity, (i.2) #3847 submatrix eigenvalue realness (`μ.im = 0`), (i.3) #3848 submatrix minimum eigenvalue exists, (i.4) #3849 Hermitian eigenspace `= ⊥` below min, (i.5) #3850 block-diag eigenspace `= ⊥` below joint per-block min, (i.6) #3851 full eig `≤ 2` at min(per-block mins) given per-block `≤ 1` at min, (i.7) #3854 bare `Ĥ'` specialisation, (i.8) #3855 bare anisotropic `Ĥ` specialisation via axis-swap (general `N` with `AxisSwapUnitaryS` + spin-1/2 instance) — the bridge to unconditional `≤ 2` modulo PF eigenvalue identification with `hermitianMinEigenvalue`. **(j) chain: PF eigenvalue identification** (#3857–#3861): (j.1) #3857 PF positive eigenvector exists for unshifted dressed submatrix, (j.2) #3858 lift to complex, (j.3) #3859 `hermitianMinEigenvalue ≤ μ` from eigenvector existence, (j.4) #3860 packaged form, (j.5) #3861 consumer-friendly conditional bound at `hermitianMinEigenvalue` (needs the `ν_PF = hermitianMinEigenvalue` hypothesis explicit). **Target balanced-sector PF discharge** (Issue #3739): off-diagonal anisotropic/Heisenberg agreement, real sector matrices, the Marshall-dressed shifted anisotropic sector matrix, structural irreducibility, and Collatz–Wielandt PF/minimum identification now provide the balanced-sector `finrank ℂ ≤ 1` input at the spin-1/2 target point; the public target wrappers no longer take an explicit `h_balanced_sector_pf` callback for case (i). | In progress |
+| P1o (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori anisotropic) | **Tasaki §2.5 Theorem 2.4 (Mattis–Nishimori)**: ground-state uniqueness + `Ŝ³_tot \|Φ_GS⟩ = 0` for the anisotropic XXZ + single-ion Hamiltonian (2.5.14) on a connected bipartite lattice with `\|A\| = \|B\|`, under (i) `−1 < λ ≤ 1, D ≥ 0` or (ii) `λ ≥ 1, D ≤ 0`. The model is only U(1)-invariant (not SU(2)), so the proof uses even/odd-sector Perron–Frobenius (at most double degeneracy) + a deformation argument from the SU(2) point `(λ,D)=(1,0)` rather than MLM directly. Foundation laid (#3740): `anisotropicHeisenbergS` definition + Hermiticity + reduction to isotropic Heisenberg at `λ=1, D=0`. **(e)-(g) chain: ground-state degeneracy ≤ 2 CONDITIONAL** (#3824–#3837): (e) parity-block matrix irreducibility (#3824), (f) bridge layer giving complex dressed parity-block submatrix `finrank ℂ ≤ 1` (#3825–#3831) + block-diag bridge (#3832), (g) dressed-and-bare assembly + axis-swap (#3833–#3837), giving `anisotropicHeisenbergS_eigenspace_finrank_le_two_of_blocks_le_one` for general `N` (with `AxisSwapUnitaryS`) and `spinHalf_anisotropicHeisenbergS_eigenspace_finrank_le_two_of_blocks_le_one` for `N = 1`. **(h) chain: block-sum finrank EQUALITY infrastructure** (#3840–#3844): (h.1) #3840 reverse block-diag bridge giving per-block submatrix-full intersection finrank equality, (h.2) #3841 strengthens involution decomposition to finrank equality, (h.3) #3842 combines (h.1)+(h.2) into `finrank ℂ (eig M μ) = ∑_p finrank ℂ (eig M.submatrix_p μ)` for parity-block-diagonal `M` commuting with `P`, (h.4) #3844 submatrix-based ≤ 2 wrappers. **(i) chain: Hermitian spectral chain** (#3846–#3855): (i.1) #3846 submatrix Hermiticity, (i.2) #3847 submatrix eigenvalue realness (`μ.im = 0`), (i.3) #3848 submatrix minimum eigenvalue exists, (i.4) #3849 Hermitian eigenspace `= ⊥` below min, (i.5) #3850 block-diag eigenspace `= ⊥` below joint per-block min, (i.6) #3851 full eig `≤ 2` at min(per-block mins) given per-block `≤ 1` at min, (i.7) #3854 bare `Ĥ'` specialisation, (i.8) #3855 bare anisotropic `Ĥ` specialisation via axis-swap (general `N` with `AxisSwapUnitaryS` + spin-1/2 instance) — the bridge to unconditional `≤ 2` modulo PF eigenvalue identification with `hermitianMinEigenvalue`. **(j) chain: PF eigenvalue identification** (#3857–#3861): (j.1) #3857 PF positive eigenvector exists for unshifted dressed submatrix, (j.2) #3858 lift to complex, (j.3) #3859 `hermitianMinEigenvalue ≤ μ` from eigenvector existence, (j.4) #3860 packaged form, (j.5) #3861 consumer-friendly conditional bound at `hermitianMinEigenvalue` (needs the `ν_PF = hermitianMinEigenvalue` hypothesis explicit). **Target balanced-sector PF discharge** (Issue #3739): off-diagonal anisotropic/Heisenberg agreement, real sector matrices, the Marshall-dressed shifted anisotropic sector matrix, structural irreducibility, and Collatz–Wielandt PF/minimum identification now provide the balanced-sector `finrank ℂ ≤ 1` input at the spin-1/2 target point; the public target wrappers no longer take an explicit `h_balanced_sector_pf` callback for case (i). | Spin-1/2 case-(i) target endpoint live; case (ii) / broader extensions deferred |
 | P2 | Finite-volume Hubbard / BCS | In progress (single-mode CAR algebra; multi-mode Jordan–Wigner backbone: JW string + multi-mode `c_i`, `c_i†` definitions and Hermiticity, `c_0` reductions, full on-site CAR `c_i² = 0`, `(c_i†)² = 0`, `{c_i, c_i†} = 1`, adjoint `(c_i)ᴴ = c_i†`, JW string idempotent `J² = 1`, site-occupation number operator `n_i` with Hermiticity and idempotency; **full cross-site CAR algebra `{c_i, c_j} = 0`, `{c_i†, c_j†} = 0`, `{c_i, c_j†} = 0`, `{c_i†, c_j} = 0` for every `i < j`**; **Hubbard chain (open + periodic BC), Hermiticity + full Gibbs companion family**; **U(1)×U(1) spin symmetry: `[N_↑, H] = [N_↓, H] = [S^z_tot, H] = 0` (Tasaki §9.3.3)**; **full SU(2) spin symmetry: `[Ŝ^+_tot, H] = [Ŝ^-_tot, H] = 0` (Tasaki §9.3.3)**; **all-up-spin state `hubbardAllUpState`: complete kinetic/interaction sector; Casimir `(Ŝ_tot)²`; eigenvalue `S_max(S_max+1)`; Definition 11.1 `isSaturatedFerromagnet` (Tasaki §11.1.1 / eq. (10.1.5))**; **SU(2) algebra: `[Ŝ^z, Ŝ^-] = -Ŝ^-`, eigenvalue preservation and decrement by `Ŝ^-` (Tasaki §9.3.3, §11.1.1)**) |
 | P3 | CAR algebras, quasi-local C*-algebras, KMS states | Not started |
 | P4 | Thermodynamic limit, phase transitions | Not started |
@@ -2685,104 +2685,49 @@ and the half-angle trig integrals established in earlier PRs. See
 `Quantum/SpinHalfRotation.lean` for `spinHalfRot3_mul_spinHalfRot2_mulVec_spinHalfDown`
 and `Quantum/SU2Integral.lean` for all supporting lemmas.
 
-### TODO — Tasaki §2.5 antiferromagnetic deferred items (issue [#240](https://github.com/phasetr/lattice-system/issues/240))
+### Tasaki §2.5 antiferromagnetic status (issues [#240](https://github.com/phasetr/lattice-system/issues/240), [#412](https://github.com/phasetr/lattice-system/issues/412))
 
-The antiferromagnetic Heisenberg / Néel state machinery in
-Tasaki §2.5 is largely formalised (chain / 2D / 3D Néel states +
-per-bond expectations `-1/4` + generic graph-centric `neelStateOf`
-+ Marshall sign machinery + time-reversal action; see Roadmap row
-P1k above). The following subitems remain deferred (large
-mathematical work):
+The original antiferromagnetic Heisenberg / Néel state tracker in Issue #240
+has been superseded by the longer Marshall-Lieb-Mattis thread in Issue #412.
+The graph-centric Néel state foundation (`neelStateOf`) remains the common
+entry point, but the main §2.5 theorem/problem endpoints are now formalised as
+follows:
 
-- **Marshall-Lieb-Mattis Theorem 2.2** (uniqueness + sign
-  structure of the AFM ground state). Requires a Perron-Frobenius
-  argument on the Marshall-rotated basis.
-- **Problem 2.5.a** (single-cluster ground-state energy
-  `-S(1+zS)` for general spin `S` and coordination `z`).
-  The single-cluster Hamiltonian, Casimir decomposition, named
-  GS/max energies, dimer/trimer/quartet/pentamer conditional
-  eigenvalue formulas, and min-eigenvalue upper/lower-bound bridges are
-  live under `Quantum/SpinS/SingleClusterHamiltonian*.lean`; the
-  final equality wrapper for `1 ≤ z` is available under the explicit
+- **DONE: Marshall-Lieb-Mattis Theorem 2.2.**  The general spin-`S`
+  magnetization-sector and full-Hilbert-space forms were assembled through
+  PRs #794-#870, including the bundled full theorem
+  `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`.
+- **DONE: Tasaki Theorem 2.3.**  The current public statement is
+  `tasaki_2_5_theorem_2_3`, with structural proof witnesses
+  `tasaki_2_5_theorem_2_3_bipartiteToy` and
+  `tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive`; PR #4082
+  synchronized the public status rows with these canonical names.
+- **DONE: Problem 2.5.a.**  The final single-cluster equality wrapper
+  `singleClusterHamiltonianS_minEigenvalue_eq_gs_of_predicted_joint_witness`
+  identifies the Hermitian minimum with the predicted energy
+  `singleClusterGSEnergyS z N` for `1 ≤ z` under the explicit
   `[IsAlgClosed ℂ]` hypothesis.
-- **Problem 2.5.b** (lower bound on `E_GS` via 2.5.a). The
-  Lemma A.5/minimum-eigenvalue finite-sum lower-bound bridge is live under
-  `Quantum/SpinS/HermitianMinEigenvalueSumLower.lean`, and the graph-local
-  decomposition is live under `Quantum/SpinS/HeisenbergGraphLocal.lean`.
-  The site-equivalence reindexing bridge for transported single clusters is
-  live under `Quantum/SpinS/SingleClusterTransport.lean`, and the fixed-outside
-  block comparison with same-Hilbert-space graph-local stars is live under
-  `Quantum/SpinS/GraphLocalStarBlock.lean`. The product-coordinate Rayleigh
-  lower-bound lift, including transfer back to the original graph-local star, is
-  live under `Quantum/SpinS/GraphLocalStarLowerBound.lean`. The option-star
-  specialization using Problem 2.5.a, the graph-local finite-sum wrapper, and
-  the closed-form `G.degree` variants are live under
-  `Quantum/SpinS/GraphLocalStarSumWrapper.lean`.
-- **Problem 2.5.c** (single-site squared expectation
-  `⟨Φ_GS|(Ŝ_x^(α))²|Φ_GS⟩ = S(S+1)/3` in the AFM ground state).  The
-  Casimir-to-equal-axes algebraic bridge is live under
-  `Quantum/SpinS/Problem25cSingleSiteSquared.lean`, and the unitary-conjugation
-  expectation input is live under
-  `Quantum/SpinS/Problem25cUnitaryAxisInput.lean`. The lifted axis-swap adjoint
-  and axis-2/axis-3 expectation equality input is live under
-  `Quantum/SpinS/Problem25cAxisSwapAdjointInput.lean`; the wrapper reducing the
-  all-axis conclusion to lifted axis-swap invariance plus the remaining
-  axis-1/axis-2 equality is live under
-  `Quantum/SpinS/Problem25cAxisSwapEqualAxes.lean`; the wrapper reducing that
-  remaining equality to an abstract second unitary symmetry input is live under
-  `Quantum/SpinS/Problem25cTwoSymmetryAxisInput.lean`; the concrete z-axis
-  rotation input is live under `Quantum/SpinS/Problem25cZAxisRotationInput.lean`;
-  and the phase-invariant version of the rotation input is live under
-  `Quantum/SpinS/Problem25cPhaseInvariantAxisInput.lean`. The one-dimensional
-  eigenspace phase bridge is live under
-  `Quantum/SpinS/Problem25cEigenspacePhaseBridge.lean`, and the lifted z-axis
-  rotation commutation input is live under
-  `Quantum/SpinS/Problem25cZAxisRotationCommutation.lean`. The z-axis
-  ground-state phase input combining commutation, unitarity, and
-  one-dimensional eigenspace data is live under
-  `Quantum/SpinS/Problem25cZAxisGroundStatePhase.lean`. The axis-swap
-  ground-state phase input removing the last explicit axis-swap invariance
-  hypothesis is live under
-  `Quantum/SpinS/Problem25cAxisSwapGroundStatePhase.lean`. The remaining work is
-  now the balanced MLM ground-state wrapper under
-  `Quantum/SpinS/Problem25cMLMGroundStateWrapper.lean`, which packages the
-  one-dimensional eigenspace formulation with the existing Theorem 2.3/SU(2)
-  uniqueness endpoint.
-- **Problem 2.5.d** (two-spin correlation under MLM). The bipartite-gauge
-  sign-conversion bridge is live under
-  `Quantum/SpinS/Problem25dCorrelationSignBridge.lean`.  The finite-sum ladder
-  positivity expansion is live under
-  `Quantum/SpinS/Problem25dLadderPositivity.lean`, and the concrete
-  cross-sublattice ladder-entry sign bridge is live under
-  `Quantum/SpinS/Problem25dLadderEntrySign.lean`.  The conditional
-  ladder-to-dot reduction is live under
-  `Quantum/SpinS/Problem25dLadderDotReduction.lean`.  The ladder-adjoint
-  component equality is live under
-  `Quantum/SpinS/Problem25dLadderAdjointEquality.lean`.  The longitudinal
-  component equality under axis-swap and z-axis rotation phase invariance is
-  live under `Quantum/SpinS/Problem25dLongitudinalComponentEquality.lean`.
-  The ground-state phase wrapper is live under
-  `Quantum/SpinS/Problem25dGroundStatePhaseWrapper.lean`, connecting the
-  phase-invariance hypotheses to the one-dimensional eigenspace and balanced
-  MLM uniqueness endpoints.  The sector-supported wrapper is live under
-  `Quantum/SpinS/Problem25dSectorSupportedWrapper.lean`, adapting the
-  positivity chain to `magSectorEmbedding` zero-extension of the sector
-  Perron-Frobenius vector.  The balanced-sector ladder witness is live under
-  `Quantum/SpinS/Problem25dBalancedSectorWitness.lean`, removing the explicit
-  strict-entry hypothesis at `M0 = |A| * N`.  The balanced PF endpoint is live
-  under `Quantum/SpinS/Problem25dBalancedPFEndpoint.lean`, packaging the
-  concrete PF vector and signed cross-sublattice positivity in the balanced
-  sector.  The balanced PF sign-case endpoint is live under
-  `Quantum/SpinS/Problem25dBalancedPFSignCases.lean`, applying the Boolean
-  bipartite sign conversion to the concrete PF endpoint.  The balanced PF
-  cross-sign endpoint is live under
-  `Quantum/SpinS/Problem25dBalancedPFCrossSign.lean`, extracting the concrete
-  cross-sublattice negative real correlation inequality from those Boolean
-  cases.
-
-The generic graph-centric `neelStateOf` (Phase 3 PR #331) is the
-foundation on which these will be built when general-spin and
-Perron-Frobenius infrastructure becomes available.
+- **DONE: Problem 2.5.b.**  The graph-local lower-bound chain reaches the
+  closed-form degree wrappers
+  `tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_closed_form` and
+  `tasaki25b_heisenbergHamiltonianOnGraphS_half_lower_bound_degree_closed_form`.
+- **DONE: Problem 2.5.c.**  The balanced structural wrapper
+  `singleSiteSpinSquareExpectationS_all_axes_eq_of_balanced_bipartiteCompletePositive`
+  removes the explicit Theorem 2.3 witness and proves
+  `E_1 = E_2 = E_3 = N(N+2)/12` for normalized non-zero Heisenberg ground
+  states under the standard balanced bipartite hypotheses.
+- **DONE: Problem 2.5.d.**  The endpoint
+  `twoSpinCorrelationS_re_neg_of_tasaki23_balanced_pf_cross` extracts the
+  concrete cross-sublattice negative real two-spin correlation from the
+  balanced Perron-Frobenius package.
+- **Theorem 2.4 status.**  The spin-`1/2` case-(i) target uniqueness and
+  zero-magnetization wrappers are live as
+  `spinHalf_anisotropicHeisenbergS_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf`
+  and
+  `spinHalf_anisotropicHeisenbergS_target_groundState_zero_magnetization_of_MLM_casimir_ladder_t23_pf`.
+  Extensions beyond the currently formalised case-(i) spin-`1/2` target
+  surface, including Tasaki's case (ii) route and broader spin-`S`
+  axis-swap-unitary instances, remain separate future work.
 
 ### TODO — remove remaining 7 per-theorem linter suppressions (issue [#377](https://github.com/phasetr/lattice-system/issues/377))
 
