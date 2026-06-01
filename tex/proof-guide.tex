@@ -14335,6 +14335,29 @@ that the AFM ground state is fixed by the inverse lifted z-axis rotation, along
 with the existing lifted axis-swap invariance.  Reference: Tasaki, Springer
 2020, Problem~2.5.c, p.~43, and the Theorem~2.4 symmetry context, pp.~43--44.
 
+\textbf{Problem 2.5.c phase-invariant axis input (PR~\#4062)}:
+the exact-invariance input in PRs~\#4057, \#4060, and \#4061 is stronger than
+what one obtains from a one-dimensional ground-state line.  If
+\[
+  T A T^{-1}=B,\qquad T^{-1}\Phi=c\Phi,\qquad \overline c c=1,
+\]
+then
+\[
+\begin{aligned}
+  \langle\Phi,B^2\Phi\rangle
+    &= \langle\Phi,T A^2 T^{-1}\Phi\rangle \\
+    &= c\,\langle\Phi,T A^2\Phi\rangle \\
+    &= c\,\langle T^\dagger\Phi,A^2\Phi\rangle \\
+    &= c\overline c\,\langle\Phi,A^2\Phi\rangle
+     = \langle\Phi,A^2\Phi\rangle .
+\end{aligned}
+\]
+The new wrapper specializes this to \(A=\hat S_x^{(2)}\),
+\(B=\hat S_x^{(1)}\), and then to the concrete z-axis rotation of PR~\#4061.
+The remaining Problem~2.5.c input is therefore a ray-invariance theorem for the
+AFM ground state under the lifted rotations.  Reference: Tasaki, Springer 2020,
+Problem~2.5.c, p.~43, and the Theorem~2.4 symmetry context, pp.~43--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
