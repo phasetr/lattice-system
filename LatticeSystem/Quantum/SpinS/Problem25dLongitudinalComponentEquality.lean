@@ -10,7 +10,7 @@ used in Problem 2.5.c: if a unitary conjugates one two-site spin product to
 another and the state is invariant up to phase, their expectations agree.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
-Springer 2020, Problem 2.5.d, p. 43, and solution pp. 498--499.
+Springer 2020, Problem 2.5.d, p. 40, and solution pp. 498--499.
 -/
 
 namespace LatticeSystem.Quantum
