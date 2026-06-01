@@ -79,6 +79,7 @@ import LatticeSystem.Quantum.SpinS.AnisotropicSectorPFAtMin
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinHalfTargetUniquenessFromBalancedPF
 import LatticeSystem.Quantum.SpinS.SingleClusterHamiltonianConcreteClusters
 import LatticeSystem.Quantum.SpinS.SingleClusterCoupledSectorEnergy
+import LatticeSystem.Quantum.SpinS.SingleClusterMagnetizationProjection
 import LatticeSystem.Quantum.SpinS.SingleClusterHamiltonianMin
 import LatticeSystem.Quantum.SpinS.SingleClusterLeafCasimirBound
 import LatticeSystem.Lattice.Graph
