@@ -26,7 +26,6 @@ open Matrix Module
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-set_option linter.style.longLine false in
 /-- **General spin-S target ground eigenspace `finrank <= 1` from balanced-sector
 inputs**: full `finrank <= 2`, balanced-sector/full-ground equality, and
 balanced-sector PF simplicity imply full target ground-state uniqueness. -/
@@ -105,7 +104,6 @@ theorem anisotropicHeisenbergS_target_finrank_le_one_of_balanced_sector_pf
     (by simpa [hμ_full_def] using h_full_le_two)
     hΦ_admis0 hΦ_ne hΦ_eig_full h_admis_pf
 
-set_option linter.style.longLine false in
 /-- **General spin-S target ground states have zero total magnetization from
 balanced-sector inputs**: the target uniqueness bridge composed with the
 existing uniqueness-implies-zero-magnetization theorem. -/
