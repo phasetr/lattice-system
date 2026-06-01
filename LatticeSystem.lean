@@ -368,6 +368,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23ToyWitness
 import LatticeSystem.Quantum.SpinS.Theorem23ToyGroundEnergyBound
 import LatticeSystem.Quantum.SpinS.Problem25dCorrelationSignBridge
 import LatticeSystem.Quantum.SpinS.Problem25dLadderPositivity
+import LatticeSystem.Quantum.SpinS.Problem25dLadderEntrySign
 
 /-!
 # `lattice-system` library root

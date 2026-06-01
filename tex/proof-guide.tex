@@ -14556,6 +14556,44 @@ specializes this to the bipartite gauge sign and the lifted
 Marshall-gauge matrix-entry non-negativity and strict witness for the
 ground-state vector.
 
+\textbf{Problem 2.5.d ladder entry sign bridge (PR~\#4071)}:
+the new file \texttt{Quantum/SpinS/Problem25dLadderEntrySign.lean}
+supplies the concrete matrix-entry sign input required by the PR~\#4069
+finite-sum wrapper, again following Tasaki, Springer 2020,
+Problem~2.5.d, p.~40, and solution p.~498, equations (S.22)--(S.23).
+For a cross-sublattice pair \(A(x)\ne A(y)\), the theorem
+\texttt{twoSpinPlusMinus\_ladder\_signed\_entry\_re\_nonneg\_of\_bipartite\_ne}
+proves
+\[
+  0\le
+  \operatorname{Re}\!\left(
+    \epsilon_A(x)\epsilon_A(y)
+    m_A(\sigma)
+    \langle\sigma,\hat S_x^+\hat S_y^- \tau\rangle
+    m_A(\tau)
+  \right),
+\]
+where \(m_A(\sigma)\) is the spin-\(S\) Marshall sign.  On a non-zero
+ladder matrix entry the configurations agree away from \(x,y\), the local
+indices differ by one at both sites, and the two odd local parity changes
+make the Marshall sign product equal to \(-1\).  Since
+\(\epsilon_A(x)\epsilon_A(y)=-1\) for \(A(x)\ne A(y)\), the two signs
+cancel and the expression reduces to the bare non-negative real ladder
+entry; all remaining cases are zero by the local raising/lowering action.
+
+The theorem
+\texttt{exists\_twoSpinPlusMinus\_ladder\_signed\_entry\_re\_pos\_of\_bipartite\_ne}
+chooses explicit configurations for \(N\ge 1\), with
+\(\sigma_x=0,\tau_x=1,\sigma_y=1,\tau_y=0\), and all other sites equal,
+giving a strictly positive signed entry.  Combining the non-negativity
+and witness with PR~\#4069 gives
+\texttt{twoSpinPlusMinusCorrelationS\_bipartite\_signed\_re\_pos\_of\_marshall\_coefficients\_cross}:
+strictly positive Marshall coefficients imply a positive
+\(\epsilon_A(x)\epsilon_A(y)\)-signed \(\hat S_x^+\hat S_y^-\)
+correlation on cross-sublattice pairs.  The remaining Problem~2.5.d
+input is the SU(2) / ladder reduction that transfers this signed ladder
+positivity to the full two-spin dot-product correlation.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
