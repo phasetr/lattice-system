@@ -2676,8 +2676,11 @@ mathematical work):
   final equality wrapper for `1 ≤ z` is available under the explicit
   `[IsAlgClosed ℂ]` hypothesis.
 - **Problem 2.5.b** (lower bound on `E_GS` via 2.5.a). The
-  Lemma A.5/minimum-eigenvalue finite-sum lower-bound bridge is in
-  progress under `Quantum/SpinS/HermitianMinEigenvalueSumLower.lean`.
+  Lemma A.5/minimum-eigenvalue finite-sum lower-bound bridge is live under
+  `Quantum/SpinS/HermitianMinEigenvalueSumLower.lean`, and the graph-local
+  decomposition is live under `Quantum/SpinS/HeisenbergGraphLocal.lean`.
+  The remaining bridge is to identify each same-Hilbert-space graph-local star
+  with a transported copy of the abstract single-cluster Hamiltonian.
 - **Problem 2.5.c** (single-site expectation `⟨Ŝ_x⟩ = 0` in the
   AFM ground state).
 - **Problem 2.5.d** (two-spin correlation under MLM).
