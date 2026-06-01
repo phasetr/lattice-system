@@ -14358,6 +14358,28 @@ The remaining Problem~2.5.c input is therefore a ray-invariance theorem for the
 AFM ground state under the lifted rotations.  Reference: Tasaki, Springer 2020,
 Problem~2.5.c, p.~43, and the Theorem~2.4 symmetry context, pp.~43--44.
 
+\textbf{Problem 2.5.c one-dimensional eigenspace phase bridge (PR pending)}:
+the new file \texttt{Quantum/SpinS/Problem25cEigenspacePhaseBridge.lean}
+formalizes the abstract linear-algebra source of the ray-invariance hypothesis.
+If the Hamiltonian eigenspace at \(\mu\) has \(\dim \le 1\), a non-zero
+eigenvector \(\Phi\) spans that eigenspace.  Therefore, whenever a symmetry
+\(U\) commutes with \(H\), the vector \(U\Phi\) is again a \(\mu\)-eigenvector
+and hence
+\[
+  U\Phi=c\Phi
+\]
+for some \(c\in\mathbb C\).  If, in addition, \(U^\dagger U=1\) and
+\(\langle\Phi,\Phi\rangle=1\), then
+\[
+  1=\langle U\Phi,U\Phi\rangle
+   =\langle c\Phi,c\Phi\rangle
+   =\overline c c,
+\]
+so the scalar is exactly the unit-modulus phase required by PR~\#4062.  The
+remaining concrete input is to show that the lifted rotations commute with the
+AFM Hamiltonian.  Reference: Tasaki, Springer 2020, Problem~2.5.c, p.~43, and
+the Theorem~2.4 symmetry context, pp.~43--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
