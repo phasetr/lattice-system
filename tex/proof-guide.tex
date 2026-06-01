@@ -14594,6 +14594,45 @@ correlation on cross-sublattice pairs.  The remaining Problem~2.5.d
 input is the SU(2) / ladder reduction that transfers this signed ladder
 positivity to the full two-spin dot-product correlation.
 
+\textbf{Problem 2.5.d ladder-to-dot reduction (PR~\#4072)}.
+The file \path{Quantum/SpinS/Problem25dLadderDotReduction.lean}
+packages the algebraic reduction from the positive signed ladder correlation
+to positive signed dot-product correlation.  It introduces the component
+definitions
+\[
+  \texttt{twoSpinMinusPlusCorrelationS}
+  \quad\text{and}\quad
+  \texttt{twoSpinZZCorrelationS},
+\]
+and lifts
+\[
+  \hat S_x\cdot\hat S_y
+  =
+  \frac12(\hat S_x^+\hat S_y^-+\hat S_x^-\hat S_y^+)
+  + \hat S_x^{(3)}\hat S_y^{(3)}
+\]
+to the expectation-level theorem
+\texttt{twoSpinCorrelationS\_eq\_ladder\_components}.  The signed form
+\texttt{signed\_twoSpinCorrelationS\_re\_pos\_of\_ladder\_component\_equalities}
+states the SU(2)-symmetric sign transfer used in Tasaki's solution: if
+\[
+  \operatorname{Re}(g C^{-+}_{xy})=\operatorname{Re}(g C^{+-}_{xy}),
+  \qquad
+  \operatorname{Re}(g C^{33}_{xy})
+    =\frac12\operatorname{Re}(g C^{+-}_{xy}),
+\]
+and \(\operatorname{Re}(g C^{+-}_{xy})>0\), then
+\[
+  \operatorname{Re}(g C_{xy})
+  =
+  \frac32\operatorname{Re}(g C^{+-}_{xy})>0.
+\]
+The wrapper
+\texttt{twoSpinCorrelationS\_bipartite\_signed\_re\_pos\_of\_marshall\_cross\_components}
+combines this reduction with the PR~\#4071 Marshall-coefficient signed ladder
+positivity on cross-sublattice pairs.  The remaining input is to discharge the
+two component equalities from the ground-state SU(2) phase invariance.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
