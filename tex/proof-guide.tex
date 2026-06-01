@@ -13360,6 +13360,25 @@ imports the abstract Hamiltonian and energy companion, and
         =\hat{\mathbf S}_y\cdot\hat{\mathbf S}_x\).  This fixes the coefficient
         convention for Tasaki's local-cluster decomposition (Tasaki, Springer
         2020, Problem~2.5.b, p.~38; solution p.~497).
+  \item Problem 2.5.b single-cluster transport bridge.  The declaration
+        \texttt{siteConfigEquiv} lifts a site equivalence \(e:\alpha\simeq\beta\)
+        to the corresponding equivalence of spin-configuration spaces.  The
+        theorems \texttt{reindex\_onSiteS\_siteEquiv} and
+        \texttt{reindex\_spinSDot\_siteEquiv} show that matrix reindexing along
+        this configuration equivalence simply transports the site labels:
+        \[
+          \operatorname{reindex}_e
+          (\hat{\mathbf S}_a\cdot\hat{\mathbf S}_b)
+          =
+          \hat{\mathbf S}_{e(a)}\cdot\hat{\mathbf S}_{e(b)} .
+        \]
+        Consequently the transported single-cluster Hamiltonian
+        \texttt{transportedSingleClusterHamiltonianS} is exactly the sum of
+        transported center-leaf dot products.  The canonical equivalence
+        \(\mathrm{Fin}(|s|+1)\simeq\mathrm{Option}(s)\), sending \(0\) to
+        \(\mathrm{none}\) and successors to \(\mathrm{some}\) leaves via
+        \texttt{Finset.equivFin}, yields the named option-star identity
+        \texttt{transportedSingleClusterHamiltonianS\_option\_eq}.
 \end{itemize}
 
 \textbf{Strategic gaps.} The single-cluster Problem 2.5.a equality is now
@@ -13368,10 +13387,9 @@ available for \(1\le z\) under the explicit
 cleanup is to discharge that hypothesis by replacing the algebraically closed
 eigenvector-extraction bridge with a constructive finite-dimensional spectral
 decomposition if that later becomes useful.  For Problem~2.5.b, the remaining
-formal work is to identify each same-Hilbert-space graph-local star \(h_x\)
-with a copy of the abstract single-cluster Hamiltonian on
-\(\mathrm{Fin}(\deg(x)+1)\), so that the Problem~2.5.a minimum-eigenvalue
-formula can be fed into the finite-sum lower-bound bridge.
+formal work is to pass from the transported finite option-star Hamiltonian to
+each same-Hilbert-space graph-local star \(h_x\), so that the Problem~2.5.a
+minimum-eigenvalue formula can be fed into the finite-sum lower-bound bridge.
 
 \subsection*{DONE: Spin-$S$ saturated ferromagnetic state (Tasaki §2.4 generalised)}
 \label{subsec:spin-s-all-aligned}
