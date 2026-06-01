@@ -13214,22 +13214,65 @@ imports the abstract Hamiltonian and energy companion, and
         \texttt{singleClusterHamiltonianS\_minEigenvalue\_eq\_gs\_of\_exists\_gs\_sector\_and\_mag\_joint\_lower}
         pass this witness callback into the PR~\#4044 lower/equality wrappers
         ($\gamma$-5 step 336).
+  \item Extracted coupled leaf-sector lower bridge:
+        \texttt{singleCluster\_mag\_component\_joint\_lower\_of\_coupled\_leaf\_sector}
+        closes the lower-bound callback left by the previous item.  Let
+        \(w\ne0\) lie in an extracted Hamiltonian/magnetization submodule:
+        \[
+          w\in \operatorname{Eig}(\hat H,\mu)\cap\mathcal H_M,\qquad
+          \hat S_{\rm tot}^2w=\alpha w,\qquad
+          \hat S_R^2w=\beta w .
+        \]
+        Since \(w\ne0\) in \(\mathcal H_M\), the magnetization value is
+        attained by some configuration \(\sigma\):
+        \[
+          M=\operatorname{magEigenvalueS}(\sigma)
+           =m_{\max}-\operatorname{magSumS}(\sigma),
+          \qquad
+          m_{\max}=|\operatorname{Fin}(z+1)|N/2 .
+        \]
+        The coupled leaf-sector theorem uses the opposite indexing convention
+        \(k-m_{\max}\).  Lean sets
+        \[
+          k=|\operatorname{Fin}(z+1)|N-\operatorname{magSumS}(\sigma)
+        \]
+        and rewrites
+        \[
+          M=k-m_{\max}.
+        \]
+        Therefore the same vector \(w\) belongs to the magnetization sector
+        required by
+        \texttt{singleClusterGSEnergyS\_re\_le\_casimir\_energy\_of\_coupled\_leaf\_sector}.
+        For \(1\le z\), that theorem gives
+        \[
+          \operatorname{Re}E_{\rm GS}
+          \le
+          \operatorname{Re}\left(
+            \frac{\alpha-N(N+2)/4-\beta}{2}\right).
+        \]
+        Feeding this callback into the PR~\#4045 witness bridge yields
+        \texttt{singleClusterGSEnergyS\_re\_le\_hermitianMinEigenvalue\_of\_extracted\_coupled\_leaf\_sector}.
+        The companion declarations
+        \texttt{singleClusterHamiltonianS\_minEigenvalue\_eq\_gs\_of\_gs\_sector\_and\_extracted\_coupled\_leaf\_sector}
+        and
+        \texttt{singleClusterHamiltonianS\_minEigenvalue\_eq\_gs\_of\_exists\_gs\_sector\_and\_extracted\_coupled}
+        package the corresponding conditional equality endpoints under the
+        explicit hypotheses \(1\le z\) and
+        \texttt{[IsAlgClosed \(\mathbb C\)]}
+        ($\gamma$-5 step 337).
 \end{itemize}
 
 \textbf{Strategic gaps.} The deferred pieces are:
-(a) constructing an actual joint-Casimir eigenvector at the GS
-sector $(s_R, s_{\rm tot}) = (zN/2, (z-1)N/2)$ via Clebsch--Gordan
-decomposition; (b) proving the global lower-bound callback, equivalently
-first using the single-cluster magnetization projection bridge to pass to a
-non-zero weight component, then showing the projected spectrum is exhausted by
-joint total/leaf Casimir sectors and applying the coupled leaf/center
-sector-energy bridge. The older raw target $\operatorname{Re}\alpha\ge\alpha_{\rm pred}$
-is too strong as an all-sector design goal; the lower-bound route should
-use the actual leaf spin parameter supplied by the sector decomposition.
-Both
-require substantial multi-PR effort (SU(2) representation theory or
-spin-$S$ Perron--Frobenius on the dressed Hamiltonian extending the
-spin-$1/2$ work in
+(a) constructing an actual joint-Casimir eigenvector at the GS sector
+$(s_R, s_{\rm tot}) = (zN/2, (z-1)N/2)$ via Clebsch--Gordan decomposition,
+and (b) discharging the explicit algebraic-closedness hypothesis if a more
+constructive finite-dimensional spectral decomposition is later preferred.
+The global lower-bound callback itself now follows from magnetization
+extraction, joint-Casimir extraction inside the Hamiltonian/magnetization
+submodule, and the coupled leaf/center sector-energy bridge. The remaining
+GS-sector witness work still requires substantial multi-PR effort
+(SU(2) representation theory or spin-$S$ Perron--Frobenius on the dressed
+Hamiltonian extending the spin-$1/2$ work in
 \texttt{Quantum/MarshallLiebMattis/H0PFApplication.lean}).
 
 \subsection*{DONE: Spin-$S$ saturated ferromagnetic state (Tasaki §2.4 generalised)}
