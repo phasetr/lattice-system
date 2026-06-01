@@ -14487,6 +14487,29 @@ in a one-dimensional Heisenberg eigenspace satisfies
 Reference: Tasaki, Springer 2020, Problem~2.5.c, p.~43, and the
 Theorem~2.4 symmetry context, pp.~43--44.
 
+\textbf{Problem 2.5.c MLM ground-state wrapper (PR~\#4067)}:
+the new file
+\texttt{Quantum/SpinS/Problem25cMLMGroundStateWrapper.lean} connects the
+conditional one-dimensional-eigenspace theorem above to the balanced
+Marshall--Lieb--Mattis/SU(2) endpoint.  Under the balanced bipartite
+Theorem~2.3 hypotheses, the existing balanced uniqueness endpoint identifies
+the Heisenberg Hermitian minimum with a common energy $\mu$ and proves
+\[
+  \dim_{\mathbb C}\ker(\hat H_J-\mu)\le 1.
+\]
+Therefore any normalized non-zero ground-state eigenvector
+\[
+  \hat H_J\Phi=E_{\min}\Phi,\qquad \langle\Phi,\Phi\rangle=1
+\]
+satisfies the hypotheses of the PR~\#4066 phase wrapper.  The z-axis rotation
+phase gives $E_1=E_2$, the axis-swap phase gives $E_3=E_2$, and the
+single-site Casimir identity yields
+\[
+  E_1=E_2=E_3=\frac{N(N+2)}{12}.
+\]
+Reference: Tasaki, Springer 2020, Problem~2.5.c, p.~43, and
+Theorems~2.3--2.4, pp.~42--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
