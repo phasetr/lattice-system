@@ -14697,6 +14697,36 @@ therefore removes the last component-equality hypothesis from the PR~\#4072
 dot-product positivity transfer, leaving only the ground-state phase-invariance
 inputs to be connected to the balanced MLM endpoint.
 
+\textbf{Problem 2.5.d ground-state phase wrapper (PR~\#4075)}.
+The file \path{Quantum/SpinS/Problem25dGroundStatePhaseWrapper.lean}
+connects the phase-invariance inputs left by PR~\#4074 to the
+one-dimensional Heisenberg eigenspace phase bridges already used for
+Problem~2.5.c.  If
+\[
+  \Phi(\sigma)=m_A(\sigma)c_\sigma,\qquad c_\sigma>0,
+  \qquad \hat H_J\Phi=\mu\Phi,
+\]
+is normalized, non-zero, and lies in a Heisenberg eigenspace of complex
+dimension at most one, then the existing phase bridges provide
+\[
+  U_{\mathrm{swap}}^{-1}\Phi=c_{\mathrm{swap}}\Phi,\qquad
+  U_3(\pi/2)\Phi=c_{\mathrm{rot}}\Phi,
+\]
+with \(\overline{c_{\mathrm{swap}}}c_{\mathrm{swap}}=
+\overline{c_{\mathrm{rot}}}c_{\mathrm{rot}}=1\).  Substituting these witnesses
+into the PR~\#4074 axis-phase wrapper gives
+\[
+  \operatorname{Re}\{\epsilon_A(x)\epsilon_A(y)
+    \langle\Phi,\hat S_x\cdot\hat S_y\Phi\rangle\}>0
+\]
+for cross-sublattice pairs \(A(x)\ne A(y)\).  The companion balanced MLM
+wrapper uses the Theorem~2.3/SU(2) endpoint to supply the one-dimensional
+ground eigenspace at the Hermitian minimum.  The remaining packaging task is to
+extract the full-space Marshall-positive coefficient vector from the sector
+Perron--Frobenius construction.  Reference: Tasaki, Springer 2020,
+Problem~2.5.d, p.~40, solution pp.~498--499, equations (S.22)--(S.23), with
+Theorems~2.3--2.4, pp.~42--44.
+
 \textbf{Spin-`S` $\leftrightarrow$ spin-`1/2` bridge at $N = 1$
 (PRs~\#922 + \#923)}: the new file
 \texttt{Quantum/SpinS/SpinHalfSpecialization.lean} proves
