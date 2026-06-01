@@ -13383,6 +13383,19 @@ imports the abstract Hamiltonian and energy companion, and
         \texttt{sum\_fin\_erase\_zero\_eq\_sum\_succ}, and yields the named
         option-star identity
         \texttt{transportedSingleClusterHamiltonianS\_option\_eq}.
+  \item Problem 2.5.b graph-local star block bridge.  After fixing an outside
+        configuration \(\eta\), the new embedding sends a configuration on
+        \(\mathrm{Option}(N_G(x))\) into the full graph configuration space.
+        Its pointwise rules identify the center, neighbor, and outside
+        coordinates.  Forward and converse agreement-transfer lemmas reduce
+        the two-site support condition for
+        \(\hat{\mathbf S}_x\cdot\hat{\mathbf S}_y\) to the option-star support
+        condition.  The centered-edge matrix-element theorem then identifies
+        each graph edge with the option-star edge.  Summing over
+        \(y\in N_G(x)\) gives the off-block zero theorem, saying different
+        outside restrictions do not couple, and the block-equality theorem,
+        identifying each fixed-outside block with the option-star Hamiltonian.
+        The exact Lean names are listed in \texttt{docs/index.md}.
 \end{itemize}
 
 \textbf{Strategic gaps.} The single-cluster Problem 2.5.a equality is now
@@ -13391,9 +13404,10 @@ available for \(1\le z\) under the explicit
 cleanup is to discharge that hypothesis by replacing the algebraically closed
 eigenvector-extraction bridge with a constructive finite-dimensional spectral
 decomposition if that later becomes useful.  For Problem~2.5.b, the remaining
-formal work is to pass from the transported finite option-star Hamiltonian to
-each same-Hilbert-space graph-local star \(h_x\), so that the Problem~2.5.a
-minimum-eigenvalue formula can be fed into the finite-sum lower-bound bridge.
+formal work is to lift the fixed-outside block identities for each
+same-Hilbert-space graph-local star \(h_x\) to a full operator lower bound, so
+that the Problem~2.5.a minimum-eigenvalue formula can be fed into the
+finite-sum lower-bound bridge.
 
 \subsection*{DONE: Spin-$S$ saturated ferromagnetic state (Tasaki §2.4 generalised)}
 \label{subsec:spin-s-all-aligned}
