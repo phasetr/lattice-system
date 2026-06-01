@@ -14594,12 +14594,17 @@ correlation on cross-sublattice pairs.  The remaining Problem~2.5.d
 input is the SU(2) / ladder reduction that transfers this signed ladder
 positivity to the full two-spin dot-product correlation.
 
-\textbf{Problem 2.5.d ladder-to-dot reduction (PR~\#4072)}:
-the new file \texttt{Quantum/SpinS/Problem25dLadderDotReduction.lean}
+\textbf{Problem 2.5.d ladder-to-dot reduction (PR~\#4072)}.
+The file \path{Quantum/SpinS/Problem25dLadderDotReduction.lean}
 packages the algebraic reduction from the positive signed ladder correlation
-to positive signed dot-product correlation.  It introduces
-\texttt{twoSpinMinusPlusCorrelationS} and \texttt{twoSpinZZCorrelationS}, and
-lifts
+to positive signed dot-product correlation.  It introduces the component
+definitions
+\[
+  \texttt{twoSpinMinusPlusCorrelationS}
+  \quad\text{and}\quad
+  \texttt{twoSpinZZCorrelationS},
+\]
+and lifts
 \[
   \hat S_x\cdot\hat S_y
   =
