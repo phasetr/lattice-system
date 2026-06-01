@@ -13054,17 +13054,33 @@ imports the abstract Hamiltonian and energy companion, and
         \texttt{singleClusterHamiltonianS\_minEigenvalue\_eq\_gs\_of\_exists\_gs\_sector\_and\_joint\_casimir\_total\_lower}
         package the corresponding conditional equality endpoints
         ($\gamma$-5 step 329).
+  \item Coupled leaf/center sector energy bridge:
+        \texttt{sublatticeSpinSquaredS\_compl\_leaf\_eq\_spinSDot\_zero\_zero}
+        identifies the complement of the leaf sublattice with the
+        singleton center Casimir, hence with the scalar single-site value.
+        For $1\le z$,
+        \texttt{singleClusterGSEnergyS\_re\_le\_casimir\_energy\_of\_coupled\_leaf\_sector}
+        applies the existing Clebsch--Gordan coupled lower theorem to the
+        leaf/center partition and divides the toy-sector energy by two.
+        The callback forms
+        \texttt{singleCluster\_global\_eigenvalue\_lower\_of\_coupled\_leaf\_sector}
+        and
+        \texttt{singleClusterGSEnergyS\_re\_le\_hermitianMinEigenvalue\_of\_coupled\_leaf\_sector}
+        reduce the remaining lower-bound work to proving that real-energy
+        eigenvectors decompose into magnetization and joint total/leaf
+        Casimir sectors ($\gamma$-5 step 330).
 \end{itemize}
 
 \textbf{Strategic gaps.} The deferred pieces are:
 (a) constructing an actual joint-Casimir eigenvector at the GS
 sector $(s_R, s_{\rm tot}) = (zN/2, (z-1)N/2)$ via Clebsch--Gordan
 decomposition; (b) proving the global lower-bound callback, equivalently
-showing the spectrum is exhausted by joint Casimir sectors and proving
-the remaining total-Casimir sector bound that places $\alpha$ above
-$\alpha_{\rm pred}$ for every sector (the leaf bound
-$\beta \le \beta_{\max}$ now follows from the sublattice spectral maximum
-bound). Both
+showing the spectrum is exhausted by magnetization and joint total/leaf
+Casimir sectors, then applying the coupled leaf/center sector-energy
+bridge. The older raw target $\operatorname{Re}\alpha\ge\alpha_{\rm pred}$
+is too strong as an all-sector design goal; the lower-bound route should
+use the actual leaf spin parameter supplied by the sector decomposition.
+Both
 require substantial multi-PR effort (SU(2) representation theory or
 spin-$S$ Perron--Frobenius on the dressed Hamiltonian extending the
 spin-$1/2$ work in
