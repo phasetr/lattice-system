@@ -13006,6 +13006,26 @@ imports the abstract Hamiltonian and energy companion, and
         reduce the remaining lower-bound work to proving that
         joint-Casimir callback and its sector arithmetic bound
         ($\gamma$-5 step 326).
+  \item Joint-Casimir sector arithmetic lower bound:
+        \texttt{singleClusterGSEnergyS\_re\_le\_casimir\_energy\_of\_joint\_bounds}
+        proves the pure arithmetic implication
+        \[
+          \alpha_{\rm pred} \le \operatorname{Re}\alpha,\quad
+          \operatorname{Re}\beta \le \beta_{\max}
+          \quad\Longrightarrow\quad
+          \operatorname{Re}\texttt{singleClusterGSEnergyS z N}
+          \le
+          \operatorname{Re}\frac{\alpha - N(N+2)/4 - \beta}{2},
+        \]
+        where
+        $\alpha_{\rm pred} = ((z-1)N/2)(((z-1)N/2)+1)$ and
+        $\beta_{\max} = (zN/2)(zN/2+1)$.  The callback forms
+        \texttt{singleCluster\_global\_eigenvalue\_lower\_of\_joint\_casimir\_bounds}
+        and
+        \texttt{singleClusterGSEnergyS\_re\_le\_hermitianMinEigenvalue\_of\_joint\_casimir\_bounds}
+        turn these sector bounds for every non-zero real-energy
+        $\hat H$-eigenvector into the global lower callback and
+        Hermitian-min lower bound ($\gamma$-5 step 327).
 \end{itemize}
 
 \textbf{Strategic gaps.} The deferred pieces are:
@@ -13013,8 +13033,9 @@ imports the abstract Hamiltonian and energy companion, and
 sector $(s_R, s_{\rm tot}) = (zN/2, (z-1)N/2)$ via Clebsch--Gordan
 decomposition; (b) proving the global lower-bound callback, equivalently
 showing the spectrum is exhausted by joint Casimir sectors and proving
-the remaining sector arithmetic bound that no such sector lies below the
-predicted value (variational principle / spectral theorem). Both
+the remaining sector bounds that place $\alpha$ above
+$\alpha_{\rm pred}$ and $\beta$ below $\beta_{\max}$ for every sector
+(variational principle / spectral theorem). Both
 require substantial multi-PR effort (SU(2) representation theory or
 spin-$S$ Perron--Frobenius on the dressed Hamiltonian extending the
 spin-$1/2$ work in
