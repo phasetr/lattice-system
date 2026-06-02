@@ -5214,6 +5214,59 @@ computational basis vectors, since \(\varepsilon^2 = 1\).
 \end{itemize}
 
 %======================================================================
+\subsection{Uniform-sign hole-filling action (Tasaki §11.2, eq.~(11.2.4))}
+\label{subsec:hubbard-tasaki-hop}
+%======================================================================
+
+\noindent\textbf{Statement (11.2.4).}
+In the Tasaki basis the hole-filling hopping term acts with a \emph{uniform}
+sign:
+\[
+  \hat c^\dagger_{(x,s)}\,\hat c_{(z,s)}\,|\Phi_{x,\sigma}\rangle
+    = -\,|\Phi_{z,\sigma_{z\to x}}\rangle,
+\]
+where `\(\sigma_{z\to x}\)` is the spin configuration obtained by moving the
+electron at the occupied source site `\(z\)` (of spin `\(s\)`) into the hole
+`\(x\)`.
+
+\medskip
+\noindent\textbf{The fermion sign.}
+On the sign-free `basisVec` basis the same term carries a configuration-dependent
+Jordan--Wigner sign `\(\mathrm{jwSign}\cdot\mathrm{jwSign}\)`
+(file \texttt{HopAction.lean}). Converting both basis states to the Tasaki basis
+multiplies this by the two basis signs `\(\varepsilon\)`, and all four signs
+combine to the constant `\(-1\)`. Writing
+`\(\mathrm{jwSign} = (-1)^{\#\{\text{occupied modes below}\}}\)`, the explicit
+counts are
+\[
+  \varepsilon(x) = (-1)^x,\quad \varepsilon(z) = (-1)^z,\quad
+  E_{\rm src} = z - [x<z],\quad E_{\rm tgt} = x - [z<x],
+\]
+so the total parity exponent is
+\[
+  x + z + (z - [x<z]) + (x - [z<x]) = 2(x+z) - 1,
+\]
+which is odd because `\(x \neq z\)` forces exactly one of `\([x<z]\)`,
+`\([z<x]\)` to equal `\(1\)`. Hence the combined sign is `\(-1\)`. The basis
+sign is `\(\varepsilon = (-1)^x\)`, \emph{independent of} `\(\sigma\)`: there are
+exactly `\(x\)` electrons (one per site below `\(x\)`) beneath the hole's
+up-orbital `\(2x\)`.
+
+\medskip
+\noindent\textbf{Lean declarations}
+(file \texttt{Fermion/JordanWigner/Hubbard/TasakiHopAction.lean}):
+\begin{itemize}
+  \item \texttt{jwSign\_eq\_neg\_one\_pow}: the string sign as
+    `\((-1)^{\sum_{k<j}(c\,k)}\)`.
+  \item \texttt{sum\_spinful\_reindex}: reindex a sum over the `\(2N+2\)` modes
+    into a double site/spin sum.
+  \item \texttt{hubbardTasakiBasisSign\_eq}: `\(\varepsilon = (-1)^x\)`.
+  \item \texttt{hop\_jwSign\_source}, \texttt{hop\_jwSign\_target}: the two hop
+    string signs as parities of occupied-site counts.
+  \item \texttt{hubbardTasakiHop\_mulVec}: the uniform-sign action (11.2.4).
+\end{itemize}
+
+%======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
 %======================================================================
