@@ -9,7 +9,9 @@ same-site double-occupancy operator `n_{i,↑} n_{i,↓}` vanishes. On this
 subspace the on-site Hubbard interaction vanishes for every coupling `U`.
 
 Tracked in Issue #4130. References: Tasaki, *Physics and Mathematics of
-Quantum Many-Body Systems*, 1st edition, §11.2, pp. 381-388.
+Quantum Many-Body Systems*, 1st edition, §11.2, pp. 381-388; this file
+formalizes unnumbered no-double-occupancy infrastructure used before
+Theorems 11.5 and 11.7.
 -/
 
 namespace LatticeSystem.Fermion
@@ -27,8 +29,9 @@ noncomputable def hubbardDoubleOccupancy (N : ℕ) (i : Fin (N + 1)) :
 /-- The finite-volume Hubbard hard-core subspace.
 
 A vector is in this subspace exactly when every same-site double-occupancy
-operator `n_{i,↑} n_{i,↓}` annihilates it. This is the linear subspace used in
-the infinite-`U` / one-hole Nagaoka sector of Tasaki §11.2. -/
+operator `n_{i,↑} n_{i,↓}` annihilates it. This is the unnumbered linear
+subspace used in the infinite-`U` / one-hole Nagaoka sector before Tasaki
+Theorems 11.5 and 11.7. -/
 noncomputable def hubbardHardcoreSubspace (N : ℕ) :
     Submodule ℂ ((Fin (2 * N + 2) → Fin 2) → ℂ) where
   carrier := {ψ | ∀ i : Fin (N + 1),
@@ -64,8 +67,9 @@ theorem hubbardDoubleOccupancy_mulVec_eq_zero_of_mem_hardcore
 /-- The Hubbard on-site interaction annihilates every hard-core vector.
 
 This is the algebraic no-double-occupancy reduction used at the start of
-Tasaki §11.2: if every `n_{i,↑} n_{i,↓}` term is zero on `ψ`, then the
-finite sum `U ∑ᵢ n_{i,↑} n_{i,↓}` is also zero on `ψ`. -/
+Tasaki §11.2 as unnumbered infrastructure for Theorems 11.5 and 11.7: if
+every `n_{i,↑} n_{i,↓}` term is zero on `ψ`, then the finite sum
+`U ∑ᵢ n_{i,↑} n_{i,↓}` is also zero on `ψ`. -/
 theorem hubbardOnSiteInteraction_mulVec_eq_zero_of_mem_hardcore
     (N : ℕ) (U : ℂ) {ψ : (Fin (2 * N + 2) → Fin 2) → ℂ}
     (hψ : ψ ∈ hubbardHardcoreSubspace N) :
