@@ -4936,6 +4936,60 @@ pp.~381--388).
 \end{itemize}
 
 %======================================================================
+\subsection{Effective Hamiltonian on the hard-core sector (Tasaki §11.2)}
+\label{subsec:hubbard-effective-hamiltonian}
+%======================================================================
+
+\noindent\textbf{Definition.}
+The effective Hamiltonian of the infinite-\(U\) / one-hole Nagaoka sector is
+the hard-core compression of the full Hubbard Hamiltonian
+\(H = H_{\rm hop} + H_{\rm int}\),
+\[
+  \hat H_{\rm eff} := \hat P_{\rm hc}\,H\,\hat P_{\rm hc}.
+\]
+
+\medskip
+\noindent\textbf{Properties} (unnumbered effective-Hamiltonian
+infrastructure for Tasaki Theorems 11.5 and 11.7; 1st edition, §11.2,
+pp.~381--388).
+\begin{enumerate}
+  \item \emph{Hermiticity}: for a Hermitian hopping matrix
+    (\(\overline{t_{ij}} = t_{ji}\)) and real \(U\), \(\hat H_{\rm eff}\) is
+    Hermitian, being the compression \(\hat P_{\rm hc}^\dagger H
+    \hat P_{\rm hc}\) of a Hermitian operator by the Hermitian projection.
+  \item \emph{\(U\uparrow\infty\) reduction}: on a hard-core vector
+    \(\psi\in\mathcal H_{\rm hc}\), the on-site interaction vanishes
+    (\(H_{\rm int}\psi = 0\)) and the inner projection fixes \(\psi\)
+    (\(\hat P_{\rm hc}\psi = \psi\)), so
+    \[
+      \hat H_{\rm eff}\psi = \hat P_{\rm hc}\,(H_{\rm hop}\,\psi).
+    \]
+    The effective dynamics on the hard-core sector is therefore the projected
+    hopping; the explicit hopping matrix elements (Tasaki eq.~(11.2.5)),
+    which carry Jordan--Wigner fermion signs, are built on this reduction in
+    a follow-up layer.
+  \item \emph{Range}: \(\hat H_{\rm eff}\psi\in\mathcal H_{\rm hc}\) for every
+    \(\psi\) (outermost factor is \(\hat P_{\rm hc}\)), and
+    \(\hat P_{\rm hc}\,\hat H_{\rm eff}\psi = \hat H_{\rm eff}\psi\).
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Lean declarations}
+(file \texttt{Fermion/JordanWigner/Hubbard/EffectiveHamiltonian.lean}):
+\begin{itemize}
+  \item \texttt{hubbardEffectiveHamiltonian N t U}:
+    \(\hat H_{\rm eff}\).
+  \item \texttt{hubbardEffectiveHamiltonian\_isHermitian}: Hermiticity.
+  \item \texttt{hubbardEffectiveHamiltonian\_mulVec\_eq\_projected\_kinetic\_of\_mem}:
+    \(\hat H_{\rm eff}\psi = \hat P_{\rm hc}(H_{\rm hop}\psi)\) on
+    \(\mathcal H_{\rm hc}\).
+  \item \texttt{hubbardEffectiveHamiltonian\_mulVec\_mem}:
+    \(\hat H_{\rm eff}\psi\in\mathcal H_{\rm hc}\).
+  \item \texttt{hubbardHardcoreProjection\_mulVec\_effectiveHamiltonian}:
+    \(\hat P_{\rm hc}\hat H_{\rm eff}\psi = \hat H_{\rm eff}\psi\).
+\end{itemize}
+
+%======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
 %======================================================================
