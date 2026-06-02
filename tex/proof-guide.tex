@@ -13260,7 +13260,8 @@ The wrappers
 therefore reduce the block PF input to a raw total-Hamiltonian witness/zero
 classification.  The next paragraphs supply that raw classification and then
 record the boundary move-set choices when a strict local coefficient vanishes;
-PF/min identification remains the later step.
+the following PF/min layer then converts shifted non-negative irreducible
+blocks into bare parity-block PF/min witnesses.
 
 \texttt{AnisotropicHeisenbergSpinSCaseIIRawSupport.lean} proves that raw
 classification under the support-zero assumption
@@ -13284,8 +13285,8 @@ therefore supply the step-or-zero hypotheses directly.  Finally,
 \texttt{shiftedCaseIIParityGaugedBlock\_irreducible\_of\_raw\_support} feed
 that raw support classification into the case~(ii) shifted block
 non-negativity and conditional irreducibility layers.  The next boundary layer
-handles the zero-coefficient move-set variants; PF/min identification remains
-the later step.
+handles the zero-coefficient move-set variants, and the following PF/min layer
+turns those shifted block inputs into bare parity-block PF/min witnesses.
 
 \texttt{AnisotropicHeisenbergSpinSCaseIIBoundaryMoveSets.lean} records the
 boundary move-set variants where one strict local coefficient vanishes.  At
@@ -13302,8 +13303,30 @@ that branch from the raw classification, and
 \texttt{shiftedCaseIIBlock\_nonneg\_of\_raw\_support\_D\_zero} plus
 \texttt{shiftedCaseIIBlock\_irreducible\_of\_raw\_support\_D\_zero} feed the
 result to the bond-only relation \texttt{bondParityReachableSOnBlock}.  The
-PF/min identification for the two bare axis-swapped parity blocks remains the
-next case~(ii) input.
+\texttt{AnisotropicHeisenbergSpinSCaseIIParityBlockPFMin.lean} layer then
+converts these shifted parity-gauged block inputs into bare parity-block
+PF/min witnesses.  It proves that the real combined parity/Marshall gauge
+diagonal complexifies to an involutive diagonal and that the complexified
+case~(ii) parity-gauged block is similar to the bare axis-swapped parity
+block:
+\[
+  R_{\mathrm{case~II},p}^{\mathbb C}
+  = G_p\,\widehat H'_{p}\,G_p .
+\]
+For a fixed parity block, Perron--Frobenius supplies a positive eigenvector and
+a one-dimensional eigenspace for the shifted non-negative irreducible matrix
+\(B=cI-R_{\mathrm{case~II},p}\).  The shift changes the eigenvalue from
+\(r\) to \(c-r\), and Collatz--Wielandt identifies \(c-r\) with the Hermitian
+minimum of the complexified real block.  The similarity then transfers the
+\(\texttt{finrank}\le1\) statement to the bare axis-swapped block at its
+Hermitian minimum.  The wrappers
+\texttt{axisSwappedAnisotropicHeisenbergS\_submatrix\_pf\_min\_of\_caseII\_raw\_support}
+and
+\texttt{axisSwappedAnisotropicHeisenbergS\_submatrix\_pf\_min\_of\_caseII\_raw\_support\_D\_zero}
+consume the strict raw-support layer and the \(D=0\) bond-only boundary,
+respectively.  The remaining endpoint input is the \(\lambda=1\) ion-only
+support callback needed to close the pathwise PF/min hypotheses for every
+\(t\in[0,1]\).
 
 The new general spin-\(S\) obligation-(2) wrapper supplies that strict-gap
 callback from one SU(2)-endpoint input.  First,
@@ -13366,9 +13389,12 @@ entrywise non-negativity input to a diagonal shift bound and a
 zero-support pairs.  The raw support layer now proves this split directly from
 the total Hamiltonian under the bipartite support-zero assumption on \(J\).  The
 boundary move-set layer now supplies the ion-only \(\lambda=1\) and bond-only
-\(D=0\) variants, including raw-support wrappers at \(D=0\).  The remaining
-case~(ii) task is PF/min identification for the shifted matrix on the two bare
-axis-swapped parity blocks.
+\(D=0\) variants, including raw-support wrappers at \(D=0\).  The parity-block
+PF/min layer now transfers shifted case~(ii) parity-gauged non-negative
+irreducible blocks to bare axis-swapped parity-block PF/min witnesses in the
+strict raw-support region and at the \(D=0\) boundary.  The remaining
+case~(ii) task is the \(\lambda=1\) ion-only support callback needed to close
+the pathwise PF/min hypotheses at that endpoint.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
