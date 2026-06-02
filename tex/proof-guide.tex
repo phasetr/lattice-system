@@ -13034,6 +13034,16 @@ target wrappers
 and
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_path\_crossing\_contradiction}
 therefore leave only the path crossing contradiction callback as the
+remaining case~(ii) input.  The next bridge in
+\texttt{AnisotropicHeisenbergSpinSCaseIIPathCrossingFromSet.lean} rewrites that
+input in the first-crossing set language.  The theorem
+\texttt{anisotropicHeisenbergS\_case\_ii\_path\_crossing\_contradiction\_of\_set\_contradiction}
+observes that a pointwise path crossing is a witness that
+\(\texttt{perMCrossingSet}\,M\cap[0,1]\) is non-empty.  Its target wrappers
+\texttt{anisotropicHeisenbergS\_case\_ii\_target\_finrank\_le\_one\_of\_set\_contradiction}
+and
+\texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_set\_contradiction}
+therefore leave only the crossing-set non-emptiness contradiction as the
 remaining case~(ii) input.
 
 The new general spin-\(S\) obligation-(2) wrapper supplies that strict-gap
@@ -13078,8 +13088,9 @@ longer exposes an abstract SU(2)-endpoint uniqueness hypothesis; the
 spin-\(S\) \(\lambda=1\), \(D\ge0\) case~(i) boundary.  Tasaki case~(ii) now
 has the conditional path/target bridge, the strict-gap bridge, the
 no-full-finrank bridge, the crossing-callback bridge, and the path-callback
-bridge described above.  The remaining case~(ii) task is to prove the path
-crossing contradiction callback.
+bridge, and the crossing-set bridge described above.  The remaining
+case~(ii) task is to prove the crossing-set non-emptiness contradiction
+callback.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
