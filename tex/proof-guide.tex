@@ -5157,8 +5157,8 @@ Marshall sign machinery + time-reversal action; see
   \(-1<\lambda<1\), \(D\ge0\), and at the SU(2) point
   \((\lambda,D)=(1,0)\); the ion-only parity route covers the
   \(\lambda=1\), \(D>0\), \(2\le N\) edge.  Tasaki's case~(ii) now has the
-  conditional path/target bridge, with the global crossing/degeneracy
-  replacement still explicit.
+  conditional path/target bridge and a strict-gap target bridge; the full
+  \(\texttt{finrank}\le2\) replacement remains explicit.
 \end{itemize}
 
 The generic graph-centric \texttt{neelStateOf} (PR \#331) remains the
@@ -12987,10 +12987,17 @@ repackages the same PF-free target step under case~(ii) hypotheses via
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_finrank\_le\_one\_of\_balanced\_eq\_full}
 and
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_balanced\_eq\_full}.
-These wrappers intentionally keep the missing global crossing/degeneracy
-replacement explicit as balanced-sector/full-ground equality plus full
-\(\texttt{finrank}\le2\); they do not reuse the case~(i) axis-swap sign
-argument.
+These first wrappers intentionally keep the missing global
+crossing/degeneracy replacement explicit as balanced-sector/full-ground
+equality plus full \(\texttt{finrank}\le2\); they do not reuse the case~(i)
+axis-swap sign argument.  The follow-up strict-gap bridge in
+\texttt{AnisotropicHeisenbergSpinSCaseIIStrictGapBridge.lean} replaces the
+direct equality input by the strict sector gap
+\(E_{M_{\mathrm{bal}}}<E_M\) over every non-balanced non-empty sector:
+\texttt{anisotropicHeisenbergS\_case\_ii\_target\_finrank\_le\_one\_of\_strict\_gap}
+and
+\texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_strict\_gap}.
+The case~(ii) full \(\texttt{finrank}\le2\) input remains explicit.
 
 The new general spin-\(S\) obligation-(2) wrapper supplies that strict-gap
 callback from one SU(2)-endpoint input.  First,
@@ -13032,8 +13039,9 @@ longer exposes an abstract SU(2)-endpoint uniqueness hypothesis; the
 \(D\ge0\).  The SU(2)-point wrappers and the
 \(\lambda=1\), \(D>0\), \(2\le N\) ion-only wrappers cover the general
 spin-\(S\) \(\lambda=1\), \(D\ge0\) case~(i) boundary.  Tasaki case~(ii) now
-has the conditional path/target bridge described above, while the global
-case~(ii) crossing/degeneracy replacement remains the next task.
+has the conditional path/target bridge and the strict-gap bridge described
+above, while the case~(ii) full \(\texttt{finrank}\le2\) replacement remains
+the next task.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
