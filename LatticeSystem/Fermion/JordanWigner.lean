@@ -36,6 +36,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreBasis
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreSpan
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HopConfig
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HopAction
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HopMatrixElement
 import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonian
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyProjection
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyCommute
