@@ -1,6 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.String
 import LatticeSystem.Fermion.JordanWigner.StringBasisVecAction
 import LatticeSystem.Fermion.JordanWigner.AnnihilationCreationBasisVec
+import LatticeSystem.Fermion.JordanWigner.HopBasisVec
 import LatticeSystem.Fermion.JordanWigner.Operators
 import LatticeSystem.Fermion.JordanWigner.CAR
 import LatticeSystem.Fermion.JordanWigner.CAR.CrossSiteOfNe
