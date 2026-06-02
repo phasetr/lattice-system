@@ -13258,9 +13258,9 @@ The wrappers
 \texttt{shiftedCaseIIParityGaugedBlock\_nonneg\_of\_step\_support} and
 \texttt{shiftedCaseIIParityGaugedBlock\_irreducible\_of\_step\_support}
 therefore reduce the block PF input to a raw total-Hamiltonian witness/zero
-classification.  The next paragraph supplies that classification; PF/min
-identification and the boundary move-set choices when a strict local coefficient
-vanishes remain separate later steps.
+classification.  The next paragraphs supply that raw classification and then
+record the boundary move-set choices when a strict local coefficient vanishes;
+PF/min identification remains the later step.
 
 \texttt{AnisotropicHeisenbergSpinSCaseIIRawSupport.lean} proves that raw
 classification under the support-zero assumption
@@ -13283,8 +13283,9 @@ therefore supply the step-or-zero hypotheses directly.  Finally,
 \texttt{shiftedCaseIIParityGaugedBlock\_nonneg\_of\_raw\_support} and
 \texttt{shiftedCaseIIParityGaugedBlock\_irreducible\_of\_raw\_support} feed
 that raw support classification into the case~(ii) shifted block
-non-negativity and conditional irreducibility layers.  The boundary move-set
-variants and the PF/min identification remain later steps.
+non-negativity and conditional irreducibility layers.  The next boundary layer
+handles the zero-coefficient move-set variants; PF/min identification remains
+the later step.
 
 \texttt{AnisotropicHeisenbergSpinSCaseIIBoundaryMoveSets.lean} records the
 boundary move-set variants where one strict local coefficient vanishes.  At
