@@ -147,6 +147,142 @@ theorem shiftedCaseIIBlock_pow_pos_of_bond_reachable_D_zero
 
 /-! ## Boundary step-support non-negativity -/
 
+/-! ## Raw support at the `lambda = 1` boundary -/
+
+/-- At `lambda = 1`, a local parity-bond witness has zero axis-swapped bond
+entry because the `(1 - lambda) / 4` parity-ladder coefficient vanishes, while
+the transverse ladder terms mismatch the same-direction move. -/
+theorem spinSDotXXZSwap_apply_eq_zero_of_parityBondStepS_witness_lambda_one
+    {x y : Λ} (hxy : x ≠ y)
+    {σ' σ : Λ → Fin (N + 1)}
+    (hsh : ((σ x).val + 1 = (σ' x).val ∧ (σ y).val + 1 = (σ' y).val) ∨
+      ((σ' x).val + 1 = (σ x).val ∧ (σ' y).val + 1 = (σ y).val))
+    (hagree : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
+    spinSDotXXZSwap x y (1 : ℂ) N σ' σ = 0 := by
+  have hne : σ' ≠ σ := by
+    intro he
+    rcases hsh with ⟨hsx, _⟩ | ⟨hsx, _⟩ <;> · rw [he] at hsx; omega
+  have hladder :=
+    congrFun (congrFun (spinSDotXXZSwap_ladder_form (Λ := Λ) (N := N) x y (1 : ℂ)) σ') σ
+  rw [hladder, Matrix.add_apply, Matrix.add_apply, Matrix.smul_apply, Matrix.smul_apply,
+    smul_eq_mul, smul_eq_mul,
+    onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_eq_zero_of_ne hxy hne, add_zero]
+  rcases hsh with ⟨hsx, hsy⟩ | ⟨hsx, hsy⟩
+  · have h1 :
+        ((onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N) :
+          ManyBodyOpS Λ N) σ' σ) = 0 := by
+      rw [onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_of_off_two_site_agree
+        hxy hagree, spinSOpPlus_apply_other N
+        (by omega : (σ' x).val + 1 ≠ (σ x).val), zero_mul]
+    have h2 :
+        ((onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N) :
+          ManyBodyOpS Λ N) σ' σ) = 0 := by
+      rw [onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_of_off_two_site_agree
+        hxy hagree, spinSOpPlus_apply_other N
+        (by omega : (σ' y).val + 1 ≠ (σ y).val), mul_zero]
+    rw [Matrix.add_apply, Matrix.add_apply, h1, h2]
+    norm_num
+  · have h1 :
+        ((onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N) :
+          ManyBodyOpS Λ N) σ' σ) = 0 := by
+      rw [onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_of_off_two_site_agree
+        hxy hagree, spinSOpMinus_apply_other N
+        (by omega : (σ y).val + 1 ≠ (σ' y).val), mul_zero]
+    have h2 :
+        ((onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N) :
+          ManyBodyOpS Λ N) σ' σ) = 0 := by
+      rw [onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_of_off_two_site_agree
+        hxy hagree, spinSOpMinus_apply_other N
+        (by omega : (σ x).val + 1 ≠ (σ' x).val), zero_mul]
+    rw [Matrix.add_apply, Matrix.add_apply, h1, h2]
+    norm_num
+
+/-- At `lambda = 1`, a raw parity-bond step has zero dressed real entry: the
+only possible ordered bond contributions are the two witness orientations, and
+both vanish by the zero parity-ladder coefficient. -/
+theorem dressedAxisSwappedReMatrix_zero_of_parityBondStep_lambda_one
+    (A : Λ → Bool) {J : Λ → Λ → ℂ} (hJself : ∀ x, J x x = 0)
+    {D : ℂ}
+    {σ' σ : Λ → Fin (N + 1)}
+    (hstep : ParityBondStepS (bipartiteCompleteGraphOf A) σ σ') :
+    dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J 1 D N σ' σ = 0 := by
+  obtain ⟨x, y, hadj, hsh, hagree⟩ := hstep
+  have hxy : x ≠ y := hadj.ne
+  have hx_ne : σ' x ≠ σ x := by
+    intro h
+    rcases hsh with ⟨hsx, _⟩ | ⟨hsx, _⟩ <;> · rw [h] at hsx; omega
+  have hy_ne : σ' y ≠ σ y := by
+    intro h
+    rcases hsh with ⟨_, hsy⟩ | ⟨_, hsy⟩ <;> · rw [h] at hsy; omega
+  have hsh_yx :
+      ((σ y).val + 1 = (σ' y).val ∧ (σ x).val + 1 = (σ' x).val) ∨
+        ((σ' y).val + 1 = (σ y).val ∧ (σ' x).val + 1 = (σ x).val) := by
+    rcases hsh with ⟨hsx, hsy⟩ | ⟨hsx, hsy⟩
+    · exact Or.inl ⟨hsy, hsx⟩
+    · exact Or.inr ⟨hsy, hsx⟩
+  have hagree_yx : ∀ k, k ≠ y → k ≠ x → σ' k = σ k := fun k hky hkx => hagree k hkx hky
+  have hbonds_zero :
+      ((∑ a : Λ, ∑ b : Λ, J a b • spinSDotXXZSwap a b (1 : ℂ) N : ManyBodyOpS Λ N)
+        σ' σ) = 0 := by
+    rw [Matrix.sum_apply]
+    refine Finset.sum_eq_zero (fun a _ => ?_)
+    rw [Matrix.sum_apply]
+    refine Finset.sum_eq_zero (fun b _ => ?_)
+    rw [Matrix.smul_apply, smul_eq_mul]
+    by_cases hab : a = b
+    · subst a
+      rw [hJself b, zero_mul]
+    · by_cases hagree_ab : ∀ k, k ≠ a → k ≠ b → σ' k = σ k
+      · have hpair := pair_or_swap_of_agree_off_two_site_two_diff hxy hx_ne hy_ne hagree_ab
+        rcases hpair with ⟨ha, hb⟩ | ⟨ha, hb⟩
+        · subst a
+          subst b
+          rw [spinSDotXXZSwap_apply_eq_zero_of_parityBondStepS_witness_lambda_one
+            hxy hsh hagree, mul_zero]
+        · subst a
+          subst b
+          rw [spinSDotXXZSwap_apply_eq_zero_of_parityBondStepS_witness_lambda_one
+            hxy.symm hsh_yx hagree_yx, mul_zero]
+      · rw [spinSDotXXZSwap_apply_eq_zero_of_not_agree hab (1 : ℂ) hagree_ab, mul_zero]
+  have hsingle_zero : singleIonAnisotropyS2 D N σ' σ = 0 :=
+    singleIonAnisotropyS2_apply_eq_zero_of_two_site_diff hxy hx_ne hy_ne
+  rw [dressedAxisSwappedAnisotropicHeisenbergSReMatrix_apply,
+    dressedAxisSwappedAnisotropicHeisenbergS_apply,
+    axisSwappedAnisotropicHeisenbergS_def, Matrix.add_apply, hbonds_zero,
+    hsingle_zero, zero_add, mul_zero, Complex.zero_re]
+
+/-- At `lambda = 1`, target-raised raw support reduces to a single-ion step
+or zero. -/
+theorem dressedAxisSwappedReMatrix_single_or_zero_of_magSum_add_two_lambda_one
+    (A : Λ → Bool) {J : Λ → Λ → ℂ} (hJself : ∀ x, J x x = 0)
+    (hJsupp : ∀ x y, ¬ (bipartiteCompleteGraphOf A).Adj x y → J x y = 0)
+    {D : ℂ}
+    {σ' σ : Λ → Fin (N + 1)} (hne : σ' ≠ σ)
+    (hmag : magSumS σ' = magSumS σ + 2) :
+    SingleIonStepS σ σ' ∨
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J 1 D N σ' σ = 0 := by
+  rcases dressedAxisSwappedReMatrix_parity_or_single_or_zero_of_magSum_add_two
+      A hJsupp hne hmag with hbond | hsingle | hzero
+  · exact Or.inr (dressedAxisSwappedReMatrix_zero_of_parityBondStep_lambda_one A hJself hbond)
+  · exact Or.inl hsingle
+  · exact Or.inr hzero
+
+/-- At `lambda = 1`, source-raised raw support reduces to a single-ion step
+or zero. -/
+theorem dressedAxisSwappedReMatrix_single_or_zero_of_add_two_magSum_lambda_one
+    (A : Λ → Bool) {J : Λ → Λ → ℂ} (hJself : ∀ x, J x x = 0)
+    (hJsupp : ∀ x y, ¬ (bipartiteCompleteGraphOf A).Adj x y → J x y = 0)
+    {D : ℂ}
+    {σ' σ : Λ → Fin (N + 1)} (hne : σ' ≠ σ)
+    (hmag : magSumS σ' + 2 = magSumS σ) :
+    SingleIonStepS σ σ' ∨
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J 1 D N σ' σ = 0 := by
+  rcases dressedAxisSwappedReMatrix_parity_or_single_or_zero_of_add_two_magSum
+      A hJsupp hne hmag with hbond | hsingle | hzero
+  · exact Or.inr (dressedAxisSwappedReMatrix_zero_of_parityBondStep_lambda_one A hJself hbond)
+  · exact Or.inl hsingle
+  · exact Or.inr hzero
+
 /-! ## Raw support at the `D = 0` boundary -/
 
 /-- At `D = 0`, a raw single-ion step has zero dressed real entry: bond terms
@@ -309,6 +445,39 @@ theorem shiftedCaseIIBlock_nonneg_of_bond_step_support_D_zero
     exact caseIIParityGaugedAxisSwappedReMatrixOnParityBlock_eq_zero_of_dressed_zero
       A J lam 0 N p (hzero hne hmag_eq hmag_up hmag_down)
 
+/-- Entrywise non-negativity at `lambda = 1` from raw total-Hamiltonian
+support. -/
+theorem shiftedCaseIIBlock_nonneg_of_raw_support_lambda_one
+    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJself : ∀ x, J x x = 0)
+    (hJsupp : ∀ x y, ¬ (bipartiteCompleteGraphOf A).Adj x y → J x y = 0)
+    {D : ℂ} (hDim : D.im = 0) (hDneg : D.re < 0)
+    {c : ℝ} (p : ℕ)
+    (hc : ∀ σ : parityConfigS Λ N p,
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J 1 D N σ.1 σ.1 ≤ c)
+    (σ τ : parityConfigS Λ N p) :
+    0 ≤ shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock A J 1 D N c p σ τ := by
+  refine shiftedCaseIIBlock_nonneg_of_ion_step_support_lambda_one
+    A hJim hJnn hJpos hJself hDim hDneg p hc ?_ ?_ ?_ ?_ σ τ
+  · intro σ τ hne hmag
+    have hne_val : τ.1 ≠ σ.1 := fun h => hne (Subtype.ext h)
+    exact dressedAxisSwappedReMatrix_raiseLower_or_zero_of_magSum_eq
+      A hJsupp hne_val hmag
+  · intro σ τ hne hmag
+    have hne_val : τ.1 ≠ σ.1 := fun h => hne (Subtype.ext h)
+    exact dressedAxisSwappedReMatrix_single_or_zero_of_magSum_add_two_lambda_one
+      A hJself hJsupp hne_val hmag
+  · intro σ τ hne hmag
+    have hne_val : τ.1 ≠ σ.1 := fun h => hne (Subtype.ext h)
+    exact dressedAxisSwappedReMatrix_single_or_zero_of_add_two_magSum_lambda_one
+      A hJself hJsupp hne_val hmag
+  · intro σ τ hne hmag_eq hmag_up hmag_down
+    have hne_val : τ.1 ≠ σ.1 := fun h => hne (Subtype.ext h)
+    exact dressedAxisSwappedAnisotropicHeisenbergSReMatrix_apply_eq_zero_of_not_magSum_step
+      A hJsupp hne_val hmag_eq hmag_up hmag_down
+
 /-- Entrywise non-negativity at `D = 0` from raw total-Hamiltonian support. -/
 theorem shiftedCaseIIBlock_nonneg_of_raw_support_D_zero
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
@@ -451,6 +620,48 @@ theorem shiftedCaseIIBlock_irreducible_of_bond_step_support_D_zero
   · obtain ⟨k, hk⟩ :=
       shiftedCaseIIBlock_pow_pos_of_bond_reachable_D_zero
         A hJim hJnn hJpos hJself hlam hlb hlam_gt hB_nn (hreach_total σ' σ hsig)
+    have hk_pos : 0 < k := by
+      rcases Nat.eq_zero_or_pos k with hk0 | hkp
+      · subst hk0
+        rw [pow_zero, Matrix.one_apply_ne hsig] at hk
+        exact absurd hk (lt_irrefl 0)
+      · exact hkp
+    exact ⟨k, hk_pos, hk⟩
+
+/-- Conditional irreducibility at `lambda = 1` from raw support and ion-only
+block reachability. -/
+theorem shiftedCaseIIBlock_irreducible_of_raw_support_lambda_one
+    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJself : ∀ x, J x x = 0)
+    (hJsupp : ∀ x y, ¬ (bipartiteCompleteGraphOf A).Adj x y → J x y = 0)
+    {D : ℂ} (hDim : D.im = 0) (hDneg : D.re < 0)
+    {c : ℝ} (p : ℕ)
+    (hc_strict : ∀ σ : parityConfigS Λ N p,
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J 1 D N σ.1 σ.1 < c)
+    [Nonempty (parityConfigS Λ N p)]
+    (hreach_total : ∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
+      ionParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ') :
+    (shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock A J 1 D N c p).IsIrreducible := by
+  have hc_le : ∀ σ : parityConfigS Λ N p,
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J 1 D N σ.1 σ.1 ≤ c :=
+    fun σ => le_of_lt (hc_strict σ)
+  have hB_nn : ∀ σ τ : parityConfigS Λ N p,
+      0 ≤ shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock A J 1 D N c p σ τ :=
+    shiftedCaseIIBlock_nonneg_of_raw_support_lambda_one
+      A hJim hJnn hJpos hJself hJsupp hDim hDneg p hc_le
+  rw [Matrix.isIrreducible_iff_exists_pow_pos hB_nn]
+  intro σ' σ
+  by_cases hsig : σ' = σ
+  · subst hsig
+    refine ⟨1, one_pos, ?_⟩
+    rw [pow_one]
+    exact shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock_diag_pos
+      A J 1 D N p (hc_strict σ')
+  · obtain ⟨k, hk⟩ :=
+      shiftedCaseIIBlock_pow_pos_of_ion_reachable_lambda_one
+        A hJim hJnn hJpos hJself hDim hDneg hB_nn (hreach_total σ' σ hsig)
     have hk_pos : 0 < k := by
       rcases Nat.eq_zero_or_pos k with hk0 | hkp
       · subst hk0
