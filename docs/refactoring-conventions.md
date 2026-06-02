@@ -337,6 +337,19 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
+- **2026-06-02 (PR #4112)**: Refactor checkpoint after the 20 post-#4091
+  Tasaki Theorem 2.4 case-(ii) feature PRs (#4092--#4111). Build-speed
+  evaluation focused on the recent case-(ii) parity-gauged shifted-matrix
+  modules. The largest new local-sign file,
+  `lake env lean LatticeSystem/Quantum/SpinS/AnisotropicHeisenbergSpinSCaseIILocalSigns.lean`,
+  measured `real 17.19s` (`user 3.67s`, `sys 3.46s`) on the first run and
+  `real 5.71s` (`user 3.62s`, `sys 1.97s`) on a warm rerun. The structural
+  sign-transfer and shifted-matrix files measured `real 4.22s` and `real 3.70s`,
+  while the block PF/min bridge measured `real 4.00s`. The warm local-sign time
+  and small downstream times do not justify a module split yet; the first run is
+  tracked as dependency/cache cost. The PR therefore keeps the checkpoint narrow
+  and removes one now-unnecessary `set_option linter.style.longLine false in`
+  wrapper from the case-(ii) block PF/min bridge.
 - **2026-06-02 (PR #4091)**: Refactor checkpoint after the 20 post-#4070
   Tasaki Theorem 2.4 / Problem 2.5 feature PRs (#4071--#4090).
   Build-speed evaluation rechecked the largest current Theorem 2.4 SU(2)
