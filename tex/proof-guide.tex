@@ -13138,7 +13138,17 @@ this for both parity blocks along \(\gamma(t)\), and the target wrappers
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_finrank\_le\_one\_of\_block\_pf\_min\_path}
 and
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_block\_pf\_min\_path}
-feed the result to the block-path bridge.
+feed the result to the block-path bridge.  The same file introduces the
+abbreviations \texttt{axisSwappedParityBlockPFMinAt} and
+\texttt{axisSwappedParityBlockPFMinPath} for this repeated PF/min callback
+shape, and
+\texttt{axisSwappedAnisotropicHeisenbergS\_submatrix\_pf\_min\_path\_of\_caseII\_raw\_support}
+turns the fixed strict and zero-coefficient raw-support consumers into a
+pathwise callback for one parity block.  The case~(ii) path-region inequalities
+choose the strict branch, the \(\lambda=1\) ion-only branch, or the \(D=0\)
+bond-only branch.  The corner \((\lambda,D)=(1,0)\) remains an explicit
+PF/min callback because the strict coefficients used by those three consumers
+all vanish there.
 \texttt{AnisotropicHeisenbergSpinSCaseIIParityGauge.lean} begins the
 case~(ii) PF sign layer.  In the region \(\lambda\ge1\), \(D\le0\), the
 Marshall sign alone does not put the parity-bond and single-ion off-diagonal
@@ -13404,8 +13414,11 @@ boundaries.  The parity-block PF/min layer now transfers shifted case~(ii)
 parity-gauged non-negative irreducible blocks to bare axis-swapped
 parity-block PF/min witnesses in the strict raw-support region, at the
 \(\lambda=1\) ion-only boundary, and at the \(D=0\) bond-only boundary.  The
-remaining pathwise case~(ii) task is to supply the appropriate strict or
-zero-coefficient reachability hypotheses along the deformation path.
+block-PF/min layer now selects among these fixed consumers along the
+case~(ii) deformation path; the remaining pathwise case~(ii) task is to
+supply the appropriate strict or zero-coefficient reachability hypotheses
+along the path, together with the explicit \((\lambda,D)=(1,0)\) corner
+PF/min callback.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
