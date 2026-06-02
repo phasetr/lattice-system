@@ -2662,6 +2662,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionMultiAnnihilation_mulVec_basisVec` | `c_j \|c⟩ = jwSign N j c • \|c with j↦0⟩` if `c j = 1`, else `0` | `Fermion/JordanWigner/AnnihilationCreationBasisVec.lean` |
 | `fermionMultiCreation_mulVec_basisVec` | `c†_j \|c⟩ = jwSign N j c • \|c with j↦1⟩` if `c j = 0`, else `0` | `Fermion/JordanWigner/AnnihilationCreationBasisVec.lean` |
 | `fermionMultiCreation_mul_Annihilation_mulVec_basisVec` | a single hop `c†_p c_q \|c⟩` = `(jwSign·jwSign) • \|c with q↦0, p↦1⟩` if `c q = 1` and the intermediate config is empty at `p`, else `0` | `Fermion/JordanWigner/HopBasisVec.lean` |
+| `jwSign_zero_config` / `fermionMultiCreation_mulVec_vacuum_eq_basisVec` | the string sign of the vacuum is `1`; `c†_j \|vac⟩ = \|single electron at j⟩` (base case for the ordered-`c†` Tasaki basis (11.2.3)) | `Fermion/JordanWigner/VacuumCreationBasisVec.lean` |
 
 #### Span of the one-hole hard-core sector (Tasaki §11.2, footnote 8)
 
