@@ -13242,9 +13242,25 @@ zero-support.  The wrappers
 \texttt{shiftedCaseIIParityGaugedBlock\_nonneg\_of\_magSum\_support}, and
 \texttt{shiftedCaseIIParityGaugedBlock\_irreducible\_of\_magSum\_support}
 feed this support split through shifted entrywise non-negativity and the block
-irreducibility layer.  The remaining case~(ii) shifted-matrix work is the raw
-total-Hamiltonian support/sign split, PF/min identification, and the boundary
-move-set choices when a strict local coefficient vanishes.
+irreducibility layer.
+\texttt{AnisotropicHeisenbergSpinSCaseIIStepSupport.lean} then supplies the
+next consumer layer: it turns a step-or-zero split into those
+\(\texttt{magSumS}\) support hypotheses.  Equal-\(\texttt{magSumS}\)
+off-diagonal pairs are represented by a transverse
+\(\texttt{RaiseLowerStepS}\) or zero support; target/source
+\(\texttt{magSumS}\) raised by two are represented by
+\(\texttt{ParityBondStepS}\), \(\texttt{SingleIonStepS}\), or zero support.
+The step signs are exactly the local case~(ii) dressed signs already proved
+above, weakened to non-positive/non-negative inequalities; dressed zero support
+is transferred through the parity gauge by
+\texttt{caseIIParityGaugedAxisSwappedReMatrixOnParityBlock\_eq\_zero\_of\_dressed\_zero}.
+The wrappers
+\texttt{shiftedCaseIIParityGaugedBlock\_nonneg\_of\_step\_support} and
+\texttt{shiftedCaseIIParityGaugedBlock\_irreducible\_of\_step\_support}
+therefore reduce the block PF input to the remaining raw
+total-Hamiltonian witness/zero classification.  PF/min identification and the
+boundary move-set choices when a strict local coefficient vanishes remain
+separate later steps.
 
 The new general spin-\(S\) obligation-(2) wrapper supplies that strict-gap
 callback from one SU(2)-endpoint input.  First,
