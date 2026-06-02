@@ -337,7 +337,7 @@ The goal is that **anyone reviewing a PR can apply this checklist
 mechanically** and catch most regressions / drift.
 
 ### History
-- **2026-06-02 (PR pending)**: Refactor checkpoint after the 20 post-#4091
+- **2026-06-02 (PR #4112)**: Refactor checkpoint after the 20 post-#4091
   Tasaki Theorem 2.4 case-(ii) feature PRs (#4092--#4111). Build-speed
   evaluation focused on the recent case-(ii) parity-gauged shifted-matrix
   modules. The largest new local-sign file,
