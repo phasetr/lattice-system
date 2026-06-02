@@ -52,6 +52,55 @@ abbrev axisSwappedParityBlockPFMinPath
       (anisotropicHeisenbergParametricPath lam D t).1
       (anisotropicHeisenbergParametricPath lam D t).2 p
 
+/-- Strict-interior raw-support data along the case-(ii) path for one
+axis-swapped parity block. -/
+abbrev axisSwappedParityBlockStrictRawSupportPath
+    (A : Λ → Bool) (J : Λ → Λ → ℂ) (lam D : ℝ)
+    (p : ℕ) [Nonempty (parityConfigS Λ N p)] : Prop :=
+  ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+    1 < (anisotropicHeisenbergParametricPath lam D t).1 →
+    (anisotropicHeisenbergParametricPath lam D t).2 < 0 →
+      ∃ c : ℝ,
+        (∀ σ : parityConfigS Λ N p,
+          dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J
+            ((anisotropicHeisenbergParametricPath lam D t).1 : ℂ)
+            ((anisotropicHeisenbergParametricPath lam D t).2 : ℂ) N
+            σ.1 σ.1 < c) ∧
+          (∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
+            parityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+
+/-- `lambda = 1` ion-only raw-support data along the case-(ii) path for one
+axis-swapped parity block. -/
+abbrev axisSwappedParityBlockLambdaOneRawSupportPath
+    (A : Λ → Bool) (J : Λ → Λ → ℂ) (lam D : ℝ)
+    (p : ℕ) [Nonempty (parityConfigS Λ N p)] : Prop :=
+  ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+    (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
+    (anisotropicHeisenbergParametricPath lam D t).2 < 0 →
+      ∃ c : ℝ,
+        (∀ σ : parityConfigS Λ N p,
+          dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J
+            1 ((anisotropicHeisenbergParametricPath lam D t).2 : ℂ) N
+            σ.1 σ.1 < c) ∧
+          (∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
+            ionParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+
+/-- `D = 0` bond-only raw-support data along the case-(ii) path for one
+axis-swapped parity block. -/
+abbrev axisSwappedParityBlockDZeroRawSupportPath
+    (A : Λ → Bool) (J : Λ → Λ → ℂ) (lam D : ℝ)
+    (p : ℕ) [Nonempty (parityConfigS Λ N p)] : Prop :=
+  ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+    1 < (anisotropicHeisenbergParametricPath lam D t).1 →
+    (anisotropicHeisenbergParametricPath lam D t).2 = 0 →
+      ∃ c : ℝ,
+        (∀ σ : parityConfigS Λ N p,
+          dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J
+            ((anisotropicHeisenbergParametricPath lam D t).1 : ℂ) 0 N
+            σ.1 σ.1 < c) ∧
+          (∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
+            bondParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+
 /-- **Parity-block `finrank <= 1` at the full ground energy from PF/min data**.
 
 For `p = 0` or `p = 1`, assume a bare axis-swapped parity block has a
@@ -233,40 +282,10 @@ theorem axisSwappedAnisotropicHeisenbergS_submatrix_pf_min_path_of_caseII_raw_su
     {lam D : ℝ}
     (hlam_case_ii : 1 ≤ lam) (hD_case_ii : D ≤ 0)
     (p : ℕ) [Nonempty (parityConfigS Λ N p)]
-    (hstrict :
-      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
-        1 < (anisotropicHeisenbergParametricPath lam D t).1 →
-        (anisotropicHeisenbergParametricPath lam D t).2 < 0 →
-          ∃ c : ℝ,
-            (∀ σ : parityConfigS Λ N p,
-              dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J
-                ((anisotropicHeisenbergParametricPath lam D t).1 : ℂ)
-                ((anisotropicHeisenbergParametricPath lam D t).2 : ℂ) N
-                σ.1 σ.1 < c) ∧
-              (∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
-                parityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ'))
+    (hstrict : axisSwappedParityBlockStrictRawSupportPath (Λ := Λ) (N := N) A J lam D p)
     (hlambda_one :
-      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
-        (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
-        (anisotropicHeisenbergParametricPath lam D t).2 < 0 →
-          ∃ c : ℝ,
-            (∀ σ : parityConfigS Λ N p,
-              dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J
-                1 ((anisotropicHeisenbergParametricPath lam D t).2 : ℂ) N
-                σ.1 σ.1 < c) ∧
-              (∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
-                ionParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ'))
-    (hD_zero :
-      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
-        1 < (anisotropicHeisenbergParametricPath lam D t).1 →
-        (anisotropicHeisenbergParametricPath lam D t).2 = 0 →
-          ∃ c : ℝ,
-            (∀ σ : parityConfigS Λ N p,
-              dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J
-                ((anisotropicHeisenbergParametricPath lam D t).1 : ℂ) 0 N
-                σ.1 σ.1 < c) ∧
-              (∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
-                bondParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ'))
+      axisSwappedParityBlockLambdaOneRawSupportPath (Λ := Λ) (N := N) A J lam D p)
+    (hD_zero : axisSwappedParityBlockDZeroRawSupportPath (Λ := Λ) (N := N) A J lam D p)
     (hcorner :
       ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
         (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
@@ -327,6 +346,129 @@ theorem axisSwappedAnisotropicHeisenbergS_submatrix_pf_min_path_of_caseII_raw_su
           (by simpa using hD_lt)
           (p := p) hc_strict hreach_total
     · exact hcorner t ht hlam_eq.symm hD_eq
+
+/-- **Even and odd PF/min callbacks from case-(ii) raw support**.
+
+This applies the single-block selector to both parity blocks.  The strict,
+`lambda = 1`, `D = 0`, and corner inputs stay separated by parity so later
+connectivity proofs can discharge them independently. -/
+theorem caseII_axisSwapped_parityBlockPFMinPath_of_raw_support
+    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJself : ∀ x, J x x = 0)
+    (hJsupp : ∀ x y, ¬ (bipartiteCompleteGraphOf A).Adj x y → J x y = 0)
+    {lam D : ℝ}
+    (hlam_case_ii : 1 ≤ lam) (hD_case_ii : D ≤ 0)
+    [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
+    (h_even_strict :
+      axisSwappedParityBlockStrictRawSupportPath (Λ := Λ) (N := N) A J lam D 0)
+    (h_even_lambda_one :
+      axisSwappedParityBlockLambdaOneRawSupportPath (Λ := Λ) (N := N) A J lam D 0)
+    (h_even_D_zero :
+      axisSwappedParityBlockDZeroRawSupportPath (Λ := Λ) (N := N) A J lam D 0)
+    (h_even_corner :
+      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
+        (anisotropicHeisenbergParametricPath lam D t).2 = 0 →
+          axisSwappedParityBlockPFMinAt (Λ := Λ) (N := N) J hJim
+            (anisotropicHeisenbergParametricPath lam D t).1
+            (anisotropicHeisenbergParametricPath lam D t).2 0)
+    (h_odd_strict :
+      axisSwappedParityBlockStrictRawSupportPath (Λ := Λ) (N := N) A J lam D 1)
+    (h_odd_lambda_one :
+      axisSwappedParityBlockLambdaOneRawSupportPath (Λ := Λ) (N := N) A J lam D 1)
+    (h_odd_D_zero :
+      axisSwappedParityBlockDZeroRawSupportPath (Λ := Λ) (N := N) A J lam D 1)
+    (h_odd_corner :
+      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
+        (anisotropicHeisenbergParametricPath lam D t).2 = 0 →
+          axisSwappedParityBlockPFMinAt (Λ := Λ) (N := N) J hJim
+            (anisotropicHeisenbergParametricPath lam D t).1
+            (anisotropicHeisenbergParametricPath lam D t).2 1) :
+    axisSwappedParityBlockPFMinPath (Λ := Λ) (N := N) J hJim lam D 0 ∧
+      axisSwappedParityBlockPFMinPath (Λ := Λ) (N := N) J hJim lam D 1 := by
+  constructor
+  · exact axisSwappedAnisotropicHeisenbergS_submatrix_pf_min_path_of_caseII_raw_support
+      (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJsupp
+      hlam_case_ii hD_case_ii 0 h_even_strict h_even_lambda_one h_even_D_zero
+      h_even_corner
+  · exact axisSwappedAnisotropicHeisenbergS_submatrix_pf_min_path_of_caseII_raw_support
+      (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJsupp
+      hlam_case_ii hD_case_ii 1 h_odd_strict h_odd_lambda_one h_odd_D_zero
+      h_odd_corner
+
+/-- **Pathwise parity-block full-min bounds from case-(ii) raw support**.
+
+This combines the raw-support PF/min selector for the even and odd blocks with
+the block-minimum transfer to the full ground energy along the path. -/
+theorem caseII_axisSwapped_submatrix_blocks_path_of_raw_support_pf_min
+    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJself : ∀ x, J x x = 0)
+    (hJsupp : ∀ x y, ¬ (bipartiteCompleteGraphOf A).Adj x y → J x y = 0)
+    (hJ_star : ∀ x y, star (J x y) = J x y)
+    [Nonempty (Λ → Fin (N + 1))]
+    [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
+    {lam D : ℝ}
+    (hlam_case_ii : 1 ≤ lam) (hD_case_ii : D ≤ 0)
+    (h_even_strict :
+      axisSwappedParityBlockStrictRawSupportPath (Λ := Λ) (N := N) A J lam D 0)
+    (h_even_lambda_one :
+      axisSwappedParityBlockLambdaOneRawSupportPath (Λ := Λ) (N := N) A J lam D 0)
+    (h_even_D_zero :
+      axisSwappedParityBlockDZeroRawSupportPath (Λ := Λ) (N := N) A J lam D 0)
+    (h_even_corner :
+      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
+        (anisotropicHeisenbergParametricPath lam D t).2 = 0 →
+          axisSwappedParityBlockPFMinAt (Λ := Λ) (N := N) J hJim
+            (anisotropicHeisenbergParametricPath lam D t).1
+            (anisotropicHeisenbergParametricPath lam D t).2 0)
+    (h_odd_strict :
+      axisSwappedParityBlockStrictRawSupportPath (Λ := Λ) (N := N) A J lam D 1)
+    (h_odd_lambda_one :
+      axisSwappedParityBlockLambdaOneRawSupportPath (Λ := Λ) (N := N) A J lam D 1)
+    (h_odd_D_zero :
+      axisSwappedParityBlockDZeroRawSupportPath (Λ := Λ) (N := N) A J lam D 1)
+    (h_odd_corner :
+      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
+        (anisotropicHeisenbergParametricPath lam D t).2 = 0 →
+          axisSwappedParityBlockPFMinAt (Λ := Λ) (N := N) J hJim
+            (anisotropicHeisenbergParametricPath lam D t).1
+            (anisotropicHeisenbergParametricPath lam D t).2 1) :
+    (∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+          ((axisSwappedAnisotropicHeisenbergS (Λ := Λ) J
+            ((anisotropicHeisenbergParametricPath lam D t).1 : ℂ)
+            ((anisotropicHeisenbergParametricPath lam D t).2 : ℂ) N).submatrix
+            (fun σ : parityConfigS Λ N 0 => σ.1)
+            (fun σ : parityConfigS Λ N 0 => σ.1)))
+          ((hermitianMinEigenvalue
+            (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N
+              (anisotropicHeisenbergParametricPath lam D t).1
+              (anisotropicHeisenbergParametricPath lam D t).2) : ℝ) : ℂ)) ≤ 1) ∧
+      (∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+          ((axisSwappedAnisotropicHeisenbergS (Λ := Λ) J
+            ((anisotropicHeisenbergParametricPath lam D t).1 : ℂ)
+            ((anisotropicHeisenbergParametricPath lam D t).2 : ℂ) N).submatrix
+            (fun σ : parityConfigS Λ N 1 => σ.1)
+            (fun σ : parityConfigS Λ N 1 => σ.1)))
+          ((hermitianMinEigenvalue
+            (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N
+              (anisotropicHeisenbergParametricPath lam D t).1
+              (anisotropicHeisenbergParametricPath lam D t).2) : ℝ) : ℂ)) ≤ 1) := by
+  rcases caseII_axisSwapped_parityBlockPFMinPath_of_raw_support
+      (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJsupp
+      hlam_case_ii hD_case_ii h_even_strict h_even_lambda_one h_even_D_zero
+      h_even_corner h_odd_strict h_odd_lambda_one h_odd_D_zero h_odd_corner with
+    ⟨h_even_pf, h_odd_pf⟩
+  exact caseII_axisSwapped_submatrix_blocks_path_of_pf_min
+    (Λ := Λ) (N := N) (J := J) hJim hJself hJ_star h_even_pf h_odd_pf
 
 /-- **General spin-S case-(ii) target uniqueness from pathwise parity-block
 PF/min callbacks**. -/
