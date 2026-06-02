@@ -4789,6 +4789,86 @@ finite sum is zero.
 \end{itemize}
 
 %======================================================================
+\subsection{Hubbard hard-core projection (Tasaki §11.2)}
+\label{subsec:hubbard-hardcore-projection}
+%======================================================================
+
+\noindent\textbf{Construction.}
+The same-site double-occupancy operators
+\(\hat D_i = n_{i,\uparrow}n_{i,\downarrow}\) are pairwise-commuting
+idempotents: \(\hat D_i^2 = \hat D_i\) and
+\([\hat D_i,\hat D_j]=0\) (the four underlying Jordan--Wigner number
+operators live at distinct positions). Hence each
+\emph{hard-core factor}
+\[
+  \hat P_i := 1 - \hat D_i
+\]
+is an idempotent (\(\hat P_i^2 = 1 - 2\hat D_i + \hat D_i^2
+= 1 - \hat D_i = \hat P_i\)), the factors pairwise commute, and
+\(\hat D_i\hat P_i = \hat D_i - \hat D_i^2 = 0\). The
+\emph{hard-core projection} is the non-commutative product
+\[
+  \hat P_{\rm hc} := \prod_{i} \hat P_i = \prod_{i}\bigl(1 - \hat D_i\bigr),
+\]
+well-defined because the factors commute.
+
+\medskip
+\noindent\textbf{Properties} (unnumbered infrastructure for Tasaki
+Theorems 11.5 and 11.7; 1st edition, §11.2, pp.~381--388).
+\begin{enumerate}
+  \item \emph{Idempotence}: \(\hat P_{\rm hc}^2 = \hat P_{\rm hc}\).
+    A non-commutative product of pairwise-commuting idempotents is
+    idempotent, proved by induction on the index finset using
+    \(\hat P_i^2=\hat P_i\) and commutativity to regroup.
+  \item \emph{Annihilation}: for every site \(j\),
+    \(\hat D_j\,\hat P_{\rm hc} = 0\). Extract the \(j\)-th factor to the
+    front (the factors commute) and use \(\hat D_j\hat P_j = 0\).
+  \item \emph{Fixed points}: \(\hat P_{\rm hc}\psi = \psi\) for every
+    \(\psi\in\mathcal H_{\rm hc}\), since each factor fixes \(\psi\)
+    (\(\hat P_i\psi = \psi - \hat D_i\psi = \psi\)).
+  \item \emph{Range}: \(\hat P_{\rm hc}\psi\in\mathcal H_{\rm hc}\) for
+    every \(\psi\), since
+    \(\hat D_j(\hat P_{\rm hc}\psi) = (\hat D_j\hat P_{\rm hc})\psi = 0\).
+  \item \emph{Hermiticity}: \(\hat P_{\rm hc}^\dagger = \hat P_{\rm hc}\).
+    Each \(\hat D_i\) is Hermitian (product of commuting Hermitian number
+    operators), so each factor \(\hat P_i = 1 - \hat D_i\) is Hermitian, and
+    a non-commutative product of pairwise-commuting Hermitian matrices is
+    Hermitian. Together with idempotence this makes \(\hat P_{\rm hc}\) an
+    orthogonal projection.
+\end{enumerate}
+Thus \(\hat P_{\rm hc}\) is the projection onto the no-double-occupancy
+(hard-core) subspace \(\mathcal H_{\rm hc}\) used in the infinite-\(U\) /
+one-hole Nagaoka sector.
+
+\medskip
+\noindent\textbf{Lean declarations}
+(file \texttt{Fermion/JordanWigner/Hubbard/HardcoreProjection.lean}):
+\begin{itemize}
+  \item \texttt{hubbardHardcoreFactor N i}: \(\hat P_i = 1 - \hat D_i\).
+  \item \texttt{hubbardHardcoreFactor\_mul\_self}: \(\hat P_i^2 = \hat P_i\).
+  \item \texttt{hubbardDoubleOccupancy\_mul\_hardcoreFactor}:
+    \(\hat D_i\hat P_i = 0\).
+  \item \texttt{hubbardHardcoreFactor\_commute}: factors commute.
+  \item \texttt{hubbardDoubleOccupancy\_isHermitian} and
+    \texttt{hubbardHardcoreFactor\_isHermitian}: \(\hat D_i\) and
+    \(\hat P_i\) are Hermitian.
+  \item \texttt{hubbardHardcoreFactor\_mulVec\_eq\_self\_of\_mem}:
+    each factor fixes a hard-core vector.
+  \item \texttt{hubbardHardcoreProjection N}:
+    \(\hat P_{\rm hc} = \prod_i \hat P_i\).
+  \item \texttt{hubbardHardcoreProjection\_mul\_self}:
+    \(\hat P_{\rm hc}^2 = \hat P_{\rm hc}\).
+  \item \texttt{hubbardHardcoreProjection\_isHermitian}:
+    \(\hat P_{\rm hc}^\dagger = \hat P_{\rm hc}\).
+  \item \texttt{hubbardDoubleOccupancy\_mul\_hardcoreProjection}:
+    \(\hat D_j\hat P_{\rm hc} = 0\).
+  \item \texttt{hubbardHardcoreProjection\_mulVec\_eq\_self\_of\_mem}:
+    \(\hat P_{\rm hc}\psi=\psi\) on \(\mathcal H_{\rm hc}\).
+  \item \texttt{hubbardHardcoreProjection\_mulVec\_mem}:
+    \(\hat P_{\rm hc}\psi\in\mathcal H_{\rm hc}\).
+\end{itemize}
+
+%======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
 %======================================================================
