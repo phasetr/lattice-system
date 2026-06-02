@@ -13211,9 +13211,21 @@ non-negative.  The strict transfer lemmas
 and
 \texttt{shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock\_pos\_of\_add\_two\_magSumS}
 turn the corresponding dressed strict signs into strict positivity of the
-shifted entry.  The remaining local case~(ii) work is now to prove those
-dressed signs from \(\lambda\ge1\) and \(D\le0\), then feed them into
-irreducibility and PF/min identification.
+shifted entry.  The local sign file
+\texttt{AnisotropicHeisenbergSpinSCaseIILocalSigns.lean} supplies those
+dressed strict signs and feeds them into this transfer API.  For transverse
+\(\pm1,\mp1\) moves,
+\texttt{shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock\_pos\_of\_raiseLowerStepS}
+uses the positive \((1+\lambda)/4\) coefficient and the Marshall sign flip;
+for parity-bond \(\pm1,\pm1\) moves,
+\texttt{shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock\_pos\_of\_parityBondStepS}
+uses the negative \((1-\lambda)/4\) coefficient together with the extra
+case~(ii) parity gauge; and for same-site \(\pm2\) moves,
+\texttt{shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock\_pos\_of\_singleIonStepS}
+uses \(D<0\) against the negative \((\hat S^2)^2\) off-diagonal entry.  Thus
+the remaining case~(ii) shifted-matrix work is reachability/irreducibility and
+PF/min identification, together with the boundary move-set choices when a
+strict local coefficient vanishes.
 
 The new general spin-\(S\) obligation-(2) wrapper supplies that strict-gap
 callback from one SU(2)-endpoint input.  First,
@@ -13262,10 +13274,14 @@ argmin-first-crossing bridge, the first-crossing finrank bridge, the
 path-global finrank bridge, the block-path finrank bridge, and the
 block-PF/min bridge described above, plus the first parity-gauge sign layer,
 the parity-gauged shifted-matrix structural layer, and the shifted-matrix
-sign-transfer layer.  The remaining
-case~(ii) task is to prove sign non-negativity, irreducibility, and PF/min
+sign-transfer layer.  The local sign layer now proves strict shifted-entry
+positivity for the transverse, parity-bond, and single-ion elementary moves in
+the corresponding strict local regimes: \(-1<\lambda\) for transverse moves,
+\(1<\lambda\) for parity-bond moves, and \(D<0\) for single-ion moves.  The
+remaining case~(ii) task is to prove reachability/irreducibility, handle the
+boundary move sets where a strict local coefficient vanishes, and prove PF/min
 identification for the shifted matrix on the two bare axis-swapped parity
-blocks in the \(\lambda\ge1\), \(D\le0\) region.
+blocks.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
