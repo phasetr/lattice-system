@@ -13139,6 +13139,26 @@ this for both parity blocks along \(\gamma(t)\), and the target wrappers
 and
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_block\_pf\_min\_path}
 feed the result to the block-path bridge.
+\texttt{AnisotropicHeisenbergSpinSCaseIIParityGauge.lean} begins the
+case~(ii) PF sign layer.  In the region \(\lambda\ge1\), \(D\le0\), the
+Marshall sign alone does not put the parity-bond and single-ion off-diagonal
+terms into the case~(i) shifted-matrix sign convention: those moves change
+\(\texttt{magSumS}\) by \(\pm2\).  On a fixed parity block the additional
+gauge
+\[
+  \Xi(\sigma)=(-1)^{\texttt{magSumS}(\sigma)/2}
+\]
+agrees with Tasaki's block convention
+\((-1)^{(\texttt{magSumS}(\sigma)-p)/2}\) up to a constant sign.  The lemmas
+\texttt{caseIIParityGaugeSign\_mul\_eq\_one\_of\_magSumS\_eq},
+\texttt{caseIIParityGaugeSign\_mul\_eq\_neg\_one\_of\_magSumS\_add\_two},
+and
+\texttt{caseIIParityGaugeSign\_mul\_eq\_neg\_one\_of\_add\_two\_magSumS}
+record exactly the needed sign behavior: equal \(\texttt{magSumS}\) gives
+product \(1\), while a difference of \(2\) gives product \(-1\).  The diagonal
+matrix \texttt{caseIIParityGaugeDiagonalOnParity} squares to the identity by
+\texttt{caseIIParityGaugeDiagonalOnParity\_mul\_self}, so it can be combined
+with the Marshall diagonal in the next case~(ii) shifted PF matrix layer.
 
 The new general spin-\(S\) obligation-(2) wrapper supplies that strict-gap
 callback from one SU(2)-endpoint input.  First,
@@ -13185,9 +13205,10 @@ no-full-finrank bridge, the crossing-callback bridge, and the path-callback
 bridge, the crossing-set bridge, the first-crossing bridge, the
 argmin-first-crossing bridge, the first-crossing finrank bridge, the
 path-global finrank bridge, the block-path finrank bridge, and the
-block-PF/min bridge described above.  The remaining case~(ii) task is to prove
-pathwise PF simplicity and PF/min identification for the two bare axis-swapped
-parity blocks in the \(\lambda\ge1\), \(D\le0\) region.
+block-PF/min bridge described above, plus the first parity-gauge sign layer.
+The remaining case~(ii) task is to build the parity-gauged shifted PF matrix
+and prove pathwise PF simplicity and PF/min identification for the two bare
+axis-swapped parity blocks in the \(\lambda\ge1\), \(D\le0\) region.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
