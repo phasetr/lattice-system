@@ -13223,9 +13223,17 @@ uses the negative \((1-\lambda)/4\) coefficient together with the extra
 case~(ii) parity gauge; and for same-site \(\pm2\) moves,
 \texttt{shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock\_pos\_of\_singleIonStepS}
 uses \(D<0\) against the negative \((\hat S^2)^2\) off-diagonal entry.  Thus
-the remaining case~(ii) shifted-matrix work is reachability/irreducibility and
-PF/min identification, together with the boundary move-set choices when a
-strict local coefficient vanishes.
+\texttt{AnisotropicHeisenbergSpinSCaseIIBlockIrreducible.lean} defines the
+block-level closure
+\texttt{parityReachableSOnBlock} and packages the three local signs as
+\texttt{shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock\_pos\_of\_parityStepS}.
+Entrywise non-negativity plus block reachability gives a positive matrix-power
+entry, and reachability totality plus strict diagonal shift gives the
+conditional irreducibility theorem
+\texttt{shiftedCaseIIParityGaugedBlock\_isIrreducible\_of\_blockReachable\_total}.
+The remaining case~(ii) shifted-matrix work is global entrywise
+non-negativity/off-diagonal support, PF/min identification, and the boundary
+move-set choices when a strict local coefficient vanishes.
 
 The new general spin-\(S\) obligation-(2) wrapper supplies that strict-gap
 callback from one SU(2)-endpoint input.  First,
@@ -13278,10 +13286,13 @@ sign-transfer layer.  The local sign layer now proves strict shifted-entry
 positivity for the transverse, parity-bond, and single-ion elementary moves in
 the corresponding strict local regimes: \(-1<\lambda\) for transverse moves,
 \(1<\lambda\) for parity-bond moves, and \(D<0\) for single-ion moves.  The
-remaining case~(ii) task is to prove reachability/irreducibility, handle the
-boundary move sets where a strict local coefficient vanishes, and prove PF/min
-identification for the shifted matrix on the two bare axis-swapped parity
-blocks.
+block irreducibility layer now turns those step signs into block matrix-power
+positivity from block-level parity reachability and into conditional
+irreducibility from entrywise non-negativity, strict diagonal shift, and
+reachability totality.  The remaining case~(ii) task is to prove global
+entrywise non-negativity/off-diagonal support, handle the boundary move sets
+where a strict local coefficient vanishes, and prove PF/min identification for
+the shifted matrix on the two bare axis-swapped parity blocks.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
