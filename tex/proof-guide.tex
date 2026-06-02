@@ -4963,6 +4963,24 @@ basis states.
     \(\hat J_i|c\rangle = \bigl(\prod_{j<i}(-1)^{c_j}\bigr)|c\rangle\).
 \end{itemize}
 
+\medskip
+\noindent\textbf{Annihilation and creation on basis states.}
+Writing the string sign \(\varepsilon_j(c) := \prod_{k<j}(-1)^{c_k}\) and using
+\(\hat c_j = \hat J_j\,\sigma^+_j\), \(\hat c_j^\dagger = \hat J_j\,\sigma^-_j\)
+with \(\sigma^+=\bigl(\begin{smallmatrix}0&1\\0&0\end{smallmatrix}\bigr)\),
+\(\sigma^-=\bigl(\begin{smallmatrix}0&0\\1&0\end{smallmatrix}\bigr)\) flipping the
+site-\(j\) occupation, the single-mode operators act on a basis state by
+\[
+  \hat c_j|c\rangle =
+    \begin{cases}\varepsilon_j(c)\,|c^{j\mapsto0}\rangle & c_j=1\\ 0 & c_j=0,\end{cases}
+  \qquad
+  \hat c_j^\dagger|c\rangle =
+    \begin{cases}\varepsilon_j(c)\,|c^{j\mapsto1}\rangle & c_j=0\\ 0 & c_j=1.\end{cases}
+\]
+(\texttt{jwSign}, \texttt{fermionMultiAnnihilation\_mulVec\_basisVec},
+\texttt{fermionMultiCreation\_mulVec\_basisVec} in
+\texttt{Fermion/JordanWigner/AnnihilationCreationBasisVec.lean}.)
+
 %======================================================================
 \subsection{Span of the one-hole hard-core sector (Tasaki §11.2, footnote 8)}
 \label{subsec:hubbard-hardcore-span}
