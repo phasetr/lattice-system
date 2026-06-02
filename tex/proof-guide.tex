@@ -13190,6 +13190,30 @@ records its diagonal, off-diagonal, strict-shift diagonal positivity, and
 symmetry facts.  The remaining case~(ii) PF work is to prove sign
 non-negativity, reachability/irreducibility, and PF/min identification for
 this shifted matrix in the region \(\lambda\ge1\), \(D\le0\).
+\texttt{AnisotropicHeisenbergSpinSCaseIIParityGaugedSigns.lean} adds the
+corresponding structural sign-transfer API.  The real gauge product lemmas
+\texttt{caseIIParityGaugeSignReal\_mul\_eq\_one\_of\_magSumS\_eq},
+\texttt{caseIIParityGaugeSignReal\_mul\_eq\_neg\_one\_of\_magSumS\_add\_two},
+and
+\texttt{caseIIParityGaugeSignReal\_mul\_eq\_neg\_one\_of\_add\_two\_magSumS}
+are the real analogues of the complex sign layer.  They yield entry
+identities saying that the parity-gauged real matrix equals the dressed real
+entry on equal-\(\texttt{magSumS}\) pairs and equals its negative when the two
+magnetization sums differ by \(2\).  Consequently dressed negativity on
+transverse moves and dressed positivity on the \(\pm2\) moves both become
+parity-gauged non-positivity.  The theorem
+\texttt{shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock\_nonneg}
+packages the structural implication: a diagonal shift bound plus
+off-diagonal non-positivity of \(R^{(ii)}\) makes \(cI-R^{(ii)}\) entrywise
+non-negative.  The strict transfer lemmas
+\texttt{shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock\_pos\_of\_magSumS\_eq},
+\texttt{shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock\_pos\_of\_magSumS\_add\_two},
+and
+\texttt{shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock\_pos\_of\_add\_two\_magSumS}
+turn the corresponding dressed strict signs into strict positivity of the
+shifted entry.  The remaining local case~(ii) work is now to prove those
+dressed signs from \(\lambda\ge1\) and \(D\le0\), then feed them into
+irreducibility and PF/min identification.
 
 The new general spin-\(S\) obligation-(2) wrapper supplies that strict-gap
 callback from one SU(2)-endpoint input.  First,
@@ -13236,8 +13260,9 @@ no-full-finrank bridge, the crossing-callback bridge, and the path-callback
 bridge, the crossing-set bridge, the first-crossing bridge, the
 argmin-first-crossing bridge, the first-crossing finrank bridge, the
 path-global finrank bridge, the block-path finrank bridge, and the
-block-PF/min bridge described above, plus the first parity-gauge sign layer
-and the parity-gauged shifted-matrix structural layer.  The remaining
+block-PF/min bridge described above, plus the first parity-gauge sign layer,
+the parity-gauged shifted-matrix structural layer, and the shifted-matrix
+sign-transfer layer.  The remaining
 case~(ii) task is to prove sign non-negativity, irreducibility, and PF/min
 identification for the shifted matrix on the two bare axis-swapped parity
 blocks in the \(\lambda\ge1\), \(D\le0\) region.
