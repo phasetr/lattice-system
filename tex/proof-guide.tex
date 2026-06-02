@@ -5152,6 +5152,68 @@ pp.~381--388).
 \end{itemize}
 
 %======================================================================
+\subsection{Tasaki ordered-creation basis (Tasaki §11.2, eq.~(11.2.3))}
+\label{subsec:hubbard-tasaki-basis}
+%======================================================================
+
+\noindent\textbf{Definition (11.2.3).}
+Tasaki's basis state for the one-hole hard-core sector is
+\[
+  |\Phi_{x,\sigma}\rangle
+    := \hat c_{x,\uparrow}
+       \Big(\prod_{y\in\Lambda} \hat c^\dagger_{y,\bar\sigma_y}\Big)
+       |\Phi_{\rm vac}\rangle,
+  \qquad \bar\sigma_x = \uparrow,
+\]
+where the creation product runs over all sites in a fixed order and
+\(\bar\sigma\) agrees with \(\sigma\) off the hole site \(x\). Every site is
+filled, then the spin-\(\uparrow\) electron at the hole \(x\) is annihilated.
+This ``redundant'' double action is Tasaki's device for fixing the precise
+fermion signs that make the hopping matrix elements (11.2.5) uniformly signed.
+
+\medskip
+\noindent\textbf{Reduction to a signed basis vector.}
+We take the creation product in \emph{increasing} Jordan--Wigner index order.
+The rightmost (largest-index) operator acts on the vacuum first, and each
+successive creation operator acts at an index smaller than all currently
+occupied modes; hence \emph{every} Jordan--Wigner string sign along the product
+equals \(1\), and the ordered product on the vacuum is exactly the
+computational basis vector of the all-filled configuration. The single
+annihilation at the hole then contributes one nontrivial string sign
+\(\varepsilon\in\{\pm 1\}\), so
+\[
+  |\Phi_{x,\sigma}\rangle
+    = \varepsilon \cdot \mathrm{basisVec}\big(\texttt{hubbardOneHoleConfig}\,
+      N\,x\,\sigma\big).
+\]
+Orthonormality of the \(|\Phi_{x,\sigma}\rangle\) is then inherited from the
+computational basis vectors, since \(\varepsilon^2 = 1\).
+
+\medskip
+\noindent\textbf{Lean declarations}
+(file \texttt{Fermion/JordanWigner/Hubbard/TasakiBasis.lean}):
+\begin{itemize}
+  \item \texttt{occupationOf js}: the configuration occupied exactly on the
+    indices listed in \texttt{js}.
+  \item \texttt{prod\_creation\_mulVec\_vacuum}: the ordered-creation fold
+    lemma --- a strictly index-sorted product of creation operators on the
+    vacuum equals \(\mathrm{basisVec}(\texttt{occupationOf js})\), every string
+    sign being \(1\).
+  \item \texttt{tasakiIndexList}, \texttt{tasakiIndexList\_sorted},
+    \texttt{mem\_tasakiIndexList\_iff}: the increasing index list of the
+    all-filled spin configuration, its strict sortedness, and its membership
+    characterization.
+  \item \texttt{hubbardTasakiBasisState N x }\(\sigma\): the (11.2.3) basis
+    state.
+  \item \texttt{hubbardTasakiBasisState\_eq\_smul\_basisVec}:
+    \(|\Phi_{x,\sigma}\rangle = \varepsilon\cdot\mathrm{basisVec}\).
+  \item \texttt{hubbardTasakiBasisSign\_mul\_self}: \(\varepsilon^2 = 1\).
+  \item \texttt{hubbardTasakiBasisState\_inner} and
+    \texttt{hubbardTasakiBasisState\_self\_inner}: orthonormality and
+    normalization.
+\end{itemize}
+
+%======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
 %======================================================================
