@@ -13159,6 +13159,37 @@ product \(1\), while a difference of \(2\) gives product \(-1\).  The diagonal
 matrix \texttt{caseIIParityGaugeDiagonalOnParity} squares to the identity by
 \texttt{caseIIParityGaugeDiagonalOnParity\_mul\_self}, so it can be combined
 with the Marshall diagonal in the next case~(ii) shifted PF matrix layer.
+\texttt{AnisotropicHeisenbergSpinSCaseIIParityGaugedMatrix.lean} constructs
+that structural matrix layer.  The real sign
+\texttt{caseIIParityGaugeSignReal} is the real-valued version of \(\Xi\), and
+\texttt{caseIICombinedGaugeSignOnParity} multiplies it with the Marshall sign
+on each parity block.  The diagonal
+\texttt{caseIICombinedGaugeDiagonalOnParity} squares to the identity by
+\texttt{caseIICombinedGaugeDiagonalOnParity\_mul\_self}.  Rather than
+duplicating the complex bare matrix, the Lean definition
+\texttt{caseIIParityGaugedAxisSwappedReMatrixOnParityBlock} applies \(\Xi\) on
+the left and right of the existing Marshall-dressed real matrix:
+\[
+  R^{(ii)}_{A,\lambda,D,p}(\sigma,\tau)
+    = \Xi(\sigma)\,
+      \operatorname{Re}\!\bigl(\widetilde H'_{A,\lambda,D}(\sigma,\tau)\bigr)\,
+      \Xi(\tau).
+\]
+Its diagonal agrees with the dressed real matrix by
+\texttt{caseIIParityGaugedAxisSwappedReMatrixOnParityBlock\_apply\_diag}, and
+it is symmetric for real coupling data by
+\texttt{caseIIParityGaugedAxisSwappedReMatrixOnParityBlock\_isSymm\_of\_real}.
+The shifted PF candidate is
+\[
+  B^{(ii)}_{A,\lambda,D,p,c}
+    = c I - R^{(ii)}_{A,\lambda,D,p},
+\]
+implemented as
+\texttt{shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock}.  The file
+records its diagonal, off-diagonal, strict-shift diagonal positivity, and
+symmetry facts.  The remaining case~(ii) PF work is to prove sign
+non-negativity, reachability/irreducibility, and PF/min identification for
+this shifted matrix in the region \(\lambda\ge1\), \(D\le0\).
 
 The new general spin-\(S\) obligation-(2) wrapper supplies that strict-gap
 callback from one SU(2)-endpoint input.  First,
@@ -13205,10 +13236,11 @@ no-full-finrank bridge, the crossing-callback bridge, and the path-callback
 bridge, the crossing-set bridge, the first-crossing bridge, the
 argmin-first-crossing bridge, the first-crossing finrank bridge, the
 path-global finrank bridge, the block-path finrank bridge, and the
-block-PF/min bridge described above, plus the first parity-gauge sign layer.
-The remaining case~(ii) task is to build the parity-gauged shifted PF matrix
-and prove pathwise PF simplicity and PF/min identification for the two bare
-axis-swapped parity blocks in the \(\lambda\ge1\), \(D\le0\) region.
+block-PF/min bridge described above, plus the first parity-gauge sign layer
+and the parity-gauged shifted-matrix structural layer.  The remaining
+case~(ii) task is to prove sign non-negativity, irreducibility, and PF/min
+identification for the shifted matrix on the two bare axis-swapped parity
+blocks in the \(\lambda\ge1\), \(D\le0\) region.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
