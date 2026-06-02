@@ -40,6 +40,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.HopAction
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HopMatrixElement
 import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonian
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiBasis
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiHopAction
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyProjection
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyCommute
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinfulNumberHermitian
@@ -117,6 +118,7 @@ expansion):
 | `Hubbard/HardcoreSpan.lean` | one-hole hard-core sector spanned by the basis states (Tasaki §11.2 fn. 8) |
 | `Hubbard/EffectiveHamiltonian.lean` | effective Hamiltonian `Ĥ_eff = P̂_hc H P̂_hc` + `U→∞` reduction (Tasaki §11.2) |
 | `Hubbard/TasakiBasis.lean` | Tasaki ordered-creation basis `\|Φ_{x,σ}⟩ = ε • basisVec` + orthonormality (Tasaki §11.2 eq. (11.2.3)) |
+| `Hubbard/TasakiHopAction.lean` | uniform-sign hole-filling action `ĉ†_{x,s}ĉ_{z,s}\|Φ_{x,σ}⟩ = -\|Φ_{z,σ_{z→x}}⟩` + sign `ε = (-1)^x` (Tasaki §11.2 eq. (11.2.4)) |
 | `Hubbard/DoubleOccupancyProjection.lean` | site-`i` `Commute n_↑ n_↓` + idempotent product |
 | `Hubbard/DoubleOccupancyCommute.lean` | cross-site `Commute (n_↑(i)·n_↓(i)) (n_↑(j)·n_↓(j))` |
 | `Hubbard/SpinfulNumberHermitian.lean` | `n_↑(i)`, `n_↓(i)`, `n_↑(i)·n_↓(i)` Hermitian |
