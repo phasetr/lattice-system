@@ -4869,6 +4869,73 @@ one-hole Nagaoka sector.
 \end{itemize}
 
 %======================================================================
+\subsection{One-hole hard-core basis states (Tasaki §11.2)}
+\label{subsec:hubbard-hardcore-basis}
+%======================================================================
+
+\noindent\textbf{Construction.}
+The one-hole hard-core basis states \(|\Phi_{x,\sigma}\rangle\) (Tasaki
+eq.~(11.2.3)) label the infinite-\(U\) / one-hole Nagaoka sector: one
+spinful site \(x\in\Lambda\) is the hole (both orbitals empty), and every
+other site \(j\neq x\) carries exactly one electron of spin
+\(\sigma(j)\in\{\uparrow,\downarrow\}\). In the Jordan--Wigner occupation
+representation this is the computational basis configuration
+\(c_{x,\sigma}\) with
+\[
+  c_{x,\sigma}(2j)=\begin{cases}0 & j=x\\ 1 & j\neq x,\ \sigma(j)=\uparrow\\
+    0 & j\neq x,\ \sigma(j)=\downarrow\end{cases}
+  \qquad
+  c_{x,\sigma}(2j{+}1)=\begin{cases}0 & j=x\\ 0 & j\neq x,\ \sigma(j)=\uparrow\\
+    1 & j\neq x,\ \sigma(j)=\downarrow,\end{cases}
+\]
+and \(|\Phi_{x,\sigma}\rangle := \mathtt{basisVec}\,(c_{x,\sigma})\). The
+states are defined sign-free as occupation configurations; the relation to
+Tasaki's ordered creation-operator products (carrying fermion signs,
+relevant to the hopping matrix elements (11.2.5)) is deferred to the
+effective-Hamiltonian layer.
+
+\medskip
+\noindent\textbf{Properties} (unnumbered one-hole hard-core basis
+infrastructure for Tasaki Theorems 11.5 and 11.7; 1st edition, §11.2,
+pp.~381--388).
+\begin{enumerate}
+  \item \emph{Hard-core membership}: at every site at least one orbital is
+    empty, so \(\hat D_i|\Phi_{x,\sigma}\rangle = 0\) and
+    \(|\Phi_{x,\sigma}\rangle\in\mathcal H_{\rm hc}\). Concretely, at the
+    hole the up-orbital is empty; off the hole the empty orbital is the
+    down-orbital for \(\sigma=\uparrow\) and the up-orbital for
+    \(\sigma=\downarrow\), and \(\hat D_i = n_{i,\uparrow}n_{i,\downarrow}\)
+    is killed by whichever number operator sees the empty orbital (using
+    \([n_{i,\uparrow},n_{i,\downarrow}]=0\)).
+  \item \emph{Projection-fixed}: \(\hat P_{\rm hc}|\Phi_{x,\sigma}\rangle =
+    |\Phi_{x,\sigma}\rangle\), immediate from membership.
+  \item \emph{Orthonormality}: since the states are distinct computational
+    basis vectors, \(\langle\Phi_{x,\sigma}|\Phi_{x',\sigma'}\rangle = 1\) if
+    \(c_{x,\sigma}=c_{x',\sigma'}\) and \(0\) otherwise; in particular each
+    state is normalised.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Lean declarations}
+(file \texttt{Fermion/JordanWigner/Hubbard/HardcoreBasis.lean}):
+\begin{itemize}
+  \item \texttt{hubbardOneHoleConfig N x }\(\sigma\): the configuration
+    \(c_{x,\sigma}\).
+  \item \texttt{hubbardOneHoleConfig\_apply\_up} /
+    \texttt{hubbardOneHoleConfig\_apply\_down}: its orbital occupation
+    values per site.
+  \item \texttt{hubbardHardcoreBasisState N x }\(\sigma\):
+    \(|\Phi_{x,\sigma}\rangle\).
+  \item \texttt{hubbardHardcoreBasisState\_mem\_hardcoreSubspace}:
+    \(|\Phi_{x,\sigma}\rangle\in\mathcal H_{\rm hc}\).
+  \item \texttt{hubbardHardcoreProjection\_mulVec\_basisState}:
+    \(\hat P_{\rm hc}|\Phi_{x,\sigma}\rangle = |\Phi_{x,\sigma}\rangle\).
+  \item \texttt{hubbardHardcoreBasisState\_inner} and
+    \texttt{hubbardHardcoreBasisState\_self\_inner}: orthonormality and
+    normalisation.
+\end{itemize}
+
+%======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
 %======================================================================
