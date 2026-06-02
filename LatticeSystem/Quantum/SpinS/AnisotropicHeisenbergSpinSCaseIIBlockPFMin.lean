@@ -266,7 +266,6 @@ theorem anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_block_pf_min_pat
     M_balanced h_balanced hlam_case_ii hD_case_ii h_centered_nonzero
     h_strict_gap_at_SU2 h_GS_at_SU2 h_even h_odd
 
-set_option linter.style.longLine false in
 /-- **General spin-S case-(ii) target zero magnetization from pathwise
 parity-block PF/min callbacks**. -/
 theorem anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_block_pf_min_path
