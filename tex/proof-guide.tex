@@ -13473,6 +13473,25 @@ for \(2\le N\), total reachability on the bipartite complete graph feeds the
 case~(ii) target uniqueness and zero-magnetization wrappers directly, modulo
 the standard balanced-sector bookkeeping.
 
+The current general spin-\(S\), \(2\le N\), public region wrapper
+(\texttt{AnisotropicHeisenbergSpinSTheorem24.lean}) is now only a dispatch
+layer.  For \(-1<\lambda<1\), \(D\ge0\), it invokes the
+\(\texttt{\_D\_nonneg\_general}\) endpoint.  For \(\lambda=1\), \(D\ge0\), it
+splits \(D=0\) from \(D>0\): the former is the direct SU(2) endpoint, while the
+latter is the ion-only \(\lambda=1\), \(D>0\) endpoint.  For
+\(\lambda\ge1\), \(D\le0\), it invokes the case~(ii) total-reachability
+endpoint above.  This gives
+\[
+  \dim_{\mathbb C}\ker\bigl(\hat H_{\lambda,D}
+    - E_{\rm GS}(\lambda,D)\bigr) \le 1
+\]
+throughout the packaged parameter region, with \(E_{\rm GS}\) represented in
+Lean by the Hermitian minimum eigenvalue of the anisotropic Hamiltonian.  The
+second wrapper then applies the existing uniqueness-implies-zero-magnetization
+theorem, giving \(\hat S^3_{\mathrm{tot}}\Phi=0\) for every non-zero target
+ground state \(\Phi\).  This is the composed Theorem~2.4 endpoint currently
+available for the general spin-\(S\), \(2\le N\), input surface.
+
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
 \hat S^1_x\hat S^1_y+\lambda\hat S^2_x\hat S^2_y+\hat S^3_x\hat S^3_y
