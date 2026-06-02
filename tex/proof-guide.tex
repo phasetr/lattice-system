@@ -13173,7 +13173,18 @@ and the target wrappers
 and
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_reachability\_pf\_min\_path}
 replace the lower-level raw-support path inputs by reachability totality plus
-the explicit corner PF/min callbacks.
+the explicit corner PF/min callbacks.  The reachability-totality bridge in
+\texttt{AnisotropicHeisenbergSpinSCaseIIBlockReachability.lean} lifts
+full-configuration \(\texttt{ParityReachableS}\),
+\(\texttt{IonParityReachableS}\), and \(\texttt{BondParityReachableS}\) paths
+to the corresponding fixed-parity-block relations by parity preservation.  Its
+totality wrappers then supply the strict and bond-only block reachability
+inputs from \(1\le N\), and the ion-only block reachability input from
+\(2\le N\).  Consequently
+\texttt{caseII\_axisSwapped\_parityBlockPFMinPath\_of\_total\_reachability}
+and
+\texttt{caseII\_axisSwapped\_submatrix\_blocks\_path\_of\_total\_reachability\_pf\_min}
+leave only the two explicit \((\lambda,D)=(1,0)\) corner PF/min callbacks.
 \texttt{AnisotropicHeisenbergSpinSCaseIIParityGauge.lean} begins the
 case~(ii) PF sign layer.  In the region \(\lambda\ge1\), \(D\le0\), the
 Marshall sign alone does not put the parity-bond and single-ion off-diagonal
@@ -13444,10 +13455,10 @@ case~(ii) deformation path, packages the even and odd parity-block callbacks,
 feeds them to the full-ground-energy block transfer, and exposes the target
 uniqueness and zero-magnetization wrappers directly from that raw-support
 surface.  It now also supplies the strict diagonal shift from finite
-parity-block boundedness.  The remaining pathwise case~(ii) input is therefore
-the appropriate strict, ion-only, or bond-only reachability totality for both
-parity blocks, together with the explicit \((\lambda,D)=(1,0)\) corner PF/min
-callbacks.
+parity-block boundedness, and the block reachability totality bridge supplies
+the strict, ion-only, and bond-only reachability inputs for \(2\le N\).  The
+remaining pathwise case~(ii) input in this layer is therefore just the two
+explicit \((\lambda,D)=(1,0)\) corner PF/min callbacks.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
