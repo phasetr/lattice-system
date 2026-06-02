@@ -4735,6 +4735,60 @@ The hopping Hamiltonian acts as
 \end{itemize}
 
 %======================================================================
+\subsection{Hubbard hard-core subspace (Tasaki §11.2)}
+\label{subsec:hubbard-hardcore-subspace}
+%======================================================================
+
+\noindent\textbf{Definition.}
+For the Hubbard model on \(N+1\) sites, the same-site
+double-occupancy operator is
+\[
+  \hat D_i := \hat n_{i,\uparrow}\hat n_{i,\downarrow}.
+\]
+The hard-core subspace is the linear subspace
+\[
+  \mathcal H_{\rm hc}
+  :=
+  \{\psi \mid \hat D_i\psi = 0 \text{ for every site } i\}.
+\]
+This is the no-double-occupancy sector used in the \(U=\infty\)
+and one-hole Nagaoka discussion as unnumbered infrastructure for
+Tasaki Theorems 11.5 and 11.7 (1st edition, §11.2, pp.~381--388).
+
+\noindent\textbf{Lean theorem} (unnumbered hard-core infrastructure for
+Tasaki Theorems 11.5 and 11.7; 1st edition, §11.2, pp.~381--388).
+If \(\psi \in \mathcal H_{\rm hc}\), then the on-site Hubbard
+interaction annihilates \(\psi\):
+\[
+  \hat H_{\rm int}\psi
+  =
+  U\sum_i \hat n_{i,\uparrow}\hat n_{i,\downarrow}\psi
+  =
+  0.
+\]
+
+\noindent\textbf{Proof.}
+Each summand is \(U\,\hat D_i\psi\), and the defining hard-core
+condition gives \(\hat D_i\psi=0\) for every \(i\). Therefore the
+finite sum is zero.
+
+\noindent\textbf{Lean names}
+(file \texttt{Fermion/JordanWigner/Hubbard/HardcoreSubspace.lean}):
+\begin{itemize}
+  \item \texttt{hubbardDoubleOccupancy N i}: \(\hat D_i\).
+  \item \texttt{hubbardHardcoreSubspace N}: the linear subspace
+    \(\mathcal H_{\rm hc}\).
+  \item \texttt{mem\_hubbardHardcoreSubspace\_iff}: membership is
+    equivalent to all double-occupancy actions vanishing.
+  \item \texttt{hubbardDoubleOccupancy\_mulVec\_eq\_zero\_of\_mem\_hardcore}:
+    each \(\hat D_i\) annihilates a hard-core vector.
+  \item \texttt{hubbardOnSiteInteraction\_mulVec\_eq\_zero\_of\_mem\_hardcore}
+    and
+    \texttt{hubbardOnSiteInteraction\_apply\_eq\_zero\_of\_mem\_hardcore}:
+    vector and pointwise forms of \(\hat H_{\rm int}\psi=0\).
+\end{itemize}
+
+%======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
 %======================================================================
@@ -16621,6 +16675,7 @@ Multi-mode fermion via Jordan--Wigner (CAR + number op + Hubbard chain) & finite
 Hubbard chain, finite volume (open and periodic BC) & finite-dim & \emph{formalized} \\
 Hubbard SU(2) symmetry: $[\hat{S}^{\pm}_{\mathrm{tot}}, H] = 0$ (Tasaki §9.3.3) & finite-dim & \emph{formalized} \\
 Hubbard all-up-spin state: $H_{\mathrm{int}}|\!\!\uparrow\cdots\uparrow\rangle = 0$ (Tasaki §11.1.1) & finite-dim & \emph{formalized} \\
+Hubbard hard-core subspace: $H_{\mathrm{int}}\psi=0$ for no-double-occupancy states (unnumbered infrastructure for Tasaki Theorems 11.5 and 11.7; 1st ed., §11.2, pp.~381--388) & finite-dim & \emph{formalized} \\
 Partial trace & finite-dim & not started \\
 Quantum canonical ensemble wrapper & finite-dim & not started \\
 BCS model (mean field) & finite-dim & not started \\

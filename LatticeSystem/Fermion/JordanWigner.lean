@@ -27,6 +27,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.AllDownState
 import LatticeSystem.Fermion.JordanWigner.Hubbard.AllDownStateTotalNumber
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinTotHermitian
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SaturatedFerromagnetism
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreSubspace
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyProjection
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyCommute
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinfulNumberHermitian
@@ -98,6 +99,7 @@ expansion):
 | `Hubbard/AllDownStateTotalNumber.lean` | `N_↓ · |↓..⟩ = (N+1)·|↓..⟩`, `S^z·|↓..⟩ = -(N+1)/2·|↓..⟩` |
 | `Hubbard/SpinTotHermitian.lean` | `(Ŝ^-)ᴴ = Ŝ^+`, `(Ŝ^z)`/`(Ŝ²)` Hermitian |
 | `Hubbard/SaturatedFerromagnetism.lean` | spin Casimir, Def 11.1, SU(2) algebra |
+| `Hubbard/HardcoreSubspace.lean` | hard-core subspace + `H_int` vanishing (Tasaki §11.2) |
 | `Hubbard/DoubleOccupancyProjection.lean` | site-`i` `Commute n_↑ n_↓` + idempotent product |
 | `Hubbard/DoubleOccupancyCommute.lean` | cross-site `Commute (n_↑(i)·n_↓(i)) (n_↑(j)·n_↓(j))` |
 | `Hubbard/SpinfulNumberHermitian.lean` | `n_↑(i)`, `n_↓(i)`, `n_↑(i)·n_↓(i)` Hermitian |
