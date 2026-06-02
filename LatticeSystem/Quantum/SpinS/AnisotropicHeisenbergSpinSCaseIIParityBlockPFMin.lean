@@ -250,6 +250,43 @@ theorem axisSwappedAnisotropicHeisenbergS_submatrix_pf_min_of_caseII_raw_support
   exact axisSwappedAnisotropicHeisenbergS_submatrix_pf_min_of_caseII_shifted_block
     (Λ := Λ) (N := N) A hJim hJself hlam hDim p hB_nn hIrred
 
+/-- At the `lambda = 1` boundary, raw support classification and ion-only
+block reachability supply the bare parity-block PF/min witness. -/
+theorem axisSwappedAnisotropicHeisenbergS_submatrix_pf_min_of_caseII_raw_support_lambda_one
+    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJself : ∀ x, J x x = 0)
+    (hJsupp : ∀ x y, ¬ (bipartiteCompleteGraphOf A).Adj x y → J x y = 0)
+    {D : ℂ} (hDim : D.im = 0) (hDneg : D.re < 0)
+    {c : ℝ} (p : ℕ) [Nonempty (parityConfigS Λ N p)]
+    (hc_strict : ∀ σ : parityConfigS Λ N p,
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J 1 D N σ.1 σ.1 < c)
+    (hreach_total : ∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
+      ionParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ') :
+    ∃ ν : ℝ,
+      finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+        ((axisSwappedAnisotropicHeisenbergS (Λ := Λ) J (1 : ℂ) D N).submatrix
+          (fun σ : parityConfigS Λ N p => σ.1)
+          (fun σ : parityConfigS Λ N p => σ.1))) (ν : ℂ)) ≤ 1 ∧
+        ν = hermitianMinEigenvalue
+          (axisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real
+            (Λ := Λ) (N := N) (J := J) (lam := (1 : ℂ)) (D := D)
+            hJim (by norm_num) hDim p) := by
+  have hc_le : ∀ σ : parityConfigS Λ N p,
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J 1 D N σ.1 σ.1 ≤ c :=
+    fun σ => le_of_lt (hc_strict σ)
+  have hB_nn : ∀ σ τ : parityConfigS Λ N p,
+      0 ≤ shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock A J 1 D N c p σ τ :=
+    shiftedCaseIIBlock_nonneg_of_raw_support_lambda_one
+      A hJim hJnn hJpos hJself hJsupp hDim hDneg p hc_le
+  have hIrred :
+      (shiftedCaseIIParityGaugedAxisSwappedReMatrixOnParityBlock A J 1 D N c p).IsIrreducible :=
+    shiftedCaseIIBlock_irreducible_of_raw_support_lambda_one
+      A hJim hJnn hJpos hJself hJsupp hDim hDneg p hc_strict hreach_total
+  exact axisSwappedAnisotropicHeisenbergS_submatrix_pf_min_of_caseII_shifted_block
+    (Λ := Λ) (N := N) (lam := (1 : ℂ)) A hJim hJself (by norm_num) hDim p hB_nn hIrred
+
 /-- At the `D = 0` boundary, raw support classification and bond-only block
 reachability supply the bare parity-block PF/min witness. -/
 theorem axisSwappedAnisotropicHeisenbergS_submatrix_pf_min_of_caseII_raw_support_D_zero
