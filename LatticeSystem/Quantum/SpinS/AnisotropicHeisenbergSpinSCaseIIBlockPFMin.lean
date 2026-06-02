@@ -101,6 +101,71 @@ abbrev axisSwappedParityBlockDZeroRawSupportPath
           (∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
             bondParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
 
+/-- A finite parity block has a strict real upper bound for any dressed diagonal
+function. -/
+lemma exists_parityBlock_dressed_diag_strict_upper_bound
+    (A : Λ → Bool) (J : Λ → Λ → ℂ) (lam D : ℂ)
+    (p : ℕ) [Nonempty (parityConfigS Λ N p)] :
+    ∃ c : ℝ, ∀ σ : parityConfigS Λ N p,
+      dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ.1 σ.1 < c := by
+  classical
+  let f : parityConfigS Λ N p → ℝ :=
+    fun σ => dressedAxisSwappedAnisotropicHeisenbergSReMatrix A J lam D N σ.1 σ.1
+  obtain ⟨σ₀, _hσ₀, hσ₀_max⟩ :=
+    Finset.exists_max_image (Finset.univ : Finset (parityConfigS Λ N p)) f
+      Finset.univ_nonempty
+  refine ⟨f σ₀ + 1, fun σ => ?_⟩
+  have hle : f σ ≤ f σ₀ := hσ₀_max σ (Finset.mem_univ σ)
+  linarith
+
+/-- Strict-interior raw-support path data from strict block reachability
+totality. -/
+theorem axisSwappedParityBlockStrictRawSupportPath_of_reachability
+    (A : Λ → Bool) (J : Λ → Λ → ℂ) (lam D : ℝ)
+    (p : ℕ) [Nonempty (parityConfigS Λ N p)]
+    (hreach_total :
+      ∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
+        parityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ') :
+    axisSwappedParityBlockStrictRawSupportPath (Λ := Λ) (N := N) A J lam D p := by
+  intro t _ht _hlam_gt _hD_lt
+  obtain ⟨c, hc⟩ :=
+    exists_parityBlock_dressed_diag_strict_upper_bound
+      (Λ := Λ) (N := N) A J
+      ((anisotropicHeisenbergParametricPath lam D t).1 : ℂ)
+      ((anisotropicHeisenbergParametricPath lam D t).2 : ℂ) p
+  exact ⟨c, hc, hreach_total⟩
+
+/-- `lambda = 1` raw-support path data from ion-only block reachability
+totality. -/
+theorem axisSwappedParityBlockLambdaOneRawSupportPath_of_reachability
+    (A : Λ → Bool) (J : Λ → Λ → ℂ) (lam D : ℝ)
+    (p : ℕ) [Nonempty (parityConfigS Λ N p)]
+    (hreach_total :
+      ∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
+        ionParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ') :
+    axisSwappedParityBlockLambdaOneRawSupportPath (Λ := Λ) (N := N) A J lam D p := by
+  intro t _ht _hlam_eq _hD_lt
+  obtain ⟨c, hc⟩ :=
+    exists_parityBlock_dressed_diag_strict_upper_bound
+      (Λ := Λ) (N := N) A J 1
+      ((anisotropicHeisenbergParametricPath lam D t).2 : ℂ) p
+  exact ⟨c, hc, hreach_total⟩
+
+/-- `D = 0` raw-support path data from bond-only block reachability totality. -/
+theorem axisSwappedParityBlockDZeroRawSupportPath_of_reachability
+    (A : Λ → Bool) (J : Λ → Λ → ℂ) (lam D : ℝ)
+    (p : ℕ) [Nonempty (parityConfigS Λ N p)]
+    (hreach_total :
+      ∀ σ' σ : parityConfigS Λ N p, σ' ≠ σ →
+        bondParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ') :
+    axisSwappedParityBlockDZeroRawSupportPath (Λ := Λ) (N := N) A J lam D p := by
+  intro t _ht _hlam_gt _hD_eq
+  obtain ⟨c, hc⟩ :=
+    exists_parityBlock_dressed_diag_strict_upper_bound
+      (Λ := Λ) (N := N) A J
+      ((anisotropicHeisenbergParametricPath lam D t).1 : ℂ) 0 p
+  exact ⟨c, hc, hreach_total⟩
+
 /-- **Parity-block `finrank <= 1` at the full ground energy from PF/min data**.
 
 For `p = 0` or `p = 1`, assume a bare axis-swapped parity block has a
@@ -470,6 +535,154 @@ theorem caseII_axisSwapped_submatrix_blocks_path_of_raw_support_pf_min
   exact caseII_axisSwapped_submatrix_blocks_path_of_pf_min
     (Λ := Λ) (N := N) (J := J) hJim hJself hJ_star h_even_pf h_odd_pf
 
+/-- **Even and odd PF/min callbacks from case-(ii) reachability inputs**.
+
+This removes the diagonal-shift component of the raw-support input surface:
+finite parity blocks supply the strict shift automatically, so only the strict,
+ion-only, bond-only reachability totality hypotheses and the corner PF/min
+callbacks remain explicit. -/
+theorem caseII_axisSwapped_parityBlockPFMinPath_of_reachability
+    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJself : ∀ x, J x x = 0)
+    (hJsupp : ∀ x y, ¬ (bipartiteCompleteGraphOf A).Adj x y → J x y = 0)
+    {lam D : ℝ}
+    (hlam_case_ii : 1 ≤ lam) (hD_case_ii : D ≤ 0)
+    [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
+    (h_even_strict_reach :
+      ∀ σ' σ : parityConfigS Λ N 0, σ' ≠ σ →
+        parityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_even_lambda_one_reach :
+      ∀ σ' σ : parityConfigS Λ N 0, σ' ≠ σ →
+        ionParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_even_D_zero_reach :
+      ∀ σ' σ : parityConfigS Λ N 0, σ' ≠ σ →
+        bondParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_even_corner :
+      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
+        (anisotropicHeisenbergParametricPath lam D t).2 = 0 →
+          axisSwappedParityBlockPFMinAt (Λ := Λ) (N := N) J hJim
+            (anisotropicHeisenbergParametricPath lam D t).1
+            (anisotropicHeisenbergParametricPath lam D t).2 0)
+    (h_odd_strict_reach :
+      ∀ σ' σ : parityConfigS Λ N 1, σ' ≠ σ →
+        parityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_odd_lambda_one_reach :
+      ∀ σ' σ : parityConfigS Λ N 1, σ' ≠ σ →
+        ionParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_odd_D_zero_reach :
+      ∀ σ' σ : parityConfigS Λ N 1, σ' ≠ σ →
+        bondParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_odd_corner :
+      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
+        (anisotropicHeisenbergParametricPath lam D t).2 = 0 →
+          axisSwappedParityBlockPFMinAt (Λ := Λ) (N := N) J hJim
+            (anisotropicHeisenbergParametricPath lam D t).1
+            (anisotropicHeisenbergParametricPath lam D t).2 1) :
+    axisSwappedParityBlockPFMinPath (Λ := Λ) (N := N) J hJim lam D 0 ∧
+      axisSwappedParityBlockPFMinPath (Λ := Λ) (N := N) J hJim lam D 1 := by
+  exact caseII_axisSwapped_parityBlockPFMinPath_of_raw_support
+    (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJsupp
+    hlam_case_ii hD_case_ii
+    (axisSwappedParityBlockStrictRawSupportPath_of_reachability
+      (Λ := Λ) (N := N) A J lam D 0 h_even_strict_reach)
+    (axisSwappedParityBlockLambdaOneRawSupportPath_of_reachability
+      (Λ := Λ) (N := N) A J lam D 0 h_even_lambda_one_reach)
+    (axisSwappedParityBlockDZeroRawSupportPath_of_reachability
+      (Λ := Λ) (N := N) A J lam D 0 h_even_D_zero_reach)
+    h_even_corner
+    (axisSwappedParityBlockStrictRawSupportPath_of_reachability
+      (Λ := Λ) (N := N) A J lam D 1 h_odd_strict_reach)
+    (axisSwappedParityBlockLambdaOneRawSupportPath_of_reachability
+      (Λ := Λ) (N := N) A J lam D 1 h_odd_lambda_one_reach)
+    (axisSwappedParityBlockDZeroRawSupportPath_of_reachability
+      (Λ := Λ) (N := N) A J lam D 1 h_odd_D_zero_reach)
+    h_odd_corner
+
+/-- **Pathwise parity-block full-min bounds from case-(ii) reachability
+inputs**.
+
+This is the reachability-level version of
+`caseII_axisSwapped_submatrix_blocks_path_of_raw_support_pf_min`: it supplies
+the strict diagonal shifts on finite parity blocks before applying the
+raw-support PF/min selector. -/
+theorem caseII_axisSwapped_submatrix_blocks_path_of_reachability_pf_min
+    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJself : ∀ x, J x x = 0)
+    (hJsupp : ∀ x y, ¬ (bipartiteCompleteGraphOf A).Adj x y → J x y = 0)
+    (hJ_star : ∀ x y, star (J x y) = J x y)
+    [Nonempty (Λ → Fin (N + 1))]
+    [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
+    {lam D : ℝ}
+    (hlam_case_ii : 1 ≤ lam) (hD_case_ii : D ≤ 0)
+    (h_even_strict_reach :
+      ∀ σ' σ : parityConfigS Λ N 0, σ' ≠ σ →
+        parityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_even_lambda_one_reach :
+      ∀ σ' σ : parityConfigS Λ N 0, σ' ≠ σ →
+        ionParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_even_D_zero_reach :
+      ∀ σ' σ : parityConfigS Λ N 0, σ' ≠ σ →
+        bondParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_even_corner :
+      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
+        (anisotropicHeisenbergParametricPath lam D t).2 = 0 →
+          axisSwappedParityBlockPFMinAt (Λ := Λ) (N := N) J hJim
+            (anisotropicHeisenbergParametricPath lam D t).1
+            (anisotropicHeisenbergParametricPath lam D t).2 0)
+    (h_odd_strict_reach :
+      ∀ σ' σ : parityConfigS Λ N 1, σ' ≠ σ →
+        parityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_odd_lambda_one_reach :
+      ∀ σ' σ : parityConfigS Λ N 1, σ' ≠ σ →
+        ionParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_odd_D_zero_reach :
+      ∀ σ' σ : parityConfigS Λ N 1, σ' ≠ σ →
+        bondParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_odd_corner :
+      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
+        (anisotropicHeisenbergParametricPath lam D t).2 = 0 →
+          axisSwappedParityBlockPFMinAt (Λ := Λ) (N := N) J hJim
+            (anisotropicHeisenbergParametricPath lam D t).1
+            (anisotropicHeisenbergParametricPath lam D t).2 1) :
+    (∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+          ((axisSwappedAnisotropicHeisenbergS (Λ := Λ) J
+            ((anisotropicHeisenbergParametricPath lam D t).1 : ℂ)
+            ((anisotropicHeisenbergParametricPath lam D t).2 : ℂ) N).submatrix
+            (fun σ : parityConfigS Λ N 0 => σ.1)
+            (fun σ : parityConfigS Λ N 0 => σ.1)))
+          ((hermitianMinEigenvalue
+            (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N
+              (anisotropicHeisenbergParametricPath lam D t).1
+              (anisotropicHeisenbergParametricPath lam D t).2) : ℝ) : ℂ)) ≤ 1) ∧
+      (∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+          ((axisSwappedAnisotropicHeisenbergS (Λ := Λ) J
+            ((anisotropicHeisenbergParametricPath lam D t).1 : ℂ)
+            ((anisotropicHeisenbergParametricPath lam D t).2 : ℂ) N).submatrix
+            (fun σ : parityConfigS Λ N 1 => σ.1)
+            (fun σ : parityConfigS Λ N 1 => σ.1)))
+          ((hermitianMinEigenvalue
+            (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N
+              (anisotropicHeisenbergParametricPath lam D t).1
+              (anisotropicHeisenbergParametricPath lam D t).2) : ℝ) : ℂ)) ≤ 1) := by
+  rcases caseII_axisSwapped_parityBlockPFMinPath_of_reachability
+      (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJsupp
+      hlam_case_ii hD_case_ii h_even_strict_reach h_even_lambda_one_reach
+      h_even_D_zero_reach h_even_corner h_odd_strict_reach h_odd_lambda_one_reach
+      h_odd_D_zero_reach h_odd_corner with
+    ⟨h_even_pf, h_odd_pf⟩
+  exact caseII_axisSwapped_submatrix_blocks_path_of_pf_min
+    (Λ := Λ) (N := N) (J := J) hJim hJself hJ_star h_even_pf h_odd_pf
+
 omit [Fintype Λ] [DecidableEq Λ] in
 /-- Coupling support vanishes off the bipartite complete graph from no
 self-coupling and the usual bipartite support predicate. -/
@@ -789,6 +1002,178 @@ theorem anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_raw_support_
       h_strict_gap_at_SU2 h_GS_at_SU2 h_even_strict h_even_lambda_one
       h_even_D_zero h_even_corner h_odd_strict h_odd_lambda_one h_odd_D_zero
       h_odd_corner
+  exact anisotropicHeisenbergS_unique_groundState_has_zero_magnetization
+    (Λ := Λ) (N := N) J (lam : ℂ) (D : ℂ)
+    ((hermitianMinEigenvalue
+      (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N lam D) :
+        ℝ) : ℂ)
+    huniq hΦ_ne hΦ_gs
+
+/-- **General spin-S case-(ii) target uniqueness from reachability PF/min
+inputs**. -/
+theorem anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_reachability_pf_min_path
+    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJself : ∀ x, J x x = 0)
+    (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
+    (hJ_star : ∀ x y, star (J x y) = J x y)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
+    (hN : 1 ≤ N)
+    (M_balanced : ℕ)
+    [Nonempty (magConfigS Λ N M_balanced)] [Nonempty (Λ → Fin (N + 1))]
+    [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
+    (h_balanced : ((Fintype.card Λ : ℂ) * (N : ℂ) / 2) - (M_balanced : ℂ) = 0)
+    {lam D : ℝ}
+    (hlam_case_ii : 1 ≤ lam) (hD_case_ii : D ≤ 0)
+    (h_centered_nonzero :
+      ∀ M : ℕ, M ∈ Finset.range (Fintype.card Λ * N + 1) → M ≠ M_balanced →
+        (((Fintype.card Λ : ℂ) * (N : ℂ) / 2) - (M : ℂ)) ≠ 0)
+    (h_strict_gap_at_SU2 :
+      ∀ M : ℕ, ∀ _ : Nonempty (magConfigS Λ N M), M ≠ M_balanced →
+        anisotropicHeisenbergS_magSector_minEigenvalue_alongParametricPath
+          (Λ := Λ) hJ_star N M_balanced lam D 0 <
+        anisotropicHeisenbergS_magSector_minEigenvalue_alongParametricPath
+          (Λ := Λ) hJ_star N M lam D 0)
+    (h_GS_at_SU2 :
+      anisotropicHeisenbergS_magSector_minEigenvalue_alongParametricPath
+        (Λ := Λ) hJ_star N M_balanced lam D 0 =
+      hermitianMinEigenvalue
+        (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N
+          (anisotropicHeisenbergParametricPath lam D 0).1
+          (anisotropicHeisenbergParametricPath lam D 0).2))
+    (h_even_strict_reach :
+      ∀ σ' σ : parityConfigS Λ N 0, σ' ≠ σ →
+        parityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_even_lambda_one_reach :
+      ∀ σ' σ : parityConfigS Λ N 0, σ' ≠ σ →
+        ionParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_even_D_zero_reach :
+      ∀ σ' σ : parityConfigS Λ N 0, σ' ≠ σ →
+        bondParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_even_corner :
+      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
+        (anisotropicHeisenbergParametricPath lam D t).2 = 0 →
+          axisSwappedParityBlockPFMinAt (Λ := Λ) (N := N) J hJim
+            (anisotropicHeisenbergParametricPath lam D t).1
+            (anisotropicHeisenbergParametricPath lam D t).2 0)
+    (h_odd_strict_reach :
+      ∀ σ' σ : parityConfigS Λ N 1, σ' ≠ σ →
+        parityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_odd_lambda_one_reach :
+      ∀ σ' σ : parityConfigS Λ N 1, σ' ≠ σ →
+        ionParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_odd_D_zero_reach :
+      ∀ σ' σ : parityConfigS Λ N 1, σ' ≠ σ →
+        bondParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_odd_corner :
+      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
+        (anisotropicHeisenbergParametricPath lam D t).2 = 0 →
+          axisSwappedParityBlockPFMinAt (Λ := Λ) (N := N) J hJim
+            (anisotropicHeisenbergParametricPath lam D t).1
+            (anisotropicHeisenbergParametricPath lam D t).2 1) :
+    finrank ℂ ↥(End.eigenspace (Matrix.toLin'
+      (anisotropicHeisenbergS (Λ := Λ) J (lam : ℂ) (D : ℂ) N))
+      ((hermitianMinEigenvalue
+        (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N lam D) :
+          ℝ) : ℂ)) ≤ 1 := by
+  have hJsupp :=
+    caseII_coupling_eq_zero_of_not_bipartiteCompleteGraph_adj
+      (Λ := Λ) A hJself hJbip
+  rcases caseII_axisSwapped_parityBlockPFMinPath_of_reachability
+      (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJsupp
+      hlam_case_ii hD_case_ii h_even_strict_reach h_even_lambda_one_reach
+      h_even_D_zero_reach h_even_corner h_odd_strict_reach h_odd_lambda_one_reach
+      h_odd_D_zero_reach h_odd_corner with
+    ⟨h_even_pf, h_odd_pf⟩
+  exact anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_block_pf_min_path
+    (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hA_ne hB_ne hN
+    M_balanced h_balanced hlam_case_ii hD_case_ii h_centered_nonzero
+    h_strict_gap_at_SU2 h_GS_at_SU2 h_even_pf h_odd_pf
+
+/-- **General spin-S case-(ii) target zero magnetization from reachability
+PF/min inputs**. -/
+theorem anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_reachability_pf_min_path
+    (A : Λ → Bool) {J : Λ → Λ → ℂ}
+    (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
+    (hJpos : ∀ x y, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
+    (hJself : ∀ x, J x x = 0)
+    (hJbip : ∀ x y, J x y ≠ 0 → A x ≠ A y)
+    (hJ_star : ∀ x y, star (J x y) = J x y)
+    (hJ_sym : ∀ x y, J x y = J y x)
+    (hA_ne : ∃ a, A a = true) (hB_ne : ∃ b, A b = false)
+    (hN : 1 ≤ N)
+    (M_balanced : ℕ)
+    [Nonempty (magConfigS Λ N M_balanced)] [Nonempty (Λ → Fin (N + 1))]
+    [Nonempty (parityConfigS Λ N 0)] [Nonempty (parityConfigS Λ N 1)]
+    (h_balanced : ((Fintype.card Λ : ℂ) * (N : ℂ) / 2) - (M_balanced : ℂ) = 0)
+    {lam D : ℝ}
+    (hlam_case_ii : 1 ≤ lam) (hD_case_ii : D ≤ 0)
+    (h_centered_nonzero :
+      ∀ M : ℕ, M ∈ Finset.range (Fintype.card Λ * N + 1) → M ≠ M_balanced →
+        (((Fintype.card Λ : ℂ) * (N : ℂ) / 2) - (M : ℂ)) ≠ 0)
+    (h_strict_gap_at_SU2 :
+      ∀ M : ℕ, ∀ _ : Nonempty (magConfigS Λ N M), M ≠ M_balanced →
+        anisotropicHeisenbergS_magSector_minEigenvalue_alongParametricPath
+          (Λ := Λ) hJ_star N M_balanced lam D 0 <
+        anisotropicHeisenbergS_magSector_minEigenvalue_alongParametricPath
+          (Λ := Λ) hJ_star N M lam D 0)
+    (h_GS_at_SU2 :
+      anisotropicHeisenbergS_magSector_minEigenvalue_alongParametricPath
+        (Λ := Λ) hJ_star N M_balanced lam D 0 =
+      hermitianMinEigenvalue
+        (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N
+          (anisotropicHeisenbergParametricPath lam D 0).1
+          (anisotropicHeisenbergParametricPath lam D 0).2))
+    (h_even_strict_reach :
+      ∀ σ' σ : parityConfigS Λ N 0, σ' ≠ σ →
+        parityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_even_lambda_one_reach :
+      ∀ σ' σ : parityConfigS Λ N 0, σ' ≠ σ →
+        ionParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_even_D_zero_reach :
+      ∀ σ' σ : parityConfigS Λ N 0, σ' ≠ σ →
+        bondParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_even_corner :
+      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
+        (anisotropicHeisenbergParametricPath lam D t).2 = 0 →
+          axisSwappedParityBlockPFMinAt (Λ := Λ) (N := N) J hJim
+            (anisotropicHeisenbergParametricPath lam D t).1
+            (anisotropicHeisenbergParametricPath lam D t).2 0)
+    (h_odd_strict_reach :
+      ∀ σ' σ : parityConfigS Λ N 1, σ' ≠ σ →
+        parityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_odd_lambda_one_reach :
+      ∀ σ' σ : parityConfigS Λ N 1, σ' ≠ σ →
+        ionParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_odd_D_zero_reach :
+      ∀ σ' σ : parityConfigS Λ N 1, σ' ≠ σ →
+        bondParityReachableSOnBlock (bipartiteCompleteGraphOf A) σ σ')
+    (h_odd_corner :
+      ∀ t : ℝ, t ∈ Icc (0 : ℝ) 1 →
+        (anisotropicHeisenbergParametricPath lam D t).1 = 1 →
+        (anisotropicHeisenbergParametricPath lam D t).2 = 0 →
+          axisSwappedParityBlockPFMinAt (Λ := Λ) (N := N) J hJim
+            (anisotropicHeisenbergParametricPath lam D t).1
+            (anisotropicHeisenbergParametricPath lam D t).2 1)
+    {Φ : (Λ → Fin (N + 1)) → ℂ}
+    (hΦ_ne : Φ ≠ 0)
+    (hΦ_gs : (anisotropicHeisenbergS J (lam : ℂ) (D : ℂ) N).mulVec Φ =
+      ((hermitianMinEigenvalue
+        (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ_star N lam D) :
+          ℝ) : ℂ) • Φ) :
+    (totalSpinSOp3 Λ N).mulVec Φ = 0 := by
+  have huniq :=
+    anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_reachability_pf_min_path
+      (Λ := Λ) (N := N) A hJim hJnn hJpos hJself hJbip hJ_star hJ_sym hA_ne hB_ne hN
+      M_balanced h_balanced hlam_case_ii hD_case_ii h_centered_nonzero
+      h_strict_gap_at_SU2 h_GS_at_SU2 h_even_strict_reach h_even_lambda_one_reach
+      h_even_D_zero_reach h_even_corner h_odd_strict_reach h_odd_lambda_one_reach
+      h_odd_D_zero_reach h_odd_corner
   exact anisotropicHeisenbergS_unique_groundState_has_zero_magnetization
     (Λ := Λ) (N := N) J (lam : ℂ) (D : ℂ)
     ((hermitianMinEigenvalue

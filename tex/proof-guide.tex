@@ -13163,7 +13163,17 @@ and
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_raw\_support\_pf\_min\_path}
 derive the raw-support zero-support hypothesis from the no-self-coupling and
 bipartite-support assumptions, then expose the target statements directly from
-the raw-support input surface.
+the raw-support input surface.  The finite-block helper
+\texttt{exists\_parityBlock\_dressed\_diag\_strict\_upper\_bound} supplies the
+strict diagonal shift for any dressed real diagonal on a parity block.  Hence
+\texttt{caseII\_axisSwapped\_parityBlockPFMinPath\_of\_reachability},
+\texttt{caseII\_axisSwapped\_submatrix\_blocks\_path\_of\_reachability\_pf\_min},
+and the target wrappers
+\texttt{anisotropicHeisenbergS\_case\_ii\_target\_finrank\_le\_one\_of\_reachability\_pf\_min\_path}
+and
+\texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_reachability\_pf\_min\_path}
+replace the lower-level raw-support path inputs by reachability totality plus
+the explicit corner PF/min callbacks.
 \texttt{AnisotropicHeisenbergSpinSCaseIIParityGauge.lean} begins the
 case~(ii) PF sign layer.  In the region \(\lambda\ge1\), \(D\le0\), the
 Marshall sign alone does not put the parity-bond and single-ion off-diagonal
@@ -13433,9 +13443,11 @@ block-PF/min layer now selects among these fixed consumers along the
 case~(ii) deformation path, packages the even and odd parity-block callbacks,
 feeds them to the full-ground-energy block transfer, and exposes the target
 uniqueness and zero-magnetization wrappers directly from that raw-support
-surface.  The remaining pathwise case~(ii) input is the appropriate strict or
-zero-coefficient reachability hypotheses for both parity blocks along the path,
-together with the explicit \((\lambda,D)=(1,0)\) corner PF/min callbacks.
+surface.  It now also supplies the strict diagonal shift from finite
+parity-block boundedness.  The remaining pathwise case~(ii) input is therefore
+the appropriate strict, ion-only, or bond-only reachability totality for both
+parity blocks, together with the explicit \((\lambda,D)=(1,0)\) corner PF/min
+callbacks.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
