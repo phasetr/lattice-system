@@ -13492,6 +13492,27 @@ theorem, giving \(\hat S^3_{\mathrm{tot}}\Phi=0\) for every non-zero target
 ground state \(\Phi\).  This is the composed Theorem~2.4 endpoint currently
 available for the general spin-\(S\), \(2\le N\), input surface.
 
+For spin-\(1/2\), the remaining exact \(N=1\) case~(ii) packaging is handled
+in the spin-half case~(ii) module.  The only obstruction to
+specialising the general total-reachability wrapper to \(N=1\) is the
+\(\lambda=1\), \(D<0\) ion-only branch, since ion-only totality requires
+\(2\le N\).  For a strict case~(ii) target \(1<\lambda\), the linear path
+\(\gamma(t)=((1-t)+t\lambda,tD)\) has first coordinate \(1\) only at \(t=0\),
+so the non-corner path never enters that ion-only branch.  The strict parity
+and \(D=0\) bond-only reachability inputs both require only \(1\le N\), while
+the exact corner is still discharged by the full SU(2)-point uniqueness
+callback.  The resulting strict case~(ii) target wrappers are:
+\begin{Verbatim}[breaklines,breakanywhere,fontsize=\scriptsize]
+spinHalf_anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf
+spinHalf_anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_MLM_casimir_ladder_t23_pf
+\end{Verbatim}
+Together with the spin-\(1/2\) \(D\ge0\) case~(i) endpoint and the scalar
+\(\lambda=1\) boundary, they feed the exact \(N=1\) region wrappers:
+\begin{Verbatim}[breaklines,breakanywhere,fontsize=\scriptsize]
+spinHalf_anisotropicHeisenbergS_tasaki24_target_finrank_le_one_of_MLM_casimir_ladder_t23_pf
+spinHalf_anisotropicHeisenbergS_tasaki24_target_zero_magnetization_of_MLM_casimir_ladder_t23_pf
+\end{Verbatim}
+
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
 \hat S^1_x\hat S^1_y+\lambda\hat S^2_x\hat S^2_y+\hat S^3_x\hat S^3_y
