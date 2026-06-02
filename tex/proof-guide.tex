@@ -13141,14 +13141,22 @@ and
 feed the result to the block-path bridge.  The same file introduces the
 abbreviations \texttt{axisSwappedParityBlockPFMinAt} and
 \texttt{axisSwappedParityBlockPFMinPath} for this repeated PF/min callback
-shape, and
+shape, together with
+\texttt{axisSwappedParityBlockStrictRawSupportPath},
+\texttt{axisSwappedParityBlockLambdaOneRawSupportPath}, and
+\texttt{axisSwappedParityBlockDZeroRawSupportPath} for the three
+raw-support inputs along the path.  The theorem
 \texttt{axisSwappedAnisotropicHeisenbergS\_submatrix\_pf\_min\_path\_of\_caseII\_raw\_support}
 turns the fixed strict and zero-coefficient raw-support consumers into a
 pathwise callback for one parity block.  The case~(ii) path-region inequalities
 choose the strict branch, the \(\lambda=1\) ion-only branch, or the \(D=0\)
 bond-only branch.  The corner \((\lambda,D)=(1,0)\) remains an explicit
 PF/min callback because the strict coefficients used by those three consumers
-all vanish there.
+all vanish there.  The wrapper
+\texttt{caseII\_axisSwapped\_parityBlockPFMinPath\_of\_raw\_support} applies
+this selector to the even and odd parity blocks, and
+\texttt{caseII\_axisSwapped\_submatrix\_blocks\_path\_of\_raw\_support\_pf\_min}
+feeds those two callbacks into the full-ground-energy block transfer.
 \texttt{AnisotropicHeisenbergSpinSCaseIIParityGauge.lean} begins the
 case~(ii) PF sign layer.  In the region \(\lambda\ge1\), \(D\le0\), the
 Marshall sign alone does not put the parity-bond and single-ion off-diagonal
@@ -13415,10 +13423,11 @@ parity-gauged non-negative irreducible blocks to bare axis-swapped
 parity-block PF/min witnesses in the strict raw-support region, at the
 \(\lambda=1\) ion-only boundary, and at the \(D=0\) bond-only boundary.  The
 block-PF/min layer now selects among these fixed consumers along the
-case~(ii) deformation path; the remaining pathwise case~(ii) task is to
-supply the appropriate strict or zero-coefficient reachability hypotheses
-along the path, together with the explicit \((\lambda,D)=(1,0)\) corner
-PF/min callback.
+case~(ii) deformation path, packages the even and odd parity-block callbacks,
+and feeds them to the full-ground-energy block transfer.  The remaining
+pathwise case~(ii) input is the appropriate strict or zero-coefficient
+reachability hypotheses for both parity blocks along the path, together with
+the explicit \((\lambda,D)=(1,0)\) corner PF/min callbacks.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
