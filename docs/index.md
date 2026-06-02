@@ -2658,6 +2658,9 @@ fermion mode acting on `ℂ²` with computational basis
 |---|---|---|
 | `onSite_pauliZ_mulVec_basisVec` | `σ^z_j · \|c⟩ = (-1)^{c j} \|c⟩` (single `σ^z` acts by the parity sign at `j`) | `Fermion/JordanWigner/StringBasisVecAction.lean` |
 | `jwString_mulVec_basisVec` | `jwString N i · \|c⟩ = (∏_{j<i} (-1)^{c j}) \|c⟩` (the JW string acts by the fermion-parity sign of the occupied modes below `i`) | `Fermion/JordanWigner/StringBasisVecAction.lean` |
+| `jwSign N j c` | the JW string sign `∏_{k<j} (-1)^{c k}` of a configuration | `Fermion/JordanWigner/AnnihilationCreationBasisVec.lean` |
+| `fermionMultiAnnihilation_mulVec_basisVec` | `c_j \|c⟩ = jwSign N j c • \|c with j↦0⟩` if `c j = 1`, else `0` | `Fermion/JordanWigner/AnnihilationCreationBasisVec.lean` |
+| `fermionMultiCreation_mulVec_basisVec` | `c†_j \|c⟩ = jwSign N j c • \|c with j↦1⟩` if `c j = 0`, else `0` | `Fermion/JordanWigner/AnnihilationCreationBasisVec.lean` |
 
 #### Span of the one-hole hard-core sector (Tasaki §11.2, footnote 8)
 
