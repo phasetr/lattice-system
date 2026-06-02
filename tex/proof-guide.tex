@@ -13257,10 +13257,34 @@ is transferred through the parity gauge by
 The wrappers
 \texttt{shiftedCaseIIParityGaugedBlock\_nonneg\_of\_step\_support} and
 \texttt{shiftedCaseIIParityGaugedBlock\_irreducible\_of\_step\_support}
-therefore reduce the block PF input to the remaining raw
-total-Hamiltonian witness/zero classification.  PF/min identification and the
-boundary move-set choices when a strict local coefficient vanishes remain
-separate later steps.
+therefore reduce the block PF input to a raw total-Hamiltonian witness/zero
+classification.  The next paragraph supplies that classification; PF/min
+identification and the boundary move-set choices when a strict local coefficient
+vanishes remain separate later steps.
+
+\texttt{AnisotropicHeisenbergSpinSCaseIIRawSupport.lean} proves that raw
+classification under the support-zero assumption
+\[
+  J(x,y)=0 \quad\text{whenever}\quad
+  (x,y)\notin E(\texttt{bipartiteCompleteGraphOf}~A).
+\]
+For a raw off-diagonal dressed real entry of the axis-swapped Hamiltonian,
+the local zero tests show that a nonzero bond contribution must be one of the
+two local \(S^1S^1+\lambda S^2S^2\) moves: a transverse
+\texttt{RaiseLowerStepS} when \(\texttt{magSumS}\) is preserved, or a
+\texttt{ParityBondStepS} when one configuration has \(\texttt{magSumS}\) two
+larger than the other.  A nonzero single-ion contribution must be a
+\texttt{SingleIonStepS}; all other off-diagonal entries vanish.  The wrappers
+\texttt{dressedAxisSwappedReMatrix\_raiseLower\_or\_zero\_of\_magSum\_eq},
+\texttt{dressedAxisSwappedReMatrix\_parity\_or\_single\_or\_zero\_of\_magSum\_add\_two},
+and
+\texttt{dressedAxisSwappedAnisotropicHeisenbergSReMatrix\_apply\_eq\_zero\_of\_not\_magSum\_step}
+therefore supply the step-or-zero hypotheses directly.  Finally,
+\texttt{shiftedCaseIIParityGaugedBlock\_nonneg\_of\_raw\_support} and
+\texttt{shiftedCaseIIParityGaugedBlock\_irreducible\_of\_raw\_support} feed
+that raw support classification into the case~(ii) shifted block
+non-negativity and conditional irreducibility layers.  The boundary move-set
+variants and the PF/min identification remain later steps.
 
 The new general spin-\(S\) obligation-(2) wrapper supplies that strict-gap
 callback from one SU(2)-endpoint input.  First,
@@ -13320,10 +13344,11 @@ reachability totality.  The block non-negativity bridge now lowers that
 entrywise non-negativity input to a diagonal shift bound and a
 \(\texttt{magSumS}\) off-diagonal support split, distinguishing equal
 \(\texttt{magSumS}\), target raised by two, source raised by two, and
-zero-support pairs.  The remaining case~(ii) task is to prove the raw
-total-Hamiltonian support/sign split, handle the boundary move sets where a
-strict local coefficient vanishes, and prove PF/min identification for the
-shifted matrix on the two bare axis-swapped parity blocks.
+zero-support pairs.  The raw support layer now proves this split directly from
+the total Hamiltonian under the bipartite support-zero assumption on \(J\).  The
+remaining case~(ii) tasks are boundary move sets where a strict local
+coefficient vanishes and PF/min identification for the shifted matrix on the two
+bare axis-swapped parity blocks.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
