@@ -4829,6 +4829,12 @@ Theorems 11.5 and 11.7; 1st edition, §11.2, pp.~381--388).
   \item \emph{Range}: \(\hat P_{\rm hc}\psi\in\mathcal H_{\rm hc}\) for
     every \(\psi\), since
     \(\hat D_j(\hat P_{\rm hc}\psi) = (\hat D_j\hat P_{\rm hc})\psi = 0\).
+  \item \emph{Hermiticity}: \(\hat P_{\rm hc}^\dagger = \hat P_{\rm hc}\).
+    Each \(\hat D_i\) is Hermitian (product of commuting Hermitian number
+    operators), so each factor \(\hat P_i = 1 - \hat D_i\) is Hermitian, and
+    a non-commutative product of pairwise-commuting Hermitian matrices is
+    Hermitian. Together with idempotence this makes \(\hat P_{\rm hc}\) an
+    orthogonal projection.
 \end{enumerate}
 Thus \(\hat P_{\rm hc}\) is the projection onto the no-double-occupancy
 (hard-core) subspace \(\mathcal H_{\rm hc}\) used in the infinite-\(U\) /
@@ -4843,12 +4849,17 @@ one-hole Nagaoka sector.
   \item \texttt{hubbardDoubleOccupancy\_mul\_hardcoreFactor}:
     \(\hat D_i\hat P_i = 0\).
   \item \texttt{hubbardHardcoreFactor\_commute}: factors commute.
+  \item \texttt{hubbardDoubleOccupancy\_isHermitian} and
+    \texttt{hubbardHardcoreFactor\_isHermitian}: \(\hat D_i\) and
+    \(\hat P_i\) are Hermitian.
   \item \texttt{hubbardHardcoreFactor\_mulVec\_eq\_self\_of\_mem}:
     each factor fixes a hard-core vector.
   \item \texttt{hubbardHardcoreProjection N}:
     \(\hat P_{\rm hc} = \prod_i \hat P_i\).
   \item \texttt{hubbardHardcoreProjection\_mul\_self}:
     \(\hat P_{\rm hc}^2 = \hat P_{\rm hc}\).
+  \item \texttt{hubbardHardcoreProjection\_isHermitian}:
+    \(\hat P_{\rm hc}^\dagger = \hat P_{\rm hc}\).
   \item \texttt{hubbardDoubleOccupancy\_mul\_hardcoreProjection}:
     \(\hat D_j\hat P_{\rm hc} = 0\).
   \item \texttt{hubbardHardcoreProjection\_mulVec\_eq\_self\_of\_mem}:
