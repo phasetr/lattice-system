@@ -13117,6 +13117,28 @@ full \(\texttt{finrank}\le2\) bound.  The wrappers
 and
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_axisSwapped\_submatrix\_blocks\_path}
 therefore leave only the pathwise parity-block simplicity input.
+\texttt{AnisotropicHeisenbergSpinSCaseIIBlockPFMin.lean} rewrites that
+remaining input into the older PF/min conditional form.  The theorem
+\texttt{axisSwappedAnisotropicHeisenbergS\_submatrix\_finrank\_le\_one\_at\_full\_min\_of\_pf\_min}
+fixes a parity block \(p=0,1\).  If a real number \(\nu\) has
+\(\texttt{finrank}\le1\) for that bare axis-swapped block and
+\(\nu\) equals the block Hermitian minimum, then the same block has
+\(\texttt{finrank}\le1\) at the full anisotropic ground energy.  Indeed,
+\texttt{hermitianMinEigenvalue\_axisSwapped\_eq\_min\_block\_mins}
+and
+\texttt{axisSwapUnitarySSpinS\_hermitianMinEigenvalue\_anisotropic\_eq\_axisSwapped}
+identify the full ground energy with the minimum of the two block minima.  If
+this minimum is the chosen block minimum, the existing conditional theorem
+\texttt{axisSwappedAnisotropicHeisenbergS\_submatrix\_finrank\_le\_one\_at\_min\_conditional}
+applies; if it is strictly lower, then
+\texttt{hermitian\_eigenspace\_eq\_bot\_of\_real\_lt\_min} makes the chosen
+block eigenspace zero.  The path wrapper
+\texttt{caseII\_axisSwapped\_submatrix\_blocks\_path\_of\_pf\_min} packages
+this for both parity blocks along \(\gamma(t)\), and the target wrappers
+\texttt{anisotropicHeisenbergS\_case\_ii\_target\_finrank\_le\_one\_of\_block\_pf\_min\_path}
+and
+\texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_block\_pf\_min\_path}
+feed the result to the block-path bridge.
 
 The new general spin-\(S\) obligation-(2) wrapper supplies that strict-gap
 callback from one SU(2)-endpoint input.  First,
@@ -13162,10 +13184,10 @@ has the conditional path/target bridge, the strict-gap bridge, the
 no-full-finrank bridge, the crossing-callback bridge, and the path-callback
 bridge, the crossing-set bridge, the first-crossing bridge, the
 argmin-first-crossing bridge, the first-crossing finrank bridge, the
-path-global finrank bridge, and the block-path finrank bridge described above.
-The remaining case~(ii) task is to prove the pathwise axis-swapped
-parity-block submatrix \(\texttt{finrank}\le1\) input along the case~(ii)
-deformation path.
+path-global finrank bridge, the block-path finrank bridge, and the
+block-PF/min bridge described above.  The remaining case~(ii) task is to prove
+pathwise PF simplicity and PF/min identification for the two bare axis-swapped
+parity blocks in the \(\lambda\ge1\), \(D\le0\) region.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
