@@ -4981,6 +4981,24 @@ site-\(j\) occupation, the single-mode operators act on a basis state by
 \texttt{fermionMultiCreation\_mulVec\_basisVec} in
 \texttt{Fermion/JordanWigner/AnnihilationCreationBasisVec.lean}.)
 
+\medskip
+\noindent\textbf{A single hopping term.}
+Composing the two, the hopping term \(\hat c_p^\dagger \hat c_q\) moves the
+electron from \(q\) to \(p\):
+\[
+  \hat c_p^\dagger \hat c_q\,|c\rangle =
+    \begin{cases}
+      \varepsilon_q(c)\,\varepsilon_p(c^{q\mapsto0})\,
+        |c^{q\mapsto0,\,p\mapsto1}\rangle
+        & c_q = 1 \text{ and } (c^{q\mapsto0})_p = 0,\\
+      0 & \text{otherwise.}
+    \end{cases}
+\]
+(\texttt{fermionMultiCreation\_mul\_Annihilation\_mulVec\_basisVec} in
+\texttt{Fermion/JordanWigner/HopBasisVec.lean}.) This is the operator-level
+content of (11.2.4); the fermion signs \(\varepsilon\) combine into the
+sign of the hopping matrix element (11.2.5).
+
 %======================================================================
 \subsection{Span of the one-hole hard-core sector (Tasaki §11.2, footnote 8)}
 \label{subsec:hubbard-hardcore-span}
