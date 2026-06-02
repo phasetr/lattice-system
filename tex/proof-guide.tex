@@ -4999,6 +4999,18 @@ electron from \(q\) to \(p\):
 content of (11.2.4); the fermion signs \(\varepsilon\) combine into the
 sign of the hopping matrix element (11.2.5).
 
+\medskip
+\noindent\textbf{Spatial content of (11.2.4) for the one-hole sector.}
+When an electron of spin \(s\) hops from an occupied site \(y\) into the hole
+\(x\) of \(|\Phi_{x,\sigma}\rangle\), the resulting occupation configuration is
+exactly that of \(|\Phi_{y,\sigma_{y\to x}}\rangle\), where the new hole is at
+\(y\) and \(\sigma_{y\to x}\) carries the spin of the moved electron to \(x\):
+\(\sigma_{y\to x}\) agrees with \(\sigma\) off \(x\) and equals \(\sigma_y\) at
+\(x\). The hypothesis that the \(s\)-orbital at \(y\) is occupied forces \(s\)
+to be the spin of the electron at \(y\). (\texttt{hubbardSpinMove},
+\texttt{hubbardOneHoleConfig\_hop} in
+\texttt{Fermion/JordanWigner/Hubbard/HopConfig.lean}.)
+
 %======================================================================
 \subsection{Span of the one-hole hard-core sector (Tasaki §11.2, footnote 8)}
 \label{subsec:hubbard-hardcore-span}

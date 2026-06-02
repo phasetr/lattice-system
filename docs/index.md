@@ -2674,6 +2674,13 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardOneHoleHardcoreSector_eq_span_basisState` | Tasaki §11.2 footnote 8: `H_hc^N` is spanned by the basis states `\|Φ_{x,σ}⟩` | `Fermion/JordanWigner/Hubbard/HardcoreSpan.lean` |
 | `hubbardHardcoreBasisState_mem_sector` | each basis state lies in the one-hole hard-core sector | `Fermion/JordanWigner/Hubbard/HardcoreSpan.lean` |
 
+#### Hole-filling hop configuration (Tasaki §11.2, eq. (11.2.4) spatial content)
+
+| Lean name | Statement | File |
+|---|---|---|
+| `hubbardSpinMove N σ x y` | `σ_{y→x}`: `σ` with the spin at `x` set to `σ y` (the electron moved from `y` to the hole `x`) | `Fermion/JordanWigner/Hubbard/HopConfig.lean` |
+| `hubbardOneHoleConfig_hop` | filling the hole `x` with an electron of spin `s` hopped from `y` turns the configuration of `\|Φ_{x,σ}⟩` into that of `\|Φ_{y, σ_{y→x}}⟩` | `Fermion/JordanWigner/Hubbard/HopConfig.lean` |
+
 #### Hubbard effective Hamiltonian on the hard-core sector (Tasaki §11.2)
 
 | Lean name | Statement | File |
