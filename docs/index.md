@@ -2652,6 +2652,13 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardHardcoreBasisState_inner` | orthonormality: `⟨Φ_{x,σ} \| Φ_{x',σ'}⟩ = 1` iff their configurations coincide, else `0` | `Fermion/JordanWigner/Hubbard/HardcoreBasis.lean` |
 | `hubbardHardcoreBasisState_self_inner` | each basis state is normalised (self-overlap `1`) | `Fermion/JordanWigner/Hubbard/HardcoreBasis.lean` |
 
+#### Jordan–Wigner string action on basis states (Tasaki §11.2 infrastructure)
+
+| Lean name | Statement | File |
+|---|---|---|
+| `onSite_pauliZ_mulVec_basisVec` | `σ^z_j · \|c⟩ = (-1)^{c j} \|c⟩` (single `σ^z` acts by the parity sign at `j`) | `Fermion/JordanWigner/StringBasisVecAction.lean` |
+| `jwString_mulVec_basisVec` | `jwString N i · \|c⟩ = (∏_{j<i} (-1)^{c j}) \|c⟩` (the JW string acts by the fermion-parity sign of the occupied modes below `i`) | `Fermion/JordanWigner/StringBasisVecAction.lean` |
+
 #### Span of the one-hole hard-core sector (Tasaki §11.2, footnote 8)
 
 | Lean name | Statement | File |

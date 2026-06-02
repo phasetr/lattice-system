@@ -4936,6 +4936,34 @@ pp.~381--388).
 \end{itemize}
 
 %======================================================================
+\subsection{Jordan--Wigner string action on basis states (Tasaki §11.2)}
+\label{subsec:jwstring-basisvec}
+%======================================================================
+
+\noindent\textbf{Statement.}
+The Jordan--Wigner string \(\hat J_i := \prod_{j<i}\sigma^z_j\) is diagonal in
+the computational basis, since \(\sigma^z = \operatorname{diag}(1,-1)\). On a
+basis state \(|c\rangle\) each factor contributes the parity sign
+\((-1)^{c_j}\), so
+\[
+  \hat J_i\,|c\rangle = \Bigl(\prod_{j<i}(-1)^{c_j}\Bigr)\,|c\rangle,
+\]
+the fermion-parity sign of the modes occupied below \(i\). This is the origin
+of the fermion signs in the hopping matrix elements (11.2.4)/(11.2.5), and is
+the foundation for computing the action of \(\hat c_i\), \(\hat c_i^\dagger\) on
+basis states.
+
+\medskip
+\noindent\textbf{Lean declarations}
+(file \texttt{Fermion/JordanWigner/StringBasisVecAction.lean}):
+\begin{itemize}
+  \item \texttt{onSite\_pauliZ\_mulVec\_basisVec}:
+    \(\sigma^z_j|c\rangle = (-1)^{c_j}|c\rangle\).
+  \item \texttt{jwString\_mulVec\_basisVec}:
+    \(\hat J_i|c\rangle = \bigl(\prod_{j<i}(-1)^{c_j}\bigr)|c\rangle\).
+\end{itemize}
+
+%======================================================================
 \subsection{Span of the one-hole hard-core sector (Tasaki §11.2, footnote 8)}
 \label{subsec:hubbard-hardcore-span}
 %======================================================================
