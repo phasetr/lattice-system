@@ -12975,8 +12975,20 @@ compose the existing general-\(N\)
 \texttt{hermitianMinEigenvalue\_balanced\_eq\_full\_of\_strict\_gap}
 with those PF-free wrappers.  Thus the remaining general spin-\(S\) target
 energy input is the strict gap
-\(E_{M_{\mathrm{bal}}}<E_M\) over all non-balanced non-empty sectors; case~(ii)
-is still a separate route.
+\(E_{M_{\mathrm{bal}}}<E_M\) over all non-balanced non-empty sectors.
+The case~(ii) bridge in
+\texttt{AnisotropicHeisenbergSpinSCaseIIConditionalBridge.lean} first records
+that the same deformation path stays in the region \(\lambda\ge1\),
+\(D\le0\):
+\texttt{anisotropicHeisenbergParametricPath\_in\_case\_ii\_region}.  It then
+repackages the same PF-free target step under case~(ii) hypotheses via
+\texttt{anisotropicHeisenbergS\_case\_ii\_target\_finrank\_le\_one\_of\_balanced\_eq\_full}
+and
+\texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_balanced\_eq\_full}.
+These wrappers intentionally keep the missing global crossing/degeneracy
+replacement explicit as balanced-sector/full-ground equality plus full
+\(\texttt{finrank}\le2\); they do not reuse the case~(i) axis-swap sign
+argument.
 
 The new general spin-\(S\) obligation-(2) wrapper supplies that strict-gap
 callback from one SU(2)-endpoint input.  First,
@@ -13017,8 +13029,9 @@ longer exposes an abstract SU(2)-endpoint uniqueness hypothesis; the
 \texttt{\_D\_nonneg\_general} wrappers above extend the same endpoint to
 \(D\ge0\).  The SU(2)-point wrappers and the
 \(\lambda=1\), \(D>0\), \(2\le N\) ion-only wrappers cover the general
-spin-\(S\) \(\lambda=1\), \(D\ge0\) case~(i) boundary.  Tasaki case~(ii)
-remains a separate task.
+spin-\(S\) \(\lambda=1\), \(D\ge0\) case~(i) boundary.  Tasaki case~(ii) now
+has the conditional path/target bridge described above, while the global
+case~(ii) crossing/degeneracy replacement remains the next task.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
