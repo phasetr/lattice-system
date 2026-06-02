@@ -2831,16 +2831,16 @@ follows:
   The block-path finrank wrappers
   `anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_axisSwapped_submatrix_blocks_path`
   and
-	  `anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_axisSwapped_submatrix_blocks_path`
-	  derive that path-global input from pathwise axis-swapped parity-block
-	  submatrix `finrank <= 1` bounds at the full ground energy.
-	  The block-PF/min wrappers
-	  `anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_block_pf_min_path`
-	  and
-	  `anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_block_pf_min_path`
-	  replace those full-ground-energy block bounds by pathwise PF simplicity
-	  and PF/min identification callbacks for the two bare axis-swapped parity
-	  blocks.
+  `anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_axisSwapped_submatrix_blocks_path`
+  derive that path-global input from pathwise axis-swapped parity-block
+  submatrix `finrank <= 1` bounds at the full ground energy.
+  The block-PF/min wrappers
+  `anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_block_pf_min_path`
+  and
+  `anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_block_pf_min_path`
+  replace those full-ground-energy block bounds by pathwise PF simplicity
+  and PF/min identification callbacks for the two bare axis-swapped parity
+  blocks.
 
 ### TODO — remove remaining 7 per-theorem linter suppressions (issue [#377](https://github.com/phasetr/lattice-system/issues/377))
 
