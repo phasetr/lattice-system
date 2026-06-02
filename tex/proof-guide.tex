@@ -13231,8 +13231,19 @@ Entrywise non-negativity plus block reachability gives a positive matrix-power
 entry, and reachability totality plus strict diagonal shift gives the
 conditional irreducibility theorem
 \texttt{shiftedCaseIIParityGaugedBlock\_isIrreducible\_of\_blockReachable\_total}.
-The remaining case~(ii) shifted-matrix work is global entrywise
-non-negativity/off-diagonal support, PF/min identification, and the boundary
+\texttt{AnisotropicHeisenbergSpinSCaseIIBlockNonneg.lean} then lowers the
+explicit entrywise non-negativity input to a diagonal shift bound and a
+\(\texttt{magSumS}\) support split for off-diagonal block pairs.  Equal
+\(\texttt{magSumS}\) pairs use dressed non-positivity; target/source
+\(\texttt{magSumS}\) raised by two use dressed non-negativity together with the
+case~(ii) parity-gauge sign flip; all other off-diagonal pairs are supplied as
+zero-support.  The wrappers
+\texttt{caseIIParityGaugedBlock\_offdiag\_nonpos\_of\_magSum\_support},
+\texttt{shiftedCaseIIParityGaugedBlock\_nonneg\_of\_magSum\_support}, and
+\texttt{shiftedCaseIIParityGaugedBlock\_irreducible\_of\_magSum\_support}
+feed this support split through shifted entrywise non-negativity and the block
+irreducibility layer.  The remaining case~(ii) shifted-matrix work is the raw
+total-Hamiltonian support/sign split, PF/min identification, and the boundary
 move-set choices when a strict local coefficient vanishes.
 
 The new general spin-\(S\) obligation-(2) wrapper supplies that strict-gap
@@ -13289,10 +13300,14 @@ the corresponding strict local regimes: \(-1<\lambda\) for transverse moves,
 block irreducibility layer now turns those step signs into block matrix-power
 positivity from block-level parity reachability and into conditional
 irreducibility from entrywise non-negativity, strict diagonal shift, and
-reachability totality.  The remaining case~(ii) task is to prove global
-entrywise non-negativity/off-diagonal support, handle the boundary move sets
-where a strict local coefficient vanishes, and prove PF/min identification for
-the shifted matrix on the two bare axis-swapped parity blocks.
+reachability totality.  The block non-negativity bridge now lowers that
+entrywise non-negativity input to a diagonal shift bound and a
+\(\texttt{magSumS}\) off-diagonal support split, distinguishing equal
+\(\texttt{magSumS}\), target raised by two, source raised by two, and
+zero-support pairs.  The remaining case~(ii) task is to prove the raw
+total-Hamiltonian support/sign split, handle the boundary move sets where a
+strict local coefficient vanishes, and prove PF/min identification for the
+shifted matrix on the two bare axis-swapped parity blocks.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
