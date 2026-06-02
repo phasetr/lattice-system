@@ -13010,7 +13010,20 @@ Perron--Frobenius simplicity gives
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_finrank\_le\_one\_of\_strict\_gap\_no\_full\_le\_two}
 and
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_strict\_gap\_no\_full\_le\_two}.
-Thus the remaining case~(ii) input is the strict-gap derivation itself.
+The next case~(ii) bridge in
+\texttt{AnisotropicHeisenbergSpinSCaseIIStrictGapFromCrossing.lean}
+compresses that strict-gap derivation to a single target crossing
+contradiction callback.  The theorem
+\texttt{anisotropicHeisenbergS\_case\_ii\_strict\_gap\_all\_M\_of\_crossing\_contradiction}
+says that if every non-balanced target crossing
+\(E_M(\lambda,D)\le E_{M_{\mathrm{bal}}}(\lambda,D)\) is impossible under
+\(1\le\lambda\), \(D\le0\), then \(E_{M_{\mathrm{bal}}}<E_M\) for every
+non-balanced non-empty sector.  The wrappers
+\texttt{anisotropicHeisenbergS\_case\_ii\_target\_finrank\_le\_one\_of\_crossing\_contradiction}
+and
+\texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_crossing\_contradiction}
+then feed this strict gap to the no-full-finrank bridge above.  Thus the
+remaining case~(ii) input is the crossing contradiction callback itself.
 
 The new general spin-\(S\) obligation-(2) wrapper supplies that strict-gap
 callback from one SU(2)-endpoint input.  First,
@@ -13052,9 +13065,9 @@ longer exposes an abstract SU(2)-endpoint uniqueness hypothesis; the
 \(D\ge0\).  The SU(2)-point wrappers and the
 \(\lambda=1\), \(D>0\), \(2\le N\) ion-only wrappers cover the general
 spin-\(S\) \(\lambda=1\), \(D\ge0\) case~(i) boundary.  Tasaki case~(ii) now
-has the conditional path/target bridge, the strict-gap bridge, and the
-no-full-finrank bridge described above.  The remaining case~(ii) task is to
-derive the strict sector gap.
+has the conditional path/target bridge, the strict-gap bridge, the
+no-full-finrank bridge, and the crossing-callback bridge described above.  The
+remaining case~(ii) task is to prove the crossing contradiction callback.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
