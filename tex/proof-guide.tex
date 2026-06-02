@@ -13457,8 +13457,13 @@ uniqueness and zero-magnetization wrappers directly from that raw-support
 surface.  It now also supplies the strict diagonal shift from finite
 parity-block boundedness, and the block reachability totality bridge supplies
 the strict, ion-only, and bond-only reachability inputs for \(2\le N\).  The
-remaining pathwise case~(ii) input in this layer is therefore just the two
-explicit \((\lambda,D)=(1,0)\) corner PF/min callbacks.
+corner bridge now separates the exact SU(2) corner from the non-corner path:
+away from \((\lambda,D)=(1,0)\), the strict, ion-only, and bond-only PF/min
+consumers are still selected pointwise from total reachability; at the corner,
+the path-global full \(\texttt{finrank}\le2\) input is supplied directly from
+a full SU(2)-point ground-eigenspace \(\texttt{finrank}\le1\) callback.  This
+avoids asking each whole parity block to be PF-simple at its own block minimum
+at the SU(2) point, which is stronger than the crossing argument needs.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
