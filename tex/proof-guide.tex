@@ -12874,6 +12874,22 @@ and
 therefore extend the general spin-\(S\) case~(i) target endpoint to
 \(-1<\lambda<1\), \(D\ge0\).
 
+For general spin-\(S\), the \(\lambda=1\), \(D>0\) parity-block
+Perron--Frobenius capstone is separated from the strict parity-bond route in
+\texttt{ParityReachableNoParityBond.lean},
+\texttt{ParityReachableNoParityBondTotal.lean},
+\texttt{DressedAxisSwapIonParityLambdaOne.lean}, and
+\texttt{DressedAxisSwapIonParityBlockIrreducibleLambdaOne.lean}.  The relation
+\texttt{IonParityStepS} is generated only by transverse raise/lower moves and
+single-ion \(\pm2\) moves.  The theorem \texttt{ionParityReachableS\_total}
+proves totality on the bipartite complete graph for equal \(\texttt{magSumS}\)
+parity when \(2\le N\): repeatedly lower \(\texttt{magSumS}\) by two using a
+direct single-ion move, or first stack two unit occupations by transverse
+transfers and then apply a single-ion lowering move.  The resulting
+\texttt{shiftedDressedAxisSwappedReMatrixOnParityBlock\_isIrreducible\_lambda\_one\_D\_pos}
+gives irreducibility at \(\lambda=1\), \(D>0\) without invoking the
+same-direction parity-bond coefficient, which vanishes at \(\lambda=1\).
+
 The \(\lambda=1\) edge of case~(i) is handled separately in
 \texttt{AnisotropicHeisenbergSpinHalfLambdaOneBoundary.lean}.  This edge is
 not a limit of the strict parity-bond Perron--Frobenius proof: the
@@ -12902,7 +12918,7 @@ and the existing uniqueness-to-zero-magnetization theorem gives
 For general spin-\(S\), the case~(i) target endpoint is now obtained on
 \(-1<\lambda<1\), \(D\ge0\), by composing the \(D\ge0\) parity-block route with
 the SU(2)-global-uniqueness wrappers and the MLM/Casimir endpoint below;
-case~(ii) and the general \(\lambda=1\) edge remain separate tasks.
+case~(ii) and the general \(\lambda=1\) target wrapper remain separate tasks.
 
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
