@@ -2681,6 +2681,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardSpinMove N σ x y` | `σ_{y→x}`: `σ` with the spin at `x` set to `σ y` (the electron moved from `y` to the hole `x`) | `Fermion/JordanWigner/Hubbard/HopConfig.lean` |
 | `hubbardOneHoleConfig_hop` | filling the hole `x` with an electron of spin `s` hopped from `y` turns the configuration of `\|Φ_{x,σ}⟩` into that of `\|Φ_{y, σ_{y→x}}⟩` | `Fermion/JordanWigner/Hubbard/HopConfig.lean` |
 | `hubbardHop_mulVec_hardcoreBasisState` | operator content of (11.2.4): `c†_{(x,s)} c_{(y,s)} \|Φ_{x,σ}⟩ = (jwSign·jwSign) • \|Φ_{y, σ_{y→x}}⟩` (create at hole `x`, annihilate at occupied `y`) | `Fermion/JordanWigner/Hubbard/HopAction.lean` |
+| `hubbardHopTerm_inner_hardcoreBasisState` | per-term content of (11.2.5): the matrix element `⟨Φ_{y,τ}\| c†_{(x,s)} c_{(y,s)} \|Φ_{x,σ}⟩` is the JW sign product times the indicator `τ = σ_{y→x}` | `Fermion/JordanWigner/Hubbard/HopMatrixElement.lean` |
 
 #### Hubbard effective Hamiltonian on the hard-core sector (Tasaki §11.2)
 

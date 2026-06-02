@@ -5028,6 +5028,21 @@ creation-operator basis (11.2.3), recovered in a later layer.
 (\texttt{hubbardHop\_mulVec\_hardcoreBasisState} in
 \texttt{Fermion/JordanWigner/Hubbard/HopAction.lean}.)
 
+\medskip
+\noindent\textbf{Per-term matrix element (11.2.5).}
+Pairing with another one-hole basis state and using orthonormality, the matrix
+element of the hopping term between basis states is the sign product times the
+indicator that the target is the moved configuration:
+\[
+  \langle \Phi_{y,\tau} |\, \hat c^\dagger_{(x,s)}\hat c_{(y,s)}\,|
+    \Phi_{x,\sigma}\rangle
+    = \varepsilon_{(y,s)}\,\varepsilon_{(x,s)}\,
+      [\,\tau = \sigma_{y\to x}\,].
+\]
+The off-diagonal support is exactly \(\tau = \sigma_{y\to x}\), matching the
+structure of (11.2.5). (\texttt{hubbardHopTerm\_inner\_hardcoreBasisState} in
+\texttt{Fermion/JordanWigner/Hubbard/HopMatrixElement.lean}.)
+
 %======================================================================
 \subsection{Span of the one-hole hard-core sector (Tasaki §11.2, footnote 8)}
 \label{subsec:hubbard-hardcore-span}
