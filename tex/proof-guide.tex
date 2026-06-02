@@ -5011,6 +5011,23 @@ to be the spin of the electron at \(y\). (\texttt{hubbardSpinMove},
 \texttt{hubbardOneHoleConfig\_hop} in
 \texttt{Fermion/JordanWigner/Hubbard/HopConfig.lean}.)
 
+\medskip
+\noindent\textbf{Operator action of the hopping term (11.2.4).}
+Assembling the configuration identity with the basis-state hop computation, the
+hole-filling hopping term acts on a one-hole basis state by
+\[
+  \hat c^\dagger_{(x,s)}\,\hat c_{(y,s)}\,|\Phi_{x,\sigma}\rangle
+    = \varepsilon_{(y,s)}(c_{x,\sigma})\,
+      \varepsilon_{(x,s)}\!\bigl(c_{x,\sigma}^{(y,s)\mapsto0}\bigr)\,
+      |\Phi_{y,\sigma_{y\to x}}\rangle,
+\]
+when the \(s\)-orbital at \(y\) is occupied (and \(x\neq y\)). The scalar is the
+honest computational-basis fermion sign in the sign-free \(\mathtt{basisVec}\)
+convention; Tasaki's uniform \(-t_{x,y}\) of (11.2.5) arises in his ordered
+creation-operator basis (11.2.3), recovered in a later layer.
+(\texttt{hubbardHop\_mulVec\_hardcoreBasisState} in
+\texttt{Fermion/JordanWigner/Hubbard/HopAction.lean}.)
+
 %======================================================================
 \subsection{Span of the one-hole hard-core sector (Tasaki §11.2, footnote 8)}
 \label{subsec:hubbard-hardcore-span}
