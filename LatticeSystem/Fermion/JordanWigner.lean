@@ -30,6 +30,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.SaturatedFerromagnetism
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreSubspace
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreProjection
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreBasis
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreSpan
 import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonian
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyProjection
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyCommute
@@ -105,6 +106,7 @@ expansion):
 | `Hubbard/HardcoreSubspace.lean` | hard-core subspace + `H_int` vanishing (Tasaki §11.2) |
 | `Hubbard/HardcoreProjection.lean` | hard-core projection `∏ᵢ (1 - n_↑n_↓)` (Tasaki §11.2) |
 | `Hubbard/HardcoreBasis.lean` | one-hole hard-core basis states `\|Φ_{x,σ}⟩` (Tasaki §11.2) |
+| `Hubbard/HardcoreSpan.lean` | one-hole hard-core sector spanned by the basis states (Tasaki §11.2 fn. 8) |
 | `Hubbard/EffectiveHamiltonian.lean` | effective Hamiltonian `Ĥ_eff = P̂_hc H P̂_hc` + `U→∞` reduction (Tasaki §11.2) |
 | `Hubbard/DoubleOccupancyProjection.lean` | site-`i` `Commute n_↑ n_↓` + idempotent product |
 | `Hubbard/DoubleOccupancyCommute.lean` | cross-site `Commute (n_↑(i)·n_↓(i)) (n_↑(j)·n_↓(j))` |

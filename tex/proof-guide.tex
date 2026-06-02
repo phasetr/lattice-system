@@ -4936,6 +4936,54 @@ pp.~381--388).
 \end{itemize}
 
 %======================================================================
+\subsection{Span of the one-hole hard-core sector (Tasaki §11.2, footnote 8)}
+\label{subsec:hubbard-hardcore-span}
+%======================================================================
+
+\noindent\textbf{Statement.}
+Tasaki's footnote 8 (p.~382) records that the one-hole hard-core sector
+\(\mathcal H_{\rm hc}^{N}\) (with \(N=|\Lambda|-1\) electrons and no doubly
+occupied site) is \emph{spanned} by the basis states \(|\Phi_{x,\sigma}\rangle\)
+of (11.2.3). We call a computational basis configuration \emph{one-hole
+hard-core} when it has no doubly occupied site and exactly one empty site (the
+hole).
+
+\medskip
+\noindent\textbf{Argument.}
+The combinatorial content is the surjectivity of the parametrization
+\((x,\sigma)\mapsto c_{x,\sigma}\) onto the one-hole hard-core configurations:
+given such a configuration, its unique empty site is the hole \(x\), and reading
+off the spin of each singly occupied site recovers \(\sigma\). Concretely, at a
+site \(i\neq x\), no double occupancy together with \(i\) not being the (unique)
+hole forces exactly one orbital to be occupied, which fixes \(\sigma_i\). Hence
+the basis states \(|\Phi_{x,\sigma}\rangle = \mathtt{basisVec}\,(c_{x,\sigma})\)
+are precisely the computational basis vectors of the one-hole hard-core
+configurations, so
+\[
+  \mathcal H_{\rm hc}^{N}
+    = \operatorname{span}\bigl\{\,|\Phi_{x,\sigma}\rangle \ \big|\ x\in\Lambda,\
+      \sigma\,\bigr\}.
+\]
+
+\medskip
+\noindent\textbf{Lean declarations}
+(file \texttt{Fermion/JordanWigner/Hubbard/HardcoreSpan.lean}):
+\begin{itemize}
+  \item \texttt{IsOneHoleHardcoreConfig N c}: no double occupancy and a unique
+    empty site.
+  \item \texttt{hubbardOneHoleConfig\_isOneHoleHardcore}: \(c_{x,\sigma}\) is
+    one-hole hard-core.
+  \item \texttt{exists\_eq\_hubbardOneHoleConfig\_of\_isOneHoleHardcore}:
+    surjectivity of the parametrization.
+  \item \texttt{hubbardOneHoleHardcoreSector N}: the sector
+    \(\mathcal H_{\rm hc}^{N}\).
+  \item \texttt{hubbardOneHoleHardcoreSector\_eq\_span\_basisState}: footnote 8
+    spanning statement.
+  \item \texttt{hubbardHardcoreBasisState\_mem\_sector}: each basis state lies in
+    the sector.
+\end{itemize}
+
+%======================================================================
 \subsection{Effective Hamiltonian on the hard-core sector (Tasaki §11.2)}
 \label{subsec:hubbard-effective-hamiltonian}
 %======================================================================
