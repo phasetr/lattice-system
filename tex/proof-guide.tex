@@ -4980,6 +4980,12 @@ site-\(j\) occupation, the single-mode operators act on a basis state by
 (\texttt{jwSign}, \texttt{fermionMultiAnnihilation\_mulVec\_basisVec},
 \texttt{fermionMultiCreation\_mulVec\_basisVec} in
 \texttt{Fermion/JordanWigner/AnnihilationCreationBasisVec.lean}.)
+The base case on the vacuum (all-empty, string sign \(1\)) is
+\(\hat c_j^\dagger|\mathrm{vac}\rangle = |0\dots0,\,j\mapsto1\rangle\)
+(\texttt{jwSign\_zero\_config},
+\texttt{fermionMultiCreation\_mulVec\_vacuum\_eq\_basisVec} in
+\texttt{Fermion/JordanWigner/VacuumCreationBasisVec.lean}), the starting point
+for the ordered creation-operator construction of the (11.2.3) basis states.
 
 \medskip
 \noindent\textbf{A single hopping term.}
