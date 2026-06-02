@@ -5146,16 +5146,16 @@ Marshall sign machinery + time-reversal action; see
   \texttt{spinHalf\_anisotropicHeisenbergS\_lambda\_one\_finrank\_le\_one\_of\_MLM\_casimir\_ladder\_t23\_pf}
   and
   \texttt{spinHalf\_anisotropicHeisenbergS\_lambda\_one\_groundState\_zero\_magnetization\_of\_MLM\_casimir\_ladder\_t23\_pf}.
-  The general spin-$S$ axis-swap unitary instance is now discharged for the
-  strict case~(i) degeneracy chain by \texttt{axisSwapUnitarySSpinS} and
+  The general spin-$S$ axis-swap unitary instance is now discharged by
+  \texttt{axisSwapUnitarySSpinS} and
   \texttt{anisotropicHeisenbergS\_eigenspace\_finrank\_le\_two\_unconditional\_general};
-  the general spin-$S$ target conditional bridge and balanced-sector PF input
-  are now packaged, the target wrappers from SU(2)-endpoint global uniqueness
-  supply the strict gap over non-balanced non-empty sectors, and the new
-  MLM/Casimir endpoint wrappers construct that SU(2) uniqueness input from the
-  general Theorem~2.3 Perron--Frobenius endpoint.  Tasaki's case~(ii), the
-  general spin-$S$ \(D=0\) edge, and the general spin-$S$ \(\lambda=1\) edge
-  remain separate future work.
+  the bond-only \(D\ge0\) parity route gives the corresponding
+  \texttt{\_D\_nonneg\_general} wrappers.  The new MLM/Casimir endpoint
+  wrappers construct the SU(2)-endpoint uniqueness input from the general
+  Theorem~2.3 Perron--Frobenius endpoint, so the general spin-$S$ case~(i)
+  target uniqueness and zero-magnetization endpoint is live for
+  \(-1<\lambda<1\), \(D\ge0\).  Tasaki's case~(ii) and the general spin-$S$
+  \(\lambda=1\) edge remain separate future work.
 \end{itemize}
 
 The generic graph-centric \texttt{neelStateOf} (PR \#331) remains the
@@ -12858,6 +12858,22 @@ and
 extend the final spin-\(1/2\) target conclusion to
 \(-1<\lambda<1\), \(D\ge0\).
 
+The same \(D\ge0\) boundary is now available for general spin-\(S\) in
+\texttt{AnisotropicHeisenbergSpinSDNonnegBoundary.lean}.  The new
+\texttt{BondParityStepS} and \texttt{BondParityReachableS} relation removes
+the single-ion strict-positive branch from the parity-block connectivity
+argument.  Bond-only reachability is total on
+\texttt{bipartiteCompleteGraphOf A}: the proof lowers both configurations to
+a minimum magnetization representative using transverse transfers and
+parity-bond lowering, then uses the existing equal-\(\texttt{magSumS}\)
+raise/lower connectivity.  Consequently the shifted dressed parity-block
+matrix is irreducible under \(D\ge0\), not merely \(D>0\).  The wrappers
+\texttt{anisotropicHeisenbergS\_target\_finrank\_le\_one\_of\_MLM\_casimir\_ladder\_t23\_pf\_D\_nonneg\_general}
+and
+\texttt{anisotropicHeisenbergS\_target\_zero\_magnetization\_of\_MLM\_casimir\_ladder\_t23\_pf\_D\_nonneg\_general}
+therefore extend the general spin-\(S\) case~(i) target endpoint to
+\(-1<\lambda<1\), \(D\ge0\).
+
 The \(\lambda=1\) edge of case~(i) is handled separately in
 \texttt{AnisotropicHeisenbergSpinHalfLambdaOneBoundary.lean}.  This edge is
 not a limit of the strict parity-bond Perron--Frobenius proof: the
@@ -12883,10 +12899,10 @@ SU(2)-endpoint uniqueness to
 \texttt{spinHalf\_anisotropicHeisenbergS\_lambda\_one\_finrank\_le\_one\_of\_MLM\_casimir\_ladder\_t23\_pf},
 and the existing uniqueness-to-zero-magnetization theorem gives
 \texttt{spinHalf\_anisotropicHeisenbergS\_lambda\_one\_groundState\_zero\_magnetization\_of\_MLM\_casimir\_ladder\_t23\_pf}.
-For general spin-\(S\), the strict-interior target endpoint is now obtained by
-composing the SU(2)-global-uniqueness wrappers with the MLM/Casimir endpoint
-below; case~(ii), the general \(D=0\) edge, and the general \(\lambda=1\) edge
-remain separate tasks.
+For general spin-\(S\), the case~(i) target endpoint is now obtained on
+\(-1<\lambda<1\), \(D\ge0\), by composing the \(D\ge0\) parity-block route with
+the SU(2)-global-uniqueness wrappers and the MLM/Casimir endpoint below;
+case~(ii) and the general \(\lambda=1\) edge remain separate tasks.
 
 For the degeneracy bound the Hamiltonian is gauged to the axis-swapped
 \(\hat H'=U^{-1}\hat HU\) (the even/odd parity structure needed for
@@ -12967,9 +12983,10 @@ compose that transport with
 \texttt{exists\_tasaki23\_common\_energy\_and\_heisenbergHamiltonianS\_full\_eigenspace\_finrank\_le\_one\_of\_casimir\_ladder\_t23\_pf}
 and the SU(2)-global-uniqueness target wrappers above.  Thus the general
 spin-\(S\) strict case~(i) target uniqueness and zero-magnetization endpoint no
-longer exposes an abstract SU(2)-endpoint uniqueness hypothesis.  Tasaki
-case~(ii), the general spin-\(S\) \(D=0\) edge, and the general spin-\(S\)
-\(\lambda=1\) edge remain separate tasks.
+longer exposes an abstract SU(2)-endpoint uniqueness hypothesis; the
+\texttt{\_D\_nonneg\_general} wrappers above extend the same endpoint to
+\(D\ge0\).  Tasaki case~(ii) and the general spin-\(S\) \(\lambda=1\) edge
+remain separate tasks.
 
 The axis-swapped bond rewrites in ladder form (2.5.16),
 \[
