@@ -1,4 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaGlobalMin
+import LatticeSystem.Math.PerronFrobenius
+import LatticeSystem.Math.PerronFrobeniusFinrank
 
 /-!
 # Magnetization sectors of the one-hole Tasaki basis (Tasaki §11.2.2)
@@ -29,7 +31,7 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 
 namespace LatticeSystem.Fermion
 
-open Matrix LatticeSystem.Quantum
+open Matrix LatticeSystem.Quantum LatticeSystem.Math.PerronFrobenius Module
 
 /-- The (doubled) total `S_z^{(3)}` magnetization read off an occupation
 configuration `c : Fin (2N+2) → Fin 2` of the spinful chain: each site `i`
@@ -185,5 +187,28 @@ theorem nagaokaPFMatrixOnSector_isSymm (N : ℕ)
   ext p q
   simp only [Matrix.transpose_apply, Matrix.neg_apply, Matrix.submatrix_apply]
   rw [(tasakiEffReMatrix_isSymm N t htsym htdiag).apply]
+
+/-- **Per-sector Perron–Frobenius (the heart of Theorem 11.7).**  On a non-empty
+magnetization sector `m` satisfying the connectivity condition (Definition
+11.6), `−M` has a strictly positive eigenvector at its Perron eigenvalue `μ`,
+and that eigenspace is at most one-dimensional — i.e. the sector ground state is
+*non-degenerate*.  (Recall `−M v = μ v ↔ M v = −μ v`, so this is the unique
+ground state of `M` in the sector.) -/
+theorem nagaokaPFMatrixOnSector_exists_pos_eigenvec (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ)
+    [Nonempty (HoleMagSector N m)]
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0)
+    (hconn : (nagaokaPFMatrixOnSector N t m).IsIrreducible) :
+    ∃ (μ : ℝ) (v : HoleMagSector N m → ℝ),
+      nagaokaPFMatrixOnSector N t m *ᵥ v = μ • v ∧ (∀ i, 0 < v i) ∧
+      finrank ℝ (End.eigenspace
+        (Matrix.toLin' (nagaokaPFMatrixOnSector N t m)) μ) ≤ 1 := by
+  have hHerm : (nagaokaPFMatrixOnSector N t m).IsHermitian := by
+    unfold Matrix.IsHermitian
+    rw [Matrix.conjTranspose_eq_transpose_of_trivial]
+    exact nagaokaPFMatrixOnSector_isSymm N t m htsym htdiag
+  obtain ⟨μ, v, hAv, _hvne, hv_pos⟩ := exists_pos_eigenvec_max hHerm hconn
+  exact ⟨μ, v, hAv, hv_pos,
+    eigenspace_finrank_le_one_of_pos_eigenvec hconn hAv hv_pos⟩
 
 end LatticeSystem.Fermion
