@@ -36,17 +36,17 @@ open Matrix LatticeSystem.Quantum
 
 /-! ## The ferromagnetic state -/
 
-/-- The ferromagnetic state `|Φ_↑⟩ = Σ_x ξ_x |Φ^T_{x,↑}⟩` (Tasaki eq. (11.2.8))
-built from real weights `ξ`: a superposition over hole positions of the all-up
-Tasaki basis states. With `ξ_x` the ferromagnetized coefficients (`ferroXi`) of a
-ground state, this is the ferromagnetic ground state `|Φ_↑⟩`. -/
-noncomputable def pfFerroState (N : ℕ) (ξ : Fin (N + 1) → ℝ) :
+/-- The all-up Tasaki state `|Φ_↑⟩ = Σ_x ξ_x |Φ^T_{x,↑}⟩` (Tasaki eq. (11.2.8))
+built from weights `ξ : Fin (N+1) → ℂ`: a superposition over hole positions of
+the all-up Tasaki basis states. With `ξ` an eigenvector of the all-up block of
+the Tasaki matrix, this is a ferromagnetic ground state `|Φ_↑⟩`. -/
+noncomputable def pfFerroState (N : ℕ) (ξ : Fin (N + 1) → ℂ) :
     (Fin (2 * N + 2) → Fin 2) → ℂ :=
-  ∑ x : Fin (N + 1), (ξ x : ℂ) • tasakiState N ⟨x, holeSpinUp N x⟩
+  ∑ x : Fin (N + 1), ξ x • tasakiState N ⟨x, holeSpinUp N x⟩
 
-/-- `Ŝ^+_tot` annihilates the ferromagnetic state: it is a highest-weight state
+/-- `Ŝ^+_tot` annihilates the all-up state: it is a highest-weight state
 (all electrons spin-up, none to raise). -/
-theorem fermionTotalSpinPlus_mulVec_pfFerroState (N : ℕ) (ξ : Fin (N + 1) → ℝ) :
+theorem fermionTotalSpinPlus_mulVec_pfFerroState (N : ℕ) (ξ : Fin (N + 1) → ℂ) :
     (fermionTotalSpinPlus N).mulVec (pfFerroState N ξ) = 0 := by
   unfold pfFerroState
   rw [Matrix.mulVec_sum]
@@ -56,9 +56,9 @@ theorem fermionTotalSpinPlus_mulVec_pfFerroState (N : ℕ) (ξ : Fin (N + 1) →
     show tasakiState N ⟨x, holeSpinUp N x⟩ = hubbardTasakiBasisState N x (fun _ => true) from rfl,
     fermionTotalSpinPlus_mulVec_hubbardTasakiBasisStateUp, smul_zero]
 
-/-- `Ŝ^z_tot` acts on the ferromagnetic state with eigenvalue `N/2 = S_max`: it is
+/-- `Ŝ^z_tot` acts on the all-up state with eigenvalue `N/2 = S_max`: it is
 the maximal-spin state. -/
-theorem fermionTotalSpinZ_mulVec_pfFerroState (N : ℕ) (ξ : Fin (N + 1) → ℝ) :
+theorem fermionTotalSpinZ_mulVec_pfFerroState (N : ℕ) (ξ : Fin (N + 1) → ℂ) :
     (fermionTotalSpinZ N).mulVec (pfFerroState N ξ) =
       ((N : ℂ) / 2) • pfFerroState N ξ := by
   unfold pfFerroState
@@ -69,33 +69,35 @@ theorem fermionTotalSpinZ_mulVec_pfFerroState (N : ℕ) (ξ : Fin (N + 1) → �
     show tasakiState N ⟨x, holeSpinUp N x⟩ = hubbardTasakiBasisState N x (fun _ => true) from rfl,
     fermionTotalSpinZ_mulVec_hubbardTasakiBasisStateUp, smul_comm]
 
-/-- The ferromagnetic state is nonzero whenever the weight vector is nonzero: its
-squared norm is `Σ_x ξ_x² > 0` by orthonormality of the Tasaki basis. -/
-theorem pfFerroState_ne_zero (N : ℕ) (ξ : Fin (N + 1) → ℝ) (hξ : ξ ≠ 0) :
+/-- The all-up state is nonzero whenever the weight vector is nonzero: pairing
+with `Φ_{x₀,↑}` extracts `ξ_{x₀}` by orthonormality, so if the state vanished all
+weights would be zero. -/
+theorem pfFerroState_ne_zero (N : ℕ) (ξ : Fin (N + 1) → ℂ) (hξ : ξ ≠ 0) :
     pfFerroState N ξ ≠ 0 := by
   classical
   obtain ⟨x₀, hx₀⟩ := Function.ne_iff.mp hξ
   rw [Pi.zero_apply] at hx₀
   intro h
-  set ψ : ((x : Fin (N + 1)) × HoleSpin N x) → ℝ :=
-    fun p => if p.2 = holeSpinUp N p.1 then ξ p.1 else 0 with hψdef
-  have hexp : pfFerroState N ξ = ∑ p, (ψ p : ℂ) • tasakiState N p := by
-    rw [pfFerroState, Fintype.sum_sigma]
-    refine Finset.sum_congr rfl (fun x _ => ?_)
-    rw [Finset.sum_eq_single (holeSpinUp N x)
-      (fun σ _ hσ => by simp only [hψdef, if_neg hσ, Complex.ofReal_zero, zero_smul])
+  -- pairing of `Φ_{x₀,↑}` against the state extracts `ξ_{x₀}`
+  have hpair : (∑ w, tasakiState N ⟨x₀, holeSpinUp N x₀⟩ w * pfFerroState N ξ w) = ξ x₀ := by
+    rw [pfFerroState]
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+    rw [Finset.sum_congr rfl (fun w _ => Finset.mul_sum _ _ _), Finset.sum_comm]
+    rw [Finset.sum_congr rfl (fun x _ => by
+      rw [show (∑ w, tasakiState N ⟨x₀, holeSpinUp N x₀⟩ w *
+              (ξ x * tasakiState N ⟨x, holeSpinUp N x⟩ w)) =
+            ξ x * (∑ w, tasakiState N ⟨x₀, holeSpinUp N x₀⟩ w *
+              tasakiState N ⟨x, holeSpinUp N x⟩ w) from by
+          rw [Finset.mul_sum]; exact Finset.sum_congr rfl (fun w _ => by ring),
+        tasakiState_orthonormal])]
+    rw [Finset.sum_eq_single x₀
+      (fun x _ hx => by
+        rw [if_neg (fun hc => hx (congrArg Sigma.fst hc).symm), mul_zero])
       (fun hmem => absurd (Finset.mem_univ _) hmem)]
-    simp only [hψdef, if_pos rfl]
-  have hnorm := tasakiExpansion_normSq N ψ
-  rw [← hexp, h] at hnorm
-  simp only [Pi.zero_apply, mul_zero, Finset.sum_const_zero] at hnorm
-  have hsum : (∑ p, (ψ p) ^ 2) = 0 := by exact_mod_cast hnorm.symm
-  have hpos : 0 < ∑ p, (ψ p) ^ 2 := by
-    refine Finset.sum_pos' (fun p _ => sq_nonneg _)
-      ⟨⟨x₀, holeSpinUp N x₀⟩, Finset.mem_univ _, ?_⟩
-    simp only [hψdef, if_pos rfl]
-    exact lt_of_le_of_ne (sq_nonneg _) (Ne.symm (pow_ne_zero 2 hx₀))
-  linarith
+    rw [if_pos rfl, mul_one]
+  rw [h] at hpair
+  simp only [Pi.zero_apply, mul_zero, Finset.sum_const_zero] at hpair
+  exact hx₀ hpair.symm
 
 /-! ## The effective Hamiltonian conserves particle number
 
