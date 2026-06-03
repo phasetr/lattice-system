@@ -57,10 +57,13 @@ def nagaokaBondGraph (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ) :
   symm := fun _ _ ⟨hne, h⟩ => ⟨hne.symm, h.symm⟩
   loopless := ⟨fun _ ⟨hne, _⟩ => hne rfl⟩
 
-/-- A graph is **biconnected** (non-separable) if removing any single vertex
-leaves it connected — there is no cut vertex.  (Tasaki fn. 10, §11.2.2.) -/
+/-- A graph is **biconnected** (non-separable) if it is connected and removing
+any single vertex leaves it connected — there is no cut vertex.  (Tasaki fn. 10,
+§11.2.2.)  The `G.Connected` conjunct excludes degenerate disconnected graphs
+(e.g. isolated vertices), for which "delete any vertex stays connected" would
+otherwise hold vacuously. -/
 def IsBiconnected {V : Type*} (G : SimpleGraph V) : Prop :=
-  ∀ v : V, (G.induce {w | w ≠ v}).Connected
+  G.Connected ∧ ∀ v : V, (G.induce {w | w ≠ v}).Connected
 
 /-- A graph is a **simple loop with more than four sites** if it is isomorphic to
 the cycle graph `C_n` for some `n > 4` (a periodic chain on `≥ 5` sites). -/
@@ -75,9 +78,11 @@ its bond graph is biconnected and is not a simple loop with more than four sites
 **AXIOMATIZED (deferred to future implementation).**  Tasaki leaves the proof to
 Bobrow–Stubis–Li and Wilson's "15-puzzle" theorem (1st ed., §11.2.2, p. 387,
 refs [4], [81]); the book gives no proof, so this is a cited external
-classification result.  See the module docstring for the rationale. -/
+classification result.  See the module docstring for the rationale.  (`1 ≤ N`
+excludes the degenerate single-site case, where there are no electrons to order.)
+-/
 axiom nagaoka_theorem_11_8 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
-    (htsym : ∀ i j, t i j = t j i) (hpos : ∀ i j, 0 ≤ t i j) :
+    (hN : 1 ≤ N) (htsym : ∀ i j, t i j = t j i) (hpos : ∀ i j, 0 ≤ t i j) :
     nagaokaConnectivity N t ↔
       (IsBiconnected (nagaokaBondGraph N t) ∧
         ¬ IsSimpleLoopGTFour (nagaokaBondGraph N t))
@@ -114,9 +119,11 @@ hopping it around the loop to exchange the spins at `x` and `y`, then returning
 the hole), but a faithful Lean proof must turn that "15-puzzle" hole-motion
 argument into strong connectivity of the per-sector quiver of `−M` (a multi-PR
 effort in the present matrix/configuration framework).  See the module docstring
-for the rationale. -/
+for the rationale.  (`1 ≤ N` excludes the degenerate single-site case, where the
+one-element exchange-bond graph is vacuously connected but the connectivity
+condition fails.) -/
 axiom nagaoka_lemma_11_9 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
-    (htsym : ∀ i j, t i j = t j i) (hpos : ∀ i j, 0 ≤ t i j) :
+    (hN : 1 ≤ N) (htsym : ∀ i j, t i j = t j i) (hpos : ∀ i j, 0 ≤ t i j) :
     ConnectedByExchangeBonds (nagaokaBondGraph N t) → nagaokaConnectivity N t
 
 end LatticeSystem.Fermion
