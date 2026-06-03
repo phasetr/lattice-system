@@ -601,4 +601,50 @@ theorem tasakiEffMatrixOnSector_map_mulVec_restriction_of_eigen (N : ℕ)
   rw [hc]
   rfl
 
+/-- **The `Ĥ_eff` ground eigenspace is at most `(N+1)`-dimensional.**  Given that
+each magnetization sector contributes at most one dimension at energy `E`
+(`hsector`, supplied by Perron–Frobenius at the global minimum), the full
+coefficient-space `E`-eigenspace embeds (by restriction to sectors) into the
+product of the sector eigenspaces over the `≤ N+1` magnetization values, so its
+dimension is at most `N + 1 = 2 S_max + 1`.  This is the upper bound matching the
+ferromagnetic multiplet (Tasaki Theorem 11.7). -/
+theorem tasakiEffMatrix_ground_finrank_le (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (E : ℂ)
+    (hsector : ∀ m : ℤ, finrank ℂ (End.eigenspace
+      (Matrix.toLin' ((tasakiEffReMatrixOnSector N t m).map (algebraMap ℝ ℂ))) E) ≤ 1) :
+    finrank ℂ (End.eigenspace
+      (Matrix.toLin' ((tasakiEffReMatrix N t).map (algebraMap ℝ ℂ))) E) ≤ N + 1 := by
+  classical
+  set img := Finset.univ.image (holeSpinMag N) with himg
+  let Vsub := End.eigenspace
+    (Matrix.toLin' ((tasakiEffReMatrix N t).map (algebraMap ℝ ℂ))) E
+  let Wsub := fun m : ℤ => End.eigenspace
+    (Matrix.toLin' ((tasakiEffReMatrixOnSector N t m).map (algebraMap ℝ ℂ))) E
+  let L : Vsub →ₗ[ℂ] (∀ i : {m // m ∈ img}, Wsub i.val) := {
+    toFun := fun c i => ⟨fun p : HoleMagSector N i.val => c.val p.val, by
+      have hc : (tasakiEffReMatrix N t).map (algebraMap ℝ ℂ) *ᵥ c.val = E • c.val := by
+        have := End.mem_eigenspace_iff.mp c.2
+        rwa [Matrix.toLin'_apply] at this
+      rw [End.mem_eigenspace_iff, Matrix.toLin'_apply]
+      exact tasakiEffMatrixOnSector_map_mulVec_restriction_of_eigen N t hc⟩
+    map_add' := fun c c' => by funext i; apply Subtype.ext; funext p; rfl
+    map_smul' := fun a c => by funext i; apply Subtype.ext; funext p; rfl }
+  have hL_inj : Function.Injective L := by
+    intro c c' hcc
+    apply Subtype.ext
+    funext p
+    have hmem : holeSpinMag N p ∈ img := by
+      rw [himg, Finset.mem_image]; exact ⟨p, Finset.mem_univ p, rfl⟩
+    have := congrFun hcc ⟨holeSpinMag N p, hmem⟩
+    have hval := congrFun (Subtype.ext_iff.mp this) ⟨p, rfl⟩
+    exact hval
+  calc finrank ℂ Vsub
+      ≤ finrank ℂ (∀ i : {m // m ∈ img}, Wsub i.val) :=
+        LinearMap.finrank_le_finrank_of_injective hL_inj
+    _ = ∑ i : {m // m ∈ img}, finrank ℂ (Wsub i.val) := Module.finrank_pi_fintype ℂ
+    _ ≤ ∑ _i : {m // m ∈ img}, 1 := Finset.sum_le_sum (fun i _ => hsector i.val)
+    _ = img.card := by rw [Finset.sum_const, Finset.card_univ, Fintype.card_coe, smul_eq_mul,
+        mul_one]
+    _ ≤ N + 1 := holeSpinMag_image_card_le N
+
 end LatticeSystem.Fermion
