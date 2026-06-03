@@ -456,6 +456,20 @@ theorem tasaki_completeness (N : ℕ) (v : (Fin (2 * N + 2) → Fin 2) → ℂ)
     exact hd_config ⟨x, ⟨Function.update σ x true, Function.update_self _ _ _⟩⟩
   · rw [hsupp w0 hw, hRHS_supp w0 hw]
 
+/-- The Tasaki basis states are real-valued: `star (Φ_q w) = Φ_q w` (the sign is
+`(-1)^x ∈ ℝ` and `basisVec` is `0`/`1`). -/
+theorem tasakiState_star (N : ℕ) (q : (x : Fin (N + 1)) × HoleSpin N x)
+    (w : Fin (2 * N + 2) → Fin 2) :
+    star (tasakiState N q w) = tasakiState N q w := by
+  have he : tasakiState N q =
+      hubbardTasakiBasisSign N q.1 q.2.val •
+        basisVec (hubbardOneHoleConfig N q.1 q.2.val) :=
+    hubbardTasakiBasisState_eq_smul_basisVec N q.1 q.2.val
+  rw [he]
+  simp only [Pi.smul_apply, smul_eq_mul, hubbardTasakiBasisSign_eq, basisVec_apply,
+    star_mul', star_pow, star_neg, star_one]
+  split <;> simp
+
 /-! ## The effective Hamiltonian acts as its Tasaki matrix -/
 
 /-- **Operator lift.** The effective Hamiltonian acting on a Tasaki basis state
@@ -476,5 +490,44 @@ theorem hubbardEffectiveHamiltonian_mulVec_tasakiState (N : ℕ)
       (hubbardEffectiveHamiltonian_mulVec_mem N t U (tasakiState N p))
       (hubbardEffectiveHamiltonian_mulVec_preserves_number N t U (tasakiState N p) (N : ℂ)
         (fermionTotalNumber_mulVec_tasakiState N p)) w hw)
+
+/-! ## The Tasaki matrix of the effective Hamiltonian -/
+
+/-- The Tasaki-basis embedding matrix: columns are the basis states `Φ_q`
+(`T_{w,q} = Φ_q(w)`). -/
+noncomputable def tasakiEmbedding (N : ℕ) :
+    Matrix (Fin (2 * N + 2) → Fin 2) ((x : Fin (N + 1)) × HoleSpin N x) ℂ :=
+  Matrix.of (fun w q => tasakiState N q w)
+
+/-- The Tasaki matrix `M = Tᴴ Ĥ_eff T` of the effective Hamiltonian — the finite
+real-symmetric matrix of eq. (11.2.5) representing `Ĥ_eff` in the Tasaki basis. -/
+noncomputable def tasakiEffMatrix (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ) :
+    Matrix ((x : Fin (N + 1)) × HoleSpin N x) ((x : Fin (N + 1)) × HoleSpin N x) ℂ :=
+  (tasakiEmbedding N)ᴴ * hubbardEffectiveHamiltonian N t U * tasakiEmbedding N
+
+/-- `M` is Hermitian, being the compression `Tᴴ Ĥ_eff T` of the Hermitian
+effective Hamiltonian. -/
+theorem tasakiEffMatrix_isHermitian (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (hJ : ∀ i j, star (t i j) = t j i) (hU : star U = U) :
+    (tasakiEffMatrix N t U).IsHermitian := by
+  change (tasakiEffMatrix N t U)ᴴ = tasakiEffMatrix N t U
+  unfold tasakiEffMatrix
+  rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul,
+    Matrix.conjTranspose_conjTranspose,
+    (hubbardEffectiveHamiltonian_isHermitian N hJ hU).eq, Matrix.mul_assoc]
+
+/-- The entries of `M` are the Tasaki matrix elements of `Ĥ_eff`:
+`M_{q,p} = ⟨Φ_q | Ĥ_eff | Φ_p⟩ = Σ_w Φ_q(w) (Ĥ_eff Φ_p)(w)` (real-bilinear pairing,
+using that the basis states are real-valued). -/
+theorem tasakiEffMatrix_apply (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (q p : (x : Fin (N + 1)) × HoleSpin N x) :
+    tasakiEffMatrix N t U q p =
+      ∑ w, tasakiState N q w *
+        ((hubbardEffectiveHamiltonian N t U).mulVec (tasakiState N p)) w := by
+  unfold tasakiEffMatrix tasakiEmbedding
+  rw [Matrix.mul_assoc, Matrix.mul_apply]
+  refine Finset.sum_congr rfl (fun w _ => ?_)
+  rw [Matrix.conjTranspose_apply, Matrix.of_apply, tasakiState_star]
+  congr 1
 
 end LatticeSystem.Fermion
