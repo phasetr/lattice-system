@@ -869,4 +869,61 @@ theorem spinMinusPow_pfFerroState_oneHole_supported (N : ℕ) (ξ : Fin (N + 1) 
     (fermionTotalSpinMinus_pow_mulVec_preserves_number N k
       (fermionTotalNumber_mulVec_pfFerroState N ξ)) w hw
 
+/-- The Tasaki embedding's `mulVec` is the Tasaki expansion. -/
+theorem tasakiEmbedding_mulVec_eq (N : ℕ)
+    (c : ((x : Fin (N + 1)) × HoleSpin N x) → ℂ) :
+    (tasakiEmbedding N).mulVec c = ∑ q, c q • tasakiState N q := by
+  funext w
+  simp only [Matrix.mulVec, dotProduct, tasakiEmbedding, Matrix.of_apply,
+    Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+  exact Finset.sum_congr rfl (fun q _ => mul_comm _ _)
+
+/-- **Lower bound (`≥ N+1`) from the ferromagnetic multiplet.**  The `N+1`
+linearly independent tower states `(Ŝ^-)^k Φ_↑` are one-hole supported
+`Ĥ_eff`-eigenvectors at the minimum `E`, so their Tasaki coefficients are `N+1`
+linearly independent `M`-eigenvectors — hence the coefficient ground eigenspace
+has dimension `≥ N+1`. -/
+theorem tasakiEffMatrix_ground_finrank_ge (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) :
+    N + 1 ≤ finrank ℂ (End.eigenspace (Matrix.toLin'
+      (tasakiEffMatrix N (fun i j => (t i j : ℂ)) 0))
+      (((hermitianMinEigenvalue (tasakiEffMatrixUp_isHermitian N
+        (fun i j => (t i j : ℂ)) 0 (tasakiEffMatrix_hJ_of_real htsym)
+        (by simp))) : ℝ) : ℂ)) := by
+  have hJ := tasakiEffMatrix_hJ_of_real htsym
+  have hU0 : star (0 : ℂ) = 0 := by simp
+  obtain ⟨ξ, hξ_ne, hξ_eig⟩ := exists_nonzero_eigenvector_hermitianMinEigenvalue
+    (tasakiEffMatrixUp_isHermitian N (fun i j => (t i j : ℂ)) 0 hJ hU0)
+  set E : ℂ := ((hermitianMinEigenvalue (tasakiEffMatrixUp_isHermitian N
+    (fun i j => (t i j : ℂ)) 0 hJ hU0) : ℝ) : ℂ) with hEdef
+  have hv0_eig := hubbardEffectiveHamiltonian_mulVec_pfFerroState_of_eigen N
+    (fun i j => (t i j : ℂ)) 0 (fun i => by simp [htdiag i]) ξ E hξ_eig
+  obtain ⟨hLI, hdeg, _⟩ := weakNagaoka_spinMultiplet N (fun i j => (t i j : ℂ)) 0 hJ hU0
+    (pfFerroState N ξ) E hv0_eig (fermionTotalSpinPlus_mulVec_pfFerroState N ξ)
+    (fermionTotalSpinZ_mulVec_pfFerroState N ξ) (pfFerroState_ne_zero N ξ hξ_ne)
+  set tower : Fin (N + 1) → (Fin (2 * N + 2) → Fin 2) → ℂ :=
+    fun k => ((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec (pfFerroState N ξ) with htower
+  set cfn : Fin (N + 1) → ((x : Fin (N + 1)) × HoleSpin N x) → ℂ :=
+    fun k => tasakiCoeff N (tower k) with hcfn
+  set W := End.eigenspace (Matrix.toLin'
+    (tasakiEffMatrix N (fun i j => (t i j : ℂ)) 0)) E with hWdef
+  have hc_mem : ∀ k, cfn k ∈ W := by
+    intro k
+    rw [hWdef, End.mem_eigenspace_iff, Matrix.toLin'_apply]
+    exact tasakiCoeff_mulVec_eigen_of_full N (fun i j => (t i j : ℂ)) 0 E (tower k)
+      (spinMinusPow_pfFerroState_oneHole_supported N ξ k) (hdeg k)
+  have hcLI : LinearIndependent ℂ cfn := by
+    have htower_eq : tower = (Matrix.mulVecLin (tasakiEmbedding N)) ∘ cfn := by
+      funext k
+      rw [Function.comp_apply, Matrix.mulVecLin_apply, tasakiEmbedding_mulVec_eq]
+      exact tasaki_completeness N (tower k)
+        (spinMinusPow_pfFerroState_oneHole_supported N ξ k)
+    rw [htower_eq] at hLI
+    exact hLI.of_comp _
+  have hWLI : LinearIndependent ℂ (fun k => (⟨cfn k, hc_mem k⟩ : W)) :=
+    LinearIndependent.of_comp W.subtype hcLI
+  have := hWLI.fintype_card_le_finrank
+  simpa using this
+
 end LatticeSystem.Fermion
