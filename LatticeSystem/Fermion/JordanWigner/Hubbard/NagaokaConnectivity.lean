@@ -712,4 +712,60 @@ theorem tasakiEffMatrix_ground_finrank_le_N_add_one (N : ℕ)
       _ = 0 := hcard
       _ ≤ 1 := by norm_num
 
+/-! ## Bridge: coefficient eigenvectors ↔ full `Ĥ_eff` ground states -/
+
+/-- The Tasaki coefficient functional `⟨Φ_q, v⟩ = Σ_w Φ_q(w) v(w)`.  On a
+one-hole-supported vector this recovers the Tasaki expansion coefficients. -/
+noncomputable def tasakiCoeff (N : ℕ) (v : (Fin (2 * N + 2) → Fin 2) → ℂ) :
+    ((x : Fin (N + 1)) × HoleSpin N x) → ℂ :=
+  fun q => ∑ w, tasakiState N q w * v w
+
+/-- **Left inverse: the coefficient functional inverts the Tasaki expansion.**
+`tasakiCoeff (Σ_p c_p Φ_p) = c` — the basis `Φ_q` being orthonormal.  Hence the
+expansion `c ↦ Σ_p c_p Φ_p` is injective. -/
+theorem tasakiCoeff_expansion (N : ℕ)
+    (c : ((x : Fin (N + 1)) × HoleSpin N x) → ℂ) :
+    tasakiCoeff N (∑ p, c p • tasakiState N p) = c := by
+  funext q
+  unfold tasakiCoeff
+  have hstep : ∀ w, tasakiState N q w * (∑ p, c p • tasakiState N p) w
+      = ∑ p, c p * (tasakiState N q w * tasakiState N p w) := by
+    intro w
+    rw [Finset.sum_apply, Finset.mul_sum]
+    exact Finset.sum_congr rfl (fun p _ => by rw [Pi.smul_apply, smul_eq_mul]; ring)
+  rw [Finset.sum_congr rfl (fun w _ => hstep w), Finset.sum_comm]
+  rw [show (∑ p, ∑ w, c p * (tasakiState N q w * tasakiState N p w))
+      = ∑ p, c p * (∑ w, tasakiState N q w * tasakiState N p w) from
+    Finset.sum_congr rfl (fun p _ => by rw [Finset.mul_sum])]
+  rw [Finset.sum_congr rfl (fun p _ => by rw [tasakiState_orthonormal])]
+  simp only [mul_ite, mul_one, mul_zero]
+  rw [Finset.sum_ite_eq Finset.univ q (fun p => c p), if_pos (Finset.mem_univ q)]
+
+/-- **Backward bridge (hardest step): a full one-hole `Ĥ_eff`-eigenvector gives a
+coefficient `M`-eigenvector.**  If `Ĥ_eff v = E v` and `v` is supported on the
+one-hole hard-core sector, then its Tasaki coefficients satisfy `M c = E c`.
+Combines completeness (`v = Σ c_q Φ_q`), the operator lift (`Ĥ_eff (Σ c Φ) =
+Σ (M c) Φ`) and the left-inverse `tasakiCoeff_expansion`. -/
+theorem tasakiCoeff_mulVec_eigen_of_full (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ) (E : ℂ)
+    (v : (Fin (2 * N + 2) → Fin 2) → ℂ)
+    (hsupp : ∀ w, ¬ IsOneHoleHardcoreConfig N w → v w = 0)
+    (hv : (hubbardEffectiveHamiltonian N t U).mulVec v = E • v) :
+    (tasakiEffMatrix N t U).mulVec (tasakiCoeff N v) = E • tasakiCoeff N v := by
+  have hexp : v = ∑ q, tasakiCoeff N v q • tasakiState N q := tasaki_completeness N v hsupp
+  -- `Ĥ_eff v = Σ (M c) Φ`, and `Ĥ_eff v = E v = Σ (E c) Φ`.
+  have hlift : (hubbardEffectiveHamiltonian N t U).mulVec v
+      = ∑ q, ((tasakiEffMatrix N t U).mulVec (tasakiCoeff N v)) q • tasakiState N q := by
+    conv_lhs => rw [hexp]
+    rw [hubbardEffectiveHamiltonian_mulVec_tasakiExpansion]
+  have hEv : E • v = ∑ q, (E • tasakiCoeff N v) q • tasakiState N q := by
+    conv_lhs => rw [hexp]
+    rw [Finset.smul_sum]
+    exact Finset.sum_congr rfl (fun q _ => by rw [Pi.smul_apply, smul_smul, smul_eq_mul])
+  have hEq : (∑ q, ((tasakiEffMatrix N t U).mulVec (tasakiCoeff N v)) q • tasakiState N q)
+      = ∑ q, (E • tasakiCoeff N v) q • tasakiState N q := by rw [← hlift, hv, hEv]
+  -- Apply the left inverse to both Tasaki expansions.
+  have hfin := congrArg (tasakiCoeff N) hEq
+  rwa [tasakiCoeff_expansion, tasakiCoeff_expansion] at hfin
+
 end LatticeSystem.Fermion
