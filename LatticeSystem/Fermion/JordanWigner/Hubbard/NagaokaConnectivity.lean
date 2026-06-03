@@ -211,4 +211,40 @@ theorem nagaokaPFMatrixOnSector_exists_pos_eigenvec (N : ℕ)
   exact ⟨μ, v, hAv, hv_pos,
     eigenspace_finrank_le_one_of_pos_eigenvec hconn hAv hv_pos⟩
 
+/-- The `(-μ)`-eigenspace of `M` (on a sector) coincides with the `μ`-eigenspace
+of `−M`: `−M v = μ v ↔ M v = −μ v`. -/
+theorem eigenspace_tasakiEffReMatrixOnSector_eq_neg (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ) (μ : ℝ) :
+    End.eigenspace (Matrix.toLin' (tasakiEffReMatrixOnSector N t m)) (-μ)
+      = End.eigenspace (Matrix.toLin' (nagaokaPFMatrixOnSector N t m)) μ := by
+  ext x
+  rw [End.mem_eigenspace_iff, End.mem_eigenspace_iff, toLin'_apply, toLin'_apply]
+  unfold nagaokaPFMatrixOnSector
+  rw [neg_mulVec]
+  constructor
+  · intro h; rw [h, neg_smul, neg_neg]
+  · intro h; rw [neg_smul]; exact neg_eq_iff_eq_neg.mp h
+
+/-- **The sector ground state of `M` is non-degenerate (Theorem 11.7 core).**
+On a non-empty connected magnetization sector, `M` has a strictly positive
+eigenvector at the eigenvalue `−μ` (`μ` the Perron eigenvalue of `−M`), and that
+eigenspace is at most one-dimensional.  Since `−μ = min spec M|_sector`, this is
+the unique ground state of `M` within the sector. -/
+theorem tasakiEffReMatrixOnSector_ground_finrank_le_one (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ)
+    [Nonempty (HoleMagSector N m)]
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0)
+    (hconn : (nagaokaPFMatrixOnSector N t m).IsIrreducible) :
+    ∃ (lam : ℝ) (v : HoleMagSector N m → ℝ),
+      tasakiEffReMatrixOnSector N t m *ᵥ v = lam • v ∧ (∀ i, 0 < v i) ∧
+      finrank ℝ (End.eigenspace
+        (Matrix.toLin' (tasakiEffReMatrixOnSector N t m)) lam) ≤ 1 := by
+  obtain ⟨μ, v, hAv, hv_pos, hfin⟩ :=
+    nagaokaPFMatrixOnSector_exists_pos_eigenvec N t m htsym htdiag hconn
+  refine ⟨-μ, v, ?_, hv_pos, ?_⟩
+  · have hthis : (-tasakiEffReMatrixOnSector N t m) *ᵥ v = μ • v := hAv
+    rw [neg_mulVec] at hthis
+    rw [neg_smul]; exact neg_eq_iff_eq_neg.mp hthis
+  · rw [eigenspace_tasakiEffReMatrixOnSector_eq_neg]; exact hfin
+
 end LatticeSystem.Fermion
