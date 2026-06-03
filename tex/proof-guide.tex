@@ -5427,6 +5427,18 @@ state to the full degenerate spin multiplet.
 \texttt{fermionTotalSpinPlus\_commute\_hubbardEffectiveHamiltonian},
 \texttt{fermionTotalSpinMinus\_commute\_hubbardEffectiveHamiltonian}.
 
+\medskip
+\noindent\textbf{Conservation of total spin.}
+The same argument applied to \(\hat S^z_{\rm tot}\) (which commutes with every
+double-occupancy operator, all number operators commuting) gives
+\([\hat H_{\rm eff}, \hat S^z_{\rm tot}] = 0\), and combining with the
+raising/lowering versions yields \([\hat H_{\rm eff}, (\hat S_{\rm tot})^2] = 0\):
+the effective Hamiltonian conserves total spin, so its eigenspaces split into
+fixed-\(S_{\rm tot}\) sectors — the conservation law behind the
+\(S_{\rm tot} = S_{\max}\) statement of Theorem 11.5 and the per-sector
+Perron--Frobenius analysis of Theorem 11.7. (\texttt{fermionTotalSpinZ\_commute\_hubbardEffectiveHamiltonian},
+\texttt{fermionTotalSpinSquared\_commute\_hubbardEffectiveHamiltonian}.)
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
