@@ -93,4 +93,44 @@ theorem pfFerroState_ne_zero (N : ℕ) (ξ : Fin (N + 1) → ℝ) (hξ : ∀ x, 
     exact pow_pos (hξ _) 2
   linarith
 
+/-! ## The effective Hamiltonian conserves particle number
+
+These prepare the operator-lift step: `Ĥ_eff` maps the one-hole hard-core sector
+to itself (it preserves both the hard-core constraint and the electron number),
+so its action on the Tasaki basis stays in the span of the basis. -/
+
+/-- The same-site double-occupancy operator commutes with the total electron
+number (it is a product of number operators). -/
+theorem hubbardDoubleOccupancy_commute_fermionTotalNumber (N : ℕ) (i : Fin (N + 1)) :
+    Commute (hubbardDoubleOccupancy N i) (fermionTotalNumber (2 * N + 1)) := by
+  unfold hubbardDoubleOccupancy fermionUpNumber fermionDownNumber
+  exact (fermionMultiNumber_commute_fermionTotalNumber (2 * N + 1) (spinfulIndex N i 0)).mul_left
+    (fermionMultiNumber_commute_fermionTotalNumber (2 * N + 1) (spinfulIndex N i 1))
+
+/-- Each hard-core factor `1 - n_{i,↑} n_{i,↓}` commutes with the total electron
+number. -/
+theorem hubbardHardcoreFactor_commute_fermionTotalNumber (N : ℕ) (i : Fin (N + 1)) :
+    Commute (hubbardHardcoreFactor N i) (fermionTotalNumber (2 * N + 1)) := by
+  unfold hubbardHardcoreFactor
+  exact (Commute.one_left _).sub_left (hubbardDoubleOccupancy_commute_fermionTotalNumber N i)
+
+/-- The hard-core projection commutes with the total electron number. -/
+theorem hubbardHardcoreProjection_commute_fermionTotalNumber (N : ℕ) :
+    Commute (hubbardHardcoreProjection N) (fermionTotalNumber (2 * N + 1)) := by
+  unfold hubbardHardcoreProjection
+  exact (Finset.noncommProd_commute _ _ _ _
+    (fun i _ => (hubbardHardcoreFactor_commute_fermionTotalNumber N i).symm)).symm
+
+/-- **`Ĥ_eff` conserves the total electron number** `[Ĥ_eff, N̂] = 0`: it is built
+from the number-conserving Hubbard Hamiltonian compressed by the
+number-conserving hard-core projection. Hence `Ĥ_eff` preserves the fixed-electron
+sectors, in particular the one-hole hard-core sector. -/
+theorem hubbardEffectiveHamiltonian_commute_fermionTotalNumber
+    (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ) :
+    Commute (hubbardEffectiveHamiltonian N t U) (fermionTotalNumber (2 * N + 1)) := by
+  unfold hubbardEffectiveHamiltonian
+  exact ((hubbardHardcoreProjection_commute_fermionTotalNumber N).mul_left
+    (hubbardHamiltonian_commute_fermionTotalNumber N t U)).mul_left
+    (hubbardHardcoreProjection_commute_fermionTotalNumber N)
+
 end LatticeSystem.Fermion
