@@ -45,6 +45,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonianMatrix
 import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonianSpinSymmetry
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaoka
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheorem
+import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaGroundState
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyProjection
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyCommute
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinfulNumberHermitian
@@ -127,6 +128,7 @@ expansion):
 | `Hubbard/WeakNagaoka.lean` | Cauchy–Schwarz energy bound `⟨Φ_↑\|Ĥ_eff\|Φ_↑⟩ ≤ ⟨Φ\|Ĥ_eff\|Φ⟩` (Tasaki §11.2 eq. (11.2.9)) |
 | `Hubbard/EffectiveHamiltonianSpinSymmetry.lean` | SU(2) symmetry of the effective Hamiltonian `[Ĥ_eff, Ŝ^±_tot] = 0` (Tasaki §11.2, degeneracy backbone) |
 | `Hubbard/WeakNagaokaTheorem.lean` | weak Nagaoka spin multiplet `weakNagaoka_spinMultiplet`: a ferromagnetic GS generates `N+1` degenerate ground states with `S_tot=S_max` via the SU(2) ladder (Tasaki §11.2.1, Theorem 11.5) |
+| `Hubbard/WeakNagaokaGroundState.lean` | **Tasaki Theorem 11.5** `weakNagaoka_theorem_11_5`: existence of the ferromagnetic ground multiplet via the all-up block `M_↑ = ` Tasaki matrix of `Ĥ_eff`; operator lift `Ĥ_eff Φ_p = Σ_q ⟨Φ_q\|Ĥ_eff\|Φ_p⟩ Φ_q`, sector completeness, `N+1 = 2S_max+1` linearly independent degenerate eigenvectors with `S_tot=S_max` (Tasaki §11.2.1) |
 | `Hubbard/DoubleOccupancyProjection.lean` | site-`i` `Commute n_↑ n_↓` + idempotent product |
 | `Hubbard/DoubleOccupancyCommute.lean` | cross-site `Commute (n_↑(i)·n_↓(i)) (n_↑(j)·n_↓(j))` |
 | `Hubbard/SpinfulNumberHermitian.lean` | `n_↑(i)`, `n_↓(i)`, `n_↑(i)·n_↓(i)` Hermitian |
