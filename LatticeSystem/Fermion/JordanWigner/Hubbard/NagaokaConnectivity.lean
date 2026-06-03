@@ -835,4 +835,38 @@ theorem fermionTotalSpinMinus_pow_mulVec_preserves_number (N : ℕ) (k : ℕ)
     rw [pow_succ', ← Matrix.mulVec_mulVec]
     exact fermionTotalSpinMinus_mulVec_preserves_number N ih
 
+/-- Each Tasaki basis state lies in the hard-core subspace. -/
+theorem tasakiState_mem_hardcore (N : ℕ) (p : (x : Fin (N + 1)) × HoleSpin N x) :
+    tasakiState N p ∈ hubbardHardcoreSubspace N := by
+  rw [tasakiState, hubbardTasakiBasisState_eq_smul_basisVec]
+  exact Submodule.smul_mem _ _
+    (hubbardHardcoreBasisState_mem_hardcoreSubspace N p.1 p.2.val)
+
+/-- The ferromagnetic ground state `pfFerroState` lies in the hard-core subspace. -/
+theorem pfFerroState_mem_hardcore (N : ℕ) (ξ : Fin (N + 1) → ℂ) :
+    pfFerroState N ξ ∈ hubbardHardcoreSubspace N := by
+  unfold pfFerroState
+  exact Submodule.sum_mem _ (fun x _ =>
+    Submodule.smul_mem _ _ (tasakiState_mem_hardcore N _))
+
+/-- `pfFerroState` is an `N`-electron state. -/
+theorem fermionTotalNumber_mulVec_pfFerroState (N : ℕ) (ξ : Fin (N + 1) → ℂ) :
+    (fermionTotalNumber (2 * N + 1)).mulVec (pfFerroState N ξ) =
+      (N : ℂ) • pfFerroState N ξ := by
+  unfold pfFerroState
+  rw [Matrix.mulVec_sum, Finset.smul_sum]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [Matrix.mulVec_smul, fermionTotalNumber_mulVec_tasakiState, smul_comm]
+
+/-- **The spin tower of `pfFerroState` is one-hole supported.**  `(Ŝ^-)^k Φ_↑`
+stays in the hard-core `N`-electron sector, hence vanishes off the one-hole
+hard-core configurations. -/
+theorem spinMinusPow_pfFerroState_oneHole_supported (N : ℕ) (ξ : Fin (N + 1) → ℂ)
+    (k : ℕ) (w : Fin (2 * N + 2) → Fin 2) (hw : ¬ IsOneHoleHardcoreConfig N w) :
+    (((fermionTotalSpinMinus N) ^ k).mulVec (pfFerroState N ξ)) w = 0 :=
+  mulVec_apply_eq_zero_of_not_oneHole N _
+    (fermionTotalSpinMinus_pow_mulVec_mem_hardcore N k (pfFerroState_mem_hardcore N ξ))
+    (fermionTotalSpinMinus_pow_mulVec_preserves_number N k
+      (fermionTotalNumber_mulVec_pfFerroState N ξ)) w hw
+
 end LatticeSystem.Fermion
