@@ -361,4 +361,61 @@ theorem tasakiEffReMatrixOnSector_mulVec_restriction_of_eigen (N : ℕ)
   rw [hc]
   rfl
 
+/-- Zero-extension of a sector vector to the full one-hole coefficient space:
+`sectorEmbed v p = v p` if `p` is in sector `m`, else `0`. -/
+def sectorEmbed (N : ℕ) (m : ℤ)
+    (v : HoleMagSector N m → ℝ) : (x : Fin (N + 1)) × HoleSpin N x → ℝ :=
+  fun p => if h : holeSpinMag N p = m then v ⟨p, h⟩ else 0
+
+/-- **Block invariance, embedding direction: a sector eigenvector lifts to a full
+eigenvector.**  If `M_m v = lam v` then `M (sectorEmbed v) = lam (sectorEmbed v)`
+— because `M` is block-diagonal in magnetization, the zero-extended vector is a
+genuine eigenvector of the full coefficient-space matrix at the same eigenvalue.
+Hence every sector eigenvalue is a full-matrix eigenvalue (so `≥ min M`). -/
+theorem tasakiEffReMatrix_mulVec_sectorEmbed_of_eigen (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) {m : ℤ} {lam : ℝ}
+    {v : HoleMagSector N m → ℝ}
+    (hv : tasakiEffReMatrixOnSector N t m *ᵥ v = lam • v) :
+    tasakiEffReMatrix N t *ᵥ sectorEmbed N m v = lam • sectorEmbed N m v := by
+  classical
+  funext q
+  change (∑ p', tasakiEffReMatrix N t q p' * sectorEmbed N m v p') = lam * sectorEmbed N m v q
+  have hzero : ∀ p' : (x : Fin (N + 1)) × HoleSpin N x,
+      holeSpinMag N p' ≠ m → tasakiEffReMatrix N t q p' * sectorEmbed N m v p' = 0 := by
+    intro p' hp'
+    simp [sectorEmbed, hp']
+  by_cases hq : holeSpinMag N q = m
+  · -- q in sector m: full sum collapses to the sector sum = (M_m v) ⟨q⟩.
+    have hfilter : (∑ p', tasakiEffReMatrix N t q p' * sectorEmbed N m v p') =
+        ∑ p' ∈ Finset.univ.filter (fun p' => holeSpinMag N p' = m),
+          tasakiEffReMatrix N t q p' * sectorEmbed N m v p' := by
+      refine (Finset.sum_filter_of_ne (fun p' _ hne => ?_)).symm
+      by_contra h; exact hne (hzero p' h)
+    have hsub : (∑ p' ∈ Finset.univ.filter (fun p' => holeSpinMag N p' = m),
+          tasakiEffReMatrix N t q p' * sectorEmbed N m v p') =
+        ∑ p : HoleMagSector N m, tasakiEffReMatrixOnSector N t m ⟨q, hq⟩ p * v p := by
+      rw [Finset.sum_subtype
+        (Finset.univ.filter (fun p' => holeSpinMag N p' = m))
+        (p := fun p' => holeSpinMag N p' = m)
+        (fun p' => by simp [Finset.mem_filter])
+        (fun p' => tasakiEffReMatrix N t q p' * sectorEmbed N m v p')]
+      refine Finset.sum_congr rfl (fun p _ => ?_)
+      simp only [sectorEmbed, dif_pos p.property, Subtype.coe_eta]
+      unfold tasakiEffReMatrixOnSector
+      rw [Matrix.submatrix_apply]
+    rw [hfilter, hsub]
+    have heig := congrFun hv ⟨q, hq⟩
+    change (∑ p, tasakiEffReMatrixOnSector N t m ⟨q, hq⟩ p * v p) = lam * v ⟨q, hq⟩ at heig
+    rw [heig]
+    simp [sectorEmbed, dif_pos hq]
+  · -- q outside sector m: both sides are 0.
+    have hlhs : (∑ p', tasakiEffReMatrix N t q p' * sectorEmbed N m v p') = 0 := by
+      refine Finset.sum_eq_zero (fun p' _ => ?_)
+      by_cases hp' : holeSpinMag N p' = m
+      · rw [tasakiEffReMatrix_eq_zero_of_holeSpinMag_ne N t q p' (by rw [hp']; exact hq),
+          zero_mul]
+      · exact hzero p' hp'
+    rw [hlhs]
+    simp [sectorEmbed, dif_neg hq]
+
 end LatticeSystem.Fermion
