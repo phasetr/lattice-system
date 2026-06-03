@@ -175,4 +175,88 @@ theorem rayleighOnVec_tasakiEffMatrixUp_eq (N : ℕ) (t : Fin (N + 1) → Fin (N
     rayleighOnVec_tasakiEffMatrix_of_real N t U (upEmbed N ξ) (by rw [star_upEmbed, hξ]),
     ← pfFerroState_eq_tasakiExpansion]
 
+/-- `upEmbed` of the ferromagnetized weights equals the ferromagnetic Tasaki
+coefficients. -/
+theorem upEmbed_ferroXi (N : ℕ) (φ : ((x : Fin (N + 1)) × HoleSpin N x) → ℝ) :
+    upEmbed N (fun x => (ferroXi N φ x : ℂ)) = fun p => ((ferroCoeff N φ p : ℝ) : ℂ) := by
+  funext p
+  simp only [upEmbed, ferroCoeff]
+  split <;> simp
+
+/-- `min(M_↑) ≤ min(M)` (Tasaki's Schwarz bound (11.2.9)): ferromagnetizing a
+real minimum eigenvector of `M` lowers the energy into the all-up sector, so the
+all-up minimum is no larger than the full minimum. -/
+theorem hermitianMinEigenvalue_tasakiEffMatrixUp_le (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (U : ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j) :
+    hermitianMinEigenvalue (tasakiEffMatrixUp_isHermitian N (fun i j => (t i j : ℂ))
+        (U : ℂ) (tasakiEffMatrix_hJ_of_real htsym)
+        (by rw [Complex.star_def, Complex.conj_ofReal])) ≤
+      hermitianMinEigenvalue (tasakiEffMatrix_isHermitian N (fun i j => (t i j : ℂ))
+        (U : ℂ) (tasakiEffMatrix_hJ_of_real htsym)
+        (by rw [Complex.star_def, Complex.conj_ofReal])) := by
+  classical
+  have hJ := tasakiEffMatrix_hJ_of_real (t := t) htsym
+  have hU : star (U : ℂ) = (U : ℂ) := by rw [Complex.star_def, Complex.conj_ofReal]
+  have hM := tasakiEffMatrix_isHermitian N (fun i j => (t i j : ℂ)) (U : ℂ) hJ hU
+  have hMup := tasakiEffMatrixUp_isHermitian N (fun i j => (t i j : ℂ)) (U : ℂ) hJ hU
+  set μ := hermitianMinEigenvalue hM with hμ
+  set μup := hermitianMinEigenvalue hMup with hμup
+  obtain ⟨φ, hφ_ne, hφ_eig⟩ := exists_real_min_eigenvector_tasakiEffReMatrix N t U htsym htdiag
+  have hφ_eigμ : (tasakiEffReMatrix N t).mulVec φ = μ • φ := hφ_eig
+  have hnorm_pos : 0 < ∑ p, (φ p) ^ 2 := by
+    obtain ⟨p₀, hp₀⟩ := Function.ne_iff.mp hφ_ne
+    rw [Pi.zero_apply] at hp₀
+    exact Finset.sum_pos' (fun p _ => sq_nonneg _)
+      ⟨p₀, Finset.mem_univ _, lt_of_le_of_ne (sq_nonneg _) (Ne.symm (pow_ne_zero 2 hp₀))⟩
+  have hA : rayleighOnVec (tasakiEffMatrixUp N (fun i j => (t i j : ℂ)) (U : ℂ))
+        (fun x => (ferroXi N φ x : ℂ)) =
+      tasakiQuadForm N t (ferroCoeff N φ) := by
+    rw [rayleighOnVec_tasakiEffMatrixUp_eq N (fun i j => (t i j : ℂ)) (U : ℂ)
+        (fun i => by simp [htdiag i]) _
+      (by funext x; rw [Pi.star_apply, Complex.star_def, Complex.conj_ofReal]),
+      pfFerroState_eq_tasakiExpansion, upEmbed_ferroXi,
+      hubbardEffEnergy_eq_quadForm N t (U : ℂ) htdiag, Complex.ofReal_re]
+  have hMφ : (tasakiEffMatrix N (fun i j => (t i j : ℂ)) (U : ℂ)).mulVec (fun p => (φ p : ℂ)) =
+      (μ : ℂ) • (fun p => (φ p : ℂ)) := by
+    rw [tasakiEffMatrix_eq_map_tasakiEffReMatrix N t U htdiag]
+    exact matrix_eigenvec_map_ofReal hφ_eigμ
+  have hE : rayleighOnVec (tasakiEffMatrix N (fun i j => (t i j : ℂ)) (U : ℂ))
+        (fun p => (φ p : ℂ)) = μ * ∑ p, (φ p) ^ 2 := by
+    unfold rayleighOnVec
+    rw [hMφ, dotProduct_smul, smul_eq_mul,
+      show dotProduct (star (fun p => ((φ p : ℝ) : ℂ))) (fun p => ((φ p : ℝ) : ℂ)) =
+          ((∑ p, (φ p) ^ 2 : ℝ) : ℂ) from by
+        simp only [dotProduct, Pi.star_apply, Complex.star_def, Complex.conj_ofReal]
+        push_cast
+        exact Finset.sum_congr rfl (fun p _ => by ring),
+      ← Complex.ofReal_mul, Complex.ofReal_re]
+  have hQ : tasakiQuadForm N t φ =
+      rayleighOnVec (tasakiEffMatrix N (fun i j => (t i j : ℂ)) (U : ℂ)) (fun p => (φ p : ℂ)) := by
+    have hcr : star (fun p => ((φ p : ℝ) : ℂ)) = fun p => ((φ p : ℝ) : ℂ) := by
+      funext p; rw [Pi.star_apply, Complex.star_def, Complex.conj_ofReal]
+    rw [rayleighOnVec_tasakiEffMatrix_of_real N (fun i j => (t i j : ℂ)) (U : ℂ)
+        (fun p => (φ p : ℂ)) hcr,
+      hubbardEffEnergy_eq_quadForm N t (U : ℂ) htdiag, Complex.ofReal_re]
+  have hlow := hermitianMinEigenvalue_mul_dotProduct_re_le_rayleighOnVec hMup
+    (fun x => (ferroXi N φ x : ℂ))
+  have hdot : (dotProduct (star (fun x => ((ferroXi N φ x : ℝ) : ℂ)))
+      (fun x => ((ferroXi N φ x : ℝ) : ℂ))).re = ∑ p, (φ p) ^ 2 := by
+    simp only [dotProduct, Pi.star_apply, Complex.star_def, Complex.conj_ofReal]
+    rw [← ferroCoeff_normSq_eq N φ,
+      show (∑ p, (ferroCoeff N φ p) ^ 2) = ∑ x, (ferroXi N φ x) ^ 2 from by
+        rw [Fintype.sum_sigma]
+        refine Finset.sum_congr rfl (fun x _ => ?_)
+        rw [Finset.sum_eq_single (holeSpinUp N x)
+          (fun σ _ hσ => by simp [ferroCoeff, if_neg hσ])
+          (fun hmem => absurd (Finset.mem_univ _) hmem)]
+        simp [ferroCoeff]]
+    rw [Complex.re_sum]
+    exact Finset.sum_congr rfl (fun x _ => by
+      simp only [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, mul_zero, sub_zero]; ring)
+  rw [hdot, hA] at hlow
+  have hchain : μup * ∑ p, (φ p) ^ 2 ≤ μ * ∑ p, (φ p) ^ 2 :=
+    le_trans hlow (le_trans (tasakiQuadForm_ferro_le N t hpos φ) (le_of_eq (hQ.trans hE)))
+  exact le_of_mul_le_mul_right hchain hnorm_pos
+
 end LatticeSystem.Fermion
