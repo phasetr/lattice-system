@@ -5382,6 +5382,38 @@ corresponding term of \(|\Phi_\uparrow\rangle\) (whose quadratic form is
 \end{itemize}
 
 %======================================================================
+\subsection{SU(2) symmetry of the effective Hamiltonian (Tasaki §11.2)}
+\label{subsec:hubbard-effham-su2}
+%======================================================================
+
+\noindent\textbf{Statement.}
+The effective Hamiltonian inherits the full SU(2) spin symmetry of the Hubbard
+model: \([\hat H_{\rm eff}, \hat S^\pm_{\rm tot}] = 0\).
+
+\medskip
+\noindent\textbf{Proof.}
+Since \(\hat H_{\rm eff} = \hat P_{\rm hc}\hat H\hat P_{\rm hc}\) and
+\([\hat H, \hat S^+_{\rm tot}] = 0\) (Tasaki §9.3.3), it suffices that
+\(\hat S^+_{\rm tot}\) commutes with the hard-core projection. Each raising term
+\(\hat c^\dagger_{k,\uparrow}\hat c_{k,\downarrow}\) commutes with every
+double-occupancy operator \(n_{i,\uparrow}n_{i,\downarrow}\) (same site: both
+products vanish by Pauli exclusion; distinct sites: the constituents commute),
+hence with each hard-core factor \(1 - n_{i,\uparrow}n_{i,\downarrow}\), hence
+with their non-commutative product \(\hat P_{\rm hc}\). The lowering symmetry
+follows by taking adjoints, using that \(\hat H_{\rm eff}\) is Hermitian and
+\((\hat S^+_{\rm tot})^\dagger = \hat S^-_{\rm tot}\). This SU(2) symmetry is the
+structural reason for the \((2S_{\max}+1)\)-fold degeneracy of the weak Nagaoka
+ground states (Theorem 11.5): \(\hat S^-_{\rm tot}\) maps a ferromagnetic ground
+state to the full degenerate spin multiplet.
+
+\medskip
+\noindent\textbf{Lean declarations}
+(file \texttt{Fermion/JordanWigner/Hubbard/EffectiveHamiltonianSpinSymmetry.lean}):
+\texttt{fermionTotalSpinPlus\_commute\_hubbardHardcoreProjection},
+\texttt{fermionTotalSpinPlus\_commute\_hubbardEffectiveHamiltonian},
+\texttt{fermionTotalSpinMinus\_commute\_hubbardEffectiveHamiltonian}.
+
+%======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
 %======================================================================

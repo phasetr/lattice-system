@@ -700,7 +700,7 @@ private theorem fermionDownNumber_mul_fermionDownAnnihilation_same (N : ℕ) (x 
 /-- Per-pair: $c^\dagger_{k,\uparrow} c_{k,\downarrow}$ commutes with
 $n_{x,\uparrow} n_{x,\downarrow}$.  Same-site ($k = x$): both products vanish by Pauli
 exclusion.  Different sites ($k \neq x$): all four constituent operators commute pairwise. -/
-private theorem fermionSpinPlusTerm_commute_interactionTerm
+theorem fermionSpinPlusTerm_commute_interactionTerm
     (N : ℕ) (k x : Fin (N + 1)) :
     Commute (fermionUpCreation N k * fermionDownAnnihilation N k)
             (fermionUpNumber N x * fermionDownNumber N x) := by
