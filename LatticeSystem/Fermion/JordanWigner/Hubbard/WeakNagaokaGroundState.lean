@@ -578,4 +578,13 @@ theorem hubbardEffEnergy_tasakiExpansion (N : ℕ) (t : Fin (N + 1) → Fin (N +
   simp only [dotProduct, Matrix.mulVec, Finset.mul_sum]
   exact Finset.sum_congr rfl (fun p _ => Finset.sum_congr rfl (fun q _ => by ring))
 
+/-- For a real coefficient vector, the Rayleigh quotient of `M` equals the real
+part of the effective-Hamiltonian energy of the corresponding Tasaki expansion. -/
+theorem rayleighOnVec_tasakiEffMatrix_of_real (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ)
+    (U : ℂ) (c : ((x : Fin (N + 1)) × HoleSpin N x) → ℂ) (hc : star c = c) :
+    rayleighOnVec (tasakiEffMatrix N t U) c =
+      (hubbardEffEnergy N t U (∑ p, c p • tasakiState N p)).re := by
+  unfold rayleighOnVec
+  rw [hc, hubbardEffEnergy_tasakiExpansion]
+
 end LatticeSystem.Fermion
