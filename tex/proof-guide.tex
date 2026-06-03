@@ -5626,10 +5626,33 @@ technical crux. The development is sorry-free.
 \medskip
 \noindent\emph{Definition 11.6 is here taken as per-sector irreducibility of
 \(-M\); the book's equivalent ``connected through non-vanishing matrix elements
-of \(\hat H_{\rm eff}\)'' is the same Perron--Frobenius notion. The necessary and
-sufficient combinatorial criterion (Theorem 11.8, biconnected and not a simple
-loop \(> 4\) sites) and the exchange-bond sufficient condition (Lemma 11.9)
-follow in the book; their formalization is planned next.}
+of \(\hat H_{\rm eff}\)'' is the same Perron--Frobenius notion.}
+
+\medskip
+\noindent\textbf{Theorem 11.8 and Lemma 11.9 (axiomatized, deferred).}
+Tasaki §11.2.2 then gives two criteria for \emph{verifying} the connectivity
+condition on a concrete bond graph \((\Lambda, B)\), \(B = \{\{x,y\} : t_{x,y}
+\ne 0\}\): \textbf{Theorem 11.8} (Bobrow--Stubis--Li) — connectivity holds
+\emph{iff} \((\Lambda, B)\) is biconnected and is not a simple loop (periodic
+chain) with more than four sites; and \textbf{Lemma 11.9} — if \((\Lambda, B)\)
+is connected by \emph{exchange bonds} (pairs lying on a common length-3/4 loop
+whose removal keeps \(\Lambda\) connected), connectivity holds. In the Lean
+development (file
+\texttt{Fermion/JordanWigner/Hubbard/NagaokaConnectivityClassification.lean})
+these are recorded as \textbf{\texttt{axiom}s}
+(\texttt{nagaoka\_theorem\_11\_8}, \texttt{nagaoka\_lemma\_11\_9}), with the
+bond-graph and biconnected / simple-loop / exchange-bond predicates defined
+(\texttt{nagaokaBondGraph}, \texttt{IsBiconnected}, \texttt{IsSimpleLoopGTFour},
+\texttt{IsExchangeBond}, \texttt{ConnectedByExchangeBonds}), and their proofs
+\emph{deferred to a future implementation}. The rationale: Tasaki
+\emph{explicitly leaves the proof of Theorem 11.8 to the original papers}
+(Bobrow--Stubis--Li; Wilson's ``15-puzzle'' theorem, p.~387 refs [4], [81]) — it
+is a cited external classification theorem; and a faithful Lean proof of Lemma
+11.9 must turn its hole-motion (``15-puzzle'') argument into strong connectivity
+of the per-sector quiver of \(-M\), a multi-PR effort in the present
+matrix/configuration framework. \textbf{Theorem 11.7 above is \texttt{sorry}-free
+and does not depend on these axioms}; they are isolated in a separate file so the
+proven core stays axiom-clean.
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}

@@ -48,6 +48,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheorem
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaGroundState
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaGlobalMin
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaConnectivity
+import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaConnectivityClassification
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyProjection
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyCommute
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinfulNumberHermitian
@@ -132,7 +133,8 @@ expansion):
 | `Hubbard/WeakNagaokaTheorem.lean` | weak Nagaoka spin multiplet `weakNagaoka_spinMultiplet`: a ferromagnetic GS generates `N+1` degenerate ground states with `S_tot=S_max` via the SU(2) ladder (Tasaki §11.2.1, Theorem 11.5) |
 | `Hubbard/WeakNagaokaGroundState.lean` | **Tasaki Theorem 11.5** `weakNagaoka_theorem_11_5`: existence of the ferromagnetic ground multiplet via the all-up block `M_↑ = ` Tasaki matrix of `Ĥ_eff`; operator lift `Ĥ_eff Φ_p = Σ_q ⟨Φ_q\|Ĥ_eff\|Φ_p⟩ Φ_q`, sector completeness, `N+1 = 2S_max+1` linearly independent degenerate eigenvectors with `S_tot=S_max` (Tasaki §11.2.1) |
 | `Hubbard/WeakNagaokaGlobalMin.lean` | **Tasaki Theorem 11.5 global form** `weakNagaoka_theorem_11_5_global`: `min(M_↑) = min(M)` via the Schwarz bound (11.2.9) ferromagnetization (real Tasaki matrix + real min eigenvector), so the multiplet sits at the **global** one-hole ground energy — genuine ground states (Tasaki §11.2.1) |
-| `Hubbard/NagaokaConnectivity.lean` | **Tasaki Theorem 11.7** `nagaoka_theorem_11_7` / `nagaoka_theorem_11_7_degeneracy`: with the connectivity condition (Definition 11.6, `nagaokaConnectivity` = per-`S_z^{(3)}`-sector irreducibility of `−M`) and `t≥0`, the one-hole ground eigenspace is `(N+1)`-dimensional and every ground state has `S_tot=S_max` — Nagaoka's theorem. Per-sector Perron–Frobenius (upper bound) + SU(2) spin-multiplet (lower bound) (Tasaki §11.2.2) |
+| `Hubbard/NagaokaConnectivity.lean` | **Tasaki Theorem 11.7** `nagaoka_theorem_11_7` / `nagaoka_theorem_11_7_degeneracy`: with the connectivity condition (Definition 11.6, `nagaokaConnectivity` = per-`S_z^{(3)}`-sector irreducibility of `−M`) and `t≥0`, the one-hole ground eigenspace is `(N+1)`-dimensional and every ground state has `S_tot=S_max` — Nagaoka's theorem. Per-sector Perron–Frobenius (upper bound) + SU(2) spin-multiplet (lower bound) (Tasaki §11.2.2). Sorry-free, axiom-clean |
+| `Hubbard/NagaokaConnectivityClassification.lean` | **Tasaki Theorem 11.8 + Lemma 11.9 (AXIOMATIZED, deferred)**: bond graph, biconnected / simple-loop / exchange-bond predicates, and the connectivity classification (`nagaoka_theorem_11_8`: connectivity ⟺ biconnected ∧ not a simple loop `>4` sites) + sufficient condition (`nagaoka_lemma_11_9`: exchange-bond-connected ⇒ connectivity). Theorem 11.8's proof is left by Tasaki to external papers (Bobrow–Stubis–Li / Wilson 15-puzzle); Lemma 11.9's faithful proof is a multi-PR effort. Statements formalized as `axiom`s in book order, proofs deferred (Theorem 11.7 does **not** depend on them) (Tasaki §11.2.2) |
 | `Hubbard/DoubleOccupancyProjection.lean` | site-`i` `Commute n_↑ n_↓` + idempotent product |
 | `Hubbard/DoubleOccupancyCommute.lean` | cross-site `Commute (n_↑(i)·n_↓(i)) (n_↑(j)·n_↓(j))` |
 | `Hubbard/SpinfulNumberHermitian.lean` | `n_↑(i)`, `n_↓(i)`, `n_↑(i)·n_↓(i)` Hermitian |
