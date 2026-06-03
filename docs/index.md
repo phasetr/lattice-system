@@ -2735,6 +2735,13 @@ fermion mode acting on `ℂ²` with computational basis
 | `tasakiQuadForm_ferro_le` | the Cauchy–Schwarz bound on the real quadratic form: `Q(Φ_↑) ≤ Q(Φ)` for `t ≥ 0` | `Fermion/JordanWigner/Hubbard/WeakNagaoka.lean` |
 | `hubbardWeakNagaoka_energy_bound` | eq. (11.2.9): `⟨Φ_↑\|Ĥ_eff\|Φ_↑⟩ ≤ ⟨Φ\|Ĥ_eff\|Φ⟩` (`t ≥ 0`, `t_{ii}=0`) — the ferromagnetic state is also a ground state | `Fermion/JordanWigner/Hubbard/WeakNagaoka.lean` |
 
+#### SU(2) symmetry of the effective Hamiltonian (Tasaki §11.2)
+
+| Lean name | Statement | File |
+|---|---|---|
+| `fermionTotalSpinPlus_commute_hubbardHardcoreProjection` | `Ŝ^+_tot` commutes with the hard-core projection `P̂_hc` (spin operators preserve the no-double-occupancy subspace) | `Fermion/JordanWigner/Hubbard/EffectiveHamiltonianSpinSymmetry.lean` |
+| `fermionTotalSpinPlus_commute_hubbardEffectiveHamiltonian` / `fermionTotalSpinMinus_commute_hubbardEffectiveHamiltonian` | `[Ĥ_eff, Ŝ^±_tot] = 0` — the effective Hamiltonian inherits SU(2) symmetry (the backbone of the `(2S_max+1)`-degeneracy in Theorem 11.5) | `Fermion/JordanWigner/Hubbard/EffectiveHamiltonianSpinSymmetry.lean` |
+
 | `hubbardKineticOnGraph N G J` | spinful Hubbard kinetic operator from a `SimpleGraph G` and edge weight `J` | `Fermion/JordanWigner.lean` |
 | `hubbardKineticOnGraph_commute_fermionTotalNumber` / `hubbardKineticOnGraph_isHermitian` | charge conservation always; Hermiticity for real `J` | `Fermion/JordanWigner.lean` |
 | `hubbardHamiltonianOnGraph N G J U` | full Hubbard Hamiltonian from a graph + on-site coupling | `Fermion/JordanWigner.lean` |
