@@ -102,4 +102,37 @@ theorem exists_real_min_eigenvector_tasakiEffReMatrix (N : ℕ)
     exact Complex.ext hr hi
   · exact ⟨fun i => (v i).re, hre, matrix_eigenvec_re_of_complex hv_map⟩
 
+/-! ## Rayleigh quotient transports between `M` and the all-up block `M_↑` -/
+
+/-- The squared norm is preserved by the all-up embedding:
+`⟨upEmbed ξ, upEmbed ξ⟩ = ⟨ξ, ξ⟩`. -/
+theorem dotProduct_star_upEmbed (N : ℕ) (ξ : Fin (N + 1) → ℂ) :
+    dotProduct (star (upEmbed N ξ)) (upEmbed N ξ) = dotProduct (star ξ) ξ := by
+  classical
+  simp only [dotProduct, Pi.star_apply]
+  rw [Fintype.sum_sigma]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [Finset.sum_eq_single (holeSpinUp N x)
+    (fun σ _ hσ => by simp [upEmbed, if_neg hσ])
+    (fun hmem => absurd (Finset.mem_univ _) hmem)]
+  simp [upEmbed]
+
+/-- The Rayleigh quotient transports along the all-up embedding:
+`rayleighOnVec M (upEmbed ξ) = rayleighOnVec M_↑ ξ`. -/
+theorem rayleighOnVec_upEmbed (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (htdiag : ∀ i, t i i = 0) (ξ : Fin (N + 1) → ℂ) :
+    rayleighOnVec (tasakiEffMatrix N t U) (upEmbed N ξ) =
+      rayleighOnVec (tasakiEffMatrixUp N t U) ξ := by
+  classical
+  unfold rayleighOnVec
+  rw [tasakiEffMatrix_mulVec_upEmbed N t U htdiag]
+  congr 1
+  simp only [dotProduct, Pi.star_apply]
+  rw [Fintype.sum_sigma]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [Finset.sum_eq_single (holeSpinUp N x)
+    (fun σ _ hσ => by simp [upEmbed, if_neg hσ])
+    (fun hmem => absurd (Finset.mem_univ _) hmem)]
+  simp [upEmbed]
+
 end LatticeSystem.Fermion
