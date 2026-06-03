@@ -5440,6 +5440,84 @@ Perron--Frobenius analysis of Theorem 11.7. (\texttt{fermionTotalSpinZ\_commute\
 \texttt{fermionTotalSpinSquared\_commute\_hubbardEffectiveHamiltonian}.)
 
 %======================================================================
+\subsection{Weak Nagaoka spin multiplet (Tasaki §11.2.1, Theorem 11.5 core)}
+\label{subsec:weak-nagaoka-multiplet}
+%======================================================================
+
+\noindent\textbf{Reference.} Tasaki, \emph{Physics and Mathematics of Quantum
+Many-Body Systems}, 1st edition, §11.2.1, Theorem 11.5, pp.~382--385; the SU(2)
+ladder algebra is §9.3.3, p.~332.
+
+\medskip
+\noindent\textbf{SU(2) ladder algebra.}
+On the spinful Jordan--Wigner chain we prove the standard \(\mathfrak{su}(2)\)
+relations for the total-spin operators directly from the per-site fermion
+commutators \([\hat S^+_{\rm tot}, c^\dagger_{j,\downarrow}] = c^\dagger_{j,\uparrow}\)
+and \([\hat S^+_{\rm tot}, c_{j,\uparrow}] = -c_{j,\downarrow}\):
+\[
+  [\hat S^+_{\rm tot}, \hat S^-_{\rm tot}] = 2\,\hat S^z_{\rm tot},
+  \qquad
+  [(\hat S_{\rm tot})^2, \hat S^-_{\rm tot}] = 0,
+  \qquad
+  \hat S^+_{\rm tot}\hat S^-_{\rm tot}
+    = (\hat S_{\rm tot})^2 - \hat S^z_{\rm tot}(\hat S^z_{\rm tot} - 1).
+\]
+The first is summed from the per-site contribution
+\([\hat S^+_{\rm tot}, c^\dagger_{j,\downarrow}c_{j,\uparrow}]
+   = n_{j,\uparrow} - n_{j,\downarrow}\); the second follows by expanding
+\([(\hat S_{\rm tot})^2, \hat S^-_{\rm tot}]\) with the Casimir definition
+\((\hat S_{\rm tot})^2 = \hat S^-_{\rm tot}\hat S^+_{\rm tot}
+   + \hat S^z_{\rm tot}(\hat S^z_{\rm tot}+1)\), both sides reducing to
+\(\hat S^-\hat S^-\hat S^+ + \hat S^-\hat S^z\hat S^z + \hat S^-\hat S^z\); the
+third combines the Casimir definition with the ladder commutator.
+
+\medskip
+\noindent\textbf{The spin-lowering tower.}
+Let \(v\) be a maximal-\(\hat S^z\) highest-weight state, i.e.
+\(\hat S^+_{\rm tot} v = 0\) and \(\hat S^z_{\rm tot} v = (N/2)\,v\); then
+\((\hat S_{\rm tot})^2 v = \tfrac N2(\tfrac N2 + 1)\,v\) automatically (the all-up
+sector is entirely \(S_{\rm tot} = S_{\max} = N/2\)). For the descendants
+\(v_k := (\hat S^-_{\rm tot})^k v\) the ladder algebra gives, for all
+\(k = 0, \dots, N\),
+\[
+  \hat S^z_{\rm tot}\, v_k = \bigl(\tfrac N2 - k\bigr) v_k,
+  \qquad
+  (\hat S_{\rm tot})^2\, v_k = \tfrac N2(\tfrac N2+1)\, v_k,
+  \qquad
+  \hat S^+_{\rm tot}\hat S^-_{\rm tot}\, v_k = (k+1)(N-k)\, v_k.
+\]
+The last identity is purely algebraic and forces \(v_k \neq 0\) for \(k \le N\):
+if \(v_{k+1} = \hat S^-_{\rm tot} v_k\) vanished then
+\(\hat S^+_{\rm tot} v_{k+1} = (k+1)(N-k)\, v_k\) would vanish too, impossible
+since \((k+1)(N-k) \neq 0\) for \(k < N\) and \(v_k \neq 0\) by induction (no
+inner product is needed). Having distinct \(\hat S^z\) eigenvalues \(N/2 - k\),
+the \(N+1\) nonzero states \(v_0, \dots, v_N\) are linearly independent.
+
+\medskip
+\noindent\textbf{Theorem 11.5 core.}
+If in addition \(v\) is an \(\hat H_{\rm eff}\)-eigenvector at energy \(E\) (e.g.\
+a ferromagnetic ground state), then \([\hat H_{\rm eff}, \hat S^-_{\rm tot}] = 0\)
+makes every \(v_k\) an \(\hat H_{\rm eff}\)-eigenvector at the \emph{same} energy
+\(E\). Thus a single ferromagnetic ground state generates
+\(N+1 = 2S_{\max} + 1\) linearly independent degenerate ground states, all with
+\(S_{\rm tot} = S_{\max} = N/2\) — the weak Nagaoka conclusion (eq.~(11.2.9)).
+What remains for the full theorem is the existence of such a ground state \(v\),
+namely the Perron--Frobenius ferromagnetic ground state of the one-hole hopping
+problem in the all-up sector.
+
+\medskip
+\noindent The Lean development
+(file \texttt{Fermion/JordanWigner/Hubbard/WeakNagaokaTheorem.lean}):
+\texttt{fermionTotalSpinPlus\_commutator\_fermionTotalSpinMinus},
+\texttt{fermionTotalSpinSquared\_commute\_fermionTotalSpinMinus},
+\texttt{fermionTotalSpinPlus\_mul\_fermionTotalSpinMinus},
+\texttt{fermionTotalSpinZ\_mulVec\_spinMinusPow},
+\texttt{fermionTotalSpinSquared\_mulVec\_spinMinusPow},
+\texttt{spinMinusPow\_ne\_zero}, \texttt{spinMinusPow\_linearIndependent},
+\texttt{hubbardEffectiveHamiltonian\_mulVec\_spinMinusPow}, and the capstone
+\texttt{weakNagaoka\_spinMultiplet}.
+
+%======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
 %======================================================================

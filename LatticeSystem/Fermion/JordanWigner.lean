@@ -44,6 +44,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiHopAction
 import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonianMatrix
 import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonianSpinSymmetry
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaoka
+import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheorem
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyProjection
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyCommute
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinfulNumberHermitian
@@ -125,6 +126,7 @@ expansion):
 | `Hubbard/EffectiveHamiltonianMatrix.lean` | off-diagonal matrix element `⟨Φ_{y,τ}\|Ĥ_eff\|Φ_{x,σ}⟩ = -t_{x,y}·[τ=σ_{y→x}]` (Tasaki §11.2 eq. (11.2.5)) |
 | `Hubbard/WeakNagaoka.lean` | Cauchy–Schwarz energy bound `⟨Φ_↑\|Ĥ_eff\|Φ_↑⟩ ≤ ⟨Φ\|Ĥ_eff\|Φ⟩` (Tasaki §11.2 eq. (11.2.9)) |
 | `Hubbard/EffectiveHamiltonianSpinSymmetry.lean` | SU(2) symmetry of the effective Hamiltonian `[Ĥ_eff, Ŝ^±_tot] = 0` (Tasaki §11.2, degeneracy backbone) |
+| `Hubbard/WeakNagaokaTheorem.lean` | weak Nagaoka spin multiplet `weakNagaoka_spinMultiplet`: a ferromagnetic GS generates `N+1` degenerate ground states with `S_tot=S_max` via the SU(2) ladder (Tasaki §11.2.1, Theorem 11.5) |
 | `Hubbard/DoubleOccupancyProjection.lean` | site-`i` `Commute n_↑ n_↓` + idempotent product |
 | `Hubbard/DoubleOccupancyCommute.lean` | cross-site `Commute (n_↑(i)·n_↓(i)) (n_↑(j)·n_↓(j))` |
 | `Hubbard/SpinfulNumberHermitian.lean` | `n_↑(i)`, `n_↓(i)`, `n_↑(i)·n_↓(i)` Hermitian |
