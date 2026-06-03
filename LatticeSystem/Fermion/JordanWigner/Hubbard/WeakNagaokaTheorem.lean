@@ -60,4 +60,67 @@ private theorem ferroHole_up_count (N : ℕ) (x : Fin (N + 1)) :
   rw [Finset.sum_boole, Finset.filter_ne', Finset.card_erase_of_mem (Finset.mem_univ x)]
   simp
 
+/-- The down-orbital is empty at every site in the ferromagnetic hole state. -/
+private theorem ferroHole_down_zero (N : ℕ) (x : Fin (N + 1)) (k : Fin (N + 1)) :
+    ferroHoleConfig N x (spinfulIndex N k 1) = 0 := by
+  rw [ferroHoleConfig, hubbardOneHoleConfig_apply_down]
+  by_cases hk : k.val = x.val <;> simp [hk]
+
+/-- The total spin-up number acts on the ferromagnetic hole state with
+eigenvalue `N` (the number of electrons). -/
+private theorem fermionTotalUpNumber_mulVec_ferroHole (N : ℕ) (x : Fin (N + 1)) :
+    (fermionTotalUpNumber N).mulVec (basisVec (ferroHoleConfig N x)) =
+      (N : ℂ) • basisVec (ferroHoleConfig N x) := by
+  unfold fermionTotalUpNumber fermionUpNumber
+  rw [Matrix.sum_mulVec]
+  rw [Finset.sum_congr rfl (fun k _ =>
+    fermionMultiNumber_mulVec_basisVec (2 * N + 1) (spinfulIndex N k 0) _)]
+  rw [← Finset.sum_smul]
+  congr 1
+  rw [← Nat.cast_sum, ferroHole_up_count]
+
+/-- The total spin-down number annihilates the ferromagnetic hole state. -/
+private theorem fermionTotalDownNumber_mulVec_ferroHole (N : ℕ) (x : Fin (N + 1)) :
+    (fermionTotalDownNumber N).mulVec (basisVec (ferroHoleConfig N x)) = 0 := by
+  unfold fermionTotalDownNumber fermionDownNumber
+  rw [Matrix.sum_mulVec]
+  apply Finset.sum_eq_zero
+  intro k _
+  rw [fermionMultiNumber_mulVec_basisVec, ferroHole_down_zero]
+  simp
+
+/-- `Ŝ^z_tot` acts on the ferromagnetic hole state with eigenvalue `N/2 = S_max`. -/
+private theorem fermionTotalSpinZ_mulVec_ferroHole (N : ℕ) (x : Fin (N + 1)) :
+    (fermionTotalSpinZ N).mulVec (basisVec (ferroHoleConfig N x)) =
+      ((N : ℂ) / 2) • basisVec (ferroHoleConfig N x) := by
+  unfold fermionTotalSpinZ
+  rw [Matrix.smul_mulVec, Matrix.sub_mulVec, fermionTotalUpNumber_mulVec_ferroHole,
+    fermionTotalDownNumber_mulVec_ferroHole, sub_zero, smul_smul]
+  congr 1
+  ring
+
+/-- `Ŝ^+_tot` annihilates the ferromagnetic hole state (no down electrons). -/
+private theorem fermionTotalSpinPlus_mulVec_ferroHole (N : ℕ) (x : Fin (N + 1)) :
+    (fermionTotalSpinPlus N).mulVec (basisVec (ferroHoleConfig N x)) = 0 := by
+  unfold fermionTotalSpinPlus fermionUpCreation fermionDownAnnihilation
+  rw [Matrix.sum_mulVec]
+  apply Finset.sum_eq_zero
+  intro k _
+  rw [← Matrix.mulVec_mulVec, fermionMultiAnnihilation_mulVec_basisVec,
+    if_neg (by rw [ferroHole_down_zero]; decide), Matrix.mulVec_zero]
+
+/-- **The ferromagnetic hole state is maximal-spin** (the `S_tot = S_max` part
+of Theorem 11.5): `(Ŝ_tot)² |Φ_{x,(↑)}⟩ = S_max(S_max+1) |Φ_{x,(↑)}⟩` with
+`S_max = N/2`. -/
+theorem fermionTotalSpinSquared_mulVec_ferroHole (N : ℕ) (x : Fin (N + 1)) :
+    (fermionTotalSpinSquared N).mulVec (basisVec (ferroHoleConfig N x)) =
+      ((N : ℂ) / 2 * ((N : ℂ) / 2 + 1)) • basisVec (ferroHoleConfig N x) := by
+  unfold fermionTotalSpinSquared
+  rw [Matrix.add_mulVec, ← Matrix.mulVec_mulVec, fermionTotalSpinPlus_mulVec_ferroHole,
+    Matrix.mulVec_zero, zero_add, ← Matrix.mulVec_mulVec, Matrix.add_mulVec,
+    Matrix.one_mulVec, fermionTotalSpinZ_mulVec_ferroHole, Matrix.mulVec_add,
+    Matrix.mulVec_smul, fermionTotalSpinZ_mulVec_ferroHole, smul_smul, ← add_smul]
+  congr 1
+  ring
+
 end LatticeSystem.Fermion
