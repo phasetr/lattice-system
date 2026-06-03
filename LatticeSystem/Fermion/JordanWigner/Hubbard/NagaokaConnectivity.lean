@@ -111,4 +111,79 @@ theorem tasakiEffReMatrix_eq_zero_of_holeSpinMag_ne (N : ℕ)
       configMag N (hubbardOneHoleConfig N x σ.val)
     rw [← hcfg, configMag_hubbardSpinMove N x y σ.val hxy]
 
+/-- **The real Tasaki matrix is symmetric.**  For symmetric hopping with zero
+diagonal it equals its own transpose (derived from the complex Hermitian form
+`tasakiEffMatrix_isHermitian` through `M = M_ℝ.map ofReal`). -/
+theorem tasakiEffReMatrix_isSymm (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) :
+    (tasakiEffReMatrix N t).IsSymm := by
+  have hmap := tasakiEffMatrix_eq_map_tasakiEffReMatrix N t 0 htdiag
+  simp only [Complex.ofReal_zero] at hmap
+  have hH := tasakiEffMatrix_isHermitian N (fun i j => (t i j : ℂ)) (0 : ℂ)
+    (tasakiEffMatrix_hJ_of_real htsym) (by simp)
+  rw [hmap] at hH
+  ext p q
+  rw [Matrix.transpose_apply]
+  have h := congr_fun₂ hH p q
+  simp only [Matrix.conjTranspose_apply, Matrix.map_apply, Complex.star_def,
+    Complex.conj_ofReal] at h
+  exact_mod_cast h
+
+/-- **The off-diagonal entries of `−M` are non-negative** when the hopping is
+non-negative (`t ≥ 0`).  Since `M_{q,p} = −t_{x,y}·[indicator] ≤ 0` off the
+diagonal and `M` vanishes on the diagonal, `−M` is entrywise non-negative. -/
+theorem neg_tasakiEffReMatrix_nonneg (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (hpos : ∀ i j, 0 ≤ t i j)
+    (q p : (x : Fin (N + 1)) × HoleSpin N x) :
+    0 ≤ (-tasakiEffReMatrix N t) q p := by
+  obtain ⟨y, τ⟩ := q
+  obtain ⟨x, σ⟩ := p
+  rw [Matrix.neg_apply]
+  unfold tasakiEffReMatrix
+  by_cases hxy : x = y
+  · simp [hxy]
+  · rw [if_neg (by simpa using hxy), neg_mul, neg_neg]
+    apply mul_nonneg (hpos x y)
+    split <;> norm_num
+
+/-- The magnetization sector `m`: one-hole Tasaki basis indices whose total
+`S_z^{(3)}` (doubled) equals `m`.  `M` is block-diagonal across these sectors
+(`tasakiEffReMatrix_eq_zero_of_holeSpinMag_ne`). -/
+abbrev HoleMagSector (N : ℕ) (m : ℤ) :=
+  {p : (x : Fin (N + 1)) × HoleSpin N x // holeSpinMag N p = m}
+
+/-- The Tasaki matrix `M` restricted to a single magnetization sector `m`. -/
+noncomputable def tasakiEffReMatrixOnSector (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ) :
+    Matrix (HoleMagSector N m) (HoleMagSector N m) ℝ :=
+  (tasakiEffReMatrix N t).submatrix Subtype.val Subtype.val
+
+/-- The matrix `−M` restricted to a sector `m`: the entrywise non-negative
+(for `t ≥ 0`) symmetric matrix to which Perron–Frobenius is applied in the
+proof of Theorem 11.7. -/
+noncomputable def nagaokaPFMatrixOnSector (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ) :
+    Matrix (HoleMagSector N m) (HoleMagSector N m) ℝ :=
+  -tasakiEffReMatrixOnSector N t m
+
+/-- **Tasaki Definition 11.6 (connectivity condition).**  The one-hole system
+is *connected* if, within every fixed total-`S_z^{(3)}` sector `m`, the basis
+states are joined through non-vanishing `Ĥ_eff` matrix elements — formalized as
+irreducibility (in the Perron–Frobenius sense) of `−M` restricted to that
+sector.  This is the hypothesis of Tasaki Theorem 11.7.
+
+Reference: Tasaki §11.2.2, Definition 11.6. -/
+def nagaokaConnectivity (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ) : Prop :=
+  ∀ m : ℤ, (nagaokaPFMatrixOnSector N t m).IsIrreducible
+
+/-- The sector restriction of `−M` is symmetric. -/
+theorem nagaokaPFMatrixOnSector_isSymm (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) :
+    (nagaokaPFMatrixOnSector N t m).IsSymm := by
+  unfold nagaokaPFMatrixOnSector tasakiEffReMatrixOnSector
+  ext p q
+  simp only [Matrix.transpose_apply, Matrix.neg_apply, Matrix.submatrix_apply]
+  rw [(tasakiEffReMatrix_isSymm N t htsym htdiag).apply]
+
 end LatticeSystem.Fermion
