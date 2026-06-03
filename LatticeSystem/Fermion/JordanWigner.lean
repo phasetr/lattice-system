@@ -53,6 +53,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaConnectivity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaConnectivityClassification
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandModel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandBasis
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandCAR
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyProjection
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyCommute
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinfulNumberHermitian
@@ -142,6 +143,7 @@ expansion):
 | `Hubbard/NagaokaConnectivity.lean` | **Tasaki Theorem 11.7** `nagaoka_theorem_11_7` / `nagaoka_theorem_11_7_degeneracy`: the capstone — coefficient↔full bridge + SU(2) spin-multiplet lower bound (`≥ N+1`); with the connectivity condition and `t≥0`, the one-hole ground eigenspace is `(N+1)`-dimensional and every ground state has `S_tot=S_max` — Nagaoka's theorem. Sorry-free, axiom-clean (Tasaki §11.2.2) |
 | `Hubbard/TasakiFlatBandModel.lean` | **Tasaki §11.3.1 flat-band model setup** (d=1 decorated/Delta chain): external/internal site embeddings `deltaExternalSite`/`deltaInternalSite` into the physical chain `Fin (2K+2)`, single-particle states `flatBandAlpha`/`flatBandBeta` (11.3.1/11.3.2), fermion operators `flatBandA{Annihilation,Creation}`/`flatBandB{…}` (11.3.3/11.3.4) + adjoints, the Hamiltonian `flatBandHamiltonian = t Σ b̂†b̂ + U Σ n↑n↓` (11.3.5/11.3.6) + Hermiticity. First file of §11.3.1 (Issue #4158) |
 | `Hubbard/TasakiFlatBandBasis.lean` | **Tasaki §11.3.1 Lemma 11.10**: `{α_p} ∪ {β_u}` is a basis of the single-particle Hilbert space `Fin (2K+2) → ℂ` (`flatBand_linearIndependent`, `flatBandBasis`). Diagonal evaluations, even/odd site-split equiv, cross-orthogonality `⟨α_p,β_u⟩=0`, combined linear independence, and the basis (sorry-free) (Issue #4158) |
+| `Hubbard/TasakiFlatBandCAR.lean` | **Tasaki §11.3.1 eq. (11.3.7)** `flatBandBAnnihilation_ACreation_anticomm`: `{b̂_{u,σ}, â†_{p,τ}} = 0` (the `b̂`/`â†` operators anticommute, since `⟨α_p,β_u⟩=0`), via the spinful CAR `{ĉ_{x,σ},ĉ†_{y,τ}}=[x=y∧σ=τ]` and bilinear expansion. Sorry-free (Issue #4158) |
 | `Hubbard/NagaokaConnectivityClassification.lean` | **Tasaki Theorem 11.8 + Lemma 11.9 (AXIOMATIZED, deferred)**: bond graph, biconnected / simple-loop / exchange-bond predicates, and the connectivity classification (`nagaoka_theorem_11_8`: connectivity ⟺ biconnected ∧ not a simple loop `>4` sites) + sufficient condition (`nagaoka_lemma_11_9`: exchange-bond-connected ⇒ connectivity). Theorem 11.8's proof is left by Tasaki to external papers (Bobrow–Stubis–Li / Wilson 15-puzzle); Lemma 11.9's faithful proof is a multi-PR effort. Statements formalized as `axiom`s in book order, proofs deferred (Theorem 11.7 does **not** depend on them) (Tasaki §11.2.2) |
 | `Hubbard/DoubleOccupancyProjection.lean` | site-`i` `Commute n_↑ n_↓` + idempotent product |
 | `Hubbard/DoubleOccupancyCommute.lean` | cross-site `Commute (n_↑(i)·n_↓(i)) (n_↑(j)·n_↓(j))` |
