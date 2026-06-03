@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaoka
 import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonianSpinSymmetry
+import Mathlib.LinearAlgebra.Eigenspace.Basic
 
 /-!
 # Tasaki Theorem 11.5 (weak version of Nagaoka's theorem)
@@ -373,3 +374,25 @@ theorem spinMinusPow_ferroHole_ne_zero (N : ℕ) (x : Fin (N + 1)) :
     rcases smul_eq_zero.mp key.symm with h | h
     · exact hc h
     · exact hψk h
+
+/-! ## Linear independence of the spin multiplet -/
+
+/-- **The spin-lowering multiplet is linearly independent**: the `N + 1` states
+`(Ŝ^-_tot)^k |Φ_{x,(↑)}⟩` for `k ∈ {0, …, N}` are linearly independent, because
+they are nonzero eigenvectors of `Ŝ^z_tot` with the pairwise-distinct eigenvalues
+`N/2 − k`. Together with energy degeneracy this exhibits the
+`(2 S_max + 1) = N + 1` degenerate ground states of the weak Nagaoka theorem. -/
+theorem spinMinusPow_ferroHole_linearIndependent (N : ℕ) (x : Fin (N + 1)) :
+    LinearIndependent ℂ (fun k : Fin (N + 1) =>
+      ((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec (basisVec (ferroHoleConfig N x))) := by
+  apply Module.End.eigenvectors_linearIndependent' (fermionTotalSpinZ N).mulVecLin
+    (fun k : Fin (N + 1) => (N : ℂ) / 2 - (k : ℕ))
+  · intro a b hab
+    rw [sub_right_inj] at hab
+    have h2 : (a : ℕ) = (b : ℕ) := by exact_mod_cast hab
+    exact Fin.ext h2
+  · intro k
+    refine ⟨?_, ?_⟩
+    · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+      exact fermionTotalSpinZ_mulVec_spinMinusPow_ferroHole N x (k : ℕ)
+    · exact spinMinusPow_ferroHole_ne_zero N x (k : ℕ) (Nat.le_of_lt_succ k.isLt)
