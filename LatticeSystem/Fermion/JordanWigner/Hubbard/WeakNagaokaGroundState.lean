@@ -99,4 +99,65 @@ theorem exists_nagaokaHole_pf_eigenvector (N : ℕ) (t : Fin (N + 1) → Fin (N 
   LatticeSystem.Math.PerronFrobenius.exists_pos_eigenvec_max
     (nagaokaHoleHoppingMatrix_isHermitian N t hsymm) hIrred
 
+/-! ## The ferromagnetic ground state vector -/
+
+/-- The ferromagnetic state `|Φ_↑⟩ = Σ_x ξ_x |Φ^T_{x,↑}⟩` built from a hopping
+eigenvector `ξ`: a superposition over hole positions of the all-up Tasaki basis
+states. With `ξ` the Perron–Frobenius eigenvector this is the ferromagnetic
+ground state. -/
+noncomputable def pfFerroState (N : ℕ) (ξ : Fin (N + 1) → ℝ) :
+    (Fin (2 * N + 2) → Fin 2) → ℂ :=
+  ∑ x : Fin (N + 1), (ξ x : ℂ) • tasakiState N ⟨x, holeSpinUp N x⟩
+
+/-- `Ŝ^+_tot` annihilates the ferromagnetic state: it is a highest-weight state
+(all electrons spin-up, none to raise). -/
+theorem fermionTotalSpinPlus_mulVec_pfFerroState (N : ℕ) (ξ : Fin (N + 1) → ℝ) :
+    (fermionTotalSpinPlus N).mulVec (pfFerroState N ξ) = 0 := by
+  unfold pfFerroState
+  rw [Matrix.mulVec_sum]
+  apply Finset.sum_eq_zero
+  intro x _
+  rw [Matrix.mulVec_smul,
+    show tasakiState N ⟨x, holeSpinUp N x⟩ = hubbardTasakiBasisState N x (fun _ => true) from rfl,
+    fermionTotalSpinPlus_mulVec_hubbardTasakiBasisStateUp, smul_zero]
+
+/-- `Ŝ^z_tot` acts on the ferromagnetic state with eigenvalue `N/2 = S_max`: it is
+the maximal-spin state. -/
+theorem fermionTotalSpinZ_mulVec_pfFerroState (N : ℕ) (ξ : Fin (N + 1) → ℝ) :
+    (fermionTotalSpinZ N).mulVec (pfFerroState N ξ) =
+      ((N : ℂ) / 2) • pfFerroState N ξ := by
+  unfold pfFerroState
+  rw [Matrix.mulVec_sum, Finset.smul_sum]
+  apply Finset.sum_congr rfl
+  intro x _
+  rw [Matrix.mulVec_smul,
+    show tasakiState N ⟨x, holeSpinUp N x⟩ = hubbardTasakiBasisState N x (fun _ => true) from rfl,
+    fermionTotalSpinZ_mulVec_hubbardTasakiBasisStateUp, smul_comm]
+
+/-- The ferromagnetic state is nonzero when the eigenvector is strictly positive:
+its squared norm is `Σ_x ξ_x² > 0` by orthonormality of the Tasaki basis. -/
+theorem pfFerroState_ne_zero (N : ℕ) (ξ : Fin (N + 1) → ℝ) (hξ : ∀ x, 0 < ξ x) :
+    pfFerroState N ξ ≠ 0 := by
+  classical
+  intro h
+  set ψ : ((x : Fin (N + 1)) × HoleSpin N x) → ℝ :=
+    fun p => if p.2 = holeSpinUp N p.1 then ξ p.1 else 0 with hψdef
+  have hexp : pfFerroState N ξ = ∑ p, (ψ p : ℂ) • tasakiState N p := by
+    rw [pfFerroState, Fintype.sum_sigma]
+    refine Finset.sum_congr rfl (fun x _ => ?_)
+    rw [Finset.sum_eq_single (holeSpinUp N x)
+      (fun σ _ hσ => by simp only [hψdef, if_neg hσ, Complex.ofReal_zero, zero_smul])
+      (fun hmem => absurd (Finset.mem_univ _) hmem)]
+    simp only [hψdef, if_pos rfl]
+  have hnorm := tasakiExpansion_normSq N ψ
+  rw [← hexp, h] at hnorm
+  simp only [Pi.zero_apply, mul_zero, Finset.sum_const_zero] at hnorm
+  have hsum : (∑ p, (ψ p) ^ 2) = 0 := by exact_mod_cast hnorm.symm
+  have hpos : 0 < ∑ p, (ψ p) ^ 2 := by
+    refine Finset.sum_pos' (fun p _ => sq_nonneg _)
+      ⟨⟨Classical.arbitrary (Fin (N + 1)), holeSpinUp N _⟩, Finset.mem_univ _, ?_⟩
+    simp only [hψdef, if_pos rfl]
+    exact pow_pos (hξ _) 2
+  linarith
+
 end LatticeSystem.Fermion

@@ -124,6 +124,24 @@ theorem fermionTotalSpinSquared_mulVec_ferroHole (N : ℕ) (x : Fin (N + 1)) :
   congr 1
   ring
 
+/-! ## The all-up Tasaki basis state is a highest-weight maximal-spin state -/
+
+/-- `Ŝ^+_tot` annihilates the all-up Tasaki basis state
+`|Φ^T_{x,↑}⟩ = ε • |Φ_{x,↑}⟩` (no down electrons to raise). -/
+theorem fermionTotalSpinPlus_mulVec_hubbardTasakiBasisStateUp (N : ℕ) (x : Fin (N + 1)) :
+    (fermionTotalSpinPlus N).mulVec (hubbardTasakiBasisState N x (fun _ => true)) = 0 := by
+  rw [hubbardTasakiBasisState_eq_smul_basisVec, Matrix.mulVec_smul,
+    show hubbardOneHoleConfig N x (fun _ => true) = ferroHoleConfig N x from rfl,
+    fermionTotalSpinPlus_mulVec_ferroHole, smul_zero]
+
+/-- `Ŝ^z_tot` acts on the all-up Tasaki basis state with eigenvalue `N/2 = S_max`. -/
+theorem fermionTotalSpinZ_mulVec_hubbardTasakiBasisStateUp (N : ℕ) (x : Fin (N + 1)) :
+    (fermionTotalSpinZ N).mulVec (hubbardTasakiBasisState N x (fun _ => true)) =
+      ((N : ℂ) / 2) • (hubbardTasakiBasisState N x (fun _ => true)) := by
+  rw [hubbardTasakiBasisState_eq_smul_basisVec, Matrix.mulVec_smul,
+    show hubbardOneHoleConfig N x (fun _ => true) = ferroHoleConfig N x from rfl,
+    fermionTotalSpinZ_mulVec_ferroHole, smul_comm]
+
 /-! ## The spin-lowering multiplet is energy-degenerate -/
 
 /-- `Ŝ^-_tot` maps an `Ĥ_eff`-eigenvector to an eigenvector at the same energy
