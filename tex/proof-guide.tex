@@ -5711,6 +5711,25 @@ $\sigma=\tau$, to the cross-orthogonality
 $\langle\alpha_p,\beta_u\rangle = 0$, and for $\sigma\ne\tau$ every term vanishes.
 This is the algebraic input to the frustration-free analysis of Theorem 11.11.
 
+\medskip
+\noindent\textbf{The all-up $\alpha$ state and $\hat H_{\rm hop}|\Phi_{\alpha,
+\mathrm{all}\uparrow}\rangle = 0$ (eqs.~(11.3.8)/(11.3.9)).}
+The candidate ferromagnetic ground state is the all-up $\alpha$ Slater state
+$|\Phi_{\alpha,\mathrm{all}\uparrow}\rangle = \bigl(\prod_p \hat a^\dagger_{p,
+\uparrow}\bigr)|\mathrm{vac}\rangle$ (\texttt{flatBandAlphaAllUpState}, eq.~(11.3.9)).
+A move-through lemma (\texttt{flatBand\_anticomm\_listProd\_mulVec\_vacuum}, by
+list induction) shows that an operator $B$ that annihilates the vacuum and
+anticommutes with each factor of an ordered product also annihilates the product
+applied to the vacuum. Applied with $B = \hat b_{u,\sigma}$ (which annihilates
+the vacuum and, by eq.~(11.3.7), anticommutes with every $\hat a^\dagger_{p,
+\uparrow}$) it gives $\hat b_{u,\sigma}|\Phi_{\alpha,\mathrm{all}\uparrow}\rangle
+= 0$ (the zero-energy condition (11.3.11) at the all-up state). Hence the hopping
+Hamiltonian $\hat H_{\rm hop} = t\sum_{u,\sigma}\hat b^\dagger_{u,\sigma}
+\hat b_{u,\sigma}$ (\texttt{flatBandHopping}) annihilates it:
+$\hat H_{\rm hop}|\Phi_{\alpha,\mathrm{all}\uparrow}\rangle = 0$
+(\texttt{flatBandHopping\_mulVec\_alphaAllUpState}, eq.~(11.3.8)) --- it is a
+zero-energy state of the (positive-semidefinite) kinetic term.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
