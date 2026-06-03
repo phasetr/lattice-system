@@ -2734,6 +2734,8 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardEffEnergy_tasaki_quadratic` | eq. (11.2.9) line 2: `⟨Φ\|Ĥ_eff\|Φ⟩ = -Σ_{x≠y} t_{y,x} Σ_σ c_{x,σ} c_{y, σ_{x→y}}` (no self-hopping) | `Fermion/JordanWigner/Hubbard/WeakNagaoka.lean` |
 | `tasakiQuadForm_ferro_le` | the Cauchy–Schwarz bound on the real quadratic form: `Q(Φ_↑) ≤ Q(Φ)` for `t ≥ 0` | `Fermion/JordanWigner/Hubbard/WeakNagaoka.lean` |
 | `hubbardWeakNagaoka_energy_bound` | eq. (11.2.9): `⟨Φ_↑\|Ĥ_eff\|Φ_↑⟩ ≤ ⟨Φ\|Ĥ_eff\|Φ⟩` (`t ≥ 0`, `t_{ii}=0`) — the ferromagnetic state is also a ground state | `Fermion/JordanWigner/Hubbard/WeakNagaoka.lean` |
+| `tasakiState_orthonormal` | orthonormality of the Tasaki basis (indexed by hole site and canonical hole-spin) | `Fermion/JordanWigner/Hubbard/WeakNagaoka.lean` |
+| `tasakiExpansion_normSq` / `ferroCoeff_normSq_eq` / `tasakiFerro_normSq_eq` | eqs. (11.2.7)–(11.2.8): `‖Σ ϕ_p Φ_p‖² = Σ ϕ_p²`, and the ferromagnetic state has the same norm `‖Φ_↑‖ = ‖Φ‖` | `Fermion/JordanWigner/Hubbard/WeakNagaoka.lean` |
 
 #### SU(2) symmetry of the effective Hamiltonian (Tasaki §11.2)
 

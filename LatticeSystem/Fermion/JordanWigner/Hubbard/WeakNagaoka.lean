@@ -372,4 +372,100 @@ theorem hubbardWeakNagaoka_energy_bound (N : ℕ) (t : Fin (N + 1) → Fin (N + 
     Complex.ofReal_re, Complex.ofReal_re]
   exact tasakiQuadForm_ferro_le N t hpos ϕ
 
+/-! ## Norm identity for Tasaki-basis expansions (11.2.7–11.2.8) -/
+
+/-- The Tasaki basis states, indexed by `(hole site, canonical hole-spin)`, are
+orthonormal under the real bilinear pairing. -/
+theorem tasakiState_orthonormal (N : ℕ)
+    (p q : (x : Fin (N + 1)) × HoleSpin N x) :
+    (∑ w : Fin (2 * N + 2) → Fin 2, tasakiState N p w * tasakiState N q w) =
+      if p = q then 1 else 0 := by
+  obtain ⟨x, σ⟩ := p
+  obtain ⟨y, τ⟩ := q
+  unfold tasakiState
+  rw [hubbardTasakiBasisState_inner]
+  by_cases hxy : x = y
+  · subst hxy
+    by_cases hστ : σ = τ
+    · subst hστ
+      rw [if_pos rfl, mul_one, hubbardTasakiBasisSign_mul_self, if_pos rfl]
+    · have hcne : ¬ (hubbardOneHoleConfig N x τ.val = hubbardOneHoleConfig N x σ.val) := by
+        intro hc
+        apply hστ; apply Subtype.ext; funext z
+        by_cases hzx : z = x
+        · subst hzx; rw [σ.2, τ.2]
+        · exact oneHoleConfig_spin_eq N x σ.val τ.val hc.symm z hzx
+      rw [if_neg hcne, mul_zero,
+        if_neg (by simp only [Sigma.mk.injEq, heq_eq_eq, true_and]; exact hστ)]
+  · have hyx : y.val ≠ x.val := fun h => hxy (Fin.ext h.symm)
+    have hcne : ¬ (hubbardOneHoleConfig N y τ.val = hubbardOneHoleConfig N x σ.val) := by
+      intro hc
+      by_cases hσy : σ.val y
+      · have h1 := congrFun hc (spinfulIndex N y 0)
+        rw [hubbardOneHoleConfig_apply_up, hubbardOneHoleConfig_apply_up, if_pos rfl,
+          if_neg hyx, if_pos hσy] at h1
+        exact absurd h1 (by decide)
+      · have h1 := congrFun hc (spinfulIndex N y 1)
+        rw [hubbardOneHoleConfig_apply_down, hubbardOneHoleConfig_apply_down, if_pos rfl,
+          if_neg hyx, if_neg hσy] at h1
+        exact absurd h1 (by decide)
+    rw [if_neg hcne, mul_zero, if_neg (fun h => hxy (congrArg Sigma.fst h))]
+
+/-- The real-bilinear squared norm of a Tasaki-basis expansion is the sum of the
+squared coefficients (orthonormality). -/
+theorem tasakiExpansion_normSq (N : ℕ)
+    (ϕ : ((x : Fin (N + 1)) × HoleSpin N x) → ℝ) :
+    (∑ w : Fin (2 * N + 2) → Fin 2,
+        (∑ p, (ϕ p : ℂ) • tasakiState N p) w *
+        (∑ p, (ϕ p : ℂ) • tasakiState N p) w) = ((∑ p, (ϕ p) ^ 2 : ℝ) : ℂ) := by
+  simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+  rw [Finset.sum_congr rfl (fun w _ => Finset.sum_mul_sum _ _ _ _), Finset.sum_comm]
+  rw [show (∑ p, ∑ w : Fin (2 * N + 2) → Fin 2, ∑ q,
+        ((ϕ p : ℂ) * tasakiState N p w) * ((ϕ q : ℂ) * tasakiState N q w)) =
+      ∑ p, ∑ q, (ϕ p : ℂ) * (ϕ q : ℂ) *
+        (∑ w, tasakiState N p w * tasakiState N q w) from by
+    refine Finset.sum_congr rfl (fun p _ => ?_)
+    rw [Finset.sum_comm]
+    refine Finset.sum_congr rfl (fun q _ => ?_)
+    rw [Finset.mul_sum]
+    exact Finset.sum_congr rfl (fun w _ => by ring)]
+  rw [Finset.sum_congr rfl (fun p _ => Finset.sum_congr rfl (fun q _ => by
+    rw [tasakiState_orthonormal]))]
+  push_cast
+  refine Finset.sum_congr rfl (fun p _ => ?_)
+  rw [Finset.sum_eq_single p (fun q _ hq => by rw [if_neg (Ne.symm hq), mul_zero])
+    (fun h => absurd (Finset.mem_univ _) h), if_pos rfl, mul_one]
+  ring
+
+/-- The ferromagnetic coefficients have the same squared norm as the original
+expansion: `Σ_p (ξ-coefficient)² = Σ_p ϕ_p²` (so `‖Φ_↑‖ = ‖Φ_GS‖`, eqs.
+(11.2.7)–(11.2.8)). -/
+theorem ferroCoeff_normSq_eq (N : ℕ)
+    (ϕ : ((x : Fin (N + 1)) × HoleSpin N x) → ℝ) :
+    (∑ p, (ferroCoeff N ϕ p) ^ 2) = ∑ p, (ϕ p) ^ 2 := by
+  rw [Fintype.sum_sigma, Fintype.sum_sigma]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [show (∑ σ : HoleSpin N x, (ferroCoeff N ϕ ⟨x, σ⟩) ^ 2) =
+      ∑ σ : HoleSpin N x, (if σ = holeSpinUp N x then (ferroXi N ϕ x) ^ 2 else 0) from
+    Finset.sum_congr rfl (fun σ _ => by
+      by_cases h : σ = holeSpinUp N x <;> simp [ferroCoeff, h])]
+  rw [Finset.sum_ite_eq' Finset.univ (holeSpinUp N x) (fun _ => (ferroXi N ϕ x) ^ 2)]
+  simp only [Finset.mem_univ, if_true, ferroXi]
+  rw [Real.sq_sqrt (Finset.sum_nonneg (fun _ _ => sq_nonneg _))]
+
+/-- The ferromagnetic state `|Φ_↑⟩` has the same squared norm as the original
+Tasaki-basis expansion `|Φ⟩`. Combined with the Cauchy–Schwarz energy bound
+(`hubbardWeakNagaoka_energy_bound`), this is the quantitative content of weak
+Nagaoka: `|Φ_↑⟩` is a normalized state of the same norm with no greater energy,
+hence is also a ground state. -/
+theorem tasakiFerro_normSq_eq (N : ℕ)
+    (ϕ : ((x : Fin (N + 1)) × HoleSpin N x) → ℝ) :
+    (∑ w : Fin (2 * N + 2) → Fin 2,
+        (∑ p, (ferroCoeff N ϕ p : ℂ) • tasakiState N p) w *
+        (∑ p, (ferroCoeff N ϕ p : ℂ) • tasakiState N p) w) =
+      ∑ w : Fin (2 * N + 2) → Fin 2,
+        (∑ p, (ϕ p : ℂ) • tasakiState N p) w *
+        (∑ p, (ϕ p : ℂ) • tasakiState N p) w := by
+  rw [tasakiExpansion_normSq, tasakiExpansion_normSq, ferroCoeff_normSq_eq]
+
 end LatticeSystem.Fermion
