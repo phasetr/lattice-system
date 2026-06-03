@@ -123,4 +123,20 @@ theorem fermionTotalSpinSquared_mulVec_ferroHole (N : ℕ) (x : Fin (N + 1)) :
   congr 1
   ring
 
+/-! ## The spin-lowering multiplet is energy-degenerate -/
+
+/-- `Ŝ^-_tot` maps an `Ĥ_eff`-eigenvector to an eigenvector at the same energy
+(since `[Ĥ_eff, Ŝ^-_tot] = 0`): the spin-lowering multiplet of a ground state
+is degenerate. -/
+theorem hubbardEffectiveHamiltonian_mulVec_spinMinus
+    (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (hJ : ∀ i j, star (t i j) = t j i) (hU : star U = U)
+    (v : (Fin (2 * N + 2) → Fin 2) → ℂ) (E : ℂ)
+    (hv : (hubbardEffectiveHamiltonian N t U).mulVec v = E • v) :
+    (hubbardEffectiveHamiltonian N t U).mulVec ((fermionTotalSpinMinus N).mulVec v) =
+      E • ((fermionTotalSpinMinus N).mulVec v) := by
+  rw [Matrix.mulVec_mulVec,
+    ← (fermionTotalSpinMinus_commute_hubbardEffectiveHamiltonian N t U hJ hU).eq,
+    ← Matrix.mulVec_mulVec, hv, Matrix.mulVec_smul]
+
 end LatticeSystem.Fermion
