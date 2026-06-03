@@ -1,4 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandModel
+import Mathlib.LinearAlgebra.Matrix.DotProduct
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+import Mathlib.LinearAlgebra.Basis.Defs
 
 /-!
 # Tasaki §11.3.1 Lemma 11.10: the `{α_p} ∪ {β_u}` single-particle basis
@@ -115,5 +118,126 @@ theorem sum_deltaSite_split {M : Type*} [AddCommMonoid M] (K : ℕ)
     ∑ x, f x = (∑ q, f (deltaExternalSite K q)) + ∑ v, f (deltaInternalSite K v) := by
   rw [← Equiv.sum_comp (deltaSiteEquiv K) f, Fintype.sum_sum_type]
   rfl
+
+/-- The incidence relations of `α_p` and `β_u` match: `p` is an external neighbor
+of internal `u` iff `u` is an internal neighbor of external `p`. -/
+theorem flatBand_incidence_iff (K : ℕ) (p u : Fin (K + 1)) :
+    (u = p ∨ u = p - 1) ↔ (p = u ∨ p = u + 1) := by
+  constructor
+  · rintro (h | h)
+    · exact Or.inl h.symm
+    · exact Or.inr (eq_add_of_sub_eq h.symm)
+  · rintro (h | h)
+    · exact Or.inl h.symm
+    · exact Or.inr (sub_eq_of_eq_add h).symm
+
+/-- **Cross-orthogonality (Tasaki §11.3.1): `⟨α_p, β_u⟩ = 0`.**  The `+ν`
+contribution at the shared external site and the `−ν` contribution at the shared
+internal site cancel. -/
+theorem flatBandAlpha_dot_beta (K : ℕ) (ν : ℝ) (p u : Fin (K + 1)) :
+    ∑ x, flatBandAlpha K ν p x * flatBandBeta K ν u x = 0 := by
+  rw [sum_deltaSite_split]
+  have hext : (∑ q, flatBandAlpha K ν p (deltaExternalSite K q) *
+      flatBandBeta K ν u (deltaExternalSite K q)) = if p = u ∨ p = u + 1 then ν else 0 := by
+    rw [Finset.sum_congr rfl (fun q _ => by
+      rw [flatBandAlpha_deltaExternalSite, flatBandBeta_deltaExternalSite, ite_mul, one_mul,
+        zero_mul])]
+    rw [Finset.sum_ite_eq' Finset.univ p (fun q => if q = u ∨ q = u + 1 then ν else 0),
+      if_pos (Finset.mem_univ p)]
+  have hint : (∑ v, flatBandAlpha K ν p (deltaInternalSite K v) *
+      flatBandBeta K ν u (deltaInternalSite K v)) = if u = p ∨ u = p - 1 then -ν else 0 := by
+    rw [Finset.sum_congr rfl (fun v _ => by
+      rw [flatBandAlpha_deltaInternalSite, flatBandBeta_deltaInternalSite, mul_ite, mul_one,
+        mul_zero])]
+    rw [Finset.sum_ite_eq' Finset.univ u (fun v => if v = p ∨ v = p - 1 then -ν else 0),
+      if_pos (Finset.mem_univ u)]
+  rw [hext, hint]
+  by_cases hpu : p = u ∨ p = u + 1
+  · rw [if_pos hpu, if_pos ((flatBand_incidence_iff K p u).mpr hpu)]; ring
+  · rw [if_neg hpu, if_neg (fun h => hpu ((flatBand_incidence_iff K p u).mp h))]; ring
+
+/-! ## Linear independence and the basis (Lemma 11.10) -/
+
+/-- The `α` family is linearly independent: evaluating at the external site `q`
+isolates the coefficient `g_q`. -/
+theorem flatBandAlphaC_linearIndependent (K : ℕ) (ν : ℝ) :
+    LinearIndependent ℂ (flatBandAlphaC K ν) := by
+  rw [Fintype.linearIndependent_iff]
+  intro g hg q
+  have hq := congrFun hg (deltaExternalSite K q)
+  simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, flatBandAlphaC,
+    flatBandAlpha_deltaExternalSite, Pi.zero_apply, apply_ite (Complex.ofReal),
+    Complex.ofReal_one, Complex.ofReal_zero, mul_ite, mul_one, mul_zero] at hq
+  rwa [Finset.sum_ite_eq Finset.univ q g, if_pos (Finset.mem_univ q)] at hq
+
+/-- The `β` family is linearly independent: evaluating at the internal site `v`
+isolates the coefficient `g_v`. -/
+theorem flatBandBetaC_linearIndependent (K : ℕ) (ν : ℝ) :
+    LinearIndependent ℂ (flatBandBetaC K ν) := by
+  rw [Fintype.linearIndependent_iff]
+  intro g hg v
+  have hv := congrFun hg (deltaInternalSite K v)
+  simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, flatBandBetaC,
+    flatBandBeta_deltaInternalSite, Pi.zero_apply, apply_ite (Complex.ofReal),
+    Complex.ofReal_one, Complex.ofReal_zero, mul_ite, mul_one, mul_zero] at hv
+  rwa [Finset.sum_ite_eq Finset.univ v g, if_pos (Finset.mem_univ v)] at hv
+
+/-- The complex cross-orthogonality `⟨α_p, β_u⟩ = 0` (the `ℝ` version cast). -/
+theorem flatBandAlphaC_dotProduct_betaC (K : ℕ) (ν : ℝ) (p u : Fin (K + 1)) :
+    star (flatBandAlphaC K ν p) ⬝ᵥ flatBandBetaC K ν u = 0 := by
+  rw [dotProduct]
+  simp only [Pi.star_apply, flatBandAlphaC, flatBandBetaC, Complex.star_def, Complex.conj_ofReal]
+  rw [show (∑ x, (flatBandAlpha K ν p x : ℂ) * (flatBandBeta K ν u x : ℂ))
+      = (((∑ x, flatBandAlpha K ν p x * flatBandBeta K ν u x : ℝ)) : ℂ) from by push_cast; rfl]
+  rw [flatBandAlpha_dot_beta]; simp
+
+/-- A complex vector with `star v ⬝ᵥ v = 0` is zero (`∑ ‖v_i‖² = 0`). -/
+theorem complexVec_eq_zero_of_star_dotProduct {n : Type*} [Fintype n] {v : n → ℂ}
+    (h : star v ⬝ᵥ v = 0) : v = 0 := by
+  have hsum : ∑ j, (Complex.normSq (v j) : ℝ) = 0 := by
+    have hc : (∑ j, (Complex.normSq (v j) : ℂ)) = 0 := by
+      rw [← h, dotProduct]
+      refine Finset.sum_congr rfl (fun j _ => ?_)
+      rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
+    exact_mod_cast hc
+  funext j
+  have hj : Complex.normSq (v j) = 0 :=
+    (Finset.sum_eq_zero_iff_of_nonneg (fun k _ => Complex.normSq_nonneg _)).mp hsum j
+      (Finset.mem_univ j)
+  exact Complex.normSq_eq_zero.mp hj
+
+/-- The `α` and `β` spans are disjoint (they are orthogonal). -/
+theorem flatBand_span_disjoint (K : ℕ) (ν : ℝ) :
+    Disjoint (Submodule.span ℂ (Set.range (flatBandAlphaC K ν)))
+      (Submodule.span ℂ (Set.range (flatBandBetaC K ν))) := by
+  rw [Submodule.disjoint_def]
+  intro x hxA hxB
+  obtain ⟨d, hd⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp hxA
+  obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp hxB
+  refine complexVec_eq_zero_of_star_dotProduct ?_
+  nth_rewrite 2 [← hc]
+  rw [← hd, star_sum, sum_dotProduct]
+  refine Finset.sum_eq_zero (fun p _ => ?_)
+  rw [star_smul, smul_dotProduct, dotProduct_sum]
+  rw [Finset.sum_eq_zero (fun u _ => ?_), smul_zero]
+  rw [dotProduct_smul, flatBandAlphaC_dotProduct_betaC, smul_zero]
+
+/-- **Tasaki Lemma 11.10**: `{α_p}_{p∈E} ∪ {β_u}_{u∈I}` is linearly independent. -/
+theorem flatBand_linearIndependent (K : ℕ) (ν : ℝ) :
+    LinearIndependent ℂ (Sum.elim (flatBandAlphaC K ν) (flatBandBetaC K ν)) := by
+  rw [linearIndependent_sum]
+  refine ⟨?_, ?_, ?_⟩
+  · simpa using flatBandAlphaC_linearIndependent K ν
+  · simpa using flatBandBetaC_linearIndependent K ν
+  · simpa using flatBand_span_disjoint K ν
+
+/-- **Tasaki Lemma 11.10 (basis form)**: `{α_p} ∪ {β_u}` is a basis of the
+single-particle Hilbert space `Fin (2K+2) → ℂ`. -/
+noncomputable def flatBandBasis (K : ℕ) (ν : ℝ) :
+    Module.Basis (Fin (K + 1) ⊕ Fin (K + 1)) ℂ (Fin (2 * K + 2) → ℂ) :=
+  basisOfLinearIndependentOfCardEqFinrank (flatBand_linearIndependent K ν) (by
+    rw [Fintype.card_sum, Fintype.card_fin, Module.finrank_fintype_fun_eq_card,
+      Fintype.card_fin]
+    omega)
 
 end LatticeSystem.Fermion
