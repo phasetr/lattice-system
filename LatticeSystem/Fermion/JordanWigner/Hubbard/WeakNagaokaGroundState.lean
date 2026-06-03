@@ -582,6 +582,37 @@ theorem hubbardEffEnergy_tasakiExpansion (N : ℕ) (t : Fin (N + 1) → Fin (N +
   simp only [dotProduct, Matrix.mulVec, Finset.mul_sum]
   exact Finset.sum_congr rfl (fun p _ => Finset.sum_congr rfl (fun q _ => by ring))
 
+/-! ## The Tasaki matrix preserves the all-up sector -/
+
+/-- The Tasaki matrix has no transitions out of the all-up sector:
+`M ⟨y,τ⟩ ⟨x,↑⟩ = 0` whenever `τ ≠ (↑)`, because hopping the all-up hole keeps the
+configuration all-up. -/
+theorem tasakiEffMatrix_allUp_off (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (htdiag : ∀ i, t i i = 0) (y x : Fin (N + 1)) (τ : HoleSpin N y)
+    (hτ : τ ≠ holeSpinUp N y) :
+    tasakiEffMatrix N t U ⟨y, τ⟩ ⟨x, holeSpinUp N x⟩ = 0 := by
+  rw [tasakiEffMatrix_apply]
+  show (∑ w, hubbardTasakiBasisState N y τ.val w *
+    ((hubbardEffectiveHamiltonian N t U) *ᵥ hubbardTasakiBasisState N x (holeSpinUp N x).val) w)
+    = 0
+  by_cases hxy : x = y
+  · subst hxy
+    exact hubbardEffective_tasaki_matrixElement_diag N x (holeSpinUp N x).val τ.val t U htdiag
+  · rw [hubbardEffective_tasaki_matrixElement N x y (holeSpinUp N x).val τ.val t U hxy,
+      if_neg ?_, mul_zero]
+    intro hc
+    apply hτ
+    apply Subtype.ext
+    funext z
+    show τ.val z = true
+    by_cases hzy : z = y
+    · subst hzy; exact τ.2
+    · have hmove : hubbardSpinMove N (holeSpinUp N x).val x y z = true := by
+        simp [hubbardSpinMove, holeSpinUp, Function.update_apply]
+      have hsp := oneHoleConfig_spin_eq N y (hubbardSpinMove N (holeSpinUp N x).val x y)
+        τ.val hc z hzy
+      rw [← hsp]; exact hmove
+
 /-- For a real coefficient vector, the Rayleigh quotient of `M` equals the real
 part of the effective-Hamiltonian energy of the corresponding Tasaki expansion. -/
 theorem rayleighOnVec_tasakiEffMatrix_of_real (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ)
