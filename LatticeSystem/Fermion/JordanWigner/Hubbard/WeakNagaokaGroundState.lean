@@ -732,6 +732,7 @@ theorem weakNagaoka_theorem_11_5 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → 
     (hJ : ∀ i j, star (t i j) = t j i) (hU : star U = U) (htdiag : ∀ i, t i i = 0) :
     ∃ (v : (Fin (2 * N + 2) → Fin 2) → ℂ) (E : ℂ),
       v ≠ 0 ∧
+      E = ((hermitianMinEigenvalue (tasakiEffMatrixUp_isHermitian N t U hJ hU) : ℝ) : ℂ) ∧
       (hubbardEffectiveHamiltonian N t U).mulVec v = E • v ∧
       (fermionTotalSpinPlus N).mulVec v = 0 ∧
       (fermionTotalSpinZ N).mulVec v = ((N : ℂ) / 2) • v ∧
@@ -749,7 +750,7 @@ theorem weakNagaoka_theorem_11_5 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → 
       (tasakiEffMatrixUp_isHermitian N t U hJ hU)
   refine ⟨pfFerroState N ξ,
     ((hermitianMinEigenvalue (tasakiEffMatrixUp_isHermitian N t U hJ hU) : ℝ) : ℂ),
-    pfFerroState_ne_zero N ξ hξ_ne,
+    pfFerroState_ne_zero N ξ hξ_ne, rfl,
     hubbardEffectiveHamiltonian_mulVec_pfFerroState_of_eigen N t U htdiag ξ _ hξ_eig,
     fermionTotalSpinPlus_mulVec_pfFerroState N ξ,
     fermionTotalSpinZ_mulVec_pfFerroState N ξ, ?_, ?_, ?_⟩ <;>
