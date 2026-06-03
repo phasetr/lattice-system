@@ -259,4 +259,56 @@ theorem hermitianMinEigenvalue_tasakiEffMatrixUp_le (N : ℕ)
     le_trans hlow (le_trans (tasakiQuadForm_ferro_le N t hpos φ) (le_of_eq (hQ.trans hE)))
   exact le_of_mul_le_mul_right hchain hnorm_pos
 
+/-- **The all-up minimum is the global one-hole minimum**: for real symmetric
+non-negative hopping, `min(M_↑) = min(M)`. The multiplet of
+`weakNagaoka_theorem_11_5` therefore sits at the global one-hole ground energy. -/
+theorem hermitianMinEigenvalue_tasakiEffMatrixUp_eq (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (U : ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j) :
+    hermitianMinEigenvalue (tasakiEffMatrixUp_isHermitian N (fun i j => (t i j : ℂ))
+        (U : ℂ) (tasakiEffMatrix_hJ_of_real htsym)
+        (by rw [Complex.star_def, Complex.conj_ofReal])) =
+      hermitianMinEigenvalue (tasakiEffMatrix_isHermitian N (fun i j => (t i j : ℂ))
+        (U : ℂ) (tasakiEffMatrix_hJ_of_real htsym)
+        (by rw [Complex.star_def, Complex.conj_ofReal])) :=
+  le_antisymm (hermitianMinEigenvalue_tasakiEffMatrixUp_le N t U htsym htdiag hpos)
+    (hermitianMinEigenvalue_le_tasakiEffMatrixUp N (fun i j => (t i j : ℂ)) (U : ℂ)
+      (tasakiEffMatrix_hJ_of_real htsym) (by rw [Complex.star_def, Complex.conj_ofReal])
+      (fun i => by simp [htdiag i]))
+
+/-- **Tasaki Theorem 11.5 (weak Nagaoka), global form.** For real symmetric
+non-negative hopping (`t_{x,y}=t_{y,x}≥0`, `t_{i,i}=0`), `N=|Λ|−1` electrons,
+`U↑∞`: there exist `N+1 = 2 S_max+1` linearly independent `Ĥ_eff`-eigenvectors at
+the **global** one-hole-sector minimum energy `E = hermitianMinEigenvalue M`, all
+with total spin `S_tot = S_max = N/2`. These are genuine ground states.
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
+1st edition, §11.2.1, Theorem 11.5, eq. (11.2.9), pp. 382-385. -/
+theorem weakNagaoka_theorem_11_5_global (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ) (U : ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j) :
+    ∃ (v : (Fin (2 * N + 2) → Fin 2) → ℂ) (E : ℂ),
+      v ≠ 0 ∧
+      E = ((hermitianMinEigenvalue (tasakiEffMatrix_isHermitian N (fun i j => (t i j : ℂ))
+        (U : ℂ) (tasakiEffMatrix_hJ_of_real htsym)
+        (by rw [Complex.star_def, Complex.conj_ofReal])) : ℝ) : ℂ) ∧
+      (hubbardEffectiveHamiltonian N (fun i j => (t i j : ℂ)) (U : ℂ)).mulVec v = E • v ∧
+      (fermionTotalSpinPlus N).mulVec v = 0 ∧
+      (fermionTotalSpinZ N).mulVec v = ((N : ℂ) / 2) • v ∧
+      LinearIndependent ℂ (fun k : Fin (N + 1) =>
+          ((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec v) ∧
+      (∀ k : Fin (N + 1),
+          (hubbardEffectiveHamiltonian N (fun i j => (t i j : ℂ)) (U : ℂ)).mulVec
+            (((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec v) =
+          E • (((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec v)) ∧
+      (∀ k : Fin (N + 1), (fermionTotalSpinSquared N).mulVec
+          (((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec v) =
+        ((N : ℂ) / 2 * ((N : ℂ) / 2 + 1)) •
+          (((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec v)) := by
+  obtain ⟨v, E, hv, hE, hHv, hSp, hSz, hLI, hdeg, hStot⟩ :=
+    weakNagaoka_theorem_11_5 N (fun i j => (t i j : ℂ)) (U : ℂ)
+      (tasakiEffMatrix_hJ_of_real htsym) (by rw [Complex.star_def, Complex.conj_ofReal])
+      (fun i => by simp [htdiag i])
+  refine ⟨v, E, hv, ?_, hHv, hSp, hSz, hLI, hdeg, hStot⟩
+  rw [hE, hermitianMinEigenvalue_tasakiEffMatrixUp_eq N t U htsym htdiag hpos]
+
 end LatticeSystem.Fermion
