@@ -38,17 +38,6 @@ def IsOneHoleHardcoreConfig (N : ℕ) (c : Fin (2 * N + 2) → Fin 2) : Prop :=
     ∃! i : Fin (N + 1),
       c (spinfulIndex N i 0) = 0 ∧ c (spinfulIndex N i 1) = 0
 
-/-- Every spinful JW index decomposes as a `spinfulIndex`: `k = spinfulIndex N
-⟨k/2, _⟩ ⟨k%2, _⟩`. -/
-private theorem exists_spinfulIndex_eq (N : ℕ) (k : Fin (2 * N + 2)) :
-    ∃ (i : Fin (N + 1)) (s : Fin 2), k = spinfulIndex N i s := by
-  have hk := k.isLt
-  refine ⟨⟨k.val / 2, (Nat.div_lt_iff_lt_mul (by norm_num)).mpr (by omega)⟩,
-    ⟨k.val % 2, Nat.mod_lt _ (by norm_num)⟩, ?_⟩
-  apply Fin.ext
-  simp only [spinfulIndex]
-  omega
-
 /-- A `Fin 2` value that is not `1` is `0`. -/
 private theorem fin_two_eq_zero_of_ne_one {v : Fin 2} (h : v ≠ 1) : v = 0 := by
   have h2 := v.isLt
@@ -97,7 +86,7 @@ theorem exists_eq_hubbardOneHoleConfig_of_isOneHoleHardcore
   obtain ⟨hnd, x, hx_hole, hx_uniq⟩ := hc
   refine ⟨x, fun i => decide (c (spinfulIndex N i 0) = 1), ?_⟩
   funext k
-  obtain ⟨i, s, rfl⟩ := exists_spinfulIndex_eq N k
+  obtain ⟨i, s, rfl⟩ := exists_spinfulIndex N k
   by_cases hs : s = 0
   · -- up orbital
     subst hs

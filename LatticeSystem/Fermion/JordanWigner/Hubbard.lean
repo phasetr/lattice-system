@@ -47,6 +47,29 @@ def spinfulIndex (N : ℕ) (i : Fin (N + 1)) (σ : Fin 2) :
     have hσ : σ.val < 2 := σ.isLt
     omega⟩
 
+/-- Joint injectivity of `spinfulIndex` in the site and the spin label:
+`spinfulIndex N a r = spinfulIndex N b s` iff `a = b` and `r = s`. -/
+theorem spinfulIndex_eq_iff (N : ℕ) (a b : Fin (N + 1)) (r s : Fin 2) :
+    spinfulIndex N a r = spinfulIndex N b s ↔ a = b ∧ r = s := by
+  constructor
+  · intro h
+    have hv : 2 * a.val + r.val = 2 * b.val + s.val := by
+      have := congrArg Fin.val h; simpa [spinfulIndex] using this
+    have := r.isLt; have := s.isLt
+    exact ⟨Fin.ext (by omega), Fin.ext (by omega)⟩
+  · rintro ⟨rfl, rfl⟩; rfl
+
+/-- Every spinful Jordan–Wigner index decomposes as `spinfulIndex N a r` for a
+unique site `a` and spin label `r`. -/
+theorem exists_spinfulIndex (N : ℕ) (k : Fin (2 * N + 2)) :
+    ∃ (a : Fin (N + 1)) (r : Fin 2), k = spinfulIndex N a r := by
+  have hk := k.isLt
+  refine ⟨⟨k.val / 2, (Nat.div_lt_iff_lt_mul (by norm_num)).mpr (by omega)⟩,
+    ⟨k.val % 2, Nat.mod_lt _ (by norm_num)⟩, ?_⟩
+  apply Fin.ext
+  simp only [spinfulIndex]
+  omega
+
 /-- Spin-up annihilation operator at spinful site `i`:
 the JW annihilation at the underlying single-species position
 `2 * i`. -/

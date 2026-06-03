@@ -115,26 +115,6 @@ noncomputable def hubbardTasakiBasisState (N : ℕ) (x : Fin (N + 1))
 
 /-! ## Auxiliary facts about `tasakiIndexList` -/
 
-/-- Joint injectivity of `spinfulIndex` in the site and the spin label. -/
-private theorem spinfulIndex_inj (N : ℕ) {a a' : Fin (N + 1)} {r r' : Fin 2}
-    (h : spinfulIndex N a r = spinfulIndex N a' r') : a = a' ∧ r = r' := by
-  have hv : 2 * a.val + r.val = 2 * a'.val + r'.val := by
-    have := congrArg Fin.val h
-    simpa [spinfulIndex] using this
-  have hr := r.isLt
-  have hr' := r'.isLt
-  exact ⟨Fin.ext (by omega), Fin.ext (by omega)⟩
-
-/-- Every spinful index decomposes as `spinfulIndex N a r`. -/
-private theorem exists_spinfulIndex (N : ℕ) (k : Fin (2 * N + 2)) :
-    ∃ (a : Fin (N + 1)) (r : Fin 2), k = spinfulIndex N a r := by
-  have hk := k.isLt
-  refine ⟨⟨k.val / 2, (Nat.div_lt_iff_lt_mul (by norm_num)).mpr (by omega)⟩,
-    ⟨k.val % 2, Nat.mod_lt _ (by norm_num)⟩, ?_⟩
-  apply Fin.ext
-  simp only [spinfulIndex]
-  omega
-
 /-- Membership in `tasakiIndexList`: `spinfulIndex N a r` is occupied exactly
 when `r` is the orbital selected by the spin `τ a`. -/
 theorem mem_tasakiIndexList_iff (N : ℕ) (τ : Fin (N + 1) → Bool)
@@ -144,7 +124,7 @@ theorem mem_tasakiIndexList_iff (N : ℕ) (τ : Fin (N + 1) → Bool)
   rw [List.mem_map]
   constructor
   · rintro ⟨s, _, hs⟩
-    obtain ⟨rfl, hr⟩ := spinfulIndex_inj N hs
+    obtain ⟨rfl, hr⟩ := (spinfulIndex_eq_iff N _ _ _ _).mp hs
     exact hr.symm
   · intro hr
     exact ⟨a, List.mem_finRange a, by rw [hr]⟩
@@ -199,12 +179,12 @@ private theorem update_occupationOf_eq_oneHoleConfig (N : ℕ) (x : Fin (N + 1))
     rcases hr2 with rfl | rfl
     · rw [if_pos rfl, hubbardOneHoleConfig_apply_up, if_pos rfl]
     · have hne : spinfulIndex N a 1 ≠ spinfulIndex N a 0 := fun h =>
-        absurd (spinfulIndex_inj N h).2 (by decide)
+        absurd ((spinfulIndex_eq_iff N _ _ _ _).mp h).2 (by decide)
       rw [if_neg hne, hubbardOneHoleConfig_apply_down, if_pos rfl]
       decide
   · -- Away from the hole: `σ̄_a = σ_a`, and the hole-orbital update never fires.
     have hne : spinfulIndex N a r ≠ spinfulIndex N x 0 := fun h =>
-      hax (spinfulIndex_inj N h).1
+      hax ((spinfulIndex_eq_iff N _ _ _ _).mp h).1
     have hax' : a.val ≠ x.val := fun h => hax (Fin.ext h)
     rw [if_neg hne, Function.update_of_ne hax]
     rcases hr2 with rfl | rfl

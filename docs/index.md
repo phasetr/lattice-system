@@ -2537,6 +2537,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionTotalNumber_mulVec_twoParticle` | `c_i† c_j† |vac⟩` is an `N̂`-eigenstate of eigenvalue 2 (Leibniz on the commutator gives `[N̂, c_i† c_j†] = 2 c_i† c_j†`) | `Fermion/JordanWigner.lean` |
 | `fermionTotalNumber_mulVec_eigenstate_of_commute` | generic charge-eigenstate helper: if `[N̂, X] = α X` and `N̂ v = 0` then `N̂ (X v) = α (X v)`; abstracts the single- and two-particle constructions | `Fermion/JordanWigner.lean` |
 | `spinfulIndex N i σ` | bijection `(i, σ : Fin 2) ↦ 2 * i + σ ∈ Fin (2*N+2)`, embedding two-species data into a single-species JW chain | `Fermion/JordanWigner.lean` |
+| `spinfulIndex_eq_iff`, `exists_spinfulIndex` | shared injectivity (`spinfulIndex N a r = spinfulIndex N b s ↔ a = b ∧ r = s`) and decomposition (`∃ a r, k = spinfulIndex N a r`) of the spinful index | `Fermion/JordanWigner.lean` |
 | `fermionUpAnnihilation`, `fermionDownAnnihilation`, `fermionUpCreation`, `fermionDownCreation` | spinful annihilation / creation operators as wrappers around the underlying single-species operators at `2i` (up) and `2i+1` (down) | `Fermion/JordanWigner.lean` |
 | `fermionUpNumber`, `fermionDownNumber` | spinful site-occupation numbers `n_{i,↑}`, `n_{i,↓}` | `Fermion/JordanWigner.lean` |
 | `hubbardOnSiteInteraction N U` | the on-site Hubbard interaction `H_int = U Σ_i n_{i,↑} · n_{i,↓}` | `Fermion/JordanWigner.lean` |

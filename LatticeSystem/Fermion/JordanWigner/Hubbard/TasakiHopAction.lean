@@ -156,17 +156,6 @@ private theorem config_exp_eq_card (N : ℕ) (b : ℕ) (holes : Finset (Fin (N +
 
 /-! ## Auxiliary identities for the one-hole configuration -/
 
-/-- Joint injectivity of `spinfulIndex`. -/
-private theorem spinful_eq_iff (N : ℕ) (t z : Fin (N + 1)) (r s : Fin 2) :
-    spinfulIndex N t r = spinfulIndex N z s ↔ t = z ∧ r = s := by
-  constructor
-  · intro h
-    have hv : 2 * t.val + r.val = 2 * z.val + s.val := by
-      have := congrArg Fin.val h; simpa [spinfulIndex] using this
-    have := r.isLt; have := s.isLt
-    exact ⟨Fin.ext (by omega), Fin.ext (by omega)⟩
-  · rintro ⟨rfl, rfl⟩; rfl
-
 /-- Occupation-value form of the one-hole configuration, expressed in the
 hole-set / orbital format consumed by `config_exp_eq_card`. -/
 private theorem onehole_hc (N : ℕ) (x : Fin (N + 1)) (σ : Fin (N + 1) → Bool)
@@ -276,7 +265,7 @@ theorem hop_jwSign_target (N : ℕ) (x z : Fin (N + 1)) (σ : Fin (N + 1) → Bo
       (fun t => if σ t then 0 else 1) _ (fun t r => by
         rw [Function.update_apply]
         by_cases hk : spinfulIndex N t r = spinfulIndex N z s
-        · obtain ⟨rfl, rfl⟩ := (spinful_eq_iff N t z r s).mp hk
+        · obtain ⟨rfl, rfl⟩ := (spinfulIndex_eq_iff N t z r s).mp hk
           simp [Finset.mem_insert, Finset.mem_singleton]
         · rw [if_neg hk, onehole_hc]
           by_cases htz : t = z
