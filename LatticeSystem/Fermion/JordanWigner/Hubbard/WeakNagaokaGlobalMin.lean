@@ -156,4 +156,23 @@ theorem hermitianMinEigenvalue_le_tasakiEffMatrixUp (N : ℕ)
   rwa [rayleighOnVec_upEmbed N t U htdiag,
     rayleighOnVec_eq_re_of_eigenvector _ ξ _ hξ_eig hξ_unit, Complex.ofReal_re] at hle
 
+/-! ## The all-up minimum is dominated by the full minimum (Schwarz bound) -/
+
+/-- `star` commutes with the all-up embedding. -/
+theorem star_upEmbed (N : ℕ) (ξ : Fin (N + 1) → ℂ) :
+    star (upEmbed N ξ) = upEmbed N (star ξ) := by
+  funext p
+  simp only [Pi.star_apply, upEmbed]
+  split <;> simp
+
+/-- The all-up block Rayleigh quotient of a real weight vector equals the real
+part of the effective-Hamiltonian energy of the corresponding all-up state. -/
+theorem rayleighOnVec_tasakiEffMatrixUp_eq (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (htdiag : ∀ i, t i i = 0) (ξ : Fin (N + 1) → ℂ) (hξ : star ξ = ξ) :
+    rayleighOnVec (tasakiEffMatrixUp N t U) ξ =
+      (hubbardEffEnergy N t U (pfFerroState N ξ)).re := by
+  rw [← rayleighOnVec_upEmbed N t U htdiag,
+    rayleighOnVec_tasakiEffMatrix_of_real N t U (upEmbed N ξ) (by rw [star_upEmbed, hξ]),
+    ← pfFerroState_eq_tasakiExpansion]
+
 end LatticeSystem.Fermion
