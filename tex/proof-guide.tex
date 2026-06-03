@@ -5381,6 +5381,20 @@ corresponding term of \(|\Phi_\uparrow\rangle\) (whose quadratic form is
     inequality.
 \end{itemize}
 
+\medskip
+\noindent\textbf{Norm identity (eqs.~(11.2.7)--(11.2.8)).}
+The Tasaki basis states (indexed by hole site and canonical hole-spin) are
+orthonormal (\texttt{tasakiState\_orthonormal}), so the squared norm of a
+real expansion is the sum of squared coefficients,
+\(\|\sum_p \phi_p \Phi_p\|^2 = \sum_p \phi_p^2\)
+(\texttt{tasakiExpansion\_normSq}). Since
+\(\sum_p (\text{ferro coeff})_p^2 = \sum_x \xi_x^2 = \sum_p \phi_p^2\)
+(\texttt{ferroCoeff\_normSq\_eq}), the ferromagnetic state has the same norm,
+\(\|\Phi_\uparrow\| = \|\Phi\|\) (\texttt{tasakiFerro\_normSq\_eq}). Together
+with the (11.2.9) energy bound, this gives the quantitative weak-Nagaoka
+content: \(|\Phi_\uparrow\rangle\) is a normalized state of the same norm with
+no greater energy, hence is also a ground state.
+
 %======================================================================
 \subsection{SU(2) symmetry of the effective Hamiltonian (Tasaki §11.2)}
 \label{subsec:hubbard-effham-su2}
