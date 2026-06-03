@@ -963,4 +963,78 @@ theorem nagaoka_theorem_11_7_degeneracy (N : ℕ)
     exact tasakiEffMatrix_ground_finrank_le_N_add_one N t htsym htdiag hpos hconn
   · exact tasakiEffMatrix_ground_finrank_ge N t htsym htdiag
 
+/-- **Tasaki Theorem 11.7 (saturated ferromagnetism).**  Under the connectivity
+condition and `t ≥ 0`, *every* one-hole `Ĥ_eff` ground state has total spin
+`S_tot = S_max`: its lifted full-space wavefunction is a `Ŝ_tot²`-eigenstate at
+`S_max (S_max + 1)`.  Since the ground eigenspace is `(N+1)`-dimensional
+(`nagaoka_theorem_11_7_degeneracy`) and the `(N+1)` ferromagnetic tower states
+span it, any ground state is a tower combination, hence spin-`S_max`.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
+(1st ed.), §11.2.2, Theorem 11.7. -/
+theorem nagaoka_theorem_11_7 (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0)
+    (hpos : ∀ i j, 0 ≤ t i j) (hconn : nagaokaConnectivity N t)
+    (c : ((x : Fin (N + 1)) × HoleSpin N x) → ℂ)
+    (hc : (tasakiEffMatrix N (fun i j => (t i j : ℂ)) 0).mulVec c =
+      (((hermitianMinEigenvalue (tasakiEffMatrixUp_isHermitian N (fun i j => (t i j : ℂ)) 0
+        (tasakiEffMatrix_hJ_of_real htsym) (by simp))) : ℝ) : ℂ) • c) :
+    (fermionTotalSpinSquared N).mulVec (∑ q, c q • tasakiState N q) =
+      ((N : ℂ) / 2 * ((N : ℂ) / 2 + 1)) • (∑ q, c q • tasakiState N q) := by
+  have hJ := tasakiEffMatrix_hJ_of_real htsym
+  have hU0 : star (0 : ℂ) = 0 := by simp
+  obtain ⟨ξ, hξ_ne, hξ_eig⟩ := exists_nonzero_eigenvector_hermitianMinEigenvalue
+    (tasakiEffMatrixUp_isHermitian N (fun i j => (t i j : ℂ)) 0 hJ hU0)
+  set E : ℂ := ((hermitianMinEigenvalue (tasakiEffMatrixUp_isHermitian N
+    (fun i j => (t i j : ℂ)) 0 hJ hU0) : ℝ) : ℂ) with hEdef
+  have hv0_eig := hubbardEffectiveHamiltonian_mulVec_pfFerroState_of_eigen N
+    (fun i j => (t i j : ℂ)) 0 (fun i => by simp [htdiag i]) ξ E hξ_eig
+  obtain ⟨hLI, hdeg, hCas⟩ := weakNagaoka_spinMultiplet N (fun i j => (t i j : ℂ)) 0 hJ hU0
+    (pfFerroState N ξ) E hv0_eig (fermionTotalSpinPlus_mulVec_pfFerroState N ξ)
+    (fermionTotalSpinZ_mulVec_pfFerroState N ξ) (pfFerroState_ne_zero N ξ hξ_ne)
+  set tower : Fin (N + 1) → (Fin (2 * N + 2) → Fin 2) → ℂ :=
+    fun k => ((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec (pfFerroState N ξ) with htower
+  set cfn : Fin (N + 1) → ((x : Fin (N + 1)) × HoleSpin N x) → ℂ :=
+    fun k => tasakiCoeff N (tower k) with hcfn
+  set W := End.eigenspace (Matrix.toLin'
+    (tasakiEffMatrix N (fun i j => (t i j : ℂ)) 0)) E with hWdef
+  have hexpand : ∀ k, (tasakiEmbedding N).mulVec (cfn k) = tower k := by
+    intro k
+    rw [tasakiEmbedding_mulVec_eq]
+    exact (tasaki_completeness N (tower k)
+      (spinMinusPow_pfFerroState_oneHole_supported N ξ k)).symm
+  have hc_mem : ∀ k, cfn k ∈ W := by
+    intro k
+    rw [hWdef, End.mem_eigenspace_iff, Matrix.toLin'_apply]
+    exact tasakiCoeff_mulVec_eigen_of_full N (fun i j => (t i j : ℂ)) 0 E (tower k)
+      (spinMinusPow_pfFerroState_oneHole_supported N ξ k) (hdeg k)
+  have hcLI : LinearIndependent ℂ cfn := by
+    have htower_eq : tower = (Matrix.mulVecLin (tasakiEmbedding N)) ∘ cfn := by
+      funext k; rw [Function.comp_apply, Matrix.mulVecLin_apply, hexpand]
+    rw [htower_eq] at hLI
+    exact hLI.of_comp _
+  have hWLI : LinearIndependent ℂ (fun k => (⟨cfn k, hc_mem k⟩ : W)) :=
+    LinearIndependent.of_comp W.subtype hcLI
+  have hcard : Fintype.card (Fin (N + 1)) = finrank ℂ W := by
+    rw [Fintype.card_fin]
+    exact (nagaoka_theorem_11_7_degeneracy N t htsym htdiag hpos hconn).symm
+  have hspan := hWLI.span_eq_top_of_card_eq_finrank hcard
+  -- the given eigenvector `c` lies in `W`, hence in the span of the tower coefficients.
+  have hcW : c ∈ W := by rw [hWdef, End.mem_eigenspace_iff, Matrix.toLin'_apply]; exact hc
+  have hmem : (⟨c, hcW⟩ : W) ∈ Submodule.span ℂ (Set.range fun k => (⟨cfn k, hc_mem k⟩ : W)) := by
+    rw [hspan]; exact Submodule.mem_top
+  obtain ⟨a, ha⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp hmem
+  have hc_eq : c = ∑ k, a k • cfn k := by
+    have := congrArg (Subtype.val) ha
+    simp only [Submodule.coe_sum, Submodule.coe_smul] at this
+    exact this.symm
+  -- lift to the full space: `Σ c_q Φ_q = Σ_k a_k tower_k`.
+  have hlift : (∑ q, c q • tasakiState N q) = ∑ k, a k • tower k := by
+    rw [← tasakiEmbedding_mulVec_eq, hc_eq, Matrix.mulVec_sum]
+    exact Finset.sum_congr rfl (fun k _ => by rw [Matrix.mulVec_smul, hexpand])
+  rw [hlift, Matrix.mulVec_sum, Finset.smul_sum]
+  refine Finset.sum_congr rfl (fun k _ => ?_)
+  rw [Matrix.mulVec_smul, hCas, smul_comm]
+
 end LatticeSystem.Fermion
