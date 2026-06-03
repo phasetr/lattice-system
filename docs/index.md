@@ -2743,6 +2743,7 @@ fermion mode acting on `ℂ²` with computational basis
 |---|---|---|
 | `fermionTotalSpinPlus_commute_hubbardHardcoreProjection` | `Ŝ^+_tot` commutes with the hard-core projection `P̂_hc` (spin operators preserve the no-double-occupancy subspace) | `Fermion/JordanWigner/Hubbard/EffectiveHamiltonianSpinSymmetry.lean` |
 | `fermionTotalSpinPlus_commute_hubbardEffectiveHamiltonian` / `fermionTotalSpinMinus_commute_hubbardEffectiveHamiltonian` | `[Ĥ_eff, Ŝ^±_tot] = 0` — the effective Hamiltonian inherits SU(2) symmetry (the backbone of the `(2S_max+1)`-degeneracy in Theorem 11.5) | `Fermion/JordanWigner/Hubbard/EffectiveHamiltonianSpinSymmetry.lean` |
+| `fermionTotalSpinZ_commute_hubbardEffectiveHamiltonian` / `fermionTotalSpinSquared_commute_hubbardEffectiveHamiltonian` | `[Ĥ_eff, Ŝ^z_tot] = 0` and `[Ĥ_eff, (Ŝ_tot)²] = 0` — `Ĥ_eff` conserves total spin, so its eigenspaces split into fixed-`S_tot` sectors (Theorem 11.5 / 11.7) | `Fermion/JordanWigner/Hubbard/EffectiveHamiltonianSpinSymmetry.lean` |
 
 | `hubbardKineticOnGraph N G J` | spinful Hubbard kinetic operator from a `SimpleGraph G` and edge weight `J` | `Fermion/JordanWigner.lean` |
 | `hubbardKineticOnGraph_commute_fermionTotalNumber` / `hubbardKineticOnGraph_isHermitian` | charge conservation always; Hermiticity for real `J` | `Fermion/JordanWigner.lean` |
