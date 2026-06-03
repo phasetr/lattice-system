@@ -647,6 +647,34 @@ theorem tasakiEffMatrixUp_isHermitian (N : ℕ) (t : Fin (N + 1) → Fin (N + 1)
   rw [Matrix.conjTranspose_apply, tasakiEffMatrixUp, tasakiEffMatrixUp,
     ← Matrix.conjTranspose_apply, (tasakiEffMatrix_isHermitian N t U hJ hU).eq]
 
+/-- `M` acting on an embedded weight vector stays in the all-up sector and equals
+the embedding of the all-up block acting on the weights:
+`M (upEmbed ξ) = upEmbed (M_↑ ξ)`. -/
+theorem tasakiEffMatrix_mulVec_upEmbed (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (htdiag : ∀ i, t i i = 0) (ξ : Fin (N + 1) → ℂ) :
+    (tasakiEffMatrix N t U).mulVec (upEmbed N ξ) =
+      upEmbed N ((tasakiEffMatrixUp N t U).mulVec ξ) := by
+  classical
+  funext q
+  obtain ⟨y, τ⟩ := q
+  have hred : (tasakiEffMatrix N t U).mulVec (upEmbed N ξ) ⟨y, τ⟩ =
+      ∑ x, tasakiEffMatrix N t U ⟨y, τ⟩ ⟨x, holeSpinUp N x⟩ * ξ x := by
+    simp only [Matrix.mulVec, dotProduct]
+    rw [Fintype.sum_sigma]
+    refine Finset.sum_congr rfl (fun x _ => ?_)
+    rw [Finset.sum_eq_single (holeSpinUp N x)
+      (fun σ _ hσ => by simp only [upEmbed, if_neg hσ, mul_zero])
+      (fun hmem => absurd (Finset.mem_univ _) hmem)]
+    simp [upEmbed]
+  rw [hred]
+  by_cases hτ : τ = holeSpinUp N y
+  · subst hτ
+    rw [upEmbed, if_pos rfl]
+    simp only [tasakiEffMatrixUp, Matrix.mulVec, dotProduct]
+  · rw [upEmbed, if_neg hτ]
+    refine Finset.sum_eq_zero (fun x _ => ?_)
+    rw [tasakiEffMatrix_allUp_off N t U htdiag y x τ hτ, zero_mul]
+
 /-- For a real coefficient vector, the Rayleigh quotient of `M` equals the real
 part of the effective-Hamiltonian energy of the corresponding Tasaki expansion. -/
 theorem rayleighOnVec_tasakiEffMatrix_of_real (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ)
