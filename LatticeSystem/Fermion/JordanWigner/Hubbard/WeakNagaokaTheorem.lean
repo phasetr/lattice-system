@@ -298,3 +298,78 @@ theorem fermionTotalSpinPlus_mul_fermionTotalSpinMinus (N : ℕ) :
   unfold fermionTotalSpinSquared
   rw [two_smul]
   noncomm_ring
+
+/-! ## The spin-lowering multiplet is nonzero -/
+
+/-- The Casimir is constant along the spin-lowering tower:
+`(Ŝ_tot)² (Ŝ^-_tot)^k |Φ_{x,(↑)}⟩ = S_max(S_max+1) (Ŝ^-_tot)^k |Φ_{x,(↑)}⟩`
+with `S_max = N/2`, since `[(Ŝ_tot)², Ŝ^-_tot] = 0` and the base state has
+maximal spin. So the whole tower lies in the `S_tot = S_max` sector. -/
+theorem fermionTotalSpinSquared_mulVec_spinMinusPow_ferroHole (N : ℕ) (x : Fin (N + 1))
+    (k : ℕ) :
+    (fermionTotalSpinSquared N).mulVec
+        (((fermionTotalSpinMinus N) ^ k).mulVec (basisVec (ferroHoleConfig N x))) =
+      ((N : ℂ) / 2 * ((N : ℂ) / 2 + 1)) •
+        (((fermionTotalSpinMinus N) ^ k).mulVec (basisVec (ferroHoleConfig N x))) := by
+  rw [Matrix.mulVec_mulVec,
+    (Commute.pow_right (fermionTotalSpinSquared_commute_fermionTotalSpinMinus N) k).eq,
+    ← Matrix.mulVec_mulVec, fermionTotalSpinSquared_mulVec_ferroHole, Matrix.mulVec_smul]
+
+/-- `Ŝ^+_tot Ŝ^-_tot` acts on the `k`-fold lowered ferromagnetic hole state with
+eigenvalue `S_max(S_max+1) − m(m−1)` where `m = N/2 − k`: combining the Casimir
+tower, the `Ŝ^z` tower, and `Ŝ^+_tot Ŝ^-_tot = (Ŝ_tot)² − Ŝ^z_tot(Ŝ^z_tot − 1)`.
+This eigenvalue equals `(k+1)(N−k)` and drives the multiplet's nonvanishing. -/
+theorem fermionTotalSpinPlusMinus_mulVec_spinMinusPow_ferroHole (N : ℕ) (x : Fin (N + 1))
+    (k : ℕ) :
+    (fermionTotalSpinPlus N * fermionTotalSpinMinus N).mulVec
+        (((fermionTotalSpinMinus N) ^ k).mulVec (basisVec (ferroHoleConfig N x))) =
+      ((N : ℂ) / 2 * ((N : ℂ) / 2 + 1) -
+          ((N : ℂ) / 2 - k) * ((N : ℂ) / 2 - k - 1)) •
+        (((fermionTotalSpinMinus N) ^ k).mulVec (basisVec (ferroHoleConfig N x))) := by
+  rw [fermionTotalSpinPlus_mul_fermionTotalSpinMinus, Matrix.sub_mulVec,
+    fermionTotalSpinSquared_mulVec_spinMinusPow_ferroHole,
+    ← Matrix.mulVec_mulVec, Matrix.sub_mulVec, Matrix.one_mulVec,
+    fermionTotalSpinZ_mulVec_spinMinusPow_ferroHole,
+    Matrix.mulVec_sub, Matrix.mulVec_smul,
+    fermionTotalSpinZ_mulVec_spinMinusPow_ferroHole]
+  module
+
+/-- **The spin-lowering multiplet is nonzero**: `(Ŝ^-_tot)^k |Φ_{x,(↑)}⟩ ≠ 0`
+for every `k ≤ N`. Purely algebraic, no inner product: if it vanished then
+`Ŝ^+_tot (Ŝ^-_tot)^{k+1} |Φ⟩ = (Ŝ^+ Ŝ^-) (Ŝ^-)^k |Φ⟩ = (k+1)(N−k) (Ŝ^-)^k|Φ⟩`
+would also vanish, but `(k+1)(N−k) ≠ 0` for `k < N` and `(Ŝ^-)^k|Φ⟩ ≠ 0` by
+induction. This gives the `(2 S_max + 1) = N+1` distinct members of the
+degenerate ground-state multiplet. -/
+theorem spinMinusPow_ferroHole_ne_zero (N : ℕ) (x : Fin (N + 1)) :
+    ∀ k : ℕ, k ≤ N →
+      ((fermionTotalSpinMinus N) ^ k).mulVec (basisVec (ferroHoleConfig N x)) ≠ 0 := by
+  intro k
+  induction k with
+  | zero =>
+    intro _ h
+    rw [pow_zero, Matrix.one_mulVec] at h
+    have h2 := congrFun h (ferroHoleConfig N x)
+    rw [Pi.zero_apply, basisVec_self] at h2
+    exact one_ne_zero h2
+  | succ k ih =>
+    intro hk hzero
+    have hk' : k ≤ N := Nat.le_of_succ_le hk
+    have hklt : k < N := hk
+    have hψk := ih hk'
+    have hc : (N : ℂ) / 2 * ((N : ℂ) / 2 + 1) -
+        ((N : ℂ) / 2 - k) * ((N : ℂ) / 2 - k - 1) ≠ 0 := by
+      have heq : (N : ℂ) / 2 * ((N : ℂ) / 2 + 1) -
+          ((N : ℂ) / 2 - k) * ((N : ℂ) / 2 - k - 1) = ((k : ℂ) + 1) * ((N : ℂ) - k) := by
+        ring
+      rw [heq]
+      refine mul_ne_zero (Nat.cast_add_one_ne_zero k) ?_
+      rw [sub_ne_zero]
+      exact_mod_cast (Nat.ne_of_lt hklt).symm
+    have harg : (fermionTotalSpinMinus N).mulVec
+        (((fermionTotalSpinMinus N) ^ k).mulVec (basisVec (ferroHoleConfig N x))) = 0 := by
+      rw [Matrix.mulVec_mulVec, ← pow_succ']; exact hzero
+    have key := fermionTotalSpinPlusMinus_mulVec_spinMinusPow_ferroHole N x k
+    rw [← Matrix.mulVec_mulVec, harg, Matrix.mulVec_zero] at key
+    rcases smul_eq_zero.mp key.symm with h | h
+    · exact hc h
+    · exact hψk h
