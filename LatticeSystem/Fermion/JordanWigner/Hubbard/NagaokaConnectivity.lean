@@ -314,4 +314,51 @@ theorem tasakiEffReMatrixOnSector_ground_finrank_le_one (N : ℕ)
     rw [neg_smul]; exact neg_eq_iff_eq_neg.mp hthis
   · rw [eigenspace_tasakiEffReMatrixOnSector_eq_neg]; exact hfin
 
+/-- **Block invariance: restricting a coefficient eigenvector to a sector gives a
+sector eigenvector.**  If `M c = E c` in the full one-hole coefficient space and
+`c|_m` is the restriction of `c` to sector `m`, then `M_m (c|_m) = E (c|_m)` —
+because `M` is block-diagonal in magnetization
+(`tasakiEffReMatrix_eq_zero_of_holeSpinMag_ne`).  This lets the global
+`E`-eigenspace decompose over sectors. -/
+theorem tasakiEffReMatrixOnSector_mulVec_restriction_of_eigen (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) {m : ℤ} {E : ℝ}
+    {c : (x : Fin (N + 1)) × HoleSpin N x → ℝ}
+    (hc : tasakiEffReMatrix N t *ᵥ c = E • c) :
+    tasakiEffReMatrixOnSector N t m *ᵥ (fun p : HoleMagSector N m => c p.val) =
+      E • (fun p : HoleMagSector N m => c p.val) := by
+  classical
+  funext q
+  have hrhs : (E • fun p : HoleMagSector N m => c p.val) q = E * c q.val := rfl
+  rw [hrhs]
+  change ∑ p : HoleMagSector N m,
+      tasakiEffReMatrixOnSector N t m q p * c p.val = E * c q.val
+  have hsec : (∑ p : HoleMagSector N m,
+        tasakiEffReMatrixOnSector N t m q p * c p.val) =
+      ∑ p' ∈ Finset.univ.filter (fun p' => holeSpinMag N p' = m),
+        tasakiEffReMatrix N t q.val p' * c p' := by
+    rw [Finset.sum_subtype
+      (Finset.univ.filter (fun p' => holeSpinMag N p' = m))
+      (p := fun p' => holeSpinMag N p' = m)
+      (fun p' => by simp [Finset.mem_filter])
+      (fun p' => tasakiEffReMatrix N t q.val p' * c p')]
+    refine Finset.sum_congr rfl (fun p' _ => ?_)
+    unfold tasakiEffReMatrixOnSector
+    rw [Matrix.submatrix_apply]
+  rw [hsec]
+  have hfull : ∑ p' ∈ Finset.univ.filter (fun p' => holeSpinMag N p' = m),
+        tasakiEffReMatrix N t q.val p' * c p' =
+      ∑ p' : (x : Fin (N + 1)) × HoleSpin N x,
+        tasakiEffReMatrix N t q.val p' * c p' := by
+    refine Finset.sum_filter_of_ne (p := fun p' => holeSpinMag N p' = m) ?_
+    intro p' _ hne
+    by_contra hp'm
+    apply hne
+    have hmag_ne : holeSpinMag N q.val ≠ holeSpinMag N p' :=
+      fun heq => hp'm (heq.symm.trans q.2)
+    rw [tasakiEffReMatrix_eq_zero_of_holeSpinMag_ne N t q.val p' hmag_ne, zero_mul]
+  rw [hfull]
+  change (tasakiEffReMatrix N t *ᵥ c) q.val = _
+  rw [hc]
+  rfl
+
 end LatticeSystem.Fermion
