@@ -259,4 +259,30 @@ theorem mulVec_apply_eq_zero_of_number_ne (N : ℕ)
     rw [sub_mul, h1, sub_self]
   exact (mul_eq_zero.mp h2).resolve_left (sub_ne_zero.mpr hne)
 
+/-! ## Hard-core states vanish on doubly-occupied configurations -/
+
+/-- The same-site double-occupancy operator is diagonal:
+`(n_{i,↑} n_{i,↓} φ)(w) = w_{i,↑} · w_{i,↓} · φ(w)`. -/
+theorem hubbardDoubleOccupancy_mulVec_apply (N : ℕ) (i : Fin (N + 1))
+    (φ : (Fin (2 * N + 2) → Fin 2) → ℂ) (w : Fin (2 * N + 2) → Fin 2) :
+    (hubbardDoubleOccupancy N i).mulVec φ w =
+      ((w (spinfulIndex N i 0)).val : ℂ) * ((w (spinfulIndex N i 1)).val : ℂ) * φ w := by
+  unfold hubbardDoubleOccupancy fermionUpNumber fermionDownNumber
+  rw [← Matrix.mulVec_mulVec, fermionMultiNumber_mulVec_apply,
+    fermionMultiNumber_mulVec_apply]
+  ring
+
+/-- A hard-core state vanishes at every doubly-occupied configuration: if
+`φ ∈ H_hc` and `w` has both orbitals occupied at some site `i`, then `φ(w) = 0`. -/
+theorem hardcore_mulVec_apply_eq_zero_of_double (N : ℕ)
+    (φ : (Fin (2 * N + 2) → Fin 2) → ℂ) (hφ : φ ∈ hubbardHardcoreSubspace N)
+    (w : Fin (2 * N + 2) → Fin 2) (i : Fin (N + 1))
+    (h0 : w (spinfulIndex N i 0) = 1) (h1 : w (spinfulIndex N i 1) = 1) :
+    φ w = 0 := by
+  have hD : (hubbardDoubleOccupancy N i).mulVec φ = 0 :=
+    (mem_hubbardHardcoreSubspace_iff N).mp hφ i
+  have hw := congrFun hD w
+  rw [hubbardDoubleOccupancy_mulVec_apply, h0, h1] at hw
+  simpa using hw
+
 end LatticeSystem.Fermion
