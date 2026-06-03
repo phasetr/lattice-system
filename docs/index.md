@@ -2722,6 +2722,7 @@ fermion mode acting on `ℂ²` with computational basis
 | Lean name | Statement | File |
 |---|---|---|
 | `hubbardEffective_tasaki_matrixElement` | eq. (11.2.5), off-diagonal (`x ≠ y`): `⟨Φ_{y,τ} \| Ĥ_eff \| Φ_{x,σ}⟩ = -t_{x,y}` if `τ = σ_{y→x}` (configurations coincide), else `0`. Only the hole-filling channel `(x, y, σ_y)` survives the hard-core projection | `Fermion/JordanWigner/Hubbard/EffectiveHamiltonianMatrix.lean` |
+| `hubbardEffective_tasaki_matrixElement_diag` | eq. (11.2.5), diagonal (`x = y`) under no self-hopping (`∀ i, t_{ii} = 0`): `⟨Φ_{x,τ} \| Ĥ_eff \| Φ_{x,σ}⟩ = 0` — `Ĥ_eff` moves the hole off `x`, so its image is orthogonal to `\|Φ_{x,τ}⟩` | `Fermion/JordanWigner/Hubbard/EffectiveHamiltonianMatrix.lean` |
 
 | `hubbardKineticOnGraph N G J` | spinful Hubbard kinetic operator from a `SimpleGraph G` and edge weight `J` | `Fermion/JordanWigner.lean` |
 | `hubbardKineticOnGraph_commute_fermionTotalNumber` / `hubbardKineticOnGraph_isHermitian` | charge conservation always; Hermiticity for real `J` | `Fermion/JordanWigner.lean` |
