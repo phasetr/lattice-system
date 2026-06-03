@@ -613,6 +613,40 @@ theorem tasakiEffMatrix_allUp_off (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) →
         τ.val hc z hzy
       rw [← hsp]; exact hmove
 
+/-! ## The all-up block of the Tasaki matrix -/
+
+/-- Embed a hole-position weight vector `ξ : Fin (N+1) → ℂ` into the full Tasaki
+index by placing it on the all-up states: `(upEmbed ξ) ⟨x,σ⟩ = ξ_x` if `σ = (↑)`,
+else `0`. -/
+noncomputable def upEmbed (N : ℕ) (ξ : Fin (N + 1) → ℂ) :
+    ((x : Fin (N + 1)) × HoleSpin N x) → ℂ :=
+  fun p => if p.2 = holeSpinUp N p.1 then ξ p.1 else 0
+
+/-- The all-up state is the Tasaki expansion of the embedded weights. -/
+theorem pfFerroState_eq_tasakiExpansion (N : ℕ) (ξ : Fin (N + 1) → ℂ) :
+    pfFerroState N ξ = ∑ p, upEmbed N ξ p • tasakiState N p := by
+  classical
+  rw [pfFerroState, Fintype.sum_sigma]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [Finset.sum_eq_single (holeSpinUp N x)
+    (fun σ _ hσ => by simp only [upEmbed, if_neg hσ, zero_smul])
+    (fun hmem => absurd (Finset.mem_univ _) hmem)]
+  simp [upEmbed]
+
+/-- The all-up block of the Tasaki matrix: the single-hole hopping matrix in the
+maximal-spin sector, `M_↑ y x = ⟨Φ_{y,↑} | Ĥ_eff | Φ_{x,↑}⟩`. -/
+noncomputable def tasakiEffMatrixUp (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ) :
+    Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ :=
+  fun y x => tasakiEffMatrix N t U ⟨y, holeSpinUp N y⟩ ⟨x, holeSpinUp N x⟩
+
+/-- The all-up block is Hermitian (a principal submatrix of the Hermitian `M`). -/
+theorem tasakiEffMatrixUp_isHermitian (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (hJ : ∀ i j, star (t i j) = t j i) (hU : star U = U) :
+    (tasakiEffMatrixUp N t U).IsHermitian := by
+  ext y x
+  rw [Matrix.conjTranspose_apply, tasakiEffMatrixUp, tasakiEffMatrixUp,
+    ← Matrix.conjTranspose_apply, (tasakiEffMatrix_isHermitian N t U hJ hU).eq]
+
 /-- For a real coefficient vector, the Rayleigh quotient of `M` equals the real
 part of the effective-Hamiltonian energy of the corresponding Tasaki expansion. -/
 theorem rayleighOnVec_tasakiEffMatrix_of_real (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ)
