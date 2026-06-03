@@ -1,6 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheorem
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreSpan
 import LatticeSystem.Quantum.SpinS.HermitianVariationalEquality
+import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 
 /-!
 # Tasaki Theorem 11.5: existence of the ferromagnetic ground state
@@ -592,7 +593,7 @@ theorem tasakiEffMatrix_allUp_off (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) →
     (hτ : τ ≠ holeSpinUp N y) :
     tasakiEffMatrix N t U ⟨y, τ⟩ ⟨x, holeSpinUp N x⟩ = 0 := by
   rw [tasakiEffMatrix_apply]
-  show (∑ w, hubbardTasakiBasisState N y τ.val w *
+  change (∑ w, hubbardTasakiBasisState N y τ.val w *
     ((hubbardEffectiveHamiltonian N t U) *ᵥ hubbardTasakiBasisState N x (holeSpinUp N x).val) w)
     = 0
   by_cases hxy : x = y
@@ -604,7 +605,7 @@ theorem tasakiEffMatrix_allUp_off (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) →
     apply hτ
     apply Subtype.ext
     funext z
-    show τ.val z = true
+    change τ.val z = true
     by_cases hzy : z = y
     · subst hzy; exact τ.2
     · have hmove : hubbardSpinMove N (holeSpinUp N x).val x y z = true := by
@@ -683,5 +684,81 @@ theorem rayleighOnVec_tasakiEffMatrix_of_real (N : ℕ) (t : Fin (N + 1) → Fin
       (hubbardEffEnergy N t U (∑ p, c p • tasakiState N p)).re := by
   unfold rayleighOnVec
   rw [hc, hubbardEffEnergy_tasakiExpansion]
+
+/-! ## The effective Hamiltonian acts on the all-up state as the all-up block -/
+
+/-- `Ĥ_eff (Σ_x ξ_x Φ_{x,↑}) = Σ_y (M_↑ ξ)_y Φ_{y,↑}`: on the all-up state the
+effective Hamiltonian is the all-up block `M_↑`. -/
+theorem hubbardEffectiveHamiltonian_mulVec_pfFerroState (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ) (htdiag : ∀ i, t i i = 0)
+    (ξ : Fin (N + 1) → ℂ) :
+    (hubbardEffectiveHamiltonian N t U).mulVec (pfFerroState N ξ) =
+      pfFerroState N ((tasakiEffMatrixUp N t U).mulVec ξ) := by
+  rw [pfFerroState_eq_tasakiExpansion N ξ,
+    hubbardEffectiveHamiltonian_mulVec_tasakiExpansion,
+    tasakiEffMatrix_mulVec_upEmbed N t U htdiag,
+    ← pfFerroState_eq_tasakiExpansion]
+
+/-- If `ξ` is an eigenvector of the all-up block `M_↑` at eigenvalue `λ`, then the
+all-up state `Σ_x ξ_x Φ_{x,↑}` is an `Ĥ_eff`-eigenvector at `λ`. -/
+theorem hubbardEffectiveHamiltonian_mulVec_pfFerroState_of_eigen (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ) (htdiag : ∀ i, t i i = 0)
+    (ξ : Fin (N + 1) → ℂ) (lam : ℂ)
+    (hξ : (tasakiEffMatrixUp N t U).mulVec ξ = lam • ξ) :
+    (hubbardEffectiveHamiltonian N t U).mulVec (pfFerroState N ξ) =
+      lam • pfFerroState N ξ := by
+  rw [hubbardEffectiveHamiltonian_mulVec_pfFerroState N t U htdiag, hξ, pfFerroState,
+    pfFerroState, Finset.smul_sum]
+  exact Finset.sum_congr rfl (fun x _ => by rw [Pi.smul_apply, smul_assoc])
+
+/-! ## Tasaki Theorem 11.5 (weak Nagaoka), effective one-hole sector -/
+
+/-- **Tasaki Theorem 11.5 (weak version of Nagaoka's theorem), effective one-hole
+sector.** For a Hubbard model with `t_{x,y} = t_{y,x}`, no self-hopping
+(`t_{i,i} = 0`), `N = |Λ| − 1` electrons in the `U ↑ ∞` (effective) limit: there
+exist `N + 1 = 2 S_max + 1` linearly independent `Ĥ_eff`-eigenvectors at the
+minimum energy of the maximal-spin (all-up) sector, all with total spin
+`S_tot = S_max = N/2`.
+
+The ground state `|Φ_↑⟩ = Σ_x ξ_x |Φ_{x,↑}⟩` is the all-up state built from a
+minimum eigenvector `ξ` of the all-up hopping block `M_↑`; applying `Ŝ^-_tot`
+generates the degenerate multiplet (capstone `weakNagaoka_spinMultiplet`).
+(That this all-up minimum is the global ground energy is Tasaki's Schwarz bound
+(11.2.9) `hubbardWeakNagaoka_energy_bound`, for `t ≥ 0`.)
+
+Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
+1st edition, §11.2.1, Theorem 11.5, pp. 382-385. -/
+theorem weakNagaoka_theorem_11_5 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (hJ : ∀ i j, star (t i j) = t j i) (hU : star U = U) (htdiag : ∀ i, t i i = 0) :
+    ∃ (v : (Fin (2 * N + 2) → Fin 2) → ℂ) (E : ℂ),
+      v ≠ 0 ∧
+      (hubbardEffectiveHamiltonian N t U).mulVec v = E • v ∧
+      (fermionTotalSpinPlus N).mulVec v = 0 ∧
+      (fermionTotalSpinZ N).mulVec v = ((N : ℂ) / 2) • v ∧
+      LinearIndependent ℂ (fun k : Fin (N + 1) =>
+          ((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec v) ∧
+      (∀ k : Fin (N + 1), (hubbardEffectiveHamiltonian N t U).mulVec
+          (((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec v) =
+        E • (((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec v)) ∧
+      (∀ k : Fin (N + 1), (fermionTotalSpinSquared N).mulVec
+          (((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec v) =
+        ((N : ℂ) / 2 * ((N : ℂ) / 2 + 1)) •
+          (((fermionTotalSpinMinus N) ^ (k : ℕ)).mulVec v)) := by
+  obtain ⟨ξ, hξ_ne, hξ_eig⟩ :=
+    exists_nonzero_eigenvector_hermitianMinEigenvalue
+      (tasakiEffMatrixUp_isHermitian N t U hJ hU)
+  refine ⟨pfFerroState N ξ,
+    ((hermitianMinEigenvalue (tasakiEffMatrixUp_isHermitian N t U hJ hU) : ℝ) : ℂ),
+    pfFerroState_ne_zero N ξ hξ_ne,
+    hubbardEffectiveHamiltonian_mulVec_pfFerroState_of_eigen N t U htdiag ξ _ hξ_eig,
+    fermionTotalSpinPlus_mulVec_pfFerroState N ξ,
+    fermionTotalSpinZ_mulVec_pfFerroState N ξ, ?_, ?_, ?_⟩ <;>
+  · obtain ⟨hLI, hdeg, hStot⟩ := weakNagaoka_spinMultiplet N t U hJ hU (pfFerroState N ξ)
+      ((hermitianMinEigenvalue (tasakiEffMatrixUp_isHermitian N t U hJ hU) : ℝ) : ℂ)
+      (hubbardEffectiveHamiltonian_mulVec_pfFerroState_of_eigen N t U htdiag ξ _ hξ_eig)
+      (fermionTotalSpinPlus_mulVec_pfFerroState N ξ)
+      (fermionTotalSpinZ_mulVec_pfFerroState N ξ)
+      (pfFerroState_ne_zero N ξ hξ_ne)
+    first | exact hLI | exact hdeg | exact hStot
 
 end LatticeSystem.Fermion
