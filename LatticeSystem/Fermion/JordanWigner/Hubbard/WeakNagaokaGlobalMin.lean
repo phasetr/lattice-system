@@ -28,6 +28,11 @@ namespace LatticeSystem.Fermion
 
 open Matrix LatticeSystem.Quantum
 
+/-- The one-hole Tasaki index is nonempty (the hole can sit at site `0`, all-up). -/
+instance instNonemptyHoleSpinSigma (N : ℕ) :
+    Nonempty ((x : Fin (N + 1)) × HoleSpin N x) :=
+  ⟨⟨0, holeSpinUp N 0⟩⟩
+
 /-- The real Tasaki matrix: the `(11.2.5)` matrix elements of `Ĥ_eff` as real
 numbers. `M_ℝ ⟨y,τ⟩ ⟨x,σ⟩ = -t_{x,y} · [σ_{x→y} = τ]` for `x ≠ y`, `0` on the
 diagonal. -/
@@ -59,5 +64,42 @@ theorem tasakiEffMatrix_eq_map_tasakiEffReMatrix (N : ℕ)
   · rw [hubbardEffective_tasaki_matrixElement N x y σ.val τ.val (fun i j => (t i j : ℂ))
       (U : ℂ) hxy, if_neg hxy]
     split <;> push_cast <;> ring
+
+/-- For real symmetric hopping, the complex-cast Hermitian hypotheses of the
+Tasaki matrix hold. -/
+theorem tasakiEffMatrix_hJ_of_real {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ}
+    (htsym : ∀ i j, t i j = t j i) :
+    ∀ i j, star ((t i j : ℂ)) = (t j i : ℂ) :=
+  fun i j => by rw [Complex.star_def, Complex.conj_ofReal, htsym i j]
+
+/-- The Tasaki matrix has a **real** minimum eigenvector: since `M = M_ℝ.map ofReal`
+is a real matrix in disguise, a complex minimum eigenvector has a nonzero real or
+imaginary part that is a real eigenvector of `M_ℝ` at the same (real) eigenvalue. -/
+theorem exists_real_min_eigenvector_tasakiEffReMatrix (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (U : ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) :
+    ∃ φ : ((x : Fin (N + 1)) × HoleSpin N x) → ℝ, φ ≠ 0 ∧
+      (tasakiEffReMatrix N t).mulVec φ =
+        (hermitianMinEigenvalue (tasakiEffMatrix_isHermitian N (fun i j => (t i j : ℂ))
+          (U : ℂ) (tasakiEffMatrix_hJ_of_real htsym) (by rw [Complex.star_def,
+            Complex.conj_ofReal]))) • φ := by
+  classical
+  set hM := tasakiEffMatrix_isHermitian N (fun i j => (t i j : ℂ)) (U : ℂ)
+    (tasakiEffMatrix_hJ_of_real htsym)
+    (by rw [Complex.star_def, Complex.conj_ofReal]) with hMdef
+  obtain ⟨v, hv_ne, hv_eig⟩ := exists_nonzero_eigenvector_hermitianMinEigenvalue hM
+  have hv_map : (tasakiEffReMatrix N t).map (Complex.ofReal) *ᵥ v =
+      ((hermitianMinEigenvalue hM : ℝ) : ℂ) • v := by
+    rw [← tasakiEffMatrix_eq_map_tasakiEffReMatrix N t U htdiag]; exact hv_eig
+  by_cases hre : (fun i => (v i).re) = 0
+  · refine ⟨fun i => (v i).im, ?_, matrix_eigenvec_im_of_complex hv_map⟩
+    intro him
+    apply hv_ne
+    funext i
+    have hr := congrFun hre i
+    have hi := congrFun him i
+    simp only [Pi.zero_apply] at hr hi ⊢
+    exact Complex.ext hr hi
+  · exact ⟨fun i => (v i).re, hre, matrix_eigenvec_re_of_complex hv_map⟩
 
 end LatticeSystem.Fermion
