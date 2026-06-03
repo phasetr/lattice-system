@@ -259,7 +259,7 @@ theorem fermionTotalSpinSquared_commute_fermionTotalSpinMinus (N : ℕ) :
     have h := fermionTotalSpinZ_commutator_fermionTotalSpinMinus N
     rw [sub_eq_iff_eq_add] at h
     rw [h]; abel
-  show fermionTotalSpinSquared N * fermionTotalSpinMinus N =
+  change fermionTotalSpinSquared N * fermionTotalSpinMinus N =
       fermionTotalSpinMinus N * fermionTotalSpinSquared N
   unfold fermionTotalSpinSquared
   set P := fermionTotalSpinPlus N
@@ -500,3 +500,5 @@ theorem spinMinusPow_ferroHole_linearIndependent (N : ℕ) (x : Fin (N + 1)) :
   have h2 := congrFun h (ferroHoleConfig N x)
   rw [Pi.zero_apply, basisVec_self] at h2
   exact one_ne_zero h2
+
+end LatticeSystem.Fermion
