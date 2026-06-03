@@ -5501,21 +5501,44 @@ makes every \(v_k\) an \(\hat H_{\rm eff}\)-eigenvector at the \emph{same} energ
 \(E\). Thus a single ferromagnetic ground state generates
 \(N+1 = 2S_{\max} + 1\) linearly independent degenerate ground states, all with
 \(S_{\rm tot} = S_{\max} = N/2\) — the weak Nagaoka conclusion (eq.~(11.2.9)).
-What remains for the full theorem is the existence of such a ground state \(v\),
-namely the Perron--Frobenius ferromagnetic ground state of the one-hole hopping
-problem in the all-up sector.
+
+\medskip
+\noindent\textbf{Existence of the ground state (the all-up block).}
+To produce such a highest-weight eigenvector we represent \(\hat H_{\rm eff}\) on
+the orthonormal one-hole Tasaki basis by the finite Hermitian matrix
+\(M = T^\dagger \hat H_{\rm eff} T\) (columns of \(T\) are the basis states
+\(|\Phi_p\rangle\)). The \emph{operator lift}
+\(\hat H_{\rm eff}|\Phi_p\rangle = \sum_q \langle\Phi_q|\hat H_{\rm eff}|\Phi_p\rangle\,
+|\Phi_q\rangle\) holds because \(\hat H_{\rm eff}|\Phi_p\rangle\) is hard-core
+(\(P_{\rm hc}\)) and an \(N\)-electron eigenstate (\([\hat H_{\rm eff},\hat N]=0\)),
+hence supported on one-hole hard-core configurations where the Tasaki basis is
+complete. Consequently \(M\)-eigenvectors lift to \(\hat H_{\rm eff}\)-eigenvectors.
+Since hopping the all-up hole keeps the configuration all-up, \(M\) leaves the
+all-up block \(M_\uparrow\) invariant; a minimum eigenvector \(\xi\) of the
+Hermitian \(M_\uparrow\) gives the all-up state
+\(|\Phi_\uparrow\rangle = \sum_x \xi_x |\Phi_{x,\uparrow}\rangle\), which is a
+nonzero highest-weight \(\hat H_{\rm eff}\)-eigenvector at the all-up sector
+minimum. Feeding it to the spin-multiplet argument above yields
+\(N+1 = 2S_{\max}+1\) linearly independent degenerate eigenstates with
+\(S_{\rm tot} = S_{\max}\) — \textbf{Tasaki Theorem 11.5}. (No Perron--Frobenius is
+used; that this all-up minimum is the global ground energy is the Schwarz bound
+(11.2.9), and PF uniqueness belongs to Theorem 11.7.) A general Rayleigh--Ritz
+equality lemma — a nonzero vector attaining the minimum-eigenvalue Rayleigh bound
+is a minimum eigenvector — is provided as
+\texttt{mulVec\_eq\_smul\_of\_rayleighOnVec\_eq\_min}.
 
 \medskip
 \noindent The Lean development
-(file \texttt{Fermion/JordanWigner/Hubbard/WeakNagaokaTheorem.lean}):
+(files \texttt{Fermion/JordanWigner/Hubbard/WeakNagaokaTheorem.lean},
+\texttt{Fermion/JordanWigner/Hubbard/WeakNagaokaGroundState.lean}):
 \texttt{fermionTotalSpinPlus\_commutator\_fermionTotalSpinMinus},
 \texttt{fermionTotalSpinSquared\_commute\_fermionTotalSpinMinus},
 \texttt{fermionTotalSpinPlus\_mul\_fermionTotalSpinMinus},
-\texttt{fermionTotalSpinZ\_mulVec\_spinMinusPow},
-\texttt{fermionTotalSpinSquared\_mulVec\_spinMinusPow},
 \texttt{spinMinusPow\_ne\_zero}, \texttt{spinMinusPow\_linearIndependent},
-\texttt{hubbardEffectiveHamiltonian\_mulVec\_spinMinusPow}, and the capstone
-\texttt{weakNagaoka\_spinMultiplet}.
+the capstone \texttt{weakNagaoka\_spinMultiplet}; and for the ground state
+\texttt{tasakiEffMatrix}, \texttt{tasakiEffMatrixUp}, the operator lift
+\texttt{hubbardEffectiveHamiltonian\_mulVec\_tasakiState}, \texttt{tasaki\_completeness},
+and the final theorem \texttt{weakNagaoka\_theorem\_11\_5}.
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
