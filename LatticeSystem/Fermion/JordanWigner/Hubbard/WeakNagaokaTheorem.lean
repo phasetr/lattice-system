@@ -139,4 +139,30 @@ theorem hubbardEffectiveHamiltonian_mulVec_spinMinus
     ← (fermionTotalSpinMinus_commute_hubbardEffectiveHamiltonian N t U hJ hU).eq,
     ← Matrix.mulVec_mulVec, hv, Matrix.mulVec_smul]
 
-end LatticeSystem.Fermion
+/-- `Ŝ^z_tot` acts on the `k`-fold lowered ferromagnetic hole state with
+eigenvalue `N/2 − k`: the spin-lowering tower has distinct `Ŝ^z` eigenvalues
+(the basis for its linear independence). -/
+theorem fermionTotalSpinZ_mulVec_spinMinusPow_ferroHole (N : ℕ) (x : Fin (N + 1))
+    (k : ℕ) :
+    (fermionTotalSpinZ N).mulVec
+        (((fermionTotalSpinMinus N) ^ k).mulVec (basisVec (ferroHoleConfig N x))) =
+      ((N : ℂ) / 2 - k) •
+        (((fermionTotalSpinMinus N) ^ k).mulVec (basisVec (ferroHoleConfig N x))) := by
+  have hcomm : fermionTotalSpinZ N * fermionTotalSpinMinus N =
+      fermionTotalSpinMinus N * fermionTotalSpinZ N - fermionTotalSpinMinus N := by
+    have h := fermionTotalSpinZ_commutator_fermionTotalSpinMinus N
+    rw [sub_eq_iff_eq_add] at h
+    rw [h]; abel
+  induction k with
+  | zero =>
+    simp only [pow_zero, Matrix.one_mulVec, Nat.cast_zero, sub_zero,
+      fermionTotalSpinZ_mulVec_ferroHole]
+  | succ k ih =>
+    have hexp : ((fermionTotalSpinMinus N) ^ (k + 1)).mulVec
+          (basisVec (ferroHoleConfig N x)) =
+        (fermionTotalSpinMinus N).mulVec
+          (((fermionTotalSpinMinus N) ^ k).mulVec (basisVec (ferroHoleConfig N x))) := by
+      rw [pow_succ', Matrix.mulVec_mulVec]
+    rw [hexp, Matrix.mulVec_mulVec, hcomm, Matrix.sub_mulVec, ← Matrix.mulVec_mulVec, ih,
+      Matrix.mulVec_smul, Nat.cast_succ]
+    module
