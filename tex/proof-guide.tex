@@ -5326,6 +5326,62 @@ coefficient \(t_{ii} = 0\). Hence \(\langle \Phi_{x,\tau} | \hat H_{\rm eff}
 | \Phi_{x,\sigma}\rangle = 0\).
 
 %======================================================================
+\subsection{Cauchy--Schwarz energy bound (Tasaki §11.2, eq.~(11.2.9))}
+\label{subsec:hubbard-weak-nagaoka}
+%======================================================================
+
+\noindent\textbf{Statement (11.2.9).}
+For non-negative hopping (\(t_{x,y} \geq 0\)) and no self-hopping
+(\(t_{i,i}=0\)), the effective-Hamiltonian energy of any real Tasaki-basis
+expansion \(|\Phi\rangle = \sum_{x,\sigma}\phi(x,\sigma)|\Phi_{x,\sigma}\rangle\)
+is bounded below by that of the ferromagnetic state
+\[
+  |\Phi_\uparrow\rangle = \sum_x \xi_x\, |\Phi_{x,(\uparrow)}\rangle,
+  \qquad \xi_x = \Big(\sum_\sigma \phi(x,\sigma)^2\Big)^{1/2},
+\]
+namely \(\langle \Phi_\uparrow | \hat H_{\rm eff} | \Phi_\uparrow\rangle
+\leq \langle \Phi | \hat H_{\rm eff} | \Phi\rangle\). Hence the ferromagnetic
+state is also a ground state.
+
+\medskip
+\noindent\textbf{Proof.}
+Expanding the energy bilinearly and substituting the matrix element (11.2.5)
+(diagonal terms vanish by no self-hopping) gives the quadratic form
+\[
+  \langle \Phi | \hat H_{\rm eff} | \Phi\rangle
+    = -\sum_{x \neq y} t_{y,x} \sum_\sigma \phi(x,\sigma)\,
+      \phi(y,\sigma_{x\to y}),
+\]
+where the inner indicator sum collapses because, among the canonical hole-spin
+configurations \(\tau\) at \(y\), exactly the hole-move image \(\sigma_{x\to y}\)
+matches the moved configuration (\texttt{oneHoleConfig\_move\_eq\_iff}). The
+spin configurations on \(\Lambda\setminus\{x\}\) are encoded as the subtype
+\texttt{HoleSpin}, on which \(\sigma\mapsto\sigma_{x\to y}\) is the bijection
+\texttt{holeSpinMoveEquiv}; this reindexing yields
+\(\sum_\sigma \phi(y,\sigma_{x\to y})^2 = \xi_y^2\). Cauchy--Schwarz
+(\texttt{Finset.sum\_mul\_sq\_le\_sq\_mul\_sq}) then gives
+\(\sum_\sigma \phi(x,\sigma)\phi(y,\sigma_{x\to y}) \leq \xi_x \xi_y\), and since
+\(t_{y,x}\geq 0\) each off-diagonal term of \(|\Phi\rangle\) dominates the
+corresponding term of \(|\Phi_\uparrow\rangle\) (whose quadratic form is
+\(-\sum_{x\neq y} t_{y,x}\xi_x\xi_y\)).
+
+\medskip
+\noindent\textbf{Lean declarations}
+(file \texttt{Fermion/JordanWigner/Hubbard/WeakNagaoka.lean}):
+\begin{itemize}
+  \item \texttt{HoleSpin}, \texttt{holeSpinMoveEquiv}: canonical hole-spin
+    configurations and the hole-move bijection.
+  \item \texttt{hubbardEffEnergy\_tasaki\_quadratic}: the quadratic-form
+    expansion of the energy.
+  \item \texttt{oneHoleConfig\_move\_eq\_iff}: the hole-move configuration
+    bridge.
+  \item \texttt{tasakiQuadForm\_ferro\_le}: the Cauchy--Schwarz bound on the
+    real quadratic form.
+  \item \texttt{hubbardWeakNagaoka\_energy\_bound}: the (11.2.9) energy
+    inequality.
+\end{itemize}
+
+%======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
 %======================================================================

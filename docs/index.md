@@ -2724,6 +2724,17 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardEffective_tasaki_matrixElement` | eq. (11.2.5), off-diagonal (`x ≠ y`): `⟨Φ_{y,τ} \| Ĥ_eff \| Φ_{x,σ}⟩ = -t_{x,y}` if `τ = σ_{y→x}` (configurations coincide), else `0`. Only the hole-filling channel `(x, y, σ_y)` survives the hard-core projection | `Fermion/JordanWigner/Hubbard/EffectiveHamiltonianMatrix.lean` |
 | `hubbardEffective_tasaki_matrixElement_diag` | eq. (11.2.5), diagonal (`x = y`) under no self-hopping (`∀ i, t_{ii} = 0`): `⟨Φ_{x,τ} \| Ĥ_eff \| Φ_{x,σ}⟩ = 0` — `Ĥ_eff` moves the hole off `x`, so its image is orthogonal to `\|Φ_{x,τ}⟩` | `Fermion/JordanWigner/Hubbard/EffectiveHamiltonianMatrix.lean` |
 
+#### Cauchy–Schwarz energy bound (Tasaki §11.2, eq. (11.2.9))
+
+| Lean name | Statement | File |
+|---|---|---|
+| `HoleSpin N x` / `holeSpinMoveEquiv` | canonical hole-spin configurations (hole-site spin fixed `↑`); the hole-move bijection `HoleSpin N x ≃ HoleSpin N y` | `Fermion/JordanWigner/Hubbard/WeakNagaoka.lean` |
+| `hubbardEffEnergy` / `hubbardEffEnergy_expand` | the real-bilinear effective-Hamiltonian energy; its quadratic-form expansion in the Tasaki basis | `Fermion/JordanWigner/Hubbard/WeakNagaoka.lean` |
+| `oneHoleConfig_move_eq_iff` | the hole-move bridge: the moved configuration matches `C_{x,σ}` iff `τ` is the hole-move image | `Fermion/JordanWigner/Hubbard/WeakNagaoka.lean` |
+| `hubbardEffEnergy_tasaki_quadratic` | eq. (11.2.9) line 2: `⟨Φ\|Ĥ_eff\|Φ⟩ = -Σ_{x≠y} t_{y,x} Σ_σ c_{x,σ} c_{y, σ_{x→y}}` (no self-hopping) | `Fermion/JordanWigner/Hubbard/WeakNagaoka.lean` |
+| `tasakiQuadForm_ferro_le` | the Cauchy–Schwarz bound on the real quadratic form: `Q(Φ_↑) ≤ Q(Φ)` for `t ≥ 0` | `Fermion/JordanWigner/Hubbard/WeakNagaoka.lean` |
+| `hubbardWeakNagaoka_energy_bound` | eq. (11.2.9): `⟨Φ_↑\|Ĥ_eff\|Φ_↑⟩ ≤ ⟨Φ\|Ĥ_eff\|Φ⟩` (`t ≥ 0`, `t_{ii}=0`) — the ferromagnetic state is also a ground state | `Fermion/JordanWigner/Hubbard/WeakNagaoka.lean` |
+
 | `hubbardKineticOnGraph N G J` | spinful Hubbard kinetic operator from a `SimpleGraph G` and edge weight `J` | `Fermion/JordanWigner.lean` |
 | `hubbardKineticOnGraph_commute_fermionTotalNumber` / `hubbardKineticOnGraph_isHermitian` | charge conservation always; Hermiticity for real `J` | `Fermion/JordanWigner.lean` |
 | `hubbardHamiltonianOnGraph N G J U` | full Hubbard Hamiltonian from a graph + on-site coupling | `Fermion/JordanWigner.lean` |
