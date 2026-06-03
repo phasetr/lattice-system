@@ -512,4 +512,40 @@ theorem hermitianMinEigenvalue_tasakiEffMatrix_le_sector (N : ℕ)
     exact absurd h0 (ne_of_gt (hv_pos _))
   exact hermitian_min_eigenvalue_le_of_eigenvector_exists _ hw_ne hcx
 
+/-- **Each sector contributes at most one ground state at the global minimum.**
+At any energy `E ≤ min M_m`, the (complex) sector eigenspace is at most
+one-dimensional: if `E < min M_m` it is `⊥` (energy below the spectrum); if
+`E = min M_m = −μ` it is the Perron ground eigenspace (`finrank ≤ 1`, real PF
+bridged to `ℂ`).  Applied at the global minimum `E = min M` (which is `≤` every
+sector minimum), this caps every sector's contribution to the `Ĥ_eff` ground
+eigenspace at `1`. -/
+theorem sector_map_eigenspace_finrank_le_one_at (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ)
+    [Nonempty (HoleMagSector N m)]
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0)
+    (hpos : ∀ i j, 0 ≤ t i j)
+    (hconn : (nagaokaPFMatrixOnSector N t m).IsIrreducible) (E : ℝ)
+    (hE : E ≤ LatticeSystem.Quantum.hermitianMinEigenvalue
+      (isHermitian_map_ofReal_of_isSymm
+        (tasakiEffReMatrixOnSector_isSymm N t m htsym htdiag))) :
+    finrank ℂ (End.eigenspace
+      (Matrix.toLin' ((tasakiEffReMatrixOnSector N t m).map (algebraMap ℝ ℂ)))
+      (E : ℂ)) ≤ 1 := by
+  rcases lt_or_eq_of_le hE with hlt | heq
+  · rw [hermitian_eigenspace_eq_bot_of_real_lt_min
+      (isHermitian_map_ofReal_of_isSymm (tasakiEffReMatrixOnSector_isSymm N t m htsym htdiag))
+      hlt]
+    simp
+  · obtain ⟨μ, v, hAv, hv_pos, hmineq⟩ :=
+      hermitianMinEigenvalue_sector_eq_neg_pf N t m htsym htdiag hpos hconn
+    have hfin_neg : finrank ℝ (End.eigenspace
+        (Matrix.toLin' (tasakiEffReMatrixOnSector N t m)) (-μ)) ≤ 1 := by
+      rw [eigenspace_tasakiEffReMatrixOnSector_eq_neg]
+      exact eigenspace_finrank_le_one_of_pos_eigenvec hconn hAv hv_pos
+    have hcx := matrix_complex_eigenspace_finrank_le_one_of_real
+      (tasakiEffReMatrixOnSector N t m) (-μ) hfin_neg
+    have hEμ : E = -μ := by rw [heq, hmineq]
+    rw [hEμ]
+    exact hcx
+
 end LatticeSystem.Fermion
