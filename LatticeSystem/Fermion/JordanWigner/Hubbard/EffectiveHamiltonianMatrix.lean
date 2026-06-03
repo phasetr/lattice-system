@@ -68,17 +68,6 @@ private theorem hardcore_proj_apply (N : ℕ) (y : Fin (N + 1)) (τ : Fin (N + 1
 
 /-! ## Auxiliary facts about one-hole configurations -/
 
-/-- Joint injectivity of `spinfulIndex`. -/
-private theorem spinful_eq_iff' (N : ℕ) (a b : Fin (N + 1)) (r s : Fin 2) :
-    spinfulIndex N a r = spinfulIndex N b s ↔ a = b ∧ r = s := by
-  constructor
-  · intro h
-    have hv : 2 * a.val + r.val = 2 * b.val + s.val := by
-      have := congrArg Fin.val h; simpa [spinfulIndex] using this
-    have := r.isLt; have := s.isLt
-    exact ⟨Fin.ext (by omega), Fin.ext (by omega)⟩
-  · rintro ⟨rfl, rfl⟩; rfl
-
 /-- A `Fin 2` value is `0` or `1`. -/
 private theorem fin_two_cases (r : Fin 2) : r = 0 ∨ r = 1 := by
   rcases r with ⟨rv, hrv⟩; interval_cases rv
@@ -129,7 +118,7 @@ private theorem hop_config_forces (N : ℕ) (x y i j : Fin (N + 1))
     · rw [if_pos h1] at e1; exact absurd e1 one_ne_zero
     · rw [if_neg h1] at e1
       by_cases h2 : spinfulIndex N y (if σ y then 0 else 1) = spinfulIndex N j s
-      · obtain ⟨hyj, hsy⟩ := (spinful_eq_iff' N y j _ s).mp h2
+      · obtain ⟨hyj, hsy⟩ := (spinfulIndex_eq_iff N y j _ s).mp h2
         exact ⟨hyj.symm, hsy.symm⟩
       · rw [if_neg h2] at e1; exact absurd e1 one_ne_zero
   obtain ⟨hjy', hsy'⟩ := hjy
@@ -139,7 +128,7 @@ private theorem hop_config_forces (N : ℕ) (x y i j : Fin (N + 1))
   -- The annihilation orbital `(j, s) = (y, σ_y)` differs from `(x, τ_x)` (x ≠ y).
   have hxne : ¬ spinfulIndex N x (if τ x then 0 else 1) = spinfulIndex N j s := by
     rw [hjy', hsy']
-    intro h; exact hxy ((spinful_eq_iff' N x y _ _).mp h).1
+    intro h; exact hxy ((spinfulIndex_eq_iff N x y _ _).mp h).1
   rw [if_neg hxne,
     show hubbardOneHoleConfig N x σ (spinfulIndex N x (if τ x then 0 else 1)) = 0 from
       by rcases fin_two_cases (if τ x then (0 : Fin 2) else 1) with h | h <;>
@@ -147,7 +136,7 @@ private theorem hop_config_forces (N : ℕ) (x y i j : Fin (N + 1))
           rw [hubbardOneHoleConfig_apply_down, if_pos rfl]],
     oneHole_occupied N y τ x hxy] at e2
   by_cases h3 : spinfulIndex N x (if τ x then 0 else 1) = spinfulIndex N i s
-  · obtain ⟨hxi, _⟩ := (spinful_eq_iff' N x i _ s).mp h3
+  · obtain ⟨hxi, _⟩ := (spinfulIndex_eq_iff N x i _ s).mp h3
     exact ⟨hxi.symm, hjy', hsy'⟩
   · rw [if_neg h3] at e2; exact absurd e2.symm one_ne_zero
 
