@@ -5556,6 +5556,82 @@ the capstone \texttt{weakNagaoka\_spinMultiplet}; and for the ground state
 and the final theorem \texttt{weakNagaoka\_theorem\_11\_5}.
 
 %======================================================================
+\subsection{Nagaoka's theorem and the connectivity condition
+  (Tasaki §11.2.2, Definition 11.6 and Theorem 11.7)}
+\label{subsec:nagaoka-theorem-11-7}
+%======================================================================
+
+\noindent This formalizes Tasaki, \emph{Physics and Mathematics of Quantum
+Many-Body Systems}, 1st edition, §11.2.2, Definition 11.6 and Theorem 11.7,
+pp.~385--388 (file
+\texttt{Fermion/JordanWigner/Hubbard/NagaokaConnectivity.lean}).
+
+\medskip
+\noindent\textbf{Magnetization sectors.}
+The one-hole Tasaki basis index \(I = \bigsqcup_x \{\sigma : \sigma_x = \uparrow\}\)
+is graded by the (doubled) total \(S_z^{(3)} = \sum_{y \ne x}\sigma_y\), read off
+the occupation configuration as \texttt{configMag}/\texttt{holeSpinMag}. Hole
+hopping (11.2.4) preserves this grading, so the Tasaki matrix \(M\) (the
+(11.2.5) matrix of \(\hat H_{\rm eff}\)) is \textbf{block-diagonal} across
+magnetization sectors: \(M_{q,p} = 0\) when \(q,p\) have different magnetization
+(\texttt{tasakiEffReMatrix\_eq\_zero\_of\_holeSpinMag\_ne}). There are exactly
+\(N+1\) non-empty sectors, since \(\text{mag} = 2(\#\!\uparrow) - N\) with
+\(\#\!\uparrow \in \{0,\dots,N\}\) (\texttt{holeSpinMag\_image\_card\_le}).
+
+\medskip
+\noindent\textbf{Definition 11.6 (connectivity condition).}
+\texttt{nagaokaConnectivity} \(:= \forall m,\ (-M_m)\) is irreducible (in the
+Perron--Frobenius sense), where \(M_m\) is \(M\) restricted to the fixed-\(m\)
+sector. Since \(M_{q,p} = -t_{x,y}\cdot[\text{indicator}] \le 0\) off the
+diagonal (for \(t \ge 0\)) and \(M\) vanishes on the diagonal, \(-M_m\) is
+entrywise non-negative (condition (i) of Perron--Frobenius), and irreducibility
+is condition (ii).
+
+\medskip
+\noindent\textbf{Theorem 11.7 (Nagaoka).}
+For \(t \ge 0\), \(N = |\Lambda|-1\), \(U = \infty\) and the connectivity
+condition, the one-hole \(\hat H_{\rm eff}\) ground eigenspace has dimension
+exactly \(N+1 = 2S_{\max}+1\) and every ground state has \(S_{\rm tot} = S_{\max}\).
+The proof matches the book's: apply Perron--Frobenius to \(-M_m\) on each fixed
+\(S_z^{(3)}\) sector to get a \emph{non-degenerate} sector ground state, then
+combine with Theorem 11.5.
+
+\emph{Upper bound} \((\le N+1)\): on a non-empty connected sector,
+\texttt{exists\_pos\_eigenvec\_max} gives a strictly positive Perron eigenvector
+of \(-M_m\) and \texttt{eigenspace\_finrank\_le\_one\_of\_pos\_eigenvec} a
+one-dimensional eigenspace; Collatz--Wielandt
+(\texttt{hermitianMinEigenvalue\_lift\_eq\_sub\_pf}, shift \(c=0\)) identifies the
+sector minimum as \(-\mu\), and the global minimum is \(\le\) every sector minimum
+(a zero-extended sector eigenvector is a genuine full eigenvector). So at the
+global minimum each sector contributes \(\le 1\); restricting a ground vector to
+its sectors embeds the ground eigenspace into the product over the \(\le N+1\)
+sectors (\texttt{tasakiEffMatrix\_ground\_finrank\_le\_N\_add\_one}).
+
+\emph{Lower bound} \((\ge N+1)\): the SU(2) ferromagnetic tower
+\((\hat S^-_{\rm tot})^k|\Phi_\uparrow\rangle\) (\(k = 0,\dots,N\)) of Theorem 11.5
+consists of \(N+1\) linearly independent ground states. \(\hat S^-_{\rm tot}\)
+conserves the particle number and preserves the hard-core subspace, so the tower
+stays one-hole supported (\texttt{spinMinusPow\_pfFerroState\_oneHole\_supported});
+its Tasaki coefficients are then \(N+1\) linearly independent \(M\)-eigenvectors
+(\texttt{tasakiEffMatrix\_ground\_finrank\_ge}).
+
+Combining gives \texttt{nagaoka\_theorem\_11\_7\_degeneracy} (degeneracy
+\(= N+1\)) and, since the tower spans the ground eigenspace, every ground state
+is a tower combination, hence a \((\hat S_{\rm tot})^2\)-eigenstate at
+\(S_{\max}(S_{\max}+1)\) (\texttt{nagaoka\_theorem\_11\_7}). The backward bridge
+\texttt{tasakiCoeff\_mulVec\_eigen\_of\_full} (a one-hole-supported full
+eigenvector at \(E\) yields a coefficient \(M\)-eigenvector at \(E\)) is the
+technical crux. The development is sorry-free.
+
+\medskip
+\noindent\emph{Definition 11.6 is here taken as per-sector irreducibility of
+\(-M\); the book's equivalent ``connected through non-vanishing matrix elements
+of \(\hat H_{\rm eff}\)'' is the same Perron--Frobenius notion. The necessary and
+sufficient combinatorial criterion (Theorem 11.8, biconnected and not a simple
+loop \(> 4\) sites) and the exchange-bond sufficient condition (Lemma 11.9)
+follow in the book; their formalization is planned next.}
+
+%======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
 %======================================================================
