@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheorem
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreSpan
 
 /-!
 # Tasaki Theorem 11.5: existence of the ferromagnetic ground state
@@ -284,5 +285,60 @@ theorem hardcore_mulVec_apply_eq_zero_of_double (N : ℕ)
   have hw := congrFun hD w
   rw [hubbardDoubleOccupancy_mulVec_apply, h0, h1] at hw
   simpa using hw
+
+/-! ## Counting: no double occupancy + `N` electrons ⟹ one-hole hard-core -/
+
+/-- A hard-core configuration with exactly `N` electrons is one-hole hard-core:
+no double occupancy plus `N` electrons on `N + 1` sites forces a unique empty
+site (the hole). -/
+theorem isOneHoleHardcore_of_noDouble_count (N : ℕ) (c : Fin (2 * N + 2) → Fin 2)
+    (hnd : ∀ i : Fin (N + 1),
+      c (spinfulIndex N i 0) = 0 ∨ c (spinfulIndex N i 1) = 0)
+    (hcount : (∑ j : Fin (2 * N + 2), (c j).val) = N) :
+    IsOneHoleHardcoreConfig N c := by
+  classical
+  -- per-site occupation g i ∈ {0,1}; g i = 0 ⟺ site i is empty (the hole)
+  set g : Fin (N + 1) → ℕ :=
+    fun i => (c (spinfulIndex N i 0)).val + (c (spinfulIndex N i 1)).val with hg
+  have hg_le : ∀ i, g i ≤ 1 := by
+    intro i
+    rcases hnd i with h | h
+    · rw [hg]; simp only [h]; have := (c (spinfulIndex N i 1)).isLt; omega
+    · rw [hg]; simp only [h]; have := (c (spinfulIndex N i 0)).isLt; omega
+  have hre : (∑ j : Fin (2 * N + 2), (c j).val) = ∑ i : Fin (N + 1), g i :=
+    (sum_spinful_reindex N (fun j => (c j).val)).trans
+      (Finset.sum_congr rfl (fun i _ => by simp only [hg, Fin.sum_univ_two]))
+  have hsum : (∑ i : Fin (N + 1), g i) = N := hre.symm.trans hcount
+  -- the empty sites are exactly {i | g i = 0}; there is exactly one
+  have hcard : (Finset.univ.filter (fun i => g i = 0)).card = 1 := by
+    have hones : (Finset.univ.filter (fun i => g i = 1)).card = N := by
+      rw [Finset.card_filter,
+        show (∑ i : Fin (N + 1), if g i = 1 then 1 else 0) = ∑ i : Fin (N + 1), g i from
+          Finset.sum_congr rfl (fun i _ => by
+            have := hg_le i; interval_cases h : g i <;> simp)]
+      exact hsum
+    have hsplit := Finset.card_filter_add_card_filter_not
+      (s := (Finset.univ : Finset (Fin (N + 1)))) (p := fun i => g i = 0)
+    have hneg : (Finset.univ.filter (fun i => ¬ g i = 0)) =
+        (Finset.univ.filter (fun i => g i = 1)) :=
+      Finset.filter_congr (fun i _ => by have := hg_le i; omega)
+    rw [hneg, hones, Finset.card_univ, Fintype.card_fin] at hsplit
+    omega
+  obtain ⟨h, hh⟩ := Finset.card_eq_one.mp hcard
+  refine ⟨hnd, h, ?_, ?_⟩
+  · have hmem : h ∈ Finset.univ.filter (fun i => g i = 0) := by
+      rw [hh]; exact Finset.mem_singleton_self h
+    rw [Finset.mem_filter] at hmem
+    have hgh : g h = 0 := hmem.2
+    simp only [hg] at hgh
+    have e0 : (c (spinfulIndex N h 0)).val = 0 := by omega
+    have e1 : (c (spinfulIndex N h 1)).val = 0 := by omega
+    exact ⟨Fin.ext e0, Fin.ext e1⟩
+  · intro y hy
+    have hy0 : g y = 0 := by simp only [hg, hy.1, hy.2]; rfl
+    have hmem : y ∈ Finset.univ.filter (fun i => g i = 0) := by
+      rw [Finset.mem_filter]; exact ⟨Finset.mem_univ y, hy0⟩
+    rw [hh, Finset.mem_singleton] at hmem
+    exact hmem
 
 end LatticeSystem.Fermion
