@@ -5697,6 +5697,20 @@ internal site, via the cyclic incidence equivalence $p\in\{u,u{+}1\}
 \texttt{linearIndependent\_sum} then gives the combined independence, and the
 basis follows from $|E|+|I| = |\Lambda| = \dim$. The development is sorry-free.
 
+\medskip
+\noindent\textbf{The anticommutator $\{\hat b_{u,\sigma}, \hat a^\dagger_{p,\tau}\}
+= 0$ (eq.~(11.3.7)).}
+The $\hat b$ and $\hat a^\dagger$ operators anticommute
+(\texttt{flatBandBAnnihilation\_ACreation\_anticomm}): expanding the
+anticommutator of the two linear combinations bilinearly and using the spinful
+canonical anticommutation relation $\{\hat c_{x,\sigma}, \hat c^\dagger_{y,\tau}\}
+= \delta_{x,y}\,\delta_{\sigma,\tau}$
+(\texttt{spinful\_annihilation\_creation\_anticomm}, from
+\texttt{spinfulIndex} injectivity and the single-species CAR) reduces it, for
+$\sigma=\tau$, to the cross-orthogonality
+$\langle\alpha_p,\beta_u\rangle = 0$, and for $\sigma\ne\tau$ every term vanishes.
+This is the algebraic input to the frustration-free analysis of Theorem 11.11.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
