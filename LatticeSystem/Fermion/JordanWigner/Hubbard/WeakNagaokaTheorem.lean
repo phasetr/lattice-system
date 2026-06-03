@@ -227,3 +227,51 @@ theorem fermionTotalSpinPlus_commutator_fermionTotalSpinMinus (N : ℕ) :
   simp only [fermionTotalSpinZ, smul_smul]
   rw [show (2 : ℂ) * (1 / 2) = 1 by norm_num, one_smul]
   rfl
+
+/-! ## The Casimir operator commutes with the lowering operator -/
+
+/-- **`[(Ŝ_tot)², Ŝ^-_tot] = 0`**: the total-spin Casimir commutes with the
+lowering operator, so the entire spin-lowering tower `(Ŝ^-_tot)^k |Φ⟩` stays in
+a single total-spin sector. Derived from the SU(2) algebra
+`[Ŝ^+_tot, Ŝ^-_tot] = 2 Ŝ^z_tot` and `[Ŝ^z_tot, Ŝ^-_tot] = −Ŝ^-_tot`: both
+sides of `(Ŝ_tot)² Ŝ^-_tot = Ŝ^-_tot (Ŝ_tot)²` reduce to
+`Ŝ^- Ŝ^- Ŝ^+ + Ŝ^- Ŝ^z Ŝ^z + Ŝ^- Ŝ^z`. -/
+theorem fermionTotalSpinSquared_commute_fermionTotalSpinMinus (N : ℕ) :
+    Commute (fermionTotalSpinSquared N) (fermionTotalSpinMinus N) := by
+  have hPM : fermionTotalSpinPlus N * fermionTotalSpinMinus N =
+      fermionTotalSpinMinus N * fermionTotalSpinPlus N +
+        (2 : ℂ) • fermionTotalSpinZ N := by
+    have h := fermionTotalSpinPlus_commutator_fermionTotalSpinMinus N
+    rwa [sub_eq_iff_eq_add'] at h
+  have hZM : fermionTotalSpinZ N * fermionTotalSpinMinus N =
+      fermionTotalSpinMinus N * fermionTotalSpinZ N - fermionTotalSpinMinus N := by
+    have h := fermionTotalSpinZ_commutator_fermionTotalSpinMinus N
+    rw [sub_eq_iff_eq_add] at h
+    rw [h]; abel
+  show fermionTotalSpinSquared N * fermionTotalSpinMinus N =
+      fermionTotalSpinMinus N * fermionTotalSpinSquared N
+  unfold fermionTotalSpinSquared
+  set P := fermionTotalSpinPlus N
+  set M := fermionTotalSpinMinus N
+  set Z := fermionTotalSpinZ N
+  have e1 : M * P * M = M * M * P + (2 : ℂ) • (M * Z) := by
+    rw [Matrix.mul_assoc, hPM, mul_add, mul_smul_comm, ← Matrix.mul_assoc]
+  have e2 : Z * Z * M = M * Z * Z - (2 : ℂ) • (M * Z) + M := by
+    calc Z * Z * M
+        = Z * (Z * M) := Matrix.mul_assoc Z Z M
+      _ = Z * (M * Z - M) := by rw [hZM]
+      _ = Z * (M * Z) - Z * M := by rw [mul_sub]
+      _ = (Z * M) * Z - Z * M := by rw [← Matrix.mul_assoc]
+      _ = (M * Z - M) * Z - (M * Z - M) := by simp only [hZM]
+      _ = M * Z * Z - (2 : ℂ) • (M * Z) + M := by rw [sub_mul]; module
+  have hL : (M * P + Z * (Z + 1)) * M = M * M * P + M * Z * Z + M * Z := by
+    calc (M * P + Z * (Z + 1)) * M
+        = M * P * M + (Z * Z + Z) * M := by rw [add_mul, mul_add, mul_one]
+      _ = M * P * M + (Z * Z * M + Z * M) := by rw [add_mul]
+      _ = (M * M * P + (2 : ℂ) • (M * Z)) +
+            ((M * Z * Z - (2 : ℂ) • (M * Z) + M) + (M * Z - M)) := by
+            rw [e1, e2, hZM]
+      _ = M * M * P + M * Z * Z + M * Z := by module
+  have hR : M * (M * P + Z * (Z + 1)) = M * M * P + M * Z * Z + M * Z := by
+    noncomm_ring
+  rw [hL, hR]
