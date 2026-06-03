@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheorem
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreSpan
+import LatticeSystem.Quantum.SpinS.HermitianVariationalEquality
 
 /-!
 # Tasaki Theorem 11.5: existence of the ferromagnetic ground state
@@ -562,5 +563,19 @@ theorem hubbardEffectiveHamiltonian_mulVec_tasakiExpansion_of_eigen (N : ℕ)
       lam • (∑ p, c p • tasakiState N p) := by
   rw [hubbardEffectiveHamiltonian_mulVec_tasakiExpansion, hc, Finset.smul_sum]
   exact Finset.sum_congr rfl (fun q _ => by rw [Pi.smul_apply, smul_assoc])
+
+/-! ## Energy of a Tasaki expansion equals the matrix quadratic form -/
+
+/-- The effective-Hamiltonian energy of a Tasaki expansion is the quadratic form
+of the Tasaki matrix `M`: `⟨Σ c_q Φ_q | Ĥ_eff | Σ c_q Φ_q⟩ = c · (M c)`. -/
+theorem hubbardEffEnergy_tasakiExpansion (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (c : ((x : Fin (N + 1)) × HoleSpin N x) → ℂ) :
+    hubbardEffEnergy N t U (∑ p, c p • tasakiState N p) =
+      dotProduct c ((tasakiEffMatrix N t U).mulVec c) := by
+  rw [hubbardEffEnergy_expand]
+  rw [Finset.sum_congr rfl (fun p _ => Finset.sum_congr rfl (fun q _ => by
+    rw [← tasakiEffMatrix_apply]))]
+  simp only [dotProduct, Matrix.mulVec, Finset.mul_sum]
+  exact Finset.sum_congr rfl (fun p _ => Finset.sum_congr rfl (fun q _ => by ring))
 
 end LatticeSystem.Fermion
