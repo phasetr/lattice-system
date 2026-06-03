@@ -5528,6 +5528,21 @@ is a minimum eigenvector — is provided as
 \texttt{mulVec\_eq\_smul\_of\_rayleighOnVec\_eq\_min}.
 
 \medskip
+\noindent\textbf{The all-up minimum is the global minimum (Schwarz bound).}
+The multiplet above sits at the all-up sector minimum \(\min(M_\uparrow)\). For
+\(t \ge 0\) this equals the global one-hole minimum \(\min(M)\), so the multiplet
+consists of genuine ground states. Indeed \(\min(M) \le \min(M_\uparrow)\) is the
+principal-submatrix inequality (embed a unit all-up eigenvector); and
+\(\min(M_\uparrow) \le \min(M)\) is Tasaki's Schwarz bound (11.2.9): the Tasaki
+matrix is real (\(M = M_{\mathbb R}\,\)cast, since its entries are
+\(-t_{x,y}\) times an indicator), so a global minimum eigenvector can be taken
+real, and ferromagnetizing it (\texttt{ferroCoeff}, \(\sum\xi_x^2 = \sum\phi_p^2\))
+does not raise the energy (\texttt{tasakiQuadForm\_ferro\_le}). Hence
+\(\min(M_\uparrow) = \min(M)\), giving the global statement
+\texttt{weakNagaoka\_theorem\_11\_5\_global}
+(file \texttt{Fermion/JordanWigner/Hubbard/WeakNagaokaGlobalMin.lean}).
+
+\medskip
 \noindent The Lean development
 (files \texttt{Fermion/JordanWigner/Hubbard/WeakNagaokaTheorem.lean},
 \texttt{Fermion/JordanWigner/Hubbard/WeakNagaokaGroundState.lean}):
