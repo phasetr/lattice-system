@@ -30,7 +30,7 @@ Many-Body Systems*, 1st edition, §11.2.1, Theorem 11.5, pp. 382-385.
 
 namespace LatticeSystem.Fermion
 
-open Matrix
+open Matrix LatticeSystem.Quantum
 
 /-! ## The ferromagnetic state -/
 
@@ -132,5 +132,29 @@ theorem hubbardEffectiveHamiltonian_commute_fermionTotalNumber
   exact ((hubbardHardcoreProjection_commute_fermionTotalNumber N).mul_left
     (hubbardHamiltonian_commute_fermionTotalNumber N t U)).mul_left
     (hubbardHardcoreProjection_commute_fermionTotalNumber N)
+
+/-- The total electron number acts diagonally on a computational basis state with
+the total occupation as eigenvalue: `N̂ |c⟩ = (Σ_j c_j) |c⟩`. -/
+theorem fermionTotalNumber_mulVec_basisVec (N : ℕ) (c : Fin (2 * N + 2) → Fin 2) :
+    (fermionTotalNumber (2 * N + 1)).mulVec (basisVec c) =
+      (∑ j : Fin (2 * N + 2), ((c j).val : ℂ)) • basisVec c := by
+  unfold fermionTotalNumber
+  rw [Matrix.sum_mulVec,
+    Finset.sum_congr rfl (fun j _ => fermionMultiNumber_mulVec_basisVec (2 * N + 1) j c),
+    ← Finset.sum_smul]
+
+/-- **`Ĥ_eff` preserves `N̂`-eigenstates.** If `v` is an electron-number
+eigenstate at eigenvalue `k`, then so is `Ĥ_eff v` (since `[Ĥ_eff, N̂] = 0`). This
+keeps `Ĥ_eff |Φ_p⟩` in the fixed-electron-number sector. -/
+theorem hubbardEffectiveHamiltonian_mulVec_preserves_number
+    (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (v : (Fin (2 * N + 2) → Fin 2) → ℂ) (k : ℂ)
+    (hv : (fermionTotalNumber (2 * N + 1)).mulVec v = k • v) :
+    (fermionTotalNumber (2 * N + 1)).mulVec
+        ((hubbardEffectiveHamiltonian N t U).mulVec v) =
+      k • ((hubbardEffectiveHamiltonian N t U).mulVec v) := by
+  rw [Matrix.mulVec_mulVec,
+    ← (hubbardEffectiveHamiltonian_commute_fermionTotalNumber N t U).eq,
+    ← Matrix.mulVec_mulVec, hv, Matrix.mulVec_smul]
 
 end LatticeSystem.Fermion
