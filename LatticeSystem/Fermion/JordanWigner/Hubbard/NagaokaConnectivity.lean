@@ -926,4 +926,41 @@ theorem tasakiEffMatrix_ground_finrank_ge (N : ℕ)
   have := hWLI.fintype_card_le_finrank
   simpa using this
 
+/-- **Tasaki Theorem 11.7 (degeneracy).**  Under the connectivity condition
+(Definition 11.6) and `t ≥ 0`, the one-hole `Ĥ_eff` ground eigenspace (in the
+Tasaki-coefficient representation) has dimension exactly `N + 1 = 2 S_max + 1`:
+the ferromagnetic multiplet and nothing more.  Combines the Perron–Frobenius
+upper bound (`≤ N+1`) with the spin-multiplet lower bound (`≥ N+1`).
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
+(1st ed.), §11.2.2, Theorem 11.7. -/
+theorem nagaoka_theorem_11_7_degeneracy (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0)
+    (hpos : ∀ i j, 0 ≤ t i j) (hconn : nagaokaConnectivity N t) :
+    finrank ℂ (End.eigenspace (Matrix.toLin'
+      (tasakiEffMatrix N (fun i j => (t i j : ℂ)) 0))
+      (((hermitianMinEigenvalue (tasakiEffMatrixUp_isHermitian N
+        (fun i j => (t i j : ℂ)) 0 (tasakiEffMatrix_hJ_of_real htsym)
+        (by simp))) : ℝ) : ℂ)) = N + 1 := by
+  have hmateq : tasakiEffMatrix N (fun i j => (t i j : ℂ)) 0
+      = (tasakiEffReMatrix N t).map (algebraMap ℝ ℂ) :=
+    tasakiEffMatrix_eq_map_tasakiEffReMatrix N t 0 htdiag
+  have hE_eq : hermitianMinEigenvalue (isHermitian_map_ofReal_of_isSymm
+        (tasakiEffReMatrix_isSymm N t htsym htdiag))
+      = hermitianMinEigenvalue (tasakiEffMatrixUp_isHermitian N
+        (fun i j => (t i j : ℂ)) 0 (tasakiEffMatrix_hJ_of_real htsym) (by simp)) := by
+    have h1 : hermitianMinEigenvalue (isHermitian_map_ofReal_of_isSymm
+          (tasakiEffReMatrix_isSymm N t htsym htdiag))
+        = hermitianMinEigenvalue (tasakiEffMatrix_isHermitian N (fun i j => (t i j : ℂ)) 0
+          (tasakiEffMatrix_hJ_of_real htsym) (by simp)) := by
+      rw [← rayleighInfMatrix_eq_hermitianMinEigenvalue,
+        ← rayleighInfMatrix_eq_hermitianMinEigenvalue, hmateq]
+    rw [h1]
+    exact (hermitianMinEigenvalue_tasakiEffMatrixUp_eq N t 0 htsym htdiag hpos).symm
+  refine le_antisymm ?_ ?_
+  · rw [hmateq, ← hE_eq]
+    exact tasakiEffMatrix_ground_finrank_le_N_add_one N t htsym htdiag hpos hconn
+  · exact tasakiEffMatrix_ground_finrank_ge N t htsym htdiag
+
 end LatticeSystem.Fermion
