@@ -1,6 +1,9 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaGlobalMin
 import LatticeSystem.Math.PerronFrobenius
 import LatticeSystem.Math.PerronFrobeniusFinrank
+import LatticeSystem.Math.HermitianMinEqOfShiftPF
+import LatticeSystem.Quantum.SpinS.RealComplexEigenspaceBridge
+import LatticeSystem.Quantum.SpinS.HermitianMinLeOfEigenvector
 
 /-!
 # Magnetization sectors of the one-hole Tasaki basis (Tasaki §11.2.2)
@@ -31,7 +34,8 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 
 namespace LatticeSystem.Fermion
 
-open Matrix LatticeSystem.Quantum LatticeSystem.Math.PerronFrobenius Module
+open Matrix LatticeSystem.Quantum LatticeSystem.Math.PerronFrobenius
+  LatticeSystem.Math.CollatzWielandt Module
 
 /-- The (doubled) total `S_z^{(3)}` magnetization read off an occupation
 configuration `c : Fin (2N+2) → Fin 2` of the spinful chain: each site `i`
@@ -417,5 +421,58 @@ theorem tasakiEffReMatrix_mulVec_sectorEmbed_of_eigen (N : ℕ)
       · exact hzero p' hp'
     rw [hlhs]
     simp [sectorEmbed, dif_neg hq]
+
+/-- The real Tasaki matrix restricted to a sector is symmetric. -/
+theorem tasakiEffReMatrixOnSector_isSymm (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) :
+    (tasakiEffReMatrixOnSector N t m).IsSymm := by
+  unfold tasakiEffReMatrixOnSector
+  ext p q
+  simp only [Matrix.transpose_apply, Matrix.submatrix_apply]
+  rw [(tasakiEffReMatrix_isSymm N t htsym htdiag).apply]
+
+/-- **The sector minimum eigenvalue equals `−μ` (the negated Perron eigenvalue).**
+For a non-empty connected sector with `t ≥ 0`, the minimum eigenvalue of the
+(complex-cast) sector matrix `M_m` is `−μ`, where `μ` is the Perron eigenvalue of
+`−M_m`.  Combines Collatz–Wielandt's `hermitianMinEigenvalue = c − μ_PF` (with
+shift `c = 0`) with the per-sector Perron–Frobenius eigenvector. -/
+theorem hermitianMinEigenvalue_sector_eq_neg_pf (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ)
+    [Nonempty (HoleMagSector N m)]
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0)
+    (hpos : ∀ i j, 0 ≤ t i j)
+    (hconn : (nagaokaPFMatrixOnSector N t m).IsIrreducible) :
+    ∃ (μ : ℝ) (v : HoleMagSector N m → ℝ),
+      nagaokaPFMatrixOnSector N t m *ᵥ v = μ • v ∧ (∀ i, 0 < v i) ∧
+      LatticeSystem.Quantum.hermitianMinEigenvalue
+        (isHermitian_map_ofReal_of_isSymm
+          (tasakiEffReMatrixOnSector_isSymm N t m htsym htdiag)) = -μ := by
+  obtain ⟨μ, v, hAv, hv_pos, _⟩ :=
+    nagaokaPFMatrixOnSector_exists_pos_eigenvec N t m htsym htdiag hconn
+  refine ⟨μ, v, hAv, hv_pos, ?_⟩
+  have hsymM := tasakiEffReMatrixOnSector_isSymm N t m htsym htdiag
+  have hBeq : (0 : ℝ) • (1 : Matrix (HoleMagSector N m) (HoleMagSector N m) ℝ)
+      - tasakiEffReMatrixOnSector N t m = nagaokaPFMatrixOnSector N t m := by
+    rw [zero_smul, zero_sub]; rfl
+  have hBnn : ∀ i j,
+      0 ≤ ((0 : ℝ) • (1 : Matrix (HoleMagSector N m) (HoleMagSector N m) ℝ)
+        - tasakiEffReMatrixOnSector N t m) i j := by
+    intro i j
+    rw [hBeq]
+    change 0 ≤ (-tasakiEffReMatrixOnSector N t m) i j
+    rw [Matrix.neg_apply]
+    unfold tasakiEffReMatrixOnSector
+    rw [Matrix.submatrix_apply]
+    have hfull := neg_tasakiEffReMatrix_nonneg N t hpos i.val j.val
+    rwa [Matrix.neg_apply] at hfull
+  have hBsymm : ((0 : ℝ) • (1 : Matrix (HoleMagSector N m) (HoleMagSector N m) ℝ)
+      - tasakiEffReMatrixOnSector N t m).IsSymm := by
+    rw [hBeq]; exact nagaokaPFMatrixOnSector_isSymm N t m htsym htdiag
+  have h_eig : ((0 : ℝ) • (1 : Matrix (HoleMagSector N m) (HoleMagSector N m) ℝ)
+      - tasakiEffReMatrixOnSector N t m) *ᵥ v = μ • v := by
+    rw [hBeq]; exact hAv
+  have hmin := hermitianMinEigenvalue_lift_eq_sub_pf hsymM 0 hBnn hBsymm h_eig hv_pos
+  rwa [zero_sub] at hmin
 
 end LatticeSystem.Fermion
