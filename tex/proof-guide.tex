@@ -5267,6 +5267,51 @@ up-orbital `\(2x\)`.
 \end{itemize}
 
 %======================================================================
+\subsection{Effective-Hamiltonian matrix element (Tasaki §11.2, eq.~(11.2.5))}
+\label{subsec:hubbard-matrix-element}
+%======================================================================
+
+\noindent\textbf{Statement (11.2.5), off-diagonal.}
+For `\(x \neq y\)`,
+\[
+  \langle \Phi_{y,\tau} |\, \hat H_{\rm eff}\, | \Phi_{x,\sigma} \rangle
+    = \begin{cases} -t_{x,y} & \text{if } \tau = \sigma_{y\to x},\\ 0 & \text{otherwise.}\end{cases}
+\]
+
+\medskip
+\noindent\textbf{Proof.}
+Since `\(|\Phi_{x,\sigma}\rangle\)` is hard-core, `\(\hat H_{\rm eff}\)` reduces
+to the projected kinetic operator `\(\hat P_{\rm hc} H_{\rm hop}\)`. The hard-core
+projection `\(\hat P_{\rm hc}\)` is diagonal and Hermitian and fixes the basis
+states, so it acts as the identity on the `\(C_{y,\tau}\)` component and drops
+out of the pairing, leaving `\(\langle \Phi_{y,\tau} | H_{\rm hop} | \Phi_{x,\sigma}\rangle\)`.
+Expanding `\(H_{\rm hop} = \sum_{s,i,j} t_{ij}\, \hat c^\dagger_{(i,s)}\hat c_{(j,s)}\)`,
+only the single channel `\((i,j,s) = (x,y,\sigma_y)\)` survives: evaluating the
+hopped configuration at the occupied orbitals of `\(y\)` and `\(x\)` forces the
+annihilation to occur at `\(y\)` and the creation at the hole `\(x\)`, so every
+other channel either annihilates an empty orbital, produces a doubly-occupied
+(non-hard-core) configuration, or merely returns the hole to `\(x\)` — none of
+which overlaps `\(|\Phi_{y,\tau}\rangle\)`. The surviving channel is the
+uniform-sign hole-filling action (11.2.4), `\(\hat c^\dagger_{(x,\sigma_y)}
+\hat c_{(y,\sigma_y)} |\Phi_{x,\sigma}\rangle = -|\Phi_{y,\sigma_{y\to x}}\rangle\)`,
+so no fermion-sign bookkeeping is repeated and the basis signs `\(\varepsilon =
+(-1)^y\)` cancel (`\(\varepsilon^2 = 1\)`), giving `\(-t_{x,y}\)` times the
+configuration-matching indicator. (The codebase kinetic uses `\(+t\)`; the
+uniform `\(-1\)` of (11.2.4) supplies the minus, matching Tasaki's `\(-t_{x,y}\)`.)
+
+\medskip
+\noindent\textbf{Lean declarations}
+(file \texttt{Fermion/JordanWigner/Hubbard/EffectiveHamiltonianMatrix.lean}):
+\begin{itemize}
+  \item \texttt{hardcore\_proj\_apply}: `\(\hat P_{\rm hc}\)` acts as the identity
+    on a hard-core component.
+  \item \texttt{hop\_config\_forces}: the hole-filling channel is the only one
+    whose hop reaches `\(C_{y,\tau}\)`.
+  \item \texttt{hubbardEffective\_tasaki\_matrixElement}: the (11.2.5) matrix
+    element.
+\end{itemize}
+
+%======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
 %======================================================================
