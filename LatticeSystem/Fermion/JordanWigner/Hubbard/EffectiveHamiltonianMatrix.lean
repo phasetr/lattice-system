@@ -267,4 +267,105 @@ theorem hubbardEffective_tasaki_matrixElement (N : ℕ) (x y : Fin (N + 1))
   · rw [if_neg hmatch, if_neg (fun h => hmatch h.symm), mul_zero, mul_zero,
       neg_zero, mul_zero, mul_zero]
 
+/-! ## The diagonal matrix element (no self-hopping) -/
+
+/-- A single hop returning the hole to its original site `x` must be the trivial
+on-site `i = j` move: any genuine hop (`i ≠ j`) empties the source site `j`
+without refilling it, producing a configuration whose hole is not at `x` alone,
+which cannot equal the one-hole configuration `C_{x,τ}`. -/
+private theorem hop_diag_forces (N : ℕ) (x i j : Fin (N + 1))
+    (σ τ : Fin (N + 1) → Bool) (s : Fin 2)
+    (hvj : hubbardOneHoleConfig N x σ (spinfulIndex N j s) = 1)
+    (hupd : Function.update
+        (Function.update (hubbardOneHoleConfig N x σ) (spinfulIndex N j s) 0)
+        (spinfulIndex N i s) 1 = hubbardOneHoleConfig N x τ) :
+    i = j := by
+  by_contra hij
+  have hjx : j ≠ x := by
+    intro h; subst h; rw [oneHole_hole_zero] at hvj; exact absurd hvj (by decide)
+  have hjx' : j.val ≠ x.val := fun h => hjx (Fin.ext h)
+  -- `s` is the occupied orbital of `j`.
+  have hsoj : s = (if σ j then 0 else 1) := by
+    rcases fin_two_cases s with rfl | rfl
+    · rw [hubbardOneHoleConfig_apply_up, if_neg hjx'] at hvj
+      by_cases hσ : σ j
+      · simp [hσ]
+      · rw [if_neg hσ] at hvj; exact absurd hvj (by decide)
+    · rw [hubbardOneHoleConfig_apply_down, if_neg hjx'] at hvj
+      by_cases hσ : σ j
+      · rw [if_pos hσ] at hvj; exact absurd hvj (by decide)
+      · simp [hσ]
+  have e := congrFun hupd (spinfulIndex N j (if τ j then 0 else 1))
+  rw [Function.update_apply, Function.update_apply, oneHole_occupied N x τ j hjx] at e
+  by_cases h1 : spinfulIndex N j (if τ j then 0 else 1) = spinfulIndex N i s
+  · exact hij ((spinfulIndex_eq_iff N j i _ s).mp h1).1.symm
+  · rw [if_neg h1] at e
+    by_cases h2 : spinfulIndex N j (if τ j then 0 else 1) = spinfulIndex N j s
+    · rw [if_pos h2] at e; exact absurd e.symm one_ne_zero
+    · rw [if_neg h2] at e
+      have hoτs : (if τ j then (0 : Fin 2) else 1) ≠ (if σ j then 0 else 1) := by
+        rw [← hsoj]; exact fun h => h2 (by rw [h])
+      have hz : hubbardOneHoleConfig N x σ
+          (spinfulIndex N j (if τ j then 0 else 1)) = 0 := by
+        rcases fin_two_cases (if τ j then (0 : Fin 2) else 1) with hoτ | hoτ
+        · rw [hoτ, hubbardOneHoleConfig_apply_up, if_neg hjx',
+            if_neg (show ¬ σ j from fun hσ => hoτs (by rw [hoτ, if_pos hσ]))]
+        · rw [hoτ, hubbardOneHoleConfig_apply_down, if_neg hjx',
+            if_pos (show σ j by by_contra hσ; exact hoτs (by rw [hoτ, if_neg hσ]))]
+      rw [hz] at e; exact absurd e.symm one_ne_zero
+
+/-- Diagonal case of Tasaki eq. (11.2.5): when the hopping matrix has no
+self-hopping (`t_{ii} = 0` for all `i`), the on-site (`x = y`) effective
+matrix element vanishes. With no diagonal kinetic term, `Ĥ_eff` moves the hole
+off `x`, so its image is orthogonal to the one-hole state `|Φ_{x,τ}⟩`. -/
+theorem hubbardEffective_tasaki_matrixElement_diag (N : ℕ) (x : Fin (N + 1))
+    (σ τ : Fin (N + 1) → Bool) (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (htdiag : ∀ i, t i i = 0) :
+    (∑ w : Fin (2 * N + 2) → Fin 2, hubbardTasakiBasisState N x τ w *
+        ((hubbardEffectiveHamiltonian N t U) *ᵥ hubbardTasakiBasisState N x σ) w) = 0 := by
+  have hmem : hubbardTasakiBasisState N x σ ∈ hubbardHardcoreSubspace N := by
+    rw [hubbardTasakiBasisState_eq_smul_basisVec]
+    exact Submodule.smul_mem _ _ (hubbardHardcoreBasisState_mem_hardcoreSubspace N x σ)
+  rw [hubbardEffectiveHamiltonian_mulVec_eq_projected_kinetic_of_mem N t U hmem]
+  have hyfac : ∀ w, hubbardTasakiBasisState N x τ w =
+      hubbardTasakiBasisSign N x τ * basisVec (hubbardOneHoleConfig N x τ) w := by
+    intro w; rw [hubbardTasakiBasisState_eq_smul_basisVec]; rfl
+  simp_rw [hyfac]
+  rw [show (∑ w : Fin (2 * N + 2) → Fin 2, hubbardTasakiBasisSign N x τ *
+        basisVec (hubbardOneHoleConfig N x τ) w *
+        (hubbardHardcoreProjection N *ᵥ
+          hubbardKinetic N t *ᵥ hubbardTasakiBasisState N x σ) w) =
+      hubbardTasakiBasisSign N x τ * ∑ w : Fin (2 * N + 2) → Fin 2,
+        basisVec (hubbardOneHoleConfig N x τ) w *
+        (hubbardHardcoreProjection N *ᵥ
+          hubbardKinetic N t *ᵥ hubbardTasakiBasisState N x σ) w from by
+      rw [Finset.mul_sum]; exact Finset.sum_congr rfl (fun w _ => by ring),
+    basisVec_sum_mul, hardcore_proj_apply]
+  refine mul_eq_zero.mpr (Or.inr ?_)
+  have hexpand : (hubbardKinetic N t *ᵥ hubbardTasakiBasisState N x σ)
+        (hubbardOneHoleConfig N x τ) =
+      ∑ s : Fin 2, ∑ i : Fin (N + 1), ∑ j : Fin (N + 1), t i j *
+        ((fermionMultiCreation (2 * N + 1) (spinfulIndex N i s) *
+            fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j s)) *ᵥ
+          hubbardTasakiBasisState N x σ) (hubbardOneHoleConfig N x τ) := by
+    unfold hubbardKinetic
+    simp only [Matrix.sum_mulVec, Matrix.smul_mulVec, Finset.sum_apply, Pi.smul_apply,
+      smul_eq_mul]
+  rw [hexpand]
+  refine Finset.sum_eq_zero (fun s _ => Finset.sum_eq_zero (fun i _ =>
+    Finset.sum_eq_zero (fun j _ => ?_)))
+  rw [hubbardTasakiBasisState_eq_smul_basisVec, Matrix.mulVec_smul,
+    show basisVec (hubbardOneHoleConfig N x σ) = hubbardHardcoreBasisState N x σ from rfl,
+    hubbardHardcoreBasisState, fermionMultiCreation_mul_Annihilation_mulVec_basisVec]
+  by_cases hij : i = j
+  · subst hij; rw [htdiag i]; ring
+  · by_cases hv : hubbardOneHoleConfig N x σ (spinfulIndex N j s) = 1 ∧
+        (Function.update (hubbardOneHoleConfig N x σ) (spinfulIndex N j s) 0)
+          (spinfulIndex N i s) = 0
+    · rw [if_pos hv, Pi.smul_apply, Pi.smul_apply, smul_eq_mul, smul_eq_mul,
+        basisVec_apply,
+        if_neg (fun hc => hij (hop_diag_forces N x i j σ τ s hv.1 hc.symm))]
+      ring
+    · simp [hv]
+
 end LatticeSystem.Fermion

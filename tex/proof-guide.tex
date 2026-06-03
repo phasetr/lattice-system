@@ -5308,8 +5308,22 @@ uniform `\(-1\)` of (11.2.4) supplies the minus, matching Tasaki's `\(-t_{x,y}\)
   \item \texttt{hop\_config\_forces}: the hole-filling channel is the only one
     whose hop reaches `\(C_{y,\tau}\)`.
   \item \texttt{hubbardEffective\_tasaki\_matrixElement}: the (11.2.5) matrix
-    element.
+    element (off-diagonal, \(x \neq y\)).
+  \item \texttt{hubbardEffective\_tasaki\_matrixElement\_diag}: the diagonal
+    (\(x = y\)) case under no self-hopping (\(\forall i,\ t_{ii} = 0\)), which
+    vanishes since `\(\hat H_{\rm eff}\)` moves the hole off `\(x\)`.
 \end{itemize}
+
+\medskip
+\noindent\textbf{Diagonal vanishing.}
+With no self-hopping the kinetic operator has no diagonal number term, so every
+surviving hop moves the hole from \(x\) to a distinct site; the image of
+\(|\Phi_{x,\sigma}\rangle\) therefore has no component on the hole-at-\(x\)
+configuration \(C_{x,\tau}\). Concretely, a hop \(i \neq j\) empties the
+source \(j\) without refilling it (\texttt{hop\_diag\_forces}), so the result is
+not a one-hole-at-\(x\) configuration; and the \(i = j\) on-site term carries the
+coefficient \(t_{ii} = 0\). Hence \(\langle \Phi_{x,\tau} | \hat H_{\rm eff}
+| \Phi_{x,\sigma}\rangle = 0\).
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
