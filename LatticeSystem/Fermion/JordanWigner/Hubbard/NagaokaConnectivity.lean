@@ -65,6 +65,73 @@ theorem configMag_hubbardOneHoleConfig (N : ℕ) (x : Fin (N + 1))
   · rw [if_neg h]
     by_cases hσ : σ i <;> simp [h, hσ]
 
+/-- `holeSpinMag ⟨x, σ⟩ = 2·(electron ↑-count) − N`: each of the `N` occupied
+sites contributes `±1` to `S_z^{(3)}`, and `(#↑) + (#↓) = N`.  Hence the
+magnetization is determined by the number of up-electrons, which lies in
+`{0, …, N}`. -/
+theorem holeSpinMag_eq_two_mul_upCount_sub (N : ℕ)
+    (p : (x : Fin (N + 1)) × HoleSpin N x) :
+    holeSpinMag N p =
+      2 * ((Finset.univ.filter (fun i => i ≠ p.1 ∧ p.2.val i = true)).card : ℤ)
+        - N := by
+  obtain ⟨x, σ⟩ := p
+  rw [holeSpinMag, configMag_hubbardOneHoleConfig]
+  have hsum : ∑ i : Fin (N + 1), (if i = x then (0 : ℤ) else if σ.val i then 1 else -1)
+      = ∑ i ∈ Finset.univ.erase x, (if σ.val i then (1 : ℤ) else -1) := by
+    rw [← Finset.sum_erase Finset.univ (a := x) (by simp)]
+    refine Finset.sum_congr rfl (fun i hi => ?_)
+    rw [if_neg (Finset.ne_of_mem_erase hi)]
+  rw [hsum]
+  have hsplit : ∑ i ∈ Finset.univ.erase x, (if σ.val i then (1 : ℤ) else -1)
+      = ((Finset.univ.erase x).filter (fun i => σ.val i = true)).card
+        - ((Finset.univ.erase x).filter (fun i => ¬ σ.val i = true)).card := by
+    rw [Finset.sum_ite, Finset.sum_const, Finset.sum_const]
+    ring
+  rw [hsplit]
+  have hcard : ((Finset.univ.erase x).filter (fun i => σ.val i = true)).card
+      + ((Finset.univ.erase x).filter (fun i => ¬ σ.val i = true)).card
+      = N := by
+    rw [Finset.card_filter_add_card_filter_not, Finset.card_erase_of_mem (Finset.mem_univ x),
+      Finset.card_univ, Fintype.card_fin]
+    omega
+  have hfilter : ((Finset.univ.erase x).filter (fun i => σ.val i = true))
+      = Finset.univ.filter (fun i => i ≠ x ∧ σ.val i = true) := by
+    ext i
+    simp only [Finset.mem_filter, Finset.mem_erase, Finset.mem_univ, true_and, and_true]
+  rw [← hfilter]
+  omega
+
+/-- **There are at most `N + 1` non-empty magnetization sectors.**  Since
+`holeSpinMag = 2·(↑-count) − N` with the `↑`-count in `{0, …, N}`, the set of
+magnetization values taken by the one-hole basis has at most `N + 1` elements.
+This is the combinatorial bound behind the `2 S_max + 1 = N + 1` ground-state
+degeneracy of Theorem 11.7. -/
+theorem holeSpinMag_image_card_le (N : ℕ) :
+    (Finset.univ.image (holeSpinMag N)).card ≤ N + 1 := by
+  have hsub : Finset.univ.image (holeSpinMag N)
+      ⊆ (Finset.range (N + 1)).image (fun j : ℕ => 2 * (j : ℤ) - N) := by
+    intro m hm
+    obtain ⟨p, _, rfl⟩ := Finset.mem_image.mp hm
+    rw [Finset.mem_image]
+    refine ⟨(Finset.univ.filter (fun i => i ≠ p.1 ∧ p.2.val i = true)).card, ?_,
+      (holeSpinMag_eq_two_mul_upCount_sub N p).symm⟩
+    rw [Finset.mem_range]
+    have hsub2 : Finset.univ.filter (fun i => i ≠ p.1 ∧ p.2.val i = true)
+        ⊆ Finset.univ.erase p.1 := by
+      intro i hi
+      rw [Finset.mem_filter] at hi
+      exact Finset.mem_erase.mpr ⟨hi.2.1, Finset.mem_univ i⟩
+    have hle : (Finset.univ.filter (fun i => i ≠ p.1 ∧ p.2.val i = true)).card ≤ N := by
+      refine le_trans (Finset.card_le_card hsub2) (le_of_eq ?_)
+      rw [Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ, Fintype.card_fin]
+      omega
+    omega
+  calc (Finset.univ.image (holeSpinMag N)).card
+      ≤ ((Finset.range (N + 1)).image (fun j : ℕ => 2 * (j : ℤ) - N)).card :=
+        Finset.card_le_card hsub
+    _ ≤ (Finset.range (N + 1)).card := Finset.card_image_le
+    _ = N + 1 := Finset.card_range _
+
 /-- **Hopping the hole preserves magnetization** (Tasaki (11.2.4)).  Moving the
 electron at `y` into the hole at `x` (turning `|Φ_{x,σ}⟩` into a basis state at
 hole `y`) does not change the total `S_z^{(3)}`: the electrons merely rearrange.
