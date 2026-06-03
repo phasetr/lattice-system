@@ -157,4 +157,37 @@ theorem hubbardEffectiveHamiltonian_mulVec_preserves_number
     ← (hubbardEffectiveHamiltonian_commute_fermionTotalNumber N t U).eq,
     ← Matrix.mulVec_mulVec, hv, Matrix.mulVec_smul]
 
+/-- The one-hole configuration has exactly `N` electrons: `Σ_j c_j = N` (one
+empty site among the `N + 1` sites, each other site singly occupied). -/
+theorem hubbardOneHoleConfig_electron_count (N : ℕ) (x : Fin (N + 1))
+    (σ : Fin (N + 1) → Bool) :
+    (∑ j : Fin (2 * N + 2), ((hubbardOneHoleConfig N x σ j).val : ℂ)) = (N : ℂ) := by
+  rw [sum_spinful_reindex N (fun j => ((hubbardOneHoleConfig N x σ j).val : ℂ))]
+  have hsite : ∀ y : Fin (N + 1),
+      (∑ r : Fin 2, ((hubbardOneHoleConfig N x σ (spinfulIndex N y r)).val : ℂ))
+        = if y ≠ x then 1 else 0 := by
+    intro y
+    rw [Fin.sum_univ_two, hubbardOneHoleConfig_apply_up, hubbardOneHoleConfig_apply_down]
+    rcases eq_or_ne y x with h | h
+    · subst h; simp
+    · have hv : ¬ (y.val = x.val) := fun hh => h (Fin.ext hh)
+      rw [if_neg hv, if_neg hv, if_pos h]
+      cases hσ : σ y <;> simp
+  rw [Finset.sum_congr rfl (fun y _ => hsite y), Finset.sum_boole, Finset.filter_ne',
+    Finset.card_erase_of_mem (Finset.mem_univ x), Finset.card_univ, Fintype.card_fin]
+  push_cast
+  ring
+
+/-- The Tasaki basis state is an `N`-electron eigenstate of `N̂`:
+`N̂ |Φ_p⟩ = N |Φ_p⟩` (one hole among `N + 1` sites). -/
+theorem fermionTotalNumber_mulVec_tasakiState (N : ℕ)
+    (p : (x : Fin (N + 1)) × HoleSpin N x) :
+    (fermionTotalNumber (2 * N + 1)).mulVec (tasakiState N p) =
+      (N : ℂ) • tasakiState N p := by
+  obtain ⟨x, σ⟩ := p
+  change (fermionTotalNumber (2 * N + 1)).mulVec (hubbardTasakiBasisState N x σ.val) =
+    (N : ℂ) • hubbardTasakiBasisState N x σ.val
+  rw [hubbardTasakiBasisState_eq_smul_basisVec, Matrix.mulVec_smul,
+    fermionTotalNumber_mulVec_basisVec, hubbardOneHoleConfig_electron_count, smul_comm]
+
 end LatticeSystem.Fermion
