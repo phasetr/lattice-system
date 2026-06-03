@@ -366,4 +366,94 @@ theorem mulVec_apply_eq_zero_of_not_oneHole (N : ℕ)
     refine isOneHoleHardcore_of_noDouble_count N w hnd ?_
     exact_mod_cast heq
 
+/-! ## Completeness of the Tasaki basis on the one-hole hard-core sector -/
+
+/-- The real-bilinear pairing of a Tasaki basis state against an arbitrary state
+picks out the (signed) component at the basis state's configuration:
+`Σ_w Φ_r(w) u(w) = ε_r · u(config_r)`. -/
+theorem tasakiState_pairing (N : ℕ)
+    (r : (x : Fin (N + 1)) × HoleSpin N x)
+    (u : (Fin (2 * N + 2) → Fin 2) → ℂ) :
+    (∑ w, tasakiState N r w * u w) =
+      hubbardTasakiBasisSign N r.1 r.2.val *
+        u (hubbardOneHoleConfig N r.1 r.2.val) := by
+  have he : tasakiState N r =
+      hubbardTasakiBasisSign N r.1 r.2.val •
+        basisVec (hubbardOneHoleConfig N r.1 r.2.val) :=
+    hubbardTasakiBasisState_eq_smul_basisVec N r.1 r.2.val
+  rw [he]
+  simp only [Pi.smul_apply, smul_eq_mul, mul_assoc]
+  rw [← Finset.mul_sum, basisVec_sum_mul]
+
+/-- The Tasaki basis sign is nonzero (`ε² = 1`). -/
+theorem hubbardTasakiBasisSign_ne_zero (N : ℕ) (x : Fin (N + 1))
+    (σ : Fin (N + 1) → Bool) :
+    hubbardTasakiBasisSign N x σ ≠ 0 := by
+  intro h
+  have := hubbardTasakiBasisSign_mul_self N x σ
+  rw [h, mul_zero] at this
+  exact one_ne_zero this.symm
+
+/-- **Completeness of the Tasaki basis on the one-hole hard-core sector.** Any
+state `v` supported on the one-hole hard-core configurations equals its Tasaki
+expansion `Σ_q ⟨Φ_q, v⟩ Φ_q`. Proof: the difference `d` is orthogonal to every
+`Φ_r` (so `d(config_r) = 0`) and is supported on one-hole configurations, hence
+vanishes everywhere. -/
+theorem tasaki_completeness (N : ℕ) (v : (Fin (2 * N + 2) → Fin 2) → ℂ)
+    (hsupp : ∀ w, ¬ IsOneHoleHardcoreConfig N w → v w = 0) :
+    v = ∑ q : (x : Fin (N + 1)) × HoleSpin N x,
+      (∑ w, tasakiState N q w * v w) • tasakiState N q := by
+  classical
+  set RHS := ∑ q : (x : Fin (N + 1)) × HoleSpin N x,
+    (∑ w, tasakiState N q w * v w) • tasakiState N q with hRHS
+  -- `RHS` is supported on one-hole configs (a sum of basis states).
+  have hRHS_supp : ∀ w, ¬ IsOneHoleHardcoreConfig N w → RHS w = 0 := by
+    intro w hw
+    rw [hRHS, Finset.sum_apply]
+    refine Finset.sum_eq_zero (fun q _ => ?_)
+    rw [Pi.smul_apply, smul_eq_mul]
+    have he : tasakiState N q =
+        hubbardTasakiBasisSign N q.1 q.2.val •
+          basisVec (hubbardOneHoleConfig N q.1 q.2.val) :=
+      hubbardTasakiBasisState_eq_smul_basisVec N q.1 q.2.val
+    rw [he, Pi.smul_apply, smul_eq_mul,
+      basisVec_of_ne (fun hcontra =>
+        hw (by rw [hcontra]; exact hubbardOneHoleConfig_isOneHoleHardcore N q.1 q.2.val))]
+    ring
+  -- `⟨Φ_r, RHS⟩ = ⟨Φ_r, v⟩` by orthonormality.
+  have hRHS_pair : ∀ r, (∑ w, tasakiState N r w * RHS w) =
+      (∑ w, tasakiState N r w * v w) := by
+    intro r
+    rw [hRHS]
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+    rw [Finset.sum_congr rfl (fun w _ => Finset.mul_sum _ _ _), Finset.sum_comm]
+    rw [Finset.sum_congr rfl (fun q _ => by
+      rw [show (∑ w, tasakiState N r w *
+            ((∑ w', tasakiState N q w' * v w') * tasakiState N q w)) =
+          (∑ w', tasakiState N q w' * v w') *
+            (∑ w, tasakiState N r w * tasakiState N q w) from by
+        rw [Finset.mul_sum]; exact Finset.sum_congr rfl (fun w _ => by ring),
+        tasakiState_orthonormal])]
+    simp only [mul_ite, mul_one, mul_zero]
+    rw [Finset.sum_ite_eq Finset.univ r (fun q => ∑ w', tasakiState N q w' * v w'),
+      if_pos (Finset.mem_univ r)]
+  -- Hence `d = v - RHS` vanishes at each `config_r` and off the sector ⇒ `d = 0`.
+  have hd_config : ∀ r : (x : Fin (N + 1)) × HoleSpin N x,
+      v (hubbardOneHoleConfig N r.1 r.2.val) =
+      RHS (hubbardOneHoleConfig N r.1 r.2.val) := by
+    intro r
+    have h := hRHS_pair r
+    rw [tasakiState_pairing, tasakiState_pairing] at h
+    exact (mul_left_cancel₀ (hubbardTasakiBasisSign_ne_zero N r.1 r.2.val) h).symm
+  funext w0
+  by_cases hw : IsOneHoleHardcoreConfig N w0
+  · obtain ⟨x, σ, rfl⟩ := exists_eq_hubbardOneHoleConfig_of_isOneHoleHardcore N w0 hw
+    have hcanon : hubbardOneHoleConfig N x σ =
+        hubbardOneHoleConfig N x (Function.update σ x true) :=
+      oneHoleConfig_congr N x σ (Function.update σ x true)
+        (fun z hz => (Function.update_of_ne hz _ _).symm)
+    rw [hcanon]
+    exact hd_config ⟨x, ⟨Function.update σ x true, Function.update_self _ _ _⟩⟩
+  · rw [hsupp w0 hw, hRHS_supp w0 hw]
+
 end LatticeSystem.Fermion
