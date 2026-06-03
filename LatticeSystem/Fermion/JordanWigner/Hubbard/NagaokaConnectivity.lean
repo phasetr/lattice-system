@@ -647,4 +647,69 @@ theorem tasakiEffMatrix_ground_finrank_le (N : ℕ)
         mul_one]
     _ ≤ N + 1 := holeSpinMag_image_card_le N
 
+/-- **`min M ≤ min M_m` with the lifted (`.map ofReal`) full witness.**  The
+sector minimum `−μ` is an eigenvalue of the full `Ĥ_eff` matrix (Perron ground
+of `−M_m`, zero-extended and complexified), so the global minimum is `≤ −μ`. -/
+theorem hermitianMinEigenvalue_mapFull_le_sector (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ)
+    [Nonempty (HoleMagSector N m)]
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0)
+    (hpos : ∀ i j, 0 ≤ t i j)
+    (hconn : (nagaokaPFMatrixOnSector N t m).IsIrreducible) :
+    LatticeSystem.Quantum.hermitianMinEigenvalue
+        (isHermitian_map_ofReal_of_isSymm (tasakiEffReMatrix_isSymm N t htsym htdiag))
+      ≤ LatticeSystem.Quantum.hermitianMinEigenvalue
+        (isHermitian_map_ofReal_of_isSymm
+          (tasakiEffReMatrixOnSector_isSymm N t m htsym htdiag)) := by
+  obtain ⟨μ, v, hAv, hv_pos, hmineq⟩ :=
+    hermitianMinEigenvalue_sector_eq_neg_pf N t m htsym htdiag hpos hconn
+  rw [hmineq]
+  have hMv : tasakiEffReMatrixOnSector N t m *ᵥ v = (-μ) • v := by
+    have hneg : (-tasakiEffReMatrixOnSector N t m) *ᵥ v = μ • v := hAv
+    rw [neg_mulVec] at hneg
+    rw [neg_smul]; exact neg_eq_iff_eq_neg.mp hneg
+  have hembed := tasakiEffReMatrix_mulVec_sectorEmbed_of_eigen N t hMv
+  have hcx := matrix_eigenvec_map_ofReal hembed
+  have hw_ne : (fun p => ((sectorEmbed N m v p : ℝ) : ℂ)) ≠ 0 := by
+    intro h
+    have h0 := congrFun h (Classical.arbitrary (HoleMagSector N m)).val
+    simp only [Pi.zero_apply, Complex.ofReal_eq_zero, sectorEmbed,
+      dif_pos (Classical.arbitrary (HoleMagSector N m)).property] at h0
+    exact absurd h0 (ne_of_gt (hv_pos _))
+  exact hermitian_min_eigenvalue_le_of_eigenvector_exists _ hw_ne hcx
+
+/-- **The `Ĥ_eff` ground eigenspace has dimension `≤ N+1` at the global minimum**
+(upper-bound half of Tasaki Theorem 11.7).  Under the connectivity condition
+(`nagaokaConnectivity`) and `t ≥ 0`, every magnetization sector contributes at
+most one ground state: non-empty connected sectors by Perron–Frobenius
+(`sector_map_eigenspace_finrank_le_one_at`, using `min M ≤ min M_m`), empty
+sectors trivially.  With `≤ N+1` sectors this caps the dimension at `N + 1`. -/
+theorem tasakiEffMatrix_ground_finrank_le_N_add_one (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0)
+    (hpos : ∀ i j, 0 ≤ t i j)
+    (hconn : nagaokaConnectivity N t) :
+    finrank ℂ (End.eigenspace
+      (Matrix.toLin' ((tasakiEffReMatrix N t).map (algebraMap ℝ ℂ)))
+      ((LatticeSystem.Quantum.hermitianMinEigenvalue
+        (isHermitian_map_ofReal_of_isSymm (tasakiEffReMatrix_isSymm N t htsym htdiag)) : ℂ)))
+      ≤ N + 1 := by
+  set E := LatticeSystem.Quantum.hermitianMinEigenvalue
+    (isHermitian_map_ofReal_of_isSymm (tasakiEffReMatrix_isSymm N t htsym htdiag)) with hE
+  apply tasakiEffMatrix_ground_finrank_le N t (E : ℂ)
+  intro m
+  by_cases hne : Nonempty (HoleMagSector N m)
+  · letI := hne
+    exact sector_map_eigenspace_finrank_le_one_at N t m htsym htdiag hpos (hconn m) E
+      (hE ▸ hermitianMinEigenvalue_mapFull_le_sector N t m htsym htdiag hpos (hconn m))
+  · rw [not_nonempty_iff] at hne
+    haveI := hne
+    have hcard : finrank ℂ (HoleMagSector N m → ℂ) = 0 := by
+      rw [Module.finrank_pi, Fintype.card_eq_zero]
+    calc finrank ℂ (End.eigenspace
+          (Matrix.toLin' ((tasakiEffReMatrixOnSector N t m).map (algebraMap ℝ ℂ))) (E : ℂ))
+        ≤ finrank ℂ (HoleMagSector N m → ℂ) := Submodule.finrank_le _
+      _ = 0 := hcard
+      _ ≤ 1 := by norm_num
+
 end LatticeSystem.Fermion
