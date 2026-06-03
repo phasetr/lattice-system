@@ -341,4 +341,29 @@ theorem isOneHoleHardcore_of_noDouble_count (N : ℕ) (c : Fin (2 * N + 2) → F
     rw [hh, Finset.mem_singleton] at hmem
     exact hmem
 
+/-- A `Fin 2` value that is not `0` equals `1`. -/
+private theorem fin2_eq_one_of_ne_zero {a : Fin 2} (h : a ≠ 0) : a = 1 :=
+  Fin.ext (by have := a.isLt; have : a.val ≠ 0 := fun hv => h (Fin.ext hv); omega)
+
+/-- **Support of a hard-core number eigenstate.** If `v` lies in the hard-core
+subspace and is an `N`-electron eigenstate (`N̂ v = N • v`), then `v(w) = 0` at
+every configuration `w` that is not one-hole hard-core. So `v` is supported on
+the one-hole hard-core configurations. -/
+theorem mulVec_apply_eq_zero_of_not_oneHole (N : ℕ)
+    (v : (Fin (2 * N + 2) → Fin 2) → ℂ) (hhc : v ∈ hubbardHardcoreSubspace N)
+    (hN : (fermionTotalNumber (2 * N + 1)).mulVec v = (N : ℂ) • v)
+    (w : Fin (2 * N + 2) → Fin 2) (hw : ¬ IsOneHoleHardcoreConfig N w) :
+    v w = 0 := by
+  by_cases hd : ∃ i, w (spinfulIndex N i 0) = 1 ∧ w (spinfulIndex N i 1) = 1
+  · obtain ⟨i, h0, h1⟩ := hd
+    exact hardcore_mulVec_apply_eq_zero_of_double N v hhc w i h0 h1
+  · have hnd : ∀ i, w (spinfulIndex N i 0) = 0 ∨ w (spinfulIndex N i 1) = 0 := by
+      intro i
+      by_contra hcon
+      rw [not_or] at hcon
+      exact hd ⟨i, fin2_eq_one_of_ne_zero hcon.1, fin2_eq_one_of_ne_zero hcon.2⟩
+    refine mulVec_apply_eq_zero_of_number_ne N v (N : ℂ) hN w (fun heq => hw ?_)
+    refine isOneHoleHardcore_of_noDouble_count N w hnd ?_
+    exact_mod_cast heq
+
 end LatticeSystem.Fermion
