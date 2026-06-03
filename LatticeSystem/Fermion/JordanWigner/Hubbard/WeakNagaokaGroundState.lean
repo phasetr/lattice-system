@@ -530,4 +530,37 @@ theorem tasakiEffMatrix_apply (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ
   rw [Matrix.conjTranspose_apply, Matrix.of_apply, tasakiState_star]
   congr 1
 
+/-- **The effective Hamiltonian acts as the matrix `M` on Tasaki expansions:**
+`Ĥ_eff (Σ_p c_p Φ_p) = Σ_q (M c)_q Φ_q`. Hence an `M`-eigenvector lifts to an
+`Ĥ_eff`-eigenvector at the same eigenvalue. -/
+theorem hubbardEffectiveHamiltonian_mulVec_tasakiExpansion (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (c : ((x : Fin (N + 1)) × HoleSpin N x) → ℂ) :
+    (hubbardEffectiveHamiltonian N t U).mulVec (∑ p, c p • tasakiState N p) =
+      ∑ q, ((tasakiEffMatrix N t U).mulVec c) q • tasakiState N q := by
+  rw [Matrix.mulVec_sum]
+  rw [show (∑ p, (hubbardEffectiveHamiltonian N t U).mulVec (c p • tasakiState N p))
+      = ∑ p, ∑ q, (c p * tasakiEffMatrix N t U q p) • tasakiState N q from by
+    refine Finset.sum_congr rfl (fun p _ => ?_)
+    rw [Matrix.mulVec_smul, hubbardEffectiveHamiltonian_mulVec_tasakiState, Finset.smul_sum]
+    refine Finset.sum_congr rfl (fun q _ => ?_)
+    rw [smul_smul, ← tasakiEffMatrix_apply]]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl (fun q _ => ?_)
+  rw [← Finset.sum_smul]
+  congr 1
+  simp only [Matrix.mulVec, dotProduct]
+  exact Finset.sum_congr rfl (fun p _ => by ring)
+
+/-- An `M`-eigenvector lifts to an `Ĥ_eff`-eigenvector at the same eigenvalue:
+if `M c = λ c` then `Ĥ_eff (Σ_q c_q Φ_q) = λ (Σ_q c_q Φ_q)`. -/
+theorem hubbardEffectiveHamiltonian_mulVec_tasakiExpansion_of_eigen (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (c : ((x : Fin (N + 1)) × HoleSpin N x) → ℂ) (lam : ℂ)
+    (hc : (tasakiEffMatrix N t U).mulVec c = lam • c) :
+    (hubbardEffectiveHamiltonian N t U).mulVec (∑ p, c p • tasakiState N p) =
+      lam • (∑ p, c p • tasakiState N p) := by
+  rw [hubbardEffectiveHamiltonian_mulVec_tasakiExpansion, hc, Finset.smul_sum]
+  exact Finset.sum_congr rfl (fun q _ => by rw [Pi.smul_apply, smul_assoc])
+
 end LatticeSystem.Fermion
