@@ -456,4 +456,25 @@ theorem tasaki_completeness (N : ℕ) (v : (Fin (2 * N + 2) → Fin 2) → ℂ)
     exact hd_config ⟨x, ⟨Function.update σ x true, Function.update_self _ _ _⟩⟩
   · rw [hsupp w0 hw, hRHS_supp w0 hw]
 
+/-! ## The effective Hamiltonian acts as its Tasaki matrix -/
+
+/-- **Operator lift.** The effective Hamiltonian acting on a Tasaki basis state
+reassembles its Tasaki-matrix column: `Ĥ_eff |Φ_p⟩ = Σ_q ⟨Φ_q|Ĥ_eff|Φ_p⟩ |Φ_q⟩`.
+Because `Ĥ_eff |Φ_p⟩` is hard-core and an `N`-electron eigenstate, it lies in the
+one-hole hard-core sector, where the Tasaki basis is complete. This is the bridge
+between the operator `Ĥ_eff` and the finite real-symmetric matrix of (11.2.5). -/
+theorem hubbardEffectiveHamiltonian_mulVec_tasakiState (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (p : (x : Fin (N + 1)) × HoleSpin N x) :
+    (hubbardEffectiveHamiltonian N t U).mulVec (tasakiState N p) =
+      ∑ q : (x : Fin (N + 1)) × HoleSpin N x,
+        (∑ w, tasakiState N q w *
+            ((hubbardEffectiveHamiltonian N t U).mulVec (tasakiState N p)) w) •
+          tasakiState N q :=
+  tasaki_completeness N _ (fun w hw =>
+    mulVec_apply_eq_zero_of_not_oneHole N _
+      (hubbardEffectiveHamiltonian_mulVec_mem N t U (tasakiState N p))
+      (hubbardEffectiveHamiltonian_mulVec_preserves_number N t U (tasakiState N p) (N : ℂ)
+        (fermionTotalNumber_mulVec_tasakiState N p)) w hw)
+
 end LatticeSystem.Fermion
