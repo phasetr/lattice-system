@@ -548,4 +548,57 @@ theorem sector_map_eigenspace_finrank_le_one_at (N : ℕ)
     rw [hEμ]
     exact hcx
 
+/-- The complex-cast Tasaki matrix is block-diagonal in magnetization. -/
+theorem tasakiEffReMatrix_map_eq_zero_of_holeSpinMag_ne (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (q p : (x : Fin (N + 1)) × HoleSpin N x)
+    (h : holeSpinMag N q ≠ holeSpinMag N p) :
+    ((tasakiEffReMatrix N t).map (algebraMap ℝ ℂ)) q p = 0 := by
+  rw [Matrix.map_apply, tasakiEffReMatrix_eq_zero_of_holeSpinMag_ne N t q p h, map_zero]
+
+/-- **Complex block invariance: restricting a complex eigenvector to a sector.**
+If the complex-cast `Ĥ_eff` matrix has `M c = E c`, then the restriction of `c`
+to magnetization sector `m` is an eigenvector of the complex sector matrix at
+`E`.  (Complex analogue of `tasakiEffReMatrixOnSector_mulVec_restriction_of_eigen`;
+uses block-diagonality.) -/
+theorem tasakiEffMatrixOnSector_map_mulVec_restriction_of_eigen (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) {m : ℤ} {E : ℂ}
+    {c : (x : Fin (N + 1)) × HoleSpin N x → ℂ}
+    (hc : (tasakiEffReMatrix N t).map (algebraMap ℝ ℂ) *ᵥ c = E • c) :
+    ((tasakiEffReMatrixOnSector N t m).map (algebraMap ℝ ℂ)) *ᵥ
+        (fun p : HoleMagSector N m => c p.val) =
+      E • (fun p : HoleMagSector N m => c p.val) := by
+  classical
+  funext q
+  change ∑ p : HoleMagSector N m,
+      ((tasakiEffReMatrixOnSector N t m).map (algebraMap ℝ ℂ)) q p * c p.val = E * c q.val
+  have hsec : (∑ p : HoleMagSector N m,
+        ((tasakiEffReMatrixOnSector N t m).map (algebraMap ℝ ℂ)) q p * c p.val) =
+      ∑ p' ∈ Finset.univ.filter (fun p' => holeSpinMag N p' = m),
+        ((tasakiEffReMatrix N t).map (algebraMap ℝ ℂ)) q.val p' * c p' := by
+    rw [Finset.sum_subtype
+      (Finset.univ.filter (fun p' => holeSpinMag N p' = m))
+      (p := fun p' => holeSpinMag N p' = m)
+      (fun p' => by simp [Finset.mem_filter])
+      (fun p' => ((tasakiEffReMatrix N t).map (algebraMap ℝ ℂ)) q.val p' * c p')]
+    refine Finset.sum_congr rfl (fun p _ => ?_)
+    unfold tasakiEffReMatrixOnSector
+    rw [Matrix.map_apply, Matrix.map_apply, Matrix.submatrix_apply]
+  rw [hsec]
+  have hfull : ∑ p' ∈ Finset.univ.filter (fun p' => holeSpinMag N p' = m),
+        ((tasakiEffReMatrix N t).map (algebraMap ℝ ℂ)) q.val p' * c p' =
+      ∑ p' : (x : Fin (N + 1)) × HoleSpin N x,
+        ((tasakiEffReMatrix N t).map (algebraMap ℝ ℂ)) q.val p' * c p' := by
+    refine Finset.sum_filter_of_ne (p := fun p' => holeSpinMag N p' = m) ?_
+    intro p' _ hne
+    by_contra hp'm
+    apply hne
+    have hmag_ne : holeSpinMag N q.val ≠ holeSpinMag N p' :=
+      fun heq => hp'm (heq.symm.trans q.2)
+    rw [tasakiEffReMatrix_map_eq_zero_of_holeSpinMag_ne N t q.val p' hmag_ne, zero_mul]
+  rw [hfull]
+  change ((tasakiEffReMatrix N t).map (algebraMap ℝ ℂ) *ᵥ c) q.val = _
+  rw [hc]
+  rfl
+
 end LatticeSystem.Fermion
