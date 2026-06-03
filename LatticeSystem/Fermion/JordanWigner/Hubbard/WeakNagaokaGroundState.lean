@@ -83,4 +83,20 @@ theorem nagaokaHoleHoppingMatrix_isHermitian (N : ℕ) (t : Fin (N + 1) → Fin 
   · rw [nagaokaHoleHoppingMatrix_apply_of_ne N t (fun h => hxy h.symm),
       nagaokaHoleHoppingMatrix_apply_of_ne N t hxy, hsymm y x]
 
+/-! ## The Perron–Frobenius ground eigenvector of the hopping matrix -/
+
+/-- **Perron–Frobenius eigenvector of the all-up hopping matrix.** Under
+irreducibility of the hopping (the connectivity condition; here a hypothesis,
+to be supplied from graph connectivity for Theorem 11.7), the hopping matrix has
+a strictly positive eigenvector `ξ` at its top eigenvalue `μ`. Since the matrix
+is `−Ĥ_eff` on the all-up sector, `ξ` is the ferromagnetic *ground* state
+configuration of `Ĥ_eff` (lowest energy `−μ`). -/
+theorem exists_nagaokaHole_pf_eigenvector (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (hsymm : ∀ i j, t i j = t j i)
+    (hIrred : (nagaokaHoleHoppingMatrix N t).IsIrreducible) :
+    ∃ (μ : ℝ) (ξ : Fin (N + 1) → ℝ),
+      (nagaokaHoleHoppingMatrix N t) *ᵥ ξ = μ • ξ ∧ ξ ≠ 0 ∧ ∀ x, 0 < ξ x :=
+  LatticeSystem.Math.PerronFrobenius.exists_pos_eigenvec_max
+    (nagaokaHoleHoppingMatrix_isHermitian N t hsymm) hIrred
+
 end LatticeSystem.Fermion
