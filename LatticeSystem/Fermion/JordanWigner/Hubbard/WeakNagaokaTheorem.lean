@@ -166,3 +166,64 @@ theorem fermionTotalSpinZ_mulVec_spinMinusPow_ferroHole (N : ℕ) (x : Fin (N + 
     rw [hexp, Matrix.mulVec_mulVec, hcomm, Matrix.sub_mulVec, ← Matrix.mulVec_mulVec, ih,
       Matrix.mulVec_smul, Nat.cast_succ]
     module
+
+/-! ## The SU(2) ladder commutator `[Ŝ⁺, Ŝ⁻] = 2 Ŝ^z` -/
+
+/-- Per-site contribution to `[Ŝ^+_tot, Ŝ^-_tot]`:
+`[Ŝ^+_tot, c^†_{j,↓} c_{j,↑}] = n_{j,↑} − n_{j,↓}`, using
+`[Ŝ^+_tot, c^†_{j,↓}] = c^†_{j,↑}` and `[Ŝ^+_tot, c_{j,↑}] = −c_{j,↓}`. -/
+private theorem fermionTotalSpinPlus_commutator_spinMinusTerm (N : ℕ) (j : Fin (N + 1)) :
+    fermionTotalSpinPlus N * (fermionDownCreation N j * fermionUpAnnihilation N j) -
+        (fermionDownCreation N j * fermionUpAnnihilation N j) * fermionTotalSpinPlus N =
+      fermionUpNumber N j - fermionDownNumber N j := by
+  have hSa : fermionTotalSpinPlus N * fermionDownCreation N j =
+      fermionDownCreation N j * fermionTotalSpinPlus N + fermionUpCreation N j := by
+    have h := fermionDownCreation_commutator_fermionTotalSpinPlus N j
+    rw [sub_eq_iff_eq_add] at h; rw [h]; abel
+  have hSb : fermionTotalSpinPlus N * fermionUpAnnihilation N j =
+      fermionUpAnnihilation N j * fermionTotalSpinPlus N - fermionDownAnnihilation N j := by
+    have h := fermionUpAnnihilation_commutator_fermionTotalSpinPlus N j
+    rw [sub_eq_iff_eq_add] at h; rw [h]; abel
+  have hn_up : fermionUpNumber N j =
+      fermionUpCreation N j * fermionUpAnnihilation N j := rfl
+  have hn_dn : fermionDownNumber N j =
+      fermionDownCreation N j * fermionDownAnnihilation N j := rfl
+  calc fermionTotalSpinPlus N * (fermionDownCreation N j * fermionUpAnnihilation N j) -
+        (fermionDownCreation N j * fermionUpAnnihilation N j) * fermionTotalSpinPlus N
+      = (fermionTotalSpinPlus N * fermionDownCreation N j) * fermionUpAnnihilation N j -
+          (fermionDownCreation N j * fermionUpAnnihilation N j) * fermionTotalSpinPlus N := by
+        rw [← Matrix.mul_assoc]
+    _ = (fermionDownCreation N j * fermionTotalSpinPlus N + fermionUpCreation N j) *
+            fermionUpAnnihilation N j -
+          (fermionDownCreation N j * fermionUpAnnihilation N j) * fermionTotalSpinPlus N := by
+        rw [hSa]
+    _ = fermionDownCreation N j *
+            (fermionTotalSpinPlus N * fermionUpAnnihilation N j) +
+          fermionUpCreation N j * fermionUpAnnihilation N j -
+          (fermionDownCreation N j * fermionUpAnnihilation N j) * fermionTotalSpinPlus N := by
+        rw [add_mul, Matrix.mul_assoc]
+    _ = fermionDownCreation N j *
+            (fermionUpAnnihilation N j * fermionTotalSpinPlus N -
+              fermionDownAnnihilation N j) +
+          fermionUpCreation N j * fermionUpAnnihilation N j -
+          (fermionDownCreation N j * fermionUpAnnihilation N j) * fermionTotalSpinPlus N := by
+        rw [hSb]
+    _ = fermionUpCreation N j * fermionUpAnnihilation N j -
+          fermionDownCreation N j * fermionDownAnnihilation N j := by noncomm_ring
+    _ = fermionUpNumber N j - fermionDownNumber N j := by rw [hn_up, hn_dn]
+
+/-- **The SU(2) ladder commutator** `[Ŝ^+_tot, Ŝ^-_tot] = 2 Ŝ^z_tot`
+(Tasaki §9.3.3, p. 332): the precursor to the ladder-norm identity
+`‖Ŝ^-_tot v‖² = ⟨v | Ŝ^+_tot Ŝ^-_tot | v⟩` used to prove the spin-lowering
+multiplet is nonzero. -/
+theorem fermionTotalSpinPlus_commutator_fermionTotalSpinMinus (N : ℕ) :
+    fermionTotalSpinPlus N * fermionTotalSpinMinus N -
+        fermionTotalSpinMinus N * fermionTotalSpinPlus N =
+      (2 : ℂ) • fermionTotalSpinZ N := by
+  unfold fermionTotalSpinMinus
+  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib,
+    Finset.sum_congr rfl (fun j _ => fermionTotalSpinPlus_commutator_spinMinusTerm N j),
+    Finset.sum_sub_distrib]
+  simp only [fermionTotalSpinZ, smul_smul]
+  rw [show (2 : ℂ) * (1 / 2) = 1 by norm_num, one_smul]
+  rfl
