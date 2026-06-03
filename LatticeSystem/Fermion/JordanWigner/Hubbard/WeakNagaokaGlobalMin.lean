@@ -1,5 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaGroundState
 import LatticeSystem.Quantum.SpinS.RealComplexEigenspaceBridge
+import LatticeSystem.Quantum.SpinS.RayleighRitzEquality
+import LatticeSystem.Quantum.SpinS.RayleighOnEigenvector
 
 /-!
 # Tasaki Theorem 11.5: the all-up minimum is the global one-hole ground energy
@@ -134,5 +136,24 @@ theorem rayleighOnVec_upEmbed (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℂ
     (fun σ _ hσ => by simp [upEmbed, if_neg hσ])
     (fun hmem => absurd (Finset.mem_univ _) hmem)]
   simp [upEmbed]
+
+/-! ## The all-up minimum dominates the full one-hole minimum -/
+
+/-- `min(M) ≤ min(M_↑)`: the all-up block is a principal submatrix, so its minimum
+eigenvalue is at least the full minimum (witnessed by embedding a unit all-up
+eigenvector). -/
+theorem hermitianMinEigenvalue_le_tasakiEffMatrixUp (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
+    (hJ : ∀ i j, star (t i j) = t j i) (hU : star U = U) (htdiag : ∀ i, t i i = 0) :
+    hermitianMinEigenvalue (tasakiEffMatrix_isHermitian N t U hJ hU) ≤
+      hermitianMinEigenvalue (tasakiEffMatrixUp_isHermitian N t U hJ hU) := by
+  obtain ⟨ξ, hξ_unit, hξ_eig⟩ :=
+    exists_unit_eigenvector_hermitianMinEigenvalue (tasakiEffMatrixUp_isHermitian N t U hJ hU)
+  have hupunit : dotProduct (star (upEmbed N ξ)) (upEmbed N ξ) = 1 := by
+    rw [dotProduct_star_upEmbed]; exact hξ_unit
+  have hle := hermitianMinEigenvalue_le_rayleighOnVec_of_unit
+    (tasakiEffMatrix_isHermitian N t U hJ hU) hupunit
+  rwa [rayleighOnVec_upEmbed N t U htdiag,
+    rayleighOnVec_eq_re_of_eigenvector _ ξ _ hξ_eig hξ_unit, Complex.ofReal_re] at hle
 
 end LatticeSystem.Fermion
