@@ -55,6 +55,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandModel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandBasis
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandCAR
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandGroundState
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandZeroEnergy
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyProjection
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyCommute
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinfulNumberHermitian
@@ -146,6 +147,7 @@ expansion):
 | `Hubbard/TasakiFlatBandBasis.lean` | **Tasaki §11.3.1 Lemma 11.10**: `{α_p} ∪ {β_u}` is a basis of the single-particle Hilbert space `Fin (2K+2) → ℂ` (`flatBand_linearIndependent`, `flatBandBasis`). Diagonal evaluations, even/odd site-split equiv, cross-orthogonality `⟨α_p,β_u⟩=0`, combined linear independence, and the basis (sorry-free) (Issue #4158) |
 | `Hubbard/TasakiFlatBandCAR.lean` | **Tasaki §11.3.1 eq. (11.3.7)** `flatBandBAnnihilation_ACreation_anticomm`: `{b̂_{u,σ}, â†_{p,τ}} = 0` (the `b̂`/`â†` operators anticommute, since `⟨α_p,β_u⟩=0`), via the spinful CAR `{ĉ_{x,σ},ĉ†_{y,τ}}=[x=y∧σ=τ]` and bilinear expansion. Sorry-free (Issue #4158) |
 | `Hubbard/TasakiFlatBandGroundState.lean` | **Tasaki §11.3.1 eqs. (11.3.8)/(11.3.9)**: the all-up α Slater state `flatBandAlphaAllUpState` = `(∏_p â†_{p,↑})|vac⟩`, the move-through lemma `flatBand_anticomm_listProd_mulVec_vacuum`, `b̂_{u,σ}|Φα⟩=0` (zero-energy condition), and `Ĥ_hop|Φα⟩=0` (`flatBandHopping_mulVec_alphaAllUpState`) — `|Φα,all↑⟩` is a zero-energy state of the hopping Hamiltonian. Sorry-free (Issue #4158) |
+| `Hubbard/TasakiFlatBandZeroEnergy.lean` | **Tasaki §11.3.1 (toward Thm 11.11)**: `Ĥ_int|Φα⟩=0` and `Ĥ|Φα⟩=0` (`flatBandHamiltonian_mulVec_alphaAllUpState`) — the all-up α state is a zero-energy state of the full flat-band Hamiltonian (down annihilation `ĉ_{x↓}|Φα⟩=0` ⇒ no double occupancy). Sorry-free (Issue #4158) |
 | `Hubbard/NagaokaConnectivityClassification.lean` | **Tasaki Theorem 11.8 + Lemma 11.9 (AXIOMATIZED, deferred)**: bond graph, biconnected / simple-loop / exchange-bond predicates, and the connectivity classification (`nagaoka_theorem_11_8`: connectivity ⟺ biconnected ∧ not a simple loop `>4` sites) + sufficient condition (`nagaoka_lemma_11_9`: exchange-bond-connected ⇒ connectivity). Theorem 11.8's proof is left by Tasaki to external papers (Bobrow–Stubis–Li / Wilson 15-puzzle); Lemma 11.9's faithful proof is a multi-PR effort. Statements formalized as `axiom`s in book order, proofs deferred (Theorem 11.7 does **not** depend on them) (Tasaki §11.2.2) |
 | `Hubbard/DoubleOccupancyProjection.lean` | site-`i` `Commute n_↑ n_↓` + idempotent product |
 | `Hubbard/DoubleOccupancyCommute.lean` | cross-site `Commute (n_↑(i)·n_↓(i)) (n_↑(j)·n_↓(j))` |

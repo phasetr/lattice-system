@@ -5730,6 +5730,21 @@ $\hat H_{\rm hop}|\Phi_{\alpha,\mathrm{all}\uparrow}\rangle = 0$
 (\texttt{flatBandHopping\_mulVec\_alphaAllUpState}, eq.~(11.3.8)) --- it is a
 zero-energy state of the (positive-semidefinite) kinetic term.
 
+\medskip
+\noindent\textbf{$\hat H |\Phi_{\alpha,\mathrm{all}\uparrow}\rangle = 0$.}
+The all-up state has no down-electrons, so $\hat c_{x,\downarrow}
+|\Phi_{\alpha,\mathrm{all}\uparrow}\rangle = 0$ (the same move-through argument
+with a down annihilation, which anticommutes with every $\hat a^\dagger_{p,
+\uparrow}$); hence the on-site interaction $\hat H_{\rm int} = U\sum_x
+\hat n_{x\uparrow}\hat n_{x\downarrow}$ annihilates it
+(\texttt{hubbardDoubleOccupancy\_mulVec\_alphaAllUpState}). Together with
+$\hat H_{\rm hop}|\Phi_{\alpha,\mathrm{all}\uparrow}\rangle = 0$ this gives
+$\hat H|\Phi_{\alpha,\mathrm{all}\uparrow}\rangle = 0$
+(\texttt{flatBandHamiltonian\_mulVec\_alphaAllUpState}): since
+$\hat H = \hat H_{\rm hop} + \hat H_{\rm int}$ is a sum of positive-semidefinite
+terms, $|\Phi_{\alpha,\mathrm{all}\uparrow}\rangle$ is a zero-energy ground state
+(the existence half of Theorem 11.11).
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
