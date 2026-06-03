@@ -768,4 +768,71 @@ theorem tasakiCoeff_mulVec_eigen_of_full (N : ℕ)
   have hfin := congrArg (tasakiCoeff N) hEq
   rwa [tasakiCoeff_expansion, tasakiCoeff_expansion] at hfin
 
+/-! ## The spin-lowering tower stays in the one-hole sector -/
+
+/-- `Ŝ^-_tot` conserves the total particle number (it is `Σ c†_{i↓} c_{i↑}`). -/
+theorem fermionTotalSpinMinus_commute_fermionTotalNumber (N : ℕ) :
+    Commute (fermionTotalSpinMinus N) (fermionTotalNumber (2 * N + 1)) := by
+  unfold fermionTotalSpinMinus
+  refine Commute.sum_left _ _ _ (fun i _ => ?_)
+  unfold fermionDownCreation fermionUpAnnihilation
+  exact (fermionTotalNumber_commute_hopping (2 * N + 1)
+    (spinfulIndex N i 1) (spinfulIndex N i 0)).symm
+
+/-- `Ŝ^-_tot` preserves the hard-core (no-double-occupancy) subspace: it commutes
+with the hard-core projection (adjoint of the `Ŝ^+_tot` version, using
+`(Ŝ^+)ᴴ = Ŝ^-` and the projection's Hermiticity). -/
+theorem fermionTotalSpinMinus_commute_hubbardHardcoreProjection (N : ℕ) :
+    Commute (fermionTotalSpinMinus N) (hubbardHardcoreProjection N) := by
+  have h := fermionTotalSpinPlus_commute_hubbardHardcoreProjection N
+  have hP := hubbardHardcoreProjection_isHermitian N
+  have hct := congrArg Matrix.conjTranspose h
+  rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul,
+    fermionTotalSpinPlus_conjTranspose, hP] at hct
+  exact hct.symm
+
+/-- `Ŝ^-_tot` maps the hard-core subspace into itself. -/
+theorem fermionTotalSpinMinus_mulVec_mem_hardcore (N : ℕ)
+    {v : (Fin (2 * N + 2) → Fin 2) → ℂ} (hv : v ∈ hubbardHardcoreSubspace N) :
+    (fermionTotalSpinMinus N).mulVec v ∈ hubbardHardcoreSubspace N := by
+  have hself : (hubbardHardcoreProjection N).mulVec ((fermionTotalSpinMinus N).mulVec v)
+      = (fermionTotalSpinMinus N).mulVec v := by
+    rw [Matrix.mulVec_mulVec,
+      (fermionTotalSpinMinus_commute_hubbardHardcoreProjection N).symm.eq,
+      ← Matrix.mulVec_mulVec, hubbardHardcoreProjection_mulVec_eq_self_of_mem N hv]
+  rw [← hself]
+  exact hubbardHardcoreProjection_mulVec_mem N _
+
+/-- `Ŝ^-_tot` preserves the total-particle-number eigenvalue. -/
+theorem fermionTotalSpinMinus_mulVec_preserves_number (N : ℕ)
+    {v : (Fin (2 * N + 2) → Fin 2) → ℂ}
+    (hv : (fermionTotalNumber (2 * N + 1)).mulVec v = (N : ℂ) • v) :
+    (fermionTotalNumber (2 * N + 1)).mulVec ((fermionTotalSpinMinus N).mulVec v)
+      = (N : ℂ) • ((fermionTotalSpinMinus N).mulVec v) := by
+  rw [Matrix.mulVec_mulVec,
+    (fermionTotalSpinMinus_commute_fermionTotalNumber N).symm.eq,
+    ← Matrix.mulVec_mulVec, hv, Matrix.mulVec_smul]
+
+/-- The tower `(Ŝ^-)^k v` stays in the hard-core subspace. -/
+theorem fermionTotalSpinMinus_pow_mulVec_mem_hardcore (N : ℕ) (k : ℕ)
+    {v : (Fin (2 * N + 2) → Fin 2) → ℂ} (hv : v ∈ hubbardHardcoreSubspace N) :
+    ((fermionTotalSpinMinus N) ^ k).mulVec v ∈ hubbardHardcoreSubspace N := by
+  induction k with
+  | zero => rwa [pow_zero, Matrix.one_mulVec]
+  | succ k ih =>
+    rw [pow_succ', ← Matrix.mulVec_mulVec]
+    exact fermionTotalSpinMinus_mulVec_mem_hardcore N ih
+
+/-- The tower `(Ŝ^-)^k v` keeps the total-particle-number eigenvalue `N`. -/
+theorem fermionTotalSpinMinus_pow_mulVec_preserves_number (N : ℕ) (k : ℕ)
+    {v : (Fin (2 * N + 2) → Fin 2) → ℂ}
+    (hv : (fermionTotalNumber (2 * N + 1)).mulVec v = (N : ℂ) • v) :
+    (fermionTotalNumber (2 * N + 1)).mulVec (((fermionTotalSpinMinus N) ^ k).mulVec v)
+      = (N : ℂ) • (((fermionTotalSpinMinus N) ^ k).mulVec v) := by
+  induction k with
+  | zero => rwa [pow_zero, Matrix.one_mulVec]
+  | succ k ih =>
+    rw [pow_succ', ← Matrix.mulVec_mulVec]
+    exact fermionTotalSpinMinus_mulVec_preserves_number N ih
+
 end LatticeSystem.Fermion
