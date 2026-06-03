@@ -275,3 +275,26 @@ theorem fermionTotalSpinSquared_commute_fermionTotalSpinMinus (N : ℕ) :
   have hR : M * (M * P + Z * (Z + 1)) = M * M * P + M * Z * Z + M * Z := by
     noncomm_ring
   rw [hL, hR]
+
+/-! ## Raising-after-lowering via the Casimir -/
+
+/-- **`Ŝ^+_tot Ŝ^-_tot = (Ŝ_tot)² − Ŝ^z_tot (Ŝ^z_tot − 1)`**: the
+raising-after-lowering product expressed through the Casimir. On a state with
+Casimir eigenvalue `S(S+1)` and `Ŝ^z` eigenvalue `m`, this gives
+`Ŝ^+_tot Ŝ^-_tot = S(S+1) − m(m−1)`, which is the squared norm of the lowered
+state and the engine behind the spin-multiplet's nonvanishing. Derived from the
+Casimir definition `(Ŝ_tot)² = Ŝ^-_tot Ŝ^+_tot + Ŝ^z_tot (Ŝ^z_tot + 1)` and the
+ladder commutator `Ŝ^+_tot Ŝ^-_tot = Ŝ^-_tot Ŝ^+_tot + 2 Ŝ^z_tot`. -/
+theorem fermionTotalSpinPlus_mul_fermionTotalSpinMinus (N : ℕ) :
+    fermionTotalSpinPlus N * fermionTotalSpinMinus N =
+      fermionTotalSpinSquared N -
+        fermionTotalSpinZ N * (fermionTotalSpinZ N - 1) := by
+  have hPM : fermionTotalSpinPlus N * fermionTotalSpinMinus N =
+      fermionTotalSpinMinus N * fermionTotalSpinPlus N +
+        (2 : ℂ) • fermionTotalSpinZ N := by
+    have h := fermionTotalSpinPlus_commutator_fermionTotalSpinMinus N
+    rwa [sub_eq_iff_eq_add'] at h
+  rw [hPM]
+  unfold fermionTotalSpinSquared
+  rw [two_smul]
+  noncomm_ring
