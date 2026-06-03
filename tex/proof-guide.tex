@@ -5655,6 +5655,49 @@ and does not depend on these axioms}; they are isolated in a separate file so th
 proven core stays axiom-clean.
 
 %======================================================================
+\subsection{Tasaki's flat-band ferromagnetism: model and Lemma 11.10
+  (Tasaki §11.3.1)}
+\label{subsec:tasaki-flatband}
+%======================================================================
+
+\noindent This formalizes the model setup of Tasaki §11.3.1 (the $d=1$
+decorated/Delta chain) and Lemma 11.10 (files
+\texttt{Fermion/JordanWigner/Hubbard/TasakiFlatBandModel.lean} and
+\texttt{TasakiFlatBandBasis.lean}).
+
+\medskip
+\noindent\textbf{The model.}
+The decorated chain $\Lambda = E \cup I$ has $K+1$ external sites $E$ (the
+periodic chain) and $K+1$ internal sites $I$ (bond midpoints); it is realized in
+the existing spinful Hubbard framework on $2K+2$ physical sites by interleaving
+external $i \mapsto 2i$ (\texttt{deltaExternalSite}) and internal $i \mapsto 2i+1$
+(\texttt{deltaInternalSite}) into $\mathrm{Fin}(2K+2)$. The localized
+single-particle states are $\alpha_p$ (\texttt{flatBandAlpha}, eq.~(11.3.1):
+$1$ at external $p$, $-\nu$ at the incident internal sites $p, p-1$) and $\beta_u$
+(\texttt{flatBandBeta}, eq.~(11.3.2): $1$ at internal $u$, $+\nu$ at external
+$u, u+1$); the fermion operators $\hat a_{p,\sigma} = \hat C_\sigma(\alpha_p)$,
+$\hat b_{u,\sigma} = \hat C_\sigma(\beta_u)$ (eqs.~(11.3.3)/(11.3.4)) are the
+corresponding combinations of $\hat c$'s. The Hamiltonian is
+\texttt{flatBandHamiltonian} $= t\sum_{u,\sigma}\hat b^\dagger_{u,\sigma}
+\hat b_{u,\sigma} + U\sum_x \hat n_{x\uparrow}\hat n_{x\downarrow}$
+(eqs.~(11.3.5)/(11.3.6)), shown Hermitian.
+
+\medskip
+\noindent\textbf{Lemma 11.10.}
+$\{\alpha_p\}_{p\in E} \cup \{\beta_u\}_{u\in I}$ is a basis of the
+single-particle Hilbert space $\mathrm{Fin}(2K+2)\to\mathbb C$
+(\texttt{flatBand\_linearIndependent}, \texttt{flatBandBasis}). Following Tasaki:
+the diagonal evaluations $\alpha_p(2q) = [p=q]$, $\beta_u(2v{+}1) = [u=v]$ give the
+individual linear independence; the even/odd site split
+(\texttt{deltaSiteEquiv}) and the cross-orthogonality
+$\langle\alpha_p,\beta_u\rangle = 0$ (\texttt{flatBandAlpha\_dot\_beta} --- the
+$+\nu$ contribution at the shared external site cancels the $-\nu$ at the shared
+internal site, via the cyclic incidence equivalence $p\in\{u,u{+}1\}
+\Leftrightarrow u\in\{p,p{-}1\}$) make the two spans orthogonal, hence disjoint;
+\texttt{linearIndependent\_sum} then gives the combined independence, and the
+basis follows from $|E|+|I| = |\Lambda| = \dim$. The development is sorry-free.
+
+%======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
 %======================================================================
