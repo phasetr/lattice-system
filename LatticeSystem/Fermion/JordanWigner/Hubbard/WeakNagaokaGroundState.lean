@@ -190,4 +190,73 @@ theorem fermionTotalNumber_mulVec_tasakiState (N : ℕ)
   rw [hubbardTasakiBasisState_eq_smul_basisVec, Matrix.mulVec_smul,
     fermionTotalNumber_mulVec_basisVec, hubbardOneHoleConfig_electron_count, smul_comm]
 
+/-! ## Pointwise diagonal action of the number operators -/
+
+/-- The site-occupation number operator is diagonal: `(n_j ψ)(w) = w_j · ψ(w)`
+for an arbitrary state `ψ`. -/
+theorem fermionMultiNumber_mulVec_apply (N : ℕ) (j : Fin (2 * N + 2))
+    (v : (Fin (2 * N + 2) → Fin 2) → ℂ) (w : Fin (2 * N + 2) → Fin 2) :
+    (fermionMultiNumber (2 * N + 1) j).mulVec v w = ((w j).val : ℂ) * v w := by
+  rw [fermionMultiNumber_eq_onSite]
+  unfold Matrix.mulVec dotProduct
+  rw [show (∑ σ : Fin (2 * N + 2) → Fin 2,
+        (onSite j (spinHalfOpMinus * spinHalfOpPlus)) w σ * v σ) =
+      ∑ σ : Fin (2 * N + 2) → Fin 2,
+        (if σ = w then ((w j).val : ℂ) * v σ else 0) from ?_]
+  · rw [Finset.sum_ite_eq']; simp
+  · refine Finset.sum_congr rfl (fun σ _ => ?_)
+    simp only [onSite_apply]
+    by_cases hagree : ∀ k, k ≠ j → w k = σ k
+    · rw [if_pos hagree]
+      by_cases hx : w j = σ j
+      · have hwσ : w = σ := funext fun k => by
+          by_cases hk : k = j
+          · rw [hk]; exact hx
+          · exact hagree k hk
+        rw [if_pos hwσ.symm, hwσ]
+        rcases (show σ j = 0 ∨ σ j = 1 from by
+          rcases (σ j) with ⟨r, hr⟩; interval_cases r; exacts [Or.inl rfl, Or.inr rfl])
+          with h | h <;>
+          rw [h] <;>
+          simp [spinHalfOpMinus, spinHalfOpPlus, Matrix.mul_apply, Fin.sum_univ_two]
+      · have hwσ : ¬ σ = w := fun h => hx (by rw [h])
+        rw [if_neg hwσ]
+        rcases (show w j = 0 ∨ w j = 1 from by
+          rcases (w j) with ⟨r, hr⟩; interval_cases r; exacts [Or.inl rfl, Or.inr rfl])
+          with hw | hw <;>
+        rcases (show σ j = 0 ∨ σ j = 1 from by
+          rcases (σ j) with ⟨r, hr⟩; interval_cases r; exacts [Or.inl rfl, Or.inr rfl])
+          with hs | hs <;>
+        first
+        | (exact absurd (hw.trans hs.symm) hx)
+        | (rw [hw, hs];
+           simp [spinHalfOpMinus, spinHalfOpPlus, Matrix.mul_apply, Fin.sum_univ_two])
+    · rw [if_neg hagree]
+      have hwσ : ¬ σ = w := fun h => hagree (fun k _ => by rw [h])
+      rw [if_neg hwσ, zero_mul]
+
+/-- The total electron number is diagonal: `(N̂ ψ)(w) = (Σ_j w_j) · ψ(w)`. -/
+theorem fermionTotalNumber_mulVec_apply (N : ℕ)
+    (v : (Fin (2 * N + 2) → Fin 2) → ℂ) (w : Fin (2 * N + 2) → Fin 2) :
+    (fermionTotalNumber (2 * N + 1)).mulVec v w =
+      (∑ j : Fin (2 * N + 2), ((w j).val : ℂ)) * v w := by
+  unfold fermionTotalNumber
+  rw [Matrix.sum_mulVec, Finset.sum_apply,
+    Finset.sum_congr rfl (fun j _ => fermionMultiNumber_mulVec_apply N j v w),
+    ← Finset.sum_mul]
+
+/-- A number eigenstate vanishes off its electron-number shell: if `N̂ v = k • v`
+then `v(w) = 0` whenever `Σ_j w_j ≠ k`. -/
+theorem mulVec_apply_eq_zero_of_number_ne (N : ℕ)
+    (v : (Fin (2 * N + 2) → Fin 2) → ℂ) (k : ℂ)
+    (hv : (fermionTotalNumber (2 * N + 1)).mulVec v = k • v)
+    (w : Fin (2 * N + 2) → Fin 2)
+    (hne : (∑ j : Fin (2 * N + 2), ((w j).val : ℂ)) ≠ k) :
+    v w = 0 := by
+  have h1 : (∑ j : Fin (2 * N + 2), ((w j).val : ℂ)) * v w = k * v w := by
+    rw [← fermionTotalNumber_mulVec_apply, hv, Pi.smul_apply, smul_eq_mul]
+  have h2 : ((∑ j : Fin (2 * N + 2), ((w j).val : ℂ)) - k) * v w = 0 := by
+    rw [sub_mul, h1, sub_self]
+  exact (mul_eq_zero.mp h2).resolve_left (sub_ne_zero.mpr hne)
+
 end LatticeSystem.Fermion
