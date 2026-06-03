@@ -69,11 +69,13 @@ theorem fermionTotalSpinZ_mulVec_pfFerroState (N : ℕ) (ξ : Fin (N + 1) → �
     show tasakiState N ⟨x, holeSpinUp N x⟩ = hubbardTasakiBasisState N x (fun _ => true) from rfl,
     fermionTotalSpinZ_mulVec_hubbardTasakiBasisStateUp, smul_comm]
 
-/-- The ferromagnetic state is nonzero when the weights are strictly positive: its
+/-- The ferromagnetic state is nonzero whenever the weight vector is nonzero: its
 squared norm is `Σ_x ξ_x² > 0` by orthonormality of the Tasaki basis. -/
-theorem pfFerroState_ne_zero (N : ℕ) (ξ : Fin (N + 1) → ℝ) (hξ : ∀ x, 0 < ξ x) :
+theorem pfFerroState_ne_zero (N : ℕ) (ξ : Fin (N + 1) → ℝ) (hξ : ξ ≠ 0) :
     pfFerroState N ξ ≠ 0 := by
   classical
+  obtain ⟨x₀, hx₀⟩ := Function.ne_iff.mp hξ
+  rw [Pi.zero_apply] at hx₀
   intro h
   set ψ : ((x : Fin (N + 1)) × HoleSpin N x) → ℝ :=
     fun p => if p.2 = holeSpinUp N p.1 then ξ p.1 else 0 with hψdef
@@ -90,9 +92,9 @@ theorem pfFerroState_ne_zero (N : ℕ) (ξ : Fin (N + 1) → ℝ) (hξ : ∀ x, 
   have hsum : (∑ p, (ψ p) ^ 2) = 0 := by exact_mod_cast hnorm.symm
   have hpos : 0 < ∑ p, (ψ p) ^ 2 := by
     refine Finset.sum_pos' (fun p _ => sq_nonneg _)
-      ⟨⟨Classical.arbitrary (Fin (N + 1)), holeSpinUp N _⟩, Finset.mem_univ _, ?_⟩
+      ⟨⟨x₀, holeSpinUp N x₀⟩, Finset.mem_univ _, ?_⟩
     simp only [hψdef, if_pos rfl]
-    exact pow_pos (hξ _) 2
+    exact lt_of_le_of_ne (sq_nonneg _) (Ne.symm (pow_ne_zero 2 hx₀))
   linarith
 
 /-! ## The effective Hamiltonian conserves particle number
