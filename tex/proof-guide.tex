@@ -6208,6 +6208,16 @@ It is Hermitian, and \texttt{wannierExampleModel\_gamma\_zero} proves it reduces
 \texttt{flatBandHamiltonian} at $\gamma=0$ (eq.~(11.4.1) reducing to (11.3.22)), explicitly
 covering §11.4.1 in book order.
 
+\medskip\noindent\textbf{Lattice translation (towards Theorem 11.19).}  Theorem 11.19 is
+stated via the fermionic translation operator $\hat\tau_z$ (eq.~(11.4.30)).  Its underlying
+combinatorial datum is built in \texttt{TranslationOperator.lean}: the spinful mode space
+$\mathrm{Fin}(2(2K{+}1){+}2)=\mathrm{Fin}((2K{+}2)\cdot 2)$ factors as (physical site)
+$\times$ (spin) (mode $2p{+}\sigma\leftrightarrow(p,\sigma)$, \texttt{modeSiteSpinEquiv}), and
+\texttt{siteTranslationPerm}~$K\,z$ is the \texttt{Equiv.Perm} cyclically shifting the
+physical site by $2z$ (one cell $=$ two physical sites), spin fixed.  This is step 1 toward
+$\hat\tau_z$; the signed Fock-space operator, $E_{\rm SW}(k)$, and the Theorem 11.19 axiom
+follow.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
