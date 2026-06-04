@@ -18,6 +18,7 @@ import LatticeSystem.Math.HermitianMaxEqPF
 import LatticeSystem.Math.HermitianSpectrumShift
 import LatticeSystem.Math.HermitianMinEqOfShiftPF
 import LatticeSystem.Math.InvariantSubmoduleEigenvector
+import LatticeSystem.Math.TasakiAppendixA.LieProduct
 import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPF
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphAltPath
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural

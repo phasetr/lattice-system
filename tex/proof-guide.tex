@@ -6660,6 +6660,29 @@ the class \texttt{LatticeWithSpacing}, the accessor
 \texttt{spacing\_fin\_succ}, \texttt{spacingOf\_fin\_succ}. Tests
 pinning these values are in \texttt{LatticeSystem/Tests/Scale.lean}.
 
+\section{Tasaki Appendix A: Mathematical Appendices}
+\label{sec:appendix-a}
+
+The book-order content following Chapter 11.  Many results here are the foundations of the
+deferred Chapter-11 proof discharges (frustration-free Hamiltonians A.9/A.10 for §11.3/§11.4,
+the strong-coupling limit A.11/A.12 for §11.5, and the Perron--Frobenius theorem A.17/A.18 for
+§11.2/§11.5, the last largely already formalised in \texttt{Math/PerronFrobenius*} and
+\texttt{Math/CollatzWielandt*}).  We prove results where mathlib supports them and axiomatize
+the heavy analytic ones, in strict book order (Issue \#4205).
+
+\medskip\noindent\textbf{Theorem A.1 (Lie product formula, axiomatized).}  For finite complex
+matrices $A,B$ --- the operator algebra of a finite-volume quantum system --- the exponential
+of a sum is the limit of the symmetric split product (Tasaki eq.~(A.2.21)),
+\[
+  e^{A+B} \;=\; \lim_{N\uparrow\infty}\bigl(e^{A/N}\,e^{B/N}\bigr)^{N}.
+\]
+Mathlib provides only the commuting case (\texttt{Matrix.exp\_add\_of\_commute}); the general
+non-commuting Lie/Trotter formula for bounded operators is a standard but non-trivial
+real-analysis result (Tasaki's footnote: ``nineteenth century mathematics''), recorded as the
+documented axiom \texttt{lieProductFormula} (\texttt{Math/TasakiAppendixA/LieProduct.lean}) via
+\texttt{NormedSpace.exp} and \texttt{Filter.Tendsto}.  It is not on the critical path of any
+Chapter-11 proof; to be discharged later.
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
