@@ -6035,6 +6035,33 @@ symmetric-tensor/SU(2) classification. The existence half does \emph{not} depend
 this axiom.
 
 %======================================================================
+\subsection{Mielke's flat-band ferromagnetism: the model (Tasaki §11.3.2)}
+%======================================================================
+
+\noindent Mielke's flat-band ferromagnetism (Tasaki §11.3.2) is the Hubbard model
+on the \emph{line graph} of a base lattice, with uniform hopping. Its Hamiltonian
+(eqs.~(11.3.31)/(11.3.6)) is
+\[
+  \hat H = t\sum_{\{x,y\}\in B}\hat c^\dagger_{x,\sigma}\hat c_{y,\sigma}
+    + 2t\sum_x \hat n_x + U\sum_x \hat n_{x\uparrow}\hat n_{x\downarrow},
+\]
+i.e.\ the uniform-hopping graph Hubbard Hamiltonian plus a $2t\,\hat N$ shift placing
+the ground-state energy at $0$. We formalize it on an arbitrary graph $G$ as
+\texttt{mielkeHamiltonian} $= \texttt{hubbardHamiltonianOnGraph}\,G\,t\,U +
+2t\cdot\hat N$ (\texttt{MielkeHamiltonian.lean}), and record its symmetries:
+Hermiticity (\texttt{mielkeHamiltonian\_isHermitian}), particle-number conservation
+$[\hat H,\hat N]=0$ (\texttt{mielkeHamiltonian\_commute\_fermionTotalNumber}), and
+SU(2) invariance $[\hat S^-_{\rm tot},\hat H]=0$
+(\texttt{fermionTotalSpinMinus\_commute\_mielkeHamiltonian}). The line graph is
+mathlib's \texttt{SimpleGraph.lineGraph}. The two main results --- Theorem 11.12
+(a line graph has $D(\tilde\Lambda,B)$ zero-energy single-electron states) and
+Theorem 11.13 (Mielke's ferromagnetism: for a biconnected base at half-filling
+$N=D$, the ground states are the maximal-spin multiplet) --- are stated by Tasaki
+with their proofs deferred to §11.3.3 (Theorem 11.12) or omitted entirely
+(Theorem 11.13), so they will be introduced as documented axioms in a companion
+file, matching the policy for Theorem 11.8 / Lemma 11.9.
+
+%======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
 %======================================================================
