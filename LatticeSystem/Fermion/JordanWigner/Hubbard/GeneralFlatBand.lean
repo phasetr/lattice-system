@@ -96,12 +96,10 @@ noncomputable def generalFlatBandGroundSubmodule (U : ℝ) :
 /-- **Saturated ferromagnetism at flat-band filling** `N = D₀` (the conclusion of
 Theorem 11.15): the ground subspace is the `D₀ + 1 = 2S_max + 1`-fold multiplet, and
 every ground state is an `(Ŝ_tot)²` eigenvector at `S_max(S_max + 1)`, `S_max = D₀/2`.
-Mirrors the `mielke_theorem_11_13` ground-subspace formulation. -/
+Expressed via the shared `IsMaximalSpinMultipletSubmodule` predicate (see
+`mielke_theorem_11_13`). -/
 def generalFlatBandFerromagnetic (U : ℝ) : Prop :=
-  Module.finrank ℂ (generalFlatBandGroundSubmodule T U) = generalFlatBandDim T + 1 ∧
-    ∀ v ∈ generalFlatBandGroundSubmodule T U,
-      (fermionTotalSpinSquared M).mulVec v =
-        (((generalFlatBandDim T : ℂ) / 2) * ((generalFlatBandDim T : ℂ) / 2 + 1)) • v
+  IsMaximalSpinMultipletSubmodule M (generalFlatBandGroundSubmodule T U) (generalFlatBandDim T)
 
 /-- **Tasaki Theorem 11.15 (general flat-band ferromagnetism), AXIOM.**  For a Hermitian
 positive-semidefinite hopping matrix `T` with nonempty flat band (`D₀ > 0`) and `U > 0`,
