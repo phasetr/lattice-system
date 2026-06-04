@@ -6162,6 +6162,22 @@ axioms (\texttt{tasaki\_theorem\_11\_15}, \texttt{generalFlatBand\_lemma\_11\_16
 \texttt{generalFlatBandBasisGraph}/\texttt{generalFlatBandBasisConnected}), matching the policy
 for Theorems 11.8 / 11.13; their proofs are deferred to later work.
 
+\medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
+§11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
+on the precise definition of \emph{exhibiting ferromagnetism}.  For a many-body Hamiltonian
+$\hat H$ the minimum energy in the total-spin-$S$ sector is
+\[
+  E_{\min}(S) = \min\{\langle\Phi|\hat H|\Phi\rangle : (\hat S_{\rm tot})^2\Phi = S(S{+}1)\Phi,\ \|\Phi\|=1\},
+\]
+and the model exhibits (saturated) ferromagnetism iff $E_{\min}(S_{\max}) < E_{\min}(S)$ for
+every $S\ne S_{\max}$.  In Lean (\texttt{SectorMinEnergy.lean}) sectors are indexed by
+$\mathtt{twoS}=2S\in\mathbb N$ (eigenvalue $(\mathtt{twoS}/2)(\mathtt{twoS}/2+1)$, allowing
+half-integer spin); \texttt{sectorMinEnergy}~$\hat H~\mathtt{twoS}$ is the infimum of
+\texttt{rayleighOnVec}~$\hat H$ over the unit (L²/\texttt{EuclideanSpace}) vectors of the
+$(\hat S_{\rm tot})^2$-eigensector, and \texttt{exhibitsFerromagnetism}~$\hat H~\mathtt{twoSmax}$
+is $\forall\,\mathtt{twoS}<\mathtt{twoSmax},\ E_{\min}(S_{\max})<E_{\min}(\mathtt{twoS})$.  These
+definitions are the foundation of the §11.4 theorems (axiomatized in later work; Issue \#4189).
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
