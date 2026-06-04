@@ -5954,6 +5954,22 @@ structural constraints Tasaki deduces that a ground state lives in the $\alpha$
 band with no double occupancy, hence is spatially symmetric and carries maximal
 spin --- the remaining steps of the uniqueness proof.
 
+\medskip
+\noindent\textbf{Number conservation and hard-core membership
+(\texttt{TasakiFlatBandNumberConservation.lean}).}
+Two structural facts organise the uniqueness analysis. First, $\hat H$ conserves
+the total particle number, $[\hat H, \hat N] = 0$
+(\texttt{flatBandHamiltonian\_commute\_fermionTotalNumber}): each kinetic mode
+$\hat b^\dagger_{u,\sigma}\hat b_{u,\sigma}$ is number-conserving (lifting
+$[\hat N, \hat c_j] = -\hat c_j$ to $\hat b_{u,\sigma}\hat N - \hat N\hat b_{u,
+\sigma} = \hat b_{u,\sigma}$ and dually for $\hat b^\dagger$, so $\hat b^\dagger$
+raises and $\hat b$ lowers $\hat N$ by one and the product commutes), and the
+interaction $\hat n_{x\uparrow}\hat n_{x\downarrow}$ commutes with $\hat N$ as a
+product of number operators. Hence ground states decompose into fixed-$N$ sectors,
+and Tasaki works in the physical sector $N_e = |E| = K+1$. Second, the
+no-double-occupancy condition (11.3.12) places any ground state in the Hubbard
+hard-core subspace (\texttt{flatBand\_groundState\_mem\_hardcoreSubspace}).
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
