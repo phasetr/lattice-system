@@ -1,8 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.FermionSiteSpin
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreProjection
-import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreSubspace
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Graph
-import LatticeSystem.Fermion.JordanWigner.Hubbard.SectorMinEnergy
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GroundSubspaceAtFilling
 import LatticeSystem.Fermion.JordanWigner.Hubbard.MielkeTheorems
 
 /-!
@@ -27,10 +26,11 @@ Perron–Frobenius / "spin-charge separation" argument (the oddness of `N` is wh
 nontrivial argument, it is recorded here as a documented axiom (to be discharged), matching
 the policy for the other §11.x ferromagnetism theorems.
 
-The conclusion is phrased on the t-J **ground subspace at fixed electron number `N_e`**
-(`tJGroundSubmodule`: the `H`-eigenspace at the ground energy, intersected with the
-`N_e`-electron sector and the no-double-occupancy subspace `H_{N_e}^hc` — the t-J
-Hamiltonian's physical domain).  The full statement — *ground spin `S_tot = N_e/2`* **and**
+The conclusion is phrased on the **ground subspace at fixed electron number `N_e`**
+(`groundSubmoduleAtFilling`, from `GroundSubspaceAtFilling`: the `H`-eigenspace at the ground
+energy, intersected with the `N_e`-electron sector and the no-double-occupancy subspace
+`H_{N_e}^hc` — the t-J Hamiltonian's physical domain).  The full statement — *ground spin
+`S_tot = N_e/2`* **and**
 *`(N_e + 1)`-fold degeneracy* — is captured at once by the shared
 `IsMaximalSpinMultipletSubmodule` predicate (the same one used for Mielke's Theorem 11.13 and
 the general flat-band Theorem 11.15).  The electron number must be fixed and the hard-core
@@ -67,32 +67,6 @@ noncomputable def tJHamiltonian (N : ℕ) (G : SimpleGraph (Fin (N + 1))) [Decid
               fermionSpinDot N x y
           else 0)
 
-/-- The **fixed-electron-number hard-core states**: unit vectors of `EuclideanSpace ℂ` over
-the computational configurations that are `N̂`-eigenvectors at the electron number `N_e` and
-lie in the no-double-occupancy subspace `H_{N_e}^hc` (the natural domain of the t-J
-Hamiltonian).  These are the candidate states over which the t-J ground energy is taken. -/
-def tJFillingHardcoreStates (M Ne : ℕ) :
-    Set (EuclideanSpace ℂ (Fin (2 * M + 2) → Fin 2)) :=
-  {φ | ‖φ‖ = 1 ∧
-    (fermionTotalNumber (2 * M + 1)).mulVec φ.ofLp = (Ne : ℂ) • φ.ofLp ∧
-    φ.ofLp ∈ hubbardHardcoreSubspace M}
-
-/-- **The t-J ground-state energy at filling `N_e`**: the infimum of `rayleighOnVec H` over
-the unit, `N_e`-electron, hard-core states `tJFillingHardcoreStates M Ne` — the minimum
-energy of the model on its physical Hilbert space `H_{N_e}^hc`. -/
-noncomputable def tJGroundEnergyAtFilling {M : ℕ} (H : ManyBodyOp (Fin (2 * M + 2)))
-    (Ne : ℕ) : ℝ :=
-  ⨅ φ : tJFillingHardcoreStates M Ne, rayleighOnVec H (φ : EuclideanSpace ℂ _).ofLp
-
-/-- **The t-J ground subspace at filling `N_e`**: the `H`-eigenspace at the ground energy
-`tJGroundEnergyAtFilling H Ne`, intersected with the `N_e`-electron number sector and the
-no-double-occupancy subspace `H_{N_e}^hc`.  Its dimension is the ground-state degeneracy. -/
-noncomputable def tJGroundSubmodule {M : ℕ} (H : ManyBodyOp (Fin (2 * M + 2)))
-    (Ne : ℕ) : Submodule ℂ ((Fin (2 * M + 2) → Fin 2) → ℂ) :=
-  Module.End.eigenspace H.mulVecLin (tJGroundEnergyAtFilling H Ne : ℂ) ⊓
-    Module.End.eigenspace (fermionTotalNumber (2 * M + 1)).mulVecLin (Ne : ℂ) ⊓
-    hubbardHardcoreSubspace M
-
 /-- **Tasaki Proposition 11.24 (ferromagnetism in the d = 1 ferromagnetic t-J model),
 AXIOM.**  On the one-dimensional periodic chain (`SimpleGraph.cycleGraph (N + 1)`), if the
 electron number `Ne` satisfies `Ne < N + 1 = L` and is **odd**, then the ground states have
@@ -107,6 +81,6 @@ a documented axiom (to be discharged), matching the §11.x ferromagnetism policy
 axiom proposition_11_24 (N : ℕ) (τ J : ℝ) (hτ : 0 < τ) (hJ : 0 < J)
     (Ne : ℕ) (hNe : Ne < N + 1) (hodd : Odd Ne) :
     IsMaximalSpinMultipletSubmodule N
-      (tJGroundSubmodule (tJHamiltonian N (SimpleGraph.cycleGraph (N + 1)) τ J) Ne) Ne
+      (groundSubmoduleAtFilling (tJHamiltonian N (SimpleGraph.cycleGraph (N + 1)) τ J) Ne) Ne
 
 end LatticeSystem.Fermion

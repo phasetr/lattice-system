@@ -6280,20 +6280,50 @@ $H_N^{\rm hc}$), and the exchange term is $J\sum$ over the ordered adjacent pair
 $(\hat n_x\hat n_y)/4 - \texttt{fermionSpinDot}~N\,x\,y$, with $\hat n_x=\texttt{fermionSiteNumber}~N\,x$.
 Since the maximal total spin at fixed electron number $N_e$ (with no double occupancy) is
 $S_{\max}=N_e/2$, the statement requires the electron number to be \emph{fixed} and the
-hard-core constraint imposed; we phrase it on the \emph{ground subspace} at filling $N_e$:
-\texttt{tJFillingHardcoreStates} (unit $N_e$-electron states in the no-double-occupancy
-subspace $H_{N_e}^{\rm hc}$), \texttt{tJGroundEnergyAtFilling} (their minimum energy), and
-\texttt{tJGroundSubmodule} ($H$-eigenspace at the ground energy $\sqcap$ the $N_e$-electron
-sector $\sqcap$ $H_{N_e}^{\rm hc}$).  \textbf{Proposition
+hard-core constraint imposed; we phrase it on the generic \emph{ground subspace} at filling
+$N_e$ (\texttt{GroundSubspaceAtFilling.lean}): \texttt{fillingHardcoreStates} (unit
+$N_e$-electron states in the no-double-occupancy subspace $H_{N_e}^{\rm hc}$),
+\texttt{groundEnergyAtFilling} (their minimum energy), and
+\texttt{groundSubmoduleAtFilling} ($H$-eigenspace at the ground energy $\sqcap$ the
+$N_e$-electron sector $\sqcap$ $H_{N_e}^{\rm hc}$).  \textbf{Proposition
 11.24} (\texttt{proposition\_11\_24}, documented axiom): for the one-dimensional periodic chain
 ($\texttt{SimpleGraph.cycleGraph}~(N+1)$), if the electron number $N_e<L$ is \emph{odd}, the
 ground states have total spin $S_{\rm tot}=N_e/2$ and are non-degenerate apart from the trivial
 $2S_{\rm tot}+1=N_e+1$-fold $SU(2)$ multiplet --- both halves captured at once by
-\texttt{IsMaximalSpinMultipletSubmodule}~$N\,(\texttt{tJGroundSubmodule}\dots)\,N_e$ (the shared
-predicate reused from Mielke's Theorem 11.13 and the general flat-band Theorem 11.15).  Tasaki's proof is a Perron--Frobenius /
+\texttt{IsMaximalSpinMultipletSubmodule}~$N\,(\texttt{groundSubmoduleAtFilling}\dots)\,N_e$ (the
+shared predicate reused from Mielke's Theorem 11.13 and the general flat-band Theorem 11.15).
+Tasaki's proof is a Perron--Frobenius /
 ``spin-charge separation'' argument (Theorem A.18); the oddness of $N_e$ is exactly what makes
 the wrap-around $1\leftrightarrow L$ hop sign-free under periodic boundary conditions.  The proof
 is deferred (Issue \#4198).
+
+\medskip\noindent\textbf{The d=1 decorated Hubbard model, Lemma 11.25 and Theorem 11.26
+(Tasaki §11.5.3, axiomatized).}  Tasaki obtains a rigorous example of \emph{metallic}
+ferromagnetism by realising the t-J model as the strong-coupling limit of a Hubbard model on
+the \emph{duplicated-internal-site} decorated lattice $\Lambda=E\cup(I\times\{1,2\})$.  We
+formalise it (\texttt{MetallicFerroModel.lean}, $d=1$, $K+1$ cells) by packing the $3(K+1)$
+sites into $\mathrm{Fin}(3K+3)$ (\texttt{decExternalSite}, \texttt{decInternalSite1},
+\texttt{decInternalSite2}); the localised states \texttt{decAlpha}, \texttt{decBeta1},
+\texttt{decBeta2} (eqs.~(11.5.7)--(11.5.9)) give fermion operators $\hat a,\hat b$ via
+$\hat C_\sigma(\varphi)=\sum_x\varphi(x)\hat c_{x,\sigma}$, and the Hamiltonian is
+$\hat H=\hat H_{\rm hop}+\hat H_{\rm int}$ with
+$\hat H_{\rm hop}=t\sum_{(c,\zeta),\sigma}\hat b^\dagger_{(c,\zeta),\sigma}\hat b_{(c,\zeta),\sigma}
+-s\sum_{\langle p,q\rangle\in E,\sigma}\hat a^\dagger_{p,\sigma}\hat a_{q,\sigma}$
+(eq.~(11.5.14)) and $\hat H_{\rm int}=U\sum_x\hat n_{x\uparrow}\hat n_{x\downarrow}$
+(eq.~(11.5.13)); the off-diagonal $\hat a^\dagger_p\hat a_q$ makes the lowest band dispersive,
+and the internal duplication forces the standard normalised anticommutation
+$\{\hat a_{p,\sigma},\hat a^\dagger_{q,\tau}\}=(1+4d\nu^2)\delta_{pq}\delta_{\sigma\tau}$
+(eq.~(11.5.11)).  \textbf{Lemma 11.25} (\texttt{lemma\_11\_25}, documented axiom): the
+$t,U\uparrow\infty$ limit of this Hubbard model at filling $N_e$ is equivalent to the
+$J\uparrow\infty$ limit of the t-J model on $E=\texttt{cycleGraph}(K+1)$ with
+$\tau=(1+4\nu^2)s$; we render the equivalence via its degeneracy consequence (the
+$\mathrm{finrank}$ of the two ground subspaces agree in the limits).  \textbf{Theorem 11.26}
+(\texttt{theorem\_11\_26}, documented axiom): for $d=1$, $N_e<K+1=|E|$ odd, in the limit
+$t,U\uparrow\infty$ the ground states are
+$\texttt{IsMaximalSpinMultipletSubmodule}~(3K+2)\,(\texttt{groundSubmoduleAtFilling}\dots)\,N_e$
+--- total spin $S_{\rm tot}=N_e/2$ and $N_e+1$-fold, a metallic ferromagnet since the lowest
+band is partially filled.  Tasaki derives it from Proposition 11.24 and Lemma 11.25
+(Perron--Frobenius); the proof is deferred (Issue \#4198).
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
