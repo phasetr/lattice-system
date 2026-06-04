@@ -6004,6 +6004,36 @@ inclusion is the other one, $\hat b$-kernel $\subseteq$ $\alpha$-Fock, which
 requires the Fock-space factorisation of the non-orthogonal $\{\alpha\}\cup\{\beta\}$
 basis and is deferred.
 
+\medskip
+\noindent\textbf{Theorem 11.11 capstone (\texttt{TasakiFlatBandTheorem11\_11.lean}).}
+The full theorem is assembled for the half-filled sector $N_e = K+1$. Define the
+ground subspace as the zero-energy, fixed-number subspace
+\[
+  \texttt{flatBandHalfFilledGroundSubmodule}
+    := \ker\hat H \;\sqcap\; \mathrm{eigenspace}(\hat N, K+1),
+\]
+and the ferromagnetic multiplet subspace as the span of the $K+2 = 2S_{\max}+1$
+lowered states. Then
+\[
+  \texttt{flatBandHalfFilledGroundSubmodule}
+    = \texttt{flatBandFerromagneticMultipletSubmodule}
+\]
+(\texttt{flatBand\_theorem\_11\_11\_groundSubmodule\_eq\_multipletSpan}), and every
+ground state carries total spin $S_{\rm tot} = S_{\max} = (K+1)/2$
+(\texttt{flatBand\_theorem\_11\_11\_groundState\_maximalSpin}). The $\geq$
+(existence) direction is fully proven: each $(\hat S^-_{\rm tot})^k|\Phi_\alpha
+\rangle$ is zero-energy ($\hat H \geq 0$) and carries $N_e = K+1$
+($\hat N|\Phi_\alpha\rangle = (K+1)|\Phi_\alpha\rangle$, preserved by the
+number-conserving tower $[\hat S^-_{\rm tot}, \hat N] = 0$). The $\leq$ (uniqueness)
+direction uses a \emph{single documented axiom}
+\texttt{flatBand\_zeroEnergy\_halfFilled\_mem\_ferromagneticMultipletSpan}: Tasaki's
+Appendix~A classification (no $\beta$-occupation + no double occupancy $\Rightarrow$
+spatially symmetric $\Rightarrow$ maximal spin), deferred under the same policy as
+Theorem 11.8 / Lemma 11.9, because a faithful proof needs the Fock-space
+factorisation of the non-orthogonal $\{\alpha\}\cup\{\beta\}$ basis and the
+symmetric-tensor/SU(2) classification. The existence half does \emph{not} depend on
+this axiom.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
