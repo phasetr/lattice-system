@@ -4,6 +4,7 @@ import Mathlib.Analysis.InnerProductSpace.Projection.Basic
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.LinearAlgebra.Matrix.Irreducible.Defs
 import Mathlib.LinearAlgebra.Matrix.PosDef
+import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
 
 /-!
 # Tasaki §11.3.4: general theory of flat-band ferromagnetism (Theorem 11.15)
@@ -111,5 +112,59 @@ discharged), matching the policy for Theorem 11.8 / Lemma 11.9 / Theorem 11.13. 
 axiom tasaki_theorem_11_15 (U : ℝ) (hT : T.PosSemidef)
     (hD0 : 0 < generalFlatBandDim T) (hU : 0 < U) :
     generalFlatBandFerromagnetic T U ↔ generalFlatBandProjectionIrreducible T
+
+/-! ### Lemma 11.16 and Theorem 11.17 (the special basis and its connectivity)
+
+Tasaki's proof of Theorem 11.15 proceeds through a *special basis* of the flat band
+`h₀` (Lemma 11.16) and an equivalent connectivity condition on that basis
+(Theorem 11.17).  Both are recorded here as documented axioms (Issue #4186). -/
+
+/-- **Lemma 11.16 special-basis property**: `I ⊆ Λ` with `|I| = D₀` indexes a basis
+`{μ_z}_{z∈I}` of the flat band `ker T` (`T.mulVec (μ z) = 0`, linearly independent and of
+the right cardinality) which is *site-localised at the index*: `μ_z(z) ≠ 0` while
+`μ_z(z') = 0` for every other index `z' ∈ I\{z}`. -/
+def IsGeneralFlatBandSpecialBasis (I : Finset (Fin (M + 1)))
+    (μ : Fin (M + 1) → Fin (M + 1) → ℂ) : Prop :=
+  I.card = generalFlatBandDim T ∧
+    (∀ z ∈ I, T.mulVec (μ z) = 0) ∧
+    LinearIndependent ℂ (fun z : I => (μ z.1 : Fin (M + 1) → ℂ)) ∧
+    (∀ z ∈ I, μ z z ≠ 0) ∧
+    (∀ z ∈ I, ∀ z' ∈ I, z ≠ z' → μ z z' = 0)
+
+/-- **Lemma 11.16 (special basis of a flat band), AXIOM.**  For a Hermitian
+positive-semidefinite `T`, the flat band `ker T` admits an index set `I` (`|I| = D₀`)
+and a basis `{μ_z}` localised at the indices.  Tasaki proves this by elementary
+determinantal-rank linear algebra; recorded as a documented axiom (to be discharged). -/
+axiom generalFlatBand_lemma_11_16 (hT : T.PosSemidef) :
+    ∃ (I : Finset (Fin (M + 1))) (μ : Fin (M + 1) → Fin (M + 1) → ℂ),
+      IsGeneralFlatBandSpecialBasis T I μ
+
+/-- The **connectivity graph of a special basis** (Tasaki §11.3.4, before Theorem 11.17):
+two index sites `z, z'` are *directly connected* (`μ_z ∼ μ_{z'}`) iff they are distinct
+and their basis vectors share a nonzero component. -/
+def generalFlatBandBasisGraph (I : Finset (Fin (M + 1)))
+    (μ : Fin (M + 1) → Fin (M + 1) → ℂ) : SimpleGraph I where
+  Adj z z' := z.1 ≠ z'.1 ∧ ∃ x, μ z.1 x ≠ 0 ∧ μ z'.1 x ≠ 0
+  symm := fun _ _ ⟨hne, x, h1, h2⟩ => ⟨hne.symm, x, h2, h1⟩
+  loopless := ⟨fun _ ⟨hne, _⟩ => hne rfl⟩
+
+/-- **Tasaki's connectivity condition for Theorem 11.17**: the special basis `{μ_z}` is
+connected (its connectivity graph is connected). -/
+def generalFlatBandBasisConnected (I : Finset (Fin (M + 1)))
+    (μ : Fin (M + 1) → Fin (M + 1) → ℂ) : Prop :=
+  (generalFlatBandBasisGraph I μ).Connected
+
+/-- **Tasaki Theorem 11.17 (connectivity form of flat-band ferromagnetism), AXIOM.**  For a
+special basis `{μ_z}` of the flat band (Lemma 11.16), the `D₀`-electron Hubbard model is
+saturated-ferromagnetic **iff** the basis is connected.  This is Mielke's second
+necessary-and-sufficient condition; Tasaki shows its connectivity is independent of the
+choice of special basis and equivalent to the irreducibility condition of Theorem 11.15.
+Recorded as a documented axiom (Issue #4186), matching the Theorem 11.8 / 11.13 / 11.15
+policy. -/
+axiom generalFlatBand_theorem_11_17 (U : ℝ) (hT : T.PosSemidef)
+    (hD0 : 0 < generalFlatBandDim T) (hU : 0 < U)
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ) :
+    generalFlatBandFerromagnetic T U ↔ generalFlatBandBasisConnected I μ
 
 end LatticeSystem.Fermion
