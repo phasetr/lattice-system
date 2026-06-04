@@ -1,7 +1,9 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.FermionSiteSpin
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreProjection
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreSubspace
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Graph
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SectorMinEnergy
+import LatticeSystem.Fermion.JordanWigner.Hubbard.MielkeTheorems
 
 /-!
 # Tasaki §11.5.2: the ferromagnetic t-J model (eq. (11.5.4)) and Proposition 11.24
@@ -25,12 +27,15 @@ Perron–Frobenius / "spin-charge separation" argument (the oddness of `N` is wh
 nontrivial argument, it is recorded here as a documented axiom (to be discharged), matching
 the policy for the other §11.x ferromagnetism theorems.
 
-Because the maximal total spin at fixed electron number `N` (with no double occupancy) is
-`S_max = N/2`, the statement is naturally phrased with the **filling-restricted**
-ferromagnetism criterion `exhibitsFerromagnetismAtFilling` introduced here (the electron
-number must be fixed — unlike the filling-agnostic `exhibitsFerromagnetism` of §11.4, which
-suffices there because the flat-band filling is part of the model's setup).  This predicate
-is reusable for the remaining §11.5 results (Theorems 11.26 / 11.27).
+The conclusion is phrased on the t-J **ground subspace at fixed electron number `N_e`**
+(`tJGroundSubmodule`: the `H`-eigenspace at the ground energy, intersected with the
+`N_e`-electron sector and the no-double-occupancy subspace `H_{N_e}^hc` — the t-J
+Hamiltonian's physical domain).  The full statement — *ground spin `S_tot = N_e/2`* **and**
+*`(N_e + 1)`-fold degeneracy* — is captured at once by the shared
+`IsMaximalSpinMultipletSubmodule` predicate (the same one used for Mielke's Theorem 11.13 and
+the general flat-band Theorem 11.15).  The electron number must be fixed and the hard-core
+constraint imposed because the maximal total spin `S_max = N_e/2` depends on `N_e` (unlike the
+filling-agnostic §11.4 `exhibitsFerromagnetism`).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), §11.5.2, eq. (11.5.4) and Proposition 11.24 (pp. 442–444).
@@ -62,47 +67,46 @@ noncomputable def tJHamiltonian (N : ℕ) (G : SimpleGraph (Fin (N + 1))) [Decid
               fermionSpinDot N x y
           else 0)
 
-/-- The **charge-and-spin sector** `(N_e, S = twoS/2)`: unit vectors of `EuclideanSpace ℂ`
-over the computational-basis configurations that are simultaneously `(Ŝ_tot)²`-eigenvectors
-at `(twoS/2)(twoS/2 + 1)` and `N̂`-eigenvectors at the electron number `N_e`.  Refines
-`spinSector` by additionally fixing the electron number, as required for the t-J model. -/
-def chargeSpinSector (M Ne twoS : ℕ) :
+/-- The **fixed-electron-number hard-core states**: unit vectors of `EuclideanSpace ℂ` over
+the computational configurations that are `N̂`-eigenvectors at the electron number `N_e` and
+lie in the no-double-occupancy subspace `H_{N_e}^hc` (the natural domain of the t-J
+Hamiltonian).  These are the candidate states over which the t-J ground energy is taken. -/
+def tJFillingHardcoreStates (M Ne : ℕ) :
     Set (EuclideanSpace ℂ (Fin (2 * M + 2) → Fin 2)) :=
   {φ | ‖φ‖ = 1 ∧
-    (fermionTotalSpinSquared M).mulVec φ.ofLp
-        = (((twoS : ℂ) / 2) * ((twoS : ℂ) / 2 + 1)) • φ.ofLp ∧
-    (fermionTotalNumber (2 * M + 1)).mulVec φ.ofLp = (Ne : ℂ) • φ.ofLp}
+    (fermionTotalNumber (2 * M + 1)).mulVec φ.ofLp = (Ne : ℂ) • φ.ofLp ∧
+    φ.ofLp ∈ hubbardHardcoreSubspace M}
 
-/-- **`E_min(N_e, S)` — the minimum energy in the fixed-electron-number, total-spin-`S`
-sector** (the t-J analogue of `sectorMinEnergy`, additionally constraining the electron
-number `N_e`): the infimum of `rayleighOnVec H` over the unit vectors of
-`chargeSpinSector M Ne twoS`. -/
-noncomputable def sectorMinEnergyAtFilling {M : ℕ} (H : ManyBodyOp (Fin (2 * M + 2)))
-    (Ne twoS : ℕ) : ℝ :=
-  ⨅ φ : chargeSpinSector M Ne twoS, rayleighOnVec H (φ : EuclideanSpace ℂ _).ofLp
+/-- **The t-J ground-state energy at filling `N_e`**: the infimum of `rayleighOnVec H` over
+the unit, `N_e`-electron, hard-core states `tJFillingHardcoreStates M Ne` — the minimum
+energy of the model on its physical Hilbert space `H_{N_e}^hc`. -/
+noncomputable def tJGroundEnergyAtFilling {M : ℕ} (H : ManyBodyOp (Fin (2 * M + 2)))
+    (Ne : ℕ) : ℝ :=
+  ⨅ φ : tJFillingHardcoreStates M Ne, rayleighOnVec H (φ : EuclideanSpace ℂ _).ofLp
 
-/-- **Ferromagnetism at fixed filling `N_e`**: at electron number `N_e` the maximal-spin
-sector `S_max = twoSmax/2` lies strictly below every other sector,
-`E_min(N_e, S_max) < E_min(N_e, S)` for all `S ≠ S_max`.  The filling-fixed counterpart of
-`exhibitsFerromagnetism`, needed when (as in the t-J model) the maximal total spin depends
-on the electron number. -/
-def exhibitsFerromagnetismAtFilling {M : ℕ} (H : ManyBodyOp (Fin (2 * M + 2)))
-    (Ne twoSmax : ℕ) : Prop :=
-  ∀ twoS : ℕ, twoS < twoSmax →
-    sectorMinEnergyAtFilling H Ne twoSmax < sectorMinEnergyAtFilling H Ne twoS
+/-- **The t-J ground subspace at filling `N_e`**: the `H`-eigenspace at the ground energy
+`tJGroundEnergyAtFilling H Ne`, intersected with the `N_e`-electron number sector and the
+no-double-occupancy subspace `H_{N_e}^hc`.  Its dimension is the ground-state degeneracy. -/
+noncomputable def tJGroundSubmodule {M : ℕ} (H : ManyBodyOp (Fin (2 * M + 2)))
+    (Ne : ℕ) : Submodule ℂ ((Fin (2 * M + 2) → Fin 2) → ℂ) :=
+  Module.End.eigenspace H.mulVecLin (tJGroundEnergyAtFilling H Ne : ℂ) ⊓
+    Module.End.eigenspace (fermionTotalNumber (2 * M + 1)).mulVecLin (Ne : ℂ) ⊓
+    hubbardHardcoreSubspace M
 
 /-- **Tasaki Proposition 11.24 (ferromagnetism in the d = 1 ferromagnetic t-J model),
 AXIOM.**  On the one-dimensional periodic chain (`SimpleGraph.cycleGraph (N + 1)`), if the
 electron number `Ne` satisfies `Ne < N + 1 = L` and is **odd**, then the ground states have
 total spin `S_tot = Ne/2` and are non-degenerate apart from the trivial
-`2 S_tot + 1 = Ne + 1`-fold `SU(2)` multiplet — i.e. the model exhibits ferromagnetism at
-filling `Ne` with maximal spin `S_max = Ne/2` (`twoSmax = Ne`).  Tasaki's proof is a
-Perron–Frobenius / spin-charge-separation argument (Theorem A.18); the oddness of `Ne` makes
-the wrap-around `1 ↔ L` hop sign-free under periodic boundary conditions.  Recorded as a
-documented axiom (to be discharged), matching the §11.x ferromagnetism policy. -/
+`2 S_tot + 1 = Ne + 1`-fold `SU(2)` multiplet.  Both halves are captured at once by
+`IsMaximalSpinMultipletSubmodule`: the `N_e`-electron hard-core ground subspace is the
+`(Ne + 1)`-fold multiplet (degeneracy = `Ne + 1`) and every ground state is an `(Ŝ_tot)²`
+eigenvector at the maximal eigenvalue `S_max(S_max + 1)`, `S_max = Ne/2`.  Tasaki's proof is
+a Perron–Frobenius / spin-charge-separation argument (Theorem A.18); the oddness of `Ne`
+makes the wrap-around `1 ↔ L` hop sign-free under periodic boundary conditions.  Recorded as
+a documented axiom (to be discharged), matching the §11.x ferromagnetism policy. -/
 axiom proposition_11_24 (N : ℕ) (τ J : ℝ) (hτ : 0 < τ) (hJ : 0 < J)
     (Ne : ℕ) (hNe : Ne < N + 1) (hodd : Odd Ne) :
-    exhibitsFerromagnetismAtFilling
-      (tJHamiltonian N (SimpleGraph.cycleGraph (N + 1)) τ J) Ne Ne
+    IsMaximalSpinMultipletSubmodule N
+      (tJGroundSubmodule (tJHamiltonian N (SimpleGraph.cycleGraph (N + 1)) τ J) Ne) Ne
 
 end LatticeSystem.Fermion

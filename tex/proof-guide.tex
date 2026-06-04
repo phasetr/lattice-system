@@ -6278,15 +6278,19 @@ number $N$ strictly below the number of sites $L=|E|$.  We formalise it
 (making it Hermitian, equal to Tasaki's $-\tau\hat P_{\rm hc}\sum\hat c^\dagger\hat c$ on
 $H_N^{\rm hc}$), and the exchange term is $J\sum$ over the ordered adjacent pairs of $G$ of
 $(\hat n_x\hat n_y)/4 - \texttt{fermionSpinDot}~N\,x\,y$, with $\hat n_x=\texttt{fermionSiteNumber}~N\,x$.
-Since the maximal total spin at fixed electron number $N$ (with no double occupancy) is
-$S_{\max}=N/2$, the statement requires the electron number to be \emph{fixed}; we introduce the
-filling-restricted predicates \texttt{chargeSpinSector}, \texttt{sectorMinEnergyAtFilling}
-($E_{\min}(N_e,S)$) and \texttt{exhibitsFerromagnetismAtFilling} (the counterpart of the §11.4
-\texttt{exhibitsFerromagnetism} with the electron number constrained).  \textbf{Proposition
+Since the maximal total spin at fixed electron number $N_e$ (with no double occupancy) is
+$S_{\max}=N_e/2$, the statement requires the electron number to be \emph{fixed} and the
+hard-core constraint imposed; we phrase it on the \emph{ground subspace} at filling $N_e$:
+\texttt{tJFillingHardcoreStates} (unit $N_e$-electron states in the no-double-occupancy
+subspace $H_{N_e}^{\rm hc}$), \texttt{tJGroundEnergyAtFilling} (their minimum energy), and
+\texttt{tJGroundSubmodule} ($H$-eigenspace at the ground energy $\sqcap$ the $N_e$-electron
+sector $\sqcap$ $H_{N_e}^{\rm hc}$).  \textbf{Proposition
 11.24} (\texttt{proposition\_11\_24}, documented axiom): for the one-dimensional periodic chain
 ($\texttt{SimpleGraph.cycleGraph}~(N+1)$), if the electron number $N_e<L$ is \emph{odd}, the
 ground states have total spin $S_{\rm tot}=N_e/2$ and are non-degenerate apart from the trivial
-$2S_{\rm tot}+1=N_e+1$-fold $SU(2)$ multiplet.  Tasaki's proof is a Perron--Frobenius /
+$2S_{\rm tot}+1=N_e+1$-fold $SU(2)$ multiplet --- both halves captured at once by
+\texttt{IsMaximalSpinMultipletSubmodule}~$N\,(\texttt{tJGroundSubmodule}\dots)\,N_e$ (the shared
+predicate reused from Mielke's Theorem 11.13 and the general flat-band Theorem 11.15).  Tasaki's proof is a Perron--Frobenius /
 ``spin-charge separation'' argument (Theorem A.18); the oddness of $N_e$ is exactly what makes
 the wrap-around $1\leftrightarrow L$ hop sign-free under periodic boundary conditions.  The proof
 is deferred (Issue \#4198).
