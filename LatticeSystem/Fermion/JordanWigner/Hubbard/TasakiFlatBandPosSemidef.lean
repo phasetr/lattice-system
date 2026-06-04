@@ -9,13 +9,15 @@ The final input to the existence half of Theorem 11.11: for `t, U ≥ 0` the
 flat-band Hamiltonian is positive-semidefinite,
 `Ĥ = t Σ_{u,σ} b̂†_{u,σ} b̂_{u,σ} + U Σ_x n̂_{x↑} n̂_{x↓} ≥ 0`, being a nonnegative
 combination of positive-semidefinite terms (each `b̂† b̂ = (b̂)ᴴ b̂`, and each
-`n̂_↑ n̂_↓` a Hermitian idempotent projection).  Hence the energy (Rayleigh
-quotient) is nonnegative everywhere, while the zero-energy tower states
-`(Ŝ^-_tot)^k |Φα,all↑⟩` attain `0`: they are **ground states**.
+`n̂_↑ n̂_↓` a Hermitian idempotent projection).  Hence the energy quadratic form
+`⟨ψ|Ĥ|ψ⟩` (unnormalized, `rayleighOnVec`) is nonnegative everywhere, while the
+zero-energy tower states `(Ŝ^-_tot)^k |Φα,all↑⟩` attain `0`: they lie in the
+lowest-energy (kernel) eigenspace — they are **ground states**.
 
 * `flatBandHamiltonian_posSemidef`: `Ĥ.PosSemidef` for `t, U ≥ 0`.
-* `flatBand_alphaTower_isGroundState`: each multiplet member minimizes the energy,
-  `rayleighOnVec Ĥ ((Ŝ^-_tot)^k |Φα⟩) ≤ rayleighOnVec Ĥ ψ` for all `ψ`.
+* `flatBand_alphaTower_isGroundState`: each multiplet member minimizes the energy
+  quadratic form, `rayleighOnVec Ĥ ((Ŝ^-_tot)^k |Φα⟩) ≤ rayleighOnVec Ĥ ψ` for all
+  `ψ`.
 
 Combined with `flatBand_ferromagnetic_multiplet` (linear independence + total spin
 `S_max = (K+1)/2`) and the energy tower, this gives the existence half of Tasaki
@@ -62,8 +64,8 @@ theorem flatBandHamiltonian_posSemidef (K : ℕ) (ν t U : ℝ) (ht : 0 ≤ t) (
   · refine Matrix.PosSemidef.smul ?_ (RCLike.ofReal_nonneg.mpr hU)
     exact Matrix.posSemidef_sum _ (fun x _ => hubbardDoubleOccupancy_posSemidef (2 * K + 1) x)
 
-/-- The energy (Rayleigh quotient) of the flat-band Hamiltonian is nonnegative
-everywhere, for `t, U ≥ 0`. -/
+/-- The energy quadratic form `⟨ψ|Ĥ|ψ⟩` (unnormalized) of the flat-band
+Hamiltonian is nonnegative everywhere, for `t, U ≥ 0`. -/
 theorem flatBandHamiltonian_rayleighOnVec_nonneg (K : ℕ) (ν t U : ℝ) (ht : 0 ≤ t)
     (hU : 0 ≤ U) (ψ : (Fin (2 * (2 * K + 1) + 2) → Fin 2) → ℂ) :
     0 ≤ rayleighOnVec (flatBandHamiltonian K ν t U) ψ := by
@@ -81,8 +83,9 @@ theorem flatBandHamiltonian_rayleighOnVec_spinMinusPow_alphaAllUpState
 
 /-- **The ferromagnetic multiplet are ground states (Theorem 11.11 existence
 half).**  For `t, U ≥ 0`, every member `(Ŝ^-_tot)^k |Φα,all↑⟩` of the multiplet
-minimizes the energy: its Rayleigh quotient `0` is `≤` that of any state `ψ`.
-Together with `flatBand_ferromagnetic_multiplet` (the `K + 2 = 2 S_max + 1` states
+minimizes the energy quadratic form `⟨ψ|Ĥ|ψ⟩`: its value `0` is `≤` that of any
+state `ψ` (so, with `Ĥ ⪰ 0`, each lies in the lowest-energy eigenspace — a ground
+state).  Together with `flatBand_ferromagnetic_multiplet` (the `K + 2 = 2 S_max + 1` states
 are linearly independent and all carry total spin `S_max = (K+1)/2`), this is the
 maximal-spin degenerate ground-state multiplet of Tasaki's flat-band ferromagnet. -/
 theorem flatBand_alphaTower_isGroundState (K : ℕ) (ν t U : ℝ) (ht : 0 ≤ t) (hU : 0 ≤ U)
