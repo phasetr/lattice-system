@@ -5898,8 +5898,29 @@ zero-energy:
 \]
 (\texttt{flatBandHamiltonian\_mulVec\_spinMinusPow\_alphaAllUpState}). Combined with
 the multiplet, the $K+2$ states are linearly independent, share total spin
-$S_{\max} = (K+1)/2$, and are all zero-energy. That $0$ is the \emph{ground}
-energy still requires $\hat H\geq 0$ (the remaining step).
+$S_{\max} = (K+1)/2$, and are all zero-energy.
+
+\medskip
+\noindent\textbf{Positive-semidefiniteness and the ground states
+(\texttt{TasakiFlatBandPosSemidef.lean}, Theorem 11.11 existence half).}
+For $t, U\geq 0$ the flat-band Hamiltonian is positive-semidefinite,
+$\hat H\geq 0$ (\texttt{flatBandHamiltonian\_posSemidef}): it is a nonnegative
+combination of positive-semidefinite terms. Each kinetic term factors as
+$\hat b^\dagger_{u,\sigma}\hat b_{u,\sigma} = (\hat b_{u,\sigma})^\dagger
+\hat b_{u,\sigma}$, manifestly PSD; each interaction term $\hat n_{x\uparrow}
+\hat n_{x\downarrow}$ is a Hermitian idempotent projection $P = P^\dagger P$, hence
+PSD; and PSD is preserved by sums and nonnegative scalar multiples. Consequently
+the energy (Rayleigh quotient) is nonnegative everywhere,
+$\langle\psi|\hat H|\psi\rangle\geq 0$
+(\texttt{flatBandHamiltonian\_rayleighOnVec\_nonneg}), while the tower states attain
+$0$ (\texttt{flatBandHamiltonian\_rayleighOnVec\_spinMinusPow\_alphaAllUpState}).
+Therefore every member $(\hat S^-_{\rm tot})^k|\Phi_\alpha\rangle$ of the multiplet
+minimizes the energy --- it is a \emph{ground state}
+(\texttt{flatBand\_alphaTower\_isGroundState}). Together with
+\texttt{flatBand\_ferromagnetic\_multiplet}, this is the existence half of
+Theorem 11.11: the $K+2 = 2S_{\max}+1$ states form a maximal-spin
+($S_{\rm tot} = S_{\max} = (K+1)/2 = N_e/2$) degenerate \emph{ground-state}
+multiplet of Tasaki's flat-band ferromagnet.
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
