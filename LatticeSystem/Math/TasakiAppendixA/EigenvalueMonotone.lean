@@ -1,0 +1,41 @@
+import Mathlib.Analysis.Matrix.Order
+
+/-!
+# Tasaki Appendix A.2.3: eigenvalue monotonicity (Theorem A.7)
+
+Tasaki's Theorem A.7 (the min–max / Courant–Fischer monotonicity, "relatively unknown to
+physicists but important"): if self-adjoint operators satisfy `Â ≤ B̂`, then the `j`-th
+eigenvalue of `Â` is at most the `j`-th eigenvalue of `B̂` (eigenvalues ordered).  The proof is
+the min–max principle (eq. (A.2.30)),
+`a_j = min_{dim M = j} max_{Φ ∈ M, ‖Φ‖=1} ⟨Φ|Â|Φ⟩`,
+together with `⟨Φ|Â|Φ⟩ ≤ ⟨Φ|B̂|Φ⟩`.
+
+We state it for finite complex matrices using mathlib's *sorted* eigenvalue function
+`Matrix.IsHermitian.eigenvalues₀ : Fin (card n) → ℝ` (antitone — largest first).  With this
+indexing `∀ i, (eigenvalues₀ of A) i ≤ (eigenvalues₀ of B) i` says "the `i`-th largest
+eigenvalue is monotone in the Loewner order `≤`", which is exactly Tasaki's `a_j ≤ b_j`
+(re-indexed from smallest-first to largest-first).  mathlib has the variational principle for
+the extreme eigenvalues but not the general min–max monotonicity for matrices, so — per the
+project's axiomatize-first policy — this is recorded as a documented axiom (to be discharged via
+the min–max principle later).  It is not on the critical path of any Chapter-11 proof.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
+(1st ed.), Appendix A.2.3, Theorem A.7 and eq. (A.2.30), p. 468.
+-/
+
+namespace LatticeSystem.Math
+
+open Matrix
+open scoped MatrixOrder ComplexOrder
+
+/-- **Tasaki Theorem A.7 (eigenvalue monotonicity / min–max), AXIOM.**  For Hermitian matrices
+`A ≤ B` (the Loewner order, `B - A` positive-semidefinite), every sorted eigenvalue of `A` is
+at most the corresponding sorted eigenvalue of `B`: `∀ i, A.eigenvalues₀ i ≤ B.eigenvalues₀ i`
+(eigenvalues largest-first).  This is the operator-monotonicity content of the min–max
+principle (eq. (A.2.30)); recorded as a documented axiom (mathlib has the variational principle
+only for the extreme eigenvalues), to be discharged later. -/
+axiom hermitian_eigenvalues₀_monotone {n : Type*} [Fintype n] [DecidableEq n]
+    {A B : Matrix n n ℂ} (hA : A.IsHermitian) (hB : B.IsHermitian) (hAB : A ≤ B) :
+    ∀ i : Fin (Fintype.card n), hA.eigenvalues₀ i ≤ hB.eigenvalues₀ i
+
+end LatticeSystem.Math
