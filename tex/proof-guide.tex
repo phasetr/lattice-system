@@ -6135,6 +6135,29 @@ dimension, so the flat-band count carries over verbatim, \textbf{discharging the
 where Tasaki's $|B|-|\tilde\Lambda|+1$ form coincides with the truncation-safe
 $|B|-(|\tilde\Lambda|-\mathrm{bip})$ proved here.
 
+\medskip\noindent\textbf{General theory of flat-band ferromagnetism (Tasaki §11.3.4,
+Theorem 11.15, axiomatized).}  Mielke's general theory gives a compact necessary-and-%
+sufficient condition for saturated ferromagnetism in any Hubbard model with a flat lowest
+band.  Let $T$ be a Hermitian positive-semidefinite hopping matrix on $\Lambda=\{0,\dots,M\}$,
+$h_0=\ker T$ the (assumed nonempty) flat band, $D_0=\dim h_0$, and $P_0$ the orthogonal
+projection onto $h_0$.  Put $\Lambda_0=\{x\mid (P_0)_{x,x}\ne0\}$ and take the Hubbard model
+with $U>0$ at filling $N=D_0$.  \textbf{Theorem 11.15} states that the model is
+saturated-ferromagnetic ($N{+}1$-fold degenerate ground states with $S_{\rm tot}=N/2$) if and
+only if the $\Lambda_0\times\Lambda_0$ submatrix $((P_0)_{x,y})_{x,y\in\Lambda_0}$ is
+\emph{irreducible} (not block-decomposable).  In Lean (\texttt{GeneralFlatBand.lean}),
+$P_0$ (\texttt{generalFlatBandProjectionMatrix}) is the matrix, in the standard orthonormal
+basis, of \texttt{Submodule.starProjection} onto $\ker(\texttt{Matrix.toEuclideanLin}\,T)$;
+irreducibility (\texttt{generalFlatBandProjectionIrreducible}) is \texttt{Matrix.IsIrreducible}
+of the real nonnegative support matrix $\mathrm{normSq}((P_0)_{x,y})$ on $\Lambda_0$ (sound
+because $P_0$ is Hermitian, so the support quiver is symmetric and strong connectivity equals
+Tasaki's irreducibility); the ferromagnetism conclusion
+(\texttt{generalFlatBandFerromagnetic}) reuses the Theorem 11.13 ground-subspace form
+($\texttt{finrank}=D_0{+}1$, all states $(\hat S_{\rm tot})^2$-eigenvectors at $S_{\max}=D_0/2$).
+The result is deep; Tasaki proves it via Lemma 11.16 (a special basis $\{\mu_z\}$ of $h_0$) and
+Theorem 11.17 (connectedness of that basis).  It is recorded as the documented axiom
+\texttt{tasaki\_theorem\_11\_15}, matching the policy for Theorems 11.8 / 11.13; the proof and
+the §11.3.4 companion results are deferred to later work.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
