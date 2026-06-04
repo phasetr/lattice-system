@@ -5864,6 +5864,43 @@ That every member is moreover a zero-energy \emph{ground} state requires the
 energy tower $\hat H(\hat S^-_{\rm tot})^k|\Phi_\alpha\rangle = 0$ (flat-band
 SU(2) lowering symmetry) and $\hat H\geq 0$, handled in subsequent steps.
 
+\medskip
+\noindent\textbf{Flat-band SU(2) lowering symmetry and the energy tower
+(\texttt{TasakiFlatBandEnergyTower.lean}).}
+The flat-band Hamiltonian is SU(2) symmetric, $[\hat S^\pm_{\rm tot},\hat H] = 0$.
+The interaction $\hat H_{\rm int} = U\sum_x \hat n_{x\uparrow}\hat n_{x\downarrow}$
+is the standard Hubbard one and reuses
+\texttt{fermionTotalSpinPlus\_commute\_hubbardDoubleOccupancy}. For the kinetic
+term $\hat H_{\rm hop} = t\sum_{u,\sigma}\hat b^\dagger_{u,\sigma}\hat b_{u,\sigma}$
+the key point is that the $\hat b$ operators form a \emph{spin doublet} (both
+spins are built from the same spatial $\beta_u$): lifting the single-particle
+covariances $[\hat c_{x,\uparrow},\hat S^+] = \hat c_{x,\downarrow}$,
+$[\hat c^\dagger_{x,\downarrow},\hat S^+] = -\hat c^\dagger_{x,\uparrow}$ termwise
+gives
+\[
+  [\hat b_{u,\uparrow},\hat S^+] = \hat b_{u,\downarrow},\qquad
+  [\hat b^\dagger_{u,\downarrow},\hat S^+] = -\hat b^\dagger_{u,\uparrow},
+\]
+while $\hat b^\dagger_{u,\uparrow}$ and $\hat b_{u,\downarrow}$ commute with
+$\hat S^+$. Hence the spin-summed mode number
+$\hat b^\dagger_{u,\uparrow}\hat b_{u,\uparrow} +
+\hat b^\dagger_{u,\downarrow}\hat b_{u,\downarrow}$ commutes with $\hat S^+$ --- the
+two off-diagonal pieces $\mp\hat b^\dagger_{u,\uparrow}\hat b_{u,\downarrow}$ cancel
+(\texttt{commute\_two\_component\_kinetic\_of\_spinPlus\_relations}). Summing over
+modes and adding the interaction gives $[\hat S^+_{\rm tot},\hat H] = 0$, and
+$[\hat S^-_{\rm tot},\hat H] = 0$ follows by adjoint ($\hat H$ Hermitian,
+$(\hat S^+_{\rm tot})^\dagger = \hat S^-_{\rm tot}$). Since $\hat H$ commutes with
+$\hat S^-_{\rm tot}$ and $\hat H|\Phi_\alpha\rangle = 0$, the whole tower is
+zero-energy:
+\[
+  \hat H\,(\hat S^-_{\rm tot})^k|\Phi_\alpha\rangle
+    = (\hat S^-_{\rm tot})^k\,\hat H|\Phi_\alpha\rangle = 0
+\]
+(\texttt{flatBandHamiltonian\_mulVec\_spinMinusPow\_alphaAllUpState}). Combined with
+the multiplet, the $K+2$ states are linearly independent, share total spin
+$S_{\max} = (K+1)/2$, and are all zero-energy. That $0$ is the \emph{ground}
+energy still requires $\hat H\geq 0$ (the remaining step).
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
