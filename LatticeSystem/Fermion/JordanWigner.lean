@@ -25,6 +25,7 @@ import LatticeSystem.Fermion.JordanWigner.CDaggerCLadderZero
 import LatticeSystem.Fermion.JordanWigner.Hubbard
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Charges
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Graph
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinSymmetryAux
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinSymmetry
 import LatticeSystem.Fermion.JordanWigner.Hubbard.AllUpState
 import LatticeSystem.Fermion.JordanWigner.Hubbard.AllDownState
@@ -132,7 +133,8 @@ expansion):
 | `Hubbard.lean` | spinful wrappers, on-graph Hubbard, 1D open / periodic chain Gibbs |
 | `Hubbard/Charges.lean` | `N_↑`, `N_↓`, `S^z_tot`, vacuum eigenstates, cross-spin commutes |
 | `Hubbard/Graph.lean` | graph-centric wrappers, chain/cycle Hamiltonians + Gibbs families |
-| `Hubbard/SpinSymmetry.lean` | U(1)×U(1) charges + S^z_tot commutation with H (Tasaki §9.3.3) |
+| `Hubbard/SpinSymmetryAux.lean` | **(split from SpinSymmetry)** U(1)×U(1) auxiliary: Hermiticity/adjoints of `N_↑`/`N_↓`, spin-site injectivity, per-spin number commutators + hopping commute, and `[S^z_tot, H]=0` (Tasaki §9.3.3) |
+| `Hubbard/SpinSymmetry.lean` | SU(2) part of the §9.3.3 spin symmetry: `Ŝ^±_tot` definitions + `[Ŝ^±_tot, H]=0` (imports `SpinSymmetryAux`; downstream API unchanged) |
 | `Hubbard/AllUpState.lean` | all-up state: H_kin eigenvalue, no double occupancy |
 | `Hubbard/AllDownState.lean` | all-down state: `H_int · |↓..⟩ = 0` (mirror) |
 | `Hubbard/AllDownStateTotalNumber.lean` | `N_↓ · |↓..⟩ = (N+1)·|↓..⟩`, `S^z·|↓..⟩ = -(N+1)/2·|↓..⟩` |
