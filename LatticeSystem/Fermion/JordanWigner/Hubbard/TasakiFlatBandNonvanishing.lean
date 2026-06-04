@@ -64,24 +64,6 @@ theorem flatBandExtUpAnnihilation_ACreation_anticomm (K : ℕ) (ν : ℝ)
   rw [flatBandAlpha_deltaExternalSite]
   by_cases h : q = p <;> simp [h]
 
-/-- **Dual-annihilation peel.**  If `c` annihilates the vacuum, anticommutes to `1`
-with `A` (`c·A + A·c = 1`), and anticommutes to `0` with every factor of the
-ordered product `(qs.map B).prod`, then `c` removes the leading factor `A`:
-`c · (A · ∏ B) |vac⟩ = (∏ B) |vac⟩`.  (Move `c` rightward: the `A·c` term feeds the
-move-through `flatBand_anticomm_listProd_mulVec_vacuum`, which kills it.) -/
-theorem flatBand_extAnnihilation_peel {M : ℕ} {ι : Type*}
-    (c A : ManyBodyOp (Fin (M + 1))) (B : ι → ManyBodyOp (Fin (M + 1))) (qs : List ι)
-    (hcvac : c.mulVec (fermionMultiVacuum M) = 0)
-    (hc1 : c * A + A * c = 1)
-    (hc0 : ∀ q ∈ qs, c * B q + B q * c = 0) :
-    (c * (A * (qs.map B).prod)).mulVec (fermionMultiVacuum M) =
-      ((qs.map B).prod).mulVec (fermionMultiVacuum M) := by
-  have hcA : c * A = 1 - A * c := by rw [eq_sub_iff_add_eq]; exact hc1
-  have hPvac0 : (c * (qs.map B).prod).mulVec (fermionMultiVacuum M) = 0 :=
-    flatBand_anticomm_listProd_mulVec_vacuum c B qs hcvac hc0
-  rw [← Matrix.mul_assoc, hcA, Matrix.sub_mul, Matrix.one_mul, Matrix.mul_assoc,
-    Matrix.sub_mulVec, ← Matrix.mulVec_mulVec, hPvac0, Matrix.mulVec_zero, sub_zero]
-
 /-- **The dual annihilations collapse the ordered `α` product to the vacuum.**  For
 a duplicate-free list `ps`, there is an operator `D` (a product of external
 up-site annihilations) with `D · (∏_{p∈ps} â†_{p,↑}) |vac⟩ = |vac⟩`.  Built by
@@ -108,7 +90,7 @@ theorem flatBandAlpha_listProd_exists_collapse (K : ℕ) (ν : ℝ) :
             (fermionMultiVacuum (2 * (2 * K + 1) + 1)) =
         ((ps.map (fun p => flatBandACreation K ν p 0)).prod).mulVec
           (fermionMultiVacuum (2 * (2 * K + 1) + 1)) := by
-      refine flatBand_extAnnihilation_peel _ _ _ ps
+      refine dualAnnihilation_peel_listProd_mulVec_vacuum _ _ _ ps
         (fermionMultiAnnihilation_mulVec_vacuum _ _) ?_ ?_
       · rw [flatBandExtUpAnnihilation_ACreation_anticomm, if_pos rfl, one_smul]
       · intro q hq

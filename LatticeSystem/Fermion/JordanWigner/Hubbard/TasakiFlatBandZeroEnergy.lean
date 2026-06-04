@@ -39,7 +39,7 @@ theorem flatBandCDownAnnihilation_mulVec_alphaAllUpState (K : ℕ) (ν : ℝ)
       (flatBandAlphaAllUpState K ν) = 0 := by
   unfold flatBandAlphaAllUpState
   rw [Matrix.mulVec_mulVec]
-  exact flatBand_anticomm_listProd_mulVec_vacuum
+  exact anticomm_listProd_mulVec_vacuum
     (fermionMultiAnnihilation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) x 1))
     (fun p => flatBandACreation K ν p 0) (List.finRange (K + 1))
     (fermionMultiAnnihilation_mulVec_vacuum _ _)

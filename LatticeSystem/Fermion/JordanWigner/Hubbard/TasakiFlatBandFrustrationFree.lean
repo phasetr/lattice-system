@@ -1,5 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandPosSemidef
-import Mathlib.Analysis.Matrix.Order
+import LatticeSystem.Math.RayleighPosSemidefKernel
 
 /-!
 # Tasaki §11.3.1: frustration-free conditions on the flat-band ground states
@@ -26,38 +26,6 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 namespace LatticeSystem.Fermion
 
 open Matrix LatticeSystem.Quantum
-open scoped ComplexOrder
-
-/-- For a positive-semidefinite `M`, a zero of the (unnormalized) energy quadratic
-form is a kernel vector: `rayleighOnVec M v = 0 → M v = 0`. -/
-theorem posSemidef_mulVec_eq_zero_of_rayleighOnVec_zero {n : Type*} [Fintype n]
-    {M : Matrix n n ℂ} (hM : M.PosSemidef) {v : n → ℂ}
-    (h0 : rayleighOnVec M v = 0) : M.mulVec v = 0 := by
-  apply (hM.dotProduct_mulVec_zero_iff v).mp
-  have hnn := hM.dotProduct_mulVec_nonneg v
-  apply Complex.ext
-  · exact h0
-  · simpa using ((Complex.le_def.mp hnn).2).symm
-
-/-- `Aᴴ A v = 0 → A v = 0` (the vanishing of `‖A v‖²`). -/
-theorem conjTranspose_mul_self_mulVec_eq_zero {m n : Type*} [Fintype m] [Fintype n]
-    {A : Matrix m n ℂ} {v : n → ℂ} (h : (Aᴴ * A).mulVec v = 0) : A.mulVec v = 0 := by
-  apply complexVec_eq_zero_of_star_dotProduct
-  rw [star_mulVec, ← dotProduct_mulVec, Matrix.mulVec_mulVec, h, dotProduct_zero]
-
-/-- The energy quadratic form is real-scalar homogeneous. -/
-theorem rayleighOnVec_real_smul {n : Type*} [Fintype n] (t : ℝ) (M : Matrix n n ℂ)
-    (v : n → ℂ) : rayleighOnVec ((t : ℂ) • M) v = t * rayleighOnVec M v := by
-  unfold rayleighOnVec
-  rw [Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul, Complex.re_ofReal_mul]
-
-/-- The energy quadratic form is additive over a finite sum of matrices. -/
-theorem rayleighOnVec_sum {n ι : Type*} [Fintype n] (s : Finset ι)
-    (f : ι → Matrix n n ℂ) (v : n → ℂ) :
-    rayleighOnVec (∑ i ∈ s, f i) v = ∑ i ∈ s, rayleighOnVec (f i) v := by
-  induction s using Finset.cons_induction with
-  | empty => simp [rayleighOnVec]
-  | cons i s hi ih => rw [Finset.sum_cons, Finset.sum_cons, rayleighOnVec_add_matrix, ih]
 
 /-- **Energy decomposition.**  The flat-band energy quadratic form splits into the
 nonnegative per-term contributions. -/

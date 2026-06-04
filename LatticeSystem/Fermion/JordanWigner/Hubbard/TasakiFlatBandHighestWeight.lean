@@ -64,26 +64,6 @@ theorem flatBandTotalDownNumber_mulVec_alphaAllUpState (K : ℕ) (ν : ℝ) :
   rw [Matrix.sum_mulVec]
   exact Finset.sum_eq_zero (fun i _ => flatBandDownNumber_mulVec_alphaAllUpState K ν i)
 
-/-- **Charge move-through lemma.**  If `Q` annihilates the vacuum and each factor
-`A p` raises the `Q`-charge by one (`Q · A p = A p · Q + A p`), then `Q` acts on
-`(∏_p A p) |vac⟩` with eigenvalue equal to the number of factors: move `Q`
-rightward through the product, picking up one copy of the product per factor, and
-kill the trailing `Q |vac⟩`. -/
-theorem flatBand_charge_listProd_mulVec_vacuum {M : ℕ} {ι : Type*}
-    (Q : ManyBodyOp (Fin (M + 1))) (A : ι → ManyBodyOp (Fin (M + 1))) (ps : List ι)
-    (hQvac : Q.mulVec (fermionMultiVacuum M) = 0)
-    (hcomm : ∀ p ∈ ps, Q * A p = A p * Q + A p) :
-    (Q * (ps.map A).prod).mulVec (fermionMultiVacuum M) =
-      (ps.length : ℂ) • ((ps.map A).prod).mulVec (fermionMultiVacuum M) := by
-  induction ps with
-  | nil => simpa using hQvac
-  | cons p ps ih =>
-    have hih := ih (fun q hq => hcomm q (by simp [hq]))
-    rw [List.map_cons, List.prod_cons, ← Matrix.mul_assoc, hcomm p (by simp),
-      Matrix.add_mul, Matrix.mul_assoc, Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hih,
-      Matrix.mulVec_smul, List.length_cons, Nat.cast_succ, ← Matrix.mulVec_mulVec,
-      add_smul, one_smul]
-
 /-- **`[N̂_↑, â†_{p,↑}] = â†_{p,↑}`** (charge `+1`): the `α` creation operator is a
 linear combination of up creations, each of which raises `N̂_↑` by one. -/
 theorem flatBandTotalUpNumber_commutator_ACreation (K : ℕ) (ν : ℝ) (p : Fin (K + 1)) :
@@ -112,7 +92,7 @@ theorem flatBandTotalUpNumber_mulVec_alphaAllUpState (K : ℕ) (ν : ℝ) :
       ((K + 1 : ℕ) : ℂ) • flatBandAlphaAllUpState K ν := by
   unfold flatBandAlphaAllUpState
   rw [Matrix.mulVec_mulVec,
-    flatBand_charge_listProd_mulVec_vacuum (fermionTotalUpNumber (2 * K + 1))
+    charge_listProd_mulVec_vacuum (fermionTotalUpNumber (2 * K + 1))
       (fun p => flatBandACreation K ν p 0) (List.finRange (K + 1))
       (fermionTotalUpNumber_mulVec_vacuum (2 * K + 1))
       (fun p _ => flatBandTotalUpNumber_commutator_ACreation K ν p),

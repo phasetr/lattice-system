@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaPerronFrobenius
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinChargeCommutation
 
 /-!
 # Tasaki Theorem 11.7 (Nagaoka's theorem): the capstone (Tasaki §11.2.2)
@@ -86,15 +87,6 @@ theorem tasakiCoeff_mulVec_eigen_of_full (N : ℕ)
   rwa [tasakiCoeff_expansion, tasakiCoeff_expansion] at hfin
 
 /-! ## The spin-lowering tower stays in the one-hole sector -/
-
-/-- `Ŝ^-_tot` conserves the total particle number (it is `Σ c†_{i↓} c_{i↑}`). -/
-theorem fermionTotalSpinMinus_commute_fermionTotalNumber (N : ℕ) :
-    Commute (fermionTotalSpinMinus N) (fermionTotalNumber (2 * N + 1)) := by
-  unfold fermionTotalSpinMinus
-  refine Commute.sum_left _ _ _ (fun i _ => ?_)
-  unfold fermionDownCreation fermionUpAnnihilation
-  exact (fermionTotalNumber_commute_hopping (2 * N + 1)
-    (spinfulIndex N i 1) (spinfulIndex N i 0)).symm
 
 /-- `Ŝ^-_tot` preserves the hard-core (no-double-occupancy) subspace: it commutes
 with the hard-core projection (adjoint of the `Ŝ^+_tot` version, using

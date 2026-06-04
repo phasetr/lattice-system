@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandAlphaFockKernel
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinChargeCommutation
 
 /-!
 # Tasaki Theorem 11.11: the flat-band ferromagnetic ground states (capstone)
@@ -68,52 +69,11 @@ theorem flatBandTotalNumber_mulVec_alphaAllUpState (K : ℕ) (ν : ℝ) :
       ((K + 1 : ℕ) : ℂ) • flatBandAlphaAllUpState K ν := by
   unfold flatBandAlphaAllUpState
   rw [Matrix.mulVec_mulVec,
-    flatBand_charge_listProd_mulVec_vacuum (fermionTotalNumber (2 * (2 * K + 1) + 1))
+    charge_listProd_mulVec_vacuum (fermionTotalNumber (2 * (2 * K + 1) + 1))
       (fun p => flatBandACreation K ν p 0) (List.finRange (K + 1))
       (fermionTotalNumber_mulVec_vacuum (2 * (2 * K + 1) + 1))
       (fun p _ => flatBandTotalNumber_commutator_ACreation K ν p),
     List.length_finRange]
-
-/-- **`[Ŝ^-_tot, N̂] = 0`**: the total lowering operator conserves particle number
-(`Ŝ^-_tot = Σ_i ĉ†_{i,↓} ĉ_{i,↑}`, each term number-conserving). -/
-theorem flatBand_fermionTotalSpinMinus_commute_fermionTotalNumber (N : ℕ) :
-    Commute (fermionTotalSpinMinus N) (fermionTotalNumber (2 * N + 1)) := by
-  unfold fermionTotalSpinMinus
-  refine Commute.sum_left _ _ _ (fun i _ => ?_)
-  have hcr : fermionTotalNumber (2 * N + 1) * fermionDownCreation N i =
-      fermionDownCreation N i * fermionTotalNumber (2 * N + 1) + fermionDownCreation N i := by
-    unfold fermionDownCreation
-    rw [sub_eq_iff_eq_add.mp
-      (fermionTotalNumber_commutator_fermionMultiCreation (2 * N + 1) (spinfulIndex N i 1))]
-    abel
-  have han : fermionTotalNumber (2 * N + 1) * fermionUpAnnihilation N i =
-      fermionUpAnnihilation N i * fermionTotalNumber (2 * N + 1) - fermionUpAnnihilation N i := by
-    unfold fermionUpAnnihilation
-    rw [sub_eq_iff_eq_add.mp
-      (fermionTotalNumber_commutator_fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N i 0))]
-    abel
-  have key : Commute (fermionTotalNumber (2 * N + 1))
-      (fermionDownCreation N i * fermionUpAnnihilation N i) := by
-    change fermionTotalNumber (2 * N + 1) *
-        (fermionDownCreation N i * fermionUpAnnihilation N i) =
-      fermionDownCreation N i * fermionUpAnnihilation N i * fermionTotalNumber (2 * N + 1)
-    rw [← Matrix.mul_assoc, hcr, Matrix.add_mul, Matrix.mul_assoc, han, Matrix.mul_sub,
-      ← Matrix.mul_assoc]
-    abel
-  exact key.symm
-
-/-- **The lowering tower preserves the total-number eigenvalue** (general
-eigenvalue `lam`): since `Ŝ^-_tot` commutes with `N̂`, `(Ŝ^-_tot)^k v` keeps the
-`N̂`-eigenvalue of `v`. -/
-theorem fermionTotalNumber_mulVec_spinMinusPow_eigenvalue (N : ℕ) (k : ℕ) (lam : ℂ)
-    {v : (Fin (2 * N + 2) → Fin 2) → ℂ}
-    (hv : (fermionTotalNumber (2 * N + 1)).mulVec v = lam • v) :
-    (fermionTotalNumber (2 * N + 1)).mulVec (((fermionTotalSpinMinus N) ^ k).mulVec v) =
-      lam • (((fermionTotalSpinMinus N) ^ k).mulVec v) := by
-  have hcomm : Commute (fermionTotalNumber (2 * N + 1))
-      ((fermionTotalSpinMinus N) ^ k) :=
-    ((flatBand_fermionTotalSpinMinus_commute_fermionTotalNumber N).symm).pow_right k
-  rw [Matrix.mulVec_mulVec, hcomm.eq, ← Matrix.mulVec_mulVec, hv, Matrix.mulVec_smul]
 
 /-- **Deferred classification input for Tasaki Theorem 11.11** (Appendix A,
 Lemmas A.10/A.11): in the half-filled flat-band sector `N_e = K + 1`, every
