@@ -6100,6 +6100,16 @@ Theorem 11.12 axiom in subsequent steps. The single-electron operator is therefo
 generalised to an arbitrary finite vertex type (\texttt{mielkeSingleElectronOpOn}),
 with the original $\mathrm{Fin}\,(M{+}1)$ form a thin wrapper, since $S^{\mathsf H}S$
 naturally lives over $G.\texttt{edgeSet}$ rather than $\mathrm{Fin}\,(M{+}1)$.
+The rank step of Lemma 11.14 then follows: mathlib's
+\texttt{ker\_mulVecLin\_conjTranspose\_mul\_self} gives $\ker(S^{\mathsf H}S)=\ker S$,
+so by rank--nullity for $S$,
+\[
+  \dim\ker T = |B| - \operatorname{rank} S
+\]
+(\texttt{mielke\_lineGraph\_ker\_finrank\_eq}, for $t\ge 0$). The next step identifies
+$\operatorname{rank} S = |\tilde\Lambda| - \dim\ker(SS^{\mathsf H})$ with
+$\dim\ker(SS^{\mathsf H})=(\text{bipartite}\,?\,1:0)$ for a connected base, yielding
+$D(\tilde\Lambda,B)$.
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
