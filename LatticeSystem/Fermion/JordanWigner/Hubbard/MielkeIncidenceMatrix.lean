@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.MielkeTheorems
 import Mathlib.Combinatorics.SimpleGraph.IncMatrix
+import Mathlib.LinearAlgebra.Matrix.Rank
 
 /-!
 # Tasaki §11.3.3: the Mielke incidence matrix and the `SᴴS` factorisation
@@ -123,5 +124,27 @@ theorem mielkeIncidence_conjTranspose_mul_self (t : ℝ) (ht : 0 ≤ t) :
     ring
   · rw [if_neg heq, if_neg heq]
     by_cases hadj : G.lineGraph.Adj e₁ e₂ <;> simp [hadj]
+
+open scoped ComplexOrder in
+/-- **Rank–nullity for the line-graph flat band** (Tasaki §11.3.3, the rank step of
+Lemma 11.14): for `t ≥ 0`, the dimension of the zero-energy (flat-band) subspace of
+the line-graph single-electron operator equals the number of edges minus the rank of
+the incidence matrix `S`,
+`dim ker T = |B| − rank S`  (where `T = SᴴS`).
+This uses the `SᴴS` factorisation together with mathlib's
+`ker_mulVecLin_conjTranspose_mul_self` (`ker SᴴS = ker S`, so the kernels coincide) and
+rank–nullity for `S`.  The subsequent step (PR 4) identifies `rank S = |Λ̃| − dim ker(SSᴴ)`
+with `dim ker(SSᴴ) = (bipartite ? 1 : 0)` for a connected base, yielding `D(Λ̃,B̃)`. -/
+theorem mielke_lineGraph_ker_finrank_eq (t : ℝ) (ht : 0 ≤ t) :
+    Module.finrank ℂ (LinearMap.ker (mielkeSingleElectronOpOn G.lineGraph t).mulVecLin)
+      = Fintype.card G.edgeSet - (mielkeIncidence G t).rank := by
+  rw [← mielkeIncidence_conjTranspose_mul_self G t ht,
+    Matrix.ker_mulVecLin_conjTranspose_mul_self]
+  have hdom : Module.finrank ℂ (G.edgeSet → ℂ) = Fintype.card G.edgeSet := Module.finrank_pi ℂ
+  have hrn := LinearMap.finrank_range_add_finrank_ker (mielkeIncidence G t).mulVecLin
+  have hrank : (mielkeIncidence G t).rank
+      = Module.finrank ℂ (LinearMap.range (mielkeIncidence G t).mulVecLin) := rfl
+  rw [hdom] at hrn
+  omega
 
 end LatticeSystem.Fermion
