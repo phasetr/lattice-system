@@ -6058,8 +6058,21 @@ mathlib's \texttt{SimpleGraph.lineGraph}. The two main results --- Theorem 11.12
 Theorem 11.13 (Mielke's ferromagnetism: for a biconnected base at half-filling
 $N=D$, the ground states are the maximal-spin multiplet) --- are stated by Tasaki
 with their proofs deferred to §11.3.3 (Theorem 11.12) or omitted entirely
-(Theorem 11.13), so they will be introduced as documented axioms in a companion
-file, matching the policy for Theorem 11.8 / Lemma 11.9.
+(Theorem 11.13), so they are introduced as documented axioms
+(\texttt{MielkeTheorems.lean}), matching the policy for Theorem 11.8 / Lemma 11.9.
+The line graph is mathlib's \texttt{SimpleGraph.lineGraph}, realised on
+$\mathrm{Fin}\,(M{+}1)$ via a graph isomorphism
+$\texttt{SimpleGraph.Iso}\,G\,(\texttt{lineGraph}\,G_{\rm base})$; the flat-band
+count is $D(\tilde\Lambda,B) = |B|-|\tilde\Lambda|+1$ (bipartite base) or
+$|B|-|\tilde\Lambda|$ (\texttt{mielkeFlatBandDim}). \texttt{mielke\_theorem\_11\_12}
+states that the single-electron operator \texttt{mielkeSingleElectronOp}
+($t\cdot\text{adjacency}+2t\,I$, eq.~(11.3.32)) has kernel of \texttt{finrank} $D$;
+\texttt{mielke\_theorem\_11\_13} states that for a biconnected base at half-filling
+$N=D$, the ground subspace of \texttt{mielkeHamiltonian} has \texttt{finrank}
+$N{+}1=2S_{\max}{+}1$ and every ground state is an $(\hat S_{\rm tot})^2$
+eigenvector at $S_{\max}(S_{\max}{+}1)$, $S_{\max}=N/2$. The Mielke Hamiltonian
+model and its symmetries are axiom-free; only these two classification statements
+are deferred.
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
