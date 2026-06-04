@@ -6177,6 +6177,13 @@ half-integer spin); \texttt{sectorMinEnergy}~$\hat H~\mathtt{twoS}$ is the infim
 $(\hat S_{\rm tot})^2$-eigensector, and \texttt{exhibitsFerromagnetism}~$\hat H~\mathtt{twoSmax}$
 is $\forall\,\mathtt{twoS}<\mathtt{twoSmax},\ E_{\min}(S_{\max})<E_{\min}(\mathtt{twoS})$.  These
 definitions are the foundation of the §11.4 theorems (axiomatized in later work; Issue \#4189).
+The non-singular model itself (eq.~(11.4.23)) is \texttt{nonsingularHubbardHamiltonian} $=
+\texttt{flatBandHamiltonian} + (\zeta:\mathbb C)\cdot\texttt{hubbardKinetic}$, i.e.\ the flat-band
+model $t\sum\hat b^\dagger\hat b + U\sum\hat n_\uparrow\hat n_\downarrow$ perturbed by
+$\zeta\sum_{x,y,\sigma} t_{x,y}\,\hat c^\dagger_{x,\sigma}\hat c_{x,\sigma}$ (recovering the flat
+band at $\zeta=0$).  Its Hermiticity, particle-number conservation, and SU(2) invariance
+$[\hat S^\pm_{\rm tot},\hat H]=0$ are proved (axiom-free) by combining the flat-band and kinetic
+symmetry lemmas (the lowering case via the adjoint of the raising case and Hermiticity).
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
