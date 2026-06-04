@@ -5922,6 +5922,38 @@ Theorem 11.11: the $K+2 = 2S_{\max}+1$ states form a maximal-spin
 ($S_{\rm tot} = S_{\max} = (K+1)/2 = N_e/2$) degenerate \emph{ground-state}
 multiplet of Tasaki's flat-band ferromagnet.
 
+\medskip
+\noindent\textbf{Frustration-free conditions on a ground state
+(\texttt{TasakiFlatBandFrustrationFree.lean}, toward Theorem 11.11 uniqueness).}
+The uniqueness half starts from the observation that $\hat H$ is a nonnegative
+combination of positive-semidefinite terms with ground energy $0$, so a ground
+state must be annihilated by \emph{each} term separately (Tasaki App.~A
+Lemmas A.10/A.11). Concretely, the energy quadratic form decomposes as
+\[
+  \langle v|\hat H|v\rangle
+    = t\sum_{u,\sigma}\langle v|\hat b^\dagger_{u,\sigma}\hat b_{u,\sigma}|v\rangle
+      + U\sum_x \langle v|\hat n_{x\uparrow}\hat n_{x\downarrow}|v\rangle,
+\]
+a sum of nonnegative contributions (\texttt{flatBandHamiltonian\_rayleighOnVec\_%
+decompose}). For a ground state ($\langle v|\hat H|v\rangle = 0$) with
+$t, U > 0$ every contribution vanishes; since each term is positive-semidefinite,
+a zero of its quadratic form is a kernel vector
+(\texttt{posSemidef\_mulVec\_eq\_zero\_of\_rayleighOnVec\_zero}, from
+\texttt{Matrix.PosSemidef.dotProduct\_mulVec\_zero\_iff}), and
+$(\hat b_{u,\sigma})^\dagger \hat b_{u,\sigma} v = 0$ forces
+$\hat b_{u,\sigma} v = 0$ (\texttt{conjTranspose\_mul\_self\_mulVec\_eq\_zero}).
+This yields
+\[
+  \hat b_{u,\sigma}|v\rangle = 0\ \ (\forall u,\sigma) \quad (11.3.11),
+  \qquad
+  \hat n_{x\uparrow}\hat n_{x\downarrow}|v\rangle = 0\ \ (\forall x) \quad (11.3.12),
+\]
+(\texttt{flatBand\_groundState\_BAnnihilation\_mulVec\_eq\_zero},
+\texttt{flatBand\_groundState\_doubleOccupancy\_mulVec\_eq\_zero}). From these
+structural constraints Tasaki deduces that a ground state lives in the $\alpha$
+band with no double occupancy, hence is spatially symmetric and carries maximal
+spin --- the remaining steps of the uniqueness proof.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
