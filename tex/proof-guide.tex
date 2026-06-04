@@ -6683,15 +6683,18 @@ documented axiom \texttt{lieProductFormula} (\texttt{Math/TasakiAppendixA/LiePro
 \texttt{NormedSpace.exp} and \texttt{Filter.Tendsto}.  It is not on the critical path of any
 Chapter-11 proof; to be discharged later.
 
-\medskip\noindent\textbf{Lemmas A.4--A.5 (positive-semidefinite basics, proved).}  Unlike the
-Lie product formula, these are available in mathlib and are \emph{proved} (axiom-free, thin
-wrappers, \texttt{Math/TasakiAppendixA/PosSemidefBasics.lean}).  \textbf{Lemma A.4}
+\medskip\noindent\textbf{Lemmas A.4--A.6 (positive-semidefinite basics, proved).}  Unlike the
+Lie product formula, these are available in mathlib and are \emph{proved} (axiom-free,
+\texttt{Math/TasakiAppendixA/PosSemidefBasics.lean}).  \textbf{Lemma A.4}
 (\texttt{posSemidef\_iff\_eigenvalues\_nonneg}): a Hermitian matrix is positive-semidefinite
 iff every eigenvalue is nonnegative.  \textbf{Lemma A.5} (\texttt{PosSemidef.add}): the sum of
 two positive-semidefinite matrices is positive-semidefinite,
 $\langle\Phi|(\hat A+\hat B)|\Phi\rangle=\langle\Phi|\hat A|\Phi\rangle+\langle\Phi|\hat B|\Phi\rangle\ge0$.
-(Lemma A.6 --- $\hat B^\dagger\hat B\ge0$ and the square root $\hat C=\sqrt{\hat A}$ --- follows
-separately.)
+\textbf{Lemma A.6}: $\hat B^\dagger\hat B\ge0$ for any $\hat B$
+(\texttt{posSemidef\_conjTranspose\_mul\_self}), and conversely every $\hat A\ge0$ is the square
+$\hat A=\hat C^2$ of a positive-semidefinite operator $\hat C=\sqrt{\hat A}$
+(\texttt{exists\_posSemidef\_sq\_eq\_of\_posSemidef}, the square root built from the Hermitian
+continuous functional calculus \texttt{cfc Real.sqrt}).
 
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
