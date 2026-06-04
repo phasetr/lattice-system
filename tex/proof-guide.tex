@@ -6241,7 +6241,15 @@ which reduces to the flat-band model at $s=0$ (\texttt{tasakiNonsingularHamilton
 $\nu>0$ there are thresholds, uniform in the system size, such that once $t/s$ and $U/s$ are
 large enough the model satisfies \texttt{exhibitsFerromagnetism} (saturated ferromagnetism,
 $S_{\max}=N/2$).  Tasaki's proof builds frustration-free local Hamiltonians $\hat h_p$ on
-$4d+1$ sites (Lemmas 11.21--11.22) and reduces to Theorem 11.11; it is deferred.
+$4d+1$ sites (Lemmas 11.21--11.22) and reduces to Theorem 11.11; it is deferred.  The
+proof-internal numbered lemmas are themselves recorded (\texttt{NonsingularLocalHamiltonian.lean}):
+\texttt{nonsingularLocalHamiltonian}~$K\,\nu\,s\,t\,U\,\mathtt{lam}\,\kappa\,i$ is the local
+Hamiltonian $\hat h_p$ (eq.~(11.4.48), $d=1$, on $p=i$ and its neighbours), and
+\textbf{Lemma 11.21} (\texttt{nonsingular\_lemma\_11\_21}: $\hat h_p\ge0\ \forall p \Rightarrow
+\texttt{exhibitsFerromagnetism}$, via Theorem 11.11), \textbf{Lemma 11.22}
+(\texttt{nonsingular\_lemma\_11\_22}: parameter conditions $\Rightarrow \hat h_p\ge0$), and
+\textbf{Lemma 11.23} (\texttt{nonsingular\_lemma\_11\_23}: the $t,U\uparrow\infty$ limit
+positivity below $S_{\max}$) are documented axioms discharging Theorem 11.20's proof.
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
