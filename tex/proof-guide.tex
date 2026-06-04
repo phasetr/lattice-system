@@ -6196,6 +6196,18 @@ perturbation regularity (eqs.~(11.4.24)--(11.4.25): cyclic translation invarianc
 summability) is \texttt{IsNonsingularHopping}.  Tasaki's perturbation-theory proof is deferred;
 the statement is the documented axiom \texttt{nonsingular\_theorem\_11\_18} (Issue \#4189).
 
+\medskip\noindent\textbf{The §11.4.1 example model (eq.~(11.4.1)).}  Section 11.4.1 (Wannier
+state perturbation theory) is heuristic and contains no numbered theorem; its one
+formalisable object is the illustrative example --- the one-dimensional flat-band model with
+the internal on-site potential shifted by $\gamma$.  Since the only $\gamma$-dependence is the
+internal on-site term $(1{+}\gamma)t$ vs $t$, this is the non-singular model
+(\texttt{nonsingularHubbardHamiltonian}) whose perturbation is $\gamma t$ times the
+internal-site number operator: \texttt{wannierExampleModel}~$K\,\nu\,t\,\gamma\,U =
+\texttt{nonsingularHubbardHamiltonian}~K\,\nu\,t\,(\gamma t)\,(\texttt{wannierExamplePerturbation}~K)\,U$.
+It is Hermitian, and \texttt{wannierExampleModel\_gamma\_zero} proves it reduces to
+\texttt{flatBandHamiltonian} at $\gamma=0$ (eq.~(11.4.1) reducing to (11.3.22)), explicitly
+covering §11.4.1 in book order.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
