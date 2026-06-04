@@ -6230,6 +6230,19 @@ $\nu_1,\eta_1,\xi_1,\xi_2,a_1,\dots,b_3>0$ such that, under (11.4.31)/(11.4.32),
 $E_{\rm SW}(k)-E_{\min}(S_{\max})$ is sandwiched between $F_2$ and $F_1$ times
 $2\nu^4 U(1-\cos k)$ (eqs.~(11.4.33)--(11.4.35)).
 
+\medskip\noindent\textbf{Ferromagnetism in the non-singular model (Tasaki §11.4.3,
+Theorem 11.20, axiomatized).}  The culmination of §11.4 is a Hubbard model with a
+\emph{nearly-flat} (non-flat) lowest band that nonetheless exhibits saturated ferromagnetism
+--- the first such result with no singularity.  The model (eq.~(11.4.38)) is
+\texttt{tasakiNonsingularHamiltonian}~$K\,\nu\,t\,s\,U =
+\texttt{flatBandHamiltonian}~K\,\nu\,t\,U - s\cdot\sum_{p,\sigma}\hat a^\dagger_{p,\sigma}\hat a_{p,\sigma}$,
+which reduces to the flat-band model at $s=0$ (\texttt{tasakiNonsingularHamiltonian\_zero\_s}).
+\textbf{Theorem 11.20} (\texttt{tasaki\_theorem\_11\_20}, documented axiom, $d=1$): for every
+$\nu>0$ there are thresholds, uniform in the system size, such that once $t/s$ and $U/s$ are
+large enough the model satisfies \texttt{exhibitsFerromagnetism} (saturated ferromagnetism,
+$S_{\max}=N/2$).  Tasaki's proof builds frustration-free local Hamiltonians $\hat h_p$ on
+$4d+1$ sites (Lemmas 11.21--11.22) and reduces to Theorem 11.11; it is deferred.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
