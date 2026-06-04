@@ -5745,6 +5745,41 @@ $\hat H = \hat H_{\rm hop} + \hat H_{\rm int}$ is a sum of positive-semidefinite
 terms, $|\Phi_{\alpha,\mathrm{all}\uparrow}\rangle$ is a zero-energy ground state
 (the existence half of Theorem 11.11).
 
+\medskip
+\noindent\textbf{General highest-weight SU(2) lowering tower
+(\texttt{SpinLoweringTowerGeneral.lean}).}
+To turn the single zero-energy state $|\Phi_{\alpha,\mathrm{all}\uparrow}\rangle$
+into the full ferromagnetic multiplet we lower it with $\hat S^-_{\rm tot}$.
+The SU(2) ladder lemmas already formalized for weak Nagaoka
+(§\ref{subsec:weak-nagaoka-multiplet}) hardcode the highest weight to the \emph{chain
+maximum} $N/2$, i.e.\ they assume $\hat S^z_{\rm tot}v = (N/2)v$. Tasaki's
+flat-band ferromagnet has only $|E| = K+1$ electrons on $2K+2$ sites
+($N = 2K+1$), so its highest-weight state carries
+$\hat S^z_{\rm tot} = (K+1)/2 < N/2$; the $N/2$-specialized lemmas do not apply.
+We therefore re-derive the same ladder algebra at an \emph{arbitrary} highest
+weight $m\in\mathbb C$ (Casimir eigenvalue $\lambda\in\mathbb C$):
+\[
+  \hat S^z_{\rm tot}(\hat S^-_{\rm tot})^k v = (m-k)(\hat S^-_{\rm tot})^k v,
+  \qquad
+  \hat S^+_{\rm tot}\hat S^-_{\rm tot}(\hat S^-_{\rm tot})^k v
+    = \bigl(\lambda-(m-k)(m-k-1)\bigr)(\hat S^-_{\rm tot})^k v,
+\]
+and, for a highest-weight state ($\hat S^+_{\rm tot}v = 0$,
+$\hat S^z_{\rm tot}v = mv$), the Casimir value
+$(\hat S_{\rm tot})^2 v = m(m+1)v$
+(\texttt{fermionTotalSpinSquared\_mulVec\_of\_isTop\_general}). Specializing to a
+step count $L\in\mathbb N$ with highest weight $m = L/2$, the factorization
+$\lambda - (m-k)(m-k-1) = (k+1)(L-k)$ shows the ladder terminates only after $L$
+steps: the $L+1$ lowered states $(\hat S^-_{\rm tot})^k v$ ($k = 0,\dots,L$) are
+nonzero (\texttt{spinMinusPow\_ne\_zero\_general}) and linearly independent
+(\texttt{spinMinusPow\_linearIndependent\_general}, distinct $\hat S^z$
+eigenvalues $L/2-k$). The packaged
+\texttt{highestWeight\_spinMultiplet\_general} states that a nonzero
+highest-weight state generates an $(L+1)$-dimensional multiplet, all members in
+the maximal-spin sector $(\hat S_{\rm tot})^2 = (L/2)(L/2+1)$ --- the SU(2) input
+to the existence half of Theorem 11.11 at the correct electron-count highest
+weight $L = K+1$.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
