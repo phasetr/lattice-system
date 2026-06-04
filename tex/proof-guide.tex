@@ -6215,8 +6215,13 @@ $\mathrm{Fin}(2(2K{+}1){+}2)=\mathrm{Fin}((2K{+}2)\cdot 2)$ factors as (physical
 $\times$ (spin) (mode $2p{+}\sigma\leftrightarrow(p,\sigma)$, \texttt{modeSiteSpinEquiv}), and
 \texttt{siteTranslationPerm}~$K\,z$ is the \texttt{Equiv.Perm} cyclically shifting the
 physical site by $2z$ (one cell $=$ two physical sites), spin fixed.  This is step 1 toward
-$\hat\tau_z$; the signed Fock-space operator, $E_{\rm SW}(k)$, and the Theorem 11.19 axiom
-follow.
+$\hat\tau_z$.  Step 2 (\texttt{FermionicTranslation.lean}) is the operator itself: the
+Jordan--Wigner sign \texttt{translationJwSign}~$\pi\,\sigma = (-1)^{\#\{(i,j):i<j,\ \sigma_i=\sigma_j=1,\ \pi(j)<\pi(i)\}}$
+(the parity of occupied inversions, $\pm1$), and \texttt{translationOperator}~$K\,z$, the
+signed permutation $\hat\tau_z|\sigma\rangle = \varepsilon(\pi,\sigma)\,|\sigma\circ\pi^{-1}\rangle$
+(\texttt{translationOperator\_mulVec\_basisVec} is exactly eq.~(11.4.30) on basis states;
+\texttt{translationOperator\_zero} gives $\hat\tau_0=1$).  The spin-wave energy $E_{\rm SW}(k)$
+and the Theorem 11.19 axiom follow.
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
