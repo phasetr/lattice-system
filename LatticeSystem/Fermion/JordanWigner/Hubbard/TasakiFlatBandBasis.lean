@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandModel
+import LatticeSystem.Math.ComplexVectorKernel
 import Mathlib.LinearAlgebra.Matrix.DotProduct
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 import Mathlib.LinearAlgebra.Basis.Defs
@@ -190,21 +191,6 @@ theorem flatBandAlphaC_dotProduct_betaC (K : ℕ) (ν : ℝ) (p u : Fin (K + 1))
   rw [show (∑ x, (flatBandAlpha K ν p x : ℂ) * (flatBandBeta K ν u x : ℂ))
       = (((∑ x, flatBandAlpha K ν p x * flatBandBeta K ν u x : ℝ)) : ℂ) from by push_cast; rfl]
   rw [flatBandAlpha_dot_beta]; simp
-
-/-- A complex vector with `star v ⬝ᵥ v = 0` is zero (`∑ ‖v_i‖² = 0`). -/
-theorem complexVec_eq_zero_of_star_dotProduct {n : Type*} [Fintype n] {v : n → ℂ}
-    (h : star v ⬝ᵥ v = 0) : v = 0 := by
-  have hsum : ∑ j, (Complex.normSq (v j) : ℝ) = 0 := by
-    have hc : (∑ j, (Complex.normSq (v j) : ℂ)) = 0 := by
-      rw [← h, dotProduct]
-      refine Finset.sum_congr rfl (fun j _ => ?_)
-      rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
-    exact_mod_cast hc
-  funext j
-  have hj : Complex.normSq (v j) = 0 :=
-    (Finset.sum_eq_zero_iff_of_nonneg (fun k _ => Complex.normSq_nonneg _)).mp hsum j
-      (Finset.mem_univ j)
-  exact Complex.normSq_eq_zero.mp hj
 
 /-- The `α` and `β` spans are disjoint (they are orthogonal). -/
 theorem flatBand_span_disjoint (K : ℕ) (ν : ℝ) :

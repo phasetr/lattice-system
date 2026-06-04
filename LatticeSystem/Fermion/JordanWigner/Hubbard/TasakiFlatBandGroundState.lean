@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandCAR
+import LatticeSystem.Fermion.JordanWigner.FockProduct
 
 /-!
 # Tasaki §11.3.1: the all-up `α` state and `Ĥ_hop |Φα,all↑⟩ = 0` (eqs. 11.3.8/11.3.9)
@@ -17,22 +18,6 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 namespace LatticeSystem.Fermion
 
 open Matrix LatticeSystem.Quantum
-
-/-- **Move-through lemma**: if `B` annihilates the vacuum and anticommutes with
-each factor `A_p`, then `B · (∏_p A_p) |vac⟩ = 0` (anticommute `B` rightward
-through the product, then `B |vac⟩ = 0`). -/
-theorem flatBand_anticomm_listProd_mulVec_vacuum {M : ℕ} {ι : Type*}
-    (B : ManyBodyOp (Fin (M + 1))) (A : ι → ManyBodyOp (Fin (M + 1))) (ps : List ι)
-    (hBvac : B.mulVec (fermionMultiVacuum M) = 0)
-    (hanti : ∀ p ∈ ps, B * A p + A p * B = 0) :
-    (B * (ps.map A).prod).mulVec (fermionMultiVacuum M) = 0 := by
-  induction ps with
-  | nil => simpa using hBvac
-  | cons p ps ih =>
-    rw [List.map_cons, List.prod_cons, ← Matrix.mul_assoc,
-      eq_neg_of_add_eq_zero_left (hanti p (by simp)),
-      Matrix.neg_mul, Matrix.mul_assoc, Matrix.neg_mulVec, ← Matrix.mulVec_mulVec,
-      ih (fun q hq => hanti q (by simp [hq])), Matrix.mulVec_zero, neg_zero]
 
 /-- The all-up `α` Slater state `|Φα,all↑⟩ = (∏_p â†_{p,↑}) |vac⟩` (eq. 11.3.9). -/
 noncomputable def flatBandAlphaAllUpState (K : ℕ) (ν : ℝ) :
@@ -58,7 +43,7 @@ theorem flatBandBAnnihilation_mulVec_alphaAllUpState (K : ℕ) (ν : ℝ) (u : F
     (flatBandBAnnihilation K ν u σ).mulVec (flatBandAlphaAllUpState K ν) = 0 := by
   unfold flatBandAlphaAllUpState
   rw [Matrix.mulVec_mulVec]
-  exact flatBand_anticomm_listProd_mulVec_vacuum (flatBandBAnnihilation K ν u σ)
+  exact anticomm_listProd_mulVec_vacuum (flatBandBAnnihilation K ν u σ)
     (fun p => flatBandACreation K ν p 0) (List.finRange (K + 1))
     (flatBandBAnnihilation_mulVec_vacuum K ν u σ)
     (fun p _ => flatBandBAnnihilation_ACreation_anticomm K ν u p σ 0)
