@@ -14,18 +14,19 @@ edges of the base graph; two are adjacent iff they share a base vertex), and a
 concrete realisation on `Fin (M+1)` is recorded by a graph isomorphism
 `SimpleGraph.Iso G (lineGraph Gbase)`.
 
-The two main results of §11.3.2 are introduced as **documented axioms**, faithfully
-following Tasaki's own presentation:
+This file holds the statement data (`mielkeFlatBandDim`, `mielkeSingleElectronOp`,
+`mielkeGroundSubmodule`) and Tasaki's two §11.3.2 results:
 
 * **Theorem 11.12 (flat band)**: the single-electron Schrödinger operator on the
-  line graph has exactly `D(Λ̃,B̃)` zero-energy eigenstates.  *Tasaki defers the
-  proof to §11.3.3* (marked advanced), so it is an axiom here, to be discharged when
-  §11.3.3 is formalised.
+  line graph has exactly `D(Λ̃,B̃)` zero-energy eigenstates.  *Tasaki defers the proof
+  to §11.3.3*; it is **now proved** (no longer an axiom) in
+  `Hubbard/MielkeIncidenceMatrix.lean` (which imports this file), via the §11.3.3
+  incidence-matrix construction — see `mielke_theorem_11_12` there (Issue #4180).
 * **Theorem 11.13 (Mielke's ferromagnetism)**: for a biconnected base lattice at
   half-filling `N = D`, the ground states are the maximal-spin `(2S_max+1)`-fold
   multiplet with `S_tot = S_max = N/2`.  *Tasaki states it without proof* ("We state
-  it without a proof"), so it is an axiom, matching the policy for Theorem 11.8 /
-  Lemma 11.9 and the §11.3.1 classification axiom.
+  it without a proof"), so it remains a **documented axiom**, matching the policy for
+  Theorem 11.8 / Lemma 11.9 and the §11.3.1 classification axiom.
 
 `D(Λ̃,B̃) = |B̃| − |Λ̃| + 1` if `(Λ̃,B̃)` is bipartite, else `|B̃| − |Λ̃|`.
 
@@ -63,23 +64,11 @@ noncomputable def mielkeSingleElectronOp {M : ℕ} (G : SimpleGraph (Fin (M + 1)
     [DecidableRel G.Adj] (t : ℝ) : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ :=
   mielkeSingleElectronOpOn G t
 
-/-- **Tasaki Theorem 11.12 (flat band in a general line graph), AXIOM.**  For a
-**connected** base lattice `(Λ̃,B̃)`, the single-electron Schrödinger operator on its
-line graph has exactly `D(Λ̃,B̃)` zero-energy eigenstates (the flat band).  Tasaki
-defers the proof to §11.3.3, so this is a documented axiom (to be discharged with
-§11.3.3).
-
-Connectedness is required: `mielkeFlatBandDim` uses the single bipartite indicator
-`if Colorable 2 then 1 else 0`, which counts the flat-band correctly only for a
-connected base — for a disconnected base, `dim ker T̃` is the number of *bipartite
-connected components* (Tasaki's eq. (11.3.41) analysis is stated for connected
-`(Λ̃,B̃)`). -/
-axiom mielke_theorem_11_12 {Nbase M : ℕ} (Gbase : SimpleGraph (Fin (Nbase + 1)))
-    [DecidableRel Gbase.Adj] (G : SimpleGraph (Fin (M + 1))) [DecidableRel G.Adj]
-    (t : ℝ) (ht : 0 < t) (hconn : Gbase.Connected)
-    (hLG : Nonempty (SimpleGraph.Iso G Gbase.lineGraph)) :
-    Module.finrank ℂ (LinearMap.ker (mielkeSingleElectronOp G t).mulVecLin) =
-      mielkeFlatBandDim Gbase
+-- **Tasaki Theorem 11.12 (flat band in a general line graph)** is now *proved* (no
+-- longer an axiom) in `Hubbard/MielkeIncidenceMatrix.lean` as `mielke_theorem_11_12`,
+-- discharged via the §11.3.3 incidence-matrix construction (Issue #4180).  It lives in
+-- that downstream file because the proof needs the incidence/rank/zero-mode results,
+-- and that file imports this one.
 
 /-- The half-filled Mielke ground subspace: the zero-energy states (`ker Ĥ`, the
 `2t·N̂` shift placing the ground energy at `0`) in the `N`-electron sector. -/

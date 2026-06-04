@@ -6053,19 +6053,21 @@ Hermiticity (\texttt{mielkeHamiltonian\_isHermitian}), particle-number conservat
 $[\hat H,\hat N]=0$ (\texttt{mielkeHamiltonian\_commute\_fermionTotalNumber}), and
 SU(2) invariance $[\hat S^-_{\rm tot},\hat H]=0$
 (\texttt{fermionTotalSpinMinus\_commute\_mielkeHamiltonian}). The line graph is
-mathlib's \texttt{SimpleGraph.lineGraph}. The two main results --- Theorem 11.12
+mathlib's \texttt{SimpleGraph.lineGraph}. The two main results are Theorem 11.12
 (a line graph has $D(\tilde\Lambda,B)$ zero-energy single-electron states) and
 Theorem 11.13 (Mielke's ferromagnetism: for a biconnected base at half-filling
-$N=D$, the ground states are the maximal-spin multiplet) --- are stated by Tasaki
-with their proofs deferred to §11.3.3 (Theorem 11.12) or omitted entirely
-(Theorem 11.13), so they are introduced as documented axioms
-(\texttt{MielkeTheorems.lean}), matching the policy for Theorem 11.8 / Lemma 11.9.
+$N=D$, the ground states are the maximal-spin multiplet). Tasaki defers Theorem 11.12's
+proof to §11.3.3 and omits Theorem 11.13's entirely. \textbf{Theorem 11.12 is now
+\emph{proved}} (§11.3.3, \texttt{MielkeIncidenceMatrix.lean}, below); only Theorem 11.13
+remains a documented axiom (\texttt{MielkeTheorems.lean}), matching the policy for
+Theorem 11.8 / Lemma 11.9.
 The line graph is mathlib's \texttt{SimpleGraph.lineGraph}, realised on
 $\mathrm{Fin}\,(M{+}1)$ via a graph isomorphism
 $\texttt{SimpleGraph.Iso}\,G\,(\texttt{lineGraph}\,G_{\rm base})$; the flat-band
 count is $D(\tilde\Lambda,B) = |B|-|\tilde\Lambda|+1$ (bipartite base) or
 $|B|-|\tilde\Lambda|$ (\texttt{mielkeFlatBandDim}). \texttt{mielke\_theorem\_11\_12}
-states that, for a \emph{connected} base lattice, the single-electron operator
+(now a \emph{proved theorem}, §11.3.3) states that, for a \emph{connected} base lattice
+with $|\tilde\Lambda|\le|B|$ (a cycle present), the single-electron operator
 \texttt{mielkeSingleElectronOp} ($t\cdot\text{adjacency}+2t\,I$, eq.~(11.3.32)) has
 kernel of \texttt{finrank} $D$;
 \texttt{mielke\_theorem\_11\_13} states that for a biconnected base at half-filling
@@ -6125,8 +6127,13 @@ $\dim\ker T = |B| - (|\tilde\Lambda| - (\text{bipartite}\,?\,1:0)) = D(\tilde\La
 (\texttt{mielke\_lineGraph\_ker\_finrank\_eq\_dim}, the general-base form of Theorem 11.12;
 written with the inner subtraction to stay sound under truncated $\mathbb N$ subtraction,
 agreeing with Tasaki's $|B|-|\tilde\Lambda|+1$ once $|\tilde\Lambda|\le|B|$).  The
-remaining step transports this along the line-graph isomorphism to the $\mathrm{Fin}\,(M{+}1)$
-statement, discharging the \texttt{mielke\_theorem\_11\_12} axiom.
+final step (\texttt{mielke\_theorem\_11\_12}) transports this along the line-graph
+isomorphism to the $\mathrm{Fin}\,(M{+}1)$ statement: reindexing a matrix by an
+equivalence preserves its rank (\texttt{Matrix.rank\_submatrix}) and hence its kernel
+dimension, so the flat-band count carries over verbatim, \textbf{discharging the former
+\texttt{mielke\_theorem\_11\_12} axiom}.  The hypothesis $|\tilde\Lambda|\le|B|$ is exactly
+where Tasaki's $|B|-|\tilde\Lambda|+1$ form coincides with the truncation-safe
+$|B|-(|\tilde\Lambda|-\mathrm{bip})$ proved here.
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
