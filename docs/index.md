@@ -107,6 +107,7 @@ recommended replacement, and earliest-removal window.
 | P3 | CAR algebras, quasi-local C*-algebras, KMS states | Not started |
 | P4 | Thermodynamic limit, phase transitions | Not started |
 | P5 | Lattice QCD | Not started |
+| Appendix A (Tasaki Mathematical Appendices) | The book-order content after Chapter 11; foundations for the deferred Chapter-11 proof discharges (frustration-free A.9/A.10, limit A.11/A.12, Perron–Frobenius A.17/A.18 — the last largely already in `Math/PerronFrobenius*`/`CollatzWielandt*`). **In progress** (Issue #4205): **Theorem A.1 (Lie product formula)** `e^{A+B} = lim_N (e^{A/N}e^{B/N})^N` (`Math/TasakiAppendixA/LieProduct.lean`, `lieProductFormula`, documented axiom — mathlib has only the commuting case `Matrix.exp_add_of_commute`). Prove-first where mathlib supports (A.2.3 PSD cluster), axiomatize-first for the heavy analytic results, strict book order. |
 
 ## Formalized theorems
 
