@@ -5780,6 +5780,41 @@ the maximal-spin sector $(\hat S_{\rm tot})^2 = (L/2)(L/2+1)$ --- the SU(2) inpu
 to the existence half of Theorem 11.11 at the correct electron-count highest
 weight $L = K+1$.
 
+\medskip
+\noindent\textbf{The all-up $\alpha$ state is a highest-weight maximal-spin state
+(\texttt{TasakiFlatBandHighestWeight.lean}, eq.~(11.3.10)).}
+To feed $|\Phi_{\alpha,\mathrm{all}\uparrow}\rangle$ into the general tower we
+verify its highest-weight data. The raising operator
+$\hat S^+_{\rm tot} = \sum_i \hat c^\dagger_{i,\uparrow}\hat c_{i,\downarrow}$
+annihilates it because each down annihilation does
+($\hat c_{i,\downarrow}|\Phi_\alpha\rangle = 0$), giving
+$\hat S^+_{\rm tot}|\Phi_\alpha\rangle = 0$
+(\texttt{flatBandTotalSpinPlus\_mulVec\_alphaAllUpState}). For the $\hat S^z$
+weight we count particles: a \emph{charge move-through} lemma
+(\texttt{flatBand\_charge\_listProd\_mulVec\_vacuum}, list induction) shows that
+if $Q$ annihilates the vacuum and each factor raises its charge by one
+($Q\,A_p = A_p Q + A_p$), then $Q$ acts on $\bigl(\prod_p A_p\bigr)|\mathrm{vac}
+\rangle$ with eigenvalue equal to the number of factors. Applied with
+$Q = \hat N_\uparrow$ and the commutator
+$[\hat N_\uparrow, \hat a^\dagger_{p,\uparrow}] = \hat a^\dagger_{p,\uparrow}$
+(each $\hat a^\dagger_{p,\uparrow}$ being a linear combination of up creations) it
+gives $\hat N_\uparrow|\Phi_\alpha\rangle = (K+1)|\Phi_\alpha\rangle$
+(\texttt{flatBandTotalUpNumber\_mulVec\_alphaAllUpState}); and
+$\hat N_\downarrow|\Phi_\alpha\rangle = 0$ since there are no down electrons.
+Hence
+\[
+  \hat S^z_{\rm tot}|\Phi_\alpha\rangle
+    = \tfrac12(\hat N_\uparrow - \hat N_\downarrow)|\Phi_\alpha\rangle
+    = \tfrac{K+1}{2}\,|\Phi_\alpha\rangle
+\]
+(\texttt{flatBandTotalSpinZ\_mulVec\_alphaAllUpState}, eq.~(11.3.10)): the highest
+weight is $m = (K+1)/2 = |E|/2$, the half-filled-band ferromagnetic weight,
+strictly below the chain maximum $N/2 = (2K+1)/2$. Together with
+$\hat S^+_{\rm tot}|\Phi_\alpha\rangle = 0$ these are exactly the hypotheses of
+\texttt{highestWeight\_spinMultiplet\_general} (at $L = K+1$), so once
+$|\Phi_\alpha\rangle\neq 0$ is established the full $(K+2)$-dimensional
+maximal-spin multiplet follows.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
