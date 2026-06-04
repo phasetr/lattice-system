@@ -6345,15 +6345,22 @@ $\hat H_{\rm hop}=\sum_{\langle p,q\rangle\in E,\sigma}(-s\,\hat a^\dagger_p\hat
 -t\,\hat b^\dagger_p\hat b_q)+u_1\sum_{p,\sigma}\hat b^\dagger_p\hat b_p
 +u_2(\sum_{p,\sigma}\hat d^\dagger_p\hat d_p+\sum_{(u,\zeta),\sigma}\hat d^\dagger_{(u,\zeta)}\hat
 d_{(u,\zeta)})$ and $\hat H_{\rm int}=U\sum_x\hat n_{x\uparrow}\hat n_{x\downarrow}$; the
-$\hat d$-bands are pushed to infinity in the $u_2\uparrow\infty$ limit.  \textbf{Theorem 11.27}
-(\texttt{theorem\_11\_27}, documented axiom): for $u_1>2(|s|+2|t|)$ (Tasaki's
+$\hat d$-bands are pushed to infinity in the $u_2\uparrow\infty$ limit.  We encode that limit
+\emph{faithfully} (\emph{not} as finite ``large enough'' thresholds --- Tasaki proves
+Theorem 11.27 only in the limit and explicitly warns it is not expected to hold at finite
+$u_2,U$, unlike the §11.4.3 insulating model): the $u_2,U=\infty$ finite-energy subspace is
+\texttt{ttDKernel} ($\hat d\,\Phi=0$ for every $\hat d$, via Theorem A.12 / Lemma A.11) and the
+$u_2,U=\infty$ effective Hamiltonian \texttt{ttEffectiveHamiltonian} is the surviving
+$\hat a$/$\hat b$ hopping $\sum_{\langle p,q\rangle,\sigma}(-s\,\hat a^\dagger_p\hat a_q
+-t\,\hat b^\dagger_p\hat b_q)+u_1\sum_{p,\sigma}\hat b^\dagger_p\hat b_p$.  \textbf{Theorem
+11.27} (\texttt{theorem\_11\_27}, documented axiom): for $u_1>2(|s|+2|t|)$ (Tasaki's
 $u_1>2d(|s|+2|t|)$) and $K+1\le N_e\le 2(K+1)$ (Tasaki's $L^d\le N\le 2L^d$), in the limit
-$u_2,U\uparrow\infty$ every ground state in \texttt{groundSubmoduleAtFilling} has the maximum
-possible total spin $S_{\rm tot}=N_e/2$ (an $(\hat S_{\rm tot})^2$ eigenvector at
-$(N_e/2)(N_e/2+1)$; weaker than the full multiplet predicate, as Tasaki claims only the spin).
-The ground states are metallic when $1<N_e/L<2$.  Tasaki cites the original paper [63] for the
-technical proof; deferred (Issue \#4198).  This completes the numbered results of §11.5 and of
-Chapter 11.
+every ground state in $\texttt{groundSubmoduleAtFilling}~(\texttt{ttEffectiveHamiltonian}\dots)\,N_e
+\sqcap\texttt{ttDKernel}$ has the maximum possible total spin $S_{\rm tot}=N_e/2$ (an
+$(\hat S_{\rm tot})^2$ eigenvector at $(N_e/2)(N_e/2+1)$; weaker than the full multiplet
+predicate, as Tasaki claims only the spin).  The ground states are metallic when $1<N_e/L<2$.
+Tasaki cites the original paper [63] for the technical proof; deferred (Issue \#4198).  This
+completes the numbered results of §11.5 and of Chapter 11.
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}

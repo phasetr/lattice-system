@@ -147,26 +147,54 @@ noncomputable def ttInteraction (K : ℕ) (U : ℝ) :
   ∑ x : Fin (5 * K + 5), (U : ℂ) • hubbardDoubleOccupancy (5 * K + 4) x
 
 /-- **The Tanaka–Tasaki Hubbard model** `Ĥ = Ĥ_hop + Ĥ_int` (Tasaki §11.5.4,
-eqs. (11.5.13), (11.5.24)). -/
+eqs. (11.5.13), (11.5.24)), at finite parameters. -/
 noncomputable def ttHamiltonian (K : ℕ) (ν s t u1 u2 U : ℝ) :
     ManyBodyOp (Fin (2 * (5 * K + 4) + 2)) :=
   ttHopping K ν s t u1 u2 + ttInteraction K U
 
+/-- **The `u₂, U ↑ ∞` finite-energy subspace** `H₀` (Tasaki §11.5.4 via Theorem A.12 /
+Lemma A.11): in the limit, any finite-energy state must be annihilated by every `d̂` operator,
+`d̂_p Φ = d̂_{(c,ζ)} Φ = 0`.  This is the `u₂ = ∞` constraint; the `U = ∞` (hard-core)
+constraint is supplied separately by `groundSubmoduleAtFilling`. -/
+noncomputable def ttDKernel (K : ℕ) (ν : ℝ) :
+    Submodule ℂ ((Fin (2 * (5 * K + 4) + 2) → Fin 2) → ℂ) :=
+  (⨅ p : Fin (K + 1), ⨅ σ : Fin 2,
+      LinearMap.ker (ttDeltaPAnnihilation K p σ).mulVecLin) ⊓
+    (⨅ c : Fin (K + 1), ⨅ ζ : Fin 2, ⨅ σ : Fin 2,
+      LinearMap.ker (ttDeltaIAnnihilation K ν c ζ σ).mulVecLin)
+
+/-- **The `u₂, U ↑ ∞` effective Hamiltonian** (Tasaki §11.5.4 via Theorem A.12): on the
+finite-energy subspace `H₀` the `u₂`-penalty (`d̂` modes) and `U`-interaction (hard-core)
+terms vanish, so the surviving operator is the `â`/`b̂` hopping
+`Σ_{⟨p,q⟩,σ}(−s â†_p â_q − t b̂†_p b̂_q) + u₁ Σ_{p,σ} b̂†_p b̂_p` — independent of `u₂, U`.
+Working with this effective Hamiltonian (rather than finite `u₂, U`) is essential: Tasaki
+proves Theorem 11.27 *only in the limit* and explicitly warns that it is not expected to hold
+at finite `u₂, U` (unlike the §11.4.3 insulating model). -/
+noncomputable def ttEffectiveHamiltonian (K : ℕ) (ν s t u1 : ℝ) :
+    ManyBodyOp (Fin (2 * (5 * K + 4) + 2)) :=
+  (∑ p : Fin (K + 1), ∑ σ : Fin 2,
+      (-(s : ℂ) • (ttACreation K ν p σ * ttAAnnihilation K ν (p + 1) σ +
+          ttACreation K ν p σ * ttAAnnihilation K ν (p - 1) σ)
+        - (t : ℂ) • (ttBCreation K p σ * ttBAnnihilation K (p + 1) σ +
+          ttBCreation K p σ * ttBAnnihilation K (p - 1) σ)))
+    + (u1 : ℂ) • ∑ p : Fin (K + 1), ∑ σ : Fin 2, ttBCreation K p σ * ttBAnnihilation K p σ
+
 /-- **Tasaki Theorem 11.27 (Tanaka–Tasaki metallic ferromagnetism), AXIOM.**  For the
 `d = 1` Tanaka–Tasaki model, if `u₁ > 2(|s| + 2|t|)` (Tasaki's `u₁ > 2d(|s|+2|t|)`) and the
 electron number satisfies `L = K + 1 ≤ Ne ≤ 2L = 2(K + 1)` (Tasaki's `L^d ≤ N ≤ 2L^d`), then
-in the limit `u₂, U ↑ ∞` (for large enough `u₂, U`) the ground states have the **maximum
-possible total spin** `S_tot = Ne/2`: every ground state in the `Ne`-electron hard-core ground
-subspace is an `(Ŝ_tot)²` eigenvector at `(Ne/2)(Ne/2 + 1)`.  (Tasaki states only the maximal
-spin, not the precise degeneracy, so this is weaker than `IsMaximalSpinMultipletSubmodule`.)
-The ground states are metallic when `1 < Ne/L < 2`.  Tasaki cites the original paper [63] for
-the technical proof; recorded as a documented axiom. -/
+**in the limit `u₂, U ↑ ∞`** the ground states have the **maximum possible total spin**
+`S_tot = Ne/2`.  The limit is taken faithfully (not as finite "large enough" thresholds —
+Tasaki proves this only in the limit and warns it is not expected to hold at finite `u₂, U`):
+the statement is on the ground subspace of the `u₂,U = ∞` effective Hamiltonian
+`ttEffectiveHamiltonian` intersected with the finite-energy subspace `ttDKernel` (the `d̂`
+modes empty); every such ground state is an `(Ŝ_tot)²` eigenvector at `(Ne/2)(Ne/2 + 1)`.
+(Tasaki states only the maximal spin, not the precise degeneracy, so this is weaker than
+`IsMaximalSpinMultipletSubmodule`.)  The ground states are metallic when `1 < Ne/L < 2`.
+Tasaki cites the original paper [63] for the technical proof; recorded as a documented axiom. -/
 axiom theorem_11_27 (K : ℕ) (ν s t u1 : ℝ) (hν : 0 < ν)
     (hu1 : 2 * (|s| + 2 * |t|) < u1) (Ne : ℕ) (hNe1 : K + 1 ≤ Ne) (hNe2 : Ne ≤ 2 * (K + 1)) :
-    ∃ W V : ℝ, 0 < W ∧ 0 < V ∧
-      ∀ u2 U : ℝ, W ≤ u2 → V ≤ U →
-        ∀ v ∈ groundSubmoduleAtFilling (ttHamiltonian K ν s t u1 u2 U) Ne,
-          (fermionTotalSpinSquared (5 * K + 4)).mulVec v
-            = (((Ne : ℂ) / 2) * ((Ne : ℂ) / 2 + 1)) • v
+    ∀ v ∈ groundSubmoduleAtFilling (ttEffectiveHamiltonian K ν s t u1) Ne ⊓ ttDKernel K ν,
+      (fermionTotalSpinSquared (5 * K + 4)).mulVec v
+        = (((Ne : ℂ) / 2) * ((Ne : ℂ) / 2 + 1)) • v
 
 end LatticeSystem.Fermion
