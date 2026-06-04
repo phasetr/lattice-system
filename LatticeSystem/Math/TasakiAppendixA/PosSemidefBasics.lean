@@ -12,7 +12,8 @@ these are available in mathlib, so they are **proved** (not axiomatized):
   nonnegative.
 * **Lemma A.5**: the sum of two positive-semidefinite operators is positive-semidefinite.
 * **Lemma A.6**: `B̂†B̂ ≥ 0` for any `B̂`, and conversely every `Â ≥ 0` is the square `Ĉ²` of a
-  positive-semidefinite operator `Ĉ = √Â` (its square root, here `cfc Real.sqrt`).
+  *unique* positive-semidefinite operator `Ĉ = √Â` (its square root, here `cfc Real.sqrt`) —
+  both existence and uniqueness.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), Appendix A.2.3, Lemmas A.4–A.6, pp. 467–468.
@@ -61,5 +62,24 @@ theorem exists_posSemidef_sq_eq_of_posSemidef {n : Type*} [Fintype n]
             exact (Real.mul_self_sqrt (hspec x hx)).symm
       _ = cfc Real.sqrt A * cfc Real.sqrt A := by
             rw [cfc_mul Real.sqrt Real.sqrt A (by fun_prop) (by fun_prop)]
+
+/-- **Tasaki Lemma A.6 (uniqueness of the square root).**  The positive-semidefinite square
+root is unique: if `C, C' ≥ 0` both satisfy `C * C = A = C' * C'`, then `C = C'`.  (Both equal
+`cfc Real.sqrt A`, since `cfc Real.sqrt (D * D) = D` for any `D ≥ 0`.) -/
+theorem posSemidef_sq_eq_unique {n : Type*} [Fintype n] {A C C' : Matrix n n ℂ}
+    (hC : C.PosSemidef) (hC' : C'.PosSemidef) (h : C * C = A) (h' : C' * C' = A) : C = C' := by
+  classical
+  have key : ∀ D : Matrix n n ℂ, D.PosSemidef → cfc Real.sqrt (D * D) = D := by
+    intro D hD
+    have hsa : IsSelfAdjoint D := hD.isHermitian
+    have hspec : ∀ x ∈ spectrum ℝ D, 0 ≤ x :=
+      (StarOrderedRing.nonneg_iff_spectrum_nonneg (R := ℝ) D hsa).mp hD.nonneg
+    have hDD : D * D = cfc (fun x : ℝ => x * x) D := by
+      rw [cfc_mul (fun x : ℝ => x) (fun x : ℝ => x) D (by fun_prop) (by fun_prop), cfc_id' ℝ D]
+    rw [hDD, ← cfc_comp' Real.sqrt (fun x : ℝ => x * x) D (by fun_prop)]
+    rw [cfc_congr (g := (id : ℝ → ℝ)) fun x hx => by
+      simp only [id_eq]; exact Real.sqrt_mul_self (hspec x hx)]
+    exact cfc_id ℝ D
+  rw [← key C hC, h, ← h', key C' hC']
 
 end LatticeSystem.Math
