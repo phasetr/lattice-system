@@ -6185,6 +6185,17 @@ band at $\zeta=0$).  Its Hermiticity, particle-number conservation, and SU(2) in
 $[\hat S^\pm_{\rm tot},\hat H]=0$ are proved (axiom-free) by combining the flat-band and kinetic
 symmetry lemmas (the lowering case via the adjoint of the raising case and Hermiticity).
 
+\medskip\noindent\textbf{Local stability (Tasaki §11.4, Theorem 11.18, axiomatized).}  Tasaki's
+first non-singular theorem is the local stability of ferromagnetism: there are constants
+$\nu_0,\eta_0,\xi_0>0$ (depending only on $d=1$ and the hopping range $R$, uniformly in the
+system size) such that, under $0<\nu\le\nu_0$, $|\zeta|\le\nu^3\eta_0$, and
+$U\ge\xi_0 t|\zeta|/\nu^2$, the maximal-spin sector lies strictly below the once-flipped sector,
+$E_{\min}(S_{\max})<E_{\min}(S_{\max}-1)$.  With $S_{\max}=(K{+}1)/2$ this is
+\texttt{sectorMinEnergy}~$\hat H~(K{+}1)<\texttt{sectorMinEnergy}~\hat H~(K{-}1)$.  The
+perturbation regularity (eqs.~(11.4.24)--(11.4.25): cyclic translation invariance and range-$R$
+summability) is \texttt{IsNonsingularHopping}.  Tasaki's perturbation-theory proof is deferred;
+the statement is the documented axiom \texttt{nonsingular\_theorem\_11\_18} (Issue \#4189).
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
