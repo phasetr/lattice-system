@@ -141,34 +141,34 @@ The `t, U ↑ ∞` limit of the decorated Hubbard model `decHubbardHamiltonian K
 electron number `Ne` (`≤` the `|E| = K + 1` lowest-band states) is equivalent to the
 `J ↑ ∞` limit of the ferromagnetic t-J model (eq. (11.5.4)) on the external chain
 `E = cycleGraph (K + 1)` with the same electron number `Ne` and hopping amplitude
-`τ = (1 + 4dν²)s` (here `d = 1`, so `τ = (1 + 4ν²)s`).  We render the equivalence by its
-operational consequence on the (system-size-independent) finite-energy subspace: for large
-enough `t, U, J` the two models have the **same ground-state degeneracy** at filling `Ne`,
-`finrank (ground subspace of the Hubbard model) = finrank (ground subspace of the t-J model)`.
-Tasaki's proof identifies both finite-energy subspaces with hard-core electrons on `E`
-carrying the same effective Hamiltonian (Theorem A.12 / Lemma A.11); recorded as a documented
-axiom, with the full Hamiltonian-intertwining equivalence rendered via this degeneracy
-identity. -/
+`τ = (1 + 4dν²)s` (here `d = 1`, so `τ = (1 + 4ν²)s`).  Tasaki's proof identifies both
+finite-energy subspaces with hard-core electrons on `E` carrying the *same effective
+Hamiltonian* (Theorem A.12 / Lemma A.11), so the ground spaces — and in particular their
+total-spin structure — coincide.  We render this **spin-structure transfer** faithfully: for
+large enough `t, U, J` the Hubbard ground subspace at filling `Ne` is the maximal-spin
+`(Ne + 1)`-fold multiplet **iff** the t-J ground subspace is.  (Combined with Proposition 11.24,
+which supplies the t-J side, this yields Theorem 11.26.)  Recorded as a documented axiom. -/
 axiom lemma_11_25 (K : ℕ) (ν s : ℝ) (hν : 0 < ν) (hs : 0 < s) (Ne : ℕ) (hNe : Ne ≤ K + 1) :
     ∃ T V W : ℝ, 0 < T ∧ 0 < V ∧ 0 < W ∧
       ∀ t U J : ℝ, T ≤ t → V ≤ U → W ≤ J →
-        Module.finrank ℂ
-            (groundSubmoduleAtFilling (decHubbardHamiltonian K ν s t U) Ne) =
-          Module.finrank ℂ
+        (IsMaximalSpinMultipletSubmodule (3 * K + 2)
+            (groundSubmoduleAtFilling (decHubbardHamiltonian K ν s t U) Ne) Ne ↔
+          IsMaximalSpinMultipletSubmodule K
             (groundSubmoduleAtFilling
-              (tJHamiltonian K (SimpleGraph.cycleGraph (K + 1)) ((1 + 4 * ν ^ 2) * s) J) Ne)
+              (tJHamiltonian K (SimpleGraph.cycleGraph (K + 1)) ((1 + 4 * ν ^ 2) * s) J) Ne) Ne)
 
 /-- **Tasaki Theorem 11.26 (metallic ferromagnetism in the d = 1 Hubbard model), AXIOM.**
 For the one-dimensional decorated Hubbard model `decHubbardHamiltonian K ν s t U`, if the
-electron number `Ne` is **odd** and `< K + 1 = |E|` (the lowest band is partially filled, a
-*metallic* density `Ne/L < 1`), then in the limit `t, U ↑ ∞` (for large enough `t, U`) the
-ground states have total spin `S_tot = Ne/2` and are non-degenerate apart from the trivial
-`2 S_tot + 1 = Ne + 1`-fold `SU(2)` multiplet — captured at once by
-`IsMaximalSpinMultipletSubmodule`.  Tasaki derives this from Proposition 11.24 (the t-J side)
-and Lemma 11.25 (the equivalence) via a Perron–Frobenius argument; recorded as a documented
-axiom. -/
+electron number `Ne` is **odd** and `≤ K + 1 = |E|` (Tasaki's `N ≤ L`), then in the limit
+`t, U ↑ ∞` (for large enough `t, U`) the ground states have total spin `S_tot = Ne/2` and are
+non-degenerate apart from the trivial `2 S_tot + 1 = Ne + 1`-fold `SU(2)` multiplet — captured
+at once by `IsMaximalSpinMultipletSubmodule`.  The ground states are *metallic* when `Ne < K+1`
+(the lowest band is partially filled, density `Ne/L < 1`) and reduce to the insulating
+Heisenberg ferromagnet at `Ne = K + 1`.  Tasaki derives this from Proposition 11.24 (the t-J
+side) and Lemma 11.25 (the equivalence) via a Perron–Frobenius argument; recorded as a
+documented axiom. -/
 axiom theorem_11_26 (K : ℕ) (ν s : ℝ) (hν : 0 < ν) (hs : 0 < s) (Ne : ℕ)
-    (hNe : Ne < K + 1) (hodd : Odd Ne) :
+    (hNe : Ne ≤ K + 1) (hodd : Odd Ne) :
     ∃ T V : ℝ, 0 < T ∧ 0 < V ∧
       ∀ t U : ℝ, T ≤ t → V ≤ U →
         IsMaximalSpinMultipletSubmodule (3 * K + 2)

@@ -6316,14 +6316,17 @@ $\{\hat a_{p,\sigma},\hat a^\dagger_{q,\tau}\}=(1+4d\nu^2)\delta_{pq}\delta_{\si
 (eq.~(11.5.11)).  \textbf{Lemma 11.25} (\texttt{lemma\_11\_25}, documented axiom): the
 $t,U\uparrow\infty$ limit of this Hubbard model at filling $N_e$ is equivalent to the
 $J\uparrow\infty$ limit of the t-J model on $E=\texttt{cycleGraph}(K+1)$ with
-$\tau=(1+4\nu^2)s$; we render the equivalence via its degeneracy consequence (the
-$\mathrm{finrank}$ of the two ground subspaces agree in the limits).  \textbf{Theorem 11.26}
-(\texttt{theorem\_11\_26}, documented axiom): for $d=1$, $N_e<K+1=|E|$ odd, in the limit
-$t,U\uparrow\infty$ the ground states are
+$\tau=(1+4\nu^2)s$; Tasaki identifies both finite-energy subspaces with hard-core electrons on
+$E$ carrying the same effective Hamiltonian, so the total-spin structure transfers.  We render
+this faithfully: in the limits the Hubbard ground subspace at filling $N_e$ is the maximal-spin
+$(N_e+1)$-fold multiplet \emph{iff} the t-J one is.  \textbf{Theorem 11.26}
+(\texttt{theorem\_11\_26}, documented axiom): for $d=1$, $N_e\le K+1=|E|$ odd (Tasaki's
+$N\le L$), in the limit $t,U\uparrow\infty$ the ground states are
 $\texttt{IsMaximalSpinMultipletSubmodule}~(3K+2)\,(\texttt{groundSubmoduleAtFilling}\dots)\,N_e$
---- total spin $S_{\rm tot}=N_e/2$ and $N_e+1$-fold, a metallic ferromagnet since the lowest
-band is partially filled.  Tasaki derives it from Proposition 11.24 and Lemma 11.25
-(Perron--Frobenius); the proof is deferred (Issue \#4198).
+--- total spin $S_{\rm tot}=N_e/2$ and $N_e+1$-fold; a metallic ferromagnet when $N_e<K+1$ (the
+lowest band is partially filled), reducing to the insulating Heisenberg ferromagnet at
+$N_e=K+1$.  Tasaki derives it from Proposition 11.24 and Lemma 11.25 (Perron--Frobenius); the
+proof is deferred (Issue \#4198).
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
