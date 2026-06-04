@@ -78,6 +78,19 @@ noncomputable def mielkeGroundSubmodule {M : ℕ} (G : SimpleGraph (Fin (M + 1))
   LinearMap.ker (mielkeHamiltonian M G t U).mulVecLin ⊓
     Module.End.eigenspace (fermionTotalNumber (2 * M + 1)).mulVecLin (N : ℂ)
 
+/-- **Maximal-spin (`S = D/2`) multiplet ground subspace.**  A submodule `sub` of the
+`(N+1)`-site spinful Fock space is the *saturated-ferromagnetic* ground subspace at the
+maximal spin `S_max = D/2` when it is the `(D+1) = (2 S_max + 1)`-fold multiplet
+(`finrank = D + 1`) and every vector is an `(Ŝ_tot)²` eigenvector at the maximal eigenvalue
+`S_max (S_max + 1)`.  This is the common conclusion shared by Mielke's Theorem 11.13
+(`mielke_theorem_11_13`), the general flat-band Theorem 11.15 (`generalFlatBandFerromagnetic`),
+and §11.5's ferromagnetic t-J results, so it is factored out as one reusable predicate. -/
+def IsMaximalSpinMultipletSubmodule (N : ℕ)
+    (sub : Submodule ℂ ((Fin (2 * N + 2) → Fin 2) → ℂ)) (D : ℕ) : Prop :=
+  Module.finrank ℂ sub = D + 1 ∧
+    ∀ v ∈ sub, (fermionTotalSpinSquared N).mulVec v
+      = (((D : ℂ) / 2) * ((D : ℂ) / 2 + 1)) • v
+
 /-- **Tasaki Theorem 11.13 (Mielke's flat-band ferromagnetism), AXIOM.**  For a
 biconnected base lattice `(Λ̃,B̃)`, the Hubbard model on its line graph at
 half-filling `N = D(Λ̃,B̃)` (with `t, U > 0`) has ground states that all carry
@@ -90,10 +103,7 @@ axiom mielke_theorem_11_13 {Nbase M : ℕ} (Gbase : SimpleGraph (Fin (Nbase + 1)
     [DecidableRel Gbase.Adj] (G : SimpleGraph (Fin (M + 1))) [DecidableRel G.Adj]
     (t U : ℝ) (ht : 0 < t) (hU : 0 < U)
     (hLG : Nonempty (SimpleGraph.Iso G Gbase.lineGraph)) (hbc : IsBiconnected Gbase) :
-    Module.finrank ℂ (mielkeGroundSubmodule G t U (mielkeFlatBandDim Gbase)) =
-        mielkeFlatBandDim Gbase + 1 ∧
-      ∀ v ∈ mielkeGroundSubmodule G t U (mielkeFlatBandDim Gbase),
-        (fermionTotalSpinSquared M).mulVec v =
-          (((mielkeFlatBandDim Gbase : ℂ) / 2) * ((mielkeFlatBandDim Gbase : ℂ) / 2 + 1)) • v
+    IsMaximalSpinMultipletSubmodule M
+      (mielkeGroundSubmodule G t U (mielkeFlatBandDim Gbase)) (mielkeFlatBandDim Gbase)
 
 end LatticeSystem.Fermion
