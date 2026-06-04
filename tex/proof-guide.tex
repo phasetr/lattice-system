@@ -6220,8 +6220,15 @@ Jordan--Wigner sign \texttt{translationJwSign}~$\pi\,\sigma = (-1)^{\#\{(i,j):i<
 (the parity of occupied inversions, $\pm1$), and \texttt{translationOperator}~$K\,z$, the
 signed permutation $\hat\tau_z|\sigma\rangle = \varepsilon(\pi,\sigma)\,|\sigma\circ\pi^{-1}\rangle$
 (\texttt{translationOperator\_mulVec\_basisVec} is exactly eq.~(11.4.30) on basis states;
-\texttt{translationOperator\_zero} gives $\hat\tau_0=1$).  The spin-wave energy $E_{\rm SW}(k)$
-and the Theorem 11.19 axiom follow.
+\texttt{translationOperator\_zero} gives $\hat\tau_0=1$).  Finally
+(\texttt{SpinWaveExcitation.lean}, completing §11.4.2): \texttt{momentumPhase}~$K\,k =
+e^{-2\pi i k/(K+1)}$, the spin-wave energy \texttt{spinWaveEnergy}~$K\,\hat H\,k = E_{\rm SW}(k)$
+is the infimum of \texttt{rayleighOnVec}~$\hat H$ over unit states in the joint eigenspace
+$\hat S^z_{\rm tot}=(K{-}1)/2\;(=S_{\max}{-}1)$ and $\hat\tau=\texttt{momentumPhase}$, and
+\textbf{Theorem 11.19} (\texttt{nonsingular\_theorem\_11\_19}, documented axiom) gives constants
+$\nu_1,\eta_1,\xi_1,\xi_2,a_1,\dots,b_3>0$ such that, under (11.4.31)/(11.4.32), the dispersion
+$E_{\rm SW}(k)-E_{\min}(S_{\max})$ is sandwiched between $F_2$ and $F_1$ times
+$2\nu^4 U(1-\cos k)$ (eqs.~(11.4.33)--(11.4.35)).
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
