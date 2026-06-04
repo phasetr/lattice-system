@@ -5970,6 +5970,24 @@ and Tasaki works in the physical sector $N_e = |E| = K+1$. Second, the
 no-double-occupancy condition (11.3.12) places any ground state in the Hubbard
 hard-core subspace (\texttt{flatBand\_groundState\_mem\_hardcoreSubspace}).
 
+\medskip
+\noindent\textbf{The two subspaces of the uniqueness argument
+(\texttt{TasakiFlatBandSubspaces.lean}).}
+Tasaki's uniqueness statement is naturally phrased through two subspaces. The
+\emph{$\alpha$-Fock subspace} \texttt{flatBandAlphaFockSubmodule} is the span of all
+$\alpha$-band Slater states $\bigl(\prod_q \hat a^\dagger_q\bigr)|\mathrm{vac}
+\rangle$ (\texttt{flatBandAlphaSlaterState}); the ferromagnetic state
+$|\Phi_{\alpha,\mathrm{all}\uparrow}\rangle$ is the all-up such Slater state and so
+lies in it (\texttt{flatBandAlphaAllUpState\_mem\_alphaFockSubmodule}). The
+\emph{$\hat b$-kernel subspace} \texttt{flatBandBKernelSubmodule}
+$= \bigcap_{u,\sigma}\ker \hat b_{u,\sigma}$ collects the states with no
+$\beta$-band occupation; every ground state lies in it by (11.3.11)
+(\texttt{flatBand\_groundState\_mem\_BKernelSubmodule}). With these in place, the
+uniqueness half reduces to the inclusion
+$\texttt{flatBandBKernelSubmodule}\subseteq\texttt{flatBandAlphaFockSubmodule}$ (a
+ground state has no $\beta$-occupation, hence is built from the flat band) followed
+by the symmetric/maximal-spin classification of the resulting $\alpha$-band states.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
