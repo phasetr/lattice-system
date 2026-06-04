@@ -6251,6 +6251,16 @@ Hamiltonian $\hat h_p$ (eq.~(11.4.48), $d=1$, on $p=i$ and its neighbours), and
 \textbf{Lemma 11.23} (\texttt{nonsingular\_lemma\_11\_23}: the $t,U\uparrow\infty$ limit
 positivity below $S_{\max}$) are documented axioms discharging Theorem 11.20's proof.
 
+\medskip\noindent\textbf{Per-site fermionic spin operators (towards §11.5).}  The
+ferromagnetic t-J model (§11.5.2, eq.~(11.5.4)) couples spins by a Heisenberg term
+$\sum_{\langle x,y\rangle}(\hat n_x\hat n_y/4 - \hat{\mathbf S}_x\cdot\hat{\mathbf S}_y)$, which
+needs the per-site spin operators of the Jordan--Wigner fermions
+(\texttt{FermionSiteSpin.lean}): \texttt{fermionSiteSpinPlus/Minus/Z}~$N\,i$
+($\hat S^+_x=\hat c^\dagger_{x\uparrow}\hat c_{x\downarrow}$, $\hat S^-_x=\hat c^\dagger_{x\downarrow}\hat c_{x\uparrow}$,
+$\hat S^z_x=(\hat n_{x\uparrow}-\hat n_{x\downarrow})/2$) and the two-site dot
+\texttt{fermionSpinDot}~$N\,i\,j = \tfrac12(\hat S^+_x\hat S^-_y+\hat S^-_x\hat S^+_y)+\hat S^z_x\hat S^z_y$.
+They sum to the total spin operators (\texttt{fermionTotalSpinPlus\_eq\_sum\_siteSpinPlus}, …).
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
