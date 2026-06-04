@@ -5815,6 +5815,32 @@ $\hat S^+_{\rm tot}|\Phi_\alpha\rangle = 0$ these are exactly the hypotheses of
 $|\Phi_\alpha\rangle\neq 0$ is established the full $(K+2)$-dimensional
 maximal-spin multiplet follows.
 
+\medskip
+\noindent\textbf{Nonvanishing $|\Phi_{\alpha,\mathrm{all}\uparrow}\rangle\neq 0$
+(\texttt{TasakiFlatBandNonvanishing.lean}).}
+The remaining input is that the candidate ground state does not vanish. We avoid
+all Slater-determinant / Gram machinery by using the \emph{triangular} structure
+of the orbitals: on the external sites the $\alpha_p$ are exactly the unit
+vectors, $\alpha_p(\texttt{deltaExternalSite}\ q) = \delta_{pq}$. Hence the
+external up-site annihilation $\hat c_{2q,\uparrow}$ is the \emph{canonical dual}
+of $\hat a^\dagger_{q,\uparrow}$:
+\[
+  \{\hat c_{2q,\uparrow},\, \hat a^\dagger_{p,\uparrow}\}
+    = \alpha_p(2q) = \delta_{pq}
+\]
+(\texttt{flatBandExtUpAnnihilation\_ACreation\_anticomm}, from spinful CAR). A
+\emph{peel} lemma (\texttt{flatBand\_extAnnihilation\_peel}): if $c$ kills the
+vacuum, anticommutes to $1$ with $A$ and to $0$ with every factor of a product
+$P$, then $c\,(A\,P)|\mathrm{vac}\rangle = P|\mathrm{vac}\rangle$ --- the dual
+annihilation removes the leading creation. Peeling one factor at a time
+(induction over the duplicate-free index list,
+\texttt{flatBandAlpha\_listProd\_exists\_collapse}) produces an operator $D$ with
+$D|\Phi_\alpha\rangle = |\mathrm{vac}\rangle$; since $|\mathrm{vac}\rangle\neq 0$
+(\texttt{fermionMultiVacuum\_ne\_zero}, value $1$ at the empty configuration),
+also $|\Phi_\alpha\rangle\neq 0$
+(\texttt{flatBandAlphaAllUpState\_ne\_zero}). This is the identity-overlap special
+case of the Slater determinant, formalized combinatorially without a determinant.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
