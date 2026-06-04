@@ -5988,6 +5988,22 @@ $\texttt{flatBandBKernelSubmodule}\subseteq\texttt{flatBandAlphaFockSubmodule}$ 
 ground state has no $\beta$-occupation, hence is built from the flat band) followed
 by the symmetric/maximal-spin classification of the resulting $\alpha$-band states.
 
+\medskip
+\noindent\textbf{The easy inclusion $\alpha$-Fock $\subseteq$ $\hat b$-kernel
+(\texttt{TasakiFlatBandAlphaFockKernel.lean}).}
+The reverse-trivial inclusion
+$\texttt{flatBandAlphaFockSubmodule}\subseteq\texttt{flatBandBKernelSubmodule}$
+(\texttt{flatBandAlphaFockSubmodule\_le\_BKernelSubmodule}) holds because every
+$\alpha$-Slater state is annihilated by every $\hat b_{u,\sigma}$: since
+$\hat b_{u,\sigma}$ anticommutes with all $\hat a^\dagger_{p,\tau}$ (eq.~(11.3.7),
+all spins) and kills the vacuum, moving it rightward through the ordered product
+$\prod_q \hat a^\dagger_q$ (by induction on the product list) lands on
+$\hat b_{u,\sigma}|\mathrm{vac}\rangle = 0$
+(\texttt{flatBandBAnnihilation\_mulVec\_alphaSlaterState}). The genuinely hard
+inclusion is the other one, $\hat b$-kernel $\subseteq$ $\alpha$-Fock, which
+requires the Fock-space factorisation of the non-orthogonal $\{\alpha\}\cup\{\beta\}$
+basis and is deferred.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
