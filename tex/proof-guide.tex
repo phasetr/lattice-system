@@ -6106,10 +6106,27 @@ so by rank--nullity for $S$,
 \[
   \dim\ker T = |B| - \operatorname{rank} S
 \]
-(\texttt{mielke\_lineGraph\_ker\_finrank\_eq}, for $t\ge 0$). The next step identifies
-$\operatorname{rank} S = |\tilde\Lambda| - \dim\ker(SS^{\mathsf H})$ with
-$\dim\ker(SS^{\mathsf H})=(\text{bipartite}\,?\,1:0)$ for a connected base, yielding
-$D(\tilde\Lambda,B)$.
+(\texttt{mielke\_lineGraph\_ker\_finrank\_eq}, for $t\ge 0$). For the companion
+$\tilde T = SS^{\mathsf H}$, rather than build the (mathlib-absent) signless Laplacian we work
+directly with $\ker S^{\mathsf H}$: the entry of $S^{\mathsf H}x$ at an edge $b=\{u,v\}$
+is $\sqrt t\,(x_u + x_v)$, so for $t>0$ the kernel is
+$\{x : x_u + x_v = 0 \text{ for all edges}\}$.  For a \emph{connected} base this kernel is
+the one-dimensional span of the alternating $\pm1$ sign vector of a $2$-colouring when the
+graph is bipartite, and is trivial otherwise (any nonzero kernel vector would $2$-colour
+the graph) --- eq.~(11.3.41):
+\[
+  \dim\ker(SS^{\mathsf H}) = \dim\ker S^{\mathsf H}
+    = \begin{cases} 1 & \text{bipartite},\\ 0 & \text{otherwise}\end{cases}
+\]
+(\texttt{mielke\_conjTranspose\_ker\_finrank}, for $t>0$ and a connected base).  Combining
+with $\operatorname{rank}S = \operatorname{rank}(SS^{\mathsf H}) = |\tilde\Lambda| -
+\dim\ker(SS^{\mathsf H})$ gives the flat-band dimension
+$\dim\ker T = |B| - (|\tilde\Lambda| - (\text{bipartite}\,?\,1:0)) = D(\tilde\Lambda,B)$
+(\texttt{mielke\_lineGraph\_ker\_finrank\_eq\_dim}, the general-base form of Theorem 11.12;
+written with the inner subtraction to stay sound under truncated $\mathbb N$ subtraction,
+agreeing with Tasaki's $|B|-|\tilde\Lambda|+1$ once $|\tilde\Lambda|\le|B|$).  The
+remaining step transports this along the line-graph isomorphism to the $\mathrm{Fin}\,(M{+}1)$
+statement, discharging the \texttt{mielke\_theorem\_11\_12} axiom.
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
