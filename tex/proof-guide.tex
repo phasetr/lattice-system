@@ -6075,6 +6075,32 @@ eigenvector at $S_{\max}(S_{\max}{+}1)$, $S_{\max}=N/2$. The Mielke Hamiltonian
 model and its symmetries are axiom-free; only these two classification statements
 are deferred.
 
+\medskip\noindent\textbf{Towards discharging Theorem 11.12: the incidence-matrix
+factorisation (Tasaki §11.3.3, eqs.~(11.3.36)--(11.3.39)).} The proof of the flat
+band realises the line-graph single-electron operator as a Gram matrix. Let
+$S=\sqrt t\,\cdot$(\,mathlib \texttt{incMatrix}\,) be the \emph{incidence matrix} of
+the base lattice $(\tilde\Lambda,B)$, the $\tilde\Lambda\times B$ matrix with
+$S_{x,b}=\sqrt t$ when the vertex $x$ is an endpoint of the edge $b$ and $0$
+otherwise (\texttt{mielkeIncidence}). Then its Gram matrix $T=S^{\mathsf H}S$, a
+$B\times B$ matrix indexed by the edges $=$ the line-graph vertices, satisfies
+\[
+  (S^{\mathsf H}S)_{b,b'} = t\bigl(2\,\delta_{b,b'} + [\,b\neq b',\ b,b'\text{ share a vertex}\,]\bigr)
+  = 2t\,\delta_{b,b'} + t\,(\text{adjacency of the line graph}),
+\]
+i.e.\ exactly \texttt{mielkeSingleElectronOpOn}$\,(\texttt{lineGraph}\,G)\,t$
+(\texttt{mielkeIncidence\_conjTranspose\_mul\_self}, for $t\ge 0$). The diagonal
+entry $2t$ is the degree of an edge ($2$ endpoints) and the off-diagonal $t$
+records adjacent edges; the proof uses mathlib's
+\texttt{sum\_incMatrix\_apply\_of\_mem\_edgeSet} for the diagonal and
+\texttt{Sym2.mem\_and\_mem\_iff} (two distinct edges meet in at most one vertex)
+for the off-diagonal count. This presents the line-graph operator as a manifestly
+positive-semidefinite Gram matrix whose kernel is $\ker S$, the algebraic core for
+the rank--nullity and bipartite zero-mode count (eq.~(11.3.41)) that discharge the
+Theorem 11.12 axiom in subsequent steps. The single-electron operator is therefore
+generalised to an arbitrary finite vertex type (\texttt{mielkeSingleElectronOpOn}),
+with the original $\mathrm{Fin}\,(M{+}1)$ form a thin wrapper, since $S^{\mathsf H}S$
+naturally lives over $G.\texttt{edgeSet}$ rather than $\mathrm{Fin}\,(M{+}1)$.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}

@@ -45,13 +45,23 @@ noncomputable def mielkeFlatBandDim {Nbase : ℕ} (Gbase : SimpleGraph (Fin (Nba
     [DecidableRel Gbase.Adj] : ℕ :=
   Gbase.edgeFinset.card - (Nbase + 1) + (if Gbase.Colorable 2 then 1 else 0)
 
+/-- The Mielke single-electron Schrödinger operator on a graph `G` over an
+arbitrary finite vertex type (eq. (11.3.32)): `T = t·(adjacency of G) + 2t·I`,
+whose `ε = 0` eigenspace is the flat band.  When `G` is the line graph of a base
+lattice this is the operator whose kernel Theorem 11.12 counts; the §11.3.3 proof
+realises it as `SᴴS` for the base lattice's incidence matrix `S`, which lives over
+`G.edgeSet` rather than `Fin (M+1)`, so the operator is stated at this generality. -/
+noncomputable def mielkeSingleElectronOpOn {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (G : SimpleGraph Λ) [DecidableRel G.Adj] (t : ℝ) : Matrix Λ Λ ℂ :=
+  Matrix.of (couplingOf G (t : ℂ)) + (2 * t : ℂ) • (1 : Matrix Λ Λ ℂ)
+
 /-- The Mielke single-electron Schrödinger operator on the line graph `Λ`
-(eq. (11.3.32)): `T = t·(adjacency of Λ) + 2t·I`, whose `ε = 0` eigenspace is the
-flat band. -/
+(eq. (11.3.32)), concretely realised on `Fin (M+1)`: `T = t·(adjacency of Λ) + 2t·I`,
+whose `ε = 0` eigenspace is the flat band.  A thin wrapper around
+`mielkeSingleElectronOpOn` specialised to `Fin (M+1)`. -/
 noncomputable def mielkeSingleElectronOp {M : ℕ} (G : SimpleGraph (Fin (M + 1)))
     [DecidableRel G.Adj] (t : ℝ) : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ :=
-  Matrix.of (couplingOf G (t : ℂ)) +
-    (2 * t : ℂ) • (1 : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ)
+  mielkeSingleElectronOpOn G t
 
 /-- **Tasaki Theorem 11.12 (flat band in a general line graph), AXIOM.**  For a
 **connected** base lattice `(Λ̃,B̃)`, the single-electron Schrödinger operator on its
