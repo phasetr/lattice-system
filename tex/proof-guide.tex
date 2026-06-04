@@ -5841,6 +5841,29 @@ also $|\Phi_\alpha\rangle\neq 0$
 (\texttt{flatBandAlphaAllUpState\_ne\_zero}). This is the identity-overlap special
 case of the Slater determinant, formalized combinatorially without a determinant.
 
+\medskip
+\noindent\textbf{The ferromagnetic spin multiplet
+(\texttt{TasakiFlatBandMultiplet.lean}, Theorem 11.11 existence half, spin
+content).}
+The three prerequisites just established --- the general highest-weight tower,
+the highest-weight data of $|\Phi_\alpha\rangle$
+($\hat S^+_{\rm tot}|\Phi_\alpha\rangle = 0$,
+$\hat S^z_{\rm tot}|\Phi_\alpha\rangle = \tfrac{K+1}{2}|\Phi_\alpha\rangle$), and
+$|\Phi_\alpha\rangle\neq 0$ --- are exactly the hypotheses of
+\texttt{highestWeight\_spinMultiplet\_general} at $L = K+1 = |E|$. Feeding them in
+yields \texttt{flatBand\_ferromagnetic\_multiplet}: the $K+2 = 2S_{\max}+1$ lowered
+states $(\hat S^-_{\rm tot})^k|\Phi_\alpha\rangle$ ($k = 0,\dots,K+1$) are linearly
+independent and all carry total spin
+\[
+  (\hat S_{\rm tot})^2\,(\hat S^-_{\rm tot})^k|\Phi_\alpha\rangle
+    = S_{\max}(S_{\max}+1)\,(\hat S^-_{\rm tot})^k|\Phi_\alpha\rangle,
+  \qquad S_{\max} = \frac{K+1}{2} = \frac{N_e}{2}.
+\]
+This is the maximal-spin multiplet structure of Tasaki's flat-band ferromagnet.
+That every member is moreover a zero-energy \emph{ground} state requires the
+energy tower $\hat H(\hat S^-_{\rm tot})^k|\Phi_\alpha\rangle = 0$ (flat-band
+SU(2) lowering symmetry) and $\hat H\geq 0$, handled in subsequent steps.
+
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
 \label{subsec:hubbard-saturated-ferro}
