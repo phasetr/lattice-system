@@ -6153,10 +6153,14 @@ because $P_0$ is Hermitian, so the support quiver is symmetric and strong connec
 Tasaki's irreducibility); the ferromagnetism conclusion
 (\texttt{generalFlatBandFerromagnetic}) reuses the Theorem 11.13 ground-subspace form
 ($\texttt{finrank}=D_0{+}1$, all states $(\hat S_{\rm tot})^2$-eigenvectors at $S_{\max}=D_0/2$).
-The result is deep; Tasaki proves it via Lemma 11.16 (a special basis $\{\mu_z\}$ of $h_0$) and
-Theorem 11.17 (connectedness of that basis).  It is recorded as the documented axiom
-\texttt{tasaki\_theorem\_11\_15}, matching the policy for Theorems 11.8 / 11.13; the proof and
-the §11.3.4 companion results are deferred to later work.
+The result is deep; Tasaki proves it via Lemma 11.16 (a special basis $\{\mu_z\}_{z\in I}$ of
+$h_0$, $|I|=D_0$, site-localised so that $\mu_z(z)\ne0$ and $\mu_z(z')=0$ for $z'\in I\setminus\{z\}$)
+and Theorem 11.17 (the model is ferromagnetic iff that basis is \emph{connected}, where
+$\mu_z\sim\mu_{z'}$ when they share a nonzero component).  All three are recorded as documented
+axioms (\texttt{tasaki\_theorem\_11\_15}, \texttt{generalFlatBand\_lemma\_11\_16},
+\texttt{generalFlatBand\_theorem\_11\_17}; the basis connectivity is
+\texttt{generalFlatBandBasisGraph}/\texttt{generalFlatBandBasisConnected}), matching the policy
+for Theorems 11.8 / 11.13; their proofs are deferred to later work.
 
 %======================================================================
 \subsection{Total-spin Casimir and Definition 11.1 (Tasaki §11.1.1)}
