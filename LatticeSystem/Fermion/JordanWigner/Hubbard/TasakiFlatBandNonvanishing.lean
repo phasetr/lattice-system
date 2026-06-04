@@ -16,7 +16,7 @@ are exactly the unit vectors, `α_p(deltaExternalSite q) = δ_{pq}`
 (`flatBandExtUpAnnihilation_ACreation_anticomm`).  Applying the dual annihilations
 in order collapses the ordered creation product back to the vacuum (identity
 overlap, no determinant): there is an operator `D` with
-`D |Φα,all↑⟩ = |vac⟩` (`flatBandAlphaAllUpState_exists_collapse`).  Since
+`D |Φα,all↑⟩ = |vac⟩` (`flatBandAlpha_listProd_exists_collapse`).  Since
 `|vac⟩ ≠ 0`, also `|Φα,all↑⟩ ≠ 0` (`flatBandAlphaAllUpState_ne_zero`).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
