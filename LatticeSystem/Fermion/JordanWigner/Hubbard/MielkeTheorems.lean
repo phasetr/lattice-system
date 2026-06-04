@@ -63,23 +63,11 @@ noncomputable def mielkeSingleElectronOp {M : ℕ} (G : SimpleGraph (Fin (M + 1)
     [DecidableRel G.Adj] (t : ℝ) : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ :=
   mielkeSingleElectronOpOn G t
 
-/-- **Tasaki Theorem 11.12 (flat band in a general line graph), AXIOM.**  For a
-**connected** base lattice `(Λ̃,B̃)`, the single-electron Schrödinger operator on its
-line graph has exactly `D(Λ̃,B̃)` zero-energy eigenstates (the flat band).  Tasaki
-defers the proof to §11.3.3, so this is a documented axiom (to be discharged with
-§11.3.3).
-
-Connectedness is required: `mielkeFlatBandDim` uses the single bipartite indicator
-`if Colorable 2 then 1 else 0`, which counts the flat-band correctly only for a
-connected base — for a disconnected base, `dim ker T̃` is the number of *bipartite
-connected components* (Tasaki's eq. (11.3.41) analysis is stated for connected
-`(Λ̃,B̃)`). -/
-axiom mielke_theorem_11_12 {Nbase M : ℕ} (Gbase : SimpleGraph (Fin (Nbase + 1)))
-    [DecidableRel Gbase.Adj] (G : SimpleGraph (Fin (M + 1))) [DecidableRel G.Adj]
-    (t : ℝ) (ht : 0 < t) (hconn : Gbase.Connected)
-    (hLG : Nonempty (SimpleGraph.Iso G Gbase.lineGraph)) :
-    Module.finrank ℂ (LinearMap.ker (mielkeSingleElectronOp G t).mulVecLin) =
-      mielkeFlatBandDim Gbase
+-- **Tasaki Theorem 11.12 (flat band in a general line graph)** is now *proved* (no
+-- longer an axiom) in `Hubbard/MielkeIncidenceMatrix.lean` as `mielke_theorem_11_12`,
+-- discharged via the §11.3.3 incidence-matrix construction (Issue #4180).  It lives in
+-- that downstream file because the proof needs the incidence/rank/zero-mode results,
+-- and that file imports this one.
 
 /-- The half-filled Mielke ground subspace: the zero-energy states (`ker Ĥ`, the
 `2t·N̂` shift placing the ground energy at `0`) in the `N`-electron sector. -/

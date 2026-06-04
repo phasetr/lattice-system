@@ -366,4 +366,58 @@ theorem mielke_lineGraph_ker_finrank_eq_dim (t : ℝ) (ht : 0 < t) (hconn : G.Co
   rw [hpr3, ← hcount]
   omega
 
+/-- **Tasaki Theorem 11.12 (flat band in a general line graph), now a theorem.**  For a
+connected base lattice `(Λ̃,B̃)` with at least as many edges as vertices (`hedge`, i.e.
+the base has a cycle — automatic for any genuine flat-band lattice; a connected graph
+violating it is a tree, which has no flat band), any concrete realisation `G` on
+`Fin (M+1)` of its line graph has single-electron flat band of dimension exactly
+`D(Λ̃,B̃) = mielkeFlatBandDim`.  This discharges the former `mielke_theorem_11_12`
+axiom (§11.3.2): the kernel dimension is transported from the abstract line graph
+`Gbase.lineGraph` (where `mielke_lineGraph_ker_finrank_eq_dim` computes it) to `G` along
+the graph isomorphism, since reindexing a matrix by an equivalence preserves its rank
+(`Matrix.rank_submatrix`) and hence its kernel dimension.  The `hedge` hypothesis is
+exactly the condition under which Tasaki's `|B|−|Λ̃|+1` form equals the true dimension
+`|B|−(|Λ̃|−1)` (no `ℕ`-truncation). -/
+theorem mielke_theorem_11_12 {Nbase M : ℕ} (Gbase : SimpleGraph (Fin (Nbase + 1)))
+    [DecidableRel Gbase.Adj] (G : SimpleGraph (Fin (M + 1))) [DecidableRel G.Adj]
+    (t : ℝ) (ht : 0 < t) (hconn : Gbase.Connected)
+    (hLG : Nonempty (SimpleGraph.Iso G Gbase.lineGraph))
+    (hedge : Nbase + 1 ≤ Gbase.edgeFinset.card) :
+    Module.finrank ℂ (LinearMap.ker (mielkeSingleElectronOp G t).mulVecLin) =
+      mielkeFlatBandDim Gbase := by
+  obtain ⟨e⟩ := hLG
+  -- the operator on `G` is the line-graph operator reindexed by the isomorphism
+  have hcorr : mielkeSingleElectronOpOn G t
+      = (mielkeSingleElectronOpOn Gbase.lineGraph t).submatrix e.toEquiv e.toEquiv := by
+    ext i j
+    have hadj : Gbase.lineGraph.Adj (e.toEquiv i) (e.toEquiv j) ↔ G.Adj i j := e.map_adj_iff
+    simp only [mielkeSingleElectronOpOn, Matrix.add_apply, Matrix.of_apply, couplingOf,
+      Matrix.smul_apply, Matrix.one_apply, Matrix.submatrix_apply, smul_eq_mul,
+      hadj, EmbeddingLike.apply_eq_iff_eq]
+  -- reindexing preserves rank, hence (with equal cardinalities) kernel dimension
+  have hrank : (mielkeSingleElectronOpOn G t).rank
+      = (mielkeSingleElectronOpOn Gbase.lineGraph t).rank := by
+    rw [hcorr, Matrix.rank_submatrix]
+  have hcard : Fintype.card (Fin (M + 1)) = Fintype.card Gbase.edgeSet :=
+    Fintype.card_congr e.toEquiv
+  have key : Module.finrank ℂ (LinearMap.ker (mielkeSingleElectronOpOn G t).mulVecLin)
+      = Module.finrank ℂ
+          (LinearMap.ker (mielkeSingleElectronOpOn Gbase.lineGraph t).mulVecLin) := by
+    have hrnG := LinearMap.finrank_range_add_finrank_ker (mielkeSingleElectronOpOn G t).mulVecLin
+    have hrnLG := LinearMap.finrank_range_add_finrank_ker
+      (mielkeSingleElectronOpOn Gbase.lineGraph t).mulVecLin
+    rw [Module.finrank_pi ℂ] at hrnG hrnLG
+    have hr1 : (mielkeSingleElectronOpOn G t).rank
+        = Module.finrank ℂ (LinearMap.range (mielkeSingleElectronOpOn G t).mulVecLin) := rfl
+    have hr2 : (mielkeSingleElectronOpOn Gbase.lineGraph t).rank
+        = Module.finrank ℂ
+            (LinearMap.range (mielkeSingleElectronOpOn Gbase.lineGraph t).mulVecLin) := rfl
+    omega
+  have hdimLG := mielke_lineGraph_ker_finrank_eq_dim Gbase t ht hconn
+  rw [show mielkeSingleElectronOp G t = mielkeSingleElectronOpOn G t from rfl, key, hdimLG]
+  unfold mielkeFlatBandDim
+  rw [SimpleGraph.edgeFinset_card, Fintype.card_fin]
+  rw [SimpleGraph.edgeFinset_card] at hedge
+  split_ifs <;> omega
+
 end LatticeSystem.Fermion
