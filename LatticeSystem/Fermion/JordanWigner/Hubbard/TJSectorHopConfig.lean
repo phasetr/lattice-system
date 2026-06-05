@@ -32,8 +32,8 @@ private theorem tJ_hop_ne_down (s : Fin (N + 1) → Fin 3) (a b : Fin (N + 1)) (
     (hb : s b = 0) : a ≠ b := by
   rintro rfl; rw [ha] at hb; exact absurd hb (by decide)
 
-/-- Either spin label is `0` or `1`. -/
-private theorem tJ_fin2_eq (r : Fin 2) : r = 0 ∨ r = 1 := by
+/-- A spin label is `0` or `1` (the two-element dichotomy used throughout the t-J sector files). -/
+theorem tJ_fin2_eq (r : Fin 2) : r = 0 ∨ r = 1 := by
   rcases eq_or_ne r 0 with h | h
   · exact Or.inl h
   · refine Or.inr (Fin.ext ?_)
