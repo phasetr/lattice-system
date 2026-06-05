@@ -6808,6 +6808,16 @@ the variational $|w|$-argument (eq.~(A.4.1)): for any eigenpair $(\lambda,w)$, $
 entrywise, and pairing with $v>0$ gives $c-\mu\ge c-\lambda$.  Proved (axiom-free,
 \texttt{Math/TasakiAppendixA/PerronFrobeniusSymmetric.lean}).
 
+\medskip\noindent\textbf{Theorems A.19 (polar) and A.20 (SVD).}  Any square complex matrix
+$A$ admits the polar decomposition $A=WC$ with $W$ unitary and $C$ positive-semidefinite
+(\texttt{matrix\_polar\_decomposition}, eq.~(A.4.2)) and the singular value decomposition
+$A=UDV^\dagger$ with $U,V$ unitary and $D=\operatorname{diagonal}d$ ($d_i\ge0$) the diagonal of
+$\sqrt{\lambda_i}$, the $\lambda_i\ge0$ being the eigenvalues of $A^\dagger A$
+(\texttt{matrix\_singular\_value\_decomposition}, eqs.~(A.4.3)--(A.4.6)).  \texttt{mathlib} provides
+the singular \emph{values} of a linear map but not the constructive matrix factorizations, so both
+are recorded as documented axioms (statements kept in book order;
+\texttt{Math/TasakiAppendixA/MatrixDecomposition.lean}).
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
