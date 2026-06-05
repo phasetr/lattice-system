@@ -6753,8 +6753,11 @@ $H_{J,M}$ with $-J\le M<J$ and $\Phi\ne0$, the raised state $\hat J^+\Phi$ is no
 $\hat J^-\hat J^+\Phi=(J-M)(J+M+1)\Phi$ with $(J-M)(J+M+1)>0$ (Tasaki eq.~(A.3.9)).  The raised state also lies in $H_{J,M+1}$
 (\texttt{angRaise\_mem\_eigenspace}): $\hat J^2(\hat J^+\Phi)=J(J+1)(\hat J^+\Phi)$ since
 $[\hat J^2,\hat J^+]=0$ (eq.~(A.3.5)) and $\hat J^{(3)}(\hat J^+\Phi)=(M+1)(\hat J^+\Phi)$ since
-$[\hat J^{(3)},\hat J^+]=\hat J^+$ (eq.~(A.3.6)).  Proved
-(axiom-free, \texttt{Math/TasakiAppendixA/AngularLadder.lean}).
+$[\hat J^{(3)},\hat J^+]=\hat J^+$ (eq.~(A.3.6)).  The mirror lowering direction
+(\texttt{angRaise\_mul\_angLower}: $\hat J^+\hat J^-=\hat J^2-\hat J^{(3)}(\hat J^{(3)}-1)$, eq.~(A.3.8);
+\texttt{angLower\_mulVec\_ne\_zero}: $\hat J^-\Phi\ne0$ for $-J<M\le J$; \texttt{angLower\_mem\_eigenspace}:
+$\hat J^-\Phi\in H_{J,M-1}$ via $[\hat J^2,\hat J^-]=0$ and $[\hat J^{(3)},\hat J^-]=-\hat J^-$) completes
+Lemma A.14.  Proved (axiom-free, \texttt{Math/TasakiAppendixA/AngularLadder.lean}).
 
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
