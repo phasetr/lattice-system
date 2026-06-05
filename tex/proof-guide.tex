@@ -6847,6 +6847,14 @@ $\omega(\hat H_L)$ is the least over all states agreeing with $\omega$ outside $
 (\texttt{groundState\_variational}, Theorem~A.26, eq.~(A.7.7), documented axiom;
 \texttt{Math/TasakiAppendixA/CStarGroundState.lean}).
 
+\medskip\noindent\textbf{Theorem A.28 (GNS construction).}  Every state $\rho$ on a
+C*-algebra $A$ admits a GNS triple $(H_\rho,\pi_\rho,\Omega_\rho)$: a Hilbert space, a
+$*$-representation $\pi_\rho:A\to B(H_\rho)$ (a \texttt{StarAlgHom} into $H\to_L H$), and a cyclic
+vector with $\rho(\hat A)=\langle\Omega_\rho,\pi_\rho(\hat A)\Omega_\rho\rangle$ (eq.~(A.7.11)) and
+$\{\pi_\rho(\hat A)\Omega_\rho\}$ dense (\texttt{gns\_construction}).  Every state is a vector state in
+its GNS space; recorded as a documented axiom (the construction is in \texttt{mathlib}'s
+\texttt{GelfandNaimarkSegal}; \texttt{Math/TasakiAppendixA/CStarGNS.lean}).
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================

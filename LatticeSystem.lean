@@ -34,6 +34,7 @@ import LatticeSystem.Math.TasakiAppendixA.MatrixDecomposition
 import LatticeSystem.Math.TasakiAppendixA.WignerTheorem
 import LatticeSystem.Math.TasakiAppendixA.CStarState
 import LatticeSystem.Math.TasakiAppendixA.CStarGroundState
+import LatticeSystem.Math.TasakiAppendixA.CStarGNS
 import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPF
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphAltPath
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
