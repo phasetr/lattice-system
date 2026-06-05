@@ -6723,6 +6723,16 @@ $\hat H\Phi=(\sum_j\varepsilon_j)\Phi$ then $\hat h_j\Phi=\varepsilon_j\Phi$ for
 $\langle\Phi|\hat h_j-\varepsilon_j|\Phi\rangle\ge0$ summing to $0$, then Lemma A.11).  Both proved
 (axiom-free, \texttt{Math/TasakiAppendixA/FrustrationFree.lean}).
 
+\medskip\noindent\textbf{Lemma A.11 (zeros of the energy form, proved).}  If
+$\hat A\ge0$ and $\langle\Phi|\hat A|\Phi\rangle=0$ then $\hat A|\Phi\rangle=0$
+(\texttt{posSemidef\_mulVec\_eq\_zero\_of\_inner\_zero}); and if $\hat A=\hat B^\dagger\hat B$ then
+$\langle\Phi|\hat A|\Phi\rangle=0$ implies $\hat B|\Phi\rangle=0$
+(\texttt{conjTranspose\_mul\_self\_mulVec\_eq\_zero\_of\_inner\_zero}).  Stated over the existing
+\texttt{Math/RayleighPosSemidefKernel}; we also record Tasaki's angular-momentum corollary
+($\hat J^2=\sum_\alpha(\hat J^{(\alpha)})^2$, $\hat J^2|\Phi\rangle=0\Rightarrow\hat J^{(\alpha)}|\Phi\rangle=0$,
+\texttt{mulVec\_eq\_zero\_of\_sq\_sum\_inner\_zero}).  All proved (axiom-free,
+\texttt{Math/TasakiAppendixA/PosSemidefKernel.lean}).
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
