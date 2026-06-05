@@ -42,6 +42,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.HopMatrixElement
 import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonian
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiBasis
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiHopAction
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HopSignBetween
 import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonianMatrix
 import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonianSpinSymmetry
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaoka
@@ -177,6 +178,7 @@ expansion):
 | `Hubbard/EffectiveHamiltonian.lean` | effective Hamiltonian `Ĥ_eff = P̂_hc H P̂_hc` + `U→∞` reduction (Tasaki §11.2) |
 | `Hubbard/TasakiBasis.lean` | Tasaki ordered-creation basis `\|Φ_{x,σ}⟩ = ε • basisVec` + orthonormality (Tasaki §11.2 eq. (11.2.3)) |
 | `Hubbard/TasakiHopAction.lean` | uniform-sign hole-filling action `ĉ†_{x,s}ĉ_{z,s}\|Φ_{x,σ}⟩ = -\|Φ_{z,σ_{z→x}}⟩` + sign `ε = (-1)^x` (Tasaki §11.2 eq. (11.2.4)) |
+| `Hubbard/HopSignBetween.lean` | **Forward-hop JW sign as a strictly-between parity** (Issue #4230 PR3c-3): `jwSign_mul_jwSign_update_forward` — for a forward hop `q→p` (`q.val<p.val`, source `c q=1`), `jwSign q c · jwSign p (update c q 0) = (-1)^(#occupied modes strictly between q,p)`; the `2·E_q` of the modes below the source cancels in parity. Model-agnostic; underlies the sign-free d=1 t-J hopping. Axiom-free |
 | `Hubbard/EffectiveHamiltonianMatrix.lean` | off-diagonal matrix element `⟨Φ_{y,τ}\|Ĥ_eff\|Φ_{x,σ}⟩ = -t_{x,y}·[τ=σ_{y→x}]` (Tasaki §11.2 eq. (11.2.5)) |
 | `Hubbard/WeakNagaoka.lean` | Cauchy–Schwarz energy bound `⟨Φ_↑\|Ĥ_eff\|Φ_↑⟩ ≤ ⟨Φ\|Ĥ_eff\|Φ⟩` (Tasaki §11.2 eq. (11.2.9)) |
 | `Hubbard/EffectiveHamiltonianSpinSymmetry.lean` | SU(2) symmetry of the effective Hamiltonian `[Ĥ_eff, Ŝ^±_tot] = 0` (Tasaki §11.2, degeneracy backbone) |
