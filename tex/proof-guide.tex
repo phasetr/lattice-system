@@ -6818,6 +6818,17 @@ the singular \emph{values} of a linear map but not the constructive matrix facto
 are recorded as documented axioms (statements kept in book order;
 \texttt{Math/TasakiAppendixA/MatrixDecomposition.lean}).
 
+\medskip\noindent\textbf{Theorems A.21 and A.22 (Wigner's theorem).}  Over a
+finite-dimensional Hilbert space $H=$ \texttt{Fin\,D}$\to\mathbb C$ (operators $M(H)=$
+\texttt{Matrix D D}$\,\mathbb C$): a linear $*$-automorphism $\Gamma$ ((A1)--(A4)) is implemented by a
+unitary, $\Gamma(\hat A)=\hat U^\dagger\hat A\hat U$ (\texttt{wignerAutomorphism\_unitary}, eq.~(A.6.1)),
+and an antilinear $*$-automorphism ((A4$'$)) by an antiunitary, in matrix form
+$\Gamma(\hat A)=\hat U^\dagger\bar{\hat A}\hat U$ via entrywise conjugation
+(\texttt{wignerAutomorphism\_antiunitary}, eq.~(A.6.2)).  A map on rank-one projections preserving the
+transition probabilities $\operatorname{Tr}[P P']$ is implemented by a unitary or antiunitary
+(\texttt{wignerProjection}, Theorem~A.22, eq.~(A.6.10)).  Recorded as documented axioms
+(\texttt{Math/TasakiAppendixA/WignerTheorem.lean}).
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
