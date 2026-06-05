@@ -6776,6 +6776,16 @@ $M\mapsto-M$) gives $J+M\in\mathbb Z_{\ge0}$, so $2J=(J-M)+(J+M)\in\mathbb Z_{\g
 (\texttt{angMom\_J\_eq\_half\_nat}, Theorem~A.13).  Proved (axiom-free,
 \texttt{Math/TasakiAppendixA/AngularQuantization.lean}).
 
+\medskip\noindent\textbf{Theorem A.16 (SU(2)-multiplet degeneracy, proved).}  For an
+$su(2)$-invariant Hamiltonian ($\hat H\hat J^{(\alpha)}=\hat J^{(\alpha)}\hat H$), a joint energy
+eigenstate $\Phi\in H_{J,M_0}$ ($\hat H\Phi=E\Phi$) has nonzero same-energy companions in every
+$H_{J,J-k}$ for $k\le 2J$ (\texttt{ham\_su2\_multiplet}); as $k$ runs $0,\dots,2J$ this realizes the
+$2J+1$ magnetic numbers, so $E$ is at least $(2J+1)$-fold degenerate (eq.~(A.3.14)).  The proof
+raises $\Phi$ to the top $H_{J,J}$ ($J-M_0\in\mathbb Z_{\ge0}$ by Lemma~A.15) and lowers $k$ times
+via the reflected raising; $\hat H$ preserves each rung because it commutes with $\hat J^\pm$
+(\texttt{ham\_mulVec\_raiseIter}).  Proved (axiom-free,
+\texttt{Math/TasakiAppendixA/AngularMultiplet.lean}).
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
