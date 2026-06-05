@@ -25,9 +25,11 @@ open scoped BigOperators
 /-- **Forward-hop sign as a strictly-between parity.**  For a forward hop `q → p` (`q.val < p.val`)
 with the source occupied (`c q = 1`), the product of the two Jordan–Wigner string signs equals
 `(-1)` to the number of occupied modes strictly between `q` and `p`.  The modes below the source
-contribute `E_q` to both signs, so `2·E_q` cancels in the parity. -/
+contribute `E_q` to both signs, so `2·E_q` cancels in the parity.  (The source occupation is
+irrelevant to the parity: the update zeroes mode `q` either way, so no `c q = 1` hypothesis is
+needed.) -/
 theorem jwSign_mul_jwSign_update_forward (M : ℕ) (q p : Fin (M + 1)) (c : Fin (M + 1) → Fin 2)
-    (hqp : q.val < p.val) (hcq : c q = 1) :
+    (hqp : q.val < p.val) :
     jwSign M q c * jwSign M p (Function.update c q 0)
       = (-1 : ℂ) ^ (∑ k ∈ (Finset.univ : Finset (Fin (M + 1))).filter
           (fun k => q.val < k.val ∧ k.val < p.val), (c k).val) := by
@@ -81,3 +83,5 @@ theorem jwSign_mul_jwSign_update_forward (M : ℕ) (q p : Fin (M + 1)) (c : Fin 
   -- assemble: `E_q + E_p' = 2·E_q + inner`, and `(-1)^(2·E_q) = 1`
   rw [hEp, show ∀ a b : ℕ, a + (a + b) = 2 * a + b from fun a b => by ring, pow_add, pow_mul]
   norm_num
+
+end LatticeSystem.Fermion
