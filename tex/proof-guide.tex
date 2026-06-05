@@ -6750,7 +6750,10 @@ angular-momentum operators with $[\hat J^{(1)},\hat J^{(2)}]=i\hat J^{(3)}$, the
 $\hat J^-\hat J^+=\hat J^2-\hat J^{(3)}(\hat J^{(3)}+1)$ (eq.~(A.3.7), \texttt{angLower\_mul\_angRaise})
 and the ladder non-vanishing (\texttt{angRaise\_mulVec\_ne\_zero}): on the joint eigenspace
 $H_{J,M}$ with $-J\le M<J$ and $\Phi\ne0$, the raised state $\hat J^+\Phi$ is nonzero, since
-$\hat J^-\hat J^+\Phi=(J-M)(J+M+1)\Phi$ with $(J-M)(J+M+1)>0$ (Tasaki eq.~(A.3.9)).  Proved
+$\hat J^-\hat J^+\Phi=(J-M)(J+M+1)\Phi$ with $(J-M)(J+M+1)>0$ (Tasaki eq.~(A.3.9)).  The raised state also lies in $H_{J,M+1}$
+(\texttt{angRaise\_mem\_eigenspace}): $\hat J^2(\hat J^+\Phi)=J(J+1)(\hat J^+\Phi)$ since
+$[\hat J^2,\hat J^+]=0$ (eq.~(A.3.5)) and $\hat J^{(3)}(\hat J^+\Phi)=(M+1)(\hat J^+\Phi)$ since
+$[\hat J^{(3)},\hat J^+]=\hat J^+$ (eq.~(A.3.6)).  Proved
 (axiom-free, \texttt{Math/TasakiAppendixA/AngularLadder.lean}).
 
 \section{Open items / TODO and axioms}
