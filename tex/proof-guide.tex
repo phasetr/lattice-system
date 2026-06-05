@@ -6855,6 +6855,19 @@ $\{\pi_\rho(\hat A)\Omega_\rho\}$ dense (\texttt{gns\_construction}).  Every sta
 its GNS space; recorded as a documented axiom (the construction is in \texttt{mathlib}'s
 \texttt{GelfandNaimarkSegal}; \texttt{Math/TasakiAppendixA/CStarGNS.lean}).
 
+\medskip\noindent\textbf{Appendix A: status and axiomatization policy.}  Tasaki's Appendix A is
+fully formalized in book order (A.1--A.28).  The linear-algebra and angular-momentum core that
+\texttt{mathlib} supports is proved axiom-free: A.4--A.6, A.9--A.11, A.13--A.16, and A.18
+(Perron--Frobenius for a real symmetric matrix).  The remaining items---A.1, A.7/A.8, A.12, the
+simultaneous-diagonalization step of A.17, A.19/A.20, and the operator-algebraic A.21--A.28 (Wigner,
+states, Banach--Alaoglu, ground states, GNS)---are recorded as faithful documented axioms.  These
+axioms are \emph{not} active proof targets here: the heavy functional-analytic and operator-algebraic
+theory has its natural home in a dedicated operator-algebra development (possibly contributed to
+\texttt{mathlib}), and the axioms wait for that implementation.  The project's policy is to
+axiomatize only the appendix results that Tasaki's formalized main text actually uses, to prove the
+rest where \texttt{mathlib} allows, and otherwise to keep a faithful book-order axiom; every
+theorem's \texttt{\#print axioms} keeps the dependency on these axioms auditable.
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
