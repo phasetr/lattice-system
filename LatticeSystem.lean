@@ -23,6 +23,7 @@ import LatticeSystem.Math.TasakiAppendixA.PosSemidefBasics
 import LatticeSystem.Math.TasakiAppendixA.EigenvalueMonotone
 import LatticeSystem.Math.TasakiAppendixA.TraceExpMonotone
 import LatticeSystem.Math.TasakiAppendixA.FrustrationFree
+import LatticeSystem.Math.TasakiAppendixA.PosSemidefKernel
 import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPF
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphAltPath
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
