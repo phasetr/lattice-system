@@ -6706,6 +6706,13 @@ variational principle only for the extreme eigenvalues, so it is recorded as the
 axiom \texttt{hermitian\_eigenvalues}$_0$\texttt{\_monotone} (\texttt{Math/TasakiAppendixA/EigenvalueMonotone.lean}),
 to be discharged later.
 
+\medskip\noindent\textbf{Corollary A.8 (trace of the exponential, axiomatized).}  An
+immediate corollary of Theorem A.7, useful in quantum statistical mechanics: $\hat A\le\hat B$
+implies $\mathrm{Tr}[e^{\hat A}]\le\mathrm{Tr}[e^{\hat B}]$ (eq.~(A.2.31)), and more generally
+$\mathrm{Tr}[f(\hat A)]\le\mathrm{Tr}[f(\hat B)]$ for non-decreasing $f$ (eq.~(A.2.32)).  Recorded as
+the documented axiom \texttt{hermitian\_trace\_exp\_monotone}
+(\texttt{Math/TasakiAppendixA/TraceExpMonotone.lean}), resting on A.7.
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
