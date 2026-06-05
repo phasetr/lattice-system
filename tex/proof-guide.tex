@@ -6713,6 +6713,16 @@ $\mathrm{Tr}[f(\hat A)]\le\mathrm{Tr}[f(\hat B)]$ for non-decreasing $f$ (eq.~(A
 the documented axiom \texttt{hermitian\_trace\_exp\_monotone}
 (\texttt{Math/TasakiAppendixA/TraceExpMonotone.lean}), resting on A.7.
 
+\medskip\noindent\textbf{Lemmas A.9--A.10 (frustration-free Hamiltonians, proved).}  For
+$\hat H=\sum_j\hat h_j$ with each local term bounded below, $\hat h_j\ge\varepsilon_j$ (i.e.
+$\hat h_j-\varepsilon_j\ge0$): \textbf{Lemma A.9} (\texttt{frustration\_free\_isGroundState}) --- a
+simultaneous eigenstate $\hat h_j\Phi=\varepsilon_j\Phi$ is a ground state, with
+$\hat H-(\sum_j\varepsilon_j)\ge0$ (lower bound) and $\hat H\Phi=(\sum_j\varepsilon_j)\Phi$
+(attained); \textbf{Lemma A.10} (\texttt{frustration\_free\_local\_eigen}, converse) --- if
+$\hat H\Phi=(\sum_j\varepsilon_j)\Phi$ then $\hat h_j\Phi=\varepsilon_j\Phi$ for every $j$ (each
+$\langle\Phi|\hat h_j-\varepsilon_j|\Phi\rangle\ge0$ summing to $0$, then Lemma A.11).  Both proved
+(axiom-free, \texttt{Math/TasakiAppendixA/FrustrationFree.lean}).
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
