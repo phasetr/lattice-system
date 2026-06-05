@@ -43,13 +43,25 @@ dynamics `δ`, has a *nonzero energy gap* iff there is `γ > 0` with `ω(Â† [
 def HasNonzeroGap (ω : WeakDual ℂ A) (δ : A → A) (γ : ℝ) : Prop :=
   0 < γ ∧ ∀ a : A, ω a = 0 → (γ : ℂ) * ω (star a * a) ≤ ω (star a * δ a)
 
-/-- **Tasaki Theorem A.26 (variational characterization of ground states), AXIOM.**  With dynamics
-`δ`, partial Hamiltonians `Ĥ_L = HL L` and constraint sets `CL L` of states agreeing with `ω`
-outside `Λ_L` (so `ω ∈ CL L ⊆` states), `ω` is a ground state iff for every `L` the energy
-`(ω(Ĥ_L)).re` is the least value of `(ω′(Ĥ_L)).re` over `ω′ ∈ CL L` (eq. (A.7.7)).  A ground state
-minimizes every partial Hamiltonian.  Recorded as a documented axiom. -/
+/-- Abstract predicate marking that `(δ, HL, CL)` are the dynamics, partial Hamiltonians, and
+outside-`Λ_L` constraint sets of *one and the same* quantum spin Hamiltonian `Ĥ` on `ℤᵈ`: `δ` is
+`[Ĥ, ·]`, `HL L = Ĥ_L = Σ_{x ∈ Λ_L} ĥ_x`, and `CL L = C_L^ω`.  A faithful definition needs
+the full quasi-local structure (sites, supports, the family `{ĥ_x}`); it is kept as an uninterpreted
+predicate so that Theorem A.26 is stated only for genuine local-Hamiltonian data (and cannot be
+applied to unrelated `δ, HL, CL`). -/
+axiom IsLocalHamiltonianData :
+    (A → A) → (ℕ → A) → (ℕ → Set (WeakDual ℂ A)) → Prop
+
+/-- **Tasaki Theorem A.26 (variational characterization of ground states), AXIOM.**  Suppose
+`(δ, HL, CL)` are the genuine dynamics / partial Hamiltonians `Ĥ_L = Σ_{x ∈ Λ_L} ĥ_x` / constraint
+sets `C_L^ω` (states agreeing with `ω` outside `Λ_L`) of one quantum spin Hamiltonian
+(`IsLocalHamiltonianData`), with `ω ∈ CL L ⊆` states.  Then `ω` is a ground state iff for every `L`
+the energy `(ω(Ĥ_L)).re` is the least value of `(ω′(Ĥ_L)).re` over `ω′ ∈ CL L` (eq. (A.7.7)): a
+ground state minimizes every partial Hamiltonian.  Recorded as a documented axiom (conditional on
+the local-Hamiltonian compatibility, so it cannot be instantiated with unrelated data). -/
 axiom groundState_variational (ω : WeakDual ℂ A) (δ : A → A) (HL : ℕ → A)
-    (CL : ℕ → Set (WeakDual ℂ A)) (hω : ∀ L, ω ∈ CL L) (hCL : ∀ L, CL L ⊆ stateSpace A) :
+    (CL : ℕ → Set (WeakDual ℂ A)) (hData : IsLocalHamiltonianData δ HL CL)
+    (hω : ∀ L, ω ∈ CL L) (hCL : ∀ L, CL L ⊆ stateSpace A) :
     IsGroundState ω δ ↔
       ∀ L, IsLeast ((fun φ : WeakDual ℂ A => (φ (HL L)).re) '' CL L) ((ω (HL L)).re)
 
