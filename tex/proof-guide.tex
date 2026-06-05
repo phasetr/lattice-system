@@ -6837,6 +6837,16 @@ $\varphi\in$ \texttt{WeakDual}$\,\mathbb C\,A$ with $\varphi(1)=1$ and $\varphi(
 infinite-volume limits of states; recorded as a documented axiom
 (\texttt{Math/TasakiAppendixA/CStarState.lean}).
 
+\medskip\noindent\textbf{Ground states of infinite systems (Definitions A.25/A.27, Theorem A.26).}
+Modelling the Hamiltonian commutator $[\hat H,\cdot]$ by a derivation $\delta:A\to A$: a state $\omega$
+is a \emph{ground state} iff $0\le\omega(\hat A^\dagger[\hat H,\hat A])$ for all $\hat A$
+(\texttt{IsGroundState}, Def~A.25); it has a \emph{nonzero gap} iff some $\gamma>0$ has
+$\omega(\hat A^\dagger[\hat H,\hat A])\ge\gamma\,\omega(\hat A^\dagger\hat A)$ whenever $\omega(\hat A)=0$
+(\texttt{HasNonzeroGap}, Def~A.27).  A state is a ground state iff for every $L$ its energy
+$\omega(\hat H_L)$ is the least over all states agreeing with $\omega$ outside $\Lambda_L$
+(\texttt{groundState\_variational}, Theorem~A.26, eq.~(A.7.7), documented axiom;
+\texttt{Math/TasakiAppendixA/CStarGroundState.lean}).
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
