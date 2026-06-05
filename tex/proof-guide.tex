@@ -6733,6 +6733,17 @@ $\langle\Phi|\hat A|\Phi\rangle=0$ implies $\hat B|\Phi\rangle=0$
 \texttt{mulVec\_eq\_zero\_of\_sq\_sum\_inner\_zero}).  All proved (axiom-free,
 \texttt{Math/TasakiAppendixA/PosSemidefKernel.lean}).
 
+\medskip\noindent\textbf{Theorem A.12 (strong-coupling effective Hamiltonian, axiomatized).}
+For $\hat H_v=\hat H_0+v\hat V$ with $\hat H_0$ self-adjoint, $\hat V\ge0$, $v\ge0$, the
+eigenstates whose energy stays finite as $v\uparrow\infty$ are governed by the effective
+Schr\"odinger equation $\hat P_0\hat H_0|\Phi\rangle=E|\Phi\rangle$ on $H_0=\ker\hat V$.  We render the
+effective equation in weak form ($\langle\psi|\hat H_0|\Phi\rangle=E\langle\psi|\Phi\rangle$ for all
+$\psi\in H_0$, avoiding an explicit projection matrix); the axiom
+(\texttt{effectiveHamiltonian\_strongCoupling\_limit}, \texttt{Math/TasakiAppendixA/EffectiveLimit.lean})
+asserts each effective eigenstate is the $v\uparrow\infty$ limit of a finite-energy eigenstate
+family of $\hat H_v$ with eigenvalue $\to E$.  This underlies the §11.5 effective-theory limits
+(\texttt{ttDKernel}/\texttt{ttEffectiveHamiltonian}).  This completes Appendix~A.2.
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
