@@ -6740,8 +6740,9 @@ Schr\"odinger equation $\hat P_0\hat H_0|\Phi\rangle=E|\Phi\rangle$ on $H_0=\ker
 effective equation in weak form ($\langle\psi|\hat H_0|\Phi\rangle=E\langle\psi|\Phi\rangle$ for all
 $\psi\in H_0$, avoiding an explicit projection matrix); the axiom
 (\texttt{effectiveHamiltonian\_strongCoupling\_limit}, \texttt{Math/TasakiAppendixA/EffectiveLimit.lean})
-asserts each effective eigenstate is the $v\uparrow\infty$ limit of a finite-energy eigenstate
-family of $\hat H_v$ with eigenvalue $\to E$.  This underlies the §11.5 effective-theory limits
+asserts, in the non-vacuous finite-energy${}\Rightarrow{}$effective direction, that a family
+$\Phi_v$ of $\hat H_v$-eigenstates converging to a nonzero $\Phi$ with energy $E_v\to E$ has
+$\Phi\in H_0$ and $\Phi$ solving the effective equation.  This underlies the §11.5 effective-theory limits
 (\texttt{ttDKernel}/\texttt{ttEffectiveHamiltonian}).  This completes Appendix~A.2.
 
 \section{Open items / TODO and axioms}
