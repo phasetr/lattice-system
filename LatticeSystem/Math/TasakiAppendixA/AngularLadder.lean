@@ -1,5 +1,6 @@
 import Mathlib.LinearAlgebra.Matrix.Hermitian
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle
+import Mathlib.Analysis.Matrix.Order
 
 /-!
 # Tasaki Appendix A.3: the angular-momentum ladder (Lemma A.14)
@@ -22,6 +23,7 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 namespace LatticeSystem.Math
 
 open Matrix
+open scoped ComplexOrder
 
 variable {d : Type*} [Fintype d] [DecidableEq d]
   (J1 J2 J3 : Matrix d d ℂ)
@@ -318,5 +320,91 @@ theorem angLower_mem_eigenspace (h12 : J1 * J2 - J2 * J1 = Complex.I • J3)
       Matrix.neg_mulVec, Matrix.mulVec_smul]
     push_cast
     module
+
+/-! ### Norm identities (eq. (A.3.9)) and the spin bound `−J ≤ M ≤ J` (Lemma A.15, part 1) -/
+
+omit [Fintype d] [DecidableEq d] in
+/-- `(Ĵ⁺)ᴴ = Ĵ⁻` for self-adjoint `Ĵ⁽¹⁾, Ĵ⁽²⁾`. -/
+private theorem angRaise_conjTranspose (h1 : J1.IsHermitian) (h2 : J2.IsHermitian) :
+    (J1 + Complex.I • J2)ᴴ = J1 - Complex.I • J2 := by
+  rw [conjTranspose_add, conjTranspose_smul, h1.eq, h2.eq, Complex.star_def, Complex.conj_I,
+    neg_smul]; abel
+
+omit [Fintype d] [DecidableEq d] in
+/-- `(Ĵ⁻)ᴴ = Ĵ⁺` for self-adjoint `Ĵ⁽¹⁾, Ĵ⁽²⁾`. -/
+private theorem angLower_conjTranspose (h1 : J1.IsHermitian) (h2 : J2.IsHermitian) :
+    (J1 - Complex.I • J2)ᴴ = J1 + Complex.I • J2 := by
+  rw [conjTranspose_sub, conjTranspose_smul, h1.eq, h2.eq, Complex.star_def, Complex.conj_I,
+    neg_smul, sub_neg_eq_add]
+
+omit [DecidableEq d] in
+/-- **Tasaki eq. (A.3.9), raising.**  `‖Ĵ⁺ Φ‖² = {J(J+1) − M(M+1)} ‖Φ‖²` on `H_{J,M}`
+(self-adjoint `Ĵ⁽¹⁾, Ĵ⁽²⁾`), as a complex identity. -/
+theorem angRaise_normSq (h1 : J1.IsHermitian) (h2 : J2.IsHermitian)
+    (h12 : J1 * J2 - J2 * J1 = Complex.I • J3) {Φ : d → ℂ} {Jr M : ℝ}
+    (hsq : (J1 * J1 + J2 * J2 + J3 * J3).mulVec Φ = ((Jr * (Jr + 1) : ℝ) : ℂ) • Φ)
+    (h3 : J3.mulVec Φ = (M : ℂ) • Φ) :
+    star ((J1 + Complex.I • J2).mulVec Φ) ⬝ᵥ ((J1 + Complex.I • J2).mulVec Φ)
+      = ((Jr * (Jr + 1) - M * (M + 1) : ℝ) : ℂ) * (star Φ ⬝ᵥ Φ) := by
+  classical
+  rw [star_mulVec, ← dotProduct_mulVec, angRaise_conjTranspose J1 J2 h1 h2, Matrix.mulVec_mulVec,
+    angLower_mul_angRaise J1 J2 J3 h12]
+  have hkey : ((J1 * J1 + J2 * J2 + J3 * J3) - J3 * (J3 + 1)).mulVec Φ
+      = ((Jr * (Jr + 1) - M * (M + 1) : ℝ) : ℂ) • Φ := by
+    rw [Matrix.sub_mulVec, hsq]
+    have h33 : (J3 * (J3 + 1)).mulVec Φ = ((M * (M + 1) : ℝ) : ℂ) • Φ := by
+      rw [← Matrix.mulVec_mulVec, Matrix.add_mulVec, Matrix.one_mulVec, h3, Matrix.mulVec_add,
+        Matrix.mulVec_smul, h3]; push_cast; module
+    rw [h33, ← sub_smul]; push_cast; ring_nf
+  rw [hkey, dotProduct_smul, smul_eq_mul]
+
+omit [DecidableEq d] in
+/-- **Tasaki eq. (A.3.9), lowering.**  `‖Ĵ⁻ Φ‖² = {J(J+1) − M(M−1)} ‖Φ‖²` on `H_{J,M}`. -/
+theorem angLower_normSq (h1 : J1.IsHermitian) (h2 : J2.IsHermitian)
+    (h12 : J1 * J2 - J2 * J1 = Complex.I • J3) {Φ : d → ℂ} {Jr M : ℝ}
+    (hsq : (J1 * J1 + J2 * J2 + J3 * J3).mulVec Φ = ((Jr * (Jr + 1) : ℝ) : ℂ) • Φ)
+    (h3 : J3.mulVec Φ = (M : ℂ) • Φ) :
+    star ((J1 - Complex.I • J2).mulVec Φ) ⬝ᵥ ((J1 - Complex.I • J2).mulVec Φ)
+      = ((Jr * (Jr + 1) - M * (M - 1) : ℝ) : ℂ) * (star Φ ⬝ᵥ Φ) := by
+  classical
+  rw [star_mulVec, ← dotProduct_mulVec, angLower_conjTranspose J1 J2 h1 h2, Matrix.mulVec_mulVec,
+    angRaise_mul_angLower J1 J2 J3 h12]
+  have hkey : ((J1 * J1 + J2 * J2 + J3 * J3) - J3 * (J3 - 1)).mulVec Φ
+      = ((Jr * (Jr + 1) - M * (M - 1) : ℝ) : ℂ) • Φ := by
+    rw [Matrix.sub_mulVec, hsq]
+    have h33 : (J3 * (J3 - 1)).mulVec Φ = ((M * (M - 1) : ℝ) : ℂ) • Φ := by
+      rw [← Matrix.mulVec_mulVec, Matrix.sub_mulVec, Matrix.one_mulVec, h3, Matrix.mulVec_sub,
+        Matrix.mulVec_smul, h3]; push_cast; module
+    rw [h33, ← sub_smul]; push_cast; ring_nf
+  rw [hkey, dotProduct_smul, smul_eq_mul]
+
+omit [DecidableEq d] in
+/-- **Tasaki Lemma A.15 (the spin bound).**  On a *nonzero* `H_{J,M}` state (self-adjoint
+`Ĵ⁽¹⁾, Ĵ⁽²⁾, Ĵ⁽³⁾`, `J ≥ 0`), the magnetic quantum number is bounded: `−J ≤ M ≤ J` (so
+`J − M ≥ 0` and `J + M ≥ 0`).  From the nonnegativity of `‖Ĵ⁺ Φ‖²` (eq. (A.3.9)),
+`J(J+1) − M(M+1) ≥ 0`, and likewise `J(J+1) − M(M−1) ≥ 0` from `‖Ĵ⁻ Φ‖²`. -/
+theorem angMom_abs_le_J (h1 : J1.IsHermitian) (h2 : J2.IsHermitian)
+    (h12 : J1 * J2 - J2 * J1 = Complex.I • J3) {Φ : d → ℂ} {Jr M : ℝ} (hΦ : Φ ≠ 0) (hJ : 0 ≤ Jr)
+    (hsq : (J1 * J1 + J2 * J2 + J3 * J3).mulVec Φ = ((Jr * (Jr + 1) : ℝ) : ℂ) • Φ)
+    (h3 : J3.mulVec Φ = (M : ℂ) • Φ) :
+    -Jr ≤ M ∧ M ≤ Jr := by
+  have hΦpos : (0 : ℂ) < star Φ ⬝ᵥ Φ := Matrix.dotProduct_star_self_pos_iff.mpr hΦ
+  have bound : ∀ (Jp : Matrix d d ℂ) (c : ℝ),
+      star (Jp.mulVec Φ) ⬝ᵥ (Jp.mulVec Φ) = ((c : ℝ) : ℂ) * (star Φ ⬝ᵥ Φ) → 0 ≤ c := by
+    intro Jp c hc
+    have hL : (0 : ℂ) ≤ star (Jp.mulVec Φ) ⬝ᵥ (Jp.mulVec Φ) := by
+      rcases eq_or_ne (Jp.mulVec Φ) 0 with h0 | h0
+      · simp [h0]
+      · exact (Matrix.dotProduct_star_self_pos_iff.mpr h0).le
+    rw [hc] at hL
+    by_contra hneg
+    rw [not_le] at hneg
+    exact lt_irrefl 0 (lt_of_le_of_lt hL
+      (mul_neg_of_neg_of_pos (by exact_mod_cast hneg) hΦpos))
+  have hup : 0 ≤ Jr * (Jr + 1) - M * (M + 1) :=
+    bound _ _ (angRaise_normSq J1 J2 J3 h1 h2 h12 hsq h3)
+  have hlo : 0 ≤ Jr * (Jr + 1) - M * (M - 1) :=
+    bound _ _ (angLower_normSq J1 J2 J3 h1 h2 h12 hsq h3)
+  constructor <;> nlinarith [hup, hlo]
 
 end LatticeSystem.Math

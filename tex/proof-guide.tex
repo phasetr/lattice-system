@@ -6759,6 +6759,13 @@ $[\hat J^{(3)},\hat J^+]=\hat J^+$ (eq.~(A.3.6)).  The mirror lowering direction
 $\hat J^-\Phi\in H_{J,M-1}$ via $[\hat J^2,\hat J^-]=0$ and $[\hat J^{(3)},\hat J^-]=-\hat J^-$) completes
 Lemma A.14.  Proved (axiom-free, \texttt{Math/TasakiAppendixA/AngularLadder.lean}).
 
+\medskip\noindent\textbf{Lemma A.15 (spin bound, part 1, proved).}  For self-adjoint
+$\hat J^{(\alpha)}$ the norm identities $\|\hat J^\pm\Phi\|^2=\{J(J+1)-M(M\pm1)\}\|\Phi\|^2$
+(eq.~(A.3.9), \texttt{angRaise\_normSq}/\texttt{angLower\_normSq}) are nonnegative, so on a nonzero
+$H_{J,M}$ state $J(J+1)-M(M+1)\ge0$ and $J(J+1)-M(M-1)\ge0$, giving the spin bound
+$-J\le M\le J$ (i.e. $J-M\ge0$ and $J+M\ge0$, \texttt{angMom\_abs\_le\_J}).  The integrality
+$J\pm M\in\mathbb Z$ (ladder termination) follows separately.
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
