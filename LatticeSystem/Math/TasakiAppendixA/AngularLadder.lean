@@ -337,6 +337,36 @@ private theorem angLower_conjTranspose (h1 : J1.IsHermitian) (h2 : J2.IsHermitia
   rw [conjTranspose_sub, conjTranspose_smul, h1.eq, h2.eq, Complex.star_def, Complex.conj_I,
     neg_smul, sub_neg_eq_add]
 
+/-! ### Gauge reflection `(Ĵ⁽¹⁾, −Ĵ⁽²⁾, −Ĵ⁽³⁾)`
+
+The reflected triple satisfies the same `su(2)` relations with `M ↦ −M`; this is used to obtain the
+lowering results from the raising machinery (`AngularQuantization.lean`, `AngularMultiplet.lean`)
+without writing a separate mirror development. -/
+
+omit [DecidableEq d] in
+/-- Reflected `[Ĵ⁽¹⁾, −Ĵ⁽²⁾] = i(−Ĵ⁽³⁾)` from `[Ĵ⁽¹⁾, Ĵ⁽²⁾] = i Ĵ⁽³⁾`. -/
+theorem su2Reflect12 (h12 : J1 * J2 - J2 * J1 = Complex.I • J3) :
+    J1 * (-J2) - (-J2) * J1 = Complex.I • (-J3) := by
+  rw [show J1 * (-J2) - (-J2) * J1 = -(J1 * J2 - J2 * J1) by noncomm_ring, h12, smul_neg]
+
+omit [DecidableEq d] in
+/-- Reflected `[−Ĵ⁽²⁾, −Ĵ⁽³⁾] = i Ĵ⁽¹⁾` from `[Ĵ⁽²⁾, Ĵ⁽³⁾] = i Ĵ⁽¹⁾`. -/
+theorem su2Reflect23 (h23 : J2 * J3 - J3 * J2 = Complex.I • J1) :
+    (-J2) * (-J3) - (-J3) * (-J2) = Complex.I • J1 := by
+  rw [show (-J2) * (-J3) - (-J3) * (-J2) = J2 * J3 - J3 * J2 by noncomm_ring, h23]
+
+omit [DecidableEq d] in
+/-- Reflected `[−Ĵ⁽³⁾, Ĵ⁽¹⁾] = i(−Ĵ⁽²⁾)` from `[Ĵ⁽³⁾, Ĵ⁽¹⁾] = i Ĵ⁽²⁾`. -/
+theorem su2Reflect31 (h31 : J3 * J1 - J1 * J3 = Complex.I • J2) :
+    (-J3) * J1 - J1 * (-J3) = Complex.I • (-J2) := by
+  rw [show (-J3) * J1 - J1 * (-J3) = -(J3 * J1 - J1 * J3) by noncomm_ring, h31, smul_neg]
+
+omit [DecidableEq d] in
+/-- The Casimir `Ĵ²` is invariant under the reflection `(Ĵ⁽¹⁾, −Ĵ⁽²⁾, −Ĵ⁽³⁾)`. -/
+theorem casimirReflect :
+    J1 * J1 + (-J2) * (-J2) + (-J3) * (-J3) = J1 * J1 + J2 * J2 + J3 * J3 := by
+  noncomm_ring
+
 omit [DecidableEq d] in
 /-- **Tasaki eq. (A.3.9), raising.**  `‖Ĵ⁺ Φ‖² = {J(J+1) − M(M+1)} ‖Φ‖²` on `H_{J,M}`
 (self-adjoint `Ĵ⁽¹⁾, Ĵ⁽²⁾`), as a complex identity. -/

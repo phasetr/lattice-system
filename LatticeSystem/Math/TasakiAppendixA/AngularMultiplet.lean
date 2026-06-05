@@ -77,16 +77,12 @@ theorem ham_su2_multiplet (hcH1 : H * J1 = J1 * H) (hcH2 : H * J2 = J2 * H)
     have := hTeig.2; rw [show ((M0 + (t : ℝ)) : ℝ) = Jr from hMt] at this; exact this
   have hHT : H.mulVec T = E • T := ham_mulVec_raiseIter H J1 J2 hcH1 hcH2 hH t
   -- Reflected operators `(Ĵ⁽¹⁾, −Ĵ⁽²⁾, −Ĵ⁽³⁾)`: same `su(2)` relations, raising = `Ĵ⁻`.
-  have h12' : J1 * (-J2) - (-J2) * J1 = Complex.I • (-J3) := by
-    rw [show J1 * (-J2) - (-J2) * J1 = -(J1 * J2 - J2 * J1) by noncomm_ring, h12, smul_neg]
-  have h23' : (-J2) * (-J3) - (-J3) * (-J2) = Complex.I • J1 := by
-    rw [show (-J2) * (-J3) - (-J3) * (-J2) = J2 * J3 - J3 * J2 by noncomm_ring, h23]
-  have h31' : (-J3) * J1 - J1 * (-J3) = Complex.I • (-J2) := by
-    rw [show (-J3) * J1 - J1 * (-J3) = -(J3 * J1 - J1 * J3) by noncomm_ring, h31, smul_neg]
+  have h12' := su2Reflect12 J1 J2 J3 h12
+  have h23' := su2Reflect23 J1 J2 J3 h23
+  have h31' := su2Reflect31 J1 J2 J3 h31
   have hsqT' : (J1 * J1 + (-J2) * (-J2) + (-J3) * (-J3)).mulVec T
       = ((Jr * (Jr + 1) : ℝ) : ℂ) • T := by
-    rw [show J1 * J1 + (-J2) * (-J2) + (-J3) * (-J3) = J1 * J1 + J2 * J2 + J3 * J3 by noncomm_ring]
-    exact hTsq
+    rw [casimirReflect J1 J2 J3]; exact hTsq
   have h3T' : (-J3).mulVec T = ((-Jr : ℝ) : ℂ) • T := by
     rw [Matrix.neg_mulVec, hT3]; push_cast; module
   -- Descend `k` times: `Ψ = (Ĵ⁻)^k T = raiseIter J1 (−J2) k T`.
@@ -97,7 +93,7 @@ theorem ham_su2_multiplet (hcH1 : H * J1 = J1 * H) (hcH2 : H * J2 = J2 * H)
     have : (i : ℝ) < (k : ℝ) := by exact_mod_cast hi
     linarith
   · have hRe := raiseIter_eigenspace J1 (-J2) (-J3) h12' h23' h31' hsqT' h3T' k
-    rw [show J1 * J1 + J2 * J2 + J3 * J3 = J1 * J1 + (-J2) * (-J2) + (-J3) * (-J3) by noncomm_ring]
+    rw [← casimirReflect J1 J2 J3]
     exact hRe.1
   · have hRe := raiseIter_eigenspace J1 (-J2) (-J3) h12' h23' h31' hsqT' h3T' k
     have h3R := hRe.2
