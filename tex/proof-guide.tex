@@ -6745,6 +6745,14 @@ $\Phi_v$ of $\hat H_v$-eigenstates converging to a nonzero $\Phi$ with energy $E
 $\Phi\in H_0$ and $\Phi$ solving the effective equation.  This underlies the §11.5 effective-theory limits
 (\texttt{ttDKernel}/\texttt{ttEffectiveHamiltonian}).  This completes Appendix~A.2.
 
+\medskip\noindent\textbf{§A.3 angular momentum --- Lemma A.14 (su(2) ladder, proved).}  For
+angular-momentum operators with $[\hat J^{(1)},\hat J^{(2)}]=i\hat J^{(3)}$, the operator identity
+$\hat J^-\hat J^+=\hat J^2-\hat J^{(3)}(\hat J^{(3)}+1)$ (eq.~(A.3.7), \texttt{angLower\_mul\_angRaise})
+and the ladder non-vanishing (\texttt{angRaise\_mulVec\_ne\_zero}): on the joint eigenspace
+$H_{J,M}$ with $-J\le M<J$ and $\Phi\ne0$, the raised state $\hat J^+\Phi$ is nonzero, since
+$\hat J^-\hat J^+\Phi=(J-M)(J+M+1)\Phi$ with $(J-M)(J+M+1)>0$ (Tasaki eq.~(A.3.9)).  Proved
+(axiom-free, \texttt{Math/TasakiAppendixA/AngularLadder.lean}).
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
