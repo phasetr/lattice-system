@@ -28,6 +28,7 @@ import LatticeSystem.Math.TasakiAppendixA.EffectiveLimit
 import LatticeSystem.Math.TasakiAppendixA.AngularLadder
 import LatticeSystem.Math.TasakiAppendixA.AngularQuantization
 import LatticeSystem.Math.TasakiAppendixA.AngularMultiplet
+import LatticeSystem.Math.TasakiAppendixA.AngularSpinHalfSector
 import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPF
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphAltPath
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
