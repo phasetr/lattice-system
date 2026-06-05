@@ -6763,8 +6763,18 @@ Lemma A.14.  Proved (axiom-free, \texttt{Math/TasakiAppendixA/AngularLadder.lean
 $\hat J^{(\alpha)}$ the norm identities $\|\hat J^\pm\Phi\|^2=\{J(J+1)-M(M\pm1)\}\|\Phi\|^2$
 (eq.~(A.3.9), \texttt{angRaise\_normSq}/\texttt{angLower\_normSq}) are nonnegative, so on a nonzero
 $H_{J,M}$ state $J(J+1)-M(M+1)\ge0$ and $J(J+1)-M(M-1)\ge0$, giving the spin bound
-$-J\le M\le J$ (i.e. $J-M\ge0$ and $J+M\ge0$, \texttt{angMom\_abs\_le\_J}).  The integrality
-$J\pm M\in\mathbb Z$ (ladder termination) follows separately.
+$-J\le M\le J$ (i.e. $J-M\ge0$ and $J+M\ge0$, \texttt{angMom\_abs\_le\_J}).
+
+\medskip\noindent\textbf{Lemma A.15 (integrality) and Theorem A.13 ($J=n/2$, proved).}  Iterating the
+raising operator, \texttt{raiseIter} ($\hat J^+$ applied $k$ times), stays inside $H_{J,M+k}$
+(\texttt{raiseIter\_eigenspace}) and stays nonzero while every intermediate magnetic number is
+below $J$ (\texttt{raiseIter\_ne\_zero}).  Were $J-M$ non-integral, $\lfloor J-M\rfloor+1$ raisings
+would produce a nonzero state with magnetic number ${>}J$, contradicting the spin bound; hence
+$J-M\in\mathbb Z_{\ge0}$ (\texttt{angMom\_sub\_mem\_nat}).  Applying the same lemma to the
+gauge-reflected operators $(\hat J^{(1)},-\hat J^{(2)},-\hat J^{(3)})$ (same $su(2)$ relations,
+$M\mapsto-M$) gives $J+M\in\mathbb Z_{\ge0}$, so $2J=(J-M)+(J+M)\in\mathbb Z_{\ge0}$, i.e. $J=n/2$
+(\texttt{angMom\_J\_eq\_half\_nat}, Theorem~A.13).  Proved (axiom-free,
+\texttt{Math/TasakiAppendixA/AngularQuantization.lean}).
 
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
