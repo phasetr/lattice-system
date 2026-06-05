@@ -6697,6 +6697,15 @@ $\hat A=\hat C^2$ of a positive-semidefinite operator $\hat C=\sqrt{\hat A}$
 continuous functional calculus \texttt{cfc Real.sqrt}); this square root is \emph{unique}
 (\texttt{posSemidef\_sq\_eq\_unique}).
 
+\medskip\noindent\textbf{Theorem A.7 (eigenvalue monotonicity, axiomatized).}  If self-adjoint
+matrices satisfy $\hat A\le\hat B$ (the Loewner order), then every sorted eigenvalue of $\hat A$
+is at most the corresponding one of $\hat B$: $\forall i,\ \hat A.\texttt{eigenvalues}_0\,i\le\hat
+B.\texttt{eigenvalues}_0\,i$ (largest-first; equivalent to Tasaki's $a_j\le b_j$).  This is the
+operator-monotonicity content of the min--max principle (eq.~(A.2.30)); mathlib has the
+variational principle only for the extreme eigenvalues, so it is recorded as the documented
+axiom \texttt{hermitian\_eigenvalues}$_0$\texttt{\_monotone} (\texttt{Math/TasakiAppendixA/EigenvalueMonotone.lean}),
+to be discharged later.
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
