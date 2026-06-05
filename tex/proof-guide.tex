@@ -6829,6 +6829,14 @@ transition probabilities $\operatorname{Tr}[P P']$ is implemented by a unitary o
 (\texttt{wignerProjection}, Theorem~A.22, eq.~(A.6.10)).  Recorded as documented axioms
 (\texttt{Math/TasakiAppendixA/WignerTheorem.lean}).
 
+\medskip\noindent\textbf{Definition A.23 (state) and Theorem A.24 (Banach--Alaoglu).}  Over an
+abstract unital complex C*-algebra $A$, a \emph{state} is a weak-$*$-continuous linear functional
+$\varphi\in$ \texttt{WeakDual}$\,\mathbb C\,A$ with $\varphi(1)=1$ and $\varphi(\hat A^\dagger\hat A)\ge0$
+(\texttt{IsState}, Definition~A.23).  The set of all states is compact in the weak-$*$ topology
+(\texttt{stateSpace\_isCompact}, Theorem~A.24, eq.~(A.7.3)) --- the operator-algebraic input for
+infinite-volume limits of states; recorded as a documented axiom
+(\texttt{Math/TasakiAppendixA/CStarState.lean}).
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
