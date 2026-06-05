@@ -21,6 +21,7 @@ import LatticeSystem.Math.InvariantSubmoduleEigenvector
 import LatticeSystem.Math.TasakiAppendixA.LieProduct
 import LatticeSystem.Math.TasakiAppendixA.PosSemidefBasics
 import LatticeSystem.Math.TasakiAppendixA.EigenvalueMonotone
+import LatticeSystem.Math.TasakiAppendixA.TraceExpMonotone
 import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPF
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphAltPath
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
