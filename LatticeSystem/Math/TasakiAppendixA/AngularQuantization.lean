@@ -131,16 +131,12 @@ theorem angMom_J_eq_half_nat (h1 : J1.IsHermitian) (h2 : J2.IsHermitian)
   -- `J − M ∈ ℤ≥0` (raising direction).
   obtain ⟨nsub, hsub⟩ := angMom_sub_mem_nat J1 J2 J3 h1 h2 h12 h23 h31 hΦ hJ hsq h3
   -- Gauge-reflected operators `(Ĵ⁽¹⁾, −Ĵ⁽²⁾, −Ĵ⁽³⁾)` satisfy the same `su(2)` relations.
-  have h12' : J1 * (-J2) - (-J2) * J1 = Complex.I • (-J3) := by
-    rw [show J1 * (-J2) - (-J2) * J1 = -(J1 * J2 - J2 * J1) by noncomm_ring, h12, smul_neg]
-  have h23' : (-J2) * (-J3) - (-J3) * (-J2) = Complex.I • J1 := by
-    rw [show (-J2) * (-J3) - (-J3) * (-J2) = J2 * J3 - J3 * J2 by noncomm_ring, h23]
-  have h31' : (-J3) * J1 - J1 * (-J3) = Complex.I • (-J2) := by
-    rw [show (-J3) * J1 - J1 * (-J3) = -(J3 * J1 - J1 * J3) by noncomm_ring, h31, smul_neg]
+  have h12' := su2Reflect12 J1 J2 J3 h12
+  have h23' := su2Reflect23 J1 J2 J3 h23
+  have h31' := su2Reflect31 J1 J2 J3 h31
   have hsq' : (J1 * J1 + (-J2) * (-J2) + (-J3) * (-J3)).mulVec Φ
       = ((Jr * (Jr + 1) : ℝ) : ℂ) • Φ := by
-    rw [show J1 * J1 + (-J2) * (-J2) + (-J3) * (-J3) = J1 * J1 + J2 * J2 + J3 * J3 by noncomm_ring]
-    exact hsq
+    rw [casimirReflect J1 J2 J3]; exact hsq
   have h3' : (-J3).mulVec Φ = ((-M : ℝ) : ℂ) • Φ := by
     rw [Matrix.neg_mulVec, h3]; push_cast; module
   -- `J + M ∈ ℤ≥0` (lowering direction = reflected raising).
