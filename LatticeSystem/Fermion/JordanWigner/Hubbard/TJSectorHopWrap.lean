@@ -39,12 +39,7 @@ private theorem tJ_wrap_ge_eq_zero (N : ℕ) (s : Fin (N + 1) → Fin 3) (b : Fi
     rw [h2] at hk
     exact Fin.ext (by omega)
   subst hi
-  have hr2 : r = 0 ∨ r = 1 := by
-    rcases eq_or_ne r 0 with h | h
-    · exact Or.inl h
-    · exact Or.inr (Fin.ext (by
-        have := r.isLt; have : r.val ≠ 0 := fun hh => h (Fin.ext hh); omega))
-  rcases hr2 with rfl | rfl
+  rcases tJ_fin2_eq r with rfl | rfl
   · rw [tJConfigOf_apply_up, if_neg (by rw [hsb]; decide)]
     rfl
   · rw [tJConfigOf_apply_down, if_neg (by rw [hsb]; decide)]
