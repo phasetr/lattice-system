@@ -30,6 +30,7 @@ import LatticeSystem.Math.TasakiAppendixA.AngularQuantization
 import LatticeSystem.Math.TasakiAppendixA.AngularMultiplet
 import LatticeSystem.Math.TasakiAppendixA.AngularSpinHalfSector
 import LatticeSystem.Math.TasakiAppendixA.PerronFrobeniusSymmetric
+import LatticeSystem.Math.TasakiAppendixA.MatrixDecomposition
 import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPF
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphAltPath
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
