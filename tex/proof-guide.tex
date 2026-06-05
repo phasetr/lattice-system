@@ -6796,6 +6796,18 @@ simultaneous eigenstate of the commuting self-adjoint family $\hat H,\hat{\bolds
 in the $E$-eigenspace (\texttt{exists\_joint\_su2\_energy\_eigenstate})---is a documented axiom
 (\texttt{Math/TasakiAppendixA/AngularSpinHalfSector.lean}).
 
+\medskip\noindent\textbf{Theorem A.18 (Perron--Frobenius for a real symmetric matrix, proved).}
+For a real symmetric $M$ whose shifted matrix $\hat A=c\cdot1-M$ is irreducible (entrywise
+nonnegative with strongly connected support---Tasaki's $M_{ij}\le0$ off-diagonal plus
+connectivity), there is an eigenvalue $\mu$ of $M$ with a strictly positive eigenvector $v$
+($M v=\mu v$, $v_i>0$); $\mu$ is the \emph{lowest} eigenvalue ($\mu\le\lambda$ for every eigenvalue
+$\lambda$) and is \emph{nondegenerate} (\texttt{perronFrobenius\_real\_symmetric}).  The proof reuses
+the project's Collatz--Wielandt Perron--Frobenius (positive eigenvector) and the eigenspace
+simplicity (\texttt{eigenspace\_finrank\_le\_one\_of\_pos\_eigenvec}); the lowest-eigenvalue claim is
+the variational $|w|$-argument (eq.~(A.4.1)): for any eigenpair $(\lambda,w)$, $\hat A|w|\ge|c-\lambda|\,|w|$
+entrywise, and pairing with $v>0$ gives $c-\mu\ge c-\lambda$.  Proved (axiom-free,
+\texttt{Math/TasakiAppendixA/PerronFrobeniusSymmetric.lean}).
+
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
 %======================================================================
