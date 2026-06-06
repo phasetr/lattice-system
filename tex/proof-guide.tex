@@ -6450,9 +6450,15 @@ lifts to a positive matrix-power entry of $B$ (\texttt{tJSectorShifted\_pow\_pos
 \texttt{tJStep\_preserves\_sector}); hence \texttt{tJSectorShifted\_isIrreducible} via
 \texttt{isIrreducible\_iff\_exists\_pow\_pos} (positive diagonal $+$ connectivity from
 \texttt{adjacentSwapReachable\_of\_same\_counts}).
-Remaining: the A.18 application (\texttt{perronFrobenius\_real\_symmetric} on $B$, with a
-nonempty-sector witness) giving the unique positive sector ground state, and the
-SU(2)-tower capstone that replaces the axiom.
+\emph{(xvi) Perron--Frobenius ground state} (\texttt{TJSectorGroundState.lean}): a
+\texttt{Nonempty}-witness (the $\hat S^3=\tfrac12$ filling with the $\uparrow$'s left of the
+$\downarrow$'s; counts via \texttt{card\_filter\_val\_lt} and the total) supplies A.18's
+\texttt{[Nonempty]}, and \texttt{tJEffReMatrixOnSector\_perronFrobenius} applies Theorem A.18 to
+$M=\texttt{tJEffReMatrixOnSector}$: $M$ has a strictly positive eigenvector at its lowest eigenvalue
+$\mu$ (the sector ground energy), with $\mathrm{finrank}\leq1$ (non-degeneracy) --- the unique
+positive Perron--Frobenius ground state of the spin-charge-separated sector.
+Remaining: identifying that ground state's total spin ($S_{\mathrm{tot}}=N_e/2$) by overlap with the
+ferromagnetic state, and the SU(2)-tower capstone that replaces the axiom.
 The discharge lemmas add no
 new t-J axioms; the one inherited dependency is the A.17 sector reduction
 \texttt{tJHamiltonian\_eigenstate\_spin\_zero\_or\_half}, which rests on Theorem A.17's single
