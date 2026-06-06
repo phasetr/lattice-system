@@ -73,4 +73,36 @@ theorem tJ_hop_matrixElement_eq_zero_of_target (N : ℕ) (s s' : Fin (N + 1) →
   rw [Function.update_of_ne (fun h => hij ((spinfulIndex_eq_iff N i j σ σ).mp h).1), htgt] at h2
   exact absurd h2 (by decide)
 
+/-- **The target-other-spin single-hop matrix element vanishes.**  If `i ≠ j` and site `i` carries
+the *opposite* spin `σ' ≠ σ`, then creating `(i,σ)` on top of the occupied `(i,σ')` would
+double-occupy site `i`; that hopped configuration is not hard-core, while every bra `tJConfigOf s'`
+is, so the per-term element is `0`. -/
+theorem tJ_hop_matrixElement_eq_zero_of_target_other (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
+    (i j : Fin (N + 1)) (σ σ' : Fin 2) (hσσ' : σ' ≠ σ) (hij : i ≠ j)
+    (hother : tJConfigOf N s (spinfulIndex N i σ') = 1) :
+    (∑ w, basisVec (tJConfigOf N s') w *
+        ((fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+            fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j σ)).mulVec
+            (basisVec (tJConfigOf N s))) w) = 0 := by
+  rw [tJ_hop_matrixElement_apply]
+  split
+  · -- the hopped config is non-hard-core at site `i`, so it differs from the hard-core bra
+    rw [basisVec_apply, if_neg ?_, mul_zero]
+    intro heq
+    -- `tJConfigOf s'` would have both `(i,σ)` and `(i,σ')` occupied
+    have hp : tJConfigOf N s' (spinfulIndex N i σ) = 1 := by
+      rw [heq, Function.update_self]
+    have hp' : tJConfigOf N s' (spinfulIndex N i σ') = 1 := by
+      rw [heq, Function.update_of_ne (fun h => hσσ' ((spinfulIndex_eq_iff N i i σ' σ).mp h).2),
+        Function.update_of_ne (fun h => hij ((spinfulIndex_eq_iff N i j σ' σ).mp h).1), hother]
+    -- but a hard-core site state occupies at most one orbital of `i`
+    rcases (show σ = 0 ∧ σ' = 1 ∨ σ = 1 ∧ σ' = 0 from by
+      fin_cases σ <;> fin_cases σ' <;> simp_all (config := { decide := true })) with
+      ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+    · rw [tJConfigOf_apply_up] at hp; rw [tJConfigOf_apply_down] at hp'
+      split at hp <;> split at hp' <;> simp_all
+    · rw [tJConfigOf_apply_down] at hp; rw [tJConfigOf_apply_up] at hp'
+      split at hp <;> split at hp' <;> simp_all
+  · rfl
+
 end LatticeSystem.Fermion

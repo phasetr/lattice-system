@@ -6342,8 +6342,10 @@ single-hop element (\texttt{tJ\_hop\_matrixElement\_apply}, arbitrary $i,j,\sigm
 adjacency assumption) reads off the single-mode action at the bra configuration: it is the product
 of the two Jordan--Wigner string signs times the indicator $[\texttt{tJConfigOf}\,s'=\text{hopped
 config}]$ when the source $(j,\sigma)$ is occupied and the target $(i,\sigma)$ empty, and vanishes
-otherwise (\texttt{tJ\_hop\_matrixElement\_eq\_zero\_of\_source}/\texttt{\_of\_target}) --- the
-foundation for the per-term $\langle\hat K\rangle\geq0$ non-negativity.  Every off-diagonal
+otherwise (\texttt{tJ\_hop\_matrixElement\_eq\_zero\_of\_source}/\texttt{\_of\_target}, and
+\texttt{\_of\_target\_other} when the target site carries the opposite spin, so the hopped
+configuration would be doubly-occupied --- non-hard-core, hence unequal to any hard-core bra) ---
+the foundation for the per-term $\langle\hat K\rangle\geq0$ non-negativity.  Every off-diagonal
 contribution is thus $-\tau$ (hopping), $-J/2$ (exchange), or $0$ (diagonal) --- all
 \emph{non-positive}, the hypothesis of the Perron--Frobenius Theorem A.18.  Remaining: the
 $\langle\hat K\rangle\geq0$ assembly, the real-symmetric sector matrix and its irreducibility, the
