@@ -6306,17 +6306,23 @@ $\hat S^z_{\rm tot},\hat S^+_{\rm tot},\hat S^-_{\rm tot}$, so by Theorem A.17 e
 has an eigenstate of total $\hat S^z\in\{0,\tfrac12\}$.  \emph{(ii) The $\hat
 S^z=\tfrac12$, $\hat N=N_e$ sector basis.}  A site-state $s:\mathrm{Fin}(N+1)\to\mathrm{Fin}\,3$
 ($0/1/2=\varnothing/\!\uparrow/\!\downarrow$) gives the spinful occupation $\texttt{tJConfigOf}\,s$,
-which is hard-core, injective and orthonormal, with $\hat N$/$\hat S^z$ eigenvalues placing it in
-the $N_e$-electron, $\hat S^z=\tfrac12$ sector.  \emph{(iii) Sign-free hopping.}  Acting
+which is hard-core, injective and orthonormal; its electron-number and spin-$z$ eigenvalues are the
+site counts ($\hat N|\Phi_s\rangle=(\#\!\uparrow+\#\!\downarrow)|\Phi_s\rangle$, $\hat
+S^z|\Phi_s\rangle=\tfrac12(\#\!\uparrow-\#\!\downarrow)|\Phi_s\rangle$), so under the count
+hypotheses $\#\!\uparrow+\#\!\downarrow=N_e$ and $\#\!\uparrow=\#\!\downarrow+1$ it lies in the
+$N_e$-electron, $\hat S^z=\tfrac12$ sector.  \emph{(iii) Sign-free hopping.}  For an \emph{allowed}
+hop --- source $a$ carrying spin $\sigma$ and empty target $b$ --- acting
 $\hat c^\dagger_{b\sigma}\hat c_{a\sigma}$ on $|\Phi_s\rangle$ produces, up to a Jordan--Wigner
-sign, $|\Phi_{\texttt{tJSiteHop}\,s\,a\,b}\rangle$; the forward parity
+sign, $|\Phi_{\texttt{tJSiteHop}\,s\,a\,b}\rangle$ (for disallowed source/target occupations the
+operator term is simply $0$); the forward parity
 $\mathrm{jwSign}(q,c)\,\mathrm{jwSign}(p,\texttt{update}\,c\,q\,0)=(-1)^{\sum_{q<k<p}c_k}$ (the
 $2E_q$ from the modes below the source cancels) and its backward analogue collapse to $+1$ on a
 nearest-neighbour bond (the single intervening orbital is empty) and to $(-1)^{N_e-1}=+1$ on the
 periodic wrap bond $\{0,N\}$ for \emph{odd} $N_e$ (a three-way mode split shows the strictly-between
-occupation is $N_e-1$).  Hence every kinetic matrix element
-$\langle\Phi_{s'}|\hat c^\dagger_{b\sigma}\hat c_{a\sigma}|\Phi_s\rangle=[\,s'=\texttt{tJSiteHop}\,
-s\,a\,b\,]\in\{0,1\}$.  \emph{(iv) Sign-free exchange.}  The ladder $\hat S^+_i\hat S^-_j=\hat
+occupation is $N_e-1$).  Hence for an allowed nearest-neighbour or wrap hop the kinetic matrix
+element $\langle\Phi_{s'}|\hat c^\dagger_{b\sigma}\hat c_{a\sigma}|\Phi_s\rangle=[\,s'=
+\texttt{tJSiteHop}\,s\,a\,b\,]\in\{0,1\}$, and it vanishes for every non-adjacent or
+occupation-forbidden term.  \emph{(iv) Sign-free exchange.}  The ladder $\hat S^+_i\hat S^-_j=\hat
 c^\dagger_{i\uparrow}\hat c_{i\downarrow}\hat c^\dagger_{j\downarrow}\hat c_{j\uparrow}$ maps an
 antiparallel pair to $|\Phi_{\texttt{tJSpinSwap}\,s\,i\,j}\rangle$ with net sign $+1$ (each same-site
 creation/annihilation pair contributes a squared string sign $=1$), giving the off-diagonal exchange
