@@ -28,7 +28,7 @@ open scoped BigOperators
 variable {N : ℕ}
 
 /-- A `Fin 3` site value is `0`, `1`, or `2`. -/
-private theorem tJ_fin3_cases (v : Fin 3) : v = 0 ∨ v = 1 ∨ v = 2 := by
+theorem tJ_fin3_cases (v : Fin 3) : v = 0 ∨ v = 1 ∨ v = 2 := by
   fin_cases v <;> simp
 
 /-- An occupied `σ`-orbital forces the site spin: `tJConfigOf s (spinfulIndex i σ) = 1` gives
@@ -45,7 +45,7 @@ private theorem tJ_site_of_orbital (N : ℕ) (s : Fin (N + 1) → Fin 3) (i : Fi
     · exact absurd h (by decide)
 
 /-- The four oriented adjacency cases of the cyclic chain, in `Fin`-value form. -/
-private theorem cycleGraph_adj_val_cases (N : ℕ) (hpos : 0 < N) (i j : Fin (N + 1))
+theorem cycleGraph_adj_val_cases (N : ℕ) (hpos : 0 < N) (i j : Fin (N + 1))
     (h : (cycleGraph (N + 1)).Adj i j) :
     j.val = i.val + 1 ∨ i.val = j.val + 1 ∨ (i.val = N ∧ j.val = 0) ∨ (j.val = N ∧ i.val = 0) := by
   obtain ⟨M, rfl⟩ : ∃ M, N = M + 1 := ⟨N - 1, by omega⟩

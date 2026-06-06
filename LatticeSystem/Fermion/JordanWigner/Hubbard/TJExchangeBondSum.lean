@@ -74,7 +74,7 @@ theorem tJ_exchange_swap_summand_zero_or_one (N : ℕ) (s s' : Fin (N + 1) → F
 /-! ### Matrix-element linearity helper -/
 
 /-- The sector matrix element `⟨Φ_{s'} | op | Φ_s⟩` as a linear functional of the operator `op`. -/
-private noncomputable def tJME (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
+noncomputable def tJME (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
     (op : ManyBodyOp (Fin (2 * N + 2))) : ℂ :=
   ∑ w, basisVec (tJConfigOf N s') w * (op.mulVec (basisVec (tJConfigOf N s))) w
 
@@ -83,7 +83,7 @@ private theorem tJME_zero (N : ℕ) (s s' : Fin (N + 1) → Fin 3) : tJME N s s'
   unfold tJME; rw [Matrix.zero_mulVec]; simp
 
 /-- The matrix element is additive in the operator. -/
-private theorem tJME_add (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
+theorem tJME_add (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
     (op₁ op₂ : ManyBodyOp (Fin (2 * N + 2))) :
     tJME N s s' (op₁ + op₂) = tJME N s s' op₁ + tJME N s s' op₂ := by
   unfold tJME
@@ -99,7 +99,7 @@ private theorem tJME_sub (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
   simp only [Pi.sub_apply, mul_sub, Finset.sum_sub_distrib]
 
 /-- The matrix element is homogeneous in the scalar multiplier of the operator. -/
-private theorem tJME_smul (N : ℕ) (s s' : Fin (N + 1) → Fin 3) (c : ℂ)
+theorem tJME_smul (N : ℕ) (s s' : Fin (N + 1) → Fin 3) (c : ℂ)
     (op : ManyBodyOp (Fin (2 * N + 2))) :
     tJME N s s' (c • op) = c * tJME N s s' op := by
   unfold tJME
@@ -238,7 +238,7 @@ theorem tJInteraction_matrixElement_nonpos (N : ℕ) (s s' : Fin (N + 1) → Fin
 /-! ### The full effective-matrix off-diagonal is non-positive -/
 
 /-- The effective-matrix entry is the sector matrix element of the t-J Hamiltonian. -/
-private theorem tJEffMatrix_eq_tJME (N : ℕ) (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj]
+theorem tJEffMatrix_eq_tJME (N : ℕ) (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj]
     (τ J : ℝ) (s s' : Fin (N + 1) → Fin 3) :
     tJEffMatrix N G τ J s' s = tJME N s s' (tJHamiltonian N G τ J) := by
   rw [tJEffMatrix_apply]; rfl
