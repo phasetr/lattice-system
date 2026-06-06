@@ -6297,6 +6297,43 @@ Tasaki's proof is a Perron--Frobenius /
 the wrap-around $1\leftrightarrow L$ hop sign-free under periodic boundary conditions.  The proof
 is deferred (Issue \#4198).
 
+\medskip\noindent\textbf{Proposition 11.24 discharge (Tasaki §11.5.2, Issue \#4230, in
+progress).}  The axiom is being replaced by a faithful Lean proof along Tasaki's spin--charge
+separation route.  \emph{(i) SU(2) invariance.}  $\hat H_{\rm tJ}$ is Hermitian
+(\texttt{tJHamiltonian\_isHermitian}; the exchange term is self-adjoint only \emph{as a sum},
+since $(\hat S_x\!\cdot\!\hat S_y)^{\mathsf H}=\hat S_y\!\cdot\!\hat S_x$) and commutes with
+$\hat S^z_{\rm tot},\hat S^+_{\rm tot},\hat S^-_{\rm tot}$, so by Theorem A.17 every energy level
+has an eigenstate of total $\hat S^z\in\{0,\tfrac12\}$.  \emph{(ii) The $\hat
+S^z=\tfrac12$, $\hat N=N_e$ sector basis.}  A site-state $s:\mathrm{Fin}(N+1)\to\mathrm{Fin}\,3$
+($0/1/2=\varnothing/\!\uparrow/\!\downarrow$) gives the spinful occupation $\texttt{tJConfigOf}\,s$,
+which is hard-core, injective and orthonormal, with $\hat N$/$\hat S^z$ eigenvalues placing it in
+the $N_e$-electron, $\hat S^z=\tfrac12$ sector.  \emph{(iii) Sign-free hopping.}  Acting
+$\hat c^\dagger_{b\sigma}\hat c_{a\sigma}$ on $|\Phi_s\rangle$ produces, up to a Jordan--Wigner
+sign, $|\Phi_{\texttt{tJSiteHop}\,s\,a\,b}\rangle$; the forward parity
+$\mathrm{jwSign}(q,c)\,\mathrm{jwSign}(p,\texttt{update}\,c\,q\,0)=(-1)^{\sum_{q<k<p}c_k}$ (the
+$2E_q$ from the modes below the source cancels) and its backward analogue collapse to $+1$ on a
+nearest-neighbour bond (the single intervening orbital is empty) and to $(-1)^{N_e-1}=+1$ on the
+periodic wrap bond $\{0,N\}$ for \emph{odd} $N_e$ (a three-way mode split shows the strictly-between
+occupation is $N_e-1$).  Hence every kinetic matrix element
+$\langle\Phi_{s'}|\hat c^\dagger_{b\sigma}\hat c_{a\sigma}|\Phi_s\rangle=[\,s'=\texttt{tJSiteHop}\,
+s\,a\,b\,]\in\{0,1\}$.  \emph{(iv) Sign-free exchange.}  The ladder $\hat S^+_i\hat S^-_j=\hat
+c^\dagger_{i\uparrow}\hat c_{i\downarrow}\hat c^\dagger_{j\downarrow}\hat c_{j\uparrow}$ maps an
+antiparallel pair to $|\Phi_{\texttt{tJSpinSwap}\,s\,i\,j}\rangle$ with net sign $+1$ (each same-site
+creation/annihilation pair contributes a squared string sign $=1$), giving the off-diagonal exchange
+entry $-J/2$.  \emph{(v) Diagonal terms.}  $\hat n_x\hat n_y$ and $\hat S^z_x\hat S^z_y$ act as
+scalars on $|\Phi_s\rangle$, so they vanish off the diagonal.  \emph{(vi) The effective matrix.}
+$M=T^{\mathsf H}\hat H_{\rm tJ}T$ (Hermitian, $M_{s',s}=\langle\Phi_{s'}|\hat H_{\rm
+tJ}|\Phi_s\rangle$); the hard-core bra drops both projections
+($\hat P_{\rm hc}\hat K\hat P_{\rm hc}|\Phi_s\rangle=\hat P_{\rm hc}(\hat K|\Phi_s\rangle)$,
+$(\hat P_{\rm hc}u)(\texttt{tJConfigOf}\,s')=u(\texttt{tJConfigOf}\,s')$), and the kinetic element
+expands as $\langle\Phi_{s'}|\hat K|\Phi_s\rangle=\sum_{\sigma,i,j}(\text{adj}\,i\,j)\,
+\langle\Phi_{s'}|\hat c^\dagger_{i\sigma}\hat c_{j\sigma}|\Phi_s\rangle$.  Every off-diagonal
+contribution is thus $-\tau$ (hopping), $-J/2$ (exchange), or $0$ (diagonal) --- all
+\emph{non-positive}, the hypothesis of the Perron--Frobenius Theorem A.18.  Remaining: the
+$\langle\hat K\rangle\geq0$ assembly, the real-symmetric sector matrix and its irreducibility, the
+A.18 application, and the SU(2)-tower capstone that replaces the axiom.  All discharge lemmas are
+axiom-free.
+
 \medskip\noindent\textbf{The d=1 decorated Hubbard model, Lemma 11.25 and Theorem 11.26
 (Tasaki §11.5.3, axiomatized).}  Tasaki obtains a rigorous example of \emph{metallic}
 ferromagnetism by realising the t-J model as the strong-coupling limit of a Hubbard model on
