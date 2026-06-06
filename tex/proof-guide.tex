@@ -6457,8 +6457,15 @@ $\downarrow$'s; counts via \texttt{card\_filter\_val\_lt} and the total) supplie
 $M=\texttt{tJEffReMatrixOnSector}$: $M$ has a strictly positive eigenvector at its lowest eigenvalue
 $\mu$ (the sector ground energy), with $\mathrm{finrank}\leq1$ (non-degeneracy) --- the unique
 positive Perron--Frobenius ground state of the spin-charge-separated sector.
-Remaining: identifying that ground state's total spin ($S_{\mathrm{tot}}=N_e/2$) by overlap with the
-ferromagnetic state, and the SU(2)-tower capstone that replaces the axiom.
+\emph{(xvii) Sector$\leftrightarrow$full bridge} (\texttt{TJExpansion.lean}):
+$\texttt{tJExpansion}\,v=\sum_s v_s\,|\Phi_s\rangle$, the coefficient functional
+$\texttt{tJExpansionCoeff}$, and the left inverse \texttt{tJExpansionCoeff\_tJExpansion} (the
+orthonormal sector basis makes the expansion injective), mirroring the Nagaoka
+\texttt{tasakiCoeff}/\texttt{tasakiCoeff\_expansion} bridge.
+Remaining: the operator lift $\hat H_{\rm tJ}(\texttt{tJExpansion}\,v)=\mu\cdot\texttt{tJExpansion}\,v$
+(sector closure of $\hat H_{\rm tJ}$), the total-spin identification ($S_{\mathrm{tot}}=N_e/2$) by
+Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
+replaces the axiom.
 The discharge lemmas add no
 new t-J axioms; the one inherited dependency is the A.17 sector reduction
 \texttt{tJHamiltonian\_eigenstate\_spin\_zero\_or\_half}, which rests on Theorem A.17's single
