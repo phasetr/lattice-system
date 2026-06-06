@@ -6614,6 +6614,19 @@ filling state is $0$ ($\texttt{tJFillingExpansion\_eq\_zero\_of\_spinZ\_mulVec\_
 kills the $\hat S^3=0$ branch of the $W$-restricted A.17 for odd $N_e$, forcing the
 $\hat S^3=\tfrac12$ sector.
 
+\emph{(xxxii) E2 capstone: $\texttt{groundEnergyAtFilling}=\mu$} (\texttt{TJGroundEnergyGe.lean}):
+$\texttt{tJ\_perronFrobeniusMin\_le\_hermitianMinEigenvalue}$ applies the matrix Theorem A.17
+($\texttt{ham\_eigenstate\_spin\_zero\_or\_half}$) to the minimum eigenvector of $\hat H_W$ (with the
+proven compressed Hermitian/su(2)/commute hypotheses), lifts it to a $W$-eigenstate, and uses odd
+$N_e$ to force $\hat S^3=\tfrac12$, giving $\mu\le\texttt{hermitianMinEigenvalue}\,\hat H_W$.  Then
+$\texttt{tJ\_groundEnergyAtFilling\_ge\_of\_sectorMin}$ ($\mu\le\texttt{groundEnergyAtFilling}$, via
+$\texttt{le\_ciInf}$ + the variational lower bound + the Rayleigh bridge + the isometry), and the
+capstone $\texttt{tJHamiltonian\_groundEnergyAtFilling\_eq\_perronFrobeniusMin}$: the d=1
+ferromagnetic t-J ground energy at odd filling $N_e$ equals the Perron--Frobenius sector minimum
+$\mu$ ($\le$ from the lifted PF eigenvector, $\ge$ from the A.17), packaged with the strictly-positive
+PF eigenvector $v$.  \textbf{E2 (ground-energy identification) is complete}, resting only on Theorem
+A.17's documented \texttt{exists\_joint\_su2\_energy\_eigenstate}.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) by
 Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
