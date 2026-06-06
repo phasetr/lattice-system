@@ -6415,8 +6415,15 @@ dispatching the forward / backward / wrap directional matrix elements via
 ladder summand equals $1$, so the bond-sum has real part $\geq1$ and the interaction entry satisfies
 $\mathrm{re}\leq-J/2$.  Combining (\texttt{tJEffMatrix\_re\_neg\_of\_step}), for $\tau,J>0$ every
 $\texttt{TJStep}\,s\,s'$ gives $M_{s',s}.\mathrm{re}<0$ (a hop $\leq-\tau$, an exchange $\leq-J/2$),
-i.e. $B_{s',s}=-M_{s',s}>0$.
-Remaining: the sector reachability/connectivity (hole-routing + spin-sorting), the
+i.e. $B_{s',s}=-M_{s',s}>0$.  \emph{(xi) The adjacent-swap bridge} (\texttt{TJAdjacentSwap.lean}).
+An \texttt{AdjacentSwapStep} exchanges the values at an adjacent pair of distinct sites
+($s'=s\circ\texttt{Equiv.swap}\,a\,b$); it is always a \texttt{TJStep}
+(\texttt{adjacentSwapStep\_to\_TJStep}: a hop if one site is empty, an exchange if the two carry
+opposite spins), so \texttt{AdjacentSwapReachable} lifts to \texttt{TJStep}-reachability through
+\texttt{ReflTransGen.mono} (\texttt{tjReachable\_of\_adjacentSwapReachable}).  The sector connectivity
+thus reduces to the model-agnostic combinatorial fact that two $\texttt{Fin}\,3$-configurations with
+equal value-counts are adjacent-swap reachable.
+Remaining: that combinatorial reachability (disagreement-count induction), the
 irreducibility of $-M$ + A.18 application, and the SU(2)-tower capstone that replaces the axiom.
 The discharge lemmas add no
 new t-J axioms; the one inherited dependency is the A.17 sector reduction
