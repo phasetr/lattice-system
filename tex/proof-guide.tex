@@ -6530,6 +6530,19 @@ at real $\mu$ bounds the ground energy, via \texttt{ciInf\_le\_of\_le} and the \
 brick \texttt{groundEnergyAtFilling\_bddBelow}).  Reverse direction ($\mu \le
 \texttt{groundEnergyAtFilling}$, hence equality) by A.17 + odd $N_e$ next.
 
+\emph{(xxiv) Reverse-bound crux} (\texttt{TJGroundEnergyReverse.lean}, E2 ``$\ge$''): a nonzero
+$\hat S^3=\tfrac12$, $\hat N=N_e$, hard-core ($W$) eigenvector of $\hat H_{\rm tJ}$ at a real
+eigenvalue $E$ yields a nonzero \emph{real} eigenvector of $\texttt{tJEffReMatrixOnSector}$ at $E$
+(\texttt{tJ\_spinHalf\_W\_eigenvector\_to\_sector}).  It is sector-supported (support restriction),
+hence equals its sector expansion; the operator action then becomes the complex sector matrix acting
+on the coefficient vector, which is real on the sector (\texttt{tJEffMatrix\_sector\_im\_zero}), and
+a complex eigenvector of a real-matrix cast at a real eigenvalue has a nonzero real or imaginary part
+(\texttt{matrix\_eigenvec\_re/im\_of\_complex}).  Corollary
+\texttt{tJ\_sectorMin\_le\_of\_spinHalf\_W\_eigenvalue}: under the Perron--Frobenius minimality of
+$\mu$, every such $E$ satisfies $\mu \le E$.  Remaining for E2-$\ge$: a $W$-restricted A.17 placing
+the global-minimum $W$-eigenvector into the $\hat S^3=\tfrac12$ block (A.17 + odd $N_e$), completing
+$\texttt{groundEnergyAtFilling}=\mu$.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) by
 Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
