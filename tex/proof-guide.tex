@@ -6586,6 +6586,18 @@ and $\hat H_W$-commutativity $\texttt{tJFillingCompress\_tJHamiltonian\_commute\
 These are exactly the inputs of the matrix Theorem A.17
 ($\texttt{exists\_joint\_su2\_energy\_eigenstate}$), to be applied at the filling index next.
 
+\emph{(xxix) Filling-embedding isometry and the Rayleigh bridge}
+(\texttt{TJFillingRayleighBridge.lean}): the embedding has orthonormal columns,
+$T^{\mathsf H} T = 1$ ($\texttt{tJFillingEmbedding\_conjTranspose\_mul\_self}$, from
+$\texttt{tJConfigOf\_basisVec\_inner}$), hence is an isometry $\langle Tc,Tc\rangle=\langle c,c\rangle$
+($\texttt{tJFillingExpansion\_dotProduct\_self}$).  The \emph{Rayleigh bridge}
+$\texttt{rayleighOnVec\_tJFillingCompress}$ then gives
+$\texttt{rayleighOnVec}\,\hat H_{\rm tJ}\,(\texttt{tJFillingExpansion}\,c)
+=\texttt{rayleighOnVec}\,\hat H_W\,c$ (operator Rayleigh on a lifted state $=$ matrix Rayleigh of
+the compression, via the rectangular adjoint identity $\langle c, T^{\mathsf H}y\rangle=\langle
+Tc,y\rangle$).  This connects the operator-side $\texttt{groundEnergyAtFilling}$ to the finite
+matrix $\hat H_W$, whose minimum eigenvalue is identified with $\mu$ via the $W$-restricted A.17.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) by
 Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
