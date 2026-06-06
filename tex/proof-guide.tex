@@ -6517,6 +6517,19 @@ $\langle\Phi_{s'}|\hat H_{\rm tJ}|\Phi_s\rangle=M_{s',s}$), and the sector realn
 diagonal by Hermiticity) which upgrades the real eigen-equation to the complex one.  Mirrors the
 Nagaoka \texttt{hubbardEffectiveHamiltonian\_mulVec\_tasakiExpansion}.
 
+\emph{(xxiii) Variational bound on the ground energy} (\texttt{TJGroundEnergy.lean}, E2 ``$\le$''
+direction): a nonzero real sector eigenvector $c$ of $\texttt{tJEffReMatrixOnSector}$ at eigenvalue
+$\mu$ gives $\texttt{groundEnergyAtFilling}\,\hat H_{\rm tJ}\,N_e \le \mu$
+(\texttt{tJHamiltonian\_groundEnergyAtFilling\_le\_of\_sectorEigen}).  The lifted state
+$\texttt{tJExpansion}\,c$ is admissible (a hard-core $\hat N=N_e$ eigenvector,
+\texttt{tJExpansion\_mem\_hardcore} / \texttt{fermionTotalNumber\_mulVec\_tJExpansion} /
+\texttt{tJExpansion\_ne\_zero\_of\_ne\_zero}) with energy $\mu$ (the (xxii) lift), so the
+variational infimum is bounded above by $\mu$.  Built on a reusable generic lemma
+\texttt{groundEnergyAtFilling\_le\_of\_eigenvector} (any nonzero $\hat N=N_e$ hard-core eigenvector
+at real $\mu$ bounds the ground energy, via \texttt{ciInf\_le\_of\_le} and the \texttt{BddBelow}
+brick \texttt{groundEnergyAtFilling\_bddBelow}).  Reverse direction ($\mu \le
+\texttt{groundEnergyAtFilling}$, hence equality) by A.17 + odd $N_e$ next.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) by
 Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
