@@ -6422,8 +6422,16 @@ An \texttt{AdjacentSwapStep} exchanges the values at an adjacent pair of distinc
 opposite spins), so \texttt{AdjacentSwapReachable} lifts to \texttt{TJStep}-reachability through
 \texttt{ReflTransGen.mono} (\texttt{tjReachable\_of\_adjacentSwapReachable}).  The sector connectivity
 thus reduces to the model-agnostic combinatorial fact that two $\texttt{Fin}\,3$-configurations with
-equal value-counts are adjacent-swap reachable.
-Remaining: that combinatorial reachability (disagreement-count induction), the
+equal value-counts are adjacent-swap reachable.  \emph{(xii) Reachability basics}
+(\texttt{TJSwapReachableBasics.lean}): \texttt{adjacentSwapReachable\_swap} (the value-swapped
+$s\circ\texttt{Equiv.swap}\,a\,b$ is reachable --- a single step if the values differ, \texttt{refl}
+if equal), \texttt{adjacentSwapReachable\_count} (reachability preserves every value-count, via the
+bijection \texttt{comp\_swap\_count}, so it stays in-sector), and
+\texttt{exists\_needed\_value\_right\_of\_same\_counts} (equal counts $+$ prefix $[0,p)$ agreement
+$+$ disagreement at $p$ $\Rightarrow$ the value $s'\,p$ occurs in $s$ strictly right of $p$ --- the
+bubble target).
+Remaining: the selection-sort bubble $+$ disagreement induction assembling these into
+$\text{same-counts}\Rightarrow\texttt{AdjacentSwapReachable}$, the
 irreducibility of $-M$ + A.18 application, and the SU(2)-tower capstone that replaces the axiom.
 The discharge lemmas add no
 new t-J axioms; the one inherited dependency is the A.17 sector reduction
