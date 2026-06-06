@@ -6436,10 +6436,14 @@ $g$), and \texttt{reach\_of\_agree\_aux} is the selection sort (bubble the neede
 leftmost disagreement, recurse on the unfixed positions), assembling into
 \texttt{adjacentSwapReachable\_of\_same\_counts}: any two $\texttt{Fin}\,3$-configurations with equal
 value-counts are adjacent-swap reachable, hence (via the bridge) \texttt{TJStep}-reachable within a
-sector.
-Remaining: the
-irreducibility of $-M$ (\texttt{isIrreducible\_iff\_exists\_pow\_pos} $+$
-\texttt{matrix\_pow\_succ\_pos\_of\_path} on a reachable chain) $+$ A.18 application, and the
+sector.  \emph{(xiv) The shifted PF matrix} (\texttt{TJSectorShifted.lean}):
+$\texttt{tJSectorShifted}=c\cdot 1-M$ with \texttt{tJSectorShifted\_isSymm}, \texttt{\_nonneg}
+(entrywise $\geq 0$ for $c$ above the diagonal: diagonal $c-M_{qq}$, off-diagonal $-M_{q,p}$ from
+\texttt{tJEffMatrix\_offdiag\_nonpos}), \texttt{tJStep\_ne} (a step changes the configuration), and
+\texttt{tJSectorShifted\_pos\_of\_step} (a \texttt{TJStep} between distinct sector states gives a
+strictly positive off-diagonal $B$-entry, from \texttt{tJEffMatrix\_re\_neg\_of\_step} $+$ symmetry).
+Remaining: the reachability $\to$ matrix-power positivity lift $+$
+\texttt{isIrreducible\_iff\_exists\_pow\_pos}, the A.18 application, and the
 SU(2)-tower capstone that replaces the axiom.
 The discharge lemmas add no
 new t-J axioms; the one inherited dependency is the A.17 sector reduction
