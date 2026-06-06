@@ -3,6 +3,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJDiagonalMatrixElement
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJKineticSummand
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJOffDiagonal
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJEffMatrix
+import LatticeSystem.Math.AnticommuteCommute
 
 /-!
 # Tasaki 11.5: the t-J interaction off-diagonal is `≤ 0`, hence `M_{s',s} ≤ 0` (Prop 11.24 PR-B7-3h)
@@ -33,31 +34,6 @@ open Matrix LatticeSystem.Quantum LatticeSystem.Lattice SimpleGraph
 open scoped BigOperators
 
 variable {N : ℕ}
-
-/-- If `a` anticommutes with both `c` and `d`, it commutes with the even product `c d`. -/
-private theorem anticomm_commute_mul {α : Type*} [Ring α] {a c d : α}
-    (hac : a * c + c * a = 0) (had : a * d + d * a = 0) :
-    a * (c * d) = c * d * a := by
-  have hac' : a * c = -(c * a) := eq_neg_of_add_eq_zero_left hac
-  have had' : a * d = -(d * a) := eq_neg_of_add_eq_zero_left had
-  calc a * (c * d) = a * c * d := by rw [mul_assoc]
-    _ = -(c * a) * d := by rw [hac']
-    _ = -(c * (a * d)) := by rw [neg_mul, mul_assoc]
-    _ = -(c * -(d * a)) := by rw [had']
-    _ = c * d * a := by rw [mul_neg, neg_neg, mul_assoc]
-
-/-- Two even products `a b` and `c d` of pairwise-anticommuting factors commute. -/
-private theorem anticomm_commute_mul_mul {α : Type*} [Ring α] {a b c d : α}
-    (hac : a * c + c * a = 0) (had : a * d + d * a = 0)
-    (hbc : b * c + c * b = 0) (hbd : b * d + d * b = 0) :
-    a * b * (c * d) = c * d * (a * b) := by
-  have ha : a * (c * d) = c * d * a := anticomm_commute_mul hac had
-  have hb : b * (c * d) = c * d * b := anticomm_commute_mul hbc hbd
-  calc a * b * (c * d) = a * (b * (c * d)) := by rw [mul_assoc]
-    _ = a * (c * d * b) := by rw [hb]
-    _ = a * (c * d) * b := by rw [← mul_assoc]
-    _ = c * d * a * b := by rw [ha]
-    _ = c * d * (a * b) := by rw [mul_assoc]
 
 /-- **Different-site spin ladders commute.**  For `x ≠ y` the bilinear (even) operators
 `Ŝ⁻_x = ĉ†_{x↓}ĉ_{x↑}` and `Ŝ⁺_y = ĉ†_{y↑}ĉ_{y↓}` act on disjoint mode sets, so they commute:
