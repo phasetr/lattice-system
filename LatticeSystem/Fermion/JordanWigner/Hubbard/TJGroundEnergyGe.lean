@@ -106,7 +106,7 @@ theorem tJ_groundEnergyAtFilling_ge_of_sectorMin (hpos : 0 < N) (Ne : ℕ) (hNeL
               (basisVec (tJConfigOf N (Classical.choice hNE).val))).ofLp i‖ ^ 2) = (1 : ℝ) from ?_]
       · simp
       · rw [Finset.sum_eq_single (tJConfigOf N (Classical.choice hNE).val)]
-        · simp [basisVec_apply]
+        · simp
         · intro b _ hb; simp [basisVec_of_ne hb]
         · intro h; exact absurd (Finset.mem_univ _) h
     · exact fermionTotalNumber_mulVec_tJConfigOf_eq N _ Ne (Classical.choice hNE).property
