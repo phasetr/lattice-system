@@ -6671,6 +6671,18 @@ electron number preserved since $[\hat N,\hat S^+]=0$).  So $(\hat S^+)^k\Phi_0$
 fixed-$N_e$, energy-$\mu$, $\hat S^3=\tfrac12+k$ eigenvector --- the building blocks for raising the
 strictly-positive Perron--Frobenius ground vector to a nonzero highest weight; fully axiom-free.
 
+\emph{(xxxvi) The spin-raising tower terminates} (\texttt{TJRaisingTermination.lean}, E3b PR3):
+$\texttt{fermionTotalDownNumber\_mul\_fermionTotalSpinPlus}$ ($[\hat N_\downarrow,\hat S^+]=-\hat
+S^+$, summed from the per-site relation), $\texttt{fermionTotalDownNumber\_mulVec\_spinPlusPow}$
+($\hat N_\downarrow(\hat S^+)^k v=(m-k)(\hat S^+)^k v$ --- each raising removes one down-spin), and
+$\texttt{spinPlusPow\_succ\_eq\_zero\_of\_downNumber}$: a vector with $\hat N_\downarrow v=m v$ is
+annihilated by $m+1$ raisings ($(\hat S^+)^{m+1}v=0$), since the would-be $\hat N_\downarrow$
+eigenvalue $-1$ forces $(\#{\downarrow}(w)+1)\,\psi(w)=0$ for every configuration $w$ (via the
+diagonal $\texttt{fermionTotalDownNumber\_mulVec\_apply}$, $\#{\downarrow}\ge 0$).  Applied to a
+$\hat S^3=\tfrac12$, $\hat N=N_e$ ground state ($\hat N_\downarrow=(N_e-1)/2$), the top
+$\Omega=(\hat S^+)^{(N_e-1)/2}\Phi$ satisfies $\hat S^+\Omega=0$ --- a highest weight; fully
+axiom-free.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
