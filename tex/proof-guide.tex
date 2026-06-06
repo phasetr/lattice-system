@@ -6394,9 +6394,20 @@ $\texttt{submatrix}\,\texttt{Subtype.val}$ as $\texttt{tJEffReMatrixOnSector}$, 
 $\texttt{tJEffReMatrixOnSector\_isSymm}$ proves symmetry directly from the Hermiticity of
 $\texttt{tJEffMatrix}$: $M_{q,p}=\overline{M_{p,q}}$, so their real parts agree (no global realness of
 the full matrix is needed --- it is only sector-real, since the wrap sign $(-1)^{N_e-1}$ depends on
-the electron parity).  This is the $\texttt{Matrix}\ \cdots\ \mathbb R$ that feeds Theorem A.18.
-Remaining: the irreducibility of $-M$ on a non-empty sector, the
-A.18 application, and the SU(2)-tower capstone that replaces the axiom.  The discharge lemmas add no
+the electron parity).  This is the $\texttt{Matrix}\ \cdots\ \mathbb R$ that feeds Theorem A.18.  \emph{(ix) The
+connectivity step relation} (\texttt{TJStepRelation.lean}).  The elementary move
+$\texttt{TJStep}\,s\,s'$ is one off-diagonal transition of the t-J Hamiltonian: a nearest-neighbour
+or wrap hop of an electron into an adjacent empty site ($s'=\texttt{tJSiteHop}\,s\,a\,b$), or an
+adjacent antiparallel spin exchange ($s'=\texttt{tJSpinSwap}\,s\,i\,j$).  Both are precomposition
+with a transposition ($\texttt{tJSpinSwap}\,s\,i\,j=s\circ\texttt{Equiv.swap}\,i\,j$), hence site
+bijections; so \texttt{tJSpinSwap\_count} / \texttt{tJSiteHop\_count} give
+$\texttt{tJStep\_preserves\_sector}$: a step preserves $\#\!\uparrow$ and $\#\!\downarrow$, so the
+reachability closure of \texttt{TJStep} stays inside one $\hat N=N_e$, $\hat S^3=\tfrac12$ sector.
+This is the step relation whose positive matrix entries will feed
+\texttt{matrix\_pow\_succ\_pos\_of\_path} and \texttt{Matrix.isIrreducible\_iff\_exists\_pow\_pos}.
+Remaining: the step matrix-entry positivity, the sector connectivity, the
+irreducibility of $-M$ + A.18 application, and the SU(2)-tower capstone that replaces the axiom.
+The discharge lemmas add no
 new t-J axioms; the one inherited dependency is the A.17 sector reduction
 \texttt{tJHamiltonian\_eigenstate\_spin\_zero\_or\_half}, which rests on Theorem A.17's single
 documented axiom \texttt{exists\_joint\_su2\_energy\_eigenstate}.  Every other layer (the
