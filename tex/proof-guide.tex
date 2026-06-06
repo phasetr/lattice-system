@@ -6361,10 +6361,26 @@ $s\,i\neq\downarrow$ ($i\neq j$) the subsequent $\hat S^+_i$ raising hits an emp
 $\texttt{couplingOf}\,i\,j\cdot\langle\Phi_{s'}|\hat S^+_i\hat S^-_j|\Phi_s\rangle$ is $0$ or $1$
 (non-adjacent pairs killed by the coupling; an adjacent antiparallel pair gives the sign-free
 indicator $[\,s'=\texttt{tJSpinSwap}\,s\,i\,j\,]$), so the exchange off-diagonal entry
-$-(J/2)\cdot(\geq0)\leq0$.  Every off-diagonal
+$-(J/2)\cdot(\geq0)\leq0$.  \emph{(vii) The full off-diagonal $M_{s',s}\leq0$ is now assembled}
+(\texttt{TJExchangeBondSum.lean}).  Different-site ladders commute,
+$\hat S^-_x\hat S^+_y=\hat S^+_y\hat S^-_x$ for $x\neq y$
+(\texttt{fermionSiteSpinMinus\_mul\_Plus\_comm}; the two even bilinears act on disjoint mode sets,
+so four cross-site anticommutations combine to $(-1)^4=+1$), whence the reversed ladder is also
+$\{0,1\}$-valued (\texttt{tJ\_exchange\_swap\_summand\_zero\_or\_one}, reusing the $(y,x)$ summand
+and the symmetry of \texttt{couplingOf}).  Through a matrix-element linearity helper
+$\texttt{tJME}(op)=\langle\Phi_{s'}|op|\Phi_s\rangle$ (additive, scalar-homogeneous, summable), the
+interaction element expands (\texttt{tJInteraction\_matrixElement\_eq}) to
+$-\tfrac12\sum_{x,y}(\texttt{couplingOf}\,x\,y\cdot\langle\hat S^+_x\hat S^-_y\rangle
++\texttt{couplingOf}\,x\,y\cdot\langle\hat S^-_x\hat S^+_y\rangle)$ once the density and $\hat S^3$
+products are dropped (PR-B6) and $\hat S_x\!\cdot\!\hat S_y=\tfrac12(\hat S^+_x\hat S^-_y+\hat
+S^-_x\hat S^+_y)+\hat S^3_x\hat S^3_y$ is split; each weighted summand lies in $\{0,1\}$, so the
+bond-sum is a non-negative real and \texttt{tJInteraction\_matrixElement\_nonpos} gives the
+exchange entry $-(J/2)\cdot(\geq0)\leq0$ (real part $\leq0$, imaginary part $0$).  Combined with the
+kinetic $-\tau\cdot(\geq0)$, \texttt{tJEffMatrix\_offdiag\_nonpos} concludes: for $\tau,J\geq0$, odd
+$N_e$, and $s'\neq s$, the entry $M_{s',s}=\langle\Phi_{s'}|\hat H_{\rm tJ}|\Phi_s\rangle$ is a
+non-positive real.  Every off-diagonal
 contribution is thus $-\tau$ (hopping), $-J/2$ (exchange), or $0$ (diagonal) --- all
-\emph{non-positive}, the hypothesis of the Perron--Frobenius Theorem A.18.  Remaining: the exchange
-$\langle\hat S^+\hat S^-+\hat S^-\hat S^+\rangle$ bond-sum assembly, the
+\emph{non-positive}, the hypothesis of the Perron--Frobenius Theorem A.18.  Remaining: the
 real-symmetric sector matrix and its irreducibility, the
 A.18 application, and the SU(2)-tower capstone that replaces the axiom.  The discharge lemmas add no
 new t-J axioms; the one inherited dependency is the A.17 sector reduction
