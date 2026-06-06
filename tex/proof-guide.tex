@@ -6337,7 +6337,13 @@ tJ}|\Phi_s\rangle$); the hard-core bra drops both projections
 ($\hat P_{\rm hc}\hat K\hat P_{\rm hc}|\Phi_s\rangle=\hat P_{\rm hc}(\hat K|\Phi_s\rangle)$,
 $(\hat P_{\rm hc}u)(\texttt{tJConfigOf}\,s')=u(\texttt{tJConfigOf}\,s')$), and the kinetic element
 expands as $\langle\Phi_{s'}|\hat K|\Phi_s\rangle=\sum_{\sigma,i,j}(\text{adj}\,i\,j)\,
-\langle\Phi_{s'}|\hat c^\dagger_{i\sigma}\hat c_{j\sigma}|\Phi_s\rangle$.  Every off-diagonal
+\langle\Phi_{s'}|\hat c^\dagger_{i\sigma}\hat c_{j\sigma}|\Phi_s\rangle$.  The \emph{general}
+single-hop element (\texttt{tJ\_hop\_matrixElement\_apply}, arbitrary $i,j,\sigma$ before any
+adjacency assumption) reads off the single-mode action at the bra configuration: it is the product
+of the two Jordan--Wigner string signs times the indicator $[\texttt{tJConfigOf}\,s'=\text{hopped
+config}]$ when the source $(j,\sigma)$ is occupied and the target $(i,\sigma)$ empty, and vanishes
+otherwise (\texttt{tJ\_hop\_matrixElement\_eq\_zero\_of\_source}/\texttt{\_of\_target}) --- the
+foundation for the per-term $\langle\hat K\rangle\geq0$ non-negativity.  Every off-diagonal
 contribution is thus $-\tau$ (hopping), $-J/2$ (exchange), or $0$ (diagonal) --- all
 \emph{non-positive}, the hypothesis of the Perron--Frobenius Theorem A.18.  Remaining: the
 $\langle\hat K\rangle\geq0$ assembly, the real-symmetric sector matrix and its irreducibility, the
