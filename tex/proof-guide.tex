@@ -6567,6 +6567,16 @@ H_{\rm tJ},\hat N]=0$ + hard-core preservation).  This homomorphism will transfe
 su(2)/Hermitian/commute relations to their $W$-compressions, enabling the matrix A.17 at the filling
 index.
 
+\emph{(xxvii) A.17 operators preserve $W$} (\texttt{TJFillingSpinCompress.lean}):
+$\texttt{preservesTJFillingW\_of\_commute}$ (an operator commuting with $\hat N$ and $\hat P_{\rm hc}$
+preserves $W$) and the submodule closure $\texttt{preservesTJFillingW\_smul/\_add/\_sub}$ give
+$\texttt{PreservesTJFillingW}$ for $\hat S^{(3)}$ ($\texttt{fermionTotalSpinZ}$), $\hat S^+$,
+$\hat S^-$, and the Cartesian $\hat S^{(1)}=\tfrac12(\hat S^++\hat S^-)$,
+$\hat S^{(2)}=-\tfrac{i}{2}(\hat S^+-\hat S^-)$ ($\texttt{tJTotalSpinOne}$/$\texttt{Two}$), plus
+$\texttt{fermionTotalSpinPlus\_commute\_fermionTotalNumber}$.  Together with
+$\texttt{preservesTJFillingW\_tJHamiltonian}$ these feed the compression homomorphism for the
+$W$-restricted A.17.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) by
 Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
