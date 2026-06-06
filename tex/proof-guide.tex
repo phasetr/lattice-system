@@ -6473,6 +6473,23 @@ $\texttt{basisVec}(\texttt{tJConfigOf}\,s)$), with the inverse \texttt{tJSiteSta
 and $\hat S_x\!\cdot\!\hat S_y$ are all number-conserving (the $\hat S^+\hat S^-$ ladders via
 \texttt{fermionTotalNumber\_commute\_hopping}), completing the conservation laws (the SU(2)
 $[\hat H_{\rm tJ},\hat S^\alpha]=0$ were already established).
+
+\emph{(xx) Hard-core preservation} (\texttt{TJHardcorePreserve.lean}): $\hat H_{\rm tJ}$ maps the
+no-double-occupancy subspace into itself (\texttt{tJHamiltonian\_mulVec\_mem\_hardcore}), via
+$[\hat H_{\rm tJ},\hat P_{\rm hc}]=0$ (\texttt{tJHamiltonian\_commute\_hubbardHardcoreProjection})
+and $\hat P_{\rm hc}(\hat H_{\rm tJ}v)=\hat H_{\rm tJ}(\hat P_{\rm hc}v)=\hat H_{\rm tJ}v$.  Each
+piece commutes with $\hat P_{\rm hc}=\prod_i(1-\hat n_{i\uparrow}\hat n_{i\downarrow})$: the kinetic
+sandwich $\hat P_{\rm hc}\hat K\hat P_{\rm hc}$ by idempotency $\hat P_{\rm hc}^2=\hat P_{\rm hc}$
+(\texttt{tJKinetic\_commute\_hubbardHardcoreProjection}), while the per-site
+$\hat S^\pm_x,\hat S^3_x,\hat n_x$ commute with every same-site double occupancy
+$\hat n_{i\uparrow}\hat n_{i\downarrow}$ (products of number operators, so simultaneously diagonal;
+the ladders by the Pauli-exclusion interaction-term commutator) --- hence with every hard-core
+factor and with their non-commutative product $\hat P_{\rm hc}$ --- so the density product
+$\hat n_x\hat n_y$ and the spin dot $\hat S_x\!\cdot\!\hat S_y$
+(\texttt{fermionSpinDot\_commute\_hubbardHardcoreProjection}) commute with $\hat P_{\rm hc}$.  This is
+the operator-side input to the sector-matrix lift, mirroring
+\texttt{fermionTotalSpinMinus\_mulVec\_mem\_hardcore}.
+
 Remaining: the operator lift $\hat H_{\rm tJ}(\texttt{tJExpansion}\,v)=\mu\cdot\texttt{tJExpansion}\,v$
 (showing $\hat H_{\rm tJ}|\Phi_s\rangle$ sector-supported via $[\hat H_{\rm tJ},\hat N]=[\hat H_{\rm
 tJ},\hat S^3]=0$ and hard-core preservation, then completeness), the total-spin
