@@ -84,4 +84,56 @@ theorem jwSign_mul_jwSign_update_forward (M : ℕ) (q p : Fin (M + 1)) (c : Fin 
   rw [hEp, show ∀ a b : ℕ, a + (a + b) = 2 * a + b from fun a b => by ring, pow_add, pow_mul]
   norm_num
 
+/-- **Backward-hop sign as a strictly-between parity.**  For a backward hop `q → p` (`p.val <
+q.val`, the source `q` above the target `p`) with the target empty (`c p = 0`), the product of the
+two Jordan–Wigner string signs equals `(-1)` to the number of occupied modes strictly between `p`
+and `q`.  Here the modes below the target contribute `E_p` to both signs (the empty target adds
+nothing), so `2·E_p` cancels in the parity. -/
+theorem jwSign_mul_jwSign_update_backward (M : ℕ) (q p : Fin (M + 1)) (c : Fin (M + 1) → Fin 2)
+    (hpq : p.val < q.val) (hcp : c p = 0) :
+    jwSign M q c * jwSign M p (Function.update c q 0)
+      = (-1 : ℂ) ^ (∑ k ∈ (Finset.univ : Finset (Fin (M + 1))).filter
+          (fun k => p.val < k.val ∧ k.val < q.val), (c k).val) := by
+  rw [jwSign_eq_neg_one_pow, jwSign_eq_neg_one_pow, ← pow_add]
+  -- `E_p' = E_p`: the update at `q > p` does not touch the modes below `p`
+  have hEp' : (∑ k ∈ (Finset.univ.filter (fun k : Fin (M + 1) => k.val < p.val)),
+        ((Function.update c q 0) k).val)
+      = ∑ k ∈ (Finset.univ.filter (fun k => k.val < p.val)), (c k).val :=
+    Finset.sum_congr rfl fun k hk => by
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hk
+      rw [Function.update_of_ne (fun h => by rw [h] at hk; omega)]
+  -- partition the modes below `q` into: below `p`, the (empty) target `p`, strictly between `p,q`
+  have hsplit : (Finset.univ.filter (fun k : Fin (M + 1) => k.val < q.val))
+      = (Finset.univ.filter (fun k => k.val < p.val))
+        ∪ insert p (Finset.univ.filter (fun k => p.val < k.val ∧ k.val < q.val)) := by
+    ext k
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_union, Finset.mem_insert]
+    constructor
+    · intro hk
+      rcases lt_trichotomy k.val p.val with h | h | h
+      · exact Or.inl h
+      · exact Or.inr (Or.inl (Fin.ext h))
+      · exact Or.inr (Or.inr ⟨h, hk⟩)
+    · rintro (h | rfl | ⟨_, h2⟩)
+      · omega
+      · exact hpq
+      · exact h2
+  have hpnotin : p ∉ (Finset.univ.filter (fun k : Fin (M + 1) =>
+      p.val < k.val ∧ k.val < q.val)) := by
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and]; omega
+  have hdisj : Disjoint (Finset.univ.filter (fun k : Fin (M + 1) => k.val < p.val))
+      (insert p (Finset.univ.filter (fun k => p.val < k.val ∧ k.val < q.val))) := by
+    rw [Finset.disjoint_left]
+    intro k hk hk'
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert] at hk hk'
+    rcases hk' with rfl | ⟨h, _⟩
+    · omega
+    · omega
+  have hEq : (∑ k ∈ (Finset.univ.filter (fun k : Fin (M + 1) => k.val < q.val)), (c k).val)
+      = (∑ k ∈ (Finset.univ.filter (fun k => k.val < p.val)), (c k).val)
+        + ∑ k ∈ (Finset.univ.filter (fun k => p.val < k.val ∧ k.val < q.val)), (c k).val := by
+    rw [hsplit, Finset.sum_union hdisj, Finset.sum_insert hpnotin, hcp]; simp
+  rw [hEp', hEq, show ∀ a b : ℕ, (a + b) + a = 2 * a + b from fun a b => by ring, pow_add, pow_mul]
+  norm_num
+
 end LatticeSystem.Fermion
