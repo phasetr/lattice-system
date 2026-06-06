@@ -6598,6 +6598,14 @@ the compression, via the rectangular adjoint identity $\langle c, T^{\mathsf H}y
 Tc,y\rangle$).  This connects the operator-side $\texttt{groundEnergyAtFilling}$ to the finite
 matrix $\hat H_W$, whose minimum eigenvalue is identified with $\mu$ via the $W$-restricted A.17.
 
+\emph{(xxx) Eigenvector lift} (\texttt{TJFillingEigenLift.lean}):
+$\texttt{mulVec\_tJFillingExpansion\_of\_compress\_eigen}$ --- if $A$ preserves $W$ and $\Phi$ is an
+eigenvector of $\texttt{compress}(A)$ at $E$, then $\texttt{tJFillingExpansion}\,\Phi$ is an
+eigenvector of $A$ at $E$ on $W$ (via the projection identity $T T^{\mathsf H}=\mathrm{id}$ on $W$),
+together with $\texttt{tJFillingExpansion\_mem\_tJFillingWSubmodule}$.  This turns the filling-index
+eigenstate produced by the matrix A.17 into a genuine $\hat H_{\rm tJ}$/$\hat S^3$-eigenstate inside
+$W$, the final input to $\texttt{groundEnergyAtFilling}=\mu$.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) by
 Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
