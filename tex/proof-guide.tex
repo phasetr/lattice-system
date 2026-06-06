@@ -6553,6 +6553,20 @@ completeness $\texttt{tJ\_filling\_completeness}$.  This is the orthonormal basi
 $\hat H_{\rm tJ}$ compresses to the filling effective matrix $\hat H_W$ (toward
 $\texttt{groundEnergyAtFilling}=\texttt{hermitianMinEigenvalue}\,\hat H_W$).
 
+\emph{(xxvi) $W$-projection + compression homomorphism} (\texttt{TJFillingCompress.lean}): the
+embedding $T=\texttt{tJFillingEmbedding}$ (columns $|\Phi_s\rangle$ over the filling index), the
+submodule $W=\texttt{tJFillingWSubmodule}=(\hat N=N_e)\text{-eigenspace}\sqcap H^{\rm hc}$, and the
+preservation predicate $\texttt{PreservesTJFillingW}\,B$ ($B$ maps $W\to W$).  The projection identity
+$\texttt{tJFillingProjection\_mulVec\_eq\_of\_mem}$ ($T T^{\mathsf H}$ fixes $W$, via
+$\texttt{Matrix.mulVec\_mulVec}$ + $\texttt{tJ\_filling\_completeness}$) yields the compression
+$\texttt{tJFillingCompress}\,A = T^{\mathsf H} A T$ and the \textbf{homomorphism}
+$\texttt{tJFillingCompress\_mul\_of\_right\_preserves}$: $\texttt{compress}(A)\,\texttt{compress}(B)
+=\texttt{compress}(AB)$ when $B$ preserves $W$ (the intermediate $T T^{\mathsf H}$ is invisible).
+$\texttt{preservesTJFillingW\_tJHamiltonian}$ records that $\hat H_{\rm tJ}$ preserves $W$ ($[\hat
+H_{\rm tJ},\hat N]=0$ + hard-core preservation).  This homomorphism will transfer the $\hat S^\alpha$
+su(2)/Hermitian/commute relations to their $W$-compressions, enabling the matrix A.17 at the filling
+index.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) by
 Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
