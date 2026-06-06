@@ -6352,9 +6352,19 @@ proven}: \texttt{tJ\_kinetic\_summand\_zero\_or\_one} shows each summand $\textt
 $\texttt{Fin}$-value cases \texttt{cycleGraph\_adj\_val\_cases}, to the rightward/leftward
 nearest-neighbour and wrap hop matrix elements, or to the source/target vanishing), whence
 \texttt{tJKinetic\_matrixElement\_nonneg} gives $0\leq\langle\Phi_{s'}|\hat K|\Phi_s\rangle$ (real
-part non-negative, imaginary part zero).  Every off-diagonal
+part non-negative, imaginary part zero).  The \emph{exchange} ladder is likewise $\{0,1\}$-valued
+(\texttt{TJExchangeNonneg.lean}): $\hat S^-_j=\hat c^\dagger_{j\downarrow}\hat c_{j\uparrow}$
+annihilates $|\Phi_s\rangle$ unless $s\,j=\uparrow$
+(\texttt{fermionSpinFlip\_matrixElement\_eq\_zero\_of\_source}), and with $s\,j=\uparrow$ but
+$s\,i\neq\downarrow$ ($i\neq j$) the subsequent $\hat S^+_i$ raising hits an empty down-orbital
+(\texttt{\_eq\_zero\_of\_target}); hence \texttt{tJ\_exchange\_summand\_zero\_or\_one}: each summand
+$\texttt{couplingOf}\,i\,j\cdot\langle\Phi_{s'}|\hat S^+_i\hat S^-_j|\Phi_s\rangle$ is $0$ or $1$
+(non-adjacent pairs killed by the coupling; an adjacent antiparallel pair gives the sign-free
+indicator $[\,s'=\texttt{tJSpinSwap}\,s\,i\,j\,]$), so the exchange off-diagonal entry
+$-(J/2)\cdot(\geq0)\leq0$.  Every off-diagonal
 contribution is thus $-\tau$ (hopping), $-J/2$ (exchange), or $0$ (diagonal) --- all
-\emph{non-positive}, the hypothesis of the Perron--Frobenius Theorem A.18.  Remaining: the
+\emph{non-positive}, the hypothesis of the Perron--Frobenius Theorem A.18.  Remaining: the exchange
+$\langle\hat S^+\hat S^-+\hat S^-\hat S^+\rangle$ bond-sum assembly, the
 real-symmetric sector matrix and its irreducibility, the
 A.18 application, and the SU(2)-tower capstone that replaces the axiom.  The discharge lemmas add no
 new t-J axioms; the one inherited dependency is the A.17 sector reduction
