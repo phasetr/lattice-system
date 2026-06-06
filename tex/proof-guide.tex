@@ -6606,6 +6606,14 @@ together with $\texttt{tJFillingExpansion\_mem\_tJFillingWSubmodule}$.  This tur
 eigenstate produced by the matrix A.17 into a genuine $\hat H_{\rm tJ}$/$\hat S^3$-eigenstate inside
 $W$, the final input to $\texttt{groundEnergyAtFilling}=\mu$.
 
+\emph{(xxxi) $\hat S^3$ diagonal on filling expansions; odd $N_e$ has no $\hat S^3=0$ state}
+(\texttt{TJFillingSpinZDiag.lean}): $\hat S^3_{\rm tot}$ scales the coefficient at $s$ by
+$\tfrac12(\#{\uparrow}-\#{\downarrow})$ ($\texttt{fermionTotalSpinZ\_mulVec\_tJFillingExpansion}$), and
+since for odd $N_e$ every filling state has $\#{\uparrow}\ne\#{\downarrow}$, the only $\hat S^3=0$
+filling state is $0$ ($\texttt{tJFillingExpansion\_eq\_zero\_of\_spinZ\_mulVec\_eq\_zero}$).  This
+kills the $\hat S^3=0$ branch of the $W$-restricted A.17 for odd $N_e$, forcing the
+$\hat S^3=\tfrac12$ sector.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) by
 Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
