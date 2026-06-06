@@ -1,5 +1,4 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorBasis
-import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheorem
 
 /-!
 # Tasaki 11.5: spin eigenvalues of the t-J sector basis (Prop 11.24 PR3a)

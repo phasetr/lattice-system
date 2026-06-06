@@ -1,7 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorShifted
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSwapReachable
 import LatticeSystem.Quantum.MarshallLiebMattis.MatrixPowExtend
-import Mathlib.LinearAlgebra.Matrix.Irreducible.Defs
 
 /-!
 # Tasaki 11.5: the shifted t-J sector matrix is irreducible (Prop 11.24 PR-C3b)

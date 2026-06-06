@@ -1,6 +1,4 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorHop
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorExchange
-import LatticeSystem.Lattice.Graph
 
 /-!
 # Tasaki 11.5: the elementary connectivity step on t-J sector states (Prop 11.24 PR-C1)

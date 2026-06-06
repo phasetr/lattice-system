@@ -1,8 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJExchangeNonneg
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJDiagonalMatrixElement
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJKineticSummand
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TJOffDiagonal
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TJEffMatrix
 import LatticeSystem.Math.AnticommuteCommute
 
 /-!

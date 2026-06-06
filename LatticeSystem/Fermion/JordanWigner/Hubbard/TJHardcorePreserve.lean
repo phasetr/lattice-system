@@ -1,6 +1,4 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TJModel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJHermitian
-import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonianSpinSymmetry
 
 /-!
 # Tasaki 11.5: the t-J Hamiltonian preserves the hard-core subspace (Prop 11.24 PR-E1b-hardcore)

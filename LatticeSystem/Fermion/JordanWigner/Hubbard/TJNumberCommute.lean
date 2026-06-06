@@ -1,4 +1,3 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TJModel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSpinSymmetry
 
 /-!

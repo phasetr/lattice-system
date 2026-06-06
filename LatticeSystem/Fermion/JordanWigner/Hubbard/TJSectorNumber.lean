@@ -1,5 +1,4 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorSpin
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiHopAction
 
 /-!
 # Tasaki 11.5: the electron-number eigenvalue of the t-J sector basis (Prop 11.24 PR3b)

@@ -1,9 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJKineticNonneg
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJKineticMatrixElement
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJOffDiagonal
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorHopBackward
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorHopBackwardWrap
-import LatticeSystem.Lattice.Graph
 
 /-!
 # Tasaki 11.5: each cyclic kinetic summand is `0` or `1` (Prop 11.24 PR-B7-3f)
