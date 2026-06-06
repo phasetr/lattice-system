@@ -6660,6 +6660,17 @@ configuration coefficients, so the strictly-positive Perron--Frobenius coordinat
 strictly-positive target coordinate, giving the non-vanishing $(\hat S^+)^{(N_e-1)/2}\Phi_0\neq 0$;
 fully axiom-free.
 
+\emph{(xxxv) Eigenvalue tracking along the spin-raising tower} (\texttt{TJRaisingTower.lean}, E3b
+PR2): $\texttt{fermionTotalSpinZ\_mulVec\_spinPlusPow}$ ($\hat S^3 (\hat S^+)^k v = (m+k)(\hat
+S^+)^k v$ --- each $\hat S^+$ step raises the $\hat S^3$ eigenvalue by one, via $[\hat S^3,\hat
+S^+]=\hat S^+$; the raising mirror of the lowering tower),
+$\texttt{tJHamiltonian\_mulVec\_spinPlusPow}$ ($\hat H_{\rm tJ}(\hat S^+)^k v=\mu(\hat S^+)^k v$, the
+energy preserved since $[\hat H_{\rm tJ},\hat S^+]=0$), and
+$\texttt{fermionTotalNumber\_mulVec\_spinPlusPow}$ ($\hat N(\hat S^+)^k v=N_e(\hat S^+)^k v$, the
+electron number preserved since $[\hat N,\hat S^+]=0$).  So $(\hat S^+)^k\Phi_0$, when nonzero, is a
+fixed-$N_e$, energy-$\mu$, $\hat S^3=\tfrac12+k$ eigenvector --- the building blocks for raising the
+strictly-positive Perron--Frobenius ground vector to a nonzero highest weight; fully axiom-free.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
