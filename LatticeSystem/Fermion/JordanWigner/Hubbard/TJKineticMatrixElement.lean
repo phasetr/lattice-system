@@ -1,4 +1,3 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorHopNN
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorHopWrap
 
 /-!

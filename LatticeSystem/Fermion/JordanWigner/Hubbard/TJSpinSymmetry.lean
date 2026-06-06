@@ -1,6 +1,4 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJModel
-import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinSymmetryAux
-import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonianSpinSymmetry
 
 /-!
 # Total-`Ŝ³` conservation of the ferromagnetic t-J model (Tasaki §11.5)

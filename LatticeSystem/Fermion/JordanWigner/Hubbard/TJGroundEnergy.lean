@@ -1,6 +1,4 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJEigenvectorLift
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorGroundState
-import LatticeSystem.Fermion.JordanWigner.Hubbard.GroundSubspaceAtFilling
 
 /-!
 # Tasaki 11.5: variational bound on the t-J ground energy (Prop 11.24 PR-E2, `≤` direction)

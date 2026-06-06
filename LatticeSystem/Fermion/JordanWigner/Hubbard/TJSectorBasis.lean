@@ -1,4 +1,3 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreBasis
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaGroundState
 
 /-!

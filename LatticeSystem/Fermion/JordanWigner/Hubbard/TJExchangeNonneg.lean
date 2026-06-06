@@ -1,5 +1,4 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJExchangeMatrixElement
-import LatticeSystem.Lattice.Graph
 
 /-!
 # Tasaki 11.5: the exchange spin-flip matrix element is `0` or `1` (Prop 11.24 PR-B7-3g)

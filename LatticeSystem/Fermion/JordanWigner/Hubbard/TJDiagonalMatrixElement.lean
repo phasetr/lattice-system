@@ -1,6 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJModel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorBasis
-import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheorem
 
 /-!
 # Tasaki 11.5: the diagonal terms have no off-diagonal matrix elements (Prop 11.24 PR-B6)

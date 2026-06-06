@@ -1,7 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJHermitian
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinTotHermitian
-import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheorem
-import LatticeSystem.Fermion.JordanWigner.Hubbard.SaturatedFerromagnetism
 import LatticeSystem.Math.TasakiAppendixA.AngularSpinHalfSector
 
 /-!

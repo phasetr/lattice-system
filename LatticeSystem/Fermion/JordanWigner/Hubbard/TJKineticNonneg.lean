@@ -1,5 +1,4 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorBasis
-import LatticeSystem.Fermion.JordanWigner.HopBasisVec
 
 /-!
 # Tasaki 11.5: the general single-hop matrix element on the sector basis (Prop 11.24 PR-B7-3d)

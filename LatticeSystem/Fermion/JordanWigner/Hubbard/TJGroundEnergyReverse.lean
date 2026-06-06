@@ -1,6 +1,4 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJGroundEnergy
-import LatticeSystem.Fermion.JordanWigner.Hubbard.TJOperatorLift
-import LatticeSystem.Quantum.SpinS.RealComplexEigenspaceBridge
 
 /-!
 # Tasaki 11.5: spin-½ `W`-eigenvalues are sector-matrix eigenvalues (Prop 11.24 PR-E2, `≥` crux)
