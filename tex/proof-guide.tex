@@ -6490,9 +6490,23 @@ $\hat n_x\hat n_y$ and the spin dot $\hat S_x\!\cdot\!\hat S_y$
 the operator-side input to the sector-matrix lift, mirroring
 \texttt{fermionTotalSpinMinus\_mulVec\_mem\_hardcore}.
 
-Remaining: the operator lift $\hat H_{\rm tJ}(\texttt{tJExpansion}\,v)=\mu\cdot\texttt{tJExpansion}\,v$
-(showing $\hat H_{\rm tJ}|\Phi_s\rangle$ sector-supported via $[\hat H_{\rm tJ},\hat N]=[\hat H_{\rm
-tJ},\hat S^3]=0$ and hard-core preservation, then completeness), the total-spin
+\emph{(xxi) Operator lift on a sector basis state} (\texttt{TJOperatorLift.lean}):
+$\hat H_{\rm tJ}|\Phi_s\rangle=\sum_{s'}\langle\Phi_{s'}|\hat H_{\rm tJ}|\Phi_s\rangle\,|\Phi_{s'}\rangle$
+(\texttt{tJHamiltonian\_mulVec\_tJConfigOf}) reassembles its sector-matrix column.  Since
+$\hat H_{\rm tJ}|\Phi_s\rangle$ stays hard-core and keeps the $\hat N=N_e$ / $\hat S^3=\tfrac12$
+eigenvalues (\texttt{tJHamiltonian\_mulVec\_preserves\_number}/\_spinZ, from
+$[\hat H_{\rm tJ},\hat N]=[\hat H_{\rm tJ},\hat S^3]=0$), it is supported on the sector
+configurations, where the basis is complete.  The key new input is the support restriction
+\texttt{tJ\_mulVec\_apply\_eq\_zero\_of\_not\_sector}: a hard-core $\hat N=N_e$, $\hat S^3=\tfrac12$
+eigenstate vanishes off the sector configurations, because a hard-core configuration with electron
+count $N_e$ and $\hat S^3$ count $\tfrac12$ is exactly a sector basis index (the diagonal actions
+\texttt{fermionTotalUpNumber/DownNumber/SpinZ\_mulVec\_apply} + the $\hat S^3$-shell vanishing
+\texttt{mulVec\_apply\_eq\_zero\_of\_spinZ\_ne}).  Mirrors the Nagaoka
+\texttt{hubbardEffectiveHamiltonian\_mulVec\_tasakiState}.
+
+Remaining: the full eigenvector lift $\hat H_{\rm tJ}(\texttt{tJExpansion}\,v)=\mu\cdot\texttt{tJExpansion}\,v$
+(the sector matrix $M=\texttt{tJEffReMatrixOnSector}$ acting on expansions, lifting the
+Perron--Frobenius eigenvector to an $\hat H_{\rm tJ}$-eigenvector), the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) by
 Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
 replaces the axiom.
