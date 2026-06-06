@@ -6543,6 +6543,16 @@ $\mu$, every such $E$ satisfies $\mu \le E$.  Remaining for E2-$\ge$: a $W$-rest
 the global-minimum $W$-eigenvector into the $\hat S^3=\tfrac12$ block (A.17 + odd $N_e$), completing
 $\texttt{groundEnergyAtFilling}=\mu$.
 
+\emph{(xxv) Full $\hat N=N_e$ filling basis} (\texttt{TJFillingBasis.lean}, the $W$-compression
+foundation): the all-$\hat S^3$ analog of the sector basis, indexing $W=(\hat N=N_e)\cap H^{\rm hc}$
+by $\texttt{TJFillingSector}\,N\,N_e=\{s : \mathrm{Fin}(N{+}1)\to\mathrm{Fin}\,3 \mid \#{\uparrow}+\#{\downarrow}=N_e\}$.
+With $\texttt{tJFillingExpansion}$/$\texttt{tJFillingExpansionCoeff}$ and the orthonormal left inverse,
+the support restriction $\texttt{tJ\_mulVec\_apply\_eq\_zero\_of\_not\_filling}$ (a hard-core
+$\hat N=N_e$ vector vanishes off the filling configurations — no $\hat S^3$ constraint), and
+completeness $\texttt{tJ\_filling\_completeness}$.  This is the orthonormal basis of $W$ in which
+$\hat H_{\rm tJ}$ compresses to the filling effective matrix $\hat H_W$ (toward
+$\texttt{groundEnergyAtFilling}=\texttt{hermitianMinEigenvalue}\,\hat H_W$).
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) by
 Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
