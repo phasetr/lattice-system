@@ -6627,9 +6627,28 @@ $\mu$ ($\le$ from the lifted PF eigenvector, $\ge$ from the A.17), packaged with
 PF eigenvector $v$.  \textbf{E2 (ground-energy identification) is complete}, resting only on Theorem
 A.17's documented \texttt{exists\_joint\_su2\_energy\_eigenstate}.
 
+\emph{(xxxiii) The $\hat S^3=\tfrac12$ ground block is at most one-dimensional}
+(\texttt{TJGroundSpinHalfFinrank.lean}, the SU(2) upper-bound seed):
+$\texttt{tJ\_groundSubmodule\_spinHalf\_finrank\_le\_one}$ proves
+$\dim_{\mathbb C}\bigl(\texttt{groundSubmoduleAtFilling}\,\hat H_{\rm tJ}\,N_e \sqcap (\hat S^3=\tfrac12)\bigr)\le 1$.
+The argument fixes the Perron--Frobenius datum once (so $\texttt{groundEnergyAtFilling}=\mu$ and the
+\emph{real} sector eigenspace at $\mu$ has $\dim_{\mathbb R}\le 1$); the real$\to$complex bridge
+$\texttt{matrix\_complex\_eigenspace\_finrank\_le\_one\_of\_real}$ promotes this to
+$\dim_{\mathbb C}\le 1$ for the complexified sector matrix
+$(\texttt{tJEffReMatrixOnSector}).\mathrm{map}\,(\cdot:\mathbb R\to\mathbb C)$ at $\mu$; and the block
+embeds into that eigenspace by the injective $\mathbb C$-linear map $\texttt{tJExpansionCoeff}_\ell$
+($\Phi\mapsto\texttt{tJExpansionCoeff}\,\Phi$, injective because every block element is
+sector-supported by $\texttt{tJ\_completeness}$), so
+$\texttt{LinearMap.finrank\_le\_finrank\_of\_injective}$ finishes.  The supporting lemma
+$\texttt{tJ\_spinHalf\_W\_complexSectorEigen}$ shows a hard-core $\hat N=N_e$, $\hat S^3=\tfrac12$
+eigenvector of $\hat H_{\rm tJ}$ at real $E$ has, as its coefficient vector, a complex eigenvector of
+the complexified sector matrix at $E$ (re-deriving the matrix action + sector-realness, injecting via
+$\texttt{tJExpansionCoeff\_tJExpansion}$); no new axioms.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) by
-Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
+Marshall-positive overlap, the SU(2)-tower lower bound (paired with this $\hat S^3=\tfrac12$ block
+bound for the upper bound), and the capstone that
 replaces the axiom.
 The discharge lemmas add no
 new t-J axioms; the one inherited dependency is the A.17 sector reduction
