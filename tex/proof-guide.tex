@@ -6683,6 +6683,15 @@ $\hat S^3=\tfrac12$, $\hat N=N_e$ ground state ($\hat N_\downarrow=(N_e-1)/2$), 
 $\Omega=(\hat S^+)^{(N_e-1)/2}\Phi$ satisfies $\hat S^+\Omega=0$ --- a highest weight; fully
 axiom-free.
 
+\emph{(xxxvii) The raised sector ground state is a highest weight} (\texttt{TJHighestWeight.lean},
+E3b PR4): $\texttt{tJ\_raised\_highestWeight}$ combines the tower tracking and termination --- a
+sector ground state $\Phi$ with $\hat S^3\Phi=\tfrac12\Phi$, $\hat N_\downarrow\Phi=m\Phi$, $\hat
+H_{\rm tJ}\Phi=\mu\Phi$ produces at the top $\Omega=(\hat S^+)^m\Phi$ a highest-weight ground state:
+$\hat S^+\Omega=0$, $\hat S^3\Omega=(m+\tfrac12)\Omega$, $\hat H_{\rm tJ}\Omega=\mu\Omega$.  For the
+d=1 ferromagnetic t-J ground state ($m=(N_e-1)/2$) this gives $\hat S^3\Omega=(N_e/2)\Omega$ --- the
+maximal-spin highest weight feeding $\texttt{highestWeight\_spinMultiplet\_general}$; the remaining
+input is $\Omega\neq 0$ (Marshall positivity).  Fully axiom-free.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
