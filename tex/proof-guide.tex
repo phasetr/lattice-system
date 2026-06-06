@@ -6462,8 +6462,15 @@ $\texttt{tJExpansion}\,v=\sum_s v_s\,|\Phi_s\rangle$, the coefficient functional
 $\texttt{tJExpansionCoeff}$, and the left inverse \texttt{tJExpansionCoeff\_tJExpansion} (the
 orthonormal sector basis makes the expansion injective), mirroring the Nagaoka
 \texttt{tasakiCoeff}/\texttt{tasakiCoeff\_expansion} bridge.
+\emph{(xviii) Sector-basis completeness} (\texttt{TJCompleteness.lean}): \texttt{tJ\_completeness} (a
+vector supported on the sector configurations equals its own sector expansion
+$\texttt{tJExpansion}\,(\texttt{tJExpansionCoeff}\,v)$, by direct orthogonality of the sign-free
+$\texttt{basisVec}(\texttt{tJConfigOf}\,s)$), with the inverse \texttt{tJSiteStateOf} and
+\texttt{tJConfigOf\_tJSiteStateOf\_of\_hardcore} ($\texttt{tJConfigOf}\circ\texttt{tJSiteStateOf}=
+\mathrm{id}$ on hard-core configurations).
 Remaining: the operator lift $\hat H_{\rm tJ}(\texttt{tJExpansion}\,v)=\mu\cdot\texttt{tJExpansion}\,v$
-(sector closure of $\hat H_{\rm tJ}$), the total-spin identification ($S_{\mathrm{tot}}=N_e/2$) by
+(showing $\hat H_{\rm tJ}|\Phi_s\rangle$ sector-supported, then completeness), the total-spin
+identification ($S_{\mathrm{tot}}=N_e/2$) by
 Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
 replaces the axiom.
 The discharge lemmas add no
