@@ -6405,7 +6405,18 @@ $\texttt{tJStep\_preserves\_sector}$: a step preserves $\#\!\uparrow$ and $\#\!\
 reachability closure of \texttt{TJStep} stays inside one $\hat N=N_e$, $\hat S^3=\tfrac12$ sector.
 This is the step relation whose positive matrix entries will feed
 \texttt{matrix\_pow\_succ\_pos\_of\_path} and \texttt{Matrix.isIrreducible\_iff\_exists\_pow\_pos}.
-Remaining: the step matrix-entry positivity, the sector connectivity, the
+\emph{(x) Per-step matrix-entry positivity} (\texttt{TJStepMatrixEntry.lean}).  For a hop $a\to b$,
+the moved-electron kinetic summand $\texttt{couplingOf}\,b\,a\cdot\langle\Phi_{s'}|\hat
+c^\dagger_{b\sigma}\hat c_{a\sigma}|\Phi_s\rangle=1$ (\texttt{tJ\_cycle\_hop\_kinetic\_summand\_eq\_one},
+dispatching the forward / backward / wrap directional matrix elements via
+\texttt{cycleGraph\_adj\_val\_cases}); since every kinetic summand is $\{0,1\}$-valued,
+\texttt{Finset.single\_le\_sum} gives $\langle\Phi_{s'}|\hat K|\Phi_s\rangle.\mathrm{re}\geq1$
+(\texttt{tJKinetic\_matrixElement\_re\_ge\_one\_of\_hop}).  For an exchange, the exchanged-pair
+ladder summand equals $1$, so the bond-sum has real part $\geq1$ and the interaction entry satisfies
+$\mathrm{re}\leq-J/2$.  Combining (\texttt{tJEffMatrix\_re\_neg\_of\_step}), for $\tau,J>0$ every
+$\texttt{TJStep}\,s\,s'$ gives $M_{s',s}.\mathrm{re}<0$ (a hop $\leq-\tau$, an exchange $\leq-J/2$),
+i.e. $B_{s',s}=-M_{s',s}>0$.
+Remaining: the sector reachability/connectivity (hole-routing + spin-sorting), the
 irreducibility of $-M$ + A.18 application, and the SU(2)-tower capstone that replaces the axiom.
 The discharge lemmas add no
 new t-J axioms; the one inherited dependency is the A.17 sector reduction
