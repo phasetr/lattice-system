@@ -102,9 +102,11 @@ private noncomputable def tJME (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
     (op : ManyBodyOp (Fin (2 * N + 2))) : ℂ :=
   ∑ w, basisVec (tJConfigOf N s') w * (op.mulVec (basisVec (tJConfigOf N s))) w
 
+/-- The matrix element of the zero operator vanishes. -/
 private theorem tJME_zero (N : ℕ) (s s' : Fin (N + 1) → Fin 3) : tJME N s s' 0 = 0 := by
   unfold tJME; rw [Matrix.zero_mulVec]; simp
 
+/-- The matrix element is additive in the operator. -/
 private theorem tJME_add (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
     (op₁ op₂ : ManyBodyOp (Fin (2 * N + 2))) :
     tJME N s s' (op₁ + op₂) = tJME N s s' op₁ + tJME N s s' op₂ := by
@@ -112,6 +114,7 @@ private theorem tJME_add (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
   rw [Matrix.add_mulVec]
   simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
+/-- The matrix element respects operator subtraction. -/
 private theorem tJME_sub (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
     (op₁ op₂ : ManyBodyOp (Fin (2 * N + 2))) :
     tJME N s s' (op₁ - op₂) = tJME N s s' op₁ - tJME N s s' op₂ := by
@@ -119,6 +122,7 @@ private theorem tJME_sub (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
   rw [Matrix.sub_mulVec]
   simp only [Pi.sub_apply, mul_sub, Finset.sum_sub_distrib]
 
+/-- The matrix element is homogeneous in the scalar multiplier of the operator. -/
 private theorem tJME_smul (N : ℕ) (s s' : Fin (N + 1) → Fin 3) (c : ℂ)
     (op : ManyBodyOp (Fin (2 * N + 2))) :
     tJME N s s' (c • op) = c * tJME N s s' op := by
@@ -127,6 +131,7 @@ private theorem tJME_smul (N : ℕ) (s s' : Fin (N + 1) → Fin 3) (c : ℂ)
   simp only [Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun w _ => by ring
 
+/-- The matrix element commutes with a finite operator sum. -/
 private theorem tJME_sum {ι : Type*} (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
     (t : Finset ι) (f : ι → ManyBodyOp (Fin (2 * N + 2))) :
     tJME N s s' (∑ i ∈ t, f i) = ∑ i ∈ t, tJME N s s' (f i) := by
@@ -136,6 +141,7 @@ private theorem tJME_sum {ι : Type*} (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
   · intro a t' ha ih
     rw [Finset.sum_insert ha, tJME_add, ih, Finset.sum_insert ha]
 
+/-- The matrix element respects operator negation. -/
 private theorem tJME_neg (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
     (op : ManyBodyOp (Fin (2 * N + 2))) :
     tJME N s s' (-op) = -tJME N s s' op := by
