@@ -6345,10 +6345,17 @@ config}]$ when the source $(j,\sigma)$ is occupied and the target $(i,\sigma)$ e
 otherwise (\texttt{tJ\_hop\_matrixElement\_eq\_zero\_of\_source}/\texttt{\_of\_target}, and
 \texttt{\_of\_target\_other} when the target site carries the opposite spin, so the hopped
 configuration would be doubly-occupied --- non-hard-core, hence unequal to any hard-core bra) ---
-the foundation for the per-term $\langle\hat K\rangle\geq0$ non-negativity.  Every off-diagonal
+the foundation for the per-term $\langle\hat K\rangle\geq0$ non-negativity, which is \emph{now
+proven}: \texttt{tJ\_kinetic\_summand\_zero\_or\_one} shows each summand $\texttt{couplingOf}\,i\,j
+\cdot\langle\Phi_{s'}|\hat c^\dagger_{i\sigma}\hat c_{j\sigma}|\Phi_s\rangle$ is $0$ or $1$
+(non-adjacent pairs killed by the coupling; an adjacent pair dispatched, via the four oriented
+$\texttt{Fin}$-value cases \texttt{cycleGraph\_adj\_val\_cases}, to the rightward/leftward
+nearest-neighbour and wrap hop matrix elements, or to the source/target vanishing), whence
+\texttt{tJKinetic\_matrixElement\_nonneg} gives $0\leq\langle\Phi_{s'}|\hat K|\Phi_s\rangle$ (real
+part non-negative, imaginary part zero).  Every off-diagonal
 contribution is thus $-\tau$ (hopping), $-J/2$ (exchange), or $0$ (diagonal) --- all
 \emph{non-positive}, the hypothesis of the Perron--Frobenius Theorem A.18.  Remaining: the
-$\langle\hat K\rangle\geq0$ assembly, the real-symmetric sector matrix and its irreducibility, the
+real-symmetric sector matrix and its irreducibility, the
 A.18 application, and the SU(2)-tower capstone that replaces the axiom.  The discharge lemmas add no
 new t-J axioms; the one inherited dependency is the A.17 sector reduction
 \texttt{tJHamiltonian\_eigenstate\_spin\_zero\_or\_half}, which rests on Theorem A.17's single
