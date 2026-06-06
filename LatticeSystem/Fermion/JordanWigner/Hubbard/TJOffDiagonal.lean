@@ -58,4 +58,28 @@ theorem tJKinetic_matrixElement_eq (N : ℕ) (G : SimpleGraph (Fin (N + 1))) [De
   rw [tJKinetic_sandwich_mulVec_tJConfigOf]
   rw [basisVec_sum_mul, basisVec_sum_mul, tJ_hardcore_proj_apply]
 
+/-- **The kinetic matrix element expands over the spin/site sums.**  `⟨Φ_{s'} | K | Φ_s⟩` is the
+graph-weighted sum over spins `σ` and sites `i, j` of the single-hop matrix elements
+`⟨Φ_{s'} | ĉ†_{iσ}ĉ_{jσ} | Φ_s⟩`. -/
+theorem tJKinetic_matrixElement_expand (N : ℕ) (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj]
+    (s s' : Fin (N + 1) → Fin 3) :
+    (∑ w, basisVec (tJConfigOf N s') w *
+        ((hubbardKineticOnGraph N G 1).mulVec (basisVec (tJConfigOf N s))) w)
+      = ∑ σ : Fin 2, ∑ i : Fin (N + 1), ∑ j : Fin (N + 1),
+          LatticeSystem.Lattice.couplingOf G (1 : ℂ) i j *
+            ∑ w, basisVec (tJConfigOf N s') w *
+              ((fermionMultiCreation (2 * N + 1) (spinfulIndex N i σ) *
+                  fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j σ)).mulVec
+                  (basisVec (tJConfigOf N s))) w := by
+  unfold hubbardKineticOnGraph hubbardKinetic
+  simp only [Matrix.sum_mulVec, Matrix.smul_mulVec, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
+    Finset.mul_sum]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun σ _ => ?_
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  exact Finset.sum_congr rfl fun w _ => by ring
+
 end LatticeSystem.Fermion
