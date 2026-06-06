@@ -6504,9 +6504,20 @@ count $N_e$ and $\hat S^3$ count $\tfrac12$ is exactly a sector basis index (the
 \texttt{mulVec\_apply\_eq\_zero\_of\_spinZ\_ne}).  Mirrors the Nagaoka
 \texttt{hubbardEffectiveHamiltonian\_mulVec\_tasakiState}.
 
-Remaining: the full eigenvector lift $\hat H_{\rm tJ}(\texttt{tJExpansion}\,v)=\mu\cdot\texttt{tJExpansion}\,v$
-(the sector matrix $M=\texttt{tJEffReMatrixOnSector}$ acting on expansions, lifting the
-Perron--Frobenius eigenvector to an $\hat H_{\rm tJ}$-eigenvector), the total-spin
+\emph{(xxii) Eigenvector lift} (\texttt{TJEigenvectorLift.lean}): a real Perron--Frobenius ground
+eigenvector $c$ of $\texttt{tJEffReMatrixOnSector}$ at eigenvalue $\mu$ lifts to an
+$\hat H_{\rm tJ}$-eigenvector at the same $\mu$,
+$\hat H_{\rm tJ}(\texttt{tJExpansion}\,c)=\mu\cdot\texttt{tJExpansion}\,c$
+(\texttt{tJHamiltonian\_mulVec\_tJExpansion\_ofReal}).  Two ingredients:
+\texttt{tJHamiltonian\_mulVec\_tJExpansion} ($\hat H_{\rm tJ}$ acts on a sector expansion as the
+effective matrix $M=\texttt{tJEffMatrix}$, from the raw-sum per-basis-state lift
+\texttt{tJHamiltonian\_mulVec\_tJConfigOf'} and the identification
+$\langle\Phi_{s'}|\hat H_{\rm tJ}|\Phi_s\rangle=M_{s',s}$), and the sector realness
+\texttt{tJEffMatrix\_sector\_im\_zero} (off-diagonals by \texttt{tJEffMatrix\_offdiag\_nonpos}, the
+diagonal by Hermiticity) which upgrades the real eigen-equation to the complex one.  Mirrors the
+Nagaoka \texttt{hubbardEffectiveHamiltonian\_mulVec\_tasakiExpansion}.
+
+Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) by
 Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
 replaces the axiom.
