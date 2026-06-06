@@ -6468,8 +6468,14 @@ $\texttt{tJExpansion}\,(\texttt{tJExpansionCoeff}\,v)$, by direct orthogonality 
 $\texttt{basisVec}(\texttt{tJConfigOf}\,s)$), with the inverse \texttt{tJSiteStateOf} and
 \texttt{tJConfigOf\_tJSiteStateOf\_of\_hardcore} ($\texttt{tJConfigOf}\circ\texttt{tJSiteStateOf}=
 \mathrm{id}$ on hard-core configurations).
+\emph{(xix) Charge conservation} (\texttt{TJNumberCommute.lean}): $[\hat H_{\rm tJ},\hat N]=0$
+(\texttt{fermionTotalNumber\_commute\_tJHamiltonian}) --- the kinetic sandwich, $\hat n_x\hat n_y$,
+and $\hat S_x\!\cdot\!\hat S_y$ are all number-conserving (the $\hat S^+\hat S^-$ ladders via
+\texttt{fermionTotalNumber\_commute\_hopping}), completing the conservation laws (the SU(2)
+$[\hat H_{\rm tJ},\hat S^\alpha]=0$ were already established).
 Remaining: the operator lift $\hat H_{\rm tJ}(\texttt{tJExpansion}\,v)=\mu\cdot\texttt{tJExpansion}\,v$
-(showing $\hat H_{\rm tJ}|\Phi_s\rangle$ sector-supported, then completeness), the total-spin
+(showing $\hat H_{\rm tJ}|\Phi_s\rangle$ sector-supported via $[\hat H_{\rm tJ},\hat N]=[\hat H_{\rm
+tJ},\hat S^3]=0$ and hard-core preservation, then completeness), the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) by
 Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
 replaces the axiom.
