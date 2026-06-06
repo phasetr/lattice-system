@@ -6341,8 +6341,11 @@ expands as $\langle\Phi_{s'}|\hat K|\Phi_s\rangle=\sum_{\sigma,i,j}(\text{adj}\,
 contribution is thus $-\tau$ (hopping), $-J/2$ (exchange), or $0$ (diagonal) --- all
 \emph{non-positive}, the hypothesis of the Perron--Frobenius Theorem A.18.  Remaining: the
 $\langle\hat K\rangle\geq0$ assembly, the real-symmetric sector matrix and its irreducibility, the
-A.18 application, and the SU(2)-tower capstone that replaces the axiom.  All discharge lemmas are
-axiom-free.
+A.18 application, and the SU(2)-tower capstone that replaces the axiom.  The discharge lemmas add no
+new t-J axioms; the one inherited dependency is the A.17 sector reduction
+\texttt{tJHamiltonian\_eigenstate\_spin\_zero\_or\_half}, which rests on Theorem A.17's single
+documented axiom \texttt{exists\_joint\_su2\_energy\_eigenstate}.  Every other layer (the
+hop/exchange/diagonal sign computations and the matrix-element machinery) is fully axiom-free.
 
 \medskip\noindent\textbf{The d=1 decorated Hubbard model, Lemma 11.25 and Theorem 11.26
 (Tasaki §11.5.3, axiomatized).}  Tasaki obtains a rigorous example of \emph{metallic}
