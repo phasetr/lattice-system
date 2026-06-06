@@ -6577,6 +6577,15 @@ $\texttt{fermionTotalSpinPlus\_commute\_fermionTotalNumber}$.  Together with
 $\texttt{preservesTJFillingW\_tJHamiltonian}$ these feed the compression homomorphism for the
 $W$-restricted A.17.
 
+\emph{(xxviii) Compressed $\hat H_W$, $\hat S^{(\alpha)}_W$ satisfy the A.17 hypotheses}
+(\texttt{TJFillingCompressSpinAlgebra.lean}): via the compression homomorphism and $\texttt{compress}$
+linearity ($\texttt{tJFillingCompress\_smul}$/$\texttt{\_sub}$/$\texttt{\_isHermitian}$), the
+$W$-compressions inherit Hermiticity, the su(2) relations
+$\texttt{tJFillingCompress\_su2\_12/\_23/\_31}$ ($[\hat S^{(1)}_W,\hat S^{(2)}_W]=i\hat S^3_W$ etc.)
+and $\hat H_W$-commutativity $\texttt{tJFillingCompress\_tJHamiltonian\_commute\_one/\_two/\_three}$.
+These are exactly the inputs of the matrix Theorem A.17
+($\texttt{exists\_joint\_su2\_energy\_eigenstate}$), to be applied at the filling index next.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) by
 Marshall-positive overlap, the SU(2)-tower lower bound, the A.17 upper bound, and the capstone that
