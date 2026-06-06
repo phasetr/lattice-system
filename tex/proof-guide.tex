@@ -6365,7 +6365,11 @@ $-(J/2)\cdot(\geq0)\leq0$.  \emph{(vii) The full off-diagonal $M_{s',s}\leq0$ is
 (\texttt{TJExchangeBondSum.lean}).  Different-site ladders commute,
 $\hat S^-_x\hat S^+_y=\hat S^+_y\hat S^-_x$ for $x\neq y$
 (\texttt{fermionSiteSpinMinus\_mul\_Plus\_comm}; the two even bilinears act on disjoint mode sets,
-so four cross-site anticommutations combine to $(-1)^4=+1$), whence the reversed ladder is also
+so four cross-site anticommutations combine to $(-1)^4=+1$, through the generic ring helpers
+\texttt{anticomm\_commute\_mul} / \texttt{anticomm\_commute\_mul\_mul} of
+\texttt{Math/AnticommuteCommute.lean}: an element anticommuting with both factors of a product
+commutes with the even product, and two even products of pairwise-anticommuting factors commute),
+whence the reversed ladder is also
 $\{0,1\}$-valued (\texttt{tJ\_exchange\_swap\_summand\_zero\_or\_one}, reusing the $(y,x)$ summand
 and the symmetry of \texttt{couplingOf}).  Through a matrix-element linearity helper
 $\texttt{tJME}(op)=\langle\Phi_{s'}|op|\Phi_s\rangle$ (additive, scalar-homogeneous, summable), the
