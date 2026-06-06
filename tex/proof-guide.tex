@@ -6384,8 +6384,18 @@ kinetic $-\tau\cdot(\geq0)$, \texttt{tJEffMatrix\_offdiag\_nonpos} concludes: fo
 $N_e$, and $s'\neq s$, the entry $M_{s',s}=\langle\Phi_{s'}|\hat H_{\rm tJ}|\Phi_s\rangle$ is a
 non-positive real.  Every off-diagonal
 contribution is thus $-\tau$ (hopping), $-J/2$ (exchange), or $0$ (diagonal) --- all
-\emph{non-positive}, the hypothesis of the Perron--Frobenius Theorem A.18.  Remaining: the
-real-symmetric sector matrix and its irreducibility, the
+\emph{non-positive}, the hypothesis of the Perron--Frobenius Theorem A.18.  \emph{(viii) The
+real-symmetric sector matrix} (\texttt{TJSectorMatrix.lean}).  The Perron--Frobenius step acts on the
+fixed $\hat N=N_e$, $\hat S^3=\tfrac12$ sector $\texttt{TJSpinHalfFillingSector}\,N\,N_e$ (site-states
+$s$ with $\#\!\uparrow=\#\!\downarrow+1$ and $\#\!\uparrow+\#\!\downarrow=N_e$), where the wrap-hop is
+sign-free and the entries are real.  The real form
+$\texttt{tJEffReMatrix}\,s'\,s=(\texttt{tJEffMatrix}\,s'\,s).\mathrm{re}$ restricts to that sector by
+$\texttt{submatrix}\,\texttt{Subtype.val}$ as $\texttt{tJEffReMatrixOnSector}$, and
+$\texttt{tJEffReMatrixOnSector\_isSymm}$ proves symmetry directly from the Hermiticity of
+$\texttt{tJEffMatrix}$: $M_{q,p}=\overline{M_{p,q}}$, so their real parts agree (no global realness of
+the full matrix is needed --- it is only sector-real, since the wrap sign $(-1)^{N_e-1}$ depends on
+the electron parity).  This is the $\texttt{Matrix}\ \cdots\ \mathbb R$ that feeds Theorem A.18.
+Remaining: the irreducibility of $-M$ on a non-empty sector, the
 A.18 application, and the SU(2)-tower capstone that replaces the axiom.  The discharge lemmas add no
 new t-J axioms; the one inherited dependency is the A.17 sector reduction
 \texttt{tJHamiltonian\_eigenstate\_spin\_zero\_or\_half}, which rests on Theorem A.17's single
