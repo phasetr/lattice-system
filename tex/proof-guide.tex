@@ -6645,9 +6645,24 @@ eigenvector of $\hat H_{\rm tJ}$ at real $E$ has, as its coefficient vector, a c
 the complexified sector matrix at $E$ (re-deriving the matrix action + sector-realness, injecting via
 $\texttt{tJExpansionCoeff\_tJExpansion}$); no new axioms.
 
+\emph{(xxxiv) The single-site spin-raising operator is sign-free on the sector basis}
+(\texttt{TJSectorRaise.lean}, E3b PR1, toward lifting the PF vector to a highest weight):
+$\texttt{fermionSiteSpinPlus\_mulVec\_tJConfigOf\_of\_down}$ proves $\hat S^+_x|\Phi_s\rangle =
+|\Phi_{s,\,x\mapsto\uparrow}\rangle$ (for $s\,x=\downarrow$) with net Jordan--Wigner sign $+1$:
+$\hat S^+_x=\hat c^\dagger_{x\uparrow}\hat c_{x\downarrow}$ acts on the \emph{adjacent} orbitals
+$(x\uparrow,x\downarrow)=(2x,2x+1)$ (since $\texttt{spinfulIndex}\,N\,x\,\sigma=2x+\sigma$), and the
+up-orbital $2x$ is empty before the move, so the two strings collapse
+($\texttt{jwSign\_succ\_cancel\_high}$); the companion
+$\texttt{fermionSiteSpinPlus\_mulVec\_tJConfigOf\_of\_not\_down}$ gives $\hat S^+_x|\Phi_s\rangle=0$
+for $s\,x\neq\downarrow$, and the config identity $\texttt{tJConfigOf\_update\_raise}$ records the
+orbital update.  This Marshall sign-freeness makes the iterated $(\hat S^+)^m$ have nonnegative
+configuration coefficients, so the strictly-positive Perron--Frobenius coordinates ($v_q>0$) yield a
+strictly-positive target coordinate, giving the non-vanishing $(\hat S^+)^{(N_e-1)/2}\Phi_0\neq 0$;
+fully axiom-free.
+
 Remaining: the total-spin
-identification ($S_{\mathrm{tot}}=N_e/2$) by
-Marshall-positive overlap, the SU(2)-tower lower bound (paired with this $\hat S^3=\tfrac12$ block
+identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
+lower bound (paired with this $\hat S^3=\tfrac12$ block
 bound for the upper bound), and the capstone that
 replaces the axiom.
 The discharge lemmas add no
