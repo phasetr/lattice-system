@@ -6321,8 +6321,12 @@ nearest-neighbour bond (the single intervening orbital is empty) and to $(-1)^{N
 periodic wrap bond $\{0,N\}$ for \emph{odd} $N_e$ (a three-way mode split shows the strictly-between
 occupation is $N_e-1$).  Hence for an allowed nearest-neighbour or wrap hop the kinetic matrix
 element $\langle\Phi_{s'}|\hat c^\dagger_{b\sigma}\hat c_{a\sigma}|\Phi_s\rangle=[\,s'=
-\texttt{tJSiteHop}\,s\,a\,b\,]\in\{0,1\}$, and it vanishes for every non-adjacent or
-occupation-forbidden term.  \emph{(iv) Sign-free exchange.}  The ladder $\hat S^+_i\hat S^-_j=\hat
+\texttt{tJSiteHop}\,s\,a\,b\,]\in\{0,1\}$.  (Occupation-forbidden terms --- empty source or occupied
+target --- already vanish at the operator level, $\hat c_{a\sigma}|\Phi_s\rangle=0$ or the creation
+hitting a filled mode; the remaining non-adjacent hops, whose per-term element need not vanish, are
+removed only by the coupling coefficient $\texttt{couplingOf}\,G\,1\,i\,j=0$ inside the kinetic
+sum $\langle\Phi_{s'}|\hat K|\Phi_s\rangle=\sum_{\sigma,i,j}(\texttt{couplingOf}\,G\,1\,i\,j)\,
+\langle\Phi_{s'}|\hat c^\dagger_{i\sigma}\hat c_{j\sigma}|\Phi_s\rangle$.)  \emph{(iv) Sign-free exchange.}  The ladder $\hat S^+_i\hat S^-_j=\hat
 c^\dagger_{i\uparrow}\hat c_{i\downarrow}\hat c^\dagger_{j\downarrow}\hat c_{j\uparrow}$ maps an
 antiparallel pair to $|\Phi_{\texttt{tJSpinSwap}\,s\,i\,j}\rangle$ with net sign $+1$ (each same-site
 creation/annihilation pair contributes a squared string sign $=1$), giving the off-diagonal exchange
