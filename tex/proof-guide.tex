@@ -6966,7 +6966,17 @@ sign-free spin-swap action ($\texttt{fermionSiteSpinPlus\_mul\_Minus\_mulVec\_tJ
 same-site creation/annihilation pairs squaring to $1$).  Hence a ground state of $\texttt{tJExchange}$
 has spin-swap-invariant amplitudes on every bond --- the input to the degeneracy upper bound (a
 connected graph's edge swaps generate $S_{N+1}$, so the amplitudes depend only on the up-count, a
-$(N{+}2)$-dimensional symmetric space).  Axiom-free.
+$(N{+}2)$-dimensional symmetric space).  Axiom-free.  PR3i-2
+($\texttt{TJHalfFillingBondGround.lean}$) discharges the first half of that programme:
+$\texttt{tJ\_ground\_bond\_mulVec\_eq\_zero}$ shows a half-filling ground state $v$ is annihilated by
+\emph{every} adjacent bond, $(\tfrac14\hat n_x\hat n_y-\hat S_x\!\cdot\!\hat S_y)v=0$.  Indeed
+$\texttt{tJ\_ground\_tJExchange\_mulVec\_eq\_zero}$ gives $\texttt{tJExchange}\,v=0$ (ground energy
+$0$, $\hat H_{tJ}=J\cdot\texttt{tJExchange}$, $J>0$), so $\langle v,\texttt{tJExchange}\,v\rangle=0$;
+each bond term $\langle v,\text{bond}_{xy}v\rangle\ge 0$ (positive-semidefinite), so by
+$\texttt{Finset.single\_le\_sum}$ every bond term vanishes, whence $\Delta_{xy}v=0$ (using
+$\text{bond}=\tfrac12\Delta^\dagger\Delta$ and $\texttt{dotProduct\_star\_self\_eq\_zero}$) and
+$\text{bond}_{xy}v=0$.  With PR3i-1 this makes the ground amplitudes spin-swap invariant on every
+bond.  Axiom-free.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
