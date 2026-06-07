@@ -6717,6 +6717,14 @@ contributing $1$).  With the uniform sector down-count $\#{\downarrow}=(N_e-1)/2
 $\texttt{coeffSum}((\hat S^+)^{(N_e-1)/2}\Phi_0)=((N_e-1)/2)!\cdot\sum_q v_q>0$ (from $v>0$), so the
 raised vector is nonzero.  Fully axiom-free.
 
+\emph{(xli) Coefficient sum of a filling expansion} (\texttt{TJFillingCoeffSum.lean}, E3b PR5b-3a):
+$\texttt{coeffSum\_tJFillingExpansion}$ ($\texttt{coeffSum}(\texttt{tJFillingExpansion}\,v)=\sum_s
+v_s$) and $\texttt{coeffSum\_fermionTotalSpinPlus\_tJFillingExpansion}$
+($\texttt{coeffSum}(\hat S^+_{\rm tot}(\texttt{tJFillingExpansion}\,v))=\sum_s v_s\,\#{\downarrow}(s)$).
+Together they give the recursion $\texttt{coeffSum}(\hat S^+\psi)=d\cdot\texttt{coeffSum}\,\psi$ for a
+hard-core $\hat N_\downarrow$-eigenvector $\psi$ at $d$ (both sides equal $\sum_s v_s\#{\downarrow}(s)$),
+the multiplicative step for the iterated-raising positivity.  Fully axiom-free.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
