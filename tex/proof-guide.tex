@@ -6954,7 +6954,19 @@ S^3_{\mathrm{tot}}=\tfrac{N+1}{2}$, $\hat H_{tJ}|{\uparrow\cdots\uparrow}\rangle
 \texttt{groundEnergy}\cdot|{\uparrow\cdots\uparrow}\rangle$, $\hat N=N{+}1$, hard-core), so the
 SU(2) lowering tower $\texttt{highestWeight\_spinMultiplet\_general}$ yields $N{+}2$ linearly
 independent ground states $(\hat S^-_{\mathrm{tot}})^k|{\uparrow\cdots\uparrow}\rangle$ (the
-maximal-spin multiplet; mirrors the $N_e<N{+}1$ lower bound).  Axiom-free.
+maximal-spin multiplet; mirrors the $N_e<N{+}1$ lower bound).  Axiom-free.  PR3i
+($\texttt{TJHalfFillingBondAction.lean}$) proves the per-bond action
+$\texttt{tJExchangeBond\_mulVec\_tJConfigOf\_full}$: on a filled $|\Phi_s\rangle$ ($x\ne y$),
+$(\tfrac14\hat n_x\hat n_y-\hat S_x\!\cdot\!\hat S_y)|\Phi_s\rangle =
+\tfrac12(|\Phi_s\rangle-|\Phi_{\texttt{tJSpinSwap}\,s\,x\,y}\rangle)$ --- the singlet projector
+$\tfrac12(1-\mathrm{SWAP}_{xy})$ on the configuration basis.  The diagonal
+$\tfrac14\hat n_x\hat n_y-\hat S^3_x\hat S^3_y$ and ladder
+$\tfrac12(\hat S^+_x\hat S^-_y+\hat S^-_x\hat S^+_y)$ combine over the four spin cases, using the
+sign-free spin-swap action ($\texttt{fermionSiteSpinPlus\_mul\_Minus\_mulVec\_tJConfigOf}$, the two
+same-site creation/annihilation pairs squaring to $1$).  Hence a ground state of $\texttt{tJExchange}$
+has spin-swap-invariant amplitudes on every bond --- the input to the degeneracy upper bound (a
+connected graph's edge swaps generate $S_{N+1}$, so the amplitudes depend only on the up-count, a
+$(N{+}2)$-dimensional symmetric space).  Axiom-free.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
