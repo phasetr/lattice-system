@@ -6892,6 +6892,17 @@ lowest band is partially filled), reducing to the insulating Heisenberg ferromag
 $N_e=K+1$.  Tasaki derives it from Proposition 11.24 and Lemma 11.25 (Perron--Frobenius); the
 proof is deferred (Issue \#4198).
 
+\emph{Discharge in progress (Issue \#4314).}  With Proposition 11.24 now proved, Theorem 11.26
+is being discharged from Lemma 11.25 (kept as the documented strong-coupling-limit axiom) plus the
+$t$-$J$ side for all $N_e\le K+1$: the metallic range $N_e<K+1$ is supplied by
+\texttt{proposition\_11\_24}, and the half-filling boundary $N_e=K+1$ reduces to the ferromagnetic
+Heisenberg model because the kinetic term vanishes there.  The first step
+(\texttt{TJHalfFillingKinetic.lean}) proves
+$\texttt{tJ\_kinetic\_sandwich\_mulVec\_tJConfigOf\_eq\_zero\_of\_full}$: for a fully occupied site
+state ($\forall k,\,s_k\neq 0$, i.e.\ $N_e=N+1$), $\hat P_{\rm hc}\hat K\hat P_{\rm hc}|\Phi_s\rangle=0$
+--- every hop lands on an occupied site, producing a doubly occupied (non-hard-core) configuration
+killed by the projection.  Axiom-free.
+
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
 ferromagnetism in a Hubbard model in \emph{arbitrary} dimension is the Tanaka--Tasaki model on
