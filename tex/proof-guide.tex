@@ -6775,6 +6775,16 @@ hard-core subspace, every tower member is again a ground state in
 $\texttt{groundSubmoduleAtFilling}$, so $\texttt{LinearIndependent.of\_comp}$ +
 $\texttt{fintype\_card\_le\_finrank}$ give the bound.  Rests only on A.17's documented axiom.
 
+\emph{(xlvii) SU(2) ladder injectivity on weight spaces} (\texttt{TJLadderInjective.lean}, E5):
+$\texttt{fermionTotalSpin\_ladder\_norm}$ --- the norm identity $\|\hat S^- v\|^2=\|\hat S^+ v\|^2+2sz
+\|v\|^2$ for a weight vector $\hat S^3 v=sz\cdot v$ (from $[\hat S^+,\hat S^-]=2\hat S^3$ and $(\hat
+S^-)^{\mathsf H}=\hat S^+$, via $\texttt{star}\,w\cdot w=\overline{\sum\|w_i\|^2}$); consequences
+$\texttt{fermionTotalSpinMinus\_mulVec\_ne\_zero\_of\_spinZ\_pos}$ ($\hat S^-$ injective for $sz>0$)
+and $\texttt{fermionTotalSpinPlus\_mulVec\_ne\_zero\_of\_spinZ\_neg}$ ($\hat S^+$ injective for
+$sz<0$).  No representation theory --- these ladder injections embed each $\hat S^3$-weight space of
+the ground subspace into $\hat S^3=\pm\tfrac12$, giving (via E3a) the upper bound $\dim\le N_e+1$.
+Fully axiom-free.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
