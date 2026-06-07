@@ -6835,6 +6835,16 @@ C$ supremum collapses to the $N_e+1$ occurring half-integer weights).  This is t
 decomposition; the internal-direct-sum finrank with the per-block bound ($\le 1$, item (l)) then
 gives $\dim G\le N_e+1$.  Rests only on A.17's documented axiom.
 
+\emph{(liii) Degeneracy upper bound $\dim G\le N_e+1$}
+(\texttt{TJGroundDegeneracyUpper.lean}, E5b): $\texttt{tJ\_groundSubmodule\_finrank\_le}$.
+The $N_e+1$ half-integer weight blocks $G\sqcap\ker(\hat S^3-(a-N_e/2))$ are independent
+(\texttt{Module.End.eigenspaces\_iSupIndep}), so they form an internal direct sum of $G$
+($\texttt{DirectSum.coeLinearMap}$ injective with range $G$, then
+$\texttt{Module.finrank\_directSum}$); with the per-block bound ($\le 1$, item (l)) this gives
+$\dim G=\sum_a\dim(\text{block})\le (N_e+1)\cdot 1$.  Paired with the SU(2)-tower lower bound
+$N_e+1\le\dim G$ ($\texttt{tJ\_groundSubmodule\_finrank\_ge}$) this pins $\dim G=N_e+1$, the input to
+the maximal-spin multiplet capstone.  Rests only on A.17's documented axiom.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
