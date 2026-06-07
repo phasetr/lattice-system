@@ -55,7 +55,7 @@ theorem tJUpCountRep_upCount (j : Fin (N + 2)) :
 half filling has dimension at most `N+2`: a ground state is determined by its amplitudes, which are
 constant on each of the `N+2` up-count classes, so evaluating at one representative per class is an
 injective linear map into `Fin (N+2) → ℂ`. -/
-theorem tJ_halfFilling_groundSubmodule_finrank_le (hpos : 0 < N) (τ J : ℝ) (hJ : 0 < J) :
+theorem tJ_halfFilling_groundSubmodule_finrank_le (τ J : ℝ) (hJ : 0 < J) :
     finrank ℂ
       ↥(groundSubmoduleAtFilling (tJHamiltonian N (cycleGraph (N + 1)) τ J) (N + 1)) ≤ N + 2 := by
   classical
@@ -92,7 +92,7 @@ theorem tJ_halfFilling_groundSubmodule_finrank_le (hpos : 0 < N) (τ J : ℝ) (h
         = (Finset.univ.filter (fun k => (tJUpCountRep j).val k = 1)).card := by
       rw [tJUpCountRep_upCount j]
     have : (v : (Fin (2 * N + 2) → Fin 2) → ℂ) (tJConfigOf N t.val) = 0 := by
-      rw [tJ_ground_amplitude_eq_of_same_upCount hpos τ J hJ v.2 t (tJUpCountRep j) hsame,
+      rw [tJ_ground_amplitude_eq_of_same_upCount τ J hJ v.2 t (tJUpCountRep j) hsame,
         hv0' j]
     rw [hcoeff, this, zero_smul]
   have hle := LinearMap.finrank_le_finrank_of_injective hinj
