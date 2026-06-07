@@ -76,7 +76,7 @@ theorem fermionTotalSpinZ_iSup_eigenspace_eq_top (N : ℕ) :
   by_cases hwc : w = c
   · subst hwc; rfl
   · have hzero : (Pi.basisFun ℂ (Fin (2 * N + 2) → Fin 2) c) w = 0 := by
-      simp [Pi.basisFun_apply, Pi.single_apply, hwc]
+      simp [Pi.basisFun_apply, hwc]
     rw [hzero, mul_zero, mul_zero]
 
 /-- **`Ŝ³` weight decomposition of the ground subspace.**  Since `Ŝ³` preserves `G` and its
