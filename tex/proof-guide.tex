@@ -6702,6 +6702,13 @@ $\texttt{fermionTotalDownNumber\_mulVec\_tJExpansion}$ ($\hat N_\downarrow(\text
 Perron--Frobenius ground vector $\Phi_0=\texttt{tJExpansion}(\mathbb C\circ v)$ with $m=(N_e-1)/2$;
 fully axiom-free.
 
+\emph{(xxxix) The total raising operator on a sector basis state} (\texttt{TJTotalRaiseAction.lean},
+E3b PR5b-1): $\texttt{fermionTotalSpinPlus\_mulVec\_tJConfigOf}$ --- $\hat S^+_{\rm tot}|\Phi_s\rangle
+= \sum_{x : s\,x=\downarrow} |\Phi_{s,\,x\mapsto\uparrow}\rangle$, the sign-free expansion (every term
+has coefficient $+1$, summing the single-site action over sites).  This is the keystone for the
+config-nonnegativity argument: the iterated raising preserves nonnegative configuration coefficients,
+so $(\hat S^+)^{(N_e-1)/2}\Phi_0\neq 0$ follows from $v>0$.  Fully axiom-free.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
