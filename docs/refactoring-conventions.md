@@ -987,3 +987,19 @@ mechanically** and catch most regressions / drift.
   split trigger (~16s); each file is small (one-/few-theorem grain), so
   **no split warranted**. The chain is well-factored; build-speed healthy;
   no code change.
+- **2026-06-07 (PR #4303, 20-PR cadence checkpoint, evaluate-only)**:
+  Build-speed checkpoint for the t-J Proposition 11.24 discharge chain
+  (Issue #4230, PRs #4277–#4302: operator↔sector-matrix bridge, ground
+  energy `= μ`, the `Ŝ³=½` block `finrank ≤ 1`, and the full E3b raising
+  machinery — sign-free single/total raising action, tower eigenvalue
+  tracking, termination, conditional highest weight, the coefficient-sum
+  functional and recursion, hard-core preservation, and the Marshall
+  positivity non-vanishing). The ~30 new `TJ*.lean` modules are all small
+  (≤ 282 lines; the largest is `TJExchangeBondSum.lean` at 282, then
+  `TJSpinSymmetry.lean` 251, `TJStepMatrixEntry.lean` 242) — every file is
+  split at the one-/few-theorem grain and each single-file rebuild is
+  light (a few seconds), well under the historical split trigger
+  (~2000–4000 lines / ~16s). The chain carries zero linter warnings (the
+  only warnings in the build are pre-existing in `Quantum/SpinS/Rayleigh*`).
+  **No split warranted**; the chain is well-factored; build-speed and
+  import hygiene healthy; no code change.
