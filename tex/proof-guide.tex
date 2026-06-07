@@ -6735,6 +6735,14 @@ $\texttt{coeffSum}(\hat N_\downarrow\psi)=d\cdot\texttt{coeffSum}\,\psi$ by the 
 multiplicative step driving $\texttt{coeffSum}((\hat S^+)^k\Phi_0)$ to $((N_e-1)/2)!\cdot\sum_q v_q>0$.
 Fully axiom-free.
 
+\emph{(xliii) The raising operator preserves the hard-core subspace} (\texttt{TJRaiseHardcore.lean},
+E3b PR5c): $\texttt{fermionTotalSpinPlus\_mulVec\_mem\_hardcore}$ ($\hat S^+_{\rm tot}$ maps the
+hard-core subspace into itself, mirror of the $\hat S^-_{\rm tot}$ version via
+$\texttt{fermionTotalSpinPlus\_commute\_hubbardHardcoreProjection}$) and
+$\texttt{fermionTotalSpinPlus\_pow\_mulVec\_mem\_hardcore}$ (the tower $(\hat S^+)^k v$ stays
+hard-core).  This keeps every tower state $(\hat S^+)^k\Phi_0$ hard-core --- the prerequisite for the
+coefficient-sum recursion along the tower.  Fully axiom-free.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
