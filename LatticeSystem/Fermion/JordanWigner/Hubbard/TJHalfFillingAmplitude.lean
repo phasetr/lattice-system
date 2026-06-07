@@ -37,6 +37,7 @@ theorem tJSpinSwap_involutive_site (s : Fin (N + 1) → Fin 3) (x y : Fin (N + 1
 def tJFillingSwap (x y : Fin (N + 1)) (s : TJFillingSector N (N + 1)) : TJFillingSector N (N + 1) :=
   ⟨tJSpinSwap s.val x y, by rw [tJSpinSwap_count, tJSpinSwap_count]; exact s.2⟩
 
+/-- The underlying site-state of the sector spin-swap is the site-state spin-swap. -/
 @[simp] theorem tJFillingSwap_val (x y : Fin (N + 1)) (s : TJFillingSector N (N + 1)) :
     (tJFillingSwap x y s).val = tJSpinSwap s.val x y := rfl
 
