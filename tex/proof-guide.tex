@@ -6995,7 +6995,14 @@ and each adjacent swap preserves the amplitude (PR3i-3a) by induction on
 $\texttt{AdjacentSwapReachable}$ (the reflexive--transitive closure of adjacent bond swaps; the empty
 count is preserved so every intermediate configuration is full).  There are $N{+}2$ up-counts
 $\{0,\dots,N{+}1\}$, so this is the last combinatorial input to the upper bound
-$\dim\le N{+}2$.  Axiom-free.
+$\dim\le N{+}2$.  Axiom-free.  PR3i-3c ($\texttt{TJHalfFillingDegeneracyUpper.lean}$) closes the upper
+bound: $\texttt{tJ\_halfFilling\_groundSubmodule\_finrank\_le}$ proves $\dim G\le N{+}2$.  A ground
+state is determined by its amplitudes ($\texttt{tJ\_filling\_completeness}$), which are constant on
+each up-count class, so evaluating at one representative per class ($\texttt{tJUpCountRep}\,j$ = the
+config with the first $j$ sites up) is an injective linear map $G\hookrightarrow(\mathrm{Fin}\,(N{+}2)\to\mathbb C)$
+($\texttt{LinearMap.finrank\_le\_finrank\_of\_injective}$, codomain dimension $N{+}2$).  Paired with the
+SU(2)-tower lower bound (\#4326) this pins $\dim G=N{+}2$ --- the dimension half of the half-filling
+case of Theorem 11.26.  Axiom-free.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
