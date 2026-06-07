@@ -38,7 +38,9 @@ theorem tJ_exists_maximalSpin_highestWeight_groundState (hpos : 0 < N) (Ne : ℕ
       (fermionTotalSpinPlus N).mulVec Ω = 0 ∧
       (fermionTotalSpinZ N).mulVec Ω = ((Ne : ℂ) / 2) • Ω ∧
       (tJHamiltonian N (cycleGraph (N + 1)) τ J).mulVec Ω =
-        ((groundEnergyAtFilling (tJHamiltonian N (cycleGraph (N + 1)) τ J) Ne : ℝ) : ℂ) • Ω := by
+        ((groundEnergyAtFilling (tJHamiltonian N (cycleGraph (N + 1)) τ J) Ne : ℝ) : ℂ) • Ω ∧
+      Ω ∈ hubbardHardcoreSubspace N ∧
+      (fermionTotalNumber (2 * N + 1)).mulVec Ω = (Ne : ℂ) • Ω := by
   classical
   haveI : Fact (Ne < N + 1) := ⟨hNeLt⟩
   haveI : Fact (Odd Ne) := ⟨hodd⟩
@@ -84,7 +86,9 @@ theorem tJ_exists_maximalSpin_highestWeight_groundState (hpos : 0 < N) (Ne : ℕ
     exact_mod_cast ne_of_gt hsumpos
   -- the highest weight Ω
   refine ⟨((fermionTotalSpinPlus N) ^ m).mulVec Φ₀,
-    spinPlusPow_ne_zero_of_coeffSum_ne_zero Ne m Φ₀ hΦhc hΦN hΦd hcs, ?_, ?_, ?_⟩
+    spinPlusPow_ne_zero_of_coeffSum_ne_zero Ne m Φ₀ hΦhc hΦN hΦd hcs, ?_, ?_, ?_,
+    fermionTotalSpinPlus_pow_mulVec_mem_hardcore N m hΦhc,
+    fermionTotalNumber_mulVec_spinPlusPow N Φ₀ (Ne : ℂ) m hΦN⟩
   · exact (tJ_raised_highestWeight N (cycleGraph (N + 1)) τ J (μ : ℂ) m Φ₀ hΦsz hΦd hΦH).1
   · rw [(tJ_raised_highestWeight N (cycleGraph (N + 1)) τ J (μ : ℂ) m Φ₀ hΦsz hΦd hΦH).2.1]
     congr 1
