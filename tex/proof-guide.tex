@@ -6785,6 +6785,15 @@ $sz<0$).  No representation theory --- these ladder injections embed each $\hat 
 the ground subspace into $\hat S^3=\pm\tfrac12$, giving (via E3a) the upper bound $\dim\le N_e+1$.
 Fully axiom-free.
 
+\emph{(xlviii) Weight-space finrank non-increasing toward $\tfrac12$} (\texttt{TJGroundWeightFinrank.lean},
+E5b): $\texttt{fermionTotalSpinMinus\_mulVec\_mem\_groundSubmodule}$ ($\hat S^-$ preserves $G$),
+$\texttt{fermionTotalSpinZ\_mulVec\_fermionTotalSpinMinus\_mulVec}$ ($\hat S^-$ lowers the $\hat S^3$
+weight by one), and $\texttt{tJ\_ground\_weight\_finrank\_le\_succ}$: for $sz\ge 0$, $\dim(G\sqcap\hat
+S^3{=}sz{+}1)\le\dim(G\sqcap\hat S^3{=}sz)$ ($\hat S^-$ injects the $sz{+}1$ weight space into the $sz$
+one, by the ladder injectivity at $sz{+}1>0$).  Iterating to $\tfrac12$ (and up from below via $\hat
+S^+$) bounds every weight space by the $\hat S^3=\tfrac12$ block ($\le 1$, E3a) --- the route to
+$\dim G\le N_e+1$.  Rests only on A.17's documented axiom.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
