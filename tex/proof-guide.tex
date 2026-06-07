@@ -6916,7 +6916,14 @@ and $|{\uparrow\cdots\uparrow}\rangle$ has exchange energy $0$.  Axiom-free.  PR
 (\texttt{TJAllUpGround.lean}) concludes $\texttt{tJHamiltonian\_mulVec\_allUpState\_eq\_zero}$:
 $\hat H_{tJ}|{\uparrow\cdots\uparrow}\rangle=0$ at half-filling (kinetic vanishes, exchange vanishes),
 so the maximal-spin $|{\uparrow\cdots\uparrow}\rangle$ is a zero-energy eigenstate of the
-half-filling ferromagnetic Heisenberg model.  Axiom-free.
+half-filling ferromagnetic Heisenberg model.  Axiom-free.  Towards positive-semidefiniteness
+(PR3c-prep, \texttt{TJSingletAnnihilation.lean}) we introduce the \emph{singlet annihilation}
+operator $\Delta_{xy}=\hat c_{y\downarrow}\hat c_{x\uparrow}-\hat c_{y\uparrow}\hat c_{x\downarrow}$,
+with $\Delta_{xy}^\dagger=\hat c^\dagger_{x\uparrow}\hat c^\dagger_{y\downarrow}-\hat
+c^\dagger_{x\downarrow}\hat c^\dagger_{y\uparrow}$ and $\Delta_{xy}|{\uparrow\cdots\uparrow}\rangle=0$
+(it kills the fully aligned state).  The Heisenberg bond is $\hat n_x\hat n_y/4-\hat S_x\cdot\hat
+S_y=\tfrac12\,\Delta_{xy}^\dagger\Delta_{xy}$ (a global operator identity, follow-up), hence
+positive-semidefinite.  Axiom-free.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
