@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandModel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJModel
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TJMaximalSpinUnified
 
 /-!
 # Tasaki §11.5.3: the d = 1 decorated Hubbard model (towards Theorem 11.26)
@@ -166,12 +167,18 @@ at once by `IsMaximalSpinMultipletSubmodule`.  The ground states are *metallic* 
 (the lowest band is partially filled, density `Ne/L < 1`) and reduce to the insulating
 Heisenberg ferromagnet at `Ne = K + 1`.  Tasaki derives this from Proposition 11.24 (the t-J
 side) and Lemma 11.25 (the equivalence) via a Perron–Frobenius argument; recorded as a
-documented axiom. -/
-axiom theorem_11_26 (K : ℕ) (ν s : ℝ) (hν : 0 < ν) (hs : 0 < s) (Ne : ℕ)
+PROVED from Lemma 11.25 (the documented strong-coupling equivalence axiom) and the t-J side
+(`tJ_isMaximalSpinMultiplet_of_le`). -/
+theorem theorem_11_26 (K : ℕ) (ν s : ℝ) (hν : 0 < ν) (hs : 0 < s) (Ne : ℕ)
     (hNe : Ne ≤ K + 1) (hodd : Odd Ne) :
     ∃ T V : ℝ, 0 < T ∧ 0 < V ∧
       ∀ t U : ℝ, T ≤ t → V ≤ U →
         IsMaximalSpinMultipletSubmodule (3 * K + 2)
-          (groundSubmoduleAtFilling (decHubbardHamiltonian K ν s t U) Ne) Ne
+          (groundSubmoduleAtFilling (decHubbardHamiltonian K ν s t U) Ne) Ne := by
+  obtain ⟨T, V, W, hT, hV, hW, hiff⟩ := lemma_11_25 K ν s hν hs Ne hNe
+  refine ⟨T, V, hT, hV, fun t U htT hUV => ?_⟩
+  rw [hiff t U W htT hUV (le_refl W)]
+  exact tJ_isMaximalSpinMultiplet_of_le K ((1 + 4 * ν ^ 2) * s) W
+    (mul_pos (by positivity) hs) hW Ne hNe hodd
 
 end LatticeSystem.Fermion
