@@ -7020,6 +7020,20 @@ the $0<N$ hypothesis --- $\texttt{adjacentSwapReachable\_of\_same\_counts\_gener
 single-site $N=0$ case by reflexivity --- so the $K=0$ boundary is covered.)  This is the t-J input to
 Theorem 11.26; it rests on the A.17 axiom through Proposition 11.24.
 
+\medskip\noindent\textbf{Theorem 11.26 (metallic ferromagnetism in the d=1 Hubbard model) is now a
+proved theorem.}  PR-final discharges the former axiom in $\texttt{MetallicFerroModel.lean}$:
+$\texttt{theorem\_11\_26}$ states that for the d=1 decorated Hubbard model
+$\texttt{decHubbardHamiltonian}\,K\,\nu\,s\,t\,U$ with odd $N_e\le K{+}1$, there are thresholds
+$T,V>0$ such that for $t\ge T$, $U\ge V$ the ground subspace at filling $N_e$ is the maximal-spin
+$(N_e{+}1)$-fold multiplet.  The proof takes the thresholds $T,V,W$ from Lemma 11.25 (the documented
+strong-coupling Hubbard$\leftrightarrow$t-J equivalence axiom), applies its biconditional at hopping
+$\tau=(1+4\nu^2)s$ and $J=W$ to rewrite the Hubbard ground-multiplet claim into the t-J one, and
+closes with $\texttt{tJ\_isMaximalSpinMultiplet\_of\_le}$.  Thus
+$\texttt{\#print axioms theorem\_11\_26}$ is
+$[\texttt{propext},\texttt{Classical.choice},\texttt{Quot.sound},\texttt{lemma\_11\_25},
+\texttt{exists\_joint\_su2\_energy\_eigenstate}]$: the result rests only on the two documented
+Tasaki-level axioms (the strong-coupling equivalence and A.17).
+
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
 ferromagnetism in a Hubbard model in \emph{arbitrary} dimension is the Tanaka--Tasaki model on
