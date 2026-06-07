@@ -6938,7 +6938,12 @@ $\texttt{Matrix.posSemidef\_conjTranspose\_mul\_self}$).  Axiom-free.  PR3e
 (\texttt{TJExchangePSD.lean}) sums over the graph: $\texttt{tJExchange\_posSemidef}$ proves
 $(\texttt{tJExchange}\ N\ G)$ is positive-semidefinite (a $\texttt{Finset.sum\_induction}$ over the
 per-bond PSD terms), the operator nonnegativity behind the half-filling ground energy $=0$.
-Axiom-free.
+Axiom-free.  PR3f (\texttt{TJHalfFillingReduction.lean}) extends the per-basis results to the whole
+sector: $\texttt{tJFillingSector\_full}$ ($N_e=N{+}1\Rightarrow$ fully occupied),
+$\texttt{tJ\_kinetic\_sandwich\_mulVec\_eq\_zero\_of\_filling}$, and
+$\texttt{tJHamiltonian\_mulVec\_eq\_smul\_tJExchange\_of\_filling}$ ($\hat H_{tJ}v=J\cdot
+\texttt{tJExchange}\,v$ for any hard-core $\hat N{=}N{+}1$ vector $v$) --- so on the half-filling
+sector $\hat H_{tJ}=J\cdot\texttt{tJExchange}$.  Axiom-free.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
