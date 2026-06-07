@@ -6709,6 +6709,14 @@ has coefficient $+1$, summing the single-site action over sites).  This is the k
 config-nonnegativity argument: the iterated raising preserves nonnegative configuration coefficients,
 so $(\hat S^+)^{(N_e-1)/2}\Phi_0\neq 0$ follows from $v>0$.  Fully axiom-free.
 
+\emph{(xl) Coefficient sum of the raising action} (\texttt{TJRaiseCoeffSum.lean}, E3b PR5b-2): the
+linear functional $\texttt{coeffSum}\,\psi=\sum_c\psi_c$ with $\texttt{coeffSum\_basisVec}$
+($\texttt{coeffSum}\,|c\rangle=1$) and $\texttt{coeffSum\_fermionTotalSpinPlus\_tJConfigOf}$
+($\texttt{coeffSum}(\hat S^+_{\rm tot}|\Phi_s\rangle)=\#{\downarrow}(s)$, each raised basis state
+contributing $1$).  With the uniform sector down-count $\#{\downarrow}=(N_e-1)/2$, iterating gives
+$\texttt{coeffSum}((\hat S^+)^{(N_e-1)/2}\Phi_0)=((N_e-1)/2)!\cdot\sum_q v_q>0$ (from $v>0$), so the
+raised vector is nonzero.  Fully axiom-free.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
