@@ -92,4 +92,24 @@ axiom nonsingular_lemma_11_23 (ν : ℝ) (hν : 0 < ν) :
         ∀ (i : Fin (K + 1)) (twoS : ℕ), twoS < K + 1 →
           0 < sectorMinEnergy (nonsingularLocalHamiltonian K ν s t U (clam * s) cκ i) twoS
 
+/-- **Tasaki Theorem 11.20 (ferromagnetism in the non-singular Hubbard model), PROVED** (`d = 1`).
+For every `ν > 0` there are thresholds `T, V > 0` (depending only on `ν`, uniformly in the system
+size `K`) such that, whenever `t/s ≥ T` and `U/s ≥ V` (with `t, s, U > 0`), the Tasaki non-singular
+Hubbard model exhibits saturated ferromagnetism `exhibitsFerromagnetism H (K+1)`.
+
+Tasaki's proof (§11.4.3): Lemma 11.22 supplies parameters `lam = clam·s`, `κ = cκ` for which every
+local Hamiltonian `ĥ_p` is positive-semidefinite once `t/s ≥ T`, `U/s ≥ V`; Lemma 11.21 then turns
+that frustration-freeness into saturated ferromagnetism (via the reduction to Theorem 11.11).  This
+discharges the former `axiom tasaki_theorem_11_20`, leaving Lemmas 11.21/11.22 (and 11.23) as the
+remaining documented axioms of §11.4. -/
+theorem tasaki_theorem_11_20 (ν : ℝ) (hν : 0 < ν) :
+    ∃ T V : ℝ, 0 < T ∧ 0 < V ∧
+      ∀ (K : ℕ) (t s U : ℝ), 0 < s → 0 < t → 0 < U →
+        T ≤ t / s → V ≤ U / s →
+        exhibitsFerromagnetism (tasakiNonsingularHamiltonian K ν t s U) (K + 1) := by
+  obtain ⟨T, V, clam, cκ, hT, hV, _, _, hpos⟩ := nonsingular_lemma_11_22 ν hν
+  refine ⟨T, V, hT, hV, fun K t s U hs ht hU hTt hVU => ?_⟩
+  exact nonsingular_lemma_11_21 K ν s t U (clam * s) cκ hs
+    (hpos K s t U hs ht hU hTt hVU)
+
 end LatticeSystem.Fermion

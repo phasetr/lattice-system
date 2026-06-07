@@ -48,18 +48,8 @@ theorem tasakiNonsingularHamiltonian_zero_s (K : ℕ) (ν t U : ℝ) :
   unfold tasakiNonsingularHamiltonian
   simp
 
-/-- **Tasaki Theorem 11.20 (ferromagnetism in the non-singular Hubbard model), AXIOM**
-(`d = 1` version).  For every `ν > 0` there are thresholds `T, V > 0` (depending only on `ν`,
-uniformly in the system size `K`) such that, whenever `t/s ≥ T` and `U/s ≥ V` (with
-`t, s, U > 0`), the Tasaki non-singular Hubbard model exhibits saturated ferromagnetism:
-`E_min(S_max) < E_min(S)` for all `S ≠ S_max = N/2` (electron number `N = |E| = K+1`,
-`twoS_max = K+1`).  Tasaki proves this via Lemmas 11.21/11.22 (the frustration-free local
-Hamiltonians `ĥ_p`) and a reduction to Theorem 11.11; the proof is deep and is recorded here
-as a documented axiom. -/
-axiom tasaki_theorem_11_20 (ν : ℝ) (hν : 0 < ν) :
-    ∃ T V : ℝ, 0 < T ∧ 0 < V ∧
-      ∀ (K : ℕ) (t s U : ℝ), 0 < s → 0 < t → 0 < U →
-        T ≤ t / s → V ≤ U / s →
-        exhibitsFerromagnetism (tasakiNonsingularHamiltonian K ν t s U) (K + 1)
+-- **Tasaki Theorem 11.20** (ferromagnetism in the non-singular Hubbard model, `d = 1`) is proved
+-- as `tasaki_theorem_11_20` in `NonsingularLocalHamiltonian.lean`, downstream of the
+-- frustration-free local Hamiltonians `ĥ_p` and Lemmas 11.21/11.22 it is reduced to.
 
 end LatticeSystem.Fermion
