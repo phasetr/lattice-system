@@ -6794,6 +6794,15 @@ one, by the ladder injectivity at $sz{+}1>0$).  Iterating to $\tfrac12$ (and up 
 S^+$) bounds every weight space by the $\hat S^3=\tfrac12$ block ($\le 1$, E3a) --- the route to
 $\dim G\le N_e+1$.  Rests only on A.17's documented axiom.
 
+\emph{(xlix) Weight-space finrank from below via $\hat S^+$} (\texttt{TJGroundWeightFinrankRaise.lean},
+E5b mirror): $\texttt{fermionTotalSpinPlus\_mulVec\_mem\_groundSubmodule}$ ($\hat S^+$ preserves $G$),
+$\texttt{fermionTotalSpinZ\_mulVec\_fermionTotalSpinPlus\_mulVec}$ ($\hat S^+$ raises the $\hat S^3$
+weight by one), and $\texttt{tJ\_ground\_weight\_finrank\_le\_of\_spinZ\_neg}$: for $sz<0$,
+$\dim(G\sqcap\hat S^3{=}sz)\le\dim(G\sqcap\hat S^3{=}sz{+}1)$ ($\hat S^+$ injects the $sz$ weight space
+into $sz{+}1$, by the ladder injectivity at $sz<0$).  With the $\hat S^-$ step this bounds every weight
+space by the $\hat S^3=\tfrac12$ block ($\le 1$, E3a); the remaining input is the $\hat S^3$ direct-sum
+to assemble $\dim G\le N_e+1$.  Rests only on A.17's documented axiom.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
