@@ -6901,7 +6901,11 @@ Heisenberg model because the kinetic term vanishes there.  The first step
 $\texttt{tJ\_kinetic\_sandwich\_mulVec\_tJConfigOf\_eq\_zero\_of\_full}$: for a fully occupied site
 state ($\forall k,\,s_k\neq 0$, i.e.\ $N_e=N+1$), $\hat P_{\rm hc}\hat K\hat P_{\rm hc}|\Phi_s\rangle=0$
 --- every hop lands on an occupied site, producing a doubly occupied (non-hard-core) configuration
-killed by the projection.  Axiom-free.
+killed by the projection.  Axiom-free.  PR2 (\texttt{TJHalfFillingExchange.lean}) then reduces the
+full Hamiltonian: $\texttt{tJHamiltonian\_mulVec\_tJConfigOf\_eq\_of\_full}$ gives
+$\hat H_{tJ}|\Phi_s\rangle=J\cdot\texttt{tJExchange}\,|\Phi_s\rangle$ for a fully occupied $s$, where
+$\texttt{tJExchange}=\sum_{x,y}[G.\mathrm{Adj}]\,(\hat n_x\hat n_y/4-\hat S_x\cdot\hat S_y)$ --- i.e.\
+at half-filling $\hat H_{tJ}$ is the ferromagnetic Heisenberg model.  Axiom-free.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
