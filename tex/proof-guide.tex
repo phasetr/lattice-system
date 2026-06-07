@@ -6923,7 +6923,14 @@ with $\Delta_{xy}^\dagger=\hat c^\dagger_{x\uparrow}\hat c^\dagger_{y\downarrow}
 c^\dagger_{x\downarrow}\hat c^\dagger_{y\uparrow}$ and $\Delta_{xy}|{\uparrow\cdots\uparrow}\rangle=0$
 (it kills the fully aligned state).  The Heisenberg bond is $\hat n_x\hat n_y/4-\hat S_x\cdot\hat
 S_y=\tfrac12\,\Delta_{xy}^\dagger\Delta_{xy}$ (a global operator identity, follow-up), hence
-positive-semidefinite.  Axiom-free.
+positive-semidefinite.  Axiom-free.  PR3c (\texttt{TJExchangeBondPSD.lean}) proves the underlying CAR
+identity $\texttt{tJSingletAnnihilation\_conjTranspose\_mul\_self}$: for $x\neq y$,
+$\Delta_{xy}^\dagger\Delta_{xy}=\hat n_{x\uparrow}\hat n_{y\downarrow}+\hat n_{x\downarrow}\hat
+n_{y\uparrow}-\hat S^+_x\hat S^-_y-\hat S^-_x\hat S^+_y$, by expanding the four products and reordering
+with the cross-site (anti)commutators (\texttt{TJCrossSiteSpinCommute.lean}: $[\hat c_{x\uparrow},\hat
+S^+_y]=[\hat c_{x\downarrow},\hat S^-_y]=0$).  This is the operator content behind $\hat n_x\hat
+n_y/4-\hat S_x\cdot\hat S_y=\tfrac12\Delta_{xy}^\dagger\Delta_{xy}$ (and hence the bond's
+positive-semidefiniteness).  Axiom-free.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
