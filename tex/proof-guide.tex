@@ -6754,6 +6754,18 @@ N_\downarrow$ tower lemmas), nonzero for $k<m$, so $\texttt{coeffSum}$ stays non
 Applied to $\Phi_0=\texttt{tJExpansion}(\mathbb C\circ v)$ ($\texttt{coeffSum}=\sum_q v_q>0$,
 $m=(N_e-1)/2$) this is the Marshall non-vanishing $\Omega\neq 0$.  Fully axiom-free.
 
+\emph{(xlv) A maximal-spin highest-weight ground state} (\texttt{TJMaximalSpinGroundState.lean}, E4
+PR6a): $\texttt{tJ\_exists\_maximalSpin\_highestWeight\_groundState}$ assembles the whole E3b chain ---
+for odd $N_e<N+1$ and $\tau,J>0$ there is a nonzero $\Omega$ with $\hat S^+\Omega=0$, $\hat
+S^3\Omega=(N_e/2)\Omega$, $\hat H_{\rm tJ}\Omega=\mu\Omega$ at $\mu=\texttt{groundEnergyAtFilling}$.
+Here $\Omega=(\hat S^+)^{(N_e-1)/2}(\texttt{tJExpansion}(\mathbb C\circ v))$ for the strictly-positive
+Perron--Frobenius eigenvector $v$: non-vanishing from
+$\texttt{spinPlusPow\_ne\_zero\_of\_coeffSum\_ne\_zero}$ ($\texttt{coeffSum}=\sum_q v_q>0$),
+highest-weight from $\texttt{tJ\_raised\_highestWeight}$, and
+$\texttt{groundEnergyAtFilling}=\mu$ from the E2 bounds.  This $\Omega$ feeds
+$\texttt{highestWeight\_spinMultiplet\_general}$ for the $N_e+1$ multiplet.  Rests only on A.17's
+documented axiom.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
