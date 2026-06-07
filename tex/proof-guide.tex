@@ -6766,6 +6766,15 @@ $\texttt{groundEnergyAtFilling}=\mu$ from the E2 bounds.  This $\Omega$ feeds
 $\texttt{highestWeight\_spinMultiplet\_general}$ for the $N_e+1$ multiplet.  Rests only on A.17's
 documented axiom.
 
+\emph{(xlvi) Ground degeneracy lower bound} (\texttt{TJGroundDegeneracyLower.lean}, E4):
+$\texttt{tJ\_groundSubmodule\_finrank\_ge}$ --- the d=1 ferromagnetic t-J ground subspace at odd
+filling $N_e<N+1$ has $N_e+1\le\dim$.  The maximal-spin highest weight $\Omega$ generates via
+$\texttt{highestWeight\_spinMultiplet\_general}$ the $N_e+1$ linearly independent tower $(\hat
+S^-)^k\Omega$; since $\hat S^-$ commutes with $\hat H_{\rm tJ}$ and $\hat N$ and preserves the
+hard-core subspace, every tower member is again a ground state in
+$\texttt{groundSubmoduleAtFilling}$, so $\texttt{LinearIndependent.of\_comp}$ +
+$\texttt{fintype\_card\_le\_finrank}$ give the bound.  Rests only on A.17's documented axiom.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
