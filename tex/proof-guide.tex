@@ -6912,7 +6912,11 @@ $\texttt{fermionSpinDot\_mulVec\_allUpState}$ gives $\hat S_i\cdot\hat S_j|{\upa
 $|{\uparrow\cdots\uparrow}\rangle$ --- one directly via $\hat S^+_j|{\uparrow\cdots\uparrow}\rangle=0$,
 the other because $\hat c_{i\downarrow}$ commutes through the different-site $\hat S^-_j$ --- leaving the
 diagonal $\hat S^z_i\hat S^z_j=\tfrac14$), so $\hat n_x\hat n_y/4-\hat S_x\cdot\hat S_y$ vanishes on it
-and $|{\uparrow\cdots\uparrow}\rangle$ has exchange energy $0$.  Axiom-free.
+and $|{\uparrow\cdots\uparrow}\rangle$ has exchange energy $0$.  Axiom-free.  PR3b
+(\texttt{TJAllUpGround.lean}) concludes $\texttt{tJHamiltonian\_mulVec\_allUpState\_eq\_zero}$:
+$\hat H_{tJ}|{\uparrow\cdots\uparrow}\rangle=0$ at half-filling (kinetic vanishes, exchange vanishes),
+so the maximal-spin $|{\uparrow\cdots\uparrow}\rangle$ is a zero-energy eigenstate of the
+half-filling ferromagnetic Heisenberg model.  Axiom-free.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
