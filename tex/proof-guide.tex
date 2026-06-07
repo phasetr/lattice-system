@@ -7002,7 +7002,15 @@ each up-count class, so evaluating at one representative per class ($\texttt{tJU
 config with the first $j$ sites up) is an injective linear map $G\hookrightarrow(\mathrm{Fin}\,(N{+}2)\to\mathbb C)$
 ($\texttt{LinearMap.finrank\_le\_finrank\_of\_injective}$, codomain dimension $N{+}2$).  Paired with the
 SU(2)-tower lower bound (\#4326) this pins $\dim G=N{+}2$ --- the dimension half of the half-filling
-case of Theorem 11.26.  Axiom-free.
+case of Theorem 11.26.  Axiom-free.  PR3-cap ($\texttt{TJHalfFillingMaximalSpin.lean}$) assembles the
+half-filling result: $\texttt{tJ\_halfFilling\_isMaximalSpinMultiplet}$ proves
+$\texttt{IsMaximalSpinMultipletSubmodule}\,N\,G\,(N{+}1)$ --- the half-filling t-J ground subspace is
+the maximal-spin $(N{+}2)$-fold multiplet (ground $S_{\mathrm{tot}}=(N{+}1)/2$).  With $\dim G=N{+}2$
+(\#4331 $\wedge$ \#4326), the all-up SU(2) tower's $N{+}2$ linearly independent ground states span $G$
+($\texttt{span\_eq\_top\_of\_card\_eq\_finrank}$), and each is an $(\hat S_{\mathrm{tot}})^2$
+eigenvector at $S_{\max}(S_{\max}{+}1)$, so every ground state is.  This is the boundary
+($N_e=N{+}1$, ferromagnetic-Heisenberg) case of the t-J side of Theorem 11.26, the half-filling
+counterpart of the metallic Proposition 11.24; axiom-free (no A.17 is needed at half filling).
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
