@@ -6743,6 +6743,17 @@ $\texttt{fermionTotalSpinPlus\_pow\_mulVec\_mem\_hardcore}$ (the tower $(\hat S^
 hard-core).  This keeps every tower state $(\hat S^+)^k\Phi_0$ hard-core --- the prerequisite for the
 coefficient-sum recursion along the tower.  Fully axiom-free.
 
+\emph{(xliv) The raised vector is nonzero --- the Marshall positivity crux}
+(\texttt{TJRaisePositivity.lean}, E3b PR5d): $\texttt{coeffSum\_tJExpansion}$
+($\texttt{coeffSum}(\texttt{tJExpansion}\,v)=\sum_s v_s$) and
+$\texttt{spinPlusPow\_ne\_zero\_of\_coeffSum\_ne\_zero}$ --- a hard-core $\hat N=N_e$ vector $\Phi_0$
+with $\hat N_\downarrow\Phi_0=m\Phi_0$ and nonzero coefficient sum has $(\hat S^+_{\rm tot})^m\Phi_0
+\neq 0$.  Each raising step multiplies the coefficient sum by the down-count eigenvalue $m-k$
+(\texttt{coeffSum\_fermionTotalSpinPlus\_eq\_of\_downEigen} with the merged hard-core/$\hat N$/$\hat
+N_\downarrow$ tower lemmas), nonzero for $k<m$, so $\texttt{coeffSum}$ stays nonzero up to $k=m$.
+Applied to $\Phi_0=\texttt{tJExpansion}(\mathbb C\circ v)$ ($\texttt{coeffSum}=\sum_q v_q>0$,
+$m=(N_e-1)/2$) this is the Marshall non-vanishing $\Omega\neq 0$.  Fully axiom-free.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
