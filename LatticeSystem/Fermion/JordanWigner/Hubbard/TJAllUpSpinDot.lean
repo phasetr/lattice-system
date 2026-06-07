@@ -1,6 +1,5 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.FermionSiteSpin
 import LatticeSystem.Fermion.JordanWigner.Hubbard.AllUpState
-import LatticeSystem.Fermion.JordanWigner.CAR.CrossSiteOfNe
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TJCrossSiteSpinCommute
 
 /-!
 # Tasaki 11.5.3: the spin dot product on the all-up state (Theorem 11.26 PR3a)
@@ -41,28 +40,6 @@ theorem fermionSiteSpinZ_mulVec_allUpState (N : ℕ) (i : Fin (N + 1)) :
     show fermionUpCreation N i * fermionUpAnnihilation N i = fermionUpNumber N i from rfl,
     show fermionDownCreation N i * fermionDownAnnihilation N i = fermionDownNumber N i from rfl,
     fermionUpNumber_mulVec_allUpState, fermionDownNumber_mulVec_allUpState, sub_zero]
-
-/-- For `i ≠ j`, `ĉ_{i↓}` commutes through the different-site lowering operator `Ŝ⁻_j` (they act on
-disjoint Jordan–Wigner orbitals). -/
-private theorem fermionDownAnnihilation_commute_fermionSiteSpinMinus_of_ne
-    (i j : Fin (N + 1)) (hij : i ≠ j) :
-    Commute (fermionDownAnnihilation N i) (fermionSiteSpinMinus N j) := by
-  unfold fermionDownAnnihilation fermionSiteSpinMinus fermionDownCreation fermionUpAnnihilation
-  have hac : fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N i 1) *
-        fermionMultiCreation (2 * N + 1) (spinfulIndex N j 1) +
-      fermionMultiCreation (2 * N + 1) (spinfulIndex N j 1) *
-        fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N i 1) = 0 :=
-    fermionMultiAnnihilation_creation_anticomm_of_ne
-      (fun h => hij (spinfulIndex_down_injective N h))
-  have haa : fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N i 1) *
-        fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j 0) +
-      fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j 0) *
-        fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N i 1) = 0 :=
-    fermionMultiAnnihilation_anticomm_of_ne (spinfulIndex_up_ne_down N j i).symm
-  unfold Commute SemiconjBy
-  linear_combination (norm := noncomm_ring)
-    hac * fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j 0) -
-      fermionMultiCreation (2 * N + 1) (spinfulIndex N j 1) * haa
 
 /-- **The spin dot product on the all-up state.**  For `i ≠ j`, `Ŝ_i·Ŝ_j |↑…↑⟩ = ¼ |↑…↑⟩`: the
 raising/lowering terms annihilate `|↑…↑⟩`, leaving `Ŝ³_i Ŝ³_j = ¼`. -/

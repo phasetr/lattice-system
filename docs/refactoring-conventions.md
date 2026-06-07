@@ -1003,3 +1003,27 @@ mechanically** and catch most regressions / drift.
   only warnings in the build are pre-existing in `Quantum/SpinS/Rayleigh*`).
   **No split warranted**; the chain is well-factored; build-speed and
   import hygiene healthy; no code change.
+
+### 2026-06-07 — t-J Theorem 11.26 chain dedup + build-speed checkpoint (Issue #4314)
+
+Refactoring checkpoint at 17 feature PRs since the previous refactor (#4303):
+PRs #4304–#4313 (Prop 11.24 capstone) and #4315–#4321 (Theorem 11.26
+half-filling: kinetic vanishing, exchange reduction, all-up spin-dot/ground,
+singlet annihilation, the Heisenberg-bond CAR identity, and the bond
+`= ½ Δ†Δ` / positive-semidefiniteness).
+
+**Code change (dedup):** `TJAllUpSpinDot.lean` (#4317) had carried a *private*
+copy of `fermionDownAnnihilation_commute_fermionSiteSpinMinus_of_ne`; the same
+cross-site annihilation–site-spin commutator was later published in
+`TJCrossSiteSpinCommute.lean` (#4320). `TJAllUpSpinDot.lean` now imports
+`TJCrossSiteSpinCommute` and reuses the public lemma, removing the ~20-line
+duplicated CAR proof (and a redundant `CrossSiteOfNe`/`FermionSiteSpin`
+transitive import).
+
+**Build-speed evaluation:** the 82 `TJ*.lean` modules total ≈ 8.3k lines, all
+small (≤ 282 lines; largest `TJExchangeBondSum.lean` 282, `TJSpinSymmetry.lean`
+251). Single-file rebuilds are light (`TJAllUpSpinDot` ≈ 5 s incremental, ≈ 11 s
+with dependency replay), well under the historical split trigger
+(~2000–4000 lines / ~16 s). Zero linter warnings in the t-J chain. **No split
+warranted**; the only structural improvement this cycle is the dedup above.
+Cadence counter reset.
