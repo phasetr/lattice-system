@@ -6930,7 +6930,11 @@ n_{y\uparrow}-\hat S^+_x\hat S^-_y-\hat S^-_x\hat S^+_y$, by expanding the four 
 with the cross-site (anti)commutators (\texttt{TJCrossSiteSpinCommute.lean}: $[\hat c_{x\uparrow},\hat
 S^+_y]=[\hat c_{x\downarrow},\hat S^-_y]=0$).  This is the operator content behind $\hat n_x\hat
 n_y/4-\hat S_x\cdot\hat S_y=\tfrac12\Delta_{xy}^\dagger\Delta_{xy}$ (and hence the bond's
-positive-semidefiniteness).  Axiom-free.
+positive-semidefiniteness).  Axiom-free.  PR3d (\texttt{TJExchangeBondHalf.lean}) completes this:
+$\texttt{tJExchangeBond\_eq\_half\_singletNormSq}$ ($\hat n_x\hat n_y/4-\hat S_x\cdot\hat
+S_y=\tfrac12\Delta_{xy}^\dagger\Delta_{xy}$, $x\neq y$) and
+$\texttt{tJExchangeBond\_posSemidef}$ (the bond is positive-semidefinite, via
+$\texttt{Matrix.posSemidef\_conjTranspose\_mul\_self}$).  Axiom-free.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
