@@ -6976,7 +6976,15 @@ each bond term $\langle v,\text{bond}_{xy}v\rangle\ge 0$ (positive-semidefinite)
 $\texttt{Finset.single\_le\_sum}$ every bond term vanishes, whence $\Delta_{xy}v=0$ (using
 $\text{bond}=\tfrac12\Delta^\dagger\Delta$ and $\texttt{dotProduct\_star\_self\_eq\_zero}$) and
 $\text{bond}_{xy}v=0$.  With PR3i-1 this makes the ground amplitudes spin-swap invariant on every
-bond.  Axiom-free.
+bond.  Axiom-free.  PR3i-3a ($\texttt{TJHalfFillingAmplitude.lean}$) reads this off in the basis:
+$\texttt{tJ\_ground\_amplitude\_swap\_invariant}$ shows
+$v(\texttt{tJConfigOf}\,s)=v(\texttt{tJConfigOf}\,(\texttt{tJSpinSwap}\,s\,x\,y))$ for an adjacent
+bond.  Expanding $v$ in the filling basis ($\texttt{tJ\_filling\_completeness}$), applying the bond
+(which is $0$ on $v$, and a half spin-swap on each basis state), and reading off the coefficient at
+the index $\texttt{tJConfigOf}\,s$ (basis orthonormality, $\texttt{tJConfigOf\_injective}$, and the
+involution $\texttt{tJSpinSwap\_involutive\_site}$) gives
+$\tfrac12\big(v(\texttt{tJConfigOf}\,s)-v(\texttt{tJConfigOf}\,(\texttt{tJSpinSwap}\,s\,x\,y))\big)=0$.
+The sector permutation $\texttt{tJFillingSwap}$ packages the swap on the filling sector.  Axiom-free.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
