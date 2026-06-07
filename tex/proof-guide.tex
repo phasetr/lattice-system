@@ -6692,6 +6692,16 @@ d=1 ferromagnetic t-J ground state ($m=(N_e-1)/2$) this gives $\hat S^3\Omega=(N
 maximal-spin highest weight feeding $\texttt{highestWeight\_spinMultiplet\_general}$; the remaining
 input is $\Omega\neq 0$ (Marshall positivity).  Fully axiom-free.
 
+\emph{(xxxviii) Sector eigenvalues of the lifted ground vector} (\texttt{TJExpansionSpinEigen.lean},
+E3b PR5a): $\texttt{tJSpinHalfFillingSector\_down\_count}$ (every $\hat S^3=\tfrac12$, $\hat N=N_e$
+sector state has $\#{\downarrow}=(N_e-1)/2$, by \texttt{omega} from $\#{\uparrow}=\#{\downarrow}+1$
+and $\#{\uparrow}+\#{\downarrow}=N_e$), $\texttt{fermionTotalSpinZ\_mulVec\_tJExpansion}$ ($\hat
+S^3(\texttt{tJExpansion}\,v)=\tfrac12(\texttt{tJExpansion}\,v)$), and
+$\texttt{fermionTotalDownNumber\_mulVec\_tJExpansion}$ ($\hat N_\downarrow(\texttt{tJExpansion}\,v)
+=((N_e-1)/2)(\texttt{tJExpansion}\,v)$).  These let the highest-weight extraction apply to the lifted
+Perron--Frobenius ground vector $\Phi_0=\texttt{tJExpansion}(\mathbb C\circ v)$ with $m=(N_e-1)/2$;
+fully axiom-free.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
