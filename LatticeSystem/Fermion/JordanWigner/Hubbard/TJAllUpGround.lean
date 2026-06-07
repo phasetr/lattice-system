@@ -16,7 +16,7 @@ So `|↑…↑⟩` is a zero-energy eigenstate; combined with positive-semidefin
 Heisenberg model.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
-(1st ed.), §11.5.3, Theorem 11.26.
+(1st ed.), §11.5.3, Theorem 11.26 (pp. 445–447).
 -/
 
 namespace LatticeSystem.Fermion
