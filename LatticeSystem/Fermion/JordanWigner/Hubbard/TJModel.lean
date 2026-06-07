@@ -65,20 +65,9 @@ noncomputable def tJHamiltonian (N : ℕ) (G : SimpleGraph (Fin (N + 1))) [Decid
               fermionSpinDot N x y
           else 0)
 
-/-- **Tasaki Proposition 11.24 (ferromagnetism in the d = 1 ferromagnetic t-J model),
-AXIOM.**  On the one-dimensional periodic chain (`SimpleGraph.cycleGraph (N + 1)`), if the
-electron number `Ne` satisfies `Ne < N + 1 = L` and is **odd**, then the ground states have
-total spin `S_tot = Ne/2` and are non-degenerate apart from the trivial
-`2 S_tot + 1 = Ne + 1`-fold `SU(2)` multiplet.  Both halves are captured at once by
-`IsMaximalSpinMultipletSubmodule`: the `N_e`-electron hard-core ground subspace is the
-`(Ne + 1)`-fold multiplet (degeneracy = `Ne + 1`) and every ground state is an `(Ŝ_tot)²`
-eigenvector at the maximal eigenvalue `S_max(S_max + 1)`, `S_max = Ne/2`.  Tasaki's proof is
-a Perron–Frobenius / spin-charge-separation argument (Theorem A.18); the oddness of `Ne`
-makes the wrap-around `1 ↔ L` hop sign-free under periodic boundary conditions.  Recorded as
-a documented axiom (to be discharged), matching the §11.x ferromagnetism policy. -/
-axiom proposition_11_24 (N : ℕ) (τ J : ℝ) (hτ : 0 < τ) (hJ : 0 < J)
-    (Ne : ℕ) (hNe : Ne < N + 1) (hodd : Odd Ne) :
-    IsMaximalSpinMultipletSubmodule N
-      (groundSubmoduleAtFilling (tJHamiltonian N (SimpleGraph.cycleGraph (N + 1)) τ J) Ne) Ne
+/-! Tasaki Proposition 11.24 (ferromagnetism in the d=1 ferromagnetic t-J model) is now **proved**
+(`proposition_11_24` in `TJProposition1124.lean`), discharging the former axiom: on the periodic
+chain `cycleGraph (N + 1)` at odd filling `Ne < N + 1`, the `Ne`-electron hard-core ground subspace
+is the maximal-spin `(Ne+1)`-fold multiplet (`IsMaximalSpinMultipletSubmodule N _ Ne`). -/
 
 end LatticeSystem.Fermion

@@ -6845,11 +6845,16 @@ $\dim G=\sum_a\dim(\text{block})\le (N_e+1)\cdot 1$.  Paired with the SU(2)-towe
 $N_e+1\le\dim G$ ($\texttt{tJ\_groundSubmodule\_finrank\_ge}$) this pins $\dim G=N_e+1$, the input to
 the maximal-spin multiplet capstone.  Rests only on A.17's documented axiom.
 
-Remaining: the total-spin
-identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
-lower bound (paired with this $\hat S^3=\tfrac12$ block
-bound for the upper bound), and the capstone that
-replaces the axiom.
+\emph{(liv) Proposition 11.24 capstone --- PROVED} (\texttt{TJProposition1124.lean}, E6):
+$\texttt{proposition\_11\_24}$ discharges the former axiom.  On $\texttt{cycleGraph}(N+1)$ at odd
+filling $N_e<N+1$, the ground subspace is the maximal-spin $(N_e+1)$-fold multiplet
+($\texttt{IsMaximalSpinMultipletSubmodule}\ N\ G\ N_e$): $\dim G=N_e+1$ ($\texttt{le\_antisymm}$ of
+the lower bound (l$'$) $\texttt{tJ\_groundSubmodule\_finrank\_ge}$ and the upper bound (liii)), and
+every $v\in G$ is an $(\hat S_{\mathrm{tot}})^2$ eigenvector at $(N_e/2)(N_e/2+1)$ --- the $N_e+1$
+linearly independent tower states $(\hat S^-)^k\Omega$ span $G$ (card $=$ finrank), each a maximal-spin
+$(\hat S_{\mathrm{tot}})^2$ eigenvector ($\texttt{highestWeight\_spinMultiplet\_general}$), so every
+linear combination is.  This completes Tasaki's d=1 ferromagnetic t-J ferromagnetism result.
+
 The discharge lemmas add no
 new t-J axioms; the one inherited dependency is the A.17 sector reduction
 \texttt{tJHamiltonian\_eigenstate\_spin\_zero\_or\_half}, which rests on Theorem A.17's single
