@@ -6905,7 +6905,14 @@ killed by the projection.  Axiom-free.  PR2 (\texttt{TJHalfFillingExchange.lean}
 full Hamiltonian: $\texttt{tJHamiltonian\_mulVec\_tJConfigOf\_eq\_of\_full}$ gives
 $\hat H_{tJ}|\Phi_s\rangle=J\cdot\texttt{tJExchange}\,|\Phi_s\rangle$ for a fully occupied $s$, where
 $\texttt{tJExchange}=\sum_{x,y}[G.\mathrm{Adj}]\,(\hat n_x\hat n_y/4-\hat S_x\cdot\hat S_y)$ --- i.e.\
-at half-filling $\hat H_{tJ}$ is the ferromagnetic Heisenberg model.  Axiom-free.
+at half-filling $\hat H_{tJ}$ is the ferromagnetic Heisenberg model.  Axiom-free.  PR3a
+(\texttt{TJAllUpSpinDot.lean}) computes the spin dot product on the maximal-spin reference:
+$\texttt{fermionSpinDot\_mulVec\_allUpState}$ gives $\hat S_i\cdot\hat S_j|{\uparrow\cdots\uparrow}
+\rangle=\tfrac14|{\uparrow\cdots\uparrow}\rangle$ for $i\neq j$ (the raising/lowering terms annihilate
+$|{\uparrow\cdots\uparrow}\rangle$ --- one directly via $\hat S^+_j|{\uparrow\cdots\uparrow}\rangle=0$,
+the other because $\hat c_{i\downarrow}$ commutes through the different-site $\hat S^-_j$ --- leaving the
+diagonal $\hat S^z_i\hat S^z_j=\tfrac14$), so $\hat n_x\hat n_y/4-\hat S_x\cdot\hat S_y$ vanishes on it
+and $|{\uparrow\cdots\uparrow}\rangle$ has exchange energy $0$.  Axiom-free.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
