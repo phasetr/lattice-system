@@ -6803,6 +6803,15 @@ into $sz{+}1$, by the ladder injectivity at $sz<0$).  With the $\hat S^-$ step t
 space by the $\hat S^3=\tfrac12$ block ($\le 1$, E3a); the remaining input is the $\hat S^3$ direct-sum
 to assemble $\dim G\le N_e+1$.  Rests only on A.17's documented axiom.
 
+\emph{(l) Every $\hat S^3$ weight block of the ground subspace is $\le 1$-dim}
+(\texttt{TJGroundWeightOne.lean}, E5b): $\texttt{tJ\_ground\_weight\_finrank\_le\_one\_pos}$
+($\dim(G\sqcap\hat S^3{=}\tfrac12{+}k)\le 1$, $k:\mathbb N$) and
+$\texttt{tJ\_ground\_weight\_finrank\_le\_one\_neg}$ ($\dim(G\sqcap\hat S^3{=}{-}\tfrac12{-}k)\le 1$),
+by iterating the two weight-finrank steps ($\hat S^-$ from above, $\hat S^+$ from below) down to the
+$\hat S^3=\tfrac12$ block ($\le 1$, E3a); the half-integers $\pm\tfrac12,\pm\tfrac32,\dots$ exhaust the
+$\hat S^3$ spectrum at odd filling.  The remaining input to $\dim G\le N_e+1$ is the $\hat S^3$
+direct-sum.  Rests only on A.17's documented axiom.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
