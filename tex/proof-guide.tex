@@ -6985,6 +6985,17 @@ the index $\texttt{tJConfigOf}\,s$ (basis orthonormality, $\texttt{tJConfigOf\_i
 involution $\texttt{tJSpinSwap\_involutive\_site}$) gives
 $\tfrac12\big(v(\texttt{tJConfigOf}\,s)-v(\texttt{tJConfigOf}\,(\texttt{tJSpinSwap}\,s\,x\,y))\big)=0$.
 The sector permutation $\texttt{tJFillingSwap}$ packages the swap on the filling sector.  Axiom-free.
+PR3i-3b ($\texttt{TJHalfFillingUpCount.lean}$) propagates this along the connected chain:
+$\texttt{tJ\_ground\_amplitude\_eq\_of\_same\_upCount}$ shows the ground amplitudes are constant on
+each up-count class --- for sector configurations $t,t'$ with the same number of up-spins,
+$v(\texttt{tJConfigOf}\,t)=v(\texttt{tJConfigOf}\,t')$.  Equal up-counts give equal value-counts
+(both are full, so $\#\!\downarrow = (N{+}1)-\#\!\uparrow$), hence $t,t'$ are connected by adjacent
+value-swaps ($\texttt{adjacentSwapReachable\_of\_same\_counts}$, reused from the Prop 11.24 route),
+and each adjacent swap preserves the amplitude (PR3i-3a) by induction on
+$\texttt{AdjacentSwapReachable}$ (the reflexive--transitive closure of adjacent bond swaps; the empty
+count is preserved so every intermediate configuration is full).  There are $N{+}2$ up-counts
+$\{0,\dots,N{+}1\}$, so this is the last combinatorial input to the upper bound
+$\dim\le N{+}2$.  Axiom-free.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
