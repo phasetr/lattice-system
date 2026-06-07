@@ -6812,6 +6812,18 @@ $\hat S^3=\tfrac12$ block ($\le 1$, E3a); the half-integers $\pm\tfrac12,\pm\tfr
 $\hat S^3$ spectrum at odd filling.  The remaining input to $\dim G\le N_e+1$ is the $\hat S^3$
 direct-sum.  Rests only on A.17's documented axiom.
 
+\emph{(li) $\hat S^3$ weight decomposition of the ground subspace}
+(\texttt{TJGroundWeightDirectSum.lean}, E5b):
+$\texttt{fermionTotalSpinZ\_mulVec\_mem\_groundSubmodule}$ ($\hat S^3$ preserves $G$, so $G$ is an
+invariant submodule of $\hat S^3$),
+$\texttt{fermionTotalSpinZ\_iSup\_eigenspace\_eq\_top}$ ($\hat S^3$ is diagonal on the computational
+basis, so every standard basis vector is an eigenvector and the eigenspaces span $\top$), and
+$\texttt{tJ\_groundSubmodule\_eq\_iSup\_inf\_eigenspace}$: $G=\bigsqcup_\mu (G\sqcap\ker(\hat
+S^3-\mu))$ (\texttt{Submodule.eq\_iSup\_inf\_genEigenspace} for the invariant $G$).  This is the
+$\hat S^3$ direct-sum input; reindexing it to the finite $N_e+1$ half-integer weights and applying
+the internal-direct-sum finrank with the per-block bound ($\le 1$, item (l)) yields
+$\dim G\le N_e+1$.  Rests only on A.17's documented axiom.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
