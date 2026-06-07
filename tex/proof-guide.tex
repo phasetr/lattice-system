@@ -6725,6 +6725,16 @@ Together they give the recursion $\texttt{coeffSum}(\hat S^+\psi)=d\cdot\texttt{
 hard-core $\hat N_\downarrow$-eigenvector $\psi$ at $d$ (both sides equal $\sum_s v_s\#{\downarrow}(s)$),
 the multiplicative step for the iterated-raising positivity.  Fully axiom-free.
 
+\emph{(xlii) The coefficient-sum recursion step} (\texttt{TJRaisePositivityStep.lean}, E3b PR5b-3b):
+$\texttt{fermionTotalDownNumber\_mulVec\_tJFillingExpansion}$ ($\hat N_\downarrow$ diagonal on a filling
+expansion) and $\texttt{coeffSum\_fermionTotalSpinPlus\_eq\_of\_downEigen}$ --- a hard-core $\hat
+N=N_e$ vector $\psi$ with $\hat N_\downarrow\psi=d\psi$ satisfies $\texttt{coeffSum}(\hat
+S^+_{\rm tot}\psi)=d\cdot\texttt{coeffSum}\,\psi$ (both $\hat S^+\psi$ and $\hat N_\downarrow\psi$ have
+coefficient sum $\sum_s\text{coeff}_s\,\#{\downarrow}(s)$ via $\texttt{tJ\_filling\_completeness}$, and
+$\texttt{coeffSum}(\hat N_\downarrow\psi)=d\cdot\texttt{coeffSum}\,\psi$ by the eigen-equation).  The
+multiplicative step driving $\texttt{coeffSum}((\hat S^+)^k\Phi_0)$ to $((N_e-1)/2)!\cdot\sum_q v_q>0$.
+Fully axiom-free.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
