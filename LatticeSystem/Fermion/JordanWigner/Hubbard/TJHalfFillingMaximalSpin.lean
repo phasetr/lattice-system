@@ -31,13 +31,13 @@ variable {N : ℕ}
 `Ne = N+1` the d=1 ferromagnetic t-J ground subspace is the maximal-spin `(N+2)`-fold multiplet:
 `finrank = N+2` and every ground state is an `(Ŝ_tot)²` eigenvector at `S_max(S_max+1)`,
 `S_max = (N+1)/2`. -/
-theorem tJ_halfFilling_isMaximalSpinMultiplet (hpos : 0 < N) (τ J : ℝ) (hJ : 0 < J) :
+theorem tJ_halfFilling_isMaximalSpinMultiplet (τ J : ℝ) (hJ : 0 < J) :
     IsMaximalSpinMultipletSubmodule N
       (groundSubmoduleAtFilling (tJHamiltonian N (cycleGraph (N + 1)) τ J) (N + 1)) (N + 1) := by
   classical
   set G := groundSubmoduleAtFilling (tJHamiltonian N (cycleGraph (N + 1)) τ J) (N + 1) with hG
   have hfin : finrank ℂ ↥G = N + 1 + 1 :=
-    le_antisymm (tJ_halfFilling_groundSubmodule_finrank_le hpos τ J hJ)
+    le_antisymm (tJ_halfFilling_groundSubmodule_finrank_le τ J hJ)
       (tJ_halfFilling_groundSubmodule_finrank_ge τ J hJ)
   refine ⟨hfin, ?_⟩
   -- the all-up state is a highest-weight ground state

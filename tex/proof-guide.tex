@@ -7011,6 +7011,14 @@ the maximal-spin $(N{+}2)$-fold multiplet (ground $S_{\mathrm{tot}}=(N{+}1)/2$).
 eigenvector at $S_{\max}(S_{\max}{+}1)$, so every ground state is.  This is the boundary
 ($N_e=N{+}1$, ferromagnetic-Heisenberg) case of the t-J side of Theorem 11.26, the half-filling
 counterpart of the metallic Proposition 11.24; axiom-free (no A.17 is needed at half filling).
+PR-unify ($\texttt{TJMaximalSpinUnified.lean}$) combines the two cases:
+$\texttt{tJ\_isMaximalSpinMultiplet\_of\_le}$ proves that for odd $N_e\le K{+}1$ and $\tau,J>0$ the
+d=1 ferromagnetic t-J ground subspace on $\texttt{cycleGraph}\,(K{+}1)$ is the maximal-spin
+$(N_e{+}1)$-fold multiplet --- the metallic case $N_e<K{+}1$ from Proposition 11.24 and the
+half-filling case $N_e=K{+}1$ from the result above.  (The half-filling chain was generalized to drop
+the $0<N$ hypothesis --- $\texttt{adjacentSwapReachable\_of\_same\_counts\_general}$ handles the
+single-site $N=0$ case by reflexivity --- so the $K=0$ boundary is covered.)  This is the t-J input to
+Theorem 11.26; it rests on the A.17 axiom through Proposition 11.24.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic

@@ -79,9 +79,36 @@ theorem tJ_ground_amplitude_eq_of_reachable (τ J : ℝ) (hJ : 0 < J)
       exact this (Finset.mem_univ k) hk
     exact ih.trans (tJ_ground_amplitude_eq_of_adjacentSwapStep τ J hJ hv hbfull hst)
 
+/-- **Adjacent-swap reachability from equal value-counts, for all `N`.**  The `N = 0` case (a single
+site) is degenerate: equal value-counts force the configs to be equal, so reachability is reflexive. -/
+theorem adjacentSwapReachable_of_same_counts_general (s s' : Fin (N + 1) → Fin 3)
+    (hcount : ∀ v, (Finset.univ.filter (fun k => s k = v)).card
+        = (Finset.univ.filter (fun k => s' k = v)).card) :
+    AdjacentSwapReachable N s s' := by
+  classical
+  rcases Nat.eq_zero_or_pos N with hN | hN
+  · subst hN
+    have hss' : s = s' := by
+      funext k
+      have hc := hcount (s k)
+      have hfull : (Finset.univ.filter (fun j => s j = s k)) = Finset.univ := by
+        apply Finset.eq_univ_of_forall; intro j
+        rw [Finset.mem_filter]
+        exact ⟨Finset.mem_univ j, by rw [Fin.ext (show j.val = k.val by omega)]⟩
+      rw [hfull, Finset.card_univ, Fintype.card_fin] at hc
+      have h1 : (Finset.univ.filter (fun j => s' j = s k)) = Finset.univ :=
+        Finset.eq_univ_of_card _ (by rw [← hc, Fintype.card_fin])
+      have hmem : k ∈ Finset.univ.filter (fun j => s' j = s k) := by
+        rw [h1]; exact Finset.mem_univ _
+      rw [Finset.mem_filter] at hmem
+      exact hmem.2.symm
+    rw [hss']
+    exact Relation.ReflTransGen.refl
+  · exact adjacentSwapReachable_of_same_counts hN s s' hcount
+
 /-- **Half-filling ground amplitudes depend only on the up-count.**  For sector configs `t, t'`
 with the same number of up-spins, `v (tJConfigOf t) = v (tJConfigOf t')`. -/
-theorem tJ_ground_amplitude_eq_of_same_upCount (hpos : 0 < N) (τ J : ℝ) (hJ : 0 < J)
+theorem tJ_ground_amplitude_eq_of_same_upCount (τ J : ℝ) (hJ : 0 < J)
     {v : (Fin (2 * N + 2) → Fin 2) → ℂ}
     (hv : v ∈ groundSubmoduleAtFilling (tJHamiltonian N (cycleGraph (N + 1)) τ J) (N + 1))
     (t t' : TJFillingSector N (N + 1))
@@ -104,6 +131,6 @@ theorem tJ_ground_amplitude_eq_of_same_upCount (hpos : 0 < N) (τ J : ℝ) (hJ :
       have h2 := t'.2
       omega
   exact tJ_ground_amplitude_eq_of_reachable τ J hJ hv htfull
-    (adjacentSwapReachable_of_same_counts hpos t.val t'.val hcount)
+    (adjacentSwapReachable_of_same_counts_general t.val t'.val hcount)
 
 end LatticeSystem.Fermion
