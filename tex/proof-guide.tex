@@ -6943,7 +6943,11 @@ sector: $\texttt{tJFillingSector\_full}$ ($N_e=N{+}1\Rightarrow$ fully occupied)
 $\texttt{tJ\_kinetic\_sandwich\_mulVec\_eq\_zero\_of\_filling}$, and
 $\texttt{tJHamiltonian\_mulVec\_eq\_smul\_tJExchange\_of\_filling}$ ($\hat H_{tJ}v=J\cdot
 \texttt{tJExchange}\,v$ for any hard-core $\hat N{=}N{+}1$ vector $v$) --- so on the half-filling
-sector $\hat H_{tJ}=J\cdot\texttt{tJExchange}$.  Axiom-free.
+sector $\hat H_{tJ}=J\cdot\texttt{tJExchange}$.  Axiom-free.  PR3g computes the ground energy:
+$\texttt{TJAllUpProperties.lean}$ supplies the all-up filling facts, and
+$\texttt{tJ\_groundEnergyAtFilling\_eq\_zero}$ proves $\texttt{groundEnergyAtFilling}\ \hat H_{tJ}\
+(N{+}1)=0$ ($\le 0$ from the all-up eigenvector at $0$; $\ge 0$ from $\texttt{tJExchange}\ge 0$ and
+$J>0$).  Axiom-free.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
