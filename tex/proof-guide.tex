@@ -6824,6 +6824,17 @@ $\hat S^3$ direct-sum input; reindexing it to the finite $N_e+1$ half-integer we
 the internal-direct-sum finrank with the per-block bound ($\le 1$, item (l)) yields
 $\dim G\le N_e+1$.  Rests only on A.17's documented axiom.
 
+\emph{(lii) Finite $\hat S^3$ weight reindexing of the ground subspace}
+(\texttt{TJGroundWeightReindex.lean}, E5b):
+$\texttt{tJ\_groundSubmodule\_inf\_eigenspace\_eq\_bot}$ (off-weight blocks vanish: $G\sqcap\ker(\hat
+S^3-\mu)=\{0\}$ for $\mu$ outside $\{a-N_e/2 : a\in\mathrm{Fin}(N_e{+}1)\}$, since a ground vector is
+an $N_e$-electron and $\hat S^3{=}\mu$ eigenstate, forcing every supported configuration to satisfy
+$\mu=\#{\uparrow}-N_e/2$) and $\texttt{tJ\_groundSubmodule\_eq\_iSup\_weight}$:
+$G=\bigsqcup_{a\in\mathrm{Fin}(N_e+1)}\bigl(G\sqcap\ker(\hat S^3-(a-N_e/2))\bigr)$ (the all-$\mathbb
+C$ supremum collapses to the $N_e+1$ occurring half-integer weights).  This is the finite weight
+decomposition; the internal-direct-sum finrank with the per-block bound ($\le 1$, item (l)) then
+gives $\dim G\le N_e+1$.  Rests only on A.17's documented axiom.
+
 Remaining: the total-spin
 identification ($S_{\mathrm{tot}}=N_e/2$) via the highest weight raised this way, the SU(2)-tower
 lower bound (paired with this $\hat S^3=\tfrac12$ block
