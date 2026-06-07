@@ -6934,7 +6934,11 @@ positive-semidefiniteness).  Axiom-free.  PR3d (\texttt{TJExchangeBondHalf.lean}
 $\texttt{tJExchangeBond\_eq\_half\_singletNormSq}$ ($\hat n_x\hat n_y/4-\hat S_x\cdot\hat
 S_y=\tfrac12\Delta_{xy}^\dagger\Delta_{xy}$, $x\neq y$) and
 $\texttt{tJExchangeBond\_posSemidef}$ (the bond is positive-semidefinite, via
-$\texttt{Matrix.posSemidef\_conjTranspose\_mul\_self}$).  Axiom-free.
+$\texttt{Matrix.posSemidef\_conjTranspose\_mul\_self}$).  Axiom-free.  PR3e
+(\texttt{TJExchangePSD.lean}) sums over the graph: $\texttt{tJExchange\_posSemidef}$ proves
+$(\texttt{tJExchange}\ N\ G)$ is positive-semidefinite (a $\texttt{Finset.sum\_induction}$ over the
+per-bond PSD terms), the operator nonnegativity behind the half-filling ground energy $=0$.
+Axiom-free.
 
 \medskip\noindent\textbf{The Tanaka--Tasaki model and Theorem 11.27 (Tasaki §11.5.4,
 axiomatized) --- the Chapter 11 capstone.}  The only rigorous example of metallic
