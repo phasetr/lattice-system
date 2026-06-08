@@ -141,4 +141,19 @@ theorem sectorMinEnergy_le_of_eigenvector {M : ℕ} (H : ManyBodyOp (Fin (2 * M 
       ≤ rayleighOnVec H φ₀.ofLp := ciInf_le hbdd ⟨φ₀, hmem⟩
     _ = lam := hray
 
+open scoped ComplexOrder in
+/-- **Per-unit-vector energy lower bound for the non-singular Hubbard model.**  When every `ĥ_p ≥ 0`
+and `0 ≤ lam`, every unit vector has energy at least `−C` with `C = (K+1)(1+2ν²)s`. -/
+theorem tasakiNonsingular_rayleighOnVec_ge (K : ℕ) (ν s t U lam κ : ℝ) (hlam : 0 ≤ lam)
+    (hpos : ∀ i : Fin (K + 1), (nonsingularLocalHamiltonian K ν s t U lam κ i).PosSemidef)
+    (φ : EuclideanSpace ℂ (Fin (2 * (2 * K + 1) + 2) → Fin 2)) (hu : ‖φ‖ = 1) :
+    -((K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s))
+      ≤ rayleighOnVec (tasakiNonsingularHamiltonian K ν t s U) φ.ofLp := by
+  have h0 := nonsingular_rayleighOnVec_add_const_nonneg K ν s t U lam κ hlam hpos φ.ofLp
+  rw [show ((K + 1 : ℂ) * ((1 + 2 * ν ^ 2) * s))
+        = (((K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s) : ℝ) : ℂ) from by push_cast; ring,
+    rayleighOnVec_add_matrix, rayleighOnVec_real_smul, rayleighOnVec_one_eq_normSq, hu] at h0
+  simp only [one_pow, mul_one] at h0
+  linarith
+
 end LatticeSystem.Fermion
