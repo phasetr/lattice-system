@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandBasis
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandCAR
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandZeroEnergy
 
 /-!
 # Tasaki §11.4.3 Lemma 11.21: the local Hamiltonian annihilates the all-up state
@@ -94,5 +95,14 @@ theorem flatBandAAnnihilation_ACreation_anticomm_self (K : ℕ) (ν : ℝ) (p : 
   rw [← Finset.sum_smul, show (∑ x, (flatBandAlpha K ν p x : ℂ) * (flatBandAlpha K ν p x : ℂ))
       = (((∑ x, flatBandAlpha K ν p x * flatBandAlpha K ν p x : ℝ)) : ℂ) from by
     push_cast; rfl, flatBandAlpha_dot_self K ν p hp]
+
+/-- **`â_{p,↓}` annihilates the all-up `α` state.**  Each `ĉ_{x,↓}` annihilates `|Φα,all↑⟩`
+(no down electrons), and `â_{p,↓}` is a linear combination of these. -/
+theorem flatBandAAnnihilation_down_mulVec_alphaAllUpState (K : ℕ) (ν : ℝ) (p : Fin (K + 1)) :
+    (flatBandAAnnihilation K ν p 1).mulVec (flatBandAlphaAllUpState K ν) = 0 := by
+  unfold flatBandAAnnihilation
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun x _ => ?_)
+  rw [Matrix.smul_mulVec, flatBandCDownAnnihilation_mulVec_alphaAllUpState, smul_zero]
 
 end LatticeSystem.Fermion
