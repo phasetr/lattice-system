@@ -103,6 +103,21 @@ theorem flatBandBNumber_mulVec_alphaAllUpState (K : ℕ) (ν : ℝ) (u : Fin (K 
   refine Finset.sum_eq_zero (fun σ _ => ?_)
   rw [← Matrix.mulVec_mulVec, flatBandBAnnihilation_mulVec_alphaAllUpState, Matrix.mulVec_zero]
 
+/-- **`ĥ_p |Φα,all↑⟩ = 0`** (Tasaki p. 430): the all-up flat-band state is a zero-mode of the
+local Hamiltonian.  The constant `(1+2ν²)s` cancels against `−s` times the α-number `(1+2ν²)`,
+and the β-number and Coulomb terms all annihilate the all-up state.  Requires a genuine chain
+(`i − 1 ≠ i`, i.e. `K ≥ 1`). -/
+theorem nonsingularLocalHamiltonian_mulVec_alphaAllUpState (K : ℕ) (ν s t U lam κ : ℝ)
+    (i : Fin (K + 1)) (hi : i - 1 ≠ i) :
+    (nonsingularLocalHamiltonian K ν s t U lam κ i).mulVec (flatBandAlphaAllUpState K ν) = 0 := by
+  unfold nonsingularLocalHamiltonian
+  simp only [Matrix.add_mulVec, Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec,
+    flatBandANumber_mulVec_alphaAllUpState K ν i hi, flatBandBNumber_mulVec_alphaAllUpState,
+    hubbardDoubleOccupancy_mulVec_alphaAllUpState, smul_zero, add_zero]
+  rw [smul_smul, ← sub_smul,
+    show ((1 + 2 * ν ^ 2) * s : ℂ) - (s : ℂ) * ((1 + 2 * ν ^ 2 : ℝ) : ℂ) = 0 from by push_cast; ring,
+    zero_smul]
+
 /-- **Tasaki Lemma 11.21 (frustration-free ⇒ ferromagnetism), AXIOM.**  If the local
 Hamiltonian `ĥ_p` is positive semidefinite for every external site `p`, then the
 non-singular Hubbard model is saturated-ferromagnetic (`E_min(S_max) < E_min(S)` for all
