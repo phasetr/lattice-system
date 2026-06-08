@@ -5,10 +5,12 @@ import Mathlib.LinearAlgebra.Matrix.PosDef
 /-!
 # Tasaki §11.4.3: frustration-free positivity `Ĥ + const ≥ 0` (towards Lemma 11.21)
 
-From the decomposition eq. (11.4.46), `Ĥ + (K+1)(1+2ν²)s·1 = (Σ_i ĥ_p i) + lam·(Σ_u N̂^β_u + Σ_x n↑n↓_x)`.
+From the decomposition eq. (11.4.46),
+`Ĥ + (K+1)(1+2ν²)s·1 = (Σ_i ĥ_p i) + lam·(Σ_u N̂^β_u + Σ_x n↑n↓_x)`.
 When every `ĥ_p ≥ 0` and `lam ≥ 0`, the right side is a sum of positive-semidefinite operators, so:
 
-* `nonsingularRemainder_eq_flatBand` — the remainder `Σ_u N̂^β_u + Σ_x n↑n↓_x` is `flatBandHamiltonian K ν 1 1`;
+* `nonsingularRemainder_eq_flatBand` — the remainder `Σ_u N̂^β_u + Σ_x n↑n↓_x` is
+  `flatBandHamiltonian K ν 1 1`;
 * `tasakiNonsingular_add_const_posSemidef` — `(Ĥ + (K+1)(1+2ν²)s·1).PosSemidef`.
 
 So the ground energy is `≥ −(K+1)(1+2ν²)s`; the max-spin tower (which annihilates the remainder and

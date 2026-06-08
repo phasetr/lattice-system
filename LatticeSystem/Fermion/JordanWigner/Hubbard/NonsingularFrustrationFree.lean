@@ -49,7 +49,8 @@ theorem sum_nonsingularLocalHamiltonian (K : ℕ) (ν s t U lam κ : ℝ) :
   push_cast
   module
 
-/-- **The frustration-free decomposition (Tasaki eq. (11.4.46), `d = 1`).**  The non-singular Hubbard
+/-- **The frustration-free decomposition (Tasaki eq. (11.4.46), `d = 1`).**  The non-singular
+Hubbard
 Hamiltonian is the sum of the local Hamiltonians `ĥ_p` minus a constant plus a manifestly positive
 remainder (`lam`-multiplied), for every choice of `lam, κ` (the `κ`-dependence cancels):
 `tasakiNonsingularHamiltonian = (Σ_i ĥ_p i) − (K+1)(1+2ν²)s·1 + lam·(Σ_u N̂^β_u + Σ_x n̂↑n̂↓_x)`. -/

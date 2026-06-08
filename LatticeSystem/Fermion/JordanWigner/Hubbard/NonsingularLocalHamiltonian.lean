@@ -115,7 +115,8 @@ theorem nonsingularLocalHamiltonian_mulVec_alphaAllUpState (K : ℕ) (ν s t U l
     flatBandANumber_mulVec_alphaAllUpState K ν i hi, flatBandBNumber_mulVec_alphaAllUpState,
     hubbardDoubleOccupancy_mulVec_alphaAllUpState, smul_zero, add_zero]
   rw [smul_smul, ← sub_smul,
-    show ((1 + 2 * ν ^ 2) * s : ℂ) - (s : ℂ) * ((1 + 2 * ν ^ 2 : ℝ) : ℂ) = 0 from by push_cast; ring,
+    show ((1 + 2 * ν ^ 2) * s : ℂ) - (s : ℂ) * ((1 + 2 * ν ^ 2 : ℝ) : ℂ) = 0 from by
+      push_cast; ring,
     zero_smul]
 
 /-- **Tasaki Lemma 11.21 (frustration-free ⇒ ferromagnetism), AXIOM.**  If the local
