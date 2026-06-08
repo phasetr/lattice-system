@@ -105,4 +105,41 @@ theorem flatBandAAnnihilation_down_mulVec_alphaAllUpState (K : ℕ) (ν : ℝ) (
   refine Finset.sum_eq_zero (fun x _ => ?_)
   rw [Matrix.smul_mulVec, flatBandCDownAnnihilation_mulVec_alphaAllUpState, smul_zero]
 
+/-- The spinful creation–creation anticommutation relation `{ĉ†_{x,σ}, ĉ†_{y,τ}} = 0`. -/
+theorem spinful_creation_creation_anticomm (K : ℕ) (x y : Fin (2 * K + 2)) (σ τ : Fin 2) :
+    fermionMultiCreation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) x σ) *
+        fermionMultiCreation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) y τ)
+      + fermionMultiCreation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) y τ) *
+        fermionMultiCreation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) x σ) = 0 := by
+  by_cases h : spinfulIndex (2 * K + 1) x σ = spinfulIndex (2 * K + 1) y τ
+  · rw [h, fermionMultiCreation_sq, add_zero]
+  · exact fermionMultiCreation_anticomm_of_ne h
+
+/-- **Creation–creation anticommutator of the flat-band operators**: `{â†_{p,σ}, â†_{q,τ}} = 0`.
+The single-particle creation operators anticommute because the underlying `ĉ†` operators do. -/
+theorem flatBandACreation_ACreation_anticomm (K : ℕ) (ν : ℝ) (p q : Fin (K + 1)) (σ τ : Fin 2) :
+    flatBandACreation K ν p σ * flatBandACreation K ν q τ
+      + flatBandACreation K ν q τ * flatBandACreation K ν p σ = 0 := by
+  set c : Fin (2 * K + 2) → ManyBodyOp (Fin (2 * (2 * K + 1) + 2)) :=
+    fun x => fermionMultiCreation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) x σ)
+    with hc
+  set d : Fin (2 * K + 2) → ManyBodyOp (Fin (2 * (2 * K + 1) + 2)) :=
+    fun y => fermionMultiCreation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) y τ)
+    with hd
+  have hkey : flatBandACreation K ν p σ * flatBandACreation K ν q τ
+      + flatBandACreation K ν q τ * flatBandACreation K ν p σ
+      = ∑ x, ∑ y, ((flatBandAlpha K ν p x : ℂ) * (flatBandAlpha K ν q y : ℂ)) •
+          (c x * d y + d y * c x) := by
+    unfold flatBandACreation
+    rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl (fun x _ => ?_)
+    rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl (fun y _ => ?_)
+    rw [smul_mul_assoc, mul_smul_comm, smul_smul, mul_comm _ (flatBandAlpha K ν q y : ℂ),
+      smul_mul_assoc, mul_smul_comm, smul_smul, mul_comm (flatBandAlpha K ν q y : ℂ),
+      ← smul_add]
+  rw [hkey]
+  refine Finset.sum_eq_zero (fun x _ => Finset.sum_eq_zero (fun y _ => ?_))
+  rw [hc, hd, spinful_creation_creation_anticomm, smul_zero]
+
 end LatticeSystem.Fermion
