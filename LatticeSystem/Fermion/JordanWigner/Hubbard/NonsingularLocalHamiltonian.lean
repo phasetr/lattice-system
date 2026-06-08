@@ -127,7 +127,7 @@ decomposition (eq. (11.4.46)); recorded as a documented axiom (proof of Theorem 
 axiom nonsingular_lemma_11_21 (K : ℕ) (ν s t U lam κ : ℝ) (hs : 0 < s)
     (hpos : ∀ i : Fin (K + 1),
       (nonsingularLocalHamiltonian K ν s t U lam κ i).PosSemidef) :
-    exhibitsFerromagnetism (tasakiNonsingularHamiltonian K ν t s U) (K + 1)
+    exhibitsFerromagnetism (tasakiNonsingularHamiltonian K ν t s U) (K + 1) (K + 1)
 
 /-- **Tasaki Lemma 11.22 (positivity of the local Hamiltonian), AXIOM.**  For `ν > 0`
 (`d = 1`; for `d ≥ 2` one needs `0 < ν < ν_c(d)`) there are thresholds such that, once
@@ -150,7 +150,7 @@ axiom nonsingular_lemma_11_23 (ν : ℝ) (hν : 0 < ν) :
     ∃ T V clam cκ : ℝ, 0 < T ∧ 0 < V ∧ 0 < clam ∧ 0 ≤ cκ ∧
       ∀ (K : ℕ) (s t U : ℝ), 0 < s → 0 < t → 0 < U → T ≤ t / s → V ≤ U / s →
         ∀ (i : Fin (K + 1)) (twoS : ℕ), twoS < K + 1 →
-          0 < sectorMinEnergy (nonsingularLocalHamiltonian K ν s t U (clam * s) cκ i) twoS
+          0 < sectorMinEnergy (nonsingularLocalHamiltonian K ν s t U (clam * s) cκ i) (K + 1) twoS
 
 /-- **Tasaki Theorem 11.20 (ferromagnetism in the non-singular Hubbard model), PROVED** (`d = 1`).
 For every `ν > 0` there are thresholds `T, V > 0` (depending only on `ν`, uniformly in the system
@@ -166,7 +166,7 @@ theorem tasaki_theorem_11_20 (ν : ℝ) (hν : 0 < ν) :
     ∃ T V : ℝ, 0 < T ∧ 0 < V ∧
       ∀ (K : ℕ) (t s U : ℝ), 0 < s → 0 < t → 0 < U →
         T ≤ t / s → V ≤ U / s →
-        exhibitsFerromagnetism (tasakiNonsingularHamiltonian K ν t s U) (K + 1) := by
+        exhibitsFerromagnetism (tasakiNonsingularHamiltonian K ν t s U) (K + 1) (K + 1) := by
   obtain ⟨T, V, clam, cκ, hT, hV, _, _, hpos⟩ := nonsingular_lemma_11_22 ν hν
   refine ⟨T, V, hT, hV, fun K t s U hs ht hU hTt hVU => ?_⟩
   exact nonsingular_lemma_11_21 K ν s t U (clam * s) cκ hs

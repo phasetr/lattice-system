@@ -2,6 +2,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularFrustrationFree
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularFrustrationFreePos
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandHighestWeight
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinLoweringTowerGeneral
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandTheorem11_11
 import LatticeSystem.Math.RayleighPosSemidefKernel
 
 /-!
@@ -69,10 +70,10 @@ value `0 ≥ −c`.) -/
 theorem sectorMinEnergy_ge_of_add_const_rayleigh_nonneg {M : ℕ}
     (H : ManyBodyOp (Fin (2 * M + 2))) (c : ℝ) (hc : 0 ≤ c)
     (hpos : ∀ φ, 0 ≤ rayleighOnVec (H + (c : ℂ) • (1 : ManyBodyOp (Fin (2 * M + 2)))) φ)
-    (twoS : ℕ) :
-    -c ≤ sectorMinEnergy H twoS := by
+    (filling twoS : ℕ) :
+    -c ≤ sectorMinEnergy H filling twoS := by
   unfold sectorMinEnergy
-  by_cases hne : Nonempty (spinSector (M := M) twoS)
+  by_cases hne : Nonempty (spinSector (M := M) filling twoS)
   · refine le_ciInf (fun φ => ?_)
     have hu : ‖(φ : EuclideanSpace ℂ (Fin (2 * M + 2) → Fin 2))‖ = 1 := φ.2.1
     have hsplit : rayleighOnVec (H + (c : ℂ) • 1) (φ : EuclideanSpace ℂ _).ofLp
@@ -82,7 +83,7 @@ theorem sectorMinEnergy_ge_of_add_const_rayleigh_nonneg {M : ℕ}
     have hge := hpos (φ : EuclideanSpace ℂ _).ofLp
     rw [hsplit] at hge
     linarith
-  · have : IsEmpty (spinSector (M := M) twoS) := not_nonempty_iff.mp hne
+  · have : IsEmpty (spinSector (M := M) filling twoS) := not_nonempty_iff.mp hne
     rw [Real.iInf_of_isEmpty]
     linarith
 
@@ -110,13 +111,15 @@ theorem rayleighOnVec_of_unit_eigenvector {ι : Type*} [Fintype ι]
 sector `twoS` has minimum energy at most `lam`: `sectorMinEnergy H twoS ≤ lam`.  The normalised
 `φ₀ = ‖v‖⁻¹ • toLp v` lies in `spinSector twoS` with `rayleighOnVec H φ₀.ofLp = lam`. -/
 theorem sectorMinEnergy_le_of_eigenvector {M : ℕ} (H : ManyBodyOp (Fin (2 * M + 2)))
-    (v : (Fin (2 * M + 2) → Fin 2) → ℂ) (hv : v ≠ 0) (lam : ℝ) (twoS : ℕ)
+    (v : (Fin (2 * M + 2) → Fin 2) → ℂ) (hv : v ≠ 0) (lam : ℝ) (filling twoS : ℕ)
     (hHeig : H.mulVec v = (lam : ℂ) • v)
+    (hNeig : (fermionTotalNumber (2 * M + 1)).mulVec v = (filling : ℂ) • v)
     (hSeig : (fermionTotalSpinSquared M).mulVec v
       = (((twoS : ℂ) / 2) * ((twoS : ℂ) / 2 + 1)) • v)
     (hbdd : BddBelow (Set.range
-      (fun φ : spinSector (M := M) twoS => rayleighOnVec H (φ : EuclideanSpace ℂ _).ofLp))) :
-    sectorMinEnergy H twoS ≤ lam := by
+      (fun φ : spinSector (M := M) filling twoS =>
+        rayleighOnVec H (φ : EuclideanSpace ℂ _).ofLp))) :
+    sectorMinEnergy H filling twoS ≤ lam := by
   classical
   set φ : EuclideanSpace ℂ (Fin (2 * M + 2) → Fin 2) := (WithLp.equiv 2 _).symm v with hφdef
   have hφne : φ ≠ 0 := by
@@ -130,14 +133,15 @@ theorem sectorMinEnergy_le_of_eigenvector {M : ℕ} (H : ManyBodyOp (Fin (2 * M 
     rw [hφ0def, norm_smul, norm_inv, Complex.norm_real, norm_norm,
       inv_mul_cancel₀ (norm_ne_zero_iff.mpr hφne)]
   -- φ₀ is a unit vector in the spin sector
-  have hmem : φ₀ ∈ spinSector (M := M) twoS := by
-    refine ⟨hu, ?_⟩
-    rw [hofLp, Matrix.mulVec_smul, hSeig, smul_comm]
+  have hmem : φ₀ ∈ spinSector (M := M) filling twoS := by
+    refine ⟨hu, ?_, ?_⟩
+    · rw [hofLp, Matrix.mulVec_smul, hNeig, smul_comm]
+    · rw [hofLp, Matrix.mulVec_smul, hSeig, smul_comm]
   -- rayleighOnVec H φ₀.ofLp = lam, since φ₀ is a unit eigenvector of H
   have hray : rayleighOnVec H φ₀.ofLp = lam := by
     refine rayleighOnVec_of_unit_eigenvector H φ₀ hu lam ?_
     rw [hofLp, Matrix.mulVec_smul, hHeig, smul_comm]
-  calc sectorMinEnergy H twoS
+  calc sectorMinEnergy H filling twoS
       ≤ rayleighOnVec H φ₀.ofLp := ciInf_le hbdd ⟨φ₀, hmem⟩
     _ = lam := hray
 
@@ -163,9 +167,9 @@ flat-band state.  (Together with `tasakiNonsingular_rayleighOnVec_ge`, `sectorMi
 theorem tasakiNonsingular_sectorMinEnergy_maxSpin_le (K : ℕ) (ν s t U lam κ : ℝ) (hK : 1 ≤ K)
     (hlam : 0 ≤ lam)
     (hpos : ∀ i : Fin (K + 1), (nonsingularLocalHamiltonian K ν s t U lam κ i).PosSemidef) :
-    sectorMinEnergy (tasakiNonsingularHamiltonian K ν t s U) (K + 1)
+    sectorMinEnergy (tasakiNonsingularHamiltonian K ν t s U) (K + 1) (K + 1)
       ≤ -((K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s)) := by
-  have hbdd : BddBelow (Set.range (fun φ : spinSector (M := 2 * K + 1) (K + 1) =>
+  have hbdd : BddBelow (Set.range (fun φ : spinSector (M := 2 * K + 1) (K + 1) (K + 1) =>
       rayleighOnVec (tasakiNonsingularHamiltonian K ν t s U)
         (φ : EuclideanSpace ℂ _).ofLp)) := by
     refine ⟨-((K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s)), ?_⟩
@@ -173,12 +177,13 @@ theorem tasakiNonsingular_sectorMinEnergy_maxSpin_le (K : ℕ) (ν s t U lam κ 
     exact tasakiNonsingular_rayleighOnVec_ge K ν s t U lam κ hlam hpos φv hφmem.1
   refine sectorMinEnergy_le_of_eigenvector (M := 2 * K + 1)
     (tasakiNonsingularHamiltonian K ν t s U) (flatBandAlphaAllUpState K ν)
-    (flatBandAlphaAllUpState_ne_zero K ν) (-((K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s))) (K + 1)
-    ?_ ?_ hbdd
+    (flatBandAlphaAllUpState_ne_zero K ν) (-((K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s))) (K + 1) (K + 1)
+    ?_ ?_ ?_ hbdd
   · rw [tasakiNonsingularHamiltonian_mulVec_alphaAllUpState K ν t s U hK]
     congr 1
     push_cast
     ring
+  · rw [flatBandTotalNumber_mulVec_alphaAllUpState K ν]
   · rw [flatBandTotalSpinSquared_mulVec_alphaAllUpState K ν]
 
 end LatticeSystem.Fermion

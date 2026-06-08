@@ -72,8 +72,8 @@ axiom nonsingular_theorem_11_19 (R : ℝ) (hR : 0 < R) :
            let F1 : ℝ := 1 + a1 * ν + a2 * |ζ| / ν ^ 3 + a3 * t * |ζ| ^ 2 / (ν ^ 4 * U)
            let F2 : ℝ := 1 - b1 * ν - b2 * |ζ| / ν ^ 2 - b3 * t * |ζ| ^ 2 / (ν ^ 4 * U)
            F1 * (2 * ν ^ 4 * U * (1 - Real.cos θ)) ≥
-               spinWaveEnergy K H k - sectorMinEnergy H (K + 1) ∧
-             spinWaveEnergy K H k - sectorMinEnergy H (K + 1) ≥
+               spinWaveEnergy K H k - sectorMinEnergy H (K + 1) (K + 1) ∧
+             spinWaveEnergy K H k - sectorMinEnergy H (K + 1) (K + 1) ≥
                F2 * (2 * ν ^ 4 * U * (1 - Real.cos θ)))
 
 end LatticeSystem.Fermion
