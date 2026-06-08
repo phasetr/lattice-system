@@ -6253,6 +6253,15 @@ Hamiltonian $\hat h_p$ (eq.~(11.4.48), $d=1$, on $p=i$ and its neighbours), and
 (\texttt{nonsingular\_lemma\_11\_22}: parameter conditions $\Rightarrow \hat h_p\ge0$), and
 \textbf{Lemma 11.23} (\texttt{nonsingular\_lemma\_11\_23}: the $t,U\uparrow\infty$ limit
 positivity below $S_{\max}$) remain documented axioms; Theorem 11.20 is proved from 11.21/11.22.
+Towards discharging Lemma 11.21, the \emph{frustration-free decomposition} eq.~(11.4.46) is now
+proved (\texttt{NonsingularFrustrationFree.lean}): \texttt{tasakiNonsingular\_eq\_sum\_localHamiltonian}
+shows, for every $\mathtt{lam},\kappa$,
+$\hat H = \bigl(\sum_i\hat h_{p}^{(i)}\bigr) - (K{+}1)(1{+}2\nu^2)s\cdot\mathbf 1
++ \mathtt{lam}\cdot\bigl(\sum_u\hat N^\beta_u + \sum_x\hat n_{x\uparrow}\hat n_{x\downarrow}\bigr)$.
+The per-site multiplicities collapse via the cyclic reindexings $\sum_p f(p\mp1)=\sum_p f(p)$
+(\texttt{sum\_shift\_sub\_one}/\texttt{sum\_shift\_add\_one}) and the even/odd site split
+(\texttt{sum\_deltaSite\_split}); the $\kappa$-dependence cancels by the external-site incidence
+$(1-\kappa)+\kappa=1$.  Axiom-free.
 
 \medskip\noindent\textbf{Per-site fermionic spin operators (towards §11.5).}  The
 ferromagnetic t-J model (§11.5.2, eq.~(11.5.4)) couples spins by a Heisenberg term
