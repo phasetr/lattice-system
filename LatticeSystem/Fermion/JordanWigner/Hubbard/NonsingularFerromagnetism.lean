@@ -285,4 +285,28 @@ theorem tasakiNonsingular_rayleigh_ne_neg_const_of_lower_sector (K : ℕ) (ν s 
   have : twoS = K + 1 := by nlinarith [hnat]
   omega
 
+/-- **A unit sphere intersected with two matrix-eigenvalue conditions is compact.**  Generic over an
+abstract finite index type: the set is a closed subset (the eigenvalue equations are closed,
+`EuclideanSpace ℂ n` finite-dimensional) of the compact unit sphere. -/
+theorem isCompact_eigenSphere {n : Type*} [Fintype n]
+    (A B : Matrix n n ℂ) (a b : ℂ) :
+    IsCompact {φ : EuclideanSpace ℂ n |
+      ‖φ‖ = 1 ∧ A.mulVec φ.ofLp = a • φ.ofLp ∧ B.mulVec φ.ofLp = b • φ.ofLp} := by
+  haveI : ProperSpace (EuclideanSpace ℂ n) := FiniteDimensional.proper ℂ (EuclideanSpace ℂ n)
+  have hofLp : Continuous fun φ : EuclideanSpace ℂ n => φ.ofLp :=
+    (PiLp.continuousLinearEquiv 2 ℂ _).continuous
+  have hcA : Continuous fun φ : EuclideanSpace ℂ n => A.mulVec φ.ofLp :=
+    A.mulVecLin.continuous_of_finiteDimensional.comp hofLp
+  have hcAa : Continuous fun φ : EuclideanSpace ℂ n => a • φ.ofLp := continuous_const.smul hofLp
+  have hcB : Continuous fun φ : EuclideanSpace ℂ n => B.mulVec φ.ofLp :=
+    B.mulVecLin.continuous_of_finiteDimensional.comp hofLp
+  have hcBb : Continuous fun φ : EuclideanSpace ℂ n => b • φ.ofLp := continuous_const.smul hofLp
+  have hclosed : IsClosed {φ : EuclideanSpace ℂ n |
+      ‖φ‖ = 1 ∧ A.mulVec φ.ofLp = a • φ.ofLp ∧ B.mulVec φ.ofLp = b • φ.ofLp} :=
+    (isClosed_eq continuous_norm continuous_const).inter
+      ((isClosed_eq hcA hcAa).inter (isClosed_eq hcB hcBb))
+  refine (isCompact_sphere (0 : EuclideanSpace ℂ n) 1).of_isClosed_subset hclosed ?_
+  rintro φ ⟨hu, _, _⟩
+  simpa [Metric.mem_sphere, dist_zero_right] using hu
+
 end LatticeSystem.Fermion
