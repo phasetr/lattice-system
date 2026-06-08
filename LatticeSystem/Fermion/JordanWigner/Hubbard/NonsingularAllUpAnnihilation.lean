@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandBasis
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandCAR
 
 /-!
 # Tasaki §11.4.3 Lemma 11.21: the local Hamiltonian annihilates the all-up state
@@ -53,5 +54,45 @@ theorem flatBandAlpha_dot_self (K : ℕ) (ν : ℝ) (p : Fin (K + 1)) (hp : p - 
       if_pos (Finset.mem_univ (p - 1))]
     ring
   rw [hext, hint]
+
+/-- **Self-anticommutator of the flat-band fermion operators** (Tasaki eq. (11.4.42), `d = 1`):
+`{â_{p,σ}, â†_{p,σ}} = (1+2ν²)·1` on a genuine chain (`p − 1 ≠ p`).  Reduces, via the canonical
+anticommutation relations, to the self-overlap `⟨α_p, α_p⟩ = 1+2ν²`. -/
+theorem flatBandAAnnihilation_ACreation_anticomm_self (K : ℕ) (ν : ℝ) (p : Fin (K + 1))
+    (σ : Fin 2) (hp : p - 1 ≠ p) :
+    flatBandAAnnihilation K ν p σ * flatBandACreation K ν p σ
+      + flatBandACreation K ν p σ * flatBandAAnnihilation K ν p σ
+      = ((1 + 2 * ν ^ 2 : ℝ) : ℂ) • (1 : ManyBodyOp (Fin (2 * (2 * K + 1) + 2))) := by
+  set c : Fin (2 * K + 2) → ManyBodyOp (Fin (2 * (2 * K + 1) + 2)) :=
+    fun x => fermionMultiAnnihilation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) x σ)
+    with hc
+  set d : Fin (2 * K + 2) → ManyBodyOp (Fin (2 * (2 * K + 1) + 2)) :=
+    fun y => fermionMultiCreation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) y σ)
+    with hd
+  have hkey : flatBandAAnnihilation K ν p σ * flatBandACreation K ν p σ
+      + flatBandACreation K ν p σ * flatBandAAnnihilation K ν p σ
+      = ∑ x, ∑ y, ((flatBandAlpha K ν p x : ℂ) * (flatBandAlpha K ν p y : ℂ)) •
+          (c x * d y + d y * c x) := by
+    unfold flatBandAAnnihilation flatBandACreation
+    rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl (fun x _ => ?_)
+    rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl (fun y _ => ?_)
+    rw [smul_mul_assoc, mul_smul_comm, smul_smul, mul_comm _ (flatBandAlpha K ν p y : ℂ),
+      smul_mul_assoc, mul_smul_comm, smul_smul, mul_comm (flatBandAlpha K ν p y : ℂ),
+      ← smul_add]
+  rw [hkey]
+  simp_rw [hc, hd, spinful_annihilation_creation_anticomm, and_true]
+  rw [show (∑ x, ∑ y, ((flatBandAlpha K ν p x : ℂ) * (flatBandAlpha K ν p y : ℂ)) •
+      (if x = y then (1 : ManyBodyOp (Fin (2 * (2 * K + 1) + 2))) else 0))
+      = ∑ x, ((flatBandAlpha K ν p x : ℂ) * (flatBandAlpha K ν p x : ℂ)) • (1 : _) from by
+    refine Finset.sum_congr rfl (fun x _ => ?_)
+    rw [Finset.sum_congr rfl (fun y _ => by rw [smul_ite, smul_zero]),
+      Finset.sum_ite_eq Finset.univ x (fun y =>
+        ((flatBandAlpha K ν p x : ℂ) * (flatBandAlpha K ν p y : ℂ)) • (1 : _)),
+      if_pos (Finset.mem_univ x)]]
+  rw [← Finset.sum_smul, show (∑ x, (flatBandAlpha K ν p x : ℂ) * (flatBandAlpha K ν p x : ℂ))
+      = (((∑ x, flatBandAlpha K ν p x * flatBandAlpha K ν p x : ℝ)) : ℂ) from by
+    push_cast; rfl, flatBandAlpha_dot_self K ν p hp]
 
 end LatticeSystem.Fermion
