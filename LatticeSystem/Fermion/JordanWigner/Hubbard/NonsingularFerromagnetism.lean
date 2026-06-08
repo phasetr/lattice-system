@@ -236,4 +236,53 @@ theorem tasakiNonsingular_flatBand_mulVec_zero_of_rayleigh_eq_neg_const (K : ℕ
   exact posSemidef_mulVec_eq_zero_of_rayleighOnVec_zero
     (flatBandHamiltonian_posSemidef K ν 1 1 (by norm_num) (by norm_num)) hflat0
 
+open scoped ComplexOrder in
+/-- **No lower-spin sector state achieves the ground energy.**  For `0 < ν`, `0 < lam`, every
+`ĥ_p ≥ 0`, and `twoS < K+1`, no unit vector of the (half-filling) total-spin-`twoS` sector has
+energy `−C`.  Such a state would lie in `ker Ĥ_flat` at half filling (the previous lemma), hence by
+Theorem 11.11 carry maximal spin `S_max = (K+1)/2`, contradicting its `twoS < K+1` sector. -/
+theorem tasakiNonsingular_rayleigh_ne_neg_const_of_lower_sector (K : ℕ) (ν s t U lam κ : ℝ)
+    (hν : 0 < ν) (hlam : 0 < lam)
+    (hpos : ∀ i : Fin (K + 1), (nonsingularLocalHamiltonian K ν s t U lam κ i).PosSemidef)
+    (twoS : ℕ) (htwoS : twoS < K + 1)
+    (φ : EuclideanSpace ℂ (Fin (2 * (2 * K + 1) + 2) → Fin 2))
+    (hφmem : φ ∈ spinSector (M := 2 * K + 1) (K + 1) twoS) :
+    rayleighOnVec (tasakiNonsingularHamiltonian K ν t s U) φ.ofLp
+      ≠ -((K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s)) := by
+  intro hE
+  obtain ⟨hu, hN, hS⟩ := hφmem
+  -- the state lies in ker Ĥ_flat at half filling, hence in the Theorem-11.11 ground submodule
+  have hflat := tasakiNonsingular_flatBand_mulVec_zero_of_rayleigh_eq_neg_const
+    K ν s t U lam κ hlam hpos φ hu hE
+  have hmem11 : φ.ofLp ∈ flatBandHalfFilledGroundSubmodule K ν 1 1 := by
+    rw [flatBandHalfFilledGroundSubmodule, Submodule.mem_inf]
+    refine ⟨?_, ?_⟩
+    · rw [LinearMap.mem_ker, Matrix.mulVecLin_apply]; exact hflat
+    · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]; exact hN
+  -- Theorem 11.11: the state carries maximal spin S_max = (K+1)/2
+  have hSmax := flatBand_theorem_11_11_groundState_maximalSpin K ν 1 1 hν
+    (by norm_num) (by norm_num) hmem11
+  -- comparing the two (Ŝ_tot)² eigenvalues forces twoS = K+1, contradiction
+  have hφne : φ ≠ 0 := norm_ne_zero_iff.mp (by rw [hu]; norm_num)
+  have hvne : φ.ofLp ≠ 0 := fun h => hφne (by
+    have := congrArg (WithLp.equiv 2 _).symm h
+    simpa using this)
+  have heq : ((twoS : ℂ) / 2) * ((twoS : ℂ) / 2 + 1)
+      = ((K + 1 : ℕ) : ℂ) / 2 * (((K + 1 : ℕ) : ℂ) / 2 + 1) := by
+    have hsmul : (((twoS : ℂ) / 2) * ((twoS : ℂ) / 2 + 1)) • φ.ofLp
+        = (((K + 1 : ℕ) : ℂ) / 2 * (((K + 1 : ℕ) : ℂ) / 2 + 1)) • φ.ofLp := by
+      rw [← hS, ← hSmax]
+    exact smul_left_injective ℂ hvne hsmul
+  -- the eigenvalue map twoS ↦ (twoS/2)(twoS/2+1) is injective on ℕ
+  have hnat : twoS * twoS + 2 * twoS = (K + 1) * (K + 1) + 2 * (K + 1) := by
+    have : ((twoS * twoS + 2 * twoS : ℕ) : ℂ) = ((((K + 1) * (K + 1) + 2 * (K + 1) : ℕ)) : ℂ) := by
+      push_cast
+      push_cast at heq
+      ring_nf
+      ring_nf at heq
+      linear_combination 4 * heq
+    exact_mod_cast this
+  have : twoS = K + 1 := by nlinarith [hnat]
+  omega
+
 end LatticeSystem.Fermion
