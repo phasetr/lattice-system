@@ -105,4 +105,40 @@ theorem rayleighOnVec_of_unit_eigenvector {ι : Type*} [Fintype ι]
   rw [heig, dotProduct_smul, star_dotProduct_self_of_norm_one φ hu, smul_eq_mul, mul_one,
     Complex.ofReal_re]
 
+/-- **Sector upper bound from a plain-vector eigenvector.**  If `v ≠ 0` is a common eigenvector of
+`H` (real eigenvalue `lam`) and of `(Ŝ_tot)²` (eigenvalue `(twoS/2)(twoS/2+1)`), then the spin
+sector `twoS` has minimum energy at most `lam`: `sectorMinEnergy H twoS ≤ lam`.  The normalised
+`φ₀ = ‖v‖⁻¹ • toLp v` lies in `spinSector twoS` with `rayleighOnVec H φ₀.ofLp = lam`. -/
+theorem sectorMinEnergy_le_of_eigenvector {M : ℕ} (H : ManyBodyOp (Fin (2 * M + 2)))
+    (v : (Fin (2 * M + 2) → Fin 2) → ℂ) (hv : v ≠ 0) (lam : ℝ) (twoS : ℕ)
+    (hHeig : H.mulVec v = (lam : ℂ) • v)
+    (hSeig : (fermionTotalSpinSquared M).mulVec v
+      = (((twoS : ℂ) / 2) * ((twoS : ℂ) / 2 + 1)) • v)
+    (hbdd : BddBelow (Set.range
+      (fun φ : spinSector (M := M) twoS => rayleighOnVec H (φ : EuclideanSpace ℂ _).ofLp))) :
+    sectorMinEnergy H twoS ≤ lam := by
+  classical
+  set φ : EuclideanSpace ℂ (Fin (2 * M + 2) → Fin 2) := (WithLp.equiv 2 _).symm v with hφdef
+  have hφne : φ ≠ 0 := by
+    intro h
+    refine hv ?_
+    have : φ.ofLp = (0 : EuclideanSpace ℂ (Fin (2 * M + 2) → Fin 2)).ofLp := by rw [h]
+    simpa [hφdef] using this
+  set φ₀ : EuclideanSpace ℂ (Fin (2 * M + 2) → Fin 2) := (‖φ‖⁻¹ : ℂ) • φ with hφ0def
+  have hofLp : φ₀.ofLp = (‖φ‖⁻¹ : ℂ) • v := rfl
+  have hu : ‖φ₀‖ = 1 := by
+    rw [hφ0def, norm_smul, norm_inv, Complex.norm_real, norm_norm,
+      inv_mul_cancel₀ (norm_ne_zero_iff.mpr hφne)]
+  -- φ₀ is a unit vector in the spin sector
+  have hmem : φ₀ ∈ spinSector (M := M) twoS := by
+    refine ⟨hu, ?_⟩
+    rw [hofLp, Matrix.mulVec_smul, hSeig, smul_comm]
+  -- rayleighOnVec H φ₀.ofLp = lam, since φ₀ is a unit eigenvector of H
+  have hray : rayleighOnVec H φ₀.ofLp = lam := by
+    refine rayleighOnVec_of_unit_eigenvector H φ₀ hu lam ?_
+    rw [hofLp, Matrix.mulVec_smul, hHeig, smul_comm]
+  calc sectorMinEnergy H twoS
+      ≤ rayleighOnVec H φ₀.ofLp := ciInf_le hbdd ⟨φ₀, hmem⟩
+    _ = lam := hray
+
 end LatticeSystem.Fermion
