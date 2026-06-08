@@ -6261,7 +6261,14 @@ $\hat H = \bigl(\sum_i\hat h_{p}^{(i)}\bigr) - (K{+}1)(1{+}2\nu^2)s\cdot\mathbf 
 The per-site multiplicities collapse via the cyclic reindexings $\sum_p f(p\mp1)=\sum_p f(p)$
 (\texttt{sum\_shift\_sub\_one}/\texttt{sum\_shift\_add\_one}) and the even/odd site split
 (\texttt{sum\_deltaSite\_split}); the $\kappa$-dependence cancels by the external-site incidence
-$(1-\kappa)+\kappa=1$.  Axiom-free.
+$(1-\kappa)+\kappa=1$.  Axiom-free.  This yields the operator-positivity half of Lemma 11.21
+(\texttt{NonsingularFrustrationFreePos.lean}): the remainder $\sum_u\hat N^\beta_u+\sum_x\hat
+n_{x\uparrow}\hat n_{x\downarrow}$ equals $\texttt{flatBandHamiltonian}~K\,\nu\,1\,1$
+(\texttt{nonsingularRemainder\_eq\_flatBand}), hence is positive-semidefinite, and so when every
+$\hat h_p\ge0$ and $\mathtt{lam}\ge0$, \texttt{tasakiNonsingular\_add\_const\_posSemidef} gives
+$\hat H + (K{+}1)(1{+}2\nu^2)s\cdot\mathbf 1\ge 0$ (a sum of the positive-semidefinite $\hat h_p$ and
+the positive $\mathtt{lam}$-remainder).  So the ground energy is $\ge -(K{+}1)(1{+}2\nu^2)s$, achieved
+by the max-spin tower; the strict gap below $S_{\max}$ (via Theorem 11.11) remains.  Axiom-free.
 
 \medskip\noindent\textbf{Per-site fermionic spin operators (towards §11.5).}  The
 ferromagnetic t-J model (§11.5.2, eq.~(11.5.4)) couples spins by a Heisenberg term
