@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.MultiSite
 import LatticeSystem.Quantum.SpinS.Hermitian
 import LatticeSystem.Quantum.SpinS.PMAsOneTwo
+import LatticeSystem.Math.MatrixAnalysis.HermitianSum
 
 /-!
 # Total spin-`S` operators on a multi-site Hilbert space
@@ -43,35 +44,22 @@ noncomputable def totalSpinSOpPlus : ManyBodyOpS Λ N :=
 noncomputable def totalSpinSOpMinus : ManyBodyOpS Λ N :=
   ∑ x : Λ, onSiteS x (spinSOpMinus N)
 
-/-- A finite sum of Hermitian matrices is Hermitian. -/
-private lemma isHermitian_sum_aux {ι : Type*} {n : Type*}
-    (s : Finset ι) {f : ι → Matrix n n ℂ}
-    (hf : ∀ i ∈ s, (f i).IsHermitian) :
-    (∑ i ∈ s, f i).IsHermitian := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simp [Matrix.IsHermitian]
-  | @insert a t hns ih =>
-    rw [Finset.sum_insert hns]
-    refine Matrix.IsHermitian.add (hf a (Finset.mem_insert_self a t)) ?_
-    exact ih (fun i hi => hf i (Finset.mem_insert_of_mem hi))
-
 /-- `Ŝ_tot^{(1)}` is Hermitian. -/
 theorem totalSpinSOp1_isHermitian : (totalSpinSOp1 Λ N).IsHermitian := by
   unfold totalSpinSOp1
-  exact isHermitian_sum_aux Finset.univ
+  exact Matrix.isHermitian_sum Finset.univ
     (fun x _ => onSiteS_isHermitian x (spinSOp1_isHermitian N))
 
 /-- `Ŝ_tot^{(2)}` is Hermitian. -/
 theorem totalSpinSOp2_isHermitian : (totalSpinSOp2 Λ N).IsHermitian := by
   unfold totalSpinSOp2
-  exact isHermitian_sum_aux Finset.univ
+  exact Matrix.isHermitian_sum Finset.univ
     (fun x _ => onSiteS_isHermitian x (spinSOp2_isHermitian N))
 
 /-- `Ŝ_tot^{(3)}` is Hermitian. -/
 theorem totalSpinSOp3_isHermitian : (totalSpinSOp3 Λ N).IsHermitian := by
   unfold totalSpinSOp3
-  exact isHermitian_sum_aux Finset.univ
+  exact Matrix.isHermitian_sum Finset.univ
     (fun x _ => onSiteS_isHermitian x (spinSOp3_isHermitian N))
 
 /-! ## Total raising/lowering decomposition -/
