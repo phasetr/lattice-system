@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandBasis
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandCAR
 
 /-!
 # Tasaki §11.3.1: the single-particle-mode creation map (towards Theorem 11.11 uniqueness)
@@ -36,6 +37,61 @@ noncomputable def flatBandModeCreation (K : ℕ) (σ : Fin 2) :
     rw [Finset.sum_add_distrib]
   map_smul' c w := by
     simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.smul_sum, smul_smul]
+
+/-- **The single-particle-mode annihilation map** `Ĉ_σ(w) = ∑_x w(x) ĉ_{x,σ}` as a `ℂ`-linear map
+(matching Tasaki's convention with the plain — not conjugated — coefficients, so `â_{p,σ}` at
+`w = α_p` and `b̂_{u,σ}` at `w = β_u`). -/
+noncomputable def flatBandModeAnnihilation (K : ℕ) (σ : Fin 2) :
+    (Fin (2 * K + 2) → ℂ) →ₗ[ℂ] ManyBodyOp (Fin (2 * (2 * K + 1) + 2)) where
+  toFun w := ∑ x : Fin (2 * K + 2), w x •
+    fermionMultiAnnihilation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) x σ)
+  map_add' w₁ w₂ := by
+    simp only [Pi.add_apply, add_smul]
+    rw [Finset.sum_add_distrib]
+  map_smul' c w := by
+    simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.smul_sum, smul_smul]
+
+/-- `b̂_{u,σ}` is the mode annihilation at the single-particle state `β_u`. -/
+theorem flatBandBAnnihilation_eq_modeAnnihilation (K : ℕ) (ν : ℝ) (u : Fin (K + 1)) (σ : Fin 2) :
+    flatBandBAnnihilation K ν u σ = flatBandModeAnnihilation K σ (flatBandBetaC K ν u) :=
+  rfl
+
+/-- **Generic single-particle mode CAR** `{Ĉ_σ(w), Ĉ†_τ(w')} = (∑_x w(x) w'(x)) δ_{στ} · 1`.
+The bilinear double sum of the spinful site anticommutations `{ĉ_{x,σ}, ĉ†_{y,τ}}` collapses on the
+diagonal.  Specialising `w, w'` to `α, β` recovers `{â,â†}`, `{b̂,b̂†}`, `{b̂,â†}`. -/
+theorem flatBandMode_annihilation_creation_anticomm (K : ℕ) (σ τ : Fin 2)
+    (w w' : Fin (2 * K + 2) → ℂ) :
+    flatBandModeAnnihilation K σ w * flatBandModeCreation K τ w'
+      + flatBandModeCreation K τ w' * flatBandModeAnnihilation K σ w
+      = (if σ = τ then (∑ x, w x * w' x) else 0) •
+        (1 : ManyBodyOp (Fin (2 * (2 * K + 1) + 2))) := by
+  have hkey : flatBandModeAnnihilation K σ w * flatBandModeCreation K τ w'
+      + flatBandModeCreation K τ w' * flatBandModeAnnihilation K σ w
+      = ∑ x, ∑ y, (w x * w' y) •
+          (fermionMultiAnnihilation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) x σ) *
+              fermionMultiCreation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) y τ)
+            + fermionMultiCreation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) y τ) *
+              fermionMultiAnnihilation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) x σ)) := by
+    simp only [flatBandModeAnnihilation, flatBandModeCreation, LinearMap.coe_mk, AddHom.coe_mk]
+    rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl (fun x _ => ?_)
+    rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl (fun y _ => ?_)
+    rw [smul_mul_assoc, mul_smul_comm, smul_smul, mul_comm _ (w' y), smul_mul_assoc,
+      mul_smul_comm, smul_smul, mul_comm (w' y), ← smul_add]
+  rw [hkey]
+  by_cases hστ : σ = τ
+  · subst hστ
+    rw [if_pos rfl, Finset.sum_smul]
+    refine Finset.sum_congr rfl (fun x _ => ?_)
+    rw [Finset.sum_eq_single x]
+    · rw [spinful_annihilation_creation_anticomm, if_pos ⟨rfl, rfl⟩]
+    · intro y _ hy
+      rw [spinful_annihilation_creation_anticomm, if_neg (fun h => hy h.1.symm), smul_zero]
+    · intro hx; exact absurd (Finset.mem_univ x) hx
+  · rw [if_neg hστ, zero_smul]
+    refine Finset.sum_eq_zero (fun x _ => Finset.sum_eq_zero (fun y _ => ?_))
+    rw [spinful_annihilation_creation_anticomm, if_neg (fun h => hστ h.2), smul_zero]
 
 /-- `â†_{p,σ}` is the mode creation at the single-particle state `α_p`. -/
 theorem flatBandACreation_eq_modeCreation (K : ℕ) (ν : ℝ) (p : Fin (K + 1)) (σ : Fin 2) :
