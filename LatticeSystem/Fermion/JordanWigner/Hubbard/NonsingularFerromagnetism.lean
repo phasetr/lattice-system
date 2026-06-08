@@ -419,4 +419,28 @@ theorem nonsingular_exhibitsFerromagnetism (K : ℕ) (ν s t U lam κ : ℝ)
         tasakiNonsingular_neg_const_lt_sectorMinEnergy_lower K ν s t U lam κ hν hs hlam hpos twoS
           htwoS
 
+/-- **Tasaki Theorem 11.20 (ferromagnetism in the non-singular Hubbard model), PROVED** (`d = 1`,
+`1 ≤ K`).  For every `ν > 0` there are thresholds `T, V > 0` (depending only on `ν`, uniformly in
+the system size `K`) such that, whenever `1 ≤ K`, `t/s ≥ T`, and `U/s ≥ V` (with `t, s, U > 0`),
+the Tasaki non-singular Hubbard model exhibits saturated ferromagnetism `exhibitsFerromagnetism H
+(K+1) (K+1)`.
+
+Tasaki's proof (§11.4.3): Lemma 11.22 (`nonsingular_lemma_11_22`) supplies parameters `lam = clam·s`
+(`clam > 0`), `κ = cκ` for which every local Hamiltonian `ĥ_p` is positive-semidefinite once
+`t/s ≥ T`, `U/s ≥ V`; the proved Lemma 11.21 (`nonsingular_exhibitsFerromagnetism`) then turns that
+frustration-freeness into saturated ferromagnetism (via the reduction to Theorem 11.11).  This
+discharges the former `axiom tasaki_theorem_11_20` *and* the former `axiom nonsingular_lemma_11_21`,
+leaving only Lemmas 11.22/11.23 (the analytic eigenvalue-continuity core) as documented axioms of
+§11.4.  The `1 ≤ K` hypothesis (genuine periodic chain) is required by the all-up-state annihilation
+`tasakiNonsingularHamiltonian_mulVec_alphaAllUpState`. -/
+theorem tasaki_theorem_11_20 (ν : ℝ) (hν : 0 < ν) :
+    ∃ T V : ℝ, 0 < T ∧ 0 < V ∧
+      ∀ (K : ℕ) (t s U : ℝ), 1 ≤ K → 0 < s → 0 < t → 0 < U →
+        T ≤ t / s → V ≤ U / s →
+        exhibitsFerromagnetism (tasakiNonsingularHamiltonian K ν t s U) (K + 1) (K + 1) := by
+  obtain ⟨T, V, clam, cκ, hT, hV, hclam, _, hpos⟩ := nonsingular_lemma_11_22 ν hν
+  refine ⟨T, V, hT, hV, fun K t s U hK hs ht hU hTt hVU => ?_⟩
+  exact nonsingular_exhibitsFerromagnetism K ν s t U (clam * s) cκ hK hν hs
+    (mul_pos hclam hs) (hpos K s t U hs ht hU hTt hVU)
+
 end LatticeSystem.Fermion

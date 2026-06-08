@@ -6244,22 +6244,25 @@ Theorem 11.20, proved modulo Lemmas 11.21/11.22).}  The culmination of §11.4 is
 \texttt{tasakiNonsingularHamiltonian}~$K\,\nu\,t\,s\,U =
 \texttt{flatBandHamiltonian}~K\,\nu\,t\,U - s\cdot\sum_{p,\sigma}\hat a^\dagger_{p,\sigma}\hat a_{p,\sigma}$,
 which reduces to the flat-band model at $s=0$ (\texttt{tasakiNonsingularHamiltonian\_zero\_s}).
-\textbf{Theorem 11.20} (\texttt{tasaki\_theorem\_11\_20}, \emph{now a proved theorem}, $d=1$): for
-every $\nu>0$ there are thresholds, uniform in the system size, such that once $t/s$ and $U/s$ are
-large enough the model satisfies \texttt{exhibitsFerromagnetism} (saturated ferromagnetism,
-$S_{\max}=N/2$).  The discharge (in \texttt{NonsingularLocalHamiltonian.lean}, downstream of the
-$\hat h_p$ lemmas) is the book-faithful reduction: Lemma 11.22 fixes parameters
+\textbf{Theorem 11.20} (\texttt{tasaki\_theorem\_11\_20}, \emph{now a proved theorem}, $d=1$,
+$1\le K$): for every $\nu>0$ there are thresholds, uniform in the system size, such that once $t/s$
+and $U/s$ are large enough the model satisfies \texttt{exhibitsFerromagnetism} (saturated
+ferromagnetism, $S_{\max}=N/2$).  The discharge (in \texttt{NonsingularFerromagnetism.lean},
+downstream of the $\hat h_p$ lemmas) is the book-faithful reduction: Lemma 11.22 fixes parameters
 $\mathtt{lam}=c_\lambda s$, $\kappa=c_\kappa$ making every $\hat h_p\ge0$ once $t/s\ge T$, $U/s\ge V$,
 and Lemma 11.21 turns that frustration-freeness into saturated ferromagnetism.  Thus Theorem 11.20
-rests only on Lemmas 11.21/11.22 (themselves documented axioms, deferred).  The proof-internal
-numbered lemmas are recorded (\texttt{NonsingularLocalHamiltonian.lean}):
+rests only on the analytic Lemmas 11.22/11.23 (documented axioms, deferred).  The proof-internal
+numbered lemmas are recorded:
 \texttt{nonsingularLocalHamiltonian}~$K\,\nu\,s\,t\,U\,\mathtt{lam}\,\kappa\,i$ is the local
-Hamiltonian $\hat h_p$ (eq.~(11.4.48), $d=1$, on $p=i$ and its neighbours), and
-\textbf{Lemma 11.21} (\texttt{nonsingular\_lemma\_11\_21}: $\hat h_p\ge0\ \forall p \Rightarrow
-\texttt{exhibitsFerromagnetism}$, via Theorem 11.11), \textbf{Lemma 11.22}
-(\texttt{nonsingular\_lemma\_11\_22}: parameter conditions $\Rightarrow \hat h_p\ge0$), and
+Hamiltonian $\hat h_p$ (eq.~(11.4.48), $d=1$, on $p=i$ and its neighbours,
+\texttt{NonsingularLocalHamiltonian.lean}), and
+\textbf{Lemma 11.21} (\texttt{nonsingular\_exhibitsFerromagnetism}, \emph{now proved}:
+$\hat h_p\ge0\ \forall p \Rightarrow \texttt{exhibitsFerromagnetism}$, via Theorem 11.11) is
+discharged in \texttt{NonsingularFerromagnetism.lean}, while \textbf{Lemma 11.22}
+(\texttt{nonsingular\_lemma\_11\_22}: parameter conditions $\Rightarrow \hat h_p\ge0$) and
 \textbf{Lemma 11.23} (\texttt{nonsingular\_lemma\_11\_23}: the $t,U\uparrow\infty$ limit
-positivity below $S_{\max}$) remain documented axioms; Theorem 11.20 is proved from 11.21/11.22.
+positivity below $S_{\max}$) remain documented axioms (genuine eigenvalue-continuity perturbation
+theory mathlib lacks); Theorem 11.20 is proved from 11.21 (proved) and 11.22.
 Towards discharging Lemma 11.21, the \emph{frustration-free decomposition} eq.~(11.4.46) is now
 proved (\texttt{NonsingularFrustrationFree.lean}): \texttt{tasakiNonsingular\_eq\_sum\_localHamiltonian}
 shows, for every $\mathtt{lam},\kappa$,
@@ -6274,8 +6277,21 @@ n_{x\uparrow}\hat n_{x\downarrow}$ equals $\texttt{flatBandHamiltonian}~K\,\nu\,
 (\texttt{nonsingularRemainder\_eq\_flatBand}), hence is positive-semidefinite, and so when every
 $\hat h_p\ge0$ and $\mathtt{lam}\ge0$, \texttt{tasakiNonsingular\_add\_const\_posSemidef} gives
 $\hat H + (K{+}1)(1{+}2\nu^2)s\cdot\mathbf 1\ge 0$ (a sum of the positive-semidefinite $\hat h_p$ and
-the positive $\mathtt{lam}$-remainder).  So the ground energy is $\ge -(K{+}1)(1{+}2\nu^2)s$, achieved
-by the max-spin tower; the strict gap below $S_{\max}$ (via Theorem 11.11) remains.  Axiom-free.
+the positive $\mathtt{lam}$-remainder).  So the ground energy is $\ge -(K{+}1)(1{+}2\nu^2)s =: -C$,
+achieved by the max-spin tower (\texttt{tasakiNonsingular\_sectorMinEnergy\_maxSpin\_le}: the all-up
+flat-band state lies in the $S_{\max}$ sector and is an eigenvector at $-C$, needing $1\le K$).  The
+\emph{strict gap} below $S_{\max}$ is then closed by an attainment argument
+(\texttt{NonsingularFerromagnetism.lean}): the fixed-filling total-spin sector is the unit sphere
+intersected with two matrix-eigenvalue conditions, hence \emph{compact}
+(\texttt{isCompact\_eigenSphere}/\texttt{isCompact\_spinSector}), and
+$\varphi\mapsto\texttt{rayleighOnVec}~\hat H~\varphi$ is \emph{continuous}
+(\texttt{continuous\_rayleighOnVec}); so a nonempty lower sector attains its infimum at some
+$\varphi_0$ (\texttt{lt\_iInf\_rayleigh\_of\_eigenSphere}).  There $\texttt{rayleighOnVec}\ge -C$
+(frustration-free lower bound) and $\ne -C$: a state achieving $-C$ would lie in
+$\ker\hat H_{\rm flat}$ (the $\mathtt{lam}$-term vanishes), hence by Theorem 11.11 carry
+$S_{\max}$, contradicting $S<S_{\max}$.  An empty sector gives the junk infimum $0>-C$ (as $C>0$).
+Thus $-C<E_{\min}(S)$ for every $S<S_{\max}$ while $E_{\min}(S_{\max})\le-C$, i.e.\
+\texttt{exhibitsFerromagnetism} (Lemma 11.21).  Modulo Theorem 11.11.
 
 \medskip\noindent\textbf{Per-site fermionic spin operators (towards §11.5).}  The
 ferromagnetic t-J model (§11.5.2, eq.~(11.5.4)) couples spins by a Heisenberg term
