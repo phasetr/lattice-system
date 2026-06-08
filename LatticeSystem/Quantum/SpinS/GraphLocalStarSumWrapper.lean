@@ -110,7 +110,7 @@ theorem tasaki25b_graphLocalCluster_sum_lower_bound
     (hdeg : ∀ x ∈ s, 1 ≤ (G.neighborFinset x).card) :
     ∑ x ∈ s, (singleClusterGSEnergyS (G.neighborFinset x).card N).re ≤
       hermitianMinEigenvalue
-        (isHermitian_sum s (fun x => graphLocalClusterHamiltonianS G x N)
+        (Matrix.isHermitian_sum s
           (fun x _hx => graphLocalClusterHamiltonianS_isHermitian G x N)) := by
   refine sum_lower_bounds_le_hermitianMinEigenvalue_sum s
     (fun x => graphLocalClusterHamiltonianS G x N)
@@ -130,7 +130,7 @@ theorem tasaki25b_graphLocalCluster_sum_lower_bound_closed_form
         -((N : ℝ) / 2) *
           (((G.neighborFinset x).card : ℝ) * (N : ℝ) / 2 + 1) ≤
       hermitianMinEigenvalue
-        (isHermitian_sum s (fun x => graphLocalClusterHamiltonianS G x N)
+        (Matrix.isHermitian_sum s
           (fun x _hx => graphLocalClusterHamiltonianS_isHermitian G x N)) := by
   simpa [singleClusterGSEnergyS_re_eq] using
     tasaki25b_graphLocalCluster_sum_lower_bound G s N hdeg
@@ -144,7 +144,7 @@ theorem tasaki25b_graphLocalCluster_sum_lower_bound_degree_closed_form
     ∑ x ∈ s,
         -((N : ℝ) / 2) * ((G.degree x : ℝ) * (N : ℝ) / 2 + 1) ≤
       hermitianMinEigenvalue
-        (isHermitian_sum s (fun x => graphLocalClusterHamiltonianS G x N)
+        (Matrix.isHermitian_sum s
           (fun x _hx => graphLocalClusterHamiltonianS_isHermitian G x N)) := by
   have hcard : ∀ x ∈ s, 1 ≤ (G.neighborFinset x).card := by
     intro x hx

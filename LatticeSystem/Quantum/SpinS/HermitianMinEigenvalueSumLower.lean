@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueViaRayleigh
 import LatticeSystem.Quantum.SpinS.RayleighRitzEquality
 import LatticeSystem.Quantum.SpinS.SingleClusterHamiltonianEnergy
+import LatticeSystem.Math.MatrixAnalysis.HermitianSum
 
 /-!
 # Minimum-eigenvalue lower bounds for sums of Hermitian matrices
@@ -20,15 +21,6 @@ namespace LatticeSystem.Quantum
 open Matrix
 
 variable {n : Type*}
-
-/-- A finite sum of Hermitian matrices is Hermitian. -/
-theorem isHermitian_sum {ι : Type*} (s : Finset ι) (M : ι → Matrix n n ℂ)
-    (hM : ∀ i ∈ s, (M i).IsHermitian) :
-    (∑ i ∈ s, M i).IsHermitian := by
-  classical
-  refine Finset.sum_induction _ _ (fun A B hA hB => hA.add hB) Matrix.isHermitian_zero ?_
-  intro i hi
-  exact hM i hi
 
 variable [Fintype n]
 
@@ -54,17 +46,17 @@ theorem sum_lower_bounds_le_hermitianMinEigenvalue_sum {ι : Type*} (s : Finset 
     (M : ι → Matrix n n ℂ) (ε : ι → ℝ)
     (hM : ∀ i ∈ s, (M i).IsHermitian)
     (hε : ∀ i (hi : i ∈ s), ε i ≤ hermitianMinEigenvalue (hM i hi)) :
-    ∑ i ∈ s, ε i ≤ hermitianMinEigenvalue (isHermitian_sum s M hM) := by
+    ∑ i ∈ s, ε i ≤ hermitianMinEigenvalue (Matrix.isHermitian_sum s hM) := by
   classical
   obtain ⟨v, hunit, hv⟩ :=
-    exists_unit_vec_rayleighOnVec_eq_hermitianMinEigenvalue (isHermitian_sum s M hM)
+    exists_unit_vec_rayleighOnVec_eq_hermitianMinEigenvalue (Matrix.isHermitian_sum s hM)
   have hterm : ∀ i ∈ s, ε i ≤ rayleighOnVec (M i) v := by
     intro i hi
     exact le_trans (hε i hi) (hermitianMinEigenvalue_le_rayleighOnVec_of_unit (hM i hi) hunit)
   calc
     ∑ i ∈ s, ε i ≤ ∑ i ∈ s, rayleighOnVec (M i) v := Finset.sum_le_sum hterm
     _ = rayleighOnVec (∑ i ∈ s, M i) v := (rayleighOnVec_sum_matrix s M v).symm
-    _ = hermitianMinEigenvalue (isHermitian_sum s M hM) := hv
+    _ = hermitianMinEigenvalue (Matrix.isHermitian_sum s hM) := hv
 
 /-- Binary convenience form of `sum_lower_bounds_le_hermitianMinEigenvalue_sum`. -/
 theorem add_lower_bounds_le_hermitianMinEigenvalue_add
@@ -97,7 +89,7 @@ theorem tasaki25b_local_cluster_sum_lower_bound {ι : Type*} (s : Finset ι)
     (hlocal : ∀ x (hx : x ∈ s),
       hermitianMinEigenvalue (hH x hx) = (singleClusterGSEnergyS (degree x) N).re) :
     ∑ x ∈ s, (singleClusterGSEnergyS (degree x) N).re ≤
-      hermitianMinEigenvalue (isHermitian_sum s localH hH) := by
+      hermitianMinEigenvalue (Matrix.isHermitian_sum s hH) := by
   refine sum_lower_bounds_le_hermitianMinEigenvalue_sum s localH
     (fun x => (singleClusterGSEnergyS (degree x) N).re) hH ?_
   intro x hx
@@ -116,7 +108,7 @@ theorem tasaki25b_local_cluster_sum_lower_bound_closed_form {ι : Type*} (s : Fi
     (hlocal : ∀ x (hx : x ∈ s),
       hermitianMinEigenvalue (hH x hx) = (singleClusterGSEnergyS (degree x) N).re) :
     ∑ x ∈ s, -((N : ℝ) / 2) * ((degree x : ℝ) * (N : ℝ) / 2 + 1) ≤
-      hermitianMinEigenvalue (isHermitian_sum s localH hH) := by
+      hermitianMinEigenvalue (Matrix.isHermitian_sum s hH) := by
   simpa [singleClusterGSEnergyS_re_eq] using
     tasaki25b_local_cluster_sum_lower_bound s localH degree N hH hlocal
 

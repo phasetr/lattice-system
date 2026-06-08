@@ -16583,6 +16583,10 @@ imports the abstract Hamiltonian and energy companion, and
         \(\lambda_{\min}(H_i)\le\langle v,H_i v\rangle\) for each summand,
         and \texttt{rayleighOnVec\_sum\_matrix} identifies the sum of the
         Rayleigh quotients with the Rayleigh quotient of the summed matrix.
+        The auxiliary fact that a finite sum of Hermitian matrices is
+        Hermitian is the generic helper \texttt{Matrix.isHermitian\_sum}
+        (\texttt{Math/MatrixAnalysis/HermitianSum.lean}), shared across the
+        physics files that previously each carried a private copy.
 
         The two \texttt{tasaki25b\_local\_cluster} wrappers specialize this
         abstract sum bound to local cluster Hamiltonians whose

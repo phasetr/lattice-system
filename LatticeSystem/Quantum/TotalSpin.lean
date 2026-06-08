@@ -2,6 +2,7 @@ import LatticeSystem.Quantum.SpinHalf
 import LatticeSystem.Quantum.SpinHalfBasis
 import LatticeSystem.Quantum.SpinHalfRotation
 import LatticeSystem.Quantum.ManyBody
+import LatticeSystem.Math.MatrixAnalysis.HermitianSum
 import Mathlib.Topology.UniformSpace.Matrix
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 
@@ -64,34 +65,22 @@ noncomputable def totalSpinHalfOp3 : ManyBodyOp Λ :=
 
 /-! ## Hermiticity -/
 
-/-- A finite sum of Hermitian matrices is Hermitian. -/
-private lemma isHermitian_sum {ι : Type*} {n : Type*}
-    (s : Finset ι) {f : ι → Matrix n n ℂ} (hf : ∀ i ∈ s, (f i).IsHermitian) :
-    (∑ i ∈ s, f i).IsHermitian := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simp [Matrix.IsHermitian]
-  | @insert a t hns ih =>
-    rw [Finset.sum_insert hns]
-    refine Matrix.IsHermitian.add (hf a (Finset.mem_insert_self a t)) ?_
-    exact ih (fun i hi => hf i (Finset.mem_insert_of_mem hi))
-
 /-- `Ŝ_tot^(1)` is Hermitian. -/
 theorem totalSpinHalfOp1_isHermitian : (totalSpinHalfOp1 Λ).IsHermitian := by
   unfold totalSpinHalfOp1
-  exact isHermitian_sum Finset.univ
+  exact Matrix.isHermitian_sum Finset.univ
     (fun x _ => onSite_isHermitian x spinHalfOp1_isHermitian)
 
 /-- `Ŝ_tot^(2)` is Hermitian. -/
 theorem totalSpinHalfOp2_isHermitian : (totalSpinHalfOp2 Λ).IsHermitian := by
   unfold totalSpinHalfOp2
-  exact isHermitian_sum Finset.univ
+  exact Matrix.isHermitian_sum Finset.univ
     (fun x _ => onSite_isHermitian x spinHalfOp2_isHermitian)
 
 /-- `Ŝ_tot^(3)` is Hermitian. -/
 theorem totalSpinHalfOp3_isHermitian : (totalSpinHalfOp3 Λ).IsHermitian := by
   unfold totalSpinHalfOp3
-  exact isHermitian_sum Finset.univ
+  exact Matrix.isHermitian_sum Finset.univ
     (fun x _ => onSite_isHermitian x spinHalfOp3_isHermitian)
 
 /-! ## Distinct-site commutation (Tasaki eq 2.2.6, S = 1/2, `x ≠ y` case)

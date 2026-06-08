@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.ManyBody
 import LatticeSystem.Quantum.Pauli
 import LatticeSystem.Quantum.GibbsState
+import LatticeSystem.Math.MatrixAnalysis.HermitianSum
 import LatticeSystem.Quantum.GibbsState.Covariance
 import LatticeSystem.Lattice.Graph
 
@@ -193,23 +194,11 @@ noncomputable def quantumIsingHamiltonian (N : ℕ) (J h : ℝ) :
 
 /-! ## Helpers for Hermiticity under sums and real scalar multiples -/
 
-/-- Hermiticity is preserved under finite sums. -/
-private lemma isHermitian_sum {ι : Type*} {n : Type*}
-    (s : Finset ι) {f : ι → Matrix n n ℂ} (hf : ∀ i ∈ s, (f i).IsHermitian) :
-    (∑ i ∈ s, f i).IsHermitian := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simp [Matrix.IsHermitian]
-  | @insert a t hns ih =>
-    rw [Finset.sum_insert hns]
-    refine Matrix.IsHermitian.add (hf a (Finset.mem_insert_self a t)) ?_
-    exact ih (fun i hi => hf i (Finset.mem_insert_of_mem hi))
-
 /-- Hermiticity is preserved under `Finset.univ` sums. -/
 private lemma isHermitian_univ_sum {ι : Type*} [Fintype ι] {n : Type*}
     {f : ι → Matrix n n ℂ} (hf : ∀ i, (f i).IsHermitian) :
     (∑ i, f i).IsHermitian :=
-  isHermitian_sum Finset.univ (fun i _ => hf i)
+  Matrix.isHermitian_sum Finset.univ (fun i _ => hf i)
 
 /-- Scaling a Hermitian matrix by a real scalar preserves Hermiticity. -/
 private lemma isHermitian_smul_real {n : Type*}
