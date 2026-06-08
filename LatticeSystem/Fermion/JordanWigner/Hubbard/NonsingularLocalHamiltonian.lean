@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiNonsingularFerro
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SectorMinEnergy
+import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularAllUpAnnihilation
 import Mathlib.LinearAlgebra.Matrix.PosDef
 
 /-!
@@ -10,10 +11,12 @@ Tasaki proves Theorem 11.20 (`tasaki_theorem_11_20`) by writing the Hamiltonian 
 `Ĥ = −Lᵈ(1+2dν²)s·1 + lam Ĥ_flat + Σ_{p∈E} ĥ_p`,
 where each `ĥ_p` (eq. (11.4.48)) acts on the site `p` and its `4d` neighbours, and proving
 that `ĥ_p ≥ 0` in a parameter range.  This file (`d = 1`) defines `ĥ_p` and records the
-three proof-internal numbered results — **Lemma 11.21** (`ĥ_p ≥ 0 ⇒` ferromagnetism, via
-Theorem 11.11), **Lemma 11.22** (parameter conditions `⇒ ĥ_p ≥ 0`), and **Lemma 11.23**
-(the `t,U↑∞` limit characterisation underlying 11.22) — as documented axioms (Theorem 11.20
-itself remains the axiom whose proof these discharge).
+two analytic proof-internal numbered results — **Lemma 11.22** (parameter conditions
+`⇒ ĥ_p ≥ 0`) and **Lemma 11.23** (the `t,U↑∞` limit characterisation underlying 11.22) — as
+documented axioms (these genuinely need eigenvalue-continuity perturbation theory mathlib
+lacks).  **Lemma 11.21** (`ĥ_p ≥ 0 ⇒` ferromagnetism, via Theorem 11.11) is *proved* as
+`nonsingular_exhibitsFerromagnetism`, and **Theorem 11.20** is assembled as
+`tasaki_theorem_11_20`, both in `NonsingularFerromagnetism.lean`.
 
 `ĥ_p` (eq. (11.4.48), `d = 1`, `p` = external site `i`, with parameters
 `0 < lam < min{t,U}`, `0 ≤ κ < 1`):
@@ -59,15 +62,64 @@ noncomputable def nonsingularLocalHamiltonian (K : ℕ) (ν s t U lam κ : ℝ) 
         (hubbardDoubleOccupancy (2 * K + 1) (deltaExternalSite K (i - 1)) +
           hubbardDoubleOccupancy (2 * K + 1) (deltaExternalSite K (i + 1)))
 
-/-- **Tasaki Lemma 11.21 (frustration-free ⇒ ferromagnetism), AXIOM.**  If the local
-Hamiltonian `ĥ_p` is positive semidefinite for every external site `p`, then the
-non-singular Hubbard model is saturated-ferromagnetic (`E_min(S_max) < E_min(S)` for all
-`S ≠ S_max = N/2`).  Tasaki's proof reduces to Theorem 11.11 via the frustration-free
-decomposition (eq. (11.4.46)); recorded as a documented axiom (proof of Theorem 11.20). -/
-axiom nonsingular_lemma_11_21 (K : ℕ) (ν s t U lam κ : ℝ) (hs : 0 < s)
-    (hpos : ∀ i : Fin (K + 1),
-      (nonsingularLocalHamiltonian K ν s t U lam κ i).PosSemidef) :
-    exhibitsFerromagnetism (tasakiNonsingularHamiltonian K ν t s U) (K + 1)
+/-! ## The local Hamiltonian annihilates the all-up state (`ĥ_p |Φα,all↑⟩ = 0`)
+
+Tasaki p. 430: the all-up flat-band state is a zero-mode of every `ĥ_p`.  The α-number gives
+`(1+2ν²)` (cancelling the constant `(1+2ν²)s`), while the β-number and the Coulomb terms vanish. -/
+
+/-- `(Σ_σ â†_{p,σ} â_{p,σ}) |Φα,all↑⟩ = (1+2ν²) |Φα,all↑⟩` (genuine chain `p − 1 ≠ p`).  The
+up-channel `â†_↑ â_↑ = (1+2ν²)·1 − â_↑ â†_↑` with `â†_↑|Φ↑⟩=0`; the down-channel `â_↓|Φ↑⟩=0`. -/
+theorem flatBandANumber_mulVec_alphaAllUpState (K : ℕ) (ν : ℝ) (p : Fin (K + 1))
+    (hp : p - 1 ≠ p) :
+    (flatBandANumber K ν p).mulVec (flatBandAlphaAllUpState K ν) =
+      ((1 + 2 * ν ^ 2 : ℝ) : ℂ) • flatBandAlphaAllUpState K ν := by
+  unfold flatBandANumber
+  rw [Matrix.sum_mulVec, Fin.sum_univ_two]
+  have hup : (flatBandACreation K ν p 0 * flatBandAAnnihilation K ν p 0).mulVec
+      (flatBandAlphaAllUpState K ν) = ((1 + 2 * ν ^ 2 : ℝ) : ℂ) • flatBandAlphaAllUpState K ν := by
+    have hcr : flatBandACreation K ν p 0 * flatBandAAnnihilation K ν p 0
+        = ((1 + 2 * ν ^ 2 : ℝ) : ℂ) • (1 : ManyBodyOp (Fin (2 * (2 * K + 1) + 2)))
+          - flatBandAAnnihilation K ν p 0 * flatBandACreation K ν p 0 := by
+      rw [eq_sub_iff_add_eq]
+      exact (add_comm _ _).trans (flatBandAAnnihilation_ACreation_anticomm_self K ν p 0 hp)
+    have hkill : (flatBandAAnnihilation K ν p 0 * flatBandACreation K ν p 0).mulVec
+        (flatBandAlphaAllUpState K ν) = 0 := by
+      rw [show (flatBandAAnnihilation K ν p 0 * flatBandACreation K ν p 0).mulVec
+            (flatBandAlphaAllUpState K ν)
+          = (flatBandAAnnihilation K ν p 0).mulVec
+            ((flatBandACreation K ν p 0).mulVec (flatBandAlphaAllUpState K ν))
+          from (Matrix.mulVec_mulVec _ _ _).symm,
+        flatBandACreation_up_mulVec_alphaAllUpState, Matrix.mulVec_zero]
+    rw [hcr, Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec, hkill, sub_zero]
+  have hdown : (flatBandACreation K ν p 1 * flatBandAAnnihilation K ν p 1).mulVec
+      (flatBandAlphaAllUpState K ν) = 0 := by
+    rw [← Matrix.mulVec_mulVec, flatBandAAnnihilation_down_mulVec_alphaAllUpState,
+      Matrix.mulVec_zero]
+  rw [hup, hdown, add_zero]
+
+/-- `(Σ_σ b̂†_{u,σ} b̂_{u,σ}) |Φα,all↑⟩ = 0`: each `b̂_{u,σ}` annihilates the all-up state. -/
+theorem flatBandBNumber_mulVec_alphaAllUpState (K : ℕ) (ν : ℝ) (u : Fin (K + 1)) :
+    (flatBandBNumber K ν u).mulVec (flatBandAlphaAllUpState K ν) = 0 := by
+  unfold flatBandBNumber
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun σ _ => ?_)
+  rw [← Matrix.mulVec_mulVec, flatBandBAnnihilation_mulVec_alphaAllUpState, Matrix.mulVec_zero]
+
+/-- **`ĥ_p |Φα,all↑⟩ = 0`** (Tasaki p. 430): the all-up flat-band state is a zero-mode of the
+local Hamiltonian.  The constant `(1+2ν²)s` cancels against `−s` times the α-number `(1+2ν²)`,
+and the β-number and Coulomb terms all annihilate the all-up state.  Requires a genuine chain
+(`i − 1 ≠ i`, i.e. `K ≥ 1`). -/
+theorem nonsingularLocalHamiltonian_mulVec_alphaAllUpState (K : ℕ) (ν s t U lam κ : ℝ)
+    (i : Fin (K + 1)) (hi : i - 1 ≠ i) :
+    (nonsingularLocalHamiltonian K ν s t U lam κ i).mulVec (flatBandAlphaAllUpState K ν) = 0 := by
+  unfold nonsingularLocalHamiltonian
+  simp only [Matrix.add_mulVec, Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec,
+    flatBandANumber_mulVec_alphaAllUpState K ν i hi, flatBandBNumber_mulVec_alphaAllUpState,
+    hubbardDoubleOccupancy_mulVec_alphaAllUpState, smul_zero, add_zero]
+  rw [smul_smul, ← sub_smul,
+    show ((1 + 2 * ν ^ 2) * s : ℂ) - (s : ℂ) * ((1 + 2 * ν ^ 2 : ℝ) : ℂ) = 0 from by
+      push_cast; ring,
+    zero_smul]
 
 /-- **Tasaki Lemma 11.22 (positivity of the local Hamiltonian), AXIOM.**  For `ν > 0`
 (`d = 1`; for `d ≥ 2` one needs `0 < ν < ν_c(d)`) there are thresholds such that, once
@@ -90,26 +142,6 @@ axiom nonsingular_lemma_11_23 (ν : ℝ) (hν : 0 < ν) :
     ∃ T V clam cκ : ℝ, 0 < T ∧ 0 < V ∧ 0 < clam ∧ 0 ≤ cκ ∧
       ∀ (K : ℕ) (s t U : ℝ), 0 < s → 0 < t → 0 < U → T ≤ t / s → V ≤ U / s →
         ∀ (i : Fin (K + 1)) (twoS : ℕ), twoS < K + 1 →
-          0 < sectorMinEnergy (nonsingularLocalHamiltonian K ν s t U (clam * s) cκ i) twoS
-
-/-- **Tasaki Theorem 11.20 (ferromagnetism in the non-singular Hubbard model), PROVED** (`d = 1`).
-For every `ν > 0` there are thresholds `T, V > 0` (depending only on `ν`, uniformly in the system
-size `K`) such that, whenever `t/s ≥ T` and `U/s ≥ V` (with `t, s, U > 0`), the Tasaki non-singular
-Hubbard model exhibits saturated ferromagnetism `exhibitsFerromagnetism H (K+1)`.
-
-Tasaki's proof (§11.4.3): Lemma 11.22 supplies parameters `lam = clam·s`, `κ = cκ` for which every
-local Hamiltonian `ĥ_p` is positive-semidefinite once `t/s ≥ T`, `U/s ≥ V`; Lemma 11.21 then turns
-that frustration-freeness into saturated ferromagnetism (via the reduction to Theorem 11.11).  This
-discharges the former `axiom tasaki_theorem_11_20`, leaving Lemmas 11.21/11.22 (and 11.23) as the
-remaining documented axioms of §11.4. -/
-theorem tasaki_theorem_11_20 (ν : ℝ) (hν : 0 < ν) :
-    ∃ T V : ℝ, 0 < T ∧ 0 < V ∧
-      ∀ (K : ℕ) (t s U : ℝ), 0 < s → 0 < t → 0 < U →
-        T ≤ t / s → V ≤ U / s →
-        exhibitsFerromagnetism (tasakiNonsingularHamiltonian K ν t s U) (K + 1) := by
-  obtain ⟨T, V, clam, cκ, hT, hV, _, _, hpos⟩ := nonsingular_lemma_11_22 ν hν
-  refine ⟨T, V, hT, hV, fun K t s U hs ht hU hTt hVU => ?_⟩
-  exact nonsingular_lemma_11_21 K ν s t U (clam * s) cκ hs
-    (hpos K s t U hs ht hU hTt hVU)
+          0 < sectorMinEnergy (nonsingularLocalHamiltonian K ν s t U (clam * s) cκ i) (K + 1) twoS
 
 end LatticeSystem.Fermion

@@ -49,7 +49,8 @@ theorem sum_nonsingularLocalHamiltonian (K : ℕ) (ν s t U lam κ : ℝ) :
   push_cast
   module
 
-/-- **The frustration-free decomposition (Tasaki eq. (11.4.46), `d = 1`).**  The non-singular Hubbard
+/-- **The frustration-free decomposition (Tasaki eq. (11.4.46), `d = 1`).**  The non-singular
+Hubbard
 Hamiltonian is the sum of the local Hamiltonians `ĥ_p` minus a constant plus a manifestly positive
 remainder (`lam`-multiplied), for every choice of `lam, κ` (the `κ`-dependence cancels):
 `tasakiNonsingularHamiltonian = (Σ_i ĥ_p i) − (K+1)(1+2ν²)s·1 + lam·(Σ_u N̂^β_u + Σ_x n̂↑n̂↓_x)`. -/
@@ -63,5 +64,26 @@ theorem tasakiNonsingular_eq_sum_localHamiltonian (K : ℕ) (ν s t U lam κ : �
   simp only [flatBandANumber, flatBandBNumber]
   push_cast
   module
+
+/-- **`|Φα,all↑⟩` is an eigenvector of `Ĥ` with eigenvalue `−(K+1)(1+2ν²)s`.**  Using the
+decomposition (11.4.46) at `lam = κ = 0`, `Ĥ = (Σ_i ĥ_p) − (K+1)(1+2ν²)s·1`, and every `ĥ_p`
+annihilates the all-up state (`nonsingularLocalHamiltonian_mulVec_alphaAllUpState`).  Requires a
+genuine chain (`1 ≤ K`).  This pins `sectorMinEnergy` at the maximal-spin sector to `−(K+1)(1+2ν²)s`
+(the ground energy), the first half of the ferromagnetism assembly (Lemma 11.21). -/
+theorem tasakiNonsingularHamiltonian_mulVec_alphaAllUpState (K : ℕ) (ν t s U : ℝ) (hK : 1 ≤ K) :
+    (tasakiNonsingularHamiltonian K ν t s U).mulVec (flatBandAlphaAllUpState K ν)
+      = (-((K + 1 : ℂ) * ((1 + 2 * ν ^ 2) * s))) • flatBandAlphaAllUpState K ν := by
+  have hone : (1 : Fin (K + 1)) ≠ 0 := by
+    intro h
+    rw [Fin.ext_iff, Fin.val_zero, Fin.val_one' (K + 1),
+      Nat.mod_eq_of_lt (by omega : 1 < K + 1)] at h
+    exact one_ne_zero h
+  have hi : ∀ i : Fin (K + 1), i - 1 ≠ i := fun i h => hone (sub_eq_self.mp h)
+  rw [tasakiNonsingular_eq_sum_localHamiltonian K ν s t U 0 0, Matrix.add_mulVec,
+    Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec, Matrix.smul_mulVec,
+    Matrix.sum_mulVec,
+    Finset.sum_eq_zero (fun i _ =>
+      nonsingularLocalHamiltonian_mulVec_alphaAllUpState K ν s t U 0 0 i (hi i)),
+    Complex.ofReal_zero, zero_smul, add_zero, zero_sub, neg_smul]
 
 end LatticeSystem.Fermion

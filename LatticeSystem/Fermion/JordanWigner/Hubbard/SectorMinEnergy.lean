@@ -30,27 +30,32 @@ open Matrix LatticeSystem.Quantum
 
 variable {M : ℕ} (H : ManyBodyOp (Fin (2 * M + 2)))
 
-/-- The set of normalised states in the total-spin sector `S = twoS/2`: unit vectors
-`Φ` of `EuclideanSpace ℂ` over the computational-basis configurations with
-`(Ŝ_tot)² Φ = (twoS/2)(twoS/2 + 1) Φ`. -/
-def spinSector (twoS : ℕ) :
+/-- The set of normalised states in the fixed-particle-number-`filling`, total-spin-`S = twoS/2`
+sector: unit vectors `Φ` of `EuclideanSpace ℂ` over the computational-basis configurations with
+`N̂_tot Φ = filling Φ` and `(Ŝ_tot)² Φ = (twoS/2)(twoS/2 + 1) Φ`.  Tasaki's `E_min(S)` (eq.
+(11.4.26)) is taken at the FIXED electron number `N = filling` (e.g. half-filling `N = L` for the
+non-singular Hubbard model), so the sector pins both the particle number and the total spin. -/
+def spinSector (filling twoS : ℕ) :
     Set (EuclideanSpace ℂ (Fin (2 * M + 2) → Fin 2)) :=
   {φ | ‖φ‖ = 1 ∧
+    (fermionTotalNumber (2 * M + 1)).mulVec φ.ofLp = (filling : ℂ) • φ.ofLp ∧
     (fermionTotalSpinSquared M).mulVec φ.ofLp
       = (((twoS : ℂ) / 2) * ((twoS : ℂ) / 2 + 1)) • φ.ofLp}
 
-/-- **`E_min(S)` — the minimum energy in the total-spin-`S` sector** (Tasaki eq. (11.4.26),
-`S = twoS/2`): the infimum of the (unnormalised) energy `rayleighOnVec Ĥ` over the unit
-vectors of the `(Ŝ_tot)²`-eigensector.  (For an empty/unachievable sector the infimum is
+/-- **`E_min(S)` — the minimum energy in the fixed-filling total-spin-`S` sector** (Tasaki eq.
+(11.4.26), `S = twoS/2`): the infimum of the (unnormalised) energy `rayleighOnVec Ĥ` over the unit
+vectors of the fixed-`N`, `(Ŝ_tot)²`-eigensector.  (For an empty/unachievable sector the infimum is
 the junk value `Real.sInf ∅ = 0`; the ferromagnetism criterion only compares achievable
 sectors, where the infimum is the genuine sector ground energy.) -/
-noncomputable def sectorMinEnergy (twoS : ℕ) : ℝ :=
-  ⨅ φ : spinSector (M := M) twoS, rayleighOnVec H (φ : EuclideanSpace ℂ _).ofLp
+noncomputable def sectorMinEnergy (filling twoS : ℕ) : ℝ :=
+  ⨅ φ : spinSector (M := M) filling twoS, rayleighOnVec H (φ : EuclideanSpace ℂ _).ofLp
 
-/-- **The (saturated) ferromagnetism criterion** (Tasaki §11.4): the model with maximal
-total spin `S_max = twoSmax/2` exhibits ferromagnetism iff the maximal-spin sector lies
-strictly below every other sector, `E_min(S_max) < E_min(S)` for all `S ≠ S_max`. -/
-def exhibitsFerromagnetism (twoSmax : ℕ) : Prop :=
-  ∀ twoS : ℕ, twoS < twoSmax → sectorMinEnergy H twoSmax < sectorMinEnergy H twoS
+/-- **The (saturated) ferromagnetism criterion** (Tasaki §11.4): at fixed electron number
+`filling`, the model with maximal total spin `S_max = twoSmax/2` exhibits ferromagnetism iff the
+maximal-spin sector lies strictly below every other sector, `E_min(S_max) < E_min(S)` for all
+`S ≠ S_max`. -/
+def exhibitsFerromagnetism (filling twoSmax : ℕ) : Prop :=
+  ∀ twoS : ℕ, twoS < twoSmax →
+    sectorMinEnergy H filling twoSmax < sectorMinEnergy H filling twoS
 
 end LatticeSystem.Fermion

@@ -51,7 +51,7 @@ axiom nonsingular_theorem_11_18 (R : ℝ) (hR : 0 < R) :
       ∀ (K : ℕ) (ν t ζ U : ℝ) (tPert : Fin (2 * K + 2) → Fin (2 * K + 2) → ℂ),
         0 < t → 0 < ν → ν ≤ ν0 → |ζ| ≤ ν ^ 3 * η0 → ξ0 * t * |ζ| / ν ^ 2 ≤ U →
         IsNonsingularHopping K tPert t R →
-        sectorMinEnergy (nonsingularHubbardHamiltonian K ν t ζ tPert U) (K + 1)
-          < sectorMinEnergy (nonsingularHubbardHamiltonian K ν t ζ tPert U) (K - 1)
+        sectorMinEnergy (nonsingularHubbardHamiltonian K ν t ζ tPert U) (K + 1) (K + 1)
+          < sectorMinEnergy (nonsingularHubbardHamiltonian K ν t ζ tPert U) (K + 1) (K - 1)
 
 end LatticeSystem.Fermion

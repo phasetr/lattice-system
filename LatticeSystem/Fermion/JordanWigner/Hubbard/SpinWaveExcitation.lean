@@ -40,11 +40,14 @@ noncomputable def momentumPhase (K : ℕ) (k : Fin (K + 1)) : ℂ :=
 energy of a normalised state in the once-flipped sector `Ŝ^z_tot = S_max − 1 = (K−1)/2`
 that is also a crystal-momentum-`k` eigenstate of the translation operator
 (`τ̂ Φ = e^{-2πik/(K+1)} Φ`).  The infimum of the energy `rayleighOnVec Ĥ` over that joint
-eigenspace (L²-unit vectors). -/
+eigenspace (L²-unit vectors).  The particle number is pinned to the half filling `N̂_tot = K+1`
+(matching the fixed-`N` convention of `sectorMinEnergy`, so that the dispersion
+`E_SW(k) − E_min(S_max)` compares states in the *same* particle-number sector). -/
 noncomputable def spinWaveEnergy (K : ℕ) (H : ManyBodyOp (Fin (2 * (2 * K + 1) + 2)))
     (k : Fin (K + 1)) : ℝ :=
   ⨅ φ : {φ : EuclideanSpace ℂ (Fin (2 * (2 * K + 1) + 2) → Fin 2) //
       ‖φ‖ = 1 ∧
+      (fermionTotalNumber (2 * (2 * K + 1) + 1)).mulVec φ.ofLp = ((K + 1 : ℂ)) • φ.ofLp ∧
       (fermionTotalSpinZ (2 * K + 1)).mulVec φ.ofLp = (((K : ℂ) - 1) / 2) • φ.ofLp ∧
       (translationOperator K 1).mulVec φ.ofLp = momentumPhase K k • φ.ofLp},
     rayleighOnVec H (φ : EuclideanSpace ℂ _).ofLp
@@ -72,8 +75,8 @@ axiom nonsingular_theorem_11_19 (R : ℝ) (hR : 0 < R) :
            let F1 : ℝ := 1 + a1 * ν + a2 * |ζ| / ν ^ 3 + a3 * t * |ζ| ^ 2 / (ν ^ 4 * U)
            let F2 : ℝ := 1 - b1 * ν - b2 * |ζ| / ν ^ 2 - b3 * t * |ζ| ^ 2 / (ν ^ 4 * U)
            F1 * (2 * ν ^ 4 * U * (1 - Real.cos θ)) ≥
-               spinWaveEnergy K H k - sectorMinEnergy H (K + 1) ∧
-             spinWaveEnergy K H k - sectorMinEnergy H (K + 1) ≥
+               spinWaveEnergy K H k - sectorMinEnergy H (K + 1) (K + 1) ∧
+             spinWaveEnergy K H k - sectorMinEnergy H (K + 1) (K + 1) ≥
                F2 * (2 * ν ^ 4 * U * (1 - Real.cos θ)))
 
 end LatticeSystem.Fermion
