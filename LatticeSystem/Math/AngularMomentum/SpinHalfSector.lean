@@ -1,4 +1,4 @@
-import LatticeSystem.Math.TasakiAppendixA.AngularMultiplet
+import LatticeSystem.Math.AngularMomentum.Multiplet
 
 /-!
 # Tasaki Appendix A.3.2: every level has a spin-0 or spin-1/2 representative (Theorem A.17)

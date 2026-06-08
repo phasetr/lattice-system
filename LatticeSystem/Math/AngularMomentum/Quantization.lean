@@ -1,4 +1,4 @@
-import LatticeSystem.Math.TasakiAppendixA.AngularLadder
+import LatticeSystem.Math.AngularMomentum.Ladder
 import Mathlib.Algebra.Order.Floor.Defs
 
 /-!

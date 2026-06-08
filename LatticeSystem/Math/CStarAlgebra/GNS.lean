@@ -1,4 +1,4 @@
-import LatticeSystem.Math.TasakiAppendixA.CStarState
+import LatticeSystem.Math.CStarAlgebra.State
 import Mathlib.Analysis.InnerProductSpace.Adjoint
 import Mathlib.Analysis.CStarAlgebra.GelfandNaimarkSegal
 

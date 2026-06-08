@@ -4,7 +4,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJGroundEnergyReverse
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorGroundState
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJHermitian
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
-import LatticeSystem.Math.TasakiAppendixA.AngularSpinHalfSector
+import LatticeSystem.Math.AngularMomentum.SpinHalfSector
 
 /-!
 # Tasaki 11.5: the Perron–Frobenius minimum bounds the ground energy (Prop 11.24 PR-E2 ≥)

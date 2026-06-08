@@ -7404,13 +7404,13 @@ of a sum is the limit of the symmetric split product (Tasaki eq.~(A.2.21)),
 Mathlib provides only the commuting case (\texttt{Matrix.exp\_add\_of\_commute}); the general
 non-commuting Lie/Trotter formula for bounded operators is a standard but non-trivial
 real-analysis result (Tasaki's footnote: ``nineteenth century mathematics''), recorded as the
-documented axiom \texttt{lieProductFormula} (\texttt{Math/TasakiAppendixA/LieProduct.lean}) via
+documented axiom \texttt{lieProductFormula} (\texttt{Math/MatrixAnalysis/LieProduct.lean}) via
 \texttt{NormedSpace.exp} and \texttt{Filter.Tendsto}.  It is not on the critical path of any
 Chapter-11 proof; to be discharged later.
 
 \medskip\noindent\textbf{Lemmas A.4--A.6 (positive-semidefinite basics, proved).}  Unlike the
 Lie product formula, these are available in mathlib and are \emph{proved} (axiom-free,
-\texttt{Math/TasakiAppendixA/PosSemidefBasics.lean}).  \textbf{Lemma A.4}
+\texttt{Math/PosSemidef/Basics.lean}).  \textbf{Lemma A.4}
 (\texttt{posSemidef\_iff\_eigenvalues\_nonneg}): a Hermitian matrix is positive-semidefinite
 iff every eigenvalue is nonnegative.  \textbf{Lemma A.5} (\texttt{PosSemidef.add}): the sum of
 two positive-semidefinite matrices is positive-semidefinite,
@@ -7428,7 +7428,7 @@ is at most the corresponding one of $\hat B$: $\forall i,\ \hat A.\texttt{eigenv
 B.\texttt{eigenvalues}_0\,i$ (largest-first; equivalent to Tasaki's $a_j\le b_j$).  This is the
 operator-monotonicity content of the min--max principle (eq.~(A.2.30)); mathlib has the
 variational principle only for the extreme eigenvalues, so it is recorded as the documented
-axiom \texttt{hermitian\_eigenvalues}$_0$\texttt{\_monotone} (\texttt{Math/TasakiAppendixA/EigenvalueMonotone.lean}),
+axiom \texttt{hermitian\_eigenvalues}$_0$\texttt{\_monotone} (\texttt{Math/MatrixAnalysis/EigenvalueMonotone.lean}),
 to be discharged later.
 
 \medskip\noindent\textbf{Corollary A.8 (trace of the exponential, axiomatized).}  An
@@ -7436,7 +7436,7 @@ immediate corollary of Theorem A.7, useful in quantum statistical mechanics: $\h
 implies $\mathrm{Tr}[e^{\hat A}]\le\mathrm{Tr}[e^{\hat B}]$ (eq.~(A.2.31)), and more generally
 $\mathrm{Tr}[f(\hat A)]\le\mathrm{Tr}[f(\hat B)]$ for non-decreasing $f$ (eq.~(A.2.32)).  Recorded as
 the documented axiom \texttt{hermitian\_trace\_exp\_monotone}
-(\texttt{Math/TasakiAppendixA/TraceExpMonotone.lean}), resting on A.7.
+(\texttt{Math/MatrixAnalysis/TraceExpMonotone.lean}), resting on A.7.
 
 \medskip\noindent\textbf{Lemmas A.9--A.10 (frustration-free Hamiltonians, proved).}  For
 $\hat H=\sum_j\hat h_j$ with each local term bounded below, $\hat h_j\ge\varepsilon_j$ (i.e.
@@ -7446,7 +7446,7 @@ $\hat H-(\sum_j\varepsilon_j)\ge0$ (lower bound) and $\hat H\Phi=(\sum_j\varepsi
 (attained); \textbf{Lemma A.10} (\texttt{frustration\_free\_local\_eigen}, converse) --- if
 $\hat H\Phi=(\sum_j\varepsilon_j)\Phi$ then $\hat h_j\Phi=\varepsilon_j\Phi$ for every $j$ (each
 $\langle\Phi|\hat h_j-\varepsilon_j|\Phi\rangle\ge0$ summing to $0$, then Lemma A.11).  Both proved
-(axiom-free, \texttt{Math/TasakiAppendixA/FrustrationFree.lean}).
+(axiom-free, \texttt{Math/FrustrationFree.lean}).
 
 \medskip\noindent\textbf{Lemma A.11 (zeros of the energy form, proved).}  If
 $\hat A\ge0$ and $\langle\Phi|\hat A|\Phi\rangle=0$ then $\hat A|\Phi\rangle=0$
@@ -7456,7 +7456,7 @@ $\langle\Phi|\hat A|\Phi\rangle=0$ implies $\hat B|\Phi\rangle=0$
 \texttt{Math/RayleighPosSemidefKernel}; we also record Tasaki's angular-momentum corollary
 ($\hat J^2=\sum_\alpha(\hat J^{(\alpha)})^2$, $\hat J^2|\Phi\rangle=0\Rightarrow\hat J^{(\alpha)}|\Phi\rangle=0$,
 \texttt{mulVec\_eq\_zero\_of\_sq\_sum\_inner\_zero}).  All proved (axiom-free,
-\texttt{Math/TasakiAppendixA/PosSemidefKernel.lean}).
+\texttt{Math/PosSemidef/Kernel.lean}).
 
 \medskip\noindent\textbf{Theorem A.12 (strong-coupling effective Hamiltonian, axiomatized).}
 For $\hat H_v=\hat H_0+v\hat V$ with $\hat H_0$ self-adjoint, $\hat V\ge0$, $v\ge0$, the
@@ -7464,7 +7464,7 @@ eigenstates whose energy stays finite as $v\uparrow\infty$ are governed by the e
 Schr\"odinger equation $\hat P_0\hat H_0|\Phi\rangle=E|\Phi\rangle$ on $H_0=\ker\hat V$.  We render the
 effective equation in weak form ($\langle\psi|\hat H_0|\Phi\rangle=E\langle\psi|\Phi\rangle$ for all
 $\psi\in H_0$, avoiding an explicit projection matrix); the axiom
-(\texttt{effectiveHamiltonian\_strongCoupling\_limit}, \texttt{Math/TasakiAppendixA/EffectiveLimit.lean})
+(\texttt{effectiveHamiltonian\_strongCoupling\_limit}, \texttt{Math/EffectiveLimit.lean})
 asserts, in the non-vacuous finite-energy${}\Rightarrow{}$effective direction, that a family
 $\Phi_v$ of $\hat H_v$-eigenstates converging to a nonzero $\Phi$ with energy $E_v\to E$ has
 $\Phi\in H_0$ and $\Phi$ solving the effective equation.  This underlies the §11.5 effective-theory limits
@@ -7482,7 +7482,7 @@ $[\hat J^{(3)},\hat J^+]=\hat J^+$ (eq.~(A.3.6)).  The mirror lowering direction
 (\texttt{angRaise\_mul\_angLower}: $\hat J^+\hat J^-=\hat J^2-\hat J^{(3)}(\hat J^{(3)}-1)$, eq.~(A.3.8);
 \texttt{angLower\_mulVec\_ne\_zero}: $\hat J^-\Phi\ne0$ for $-J<M\le J$; \texttt{angLower\_mem\_eigenspace}:
 $\hat J^-\Phi\in H_{J,M-1}$ via $[\hat J^2,\hat J^-]=0$ and $[\hat J^{(3)},\hat J^-]=-\hat J^-$) completes
-Lemma A.14.  Proved (axiom-free, \texttt{Math/TasakiAppendixA/AngularLadder.lean}).
+Lemma A.14.  Proved (axiom-free, \texttt{Math/AngularMomentum/Ladder.lean}).
 
 \medskip\noindent\textbf{Lemma A.15 (spin bound, part 1, proved).}  For self-adjoint
 $\hat J^{(\alpha)}$ the norm identities $\|\hat J^\pm\Phi\|^2=\{J(J+1)-M(M\pm1)\}\|\Phi\|^2$
@@ -7499,7 +7499,7 @@ $J-M\in\mathbb Z_{\ge0}$ (\texttt{angMom\_sub\_mem\_nat}).  Applying the same le
 gauge-reflected operators $(\hat J^{(1)},-\hat J^{(2)},-\hat J^{(3)})$ (same $su(2)$ relations,
 $M\mapsto-M$) gives $J+M\in\mathbb Z_{\ge0}$, so $2J=(J-M)+(J+M)\in\mathbb Z_{\ge0}$, i.e. $J=n/2$
 (\texttt{angMom\_J\_eq\_half\_nat}, Theorem~A.13).  Proved (axiom-free,
-\texttt{Math/TasakiAppendixA/AngularQuantization.lean}).
+\texttt{Math/AngularMomentum/Quantization.lean}).
 
 \medskip\noindent\textbf{Theorem A.16 (SU(2)-multiplet degeneracy, proved).}  For an
 $su(2)$-invariant Hamiltonian ($\hat H\hat J^{(\alpha)}=\hat J^{(\alpha)}\hat H$), a joint energy
@@ -7509,7 +7509,7 @@ $2J+1$ magnetic numbers, so $E$ is at least $(2J+1)$-fold degenerate (eq.~(A.3.1
 raises $\Phi$ to the top $H_{J,J}$ ($J-M_0\in\mathbb Z_{\ge0}$ by Lemma~A.15) and lowers $k$ times
 via the reflected raising; $\hat H$ preserves each rung because it commutes with $\hat J^\pm$
 (\texttt{ham\_mulVec\_raiseIter}).  Proved (axiom-free,
-\texttt{Math/TasakiAppendixA/AngularMultiplet.lean}).
+\texttt{Math/AngularMomentum/Multiplet.lean}).
 
 \medskip\noindent\textbf{Theorem A.17 (spin-0/spin-1/2 sector suffices).}  For an
 $su(2)$-invariant self-adjoint $\hat H$, every energy eigenvalue $E$ has a corresponding eigenstate
@@ -7519,7 +7519,7 @@ magnetic number $M=J-\lfloor J\rfloor$, equal to $0$ for even $n$ and $1/2$ for 
 $k=\lfloor J\rfloor$).  The single ingredient beyond finite-matrix algebra---the existence of a
 simultaneous eigenstate of the commuting self-adjoint family $\hat H,\hat{\boldsymbol J}^2,\hat J^{(3)}$
 in the $E$-eigenspace (\texttt{exists\_joint\_su2\_energy\_eigenstate})---is a documented axiom
-(\texttt{Math/TasakiAppendixA/AngularSpinHalfSector.lean}).
+(\texttt{Math/AngularMomentum/SpinHalfSector.lean}).
 
 \medskip\noindent\textbf{Theorem A.18 (Perron--Frobenius for a real symmetric matrix, proved).}
 For a real symmetric $M$ whose shifted matrix $\hat A=c\cdot1-M$ is irreducible (entrywise
@@ -7531,7 +7531,7 @@ the project's Collatz--Wielandt Perron--Frobenius (positive eigenvector) and the
 simplicity (\texttt{eigenspace\_finrank\_le\_one\_of\_pos\_eigenvec}); the lowest-eigenvalue claim is
 the variational $|w|$-argument (eq.~(A.4.1)): for any eigenpair $(\lambda,w)$, $\hat A|w|\ge|c-\lambda|\,|w|$
 entrywise, and pairing with $v>0$ gives $c-\mu\ge c-\lambda$.  Proved (axiom-free,
-\texttt{Math/TasakiAppendixA/PerronFrobeniusSymmetric.lean}).
+\texttt{Math/PerronFrobeniusSymmetric.lean}).
 
 \medskip\noindent\textbf{Theorems A.19 (polar) and A.20 (SVD).}  Any square complex matrix
 $A$ admits the polar decomposition $A=WC$ with $W$ unitary and $C$ positive-semidefinite
@@ -7541,7 +7541,7 @@ $\sqrt{\lambda_i}$, the $\lambda_i\ge0$ being the eigenvalues of $A^\dagger A$
 (\texttt{matrix\_singular\_value\_decomposition}, eqs.~(A.4.3)--(A.4.6)).  \texttt{mathlib} provides
 the singular \emph{values} of a linear map but not the constructive matrix factorizations, so both
 are recorded as documented axioms (statements kept in book order;
-\texttt{Math/TasakiAppendixA/MatrixDecomposition.lean}).
+\texttt{Math/MatrixAnalysis/Decomposition.lean}).
 
 \medskip\noindent\textbf{Theorems A.21 and A.22 (Wigner's theorem).}  Over a
 finite-dimensional Hilbert space $H=$ \texttt{Fin\,D}$\to\mathbb C$ (operators $M(H)=$
@@ -7552,7 +7552,7 @@ $\Gamma(\hat A)=\hat U^\dagger\bar{\hat A}\hat U$ via entrywise conjugation
 (\texttt{wignerAutomorphism\_antiunitary}, eq.~(A.6.2)).  A map on rank-one projections preserving the
 transition probabilities $\operatorname{Tr}[P P']$ is implemented by a unitary or antiunitary
 (\texttt{wignerProjection}, Theorem~A.22, eq.~(A.6.10)).  Recorded as documented axioms
-(\texttt{Math/TasakiAppendixA/WignerTheorem.lean}).
+(\texttt{Math/WignerTheorem.lean}).
 
 \medskip\noindent\textbf{Definition A.23 (state) and Theorem A.24 (Banach--Alaoglu).}  Over an
 abstract unital complex C*-algebra $A$, a \emph{state} is a weak-$*$-continuous linear functional
@@ -7560,7 +7560,7 @@ $\varphi\in$ \texttt{WeakDual}$\,\mathbb C\,A$ with $\varphi(1)=1$ and $\varphi(
 (\texttt{IsState}, Definition~A.23).  The set of all states is compact in the weak-$*$ topology
 (\texttt{stateSpace\_isCompact}, Theorem~A.24, eq.~(A.7.3)) --- the operator-algebraic input for
 infinite-volume limits of states; recorded as a documented axiom
-(\texttt{Math/TasakiAppendixA/CStarState.lean}).
+(\texttt{Math/CStarAlgebra/State.lean}).
 
 \medskip\noindent\textbf{Ground states of infinite systems (Definitions A.25/A.27, Theorem A.26).}
 Modelling the Hamiltonian commutator $[\hat H,\cdot]$ by a derivation $\delta:A\to A$: a state $\omega$
@@ -7570,7 +7570,7 @@ $\omega(\hat A^\dagger[\hat H,\hat A])\ge\gamma\,\omega(\hat A^\dagger\hat A)$ w
 (\texttt{HasNonzeroGap}, Def~A.27).  A state is a ground state iff for every $L$ its energy
 $\omega(\hat H_L)$ is the least over all states agreeing with $\omega$ outside $\Lambda_L$
 (\texttt{groundState\_variational}, Theorem~A.26, eq.~(A.7.7), documented axiom;
-\texttt{Math/TasakiAppendixA/CStarGroundState.lean}).
+\texttt{Math/CStarAlgebra/GroundState.lean}).
 
 \medskip\noindent\textbf{Theorem A.28 (GNS construction).}  Every state $\rho$ on a
 C*-algebra $A$ admits a GNS triple $(H_\rho,\pi_\rho,\Omega_\rho)$: a Hilbert space, a
@@ -7578,7 +7578,7 @@ $*$-representation $\pi_\rho:A\to B(H_\rho)$ (a \texttt{StarAlgHom} into $H\to_L
 vector with $\rho(\hat A)=\langle\Omega_\rho,\pi_\rho(\hat A)\Omega_\rho\rangle$ (eq.~(A.7.11)) and
 $\{\pi_\rho(\hat A)\Omega_\rho\}$ dense (\texttt{gns\_construction}).  Every state is a vector state in
 its GNS space; recorded as a documented axiom (the construction is in \texttt{mathlib}'s
-\texttt{GelfandNaimarkSegal}; \texttt{Math/TasakiAppendixA/CStarGNS.lean}).
+\texttt{GelfandNaimarkSegal}; \texttt{Math/CStarAlgebra/GNS.lean}).
 
 \medskip\noindent\textbf{Appendix A: status and axiomatization policy.}  Tasaki's Appendix A is
 fully formalized in book order (A.1--A.28).  The linear-algebra and angular-momentum core that
