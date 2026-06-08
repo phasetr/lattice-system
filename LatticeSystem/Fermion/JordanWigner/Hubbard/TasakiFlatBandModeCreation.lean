@@ -60,6 +60,19 @@ theorem flatBandModeCreation_basis (K : ℕ) (ν : ℝ) (σ : Fin 2)
   · rw [Sum.elim_inl, flatBandACreation_eq_modeCreation, hb, Sum.elim_inl]
   · rw [Sum.elim_inr, flatBandBCreation_eq_modeCreation, hb, Sum.elim_inr]
 
+/-- The mode creation at the standard single-particle basis vector `Pi.single x 1` is the site
+creation `ĉ†_{x,σ}`: only the `y = x` term of the defining sum survives. -/
+theorem flatBandModeCreation_single (K : ℕ) (σ : Fin 2) (x : Fin (2 * K + 2)) :
+    flatBandModeCreation K σ (Pi.single x 1)
+      = fermionMultiCreation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) x σ) := by
+  simp only [flatBandModeCreation, LinearMap.coe_mk, AddHom.coe_mk]
+  rw [Finset.sum_eq_single x]
+  · rw [Pi.single_eq_same, one_smul]
+  · intro y _ hy
+    rw [Pi.single_eq_of_ne hy, zero_smul]
+  · intro hx
+    exact absurd (Finset.mem_univ x) hx
+
 /-- **Operator-level change of single-particle basis.**  Every mode creation `Ĉ†_σ(w)` is the
 `flatBandBasis`-expansion combination of the `â†_{p,σ}` and `b̂†_{u,σ}`:
 `Ĉ†_σ(w) = ∑_i (repr w) i • Ĉ†_σ(basis i)`.  In particular every site creation `ĉ†_{x,σ}` is a
