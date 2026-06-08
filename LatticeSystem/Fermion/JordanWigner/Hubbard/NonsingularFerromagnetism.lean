@@ -86,4 +86,23 @@ theorem sectorMinEnergy_ge_of_add_const_rayleigh_nonneg {M : ℕ}
     rw [Real.iInf_of_isEmpty]
     linarith
 
+/-- The squared `dotProduct` self-pairing of a unit `EuclideanSpace` vector is `1`. -/
+theorem star_dotProduct_self_of_norm_one {ι : Type*} [Fintype ι]
+    (φ : EuclideanSpace ℂ ι) (hu : ‖φ‖ = 1) : star φ.ofLp ⬝ᵥ φ.ofLp = (1 : ℂ) := by
+  have h := inner_self_eq_norm_sq_to_K (𝕜 := ℂ) φ
+  rw [EuclideanSpace.inner_eq_star_dotProduct, hu] at h
+  rw [dotProduct_comm]
+  simpa using h
+
+/-- **Rayleigh value of a unit eigenvector.**  If `φ` is a unit `EuclideanSpace` vector and an
+eigenvector of `H` with real eigenvalue `lam` (`H φ.ofLp = lam • φ.ofLp`), then
+`rayleighOnVec H φ.ofLp = lam`. -/
+theorem rayleighOnVec_of_unit_eigenvector {ι : Type*} [Fintype ι]
+    (H : Matrix ι ι ℂ) (φ : EuclideanSpace ℂ ι) (hu : ‖φ‖ = 1) (lam : ℝ)
+    (heig : H.mulVec φ.ofLp = (lam : ℂ) • φ.ofLp) :
+    rayleighOnVec H φ.ofLp = lam := by
+  unfold rayleighOnVec
+  rw [heig, dotProduct_smul, star_dotProduct_self_of_norm_one φ hu, smul_eq_mul, mul_one,
+    Complex.ofReal_re]
+
 end LatticeSystem.Fermion
