@@ -81,4 +81,28 @@ theorem fermionMultiCreation_spinful_mulVec_mem (x : Fin (2 * K + 2)) (σ : Fin 
   rw [Matrix.smul_mulVec]
   exact Submodule.smul_mem _ _ (flatBandModeCreation_basis_mulVec_mem i σ hw)
 
+/-- The vacuum lies in the rotated-monomial span (it is the empty monomial). -/
+theorem fermionMultiVacuum_mem_modeFock :
+    fermionMultiVacuum (2 * (2 * K + 1) + 1) ∈ flatBandModeFockSubmodule K ν := by
+  have h := flatBandModeMonomial_mem (K := K) (ν := ν) []
+  simpa [flatBandModeMonomial] using h
+
+/-- The span is invariant under every site creation `ĉ†_j` (any spinful mode `j`), via the
+spinful-index decomposition `j = spinfulIndex x σ`. -/
+theorem fermionMultiCreation_mulVec_mem (j : Fin (2 * (2 * K + 1) + 2))
+    {w : (Fin (2 * (2 * K + 1) + 2) → Fin 2) → ℂ} (hw : w ∈ flatBandModeFockSubmodule K ν) :
+    (fermionMultiCreation (2 * (2 * K + 1) + 1) j).mulVec w ∈ flatBandModeFockSubmodule K ν := by
+  obtain ⟨x, σ, rfl⟩ := exists_spinfulIndex (2 * K + 1) j
+  exact fermionMultiCreation_spinful_mulVec_mem x σ hw
+
+/-- Any ordered product of site creations on the vacuum lies in the rotated-monomial span. -/
+theorem listProd_creation_mulVec_vacuum_mem (js : List (Fin (2 * (2 * K + 1) + 2))) :
+    ((js.map (fermionMultiCreation (2 * (2 * K + 1) + 1))).prod).mulVec
+        (fermionMultiVacuum (2 * (2 * K + 1) + 1)) ∈ flatBandModeFockSubmodule K ν :=
+  LatticeSystem.Math.listProd_mulVec_mem
+    (fun _ hM _ hwmem => by
+      obtain ⟨j, _, rfl⟩ := List.mem_map.mp hM
+      exact fermionMultiCreation_mulVec_mem j hwmem)
+    fermionMultiVacuum_mem_modeFock
+
 end LatticeSystem.Fermion
