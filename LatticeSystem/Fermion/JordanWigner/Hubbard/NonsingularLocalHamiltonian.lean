@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiNonsingularFerro
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SectorMinEnergy
+import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularAllUpAnnihilation
 import Mathlib.LinearAlgebra.Matrix.PosDef
 
 /-!
@@ -58,6 +59,49 @@ noncomputable def nonsingularLocalHamiltonian (K : ℕ) (ν s t U lam κ : ℝ) 
     + ((κ / 2 * (U - lam) : ℝ) : ℂ) •
         (hubbardDoubleOccupancy (2 * K + 1) (deltaExternalSite K (i - 1)) +
           hubbardDoubleOccupancy (2 * K + 1) (deltaExternalSite K (i + 1)))
+
+/-! ## The local Hamiltonian annihilates the all-up state (`ĥ_p |Φα,all↑⟩ = 0`)
+
+Tasaki p. 430: the all-up flat-band state is a zero-mode of every `ĥ_p`.  The α-number gives
+`(1+2ν²)` (cancelling the constant `(1+2ν²)s`), while the β-number and the Coulomb terms vanish. -/
+
+/-- `(Σ_σ â†_{p,σ} â_{p,σ}) |Φα,all↑⟩ = (1+2ν²) |Φα,all↑⟩` (genuine chain `p − 1 ≠ p`).  The
+up-channel `â†_↑ â_↑ = (1+2ν²)·1 − â_↑ â†_↑` with `â†_↑|Φ↑⟩=0`; the down-channel `â_↓|Φ↑⟩=0`. -/
+theorem flatBandANumber_mulVec_alphaAllUpState (K : ℕ) (ν : ℝ) (p : Fin (K + 1))
+    (hp : p - 1 ≠ p) :
+    (flatBandANumber K ν p).mulVec (flatBandAlphaAllUpState K ν) =
+      ((1 + 2 * ν ^ 2 : ℝ) : ℂ) • flatBandAlphaAllUpState K ν := by
+  unfold flatBandANumber
+  rw [Matrix.sum_mulVec, Fin.sum_univ_two]
+  have hup : (flatBandACreation K ν p 0 * flatBandAAnnihilation K ν p 0).mulVec
+      (flatBandAlphaAllUpState K ν) = ((1 + 2 * ν ^ 2 : ℝ) : ℂ) • flatBandAlphaAllUpState K ν := by
+    have hcr : flatBandACreation K ν p 0 * flatBandAAnnihilation K ν p 0
+        = ((1 + 2 * ν ^ 2 : ℝ) : ℂ) • (1 : ManyBodyOp (Fin (2 * (2 * K + 1) + 2)))
+          - flatBandAAnnihilation K ν p 0 * flatBandACreation K ν p 0 := by
+      rw [eq_sub_iff_add_eq]
+      exact (add_comm _ _).trans (flatBandAAnnihilation_ACreation_anticomm_self K ν p 0 hp)
+    have hkill : (flatBandAAnnihilation K ν p 0 * flatBandACreation K ν p 0).mulVec
+        (flatBandAlphaAllUpState K ν) = 0 := by
+      rw [show (flatBandAAnnihilation K ν p 0 * flatBandACreation K ν p 0).mulVec
+            (flatBandAlphaAllUpState K ν)
+          = (flatBandAAnnihilation K ν p 0).mulVec
+            ((flatBandACreation K ν p 0).mulVec (flatBandAlphaAllUpState K ν))
+          from (Matrix.mulVec_mulVec _ _ _).symm,
+        flatBandACreation_up_mulVec_alphaAllUpState, Matrix.mulVec_zero]
+    rw [hcr, Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec, hkill, sub_zero]
+  have hdown : (flatBandACreation K ν p 1 * flatBandAAnnihilation K ν p 1).mulVec
+      (flatBandAlphaAllUpState K ν) = 0 := by
+    rw [← Matrix.mulVec_mulVec, flatBandAAnnihilation_down_mulVec_alphaAllUpState,
+      Matrix.mulVec_zero]
+  rw [hup, hdown, add_zero]
+
+/-- `(Σ_σ b̂†_{u,σ} b̂_{u,σ}) |Φα,all↑⟩ = 0`: each `b̂_{u,σ}` annihilates the all-up state. -/
+theorem flatBandBNumber_mulVec_alphaAllUpState (K : ℕ) (ν : ℝ) (u : Fin (K + 1)) :
+    (flatBandBNumber K ν u).mulVec (flatBandAlphaAllUpState K ν) = 0 := by
+  unfold flatBandBNumber
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun σ _ => ?_)
+  rw [← Matrix.mulVec_mulVec, flatBandBAnnihilation_mulVec_alphaAllUpState, Matrix.mulVec_zero]
 
 /-- **Tasaki Lemma 11.21 (frustration-free ⇒ ferromagnetism), AXIOM.**  If the local
 Hamiltonian `ĥ_p` is positive semidefinite for every external site `p`, then the
