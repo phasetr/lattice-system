@@ -4286,7 +4286,14 @@ The string is a noncomm-product of pairwise-commuting Hermitian
 $\sigma^z_j$ factors.  An induction over the Finset, using
 \texttt{Matrix.IsHermitian.mul\_of\_commute} at each step (the new
 factor commutes with the rest by
-\texttt{Finset.noncommProd\_commute}), establishes the result.
+\texttt{Finset.noncommProd\_commute}), establishes the result.  This
+induction is packaged once as the generic helper
+\texttt{Matrix.noncommProd\_isHermitian} in
+\texttt{Math/MatrixAnalysis/NoncommProd.lean}, together with the
+involution (\texttt{noncommProd\_sq\_of\_sq\_one}), idempotent
+(\texttt{noncommProd\_mul\_self\_of\_idempotent}), and vector-fixing
+(\texttt{noncommProd\_mulVec\_eq\_self}) analogues shared across the
+Jordan--Wigner and Hubbard hard-core layers.
 \end{proof}
 
 \begin{lemma}[\texttt{fermionMultiAnnihilation\_conjTranspose},
