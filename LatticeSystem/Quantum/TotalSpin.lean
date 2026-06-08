@@ -470,23 +470,11 @@ theorem onSite_conjTranspose (i : Λ) (A : Matrix (Fin 2) (Fin 2) ℂ) :
       h (fun k hk => (hp k hk).symm)
     rw [if_neg h, if_neg h', star_zero]
 
-omit [Fintype Λ] [DecidableEq Λ] in
-/-- Conjugate transpose distributes over finite sums in `ManyBodyOp Λ`. -/
-private lemma sum_conjTranspose_manyBody
-    {s : Finset Λ} (f : Λ → ManyBodyOp Λ) :
-    (∑ x ∈ s, f x).conjTranspose = ∑ x ∈ s, (f x).conjTranspose := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simp
-  | @insert a t hns ih =>
-    rw [Finset.sum_insert hns, Finset.sum_insert hns,
-      Matrix.conjTranspose_add, ih]
-
 /-- `(Ŝ^+_tot)† = Ŝ^-_tot`. -/
 theorem totalSpinHalfOpPlus_conjTranspose :
     (totalSpinHalfOpPlus Λ).conjTranspose = totalSpinHalfOpMinus Λ := by
   unfold totalSpinHalfOpPlus totalSpinHalfOpMinus
-  rw [sum_conjTranspose_manyBody]
+  rw [Matrix.conjTranspose_sum]
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [onSite_conjTranspose, spinHalfOpPlus_conjTranspose]
 
@@ -494,7 +482,7 @@ theorem totalSpinHalfOpPlus_conjTranspose :
 theorem totalSpinHalfOpMinus_conjTranspose :
     (totalSpinHalfOpMinus Λ).conjTranspose = totalSpinHalfOpPlus Λ := by
   unfold totalSpinHalfOpPlus totalSpinHalfOpMinus
-  rw [sum_conjTranspose_manyBody]
+  rw [Matrix.conjTranspose_sum]
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [onSite_conjTranspose, spinHalfOpMinus_conjTranspose]
 
