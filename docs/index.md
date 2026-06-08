@@ -445,7 +445,25 @@ equality; specializing to `Λ = Fin N` recovers an `N`-site chain.
 | `basisVec` / `onSite_mulVec_basisVec` | tensor-product basis states and their action under site operators (Tasaki (2.2.1)/(2.2.4)) | `Quantum/ManyBody.lean` |
 | `onSite_mul_onSite_same` | same-site product `onSite i A · onSite i B = onSite i (A · B)` (Tasaki (2.2.6), `x = y`) | `Quantum/ManyBody.lean` |
 | `onSite_commutator_same` | same-site commutator `[onSite i A, onSite i B] = onSite i [A, B]` | `Quantum/ManyBody.lean` |
-| `Matrix.IsHermitian.mul_of_commute` | commuting Hermitians multiply Hermitian | `Quantum/ManyBody.lean` |
+| `Matrix.IsHermitian.mul_of_commute` | commuting Hermitians multiply Hermitian (generic; relocated to the matrix-analysis layer in PR #4342) | `Math/MatrixAnalysis/HermitianSum.lean` |
+
+### Generic matrix-analysis helpers (`Math/MatrixAnalysis/`)
+
+Topic-organized generic linear-algebra facts extracted from the physics files where they had been
+re-proved as private helpers (Issue [#4339](https://github.com/phasetr/lattice-system/issues/4339)).
+
+| Lean name | Statement | File |
+|---|---|---|
+| `Matrix.isHermitian_sum` | a finite sum of Hermitian matrices is Hermitian | `Math/MatrixAnalysis/HermitianSum.lean` |
+| `Matrix.IsHermitian.mul_of_commute` | the product of two commuting Hermitian matrices is Hermitian | `Math/MatrixAnalysis/HermitianSum.lean` |
+| `Matrix.noncommProd_isHermitian` | a `Finset.noncommProd` of pairwise-commuting Hermitian matrices is Hermitian | `Math/MatrixAnalysis/NoncommProd.lean` |
+| `Matrix.noncommProd_sq_of_sq_one` | a `Finset.noncommProd` of pairwise-commuting involutions is an involution | `Math/MatrixAnalysis/NoncommProd.lean` |
+| `Matrix.noncommProd_mul_self_of_idempotent` | a `Finset.noncommProd` of pairwise-commuting idempotents is idempotent | `Math/MatrixAnalysis/NoncommProd.lean` |
+| `Matrix.noncommProd_mulVec_eq_self` | a `Finset.noncommProd` of matrices each fixing `ψ` also fixes `ψ` | `Math/MatrixAnalysis/NoncommProd.lean` |
+
+These are consumed by the Jordan–Wigner string / Hubbard hard-core projection layers (PR #4342),
+replacing the per-file private copies in `Fermion/JWAbstract.lean`,
+`Fermion/JordanWigner/Operators.lean`, and `Fermion/JordanWigner/Hubbard/HardcoreProjection.lean`.
 
 ### Total spin operator (Tasaki §2.2 eq. (2.2.7), (2.2.8))
 

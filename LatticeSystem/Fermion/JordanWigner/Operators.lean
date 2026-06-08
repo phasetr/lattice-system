@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.String
 import LatticeSystem.Quantum.SpinHalfBasis
+import LatticeSystem.Math.MatrixAnalysis.NoncommProd
 
 /-!
 # Multi-mode JW fermion operators
@@ -112,38 +113,11 @@ lemma onSite_conjTranspose {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
       fun hp => h (fun k hki => (hp k hki).symm)
     rw [if_neg h, if_neg h', star_zero]
 
-/-- A noncomm-product of pairwise-commuting Hermitian matrices is
-Hermitian. Used here for the JW string, which is a product of
-mutually commuting Hermitian `σ^z_j` factors. -/
-private lemma noncommProd_isHermitian_of_pairwise_commute_of_isHermitian
-    {ι : Type*} {n : Type*} [Fintype n] [DecidableEq n]
-    (s : Finset ι) (f : ι → Matrix n n ℂ)
-    (hcomm : (s : Set ι).Pairwise (fun a b => Commute (f a) (f b)))
-    (hHerm : ∀ a ∈ s, (f a).IsHermitian) :
-    (s.noncommProd f hcomm).IsHermitian := by
-  classical
-  induction s using Finset.induction_on with
-  | empty =>
-    simp only [Finset.noncommProd_empty]
-    exact Matrix.isHermitian_one
-  | @insert a t hat ih =>
-    rw [Finset.noncommProd_insert_of_notMem _ _ _ _ hat]
-    have hcomm_t : (t : Set ι).Pairwise (fun a b => Commute (f a) (f b)) :=
-      hcomm.mono fun x hx => Finset.mem_insert_of_mem hx
-    have hHerm_t : ∀ b ∈ t, (f b).IsHermitian :=
-      fun b hb => hHerm b (Finset.mem_insert_of_mem hb)
-    refine Matrix.IsHermitian.mul_of_commute
-      (hHerm a (Finset.mem_insert_self a t)) (ih hcomm_t hHerm_t) ?_
-    apply Finset.noncommProd_commute
-    intro b hb
-    have hab : a ≠ b := fun h => hat (h ▸ hb)
-    exact hcomm (Finset.mem_insert_self a t) (Finset.mem_insert_of_mem hb) hab
-
 /-- The Jordan–Wigner string is Hermitian: `(jwString N i)ᴴ = jwString N i`. -/
 theorem jwString_isHermitian (N : ℕ) (i : Fin (N + 1)) :
     (jwString N i).IsHermitian := by
   unfold jwString
-  apply noncommProd_isHermitian_of_pairwise_commute_of_isHermitian
+  apply Matrix.noncommProd_isHermitian
   intro j _
   exact onSite_isHermitian j pauliZ_isHermitian
 
@@ -167,45 +141,12 @@ theorem fermionMultiCreation_conjTranspose (N : ℕ) (i : Fin (N + 1)) :
 
 /-! ## Site-occupation number operator -/
 
-/-- A noncomm-product of pairwise-commuting matrices, each squaring to
-the identity, itself squares to the identity. Used here for the JW
-string, where each `σ^z_j` satisfies `σ^z² = 1`. -/
-private lemma noncommProd_sq_of_pairwise_commute_of_sq_one
-    {ι : Type*} {n : Type*} [Fintype n] [DecidableEq n]
-    (s : Finset ι) (f : ι → Matrix n n ℂ)
-    (hcomm : (s : Set ι).Pairwise (fun a b => Commute (f a) (f b)))
-    (hSq : ∀ a ∈ s, f a * f a = 1) :
-    s.noncommProd f hcomm * s.noncommProd f hcomm = 1 := by
-  classical
-  induction s using Finset.induction_on with
-  | empty =>
-    simp only [Finset.noncommProd_empty]
-    rw [Matrix.one_mul]
-  | @insert a t hat ih =>
-    rw [Finset.noncommProd_insert_of_notMem _ _ _ _ hat]
-    have hcomm_t : (t : Set ι).Pairwise (fun a b => Commute (f a) (f b)) :=
-      hcomm.mono fun x hx => Finset.mem_insert_of_mem hx
-    have hSq_t : ∀ b ∈ t, f b * f b = 1 :=
-      fun b hb => hSq b (Finset.mem_insert_of_mem hb)
-    have hcomm_a : Commute (f a) (t.noncommProd f hcomm_t) := by
-      apply Finset.noncommProd_commute
-      intro b hb
-      have hab : a ≠ b := fun h => hat (h ▸ hb)
-      exact hcomm (Finset.mem_insert_self a t) (Finset.mem_insert_of_mem hb) hab
-    -- (f a · ∏)·(f a · ∏) = f a · (∏ · f a) · ∏ = f a · (f a · ∏) · ∏ = (f a · f a) · ∏²
-    -- = 1 · 1 = 1
-    rw [show f a * t.noncommProd f hcomm_t * (f a * t.noncommProd f hcomm_t)
-          = (f a * f a) * (t.noncommProd f hcomm_t * t.noncommProd f hcomm_t) by
-        rw [Matrix.mul_assoc, ← Matrix.mul_assoc (t.noncommProd f hcomm_t) (f a),
-            ← hcomm_a.eq, Matrix.mul_assoc, Matrix.mul_assoc]]
-    rw [hSq a (Finset.mem_insert_self a t), Matrix.one_mul, ih hcomm_t hSq_t]
-
 /-- `(jwString N i)² = 1`: the JW string squares to the identity, since
 each `σ^z` factor satisfies `(σ^z)² = 1`. -/
 theorem jwString_sq (N : ℕ) (i : Fin (N + 1)) :
     jwString N i * jwString N i = 1 := by
   unfold jwString
-  apply noncommProd_sq_of_pairwise_commute_of_sq_one
+  apply Matrix.noncommProd_sq_of_sq_one
   intro j _
   rw [onSite_mul_onSite_same, pauliZ_mul_self, onSite_one]
 
