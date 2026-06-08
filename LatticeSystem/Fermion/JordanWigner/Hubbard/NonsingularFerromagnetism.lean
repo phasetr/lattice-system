@@ -156,4 +156,29 @@ theorem tasakiNonsingular_rayleighOnVec_ge (K : ℕ) (ν s t U lam κ : ℝ) (hl
   simp only [one_pow, mul_one] at h0
   linarith
 
+open scoped ComplexOrder in
+/-- **Maximal-spin sector energy bound.**  When every `ĥ_p ≥ 0` (`0 ≤ lam`, `1 ≤ K`), the maximal
+spin sector `twoS = K+1` has minimum energy at most `−C = −(K+1)(1+2ν²)s`, achieved by the all-up
+flat-band state.  (Together with `tasakiNonsingular_rayleighOnVec_ge`, `sectorMinEnergy = −C`.) -/
+theorem tasakiNonsingular_sectorMinEnergy_maxSpin_le (K : ℕ) (ν s t U lam κ : ℝ) (hK : 1 ≤ K)
+    (hlam : 0 ≤ lam)
+    (hpos : ∀ i : Fin (K + 1), (nonsingularLocalHamiltonian K ν s t U lam κ i).PosSemidef) :
+    sectorMinEnergy (tasakiNonsingularHamiltonian K ν t s U) (K + 1)
+      ≤ -((K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s)) := by
+  have hbdd : BddBelow (Set.range (fun φ : spinSector (M := 2 * K + 1) (K + 1) =>
+      rayleighOnVec (tasakiNonsingularHamiltonian K ν t s U)
+        (φ : EuclideanSpace ℂ _).ofLp)) := by
+    refine ⟨-((K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s)), ?_⟩
+    rintro y ⟨⟨φv, hφmem⟩, rfl⟩
+    exact tasakiNonsingular_rayleighOnVec_ge K ν s t U lam κ hlam hpos φv hφmem.1
+  refine sectorMinEnergy_le_of_eigenvector (M := 2 * K + 1)
+    (tasakiNonsingularHamiltonian K ν t s U) (flatBandAlphaAllUpState K ν)
+    (flatBandAlphaAllUpState_ne_zero K ν) (-((K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s))) (K + 1)
+    ?_ ?_ hbdd
+  · rw [tasakiNonsingularHamiltonian_mulVec_alphaAllUpState K ν t s U hK]
+    congr 1
+    push_cast
+    ring
+  · rw [flatBandTotalSpinSquared_mulVec_alphaAllUpState K ν]
+
 end LatticeSystem.Fermion
