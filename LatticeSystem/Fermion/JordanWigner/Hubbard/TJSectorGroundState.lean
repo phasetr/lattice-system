@@ -1,5 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorIrreducible
-import LatticeSystem.Math.TasakiAppendixA.PerronFrobeniusSymmetric
+import LatticeSystem.Math.PerronFrobeniusSymmetric
 
 /-!
 # Tasaki 11.5: the unique positive sector ground state via Perron–Frobenius (Prop 11.24 PR-D)

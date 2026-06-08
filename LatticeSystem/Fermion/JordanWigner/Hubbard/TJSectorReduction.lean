@@ -1,6 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJHermitian
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinTotHermitian
-import LatticeSystem.Math.TasakiAppendixA.AngularSpinHalfSector
+import LatticeSystem.Math.AngularMomentum.SpinHalfSector
 
 /-!
 # Tasaki §11.5: the spin-½ sector reduction for the t-J model (Theorem A.17)

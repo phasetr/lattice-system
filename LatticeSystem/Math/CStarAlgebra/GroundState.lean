@@ -1,4 +1,4 @@
-import LatticeSystem.Math.TasakiAppendixA.CStarState
+import LatticeSystem.Math.CStarAlgebra.State
 
 /-!
 # Tasaki Appendix A.7: ground states of infinite systems (Definitions A.25, A.27, Theorem A.26)

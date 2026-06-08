@@ -1,4 +1,4 @@
-import LatticeSystem.Math.TasakiAppendixA.AngularQuantization
+import LatticeSystem.Math.AngularMomentum.Quantization
 
 /-!
 # Tasaki Appendix A.3.2: the SU(2)-multiplet degeneracy (Theorem A.16)
