@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreSubspace
 import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyCommute
+import LatticeSystem.Math.MatrixAnalysis.NoncommProd
 
 /-!
 # Hubbard hard-core projection
@@ -33,87 +34,11 @@ namespace LatticeSystem.Fermion
 
 open Matrix LatticeSystem.Quantum
 
-/-! ## Generic `noncommProd` helpers for commuting idempotents -/
+/-! ## The hard-core factor `1 - n_{i,↑} n_{i,↓}`
 
-/-- A non-commutative product of pairwise-commuting idempotent matrices is
-itself idempotent. This is the projection analogue of
-`noncommProd_sq_of_sq_one`: instead of `f a * f a = 1` we assume
-`f a * f a = f a`. -/
-private theorem noncommProd_mul_self_of_idempotent
-    {ι : Type*} {n : Type*} [Fintype n] [DecidableEq n]
-    (s : Finset ι) (f : ι → Matrix n n ℂ)
-    (hcomm : (s : Set ι).Pairwise (fun a b => Commute (f a) (f b)))
-    (hId : ∀ a ∈ s, f a * f a = f a) :
-    s.noncommProd f hcomm * s.noncommProd f hcomm = s.noncommProd f hcomm := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simp only [Finset.noncommProd_empty]; rw [Matrix.one_mul]
-  | @insert a t hat ih =>
-    rw [Finset.noncommProd_insert_of_notMem _ _ _ _ hat]
-    have hcomm_t : (t : Set ι).Pairwise (fun a b => Commute (f a) (f b)) :=
-      hcomm.mono fun x hx => Finset.mem_insert_of_mem hx
-    have hId_t : ∀ b ∈ t, f b * f b = f b :=
-      fun b hb => hId b (Finset.mem_insert_of_mem hb)
-    have hcomm_a : Commute (f a) (t.noncommProd f hcomm_t) := by
-      apply Finset.noncommProd_commute
-      intro b hb
-      have hab : a ≠ b := fun h => hat (h ▸ hb)
-      exact hcomm (Finset.mem_insert_self a t) (Finset.mem_insert_of_mem hb) hab
-    rw [show f a * t.noncommProd f hcomm_t * (f a * t.noncommProd f hcomm_t)
-          = (f a * f a) * (t.noncommProd f hcomm_t * t.noncommProd f hcomm_t) by
-        rw [Matrix.mul_assoc,
-          ← Matrix.mul_assoc (t.noncommProd f hcomm_t) (f a),
-          ← hcomm_a.eq, Matrix.mul_assoc, Matrix.mul_assoc]]
-    rw [hId a (Finset.mem_insert_self a t), ih hcomm_t hId_t]
-
-/-- A non-commutative product of matrices, each of which fixes a vector `ψ`
-under `mulVec`, also fixes `ψ`. -/
-private theorem noncommProd_mulVec_eq_self
-    {ι : Type*} {n : Type*} [Fintype n] [DecidableEq n]
-    (s : Finset ι) (f : ι → Matrix n n ℂ)
-    (hcomm : (s : Set ι).Pairwise (fun a b => Commute (f a) (f b)))
-    (ψ : n → ℂ) (hfix : ∀ a ∈ s, (f a).mulVec ψ = ψ) :
-    (s.noncommProd f hcomm).mulVec ψ = ψ := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simp only [Finset.noncommProd_empty]; rw [Matrix.one_mulVec]
-  | @insert a t hat ih =>
-    rw [Finset.noncommProd_insert_of_notMem _ _ _ _ hat]
-    have hcomm_t : (t : Set ι).Pairwise (fun a b => Commute (f a) (f b)) :=
-      hcomm.mono fun x hx => Finset.mem_insert_of_mem hx
-    have hfix_t : ∀ b ∈ t, (f b).mulVec ψ = ψ :=
-      fun b hb => hfix b (Finset.mem_insert_of_mem hb)
-    rw [← Matrix.mulVec_mulVec, ih hcomm_t hfix_t,
-      hfix a (Finset.mem_insert_self a t)]
-
-/-- A non-commutative product of pairwise-commuting Hermitian matrices is
-Hermitian. Local copy of the `JWAbstract` helper, duplicated here because
-`JWAbstract` imports `JordanWigner`, which in turn imports this file. -/
-private theorem noncommProd_isHermitian
-    {ι : Type*} {n : Type*} [Fintype n] [DecidableEq n]
-    (s : Finset ι) (f : ι → Matrix n n ℂ)
-    (hcomm : (s : Set ι).Pairwise (fun a b => Commute (f a) (f b)))
-    (hHerm : ∀ a ∈ s, (f a).IsHermitian) :
-    (s.noncommProd f hcomm).IsHermitian := by
-  classical
-  induction s using Finset.induction_on with
-  | empty =>
-    simp only [Finset.noncommProd_empty]
-    exact Matrix.isHermitian_one
-  | @insert a t hat ih =>
-    rw [Finset.noncommProd_insert_of_notMem _ _ _ _ hat]
-    have hcomm_t : (t : Set ι).Pairwise (fun a b => Commute (f a) (f b)) :=
-      hcomm.mono fun x hx => Finset.mem_insert_of_mem hx
-    have hHerm_t : ∀ b ∈ t, (f b).IsHermitian :=
-      fun b hb => hHerm b (Finset.mem_insert_of_mem hb)
-    refine Matrix.IsHermitian.mul_of_commute
-      (hHerm a (Finset.mem_insert_self a t)) (ih hcomm_t hHerm_t) ?_
-    apply Finset.noncommProd_commute
-    intro b hb
-    have hab : a ≠ b := fun h => hat (h ▸ hb)
-    exact hcomm (Finset.mem_insert_self a t) (Finset.mem_insert_of_mem hb) hab
-
-/-! ## The hard-core factor `1 - n_{i,↑} n_{i,↓}` -/
+The generic `Finset.noncommProd` helpers used below
+(`Matrix.noncommProd_isHermitian`, `Matrix.noncommProd_mul_self_of_idempotent`,
+`Matrix.noncommProd_mulVec_eq_self`) live in `Math/MatrixAnalysis/NoncommProd.lean`. -/
 
 /-- The single-site hard-core factor `1 - n_{i,↑} n_{i,↓}` at spinful site
 `i`: the complementary projection that annihilates the doubly-occupied
@@ -198,7 +123,7 @@ theorem hubbardHardcoreProjection_mul_self (N : ℕ) :
     hubbardHardcoreProjection N * hubbardHardcoreProjection N =
       hubbardHardcoreProjection N := by
   unfold hubbardHardcoreProjection
-  exact noncommProd_mul_self_of_idempotent _ _ _
+  exact Matrix.noncommProd_mul_self_of_idempotent _ _ _
     (fun i _ => hubbardHardcoreFactor_mul_self N i)
 
 /-- The hard-core projection is Hermitian: it is a non-commutative product
@@ -206,7 +131,7 @@ of pairwise-commuting Hermitian factors. -/
 theorem hubbardHardcoreProjection_isHermitian (N : ℕ) :
     (hubbardHardcoreProjection N).IsHermitian := by
   unfold hubbardHardcoreProjection
-  exact noncommProd_isHermitian _ _ _
+  exact Matrix.noncommProd_isHermitian _ _ _
     (fun i _ => hubbardHardcoreFactor_isHermitian N i)
 
 /-- Each same-site double-occupancy operator annihilates the hard-core
@@ -231,7 +156,7 @@ theorem hubbardHardcoreProjection_mulVec_eq_self_of_mem
     (hψ : ψ ∈ hubbardHardcoreSubspace N) :
     (hubbardHardcoreProjection N).mulVec ψ = ψ := by
   unfold hubbardHardcoreProjection
-  exact noncommProd_mulVec_eq_self _ _ _ ψ
+  exact Matrix.noncommProd_mulVec_eq_self _ _ _ ψ
     (fun i _ => hubbardHardcoreFactor_mulVec_eq_self_of_mem N hψ i)
 
 /-- The hard-core projection lands in the hard-core subspace: every

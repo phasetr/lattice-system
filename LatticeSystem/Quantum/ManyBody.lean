@@ -1,5 +1,6 @@
 import Mathlib.Data.Complex.Basic
 import Mathlib.LinearAlgebra.Matrix.Hermitian
+import LatticeSystem.Math.MatrixAnalysis.HermitianSum
 
 /-!
 # Multi-body operator space and site-embedded operators
@@ -191,14 +192,11 @@ theorem onSite_mul_onSite_of_ne {i j : Λ} (hij : i ≠ j)
   · exact absurd (hcond.mpr h2) h1
   · rfl
 
-/-! ## Products of commuting Hermitian matrices -/
+/-! ## Products of commuting Hermitian matrices
 
-/-- The product of two commuting Hermitian matrices is Hermitian. -/
-theorem Matrix.IsHermitian.mul_of_commute {n : Type*} [Fintype n]
-    {A B : Matrix n n ℂ} (hA : A.IsHermitian) (hB : B.IsHermitian)
-    (hcomm : A * B = B * A) : (A * B).IsHermitian := by
-  unfold Matrix.IsHermitian
-  rw [Matrix.conjTranspose_mul, hA, hB, hcomm]
+The generic fact `Matrix.IsHermitian.mul_of_commute` (the product of two commuting Hermitian
+matrices is Hermitian) now lives in `Math/MatrixAnalysis/HermitianSum.lean` and is re-exported via
+the import above. -/
 
 /-! ## Linearity of the site embedding -/
 
