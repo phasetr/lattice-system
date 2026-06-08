@@ -309,4 +309,114 @@ theorem isCompact_eigenSphere {n : Type*} [Fintype n]
   rintro φ ⟨hu, _, _⟩
   simpa [Metric.mem_sphere, dist_zero_right] using hu
 
+/-- **The fixed-filling total-spin sector is compact.**  `spinSector filling twoS` is exactly the
+unit sphere of `EuclideanSpace ℂ` intersected with the `N̂`-eigenvalue-`filling` and
+`(Ŝ_tot)²`-eigenvalue-`(twoS/2)(twoS/2+1)` conditions, so `isCompact_eigenSphere` applies. -/
+theorem isCompact_spinSector {M : ℕ} (filling twoS : ℕ) :
+    IsCompact (spinSector (M := M) filling twoS) := by
+  unfold spinSector
+  exact isCompact_eigenSphere (n := Fin (2 * M + 2) → Fin 2)
+    (fermionTotalNumber (2 * M + 1)) (fermionTotalSpinSquared M)
+    (filling : ℂ) (((twoS : ℂ) / 2) * ((twoS : ℂ) / 2 + 1))
+
+/-- **The energy quadratic form is continuous.**  `φ ↦ rayleighOnVec H φ.ofLp` is continuous on
+`EuclideanSpace ℂ ι` (a finite real polynomial in the coordinates: the real part of the
+`dotProduct` of `star φ` with the continuous linear image `H.mulVec φ`). -/
+theorem continuous_rayleighOnVec {ι : Type*} [Fintype ι] (H : Matrix ι ι ℂ) :
+    Continuous fun φ : EuclideanSpace ℂ ι => rayleighOnVec H φ.ofLp := by
+  have hofLp : Continuous fun φ : EuclideanSpace ℂ ι => φ.ofLp :=
+    (PiLp.continuousLinearEquiv 2 ℂ _).continuous
+  have hH : Continuous fun φ : EuclideanSpace ℂ ι => H.mulVec φ.ofLp :=
+    H.mulVecLin.continuous_of_finiteDimensional.comp hofLp
+  unfold rayleighOnVec
+  refine Complex.continuous_re.comp ?_
+  simp only [dotProduct]
+  refine continuous_finset_sum _ (fun i _ => ?_)
+  exact ((continuous_apply i).comp (continuous_star.comp hofLp)).mul
+    ((continuous_apply i).comp hH)
+
+/-- **Strict lower bound for an attained sector infimum.**  On the compact unit-sphere eigenspace
+intersection `S = {φ | ‖φ‖ = 1 ∧ Aφ = aφ ∧ Bφ = bφ}`, if `S` is nonempty, every unit vector has
+`rayleighOnVec H ≥ c`, and no element of `S` achieves `c`, then `⨅_{φ ∈ S} rayleighOnVec H φ > c`.
+Compactness (`isCompact_eigenSphere`) and continuity (`continuous_rayleighOnVec`) attain the infimum
+at some `φ₀ ∈ S`, where `rayleighOnVec H φ₀ ≥ c` and `≠ c`.  Kept generic over the abstract index
+`n` so the heavy attainment analysis is elaborated once, away from the large fermion configuration
+type. -/
+theorem lt_iInf_rayleigh_of_eigenSphere {n : Type*} [Fintype n]
+    (H A B : Matrix n n ℂ) (a b : ℂ) (c : ℝ)
+    (hNe : ({φ : EuclideanSpace ℂ n |
+        ‖φ‖ = 1 ∧ A.mulVec φ.ofLp = a • φ.ofLp ∧ B.mulVec φ.ofLp = b • φ.ofLp}).Nonempty)
+    (hlb : ∀ φ : EuclideanSpace ℂ n, ‖φ‖ = 1 → c ≤ rayleighOnVec H φ.ofLp)
+    (hstrict : ∀ φ : EuclideanSpace ℂ n,
+        φ ∈ {φ : EuclideanSpace ℂ n |
+          ‖φ‖ = 1 ∧ A.mulVec φ.ofLp = a • φ.ofLp ∧ B.mulVec φ.ofLp = b • φ.ofLp} →
+        rayleighOnVec H φ.ofLp ≠ c) :
+    c < ⨅ φ : {φ : EuclideanSpace ℂ n |
+        ‖φ‖ = 1 ∧ A.mulVec φ.ofLp = a • φ.ofLp ∧ B.mulVec φ.ofLp = b • φ.ofLp},
+      rayleighOnVec H (φ : EuclideanSpace ℂ n).ofLp := by
+  haveI : Nonempty {φ : EuclideanSpace ℂ n |
+      ‖φ‖ = 1 ∧ A.mulVec φ.ofLp = a • φ.ofLp ∧ B.mulVec φ.ofLp = b • φ.ofLp} := hNe.to_subtype
+  obtain ⟨φ₀, hφ₀mem, hmin⟩ := (isCompact_eigenSphere A B a b).exists_isMinOn hNe
+    (continuous_rayleighOnVec H).continuousOn
+  have hbdd : BddBelow (Set.range (fun φ : {φ : EuclideanSpace ℂ n |
+      ‖φ‖ = 1 ∧ A.mulVec φ.ofLp = a • φ.ofLp ∧ B.mulVec φ.ofLp = b • φ.ofLp} =>
+      rayleighOnVec H (φ : EuclideanSpace ℂ n).ofLp)) := by
+    refine ⟨c, ?_⟩
+    rintro y ⟨⟨φv, hφv⟩, rfl⟩
+    exact hlb φv hφv.1
+  have hInf : (⨅ φ : {φ : EuclideanSpace ℂ n |
+        ‖φ‖ = 1 ∧ A.mulVec φ.ofLp = a • φ.ofLp ∧ B.mulVec φ.ofLp = b • φ.ofLp},
+      rayleighOnVec H (φ : EuclideanSpace ℂ n).ofLp) = rayleighOnVec H φ₀.ofLp := by
+    refine le_antisymm (ciInf_le hbdd ⟨φ₀, hφ₀mem⟩) (le_ciInf (fun φ => ?_))
+    exact (isMinOn_iff.mp hmin) (φ : EuclideanSpace ℂ n) φ.2
+  rw [hInf]
+  exact lt_of_le_of_ne (hlb φ₀ hφ₀mem.1) (Ne.symm (hstrict φ₀ hφ₀mem))
+
+open scoped ComplexOrder in
+/-- **Strict gap below the ground energy for every lower-spin sector.**  For `0 < ν`, `0 < s`,
+`0 < lam`, every `ĥ_p ≥ 0`, and `twoS < K+1`, the (half-filling) total-spin-`twoS` sector minimum
+energy is strictly above the ground energy `−C = −(K+1)(1+2ν²)s`.  When the sector is nonempty,
+compactness (`isCompact_spinSector`) plus continuity (`continuous_rayleighOnVec`) attains the
+infimum at some `φ₀`, where `rayleighOnVec ≥ −C` (lower bound) and `≠ −C` (no lower-sector state
+achieves the ground energy); when empty the junk infimum `0` exceeds `−C` since `C > 0`. -/
+theorem tasakiNonsingular_neg_const_lt_sectorMinEnergy_lower (K : ℕ) (ν s t U lam κ : ℝ)
+    (hν : 0 < ν) (hs : 0 < s) (hlam : 0 < lam)
+    (hpos : ∀ i : Fin (K + 1), (nonsingularLocalHamiltonian K ν s t U lam κ i).PosSemidef)
+    (twoS : ℕ) (htwoS : twoS < K + 1) :
+    -((K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s))
+      < sectorMinEnergy (tasakiNonsingularHamiltonian K ν t s U) (K + 1) twoS := by
+  have hC : (0 : ℝ) < (K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s) := by positivity
+  by_cases hne : (spinSector (M := 2 * K + 1) (K + 1) twoS).Nonempty
+  · -- attain the infimum via the generic compact-eigenSphere lemma (off the large config type)
+    unfold sectorMinEnergy spinSector
+    refine lt_iInf_rayleigh_of_eigenSphere _ _ _ _ _ _ hne (fun φ hu => ?_) (fun φ hmem => ?_)
+    · exact tasakiNonsingular_rayleighOnVec_ge K ν s t U lam κ hlam.le hpos φ hu
+    · exact tasakiNonsingular_rayleigh_ne_neg_const_of_lower_sector
+        K ν s t U lam κ hν hlam hpos twoS htwoS φ hmem
+  · -- empty sector: the junk infimum is 0 > −C
+    haveI : IsEmpty (spinSector (M := 2 * K + 1) (K + 1) twoS) :=
+      Set.isEmpty_coe_sort.mpr (Set.not_nonempty_iff_eq_empty.mp hne)
+    unfold sectorMinEnergy
+    rw [Real.iInf_of_isEmpty]
+    linarith
+
+open scoped ComplexOrder in
+/-- **Tasaki Lemma 11.21 (frustration-free ⇒ saturated ferromagnetism), PROVED** (`d = 1`,
+`1 ≤ K`).  If every local Hamiltonian `ĥ_p` is positive-semidefinite (`0 < ν`, `0 < s`, `0 < lam`),
+the non-singular Hubbard model exhibits saturated ferromagnetism: the maximal-spin sector
+`twoS = K+1` lies strictly below every lower sector.  The maximal sector achieves the ground energy
+`−C = −(K+1)(1+2ν²)s` (`tasakiNonsingular_sectorMinEnergy_maxSpin_le`), while every lower sector
+lies strictly above it (`tasakiNonsingular_neg_const_lt_sectorMinEnergy_lower`). -/
+theorem nonsingular_exhibitsFerromagnetism (K : ℕ) (ν s t U lam κ : ℝ)
+    (hK : 1 ≤ K) (hν : 0 < ν) (hs : 0 < s) (hlam : 0 < lam)
+    (hpos : ∀ i : Fin (K + 1), (nonsingularLocalHamiltonian K ν s t U lam κ i).PosSemidef) :
+    exhibitsFerromagnetism (tasakiNonsingularHamiltonian K ν t s U) (K + 1) (K + 1) := by
+  intro twoS htwoS
+  calc sectorMinEnergy (tasakiNonsingularHamiltonian K ν t s U) (K + 1) (K + 1)
+      ≤ -((K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s)) :=
+        tasakiNonsingular_sectorMinEnergy_maxSpin_le K ν s t U lam κ hK hlam.le hpos
+    _ < sectorMinEnergy (tasakiNonsingularHamiltonian K ν t s U) (K + 1) twoS :=
+        tasakiNonsingular_neg_const_lt_sectorMinEnergy_lower K ν s t U lam κ hν hs hlam hpos twoS
+          htwoS
+
 end LatticeSystem.Fermion
