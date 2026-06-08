@@ -142,4 +142,49 @@ theorem flatBandACreation_ACreation_anticomm (K : ℕ) (ν : ℝ) (p q : Fin (K 
   refine Finset.sum_eq_zero (fun x _ => Finset.sum_eq_zero (fun y _ => ?_))
   rw [hc, hd, spinful_creation_creation_anticomm, smul_zero]
 
+/-- The flat-band creation operator is nilpotent: `(â†_{p,σ})² = 0`. -/
+theorem flatBandACreation_sq (K : ℕ) (ν : ℝ) (p : Fin (K + 1)) (σ : Fin 2) :
+    flatBandACreation K ν p σ * flatBandACreation K ν p σ = 0 := by
+  have h2 : (2 : ℂ) • (flatBandACreation K ν p σ * flatBandACreation K ν p σ) = 0 := by
+    rw [two_smul]; exact flatBandACreation_ACreation_anticomm K ν p p σ σ
+  rcases smul_eq_zero.mp h2 with h0 | h0
+  · exact absurd h0 (by norm_num)
+  · exact h0
+
+/-- **Generic creation move-through hitting a duplicate.**  If `a` anticommutes with every factor
+`A q` of the ordered product and additionally `a · A p = 0` for some `p` occurring in the list, then
+`a · (∏ A) |vac⟩ = 0`: anticommute `a` rightward until it reaches the factor `A p`, where it is
+annihilated.  This is the creation analogue of `anticomm_listProd_mulVec_vacuum` for an operator
+that does *not* annihilate the vacuum but appears (up to `a · A p = 0`) inside the product. -/
+theorem creationDup_listProd_mulVec_vacuum {M : ℕ} {ι : Type*}
+    (a : ManyBodyOp (Fin (M + 1))) (A : ι → ManyBodyOp (Fin (M + 1))) (ps : List ι) (p : ι)
+    (hp : p ∈ ps) (hself : a * A p = 0)
+    (hanti : ∀ q ∈ ps, a * A q + A q * a = 0) :
+    (a * (ps.map A).prod).mulVec (fermionMultiVacuum M) = 0 := by
+  revert hp hanti
+  induction ps with
+  | nil => intro hp _; simp at hp
+  | cons q ps ih =>
+    intro hp hanti
+    rw [List.map_cons, List.prod_cons, ← Matrix.mul_assoc]
+    by_cases hqp : q = p
+    · rw [show A q = A p from by rw [hqp], hself, Matrix.zero_mul, Matrix.zero_mulVec]
+    · have hpps : p ∈ ps := (List.mem_cons.mp hp).resolve_left (fun h => hqp h.symm)
+      rw [eq_neg_of_add_eq_zero_left (hanti q (by simp)),
+        Matrix.neg_mul, Matrix.mul_assoc, Matrix.neg_mulVec, ← Matrix.mulVec_mulVec,
+        ih hpps (fun r hr => hanti r (by simp [hr])),
+        Matrix.mulVec_zero, neg_zero]
+
+/-- **`â†_{p,↑}` annihilates the all-up `α` state.**  The all-up state `|Φα,all↑⟩` already contains
+the creation `â†_{p,↑}` (`p ∈ List.finRange (K+1)`), so prepending another copy hits
+`(â†_{p,↑})² = 0` after anticommuting through the earlier factors. -/
+theorem flatBandACreation_up_mulVec_alphaAllUpState (K : ℕ) (ν : ℝ) (p : Fin (K + 1)) :
+    (flatBandACreation K ν p 0).mulVec (flatBandAlphaAllUpState K ν) = 0 := by
+  unfold flatBandAlphaAllUpState
+  rw [Matrix.mulVec_mulVec]
+  exact creationDup_listProd_mulVec_vacuum (flatBandACreation K ν p 0)
+    (fun q => flatBandACreation K ν q 0) (List.finRange (K + 1)) p (by simp)
+    (flatBandACreation_sq K ν p 0)
+    (fun q _ => flatBandACreation_ACreation_anticomm K ν p q 0 0)
+
 end LatticeSystem.Fermion
