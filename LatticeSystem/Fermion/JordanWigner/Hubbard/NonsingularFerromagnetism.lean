@@ -33,4 +33,19 @@ theorem flatBandTotalSpinSquared_mulVec_alphaAllUpState (K : ℕ) (ν : ℝ) :
     (flatBandTotalSpinPlus_mulVec_alphaAllUpState K ν)
     (flatBandTotalSpinZ_mulVec_alphaAllUpState K ν)
 
+open scoped ComplexOrder in
+/-- **Energy lower bound from frustration-free positivity.**  If every `ĥ_p ≥ 0` and `0 ≤ lam`, the
+shifted energy quadratic form is nonnegative: `0 ≤ rayleighOnVec (Ĥ + C·1) φ` for every `φ`, where
+`C = (K+1)(1+2ν²)s`.  Equivalently the energy is `≥ −C·‖φ‖²` everywhere — the global ground-energy
+bound underlying the `sectorMinEnergy ≥ −C` half of the ferromagnetism criterion. -/
+theorem nonsingular_rayleighOnVec_add_const_nonneg (K : ℕ) (ν s t U lam κ : ℝ) (hlam : 0 ≤ lam)
+    (hpos : ∀ i : Fin (K + 1), (nonsingularLocalHamiltonian K ν s t U lam κ i).PosSemidef)
+    (φ : (Fin (2 * (2 * K + 1) + 2) → Fin 2) → ℂ) :
+    0 ≤ rayleighOnVec (tasakiNonsingularHamiltonian K ν t s U
+      + ((K + 1 : ℂ) * ((1 + 2 * ν ^ 2) * s)) •
+        (1 : ManyBodyOp (Fin (2 * (2 * K + 1) + 2)))) φ := by
+  have hP := tasakiNonsingular_add_const_posSemidef K ν s t U lam κ hlam hpos
+  unfold rayleighOnVec
+  simpa using (Complex.le_def.mp (hP.dotProduct_mulVec_nonneg φ)).1
+
 end LatticeSystem.Fermion
