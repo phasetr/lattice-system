@@ -429,9 +429,11 @@ Tasaki's proof (§11.4.3): Lemma 11.22 (`nonsingular_lemma_11_22`) supplies para
 (`clam > 0`), `κ = cκ` for which every local Hamiltonian `ĥ_p` is positive-semidefinite once
 `t/s ≥ T`, `U/s ≥ V`; the proved Lemma 11.21 (`nonsingular_exhibitsFerromagnetism`) then turns that
 frustration-freeness into saturated ferromagnetism (via the reduction to Theorem 11.11).  This
-discharges the former `axiom tasaki_theorem_11_20` *and* the former `axiom nonsingular_lemma_11_21`,
-leaving only Lemmas 11.22/11.23 (the analytic eigenvalue-continuity core) as documented axioms of
-§11.4.  The `1 ≤ K` hypothesis (genuine periodic chain) is required by the all-up-state annihilation
+discharges the former `axiom tasaki_theorem_11_20` *and* the former `axiom nonsingular_lemma_11_21`.
+`#print axioms` confirms `tasaki_theorem_11_20` now rests on `nonsingular_lemma_11_22` (the analytic
+positivity Lemma 11.22) and the existing Theorem 11.11 classification axiom
+`flatBand_zeroEnergy_halfFilled_mem_ferromagneticMultipletSpan` (no `sorryAx`, no Lemma 11.21).  The
+`1 ≤ K` hypothesis (genuine periodic chain) is required by the all-up-state annihilation
 `tasakiNonsingularHamiltonian_mulVec_alphaAllUpState`. -/
 theorem tasaki_theorem_11_20 (ν : ℝ) (hν : 0 < ν) :
     ∃ T V : ℝ, 0 < T ∧ 0 < V ∧
