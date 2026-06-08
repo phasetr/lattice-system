@@ -186,4 +186,54 @@ theorem tasakiNonsingular_sectorMinEnergy_maxSpin_le (K : ℕ) (ν s t U lam κ 
   · rw [flatBandTotalNumber_mulVec_alphaAllUpState K ν]
   · rw [flatBandTotalSpinSquared_mulVec_alphaAllUpState K ν]
 
+open scoped ComplexOrder in
+/-- **A ground-energy state lies in `ker Ĥ_flat`.**  When every `ĥ_p ≥ 0` and `0 < lam`, a unit
+vector `φ` whose energy equals the ground energy `−C` is annihilated by the flat-band Hamiltonian:
+`Ĥ_flat φ = 0`.  Via the decomposition (11.4.46), `rayleighOnVec(Ĥ+C·1)φ = rayleighOnVec(Σĥ_p)φ +
+lam·rayleighOnVec(Ĥ_flat)φ`; both PSD terms are `≥ 0` and sum to `0`, so (using `lam > 0`) the
+flat-band term vanishes and the PSD-kernel lemma gives `Ĥ_flat φ = 0`.  This is the bridge from
+"achieves `−C`" to Theorem 11.11 (the strict-gap step of Lemma 11.21). -/
+theorem tasakiNonsingular_flatBand_mulVec_zero_of_rayleigh_eq_neg_const (K : ℕ) (ν s t U lam κ : ℝ)
+    (hlam : 0 < lam)
+    (hpos : ∀ i : Fin (K + 1), (nonsingularLocalHamiltonian K ν s t U lam κ i).PosSemidef)
+    (φ : EuclideanSpace ℂ (Fin (2 * (2 * K + 1) + 2) → Fin 2)) (hu : ‖φ‖ = 1)
+    (hE : rayleighOnVec (tasakiNonsingularHamiltonian K ν t s U) φ.ofLp
+      = -((K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s))) :
+    (flatBandHamiltonian K ν 1 1).mulVec φ.ofLp = 0 := by
+  -- the shifted energy vanishes
+  have hC : rayleighOnVec (tasakiNonsingularHamiltonian K ν t s U
+      + ((K + 1 : ℂ) * ((1 + 2 * ν ^ 2) * s)) • (1 : ManyBodyOp (Fin (2 * (2 * K + 1) + 2)))) φ.ofLp
+      = 0 := by
+    rw [rayleighOnVec_add_matrix,
+      show ((K + 1 : ℂ) * ((1 + 2 * ν ^ 2) * s))
+        = (((K + 1 : ℝ) * ((1 + 2 * ν ^ 2) * s) : ℝ) : ℂ) from by push_cast; ring,
+      rayleighOnVec_real_smul, rayleighOnVec_one_eq_normSq, hu, hE]
+    simp only [one_pow, mul_one]; ring
+  -- decompose the shifted Hamiltonian into the PSD sum + lam·(flat-band remainder)
+  have hdecomp : tasakiNonsingularHamiltonian K ν t s U
+      + ((K + 1 : ℂ) * ((1 + 2 * ν ^ 2) * s)) • (1 : ManyBodyOp (Fin (2 * (2 * K + 1) + 2)))
+      = (∑ i, nonsingularLocalHamiltonian K ν s t U lam κ i)
+        + (lam : ℂ) • (flatBandHamiltonian K ν 1 1) := by
+    rw [tasakiNonsingular_eq_sum_localHamiltonian K ν s t U lam κ,
+      ← nonsingularRemainder_eq_flatBand]
+    abel
+  rw [hdecomp, rayleighOnVec_add_matrix, rayleighOnVec_sum, rayleighOnVec_real_smul] at hC
+  -- each summand is ≥ 0
+  have hsum_nonneg : ∀ i ∈ Finset.univ,
+      0 ≤ rayleighOnVec (nonsingularLocalHamiltonian K ν s t U lam κ i) φ.ofLp := by
+    intro i _
+    exact (Complex.le_def.mp ((hpos i).dotProduct_mulVec_nonneg φ.ofLp)).1
+  have hrem_nonneg : 0 ≤ rayleighOnVec (flatBandHamiltonian K ν 1 1) φ.ofLp :=
+    (Complex.le_def.mp
+      ((flatBandHamiltonian_posSemidef K ν 1 1 (by norm_num) (by norm_num)).dotProduct_mulVec_nonneg
+        φ.ofLp)).1
+  have hsum0 : (0 : ℝ)
+      ≤ ∑ i, rayleighOnVec (nonsingularLocalHamiltonian K ν s t U lam κ i) φ.ofLp :=
+    Finset.sum_nonneg hsum_nonneg
+  -- the flat-band term must vanish
+  have hflat0 : rayleighOnVec (flatBandHamiltonian K ν 1 1) φ.ofLp = 0 := by
+    nlinarith [hC, hsum0, hrem_nonneg, hlam, mul_nonneg hlam.le hrem_nonneg]
+  exact posSemidef_mulVec_eq_zero_of_rayleighOnVec_zero
+    (flatBandHamiltonian_posSemidef K ν 1 1 (by norm_num) (by norm_num)) hflat0
+
 end LatticeSystem.Fermion
