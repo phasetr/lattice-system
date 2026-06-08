@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.ManyBody
+import LatticeSystem.Math.MatrixAnalysis.HermitianTrace
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 
@@ -320,14 +321,6 @@ theorem partitionFn_zero_ne_zero (H : ManyBodyOp Λ) :
   rw [partitionFn_zero]
   exact_mod_cast Fintype.card_pos.ne'
 
-/-- For any Hermitian matrix `A : Matrix n n ℂ`, the trace is real. -/
-theorem _root_.Matrix.IsHermitian.trace_im
-    {n : Type*} [Fintype n] {A : Matrix n n ℂ} (hA : A.IsHermitian) :
-    A.trace.im = 0 := by
-  have : star A.trace = A.trace := by
-    rw [← Matrix.trace_conjTranspose, hA.eq]
-  exact Complex.conj_eq_iff_im.mp this
-
 /-- For a Hermitian Hamiltonian `H`, the partition function
 `Z(β) = Tr(e^{-βH})` is real. -/
 theorem partitionFn_im_of_isHermitian {H : ManyBodyOp Λ}
@@ -449,17 +442,6 @@ expectation `⟨O⟩_β = Tr(ρ_β O)` is real:
             = ⟨O⟩_β`,
 combining `Matrix.trace_conjTranspose`, Hermiticity of `ρ_β` and `O`,
 and the cyclic property `Matrix.trace_mul_comm`. See Tasaki §3.3, p. 80. -/
-
-/-- For Hermitian matrices `A`, `B` over `ℂ`, the trace `Tr(A · B)`
-is invariant under complex conjugation. This is the algebraic core of
-the reality of Gibbs expectations and is independent of the Gibbs
-construction. -/
-theorem _root_.Matrix.trace_mul_star_of_isHermitian
-    {n : Type*} [Fintype n] {A B : Matrix n n ℂ}
-    (hA : A.IsHermitian) (hB : B.IsHermitian) :
-    star (A * B).trace = (A * B).trace := by
-  rw [← Matrix.trace_conjTranspose, Matrix.conjTranspose_mul, hB.eq, hA.eq,
-    Matrix.trace_mul_comm]
 
 /-- For Hermitian `H` and Hermitian observable `O`, the Gibbs expectation
 is invariant under complex conjugation, i.e. `star ⟨O⟩_β = ⟨O⟩_β`. -/
