@@ -64,6 +64,28 @@ theorem flatBandDual_passThrough_listProd_mulVec_vacuum (u : Fin (K + 1)) (σ : 
       Matrix.neg_mulVec, ← Matrix.mulVec_mulVec,
       ih (fun p hp => hl p (List.mem_cons.mpr (Or.inr hp))), Matrix.mulVec_zero, neg_zero]
 
+/-- **The dual annihilator peels its own leading `b̂†_{u,σ}` off a product on the vacuum** (when it
+passes every remaining factor): `d_{u,σ} · (b̂†_{u,σ} ∏) |vac⟩ = (∏) |vac⟩`.  Uses
+`{d_{u,σ}, b̂†_{u,σ}} = 1` and the pass-through on the rest. -/
+theorem flatBandDual_peelLeading_mulVec_vacuum (u : Fin (K + 1)) (σ : Fin 2)
+    (l : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2))
+    (hl : ∀ q ∈ l, flatBandDualBAnnihilation K ν u σ *
+          flatBandModeCreation K q.2 (flatBandBasis K ν q.1)
+        + flatBandModeCreation K q.2 (flatBandBasis K ν q.1) *
+          flatBandDualBAnnihilation K ν u σ = 0) :
+    (flatBandDualBAnnihilation K ν u σ).mulVec ((flatBandBCreation K ν u σ *
+        ((l.map (fun q => flatBandModeCreation K q.2 (flatBandBasis K ν q.1))).prod)).mulVec
+          (fermionMultiVacuum (2 * (2 * K + 1) + 1)))
+      = ((l.map (fun q => flatBandModeCreation K q.2 (flatBandBasis K ν q.1))).prod).mulVec
+          (fermionMultiVacuum (2 * (2 * K + 1) + 1)) := by
+  rw [Matrix.mulVec_mulVec, ← Matrix.mul_assoc,
+    show flatBandDualBAnnihilation K ν u σ * flatBandBCreation K ν u σ
+        = 1 - flatBandBCreation K ν u σ * flatBandDualBAnnihilation K ν u σ from by
+      rw [eq_sub_iff_add_eq]; exact flatBandDualBAnnihilation_BCreation_self u σ,
+    Matrix.sub_mul, Matrix.one_mul, Matrix.sub_mulVec, Matrix.mul_assoc, ← Matrix.mulVec_mulVec,
+    ← Matrix.mulVec_mulVec, flatBandDual_passThrough_listProd_mulVec_vacuum u σ l hl,
+    Matrix.mulVec_zero, sub_zero]
+
 /-- **`d_{u,σ}` annihilates an occupation monomial with the β-mode `(inr u, σ)` empty.** -/
 theorem flatBandDualBAnnihilation_mulVec_occMonomial_of_not_mem (u : Fin (K + 1)) (σ : Fin 2)
     (f : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2) (hf : (Sum.inr u, σ) ∉ occFinset f) :
