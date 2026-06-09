@@ -62,7 +62,7 @@ theorem flatBandModeCreation_basis_mulVec_occMonomial_mem
         (occFinset (Function.update f (i, σ) 1)).toList := by
       rw [occFinset_update_one f]
       exact (Finset.toList_insert h).symm
-    obtain ⟨z, hz⟩ := flatBandModeMonomial_perm (K := K) (ν := ν) hperm
+    obtain ⟨z, _, hz⟩ := flatBandModeMonomial_perm (K := K) (ν := ν) hperm
     rw [hz]
     exact Submodule.smul_mem _ _ (occMonomial_mem _)
 
@@ -91,7 +91,7 @@ theorem flatBandModeMonomial_mem_span_occMonomial
     have hperm : l.Perm (occFinset (fun q => if q ∈ l.toFinset then 1 else 0)).toList := by
       rw [hocc]
       exact (List.toFinset_toList hl).symm
-    obtain ⟨z, hz⟩ := flatBandModeMonomial_perm (K := K) (ν := ν) hperm
+    obtain ⟨z, _, hz⟩ := flatBandModeMonomial_perm (K := K) (ν := ν) hperm
     rw [hz]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)
   · rw [flatBandModeMonomial_eq_zero_of_not_nodup l hl]

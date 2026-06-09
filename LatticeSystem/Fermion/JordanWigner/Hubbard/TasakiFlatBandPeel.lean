@@ -98,4 +98,40 @@ theorem flatBandDualBAnnihilation_mulVec_occMonomial_of_not_mem (u : Fin (K + 1)
   rintro rfl
   exact hf (Finset.mem_toList.mp hq)
 
+/-- **`b̂†_{u,σ} d_{u,σ}` is the β-mode-`(inr u, σ)` occupation projector on the occupation basis.**
+It fixes an occupation monomial with that mode occupied (peel it off with `d`, glue it back with
+`b̂†`) and annihilates one with it empty.  Hence `∑_{u,σ} b̂†_{u,σ} d_{u,σ}` is diagonal with
+eigenvalue the β-occupation count. -/
+theorem flatBandBCreation_dual_mulVec_occMonomial (u : Fin (K + 1)) (σ : Fin 2)
+    (f : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2) :
+    (flatBandBCreation K ν u σ).mulVec
+        ((flatBandDualBAnnihilation K ν u σ).mulVec (occMonomial K ν f))
+      = if (Sum.inr u, σ) ∈ occFinset f then occMonomial K ν f else 0 := by
+  by_cases h : (Sum.inr u, σ) ∈ occFinset f
+  · rw [if_pos h]
+    obtain ⟨s, t, hst⟩ := List.append_of_mem (Finset.mem_toList.mpr h)
+    have hnotin : (Sum.inr u, σ) ∉ s ++ t := by
+      have hnd := (occFinset f).nodup_toList
+      rw [hst] at hnd
+      exact (List.nodup_cons.mp (List.perm_middle.nodup_iff.mp hnd)).1
+    have hpass : ∀ q ∈ s ++ t, flatBandDualBAnnihilation K ν u σ *
+          flatBandModeCreation K q.2 (flatBandBasis K ν q.1)
+        + flatBandModeCreation K q.2 (flatBandBasis K ν q.1) *
+          flatBandDualBAnnihilation K ν u σ = 0 := by
+      refine fun q hq => flatBandDualBAnnihilation_basisCreation_anticomm u σ q.2 q.1 ?_
+      rw [Prod.mk.eta]; rintro rfl; exact hnotin hq
+    have hm : flatBandModeMonomial K ν ((Sum.inr u, σ) :: (s ++ t))
+        = (flatBandBCreation K ν u σ * ((s ++ t).map
+            (fun q => flatBandModeCreation K q.2 (flatBandBasis K ν q.1))).prod).mulVec
+          (fermionMultiVacuum (2 * (2 * K + 1) + 1)) := by
+      rw [flatBandModeMonomial, List.map_cons, List.prod_cons]
+      congr 2
+      simp only [flatBandModeCreation_basis, Sum.elim_inr]
+    obtain ⟨z, _, hz⟩ := flatBandModeMonomial_perm (K := K) (ν := ν)
+      (l := (occFinset f).toList) (l' := (Sum.inr u, σ) :: (s ++ t)) (hst ▸ List.perm_middle)
+    rw [occMonomial, hz, Matrix.mulVec_smul, Matrix.mulVec_smul, hm,
+      flatBandDual_peelLeading_mulVec_vacuum u σ (s ++ t) hpass, Matrix.mulVec_mulVec]
+  · rw [if_neg h, flatBandDualBAnnihilation_mulVec_occMonomial_of_not_mem u σ f h,
+      Matrix.mulVec_zero]
+
 end LatticeSystem.Fermion

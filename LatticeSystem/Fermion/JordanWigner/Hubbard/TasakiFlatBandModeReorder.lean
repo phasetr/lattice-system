@@ -64,19 +64,20 @@ irrelevant.  Proved by induction on the permutation: `cons` keeps `z`, `swap` fl
 `trans` multiplies. -/
 theorem flatBandModeMonomial_perm {l l' : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2)}
     (h : l.Perm l') :
-    ∃ z : ℂ, flatBandModeMonomial K ν l = z • flatBandModeMonomial K ν l' := by
+    ∃ z : ℂ, z ≠ 0 ∧ flatBandModeMonomial K ν l = z • flatBandModeMonomial K ν l' := by
   induction h with
-  | nil => exact ⟨1, by rw [one_smul]⟩
+  | nil => exact ⟨1, one_ne_zero, by rw [one_smul]⟩
   | cons x _ ih =>
-    obtain ⟨z, hz⟩ := ih
-    refine ⟨z, ?_⟩
+    obtain ⟨z, hz0, hz⟩ := ih
+    refine ⟨z, hz0, ?_⟩
     rw [← flatBandModeCreation_mulVec_monomial x.1 x.2, hz, Matrix.mulVec_smul,
       flatBandModeCreation_mulVec_monomial x.1 x.2]
-  | swap x y l => exact ⟨-1, by rw [flatBandModeMonomial_swap, neg_one_smul]⟩
+  | swap x y l => exact ⟨-1, neg_ne_zero.mpr one_ne_zero, by rw [flatBandModeMonomial_swap,
+      neg_one_smul]⟩
   | trans _ _ ih₁ ih₂ =>
-    obtain ⟨z₁, hz₁⟩ := ih₁
-    obtain ⟨z₂, hz₂⟩ := ih₂
-    exact ⟨z₁ * z₂, by rw [hz₁, hz₂, smul_smul]⟩
+    obtain ⟨z₁, hz₁0, hz₁⟩ := ih₁
+    obtain ⟨z₂, hz₂0, hz₂⟩ := ih₂
+    exact ⟨z₁ * z₂, mul_ne_zero hz₁0 hz₂0, by rw [hz₁, hz₂, smul_smul]⟩
 
 /-- The square of a mode creation vanishes (`(Ĉ†)² = 0`). -/
 theorem flatBandModeCreation_sq (i : Fin (K + 1) ⊕ Fin (K + 1)) (σ : Fin 2) :
@@ -94,7 +95,7 @@ theorem flatBandModeMonomial_cons_mem_eq_zero
     (l : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2)) (hq : q ∈ l) :
     flatBandModeMonomial K ν (q :: l) = 0 := by
   obtain ⟨s, t, rfl⟩ := List.append_of_mem hq
-  obtain ⟨z, hz⟩ := flatBandModeMonomial_perm (K := K) (ν := ν)
+  obtain ⟨z, _, hz⟩ := flatBandModeMonomial_perm (K := K) (ν := ν)
     (List.perm_middle.cons q)
   rw [hz]
   have : flatBandModeMonomial K ν (q :: q :: (s ++ t)) = 0 := by
