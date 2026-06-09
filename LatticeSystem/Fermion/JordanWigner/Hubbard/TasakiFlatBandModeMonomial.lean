@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandModeCreation
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiBasis
 import LatticeSystem.Math.ListProdMulVec
 
 /-!
@@ -104,5 +105,31 @@ theorem listProd_creation_mulVec_vacuum_mem (js : List (Fin (2 * (2 * K + 1) + 2
       obtain ⟨j, _, rfl⟩ := List.mem_map.mp hM
       exact fermionMultiCreation_mulVec_mem j hwmem)
     fermionMultiVacuum_mem_modeFock
+
+/-- **The rotated-basis Fock monomials span the whole space** (`= ⊤`).  Every standard computational
+basis vector `basisVec c` is the ordered product of site creations over the sorted occupied modes of
+`c`, applied to the vacuum (`prod_creation_mulVec_vacuum`), hence lies in the span; and the
+`basisVec` span the whole space. -/
+theorem flatBandModeFockSubmodule_eq_top : flatBandModeFockSubmodule K ν = ⊤ := by
+  rw [Submodule.eq_top_iff']
+  intro v
+  have hbasis : ∀ c : Fin (2 * (2 * K + 1) + 2) → Fin 2,
+      basisVec c ∈ flatBandModeFockSubmodule K ν := by
+    intro c
+    have hsorted : ((Finset.univ.filter (fun x => c x = 1)).sort (· ≤ ·)).Pairwise (· < ·) :=
+      List.sortedLT_iff_pairwise.mp (Finset.sortedLT_sort _)
+    have hocc : occupationOf ((Finset.univ.filter (fun x => c x = 1)).sort (· ≤ ·)) = c := by
+      funext k
+      simp only [occupationOf, Finset.mem_sort, Finset.mem_filter, Finset.mem_univ, true_and]
+      generalize c k = m
+      fin_cases m <;> simp
+    rw [← hocc, ← prod_creation_mulVec_vacuum (2 * (2 * K + 1) + 1) _ hsorted]
+    exact listProd_creation_mulVec_vacuum_mem _
+  have hv : v = ∑ c, v c • basisVec c := by
+    funext τ
+    simp only [Finset.sum_apply, Pi.smul_apply, basisVec_apply, smul_eq_mul, mul_ite,
+      mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+  rw [hv]
+  exact Submodule.sum_mem _ (fun c _ => Submodule.smul_mem _ _ (hbasis c))
 
 end LatticeSystem.Fermion
