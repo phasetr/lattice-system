@@ -533,4 +533,25 @@ theorem flatBand_cDownUp_extSite_double (K : ℕ) (ν : ℝ) (q : Fin (K + 1))
   rw [flatBand_cDownUp_two_head K ν (deltaExternalSite K q) q q rest hrest,
     flatBandBasis_inl_deltaExternalSite_self, one_mul, one_smul]
 
+/-- **Pulling two occupied modes to the front of an occupation `toList`.**  For any config `f` and
+two distinct occupied modes `a, b`, the `toList` enumeration is a permutation of `a :: b :: r`,
+where `r` lists the remaining occupied modes.  (Generalises `flatBandAlphaSpinOcc_toList_perm` to an
+arbitrary config and mode pair; used for both the external double-occupancy and the internal
+coefficient readings.) -/
+theorem occFinset_toList_perm_two_front
+    (f : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2)
+    (a b : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2)
+    (ha : a ∈ occFinset f) (hb : b ∈ (occFinset f).erase a) :
+    (occFinset f).toList.Perm
+      (a :: b :: (((occFinset f).erase a).erase b).toList) := by
+  classical
+  have h1 : (occFinset f).toList.Perm (a :: ((occFinset f).erase a).toList) := by
+    have h := Finset.toList_insert (Finset.notMem_erase a (occFinset f))
+    rwa [Finset.insert_erase ha] at h
+  have h2 : ((occFinset f).erase a).toList.Perm
+      (b :: (((occFinset f).erase a).erase b).toList) := by
+    have h := Finset.toList_insert (Finset.notMem_erase b ((occFinset f).erase a))
+    rwa [Finset.insert_erase hb] at h
+  exact h1.trans (h2.cons _)
+
 end LatticeSystem.Fermion
