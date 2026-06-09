@@ -696,6 +696,44 @@ theorem flatBandAlphaSpinList_rest_perm_twoHole (s : Fin (K + 1) → Fin 2) (p :
         · exact absurd rfl hxb
         · exact List.mem_append.mpr (Or.inr h'')
 
+/-- **Internal double annihilation on a canonical-oriented α-config.**  For an α-spin config `s`
+with `(↑, ↓)` on the overlapping pair `p, p+1`, `ĉ_{int(p)↓} ĉ_{int(p)↑}` returns a nonzero scalar
+multiple of the two-hole occupation monomial. -/
+theorem flatBand_cDownUp_int_occMonomial_canonical (hν : 0 < ν) (s : Fin (K + 1) → Fin 2)
+    (p : Fin K) (h0 : s p.castSucc = 0) (h1 : s p.succ = 1) :
+    ∃ z : ℂ, z ≠ 0 ∧ (cDownUp K (deltaInternalSite K p.castSucc)).mulVec
+        (occMonomial K ν (flatBandAlphaSpinOcc K s))
+      = z • occMonomial K ν (flatBandAlphaTwoHoleOcc K s p.castSucc) := by
+  obtain ⟨z1, hz1, hz1eq⟩ := occMonomial_alphaSpinOcc_eq_smul_canonical s
+  obtain ⟨z2, hz2, hz2eq⟩ := flatBandModeMonomial_perm (flatBandAlphaSpinList_rest_perm_twoHole s p)
+  refine ⟨z1 * (((ν : ℝ) : ℂ)) ^ 2 * z2,
+    mul_ne_zero (mul_ne_zero hz1 (pow_ne_zero _ (by exact_mod_cast ne_of_gt hν))) hz2, ?_⟩
+  rw [hz1eq, Matrix.mulVec_smul, flatBand_cDownUp_alphaSpinList_canonical s p h0 h1, smul_smul,
+    hz2eq, ← occMonomial, smul_smul]
+
+/-- **Internal double annihilation on a swap-oriented α-config.**  For `(↓, ↑)` on the pair
+`p, p+1`, `ĉ_{int(p)↓} ĉ_{int(p)↑}` returns a nonzero scalar multiple of the two-hole monomial. -/
+theorem flatBand_cDownUp_int_occMonomial_swap (hν : 0 < ν) (s : Fin (K + 1) → Fin 2)
+    (p : Fin K) (h0 : s p.castSucc = 1) (h1 : s p.succ = 0) :
+    ∃ z : ℂ, z ≠ 0 ∧ (cDownUp K (deltaInternalSite K p.castSucc)).mulVec
+        (occMonomial K ν (flatBandAlphaSpinOcc K s))
+      = z • occMonomial K ν (flatBandAlphaTwoHoleOcc K s p.castSucc) := by
+  obtain ⟨z1, hz1, hz1eq⟩ := occMonomial_alphaSpinOcc_eq_smul_canonical s
+  obtain ⟨z2, hz2, hz2eq⟩ := flatBandModeMonomial_perm (flatBandAlphaSpinList_rest_perm_twoHole s p)
+  refine ⟨z1 * (-(((ν : ℝ) : ℂ)) ^ 2) * z2,
+    mul_ne_zero (mul_ne_zero hz1 (neg_ne_zero.mpr (pow_ne_zero _
+      (by exact_mod_cast ne_of_gt hν)))) hz2, ?_⟩
+  rw [hz1eq, Matrix.mulVec_smul, flatBand_cDownUp_alphaSpinList_swap s p h0 h1, smul_smul,
+    hz2eq, ← occMonomial, smul_smul]
+
+/-- **Internal double annihilation on a same-spin α-config vanishes.** -/
+theorem flatBand_cDownUp_int_occMonomial_same (s : Fin (K + 1) → Fin 2) (p : Fin K)
+    (hsame : s p.castSucc = s p.succ) :
+    (cDownUp K (deltaInternalSite K p.castSucc)).mulVec
+        (occMonomial K ν (flatBandAlphaSpinOcc K s)) = 0 := by
+  obtain ⟨z1, _, hz1eq⟩ := occMonomial_alphaSpinOcc_eq_smul_canonical s
+  rw [hz1eq, Matrix.mulVec_smul, flatBand_cDownUp_alphaSpinList_same_spin s p hsame, smul_zero]
+
 /-- **No orbital double occupancy in the half-filled ground subspace.**  A β-free occupation config
 `g` that doubly occupies an orbital `q₀` has vanishing ground-state coordinate.  Reading the
 `(q₀`-pair-erased) coordinate of `0 = ĉ_{ext(q₀)↓} ĉ_{ext(q₀)↑} v` isolates exactly the `g` term
