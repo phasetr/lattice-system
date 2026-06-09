@@ -29,4 +29,18 @@ theorem flatBandFerromagneticMultipletSubmodule_finrank (K : ℕ) (ν : ℝ) :
   rw [flatBandFerromagneticMultipletSubmodule,
     finrank_span_eq_card (flatBand_ferromagnetic_multiplet K ν).1, Fintype.card_fin]
 
+/-- **`[Ŝ^z_tot, Ĥ_flat] = 0`.**  From `[Ŝ^±_tot, Ĥ_flat] = 0` and the `su(2)` relation
+`Ŝ^+ Ŝ^- − Ŝ^- Ŝ^+ = 2 Ŝ^z`: `2 Ŝ^z` commutes with `Ĥ_flat`, hence so does `Ŝ^z`. -/
+theorem fermionTotalSpinZ_commute_flatBandHamiltonian (K : ℕ) (ν t U : ℝ) :
+    Commute (fermionTotalSpinZ (2 * K + 1)) (flatBandHamiltonian K ν t U) := by
+  have hp := fermionTotalSpinPlus_commute_flatBandHamiltonian K ν t U
+  have hm := fermionTotalSpinMinus_commute_flatBandHamiltonian K ν t U
+  have h2 : Commute ((2 : ℂ) • fermionTotalSpinZ (2 * K + 1)) (flatBandHamiltonian K ν t U) := by
+    rw [← fermionTotalSpinPlus_commutator_fermionTotalSpinMinus]
+    exact (hp.mul_left hm).sub_left (hm.mul_left hp)
+  have h2' : (2 : ℂ) • (fermionTotalSpinZ (2 * K + 1) * flatBandHamiltonian K ν t U)
+      = (2 : ℂ) • (flatBandHamiltonian K ν t U * fermionTotalSpinZ (2 * K + 1)) := by
+    rw [← smul_mul_assoc, ← mul_smul_comm]; exact h2.eq
+  exact smul_right_injective _ (by norm_num : (2 : ℂ) ≠ 0) h2'
+
 end LatticeSystem.Fermion
