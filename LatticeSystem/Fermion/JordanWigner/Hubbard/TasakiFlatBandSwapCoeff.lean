@@ -345,4 +345,57 @@ theorem flatBandAlphaSpinList_split_adj (s : Fin (K + 1) → Fin 2) (p : Fin K) 
   conv_lhs => rw [← List.take_append_drop p.val (flatBandAlphaSpinList K s)]
   rw [List.drop_eq_getElem_cons h1, List.drop_eq_getElem_cons h2, e1, e2]
 
+/-- The canonical orbital list has no repeated mode. -/
+theorem flatBandAlphaSpinList_nodup (s : Fin (K + 1) → Fin 2) :
+    (flatBandAlphaSpinList K s).Nodup := by
+  rw [flatBandAlphaSpinList]
+  exact List.nodup_ofFn.mpr (fun a b h => Sum.inl_injective (congrArg Prod.fst h))
+
+/-- **The non-pair part of the canonical list is `int(p)`-clean.**  Every mode outside the
+overlapping pair `p, p+1` has zero single-particle amplitude at the shared internal site `int(p)`
+(only `α_p` and `α_{p+1}` are supported there). -/
+theorem flatBandAlphaSpinList_rest_clean (s : Fin (K + 1) → Fin 2) (p : Fin K) :
+    ∀ m ∈ (flatBandAlphaSpinList K s).take p.val ++ (flatBandAlphaSpinList K s).drop (p.val + 2),
+      flatBandBasis K ν m.1 (deltaInternalSite K p.castSucc) = 0 := by
+  intro m hm
+  have hsplit := flatBandAlphaSpinList_split_adj s p
+  have hnd : (flatBandAlphaSpinList K s).Nodup := flatBandAlphaSpinList_nodup s
+  rw [hsplit] at hnd
+  -- a, b (the pair modes) are not in take ++ drop, by nodup
+  obtain ⟨_, hcons, hdisj⟩ := List.nodup_append.mp hnd
+  have hane : (Sum.inl p.castSucc, s p.castSucc) ∉
+      (flatBandAlphaSpinList K s).take p.val ++ (flatBandAlphaSpinList K s).drop (p.val + 2) := by
+    rw [List.mem_append, not_or]
+    refine ⟨fun h => hdisj _ h _ List.mem_cons_self rfl, fun h => ?_⟩
+    exact (List.nodup_cons.mp hcons).1 (List.mem_cons_of_mem _ h)
+  have hbne : (Sum.inl p.succ, s p.succ) ∉
+      (flatBandAlphaSpinList K s).take p.val ++ (flatBandAlphaSpinList K s).drop (p.val + 2) := by
+    rw [List.mem_append, not_or]
+    refine ⟨fun h => hdisj _ h _ (List.mem_cons_of_mem _ List.mem_cons_self) rfl, fun h => ?_⟩
+    exact (List.nodup_cons.mp (List.nodup_cons.mp hcons).2).1 h
+  -- m is some (inl r, s r); r ≠ p.castSucc, p.succ since m ≠ a, b
+  have hmem : m ∈ flatBandAlphaSpinList K s := by
+    rw [hsplit]
+    rcases List.mem_append.mp hm with h | h
+    · exact List.mem_append.mpr (Or.inl h)
+    · exact List.mem_append.mpr
+        (Or.inr (List.mem_cons_of_mem _ (List.mem_cons_of_mem _ h)))
+  rw [flatBandAlphaSpinList, List.mem_ofFn] at hmem
+  obtain ⟨r, rfl⟩ := hmem
+  have hrp : r ≠ p.castSucc := fun h => hane (h ▸ hm)
+  have hrp1 : r ≠ p.succ := fun h => hbne (h ▸ hm)
+  rw [flatBandBasis_inl, flatBandAlphaC, flatBandAlpha_deltaInternalSite, if_neg,
+    Complex.ofReal_zero]
+  rintro (h | h)
+  · exact hrp h.symm
+  · apply hrp1
+    -- h : p.castSucc = r - 1, decode the modular subtraction to r = p.succ
+    have hv : (p.castSucc : Fin (K + 1)).val = (r - 1 : Fin (K + 1)).val := congrArg Fin.val h
+    rw [Fin.val_castSucc, Fin.coe_sub_one] at hv
+    by_cases hr0 : r = 0
+    · rw [if_pos hr0] at hv; exact absurd hv (by have := p.isLt; omega)
+    · rw [if_neg hr0] at hv
+      have hrpos : 0 < r.val := Fin.pos_iff_ne_zero.mpr hr0
+      exact Fin.ext (by rw [Fin.val_succ]; omega)
+
 end LatticeSystem.Fermion
