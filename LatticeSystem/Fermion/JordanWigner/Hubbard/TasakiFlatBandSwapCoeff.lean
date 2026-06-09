@@ -398,4 +398,39 @@ theorem flatBandAlphaSpinList_rest_clean (s : Fin (K + 1) → Fin 2) (p : Fin K)
       have hrpos : 0 < r.val := Fin.pos_iff_ne_zero.mpr hr0
       exact Fin.ext (by rw [Fin.val_succ]; omega)
 
+/-- For `p : Fin K` the successor orbital equals `p.castSucc + 1` inside `Fin (K + 1)`
+(no wrap, since `p.castSucc < last`). -/
+theorem flatBand_succ_eq_castSucc_add_one (p : Fin K) :
+    (p.succ : Fin (K + 1)) = p.castSucc + 1 := by
+  apply Fin.ext
+  rw [Fin.val_add_one, if_neg (Fin.castSucc_lt_last p).ne, Fin.val_castSucc, Fin.val_succ]
+
+/-- **Double-annihilation on the canonical α-monomial (aligned spins).**  When the overlapping pair
+carries `(↑, ↓)` at orbitals `p, p+1`, `ĉ_↓ĉ_↑` at the shared internal site `int(p)` returns
+`+ν²` times the canonical monomial with that pair removed. -/
+theorem flatBand_cDownUp_alphaSpinList_canonical (s : Fin (K + 1) → Fin 2) (p : Fin K)
+    (h0 : s p.castSucc = 0) (h1 : s p.succ = 1) :
+    (cDownUp K (deltaInternalSite K p.castSucc)).mulVec
+        (flatBandModeMonomial K ν (flatBandAlphaSpinList K s))
+      = ((ν : ℝ) : ℂ) ^ 2 • flatBandModeMonomial K ν
+          ((flatBandAlphaSpinList K s).take p.val
+            ++ (flatBandAlphaSpinList K s).drop (p.val + 2)) := by
+  nth_rewrite 1 [flatBandAlphaSpinList_split_adj s p]
+  rw [flatBandModeMonomial_move_pair_front, h0, h1, flatBand_succ_eq_castSucc_add_one p]
+  exact flatBand_cDownUp_canonical K ν p.castSucc _ (flatBandAlphaSpinList_rest_clean s p)
+
+/-- **Double-annihilation on the canonical α-monomial (swapped spins).**  When the overlapping pair
+carries `(↓, ↑)` at orbitals `p, p+1`, `ĉ_↓ĉ_↑` at `int(p)` returns `-ν²` times the canonical
+monomial with that pair removed.  The relative sign vs. the aligned case is position-independent. -/
+theorem flatBand_cDownUp_alphaSpinList_swap (s : Fin (K + 1) → Fin 2) (p : Fin K)
+    (h0 : s p.castSucc = 1) (h1 : s p.succ = 0) :
+    (cDownUp K (deltaInternalSite K p.castSucc)).mulVec
+        (flatBandModeMonomial K ν (flatBandAlphaSpinList K s))
+      = (-(((ν : ℝ) : ℂ)) ^ 2) • flatBandModeMonomial K ν
+          ((flatBandAlphaSpinList K s).take p.val
+            ++ (flatBandAlphaSpinList K s).drop (p.val + 2)) := by
+  nth_rewrite 1 [flatBandAlphaSpinList_split_adj s p]
+  rw [flatBandModeMonomial_move_pair_front, h0, h1, flatBand_succ_eq_castSucc_add_one p]
+  exact flatBand_cDownUp_swap K ν p.castSucc _ (flatBandAlphaSpinList_rest_clean s p)
+
 end LatticeSystem.Fermion
