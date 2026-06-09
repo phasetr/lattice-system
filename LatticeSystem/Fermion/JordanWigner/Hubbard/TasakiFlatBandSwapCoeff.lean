@@ -454,4 +454,62 @@ theorem occMonomial_alphaSpinOcc_eq_smul_canonical (s : Fin (K + 1) → Fin 2) :
   rw [occMonomial]
   exact flatBandModeMonomial_perm (flatBandAlphaSpinList_perm_toList s).symm
 
+/-- **Site annihilation kills a monomial with no matching-spin mode at the site.**  If every mode of
+`M` either has zero amplitude at `x` or carries the wrong spin, then `ĉ_{x,σ}` annihilates the
+monomial. -/
+theorem flatBand_siteAnnihilation_eq_zero (K : ℕ) (ν : ℝ) (x : Fin (2 * K + 2)) (σ : Fin 2)
+    (M : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2))
+    (hM : ∀ q ∈ M, flatBandBasis K ν q.1 x = 0 ∨ q.2 ≠ σ) :
+    (fermionMultiAnnihilation (2 * (2 * K + 1) + 1) (spinfulIndex (2 * K + 1) x σ)).mulVec
+        (flatBandModeMonomial K ν M) = 0 := by
+  rw [flatBand_siteAnnihilation_peel_modeMonomial]
+  apply Finset.sum_eq_zero
+  intro i _
+  simp only [flatBandModePeelTerm]
+  rcases hM (M.get i) (List.get_mem M i) with h0 | hne
+  · rw [h0, ite_self, zero_smul, smul_zero]
+  · rw [if_neg hne, zero_smul, smul_zero]
+
+/-- **Double annihilation on a same-spin two-head monomial vanishes.**  If both leading heads carry
+the same spin `σ` and `rest` is `int(p)`-clean, then `ĉ_{int(p)↓} ĉ_{int(p)↑}` cannot extract both
+an up and a down electron at `int(p)`, so the result is zero.  (One factor annihilates the state
+outright; for `σ = ↑` we first anticommute the two annihilations.) -/
+theorem flatBand_cDownUp_two_head_same_spin (K : ℕ) (ν : ℝ) (p r₁ r₂ : Fin (K + 1)) (σ : Fin 2)
+    (rest : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2))
+    (hrest : ∀ q ∈ rest, flatBandBasis K ν q.1 (deltaInternalSite K p) = 0) :
+    (cDownUp K (deltaInternalSite K p)).mulVec
+        (flatBandModeMonomial K ν ((Sum.inl r₁, σ) :: (Sum.inl r₂, σ) :: rest)) = 0 := by
+  fin_cases σ
+  · rw [cDownUp,
+      eq_neg_of_add_eq_zero_left (fermionMultiAnnihilation_anticomm_of_ne
+        (spinfulIndex_up_ne_down (2 * K + 1) (deltaInternalSite K p) (deltaInternalSite K p)).symm),
+      Matrix.neg_mulVec, ← Matrix.mulVec_mulVec,
+      flatBand_siteAnnihilation_eq_zero K ν (deltaInternalSite K p) 1 _ ?_,
+      Matrix.mulVec_zero, neg_zero]
+    intro q hq
+    rcases List.mem_cons.mp hq with rfl | hq1
+    · exact Or.inr (show (0 : Fin 2) ≠ 1 by decide)
+    · rcases List.mem_cons.mp hq1 with rfl | hq2
+      · exact Or.inr (show (0 : Fin 2) ≠ 1 by decide)
+      · exact Or.inl (hrest q hq2)
+  · rw [cDownUp, ← Matrix.mulVec_mulVec,
+      flatBand_siteAnnihilation_eq_zero K ν (deltaInternalSite K p) 0 _ ?_, Matrix.mulVec_zero]
+    intro q hq
+    rcases List.mem_cons.mp hq with rfl | hq1
+    · exact Or.inr (show (1 : Fin 2) ≠ 0 by decide)
+    · rcases List.mem_cons.mp hq1 with rfl | hq2
+      · exact Or.inr (show (1 : Fin 2) ≠ 0 by decide)
+      · exact Or.inl (hrest q hq2)
+
+/-- **Double annihilation on the canonical α-monomial (same spins) vanishes.**  When the overlapping
+pair `p, p+1` carries the same spin, `ĉ_↓ĉ_↑` at `int(p)` returns zero. -/
+theorem flatBand_cDownUp_alphaSpinList_same_spin (s : Fin (K + 1) → Fin 2) (p : Fin K)
+    (hsame : s p.castSucc = s p.succ) :
+    (cDownUp K (deltaInternalSite K p.castSucc)).mulVec
+        (flatBandModeMonomial K ν (flatBandAlphaSpinList K s)) = 0 := by
+  nth_rewrite 1 [flatBandAlphaSpinList_split_adj s p]
+  rw [flatBandModeMonomial_move_pair_front, hsame]
+  exact flatBand_cDownUp_two_head_same_spin K ν p.castSucc p.castSucc p.succ (s p.succ) _
+    (flatBandAlphaSpinList_rest_clean s p)
+
 end LatticeSystem.Fermion
