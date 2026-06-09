@@ -433,4 +433,25 @@ theorem flatBand_cDownUp_alphaSpinList_swap (s : Fin (K + 1) → Fin 2) (p : Fin
   rw [flatBandModeMonomial_move_pair_front, h0, h1, flatBand_succ_eq_castSucc_add_one p]
   exact flatBand_cDownUp_swap K ν p.castSucc _ (flatBandAlphaSpinList_rest_clean s p)
 
+/-- The canonical orbital list is a permutation of the (arbitrary-order) occupation `toList`:
+both enumerate the occupied modes `{(inl q, s q)}` without repetition. -/
+theorem flatBandAlphaSpinList_perm_toList (s : Fin (K + 1) → Fin 2) :
+    (flatBandAlphaSpinList K s).Perm (occFinset (flatBandAlphaSpinOcc K s)).toList := by
+  apply List.perm_of_nodup_nodup_toFinset_eq (flatBandAlphaSpinList_nodup s)
+    (Finset.nodup_toList _)
+  rw [Finset.toList_toFinset]
+  ext x
+  rw [List.mem_toFinset, flatBandAlphaSpinList, List.mem_ofFn, mem_occFinset_alphaSpinOcc]
+  exact ⟨fun ⟨q, hq⟩ => ⟨q, hq.symm⟩, fun ⟨p, hp⟩ => ⟨p, hp.symm⟩⟩
+
+/-- **The occupation monomial is a nonzero scalar multiple of the canonical-list monomial.**  Since
+`occMonomial` is built from the `toList`-opaque enumeration, it differs from the orbital-ordered
+canonical monomial only by a nonzero fermionic reordering scalar `z`.  This makes the canonical
+α-monomials nonzero multiples of distinct basis vectors, hence linearly independent. -/
+theorem occMonomial_alphaSpinOcc_eq_smul_canonical (s : Fin (K + 1) → Fin 2) :
+    ∃ z : ℂ, z ≠ 0 ∧ occMonomial K ν (flatBandAlphaSpinOcc K s)
+      = z • flatBandModeMonomial K ν (flatBandAlphaSpinList K s) := by
+  rw [occMonomial]
+  exact flatBandModeMonomial_perm (flatBandAlphaSpinList_perm_toList s).symm
+
 end LatticeSystem.Fermion
