@@ -45,4 +45,62 @@ theorem flatBandMode_creation_creation_anticomm (K : ℕ) (σ τ : Fin 2)
   refine Finset.sum_eq_zero (fun x _ => Finset.sum_eq_zero (fun y _ => ?_))
   rw [spinful_creation_creation_anticomm, smul_zero]
 
+/-- Swapping the first two factors of a rotated Fock monomial negates it (the two leading creations
+anticommute). -/
+theorem flatBandModeMonomial_swap (x y : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2)
+    (l : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2)) :
+    flatBandModeMonomial K ν (y :: x :: l) = -flatBandModeMonomial K ν (x :: y :: l) := by
+  unfold flatBandModeMonomial
+  simp only [List.map_cons, List.prod_cons]
+  rw [← Matrix.mul_assoc, ← Matrix.mul_assoc,
+    eq_neg_of_add_eq_zero_left
+      (flatBandMode_creation_creation_anticomm K y.2 x.2 (flatBandBasis K ν y.1)
+        (flatBandBasis K ν x.1)),
+    Matrix.neg_mul, Matrix.neg_mulVec]
+
+/-- **Reordering a rotated Fock monomial scales it.**  Permuting the creation list multiplies the
+monomial by a (sign) scalar `z` — enough for the spanning/basis argument, where the explicit sign is
+irrelevant.  Proved by induction on the permutation: `cons` keeps `z`, `swap` flips the sign,
+`trans` multiplies. -/
+theorem flatBandModeMonomial_perm {l l' : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2)}
+    (h : l.Perm l') :
+    ∃ z : ℂ, flatBandModeMonomial K ν l = z • flatBandModeMonomial K ν l' := by
+  induction h with
+  | nil => exact ⟨1, by rw [one_smul]⟩
+  | cons x _ ih =>
+    obtain ⟨z, hz⟩ := ih
+    refine ⟨z, ?_⟩
+    rw [← flatBandModeCreation_mulVec_monomial x.1 x.2, hz, Matrix.mulVec_smul,
+      flatBandModeCreation_mulVec_monomial x.1 x.2]
+  | swap x y l => exact ⟨-1, by rw [flatBandModeMonomial_swap, neg_one_smul]⟩
+  | trans _ _ ih₁ ih₂ =>
+    obtain ⟨z₁, hz₁⟩ := ih₁
+    obtain ⟨z₂, hz₂⟩ := ih₂
+    exact ⟨z₁ * z₂, by rw [hz₁, hz₂, smul_smul]⟩
+
+/-- The square of a mode creation vanishes (`(Ĉ†)² = 0`). -/
+theorem flatBandModeCreation_sq (i : Fin (K + 1) ⊕ Fin (K + 1)) (σ : Fin 2) :
+    flatBandModeCreation K σ (flatBandBasis K ν i) *
+      flatBandModeCreation K σ (flatBandBasis K ν i) = 0 := by
+  have h2 := flatBandMode_creation_creation_anticomm K σ σ (flatBandBasis K ν i)
+    (flatBandBasis K ν i)
+  rw [← two_smul ℂ] at h2
+  exact (smul_eq_zero.mp h2).resolve_left (by norm_num)
+
+/-- **Prepending an already-present mode to a monomial kills it.**  Splitting `l = s ++ q :: t`,
+`q :: l` is a permutation of `q :: q :: (s ++ t)`, whose leading `(Ĉ†_q)² = 0`. -/
+theorem flatBandModeMonomial_cons_mem_eq_zero
+    (q : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2)
+    (l : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2)) (hq : q ∈ l) :
+    flatBandModeMonomial K ν (q :: l) = 0 := by
+  obtain ⟨s, t, rfl⟩ := List.append_of_mem hq
+  obtain ⟨z, hz⟩ := flatBandModeMonomial_perm (K := K) (ν := ν)
+    (List.perm_middle.cons q)
+  rw [hz]
+  have : flatBandModeMonomial K ν (q :: q :: (s ++ t)) = 0 := by
+    unfold flatBandModeMonomial
+    simp only [List.map_cons, List.prod_cons]
+    rw [← Matrix.mul_assoc, flatBandModeCreation_sq, Matrix.zero_mul, Matrix.zero_mulVec]
+  rw [this, smul_zero]
+
 end LatticeSystem.Fermion
