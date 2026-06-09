@@ -600,4 +600,35 @@ theorem flatBand_cDownUp_ext_betaFree_eq_zero_of_not_double (K : ℕ) (ν : ℝ)
       flatBand_siteAnnihilation_ext_betaFree_eq_zero K ν q₀ 1 f hbf h1, Matrix.mulVec_zero,
       neg_zero]
 
+/-- **External double annihilation on a β-free doubly-occupied config.**  If a β-free config `f`
+doubly occupies orbital `q₀`, then `ĉ_{ext(q₀)↓} ĉ_{ext(q₀)↑}` removes that pair, returning a
+nonzero scalar multiple of the monomial of the remaining (`q₀`-pair-erased) modes. -/
+theorem flatBand_cDownUp_ext_betaFree_double (K : ℕ) (ν : ℝ) (q₀ : Fin (K + 1))
+    (f : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2)
+    (hbf : ∀ q' ∈ occFinset f, ∃ r, q'.1 = Sum.inl r)
+    (h0 : (Sum.inl q₀, (0 : Fin 2)) ∈ occFinset f)
+    (h1 : (Sum.inl q₀, (1 : Fin 2)) ∈ occFinset f) :
+    ∃ z : ℂ, z ≠ 0 ∧ (cDownUp K (deltaExternalSite K q₀)).mulVec (occMonomial K ν f)
+      = z • flatBandModeMonomial K ν
+          (((occFinset f).erase (Sum.inl q₀, 0)).erase (Sum.inl q₀, 1)).toList := by
+  have hb : (Sum.inl q₀, (1 : Fin 2)) ∈ (occFinset f).erase (Sum.inl q₀, 0) :=
+    Finset.mem_erase.mpr ⟨by simp, h1⟩
+  obtain ⟨z, hz0, hz⟩ := flatBandModeMonomial_perm (occFinset_toList_perm_two_front f _ _ h0 hb)
+  refine ⟨z, hz0, ?_⟩
+  rw [occMonomial, hz, Matrix.mulVec_smul, flatBand_cDownUp_extSite_double K ν q₀ _ ?_]
+  intro q' hq'
+  rw [Finset.mem_toList, Finset.mem_erase, Finset.mem_erase] at hq'
+  obtain ⟨hqb, hqa, hqf⟩ := hq'
+  obtain ⟨r, hr⟩ := hbf q' hqf
+  rw [hr, flatBandBasis_inl_deltaExternalSite, if_neg ?_]
+  intro hq0r
+  have hlt := q'.2.isLt
+  have hd : q'.2 = 0 ∨ q'.2 = 1 := by
+    rcases (by omega : q'.2.val = 0 ∨ q'.2.val = 1) with h | h
+    · exact Or.inl (Fin.ext h)
+    · exact Or.inr (Fin.ext h)
+  rcases hd with h | h
+  · exact hqa (Prod.ext (by rw [hr, hq0r]) h)
+  · exact hqb (Prod.ext (by rw [hr, hq0r]) h)
+
 end LatticeSystem.Fermion
