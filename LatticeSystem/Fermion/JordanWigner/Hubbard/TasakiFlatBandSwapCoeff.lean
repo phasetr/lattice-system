@@ -631,4 +631,15 @@ theorem flatBand_cDownUp_ext_betaFree_double (K : ℕ) (ν : ℝ) (q₀ : Fin (K
   · exact hqa (Prod.ext (by rw [hr, hq0r]) h)
   · exact hqb (Prod.ext (by rw [hr, hq0r]) h)
 
+/-- Setting a mode to unoccupied erases it from the occupation finset. -/
+theorem occFinset_update_zero (f : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2)
+    {q : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2} :
+    occFinset (Function.update f q 0) = (occFinset f).erase q := by
+  ext q'
+  simp only [occFinset, Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_erase,
+    Function.update_apply]
+  by_cases h : q' = q
+  · subst h; simp
+  · simp [h]
+
 end LatticeSystem.Fermion
