@@ -151,9 +151,29 @@ theorem flatBand_siteAnnihilation_head (K : ℕ) (ν : ℝ) (p r : Fin (K + 1)) 
     · rw [h0, ite_self]; simp
     · rw [if_neg hne]; simp
 
-/-- **The double annihilation on the canonical two-overlap monomial.**  If `rest` has no mode
-supported at `int(p)`, then `ĉ_{int(p)↓} ĉ_{int(p)↑}` removes the leading
-`(inl p, ↑), (inl(p+1), ↓)` pair, each with amplitude `−ν`, leaving `ν² · monomial(rest)`. -/
+/-- **The double annihilation on a two-`α`-head monomial.**  If `rest` has no mode supported at
+`int(p)`, then `ĉ_{int(p)↓} ĉ_{int(p)↑}` removes the leading up head `(inl r₁, ↑)` and down head
+`(inl r₂, ↓)`, leaving `α_{r₁}(int p) · α_{r₂}(int p) · monomial(rest)`. -/
+theorem flatBand_cDownUp_two_head (K : ℕ) (ν : ℝ) (p r₁ r₂ : Fin (K + 1))
+    (rest : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2))
+    (hrest : ∀ q ∈ rest, flatBandBasis K ν q.1 (deltaInternalSite K p) = 0) :
+    (cDownUp K (deltaInternalSite K p)).mulVec
+        (flatBandModeMonomial K ν
+          ((Sum.inl r₁, (0 : Fin 2)) :: (Sum.inl r₂, (1 : Fin 2)) :: rest))
+      = (flatBandBasis K ν (Sum.inl r₁) (deltaInternalSite K p) *
+          flatBandBasis K ν (Sum.inl r₂) (deltaInternalSite K p)) •
+        flatBandModeMonomial K ν rest := by
+  rw [cDownUp, ← Matrix.mulVec_mulVec,
+    flatBand_siteAnnihilation_head K ν p r₁ 0 ((Sum.inl r₂, (1 : Fin 2)) :: rest)
+      (fun q hq => by
+        rcases List.mem_cons.mp hq with rfl | hq'
+        · exact Or.inr (show (1 : Fin 2) ≠ 0 by decide)
+        · exact Or.inl (hrest q hq')),
+    Matrix.mulVec_smul,
+    flatBand_siteAnnihilation_head K ν p r₂ 1 rest (fun q hq => Or.inl (hrest q hq)), smul_smul]
+
+/-- **Canonical `(↑,↓)` two-overlap monomial:** `ĉ_{int(p)↓} ĉ_{int(p)↑}` on
+`(inl p, ↑) :: (inl(p+1), ↓) :: rest` gives `+ν² · monomial(rest)`. -/
 theorem flatBand_cDownUp_canonical (K : ℕ) (ν : ℝ) (p : Fin (K + 1))
     (rest : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2))
     (hrest : ∀ q ∈ rest, flatBandBasis K ν q.1 (deltaInternalSite K p) = 0) :
@@ -161,15 +181,29 @@ theorem flatBand_cDownUp_canonical (K : ℕ) (ν : ℝ) (p : Fin (K + 1))
         (flatBandModeMonomial K ν
           ((Sum.inl p, (0 : Fin 2)) :: (Sum.inl (p + 1), (1 : Fin 2)) :: rest))
       = (((ν : ℝ) : ℂ)) ^ 2 • flatBandModeMonomial K ν rest := by
-  rw [cDownUp, ← Matrix.mulVec_mulVec,
-    flatBand_siteAnnihilation_head K ν p p 0 ((Sum.inl (p + 1), (1 : Fin 2)) :: rest)
-      (fun q hq => by
-        rcases List.mem_cons.mp hq with rfl | hq'
-        · exact Or.inr (show (1 : Fin 2) ≠ 0 by decide)
-        · exact Or.inl (hrest q hq')),
-    Matrix.mulVec_smul,
-    flatBand_siteAnnihilation_head K ν p (p + 1) 1 rest (fun q hq => Or.inl (hrest q hq)),
-    flatBandBasis_inl_deltaInternalSite_self, flatBandBasis_inl_deltaInternalSite_succ, smul_smul]
+  rw [flatBand_cDownUp_two_head K ν p p (p + 1) rest hrest,
+    flatBandBasis_inl_deltaInternalSite_self, flatBandBasis_inl_deltaInternalSite_succ]
+  congr 1
+  ring
+
+/-- **Swapped `(↓,↑)` two-overlap monomial:** `ĉ_{int(p)↓} ĉ_{int(p)↑}` on
+`(inl p, ↓) :: (inl(p+1), ↑) :: rest` gives `−ν² · monomial(rest)` — the opposite sign from the
+canonical assignment (one extra Koszul transposition). -/
+theorem flatBand_cDownUp_swap (K : ℕ) (ν : ℝ) (p : Fin (K + 1))
+    (rest : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2))
+    (hrest : ∀ q ∈ rest, flatBandBasis K ν q.1 (deltaInternalSite K p) = 0) :
+    (cDownUp K (deltaInternalSite K p)).mulVec
+        (flatBandModeMonomial K ν
+          ((Sum.inl p, (1 : Fin 2)) :: (Sum.inl (p + 1), (0 : Fin 2)) :: rest))
+      = (-(((ν : ℝ) : ℂ)) ^ 2) • flatBandModeMonomial K ν rest := by
+  rw [show flatBandModeMonomial K ν
+        ((Sum.inl p, (1 : Fin 2)) :: (Sum.inl (p + 1), (0 : Fin 2)) :: rest)
+      = -flatBandModeMonomial K ν
+        ((Sum.inl (p + 1), (0 : Fin 2)) :: (Sum.inl p, (1 : Fin 2)) :: rest) from by
+      rw [flatBandModeMonomial_swap], Matrix.mulVec_neg,
+    flatBand_cDownUp_two_head K ν p (p + 1) p rest hrest,
+    flatBandBasis_inl_deltaInternalSite_self, flatBandBasis_inl_deltaInternalSite_succ]
+  rw [← neg_smul]
   congr 1
   ring
 
