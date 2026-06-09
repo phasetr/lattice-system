@@ -89,4 +89,22 @@ theorem occFinset_alphaSpinOcc_card (s : Fin (K + 1) → Fin 2) :
     Finset.card_image_of_injective _ (fun a b hab => Sum.inl_injective (congrArg Prod.fst hab)),
     Finset.card_univ, Fintype.card_fin]
 
+/-- **The `Ŝ^z` weight of an `α`-spin config** is the sum of the per-orbital spin charges:
+`∑_{q occupied} (1/2 − σ_q) = ∑_p (1/2 − s p)`.  Each orbital `p` contributes its single occupied
+mode's charge `flatBandSpinCharge (s p)`. -/
+theorem occFinset_alphaSpinOcc_spinCharge_sum (s : Fin (K + 1) → Fin 2) :
+    ∑ q ∈ occFinset (flatBandAlphaSpinOcc K s), flatBandSpinCharge q.2
+      = ∑ p : Fin (K + 1), flatBandSpinCharge (s p) := by
+  rw [occFinset_alphaSpinOcc_eq_image,
+    Finset.sum_image (fun a _ b _ hab => Sum.inl_injective (congrArg Prod.fst hab))]
+
+/-- **An `α`-spin occupation monomial is an `Ŝ^z` eigenvector** with eigenvalue
+`∑_p (1/2 − s p)` (the total chosen-spin charge). -/
+theorem fermionTotalSpinZ_mulVec_occMonomial_alphaSpinOcc (K : ℕ) (ν : ℝ)
+    (s : Fin (K + 1) → Fin 2) :
+    (fermionTotalSpinZ (2 * K + 1)).mulVec (occMonomial K ν (flatBandAlphaSpinOcc K s))
+      = (∑ p : Fin (K + 1), flatBandSpinCharge (s p)) •
+        occMonomial K ν (flatBandAlphaSpinOcc K s) := by
+  rw [fermionTotalSpinZ_mulVec_occMonomial, occFinset_alphaSpinOcc_spinCharge_sum]
+
 end LatticeSystem.Fermion
