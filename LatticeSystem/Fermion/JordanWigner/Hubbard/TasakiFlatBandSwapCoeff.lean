@@ -207,4 +207,30 @@ theorem flatBand_cDownUp_swap (K : ℕ) (ν : ℝ) (p : Fin (K + 1))
   congr 1
   ring
 
+/-- **The `α`-spin occupation list, with the overlapping pair pulled to the front.**  For
+`s p = ↑`, `s (p+1) = ↓` the occupation list is a permutation of `(inl p, ↑) :: (inl(p+1), ↓) ::
+rest`, where `rest` is the rest of the occupied modes (the other orbitals, shared with the spin-swap
+of `s`). -/
+theorem flatBandAlphaSpinOcc_toList_perm (K : ℕ) (s : Fin (K + 1) → Fin 2) (p : Fin (K + 1))
+    (hsp : s p = 0) (hsp1 : s (p + 1) = 1) (hp1 : p + 1 ≠ p) :
+    (occFinset (flatBandAlphaSpinOcc K s)).toList.Perm
+      ((Sum.inl p, (0 : Fin 2)) :: (Sum.inl (p + 1), (1 : Fin 2)) ::
+        (((occFinset (flatBandAlphaSpinOcc K s)).erase (Sum.inl p, (0 : Fin 2))).erase
+          (Sum.inl (p + 1), (1 : Fin 2))).toList) := by
+  classical
+  set occ := occFinset (flatBandAlphaSpinOcc K s) with hocc
+  set a : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 := (Sum.inl p, (0 : Fin 2)) with ha
+  set b : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 := (Sum.inl (p + 1), (1 : Fin 2)) with hb
+  have hmem0 : a ∈ occ := (mem_occFinset_alphaSpinOcc s _).mpr ⟨p, by rw [ha, hsp]⟩
+  have hne : b ≠ a := fun h => hp1 (Sum.inl_injective (congrArg Prod.fst h))
+  have hmem1 : b ∈ occ.erase a :=
+    Finset.mem_erase.mpr ⟨hne, (mem_occFinset_alphaSpinOcc s _).mpr ⟨p + 1, by rw [hb, hsp1]⟩⟩
+  have h1 : occ.toList.Perm (a :: (occ.erase a).toList) := by
+    have h := Finset.toList_insert (Finset.notMem_erase a occ)
+    rwa [Finset.insert_erase hmem0] at h
+  have h2 : (occ.erase a).toList.Perm (b :: ((occ.erase a).erase b).toList) := by
+    have h := Finset.toList_insert (Finset.notMem_erase b (occ.erase a))
+    rwa [Finset.insert_erase hmem1] at h
+  exact h1.trans (h2.cons _)
+
 end LatticeSystem.Fermion
