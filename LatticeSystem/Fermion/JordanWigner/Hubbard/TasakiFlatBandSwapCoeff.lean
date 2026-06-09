@@ -238,6 +238,29 @@ theorem flatBandAlphaSpinOcc_toList_perm (K : ℕ) (s : Fin (K + 1) → Fin 2) (
     rwa [Finset.insert_erase hmem1] at h
   exact h1.trans (h2.cons _)
 
+/-- Moving one leading creation past the next two negates twice (back to `+`):
+`monomial(c::a::b::l) = monomial(a::b::c::l)`. -/
+theorem flatBandModeMonomial_move_one_past_two (c a b : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2)
+    (l : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2)) :
+    flatBandModeMonomial K ν (c :: a :: b :: l) = flatBandModeMonomial K ν (a :: b :: c :: l) := by
+  rw [flatBandModeMonomial_swap a c (b :: l), ← flatBandModeCreation_mulVec_monomial a.1 a.2,
+    flatBandModeMonomial_swap b c l, Matrix.mulVec_neg,
+    flatBandModeCreation_mulVec_monomial a.1 a.2, neg_neg]
+
+/-- **Moving a contiguous pair to the front of a monomial preserves it** (sign `+1`): pushing the
+pair `a, b` leftward past the block `l₁` is `2·|l₁|` adjacent transpositions.  Hence
+`monomial(l₁ ++ a :: b :: l₂) = monomial(a :: b :: (l₁ ++ l₂))`. -/
+theorem flatBandModeMonomial_move_pair_front (a b : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2)
+    (l₁ l₂ : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2)) :
+    flatBandModeMonomial K ν (l₁ ++ a :: b :: l₂)
+      = flatBandModeMonomial K ν (a :: b :: (l₁ ++ l₂)) := by
+  induction l₁ with
+  | nil => rfl
+  | cons c l₁' ih =>
+    rw [List.cons_append, ← flatBandModeCreation_mulVec_monomial c.1 c.2, ih,
+      flatBandModeCreation_mulVec_monomial c.1 c.2,
+      flatBandModeMonomial_move_one_past_two c a b (l₁' ++ l₂), List.cons_append]
+
 /-- **The two-hole occupation config.**  `alphaSpinOcc s` with the `p` and `p+1` α-modes removed —
 the common `(K-1)`-electron config reached by the double annihilation from both spin assignments of
 the overlapping pair. -/
