@@ -81,6 +81,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandClassification
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandWeightStructure
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandWeightSupport
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandSiteAnnihilation
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandSiteModeCAR
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandSitePeel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandDoubleOcc
 import LatticeSystem.Fermion.JordanWigner.Hubbard.MielkeHamiltonian
