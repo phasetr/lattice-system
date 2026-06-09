@@ -43,4 +43,22 @@ theorem fermionTotalSpinZ_commute_flatBandHamiltonian (K : ℕ) (ν t U : ℝ) :
     rw [← smul_mul_assoc, ← mul_smul_comm]; exact h2.eq
   exact smul_right_injective _ (by norm_num : (2 : ℂ) ≠ 0) h2'
 
+/-- **`Ŝ^z_tot` preserves the half-filled ground subspace** (it commutes with both `Ĥ_flat` and the
+total number `N̂`). -/
+theorem fermionTotalSpinZ_mulVec_mem_flatBandHalfFilledGroundSubmodule (K : ℕ) (ν t U : ℝ)
+    {v : (Fin (2 * (2 * K + 1) + 2) → Fin 2) → ℂ}
+    (hv : v ∈ flatBandHalfFilledGroundSubmodule K ν t U) :
+    (fermionTotalSpinZ (2 * K + 1)).mulVec v ∈ flatBandHalfFilledGroundSubmodule K ν t U := by
+  rw [flatBandHalfFilledGroundSubmodule, Submodule.mem_inf] at hv ⊢
+  obtain ⟨hker, heig⟩ := hv
+  rw [LinearMap.mem_ker, Matrix.mulVecLin_apply] at hker
+  rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at heig
+  refine ⟨?_, ?_⟩
+  · rw [LinearMap.mem_ker, Matrix.mulVecLin_apply, Matrix.mulVec_mulVec,
+      ← (fermionTotalSpinZ_commute_flatBandHamiltonian K ν t U).eq, ← Matrix.mulVec_mulVec, hker,
+      Matrix.mulVec_zero]
+  · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply, Matrix.mulVec_mulVec,
+      ← (fermionTotalSpinZ_commute_fermionTotalNumber (2 * K + 1)).eq, ← Matrix.mulVec_mulVec, heig,
+      Matrix.mulVec_smul]
+
 end LatticeSystem.Fermion
