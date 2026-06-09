@@ -120,24 +120,24 @@ theorem flatBandBasis_inl_deltaInternalSite_self (K : ℕ) (ν : ℝ) (p : Fin (
   rw [flatBandBasis_inl, flatBandAlphaC, flatBandAlpha_deltaInternalSite, if_pos (Or.inl rfl)]
   push_cast; ring
 
-/-- **The up site annihilation peels the leading occupied up-mode at orbital `p`.**  If no other
-mode of `rest` is an up-mode supported at `int(p)`, then `ĉ_{int(p)↑}` removes the head `(inl p, ↑)`
-with
-amplitude `−ν`: `ĉ_{int(p)↑}·monomial((inl p,↑) :: rest) = −ν · monomial(rest)`. -/
-theorem flatBand_siteAnnihilation_up_head (K : ℕ) (ν : ℝ) (p : Fin (K + 1))
+/-- **The site annihilation peels a leading mode of matching spin at orbital `r`.**  If no other
+mode of `rest` is a spin-`σ` mode supported at `int(p)`, then `ĉ_{int(p),σ}` removes the head
+`(inl r, σ)` with the single-particle amplitude `α_r(int p)`:
+`ĉ_{int(p),σ}·monomial((inl r, σ) :: rest) = α_r(int p) · monomial(rest)`. -/
+theorem flatBand_siteAnnihilation_head (K : ℕ) (ν : ℝ) (p r : Fin (K + 1)) (σ : Fin 2)
     (rest : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2))
-    (hrest : ∀ q ∈ rest, flatBandBasis K ν q.1 (deltaInternalSite K p) = 0 ∨ q.2 ≠ 0) :
+    (hrest : ∀ q ∈ rest, flatBandBasis K ν q.1 (deltaInternalSite K p) = 0 ∨ q.2 ≠ σ) :
     (fermionMultiAnnihilation (2 * (2 * K + 1) + 1)
-        (spinfulIndex (2 * K + 1) (deltaInternalSite K p) 0)).mulVec
-        (flatBandModeMonomial K ν ((Sum.inl p, (0 : Fin 2)) :: rest))
-      = (-(ν : ℝ) : ℂ) • flatBandModeMonomial K ν rest := by
+        (spinfulIndex (2 * K + 1) (deltaInternalSite K p) σ)).mulVec
+        (flatBandModeMonomial K ν ((Sum.inl r, σ) :: rest))
+      = flatBandBasis K ν (Sum.inl r) (deltaInternalSite K p) • flatBandModeMonomial K ν rest := by
   rw [flatBand_siteAnnihilation_peel_modeMonomial]
   change ∑ i : Fin (rest.length + 1),
-      flatBandModePeelTerm K ν (deltaInternalSite K p) 0 ((Sum.inl p, (0 : Fin 2)) :: rest) i = _
+      flatBandModePeelTerm K ν (deltaInternalSite K p) σ ((Sum.inl r, σ) :: rest) i = _
   rw [Fin.sum_univ_succ, Finset.sum_eq_zero (fun i _ => ?_), add_zero]
   · simp only [flatBandModePeelTerm, List.get_cons_zero, List.eraseIdx_cons_zero, Fin.val_zero,
       pow_zero, one_smul]
-    rw [if_true, flatBandBasis_inl_deltaInternalSite_self]
+    rw [if_true]
   · simp only [flatBandModePeelTerm, List.get_cons_succ', List.eraseIdx_cons_succ, Fin.val_succ]
     rcases hrest (rest.get i) (List.get_mem rest i) with h0 | hne
     · rw [h0, ite_self]; simp
