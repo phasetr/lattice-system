@@ -6038,9 +6038,34 @@ an ordered product of site creations on the vacuum
 (\texttt{prod\_creation\_mulVec\_vacuum}) and a $\mathtt{mulVec}$-invariant
 submodule absorbs such products (\texttt{listProd\_mulVec\_mem}), the rotated
 monomials span the whole space: \texttt{flatBandModeFockSubmodule}~$=\top$
-(\texttt{flatBandModeFockSubmodule\_eq\_top}).  This is the spanning foundation for
-the $\hat b$-kernel $\subseteq$ $\alpha$-Fock factorisation (the remaining
-$\beta$-annihilator peel is deferred to a follow-up).
+(\texttt{flatBandModeFockSubmodule\_eq\_top}).  Reindexing them by occupation
+configs of the $4K{+}4$ rotated modes gives, since their count $2^{4K+4}$ equals
+$\operatorname{finrank}V$, the \emph{rotated occupation basis}
+\texttt{flatBandOccBasis} (\texttt{TasakiFlatBandOccBasis.lean}; the reorder uses
+only $\{\hat C^\dagger,\hat C^\dagger\}=0$ via $\exists z$, no explicit sign).
+
+\medskip
+\noindent\textbf{The hard inclusion $\hat b$-kernel $\subseteq$ $\alpha$-Fock,
+PROVED (\texttt{TasakiFlatBandUniqueness.lean}).}  The $\beta$-Gram matrix
+$G_{uv}=\langle\beta_u,\beta_v\rangle$ is positive definite (Lemma 11.10), hence
+invertible (\texttt{flatBandBetaGram}); its inverse defines the \emph{dual
+annihilators} $\hat d_{u,\sigma}=\sum_v(G^{-1})_{uv}\hat b_{v,\sigma}$ with
+$\{\hat d_{u,\sigma},\hat b^\dagger_{w,\tau}\}=\delta_{uw}\delta_{\sigma\tau}$,
+$\{\hat d_{u,\sigma},\hat a^\dagger\}=0$, $\hat d_{u,\sigma}|\mathrm{vac}\rangle=0$
+(\texttt{TasakiFlatBandDualAnnihilation.lean}).  Then
+$\hat b^\dagger_{u,\sigma}\hat d_{u,\sigma}$ is the occupation projector of the
+$\beta$-mode $(\mathrm{inr}\,u,\sigma)$ on the occupation basis (peel with
+$\hat d$, glue back with $\hat b^\dagger$;
+\texttt{flatBandBCreation\_dual\_mulVec\_occMonomial}).  A $\hat b$-kernel vector
+$v$ has $\hat d_{u,\sigma}v=0$, so each projector kills it; expanding $v$ in the
+occupation basis and reading off coordinates, every $\beta$-occupied coordinate
+vanishes (basis independence).  Hence $v$ is a combination of $\beta$-free
+occupation monomials, each an $\alpha$-Slater state, so $v\in\alpha$-Fock
+(\texttt{flatBandBKernelSubmodule\_le\_alphaFockSubmodule}, axiom-clean).  Combined
+with the easy inclusion this gives $\hat b$-kernel $=\alpha$-Fock.  A giant-type
+\texttt{isDefEq} blow-up in the generic move-through lemmas (operator type
+$\mathrm{Fin}(2(2K{+}1){+}2)$ vs.\ $\mathrm{Fin}(M{+}1)$) is dodged by re-proving
+the needed pass-through by direct induction in the operators' native type.
 
 \medskip
 \noindent\textbf{Theorem 11.11 capstone (\texttt{TasakiFlatBandTheorem11\_11.lean}).}
