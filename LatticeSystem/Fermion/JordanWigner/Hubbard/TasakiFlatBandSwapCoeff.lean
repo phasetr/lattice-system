@@ -107,4 +107,40 @@ theorem fermionTotalSpinZ_mulVec_occMonomial_alphaSpinOcc (K : ℕ) (ν : ℝ)
         occMonomial K ν (flatBandAlphaSpinOcc K s) := by
   rw [fermionTotalSpinZ_mulVec_occMonomial, occFinset_alphaSpinOcc_spinCharge_sum]
 
+/-- The basis vector at an `α` index is the `ℂ`-valued single-particle state `α_p`. -/
+theorem flatBandBasis_inl (K : ℕ) (ν : ℝ) (p : Fin (K + 1)) :
+    flatBandBasis K ν (Sum.inl p) = flatBandAlphaC K ν p := by
+  have hb : ⇑(flatBandBasis K ν) = Sum.elim (flatBandAlphaC K ν) (flatBandBetaC K ν) := by
+    unfold flatBandBasis; exact coe_basisOfLinearIndependentOfCardEqFinrank _ _
+  rw [hb, Sum.elim_inl]
+
+/-- The `α_p` amplitude at the shared internal site `int(p)` is `−ν`. -/
+theorem flatBandBasis_inl_deltaInternalSite_self (K : ℕ) (ν : ℝ) (p : Fin (K + 1)) :
+    flatBandBasis K ν (Sum.inl p) (deltaInternalSite K p) = (-(ν : ℝ) : ℂ) := by
+  rw [flatBandBasis_inl, flatBandAlphaC, flatBandAlpha_deltaInternalSite, if_pos (Or.inl rfl)]
+  push_cast; ring
+
+/-- **The up site annihilation peels the leading occupied up-mode at orbital `p`.**  If no other
+mode of `rest` is an up-mode supported at `int(p)`, then `ĉ_{int(p)↑}` removes the head `(inl p, ↑)`
+with
+amplitude `−ν`: `ĉ_{int(p)↑}·monomial((inl p,↑) :: rest) = −ν · monomial(rest)`. -/
+theorem flatBand_siteAnnihilation_up_head (K : ℕ) (ν : ℝ) (p : Fin (K + 1))
+    (rest : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2))
+    (hrest : ∀ q ∈ rest, flatBandBasis K ν q.1 (deltaInternalSite K p) = 0 ∨ q.2 ≠ 0) :
+    (fermionMultiAnnihilation (2 * (2 * K + 1) + 1)
+        (spinfulIndex (2 * K + 1) (deltaInternalSite K p) 0)).mulVec
+        (flatBandModeMonomial K ν ((Sum.inl p, (0 : Fin 2)) :: rest))
+      = (-(ν : ℝ) : ℂ) • flatBandModeMonomial K ν rest := by
+  rw [flatBand_siteAnnihilation_peel_modeMonomial]
+  change ∑ i : Fin (rest.length + 1),
+      flatBandModePeelTerm K ν (deltaInternalSite K p) 0 ((Sum.inl p, (0 : Fin 2)) :: rest) i = _
+  rw [Fin.sum_univ_succ, Finset.sum_eq_zero (fun i _ => ?_), add_zero]
+  · simp only [flatBandModePeelTerm, List.get_cons_zero, List.eraseIdx_cons_zero, Fin.val_zero,
+      pow_zero, one_smul]
+    rw [if_true, flatBandBasis_inl_deltaInternalSite_self]
+  · simp only [flatBandModePeelTerm, List.get_cons_succ', List.eraseIdx_cons_succ, Fin.val_succ]
+    rcases hrest (rest.get i) (List.get_mem rest i) with h0 | hne
+    · rw [h0, ite_self]; simp
+    · rw [if_neg hne]; simp
+
 end LatticeSystem.Fermion
