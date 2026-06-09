@@ -51,4 +51,42 @@ theorem flatBandAlphaSpinOcc_inr (s : Fin (K + 1) → Fin 2) (u : Fin (K + 1)) (
 theorem flatBandAlphaSpinOcc_inl (s : Fin (K + 1) → Fin 2) (p : Fin (K + 1)) (σ : Fin 2) :
     flatBandAlphaSpinOcc K s (Sum.inl p, σ) = if σ = s p then 1 else 0 := rfl
 
+/-- **Occupied modes of an `α`-spin config.**  A mode `q` is occupied exactly when it is the chosen
+spin mode `(inl p, s p)` of some orbital `p`. -/
+theorem mem_occFinset_alphaSpinOcc (s : Fin (K + 1) → Fin 2)
+    (q : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2) :
+    q ∈ occFinset (flatBandAlphaSpinOcc K s) ↔ ∃ p, q = (Sum.inl p, s p) := by
+  rw [occFinset, Finset.mem_filter]
+  obtain ⟨m, σ⟩ := q
+  constructor
+  · rintro ⟨_, hq⟩
+    cases m with
+    | inl p =>
+      rw [flatBandAlphaSpinOcc_inl] at hq
+      split_ifs at hq with h
+      · exact ⟨p, by rw [h]⟩
+      · exact absurd hq (by decide)
+    | inr u => rw [flatBandAlphaSpinOcc_inr] at hq; exact absurd hq (by decide)
+  · rintro ⟨p, hp⟩
+    obtain ⟨hm, hσ⟩ := Prod.mk.injEq _ _ _ _ ▸ hp
+    subst hm; subst hσ
+    exact ⟨Finset.mem_univ _, by rw [flatBandAlphaSpinOcc_inl, if_pos rfl]⟩
+
+/-- The `α`-spin occupation set is the image of the chosen-spin embedding `p ↦ (inl p, s p)`. -/
+theorem occFinset_alphaSpinOcc_eq_image (s : Fin (K + 1) → Fin 2) :
+    occFinset (flatBandAlphaSpinOcc K s)
+      = Finset.univ.image (fun p : Fin (K + 1) => (Sum.inl p, s p)) := by
+  ext q
+  rw [mem_occFinset_alphaSpinOcc, Finset.mem_image]
+  constructor
+  · rintro ⟨p, rfl⟩; exact ⟨p, Finset.mem_univ _, rfl⟩
+  · rintro ⟨p, _, rfl⟩; exact ⟨p, rfl⟩
+
+/-- The `α`-spin config occupies exactly `K+1` modes (one per orbital). -/
+theorem occFinset_alphaSpinOcc_card (s : Fin (K + 1) → Fin 2) :
+    (occFinset (flatBandAlphaSpinOcc K s)).card = K + 1 := by
+  rw [occFinset_alphaSpinOcc_eq_image,
+    Finset.card_image_of_injective _ (fun a b hab => Sum.inl_injective (congrArg Prod.fst hab)),
+    Finset.card_univ, Fintype.card_fin]
+
 end LatticeSystem.Fermion
