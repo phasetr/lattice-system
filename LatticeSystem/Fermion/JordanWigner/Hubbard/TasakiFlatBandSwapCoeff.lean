@@ -642,4 +642,96 @@ theorem occFinset_update_zero (f : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fi
   · subst h; simp
   · simp [h]
 
+/-- **No orbital double occupancy in the half-filled ground subspace.**  A β-free occupation config
+`g` that doubly occupies an orbital `q₀` has vanishing ground-state coordinate.  Reading the
+`(q₀`-pair-erased) coordinate of `0 = ĉ_{ext(q₀)↓} ĉ_{ext(q₀)↑} v` isolates exactly the `g` term
+(β-occupied configs are killed by the b̂-kernel; β-free non-doubly-occupied ones by the external
+double annihilation), forcing `z_g · repr(v, g) = 0` with `z_g ≠ 0`. -/
+theorem flatBandOccBasis_repr_eq_zero_of_doubleOcc (K : ℕ) (ν t U : ℝ) (ht : 0 < t) (hU : 0 < U)
+    {v : (Fin (2 * (2 * K + 1) + 2) → Fin 2) → ℂ}
+    (hv : v ∈ flatBandHalfFilledGroundSubmodule K ν t U) {q₀ : Fin (K + 1)}
+    {g : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2}
+    (hgbf : ∀ q' ∈ occFinset g, ∃ r, q'.1 = Sum.inl r)
+    (hg0 : (Sum.inl q₀, (0 : Fin 2)) ∈ occFinset g)
+    (hg1 : (Sum.inl q₀, (1 : Fin 2)) ∈ occFinset g) :
+    (flatBandOccBasis K ν).repr v g = 0 := by
+  classical
+  have hE : rayleighOnVec (flatBandHamiltonian K ν t U) v = 0 := by
+    rw [flatBandHalfFilledGroundSubmodule, Submodule.mem_inf] at hv
+    obtain ⟨hker, _⟩ := hv
+    rw [LinearMap.mem_ker, Matrix.mulVecLin_apply] at hker
+    unfold rayleighOnVec; rw [hker, dotProduct_zero, Complex.zero_re]
+  have hcd := flatBand_groundState_doubleAnnihilation_mulVec_eq_zero K ν t U ht.le hU hE
+    (deltaExternalSite K q₀)
+  have hBK := flatBand_groundState_mem_BKernelSubmodule K ν t U ht hU.le hE
+  -- the q₀-pair-erased config of g
+  set h := Function.update (Function.update g (Sum.inl q₀, 0) 0) (Sum.inl q₀, 1) 0 with hh
+  have hocch : occFinset h = ((occFinset g).erase (Sum.inl q₀, 0)).erase (Sum.inl q₀, 1) := by
+    rw [hh, occFinset_update_zero, occFinset_update_zero]
+  obtain ⟨zg, hzg0, hzg⟩ := flatBand_cDownUp_ext_betaFree_double K ν q₀ g hgbf hg0 hg1
+  -- expand the h-coordinate of `cDownUp(ext q₀) v`
+  have hexp : (flatBandOccBasis K ν).repr ((cDownUp K (deltaExternalSite K q₀)).mulVec v) h
+      = ∑ f, (flatBandOccBasis K ν).repr v f *
+          (flatBandOccBasis K ν).repr
+            ((cDownUp K (deltaExternalSite K q₀)).mulVec (occMonomial K ν f)) h := by
+    conv_lhs => rw [← (flatBandOccBasis K ν).sum_repr v]
+    rw [Matrix.mulVec_sum, map_sum, Finsupp.finset_sum_apply]
+    refine Finset.sum_congr rfl (fun f _ => ?_)
+    rw [flatBandOccBasis_apply, Matrix.mulVec_smul, map_smul, Finsupp.smul_apply, smul_eq_mul]
+  rw [hcd, map_zero, Finsupp.zero_apply] at hexp
+  -- only f = g contributes
+  rw [Finset.sum_eq_single g] at hexp
+  · -- g term: repr(cDownUp occMonomial g)(h) = zg
+    rw [hzg, map_smul, Finsupp.smul_apply, smul_eq_mul] at hexp
+    have hmono : flatBandModeMonomial K ν
+        (((occFinset g).erase (Sum.inl q₀, 0)).erase (Sum.inl q₀, 1)).toList
+        = occMonomial K ν h := by rw [occMonomial, hocch]
+    rw [hmono, ← flatBandOccBasis_apply, (flatBandOccBasis K ν).repr_self_apply, if_pos rfl,
+      mul_one] at hexp
+    exact (mul_eq_zero.mp hexp.symm).resolve_right hzg0
+  · -- f ≠ g term vanishes
+    intro f _ hfg
+    by_cases hfbf : ∀ q' ∈ occFinset f, ∃ r, q'.1 = Sum.inl r
+    · by_cases hfd : (Sum.inl q₀, (0 : Fin 2)) ∈ occFinset f ∧
+          (Sum.inl q₀, (1 : Fin 2)) ∈ occFinset f
+      · -- β-free, doubly-occ, but f ≠ g ⇒ erased coordinate differs
+        obtain ⟨zf, _, hzf⟩ := flatBand_cDownUp_ext_betaFree_double K ν q₀ f hfbf hfd.1 hfd.2
+        rw [hzf, map_smul, Finsupp.smul_apply, smul_eq_mul]
+        have hmono : flatBandModeMonomial K ν
+            (((occFinset f).erase (Sum.inl q₀, 0)).erase (Sum.inl q₀, 1)).toList
+            = occMonomial K ν (Function.update (Function.update f (Sum.inl q₀, 0) 0)
+                (Sum.inl q₀, 1) 0) := by
+          rw [occMonomial, occFinset_update_zero, occFinset_update_zero]
+        rw [hmono, ← flatBandOccBasis_apply, (flatBandOccBasis K ν).repr_self_apply, if_neg ?_,
+          mul_zero, mul_zero]
+        -- the erased configs differ since f ≠ g
+        intro heq
+        apply hfg
+        funext m
+        by_cases hma : m = (Sum.inl q₀, 0)
+        · rw [hma]
+          exact (mem_occFinset_iff f _).mp hfd.1 |>.trans ((mem_occFinset_iff g _).mp hg0).symm
+        · by_cases hmb : m = (Sum.inl q₀, 1)
+          · rw [hmb]
+            exact (mem_occFinset_iff f _).mp hfd.2 |>.trans ((mem_occFinset_iff g _).mp hg1).symm
+          · have := congrFun heq m
+            simp only [hh, Function.update_of_ne hma, Function.update_of_ne hmb] at this
+            exact this
+      · -- β-free, not doubly-occ ⇒ cDownUp annihilates
+        rw [not_and_or] at hfd
+        rw [flatBand_cDownUp_ext_betaFree_eq_zero_of_not_double K ν q₀ f hfbf hfd, map_zero,
+          Finsupp.zero_apply, mul_zero]
+    · -- not β-free ⇒ repr(v, f) = 0 by b̂-kernel
+      simp only [not_forall, not_exists] at hfbf
+      obtain ⟨q', hq'occ, hq'⟩ := hfbf
+      obtain ⟨u, hu⟩ : ∃ u, q'.1 = Sum.inr u := by
+        cases hq'1 : q'.1 with
+        | inl r => exact absurd hq'1 (by simpa using hq' r)
+        | inr u => exact ⟨u, rfl⟩
+      have : (Sum.inr u, q'.2) ∈ occFinset f := by
+        have : (Sum.inr u, q'.2) = q' := Prod.ext hu.symm rfl
+        rwa [this]
+      rw [flatBandOccBasis_repr_eq_zero_of_mem_BKernel u q'.2 hBK this, zero_mul]
+  · intro hg_notin; exact absurd (Finset.mem_univ g) hg_notin
+
 end LatticeSystem.Fermion
