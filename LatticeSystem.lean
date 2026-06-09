@@ -1,5 +1,6 @@
 import LatticeSystem.Math.AnticommuteCommute
 import LatticeSystem.Math.ComplexVectorKernel
+import LatticeSystem.Math.ListProdMulVec
 import LatticeSystem.Math.RayleighPosSemidefKernel
 import LatticeSystem.Math.PerronFrobeniusPrimitive
 import LatticeSystem.Math.CollatzWielandt

@@ -6009,7 +6009,38 @@ $\hat b_{u,\sigma}|\mathrm{vac}\rangle = 0$
 (\texttt{flatBandBAnnihilation\_mulVec\_alphaSlaterState}). The genuinely hard
 inclusion is the other one, $\hat b$-kernel $\subseteq$ $\alpha$-Fock, which
 requires the Fock-space factorisation of the non-orthogonal $\{\alpha\}\cup\{\beta\}$
-basis and is deferred.
+basis.
+
+\medskip
+\noindent\textbf{Rotated-basis Fock-spanning infrastructure (Issue \#4346,
+\texttt{TasakiFlatBandModeCreation.lean}, \texttt{TasakiFlatBandModeMonomial.lean},
+\texttt{Math/ListProdMulVec.lean}).}  Towards that hard inclusion, the
+single-particle change of basis is lifted to the many-body level.  The
+\emph{mode creation/annihilation maps} $\hat C^\dagger_\sigma(w)=\sum_x w(x)\,\hat
+c^\dagger_{x,\sigma}$ and $\hat C_\sigma(w)$ (\texttt{flatBandModeCreation},
+\texttt{flatBandModeAnnihilation}) are $\mathbb C$-linear in the single-particle
+vector $w$, with $\hat a^\dagger,\hat b^\dagger,\hat a,\hat b$ their values at
+$\alpha,\beta$; since $\{\alpha\}\cup\{\beta\}$ is a basis (Lemma 11.10), every
+site creation $\hat c^\dagger_{x,\sigma}=\hat C^\dagger_\sigma(\delta_x)$ is the
+$\{\alpha\}\cup\{\beta\}$-expansion combination of the $\hat a^\dagger/\hat b^\dagger$
+(\texttt{flatBandModeCreation\_eq\_repr\_sum}, \texttt{flatBandModeCreation\_single}).
+The bilinear double sum of the spinful site CAR collapses on the diagonal to the
+\emph{generic single-particle CAR} $\{\hat C_\sigma(w),\hat
+C^\dagger_\tau(w')\}=(\sum_x w(x)w'(x))\,\delta_{\sigma\tau}\,\mathbf 1$
+(\texttt{flatBandMode\_annihilation\_creation\_anticomm}), which specialises to
+$\{\hat a,\hat a^\dagger\}$, the $\beta$-Gram $\{\hat b,\hat b^\dagger\}$, and
+$\{\hat b,\hat a^\dagger\}=0$.  Writing \texttt{flatBandModeFockSubmodule} for the span
+of the \emph{rotated Fock monomials} $\bigl(\prod \hat C^\dagger_\sigma(\text{basis
+}i)\bigr)|\mathrm{vac}\rangle$, this span is invariant under every site creation
+(it is a finite combination of the $\hat a^\dagger/\hat b^\dagger$, each of which
+prepends one mode); since any computational basis vector $\mathtt{basisVec}\,c$ is
+an ordered product of site creations on the vacuum
+(\texttt{prod\_creation\_mulVec\_vacuum}) and a $\mathtt{mulVec}$-invariant
+submodule absorbs such products (\texttt{listProd\_mulVec\_mem}), the rotated
+monomials span the whole space: \texttt{flatBandModeFockSubmodule}~$=\top$
+(\texttt{flatBandModeFockSubmodule\_eq\_top}).  This is the spanning foundation for
+the $\hat b$-kernel $\subseteq$ $\alpha$-Fock factorisation (the remaining
+$\beta$-annihilator peel is deferred to a follow-up).
 
 \medskip
 \noindent\textbf{Theorem 11.11 capstone (\texttt{TasakiFlatBandTheorem11\_11.lean}).}
