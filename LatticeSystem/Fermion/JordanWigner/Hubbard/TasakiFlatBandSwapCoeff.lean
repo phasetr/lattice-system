@@ -51,6 +51,11 @@ theorem flatBandAlphaSpinOcc_inr (s : Fin (K + 1) → Fin 2) (u : Fin (K + 1)) (
 theorem flatBandAlphaSpinOcc_inl (s : Fin (K + 1) → Fin 2) (p : Fin (K + 1)) (σ : Fin 2) :
     flatBandAlphaSpinOcc K s (Sum.inl p, σ) = if σ = s p then 1 else 0 := rfl
 
+/-- A mode is in the occupied finset iff the config value there is `1`. -/
+theorem mem_occFinset_iff (f : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2)
+    (q : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2) : q ∈ occFinset f ↔ f q = 1 := by
+  rw [occFinset, Finset.mem_filter, and_iff_right (Finset.mem_univ q)]
+
 /-- **Occupied modes of an `α`-spin config.**  A mode `q` is occupied exactly when it is the chosen
 spin mode `(inl p, s p)` of some orbital `p`. -/
 theorem mem_occFinset_alphaSpinOcc (s : Fin (K + 1) → Fin 2)
@@ -232,5 +237,61 @@ theorem flatBandAlphaSpinOcc_toList_perm (K : ℕ) (s : Fin (K + 1) → Fin 2) (
     have h := Finset.toList_insert (Finset.notMem_erase b (occ.erase a))
     rwa [Finset.insert_erase hmem1] at h
   exact h1.trans (h2.cons _)
+
+/-- **The two-hole occupation config.**  `alphaSpinOcc s` with the `p` and `p+1` α-modes removed —
+the common `(K-1)`-electron config reached by the double annihilation from both spin assignments of
+the overlapping pair. -/
+def flatBandAlphaTwoHoleOcc (K : ℕ) (s : Fin (K + 1) → Fin 2) (p : Fin (K + 1)) :
+    (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2 :=
+  fun q => if q.1 = Sum.inl p ∨ q.1 = Sum.inl (p + 1) then 0 else flatBandAlphaSpinOcc K s q
+
+/-- The two-hole config is unchanged by swapping the spins of `p` and `p+1` (they are zeroed out;
+the configs agree off `{p, p+1}`). -/
+theorem flatBandAlphaTwoHoleOcc_swap_eq (K : ℕ) (s : Fin (K + 1) → Fin 2) (p : Fin (K + 1)) :
+    flatBandAlphaTwoHoleOcc K (Function.update (Function.update s p 1) (p + 1) 0) p
+      = flatBandAlphaTwoHoleOcc K s p := by
+  funext q
+  simp only [flatBandAlphaTwoHoleOcc]
+  by_cases hq : q.1 = Sum.inl p ∨ q.1 = Sum.inl (p + 1)
+  · rw [if_pos hq, if_pos hq]
+  · rw [if_neg hq, if_neg hq]
+    rw [not_or] at hq
+    obtain ⟨hqp, hqp1⟩ := hq
+    obtain ⟨m, σ⟩ := q
+    cases m with
+    | inr u => rfl
+    | inl r =>
+      have hrp : r ≠ p := fun h => hqp (by rw [h])
+      have hrp1 : r ≠ p + 1 := fun h => hqp1 (by rw [h])
+      simp only [flatBandAlphaSpinOcc_inl, Function.update_apply]
+      rw [if_neg hrp1, if_neg hrp]
+
+/-- The occupied modes of the two-hole config are those of `alphaSpinOcc s` minus the `p`, `p+1`
+chosen-spin modes. -/
+theorem occFinset_alphaTwoHoleOcc_eq (K : ℕ) (s : Fin (K + 1) → Fin 2) (p : Fin (K + 1)) :
+    occFinset (flatBandAlphaTwoHoleOcc K s p)
+      = ((occFinset (flatBandAlphaSpinOcc K s)).erase (Sum.inl p, s p)).erase
+        (Sum.inl (p + 1), s (p + 1)) := by
+  ext q
+  rw [Finset.mem_erase, Finset.mem_erase, mem_occFinset_iff, mem_occFinset_iff]
+  constructor
+  · intro hq1
+    simp only [flatBandAlphaTwoHoleOcc] at hq1
+    by_cases h : q.1 = Sum.inl p ∨ q.1 = Sum.inl (p + 1)
+    · rw [if_pos h] at hq1; exact absurd hq1 (by decide)
+    · rw [if_neg h] at hq1
+      rw [not_or] at h
+      exact ⟨fun he => h.2 (by rw [he]), fun he => h.1 (by rw [he]), hq1⟩
+  · rintro ⟨hne1, hne0, hmem⟩
+    obtain ⟨r, hr⟩ := (mem_occFinset_alphaSpinOcc s q).mp ((mem_occFinset_iff _ q).mpr hmem)
+    subst hr
+    have hrp : r ≠ p := fun h => hne0 (by rw [h])
+    have hrp1 : r ≠ p + 1 := fun h => hne1 (by rw [h])
+    have hcond : ¬((Sum.inl r : Fin (K + 1) ⊕ Fin (K + 1)) = Sum.inl p ∨
+        (Sum.inl r : Fin (K + 1) ⊕ Fin (K + 1)) = Sum.inl (p + 1)) := by
+      rw [not_or]
+      exact ⟨fun he => hrp (Sum.inl_injective he), fun he => hrp1 (Sum.inl_injective he)⟩
+    simp only [flatBandAlphaTwoHoleOcc]
+    rw [if_neg hcond, flatBandAlphaSpinOcc_inl, if_pos rfl]
 
 end LatticeSystem.Fermion
