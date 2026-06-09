@@ -57,6 +57,12 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandModel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandBasis
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandModeCreation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandModeMonomial
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandBetaGram
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandDualAnnihilation
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandModeReorder
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandOccBasis
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandPeel
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandUniqueness
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandCAR
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandGroundState
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandZeroEnergy
