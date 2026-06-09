@@ -137,16 +137,16 @@ theorem flatBandBasis_inl_deltaInternalSite_succ (K : ℕ) (ν : ℝ) (p : Fin (
 mode of `rest` is a spin-`σ` mode supported at `int(p)`, then `ĉ_{int(p),σ}` removes the head
 `(inl r, σ)` with the single-particle amplitude `α_r(int p)`:
 `ĉ_{int(p),σ}·monomial((inl r, σ) :: rest) = α_r(int p) · monomial(rest)`. -/
-theorem flatBand_siteAnnihilation_head (K : ℕ) (ν : ℝ) (p r : Fin (K + 1)) (σ : Fin 2)
-    (rest : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2))
-    (hrest : ∀ q ∈ rest, flatBandBasis K ν q.1 (deltaInternalSite K p) = 0 ∨ q.2 ≠ σ) :
+theorem flatBand_siteAnnihilation_head (K : ℕ) (ν : ℝ) (x : Fin (2 * K + 2)) (r : Fin (K + 1))
+    (σ : Fin 2) (rest : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2))
+    (hrest : ∀ q ∈ rest, flatBandBasis K ν q.1 x = 0 ∨ q.2 ≠ σ) :
     (fermionMultiAnnihilation (2 * (2 * K + 1) + 1)
-        (spinfulIndex (2 * K + 1) (deltaInternalSite K p) σ)).mulVec
+        (spinfulIndex (2 * K + 1) x σ)).mulVec
         (flatBandModeMonomial K ν ((Sum.inl r, σ) :: rest))
-      = flatBandBasis K ν (Sum.inl r) (deltaInternalSite K p) • flatBandModeMonomial K ν rest := by
+      = flatBandBasis K ν (Sum.inl r) x • flatBandModeMonomial K ν rest := by
   rw [flatBand_siteAnnihilation_peel_modeMonomial]
   change ∑ i : Fin (rest.length + 1),
-      flatBandModePeelTerm K ν (deltaInternalSite K p) σ ((Sum.inl r, σ) :: rest) i = _
+      flatBandModePeelTerm K ν x σ ((Sum.inl r, σ) :: rest) i = _
   rw [Fin.sum_univ_succ, Finset.sum_eq_zero (fun i _ => ?_), add_zero]
   · simp only [flatBandModePeelTerm, List.get_cons_zero, List.eraseIdx_cons_zero, Fin.val_zero,
       pow_zero, one_smul]
@@ -159,23 +159,23 @@ theorem flatBand_siteAnnihilation_head (K : ℕ) (ν : ℝ) (p r : Fin (K + 1)) 
 /-- **The double annihilation on a two-`α`-head monomial.**  If `rest` has no mode supported at
 `int(p)`, then `ĉ_{int(p)↓} ĉ_{int(p)↑}` removes the leading up head `(inl r₁, ↑)` and down head
 `(inl r₂, ↓)`, leaving `α_{r₁}(int p) · α_{r₂}(int p) · monomial(rest)`. -/
-theorem flatBand_cDownUp_two_head (K : ℕ) (ν : ℝ) (p r₁ r₂ : Fin (K + 1))
+theorem flatBand_cDownUp_two_head (K : ℕ) (ν : ℝ) (x : Fin (2 * K + 2)) (r₁ r₂ : Fin (K + 1))
     (rest : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2))
-    (hrest : ∀ q ∈ rest, flatBandBasis K ν q.1 (deltaInternalSite K p) = 0) :
-    (cDownUp K (deltaInternalSite K p)).mulVec
+    (hrest : ∀ q ∈ rest, flatBandBasis K ν q.1 x = 0) :
+    (cDownUp K x).mulVec
         (flatBandModeMonomial K ν
           ((Sum.inl r₁, (0 : Fin 2)) :: (Sum.inl r₂, (1 : Fin 2)) :: rest))
-      = (flatBandBasis K ν (Sum.inl r₁) (deltaInternalSite K p) *
-          flatBandBasis K ν (Sum.inl r₂) (deltaInternalSite K p)) •
+      = (flatBandBasis K ν (Sum.inl r₁) x *
+          flatBandBasis K ν (Sum.inl r₂) x) •
         flatBandModeMonomial K ν rest := by
   rw [cDownUp, ← Matrix.mulVec_mulVec,
-    flatBand_siteAnnihilation_head K ν p r₁ 0 ((Sum.inl r₂, (1 : Fin 2)) :: rest)
+    flatBand_siteAnnihilation_head K ν x r₁ 0 ((Sum.inl r₂, (1 : Fin 2)) :: rest)
       (fun q hq => by
         rcases List.mem_cons.mp hq with rfl | hq'
         · exact Or.inr (show (1 : Fin 2) ≠ 0 by decide)
         · exact Or.inl (hrest q hq')),
     Matrix.mulVec_smul,
-    flatBand_siteAnnihilation_head K ν p r₂ 1 rest (fun q hq => Or.inl (hrest q hq)), smul_smul]
+    flatBand_siteAnnihilation_head K ν x r₂ 1 rest (fun q hq => Or.inl (hrest q hq)), smul_smul]
 
 /-- **Canonical `(↑,↓)` two-overlap monomial:** `ĉ_{int(p)↓} ĉ_{int(p)↑}` on
 `(inl p, ↑) :: (inl(p+1), ↓) :: rest` gives `+ν² · monomial(rest)`. -/
@@ -186,7 +186,7 @@ theorem flatBand_cDownUp_canonical (K : ℕ) (ν : ℝ) (p : Fin (K + 1))
         (flatBandModeMonomial K ν
           ((Sum.inl p, (0 : Fin 2)) :: (Sum.inl (p + 1), (1 : Fin 2)) :: rest))
       = (((ν : ℝ) : ℂ)) ^ 2 • flatBandModeMonomial K ν rest := by
-  rw [flatBand_cDownUp_two_head K ν p p (p + 1) rest hrest,
+  rw [flatBand_cDownUp_two_head K ν (deltaInternalSite K p) p (p + 1) rest hrest,
     flatBandBasis_inl_deltaInternalSite_self, flatBandBasis_inl_deltaInternalSite_succ]
   congr 1
   ring
@@ -206,7 +206,7 @@ theorem flatBand_cDownUp_swap (K : ℕ) (ν : ℝ) (p : Fin (K + 1))
       = -flatBandModeMonomial K ν
         ((Sum.inl (p + 1), (0 : Fin 2)) :: (Sum.inl p, (1 : Fin 2)) :: rest) from by
       rw [flatBandModeMonomial_swap], Matrix.mulVec_neg,
-    flatBand_cDownUp_two_head K ν p (p + 1) p rest hrest,
+    flatBand_cDownUp_two_head K ν (deltaInternalSite K p) (p + 1) p rest hrest,
     flatBandBasis_inl_deltaInternalSite_self, flatBandBasis_inl_deltaInternalSite_succ]
   rw [← neg_smul]
   congr 1
@@ -511,5 +511,26 @@ theorem flatBand_cDownUp_alphaSpinList_same_spin (s : Fin (K + 1) → Fin 2) (p 
   rw [flatBandModeMonomial_move_pair_front, hsame]
   exact flatBand_cDownUp_two_head_same_spin K ν p.castSucc p.castSucc p.succ (s p.succ) _
     (flatBandAlphaSpinList_rest_clean s p)
+
+/-- The `α_q` amplitude at its own external site `ext(q)` is `1` (only `α_q` is supported at
+`ext(q)`). -/
+theorem flatBandBasis_inl_deltaExternalSite_self (K : ℕ) (ν : ℝ) (q : Fin (K + 1)) :
+    flatBandBasis K ν (Sum.inl q) (deltaExternalSite K q) = 1 := by
+  rw [flatBandBasis_inl, flatBandAlphaC, flatBandAlpha_deltaExternalSite, if_pos rfl]
+  norm_num
+
+/-- **Double annihilation at an external site detects orbital double occupancy.**  Since only `α_q`
+is supported at `ext(q)` (amplitude `1`), `ĉ_{ext(q)↓} ĉ_{ext(q)↑}` on a monomial whose two leading
+heads are both at orbital `q` (with opposite spins) and whose `rest` is `ext(q)`-clean returns
+`monomial(rest)`. -/
+theorem flatBand_cDownUp_extSite_double (K : ℕ) (ν : ℝ) (q : Fin (K + 1))
+    (rest : List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2))
+    (hrest : ∀ q' ∈ rest, flatBandBasis K ν q'.1 (deltaExternalSite K q) = 0) :
+    (cDownUp K (deltaExternalSite K q)).mulVec
+        (flatBandModeMonomial K ν
+          ((Sum.inl q, (0 : Fin 2)) :: (Sum.inl q, (1 : Fin 2)) :: rest))
+      = flatBandModeMonomial K ν rest := by
+  rw [flatBand_cDownUp_two_head K ν (deltaExternalSite K q) q q rest hrest,
+    flatBandBasis_inl_deltaExternalSite_self, one_mul, one_smul]
 
 end LatticeSystem.Fermion
