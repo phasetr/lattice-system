@@ -554,4 +554,50 @@ theorem occFinset_toList_perm_two_front
     rwa [Finset.insert_erase hb] at h
   exact h1.trans (h2.cons _)
 
+/-- The `α_{q'}` amplitude at external site `ext(q₀)` is `1` if `q' = q₀`, else `0`. -/
+theorem flatBandBasis_inl_deltaExternalSite (K : ℕ) (ν : ℝ) (q' q₀ : Fin (K + 1)) :
+    flatBandBasis K ν (Sum.inl q') (deltaExternalSite K q₀) = if q₀ = q' then 1 else 0 := by
+  rw [flatBandBasis_inl, flatBandAlphaC, flatBandAlpha_deltaExternalSite]
+  split_ifs <;> norm_num
+
+/-- **A single annihilation at an external site kills a β-free monomial missing that mode.**  For a
+β-free config `f` not occupying `(inl q₀, σ)`, `ĉ_{ext(q₀),σ}` annihilates `occMonomial f` (the only
+mode reaching `ext(q₀)` is `α_{q₀}`, which carries the missing spin). -/
+theorem flatBand_siteAnnihilation_ext_betaFree_eq_zero (K : ℕ) (ν : ℝ) (q₀ : Fin (K + 1))
+    (σ : Fin 2) (f : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2)
+    (hbf : ∀ q' ∈ occFinset f, ∃ r, q'.1 = Sum.inl r)
+    (hmiss : (Sum.inl q₀, σ) ∉ occFinset f) :
+    (fermionMultiAnnihilation (2 * (2 * K + 1) + 1)
+        (spinfulIndex (2 * K + 1) (deltaExternalSite K q₀) σ)).mulVec (occMonomial K ν f) = 0 := by
+  rw [occMonomial]
+  apply flatBand_siteAnnihilation_eq_zero
+  intro q' hq'
+  rw [Finset.mem_toList] at hq'
+  obtain ⟨r, hr⟩ := hbf q' hq'
+  rw [hr, flatBandBasis_inl_deltaExternalSite]
+  by_cases hrq : q₀ = r
+  · refine Or.inr (fun hσ => hmiss ?_)
+    have : (Sum.inl q₀, σ) = q' := Prod.ext (by rw [hr, hrq]) hσ.symm
+    rwa [this]
+  · exact Or.inl (if_neg hrq)
+
+/-- **External double annihilation vanishes on a β-free non-doubly-occupied config.**  If a β-free
+config `f` does not doubly occupy orbital `q₀` (it misses one of the two spins), then
+`ĉ_{ext(q₀)↓} ĉ_{ext(q₀)↑}` annihilates `occMonomial f`. -/
+theorem flatBand_cDownUp_ext_betaFree_eq_zero_of_not_double (K : ℕ) (ν : ℝ) (q₀ : Fin (K + 1))
+    (f : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2)
+    (hbf : ∀ q' ∈ occFinset f, ∃ r, q'.1 = Sum.inl r)
+    (hnd : (Sum.inl q₀, (0 : Fin 2)) ∉ occFinset f ∨ (Sum.inl q₀, (1 : Fin 2)) ∉ occFinset f) :
+    (cDownUp K (deltaExternalSite K q₀)).mulVec (occMonomial K ν f) = 0 := by
+  rcases hnd with h0 | h1
+  · rw [cDownUp, ← Matrix.mulVec_mulVec,
+      flatBand_siteAnnihilation_ext_betaFree_eq_zero K ν q₀ 0 f hbf h0, Matrix.mulVec_zero]
+  · rw [cDownUp,
+      eq_neg_of_add_eq_zero_left (fermionMultiAnnihilation_anticomm_of_ne
+        (spinfulIndex_up_ne_down (2 * K + 1) (deltaExternalSite K q₀)
+          (deltaExternalSite K q₀)).symm),
+      Matrix.neg_mulVec, ← Matrix.mulVec_mulVec,
+      flatBand_siteAnnihilation_ext_betaFree_eq_zero K ν q₀ 1 f hbf h1, Matrix.mulVec_zero,
+      neg_zero]
+
 end LatticeSystem.Fermion
