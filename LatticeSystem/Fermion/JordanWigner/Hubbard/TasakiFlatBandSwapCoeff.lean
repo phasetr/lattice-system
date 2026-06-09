@@ -642,6 +642,60 @@ theorem occFinset_update_zero (f : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fi
   · subst h; simp
   · simp [h]
 
+/-- The canonical orbital list's `toFinset` is the occupation finset of the α-spin config. -/
+theorem flatBandAlphaSpinList_toFinset (s : Fin (K + 1) → Fin 2) :
+    (flatBandAlphaSpinList K s).toFinset = occFinset (flatBandAlphaSpinOcc K s) := by
+  ext x
+  rw [List.mem_toFinset, flatBandAlphaSpinList, List.mem_ofFn, mem_occFinset_alphaSpinOcc]
+  exact ⟨fun ⟨q, hq⟩ => ⟨q, hq.symm⟩, fun ⟨p, hp⟩ => ⟨p, hp.symm⟩⟩
+
+/-- **The non-pair part of the canonical list permutes the two-hole occupation `toList`.**  Both
+enumerate the occupied modes of `αs` with the `p, p+1` pair removed. -/
+theorem flatBandAlphaSpinList_rest_perm_twoHole (s : Fin (K + 1) → Fin 2) (p : Fin K) :
+    ((flatBandAlphaSpinList K s).take p.val
+        ++ (flatBandAlphaSpinList K s).drop (p.val + 2)).Perm
+      (occFinset (flatBandAlphaTwoHoleOcc K s p.castSucc)).toList := by
+  have hnd := flatBandAlphaSpinList_nodup s
+  rw [flatBandAlphaSpinList_split_adj s p] at hnd
+  obtain ⟨htnd, hcons, hdisj⟩ := List.nodup_append.mp hnd
+  have hdnd : ((flatBandAlphaSpinList K s).drop (p.val + 2)).Nodup :=
+    (List.nodup_cons.mp (List.nodup_cons.mp hcons).2).2
+  have hrnd : ((flatBandAlphaSpinList K s).take p.val
+      ++ (flatBandAlphaSpinList K s).drop (p.val + 2)).Nodup :=
+    List.nodup_append.mpr ⟨htnd, hdnd, fun x hx y hy =>
+      hdisj x hx y (List.mem_cons_of_mem _ (List.mem_cons_of_mem _ hy))⟩
+  have ha_rest : (Sum.inl p.castSucc, s p.castSucc) ∉
+      (flatBandAlphaSpinList K s).take p.val ++ (flatBandAlphaSpinList K s).drop (p.val + 2) := by
+    rw [List.mem_append, not_or]
+    exact ⟨fun h => hdisj _ h _ List.mem_cons_self rfl,
+      fun h => (List.nodup_cons.mp hcons).1 (List.mem_cons_of_mem _ h)⟩
+  have hb_rest : (Sum.inl p.succ, s p.succ) ∉
+      (flatBandAlphaSpinList K s).take p.val ++ (flatBandAlphaSpinList K s).drop (p.val + 2) := by
+    rw [List.mem_append, not_or]
+    exact ⟨fun h => hdisj _ h _ (List.mem_cons_of_mem _ List.mem_cons_self) rfl,
+      fun h => (List.nodup_cons.mp (List.nodup_cons.mp hcons).2).1 h⟩
+  apply List.perm_of_nodup_nodup_toFinset_eq hrnd (Finset.nodup_toList _)
+  rw [Finset.toList_toFinset, occFinset_alphaTwoHoleOcc_eq, ← flatBand_succ_eq_castSucc_add_one p]
+  ext x
+  rw [List.mem_toFinset, Finset.mem_erase, Finset.mem_erase]
+  constructor
+  · intro hx
+    refine ⟨fun he => hb_rest (he ▸ hx), fun he => ha_rest (he ▸ hx), ?_⟩
+    rw [← flatBandAlphaSpinList_toFinset, List.mem_toFinset, flatBandAlphaSpinList_split_adj s p]
+    rcases List.mem_append.mp hx with h | h
+    · exact List.mem_append.mpr (Or.inl h)
+    · exact List.mem_append.mpr (Or.inr (List.mem_cons_of_mem _ (List.mem_cons_of_mem _ h)))
+  · rintro ⟨hxb, hxa, hxocc⟩
+    rw [← flatBandAlphaSpinList_toFinset, List.mem_toFinset, flatBandAlphaSpinList_split_adj s p]
+      at hxocc
+    rcases List.mem_append.mp hxocc with h | h
+    · exact List.mem_append.mpr (Or.inl h)
+    · rcases List.mem_cons.mp h with rfl | h'
+      · exact absurd rfl hxa
+      · rcases List.mem_cons.mp h' with rfl | h''
+        · exact absurd rfl hxb
+        · exact List.mem_append.mpr (Or.inr h'')
+
 /-- **No orbital double occupancy in the half-filled ground subspace.**  A β-free occupation config
 `g` that doubly occupies an orbital `q₀` has vanishing ground-state coordinate.  Reading the
 `(q₀`-pair-erased) coordinate of `0 = ĉ_{ext(q₀)↓} ĉ_{ext(q₀)↑} v` isolates exactly the `g` term
