@@ -6097,6 +6097,43 @@ factorisation of the non-orthogonal $\{\alpha\}\cup\{\beta\}$ basis and the
 symmetric-tensor/SU(2) classification. The existence half does \emph{not} depend on
 this axiom.
 
+\medskip
+\noindent\textbf{Dimension-route reduction of the classification axiom (Issue
+\#4346, \texttt{TasakiFlatBandClassification.lean}).}  Toward discharging the axiom,
+the uniqueness $\leq$ half is reduced to a sharp finite-dimensional linear-algebra
+statement, following the dimension method of Theorem 11.26 rather than an explicit
+symmetric-tensor construction. The multiplet has the expected dimension
+$\operatorname{finrank}\texttt{flatBandFerromagneticMultipletSubmodule}=K+2$
+(\texttt{flatBandFerromagneticMultipletSubmodule\_finrank}, from linear independence
+of the $K+2$ lowered states). The total $\hat S^z_{\rm tot}$ commutes with $\hat
+H_{\rm flat}$ (\texttt{fermionTotalSpinZ\_commute\_flatBandHamiltonian}): from
+$[\hat S^\pm_{\rm tot},\hat H]=0$ and the $\mathfrak{su}(2)$ relation $\hat
+S^+\hat S^- - \hat S^-\hat S^+ = 2\hat S^z$, the operator $2\hat S^z$ commutes with
+$\hat H$, hence so does $\hat S^z$; together with $[\hat S^z,\hat N]=0$ this makes
+$\hat S^z$ preserve the ground subspace $G$. Because $\hat S^z$ acts diagonally with
+half-integer weights $a-(K+1)/2$ ($a$ the up-count), and a ground vector lives in
+the $\hat N=K+1$ shell where only the $K+2$ weights $a-(K+1)/2$ ($a\in\{0,\dots,K+1\}$)
+occur, $G$ decomposes as the finite supremum
+\[
+  G = \bigsqcup_{a\in\mathrm{Fin}(K+2)}
+        G \sqcap \mathrm{eigenspace}\bigl(\hat S^z,\ a-\tfrac{K+1}{2}\bigr)
+\]
+(\texttt{flatBandHalfFilledGroundSubmodule\_eq\_iSup\_weight}; off-weight blocks are
+$\bot$ by the diagonal support argument). Since distinct eigenspaces are independent,
+the blocks form an internal direct sum, so $\operatorname{finrank}G=\sum_a
+\operatorname{finrank}(\text{block}_a)$. Hence \emph{if} each $\hat S^z$-weight block
+is at most one-dimensional, then $\operatorname{finrank}G\leq K+2$
+(\texttt{Math/EigenspaceWeightFinrank.lean},
+\texttt{finrank\_le\_of\_weight\_blocks}); combined with the proven inclusion
+$\texttt{multiplet}\leq G$
+(\texttt{flatBandFerromagneticMultipletSubmodule\_le\_groundSubmodule}) and
+$\operatorname{finrank}\texttt{multiplet}=K+2$, the dimension comparison
+\texttt{Submodule.eq\_of\_le\_of\_finrank\_le} forces $G=\texttt{multiplet}$
+(\texttt{flatBand\_groundSubmodule\_eq\_multipletSpan\_of\_blocks}). This isolates the
+entire remaining content of the classification axiom into the single sharp statement
+``each $\hat S^z$-weight block of $G$ is $\leq 1$-dimensional'' (the symmetric /
+maximal-spin core); proving it and removing the axiom are subsequent steps.
+
 %======================================================================
 \subsection{Mielke's flat-band ferromagnetism: the model (Tasaki §11.3.2)}
 %======================================================================
