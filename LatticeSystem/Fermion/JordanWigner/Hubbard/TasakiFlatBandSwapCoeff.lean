@@ -317,4 +317,32 @@ theorem occFinset_alphaTwoHoleOcc_eq (K : ℕ) (s : Fin (K + 1) → Fin 2) (p : 
     simp only [flatBandAlphaTwoHoleOcc]
     rw [if_neg hcond, flatBandAlphaSpinOcc_inl, if_pos rfl]
 
+/-- The canonical orbital-ordered list of occupied modes of an `α`-spin config:
+`[(inl 0, s 0), (inl 1, s 1), …, (inl K, s K)]`. -/
+def flatBandAlphaSpinList (K : ℕ) (s : Fin (K + 1) → Fin 2) :
+    List ((Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2) :=
+  List.ofFn (fun q : Fin (K + 1) => (Sum.inl q, s q))
+
+/-- **The canonical list splits with the adjacent overlapping pair `p, p+1` exposed.**  For
+`p : Fin K` the orbitals `p` and `p+1` sit at consecutive positions `p, p+1` (no cycle wrap), so the
+list is `take p ++ (inl p, s p) :: (inl(p+1), s(p+1)) :: drop (p+2)`. -/
+theorem flatBandAlphaSpinList_split_adj (s : Fin (K + 1) → Fin 2) (p : Fin K) :
+    flatBandAlphaSpinList K s =
+      (flatBandAlphaSpinList K s).take p.val ++
+        (Sum.inl p.castSucc, s p.castSucc) :: (Sum.inl p.succ, s p.succ) ::
+        (flatBandAlphaSpinList K s).drop (p.val + 2) := by
+  have hlen : (flatBandAlphaSpinList K s).length = K + 1 := List.length_ofFn
+  have h1 : p.val < (flatBandAlphaSpinList K s).length := by rw [hlen]; omega
+  have h2 : p.val + 1 < (flatBandAlphaSpinList K s).length := by rw [hlen]; omega
+  have hc1 : (⟨p.val, by omega⟩ : Fin (K + 1)) = p.castSucc := Fin.ext rfl
+  have hc2 : (⟨p.val + 1, by omega⟩ : Fin (K + 1)) = p.succ := Fin.ext rfl
+  have e1 : (flatBandAlphaSpinList K s)[p.val]'h1 = (Sum.inl p.castSucc, s p.castSucc) := by
+    simp only [flatBandAlphaSpinList, List.getElem_ofFn]
+    rw [hc1]
+  have e2 : (flatBandAlphaSpinList K s)[p.val + 1]'h2 = (Sum.inl p.succ, s p.succ) := by
+    simp only [flatBandAlphaSpinList, List.getElem_ofFn]
+    rw [hc2]
+  conv_lhs => rw [← List.take_append_drop p.val (flatBandAlphaSpinList K s)]
+  rw [List.drop_eq_getElem_cons h1, List.drop_eq_getElem_cons h2, e1, e2]
+
 end LatticeSystem.Fermion
