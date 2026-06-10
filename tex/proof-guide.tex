@@ -7707,15 +7707,23 @@ the variational $|w|$-argument (eq.~(A.4.1)): for any eigenpair $(\lambda,w)$, $
 entrywise, and pairing with $v>0$ gives $c-\mu\ge c-\lambda$.  Proved (axiom-free,
 \texttt{Math/PerronFrobeniusSymmetric.lean}).
 
-\medskip\noindent\textbf{Theorems A.19 (polar) and A.20 (SVD).}  Any square complex matrix
+\medskip\noindent\textbf{Theorems A.19 (polar) and A.20 (SVD), proved.}  Any square complex matrix
 $A$ admits the polar decomposition $A=WC$ with $W$ unitary and $C$ positive-semidefinite
 (\texttt{matrix\_polar\_decomposition}, eq.~(A.4.2)) and the singular value decomposition
 $A=UDV^\dagger$ with $U,V$ unitary and $D=\operatorname{diagonal}d$ ($d_i\ge0$) the diagonal of
 $\sqrt{\lambda_i}$, the $\lambda_i\ge0$ being the eigenvalues of $A^\dagger A$
 (\texttt{matrix\_singular\_value\_decomposition}, eqs.~(A.4.3)--(A.4.6)).  \texttt{mathlib} provides
-the singular \emph{values} of a linear map but not the constructive matrix factorizations, so both
-are recorded as documented axioms (statements kept in book order;
-\texttt{Math/MatrixAnalysis/Decomposition.lean}).
+the singular \emph{values} of a linear map but not the matrix factorizations, so these are
+\textbf{constructed here (axiom-free)}.  The SVD is built from the spectral theorem of
+$M=A^\dagger A$ (\texttt{Matrix.IsHermitian.eigenvectorUnitary} gives $V$, eigenvalues
+$\lambda_i\ge0$ by \texttt{PosSemidef.eigenvalues\_nonneg}): the images $w_i=A v_i$ are orthogonal
+with $\lVert w_i\rVert^2=\lambda_i$ (proved via the matrix adjoint of \texttt{toEuclideanLin}), so the
+normalised $u_i=d_i^{-1}w_i$ ($d_i=\sqrt{\lambda_i}$, $\lambda_i\ne0$) are orthonormal and extend to a
+full orthonormal basis (\texttt{Orthonormal.exists\_orthonormalBasis\_extension\_of\_card\_eq})
+forming $U$; then $A V=U D$ columnwise (for $\lambda_i=0$, $w_i=0$ and $d_i=0$), hence $A=UDV^\dagger$.
+The polar decomposition follows with $W=UV^\dagger$ and $C=VDV^\dagger$ (positive-semidefinite by
+\texttt{PosSemidef.mul\_mul\_conjTranspose\_same}).  In
+\texttt{Math/MatrixAnalysis/Decomposition.lean}.
 
 \medskip\noindent\textbf{Theorems A.21 and A.22 (Wigner's theorem).}  Over a
 finite-dimensional Hilbert space $H=$ \texttt{Fin\,D}$\to\mathbb C$ (operators $M(H)=$
@@ -7756,10 +7764,11 @@ its GNS space; recorded as a documented axiom (the construction is in \texttt{ma
 
 \medskip\noindent\textbf{Appendix A: status and axiomatization policy.}  Tasaki's Appendix A is
 fully formalized in book order (A.1--A.28).  The linear-algebra and angular-momentum core that
-\texttt{mathlib} supports is proved axiom-free: A.4--A.6, A.9--A.11, A.13--A.18 (including the
-simultaneous-diagonalization step of A.17 and Perron--Frobenius for a real symmetric matrix A.18).
-The remaining items---A.1, A.7/A.8, A.12, A.19/A.20, and the operator-algebraic A.21--A.28 (Wigner,
-states, Banach--Alaoglu, ground states, GNS)---are recorded as faithful documented axioms.  These
+\texttt{mathlib} supports is proved axiom-free: A.4--A.6, A.9--A.11, A.13--A.20 (including the
+simultaneous-diagonalization step of A.17, Perron--Frobenius for a real symmetric matrix A.18, and the
+polar / singular-value decompositions A.19/A.20).  The remaining items---A.1, A.7/A.8, A.12, and the
+operator-algebraic A.21--A.28 (Wigner, states, Banach--Alaoglu, ground states, GNS)---are recorded as
+faithful documented axioms.  These
 axioms are \emph{not} active proof targets here: the heavy functional-analytic and operator-algebraic
 theory has its natural home in a dedicated operator-algebra development (possibly contributed to
 \texttt{mathlib}), and the axioms wait for that implementation.  The project's policy is to
