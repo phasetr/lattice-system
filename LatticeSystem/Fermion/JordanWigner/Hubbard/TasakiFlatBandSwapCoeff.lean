@@ -1218,4 +1218,46 @@ theorem flatBand_no_adj_inv_eq (s s' : Fin (K + 1) → Fin 2)
     · exact absurd (key s' s hs' hs hc.symm q h1') (by rw [h0]; decide)
   · rw [h1, key s s' hs hs' hc q h1]
 
+/-- Split a sum over `Fin (K+1)` off the two adjacent pair positions `k, k+1`. -/
+theorem flatBand_sum_split_pair (k : Fin K) (g : Fin (K + 1) → ℕ) :
+    ∑ q, g q = g k.castSucc + g k.succ
+      + ∑ q ∈ (Finset.univ.erase k.castSucc).erase k.succ, g q := by
+  have hne : k.castSucc ≠ k.succ := by
+    intro h; have := congrArg Fin.val h; rw [Fin.val_succ, Fin.val_castSucc] at this; omega
+  rw [← Finset.add_sum_erase _ g (Finset.mem_univ k.castSucc),
+    ← Finset.add_sum_erase _ g (Finset.mem_erase.mpr ⟨hne.symm, Finset.mem_univ k.succ⟩),
+    ← add_assoc]
+
+/-- **An adjacent `(1,0) → (0,1)` swap preserves the up-count and raises the weight by one.** -/
+theorem flatBand_adjSwap_weight_upCount (s' : Fin (K + 1) → Fin 2) (k : Fin K)
+    (h1 : s' k.castSucc = 1) (h0 : s' k.succ = 0) :
+    (∑ q, (Function.update (Function.update s' k.castSucc 0) k.succ 1 q).val
+        = ∑ q, (s' q).val) ∧
+      (∑ q, q.val * (Function.update (Function.update s' k.castSucc 0) k.succ 1 q).val
+        = (∑ q, q.val * (s' q).val) + 1) := by
+  have hne : k.castSucc ≠ k.succ := by
+    intro h; have := congrArg Fin.val h; rw [Fin.val_succ, Fin.val_castSucc] at this; omega
+  set G := Function.update (Function.update s' k.castSucc 0) k.succ 1 with hG
+  have hGksc : G k.succ = 1 := Function.update_self _ _ _
+  have hGkcs : G k.castSucc = 0 := by rw [hG, Function.update_of_ne hne, Function.update_self]
+  have hGoff : ∀ q, q ≠ k.castSucc → q ≠ k.succ → G q = s' q := fun q hq0 hq1 => by
+    rw [hG, Function.update_of_ne hq1, Function.update_of_ne hq0]
+  have hrest : ∀ (g : Fin 2 → ℕ → ℕ),
+      (∑ q ∈ (Finset.univ.erase k.castSucc).erase k.succ, g (G q) q.val)
+        = ∑ q ∈ (Finset.univ.erase k.castSucc).erase k.succ, g (s' q) q.val := by
+    intro g
+    refine Finset.sum_congr rfl (fun q hq => ?_)
+    rw [Finset.mem_erase, Finset.mem_erase] at hq
+    rw [hGoff q hq.2.1 hq.1]
+  refine ⟨?_, ?_⟩
+  · rw [flatBand_sum_split_pair k (fun q => (G q).val),
+      flatBand_sum_split_pair k (fun q => (s' q).val), hGkcs, hGksc, h1, h0,
+      hrest (fun v _ => v.val)]
+    simp only [Fin.val_zero, Fin.val_one, Nat.zero_add, Nat.add_zero]
+  · rw [flatBand_sum_split_pair k (fun q => q.val * (G q).val),
+      flatBand_sum_split_pair k (fun q => q.val * (s' q).val), hGkcs, hGksc, h1, h0,
+      hrest (fun v n => n * v.val)]
+    simp only [Fin.val_zero, Fin.val_one, mul_zero, mul_one, Fin.val_succ, Fin.val_castSucc]
+    ring
+
 end LatticeSystem.Fermion
