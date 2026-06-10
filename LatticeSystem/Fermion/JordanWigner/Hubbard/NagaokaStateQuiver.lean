@@ -192,5 +192,23 @@ theorem StateReach.transposition (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → 
     rfl
   rwa [heq] at h
 
+/-- **Step B (length-4 loops): the 4-cycle hole motion 3-cycles three spins.**  Moving the hole
+around a length-4 loop `x → y → w → z → x` (distinct sites) returns it to `x` and cyclically
+permutes the spins `y → w → z → y` (i.e. site `y` receives `w`'s spin, `w` receives `z`'s, `z`
+receives `y`'s), leaving all other sites fixed.  This is the length-4 case of Tasaki's exchange
+mechanism. -/
+theorem holeSpinMove_four_cycle_val (N : ℕ) (x y w z : Fin (N + 1))
+    (hxy : x ≠ y) (hyw : y ≠ w) (hwz : w ≠ z) (hzx : z ≠ x) (hxw : x ≠ w) (hyz : y ≠ z)
+    (σ : HoleSpin N x) :
+    (holeSpinMove N z x (holeSpinMove N w z (holeSpinMove N y w (holeSpinMove N x y σ)))).val
+      = fun v => if v = y then σ.val w else if v = w then σ.val z
+          else if v = z then σ.val y else σ.val v := by
+  funext v
+  simp only [holeSpinMove, Function.update_apply]
+  by_cases hvx : v = x <;> by_cases hvy : v = y <;> by_cases hvw : v = w <;>
+      by_cases hvz : v = z <;>
+    simp_all [hxy, hyw, hwz, hzx, hxw, hyz, hxy.symm, hyw.symm, hwz.symm, hzx.symm,
+      hxw.symm, hyz.symm, σ.2]
+
 end LatticeSystem.Fermion
 
