@@ -611,12 +611,13 @@ exchange-bond condition E2 — connectedness of `Λ ∖ {y, z}` — provides).  
 the hole at `p`) unchanged.  The hole is routed to the triangle without disturbing `y, z`, the spins
 at `y, z` are swapped by circling the triangle (`transposition_of_triangle`), and the reversed walk
 restores all other spins (`holeWalkTransport_reverse` + `holeWalkTransport_val_congr`). -/
-theorem StateReach.swap_via_triangle_walk (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+theorem StateReach.swap_via_landing_walk (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
     (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
-    {a y z p : Fin (N + 1)} (hay : (nagaokaBondGraph N t).Adj a y)
-    (hyz : (nagaokaBondGraph N t).Adj y z) (hza : (nagaokaBondGraph N t).Adj z a)
+    {a y z p : Fin (N + 1)} (hay_ne : a ≠ y) (hza_ne : a ≠ z)
     (W : (nagaokaBondGraph N t).Walk p a) (hyW : y ∉ W.support) (hzW : z ∉ W.support)
-    (σ : HoleSpin N p) :
+    (σ : HoleSpin N p)
+    (rmid : StateReach N t ⟨a, holeWalkTransport N W σ⟩
+      ⟨a, swapHoleSpin N a y z hay_ne hza_ne (holeWalkTransport N W σ)⟩) :
     StateReach N t ⟨p, σ⟩
       ⟨p, swapHoleSpin N p y z
         (fun h => hyW (h ▸ W.start_mem_support)) (fun h => hzW (h ▸ W.start_mem_support)) σ⟩ := by
@@ -626,11 +627,10 @@ theorem StateReach.swap_via_triangle_walk (N : ℕ) (t : Fin (N + 1) → Fin (N 
   have hzWr : z ∉ W.reverse.support := by
     rw [SimpleGraph.Walk.support_reverse]; simpa using hzW
   set σa := holeWalkTransport N W σ with hσa
-  set C := swapHoleSpin N a y z hay.ne hza.ne.symm σa with hC
-  -- the three legs: hole p→a, triangle swap at a, hole a→p
+  set C := swapHoleSpin N a y z hay_ne hza_ne σa with hC
+  -- the three legs: hole p→a, the landing swap at a, hole a→p
   have r1 : StateReach N t ⟨p, σ⟩ ⟨a, σa⟩ := StateReach.ofBondWalk N t htsym htdiag hpos W σ
-  have r2 : StateReach N t ⟨a, σa⟩ ⟨a, C⟩ :=
-    StateReach.transposition_of_triangle N t htsym htdiag hpos hay hyz hza σa
+  have r2 : StateReach N t ⟨a, σa⟩ ⟨a, C⟩ := rmid
   have r3 : StateReach N t ⟨a, C⟩ ⟨p, holeWalkTransport N W.reverse C⟩ :=
     StateReach.ofBondWalk N t htsym htdiag hpos W.reverse C
   -- σa agrees with σ at y and z (the walk avoids them)
@@ -668,6 +668,21 @@ theorem StateReach.swap_via_triangle_walk (N : ℕ) (t : Fin (N + 1) → Fin (N 
               (fun h => hsW (by rw [SimpleGraph.Walk.support_reverse]; simpa using h))]
   rw [← hnet]
   exact (r1.trans r2).trans r3
+
+/-- **The 15-puzzle exchange (length-3 loop): an exchange via a triangle from any hole position.**
+The triangle `{a, y, z}` instance of `swap_via_landing_walk`, where the landing swap is one trip
+around the triangle (`transposition_of_triangle`). -/
+theorem StateReach.swap_via_triangle_walk (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {a y z p : Fin (N + 1)} (hay : (nagaokaBondGraph N t).Adj a y)
+    (hyz : (nagaokaBondGraph N t).Adj y z) (hza : (nagaokaBondGraph N t).Adj z a)
+    (W : (nagaokaBondGraph N t).Walk p a) (hyW : y ∉ W.support) (hzW : z ∉ W.support)
+    (σ : HoleSpin N p) :
+    StateReach N t ⟨p, σ⟩
+      ⟨p, swapHoleSpin N p y z
+        (fun h => hyW (h ▸ W.start_mem_support)) (fun h => hzW (h ▸ W.start_mem_support)) σ⟩ :=
+  StateReach.swap_via_landing_walk N t htsym htdiag hpos hay.ne hza.ne.symm W hyW hzW σ
+    (StateReach.transposition_of_triangle N t htsym htdiag hpos hay hyz hza _)
 
 /-- The inclusion `G.induce s →g G` sending a vertex of the induced subgraph to the underlying
 vertex.  (Induced adjacency is just the ambient adjacency restricted to `s`.) -/
