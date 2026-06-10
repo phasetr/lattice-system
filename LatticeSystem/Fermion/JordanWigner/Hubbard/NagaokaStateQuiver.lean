@@ -145,5 +145,19 @@ theorem holeSpinMove_three_cycle_val (N : ℕ) (x y z : Fin (N + 1))
   by_cases hwx : w = x <;> by_cases hwy : w = y <;> by_cases hwz : w = z <;>
     simp_all [hxy, hyz, hzx, hxy.symm, hyz.symm, hzx.symm, σ.2]
 
+/-- **Step B: a 3-cycle of bonds gives reachability to the spin-transposed state.**  If `x, y, z`
+form a triangle of bonds (`0 < t` on each edge), the hole can travel `x → y → z → x`, returning to
+`x` with the spins at `y` and `z` swapped — so `(x, σ)` reaches `(x, σ')` with `σ'` the `(y z)`
+spin transposition of `σ` (same magnetization sector). -/
+theorem StateReach.threeCycle (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (x y z : Fin (N + 1))
+    (hxy : x ≠ y) (hyz : y ≠ z) (hzx : z ≠ x)
+    (hbxy : 0 < t x y) (hbyz : 0 < t y z) (hbzx : 0 < t z x) (σ : HoleSpin N x) :
+    StateReach N t ⟨x, σ⟩
+      ⟨x, holeSpinMove N z x (holeSpinMove N y z (holeSpinMove N x y σ))⟩ :=
+  (StateReach.holeHop N t htsym htdiag x y σ hxy hbxy).trans
+    ((StateReach.holeHop N t htsym htdiag y z _ hyz hbyz).trans
+      (StateReach.holeHop N t htsym htdiag z x _ hzx hbzx))
+
 end LatticeSystem.Fermion
 
