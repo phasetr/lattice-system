@@ -4,6 +4,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandTheorem11_11
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJGroundWeightDirectSum
 import LatticeSystem.Fermion.JordanWigner.Hubbard.Charges
 import LatticeSystem.Math.EigenspaceWeightFinrank
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandSwapCoeff
 
 /-!
 # Tasaki §11.3.1: discharging the Theorem 11.11 classification axiom (dimension route)
@@ -196,5 +197,15 @@ theorem flatBand_groundSubmodule_eq_multipletSpan_of_blocks (K : ℕ) (ν t U : 
     (flatBandFerromagneticMultipletSubmodule_le_groundSubmodule K ν t U) ?_).symm
   rw [flatBandFerromagneticMultipletSubmodule_finrank K ν]
   exact flatBandHalfFilledGroundSubmodule_finrank_le_of_blocks K ν t U hblock
+
+/-- **Tasaki Theorem 11.11 (uniqueness side, axiom-free).**  The half-filled zero-energy ground
+subspace equals the ferromagnetic multiplet span.  Discharges the classification: every weight block
+is one-dimensional (`flatBand_block_finrank_le_one`, the swap-invariant coordinate argument), so the
+ground subspace has dimension `≤ K+2 = dim` of the multiplet, and the multiplet is contained in it. -/
+theorem flatBand_groundSubmodule_eq_multipletSpan (K : ℕ) (ν t U : ℝ)
+    (hν : 0 < ν) (ht : 0 < t) (hU : 0 < U) :
+    flatBandHalfFilledGroundSubmodule K ν t U = flatBandFerromagneticMultipletSubmodule K ν :=
+  flatBand_groundSubmodule_eq_multipletSpan_of_blocks K ν t U
+    (fun a => flatBand_block_finrank_le_one K ν t U hν ht hU a)
 
 end LatticeSystem.Fermion
