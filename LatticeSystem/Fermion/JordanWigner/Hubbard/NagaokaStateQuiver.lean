@@ -363,5 +363,18 @@ theorem StateReach.exists_ofBondWalk (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) 
     obtain ⟨τ, hτ⟩ := ih (holeSpinMove N u v σ)
     exact ⟨τ, e1.trans hτ⟩
 
+/-- **Step C (hole relocation): the hole can be moved to any bond-graph-reachable site.**  If site
+`x₀` is reachable from the hole position `x` in the bond graph, then `(x, σ)` reaches some state with
+the hole at `x₀`.  Specialising `StateReach.exists_ofBondWalk` to a `Reachable` hypothesis, this lets
+one reduce sector connectivity to connectivity among states with a *fixed* hole position (where only
+the spin configuration varies). -/
+theorem StateReach.exists_hole_at (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {x : Fin (N + 1)} (σ : HoleSpin N x) (x₀ : Fin (N + 1))
+    (h : (nagaokaBondGraph N t).Reachable x x₀) :
+    ∃ τ : HoleSpin N x₀, StateReach N t ⟨x, σ⟩ ⟨x₀, τ⟩ := by
+  obtain ⟨W⟩ := h
+  exact StateReach.exists_ofBondWalk N t htsym htdiag hpos W σ
+
 end LatticeSystem.Fermion
 
