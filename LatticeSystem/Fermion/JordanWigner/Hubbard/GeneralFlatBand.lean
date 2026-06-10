@@ -57,6 +57,69 @@ band (zero-energy space of the hopping matrix `T`). -/
 noncomputable def generalFlatBandDim : ℕ :=
   Module.finrank ℂ (generalFlatBandKernel T)
 
+/-- A vector lies in the flat band `h₀ = ker T` iff `T` annihilates it as a plain `mulVec`
+(the `EuclideanSpace`/`L²` wrapping is transparent). -/
+theorem generalFlatBand_mem_kernel_iff (v : EuclideanSpace ℂ (Fin (M + 1))) :
+    v ∈ generalFlatBandKernel T ↔ T.mulVec (WithLp.ofLp v) = 0 := by
+  rw [generalFlatBandKernel, LinearMap.mem_ker, Matrix.toLpLin_apply]
+  constructor
+  · intro h; have := congrArg WithLp.ofLp h; simpa using this
+  · intro h; rw [h]; rfl
+
+/-- The coordinate evaluations separate the flat band: a flat-band vector whose every coordinate
+vanishes is zero.  (The input to the dual-extraction step of Lemma 11.16's special basis.) -/
+theorem generalFlatBand_kernel_coord_separating {w : ↥(generalFlatBandKernel T)}
+    (h : ∀ x, WithLp.ofLp (w : EuclideanSpace ℂ (Fin (M + 1))) x = 0) : w = 0 := by
+  apply Subtype.ext
+  apply WithLp.ofLp_injective
+  funext x
+  simpa using h x
+
+/-- **The coordinate functionals span the dual of the flat band.**  Restricting each coordinate
+evaluation `EuclideanSpace.projₗ x` to `h₀ = ker T` gives a spanning family (they separate
+points, and `h₀` is finite-dimensional, hence reflexive).  This lets a basis subset — the index set
+`I` of Lemma 11.16 — be extracted from them. -/
+theorem generalFlatBand_coord_span :
+    Submodule.span ℂ (Set.range (fun x : Fin (M + 1) =>
+      (EuclideanSpace.projₗ x).comp (generalFlatBandKernel T).subtype)) = ⊤ := by
+  apply Submodule.span_eq_top_of_ne_zero
+  intro w hw
+  by_contra hcon
+  simp only [not_exists, not_and, not_not] at hcon
+  apply hw
+  apply generalFlatBand_kernel_coord_separating (w := w)
+  intro x
+  simpa using hcon _ ⟨x, rfl⟩
+
+/-- **The index set `I` of Lemma 11.16.**  A subset of sites carrying `D₀` coordinate functionals
+that form a basis of the flat band's dual (extracted from the spanning family); its cardinality is
+the flat-band dimension. -/
+theorem generalFlatBand_exists_special_index :
+    ∃ I : Finset (Fin (M + 1)), I.card = generalFlatBandDim T ∧
+      LinearIndepOn ℂ (fun x : Fin (M + 1) =>
+          (EuclideanSpace.projₗ x).comp (generalFlatBandKernel T).subtype) (I : Set (Fin (M + 1))) ∧
+      Submodule.span ℂ ((fun x : Fin (M + 1) =>
+          (EuclideanSpace.projₗ x).comp (generalFlatBandKernel T).subtype) ''
+            (I : Set (Fin (M + 1)))) = ⊤ := by
+  classical
+  set fc : Fin (M + 1) → Module.Dual ℂ ↥(generalFlatBandKernel T) :=
+    fun x => (EuclideanSpace.projₗ x).comp (generalFlatBandKernel T).subtype with hfc
+  obtain ⟨b, -, -, hsub, hli⟩ := exists_linearIndepOn_extension (v := fc)
+    (linearIndepOn_empty ℂ fc) (Set.empty_subset Set.univ)
+  have hspan : Submodule.span ℂ (fc '' b) = ⊤ := by
+    rw [eq_top_iff, ← generalFlatBand_coord_span T, Submodule.span_le]
+    rintro _ ⟨x, rfl⟩
+    exact hsub ⟨x, Set.mem_univ x, rfl⟩
+  have hbfin : b.Finite := Set.toFinite b
+  have hcard : hbfin.toFinset.card = generalFlatBandDim T := by
+    have hbasis : Module.Basis ↥b ℂ (Module.Dual ℂ ↥(generalFlatBandKernel T)) :=
+      Module.Basis.mk hli (by rw [← Set.image_eq_range]; exact hspan.ge)
+    rw [← Set.ncard_eq_toFinset_card b hbfin, ← Nat.card_coe_set_eq,
+      ← Module.finrank_eq_nat_card_basis hbasis, Subspace.dual_finrank_eq, generalFlatBandDim]
+  refine ⟨hbfin.toFinset, hcard, ?_, ?_⟩
+  · rwa [Set.Finite.coe_toFinset]
+  · rwa [Set.Finite.coe_toFinset]
+
 /-- **The projection matrix `P₀`** onto the flat band `h₀ = ker T` (Tasaki §11.3.4):
 the matrix, in the standard orthonormal basis, of the self-adjoint orthogonal
 projection onto `ker T`. -/
@@ -129,13 +192,99 @@ def IsGeneralFlatBandSpecialBasis (I : Finset (Fin (M + 1)))
     (∀ z ∈ I, μ z z ≠ 0) ∧
     (∀ z ∈ I, ∀ z' ∈ I, z ≠ z' → μ z z' = 0)
 
-/-- **Lemma 11.16 (special basis of a flat band), AXIOM.**  For a Hermitian
+/-- **Lemma 11.16 (special basis of a flat band).**  For a Hermitian
 positive-semidefinite `T`, the flat band `ker T` admits an index set `I` (`|I| = D₀`)
-and a basis `{μ_z}` localised at the indices.  Tasaki proves this by elementary
-determinantal-rank linear algebra; recorded as a documented axiom (to be discharged). -/
-axiom generalFlatBand_lemma_11_16 (hT : T.PosSemidef) :
+and a basis `{μ_z}` localised at the indices (`μ_z(z) ≠ 0`, `μ_z(z') = 0` for `z' ≠ z`).
+
+Discharged here by elementary linear algebra: the coordinate functionals
+`(EuclideanSpace.projₗ x)|_{ker T}` separate points of the finite-dimensional `ker T`, so
+a `D₀`-element subset `I` of them is a basis of the dual `(ker T)*`
+(`generalFlatBand_exists_special_index`).  The *predual* basis — obtained via reflexivity
+from the dual basis of that dual basis — is the localised special basis `{μ_z}`: the
+biorthogonality `fc_x(μ_z) = δ_{xz}` (`Module.Basis.dualBasis_apply_self` after
+`Module.apply_evalEquiv_symm_apply`) gives both localisation `μ_z(x) = δ_{xz}` on `I` and
+linear independence, while membership in `ker T` gives `T.mulVec (μ_z) = 0`.  Tasaki proves
+this by determinantal-rank linear algebra (§11.3.4). -/
+theorem generalFlatBand_lemma_11_16 (_hT : T.PosSemidef) :
     ∃ (I : Finset (Fin (M + 1))) (μ : Fin (M + 1) → Fin (M + 1) → ℂ),
-      IsGeneralFlatBandSpecialBasis T I μ
+      IsGeneralFlatBandSpecialBasis T I μ := by
+  classical
+  obtain ⟨I, hcard, hli, hsp⟩ := generalFlatBand_exists_special_index T
+  set fc : Fin (M + 1) → Module.Dual ℂ ↥(generalFlatBandKernel T) :=
+    fun x => (EuclideanSpace.projₗ x).comp (generalFlatBandKernel T).subtype with hfc
+  -- `I` indexes a basis of the dual `(ker T)*`
+  have hsp_top : ⊤ ≤ Submodule.span ℂ
+      (Set.range (fun x : ↥(I : Set (Fin (M + 1))) => fc x.1)) := by
+    rw [← Set.image_eq_range]; exact hsp.ge
+  set hbasis : Module.Basis ↥(I : Set (Fin (M + 1))) ℂ
+      (Module.Dual ℂ ↥(generalFlatBandKernel T)) :=
+    Module.Basis.mk hli hsp_top with hbasis_def
+  -- the predual (localised) basis of `ker T`, via reflexivity
+  set B : Module.Basis ↥(I : Set (Fin (M + 1))) ℂ ↥(generalFlatBandKernel T) :=
+    hbasis.dualBasis.map (Module.evalEquiv ℂ ↥(generalFlatBandKernel T)).symm with hB
+  -- the plain localised functions `μ_z : Fin (M+1) → ℂ`
+  set μ : Fin (M + 1) → Fin (M + 1) → ℂ := fun z =>
+    if hz : z ∈ I then
+      WithLp.ofLp ((B ⟨z, Finset.mem_coe.mpr hz⟩ : ↥(generalFlatBandKernel T)) :
+        EuclideanSpace ℂ (Fin (M + 1)))
+    else 0 with hμ
+  -- a coordinate functional reads off the corresponding coordinate
+  have hfc_apply : ∀ (x : Fin (M + 1)) (w : ↥(generalFlatBandKernel T)),
+      fc x w = WithLp.ofLp (w : EuclideanSpace ℂ (Fin (M + 1))) x := by
+    intro x w; simp [hfc]
+  -- biorthogonality `fc_x (B z) = δ_{xz}`
+  have hBval : ∀ (x z : ↥(I : Set (Fin (M + 1)))),
+      fc x.1 (B z) = if x = z then (1 : ℂ) else 0 := by
+    intro x z
+    rw [hB, Module.Basis.map_apply, Module.apply_evalEquiv_symm_apply,
+      show fc x.1 = hbasis x from by
+        rw [hbasis_def]; exact (Module.Basis.mk_apply hli hsp_top x).symm,
+      Module.Basis.dualBasis_apply_self]
+  -- coordinate values of the plain localised functions
+  have hmu_eval : ∀ (z x : Fin (M + 1)), z ∈ I → x ∈ I →
+      μ z x = if x = z then (1 : ℂ) else 0 := by
+    intro z x hz hx
+    have h1 : μ z x = fc x (B ⟨z, Finset.mem_coe.mpr hz⟩) := by
+      rw [hfc_apply]; simp only [hμ, dif_pos hz]
+    have h2 := hBval ⟨x, Finset.mem_coe.mpr hx⟩ ⟨z, Finset.mem_coe.mpr hz⟩
+    simp only [Subtype.mk.injEq] at h2
+    rw [h1, h2]
+  refine ⟨I, μ, hcard, ?_, ?_, ?_, ?_⟩
+  · -- `T.mulVec (μ z) = 0` : `μ z` is a flat-band vector
+    intro z hz
+    have hmem := (B ⟨z, Finset.mem_coe.mpr hz⟩ : ↥(generalFlatBandKernel T)).2
+    rw [generalFlatBand_mem_kernel_iff] at hmem
+    have heq : μ z = WithLp.ofLp ((B ⟨z, Finset.mem_coe.mpr hz⟩ :
+        ↥(generalFlatBandKernel T)) : EuclideanSpace ℂ (Fin (M + 1))) := by
+      simp only [hμ, dif_pos hz]
+    rw [heq]; exact hmem
+  · -- linear independence of `{μ_z}` from that of the basis `B`
+    set L : ↥(generalFlatBandKernel T) →ₗ[ℂ] (Fin (M + 1) → ℂ) :=
+      (WithLp.linearEquiv 2 ℂ (Fin (M + 1) → ℂ)).toLinearMap.comp
+        (generalFlatBandKernel T).subtype with hL
+    have hLinj : LinearMap.ker L = ⊥ := by
+      rw [LinearMap.ker_eq_bot]
+      intro a b hab
+      apply Subtype.ext
+      apply (WithLp.linearEquiv 2 ℂ (Fin (M + 1) → ℂ)).injective
+      exact hab
+    have hmapped := B.linearIndependent.map' L hLinj
+    have hfun : (⇑L ∘ ⇑B)
+        = (fun y : ↥(I : Set (Fin (M + 1))) => (μ y.1 : Fin (M + 1) → ℂ)) := by
+      funext y
+      rw [Function.comp_apply,
+        show μ y.1 = WithLp.ofLp ((B ⟨y.1, y.2⟩ : ↥(generalFlatBandKernel T)) :
+          EuclideanSpace ℂ (Fin (M + 1)))
+        from by simp only [hμ, dif_pos (Finset.mem_coe.mp y.2)]]
+      rfl
+    rw [hfun] at hmapped
+    exact hmapped
+  · -- `μ z z ≠ 0`
+    intro z hz
+    rw [hmu_eval z z hz hz]; simp
+  · -- `μ z z' = 0` for `z ≠ z'`
+    intro z hz z' hz' hne
+    rw [hmu_eval z z' hz hz', if_neg (fun h => hne h.symm)]
 
 /-- The **connectivity graph of a special basis** (Tasaki §11.3.4, before Theorem 11.17):
 two index sites `z, z'` are *directly connected* (`μ_z ∼ μ_{z'}`) iff they are distinct
