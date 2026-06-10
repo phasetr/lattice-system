@@ -66,6 +66,15 @@ theorem generalFlatBand_mem_kernel_iff (v : EuclideanSpace ℂ (Fin (M + 1))) :
   · intro h; have := congrArg WithLp.ofLp h; simpa using this
   · intro h; rw [h]; rfl
 
+/-- The coordinate evaluations separate the flat band: a flat-band vector whose every coordinate
+vanishes is zero.  (The input to the dual-extraction step of Lemma 11.16's special basis.) -/
+theorem generalFlatBand_kernel_coord_separating {w : ↥(generalFlatBandKernel T)}
+    (h : ∀ x, WithLp.ofLp (w : EuclideanSpace ℂ (Fin (M + 1))) x = 0) : w = 0 := by
+  apply Subtype.ext
+  apply WithLp.ofLp_injective
+  funext x
+  simpa using h x
+
 /-- **The projection matrix `P₀`** onto the flat band `h₀ = ker T` (Tasaki §11.3.4):
 the matrix, in the standard orthonormal basis, of the self-adjoint orthogonal
 projection onto `ker T`. -/
