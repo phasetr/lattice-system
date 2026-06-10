@@ -1319,4 +1319,41 @@ theorem flatBand_ground_repr_zero_of_upCount (K : ℕ) (ν t U : ℝ) (hν : 0 <
       rw [flatBand_no_adj_inv_eq s' rep hs'sort hrepsort (by rw [hcardval, hcardval, hc])]
       exact hrep0
 
+/-- The sorted representative α-config for a block: `m` leading down-spins, the rest up. -/
+def flatBandSortedRep (K m : ℕ) : Fin (K + 1) → Fin 2 := fun q => if q.val < m then 0 else 1
+
+/-- The sorted representative has no adjacent `(1,0)` inversion. -/
+theorem flatBandSortedRep_no_adj_inv (m : ℕ) : ∀ k : Fin K,
+    ¬((flatBandSortedRep K m) k.castSucc = 1 ∧ (flatBandSortedRep K m) k.succ = 0) := by
+  intro k ⟨h1, h0⟩
+  simp only [flatBandSortedRep, Fin.val_castSucc, Fin.val_succ] at h1 h0
+  by_cases hk : k.val < m
+  · rw [if_pos hk] at h1; exact absurd h1 (by decide)
+  · rw [if_neg hk] at h1
+    by_cases hk1 : k.val + 1 < m
+    · omega
+    · rw [if_neg hk1] at h0; exact absurd h0 (by decide)
+
+/-- Counting the up-spins of the sorted representative: `∑ (rep q).val = (K+1) − m`. -/
+theorem flatBandSortedRep_upCount (m : ℕ) :
+    ∑ q, ((flatBandSortedRep K m) q).val = (K + 1) - m := by
+  have hrange : ∀ (n : ℕ),
+      ∑ i ∈ Finset.range n, (if i < m then (0 : ℕ) else 1) = n - m := by
+    intro n
+    induction n with
+    | zero => simp
+    | succ p ih =>
+      rw [Finset.sum_range_succ, ih]
+      by_cases hp : p < m
+      · rw [if_pos hp]; omega
+      · rw [if_neg hp]; omega
+  calc ∑ q, ((flatBandSortedRep K m) q).val
+      = ∑ q : Fin (K + 1), (if q.val < m then (0 : ℕ) else 1) := by
+        refine Finset.sum_congr rfl (fun q _ => ?_)
+        simp only [flatBandSortedRep]
+        by_cases hq : q.val < m <;> simp [hq]
+    _ = ∑ i ∈ Finset.range (K + 1), (if i < m then (0 : ℕ) else 1) :=
+        (Fin.sum_univ_eq_sum_range (fun i => if i < m then (0 : ℕ) else 1) (K + 1))
+    _ = (K + 1) - m := hrange (K + 1)
+
 end LatticeSystem.Fermion
