@@ -6132,7 +6132,35 @@ $\operatorname{finrank}\texttt{multiplet}=K+2$, the dimension comparison
 (\texttt{flatBand\_groundSubmodule\_eq\_multipletSpan\_of\_blocks}). This isolates the
 entire remaining content of the classification axiom into the single sharp statement
 ``each $\hat S^z$-weight block of $G$ is $\leq 1$-dimensional'' (the symmetric /
-maximal-spin core); proving it and removing the axiom are subsequent steps.
+maximal-spin core).
+
+\smallskip\noindent\textbf{Discharge of the block bound and removal of the axiom
+(Issue \#4346, \texttt{TasakiFlatBandSwapCoeff.lean}).}  The block bound
+\texttt{flatBand\_block\_finrank\_le\_one} is proved by a Marshall-sign / swap-invariance
+argument on the occupation coordinates, in the rotated single-particle basis
+$\{\alpha_p\}\cup\{\beta_u\}$ (\texttt{flatBandOccBasis}, the full Fock basis indexed by
+occupation configurations). For a ground vector $v$ the local frustration-free conditions
+give $\hat b_{u,\sigma}v=0$ (no $\beta$-occupation) and $\hat c_{x\downarrow}\hat
+c_{x\uparrow}v=0$ at every physical site $x$ (no double occupancy, the Gram identity
+$\hat n_{x\uparrow}\hat n_{x\downarrow}=(\hat c_{x\downarrow}\hat
+c_{x\uparrow})^{\mathsf H}(\hat c_{x\downarrow}\hat c_{x\uparrow})$). Reading the
+two-hole coordinate of $0=\hat c_{\mathrm{int}(p)\downarrow}\hat
+c_{\mathrm{int}(p)\uparrow}v$ on the orbital-ordered canonical list (where the
+overlapping pair $p,p+1$ sits at adjacent positions, so moving it to the front carries
+the explicit Koszul sign $+1$) isolates exactly the two configurations $\alpha_s$ and its
+pair-spin-swap, giving $\operatorname{repr}(v,\alpha_s)=0\Leftrightarrow
+\operatorname{repr}(v,\alpha_{\mathrm{swap}})=0$
+(\texttt{flatBand\_ground\_repr\_alphaSpinOcc\_swap\_iff}). This coordinate-vanishing
+then propagates across every configuration of equal up-count (induction on the inversion
+weight, each adjacent $(1,0)\to(0,1)$ transposition preserving the up-count), so the
+coordinate functional at the sorted representative is injective on the block and
+$\operatorname{finrank}(\text{block})\leq 1$. Feeding this into
+\texttt{flatBand\_groundSubmodule\_eq\_multipletSpan\_of\_blocks} yields the
+\emph{axiom-free} equality \texttt{flatBand\_theorem\_11\_11\_groundSubmodule\_eq\_multipletSpan}
+(and the maximal-spin corollary), depending only on
+\texttt{propext}/\texttt{Classical.choice}/\texttt{Quot.sound}; the former classification
+axiom \texttt{flatBand\_zeroEnergy\_halfFilled\_mem\_ferromagneticMultipletSpan} is
+removed. Tasaki Theorem 11.11 is thus fully proved.
 
 %======================================================================
 \subsection{Mielke's flat-band ferromagnetism: the model (Tasaki §11.3.2)}
