@@ -376,5 +376,21 @@ theorem StateReach.exists_hole_at (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) →
   obtain ⟨W⟩ := h
   exact StateReach.exists_ofBondWalk N t htsym htdiag hpos W σ
 
+/-- **Step C (triangle transposition from graph adjacency).**  If `x, y, z` are mutually adjacent
+in the bond graph (a triangle of bonds), then with the hole at `x` the state `(x, σ)` reaches the
+state with the spins at `y` and `z` exchanged (`swapHoleSpin`).  This packages
+`StateReach.transposition` with `nagaokaBondGraph_adj_pos`, turning the graph-level triangle
+hypothesis (as produced by a length-3 cycle / exchange bond) directly into a reachable spin
+transposition. -/
+theorem StateReach.transposition_of_triangle (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {x y z : Fin (N + 1)} (hxy : (nagaokaBondGraph N t).Adj x y)
+    (hyz : (nagaokaBondGraph N t).Adj y z) (hzx : (nagaokaBondGraph N t).Adj z x)
+    (σ : HoleSpin N x) :
+    StateReach N t ⟨x, σ⟩ ⟨x, swapHoleSpin N x y z hxy.ne hzx.ne.symm σ⟩ :=
+  StateReach.transposition N t htsym htdiag x y z hxy.ne hyz.ne hzx.ne
+    (nagaokaBondGraph_adj_pos N t htsym hpos hxy) (nagaokaBondGraph_adj_pos N t htsym hpos hyz)
+    (nagaokaBondGraph_adj_pos N t htsym hpos hzx) σ
+
 end LatticeSystem.Fermion
 
