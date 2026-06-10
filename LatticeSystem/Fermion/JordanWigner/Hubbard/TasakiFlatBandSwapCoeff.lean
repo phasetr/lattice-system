@@ -1356,4 +1356,91 @@ theorem flatBandSortedRep_upCount (m : ℕ) :
         (Fin.sum_univ_eq_sum_range (fun i => if i < m then (0 : ℕ) else 1) (K + 1))
     _ = (K + 1) - m := hrange (K + 1)
 
+/-- The `Ŝ^z` weight of an α-config is `(K+1)/2` minus its up-count. -/
+theorem flatBand_alphaSpinCharge_eq (s : Fin (K + 1) → Fin 2) :
+    ∑ p, flatBandSpinCharge (s p) = ((K + 1 : ℕ) : ℂ) / 2 - ∑ p, ((s p).val : ℂ) := by
+  simp only [flatBandSpinCharge]
+  rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin]
+  push_cast
+  ring
+
+open Module in
+/-- **Each `Ŝ^z`-weight block of the half-filled ground subspace is at most one-dimensional.**  The
+coordinate functional at the sorted representative is injective: its kernel forces every occupation
+coordinate to vanish (off-sector ones by the support lemmas, the in-sector ones by the
+swap-invariant propagation), hence the vector is zero. -/
+theorem flatBand_block_finrank_le_one (K : ℕ) (ν t U : ℝ) (hν : 0 < ν) (ht : 0 < t) (hU : 0 < U)
+    (a : Fin (K + 2)) :
+    finrank ℂ ↥(flatBandHalfFilledGroundSubmodule K ν t U ⊓
+      Module.End.eigenspace (fermionTotalSpinZ (2 * K + 1)).mulVecLin
+        (((a : ℝ) - ((K + 1 : ℕ) : ℝ) / 2 : ℝ) : ℂ)) ≤ 1 := by
+  classical
+  set μ : ℂ := (((a : ℝ) - ((K + 1 : ℕ) : ℝ) / 2 : ℝ) : ℂ) with hμ
+  set B := flatBandHalfFilledGroundSubmodule K ν t U ⊓
+    Module.End.eigenspace (fermionTotalSpinZ (2 * K + 1)).mulVecLin μ with hB
+  set rep := flatBandSortedRep K a.val with hrep
+  have ha : a.val ≤ K + 1 := by have := a.isLt; omega
+  have hrepμ : ∑ p, flatBandSpinCharge (rep p) = μ := by
+    rw [flatBand_alphaSpinCharge_eq,
+      show (∑ p, ((rep p).val : ℂ)) = (((K + 1 - a.val : ℕ) : ℕ) : ℂ) from by
+        rw [show (∑ p, ((rep p).val : ℂ)) = ((∑ p, (rep p).val : ℕ) : ℂ) from by push_cast; rfl,
+          hrep, flatBandSortedRep_upCount],
+      hμ, Nat.cast_sub ha]
+    push_cast
+    ring
+  set Φ : ↥B →ₗ[ℂ] ℂ := (Finsupp.lapply (flatBandAlphaSpinOcc K rep)).comp
+    (((flatBandOccBasis K ν).repr.toLinearMap).comp B.subtype) with hΦ
+  have hinj : Function.Injective Φ := by
+    rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
+    intro w hw
+    have hw' : (flatBandOccBasis K ν).repr w.1 (flatBandAlphaSpinOcc K rep) = 0 := hw
+    have hwg : w.1 ∈ flatBandHalfFilledGroundSubmodule K ν t U := (Submodule.mem_inf.mp w.2).1
+    have hall : ∀ f, (flatBandOccBasis K ν).repr w.1 f = 0 := by
+      intro f
+      by_cases hcard : (occFinset f).card = K + 1
+      · by_cases hbf : ∀ q' ∈ occFinset f, ∃ r, q'.1 = Sum.inl r
+        · by_cases hnd : ∀ q : Fin (K + 1),
+              ¬((Sum.inl q, (0 : Fin 2)) ∈ occFinset f ∧ (Sum.inl q, (1 : Fin 2)) ∈ occFinset f)
+          · have hrecon := flatBand_occFinset_eq_alphaSpinOcc_of_betaFree_noDouble f hbf hnd hcard
+            set s' := fun q => if (Sum.inl q, (0 : Fin 2)) ∈ occFinset f then (0 : Fin 2) else 1
+              with hs'
+            have hfeq : f = flatBandAlphaSpinOcc K s' := config_eq_of_occFinset_eq f _ hrecon
+            by_cases hsc : (∑ q ∈ occFinset f, flatBandSpinCharge q.2) = μ
+            · have hscf : ∑ p, flatBandSpinCharge (s' p) = μ := by
+                rw [← occFinset_alphaSpinOcc_spinCharge_sum, ← hrecon, hsc]
+              have hcount : ∑ q, (s' q).val = ∑ q, (rep q).val := by
+                have h1 : ∑ p, flatBandSpinCharge (s' p) = ∑ p, flatBandSpinCharge (rep p) := by
+                  rw [hscf, hrepμ]
+                rw [flatBand_alphaSpinCharge_eq, flatBand_alphaSpinCharge_eq] at h1
+                have h2 := sub_right_inj.mp h1
+                exact_mod_cast h2
+              rw [hfeq]
+              exact flatBand_ground_repr_zero_of_upCount K ν t U hν ht hU hwg rep
+                (flatBandSortedRep_no_adj_inv a.val) hw' s' hcount
+            · exact flatBandOccBasis_repr_eq_zero_of_spinZ_ne t U μ w.2 hsc
+          · simp only [not_forall, not_not] at hnd
+            obtain ⟨q, hq0, hq1⟩ := hnd
+            exact flatBandOccBasis_repr_eq_zero_of_doubleOcc K ν t U ht hU hwg hbf hq0 hq1
+        · rw [not_forall] at hbf
+          obtain ⟨q', hq'⟩ := hbf
+          rw [Classical.not_imp, not_exists] at hq'
+          obtain ⟨hq'occ, hq'nr⟩ := hq'
+          obtain ⟨u, hu⟩ : ∃ u, q'.1 = Sum.inr u := by
+            cases hq1 : q'.1 with
+            | inl r => exact absurd hq1 (hq'nr r)
+            | inr u => exact ⟨u, rfl⟩
+          have hmem : (Sum.inr u, q'.2) ∈ occFinset f := by
+            rw [show (Sum.inr u, q'.2) = q' from Prod.ext hu.symm rfl]; exact hq'occ
+          exact flatBandOccBasis_repr_eq_zero_of_mem_BKernel u q'.2
+            (flatBand_groundState_mem_BKernelSubmodule K ν t U ht hU.le (by
+              rw [flatBandHalfFilledGroundSubmodule, Submodule.mem_inf] at hwg
+              obtain ⟨hker, _⟩ := hwg
+              rw [LinearMap.mem_ker, Matrix.mulVecLin_apply] at hker
+              unfold rayleighOnVec; rw [hker, dotProduct_zero, Complex.zero_re])) hmem
+      · exact flatBandOccBasis_repr_eq_zero_of_card_ne t U hwg hcard
+    have hw1 : w.1 = 0 := (flatBandOccBasis K ν).repr.map_eq_zero_iff.mp (Finsupp.ext hall)
+    exact Subtype.ext hw1
+  have key := LinearMap.finrank_le_finrank_of_injective hinj
+  rwa [finrank_self] at key
+
 end LatticeSystem.Fermion
