@@ -258,6 +258,12 @@ def swapHoleSpin (N : ℕ) (x y z : Fin (N + 1)) (hxy : x ≠ y) (hxz : x ≠ z)
   ⟨fun w => if w = y then σ.val z else if w = z then σ.val y else σ.val w, by
     dsimp only; rw [if_neg hxy, if_neg hxz]; exact σ.2⟩
 
+/-- Pointwise value of `swapHoleSpin`: the spins at `y` and `z` are exchanged, all others kept. -/
+theorem swapHoleSpin_val_apply (N : ℕ) (x y z : Fin (N + 1)) (hxy : x ≠ y) (hxz : x ≠ z)
+    (σ : HoleSpin N x) (s : Fin (N + 1)) :
+    (swapHoleSpin N x y z hxy hxz σ).val s
+      = if s = y then σ.val z else if s = z then σ.val y else σ.val s := rfl
+
 /-- **Step B (clean form): a bond triangle makes a spin transposition reachable.**  With bonds on
 all three edges of `x, y, z`, the state `(x, σ)` reaches `(x, swapHoleSpin σ)` — the hole returns to
 `x` and the spins at `y`, `z` are exchanged.  These two states share the magnetization sector
@@ -559,6 +565,72 @@ theorem holeWalkTransport_val_congr (N : ℕ) {G : SimpleGraph (Fin (N + 1))}
           holeSpinMove_val_apply, holeSpinMove_val_apply,
           if_neg hab.ne, if_pos rfl, if_neg hab.ne, if_pos rfl, hbval]
     · exact ih _ _ hmove s hsp
+
+/-- **The 15-puzzle exchange (Lemma 11.9, key step): an exchange bond gives a reachable spin swap
+from any hole position.**  Suppose `a, y, z` form a triangle of bonds and the hole, starting at
+position `p`, can travel to `a` along a walk `W` that avoids both `y` and `z` (this is what the
+exchange-bond condition E2 — connectedness of `Λ ∖ {y, z}` — provides).  Then `(p, σ)` reaches
+`(p, swap σ)`, where `swap` exchanges the spins at `y` and `z` and leaves everything else (including
+the hole at `p`) unchanged.  The hole is routed to the triangle without disturbing `y, z`, the spins
+at `y, z` are swapped by circling the triangle (`transposition_of_triangle`), and the reversed walk
+restores all other spins (`holeWalkTransport_reverse` + `holeWalkTransport_val_congr`). -/
+theorem StateReach.swap_via_triangle_walk (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {a y z p : Fin (N + 1)} (hay : (nagaokaBondGraph N t).Adj a y)
+    (hyz : (nagaokaBondGraph N t).Adj y z) (hza : (nagaokaBondGraph N t).Adj z a)
+    (W : (nagaokaBondGraph N t).Walk p a) (hyW : y ∉ W.support) (hzW : z ∉ W.support)
+    (σ : HoleSpin N p) :
+    StateReach N t ⟨p, σ⟩
+      ⟨p, swapHoleSpin N p y z
+        (fun h => hyW (h ▸ W.start_mem_support)) (fun h => hzW (h ▸ W.start_mem_support)) σ⟩ := by
+  -- supports of W and its reverse coincide
+  have hyWr : y ∉ W.reverse.support := by
+    rw [SimpleGraph.Walk.support_reverse]; simpa using hyW
+  have hzWr : z ∉ W.reverse.support := by
+    rw [SimpleGraph.Walk.support_reverse]; simpa using hzW
+  set σa := holeWalkTransport N W σ with hσa
+  set C := swapHoleSpin N a y z hay.ne hza.ne.symm σa with hC
+  -- the three legs: hole p→a, triangle swap at a, hole a→p
+  have r1 : StateReach N t ⟨p, σ⟩ ⟨a, σa⟩ := StateReach.ofBondWalk N t htsym htdiag hpos W σ
+  have r2 : StateReach N t ⟨a, σa⟩ ⟨a, C⟩ :=
+    StateReach.transposition_of_triangle N t htsym htdiag hpos hay hyz hza σa
+  have r3 : StateReach N t ⟨a, C⟩ ⟨p, holeWalkTransport N W.reverse C⟩ :=
+    StateReach.ofBondWalk N t htsym htdiag hpos W.reverse C
+  -- σa agrees with σ at y and z (the walk avoids them)
+  have hσay : σa.val y = σ.val y := holeWalkTransport_apply_of_notMem_support N W σ hyW
+  have hσaz : σa.val z = σ.val z := holeWalkTransport_apply_of_notMem_support N W σ hzW
+  -- the net transported configuration is exactly the (y z) swap of σ
+  have hnet : holeWalkTransport N W.reverse C
+      = swapHoleSpin N p y z (fun h => hyW (h ▸ W.start_mem_support))
+          (fun h => hzW (h ▸ W.start_mem_support)) σ := by
+    apply Subtype.ext
+    funext s
+    rw [swapHoleSpin_val_apply]
+    by_cases hsy : s = y
+    · subst hsy
+      rw [holeWalkTransport_apply_of_notMem_support N W.reverse C hyWr, hC,
+        swapHoleSpin_val_apply, if_pos rfl, hσaz, if_pos rfl]
+    · by_cases hsz : s = z
+      · subst hsz
+        rw [holeWalkTransport_apply_of_notMem_support N W.reverse C hzWr, hC,
+          swapHoleSpin_val_apply, if_neg hsy, if_pos rfl, hσay, if_neg hsy, if_pos rfl]
+      · rw [if_neg hsy, if_neg hsz]
+        by_cases hsW : s ∈ W.reverse.support
+        · -- on-path: use congruence + round trip (C and σa agree on the path)
+          have hagree : ∀ u ∈ W.reverse.support, C.val u = σa.val u := by
+            intro u hu
+            have huy : u ≠ y := fun h => hyWr (h ▸ hu)
+            have huz : u ≠ z := fun h => hzWr (h ▸ hu)
+            rw [hC, swapHoleSpin_val_apply, if_neg huy, if_neg huz]
+          rw [← holeWalkTransport_val_congr N W.reverse σa C
+            (fun u hu => (hagree u hu).symm) s hsW, hσa, holeWalkTransport_reverse N W σ]
+        · -- off-path: both untouched, C agrees with σa, σa agrees with σ
+          rw [holeWalkTransport_apply_of_notMem_support N W.reverse C hsW, hC,
+            swapHoleSpin_val_apply, if_neg hsy, if_neg hsz,
+            holeWalkTransport_apply_of_notMem_support N W σ
+              (fun h => hsW (by rw [SimpleGraph.Walk.support_reverse]; simpa using h))]
+  rw [← hnet]
+  exact (r1.trans r2).trans r3
 
 end LatticeSystem.Fermion
 
