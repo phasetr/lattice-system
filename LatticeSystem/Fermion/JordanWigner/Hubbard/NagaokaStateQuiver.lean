@@ -132,5 +132,18 @@ theorem StateReach.holeHop (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
   letI := Matrix.toQuiver (-tasakiEffReMatrix N t)
   exact ⟨(holeHopHom' N t htsym htdiag x y σ hxy ht).toPath⟩
 
+/-- **Step B core: the 3-cycle hole motion transposes two spins.**  Moving the hole around a
+length-3 loop `x → y → z → x` (distinct sites) returns it to `x` and swaps the spins at `y` and
+`z`, leaving all other sites fixed.  This is Tasaki's "15-puzzle" exchange of two spins via a
+short loop. -/
+theorem holeSpinMove_three_cycle_val (N : ℕ) (x y z : Fin (N + 1))
+    (hxy : x ≠ y) (hyz : y ≠ z) (hzx : z ≠ x) (σ : HoleSpin N x) :
+    (holeSpinMove N z x (holeSpinMove N y z (holeSpinMove N x y σ))).val
+      = fun w => if w = y then σ.val z else if w = z then σ.val y else σ.val w := by
+  funext w
+  simp only [holeSpinMove, Function.update_apply]
+  by_cases hwx : w = x <;> by_cases hwy : w = y <;> by_cases hwz : w = z <;>
+    simp_all [hxy, hyz, hzx, hxy.symm, hyz.symm, hzx.symm, σ.2]
+
 end LatticeSystem.Fermion
 
