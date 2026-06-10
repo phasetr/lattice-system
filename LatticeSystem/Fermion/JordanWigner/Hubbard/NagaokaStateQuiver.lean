@@ -464,5 +464,35 @@ theorem StateReach.ofBondWalk (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ
     rw [holeWalkTransport_cons]
     exact e1.trans (ih (holeSpinMove N u v σ))
 
+/-- Moving the hole `x → y` and back `y → x` restores the configuration: `holeSpinMove` for `x ≠ y`
+is invertible (its inverse moves the electron back), so the round trip is the identity. -/
+theorem holeSpinMove_moveBack (N : ℕ) {x y : Fin (N + 1)} (hxy : x ≠ y) (σ : HoleSpin N x) :
+    holeSpinMove N y x (holeSpinMove N x y σ) = σ :=
+  (holeSpinMoveEquiv N hxy).left_inv σ
+
+/-- **Hole transport composes along walk concatenation.**  Transporting the configuration along
+`W₁ ++ W₂` equals transporting along `W₁` then along `W₂`. -/
+theorem holeWalkTransport_append (N : ℕ) {G : SimpleGraph (Fin (N + 1))}
+    {x y z : Fin (N + 1)} (W₁ : G.Walk x y) (W₂ : G.Walk y z) (σ : HoleSpin N x) :
+    holeWalkTransport N (W₁.append W₂) σ
+      = holeWalkTransport N W₂ (holeWalkTransport N W₁ σ) := by
+  induction W₁ with
+  | nil => rfl
+  | @cons a b _ h p ih => simp only [SimpleGraph.Walk.cons_append, holeWalkTransport_cons, ih]
+
+/-- **A round trip restores the configuration.**  Transporting the hole along a walk `W : x → x'`
+and then back along its reverse returns the original configuration `σ` — the moving hole permutes
+the spins, and the reversed walk inverts that permutation edge by edge.  This is the key tool for
+the "15-puzzle" argument: a hole excursion that does not pass through the two sites being exchanged
+leaves all spins untouched. -/
+theorem holeWalkTransport_reverse (N : ℕ) {G : SimpleGraph (Fin (N + 1))}
+    {x x' : Fin (N + 1)} (W : G.Walk x x') (σ : HoleSpin N x) :
+    holeWalkTransport N W.reverse (holeWalkTransport N W σ) = σ := by
+  induction W with
+  | nil => rfl
+  | @cons a b _ h p ih =>
+    rw [SimpleGraph.Walk.reverse_cons, holeWalkTransport_cons, holeWalkTransport_append,
+      holeWalkTransport_cons, holeWalkTransport_nil, ih, holeSpinMove_moveBack N h.ne]
+
 end LatticeSystem.Fermion
 
