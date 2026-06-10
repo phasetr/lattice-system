@@ -2,6 +2,7 @@ import Mathlib.Analysis.InnerProductSpace.Spectrum
 import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
 import Mathlib.Analysis.Complex.Polynomial.Basic
 import Mathlib.Analysis.Matrix.Hermitian
+import Mathlib.Analysis.InnerProductSpace.Positive
 
 /-!
 # Common eigenvector of two commuting self-adjoint operators
@@ -85,6 +86,21 @@ theorem exists_common_eigenvector_of_isSymmetric_comm {A B : E →ₗ[ℂ] E}
   refine ⟨(φ : E), α.re, β.re, hφ_S.1, hφ_ne_E, ?_, ?_⟩
   · rw [hα_re]; exact hAφ
   · rw [hβ_re]; exact hBφ
+
+omit [FiniteDimensional ℂ E] in
+/-- A real eigenvalue of a positive operator is nonnegative. -/
+theorem isPositive_eigenvalue_nonneg {A : E →ₗ[ℂ] E} (hA : A.IsPositive)
+    {a : ℝ} {Φ : E} (hΦ : Φ ≠ 0) (hAΦ : A Φ = (a : ℂ) • Φ) : 0 ≤ a := by
+  have h := hA.re_inner_nonneg_right Φ
+  rw [hAΦ, inner_smul_right] at h
+  have hre : RCLike.re ((a : ℂ) * inner ℂ Φ Φ) = a * ‖Φ‖ ^ 2 := by
+    rw [RCLike.re_to_complex, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, zero_mul,
+      sub_zero, ← RCLike.re_to_complex, inner_self_eq_norm_sq]
+  rw [hre] at h
+  have hn : (0 : ℝ) < ‖Φ‖ ^ 2 := by
+    have : ‖Φ‖ ≠ 0 := norm_ne_zero_iff.mpr hΦ
+    positivity
+  exact (mul_nonneg_iff_of_pos_right hn).mp h
 
 /-- **Matrix form: common eigenvector of two commuting Hermitian matrices on an invariant
 subspace.**  For Hermitian `A`, `B` with `A * B = B * A`, both preserving a nonzero subspace `W`
