@@ -66,4 +66,44 @@ theorem isSymmetric_re_inner_self_eq_sum {T : EuclideanSpace ℂ n →ₗ[ℂ] E
     hT.eigenvectorBasis_apply_self_apply hn x i]
   exact key (hT.eigenvalues hn i) ((hT.eigenvectorBasis hn).repr x i)
 
+open Module in
+/-- **Parseval**: `‖x‖² = ∑ᵢ ‖⟨bᵢ, x⟩‖²` in an orthonormal eigenbasis. -/
+theorem repr_norm_sq_sum {T : EuclideanSpace ℂ n →ₗ[ℂ] EuclideanSpace ℂ n}
+    (hT : T.IsSymmetric) (hn : finrank ℂ (EuclideanSpace ℂ n) = Fintype.card n)
+    (x : EuclideanSpace ℂ n) :
+    ‖x‖ ^ 2 = ∑ i, ‖(hT.eigenvectorBasis hn).repr x i‖ ^ 2 := by
+  rw [← LinearIsometryEquiv.norm_map (hT.eigenvectorBasis hn).repr x, EuclideanSpace.norm_sq_eq]
+
+open scoped InnerProductSpace in
+open Module in
+/-- **Block lower bound.**  If the eigenbasis coordinates of `x` are supported where the
+eigenvalue is `≥ c`, then `c‖x‖² ≤ re⟪x, T x⟫`. -/
+theorem isSymmetric_block_lower {T : EuclideanSpace ℂ n →ₗ[ℂ] EuclideanSpace ℂ n}
+    (hT : T.IsSymmetric) (hn : finrank ℂ (EuclideanSpace ℂ n) = Fintype.card n)
+    (x : EuclideanSpace ℂ n) (c : ℝ)
+    (hc : ∀ i, (hT.eigenvectorBasis hn).repr x i ≠ 0 → c ≤ hT.eigenvalues hn i) :
+    c * ‖x‖ ^ 2 ≤ RCLike.re (inner ℂ x (T x)) := by
+  rw [isSymmetric_re_inner_self_eq_sum hT hn x, repr_norm_sq_sum hT hn x, Finset.mul_sum]
+  refine Finset.sum_le_sum (fun i _ => ?_)
+  by_cases hz : (hT.eigenvectorBasis hn).repr x i = 0
+  · simp [hz]
+  · rw [mul_comm c, mul_comm (hT.eigenvalues hn i)]
+    exact mul_le_mul_of_nonneg_left (hc i hz) (sq_nonneg _)
+
+open scoped InnerProductSpace in
+open Module in
+/-- **Block upper bound.**  If the eigenbasis coordinates of `x` are supported where the
+eigenvalue is `≤ c`, then `re⟪x, T x⟫ ≤ c‖x‖²`. -/
+theorem isSymmetric_block_upper {T : EuclideanSpace ℂ n →ₗ[ℂ] EuclideanSpace ℂ n}
+    (hT : T.IsSymmetric) (hn : finrank ℂ (EuclideanSpace ℂ n) = Fintype.card n)
+    (x : EuclideanSpace ℂ n) (c : ℝ)
+    (hc : ∀ i, (hT.eigenvectorBasis hn).repr x i ≠ 0 → hT.eigenvalues hn i ≤ c) :
+    RCLike.re (inner ℂ x (T x)) ≤ c * ‖x‖ ^ 2 := by
+  rw [isSymmetric_re_inner_self_eq_sum hT hn x, repr_norm_sq_sum hT hn x, Finset.mul_sum]
+  refine Finset.sum_le_sum (fun i _ => ?_)
+  by_cases hz : (hT.eigenvectorBasis hn).repr x i = 0
+  · simp [hz]
+  · rw [mul_comm c, mul_comm (hT.eigenvalues hn i)]
+    exact mul_le_mul_of_nonneg_left (hc i hz) (sq_nonneg _)
+
 end LatticeSystem.Quantum
