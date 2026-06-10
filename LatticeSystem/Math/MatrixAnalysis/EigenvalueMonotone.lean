@@ -16,9 +16,9 @@ We state it for finite complex matrices using mathlib's *sorted* eigenvalue func
 indexing `∀ i, (eigenvalues₀ of A) i ≤ (eigenvalues₀ of B) i` says "the `i`-th largest
 eigenvalue is monotone in the Loewner order `≤`", which is exactly Tasaki's `a_j ≤ b_j`
 (re-indexed from smallest-first to largest-first).  mathlib has the variational principle for
-the extreme eigenvalues but not the general min–max monotonicity for matrices, so — per the
-project's axiomatize-first policy — this is recorded as a documented axiom (to be discharged via
-the min–max principle later).  It is not on the critical path of any Chapter-11 proof.
+the extreme eigenvalues but not the general min–max monotonicity for matrices; the missing
+Courant–Fischer block/pigeonhole machinery is built in `CourantFischer.lean`, and this theorem is
+**now proved (axiom-free)** from it (`LatticeSystem.Quantum.hermitian_eigenvalues₀_mono`).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), Appendix A.2.3, Theorem A.7 and eq. (A.2.30), p. 468.

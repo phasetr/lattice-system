@@ -123,8 +123,8 @@ now covered. The appendix splits into two kinds of items:
   symmetric matrix, via the project's Collatz–Wielandt development and the
   variational `|w|`-argument).
 - **Documented axioms (faithful statements, deferred proofs)** — **A.1** (Lie
-  product formula), **A.7/A.8** (Weyl eigenvalue monotonicity, trace-exp
-  monotonicity), **A.12** (strong-coupling effective Hamiltonian limit) and the
+  product formula), **A.8** (trace-exp
+  monotonicity — pending the spectral mapping for `exp`; A.7 Weyl monotonicity now **proved**), **A.12** (strong-coupling effective Hamiltonian limit) and the
   operator-algebraic **A.21–A.28** (Wigner's
   theorem, states, Banach–Alaoglu, ground states of infinite systems, the GNS
   construction).
