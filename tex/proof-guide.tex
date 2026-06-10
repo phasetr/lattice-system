@@ -7671,15 +7671,27 @@ via the reflected raising; $\hat H$ preserves each rung because it commutes with
 (\texttt{ham\_mulVec\_raiseIter}).  Proved (axiom-free,
 \texttt{Math/AngularMomentum/Multiplet.lean}).
 
-\medskip\noindent\textbf{Theorem A.17 (spin-0/spin-1/2 sector suffices).}  For an
+\medskip\noindent\textbf{Theorem A.17 (spin-0/spin-1/2 sector suffices, proved).}  For an
 $su(2)$-invariant self-adjoint $\hat H$, every energy eigenvalue $E$ has a corresponding eigenstate
 $\Phi$ with $\hat J^{(3)}\Phi=0$ or $\hat J^{(3)}\Phi=\tfrac12\Phi$ (\texttt{ham\_eigenstate\_spin\_zero\_or\_half}).
 From a joint eigenstate of spin $J=n/2$ (Theorem~A.13) the multiplet (Theorem~A.16) contains the
 magnetic number $M=J-\lfloor J\rfloor$, equal to $0$ for even $n$ and $1/2$ for odd $n$ (take
 $k=\lfloor J\rfloor$).  The single ingredient beyond finite-matrix algebra---the existence of a
 simultaneous eigenstate of the commuting self-adjoint family $\hat H,\hat{\boldsymbol J}^2,\hat J^{(3)}$
-in the $E$-eigenspace (\texttt{exists\_joint\_su2\_energy\_eigenstate})---is a documented axiom
-(\texttt{Math/AngularMomentum/SpinHalfSector.lean}).
+in the $E$-eigenspace (\texttt{exists\_joint\_su2\_energy\_eigenstate})---is \textbf{now proved
+(axiom-free)}.  The Casimir $\hat{\boldsymbol J}^2=J_1^2+J_2^2+J_3^2$ is positive semidefinite (a sum
+$\sum_\alpha J_\alpha^{\mathsf H}J_\alpha$) and commutes with both $\hat J^{(3)}$ (from the su(2)
+relations, $[\hat{\boldsymbol J}^2,\hat J^{(3)}]=0$) and $\hat H$; so $\hat{\boldsymbol J}^2$ and
+$\hat J^{(3)}$ are two \emph{commuting Hermitian} operators preserving the $\hat H=E$ eigenspace $W$
+(nonzero, witnessed by $v$).  A generic finite-dimensional lemma---two commuting Hermitian operators on
+a nonzero invariant subspace have a common eigenvector there, with real eigenvalues, via
+\texttt{Module.End.exists\_eigenvalue} on the restriction, eigenvalue reality
+(\texttt{IsSymmetric.conj\_eigenvalue\_eq\_self}) and invariant-subspace restriction
+(\texttt{Math/CommutingHermitianEigenvector.lean}: \texttt{exists\_common\_eigenvector\_of\_isHermitian\_commute})---yields
+the common eigenvector $\Phi\in W$, with the $\hat{\boldsymbol J}^2$-eigenvalue $a\ge0$ (positive
+operator) written $a=J(J+1)$ for $J=(\sqrt{1+4a}-1)/2\ge0$.  Proved (axiom-free,
+\texttt{Math/AngularMomentum/SpinHalfSector.lean}).  As a consequence the §11.5 Proposition~11.24 (and
+its dependents) become \emph{fully axiom-free}.
 
 \medskip\noindent\textbf{Theorem A.18 (Perron--Frobenius for a real symmetric matrix, proved).}
 For a real symmetric $M$ whose shifted matrix $\hat A=c\cdot1-M$ is irreducible (entrywise
@@ -7742,9 +7754,9 @@ its GNS space; recorded as a documented axiom (the construction is in \texttt{ma
 
 \medskip\noindent\textbf{Appendix A: status and axiomatization policy.}  Tasaki's Appendix A is
 fully formalized in book order (A.1--A.28).  The linear-algebra and angular-momentum core that
-\texttt{mathlib} supports is proved axiom-free: A.4--A.6, A.9--A.11, A.13--A.16, and A.18
-(Perron--Frobenius for a real symmetric matrix).  The remaining items---A.1, A.7/A.8, A.12, the
-simultaneous-diagonalization step of A.17, A.19/A.20, and the operator-algebraic A.21--A.28 (Wigner,
+\texttt{mathlib} supports is proved axiom-free: A.4--A.6, A.9--A.11, A.13--A.18 (including the
+simultaneous-diagonalization step of A.17 and Perron--Frobenius for a real symmetric matrix A.18).
+The remaining items---A.1, A.7/A.8, A.12, A.19/A.20, and the operator-algebraic A.21--A.28 (Wigner,
 states, Banach--Alaoglu, ground states, GNS)---are recorded as faithful documented axioms.  These
 axioms are \emph{not} active proof targets here: the heavy functional-analytic and operator-algebraic
 theory has its natural home in a dedicated operator-algebra development (possibly contributed to
