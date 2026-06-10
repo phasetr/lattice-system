@@ -7690,8 +7690,10 @@ a nonzero invariant subspace have a common eigenvector there, with real eigenval
 (\texttt{Math/CommutingHermitianEigenvector.lean}: \texttt{exists\_common\_eigenvector\_of\_isHermitian\_commute})---yields
 the common eigenvector $\Phi\in W$, with the $\hat{\boldsymbol J}^2$-eigenvalue $a\ge0$ (positive
 operator) written $a=J(J+1)$ for $J=(\sqrt{1+4a}-1)/2\ge0$.  Proved (axiom-free,
-\texttt{Math/AngularMomentum/SpinHalfSector.lean}).  As a consequence the §11.5 Proposition~11.24 (and
-its dependents) become \emph{fully axiom-free}.
+\texttt{Math/AngularMomentum/SpinHalfSector.lean}).  As a consequence the §11.5 Proposition~11.24,
+which rested only on this A.17 ingredient, becomes \emph{fully axiom-free}; dependents such as
+Theorem~11.26 lose their A.17 dependency but still rest on their other documented axioms (e.g.\
+\texttt{lemma\_11\_25}).
 
 \medskip\noindent\textbf{Theorem A.18 (Perron--Frobenius for a real symmetric matrix, proved).}
 For a real symmetric $M$ whose shifted matrix $\hat A=c\cdot1-M$ is irreducible (entrywise
