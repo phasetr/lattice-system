@@ -676,5 +676,41 @@ theorem exists_common_neighbor_of_triangle {V : Type*} (G : SimpleGraph V) {w α
   · exact ⟨w, hβw.symm, hαβ.symm, hwα.symm⟩
   · exact absurd rfl hyz
 
+/-- **A length-3 closed walk: its three bonds and that its support is exactly the three vertices.**
+Refines `exists_triangle_adj_of_walk_length_three` by also certifying that every vertex on the walk
+is one of the three triangle vertices `z', a, b` — needed to place the exchange-bond endpoints
+`y, z` among them. -/
+theorem walk_length_three_support_mem {V : Type*} (G : SimpleGraph V) {z' : V}
+    (c : G.Walk z' z') (hlen : c.length = 3) :
+    ∃ a b : V, G.Adj z' a ∧ G.Adj a b ∧ G.Adj b z' ∧
+      ∀ x ∈ c.support, x = z' ∨ x = a ∨ x = b := by
+  match c, hlen with
+  | .cons h1 (.cons h2 (.cons h3 .nil)), _ =>
+    refine ⟨_, _, h1, h2, h3, fun x hx => ?_⟩
+    simp only [SimpleGraph.Walk.support_cons, SimpleGraph.Walk.support_nil, List.mem_cons,
+      List.not_mem_nil, or_false] at hx
+    tauto
+
+/-- **Lemma 11.9, exchange-bond step (length-3 loop): an exchange bond yields a reachable spin
+swap.**  If `y, z` lie on a common triangle of bonds (E1, length 3) and deleting `y, z` keeps the
+lattice connected (E2), then from any hole position `p ∉ {y, z}` the state `(p, σ)` reaches
+`(p, swapHoleSpin y z σ)`.  This combines the triangle extraction, the common-neighbour, the E2
+route, and the 15-puzzle exchange `StateReach.swap_via_triangle_walk`. -/
+theorem StateReach.swap_of_exchange_len3 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {y z : Fin (N + 1)} (hyz : y ≠ z)
+    {z' : Fin (N + 1)} (c : (nagaokaBondGraph N t).Walk z' z') (hlen : c.length = 3)
+    (hyc : y ∈ c.support) (hzc : z ∈ c.support)
+    (hE2 : ((nagaokaBondGraph N t).induce {w | w ≠ y ∧ w ≠ z}).Connected)
+    {p : Fin (N + 1)} (hpy : p ≠ y) (hpz : p ≠ z) (σ : HoleSpin N p) :
+    StateReach N t ⟨p, σ⟩ ⟨p, swapHoleSpin N p y z hpy hpz σ⟩ := by
+  obtain ⟨a, b, h1, h2, h3, hmem⟩ := walk_length_three_support_mem _ c hlen
+  obtain ⟨a3, ha3y, hyz_adj, hza3⟩ :=
+    exists_common_neighbor_of_triangle _ h1 h2 h3 (hmem y hyc) (hmem z hzc) hyz
+  obtain ⟨W, hyW, hzW⟩ :=
+    exists_avoiding_walk_of_induce_connected (nagaokaBondGraph N t) hE2 ⟨hpy, hpz⟩
+      ⟨ha3y.ne, hza3.ne.symm⟩
+  exact StateReach.swap_via_triangle_walk N t htsym htdiag hpos ha3y hyz_adj hza3 W hyW hzW σ
+
 end LatticeSystem.Fermion
 
