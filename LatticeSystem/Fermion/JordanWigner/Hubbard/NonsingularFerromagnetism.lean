@@ -3,6 +3,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularFrustrationFreePos
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandHighestWeight
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinLoweringTowerGeneral
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandTheorem11_11
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandClassification
 import LatticeSystem.Math.RayleighPosSemidefKernel
 
 /-!
