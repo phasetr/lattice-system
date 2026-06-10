@@ -129,6 +129,42 @@ theorem neg_tasakiEffReMatrix_pos_holeSpinMag_eq (N : ℕ) (t : Fin (N + 1) → 
   rw [Matrix.neg_apply, tasakiEffReMatrix_eq_zero_of_holeSpinMag_ne N t q p hne, neg_zero] at h
   exact lt_irrefl 0 h
 
+/-- The sector matrix entry is the full `−M` entry between the underlying states: the
+Perron–Frobenius sector matrix `nagaokaPFMatrixOnSector` is literally the submatrix of `−M` on the
+sector, so its quiver edges are exactly the full-quiver edges between sector states. -/
+theorem nagaokaPFMatrixOnSector_apply (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ)
+    (i j : HoleMagSector N m) :
+    nagaokaPFMatrixOnSector N t m i j = (-tasakiEffReMatrix N t) i.val j.val := by
+  simp only [nagaokaPFMatrixOnSector, tasakiEffReMatrixOnSector, Matrix.neg_apply,
+    Matrix.submatrix_apply]
+
+/-- **Step C: lifting a full-quiver path to the sector quiver.**  A path of `−M` quiver edges from
+`a` to `b`, with `a` in sector `m`, lifts to a path of the *sector* quiver
+`toQuiver (nagaokaPFMatrixOnSector N t m)` of the same length — and `b` is automatically in sector
+`m` too.  Every edge preserves magnetization (`neg_tasakiEffReMatrix_pos_holeSpinMag_eq`), so the
+whole path stays inside the sector, where the sector matrix coincides with `−M`
+(`nagaokaPFMatrixOnSector_apply`).  This is the bridge from the hole-motion reachability of the full
+quiver to strong connectivity of each sector block (Definition 11.6 / `IsIrreducible`). -/
+theorem exists_sectorPath_of_path (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ)
+    {a b : (x : Fin (N + 1)) × HoleSpin N x} (ha : holeSpinMag N a = m)
+    (p : @Quiver.Path _ (Matrix.toQuiver (-tasakiEffReMatrix N t)) a b) :
+    ∃ (hb : holeSpinMag N b = m)
+      (q : @Quiver.Path _ (Matrix.toQuiver (nagaokaPFMatrixOnSector N t m)) ⟨a, ha⟩ ⟨b, hb⟩),
+      @Quiver.Path.length _ (Matrix.toQuiver (nagaokaPFMatrixOnSector N t m)) _ _ q
+        = @Quiver.Path.length _ (Matrix.toQuiver (-tasakiEffReMatrix N t)) _ _ p := by
+  letI iQ : Quiver _ := Matrix.toQuiver (-tasakiEffReMatrix N t)
+  letI iS : Quiver (HoleMagSector N m) := Matrix.toQuiver (nagaokaPFMatrixOnSector N t m)
+  induction p with
+  | nil => exact ⟨ha, @Quiver.Path.nil _ iS _, rfl⟩
+  | @cons c d r e ih =>
+    obtain ⟨hc, q, hq⟩ := ih
+    have hd : holeSpinMag N d = m :=
+      (neg_tasakiEffReMatrix_pos_holeSpinMag_eq N t c d e.down).symm.trans hc
+    have eS : (0 : ℝ) < nagaokaPFMatrixOnSector N t m ⟨c, hc⟩ ⟨d, hd⟩ := by
+      rw [nagaokaPFMatrixOnSector_apply]; exact e.down
+    refine ⟨hd, @Quiver.Path.cons _ iS ⟨a, ha⟩ ⟨c, hc⟩ ⟨d, hd⟩ q (PLift.up eS), ?_⟩
+    rw [@Quiver.Path.length_cons _ iS, hq, @Quiver.Path.length_cons _ iQ]
+
 /-- Reachability is transitive (path composition). -/
 theorem StateReach.trans {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ}
     {p q r : (z : Fin (N + 1)) × HoleSpin N z}
