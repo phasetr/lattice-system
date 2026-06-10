@@ -198,14 +198,36 @@ theorem flatBand_groundSubmodule_eq_multipletSpan_of_blocks (K : ℕ) (ν t U : 
   rw [flatBandFerromagneticMultipletSubmodule_finrank K ν]
   exact flatBandHalfFilledGroundSubmodule_finrank_le_of_blocks K ν t U hblock
 
-/-- **Tasaki Theorem 11.11 (uniqueness side, axiom-free).**  The half-filled zero-energy ground
-subspace equals the ferromagnetic multiplet span.  Discharges the classification: every weight block
-is one-dimensional (`flatBand_block_finrank_le_one`, the swap-invariant coordinate argument), so the
-ground subspace has dimension `≤ K+2 = dim` of the multiplet, and the multiplet is contained in it. -/
-theorem flatBand_groundSubmodule_eq_multipletSpan (K : ℕ) (ν t U : ℝ)
+/-- **Tasaki Theorem 11.11 (flat-band ferromagnetism, half-filled ground space) — axiom-free.**
+The zero-energy `N_e = K+1` ground subspace of the flat-band Hubbard model is *exactly* the
+ferromagnetic lowering multiplet of `|Φα,all↑⟩` (the maximal-spin `(2 S_max + 1)`-dimensional
+multiplet).  `⊇` is the existence side; `⊆` is the classification, discharged here: every `Ŝ^z`-weight
+block is one-dimensional (`flatBand_block_finrank_le_one`, the swap-invariant coordinate argument), so
+the ground subspace has dimension `≤ K+2 = dim` of the multiplet. -/
+theorem flatBand_theorem_11_11_groundSubmodule_eq_multipletSpan (K : ℕ) (ν t U : ℝ)
     (hν : 0 < ν) (ht : 0 < t) (hU : 0 < U) :
     flatBandHalfFilledGroundSubmodule K ν t U = flatBandFerromagneticMultipletSubmodule K ν :=
   flatBand_groundSubmodule_eq_multipletSpan_of_blocks K ν t U
     (fun a => flatBand_block_finrank_le_one K ν t U hν ht hU a)
+
+/-- **Tasaki Theorem 11.11 (maximal-spin corollary).**  Every half-filled zero-energy ground state
+carries total spin `S_tot = S_max = (K+1)/2`: it is a `(Ŝ_tot)²` eigenvector with eigenvalue
+`S_max(S_max + 1)`.  (Combines the ground subspace classification with the common total spin of the
+multiplet.) -/
+theorem flatBand_theorem_11_11_groundState_maximalSpin (K : ℕ) (ν t U : ℝ)
+    (hν : 0 < ν) (ht : 0 < t) (hU : 0 < U)
+    {v : (Fin (2 * (2 * K + 1) + 2) → Fin 2) → ℂ}
+    (hv : v ∈ flatBandHalfFilledGroundSubmodule K ν t U) :
+    (fermionTotalSpinSquared (2 * K + 1)).mulVec v =
+      (((K + 1 : ℕ) : ℂ) / 2 * (((K + 1 : ℕ) : ℂ) / 2 + 1)) • v := by
+  rw [flatBand_theorem_11_11_groundSubmodule_eq_multipletSpan K ν t U hν ht hU,
+    flatBandFerromagneticMultipletSubmodule] at hv
+  induction hv using Submodule.span_induction with
+  | mem w hw =>
+    obtain ⟨k, rfl⟩ := hw
+    exact (flatBand_ferromagnetic_multiplet K ν).2 k
+  | zero => simp
+  | add x y _ _ hx hy => rw [Matrix.mulVec_add, hx, hy, smul_add]
+  | smul a x _ hx => rw [Matrix.mulVec_smul, hx, smul_comm]
 
 end LatticeSystem.Fermion
