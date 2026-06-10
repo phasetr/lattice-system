@@ -494,11 +494,19 @@ theorem holeWalkTransport_reverse (N : ℕ) {G : SimpleGraph (Fin (N + 1))}
     rw [SimpleGraph.Walk.reverse_cons, holeWalkTransport_cons, holeWalkTransport_append,
       holeWalkTransport_cons, holeWalkTransport_nil, ih, holeSpinMove_moveBack N h.ne]
 
+/-- Pointwise value of a hole hop `x → y`: the new hole site `y` becomes `true` (empty orbital
+canonicalised), the old hole site `x` receives the spin that was at `y`, every other site is
+unchanged. -/
+theorem holeSpinMove_val_apply (N : ℕ) (x y : Fin (N + 1)) (σ : HoleSpin N x) (s : Fin (N + 1)) :
+    (holeSpinMove N x y σ).val s
+      = if s = y then true else if s = x then σ.val y else σ.val s := by
+  simp only [holeSpinMove, Function.update_apply]
+
 /-- A single hole hop `x → y` only changes the spins at the old and new hole sites: at any site
 `s ∉ {x, y}` the configuration is unchanged. -/
 theorem holeSpinMove_apply_of_ne (N : ℕ) {x y : Fin (N + 1)} (σ : HoleSpin N x) {s : Fin (N + 1)}
     (hsx : s ≠ x) (hsy : s ≠ y) : (holeSpinMove N x y σ).val s = σ.val s := by
-  simp only [holeSpinMove, Function.update_apply, if_neg hsy, if_neg hsx]
+  rw [holeSpinMove_val_apply, if_neg hsy, if_neg hsx]
 
 /-- **Spins off the hole's path are untouched.**  If the hole's walk `W` never visits site `s`
 (`s ∉ W.support`), then transporting along `W` leaves the spin at `s` unchanged.  The hole only ever
@@ -514,6 +522,43 @@ theorem holeWalkTransport_apply_of_notMem_support (N : ℕ) {G : SimpleGraph (Fi
     obtain ⟨hsa, hsp⟩ := hs
     rw [holeWalkTransport_cons, ih (holeSpinMove N a b σ) hsp,
       holeSpinMove_apply_of_ne N σ hsa (fun h0 => hsp (h0 ▸ p.start_mem_support))]
+
+/-- **Hole transport depends only on the spins along its path.**  If two configurations agree on
+every site of the walk `W`, then transporting either along `W` gives results that still agree on
+all of `W`'s sites.  (The hole only ever reads and writes spins at the sites it visits, so values
+off the path are irrelevant to the on-path outcome.)  This is the congruence that lets a spin swap
+at two *off-path* sites commute through a hole excursion. -/
+theorem holeWalkTransport_val_congr (N : ℕ) {G : SimpleGraph (Fin (N + 1))}
+    {x x' : Fin (N + 1)} (W : G.Walk x x') :
+    ∀ (σ₁ σ₂ : HoleSpin N x), (∀ s ∈ W.support, σ₁.val s = σ₂.val s) →
+      ∀ s ∈ W.support, (holeWalkTransport N W σ₁).val s = (holeWalkTransport N W σ₂).val s := by
+  induction W with
+  | nil => intro σ₁ σ₂ h s hs; simpa using h s hs
+  | @cons a b _ hab p ih =>
+    intro σ₁ σ₂ h s hs
+    have hb : b ∈ (SimpleGraph.Walk.cons hab p).support := by
+      rw [SimpleGraph.Walk.support_cons]; exact List.mem_cons_of_mem _ p.start_mem_support
+    have hbval : σ₁.val b = σ₂.val b := h b hb
+    have hmove : ∀ s' ∈ p.support,
+        (holeSpinMove N a b σ₁).val s' = (holeSpinMove N a b σ₂).val s' := by
+      intro s' hs'
+      rw [holeSpinMove_val_apply, holeSpinMove_val_apply]
+      by_cases e1 : s' = b
+      · simp [e1]
+      · by_cases e2 : s' = a
+        · rw [if_neg e1, if_neg e1, if_pos e2, if_pos e2, hbval]
+        · rw [if_neg e1, if_neg e1, if_neg e2, if_neg e2]
+          exact h s' (by rw [SimpleGraph.Walk.support_cons]; exact List.mem_cons_of_mem _ hs')
+    rw [holeWalkTransport_cons, holeWalkTransport_cons]
+    rw [SimpleGraph.Walk.support_cons, List.mem_cons] at hs
+    rcases hs with rfl | hsp
+    · by_cases ha : s ∈ p.support
+      · exact ih _ _ hmove s ha
+      · rw [holeWalkTransport_apply_of_notMem_support N p _ ha,
+          holeWalkTransport_apply_of_notMem_support N p _ ha,
+          holeSpinMove_val_apply, holeSpinMove_val_apply,
+          if_neg hab.ne, if_pos rfl, if_neg hab.ne, if_pos rfl, hbval]
+    · exact ih _ _ hmove s hsp
 
 end LatticeSystem.Fermion
 
