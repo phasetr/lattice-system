@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaGlobalMin
+import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaMagnetizationSector
 import Mathlib.LinearAlgebra.Matrix.Irreducible.Defs
 
 /-!
@@ -79,6 +80,28 @@ def holeHopHom (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ) (x y : Fin (N
     (Matrix.toQuiver (-tasakiEffReMatrix N t)).Hom
       (⟨y, holeSpinMove N x y σ⟩ : (z : Fin (N + 1)) × HoleSpin N z) ⟨x, σ⟩ :=
   ⟨neg_tasakiEffReMatrix_holeSpinMove_pos N t x y σ hxy ht⟩
+
+/-- `−M` is symmetric (for symmetric `t` with zero diagonal), so the reverse hole-hop edge is also
+positive: `0 < −M_{(x,σ),(y, holeSpinMove x y σ)}`. -/
+theorem neg_tasakiEffReMatrix_holeSpinMove_pos' (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0)
+    (x y : Fin (N + 1)) (σ : HoleSpin N x) (hxy : x ≠ y) (ht : 0 < t x y) :
+    0 < (-tasakiEffReMatrix N t) ⟨x, σ⟩ ⟨y, holeSpinMove N x y σ⟩ := by
+  have hsym : (-tasakiEffReMatrix N t) (⟨x, σ⟩ : (z : Fin (N + 1)) × HoleSpin N z)
+      ⟨y, holeSpinMove N x y σ⟩
+      = (-tasakiEffReMatrix N t) ⟨y, holeSpinMove N x y σ⟩ ⟨x, σ⟩ := by
+    rw [Matrix.neg_apply, Matrix.neg_apply, (tasakiEffReMatrix_isSymm N t htsym htdiag).apply]
+  rw [hsym]
+  exact neg_tasakiEffReMatrix_holeSpinMove_pos N t x y σ hxy ht
+
+/-- The reverse hole-hop arrow of the `−M` quiver: from `(y, holeSpinMove N x y σ)` to `(x, σ)`,
+available since `−M` is symmetric.  With `holeHopHom` this gives bidirectional atomic moves. -/
+def holeHopHom' (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0)
+    (x y : Fin (N + 1)) (σ : HoleSpin N x) (hxy : x ≠ y) (ht : 0 < t x y) :
+    (Matrix.toQuiver (-tasakiEffReMatrix N t)).Hom
+      (⟨x, σ⟩ : (z : Fin (N + 1)) × HoleSpin N z) ⟨y, holeSpinMove N x y σ⟩ :=
+  ⟨neg_tasakiEffReMatrix_holeSpinMove_pos' N t htsym htdiag x y σ hxy ht⟩
 
 end LatticeSystem.Fermion
 
