@@ -57,6 +57,15 @@ band (zero-energy space of the hopping matrix `T`). -/
 noncomputable def generalFlatBandDim : ℕ :=
   Module.finrank ℂ (generalFlatBandKernel T)
 
+/-- A vector lies in the flat band `h₀ = ker T` iff `T` annihilates it as a plain `mulVec`
+(the `EuclideanSpace`/`L²` wrapping is transparent). -/
+theorem generalFlatBand_mem_kernel_iff (v : EuclideanSpace ℂ (Fin (M + 1))) :
+    v ∈ generalFlatBandKernel T ↔ T.mulVec (WithLp.ofLp v) = 0 := by
+  rw [generalFlatBandKernel, LinearMap.mem_ker, Matrix.toLpLin_apply]
+  constructor
+  · intro h; have := congrArg WithLp.ofLp h; simpa using this
+  · intro h; rw [h]; rfl
+
 /-- **The projection matrix `P₀`** onto the flat band `h₀ = ker T` (Tasaki §11.3.4):
 the matrix, in the standard orthonormal basis, of the self-adjoint orthogonal
 projection onto `ker T`. -/
