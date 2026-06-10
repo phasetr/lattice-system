@@ -6284,11 +6284,26 @@ Tasaki's irreducibility); the ferromagnetism conclusion
 The result is deep; Tasaki proves it via Lemma 11.16 (a special basis $\{\mu_z\}_{z\in I}$ of
 $h_0$, $|I|=D_0$, site-localised so that $\mu_z(z)\ne0$ and $\mu_z(z')=0$ for $z'\in I\setminus\{z\}$)
 and Theorem 11.17 (the model is ferromagnetic iff that basis is \emph{connected}, where
-$\mu_z\sim\mu_{z'}$ when they share a nonzero component).  All three are recorded as documented
-axioms (\texttt{tasaki\_theorem\_11\_15}, \texttt{generalFlatBand\_lemma\_11\_16},
-\texttt{generalFlatBand\_theorem\_11\_17}; the basis connectivity is
-\texttt{generalFlatBandBasisGraph}/\texttt{generalFlatBandBasisConnected}), matching the policy
-for Theorems 11.8 / 11.13; their proofs are deferred to later work.
+$\mu_z\sim\mu_{z'}$ when they share a nonzero component).
+
+\textbf{Lemma 11.16 is now discharged (axiom-free)} by elementary linear algebra
+(\texttt{generalFlatBand\_lemma\_11\_16}).  The construction: the restricted coordinate
+functionals $\mathrm{fc}_x = (\texttt{EuclideanSpace.proj}_x)\!\restriction_{\ker T}$
+\emph{separate points} of the finite-dimensional $h_0=\ker T$ (a flat-band vector with all
+coordinates zero is zero), so they span the dual $(\ker T)^\ast$; a $D_0$-element subset $I$
+extracted from them (\texttt{generalFlatBand\_exists\_special\_index}) is a basis of
+$(\ker T)^\ast$.  Its dual basis lives in $(\ker T)^{\ast\ast}$, and reflexivity of the
+finite-dimensional $\ker T$ (\texttt{Module.evalEquiv}) transports it back to a
+\emph{predual} basis $\{\mu_z\}_{z\in I}$ of $\ker T$ itself.  The biorthogonality
+$\mathrm{fc}_x(\mu_z)=\delta_{xz}$ (\texttt{Module.Basis.dualBasis\_apply\_self} after
+\texttt{Module.apply\_evalEquiv\_symm\_apply}) reads off as $\mu_z(x)=\delta_{xz}$, giving both
+site-localisation ($\mu_z(z)=1\ne0$, $\mu_z(z')=0$) and linear independence; membership of each
+$\mu_z$ in $\ker T$ gives $T\,\mu_z=0$.  This does not even use $T\ge0$.
+
+The remaining two, \texttt{tasaki\_theorem\_11\_15} and \texttt{generalFlatBand\_theorem\_11\_17}
+(the basis connectivity is \texttt{generalFlatBandBasisGraph}/%
+\texttt{generalFlatBandBasisConnected}), are still recorded as documented axioms, matching the
+policy for Theorems 11.8 / 11.13; their proofs are deferred to later work.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
 §11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
