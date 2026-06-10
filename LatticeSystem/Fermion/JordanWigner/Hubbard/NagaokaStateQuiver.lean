@@ -656,5 +656,25 @@ theorem exists_avoiding_walk_of_induce_connected {V : Type*} (G : SimpleGraph V)
     exact hv
   exact ⟨W'.map (induceValHom G _), fun hy => (hsupp y hy).1 rfl, fun hz => (hsupp z hz).2 rfl⟩
 
+/-- **A triangle gives a common neighbour for any two of its vertices.**  If `w, α, β` are pairwise
+adjacent (a complete triangle) and `y, z` are two distinct vertices among them, then the third
+vertex `a` is a common neighbour and `y, z` are themselves adjacent — exactly the data
+(`Adj a y`, `Adj y z`, `Adj z a`) that `StateReach.swap_via_triangle_walk` needs to swap the spins
+at `y` and `z`.  (The triangle is complete, so every directed pair among `w, α, β` is an edge.) -/
+theorem exists_common_neighbor_of_triangle {V : Type*} (G : SimpleGraph V) {w α β : V}
+    (hwα : G.Adj w α) (hαβ : G.Adj α β) (hβw : G.Adj β w)
+    {y z : V} (hy : y = w ∨ y = α ∨ y = β) (hz : z = w ∨ z = α ∨ z = β) (hyz : y ≠ z) :
+    ∃ a : V, G.Adj a y ∧ G.Adj y z ∧ G.Adj z a := by
+  rcases hy with rfl | rfl | rfl <;> rcases hz with rfl | rfl | rfl
+  · exact absurd rfl hyz
+  · exact ⟨β, hβw, hwα, hαβ⟩
+  · exact ⟨α, hwα.symm, hβw.symm, hαβ.symm⟩
+  · exact ⟨β, hαβ.symm, hwα.symm, hβw.symm⟩
+  · exact absurd rfl hyz
+  · exact ⟨w, hwα, hαβ, hβw⟩
+  · exact ⟨α, hαβ, hβw, hwα⟩
+  · exact ⟨w, hβw.symm, hαβ.symm, hwα.symm⟩
+  · exact absurd rfl hyz
+
 end LatticeSystem.Fermion
 
