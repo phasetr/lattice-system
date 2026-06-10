@@ -734,6 +734,44 @@ theorem flatBand_cDownUp_int_occMonomial_same (s : Fin (K + 1) → Fin 2) (p : F
   obtain ⟨z1, _, hz1eq⟩ := occMonomial_alphaSpinOcc_eq_smul_canonical s
   rw [hz1eq, Matrix.mulVec_smul, flatBand_cDownUp_alphaSpinList_same_spin s p hsame, smul_zero]
 
+/-- **A β-free, non-doubly-occupied, half-filled config is an α-spin config.**  Its occupation set
+equals that of `αs'` for `s' q := (the spin occupied at orbital q)`.  Subset (each occupied mode is
+at its `s'`-spin, by no double occupancy) plus equal cardinality `K+1` forces equality. -/
+theorem flatBand_occFinset_eq_alphaSpinOcc_of_betaFree_noDouble
+    (f : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2)
+    (hbf : ∀ q' ∈ occFinset f, ∃ r, q'.1 = Sum.inl r)
+    (hnd : ∀ q : Fin (K + 1),
+      ¬((Sum.inl q, (0 : Fin 2)) ∈ occFinset f ∧ (Sum.inl q, (1 : Fin 2)) ∈ occFinset f))
+    (hcard : (occFinset f).card = K + 1) :
+    occFinset f = occFinset (flatBandAlphaSpinOcc K
+      (fun q => if (Sum.inl q, (0 : Fin 2)) ∈ occFinset f then 0 else 1)) := by
+  refine Finset.eq_of_subset_of_card_le (fun x hx => ?_)
+    (by rw [occFinset_alphaSpinOcc_card, hcard])
+  obtain ⟨r, hr⟩ := hbf x hx
+  rw [mem_occFinset_alphaSpinOcc]
+  refine ⟨r, Prod.ext hr ?_⟩
+  change x.2 = if (Sum.inl r, (0 : Fin 2)) ∈ occFinset f then (0 : Fin 2) else 1
+  have hlt := x.2.isLt
+  by_cases h0 : (Sum.inl r, (0 : Fin 2)) ∈ occFinset f
+  · rw [if_pos h0]
+    by_contra hne
+    have hx1 : x.2 = 1 := by
+      rcases (by omega : x.2.val = 0 ∨ x.2.val = 1) with h | h
+      · exact absurd (Fin.ext h) hne
+      · exact Fin.ext h
+    have hxe : x = (Sum.inl r, (1 : Fin 2)) := Prod.ext hr hx1
+    rw [hxe] at hx
+    exact hnd r ⟨h0, hx⟩
+  · rw [if_neg h0]
+    have hx0 : x.2 ≠ 0 := by
+      intro hc
+      have hxe : x = (Sum.inl r, (0 : Fin 2)) := Prod.ext hr hc
+      rw [hxe] at hx
+      exact h0 hx
+    rcases (by omega : x.2.val = 0 ∨ x.2.val = 1) with h | h
+    · exact absurd (Fin.ext h) hx0
+    · exact Fin.ext h
+
 /-- **No orbital double occupancy in the half-filled ground subspace.**  A β-free occupation config
 `g` that doubly occupies an orbital `q₀` has vanishing ground-state coordinate.  Reading the
 `(q₀`-pair-erased) coordinate of `0 = ĉ_{ext(q₀)↓} ĉ_{ext(q₀)↑} v` isolates exactly the `g` term
