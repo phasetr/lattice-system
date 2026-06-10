@@ -1074,4 +1074,52 @@ theorem flatBand_ground_repr_alphaSpinOcc_swap_iff (K : ℕ) (ν t U : ℝ) (hν
     · exact hf.1 (config_eq_of_occFinset_eq f (flatBandAlphaSpinOcc K s) (by rw [hrecon, hs's]))
     · exact hf.2 (config_eq_of_occFinset_eq f (flatBandAlphaSpinOcc K s_sw) (by rw [hrecon, hs'sw]))
 
+/-- **Ground coordinate-vanishing is invariant under any adjacent opposite-spin transposition.**
+For a ground vector `v` and an α-config `s` with opposite spins on the adjacent pair `p, p+1`, the
+coordinate at `αs` vanishes iff it vanishes at the pair-transposed config. -/
+theorem flatBand_ground_repr_adjSwap_iff (K : ℕ) (ν t U : ℝ) (hν : 0 < ν) (ht : 0 < t)
+    (hU : 0 < U) {v : (Fin (2 * (2 * K + 1) + 2) → Fin 2) → ℂ}
+    (hv : v ∈ flatBandHalfFilledGroundSubmodule K ν t U)
+    (p : Fin K) (s : Fin (K + 1) → Fin 2) (hopp : s p.castSucc ≠ s p.succ) :
+    (flatBandOccBasis K ν).repr v (flatBandAlphaSpinOcc K s) = 0 ↔
+      (flatBandOccBasis K ν).repr v (flatBandAlphaSpinOcc K
+        (Function.update (Function.update s p.castSucc (s p.succ)) p.succ (s p.castSucc))) = 0 := by
+  have hpne : p.castSucc ≠ p.succ := by
+    intro h; have := congrArg Fin.val h; rw [Fin.val_succ, Fin.val_castSucc] at this; omega
+  have hdich : ∀ t : Fin 2, t = 0 ∨ t = 1 := by
+    intro t
+    rcases (by omega : t.val = 0 ∨ t.val = 1) with h | h
+    · exact Or.inl (Fin.ext h)
+    · exact Or.inr (Fin.ext h)
+  rcases hdich (s p.castSucc) with h0 | h1
+  · have h1 : s p.succ = 1 := by
+      rcases hdich (s p.succ) with h | h
+      · exact absurd (h0.trans h.symm) hopp
+      · exact h
+    have hcfg : Function.update (Function.update s p.castSucc (s p.succ)) p.succ (s p.castSucc)
+        = Function.update (Function.update s p.castSucc 1) p.succ 0 := by
+      rw [h0, h1]
+    rw [hcfg]
+    exact flatBand_ground_repr_alphaSpinOcc_swap_iff K ν t U hν ht hU hv p s h0 h1
+  · have h0 : s p.succ = 0 := by
+      rcases hdich (s p.succ) with h | h
+      · exact h
+      · exact absurd (h1.trans h.symm) hopp
+    set s2 := Function.update (Function.update s p.castSucc (s p.succ)) p.succ (s p.castSucc)
+      with hs2
+    have hs20 : s2 p.castSucc = 0 := by
+      rw [hs2, Function.update_of_ne hpne, Function.update_self, h0]
+    have hs21 : s2 p.succ = 1 := by rw [hs2, Function.update_self, h1]
+    have hback : Function.update (Function.update s2 p.castSucc 1) p.succ 0 = s := by
+      funext q
+      by_cases hq0 : q = p.castSucc
+      · rw [hq0, Function.update_of_ne hpne, Function.update_self, h1]
+      · by_cases hq1 : q = p.succ
+        · rw [hq1, Function.update_self, h0]
+        · rw [Function.update_of_ne hq1, Function.update_of_ne hq0, hs2,
+            Function.update_of_ne hq1, Function.update_of_ne hq0]
+    have hmain := flatBand_ground_repr_alphaSpinOcc_swap_iff K ν t U hν ht hU hv p s2 hs20 hs21
+    rw [hback] at hmain
+    exact hmain.symm
+
 end LatticeSystem.Fermion
