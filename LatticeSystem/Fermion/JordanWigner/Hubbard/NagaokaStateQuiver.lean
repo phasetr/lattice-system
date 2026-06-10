@@ -159,5 +159,29 @@ theorem StateReach.threeCycle (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ
     ((StateReach.holeHop N t htsym htdiag y z _ hyz hbyz).trans
       (StateReach.holeHop N t htsym htdiag z x _ hzx hbzx))
 
+/-- The `(y z)` spin transposition of a one-hole state at hole `x` (with `x ∉ {y, z}`): swap the
+spin values at `y` and `z`, leave the rest (and the hole at `x`) fixed. -/
+def swapHoleSpin (N : ℕ) (x y z : Fin (N + 1)) (hxy : x ≠ y) (hxz : x ≠ z)
+    (σ : HoleSpin N x) : HoleSpin N x :=
+  ⟨fun w => if w = y then σ.val z else if w = z then σ.val y else σ.val w, by
+    dsimp only; rw [if_neg hxy, if_neg hxz]; exact σ.2⟩
+
+/-- **Step B (clean form): a bond triangle makes a spin transposition reachable.**  With bonds on
+all three edges of `x, y, z`, the state `(x, σ)` reaches `(x, swapHoleSpin σ)` — the hole returns to
+`x` and the spins at `y`, `z` are exchanged.  These two states share the magnetization sector
+(transposition preserves total `S_z`), so this is an edge of the sector quiver's connectivity. -/
+theorem StateReach.transposition (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (x y z : Fin (N + 1))
+    (hxy : x ≠ y) (hyz : y ≠ z) (hzx : z ≠ x)
+    (hbxy : 0 < t x y) (hbyz : 0 < t y z) (hbzx : 0 < t z x) (σ : HoleSpin N x) :
+    StateReach N t ⟨x, σ⟩ ⟨x, swapHoleSpin N x y z hxy hzx.symm σ⟩ := by
+  have h := StateReach.threeCycle N t htsym htdiag x y z hxy hyz hzx hbxy hbyz hbzx σ
+  have heq : holeSpinMove N z x (holeSpinMove N y z (holeSpinMove N x y σ))
+      = swapHoleSpin N x y z hxy hzx.symm σ := by
+    apply Subtype.ext
+    rw [holeSpinMove_three_cycle_val N x y z hxy hyz hzx σ]
+    rfl
+  rwa [heq] at h
+
 end LatticeSystem.Fermion
 
