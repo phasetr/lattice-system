@@ -165,6 +165,26 @@ theorem exists_sectorPath_of_path (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) →
     refine ⟨hd, @Quiver.Path.cons _ iS ⟨a, ha⟩ ⟨c, hc⟩ ⟨d, hd⟩ q (PLift.up eS), ?_⟩
     rw [@Quiver.Path.length_cons _ iS, hq, @Quiver.Path.length_cons _ iQ]
 
+/-- **Step C: state-quiver reachability ⟹ sector irreducibility.**  For `t ≥ 0`, if every ordered
+pair of states in a magnetization sector `m` is joined by a *positive-length* path of `−M` quiver
+edges (hole hops), then the sector matrix `nagaokaPFMatrixOnSector N t m` is irreducible (Definition
+11.6 for that sector).  Non-negativity is `neg_tasakiEffReMatrix_nonneg`; strong connectivity lifts
+each full-quiver path into the sector via `exists_sectorPath_of_path`.  This reduces the connectivity
+condition to the purely combinatorial reachability of the one-hole states by hole motion. -/
+theorem nagaokaPFMatrixOnSector_isIrreducible_of_reach (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ) (hpos : ∀ i j, 0 ≤ t i j)
+    (hreach : ∀ i j : HoleMagSector N m,
+      ∃ p : @Quiver.Path _ (Matrix.toQuiver (-tasakiEffReMatrix N t)) i.val j.val,
+        0 < @Quiver.Path.length _ (Matrix.toQuiver (-tasakiEffReMatrix N t)) _ _ p) :
+    (nagaokaPFMatrixOnSector N t m).IsIrreducible := by
+  refine ⟨fun i j => ?_, ?_⟩
+  · rw [nagaokaPFMatrixOnSector_apply]; exact neg_tasakiEffReMatrix_nonneg N t hpos i.val j.val
+  · letI iS : Quiver (HoleMagSector N m) := Matrix.toQuiver (nagaokaPFMatrixOnSector N t m)
+    intro i j
+    obtain ⟨p, hp⟩ := hreach i j
+    obtain ⟨hj, q, hq⟩ := exists_sectorPath_of_path N t m i.2 p
+    exact ⟨q, by rw [hq]; exact hp⟩
+
 /-- Reachability is transitive (path composition). -/
 theorem StateReach.trans {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ}
     {p q r : (z : Fin (N + 1)) × HoleSpin N z}
@@ -200,7 +220,7 @@ theorem holeSpinMove_three_cycle_val (N : ℕ) (x y z : Fin (N + 1))
   funext w
   simp only [holeSpinMove, Function.update_apply]
   by_cases hwx : w = x <;> by_cases hwy : w = y <;> by_cases hwz : w = z <;>
-    simp_all [hxy, hyz, hzx, hxy.symm, hyz.symm, hzx.symm, σ.2]
+    simp_all [hyz, hzx, hxy.symm, hyz.symm, hzx.symm, σ.2]
 
 /-- **Step B: a 3-cycle of bonds gives reachability to the spin-transposed state.**  If `x, y, z`
 form a triangle of bonds (`0 < t` on each edge), the hole can travel `x → y → z → x`, returning to
