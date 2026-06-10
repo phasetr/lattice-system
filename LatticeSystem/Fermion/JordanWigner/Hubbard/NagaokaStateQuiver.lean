@@ -880,5 +880,19 @@ theorem ReachSwap.comp_via {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ} {
   rw [swapHoleSpin_conj N p y w z hpy hpw hpz hyw_ne hwz_ne hyz_ne]
   exact (hyw p hpy hpw σ).trans ((hwz p hpw hpz _).trans (hyw p hpy hpw _))
 
+/-- **Base case of the generation: a length-3 exchange bond gives `ReachSwap`.**  Packages
+`StateReach.swap_of_exchange_len3` (valid from every hole position avoiding `y, z`) as a `ReachSwap`
+fact — the direct-edge instances from which `ReachSwap.comp_via` propagates the swap along
+exchange-bond paths. -/
+theorem reachSwap_of_exchange_len3 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {y z : Fin (N + 1)} (hyz : y ≠ z) {z' : Fin (N + 1)}
+    (c : (nagaokaBondGraph N t).Walk z' z') (hlen : c.length = 3)
+    (hyc : y ∈ c.support) (hzc : z ∈ c.support)
+    (hE2 : ((nagaokaBondGraph N t).induce {w | w ≠ y ∧ w ≠ z}).Connected) :
+    ReachSwap N t y z :=
+  fun p hpy hpz σ =>
+    StateReach.swap_of_exchange_len3 N t htsym htdiag hpos hyz c hlen hyc hzc hE2 hpy hpz σ
+
 end LatticeSystem.Fermion
 
