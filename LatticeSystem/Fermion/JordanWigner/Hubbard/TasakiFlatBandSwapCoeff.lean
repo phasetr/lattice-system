@@ -1122,4 +1122,46 @@ theorem flatBand_ground_repr_adjSwap_iff (K : ℕ) (ν t U : ℝ) (hν : 0 < ν)
     rw [hback] at hmain
     exact hmain.symm
 
+/-- **Without an adjacent `(1,0)` descent, occupied spins propagate to the right.**  If no adjacent
+orbital pair is `(↓-from-↑)` i.e. `(1, 0)`, then an up-spin at orbital `i` forces up-spins at all
+later orbitals. -/
+theorem flatBand_one_propagates (s : Fin (K + 1) → Fin 2)
+    (h : ∀ k : Fin K, ¬(s k.castSucc = 1 ∧ s k.succ = 0)) :
+    ∀ i j : Fin (K + 1), i ≤ j → s i = 1 → s j = 1 := by
+  have hdich : ∀ t : Fin 2, t = 0 ∨ t = 1 := by
+    intro t
+    rcases (by omega : t.val = 0 ∨ t.val = 1) with h | h
+    · exact Or.inl (Fin.ext h)
+    · exact Or.inr (Fin.ext h)
+  have hstep : ∀ k : Fin K, s k.castSucc = 1 → s k.succ = 1 := by
+    intro k hk
+    rcases hdich (s k.succ) with h0 | h1
+    · exact absurd ⟨hk, h0⟩ (h k)
+    · exact h1
+  have hgap : ∀ (m : ℕ) (i : Fin (K + 1)), s i = 1 → (hm : i.val + m < K + 1) →
+      s ⟨i.val + m, hm⟩ = 1 := by
+    intro m
+    induction m with
+    | zero =>
+      intro i hi hm
+      rw [show (⟨i.val + 0, hm⟩ : Fin (K + 1)) = i from Fin.ext (Nat.add_zero i.val)]; exact hi
+    | succ n ih =>
+      intro i hi hm
+      have hn1 : i.val + n < K + 1 := by omega
+      have hkK : i.val + n < K := by omega
+      have hihn := ih i hi hn1
+      have hcs : ((⟨i.val + n, hkK⟩ : Fin K).castSucc) = (⟨i.val + n, hn1⟩ : Fin (K + 1)) :=
+        Fin.ext rfl
+      have hsc : ((⟨i.val + n, hkK⟩ : Fin K).succ) = (⟨i.val + (n + 1), hm⟩ : Fin (K + 1)) :=
+        Fin.ext (by simp only [Fin.val_succ]; omega)
+      rw [← hsc]
+      exact hstep ⟨i.val + n, hkK⟩ (by rw [hcs]; exact hihn)
+  intro i j hij hi
+  have hle : i.val ≤ j.val := hij
+  have hj : j.val < K + 1 := j.isLt
+  have hb : i.val + (j.val - i.val) < K + 1 := by omega
+  have hg := hgap (j.val - i.val) i hi hb
+  rwa [show (⟨i.val + (j.val - i.val), hb⟩ : Fin (K + 1)) = j from
+    Fin.ext (Nat.add_sub_cancel' hle)] at hg
+
 end LatticeSystem.Fermion
