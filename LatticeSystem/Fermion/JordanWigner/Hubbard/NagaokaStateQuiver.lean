@@ -185,6 +185,20 @@ theorem nagaokaPFMatrixOnSector_isIrreducible_of_reach (N : ℕ)
     obtain ⟨hj, q, hq⟩ := exists_sectorPath_of_path N t m i.2 p
     exact ⟨q, by rw [hq]; exact hp⟩
 
+/-- **Step C capstone: the connectivity condition reduces to state-quiver reachability.**  For
+`t ≥ 0`, if within every magnetization sector every ordered pair of one-hole states is joined by a
+positive-length path of `−M` quiver edges (i.e. a non-trivial sequence of hole hops), then the
+connectivity condition of Definition 11.6 (`nagaokaConnectivity`) holds.  This is the matrix/quiver
+half of Lemma 11.9: it leaves exactly the combinatorial task of exhibiting those hole-motion paths
+from the exchange-bond hypothesis (the "15-puzzle" argument). -/
+theorem nagaokaConnectivity_of_reach (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (hpos : ∀ i j, 0 ≤ t i j)
+    (hreach : ∀ (m : ℤ) (i j : HoleMagSector N m),
+      ∃ p : @Quiver.Path _ (Matrix.toQuiver (-tasakiEffReMatrix N t)) i.val j.val,
+        0 < @Quiver.Path.length _ (Matrix.toQuiver (-tasakiEffReMatrix N t)) _ _ p) :
+    nagaokaConnectivity N t :=
+  fun m => nagaokaPFMatrixOnSector_isIrreducible_of_reach N t m hpos (hreach m)
+
 /-- Reachability is transitive (path composition). -/
 theorem StateReach.trans {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ}
     {p q r : (z : Fin (N + 1)) × HoleSpin N z}
