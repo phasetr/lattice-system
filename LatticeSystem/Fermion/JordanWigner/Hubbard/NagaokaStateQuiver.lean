@@ -322,6 +322,43 @@ def cyc3HoleSpin (N : ℕ) (x y w z : Fin (N + 1)) (hxy : x ≠ y) (hxw : x ≠ 
       else if v = z then σ.val y else σ.val v, by
     dsimp only; rw [if_neg hxy, if_neg hxw, if_neg hxz]; exact σ.2⟩
 
+/-- Pointwise value of `cyc3HoleSpin`: `y ← σ(w)`, `w ← σ(z)`, `z ← σ(y)`, others kept. -/
+theorem cyc3HoleSpin_val_apply (N : ℕ) (x y w z : Fin (N + 1)) (hxy : x ≠ y) (hxw : x ≠ w)
+    (hxz : x ≠ z) (σ : HoleSpin N x) (s : Fin (N + 1)) :
+    (cyc3HoleSpin N x y w z hxy hxw hxz σ).val s
+      = if s = y then σ.val w else if s = w then σ.val z
+          else if s = z then σ.val y else σ.val s := rfl
+
+/-- **Length-4 exchange, single loop (Tasaki Fig. 11.9, footnote 14).**  On a 4-loop with hole at
+`x` and occupied sites `y, w, z`, when the auxiliary site `w` carries the *same* spin as `z`, the
+spin 3-cycle `cyc3HoleSpin` realised by one trip around the loop coincides with the plain
+transposition of the spins at `y` and `z`.  (Spins are Boolean, so the third spin must match one of
+the two being exchanged; this is the `w = z` branch.) -/
+theorem cyc3HoleSpin_eq_swap_of_val_eq (N : ℕ) (x y w z : Fin (N + 1)) (hxy : x ≠ y) (hxw : x ≠ w)
+    (hxz : x ≠ z) (hwy : w ≠ y) (hwz : w ≠ z) (hzy : z ≠ y) (σ : HoleSpin N x)
+    (hval : σ.val w = σ.val z) :
+    cyc3HoleSpin N x y w z hxy hxw hxz σ = swapHoleSpin N x y z hxy hxz σ := by
+  apply Subtype.ext; funext s
+  rw [cyc3HoleSpin_val_apply, swapHoleSpin_val_apply]
+  by_cases h1 : s = y <;> by_cases h2 : s = w <;> by_cases h3 : s = z <;>
+    simp_all [hwy, hwz, hzy]
+
+/-- **Length-4 exchange, double loop (Tasaki Fig. 11.9, footnote 14).**  When the auxiliary site
+`w` carries the *same* spin as `y`, going around the 4-loop *twice* (applying the 3-cycle
+`cyc3HoleSpin` twice, the inverse 3-cycle) coincides with the plain transposition of the spins at
+`y` and `z`.  This is the second branch of the Boolean dichotomy: `σ(w)` must equal either `σ(z)`
+(handled by `cyc3HoleSpin_eq_swap_of_val_eq`, one trip) or `σ(y)` (here, two trips). -/
+theorem cyc3HoleSpin_twice_eq_swap_of_val_eq (N : ℕ) (x y w z : Fin (N + 1)) (hxy : x ≠ y)
+    (hxw : x ≠ w) (hxz : x ≠ z) (hwy : w ≠ y) (hwz : w ≠ z) (hzy : z ≠ y) (σ : HoleSpin N x)
+    (hval : σ.val w = σ.val y) :
+    cyc3HoleSpin N x y w z hxy hxw hxz (cyc3HoleSpin N x y w z hxy hxw hxz σ)
+      = swapHoleSpin N x y z hxy hxz σ := by
+  apply Subtype.ext; funext s
+  rw [cyc3HoleSpin_val_apply, swapHoleSpin_val_apply]
+  simp only [cyc3HoleSpin_val_apply]
+  by_cases h1 : s = y <;> by_cases h2 : s = w <;> by_cases h3 : s = z <;>
+    simp_all [hwy, hwz, hzy]
+
 /-- **Step B (length-4, clean form): a bond 4-loop makes a spin 3-cycle reachable.**  With bonds on
 the loop `x → y → w → z → x`, `(x, σ)` reaches `(x, cyc3HoleSpin σ)` — the spins at `y, w, z` are
 cyclically permuted (same magnetization sector). -/
