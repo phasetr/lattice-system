@@ -124,6 +124,15 @@ theorem StateReach.trans {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ}
   letI := Matrix.toQuiver (-tasakiEffReMatrix N t)
   exact ⟨hpq.some.comp hqr.some⟩
 
+/-- Reachability is symmetric: `−M` is symmetric (for symmetric `t`, zero diagonal), so reversing a
+path of positive entries gives a path back.  Hence sector connectivity is undirected. -/
+theorem StateReach.symm (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0)
+    {p q : (z : Fin (N + 1)) × HoleSpin N z} (h : StateReach N t p q) : StateReach N t q p := by
+  have hsymm : (-tasakiEffReMatrix N t)ᵀ = -tasakiEffReMatrix N t := by
+    rw [Matrix.transpose_neg, (tasakiEffReMatrix_isSymm N t htsym htdiag)]
+  exact ⟨hsymm ▸ Matrix.transposePath h.some⟩
+
 /-- A single hole hop along a present bond gives reachability `(x, σ) → (y, holeSpinMove x y σ)`. -/
 theorem StateReach.holeHop (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
     (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0)
