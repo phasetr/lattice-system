@@ -58,10 +58,10 @@ theorem matrix_singular_value_decomposition (A : Matrix n n ℂ) :
   set w : n → EuclideanSpace ℂ n := fun i => Matrix.toEuclideanLin A (vb i) with hw_def
   -- `⟪w i, w j⟫ = λ_j · δ_{ij}`.
   have hw_inner : ∀ i j, (inner ℂ (w i) (w j)) = ((if i = j then lam j else 0 : ℝ) : ℂ) := by
-    intro i j
-    rw [hw_def, EuclideanSpace.inner_eq_star_dotProduct]
-    change (A *ᵥ WithLp.ofLp (hMH.eigenvectorBasis j)) ⬝ᵥ
-      star (A *ᵥ WithLp.ofLp (hMH.eigenvectorBasis i)) = _
+    -- TODO (#4352): the ℝ-smul-on-`n → ℂ` from `mulVec_eigenvectorBasis` blocks both
+    -- `dotProduct_smul` (SMulCommClass ℝ ℂ ℂ) and `smul_dotProduct` (IsScalarTower ℝ ℂ ℂ) here;
+    -- redo via the `EuclideanSpace` inner product (its scalar-tower instances avoid the gap)
+    -- with `Matrix.toEuclideanLin_conjTranspose_eq_adjoint` + `inner_smul_real_right`.
     sorry
   sorry
 
