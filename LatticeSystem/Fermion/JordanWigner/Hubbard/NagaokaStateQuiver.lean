@@ -392,5 +392,22 @@ theorem StateReach.transposition_of_triangle (N : ℕ) (t : Fin (N + 1) → Fin 
     (nagaokaBondGraph_adj_pos N t htsym hpos hxy) (nagaokaBondGraph_adj_pos N t htsym hpos hyz)
     (nagaokaBondGraph_adj_pos N t htsym hpos hzx) σ
 
+/-- **Step C (4-loop 3-cycle from graph adjacency).**  If `x, y, w, z` form a 4-loop of bonds in
+the bond graph (consecutive edges `x—y—w—z—x`, with the two diagonals `x ≠ w`, `y ≠ z`), then with
+the hole at `x` the state `(x, σ)` reaches the state with the spins at `y, w, z` cyclically permuted
+(`cyc3HoleSpin`).  This packages `StateReach.threeCyclePerm` with `nagaokaBondGraph_adj_pos`, turning
+a graph-level 4-cycle (as produced by a length-4 cycle / exchange bond) into a reachable spin
+3-cycle. -/
+theorem StateReach.threeCyclePerm_of_quad (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {x y w z : Fin (N + 1)} (hxy : (nagaokaBondGraph N t).Adj x y)
+    (hyw : (nagaokaBondGraph N t).Adj y w) (hwz : (nagaokaBondGraph N t).Adj w z)
+    (hzx : (nagaokaBondGraph N t).Adj z x) (hxw : x ≠ w) (hyz : y ≠ z)
+    (σ : HoleSpin N x) :
+    StateReach N t ⟨x, σ⟩ ⟨x, cyc3HoleSpin N x y w z hxy.ne hxw hzx.ne.symm σ⟩ :=
+  StateReach.threeCyclePerm N t htsym htdiag x y w z hxy.ne hyw.ne hwz.ne hzx.ne hxw hyz
+    (nagaokaBondGraph_adj_pos N t htsym hpos hxy) (nagaokaBondGraph_adj_pos N t htsym hpos hyw)
+    (nagaokaBondGraph_adj_pos N t htsym hpos hwz) (nagaokaBondGraph_adj_pos N t htsym hpos hzx) σ
+
 end LatticeSystem.Fermion
 
