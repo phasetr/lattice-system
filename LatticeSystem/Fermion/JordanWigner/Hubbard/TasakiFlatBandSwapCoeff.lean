@@ -772,6 +772,25 @@ theorem flatBand_occFinset_eq_alphaSpinOcc_of_betaFree_noDouble
     · exact absurd (Fin.ext h) hx0
     · exact Fin.ext h
 
+/-- An occupation config (a `Fin 2`-valued function) is determined by its occupation finset. -/
+theorem config_eq_of_occFinset_eq (f g : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2)
+    (h : occFinset f = occFinset g) : f = g := by
+  funext q
+  have hiff := Finset.ext_iff.mp h q
+  simp only [occFinset, Finset.mem_filter, Finset.mem_univ, true_and] at hiff
+  have hf2 := (f q).isLt
+  have hg2 := (g q).isLt
+  by_cases hf : f q = 1
+  · rw [hf, hiff.mp hf]
+  · have hg : g q ≠ 1 := fun hg => hf (hiff.mpr hg)
+    rw [Fin.ext (by have := Fin.val_ne_of_ne hf; omega : (f q).val = (g q).val)]
+
+/-- The occupation monomial depends only on the occupation finset. -/
+theorem occMonomial_congr (f g : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2)
+    (h : occFinset f = occFinset g) :
+    occMonomial K ν f = occMonomial K ν g := by
+  rw [occMonomial, occMonomial, h]
+
 /-- **Two-hole configs with opposite pair spins coincide only for `s` and its pair-swap.**  If the
 two-hole occupations of `s'` and `s` agree and `s'` carries opposite spins on the pair `p, p+1`,
 then `s'` is `s` itself or `s` with the pair spins swapped (it must agree with `s` off the pair). -/
