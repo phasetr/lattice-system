@@ -322,6 +322,20 @@ def cyc3HoleSpin (N : ℕ) (x y w z : Fin (N + 1)) (hxy : x ≠ y) (hxw : x ≠ 
       else if v = z then σ.val y else σ.val v, by
     dsimp only; rw [if_neg hxy, if_neg hxw, if_neg hxz]; exact σ.2⟩
 
+/-- **Transposition conjugation `(y z) = (y w)(w z)(y w)`.**  Swapping the spins at `y` and `z` can
+be realised as three swaps through an intermediate site `w` (distinct from `y, z` and the hole).
+This is the algebraic step of the distance induction: if the swaps `{y, w}` and `{w, z}` are
+reachable, so is `{y, z}`. -/
+theorem swapHoleSpin_conj (N : ℕ) (p y w z : Fin (N + 1)) (hpy : p ≠ y) (hpw : p ≠ w)
+    (hpz : p ≠ z) (hyw : y ≠ w) (hwz : w ≠ z) (hyz : y ≠ z) (σ : HoleSpin N p) :
+    swapHoleSpin N p y z hpy hpz σ
+      = swapHoleSpin N p y w hpy hpw
+          (swapHoleSpin N p w z hpw hpz (swapHoleSpin N p y w hpy hpw σ)) := by
+  apply Subtype.ext; funext s
+  simp only [swapHoleSpin_val_apply]
+  by_cases h1 : s = y <;> by_cases h2 : s = w <;> by_cases h3 : s = z <;>
+    simp_all [hyw, hwz, hyz, hyw.symm, hwz.symm, hyz.symm]
+
 /-- Pointwise value of `cyc3HoleSpin`: `y ← σ(w)`, `w ← σ(z)`, `z ← σ(y)`, others kept. -/
 theorem cyc3HoleSpin_val_apply (N : ℕ) (x y w z : Fin (N + 1)) (hxy : x ≠ y) (hxw : x ≠ w)
     (hxz : x ≠ z) (σ : HoleSpin N x) (s : Fin (N + 1)) :
