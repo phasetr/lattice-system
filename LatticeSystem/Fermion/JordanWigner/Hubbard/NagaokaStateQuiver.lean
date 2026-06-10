@@ -494,5 +494,26 @@ theorem holeWalkTransport_reverse (N : ℕ) {G : SimpleGraph (Fin (N + 1))}
     rw [SimpleGraph.Walk.reverse_cons, holeWalkTransport_cons, holeWalkTransport_append,
       holeWalkTransport_cons, holeWalkTransport_nil, ih, holeSpinMove_moveBack N h.ne]
 
+/-- A single hole hop `x → y` only changes the spins at the old and new hole sites: at any site
+`s ∉ {x, y}` the configuration is unchanged. -/
+theorem holeSpinMove_apply_of_ne (N : ℕ) {x y : Fin (N + 1)} (σ : HoleSpin N x) {s : Fin (N + 1)}
+    (hsx : s ≠ x) (hsy : s ≠ y) : (holeSpinMove N x y σ).val s = σ.val s := by
+  simp only [holeSpinMove, Function.update_apply, if_neg hsy, if_neg hsx]
+
+/-- **Spins off the hole's path are untouched.**  If the hole's walk `W` never visits site `s`
+(`s ∉ W.support`), then transporting along `W` leaves the spin at `s` unchanged.  The hole only ever
+rewrites the sites it occupies, so any site outside the walk keeps its value — the precise sense in
+which a hole excursion avoiding two sites does not disturb their spins. -/
+theorem holeWalkTransport_apply_of_notMem_support (N : ℕ) {G : SimpleGraph (Fin (N + 1))}
+    {x x' : Fin (N + 1)} (W : G.Walk x x') (σ : HoleSpin N x) {s : Fin (N + 1)}
+    (hs : s ∉ W.support) : (holeWalkTransport N W σ).val s = σ.val s := by
+  induction W with
+  | nil => rfl
+  | @cons a b _ h p ih =>
+    rw [SimpleGraph.Walk.support_cons, List.mem_cons, not_or] at hs
+    obtain ⟨hsa, hsp⟩ := hs
+    rw [holeWalkTransport_cons, ih (holeSpinMove N a b σ) hsp,
+      holeSpinMove_apply_of_ne N σ hsa (fun h0 => hsp (h0 ▸ p.start_mem_support))]
+
 end LatticeSystem.Fermion
 
