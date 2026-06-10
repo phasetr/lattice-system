@@ -817,5 +817,19 @@ theorem StateReach.swap_of_exchange_len3 (N : ℕ) (t : Fin (N + 1) → Fin (N +
       ⟨ha3y.ne, hza3.ne.symm⟩
   exact StateReach.swap_via_triangle_walk N t htsym htdiag hpos ha3y hyz_adj hza3 W hyW hzW σ
 
+/-- **A positive-length self-loop in the state quiver.**  If the hole at `p` has a bond-neighbour
+`q`, then hopping `p → q → p` is a length-2 closed path that returns to the same state `(p, σ)` (the
+round trip restores the configuration).  This supplies the diagonal `i = i` case of
+`IsSStronglyConnected`, which demands a path of *positive* length even from a state to itself. -/
+theorem exists_pos_selfPath (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) {p q : Fin (N + 1)}
+    (σ : HoleSpin N p) (hpq : p ≠ q) (ht : 0 < t p q) :
+    ∃ path : @Quiver.Path _ (Matrix.toQuiver (-tasakiEffReMatrix N t)) ⟨p, σ⟩ ⟨p, σ⟩,
+      0 < @Quiver.Path.length _ (Matrix.toQuiver (-tasakiEffReMatrix N t)) _ _ path := by
+  letI : Quiver _ := Matrix.toQuiver (-tasakiEffReMatrix N t)
+  refine ⟨(holeHopHom' N t htsym htdiag p q σ hpq ht).toPath.comp
+    (holeHopHom N t p q σ hpq ht).toPath, ?_⟩
+  simp [Quiver.Path.length_comp, Quiver.Path.length_toPath]
+
 end LatticeSystem.Fermion
 
