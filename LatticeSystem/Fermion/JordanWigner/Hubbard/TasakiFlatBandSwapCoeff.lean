@@ -1164,4 +1164,58 @@ theorem flatBand_one_propagates (s : Fin (K + 1) → Fin 2)
   rwa [show (⟨i.val + (j.val - i.val), hb⟩ : Fin (K + 1)) = j from
     Fin.ext (Nat.add_sub_cancel' hle)] at hg
 
+/-- **A config with no adjacent inversion is determined by its up-count.**  Two monotone
+(`0…01…1`) configs with the same number of up-spins are equal. -/
+theorem flatBand_no_adj_inv_eq (s s' : Fin (K + 1) → Fin 2)
+    (hs : ∀ k : Fin K, ¬(s k.castSucc = 1 ∧ s k.succ = 0))
+    (hs' : ∀ k : Fin K, ¬(s' k.castSucc = 1 ∧ s' k.succ = 0))
+    (hc : (Finset.univ.filter (fun q => s q = 1)).card
+        = (Finset.univ.filter (fun q => s' q = 1)).card) :
+    s = s' := by
+  have hdich : ∀ t : Fin 2, t = 0 ∨ t = 1 := by
+    intro t
+    rcases (by omega : t.val = 0 ∨ t.val = 1) with h | h
+    · exact Or.inl (Fin.ext h)
+    · exact Or.inr (Fin.ext h)
+  have key : ∀ (a b : Fin (K + 1) → Fin 2),
+      (∀ k : Fin K, ¬(a k.castSucc = 1 ∧ a k.succ = 0)) →
+      (∀ k : Fin K, ¬(b k.castSucc = 1 ∧ b k.succ = 0)) →
+      (Finset.univ.filter (fun q => a q = 1)).card
+        = (Finset.univ.filter (fun q => b q = 1)).card →
+      ∀ q, a q = 1 → b q = 1 := by
+    intro a b ha hb hcard q haq
+    by_contra hbq
+    have hbq0 : b q = 0 := (hdich (b q)).resolve_right hbq
+    have hsub1 : Finset.Ici q ⊆ Finset.univ.filter (fun q' => a q' = 1) := fun q' hq' =>
+      Finset.mem_filter.mpr ⟨Finset.mem_univ _,
+        flatBand_one_propagates a ha q q' (Finset.mem_Ici.mp hq') haq⟩
+    have hsub0 : Finset.Iic q ⊆ Finset.univ.filter (fun q' => b q' = 0) := by
+      intro q' hq'
+      refine Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩
+      rcases hdich (b q') with h0 | h1
+      · exact h0
+      · exact absurd (flatBand_one_propagates b hb q' q (Finset.mem_Iic.mp hq') h1)
+          (by rw [hbq0]; decide)
+    have hc1 : (K + 1) - q.val ≤ (Finset.univ.filter (fun q' => a q' = 1)).card := by
+      rw [← Fin.card_Ici]; exact Finset.card_le_card hsub1
+    have hc0 : q.val + 1 ≤ (Finset.univ.filter (fun q' => b q' = 0)).card := by
+      rw [← Fin.card_Iic]; exact Finset.card_le_card hsub0
+    have hsplit : (Finset.univ.filter (fun q' => b q' = 0)).card
+        + (Finset.univ.filter (fun q' => b q' = 1)).card = K + 1 := by
+      have hh := Finset.card_filter_add_card_filter_not
+        (s := (Finset.univ : Finset (Fin (K + 1)))) (p := fun q' => b q' = 0)
+      rw [Finset.card_univ, Fintype.card_fin,
+        show (Finset.univ.filter (fun q' => ¬ b q' = 0))
+            = Finset.univ.filter (fun q' => b q' = 1) from
+          Finset.filter_congr (fun q' _ => by rcases hdich (b q') with h | h <;> simp [h])] at hh
+      exact hh
+    have hq := q.isLt
+    omega
+  funext q
+  rcases hdich (s q) with h0 | h1
+  · rcases hdich (s' q) with h0' | h1'
+    · rw [h0, h0']
+    · exact absurd (key s' s hs' hs hc.symm q h1') (by rw [h0]; decide)
+  · rw [h1, key s s' hs hs' hc q h1]
+
 end LatticeSystem.Fermion
