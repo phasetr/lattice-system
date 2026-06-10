@@ -210,5 +210,20 @@ theorem holeSpinMove_four_cycle_val (N : ℕ) (x y w z : Fin (N + 1))
     simp_all [hxy, hyw, hwz, hzx, hxw, hyz, hxy.symm, hyw.symm, hwz.symm, hzx.symm,
       hxw.symm, hyz.symm, σ.2]
 
+/-- **Step B (length-4 loops): a 4-cycle of bonds makes the spin 3-cycle reachable.**  With bonds
+on all four edges of the loop `x → y → w → z → x`, `(x, σ)` reaches `(x, σ')` where `σ'` 3-cycles
+the spins at `y, w, z` — the length-4 case of Tasaki's exchange. -/
+theorem StateReach.fourCycle (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (x y w z : Fin (N + 1))
+    (hxy : x ≠ y) (hyw : y ≠ w) (hwz : w ≠ z) (hzx : z ≠ x)
+    (hbxy : 0 < t x y) (hbyw : 0 < t y w) (hbwz : 0 < t w z) (hbzx : 0 < t z x)
+    (σ : HoleSpin N x) :
+    StateReach N t ⟨x, σ⟩
+      ⟨x, holeSpinMove N z x (holeSpinMove N w z (holeSpinMove N y w (holeSpinMove N x y σ)))⟩ :=
+  (StateReach.holeHop N t htsym htdiag x y σ hxy hbxy).trans
+    ((StateReach.holeHop N t htsym htdiag y w _ hyw hbyw).trans
+      ((StateReach.holeHop N t htsym htdiag w z _ hwz hbwz).trans
+        (StateReach.holeHop N t htsym htdiag z x _ hzx hbzx)))
+
 end LatticeSystem.Fermion
 
