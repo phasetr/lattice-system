@@ -429,5 +429,40 @@ theorem exists_quad_adj_of_walk_length_four {V : Type*} (G : SimpleGraph V) {z :
   match c, hlen with
   | .cons h1 (.cons h2 (.cons h3 (.cons h4 .nil))), _ => exact ⟨_, _, _, h1, h2, h3, h4⟩
 
+/-- **Controlled hole transport along a walk.**  The spin configuration carried by the hole as it
+travels along a walk `W : x → x'`, obtained by iterating `holeSpinMove` edge by edge.  Unlike the
+existential `StateReach.exists_ofBondWalk`, this records the *exact* resulting configuration, which
+is what the "15-puzzle" round-trip argument needs to compute the net spin permutation. -/
+def holeWalkTransport (N : ℕ) {G : SimpleGraph (Fin (N + 1))} :
+    {x x' : Fin (N + 1)} → G.Walk x x' → HoleSpin N x → HoleSpin N x'
+  | _, _, SimpleGraph.Walk.nil, σ => σ
+  | x, _, SimpleGraph.Walk.cons (v := v) _ W', σ => holeWalkTransport N W' (holeSpinMove N x v σ)
+
+@[simp] theorem holeWalkTransport_nil (N : ℕ) {G : SimpleGraph (Fin (N + 1))} {x : Fin (N + 1)}
+    (σ : HoleSpin N x) : holeWalkTransport N (G := G) SimpleGraph.Walk.nil σ = σ := rfl
+
+@[simp] theorem holeWalkTransport_cons (N : ℕ) {G : SimpleGraph (Fin (N + 1))}
+    {x v x' : Fin (N + 1)} (h : G.Adj x v) (W' : G.Walk v x') (σ : HoleSpin N x) :
+    holeWalkTransport N (SimpleGraph.Walk.cons h W') σ
+      = holeWalkTransport N W' (holeSpinMove N x v σ) := rfl
+
+/-- **Controlled hole mobility: a bond walk reaches the explicitly transported state.**  The state
+`(x, σ)` reaches `(x', holeWalkTransport W σ)` — the same reachability as
+`StateReach.exists_ofBondWalk`, but with the destination configuration pinned down to the computed
+transport.  Proved by induction on `W`, each edge being a `StateReach.holeHop`. -/
+theorem StateReach.ofBondWalk (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {x x' : Fin (N + 1)} (W : (nagaokaBondGraph N t).Walk x x') (σ : HoleSpin N x) :
+    StateReach N t ⟨x, σ⟩ ⟨x', holeWalkTransport N W σ⟩ := by
+  revert σ
+  induction W with
+  | nil => exact fun σ => StateReach.refl N t ⟨_, σ⟩
+  | @cons u v w h W' ih =>
+    intro σ
+    have e1 : StateReach N t ⟨u, σ⟩ ⟨v, holeSpinMove N u v σ⟩ :=
+      StateReach.holeHop N t htsym htdiag u v σ h.ne (nagaokaBondGraph_adj_pos N t htsym hpos h)
+    rw [holeWalkTransport_cons]
+    exact e1.trans (ih (holeSpinMove N u v σ))
+
 end LatticeSystem.Fermion
 
