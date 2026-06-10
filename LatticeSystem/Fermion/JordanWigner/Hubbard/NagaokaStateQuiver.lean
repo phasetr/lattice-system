@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaGlobalMin
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaMagnetizationSector
+import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaConnectivityClassification
 import Mathlib.LinearAlgebra.Matrix.Irreducible.Defs
 
 /-!
@@ -331,6 +332,36 @@ theorem StateReach.threeCyclePerm (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) →
     rw [holeSpinMove_four_cycle_val N x y w z hxy hyw hwz hzx hxw hyz σ]
     rfl
   rwa [heq] at h
+
+/-- A bond-graph edge gives a positive hopping amplitude (for symmetric `t ≥ 0`): adjacency in
+`nagaokaBondGraph` means `t x y ≠ 0`, which together with `0 ≤ t x y` forces `0 < t x y`. -/
+theorem nagaokaBondGraph_adj_pos (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (hpos : ∀ i j, 0 ≤ t i j) {x y : Fin (N + 1)}
+    (h : (nagaokaBondGraph N t).Adj x y) : 0 < t x y := by
+  obtain ⟨_, hne⟩ := h
+  refine lt_of_le_of_ne (hpos x y) (fun h0 => ?_)
+  rcases hne with hxy | hyx
+  · exact hxy h0.symm
+  · exact hyx (by rw [htsym]; exact h0.symm)
+
+/-- **Step C (hole mobility): a bond-graph walk lifts to state-quiver reachability.**  If the hole
+can travel from site `x` to site `x'` along a walk of bonds, then for any spin configuration `σ` the
+state `(x, σ)` reaches *some* state `(x', τ)` (the spins carried along by the moving hole).  This is
+the mobility ingredient of Lemma 11.9: the hole can be brought anywhere the bond graph allows, which
+combined with the exchange-bond spin transpositions yields full sector connectivity. -/
+theorem StateReach.exists_ofBondWalk (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {x x' : Fin (N + 1)} (W : (nagaokaBondGraph N t).Walk x x') (σ : HoleSpin N x) :
+    ∃ τ : HoleSpin N x', StateReach N t ⟨x, σ⟩ ⟨x', τ⟩ := by
+  revert σ
+  induction W with
+  | nil => exact fun σ => ⟨σ, StateReach.refl N t ⟨_, σ⟩⟩
+  | @cons u v w h W' ih =>
+    intro σ
+    have e1 : StateReach N t ⟨u, σ⟩ ⟨v, holeSpinMove N u v σ⟩ :=
+      StateReach.holeHop N t htsym htdiag u v σ h.ne (nagaokaBondGraph_adj_pos N t htsym hpos h)
+    obtain ⟨τ, hτ⟩ := ih (holeSpinMove N u v σ)
+    exact ⟨τ, e1.trans hτ⟩
 
 end LatticeSystem.Fermion
 
