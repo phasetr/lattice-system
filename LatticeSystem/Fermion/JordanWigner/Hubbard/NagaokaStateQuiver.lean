@@ -103,5 +103,34 @@ def holeHopHom' (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
       (⟨x, σ⟩ : (z : Fin (N + 1)) × HoleSpin N z) ⟨y, holeSpinMove N x y σ⟩ :=
   ⟨neg_tasakiEffReMatrix_holeSpinMove_pos' N t htsym htdiag x y σ hxy ht⟩
 
+/-- **State reachability** in the `−M` quiver: a (possibly empty) path of positive entries between
+two one-hole states.  Strong connectivity of a sector (`nagaokaConnectivity`) amounts to a
+*positive-length* such path between any two same-magnetization states; reachability is the
+reflexive–transitive backbone for assembling those from atomic hole hops. -/
+def StateReach (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (p q : (z : Fin (N + 1)) × HoleSpin N z) : Prop :=
+  Nonempty ((Matrix.toQuiver (-tasakiEffReMatrix N t)).Path p q)
+
+/-- Reachability is reflexive (empty path). -/
+theorem StateReach.refl (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (p : (z : Fin (N + 1)) × HoleSpin N z) : StateReach N t p p := by
+  letI := Matrix.toQuiver (-tasakiEffReMatrix N t)
+  exact ⟨Quiver.Path.nil⟩
+
+/-- Reachability is transitive (path composition). -/
+theorem StateReach.trans {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ}
+    {p q r : (z : Fin (N + 1)) × HoleSpin N z}
+    (hpq : StateReach N t p q) (hqr : StateReach N t q r) : StateReach N t p r := by
+  letI := Matrix.toQuiver (-tasakiEffReMatrix N t)
+  exact ⟨hpq.some.comp hqr.some⟩
+
+/-- A single hole hop along a present bond gives reachability `(x, σ) → (y, holeSpinMove x y σ)`. -/
+theorem StateReach.holeHop (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0)
+    (x y : Fin (N + 1)) (σ : HoleSpin N x) (hxy : x ≠ y) (ht : 0 < t x y) :
+    StateReach N t ⟨x, σ⟩ ⟨y, holeSpinMove N x y σ⟩ := by
+  letI := Matrix.toQuiver (-tasakiEffReMatrix N t)
+  exact ⟨(holeHopHom' N t htsym htdiag x y σ hxy ht).toPath⟩
+
 end LatticeSystem.Fermion
 
