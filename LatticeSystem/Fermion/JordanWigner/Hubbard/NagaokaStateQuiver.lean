@@ -853,5 +853,32 @@ theorem exists_pos_selfPath (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
     (holeHopHom N t p q σ hpq ht).toPath, ?_⟩
   simp [Quiver.Path.length_comp, Quiver.Path.length_toPath]
 
+/-- **The spin swap of two sites is reachable from any hole position.**  The abstract relation behind
+Lemma 11.9's generation step: from *every* hole position `p ∉ {y, z}` the state `(p, σ)` reaches the
+state with the spins at `y, z` exchanged.  Exchange bonds give the base instances
+(`swap_of_exchange_len3`), and `ReachSwap.comp_via` propagates it along paths. -/
+def ReachSwap (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ) (y z : Fin (N + 1)) : Prop :=
+  ∀ (p : Fin (N + 1)) (hpy : p ≠ y) (hpz : p ≠ z) (σ : HoleSpin N p),
+    StateReach N t ⟨p, σ⟩ ⟨p, swapHoleSpin N p y z hpy hpz σ⟩
+
+/-- `ReachSwap` is symmetric in the two sites. -/
+theorem ReachSwap.symm {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ} {y z : Fin (N + 1)}
+    (h : ReachSwap N t y z) (hyz : y ≠ z) : ReachSwap N t z y := by
+  intro p hpz hpy σ
+  rw [← swapHoleSpin_comm N p y z hpy hpz hyz]
+  exact h p hpy hpz σ
+
+/-- **Composition through an intermediate site** (the conjugation `(y z) = (y w)(w z)(y w)`): if the
+swaps `{y, w}` and `{w, z}` are reachable, then so is `{y, z}`, *for hole positions also avoiding the
+intermediate* `w`.  This is the inductive step of the distance generation argument. -/
+theorem ReachSwap.comp_via {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ} {y w z : Fin (N + 1)}
+    (hyw : ReachSwap N t y w) (hwz : ReachSwap N t w z)
+    (hyw_ne : y ≠ w) (hwz_ne : w ≠ z) (hyz_ne : y ≠ z) :
+    ∀ (p : Fin (N + 1)) (hpy : p ≠ y) (hpw : p ≠ w) (hpz : p ≠ z) (σ : HoleSpin N p),
+      StateReach N t ⟨p, σ⟩ ⟨p, swapHoleSpin N p y z hpy hpz σ⟩ := by
+  intro p hpy hpw hpz σ
+  rw [swapHoleSpin_conj N p y w z hpy hpw hpz hyw_ne hwz_ne hyz_ne]
+  exact (hyw p hpy hpw σ).trans ((hwz p hpw hpz _).trans (hyw p hpy hpw _))
+
 end LatticeSystem.Fermion
 
