@@ -772,6 +772,44 @@ theorem flatBand_occFinset_eq_alphaSpinOcc_of_betaFree_noDouble
     · exact absurd (Fin.ext h) hx0
     · exact Fin.ext h
 
+/-- **Only matching-two-hole opposite-spin α-configs survive the internal coordinate read.**  If the
+two-hole coordinate of `ĉ_{int(p)↓}ĉ_{int(p)↑}` applied to `occMonomial(αs')` is nonzero, then `s'`
+carries opposite pair spins and its two-hole config matches that of `s`. -/
+theorem flatBand_cDownUp_int_occMonomial_repr_ne_zero_imp (hν : 0 < ν)
+    (s s' : Fin (K + 1) → Fin 2) (p : Fin K)
+    (hne : (flatBandOccBasis K ν).repr
+        ((cDownUp K (deltaInternalSite K p.castSucc)).mulVec
+          (occMonomial K ν (flatBandAlphaSpinOcc K s'))) (flatBandAlphaTwoHoleOcc K s p.castSucc)
+      ≠ 0) :
+    s' p.castSucc ≠ s' p.succ ∧
+      flatBandAlphaTwoHoleOcc K s' p.castSucc = flatBandAlphaTwoHoleOcc K s p.castSucc := by
+  have hdich : ∀ t : Fin 2, t = 0 ∨ t = 1 := by
+    intro t
+    rcases (by omega : t.val = 0 ∨ t.val = 1) with h | h
+    · exact Or.inl (Fin.ext h)
+    · exact Or.inr (Fin.ext h)
+  by_cases hsame : s' p.castSucc = s' p.succ
+  · exact absurd (by rw [flatBand_cDownUp_int_occMonomial_same s' p hsame, map_zero,
+      Finsupp.zero_apply]) hne
+  refine ⟨hsame, ?_⟩
+  by_contra htw
+  apply hne
+  rcases hdich (s' p.castSucc) with h0 | h1
+  · have h1 : s' p.succ = 1 := by
+      rcases hdich (s' p.succ) with h | h
+      · exact absurd (h0.trans h.symm) hsame
+      · exact h
+    obtain ⟨z, _, hz⟩ := flatBand_cDownUp_int_occMonomial_canonical hν s' p h0 h1
+    rw [hz, map_smul, Finsupp.smul_apply, smul_eq_mul, ← flatBandOccBasis_apply,
+      (flatBandOccBasis K ν).repr_self_apply, if_neg htw, mul_zero]
+  · have h0 : s' p.succ = 0 := by
+      rcases hdich (s' p.succ) with h | h
+      · exact h
+      · exact absurd (h1.trans h.symm) hsame
+    obtain ⟨z, _, hz⟩ := flatBand_cDownUp_int_occMonomial_swap hν s' p h1 h0
+    rw [hz, map_smul, Finsupp.smul_apply, smul_eq_mul, ← flatBandOccBasis_apply,
+      (flatBandOccBasis K ν).repr_self_apply, if_neg htw, mul_zero]
+
 /-- An occupation config (a `Fin 2`-valued function) is determined by its occupation finset. -/
 theorem config_eq_of_occFinset_eq (f g : (Fin (K + 1) ⊕ Fin (K + 1)) × Fin 2 → Fin 2)
     (h : occFinset f = occFinset g) : f = g := by
