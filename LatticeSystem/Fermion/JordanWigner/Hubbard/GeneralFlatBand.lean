@@ -75,6 +75,22 @@ theorem generalFlatBand_kernel_coord_separating {w : ↥(generalFlatBandKernel T
   funext x
   simpa using h x
 
+/-- **The coordinate functionals span the dual of the flat band.**  Restricting each coordinate
+evaluation `EuclideanSpace.projₗ x` to `h₀ = ker T` gives a spanning family (they separate
+points, and `h₀` is finite-dimensional, hence reflexive).  This lets a basis subset — the index set
+`I` of Lemma 11.16 — be extracted from them. -/
+theorem generalFlatBand_coord_span :
+    Submodule.span ℂ (Set.range (fun x : Fin (M + 1) =>
+      (EuclideanSpace.projₗ x).comp (generalFlatBandKernel T).subtype)) = ⊤ := by
+  apply Submodule.span_eq_top_of_ne_zero
+  intro w hw
+  by_contra hcon
+  simp only [not_exists, not_and, not_not] at hcon
+  apply hw
+  apply generalFlatBand_kernel_coord_separating (w := w)
+  intro x
+  simpa using hcon _ ⟨x, rfl⟩
+
 /-- **The projection matrix `P₀`** onto the flat band `h₀ = ker T` (Tasaki §11.3.4):
 the matrix, in the standard orthonormal basis, of the self-adjoint orthogonal
 projection onto `ker T`. -/
