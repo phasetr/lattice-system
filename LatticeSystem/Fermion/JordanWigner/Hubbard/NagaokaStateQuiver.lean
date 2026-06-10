@@ -117,6 +117,18 @@ theorem StateReach.refl (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
   letI := Matrix.toQuiver (-tasakiEffReMatrix N t)
   exact ⟨Quiver.Path.nil⟩
 
+/-- **Block-diagonality of the quiver: every edge preserves magnetization.**  A positive entry of
+`−M` (i.e. a quiver edge `q → p`) forces `q` and `p` to lie in the same total-`S_z^{(3)}` sector
+(`holeSpinMag`).  Contrapositive of `tasakiEffReMatrix_eq_zero_of_holeSpinMag_ne`: `Ĥ_eff` conserves
+`S_z^{(3)}`, so the state quiver decomposes into the magnetization sectors and every path stays in
+one sector. -/
+theorem neg_tasakiEffReMatrix_pos_holeSpinMag_eq (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (q p : (x : Fin (N + 1)) × HoleSpin N x) (h : 0 < (-tasakiEffReMatrix N t) q p) :
+    holeSpinMag N q = holeSpinMag N p := by
+  by_contra hne
+  rw [Matrix.neg_apply, tasakiEffReMatrix_eq_zero_of_holeSpinMag_ne N t q p hne, neg_zero] at h
+  exact lt_irrefl 0 h
+
 /-- Reachability is transitive (path composition). -/
 theorem StateReach.trans {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ}
     {p q r : (z : Fin (N + 1)) × HoleSpin N z}
