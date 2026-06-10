@@ -4,6 +4,9 @@ import Mathlib.Analysis.Matrix.Order
 import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.Analysis.Matrix.PosDef
 import Mathlib.Analysis.SpecialFunctions.Sqrt
+import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.Analysis.InnerProductSpace.Adjoint
+import Mathlib.Analysis.RCLike.Basic
 
 /-!
 # Tasaki Appendix A.4.2: polar and singular-value decompositions (Theorems A.19, A.20)
@@ -58,11 +61,26 @@ theorem matrix_singular_value_decomposition (A : Matrix n n ℂ) :
   set w : n → EuclideanSpace ℂ n := fun i => Matrix.toEuclideanLin A (vb i) with hw_def
   -- `⟪w i, w j⟫ = λ_j · δ_{ij}`.
   have hw_inner : ∀ i j, (inner ℂ (w i) (w j)) = ((if i = j then lam j else 0 : ℝ) : ℂ) := by
-    -- TODO (#4352): the ℝ-smul-on-`n → ℂ` from `mulVec_eigenvectorBasis` blocks both
-    -- `dotProduct_smul` (SMulCommClass ℝ ℂ ℂ) and `smul_dotProduct` (IsScalarTower ℝ ℂ ℂ) here;
-    -- redo via the `EuclideanSpace` inner product (its scalar-tower instances avoid the gap)
-    -- with `Matrix.toEuclideanLin_conjTranspose_eq_adjoint` + `inner_smul_real_right`.
-    sorry
+    intro i j
+    simp only [hw_def]
+    rw [← LinearMap.adjoint_inner_right, ← Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
+    -- `Aᴴ.toEuclideanLin (A.toEuclideanLin (vb j)) = M.toEuclideanLin (vb j) = lam_j • vb j`
+    have htel : (Matrix.toEuclideanLin Aᴴ) (Matrix.toEuclideanLin A (hMH.eigenvectorBasis j))
+        = ((hMH.eigenvalues j : ℝ) : ℂ) • (hMH.eigenvectorBasis j : EuclideanSpace ℂ n) := by
+      apply WithLp.ofLp_injective (p := 2) (V := n → ℂ)
+      have hofLp : WithLp.ofLp ((Matrix.toEuclideanLin Aᴴ)
+            (Matrix.toEuclideanLin A (hMH.eigenvectorBasis j)))
+          = M *ᵥ WithLp.ofLp (hMH.eigenvectorBasis j) := by
+        change Aᴴ *ᵥ (A *ᵥ WithLp.ofLp (hMH.eigenvectorBasis j))
+          = M *ᵥ WithLp.ofLp (hMH.eigenvectorBasis j)
+        rw [Matrix.mulVec_mulVec]
+      rw [hofLp, hMH.mulVec_eigenvectorBasis j]
+      funext k
+      simp only [Pi.smul_apply, WithLp.ofLp_smul, smul_eq_mul, RCLike.real_smul_eq_coe_mul]
+      rfl
+    rw [htel, inner_smul_right,
+      orthonormal_iff_ite.mp hMH.eigenvectorBasis.orthonormal i j, hlam_def]
+    split <;> simp
   sorry
 
 end LatticeSystem.Math
