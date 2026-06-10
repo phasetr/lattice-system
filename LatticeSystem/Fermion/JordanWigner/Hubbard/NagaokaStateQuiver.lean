@@ -721,6 +721,22 @@ theorem StateReach.landing_swap_quad (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) 
       rwa [cyc3HoleSpin_twice_eq_swap_of_val_eq N a y w z hay.ne haw hza.ne.symm hwy hwz_ne hzy τ
         hwyv] at h
 
+/-- **The 15-puzzle exchange (length-4 loop): an exchange via an opposite-corner 4-loop from any
+hole position.**  The 4-loop `{a, y, w, z}` instance of `swap_via_landing_walk`, where the landing
+swap is the Boolean once/twice trip of `landing_swap_quad`. -/
+theorem StateReach.swap_via_quad_walk (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {a y w z p : Fin (N + 1)} (hay : (nagaokaBondGraph N t).Adj a y)
+    (hyw : (nagaokaBondGraph N t).Adj y w) (hwz : (nagaokaBondGraph N t).Adj w z)
+    (hza : (nagaokaBondGraph N t).Adj z a) (haw : a ≠ w) (hyz : y ≠ z)
+    (W : (nagaokaBondGraph N t).Walk p a) (hyW : y ∉ W.support) (hzW : z ∉ W.support)
+    (σ : HoleSpin N p) :
+    StateReach N t ⟨p, σ⟩
+      ⟨p, swapHoleSpin N p y z
+        (fun h => hyW (h ▸ W.start_mem_support)) (fun h => hzW (h ▸ W.start_mem_support)) σ⟩ :=
+  StateReach.swap_via_landing_walk N t htsym htdiag hpos hay.ne hza.ne.symm W hyW hzW σ
+    (StateReach.landing_swap_quad N t htsym htdiag hpos hay hyw hwz hza haw hyz _)
+
 /-- The inclusion `G.induce s →g G` sending a vertex of the induced subgraph to the underlying
 vertex.  (Induced adjacency is just the ambient adjacency restricted to `s`.) -/
 def induceValHom {V : Type*} (G : SimpleGraph V) (s : Set V) : G.induce s →g G where
