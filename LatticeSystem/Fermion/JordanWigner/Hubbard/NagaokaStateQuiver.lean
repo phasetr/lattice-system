@@ -225,5 +225,30 @@ theorem StateReach.fourCycle (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
       ((StateReach.holeHop N t htsym htdiag w z _ hwz hbwz).trans
         (StateReach.holeHop N t htsym htdiag z x _ hzx hbzx)))
 
+/-- The `(y w z)` spin 3-cycle of a one-hole state at hole `x` (with `x ∉ {y, w, z}`): `y` takes
+`σ`'s spin at `w`, `w` takes `z`'s, `z` takes `y`'s; the rest (and the hole) fixed. -/
+def cyc3HoleSpin (N : ℕ) (x y w z : Fin (N + 1)) (hxy : x ≠ y) (hxw : x ≠ w) (hxz : x ≠ z)
+    (σ : HoleSpin N x) : HoleSpin N x :=
+  ⟨fun v => if v = y then σ.val w else if v = w then σ.val z
+      else if v = z then σ.val y else σ.val v, by
+    dsimp only; rw [if_neg hxy, if_neg hxw, if_neg hxz]; exact σ.2⟩
+
+/-- **Step B (length-4, clean form): a bond 4-loop makes a spin 3-cycle reachable.**  With bonds on
+the loop `x → y → w → z → x`, `(x, σ)` reaches `(x, cyc3HoleSpin σ)` — the spins at `y, w, z` are
+cyclically permuted (same magnetization sector). -/
+theorem StateReach.threeCyclePerm (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (x y w z : Fin (N + 1))
+    (hxy : x ≠ y) (hyw : y ≠ w) (hwz : w ≠ z) (hzx : z ≠ x) (hxw : x ≠ w) (hyz : y ≠ z)
+    (hbxy : 0 < t x y) (hbyw : 0 < t y w) (hbwz : 0 < t w z) (hbzx : 0 < t z x)
+    (σ : HoleSpin N x) :
+    StateReach N t ⟨x, σ⟩ ⟨x, cyc3HoleSpin N x y w z hxy hxw hzx.symm σ⟩ := by
+  have h := StateReach.fourCycle N t htsym htdiag x y w z hxy hyw hwz hzx hbxy hbyw hbwz hbzx σ
+  have heq : holeSpinMove N z x (holeSpinMove N w z (holeSpinMove N y w (holeSpinMove N x y σ)))
+      = cyc3HoleSpin N x y w z hxy hxw hzx.symm σ := by
+    apply Subtype.ext
+    rw [holeSpinMove_four_cycle_val N x y w z hxy hyw hwz hzx hxw hyz σ]
+    rfl
+  rwa [heq] at h
+
 end LatticeSystem.Fermion
 
