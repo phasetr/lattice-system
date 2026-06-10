@@ -632,5 +632,29 @@ theorem StateReach.swap_via_triangle_walk (N : ℕ) (t : Fin (N + 1) → Fin (N 
   rw [← hnet]
   exact (r1.trans r2).trans r3
 
+/-- The inclusion `G.induce s →g G` sending a vertex of the induced subgraph to the underlying
+vertex.  (Induced adjacency is just the ambient adjacency restricted to `s`.) -/
+def induceValHom {V : Type*} (G : SimpleGraph V) (s : Set V) : G.induce s →g G where
+  toFun := Subtype.val
+  map_rel' := fun {_ _} h => h
+
+/-- **E2 routing: a walk avoiding two sites.**  If the subgraph induced on `Λ ∖ {y, z}` is connected
+and `p, a` both avoid `y, z`, then there is a walk `p → a` in the full graph whose support avoids
+both `y` and `z`.  This realises Tasaki's exchange-bond condition E2 (deleting the two exchanged
+sites keeps the lattice connected) as a concrete hole route that never touches `y` or `z`, feeding
+`StateReach.swap_via_triangle_walk`. -/
+theorem exists_avoiding_walk_of_induce_connected {V : Type*} (G : SimpleGraph V) {y z : V}
+    (hconn : (G.induce {w | w ≠ y ∧ w ≠ z}).Connected) {p a : V}
+    (hp : p ≠ y ∧ p ≠ z) (ha : a ≠ y ∧ a ≠ z) :
+    ∃ W : G.Walk p a, y ∉ W.support ∧ z ∉ W.support := by
+  obtain ⟨W'⟩ := hconn.preconnected ⟨p, hp⟩ ⟨a, ha⟩
+  have hsupp : ∀ x ∈ (W'.map (induceValHom G {w | w ≠ y ∧ w ≠ z})).support,
+      x ≠ y ∧ x ≠ z := by
+    intro x hx
+    rw [SimpleGraph.Walk.support_map, List.mem_map] at hx
+    obtain ⟨⟨v, hv⟩, _, rfl⟩ := hx
+    exact hv
+  exact ⟨W'.map (induceValHom G _), fun hy => (hsupp y hy).1 rfl, fun hz => (hsupp z hz).2 rfl⟩
+
 end LatticeSystem.Fermion
 
