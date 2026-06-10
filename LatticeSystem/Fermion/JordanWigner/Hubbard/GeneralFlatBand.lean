@@ -91,6 +91,35 @@ theorem generalFlatBand_coord_span :
   intro x
   simpa using hcon _ ⟨x, rfl⟩
 
+/-- **The index set `I` of Lemma 11.16.**  A subset of sites carrying `D₀` coordinate functionals
+that form a basis of the flat band's dual (extracted from the spanning family); its cardinality is
+the flat-band dimension. -/
+theorem generalFlatBand_exists_special_index :
+    ∃ I : Finset (Fin (M + 1)), I.card = generalFlatBandDim T ∧
+      LinearIndepOn ℂ (fun x : Fin (M + 1) =>
+          (EuclideanSpace.projₗ x).comp (generalFlatBandKernel T).subtype) (I : Set (Fin (M + 1))) ∧
+      Submodule.span ℂ ((fun x : Fin (M + 1) =>
+          (EuclideanSpace.projₗ x).comp (generalFlatBandKernel T).subtype) ''
+            (I : Set (Fin (M + 1)))) = ⊤ := by
+  classical
+  set fc : Fin (M + 1) → Module.Dual ℂ ↥(generalFlatBandKernel T) :=
+    fun x => (EuclideanSpace.projₗ x).comp (generalFlatBandKernel T).subtype with hfc
+  obtain ⟨b, -, -, hsub, hli⟩ := exists_linearIndepOn_extension (v := fc)
+    (linearIndepOn_empty ℂ fc) (Set.empty_subset Set.univ)
+  have hspan : Submodule.span ℂ (fc '' b) = ⊤ := by
+    rw [eq_top_iff, ← generalFlatBand_coord_span T, Submodule.span_le]
+    rintro _ ⟨x, rfl⟩
+    exact hsub ⟨x, Set.mem_univ x, rfl⟩
+  have hbfin : b.Finite := Set.toFinite b
+  have hcard : hbfin.toFinset.card = generalFlatBandDim T := by
+    have hbasis : Module.Basis ↥b ℂ (Module.Dual ℂ ↥(generalFlatBandKernel T)) :=
+      Module.Basis.mk hli (by rw [← Set.image_eq_range]; exact hspan.ge)
+    rw [← Set.ncard_eq_toFinset_card b hbfin, ← Nat.card_coe_set_eq,
+      ← Module.finrank_eq_nat_card_basis hbasis, Subspace.dual_finrank_eq, generalFlatBandDim]
+  refine ⟨hbfin.toFinset, hcard, ?_, ?_⟩
+  · rwa [Set.Finite.coe_toFinset]
+  · rwa [Set.Finite.coe_toFinset]
+
 /-- **The projection matrix `P₀`** onto the flat band `h₀ = ker T` (Tasaki §11.3.4):
 the matrix, in the standard orthonormal basis, of the self-adjoint orthogonal
 projection onto `ker T`. -/
