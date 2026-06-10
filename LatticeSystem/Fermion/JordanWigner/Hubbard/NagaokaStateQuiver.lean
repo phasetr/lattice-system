@@ -684,6 +684,43 @@ theorem StateReach.swap_via_triangle_walk (N : ℕ) (t : Fin (N + 1) → Fin (N 
   StateReach.swap_via_landing_walk N t htsym htdiag hpos hay.ne hza.ne.symm W hyW hzW σ
     (StateReach.transposition_of_triangle N t htsym htdiag hpos hay hyz hza _)
 
+/-- **Length-4 landing swap (Tasaki Fig. 11.9).**  On a 4-loop `a → y → w → z → a` with the hole at
+the corner `a` and the exchanged pair `y, z` on the opposite diagonal (auxiliary site `w`), the
+spins at `y` and `z` can be exchanged in place: one trip around the loop if `σ(w) = σ(z)`, two trips
+if `σ(w) = σ(y)` (and a no-op if `σ(y) = σ(z)`).  Because spins are Boolean, one of these always
+applies.  Combines `threeCyclePerm_of_quad` with the footnote-14 identities. -/
+theorem StateReach.landing_swap_quad (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {a y w z : Fin (N + 1)} (hay : (nagaokaBondGraph N t).Adj a y)
+    (hyw : (nagaokaBondGraph N t).Adj y w) (hwz : (nagaokaBondGraph N t).Adj w z)
+    (hza : (nagaokaBondGraph N t).Adj z a) (haw : a ≠ w) (hyz : y ≠ z) (τ : HoleSpin N a) :
+    StateReach N t ⟨a, τ⟩ ⟨a, swapHoleSpin N a y z hay.ne hza.ne.symm τ⟩ := by
+  have hwy : w ≠ y := hyw.ne.symm
+  have hwz_ne : w ≠ z := hwz.ne
+  have hzy : z ≠ y := hyz.symm
+  by_cases hyzval : τ.val y = τ.val z
+  · -- swapping two equal spins is the identity
+    have hid : swapHoleSpin N a y z hay.ne hza.ne.symm τ = τ := by
+      apply Subtype.ext; funext s
+      rw [swapHoleSpin_val_apply]
+      by_cases h1 : s = y <;> by_cases h2 : s = z <;> simp_all [hyz, hzy]
+    rw [hid]; exact StateReach.refl N t _
+  · -- opposite spins: Boolean dichotomy on σ(w)
+    have hbool : τ.val w = τ.val z ∨ τ.val w = τ.val y :=
+      (by decide : ∀ b c d : Bool, b ≠ c → (d = c ∨ d = b)) _ _ _ hyzval
+    rcases hbool with hwzv | hwyv
+    · -- one trip
+      have h := StateReach.threeCyclePerm_of_quad N t htsym htdiag hpos hay hyw hwz hza haw hyz τ
+      rwa [cyc3HoleSpin_eq_swap_of_val_eq N a y w z hay.ne haw hza.ne.symm hwy hwz_ne hzy τ hwzv]
+        at h
+    · -- two trips
+      have h1 := StateReach.threeCyclePerm_of_quad N t htsym htdiag hpos hay hyw hwz hza haw hyz τ
+      have h2 := StateReach.threeCyclePerm_of_quad N t htsym htdiag hpos hay hyw hwz hza haw hyz
+        (cyc3HoleSpin N a y w z hay.ne haw hza.ne.symm τ)
+      have h := h1.trans h2
+      rwa [cyc3HoleSpin_twice_eq_swap_of_val_eq N a y w z hay.ne haw hza.ne.symm hwy hwz_ne hzy τ
+        hwyv] at h
+
 /-- The inclusion `G.induce s →g G` sending a vertex of the induced subgraph to the underlying
 vertex.  (Induced adjacency is just the ambient adjacency restricted to `s`.) -/
 def induceValHom {V : Type*} (G : SimpleGraph V) (s : Set V) : G.induce s →g G where
