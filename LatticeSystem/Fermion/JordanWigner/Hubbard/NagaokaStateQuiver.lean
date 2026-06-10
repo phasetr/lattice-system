@@ -409,5 +409,25 @@ theorem StateReach.threeCyclePerm_of_quad (N : ℕ) (t : Fin (N + 1) → Fin (N 
     (nagaokaBondGraph_adj_pos N t htsym hpos hxy) (nagaokaBondGraph_adj_pos N t htsym hpos hyw)
     (nagaokaBondGraph_adj_pos N t htsym hpos hwz) (nagaokaBondGraph_adj_pos N t htsym hpos hzx) σ
 
+/-- **A length-3 closed walk is a triangle of edges.**  A walk `z → z` of length 3 in a simple
+graph decomposes as three consecutive adjacencies `z—a`, `a—b`, `b—z`.  This extracts the explicit
+triangle (with its three bonds) underlying an exchange bond's length-3 cycle, feeding
+`StateReach.transposition_of_triangle`. -/
+theorem exists_triangle_adj_of_walk_length_three {V : Type*} (G : SimpleGraph V) {z : V}
+    (c : G.Walk z z) (hlen : c.length = 3) :
+    ∃ a b : V, G.Adj z a ∧ G.Adj a b ∧ G.Adj b z := by
+  match c, hlen with
+  | .cons h1 (.cons h2 (.cons h3 .nil)), _ => exact ⟨_, _, h1, h2, h3⟩
+
+/-- **A length-4 closed walk is a 4-loop of edges.**  A walk `z → z` of length 4 in a simple graph
+decomposes as four consecutive adjacencies `z—a`, `a—b`, `b—c`, `c—z`.  This extracts the explicit
+4-loop (with its four bonds) underlying an exchange bond's length-4 cycle, feeding
+`StateReach.threeCyclePerm_of_quad`. -/
+theorem exists_quad_adj_of_walk_length_four {V : Type*} (G : SimpleGraph V) {z : V}
+    (c : G.Walk z z) (hlen : c.length = 4) :
+    ∃ a b d : V, G.Adj z a ∧ G.Adj a b ∧ G.Adj b d ∧ G.Adj d z := by
+  match c, hlen with
+  | .cons h1 (.cons h2 (.cons h3 (.cons h4 .nil))), _ => exact ⟨_, _, _, h1, h2, h3, h4⟩
+
 end LatticeSystem.Fermion
 
