@@ -1260,4 +1260,63 @@ theorem flatBand_adjSwap_weight_upCount (s' : Fin (K + 1) → Fin 2) (k : Fin K)
     simp only [Fin.val_zero, Fin.val_one, mul_zero, mul_one, Fin.val_succ, Fin.val_castSucc]
     ring
 
+/-- **Coordinate-vanishing propagates across all configs of equal up-count.**  If a ground vector's
+coordinate vanishes at the sorted (no-adjacent-inversion) representative `rep`, it vanishes at every
+α-config with the same up-count.  Strong induction on `M − weight`: an adjacent `(1,0)` raises the
+weight (via the swap-iff and `flatBand_adjSwap_weight_upCount`); when none remains the config is
+`rep` (sorted-unique). -/
+theorem flatBand_ground_repr_zero_of_upCount (K : ℕ) (ν t U : ℝ) (hν : 0 < ν) (ht : 0 < t)
+    (hU : 0 < U) {v : (Fin (2 * (2 * K + 1) + 2) → Fin 2) → ℂ}
+    (hv : v ∈ flatBandHalfFilledGroundSubmodule K ν t U) (rep : Fin (K + 1) → Fin 2)
+    (hrepsort : ∀ k : Fin K, ¬(rep k.castSucc = 1 ∧ rep k.succ = 0))
+    (hrep0 : (flatBandOccBasis K ν).repr v (flatBandAlphaSpinOcc K rep) = 0) :
+    ∀ s' : Fin (K + 1) → Fin 2, (∑ q, (s' q).val = ∑ q, (rep q).val) →
+      (flatBandOccBasis K ν).repr v (flatBandAlphaSpinOcc K s') = 0 := by
+  have hdich : ∀ t : Fin 2, t = 0 ∨ t = 1 := by
+    intro t
+    rcases (by omega : t.val = 0 ∨ t.val = 1) with h | h
+    · exact Or.inl (Fin.ext h)
+    · exact Or.inr (Fin.ext h)
+  have hcardval : ∀ (s : Fin (K + 1) → Fin 2),
+      (Finset.univ.filter (fun q => s q = 1)).card = ∑ q, (s q).val := by
+    intro s
+    rw [Finset.card_filter]
+    exact Finset.sum_congr rfl (fun q _ => by rcases hdich (s q) with h | h <;> simp [h])
+  have hwle : ∀ (s : Fin (K + 1) → Fin 2), (∑ q, q.val * (s q).val) ≤ (K + 1) * (K + 1) := by
+    intro s
+    calc ∑ q, q.val * (s q).val ≤ ∑ _q : Fin (K + 1), K :=
+          Finset.sum_le_sum (fun q _ => by have := q.isLt; have := (s q).isLt; nlinarith)
+      _ = (K + 1) * K := by
+          rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul]
+      _ ≤ (K + 1) * (K + 1) := by nlinarith
+  suffices H : ∀ (D : ℕ) (s' : Fin (K + 1) → Fin 2),
+      (K + 1) * (K + 1) - (∑ q, q.val * (s' q).val) = D →
+      (∑ q, (s' q).val = ∑ q, (rep q).val) →
+      (flatBandOccBasis K ν).repr v (flatBandAlphaSpinOcc K s') = 0 by
+    intro s' hc; exact H _ s' rfl hc
+  intro D
+  induction D using Nat.strong_induction_on with
+  | _ D ih =>
+    intro s' hD hc
+    by_cases hsw : ∃ k : Fin K, s' k.castSucc = 1 ∧ s' k.succ = 0
+    · obtain ⟨k, hk1, hk0⟩ := hsw
+      obtain ⟨huc, hwt⟩ := flatBand_adjSwap_weight_upCount s' k hk1 hk0
+      have hcG : ∑ q, (Function.update (Function.update s' k.castSucc 0) k.succ 1 q).val
+          = ∑ q, (rep q).val := by rw [huc, hc]
+      have hwGle := hwle (Function.update (Function.update s' k.castSucc 0) k.succ 1)
+      rw [hwt] at hwGle
+      have hlt : (K + 1) * (K + 1) - (∑ q, q.val *
+          (Function.update (Function.update s' k.castSucc 0) k.succ 1 q).val) < D := by
+        rw [hwt]; omega
+      have hGrepr := ih _ hlt (Function.update (Function.update s' k.castSucc 0) k.succ 1) rfl hcG
+      have hopp : s' k.castSucc ≠ s' k.succ := by rw [hk1, hk0]; decide
+      have hiff := flatBand_ground_repr_adjSwap_iff K ν t U hν ht hU hv k s' hopp
+      rw [show Function.update (Function.update s' k.castSucc (s' k.succ)) k.succ (s' k.castSucc)
+          = Function.update (Function.update s' k.castSucc 0) k.succ 1 by rw [hk0, hk1]] at hiff
+      exact hiff.mpr hGrepr
+    · have hs'sort : ∀ k : Fin K, ¬(s' k.castSucc = 1 ∧ s' k.succ = 0) :=
+        fun k ⟨ha, hb⟩ => hsw ⟨k, ha, hb⟩
+      rw [flatBand_no_adj_inv_eq s' rep hs'sort hrepsort (by rw [hcardval, hcardval, hc])]
+      exact hrep0
+
 end LatticeSystem.Fermion
