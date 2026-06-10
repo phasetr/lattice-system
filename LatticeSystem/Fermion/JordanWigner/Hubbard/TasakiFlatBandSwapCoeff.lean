@@ -772,6 +772,59 @@ theorem flatBand_occFinset_eq_alphaSpinOcc_of_betaFree_noDouble
     · exact absurd (Fin.ext h) hx0
     · exact Fin.ext h
 
+/-- **Two-hole configs with opposite pair spins coincide only for `s` and its pair-swap.**  If the
+two-hole occupations of `s'` and `s` agree and `s'` carries opposite spins on the pair `p, p+1`,
+then `s'` is `s` itself or `s` with the pair spins swapped (it must agree with `s` off the pair). -/
+theorem flatBand_alphaTwoHoleOcc_eq_imp (s s' : Fin (K + 1) → Fin 2) (p : Fin K)
+    (hs0 : s p.castSucc = 0) (hs1 : s p.succ = 1) (hopp : s' p.castSucc ≠ s' p.succ)
+    (heq : flatBandAlphaTwoHoleOcc K s' p.castSucc = flatBandAlphaTwoHoleOcc K s p.castSucc) :
+    s' = s ∨ s' = Function.update (Function.update s p.castSucc 1) p.succ 0 := by
+  have hdich : ∀ t : Fin 2, t = 0 ∨ t = 1 := by
+    intro t
+    rcases (by omega : t.val = 0 ∨ t.val = 1) with h | h
+    · exact Or.inl (Fin.ext h)
+    · exact Or.inr (Fin.ext h)
+  have hne : p.castSucc ≠ p.succ := by
+    intro h; have := congrArg Fin.val h; rw [Fin.val_succ, Fin.val_castSucc] at this; omega
+  have hoff : ∀ q, q ≠ p.castSucc → q ≠ p.succ → s' q = s q := by
+    intro q hq0 hq1
+    have hc := congrFun heq (Sum.inl q, s' q)
+    have hcond : ¬((Sum.inl q : Fin (K + 1) ⊕ Fin (K + 1)) = Sum.inl p.castSucc ∨
+        (Sum.inl q : Fin (K + 1) ⊕ Fin (K + 1)) = Sum.inl (p.castSucc + 1)) := by
+      rw [← flatBand_succ_eq_castSucc_add_one p, not_or]
+      exact ⟨fun h => hq0 (Sum.inl_injective h), fun h => hq1 (Sum.inl_injective h)⟩
+    simp only [flatBandAlphaTwoHoleOcc] at hc
+    rw [if_neg hcond, if_neg hcond, flatBandAlphaSpinOcc_inl, flatBandAlphaSpinOcc_inl,
+      if_pos rfl] at hc
+    by_contra hsq
+    rw [if_neg hsq] at hc
+    exact absurd hc (by decide)
+  have hswap0 : Function.update (Function.update s p.castSucc 1) p.succ 0 p.castSucc = 1 := by
+    rw [Function.update_of_ne hne, Function.update_self]
+  have hswap1 : Function.update (Function.update s p.castSucc 1) p.succ 0 p.succ = 0 :=
+    Function.update_self _ _ _
+  rcases hdich (s' p.castSucc) with hc0 | hc1
+  · left
+    funext q
+    by_cases hq0 : q = p.castSucc
+    · rw [hq0, hc0, hs0]
+    · by_cases hq1 : q = p.succ
+      · rw [hq1, hs1]
+        rcases hdich (s' p.succ) with h | h
+        · exact absurd (hc0.trans h.symm) hopp
+        · exact h
+      · exact hoff q hq0 hq1
+  · right
+    funext q
+    by_cases hq0 : q = p.castSucc
+    · rw [hq0, hc1, hswap0]
+    · by_cases hq1 : q = p.succ
+      · rw [hq1, hswap1]
+        rcases hdich (s' p.succ) with h | h
+        · exact h
+        · exact absurd (hc1.trans h.symm) hopp
+      · rw [hoff q hq0 hq1, Function.update_of_ne hq1, Function.update_of_ne hq0]
+
 /-- **No orbital double occupancy in the half-filled ground subspace.**  A β-free occupation config
 `g` that doubly occupies an orbital `q₀` has vanishing ground-state coordinate.  Reading the
 `(q₀`-pair-erased) coordinate of `0 = ĉ_{ext(q₀)↓} ĉ_{ext(q₀)↑} v` isolates exactly the `g` term
