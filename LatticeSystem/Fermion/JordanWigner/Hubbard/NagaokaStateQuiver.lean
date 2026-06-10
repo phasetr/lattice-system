@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaGlobalMin
+import Mathlib.LinearAlgebra.Matrix.Irreducible.Defs
 
 /-!
 # Tasaki §11.2.2: the one-hole state quiver of `−M` (toward Lemma 11.9)
@@ -69,6 +70,15 @@ theorem neg_tasakiEffReMatrix_holeSpinMove_pos (N : ℕ) (t : Fin (N + 1) → Fi
   rw [show (holeSpinMove N x y σ).val
       = Function.update (hubbardSpinMove N σ.val x y) y true from rfl,
     hubbardOneHoleConfig_update_hole]
+
+/-- The canonical hole-hop edge as an **arrow of the `−M` quiver** (`Matrix.toQuiver`): from
+`(x, σ)` to `(y, holeSpinMove N x y σ)` whenever `x ≠ y` and `0 < t x y`.  This is the atomic
+step from which hole-motion paths (Lemma 11.9) are assembled by `Quiver.Path.cons`. -/
+def holeHopHom (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ) (x y : Fin (N + 1))
+    (σ : HoleSpin N x) (hxy : x ≠ y) (ht : 0 < t x y) :
+    (Matrix.toQuiver (-tasakiEffReMatrix N t)).Hom
+      (⟨y, holeSpinMove N x y σ⟩ : (z : Fin (N + 1)) × HoleSpin N z) ⟨x, σ⟩ :=
+  ⟨neg_tasakiEffReMatrix_holeSpinMove_pos N t x y σ hxy ht⟩
 
 end LatticeSystem.Fermion
 
