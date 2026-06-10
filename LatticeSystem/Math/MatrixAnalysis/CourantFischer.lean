@@ -38,4 +38,32 @@ theorem rayleighOnVec_mono {A B : Matrix n n ℂ} (hAB : A ≤ B) (v : n → ℂ
     ring
   linarith [hsplit ▸ h0]
 
+open scoped InnerProductSpace in
+open Module in
+/-- **Spectral form of the Rayleigh quotient.**  For a symmetric operator `T` on
+`EuclideanSpace ℂ n` with sorted eigenvalues `λ_i` and orthonormal eigenbasis `b`, the energy
+`re ⟪x, T x⟫` is the eigenvalue-weighted sum `∑ᵢ λᵢ ‖⟨bᵢ, x⟩‖²`. -/
+theorem isSymmetric_re_inner_self_eq_sum {T : EuclideanSpace ℂ n →ₗ[ℂ] EuclideanSpace ℂ n}
+    (hT : T.IsSymmetric) (hn : finrank ℂ (EuclideanSpace ℂ n) = Fintype.card n)
+    (x : EuclideanSpace ℂ n) :
+    RCLike.re (inner ℂ x (T x))
+      = ∑ i, hT.eigenvalues hn i * ‖(hT.eigenvectorBasis hn).repr x i‖ ^ 2 := by
+  have key : ∀ (l : ℝ) (c : ℂ),
+      RCLike.re ((starRingEnd ℂ) c * ((l : ℂ) * c)) = l * ‖c‖ ^ 2 := by
+    intro l c
+    have hnorm : ‖c‖ ^ 2 = Complex.normSq c := (Complex.normSq_eq_norm_sq c).symm
+    rw [hnorm, RCLike.re_to_complex]
+    simp only [Complex.mul_re, Complex.mul_im, Complex.conj_re, Complex.conj_im,
+      Complex.ofReal_re, Complex.ofReal_im, Complex.normSq_apply]
+    ring
+  rw [← OrthonormalBasis.sum_inner_mul_inner (hT.eigenvectorBasis hn) x (T x), map_sum]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [show inner ℂ x (hT.eigenvectorBasis hn i)
+        = (starRingEnd ℂ) ((hT.eigenvectorBasis hn).repr x i) from by
+      rw [(hT.eigenvectorBasis hn).repr_apply_apply, inner_conj_symm],
+    show inner ℂ (hT.eigenvectorBasis hn i) (T x) = (hT.eigenvectorBasis hn).repr (T x) i from
+      ((hT.eigenvectorBasis hn).repr_apply_apply (T x) i).symm,
+    hT.eigenvectorBasis_apply_self_apply hn x i]
+  exact key (hT.eigenvalues hn i) ((hT.eigenvectorBasis hn).repr x i)
+
 end LatticeSystem.Quantum
