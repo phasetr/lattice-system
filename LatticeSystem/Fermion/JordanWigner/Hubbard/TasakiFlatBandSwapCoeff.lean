@@ -974,4 +974,104 @@ theorem flatBandOccBasis_repr_eq_zero_of_doubleOcc (K : ℕ) (ν t U : ℝ) (ht 
       rw [flatBandOccBasis_repr_eq_zero_of_mem_BKernel u q'.2 hBK this, zero_mul]
   · intro hg_notin; exact absurd (Finset.mem_univ g) hg_notin
 
+/-- **Adjacent spin-swap leaves the ground coordinate-vanishing invariant (Marshall sign).**  For a
+ground vector `v` and an α-config `s` carrying `(↑, ↓)` on the pair `p, p+1`, the occupation
+coordinate at `αs` vanishes iff it vanishes at the pair-swapped config.  Reading the two-hole
+coordinate of `0 = ĉ_{int(p)↓} ĉ_{int(p)↑} v` isolates exactly the `αs` and pair-swap terms, with
+nonzero relative weights `z_s, z_swap`. -/
+theorem flatBand_ground_repr_alphaSpinOcc_swap_iff (K : ℕ) (ν t U : ℝ) (hν : 0 < ν) (ht : 0 < t)
+    (hU : 0 < U) {v : (Fin (2 * (2 * K + 1) + 2) → Fin 2) → ℂ}
+    (hv : v ∈ flatBandHalfFilledGroundSubmodule K ν t U)
+    (p : Fin K) (s : Fin (K + 1) → Fin 2) (hs0 : s p.castSucc = 0) (hs1 : s p.succ = 1) :
+    (flatBandOccBasis K ν).repr v (flatBandAlphaSpinOcc K s) = 0 ↔
+      (flatBandOccBasis K ν).repr v (flatBandAlphaSpinOcc K
+        (Function.update (Function.update s p.castSucc 1) p.succ 0)) = 0 := by
+  classical
+  have hpne : p.castSucc ≠ p.succ := by
+    intro h; have := congrArg Fin.val h; rw [Fin.val_succ, Fin.val_castSucc] at this; omega
+  have hE : rayleighOnVec (flatBandHamiltonian K ν t U) v = 0 := by
+    rw [flatBandHalfFilledGroundSubmodule, Submodule.mem_inf] at hv
+    obtain ⟨hker, _⟩ := hv
+    rw [LinearMap.mem_ker, Matrix.mulVecLin_apply] at hker
+    unfold rayleighOnVec; rw [hker, dotProduct_zero, Complex.zero_re]
+  have hcd := flatBand_groundState_doubleAnnihilation_mulVec_eq_zero K ν t U ht.le hU hE
+    (deltaInternalSite K p.castSucc)
+  have hBK := flatBand_groundState_mem_BKernelSubmodule K ν t U ht hU.le hE
+  set s_sw := Function.update (Function.update s p.castSucc 1) p.succ 0 with hssw
+  have hsw0 : s_sw p.castSucc = 1 := by rw [hssw, Function.update_of_ne hpne, Function.update_self]
+  have hsw1 : s_sw p.succ = 0 := by rw [hssw, Function.update_self]
+  have hαne : flatBandAlphaSpinOcc K s ≠ flatBandAlphaSpinOcc K s_sw := by
+    intro h
+    have hh := congrFun h (Sum.inl p.castSucc, 0)
+    rw [flatBandAlphaSpinOcc_inl, flatBandAlphaSpinOcc_inl, hs0, hsw0] at hh
+    simp at hh
+  obtain ⟨zs, hzs0, hzseq⟩ := flatBand_cDownUp_int_occMonomial_canonical hν s p hs0 hs1
+  obtain ⟨zsw, hzsw0, hzsweq⟩ := flatBand_cDownUp_int_occMonomial_swap hν s_sw p hsw0 hsw1
+  have htwsw : flatBandAlphaTwoHoleOcc K s_sw p.castSucc
+      = flatBandAlphaTwoHoleOcc K s p.castSucc := by
+    rw [hssw, flatBand_succ_eq_castSucc_add_one p]
+    exact flatBandAlphaTwoHoleOcc_swap_eq K s p.castSucc
+  -- expand the two-hole coordinate of `cDownUp(int p) v`
+  have hexp : (flatBandOccBasis K ν).repr
+        ((cDownUp K (deltaInternalSite K p.castSucc)).mulVec v)
+        (flatBandAlphaTwoHoleOcc K s p.castSucc)
+      = ∑ f, (flatBandOccBasis K ν).repr v f *
+          (flatBandOccBasis K ν).repr
+            ((cDownUp K (deltaInternalSite K p.castSucc)).mulVec (occMonomial K ν f))
+            (flatBandAlphaTwoHoleOcc K s p.castSucc) := by
+    conv_lhs => rw [← (flatBandOccBasis K ν).sum_repr v]
+    rw [Matrix.mulVec_sum, map_sum, Finsupp.finset_sum_apply]
+    refine Finset.sum_congr rfl (fun f _ => ?_)
+    rw [flatBandOccBasis_apply, Matrix.mulVec_smul, map_smul, Finsupp.smul_apply, smul_eq_mul]
+  rw [hcd, map_zero, Finsupp.zero_apply] at hexp
+  have hca : (flatBandOccBasis K ν).repr ((cDownUp K (deltaInternalSite K p.castSucc)).mulVec
+        (occMonomial K ν (flatBandAlphaSpinOcc K s)))
+        (flatBandAlphaTwoHoleOcc K s p.castSucc) = zs := by
+    rw [hzseq, map_smul, Finsupp.smul_apply, smul_eq_mul, ← flatBandOccBasis_apply,
+      (flatBandOccBasis K ν).repr_self_apply, if_pos rfl, mul_one]
+  have hcsw : (flatBandOccBasis K ν).repr ((cDownUp K (deltaInternalSite K p.castSucc)).mulVec
+        (occMonomial K ν (flatBandAlphaSpinOcc K s_sw)))
+        (flatBandAlphaTwoHoleOcc K s p.castSucc) = zsw := by
+    rw [hzsweq, htwsw, map_smul, Finsupp.smul_apply, smul_eq_mul, ← flatBandOccBasis_apply,
+      (flatBandOccBasis K ν).repr_self_apply, if_pos rfl, mul_one]
+  rw [← Finset.sum_subset
+      (Finset.subset_univ {flatBandAlphaSpinOcc K s, flatBandAlphaSpinOcc K s_sw}) ?_,
+    Finset.sum_pair hαne, hca, hcsw] at hexp
+  · constructor
+    · intro h
+      rw [h, zero_mul, zero_add] at hexp
+      exact (mul_eq_zero.mp hexp.symm).resolve_right hzsw0
+    · intro h
+      rw [h, zero_mul, add_zero] at hexp
+      exact (mul_eq_zero.mp hexp.symm).resolve_right hzs0
+  -- the off-{αs, αsw} terms vanish
+  intro f _ hf
+  rw [Finset.mem_insert, Finset.mem_singleton, not_or] at hf
+  by_cases hrv : (flatBandOccBasis K ν).repr v f = 0
+  · rw [hrv, zero_mul]
+  · have hbf : ∀ q' ∈ occFinset f, ∃ r, q'.1 = Sum.inl r := by
+      intro q' hq'
+      by_contra hcon
+      apply hrv
+      obtain ⟨u, hu⟩ : ∃ u, q'.1 = Sum.inr u := by
+        cases hq1 : q'.1 with
+        | inl r => exact absurd ⟨r, hq1⟩ hcon
+        | inr u => exact ⟨u, rfl⟩
+      have hmem : (Sum.inr u, q'.2) ∈ occFinset f := by
+        rw [show (Sum.inr u, q'.2) = q' from Prod.ext hu.symm rfl]; exact hq'
+      exact flatBandOccBasis_repr_eq_zero_of_mem_BKernel u q'.2 hBK hmem
+    have hnd : ∀ q : Fin (K + 1),
+        ¬((Sum.inl q, (0 : Fin 2)) ∈ occFinset f ∧ (Sum.inl q, (1 : Fin 2)) ∈ occFinset f) :=
+      fun q hd => hrv (flatBandOccBasis_repr_eq_zero_of_doubleOcc K ν t U ht hU hv hbf hd.1 hd.2)
+    have hcard : (occFinset f).card = K + 1 := by
+      by_contra hc; exact hrv (flatBandOccBasis_repr_eq_zero_of_card_ne t U hv hc)
+    have hrecon := flatBand_occFinset_eq_alphaSpinOcc_of_betaFree_noDouble f hbf hnd hcard
+    rw [occMonomial_congr f _ hrecon]
+    by_contra hcoord
+    obtain ⟨hopp, htweq⟩ := flatBand_cDownUp_int_occMonomial_repr_ne_zero_imp hν s _ p
+      (fun h => hcoord (by rw [h, mul_zero]))
+    rcases flatBand_alphaTwoHoleOcc_eq_imp s _ p hs0 hs1 hopp htweq with hs's | hs'sw
+    · exact hf.1 (config_eq_of_occFinset_eq f (flatBandAlphaSpinOcc K s) (by rw [hrecon, hs's]))
+    · exact hf.2 (config_eq_of_occFinset_eq f (flatBandAlphaSpinOcc K s_sw) (by rw [hrecon, hs'sw]))
+
 end LatticeSystem.Fermion
