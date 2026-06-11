@@ -1051,6 +1051,52 @@ theorem reachSwap_of_exchange_len4_adj (N : ℕ) (t : Fin (N + 1) → Fin (N + 1
   exact StateReach.swap_via_landing_walk N t htsym htdiag hpos hay.ne haz W hyW hzW σ
     (StateReach.landing_swap_quad_adj N t htsym htdiag hpos hay hyz hzb hba haz hyz_ne hyb _)
 
+/-- **Lemma 11.9, the exchange-bond bridge (every exchange bond gives a reachable swap).**  If
+`{y, z}` is an exchange bond of the bond graph (E1: `y, z` lie on a common loop of length 3 or 4;
+E2: deleting `y, z` keeps the lattice connected), then `ReachSwap N t y z` — from every hole `p`
+`p ∉ {y, z}` the spins at `y` and `z` can be exchanged.  The length-3 loop is the triangle case
+(`reachSwap_of_exchange_len3`); the length-4 loop is dispatched on whether `y, z` are *opposite*
+corners (`reachSwap_of_exchange_len4`, common-neighbour diagonal) or *adjacent* corners
+(`reachSwap_of_exchange_len4_adj`, the footnote-14 once/twice trip) — Tasaki notes a length-4 loop
+exchanges *any* pair on it because spins are Boolean.  This is the single edge fact feeding
+`ReachSwapOff.of_walk`. -/
+theorem reachSwap_of_isExchangeBond (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {y z : Fin (N + 1)} (hyz : y ≠ z)
+    (h : IsExchangeBond (nagaokaBondGraph N t) y z) :
+    ReachSwap N t y z := by
+  obtain ⟨⟨z', c, _hcyc, hlen, hyc, hzc⟩, hE2⟩ := h
+  rcases hlen with h3 | h4
+  · exact reachSwap_of_exchange_len3 N t htsym htdiag hpos hyz c h3 hyc hzc hE2
+  · obtain ⟨a, b, d, h1, h2, h3', h4', hZa, hZb, hZd, hab, had, hbd, hmem⟩ :=
+      cycle_length_four_data (nagaokaBondGraph N t) c _hcyc h4
+    have hy := hmem y hyc
+    have hz := hmem z hzc
+    rcases hy with rfl | rfl | rfl | rfl <;> rcases hz with rfl | rfl | rfl | rfl
+    · exact absurd rfl hyz
+    · exact reachSwap_of_exchange_len4_adj N t htsym htdiag hpos h4' h1 h2 h3' had.symm hZa hZb hE2
+    · exact reachSwap_of_exchange_len4 N t htsym htdiag hpos h1.symm h2 h4' h3'.symm had hZb hE2
+    · exact reachSwap_of_exchange_len4_adj N t htsym htdiag hpos h1.symm h4'.symm h3'.symm h2.symm
+        had hZd hZb hE2
+    · exact reachSwap_of_exchange_len4_adj N t htsym htdiag hpos h2.symm h1.symm h4'.symm h3'.symm
+        hZb.symm hZa.symm had hE2
+    · exact absurd rfl hyz
+    · exact reachSwap_of_exchange_len4_adj N t htsym htdiag hpos h1 h2 h3' h4' hZb hab had hE2
+    · exact reachSwap_of_exchange_len4 N t htsym htdiag hpos h1 h4'.symm h2.symm h3' hZb had hE2
+    · exact reachSwap_of_exchange_len4 N t htsym htdiag hpos h2 h1.symm h3'.symm h4' had hZb.symm
+        hE2
+    · exact reachSwap_of_exchange_len4_adj N t htsym htdiag hpos h3'.symm h2.symm h1.symm h4'.symm
+        had.symm hab.symm hZb.symm hE2
+    · exact absurd rfl hyz
+    · exact reachSwap_of_exchange_len4_adj N t htsym htdiag hpos h2 h3' h4' h1 had hbd hZb.symm hE2
+    · exact reachSwap_of_exchange_len4_adj N t htsym htdiag hpos h3' h4' h1 h2 hZb.symm hZd.symm
+        had.symm hE2
+    · exact reachSwap_of_exchange_len4 N t htsym htdiag hpos h4'.symm h1 h3' h2.symm hZb had.symm
+        hE2
+    · exact reachSwap_of_exchange_len4_adj N t htsym htdiag hpos h4'.symm h3'.symm h2.symm h1.symm
+        hZb hbd.symm had.symm hE2
+    · exact absurd rfl hyz
+
 /-- **Swap reachable from every hole avoiding a finite set `S`.**  Generalises `ReachSwap`
 (the case `S = ∅`) by tracking the set of *auxiliary* sites a composed swap must steer the hole
 clear of.  When two exchange-bond swaps `{y, w}` and `{w, z}` are chained by the conjugation
