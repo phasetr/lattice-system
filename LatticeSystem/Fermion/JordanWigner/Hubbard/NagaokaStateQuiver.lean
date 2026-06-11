@@ -742,6 +742,85 @@ theorem StateReach.landing_swap_quad (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) 
       rwa [cyc3HoleSpin_twice_eq_swap_of_val_eq N a y w z hay.ne haw hza.ne.symm hwy hwz_ne hzy τ
         hwyv] at h
 
+/-- **Length-4 exchange of an ADJACENT pair, one trip (Tasaki Fig. 11.9, the `y,z` pair).**  On the
+loop `a — y — w — z — a` (hole at `a`), the spins at the *adjacent* corners `y` and `w` (the first
+two cycle sites — `y` a hole-neighbour, `w` the corner opposite the hole) are exchanged by one
+trip when the *other* hole-neighbour `z` carries the same spin as `y`.  This is the footnote-14
+once/twice dichotomy applied to a pair that is NOT the hole's two neighbours — exactly Tasaki's
+"`y` and `z` exchanged when the hole hops once in the opposite orientation". -/
+theorem cyc3HoleSpin_eq_swap_pair_of_val_eq (N : ℕ) (a y w z : Fin (N + 1)) (hay : a ≠ y)
+    (haw : a ≠ w) (haz : a ≠ z) (hwy : w ≠ y) (hwz : w ≠ z) (hzy : z ≠ y) (σ : HoleSpin N a)
+    (hval : σ.val y = σ.val z) :
+    cyc3HoleSpin N a y w z hay haw haz σ = swapHoleSpin N a y w hay haw σ := by
+  apply Subtype.ext; funext s
+  rw [cyc3HoleSpin_val_apply, swapHoleSpin_val_apply]
+  by_cases h1 : s = y <;> by_cases h2 : s = w <;> by_cases h3 : s = z <;>
+    simp_all
+
+/-- **Length-4 exchange of an ADJACENT pair, two trips (Tasaki Fig. 11.9).**  The second branch of
+the Boolean dichotomy for the adjacent pair `{y, w}`: when the other hole-neighbour `z` carries the
+same spin as `w`, going around the loop *twice* exchanges the spins at `y` and `w`. -/
+theorem cyc3HoleSpin_twice_eq_swap_pair_of_val_eq (N : ℕ) (a y w z : Fin (N + 1)) (hay : a ≠ y)
+    (haw : a ≠ w) (haz : a ≠ z) (hwy : w ≠ y) (hwz : w ≠ z) (hzy : z ≠ y) (σ : HoleSpin N a)
+    (hval : σ.val w = σ.val z) :
+    cyc3HoleSpin N a y w z hay haw haz (cyc3HoleSpin N a y w z hay haw haz σ)
+      = swapHoleSpin N a y w hay haw σ := by
+  apply Subtype.ext; funext s
+  -- explicit values of the inner 3-cycle at the three corners (`simp_all` blows up here)
+  have ey : (cyc3HoleSpin N a y w z hay haw haz σ).val y = σ.val w := by
+    rw [cyc3HoleSpin_val_apply, if_pos rfl]
+  have ew : (cyc3HoleSpin N a y w z hay haw haz σ).val w = σ.val z := by
+    rw [cyc3HoleSpin_val_apply, if_neg hwy, if_pos rfl]
+  have ez : (cyc3HoleSpin N a y w z hay haw haz σ).val z = σ.val y := by
+    rw [cyc3HoleSpin_val_apply, if_neg hzy, if_neg (Ne.symm hwz), if_pos rfl]
+  have es : ∀ u, u ≠ y → u ≠ w → u ≠ z →
+      (cyc3HoleSpin N a y w z hay haw haz σ).val u = σ.val u := by
+    intro u h1 h2 h3; rw [cyc3HoleSpin_val_apply, if_neg h1, if_neg h2, if_neg h3]
+  rw [cyc3HoleSpin_val_apply, swapHoleSpin_val_apply]
+  by_cases h1 : s = y
+  · subst h1; rw [if_pos rfl, ew, if_pos rfl]; exact hval.symm
+  · by_cases h2 : s = w
+    · subst h2; rw [if_neg h1, if_pos rfl, ez, if_neg h1, if_pos rfl]
+    · by_cases h3 : s = z
+      · subst h3; rw [if_neg h1, if_neg h2, if_pos rfl, ey, if_neg h1, if_neg h2]; exact hval
+      · rw [if_neg h1, if_neg h2, if_neg h3, es s h1 h2 h3, if_neg h1, if_neg h2]
+
+/-- **Length-4 landing swap of an ADJACENT pair (Tasaki Fig. 11.9).**  On a 4-loop
+`a → y → w → z → a` with the hole at the corner `a`, the spins at the *adjacent* corners `y` and `w`
+(an edge of the loop — `y` a hole-neighbour, `w` the corner opposite the hole) can be exchanged in
+place: one trip if the other hole-neighbour `z` carries `y`'s spin, two trips if it carries `w`'s
+spin (a no-op if `σ(y) = σ(w)`).  Because spins are Boolean one of these always applies.  This is
+the adjacent-pair sibling of `landing_swap_quad`; together they exchange *any* two of the occupied
+corners, matching Tasaki's claim that a length-4 loop exchanges any pair on it. -/
+theorem StateReach.landing_swap_quad_adj (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {a y w z : Fin (N + 1)} (hay : (nagaokaBondGraph N t).Adj a y)
+    (hyw : (nagaokaBondGraph N t).Adj y w) (hwz : (nagaokaBondGraph N t).Adj w z)
+    (hza : (nagaokaBondGraph N t).Adj z a) (haw : a ≠ w) (hyw_ne : y ≠ w) (hyz : y ≠ z)
+    (τ : HoleSpin N a) :
+    StateReach N t ⟨a, τ⟩ ⟨a, swapHoleSpin N a y w hay.ne haw τ⟩ := by
+  by_cases hval : τ.val y = τ.val w
+  · have hid : swapHoleSpin N a y w hay.ne haw τ = τ := by
+      apply Subtype.ext; funext s
+      rw [swapHoleSpin_val_apply]
+      by_cases h1 : s = y <;> by_cases h2 : s = w <;> simp_all
+    rw [hid]; exact StateReach.refl N t ⟨a, τ⟩
+  · have hbool : τ.val z = τ.val y ∨ τ.val z = τ.val w :=
+      (by decide : ∀ b c d : Bool, b ≠ c → (d = b ∨ d = c)) _ _ _ hval
+    have hzy : z ≠ y := hyz.symm
+    have hwz_ne : w ≠ z := hwz.ne
+    have hwy : w ≠ y := hyw_ne.symm
+    rcases hbool with hzyv | hzwv
+    · have h := StateReach.threeCyclePerm_of_quad N t htsym htdiag hpos hay hyw hwz hza haw hyz τ
+      rwa [cyc3HoleSpin_eq_swap_pair_of_val_eq N a y w z hay.ne haw hza.ne.symm hwy hwz_ne hzy τ
+        hzyv.symm] at h
+    · have h1 := StateReach.threeCyclePerm_of_quad N t htsym htdiag hpos hay hyw hwz hza haw hyz τ
+      have h2 := StateReach.threeCyclePerm_of_quad N t htsym htdiag hpos hay hyw hwz hza haw hyz
+        (cyc3HoleSpin N a y w z hay.ne haw hza.ne.symm τ)
+      have h := h1.trans h2
+      rwa [cyc3HoleSpin_twice_eq_swap_pair_of_val_eq N a y w z hay.ne haw hza.ne.symm hwy hwz_ne hzy
+        τ hzwv.symm] at h
+
 /-- **The 15-puzzle exchange (length-4 loop): an exchange via an opposite-corner 4-loop from any
 hole position.**  The 4-loop `{a, y, w, z}` instance of `swap_via_landing_walk`, where the landing
 swap is the Boolean once/twice trip of `landing_swap_quad`. -/
@@ -927,6 +1006,25 @@ theorem reachSwap_of_exchange_len4 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) �
     ReachSwap N t y z :=
   fun _p hpy hpz σ =>
     StateReach.swap_of_exchange_len4 N t htsym htdiag hpos hay haz hwy hwz haw hyz hE2 hpy hpz σ
+
+/-- **Base case of the generation (length-4 adjacent corners): a 4-loop edge gives a swap.**
+If `y, z` are *adjacent* corners of a 4-loop `a — y — z — b — a` (so `{y, z}` is a loop edge, with
+`a, b` the other two corners) and deleting `y, z` keeps the lattice connected (E2), then `ReachSwap
+N t y z`.  This is the adjacent-pair sibling of `reachSwap_of_exchange_len4`: the hole is routed to
+the corner `a` (avoiding `y, z`) and the spins at `y, z` are exchanged in place by the once/twice
+Boolean trip `StateReach.landing_swap_quad_adj` (Tasaki Fig. 11.9, the two-trip case). -/
+theorem reachSwap_of_exchange_len4_adj (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {y z a b : Fin (N + 1)} (hay : (nagaokaBondGraph N t).Adj a y)
+    (hyz : (nagaokaBondGraph N t).Adj y z) (hzb : (nagaokaBondGraph N t).Adj z b)
+    (hba : (nagaokaBondGraph N t).Adj b a) (haz : a ≠ z) (hyz_ne : y ≠ z) (hyb : y ≠ b)
+    (hE2 : ((nagaokaBondGraph N t).induce {v | v ≠ y ∧ v ≠ z}).Connected) :
+    ReachSwap N t y z := by
+  intro p hpy hpz σ
+  obtain ⟨W, hyW, hzW⟩ :=
+    exists_avoiding_walk_of_induce_connected (nagaokaBondGraph N t) hE2 ⟨hpy, hpz⟩ ⟨hay.ne, haz⟩
+  exact StateReach.swap_via_landing_walk N t htsym htdiag hpos hay.ne haz W hyW hzW σ
+    (StateReach.landing_swap_quad_adj N t htsym htdiag hpos hay hyz hzb hba haz hyz_ne hyb _)
 
 /-- **Swap reachable from every hole avoiding a finite set `S`.**  Generalises `ReachSwap`
 (the case `S = ∅`) by tracking the set of *auxiliary* sites a composed swap must steer the hole
