@@ -1162,5 +1162,35 @@ theorem ReachSwapOff.of_walk {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ}
       exact ⟨Finset.mem_insert_of_mem (List.mem_toFinset.mpr W'.start_mem_support),
         Finset.subset_insert _ _⟩
 
+/-- **An exchange-bond-graph edge gives a full `ReachSwap`.**  An edge `a — b` of the exchange-bond
+graph is, by definition, an exchange bond `{a, b}` (or `{b, a}`); either way
+`reachSwap_of_isExchangeBond` (plus `ReachSwap.symm` in the reversed case) exchanges the spins at
+`a, b` from every hole `∉ {a, b}`.
+This is the `hedge` hypothesis specialising `ReachSwapOff.of_walk` to the exchange-bond graph. -/
+theorem reachSwap_of_exchangeBondAdj (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {a b : Fin (N + 1)} (h : (exchangeBondGraph (nagaokaBondGraph N t)).Adj a b) :
+    ReachSwap N t a b := by
+  obtain ⟨hne, hor⟩ := h
+  rcases hor with hab | hba
+  · exact reachSwap_of_isExchangeBond N t htsym htdiag hpos hne hab
+  · exact (reachSwap_of_isExchangeBond N t htsym htdiag hpos hne.symm hba).symm hne.symm
+
+/-- **Distance-induction generation for the bond graph (Tasaki footnote 13).**  If two sites `x ≠ y`
+are joined in the exchange-bond graph, the spin swap `{x, y}` is reachable off the (finite) support
+of the connecting exchange-bond walk: from every hole avoiding that support, `(p, σ)` reaches
+`(p, swap_{x,y} σ)`.  This combines `reachSwap_of_exchangeBondAdj` (each exchange bond swaps its
+endpoints) with `ReachSwapOff.of_walk` (conjugation along the walk).  Under
+`ConnectedByExchangeBonds` the hypothesis holds for *every* pair `x ≠ y`, generating all
+transpositions of the occupied sites. -/
+theorem reachSwapOff_of_exchangeReachable (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {x y : Fin (N + 1)} (hxy : x ≠ y)
+    (hreach : (exchangeBondGraph (nagaokaBondGraph N t)).Reachable x y) :
+    ∃ S : Finset (Fin (N + 1)), ReachSwapOff N t S x y := by
+  obtain ⟨W⟩ := hreach
+  exact ⟨W.support.toFinset,
+    ReachSwapOff.of_walk (fun h => reachSwap_of_exchangeBondAdj N t htsym htdiag hpos h) W hxy⟩
+
 end LatticeSystem.Fermion
 
