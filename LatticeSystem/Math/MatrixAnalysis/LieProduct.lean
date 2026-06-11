@@ -178,6 +178,116 @@ theorem norm_pow_sub_pow_le [NormOneClass 𝔸] (C D : 𝔸) {M : ℝ} (hC : ‖
             push_cast
             simp
 
+/-- **Trotter product comparison.**  For `0 ≤ s ≤ 1` the split product differs from the joint
+exponential by `O(s²)`:
+`‖e^{sA}e^{sB} − e^{s(A+B)}‖ ≤ 4 s² (‖A‖+‖B‖)² e^{‖A‖+‖B‖}`.
+Both sides equal `1 + s(A+B)` to first order; the four second-order remainders — the two tails of
+`e^{sA}e^{sB} − 1 − sA − sB`, the cross term `sA·(e^{sB}−1)`, and the tail of
+`e^{s(A+B)} − 1 − s(A+B)` — are each bounded by `s²(‖A‖+‖B‖)²e^{‖A‖+‖B‖}` via the series tail
+estimates. -/
+theorem norm_exp_smul_mul_sub_exp_smul_add_le [CompleteSpace 𝔸] [NormOneClass 𝔸]
+    (A B : 𝔸) {s : ℝ} (hs0 : 0 ≤ s) (hs1 : s ≤ 1) :
+    ‖NormedSpace.exp (s • A) * NormedSpace.exp (s • B) - NormedSpace.exp (s • (A + B))‖
+      ≤ 4 * s ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) := by
+  have ha : (0 : ℝ) ≤ ‖A‖ := norm_nonneg A
+  have hb : (0 : ℝ) ≤ ‖B‖ := norm_nonneg B
+  have hEX : (0 : ℝ) < Real.exp (‖A‖ + ‖B‖) := Real.exp_pos _
+  -- norms of the scaled elements
+  have hsa : ‖s • A‖ = s * ‖A‖ := by
+    rw [norm_smul, Real.norm_eq_abs, abs_of_nonneg hs0]
+  have hsb : ‖s • B‖ = s * ‖B‖ := by
+    rw [norm_smul, Real.norm_eq_abs, abs_of_nonneg hs0]
+  have hsab : ‖s • (A + B)‖ ≤ s * (‖A‖ + ‖B‖) := by
+    rw [norm_smul, Real.norm_eq_abs, abs_of_nonneg hs0]
+    exact mul_le_mul_of_nonneg_left (norm_add_le A B) hs0
+  -- exponential comparisons (all `≤ e^{‖A‖+‖B‖}` since `s ≤ 1`)
+  have hea : Real.exp (s * ‖A‖) ≤ Real.exp (‖A‖ + ‖B‖) :=
+    Real.exp_le_exp.mpr (by nlinarith)
+  have heb : Real.exp (s * ‖B‖) ≤ Real.exp (‖A‖ + ‖B‖) :=
+    Real.exp_le_exp.mpr (by nlinarith)
+  have heab : Real.exp (s * ‖A‖) * Real.exp (s * ‖B‖) ≤ Real.exp (‖A‖ + ‖B‖) := by
+    rw [← Real.exp_add]
+    exact Real.exp_le_exp.mpr (by nlinarith)
+  have heApB : Real.exp ‖s • (A + B)‖ ≤ Real.exp (‖A‖ + ‖B‖) :=
+    Real.exp_le_exp.mpr (hsab.trans (by nlinarith))
+  -- the four second-order remainders
+  set F := NormedSpace.exp (s • A) * NormedSpace.exp (s • B) with hF
+  set E := NormedSpace.exp (s • (A + B)) with hE
+  -- algebraic split of `F − 1 − sA − sB`
+  have key : F - 1 - (s • A + s • B)
+      = (NormedSpace.exp (s • A) - 1 - s • A) * NormedSpace.exp (s • B)
+        + (NormedSpace.exp (s • B) - 1 - s • B)
+        + (s • A) * (NormedSpace.exp (s • B) - 1) := by
+    rw [hF]
+    generalize NormedSpace.exp (s • A) = P
+    generalize NormedSpace.exp (s • B) = Q
+    generalize s • A = X
+    generalize s • B = Y
+    rw [sub_mul, sub_mul, one_mul, mul_sub, mul_one]
+    abel
+  -- term bounds, each by `s²(‖A‖+‖B‖)² e^{‖A‖+‖B‖}`
+  have hT1 : ‖(NormedSpace.exp (s • A) - 1 - s • A) * NormedSpace.exp (s • B)‖
+      ≤ s ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) := by
+    calc ‖(NormedSpace.exp (s • A) - 1 - s • A) * NormedSpace.exp (s • B)‖
+        ≤ ‖NormedSpace.exp (s • A) - 1 - s • A‖ * ‖NormedSpace.exp (s • B)‖ := norm_mul_le _ _
+      _ ≤ (‖s • A‖ ^ 2 * Real.exp ‖s • A‖) * Real.exp ‖s • B‖ := by
+          exact mul_le_mul (norm_exp_sub_one_sub_id_le (s • A)) (norm_exp_le_exp_norm (s • B))
+            (norm_nonneg _) (by positivity)
+      _ = s ^ 2 * ‖A‖ ^ 2 * (Real.exp (s * ‖A‖) * Real.exp (s * ‖B‖)) := by
+          rw [hsa, hsb]; ring
+      _ ≤ s ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) := by
+          gcongr
+          nlinarith
+  have hT2 : ‖NormedSpace.exp (s • B) - 1 - s • B‖
+      ≤ s ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) := by
+    calc ‖NormedSpace.exp (s • B) - 1 - s • B‖
+        ≤ ‖s • B‖ ^ 2 * Real.exp ‖s • B‖ := norm_exp_sub_one_sub_id_le (s • B)
+      _ = s ^ 2 * ‖B‖ ^ 2 * Real.exp (s * ‖B‖) := by rw [hsb]; ring
+      _ ≤ s ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) := by
+          gcongr
+          nlinarith
+  have hT3 : ‖(s • A) * (NormedSpace.exp (s • B) - 1)‖
+      ≤ s ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) := by
+    calc ‖(s • A) * (NormedSpace.exp (s • B) - 1)‖
+        ≤ ‖s • A‖ * ‖NormedSpace.exp (s • B) - 1‖ := norm_mul_le _ _
+      _ ≤ (s * ‖A‖) * (‖s • B‖ * Real.exp ‖s • B‖) := by
+          rw [hsa]
+          exact mul_le_mul_of_nonneg_left (norm_exp_sub_one_le (s • B)) (by positivity)
+      _ = s ^ 2 * (‖A‖ * ‖B‖) * Real.exp (s * ‖B‖) := by rw [hsb]; ring
+      _ ≤ s ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) := by
+          gcongr
+          nlinarith
+  have hT4 : ‖E - 1 - s • (A + B)‖
+      ≤ s ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) := by
+    calc ‖E - 1 - s • (A + B)‖
+        ≤ ‖s • (A + B)‖ ^ 2 * Real.exp ‖s • (A + B)‖ := norm_exp_sub_one_sub_id_le _
+      _ ≤ (s * (‖A‖ + ‖B‖)) ^ 2 * Real.exp (‖A‖ + ‖B‖) := by
+          exact mul_le_mul (pow_le_pow_left₀ (norm_nonneg _) hsab 2) heApB
+            (Real.exp_pos _).le (by positivity)
+      _ = s ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) := by ring
+  -- assemble: `F − E = (F − 1 − (sA+sB)) − (E − 1 − s(A+B))`
+  have hFE : F - E = (F - 1 - (s • A + s • B)) - (E - 1 - s • (A + B)) := by
+    rw [smul_add]; abel
+  calc ‖F - E‖ = ‖(F - 1 - (s • A + s • B)) - (E - 1 - s • (A + B))‖ := by rw [hFE]
+    _ ≤ ‖F - 1 - (s • A + s • B)‖ + ‖E - 1 - s • (A + B)‖ := norm_sub_le _ _
+    _ ≤ (s ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖)) * 3
+        + s ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) := by
+        refine add_le_add ?_ hT4
+        calc ‖F - 1 - (s • A + s • B)‖
+            = ‖(NormedSpace.exp (s • A) - 1 - s • A) * NormedSpace.exp (s • B)
+                + (NormedSpace.exp (s • B) - 1 - s • B)
+                + (s • A) * (NormedSpace.exp (s • B) - 1)‖ := by rw [key]
+          _ ≤ ‖(NormedSpace.exp (s • A) - 1 - s • A) * NormedSpace.exp (s • B)
+                + (NormedSpace.exp (s • B) - 1 - s • B)‖
+              + ‖(s • A) * (NormedSpace.exp (s • B) - 1)‖ := norm_add_le _ _
+          _ ≤ ‖(NormedSpace.exp (s • A) - 1 - s • A) * NormedSpace.exp (s • B)‖
+              + ‖NormedSpace.exp (s • B) - 1 - s • B‖
+              + ‖(s • A) * (NormedSpace.exp (s • B) - 1)‖ := by
+              exact add_le_add (norm_add_le _ _) le_rfl
+          _ ≤ (s ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖)) * 3 := by
+              linarith [hT1, hT2, hT3]
+    _ = 4 * s ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) := by ring
+
 end ExpTailBounds
 
 /-- **Tasaki Theorem A.1 (Lie product formula), AXIOM.**  For finite complex matrices `A`, `B`,
