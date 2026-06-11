@@ -1192,5 +1192,42 @@ theorem reachSwapOff_of_exchangeReachable (N : ℕ) (t : Fin (N + 1) → Fin (N 
   exact ⟨W.support.toFinset,
     ReachSwapOff.of_walk (fun h => reachSwap_of_exchangeBondAdj N t htsym htdiag hpos h) W hxy⟩
 
+/-- **An exchange bond's endpoints are bond-connected.**  An exchange-bond edge `x — y` puts `x` and
+`y` on a common loop of the bond graph, so they are joined by a walk *in the bond graph itself* (the
+loop arc).  Hence every exchange-bond-graph edge lifts to bond-graph reachability. -/
+theorem bondReachable_of_exchangeBondAdj (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    {x y : Fin (N + 1)} (h : (exchangeBondGraph (nagaokaBondGraph N t)).Adj x y) :
+    (nagaokaBondGraph N t).Reachable x y := by
+  obtain ⟨z', c, hx, hy⟩ :
+      ∃ (z' : Fin (N + 1)) (c : (nagaokaBondGraph N t).Walk z' z'),
+        x ∈ c.support ∧ y ∈ c.support := by
+    obtain ⟨_, hor⟩ := h
+    rcases hor with ⟨⟨z', c, _, _, hx, hy⟩, _⟩ | ⟨⟨z', c, _, _, hy, hx⟩, _⟩
+    · exact ⟨z', c, hx, hy⟩
+    · exact ⟨z', c, hx, hy⟩
+  exact ((c.takeUntil x hx).reachable).symm.trans (c.takeUntil y hy).reachable
+
+/-- **Bond-graph reachability from exchange-bond reachability.**  Composing
+`bondReachable_of_exchangeBondAdj` along an exchange-bond walk: if `x, y` are joined in the
+exchange-bond graph, they are joined in the bond graph. -/
+theorem bondReachable_of_exchangeReachable (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    {x y : Fin (N + 1)} (h : (exchangeBondGraph (nagaokaBondGraph N t)).Reachable x y) :
+    (nagaokaBondGraph N t).Reachable x y := by
+  obtain ⟨W⟩ := h
+  induction W with
+  | nil => exact SimpleGraph.Reachable.refl _
+  | cons h _ ih => exact (bondReachable_of_exchangeBondAdj N t h).trans ih
+
+/-- **Hole mobility: connected by exchange bonds ⟹ the bond graph is connected.**  Every exchange
+bond's endpoints are bond-connected (through its loop), so connectivity of the exchange-bond graph
+transfers to the bond graph.  This supplies the hole-relocation ingredient (`exists_hole_at` needs
+bond-graph reachability) for the final sector-connectivity assembly of Lemma 11.9. -/
+theorem nagaokaBondGraph_connected_of_connectedByExchangeBonds (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (h : ConnectedByExchangeBonds (nagaokaBondGraph N t)) :
+    (nagaokaBondGraph N t).Connected :=
+  { preconnected := fun u v => bondReachable_of_exchangeReachable N t (h.preconnected u v)
+    nonempty := h.nonempty }
+
 end LatticeSystem.Fermion
 
