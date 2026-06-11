@@ -65,4 +65,16 @@ theorem spinful_annihilation_creation_anticomm_general (M : ℕ) (x y : Fin (M +
   · rw [fermionMultiAnnihilation_creation_anticomm_of_ne h,
       if_neg (fun hxy => h ((spinfulIndex_eq_iff M x y σ τ).mpr hxy))]
 
+/-- Expansion of the product `Ĉ_σ(φ)·Ĉ†_τ(ψ)` into the double sum of sitewise products. -/
+private theorem fromVector_mul_expand (M : ℕ) (φ ψ : Fin (M + 1) → ℂ) (σ τ : Fin 2) :
+    spinfulAnnihilationFromVector M φ σ * spinfulCreationFromVector M ψ τ
+      = ∑ x : Fin (M + 1), ∑ y : Fin (M + 1), (φ x * ψ y) •
+          (fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ) *
+            fermionMultiCreation (2 * M + 1) (spinfulIndex M y τ)) := by
+  simp only [spinfulAnnihilationFromVector, spinfulCreationFromVector, Finset.sum_mul,
+    Finset.mul_sum, Finset.smul_sum, smul_mul_assoc, mul_smul_comm, smul_smul]
+  rw [Finset.sum_comm]
+  exact Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => by
+    rw [mul_comm (ψ y) (φ x)]
+
 end LatticeSystem.Fermion
