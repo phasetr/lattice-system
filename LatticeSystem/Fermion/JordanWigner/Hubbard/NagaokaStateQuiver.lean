@@ -893,6 +893,41 @@ theorem reachSwap_of_exchange_len3 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) �
   fun _p hpy hpz σ =>
     StateReach.swap_of_exchange_len3 N t htsym htdiag hpos hyz c hlen hyc hzc hE2 hpy hpz σ
 
+/-- **Lemma 11.9, exchange-bond step (length-4 loop, opposite corners): an exchange bond yields a
+reachable spin swap.**  If `y, z` are the *opposite corners* of a 4-loop — i.e. they have two
+distinct common bond-neighbours `a, w` (so the loop is `a — y — w — z — a`, with `a, w` on the other
+diagonal) — and deleting `y, z` keeps the lattice connected (E2), then from any hole `p ∉ {y, z}`
+the state `(p, σ)` reaches `(p, swapHoleSpin y z σ)`.  This is the faithful length-4 analogue of
+`StateReach.swap_of_exchange_len3`: Tasaki's Fig. 11.9 exchange always places the swapped pair on
+one diagonal and the hole/auxiliary on the other.  It combines the E2 route with the footnote-14
+once/twice trip `StateReach.swap_via_quad_walk`. -/
+theorem StateReach.swap_of_exchange_len4 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {y z a w : Fin (N + 1)} (hay : (nagaokaBondGraph N t).Adj a y)
+    (haz : (nagaokaBondGraph N t).Adj a z) (hwy : (nagaokaBondGraph N t).Adj w y)
+    (hwz : (nagaokaBondGraph N t).Adj w z) (haw : a ≠ w) (hyz : y ≠ z)
+    (hE2 : ((nagaokaBondGraph N t).induce {v | v ≠ y ∧ v ≠ z}).Connected)
+    {p : Fin (N + 1)} (hpy : p ≠ y) (hpz : p ≠ z) (σ : HoleSpin N p) :
+    StateReach N t ⟨p, σ⟩ ⟨p, swapHoleSpin N p y z hpy hpz σ⟩ := by
+  obtain ⟨W, hyW, hzW⟩ :=
+    exists_avoiding_walk_of_induce_connected (nagaokaBondGraph N t) hE2 ⟨hpy, hpz⟩
+      ⟨hay.ne, haz.ne⟩
+  exact StateReach.swap_via_quad_walk N t htsym htdiag hpos hay hwy.symm hwz haz.symm haw hyz
+    W hyW hzW σ
+
+/-- **Base case of the generation (length-4 opposite corners): a 4-loop diagonal gives a swap.**
+Packages `StateReach.swap_of_exchange_len4` as a `ReachSwap` fact (valid from every hole avoiding
+`y, z`), the length-4 sibling of `reachSwap_of_exchange_len3`. -/
+theorem reachSwap_of_exchange_len4 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {y z a w : Fin (N + 1)} (hay : (nagaokaBondGraph N t).Adj a y)
+    (haz : (nagaokaBondGraph N t).Adj a z) (hwy : (nagaokaBondGraph N t).Adj w y)
+    (hwz : (nagaokaBondGraph N t).Adj w z) (haw : a ≠ w) (hyz : y ≠ z)
+    (hE2 : ((nagaokaBondGraph N t).induce {v | v ≠ y ∧ v ≠ z}).Connected) :
+    ReachSwap N t y z :=
+  fun _p hpy hpz σ =>
+    StateReach.swap_of_exchange_len4 N t htsym htdiag hpos hay haz hwy hwz haw hyz hE2 hpy hpz σ
+
 /-- **Swap reachable from every hole avoiding a finite set `S`.**  Generalises `ReachSwap`
 (the case `S = ∅`) by tracking the set of *auxiliary* sites a composed swap must steer the hole
 clear of.  When two exchange-bond swaps `{y, w}` and `{w, z}` are chained by the conjugation
