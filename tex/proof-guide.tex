@@ -5636,7 +5636,7 @@ technical crux. The development is sorry-free.
 of \(\hat H_{\rm eff}\)'' is the same Perron--Frobenius notion.}
 
 \medskip
-\noindent\textbf{Theorem 11.8 and Lemma 11.9 (axiomatized, deferred).}
+\noindent\textbf{Theorem 11.8 (axiomatized) and Lemma 11.9 (proved).}
 Tasaki §11.2.2 then gives two criteria for \emph{verifying} the connectivity
 condition on a concrete bond graph \((\Lambda, B)\), \(B = \{\{x,y\} : t_{x,y}
 \ne 0\}\): \textbf{Theorem 11.8} (Bobrow--Stubis--Li) — connectivity holds
@@ -5644,22 +5644,66 @@ condition on a concrete bond graph \((\Lambda, B)\), \(B = \{\{x,y\} : t_{x,y}
 chain) with more than four sites; and \textbf{Lemma 11.9} — if \((\Lambda, B)\)
 is connected by \emph{exchange bonds} (pairs lying on a common length-3/4 loop
 whose removal keeps \(\Lambda\) connected), connectivity holds. In the Lean
-development (file
-\texttt{Fermion/JordanWigner/Hubbard/NagaokaConnectivityClassification.lean})
-these are recorded as \textbf{\texttt{axiom}s}
-(\texttt{nagaoka\_theorem\_11\_8}, \texttt{nagaoka\_lemma\_11\_9}), with the
-bond-graph and biconnected / simple-loop / exchange-bond predicates defined
+development the predicates live in
+\texttt{Fermion/JordanWigner/Hubbard/NagaokaConnectivityClassification.lean}
 (\texttt{nagaokaBondGraph}, \texttt{IsBiconnected}, \texttt{IsSimpleLoopGTFour},
-\texttt{IsExchangeBond}, \texttt{ConnectedByExchangeBonds}), and their proofs
-\emph{deferred to a future implementation}. The rationale: Tasaki
-\emph{explicitly leaves the proof of Theorem 11.8 to the original papers}
-(Bobrow--Stubis--Li; Wilson's ``15-puzzle'' theorem, p.~387 refs [4], [81]) — it
-is a cited external classification theorem; and a faithful Lean proof of Lemma
-11.9 must turn its hole-motion (``15-puzzle'') argument into strong connectivity
-of the per-sector quiver of \(-M\), a multi-PR effort in the present
-matrix/configuration framework. \textbf{Theorem 11.7 above is \texttt{sorry}-free
-and does not depend on these axioms}; they are isolated in a separate file so the
-proven core stays axiom-clean.
+\texttt{IsExchangeBond}, \texttt{ConnectedByExchangeBonds}). Theorem 11.8 is
+recorded as an \textbf{\texttt{axiom}} (\texttt{nagaoka\_theorem\_11\_8}):
+Tasaki \emph{explicitly leaves its proof to the original papers}
+(Bobrow--Stubis--Li; Wilson's ``15-puzzle'' theorem, p.~387 refs [4], [81]) — a
+cited external classification theorem. \textbf{Theorem 11.7 above is
+\texttt{sorry}-free and does not depend on this axiom.}
+
+\medskip
+\noindent\textbf{Proof of Lemma 11.9 (\texttt{nagaoka\_lemma\_11\_9}, file
+\texttt{NagaokaStateQuiver.lean}).}
+Lemma 11.9, initially axiomatized, is now \emph{proved}, following Tasaki's
+hole-motion argument (1st ed., §11.2.2, pp.~387--388, Figs.~11.8--11.9,
+footnotes 13--14) made precise as strong connectivity of the per-sector quiver
+of \(-M\):
+\begin{enumerate}
+\item \emph{Edges.} \((-M)_{(y,\tau),(x,\sigma)} > 0\) iff \(x \ne y\),
+  \(t_{xy} > 0\), and \(\tau\) is \(\sigma\) with the hole hopped \(x \to y\)
+  (\texttt{neg\_tasakiEffReMatrix\_pos\_iff}); this generates the reachability
+  relation \texttt{StateReach} (reflexive, transitive, and — by symmetry of
+  \(M\) — symmetric).
+\item \emph{Loop trips.} Circling a triangle of bonds transposes the two
+  passed spins (\texttt{StateReach.transposition}, Fig.~11.8). Circling a
+  length-4 loop 3-cycles the three passed spins; because spins are Boolean,
+  one or two trips realize an exact transposition of the diagonal pair
+  (\texttt{landing\_swap\_quad}, Fig.~11.9) \emph{or} of an adjacent pair
+  (\texttt{landing\_swap\_quad\_adj}), per footnote 14.
+\item \emph{Controlled transport.} The hole travels from any position \(p\) to
+  the loop along a walk avoiding the exchanged pair \(\{x,y\}\) — such a route
+  exists by E2 (\texttt{exists\_avoiding\_walk\_of\_induce\_connected}) — swaps
+  in place, and returns along the reversed walk, restoring every other spin
+  (\texttt{holeWalkTransport}, \texttt{swap\_via\_landing\_walk}). Hence every
+  exchange bond yields a spin swap available from \emph{every} hole position
+  (\texttt{reachSwap\_of\_isExchangeBond}, dispatching the length-4 cycle into
+  its diagonal and adjacent cases).
+\item \emph{Generation (footnote 13).} Swaps propagate along exchange-bond
+  walks through the conjugation \((y\,z) = (y\,w)(w\,z)(y\,w)\), tracking the
+  finite set of sites the hole must avoid (\texttt{ReachSwapOff.of\_walk}).
+  Parking the hole at a \emph{farthest} vertex \(q\) of the exchange-bond graph
+  makes every pair swappable: a geodesic from the root to any other vertex
+  cannot pass through \(q\), so deleting \(q\) disconnects nothing
+  (\texttt{exists\_vertex\_walks\_avoid}, the parking lemma — no cut-vertex
+  analysis needed).
+\item \emph{Assembly.} Two same-magnetization configurations at the parked
+  hole differ on an even number of sites split into opposite mismatches
+  (equal up-spin counts); swapping one opposite pair reduces the disagreement
+  by two, and induction connects them
+  (\texttt{StateReach.of\_swaps\_of\_holeSpinMag\_eq}). Hole mobility along the
+  connected bond graph aligns arbitrary states
+  (\texttt{StateReach.exists\_hole\_at}), an out-and-back hop supplies the
+  positive-length diagonal of strong connectivity
+  (\texttt{exists\_pos\_selfPath}), and sector reachability yields
+  irreducibility (\texttt{nagaokaConnectivity\_of\_reach}). Finally, neither
+  \(M\) nor the bond graph reads the diagonal of \(t\)
+  (\texttt{tasakiEffReMatrix\_zeroDiag}, \texttt{nagaokaBondGraph\_zeroDiag}),
+  so the auxiliary zero-diagonal hypothesis is removed and the lemma holds
+  verbatim for symmetric \(t \ge 0\).
+\end{enumerate}
 
 %======================================================================
 \subsection{Tasaki's flat-band ferromagnetism: model and Lemma 11.10
@@ -6092,7 +6136,7 @@ direction uses a \emph{single documented axiom}
 \texttt{flatBand\_zeroEnergy\_halfFilled\_mem\_ferromagneticMultipletSpan}: Tasaki's
 Appendix~A classification (no $\beta$-occupation + no double occupancy $\Rightarrow$
 spatially symmetric $\Rightarrow$ maximal spin), deferred under the same policy as
-Theorem 11.8 / Lemma 11.9, because a faithful proof needs the Fock-space
+Theorem 11.8, because a faithful proof needs the Fock-space
 factorisation of the non-orthogonal $\{\alpha\}\cup\{\beta\}$ basis and the
 symmetric-tensor/SU(2) classification. The existence half does \emph{not} depend on
 this axiom.
@@ -6188,7 +6232,7 @@ $N=D$, the ground states are the maximal-spin multiplet). Tasaki defers Theorem 
 proof to §11.3.3 and omits Theorem 11.13's entirely. \textbf{Theorem 11.12 is now
 \emph{proved}} (§11.3.3, \texttt{MielkeIncidenceMatrix.lean}, below); only Theorem 11.13
 remains a documented axiom (\texttt{MielkeTheorems.lean}), matching the policy for
-Theorem 11.8 / Lemma 11.9.
+Theorem 11.8.
 The line graph is mathlib's \texttt{SimpleGraph.lineGraph}, realised on
 $\mathrm{Fin}\,(M{+}1)$ via a graph isomorphism
 $\texttt{SimpleGraph.Iso}\,G\,(\texttt{lineGraph}\,G_{\rm base})$; the flat-band

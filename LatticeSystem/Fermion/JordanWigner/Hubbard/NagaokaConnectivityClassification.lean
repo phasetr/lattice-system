@@ -17,29 +17,27 @@ bond graph `(Λ, B)`, `B = {{x, y} : t_{x,y} ≠ 0}`:
 * **Lemma 11.9**: if `(Λ, B)` is connected by *exchange bonds*, the connectivity
   condition holds.
 
-## Axiomatization rationale (project decision, 2026-06-04)
+## Status
 
-Both results are recorded here as **`axiom`s**, deferring their proofs to a
-future implementation, for the following reasons.
+* **Theorem 11.8** is recorded as an **`axiom`**: Tasaki's text *explicitly
+  leaves the proof to the original papers* — Bobrow, Stubis and Li, and Wilson's
+  graph-theoretic analysis of the "15-puzzle" (Tasaki 1st ed., §11.2.2, p. 387,
+  refs [4], [81]). The book itself provides no proof, so it is a *cited external
+  classification theorem*. Rather than reproduce Wilson's theorem we axiomatize
+  its statement.
 
-* **Theorem 11.8.** Tasaki's text *explicitly leaves the proof to the original
-  papers* — Bobrow, Stubis and Li, and Wilson's graph-theoretic analysis of the
-  "15-puzzle" (Tasaki 1st ed., §11.2.2, p. 387, refs [4], [81]). The book itself
-  provides no proof, so it is a *cited external classification theorem*. Rather
-  than reproduce Wilson's theorem we axiomatize its statement.
+* **Lemma 11.9** was initially axiomatized here (project decision, 2026-06-04)
+  and is now a **proved theorem** `nagaoka_lemma_11_9` in
+  `NagaokaStateQuiver.lean`, which turns Tasaki's "15-puzzle" hole-motion proof
+  into strong connectivity of the per-sector quiver of `−M` (loop-trip spin
+  swaps, exchange-bond generation, hole parking, mismatch reduction). This file
+  keeps the *predicates* (`nagaokaBondGraph`, `IsExchangeBond`,
+  `exchangeBondGraph`, `ConnectedByExchangeBonds`) on which both results are
+  stated.
 
-* **Lemma 11.9.** Tasaki gives a proof (moving the hole around a length-3/4 loop
-  to exchange the spins at an exchange bond). A faithful Lean proof would have to
-  turn that "15-puzzle" hole-motion argument into a sequence of non-vanishing
-  `Ĥ_eff` matrix elements connecting any two same-magnetization basis states
-  (i.e. strong connectivity of the per-sector quiver of `−M`); this is a
-  multi-PR effort in the present matrix/configuration framework. It is
-  axiomatized now and deferred to a future implementation.
-
-The *statements* are formalized here in book order; the *proofs* are deferred.
 **Theorem 11.7 itself (`NagaokaConnectivity.lean`) is `sorry`-free and does not
-depend on these axioms** — they are isolated in this file so that the proven
-core stays axiom-clean.
+depend on the Theorem 11.8 axiom** — it is isolated in this file so that the
+proven core stays axiom-clean.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), §11.2.2, Theorem 11.8 and Lemma 11.9, pp. 386–388.

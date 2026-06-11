@@ -4,18 +4,43 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaConnectivityClassificat
 import Mathlib.LinearAlgebra.Matrix.Irreducible.Defs
 
 /-!
-# Tasaki §11.2.2: the one-hole state quiver of `−M` (toward Lemma 11.9)
+# Tasaki §11.2.2: the one-hole state quiver of `−M` and the proof of Lemma 11.9
 
 The connectivity condition (Definition 11.6, `nagaokaConnectivity`) is irreducibility of the
 sector-restricted `−M`, i.e. strong connectivity of the quiver whose edges are the *positive*
-entries of `−M`.  This file records the **edge characterisation**: `−M_{(y,τ),(x,σ)} > 0` exactly
-when `x ≠ y`, the bond `x—y` is present (`t x y > 0`), and the spin configuration of the target
-state `(y,τ)` is that of the source state `(x,σ)` after the hole hops `x → y`
-(`hubbardSpinMove`).  This is **Step A** of Lemma 11.9 (a hole hop along a single bond), the
-foundation for turning the "15-puzzle" hole-motion argument into quiver paths.
+entries of `−M`.  This file builds Tasaki's "15-puzzle" hole-motion argument in full and proves
+**Lemma 11.9** (`nagaoka_lemma_11_9`: a bond graph connected by exchange bonds satisfies the
+connectivity condition), discharging the former axiom of
+`NagaokaConnectivityClassification.lean`.  The layers:
+
+* **Edges** — `−M_{(y,τ),(x,σ)} > 0` iff the hole hops `x → y` along a present bond
+  (`neg_tasakiEffReMatrix_pos_iff`, `holeHopHom`/`holeHopHom'`), giving the reachability relation
+  `StateReach` with `refl`/`trans`/`symm`.
+* **Loop trips** — circling a length-3 loop transposes the two passed spins
+  (`StateReach.transposition`); a length-4 loop 3-cycles them, and the footnote-14 once/twice
+  Boolean trip turns that into a transposition of either the diagonal or an adjacent pair
+  (`landing_swap_quad`, `landing_swap_quad_adj`).
+* **Controlled transport** — the hole travels to a loop, performs the in-place swap, and returns
+  along the reversed walk restoring everything else (`holeWalkTransport`,
+  `swap_via_landing_walk`); the route avoiding the swapped pair exists by E2
+  (`exists_avoiding_walk_of_induce_connected`).
+* **Exchange-bond bridge** — every exchange bond (length-3 or length-4 loop + E2) yields a
+  `ReachSwap`, a spin swap available from *every* hole position
+  (`reachSwap_of_isExchangeBond`).
+* **Generation** — swaps propagate along exchange-bond walks by the conjugation
+  `(y z) = (y w)(w z)(y w)` with explicit avoid-set bookkeeping (`ReachSwapOff.of_walk`,
+  Tasaki footnote 13); parking the hole at a *farthest* vertex of the exchange-bond graph makes
+  every pair swappable (`exists_vertex_walks_avoid`, the parking lemma).
+* **Assembly** — same-magnetization configurations at the parked hole are connected by the
+  mismatch-reduction induction (`StateReach.of_swaps_of_holeSpinMag_eq`); hole mobility aligns
+  arbitrary states (`StateReach.exists_hole_at`), and an out-and-back hop supplies the
+  positive-length diagonal (`exists_pos_selfPath`).  The sector quiver half
+  (`nagaokaConnectivity_of_reach`) converts reachability into irreducibility, and the
+  diagonal-zeroing transfer (`tasakiEffReMatrix_zeroDiag`) removes the auxiliary zero-diagonal
+  hypothesis, yielding `nagaoka_lemma_11_9` verbatim.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
-(1st ed.), §11.2.2, Lemma 11.9 (the connectivity argument), pp. 386–388.
+(1st ed.), §11.2.2, Lemma 11.9, Figs. 11.8–11.9, footnotes 13–14, pp. 386–388.
 -/
 
 namespace LatticeSystem.Fermion
