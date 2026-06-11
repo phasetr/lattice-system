@@ -7602,21 +7602,31 @@ the strong-coupling limit A.11/A.12 for §11.5, and the Perron--Frobenius theore
 \texttt{Math/CollatzWielandt*}).  We prove results where mathlib supports them and axiomatize
 the heavy analytic ones, in strict book order (Issue \#4205).
 
-\medskip\noindent\textbf{Theorem A.1 (Lie product formula, axiomatized).}  For finite complex
+\medskip\noindent\textbf{Theorem A.1 (Lie product formula, proved).}  For finite complex
 matrices $A,B$ --- the operator algebra of a finite-volume quantum system --- the exponential
 of a sum is the limit of the symmetric split product (Tasaki eq.~(A.2.21)),
 \[
   e^{A+B} \;=\; \lim_{N\uparrow\infty}\bigl(e^{A/N}\,e^{B/N}\bigr)^{N}.
 \]
 Mathlib provides only the commuting case (\texttt{Matrix.exp\_add\_of\_commute}); the general
-non-commuting Lie/Trotter formula for bounded operators is a standard but non-trivial
-real-analysis result (Tasaki's footnote: ``nineteenth century mathematics''), recorded as the
-documented axiom \texttt{lieProductFormula} (\texttt{Math/MatrixAnalysis/LieProduct.lean}) via
-\texttt{NormedSpace.exp} and \texttt{Filter.Tendsto}.  It is not on the critical path of any
-Chapter-11 proof; to be discharged later.
+non-commuting Lie/Trotter formula is \textbf{now proved from scratch} (axiom-free,
+\texttt{lieProductFormula}, \texttt{Math/MatrixAnalysis/LieProduct.lean}), in a general complete
+normed $\mathbb R$-algebra (\texttt{trotterProductFormula}) instantiated for matrices under the
+scoped operator norm.  The proof is the classical four-step argument: \emph{(i)} exponential-series
+tail bounds $\|e^X-1-X\|\le\|X\|^2e^{\|X\|}$, $\|e^X-1\|\le\|X\|e^{\|X\|}$,
+$\|e^X\|\le e^{\|X\|}$, obtained by splitting the series
+(\texttt{Summable.tsum\_eq\_zero\_add}) and comparing termwise with the real exponential series;
+\emph{(ii)} the telescoping power estimate $\|C^n-D^n\|\le n\,M^{n-1}\|C-D\|$ for
+$\|C\|,\|D\|\le M$; \emph{(iii)} the product comparison
+$\|e^{sA}e^{sB}-e^{s(A+B)}\|\le 4s^2(\|A\|+\|B\|)^2e^{\|A\|+\|B\|}$ for $0\le s\le1$
+(both sides equal $1+s(A+B)$ to first order; the four remainders are bounded by \emph{(i)});
+\emph{(iv)} since $e^{A+B}$ is \emph{exactly} the $n$-th power of its $1/n$-step
+(\texttt{exp\_nsmul}), the telescope with $M=e^{(\|A\|+\|B\|)/n}$ (so
+$M^{n-1}\le e^{\|A\|+\|B\|}$) converts the per-step $O(1/n^2)$ distance into an $O(1/n)$ bound,
+which squeezes to $0$.
 
-\medskip\noindent\textbf{Lemmas A.4--A.6 (positive-semidefinite basics, proved).}  Unlike the
-Lie product formula, these are available in mathlib and are \emph{proved} (axiom-free,
+\medskip\noindent\textbf{Lemmas A.4--A.6 (positive-semidefinite basics, proved).}  These are
+available in mathlib and are \emph{proved} (axiom-free,
 \texttt{Math/PosSemidef/Basics.lean}).  \textbf{Lemma A.4}
 (\texttt{posSemidef\_iff\_eigenvalues\_nonneg}): a Hermitian matrix is positive-semidefinite
 iff every eigenvalue is nonnegative.  \textbf{Lemma A.5} (\texttt{PosSemidef.add}): the sum of
