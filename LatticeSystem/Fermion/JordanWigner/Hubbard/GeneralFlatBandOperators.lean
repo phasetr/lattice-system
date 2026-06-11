@@ -219,4 +219,10 @@ theorem site_annihilation_mulVec_generalFlatBandSlaterState (M : ℕ)
       Matrix.neg_mulVec, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
       ih (fun q' hq' => hz q' (List.mem_cons_of_mem q hq')), Matrix.mulVec_zero, neg_zero]
 
+/-- Every `â†`-Slater state lies in the general flat-band Fock subspace (span membership). -/
+theorem generalFlatBandSlaterState_mem_fockSubmodule
+    (μ : Fin (M + 1) → Fin (M + 1) → ℂ) (qs : List (Fin (M + 1) × Fin 2)) :
+    generalFlatBandSlaterState μ qs ∈ generalFlatBandFockSubmodule μ :=
+  Submodule.subset_span ⟨qs, rfl⟩
+
 end LatticeSystem.Fermion
