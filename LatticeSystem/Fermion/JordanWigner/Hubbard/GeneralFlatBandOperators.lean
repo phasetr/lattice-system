@@ -175,4 +175,17 @@ theorem site_annihilation_generalFlatBandCreation_anticomm (M : ℕ)
       exact absurd (Finset.mem_univ z) h
   rw [hcoef]
 
+/-- A **general flat-band Slater state** `(∏_{q ∈ qs} â†_{q.1, q.2}) |vac⟩`, indexed by an
+ordered list of `(index-site, spin)` modes of a special basis (the states of eq. (11.3.46)). -/
+noncomputable def generalFlatBandSlaterState (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (qs : List (Fin (M + 1) × Fin 2)) : (Fin (2 * M + 2) → Fin 2) → ℂ :=
+  ((qs.map (fun q => generalFlatBandCreation μ q.1 q.2)).prod).mulVec
+    (fermionMultiVacuum (2 * M + 1))
+
+/-- The **general flat-band Fock subspace**: the span of all `â†`-Slater states of a special
+basis — the right-hand side of Tasaki's eq. (11.3.46). -/
+noncomputable def generalFlatBandFockSubmodule (μ : Fin (M + 1) → Fin (M + 1) → ℂ) :
+    Submodule ℂ ((Fin (2 * M + 2) → Fin 2) → ℂ) :=
+  Submodule.span ℂ (Set.range (generalFlatBandSlaterState μ))
+
 end LatticeSystem.Fermion
