@@ -5645,9 +5645,10 @@ chain) with more than four sites; and \textbf{Lemma 11.9} — if \((\Lambda, B)\
 is connected by \emph{exchange bonds} (pairs lying on a common length-3/4 loop
 whose removal keeps \(\Lambda\) connected), connectivity holds. In the Lean
 development the predicates live in
-\texttt{Fermion/JordanWigner/Hubbard/NagaokaConnectivityClassification.lean}
+\texttt{Fermion/JordanWigner/Hubbard/NagaokaBondGraph.lean}
 (\texttt{nagaokaBondGraph}, \texttt{IsBiconnected}, \texttt{IsSimpleLoopGTFour},
-\texttt{IsExchangeBond}, \texttt{ConnectedByExchangeBonds}). Theorem 11.8 is
+\texttt{IsExchangeBond}, \texttt{ConnectedByExchangeBonds}), and the two
+statements in \texttt{NagaokaConnectivityClassification.lean}. Theorem 11.8 is
 recorded as an \textbf{\texttt{axiom}} (\texttt{nagaoka\_theorem\_11\_8}):
 Tasaki \emph{explicitly leaves its proof to the original papers}
 (Bobrow--Stubis--Li; Wilson's ``15-puzzle'' theorem, p.~387 refs [4], [81]) — a
