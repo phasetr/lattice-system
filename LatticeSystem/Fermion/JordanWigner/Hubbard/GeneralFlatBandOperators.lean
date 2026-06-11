@@ -236,4 +236,13 @@ noncomputable def generalFlatBandPeelTerm (μ : Fin (M + 1) → Fin (M + 1) → 
     ((if (qs.get i).2 = σ then μ (qs.get i).1 x else 0) •
       generalFlatBandSlaterState μ (qs.eraseIdx i))
 
+/-- Acting with one more mode creator prepends it to the Slater list:
+`â†_{z,σ} |qs⟩ = |(z,σ) :: qs⟩`. -/
+theorem generalFlatBandCreation_mulVec_slaterState (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (z : Fin (M + 1)) (σ : Fin 2) (qs : List (Fin (M + 1) × Fin 2)) :
+    (generalFlatBandCreation μ z σ).mulVec (generalFlatBandSlaterState μ qs)
+      = generalFlatBandSlaterState μ ((z, σ) :: qs) := by
+  unfold generalFlatBandSlaterState
+  rw [List.map_cons, List.prod_cons, Matrix.mulVec_mulVec]
+
 end LatticeSystem.Fermion
