@@ -188,4 +188,35 @@ noncomputable def generalFlatBandFockSubmodule (μ : Fin (M + 1) → Fin (M + 1)
     Submodule ℂ ((Fin (2 * M + 2) → Fin 2) → ℂ) :=
   Submodule.span ℂ (Set.range (generalFlatBandSlaterState μ))
 
+/-- **The site annihilator kills a Slater state whose mode vectors vanish at its site** (the
+peel of eq. (11.3.46)): if `μ_{q}(z) = 0` for every mode `q` in the list, then
+`ĉ_{z,σ}` anticommutes through every `â†` factor (site-dual CAR with vanishing pairing) and
+annihilates the vacuum.  On the index set `I` this is exactly the biorthogonality statement for
+`z ∈ I` not among the listed modes. -/
+theorem site_annihilation_mulVec_generalFlatBandSlaterState (M : ℕ)
+    (μ : Fin (M + 1) → Fin (M + 1) → ℂ) (z : Fin (M + 1)) (σ : Fin 2)
+    (qs : List (Fin (M + 1) × Fin 2)) (hz : ∀ q ∈ qs, μ q.1 z = 0) :
+    (fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z σ)).mulVec
+      (generalFlatBandSlaterState μ qs) = 0 := by
+  revert hz
+  unfold generalFlatBandSlaterState
+  induction qs with
+  | nil =>
+    intro _
+    simpa using fermionMultiAnnihilation_mulVec_vacuum (2 * M + 1) (spinfulIndex M z σ)
+  | cons q qs ih =>
+    intro hz
+    have hanti := site_annihilation_generalFlatBandCreation_anticomm M μ z q.1 σ q.2
+    rw [hz q List.mem_cons_self] at hanti
+    have hanti0 : fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z σ) *
+        generalFlatBandCreation μ q.1 q.2
+        + generalFlatBandCreation μ q.1 q.2 *
+          fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z σ) = 0 := by
+      rw [hanti]
+      by_cases h : σ = q.2 <;> simp [h]
+    rw [List.map_cons, List.prod_cons, Matrix.mulVec_mulVec, ← Matrix.mul_assoc,
+      eq_neg_of_add_eq_zero_left hanti0, Matrix.neg_mul, Matrix.mul_assoc,
+      Matrix.neg_mulVec, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
+      ih (fun q' hq' => hz q' (List.mem_cons_of_mem q hq')), Matrix.mulVec_zero, neg_zero]
+
 end LatticeSystem.Fermion
