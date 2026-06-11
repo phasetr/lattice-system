@@ -235,7 +235,7 @@ theorem holeSpinMove_three_cycle_val (N : ℕ) (x y z : Fin (N + 1))
   funext w
   simp only [holeSpinMove, Function.update_apply]
   by_cases hwx : w = x <;> by_cases hwy : w = y <;> by_cases hwz : w = z <;>
-    simp_all [hyz, hzx, hxy.symm, hyz.symm, hzx.symm, σ.2]
+    simp_all [hxy.symm, hyz.symm, hzx.symm, σ.2]
 
 /-- **Step B: a 3-cycle of bonds gives reachability to the spin-transposed state.**  If `x, y, z`
 form a triangle of bonds (`0 < t` on each edge), the hole can travel `x → y → z → x`, returning to
@@ -296,8 +296,7 @@ theorem holeSpinMove_four_cycle_val (N : ℕ) (x y w z : Fin (N + 1))
   simp only [holeSpinMove, Function.update_apply]
   by_cases hvx : v = x <;> by_cases hvy : v = y <;> by_cases hvw : v = w <;>
       by_cases hvz : v = z <;>
-    simp_all [hxy, hyw, hwz, hzx, hxw, hyz, hxy.symm, hyw.symm, hwz.symm, hzx.symm,
-      hxw.symm, hyz.symm, σ.2]
+    simp_all [hxy.symm, hyw.symm, hwz.symm, hzx.symm, hxw.symm, hyz.symm, σ.2]
 
 /-- **Step B (length-4 loops): a 4-cycle of bonds makes the spin 3-cycle reachable.**  With bonds
 on all four edges of the loop `x → y → w → z → x`, `(x, σ)` reaches `(x, σ')` where `σ'` 3-cycles
@@ -328,7 +327,7 @@ theorem swapHoleSpin_comm (N : ℕ) (p y z : Fin (N + 1)) (hpy : p ≠ y) (hpz :
     swapHoleSpin N p y z hpy hpz σ = swapHoleSpin N p z y hpz hpy σ := by
   apply Subtype.ext; funext s
   simp only [swapHoleSpin_val_apply]
-  by_cases h1 : s = y <;> by_cases h2 : s = z <;> simp_all [hyz, hyz.symm]
+  by_cases h1 : s = y <;> by_cases h2 : s = z <;> simp_all [hyz.symm]
 
 /-- **Transposition conjugation `(y z) = (y w)(w z)(y w)`.**  Swapping the spins at `y` and `z` can
 be realised as three swaps through an intermediate site `w` (distinct from `y, z` and the hole).
@@ -342,7 +341,7 @@ theorem swapHoleSpin_conj (N : ℕ) (p y w z : Fin (N + 1)) (hpy : p ≠ y) (hpw
   apply Subtype.ext; funext s
   simp only [swapHoleSpin_val_apply]
   by_cases h1 : s = y <;> by_cases h2 : s = w <;> by_cases h3 : s = z <;>
-    simp_all [hyw, hwz, hyz, hyw.symm, hwz.symm, hyz.symm]
+    simp_all [hyw.symm, hwz.symm, hyz.symm]
 
 /-- Pointwise value of `cyc3HoleSpin`: `y ← σ(w)`, `w ← σ(z)`, `z ← σ(y)`, others kept. -/
 theorem cyc3HoleSpin_val_apply (N : ℕ) (x y w z : Fin (N + 1)) (hxy : x ≠ y) (hxw : x ≠ w)
@@ -363,7 +362,7 @@ theorem cyc3HoleSpin_eq_swap_of_val_eq (N : ℕ) (x y w z : Fin (N + 1)) (hxy : 
   apply Subtype.ext; funext s
   rw [cyc3HoleSpin_val_apply, swapHoleSpin_val_apply]
   by_cases h1 : s = y <;> by_cases h2 : s = w <;> by_cases h3 : s = z <;>
-    simp_all [hwy, hwz, hzy]
+    simp_all
 
 /-- **Length-4 exchange, double loop (Tasaki Fig. 11.9, footnote 14).**  When the auxiliary site
 `w` carries the *same* spin as `y`, going around the 4-loop *twice* (applying the 3-cycle
@@ -379,7 +378,7 @@ theorem cyc3HoleSpin_twice_eq_swap_of_val_eq (N : ℕ) (x y w z : Fin (N + 1)) (
   rw [cyc3HoleSpin_val_apply, swapHoleSpin_val_apply]
   simp only [cyc3HoleSpin_val_apply]
   by_cases h1 : s = y <;> by_cases h2 : s = w <;> by_cases h3 : s = z <;>
-    simp_all [hwy, hwz, hzy]
+    simp_all
 
 /-- **Step B (length-4, clean form): a bond 4-loop makes a spin 3-cycle reachable.**  With bonds on
 the loop `x → y → w → z → x`, `(x, σ)` reaches `(x, cyc3HoleSpin σ)` — the spins at `y, w, z` are
@@ -725,7 +724,7 @@ theorem StateReach.landing_swap_quad (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) 
     have hid : swapHoleSpin N a y z hay.ne hza.ne.symm τ = τ := by
       apply Subtype.ext; funext s
       rw [swapHoleSpin_val_apply]
-      by_cases h1 : s = y <;> by_cases h2 : s = z <;> simp_all [hyz, hzy]
+      by_cases h1 : s = y <;> by_cases h2 : s = z <;> simp_all
     rw [hid]; exact StateReach.refl N t _
   · -- opposite spins: Boolean dichotomy on σ(w)
     have hbool : τ.val w = τ.val z ∨ τ.val w = τ.val y :=
@@ -851,7 +850,7 @@ theorem exists_pos_selfPath (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
   letI : Quiver _ := Matrix.toQuiver (-tasakiEffReMatrix N t)
   refine ⟨(holeHopHom' N t htsym htdiag p q σ hpq ht).toPath.comp
     (holeHopHom N t p q σ hpq ht).toPath, ?_⟩
-  simp [Quiver.Path.length_comp, Quiver.Path.length_toPath]
+  simp [Quiver.Path.length_toPath]
 
 /-- **The spin swap of two sites is reachable from any hole position.**  The abstract relation behind
 Lemma 11.9's generation step: from *every* hole position `p ∉ {y, z}` the state `(p, σ)` reaches the
@@ -874,7 +873,7 @@ intermediate* `w`.  This is the inductive step of the distance generation argume
 theorem ReachSwap.comp_via {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ} {y w z : Fin (N + 1)}
     (hyw : ReachSwap N t y w) (hwz : ReachSwap N t w z)
     (hyw_ne : y ≠ w) (hwz_ne : w ≠ z) (hyz_ne : y ≠ z) :
-    ∀ (p : Fin (N + 1)) (hpy : p ≠ y) (hpw : p ≠ w) (hpz : p ≠ z) (σ : HoleSpin N p),
+    ∀ (p : Fin (N + 1)) (hpy : p ≠ y) (_hpw : p ≠ w) (hpz : p ≠ z) (σ : HoleSpin N p),
       StateReach N t ⟨p, σ⟩ ⟨p, swapHoleSpin N p y z hpy hpz σ⟩ := by
   intro p hpy hpw hpz σ
   rw [swapHoleSpin_conj N p y w z hpy hpw hpz hyw_ne hwz_ne hyz_ne]
@@ -891,7 +890,7 @@ theorem reachSwap_of_exchange_len3 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) �
     (hyc : y ∈ c.support) (hzc : z ∈ c.support)
     (hE2 : ((nagaokaBondGraph N t).induce {w | w ≠ y ∧ w ≠ z}).Connected) :
     ReachSwap N t y z :=
-  fun p hpy hpz σ =>
+  fun _p hpy hpz σ =>
     StateReach.swap_of_exchange_len3 N t htsym htdiag hpos hyz c hlen hyc hzc hE2 hpy hpz σ
 
 end LatticeSystem.Fermion
