@@ -1532,5 +1532,103 @@ theorem StateReach.of_holeSpinMag_eq_of_connectedByExchangeBonds (N : ℕ)
     rw [this]; exact (hτ'.symm N t htsym htdiag)
   exact (ha.trans hmid).trans hb
 
+/-- **Lemma 11.9 capstone (zero-diagonal form): exchange-bond connectivity implies the
+connectivity condition.**  For symmetric `t ≥ 0` with zero diagonal on at least two sites, if the
+bond graph is connected by exchange bonds then every magnetization sector of `−M` is irreducible
+(Definition 11.6).  Sector reachability is
+`StateReach.of_holeSpinMag_eq_of_connectedByExchangeBonds`; the positive-length requirement is met
+by an out-and-back hole hop on the diagonal (`exists_pos_selfPath`) and automatically off it. -/
+theorem nagaokaConnectivity_of_connectedByExchangeBonds (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ) (hN : 1 ≤ N)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    (hconn : ConnectedByExchangeBonds (nagaokaBondGraph N t)) :
+    nagaokaConnectivity N t := by
+  apply nagaokaConnectivity_of_reach N t hpos
+  intro m i j
+  letI := Matrix.toQuiver (-tasakiEffReMatrix N t)
+  have hbond := nagaokaBondGraph_connected_of_connectedByExchangeBonds N t hconn
+  have hmag : holeSpinMag N i.val = holeSpinMag N j.val := i.2.trans j.2.symm
+  have hreach := StateReach.of_holeSpinMag_eq_of_connectedByExchangeBonds N t htsym htdiag hpos
+    hconn i.val j.val hmag
+  by_cases hij : i.val = j.val
+  · -- diagonal: an out-and-back hole hop is a positive-length self-loop
+    obtain ⟨v, hvne⟩ : ∃ v : Fin (N + 1), v ≠ i.val.1 := by
+      have : Nontrivial (Fin (N + 1)) :=
+        ⟨⟨0, by omega⟩, ⟨1, by omega⟩, by simp [Fin.ext_iff]⟩
+      exact exists_ne i.val.1
+    obtain ⟨W⟩ := hbond.preconnected i.val.1 v
+    obtain ⟨u, hadj⟩ : ∃ u, (nagaokaBondGraph N t).Adj i.val.1 u := by
+      cases W with
+      | nil => exact absurd rfl hvne
+      | cons h _ => exact ⟨_, h⟩
+    obtain ⟨path, hlen⟩ := exists_pos_selfPath N t htsym htdiag i.val.2 hadj.ne
+      (nagaokaBondGraph_adj_pos N t htsym hpos hadj)
+    rw [← hij]
+    exact ⟨path, hlen⟩
+  · -- distinct states: any connecting path has positive length
+    obtain ⟨p⟩ := hreach
+    refine ⟨p, ?_⟩
+    rcases Nat.eq_zero_or_pos p.length with h0 | hposlen
+    · exact absurd (Quiver.Path.eq_of_length_zero p h0) hij
+    · exact hposlen
+
+/-- Zeroing the diagonal of the hopping does not change the Tasaki matrix: the matrix is `0` on the
+diagonal block *by definition* and reads `t` only at off-diagonal pairs. -/
+theorem tasakiEffReMatrix_zeroDiag (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ) :
+    tasakiEffReMatrix N (fun i j => if i = j then 0 else t i j) = tasakiEffReMatrix N t := by
+  ext q p
+  unfold tasakiEffReMatrix
+  by_cases h : p.1 = q.1 <;> simp [h]
+
+/-- Zeroing the diagonal of the hopping does not change the bond graph: adjacency requires
+`x ≠ y` and reads `t` only there. -/
+theorem nagaokaBondGraph_zeroDiag (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ) :
+    nagaokaBondGraph N (fun i j => if i = j then 0 else t i j) = nagaokaBondGraph N t := by
+  ext x y
+  constructor
+  · rintro ⟨hne, h⟩
+    refine ⟨hne, ?_⟩
+    simpa only [if_neg hne, if_neg (Ne.symm hne)] using h
+  · rintro ⟨hne, h⟩
+    refine ⟨hne, ?_⟩
+    simpa only [if_neg hne, if_neg (Ne.symm hne)] using h
+
+/-- **Tasaki Lemma 11.9 (a sufficient condition for the connectivity), DISCHARGED.**  If the bond
+graph is connected by exchange bonds, the connectivity condition (Definition 11.6,
+`nagaokaConnectivity`) holds.  This is the full 15-puzzle argument of Tasaki §11.2.2, pp. 387–388:
+exchange bonds yield in-place spin swaps via length-3/4 loop trips (Figs. 11.8, 11.9 and
+footnote 14), the swaps propagate along exchange-bond walks (footnote 13), parking the hole at a
+farthest vertex of the exchange-bond graph makes every pair swappable, and the mismatch-reduction
+induction connects any two same-magnetization configurations.  The general (not necessarily
+zero-diagonal) hopping reduces to the zero-diagonal capstone because neither the Tasaki matrix nor
+the bond graph reads the diagonal of `t` (`tasakiEffReMatrix_zeroDiag`,
+`nagaokaBondGraph_zeroDiag`). -/
+theorem nagaoka_lemma_11_9 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (hN : 1 ≤ N) (htsym : ∀ i j, t i j = t j i) (hpos : ∀ i j, 0 ≤ t i j) :
+    ConnectedByExchangeBonds (nagaokaBondGraph N t) → nagaokaConnectivity N t := by
+  intro hconn
+  -- run the zero-diagonal capstone on the diagonal-zeroed hopping and transfer back
+  set t₀ : Fin (N + 1) → Fin (N + 1) → ℝ := fun i j => if i = j then 0 else t i j with ht₀
+  have htsym₀ : ∀ i j, t₀ i j = t₀ j i := by
+    intro i j
+    by_cases h : i = j
+    · simp [ht₀, h]
+    · simp [ht₀, h, Ne.symm h, htsym i j]
+  have htdiag₀ : ∀ i, t₀ i i = 0 := fun i => by simp [ht₀]
+  have hpos₀ : ∀ i j, 0 ≤ t₀ i j := by
+    intro i j
+    by_cases h : i = j
+    · simp [ht₀, h]
+    · simp [ht₀, h, hpos i j]
+  have hconn₀ : ConnectedByExchangeBonds (nagaokaBondGraph N t₀) := by
+    rw [ht₀, nagaokaBondGraph_zeroDiag]; exact hconn
+  have hcap := nagaokaConnectivity_of_connectedByExchangeBonds N t₀ hN htsym₀ htdiag₀ hpos₀ hconn₀
+  intro m
+  have hPF : nagaokaPFMatrixOnSector N t m = nagaokaPFMatrixOnSector N t₀ m := by
+    unfold nagaokaPFMatrixOnSector tasakiEffReMatrixOnSector
+    rw [ht₀, tasakiEffReMatrix_zeroDiag]
+  rw [hPF]
+  exact hcap m
+
 end LatticeSystem.Fermion
 

@@ -109,21 +109,9 @@ connected. -/
 def ConnectedByExchangeBonds {V : Type*} (G : SimpleGraph V) : Prop :=
   (exchangeBondGraph G).Connected
 
-/-- **Tasaki Lemma 11.9 (a sufficient condition for connectivity).**  If the bond
-graph is connected by exchange bonds, the connectivity condition (Definition
-11.6, `nagaokaConnectivity`) holds.
-
-**AXIOMATIZED (deferred to future implementation).**  Tasaki gives a proof
-(bringing the hole onto a length-3/4 loop through an exchange bond `{x, y}`,
-hopping it around the loop to exchange the spins at `x` and `y`, then returning
-the hole), but a faithful Lean proof must turn that "15-puzzle" hole-motion
-argument into strong connectivity of the per-sector quiver of `−M` (a multi-PR
-effort in the present matrix/configuration framework).  See the module docstring
-for the rationale.  (`1 ≤ N` excludes the degenerate single-site case, where the
-one-element exchange-bond graph is vacuously connected but the connectivity
-condition fails.) -/
-axiom nagaoka_lemma_11_9 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
-    (hN : 1 ≤ N) (htsym : ∀ i j, t i j = t j i) (hpos : ∀ i j, 0 ≤ t i j) :
-    ConnectedByExchangeBonds (nagaokaBondGraph N t) → nagaokaConnectivity N t
+/-! **Tasaki Lemma 11.9 (a sufficient condition for connectivity)** — formerly an `axiom` here —
+is now a **proved theorem** `nagaoka_lemma_11_9` in `NagaokaStateQuiver.lean`, which builds the
+full "15-puzzle" hole-motion argument (loop-trip spin swaps, exchange-bond generation, hole
+parking, and mismatch reduction) on top of the predicates defined in this file. -/
 
 end LatticeSystem.Fermion
