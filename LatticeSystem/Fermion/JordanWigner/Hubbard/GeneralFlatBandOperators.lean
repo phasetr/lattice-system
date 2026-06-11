@@ -245,4 +245,47 @@ theorem generalFlatBandCreation_mulVec_slaterState (μ : Fin (M + 1) → Fin (M 
   unfold generalFlatBandSlaterState
   rw [List.map_cons, List.prod_cons, Matrix.mulVec_mulVec]
 
+/-- **The site-annihilation peel** (the engine of Tasaki's eq. (11.3.48)): `ĉ_{x,σ}` removes one
+mode creation at a time from a general flat-band Slater state, each with amplitude `μ_{qs[i]}(x)`
+(on a spin match) and Koszul sign `(-1)^i`. -/
+theorem generalFlatBand_siteAnnihilation_peel (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (x : Fin (M + 1)) (σ : Fin 2) (qs : List (Fin (M + 1) × Fin 2)) :
+    (fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ)).mulVec
+        (generalFlatBandSlaterState μ qs)
+      = ∑ i : Fin qs.length, generalFlatBandPeelTerm μ x σ qs i := by
+  induction qs with
+  | nil =>
+    simp only [generalFlatBandSlaterState, List.map_nil, List.prod_nil, Matrix.one_mulVec,
+      List.length_nil, Finset.univ_eq_empty, Finset.sum_empty]
+    exact fermionMultiAnnihilation_mulVec_vacuum (2 * M + 1) _
+  | cons q l' ih =>
+    have hcons : generalFlatBandSlaterState μ (q :: l')
+        = (generalFlatBandCreation μ q.1 q.2).mulVec (generalFlatBandSlaterState μ l') := by
+      rw [generalFlatBandCreation_mulVec_slaterState]
+    have hCAR : fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ) *
+          generalFlatBandCreation μ q.1 q.2
+        = (if σ = q.2 then μ q.1 x else 0) • 1
+          - generalFlatBandCreation μ q.1 q.2 *
+            fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ) := by
+      rw [eq_sub_iff_add_eq]
+      exact site_annihilation_generalFlatBandCreation_anticomm M μ x q.1 σ q.2
+    rw [hcons, Matrix.mulVec_mulVec, hCAR, Matrix.sub_mulVec, Matrix.smul_mulVec,
+      Matrix.one_mulVec, ← Matrix.mulVec_mulVec, ih, Matrix.mulVec_sum]
+    change (if σ = q.2 then μ q.1 x else 0) • generalFlatBandSlaterState μ l'
+        - ∑ i : Fin l'.length,
+            (generalFlatBandCreation μ q.1 q.2).mulVec (generalFlatBandPeelTerm μ x σ l' i)
+      = ∑ i : Fin (l'.length + 1), generalFlatBandPeelTerm μ x σ (q :: l') i
+    rw [Fin.sum_univ_succ, sub_eq_iff_eq_add, add_assoc, ← Finset.sum_add_distrib,
+      Finset.sum_eq_zero (fun i _ => ?_), add_zero]
+    · simp only [generalFlatBandPeelTerm, List.get_cons_zero, List.eraseIdx_cons_zero,
+        Fin.val_zero, pow_zero, one_smul]
+      by_cases hσ : σ = q.2
+      · rw [if_pos hσ, if_pos hσ.symm]
+      · rw [if_neg hσ, if_neg (fun h => hσ h.symm), zero_smul]
+    · simp only [generalFlatBandPeelTerm, List.get_cons_succ', List.eraseIdx_cons_succ,
+        Fin.val_succ, pow_succ]
+      rw [Matrix.mulVec_smul, Matrix.mulVec_smul, generalFlatBandCreation_mulVec_slaterState,
+        ← add_smul]
+      rw [show (-1 : ℂ) ^ (i : ℕ) * -1 + (-1 : ℂ) ^ (i : ℕ) = 0 by ring, zero_smul]
+
 end LatticeSystem.Fermion
