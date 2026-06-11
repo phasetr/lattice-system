@@ -87,4 +87,58 @@ private theorem fromVector_mul_expand' (M : ℕ) (φ ψ : Fin (M + 1) → ℂ) (
   simp only [spinfulAnnihilationFromVector, spinfulCreationFromVector, Finset.sum_mul,
     Finset.mul_sum, Finset.smul_sum, smul_mul_assoc, mul_smul_comm, smul_smul]
 
+/-- **Bilinear CAR for single-particle-state operators** (Tasaki §11.3.4 input):
+`{Ĉ_σ(φ), Ĉ†_τ(ψ)} = δ_{στ}·(Σ_x φ(x)ψ(x))·1`.  Expand both products into double sums
+(`fromVector_mul_expand`, `fromVector_mul_expand'`), apply the sitewise CAR
+`spinful_annihilation_creation_anticomm_general` termwise, and collapse the Kronecker delta. -/
+theorem spinfulFromVector_annihilation_creation_anticomm (M : ℕ)
+    (φ ψ : Fin (M + 1) → ℂ) (σ τ : Fin 2) :
+    spinfulAnnihilationFromVector M φ σ * spinfulCreationFromVector M ψ τ
+      + spinfulCreationFromVector M ψ τ * spinfulAnnihilationFromVector M φ σ
+      = (if σ = τ then (∑ x : Fin (M + 1), φ x * ψ x) else 0)
+          • (1 : ManyBodyOp (Fin (2 * M + 2))) := by
+  rw [fromVector_mul_expand, fromVector_mul_expand', ← Finset.sum_add_distrib]
+  by_cases hστ : σ = τ
+  · subst hστ
+    rw [if_pos rfl]
+    have hy : ∀ x y : Fin (M + 1),
+        ((φ x * ψ y) • (fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ) *
+            fermionMultiCreation (2 * M + 1) (spinfulIndex M y σ))
+          + (φ x * ψ y) • (fermionMultiCreation (2 * M + 1) (spinfulIndex M y σ) *
+            fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ)))
+        = if x = y then (φ x * ψ y) • (1 : ManyBodyOp (Fin (2 * M + 2))) else 0 := by
+      intro x y
+      rw [← smul_add, spinful_annihilation_creation_anticomm_general]
+      by_cases hxy : x = y
+      · rw [if_pos ⟨hxy, rfl⟩, if_pos hxy]
+      · rw [if_neg (fun h => hxy h.1), if_neg hxy, smul_zero]
+    have hx : ∀ x : Fin (M + 1),
+        (∑ y : Fin (M + 1),
+          ((φ x * ψ y) • (fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ) *
+              fermionMultiCreation (2 * M + 1) (spinfulIndex M y σ))
+            + (φ x * ψ y) • (fermionMultiCreation (2 * M + 1) (spinfulIndex M y σ) *
+              fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ))))
+        = (φ x * ψ x) • (1 : ManyBodyOp (Fin (2 * M + 2))) := by
+      intro x
+      simp only [hy]
+      rw [Finset.sum_ite_eq, if_pos (Finset.mem_univ x)]
+    calc (∑ x : Fin (M + 1), ((∑ y : Fin (M + 1), (φ x * ψ y) •
+            (fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ) *
+              fermionMultiCreation (2 * M + 1) (spinfulIndex M y σ)))
+          + ∑ y : Fin (M + 1), (φ x * ψ y) •
+            (fermionMultiCreation (2 * M + 1) (spinfulIndex M y σ) *
+              fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ))))
+        = ∑ x : Fin (M + 1), (φ x * ψ x) • (1 : ManyBodyOp (Fin (2 * M + 2))) := by
+          refine Finset.sum_congr rfl fun x _ => ?_
+          rw [← Finset.sum_add_distrib]
+          exact hx x
+      _ = (∑ x : Fin (M + 1), φ x * ψ x) • (1 : ManyBodyOp (Fin (2 * M + 2))) := by
+          rw [Finset.sum_smul]
+  · rw [if_neg hστ, zero_smul]
+    refine Finset.sum_eq_zero fun x _ => ?_
+    rw [← Finset.sum_add_distrib]
+    refine Finset.sum_eq_zero fun y _ => ?_
+    rw [← smul_add, spinful_annihilation_creation_anticomm_general,
+      if_neg (fun h => hστ h.2), smul_zero]
+
 end LatticeSystem.Fermion
