@@ -7846,13 +7846,14 @@ its GNS space; recorded as a documented axiom (the construction is in \texttt{ma
 \texttt{GelfandNaimarkSegal}; \texttt{Math/CStarAlgebra/GNS.lean}).
 
 \medskip\noindent\textbf{Appendix A: status and axiomatization policy.}  Tasaki's Appendix A is
-fully formalized in book order (A.1--A.28).  The linear-algebra and angular-momentum core that
-\texttt{mathlib} supports is proved axiom-free: A.4--A.7, A.9--A.11, A.13--A.20 (including Weyl
-eigenvalue monotonicity A.7 via Courant--Fischer, the simultaneous-diagonalization step of A.17,
-Perron--Frobenius for a real symmetric matrix A.18, and the polar / singular-value decompositions
-A.19/A.20).  The remaining items---A.1, A.8, A.12, and the operator-algebraic A.21--A.28 (Wigner,
-states, Banach--Alaoglu, ground states, GNS)---are recorded as faithful documented axioms (A.8
-trace-exp pending the spectral mapping for \texttt{exp}).  These
+fully formalized in book order (A.1--A.28), and \textbf{every item the book itself proves is now
+proved axiom-free}: A.1--A.20 (including the Lie product / Trotter formula A.1 built from scratch,
+Weyl eigenvalue monotonicity A.7 via Courant--Fischer, the trace-exponential monotonicity A.8 via
+the spectral mapping, the strong-coupling effective Hamiltonian A.12, the
+simultaneous-diagonalization step of A.17, Perron--Frobenius for a real symmetric matrix A.18, and
+the polar / singular-value decompositions A.19/A.20).  The remaining items---the operator-algebraic
+A.21--A.28 (Wigner, states, Banach--Alaoglu, ground states, GNS)---are recorded as faithful
+documented axioms.  These
 axioms are \emph{not} active proof targets here: the heavy functional-analytic and operator-algebraic
 theory has its natural home in a dedicated operator-algebra development (possibly contributed to
 \texttt{mathlib}), and the axioms wait for that implementation.  The project's policy is to
