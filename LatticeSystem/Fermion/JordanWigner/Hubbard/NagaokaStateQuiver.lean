@@ -170,7 +170,7 @@ theorem exists_sectorPath_of_path (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) →
 pair of states in a magnetization sector `m` is joined by a *positive-length* path of `−M` quiver
 edges (hole hops), then the sector matrix `nagaokaPFMatrixOnSector N t m` is irreducible (Definition
 11.6 for that sector).  Non-negativity is `neg_tasakiEffReMatrix_nonneg`; strong connectivity lifts
-each full-quiver path into the sector via `exists_sectorPath_of_path`.  This reduces the connectivity
+each full-quiver path into the sector via `exists_sectorPath_of_path`.  This reduces connectivity
 condition to the purely combinatorial reachability of the one-hole states by hole motion. -/
 theorem nagaokaPFMatrixOnSector_isIrreducible_of_reach (N : ℕ)
     (t : Fin (N + 1) → Fin (N + 1) → ℝ) (m : ℤ) (hpos : ∀ i j, 0 ≤ t i j)
@@ -428,8 +428,8 @@ theorem StateReach.exists_ofBondWalk (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) 
     exact ⟨τ, e1.trans hτ⟩
 
 /-- **Step C (hole relocation): the hole can be moved to any bond-graph-reachable site.**  If site
-`x₀` is reachable from the hole position `x` in the bond graph, then `(x, σ)` reaches some state with
-the hole at `x₀`.  Specialising `StateReach.exists_ofBondWalk` to a `Reachable` hypothesis, this lets
+`x₀` is reachable from the hole position `x` in the bond graph, then `(x, σ)` reaches some state
+with the hole at `x₀`.  Specialising `StateReach.exists_ofBondWalk` to a `Reachable` hypothesis,
 one reduce sector connectivity to connectivity among states with a *fixed* hole position (where only
 the spin configuration varies). -/
 theorem StateReach.exists_hole_at (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
@@ -459,7 +459,7 @@ theorem StateReach.transposition_of_triangle (N : ℕ) (t : Fin (N + 1) → Fin 
 /-- **Step C (4-loop 3-cycle from graph adjacency).**  If `x, y, w, z` form a 4-loop of bonds in
 the bond graph (consecutive edges `x—y—w—z—x`, with the two diagonals `x ≠ w`, `y ≠ z`), then with
 the hole at `x` the state `(x, σ)` reaches the state with the spins at `y, w, z` cyclically permuted
-(`cyc3HoleSpin`).  This packages `StateReach.threeCyclePerm` with `nagaokaBondGraph_adj_pos`, turning
+(`cyc3HoleSpin`).  This packages `StateReach.threeCyclePerm` with `nagaokaBondGraph_adj_pos` to turn
 a graph-level 4-cycle (as produced by a length-4 cycle / exchange bond) into a reachable spin
 3-cycle. -/
 theorem StateReach.threeCyclePerm_of_quad (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
@@ -852,7 +852,7 @@ theorem exists_pos_selfPath (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
     (holeHopHom N t p q σ hpq ht).toPath, ?_⟩
   simp [Quiver.Path.length_toPath]
 
-/-- **The spin swap of two sites is reachable from any hole position.**  The abstract relation behind
+/-- **The spin swap of two sites is reachable from any hole position.**  The abstract relation that
 Lemma 11.9's generation step: from *every* hole position `p ∉ {y, z}` the state `(p, σ)` reaches the
 state with the spins at `y, z` exchanged.  Exchange bonds give the base instances
 (`swap_of_exchange_len3`), and `ReachSwap.comp_via` propagates it along paths. -/
@@ -868,7 +868,7 @@ theorem ReachSwap.symm {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ} {y z 
   exact h p hpy hpz σ
 
 /-- **Composition through an intermediate site** (the conjugation `(y z) = (y w)(w z)(y w)`): if the
-swaps `{y, w}` and `{w, z}` are reachable, then so is `{y, z}`, *for hole positions also avoiding the
+swaps `{y, w}` and `{w, z}` are reachable, then so is `{y, z}`, *for holes also avoiding the
 intermediate* `w`.  This is the inductive step of the distance generation argument. -/
 theorem ReachSwap.comp_via {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ} {y w z : Fin (N + 1)}
     (hyw : ReachSwap N t y w) (hwz : ReachSwap N t w z)
