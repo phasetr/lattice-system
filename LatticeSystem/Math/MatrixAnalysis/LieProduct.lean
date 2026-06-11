@@ -139,6 +139,45 @@ theorem norm_exp_le_exp_norm [CompleteSpace 𝔸] [NormOneClass 𝔸] (X : 𝔸)
         exact norm_pow_le X n
     _ = Real.exp ‖X‖ := tsum_norm_series_eq_exp ‖X‖
 
+omit [NormedAlgebra ℝ 𝔸] in
+/-- **Telescoping power estimate.**  In a normed ring with `‖1‖ = 1`, if `‖C‖, ‖D‖ ≤ M` then
+`‖Cⁿ − Dⁿ‖ ≤ n · M^(n−1) · ‖C − D‖`: telescope
+`Cⁿ − Dⁿ = C·(Cⁿ⁻¹ − Dⁿ⁻¹) + (C − D)·Dⁿ⁻¹` and induct.  This converts the per-factor
+closeness of the Trotter factors into closeness of their `n`-th powers. -/
+theorem norm_pow_sub_pow_le [NormOneClass 𝔸] (C D : 𝔸) {M : ℝ} (hC : ‖C‖ ≤ M) (hD : ‖D‖ ≤ M) :
+    ∀ n : ℕ, ‖C ^ n - D ^ n‖ ≤ (n : ℝ) * M ^ (n - 1) * ‖C - D‖
+  | 0 => by simp
+  | (n + 1) => by
+    have hM0 : 0 ≤ M := le_trans (norm_nonneg C) hC
+    have key : C ^ (n + 1) - D ^ (n + 1) = C * (C ^ n - D ^ n) + (C - D) * D ^ n := by
+      rw [mul_sub, sub_mul, ← _root_.pow_succ', ← _root_.pow_succ']
+      abel
+    calc ‖C ^ (n + 1) - D ^ (n + 1)‖
+        = ‖C * (C ^ n - D ^ n) + (C - D) * D ^ n‖ := by rw [key]
+      _ ≤ ‖C * (C ^ n - D ^ n)‖ + ‖(C - D) * D ^ n‖ := norm_add_le _ _
+      _ ≤ ‖C‖ * ‖C ^ n - D ^ n‖ + ‖C - D‖ * ‖D ^ n‖ :=
+          add_le_add (norm_mul_le _ _) (norm_mul_le _ _)
+      _ ≤ M * ((n : ℝ) * M ^ (n - 1) * ‖C - D‖) + ‖C - D‖ * M ^ n := by
+          refine add_le_add
+            (mul_le_mul hC (norm_pow_sub_pow_le C D hC hD n) (norm_nonneg _) hM0) ?_
+          refine mul_le_mul_of_nonneg_left ?_ (norm_nonneg _)
+          exact (norm_pow_le D n).trans (pow_le_pow_left₀ (norm_nonneg D) hD n)
+      _ ≤ ((n + 1 : ℕ) : ℝ) * M ^ ((n + 1) - 1) * ‖C - D‖ := by
+          rcases Nat.eq_zero_or_pos n with rfl | hn
+          · simp
+          · have hMM : M * M ^ (n - 1) = M ^ n := by
+              have hn1 : n - 1 + 1 = n := by omega
+              calc M * M ^ (n - 1) = M ^ (n - 1 + 1) := (_root_.pow_succ' M (n - 1)).symm
+                _ = M ^ n := by rw [hn1]
+            have heq : M * ((n : ℝ) * M ^ (n - 1) * ‖C - D‖) + ‖C - D‖ * M ^ n
+                = ((n : ℝ) + 1) * M ^ n * ‖C - D‖ := by
+              calc M * ((n : ℝ) * M ^ (n - 1) * ‖C - D‖) + ‖C - D‖ * M ^ n
+                  = (n : ℝ) * (M * M ^ (n - 1)) * ‖C - D‖ + M ^ n * ‖C - D‖ := by ring
+                _ = ((n : ℝ) + 1) * M ^ n * ‖C - D‖ := by rw [hMM]; ring
+            rw [heq]
+            push_cast
+            simp
+
 end ExpTailBounds
 
 /-- **Tasaki Theorem A.1 (Lie product formula), AXIOM.**  For finite complex matrices `A`, `B`,
