@@ -1471,5 +1471,66 @@ theorem StateReach.holeSpinMag_eq {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) →
   | nil => rfl
   | cons _ e ih => exact ih.trans (neg_tasakiEffReMatrix_pos_holeSpinMag_eq N t _ _ e.down)
 
+/-- **Lemma 11.9, generation at the parked hole: every pair is swappable.**  If `q` is a vertex
+that no pair needs (every two other sites are joined by an exchange-bond walk avoiding `q` — as
+supplied by the parking lemma `exists_vertex_walks_avoid`), then with the hole at `q` *every* pair
+of distinct occupied sites can be spin-swapped: propagate the exchange-bond swaps along the avoiding
+walk (`ReachSwapOff.of_walk`); the hole `q` is off the walk's support, so the composed swap applies
+at `q`. -/
+theorem hswap_of_walks_avoid (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    {q : Fin (N + 1)}
+    (havoid : ∀ x y : Fin (N + 1), x ≠ q → y ≠ q →
+      ∃ W : (exchangeBondGraph (nagaokaBondGraph N t)).Walk x y, q ∉ W.support)
+    (x y : Fin (N + 1)) (hqx : q ≠ x) (hqy : q ≠ y) (hxy : x ≠ y) (τ : HoleSpin N q) :
+    StateReach N t ⟨q, τ⟩ ⟨q, swapHoleSpin N q x y hqx hqy τ⟩ := by
+  obtain ⟨W, hW⟩ := havoid x y (Ne.symm hqx) (Ne.symm hqy)
+  exact ReachSwapOff.of_walk
+    (fun h => reachSwap_of_exchangeBondAdj N t htsym htdiag hpos h) W hxy q hqx hqy
+    (fun hmem => hW (List.mem_toFinset.mp hmem)) τ
+
+/-- **Lemma 11.9, full sector reachability: any two same-magnetization one-hole states are
+joined.**  The complete 15-puzzle assembly, for symmetric `t ≥ 0` with zero diagonal and an
+exchange-bond-connected bond graph: park both holes at a farthest vertex `q` of the exchange-bond
+graph (mobility through the connected bond graph), where every spin pair is exchangeable (the
+parking lemma + the exchange-bond generation), then convert one configuration into the other by
+the mismatch-reduction induction. -/
+theorem StateReach.of_holeSpinMag_eq_of_connectedByExchangeBonds (N : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (htsym : ∀ i j, t i j = t j i) (htdiag : ∀ i, t i i = 0) (hpos : ∀ i j, 0 ≤ t i j)
+    (hconn : ConnectedByExchangeBonds (nagaokaBondGraph N t))
+    (a b : (z : Fin (N + 1)) × HoleSpin N z) (hmag : holeSpinMag N a = holeSpinMag N b) :
+    StateReach N t a b := by
+  -- the bond graph is connected, so holes are mobile
+  have hbond := nagaokaBondGraph_connected_of_connectedByExchangeBonds N t hconn
+  -- park position: a farthest vertex of the exchange-bond graph
+  obtain ⟨q, havoid⟩ := exists_vertex_walks_avoid (exchangeBondGraph (nagaokaBondGraph N t)) hconn
+  -- relocate both holes to `q`
+  obtain ⟨τ, hτ⟩ := StateReach.exists_hole_at N t htsym htdiag hpos a.2 q
+    (hbond.preconnected a.1 q)
+  obtain ⟨τ', hτ'⟩ := StateReach.exists_hole_at N t htsym htdiag hpos b.2 q
+    (hbond.preconnected b.1 q)
+  -- the parked configurations share the magnetization
+  have hmagτ : holeSpinMag N ⟨q, τ⟩ = holeSpinMag N ⟨q, τ'⟩ := by
+    have h1 : holeSpinMag N (⟨a.1, a.2⟩ : (z : Fin (N + 1)) × HoleSpin N z)
+        = holeSpinMag N ⟨q, τ⟩ := hτ.holeSpinMag_eq
+    have h2 : holeSpinMag N (⟨b.1, b.2⟩ : (z : Fin (N + 1)) × HoleSpin N z)
+        = holeSpinMag N ⟨q, τ'⟩ := hτ'.holeSpinMag_eq
+    calc holeSpinMag N ⟨q, τ⟩ = holeSpinMag N a := by rw [← h1]
+      _ = holeSpinMag N b := hmag
+      _ = holeSpinMag N ⟨q, τ'⟩ := by rw [← h2]
+  -- connect the parked configurations by pairwise swaps and compose
+  have hmid : StateReach N t ⟨q, τ⟩ ⟨q, τ'⟩ :=
+    StateReach.of_swaps_of_holeSpinMag_eq N t
+      (fun x y hqx hqy hxy σ =>
+        hswap_of_walks_avoid N t htsym htdiag hpos havoid x y hqx hqy hxy σ) τ τ' hmagτ
+  have ha : StateReach N t a ⟨q, τ⟩ := by
+    have : a = ⟨a.1, a.2⟩ := rfl
+    rw [this]; exact hτ
+  have hb : StateReach N t ⟨q, τ'⟩ b := by
+    have : b = ⟨b.1, b.2⟩ := rfl
+    rw [this]; exact (hτ'.symm N t htsym htdiag)
+  exact (ha.trans hmid).trans hb
+
 end LatticeSystem.Fermion
 
