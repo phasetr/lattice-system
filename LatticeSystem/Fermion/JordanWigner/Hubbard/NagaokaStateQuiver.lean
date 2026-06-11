@@ -1422,5 +1422,54 @@ theorem StateReach.of_swaps_of_holeSpinMag_eq (N : ℕ) (t : Fin (N + 1) → Fin
       rw [hσ₂, holeSpinMag_swapHoleSpin]; exact hmagσ
     exact hstep.trans (ih (k - 2) (by omega) σ₂ hmag₂ hknew)
 
+/-- **The parking lemma: a farthest vertex obstructs no connection.**  In a connected graph on a
+nonempty finite vertex type there is a vertex `q` such that any two *other* vertices are joined by
+a walk avoiding `q`.  Take `q` at maximum distance from a fixed root `r`: a geodesic from `r` to
+any `v ≠ q` cannot pass through `q` (the leg beyond `q` would make `v` strictly farther than the
+maximum), so routing `x ⤳ r ⤳ y` along two geodesics avoids `q`.  This replaces any cut-vertex
+analysis: parking the hole at `q` leaves every other pair exchange-connected. -/
+theorem exists_vertex_walks_avoid {V : Type*} [Finite V] (G : SimpleGraph V)
+    (hconn : G.Connected) :
+    ∃ q : V, ∀ x y : V, x ≠ q → y ≠ q → ∃ W : G.Walk x y, q ∉ W.support := by
+  classical
+  have : Fintype V := Fintype.ofFinite V
+  obtain ⟨r⟩ : Nonempty V := hconn.nonempty
+  obtain ⟨q, -, hq⟩ := Finset.exists_max_image (Finset.univ : Finset V) (fun v => G.dist r v)
+    ⟨r, Finset.mem_univ r⟩
+  refine ⟨q, fun x y hx hy => ?_⟩
+  -- a geodesic from the root to any vertex `v ≠ q` avoids `q`
+  have key : ∀ v : V, v ≠ q → ∃ W : G.Walk r v, q ∉ W.support := by
+    intro v hv
+    obtain ⟨W, hWlen⟩ := hconn.exists_walk_length_eq_dist r v
+    refine ⟨W, fun hqW => ?_⟩
+    have hlen : (W.takeUntil q hqW).length + (W.dropUntil q hqW).length = W.length := by
+      conv_rhs => rw [← SimpleGraph.Walk.take_spec W hqW]
+      rw [SimpleGraph.Walk.length_append]
+    have h1 : G.dist r q ≤ (W.takeUntil q hqW).length := SimpleGraph.dist_le _
+    have h2 : G.dist q v ≤ (W.dropUntil q hqW).length := SimpleGraph.dist_le _
+    have h3 : 0 < G.dist q v := (hconn.preconnected q v).pos_dist_of_ne (Ne.symm hv)
+    have h4 : G.dist r v ≤ G.dist r q := hq v (Finset.mem_univ v)
+    omega
+  obtain ⟨W₁, h₁⟩ := key x hx
+  obtain ⟨W₂, h₂⟩ := key y hy
+  refine ⟨W₁.reverse.append W₂, fun hmem => ?_⟩
+  rw [SimpleGraph.Walk.mem_support_append_iff] at hmem
+  rcases hmem with h | h
+  · rw [SimpleGraph.Walk.support_reverse] at h
+    exact h₁ (List.mem_reverse.mp h)
+  · exact h₂ h
+
+/-- **Reachability preserves magnetization.**  Every edge of the `−M` quiver stays in one
+magnetization sector (`neg_tasakiEffReMatrix_pos_holeSpinMag_eq`), so any path — and hence
+`StateReach` — does too. -/
+theorem StateReach.holeSpinMag_eq {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ}
+    {a b : (z : Fin (N + 1)) × HoleSpin N z} (h : StateReach N t a b) :
+    holeSpinMag N a = holeSpinMag N b := by
+  letI := Matrix.toQuiver (-tasakiEffReMatrix N t)
+  obtain ⟨p⟩ := h
+  induction p with
+  | nil => rfl
+  | cons _ e ih => exact ih.trans (neg_tasakiEffReMatrix_pos_holeSpinMag_eq N t _ _ e.down)
+
 end LatticeSystem.Fermion
 
