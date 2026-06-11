@@ -749,7 +749,7 @@ trip when the *other* hole-neighbour `z` carries the same spin as `y`.  This is 
 once/twice dichotomy applied to a pair that is NOT the hole's two neighbours — exactly Tasaki's
 "`y` and `z` exchanged when the hole hops once in the opposite orientation". -/
 theorem cyc3HoleSpin_eq_swap_pair_of_val_eq (N : ℕ) (a y w z : Fin (N + 1)) (hay : a ≠ y)
-    (haw : a ≠ w) (haz : a ≠ z) (hwy : w ≠ y) (hwz : w ≠ z) (hzy : z ≠ y) (σ : HoleSpin N a)
+    (haw : a ≠ w) (haz : a ≠ z) (hwy : w ≠ y) (_hwz : w ≠ z) (hzy : z ≠ y) (σ : HoleSpin N a)
     (hval : σ.val y = σ.val z) :
     cyc3HoleSpin N a y w z hay haw haz σ = swapHoleSpin N a y w hay haw σ := by
   apply Subtype.ext; funext s
@@ -892,6 +892,31 @@ theorem walk_length_three_support_mem {V : Type*} (G : SimpleGraph V) {z' : V}
   match c, hlen with
   | .cons h1 (.cons h2 (.cons h3 .nil)), _ =>
     refine ⟨_, _, h1, h2, h3, fun x hx => ?_⟩
+    simp only [SimpleGraph.Walk.support_cons, SimpleGraph.Walk.support_nil, List.mem_cons,
+      List.not_mem_nil, or_false] at hx
+    tauto
+
+/-- **A length-4 cycle: its four bonds, the pairwise-distinctness of its four corners, and that its
+support is exactly those four vertices.**  From `IsCycle` (whose `support.tail` is `Nodup`) the four
+corners `z', a, b, d` of the loop `z' — a — b — d — z'` are pairwise distinct, giving both the
+adjacency data and the *diagonal* inequalities `z' ≠ b`, `a ≠ d` that the four edges alone do not
+supply.  This is the length-4 analogue of `walk_length_three_support_mem`, feeding the exchange-bond
+length-4 bridge (which must place the endpoints `y, z` among the four corners and tell whether they
+are opposite or adjacent on the loop). -/
+theorem cycle_length_four_data {V : Type*} (G : SimpleGraph V) {z' : V}
+    (c : G.Walk z' z') (hcyc : c.IsCycle) (hlen : c.length = 4) :
+    ∃ a b d : V, G.Adj z' a ∧ G.Adj a b ∧ G.Adj b d ∧ G.Adj d z' ∧
+      z' ≠ a ∧ z' ≠ b ∧ z' ≠ d ∧ a ≠ b ∧ a ≠ d ∧ b ≠ d ∧
+      (∀ x ∈ c.support, x = z' ∨ x = a ∨ x = b ∨ x = d) := by
+  match c, hlen, hcyc with
+  | .cons h1 (.cons h2 (.cons h3 (.cons h4 .nil))), _, hcyc' =>
+    have hnd := hcyc'.support_nodup
+    simp only [SimpleGraph.Walk.support_cons, SimpleGraph.Walk.support_nil, List.tail_cons,
+      List.nodup_cons, List.mem_cons, List.not_mem_nil, or_false, not_or, and_true,
+      not_false_iff, List.nodup_nil] at hnd
+    obtain ⟨⟨hab, had, haz⟩, ⟨hbd, hbz⟩, hdz⟩ := hnd
+    refine ⟨_, _, _, h1, h2, h3, h4, (Ne.symm haz), (Ne.symm hbz), (Ne.symm hdz), hab, had, hbd,
+      fun x hx => ?_⟩
     simp only [SimpleGraph.Walk.support_cons, SimpleGraph.Walk.support_nil, List.mem_cons,
       List.not_mem_nil, or_false] at hx
     tauto
