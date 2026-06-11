@@ -288,4 +288,22 @@ theorem generalFlatBand_siteAnnihilation_peel (μ : Fin (M + 1) → Fin (M + 1) 
         ← add_smul]
       rw [show (-1 : ℂ) ^ (i : ℕ) * -1 + (-1 : ℂ) ^ (i : ℕ) = 0 by ring, zero_smul]
 
+/-- **The double-annihilation expansion** (Tasaki's eq. (11.3.48), raw form): applying
+`ĉ_{x,↓}ĉ_{x,↑}` to a Slater state expands into the double peel — the outer annihilator peels
+each term of the inner peel.  Composing `generalFlatBand_siteAnnihilation_peel` twice and
+pushing the second annihilator through the finite sum and the scalars. -/
+theorem generalFlatBand_double_siteAnnihilation_peel (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (x : Fin (M + 1)) (σ σ' : Fin 2) (qs : List (Fin (M + 1) × Fin 2)) :
+    (fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ')).mulVec
+      ((fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ)).mulVec
+        (generalFlatBandSlaterState μ qs))
+      = ∑ i : Fin qs.length, ((-1 : ℂ) ^ (i : ℕ)) •
+          ((if (qs.get i).2 = σ then μ (qs.get i).1 x else 0) •
+            ∑ j : Fin (qs.eraseIdx i).length,
+              generalFlatBandPeelTerm μ x σ' (qs.eraseIdx i) j) := by
+  rw [generalFlatBand_siteAnnihilation_peel, Matrix.mulVec_sum]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [generalFlatBandPeelTerm, Matrix.mulVec_smul, Matrix.mulVec_smul,
+    generalFlatBand_siteAnnihilation_peel]
+
 end LatticeSystem.Fermion
