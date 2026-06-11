@@ -288,6 +288,94 @@ theorem norm_exp_smul_mul_sub_exp_smul_add_le [CompleteSpace 𝔸] [NormOneClass
               linarith [hT1, hT2, hT3]
     _ = 4 * s ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) := by ring
 
+
+/-- **The Lie product (Trotter) formula in a complete normed `ℝ`-algebra.**
+`e^{A+B} = lim_{n→∞} (e^{A/n} e^{B/n})^n`.  The joint exponential is *exactly* the `n`-th power
+of its `1/n`-step (`exp_nsmul`), the per-step distance to the split product is `O(1/n²)`
+(`norm_exp_smul_mul_sub_exp_smul_add_le`), the telescoping estimate (`norm_pow_sub_pow_le`)
+multiplies that by `n·M^{n−1}` with `M = e^{(‖A‖+‖B‖)/n}` (so `M^{n−1} ≤ e^{‖A‖+‖B‖}`), and the
+resulting `O(1/n)` bound squeezes to `0`. -/
+theorem trotterProductFormula [NormedAlgebra ℚ 𝔸] [CompleteSpace 𝔸] [NormOneClass 𝔸]
+    (A B : 𝔸) :
+    Tendsto
+      (fun n : ℕ => (NormedSpace.exp ((n : ℝ)⁻¹ • A) * NormedSpace.exp ((n : ℝ)⁻¹ • B)) ^ n)
+      atTop (𝓝 (NormedSpace.exp (A + B))) := by
+  rw [← tendsto_sub_nhds_zero_iff]
+  refine squeeze_zero_norm'
+    (a := fun n : ℕ => (4 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) * Real.exp (‖A‖ + ‖B‖)) / n)
+    ?_ (tendsto_const_div_atTop_nhds_zero_nat _)
+  filter_upwards [Filter.eventually_ge_atTop 1] with n hn
+  have hn0 : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
+  have hn1 : (1 : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn
+  have hs0 : (0 : ℝ) ≤ (n : ℝ)⁻¹ := by positivity
+  have hs1 : (n : ℝ)⁻¹ ≤ 1 := inv_le_one_of_one_le₀ hn1
+  have ha : (0 : ℝ) ≤ ‖A‖ := norm_nonneg A
+  have hb : (0 : ℝ) ≤ ‖B‖ := norm_nonneg B
+  -- the joint exponential is exactly the n-th power of its 1/n-step
+  have hCn : NormedSpace.exp (A + B)
+      = (NormedSpace.exp ((n : ℝ)⁻¹ • (A + B))) ^ n := by
+    rw [← NormedSpace.exp_nsmul]
+    congr 1
+    rw [← Nat.cast_smul_eq_nsmul ℝ, smul_smul, mul_inv_cancel₀ hn0, one_smul]
+  -- uniform per-factor norm bound `M = e^{(‖A‖+‖B‖)/n}`
+  have hC : ‖NormedSpace.exp ((n : ℝ)⁻¹ • (A + B))‖
+      ≤ Real.exp ((n : ℝ)⁻¹ * (‖A‖ + ‖B‖)) :=
+    (norm_exp_le_exp_norm _).trans (Real.exp_le_exp.mpr (by
+      rw [norm_smul, Real.norm_eq_abs, abs_of_nonneg hs0]
+      exact mul_le_mul_of_nonneg_left (norm_add_le A B) hs0))
+  have hD : ‖NormedSpace.exp ((n : ℝ)⁻¹ • A) * NormedSpace.exp ((n : ℝ)⁻¹ • B)‖
+      ≤ Real.exp ((n : ℝ)⁻¹ * (‖A‖ + ‖B‖)) := by
+    calc ‖NormedSpace.exp ((n : ℝ)⁻¹ • A) * NormedSpace.exp ((n : ℝ)⁻¹ • B)‖
+        ≤ ‖NormedSpace.exp ((n : ℝ)⁻¹ • A)‖ * ‖NormedSpace.exp ((n : ℝ)⁻¹ • B)‖ :=
+          norm_mul_le _ _
+      _ ≤ Real.exp ‖(n : ℝ)⁻¹ • A‖ * Real.exp ‖(n : ℝ)⁻¹ • B‖ :=
+          mul_le_mul (norm_exp_le_exp_norm _) (norm_exp_le_exp_norm _) (norm_nonneg _)
+            (Real.exp_pos _).le
+      _ = Real.exp (‖(n : ℝ)⁻¹ • A‖ + ‖(n : ℝ)⁻¹ • B‖) := (Real.exp_add _ _).symm
+      _ ≤ Real.exp ((n : ℝ)⁻¹ * (‖A‖ + ‖B‖)) := by
+          refine Real.exp_le_exp.mpr (le_of_eq ?_)
+          rw [norm_smul, norm_smul, Real.norm_eq_abs, abs_of_nonneg hs0]
+          ring
+  -- M^{n−1} ≤ e^{‖A‖+‖B‖}
+  have hMn : Real.exp ((n : ℝ)⁻¹ * (‖A‖ + ‖B‖)) ^ (n - 1) ≤ Real.exp (‖A‖ + ‖B‖) := by
+    rw [← Real.exp_nat_mul]
+    refine Real.exp_le_exp.mpr ?_
+    have hcast : ((n - 1 : ℕ) : ℝ) = (n : ℝ) - 1 := by
+      have h1n : (1 : ℕ) ≤ n := hn
+      push_cast [h1n]
+      ring
+    rw [hcast]
+    have hsub : ((n : ℝ) - 1) * (n : ℝ)⁻¹ = 1 - (n : ℝ)⁻¹ := by
+      field_simp
+    calc ((n : ℝ) - 1) * ((n : ℝ)⁻¹ * (‖A‖ + ‖B‖))
+        = (1 - (n : ℝ)⁻¹) * (‖A‖ + ‖B‖) := by rw [← hsub]; ring
+      _ ≤ 1 * (‖A‖ + ‖B‖) := by
+          refine mul_le_mul_of_nonneg_right (by nlinarith) (by positivity)
+      _ = ‖A‖ + ‖B‖ := one_mul _
+  -- assemble
+  have htel := norm_pow_sub_pow_le
+    (NormedSpace.exp ((n : ℝ)⁻¹ • A) * NormedSpace.exp ((n : ℝ)⁻¹ • B))
+    (NormedSpace.exp ((n : ℝ)⁻¹ • (A + B))) hD hC n
+  have hprod := norm_exp_smul_mul_sub_exp_smul_add_le A B hs0 hs1
+  have hns : (n : ℝ) * ((n : ℝ)⁻¹) ^ 2 = 1 / n := by
+    field_simp
+  calc ‖(NormedSpace.exp ((n : ℝ)⁻¹ • A) * NormedSpace.exp ((n : ℝ)⁻¹ • B)) ^ n
+        - NormedSpace.exp (A + B)‖
+      = ‖(NormedSpace.exp ((n : ℝ)⁻¹ • A) * NormedSpace.exp ((n : ℝ)⁻¹ • B)) ^ n
+        - (NormedSpace.exp ((n : ℝ)⁻¹ • (A + B))) ^ n‖ := by rw [← hCn]
+    _ ≤ (n : ℝ) * Real.exp ((n : ℝ)⁻¹ * (‖A‖ + ‖B‖)) ^ (n - 1)
+        * ‖NormedSpace.exp ((n : ℝ)⁻¹ • A) * NormedSpace.exp ((n : ℝ)⁻¹ • B)
+            - NormedSpace.exp ((n : ℝ)⁻¹ • (A + B))‖ := htel
+    _ ≤ (n : ℝ) * Real.exp (‖A‖ + ‖B‖)
+        * (4 * ((n : ℝ)⁻¹) ^ 2 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖)) := by
+        refine mul_le_mul (mul_le_mul_of_nonneg_left hMn (Nat.cast_nonneg n)) hprod
+          (norm_nonneg _) (by positivity)
+    _ = (4 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) * Real.exp (‖A‖ + ‖B‖))
+        * ((n : ℝ) * ((n : ℝ)⁻¹) ^ 2) := by ring
+    _ = (4 * (‖A‖ + ‖B‖) ^ 2 * Real.exp (‖A‖ + ‖B‖) * Real.exp (‖A‖ + ‖B‖)) / n := by
+        rw [hns]
+        ring
+
 end ExpTailBounds
 
 /-- **Tasaki Theorem A.1 (Lie product formula), AXIOM.**  For finite complex matrices `A`, `B`,
