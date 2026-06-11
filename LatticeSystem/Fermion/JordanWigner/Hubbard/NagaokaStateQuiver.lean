@@ -893,5 +893,70 @@ theorem reachSwap_of_exchange_len3 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) �
   fun _p hpy hpz σ =>
     StateReach.swap_of_exchange_len3 N t htsym htdiag hpos hyz c hlen hyc hzc hE2 hpy hpz σ
 
+/-- **Swap reachable from every hole avoiding a finite set `S`.**  Generalises `ReachSwap`
+(the case `S = ∅`) by tracking the set of *auxiliary* sites a composed swap must steer the hole
+clear of.  When two exchange-bond swaps `{y, w}` and `{w, z}` are chained by the conjugation
+`(y z) = (y w)(w z)(y w)` (`ReachSwapOff.comp_via`), the intermediate `w` joins the avoid-set, so a
+swap propagated along an exchange-bond path is valid precisely for holes off the path's interior.
+This is the bookkeeping device of the distance-induction generation argument (Tasaki fn. 13). -/
+def ReachSwapOff (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ) (S : Finset (Fin (N + 1)))
+    (y z : Fin (N + 1)) : Prop :=
+  ∀ (p : Fin (N + 1)) (hpy : p ≠ y) (hpz : p ≠ z), p ∉ S → ∀ σ : HoleSpin N p,
+    StateReach N t ⟨p, σ⟩ ⟨p, swapHoleSpin N p y z hpy hpz σ⟩
+
+/-- A full `ReachSwap` (valid for every hole `∉ {y, z}`) is in particular a `ReachSwapOff` for any
+avoid-set `S`: ignoring the extra constraint `p ∉ S` only discards admissible holes. -/
+theorem ReachSwap.toOff {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ} {S : Finset (Fin (N + 1))}
+    {y z : Fin (N + 1)} (h : ReachSwap N t y z) : ReachSwapOff N t S y z :=
+  fun p hpy hpz _ σ => h p hpy hpz σ
+
+/-- `ReachSwapOff` is monotone in the avoid-set: enlarging `S` only removes admissible holes, so a
+swap valid off `S` is a fortiori valid off any `S' ⊇ S`. -/
+theorem ReachSwapOff.mono {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ}
+    {S S' : Finset (Fin (N + 1))} {y z : Fin (N + 1)} (hSS : S ⊆ S')
+    (h : ReachSwapOff N t S y z) : ReachSwapOff N t S' y z :=
+  fun p hpy hpz hpS' σ => h p hpy hpz (fun hpS => hpS' (hSS hpS)) σ
+
+/-- **Composition through an intermediate site, with avoid-set bookkeeping.**  The conjugation
+`(y z) = (y w)(w z)(y w)`: if `{y, w}` is reachable off `S₁` and `{w, z}` is reachable off `S₂`,
+then `{y, z}` is reachable off `insert w (S₁ ∪ S₂)` — the new avoid-set adds the intermediate `w`
+(the hole must differ from it to perform the inner swaps) and the union of the two component
+avoid-sets.  This is the avoid-set-tracking form of `ReachSwap.comp_via`. -/
+theorem ReachSwapOff.comp_via {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ}
+    {S₁ S₂ : Finset (Fin (N + 1))} {y w z : Fin (N + 1)}
+    (hyw : ReachSwapOff N t S₁ y w) (hwz : ReachSwapOff N t S₂ w z)
+    (hyw_ne : y ≠ w) (hwz_ne : w ≠ z) (hyz_ne : y ≠ z) :
+    ReachSwapOff N t (insert w (S₁ ∪ S₂)) y z := by
+  intro p hpy hpz hpS σ
+  rw [Finset.mem_insert, not_or, Finset.mem_union, not_or] at hpS
+  obtain ⟨hpw, hpS₁, hpS₂⟩ := hpS
+  rw [swapHoleSpin_conj N p y w z hpy hpw hpz hyw_ne hwz_ne hyz_ne]
+  exact (hyw p hpy hpw hpS₁ σ).trans
+    ((hwz p hpw hpz hpS₂ _).trans (hyw p hpy hpw hpS₁ _))
+
+/-- **Distance-induction generation: a swap propagates along a path of unit swaps.**  If every edge
+`a — b` of a graph `H` already yields a full `ReachSwap N t a b`, then for any `H`-walk `x → y`
+between distinct endpoints the swap `{x, y}` is reachable off the walk's support: the hole need only
+avoid the (finitely many) vertices visited along the way.  Proved by induction on the walk, chaining
+the unit swaps with `ReachSwapOff.comp_via`.  With `H = exchangeBondGraph (nagaokaBondGraph N t)`
+this is Tasaki's "connected by exchange bonds ⟹ every transposition is generated" (footnote 13). -/
+theorem ReachSwapOff.of_walk {N : ℕ} {t : Fin (N + 1) → Fin (N + 1) → ℝ}
+    {H : SimpleGraph (Fin (N + 1))} (hedge : ∀ {a b}, H.Adj a b → ReachSwap N t a b)
+    {x y : Fin (N + 1)} (W : H.Walk x y) (hxy : x ≠ y) :
+    ReachSwapOff N t W.support.toFinset x y := by
+  induction W with
+  | nil => exact absurd rfl hxy
+  | @cons x v y h W' ih =>
+    by_cases hvy : v = y
+    · subst hvy
+      exact (hedge h).toOff
+    · have key := ReachSwapOff.comp_via (S₁ := W'.support.toFinset) (S₂ := W'.support.toFinset)
+        (hedge h).toOff (ih hvy) h.ne hvy hxy
+      refine ReachSwapOff.mono ?_ key
+      rw [Finset.union_self, SimpleGraph.Walk.support_cons, List.toFinset_cons,
+        Finset.insert_subset_iff]
+      exact ⟨Finset.mem_insert_of_mem (List.mem_toFinset.mpr W'.start_mem_support),
+        Finset.subset_insert _ _⟩
+
 end LatticeSystem.Fermion
 
