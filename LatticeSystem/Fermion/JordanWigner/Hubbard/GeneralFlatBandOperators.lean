@@ -225,4 +225,15 @@ theorem generalFlatBandSlaterState_mem_fockSubmodule
     generalFlatBandSlaterState μ qs ∈ generalFlatBandFockSubmodule μ :=
   Submodule.subset_span ⟨qs, rfl⟩
 
+/-- **The single peeled contribution** of position `i` when the site annihilator `ĉ_{x,σ}`
+passes through a general flat-band Slater list: amplitude `μ_{qs[i].1}(x)` on a spin match and
+Koszul sign `(-1)^i`, leaving the Slater state with the `i`-th mode removed (the general-basis
+analogue of `flatBandModePeelTerm`, toward the eq. (11.3.48) expansion). -/
+noncomputable def generalFlatBandPeelTerm (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (x : Fin (M + 1)) (σ : Fin 2) (qs : List (Fin (M + 1) × Fin 2)) (i : Fin qs.length) :
+    (Fin (2 * M + 2) → Fin 2) → ℂ :=
+  ((-1 : ℂ) ^ (i : ℕ)) •
+    ((if (qs.get i).2 = σ then μ (qs.get i).1 x else 0) •
+      generalFlatBandSlaterState μ (qs.eraseIdx i))
+
 end LatticeSystem.Fermion
