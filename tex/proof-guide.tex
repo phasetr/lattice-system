@@ -7649,12 +7649,19 @@ Bx\rangle\le\lambda_i(\hat B)\lVert x\rVert^2$ (Loewner monotonicity of the ener
 constructive min--max machinery beyond mathlib's extreme-eigenvalue variational principle is built
 in \texttt{CourantFischer.lean}.
 
-\medskip\noindent\textbf{Corollary A.8 (trace of the exponential, axiomatized).}  An
+\medskip\noindent\textbf{Corollary A.8 (trace of the exponential, proved).}  An
 immediate corollary of Theorem A.7, useful in quantum statistical mechanics: $\hat A\le\hat B$
 implies $\mathrm{Tr}[e^{\hat A}]\le\mathrm{Tr}[e^{\hat B}]$ (eq.~(A.2.31)), and more generally
-$\mathrm{Tr}[f(\hat A)]\le\mathrm{Tr}[f(\hat B)]$ for non-decreasing $f$ (eq.~(A.2.32)).  Recorded as
-the documented axiom \texttt{hermitian\_trace\_exp\_monotone}
-(\texttt{Math/MatrixAnalysis/TraceExpMonotone.lean}), resting on A.7.
+$\mathrm{Tr}[f(\hat A)]\le\mathrm{Tr}[f(\hat B)]$ for non-decreasing $f$ (eq.~(A.2.32)).
+\textbf{Now proved (axiom-free)}, \texttt{hermitian\_trace\_exp\_monotone}
+(\texttt{Math/MatrixAnalysis/TraceExpMonotone.lean}): the spectral mapping
+$\mathrm{Tr}[e^{\hat A}]=\sum_j e^{a_j}$ (\texttt{trace\_exp\_eq\_sum\_exp\_eigenvalues}) follows
+from the spectral theorem $\hat A=U\,\mathrm{diag}(a)\,U^\dagger$ by passing $e^{(\cdot)}$ through
+the conjugation (\texttt{Matrix.exp\_conj}, with $U^\dagger=U^{-1}$ for the eigenvector unitary),
+exponentiating the diagonal entrywise (\texttt{Matrix.exp\_diagonal}), and cancelling the
+conjugation under the trace (\texttt{Matrix.trace\_mul\_cycle}); the termwise comparison
+$e^{a_j}\le e^{b_j}$ is Theorem A.7 (now proved via Courant--Fischer) composed with the
+monotonicity of $e^x$.
 
 \medskip\noindent\textbf{Lemmas A.9--A.10 (frustration-free Hamiltonians, proved).}  For
 $\hat H=\sum_j\hat h_j$ with each local term bounded below, $\hat h_j\ge\varepsilon_j$ (i.e.
