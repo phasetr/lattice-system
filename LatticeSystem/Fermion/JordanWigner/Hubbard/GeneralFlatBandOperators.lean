@@ -77,4 +77,14 @@ private theorem fromVector_mul_expand (M : ℕ) (φ ψ : Fin (M + 1) → ℂ) (�
   exact Finset.sum_congr rfl fun x _ => Finset.sum_congr rfl fun y _ => by
     rw [mul_comm (ψ y) (φ x)]
 
+/-- Expansion of the reversed product `Ĉ†_τ(ψ)·Ĉ_σ(φ)` into the double sum of sitewise
+products (annihilation index outer, matching `fromVector_mul_expand`). -/
+private theorem fromVector_mul_expand' (M : ℕ) (φ ψ : Fin (M + 1) → ℂ) (σ τ : Fin 2) :
+    spinfulCreationFromVector M ψ τ * spinfulAnnihilationFromVector M φ σ
+      = ∑ x : Fin (M + 1), ∑ y : Fin (M + 1), (φ x * ψ y) •
+          (fermionMultiCreation (2 * M + 1) (spinfulIndex M y τ) *
+            fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ)) := by
+  simp only [spinfulAnnihilationFromVector, spinfulCreationFromVector, Finset.sum_mul,
+    Finset.mul_sum, Finset.smul_sum, smul_mul_assoc, mul_smul_comm, smul_smul]
+
 end LatticeSystem.Fermion
