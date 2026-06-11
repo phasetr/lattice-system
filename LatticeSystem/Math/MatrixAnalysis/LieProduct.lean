@@ -2,6 +2,7 @@ import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Topology.Algebra.InfiniteSum.NatInt
 import Mathlib.Topology.Algebra.InfiniteSum.Order
+import Mathlib.Topology.UniformSpace.Matrix
 
 /-!
 # Tasaki Appendix A.2.2: the Lie product formula (Theorem A.1)
@@ -11,11 +12,21 @@ The first numbered result of Tasaki's Mathematical Appendix.  For any (bounded) 
 finite-volume quantum system — the exponential of a sum is the limit of symmetrically split
 products:
 `e^{Â+B̂} = lim_{N↑∞} (e^{Â/N} e^{B̂/N})^N`  (Tasaki eq. (A.2.21)).
-Mathlib provides the *commuting* case (`Matrix.exp_add_of_commute`); the general
-non-commuting Lie/Trotter formula for bounded operators is a standard but non-trivial
-real-analysis result (Tasaki's footnote: "nineteenth century mathematics"), not currently in
-mathlib.  Per the project's axiomatize-first policy it is recorded here as a documented axiom,
-to be discharged later; it is not on the critical path of any Chapter-11 proof.
+Mathlib provides only the *commuting* case (`Matrix.exp_add_of_commute`); the general
+non-commuting Lie/Trotter formula is **now proved here (axiom-free)**, in four layers, all but
+the last in a general complete normed `ℝ`-algebra:
+
+* **series tail bounds** — `‖e^X − 1 − X‖ ≤ ‖X‖²e^{‖X‖}`, `‖e^X − 1‖ ≤ ‖X‖e^{‖X‖}`,
+  `‖e^X‖ ≤ e^{‖X‖}` (`norm_exp_sub_one_sub_id_le`, `norm_exp_sub_one_le`,
+  `norm_exp_le_exp_norm`);
+* **telescoping power estimate** — `‖Cⁿ − Dⁿ‖ ≤ n·M^{n−1}·‖C−D‖` (`norm_pow_sub_pow_le`);
+* **product comparison** — `‖e^{sA}e^{sB} − e^{s(A+B)}‖ ≤ 4s²(‖A‖+‖B‖)²e^{‖A‖+‖B‖}` for
+  `0 ≤ s ≤ 1` (`norm_exp_smul_mul_sub_exp_smul_add_le`);
+* **the Trotter formula** — `e^{A+B}` is *exactly* the `n`-th power of its `1/n`-step
+  (`exp_nsmul`), so the telescope multiplies the per-step `O(1/n²)` distance by
+  `n·e^{(n−1)(‖A‖+‖B‖)/n} ≤ n·e^{‖A‖+‖B‖}`, and the resulting `O(1/n)` bound squeezes to `0`
+  (`trotterProductFormula`); the matrix statement `lieProductFormula` instantiates it under the
+  scoped operator-norm structure (the empty index type is the trivial case).
 
 `NormedSpace.exp` is the matrix exponential used throughout the project (e.g. the Gibbs
 exponential `e^{-βH}`); `(N : ℂ)⁻¹ • A = A/N`.
@@ -378,14 +389,38 @@ theorem trotterProductFormula [NormedAlgebra ℚ 𝔸] [CompleteSpace 𝔸] [Nor
 
 end ExpTailBounds
 
-/-- **Tasaki Theorem A.1 (Lie product formula), AXIOM.**  For finite complex matrices `A`, `B`,
+set_option backward.isDefEq.respectTransparency false in
+/-- **Tasaki Theorem A.1 (Lie product formula), PROVED.**  For finite complex matrices `A`, `B`,
 the exponential of the sum is the limit of the symmetric split product,
-`e^{A+B} = lim_{N↑∞} (e^{A/N} e^{B/N})^N`.  Specializes to `Matrix.exp_add_of_commute` when
-`A`, `B` commute; the general case is recorded as a documented axiom (standard analysis,
-deferred). -/
-axiom lieProductFormula {n : Type*} [Fintype n] [DecidableEq n] (A B : Matrix n n ℂ) :
+`e^{A+B} = lim_{N↑∞} (e^{A/N} e^{B/N})^N`.  Instance of the generic
+`trotterProductFormula` under the scoped operator-norm structure of `Matrix n n ℂ` (the topology
+agrees with the entrywise one, the pattern of `Mathlib.Analysis.Normed.Algebra.MatrixExponential`);
+the empty index type is the trivial (subsingleton) case.  Specializes to
+`Matrix.exp_add_of_commute` when `A`, `B` commute. -/
+theorem lieProductFormula {n : Type*} [Fintype n] [DecidableEq n] (A B : Matrix n n ℂ) :
     Tendsto
       (fun N : ℕ => (NormedSpace.exp ((N : ℂ)⁻¹ • A) * NormedSpace.exp ((N : ℂ)⁻¹ • B)) ^ N)
-      atTop (𝓝 (NormedSpace.exp (A + B)))
+      atTop (𝓝 (NormedSpace.exp (A + B))) := by
+  -- the complex `1/N` scalar acts as the real one
+  have hsmul : ∀ (N : ℕ) (X : Matrix n n ℂ), (N : ℂ)⁻¹ • X = (N : ℝ)⁻¹ • X := by
+    intro N X
+    rw [show ((N : ℂ))⁻¹ = (((N : ℝ)⁻¹ : ℝ) : ℂ) by
+      rw [Complex.ofReal_inv, Complex.ofReal_natCast]]
+    rw [Complex.coe_smul]
+  simp_rw [hsmul]
+  cases isEmpty_or_nonempty n with
+  | inl h =>
+    -- a matrix algebra over an empty index type is trivial
+    have hsub : Subsingleton (Matrix n n ℂ) := by infer_instance
+    have hconst : (fun N : ℕ =>
+        (NormedSpace.exp ((N : ℝ)⁻¹ • A) * NormedSpace.exp ((N : ℝ)⁻¹ • B)) ^ N)
+        = fun _ => NormedSpace.exp (A + B) := by
+      funext N
+      exact Subsingleton.elim _ _
+    rw [hconst]
+    exact tendsto_const_nhds
+  | inr h =>
+    open scoped Matrix.Norms.Operator in
+    exact trotterProductFormula A B
 
 end LatticeSystem.Math
