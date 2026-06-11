@@ -141,4 +141,38 @@ theorem spinfulFromVector_annihilation_creation_anticomm (M : ℕ)
     rw [← smul_add, spinful_annihilation_creation_anticomm_general,
       if_neg (fun h => hστ h.2), smul_zero]
 
+/-- The single-particle operator of a coordinate delta vector is the plain site operator:
+`Ĉ_σ(e_z) = ĉ_{z,σ}`. -/
+theorem spinfulAnnihilationFromVector_single (M : ℕ) (z : Fin (M + 1)) (σ : Fin 2) :
+    spinfulAnnihilationFromVector M (Pi.single z 1) σ
+      = fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z σ) := by
+  rw [spinfulAnnihilationFromVector, Finset.sum_eq_single z]
+  · rw [Pi.single_eq_same, one_smul]
+  · intro y _ hyz
+    rw [Pi.single_eq_of_ne hyz, zero_smul]
+  · intro h
+    exact absurd (Finset.mem_univ z) h
+
+/-- **Site-dual CAR for the flat-band mode creators** (the peel input for eq. (11.3.46)):
+`{ĉ_{z,σ}, â†_{z',τ}} = δ_{στ}·μ_{z'}(z)·1`.  The site annihilation operator at `z` reads off
+the `z`-coordinate of the mode vector; on the index set `I` of a special basis the
+biorthogonality `μ_{z'}(z) = δ_{zz'}·μ_z(z)` then makes this the dual pairing. -/
+theorem site_annihilation_generalFlatBandCreation_anticomm (M : ℕ)
+    (μ : Fin (M + 1) → Fin (M + 1) → ℂ) (z z' : Fin (M + 1)) (σ τ : Fin 2) :
+    fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z σ) * generalFlatBandCreation μ z' τ
+      + generalFlatBandCreation μ z' τ *
+          fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z σ)
+      = (if σ = τ then μ z' z else 0) • (1 : ManyBodyOp (Fin (2 * M + 2))) := by
+  rw [← spinfulAnnihilationFromVector_single M z σ, generalFlatBandCreation,
+    spinfulFromVector_annihilation_creation_anticomm]
+  have hcoef : (∑ x : Fin (M + 1), (Pi.single z 1 : Fin (M + 1) → ℂ) x * μ z' x)
+      = μ z' z := by
+    rw [Finset.sum_eq_single z]
+    · rw [Pi.single_eq_same, one_mul]
+    · intro y _ hyz
+      rw [Pi.single_eq_of_ne hyz, zero_mul]
+    · intro h
+      exact absurd (Finset.mem_univ z) h
+  rw [hcoef]
+
 end LatticeSystem.Fermion
