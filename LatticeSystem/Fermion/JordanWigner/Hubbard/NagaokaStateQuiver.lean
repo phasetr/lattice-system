@@ -1229,5 +1229,198 @@ theorem nagaokaBondGraph_connected_of_connectedByExchangeBonds (N : ℕ)
   { preconnected := fun u v => bondReachable_of_exchangeReachable N t (h.preconnected u v)
     nonempty := h.nonempty }
 
+/-- **Equal magnetization at a common hole = equal occupied up-spin count.**  The doubled
+magnetization at a fixed hole is `2·(#↑ among occupied sites) − N`
+(`holeSpinMag_eq_two_mul_upCount_sub`), so two configurations at the same hole have the same
+magnetization exactly when they carry the same number of up-spins on the occupied (non-hole) sites.
+This is the counting input of the mismatch-reduction induction. -/
+theorem occUpCount_eq_of_holeSpinMag_eq {N : ℕ} {q : Fin (N + 1)} (σ σ' : HoleSpin N q)
+    (h : holeSpinMag N ⟨q, σ⟩ = holeSpinMag N ⟨q, σ'⟩) :
+    (Finset.univ.filter (fun i => i ≠ q ∧ σ.val i = true)).card
+      = (Finset.univ.filter (fun i => i ≠ q ∧ σ'.val i = true)).card := by
+  have h1 : holeSpinMag N ⟨q, σ⟩
+      = 2 * ((Finset.univ.filter (fun i => i ≠ q ∧ σ.val i = true)).card : ℤ) - N :=
+    holeSpinMag_eq_two_mul_upCount_sub N ⟨q, σ⟩
+  have h2 : holeSpinMag N ⟨q, σ'⟩
+      = 2 * ((Finset.univ.filter (fun i => i ≠ q ∧ σ'.val i = true)).card : ℤ) - N :=
+    holeSpinMag_eq_two_mul_upCount_sub N ⟨q, σ'⟩
+  rw [h1, h2] at h
+  omega
+
+/-- **A spin swap preserves the magnetization.**  Exchanging the spins at two (non-hole) sites
+permutes the occupied values by the involution `Equiv.swap x y`, so the up-count — and hence
+`holeSpinMag` — is unchanged. -/
+theorem holeSpinMag_swapHoleSpin (N : ℕ) (q x y : Fin (N + 1)) (hqx : q ≠ x) (hqy : q ≠ y)
+    (σ : HoleSpin N q) :
+    holeSpinMag N ⟨q, swapHoleSpin N q x y hqx hqy σ⟩ = holeSpinMag N ⟨q, σ⟩ := by
+  have hval : ∀ w, (swapHoleSpin N q x y hqx hqy σ).val w = σ.val (Equiv.swap x y w) := by
+    intro w
+    rw [swapHoleSpin_val_apply, Equiv.swap_apply_def]
+    rcases eq_or_ne w x with rfl | h1
+    · simp
+    · rcases eq_or_ne w y with rfl | h2
+      · simp [h1]
+      · simp [h1, h2]
+  have h1 : holeSpinMag N ⟨q, swapHoleSpin N q x y hqx hqy σ⟩
+      = 2 * ((Finset.univ.filter
+          (fun i => i ≠ q ∧ (swapHoleSpin N q x y hqx hqy σ).val i = true)).card : ℤ) - N :=
+    holeSpinMag_eq_two_mul_upCount_sub N _
+  have h2 : holeSpinMag N ⟨q, σ⟩
+      = 2 * ((Finset.univ.filter (fun i => i ≠ q ∧ σ.val i = true)).card : ℤ) - N :=
+    holeSpinMag_eq_two_mul_upCount_sub N _
+  suffices hc : (Finset.univ.filter
+      (fun i => i ≠ q ∧ (swapHoleSpin N q x y hqx hqy σ).val i = true)).card
+      = (Finset.univ.filter (fun i => i ≠ q ∧ σ.val i = true)).card by
+    rw [h1, h2, hc]
+  refine Finset.card_bij' (fun i _ => Equiv.swap x y i) (fun i _ => Equiv.swap x y i) ?_ ?_ ?_ ?_
+  · intro a ha
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at ha ⊢
+    obtain ⟨haq, hav⟩ := ha
+    refine ⟨fun h => haq ?_, by rw [← hval a]; exact hav⟩
+    have h' := congrArg (Equiv.swap x y) h
+    rw [Equiv.swap_apply_self, Equiv.swap_apply_of_ne_of_ne hqx hqy] at h'
+    exact h'
+  · intro b hb
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hb ⊢
+    obtain ⟨hbq, hbv⟩ := hb
+    refine ⟨fun h => hbq ?_, ?_⟩
+    · have h' := congrArg (Equiv.swap x y) h
+      rw [Equiv.swap_apply_self, Equiv.swap_apply_of_ne_of_ne hqx hqy] at h'
+      exact h'
+    · rw [hval, Equiv.swap_apply_self]
+      exact hbv
+  · intro a _
+    exact Equiv.swap_apply_self x y a
+  · intro b _
+    exact Equiv.swap_apply_self x y b
+
+/-- **Mismatch reduction (the generation Proposition; Tasaki footnote 13 → p. 41, "Proof of
+Property (iii)").**  If from the hole `q` *every* pair of distinct occupied sites can be
+spin-swapped (hypothesis `hswap`, to be supplied by the exchange-bond generation), then any two
+configurations at hole `q` with equal magnetization are joined by `StateReach`: pick a site `x`
+where `σ` is down but `σ'` is up and a site `y` where `σ` is up but `σ'` is down (both exist, in
+equal numbers, by the up-count `upCount_eq_of_holeSpinMag_eq`), swap them — the number of
+disagreeing sites drops by exactly `2` — and induct down to zero disagreement. -/
+theorem StateReach.of_swaps_of_holeSpinMag_eq (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    {q : Fin (N + 1)}
+    (hswap : ∀ (x y : Fin (N + 1)) (hqx : q ≠ x) (hqy : q ≠ y), x ≠ y →
+      ∀ τ : HoleSpin N q, StateReach N t ⟨q, τ⟩ ⟨q, swapHoleSpin N q x y hqx hqy τ⟩)
+    (σ σ' : HoleSpin N q)
+    (hmag : holeSpinMag N ⟨q, σ⟩ = holeSpinMag N ⟨q, σ'⟩) :
+    StateReach N t ⟨q, σ⟩ ⟨q, σ'⟩ := by
+  suffices H : ∀ (k : ℕ) (σ : HoleSpin N q),
+      holeSpinMag N ⟨q, σ⟩ = holeSpinMag N ⟨q, σ'⟩ →
+      (Finset.univ.filter (fun s => σ.val s ≠ σ'.val s)).card = k →
+      StateReach N t ⟨q, σ⟩ ⟨q, σ'⟩ from H _ σ hmag rfl
+  intro k
+  induction k using Nat.strong_induction_on with
+  | _ k ih =>
+  intro σ hmagσ hk
+  rcases Nat.eq_zero_or_pos k with hk0 | hkpos
+  · -- no disagreement: the configurations coincide
+    subst hk0
+    have hall : ∀ s, σ.val s = σ'.val s := by
+      intro s
+      by_contra hne
+      have hmem : s ∈ Finset.univ.filter (fun s => σ.val s ≠ σ'.val s) := by simp [hne]
+      have hpos := Finset.card_pos.mpr ⟨s, hmem⟩
+      omega
+    have : σ = σ' := Subtype.ext (funext hall)
+    rw [this]
+    exact StateReach.refl N t _
+  · -- a disagreement exists; locate an opposite pair and swap it away
+    -- the full up-sets (hole included — the hole carries `true`) have equal size
+    have hTins : ∀ τ : HoleSpin N q,
+        Finset.univ.filter (fun i => τ.val i = true)
+          = insert q (Finset.univ.filter (fun i => i ≠ q ∧ τ.val i = true)) := by
+      intro τ
+      ext i
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert]
+      by_cases hiq : i = q
+      · subst hiq
+        simp [τ.2]
+      · simp [hiq]
+    have hcardTT : (Finset.univ.filter (fun i => σ.val i = true)).card
+        = (Finset.univ.filter (fun i => σ'.val i = true)).card := by
+      have hnotmem : ∀ τ : HoleSpin N q,
+          q ∉ Finset.univ.filter (fun i => i ≠ q ∧ τ.val i = true) := by
+        intro τ
+        simp
+      rw [hTins σ, hTins σ', Finset.card_insert_of_notMem (hnotmem σ),
+        Finset.card_insert_of_notMem (hnotmem σ'),
+        occUpCount_eq_of_holeSpinMag_eq σ σ' hmagσ]
+    have hMsplit : Finset.univ.filter (fun s => σ.val s ≠ σ'.val s)
+        = Finset.univ.filter (fun s => σ.val s = false ∧ σ'.val s = true)
+          ∪ Finset.univ.filter (fun s => σ.val s = true ∧ σ'.val s = false) := by
+      ext s
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_union]
+      cases hσs : σ.val s <;> cases hσ's : σ'.val s <;> simp
+    have hABcard : (Finset.univ.filter (fun s => σ.val s = false ∧ σ'.val s = true)).card
+        = (Finset.univ.filter (fun s => σ.val s = true ∧ σ'.val s = false)).card := by
+      have e1 : Finset.univ.filter (fun s => σ.val s = false ∧ σ'.val s = true)
+          = Finset.univ.filter (fun i => σ'.val i = true)
+            \ Finset.univ.filter (fun i => σ.val i = true) := by
+        ext s
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_sdiff]
+        cases hσs : σ.val s <;> simp
+      have e2 : Finset.univ.filter (fun s => σ.val s = true ∧ σ'.val s = false)
+          = Finset.univ.filter (fun i => σ.val i = true)
+            \ Finset.univ.filter (fun i => σ'.val i = true) := by
+        ext s
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_sdiff]
+        cases hσ's : σ'.val s <;> simp
+      rw [e1, e2]
+      have h1 := Finset.card_sdiff_add_card_inter
+        (Finset.univ.filter (fun i => σ'.val i = true))
+        (Finset.univ.filter (fun i => σ.val i = true))
+      have h2 := Finset.card_sdiff_add_card_inter
+        (Finset.univ.filter (fun i => σ.val i = true))
+        (Finset.univ.filter (fun i => σ'.val i = true))
+      rw [Finset.inter_comm] at h1
+      omega
+    have hMne : (Finset.univ.filter (fun s => σ.val s ≠ σ'.val s)).Nonempty :=
+      Finset.card_pos.mp (by rw [hk]; exact hkpos)
+    -- both directions of disagreement are realized
+    obtain ⟨⟨x, hx⟩, y, hy⟩ :
+        (Finset.univ.filter (fun s => σ.val s = false ∧ σ'.val s = true)).Nonempty ∧
+          (Finset.univ.filter (fun s => σ.val s = true ∧ σ'.val s = false)).Nonempty := by
+      obtain ⟨s, hs⟩ := hMne
+      rw [hMsplit, Finset.mem_union] at hs
+      rcases hs with hs | hs
+      · exact ⟨⟨s, hs⟩, Finset.card_pos.mp
+          (by rw [← hABcard]; exact Finset.card_pos.mpr ⟨s, hs⟩)⟩
+      · exact ⟨Finset.card_pos.mp (by rw [hABcard]; exact Finset.card_pos.mpr ⟨s, hs⟩), ⟨s, hs⟩⟩
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hx hy
+    obtain ⟨hxσ, hxσ'⟩ := hx
+    obtain ⟨hyσ, hyσ'⟩ := hy
+    -- the hole carries `true`, so a `false`-valued site is never the hole
+    have hqx : q ≠ x := by rintro rfl; rw [σ.2] at hxσ; exact absurd hxσ (by decide)
+    have hqy : q ≠ y := by rintro rfl; rw [σ'.2] at hyσ'; exact absurd hyσ' (by decide)
+    have hxy : x ≠ y := by rintro rfl; rw [hxσ] at hyσ; exact Bool.false_ne_true hyσ
+    -- swap the pair and recurse on the strictly smaller disagreement set
+    have hstep := hswap x y hqx hqy hxy σ
+    set σ₂ := swapHoleSpin N q x y hqx hqy σ with hσ₂
+    have hMnew : Finset.univ.filter (fun s => σ₂.val s ≠ σ'.val s)
+        = ((Finset.univ.filter (fun s => σ.val s ≠ σ'.val s)).erase x).erase y := by
+      ext s
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_erase, hσ₂,
+        swapHoleSpin_val_apply]
+      by_cases h1 : s = x
+      · subst h1; simp [hyσ, hxσ']
+      · by_cases h2 : s = y
+        · subst h2; simp [Ne.symm hxy, hxσ, hyσ']
+        · simp [h1, h2]
+    have hxM : x ∈ Finset.univ.filter (fun s => σ.val s ≠ σ'.val s) := by
+      simp [hxσ, hxσ']
+    have hyM : y ∈ (Finset.univ.filter (fun s => σ.val s ≠ σ'.val s)).erase x := by
+      rw [Finset.mem_erase]
+      exact ⟨Ne.symm hxy, by simp [hyσ, hyσ']⟩
+    have hknew : (Finset.univ.filter (fun s => σ₂.val s ≠ σ'.val s)).card = k - 2 := by
+      rw [hMnew, Finset.card_erase_of_mem hyM, Finset.card_erase_of_mem hxM, hk]
+      omega
+    have hmag₂ : holeSpinMag N ⟨q, σ₂⟩ = holeSpinMag N ⟨q, σ'⟩ := by
+      rw [hσ₂, holeSpinMag_swapHoleSpin]; exact hmagσ
+    exact hstep.trans (ih (k - 2) (by omega) σ₂ hmag₂ hknew)
+
 end LatticeSystem.Fermion
 
