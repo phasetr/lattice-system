@@ -48,4 +48,21 @@ theorem generalFlatBandAnnihilation_eq_sum (μ : Fin (M + 1) → Fin (M + 1) →
       = ∑ x : Fin (M + 1), μ z x • fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ) :=
   rfl
 
+/-- **The spinful canonical anticommutation relation at general site count**:
+`{ĉ_{x,σ}, ĉ†_{y,τ}} = [x = y ∧ σ = τ]` on `M + 1` physical sites.  The general-`M` form of
+`spinful_annihilation_creation_anticomm` (which is its `M = 2K+1` delta-chain instance); the
+bilinear input for the CAR of the general flat-band mode operators. -/
+theorem spinful_annihilation_creation_anticomm_general (M : ℕ) (x y : Fin (M + 1))
+    (σ τ : Fin 2) :
+    fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ) *
+        fermionMultiCreation (2 * M + 1) (spinfulIndex M y τ)
+      + fermionMultiCreation (2 * M + 1) (spinfulIndex M y τ) *
+        fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ)
+      = if x = y ∧ σ = τ then 1 else 0 := by
+  by_cases h : spinfulIndex M x σ = spinfulIndex M y τ
+  · obtain ⟨rfl, rfl⟩ := (spinfulIndex_eq_iff M x y σ τ).mp h
+    rw [if_pos ⟨rfl, rfl⟩, fermionMultiAnticomm_self]
+  · rw [fermionMultiAnnihilation_creation_anticomm_of_ne h,
+      if_neg (fun hxy => h ((spinfulIndex_eq_iff M x y σ τ).mpr hxy))]
+
 end LatticeSystem.Fermion
