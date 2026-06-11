@@ -1,6 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaGlobalMin
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaMagnetizationSector
-import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaConnectivityClassification
+import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaBondGraph
 import Mathlib.LinearAlgebra.Matrix.Irreducible.Defs
 
 /-!
@@ -8,10 +8,10 @@ import Mathlib.LinearAlgebra.Matrix.Irreducible.Defs
 
 The connectivity condition (Definition 11.6, `nagaokaConnectivity`) is irreducibility of the
 sector-restricted `−M`, i.e. strong connectivity of the quiver whose edges are the *positive*
-entries of `−M`.  This file builds Tasaki's "15-puzzle" hole-motion argument in full and proves
-**Lemma 11.9** (`nagaoka_lemma_11_9`: a bond graph connected by exchange bonds satisfies the
-connectivity condition), discharging the former axiom of
-`NagaokaConnectivityClassification.lean`.  The layers:
+entries of `−M`.  This file builds Tasaki's "15-puzzle" hole-motion argument in full, proving the
+capstone `nagaokaConnectivity_of_connectedByExchangeBonds` behind **Lemma 11.9**
+(`nagaoka_lemma_11_9`, stated at its original path in
+`NagaokaConnectivityClassification.lean`, formerly an axiom there).  The layers:
 
 * **Edges** — `−M_{(y,τ),(x,σ)} > 0` iff the hole hops `x → y` along a present bond
   (`neg_tasakiEffReMatrix_pos_iff`, `holeHopHom`/`holeHopHom'`), giving the reachability relation
@@ -35,9 +35,10 @@ connectivity condition), discharging the former axiom of
   mismatch-reduction induction (`StateReach.of_swaps_of_holeSpinMag_eq`); hole mobility aligns
   arbitrary states (`StateReach.exists_hole_at`), and an out-and-back hop supplies the
   positive-length diagonal (`exists_pos_selfPath`).  The sector quiver half
-  (`nagaokaConnectivity_of_reach`) converts reachability into irreducibility, and the
-  diagonal-zeroing transfer (`tasakiEffReMatrix_zeroDiag`) removes the auxiliary zero-diagonal
-  hypothesis, yielding `nagaoka_lemma_11_9` verbatim.
+  (`nagaokaConnectivity_of_reach`) converts reachability into irreducibility, giving the
+  zero-diagonal capstone; the diagonal-zeroing transfer (`tasakiEffReMatrix_zeroDiag`,
+  `nagaokaBondGraph_zeroDiag`) then yields `nagaoka_lemma_11_9` verbatim in
+  `NagaokaConnectivityClassification.lean`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), §11.2.2, Lemma 11.9, Figs. 11.8–11.9, footnotes 13–14, pp. 386–388.
@@ -527,9 +528,12 @@ def holeWalkTransport (N : ℕ) {G : SimpleGraph (Fin (N + 1))} :
   | _, _, SimpleGraph.Walk.nil, σ => σ
   | x, _, SimpleGraph.Walk.cons (v := v) _ W', σ => holeWalkTransport N W' (holeSpinMove N x v σ)
 
+/-- Transport along the empty walk is the identity (defining equation of `holeWalkTransport`). -/
 @[simp] theorem holeWalkTransport_nil (N : ℕ) {G : SimpleGraph (Fin (N + 1))} {x : Fin (N + 1)}
     (σ : HoleSpin N x) : holeWalkTransport N (G := G) SimpleGraph.Walk.nil σ = σ := rfl
 
+/-- Transport along `cons h W'` first hops the hole across the edge `h`, then transports along
+`W'` (defining equation of `holeWalkTransport`). -/
 @[simp] theorem holeWalkTransport_cons (N : ℕ) {G : SimpleGraph (Fin (N + 1))}
     {x v x' : Fin (N + 1)} (h : G.Adj x v) (W' : G.Walk v x') (σ : HoleSpin N x) :
     holeWalkTransport N (SimpleGraph.Walk.cons h W') σ
@@ -1617,43 +1621,6 @@ theorem nagaokaBondGraph_zeroDiag (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) →
   · rintro ⟨hne, h⟩
     refine ⟨hne, ?_⟩
     simpa only [if_neg hne, if_neg (Ne.symm hne)] using h
-
-/-- **Tasaki Lemma 11.9 (a sufficient condition for the connectivity), DISCHARGED.**  If the bond
-graph is connected by exchange bonds, the connectivity condition (Definition 11.6,
-`nagaokaConnectivity`) holds.  This is the full 15-puzzle argument of Tasaki §11.2.2, pp. 387–388:
-exchange bonds yield in-place spin swaps via length-3/4 loop trips (Figs. 11.8, 11.9 and
-footnote 14), the swaps propagate along exchange-bond walks (footnote 13), parking the hole at a
-farthest vertex of the exchange-bond graph makes every pair swappable, and the mismatch-reduction
-induction connects any two same-magnetization configurations.  The general (not necessarily
-zero-diagonal) hopping reduces to the zero-diagonal capstone because neither the Tasaki matrix nor
-the bond graph reads the diagonal of `t` (`tasakiEffReMatrix_zeroDiag`,
-`nagaokaBondGraph_zeroDiag`). -/
-theorem nagaoka_lemma_11_9 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
-    (hN : 1 ≤ N) (htsym : ∀ i j, t i j = t j i) (hpos : ∀ i j, 0 ≤ t i j) :
-    ConnectedByExchangeBonds (nagaokaBondGraph N t) → nagaokaConnectivity N t := by
-  intro hconn
-  -- run the zero-diagonal capstone on the diagonal-zeroed hopping and transfer back
-  set t₀ : Fin (N + 1) → Fin (N + 1) → ℝ := fun i j => if i = j then 0 else t i j with ht₀
-  have htsym₀ : ∀ i j, t₀ i j = t₀ j i := by
-    intro i j
-    by_cases h : i = j
-    · simp [ht₀, h]
-    · simp [ht₀, h, Ne.symm h, htsym i j]
-  have htdiag₀ : ∀ i, t₀ i i = 0 := fun i => by simp [ht₀]
-  have hpos₀ : ∀ i j, 0 ≤ t₀ i j := by
-    intro i j
-    by_cases h : i = j
-    · simp [ht₀, h]
-    · simp [ht₀, h, hpos i j]
-  have hconn₀ : ConnectedByExchangeBonds (nagaokaBondGraph N t₀) := by
-    rw [ht₀, nagaokaBondGraph_zeroDiag]; exact hconn
-  have hcap := nagaokaConnectivity_of_connectedByExchangeBonds N t₀ hN htsym₀ htdiag₀ hpos₀ hconn₀
-  intro m
-  have hPF : nagaokaPFMatrixOnSector N t m = nagaokaPFMatrixOnSector N t₀ m := by
-    unfold nagaokaPFMatrixOnSector tasakiEffReMatrixOnSector
-    rw [ht₀, tasakiEffReMatrix_zeroDiag]
-  rw [hPF]
-  exact hcap m
 
 end LatticeSystem.Fermion
 

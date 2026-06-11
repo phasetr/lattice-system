@@ -1,7 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaConnectivity
-import Mathlib.Combinatorics.SimpleGraph.Circulant
-import Mathlib.Combinatorics.SimpleGraph.Paths
-import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
+import LatticeSystem.Fermion.JordanWigner.Hubbard.NagaokaStateQuiver
 
 /-!
 # Connectivity condition: classification (Tasaki §11.2.2, Theorem 11.8 and Lemma 11.9)
@@ -17,6 +15,9 @@ bond graph `(Λ, B)`, `B = {{x, y} : t_{x,y} ≠ 0}`:
 * **Lemma 11.9**: if `(Λ, B)` is connected by *exchange bonds*, the connectivity
   condition holds.
 
+The graph predicates live in `NagaokaBondGraph.lean`; this module holds the two
+statements in book order.
+
 ## Status
 
 * **Theorem 11.8** is recorded as an **`axiom`**: Tasaki's text *explicitly
@@ -27,13 +28,14 @@ bond graph `(Λ, B)`, `B = {{x, y} : t_{x,y} ≠ 0}`:
   its statement.
 
 * **Lemma 11.9** was initially axiomatized here (project decision, 2026-06-04)
-  and is now a **proved theorem** `nagaoka_lemma_11_9` in
-  `NagaokaStateQuiver.lean`, which turns Tasaki's "15-puzzle" hole-motion proof
-  into strong connectivity of the per-sector quiver of `−M` (loop-trip spin
-  swaps, exchange-bond generation, hole parking, mismatch reduction). This file
-  keeps the *predicates* (`nagaokaBondGraph`, `IsExchangeBond`,
-  `exchangeBondGraph`, `ConnectedByExchangeBonds`) on which both results are
-  stated.
+  and is now a **proved theorem** `nagaoka_lemma_11_9`, at its original module
+  path: the full "15-puzzle" hole-motion machinery (loop-trip spin swaps,
+  exchange-bond generation, hole parking, mismatch reduction) lives in
+  `NagaokaStateQuiver.lean`, whose zero-diagonal capstone
+  (`nagaokaConnectivity_of_connectedByExchangeBonds`) is transferred here to the
+  general symmetric `t ≥ 0` by diagonal zeroing (`tasakiEffReMatrix_zeroDiag`,
+  `nagaokaBondGraph_zeroDiag` — neither the Tasaki matrix nor the bond graph
+  reads the diagonal of `t`).
 
 **Theorem 11.7 itself (`NagaokaConnectivity.lean`) is `sorry`-free and does not
 depend on the Theorem 11.8 axiom** — it is isolated in this file so that the
@@ -44,29 +46,6 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 -/
 
 namespace LatticeSystem.Fermion
-
-/-- The **bond graph** `(Λ, B)` of a hopping amplitude: an edge `x — y` whenever
-`x ≠ y` and the hopping `t_{x,y}` (or its transpose) is non-zero.  The symmetric
-closure is taken so the definition is a `SimpleGraph` without assuming
-`t_{x,y} = t_{y,x}` (for symmetric `t` it is just the support of `t`). -/
-def nagaokaBondGraph (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ) :
-    SimpleGraph (Fin (N + 1)) where
-  Adj x y := x ≠ y ∧ (t x y ≠ 0 ∨ t y x ≠ 0)
-  symm := fun _ _ ⟨hne, h⟩ => ⟨hne.symm, h.symm⟩
-  loopless := ⟨fun _ ⟨hne, _⟩ => hne rfl⟩
-
-/-- A graph is **biconnected** (non-separable) if it is connected and removing
-any single vertex leaves it connected — there is no cut vertex.  (Tasaki fn. 10,
-§11.2.2.)  The `G.Connected` conjunct excludes degenerate disconnected graphs
-(e.g. isolated vertices), for which "delete any vertex stays connected" would
-otherwise hold vacuously. -/
-def IsBiconnected {V : Type*} (G : SimpleGraph V) : Prop :=
-  G.Connected ∧ ∀ v : V, (G.induce {w | w ≠ v}).Connected
-
-/-- A graph is a **simple loop with more than four sites** if it is isomorphic to
-the cycle graph `C_n` for some `n > 4` (a periodic chain on `≥ 5` sites). -/
-def IsSimpleLoopGTFour {V : Type*} (G : SimpleGraph V) : Prop :=
-  ∃ n : ℕ, 4 < n ∧ Nonempty (G ≃g SimpleGraph.cycleGraph n)
 
 /-- **Tasaki Theorem 11.8 (necessary and sufficient condition for connectivity).**
 A Hubbard model with `U = ∞`, `N = |Λ| − 1` and `t ≥ 0` satisfies the
@@ -85,31 +64,42 @@ axiom nagaoka_theorem_11_8 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
       (IsBiconnected (nagaokaBondGraph N t) ∧
         ¬ IsSimpleLoopGTFour (nagaokaBondGraph N t))
 
-/-- A pair `{x, y}` is an **exchange bond** of a graph `G` when (E1) `x` and `y`
-lie on a common loop (cycle) of length 3 or 4, and (E2) `G` stays connected when
-both `x` and `y` are removed.  (Tasaki §11.2.2, definition before Lemma 11.9.) -/
-def IsExchangeBond {V : Type*} (G : SimpleGraph V) (x y : V) : Prop :=
-  (∃ (z : V) (c : G.Walk z z), c.IsCycle ∧ (c.length = 3 ∨ c.length = 4) ∧
-      x ∈ c.support ∧ y ∈ c.support) ∧
-    (G.induce {w | w ≠ x ∧ w ≠ y}).Connected
-
-/-- The **exchange-bond graph**: an edge `x — y` whenever `{x, y}` (or `{y, x}`)
-is an exchange bond.  The symmetric closure of `IsExchangeBond` (which is itself
-symmetric in `x, y`) is taken so the definition is a `SimpleGraph` without a
-separate symmetry proof. -/
-def exchangeBondGraph {V : Type*} (G : SimpleGraph V) : SimpleGraph V where
-  Adj x y := x ≠ y ∧ (IsExchangeBond G x y ∨ IsExchangeBond G y x)
-  symm := fun _ _ ⟨hne, h⟩ => ⟨hne.symm, h.symm⟩
-  loopless := ⟨fun _ ⟨hne, _⟩ => hne rfl⟩
-
-/-- A graph is **connected by exchange bonds** when its exchange-bond graph is
-connected. -/
-def ConnectedByExchangeBonds {V : Type*} (G : SimpleGraph V) : Prop :=
-  (exchangeBondGraph G).Connected
-
-/-! **Tasaki Lemma 11.9 (a sufficient condition for connectivity)** — formerly an `axiom` here —
-is now a **proved theorem** `nagaoka_lemma_11_9` in `NagaokaStateQuiver.lean`, which builds the
-full "15-puzzle" hole-motion argument (loop-trip spin swaps, exchange-bond generation, hole
-parking, and mismatch reduction) on top of the predicates defined in this file. -/
+/-- **Tasaki Lemma 11.9 (a sufficient condition for the connectivity), PROVED.**  If the bond
+graph is connected by exchange bonds, the connectivity condition (Definition 11.6,
+`nagaokaConnectivity`) holds.  This is the full 15-puzzle argument of Tasaki §11.2.2, pp. 387–388
+(formerly an `axiom` here, now discharged): exchange bonds yield in-place spin swaps via
+length-3/4 loop trips (Figs. 11.8, 11.9 and footnote 14), the swaps propagate along exchange-bond
+walks (footnote 13), parking the hole at a farthest vertex of the exchange-bond graph makes every
+pair swappable, and the mismatch-reduction induction connects any two same-magnetization
+configurations — see `NagaokaStateQuiver.lean` for the machinery.  The general (not necessarily
+zero-diagonal) hopping reduces to the zero-diagonal capstone
+`nagaokaConnectivity_of_connectedByExchangeBonds` because neither the Tasaki matrix nor the bond
+graph reads the diagonal of `t` (`tasakiEffReMatrix_zeroDiag`, `nagaokaBondGraph_zeroDiag`). -/
+theorem nagaoka_lemma_11_9 (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → ℝ)
+    (hN : 1 ≤ N) (htsym : ∀ i j, t i j = t j i) (hpos : ∀ i j, 0 ≤ t i j) :
+    ConnectedByExchangeBonds (nagaokaBondGraph N t) → nagaokaConnectivity N t := by
+  intro hconn
+  -- run the zero-diagonal capstone on the diagonal-zeroed hopping and transfer back
+  set t₀ : Fin (N + 1) → Fin (N + 1) → ℝ := fun i j => if i = j then 0 else t i j with ht₀
+  have htsym₀ : ∀ i j, t₀ i j = t₀ j i := by
+    intro i j
+    by_cases h : i = j
+    · simp [ht₀, h]
+    · simp [ht₀, h, Ne.symm h, htsym i j]
+  have htdiag₀ : ∀ i, t₀ i i = 0 := fun i => by simp [ht₀]
+  have hpos₀ : ∀ i j, 0 ≤ t₀ i j := by
+    intro i j
+    by_cases h : i = j
+    · simp [ht₀, h]
+    · simp [ht₀, h, hpos i j]
+  have hconn₀ : ConnectedByExchangeBonds (nagaokaBondGraph N t₀) := by
+    rw [ht₀, nagaokaBondGraph_zeroDiag]; exact hconn
+  have hcap := nagaokaConnectivity_of_connectedByExchangeBonds N t₀ hN htsym₀ htdiag₀ hpos₀ hconn₀
+  intro m
+  have hPF : nagaokaPFMatrixOnSector N t m = nagaokaPFMatrixOnSector N t₀ m := by
+    unfold nagaokaPFMatrixOnSector tasakiEffReMatrixOnSector
+    rw [ht₀, tasakiEffReMatrix_zeroDiag]
+  rw [hPF]
+  exact hcap m
 
 end LatticeSystem.Fermion
