@@ -63,4 +63,38 @@ theorem ker_mulVecLin_eq_span_specialBasis
     rw [finrank_ker_mulVecLin_eq_generalFlatBandDim, hcard]
   exact (Submodule.eq_of_le_of_finrank_le hspan_le (by rw [hfr_span, hfr_ker])).symm
 
+/-- The `μ`-Slater Fock submodule is invariant under each special-basis mode creation
+`â†_{μ_z,σ}` (prepending the mode to a Slater list). -/
+theorem generalFlatBandCreation_mulVec_mem_fockSubmodule (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (z : Fin (M + 1)) (σ : Fin 2) {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
+    (hv : v ∈ generalFlatBandFockSubmodule μ) :
+    (generalFlatBandCreation μ z σ).mulVec v ∈ generalFlatBandFockSubmodule μ := by
+  refine Submodule.span_induction ?_ ?_ ?_ ?_ hv
+  · rintro _ ⟨qs, rfl⟩
+    rw [generalFlatBandCreation_mulVec_slaterState]
+    exact generalFlatBandSlaterState_mem_fockSubmodule μ _
+  · rw [Matrix.mulVec_zero]; exact Submodule.zero_mem _
+  · intro x y _ _ hx hy; rw [Matrix.mulVec_add]; exact Submodule.add_mem _ hx hy
+  · intro a x _ hx; rw [Matrix.mulVec_smul]; exact Submodule.smul_mem _ a hx
+
+/-- **The `μ`-Slater Fock submodule is invariant under `Ĉ†_σ(w)` for every `w ∈ span{μ_z}` (= ker T)**:
+since `w` is a combination of the `μ_z`, the smeared creator is a combination of the mode creators,
+each of which keeps the submodule invariant. -/
+theorem spinfulCreationFromVector_span_mulVec_mem_fockSubmodule
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (σ : Fin 2) {w : Fin (M + 1) → ℂ}
+    (hw : w ∈ Submodule.span ℂ (Set.range (fun z : I => (μ z.1 : Fin (M + 1) → ℂ))))
+    {v : (Fin (2 * M + 2) → Fin 2) → ℂ} (hv : v ∈ generalFlatBandFockSubmodule μ) :
+    (spinfulCreationFromVector M w σ).mulVec v ∈ generalFlatBandFockSubmodule μ := by
+  induction hw using Submodule.span_induction with
+  | mem w' hw' =>
+    obtain ⟨z, rfl⟩ := hw'
+    exact generalFlatBandCreation_mulVec_mem_fockSubmodule μ z.1 σ hv
+  | zero =>
+    rw [spinfulCreationFromVector_zero, Matrix.zero_mulVec]; exact Submodule.zero_mem _
+  | add x y _ _ hx hy =>
+    rw [spinfulCreationFromVector_add, Matrix.add_mulVec]; exact Submodule.add_mem _ hx hy
+  | smul a x _ hx =>
+    rw [spinfulCreationFromVector_smul, Matrix.smul_mulVec]; exact Submodule.smul_mem _ a hx
+
 end LatticeSystem.Fermion
