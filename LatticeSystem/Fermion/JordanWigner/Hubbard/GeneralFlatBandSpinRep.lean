@@ -19,6 +19,7 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 namespace LatticeSystem.Fermion
 
 open Matrix LatticeSystem.Quantum Module
+open scoped ComplexOrder
 
 variable {M : ℕ}
 
@@ -66,9 +67,9 @@ theorem generalFlatBandSlaterState_eq_generalModeMonomial
   intro q hq
   rw [Function.comp_apply, generalFlatBandCreation, ← hidx q.1 (hqs q hq)]
 
-/-- The **`I`-mode `μ`-Slater Fock submodule**: the span of the `μ`-Slater states whose modes all lie
-in the index set `I` (the tight version of `generalFlatBandFockSubmodule`, in which a ground state
-actually lives — PR6 builds it from `ker T = span{μ_z}` creations only). -/
+/-- The **`I`-mode `μ`-Slater Fock submodule**: the span of the `μ`-Slater states whose modes all
+lie in the index set `I` (the tight version of `generalFlatBandFockSubmodule`, in which a ground
+state actually lives — PR6 builds it from `ker T = span{μ_z}` creations only). -/
 noncomputable def generalFlatBandIModeFockSubmodule (I : Finset (Fin (M + 1)))
     (μ : Fin (M + 1) → Fin (M + 1) → ℂ) : Submodule ℂ ((Fin (2 * M + 2) → Fin 2) → ℂ) :=
   Submodule.span ℂ
@@ -115,5 +116,48 @@ theorem spinfulCreationFromVector_span_mulVec_mem_imode {I : Finset (Fin (M + 1)
     rw [spinfulCreationFromVector_add, Matrix.add_mulVec]; exact Submodule.add_mem _ hx hy
   | smul a x _ hx =>
     rw [spinfulCreationFromVector_smul, Matrix.smul_mulVec]; exact Submodule.smul_mem _ a hx
+
+/-- A flat-mode eigenbasis monomial lies in the `I`-mode submodule (tight version of PR6). -/
+theorem generalModeMonomial_mem_imode {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    (hT : T.IsHermitian) {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (qs : List (Fin (M + 1) × Fin 2))
+    (hqs : ∀ q ∈ qs, (eigenbasisAsBasis hT q.1 : Fin (M + 1) → ℂ)
+      ∈ Submodule.span ℂ (Set.range (fun z : I => (μ z.1 : Fin (M + 1) → ℂ)))) :
+    generalModeMonomial (eigenbasisAsBasis hT) qs ∈ generalFlatBandIModeFockSubmodule I μ := by
+  induction qs with
+  | nil =>
+    have hvac := generalFlatBandSlaterState_mem_imode (I := I) (μ := μ)
+      ([] : List (Fin (M + 1) × Fin 2)) (by simp)
+    simpa only [generalModeMonomial, generalFlatBandSlaterState, List.map_nil, List.prod_nil]
+      using hvac
+  | cons q qs' ih =>
+    obtain ⟨q1, q2⟩ := q
+    rw [← spinfulCreation_mulVec_generalModeMonomial (eigenbasisAsBasis hT) q1 q2 qs']
+    exact spinfulCreationFromVector_span_mulVec_mem_imode q2
+      (hqs (q1, q2) List.mem_cons_self)
+      (ih fun q' hq' => hqs q' (List.mem_cons_of_mem _ hq'))
+
+/-- **A flat-band ground state lies in the `I`-mode `μ`-Slater Fock submodule** (the tight transport
+of eq. (11.3.46)): the flat-supported eigenbasis monomials use only flat eigenvectors, each in
+`ker T = span{μ_z}`, so the `I`-mode submodule's invariance under index-mode creation carries `Φ`
+into it. -/
+theorem flatBand_groundState_mem_imode {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ) (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U) :
+    Φ ∈ generalFlatBandIModeFockSubmodule I μ := by
+  have heig : ∀ j : Fin (M + 1), hT.1.eigenvalues j = 0 →
+      (eigenbasisAsBasis hT.1 j : Fin (M + 1) → ℂ)
+        ∈ Submodule.span ℂ (Set.range (fun z : I => (μ z.1 : Fin (M + 1) → ℂ))) := by
+    intro j hj
+    rw [← ker_mulVecLin_eq_span_specialBasis hbasis, LinearMap.mem_ker, Matrix.mulVecLin_apply,
+      eigenbasisAsBasis_mulVec hT.1 j, hj, Complex.ofReal_zero, zero_smul]
+  refine (Submodule.span_le.mpr ?_) (flatBand_groundState_atFilling_mem_flatFockSpan hT U hU hΦ)
+  rintro _ ⟨g, hf, _, rfl⟩
+  refine generalModeMonomial_mem_imode (I := I) hT.1 _ fun q hq => ?_
+  have hgq : g q = 1 := by
+    have := Finset.mem_toList.mp hq
+    simpa only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and] using this
+  exact heig q.1 (hf q.1 q.2 (by rw [← hgq]))
 
 end LatticeSystem.Fermion
