@@ -47,4 +47,23 @@ theorem exists_extended_special_basis
   refine ⟨e ⟨μ z, hmem⟩, ?_⟩
   rw [Module.Basis.reindex_apply, Equiv.symm_apply_apply, hb, Basis.coe_extend]
 
+/-- **A μ-Slater state is a mode monomial over the extended basis** `eμ`: since `eμ(idx z) = μ_z`,
+the special-basis creators are mode creators of `eμ`, so `generalFlatBandSlaterState μ qs` (with all
+modes in `I`) equals `generalModeMonomial eμ (qs ↦ (idx z, σ))`.  This carries the μ-Slater states
+into the general occupation basis (`generalOccBasis eμ`), giving their linear independence for
+free. -/
+theorem generalFlatBandSlaterState_eq_generalModeMonomial
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (idx : Fin (M + 1) → Fin (M + 1))
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    (qs : List (Fin (M + 1) × Fin 2)) (hqs : ∀ q ∈ qs, q.1 ∈ I) :
+    generalFlatBandSlaterState μ qs
+      = generalModeMonomial eμ (qs.map (fun q => (idx q.1, q.2))) := by
+  unfold generalFlatBandSlaterState generalModeMonomial
+  rw [List.map_map]
+  congr 2
+  apply List.map_congr_left
+  intro q hq
+  rw [Function.comp_apply, generalFlatBandCreation, ← hidx q.1 (hqs q hq)]
+
 end LatticeSystem.Fermion
