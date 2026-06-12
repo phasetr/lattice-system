@@ -364,4 +364,18 @@ theorem spinfulAnnihilationFromVector_conjTranspose (M : ℕ)
   rw [Matrix.conjTranspose_smul, fermionMultiAnnihilation_conjTranspose]
   rfl
 
+/-- Expansion of the normal-ordered product `Ĉ†_σ(φ)·Ĉ_σ(ψ)` into the double sum of sitewise
+`c†c` hopping terms (the Gram building block of the kinetic operator). -/
+theorem spinfulCreation_mul_annihilationFromVector_expand (M : ℕ)
+    (φ ψ : Fin (M + 1) → ℂ) (σ : Fin 2) :
+    spinfulCreationFromVector M φ σ * spinfulAnnihilationFromVector M ψ σ
+      = ∑ i : Fin (M + 1), ∑ j : Fin (M + 1), (φ i * ψ j) •
+          (fermionMultiCreation (2 * M + 1) (spinfulIndex M i σ) *
+            fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M j σ)) := by
+  simp only [spinfulCreationFromVector, spinfulAnnihilationFromVector, Finset.sum_mul,
+    Finset.mul_sum, Finset.smul_sum, smul_mul_assoc, mul_smul_comm, smul_smul]
+  rw [Finset.sum_comm]
+  exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by
+    rw [mul_comm (ψ j) (φ i)]
+
 end LatticeSystem.Fermion
