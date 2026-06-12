@@ -66,4 +66,54 @@ theorem generalFlatBandSlaterState_eq_generalModeMonomial
   intro q hq
   rw [Function.comp_apply, generalFlatBandCreation, ← hidx q.1 (hqs q hq)]
 
+/-- The **`I`-mode `μ`-Slater Fock submodule**: the span of the `μ`-Slater states whose modes all lie
+in the index set `I` (the tight version of `generalFlatBandFockSubmodule`, in which a ground state
+actually lives — PR6 builds it from `ker T = span{μ_z}` creations only). -/
+noncomputable def generalFlatBandIModeFockSubmodule (I : Finset (Fin (M + 1)))
+    (μ : Fin (M + 1) → Fin (M + 1) → ℂ) : Submodule ℂ ((Fin (2 * M + 2) → Fin 2) → ℂ) :=
+  Submodule.span ℂ
+    {v | ∃ qs : List (Fin (M + 1) × Fin 2),
+      (∀ q ∈ qs, q.1 ∈ I) ∧ generalFlatBandSlaterState μ qs = v}
+
+/-- An `I`-mode `μ`-Slater state lies in the `I`-mode submodule. -/
+theorem generalFlatBandSlaterState_mem_imode {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (qs : List (Fin (M + 1) × Fin 2))
+    (hqs : ∀ q ∈ qs, q.1 ∈ I) :
+    generalFlatBandSlaterState μ qs ∈ generalFlatBandIModeFockSubmodule I μ :=
+  Submodule.subset_span ⟨qs, hqs, rfl⟩
+
+/-- The `I`-mode submodule is invariant under each index-mode creation `â†_{μ_z,σ}` with `z ∈ I`. -/
+theorem generalFlatBandCreation_mulVec_mem_imode {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} {z : Fin (M + 1)} (hz : z ∈ I) (σ : Fin 2)
+    {v : (Fin (2 * M + 2) → Fin 2) → ℂ} (hv : v ∈ generalFlatBandIModeFockSubmodule I μ) :
+    (generalFlatBandCreation μ z σ).mulVec v ∈ generalFlatBandIModeFockSubmodule I μ := by
+  refine Submodule.span_induction ?_ ?_ ?_ ?_ hv
+  · rintro _ ⟨qs, hqs, rfl⟩
+    rw [generalFlatBandCreation_mulVec_slaterState]
+    refine generalFlatBandSlaterState_mem_imode _ ?_
+    intro q hq
+    rcases List.mem_cons.mp hq with h | h
+    · rw [h]; exact hz
+    · exact hqs q h
+  · rw [Matrix.mulVec_zero]; exact Submodule.zero_mem _
+  · intro x y _ _ hx hy; rw [Matrix.mulVec_add]; exact Submodule.add_mem _ hx hy
+  · intro a x _ hx; rw [Matrix.mulVec_smul]; exact Submodule.smul_mem _ a hx
+
+/-- The `I`-mode submodule is invariant under `Ĉ†_σ(w)` for every `w ∈ span{μ_z}` (= ker T). -/
+theorem spinfulCreationFromVector_span_mulVec_mem_imode {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (σ : Fin 2) {w : Fin (M + 1) → ℂ}
+    (hw : w ∈ Submodule.span ℂ (Set.range (fun z : I => (μ z.1 : Fin (M + 1) → ℂ))))
+    {v : (Fin (2 * M + 2) → Fin 2) → ℂ} (hv : v ∈ generalFlatBandIModeFockSubmodule I μ) :
+    (spinfulCreationFromVector M w σ).mulVec v ∈ generalFlatBandIModeFockSubmodule I μ := by
+  induction hw using Submodule.span_induction with
+  | mem w' hw' =>
+    obtain ⟨z, rfl⟩ := hw'
+    exact generalFlatBandCreation_mulVec_mem_imode z.2 σ hv
+  | zero =>
+    rw [spinfulCreationFromVector_zero, Matrix.zero_mulVec]; exact Submodule.zero_mem _
+  | add x y _ _ hx hy =>
+    rw [spinfulCreationFromVector_add, Matrix.add_mulVec]; exact Submodule.add_mem _ hx hy
+  | smul a x _ hx =>
+    rw [spinfulCreationFromVector_smul, Matrix.smul_mulVec]; exact Submodule.smul_mem _ a hx
+
 end LatticeSystem.Fermion
