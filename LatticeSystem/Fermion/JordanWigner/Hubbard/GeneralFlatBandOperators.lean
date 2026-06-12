@@ -695,4 +695,14 @@ theorem spinfulCreationFromVector_conjTranspose (M : ℕ)
   rw [Matrix.conjTranspose_smul, fermionMultiCreation_conjTranspose]
   rfl
 
+/-- **A zero-eigenvalue eigenvector lies in the flat band `ker T`**: the spectral basis splits the
+single-particle space into the flat band (zero eigenvalues) and its orthocomplement `range T`
+(nonzero eigenvalues), the basis for the full Fock decomposition toward eq. (11.3.46). -/
+theorem eigenvectorBasis_mem_ker_of_eigenvalue_eq_zero
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : T.IsHermitian) (j : Fin (M + 1))
+    (hj : hT.eigenvalues j = 0) :
+    T.mulVec (⇑(hT.eigenvectorBasis j)) = 0 := by
+  rw [hT.mulVec_eigenvectorBasis, hj]
+  exact zero_smul _ _
+
 end LatticeSystem.Fermion
