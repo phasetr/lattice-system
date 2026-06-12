@@ -139,4 +139,31 @@ theorem eigenNumberOp_mulVec_generalModeMonomial {T : Matrix (Fin (M + 1)) (Fin 
         h ⟨(Prod.ext_iff.mp he).1.symm, (Prod.ext_iff.mp he).2.symm⟩)]
       ring
 
+/-- **The number operator is diagonal in the occupation monomials**:
+`n̂_{j,σ} occMon(g) = g(j,σ)·occMon(g)`.  Specialising the count to the (nodup) occupied list of
+`g`, where `(j,σ)` appears once iff `g(j,σ) = 1`. -/
+theorem eigenNumberOp_mulVec_generalOccMonomial {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    (hT : T.IsHermitian) (j : Fin (M + 1)) (σ : Fin 2) (g : Fin (M + 1) × Fin 2 → Fin 2) :
+    (eigenNumberOp hT j σ).mulVec (generalOccMonomial (eigenbasisAsBasis hT) g)
+      = (if g (j, σ) = 1 then (1 : ℂ) else 0)
+        • generalOccMonomial (eigenbasisAsBasis hT) g := by
+  rw [generalOccMonomial, eigenNumberOp_mulVec_generalModeMonomial]
+  congr 1
+  by_cases h : (j, σ) ∈ generalOccFinset g
+  · rw [List.count_eq_one_of_mem (generalOccFinset g).nodup_toList (Finset.mem_toList.mpr h),
+      Nat.cast_one, if_pos (by simpa [generalOccFinset] using h)]
+  · rw [List.count_eq_zero_of_not_mem (by simpa using h), Nat.cast_zero,
+      if_neg (by simpa [generalOccFinset] using h)]
+
+/-- **A flat-band ground state is killed by the number operator of every nonzero-eigenvalue mode**:
+`n̂_{j,σ} Φ = Ĉ†_σ(e_j)·(Ĉ_σ(ē_j)·Φ) = Ĉ†_σ(e_j)·0 = 0` (PR1 + `groundState_eigenModeAnnihilation`). -/
+theorem groundState_eigenNumberOp_mulVec_eq_zero
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ}
+    (hΦ : rayleighOnVec (hubbardHamiltonian M T (U : ℂ)) Φ = 0) (σ : Fin 2) (j : Fin (M + 1))
+    (hj : hT.1.eigenvalues j ≠ 0) :
+    (eigenNumberOp hT.1 j σ).mulVec Φ = 0 := by
+  rw [eigenNumberOp, ← Matrix.mulVec_mulVec,
+    groundState_eigenModeAnnihilation_eq_zero hT U hU hΦ σ j hj, Matrix.mulVec_zero]
+
 end LatticeSystem.Fermion
