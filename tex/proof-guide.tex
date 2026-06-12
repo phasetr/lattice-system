@@ -6490,9 +6490,23 @@ in }qs)\,|qs\rangle$.  The operator identity $\hat n^\mu_{z,\uparrow}\hat n^\mu_
 =\hat a^\dagger_{\mu_z,\uparrow}\hat a^\dagger_{\mu_z,\downarrow}\,(\hat c_{z,\downarrow}\hat
 c_{z,\uparrow})$ together with the zero-energy condition $\hat c_{z,\downarrow}\hat
 c_{z,\uparrow}\Phi=0$ ($\hat H_{\rm int}\Phi=0$) gives \textbf{no double occupancy of the index
-modes}, $\hat n^\mu_{z,\uparrow}\hat n^\mu_{z,\downarrow}\Phi=0$.  The linear independence of the
-$\mu$-occupation states and the resulting one-spin-per-index decomposition (eq.~(11.3.47)) and the
-sign propagation (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
+modes}, $\hat n^\mu_{z,\uparrow}\hat n^\mu_{z,\downarrow}\Phi=0$.
+
+\medskip\noindent\textbf{Theorem 11.17 PR8, the tight $I$-mode transport (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandSpinRep.lean}).}  To extract the occupation coefficients we need a
+basis adapted to the index modes.  The special basis $\{\mu_z\}_{z\in I}$ is linearly independent, so
+it extends to a basis $e_\mu$ of the whole single-particle space (\texttt{exists\_extended\_special\_%
+basis}, via \texttt{Module.Basis.extend}); each $\mu_z$ is some $e_\mu(\mathrm{idx}\,z)$, so an
+$I$-mode $\mu$-Slater state equals a mode monomial over $e_\mu$ (\texttt{generalFlatBandSlaterState\_%
+eq\_generalModeMonomial}), carrying it into the general occupation basis $\texttt{generalOccBasis}\
+e_\mu$ and giving its linear independence.  Since PR6 builds a ground state only from $\ker T=%
+\operatorname{span}\{\mu_z\}$ creations, it actually lives in the \emph{tight} $I$-mode $\mu$-Slater
+submodule \texttt{generalFlatBandIModeFockSubmodule} (the span of $\mu$-Slater states whose modes all
+lie in $I$), which is invariant under index-mode creation and contains the ground state
+(\texttt{flatBand\_groundState\_mem\_imode}) --- resolving the subtlety that $\mu_z$ is unconstrained
+for $z\notin I$.  The coefficient extraction (no double occupancy + filling $\Rightarrow$ one spin
+per index, eq.~(11.3.47)) and the sign propagation (eqs.~(11.3.48)/(11.3.49)) toward the connectivity
+capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
 §11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
