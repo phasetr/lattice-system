@@ -5,7 +5,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandMuTransport
 
 After the transport to the special basis (PR6), a flat-band ground state at filling `D₀` lies in the
 `μ`-Slater Fock submodule.  Tasaki's eq. (11.3.47) refines this: using `ĉ_{z,↓}ĉ_{z,↑}|Φ⟩ = 0` for
-`z ∈ I` (from `Ĥ_int|Φ⟩ = 0`), there can be no double occupancy of the `â†_{μ_z}` modes, so the ground
+`z ∈ I` (from `Ĥ_int|Φ⟩ = 0`), there can be no double occupancy of the `â†_{μ_z}` modes, so the
+ground
 state is a superposition over spin configurations `σ : I → {↑,↓}` of
 `Π_{z∈I} â†_{μ_z, σ_z}|vac⟩`.
 
@@ -24,7 +25,8 @@ open Matrix LatticeSystem.Quantum
 
 variable {M : ℕ}
 
-/-- **The site-dual CAR on the index set `I`** (Tasaki §11.3.4): for `z, z' ∈ I`, the special basis's
+/-- **The site-dual CAR on the index set `I`** (Tasaki §11.3.4): for `z, z' ∈ I`, the special
+basis's
 localisation `μ_{z'}(z) = δ_{zz'}μ_z(z)` collapses the site-dual anticommutator to
 `{ĉ_{z,σ}, â†_{μ_{z'},τ}} = δ_{στ}·δ_{zz'}·μ_z(z)·1`. -/
 theorem site_annihilation_generalFlatBandCreation_anticomm_localized
@@ -79,5 +81,40 @@ theorem muNumberOp_mul_creation
     · rw [if_neg h, zero_smul, zero_smul]
   rw [muNumberOp, Matrix.mul_assoc, hdual, mul_sub, mul_smul_comm, Matrix.mul_one,
     ← Matrix.mul_assoc, hcc, Matrix.neg_mul, sub_neg_eq_add, hδ, Matrix.mul_assoc]
+
+/-- **The index-mode number operator is diagonal in the `μ`-Slater states**:
+`n̂^μ_{z,σ}|qs⟩ = μ_z(z)·(count of (z,σ) in qs)·|qs⟩` (for a list `qs` of index modes, `z ∈ I`).
+List induction via the commutation, down to `n̂^μ_{z,σ}|vac⟩ = 0`. -/
+theorem muNumberOp_mulVec_generalFlatBandSlaterState
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {z : Fin (M + 1)} (hz : z ∈ I) (σ : Fin 2) (qs : List (Fin (M + 1) × Fin 2))
+    (hqs : ∀ q ∈ qs, q.1 ∈ I) :
+    (muNumberOp μ z σ).mulVec (generalFlatBandSlaterState μ qs)
+      = (μ z z * (qs.count (z, σ) : ℂ)) • generalFlatBandSlaterState μ qs := by
+  induction qs with
+  | nil =>
+    rw [muNumberOp]
+    simp only [generalFlatBandSlaterState, List.map_nil, List.prod_nil, Matrix.one_mulVec,
+      List.count_nil, Nat.cast_zero, mul_zero, zero_smul]
+    rw [← Matrix.mulVec_mulVec, fermionMultiAnnihilation_mulVec_vacuum, Matrix.mulVec_zero]
+  | cons q qs' ih =>
+    obtain ⟨q1, q2⟩ := q
+    have hcons : generalFlatBandSlaterState μ ((q1, q2) :: qs')
+        = (generalFlatBandCreation μ q1 q2).mulVec (generalFlatBandSlaterState μ qs') :=
+      (generalFlatBandCreation_mulVec_slaterState μ q1 q2 qs').symm
+    rw [hcons, Matrix.mulVec_mulVec,
+      muNumberOp_mul_creation hbasis hz (hqs (q1, q2) List.mem_cons_self) σ q2,
+      Matrix.add_mulVec, Matrix.smul_mulVec, ← Matrix.mulVec_mulVec,
+      ih (fun q' hq' => hqs q' (List.mem_cons_of_mem _ hq')), Matrix.mulVec_smul, ← add_smul]
+    congr 1
+    rw [List.count_cons]
+    simp only [beq_iff_eq]
+    push_cast
+    by_cases h : (z, σ) = (q1, q2)
+    · rw [if_pos ⟨(Prod.ext_iff.mp h).2, (Prod.ext_iff.mp h).1⟩, if_pos h.symm]
+      ring
+    · rw [if_neg (fun hc => h (Prod.ext hc.2 hc.1)), if_neg (fun he => h he.symm)]
+      ring
 
 end LatticeSystem.Fermion
