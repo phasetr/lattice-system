@@ -98,6 +98,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandModeMonomial
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandOccBasis
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandEigenbasis
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandSpanning
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandFilling
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SectorMinEnergy
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularHubbardModel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularLocalStability

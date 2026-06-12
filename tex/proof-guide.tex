@@ -6451,8 +6451,19 @@ occupation basis and reading off the coefficient of $g$ gives $c_g\,g(j,\sigma)=
 \textbf{coefficient vanishes}, $c_g=0$, whenever $g$ occupies a nonzero-eigenvalue mode.  Therefore
 $\Phi$ lies in the span of the \emph{flat-supported} occupation monomials (those occupying only
 zero-eigenvalue modes) --- this is \texttt{flatBand\_groundState\_mem\_flatFockSpan}, eq.~(11.3.46).
-The spin representation (eq.~(11.3.47)) and the sign propagation (eqs.~(11.3.48)/(11.3.49)) toward
-the connectivity capstone are the subsequent PRs.
+
+\medskip\noindent\textbf{Theorem 11.17 PR5, filling refinement (Tasaki §11.3.4, Issue \#4363,
+\texttt{GeneralFlatBandFilling.lean}).}  The same diagonalisation argument applies to the
+\emph{total} fermion number $\hat N$: from the basis-independent raising relation
+$[\hat N,\hat C^\dagger_\sigma(w)]=\hat C^\dagger_\sigma(w)$, induction on a mode monomial gives
+$\hat N\,\mathrm{occMon}(g)=|\mathrm{occupied}(g)|\,\mathrm{occMon}(g)$, so $\hat N$ is diagonal in
+the occupation basis with eigenvalue the particle count.  A $D_0$-electron ground state
+($\hat N\Phi=D_0\Phi$) therefore has occupation-basis coefficients supported on the $D_0$-electron
+configurations; combined with eq.~(11.3.46) this yields
+\texttt{flatBand\_groundState\_atFilling\_mem\_flatFockSpan}: $\Phi$ lies in the span of the
+flat-supported occupation monomials with \emph{exactly} $D_0$ occupied modes.  The spin
+representation (eq.~(11.3.47)) and the sign propagation (eqs.~(11.3.48)/(11.3.49)) toward the
+connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
 §11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
