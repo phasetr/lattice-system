@@ -524,4 +524,35 @@ theorem hubbardKinetic_conjTranspose_mul_self_eq_gram_sum (M : ℕ)
         rw [← Finset.sum_smul]
         congr 1
 
+open scoped ComplexOrder in
+/-- **Ground-state annihilation by every row mode**: if the kinetic Rayleigh expectation of `v`
+vanishes (for a factored hopping `T = Cᴴ·C`), then each smeared annihilation `Ĉ_σ(C_k) v = 0`.
+Each Gram term `(Ĉ_σ(C_k))ᴴ Ĉ_σ(C_k)` is PSD with nonnegative expectation; they sum to zero, so
+each vanishes, and the PSD kernel kills `Ĉ_σ(C_k) v`.  This is the operative consequence of the
+flat-band ground condition toward eq. (11.3.46). -/
+theorem spinfulAnnihilationFromVector_mulVec_eq_zero_of_kinetic_rayleigh_zero (M : ℕ)
+    (C : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ)
+    {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
+    (h : rayleighOnVec (hubbardKinetic M (Cᴴ * C)) v = 0) (k : Fin (M + 1)) (σ : Fin 2) :
+    (spinfulAnnihilationFromVector M (fun j => C k j) σ).mulVec v = 0 := by
+  have hnonneg : ∀ (σ' : Fin 2) (k' : Fin (M + 1)),
+      0 ≤ rayleighOnVec
+        ((spinfulAnnihilationFromVector M (fun j => C k' j) σ')ᴴ *
+          spinfulAnnihilationFromVector M (fun j => C k' j) σ') v :=
+    fun σ' k' => (Matrix.posSemidef_conjTranspose_mul_self _).re_dotProduct_nonneg v
+  rw [hubbardKinetic_conjTranspose_mul_self_eq_gram_sum, rayleighOnVec_sum] at h
+  simp only [rayleighOnVec_sum] at h
+  have hσ : (∑ k' : Fin (M + 1), rayleighOnVec
+      ((spinfulAnnihilationFromVector M (fun j => C k' j) σ)ᴴ *
+        spinfulAnnihilationFromVector M (fun j => C k' j) σ) v) = 0 :=
+    (Finset.sum_eq_zero_iff_of_nonneg
+      (fun σ' _ => Finset.sum_nonneg fun k' _ => hnonneg σ' k')).mp h σ (Finset.mem_univ σ)
+  have hterm : rayleighOnVec
+      ((spinfulAnnihilationFromVector M (fun j => C k j) σ)ᴴ *
+        spinfulAnnihilationFromVector M (fun j => C k j) σ) v = 0 :=
+    (Finset.sum_eq_zero_iff_of_nonneg (fun k' _ => hnonneg σ k')).mp hσ k (Finset.mem_univ k)
+  have hker := posSemidef_mulVec_eq_zero_of_rayleighOnVec_zero
+    (Matrix.posSemidef_conjTranspose_mul_self _) hterm
+  exact conjTranspose_mul_self_mulVec_eq_zero hker
+
 end LatticeSystem.Fermion
