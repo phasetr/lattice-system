@@ -2,6 +2,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinfulVectorOperator
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBand
 import LatticeSystem.Math.RayleighPosSemidefKernel
 import LatticeSystem.Math.PosSemidef.Basics
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandPosSemidef
 
 /-!
 # General flat-band mode operators (Tasaki §11.3.4, toward Theorem 11.17)
@@ -426,5 +427,47 @@ theorem hubbardKinetic_posSemidef_of_posSemidef (M : ℕ)
   rw [key]
   exact Matrix.posSemidef_sum _ fun σ _ =>
     Matrix.posSemidef_sum _ fun k _ => Matrix.posSemidef_conjTranspose_mul_self _
+
+open scoped ComplexOrder in
+/-- **No double occupancy for a general flat-band ground state** (Tasaki eq. (11.3.12), general
+form): for a positive-semidefinite hopping `T` and `U > 0`, any vector with vanishing Hamiltonian
+expectation satisfies `n̂_{x↑} n̂_{x↓} v = 0` at every site `x`.  The Rayleigh expectation splits
+into the (PSD) kinetic part and `U` times the summed (PSD) double-occupancy expectations; all are
+nonnegative and sum to zero, so each double-occupancy term vanishes, and the PSD kernel kills the
+operator on `v`. -/
+theorem generalFlatBand_groundState_doubleOccupancy_mulVec_eq_zero (M : ℕ)
+    (T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (U : ℝ) (hT : T.PosSemidef) (hU : 0 < U)
+    {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
+    (hv : rayleighOnVec (hubbardHamiltonian M T (U : ℂ)) v = 0) (x : Fin (M + 1)) :
+    (hubbardDoubleOccupancy M x).mulVec v = 0 := by
+  have hkin_nonneg : 0 ≤ rayleighOnVec (hubbardKinetic M T) v :=
+    (hubbardKinetic_posSemidef_of_posSemidef M T hT).re_dotProduct_nonneg v
+  have hint_nonneg : ∀ x' : Fin (M + 1),
+      0 ≤ rayleighOnVec (hubbardDoubleOccupancy M x') v :=
+    fun x' => (hubbardDoubleOccupancy_posSemidef M x').re_dotProduct_nonneg v
+  have hdec := hubbardHamiltonian_rayleighOnVec_decompose_general M T U v
+  rw [hv] at hdec
+  have hInt : (0 : ℝ) ≤ ∑ x' : Fin (M + 1), rayleighOnVec (hubbardDoubleOccupancy M x') v :=
+    Finset.sum_nonneg (fun x' _ => hint_nonneg x')
+  have hIntZero : (∑ x' : Fin (M + 1), rayleighOnVec (hubbardDoubleOccupancy M x') v) = 0 := by
+    nlinarith [mul_nonneg hU.le hInt, hkin_nonneg, hdec]
+  have hterm : rayleighOnVec (hubbardDoubleOccupancy M x) v = 0 :=
+    (Finset.sum_eq_zero_iff_of_nonneg (fun x' _ => hint_nonneg x')).mp hIntZero x
+      (Finset.mem_univ x)
+  exact posSemidef_mulVec_eq_zero_of_rayleighOnVec_zero
+    (hubbardDoubleOccupancy_posSemidef M x) hterm
+
+open scoped ComplexOrder in
+/-- **`ĉ_{x↓} ĉ_{x↑} v = 0`** for any general flat-band ground state `v` (the operator form of the
+no-double-occupancy condition used in eq. (11.3.48)): from `n̂_{x↑} n̂_{x↓} v = 0` and the Gram
+identity, by the positive-semidefinite kernel. -/
+theorem generalFlatBand_groundState_doubleAnnihilation_mulVec_eq_zero (M : ℕ)
+    (T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (U : ℝ) (hT : T.PosSemidef) (hU : 0 < U)
+    {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
+    (hv : rayleighOnVec (hubbardHamiltonian M T (U : ℂ)) v = 0) (x : Fin (M + 1)) :
+    (generalCDownUp M x).mulVec v = 0 := by
+  have hdo := generalFlatBand_groundState_doubleOccupancy_mulVec_eq_zero M T U hT hU hv x
+  rw [hubbardDoubleOccupancy_eq_conjTranspose_mul_self_general] at hdo
+  exact conjTranspose_mul_self_mulVec_eq_zero hdo
 
 end LatticeSystem.Fermion
