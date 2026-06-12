@@ -705,6 +705,20 @@ theorem eigenvectorBasis_mem_ker_of_eigenvalue_eq_zero
   rw [hT.mulVec_eigenvectorBasis, hj]
   exact zero_smul _ _
 
+/-- **A nonzero-eigenvalue eigenvector lies in `range T`**: companion to
+`eigenvectorBasis_mem_ker_of_eigenvalue_eq_zero`. Together they classify every spectral basis
+vector into the flat band `ker T` or its orthocomplement `range T`, the decomposition driving the
+Fock-space spanning of eq. (11.3.46). -/
+theorem eigenvectorBasis_mem_range_of_eigenvalue_ne_zero
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : T.IsHermitian) (j : Fin (M + 1))
+    (hj : hT.eigenvalues j ≠ 0) :
+    ∃ w : Fin (M + 1) → ℂ, T.mulVec w = ⇑(hT.eigenvectorBasis j) := by
+  refine mem_range_mulVec_of_eigenvalue_ne_zero T (lam := (hT.eigenvalues j : ℂ))
+    (by exact_mod_cast hj) ?_
+  rw [hT.mulVec_eigenvectorBasis]
+  funext i
+  simp [Complex.real_smul]
+
 /-- `Ĉ†_σ` is additive in its single-particle state: `Ĉ†_σ(φ + ψ) = Ĉ†_σ(φ) + Ĉ†_σ(ψ)`. -/
 theorem spinfulCreationFromVector_add (M : ℕ) (φ ψ : Fin (M + 1) → ℂ) (σ : Fin 2) :
     spinfulCreationFromVector M (φ + ψ) σ
