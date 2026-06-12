@@ -6414,6 +6414,25 @@ $f$) still span $\top$, and there are $2^{2(M+1)}=\dim$ of them, giving the \tex
 occupation basis} (\texttt{generalOccBasis}).  This is the Fock-space scaffolding for the
 eq.~(11.3.46) spanning step of the next PR.
 
+\medskip\noindent\textbf{Theorem 11.17 PR3, the spectral-eigenbasis annihilation peel (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandEigenbasis.lean}).}  To detect which modes a ground
+state occupies, the occupation basis is built on the \emph{orthonormal eigenbasis} of the hopping
+matrix.  The eigenbasis $T.\mathtt{IsHermitian.eigenvectorBasis}$ (on
+$\mathrm{EuclideanSpace}\,\mathbb C\,(\mathrm{Fin}(M{+}1))$) transports to a \texttt{Module.Basis}
+of the plain coordinate space $\mathrm{Fin}(M{+}1)\to\mathbb C$ (\texttt{eigenbasisAsBasis}, via
+\texttt{OrthonormalBasis.toBasis} and \texttt{WithLp.linearEquiv}).  Its coordinate orthonormality
+$\sum_x \overline{e_j(x)}\,e_k(x)=\delta_{jk}$ collapses the bilinear CAR coefficient, giving the
+\emph{dual canonical anticommutation relation}
+$\{\hat C_\sigma(\bar e_j),\hat C^\dagger_\tau(e_k)\}=\delta_{jk}\delta_{\sigma\tau}\cdot\mathbf 1$.
+Together with the smeared-annihilator vacuum kill $\hat C_\sigma(\varphi)|\mathrm{vac}\rangle=0$,
+moving $\hat C_\sigma(\bar e_j)$ rightward through a mode monomial yields the
+\textbf{eigenbasis-annihilation peel}
+$\hat C_\sigma(\bar e_j)\,|qs\rangle = \sum_i (-1)^i\,\delta_{j,(qs_i)_1}\delta_{\sigma,(qs_i)_2}\,
+|qs\setminus i\rangle$ — the operator removes the mode $(j,\sigma)$ wherever it occurs (Koszul
+sign), and annihilates a monomial not containing it.  This is the occupation-detection engine for
+the eq.~(11.3.46) hard direction (a flat-band ground state, annihilated by every nonzero-eigenvalue
+mode $\hat C_\sigma(\bar e_j)$, has occupation only on the flat band), completed in the next PR.
+
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
 §11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
 on the precise definition of \emph{exhibiting ferromagnetism}.  For a many-body Hamiltonian
