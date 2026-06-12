@@ -6378,8 +6378,14 @@ $T=C^{\mathsf H}C$ gives the Gram-sum factorisation
 $\hat H_{\rm hop}=\sum_\sigma\sum_k (\hat C_\sigma(C_k))^{\mathsf H}\hat C_\sigma(C_k)\ge0$.
 Consequently a flat-band ground state at filling $N=D_0$ (zero Rayleigh quotient, $U>0$) has
 \emph{no double occupancy} ($\hat n_{x,\uparrow}\hat n_{x,\downarrow}\Phi=0$,
-$\hat c_{x,\downarrow}\hat c_{x,\uparrow}\Phi=0$) and is annihilated by $\hat C_\sigma(w)$ for
-\emph{every} $w\in\operatorname{range}T=(\ker T)^\perp$.  The single-particle space is split by
+$\hat c_{x,\downarrow}\hat c_{x,\uparrow}\Phi=0$) and is annihilated by $\hat C_\sigma(\bar w)$ for
+\emph{every} $w\in\operatorname{range}T$.  (The smeared annihilator is $\mathbb C$-\emph{linear},
+so the exact killing space is the row span of the positive square root $C$ of $T=C^{\mathsf H}C$,
+which equals $\overline{\operatorname{range}T}$: writing $b=Cw$, the identity
+$\overline{(Tw)_x}=\sum_k C_{kx}\overline{b_k}$ exhibits $\overline{Tw}$ as a row combination, giving
+$\hat C_\sigma(\overline{Tw})\Phi=0$; for an \emph{orthonormal} eigenbasis the operator detecting
+occupation of a nonzero-eigenvalue mode $u$ is exactly $\hat C_\sigma(\bar u)$, so this is the form
+the Fock-spanning step consumes.)  The single-particle space is split by
 the Hermitian spectral theorem (\texttt{IsHermitian.eigenvectorBasis}): zero-eigenvalue
 eigenvectors lie in the flat band $\ker T$, nonzero-eigenvalue eigenvectors lie in
 $\operatorname{range}T$, and every $v$ decomposes as $v_{\ker}+v_{\rm range}$

@@ -186,7 +186,16 @@ noncomputable def generalFlatBandSlaterState (μ : Fin (M + 1) → Fin (M + 1) �
     (fermionMultiVacuum (2 * M + 1))
 
 /-- The **general flat-band Fock subspace**: the span of all `â†`-Slater states of a special
-basis — the right-hand side of Tasaki's eq. (11.3.46). -/
+basis — the right-hand side of Tasaki's eq. (11.3.46), mirroring the proved Theorem 11.11
+`flatBandAlphaFockSubmodule` (`TasakiFlatBandSubspaces.lean`).
+
+Note: like its Theorem 11.11 model, this span ranges over arbitrary-length lists with possibly
+repeated/empty modes, so it contains the vacuum and lower-filling states; it is *not* yet
+restricted to the `D₀`-electron sector.  That restriction is supplied separately by intersecting
+with the number eigenspace at `generalFlatBandGroundSubmodule` (`= ker Ĥ ⊓` `N̂`-eigenspace at
+`D₀`); the fixed-filling, one-spin-per-index coefficient structure of eqs. (11.3.47)–(11.3.49)
+emerges from that intersection together with the no-double-occupancy and connectivity arguments
+of the subsequent PRs, exactly as in the Theorem 11.11 chain. -/
 noncomputable def generalFlatBandFockSubmodule (μ : Fin (M + 1) → Fin (M + 1) → ℂ) :
     Submodule ℂ ((Fin (2 * M + 2) → Fin 2) → ℂ) :=
   Submodule.span ℂ (Set.range (generalFlatBandSlaterState μ))
@@ -673,6 +682,56 @@ theorem spinfulAnnihilation_rangeT_mulVec_eq_zero_of_mem_groundSubmodule
           = 0 :=
   spinfulAnnihilation_rangeT_mulVec_eq_zero_of_groundState M T U hT hU
     (hamiltonian_rayleigh_zero_of_mem_groundSubmodule T U hΦ) σ
+
+open scoped ComplexOrder in
+/-- **A flat-band ground state is annihilated by `Ĉ_σ(conj w)` for every `w ∈ range T`** — the
+precise, square-root-free form of `spinfulAnnihilation_rangeT_mulVec_eq_zero_of_groundState`.
+Since the smeared annihilator is `ℂ`-linear (not conjugate-linear), the natural killing space is
+the row span of the positive square root `C` of `T = Cᴴ·C`, which equals `conj(range T)`: for any
+`w`, writing `b = C·w`, the identity `star(T·w)_x = Σ_k C_{kx}·conj(b_k)` exhibits `star(T·w)` as
+the row combination `Σ_k (star b)_k · C_k`, so `Ĉ_σ(star(T·w))` kills `v`.  For an **orthonormal**
+eigenbasis the operator detecting occupation of a nonzero-eigenvalue mode `u` (`T·u = λu`, `λ≠0`,
+so `u = T·(λ⁻¹u) ∈ range T`) is exactly `Ĉ_σ(conj u)`, so this is the form consumed by the
+eq. (11.3.46) Fock-spanning step of the next PR. -/
+theorem spinfulAnnihilation_starRangeT_mulVec_eq_zero_of_groundState (M : ℕ)
+    (T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (U : ℝ) (hT : T.PosSemidef) (hU : 0 < U)
+    {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
+    (hv : rayleighOnVec (hubbardHamiltonian M T (U : ℂ)) v = 0) (σ : Fin 2)
+    (w : Fin (M + 1) → ℂ) :
+    (spinfulAnnihilationFromVector M (star (T.mulVec w)) σ).mulVec v = 0 := by
+  obtain ⟨C, hC, hTC⟩ := LatticeSystem.Math.exists_posSemidef_sq_eq_of_posSemidef hT
+  have hTCH : T = Cᴴ * C := by rw [hTC, hC.isHermitian.eq]
+  have hkin : rayleighOnVec (hubbardKinetic M (Cᴴ * C)) v = 0 := by
+    rw [← hTCH]; exact hubbardKinetic_rayleigh_zero_of_groundState M T U hT hU hv
+  have hrow := spinfulAnnihilation_rowSpan_mulVec_eq_zero M C hkin σ (star (C.mulVec w))
+  have hvec : (∑ k : Fin (M + 1), (star (C.mulVec w)) k • (fun j => C k j))
+      = star (T.mulVec w) := by
+    funext x
+    have hTx : (T.mulVec w) x = ∑ k : Fin (M + 1), star (C k x) * (C.mulVec w) k := by
+      rw [hTCH, ← Matrix.mulVec_mulVec]; rfl
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.star_apply, hTx, star_sum,
+      star_mul', star_star]
+    exact Finset.sum_congr rfl fun k _ => mul_comm _ _
+  rwa [hvec] at hrow
+
+open scoped ComplexOrder in
+/-- **A flat-band ground state is annihilated by `Ĉ_σ(conj u)` for every nonzero-eigenvalue
+eigenvector `u` of `T`** (`T·u = λu`, `λ ≠ 0`).  This is the exact occupation-detection operator for
+the orthonormal eigenbasis used in the eq. (11.3.46) Fock-spanning step: a ground state has no
+occupation on any `range T` (nonzero-eigenvalue) mode.  Obtained from
+`spinfulAnnihilation_starRangeT_mulVec_eq_zero_of_groundState` with `w = λ⁻¹ u`
+(so `T·w = u`). -/
+theorem spinfulAnnihilation_starEigenvector_mulVec_eq_zero_of_groundState (M : ℕ)
+    (T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (U : ℝ) (hT : T.PosSemidef) (hU : 0 < U)
+    {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
+    (hv : rayleighOnVec (hubbardHamiltonian M T (U : ℂ)) v = 0) (σ : Fin 2)
+    {lam : ℂ} (hlam : lam ≠ 0) {u : Fin (M + 1) → ℂ} (hu : T.mulVec u = lam • u) :
+    (spinfulAnnihilationFromVector M (star u) σ).mulVec v = 0 := by
+  have hw : T.mulVec (lam⁻¹ • u) = u := by
+    rw [Matrix.mulVec_smul, hu, smul_smul, inv_mul_cancel₀ hlam, one_smul]
+  have h := spinfulAnnihilation_starRangeT_mulVec_eq_zero_of_groundState M T U hT hU hv σ
+    (lam⁻¹ • u)
+  rwa [hw] at h
 
 /-- **A nonzero-eigenvalue eigenvector lies in the range of the matrix** (`u = T·(λ⁻¹ u)`): the
 single-particle modes orthogonal to the flat band `ker T` are exactly the range of `T`, the source
