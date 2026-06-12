@@ -683,4 +683,16 @@ theorem mem_range_mulVec_of_eigenvalue_ne_zero
     ∃ w : Fin (M + 1) → ℂ, T.mulVec w = u :=
   ⟨lam⁻¹ • u, by rw [Matrix.mulVec_smul, hu, smul_smul, inv_mul_cancel₀ hlam, one_smul]⟩
 
+/-- **Conjugate transpose of a smeared creation operator**: `(Ĉ†_σ(φ))ᴴ = Ĉ_σ(φ̄)` — the adjoint
+of the `φ`-smeared creator annihilates the conjugated state (companion to
+`spinfulAnnihilationFromVector_conjTranspose`). -/
+theorem spinfulCreationFromVector_conjTranspose (M : ℕ)
+    (φ : Fin (M + 1) → ℂ) (σ : Fin 2) :
+    (spinfulCreationFromVector M φ σ)ᴴ = spinfulAnnihilationFromVector M (star φ) σ := by
+  unfold spinfulCreationFromVector spinfulAnnihilationFromVector
+  rw [Matrix.conjTranspose_sum]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  rw [Matrix.conjTranspose_smul, fermionMultiCreation_conjTranspose]
+  rfl
+
 end LatticeSystem.Fermion
