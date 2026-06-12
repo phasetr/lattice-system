@@ -555,4 +555,41 @@ theorem spinfulAnnihilationFromVector_mulVec_eq_zero_of_kinetic_rayleigh_zero (M
     (Matrix.posSemidef_conjTranspose_mul_self _) hterm
   exact conjTranspose_mul_self_mulVec_eq_zero hker
 
+/-- `Ĉ_σ` is additive in its single-particle state: `Ĉ_σ(φ + ψ) = Ĉ_σ(φ) + Ĉ_σ(ψ)`. -/
+theorem spinfulAnnihilationFromVector_add (M : ℕ) (φ ψ : Fin (M + 1) → ℂ) (σ : Fin 2) :
+    spinfulAnnihilationFromVector M (φ + ψ) σ
+      = spinfulAnnihilationFromVector M φ σ + spinfulAnnihilationFromVector M ψ σ := by
+  unfold spinfulAnnihilationFromVector
+  rw [← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl fun x _ => by rw [Pi.add_apply, add_smul]
+
+/-- `Ĉ_σ` is homogeneous in its single-particle state: `Ĉ_σ(a • φ) = a • Ĉ_σ(φ)`. -/
+theorem spinfulAnnihilationFromVector_smul (M : ℕ) (a : ℂ) (φ : Fin (M + 1) → ℂ) (σ : Fin 2) :
+    spinfulAnnihilationFromVector M (a • φ) σ = a • spinfulAnnihilationFromVector M φ σ := by
+  unfold spinfulAnnihilationFromVector
+  rw [Finset.smul_sum]
+  exact Finset.sum_congr rfl fun x _ => by rw [Pi.smul_apply, smul_eq_mul, ← smul_smul]
+
+/-- `Ĉ_σ(0) = 0`. -/
+@[simp] theorem spinfulAnnihilationFromVector_zero (M : ℕ) (σ : Fin 2) :
+    spinfulAnnihilationFromVector M (0 : Fin (M + 1) → ℂ) σ = 0 := by
+  unfold spinfulAnnihilationFromVector
+  exact Finset.sum_eq_zero fun x _ => by rw [Pi.zero_apply, zero_smul]
+
+/-- **Annihilation extends to any linear combination of states**: if `Ĉ_σ(φ_i) v = 0` for every
+`i` in a finite family, then `Ĉ_σ(Σ_i a_i φ_i) v = 0` for any coefficients `a_i`. -/
+theorem spinfulAnnihilationFromVector_linearCombination_mulVec_eq_zero (M : ℕ) {ι : Type*}
+    (s : Finset ι) (a : ι → ℂ) (φ : ι → Fin (M + 1) → ℂ) (σ : Fin 2)
+    {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
+    (h : ∀ i ∈ s, (spinfulAnnihilationFromVector M (φ i) σ).mulVec v = 0) :
+    (spinfulAnnihilationFromVector M (∑ i ∈ s, a i • φ i) σ).mulVec v = 0 := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp
+  | insert i s hi ih =>
+    rw [Finset.sum_insert hi, spinfulAnnihilationFromVector_add,
+      spinfulAnnihilationFromVector_smul, Matrix.add_mulVec, Matrix.smul_mulVec,
+      h i (Finset.mem_insert_self i s),
+      ih (fun j hj => h j (Finset.mem_insert_of_mem hj)), smul_zero, add_zero]
+
 end LatticeSystem.Fermion
