@@ -1,6 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinfulVectorOperator
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBand
 import LatticeSystem.Math.RayleighPosSemidefKernel
+import LatticeSystem.Math.PosSemidef.Basics
 
 /-!
 # General flat-band mode operators (Tasaki §11.3.4, toward Theorem 11.17)
@@ -377,5 +378,53 @@ theorem spinfulCreation_mul_annihilationFromVector_expand (M : ℕ)
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by
     rw [mul_comm (ψ j) (φ i)]
+
+open scoped ComplexOrder in
+/-- **The kinetic operator is positive-semidefinite when the hopping matrix is**
+(Tasaki §11.3.4, the frustration-free structure for a general flat band): writing
+`T = C·C` with `C` positive-semidefinite (hence Hermitian, repo A.6), the kinetic operator
+factors as `Σ_σ Σ_k (Ĉ_σ(C_k))ᴴ (Ĉ_σ(C_k))` — a sum of Gram operators, each PSD. -/
+theorem hubbardKinetic_posSemidef_of_posSemidef (M : ℕ)
+    (t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (ht : t.PosSemidef) :
+    (hubbardKinetic M t).PosSemidef := by
+  obtain ⟨C, hC, hTC⟩ := LatticeSystem.Math.exists_posSemidef_sq_eq_of_posSemidef ht
+  have key : hubbardKinetic M t
+      = ∑ σ : Fin 2, ∑ k : Fin (M + 1),
+          (spinfulAnnihilationFromVector M (fun j => C k j) σ)ᴴ *
+            spinfulAnnihilationFromVector M (fun j => C k j) σ := by
+    unfold hubbardKinetic
+    refine Finset.sum_congr rfl fun σ _ => ?_
+    symm
+    calc ∑ k : Fin (M + 1),
+            (spinfulAnnihilationFromVector M (fun j => C k j) σ)ᴴ *
+              spinfulAnnihilationFromVector M (fun j => C k j) σ
+        = ∑ k : Fin (M + 1), ∑ i : Fin (M + 1), ∑ j : Fin (M + 1),
+            (star (C k i) * C k j) •
+              (fermionMultiCreation (2 * M + 1) (spinfulIndex M i σ) *
+                fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M j σ)) := by
+          refine Finset.sum_congr rfl fun k _ => ?_
+          rw [spinfulAnnihilationFromVector_conjTranspose,
+            spinfulCreation_mul_annihilationFromVector_expand]
+          simp only [Pi.star_apply]
+      _ = ∑ i : Fin (M + 1), ∑ j : Fin (M + 1), ∑ k : Fin (M + 1),
+            (star (C k i) * C k j) •
+              (fermionMultiCreation (2 * M + 1) (spinfulIndex M i σ) *
+                fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M j σ)) := by
+          rw [Finset.sum_comm]
+          exact Finset.sum_congr rfl fun i _ => Finset.sum_comm
+      _ = ∑ i : Fin (M + 1), ∑ j : Fin (M + 1), t i j •
+              (fermionMultiCreation (2 * M + 1) (spinfulIndex M i σ) *
+                fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M j σ)) := by
+          refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+          rw [← Finset.sum_smul]
+          congr 1
+          have htij : t i j = ∑ k : Fin (M + 1), star (C k i) * C k j := by
+            have : t i j = (C * C) i j := by rw [hTC]
+            rw [this, Matrix.mul_apply]
+            exact Finset.sum_congr rfl fun k _ => by rw [hC.isHermitian.apply i k]
+          rw [htij]
+  rw [key]
+  exact Matrix.posSemidef_sum _ fun σ _ =>
+    Matrix.posSemidef_sum _ fun k _ => Matrix.posSemidef_conjTranspose_mul_self _
 
 end LatticeSystem.Fermion
