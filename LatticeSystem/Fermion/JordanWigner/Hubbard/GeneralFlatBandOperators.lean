@@ -592,4 +592,19 @@ theorem spinfulAnnihilationFromVector_linearCombination_mulVec_eq_zero (M : ℕ)
       h i (Finset.mem_insert_self i s),
       ih (fun j hj => h j (Finset.mem_insert_of_mem hj)), smul_zero, add_zero]
 
+open scoped ComplexOrder in
+/-- **A flat-band ground state is annihilated by every row-space mode**: for `T = Cᴴ·C` and a
+vector with vanishing kinetic Rayleigh expectation, `Ĉ_σ(Σ_k a_k C_k) v = 0` for any coefficients
+`a` — i.e. `Ĉ_σ(w) v = 0` for every `w` in the row span of `C` (which is the range of `T`, the
+orthocomplement of the flat band).  Combines the per-row kill with the linearity of `Ĉ_σ`. -/
+theorem spinfulAnnihilation_rowSpan_mulVec_eq_zero (M : ℕ)
+    (C : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ)
+    {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
+    (h : rayleighOnVec (hubbardKinetic M (Cᴴ * C)) v = 0) (σ : Fin 2)
+    (a : Fin (M + 1) → ℂ) :
+    (spinfulAnnihilationFromVector M (∑ k : Fin (M + 1), a k • (fun j => C k j)) σ).mulVec v = 0 :=
+  spinfulAnnihilationFromVector_linearCombination_mulVec_eq_zero M Finset.univ a
+    (fun k => fun j => C k j) σ
+    (fun k _ => spinfulAnnihilationFromVector_mulVec_eq_zero_of_kinetic_rayleigh_zero M C h k σ)
+
 end LatticeSystem.Fermion
