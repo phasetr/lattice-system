@@ -306,4 +306,35 @@ theorem generalFlatBand_double_siteAnnihilation_peel (μ : Fin (M + 1) → Fin (
   rw [generalFlatBandPeelTerm, Matrix.mulVec_smul, Matrix.mulVec_smul,
     generalFlatBand_siteAnnihilation_peel]
 
+/-- The down-then-up site annihilation `ĉ_{x↓} ĉ_{x↑}` at general site count (the operator of
+Tasaki's no-double-occupancy condition, eq. (11.3.48) left-hand side). -/
+noncomputable def generalCDownUp (M : ℕ) (x : Fin (M + 1)) :
+    ManyBodyOp (Fin (2 * M + 2)) :=
+  fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x 1) *
+    fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x 0)
+
+/-- **`n̂_{x↑} n̂_{x↓} = (ĉ_{x↓} ĉ_{x↑})ᴴ (ĉ_{x↓} ĉ_{x↑})` at general site count**: the diagonal
+double occupancy is the Gram operator of the double annihilation (general-`M` form of the
+delta-chain identity, via the unified spinful CAR). -/
+theorem hubbardDoubleOccupancy_eq_conjTranspose_mul_self_general (M : ℕ) (x : Fin (M + 1)) :
+    hubbardDoubleOccupancy M x = (generalCDownUp M x)ᴴ * generalCDownUp M x := by
+  rw [hubbardDoubleOccupancy, fermionUpNumber, fermionDownNumber, fermionMultiNumber,
+    fermionMultiNumber, generalCDownUp, Matrix.conjTranspose_mul,
+    fermionMultiAnnihilation_conjTranspose, fermionMultiAnnihilation_conjTranspose]
+  set cup := fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x 0)
+  set cdn := fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x 1)
+  set cre := fermionMultiCreation (2 * M + 1) (spinfulIndex M x 1)
+  have hcd : cup * cre = -(cre * cup) := by
+    have h := spinful_annihilation_creation_anticomm_general M x x 0 1
+    rw [if_neg (fun hc => absurd hc.2 (by decide))] at h
+    exact eq_neg_of_add_eq_zero_left h
+  have haa : cup * cdn = -(cdn * cup) :=
+    eq_neg_of_add_eq_zero_left
+      (fermionMultiAnnihilation_anticomm_of_ne (spinfulIndex_up_ne_down M x x))
+  have hmid : cup * (cre * cdn) = cre * (cdn * cup) := by
+    rw [← mul_assoc, hcd, neg_mul, mul_assoc, haa, mul_neg]
+    exact neg_neg _
+  simp only [mul_assoc]
+  rw [hmid]
+
 end LatticeSystem.Fermion
