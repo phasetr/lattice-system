@@ -70,4 +70,34 @@ theorem spinfulCreationFromVector_sq (M : ℕ) (φ : Fin (M + 1) → ℂ) (σ : 
   rw [← two_smul ℂ] at h2
   exact (smul_eq_zero.mp h2).resolve_left (by norm_num)
 
+/-- A **general-basis Fock monomial**: the ordered product of mode-creations `Ĉ†_σ(e i)` (for
+`(i, σ)` ranging over the list `qs`) applied to the vacuum, for a single-particle basis `e` of the
+`M + 1` modes.  Mirrors `flatBandModeMonomial` for an arbitrary basis (instantiated at the spectral
+eigenbasis of `T` for eq. (11.3.46)). -/
+noncomputable def generalModeMonomial (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ))
+    (qs : List (Fin (M + 1) × Fin 2)) : (Fin (2 * M + 2) → Fin 2) → ℂ :=
+  ((qs.map (fun q => spinfulCreationFromVector M (e q.1) q.2)).prod).mulVec
+    (fermionMultiVacuum (2 * M + 1))
+
+/-- The span of all general-basis Fock monomials (the candidate full Fock basis span). -/
+noncomputable def generalModeFockSubmodule
+    (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) :
+    Submodule ℂ ((Fin (2 * M + 2) → Fin 2) → ℂ) :=
+  Submodule.span ℂ (Set.range (generalModeMonomial e))
+
+/-- Every general-basis Fock monomial lies in the span. -/
+theorem generalModeMonomial_mem (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ))
+    (qs : List (Fin (M + 1) × Fin 2)) :
+    generalModeMonomial e qs ∈ generalModeFockSubmodule e :=
+  Submodule.subset_span ⟨qs, rfl⟩
+
+/-- Prepending a mode-creation `Ĉ†_σ(e i)` to a monomial conses `(i, σ)` onto its list. -/
+theorem spinfulCreation_mulVec_generalModeMonomial
+    (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (i : Fin (M + 1)) (σ : Fin 2)
+    (qs : List (Fin (M + 1) × Fin 2)) :
+    (spinfulCreationFromVector M (e i) σ).mulVec (generalModeMonomial e qs)
+      = generalModeMonomial e ((i, σ) :: qs) := by
+  unfold generalModeMonomial
+  rw [List.map_cons, List.prod_cons, ← Matrix.mulVec_mulVec]
+
 end LatticeSystem.Fermion
