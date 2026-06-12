@@ -648,4 +648,30 @@ theorem spinfulAnnihilation_rangeT_mulVec_eq_zero_of_groundState (M : ℕ)
     rw [← hTCH]; exact hubbardKinetic_rayleigh_zero_of_groundState M T U hT hU hv
   exact spinfulAnnihilation_rowSpan_mulVec_eq_zero M C hkin σ a
 
+/-- The Hamiltonian Rayleigh expectation vanishes on any ground-submodule vector (it lies in the
+kernel of `Ĥ`). -/
+theorem hamiltonian_rayleigh_zero_of_mem_groundSubmodule
+    (T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (U : ℝ)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U) :
+    rayleighOnVec (hubbardHamiltonian M T (U : ℂ)) Φ = 0 := by
+  have hker : (hubbardHamiltonian M T (U : ℂ)).mulVec Φ = 0 := by
+    have h := (Submodule.mem_inf.mp hΦ).1
+    rw [LinearMap.mem_ker, Matrix.mulVecLin_apply] at h
+    exact h
+  rw [rayleighOnVec, hker, dotProduct_zero, Complex.zero_re]
+
+open scoped ComplexOrder in
+/-- **A ground-submodule vector is annihilated by every range-`T` mode** (eq. (11.3.46) premise,
+packaged for the ground submodule): factoring `T = Cᴴ·C`, every `Ĉ_σ(Σ a_k C_k)` kills `Φ`. -/
+theorem spinfulAnnihilation_rangeT_mulVec_eq_zero_of_mem_groundSubmodule
+    (T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (U : ℝ) (hT : T.PosSemidef) (hU : 0 < U)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U)
+    (σ : Fin 2) :
+    ∃ C : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ, T = Cᴴ * C ∧
+      ∀ a : Fin (M + 1) → ℂ,
+        (spinfulAnnihilationFromVector M (∑ k : Fin (M + 1), a k • (fun j => C k j)) σ).mulVec Φ
+          = 0 :=
+  spinfulAnnihilation_rangeT_mulVec_eq_zero_of_groundState M T U hT hU
+    (hamiltonian_rayleigh_zero_of_mem_groundSubmodule T U hΦ) σ
+
 end LatticeSystem.Fermion
