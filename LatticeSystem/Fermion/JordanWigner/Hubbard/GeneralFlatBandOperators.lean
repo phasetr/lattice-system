@@ -470,4 +470,21 @@ theorem generalFlatBand_groundState_doubleAnnihilation_mulVec_eq_zero (M : ℕ)
   rw [hubbardDoubleOccupancy_eq_conjTranspose_mul_self_general] at hdo
   exact conjTranspose_mul_self_mulVec_eq_zero hdo
 
+open scoped ComplexOrder in
+/-- **`ĉ_{x↓} ĉ_{x↑} Φ = 0` for any vector in the ground submodule**: the ground submodule sits
+in the kernel of `Ĥ`, so its Rayleigh expectation vanishes and the no-double-occupancy kill
+applies (Tasaki §11.3.4 — the eq.-(11.3.48) input phrased directly for ground states). -/
+theorem generalCDownUp_mulVec_eq_zero_of_mem_groundSubmodule
+    (T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (U : ℝ) (hT : T.PosSemidef) (hU : 0 < U)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U)
+    (x : Fin (M + 1)) :
+    (generalCDownUp M x).mulVec Φ = 0 := by
+  have hker : (hubbardHamiltonian M T (U : ℂ)).mulVec Φ = 0 := by
+    have h := (Submodule.mem_inf.mp hΦ).1
+    rw [LinearMap.mem_ker, Matrix.mulVecLin_apply] at h
+    exact h
+  have hray : rayleighOnVec (hubbardHamiltonian M T (U : ℂ)) Φ = 0 := by
+    rw [rayleighOnVec, hker, dotProduct_zero, Complex.zero_re]
+  exact generalFlatBand_groundState_doubleAnnihilation_mulVec_eq_zero M T U hT hU hray x
+
 end LatticeSystem.Fermion
