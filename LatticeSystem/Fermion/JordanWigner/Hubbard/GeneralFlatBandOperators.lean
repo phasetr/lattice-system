@@ -352,4 +352,16 @@ theorem hubbardHamiltonian_rayleighOnVec_decompose_general (M : ℕ)
   rw [← Finset.mul_sum]
   rfl
 
+/-- **Conjugate transpose of a smeared annihilation operator**: `(Ĉ_σ(φ))ᴴ = Ĉ†_σ(φ̄)` — the
+adjoint of the `φ`-smeared annihilator creates the conjugated state (the Gram-form input for the
+kinetic positivity from `T.PosSemidef`). -/
+theorem spinfulAnnihilationFromVector_conjTranspose (M : ℕ)
+    (φ : Fin (M + 1) → ℂ) (σ : Fin 2) :
+    (spinfulAnnihilationFromVector M φ σ)ᴴ = spinfulCreationFromVector M (star φ) σ := by
+  unfold spinfulAnnihilationFromVector spinfulCreationFromVector
+  rw [Matrix.conjTranspose_sum]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  rw [Matrix.conjTranspose_smul, fermionMultiAnnihilation_conjTranspose]
+  rfl
+
 end LatticeSystem.Fermion
