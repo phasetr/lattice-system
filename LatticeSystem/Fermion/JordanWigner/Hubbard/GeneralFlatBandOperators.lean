@@ -705,4 +705,25 @@ theorem eigenvectorBasis_mem_ker_of_eigenvalue_eq_zero
   rw [hT.mulVec_eigenvectorBasis, hj]
   exact zero_smul _ _
 
+/-- `Ĉ†_σ` is additive in its single-particle state: `Ĉ†_σ(φ + ψ) = Ĉ†_σ(φ) + Ĉ†_σ(ψ)`. -/
+theorem spinfulCreationFromVector_add (M : ℕ) (φ ψ : Fin (M + 1) → ℂ) (σ : Fin 2) :
+    spinfulCreationFromVector M (φ + ψ) σ
+      = spinfulCreationFromVector M φ σ + spinfulCreationFromVector M ψ σ := by
+  unfold spinfulCreationFromVector
+  rw [← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl fun x _ => by rw [Pi.add_apply, add_smul]
+
+/-- `Ĉ†_σ` is homogeneous in its single-particle state: `Ĉ†_σ(a • φ) = a • Ĉ†_σ(φ)`. -/
+theorem spinfulCreationFromVector_smul (M : ℕ) (a : ℂ) (φ : Fin (M + 1) → ℂ) (σ : Fin 2) :
+    spinfulCreationFromVector M (a • φ) σ = a • spinfulCreationFromVector M φ σ := by
+  unfold spinfulCreationFromVector
+  rw [Finset.smul_sum]
+  exact Finset.sum_congr rfl fun x _ => by rw [Pi.smul_apply, smul_eq_mul, ← smul_smul]
+
+/-- `Ĉ†_σ(0) = 0`. -/
+@[simp] theorem spinfulCreationFromVector_zero (M : ℕ) (σ : Fin 2) :
+    spinfulCreationFromVector M (0 : Fin (M + 1) → ℂ) σ = 0 := by
+  unfold spinfulCreationFromVector
+  exact Finset.sum_eq_zero fun x _ => by rw [Pi.zero_apply, zero_smul]
+
 end LatticeSystem.Fermion
