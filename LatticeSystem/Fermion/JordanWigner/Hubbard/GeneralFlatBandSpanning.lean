@@ -156,7 +156,8 @@ theorem eigenNumberOp_mulVec_generalOccMonomial {T : Matrix (Fin (M + 1)) (Fin (
       if_neg (by simpa [generalOccFinset] using h)]
 
 /-- **A flat-band ground state is killed by the number operator of every nonzero-eigenvalue mode**:
-`n̂_{j,σ} Φ = Ĉ†_σ(e_j)·(Ĉ_σ(ē_j)·Φ) = Ĉ†_σ(e_j)·0 = 0` (PR1 + `groundState_eigenModeAnnihilation`). -/
+`n̂_{j,σ} Φ = Ĉ†_σ(e_j)·(Ĉ_σ(ē_j)·Φ) = Ĉ†_σ(e_j)·0 = 0` (PR1 +
+`groundState_eigenModeAnnihilation`). -/
 theorem groundState_eigenNumberOp_mulVec_eq_zero
     {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
     {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ}
@@ -230,7 +231,7 @@ theorem flatBand_groundState_mem_flatFockSpan
   · exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨g, hf, (hbcoe g).symm⟩)
   · obtain ⟨j, σ, hg1, hjne⟩ : ∃ j σ, g (j, σ) = 1 ∧ hT.1.eigenvalues j ≠ 0 := by
       unfold IsFlatSupported at hf
-      push_neg at hf
+      push Not at hf
       obtain ⟨j, σ, hg1, hjne⟩ := hf
       exact ⟨j, σ, hg1, hjne⟩
     rw [groundState_generalOccBasis_repr_eq_zero_of_occupied hT U hU hΦ j σ hjne g hg1,
