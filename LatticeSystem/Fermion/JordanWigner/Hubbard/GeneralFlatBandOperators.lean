@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinfulVectorOperator
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBand
+import LatticeSystem.Math.RayleighPosSemidefKernel
 
 /-!
 # General flat-band mode operators (Tasaki §11.3.4, toward Theorem 11.17)
@@ -336,5 +337,19 @@ theorem hubbardDoubleOccupancy_eq_conjTranspose_mul_self_general (M : ℕ) (x : 
     exact neg_neg _
   simp only [mul_assoc]
   rw [hmid]
+
+/-- **Rayleigh decomposition of the general Hubbard Hamiltonian** (real `U`): the expectation
+splits into the kinetic part and `U` times the summed double-occupancy expectations. -/
+theorem hubbardHamiltonian_rayleighOnVec_decompose_general (M : ℕ)
+    (t : Fin (M + 1) → Fin (M + 1) → ℂ) (U : ℝ)
+    (v : (Fin (2 * M + 2) → Fin 2) → ℂ) :
+    rayleighOnVec (hubbardHamiltonian M t (U : ℂ)) v =
+      rayleighOnVec (hubbardKinetic M t) v
+        + U * ∑ x : Fin (M + 1), rayleighOnVec (hubbardDoubleOccupancy M x) v := by
+  unfold hubbardHamiltonian hubbardOnSiteInteraction
+  rw [rayleighOnVec_add_matrix, rayleighOnVec_sum]
+  simp only [rayleighOnVec_real_smul]
+  rw [← Finset.mul_sum]
+  rfl
 
 end LatticeSystem.Fermion
