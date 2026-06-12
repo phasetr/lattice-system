@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandEigenbasis
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandGroundAnnihilation
 
 /-!
 # Ground-state Fock spanning, eq. (11.3.46) (Tasaki §11.3.4, toward Theorem 11.17)

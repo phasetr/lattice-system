@@ -6389,7 +6389,9 @@ the Fock-spanning step consumes.)  The single-particle space is split by
 the Hermitian spectral theorem (\texttt{IsHermitian.eigenvectorBasis}): zero-eigenvalue
 eigenvectors lie in the flat band $\ker T$, nonzero-eigenvalue eigenvectors lie in
 $\operatorname{range}T$, and every $v$ decomposes as $v_{\ker}+v_{\rm range}$
-(\texttt{exists\_ker\_add\_range\_decomp}).  This is exactly the operator-algebraic premise of the
+(\texttt{exists\_ker\_add\_range\_decomp}).  (These ground-state-annihilation and spectral results
+were later split into \texttt{GeneralFlatBandGroundAnnihilation.lean} in a build-speed refactor.)
+This is exactly the operator-algebraic premise of the
 Fock-spanning eq.~(11.3.46); the remaining Fock-space spanning, spin representation
 (eq.~(11.3.47)), sign relation (eq.~(11.3.49)) and connectivity capstone are the subsequent PRs.
 
