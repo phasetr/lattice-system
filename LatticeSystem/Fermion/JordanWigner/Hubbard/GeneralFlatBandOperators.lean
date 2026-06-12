@@ -487,4 +487,41 @@ theorem generalCDownUp_mulVec_eq_zero_of_mem_groundSubmodule
     rw [rayleighOnVec, hker, dotProduct_zero, Complex.zero_re]
   exact generalFlatBand_groundState_doubleAnnihilation_mulVec_eq_zero M T U hT hU hray x
 
+/-- **Gram-sum factorization of the kinetic operator** for a factored hopping `T = Cᴴ·C`:
+`hubbardKinetic M (Cᴴ·C) = Σ_σ Σ_k (Ĉ_σ(C_k))ᴴ (Ĉ_σ(C_k))`, the rows `C_k` of `C` smeared into
+mode operators.  The general-`C` form of the kinetic-PSD factorization (no Hermitian assumption on
+`C`); the engine for "ground state ⟹ annihilated by every row mode" toward eq. (11.3.46). -/
+theorem hubbardKinetic_conjTranspose_mul_self_eq_gram_sum (M : ℕ)
+    (C : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) :
+    hubbardKinetic M (Cᴴ * C)
+      = ∑ σ : Fin 2, ∑ k : Fin (M + 1),
+          (spinfulAnnihilationFromVector M (fun j => C k j) σ)ᴴ *
+            spinfulAnnihilationFromVector M (fun j => C k j) σ := by
+  unfold hubbardKinetic
+  refine Finset.sum_congr rfl fun σ _ => ?_
+  symm
+  calc ∑ k : Fin (M + 1),
+          (spinfulAnnihilationFromVector M (fun j => C k j) σ)ᴴ *
+            spinfulAnnihilationFromVector M (fun j => C k j) σ
+      = ∑ k : Fin (M + 1), ∑ i : Fin (M + 1), ∑ j : Fin (M + 1),
+          (star (C k i) * C k j) •
+            (fermionMultiCreation (2 * M + 1) (spinfulIndex M i σ) *
+              fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M j σ)) := by
+        refine Finset.sum_congr rfl fun k _ => ?_
+        rw [spinfulAnnihilationFromVector_conjTranspose,
+          spinfulCreation_mul_annihilationFromVector_expand]
+        simp only [Pi.star_apply]
+    _ = ∑ i : Fin (M + 1), ∑ j : Fin (M + 1), ∑ k : Fin (M + 1),
+          (star (C k i) * C k j) •
+            (fermionMultiCreation (2 * M + 1) (spinfulIndex M i σ) *
+              fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M j σ)) := by
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun i _ => Finset.sum_comm
+    _ = ∑ i : Fin (M + 1), ∑ j : Fin (M + 1), (Cᴴ * C) i j •
+            (fermionMultiCreation (2 * M + 1) (spinfulIndex M i σ) *
+              fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M j σ)) := by
+        refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+        rw [← Finset.sum_smul]
+        congr 1
+
 end LatticeSystem.Fermion
