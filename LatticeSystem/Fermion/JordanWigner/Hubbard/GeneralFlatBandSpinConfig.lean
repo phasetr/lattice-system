@@ -117,4 +117,58 @@ theorem muNumberOp_mulVec_generalFlatBandSlaterState
     · rw [if_neg (fun hc => h (Prod.ext hc.2 hc.1)), if_neg (fun he => h he.symm)]
       ring
 
+/-- **The double index-mode number operator equals the doubled creation times the site
+double-annihilation**: `n̂^μ_{z,↑}·n̂^μ_{z,↓} = â†_{μ_z,↑}·â†_{μ_z,↓}·(ĉ_{z,↓}ĉ_{z,↑})`.  Moving the
+up-spin site annihilator past the down-spin mode creator (cross-spin, anticommute) and the two site
+annihilators past each other.  (Spins: `↑ = 0`, `↓ = 1`.) -/
+theorem muNumberOp_mul_eq_creation_creation_cdownup
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {z : Fin (M + 1)} (hz : z ∈ I) :
+    muNumberOp μ z 0 * muNumberOp μ z 1
+      = generalFlatBandCreation μ z 0 * generalFlatBandCreation μ z 1 * generalCDownUp M z := by
+  have hcross : fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z 0)
+        * generalFlatBandCreation μ z 1
+      = - (generalFlatBandCreation μ z 1
+          * fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z 0)) := by
+    apply eq_neg_of_add_eq_zero_left
+    have h := site_annihilation_generalFlatBandCreation_anticomm_localized hbasis hz hz 0 1
+    rwa [if_neg (fun hc => absurd hc.1 (by decide)), zero_smul] at h
+  have hann : fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z 0)
+        * fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z 1)
+      = - generalCDownUp M z := by
+    rw [generalCDownUp]
+    exact eq_neg_of_add_eq_zero_left
+      (fermionMultiAnnihilation_anticomm_of_ne (spinfulIndex_up_ne_down M z z))
+  calc muNumberOp μ z 0 * muNumberOp μ z 1
+      = generalFlatBandCreation μ z 0
+          * (fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z 0)
+              * generalFlatBandCreation μ z 1)
+          * fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z 1) := by
+        rw [muNumberOp, muNumberOp]; noncomm_ring
+    _ = generalFlatBandCreation μ z 0
+          * (- (generalFlatBandCreation μ z 1
+              * fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z 0)))
+          * fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z 1) := by rw [hcross]
+    _ = - (generalFlatBandCreation μ z 0 * generalFlatBandCreation μ z 1
+          * (fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z 0)
+              * fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z 1))) := by noncomm_ring
+    _ = - (generalFlatBandCreation μ z 0 * generalFlatBandCreation μ z 1
+          * (- generalCDownUp M z)) := by rw [hann]
+    _ = generalFlatBandCreation μ z 0 * generalFlatBandCreation μ z 1 * generalCDownUp M z := by
+        noncomm_ring
+
+open scoped ComplexOrder in
+/-- **No double occupancy of the index modes**: for a flat-band ground state `Φ`, the double
+index-mode number operator kills it, `n̂^μ_{z,↑}·n̂^μ_{z,↓}·Φ = 0` (`z ∈ I`).  From the operator
+identity and `ĉ_{z,↓}ĉ_{z,↑}Φ = 0` (the `Ĥ_int|Φ⟩ = 0` zero-energy condition). -/
+theorem muNumberOp_double_mulVec_eq_zero_of_mem_groundSubmodule
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U) {z : Fin (M + 1)} (hz : z ∈ I)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U) :
+    (muNumberOp μ z 0 * muNumberOp μ z 1).mulVec Φ = 0 := by
+  rw [muNumberOp_mul_eq_creation_creation_cdownup hbasis hz, ← Matrix.mulVec_mulVec,
+    generalCDownUp_mulVec_eq_zero_of_mem_groundSubmodule T U hT hU hΦ z, Matrix.mulVec_zero]
+
 end LatticeSystem.Fermion
