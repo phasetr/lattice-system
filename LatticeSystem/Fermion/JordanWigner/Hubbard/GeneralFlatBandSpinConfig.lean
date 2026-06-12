@@ -43,4 +43,41 @@ theorem site_annihilation_generalFlatBandCreation_anticomm_localized
     · rw [if_pos hσ, if_neg (fun h => hzz h.2), hloc z' hz' z hz (fun h => hzz h.symm)]
   · rw [if_neg hσ, if_neg (fun h => hσ h.1)]
 
+/-- **The index-mode number operator** `n̂^μ_{z,σ} = â†_{μ_z,σ}·ĉ_{z,σ}` counts (up to the scale
+`μ_z(z)`) the occupation of the special-basis index mode `(z, σ)`, using the site annihilator `ĉ_z`
+as the dual of `â†_{μ_z}` on the index set `I`. -/
+noncomputable def muNumberOp (μ : Fin (M + 1) → Fin (M + 1) → ℂ) (z : Fin (M + 1)) (σ : Fin 2) :
+    ManyBodyOp (Fin (2 * M + 2)) :=
+  generalFlatBandCreation μ z σ * fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z σ)
+
+/-- **The index-mode number-operator/creation commutation**:
+`n̂^μ_{z,σ}·â†_{μ_{z'},τ} = δ_{στ}δ_{zz'}μ_z(z)·â†_{μ_{z'},τ} + â†_{μ_{z'},τ}·n̂^μ_{z,σ}`
+(for `z, z' ∈ I`).  From the localized site-dual CAR and the creation–creation anticommutation;
+mirrors `eigenNumberOp_mul_creation` of the eq. (11.3.46) machinery. -/
+theorem muNumberOp_mul_creation
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {z z' : Fin (M + 1)} (hz : z ∈ I) (hz' : z' ∈ I) (σ τ : Fin 2) :
+    muNumberOp μ z σ * generalFlatBandCreation μ z' τ
+      = (if σ = τ ∧ z = z' then μ z z else 0) • generalFlatBandCreation μ z' τ
+        + generalFlatBandCreation μ z' τ * muNumberOp μ z σ := by
+  have hdual : fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z σ)
+        * generalFlatBandCreation μ z' τ
+      = (if σ = τ ∧ z = z' then μ z z else 0) • 1
+        - generalFlatBandCreation μ z' τ
+          * fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M z σ) := by
+    rw [eq_sub_iff_add_eq]
+    exact site_annihilation_generalFlatBandCreation_anticomm_localized hbasis hz hz' σ τ
+  have hcc : generalFlatBandCreation μ z σ * generalFlatBandCreation μ z' τ
+      = - (generalFlatBandCreation μ z' τ * generalFlatBandCreation μ z σ) :=
+    eq_neg_of_add_eq_zero_left
+      (spinfulFromVector_creation_creation_anticomm M (μ z) (μ z') σ τ)
+  have hδ : (if σ = τ ∧ z = z' then μ z z else 0) • generalFlatBandCreation μ z σ
+      = (if σ = τ ∧ z = z' then μ z z else 0) • generalFlatBandCreation μ z' τ := by
+    by_cases h : σ = τ ∧ z = z'
+    · rw [h.1, h.2]
+    · rw [if_neg h, zero_smul, zero_smul]
+  rw [muNumberOp, Matrix.mul_assoc, hdual, mul_sub, mul_smul_comm, Matrix.mul_one,
+    ← Matrix.mul_assoc, hcc, Matrix.neg_mul, sub_neg_eq_add, hδ, Matrix.mul_assoc]
+
 end LatticeSystem.Fermion
