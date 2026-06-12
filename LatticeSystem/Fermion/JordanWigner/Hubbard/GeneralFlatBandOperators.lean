@@ -607,4 +607,45 @@ theorem spinfulAnnihilation_rowSpan_mulVec_eq_zero (M : ℕ)
     (fun k => fun j => C k j) σ
     (fun k _ => spinfulAnnihilationFromVector_mulVec_eq_zero_of_kinetic_rayleigh_zero M C h k σ)
 
+open scoped ComplexOrder in
+/-- **The kinetic Rayleigh expectation vanishes on a flat-band ground state**: for `T` PSD and
+`U > 0`, if the full Hamiltonian expectation is zero then so is the kinetic one (the kinetic and
+the `U`-weighted double-occupancy parts are both nonnegative and sum to zero). -/
+theorem hubbardKinetic_rayleigh_zero_of_groundState (M : ℕ)
+    (T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (U : ℝ) (hT : T.PosSemidef) (hU : 0 < U)
+    {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
+    (hv : rayleighOnVec (hubbardHamiltonian M T (U : ℂ)) v = 0) :
+    rayleighOnVec (hubbardKinetic M T) v = 0 := by
+  have hkin_nonneg : 0 ≤ rayleighOnVec (hubbardKinetic M T) v :=
+    (hubbardKinetic_posSemidef_of_posSemidef M T hT).re_dotProduct_nonneg v
+  have hint_nonneg : ∀ x' : Fin (M + 1),
+      0 ≤ rayleighOnVec (hubbardDoubleOccupancy M x') v :=
+    fun x' => (hubbardDoubleOccupancy_posSemidef M x').re_dotProduct_nonneg v
+  have hInt : (0 : ℝ) ≤ ∑ x' : Fin (M + 1), rayleighOnVec (hubbardDoubleOccupancy M x') v :=
+    Finset.sum_nonneg (fun x' _ => hint_nonneg x')
+  have hdec := hubbardHamiltonian_rayleighOnVec_decompose_general M T U v
+  rw [hv] at hdec
+  nlinarith [mul_nonneg hU.le hInt, hkin_nonneg, hdec]
+
+open scoped ComplexOrder in
+/-- **A flat-band ground state is annihilated by every range-`T` mode** (the operative content of
+eq. (11.3.46)): for `T` PSD and `U > 0`, any vector with vanishing Hamiltonian expectation is
+killed by `Ĉ_σ(T_k)` summed against any coefficients — i.e. by `Ĉ_σ(w)` for every `w` in the
+range of `T = (ker T)^⊥`.  Factoring `T = Cᴴ·C` (positive square root), the kinetic Rayleigh
+vanishes, so each Gram mode kills `v`, and the row span of `C` is the range of `T`. -/
+theorem spinfulAnnihilation_rangeT_mulVec_eq_zero_of_groundState (M : ℕ)
+    (T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (U : ℝ) (hT : T.PosSemidef) (hU : 0 < U)
+    {v : (Fin (2 * M + 2) → Fin 2) → ℂ}
+    (hv : rayleighOnVec (hubbardHamiltonian M T (U : ℂ)) v = 0) (σ : Fin 2) :
+    ∃ C : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ, T = Cᴴ * C ∧
+      ∀ a : Fin (M + 1) → ℂ,
+        (spinfulAnnihilationFromVector M (∑ k : Fin (M + 1), a k • (fun j => C k j)) σ).mulVec v
+          = 0 := by
+  obtain ⟨C, hC, hTC⟩ := LatticeSystem.Math.exists_posSemidef_sq_eq_of_posSemidef hT
+  have hTCH : T = Cᴴ * C := by rw [hTC, hC.isHermitian.eq]
+  refine ⟨C, hTCH, fun a => ?_⟩
+  have hkin : rayleighOnVec (hubbardKinetic M (Cᴴ * C)) v = 0 := by
+    rw [← hTCH]; exact hubbardKinetic_rayleigh_zero_of_groundState M T U hT hU hv
+  exact spinfulAnnihilation_rowSpan_mulVec_eq_zero M C hkin σ a
+
 end LatticeSystem.Fermion
