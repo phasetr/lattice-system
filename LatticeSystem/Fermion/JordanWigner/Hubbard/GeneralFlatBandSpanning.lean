@@ -166,4 +166,40 @@ theorem groundState_eigenNumberOp_mulVec_eq_zero
   rw [eigenNumberOp, ← Matrix.mulVec_mulVec,
     groundState_eigenModeAnnihilation_eq_zero hT U hU hΦ σ j hj, Matrix.mulVec_zero]
 
+open Module in
+/-- **Coefficient vanishing (the heart of eq. (11.3.46))**: a flat-band ground state `Φ` has
+vanishing occupation-basis coefficient on every configuration `g` that occupies a nonzero-eigenvalue
+(`range T`) mode `(j,σ)`.  Applying the diagonal number operator `n̂_{j,σ}` (eigenvalue `g(j,σ)` on
+`occMon(g)`) to `Φ = Σ_h c_h occMon(h)` and using `n̂_{j,σ}Φ = 0` gives `c_g·g(j,σ) = 0`, hence
+`c_g = 0` when `g(j,σ) = 1`. -/
+theorem groundState_generalOccBasis_repr_eq_zero_of_occupied
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ}
+    (hΦ : rayleighOnVec (hubbardHamiltonian M T (U : ℂ)) Φ = 0) (j : Fin (M + 1)) (σ : Fin 2)
+    (hj : hT.1.eigenvalues j ≠ 0) (g : Fin (M + 1) × Fin 2 → Fin 2) (hg : g (j, σ) = 1) :
+    (generalOccBasis (eigenbasisAsBasis hT.1)).repr Φ g = 0 := by
+  set e := eigenbasisAsBasis hT.1 with he
+  set b := generalOccBasis e with hb
+  have hbcoe : ∀ h, (b h : (Fin (2 * M + 2) → Fin 2) → ℂ) = generalOccMonomial e h :=
+    fun h => congrFun (coe_basisOfTopLeSpanOfCardEqFinrank _ _ _) h
+  have hzero := groundState_eigenNumberOp_mulVec_eq_zero hT U hU hΦ σ j hj
+  have hexp : (eigenNumberOp hT.1 j σ).mulVec Φ
+      = ∑ h, (b.repr Φ h * (if h (j, σ) = 1 then (1 : ℂ) else 0)) • (b h) := by
+    conv_lhs => rw [← b.sum_repr Φ]
+    rw [Matrix.mulVec_sum]
+    refine Finset.sum_congr rfl fun h _ => ?_
+    rw [Matrix.mulVec_smul, hbcoe, eigenNumberOp_mulVec_generalOccMonomial, smul_smul, ← hbcoe]
+  have hrepr : b.repr ((eigenNumberOp hT.1 j σ).mulVec Φ) g
+      = b.repr Φ g * (if g (j, σ) = 1 then (1 : ℂ) else 0) := by
+    rw [hexp, map_sum]
+    simp only [map_smul, Finsupp.coe_finset_sum, Finset.sum_apply, Finsupp.coe_smul,
+      Pi.smul_apply, smul_eq_mul, b.repr_self]
+    rw [Finset.sum_eq_single g]
+    · rw [Finsupp.single_eq_same, mul_one]
+    · intro h _ hhg
+      rw [Finsupp.single_eq_of_ne (Ne.symm hhg), mul_zero]
+    · intro h; exact absurd (Finset.mem_univ g) h
+  rw [hzero, map_zero, Finsupp.coe_zero, Pi.zero_apply, if_pos hg, mul_one] at hrepr
+  exact hrepr.symm
+
 end LatticeSystem.Fermion
