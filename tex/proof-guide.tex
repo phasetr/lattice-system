@@ -6352,6 +6352,41 @@ The remaining two, \texttt{tasaki\_theorem\_11\_15} and \texttt{generalFlatBand\
 \texttt{generalFlatBandBasisConnected}), are still recorded as documented axioms, matching the
 policy for Theorems 11.8 / 11.13; their proofs are deferred to later work.
 
+\medskip\noindent\textbf{Theorem 11.17 discharge, operator-algebraic foundation (Tasaki
+§11.3.4, Issue \#4363, PR1, \texttt{GeneralFlatBandOperators.lean}).}  Tasaki's proof of
+Theorem 11.17 mirrors the fully-proved Theorem 11.11 (the $\nu$-chain flat band), generalised
+from the concrete delta-chain modes to an \emph{arbitrary} special basis $\{\mu_z\}_{z\in I}$ of
+$\ker T$ (Lemma 11.16).  The first PR builds the operator-algebraic premise side.  The
+\emph{general flat-band creation/annihilation operators} are the smeared operators
+$\hat a^\dagger_{z,\sigma} := \hat C^\dagger_\sigma(\mu_z)$,
+$\hat a_{z,\sigma} := \hat C_\sigma(\mu_z)$
+(\texttt{generalFlatBandCreation}/\texttt{Annihilation}, with
+$\hat C^\dagger_\sigma(\varphi)=\sum_x \varphi(x)\,\hat c^\dagger_{x,\sigma}$).  Their adjoints
+$(\hat C^\dagger_\sigma(\varphi))^{\mathsf H}=\hat C_\sigma(\bar\varphi)$ and full
+$\mathbb C$-linearity are established, together with the canonical-anticommutation algebra: the
+unified site form $\{\hat c_{x,\sigma},\hat c^\dagger_{y,\tau}\}=[\,x{=}y\wedge
+\sigma{=}\tau\,]$, the \emph{bilinear} smeared form $\{\hat C_\sigma(\varphi),
+\hat C^\dagger_\tau(\psi)\}=\delta_{\sigma\tau}\bigl(\sum_x\varphi(x)\psi(x)\bigr)\cdot\mathbf 1$,
+and the site-dual form $\{\hat c_{z,\sigma},\hat a^\dagger_{z',\tau}\}=\delta_{\sigma\tau}\,
+\mu_{z'}(z)\cdot\mathbf 1$.  From these one obtains the $\hat a^\dagger$-monomial Slater states and
+their span (the right-hand side of eq.~(11.3.46)), the single- and double-site annihilation
+\emph{peel} formulae (the eq.~(11.3.48) engine), the doubled annihilator
+$\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ together with the double-occupancy Gram identity
+$\hat n_{x,\uparrow}\hat n_{x,\downarrow}=(\hat c_{x,\downarrow}\hat c_{x,\uparrow})^{\mathsf H}
+(\hat c_{x,\downarrow}\hat c_{x,\uparrow})$, and the kinetic-operator positivity: writing
+$T=C^{\mathsf H}C$ gives the Gram-sum factorisation
+$\hat H_{\rm hop}=\sum_\sigma\sum_k (\hat C_\sigma(C_k))^{\mathsf H}\hat C_\sigma(C_k)\ge0$.
+Consequently a flat-band ground state at filling $N=D_0$ (zero Rayleigh quotient, $U>0$) has
+\emph{no double occupancy} ($\hat n_{x,\uparrow}\hat n_{x,\downarrow}\Phi=0$,
+$\hat c_{x,\downarrow}\hat c_{x,\uparrow}\Phi=0$) and is annihilated by $\hat C_\sigma(w)$ for
+\emph{every} $w\in\operatorname{range}T=(\ker T)^\perp$.  The single-particle space is split by
+the Hermitian spectral theorem (\texttt{IsHermitian.eigenvectorBasis}): zero-eigenvalue
+eigenvectors lie in the flat band $\ker T$, nonzero-eigenvalue eigenvectors lie in
+$\operatorname{range}T$, and every $v$ decomposes as $v_{\ker}+v_{\rm range}$
+(\texttt{exists\_ker\_add\_range\_decomp}).  This is exactly the operator-algebraic premise of the
+Fock-spanning eq.~(11.3.46); the remaining Fock-space spanning, spin representation
+(eq.~(11.3.47)), sign relation (eq.~(11.3.49)) and connectivity capstone are the subsequent PRs.
+
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
 §11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
 on the precise definition of \emph{exhibiting ferromagnetism}.  For a many-body Hamiltonian

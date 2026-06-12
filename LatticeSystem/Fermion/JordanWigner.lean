@@ -92,6 +92,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.MielkeHamiltonian
 import LatticeSystem.Fermion.JordanWigner.Hubbard.MielkeTheorems
 import LatticeSystem.Fermion.JordanWigner.Hubbard.MielkeIncidenceMatrix
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBand
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandOperators
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SectorMinEnergy
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularHubbardModel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularLocalStability
