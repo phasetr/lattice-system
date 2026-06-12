@@ -719,6 +719,41 @@ theorem eigenvectorBasis_mem_range_of_eigenvalue_ne_zero
   funext i
   simp [Complex.real_smul]
 
+/-- **Spectral `ker T ⊕ range T` decomposition of any single-particle vector**: every
+`v : Fin (M+1) → ℂ` splits as `v = v_ker + v_range` with `T v_ker = 0` (flat band) and
+`v_range ∈ range T`. Obtained from the orthonormal eigenbasis (`OrthonormalBasis.sum_repr`)
+partitioned by zero/nonzero eigenvalue. This is the completeness input that lets the range-`T`
+annihilation conditions pin a ground state into the flat-band Fock sector (eq. 11.3.46). -/
+theorem exists_ker_add_range_decomp {M : ℕ}
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : T.IsHermitian) (v : Fin (M + 1) → ℂ) :
+    ∃ vk vr : Fin (M + 1) → ℂ,
+      T.mulVec vk = 0 ∧ (∃ w, T.mulVec w = vr) ∧ v = vk + vr := by
+  classical
+  set c : Fin (M + 1) → ℂ := fun j => hT.eigenvectorBasis.repr (WithLp.toLp 2 v) j with hc
+  refine ⟨∑ j ∈ Finset.univ.filter (fun j => hT.eigenvalues j = 0),
+            c j • (⇑(hT.eigenvectorBasis j) : Fin (M + 1) → ℂ),
+          ∑ j ∈ Finset.univ.filter (fun j => ¬ hT.eigenvalues j = 0),
+            c j • (⇑(hT.eigenvectorBasis j) : Fin (M + 1) → ℂ), ?_, ?_, ?_⟩
+  · rw [Matrix.mulVec_sum]
+    refine Finset.sum_eq_zero fun j hj => ?_
+    rw [Matrix.mulVec_smul,
+      eigenvectorBasis_mem_ker_of_eigenvalue_eq_zero hT j (Finset.mem_filter.mp hj).2, smul_zero]
+  · have hmem : (∑ j ∈ Finset.univ.filter (fun j => ¬ hT.eigenvalues j = 0),
+        c j • (⇑(hT.eigenvectorBasis j) : Fin (M + 1) → ℂ)) ∈
+        LinearMap.range T.mulVecLin := by
+      refine Submodule.sum_mem _ fun j hj => Submodule.smul_mem _ _ ?_
+      obtain ⟨w, hw⟩ :=
+        eigenvectorBasis_mem_range_of_eigenvalue_ne_zero hT j (Finset.mem_filter.mp hj).2
+      exact ⟨w, by rw [Matrix.mulVecLin_apply, hw]⟩
+    obtain ⟨w, hw⟩ := hmem
+    exact ⟨w, by rw [← Matrix.mulVecLin_apply]; exact hw⟩
+  · have hsum : (∑ j, c j • (⇑(hT.eigenvectorBasis j) : Fin (M + 1) → ℂ)) = v := by
+      have hrepr := hT.eigenvectorBasis.sum_repr (WithLp.toLp 2 v)
+      apply_fun WithLp.ofLp at hrepr
+      rw [WithLp.ofLp_sum, WithLp.ofLp_toLp] at hrepr
+      simpa only [WithLp.ofLp_smul, hc] using hrepr
+    rw [← hsum, ← Finset.sum_filter_add_sum_filter_not Finset.univ (fun j => hT.eigenvalues j = 0)]
+
 /-- `Ĉ†_σ` is additive in its single-particle state: `Ĉ†_σ(φ + ψ) = Ĉ†_σ(φ) + Ĉ†_σ(ψ)`. -/
 theorem spinfulCreationFromVector_add (M : ℕ) (φ ψ : Fin (M + 1) → ℂ) (σ : Fin 2) :
     spinfulCreationFromVector M (φ + ψ) σ
