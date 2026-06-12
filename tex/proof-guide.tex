@@ -6461,9 +6461,23 @@ the occupation basis with eigenvalue the particle count.  A $D_0$-electron groun
 ($\hat N\Phi=D_0\Phi$) therefore has occupation-basis coefficients supported on the $D_0$-electron
 configurations; combined with eq.~(11.3.46) this yields
 \texttt{flatBand\_groundState\_atFilling\_mem\_flatFockSpan}: $\Phi$ lies in the span of the
-flat-supported occupation monomials with \emph{exactly} $D_0$ occupied modes.  The spin
-representation (eq.~(11.3.47)) and the sign propagation (eqs.~(11.3.48)/(11.3.49)) toward the
-connectivity capstone are the subsequent PRs.
+flat-supported occupation monomials with \emph{exactly} $D_0$ occupied modes.
+
+\medskip\noindent\textbf{Theorem 11.17 PR6, transport to the special basis (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandMuTransport.lean}).}  Eq.~(11.3.46) was proved over the spectral
+eigenbasis, but the spin representation (eq.~(11.3.47)) is stated over the \emph{special basis}
+$\{\mu_z\}$ (Lemma 11.16).  Since both are bases of the same flat band, the spanning transports.
+Concretely: $\ker T = \operatorname{span}\{\mu_z\}$ at the coordinate level (each $\mu_z\in\ker T$,
+they are independent and number $D_0=\dim\ker T$; the $\mathrm{WithLp}$ identification transports
+the finrank of $\ker T$ between $\mathrm{EuclideanSpace}$ and the plain coordinate space).  The
+$\mu$-Slater Fock submodule $\mathtt{generalFlatBandFockSubmodule}\ \mu$ is invariant under
+$\hat C^\dagger_\sigma(w)$ for every $w\in\operatorname{span}\{\mu_z\}$ (a combination of the mode
+creators $\hat a^\dagger_{\mu_z,\sigma}$, each of which prepends a mode to a Slater list), and
+contains the vacuum.  A flat-supported eigenbasis occupation monomial uses only flat eigenvectors,
+each lying in $\ker T=\operatorname{span}\{\mu_z\}$, so it lies in the $\mu$-Slater submodule; hence
+so does the ground state --- \texttt{flatBand\_groundState\_mem\_generalFlatBandFockSubmodule}.  The
+spin representation (eq.~(11.3.47), via no double occupancy and $\mu$'s site-localisation) and the
+sign propagation (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
 §11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
