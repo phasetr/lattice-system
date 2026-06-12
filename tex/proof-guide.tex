@@ -6433,6 +6433,25 @@ sign), and annihilates a monomial not containing it.  This is the occupation-det
 the eq.~(11.3.46) hard direction (a flat-band ground state, annihilated by every nonzero-eigenvalue
 mode $\hat C_\sigma(\bar e_j)$, has occupation only on the flat band), completed in the next PR.
 
+\medskip\noindent\textbf{Theorem 11.17 PR4, eq.~(11.3.46) Fock spanning, hard direction (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSpanning.lean}).}  The flat-band ground state at
+filling is now shown to be a superposition of flat-band occupation monomials.  The transported
+eigenbasis satisfies $T\,e_j=\lambda_j e_j$, so the precise range-$T$ annihilation (PR1) gives
+$\hat C_\sigma(\bar e_j)\Phi=0$ for every nonzero-eigenvalue mode $j$.  Form the \emph{eigenmode
+number operator} $\hat n_{j,\sigma}=\hat C^\dagger_\sigma(e_j)\hat C_\sigma(\bar e_j)$; from the dual
+CAR and the creation anticommutation it obeys
+$\hat n_{j,\sigma}\hat C^\dagger_\tau(e_k)=\delta_{jk}\delta_{\sigma\tau}\hat C^\dagger_\tau(e_k)
++\hat C^\dagger_\tau(e_k)\hat n_{j,\sigma}$, so by induction on a mode monomial it is
+\emph{diagonal} in the occupation basis, $\hat n_{j,\sigma}\,\mathrm{occMon}(g)=g(j,\sigma)\,
+\mathrm{occMon}(g)$.  Since $\hat n_{j,\sigma}\Phi=\hat C^\dagger_\sigma(e_j)(\hat C_\sigma(\bar
+e_j)\Phi)=0$ for nonzero-eigenvalue $j$, expanding $\Phi=\sum_g c_g\,\mathrm{occMon}(g)$ in the
+occupation basis and reading off the coefficient of $g$ gives $c_g\,g(j,\sigma)=0$; hence the
+\textbf{coefficient vanishes}, $c_g=0$, whenever $g$ occupies a nonzero-eigenvalue mode.  Therefore
+$\Phi$ lies in the span of the \emph{flat-supported} occupation monomials (those occupying only
+zero-eigenvalue modes) --- this is \texttt{flatBand\_groundState\_mem\_flatFockSpan}, eq.~(11.3.46).
+The spin representation (eq.~(11.3.47)) and the sign propagation (eqs.~(11.3.48)/(11.3.49)) toward
+the connectivity capstone are the subsequent PRs.
+
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
 §11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
 on the precise definition of \emph{exhibiting ferromagnetism}.  For a many-body Hamiltonian
