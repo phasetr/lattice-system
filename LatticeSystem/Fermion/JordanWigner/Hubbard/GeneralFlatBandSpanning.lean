@@ -202,4 +202,39 @@ theorem groundState_generalOccBasis_repr_eq_zero_of_occupied
   rw [hzero, map_zero, Finsupp.coe_zero, Pi.zero_apply, if_pos hg, mul_one] at hrepr
   exact hrepr.symm
 
+/-- A configuration is **flat-supported** if it occupies only flat-band (zero-eigenvalue) modes. -/
+def IsFlatSupported {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : T.IsHermitian)
+    (g : Fin (M + 1) × Fin 2 → Fin 2) : Prop :=
+  ∀ (j : Fin (M + 1)) (σ : Fin 2), g (j, σ) = 1 → hT.eigenvalues j = 0
+
+open Module in
+/-- **Tasaki eq. (11.3.46) (Fock spanning, hard direction)**: a flat-band Hubbard ground state `Φ`
+at filling, with `T` positive-semidefinite and `U > 0`, lies in the span of the occupation monomials
+supported on the **flat band** (zero-eigenvalue modes).  From the coefficient vanishing
+(`groundState_generalOccBasis_repr_eq_zero_of_occupied`): expanding `Φ` in the occupation basis, the
+coefficient of every configuration occupying a nonzero-eigenvalue mode vanishes. -/
+theorem flatBand_groundState_mem_flatFockSpan
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ}
+    (hΦ : rayleighOnVec (hubbardHamiltonian M T (U : ℂ)) Φ = 0) :
+    Φ ∈ Submodule.span ℂ
+      {v | ∃ g, IsFlatSupported hT.1 g
+        ∧ generalOccMonomial (eigenbasisAsBasis hT.1) g = v} := by
+  set e := eigenbasisAsBasis hT.1 with he
+  set b := generalOccBasis e with hb
+  have hbcoe : ∀ h, (b h : (Fin (2 * M + 2) → Fin 2) → ℂ) = generalOccMonomial e h :=
+    fun h => congrFun (coe_basisOfTopLeSpanOfCardEqFinrank _ _ _) h
+  rw [← b.sum_repr Φ]
+  refine Submodule.sum_mem _ fun g _ => ?_
+  by_cases hf : IsFlatSupported hT.1 g
+  · exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨g, hf, (hbcoe g).symm⟩)
+  · obtain ⟨j, σ, hg1, hjne⟩ : ∃ j σ, g (j, σ) = 1 ∧ hT.1.eigenvalues j ≠ 0 := by
+      unfold IsFlatSupported at hf
+      push_neg at hf
+      obtain ⟨j, σ, hg1, hjne⟩ := hf
+      exact ⟨j, σ, hg1, hjne⟩
+    rw [groundState_generalOccBasis_repr_eq_zero_of_occupied hT U hU hΦ j σ hjne g hg1,
+      zero_smul]
+    exact Submodule.zero_mem _
+
 end LatticeSystem.Fermion
