@@ -674,4 +674,13 @@ theorem spinfulAnnihilation_rangeT_mulVec_eq_zero_of_mem_groundSubmodule
   spinfulAnnihilation_rangeT_mulVec_eq_zero_of_groundState M T U hT hU
     (hamiltonian_rayleigh_zero_of_mem_groundSubmodule T U hΦ) σ
 
+/-- **A nonzero-eigenvalue eigenvector lies in the range of the matrix** (`u = T·(λ⁻¹ u)`): the
+single-particle modes orthogonal to the flat band `ker T` are exactly the range of `T`, the source
+of the complement creation operators in the full Fock basis (toward eq. (11.3.46)). -/
+theorem mem_range_mulVec_of_eigenvalue_ne_zero
+    (T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) {lam : ℂ} (hlam : lam ≠ 0)
+    {u : Fin (M + 1) → ℂ} (hu : T.mulVec u = lam • u) :
+    ∃ w : Fin (M + 1) → ℂ, T.mulVec w = u :=
+  ⟨lam⁻¹ • u, by rw [Matrix.mulVec_smul, hu, smul_smul, inv_mul_cancel₀ hlam, one_smul]⟩
+
 end LatticeSystem.Fermion
