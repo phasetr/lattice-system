@@ -107,4 +107,36 @@ theorem eigenNumberOp_mul_creation {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} 
   rw [eigenNumberOp, Matrix.mul_assoc, hdual, mul_sub, mul_smul_comm, Matrix.mul_one,
     ← Matrix.mul_assoc, hcc, Matrix.neg_mul, sub_neg_eq_add, hδ, Matrix.mul_assoc]
 
+/-- **The number operator is diagonal in the mode monomials**: `n̂_{j,σ}|qs⟩ = (count of (j,σ) in
+qs)·|qs⟩`.  By list induction, moving `n̂_{j,σ}` past each leading creation via the commutation
+relation (raising the count by `δ` on a match) down to `n̂_{j,σ}|vac⟩ = 0`. -/
+theorem eigenNumberOp_mulVec_generalModeMonomial {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    (hT : T.IsHermitian) (j : Fin (M + 1)) (σ : Fin 2) (qs : List (Fin (M + 1) × Fin 2)) :
+    (eigenNumberOp hT j σ).mulVec (generalModeMonomial (eigenbasisAsBasis hT) qs)
+      = (qs.count (j, σ) : ℂ) • generalModeMonomial (eigenbasisAsBasis hT) qs := by
+  induction qs with
+  | nil =>
+    rw [eigenNumberOp]
+    simp only [generalModeMonomial, List.map_nil, List.prod_nil, Matrix.one_mulVec,
+      List.count_nil, Nat.cast_zero, zero_smul]
+    rw [← Matrix.mulVec_mulVec, spinfulAnnihilationFromVector_mulVec_vacuum, Matrix.mulVec_zero]
+  | cons q qs' ih =>
+    obtain ⟨q1, q2⟩ := q
+    have hcons : generalModeMonomial (eigenbasisAsBasis hT) ((q1, q2) :: qs')
+        = (spinfulCreationFromVector M (eigenbasisAsBasis hT q1) q2).mulVec
+            (generalModeMonomial (eigenbasisAsBasis hT) qs') :=
+      (spinfulCreation_mulVec_generalModeMonomial (eigenbasisAsBasis hT) q1 q2 qs').symm
+    rw [hcons, Matrix.mulVec_mulVec, eigenNumberOp_mul_creation, Matrix.add_mulVec,
+      Matrix.smul_mulVec, ← Matrix.mulVec_mulVec, ih, Matrix.mulVec_smul, ← add_smul]
+    congr 1
+    rw [List.count_cons]
+    simp only [beq_iff_eq]
+    push_cast
+    by_cases h : j = q1 ∧ σ = q2
+    · rw [if_pos h, if_pos (show (q1, q2) = (j, σ) from Prod.ext h.1.symm h.2.symm)]
+      ring
+    · rw [if_neg h, if_neg (show ¬ ((q1, q2) = (j, σ)) from fun he =>
+        h ⟨(Prod.ext_iff.mp he).1.symm, (Prod.ext_iff.mp he).2.symm⟩)]
+      ring
+
 end LatticeSystem.Fermion
