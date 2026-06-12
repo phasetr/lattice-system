@@ -6475,8 +6475,23 @@ $\hat C^\dagger_\sigma(w)$ for every $w\in\operatorname{span}\{\mu_z\}$ (a combi
 creators $\hat a^\dagger_{\mu_z,\sigma}$, each of which prepends a mode to a Slater list), and
 contains the vacuum.  A flat-supported eigenbasis occupation monomial uses only flat eigenvectors,
 each lying in $\ker T=\operatorname{span}\{\mu_z\}$, so it lies in the $\mu$-Slater submodule; hence
-so does the ground state --- \texttt{flatBand\_groundState\_mem\_generalFlatBandFockSubmodule}.  The
-spin representation (eq.~(11.3.47), via no double occupancy and $\mu$'s site-localisation) and the
+so does the ground state --- \texttt{flatBand\_groundState\_mem\_generalFlatBandFockSubmodule}.
+
+\medskip\noindent\textbf{Theorem 11.17 PR7, index-mode number operators toward eq.~(11.3.47)
+(Tasaki §11.3.4, Issue \#4363, \texttt{GeneralFlatBandSpinConfig.lean}).}  On the index set $I$ the
+special basis is localised ($\mu_{z'}(z)=\delta_{zz'}\mu_z(z)$), so the site annihilator $\hat
+c_{z,\sigma}$ ($z\in I$) is dual to the mode creator $\hat a^\dagger_{\mu_z,\sigma}$:
+$\{\hat c_{z,\sigma},\hat a^\dagger_{\mu_{z'},\tau}\}=\delta_{\sigma\tau}\delta_{zz'}\mu_z(z)$.  The
+index-mode number operator $\hat n^\mu_{z,\sigma}=\hat a^\dagger_{\mu_z,\sigma}\hat c_{z,\sigma}$
+obeys the creation commutation $[\hat n^\mu_{z,\sigma},\hat a^\dagger_{\mu_{z'},\tau}]
+=\delta_{\sigma\tau}\delta_{zz'}\mu_z(z)\,\hat a^\dagger_{\mu_{z'},\tau}$, so by induction it is
+diagonal in the $\mu$-Slater states, $\hat n^\mu_{z,\sigma}|qs\rangle=\mu_z(z)\,(\#(z,\sigma)\text{
+in }qs)\,|qs\rangle$.  The operator identity $\hat n^\mu_{z,\uparrow}\hat n^\mu_{z,\downarrow}
+=\hat a^\dagger_{\mu_z,\uparrow}\hat a^\dagger_{\mu_z,\downarrow}\,(\hat c_{z,\downarrow}\hat
+c_{z,\uparrow})$ together with the zero-energy condition $\hat c_{z,\downarrow}\hat
+c_{z,\uparrow}\Phi=0$ ($\hat H_{\rm int}\Phi=0$) gives \textbf{no double occupancy of the index
+modes}, $\hat n^\mu_{z,\uparrow}\hat n^\mu_{z,\downarrow}\Phi=0$.  The linear independence of the
+$\mu$-occupation states and the resulting one-spin-per-index decomposition (eq.~(11.3.47)) and the
 sign propagation (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki

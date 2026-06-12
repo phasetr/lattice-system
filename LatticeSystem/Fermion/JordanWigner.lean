@@ -100,6 +100,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandEigenbasis
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandSpanning
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandFilling
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandMuTransport
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandSpinConfig
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SectorMinEnergy
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularHubbardModel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularLocalStability
