@@ -141,7 +141,7 @@ theorem spinfulCreation_basis_mulVec_mem
 
 /-- The span is invariant under every site creation `ĉ†_{x,σ}`, because a site creation is the
 `e`-expansion `∑_i (e.repr e_x) i • Ĉ†_σ(e i)` of the mode-creations. -/
-theorem fermionMultiCreation_spinful_mulVec_mem
+theorem fermionMultiCreation_spinful_mulVec_generalModeFock_mem
     (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (x : Fin (M + 1)) (σ : Fin 2)
     {w : (Fin (2 * M + 2) → Fin 2) → ℂ} (hw : w ∈ generalModeFockSubmodule e) :
     (fermionMultiCreation (2 * M + 1) (spinfulIndex M x σ)).mulVec w
@@ -165,22 +165,22 @@ theorem fermionMultiVacuum_mem_generalModeFock
   simpa [generalModeMonomial] using h
 
 /-- The span is invariant under every site creation `ĉ†_j` (any spinful mode `j`). -/
-theorem fermionMultiCreation_mulVec_mem
+theorem fermionMultiCreation_mulVec_generalModeFock_mem
     (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (j : Fin (2 * M + 2))
     {w : (Fin (2 * M + 2) → Fin 2) → ℂ} (hw : w ∈ generalModeFockSubmodule e) :
     (fermionMultiCreation (2 * M + 1) j).mulVec w ∈ generalModeFockSubmodule e := by
   obtain ⟨x, σ, rfl⟩ := exists_spinfulIndex M j
-  exact fermionMultiCreation_spinful_mulVec_mem e x σ hw
+  exact fermionMultiCreation_spinful_mulVec_generalModeFock_mem e x σ hw
 
 /-- Any ordered product of site creations on the vacuum lies in the monomial span. -/
-theorem listProd_creation_mulVec_vacuum_mem
+theorem listProd_creation_mulVec_vacuum_generalModeFock_mem
     (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (js : List (Fin (2 * M + 2))) :
     ((js.map (fermionMultiCreation (2 * M + 1))).prod).mulVec (fermionMultiVacuum (2 * M + 1))
       ∈ generalModeFockSubmodule e :=
   LatticeSystem.Math.listProd_mulVec_mem
     (fun _ hMmem _ hwmem => by
       obtain ⟨j, _, rfl⟩ := List.mem_map.mp hMmem
-      exact fermionMultiCreation_mulVec_mem e j hwmem)
+      exact fermionMultiCreation_mulVec_generalModeFock_mem e j hwmem)
     (fermionMultiVacuum_mem_generalModeFock e)
 
 /-- **The general-basis Fock monomials span the whole space** (`= ⊤`).  Every computational basis
@@ -201,7 +201,7 @@ theorem generalModeFockSubmodule_eq_top
       generalize c k = m
       fin_cases m <;> simp
     rw [← hocc, ← prod_creation_mulVec_vacuum (2 * M + 1) _ hsorted]
-    exact listProd_creation_mulVec_vacuum_mem e _
+    exact listProd_creation_mulVec_vacuum_generalModeFock_mem e _
   have hv : v = ∑ c, v c • basisVec c := by
     funext τ
     simp only [Finset.sum_apply, Pi.smul_apply, basisVec_apply, smul_eq_mul, mul_ite,

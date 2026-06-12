@@ -6393,6 +6393,27 @@ $\operatorname{range}T$, and every $v$ decomposes as $v_{\ker}+v_{\rm range}$
 Fock-spanning eq.~(11.3.46); the remaining Fock-space spanning, spin representation
 (eq.~(11.3.47)), sign relation (eq.~(11.3.49)) and connectivity capstone are the subsequent PRs.
 
+\medskip\noindent\textbf{Theorem 11.17 PR2, the general occupation basis (Tasaki §11.3.4,
+Issue \#4363, \texttt{GeneralFlatBandModeMonomial.lean} + \texttt{GeneralFlatBandOccBasis.lean}).}
+The right-hand side of eq.~(11.3.46) is a span of Fock monomials, so the proof needs a Fock
+\emph{basis} adapted to a single-particle basis.  Tasaki's argument reuses the fully-proved
+Theorem 11.11 occupation-basis machinery, which is in fact \emph{generic in the single-particle
+basis}; PR2 re-develops it for an arbitrary basis $e$ of the $M{+}1$ modes (to be instantiated at the
+spectral eigenbasis of $T$).  First the smeared creators anticommute,
+$\{\hat C^\dagger_\sigma(\varphi),\hat C^\dagger_\tau(\psi)\}=0$ (bilinear double sum of the site
+anticommutations), whence $(\hat C^\dagger_\sigma(\varphi))^2=0$.  The \emph{general-basis Fock
+monomials} are ordered products $\prod_{(i,\sigma)\in qs}\hat C^\dagger_\sigma(e_i)$ on the vacuum;
+their span is all of Fock space, because it is invariant under each mode creation, hence (writing a
+site creation $\hat c^\dagger_{x,\sigma}=\sum_i (e.\mathrm{repr}\,\delta_x)_i\,\hat
+C^\dagger_\sigma(e_i)$ via the basis expansion) under every \emph{site} creation, and every
+computational basis vector is an ordered product of site creations on the vacuum.  Reordering the
+creation list scales a monomial by a nonzero sign (induction on the permutation; a transposition
+flips the sign through the anticommutation), and a repeated mode kills it ($(\hat C^\dagger)^2=0$);
+so the \emph{occupation monomials} (products over the sorted occupied modes of a configuration
+$f$) still span $\top$, and there are $2^{2(M+1)}=\dim$ of them, giving the \textbf{general
+occupation basis} (\texttt{generalOccBasis}).  This is the Fock-space scaffolding for the
+eq.~(11.3.46) spanning step of the next PR.
+
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
 §11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
 on the precise definition of \emph{exhibiting ferromagnetism}.  For a many-body Hamiltonian
