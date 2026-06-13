@@ -397,4 +397,37 @@ theorem exists_ker_add_range_decomp {M : ℕ}
       simpa only [WithLp.ofLp_smul, hc] using hrepr
     rw [← hsum, ← Finset.sum_filter_add_sum_filter_not Finset.univ (fun j => hT.eigenvalues j = 0)]
 
+/-- **The smeared annihilation `Ĉ_σ(φ)` kills a μ-Slater state whose every occupied mode is
+orthogonal to `φ`** — the kinetic building block toward the all-up μ-Slater being a flat-band
+ground state.  Writing `Ĉ_σ(φ) = Σ_x φ(x) ĉ_{x,σ}` and peeling each site annihilation
+(`generalFlatBand_siteAnnihilation_peel`), the action collects term-wise to
+`Σ_i (-1)^i [σ = q_i.2] (Σ_x φ(x) μ_{q_i.1}(x)) |Slater(erase i)⟩`; when each occupied-mode overlap
+`Σ_x φ(x) μ_{q.1}(x)` vanishes, every peel term vanishes. -/
+theorem spinfulAnnihilationFromVector_mulVec_generalFlatBandSlaterState_eq_zero_of_orthogonal
+    (μ : Fin (M + 1) → Fin (M + 1) → ℂ) (φ : Fin (M + 1) → ℂ) (σ : Fin 2)
+    (qs : List (Fin (M + 1) × Fin 2))
+    (h : ∀ q ∈ qs, ∑ x : Fin (M + 1), φ x * μ q.1 x = 0) :
+    (spinfulAnnihilationFromVector M φ σ).mulVec (generalFlatBandSlaterState μ qs) = 0 := by
+  unfold spinfulAnnihilationFromVector
+  rw [Matrix.sum_mulVec]
+  have hx : ∀ x : Fin (M + 1),
+      (φ x • fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ)).mulVec
+          (generalFlatBandSlaterState μ qs)
+        = ∑ i : Fin qs.length, φ x • generalFlatBandPeelTerm μ x σ qs i := fun x => by
+    rw [Matrix.smul_mulVec, generalFlatBand_siteAnnihilation_peel, Finset.smul_sum]
+  rw [Finset.sum_congr rfl (fun x _ => hx x), Finset.sum_comm]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  unfold generalFlatBandPeelTerm
+  by_cases hc : (qs.get i).2 = σ
+  · simp only [hc, if_true]
+    have hrew : ∀ x : Fin (M + 1),
+        φ x • ((-1 : ℂ) ^ (i : ℕ) • (μ (qs.get i).1 x •
+            generalFlatBandSlaterState μ (qs.eraseIdx i)))
+          = (φ x * μ (qs.get i).1 x) • ((-1 : ℂ) ^ (i : ℕ) •
+            generalFlatBandSlaterState μ (qs.eraseIdx i)) := fun x => by
+      simp only [smul_smul]; congr 1; ring
+    rw [Finset.sum_congr rfl (fun x _ => hrew x), ← Finset.sum_smul,
+      h (qs.get i) (List.get_mem qs i), zero_smul]
+  · simp only [hc, if_false, zero_smul, smul_zero, Finset.sum_const_zero]
+
 end LatticeSystem.Fermion
