@@ -724,4 +724,49 @@ theorem flatBand_groundState_D_swap_eq_of_walk {T : Matrix (Fin (M + 1)) (Fin (M
         rw [hconj]
         exact hmul hedge (hmul ih hedge) s
 
+/-- **Permutation invariance of the ground-state coefficients on a connected basis**: if the
+special basis is connected, then `D (s ∘ π) = D s` for *every* permutation `π : Equiv.Perm I`.  The
+set of `D`-invariant permutations is a subgroup containing every transposition (each
+`Equiv.swap a b` is invariant via a walk between `a` and `b`, which connectivity supplies); since
+transpositions generate the whole symmetric group (`Equiv.Perm.closure_isSwap`), that subgroup is
+`⊤`. -/
+theorem flatBand_groundState_D_perm_eq {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U)
+    (D : (I → Fin 2) → ℂ)
+    (hD : Φ = ∑ s, D s • generalFlatBandSlaterState μ
+      (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0)))
+    (hconn : generalFlatBandBasisConnected I μ) (π : Equiv.Perm I) (s : I → Fin 2) :
+    D (s ∘ ⇑π) = D s := by
+  -- D-invariance subgroup
+  let G : Subgroup (Equiv.Perm I) :=
+    { carrier := {ρ | ∀ t : I → Fin 2, D (t ∘ ⇑ρ) = D t}
+      one_mem' := by intro t; simp
+      mul_mem' := by
+        intro ρ ρ' hρ hρ' t
+        have : t ∘ ⇑(ρ * ρ') = (t ∘ ⇑ρ) ∘ ⇑ρ' := by funext x; simp [Equiv.Perm.coe_mul]
+        rw [this, hρ', hρ]
+      inv_mem' := by
+        intro ρ hρ t
+        have h := hρ (t ∘ ⇑ρ⁻¹)
+        have he : (t ∘ ⇑ρ⁻¹) ∘ ⇑ρ = t := by funext x; simp
+        rw [he] at h; exact h.symm }
+  have hswap : ∀ ρ : Equiv.Perm I, ρ.IsSwap → ρ ∈ G := by
+    rintro ρ ⟨a, b, hab, rfl⟩
+    intro t
+    have hreach : (generalFlatBandBasisGraph I μ).Reachable a b :=
+      (hconn.preconnected a b)
+    obtain ⟨w⟩ := hreach
+    exact flatBand_groundState_D_swap_eq_of_walk hbasis hT U hU hidx hΦ D hD w t
+  have htop : G = ⊤ := by
+    refine le_antisymm le_top ?_
+    rw [← Equiv.Perm.closure_isSwap]
+    exact (Subgroup.closure_le G).mpr hswap
+  have hπ : π ∈ G := by rw [htop]; exact Subgroup.mem_top π
+  exact hπ s
+
 end LatticeSystem.Fermion
