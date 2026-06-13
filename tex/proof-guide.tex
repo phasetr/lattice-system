@@ -6644,8 +6644,18 @@ induction, pushing a contiguous pair $a,b$ leftward past a block $l_1$ is $2|l_1
 hence $\text{Slater}(l_1 \mathbin{+\!+} a\!::\!b\!::\!l_2) = \text{Slater}(a\!::\!b\!::\!(l_1
 \mathbin{+\!+} l_2))$ (\texttt{generalFlatBandSlaterState\_move\_pair\_front}, the general-basis
 analogue of \texttt{flatBandModeMonomial\_move\_pair\_front}).  Combined with the two-head/swapped
-extraction, this gives the $\pm\mu_a(x)\mu_b(x)$ contribution of an arbitrary pair; reindexing the
-double peel by removed pair and collecting is the subsequent PR.  The double-annihilation expansion and sign relation
+extraction, this gives the $\pm\mu_a(x)\mu_b(x)$ contribution of an arbitrary pair.
+
+\medskip\noindent\textbf{Theorem 11.17 PR21, extracting a pair at an arbitrary position (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  Composing the move-pair-front
+with the two-head extraction, $\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ on
+$l_1 \mathbin{+\!+} (a,\uparrow)\!::\!(b,\downarrow)\!::\!l_2$ (with $l_1,l_2$ disconnected from $x$)
+removes the pair with amplitude $\mu_a(x)\mu_b(x)$, leaving $\text{Slater}(l_1 \mathbin{+\!+} l_2)$
+(\texttt{generalFlatBand\_cDownUp\_extract\_pair}); the swapped assignment $(a,\downarrow),(b,\uparrow)$
+extracts with the opposite sign $-\mu_a(x)\mu_b(x)$
+(\texttt{generalFlatBand\_cDownUp\_extract\_pair\_swap}) --- the per-pair eq.~(11.3.49) relative
+$-1$.  Reindexing the full double peel by removed pair and collecting via linear independence is the
+subsequent PR.  The double-annihilation expansion and sign relation
 (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
