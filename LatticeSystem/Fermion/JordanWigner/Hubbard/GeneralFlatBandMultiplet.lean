@@ -764,4 +764,72 @@ theorem canonicalSlaterSum_mem_groundSubmodule_of_edgeSwap_invariant
     rw [Matrix.mulVec_smul, fermionTotalNumber_mulVec_generalFlatBandSlaterState,
       flatBandSpinConfigList_length, hbasis.1, smul_comm]
 
+/-- **An in-block transposition preserves the up-count of a block**: for `z, z'` both in `T` or
+both outside `T`, the number of up-spins of `s ∘ swap z z'` on `T` equals that of `s`.  If both lie
+in `T`, `swap z z'` is a bijection of `T` permuting the count; if both lie outside, `swap z z'`
+fixes `T` pointwise. -/
+theorem upCountOn_comp_swap_eq {I : Finset (Fin (M + 1))} (T : Finset ↥I) (s : ↥I → Fin 2)
+    {z z' : ↥I} (h : (z ∈ T ∧ z' ∈ T) ∨ (z ∉ T ∧ z' ∉ T)) :
+    (T.filter (fun w => (s ∘ ⇑(Equiv.swap z z')) w = 0)).card
+      = (T.filter (fun w => s w = 0)).card := by
+  classical
+  have hswapT : ∀ w : ↥I, (z ∈ T ∧ z' ∈ T) → w ∈ T → Equiv.swap z z' w ∈ T := by
+    intro w ⟨hzT, hz'T⟩ hwT
+    rcases eq_or_ne w z with rfl | hwz
+    · rwa [Equiv.swap_apply_left]
+    · rcases eq_or_ne w z' with rfl | hwz'
+      · rwa [Equiv.swap_apply_right]
+      · rwa [Equiv.swap_apply_of_ne_of_ne hwz hwz']
+  rcases h with hin | ⟨hz, hz'⟩
+  · refine Finset.card_bij (fun w _ => Equiv.swap z z' w) ?_ ?_ ?_
+    · intro w hw
+      simp only [Finset.mem_filter] at hw ⊢
+      exact ⟨hswapT w hin hw.1, hw.2⟩
+    · intro w₁ _ w₂ _ heq; exact (Equiv.swap z z').injective heq
+    · intro v hv
+      simp only [Finset.mem_filter] at hv
+      refine ⟨Equiv.swap z z' v, ?_, Equiv.swap_apply_self z z' v⟩
+      simp only [Finset.mem_filter]
+      exact ⟨hswapT v hin hv.1, by rw [Function.comp_apply, Equiv.swap_apply_self]; exact hv.2⟩
+  · refine congrArg Finset.card (Finset.filter_congr (fun w hw => ?_))
+    rw [Function.comp_apply, Equiv.swap_apply_of_ne_of_ne (by rintro rfl; exact hz hw)
+      (by rintro rfl; exact hz' hw)]
+
+open scoped ComplexOrder in
+/-- **The per-block weight states of a disconnected basis lie in the ground subspace**: for a cut
+`(A, Aᶜ)` with no crossing μ-overlap, the fiber sum
+`W_{p,q} = Σ_{s : upCount A = p, upCount Aᶜ = q} Slater(canonical I (extend s))` is a ground state.
+Its coefficient `D(s) = [upCount A s = p][upCount Aᶜ s = q]` is edge-swap-invariant: a basis-graph
+edge `z ~ z'` lies within one block (no crossing μ-overlap), so `swap z z'` preserves both block
+up-counts (`upCountOn_comp_swap_eq`); membership follows from
+`canonicalSlaterSum_mem_groundSubmodule_of_edgeSwap_invariant`. -/
+theorem generalFlatBand_blockWeightState_mem_groundSubmodule
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)}
+    {idx : Fin (M + 1) → Fin (M + 1)} (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    (A : Finset ↥I) (hcut : ∀ z ∈ A, ∀ w ∈ Aᶜ, ∀ x, μ z.1 x * μ w.1 x = 0) (p q : ℕ) :
+    (∑ s : I → Fin 2, (if (A.filter (fun w => s w = 0)).card = p ∧
+          (Aᶜ.filter (fun w => s w = 0)).card = q then (1 : ℂ) else 0) •
+        generalFlatBandSlaterState μ
+          (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0)))
+      ∈ generalFlatBandGroundSubmodule T U := by
+  classical
+  refine canonicalSlaterSum_mem_groundSubmodule_of_edgeSwap_invariant hbasis hT U hidx _
+    (fun {z z'} hadj s => ?_)
+  have hsame : (z ∈ A ∧ z' ∈ A) ∨ (z ∉ A ∧ z' ∉ A) := by
+    obtain ⟨_, x, hzx, hz'x⟩ := hadj
+    by_cases hzA : z ∈ A
+    · by_cases hz'A : z' ∈ A
+      · exact Or.inl ⟨hzA, hz'A⟩
+      · exact absurd (hcut z hzA z' (Finset.mem_compl.mpr hz'A) x) (mul_ne_zero hzx hz'x)
+    · by_cases hz'A : z' ∈ A
+      · exact absurd (hcut z' hz'A z (Finset.mem_compl.mpr hzA) x) (mul_ne_zero hz'x hzx)
+      · exact Or.inr ⟨hzA, hz'A⟩
+  have hsameC : (z ∈ Aᶜ ∧ z' ∈ Aᶜ) ∨ (z ∉ Aᶜ ∧ z' ∉ Aᶜ) := by
+    rcases hsame with ⟨h1, h2⟩ | ⟨h1, h2⟩
+    · exact Or.inr ⟨fun hc => (Finset.mem_compl.mp hc) h1, fun hc => (Finset.mem_compl.mp hc) h2⟩
+    · exact Or.inl ⟨Finset.mem_compl.mpr h1, Finset.mem_compl.mpr h2⟩
+  rw [upCountOn_comp_swap_eq A s hsame, upCountOn_comp_swap_eq Aᶜ s hsameC]
+
 end LatticeSystem.Fermion
