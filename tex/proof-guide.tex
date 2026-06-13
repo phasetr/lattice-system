@@ -6596,7 +6596,7 @@ spin-config state (\texttt{flatBandSpinConfigState\_cDownUp\_eq\_zero\_of\_disco
 trivial branch of eq.~(11.3.48), contributing no sign relation.
 
 \medskip\noindent\textbf{Theorem 11.17 PR16, $\mu$-Slater permutation scaling (Tasaki §11.3.4,
-Issue \#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  To compare list orderings (the opaque
+Issue \#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  To compare list orderings (the opaque
 preimage list vs.\ a canonical order) when collecting peel terms, a $\mu$-Slater state changes only
 by a tracked sign under reordering: swapping the first two creations negates the state
 (\texttt{generalFlatBandSlaterState\_swap}, the two leading $\hat a^\dagger$ anticommute), and a
@@ -6605,7 +6605,7 @@ general permutation of the creation list scales it by a nonzero $\pm1$
 \texttt{generalModeMonomial\_perm}).
 
 \medskip\noindent\textbf{Theorem 11.17 PR17, the canonical spin-config list (Tasaki §11.3.4, Issue
-\#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  The orbital-ordered creation list of a spin
+\#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  The orbital-ordered creation list of a spin
 configuration is \texttt{flatBandSpinConfigList}~$=$ the sorted $(z,\sigma_z)$ for $z\in I$ (the
 general-basis analogue of the Theorem 11.11 \texttt{flatBandAlphaSpinList}).  Its occupied finset is
 $\{(\mathrm{idx}\,z,\sigma_z):z\in I\}$ (\texttt{flatBandSpinConfigOcc\_occFinset}); it is nodup with
@@ -6616,7 +6616,7 @@ spin-config state is a nonzero-sign multiple of the canonical-list Slater state
 eq.~(11.3.48) double peel has explicit positions and Koszul signs.
 
 \medskip\noindent\textbf{Theorem 11.17 PR18, the cDownUp two-head extraction (Tasaki §11.3.4, Issue
-\#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  On the orbital-ordered form, site
+\#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  On the orbital-ordered form, site
 annihilation removes a leading matching-spin head: $\hat c_{x,\sigma}$ applied to
 $(z,\sigma)\!::\!\text{rest}$ (with \text{rest} carrying no matching-spin mode connected to $x$)
 returns $\mu_z(x)\cdot\text{Slater}(\text{rest})$ (\texttt{generalFlatBand\_siteAnnihilation\_head},
@@ -6627,7 +6627,7 @@ $(b,\downarrow)$, leaving $\mu_a(x)\,\mu_b(x)\,\text{Slater}(\text{rest})$
 --- the seed of the eq.~(11.3.48) sign relation.
 
 \medskip\noindent\textbf{Theorem 11.17 PR19, the cDownUp swapped two-head (Tasaki §11.3.4, Issue
-\#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  On the swapped down--up head pair, the
+\#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  On the swapped down--up head pair, the
 extraction carries the opposite sign: $\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ on
 $(a,\downarrow)\!::\!(b,\uparrow)\!::\!\text{rest}$ gives
 $-\mu_a(x)\,\mu_b(x)\,\text{Slater}(\text{rest})$ (\texttt{generalFlatBand\_cDownUp\_two\_head\_swap},
@@ -6637,7 +6637,7 @@ the eq.~(11.3.49) sign relation $C(\sigma)=C(\sigma_{z_1\leftrightarrow z_2})$ (
 analogue of the Theorem 11.11 \texttt{flatBand\_cDownUp\_swap}).
 
 \medskip\noindent\textbf{Theorem 11.17 PR20, the Slater move-pair-front (Tasaki §11.3.4, Issue
-\#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  To extract an \emph{arbitrary} occupied pair
+\#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  To extract an \emph{arbitrary} occupied pair
 (not just a leading one), bring it to the head.  Moving the head past the next two creations is sign
 $+1$ (two adjacent transpositions, \texttt{generalFlatBandSlaterState\_move\_one\_past\_two}); by
 induction, pushing a contiguous pair $a,b$ leftward past a block $l_1$ is $2|l_1|$ transpositions,
@@ -6647,7 +6647,7 @@ analogue of \texttt{flatBandModeMonomial\_move\_pair\_front}).  Combined with th
 extraction, this gives the $\pm\mu_a(x)\mu_b(x)$ contribution of an arbitrary pair.
 
 \medskip\noindent\textbf{Theorem 11.17 PR21, extracting a pair at an arbitrary position (Tasaki
-§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  Composing the move-pair-front
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  Composing the move-pair-front
 with the two-head extraction, $\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ on
 $l_1 \mathbin{+\!+} (a,\uparrow)\!::\!(b,\downarrow)\!::\!l_2$ (with $l_1,l_2$ disconnected from $x$)
 removes the pair with amplitude $\mu_a(x)\mu_b(x)$, leaving $\text{Slater}(l_1 \mathbin{+\!+} l_2)$
@@ -6657,7 +6657,7 @@ extracts with the opposite sign $-\mu_a(x)\mu_b(x)$
 $-1$.
 
 \medskip\noindent\textbf{Theorem 11.17 PR22, the canonical-Slater $D$-coefficient expansion (Tasaki
-§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  The sign-relation comparison
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  The sign-relation comparison
 of $\sigma$ and $\sigma_{z_1\leftrightarrow z_2}$ must be run in a single, order-fixed coefficient
 system.  The \texttt{flatBandSpinConfigState} coefficients carry an existential $\pm1$ canonical sign
 (\texttt{flatBandSpinConfigState\_eq\_smul\_canonical}); instead, since the canonical-list Slater
