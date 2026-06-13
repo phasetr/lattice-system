@@ -148,4 +148,15 @@ theorem generalFlatBand_active_iff_exists_mu_ne {I : Finset (Fin (M + 1))}
     rw [← inner_conj_symm, EuclideanSpace.basisFun_inner] at hortho
     exact hzx (by simpa using hortho)
 
+/-- **The projection support matrix is symmetric**: `|P₀_{xy}|² = |P₀_{yx}|²`.  Since `P₀` is
+Hermitian (`P₀_{yx} = conj P₀_{xy}`) and `normSq` is conjugation-invariant, the real nonnegative
+support matrix on `Λ₀` is symmetric — its irreducibility is the connectivity of an *undirected*
+support graph (strong connectivity = connectivity for a symmetric nonnegative matrix). -/
+theorem generalFlatBandProjectionSupportMatrix_isSymm :
+    (generalFlatBandProjectionSupportMatrix T).IsSymm := by
+  ext x y
+  simp only [Matrix.transpose_apply, generalFlatBandProjectionSupportMatrix]
+  rw [← (generalFlatBandProjectionMatrix_isHermitian T).apply x.1 y.1, ← starRingEnd_apply,
+    Complex.normSq_conj]
+
 end LatticeSystem.Fermion
