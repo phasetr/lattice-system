@@ -6602,8 +6602,19 @@ by a tracked sign under reordering: swapping the first two creations negates the
 (\texttt{generalFlatBandSlaterState\_swap}, the two leading $\hat a^\dagger$ anticommute), and a
 general permutation of the creation list scales it by a nonzero $\pm1$
 (\texttt{generalFlatBandSlaterState\_perm}, the \texttt{generalFlatBandSlaterState} analogue of
-\texttt{generalModeMonomial\_perm}).  Collecting the surviving $(D_0{-}2)$-occupied terms by removed
-index pair is the subsequent PR.  The double-annihilation expansion and sign relation
+\texttt{generalModeMonomial\_perm}).
+
+\medskip\noindent\textbf{Theorem 11.17 PR17, the canonical spin-config list (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  The orbital-ordered creation list of a spin
+configuration is \texttt{flatBandSpinConfigList}~$=$ the sorted $(z,\sigma_z)$ for $z\in I$ (the
+general-basis analogue of the Theorem 11.11 \texttt{flatBandAlphaSpinList}).  Its occupied finset is
+$\{(\mathrm{idx}\,z,\sigma_z):z\in I\}$ (\texttt{flatBandSpinConfigOcc\_occFinset}); it is nodup with
+the same \texttt{toFinset} as the opaque $\mu$-Slater preimage list, hence a permutation of it
+(\texttt{flatBandSpinConfigList\_perm\_preimageList}).  Combined with the permutation scaling, the
+spin-config state is a nonzero-sign multiple of the canonical-list Slater state
+(\texttt{flatBandSpinConfigState\_eq\_smul\_canonical}) --- the orbital-ordered form on which the
+eq.~(11.3.48) double peel has explicit positions and Koszul signs.  Collecting the surviving
+$(D_0{-}2)$-occupied terms by removed index pair is the subsequent PR.  The double-annihilation expansion and sign relation
 (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
