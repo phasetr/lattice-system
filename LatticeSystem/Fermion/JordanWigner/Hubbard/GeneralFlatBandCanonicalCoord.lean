@@ -392,4 +392,54 @@ theorem idxConfigOf_flatBandSpinConfigList_inj {T : Matrix (Fin (M + 1)) (Fin (M
     · intro hw; exact absurd (hS hw) hwI
     · intro hw; exact absurd (hS' hw) hwI
 
+/-- **The target config of a canonical double peel determines the removed pair**: if the doubly
+erased canonical rest config equals the `(a,b)`-emptied config `idxConfigOf idx (canonical
+((I.erase a).erase b) σ)`, with the up-guard on the outer position `i` and the down-guard on the
+inner position `j`, then the outer index is `a` and the inner index is `b`.  Rewriting the rest list
+by `flatBandSpinConfigList_eraseIdx_eraseIdx`, config injectivity
+(`idxConfigOf_flatBandSpinConfigList_inj`) forces the twice-erased index set to match
+`(I.erase a).erase b`; `Finset.eq_or_eq_of_erase_erase_eq` (with `erase_right_comm`) pins both
+removed indices to `{a,b}`, and the opposite spin guards (`σ = 0` up vs `σ = 1` down) disambiguate
+them.  This is the "exactly one `(i,j)`" engine for the `cDownUp_canonical_repr_eq_sum` collapse. -/
+theorem flatBandSpinConfig_doublePeel_index_eq {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2)
+    {a b : Fin (M + 1)} (hσa : σ a = 0) (hσb : σ b = 1)
+    {i : ℕ} (hi : i < (flatBandSpinConfigList I σ).length)
+    (hgi : ((flatBandSpinConfigList I σ)[i]).2 = 0) {j : ℕ}
+    (hj : j < (flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I σ)[i]).1) σ).length)
+    (hgj : ((flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I σ)[i]).1) σ)[j]).2 = 1)
+    (hconfig : idxConfigOf idx (((flatBandSpinConfigList I σ).eraseIdx i).eraseIdx j)
+      = idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ)) :
+    ((flatBandSpinConfigList I σ)[i]).1 = a
+      ∧ ((flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I σ)[i]).1) σ)[j]).1 = b := by
+  have hcI : ((flatBandSpinConfigList I σ)[i]).1 ∈ I :=
+    flatBandSpinConfigList_mem_fst_mem I σ (List.getElem_mem _)
+  have hdI : ((flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I σ)[i]).1) σ)[j]).1 ∈ I :=
+    Finset.mem_of_mem_erase (flatBandSpinConfigList_mem_fst_mem _ σ (List.getElem_mem _))
+  rw [flatBandSpinConfigList_eraseIdx_eraseIdx I σ hi hj] at hconfig
+  have hset : (I.erase ((flatBandSpinConfigList I σ)[i]).1).erase
+        ((flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I σ)[i]).1) σ)[j]).1
+      = (I.erase a).erase b :=
+    idxConfigOf_flatBandSpinConfigList_inj hbasis hidx σ
+      ((Finset.erase_subset _ _).trans (Finset.erase_subset _ _))
+      ((Finset.erase_subset _ _).trans (Finset.erase_subset _ _)) hconfig
+  have hσc : σ ((flatBandSpinConfigList I σ)[i]).1 = 0 := by
+    rw [← flatBandSpinConfigList_mem_snd_eq I σ (List.getElem_mem hi)]; exact hgi
+  have hσd :
+      σ ((flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I σ)[i]).1) σ)[j]).1 = 1 := by
+    rw [← flatBandSpinConfigList_mem_snd_eq _ σ (List.getElem_mem hj)]; exact hgj
+  have hc := Finset.eq_or_eq_of_erase_erase_eq hcI hset
+  rw [Finset.erase_right_comm] at hset
+  have hd := Finset.eq_or_eq_of_erase_erase_eq hdI hset
+  refine ⟨?_, ?_⟩
+  · rcases hc with h | h
+    · exact h
+    · exfalso; rw [h, hσb] at hσc; exact absurd hσc (by decide)
+  · rcases hd with h | h
+    · exfalso; rw [h, hσa] at hσd; exact absurd hσd (by decide)
+    · exact h
+
 end LatticeSystem.Fermion
