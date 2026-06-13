@@ -2,6 +2,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandConnectivity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinLoweringTowerGeneral
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiHopAction
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandGroundAnnihilation
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinSymmetry
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinChargeCommutation
 
 /-!
 # The general flat-band maximal-spin multiplet (Tasaki §11.3.4)
@@ -227,5 +229,29 @@ theorem generalFlatBandSlaterState_allUp_mem_groundSubmodule
       hubbardOnSiteInteraction_mulVec_allUpSlater_eq_zero μ I (U : ℂ), add_zero]
   · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply,
       fermionTotalNumber_mulVec_generalFlatBandSlaterState, flatBandSpinConfigList_length, hbasis.1]
+
+open scoped ComplexOrder in
+/-- **The total spin-lowering operator preserves the general flat-band ground submodule**
+(`tower ⊆ ground`): if `v` is a ground state then so is `Ŝ⁻_tot v`.  `Ŝ⁻_tot` commutes with both
+`Ĥ` (SU(2) symmetry, `fermionTotalSpinMinus_commute_hubbardHamiltonian` — needs `T` Hermitian and
+`U` real) and `N̂_tot` (it conserves particle number, `fermionTotalSpinMinus_commute_fermionTotalNumber`),
+so it maps `ker Ĥ ∩ {N = D₀}` into itself.  Hence the whole SU(2) lowering tower `(Ŝ⁻_tot)^k v` from
+the all-up highest-weight vector lies inside the ground subspace, supplying `D₀+1` independent
+ground states for the `finrank ≥ D₀+1` lower bound. -/
+theorem fermionTotalSpinMinus_mulVec_mem_generalFlatBandGroundSubmodule
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : T.PosSemidef) (U : ℝ)
+    {v : (Fin (2 * M + 2) → Fin 2) → ℂ} (hv : v ∈ generalFlatBandGroundSubmodule T U) :
+    (fermionTotalSpinMinus M).mulVec v ∈ generalFlatBandGroundSubmodule T U := by
+  simp only [generalFlatBandGroundSubmodule, Submodule.mem_inf, LinearMap.mem_ker,
+    Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hv ⊢
+  obtain ⟨hH, hN⟩ := hv
+  refine ⟨?_, ?_⟩
+  · have hcomm : Commute (hubbardHamiltonian M T (U : ℂ)) (fermionTotalSpinMinus M) :=
+      (fermionTotalSpinMinus_commute_hubbardHamiltonian M T (U : ℂ)
+        (hJ := fun i j => hT.isHermitian.apply j i) (hU := Complex.conj_ofReal U)).symm
+    rw [Matrix.mulVec_mulVec, hcomm.eq, ← Matrix.mulVec_mulVec, hH, Matrix.mulVec_zero]
+  · have hcomm : Commute (fermionTotalNumber (2 * M + 1)) (fermionTotalSpinMinus M) :=
+      (fermionTotalSpinMinus_commute_fermionTotalNumber M).symm
+    rw [Matrix.mulVec_mulVec, hcomm.eq, ← Matrix.mulVec_mulVec, hN, Matrix.mulVec_smul]
 
 end LatticeSystem.Fermion
