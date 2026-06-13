@@ -552,4 +552,69 @@ theorem disconnection_cut_card_lt {I : Finset (Fin (M + 1))} (A : Finset ↥I)
   have h2 : 1 ≤ Aᶜ.card := hAc.card_pos
   nlinarith [hcard, h1, h2]
 
+/-- **Two-hole-target coordinate kill for an edge-swap-invariant `D`-sum**: at the `(a,b)`-emptied
+occupation target `g_ab`, the `D`-weighted sum of `ĉ_{x↓}ĉ_{x↑}`-coordinates over all spin configs
+vanishes (for `D` edge-swap-invariant).  The sum collapses (`cDownUp_canonicalSum_eq_two_terms`) to
+`D(σ)·coord_σ + D(σ')·coord_σ'`; the coordinates are negatives (`..._twoHole_swap_eq_neg`) and the
+two-hole coordinate carries a `μ_a(x)μ_b(x)` factor (`cDownUp_canonical_repr_twoHole`), so either
+`a,b` connect at `x` (giving an edge `⟨a⟩ ~ ⟨b⟩`, whence `D(σ) = D(σ')` and the terms cancel) or the
+coordinate vanishes.  This is the reverse of the eq. (11.3.49) Marshall-sign derivation, used to put
+the per-block weight states of a disconnected basis into the ground subspace. -/
+theorem cDownUp_canonicalSlaterSum_repr_twoHole_eq_zero_of_edgeSwap_invariant
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2)
+    (x : Fin (M + 1)) {a b : Fin (M + 1)} (ha : a ∈ I) (hb : b ∈ I) (hab : a ≠ b)
+    (hσa : σ a = 0) (hσb : σ b = 1) (D : (I → Fin 2) → ℂ)
+    (hedge : ∀ {z z' : ↥I}, (generalFlatBandBasisGraph I μ).Adj z z' →
+      ∀ s : I → Fin 2, D s = D (s ∘ ⇑(Equiv.swap z z'))) :
+    ∑ s : I → Fin 2, D s * (generalOccBasis eμ).repr
+        ((generalCDownUp M x).mulVec (generalFlatBandSlaterState μ
+          (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0))))
+        (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ)) = 0 := by
+  have hcanσ : flatBandSpinConfigList I
+      (fun z => if h : z ∈ I then (fun z : I => σ z.1) ⟨z, h⟩ else 0)
+        = flatBandSpinConfigList I σ :=
+    flatBandSpinConfigList_congr I _ σ (fun z hz => by simp only [dif_pos hz])
+  have hcanσ' : flatBandSpinConfigList I
+      (fun z => if h : z ∈ I then (fun z : I => (σ ∘ ⇑(Equiv.swap a b)) z.1) ⟨z, h⟩ else 0)
+        = flatBandSpinConfigList I (σ ∘ ⇑(Equiv.swap a b)) :=
+    flatBandSpinConfigList_congr I _ _ (fun z hz => by simp only [dif_pos hz])
+  rw [cDownUp_canonicalSum_eq_two_terms hbasis hidx σ x ha hb hab hσa hσb D, hcanσ, hcanσ']
+  set cσ := (generalOccBasis eμ).repr ((generalCDownUp M x).mulVec
+    (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ)))
+    (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ)) with hcσdef
+  set cσ' := (generalOccBasis eμ).repr ((generalCDownUp M x).mulVec
+    (generalFlatBandSlaterState μ (flatBandSpinConfigList I (σ ∘ ⇑(Equiv.swap a b)))))
+    (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ)) with hcσ'def
+  have hneg : cσ = -cσ' :=
+    cDownUp_canonical_repr_twoHole_swap_eq_neg hbasis hidx σ x ha hb hab hσa hσb
+  by_cases hμ : μ a x = 0 ∨ μ b x = 0
+  · have hcσ0 : cσ = 0 := by
+      rw [hcσdef, cDownUp_canonical_repr_twoHole hbasis hidx σ x ha hb hab hσa hσb]
+      rcases hμ with h | h <;> simp [h]
+    have hcσ'0 : cσ' = 0 := by
+      have h := hneg; rw [hcσ0] at h; exact neg_eq_zero.mp h.symm
+    rw [hcσ0, hcσ'0, mul_zero, mul_zero, add_zero]
+  · push Not at hμ
+    have hadj : (generalFlatBandBasisGraph I μ).Adj ⟨a, ha⟩ ⟨b, hb⟩ :=
+      ⟨hab, x, hμ.1, hμ.2⟩
+    have hswapcompat : ∀ z : ↥I,
+        ((Equiv.swap (⟨a, ha⟩ : ↥I) ⟨b, hb⟩) z).1 = Equiv.swap a b z.1 := by
+      intro z
+      rcases eq_or_ne z ⟨a, ha⟩ with hz | hz
+      · subst hz; simp [Equiv.swap_apply_left]
+      · rcases eq_or_ne z ⟨b, hb⟩ with hz2 | hz2
+        · subst hz2; simp [Equiv.swap_apply_right]
+        · rw [Equiv.swap_apply_of_ne_of_ne hz hz2,
+            Equiv.swap_apply_of_ne_of_ne (fun h => hz (Subtype.ext h))
+              (fun h => hz2 (Subtype.ext h))]
+    have hsσ'eq : (fun z : I => (σ ∘ ⇑(Equiv.swap a b)) z.1)
+        = (fun z : I => σ z.1) ∘ ⇑(Equiv.swap (⟨a, ha⟩ : ↥I) ⟨b, hb⟩) := by
+      funext z; simp only [Function.comp_apply]; rw [hswapcompat z]
+    have hDeq : D (fun z : I => σ z.1) = D (fun z : I => (σ ∘ ⇑(Equiv.swap a b)) z.1) := by
+      rw [hsσ'eq]; exact hedge hadj (fun z : I => σ z.1)
+    rw [hDeq, hneg]; ring
+
 end LatticeSystem.Fermion
