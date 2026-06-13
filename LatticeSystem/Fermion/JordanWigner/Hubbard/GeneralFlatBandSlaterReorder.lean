@@ -16,6 +16,21 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), §11.3.4, eqs. (11.3.48)–(11.3.49).  Tracked in Issue #4363.
 -/
 
+/-- **The occupied-set of a one-erased nodup list** is the original set with the erased element
+removed: for a nodup list `l` and `i < l.length`, `(l.eraseIdx i).toFinset = l.toFinset.erase l[i]`.
+(Generic list fact; the engine behind tracking which mode a double-peel `eraseIdx` removes.) -/
+theorem List.toFinset_eraseIdx_of_nodup {α : Type*} [DecidableEq α] {l : List α} (h : l.Nodup)
+    {i : ℕ} (hi : i < l.length) :
+    (l.eraseIdx i).toFinset = l.toFinset.erase l[i] := by
+  ext q
+  simp only [List.mem_toFinset, List.mem_eraseIdx_iff_getElem, Finset.mem_erase]
+  constructor
+  · rintro ⟨k, hk, hkne, rfl⟩
+    exact ⟨fun hc => hkne ((List.Nodup.getElem_inj_iff h).mp hc), List.getElem_mem hk⟩
+  · rintro ⟨hne, hmem⟩
+    obtain ⟨k, hk, rfl⟩ := List.mem_iff_getElem.mp hmem
+    exact ⟨k, hk, fun hc => hne ((List.Nodup.getElem_inj_iff h).mpr hc), rfl⟩
+
 namespace LatticeSystem.Fermion
 
 open Matrix LatticeSystem.Quantum Module
