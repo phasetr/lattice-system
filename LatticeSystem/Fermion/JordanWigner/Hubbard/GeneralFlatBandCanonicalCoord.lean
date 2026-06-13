@@ -409,6 +409,58 @@ theorem idxConfigOf_flatBandSpinConfigList_inj {T : Matrix (Fin (M + 1)) (Fin (M
     · intro hw; exact absurd (hS hw) hwI
     · intro hw; exact absurd (hS' hw) hwI
 
+/-- **The index config of a canonical creation list determines its index set *and* its spins** (the
+`σ`-varying refinement of `idxConfigOf_flatBandSpinConfigList_inj`): for `S, S' ⊆ I`, if
+`idxConfigOf idx (canonical S σ) = idxConfigOf idx (canonical S' σ')` then `S = S'` and `σ = σ'` on
+`S`.  Evaluating the config at every mode `(idx w, s)` reads off `w ∈ S ∧ σ w = s`, so equal configs
+force equal index sets and matching spins.  This is the engine for the eq. (11.3.49) sum collapse:
+only the spin configs agreeing with `σ` off `{a,b}` (and with the right `(a,b)` spins) can hit the
+target config. -/
+theorem idxConfigOf_flatBandSpinConfigList_inj_gen {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ σ' : Fin (M + 1) → Fin 2)
+    {S S' : Finset (Fin (M + 1))} (hS : S ⊆ I) (hS' : S' ⊆ I)
+    (heq : idxConfigOf idx (flatBandSpinConfigList S σ)
+      = idxConfigOf idx (flatBandSpinConfigList S' σ')) :
+    S = S' ∧ ∀ z ∈ S, σ z = σ' z := by
+  have hmem : ∀ (R : Finset (Fin (M + 1))) (τ : Fin (M + 1) → Fin 2) (w : Fin (M + 1)) (s : Fin 2),
+      (idx w, s) ∈ ((flatBandSpinConfigList R τ).map (fun p => (idx p.1, p.2))).toFinset
+        ↔ ∃ z ∈ R, idx z = idx w ∧ τ z = s := by
+    intro R τ w s
+    simp only [flatBandSpinConfigList, List.map_map, List.mem_toFinset, List.mem_map,
+      Finset.mem_sort, Function.comp]
+    constructor
+    · rintro ⟨z, hz, he⟩; exact ⟨z, hz, (Prod.ext_iff.mp he).1, (Prod.ext_iff.mp he).2⟩
+    · rintro ⟨z, hz, h1, h2⟩; exact ⟨z, hz, by rw [Prod.ext_iff]; exact ⟨h1, h2⟩⟩
+  have key : ∀ w ∈ I, ∀ (R : Finset (Fin (M + 1))) (τ : Fin (M + 1) → Fin 2), R ⊆ I → ∀ s : Fin 2,
+      (idxConfigOf idx (flatBandSpinConfigList R τ) (idx w, s) = 1 ↔ (w ∈ R ∧ τ w = s)) := by
+    intro w hw R τ hR s
+    simp only [idxConfigOf]
+    rw [if_congr (hmem R τ w s) rfl rfl]
+    constructor
+    · intro h
+      by_contra hcon
+      rw [if_neg (by
+        rintro ⟨z, hz, h1, h2⟩
+        have : z = w := flatBandSpecial_idx_injOn hbasis hidx (hR hz) hw h1
+        rw [this] at hz h2; exact hcon ⟨hz, h2⟩)] at h
+      exact absurd h (by decide)
+    · rintro ⟨hwR, hτ⟩; rw [if_pos ⟨w, hwR, rfl, hτ⟩]
+  have hsetspin : ∀ w ∈ I, ∀ s, (w ∈ S ∧ σ w = s) ↔ (w ∈ S' ∧ σ' w = s) := by
+    intro w hw s
+    rw [← key w hw S σ hS s, ← key w hw S' σ' hS' s, heq]
+  refine ⟨?_, ?_⟩
+  · ext w
+    by_cases hwI : w ∈ I
+    · constructor
+      · intro hwS; exact ((hsetspin w hwI (σ w)).mp ⟨hwS, rfl⟩).1
+      · intro hwS'; exact ((hsetspin w hwI (σ' w)).mpr ⟨hwS', rfl⟩).1
+    · exact ⟨fun h => absurd (hS h) hwI, fun h => absurd (hS' h) hwI⟩
+  · intro z hzS
+    exact ((hsetspin z (hS hzS) (σ z)).mp ⟨hzS, rfl⟩).2.symm
+
 /-- **The target config of a canonical double peel determines the removed pair**: if the doubly
 erased canonical rest config equals the `(a,b)`-emptied config `idxConfigOf idx (canonical
 ((I.erase a).erase b) σ)`, with the up-guard on the outer position `i` and the down-guard on the
