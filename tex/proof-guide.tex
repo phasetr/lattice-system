@@ -6672,7 +6672,12 @@ the occupation-basis coordinate functional and linear independence is the subseq
 reorder/extraction machinery above --- the Slater swap/permutation, the canonical list, the
 head/two-head/swap extraction, the move-pair-front, the per-pair extraction, and the
 canonical-Slater $D$-coefficient expansion --- lives in \texttt{GeneralFlatBandSlaterReorder.lean},
-split from \texttt{GeneralFlatBandSignPropagation.lean} for build speed.)
+split from \texttt{GeneralFlatBandSignPropagation.lean} for build speed.  The canonical-list
+coordinate/config machinery built on top of it (the list length and per-mode shape, the
+occupation-basis coordinate functional and its distribution over the positional double-peel sum,
+the index-configuration \texttt{idxConfigOf} and its erase-tracking, the position$\leftrightarrow$index
+correspondence, and the erase-to-canonical bridge \texttt{flatBandSpinConfigList\_eraseIdx}) was in
+turn split into \texttt{GeneralFlatBandCanonicalCoord.lean} for build speed.)
 
 \medskip\noindent\textbf{Theorem 11.17 PR23, the canonical double peel (Tasaki §11.3.4, Issue
 \#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  The reindexing starts from the explicit
