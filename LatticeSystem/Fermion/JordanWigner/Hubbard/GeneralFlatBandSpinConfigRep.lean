@@ -434,4 +434,82 @@ theorem flatBand_groundState_mem_spinConfigSpan
       g hsupp, zero_smul]
     exact Submodule.zero_mem _
 
+/-- Two distinct `Fin 2` values are `0` and `1` in some order. -/
+theorem fin2_ne_cases {a b : Fin 2} (h : a ≠ b) :
+    (a = 0 ∧ b = 1) ∨ (a = 1 ∧ b = 0) := by
+  fin_cases a <;> fin_cases b <;> simp_all
+
+/-- Every `Fin 2` value is `0` or `1`. -/
+theorem fin2_eq_zero_or_one (a : Fin 2) : a = 0 ∨ a = 1 := by revert a; decide
+
+/-- **One spin per index (the pigeonhole behind eq. (11.3.47))**: a spin-configuration occupation
+`g` (`idx(I)`-supported, no doubly occupied index mode, exactly `D₀` occupied) occupies **every**
+index mode `idx z` (`z ∈ I`) by at least one spin.  Since `D₀ = |I|` and the first-coordinate
+projection is injective on the occupied finset (no double occupancy), it surjects onto `idx(I)`. -/
+theorem flatBandSpinConfig_occupied_per_index
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) {g : Fin (M + 1) × Fin 2 → Fin 2}
+    (hsupp : IsIdxSupported I idx g)
+    (hno : ∀ z ∈ I, ¬ (g (idx z, 0) = 1 ∧ g (idx z, 1) = 1))
+    (hcard : (generalOccFinset g).card = generalFlatBandDim T) {z : Fin (M + 1)} (hz : z ∈ I) :
+    g (idx z, 0) = 1 ∨ g (idx z, 1) = 1 := by
+  classical
+  have hgmem : ∀ {q : Fin (M + 1) × Fin 2}, q ∈ generalOccFinset g → g q = 1 := fun {q} hq => by
+    simpa only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and] using hq
+  have hinjOn : Set.InjOn (Prod.fst : Fin (M + 1) × Fin 2 → Fin (M + 1)) ↑(generalOccFinset g) := by
+    intro q hq q' hq' hqq
+    rw [Finset.mem_coe] at hq hq'
+    by_contra hne
+    have h2 : q.2 ≠ q'.2 := fun h => hne (Prod.ext hqq h)
+    obtain ⟨w, hw, hwq⟩ := Finset.mem_image.mp (hsupp q (hgmem hq))
+    have hqw : q = (idx w, q.2) := Prod.ext hwq.symm rfl
+    have hq'w : q' = (idx w, q'.2) := Prod.ext (by rw [← hqq, ← hwq]) rfl
+    have hga : g (idx w, q.2) = 1 := hqw ▸ hgmem hq
+    have hgb : g (idx w, q'.2) = 1 := hq'w ▸ hgmem hq'
+    refine hno w hw ?_
+    rcases fin2_ne_cases h2 with ⟨ha, hb⟩ | ⟨ha, hb⟩
+    · exact ⟨ha ▸ hga, hb ▸ hgb⟩
+    · exact ⟨hb ▸ hgb, ha ▸ hga⟩
+  -- the projection image of the occupied finset is all of `idx(I)`
+  set π : Fin (M + 1) × Fin 2 → Fin (M + 1) := Prod.fst with hπ
+  have hsub : (generalOccFinset g).image π ⊆ I.image idx := by
+    intro p hp
+    obtain ⟨q, hq, rfl⟩ := Finset.mem_image.mp hp
+    exact hsupp q (hgmem hq)
+  have hidxinj : Set.InjOn idx ↑I := fun a ha b hb hab =>
+    flatBandSpecial_idx_injOn hbasis hidx (Finset.mem_coe.mp ha) (Finset.mem_coe.mp hb) hab
+  have hcardeq : ((generalOccFinset g).image π).card = (I.image idx).card := by
+    rw [Finset.card_image_of_injOn hinjOn, Finset.card_image_of_injOn hidxinj, hcard]
+    exact (hbasis.1).symm
+  have himg : (generalOccFinset g).image π = I.image idx :=
+    Finset.eq_of_subset_of_card_le hsub hcardeq.ge
+  have hmem : idx z ∈ (generalOccFinset g).image π := by
+    rw [himg]; exact Finset.mem_image_of_mem idx hz
+  obtain ⟨q, hq, hqfst⟩ := Finset.mem_image.mp hmem
+  have hgq : g q = 1 := hgmem hq
+  have hqeq : q = (idx z, q.2) := Prod.ext hqfst rfl
+  rw [hqeq] at hgq
+  rcases fin2_eq_zero_or_one q.2 with h | h
+  · left; rw [h] at hgq; exact hgq
+  · right; rw [h] at hgq; exact hgq
+
+/-- **Exactly one spin per index, eq. (11.3.47) explicit form**: a spin-configuration occupation `g`
+(`idx(I)`-supported, no double occupancy, `D₀` occupied) occupies every index mode `idx z` (`z ∈ I`)
+by **exactly one** spin.  Combines the pigeonhole `flatBandSpinConfig_occupied_per_index` (at least
+one) with the no-double-occupancy hypothesis (not both). -/
+theorem flatBandSpinConfig_exactlyOne_per_index
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) {g : Fin (M + 1) × Fin 2 → Fin 2}
+    (hsupp : IsIdxSupported I idx g)
+    (hno : ∀ z ∈ I, ¬ (g (idx z, 0) = 1 ∧ g (idx z, 1) = 1))
+    (hcard : (generalOccFinset g).card = generalFlatBandDim T) {z : Fin (M + 1)} (hz : z ∈ I) :
+    (g (idx z, 0) = 1 ∧ g (idx z, 1) ≠ 1) ∨ (g (idx z, 0) ≠ 1 ∧ g (idx z, 1) = 1) := by
+  rcases flatBandSpinConfig_occupied_per_index hbasis hidx hsupp hno hcard hz with h0 | h1
+  · exact Or.inl ⟨h0, fun h1 => hno z hz ⟨h0, h1⟩⟩
+  · exact Or.inr ⟨fun h0 => hno z hz ⟨h0, h1⟩, h1⟩
+
 end LatticeSystem.Fermion
