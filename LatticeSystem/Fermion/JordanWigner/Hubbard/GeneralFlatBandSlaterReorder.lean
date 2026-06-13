@@ -549,4 +549,15 @@ theorem flatBandSpinConfigList_exists_pos (I : Finset (Fin (M + 1))) (σ : Fin (
     ∃ i : Fin (flatBandSpinConfigList I σ).length, (flatBandSpinConfigList I σ).get i = (z, σ z) :=
   List.get_of_mem (flatBandSpinConfigList_mem I σ hz)
 
+/-- **Each index of `I` sits at a unique canonical-list position**: for `z ∈ I` there is exactly one
+position `i` with index `z` (existence `flatBandSpinConfigList_exists_pos` + uniqueness
+`flatBandSpinConfigList_get_fst_inj`).  This is the position-of-index bookkeeping that makes the
+double-peel `(i,j)` of a removed pair unique. -/
+theorem flatBandSpinConfigList_existsUnique_pos (I : Finset (Fin (M + 1)))
+    (σ : Fin (M + 1) → Fin 2) {z : Fin (M + 1)} (hz : z ∈ I) :
+    ∃! i : Fin (flatBandSpinConfigList I σ).length, ((flatBandSpinConfigList I σ).get i).1 = z := by
+  obtain ⟨i, hi⟩ := flatBandSpinConfigList_exists_pos I σ hz
+  refine ⟨i, by simp only [hi], fun i' hi' => flatBandSpinConfigList_get_fst_inj I σ ?_⟩
+  rw [hi', hi]
+
 end LatticeSystem.Fermion
