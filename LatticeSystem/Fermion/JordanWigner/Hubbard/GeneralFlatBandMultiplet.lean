@@ -12,7 +12,7 @@ carrying total spin `(D₀/2)(D₀/2+1)`, which (with the `finrank ≤ D₀+1` u
 `generalFlatBandGround_finrank_le_of_connected`) pins the ground subspace as the multiplet.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
-(1st ed.), §11.3.4.  Tracked in Issue #4363.
+(1st ed., Springer, 2020), §11.3.4, Theorem 11.17, pp. 410–412.  Tracked in Issue #4363.
 -/
 
 namespace LatticeSystem.Fermion
