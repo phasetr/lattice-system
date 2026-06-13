@@ -533,4 +533,46 @@ theorem flatBandSpinConfig_inner_sum_collapse {T : Matrix (Fin (M + 1)) (Fin (M 
     rw [helper j this, mul_zero, mul_zero]
   · intro h; exact absurd (Finset.mem_univ pb) h
 
+/-- **Wrong-outer vanishing**: if the outer-peeled index `c` is neither `a` nor `b`, the inner
+`j`-sum over `canonical (I.erase c) σ` evaluated at the `(a,b)`-emptied target config is identically
+zero.  Every term vanishes: by config injectivity and `Finset.eq_or_eq_of_erase_erase_eq`, no
+single peel of `canonical (I.erase c) σ` can hit the `(a,b)`-emptied config (that would force
+`c ∈ {a,b}`), so every `repr` coordinate is zero.  This is the off-diagonal case of the outer
+`Finset.sum_eq_single` collapse of `cDownUp_canonical_repr_eq_sum`. -/
+theorem flatBandSpinConfig_inner_sum_other_outer_zero {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2)
+    (x : Fin (M + 1)) {a b c : Fin (M + 1)} (hcI : c ∈ I) (hca : c ≠ a) (hcb : c ≠ b) :
+    ∑ j : Fin (flatBandSpinConfigList (I.erase c) σ).length,
+        ((-1 : ℂ) ^ (j : ℕ)) *
+          ((if ((flatBandSpinConfigList (I.erase c) σ).get j).2 = 1 then
+              μ ((flatBandSpinConfigList (I.erase c) σ).get j).1 x else 0) *
+            (generalOccBasis eμ).repr (generalFlatBandSlaterState μ
+              ((flatBandSpinConfigList (I.erase c) σ).eraseIdx j))
+              (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ))) = 0 := by
+  apply Finset.sum_eq_zero
+  intro j _
+  have hnd : ((flatBandSpinConfigList (I.erase c) σ).eraseIdx (j : ℕ)).Nodup :=
+    flatBandSpinConfigList_eraseIdx_nodup (I.erase c) σ j
+  have hsub : ∀ q ∈ (flatBandSpinConfigList (I.erase c) σ).eraseIdx (j : ℕ), q.1 ∈ I := fun q hq =>
+    Finset.mem_of_mem_erase
+      (flatBandSpinConfigList_mem_fst_mem (I.erase c) σ (List.mem_of_mem_eraseIdx hq))
+  obtain ⟨z, _, heq⟩ := generalFlatBandSlaterState_over_I_repr hbasis eμ idx hidx
+    ((flatBandSpinConfigList (I.erase c) σ).eraseIdx (j : ℕ)) hnd hsub
+    (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ))
+  have hne : idxConfigOf idx ((flatBandSpinConfigList (I.erase c) σ).eraseIdx (j : ℕ))
+      ≠ idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ) := by
+    intro hcond'
+    rw [flatBandSpinConfigList_eraseIdx (I.erase c) σ j.2] at hcond'
+    have hset := idxConfigOf_flatBandSpinConfigList_inj hbasis hidx σ
+      ((Finset.erase_subset _ _).trans (Finset.erase_subset _ _))
+      ((Finset.erase_subset _ _).trans (Finset.erase_subset _ _)) hcond'
+    rcases Finset.eq_or_eq_of_erase_erase_eq hcI hset with h | h
+    · exact hca h
+    · exact hcb h
+  rw [heq]
+  split_ifs with hg hc <;> first | exact absurd hc hne | ring
+
 end LatticeSystem.Fermion
