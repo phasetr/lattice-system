@@ -469,4 +469,68 @@ theorem flatBandSpinConfig_singlePeel_index_eq {T : Matrix (Fin (M + 1)) (Fin (M
   by_contra hne
   exact hdnot (Finset.mem_erase.mpr ⟨hne, hdS⟩)
 
+/-- **Inner-sum collapse (single peel)**: the inner `j`-sum of the canonical double peel, evaluated
+at the `b`-emptied target config `idxConfigOf idx (canonical (S.erase b) σ)` (with `b ∈ S`,
+`σ b = 1`) collapses to its single surviving term at the position of `b`.  Every off-position `j`
+contributes
+zero: by `flatBandSpinConfig_singlePeel_index_eq` the only `j` whose erased rest config hits the
+target is the position of `b`, so all other `repr` coordinates vanish; at the position of `b` the
+down-guard holds and the rest list is `canonical (S.erase b) σ`.  The surviving Koszul sign is
+`(-1)` to the power of that position. -/
+theorem flatBandSpinConfig_inner_sum_collapse {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2)
+    (x : Fin (M + 1)) {S : Finset (Fin (M + 1))} (hS : S ⊆ I) {b : Fin (M + 1)} (hb : b ∈ S)
+    (hσb : σ b = 1) :
+    ∑ j : Fin (flatBandSpinConfigList S σ).length,
+        ((-1 : ℂ) ^ (j : ℕ)) *
+          ((if ((flatBandSpinConfigList S σ).get j).2 = 1 then
+              μ ((flatBandSpinConfigList S σ).get j).1 x else 0) *
+            (generalOccBasis eμ).repr (generalFlatBandSlaterState μ
+              ((flatBandSpinConfigList S σ).eraseIdx j))
+              (idxConfigOf idx (flatBandSpinConfigList (S.erase b) σ)))
+      = ((-1 : ℂ) ^ ((flatBandSpinConfigList_existsUnique_pos S σ hb).choose : ℕ)) *
+          (μ b x * (generalOccBasis eμ).repr (generalFlatBandSlaterState μ
+            (flatBandSpinConfigList (S.erase b) σ))
+            (idxConfigOf idx (flatBandSpinConfigList (S.erase b) σ))) := by
+  have helper : ∀ j : Fin (flatBandSpinConfigList S σ).length,
+      ((flatBandSpinConfigList S σ).get j).1 ≠ b →
+      (generalOccBasis eμ).repr (generalFlatBandSlaterState μ
+        ((flatBandSpinConfigList S σ).eraseIdx (j : ℕ)))
+        (idxConfigOf idx (flatBandSpinConfigList (S.erase b) σ)) = 0 := by
+    intro j hjb
+    have hnd : ((flatBandSpinConfigList S σ).eraseIdx (j : ℕ)).Nodup :=
+      flatBandSpinConfigList_eraseIdx_nodup S σ j
+    have hsub : ∀ q ∈ (flatBandSpinConfigList S σ).eraseIdx (j : ℕ), q.1 ∈ I := fun q hq =>
+      hS (flatBandSpinConfigList_mem_fst_mem S σ (List.mem_of_mem_eraseIdx hq))
+    obtain ⟨z, _, heq⟩ := generalFlatBandSlaterState_over_I_repr hbasis eμ idx hidx
+      ((flatBandSpinConfigList S σ).eraseIdx (j : ℕ)) hnd hsub
+      (idxConfigOf idx (flatBandSpinConfigList (S.erase b) σ))
+    rw [heq]
+    split_ifs with hcond
+    · refine absurd ?_ hjb
+      rw [List.get_eq_getElem]
+      exact flatBandSpinConfig_singlePeel_index_eq hbasis hidx σ hS j.2 hcond
+    · ring
+  obtain ⟨pb, hpb, huniq⟩ := flatBandSpinConfigList_existsUnique_pos S σ hb
+  have hchoose : (flatBandSpinConfigList_existsUnique_pos S σ hb).choose = pb :=
+    huniq _ (flatBandSpinConfigList_existsUnique_pos S σ hb).choose_spec.1
+  rw [hchoose]
+  have hXb : ((flatBandSpinConfigList S σ)[(pb:ℕ)]'pb.2).1 = b := by
+    rw [← List.get_eq_getElem]; exact hpb
+  have hlist : (flatBandSpinConfigList S σ).eraseIdx (pb : ℕ)
+      = flatBandSpinConfigList (S.erase b) σ := by
+    rw [flatBandSpinConfigList_eraseIdx S σ pb.2]
+    exact congrArg (fun s => flatBandSpinConfigList (S.erase s) σ) hXb
+  rw [Finset.sum_eq_single pb]
+  · have hguard : ((flatBandSpinConfigList S σ).get pb).2 = 1 := by
+      rw [flatBandSpinConfigList_get_snd_eq, hpb, hσb]
+    rw [if_pos hguard, hpb, hlist]
+  · intro j _ hjne
+    have : ((flatBandSpinConfigList S σ).get j).1 ≠ b := fun hc => hjne (huniq j hc)
+    rw [helper j this, mul_zero, mul_zero]
+  · intro h; exact absurd (Finset.mem_univ pb) h
+
 end LatticeSystem.Fermion
