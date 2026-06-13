@@ -342,5 +342,73 @@ theorem cDownUp_canonical_repr_twoHole_swap_eq_neg {T : Matrix (Fin (M + 1)) (Fi
     (generalFlatBandSlaterState μ (flatBandSpinConfigList ((I.erase a).erase b) σ))
     (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ))) * hsign
 
+/-- **A contributing double peel forces the Slater config to be `σ` or its `a↔b` swap** (the
+`σ`-varying determination feeding the eq. (11.3.49) sum collapse): if the doubly-erased rest config
+of `Slater(canonical I τ)` equals the `(a,b)`-emptied target `idxConfigOf idx (canonical
+((I.erase a).erase b) σ)` (with `σ a = 0`, `σ b = 1`) and the peel guards hold (outer up, inner
+down), then on `I` either `τ = σ` or `τ = σ ∘ swap a b`.  The `σ`-varying config injectivity
+(`idxConfigOf_flatBandSpinConfigList_inj_gen`) forces the twice-erased set to match and `τ = σ` off
+`{a,b}`; `Finset.eq_or_eq_of_erase_erase_eq` pins the removed pair to `{a,b}`, and the guards fix
+the two spins of `τ` at `a, b` to `0, 1` in one of the two orders. -/
+theorem flatBandSpinConfig_doublePeel_config_eq {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ τ : Fin (M + 1) → Fin 2)
+    {a b : Fin (M + 1)} (hσa : σ a = 0) (hσb : σ b = 1)
+    {i : ℕ} (hi : i < (flatBandSpinConfigList I τ).length)
+    (hgi : ((flatBandSpinConfigList I τ)[i]).2 = 0) {j : ℕ}
+    (hj : j < (flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I τ)[i]).1) τ).length)
+    (hgj : ((flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I τ)[i]).1) τ)[j]).2 = 1)
+    (hconfig : idxConfigOf idx (((flatBandSpinConfigList I τ).eraseIdx i).eraseIdx j)
+      = idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ)) :
+    (∀ z ∈ I, τ z = σ z) ∨ (∀ z ∈ I, τ z = (σ ∘ ⇑(Equiv.swap a b)) z) := by
+  have hcI : ((flatBandSpinConfigList I τ)[i]).1 ∈ I :=
+    flatBandSpinConfigList_mem_fst_mem I τ (List.getElem_mem _)
+  have hdI : ((flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I τ)[i]).1) τ)[j]).1 ∈ I :=
+    Finset.mem_of_mem_erase (flatBandSpinConfigList_mem_fst_mem _ τ (List.getElem_mem _))
+  rw [flatBandSpinConfigList_eraseIdx_eraseIdx I τ hi hj] at hconfig
+  obtain ⟨hset, hspin⟩ := idxConfigOf_flatBandSpinConfigList_inj_gen hbasis hidx τ σ
+      ((Finset.erase_subset _ _).trans (Finset.erase_subset _ _))
+      ((Finset.erase_subset _ _).trans (Finset.erase_subset _ _)) hconfig
+  have hτc : τ ((flatBandSpinConfigList I τ)[i]).1 = 0 := by
+    rw [← flatBandSpinConfigList_mem_snd_eq I τ (List.getElem_mem hi)]; exact hgi
+  have hτd :
+      τ ((flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I τ)[i]).1) τ)[j]).1 = 1 := by
+    rw [← flatBandSpinConfigList_mem_snd_eq _ τ (List.getElem_mem hj)]; exact hgj
+  set c := ((flatBandSpinConfigList I τ)[i]).1 with hcdef
+  set d := ((flatBandSpinConfigList (I.erase c) τ)[j]).1 with hddef
+  have hcd : c ≠ d := fun h => by rw [h, hτd] at hτc; exact absurd hτc (by decide)
+  have hc := Finset.eq_or_eq_of_erase_erase_eq hcI hset
+  rw [Finset.erase_right_comm] at hset
+  have hd := Finset.eq_or_eq_of_erase_erase_eq hdI hset
+  rcases hc with hca | hcb
+  · left
+    have hdb : d = b := by
+      rcases hd with h | h
+      · exact absurd (hca.trans h.symm) hcd
+      · exact h
+    intro z hzI
+    by_cases hza : z = a
+    · rw [hza, hσa, ← hca]; exact hτc
+    · by_cases hzb : z = b
+      · rw [hzb, hσb, ← hdb]; exact hτd
+      · exact hspin z (Finset.mem_erase.mpr ⟨(fun h => hzb (h.trans hdb)),
+          Finset.mem_erase.mpr ⟨(fun h => hza (h.trans hca)), hzI⟩⟩)
+  · right
+    have hda : d = a := by
+      rcases hd with h | h
+      · exact h
+      · exact absurd (hcb.trans h.symm) hcd
+    intro z hzI
+    by_cases hza : z = a
+    · rw [hza, show (σ ∘ ⇑(Equiv.swap a b)) a = 1 from by
+        simp only [Function.comp, Equiv.swap_apply_left]; exact hσb, ← hda]; exact hτd
+    · by_cases hzb : z = b
+      · rw [hzb, show (σ ∘ ⇑(Equiv.swap a b)) b = 0 from by
+          simp only [Function.comp, Equiv.swap_apply_right]; exact hσa, ← hcb]; exact hτc
+      · have hz := hspin z (Finset.mem_erase.mpr ⟨(fun h => hza (h.trans hda)),
+          Finset.mem_erase.mpr ⟨(fun h => hzb (h.trans hcb)), hzI⟩⟩)
+        rw [hz]; simp only [Function.comp, Equiv.swap_apply_of_ne_of_ne hza hzb]
 
 end LatticeSystem.Fermion
