@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandTwoHoleCollapse
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinLoweringTowerGeneral
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiHopAction
 
 /-!
 # The general flat-band maximal-spin multiplet (Tasaki §11.3.4)
@@ -67,5 +68,67 @@ theorem fermionTotalNumber_mulVec_generalFlatBandSlaterState
       Matrix.add_mulVec, ← Matrix.mulVec_mulVec, ih, Matrix.mulVec_smul, List.length_cons]
     push_cast
     rw [add_smul, one_smul]
+
+/-- **The total number operator splits into spin-up and spin-down totals**:
+`N̂_tot = N̂_↑ + N̂_↓` on the spinful `2M+2`-mode chain.  Reindex the `2M+2` Jordan–Wigner modes
+into sites `t : Fin (M+1)` and spins `r : Fin 2` via `sum_spinful_reindex`, then split the inner
+two-element spin sum (`r = 0 ↦ n_{t,↑}`, `r = 1 ↦ n_{t,↓}`).  This is the standard
+`N̂ = N̂_↑ + N̂_↓` charge decomposition; used to read `Ŝᶻ_tot = (N̂_↑ − N̂_↓)/2` off the diagonal
+filling `N̂_tot = D₀`, `N̂_↓ = 0` of the all-up flat-band Slater. -/
+theorem fermionTotalNumber_eq_up_add_down (N : ℕ) :
+    fermionTotalNumber (2 * N + 1) = fermionTotalUpNumber N + fermionTotalDownNumber N := by
+  change (∑ k : Fin (2 * N + 2), fermionMultiNumber (2 * N + 1) k)
+      = (∑ t : Fin (N + 1), fermionUpNumber N t) + ∑ t : Fin (N + 1), fermionDownNumber N t
+  rw [sum_spinful_reindex N (fun k => fermionMultiNumber (2 * N + 1) k), ← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl (fun t _ => Fin.sum_univ_two _)
+
+/-- **The total spin-down number annihilates the all-up μ-Slater state**: each
+`n̂_{i,↓} = ĉ†_{i,↓}ĉ_{i,↓}` and `ĉ_{i,↓}` kills the all-up Slater (every mode carries spin
+`↑ = 0 ≠ 1`), so `N̂_↓ |Slater⟩ = 0`.  Together with `N̂_tot |Slater⟩ = D₀ |Slater⟩` this fixes the
+filling to be fully spin-polarized. -/
+theorem fermionTotalDownNumber_mulVec_allUpSlater (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (I : Finset (Fin (M + 1))) :
+    (fermionTotalDownNumber M).mulVec
+      (generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0))) = 0 := by
+  unfold fermionTotalDownNumber
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  rw [fermionDownNumber,
+    show fermionMultiNumber (2 * M + 1) (spinfulIndex M i 1)
+        = fermionMultiCreation (2 * M + 1) (spinfulIndex M i 1)
+          * fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M i 1) from rfl,
+    ← Matrix.mulVec_mulVec]
+  have hann : (fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M i 1)).mulVec
+      (generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0))) = 0 :=
+    generalFlatBand_siteAnnihilation_eq_zero μ i 1 _ (fun q hq => Or.inr (by
+      rw [flatBandSpinConfigList_mem_snd_eq I (fun _ => 0) hq]; decide))
+  rw [hann, Matrix.mulVec_zero]
+
+/-- **`Ŝᶻ_tot` eigenvalue `D₀/2` on the all-up μ-Slater state** (`D₀ = |I|`): from
+`Ŝᶻ_tot = (N̂_↑ − N̂_↓)/2`, `N̂_tot |Slater⟩ = |I| |Slater⟩`, and `N̂_↓ |Slater⟩ = 0` (hence
+`N̂_↑ |Slater⟩ = N̂_tot |Slater⟩ − N̂_↓ |Slater⟩ = |I| |Slater⟩`), the all-up Slater is the
+highest-weight vector of the SU(2) tower with `Ŝᶻ` eigenvalue `|I|/2`. -/
+theorem generalFlatBand_totalSpinZ_mulVec_allUpSlater (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (I : Finset (Fin (M + 1))) :
+    (fermionTotalSpinZ M).mulVec
+        (generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0)))
+      = ((I.card : ℂ) / 2) •
+        generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0)) := by
+  set v := generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0)) with hv
+  have hdown : (fermionTotalDownNumber M).mulVec v = 0 :=
+    fermionTotalDownNumber_mulVec_allUpSlater μ I
+  have htot : (fermionTotalNumber (2 * M + 1)).mulVec v = (I.card : ℂ) • v := by
+    rw [hv, fermionTotalNumber_mulVec_generalFlatBandSlaterState,
+      flatBandSpinConfigList_length]
+  have hup : (fermionTotalUpNumber M).mulVec v = (I.card : ℂ) • v := by
+    have hsplit := fermionTotalNumber_eq_up_add_down M
+    have : (fermionTotalUpNumber M).mulVec v + (fermionTotalDownNumber M).mulVec v
+        = (I.card : ℂ) • v := by
+      rw [← Matrix.add_mulVec, ← hsplit, htot]
+    rwa [hdown, add_zero] at this
+  rw [fermionTotalSpinZ, Matrix.smul_mulVec, Matrix.sub_mulVec, hup, hdown, sub_zero, smul_smul]
+  congr 1
+  rw [one_div]
+  ring
 
 end LatticeSystem.Fermion
