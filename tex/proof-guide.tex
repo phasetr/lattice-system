@@ -6524,8 +6524,17 @@ n^\mu_{z,\downarrow}\Phi=0$ (PR7); (c) \emph{filling} --- it vanishes off the $D
 ($\hat N$ diagonal).  As $D_0=|I|$, the surviving configs occupy each index mode by exactly one spin,
 so $\Phi$ lies in the span of the one-spin-per-index $\mu$-Slater states
 $\Phi=\sum_\sigma C(\sigma)\prod_{z\in I}\hat a^\dagger_{\mu_z,\sigma_z}|vac\rangle$ --- this is
-eq.~(11.3.47), \texttt{flatBand\_groundState\_mem\_spinConfigSpan} (sorry-free, axiom-clean).  The
-sign propagation (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone is the subsequent PR.
+eq.~(11.3.47), \texttt{flatBand\_groundState\_mem\_spinConfigSpan} (sorry-free, axiom-clean).
+
+\medskip\noindent\textbf{Theorem 11.17 PR10, eq.~(11.3.47) explicit one-spin-per-index (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSpinConfigRep.lean}).}  The surviving spin-config
+occupations occupy each index mode by exactly one spin.  Pigeonhole: the first-coordinate projection
+$q\mapsto q.1$ is injective on the occupied finset (no double occupancy forbids two spins at the same
+$\mathrm{idx}\,z$), so its image has $|{\rm occupied}|=D_0=|I|$ elements inside $\mathrm{idx}(I)$
+(cardinality $|I|$), hence equals $\mathrm{idx}(I)$; every index mode is therefore occupied
+(\texttt{flatBandSpinConfig\_occupied\_per\_index}), and with no double occupancy \emph{exactly} one
+spin (\texttt{flatBandSpinConfig\_exactlyOne\_per\_index}).  The sign propagation
+(eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone is the subsequent PR.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
 §11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
