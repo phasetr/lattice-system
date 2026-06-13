@@ -309,4 +309,22 @@ theorem flatBand_groundState_eq_canonicalSlaterSum
   obtain ⟨D, hD⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp (hle hmem)
   exact ⟨D, hD.symm⟩
 
+/-- **The site double-annihilation of the canonical-list Slater state, as an explicit double peel**:
+`ĉ_{x,↓}ĉ_{x,↑}` on `Slater(flatBandSpinConfigList σ)` expands (via the proved engine
+`generalFlatBand_double_siteAnnihilation_peel`) into the position double-sum over the
+orbital-ordered
+canonical list — the explicit form whose terms are collected by removed index pair in the eq.
+(11.3.48) reindexing step. -/
+theorem cDownUp_canonical_eq_doublePeel (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2) (x : Fin (M + 1)) :
+    (generalCDownUp M x).mulVec (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ))
+      = ∑ i : Fin (flatBandSpinConfigList I σ).length,
+          ((-1 : ℂ) ^ (i : ℕ)) •
+            ((if ((flatBandSpinConfigList I σ).get i).2 = 0 then
+                μ ((flatBandSpinConfigList I σ).get i).1 x else 0) •
+              ∑ j : Fin ((flatBandSpinConfigList I σ).eraseIdx i).length,
+                generalFlatBandPeelTerm μ x 1 ((flatBandSpinConfigList I σ).eraseIdx i) j) := by
+  rw [generalCDownUp, ← Matrix.mulVec_mulVec,
+    generalFlatBand_double_siteAnnihilation_peel μ x 0 1 (flatBandSpinConfigList I σ)]
+
 end LatticeSystem.Fermion
