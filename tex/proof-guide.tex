@@ -6570,7 +6570,20 @@ $\Phi=\sum_{s:I\to\{\uparrow,\downarrow\}} C(s)\,\texttt{flatBandSpinConfigState
 (\texttt{flatBand\_groundState\_eq\_spinConfigStateSum}, via
 \texttt{Submodule.mem\_span\_range\_iff\_exists\_fun}); indexing by $I\to\{\uparrow,\downarrow\}$
 (not the redundant $\Lambda\to\{\uparrow,\downarrow\}$) makes $C(s)$ the genuine, comparison-ready
-coefficients matching the linear-independence index type.  The double-annihilation expansion and sign relation
+coefficients matching the linear-independence index type.
+
+\medskip\noindent\textbf{Theorem 11.17 PR14, eq.~(11.3.48) raw form (Tasaki §11.3.4, Issue \#4363,
+\texttt{GeneralFlatBandSignPropagation.lean}).}  The left-hand side of eq.~(11.3.48) is assembled in
+$C(\sigma)$ form.  The site double-annihilation of a spin-config state is the double annihilation of
+its $\mu$-Slater preimage list (\texttt{flatBandSpinConfigState\_cDownUp\_eq\_slaterDoubleAnnih}),
+on which the proved peel engine \texttt{generalFlatBand\_double\_siteAnnihilation\_peel} expands.
+Since $\hat c_{x,\downarrow}\hat c_{x,\uparrow}\Phi=0$ (the zero-energy condition) and
+$\Phi=\sum_s C(s)\,\texttt{flatBandSpinConfigState}$, the $C(\sigma)$-weighted sum of
+double-annihilated spin-config states vanishes for \emph{every} site $x$
+(\texttt{flatBand\_cDownUp\_spinConfigSum\_eq\_zero}); for $x\in\Lambda\setminus I$ the connectivity
+data $\mu_z(x)$ enters through the peel.  Collecting the $(D_0{-}2)$-occupied terms and using the
+linear independence (PR12) then yields the sign relation $C(\sigma)=C(\sigma_{z_1\leftrightarrow z_2})$
+(eq.~(11.3.49)) --- the subsequent PRs.  The double-annihilation expansion and sign relation
 (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki

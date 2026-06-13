@@ -143,4 +143,42 @@ theorem flatBand_groundState_eq_spinConfigStateSum
   obtain ⟨C, hC⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp hmem
   exact ⟨C, hC.symm⟩
 
+/-- **The site double-annihilation of a spin-config state, in `μ`-Slater form**: `ĉ_{x,↓}ĉ_{x,↑}`
+applied to `flatBandSpinConfigState σ` is the double annihilation applied to the `μ`-Slater state of
+its preimage list — the form on which the proved peel engine
+`generalFlatBand_double_siteAnnihilation_peel` expands it (eq. (11.3.48) left-hand side). -/
+theorem flatBandSpinConfigState_cDownUp_eq_slaterDoubleAnnih
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2)
+    (x : Fin (M + 1)) :
+    (generalCDownUp M x).mulVec (flatBandSpinConfigState I idx eμ σ)
+      = (fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x 1)).mulVec
+          ((fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x 0)).mulVec
+            (generalFlatBandSlaterState μ
+              (flatBandSpecialPreimageList I idx (flatBandSpinConfigOcc I idx σ)))) := by
+  rw [flatBandSpinConfigState_eq_slaterState hidx, generalCDownUp, ← Matrix.mulVec_mulVec]
+
+/-- **Tasaki eq. (11.3.48), `C(σ)`-weighted vanishing**: for the explicit coefficient expansion
+`Φ = Σ_s C(s)·flatBandSpinConfigState (extend s)` (PR13), the site double-annihilation
+`ĉ_{x,↓}ĉ_{x,↑}`
+kills `Φ` (the zero-energy condition), so the `C(σ)`-weighted sum of double-annihilated spin-config
+states vanishes for **every** site `x` — in particular `x ∈ Λ∖I`, where the connectivity data
+`μ_z(x)` enters via the peel engine. -/
+theorem flatBand_cDownUp_spinConfigSum_eq_zero
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (idx : Fin (M + 1) → Fin (M + 1))
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U)
+    (C : (I → Fin 2) → ℂ)
+    (hsum : Φ = ∑ s, C s • flatBandSpinConfigState I idx eμ
+      (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0))
+    (x : Fin (M + 1)) :
+    ∑ s, C s • (generalCDownUp M x).mulVec
+        (flatBandSpinConfigState I idx eμ (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0)) = 0 := by
+  have hz := generalCDownUp_mulVec_eq_zero_of_mem_groundSubmodule T U hT hU hΦ x
+  rw [hsum, Matrix.mulVec_sum] at hz
+  simp only [Matrix.mulVec_smul] at hz
+  exact hz
+
 end LatticeSystem.Fermion
