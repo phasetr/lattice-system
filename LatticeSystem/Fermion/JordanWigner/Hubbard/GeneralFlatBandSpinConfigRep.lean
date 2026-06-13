@@ -512,4 +512,94 @@ theorem flatBandSpinConfig_exactlyOne_per_index
   · exact Or.inl ⟨h0, fun h1 => hno z hz ⟨h0, h1⟩⟩
   · exact Or.inr ⟨fun h0 => hno z hz ⟨h0, h1⟩, h1⟩
 
+/-- **The one-spin-per-index occupation of a spin configuration** `σ : Fin (M+1) → Fin 2`: the
+config occupying exactly the modes `(idx z, σ z)` for `z ∈ I`.  Its occupation monomial is the
+spin-configuration `μ`-Slater state `Π_{z∈I} â†_{μ_z,σ_z}|vac⟩` of eq. (11.3.47). -/
+noncomputable def flatBandSpinConfigOcc (I : Finset (Fin (M + 1)))
+    (idx : Fin (M + 1) → Fin (M + 1)) (σ : Fin (M + 1) → Fin 2) :
+    Fin (M + 1) × Fin 2 → Fin 2 :=
+  fun q => if ∃ z ∈ I, q = (idx z, σ z) then 1 else 0
+
+open Classical in
+/-- **The spin-configuration state** `Π_{z∈I} â†_{μ_z,σ_z}|vac⟩`, indexed by a spin configuration
+`σ` (the summands of eq. (11.3.47)), realised as the occupation monomial of `flatBandSpinConfigOcc`
+over the extended basis `eμ`. -/
+noncomputable def flatBandSpinConfigState (I : Finset (Fin (M + 1)))
+    (idx : Fin (M + 1) → Fin (M + 1))
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (σ : Fin (M + 1) → Fin 2) :
+    (Fin (2 * M + 2) → Fin 2) → ℂ :=
+  generalOccMonomial eμ (flatBandSpinConfigOcc I idx σ)
+
+/-- **A spin-configuration occupation `g` is `flatBandSpinConfigOcc` of its spin function**: with
+`σ_g z := [g(idx z,↑) ≠ 1]`, a spin-config occupation (`idx(I)`-supported, no double occupancy, `D₀`
+occupied) equals `flatBandSpinConfigOcc I idx σ_g`.  Uses the explicit one-spin-per-index property
+(`flatBandSpinConfig_exactlyOne_per_index`). -/
+theorem flatBandSpinConfig_eq_spinConfigOcc
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) {g : Fin (M + 1) × Fin 2 → Fin 2}
+    (hsupp : IsIdxSupported I idx g)
+    (hno : ∀ z ∈ I, ¬ (g (idx z, 0) = 1 ∧ g (idx z, 1) = 1))
+    (hcard : (generalOccFinset g).card = generalFlatBandDim T) :
+    g = flatBandSpinConfigOcc I idx (fun z => if g (idx z, 0) = 1 then 0 else 1) := by
+  classical
+  have hinj : ∀ {a b : Fin (M + 1)}, a ∈ I → b ∈ I → idx a = idx b → a = b :=
+    fun {a b} ha hb => flatBandSpecial_idx_injOn hbasis hidx ha hb
+  funext q
+  set σg : Fin (M + 1) → Fin 2 := fun z => if g (idx z, 0) = 1 then 0 else 1 with hσg
+  by_cases hq : q.1 ∈ I.image idx
+  · obtain ⟨z, hz, hzq⟩ := Finset.mem_image.mp hq
+    have hqz : q = (idx z, q.2) := Prod.ext hzq.symm rfl
+    -- value of the spin-config occupation at q
+    have hocc : flatBandSpinConfigOcc I idx σg q = if q.2 = σg z then 1 else 0 := by
+      unfold flatBandSpinConfigOcc
+      by_cases hτ : q.2 = σg z
+      · rw [if_pos ⟨z, hz, by rw [hqz, hτ]⟩, if_pos hτ]
+      · rw [if_neg hτ, if_neg ?_]
+        rintro ⟨w, hw, hwq⟩
+        have e1 : q.1 = idx w := by rw [hwq]
+        rw [← hzq] at e1
+        have hwz : idx w = idx z := e1.symm
+        exact hτ (by rw [hwq, hinj hw hz hwz])
+    rw [hocc]
+    conv_lhs => rw [hqz]
+    rcases flatBandSpinConfig_exactlyOne_per_index hbasis hidx hsupp hno hcard hz with
+      ⟨h0, h1⟩ | ⟨h0, h1⟩
+    · have hσz : σg z = 0 := by rw [hσg]; exact if_pos h0
+      have hg1 : g (idx z, 1) = 0 := (fin2_eq_zero_or_one _).resolve_right h1
+      rcases fin2_eq_zero_or_one q.2 with h | h <;> rw [h, hσz]
+      · rw [if_pos rfl]; exact h0
+      · rw [if_neg (by decide)]; exact hg1
+    · have hσz : σg z = 1 := by rw [hσg]; exact if_neg h0
+      have hg0 : g (idx z, 0) = 0 := (fin2_eq_zero_or_one _).resolve_right h0
+      rcases fin2_eq_zero_or_one q.2 with h | h <;> rw [h, hσz]
+      · rw [if_neg (by decide)]; exact hg0
+      · rw [if_pos rfl]; exact h1
+  · have hg0 : g q = 0 := (fin2_eq_zero_or_one (g q)).resolve_right (fun h => hq (hsupp q h))
+    rw [hg0]
+    unfold flatBandSpinConfigOcc
+    rw [if_neg ?_]
+    rintro ⟨w, hw, hwq⟩
+    exact hq (by rw [hwq]; exact Finset.mem_image_of_mem idx hw)
+
+/-- **Tasaki eq. (11.3.47), `σ`-parametrised form**: a flat-band Hubbard ground state lies in the
+span of the spin-configuration states `flatBandSpinConfigState` ranging over all spin configurations
+`σ : Fin (M+1) → Fin 2`.  From `flatBand_groundState_mem_spinConfigSpan` (PR9), each surviving
+spin-config occupation equals `flatBandSpinConfigOcc` of its spin function (PR10
+one-spin-per-index), so its occupation monomial is a `flatBandSpinConfigState`. -/
+theorem flatBand_groundState_mem_spinConfigStateSpan
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (idx : Fin (M + 1) → Fin (M + 1))
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U) :
+    Φ ∈ Submodule.span ℂ (Set.range (flatBandSpinConfigState I idx eμ)) := by
+  refine (Submodule.span_le.mpr ?_)
+    (flatBand_groundState_mem_spinConfigSpan hbasis hT U hU eμ idx hidx hΦ)
+  rintro _ ⟨g, hsupp, hno, hcard, rfl⟩
+  refine Submodule.subset_span ⟨fun z => if g (idx z, 0) = 1 then 0 else 1, ?_⟩
+  rw [flatBandSpinConfigState, ← flatBandSpinConfig_eq_spinConfigOcc hbasis hidx hsupp hno hcard]
+
 end LatticeSystem.Fermion

@@ -6533,8 +6533,21 @@ $q\mapsto q.1$ is injective on the occupied finset (no double occupancy forbids 
 $\mathrm{idx}\,z$), so its image has $|{\rm occupied}|=D_0=|I|$ elements inside $\mathrm{idx}(I)$
 (cardinality $|I|$), hence equals $\mathrm{idx}(I)$; every index mode is therefore occupied
 (\texttt{flatBandSpinConfig\_occupied\_per\_index}), and with no double occupancy \emph{exactly} one
-spin (\texttt{flatBandSpinConfig\_exactlyOne\_per\_index}).  The sign propagation
-(eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone is the subsequent PR.
+spin (\texttt{flatBandSpinConfig\_exactlyOne\_per\_index}).
+
+\medskip\noindent\textbf{Theorem 11.17 PR11, eq.~(11.3.47) $\sigma$-parametrised form (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSpinConfigRep.lean}).}  Eq.~(11.3.47) is restated with
+the surviving states indexed by spin configurations $\sigma:\Lambda\to\{\uparrow,\downarrow\}$: the
+one-spin-per-index occupation \texttt{flatBandSpinConfigOcc} (occupying exactly $(\mathrm{idx}\,z,
+\sigma_z)$ for $z\in I$) and its occupation monomial \texttt{flatBandSpinConfigState}
+$=\prod_{z\in I}\hat a^\dagger_{\mu_z,\sigma_z}|vac\rangle$.  Every surviving spin-config occupation
+equals \texttt{flatBandSpinConfigOcc} of its spin function $\sigma_g(z)=[g(\mathrm{idx}\,z,\uparrow)
+\ne1]$ (\texttt{flatBandSpinConfig\_eq\_spinConfigOcc}, from the one-spin-per-index property), so the
+spin-config span of PR9 is the span of the $\sigma$-states:
+$\Phi\in\operatorname{span}\{\,\texttt{flatBandSpinConfigState}\,\sigma\,\}_\sigma$
+(\texttt{flatBand\_groundState\_mem\_spinConfigStateSpan}) --- the $C(\sigma)$-coefficient foundation
+for the sign relation.  The sign propagation (eqs.~(11.3.48)/(11.3.49)) toward the connectivity
+capstone is the subsequent PR.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
 §11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
