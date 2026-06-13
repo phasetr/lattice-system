@@ -374,4 +374,14 @@ theorem flatBandSpinConfigList_eraseIdx_nodup (I : Finset (Fin (M + 1)))
     ((flatBandSpinConfigList I σ).eraseIdx i).Nodup :=
   (flatBandSpinConfigList_nodup I σ).eraseIdx i
 
+/-- **Position ↔ index correspondence of the canonical list**: the mode at position `i` is
+`(z_i, σ z_i)` where `z_i` is the `i`-th smallest index of `I`.  Pins each canonical-list position
+to its index, the bookkeeping for collecting the double peel by removed index pair. -/
+theorem flatBandSpinConfigList_getElem (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2)
+    (i : ℕ) (hi : i < (I.sort (· ≤ ·)).length) :
+    (flatBandSpinConfigList I σ)[i]'(by
+        rwa [flatBandSpinConfigList_length, ← Finset.length_sort (· ≤ ·)])
+      = ((I.sort (· ≤ ·))[i], σ ((I.sort (· ≤ ·))[i])) := by
+  simp only [flatBandSpinConfigList, List.getElem_map]
+
 end LatticeSystem.Fermion
