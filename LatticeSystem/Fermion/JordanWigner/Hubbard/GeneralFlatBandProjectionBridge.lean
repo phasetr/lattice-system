@@ -56,8 +56,10 @@ idempotence merges them, so the diagonal entry equals `‖P₀ e_x‖²`. -/
 theorem generalFlatBandProjectionMatrix_diag_eq (x : Fin (M + 1)) :
     generalFlatBandProjectionMatrix T x x
       = inner ℂ
-          ((generalFlatBandKernel T).starProjection (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x))
-          ((generalFlatBandKernel T).starProjection (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x)) := by
+          ((generalFlatBandKernel T).starProjection
+            (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x))
+          ((generalFlatBandKernel T).starProjection
+            (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x)) := by
   rw [generalFlatBandProjectionMatrix_apply]
   conv_lhs => rw [← (generalFlatBandKernel T).isIdempotentElem_starProjection.eq]
   exact (Submodule.inner_starProjection_left_eq_right (generalFlatBandKernel T) _ _).symm
