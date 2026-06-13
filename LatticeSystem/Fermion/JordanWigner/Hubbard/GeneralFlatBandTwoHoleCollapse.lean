@@ -411,4 +411,71 @@ theorem flatBandSpinConfig_doublePeel_config_eq {T : Matrix (Fin (M + 1)) (Fin (
           Finset.mem_erase.mpr ⟨(fun h => hzb (h.trans hcb)), hzI⟩⟩)
         rw [hz]; simp only [Function.comp, Equiv.swap_apply_of_ne_of_ne hza hzb]
 
+/-- **A flat-band Slater coordinate vanishes off the two relevant spin configs** (the eq. (11.3.49)
+sum-collapse engine): if `τ` is neither `σ` nor `σ ∘ swap a b` on `I`, then the `(a,b)`-emptied
+coordinate of `ĉ_{x,↓}ĉ_{x,↑}Slater(canonical I τ)` is zero.  Each double-peel term of
+`cDownUp_canonical_repr_eq_sum` vanishes: a term with both guards (outer up, inner down) holding and
+nonzero rest coordinate would force the config equality of
+`flatBandSpinConfig_doublePeel_config_eq`, hence `τ = σ` or `τ = σ ∘ swap a b` on `I`, contradicting
+the hypotheses; the other terms vanish by the failing guard. -/
+theorem cDownUp_canonical_repr_eq_zero_of_ne {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ τ : Fin (M + 1) → Fin 2)
+    (x : Fin (M + 1)) {a b : Fin (M + 1)} (hσa : σ a = 0) (hσb : σ b = 1)
+    (hne1 : ¬ ∀ z ∈ I, τ z = σ z) (hne2 : ¬ ∀ z ∈ I, τ z = (σ ∘ ⇑(Equiv.swap a b)) z) :
+    (generalOccBasis eμ).repr
+        ((generalCDownUp M x).mulVec (generalFlatBandSlaterState μ (flatBandSpinConfigList I τ)))
+        (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ)) = 0 := by
+  -- per-(i,j) helper
+  have hterm : ∀ (i : ℕ) (hi : i < (flatBandSpinConfigList I τ).length),
+      ((flatBandSpinConfigList I τ)[i]).2 = 0 →
+      ∀ (j : ℕ) (hj : j <
+        (flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I τ)[i]).1) τ).length),
+      ((flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I τ)[i]).1) τ)[j]).2 = 1 →
+      (generalOccBasis eμ).repr (generalFlatBandSlaterState μ
+        (((flatBandSpinConfigList I τ).eraseIdx i).eraseIdx j))
+        (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ)) = 0 := by
+    intro i hi hgi j hj hgj
+    have hnd : (((flatBandSpinConfigList I τ).eraseIdx i).eraseIdx j).Nodup := by
+      rw [flatBandSpinConfigList_eraseIdx_eraseIdx I τ hi hj]
+      exact flatBandSpinConfigList_nodup _ _
+    have hsub : ∀ q ∈ ((flatBandSpinConfigList I τ).eraseIdx i).eraseIdx j, q.1 ∈ I := by
+      rw [flatBandSpinConfigList_eraseIdx_eraseIdx I τ hi hj]
+      intro q hq
+      exact Finset.mem_of_mem_erase (Finset.mem_of_mem_erase
+        (flatBandSpinConfigList_mem_fst_mem _ τ hq))
+    obtain ⟨z, _, heq⟩ := generalFlatBandSlaterState_over_I_repr hbasis eμ idx hidx
+      (((flatBandSpinConfigList I τ).eraseIdx i).eraseIdx j) hnd hsub _
+    rw [heq]
+    split_ifs with hcond
+    · exfalso
+      rcases flatBandSpinConfig_doublePeel_config_eq hbasis hidx σ τ hσa hσb hi hgi hj hgj hcond
+        with h | h
+      · exact hne1 h
+      · exact hne2 h
+    · ring
+  -- main
+  rw [cDownUp_canonical_repr_eq_sum]
+  apply Finset.sum_eq_zero
+  intro i _
+  by_cases hgi : ((flatBandSpinConfigList I τ).get i).2 = 0
+  · rw [if_pos hgi]
+    have hgi' : ((flatBandSpinConfigList I τ)[(i:ℕ)]'i.2).2 = 0 := by
+      rw [← List.get_eq_getElem]; exact hgi
+    have hpr38 := flatBandSpinConfigList_eraseIdx I τ i.2
+    rw [Finset.sum_eq_zero, mul_zero, mul_zero]
+    intro j _
+    by_cases hgj : (((flatBandSpinConfigList I τ).eraseIdx (i:ℕ)).get j).2 = 1
+    · have hjc : (j : ℕ) < (flatBandSpinConfigList
+          (I.erase ((flatBandSpinConfigList I τ)[(i:ℕ)]'i.2).1) τ).length := by
+        rw [← hpr38]; exact j.2
+      have hgjc : ((flatBandSpinConfigList
+          (I.erase ((flatBandSpinConfigList I τ)[(i:ℕ)]'i.2).1) τ)[(j:ℕ)]'hjc).2 = 1 := by
+        rw [← List.getElem_of_eq hpr38 j.2, ← List.get_eq_getElem]; exact hgj
+      rw [if_pos hgj, hterm (i:ℕ) i.2 hgi' (j:ℕ) hjc hgjc, mul_zero, mul_zero]
+    · rw [if_neg hgj, zero_mul, mul_zero]
+  · rw [if_neg hgi, zero_mul, mul_zero]
+
 end LatticeSystem.Fermion
