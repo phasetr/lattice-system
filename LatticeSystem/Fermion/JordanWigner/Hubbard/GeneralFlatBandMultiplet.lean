@@ -131,4 +131,22 @@ theorem generalFlatBand_totalSpinZ_mulVec_allUpSlater (μ : Fin (M + 1) → Fin 
   rw [one_div]
   ring
 
+/-- **The all-up μ-Slater state is nonzero** (`hv` for the SU(2) tower).  Its occupation-basis
+coordinate at its own index configuration is nonzero
+(`generalFlatBandSlaterState_repr_self_ne_zero`, since the canonical creation list is nodup with all
+indices in `I`), so the vector cannot be the zero vector.  This is the nontriviality hypothesis of
+`highestWeight_spinMultiplet_general`. -/
+theorem generalFlatBandSlaterState_allUp_ne_zero
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (idx : Fin (M + 1) → Fin (M + 1))
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) :
+    generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0)) ≠ 0 := by
+  intro h
+  refine generalFlatBandSlaterState_repr_self_ne_zero hbasis eμ idx hidx
+    (flatBandSpinConfigList I (fun _ => 0)) (flatBandSpinConfigList_nodup I _)
+    (fun q hq => flatBandSpinConfigList_mem_fst_mem I _ hq) ?_
+  rw [h, map_zero]
+  rfl
+
 end LatticeSystem.Fermion
