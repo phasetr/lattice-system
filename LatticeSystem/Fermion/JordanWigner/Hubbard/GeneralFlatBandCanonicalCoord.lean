@@ -53,6 +53,16 @@ theorem flatBandSpinConfigList_mem_snd_eq (I : Finset (Fin (M + 1))) (σ : Fin (
   obtain ⟨z, _, hzq⟩ := hq
   rw [← hzq]
 
+/-- **Every canonical-list mode is indexed in `I`**: any element `q` of `flatBandSpinConfigList I σ`
+has `q.1 ∈ I`.  Supplies the `∀ q ∈ qs, q.1 ∈ I` hypothesis of
+`generalFlatBandSlaterState_over_I_repr` for canonical lists and the `(D₀-2)`-electron rest lists
+derived from them by `eraseIdx`. -/
+theorem flatBandSpinConfigList_mem_fst_mem (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2)
+    {q : Fin (M + 1) × Fin 2} (hq : q ∈ flatBandSpinConfigList I σ) : q.1 ∈ I := by
+  simp only [flatBandSpinConfigList, List.mem_map, Finset.mem_sort] at hq
+  obtain ⟨z, hz, rfl⟩ := hq
+  exact hz
+
 /-- The spin at position `i` of the canonical list equals `σ` of the index at position `i`. -/
 theorem flatBandSpinConfigList_get_snd_eq (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2)
     (i : Fin (flatBandSpinConfigList I σ).length) :
