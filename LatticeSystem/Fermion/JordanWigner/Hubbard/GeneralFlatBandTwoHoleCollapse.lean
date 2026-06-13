@@ -19,6 +19,13 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), §11.3.4, eq. (11.3.49).  Tracked in Issue #4363.
 -/
 
+namespace LatticeSystem.Fermion
+
+open Matrix LatticeSystem.Quantum Module
+open scoped BigOperators ComplexOrder
+
+variable {M : ℕ}
+
 /-- **Two `Fin 2`-configs of equal weight differ by a permutation**: if `s, s' : I → Fin 2` have the
 same number of `0`s, there is a permutation `π : Equiv.Perm I` with `s' ∘ π = s`.  Glue the
 `Fintype.equivOfCardEq` bijections of the `0`-fibers and their complements through
@@ -51,18 +58,11 @@ theorem exists_perm_comp_of_card_eq {I : Type*} [Fintype I] (s s' : I → Fin 2)
         Equiv.sumCongr_apply, Sum.map_inr, Equiv.sumCompl_apply_inr]
     rw [hpi]
     have he := (e1 ⟨z, hz⟩).2
-    rcases LatticeSystem.Fermion.fin2_eq_zero_or_one (s z) with h0 | h1x
+    rcases fin2_eq_zero_or_one (s z) with h0 | h1x
     · exact absurd h0 hz
-    · rcases LatticeSystem.Fermion.fin2_eq_zero_or_one (s' (e1 ⟨z, hz⟩).1) with hh | hh
+    · rcases fin2_eq_zero_or_one (s' (e1 ⟨z, hz⟩).1) with hh | hh
       · exact absurd hh he
       · rw [hh, h1x]
-
-namespace LatticeSystem.Fermion
-
-open Matrix LatticeSystem.Quantum Module
-open scoped BigOperators ComplexOrder
-
-variable {M : ℕ}
 
 /-- **Inner-sum collapse (single peel)**: the inner `j`-sum of the canonical double peel, evaluated
 at the `b`-emptied target config `idxConfigOf idx (canonical (S.erase b) σ)` (with `b ∈ S`,
