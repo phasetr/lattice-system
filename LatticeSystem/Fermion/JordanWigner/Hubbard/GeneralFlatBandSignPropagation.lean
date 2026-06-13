@@ -181,4 +181,40 @@ theorem flatBand_cDownUp_spinConfigSum_eq_zero
   simp only [Matrix.mulVec_smul] at hz
   exact hz
 
+/-- **Site annihilation kills a `μ`-Slater state with no matching-spin connected mode**: if every
+mode of `qs` either has zero amplitude `μ_{q.1}(x) = 0` at the site `x` or carries the wrong spin
+`q.2 ≠ σ`, then `ĉ_{x,σ}|qs⟩ = 0`.  (Every peel term vanishes; the general analogue of the Theorem
+11.11 `flatBand_siteAnnihilation_eq_zero`.) -/
+theorem generalFlatBand_siteAnnihilation_eq_zero (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (x : Fin (M + 1)) (σ : Fin 2) (qs : List (Fin (M + 1) × Fin 2))
+    (h : ∀ q ∈ qs, μ q.1 x = 0 ∨ q.2 ≠ σ) :
+    (fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ)).mulVec
+        (generalFlatBandSlaterState μ qs) = 0 := by
+  rw [generalFlatBand_siteAnnihilation_peel]
+  refine Finset.sum_eq_zero fun i _ => ?_
+  rw [generalFlatBandPeelTerm]
+  rcases h (qs.get i) (List.get_mem qs i) with h0 | hne
+  · rw [h0, ite_self, zero_smul, smul_zero]
+  · rw [if_neg hne, zero_smul, smul_zero]
+
+/-- **The site double-annihilation kills a spin-config state disconnected from the site**: if every
+index `z ∈ I` has zero amplitude `μ_z(x) = 0` at the site `x` (so `x` connects to no index mode),
+then `ĉ_{x,↓}ĉ_{x,↑}|s⟩ = 0`.  (The inner `ĉ_{x,↑}` already annihilates the state via
+`generalFlatBand_siteAnnihilation_eq_zero`.)  This is the trivial branch of eq. (11.3.48): a site
+disconnected from the basis contributes no sign relation. -/
+theorem flatBandSpinConfigState_cDownUp_eq_zero_of_disconnected
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2)
+    {x : Fin (M + 1)} (hx : ∀ z ∈ I, μ z x = 0) :
+    (generalCDownUp M x).mulVec (flatBandSpinConfigState I idx eμ σ) = 0 := by
+  rw [flatBandSpinConfigState_cDownUp_eq_slaterDoubleAnnih hidx,
+    generalFlatBand_siteAnnihilation_eq_zero μ x 0 _ (fun q hq => Or.inl ?_), Matrix.mulVec_zero]
+  obtain ⟨w, hw, rfl⟩ := List.mem_map.mp hq
+  have hgw : flatBandSpinConfigOcc I idx σ w = 1 := by
+    have := Finset.mem_toList.mp hw
+    simpa only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and] using this
+  exact hx _ (flatBandSpecialIdxInv_mem
+    (Finset.mem_image.mp (flatBandSpinConfigOcc_idxSupported I idx σ w hgw)))
+
 end LatticeSystem.Fermion
