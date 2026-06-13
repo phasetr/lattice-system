@@ -98,4 +98,54 @@ theorem generalFlatBand_special_index_active {I : Finset (Fin (M + 1))}
   rw [← inner_conj_symm, EuclideanSpace.basisFun_inner] at hortho
   exact hbasis.2.2.2.1 z hz (by simpa using hortho)
 
+/-- **The flat band is spanned by the special basis**: `ker T = span{μ_z : z ∈ I}` (as Euclidean
+vectors).  The `|I| = D₀` vectors `μ_z` are linearly independent and lie in `ker T`, whose dimension
+is `D₀`, so they span it. -/
+theorem generalFlatBand_kernel_eq_span {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ) :
+    generalFlatBandKernel T
+      = Submodule.span ℂ (Set.range (fun z : I =>
+        (WithLp.toLp 2 (μ z.1) : EuclideanSpace ℂ (Fin (M + 1))))) := by
+  have hli : LinearIndependent ℂ
+      (fun z : I => (WithLp.toLp 2 (μ z.1) : EuclideanSpace ℂ (Fin (M + 1)))) :=
+    hbasis.2.2.1.map' (WithLp.linearEquiv 2 ℂ (Fin (M + 1) → ℂ)).symm.toLinearMap
+      (LinearEquiv.ker _)
+  refine (Submodule.eq_of_le_of_finrank_le ?_ ?_).symm
+  · rw [Submodule.span_le]
+    rintro v ⟨z, rfl⟩
+    exact generalFlatBand_mu_mem_kernel T hbasis z.2
+  · rw [finrank_span_eq_card hli, Fintype.card_coe,
+      show Module.finrank ℂ ↥(generalFlatBandKernel T) = generalFlatBandDim T from rfl, ← hbasis.1]
+
+/-- **Active site ⟺ covered by a special-basis vector**: `(P₀)_{xx} ≠ 0` iff some `μ_z` (`z ∈ I`)
+has `μ_z(x) ≠ 0`.  Since `ker T = span{μ_z}`, `e_x` is non-orthogonal to the flat band exactly when
+some spanning vector has a nonzero `x`-coordinate. -/
+theorem generalFlatBand_active_iff_exists_mu_ne {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (x : Fin (M + 1)) :
+    generalFlatBandProjectionMatrix T x x ≠ 0 ↔ ∃ z ∈ I, μ z x ≠ 0 := by
+  rw [generalFlatBand_diag_ne_zero_iff]
+  constructor
+  · intro hperp
+    by_contra hall
+    push Not at hall
+    apply hperp
+    rw [Submodule.mem_orthogonal]
+    intro v hv
+    rw [generalFlatBand_kernel_eq_span T hbasis] at hv
+    induction hv using Submodule.span_induction with
+    | mem w hw =>
+      obtain ⟨z, rfl⟩ := hw
+      rw [← inner_conj_symm, EuclideanSpace.basisFun_inner]
+      simp [hall z.1 z.2]
+    | zero => simp
+    | add a b _ _ ha hb => rw [inner_add_left, ha, hb, add_zero]
+    | smul c a _ ha => rw [inner_smul_left, ha, mul_zero]
+  · rintro ⟨z, hz, hzx⟩
+    intro hperp
+    have hortho := (Submodule.mem_orthogonal _ _).mp hperp (WithLp.toLp 2 (μ z))
+      (generalFlatBand_mu_mem_kernel T hbasis hz)
+    rw [← inner_conj_symm, EuclideanSpace.basisFun_inner] at hortho
+    exact hzx (by simpa using hortho)
+
 end LatticeSystem.Fermion
