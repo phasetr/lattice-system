@@ -250,4 +250,98 @@ theorem generalFlatBandSlaterState_perm (μ : Fin (M + 1) → Fin (M + 1) → �
     obtain ⟨z₂, hz₂0, hz₂⟩ := ih₂
     exact ⟨z₁ * z₂, mul_ne_zero hz₁0 hz₂0, by rw [hz₁, hz₂, smul_smul]⟩
 
+/-- **The occupied finset of a spin-configuration occupation** is `{(idx z, σ z) : z ∈ I}`. -/
+theorem flatBandSpinConfigOcc_occFinset (I : Finset (Fin (M + 1)))
+    (idx : Fin (M + 1) → Fin (M + 1)) (σ : Fin (M + 1) → Fin 2) :
+    generalOccFinset (flatBandSpinConfigOcc I idx σ) = I.image (fun z => (idx z, σ z)) := by
+  ext q
+  simp only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_image,
+    flatBandSpinConfigOcc]
+  by_cases h : ∃ z ∈ I, q = (idx z, σ z)
+  · obtain ⟨z, hz, rfl⟩ := h
+    exact iff_of_true (if_pos ⟨z, hz, rfl⟩) ⟨z, hz, rfl⟩
+  · rw [if_neg h]
+    exact iff_of_false (by decide) (fun ⟨z, hz, hzq⟩ => h ⟨z, hz, hzq.symm⟩)
+
+/-- **The canonical (sorted) creation list of a spin configuration**: `(z, σ z)` for `z ∈ I` in
+increasing order of `z`.  The orbital-ordered list on which the eq. (11.3.48) double-annihilation
+acts with explicit positions and Koszul signs (the general-basis analogue of the Theorem 11.11
+`flatBandAlphaSpinList`). -/
+def flatBandSpinConfigList (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2) :
+    List (Fin (M + 1) × Fin 2) :=
+  (I.sort (· ≤ ·)).map (fun z => (z, σ z))
+
+/-- The canonical list is nodup. -/
+theorem flatBandSpinConfigList_nodup (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2) :
+    (flatBandSpinConfigList I σ).Nodup :=
+  (I.sort_nodup _).map fun _ _ hab => (Prod.ext_iff.mp hab).1
+
+/-- The canonical list enumerates the occupied modes `{(z, σ z) : z ∈ I}` of `σ`. -/
+theorem flatBandSpinConfigList_toFinset (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2) :
+    (flatBandSpinConfigList I σ).toFinset = I.image (fun z => (z, σ z)) := by
+  ext q
+  simp only [flatBandSpinConfigList, List.mem_toFinset, List.mem_map, Finset.mem_sort,
+    Finset.mem_image]
+
+/-- **The canonical list is a permutation of the `μ`-Slater preimage list** of the spin
+configuration: both enumerate `{(z, σ z) : z ∈ I}` without repetition. -/
+theorem flatBandSpinConfigList_perm_preimageList {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2) :
+    (flatBandSpinConfigList I σ).Perm
+      (flatBandSpecialPreimageList I idx (flatBandSpinConfigOcc I idx σ)) := by
+  classical
+  refine List.perm_of_nodup_nodup_toFinset_eq (flatBandSpinConfigList_nodup I σ) ?_ ?_
+  · rw [flatBandSpecialPreimageList]
+    refine ((generalOccFinset _).nodup_toList).map_on fun a ha b hb hab => ?_
+    have hga : flatBandSpinConfigOcc I idx σ a = 1 := by
+      have := Finset.mem_toList.mp ha
+      simpa only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and] using this
+    have hgb : flatBandSpinConfigOcc I idx σ b = 1 := by
+      have := Finset.mem_toList.mp hb
+      simpa only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and] using this
+    have ha1 : idx (flatBandSpecialIdxInv I idx a.1) = a.1 := idx_flatBandSpecialIdxInv
+      (Finset.mem_image.mp (flatBandSpinConfigOcc_idxSupported I idx σ a hga))
+    have hb1 : idx (flatBandSpecialIdxInv I idx b.1) = b.1 := idx_flatBandSpecialIdxInv
+      (Finset.mem_image.mp (flatBandSpinConfigOcc_idxSupported I idx σ b hgb))
+    have hab1 : flatBandSpecialIdxInv I idx a.1 = flatBandSpecialIdxInv I idx b.1 :=
+      (Prod.ext_iff.mp hab).1
+    exact Prod.ext (by rw [← ha1, hab1, hb1]) (Prod.ext_iff.mp hab).2
+  · rw [flatBandSpinConfigList_toFinset]
+    ext q'
+    constructor
+    · intro hq'
+      rw [Finset.mem_image] at hq'
+      obtain ⟨z, hz, rfl⟩ := hq'
+      rw [List.mem_toFinset, flatBandSpecialPreimageList, List.mem_map]
+      refine ⟨(idx z, σ z), ?_, ?_⟩
+      · rw [Finset.mem_toList, flatBandSpinConfigOcc_occFinset, Finset.mem_image]
+        exact ⟨z, hz, rfl⟩
+      · rw [flatBandSpecialIdxInv_idx hbasis hidx hz]
+    · intro hq'
+      rw [List.mem_toFinset, flatBandSpecialPreimageList, List.mem_map] at hq'
+      obtain ⟨q, hq, rfl⟩ := hq'
+      rw [Finset.mem_toList, flatBandSpinConfigOcc_occFinset, Finset.mem_image] at hq
+      obtain ⟨z, hz, rfl⟩ := hq
+      rw [Finset.mem_image]
+      exact ⟨z, hz, by rw [flatBandSpecialIdxInv_idx hbasis hidx hz]⟩
+
+/-- **The spin-configuration state is a nonzero scalar multiple of its canonical-list Slater
+state**: `flatBandSpinConfigState σ = z·generalFlatBandSlaterState μ (flatBandSpinConfigList σ)` for
+a nonzero sign `z`.  This puts the state in the orbital-ordered form on which the eq. (11.3.48)
+double peel has explicit positions and signs.  From the preimage-list Slater form (PR13) and the
+permutation scaling (PR16). -/
+theorem flatBandSpinConfigState_eq_smul_canonical {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2) :
+    ∃ z : ℂ, z ≠ 0 ∧ flatBandSpinConfigState I idx eμ σ
+      = z • generalFlatBandSlaterState μ (flatBandSpinConfigList I σ) := by
+  rw [flatBandSpinConfigState_eq_slaterState hidx]
+  exact generalFlatBandSlaterState_perm μ
+    (flatBandSpinConfigList_perm_preimageList hbasis hidx σ).symm
+
 end LatticeSystem.Fermion
