@@ -4,6 +4,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiHopAction
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandGroundAnnihilation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinSymmetry
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinChargeCommutation
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandSpinRep
 
 /-!
 # The general flat-band maximal-spin multiplet (Tasaki §11.3.4)
@@ -253,5 +254,65 @@ theorem fermionTotalSpinMinus_mulVec_mem_generalFlatBandGroundSubmodule
   · have hcomm : Commute (fermionTotalNumber (2 * M + 1)) (fermionTotalSpinMinus M) :=
       (fermionTotalSpinMinus_commute_fermionTotalNumber M).symm
     rw [Matrix.mulVec_mulVec, hcomm.eq, ← Matrix.mulVec_mulVec, hN, Matrix.mulVec_smul]
+
+open scoped ComplexOrder in
+/-- **Unconditional `finrank ≥ D₀+1` lower bound on the general flat-band ground subspace**: the
+SU(2) lowering tower of the all-up μ-Slater supplies `D₀+1` linearly independent ground states.
+From the highest-weight inputs (`v ≠ 0`, `Ŝ⁺v = 0`, `Ŝᶻv = (D₀/2)v`), `highestWeight_spinMultiplet_general`
+gives a linearly independent family `(Ŝ⁻)^k v`, `k : Fin (D₀+1)`; each member stays in the ground
+submodule (`Ŝ⁻` commutes with `Ĥ` and `N̂`, applied as a power), so lifting the independence into the
+submodule and counting (`LinearIndependent.fintype_card_le_finrank`) gives the bound.  This holds for
+*any* special basis (connected or not); equality with `D₀+1` needs connectivity (`generalFlatBandGround_finrank_le_of_connected`). -/
+theorem generalFlatBandGround_finrank_ge
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) :
+    generalFlatBandDim T + 1 ≤ Module.finrank ℂ ↥(generalFlatBandGroundSubmodule T U) := by
+  classical
+  obtain ⟨eμ, heμ⟩ := exists_extended_special_basis hbasis
+  choose! idx hidx using heμ
+  have hvmem : generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0))
+      ∈ generalFlatBandGroundSubmodule T U :=
+    generalFlatBandSlaterState_allUp_mem_groundSubmodule hbasis hT U
+  rw [generalFlatBandGroundSubmodule, Submodule.mem_inf, LinearMap.mem_ker,
+    Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply, Matrix.mulVecLin_apply] at hvmem
+  obtain ⟨hHv, hNv⟩ := hvmem
+  have hv : generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0)) ≠ 0 :=
+    generalFlatBandSlaterState_allUp_ne_zero hbasis eμ idx hidx
+  obtain ⟨hLI, _⟩ := highestWeight_spinMultiplet_general M I.card
+    (generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0))) hv
+    (generalFlatBand_totalSpinPlus_mulVec_allUpSlater μ I)
+    (generalFlatBand_totalSpinZ_mulVec_allUpSlater μ I)
+  set G := generalFlatBandGroundSubmodule T U with hG
+  have hmem : ∀ k : Fin (I.card + 1),
+      ((fermionTotalSpinMinus M) ^ (k : ℕ)).mulVec
+          (generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0))) ∈ G := by
+    intro k
+    have hHk : (hubbardHamiltonian M T (U : ℂ)).mulVec
+        (((fermionTotalSpinMinus M) ^ (k : ℕ)).mulVec
+          (generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0)))) = 0 := by
+      have hcomm : Commute (hubbardHamiltonian M T (U : ℂ))
+          ((fermionTotalSpinMinus M) ^ (k : ℕ)) :=
+        ((fermionTotalSpinMinus_commute_hubbardHamiltonian M T (U : ℂ)
+          (hJ := fun i j => hT.isHermitian.apply j i) (hU := Complex.conj_ofReal U)).symm).pow_right _
+      rw [Matrix.mulVec_mulVec, hcomm.eq, ← Matrix.mulVec_mulVec, hHv, Matrix.mulVec_zero]
+    have hNk : (fermionTotalNumber (2 * M + 1)).mulVec
+        (((fermionTotalSpinMinus M) ^ (k : ℕ)).mulVec
+          (generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0)))) =
+        (generalFlatBandDim T : ℂ) • (((fermionTotalSpinMinus M) ^ (k : ℕ)).mulVec
+          (generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0)))) := by
+      have hcomm : Commute (fermionTotalNumber (2 * M + 1)) ((fermionTotalSpinMinus M) ^ (k : ℕ)) :=
+        ((fermionTotalSpinMinus_commute_fermionTotalNumber M).symm).pow_right _
+      rw [Matrix.mulVec_mulVec, hcomm.eq, ← Matrix.mulVec_mulVec, hNv, Matrix.mulVec_smul]
+    rw [hG, generalFlatBandGroundSubmodule, Submodule.mem_inf, LinearMap.mem_ker,
+      Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply, Matrix.mulVecLin_apply]
+    exact ⟨hHk, hNk⟩
+  have hGLI : LinearIndependent ℂ (fun k : Fin (I.card + 1) =>
+      (⟨((fermionTotalSpinMinus M) ^ (k : ℕ)).mulVec
+        (generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0))), hmem k⟩ : G)) :=
+    LinearIndependent.of_comp G.subtype hLI
+  have hcard := hGLI.fintype_card_le_finrank
+  rw [Fintype.card_fin] at hcard
+  rwa [hbasis.1] at hcard
 
 end LatticeSystem.Fermion
