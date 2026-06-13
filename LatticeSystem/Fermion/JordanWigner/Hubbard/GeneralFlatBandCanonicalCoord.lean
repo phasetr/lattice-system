@@ -575,4 +575,61 @@ theorem flatBandSpinConfig_inner_sum_other_outer_zero {T : Matrix (Fin (M + 1)) 
   rw [heq]
   split_ifs with hg hc <;> first | exact absurd hc hne | ring
 
+/-- **The canonical double-peel coordinate collapses to a single term** (the eq. (11.3.49) heart):
+for `a, b ∈ I`, `a ≠ b`, `σ a = 0` (up), `σ b = 1` (down), the coordinate of
+`ĉ_{x,↓}ĉ_{x,↑}Slater(canonical I σ)` at the `(a,b)`-emptied target config collapses to the single
+`(pos a, pos b)` term.  The outer `Finset.sum_eq_single` keeps only the outer position of `a` (the
+up-guard forces an up index, uniquely `a`; every other outer index gives a vanishing inner sum by
+`flatBandSpinConfig_inner_sum_other_outer_zero`), and at that position the inner sum collapses by
+`flatBandSpinConfig_inner_sum_collapse` to the position of `b` in `I.erase a`.  The result is the
+product of the two Koszul signs, `μ_a(x)`, `μ_b(x)`, and the shared `(D₀-2)`-electron rest
+coordinate. -/
+theorem cDownUp_canonical_repr_twoHole {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2)
+    (x : Fin (M + 1)) {a b : Fin (M + 1)} (ha : a ∈ I) (hb : b ∈ I) (hab : a ≠ b)
+    (hσa : σ a = 0) (hσb : σ b = 1) :
+    (generalOccBasis eμ).repr
+        ((generalCDownUp M x).mulVec (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ)))
+        (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ))
+      = ((-1 : ℂ) ^ ((flatBandSpinConfigList_existsUnique_pos I σ ha).choose : ℕ)) *
+          (μ a x *
+            (((-1 : ℂ) ^ ((flatBandSpinConfigList_existsUnique_pos (I.erase a) σ
+                (Finset.mem_erase.mpr ⟨Ne.symm hab, hb⟩)).choose : ℕ)) *
+              (μ b x * (generalOccBasis eμ).repr (generalFlatBandSlaterState μ
+                (flatBandSpinConfigList ((I.erase a).erase b) σ))
+                (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ))))) := by
+  have hbea : b ∈ I.erase a := Finset.mem_erase.mpr ⟨Ne.symm hab, hb⟩
+  rw [cDownUp_canonical_repr_eq_sum]
+  obtain ⟨pa, hpa, huniqa⟩ := flatBandSpinConfigList_existsUnique_pos I σ ha
+  have hcha : (flatBandSpinConfigList_existsUnique_pos I σ ha).choose = pa :=
+    huniqa _ (flatBandSpinConfigList_existsUnique_pos I σ ha).choose_spec.1
+  rw [hcha, Finset.sum_eq_single pa]
+  · have hguard : ((flatBandSpinConfigList I σ).get pa).2 = 0 := by
+      rw [flatBandSpinConfigList_get_snd_eq, hpa, hσa]
+    rw [if_pos hguard, hpa]
+    have hXa : ((flatBandSpinConfigList I σ)[(pa:ℕ)]'pa.2).1 = a := by
+      rw [← List.get_eq_getElem]; exact hpa
+    rw [flatBandSpinConfigList_eraseIdx I σ pa.2,
+      show ((flatBandSpinConfigList I σ)[(pa:ℕ)]'pa.2).1 = a from hXa,
+      flatBandSpinConfig_inner_sum_collapse hbasis hidx σ x (Finset.erase_subset _ _) hbea hσb]
+  · intro i _ hine
+    by_cases hg : ((flatBandSpinConfigList I σ).get i).2 = 0
+    · rw [if_pos hg]
+      have hc : ((flatBandSpinConfigList I σ).get i).1 ≠ a := fun hca => hine (huniqa i hca)
+      have hcb : ((flatBandSpinConfigList I σ).get i).1 ≠ b := by
+        intro hcb'
+        rw [flatBandSpinConfigList_get_snd_eq, hcb', hσb] at hg; exact absurd hg (by decide)
+      have hcI : ((flatBandSpinConfigList I σ).get i).1 ∈ I :=
+        flatBandSpinConfigList_mem_fst_mem I σ (List.get_mem _ _)
+      have hXi : ((flatBandSpinConfigList I σ)[(i:ℕ)]'i.2).1
+          = ((flatBandSpinConfigList I σ).get i).1 := by rw [List.get_eq_getElem]
+      rw [flatBandSpinConfigList_eraseIdx I σ i.2, hXi,
+        flatBandSpinConfig_inner_sum_other_outer_zero hbasis hidx σ x hcI hc hcb,
+        mul_zero, mul_zero]
+    · rw [if_neg hg, zero_mul, mul_zero]
+  · intro h; exact absurd (Finset.mem_univ pa) h
+
 end LatticeSystem.Fermion
