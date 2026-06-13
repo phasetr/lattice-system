@@ -235,7 +235,8 @@ open scoped ComplexOrder in
 /-- **The total spin-lowering operator preserves the general flat-band ground submodule**
 (`tower ⊆ ground`): if `v` is a ground state then so is `Ŝ⁻_tot v`.  `Ŝ⁻_tot` commutes with both
 `Ĥ` (SU(2) symmetry, `fermionTotalSpinMinus_commute_hubbardHamiltonian` — needs `T` Hermitian and
-`U` real) and `N̂_tot` (it conserves particle number, `fermionTotalSpinMinus_commute_fermionTotalNumber`),
+`U` real) and `N̂_tot` (it conserves particle number,
+`fermionTotalSpinMinus_commute_fermionTotalNumber`),
 so it maps `ker Ĥ ∩ {N = D₀}` into itself.  Hence the whole SU(2) lowering tower `(Ŝ⁻_tot)^k v` from
 the all-up highest-weight vector lies inside the ground subspace, supplying `D₀+1` independent
 ground states for the `finrank ≥ D₀+1` lower bound. -/
@@ -258,11 +259,14 @@ theorem fermionTotalSpinMinus_mulVec_mem_generalFlatBandGroundSubmodule
 open scoped ComplexOrder in
 /-- **Unconditional `finrank ≥ D₀+1` lower bound on the general flat-band ground subspace**: the
 SU(2) lowering tower of the all-up μ-Slater supplies `D₀+1` linearly independent ground states.
-From the highest-weight inputs (`v ≠ 0`, `Ŝ⁺v = 0`, `Ŝᶻv = (D₀/2)v`), `highestWeight_spinMultiplet_general`
+From the highest-weight inputs (`v ≠ 0`, `Ŝ⁺v = 0`, `Ŝᶻv = (D₀/2)v`),
+`highestWeight_spinMultiplet_general`
 gives a linearly independent family `(Ŝ⁻)^k v`, `k : Fin (D₀+1)`; each member stays in the ground
-submodule (`Ŝ⁻` commutes with `Ĥ` and `N̂`, applied as a power), so lifting the independence into the
-submodule and counting (`LinearIndependent.fintype_card_le_finrank`) gives the bound.  This holds for
-*any* special basis (connected or not); equality with `D₀+1` needs connectivity (`generalFlatBandGround_finrank_le_of_connected`). -/
+submodule (`Ŝ⁻` commutes with `Ĥ` and `N̂`, applied as a power), so lifting the independence
+into the
+submodule and counting (`LinearIndependent.fintype_card_le_finrank`) gives the bound.  This holds
+for *any* special basis (connected or not); equality with `D₀+1` needs connectivity
+(`generalFlatBandGround_finrank_le_of_connected`). -/
 theorem generalFlatBandGround_finrank_ge
     {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
     {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
@@ -294,7 +298,8 @@ theorem generalFlatBandGround_finrank_ge
       have hcomm : Commute (hubbardHamiltonian M T (U : ℂ))
           ((fermionTotalSpinMinus M) ^ (k : ℕ)) :=
         ((fermionTotalSpinMinus_commute_hubbardHamiltonian M T (U : ℂ)
-          (hJ := fun i j => hT.isHermitian.apply j i) (hU := Complex.conj_ofReal U)).symm).pow_right _
+          (hJ := fun i j => hT.isHermitian.apply j i)
+          (hU := Complex.conj_ofReal U)).symm).pow_right _
       rw [Matrix.mulVec_mulVec, hcomm.eq, ← Matrix.mulVec_mulVec, hHv, Matrix.mulVec_zero]
     have hNk : (fermionTotalNumber (2 * M + 1)).mulVec
         (((fermionTotalSpinMinus M) ^ (k : ℕ)).mulVec
@@ -360,7 +365,8 @@ theorem generalFlatBand_connected_isMaximalSpinMultiplet
       have hcomm : Commute (hubbardHamiltonian M T (U : ℂ))
           ((fermionTotalSpinMinus M) ^ (k : ℕ)) :=
         ((fermionTotalSpinMinus_commute_hubbardHamiltonian M T (U : ℂ)
-          (hJ := fun i j => hT.isHermitian.apply j i) (hU := Complex.conj_ofReal U)).symm).pow_right _
+          (hJ := fun i j => hT.isHermitian.apply j i)
+          (hU := Complex.conj_ofReal U)).symm).pow_right _
       rw [htower, Matrix.mulVec_mulVec, hcomm.eq, ← Matrix.mulVec_mulVec, hHv, Matrix.mulVec_zero]
     have hNk : (fermionTotalNumber (2 * M + 1)).mulVec (tower k) =
         (generalFlatBandDim T : ℂ) • (tower k) := by
@@ -399,7 +405,8 @@ theorem hubbardKinetic_mulVec_spinConfigSlater_eq_zero
     {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
     {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
     (hT : T.PosSemidef) (σ : Fin (M + 1) → Fin 2) :
-    (hubbardKinetic M T).mulVec (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ)) = 0 := by
+    (hubbardKinetic M T).mulVec
+        (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ)) = 0 := by
   obtain ⟨C, hC, hTC⟩ := LatticeSystem.Math.exists_posSemidef_sq_eq_of_posSemidef hT
   have hTCH : T = Cᴴ * C := by rw [hTC, hC.isHermitian.eq]
   set v := generalFlatBandSlaterState μ (flatBandSpinConfigList I σ) with hv
@@ -430,7 +437,8 @@ theorem generalCDownUp_mulVec_spinSeparatedSlater_eq_zero
     (μ : Fin (M + 1) → Fin (M + 1) → ℂ) (I : Finset (Fin (M + 1)))
     (σ : Fin (M + 1) → Fin 2) (x : Fin (M + 1))
     (hsep : ∀ z ∈ I, ∀ w ∈ I, σ z ≠ σ w → μ z x * μ w x = 0) :
-    (generalCDownUp M x).mulVec (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ)) = 0 := by
+    (generalCDownUp M x).mulVec
+        (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ)) = 0 := by
   rw [cDownUp_canonical_eq_doublePeel]
   refine Finset.sum_eq_zero (fun i _ => ?_)
   rcases eq_or_ne ((flatBandSpinConfigList I σ).get i).2 0 with hi | hi
@@ -463,9 +471,11 @@ open scoped ComplexOrder in
 opposite-spin modes have disjoint site support (`σ z ≠ σ w ⟹ ∀ x, μ_z(x)μ_w(x) = 0`), the Slater
 state is in `generalFlatBandGroundSubmodule`.  The kinetic part annihilates it
 (`hubbardKinetic_mulVec_spinConfigSlater_eq_zero`); the interaction
-`Σ_x U·n̂_{x↑}n̂_{x↓} = Σ_x U·(ĉ_{x↓}ĉ_{x↑})ᴴ(ĉ_{x↓}ĉ_{x↑})` annihilates it because no site is doubly
+`Σ_x U·n̂_{x↑}n̂_{x↓} = Σ_x U·(ĉ_{x↓}ĉ_{x↑})ᴴ(ĉ_{x↓}ĉ_{x↑})` annihilates it because no site is
+doubly
 occupied (`generalCDownUp_mulVec_spinSeparatedSlater_eq_zero`); and `N̂_tot` eigenvalue is `D₀`.
-For a disconnected basis a component-colouring gives such a `σ` lying outside the maximal-spin tower,
+For a disconnected basis a component-colouring gives such a `σ` lying outside the maximal-spin
+tower,
 the seed of the `⟹` direction of Theorem 11.17. -/
 theorem generalFlatBandSlaterState_spinSeparated_mem_groundSubmodule
     {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
@@ -495,7 +505,8 @@ theorem generalFlatBandSlaterState_spinSeparated_mem_groundSubmodule
   · rw [fermionTotalNumber_mulVec_generalFlatBandSlaterState, flatBandSpinConfigList_length,
       hbasis.1]
 
-/-- **A disconnected special basis splits into a non-trivial cut with no crossing μ-overlap**: if the
+/-- **A disconnected special basis splits into a non-trivial cut with no crossing μ-overlap**: if
+the
 basis graph is not connected (and `I` is nonempty), there is a subset `A` of the index set with `A`
 and its complement both nonempty such that opposite-side modes have disjoint site support
 (`z ∈ A`, `w ∉ A` ⟹ `∀ x, μ_z(x)μ_w(x) = 0`).  `A` is the connected component of a vertex `a` that
@@ -511,7 +522,7 @@ theorem exists_disconnection_cut_of_not_connected {I : Finset (Fin (M + 1))}
   have hnp : ¬ (generalFlatBandBasisGraph I μ).Preconnected := fun hp =>
     hnc ((SimpleGraph.connected_iff _).mpr ⟨hp, hnonempty⟩)
   rw [SimpleGraph.Preconnected] at hnp
-  push_neg at hnp
+  push Not at hnp
   obtain ⟨a, b, hab⟩ := hnp
   refine ⟨Finset.univ.filter (fun z => (generalFlatBandBasisGraph I μ).Reachable a z),
     ⟨a, Finset.mem_filter.mpr ⟨Finset.mem_univ _, SimpleGraph.Reachable.refl a⟩⟩, ⟨b, ?_⟩, ?_⟩
