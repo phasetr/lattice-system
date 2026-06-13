@@ -384,4 +384,32 @@ theorem flatBandSpinConfigList_getElem (I : Finset (Fin (M + 1))) (σ : Fin (M +
       = ((I.sort (· ≤ ·))[i], σ ((I.sort (· ≤ ·))[i])) := by
   simp only [flatBandSpinConfigList, List.getElem_map]
 
+/-- **The `(D₀−2)`-config coordinate of the canonical double peel**: applying the occupation-basis
+coordinate functional `(generalOccBasis eμ).repr · g` to `ĉ_{x,↓}ĉ_{x,↑}Slater(canonical σ)`
+distributes (by linearity) over the position double-sum, leaving the coordinates of the
+doubly-erased
+`(D₀−2)`-Slater states weighted by the peel amplitudes and Koszul signs.  This is the form on which
+the removed-pair identification picks out, for a fixed `(D₀−2)`-target `g`, the unique contributing
+`(i,j)`. -/
+theorem cDownUp_canonical_repr_eq_sum (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2) (x : Fin (M + 1))
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ))
+    (g : Fin (M + 1) × Fin 2 → Fin 2) :
+    (generalOccBasis eμ).repr
+        ((generalCDownUp M x).mulVec
+          (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ))) g
+      = ∑ i : Fin (flatBandSpinConfigList I σ).length,
+          ((-1 : ℂ) ^ (i : ℕ)) *
+            ((if ((flatBandSpinConfigList I σ).get i).2 = 0 then
+                μ ((flatBandSpinConfigList I σ).get i).1 x else 0) *
+              ∑ j : Fin ((flatBandSpinConfigList I σ).eraseIdx i).length,
+                ((-1 : ℂ) ^ (j : ℕ)) *
+                  ((if (((flatBandSpinConfigList I σ).eraseIdx i).get j).2 = 1 then
+                      μ (((flatBandSpinConfigList I σ).eraseIdx i).get j).1 x else 0) *
+                    (generalOccBasis eμ).repr (generalFlatBandSlaterState μ
+                      (((flatBandSpinConfigList I σ).eraseIdx i).eraseIdx j)) g)) := by
+  rw [cDownUp_canonical_eq_doublePeel]
+  simp only [map_sum, map_smul, generalFlatBandPeelTerm, Finsupp.coe_finset_sum, Finsupp.coe_smul,
+    Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+
 end LatticeSystem.Fermion
