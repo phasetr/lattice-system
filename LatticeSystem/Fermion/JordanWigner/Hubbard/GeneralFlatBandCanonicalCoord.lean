@@ -289,4 +289,17 @@ theorem flatBandSpinConfigList_eraseIdx_eraseIdx (I : Finset (Fin (M + 1)))
           ((flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I σ)[i]).1) σ)[j]).1) σ := by
   rw [flatBandSpinConfigList_eraseIdx I σ hi, flatBandSpinConfigList_eraseIdx _ σ hj]
 
+/-- **The canonical list depends on `σ` only through its values on the index set**: if `σ` and `σ'`
+agree on every `z ∈ S` then `flatBandSpinConfigList S σ = flatBandSpinConfigList S σ'`.  Applied to
+the twice-erased set `(I.erase a).erase b` (containing neither `a` nor `b`), the `(D₀-2)`-electron
+rest list is the *same* for `σ` and the spin-swapped `σ_{a↔b}` (they agree off `{a,b}`), so the
+shared rest Slater state's nonzero bridge coefficient cancels in the eq. (11.3.49) comparison
+`D(σ) = D(σ_{a↔b})` instead of requiring an existential sign comparison. -/
+theorem flatBandSpinConfigList_congr (S : Finset (Fin (M + 1))) (σ σ' : Fin (M + 1) → Fin 2)
+    (h : ∀ z ∈ S, σ z = σ' z) : flatBandSpinConfigList S σ = flatBandSpinConfigList S σ' := by
+  unfold flatBandSpinConfigList
+  apply List.map_congr_left
+  intro z hz
+  rw [h z ((Finset.mem_sort (· ≤ ·)).mp hz)]
+
 end LatticeSystem.Fermion
