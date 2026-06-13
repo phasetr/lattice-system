@@ -412,4 +412,42 @@ theorem cDownUp_canonical_repr_eq_sum (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
   simp only [map_sum, map_smul, generalFlatBandPeelTerm, Finsupp.coe_finset_sum, Finsupp.coe_smul,
     Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
 
+/-- **The occupation-basis coordinate of a `μ`-Slater state over `I`**: for a nodup list `qs` of
+index modes (`q.1 ∈ I`), `(generalOccBasis eμ).repr (Slater μ qs) g` is a nonzero sign times the
+Kronecker delta `[config(qs) = g]`, where `config(qs)` is the occupation indicator of the
+`idx`-image
+modes `{(idx z, σ) : (z,σ) ∈ qs}`.  This computes the coordinate of every `(D₀−2)`-Slater state
+produced by the double peel (those `eraseIdx` lists are nodup over `I`).  Via the `μ`-Slater↔mode
+monomial bridge (PR9), permutation scaling, and the occupation-monomial coordinate (PR25). -/
+theorem generalFlatBandSlaterState_over_I_repr
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (idx : Fin (M + 1) → Fin (M + 1))
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    (qs : List (Fin (M + 1) × Fin 2)) (hqs_nd : qs.Nodup) (hqs_I : ∀ q ∈ qs, q.1 ∈ I)
+    (g : Fin (M + 1) × Fin 2 → Fin 2) :
+    ∃ z : ℂ, z ≠ 0 ∧ (generalOccBasis eμ).repr (generalFlatBandSlaterState μ qs) g
+      = z * (if (fun q => if q ∈ (qs.map (fun p => (idx p.1, p.2))).toFinset then (1 : Fin 2)
+                else 0) = g then 1 else 0) := by
+  classical
+  set l : List (Fin (M + 1) × Fin 2) := qs.map (fun p => (idx p.1, p.2)) with hl
+  have hl_nd : l.Nodup := by
+    rw [hl]
+    refine hqs_nd.map_on fun a ha b hb hab => ?_
+    exact Prod.ext (flatBandSpecial_idx_injOn hbasis hidx (hqs_I a ha) (hqs_I b hb)
+      (Prod.ext_iff.mp hab).1) (Prod.ext_iff.mp hab).2
+  rw [generalFlatBandSlaterState_eq_generalModeMonomial eμ idx hidx qs hqs_I]
+  set f : Fin (M + 1) × Fin 2 → Fin 2 := fun q => if q ∈ l.toFinset then 1 else 0 with hf
+  have hocc : generalOccFinset f = l.toFinset := by
+    ext q
+    simp only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and, hf]
+    by_cases h : q ∈ l.toFinset <;> simp [h]
+  have hperm : l.Perm (generalOccFinset f).toList := by
+    rw [hocc]; exact (List.toFinset_toList hl_nd).symm
+  obtain ⟨z, hz0, hz⟩ := generalModeMonomial_perm eμ hperm
+  refine ⟨z, hz0, ?_⟩
+  rw [hz,
+    show generalModeMonomial eμ (generalOccFinset f).toList = generalOccMonomial eμ f from rfl,
+    map_smul, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul, generalOccMonomial_repr]
+
 end LatticeSystem.Fermion
