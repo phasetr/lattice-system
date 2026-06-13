@@ -617,4 +617,64 @@ theorem cDownUp_canonicalSlaterSum_repr_twoHole_eq_zero_of_edgeSwap_invariant
       rw [hsσ'eq]; exact hedge hadj (fun z : I => σ z.1)
     rw [hDeq, hneg]; ring
 
+/-- **Off-target coordinate kill for a `D`-sum**: at an occupation target `g` that is *not* a
+`(D₀-2)`-emptied two-hole config of any pair, the `D`-weighted sum of `ĉ_{x↓}ĉ_{x↑}`-coordinates
+vanishes.  Expanding the double peel (`cDownUp_canonical_repr_eq_sum`), every inner rest-Slater
+coordinate is a Kronecker delta (`generalFlatBandSlaterState_over_I_repr`) at the occupation config
+of the twice-erased canonical list
+`((canonical).eraseIdx i).eraseIdx j = canonical((I.erase a).erase b) σ`
+(`flatBandSpinConfigList_eraseIdx_eraseIdx`); since `g` matches no such config (`hnot`), every delta
+is zero.  Together with the two-hole-target kill this gives `generalCDownUp x Φ = 0`. -/
+theorem cDownUp_canonicalSlaterSum_repr_eq_zero_of_not_twoHoleTarget
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (x : Fin (M + 1))
+    (D : (I → Fin 2) → ℂ) (g : Fin (M + 1) × Fin 2 → Fin 2)
+    (hnot : ∀ (σ : Fin (M + 1) → Fin 2) (a b : Fin (M + 1)), a ∈ I → b ∈ I → a ≠ b →
+      g ≠ idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ)) :
+    ∑ s : I → Fin 2, D s * (generalOccBasis eμ).repr
+        ((generalCDownUp M x).mulVec (generalFlatBandSlaterState μ
+          (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0)))) g = 0 := by
+  refine Finset.sum_eq_zero (fun s _ => ?_)
+  set σ : Fin (M + 1) → Fin 2 := fun z => if h : z ∈ I then s ⟨z, h⟩ else 0 with hσdef
+  suffices h : (generalOccBasis eμ).repr ((generalCDownUp M x).mulVec
+      (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ))) g = 0 by rw [h, mul_zero]
+  rw [cDownUp_canonical_repr_eq_sum]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  have hinner : (∑ j : Fin ((flatBandSpinConfigList I σ).eraseIdx (i : ℕ)).length,
+      ((-1 : ℂ) ^ (j : ℕ)) *
+        ((if (((flatBandSpinConfigList I σ).eraseIdx (i : ℕ)).get j).2 = 1 then
+            μ (((flatBandSpinConfigList I σ).eraseIdx (i : ℕ)).get j).1 x else 0) *
+          (generalOccBasis eμ).repr (generalFlatBandSlaterState μ
+            (((flatBandSpinConfigList I σ).eraseIdx (i : ℕ)).eraseIdx (j : ℕ))) g)) = 0 := by
+    refine Finset.sum_eq_zero (fun j _ => ?_)
+    have hnd : (((flatBandSpinConfigList I σ).eraseIdx (i : ℕ)).eraseIdx (j : ℕ)).Nodup :=
+      (flatBandSpinConfigList_eraseIdx_nodup I σ (i : ℕ)).eraseIdx (j : ℕ)
+    have hmemI : ∀ q ∈ ((flatBandSpinConfigList I σ).eraseIdx (i : ℕ)).eraseIdx (j : ℕ), q.1 ∈ I :=
+      fun q hq => flatBandSpinConfigList_mem_fst_mem I σ
+        (List.mem_of_mem_eraseIdx (List.mem_of_mem_eraseIdx hq))
+    obtain ⟨z, _, hz⟩ := generalFlatBandSlaterState_over_I_repr hbasis eμ idx hidx
+      (((flatBandSpinConfigList I σ).eraseIdx (i : ℕ)).eraseIdx (j : ℕ)) hnd hmemI g
+    set a : Fin (M + 1) := ((flatBandSpinConfigList I σ)[(i : ℕ)]).1 with ha_def
+    have heq : (flatBandSpinConfigList I σ).eraseIdx (i : ℕ)
+        = flatBandSpinConfigList (I.erase a) σ :=
+      flatBandSpinConfigList_eraseIdx I σ i.2
+    have hjlt : (j : ℕ) < (flatBandSpinConfigList (I.erase a) σ).length := by
+      rw [← heq]; exact j.2
+    set b : Fin (M + 1) := ((flatBandSpinConfigList (I.erase a) σ)[(j : ℕ)]).1 with hb_def
+    have hrest : ((flatBandSpinConfigList I σ).eraseIdx (i : ℕ)).eraseIdx (j : ℕ)
+        = flatBandSpinConfigList ((I.erase a).erase b) σ :=
+      flatBandSpinConfigList_eraseIdx_eraseIdx I σ i.2 hjlt
+    have ha : a ∈ I := flatBandSpinConfigList_mem_fst_mem I σ (List.getElem_mem _)
+    have hbe : b ∈ I.erase a := flatBandSpinConfigList_mem_fst_mem _ σ (List.getElem_mem _)
+    have hrepr0 : (generalOccBasis eμ).repr (generalFlatBandSlaterState μ
+        (((flatBandSpinConfigList I σ).eraseIdx (i : ℕ)).eraseIdx (j : ℕ))) g = 0 := by
+      rw [hz]; split_ifs with hc
+      · exact absurd ((hc.symm).trans (congrArg (idxConfigOf idx) hrest))
+          (hnot σ a b ha (Finset.mem_of_mem_erase hbe) (Ne.symm (Finset.ne_of_mem_erase hbe)))
+      · rw [mul_zero]
+    rw [hrepr0, mul_zero, mul_zero]
+  rw [hinner, mul_zero, mul_zero]
+
 end LatticeSystem.Fermion
