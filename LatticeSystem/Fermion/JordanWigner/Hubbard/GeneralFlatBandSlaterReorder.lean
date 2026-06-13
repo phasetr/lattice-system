@@ -487,4 +487,22 @@ theorem idxConfigOf_eraseIdx
   simp only [Finset.mem_erase, Function.update_apply]
   by_cases hq : q = (idx (qs[i]'hi).1, (qs[i]'hi).2) <;> simp [hq, idxConfigOf]
 
+/-- **Double-erase of the `idx`-config**: erasing positions `i` then `j` zeroes the config at the
+two
+removed modes `(idx qs[i].1, qs[i].2)` and `(idx (qs.eraseIdx i)[j].1, (qs.eraseIdx i)[j].2)`.  The
+config of every `(D₀−2)`-Slater state produced by the double peel, in terms of the two removed
+modes. -/
+theorem idxConfigOf_eraseIdx_eraseIdx
+    (idx : Fin (M + 1) → Fin (M + 1)) (qs : List (Fin (M + 1) × Fin 2))
+    (hnd : (qs.map (fun p => (idx p.1, p.2))).Nodup) (i : ℕ) (hi : i < qs.length)
+    (j : ℕ) (hj : j < (qs.eraseIdx i).length) :
+    idxConfigOf idx ((qs.eraseIdx i).eraseIdx j)
+      = Function.update
+          (Function.update (idxConfigOf idx qs) (idx (qs[i]'hi).1, (qs[i]'hi).2) 0)
+          (idx ((qs.eraseIdx i)[j]'hj).1, ((qs.eraseIdx i)[j]'hj).2) 0 := by
+  have hnd' : ((qs.eraseIdx i).map (fun p => (idx p.1, p.2))).Nodup := by
+    rw [← List.eraseIdx_map]; exact hnd.eraseIdx i
+  rw [idxConfigOf_eraseIdx idx (qs.eraseIdx i) hnd' j hj,
+    idxConfigOf_eraseIdx idx qs hnd i hi]
+
 end LatticeSystem.Fermion
