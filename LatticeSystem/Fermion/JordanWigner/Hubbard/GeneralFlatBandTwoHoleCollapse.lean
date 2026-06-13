@@ -521,4 +521,64 @@ theorem cDownUp_canonicalSum_eq_two_terms {T : Matrix (Fin (M + 1)) (Fin (M + 1)
       (by intro hh; apply hs.2; funext z; have := hh z.1 z.2; simpa [z.2] using this)
     rw [hvanish, mul_zero]
 
+/-- **The eq. (11.3.49) Marshall-sign relation**: for a flat-band ground state `Φ` with spin-config
+expansion `Φ = Σ_s D s • Slater(canonical I (extend s))`, and a connected pair `a, b ∈ I` (i.e. a
+site `x` with `μ_a(x) ≠ 0` and `μ_b(x) ≠ 0`) with `σ a = 0`, `σ b = 1`, the coefficient of `σ|_I`
+equals that of the `a↔b` spin-swapped config `(σ ∘ swap a b)|_I`.  Acting with `ĉ_{x,↓}ĉ_{x,↑}`
+kills the ground state (`generalCDownUp_mulVec_eq_zero_of_mem_groundSubmodule`); taking the
+`(a,b)`-emptied coordinate, the sum collapses (`cDownUp_canonicalSum_eq_two_terms`) to the two
+relevant configs, whose coordinates are negatives (`cDownUp_canonical_repr_twoHole_swap_eq_neg`) and
+nonzero (the `μ`-amplitudes and the rest coordinate are nonzero), forcing `D σ = D σ_{a↔b}`. -/
+theorem flatBand_groundState_D_swap_eq {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2)
+    (x : Fin (M + 1)) {a b : Fin (M + 1)} (ha : a ∈ I) (hb : b ∈ I) (hab : a ≠ b)
+    (hσa : σ a = 0) (hσb : σ b = 1) (hμa : μ a x ≠ 0) (hμb : μ b x ≠ 0)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U)
+    (D : (I → Fin 2) → ℂ)
+    (hD : Φ = ∑ s, D s • generalFlatBandSlaterState μ
+      (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0))) :
+    D (fun z : I => σ z.1) = D (fun z : I => (σ ∘ ⇑(Equiv.swap a b)) z.1) := by
+  set g := idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ) with hg
+  -- coord_σ ≠ 0
+  have hcoordne : (generalOccBasis eμ).repr ((generalCDownUp M x).mulVec
+      (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ))) g ≠ 0 := by
+    rw [cDownUp_canonical_repr_twoHole hbasis hidx σ x ha hb hab hσa hσb]
+    refine mul_ne_zero (pow_ne_zero _ (by norm_num)) (mul_ne_zero hμa
+      (mul_ne_zero (pow_ne_zero _ (by norm_num)) (mul_ne_zero hμb ?_)))
+    exact generalFlatBandSlaterState_repr_self_ne_zero hbasis eμ idx hidx _
+      (flatBandSpinConfigList_nodup _ _)
+      (fun q hq => Finset.mem_of_mem_erase (Finset.mem_of_mem_erase
+        (flatBandSpinConfigList_mem_fst_mem _ σ hq)))
+  -- cDownUp Φ = 0 → coordinate sum = 0
+  have hzero := generalCDownUp_mulVec_eq_zero_of_mem_groundSubmodule T U hT hU hΦ x
+  have h0 : (generalOccBasis eμ).repr ((generalCDownUp M x).mulVec Φ) g = 0 := by rw [hzero]; simp
+  rw [hD, Matrix.mulVec_sum] at h0
+  simp only [Matrix.mulVec_smul, map_sum, map_smul, Finsupp.coe_finset_sum, Finsupp.coe_smul,
+    Finset.sum_apply, Pi.smul_apply, smul_eq_mul] at h0
+  rw [cDownUp_canonicalSum_eq_two_terms hbasis hidx σ x ha hb hab hσa hσb D] at h0
+  have hc0 : flatBandSpinConfigList I
+        (fun z => if h : z ∈ I then (fun z : I => σ z.1) ⟨z, h⟩ else 0)
+      = flatBandSpinConfigList I σ := by
+    apply flatBandSpinConfigList_congr; intro z hz; simp only [hz, dif_pos]
+  have hc0' : flatBandSpinConfigList I
+        (fun z => if h : z ∈ I then (fun z : I => (σ ∘ ⇑(Equiv.swap a b)) z.1) ⟨z, h⟩ else 0)
+      = flatBandSpinConfigList I (σ ∘ ⇑(Equiv.swap a b)) := by
+    apply flatBandSpinConfigList_congr; intro z hz; simp only [hz, dif_pos]
+  rw [hc0, hc0'] at h0
+  have hpr55 := cDownUp_canonical_repr_twoHole_swap_eq_neg hbasis hidx σ x ha hb hab hσa hσb
+  rw [hpr55] at h0
+  set csw := (generalOccBasis eμ).repr ((generalCDownUp M x).mulVec
+    (generalFlatBandSlaterState μ (flatBandSpinConfigList I (σ ∘ ⇑(Equiv.swap a b))))) g with hcsw
+  have hcswne : csw ≠ 0 := fun hc => hcoordne (by rw [hpr55, hc, neg_zero])
+  have hfin : (D (fun z : I => (σ ∘ ⇑(Equiv.swap a b)) z.1)
+      - D (fun z : I => σ z.1)) * csw = 0 := by
+    linear_combination h0
+  rcases mul_eq_zero.mp hfin with h | h
+  · exact (sub_eq_zero.mp h).symm
+  · exact absurd h hcswne
+
 end LatticeSystem.Fermion
