@@ -159,4 +159,29 @@ theorem generalFlatBandProjectionSupportMatrix_isSymm :
   rw [← (generalFlatBandProjectionMatrix_isHermitian T).apply x.1 y.1, ← starRingEnd_apply,
     Complex.normSq_conj]
 
+/-- **Special-basis coordinates determine flat-band vectors**: a flat-band vector vanishing at every
+index site is zero.  Writing `v = Σ_z c_z μ_z` (`ker T = span{μ_z}`) and evaluating at an index `w`,
+the localisation `μ_{z'}(w) = δ_{z'w}μ_w(w)` collapses the sum to `c_w μ_w(w)`; since `v_w = 0` and
+`μ_w(w) ≠ 0`, every coefficient vanishes.  This is the engine of the cut/block argument: a flat-band
+vector supported off a coordinate block is killed. -/
+theorem generalFlatBand_kernel_coord_determined {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {v : EuclideanSpace ℂ (Fin (M + 1))} (hv : v ∈ generalFlatBandKernel T)
+    (hcoord : ∀ w ∈ I, WithLp.ofLp v w = 0) : v = 0 := by
+  classical
+  rw [generalFlatBand_kernel_eq_span T hbasis, Submodule.mem_span_range_iff_exists_fun] at hv
+  obtain ⟨c, hc⟩ := hv
+  have hc0 : ∀ z : I, c z = 0 := by
+    intro z
+    have hz : inner ℂ (EuclideanSpace.basisFun (Fin (M + 1)) ℂ z.1) v = 0 := by
+      rw [EuclideanSpace.basisFun_inner]; exact hcoord z.1 z.2
+    rw [← hc, inner_sum] at hz
+    simp only [inner_smul_right, EuclideanSpace.basisFun_inner] at hz
+    rw [Finset.sum_eq_single z (fun z' _ hz' => by
+      rw [hbasis.2.2.2.2 z'.1 z'.2 z.1 z.2 (fun h => hz' (Subtype.ext h)), mul_zero])
+      (fun h => absurd (Finset.mem_univ z) h)] at hz
+    exact (mul_eq_zero.mp hz).resolve_right (hbasis.2.2.2.1 z.1 z.2)
+  rw [← hc]
+  simp only [hc0, zero_smul, Finset.sum_const_zero]
+
 end LatticeSystem.Fermion
