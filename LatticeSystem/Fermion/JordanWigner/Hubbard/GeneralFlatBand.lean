@@ -304,7 +304,7 @@ def generalFlatBandBasisConnected (I : Finset (Fin (M + 1)))
 /-! **Tasaki Theorem 11.17 (connectivity form of flat-band ferromagnetism).**  For a special basis
 `{μ_z}` of the flat band (Lemma 11.16), the `D₀`-electron Hubbard model is saturated-ferromagnetic
 **iff** the basis is connected (Mielke's second necessary-and-sufficient condition).  Now a proved
-theorem — `generalFlatBand_theorem_11_17` in `GeneralFlatBandMultiplet.lean` (Issue #4363): the
+theorem — `generalFlatBand_theorem_11_17` in `GeneralFlatBandDisconnected.lean` (Issue #4363): the
 connected ⟹ multiplet direction is `generalFlatBand_connected_isMaximalSpinMultiplet` (the SU(2)
 tower lower bound with the connectivity-induction upper bound), and the converse is the
 contrapositive `¬connected ⟹ finrank > D₀+1` (`generalFlatBand_disconnected_finrank_gt`, the
