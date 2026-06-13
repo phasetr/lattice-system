@@ -301,17 +301,13 @@ def generalFlatBandBasisConnected (I : Finset (Fin (M + 1)))
     (μ : Fin (M + 1) → Fin (M + 1) → ℂ) : Prop :=
   (generalFlatBandBasisGraph I μ).Connected
 
-/-- **Tasaki Theorem 11.17 (connectivity form of flat-band ferromagnetism), AXIOM.**  For a
-special basis `{μ_z}` of the flat band (Lemma 11.16), the `D₀`-electron Hubbard model is
-saturated-ferromagnetic **iff** the basis is connected.  This is Mielke's second
-necessary-and-sufficient condition; Tasaki shows its connectivity is independent of the
-choice of special basis and equivalent to the irreducibility condition of Theorem 11.15.
-Recorded as a documented axiom (Issue #4186), matching the Theorem 11.8 / 11.13 / 11.15
-policy. -/
-axiom generalFlatBand_theorem_11_17 (U : ℝ) (hT : T.PosSemidef)
-    (hD0 : 0 < generalFlatBandDim T) (hU : 0 < U)
-    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
-    (hbasis : IsGeneralFlatBandSpecialBasis T I μ) :
-    generalFlatBandFerromagnetic T U ↔ generalFlatBandBasisConnected I μ
+/-! **Tasaki Theorem 11.17 (connectivity form of flat-band ferromagnetism).**  For a special basis
+`{μ_z}` of the flat band (Lemma 11.16), the `D₀`-electron Hubbard model is saturated-ferromagnetic
+**iff** the basis is connected (Mielke's second necessary-and-sufficient condition).  Now a proved
+theorem — `generalFlatBand_theorem_11_17` in `GeneralFlatBandMultiplet.lean` (Issue #4363): the
+connected ⟹ multiplet direction is `generalFlatBand_connected_isMaximalSpinMultiplet` (the SU(2)
+tower lower bound with the connectivity-induction upper bound), and the converse is the
+contrapositive `¬connected ⟹ finrank > D₀+1` (`generalFlatBand_disconnected_finrank_gt`, the
+per-block weight states). -/
 
 end LatticeSystem.Fermion

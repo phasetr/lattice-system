@@ -952,4 +952,33 @@ theorem generalFlatBand_disconnected_finrank_gt
     _ < (A.card + 1) * (Aᶜ.card + 1) := disconnection_cut_card_lt A hAne hAcne
     _ ≤ Module.finrank ℂ ↥G := hcard
 
+open scoped ComplexOrder in
+/-- **Tasaki Theorem 11.17 (connectivity form of flat-band ferromagnetism)** — discharged from the
+axiom (Issue #4363).  For a special basis `{μ_z}` of the flat band (Lemma 11.16), the `D₀`-electron
+Hubbard model is saturated-ferromagnetic (its ground subspace is the `(D₀+1)`-fold maximal-spin
+multiplet, `generalFlatBandFerromagnetic`) **iff** the basis is connected.
+
+`⇐` (connected ⟹ multiplet) is `generalFlatBand_connected_isMaximalSpinMultiplet`: the SU(2)
+lowering tower of the all-up μ-Slater gives `finrank ≥ D₀+1`, the eq. (11.3.49) connectivity
+induction gives `finrank ≤ D₀+1`, and the tower spans the ground subspace as `(Ŝ_tot)²`-eigenstates
+at the maximal spin.  `⇒` is the contrapositive: a disconnected basis admits a non-trivial cut whose
+`(|A|+1)(|Aᶜ|+1) > D₀+1` per-block weight states are independent ground states
+(`generalFlatBand_disconnected_finrank_gt`), so `finrank > D₀+1` and the multiplet's
+`finrank = D₀+1`
+fails.  Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed.,
+Springer, 2020), §11.3.4, Theorem 11.17, pp. 410–412. -/
+theorem generalFlatBand_theorem_11_17 (T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ) (U : ℝ)
+    (hT : T.PosSemidef) (hD0 : 0 < generalFlatBandDim T) (hU : 0 < U)
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ) :
+    generalFlatBandFerromagnetic T U ↔ generalFlatBandBasisConnected I μ := by
+  refine ⟨fun hferro => ?_, fun hconn =>
+    generalFlatBand_connected_isMaximalSpinMultiplet hbasis hT U hU hconn⟩
+  by_contra hnc
+  have hne : I.Nonempty := Finset.card_pos.mp (hbasis.1.symm ▸ hD0)
+  have hgt := generalFlatBand_disconnected_finrank_gt hbasis hT U hnc hne
+  have hfin : Module.finrank ℂ ↥(generalFlatBandGroundSubmodule T U) = generalFlatBandDim T + 1 :=
+    hferro.1
+  omega
+
 end LatticeSystem.Fermion
