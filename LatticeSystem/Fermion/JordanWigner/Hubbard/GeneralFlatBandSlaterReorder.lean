@@ -31,6 +31,25 @@ theorem List.toFinset_eraseIdx_of_nodup {α : Type*} [DecidableEq α] {l : List 
     obtain ⟨k, hk, rfl⟩ := List.mem_iff_getElem.mp hmem
     exact ⟨k, hk, fun hc => hne ((List.Nodup.getElem_inj_iff h).mpr hc), rfl⟩
 
+/-- **Erasing the `i`-th position of a sorted finset list yields the sorted list of the erased
+finset**: `(s.sort r).eraseIdx i = (s.erase (s.sort r)[i]).sort r`.  Both sides are sorted lists
+with the same (nodup) underlying finset `s.erase (s.sort r)[i]`, so they are equal by the
+uniqueness of sorted enumerations (`List.Perm.eq_of_pairwise`).  This reduces a positional
+double-peel of the canonical creation list to a canonical list over a smaller index set, so all
+the canonical-list machinery applies verbatim to the `(D₀-2)`-electron "rest" states. -/
+theorem Finset.sort_eraseIdx_eq_sort_erase {α : Type*} (r : α → α → Prop) [DecidableRel r]
+    [IsTrans α r] [Std.Antisymm r] [Std.Total r] [DecidableEq α] (s : Finset α) {i : ℕ}
+    (hi : i < (s.sort r).length) : (s.sort r).eraseIdx i = (s.erase (s.sort r)[i]).sort r := by
+  have hanti : ∀ a b : α, r a b → r b a → a = b := fun a b => Std.Antisymm.antisymm a b
+  apply List.Perm.eq_of_pairwise (fun a b _ _ => hanti a b)
+  · exact List.Pairwise.sublist ((s.sort r).eraseIdx_sublist i) (Finset.pairwise_sort s r)
+  · exact Finset.pairwise_sort (s.erase (s.sort r)[i]) r
+  · apply List.perm_of_nodup_nodup_toFinset_eq
+    · exact List.Nodup.eraseIdx i (s.sort_nodup r)
+    · exact (s.erase (s.sort r)[i]).sort_nodup r
+    · rw [List.toFinset_eraseIdx_of_nodup (s.sort_nodup r) hi]
+      simp only [Finset.sort_toFinset]
+
 namespace LatticeSystem.Fermion
 
 open Matrix LatticeSystem.Quantum Module
