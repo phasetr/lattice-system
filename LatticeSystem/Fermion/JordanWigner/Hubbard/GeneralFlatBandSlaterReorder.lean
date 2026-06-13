@@ -505,4 +505,21 @@ theorem idxConfigOf_eraseIdx_eraseIdx
   rw [idxConfigOf_eraseIdx idx (qs.eraseIdx i) hnd' j hj,
     idxConfigOf_eraseIdx idx qs hnd i hi]
 
+/-- **The `idx`-config of the canonical list is the spin-configuration occupation**:
+`idxConfigOf idx (flatBandSpinConfigList I σ) = flatBandSpinConfigOcc I idx σ`.  Connects the
+`eraseIdx`-tracking config to the established spin-config-occupation machinery (PR9–PR11), so the
+`(D₀−2)`-target configs are expressed via `flatBandSpinConfigOcc`. -/
+theorem idxConfigOf_flatBandSpinConfigList (I : Finset (Fin (M + 1)))
+    (idx : Fin (M + 1) → Fin (M + 1)) (σ : Fin (M + 1) → Fin 2) :
+    idxConfigOf idx (flatBandSpinConfigList I σ) = flatBandSpinConfigOcc I idx σ := by
+  funext q
+  simp only [idxConfigOf, flatBandSpinConfigList, List.map_map, List.mem_toFinset, List.mem_map,
+    Finset.mem_sort, Function.comp_apply, flatBandSpinConfigOcc]
+  by_cases h : ∃ z ∈ I, q = (idx z, σ z)
+  · obtain ⟨z, hz, rfl⟩ := h
+    rw [if_pos ⟨z, hz, rfl⟩, if_pos ⟨z, hz, rfl⟩]
+  · rw [if_neg, if_neg h]
+    rintro ⟨z, hz, hzq⟩
+    exact h ⟨z, hz, hzq.symm⟩
+
 end LatticeSystem.Fermion
