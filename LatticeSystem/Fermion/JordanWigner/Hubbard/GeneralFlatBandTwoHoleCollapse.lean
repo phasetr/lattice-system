@@ -19,6 +19,44 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), §11.3.4, eq. (11.3.49).  Tracked in Issue #4363.
 -/
 
+/-- **Two `Fin 2`-configs of equal weight differ by a permutation**: if `s, s' : I → Fin 2` have the
+same number of `0`s, there is a permutation `π : Equiv.Perm I` with `s' ∘ π = s`.  Glue the
+`Fintype.equivOfCardEq` bijections of the `0`-fibers and their complements through
+`Equiv.sumCompl`.  (Generic fact; the engine behind "the ground-state coefficient depends only on
+the up-count" in the eq. (11.3.49) connectivity induction.) -/
+theorem exists_perm_comp_of_card_eq {I : Type*} [Fintype I] (s s' : I → Fin 2)
+    (h : Fintype.card {z // s z = 0} = Fintype.card {z // s' z = 0}) :
+    ∃ π : Equiv.Perm I, s' ∘ π = s := by
+  classical
+  have h1 : Fintype.card {z // ¬ s z = 0} = Fintype.card {z // ¬ s' z = 0} := by
+    rw [Fintype.card_subtype_compl (fun z => s z = 0),
+      Fintype.card_subtype_compl (fun z => s' z = 0), h]
+  let e0 : {z // s z = 0} ≃ {z // s' z = 0} := Fintype.equivOfCardEq h
+  let e1 : {z // ¬ s z = 0} ≃ {z // ¬ s' z = 0} := Fintype.equivOfCardEq h1
+  refine ⟨(Equiv.sumCompl (fun z => s z = 0)).symm.trans
+    ((e0.sumCongr e1).trans (Equiv.sumCompl (fun z => s' z = 0))), ?_⟩
+  funext z
+  rw [Function.comp_apply]
+  by_cases hz : s z = 0
+  · have hpi : ((Equiv.sumCompl (fun z => s z = 0)).symm.trans
+        ((e0.sumCongr e1).trans (Equiv.sumCompl (fun z => s' z = 0)))) z = (e0 ⟨z, hz⟩).1 := by
+      rw [Equiv.trans_apply, Equiv.trans_apply,
+        Equiv.sumCompl_symm_apply_of_pos (p := fun w => s w = 0) hz,
+        Equiv.sumCongr_apply, Sum.map_inl, Equiv.sumCompl_apply_inl]
+    rw [hpi, (e0 ⟨z, hz⟩).2, hz]
+  · have hpi : ((Equiv.sumCompl (fun z => s z = 0)).symm.trans
+        ((e0.sumCongr e1).trans (Equiv.sumCompl (fun z => s' z = 0)))) z = (e1 ⟨z, hz⟩).1 := by
+      rw [Equiv.trans_apply, Equiv.trans_apply,
+        Equiv.sumCompl_symm_apply_of_neg (p := fun w => s w = 0) hz,
+        Equiv.sumCongr_apply, Sum.map_inr, Equiv.sumCompl_apply_inr]
+    rw [hpi]
+    have he := (e1 ⟨z, hz⟩).2
+    rcases LatticeSystem.Fermion.fin2_eq_zero_or_one (s z) with h0 | h1x
+    · exact absurd h0 hz
+    · rcases LatticeSystem.Fermion.fin2_eq_zero_or_one (s' (e1 ⟨z, hz⟩).1) with hh | hh
+      · exact absurd hh he
+      · rw [hh, h1x]
+
 namespace LatticeSystem.Fermion
 
 open Matrix LatticeSystem.Quantum Module
@@ -768,5 +806,25 @@ theorem flatBand_groundState_D_perm_eq {T : Matrix (Fin (M + 1)) (Fin (M + 1)) �
     exact (Subgroup.closure_le G).mpr hswap
   have hπ : π ∈ G := by rw [htop]; exact Subgroup.mem_top π
   exact hπ s
+
+/-- **The ground-state coefficient depends only on the up-count** (connected basis): if `s, s'` have
+the same number of up-spins (`Fintype.card {z // s z = 0} = Fintype.card {z // s' z = 0}`), then
+`D s = D s'`.  Equal-weight configs differ by a permutation (`exists_perm_comp_of_card_eq`), under
+which `D` is invariant on a connected basis (`flatBand_groundState_D_perm_eq`). -/
+theorem flatBand_groundState_D_const_of_weight_eq {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U)
+    (D : (I → Fin 2) → ℂ)
+    (hD : Φ = ∑ s, D s • generalFlatBandSlaterState μ
+      (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0)))
+    (hconn : generalFlatBandBasisConnected I μ) (s s' : I → Fin 2)
+    (hw : Fintype.card {z // s z = 0} = Fintype.card {z // s' z = 0}) :
+    D s = D s' := by
+  obtain ⟨π, hπ⟩ := exists_perm_comp_of_card_eq s s' hw
+  rw [← hπ, flatBand_groundState_D_perm_eq hbasis hT U hU hidx hΦ D hD hconn]
 
 end LatticeSystem.Fermion
