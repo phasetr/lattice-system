@@ -400,4 +400,32 @@ theorem generalFlatBand_cDownUp_two_head_swap (μ : Fin (M + 1) → Fin (M + 1) 
   congr 1
   ring
 
+/-- Moving the head `c` past the next two creations `a, b` preserves the Slater state (sign `+1`:
+two adjacent transpositions).  General-basis analogue of
+`flatBandModeMonomial_move_one_past_two`. -/
+theorem generalFlatBandSlaterState_move_one_past_two (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (c a b : Fin (M + 1) × Fin 2) (l : List (Fin (M + 1) × Fin 2)) :
+    generalFlatBandSlaterState μ (c :: a :: b :: l)
+      = generalFlatBandSlaterState μ (a :: b :: c :: l) := by
+  rw [generalFlatBandSlaterState_swap μ a c (b :: l),
+    ← generalFlatBandCreation_mulVec_slaterState μ a.1 a.2,
+    generalFlatBandSlaterState_swap μ b c l, Matrix.mulVec_neg,
+    generalFlatBandCreation_mulVec_slaterState μ a.1 a.2, neg_neg]
+
+/-- **Moving a contiguous pair to the front of a Slater state preserves it** (sign `+1`): pushing
+the pair `a, b` leftward past the block `l₁` is `2·|l₁|` adjacent transpositions, hence
+`Slater(l₁ ++ a :: b :: l₂) = Slater(a :: b :: (l₁ ++ l₂))`.  General-basis analogue of
+`flatBandModeMonomial_move_pair_front`; brings an arbitrary occupied pair to the head for the
+`cDownUp` two-head extraction. -/
+theorem generalFlatBandSlaterState_move_pair_front (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (a b : Fin (M + 1) × Fin 2) (l₁ l₂ : List (Fin (M + 1) × Fin 2)) :
+    generalFlatBandSlaterState μ (l₁ ++ a :: b :: l₂)
+      = generalFlatBandSlaterState μ (a :: b :: (l₁ ++ l₂)) := by
+  induction l₁ with
+  | nil => rfl
+  | cons c l₁' ih =>
+    rw [List.cons_append, ← generalFlatBandCreation_mulVec_slaterState μ c.1 c.2, ih,
+      generalFlatBandCreation_mulVec_slaterState μ c.1 c.2,
+      generalFlatBandSlaterState_move_one_past_two μ c a b (l₁' ++ l₂), List.cons_append]
+
 end LatticeSystem.Fermion

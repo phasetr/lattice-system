@@ -6634,8 +6634,18 @@ $-\mu_a(x)\,\mu_b(x)\,\text{Slater}(\text{rest})$ (\texttt{generalFlatBand\_cDow
 via \texttt{generalFlatBandSlaterState\_swap} composed with the two-head extraction).  This relative
 $-1$ versus the canonical up--down assignment (one extra Koszul transposition) is exactly the seed of
 the eq.~(11.3.49) sign relation $C(\sigma)=C(\sigma_{z_1\leftrightarrow z_2})$ (the general-basis
-analogue of the Theorem 11.11 \texttt{flatBand\_cDownUp\_swap}).  Reordering an arbitrary occupied
-pair to the front and collecting the surviving $(D_0{-}2)$-occupied terms is the subsequent PR.  The double-annihilation expansion and sign relation
+analogue of the Theorem 11.11 \texttt{flatBand\_cDownUp\_swap}).
+
+\medskip\noindent\textbf{Theorem 11.17 PR20, the Slater move-pair-front (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  To extract an \emph{arbitrary} occupied pair
+(not just a leading one), bring it to the head.  Moving the head past the next two creations is sign
+$+1$ (two adjacent transpositions, \texttt{generalFlatBandSlaterState\_move\_one\_past\_two}); by
+induction, pushing a contiguous pair $a,b$ leftward past a block $l_1$ is $2|l_1|$ transpositions,
+hence $\text{Slater}(l_1 \mathbin{+\!+} a\!::\!b\!::\!l_2) = \text{Slater}(a\!::\!b\!::\!(l_1
+\mathbin{+\!+} l_2))$ (\texttt{generalFlatBandSlaterState\_move\_pair\_front}, the general-basis
+analogue of \texttt{flatBandModeMonomial\_move\_pair\_front}).  Combined with the two-head/swapped
+extraction, this gives the $\pm\mu_a(x)\mu_b(x)$ contribution of an arbitrary pair; reindexing the
+double peel by removed pair and collecting is the subsequent PR.  The double-annihilation expansion and sign relation
 (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
