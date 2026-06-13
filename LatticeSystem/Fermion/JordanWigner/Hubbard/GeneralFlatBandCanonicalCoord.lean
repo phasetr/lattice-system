@@ -739,4 +739,67 @@ theorem flatBandSpinConfigList_choose_erase_shift (I : Finset (Fin (M + 1)))
       (List.Nodup.getElem_inj_iff hnd).mp (hsQ2.trans hsb.symm)
     rw [if_pos (by omega)]; omega
 
+/-- **The two-hole coordinate flips sign under the `a↔b` spin swap** (eq. (11.3.49)): the coordinate
+of `ĉ_{x,↓}ĉ_{x,↑}Slater(canonical I σ)` at the `(a,b)`-emptied config is the negative of the
+coordinate for the spin-swapped `σ' = σ ∘ swap a b`.  Both collapse to a single term by
+`cDownUp_canonical_repr_twoHole` (the swapped side with up/down roles exchanged, since `σ' a = 1`,
+`σ' b = 0`); the rest Slater states coincide (`flatBandSpinConfigList_congr`, the rest set has no
+`a, b`), the positions agree on `I.sort` (`flatBandSpinConfigList_choose_eq`) and shift by
+`flatBandSpinConfigList_choose_erase_shift`, and the two Koszul signs are negatives by
+`neg_one_pow_two_erase_shift`. -/
+theorem cDownUp_canonical_repr_twoHole_swap_eq_neg {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2)
+    (x : Fin (M + 1)) {a b : Fin (M + 1)} (ha : a ∈ I) (hb : b ∈ I) (hab : a ≠ b)
+    (hσa : σ a = 0) (hσb : σ b = 1) :
+    (generalOccBasis eμ).repr
+        ((generalCDownUp M x).mulVec (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ)))
+        (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ))
+      = - (generalOccBasis eμ).repr
+          ((generalCDownUp M x).mulVec
+            (generalFlatBandSlaterState μ (flatBandSpinConfigList I (σ ∘ ⇑(Equiv.swap a b)))))
+          (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ)) := by
+  set σ' := σ ∘ ⇑(Equiv.swap a b) with hσ'def
+  have hba : b ≠ a := Ne.symm hab
+  have hσ'a : σ' a = 1 := by simp only [hσ'def, Function.comp, Equiv.swap_apply_left]; exact hσb
+  have hσ'b : σ' b = 0 := by simp only [hσ'def, Function.comp, Equiv.swap_apply_right]; exact hσa
+  have hbeb : a ∈ I.erase b := Finset.mem_erase.mpr ⟨hab, ha⟩
+  have hrest : flatBandSpinConfigList ((I.erase b).erase a) σ'
+      = flatBandSpinConfigList ((I.erase a).erase b) σ := by
+    rw [Finset.erase_right_comm]
+    apply flatBandSpinConfigList_congr
+    intro z hz
+    have hzb : z ≠ b := fun h => (Finset.mem_erase.mp hz).1 h
+    have hza : z ≠ a := fun h => (Finset.mem_erase.mp (Finset.mem_of_mem_erase hz)).1 h
+    simp only [hσ'def, Function.comp, Equiv.swap_apply_of_ne_of_ne hza hzb]
+  rw [cDownUp_canonical_repr_twoHole hbasis hidx σ x ha hb hab hσa hσb]
+  rw [show idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ)
+      = idxConfigOf idx (flatBandSpinConfigList ((I.erase b).erase a) σ') from by rw [hrest]]
+  rw [cDownUp_canonical_repr_twoHole hbasis hidx σ' x hb ha hba hσ'b hσ'a]
+  rw [hrest]
+  rw [flatBandSpinConfigList_choose_eq I σ' σ hb]
+  rw [flatBandSpinConfigList_choose_eq (I.erase b) σ' σ hbeb]
+  rw [flatBandSpinConfigList_choose_erase_shift I σ ha hb hab]
+  rw [flatBandSpinConfigList_choose_erase_shift I σ hb ha hba]
+  have hsortnd : (I.sort (· ≤ ·)).Nodup := I.sort_nodup _
+  have hva := flatBandSpinConfigList_sort_getElem_choose I σ ha
+  have hvb := flatBandSpinConfigList_sort_getElem_choose I σ hb
+  have hPab : ((flatBandSpinConfigList_existsUnique_pos I σ ha).choose : ℕ)
+      ≠ ((flatBandSpinConfigList_existsUnique_pos I σ hb).choose : ℕ) := fun h =>
+    hab (hva.symm.trans (((List.Nodup.getElem_inj_iff hsortnd).mpr h).trans hvb))
+  have hsign : (-1 : ℂ) ^ ((flatBandSpinConfigList_existsUnique_pos I σ ha).choose : ℕ)
+        * (-1) ^ (((flatBandSpinConfigList_existsUnique_pos I σ hb).choose : ℕ)
+          - (if ((flatBandSpinConfigList_existsUnique_pos I σ hb).choose : ℕ)
+              > ((flatBandSpinConfigList_existsUnique_pos I σ ha).choose : ℕ) then 1 else 0))
+      = -((-1 : ℂ) ^ ((flatBandSpinConfigList_existsUnique_pos I σ hb).choose : ℕ)
+        * (-1) ^ (((flatBandSpinConfigList_existsUnique_pos I σ ha).choose : ℕ)
+          - (if ((flatBandSpinConfigList_existsUnique_pos I σ ha).choose : ℕ)
+              > ((flatBandSpinConfigList_existsUnique_pos I σ hb).choose : ℕ) then 1 else 0))) := by
+    rw [← pow_add, ← pow_add]; exact neg_one_pow_two_erase_shift _ _ hPab
+  linear_combination (μ a x * μ b x * (generalOccBasis eμ).repr
+    (generalFlatBandSlaterState μ (flatBandSpinConfigList ((I.erase a).erase b) σ))
+    (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ))) * hsign
+
 end LatticeSystem.Fermion
