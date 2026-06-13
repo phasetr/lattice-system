@@ -344,4 +344,44 @@ theorem flatBandSpinConfigState_eq_smul_canonical {T : Matrix (Fin (M + 1)) (Fin
   exact generalFlatBandSlaterState_perm μ
     (flatBandSpinConfigList_perm_preimageList hbasis hidx σ).symm
 
+/-- **Site annihilation extracts the leading matching-spin head**: if `rest` carries no
+matching-spin connected mode at `x`, then `ĉ_{x,σ}` removes the leading creation `(z, σ)` with
+amplitude `μ_z(x)`, leaving the Slater state of `rest`.  (General-basis analogue of the Theorem
+11.11 `flatBand_siteAnnihilation_head`.) -/
+theorem generalFlatBand_siteAnnihilation_head (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (x z : Fin (M + 1)) (σ : Fin 2) (rest : List (Fin (M + 1) × Fin 2))
+    (hrest : ∀ q ∈ rest, μ q.1 x = 0 ∨ q.2 ≠ σ) :
+    (fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M x σ)).mulVec
+        (generalFlatBandSlaterState μ ((z, σ) :: rest))
+      = μ z x • generalFlatBandSlaterState μ rest := by
+  rw [generalFlatBand_siteAnnihilation_peel]
+  change ∑ i : Fin (rest.length + 1), generalFlatBandPeelTerm μ x σ ((z, σ) :: rest) i = _
+  rw [Fin.sum_univ_succ, Finset.sum_eq_zero (fun i _ => ?_), add_zero]
+  · simp only [generalFlatBandPeelTerm, List.get_cons_zero, List.eraseIdx_cons_zero, Fin.val_zero,
+      pow_zero, one_smul]
+    rw [if_true]
+  · simp only [generalFlatBandPeelTerm, List.get_cons_succ', List.eraseIdx_cons_succ, Fin.val_succ]
+    rcases hrest (rest.get i) (List.get_mem rest i) with h0 | hne
+    · rw [h0, ite_self]; simp
+    · rw [if_neg hne]; simp
+
+/-- **The double annihilation extracts the leading up–down head pair**: if `rest` is disconnected
+from `x` (`μ_{q.1}(x) = 0`), then `ĉ_{x,↓}ĉ_{x,↑}` removes the leading up head `(a, ↑)` and down
+head `(b, ↓)`, leaving `μ_a(x)·μ_b(x)·Slater(rest)`.  (General-basis analogue of the Theorem 11.11
+`flatBand_cDownUp_two_head`; the seed of the eq. (11.3.48) sign relation.) -/
+theorem generalFlatBand_cDownUp_two_head (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (x a b : Fin (M + 1)) (rest : List (Fin (M + 1) × Fin 2))
+    (hrest : ∀ q ∈ rest, μ q.1 x = 0) :
+    (generalCDownUp M x).mulVec
+        (generalFlatBandSlaterState μ ((a, (0 : Fin 2)) :: (b, (1 : Fin 2)) :: rest))
+      = (μ a x * μ b x) • generalFlatBandSlaterState μ rest := by
+  rw [generalCDownUp, ← Matrix.mulVec_mulVec,
+    generalFlatBand_siteAnnihilation_head μ x a 0 ((b, (1 : Fin 2)) :: rest)
+      (fun q hq => by
+        rcases List.mem_cons.mp hq with rfl | hq'
+        · exact Or.inr (show (1 : Fin 2) ≠ 0 by decide)
+        · exact Or.inl (hrest q hq')),
+    Matrix.mulVec_smul,
+    generalFlatBand_siteAnnihilation_head μ x b 1 rest (fun q hq => Or.inl (hrest q hq)), smul_smul]
+
 end LatticeSystem.Fermion
