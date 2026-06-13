@@ -604,4 +604,49 @@ theorem flatBand_groundState_D_swap_eq_of_adj {T : Matrix (Fin (M + 1)) (Fin (M 
   exact flatBand_groundState_D_swap_eq hbasis hT U hU hidx σ x z.2 z'.2 hne hσz hσz'
     hμz hμz' hΦ D hD
 
+/-- **Unconditional edge-swap invariance of the ground-state coefficients**: for `z, z'` adjacent in
+the special-basis connectivity graph, `D σ = D (σ ∘ swap z z')` with *no* spin condition.  When
+`σ z = σ z'` the swap leaves the config unchanged; otherwise one of `z, z'` is `↑` and the other
+`↓`, and `flatBand_groundState_D_swap_eq_of_adj` (the eq. (11.3.49) per-edge relation) applies in
+the appropriate orientation.  Hence `D` is invariant under every edge-transposition of the basis
+graph, the input to the connectivity-induction "D depends only on the up-count". -/
+theorem flatBand_groundState_D_edgeSwap_eq {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U)
+    (D : (I → Fin 2) → ℂ)
+    (hD : Φ = ∑ s, D s • generalFlatBandSlaterState μ
+      (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0)))
+    {z z' : I} (hadj : (generalFlatBandBasisGraph I μ).Adj z z') :
+    D (fun w : I => σ w.1) = D (fun w : I => (σ ∘ ⇑(Equiv.swap z.1 z'.1)) w.1) := by
+  have hne : z.1 ≠ z'.1 := hadj.1
+  by_cases hsame : σ z.1 = σ z'.1
+  · -- σ∘swap = σ ⟹ D args equal
+    have : (fun w : I => σ w.1) = (fun w : I => (σ ∘ ⇑(Equiv.swap z.1 z'.1)) w.1) := by
+      funext w
+      simp only [Function.comp]
+      by_cases hw : w.1 = z.1
+      · rw [hw, Equiv.swap_apply_left, hsame]
+      · by_cases hw' : w.1 = z'.1
+        · rw [hw', Equiv.swap_apply_right, hsame]
+        · rw [Equiv.swap_apply_of_ne_of_ne hw hw']
+    rw [this]
+  · -- one up one down
+    rcases fin2_eq_zero_or_one (σ z.1) with h0 | h1
+    · have h1' : σ z'.1 = 1 := by
+        rcases fin2_eq_zero_or_one (σ z'.1) with hh | hh
+        · exact absurd (h0.trans hh.symm) hsame
+        · exact hh
+      exact flatBand_groundState_D_swap_eq_of_adj hbasis hT U hU hidx σ hΦ D hD hadj h0 h1'
+    · have h0' : σ z'.1 = 0 := by
+        rcases fin2_eq_zero_or_one (σ z'.1) with hh | hh
+        · exact hh
+        · exact absurd (h1.trans hh.symm) hsame
+      have := flatBand_groundState_D_swap_eq_of_adj hbasis hT U hU hidx σ hΦ D hD hadj.symm h0' h1
+      rw [Equiv.swap_comm] at this
+      exact this
+
 end LatticeSystem.Fermion
