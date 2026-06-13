@@ -384,4 +384,20 @@ theorem generalFlatBand_cDownUp_two_head (μ : Fin (M + 1) → Fin (M + 1) → �
     Matrix.mulVec_smul,
     generalFlatBand_siteAnnihilation_head μ x b 1 rest (fun q hq => Or.inl (hrest q hq)), smul_smul]
 
+/-- **The double annihilation on a swapped down–up head pair**: if `rest` is disconnected from `x`,
+then `ĉ_{x,↓}ĉ_{x,↑}` on `(a, ↓) :: (b, ↑) :: rest` gives `−μ_a(x)·μ_b(x)·Slater(rest)` — the
+**opposite sign** from the canonical up–down assignment (one extra Koszul transposition).  This
+relative `−1` is exactly the seed of the eq. (11.3.49) sign relation `C(σ) = C(σ_{z₁↔z₂})`
+(general-basis analogue of the Theorem 11.11 `flatBand_cDownUp_swap`). -/
+theorem generalFlatBand_cDownUp_two_head_swap (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (x a b : Fin (M + 1)) (rest : List (Fin (M + 1) × Fin 2))
+    (hrest : ∀ q ∈ rest, μ q.1 x = 0) :
+    (generalCDownUp M x).mulVec
+        (generalFlatBandSlaterState μ ((a, (1 : Fin 2)) :: (b, (0 : Fin 2)) :: rest))
+      = (-(μ a x * μ b x)) • generalFlatBandSlaterState μ rest := by
+  rw [generalFlatBandSlaterState_swap μ (b, 0) (a, 1) rest, Matrix.mulVec_neg,
+    generalFlatBand_cDownUp_two_head μ x b a rest hrest, ← neg_smul]
+  congr 1
+  ring
+
 end LatticeSystem.Fermion
