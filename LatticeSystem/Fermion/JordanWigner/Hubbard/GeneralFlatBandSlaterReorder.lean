@@ -465,4 +465,26 @@ theorem generalFlatBandSlaterState_over_I_repr
     show generalModeMonomial eμ (generalOccFinset f).toList = generalOccMonomial eμ f from rfl,
     map_smul, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul, generalOccMonomial_repr]
 
+/-- **The `idx`-image occupation config of a mode list**: the occupation indicator of the modes
+`{(idx z, σ) : (z, σ) ∈ qs}`.  This is the `generalOccBasis eμ`-config that
+`generalFlatBandSlaterState_over_I_repr` reads off; tracking it through `eraseIdx` identifies which
+mode the double peel removes. -/
+def idxConfigOf (idx : Fin (M + 1) → Fin (M + 1)) (qs : List (Fin (M + 1) × Fin 2)) :
+    Fin (M + 1) × Fin 2 → Fin 2 :=
+  fun q => if q ∈ (qs.map (fun p => (idx p.1, p.2))).toFinset then 1 else 0
+
+/-- **One-erase of the `idx`-config**: removing position `i` from the list zeroes the config at the
+removed mode `(idx qs[i].1, qs[i].2)` (requires the `idx`-image list nodup). -/
+theorem idxConfigOf_eraseIdx
+    (idx : Fin (M + 1) → Fin (M + 1)) (qs : List (Fin (M + 1) × Fin 2))
+    (hnd : (qs.map (fun p => (idx p.1, p.2))).Nodup) (i : ℕ) (hi : i < qs.length) :
+    idxConfigOf idx (qs.eraseIdx i)
+      = Function.update (idxConfigOf idx qs) (idx (qs[i]'hi).1, (qs[i]'hi).2) 0 := by
+  funext q
+  have hi' : i < (qs.map (fun p => (idx p.1, p.2))).length := by rwa [List.length_map]
+  simp only [idxConfigOf]
+  rw [← List.eraseIdx_map, List.toFinset_eraseIdx_of_nodup hnd hi', List.getElem_map]
+  simp only [Finset.mem_erase, Function.update_apply]
+  by_cases hq : q = (idx (qs[i]'hi).1, (qs[i]'hi).2) <;> simp [hq, idxConfigOf]
+
 end LatticeSystem.Fermion
