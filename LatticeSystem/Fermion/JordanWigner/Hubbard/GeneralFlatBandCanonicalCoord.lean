@@ -32,6 +32,23 @@ theorem Finset.eq_or_eq_of_erase_erase_eq {α : Type*} [DecidableEq α] {I : Fin
   push Not at hcon
   exact (hcL hcon.2 hcon.1) hc
 
+/-- **Two-erase Koszul sign flip**: for distinct naturals `p ≠ q`, the two
+single-transposition-shifted exponents differ by exactly one, so
+`(-1)^(p + (q - [q>p])) = -(-1)^(q + (p - [p>q]))`.  This is the sign engine of the eq. (11.3.49)
+comparison `D(σ) = D(σ_{a↔b})`: `p, q` are the `I.sort` positions of `a, b`, the first exponent is
+the `σ`-side Koszul sign (position of `a` plus position of `b` in `I.erase a`), the second is the
+swapped-side sign, and they are negatives of each other. -/
+theorem neg_one_pow_two_erase_shift (p q : ℕ) (h : p ≠ q) :
+    (-1 : ℂ) ^ (p + (q - (if q > p then 1 else 0)))
+      = -((-1 : ℂ) ^ (q + (p - (if p > q then 1 else 0)))) := by
+  have hsign : ∀ A B : ℕ, (A + 1 = B ∨ B + 1 = A) → (-1 : ℂ) ^ A = -((-1 : ℂ) ^ B) := by
+    intro A B hAB
+    rcases hAB with hAB | hAB
+    · rw [← hAB, pow_succ]; ring
+    · rw [← hAB, pow_succ]; ring
+  apply hsign
+  split_ifs <;> omega
+
 namespace LatticeSystem.Fermion
 
 open Matrix LatticeSystem.Quantum Module
