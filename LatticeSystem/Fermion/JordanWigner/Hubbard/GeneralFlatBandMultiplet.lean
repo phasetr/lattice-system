@@ -832,4 +832,124 @@ theorem generalFlatBand_blockWeightState_mem_groundSubmodule
     · exact Or.inl ⟨Finset.mem_compl.mpr h1, Finset.mem_compl.mpr h2⟩
   rw [upCountOn_comp_swap_eq A s hsame, upCountOn_comp_swap_eq Aᶜ s hsameC]
 
+/-- **A configuration with prescribed per-block up-counts exists**: for `p ≤ |A|`, `q ≤ |Aᶜ|`, some
+`s : ↥I → Fin 2` has exactly `p` up-spins on `A` and `q` on `Aᶜ`.  Take `A₀ ⊆ A` of size `p` and
+`B₀ ⊆ Aᶜ` of size `q`, set `s = 0` on `A₀ ∪ B₀` and `1` elsewhere. -/
+theorem exists_blockUpCount_config {I : Finset (Fin (M + 1))} (A : Finset ↥I) {p q : ℕ}
+    (hp : p ≤ A.card) (hq : q ≤ Aᶜ.card) :
+    ∃ s : ↥I → Fin 2, (A.filter (fun z => s z = 0)).card = p ∧
+      (Aᶜ.filter (fun z => s z = 0)).card = q := by
+  classical
+  obtain ⟨A₀, hA₀sub, hA₀c⟩ := Finset.exists_subset_card_eq hp
+  obtain ⟨B₀, hB₀sub, hB₀c⟩ := Finset.exists_subset_card_eq hq
+  refine ⟨fun z => if z ∈ A₀ ∪ B₀ then 0 else 1, ?_, ?_⟩
+  · rw [show (A.filter (fun z => (if z ∈ A₀ ∪ B₀ then (0 : Fin 2) else 1) = 0)) = A₀ from ?_, hA₀c]
+    ext z
+    simp only [Finset.mem_filter]
+    by_cases h : z ∈ A₀ ∪ B₀
+    · rw [if_pos h, eq_self_iff_true, and_true]
+      refine ⟨fun hzA => (Finset.mem_union.mp h).resolve_right (fun hzB =>
+        absurd hzA (Finset.mem_compl.mp (hB₀sub hzB))), fun hz => hA₀sub hz⟩
+    · rw [if_neg h]
+      refine ⟨fun hzA => absurd hzA.2 (by decide), fun hz => ?_⟩
+      exact absurd (Finset.mem_union.mpr (Or.inl hz)) h
+  · rw [show (Aᶜ.filter (fun z => (if z ∈ A₀ ∪ B₀ then (0 : Fin 2) else 1) = 0)) = B₀ from ?_, hB₀c]
+    ext z
+    simp only [Finset.mem_filter]
+    by_cases h : z ∈ A₀ ∪ B₀
+    · rw [if_pos h, eq_self_iff_true, and_true]
+      refine ⟨fun hzAc => (Finset.mem_union.mp h).resolve_left (fun hzA₀ =>
+        absurd (hA₀sub hzA₀) (Finset.mem_compl.mp hzAc)), fun hz => hB₀sub hz⟩
+    · rw [if_neg h]
+      refine ⟨fun hzAc => absurd hzAc.2 (by decide), fun hz => ?_⟩
+      exact absurd (Finset.mem_union.mpr (Or.inr hz)) h
+
+open scoped ComplexOrder in
+/-- **A disconnected special basis has ground dimension exceeding `D₀+1`**: the `(|A|+1)(|Aᶜ|+1)`
+per-block weight states `W_{p,q}` of a non-trivial cut are linearly independent ground states, so
+`finrank > D₀+1`.  Independence is read off the occupation basis: at the index config of a
+representative of fiber `(p₀,q₀)`, only `W_{p₀,q₀}` has a nonzero coordinate (the index config of a
+canonical creation list determines its spin configuration,
+`idxConfigOf_flatBandSpinConfigList_inj_gen`,
+and the per-block up-counts pick out the fiber).  This is the contradiction with the maximal-spin
+multiplet's `finrank = D₀+1`, giving the `⟹` direction of Theorem 11.17. -/
+theorem generalFlatBand_disconnected_finrank_gt
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hnc : ¬ generalFlatBandBasisConnected I μ) (hne : I.Nonempty) :
+    generalFlatBandDim T + 1 < Module.finrank ℂ ↥(generalFlatBandGroundSubmodule T U) := by
+  classical
+  obtain ⟨A, hAne, hAcne, hcut⟩ := exists_disconnection_cut_of_not_connected hnc hne
+  obtain ⟨eμ, heμ⟩ := exists_extended_special_basis hbasis
+  choose! idx hidx using heμ
+  set G := generalFlatBandGroundSubmodule T U with hG
+  set ind : ℕ → ℕ → (I → Fin 2) → ℂ := fun p q s =>
+    if (A.filter (fun z => s z = 0)).card = p ∧ (Aᶜ.filter (fun z => s z = 0)).card = q
+      then 1 else 0 with hind
+  set W : Fin (A.card + 1) × Fin (Aᶜ.card + 1) → (Fin (2 * M + 2) → Fin 2) → ℂ :=
+    fun pq => ∑ s : I → Fin 2, ind pq.1 pq.2 s • generalFlatBandSlaterState μ
+      (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0)) with hW
+  have hWmem : ∀ pq, W pq ∈ G := fun pq =>
+    generalFlatBand_blockWeightState_mem_groundSubmodule hbasis hT U hidx A hcut pq.1 pq.2
+  have hWLI : LinearIndependent ℂ (fun pq => (⟨W pq, hWmem pq⟩ : G)) := by
+    apply LinearIndependent.of_comp G.subtype
+    rw [Fintype.linearIndependent_iff]
+    intro c hc pq₀
+    obtain ⟨s₀, hs₀A, hs₀B⟩ := exists_blockUpCount_config A (Nat.lt_succ_iff.mp pq₀.1.2)
+      (Nat.lt_succ_iff.mp pq₀.2.2)
+    set t₀ : Fin (M + 1) → Fin 2 := fun z => if h : z ∈ I then s₀ ⟨z, h⟩ else 0 with ht₀
+    set g₀ := idxConfigOf idx (flatBandSpinConfigList I t₀) with hg₀
+    set z₀ := (generalOccBasis eμ).repr
+      (generalFlatBandSlaterState μ (flatBandSpinConfigList I t₀)) g₀ with hz₀def
+    have hz₀ne : z₀ ≠ 0 := by
+      rw [hz₀def, hg₀]
+      exact generalFlatBandSlaterState_repr_self_ne_zero hbasis eμ idx hidx
+        (flatBandSpinConfigList I t₀) (flatBandSpinConfigList_nodup I t₀)
+        (fun q hq => flatBandSpinConfigList_mem_fst_mem I t₀ hq)
+    have hreprzero : ∀ s : I → Fin 2, s ≠ s₀ → (generalOccBasis eμ).repr
+        (generalFlatBandSlaterState μ (flatBandSpinConfigList I
+          (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0))) g₀ = 0 := by
+      intro s hss
+      obtain ⟨z, _, hzeq⟩ := generalFlatBandSlaterState_over_I_repr hbasis eμ idx hidx
+        (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0))
+        (flatBandSpinConfigList_nodup I _)
+        (fun q hq => flatBandSpinConfigList_mem_fst_mem I _ hq) g₀
+      rw [hzeq, if_neg, mul_zero]
+      intro hcfg
+      refine hss (funext fun w => ?_)
+      have hw := (idxConfigOf_flatBandSpinConfigList_inj_gen hbasis hidx
+        (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0) t₀ subset_rfl subset_rfl hcfg).2 w.1 w.2
+      simpa only [ht₀, dif_pos w.2, Subtype.coe_eta] using hw
+    have hind0 : ∀ pq : Fin (A.card + 1) × Fin (Aᶜ.card + 1),
+        ind pq.1 pq.2 s₀ = if pq = pq₀ then (1 : ℂ) else 0 := by
+      intro pq
+      simp only [hind, hs₀A, hs₀B]
+      by_cases hpq : pq = pq₀
+      · subst hpq; simp
+      · rw [if_neg, if_neg hpq]
+        rintro ⟨h1, h2⟩
+        exact hpq (Prod.ext (Fin.val_injective h1.symm) (Fin.val_injective h2.symm))
+    have hWrepr : ∀ pq : Fin (A.card + 1) × Fin (Aᶜ.card + 1),
+        (generalOccBasis eμ).repr (W pq) g₀ = (if pq = pq₀ then z₀ else 0) := by
+      intro pq
+      rw [hW, map_sum, Finsupp.finset_sum_apply, Finset.sum_eq_single s₀]
+      · rw [map_smul, Finsupp.smul_apply, smul_eq_mul, ← ht₀, ← hz₀def, hind0 pq]
+        split_ifs <;> simp
+      · intro s _ hss
+        rw [map_smul, Finsupp.smul_apply, smul_eq_mul, hreprzero s hss, mul_zero]
+      · intro h; exact absurd (Finset.mem_univ s₀) h
+    have hc' : (∑ pq, c pq • W pq) = 0 := hc
+    have hc0 : (generalOccBasis eμ).repr (∑ pq, c pq • W pq) g₀ = 0 := by
+      rw [hc', map_zero, Finsupp.zero_apply]
+    rw [map_sum, Finsupp.finset_sum_apply] at hc0
+    simp_rw [map_smul, Finsupp.smul_apply, smul_eq_mul, hWrepr] at hc0
+    rw [Finset.sum_eq_single pq₀ (fun pq _ hpq => by rw [if_neg hpq, mul_zero])
+      (fun h => absurd (Finset.mem_univ pq₀) h), if_pos rfl] at hc0
+    exact (mul_eq_zero.mp hc0).resolve_right hz₀ne
+  have hcard := hWLI.fintype_card_le_finrank
+  rw [Fintype.card_prod, Fintype.card_fin, Fintype.card_fin] at hcard
+  calc generalFlatBandDim T + 1 = I.card + 1 := by rw [hbasis.1]
+    _ < (A.card + 1) * (Aᶜ.card + 1) := disconnection_cut_card_lt A hAne hAcne
+    _ ≤ Module.finrank ℂ ↥G := hcard
+
 end LatticeSystem.Fermion
