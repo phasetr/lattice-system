@@ -495,4 +495,50 @@ theorem generalFlatBandSlaterState_spinSeparated_mem_groundSubmodule
   · rw [fermionTotalNumber_mulVec_generalFlatBandSlaterState, flatBandSpinConfigList_length,
       hbasis.1]
 
+/-- **A disconnected special basis splits into a non-trivial cut with no crossing μ-overlap**: if the
+basis graph is not connected (and `I` is nonempty), there is a subset `A` of the index set with `A`
+and its complement both nonempty such that opposite-side modes have disjoint site support
+(`z ∈ A`, `w ∉ A` ⟹ `∀ x, μ_z(x)μ_w(x) = 0`).  `A` is the connected component of a vertex `a` that
+fails to reach some `b`; a crossing μ-overlap would be an edge `z ~ w`, making `w` reachable from
+`a` — contradiction.  This is the cut underlying the `finrank > D₀+1` bound of the `⟹` direction. -/
+theorem exists_disconnection_cut_of_not_connected {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hnc : ¬ generalFlatBandBasisConnected I μ)
+    (hne : I.Nonempty) :
+    ∃ A : Finset ↥I, A.Nonempty ∧ Aᶜ.Nonempty ∧
+      ∀ z ∈ A, ∀ w ∈ Aᶜ, ∀ x, μ z.1 x * μ w.1 x = 0 := by
+  classical
+  have hnonempty : Nonempty ↥I := ⟨⟨hne.choose, hne.choose_spec⟩⟩
+  have hnp : ¬ (generalFlatBandBasisGraph I μ).Preconnected := fun hp =>
+    hnc ((SimpleGraph.connected_iff _).mpr ⟨hp, hnonempty⟩)
+  rw [SimpleGraph.Preconnected] at hnp
+  push_neg at hnp
+  obtain ⟨a, b, hab⟩ := hnp
+  refine ⟨Finset.univ.filter (fun z => (generalFlatBandBasisGraph I μ).Reachable a z),
+    ⟨a, Finset.mem_filter.mpr ⟨Finset.mem_univ _, SimpleGraph.Reachable.refl a⟩⟩, ⟨b, ?_⟩, ?_⟩
+  · rw [Finset.mem_compl, Finset.mem_filter]
+    exact fun h => hab h.2
+  · intro z hz w hw x
+    rw [Finset.mem_filter] at hz
+    rw [Finset.mem_compl, Finset.mem_filter] at hw
+    by_contra hxne
+    have hzx : μ z.1 x ≠ 0 := fun h => hxne (by rw [h, zero_mul])
+    have hwx : μ w.1 x ≠ 0 := fun h => hxne (by rw [h, mul_zero])
+    have hzw : z.1 ≠ w.1 := fun h =>
+      hw ⟨Finset.mem_univ _, (Subtype.ext h : z = w) ▸ hz.2⟩
+    exact hw ⟨Finset.mem_univ _, hz.2.trans
+      (SimpleGraph.Adj.reachable (⟨hzw, x, hzx, hwx⟩ : (generalFlatBandBasisGraph I μ).Adj z w))⟩
+
+/-- **The 2-block cut beats the maximal-spin dimension**: for a non-trivial cut `(A, Aᶜ)` of the
+`D₀`-element index set, `(|A|+1)(|Aᶜ|+1) > D₀ + 1`.  Since `|A|, |Aᶜ| ≥ 1` and `|A|+|Aᶜ| = D₀`, the
+product `|A||Aᶜ| + D₀ + 1` strictly exceeds `D₀ + 1`.  The per-block weight states of a disconnected
+basis number `(|A|+1)(|Aᶜ|+1)`, so this is the contradiction with `finrank = D₀ + 1`. -/
+theorem disconnection_cut_card_lt {I : Finset (Fin (M + 1))} (A : Finset ↥I)
+    (hA : A.Nonempty) (hAc : Aᶜ.Nonempty) :
+    I.card + 1 < (A.card + 1) * (Aᶜ.card + 1) := by
+  have hcard : A.card + Aᶜ.card = I.card := by
+    rw [Finset.card_add_card_compl A, Fintype.card_coe]
+  have h1 : 1 ≤ A.card := hA.card_pos
+  have h2 : 1 ≤ Aᶜ.card := hAc.card_pos
+  nlinarith [hcard, h1, h2]
+
 end LatticeSystem.Fermion
