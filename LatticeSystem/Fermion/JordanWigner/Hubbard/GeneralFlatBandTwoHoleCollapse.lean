@@ -478,4 +478,47 @@ theorem cDownUp_canonical_repr_eq_zero_of_ne {T : Matrix (Fin (M + 1)) (Fin (M +
     · rw [if_neg hgj, zero_mul, mul_zero]
   · rw [if_neg hgi, zero_mul, mul_zero]
 
+/-- **The ground-state coordinate sum collapses to two terms** (the eq. (11.3.49) sum collapse):
+summing the `(a,b)`-emptied coordinate of `ĉ_{x,↓}ĉ_{x,↑}Slater` over all spin configs
+`s : I → Fin 2` (weighted by `D s`) keeps only the two configs `σ|_I` and `(σ ∘ swap a b)|_I`, every
+other config
+contributing zero by `cDownUp_canonical_repr_eq_zero_of_ne`. -/
+theorem cDownUp_canonicalSum_eq_two_terms {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2)
+    (x : Fin (M + 1)) {a b : Fin (M + 1)} (ha : a ∈ I) (_hb : b ∈ I) (_hab : a ≠ b)
+    (hσa : σ a = 0) (hσb : σ b = 1) (D : (I → Fin 2) → ℂ) :
+    ∑ s : I → Fin 2, D s * (generalOccBasis eμ).repr
+        ((generalCDownUp M x).mulVec (generalFlatBandSlaterState μ
+          (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0))))
+        (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ))
+      = D (fun z : I => σ z.1) * (generalOccBasis eμ).repr
+          ((generalCDownUp M x).mulVec (generalFlatBandSlaterState μ
+            (flatBandSpinConfigList I
+              (fun z => if h : z ∈ I then (fun z : I => σ z.1) ⟨z, h⟩ else 0))))
+          (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ))
+        + D (fun z : I => (σ ∘ ⇑(Equiv.swap a b)) z.1) * (generalOccBasis eμ).repr
+          ((generalCDownUp M x).mulVec (generalFlatBandSlaterState μ
+            (flatBandSpinConfigList I (fun z => if h : z ∈ I then
+              (fun z : I => (σ ∘ ⇑(Equiv.swap a b)) z.1) ⟨z, h⟩ else 0))))
+          (idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ)) := by
+  have hne : (fun z : I => σ z.1) ≠ (fun z : I => (σ ∘ ⇑(Equiv.swap a b)) z.1) := by
+    intro h
+    have := congrFun h ⟨a, ha⟩
+    simp only [Function.comp, Equiv.swap_apply_left, hσa, hσb] at this
+    exact absurd this (by decide)
+  rw [← Finset.sum_subset (Finset.subset_univ {(fun z : I => σ z.1),
+      (fun z : I => (σ ∘ ⇑(Equiv.swap a b)) z.1)})]
+  · rw [Finset.sum_pair hne]
+  · intro s _ hs
+    rw [Finset.mem_insert, Finset.mem_singleton] at hs
+    push Not at hs
+    have hvanish := cDownUp_canonical_repr_eq_zero_of_ne hbasis hidx σ
+      (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0) x hσa hσb
+      (by intro hh; apply hs.1; funext z; have := hh z.1 z.2; simpa [z.2] using this)
+      (by intro hh; apply hs.2; funext z; have := hh z.1 z.2; simpa [z.2] using this)
+    rw [hvanish, mul_zero]
+
 end LatticeSystem.Fermion
