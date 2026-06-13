@@ -107,6 +107,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandSignPropagation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandSlaterReorder
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandCanonicalCoord
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandTwoHoleCollapse
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandConnectivity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandMultiplet
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SectorMinEnergy
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularHubbardModel

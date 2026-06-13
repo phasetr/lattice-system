@@ -1,4 +1,4 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandTwoHoleCollapse
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandConnectivity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinLoweringTowerGeneral
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiHopAction
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandGroundAnnihilation
