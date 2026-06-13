@@ -649,4 +649,37 @@ theorem flatBand_groundState_D_edgeSwap_eq {T : Matrix (Fin (M + 1)) (Fin (M + 1
       rw [Equiv.swap_comm] at this
       exact this
 
+/-- **Edge-swap invariance as an `Equiv.Perm I` action**: for `z, z'` adjacent in the special-basis
+graph, `D s = D (s ∘ Equiv.swap z z')` for every config `s : I → Fin 2`.  Extending `s` to a full
+`σ` and applying `flatBand_groundState_D_edgeSwap_eq`, the restricted swapped config is exactly
+`s ∘ Equiv.swap z z'`.  This is the per-generator step for the symmetric-group action: `D` is
+invariant under every edge-transposition of the basis graph, viewed as a permutation of `I`. -/
+theorem flatBand_groundState_D_permSwap_eq {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U)
+    (D : (I → Fin 2) → ℂ)
+    (hD : Φ = ∑ s, D s • generalFlatBandSlaterState μ
+      (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0)))
+    (s : I → Fin 2) {z z' : I} (hadj : (generalFlatBandBasisGraph I μ).Adj z z') :
+    D s = D (s ∘ ⇑(Equiv.swap z z')) := by
+  set σ := fun w => if h : w ∈ I then s ⟨w, h⟩ else (0 : Fin 2) with hσdef
+  have hsσ : (fun w : I => σ w.1) = s := by funext w; simp only [hσdef, w.2, dif_pos]
+  have hkey := flatBand_groundState_D_edgeSwap_eq hbasis hT U hU hidx σ hΦ D hD hadj
+  rw [hsσ] at hkey
+  rw [hkey]
+  congr 1
+  funext w
+  simp only [Function.comp, hσdef]
+  by_cases hwz : w = z
+  · subst hwz; rw [Equiv.swap_apply_left, Equiv.swap_apply_left, dif_pos z'.2]
+  · by_cases hwz' : w = z'
+    · subst hwz'; rw [Equiv.swap_apply_right, Equiv.swap_apply_right, dif_pos z.2]
+    · rw [Equiv.swap_apply_of_ne_of_ne hwz hwz',
+        Equiv.swap_apply_of_ne_of_ne (fun h => hwz (Subtype.ext h)) (fun h => hwz' (Subtype.ext h)),
+        dif_pos w.2]
+
 end LatticeSystem.Fermion
