@@ -6683,7 +6683,7 @@ expansion: $\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ on $\text{Slater}(\texttt{
 the removed index pair, then projected by the occupation-basis coordinate functional, in the
 subsequent PRs.  (Structural support: the canonical list has length $|I|$ and each of its modes is
 $(z,\sigma_z)$ --- so the double-peel spin guard $[q].2=\uparrow$ reads as a condition on $\sigma$
-of the index: \texttt{flatBandSpinConfigList\_length}, \texttt{flatBandSpinConfigList\_mem\_snd\_eq}.)  The projection itself is the Kronecker delta $\langle\texttt{generalOccBasis}\,e_\mu\rangle.\mathrm{repr}\,(\texttt{occMon}_{e_\mu}\,h)\,g=[h=g]$ (\texttt{generalOccMonomial\_repr}, since $\texttt{occMon}_{e_\mu}\,h$ is the basis vector).  The double-annihilation expansion and sign relation
+of the index: \texttt{flatBandSpinConfigList\_length}, \texttt{flatBandSpinConfigList\_mem\_snd\_eq}.)  The projection itself is the Kronecker delta $\langle\texttt{generalOccBasis}\,e_\mu\rangle.\mathrm{repr}\,(\texttt{occMon}_{e_\mu}\,h)\,g=[h=g]$ (\texttt{generalOccMonomial\_repr}, since $\texttt{occMon}_{e_\mu}\,h$ is the basis vector).  And a one-erased canonical list keeps its modes of the form $(z,\sigma_z)$ and stays nodup (\texttt{flatBandSpinConfigList\_eraseIdx\_mem\_snd\_eq}, \texttt{flatBandSpinConfigList\_eraseIdx\_nodup}), so the $(D_0{-}1)$/$(D_0{-}2)$-electron states from the double peel are spin-config lists over a smaller index set.  The double-annihilation expansion and sign relation
 (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki

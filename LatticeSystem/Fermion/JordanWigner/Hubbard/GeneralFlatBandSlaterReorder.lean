@@ -359,4 +359,19 @@ theorem generalOccMonomial_repr (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 
     (congrFun (coe_basisOfTopLeSpanOfCardEqFinrank _ _ _) h).symm
   rw [hb, Module.Basis.repr_self, Finsupp.single_apply]
 
+/-- **Each mode of a one-erased canonical list is still `(z, σ z)`**: removing a position keeps the
+remaining modes of the form `(z, σ z)`.  Lets the `(D₀−1)`/`(D₀−2)`-electron states produced by the
+double peel be treated by the same spin-config machinery (they are spin-config lists over a smaller
+index set). -/
+theorem flatBandSpinConfigList_eraseIdx_mem_snd_eq (I : Finset (Fin (M + 1)))
+    (σ : Fin (M + 1) → Fin 2) (i : ℕ) {q : Fin (M + 1) × Fin 2}
+    (hq : q ∈ (flatBandSpinConfigList I σ).eraseIdx i) : q.2 = σ q.1 :=
+  flatBandSpinConfigList_mem_snd_eq I σ (List.mem_of_mem_eraseIdx hq)
+
+/-- A one-erased canonical list is still nodup. -/
+theorem flatBandSpinConfigList_eraseIdx_nodup (I : Finset (Fin (M + 1)))
+    (σ : Fin (M + 1) → Fin 2) (i : ℕ) :
+    ((flatBandSpinConfigList I σ).eraseIdx i).Nodup :=
+  (flatBandSpinConfigList_nodup I σ).eraseIdx i
+
 end LatticeSystem.Fermion
