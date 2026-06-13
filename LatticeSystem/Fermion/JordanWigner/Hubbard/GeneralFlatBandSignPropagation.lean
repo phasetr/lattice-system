@@ -428,4 +428,34 @@ theorem generalFlatBandSlaterState_move_pair_front (μ : Fin (M + 1) → Fin (M 
       generalFlatBandCreation_mulVec_slaterState μ c.1 c.2,
       generalFlatBandSlaterState_move_one_past_two μ c a b (l₁' ++ l₂), List.cons_append]
 
+/-- **Extracting an up–down pair at an arbitrary position**: if the surrounding blocks `l₁, l₂` are
+disconnected from `x`, then `ĉ_{x,↓}ĉ_{x,↑}` on `l₁ ++ (a,↑) :: (b,↓) :: l₂` removes the pair
+`(a,↑), (b,↓)` with amplitude `μ_a(x)·μ_b(x)`, leaving `Slater(l₁ ++ l₂)`.  (Move the pair to the
+head, then
+the two-head extraction — the per-pair contribution of eq. (11.3.48) for a canonical up–down
+assignment.) -/
+theorem generalFlatBand_cDownUp_extract_pair (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (x a b : Fin (M + 1)) (l₁ l₂ : List (Fin (M + 1) × Fin 2))
+    (h1 : ∀ q ∈ l₁, μ q.1 x = 0) (h2 : ∀ q ∈ l₂, μ q.1 x = 0) :
+    (generalCDownUp M x).mulVec
+        (generalFlatBandSlaterState μ (l₁ ++ (a, (0 : Fin 2)) :: (b, (1 : Fin 2)) :: l₂))
+      = (μ a x * μ b x) • generalFlatBandSlaterState μ (l₁ ++ l₂) := by
+  rw [generalFlatBandSlaterState_move_pair_front,
+    generalFlatBand_cDownUp_two_head μ x a b (l₁ ++ l₂)
+      (fun q hq => (List.mem_append.mp hq).elim (h1 q) (h2 q))]
+
+/-- **Extracting a swapped down–up pair at an arbitrary position**: the swapped assignment `(a,↓),
+(b,↑)` extracts with the **opposite** sign `−μ_a(x)·μ_b(x)`, leaving `Slater(l₁ ++ l₂)`.  This
+relative `−1` between the two spin assignments of the same index pair is the per-pair eq. (11.3.49)
+sign relation. -/
+theorem generalFlatBand_cDownUp_extract_pair_swap (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (x a b : Fin (M + 1)) (l₁ l₂ : List (Fin (M + 1) × Fin 2))
+    (h1 : ∀ q ∈ l₁, μ q.1 x = 0) (h2 : ∀ q ∈ l₂, μ q.1 x = 0) :
+    (generalCDownUp M x).mulVec
+        (generalFlatBandSlaterState μ (l₁ ++ (a, (1 : Fin 2)) :: (b, (0 : Fin 2)) :: l₂))
+      = (-(μ a x * μ b x)) • generalFlatBandSlaterState μ (l₁ ++ l₂) := by
+  rw [generalFlatBandSlaterState_move_pair_front,
+    generalFlatBand_cDownUp_two_head_swap μ x a b (l₁ ++ l₂)
+      (fun q hq => (List.mem_append.mp hq).elim (h1 q) (h2 q))]
+
 end LatticeSystem.Fermion
