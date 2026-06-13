@@ -327,4 +327,24 @@ theorem cDownUp_canonical_eq_doublePeel (μ : Fin (M + 1) → Fin (M + 1) → �
   rw [generalCDownUp, ← Matrix.mulVec_mulVec,
     generalFlatBand_double_siteAnnihilation_peel μ x 0 1 (flatBandSpinConfigList I σ)]
 
+/-- The canonical list has length `|I|` (one mode per index). -/
+theorem flatBandSpinConfigList_length (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2) :
+    (flatBandSpinConfigList I σ).length = I.card := by
+  rw [flatBandSpinConfigList, List.length_map, Finset.length_sort]
+
+/-- **Each canonical-list mode is `(z, σ z)`**: any element `q` of the canonical list satisfies
+`q.2 = σ q.1`.  Lets the double-peel spin guard `[q].2 = ↑` be read as a condition on `σ` of the
+index, in the eq. (11.3.48) reindexing. -/
+theorem flatBandSpinConfigList_mem_snd_eq (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2)
+    {q : Fin (M + 1) × Fin 2} (hq : q ∈ flatBandSpinConfigList I σ) : q.2 = σ q.1 := by
+  rw [flatBandSpinConfigList, List.mem_map] at hq
+  obtain ⟨z, _, hzq⟩ := hq
+  rw [← hzq]
+
+/-- The spin at position `i` of the canonical list equals `σ` of the index at position `i`. -/
+theorem flatBandSpinConfigList_get_snd_eq (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2)
+    (i : Fin (flatBandSpinConfigList I σ).length) :
+    ((flatBandSpinConfigList I σ).get i).2 = σ ((flatBandSpinConfigList I σ).get i).1 :=
+  flatBandSpinConfigList_mem_snd_eq I σ (List.get_mem _ i)
+
 end LatticeSystem.Fermion
