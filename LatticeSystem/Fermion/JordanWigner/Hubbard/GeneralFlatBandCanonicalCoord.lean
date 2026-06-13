@@ -442,4 +442,31 @@ theorem flatBandSpinConfig_doublePeel_index_eq {T : Matrix (Fin (M + 1)) (Fin (M
     · exfalso; rw [h, hσa] at hσd; exact absurd hσd (by decide)
     · exact h
 
+/-- **The target config of a canonical single peel determines the removed index**: for `S ⊆ I`, if
+the once-erased canonical rest config equals the `b`-emptied config `idxConfigOf idx (canonical
+(S.erase b) σ)` then the erased index `(canonical S σ)[j].1` is `b`.  Rewriting the rest list by
+`flatBandSpinConfigList_eraseIdx`, config injectivity forces `S.erase d = S.erase b` (with `d` the
+erased index), and since `d ∈ S` this gives `d = b`.  No spin guard is needed: the removed index is
+pinned by the config alone.  This is the inner-sum "exactly one `j`" engine. -/
+theorem flatBandSpinConfig_singlePeel_index_eq {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2)
+    {S : Finset (Fin (M + 1))} (hS : S ⊆ I) {b : Fin (M + 1)}
+    {j : ℕ} (hj : j < (flatBandSpinConfigList S σ).length)
+    (hconfig : idxConfigOf idx ((flatBandSpinConfigList S σ).eraseIdx j)
+      = idxConfigOf idx (flatBandSpinConfigList (S.erase b) σ)) :
+    ((flatBandSpinConfigList S σ)[j]).1 = b := by
+  have hdS : ((flatBandSpinConfigList S σ)[j]).1 ∈ S :=
+    flatBandSpinConfigList_mem_fst_mem S σ (List.getElem_mem _)
+  rw [flatBandSpinConfigList_eraseIdx S σ hj] at hconfig
+  have hset : S.erase ((flatBandSpinConfigList S σ)[j]).1 = S.erase b :=
+    idxConfigOf_flatBandSpinConfigList_inj hbasis hidx σ
+      ((Finset.erase_subset _ _).trans hS) ((Finset.erase_subset _ _).trans hS) hconfig
+  have hdnot : ((flatBandSpinConfigList S σ)[j]).1 ∉ S.erase b := by
+    rw [← hset]; exact Finset.notMem_erase _ _
+  by_contra hne
+  exact hdnot (Finset.mem_erase.mpr ⟨hne, hdS⟩)
+
 end LatticeSystem.Fermion
