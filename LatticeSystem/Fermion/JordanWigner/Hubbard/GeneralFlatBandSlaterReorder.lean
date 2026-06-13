@@ -347,4 +347,16 @@ theorem flatBandSpinConfigList_get_snd_eq (I : Finset (Fin (M + 1))) (σ : Fin (
     ((flatBandSpinConfigList I σ).get i).2 = σ ((flatBandSpinConfigList I σ).get i).1 :=
   flatBandSpinConfigList_mem_snd_eq I σ (List.get_mem _ i)
 
+/-- **The occupation-basis coordinate of an occupation monomial is a Kronecker delta**:
+`(generalOccBasis eμ).repr (occMon_eμ h) g = [h = g]`.  Since `occMon_eμ h` is the basis vector
+`generalOccBasis eμ h`, its representation is `Finsupp.single h 1`.  This is the coordinate
+functional that projects the eq. (11.3.48) double peel onto a fixed `(D₀−2)`-config in the
+collection step. -/
+theorem generalOccMonomial_repr (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ))
+    (h g : Fin (M + 1) × Fin 2 → Fin 2) :
+    (generalOccBasis eμ).repr (generalOccMonomial eμ h) g = if h = g then 1 else 0 := by
+  have hb : generalOccMonomial eμ h = (generalOccBasis eμ) h :=
+    (congrFun (coe_basisOfTopLeSpanOfCardEqFinrank _ _ _) h).symm
+  rw [hb, Module.Basis.repr_self, Finsupp.single_apply]
+
 end LatticeSystem.Fermion
