@@ -184,4 +184,22 @@ theorem generalFlatBand_kernel_coord_determined {I : Finset (Fin (M + 1))}
   rw [← hc]
   simp only [hc0, zero_smul, Finset.sum_const_zero]
 
+/-- **An inactive site projects to zero**: if `(P₀)_{xx} = 0` then `P₀ e_x = 0` (the basis vector
+`e_x` lies entirely in `(ker T)ᗮ`).  Contrapositive of the active-site criterion. -/
+theorem generalFlatBand_proj_apply_eq_zero_of_diag_zero (x : Fin (M + 1))
+    (h : generalFlatBandProjectionMatrix T x x = 0) :
+    (generalFlatBandKernel T).starProjection (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x) = 0 := by
+  rw [Submodule.starProjection_apply_eq_zero_iff]
+  by_contra hmem
+  exact (generalFlatBand_diag_ne_zero_iff T x).mpr hmem h
+
+/-- **An inactive site has a zero projection row**: if `(P₀)_{xx} = 0` then `(P₀)_{xy} = 0` for
+every `y`.  Self-adjointness moves `P₀` onto `e_x`, which projects to zero. -/
+theorem generalFlatBand_proj_row_eq_zero_of_diag_zero (x y : Fin (M + 1))
+    (h : generalFlatBandProjectionMatrix T x x = 0) :
+    generalFlatBandProjectionMatrix T x y = 0 := by
+  rw [generalFlatBandProjectionMatrix_apply,
+    ← Submodule.inner_starProjection_left_eq_right,
+    generalFlatBand_proj_apply_eq_zero_of_diag_zero T x h, inner_zero_left]
+
 end LatticeSystem.Fermion
