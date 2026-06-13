@@ -71,4 +71,76 @@ theorem flatBandSpinConfigState_linearIndependent
     congr 1
     exact Subtype.ext hwz
 
+/-- The spin-configuration occupation `flatBandSpinConfigOcc` is `idx(I)`-supported: every occupied
+mode lies over an index mode `idx z` (`z ∈ I`). -/
+theorem flatBandSpinConfigOcc_idxSupported (I : Finset (Fin (M + 1)))
+    (idx : Fin (M + 1) → Fin (M + 1)) (σ : Fin (M + 1) → Fin 2) :
+    IsIdxSupported I idx (flatBandSpinConfigOcc I idx σ) := by
+  intro q hq
+  by_cases h : ∃ z ∈ I, q = (idx z, σ z)
+  · obtain ⟨z, hz, rfl⟩ := h
+    exact Finset.mem_image_of_mem idx hz
+  · rw [flatBandSpinConfigOcc, if_neg h] at hq
+    exact absurd hq (by decide)
+
+/-- **The spin-configuration state is the `μ`-Slater state of its preimage list**: each
+`flatBandSpinConfigState σ` equals `generalFlatBandSlaterState μ` of the preimage list of its
+occupation config.  This puts the spin-config states into `μ`-Slater form, so the site
+double-annihilation peel engine (`generalFlatBand_double_siteAnnihilation_peel`) applies to them. -/
+theorem flatBandSpinConfigState_eq_slaterState
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2) :
+    flatBandSpinConfigState I idx eμ σ
+      = generalFlatBandSlaterState μ
+          (flatBandSpecialPreimageList I idx (flatBandSpinConfigOcc I idx σ)) := by
+  rw [flatBandSpinConfigState,
+    generalOccMonomial_eq_generalFlatBandSlaterState_of_idxSupported hidx
+      (flatBandSpinConfigOcc_idxSupported I idx σ)]
+
+/-- `flatBandSpinConfigOcc` (hence `flatBandSpinConfigState`) depends only on `σ` restricted to the
+index set `I`: spin functions agreeing on `I` give the same occupation. -/
+theorem flatBandSpinConfigOcc_congr (I : Finset (Fin (M + 1)))
+    (idx : Fin (M + 1) → Fin (M + 1)) {σ σ' : Fin (M + 1) → Fin 2}
+    (h : ∀ z ∈ I, σ z = σ' z) :
+    flatBandSpinConfigOcc I idx σ = flatBandSpinConfigOcc I idx σ' := by
+  funext q
+  simp only [flatBandSpinConfigOcc]
+  refine if_congr ⟨?_, ?_⟩ rfl rfl <;>
+    · rintro ⟨z, hz, hzq⟩
+      exact ⟨z, hz, by rw [hzq, h z hz]⟩
+
+/-- **Tasaki eq. (11.3.47) as an explicit `C(σ)` sum**: a flat-band Hubbard ground state is an
+explicit finite linear combination `Φ = Σ_s C(s)·flatBandSpinConfigState (extend s)` of the
+spin-configuration states, indexed by spin configurations `s : I → Fin 2` **on the index set `I`**
+(the same index type as the linear independence `flatBandSpinConfigState_linearIndependent`, so the
+`C(s)` are the genuine, comparison-ready coefficients of eqs. (11.3.47)–(11.3.48)).  From
+`flatBand_groundState_mem_spinConfigStateSpan` (PR11, narrowed to `I`-configs via
+`flatBandSpinConfigOcc_congr`) and `Submodule.mem_span_range_iff_exists_fun`. -/
+theorem flatBand_groundState_eq_spinConfigStateSum
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (idx : Fin (M + 1) → Fin (M + 1))
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U) :
+    ∃ C : (I → Fin 2) → ℂ,
+      Φ = ∑ s, C s • flatBandSpinConfigState I idx eμ
+        (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0) := by
+  classical
+  set ext : (I → Fin 2) → (Fin (M + 1) → Fin 2) :=
+    fun s z => if h : z ∈ I then s ⟨z, h⟩ else 0 with hext_def
+  have hmem : Φ ∈ Submodule.span ℂ
+      (Set.range (fun s : I → Fin 2 => flatBandSpinConfigState I idx eμ (ext s))) := by
+    refine Submodule.span_mono ?_
+      (flatBand_groundState_mem_spinConfigStateSpan hbasis hT U hU eμ idx hidx hΦ)
+    rintro _ ⟨σ, rfl⟩
+    refine ⟨fun z => σ z.1, ?_⟩
+    simp only [flatBandSpinConfigState]
+    congr 1
+    refine flatBandSpinConfigOcc_congr I idx fun z hz => ?_
+    simp only [hext_def, dif_pos hz]
+  obtain ⟨C, hC⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp hmem
+  exact ⟨C, hC.symm⟩
+
 end LatticeSystem.Fermion

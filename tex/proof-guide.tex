@@ -6555,8 +6555,23 @@ configurations $s:I\to\{\uparrow,\downarrow\}$ give distinct occupation configs
 \texttt{flatBandSpinConfigOcc} (evaluate the config equality at $(\mathrm{idx}\,z, s_z)$ and use the
 injectivity of $\mathrm{idx}$ on $I$), hence distinct elements of the basis
 $\texttt{generalOccBasis}\ e_\mu$; \texttt{flatBandSpinConfigState\_linearIndependent} then follows
-from \texttt{Basis.linearIndependent.comp}.  The sign propagation (eqs.~(11.3.48)/(11.3.49)) toward
-the connectivity capstone is the subsequent PR.
+from \texttt{Basis.linearIndependent.comp}.
+
+\medskip\noindent\textbf{Theorem 11.17 PR13, explicit $C(\sigma)$ sum and Slater form (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  Two foundations for the
+sign argument.  First, each spin-config state is a $\mu$-Slater state of its preimage list
+(\texttt{flatBandSpinConfigState\_eq\_slaterState}, since \texttt{flatBandSpinConfigOcc} is
+$\mathrm{idx}(I)$-supported), so the proved site double-annihilation peel engine
+\texttt{generalFlatBand\_double\_siteAnnihilation\_peel} applies to them.  Second, since the spin
+configurations on the index set $I$ form a finite type, the span membership of PR11 (narrowed to
+$I$-configs, since \texttt{flatBandSpinConfigOcc} depends only on $\sigma|_I$ ---
+\texttt{flatBandSpinConfigOcc\_congr}) gives an explicit finite combination
+$\Phi=\sum_{s:I\to\{\uparrow,\downarrow\}} C(s)\,\texttt{flatBandSpinConfigState}\,(\mathrm{extend}\,s)$
+(\texttt{flatBand\_groundState\_eq\_spinConfigStateSum}, via
+\texttt{Submodule.mem\_span\_range\_iff\_exists\_fun}); indexing by $I\to\{\uparrow,\downarrow\}$
+(not the redundant $\Lambda\to\{\uparrow,\downarrow\}$) makes $C(s)$ the genuine, comparison-ready
+coefficients matching the linear-independence index type.  The double-annihilation expansion and sign relation
+(eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
 §11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
