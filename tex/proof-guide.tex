@@ -6504,9 +6504,28 @@ e_\mu$ and giving its linear independence.  Since PR6 builds a ground state only
 submodule \texttt{generalFlatBandIModeFockSubmodule} (the span of $\mu$-Slater states whose modes all
 lie in $I$), which is invariant under index-mode creation and contains the ground state
 (\texttt{flatBand\_groundState\_mem\_imode}) --- resolving the subtlety that $\mu_z$ is unconstrained
-for $z\notin I$.  The coefficient extraction (no double occupancy + filling $\Rightarrow$ one spin
-per index, eq.~(11.3.47)) and the sign propagation (eqs.~(11.3.48)/(11.3.49)) toward the connectivity
-capstone are the subsequent PRs.
+for $z\notin I$.
+
+\medskip\noindent\textbf{Theorem 11.17 PR9, the spin-configuration capstone, eq.~(11.3.47) (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSpinConfigRep.lean}).}  The coefficient extraction is
+carried out in the general occupation basis $\texttt{generalOccBasis}\ e_\mu$.  A left inverse
+$\mathrm{idxInv}$ of the index map on $I$ (\texttt{flatBandSpecialIdxInv}, with $\mathrm{idx}$
+injective on $I$ since distinct $\mu_z$ are distinct) identifies the $\mathrm{idx}(I)$-supported
+occupation monomials with $I$-mode $\mu$-Slater states:
+$\texttt{occMon}_{e_\mu}(g)=\prod_{z\in I}\hat a^\dagger_{\mu_z,\sigma}|vac\rangle$
+(\texttt{generalOccMonomial\_eq\_generalFlatBandSlaterState\_of\_idxSupported}).  On these the double
+index-mode number operator is diagonal with eigenvalue
+$\mu_z(z)^2\,[g(\mathrm{idx}\,z,\uparrow){=}1]\,[g(\mathrm{idx}\,z,\downarrow){=}1]$.  Expanding
+$\Phi$ in the basis, three coefficient-vanishing facts pin it down: (a) \emph{support} --- the
+coefficient vanishes off the $\mathrm{idx}(I)$-supported configs (PR8 tight membership +
+\texttt{Basis.repr\_support\_subset\_of\_mem\_span}); (b) \emph{no double occupancy} --- it vanishes
+on configs with a doubly occupied index mode, since $\mu_z(z)^2\ne0$ and $\hat n^\mu_{z,\uparrow}\hat
+n^\mu_{z,\downarrow}\Phi=0$ (PR7); (c) \emph{filling} --- it vanishes off the $D_0$-electron sector
+($\hat N$ diagonal).  As $D_0=|I|$, the surviving configs occupy each index mode by exactly one spin,
+so $\Phi$ lies in the span of the one-spin-per-index $\mu$-Slater states
+$\Phi=\sum_\sigma C(\sigma)\prod_{z\in I}\hat a^\dagger_{\mu_z,\sigma_z}|vac\rangle$ --- this is
+eq.~(11.3.47), \texttt{flatBand\_groundState\_mem\_spinConfigSpan} (sorry-free, axiom-clean).  The
+sign propagation (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone is the subsequent PR.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
 §11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
