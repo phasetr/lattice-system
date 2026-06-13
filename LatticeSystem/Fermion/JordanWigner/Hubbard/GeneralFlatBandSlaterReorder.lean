@@ -522,4 +522,17 @@ theorem idxConfigOf_flatBandSpinConfigList (I : Finset (Fin (M + 1)))
     rintro ⟨z, hz, hzq⟩
     exact h ⟨z, hz, hzq.symm⟩
 
+/-- **Distinct canonical-list positions carry distinct indices**: the first-coordinate (index) at
+position `i` determines `i`.  Since each mode is `(z, σ z)` and the list is nodup, equal indices
+give
+equal modes give equal positions.  The injectivity behind "exactly one `(i,j)` per removed pair". -/
+theorem flatBandSpinConfigList_get_fst_inj (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2)
+    {i i' : Fin (flatBandSpinConfigList I σ).length}
+    (h : ((flatBandSpinConfigList I σ).get i).1 = ((flatBandSpinConfigList I σ).get i').1) :
+    i = i' := by
+  have he : (flatBandSpinConfigList I σ).get i = (flatBandSpinConfigList I σ).get i' :=
+    Prod.ext h (by rw [flatBandSpinConfigList_get_snd_eq I σ i,
+      flatBandSpinConfigList_get_snd_eq I σ i', h])
+  exact (List.nodup_iff_injective_get.mp (flatBandSpinConfigList_nodup I σ)) he
+
 end LatticeSystem.Fermion
