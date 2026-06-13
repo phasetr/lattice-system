@@ -6681,7 +6681,9 @@ expansion: $\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ on $\text{Slater}(\texttt{
 (\texttt{cDownUp\_canonical\_eq\_doublePeel}, via the proved engine
 \texttt{generalFlatBand\_double\_siteAnnihilation\_peel}).  Its $(i,j)$ terms are to be collected by
 the removed index pair, then projected by the occupation-basis coordinate functional, in the
-subsequent PRs.  The double-annihilation expansion and sign relation
+subsequent PRs.  (Structural support: the canonical list has length $|I|$ and each of its modes is
+$(z,\sigma_z)$ --- so the double-peel spin guard $[q].2=\uparrow$ reads as a condition on $\sigma$
+of the index: \texttt{flatBandSpinConfigList\_length}, \texttt{flatBandSpinConfigList\_mem\_snd\_eq}.)  The double-annihilation expansion and sign relation
 (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
