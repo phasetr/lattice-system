@@ -827,4 +827,61 @@ theorem flatBand_groundState_D_const_of_weight_eq {T : Matrix (Fin (M + 1)) (Fin
   obtain ⟨π, hπ⟩ := exists_perm_comp_of_card_eq s s' hw
   rw [← hπ, flatBand_groundState_D_perm_eq hbasis hT U hU hidx hΦ D hD hconn]
 
+/-- **Ground-subspace dimension upper bound on a connected basis** (Tasaki §11.3.4, toward the
+`(D₀+1)`-fold multiplet): on a connected special basis, the flat-band ground subspace has
+`finrank ≤ D₀ + 1`.  Every ground state decomposes into `μ`-Slater states
+(`flatBand_groundState_eq_canonicalSlaterSum`) whose coefficient depends only on the up-count
+(`flatBand_groundState_D_const_of_weight_eq`); grouping the decomposition by up-count
+(`Finset.sum_fiberwise_of_maps_to`) and factoring the constant coefficient out of each fiber, every
+ground state lies in the span of the `D₀ + 1` symmetric weight-states `W_0, …, W_{D₀}`. -/
+theorem generalFlatBandGround_finrank_le_of_connected
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (idx : Fin (M + 1) → Fin (M + 1))
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    (hconn : generalFlatBandBasisConnected I μ) :
+    Module.finrank ℂ (generalFlatBandGroundSubmodule T U) ≤ generalFlatBandDim T + 1 := by
+  classical
+  set E := (Fin (2 * M + 2) → Fin 2) → ℂ
+  let W : ℕ → E := fun k => ∑ s ∈ (Finset.univ.filter (fun s : I → Fin 2 =>
+    Fintype.card {z // s z = 0} = k)), generalFlatBandSlaterState μ
+      (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0))
+  let S : Finset E := (Finset.range (I.card + 1)).image W
+  let K : Submodule ℂ E := Submodule.span ℂ (S : Set E)
+  have hcover : generalFlatBandGroundSubmodule T U ≤ K := by
+    intro Φ hΦ
+    obtain ⟨D, hD⟩ := flatBand_groundState_eq_canonicalSlaterSum hbasis hT U hU eμ idx hidx hΦ
+    rw [hD]
+    rw [← Finset.sum_fiberwise_of_maps_to
+      (g := fun s : I → Fin 2 => Fintype.card {z // s z = 0}) (s := Finset.univ)
+      (t := Finset.range (I.card + 1))
+      (f := fun s => D s • generalFlatBandSlaterState μ
+        (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0)))
+      (fun s _ => Finset.mem_range.mpr (Nat.lt_succ_of_le
+        ((Fintype.card_subtype_le (fun z : I => s z = 0)).trans_eq (Fintype.card_coe I))))]
+    refine Submodule.sum_mem K ?_
+    intro k hk
+    rcases (Finset.univ.filter
+        (fun s : I → Fin 2 => Fintype.card {z // s z = 0} = k)).eq_empty_or_nonempty
+      with he | ⟨s0, hs0⟩
+    · rw [he, Finset.sum_empty]; exact Submodule.zero_mem K
+    · have hfac : (∑ s ∈ Finset.univ.filter (fun s : I → Fin 2 => Fintype.card {z // s z = 0} = k),
+          D s • generalFlatBandSlaterState μ
+            (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0)))
+          = D s0 • W k := by
+        rw [Finset.smul_sum]
+        refine Finset.sum_congr rfl (fun s hs => ?_)
+        have hws : Fintype.card {z // s z = 0} = Fintype.card {z // s0 z = 0} := by
+          rw [(Finset.mem_filter.mp hs).2, (Finset.mem_filter.mp hs0).2]
+        rw [flatBand_groundState_D_const_of_weight_eq hbasis hT U hU hidx hΦ D hD hconn s s0 hws]
+      rw [hfac]
+      exact Submodule.smul_mem K (D s0) (Submodule.subset_span (Finset.mem_image_of_mem W hk))
+  calc Module.finrank ℂ (generalFlatBandGroundSubmodule T U)
+      ≤ Module.finrank ℂ K := Submodule.finrank_mono hcover
+    _ ≤ S.card := finrank_span_finset_le_card S
+    _ ≤ (Finset.range (I.card + 1)).card := Finset.card_image_le
+    _ = I.card + 1 := Finset.card_range _
+    _ = generalFlatBandDim T + 1 := by rw [hbasis.1]
+
 end LatticeSystem.Fermion
