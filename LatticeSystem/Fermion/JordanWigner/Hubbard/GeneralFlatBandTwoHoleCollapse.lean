@@ -682,4 +682,46 @@ theorem flatBand_groundState_D_permSwap_eq {T : Matrix (Fin (M + 1)) (Fin (M + 1
         Equiv.swap_apply_of_ne_of_ne (fun h => hwz (Subtype.ext h)) (fun h => hwz' (Subtype.ext h)),
         dif_pos w.2]
 
+/-- **Walk-swap invariance**: for a walk `z ⤳ z'` in the special-basis connectivity graph,
+`D (s ∘ Equiv.swap z z') = D s`.  Induction on the walk: the empty walk gives the identity swap; a
+`cons` step decomposes `Equiv.swap z z'` as the conjugate `Equiv.swap z w * Equiv.swap w z' *
+Equiv.swap z w` (when `z' ∉ {z, w}`), each factor invariant (the edge by
+`flatBand_groundState_D_permSwap_eq`, the tail by induction), and `D`-invariance is closed under
+products.  Hence reachable indices give equal coefficients after swapping. -/
+theorem flatBand_groundState_D_swap_eq_of_walk {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U)
+    (D : (I → Fin 2) → ℂ)
+    (hD : Φ = ∑ s, D s • generalFlatBandSlaterState μ
+      (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0))) :
+    ∀ {z z' : I}, (generalFlatBandBasisGraph I μ).Walk z z' →
+      ∀ s : I → Fin 2, D (s ∘ ⇑(Equiv.swap z z')) = D s := by
+  have hmul : ∀ {π π' : Equiv.Perm I}, (∀ s, D (s ∘ π) = D s) → (∀ s, D (s ∘ π') = D s) →
+      ∀ s, D (s ∘ (π * π')) = D s := by
+    intro π π' hπ hπ' s
+    have : s ∘ ⇑(π * π') = (s ∘ ⇑π) ∘ ⇑π' := by funext x; simp [Equiv.Perm.coe_mul]
+    rw [this, hπ', hπ]
+  intro z z' w
+  induction w with
+  | nil => intro s; simp [Equiv.swap_self]
+  | @cons u v z' hadj p ih =>
+    intro s
+    have hedge : ∀ s, D (s ∘ ⇑(Equiv.swap u v)) = D s :=
+      fun s => (flatBand_groundState_D_permSwap_eq hbasis hT U hU hidx hΦ D hD s hadj).symm
+    by_cases hz'u : z' = u
+    · subst hz'u; simp [Equiv.swap_self]
+    · by_cases hz'v : z' = v
+      · subst hz'v; exact hedge s
+      · have hconj : Equiv.swap u z' = Equiv.swap u v * Equiv.swap v z' * Equiv.swap u v := by
+          have h := Equiv.swap_apply_apply (Equiv.swap u v) v z'
+          rw [Equiv.swap_apply_right, Equiv.swap_apply_of_ne_of_ne hz'u hz'v,
+            Equiv.swap_inv] at h
+          exact h
+        rw [hconj]
+        exact hmul hedge (hmul ih hedge) s
+
 end LatticeSystem.Fermion
