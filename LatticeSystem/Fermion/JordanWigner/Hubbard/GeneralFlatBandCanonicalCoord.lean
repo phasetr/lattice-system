@@ -260,5 +260,19 @@ theorem flatBandSpinConfigList_eraseIdx (I : Finset (Fin (M + 1))) (σ : Fin (M 
     Finset.sort_eraseIdx_eq_sort_erase (· ≤ ·) I hsort]
   rfl
 
+/-- **Coordinate value of a single inner peel term**: the occupation-basis coordinate functional
+distributes over `generalFlatBandPeelTerm` as `repr (peelTerm μ x s qs i) g`
+`= (-1)^i · [qs[i].2 = s] · μ_{qs[i].1}(x) · repr (Slater (qs.eraseIdx i)) g`.
+The inner `j`-sum of the canonical double peel (`cDownUp_canonical_repr_eq_sum`) is term-wise of
+this form, so collecting it at a target config `g` reduces to the bridge coordinate
+`generalFlatBandSlaterState_over_I_repr` of the double-erased "rest" Slater state. -/
+theorem generalFlatBandPeelTerm_repr (μ : Fin (M + 1) → Fin (M + 1) → ℂ) (x : Fin (M + 1))
+    (s : Fin 2) (qs : List (Fin (M + 1) × Fin 2)) (i : Fin qs.length)
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (g : Fin (M + 1) × Fin 2 → Fin 2) :
+    (generalOccBasis eμ).repr (generalFlatBandPeelTerm μ x s qs i) g
+      = (-1 : ℂ) ^ (i : ℕ) * (if (qs.get i).2 = s then μ (qs.get i).1 x else 0)
+          * (generalOccBasis eμ).repr (generalFlatBandSlaterState μ (qs.eraseIdx i)) g := by
+  simp only [generalFlatBandPeelTerm, map_smul, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul]
+  ring
 
 end LatticeSystem.Fermion
