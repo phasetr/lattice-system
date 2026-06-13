@@ -6613,8 +6613,20 @@ the same \texttt{toFinset} as the opaque $\mu$-Slater preimage list, hence a per
 (\texttt{flatBandSpinConfigList\_perm\_preimageList}).  Combined with the permutation scaling, the
 spin-config state is a nonzero-sign multiple of the canonical-list Slater state
 (\texttt{flatBandSpinConfigState\_eq\_smul\_canonical}) --- the orbital-ordered form on which the
-eq.~(11.3.48) double peel has explicit positions and Koszul signs.  Collecting the surviving
-$(D_0{-}2)$-occupied terms by removed index pair is the subsequent PR.  The double-annihilation expansion and sign relation
+eq.~(11.3.48) double peel has explicit positions and Koszul signs.
+
+\medskip\noindent\textbf{Theorem 11.17 PR18, the cDownUp two-head extraction (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  On the orbital-ordered form, site
+annihilation removes a leading matching-spin head: $\hat c_{x,\sigma}$ applied to
+$(z,\sigma)\!::\!\text{rest}$ (with \text{rest} carrying no matching-spin mode connected to $x$)
+returns $\mu_z(x)\cdot\text{Slater}(\text{rest})$ (\texttt{generalFlatBand\_siteAnnihilation\_head},
+the general analogue of \texttt{flatBand\_siteAnnihilation\_head}).  Composing the two annihilations,
+$\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ removes the leading up head $(a,\uparrow)$ and down head
+$(b,\downarrow)$, leaving $\mu_a(x)\,\mu_b(x)\,\text{Slater}(\text{rest})$
+(\texttt{generalFlatBand\_cDownUp\_two\_head}, the analogue of \texttt{flatBand\_cDownUp\_two\_head})
+--- the seed of the eq.~(11.3.48) sign relation.  Reordering an arbitrary occupied pair to the front
+(canonical/swap relative sign) and collecting the surviving $(D_0{-}2)$-occupied terms is the
+subsequent PR.  The double-annihilation expansion and sign relation
 (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
