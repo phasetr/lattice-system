@@ -6583,7 +6583,18 @@ double-annihilated spin-config states vanishes for \emph{every} site $x$
 (\texttt{flatBand\_cDownUp\_spinConfigSum\_eq\_zero}); for $x\in\Lambda\setminus I$ the connectivity
 data $\mu_z(x)$ enters through the peel.  Collecting the $(D_0{-}2)$-occupied terms and using the
 linear independence (PR12) then yields the sign relation $C(\sigma)=C(\sigma_{z_1\leftrightarrow z_2})$
-(eq.~(11.3.49)) --- the subsequent PRs.  The double-annihilation expansion and sign relation
+(eq.~(11.3.49)) --- the subsequent PRs.
+
+\medskip\noindent\textbf{Theorem 11.17 PR15, spin-aware peel vanishing (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  The non-contributing peel terms are killed
+up front.  If every mode of a $\mu$-Slater list has zero amplitude $\mu_{q.1}(x)=0$ at the site $x$
+or the wrong spin $q.2\ne\sigma$, then $\hat c_{x,\sigma}$ annihilates it
+(\texttt{generalFlatBand\_siteAnnihilation\_eq\_zero}, every peel term vanishing --- the general
+analogue of the proved Theorem 11.11 \texttt{flatBand\_siteAnnihilation\_eq\_zero}).  In particular,
+when $x$ connects to no index mode ($\mu_z(x)=0$ for all $z\in I$) the double annihilation kills the
+spin-config state (\texttt{flatBandSpinConfigState\_cDownUp\_eq\_zero\_of\_disconnected}) --- the
+trivial branch of eq.~(11.3.48), contributing no sign relation.  Collecting the surviving
+$(D_0{-}2)$-occupied terms by removed index pair is the subsequent PR.  The double-annihilation expansion and sign relation
 (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
