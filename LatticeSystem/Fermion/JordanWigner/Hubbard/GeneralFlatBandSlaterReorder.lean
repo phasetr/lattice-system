@@ -579,4 +579,21 @@ theorem flatBandSpinConfigList_existsUnique_pos (I : Finset (Fin (M + 1)))
   refine ⟨i, by simp only [hi], fun i' hi' => flatBandSpinConfigList_get_fst_inj I σ ?_⟩
   rw [hi', hi]
 
+/-- **Erasing a canonical-list position gives the canonical list of the erased index set**:
+`(flatBandSpinConfigList I σ).eraseIdx i = flatBandSpinConfigList (I.erase L[i].1) σ`.  Combining
+`List.eraseIdx_map` with `Finset.sort_eraseIdx_eq_sort_erase`, the inner double-peel list over the
+positions of the canonical creation list is itself a canonical creation list over `I.erase L[i].1`,
+so the `(D₀-2)`-electron "rest" states reuse the canonical machinery (`existsUnique_pos`,
+`idxConfigOf`, the bridge `repr`) over the smaller index set. -/
+theorem flatBandSpinConfigList_eraseIdx (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2)
+    {i : ℕ} (hi : i < (flatBandSpinConfigList I σ).length) :
+    (flatBandSpinConfigList I σ).eraseIdx i
+      = flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I σ)[i]).1) σ := by
+  have hsort : i < (I.sort (· ≤ ·)).length := by
+    rw [Finset.length_sort]; rw [flatBandSpinConfigList_length] at hi; exact hi
+  rw [flatBandSpinConfigList_getElem]
+  conv_lhs => rw [flatBandSpinConfigList, List.eraseIdx_map,
+    Finset.sort_eraseIdx_eq_sort_erase (· ≤ ·) I hsort]
+  rfl
+
 end LatticeSystem.Fermion
