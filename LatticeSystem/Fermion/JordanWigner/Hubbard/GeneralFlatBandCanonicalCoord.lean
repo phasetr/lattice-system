@@ -687,4 +687,56 @@ theorem flatBandSpinConfigList_choose_eq (I : Finset (Fin (M + 1))) (σ σ' : Fi
     exact (flatBandSpinConfigList_existsUnique_pos I σ' hz).choose_spec.1
   exact (List.Nodup.getElem_inj_iff (I.sort_nodup _)).mp (h1.trans h2.symm)
 
+/-- The canonical position of `z ∈ I` is a valid index into `I.sort`. -/
+theorem flatBandSpinConfigList_choose_lt_sortLength (I : Finset (Fin (M + 1)))
+    (σ : Fin (M + 1) → Fin 2) {z : Fin (M + 1)} (hz : z ∈ I) :
+    ((flatBandSpinConfigList_existsUnique_pos I σ hz).choose : ℕ) < (I.sort (· ≤ ·)).length := by
+  rw [Finset.length_sort, ← flatBandSpinConfigList_length I σ]
+  exact (flatBandSpinConfigList_existsUnique_pos I σ hz).choose.2
+
+/-- `I.sort` at the canonical position of `z ∈ I` is `z` itself. -/
+theorem flatBandSpinConfigList_sort_getElem_choose (I : Finset (Fin (M + 1)))
+    (σ : Fin (M + 1) → Fin 2) {z : Fin (M + 1)} (hz : z ∈ I) :
+    (I.sort (· ≤ ·))[((flatBandSpinConfigList_existsUnique_pos I σ hz).choose : ℕ)]'
+        (flatBandSpinConfigList_choose_lt_sortLength I σ hz) = z := by
+  rw [← flatBandSpinConfigList_get_fst_eq_sort I σ _
+    (flatBandSpinConfigList_choose_lt_sortLength I σ hz)]
+  exact (flatBandSpinConfigList_existsUnique_pos I σ hz).choose_spec.1
+
+/-- **eraseIdx position shift**: the canonical position of `b` in `I.erase a` equals its position in
+`I` minus one when it sits to the right of `a`'s position: `pos_{I.erase a}(b) = pos_I(b) -
+[pos_I(b) > pos_I(a)]`.  Identifying `(I.erase a).sort` with `(I.sort).eraseIdx pos_I(a)`
+(`Finset.sort_eraseIdx_eq_sort_erase`), `List.getElem_eraseIdx` reads off the shifted index and
+`I.sort` nodup inverts it.  This is the position arithmetic feeding `neg_one_pow_two_erase_shift`
+for the eq. (11.3.49) sign comparison. -/
+theorem flatBandSpinConfigList_choose_erase_shift (I : Finset (Fin (M + 1)))
+    (σ : Fin (M + 1) → Fin 2) {a b : Fin (M + 1)} (ha : a ∈ I) (hb : b ∈ I) (hab : a ≠ b) :
+    ((flatBandSpinConfigList_existsUnique_pos (I.erase a) σ
+        (Finset.mem_erase.mpr ⟨Ne.symm hab, hb⟩)).choose : ℕ)
+      = ((flatBandSpinConfigList_existsUnique_pos I σ hb).choose : ℕ)
+        - (if ((flatBandSpinConfigList_existsUnique_pos I σ hb).choose : ℕ)
+            > ((flatBandSpinConfigList_existsUnique_pos I σ ha).choose : ℕ) then 1 else 0) := by
+  have hbea : b ∈ I.erase a := Finset.mem_erase.mpr ⟨Ne.symm hab, hb⟩
+  have hsa := flatBandSpinConfigList_sort_getElem_choose I σ ha
+  have hsb := flatBandSpinConfigList_sort_getElem_choose I σ hb
+  have hsQ := flatBandSpinConfigList_sort_getElem_choose (I.erase a) σ hbea
+  have hnd : (I.sort (· ≤ ·)).Nodup := I.sort_nodup _
+  have herase : (I.erase a).sort (· ≤ ·)
+      = (I.sort (· ≤ ·)).eraseIdx
+        ((flatBandSpinConfigList_existsUnique_pos I σ ha).choose : ℕ) := by
+    rw [Finset.sort_eraseIdx_eq_sort_erase (· ≤ ·) I
+      (flatBandSpinConfigList_choose_lt_sortLength I σ ha), hsa]
+  have hsQ2 := (List.getElem_of_eq herase
+    (flatBandSpinConfigList_choose_lt_sortLength (I.erase a) σ hbea)).symm.trans hsQ
+  rw [List.getElem_eraseIdx] at hsQ2
+  split_ifs at hsQ2 with hlt
+  · have heq : ((flatBandSpinConfigList_existsUnique_pos (I.erase a) σ hbea).choose : ℕ)
+        = ((flatBandSpinConfigList_existsUnique_pos I σ hb).choose : ℕ) :=
+      (List.Nodup.getElem_inj_iff hnd).mp (hsQ2.trans hsb.symm)
+    rw [heq, if_neg (by omega), Nat.sub_zero]
+  · have hQ1 : ((flatBandSpinConfigList_existsUnique_pos (I.erase a) σ hbea).choose : ℕ) + 1
+        = ((flatBandSpinConfigList_existsUnique_pos I σ hb).choose : ℕ) :=
+      (List.Nodup.getElem_inj_iff hnd).mp (hsQ2.trans hsb.symm)
+    rw [if_pos (by omega)]; omega
+
 end LatticeSystem.Fermion
