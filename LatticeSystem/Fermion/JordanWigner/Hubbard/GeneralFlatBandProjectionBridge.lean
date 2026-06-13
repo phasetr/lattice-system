@@ -202,4 +202,29 @@ theorem generalFlatBand_proj_row_eq_zero_of_diag_zero (x y : Fin (M + 1))
     ← Submodule.inner_starProjection_left_eq_right,
     generalFlatBand_proj_apply_eq_zero_of_diag_zero T x h, inner_zero_left]
 
+/-- **Off-diagonal projection entry as an inner product of projected basis vectors**:
+`(P₀)_{xy} = ⟪P₀ e_x, P₀ e_y⟫`.  Idempotence and self-adjointness move both `P₀`'s onto the basis
+vectors. -/
+theorem generalFlatBand_proj_offdiag_eq (x y : Fin (M + 1)) :
+    generalFlatBandProjectionMatrix T x y
+      = inner ℂ
+          ((generalFlatBandKernel T).starProjection
+            (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x))
+          ((generalFlatBandKernel T).starProjection
+            (EuclideanSpace.basisFun (Fin (M + 1)) ℂ y)) := by
+  rw [generalFlatBandProjectionMatrix_apply]
+  conv_lhs => rw [← (generalFlatBandKernel T).isIdempotentElem_starProjection.eq]
+  exact (Submodule.inner_starProjection_left_eq_right (generalFlatBandKernel T) _ _).symm
+
+/-- **Support edges connect active sites**: if `(P₀)_{xy} ≠ 0` then both `x` and `y` are active
+(`(P₀)_{xx} ≠ 0` and `(P₀)_{yy} ≠ 0`).  An inactive site has a zero projection row (and, by
+symmetry, column), so the support graph of `P₀` lives on `Λ₀`. -/
+theorem generalFlatBand_proj_active_of_ne_zero (x y : Fin (M + 1))
+    (h : generalFlatBandProjectionMatrix T x y ≠ 0) :
+    generalFlatBandProjectionMatrix T x x ≠ 0 ∧ generalFlatBandProjectionMatrix T y y ≠ 0 := by
+  refine ⟨fun hx => h (generalFlatBand_proj_row_eq_zero_of_diag_zero T x y hx), fun hy => h ?_⟩
+  have hyx := generalFlatBand_proj_row_eq_zero_of_diag_zero T y x hy
+  rw [← (generalFlatBandProjectionMatrix_isHermitian T).apply y x] at hyx
+  exact (star_eq_zero.mp hyx)
+
 end LatticeSystem.Fermion
