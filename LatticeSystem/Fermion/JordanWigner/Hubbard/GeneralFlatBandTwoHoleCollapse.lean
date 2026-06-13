@@ -581,4 +581,27 @@ theorem flatBand_groundState_D_swap_eq {T : Matrix (Fin (M + 1)) (Fin (M + 1)) �
   · exact (sub_eq_zero.mp h).symm
   · exact absurd h hcswne
 
+/-- **Graph-adjacent indices give equal ground-state coefficients** (eq. (11.3.49) on the
+special-basis graph): if `z, z'` are adjacent in the special-basis connectivity graph (so
+`∃ x, μ_z(x) ≠ 0` and
+`μ_{z'}(x) ≠ 0`) and `σ z = 0`, `σ z' = 1`, then the coefficient of `σ|_I` equals that of the
+`z↔z'` spin-swapped config.  Extracts the witnessing site `x` from the adjacency and applies
+`flatBand_groundState_D_swap_eq`.  This is the per-edge step of the connectivity induction. -/
+theorem flatBand_groundState_D_swap_eq_of_adj {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U)
+    (D : (I → Fin 2) → ℂ)
+    (hD : Φ = ∑ s, D s • generalFlatBandSlaterState μ
+      (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0)))
+    {z z' : I} (hadj : (generalFlatBandBasisGraph I μ).Adj z z')
+    (hσz : σ z.1 = 0) (hσz' : σ z'.1 = 1) :
+    D (fun w : I => σ w.1) = D (fun w : I => (σ ∘ ⇑(Equiv.swap z.1 z'.1)) w.1) := by
+  obtain ⟨hne, x, hμz, hμz'⟩ := hadj
+  exact flatBand_groundState_D_swap_eq hbasis hT U hU hidx σ x z.2 z'.2 hne hσz hσz'
+    hμz hμz' hΦ D hD
+
 end LatticeSystem.Fermion
