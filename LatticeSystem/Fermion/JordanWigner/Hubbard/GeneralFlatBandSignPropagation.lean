@@ -458,4 +458,49 @@ theorem generalFlatBand_cDownUp_extract_pair_swap (μ : Fin (M + 1) → Fin (M +
     generalFlatBand_cDownUp_two_head_swap μ x a b (l₁ ++ l₂)
       (fun q hq => (List.mem_append.mp hq).elim (h1 q) (h2 q))]
 
+/-- **Tasaki eq. (11.3.47) in canonical-Slater coefficients**: a flat-band ground state is an
+explicit finite combination `Φ = Σ_s D(s)·generalFlatBandSlaterState μ (flatBandSpinConfigList σ_s)`
+of the **canonical-list** Slater states, indexed by spin configurations `s : I → Fin 2`.  Unlike the
+`flatBandSpinConfigState` coefficients (which differ from the canonical-Slater ones by the
+existential `±1` sign of `flatBandSpinConfigState_eq_smul_canonical`), the `D(s)` are the genuine,
+order-fixed coefficients of eqs. (11.3.47)–(11.3.49) — the canonical sorted order makes the sign
+relation comparison clean. -/
+theorem flatBand_groundState_eq_canonicalSlaterSum
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (idx : Fin (M + 1) → Fin (M + 1))
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U) :
+    ∃ D : (I → Fin 2) → ℂ,
+      Φ = ∑ s, D s • generalFlatBandSlaterState μ
+        (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0)) := by
+  classical
+  set ext : (I → Fin 2) → (Fin (M + 1) → Fin 2) :=
+    fun s z => if h : z ∈ I then s ⟨z, h⟩ else 0 with hext_def
+  -- Φ lies in the span of the `flatBandSpinConfigState` family (PR13's construction)
+  have hmem : Φ ∈ Submodule.span ℂ
+      (Set.range (fun s : I → Fin 2 => flatBandSpinConfigState I idx eμ (ext s))) := by
+    refine Submodule.span_mono ?_
+      (flatBand_groundState_mem_spinConfigStateSpan hbasis hT U hU eμ idx hidx hΦ)
+    rintro _ ⟨σ, rfl⟩
+    refine ⟨fun z => σ z.1, ?_⟩
+    simp only [flatBandSpinConfigState]
+    congr 1
+    refine flatBandSpinConfigOcc_congr I idx fun z hz => ?_
+    simp only [hext_def, dif_pos hz]
+  -- the canonical-Slater family spans at least as much (they differ by a nonzero ±1 sign)
+  have hle : Submodule.span ℂ
+        (Set.range (fun s : I → Fin 2 => flatBandSpinConfigState I idx eμ (ext s)))
+      ≤ Submodule.span ℂ
+        (Set.range (fun s : I → Fin 2 =>
+          generalFlatBandSlaterState μ (flatBandSpinConfigList I (ext s)))) := by
+    rw [Submodule.span_le]
+    rintro _ ⟨s, rfl⟩
+    obtain ⟨z, _, hz⟩ := flatBandSpinConfigState_eq_smul_canonical hbasis hidx (ext s)
+    simp only [hz]
+    exact Submodule.smul_mem _ _ (Submodule.subset_span (Set.mem_range_self s))
+  obtain ⟨D, hD⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp (hle hmem)
+  exact ⟨D, hD.symm⟩
+
 end LatticeSystem.Fermion
