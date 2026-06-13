@@ -1,6 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandTwoHoleCollapse
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinLoweringTowerGeneral
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiHopAction
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandGroundAnnihilation
 
 /-!
 # The general flat-band maximal-spin multiplet (Tasaki §11.3.4)
@@ -148,5 +149,83 @@ theorem generalFlatBandSlaterState_allUp_ne_zero
     (fun q hq => flatBandSpinConfigList_mem_fst_mem I _ hq) ?_
   rw [h, map_zero]
   rfl
+
+open scoped ComplexOrder in
+/-- **The kinetic operator annihilates the all-up μ-Slater state**: the flat-band Slater is a
+zero-kinetic-energy state.  Factor `T = Cᴴ C` (`exists_posSemidef_sq_eq_of_posSemidef`); then
+`hubbardKinetic M (Cᴴ C) = Σ_σ,k Ĉ_σ(C_k)ᴴ Ĉ_σ(C_k)`
+(`hubbardKinetic_conjTranspose_mul_self_eq_gram_sum`).  Each Gram-mode annihilation kills the
+Slater: every occupied mode `μ_z` lies in `ker T = ker C` (so `C μ_z = 0`, i.e.
+`Σ_x C_k(x) μ_z(x) = 0`), so the orthogonal-kill lemma applies. -/
+theorem hubbardKinetic_mulVec_allUpSlater_eq_zero
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) :
+    (hubbardKinetic M T).mulVec
+        (generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0))) = 0 := by
+  obtain ⟨C, hC, hTC⟩ := LatticeSystem.Math.exists_posSemidef_sq_eq_of_posSemidef hT
+  have hTCH : T = Cᴴ * C := by rw [hTC, hC.isHermitian.eq]
+  set v := generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0)) with hv
+  have hkerC : ∀ z ∈ I, C.mulVec (μ z) = 0 := fun z hz => by
+    have hTz : (Cᴴ * C).mulVec (μ z) = 0 := by rw [← hTCH]; exact hbasis.2.1 z hz
+    have hmem : μ z ∈ LinearMap.ker (Cᴴ * C).mulVecLin := by
+      rw [LinearMap.mem_ker, Matrix.mulVecLin_apply]; exact hTz
+    rw [Matrix.ker_mulVecLin_conjTranspose_mul_self] at hmem
+    rwa [LinearMap.mem_ker, Matrix.mulVecLin_apply] at hmem
+  have hCk : ∀ (σ : Fin 2) (k : Fin (M + 1)),
+      (spinfulAnnihilationFromVector M (fun j => C k j) σ).mulVec v = 0 := fun σ k =>
+    spinfulAnnihilationFromVector_mulVec_generalFlatBandSlaterState_eq_zero_of_orthogonal
+      μ (fun j => C k j) σ _ (fun q hq => by
+        have hk := congrFun (hkerC q.1 (flatBandSpinConfigList_mem_fst_mem I _ hq)) k
+        simpa [Matrix.mulVec, dotProduct] using hk)
+  rw [hTCH, hubbardKinetic_conjTranspose_mul_self_eq_gram_sum, Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun σ _ => ?_)
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun k _ => ?_)
+  rw [← Matrix.mulVec_mulVec, hCk σ k, Matrix.mulVec_zero]
+
+/-- **The on-site interaction annihilates the all-up μ-Slater state**: the fully spin-polarized
+Slater has no double occupancy, so each term `U • (n̂_{i,↑} n̂_{i,↓})` kills it (the inner
+`n̂_{i,↓} = ĉ†_{i,↓}ĉ_{i,↓}` already vanishes, as `ĉ_{i,↓}` annihilates the all-up state). -/
+theorem hubbardOnSiteInteraction_mulVec_allUpSlater_eq_zero
+    (μ : Fin (M + 1) → Fin (M + 1) → ℂ) (I : Finset (Fin (M + 1))) (U : ℂ) :
+    (hubbardOnSiteInteraction M U).mulVec
+        (generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0))) = 0 := by
+  unfold hubbardOnSiteInteraction
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  have hdown : (fermionDownNumber M i).mulVec
+      (generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0))) = 0 := by
+    rw [fermionDownNumber,
+      show fermionMultiNumber (2 * M + 1) (spinfulIndex M i 1)
+          = fermionMultiCreation (2 * M + 1) (spinfulIndex M i 1)
+            * fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M i 1) from rfl,
+      ← Matrix.mulVec_mulVec]
+    have hann : (fermionMultiAnnihilation (2 * M + 1) (spinfulIndex M i 1)).mulVec
+        (generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0))) = 0 :=
+      generalFlatBand_siteAnnihilation_eq_zero μ i 1 _ (fun q hq => Or.inr (by
+        rw [flatBandSpinConfigList_mem_snd_eq I (fun _ => 0) hq]; decide))
+    rw [hann, Matrix.mulVec_zero]
+  rw [Matrix.smul_mulVec, ← Matrix.mulVec_mulVec, hdown, Matrix.mulVec_zero, smul_zero]
+
+open scoped ComplexOrder in
+/-- **The all-up μ-Slater state lies in the general flat-band ground submodule** (`v ∈ ground`):
+it is a zero-energy `D₀`-electron state.  `Ĥ = K̂ + U Σ n̂↑n̂↓` annihilates it (kinetic and
+interaction kills above), and `N̂_tot v = |I| v = D₀ v` places it in the `D₀`-electron sector.  This
+exhibits the highest-weight vector of the SU(2) tower inside the ground subspace, the seed for the
+`finrank ≥ D₀+1` lower bound. -/
+theorem generalFlatBandSlaterState_allUp_mem_groundSubmodule
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) :
+    generalFlatBandSlaterState μ (flatBandSpinConfigList I (fun _ => 0))
+      ∈ generalFlatBandGroundSubmodule T U := by
+  simp only [generalFlatBandGroundSubmodule, Submodule.mem_inf]
+  refine ⟨?_, ?_⟩
+  · rw [LinearMap.mem_ker, Matrix.mulVecLin_apply, hubbardHamiltonian, Matrix.add_mulVec,
+      hubbardKinetic_mulVec_allUpSlater_eq_zero hbasis hT,
+      hubbardOnSiteInteraction_mulVec_allUpSlater_eq_zero μ I (U : ℂ), add_zero]
+  · rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply,
+      fermionTotalNumber_mulVec_generalFlatBandSlaterState, flatBandSpinConfigList_length, hbasis.1]
 
 end LatticeSystem.Fermion
