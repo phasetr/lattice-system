@@ -73,4 +73,29 @@ theorem generalFlatBand_diag_ne_zero_iff (x : Fin (M + 1)) :
   rw [generalFlatBandProjectionMatrix_diag_eq, ← Submodule.starProjection_apply_eq_zero_iff,
     ne_eq, not_iff_not, inner_self_eq_zero]
 
+/-- **A special-basis vector lies in the flat band** (as a Euclidean vector): for `z ∈ I`,
+`μ_z ∈ ker T`.  `T.mulVec (μ z) = 0` lifts to `toEuclideanLin T (toLp μ_z) = 0`. -/
+theorem generalFlatBand_mu_mem_kernel {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {z : Fin (M + 1)} (hz : z ∈ I) :
+    (WithLp.toLp 2 (μ z) : EuclideanSpace ℂ (Fin (M + 1))) ∈ generalFlatBandKernel T := by
+  rw [generalFlatBandKernel, LinearMap.mem_ker]
+  have hrfl : Matrix.toEuclideanLin T (WithLp.toLp 2 (μ z))
+      = WithLp.toLp 2 (T.mulVec (μ z)) := rfl
+  rw [hrfl, hbasis.2.1 z hz]
+  rfl
+
+/-- **Every index site is active**: `I ⊆ Λ₀`.  For `z ∈ I` the localised vector `μ_z` lies in the
+flat band and has `μ_z(z) ≠ 0`, so `e_z` is not orthogonal to `ker T`, i.e. `(P₀)_{zz} ≠ 0`. -/
+theorem generalFlatBand_special_index_active {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {z : Fin (M + 1)} (hz : z ∈ I) :
+    generalFlatBandProjectionMatrix T z z ≠ 0 := by
+  rw [generalFlatBand_diag_ne_zero_iff]
+  intro hperp
+  have hortho := (Submodule.mem_orthogonal _ _).mp hperp (WithLp.toLp 2 (μ z))
+    (generalFlatBand_mu_mem_kernel T hbasis hz)
+  rw [← inner_conj_symm, EuclideanSpace.basisFun_inner] at hortho
+  exact hbasis.2.2.2.1 z hz (by simpa using hortho)
+
 end LatticeSystem.Fermion
