@@ -6668,7 +6668,11 @@ The $D(s)$ are the order-fixed coefficients of eqs.~(11.3.47)--(11.3.49): in the
 order an index pair $a,b$ sits at the same positions $\mathrm{rank}(a),\mathrm{rank}(b)$ for both
 $\sigma$ and $\sigma_{a\leftrightarrow b}$, so the move-to-front permutation sign is shared and the
 relative $-1$ survives cleanly.  Reindexing the full double peel by removed pair and collecting via
-the occupation-basis coordinate functional and linear independence is the subsequent PR.  The double-annihilation expansion and sign relation
+the occupation-basis coordinate functional and linear independence is the subsequent PR.  (The
+reorder/extraction machinery above --- the Slater swap/permutation, the canonical list, the
+head/two-head/swap extraction, the move-pair-front, the per-pair extraction, and the
+canonical-Slater $D$-coefficient expansion --- lives in \texttt{GeneralFlatBandSlaterReorder.lean},
+split from \texttt{GeneralFlatBandSignPropagation.lean} for build speed.)  The double-annihilation expansion and sign relation
 (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
