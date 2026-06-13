@@ -42,4 +42,30 @@ theorem generalFlatBand_totalSpinPlus_mulVec_allUpSlater (μ : Fin (M + 1) → F
     decide
   rw [hdown, Matrix.mulVec_zero]
 
+/-- **The total number operator is diagonal on the general flat-band Slater states**:
+`N̂_tot |Slater(μ, qs)⟩ = (length qs) · |Slater(μ, qs)⟩` — every `â†`-creation adds one particle.
+List induction via `fermionTotalNumber_mul_spinfulCreationFromVector` (each
+`generalFlatBandCreation μ z σ = spinfulCreationFromVector M (μ z) σ`), down to
+`N̂_tot|vac⟩ = 0`. -/
+theorem fermionTotalNumber_mulVec_generalFlatBandSlaterState
+    (μ : Fin (M + 1) → Fin (M + 1) → ℂ) (qs : List (Fin (M + 1) × Fin 2)) :
+    (fermionTotalNumber (2 * M + 1)).mulVec (generalFlatBandSlaterState μ qs)
+      = (qs.length : ℂ) • generalFlatBandSlaterState μ qs := by
+  induction qs with
+  | nil =>
+    simp only [generalFlatBandSlaterState, List.map_nil, List.prod_nil, Matrix.one_mulVec,
+      List.length_nil, Nat.cast_zero, zero_smul]
+    exact fermionTotalNumber_mulVec_vacuum (2 * M + 1)
+  | cons q qs' ih =>
+    obtain ⟨q1, q2⟩ := q
+    have hcons : generalFlatBandSlaterState μ ((q1, q2) :: qs')
+        = (spinfulCreationFromVector M (μ q1) q2).mulVec (generalFlatBandSlaterState μ qs') := by
+      rw [generalFlatBandSlaterState, generalFlatBandSlaterState, List.map_cons, List.prod_cons,
+        Matrix.mulVec_mulVec]
+      rfl
+    rw [hcons, Matrix.mulVec_mulVec, fermionTotalNumber_mul_spinfulCreationFromVector,
+      Matrix.add_mulVec, ← Matrix.mulVec_mulVec, ih, Matrix.mulVec_smul, List.length_cons]
+    push_cast
+    rw [add_smul, one_smul]
+
 end LatticeSystem.Fermion
