@@ -302,4 +302,24 @@ theorem flatBandSpinConfigList_congr (S : Finset (Fin (M + 1))) (σ σ' : Fin (M
   intro z hz
   rw [h z ((Finset.mem_sort (· ≤ ·)).mp hz)]
 
+/-- **A `μ`-Slater state over `I` has nonzero coordinate at its own index config**: evaluating the
+bridge coordinate `generalFlatBandSlaterState_over_I_repr` at `g = idxConfigOf idx qs` (its own
+occupied config) forces the indicator to `1`, leaving the nonzero scalar `z`.  This is the `R ≠ 0`
+fact cancelled in the eq. (11.3.49) relation `D(σ) = D(σ_{a↔b})`: the shared `(D₀-2)`-electron rest
+Slater state has nonzero coordinate at the rest config, so it can be divided out. -/
+theorem generalFlatBandSlaterState_repr_self_ne_zero
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (idx : Fin (M + 1) → Fin (M + 1))
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    (qs : List (Fin (M + 1) × Fin 2)) (hqs_nd : qs.Nodup) (hqs_I : ∀ q ∈ qs, q.1 ∈ I) :
+    (generalOccBasis eμ).repr (generalFlatBandSlaterState μ qs) (idxConfigOf idx qs) ≠ 0 := by
+  obtain ⟨z, hz, heq⟩ :=
+    generalFlatBandSlaterState_over_I_repr hbasis eμ idx hidx qs hqs_nd hqs_I (idxConfigOf idx qs)
+  rw [heq]
+  have hc : (fun q => if q ∈ (qs.map (fun p => (idx p.1, p.2))).toFinset then (1 : Fin 2) else 0)
+      = idxConfigOf idx qs := rfl
+  rw [hc, if_pos rfl, mul_one]
+  exact hz
+
 end LatticeSystem.Fermion
