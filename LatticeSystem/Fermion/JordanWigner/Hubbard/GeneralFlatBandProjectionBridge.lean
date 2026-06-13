@@ -50,4 +50,27 @@ theorem generalFlatBandProjectionMatrix_isIdempotent :
   congr 1
   rw [← ContinuousLinearMap.coe_mul, h]
 
+/-- **The diagonal projection density is the squared norm of the projected basis vector**:
+`(P₀)_{xx} = ⟪P₀ e_x, P₀ e_x⟫`.  Self-adjointness moves one `P₀` across the inner product and
+idempotence merges them, so the diagonal entry equals `‖P₀ e_x‖²`. -/
+theorem generalFlatBandProjectionMatrix_diag_eq (x : Fin (M + 1)) :
+    generalFlatBandProjectionMatrix T x x
+      = inner ℂ
+          ((generalFlatBandKernel T).starProjection
+            (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x))
+          ((generalFlatBandKernel T).starProjection
+            (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x)) := by
+  rw [generalFlatBandProjectionMatrix_apply]
+  conv_lhs => rw [← (generalFlatBandKernel T).isIdempotentElem_starProjection.eq]
+  exact (Submodule.inner_starProjection_left_eq_right (generalFlatBandKernel T) _ _).symm
+
+/-- **Active site ⟺ the basis vector is not orthogonal to the flat band**: `(P₀)_{xx} ≠ 0` iff
+`P₀ e_x ≠ 0` iff `e_x ∉ (ker T)ᗮ`.  The diagonal density `‖P₀ e_x‖²` is nonzero exactly when the
+projection of `e_x` onto the flat band is nonzero. -/
+theorem generalFlatBand_diag_ne_zero_iff (x : Fin (M + 1)) :
+    generalFlatBandProjectionMatrix T x x ≠ 0
+      ↔ EuclideanSpace.basisFun (Fin (M + 1)) ℂ x ∉ (generalFlatBandKernel T)ᗮ := by
+  rw [generalFlatBandProjectionMatrix_diag_eq, ← Submodule.starProjection_apply_eq_zero_iff,
+    ne_eq, not_iff_not, inner_self_eq_zero]
+
 end LatticeSystem.Fermion
