@@ -677,4 +677,91 @@ theorem cDownUp_canonicalSlaterSum_repr_eq_zero_of_not_twoHoleTarget
     rw [hrepr0, mul_zero, mul_zero]
   rw [hinner, mul_zero, mul_zero]
 
+/-- **The site double-annihilation kills an edge-swap-invariant `D`-sum**: `ĉ_{x↓}ĉ_{x↑} Φ = 0`
+for `Φ = Σ_s D(s)·Slater(canonical I (extend s))` with `D` edge-swap-invariant.  Reduce (via
+`generalOccBasis` injectivity) to every occupation coordinate vanishing; at each target `g`, the
+`D`-weighted coordinate sum is killed either by the two-hole-target lemma (`g` a `(D₀-2)`-emptied
+config of a pair, where edge-swap invariance forces the cancellation) or the off-target lemma
+(otherwise).  A target config is spin-independent in `σ a`, `σ b`, so a witness with `σa=0, σb=1`
+exists whenever any does. -/
+theorem generalCDownUp_mulVec_canonicalSlaterSum_eq_zero_of_edgeSwap_invariant
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (x : Fin (M + 1))
+    (D : (I → Fin 2) → ℂ)
+    (hedge : ∀ {z z' : ↥I}, (generalFlatBandBasisGraph I μ).Adj z z' →
+      ∀ s : I → Fin 2, D s = D (s ∘ ⇑(Equiv.swap z z'))) :
+    (generalCDownUp M x).mulVec (∑ s : I → Fin 2, D s • generalFlatBandSlaterState μ
+        (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0))) = 0 := by
+  classical
+  rw [Matrix.mulVec_sum]
+  simp_rw [Matrix.mulVec_smul]
+  refine (generalOccBasis eμ).repr.map_eq_zero_iff.mp (Finsupp.ext (fun g => ?_))
+  rw [Finsupp.zero_apply, map_sum, Finsupp.finset_sum_apply]
+  simp_rw [map_smul, Finsupp.smul_apply, smul_eq_mul]
+  by_cases hg : ∃ (σ : Fin (M + 1) → Fin 2) (a b : Fin (M + 1)),
+      a ∈ I ∧ b ∈ I ∧ a ≠ b ∧ g = idxConfigOf idx (flatBandSpinConfigList ((I.erase a).erase b) σ)
+  · obtain ⟨σ, a, b, ha, hb, hab, hgeq⟩ := hg
+    set σ'' : Fin (M + 1) → Fin 2 := Function.update (Function.update σ a 0) b 1 with hσ''
+    have hσ''a : σ'' a = 0 := by
+      rw [hσ'', Function.update_of_ne hab, Function.update_self]
+    have hσ''b : σ'' b = 1 := by rw [hσ'']; exact Function.update_self _ _ _
+    have hcongr : flatBandSpinConfigList ((I.erase a).erase b) σ
+        = flatBandSpinConfigList ((I.erase a).erase b) σ'' :=
+      flatBandSpinConfigList_congr _ σ σ'' (fun z hz => by
+        rw [hσ'', Function.update_of_ne (Finset.ne_of_mem_erase hz),
+          Function.update_of_ne (Finset.ne_of_mem_erase (Finset.mem_of_mem_erase hz))])
+    rw [hgeq, hcongr]
+    exact cDownUp_canonicalSlaterSum_repr_twoHole_eq_zero_of_edgeSwap_invariant hbasis hidx σ'' x
+      ha hb hab hσ''a hσ''b D hedge
+  · push Not at hg
+    exact cDownUp_canonicalSlaterSum_repr_eq_zero_of_not_twoHoleTarget hbasis hidx x D g
+      (fun σ a b ha hb hab => hg σ a b ha hb hab)
+
+open scoped ComplexOrder in
+/-- **An edge-swap-invariant canonical-Slater sum is a flat-band ground state**: for `D` invariant
+under every basis-graph edge transposition, `Φ = Σ_s D(s)·Slater(canonical I (extend s))` lies in
+`generalFlatBandGroundSubmodule`.  Kinetic kill is per-Slater
+(`hubbardKinetic_mulVec_spinConfigSlater_eq_zero`); interaction kill follows from
+`ĉ_{x↓}ĉ_{x↑} Φ = 0` via the double-occupancy factorization; and `N̂_tot Φ = D₀ Φ`.  This is the
+converse of the eq. (11.3.49) ground-state characterization, used to place the per-block weight
+states of a disconnected basis into the ground subspace. -/
+theorem canonicalSlaterSum_mem_groundSubmodule_of_edgeSwap_invariant
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)}
+    {idx : Fin (M + 1) → Fin (M + 1)} (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    (D : (I → Fin 2) → ℂ)
+    (hedge : ∀ {z z' : ↥I}, (generalFlatBandBasisGraph I μ).Adj z z' →
+      ∀ s : I → Fin 2, D s = D (s ∘ ⇑(Equiv.swap z z'))) :
+    (∑ s : I → Fin 2, D s • generalFlatBandSlaterState μ
+        (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0)))
+      ∈ generalFlatBandGroundSubmodule T U := by
+  simp only [generalFlatBandGroundSubmodule, Submodule.mem_inf, LinearMap.mem_ker,
+    Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+  refine ⟨?_, ?_⟩
+  · have hK : (hubbardKinetic M T).mulVec (∑ s : I → Fin 2, D s • generalFlatBandSlaterState μ
+        (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0))) = 0 := by
+      rw [Matrix.mulVec_sum]
+      refine Finset.sum_eq_zero (fun s _ => ?_)
+      rw [Matrix.mulVec_smul, hubbardKinetic_mulVec_spinConfigSlater_eq_zero hbasis hT, smul_zero]
+    have hInt : (hubbardOnSiteInteraction M (U : ℂ)).mulVec
+        (∑ s : I → Fin 2, D s • generalFlatBandSlaterState μ
+          (flatBandSpinConfigList I (fun z => if h : z ∈ I then s ⟨z, h⟩ else 0))) = 0 := by
+      unfold hubbardOnSiteInteraction
+      rw [Matrix.sum_mulVec]
+      refine Finset.sum_eq_zero (fun x _ => ?_)
+      have hcd := generalCDownUp_mulVec_canonicalSlaterSum_eq_zero_of_edgeSwap_invariant
+        hbasis hidx x D hedge
+      rw [Matrix.smul_mulVec,
+        show fermionUpNumber M x * fermionDownNumber M x = hubbardDoubleOccupancy M x from rfl,
+        hubbardDoubleOccupancy_eq_conjTranspose_mul_self_general, ← Matrix.mulVec_mulVec, hcd,
+        Matrix.mulVec_zero, smul_zero]
+    rw [hubbardHamiltonian, Matrix.add_mulVec, hK, hInt, add_zero]
+  · rw [Matrix.mulVec_sum, Finset.smul_sum]
+    refine Finset.sum_congr rfl (fun s _ => ?_)
+    rw [Matrix.mulVec_smul, fermionTotalNumber_mulVec_generalFlatBandSlaterState,
+      flatBandSpinConfigList_length, hbasis.1, smul_comm]
+
 end LatticeSystem.Fermion
