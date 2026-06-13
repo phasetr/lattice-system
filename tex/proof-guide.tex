@@ -6624,9 +6624,18 @@ the general analogue of \texttt{flatBand\_siteAnnihilation\_head}).  Composing t
 $\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ removes the leading up head $(a,\uparrow)$ and down head
 $(b,\downarrow)$, leaving $\mu_a(x)\,\mu_b(x)\,\text{Slater}(\text{rest})$
 (\texttt{generalFlatBand\_cDownUp\_two\_head}, the analogue of \texttt{flatBand\_cDownUp\_two\_head})
---- the seed of the eq.~(11.3.48) sign relation.  Reordering an arbitrary occupied pair to the front
-(canonical/swap relative sign) and collecting the surviving $(D_0{-}2)$-occupied terms is the
-subsequent PR.  The double-annihilation expansion and sign relation
+--- the seed of the eq.~(11.3.48) sign relation.
+
+\medskip\noindent\textbf{Theorem 11.17 PR19, the cDownUp swapped two-head (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  On the swapped down--up head pair, the
+extraction carries the opposite sign: $\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ on
+$(a,\downarrow)\!::\!(b,\uparrow)\!::\!\text{rest}$ gives
+$-\mu_a(x)\,\mu_b(x)\,\text{Slater}(\text{rest})$ (\texttt{generalFlatBand\_cDownUp\_two\_head\_swap},
+via \texttt{generalFlatBandSlaterState\_swap} composed with the two-head extraction).  This relative
+$-1$ versus the canonical up--down assignment (one extra Koszul transposition) is exactly the seed of
+the eq.~(11.3.49) sign relation $C(\sigma)=C(\sigma_{z_1\leftrightarrow z_2})$ (the general-basis
+analogue of the Theorem 11.11 \texttt{flatBand\_cDownUp\_swap}).  Reordering an arbitrary occupied
+pair to the front and collecting the surviving $(D_0{-}2)$-occupied terms is the subsequent PR.  The double-annihilation expansion and sign relation
 (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
