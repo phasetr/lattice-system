@@ -217,4 +217,37 @@ theorem flatBandSpinConfigState_cDownUp_eq_zero_of_disconnected
   exact hx _ (flatBandSpecialIdxInv_mem
     (Finset.mem_image.mp (flatBandSpinConfigOcc_idxSupported I idx σ w hgw)))
 
+/-- Swapping the first two creations of a `μ`-Slater state negates it (the two leading `â†` factors
+anticommute).  The `generalFlatBandSlaterState` analogue of `generalModeMonomial_swap`. -/
+theorem generalFlatBandSlaterState_swap (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    (x y : Fin (M + 1) × Fin 2) (l : List (Fin (M + 1) × Fin 2)) :
+    generalFlatBandSlaterState μ (y :: x :: l) = -generalFlatBandSlaterState μ (x :: y :: l) := by
+  unfold generalFlatBandSlaterState
+  simp only [List.map_cons, List.prod_cons, generalFlatBandCreation]
+  rw [← Matrix.mul_assoc, ← Matrix.mul_assoc,
+    eq_neg_of_add_eq_zero_left
+      (spinfulFromVector_creation_creation_anticomm M (μ y.1) (μ x.1) y.2 x.2),
+    Matrix.neg_mul, Matrix.neg_mulVec]
+
+/-- **Reordering a `μ`-Slater state scales it by a nonzero sign**: a permutation of the creation
+list multiplies the Slater state by a nonzero (`±1`) scalar.  The `generalFlatBandSlaterState`
+analogue of `generalModeMonomial_perm`; lets list orderings (e.g. the opaque preimage list vs. a
+canonical order) be compared up to a tracked sign. -/
+theorem generalFlatBandSlaterState_perm (μ : Fin (M + 1) → Fin (M + 1) → ℂ)
+    {l l' : List (Fin (M + 1) × Fin 2)} (h : l.Perm l') :
+    ∃ z : ℂ, z ≠ 0 ∧ generalFlatBandSlaterState μ l = z • generalFlatBandSlaterState μ l' := by
+  induction h with
+  | nil => exact ⟨1, one_ne_zero, by rw [one_smul]⟩
+  | cons x _ ih =>
+    obtain ⟨z, hz0, hz⟩ := ih
+    refine ⟨z, hz0, ?_⟩
+    rw [← generalFlatBandCreation_mulVec_slaterState, hz, Matrix.mulVec_smul,
+      generalFlatBandCreation_mulVec_slaterState]
+  | swap x y l =>
+    exact ⟨-1, neg_ne_zero.mpr one_ne_zero, by rw [generalFlatBandSlaterState_swap, neg_one_smul]⟩
+  | trans _ _ ih₁ ih₂ =>
+    obtain ⟨z₁, hz₁0, hz₁⟩ := ih₁
+    obtain ⟨z₂, hz₂0, hz₂⟩ := ih₂
+    exact ⟨z₁ * z₂, mul_ne_zero hz₁0 hz₂0, by rw [hz₁, hz₂, smul_smul]⟩
+
 end LatticeSystem.Fermion

@@ -6593,8 +6593,17 @@ or the wrong spin $q.2\ne\sigma$, then $\hat c_{x,\sigma}$ annihilates it
 analogue of the proved Theorem 11.11 \texttt{flatBand\_siteAnnihilation\_eq\_zero}).  In particular,
 when $x$ connects to no index mode ($\mu_z(x)=0$ for all $z\in I$) the double annihilation kills the
 spin-config state (\texttt{flatBandSpinConfigState\_cDownUp\_eq\_zero\_of\_disconnected}) --- the
-trivial branch of eq.~(11.3.48), contributing no sign relation.  Collecting the surviving
-$(D_0{-}2)$-occupied terms by removed index pair is the subsequent PR.  The double-annihilation expansion and sign relation
+trivial branch of eq.~(11.3.48), contributing no sign relation.
+
+\medskip\noindent\textbf{Theorem 11.17 PR16, $\mu$-Slater permutation scaling (Tasaki §11.3.4,
+Issue \#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  To compare list orderings (the opaque
+preimage list vs.\ a canonical order) when collecting peel terms, a $\mu$-Slater state changes only
+by a tracked sign under reordering: swapping the first two creations negates the state
+(\texttt{generalFlatBandSlaterState\_swap}, the two leading $\hat a^\dagger$ anticommute), and a
+general permutation of the creation list scales it by a nonzero $\pm1$
+(\texttt{generalFlatBandSlaterState\_perm}, the \texttt{generalFlatBandSlaterState} analogue of
+\texttt{generalModeMonomial\_perm}).  Collecting the surviving $(D_0{-}2)$-occupied terms by removed
+index pair is the subsequent PR.  The double-annihilation expansion and sign relation
 (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
