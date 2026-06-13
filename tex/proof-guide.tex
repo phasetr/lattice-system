@@ -6546,8 +6546,17 @@ equals \texttt{flatBandSpinConfigOcc} of its spin function $\sigma_g(z)=[g(\math
 spin-config span of PR9 is the span of the $\sigma$-states:
 $\Phi\in\operatorname{span}\{\,\texttt{flatBandSpinConfigState}\,\sigma\,\}_\sigma$
 (\texttt{flatBand\_groundState\_mem\_spinConfigStateSpan}) --- the $C(\sigma)$-coefficient foundation
-for the sign relation.  The sign propagation (eqs.~(11.3.48)/(11.3.49)) toward the connectivity
-capstone is the subsequent PR.
+for the sign relation.
+
+\medskip\noindent\textbf{Theorem 11.17 PR12, spin-config state linear independence (Tasaki §11.3.4,
+Issue \#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  For the coefficients $C(\sigma)$ to be
+well-defined, the spin-configuration states must be linearly independent.  Distinct spin
+configurations $s:I\to\{\uparrow,\downarrow\}$ give distinct occupation configs
+\texttt{flatBandSpinConfigOcc} (evaluate the config equality at $(\mathrm{idx}\,z, s_z)$ and use the
+injectivity of $\mathrm{idx}$ on $I$), hence distinct elements of the basis
+$\texttt{generalOccBasis}\ e_\mu$; \texttt{flatBandSpinConfigState\_linearIndependent} then follows
+from \texttt{Basis.linearIndependent.comp}.  The sign propagation (eqs.~(11.3.48)/(11.3.49)) toward
+the connectivity capstone is the subsequent PR.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
 §11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
