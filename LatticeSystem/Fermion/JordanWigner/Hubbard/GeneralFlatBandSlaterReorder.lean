@@ -535,4 +535,18 @@ theorem flatBandSpinConfigList_get_fst_inj (I : Finset (Fin (M + 1))) (σ : Fin 
       flatBandSpinConfigList_get_snd_eq I σ i', h])
   exact (List.nodup_iff_injective_get.mp (flatBandSpinConfigList_nodup I σ)) he
 
+/-- **Each index of `I` occurs in the canonical list**: `z ∈ I → (z, σ z) ∈ flatBandSpinConfigList
+I σ`. -/
+theorem flatBandSpinConfigList_mem (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2)
+    {z : Fin (M + 1)} (hz : z ∈ I) : (z, σ z) ∈ flatBandSpinConfigList I σ :=
+  List.mem_map.mpr ⟨z, Finset.mem_sort _ |>.mpr hz, rfl⟩
+
+/-- **Existence of the canonical-list position of an index**: for `z ∈ I` there is a position whose
+mode is `(z, σ z)`.  With `flatBandSpinConfigList_get_fst_inj` (uniqueness), this pins the unique
+position carrying each index — the bookkeeping for "exactly one `(i,j)` per removed pair". -/
+theorem flatBandSpinConfigList_exists_pos (I : Finset (Fin (M + 1))) (σ : Fin (M + 1) → Fin 2)
+    {z : Fin (M + 1)} (hz : z ∈ I) :
+    ∃ i : Fin (flatBandSpinConfigList I σ).length, (flatBandSpinConfigList I σ).get i = (z, σ z) :=
+  List.get_of_mem (flatBandSpinConfigList_mem I σ hz)
+
 end LatticeSystem.Fermion
