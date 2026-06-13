@@ -18,6 +18,20 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
 (1st ed.), §11.3.4, eqs. (11.3.48)–(11.3.49).  Tracked in Issue #4363.
 -/
 
+/-- **An element erased on the left lies in the pair erased on the right**: if `c ∈ I` and
+`(I.erase c).erase d = (I.erase a).erase b` then `c = a ∨ c = b`.  (Generic finset fact; the engine
+disambiguating which removed index pair a double-peel "rest" set came from in the eq. (11.3.49)
+collapse — applied to both removed indices it pins the unordered pair to `{a,b}`.) -/
+theorem Finset.eq_or_eq_of_erase_erase_eq {α : Type*} [DecidableEq α] {I : Finset α} {a b c d : α}
+    (hc : c ∈ I) (h : (I.erase c).erase d = (I.erase a).erase b) : c = a ∨ c = b := by
+  have hcL : c ∉ (I.erase c).erase d := by simp [Finset.mem_erase]
+  rw [h] at hcL
+  simp only [Finset.mem_erase] at hcL
+  push Not at hcL
+  by_contra hcon
+  push Not at hcon
+  exact (hcL hcon.2 hcon.1) hc
+
 namespace LatticeSystem.Fermion
 
 open Matrix LatticeSystem.Quantum Module
