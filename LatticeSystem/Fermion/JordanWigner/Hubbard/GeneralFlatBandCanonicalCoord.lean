@@ -322,4 +322,50 @@ theorem generalFlatBandSlaterState_repr_self_ne_zero
   rw [hc, if_pos rfl, mul_one]
   exact hz
 
+/-- **The index config of a canonical creation list determines its index set**: for `S, S' ⊆ I`
+(with `idx` injective on `I`), if `idxConfigOf idx (canonical S σ)` equals
+`idxConfigOf idx (canonical S' σ)` then `S = S'`.  Evaluating the config at the mode `(idx w, σ w)`
+reads off `w ∈ S` (the indicator
+is `1` exactly there), so equal configs force equal index sets.  This is the injectivity behind
+"exactly one `(i,j)`": distinct double-peels empty distinct index pairs, hence land on distinct
+target configs, so at a fixed target only the matching pair contributes to
+`cDownUp_canonical_repr_eq_sum`. -/
+theorem idxConfigOf_flatBandSpinConfigList_inj {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) (σ : Fin (M + 1) → Fin 2)
+    {S S' : Finset (Fin (M + 1))} (hS : S ⊆ I) (hS' : S' ⊆ I)
+    (heq : idxConfigOf idx (flatBandSpinConfigList S σ)
+      = idxConfigOf idx (flatBandSpinConfigList S' σ)) :
+    S = S' := by
+  have hmem : ∀ (R : Finset (Fin (M + 1))) (w : Fin (M + 1)) (s : Fin 2),
+      (idx w, s) ∈ ((flatBandSpinConfigList R σ).map (fun p => (idx p.1, p.2))).toFinset
+        ↔ ∃ z ∈ R, idx z = idx w ∧ σ z = s := by
+    intro R w s
+    simp only [flatBandSpinConfigList, List.map_map, List.mem_toFinset, List.mem_map,
+      Finset.mem_sort, Function.comp]
+    constructor
+    · rintro ⟨z, hz, he⟩; exact ⟨z, hz, (Prod.ext_iff.mp he).1, (Prod.ext_iff.mp he).2⟩
+    · rintro ⟨z, hz, h1, h2⟩; exact ⟨z, hz, by rw [Prod.ext_iff]; exact ⟨h1, h2⟩⟩
+  have key : ∀ w ∈ I, ∀ R : Finset (Fin (M + 1)), R ⊆ I →
+      (idxConfigOf idx (flatBandSpinConfigList R σ) (idx w, σ w) = 1 ↔ w ∈ R) := by
+    intro w hw R hR
+    simp only [idxConfigOf]
+    rw [if_congr (hmem R w (σ w)) rfl rfl]
+    constructor
+    · intro h
+      by_contra hwR
+      rw [if_neg (by rintro ⟨z, hz, h1, _⟩; exact hwR (by
+        rwa [flatBandSpecial_idx_injOn hbasis hidx (hR hz) hw h1] at hz))] at h
+      exact absurd h (by decide)
+    · intro hwR
+      rw [if_pos ⟨w, hwR, rfl, rfl⟩]
+  ext w
+  by_cases hwI : w ∈ I
+  · rw [← key w hwI S hS, ← key w hwI S' hS', heq]
+  · constructor
+    · intro hw; exact absurd (hS hw) hwI
+    · intro hw; exact absurd (hS' hw) hwI
+
 end LatticeSystem.Fermion
