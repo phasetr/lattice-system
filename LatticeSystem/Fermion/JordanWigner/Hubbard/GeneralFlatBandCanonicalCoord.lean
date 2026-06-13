@@ -632,4 +632,42 @@ theorem cDownUp_canonical_repr_twoHole {T : Matrix (Fin (M + 1)) (Fin (M + 1)) �
     · rw [if_neg hg, zero_mul, mul_zero]
   · intro h; exact absurd (Finset.mem_univ pa) h
 
+/-- **The index at a canonical position is the sorted-finset element there**:
+`(canonical I σ).get p` has first component `(I.sort)[p]`, independent of `σ`.  (Destructuring `p`
+to a bare `ℕ` index lets `List.getElem_map` fire without the `Fin`-length dependency that breaks a
+direct rewrite.) -/
+theorem flatBandSpinConfigList_get_fst_eq_sort (I : Finset (Fin (M + 1)))
+    (σ : Fin (M + 1) → Fin 2) (p : Fin (flatBandSpinConfigList I σ).length)
+    (hb : (p : ℕ) < (I.sort (· ≤ ·)).length) :
+    ((flatBandSpinConfigList I σ).get p).1 = (I.sort (· ≤ ·))[(p : ℕ)]'hb := by
+  obtain ⟨n, hn⟩ := p
+  rw [List.get_eq_getElem]
+  simp only [flatBandSpinConfigList, List.getElem_map]
+
+/-- **The canonical position of an index is `σ`-independent**: the unique position carrying `z ∈ I`
+is the same in `canonical I σ` and `canonical I σ'`, since the index sequence of the canonical list
+is `I.sort` for every `σ`.  This lets the eq. (11.3.49) Koszul signs of `σ` and the spin-swapped
+`σ_{a↔b}` be compared on the common `I.sort` positions. -/
+theorem flatBandSpinConfigList_choose_eq (I : Finset (Fin (M + 1))) (σ σ' : Fin (M + 1) → Fin 2)
+    {z : Fin (M + 1)} (hz : z ∈ I) :
+    ((flatBandSpinConfigList_existsUnique_pos I σ hz).choose : ℕ)
+      = ((flatBandSpinConfigList_existsUnique_pos I σ' hz).choose : ℕ) := by
+  have hb1 : ((flatBandSpinConfigList_existsUnique_pos I σ hz).choose : ℕ)
+      < (I.sort (· ≤ ·)).length := by
+    rw [Finset.length_sort, ← flatBandSpinConfigList_length I σ]
+    exact (flatBandSpinConfigList_existsUnique_pos I σ hz).choose.2
+  have hb2 : ((flatBandSpinConfigList_existsUnique_pos I σ' hz).choose : ℕ)
+      < (I.sort (· ≤ ·)).length := by
+    rw [Finset.length_sort, ← flatBandSpinConfigList_length I σ']
+    exact (flatBandSpinConfigList_existsUnique_pos I σ' hz).choose.2
+  have h1 : (I.sort (· ≤ ·))[((flatBandSpinConfigList_existsUnique_pos I σ hz).choose : ℕ)]'hb1
+      = z := by
+    rw [← flatBandSpinConfigList_get_fst_eq_sort I σ _ hb1]
+    exact (flatBandSpinConfigList_existsUnique_pos I σ hz).choose_spec.1
+  have h2 : (I.sort (· ≤ ·))[((flatBandSpinConfigList_existsUnique_pos I σ' hz).choose : ℕ)]'hb2
+      = z := by
+    rw [← flatBandSpinConfigList_get_fst_eq_sort I σ' _ hb2]
+    exact (flatBandSpinConfigList_existsUnique_pos I σ' hz).choose_spec.1
+  exact (List.Nodup.getElem_inj_iff (I.sort_nodup _)).mp (h1.trans h2.symm)
+
 end LatticeSystem.Fermion
