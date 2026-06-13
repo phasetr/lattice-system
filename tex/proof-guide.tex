@@ -6654,8 +6654,21 @@ removes the pair with amplitude $\mu_a(x)\mu_b(x)$, leaving $\text{Slater}(l_1 \
 (\texttt{generalFlatBand\_cDownUp\_extract\_pair}); the swapped assignment $(a,\downarrow),(b,\uparrow)$
 extracts with the opposite sign $-\mu_a(x)\mu_b(x)$
 (\texttt{generalFlatBand\_cDownUp\_extract\_pair\_swap}) --- the per-pair eq.~(11.3.49) relative
-$-1$.  Reindexing the full double peel by removed pair and collecting via linear independence is the
-subsequent PR.  The double-annihilation expansion and sign relation
+$-1$.
+
+\medskip\noindent\textbf{Theorem 11.17 PR22, the canonical-Slater $D$-coefficient expansion (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  The sign-relation comparison
+of $\sigma$ and $\sigma_{z_1\leftrightarrow z_2}$ must be run in a single, order-fixed coefficient
+system.  The \texttt{flatBandSpinConfigState} coefficients carry an existential $\pm1$ canonical sign
+(\texttt{flatBandSpinConfigState\_eq\_smul\_canonical}); instead, since the canonical-list Slater
+states span the same space, $\Phi$ has an explicit expansion in them,
+$\Phi=\sum_s D(s)\,\text{Slater}(\texttt{flatBandSpinConfigList}\,\sigma_s)$
+(\texttt{flatBand\_groundState\_eq\_canonicalSlaterSum}, indexed by $s:I\to\{\uparrow,\downarrow\}$).
+The $D(s)$ are the order-fixed coefficients of eqs.~(11.3.47)--(11.3.49): in the canonical sorted
+order an index pair $a,b$ sits at the same positions $\mathrm{rank}(a),\mathrm{rank}(b)$ for both
+$\sigma$ and $\sigma_{a\leftrightarrow b}$, so the move-to-front permutation sign is shared and the
+relative $-1$ survives cleanly.  Reindexing the full double peel by removed pair and collecting via
+the occupation-basis coordinate functional and linear independence is the subsequent PR.  The double-annihilation expansion and sign relation
 (eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
