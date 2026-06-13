@@ -390,4 +390,109 @@ theorem generalFlatBand_connected_isMaximalSpinMultiplet
   refine Finset.sum_congr rfl (fun k _ => ?_)
   rw [Matrix.mulVec_smul, htw k, smul_comm]
 
+open scoped ComplexOrder in
+/-- **The kinetic operator annihilates *every* μ-Slater state** (any spin configuration `σ`, not
+just all-up): the kinetic kill of `hubbardKinetic_mulVec_allUpSlater_eq_zero` is independent of the
+spins.  Factor `T = Cᴴ C`; each Gram-mode annihilation `Ĉ_s(C_k)` kills the Slater because every
+occupied mode `μ_z` (`z ∈ I`) lies in `ker T = ker C`, regardless of its spin label. -/
+theorem hubbardKinetic_mulVec_spinConfigSlater_eq_zero
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (σ : Fin (M + 1) → Fin 2) :
+    (hubbardKinetic M T).mulVec (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ)) = 0 := by
+  obtain ⟨C, hC, hTC⟩ := LatticeSystem.Math.exists_posSemidef_sq_eq_of_posSemidef hT
+  have hTCH : T = Cᴴ * C := by rw [hTC, hC.isHermitian.eq]
+  set v := generalFlatBandSlaterState μ (flatBandSpinConfigList I σ) with hv
+  have hkerC : ∀ z ∈ I, C.mulVec (μ z) = 0 := fun z hz => by
+    have hTz : (Cᴴ * C).mulVec (μ z) = 0 := by rw [← hTCH]; exact hbasis.2.1 z hz
+    have hmem : μ z ∈ LinearMap.ker (Cᴴ * C).mulVecLin := by
+      rw [LinearMap.mem_ker, Matrix.mulVecLin_apply]; exact hTz
+    rw [Matrix.ker_mulVecLin_conjTranspose_mul_self] at hmem
+    rwa [LinearMap.mem_ker, Matrix.mulVecLin_apply] at hmem
+  have hCk : ∀ (s : Fin 2) (k : Fin (M + 1)),
+      (spinfulAnnihilationFromVector M (fun j => C k j) s).mulVec v = 0 := fun s k =>
+    spinfulAnnihilationFromVector_mulVec_generalFlatBandSlaterState_eq_zero_of_orthogonal
+      μ (fun j => C k j) s _ (fun q hq => by
+        have hk := congrFun (hkerC q.1 (flatBandSpinConfigList_mem_fst_mem I _ hq)) k
+        simpa [Matrix.mulVec, dotProduct] using hk)
+  rw [hTCH, hubbardKinetic_conjTranspose_mul_self_eq_gram_sum, Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun s _ => ?_)
+  rw [Matrix.sum_mulVec]
+  refine Finset.sum_eq_zero (fun k _ => ?_)
+  rw [← Matrix.mulVec_mulVec, hCk s k, Matrix.mulVec_zero]
+
+/-- **The site double-annihilation `ĉ_{x,↓}ĉ_{x,↑}` kills a spin-separated μ-Slater**: if at every
+site `x` opposite-spin modes have disjoint support (`σ z ≠ σ w ⟹ μ_z(x)μ_w(x) = 0`), then no site
+carries both an up- and a down-electron, so `ĉ_{x,↓}ĉ_{x,↑}` annihilates the Slater.  Expanding the
+double peel (`cDownUp_canonical_eq_doublePeel`), every term pairs an up-mode (outer, `μ_{q_i}(x)`)
+with a down-mode (inner, `μ_{q_j}(x)`); by separation their product vanishes. -/
+theorem generalCDownUp_mulVec_spinSeparatedSlater_eq_zero
+    (μ : Fin (M + 1) → Fin (M + 1) → ℂ) (I : Finset (Fin (M + 1)))
+    (σ : Fin (M + 1) → Fin 2) (x : Fin (M + 1))
+    (hsep : ∀ z ∈ I, ∀ w ∈ I, σ z ≠ σ w → μ z x * μ w x = 0) :
+    (generalCDownUp M x).mulVec (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ)) = 0 := by
+  rw [cDownUp_canonical_eq_doublePeel]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  rcases eq_or_ne ((flatBandSpinConfigList I σ).get i).2 0 with hi | hi
+  · rw [if_pos hi]
+    suffices h : μ ((flatBandSpinConfigList I σ).get i).1 x •
+        (∑ j : Fin ((flatBandSpinConfigList I σ).eraseIdx i).length,
+          generalFlatBandPeelTerm μ x 1 ((flatBandSpinConfigList I σ).eraseIdx i) j) = 0 by
+      rw [h, smul_zero]
+    rw [Finset.smul_sum]
+    refine Finset.sum_eq_zero (fun j _ => ?_)
+    rw [generalFlatBandPeelTerm]
+    rcases eq_or_ne (((flatBandSpinConfigList I σ).eraseIdx i).get j).2 1 with hj | hj
+    · rw [if_pos hj]
+      have heL : ((flatBandSpinConfigList I σ).eraseIdx i).get j ∈ flatBandSpinConfigList I σ :=
+        List.mem_of_mem_eraseIdx (List.get_mem _ j)
+      have h1 : σ ((flatBandSpinConfigList I σ).get i).1 = 0 := by
+        rw [← flatBandSpinConfigList_get_snd_eq I σ i]; exact hi
+      have h2 : σ (((flatBandSpinConfigList I σ).eraseIdx i).get j).1 = 1 := by
+        rw [← flatBandSpinConfigList_mem_snd_eq I σ heL]; exact hj
+      have hzero : μ ((flatBandSpinConfigList I σ).get i).1 x *
+          μ (((flatBandSpinConfigList I σ).eraseIdx i).get j).1 x = 0 :=
+        hsep _ (flatBandSpinConfigList_mem_fst_mem I σ (List.get_mem _ i)) _
+          (flatBandSpinConfigList_mem_fst_mem I σ heL) (by rw [h1, h2]; decide)
+      rw [smul_smul, smul_smul, mul_right_comm, hzero, zero_mul, zero_smul]
+    · rw [if_neg hj, zero_smul, smul_zero, smul_zero]
+  · rw [if_neg hi, zero_smul, smul_zero]
+
+open scoped ComplexOrder in
+/-- **A spin-separated μ-Slater is a flat-band ground state**: for any spin configuration `σ` whose
+opposite-spin modes have disjoint site support (`σ z ≠ σ w ⟹ ∀ x, μ_z(x)μ_w(x) = 0`), the Slater
+state is in `generalFlatBandGroundSubmodule`.  The kinetic part annihilates it
+(`hubbardKinetic_mulVec_spinConfigSlater_eq_zero`); the interaction
+`Σ_x U·n̂_{x↑}n̂_{x↓} = Σ_x U·(ĉ_{x↓}ĉ_{x↑})ᴴ(ĉ_{x↓}ĉ_{x↑})` annihilates it because no site is doubly
+occupied (`generalCDownUp_mulVec_spinSeparatedSlater_eq_zero`); and `N̂_tot` eigenvalue is `D₀`.
+For a disconnected basis a component-colouring gives such a `σ` lying outside the maximal-spin tower,
+the seed of the `⟹` direction of Theorem 11.17. -/
+theorem generalFlatBandSlaterState_spinSeparated_mem_groundSubmodule
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (σ : Fin (M + 1) → Fin 2)
+    (hsep : ∀ z ∈ I, ∀ w ∈ I, σ z ≠ σ w → ∀ x, μ z x * μ w x = 0) :
+    generalFlatBandSlaterState μ (flatBandSpinConfigList I σ)
+      ∈ generalFlatBandGroundSubmodule T U := by
+  simp only [generalFlatBandGroundSubmodule, Submodule.mem_inf, LinearMap.mem_ker,
+    Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+  refine ⟨?_, ?_⟩
+  · have hint : (hubbardOnSiteInteraction M (U : ℂ)).mulVec
+        (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ)) = 0 := by
+      unfold hubbardOnSiteInteraction
+      rw [Matrix.sum_mulVec]
+      refine Finset.sum_eq_zero (fun x _ => ?_)
+      have hdo : (hubbardDoubleOccupancy M x).mulVec
+          (generalFlatBandSlaterState μ (flatBandSpinConfigList I σ)) = 0 := by
+        rw [hubbardDoubleOccupancy_eq_conjTranspose_mul_self_general, ← Matrix.mulVec_mulVec,
+          generalCDownUp_mulVec_spinSeparatedSlater_eq_zero μ I σ x
+            (fun z hz w hw hne => hsep z hz w hw hne x), Matrix.mulVec_zero]
+      rw [Matrix.smul_mulVec,
+        show fermionUpNumber M x * fermionDownNumber M x = hubbardDoubleOccupancy M x from rfl,
+        hdo, smul_zero]
+    rw [hubbardHamiltonian, Matrix.add_mulVec,
+      hubbardKinetic_mulVec_spinConfigSlater_eq_zero hbasis hT, hint, add_zero]
+  · rw [fermionTotalNumber_mulVec_generalFlatBandSlaterState, flatBandSpinConfigList_length,
+      hbasis.1]
+
 end LatticeSystem.Fermion
