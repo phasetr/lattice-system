@@ -275,4 +275,18 @@ theorem generalFlatBandPeelTerm_repr (μ : Fin (M + 1) → Fin (M + 1) → ℂ) 
   simp only [generalFlatBandPeelTerm, map_smul, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul]
   ring
 
+/-- **Erasing two canonical-list positions gives the canonical list of the twice-erased index set**:
+applying `flatBandSpinConfigList_eraseIdx` twice, the double-peel "rest" list
+`((flatBandSpinConfigList I σ).eraseIdx i).eraseIdx j` is the canonical creation list over
+`(I.erase a).erase b` with `a = L[i].1` and `b` the index at position `j` of the once-erased
+canonical list.  This identifies the `(D₀-2)`-electron rest Slater state, so its coordinate is read
+off by `generalFlatBandSlaterState_over_I_repr` over the smaller index set. -/
+theorem flatBandSpinConfigList_eraseIdx_eraseIdx (I : Finset (Fin (M + 1)))
+    (σ : Fin (M + 1) → Fin 2) {i : ℕ} (hi : i < (flatBandSpinConfigList I σ).length) {j : ℕ}
+    (hj : j < (flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I σ)[i]).1) σ).length) :
+    ((flatBandSpinConfigList I σ).eraseIdx i).eraseIdx j
+      = flatBandSpinConfigList ((I.erase ((flatBandSpinConfigList I σ)[i]).1).erase
+          ((flatBandSpinConfigList (I.erase ((flatBandSpinConfigList I σ)[i]).1) σ)[j]).1) σ := by
+  rw [flatBandSpinConfigList_eraseIdx I σ hi, flatBandSpinConfigList_eraseIdx _ σ hj]
+
 end LatticeSystem.Fermion
