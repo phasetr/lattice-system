@@ -118,15 +118,17 @@ axiom GeneratesSameMPS (A B : MPSMatrices D N) : Prop
 /-- **Tasaki Theorem 7.6 (uniqueness of the injective MPS representation,
 Fannes–Nachtergaele–Werner), AXIOM.**  Two injective collections `(A^σ)`, `(B^σ)` that generate the
 same matrix product state are
-related by a **gauge transformation**: there are a unitary `U`, a phase `θ` with `|θ| = 1`, and a
-nonzero scalar `c` such that `A^σ = (θ/c) U B^σ U†` for every `σ`.  The injective matrix product
-representation is therefore essentially unique (up to unitary gauge and phase), the fact underlying
-the classification of symmetry-protected topological phases (§8.3.4).  Stated without proof in the
-book; recorded as a documented axiom. -/
+related by a **unitary gauge transformation**: there is a unitary `U` such that `A^σ = U B^σ U†` for
+every `σ` (eq. (7.2.44); no additional rescaling — a nonzero scalar would multiply the length-`L`
+amplitudes by its `L`-th power and so change the state).  The injective matrix product
+representation is therefore essentially unique (up to unitary gauge), the fact underlying the
+classification of symmetry-protected topological phases (§8.3.4).  Stated without proof in the book;
+recorded as a
+documented axiom. -/
 axiom mps_theorem_7_6 (A B : MPSMatrices D N) (lamA lamB : ℝ)
     (hA : IsInjectiveMPS A lamA) (hB : IsInjectiveMPS B lamB) (hsame : GeneratesSameMPS A B) :
-    ∃ (U : Matrix (Fin D) (Fin D) ℂ) (θ c : ℂ),
-      U ∈ Matrix.unitaryGroup (Fin D) ℂ ∧ ‖θ‖ = 1 ∧ c ≠ 0 ∧
-        ∀ σ : Fin (N + 1), A σ = (θ / c) • (U * B σ * U.conjTranspose)
+    ∃ U : Matrix (Fin D) (Fin D) ℂ,
+      U ∈ Matrix.unitaryGroup (Fin D) ℂ ∧
+        ∀ σ : Fin (N + 1), A σ = U * B σ * U.conjTranspose
 
 end LatticeSystem.Quantum
