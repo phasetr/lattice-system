@@ -391,4 +391,95 @@ theorem generalFlatBand_proj_offdiag_eq_zero_across_cut {I : Finset (Fin (M + 1)
     (Submodule.mem_orthogonal _ _).mp
       (generalFlatBand_side_subspaces_orthogonal μ S hdisj hPx) _ hPy, map_zero]
 
+/-- **The projection of a kernel vector expands over the basis**: for `v ∈ ker T`,
+`P₀ v = Σ_x v_x (P₀ e_x)` (since `v = Σ_x v_x e_x` and `P₀` is linear). -/
+theorem generalFlatBand_starProjection_expand
+    {v : EuclideanSpace ℂ (Fin (M + 1))} :
+    (generalFlatBandKernel T).starProjection v
+      = ∑ x, v x • (generalFlatBandKernel T).starProjection
+          (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x) := by
+  have hexpand : v = ∑ x, v x •
+      (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x : EuclideanSpace ℂ (Fin (M + 1))) := by
+    have h := (EuclideanSpace.basisFun (Fin (M + 1)) ℂ).sum_repr v
+    simp only [EuclideanSpace.basisFun_repr] at h
+    exact h.symm
+  conv_lhs => rw [hexpand]
+  rw [map_sum]
+  simp only [map_smul]
+
+/-- **Matrix–vector form of the projection on a kernel vector**: for `v ∈ ker T`,
+`v y = Σ_x v_x (P₀)_{yx}`.  Indeed `v = P₀ v` and expanding `v = Σ_x v_x e_x` through the linear
+`P₀` gives `⟪e_y, v⟫ = ⟪e_y, P₀ v⟫ = Σ_x v_x ⟪e_y, P₀ e_x⟫`. -/
+theorem generalFlatBand_kernel_coord_matvec
+    {v : EuclideanSpace ℂ (Fin (M + 1))} (hv : v ∈ generalFlatBandKernel T) (y : Fin (M + 1)) :
+    v y = ∑ x, v x * generalFlatBandProjectionMatrix T y x := by
+  have hvfix : (generalFlatBandKernel T).starProjection v = v :=
+    Submodule.starProjection_eq_self_iff.mpr hv
+  calc v y = inner ℂ (EuclideanSpace.basisFun (Fin (M + 1)) ℂ y) v := by
+        rw [EuclideanSpace.basisFun_inner]
+    _ = inner ℂ (EuclideanSpace.basisFun (Fin (M + 1)) ℂ y)
+          (∑ x, v x • (generalFlatBandKernel T).starProjection
+            (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x)) := by
+        rw [← generalFlatBand_starProjection_expand, hvfix]
+    _ = ∑ x, v x * generalFlatBandProjectionMatrix T y x := by
+        rw [inner_sum]
+        refine Finset.sum_congr rfl (fun x _ => ?_)
+        rw [inner_smul_right, ← generalFlatBandProjectionMatrix_apply]
+
+/-- **Coordinate restriction of a kernel vector across a `P₀`-block cut stays in `ker T`**: if `W`
+is a coordinate set with no `P₀` entries linking it to its complement (`(P₀)_{yx} = 0` for `x ∈ W`,
+`y ∉ W`), then for `v ∈ ker T` the truncation `1_W · v = Σ_{x∈W} v_x e_x` is again in `ker T`.
+Indeed `1_W·v = Σ_{x∈W} v_x (P₀ e_x)` (a sum of kernel elements): for `y ∈ W` the block hypothesis
+(with `P₀` Hermitian) kills the `x∉W` part of `v_y = Σ_x v_x (P₀)_{yx}`, and for `y ∉ W` the
+`x∈W` sum vanishes outright.  This is the linear-algebra core of "`P₀` reducible ⟹ basis cut". -/
+theorem generalFlatBand_restrict_mem_kernel (W : Finset (Fin (M + 1)))
+    (hcol : ∀ x ∈ W, ∀ y ∉ W, generalFlatBandProjectionMatrix T y x = 0)
+    {v : EuclideanSpace ℂ (Fin (M + 1))} (hv : v ∈ generalFlatBandKernel T) :
+    (∑ x ∈ W, v x • (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x :
+      EuclideanSpace ℂ (Fin (M + 1)))) ∈ generalFlatBandKernel T := by
+  have hHerm := generalFlatBandProjectionMatrix_isHermitian T
+  have key : (∑ x ∈ W, v x • (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x :
+        EuclideanSpace ℂ (Fin (M + 1))))
+      = ∑ x ∈ W, v x • (generalFlatBandKernel T).starProjection
+          (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x) := by
+    ext y
+    have coord : ∀ w : EuclideanSpace ℂ (Fin (M + 1)),
+        w y = inner ℂ (EuclideanSpace.basisFun (Fin (M + 1)) ℂ y) w :=
+      fun w => by rw [EuclideanSpace.basisFun_inner]
+    have hbf : ∀ a b : Fin (M + 1),
+        inner ℂ (EuclideanSpace.basisFun (Fin (M + 1)) ℂ a)
+          (EuclideanSpace.basisFun (Fin (M + 1)) ℂ b : EuclideanSpace ℂ (Fin (M + 1)))
+          = if a = b then (1 : ℂ) else 0 :=
+      fun a b => orthonormal_iff_ite.mp (EuclideanSpace.basisFun (Fin (M + 1)) ℂ).orthonormal a b
+    rw [coord, coord, inner_sum, inner_sum]
+    -- LHS term: ⟪e_y, v x • e_x⟫ = if y = x then v x else 0
+    have hL : (∑ x ∈ W, inner ℂ (EuclideanSpace.basisFun (Fin (M + 1)) ℂ y)
+          (v x • (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x :
+            EuclideanSpace ℂ (Fin (M + 1)))))
+        = ∑ x ∈ W, (if y = x then v x else 0) := by
+      refine Finset.sum_congr rfl (fun x _ => ?_)
+      rw [inner_smul_right, hbf y x]; split_ifs <;> simp
+    -- RHS term: ⟪e_y, v x • P₀ e_x⟫ = v x * (P₀)_{yx}
+    have hR : (∑ x ∈ W, inner ℂ (EuclideanSpace.basisFun (Fin (M + 1)) ℂ y)
+          (v x • (generalFlatBandKernel T).starProjection
+            (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x)))
+        = ∑ x ∈ W, v x * generalFlatBandProjectionMatrix T y x := by
+      refine Finset.sum_congr rfl (fun x _ => ?_)
+      rw [inner_smul_right, ← generalFlatBandProjectionMatrix_apply]
+    rw [hL, hR, Finset.sum_ite_eq W y (fun x => v x)]
+    by_cases hy : y ∈ W
+    · rw [if_pos hy, generalFlatBand_kernel_coord_matvec T hv y]
+      symm
+      refine Finset.sum_subset (Finset.subset_univ W) (fun x _ hxW => ?_)
+      have hxy : generalFlatBandProjectionMatrix T x y = 0 := hcol y hy x hxW
+      have hyx : generalFlatBandProjectionMatrix T y x = 0 := by
+        have h := hHerm.apply y x; rw [hxy] at h; simpa using h.symm
+      rw [hyx, mul_zero]
+    · rw [if_neg hy]
+      refine (Finset.sum_eq_zero (fun x hxW => ?_)).symm
+      rw [hcol x hxW y hy, mul_zero]
+  rw [key]
+  exact Submodule.sum_mem _ (fun x _ =>
+    Submodule.smul_mem _ _ (Submodule.starProjection_apply_mem _ _))
+
 end LatticeSystem.Fermion
