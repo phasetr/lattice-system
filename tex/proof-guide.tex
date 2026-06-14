@@ -7790,6 +7790,23 @@ using $h>0$, and bound $R(H)\Psi\ge E_0$.  The double limit $L\uparrow\infty$, $
 the essential bound $\langle\Xi_+,O_L/L^d\,\Xi_+\rangle\ge\sqrt{q_0}$) then gives the $\sqrt{q_0}$
 order-parameter bound (3.4.22) --- the thermodynamic input, which is not part of the formalized core.  Chapters~3--10 backfill.
 
+\noindent\textbf{Theorem 4.1} (Dyson--Lieb--Simon / Neves--Perez / Kennedy--Lieb--Shastry, Tasaki
+§4.1, eq.~(4.1.7), pp.~88--90; \texttt{Quantum/SpinS/DysonLiebSimon.lean}, Issue \#4485).  Existence
+of N\'eel long-range order: for the antiferromagnetic Heisenberg model in dimension $d\ge3$ (any $S$)
+or $d=2$, $S\ge1$, the staggered order parameter is bounded below \emph{uniformly in the system
+size}, $\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(\alpha)})^2/L^d|\Phi_{\mathrm{GS}}\rangle\ge q_0>0$.
+We define the staggered (N\'eel) order operator
+$\texttt{staggeredOrderOpS}=\sum_x\varepsilon_x\hat S_x^{(3)}$ ($\varepsilon_x=\pm1$ the sublattice
+sign) and prove it Hermitian (\texttt{staggeredOrderOpS\_isHermitian}, a real $\pm1$ combination of
+the Hermitian $\hat S_x^{(3)}$), so $\langle\Phi|(\hat O)^2\Phi\rangle$ is a real nonnegative order
+parameter.  The N\'eel-LRO statement (eq.~(4.1.7)) is a deep theorem whose faithful, sound
+formalization requires the actual $d$-dimensional hypercubic torus with nearest-neighbor
+antiferromagnetic coupling (the uniform-in-$L$ bound is \emph{false} for arbitrary finite bipartite
+graphs, e.g.\ with vanishing coupling), and its proof rests on reflection positivity and infrared
+(Gaussian-domination) bounds; it is deferred until that hypercubic-lattice / reflection-positivity
+framework is in place (infinite-volume systems are in scope --- a deferral pending infrastructure,
+not an exclusion).  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
