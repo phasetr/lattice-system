@@ -2,6 +2,7 @@ import LatticeSystem.Quantum.SpinS.Heisenberg
 import LatticeSystem.Quantum.SpinS.RayleighInfMatrix
 import LatticeSystem.Quantum.SpinS.DysonLiebSimon
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Mathlib.Data.Real.Sqrt
 import Mathlib.Data.ZMod.Basic
 
 /-!
@@ -46,6 +47,40 @@ noncomputable def staggeredRaisingOpS (A : Λ → Bool) (N : ℕ) : ManyBodyOpS 
 assignment `A`, built from the per-site lowering operators `spinSSiteOpMinus`. -/
 noncomputable def staggeredLoweringOpS (A : Λ → Bool) (N : ℕ) : ManyBodyOpS Λ N :=
   ∑ x : Λ, (if A x then (1 : ℂ) else (-1 : ℂ)) • spinSSiteOpMinus x N
+
+/-- The **staggered `1`-axis order operator** `Ô_L^{(1)} = Σ_x ε_x Ŝ_x^{(1)}` for a sublattice
+assignment `A`.  Since `Ŝ^{(1)} = (Ŝ^+ + Ŝ^−)/2`, this is `(Ô_L^+ + Ô_L^−)/2`; it is the order
+operator whose direction `(1,0,0)` the Tanaka symmetry-breaking state singles out. -/
+noncomputable def staggeredOrderOp1S (A : Λ → Bool) (N : ℕ) : ManyBodyOpS Λ N :=
+  ∑ x : Λ, (if A x then (1 : ℂ) else (-1 : ℂ)) • spinSSiteOp1 x N
+
+/-- The squared `L²` norm of a vector, as a real number: `vecNormSqRe w = (⟨w, w⟩).re`.  Used as the
+positive denominator in Rayleigh quotients and as the well-definedness witness for normalization. -/
+noncomputable def vecNormSqRe {ι : Type*} [Fintype ι] (w : ι → ℂ) : ℝ :=
+  (star w ⬝ᵥ w).re
+
+/-- **Unit normalization** of a vector in the `L²` inner product: `unitNormalize w = ‖w‖⁻¹ • w`
+(with `‖w‖ = √⟨w, w⟩`, and `0` when `w = 0`). -/
+noncomputable def unitNormalize {ι : Type*} [Fintype ι] (w : ι → ℂ) : ι → ℂ :=
+  ((Real.sqrt (vecNormSqRe w) : ℝ) : ℂ)⁻¹ • w
+
+/-- The (unnormalized) `k`-th **Tanaka tower term** `(Ô_L^{(1)})^k Φ`, built with the `1`-axis
+staggered order operator. -/
+noncomputable def tanakaTowerTerm (A : Λ → Bool) (N k : ℕ)
+    (Φ : (Λ → Fin (N + 1)) → ℂ) : (Λ → Fin (N + 1)) → ℂ :=
+  ((staggeredOrderOp1S A N) ^ k).mulVec Φ
+
+/-- The **Tanaka symmetry-breaking state** `|Ξ_{(1,0,0)}⟩` (eq. (4.2.10)): the normalized sum of two
+adjacent `1`-axis tower terms, each separately unit-normalized, with the global `1/√2`,
+`|Ξ_{(1,0,0)}⟩ = (1/√2)( (Ô_L^{(1)})^M Φ / ‖·‖ + (Ô_L^{(1)})^{M+1} Φ / ‖·‖ )`.  Each term is
+normalized on its own (faithful to (4.2.10)); the two terms lie in opposite-magnetization-parity
+subspaces (orthogonal), and their interference magnifies the part of `Φ` with large positive
+`Ô_L^{(1)}` — a candidate physical "ground state" with full `SU(2)` symmetry breaking in the
+`(1,0,0)` direction. -/
+noncomputable def tanakaSSBState (A : Λ → Bool) (N M : ℕ)
+    (Φ : (Λ → Fin (N + 1)) → ℂ) : (Λ → Fin (N + 1)) → ℂ :=
+  ((Real.sqrt (2 : ℝ) : ℂ))⁻¹ •
+    (unitNormalize (tanakaTowerTerm A N M Φ) + unitNormalize (tanakaTowerTerm A N (M + 1) Φ))
 
 /-- The **Anderson tower trial state** `ψ_M = (Ô_L^{sgn M})^{|M|} Φ` (eq. (4.2.3), unnormalized): for
 `M ≥ 0` apply the staggered *raising* operator `M` times, for `M < 0` apply the staggered *lowering*
@@ -97,26 +132,33 @@ The theorem is **conditional on long-range order**: the constants depend on the 
 hypothesis, eq. (4.1.7)).  In one dimension there is no such ground state (Corollary 4.3,
 `no_long_range_order_1d`), so the statement is vacuous there — exactly as in Tasaki.
 Tasaki sketches the reflection-positivity / infinite-volume proof (§4.2.2); recorded here as a
-faithful, sound documented axiom over the concrete torus family. -/
-axiom tower_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
-    ∃ C₁ C₂ : ℝ, 0 < C₁ ∧ 0 < C₂ ∧
-      ∀ (L : ℕ) [NeZero L], 2 ≤ L → Even L →
-        ∀ (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ) (M : ℤ),
-          (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ →
-          (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
-            (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) →
-          Φ ≠ 0 →
-          q₀ ≤ (star Φ ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
-              staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ)).re /
-              ((star Φ ⬝ᵥ Φ).re * ((L : ℝ) ^ d) ^ 2) →
-          (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
-          towerState (torusParitySublattice d L) N M Φ ≠ 0 →
+faithful, sound documented axiom over the concrete torus family.
+
+The body is factored as the predicate `IsAndersonTowerConstants d N q₀ C₁ C₂` (positivity of the
+constants together with the per-torus tower bound), so that Theorem 4.8 can assert the *same*
+constants `C₁`, `C₂`. -/
+def IsAndersonTowerConstants (d N : ℕ) (q₀ C₁ C₂ : ℝ) : Prop :=
+  0 < C₁ ∧ 0 < C₂ ∧
+    ∀ (L : ℕ) [NeZero L], 2 ≤ L → Even L →
+      ∀ (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ) (M : ℤ),
+        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ →
+        (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+          (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) →
+        Φ ≠ 0 →
+        q₀ ≤ (star Φ ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
+            staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ)).re /
+            ((star Φ ⬝ᵥ Φ).re * ((L : ℝ) ^ d) ^ 2) →
+        (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
+        towerState (torusParitySublattice d L) N M Φ ≠ 0 →
+        (star (towerState (torusParitySublattice d L) N M Φ) ⬝ᵥ
+            (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec
+              (towerState (torusParitySublattice d L) N M Φ)).re /
           (star (towerState (torusParitySublattice d L) N M Φ) ⬝ᵥ
-              (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec
-                (towerState (torusParitySublattice d L) N M Φ)).re /
-            (star (towerState (torusParitySublattice d L) N M Φ) ⬝ᵥ
-              towerState (torusParitySublattice d L) N M Φ).re ≤
-          E₀.re + C₂ * (M : ℝ) ^ 2 / (L : ℝ) ^ d
+            towerState (torusParitySublattice d L) N M Φ).re ≤
+        E₀.re + C₂ * (M : ℝ) ^ 2 / (L : ℝ) ^ d
+
+axiom tower_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
+    ∃ C₁ C₂ : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂
 
 /-- **Tasaki Corollary 4.7 (the tower of low-lying energy eigenstates), AXIOM.**  Exactly as
 Theorem 3.1 turns a low-lying trial state into a low-lying energy eigenstate, Theorem 4.6 yields, for
@@ -150,5 +192,52 @@ axiom tower_lowLying_eigenstates (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ 
             (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E_M • Ψ ∧
             E₀.re < E_M.re ∧ E_M.re ≤ E₀.re + C₂ * (M : ℝ) ^ 2 / (L : ℝ) ^ d ∧
             (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Ψ = (μ₀ + (M : ℂ)) • Ψ
+
+/-- The Tanaka Theorem 4.8 energy bound for fixed constants `C₁`, `C₂` (the body of Theorem 4.8,
+factored so that the axiom can assert the *same* constants as Theorem 4.6).  For each `M(L) > 0` with
+`M + 1 ≤ C₁ L^{d/2}`, on every even-side torus the Tanaka symmetry-breaking state
+`Ξ_{(1,0,0)} = tanakaSSBState A N M Φ` obeys the Rayleigh-ratio bound (eq. (4.2.11)):
+`⟨Ξ, Ĥ Ξ⟩ / ⟨Ξ, Ξ⟩ ≤ E_GS + C₂ {M+1}² / L^d`.
+
+The two tower terms and the state itself are required to have strictly positive squared norm
+(`vecNormSqRe > 0`), the well-definedness condition for `unitNormalize` (the Tanaka state is built by
+normalizing each term separately).  Conditional on long-range order (the same `q₀` premise as
+Theorem 4.6), hence vacuous in one dimension by Corollary 4.3. -/
+def IsTanakaSSBConstants (d N : ℕ) (q₀ C₁ C₂ : ℝ) : Prop :=
+  0 < C₁ ∧ 0 < C₂ ∧
+    ∀ (L : ℕ) [NeZero L], 2 ≤ L → Even L →
+      ∀ (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ) (M : ℕ),
+        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ →
+        (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+          (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) →
+        Φ ≠ 0 →
+        q₀ ≤ (star Φ ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
+            staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ)).re /
+            ((star Φ ⬝ᵥ Φ).re * ((L : ℝ) ^ d) ^ 2) →
+        0 < M →
+        ((M : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
+        0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N M Φ) →
+        0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M + 1) Φ) →
+        0 < vecNormSqRe (tanakaSSBState (torusParitySublattice d L) N M Φ) →
+        (star (tanakaSSBState (torusParitySublattice d L) N M Φ) ⬝ᵥ
+            (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec
+              (tanakaSSBState (torusParitySublattice d L) N M Φ)).re /
+          (star (tanakaSSBState (torusParitySublattice d L) N M Φ) ⬝ᵥ
+            tanakaSSBState (torusParitySublattice d L) N M Φ).re ≤
+        E₀.re + C₂ * ((M : ℝ) + 1) ^ 2 / (L : ℝ) ^ d
+
+/-- **Tasaki Theorem 4.8 (the Tanaka symmetry-breaking state is low-lying), AXIOM.**  With the *same*
+constants `C₁`, `C₂` as Theorem 4.6 (`IsAndersonTowerConstants`), the Tanaka state `|Ξ_{(1,0,0)}⟩`
+(eq. (4.2.10)) — a candidate physical "ground state" with full symmetry breaking — is itself a
+low-lying state (eq. (4.2.11), `IsTanakaSSBConstants`):
+`⟨Ξ_{(1,0,0)}| Ĥ |Ξ_{(1,0,0)}⟩ / ⟨Ξ_{(1,0,0)}, Ξ_{(1,0,0)}⟩ ≤ E_GS + C₂ {M(L)+1}² / L^d`,
+for any increasing `M = M(L) > 0` with `M + 1 ≤ C₁ L^{d/2}`.
+
+Asserting both predicates with one pair `(C₁, C₂)` formalizes Tasaki's "with the same constants as in
+Theorem 4.6".  Conditional on long-range order, hence vacuous in one dimension by Corollary 4.3.
+Tasaki sketches the proof (§4.2.2, following Tanaka [62]); recorded here as a faithful, sound
+documented axiom over the torus family. -/
+axiom tanakaSSB_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
+    ∃ C₁ C₂ : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂ ∧ IsTanakaSSBConstants d N q₀ C₁ C₂
 
 end LatticeSystem.Quantum

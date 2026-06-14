@@ -7892,6 +7892,21 @@ $O(L^{d/2})$ distinct low-lying energy eigenstates --- the rigorous Anderson tow
 \texttt{tower\_lowLying\_eigenstates} is conditional on long-range order (the same $q_0$ premise as
 Theorem 4.6), hence vacuous in one dimension by Corollary 4.3.  Chapters~3--10 backfill.
 
+\noindent\textbf{Theorem 4.8} (Tanaka, Tasaki §4.2.1, eqs.~(4.2.10)--(4.2.11), pp.~97--98;
+documented axiom, \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The Tanaka
+full-symmetry-breaking state is low-lying: the candidate physical ``ground state''
+$|\Xi_{(1,0,0)}\rangle=\tfrac1{\sqrt2}\bigl((\hat O_L^{(1)})^M|\Phi_{\mathrm{GS}}\rangle/\lVert\cdot
+\rVert+(\hat O_L^{(1)})^{M+1}|\Phi_{\mathrm{GS}}\rangle/\lVert\cdot\rVert\bigr)$ (eq.~(4.2.10),
+\texttt{tanakaSSBState}; each term separately normalized via \texttt{unitNormalize} and
+\texttt{vecNormSqRe}, with the $1$-axis staggered operator \texttt{staggeredOrderOp1S}) satisfies
+$\langle\Xi_{(1,0,0)}|\hat H|\Xi_{(1,0,0)}\rangle/\langle\Xi_{(1,0,0)}|\Xi_{(1,0,0)}\rangle\le
+E_{\mathrm{GS}}+C_2\{M+1\}^2/L^d$ (eq.~(4.2.11)) for $M>0$ with $M+1\le C_1 L^{d/2}$.  The axiom
+\texttt{tanakaSSB\_lowLying\_energy\_bound} asserts both \texttt{IsAndersonTowerConstants} (the
+Theorem 4.6 body, refactored as a predicate) and \texttt{IsTanakaSSBConstants} for one pair
+$(C_1,C_2)$, formalizing Tasaki's ``with the same constants as in Theorem 4.6''.  Stated in
+scale-invariant Rayleigh-ratio form, conditional on long-range order (vacuous in one dimension by
+Corollary 4.3).  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
