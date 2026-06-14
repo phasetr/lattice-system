@@ -1,4 +1,4 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.SaturatedFerromagnetism
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardFerromagnetismStructure
 import Mathlib.Analysis.Matrix.Spectrum
 
 /-!
@@ -40,19 +40,32 @@ noncomputable def hubbardFermiGap (ht : Matrix.IsHermitian t) :
   Finset.univ.sup' Finset.univ_nonempty ht.eigenvalues -
     Finset.univ.inf' Finset.univ_nonempty ht.eigenvalues
 
-/-- **Tasaki Theorem 11.3 (impossibility of ferromagnetism for small `U`), AXIOM.**  For the
-all-to-all Hubbard model with Hermitian hopping `t`, if `0 ≤ U` is strictly below the
-single-particle Fermi gap `hubbardFermiGap`, then the model is **not** saturated-ferromagnetic.
+/-- **Tasaki Theorem 11.3 (impossibility of ferromagnetism for small `U`), AXIOM.**  Let `E₀` be the
+genuine half-filling (`N + 1`-electron) ground energy of the Hubbard model with Hermitian hopping
+`t`: its eigenspace is nonzero (`hne`) and `E₀` is minimal among energies with a nonzero
+`(N + 1)`-electron eigenspace (`hmin`).  If `0 ≤ U` is strictly below the single-particle Fermi gap
+`hubbardFermiGap`, then the ground states are **not** all maximal-spin: some ground state has
+`S_tot < S_max`, so the
+model is not saturated-ferromagnetic.
+
+The conclusion negates the *pinned* ground-state max-spin property (over
+`hubbardEigenspaceAtFilling` at the real ground energy `E₀`), not the vacuously-satisfiable
+`isSaturatedFerromagnet`, so the
+impossibility statement is sound.
 
 Tasaki's proof: the trial state `|Ψ⟩ = ĉ†_{1,↓} ∏_{j=1}^{N-1} ĉ†_{j,↑}|0⟩` (eq. (11.1.6), one spin
 flipped into the lowest single-particle level) has energy `E_ferro − (ε_N − ε_1) + U·‖…‖²`, strictly
-below `E_ferro` when `U < ε_N − ε_1`, so the maximal-spin all-up state is not the unique ground
-state.  The variational estimate uses the single-particle eigenbasis fermion operators; it is
-finite-dimensional but needs that eigenbasis machinery, so it is recorded here as a documented axiom
-(to be discharged), matching the policy for the other deferred Chapter 11 results. -/
+below `E_ferro` when `U < ε_N − ε_1`, so the maximal-spin all-up state is not the ground state.  The
+variational estimate uses the single-particle eigenbasis fermion operators; it is finite-dimensional
+but needs that eigenbasis machinery, so it is recorded here as a documented axiom (to be
+discharged), matching the policy for the other deferred Chapter 11 results. -/
 axiom hubbard_theorem_11_3
-    (ht : Matrix.IsHermitian t) (U : ℝ)
+    (ht : Matrix.IsHermitian t) (U : ℝ) (E₀ : ℂ)
+    (hne : hubbardEigenspaceAtFilling t (U : ℂ) E₀ ≠ ⊥)
+    (hmin : ∀ E : ℂ, hubbardEigenspaceAtFilling t (U : ℂ) E ≠ ⊥ → E₀.re ≤ E.re)
     (hU0 : 0 ≤ U) (hUlt : U < hubbardFermiGap t ht) :
-    ¬ isSaturatedFerromagnet N t (U : ℂ)
+    ¬ ∀ v ∈ hubbardEigenspaceAtFilling t (U : ℂ) E₀,
+      (fermionTotalSpinSquared N).mulVec v
+        = (((N + 1 : ℕ) : ℂ) / 2 * (((N + 1 : ℕ) : ℂ) / 2 + 1)) • v
 
 end LatticeSystem.Fermion
