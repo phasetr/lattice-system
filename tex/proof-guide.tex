@@ -8223,6 +8223,29 @@ into the predicate \texttt{IsBECTowerConstants}; the bound is conditional on ODL
 projection is the identity in the spin-$1/2$ formulation.  Proved by Koma--Tasaki~[21]; recorded as a
 documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{Theorem 5.3} (U(1) symmetry-breaking states of hard-core bosons; Tasaki §5.3,
+eqs.~(5.3.5)--(5.3.8), pp.~141--142; documented axiom,
+\texttt{Quantum/SpinS/BoseEinsteinCondensate.lean}, Issue \#4485).  This is the BEC counterpart of the
+Tanaka full-symmetry-breaking Theorem~4.9.  We introduce the phase-$\theta$ coherent state
+$\Xi_\theta=(2M_{\max}+1)^{-1/2}\sum_{M=-M_{\max}}^{M_{\max}}e^{-iM\theta}\Gamma_M$
+(\texttt{becCoherentState}, eq.~5.3.5; $\Gamma_M$ the normalized tower states), together with the
+slow-window predicate \texttt{IsSlowBECWindow} ($M_{\max}$ monotone, $\to\infty$, $\le C_1L^{d/2}$
+eventually) and the complex Rayleigh ratio \texttt{expectationRatioComplex} (for the non-self-adjoint
+$\hat O_L^\pm$).  The axiom \texttt{tasaki\_5\_3\_bec\_u1\_ssb} asserts that for every phase $\theta$
+and realizing ground-state family, there \emph{exists} a sufficiently slowly diverging $M_{\max}$
+(existential, matching Tasaki's ``if $M_{\max}$ diverges not too rapidly'' and Theorem~4.9's $\exists
+M$) for which $\Xi_\theta$ fully breaks the
+$U(1)$ symmetry: the magnetization densities converge to a classical planar vector of length $m_\ast$
+in direction $\theta$ --- (5.3.7) $\langle\hat O_L^{(1)}\rangle/L^d\to m_\ast\cos\theta$,
+$\langle\hat O_L^{(2)}\rangle/L^d\to m_\ast\sin\theta$; (5.3.8) the squared moments $\to(m_\ast\cos
+\theta)^2,(m_\ast\sin\theta)^2$; (5.3.6) the complex moments $\langle\hat O_L^\pm\rangle/L^d\to
+m_\ast e^{\pm i\theta}$ --- with the order parameter $m_\ast\ge\sqrt{2q_0}$ (the $U(1)$ $\sqrt2$
+bound, companion of Theorem~4.11's $\sqrt3$).  The limits are stated in the sound eventual-$\varepsilon$
+form (footnote~9: the $\lim$ is to be interpreted properly), the construction is bundled into
+\texttt{IsBECCoherentSSBConstants}, and the statement is conditional on ODLRO.  Proved by
+Koma--Tasaki~[21]; recorded as a documented axiom.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
