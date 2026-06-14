@@ -122,6 +122,7 @@ full-SSB statements and conditional on long-range order (vacuous in one dimensio
 Conjecture 4.12 enters only as a hypothesis (`IsConjecture412Equality`); never asserted true. -/
 axiom tanakaSphereAverage_groundState (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
     ∃ C₁ C₂ mStar : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂ ∧
+      IsTanakaSSBConstants d N q₀ C₁ C₂ ∧
       IsTanakaFullSSBConstants d N q₀ C₁ mStar ∧
       IsTanakaSphereAverageConstants d N q₀ C₁ mStar
 
