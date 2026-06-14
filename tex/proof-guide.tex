@@ -8018,6 +8018,19 @@ in Proposition 4.10).  Being purely analytic, it is \emph{proved axiom-free}
 and the step index $m(L)=\texttt{Nat.findGreatest}$), with no operators or physics.  Chapters~3--10
 backfill.
 
+\noindent\textbf{Definition 4.17} (Tasaki §4.3.1, eqs.~(4.3.1)--(4.3.4), pp.~112--113;
+\texttt{Quantum/SpinS/InfiniteVolumeGroundState.lean}, Issue \#4485).  Ground state of the
+\emph{infinite-volume} antiferromagnetic Heisenberg model on $\mathbb{Z}^d$.  The
+\texttt{structure InfiniteSpinSystem}\,$d\,A$ bundles the quasi-local $C^\ast$-algebra $A$, the
+per-site spin operators $\hat S_x^{(\alpha)}$ (\texttt{spin}), and the translation automorphisms
+$\tau_x$ (\texttt{transl}, bundled star-algebra isomorphisms, eq.~(4.3.3)); helpers
+\texttt{evenSite}, \texttt{bond} ($B_\infty$), \texttt{spinDot} ($\hat S_x\cdot\hat S_y$), and
+\texttt{TranslationInvariant} are provided over the reused state machinery (\texttt{IsState},
+\texttt{WeakDual}).  A translation-invariant state $\omega$ is a ground state
+(\texttt{IsInfiniteVolumeGroundState}) iff $\omega(\hat S_x\cdot\hat S_y)=\varepsilon_{\mathrm{GS}}$
+for every nearest-neighbor bond, the infinite-volume variational characterization restricted to
+translation-invariant states.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
