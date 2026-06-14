@@ -483,7 +483,7 @@ scope). Tasaki §3.4, Theorem 3.1, eqs. (3.4.7)–(3.4.12), pp. 66–67.
 | Lean name | Statement | File |
 |---|---|---|
 | `horsch_vonderLinden_lowLying` | for Hermitian `H` with min eigenvalue `E₀ = eigenvalues i₀`, a unit state `Γ` orthogonal to the ground eigenvector with `⟨Γ,HΓ⟩ ≤ E₀+δ` yields an energy eigenstate `j ≠ i₀` with `E₀ ≤ E_j ≤ E₀+δ` (a low-lying state; possibly another ground state if degenerate, as Tasaki notes) | `Quantum/HorschVonderLinden.lean` |
-| `kaplan_horsch_vonderLinden_order_lower_bound` | **Theorem 3.2** (§3.4): for the field-perturbed ground state `Ψ` of `H − h·O` (`h>0`) and any trial `Ξ`, the order parameter obeys `⟨Ξ,OΞ⟩ + (E₀−⟨Ξ,HΞ⟩)/h ≤ ⟨Ψ,OΨ⟩` (eq. (3.4.21), the variational core; the double limit `L↑∞,h↓0` gives the √q₀ SSB bound) | `Quantum/KaplanHorschVonderLinden.lean` |
+| `kaplan_horsch_vonderLinden_order_lower_bound` | **Theorem 3.2, finite-volume core** (§3.4; the thermodynamic double limit 3.4.22 is not formalized): for the field-perturbed ground state `Ψ` of `H − h·O` (`h>0`) and any trial `Ξ`, the order parameter obeys `⟨Ξ,OΞ⟩ + (E₀−⟨Ξ,HΞ⟩)/h ≤ ⟨Ψ,OΨ⟩` (eq. (3.4.21), the variational core; the double limit `L↑∞,h↓0` gives the √q₀ SSB bound) | `Quantum/KaplanHorschVonderLinden.lean` |
 
 ### Total spin operator (Tasaki §2.2 eq. (2.2.7), (2.2.8))
 
