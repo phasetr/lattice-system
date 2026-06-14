@@ -383,9 +383,12 @@ so `m∗` is the order parameter of the *selected* Tanaka construction, not an a
 requires `Φ L` to be an eventual minimizing ground state (eigenvector, minimal `.re`, nonzero) with
 well-defined Tanaka terms;
 `hLRO` pins `q₀` as the long-range-order limit (eq. (4.1.7) / (4.2.25)) and `hSSB` pins `m∗` as the
-staggered-moment limit of the Tanaka state (eq. (4.2.12), exact two-sided limit).  These hypotheses
-are unsatisfiable in `d = 1` (no LRO ground state, Corollary 4.3), so the bound applies exactly where
-it should.  `m∗ > 0` then follows from `q₀ > 0`. -/
+staggered-moment limit of the Tanaka state (eq. (4.2.12), exact two-sided limit).  `hSSBpred :
+IsTanakaFullSSBConstants d N q₀ C₁ m∗` connects `m∗` to the full-symmetry-breaking API (Theorem 4.9)
+so the bound composes with it for the *same* `m∗`; the exact-limit `hSSB` forces `m∗` to the unique
+limit value, so the predicate's downward-closure is harmless.  These hypotheses are unsatisfiable in
+`d = 1` (no LRO ground state, Corollary 4.3), so the bound applies exactly where it should.  `m∗ > 0`
+then follows from `q₀ > 0`. -/
 axiom tanakaSSB_orderParameter_lowerBound (d N : ℕ) (hd : 1 ≤ d) (q₀ mStar C₁ : ℝ)
     (hq₀ : 0 < q₀) (hC₁ : 0 < C₁)
     (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ) (M : ℕ → ℕ)
@@ -404,7 +407,8 @@ axiom tanakaSSB_orderParameter_lowerBound (d N : ℕ) (hd : 1 ≤ d) (q₀ mStar
           staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
           ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2) - q₀| < ε)
     (hSSB : ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
-      |tanakaOrderMean1 d L N (M L) (Φ L) - mStar| < ε) :
+      |tanakaOrderMean1 d L N (M L) (Φ L) - mStar| < ε)
+    (hSSBpred : IsTanakaFullSSBConstants d N q₀ C₁ mStar) :
     Real.sqrt (3 * q₀) ≤ mStar
 
 end LatticeSystem.Quantum
