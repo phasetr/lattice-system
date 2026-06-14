@@ -8056,6 +8056,15 @@ magnetization $\omega_n(\hat S_x^{(\alpha)})=(-1)^x m^\ast n_\alpha$ (eq.~(4.3.1
 \texttt{staggeredSign}) --- long-range order and full symmetry breaking.  The $L\uparrow\infty$
 limits' existence is assumed (Banach--Alaoglu, Theorem A.24); both axioms are conditional on \texttt{IsGroundStateEnergyDensity}\,$S\ \varepsilon_{\mathrm{GS}}$ (the genuine energy density, eq.~(4.3.4)).  Chapters~3--10 backfill.
 
+\noindent\textbf{Conjecture 4.21} (Tasaki §4.3.1, eq.~after~(4.3.10), p.~115; axiom-free \texttt{Prop}
+statement, \texttt{Quantum/SpinS/InfiniteVolumeGroundState.lean}, Issue \#4485).  The symmetry-breaking
+infinite-volume ground states are physical.  Being \emph{unproven}, it is registered as
+\texttt{def conjecture\_4\_21 (S) (}$\varepsilon_{\mathrm{GS}}$\texttt{) : Prop}: every infinite-volume
+ground state $\omega$ with the N\'eel magnetization $\omega(\hat S_x^{(\alpha)})=(-1)^x m^\ast
+n_\alpha$ (the $\omega_n$ of Theorem 4.20) is \emph{ergodic}, hence a physical ground state
+(Definition 4.19).  It is \textbf{never asserted true} (no \texttt{axiom}/\texttt{theorem} derives it).
+Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}

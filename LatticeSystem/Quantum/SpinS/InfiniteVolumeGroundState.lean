@@ -173,6 +173,23 @@ axiom theorem_4_20_omegaN (S : InfiniteSpinSystem d A) (εGS : ℝ)
       ∀ (x : Fin d → ℤ) (α : Fin 3),
         ωn (S.spin x α) = ((staggeredSign x : ℝ) : ℂ) * (mStar : ℂ) * (n α : ℂ)
 
+/-- **Tasaki Conjecture 4.21 (the symmetry-breaking ground states are physical), as a `Prop`
+STATEMENT ONLY** (eq. after (4.3.10)).  This registers the *unproven* conjecture as a numbered,
+searchable item; it is a `def … : Prop` and is **never asserted true** (no `axiom`/`theorem` derives
+it — that would be unsound, the conjecture being open).
+
+The statement: every symmetry-breaking infinite-volume ground state `ω` — a translation-invariant
+ground state with the Néel magnetization `ω(Ŝ_x^{(α)}) = (−1)^x m∗ n_α` for some `m∗ > 0` and unit
+direction `n` (the `ω_n` of Theorem 4.20) — is **ergodic**, hence a *physical* ground state
+(Definition 4.19).  This conjecture motivates identifying the low-lying states `|Ξ_n⟩` as physical
+"ground states".  Tasaki believes it likely valid but it is open; we record it without asserting it. -/
+def conjecture_4_21 (S : InfiniteSpinSystem d A) (εGS : ℝ) : Prop :=
+  ∀ (mStar : ℝ), 0 < mStar → ∀ (n : Fin 3 → ℝ), IsUnitVector n →
+    ∀ (ω : WeakDual ℂ A), IsInfiniteVolumeGroundState S εGS ω →
+      (∀ (x : Fin d → ℤ) (α : Fin 3),
+        ω (S.spin x α) = ((staggeredSign x : ℝ) : ℂ) * (mStar : ℂ) * (n α : ℂ)) →
+      IsErgodic S ω
+
 end InfiniteSpinSystem
 
 end LatticeSystem.Quantum
