@@ -371,4 +371,44 @@ axiom tanakaSSB_full_symmetry_breaking (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (
     ∃ C₁ C₂ mStar : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂ ∧
       IsTanakaSSBConstants d N q₀ C₁ C₂ ∧ IsTanakaFullSSBConstants d N q₀ C₁ mStar
 
+/-- **Tasaki Theorem 4.11 (the two order parameters), AXIOM.**  The symmetry-breaking order parameter
+`m∗` and the long-range-order parameter `q₀` satisfy `√(3 q₀) ≤ m∗` (eq. (4.2.23)).  The factor `√3`
+reflects the `SU(2)` symmetry of the Heisenberg model (for the `U(1)`/XXZ variant it is `√2`).
+
+To avoid the downward-closure of `IsTanakaFullSSBConstants` (a `liminf ≥ m` lower bound, true for any
+smaller `m` and vacuously true in `d = 1`), `m∗` and `q₀` are pinned as the **exact** infinite-volume
+limits of a *genuine* realizing ground-state family `Φ` and the *realizing* slowly-diverging tower
+sequence `M` (`hMdiv : Tendsto M atTop atTop`, with the growth bound `M L + 1 ≤ C₁ L^{d/2}` in `hGS`),
+so `m∗` is the order parameter of the *selected* Tanaka construction, not an arbitrary mean.  `hGS`
+requires `Φ L` to be an eventual minimizing ground state (eigenvector, minimal `.re`, nonzero) with
+well-defined Tanaka terms;
+`hLRO` pins `q₀` as the long-range-order limit (eq. (4.1.7) / (4.2.25)) and `hSSB` pins `m∗` as the
+staggered-moment limit of the Tanaka state (eq. (4.2.12), exact two-sided limit).  `hSSBpred :
+IsTanakaFullSSBConstants d N q₀ C₁ m∗` connects `m∗` to the full-symmetry-breaking API (Theorem 4.9)
+so the bound composes with it for the *same* `m∗`; the exact-limit `hSSB` forces `m∗` to the unique
+limit value, so the predicate's downward-closure is harmless.  These hypotheses are unsatisfiable in
+`d = 1` (no LRO ground state, Corollary 4.3), so the bound applies exactly where it should.  `m∗ > 0`
+then follows from `q₀ > 0`. -/
+axiom tanakaSSB_orderParameter_lowerBound (d N : ℕ) (hd : 1 ≤ d) (q₀ mStar C₁ : ℝ)
+    (hq₀ : 0 < q₀) (hC₁ : 0 < C₁)
+    (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ) (M : ℕ → ℕ)
+    (hMdiv : Filter.Tendsto M Filter.atTop Filter.atTop)
+    (hGS : ∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
+      (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec (Φ L) = E₀ L • Φ L ∧
+      (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
+      Φ L ≠ 0 ∧
+      0 < M L ∧ ((M L : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) ∧
+      0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L) (Φ L)) ∧
+      0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L + 1) (Φ L)) ∧
+      0 < vecNormSqRe (tanakaSSBState (torusParitySublattice d L) N (M L) (Φ L)))
+    (hLRO : ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+      |(star (Φ L) ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
+          staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
+          ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2) - q₀| < ε)
+    (hSSB : ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+      |tanakaOrderMean1 d L N (M L) (Φ L) - mStar| < ε)
+    (hSSBpred : IsTanakaFullSSBConstants d N q₀ C₁ mStar) :
+    Real.sqrt (3 * q₀) ≤ mStar
+
 end LatticeSystem.Quantum
