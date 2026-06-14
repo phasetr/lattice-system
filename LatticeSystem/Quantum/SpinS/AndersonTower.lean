@@ -118,4 +118,37 @@ axiom tower_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀
               towerState (torusParitySublattice d L) N M Φ).re ≤
           E₀.re + C₂ * (M : ℝ) ^ 2 / (L : ℝ) ^ d
 
+/-- **Tasaki Corollary 4.7 (the tower of low-lying energy eigenstates), AXIOM.**  Exactly as
+Theorem 3.1 turns a low-lying trial state into a low-lying energy eigenstate, Theorem 4.6 yields, for
+each nonzero magnetization `M ≠ 0`, an energy eigenstate `Ψ_M` in the `Ŝ_tot^{(3)}` sector `M`
+(eq. (4.2.7)): `E_GS < E_M ≤ E_GS + C₂ M² / L^d` (the strict gap is the excitation; `M = 0` is the
+ground state itself, excluded).
+
+Here the ground state `Φ` lies in a definite magnetization sector (`totalSpinSOp3 Φ = μ₀ • Φ`); the
+tower raises/lowers the magnetization by `M`, so `Ψ_M` lies in the sector `μ₀ + M`
+(`totalSpinSOp3 Ψ = (μ₀ + M) • Ψ`).  Distinct `M` give distinct (orthogonal) sectors, so this
+exhibits `O(L^{d/2})` distinct low-lying energy eigenstates — the rigorous Anderson tower.  The bound
+is conditional on long-range order (the same `q₀` premise as Theorem 4.6), hence vacuous in one
+dimension by Corollary 4.3.  Recorded as a faithful, sound documented axiom over the torus family. -/
+axiom tower_lowLying_eigenstates (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
+    ∃ C₁ C₂ : ℝ, 0 < C₁ ∧ 0 < C₂ ∧
+      ∀ (L : ℕ) [NeZero L], 2 ≤ L → Even L →
+        ∀ (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ μ₀ : ℂ) (M : ℤ),
+          (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ →
+          (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+            (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) →
+          Φ ≠ 0 →
+          (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = μ₀ • Φ →
+          q₀ ≤ (star Φ ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
+              staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ)).re /
+              ((star Φ ⬝ᵥ Φ).re * ((L : ℝ) ^ d) ^ 2) →
+          M ≠ 0 →
+          (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
+          towerState (torusParitySublattice d L) N M Φ ≠ 0 →
+          ∃ (Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E_M : ℂ),
+            Ψ ≠ 0 ∧
+            (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E_M • Ψ ∧
+            E₀.re < E_M.re ∧ E_M.re ≤ E₀.re + C₂ * (M : ℝ) ^ 2 / (L : ℝ) ^ d ∧
+            (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Ψ = (μ₀ + (M : ℂ)) • Ψ
+
 end LatticeSystem.Quantum

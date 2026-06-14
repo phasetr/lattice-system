@@ -7878,9 +7878,19 @@ hypercubic torus model: vertices $\texttt{HypercubicTorus}\,d\,L=\mathrm{Fin}\,d
 staggered raising/lowering operators \texttt{staggeredRaisingOpS}/\texttt{staggeredLoweringOpS}.  The
 axiom \texttt{tower\_lowLying\_energy\_bound} states eq.~(4.2.4) in scale-invariant Rayleigh-ratio
 form over the torus family.  The statement is \emph{conditional on long-range order} (a $q_0>0$
-premise bounding the staggered order parameter per site from below), hence vacuous in one dimension by
-Corollary 4.3, exactly as in Tasaki.  The deep reflection-positivity / infinite-volume construction is
-deferred (in scope).  Chapters~3--10 backfill.
+premise bounding the squared staggered order parameter $\langle(\hat O_L/L^d)^2\rangle$ from below),
+hence vacuous in one dimension by Corollary 4.3, exactly as in Tasaki.  The deep reflection-positivity
+/ infinite-volume construction is deferred (in scope).  Chapters~3--10 backfill.
+
+\noindent\textbf{Corollary 4.7} (Tasaki §4.2.1, eq.~(4.2.7), pp.~95--96; documented axiom,
+\texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The tower of low-lying energy
+\emph{eigenstates}: exactly as Theorem 3.1 turns a low-lying trial state into a low-lying energy
+eigenstate, Theorem 4.6 yields, for each magnetization $M$ with $|M|\le C_1 L^{d/2}$, an energy
+eigenstate $\Psi_M$ in the $\hat S_{\mathrm{tot}}^{(3)}$ sector $\mu_0+M$ with $E_{\mathrm{GS}}<E_M\le
+E_{\mathrm{GS}}+C_2 M^2/L^d$.  Distinct $M$ give distinct (orthogonal) sectors, so this exhibits
+$O(L^{d/2})$ distinct low-lying energy eigenstates --- the rigorous Anderson tower.  The axiom
+\texttt{tower\_lowLying\_eigenstates} is conditional on long-range order (the same $q_0$ premise as
+Theorem 4.6), hence vacuous in one dimension by Corollary 4.3.  Chapters~3--10 backfill.
 
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
