@@ -42,10 +42,13 @@ predicate (a hypothesis constraining the chain, never asserted of arbitrary oper
 axiom IsLocalRangeR (L N r : ℕ) (x : Fin L) (op : ManyBodyOpS (Fin L) N) : Prop
 
 /-- **A short-ranged `U(1)`-invariant chain** of local terms `ĥ_x` (Tasaki eq. (6.2.23) and the
-assumptions below it): each `ĥ_x` is `r`-local (`range`), bounded by `h₀` in the `L²` operator norm
-(`norm_le`), and `U(1)`-invariant, i.e. commutes with the total spin `Ŝ_tot^{(3)}` (`u1_comm`). -/
+assumptions below it): each `ĥ_x` is self-adjoint (`hermitian`, so `Ĥ = Σ_x ĥ_x` is a genuine
+Hamiltonian), `r`-local (`range`), bounded by `h₀` in the `L²` operator norm (`norm_le`), and
+`U(1)`-invariant, i.e. commutes with the total spin `Ŝ_tot^{(3)}` (`u1_comm`). -/
 structure IsShortRangeU1Chain (L N r : ℕ) (h₀ : ℝ)
     (h : Fin L → ManyBodyOpS (Fin L) N) : Prop where
+  /-- Each local term `ĥ_x` is self-adjoint (Hermitian), so `Σ_x ĥ_x` is a Hermitian Hamiltonian. -/
+  hermitian : ∀ x, (h x).IsHermitian
   /-- Each local term `ĥ_x` acts only on sites within range `r` of `x`. -/
   range : ∀ x, IsLocalRangeR L N r x (h x)
   /-- Each local term is bounded in the `L²` operator norm by `h₀`. -/
