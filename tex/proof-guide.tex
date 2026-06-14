@@ -8096,7 +8096,9 @@ axiom, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  The He
 $d\ge 2$ is \emph{disordered at sufficiently high temperature}.  Reusing the Theorem~4.22
 finite-temperature framework at general $d$ (\texttt{hd : 2 $\le$ d}), the axiom
 \texttt{tasaki\_4\_23\_high\_temperature\_disorder} asserts the existence of a threshold
-$\beta_0\in(0,\infty)$ depending only on $d$ and $S$ such that for every $\beta\in[0,\beta_0]$ both
+$\beta_0\in(0,\infty)$ depending only on $d$ and $S$ (not on the ferro/antiferro flag, which is
+universally quantified \emph{after} the $\exists\,\beta_0$) such that for every $\beta\in[0,\beta_0]$
+both
 the no-SSB magnetization vanishing (4.4.7), $\lim_{h\downarrow0}\lim_{L\uparrow\infty}\langle\hat
 S_x^{(3)}\rangle_{\beta,h}^L=0$ (same $\varepsilon$--$\delta$ / $\liminf$-subsequence form as
 Theorem~4.22), and the exponential clustering (4.4.8), $|\langle\hat S_x^{(\alpha)}\hat

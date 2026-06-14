@@ -177,12 +177,13 @@ every inverse temperature `β ∈ [0, β₀]` the model is disordered:
   `|⟨Ŝ_x^{(α)} Ŝ_y^{(α)}⟩_{β,0}^∞| ≤ C(β) exp(−|x − y| / ξ(β))`, for every `α = 1, 2, 3` and
   `x, y ∈ ℤ^d`.
 
-The high-temperature threshold `β₀` is shared by both statements (it depends only on `d` and `S`),
-so the two are bundled under one outer `∃ β₀, 0 < β₀ ∧ ∀ β ∈ [0, β₀], …`.  Proved by the
-cluster-expansion technique, valid at sufficiently high temperature in any dimension and for any
-short-ranged interaction (Tasaki [21, 50, 61]); recorded as a documented axiom. -/
-axiom tasaki_4_23_high_temperature_disorder (N : ℕ) (ferro : Bool) (d : ℕ) (hd : 2 ≤ d) :
-    ∃ β₀ : ℝ, 0 < β₀ ∧ ∀ β : ℝ, 0 ≤ β → β ≤ β₀ →
+The high-temperature threshold `β₀` is shared by both statements *and by both models* — it depends
+only on `d` and `S`, **not** on the ferromagnetic/antiferromagnetic flag — so `ferro` is universally
+quantified *after* the `∃ β₀` (the same threshold works for `ferro = true` and `ferro = false`).
+Proved by the cluster-expansion technique, valid at sufficiently high temperature in any dimension
+and for any short-ranged interaction (Tasaki [21, 50, 61]); recorded as a documented axiom. -/
+axiom tasaki_4_23_high_temperature_disorder (N d : ℕ) (hd : 2 ≤ d) :
+    ∃ β₀ : ℝ, 0 < β₀ ∧ ∀ (ferro : Bool) (β : ℝ), 0 ≤ β → β ≤ β₀ →
       (∀ (x : Fin d → ℤ) (ε : ℝ), 0 < ε → ∃ δ : ℝ, 0 < δ ∧ ∀ h : ℝ, 0 < h → h < δ →
         ∃ n₀ : ℕ, ∀ n : ℕ, n₀ ≤ n → ∃ m : ℕ, n ≤ m ∧
           |finiteVolMagnetizationS ferro d N β h x m| < ε) ∧
