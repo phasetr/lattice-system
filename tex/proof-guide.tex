@@ -8177,6 +8177,26 @@ lower bound), and $N\ge1$ is again essential.  Proved by Koma--Tasaki~[34], exte
 argument for commuting order operators; recorded as a documented axiom.  This completes Tasaki §4.4.
 Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{Theorem 5.1} (off-diagonal long-range order of hard-core bosons; Tasaki §5.1--§5.2,
+eqs.~(5.1.1)--(5.2.5), pp.~135--139; documented axiom,
+\texttt{Quantum/SpinS/BoseEinsteinCondensate.lean}, Issue \#4485).  This opens Tasaki Chapter~5 on
+Bose--Einstein condensation.  In the $u\uparrow\infty$ limit the bosonic Hubbard model (5.1.3)
+reduces to hard-core bosons (5.1.4), which are \emph{equivalent to the spin-$1/2$ XY model} (5.1.5)
+via the identification $\hat a_x^\dagger\leftrightarrow(-1)^x\hat S_x^+$, $\hat n_x\leftrightarrow\hat
+S_x^{(3)}+\tfrac12$, $\hat N\leftrightarrow\hat S_{\mathrm{tot}}^{(3)}+L^d/2$ (5.1.6)--(5.1.7); half
+filling $\rho=1/2$ is the $\hat S_{\mathrm{tot}}^{(3)}=0$ sector.  We realize the XY Hamiltonian as
+\texttt{xyHamiltonianS} (the XXZ Hamiltonian at $\lambda=D=0$, $N=1$), and the bosonic order operators
+$\hat O_L^{(1,2)}$ (5.2.2)/(5.2.4) as the staggered XY-plane spin order operators.  The axiom
+\texttt{tasaki\_5\_1\_xy\_odlro\_half\_filling} states that for $d\ge 2$ and half filling there is a
+constant $q_0>0$ (depending only on $d$) such that every ground state $\Phi_{\mathrm{GS}}$
+(eigenvector at the minimal energy, $\Phi\ne0$, $\hat S_{\mathrm{tot}}^{(3)}\Phi=0$) of
+\texttt{xyHamiltonianS} satisfies the ODLRO bound $\langle(\hat O_L^{(\alpha)})^2\rangle/\langle\Phi,
+\Phi\rangle/L^d\ge q_0$ for $\alpha=1,2$ and all sufficiently large even $L$ (5.2.5).  Half filling is
+essential, and the ground state exhibits long-range order \emph{without} symmetry breaking
+(eq.~5.2.8).  Proved by Kennedy--Lieb--Shastry and Kubo--Kishi via reflection positivity; recorded as
+a documented axiom.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
