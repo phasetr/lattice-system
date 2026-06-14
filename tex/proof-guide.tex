@@ -8023,7 +8023,7 @@ backfill.
 \emph{infinite-volume} antiferromagnetic Heisenberg model on $\mathbb{Z}^d$.  The
 \texttt{structure InfiniteSpinSystem}\,$d\,A$ bundles the quasi-local $C^\ast$-algebra $A$, the
 per-site spin operators $\hat S_x^{(\alpha)}$ (\texttt{spin}), and the translation automorphisms
-$\tau_x$ (\texttt{transl}, bundled star-algebra isomorphisms, eq.~(4.3.3)); helpers
+$\tau_x$ (\texttt{transl}, bundled star-algebra isomorphisms with the action laws $\tau_0=\mathrm{id}$, $\tau_x\circ\tau_y=\tau_{x+y}$ and spin covariance $\tau_x(\hat S_y^{(\alpha)})=\hat S_{y+x}^{(\alpha)}$, eq.~(4.3.3)); helpers
 \texttt{evenSite}, \texttt{bond} ($B_\infty$), \texttt{spinDot} ($\hat S_x\cdot\hat S_y$), and
 \texttt{TranslationInvariant} are provided over the reused state machinery (\texttt{IsState},
 \texttt{WeakDual}).  A translation-invariant state $\omega$ is a ground state

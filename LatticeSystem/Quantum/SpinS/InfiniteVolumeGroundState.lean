@@ -37,6 +37,13 @@ structure InfiniteSpinSystem (d : ℕ) (A : Type*) [CStarAlgebra A] [NormedSpace
   spin : (Fin d → ℤ) → Fin 3 → A
   /-- The translation automorphisms `τ_x` (eq. (4.3.3)). -/
   transl : (Fin d → ℤ) → (A ≃⋆ₐ[ℂ] A)
+  /-- `τ_0` is the identity (the translations form an action of `ℤᵈ`). -/
+  transl_zero : ∀ a : A, transl 0 a = a
+  /-- The translations compose additively: `τ_x ∘ τ_y = τ_{x+y}` (action law). -/
+  transl_add : ∀ (x y : Fin d → ℤ) (a : A), transl x (transl y a) = transl (x + y) a
+  /-- **Spin covariance** (eq. (4.3.3)): the translation `τ_x` moves the site-`y` spin operator to
+  site `y + x`, `τ_x(Ŝ_y^{(α)}) = Ŝ_{y+x}^{(α)}`. -/
+  transl_spin : ∀ (x y : Fin d → ℤ) (α : Fin 3), transl x (spin y α) = spin (y + x) α
 
 namespace InfiniteSpinSystem
 
