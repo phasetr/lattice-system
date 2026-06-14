@@ -8043,6 +8043,19 @@ $\hat A$ the fluctuation of the density $\hat A_L/L^d$ vanishes, $\rho(\hat A_L^
 state is a \emph{physical ground state} (\texttt{IsPhysicalGroundState}) iff it is ergodic
 (Definition 4.19).  Both are \texttt{def}-level Props.  Chapters~3--10 backfill.
 
+\noindent\textbf{Theorem 4.20} (Tasaki §4.3.1, eqs.~(4.3.7)--(4.3.10), pp.~114--115; documented
+axioms, \texttt{Quantum/SpinS/InfiniteVolumeGroundState.lean}, Issue \#4485).  The concrete
+infinite-volume ground states exist.  The state $\omega_0$, built as the $L\uparrow\infty$ limit of
+the unique finite-volume ground-state expectation $\langle\Phi_{\mathrm{GS}}|\cdot|\Phi_{\mathrm{GS}}
+\rangle$ (eq.~(4.3.7), \texttt{theorem\_4\_20\_omega0}), is a translation-invariant ground state with
+$\omega_0(\hat S_x^{(\alpha)})=0$ (eq.~(4.3.9)) --- long-range order, no symmetry breaking.  Assuming
+staggered long-range order with order parameter $m^\ast>0$ (\texttt{HasStaggeredLRO}), for every unit
+direction $n\in\mathbb{R}^3$ the state $\omega_n$ built from $\langle\Xi_n|\cdot|\Xi_n\rangle$
+(eq.~(4.3.8), \texttt{theorem\_4\_20\_omegaN}) is a translation-invariant ground state with N\'eel
+magnetization $\omega_n(\hat S_x^{(\alpha)})=(-1)^x m^\ast n_\alpha$ (eq.~(4.3.10),
+\texttt{staggeredSign}) --- long-range order and full symmetry breaking.  The $L\uparrow\infty$
+limits' existence is assumed (Banach--Alaoglu, Theorem A.24); both axioms are conditional on \texttt{IsGroundStateEnergyDensity}\,$S\ \varepsilon_{\mathrm{GS}}$ (the genuine energy density, eq.~(4.3.4)).  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
