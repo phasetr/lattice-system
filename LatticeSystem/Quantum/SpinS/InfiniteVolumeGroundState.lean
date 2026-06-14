@@ -63,7 +63,11 @@ noncomputable def spinDot (S : InfiniteSpinSystem d A) (x y : Fin d → ℤ) : A
   ∑ α : Fin 3, S.spin x α * S.spin y α
 
 /-- A state `ρ` is **translation invariant** when `ρ(τ_x a) = ρ(a)` for every observable `a` and
-every even translation `x ∈ ℤᵈ_even` (the symmetry appropriate to antiferromagnetic order). -/
+every **even** translation `x ∈ ℤᵈ_even`.  This is exactly Tasaki's convention for §4.3: he restricts
+the translations to the even sublattice `ℤᵈ_even`, "anticipating antiferromagnetic order" (the Néel
+state is invariant under even translations but *not* under odd ones), and footnote 35 explicitly
+notes this is a deliberate restriction of the general (all-`x`) notion to even translations.  So the
+`evenSite` quantifier is faithful to Definition 4.17, not a weakening. -/
 def TranslationInvariant (S : InfiniteSpinSystem d A) (ρ : WeakDual ℂ A) : Prop :=
   ∀ a : A, ∀ x : Fin d → ℤ, evenSite x → ρ (S.transl x a) = ρ a
 
