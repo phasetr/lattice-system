@@ -7707,6 +7707,22 @@ axiom sound; the only content beyond the ferromagnetism premise is the dimension
 backfill of the Chapter 11 numbered items; recorded as a documented axiom (the finite-dimensional but
 general-hopping structural argument is deferred).
 
+\noindent\textbf{Theorem 11.3} (Tasaki §11.1.1, eqs.~(11.1.5)--(11.1.6), pp.~378--379; documented
+axiom, \texttt{HubbardImpossibilityLowU.lean}, Issue \#4477).  Ferromagnetism is impossible when the
+on-site repulsion is smaller than the single-particle Fermi gap.  We build the single-particle
+spectrum \texttt{hubbardSingleParticleEnergies} (the Hermitian eigenvalues
+\texttt{ht.eigenvalues} of the hopping matrix $t$) and the Fermi gap \texttt{hubbardFermiGap}
+($\max_j\varepsilon_j-\min_j\varepsilon_j$, the completely-filled-band specialisation of Tasaki's
+$\varepsilon_N-\varepsilon_1$), and record \texttt{hubbard\_theorem\_11\_3}: for Hermitian $t$, a
+pinned genuine half-filling ground energy $E_0$ (nonempty and minimal $(N+1)$-electron eigenspace),
+and $0\le U<\texttt{hubbardFermiGap}$, the ground states are not all maximal-spin.  The conclusion
+negates the \emph{pinned} ground max-spin property over \texttt{hubbardEigenspaceAtFilling}\,$E_0$,
+not the vacuously-true \texttt{isSaturatedFerromagnet}, keeping the impossibility statement sound.
+Tasaki's variational trial state (11.1.6) (a single spin
+flip into the lowest level) undercuts the all-up energy; the estimate needs the single-particle
+eigenbasis fermion operators, so it is recorded as a documented axiom.  Another book-order Chapter 11
+backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
