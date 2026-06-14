@@ -77,4 +77,47 @@ axiom staggered_balanced_order_product_norm_le {d L N n : ℕ} [NeZero L] (hn : 
     manyBodyOperatorNormS (balancedOrderProductS d L N n s - staggeredPhatS d L N ^ n) ≤
       (n : ℝ) ^ 2 * (N : ℝ) ^ (2 * n - 1) / (L : ℝ) ^ d
 
+open Filter in
+/-- **Tasaki Lemma 4.15 (the order parameter as a `p̂`-ratio double limit), AXIOM.**  The
+symmetry-breaking order parameter `m∗` is the iterated limit of the ground-state `p̂`-ratios
+(eq. (4.2.38)): `m∗ = lim_{n↑∞} liminf_{L↑∞} ⟨p̂^{n+1}⟩ / ⟨p̂^n⟩` (the `n`-ratio is increasing and
+bounded, so the outer limit exists; the inner is a `liminf` per footnote 31).  We state the sound
+`liminf`-lower direction — for every `ε > 0`, for all large `n`, eventually in (even) `L` the ratio
+exceeds `m∗ − ε` — which captures `lim_n liminf_L ⟨p̂^{n+1}⟩/⟨p̂^n⟩ ≥ m∗`.  The axiom also records the
+`U(1)`-optimal bound `√(2 q₀) ≤ m∗` (eq. (4.2.39), the weaker `√2` companion of Theorem 4.11's `√3`).
+
+`m∗` is the genuine order parameter, pinned (as in Theorems 4.11/4.13) by a realizing ground-state
+family `Φ` with exact LRO limit `q₀`, staggered-moment limit `m∗`, `IsTanakaFullSSBConstants`, and the
+realizing slow tower `M` — unsatisfiable in `d = 1` (no LRO, Corollary 4.3), so vacuous there.  The
+`p̂`-moment denominators are positive (`hPhat`, `⟨p̂^n⟩ ≥ (2q₀)^n > 0` under LRO, eq. (4.2.37)), so the
+Rayleigh-ratio division is meaningful. -/
+axiom mStar_eq_phat_ratio_limit (d N : ℕ) (hd : 1 ≤ d) (q₀ mStar C₁ : ℝ)
+    (hq₀ : 0 < q₀) (hC₁ : 0 < C₁)
+    (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ) (M : ℕ → ℕ)
+    (hMdiv : Tendsto M atTop atTop)
+    (hGS : ∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
+      (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec (Φ L) = E₀ L • Φ L ∧
+      (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
+      Φ L ≠ 0 ∧
+      0 < M L ∧ ((M L : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) ∧
+      0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L) (Φ L)) ∧
+      0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L + 1) (Φ L)) ∧
+      0 < vecNormSqRe (tanakaSSBState (torusParitySublattice d L) N (M L) (Φ L)))
+    (hLRO : ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+      |(star (Φ L) ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
+          staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
+          ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2) - q₀| < ε)
+    (hSSB : ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+      |tanakaOrderMean1 d L N (M L) (Φ L) - mStar| < ε)
+    (hSSBpred : IsTanakaFullSSBConstants d N q₀ C₁ mStar)
+    (hPhat : ∀ (n L : ℕ) [NeZero L], 2 ≤ L → Even L →
+      0 < expectationRatioRe (staggeredPhatS d L N ^ n) (Φ L)) :
+    (∀ ε : ℝ, 0 < ε → ∃ n₀ : ℕ, ∀ n : ℕ, n₀ ≤ n →
+      ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+        mStar - ε <
+          expectationRatioRe (staggeredPhatS d L N ^ (n + 1)) (Φ L) /
+            expectationRatioRe (staggeredPhatS d L N ^ n) (Φ L)) ∧
+    Real.sqrt (2 * q₀) ≤ mStar
+
 end LatticeSystem.Quantum
