@@ -13,9 +13,10 @@ and `v̂_x = T̂^x v̂_o (T̂†)^x` is its translate.  Yarotsky [91] proved, by
 expansion:
 
 **Theorem 7.3**: for `|ε|` sufficiently small there is a positive constant `ΔE_ε > 0`, independent
-of
-`L`, such that for *any* `L` the ground state of `Ĥ_ε` is **unique**, the energy gap above it is at
-least `ΔE_ε`, and the ground-state correlation functions **decay exponentially**.
+of `L`, such that for any `L` the ground state of `Ĥ_ε` is **unique**, the energy gap above it is at
+least `ΔE_ε`, and the ground-state **connected** correlation functions **decay exponentially**.  (We
+state the connected/truncated correlation, since a symmetry-breaking perturbation can give nonzero
+one-point functions; and we take `L ≥ 3` to exclude the degenerate small rings.)
 
 We model the perturbation through `IsAKLTPerturbation` (a self-adjoint, range-`r`, uniformly bounded
 family whose translation covariance — `v̂_x = T̂^x v̂_o (T̂†)^x` — is recorded by the uninterpreted
@@ -61,6 +62,16 @@ noncomputable def perturbedAKLTHamiltonianS (L : ℕ) (ε : ℝ)
     (v : Fin L → ManyBodyOpS (Fin L) 2) : ManyBodyOpS (Fin L) 2 :=
   akltHamiltonianS L + (ε : ℂ) • ∑ x : Fin L, v x
 
+/-- The **connected (truncated) two-point correlation** `⟨Φ, Ŝ_x · Ŝ_y Φ⟩ − Σ_α ⟨Φ, Ŝ_x^{(α)} Φ⟩
+⟨Φ, Ŝ_y^{(α)} Φ⟩` (each expectation a Rayleigh ratio).  For a symmetry-breaking perturbed ground
+state the one-point functions `⟨Ŝ_x^{(α)}⟩` need not vanish, so it is the *connected* correlation —
+not the raw `⟨Ŝ_x · Ŝ_y⟩` — that decays exponentially in Yarotsky's stability theorem. -/
+noncomputable def connectedChainCorrelation (L : ℕ) (Φ : (Fin L → Fin 3) → ℂ) (x y : Fin L) : ℝ :=
+  expectationRatioRe (spinSDot x y 2) Φ -
+    (expectationRatioRe (spinSSiteOp1 x 2) Φ * expectationRatioRe (spinSSiteOp1 y 2) Φ +
+      expectationRatioRe (spinSSiteOp2 x 2) Φ * expectationRatioRe (spinSSiteOp2 y 2) Φ +
+      expectationRatioRe (spinSSiteOp3 x 2) Φ * expectationRatioRe (spinSSiteOp3 y 2) Φ)
+
 /-- `IsUniqueChainGroundState H E Φ`: `Φ` is the **unique ground state** of the chain Hamiltonian
 `H`
 at energy `E` — a nonzero eigenvector at the ground energy `E`, with every ground-energy eigenvector
@@ -74,11 +85,14 @@ def IsUniqueChainGroundState {L : ℕ} (H : ManyBodyOpS (Fin L) 2) (E : ℝ)
 `r` bounded by `v₀`, there is a positive coupling threshold `ε₀` such that for every `|ε| < ε₀`
 there
 are positive constants `ΔE`, `C`, `ξ` — all **independent of the chain length `L`** — such that for
-any `L > 0` and any AKLT perturbation family `v` (`IsAKLTPerturbation`), the perturbed AKLT
+any `L ≥ 3` and any AKLT perturbation family `v` (`IsAKLTPerturbation`), the perturbed AKLT
 Hamiltonian `Ĥ_ε = Ĥ_AKLT + ε Σ_x v̂_x` has a **unique ground state** `Φ`
 (`IsUniqueChainGroundState`), a **gap** above it of at least `ΔE` (`∃ gap ≥ ΔE`,
-`IsPositiveSpectralGap`), and **exponentially decaying correlations**
-`|⟨Φ, Ŝ_x · Ŝ_y Φ⟩ / ⟨Φ, Φ⟩| ≤ C e^{−d(x,y)/ξ}` (`d` the ring distance).
+`IsPositiveSpectralGap`), and **exponentially decaying connected correlations**
+`|connectedChainCorrelation| ≤ C e^{−d(x,y)/ξ}` (`d` the ring distance).  The correlation is the
+*connected* (truncated) one — for a symmetry-breaking perturbation the one-point functions need not
+vanish, so the raw `⟨Ŝ_x · Ŝ_y⟩` need not decay; `L ≥ 3` excludes the degenerate one- and two-site
+rings (where the AKLT term is a single-bond Casimir polynomial and the ground state is not unique).
 
 The gap stays open and the disorder persists for the whole family of small local perturbations — the
 gapful AKLT phase is stable.  Proved by Yarotsky [91] via cluster expansion; recorded as a
@@ -87,11 +101,11 @@ axiom. -/
 axiom aklt_theorem_7_3 (r : ℕ) (v₀ : ℝ) :
     ∃ ε₀ : ℝ, 0 < ε₀ ∧ ∀ ε : ℝ, |ε| < ε₀ →
       ∃ ΔE C ξ : ℝ, 0 < ΔE ∧ 0 < C ∧ 0 < ξ ∧
-        ∀ (L : ℕ), 0 < L → ∀ (v : Fin L → ManyBodyOpS (Fin L) 2), IsAKLTPerturbation L r v₀ v →
+        ∀ (L : ℕ), 3 ≤ L → ∀ (v : Fin L → ManyBodyOpS (Fin L) 2), IsAKLTPerturbation L r v₀ v →
           ∃ (E : ℝ) (Φ : (Fin L → Fin 3) → ℂ),
             IsUniqueChainGroundState (perturbedAKLTHamiltonianS L ε v) E Φ ∧
             (∃ gap : ℝ, ΔE ≤ gap ∧ IsPositiveSpectralGap (perturbedAKLTHamiltonianS L ε v) gap) ∧
-            ∀ x y : Fin L, |expectationRatioRe (spinSDot x y 2) Φ| ≤
+            ∀ x y : Fin L, |connectedChainCorrelation L Φ x y| ≤
               C * Real.exp (-(ringDist L x y : ℝ) / ξ)
 
 end LatticeSystem.Quantum

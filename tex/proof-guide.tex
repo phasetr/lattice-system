@@ -8396,12 +8396,14 @@ uniformly bounded ($\texttt{manyBodyOperatorNormS}\le v_0$), and translation cov
 ($\hat v_x=\hat T^x\hat v_o\hat T^{-x}$, recorded by the uninterpreted marker
 \texttt{IsTranslationCovariant}).  The axiom \texttt{aklt\_theorem\_7\_3} states that for range $r$
 bounded by $v_0$ there is $\varepsilon_0>0$ such that for every $|\varepsilon|<\varepsilon_0$ there are
-$L$-\emph{independent} constants $\Delta E,C,\xi>0$ with: for any $L>0$ and any such $v$, the
+$L$-\emph{independent} constants $\Delta E,C,\xi>0$ with: for any $L\ge3$ and any such $v$, the
 perturbed AKLT chain has a \emph{unique ground state} (\texttt{IsUniqueChainGroundState}), a gap
-$\ge\Delta E$ (\texttt{IsPositiveSpectralGap}), and exponentially decaying correlations
-$|\langle\Phi,\hat S_x\!\cdot\!\hat S_y\Phi\rangle/\langle\Phi,\Phi\rangle|\le Ce^{-d(x,y)/\xi}$ (ring
-distance).  Proved by Yarotsky via cluster expansion; recorded as a documented axiom.  Chapters~3--10
-backfill.
+$\ge\Delta E$ (\texttt{IsPositiveSpectralGap}), and exponential decay of the \emph{connected}
+correlation $|\texttt{connectedChainCorrelation}|\le Ce^{-d(x,y)/\xi}$ (ring distance).  The connected
+/truncated correlation $\langle\hat S_x\!\cdot\!\hat S_y\rangle-\sum_\alpha\langle\hat S_x^{(\alpha)}
+\rangle\langle\hat S_y^{(\alpha)}\rangle$ is used because a symmetry-breaking perturbation can give
+nonzero one-point functions, and $L\ge3$ excludes the degenerate small rings.  Proved by Yarotsky via
+cluster expansion; recorded as a documented axiom.  Chapters~3--10 backfill.
 
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
