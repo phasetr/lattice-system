@@ -31,23 +31,32 @@ noncomputable def hubbardEigenspaceAtFilling (E₀ : ℂ) :
   Module.End.eigenspace (hubbardHamiltonian N t U).mulVecLin E₀ ⊓
     Module.End.eigenspace (fermionTotalNumber (2 * N + 1)).mulVecLin (((N + 1 : ℕ) : ℂ))
 
-/-- **Tasaki Proposition 11.2 (ground states of a ferromagnetic Hubbard model), AXIOM.**  If the
-all-to-all Hubbard model `hubbardHamiltonian N t U` exhibits saturated ferromagnetism
-(`isSaturatedFerromagnet`), then there is a ground energy `E₀` whose half-filling (`N + 1`-electron)
-eigenspace is the `(N + 2)`-fold maximal-spin multiplet: it has dimension `N + 2 = 2 S_max + 1` and
-every state in it is an `(Ŝ_tot)²`-eigenvector at `S_max(S_max + 1)`, `S_max = (N + 1)/2`
-(Tasaki eq. (11.1.4)).
+/-- **Tasaki Proposition 11.2 (ground states of a ferromagnetic Hubbard model), AXIOM.**  Let `E₀`
+be a genuine half-filling ground energy of the all-to-all Hubbard model `hubbardHamiltonian N t U`:
+its
+`(N + 1)`-electron eigenspace is nonzero (`hne`) and `E₀` is minimal among all energies with a
+nonzero `(N + 1)`-electron eigenspace (`hmin`, using the real part as the physical eigenvalue order,
+`hubbardHamiltonian` being Hermitian).  If, moreover, the model is ferromagnetic at this ground
+energy — every ground state is an `(Ŝ_tot)²`-eigenvector at `S_max(S_max + 1)`, `S_max = (N + 1)/2`
+(`hferro`, Definition 11.1 specialised to the ground eigenspace) — then the ground eigenspace is the
+`(N + 2)`-fold maximal-spin multiplet (Tasaki eq. (11.1.4)): its dimension is exactly
+`N + 2 = 2 S_max + 1`.
 
-The conclusion is **existential in `E₀`** and the multiplet is taken at *that same* `E₀`, so the
-statement is tied to a genuine ground eigenspace (avoiding any mismatch with a hard-core variational
-energy, and not over-claiming from a spurious `isSaturatedFerromagnet` witness).
+The `E₀` of the conclusion is pinned by `hne`/`hmin` to a real ground energy, so the axiom does not
+over-claim from a spurious witness; the only content beyond `hferro` (which already supplies the
+maximal-spin part of `IsMaximalSpinMultipletSubmodule`) is the dimension count.
 
 Tasaki's proof: on the all-up subspace the interaction `Ĥ_int` vanishes, so the model reduces to a
 non-interacting one whose lowest state is the all-up Slater determinant; the SU(2) lowering tower of
 that state then exhausts the ground eigenspace.  The structural argument is finite-dimensional but
 broad (arbitrary hopping `t`); recorded here as a documented axiom (to be discharged), matching the
 policy for the other deferred Chapter 11 results. -/
-axiom hubbard_proposition_11_2 (hferro : isSaturatedFerromagnet N t U) :
-    ∃ E₀ : ℂ, IsMaximalSpinMultipletSubmodule N (hubbardEigenspaceAtFilling t U E₀) (N + 1)
+axiom hubbard_proposition_11_2 (E₀ : ℂ)
+    (hne : hubbardEigenspaceAtFilling t U E₀ ≠ ⊥)
+    (hmin : ∀ E : ℂ, hubbardEigenspaceAtFilling t U E ≠ ⊥ → E₀.re ≤ E.re)
+    (hferro : ∀ v ∈ hubbardEigenspaceAtFilling t U E₀,
+      (fermionTotalSpinSquared N).mulVec v
+        = (((N + 1 : ℕ) : ℂ) / 2 * (((N + 1 : ℕ) : ℂ) / 2 + 1)) • v) :
+    IsMaximalSpinMultipletSubmodule N (hubbardEigenspaceAtFilling t U E₀) (N + 1)
 
 end LatticeSystem.Fermion

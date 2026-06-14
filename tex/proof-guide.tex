@@ -7697,14 +7697,15 @@ $(\hat{S}^2_{\rm tot})v = S_{\max}(S_{\max}+1)v$.
 axiom, \texttt{HubbardFerromagnetismStructure.lean}, Issue \#4477).  When the all-to-all Hubbard
 model exhibits saturated ferromagnetism, its ground states simplify to the
 $(2S_{\max}+1)$-fold $SU(2)$ multiplet built from the lowest-energy all-up Slater state.  We render
-this as \texttt{hubbard\_proposition\_11\_2}: \texttt{isSaturatedFerromagnet}\,$N\,t\,U$ implies
-there is a ground energy $E_0$ whose half-filling $N+1$ eigenspace
-(\texttt{hubbardEigenspaceAtFilling}\,$E_0$: the \texttt{hubbardHamiltonian}-eigenspace at $E_0$
+this as \texttt{hubbard\_proposition\_11\_2}: for a genuine half-filling ground energy $E_0$ (nonempty
+$(N+1)$-electron eigenspace, minimal in real part), if the model is ferromagnetic there (every ground
+state is $(\hat S_{\mathrm{tot}})^2$-maximal at $S_{\max}=(N+1)/2$) then the ground eigenspace
+\texttt{hubbardEigenspaceAtFilling}\,$E_0$ (the \texttt{hubbardHamiltonian}-eigenspace at $E_0$
 intersected with the $(N+1)$-electron number sector, \emph{without} the hard-core constraint) is a
-maximal-spin multiplet of dimension $N+2$ at $S_{\max}=(N+1)/2$.  The conclusion is existential in
-$E_0$ with the multiplet taken at that same $E_0$, so it is tied to a genuine ground eigenspace.  A
-book-order backfill of the Chapter 11 numbered items; recorded as a documented axiom (the
-finite-dimensional but general-hopping structural argument is deferred).
+maximal-spin multiplet of dimension $N+2$.  Pinning $E_0$ by the nonempty/minimal hypotheses keeps the
+axiom sound; the only content beyond the ferromagnetism premise is the dimension count.  A book-order
+backfill of the Chapter 11 numbered items; recorded as a documented axiom (the finite-dimensional but
+general-hopping structural argument is deferred).
 
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
