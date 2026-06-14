@@ -21,15 +21,20 @@ open Matrix
 
 variable {N : ℕ} (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ)
 
-/-- **The `E₀`-eigenspace of the Hubbard model at half filling `N + 1`**: the
-`hubbardHamiltonian`-eigenspace at energy `E₀`, intersected with the `(N + 1)`-electron number
-sector.  No hard-core constraint is imposed, so for `E₀` the true ground energy this captures
-*every* ground state (relevant for the general — possibly doubly occupied — Hubbard ground states of
-Proposition 11.2). -/
-noncomputable def hubbardEigenspaceAtFilling (E₀ : ℂ) :
+/-- **The `E₀`-eigenspace of the Hubbard model at electron filling `Ne`**: the
+`hubbardHamiltonian`-eigenspace at energy `E₀`, intersected with the `Ne`-electron number sector.
+No hard-core constraint is imposed, so for `E₀` the true ground energy this captures *every* ground
+state (relevant for the general — possibly doubly occupied — Hubbard ground states of §11.1). -/
+noncomputable def hubbardEigenspaceAt (E₀ : ℂ) (Ne : ℕ) :
     Submodule ℂ ((Fin (2 * N + 2) → Fin 2) → ℂ) :=
   Module.End.eigenspace (hubbardHamiltonian N t U).mulVecLin E₀ ⊓
-    Module.End.eigenspace (fermionTotalNumber (2 * N + 1)).mulVecLin (((N + 1 : ℕ) : ℂ))
+    Module.End.eigenspace (fermionTotalNumber (2 * N + 1)).mulVecLin (Ne : ℂ)
+
+/-- **The `E₀`-eigenspace at half filling `N + 1`**: the special case `Ne = N + 1` of
+`hubbardEigenspaceAt`, the natural filling for saturated ferromagnetism (Proposition 11.2). -/
+noncomputable def hubbardEigenspaceAtFilling (E₀ : ℂ) :
+    Submodule ℂ ((Fin (2 * N + 2) → Fin 2) → ℂ) :=
+  hubbardEigenspaceAt t U E₀ (N + 1)
 
 /-- **Tasaki Proposition 11.2 (ground states of a ferromagnetic Hubbard model), AXIOM.**  Let `E₀`
 be a genuine half-filling ground energy of the all-to-all Hubbard model `hubbardHamiltonian N t U`:
