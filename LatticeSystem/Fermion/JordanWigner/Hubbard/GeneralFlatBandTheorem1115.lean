@@ -1,4 +1,4 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandProjectionBridge
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandProjectionBlock
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandDisconnected
 
 /-!

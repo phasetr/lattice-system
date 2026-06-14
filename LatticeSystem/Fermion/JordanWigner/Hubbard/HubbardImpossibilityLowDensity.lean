@@ -1,5 +1,4 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.GroundSubspaceAtFilling
-import LatticeSystem.Fermion.JordanWigner.Hubbard.SaturatedFerromagnetism
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardFerromagnetismStructure
 import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
@@ -25,14 +24,6 @@ namespace LatticeSystem.Fermion
 open Matrix
 
 variable {N : ℕ} (t : Fin (N + 1) → Fin (N + 1) → ℂ)
-
-/-- **The `E₀`-eigenspace at electron filling `Ne`**: the `hubbardHamiltonian`-eigenspace at energy
-`E₀` intersected with the `Ne`-electron number sector (no hard-core constraint).  For `E₀` the true
-ground energy at filling `Ne` this is the ground eigenspace. -/
-noncomputable def hubbardEigenspaceAt (U E₀ : ℂ) (Ne : ℕ) :
-    Submodule ℂ ((Fin (2 * N + 2) → Fin 2) → ℂ) :=
-  Module.End.eigenspace (hubbardHamiltonian N t U).mulVecLin E₀ ⊓
-    Module.End.eigenspace (fermionTotalNumber (2 * N + 1)).mulVecLin (Ne : ℂ)
 
 /-- **The dimensional band condition (Tasaki eq. (11.1.8))** on the ascending single-particle
 energies `ε_1 ≤ ε_2 ≤ ⋯` (`ε 0 = ε_1`, `ε n = ε_{n+1}`): there are positive constants `c, ρ₀` and a

@@ -111,6 +111,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandConnectivity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandMultiplet
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandDisconnected
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandProjectionBridge
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandProjectionBlock
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandTheorem1115
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SectorMinEnergy
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularHubbardModel
