@@ -162,20 +162,21 @@ def IsSlowBECWindow (d : ℕ) (C₁ : ℝ) (Mmax : ℕ → ℕ) : Prop :=
 
 /-- **The BEC coherent-state SSB constants predicate** (Tasaki Theorem 5.3, eqs. (5.3.6)–(5.3.8)).
 `IsBECCoherentSSBConstants d μ q₀ C₁ mStar` asserts `√(2 q₀) ≤ mStar` (the `U(1)` bound, eq.
-(5.3.6), the `√2` companion of Theorem 4.11's `√3`) and that, for every slow window `M_max` and
-phase `θ`, and every realizing ground-state family `Φ_L` of the chemical-potential Hamiltonian `Ĥ_μ`
-(eventual
-minimizer/nonzero with ODLRO `q₀`, whose tower states are nonvanishing), the coherent state `Ξ_θ`
-exhibits the symmetry-breaking limits — stated in the sound eventual-`ε` form (per footnote 9, the
-`lim` is interpreted as genuine eventual convergence along even volumes):
+(5.3.6), the `√2` companion of Theorem 4.11's `√3`) and that, for every phase `θ` and every
+realizing ground-state family `Φ_L` of the chemical-potential Hamiltonian `Ĥ_μ` (eventual
+minimizer/nonzero
+with ODLRO `q₀`, whose tower states are nonvanishing throughout the range `|M| ≤ C₁ L^{d/2}`), there
+**exists a sufficiently slowly diverging window** `M_max` (`IsSlowBECWindow`) for which the coherent
+state `Ξ_θ` exhibits the symmetry-breaking limits — stated in the sound eventual-`ε` form (per
+footnote 9, the `lim` is interpreted as genuine eventual convergence along even volumes; the
+existential window matches Tasaki's "if `M_max` diverges not too rapidly" and Theorem 4.9's `∃ M`):
 * (5.3.7) `⟨Ξ_θ, Ô_L^{(1)} Ξ_θ⟩ / L^d → mStar cos θ` and `⟨Ξ_θ, Ô_L^{(2)} Ξ_θ⟩ / L^d → mStar sin θ`;
 * (5.3.8) `⟨Ξ_θ, (Ô_L^{(1)})² Ξ_θ⟩ / (L^d)² → (mStar cos θ)²` and the `(2)` analog
   `→ (mStar sin θ)²`;
 * (5.3.6) the complex moments `⟨Ξ_θ, Ô_L^± Ξ_θ⟩ / L^d → mStar e^{±iθ}`. -/
 def IsBECCoherentSSBConstants (d : ℕ) (μ q₀ C₁ mStar : ℝ) : Prop :=
   0 < C₁ ∧ 0 ≤ q₀ ∧ 0 < mStar ∧ Real.sqrt (2 * q₀) ≤ mStar ∧
-    ∀ (Mmax : ℕ → ℕ), IsSlowBECWindow d C₁ Mmax → ∀ (θ : ℝ)
-      (Φ : (L : ℕ) → (HypercubicTorus d L → Fin 2) → ℂ) (E₀ : ℕ → ℂ),
+    ∀ (θ : ℝ) (Φ : (L : ℕ) → (HypercubicTorus d L → Fin 2) → ℂ) (E₀ : ℕ → ℂ),
       (∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
         (xyChemicalPotentialHamiltonianS d L μ).mulVec (Φ L) = E₀ L • Φ L ∧
         (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin 2) → ℂ, Ψ ≠ 0 →
@@ -183,8 +184,10 @@ def IsBECCoherentSSBConstants (d : ℕ) (μ q₀ C₁ mStar : ℝ) : Prop :=
         Φ L ≠ 0 ∧
         (∀ α : Fin 3, α ≠ 2 → q₀ ≤ expectationRatioRe
           ((staggeredOrderOpAxisS α (torusParitySublattice d L) 1) ^ 2) (Φ L) / ((L : ℝ) ^ d) ^ 2) ∧
-        (∀ M : ℤ, M.natAbs ≤ Mmax L →
+        (∀ M : ℤ, (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
           towerState (torusParitySublattice d L) 1 M (Φ L) ≠ 0)) →
+      -- there exists a *sufficiently slowly* diverging window for which the SSB limits hold
+      ∃ Mmax : ℕ → ℕ, IsSlowBECWindow d C₁ Mmax ∧
       -- (5.3.7): the magnetization-density moments converge to a classical vector of length mStar
       (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
         |expectationRatioRe (staggeredOrderOp1S (torusParitySublattice d L) 1)
