@@ -47,6 +47,14 @@ assignment `A`, built from the per-site lowering operators `spinSSiteOpMinus`. -
 noncomputable def staggeredLoweringOpS (A : Λ → Bool) (N : ℕ) : ManyBodyOpS Λ N :=
   ∑ x : Λ, (if A x then (1 : ℂ) else (-1 : ℂ)) • spinSSiteOpMinus x N
 
+/-- The **Anderson tower trial state** `ψ_M = (Ô_L^{sgn M})^{|M|} Φ` (eq. (4.2.3), unnormalized): for
+`M ≥ 0` apply the staggered *raising* operator `M` times, for `M < 0` apply the staggered *lowering*
+operator `|M|` times.  This realizes the two-sided tower `Γ_M`, `Γ_{−M}` in the
+`Ŝ_tot^{(3)} = M` sectors. -/
+noncomputable def towerState (A : Λ → Bool) (N : ℕ) (M : ℤ)
+    (Φ : (Λ → Fin (N + 1)) → ℂ) : (Λ → Fin (N + 1)) → ℂ :=
+  ((if 0 ≤ M then staggeredRaisingOpS A N else staggeredLoweringOpS A N) ^ M.natAbs).mulVec Φ
+
 /-- The **`d`-dimensional hypercubic torus** with side length `L`: the vertex set is
 `Fin d → ZMod L`, a product of `d` cyclic groups, with `L^d` sites. -/
 abbrev HypercubicTorus (d L : ℕ) : Type := Fin d → ZMod L
@@ -92,7 +100,7 @@ faithful, sound documented axiom over the concrete torus family. -/
 axiom tower_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
     ∃ C₁ C₂ : ℝ, 0 < C₁ ∧ 0 < C₂ ∧
       ∀ (L : ℕ) [NeZero L], 2 ≤ L → Even L →
-        ∀ (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ) (M : ℕ),
+        ∀ (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ) (M : ℤ),
           (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ →
           (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
             (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) →
@@ -100,13 +108,13 @@ axiom tower_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀
           q₀ ≤ (star Φ ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
               staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ)).re /
               ((star Φ ⬝ᵥ Φ).re * (L : ℝ) ^ d) →
-          (M : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
-          ((staggeredRaisingOpS (torusParitySublattice d L) N) ^ M).mulVec Φ ≠ 0 →
-          (star (((staggeredRaisingOpS (torusParitySublattice d L) N) ^ M).mulVec Φ) ⬝ᵥ
+          (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
+          towerState (torusParitySublattice d L) N M Φ ≠ 0 →
+          (star (towerState (torusParitySublattice d L) N M Φ) ⬝ᵥ
               (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec
-                (((staggeredRaisingOpS (torusParitySublattice d L) N) ^ M).mulVec Φ)).re /
-            (star (((staggeredRaisingOpS (torusParitySublattice d L) N) ^ M).mulVec Φ) ⬝ᵥ
-              ((staggeredRaisingOpS (torusParitySublattice d L) N) ^ M).mulVec Φ).re ≤
+                (towerState (torusParitySublattice d L) N M Φ)).re /
+            (star (towerState (torusParitySublattice d L) N M Φ) ⬝ᵥ
+              towerState (torusParitySublattice d L) N M Φ).re ≤
           E₀.re + C₂ * (M : ℝ) ^ 2 / (L : ℝ) ^ d
 
 end LatticeSystem.Quantum
