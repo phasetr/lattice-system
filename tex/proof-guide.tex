@@ -8114,7 +8114,8 @@ eqs.~(4.4.21)--(4.4.22), pp.~123--124; documented axiom,
 \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  The two-dimensional Heisenberg
 model exhibits \emph{no magnetic ordering of any type} at any nonzero temperature.  We introduce the
 generalized field Hamiltonian (4.4.21) \texttt{generalizedFieldHamiltonianS}, $\hat H_h=J\sum_{\langle
-x,y\rangle}\hat S_x\!\cdot\!\hat S_y-\sum_x\sum_\alpha (\xi_x^{(\alpha)})\,\hat S_x^{(\alpha)}$, with
+x,y\rangle}\hat S_x\!\cdot\!\hat S_y-h\sum_x\sum_\alpha (\xi_x^{(\alpha)})\,\hat S_x^{(\alpha)}$
+(field $h_x=h\,\xi_x$), with
 $J\in\{-1,+1\}$ and an \emph{arbitrary} fixed field-direction family $\xi$ subject to $|\xi_x|\le 1$
 (the uniform and staggered fields are special cases; allowing arbitrary $\xi$ is what makes the
 exclusion cover \emph{any} ordering).  The axiom \texttt{improved\_hohenberg\_mermin\_wagner} asserts
