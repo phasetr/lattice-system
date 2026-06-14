@@ -7790,6 +7790,19 @@ using $h>0$, and bound $R(H)\Psi\ge E_0$.  The double limit $L\uparrow\infty$, $
 the essential bound $\langle\Xi_+,O_L/L^d\,\Xi_+\rangle\ge\sqrt{q_0}$) then gives the $\sqrt{q_0}$
 order-parameter bound (3.4.22) --- the thermodynamic input, which is not part of the formalized core.  Chapters~3--10 backfill.
 
+\noindent\textbf{Theorem 4.1} (Dyson--Lieb--Simon / Neves--Perez / Kennedy--Lieb--Shastry, Tasaki
+§4.1, eq.~(4.1.7), pp.~88--90; documented axiom, \texttt{Quantum/SpinS/DysonLiebSimon.lean}, Issue
+\#4485).  Existence of N\'eel long-range order: for the antiferromagnetic Heisenberg model in
+dimension $d\ge3$ (any $S$) or $d=2$, $S\ge1$, the staggered order parameter is bounded below
+\emph{uniformly in the system size}, $\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(\alpha)})^2/L^d
+|\Phi_{\mathrm{GS}}\rangle\ge q_0>0$.  We define the staggered order operator
+$\texttt{staggeredOrderOpS}=\sum_x\varepsilon_x\hat S_x^{(3)}$ ($\varepsilon_x=\pm1$ the sublattice
+sign) and record \texttt{dyson\_lieb\_simon\_neel\_lro}: for the AFM Heisenberg ground state on an
+arbitrarily large finite bipartite lattice, the staggered parameter per site is $\ge q_0$.  The
+uniformity in $L$ is the content (a single volume is uninformative); the deep reflection-positivity
+/ infrared-bound proof is deferred to the infinite-volume framework (in scope).  Chapters~3--10
+backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
