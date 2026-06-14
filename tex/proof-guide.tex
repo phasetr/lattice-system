@@ -8130,6 +8130,23 @@ n_0$, all large even volumes).  The proof is McBryan--Spencer's complex-translat
 which does not require translation invariance; recorded as a documented axiom.  Chapters~3--10
 backfill.
 
+\medskip
+\noindent\textbf{Theorem 4.25} (McBryan--Spencer, Koma--Tasaki theorem; Tasaki §4.4.3,
+eqs.~(4.4.23)--(4.4.24), pp.~124--125; documented axiom,
+\texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  In two dimensions at vanishing
+field, the finite-volume two-point correlation \texttt{finiteVolSpinCorrS} decays at least as a power
+law.  The axiom \texttt{mcbryan\_spencer\_koma\_tasaki} provides an $L$-independent positive
+\emph{decreasing} exponent $\eta(\beta)$ with $|\langle\hat S_x^{(\alpha)}\hat
+S_y^{(\alpha)}\rangle_{\beta,0}^L|\le 2S^2\,|x-y|^{-\eta(\beta)}$ (\texttt{Real.rpow}) for every
+$\alpha=1,2,3$, $\beta\in[0,\infty)$, and every pair of \emph{distinct} sites with $0<|x-y|<L/2$.
+The distinctness $0<|x-y|$ is \emph{required for soundness}: in Lean $\texttt{Real.rpow}\;0\;(-\eta)=0$,
+so the bound would be false at $x=y$ where the self-correlation $\langle(\hat S_x^{(\alpha)})^2\rangle$
+is positive.  The exponent behaves as $\eta(\beta)\simeq(16CS^2\beta)^{-1}$ for large $\beta$
+(eq.~(4.4.24)); the same $\eta$ is quantified before \texttt{ferro}, so it serves both signs.  The
+bound is weaker than the conjectured exponential decay but already excludes long-range order in
+$d=2$.  Proved by the McBryan--Spencer complex-translation method extended to quantum systems by
+Koma--Tasaki; recorded as a documented axiom.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}

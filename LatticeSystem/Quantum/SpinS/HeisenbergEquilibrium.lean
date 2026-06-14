@@ -4,7 +4,7 @@ import Mathlib.Order.LiminfLimsup
 
 /-!
 # Tasaki §4.4: equilibrium states of the Heisenberg model — high-temperature / one-dimensional /
-two-dimensional disorder (Theorems 4.22, 4.23, 4.24)
+two-dimensional disorder (Theorems 4.22, 4.23, 4.24, 4.25)
 
 For the standard spin-`S` Heisenberg model on the `d`-dimensional hypercubic torus we study the
 finite-temperature equilibrium (Gibbs) state.  With the field Hamiltonians (eqs. (4.4.1), (4.4.2))
@@ -117,16 +117,22 @@ noncomputable def finiteVolMagnetizationS (ferro : Bool) (d N : ℕ) (β h : ℝ
   thermalAverageReS β (heisenbergFieldHamiltonianS ferro d (evenSide n) N h)
     (spinSSiteOp3 (torusEmbed d (evenSide n) x) N)
 
+/-- The **finite-volume two-spin correlation** `⟨Ŝ_x^{(α)} Ŝ_y^{(α)}⟩_{β,0}^L` at vanishing field on
+the even torus of side `L = 2(n + 1)` (the observable of eq. (4.4.4) before the `L↑∞` limit, and the
+quantity bounded by Theorem 4.25). -/
+noncomputable def finiteVolSpinCorrS (ferro : Bool) (d N : ℕ) (β : ℝ) (α : Fin 3)
+    (x y : Fin d → ℤ) (n : ℕ) : ℝ :=
+  thermalAverageReS β (heisenbergFieldHamiltonianS ferro d (evenSide n) N 0)
+    (spinSSiteOpAxis α (torusEmbed d (evenSide n) x) N *
+      spinSSiteOpAxis α (torusEmbed d (evenSide n) y) N)
+
 /-- The **infinite-volume two-spin correlation** `⟨Ŝ_x^{(α)} Ŝ_y^{(α)}⟩_{β,0}^∞` at vanishing field
 (eq. (4.4.4)), defined as the `liminf` over the even-volume sequence of the finite-volume
 correlations (per footnote 41: the genuine `L↑∞` limit is not known to exist, so we use the sound
 `liminf` cluster value). -/
 noncomputable def infiniteVolSpinCorrLiminf (ferro : Bool) (d N : ℕ) (β : ℝ) (α : Fin 3)
     (x y : Fin d → ℤ) : ℝ :=
-  liminf (fun n : ℕ =>
-    thermalAverageReS β (heisenbergFieldHamiltonianS ferro d (evenSide n) N 0)
-      (spinSSiteOpAxis α (torusEmbed d (evenSide n) x) N *
-        spinSSiteOpAxis α (torusEmbed d (evenSide n) y) N)) atTop
+  liminf (fun n : ℕ => finiteVolSpinCorrS ferro d N β α x y n) atTop
 
 /-! ## Theorem 4.22 -/
 
@@ -234,5 +240,30 @@ axiom improved_hohenberg_mermin_wagner (N : ℕ) (β : ℝ) (hβ : 0 ≤ β) (J 
     ∀ ε : ℝ, 0 < ε → ∃ δ : ℝ, 0 < δ ∧ ∀ h : ℝ, 0 < h → h < δ →
       ∃ n₀ : ℕ, ∀ n : ℕ, n₀ ≤ n →
         |finiteVolMagnetizationGenS J 2 N ξ β h α x n| < ε
+
+/-! ## Theorem 4.25: the McBryan–Spencer / Koma–Tasaki power-law bound -/
+
+/-- **Tasaki Theorem 4.25 (McBryan–Spencer, Koma–Tasaki theorem), AXIOM.**  For the ferromagnetic
+(`ferro = true`) or antiferromagnetic (`ferro = false`) Heisenberg model in **two dimensions** with
+any spin `S = N/2` and vanishing field (`h = 0`), the finite-volume two-point spin correlation obeys
+a **power-law** upper bound (eq. (4.4.23)): there is an `L`-independent positive *decreasing*
+exponent `η(β)` such that
+`|⟨Ŝ_x^{(α)} Ŝ_y^{(α)}⟩_{β,0}^L| ≤ 2 S² |x − y|^{−η(β)}`
+for every `α = 1, 2, 3`, every `β ∈ [0, ∞)`, and every pair of *distinct* sites `x, y` with
+`0 < |x − y| < L/2` (the distinctness `0 < |x − y|` is required: the bound is a genuine power
+law, vacuously false at `x = y` where the self-correlation `⟨(Ŝ_x^{(α)})²⟩` is positive while
+`|x − y|^{−η} = 0^{−η}` evaluates to `0` in Lean's `Real.rpow`).  The exponent behaves as
+`η(β) ≃ (16 C S² β)^{−1}` for large `β` (eq. (4.4.24); `C` a numerical constant).  The bound is
+weaker than the conjectured exponential decay, but already rules out long-range order in `d = 2`.
+Proved by the McBryan–Spencer complex-translation method extended to quantum systems by
+Koma–Tasaki; recorded as a documented axiom (the same `η` works for both signs, so it is bound
+*before* `ferro`). -/
+axiom mcbryan_spencer_koma_tasaki (N : ℕ) :
+    ∃ η : ℝ → ℝ, (∀ β : ℝ, 0 ≤ β → 0 < η β) ∧
+      (∀ β₁ β₂ : ℝ, 0 ≤ β₁ → β₁ ≤ β₂ → η β₂ ≤ η β₁) ∧
+      ∀ (ferro : Bool) (β : ℝ), 0 ≤ β → ∀ (α : Fin 3) (x y : Fin 2 → ℤ) (n : ℕ),
+        0 < intL1Dist x y → intL1Dist x y < (evenSide n : ℝ) / 2 →
+          |finiteVolSpinCorrS ferro 2 N β α x y n| ≤
+            2 * ((N : ℝ) / 2) ^ 2 * Real.rpow (intL1Dist x y) (-(η β))
 
 end LatticeSystem.Quantum
