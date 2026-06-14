@@ -71,8 +71,11 @@ This is the local characterization that drives the Kennedy–Lieb–Tasaki uniqu
 lies in the AKLT ground space iff it is annihilated by *every* bond projection, i.e. iff every bond
 carries a singlet pair (the VBS state).  The concrete bond projection and the affine identity
 (7.1.5) are proved above; the deep singlet form (7.1.20) is recorded through the marker
-`IsVBSGroundForm`, so the equivalence is a faithful, sound documented axiom. -/
-axiom tasaki_lemma_7_4 (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) :
+`IsVBSGroundForm`, so the equivalence is a faithful, sound documented axiom.  The hypothesis
+`1 < L` ensures the bond `{x, ringSucc x}` is genuinely two-site: on the degenerate one-site ring
+`L = 1` one has `ringSucc x = x`, so the operator would be a single-site self-interaction rather
+than the two-site bond projection of Lemma 7.4. -/
+axiom tasaki_lemma_7_4 (hL : 1 < L) (x : Fin L) (Φ : (Fin L → Fin 3) → ℂ) :
     (bondSpin2ProjectionS x (ringSucc x)).mulVec Φ = 0 ↔ IsVBSGroundForm L x Φ
 
 end LatticeSystem.Quantum
