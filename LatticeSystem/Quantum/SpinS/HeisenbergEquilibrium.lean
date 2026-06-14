@@ -3,8 +3,8 @@ import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.Order.LiminfLimsup
 
 /-!
-# Tasaki §4.4: equilibrium states of the Heisenberg model — high-temperature / one-dimensional
-disorder (Theorems 4.22, 4.23)
+# Tasaki §4.4: equilibrium states of the Heisenberg model — high-temperature / one-dimensional /
+two-dimensional disorder (Theorems 4.22, 4.23, 4.24)
 
 For the standard spin-`S` Heisenberg model on the `d`-dimensional hypercubic torus we study the
 finite-temperature equilibrium (Gibbs) state.  With the field Hamiltonians (eqs. (4.4.1), (4.4.2))
@@ -189,5 +189,50 @@ axiom tasaki_4_23_high_temperature_disorder (N d : ℕ) (hd : 2 ≤ d) :
           |finiteVolMagnetizationS ferro d N β h x m| < ε) ∧
       (∃ ξ C : ℝ, 0 < ξ ∧ 0 < C ∧ ∀ (α : Fin 3) (x y : Fin d → ℤ),
         |infiniteVolSpinCorrLiminf ferro d N β α x y| ≤ C * Real.exp (-(intL1Dist x y) / ξ))
+
+/-! ## Theorem 4.24: the generalized field Hamiltonian and the improved Hohenberg–Mermin–Wagner
+theorem -/
+
+/-- The **generalized field Hamiltonian** (eq. (4.4.21)) on the `d`-dimensional hypercubic torus:
+`Ĥ_h = J Σ_{⟨x,y⟩} Ŝ_x · Ŝ_y − Σ_x h_x · Ŝ_x`, with `J ∈ {−1, +1}` (ferromagnetic /
+antiferromagnetic) and a site-dependent external field `h_x = h ξ_x`, where `ξ : torus → ℝ³` is an
+arbitrary fixed field-direction family (subject to `|ξ_x| ≤ 1`) and only the magnitude `h ≥ 0` is
+varied.  The uniform field (4.4.1) and the staggered field (4.4.2) are the special cases
+`ξ_x = (0,0,1)` (with `J = −1`)
+and `ξ_x = (0,0,(−1)^x)` (with `J = +1`); the generalized field allows much more complicated spatial
+modulation, so the theorem excludes magnetic ordering of *any* type. -/
+noncomputable def generalizedFieldHamiltonianS (J : ℝ) (d L N : ℕ) [NeZero L]
+    (ξ : HypercubicTorus d L → Fin 3 → ℝ) (h : ℝ) : ManyBodyOpS (HypercubicTorus d L) N :=
+  (J : ℂ) • heisenbergHamiltonianS (torusNNCoupling d L) N -
+    (h : ℂ) • ∑ x : HypercubicTorus d L, ∑ α : Fin 3, (ξ x α : ℂ) • spinSSiteOpAxis α x N
+
+/-- The **finite-volume magnetization** `⟨Ŝ_x^{(α)}⟩_{β,h}^L` for the generalized field Hamiltonian
+on the even torus of side `L = 2(n + 1)` (the inner observable of Theorem 4.24).  The
+field-direction family `ξ` is supplied per volume `L`. -/
+noncomputable def finiteVolMagnetizationGenS (J : ℝ) (d N : ℕ)
+    (ξ : ∀ L, HypercubicTorus d L → Fin 3 → ℝ) (β h : ℝ) (α : Fin 3) (x : Fin d → ℤ) (n : ℕ) : ℝ :=
+  thermalAverageReS β (generalizedFieldHamiltonianS J d (evenSide n) N (ξ (evenSide n)) h)
+    (spinSSiteOpAxis α (torusEmbed d (evenSide n) x) N)
+
+/-- **Tasaki Theorem 4.24 (improved Hohenberg–Mermin–Wagner theorem), AXIOM.**  For the generalized
+field Heisenberg model (eq. (4.4.21)) in **two dimensions** with any spin `S = N/2`, either sign
+`J ∈ {−1, +1}`, and *any* fixed field-direction family `ξ` with `|ξ_x| ≤ 1`, the magnetization in
+*every* component `α = 1, 2, 3` vanishes in the iterated limit
+`lim_{h↓0} lim_{L↑∞} ⟨Ŝ_x^{(α)}⟩_{β,h}^L = 0`, for any `β ∈ [0, ∞)` and `x ∈ ℤ²` (eq. (4.4.22)).
+Since the field direction is arbitrary, this excludes magnetic ordering of *any* type (not just the
+standard ferro/antiferromagnetic ordering).
+
+Per footnote 48 the inner `lim_{L↑∞}` is rigorously a `lim sup_{L↑∞}`, so — unlike the `liminf`
+(subsequence) form of Theorems 4.22/4.23 — the sound statement uses the *eventual* form
+(`∃ n₀, ∀ n ≥ n₀`, i.e. all large even volumes, capturing `lim sup_{L↑∞} = 0`).  The proof is
+McBryan–Spencer's complex-translation method [33, 44], which (unlike the original
+Bogoliubov-inequality proof) does not need translation invariance; recorded as a documented
+axiom. -/
+axiom improved_hohenberg_mermin_wagner (N : ℕ) (β : ℝ) (hβ : 0 ≤ β) (J : ℝ) (hJ : J = 1 ∨ J = -1)
+    (ξ : ∀ L, HypercubicTorus 2 L → Fin 3 → ℝ) (hξ : ∀ (L : ℕ) (x : HypercubicTorus 2 L),
+      ∑ α : Fin 3, (ξ L x α) ^ 2 ≤ 1) (α : Fin 3) (x : Fin 2 → ℤ) :
+    ∀ ε : ℝ, 0 < ε → ∃ δ : ℝ, 0 < δ ∧ ∀ h : ℝ, 0 < h → h < δ →
+      ∃ n₀ : ℕ, ∀ n : ℕ, n₀ ≤ n →
+        |finiteVolMagnetizationGenS J 2 N ξ β h α x n| < ε
 
 end LatticeSystem.Quantum
