@@ -1,6 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AKLT
 import LatticeSystem.Quantum.SpinS.AndersonTower
-import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder
 
 /-!
 # Tasaki §7.2.1: hidden antiferromagnetic order and the string order parameter
@@ -72,13 +71,16 @@ ground-state family, the den Nijs–Rommelse string order parameter equals `4/9`
 `O_string^{(3)}(Φ_VBS) = lim_{d↑∞} lim_{L↑∞} ⟨Φ_L| Ŝ_x^{(3)} exp(iπ Σ Ŝ^{(3)}) Ŝ_y^{(3)} |Φ_L⟩
 = 4/9`,
 written in the explicit double-`ε` form (the inner thermodynamic limit `L↑∞` taken before the
-separation limit `d = ringDist↑∞`).  Since `4/9 > 0`, the VBS state has **positive string order**,
+separation limit `d = y − x ↑∞`, over ordered linear windows `0 < x < y < L` as in eq. (7.2.6),
+matching the linear interval of `stringOperatorS`).  Since `4/9 > 0`, the VBS state has **positive
+string order**,
 i.e. hidden antiferromagnetic order in the `3`-direction (and, by SU(2) invariance, in all three
 directions); the ordinary Néel order vanishes.  The positivity is the hallmark of the Haldane phase.
 The explicit value rests on the VBS / matrix-product computation; recorded as a documented axiom. -/
 axiom aklt_string_order_7_2_8
     (Φ : (L : ℕ) → (Fin L → Fin 3) → ℂ) (hΦ : IsAKLTVBSGroundStateFamily Φ) :
     ∀ ε : ℝ, 0 < ε → ∃ d₀ : ℕ, ∀ d : ℕ, d₀ ≤ d → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L →
-      ∀ x y : Fin L, ringDist L x y = d → |stringCorrelationS x y (Φ L) - 4 / 9| < ε
+      ∀ x y : Fin L, 0 < x.val → x.val < y.val → y.val - x.val = d →
+        |stringCorrelationS x y (Φ L) - 4 / 9| < ε
 
 end LatticeSystem.Quantum
