@@ -17,9 +17,10 @@ the bridge is in place so far.  The bridge factors through an intermediate
 separating two active sites with no `P₀` entries across it:
 
 * `blockReducible ↔ ¬ basisConnected` — direction `¬basisConnected ⟹ blockReducible` (DONE,
-  `generalFlatBand_blockReducible_of_not_basisConnected`) builds the cut from the basis disconnection
-  (`exists_disconnection_cut_of_not_connected` + `generalFlatBand_proj_offdiag_eq_zero_across_cut`);
-  the converse (TODO) uses `generalFlatBand_mu_confined_of_block`.
+  `generalFlatBand_blockReducible_of_not_basisConnected`) builds the cut from the basis
+  disconnection (`exists_disconnection_cut_of_not_connected` +
+  `generalFlatBand_proj_offdiag_eq_zero_across_cut`); the converse (TODO) uses
+  `generalFlatBand_mu_confined_of_block`.
 * `projectionIrreducible ↔ ¬ blockReducible` (TODO) — the support matrix on the active sites is
   irreducible (strongly connected) iff there is no such block cut.
 
