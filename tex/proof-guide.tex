@@ -8108,6 +8108,28 @@ statements under one outer existential.  Proved by the cluster-expansion techniq
 sufficiently high temperature in any dimension for any short-ranged interaction
 (Tasaki~[21,~50,~61]); recorded as a documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{Theorem 4.24} (improved Hohenberg--Mermin--Wagner theorem; Tasaki §4.4.3,
+eqs.~(4.4.21)--(4.4.22), pp.~123--124; documented axiom,
+\texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  The two-dimensional Heisenberg
+model exhibits \emph{no magnetic ordering of any type} at any nonzero temperature.  We introduce the
+generalized field Hamiltonian (4.4.21) \texttt{generalizedFieldHamiltonianS}, $\hat H_h=J\sum_{\langle
+x,y\rangle}\hat S_x\!\cdot\!\hat S_y-h\sum_x\sum_\alpha (\xi_x^{(\alpha)})\,\hat S_x^{(\alpha)}$
+(field $h_x=h\,\xi_x$), with
+$J\in\{-1,+1\}$ and an \emph{arbitrary} fixed field-direction family $\xi$ subject to $|\xi_x|\le 1$
+(the uniform and staggered fields are special cases; allowing arbitrary $\xi$ is what makes the
+exclusion cover \emph{any} ordering); its finite-volume Gibbs magnetization $\langle\hat
+S_x^{(\alpha)}\rangle_{\beta,h}^L$ is \texttt{finiteVolMagnetizationGenS}.  The axiom
+\texttt{improved\_hohenberg\_mermin\_wagner} asserts
+that in $d=2$, for any $\beta\in[0,\infty)$, either sign $J=\pm1$, any bounded $\xi$, every component
+$\alpha=1,2,3$, and every $x\in\mathbb Z^2$, $\lim_{h\downarrow0}\lim_{L\uparrow\infty}\langle\hat
+S_x^{(\alpha)}\rangle_{\beta,h}^L=0$ (4.4.22).  Per footnote~48 the inner $\lim_{L\uparrow\infty}$ is
+rigorously a $\limsup_{L\uparrow\infty}$, so — unlike the $\liminf$/subsequence form of
+Theorems~4.22/4.23 — the sound statement uses the \emph{eventual} form ($\exists n_0,\forall n\ge
+n_0$, all large even volumes).  The proof is McBryan--Spencer's complex-translation method [33,~44],
+which does not require translation invariance; recorded as a documented axiom.  Chapters~3--10
+backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
