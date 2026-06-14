@@ -4,10 +4,10 @@ import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
 # Tasaki §3.4: the Horsch–von der Linden theorem (Theorem 3.1)
 
 Tasaki's Theorem 3.1 (Horsch–von der Linden) states that a ground state with long-range order but
-without spontaneous symmetry breaking inevitably has a low-lying excited energy eigenstate: from the
+without spontaneous symmetry breaking inevitably has a low-lying energy eigenstate: from the
 Horsch–von der Linden trial state `|Γ⟩` (orthogonal to the ground state and with energy
 `⟨Γ|Ĥ|Γ⟩ ≤ E_GS + C·L^{-d}`, eq. (3.4.12)) one extracts an energy eigenstate `|Ψ⟩ ⊥ |Φ_GS⟩` with
-`E_GS ≤ E ≤ E_GS + C·L^{-d}`.
+`E_GS ≤ E ≤ E_GS + C·L^{-d}` (possibly another ground state if degenerate).
 
 The proof is elementary and finite-dimensional: expand `|Γ⟩` in the energy eigenbasis,
 `⟨Γ|Ĥ|Γ⟩ = Σ_j |c_j|² E_j` with `Σ|c_j|² = 1` and `c_{GS} = 0` (orthogonality); if every excited
@@ -27,9 +27,14 @@ open Matrix
 /-- **Tasaki Theorem 3.1 (Horsch–von der Linden), finite-dimensional core.**  Let `H` be a Hermitian
 matrix with minimum eigenvalue `E₀ = hH.eigenvalues i₀` (witnessed by `hmin`).  If a normalized
 state `Γ` is orthogonal to the ground eigenvector (its `i₀`-component in the eigenbasis vanishes,
-`hortho`)
-and has Rayleigh energy `⟨Γ, H Γ⟩ ≤ E₀ + δ`, then there is an energy eigenstate `j ≠ i₀` (an excited
-state orthogonal to the ground state) with `E₀ ≤ E_j ≤ E₀ + δ` — a low-lying excited state.
+`hortho`) and has Rayleigh energy `⟨Γ, H Γ⟩ ≤ E₀ + δ`, then there is an energy eigenstate `j ≠ i₀`,
+orthogonal to that ground eigenvector, with `E₀ ≤ E_j ≤ E₀ + δ` — a low-lying state.
+
+This matches Tasaki's statement exactly: the eigenvalue range is `E₀ ≤ E ≤ E₀ + δ` (not a strict
+excitation).  When the ground state is **degenerate** the returned `j ≠ i₀` may be *another* ground
+eigenvector with `E_j = E₀`, precisely the caveat Tasaki notes ("the state may be another ground
+state when the ground states are degenerate").  For a strict excitation one would additionally
+assume a non-degenerate ground state (`∀ j ≠ i₀, E₀ < E_j`).
 
 Proof: expand the Rayleigh quotient in the eigenbasis, `⟨Γ, H Γ⟩ = Σ_j ‖w_j‖² E_j` with
 `Σ_j ‖w_j‖² = 1` and `w_{i₀} = 0`; if every `j` in the support had `E_j > E₀ + δ` the weighted sum
