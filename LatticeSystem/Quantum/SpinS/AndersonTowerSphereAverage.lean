@@ -71,15 +71,18 @@ symmetry-breaking order parameter and the long-range-order parameter coincide, `
 def IsConjecture412Equality (mStar qStar : ℝ) : Prop :=
   mStar = Real.sqrt (3 * qStar)
 
-/-- The Proposition 4.10 statement for fixed constants.  **Conditional on Conjecture 4.12**: if the
-equality `m∗ = √(3 q∗)` holds, then for a given ground-state family `Φ` (with the minimizer /
+/-- The Proposition 4.10 statement for fixed constants.  **Conditional on Conjecture 4.12**: for
+every `qStar` such that the equality `m∗ = √(3 qStar)` holds (a genuine hypothesis the consumer
+supplies — `qStar` is *not* existentially hidden), for a given ground-state family `Φ` (with the
+minimizer /
 long-range-order conditions eventual) there is a slowly diverging `M(L)` such that the *normalized
 solid-angle average* of the symmetry-breaking states converges, up to a unimodular phase, to the
 ground state (eq. (4.2.22)):
 `∀ ε > 0, ∃ L₀, ∀ L ≥ L₀ (even), ∃ z, ‖z‖ = 1 ∧ ‖unitNormalize(Ξ_avg) − z • unitNormalize(Φ)‖ < ε`. -/
-def IsTanakaSphereAverageConstants (d N : ℕ) (q₀ C₁ mStar qStar : ℝ) : Prop :=
+def IsTanakaSphereAverageConstants (d N : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
   0 < C₁ ∧ 0 < mStar ∧
-    (IsConjecture412Equality mStar qStar →
+    -- the conjecture is a genuine hypothesis: for EVERY `qStar` making it hold, convergence follows
+    (∀ qStar : ℝ, IsConjecture412Equality mStar qStar →
       ∀ (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ),
         (∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
           (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec (Φ L) = E₀ L • Φ L ∧
@@ -107,7 +110,7 @@ Recorded as a documented axiom, sharing constants `C₁`, `C₂`, `m∗` with th
 full-SSB statements and conditional on long-range order (vacuous in one dimension by Corollary 4.3).
 Conjecture 4.12 enters only as a hypothesis (`IsConjecture412Equality`); never asserted true. -/
 axiom tanakaSphereAverage_groundState (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
-    ∃ C₁ C₂ mStar qStar : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂ ∧
-      IsTanakaSphereAverageConstants d N q₀ C₁ mStar qStar
+    ∃ C₁ C₂ mStar : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂ ∧
+      IsTanakaSphereAverageConstants d N q₀ C₁ mStar
 
 end LatticeSystem.Quantum
