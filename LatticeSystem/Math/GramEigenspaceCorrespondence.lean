@@ -25,7 +25,7 @@ namespace LatticeSystem.Math
 
 open Matrix Module
 
-variable {m n : Type*} [Fintype m] [Fintype n] [DecidableEq m] [DecidableEq n]
+variable {m n : Type*} [Fintype m] [Fintype n]
 
 /-- For `λ ≠ 0`, the map `φ ↦ S φ` embeds the `λ`-eigenspace of `Sᴴ S` into that of `S Sᴴ`, so the
 former has dimension at most the latter. -/
