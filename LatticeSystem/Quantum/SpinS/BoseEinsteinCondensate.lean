@@ -2,8 +2,8 @@ import LatticeSystem.Quantum.SpinS.HeisenbergEquilibrium
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenberg
 
 /-!
-# Tasaki §5.1–§5.2: Bose–Einstein condensation of hard-core bosons and off-diagonal long-range
-order (Theorem 5.1)
+# Tasaki §5.1–§5.3: Bose–Einstein condensation of hard-core bosons — off-diagonal long-range order
+and low-lying tower states (Theorems 5.1, 5.2)
 
 Tasaki Chapter 5 studies **Bose–Einstein condensation (BEC)** of bosons on the `d`-dimensional
 hypercubic lattice.  In the limit of infinitely strong on-site repulsion (`u ↑ ∞`) the bosonic
@@ -75,5 +75,57 @@ axiom tasaki_5_1_xy_odlro_half_filling (d : ℕ) (hd : 2 ≤ d) :
         ∀ (α : Fin 3), α ≠ 2 →
           q₀ ≤ expectationRatioRe
             ((staggeredOrderOpAxisS α (torusParitySublattice d L) 1) ^ 2) Φ / ((L : ℝ) ^ d) ^ 2
+
+/-! ## Theorem 5.2: low-lying tower states of hard-core bosons -/
+
+/-- The **chemical-potential XY Hamiltonian** `Ĥ_μ = Ĥ_XY − μ N̂` (eq. (5.3.2)) on the
+`d`-dimensional torus, in spin form: `N̂ ↔ Ŝ_tot^{(3)} + L^d/2` (5.1.7), so up to the constant
+`μ L^d/2` (which cancels in all energy *differences*) the chemical-potential term is
+`−μ Ŝ_tot^{(3)}`.  Adjusting `μ` selects the particle density `ρ = N/L^d` of the ground state; half
+filling is `μ = 0`. -/
+noncomputable def xyChemicalPotentialHamiltonianS (d L : ℕ) [NeZero L] (μ : ℝ) :
+    ManyBodyOpS (HypercubicTorus d L) 1 :=
+  xyHamiltonianS d L - (μ : ℂ) • totalSpinSOp3 (HypercubicTorus d L) 1
+
+/-- **The BEC tower constants predicate** (Tasaki Theorem 5.2, eq. (5.3.4)).  `IsBECTowerConstants d
+q₀ C₁ C₂` asserts that `C₁, C₂ > 0` and, for every even torus side `L ≥ 2`, every chemical potential
+`μ`, and every ground state `Φ_GS` of the chemical-potential XY Hamiltonian `Ĥ_μ`
+(eigenvector at the minimal real eigenvalue `E₀`, nonzero) that exhibits ODLRO with parameter `q₀`
+(the half-filling/XY-plane order parameters `⟨(Ô_L^{(α)})²⟩/(⟨Φ,Φ⟩ (L^d)²) ≥ q₀` for `α = 1, 2`,
+as in Theorem 5.1), the tower state `Γ_M = (Ô_L^{sgn M})^{|M|} Φ_GS` (for `|M| ≤ C₁ L^{d/2}`,
+nonvanishing) is low-lying with the **cubic** energy increment (eq. (5.3.4))
+`⟨Γ_M, Ĥ_μ Γ_M⟩ / ⟨Γ_M, Γ_M⟩ ≤ E₀ + C₂ |M|³ / L^d`.
+(The hard-core projection `P̂_hc` is the identity in the spin-`1/2` formulation.) -/
+def IsBECTowerConstants (d : ℕ) (q₀ C₁ C₂ : ℝ) : Prop :=
+  0 < C₁ ∧ 0 < C₂ ∧
+    ∀ (L : ℕ) [NeZero L], 2 ≤ L → Even L →
+      ∀ (μ : ℝ) (Φ : (HypercubicTorus d L → Fin 2) → ℂ) (E₀ : ℂ) (M : ℤ),
+        (xyChemicalPotentialHamiltonianS d L μ).mulVec Φ = E₀ • Φ →
+        (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin 2) → ℂ, Ψ ≠ 0 →
+          (xyChemicalPotentialHamiltonianS d L μ).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) →
+        Φ ≠ 0 →
+        (∀ α : Fin 3, α ≠ 2 →
+          q₀ ≤ expectationRatioRe
+            ((staggeredOrderOpAxisS α (torusParitySublattice d L) 1) ^ 2) Φ / ((L : ℝ) ^ d) ^ 2) →
+        (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
+        towerState (torusParitySublattice d L) 1 M Φ ≠ 0 →
+        expectationRatioRe (xyChemicalPotentialHamiltonianS d L μ)
+            (towerState (torusParitySublattice d L) 1 M Φ) ≤
+          E₀.re + C₂ * (M.natAbs : ℝ) ^ 3 / (L : ℝ) ^ d
+
+/-- **Tasaki Theorem 5.2 (low-lying tower states of hard-core bosons), AXIOM.**  Suppose the ground
+state `Φ_GS` of the chemical-potential XY Hamiltonian `Ĥ_μ` (5.3.2) exhibits ODLRO with some
+constant `q₀ > 0` (Theorem 5.1, eq. (5.2.5)).  Then there are constants `C₁, C₂ > 0` — depending
+only on `d`,
+the density, and `q₀` — such that the bosonic tower states `Γ_M` are low-lying with the cubic energy
+bound `⟨Γ_M, Ĥ_μ Γ_M⟩ ≤ ⟨Φ_GS, Ĥ_μ Φ_GS⟩ + C₂ |M|³ / L^d` for `|M| ≤ C₁ L^{d/2}` (eq. (5.3.4)).
+
+This is the BEC counterpart of the Anderson-tower Theorem 4.6; the construction and the constants
+are bundled into `IsBECTowerConstants` (the energy increment is **cubic** in `|M|`, not quadratic as
+in
+Theorem 4.6).  Like Theorem 4.6 the bound is conditional on ODLRO (`q₀ > 0`), so it is vacuous where
+ODLRO is absent.  Proved in Koma–Tasaki [21]; recorded as a documented axiom. -/
+axiom tasaki_5_2_bec_tower (d : ℕ) (hd : 2 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
+    ∃ C₁ C₂ : ℝ, IsBECTowerConstants d q₀ C₁ C₂
 
 end LatticeSystem.Quantum
