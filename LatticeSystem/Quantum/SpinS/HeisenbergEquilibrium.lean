@@ -4,7 +4,8 @@ import Mathlib.Order.LiminfLimsup
 
 /-!
 # Tasaki §4.4: equilibrium states of the Heisenberg model — disorder (1D / 2D / high-T) and
-low-temperature long-range order in `d ≥ 3` (Theorems 4.22, 4.23, 4.24, 4.25, 4.26)
+low-temperature long-range order and symmetry breaking in `d ≥ 3`
+(Theorems 4.22, 4.23, 4.24, 4.25, 4.26, 4.27)
 
 For the standard spin-`S` Heisenberg model on the `d`-dimensional hypercubic torus we study the
 finite-temperature equilibrium (Gibbs) state.  With the field Hamiltonians (eqs. (4.4.1), (4.4.2))
@@ -296,5 +297,34 @@ axiom theorem_4_26_staggered_lro (d : ℕ) (hd : 3 ≤ d) (N : ℕ) [NeZero N] :
         q β ≤ thermalAverageReS β (heisenbergFieldHamiltonianS false d (evenSide n) N 0)
             ((staggeredOrderOpAxisS α (torusParitySublattice d (evenSide n)) N) ^ 2) /
           ((evenSide n : ℝ) ^ d)
+
+/-! ## Theorem 4.27: the Griffiths / Koma–Tasaki finite-temperature symmetry breaking -/
+
+/-- **Tasaki Theorem 4.27 (Griffiths, Koma–Tasaki theorem), AXIOM.**  Under the same conditions as
+Theorem 4.26 (antiferromagnetic Heisenberg model, `d ≥ 3`, spin `S = N/2` with `N ≥ 1`), long-range
+order is accompanied by genuine **symmetry breaking** at sufficiently low temperature: with the
+staggered magnetic field in the `3`-direction (eq. (4.4.2)), the per-site staggered moment survives
+the iterated limit and is bounded below by `√(3 q(β))` (eq. (4.4.53)):
+`lim_{h↓0} lim_{L↑∞} ⟨Ô_L^{(3)}⟩_{β,h}^L / L^d ≥ √(3 q(β))`, for every `β > β₀`.
+
+The threshold `β₀` and the order-parameter function `q` are the *same* as in Theorem 4.26 — the
+statement bundles the Theorem 4.26 long-range-order bound (eq. (4.4.52)) and the symmetry-breaking
+bound (eq. (4.4.53)) under one shared `∃ β₀, ∃ q`, making the "same `q`" dependence explicit.  The
+`√3` factor has the same origin as the one in Theorem 4.11 (`√(3 q₀)`).  The double limit is stated
+soundly in `ε`–`δ` form (outer `h↓0`, inner `liminf_{L↑∞}` as an eventual lower bound).  Proved by
+Koma–Tasaki [34], extending Griffiths' [23] argument for commuting order operators; recorded as a
+documented axiom.  (`[NeZero N]` is again essential, as in Theorem 4.26.) -/
+axiom theorem_4_27_griffiths_koma_tasaki_ssb (d : ℕ) (hd : 3 ≤ d) (N : ℕ) [NeZero N] :
+    ∃ β₀ : ℝ, 0 < β₀ ∧ ∃ q : ℝ → ℝ, (∀ β : ℝ, β₀ < β → 0 < q β) ∧
+      (∀ (α : Fin 3) (β : ℝ), β₀ < β → ∃ L₀ : ℕ, ∀ n : ℕ, L₀ ≤ evenSide n →
+        q β ≤ thermalAverageReS β (heisenbergFieldHamiltonianS false d (evenSide n) N 0)
+            ((staggeredOrderOpAxisS α (torusParitySublattice d (evenSide n)) N) ^ 2) /
+          ((evenSide n : ℝ) ^ d)) ∧
+      (∀ β : ℝ, β₀ < β → ∀ ε : ℝ, 0 < ε → ∃ δ : ℝ, 0 < δ ∧ ∀ h : ℝ, 0 < h → h < δ →
+        ∃ L₀ : ℕ, ∀ n : ℕ, L₀ ≤ evenSide n →
+          Real.sqrt (3 * q β) - ε ≤
+            thermalAverageReS β (heisenbergFieldHamiltonianS false d (evenSide n) N h)
+              (staggeredOrderOpAxisS 2 (torusParitySublattice d (evenSide n)) N) /
+            ((evenSide n : ℝ) ^ d))
 
 end LatticeSystem.Quantum

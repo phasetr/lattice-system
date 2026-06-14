@@ -8162,6 +8162,21 @@ $q(\beta)>0$.  The proof uses reflection positivity (Dyson--Lieb--Simon~[12]; th
 $S=1/2$ by Kennedy--Lieb--Shastry~[29]); the ferromagnetic counterpart is only conjectured, as it
 fails reflection positivity.  Recorded as a documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{Theorem 4.27} (Griffiths, Koma--Tasaki theorem; Tasaki §4.4.4, eq.~(4.4.53),
+p.~130; documented axiom, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  Under
+the same conditions as Theorem~4.26, low-temperature long-range order is accompanied by genuine
+symmetry breaking.  The axiom \texttt{theorem\_4\_27\_griffiths\_koma\_tasaki\_ssb} bundles the
+Theorem~4.26 long-range-order bound (4.4.52) and the symmetry-breaking bound (4.4.53) under one
+\emph{shared} $\exists\beta_0,\exists q$, so the ``same $q$'' dependence is explicit: with the
+staggered field (eq.~(4.4.2)), $\lim_{h\downarrow0}\lim_{L\uparrow\infty}\langle\hat
+O_L^{(3)}\rangle_{\beta,h}^L/L^d\ge\sqrt{3\,q(\beta)}$ for every $\beta>\beta_0$.  The $\sqrt3$ factor
+has the same origin as the one in Theorem~4.11.  The double limit is stated soundly in
+$\varepsilon$--$\delta$ form (outer $h\downarrow0$, inner $\liminf_{L\uparrow\infty}$ as an eventual
+lower bound), and $N\ge1$ is again essential.  Proved by Koma--Tasaki~[34], extending Griffiths'~[23]
+argument for commuting order operators; recorded as a documented axiom.  This completes Tasaki §4.4.
+Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
