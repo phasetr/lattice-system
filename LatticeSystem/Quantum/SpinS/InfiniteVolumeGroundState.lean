@@ -128,6 +128,14 @@ def staggeredSign (x : Fin d → ℤ) : ℝ := if Even (∑ i, x i) then 1 else 
 /-- A vector `n : Fin 3 → ℝ` is a **unit vector** when `Σ_α (n α)² = 1`. -/
 def IsUnitVector (n : Fin 3 → ℝ) : Prop := (∑ α, (n α) ^ 2) = 1
 
+/-- **`εGS` is the ground-state energy density of `S`** (an uninterpreted documented predicate): the
+per-bond ground-state energy density `ε_GS = lim_L E_GS,L / |B_L|` (eq. (4.3.4)) of the
+antiferromagnetic Heisenberg model `S`.  Kept uninterpreted so Theorem 4.20 asserts the existence of
+ground states only for the genuine `(S, ε_GS)` data (and cannot be instantiated with an arbitrary
+`εGS` unrelated to `S`, which would be inconsistent for degenerate systems). -/
+axiom IsGroundStateEnergyDensity {d : ℕ} {A : Type*} [CStarAlgebra A] [NormedSpace ℂ A]
+    [StarModule ℂ A] : InfiniteSpinSystem d A → ℝ → Prop
+
 /-- **The model exhibits staggered long-range order with order parameter `m∗`** (an uninterpreted
 documented predicate, the infinite-volume LRO assumption).  Tasaki's construction of the
 symmetry-breaking ground states `ω_n` (Theorem 4.20) presumes the model has Néel long-range order
@@ -142,8 +150,11 @@ infinite-volume state `ω_0` built as the `L↑∞` limit of the unique finite-v
 expectation `⟨Φ_GS|·|Φ_GS⟩` (eq. (4.3.7)) is a translation-invariant ground state with vanishing
 single-site magnetization `ω_0(Ŝ_x^{(α)}) = 0` (eq. (4.3.9)): it exhibits long-range order but **no**
 spontaneous symmetry breaking.  The `L↑∞` limit's existence is assumed (Banach–Alaoglu, Theorem
-A.24); recorded as a documented axiom asserting the limit state exists with the stated properties. -/
-axiom theorem_4_20_omega0 (S : InfiniteSpinSystem d A) (εGS : ℝ) :
+A.24); recorded as a documented axiom asserting the limit state exists with the stated properties.
+Conditional on `εGS` being the genuine ground-state energy density of `S` (`hε`), so it cannot be
+applied with an arbitrary `εGS`. -/
+axiom theorem_4_20_omega0 (S : InfiniteSpinSystem d A) (εGS : ℝ)
+    (hε : IsGroundStateEnergyDensity S εGS) :
     ∃ ω0 : WeakDual ℂ A, IsInfiniteVolumeGroundState S εGS ω0 ∧
       ∀ (x : Fin d → ℤ) (α : Fin 3), ω0 (S.spin x α) = 0
 
@@ -155,7 +166,8 @@ ground state with Néel magnetization `ω_n(Ŝ_x^{(α)}) = (−1)^x m∗ n_α` (
 long-range order **and** full spontaneous symmetry breaking in the direction `n`.  Recorded as a
 documented axiom; the `m∗` is tied to long-range order (not arbitrary), so `ω_n` exists only in the
 ordered regime (vacuous in one dimension). -/
-axiom theorem_4_20_omegaN (S : InfiniteSpinSystem d A) (εGS : ℝ) (mStar : ℝ) (hm : 0 < mStar)
+axiom theorem_4_20_omegaN (S : InfiniteSpinSystem d A) (εGS : ℝ)
+    (hε : IsGroundStateEnergyDensity S εGS) (mStar : ℝ) (hm : 0 < mStar)
     (hLRO : HasStaggeredLRO S mStar) (n : Fin 3 → ℝ) (hn : IsUnitVector n) :
     ∃ ωn : WeakDual ℂ A, IsInfiniteVolumeGroundState S εGS ωn ∧
       ∀ (x : Fin d → ℤ) (α : Fin 3),
