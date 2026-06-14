@@ -342,6 +342,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23TotalLoweringNonvanishing
 import LatticeSystem.Quantum.SpinS.Theorem23GeneralHOutside
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenberg
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergReduction
+import LatticeSystem.Quantum.SpinS.AnisotropicLargeD
 import LatticeSystem.Quantum.SpinS.AxisSwappedAnisotropicHeisenberg
 import LatticeSystem.Quantum.SpinS.ManyBodyTensorS
 import LatticeSystem.Quantum.SpinS.ManyBodyTensorConj

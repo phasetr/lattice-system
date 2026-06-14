@@ -8510,6 +8510,24 @@ every ground-energy eigenvector proportional to $\Phi$.  Proved by mapping $\hat
 through the controlled-$Z$ unitary $\hat U_C$ ($\hat U_C^2=1$); the Paulis, stabilizers and
 Hamiltonian are concrete, Theorem 7.8 a documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§8.1.1 Large-$D$ phase of the anisotropic $S=1$ chain} (Theorem 8.1; Tasaki §8.1.1,
+eqs.~(8.1.1)--(8.1.3), pp.~226--228; \texttt{Quantum/SpinS/AnisotropicLargeD.lean}, Issue \#4485).
+The Haldane phase is studied through the anisotropic $S=1$ chain with crystal-field anisotropy:
+\texttt{anisotropicChainHamiltonianS} $L\,D=$ \texttt{heisenbergHamiltonianS}~$(\texttt{ringCoupling}\,
+L)\,2+D\sum_x(\hat S_x^{(3)})^2$, i.e. $\hat H_D=\sum_x[\hat S_x\!\cdot\!\hat S_{x+1}+D(\hat
+S_x^{(3)})^2]$ (eq.~8.1.1, periodic ring); \texttt{spinSSiteComponentS} $\alpha\,x$ selects $\hat
+S_x^{(\alpha)}$.  As $D$ grows the gap closes at $D_c\approx1$ and reopens, separating the Haldane
+phase from the large-$D$ phase --- a topological phase transition with no distinguishing order
+parameter.  The axiom \texttt{tasaki\_theorem\_8\_1} states the large-$D$ behaviour: there is
+$D_0>0$ such that for $D\ge D_0$ there are $L$-independent $\Delta E_0,C,\xi>0$ with, for every even
+$L\ge2$, a unique ground state (\texttt{IsUniqueChainGroundState}), a gap $\ge\Delta E_0$
+(\texttt{IsPositiveSpectralGap}), and exponential decay $|\langle\hat S_x^{(\alpha)}\hat
+S_y^{(\alpha)}\rangle|\le Ce^{-d(x,y)/\xi}$ for all three $\alpha$ ($d=\texttt{ringDist}$).  The raw
+correlation equals the connected one (the disordered symmetric ground state has vanishing one-point
+functions).  Proved by cluster-expansion perturbation theory for large $D$ (book $D_0\approx28$, the
+phase extending to $D_c\approx1$); a documented axiom.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
