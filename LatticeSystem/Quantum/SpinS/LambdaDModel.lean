@@ -9,7 +9,8 @@ The phase diagram of the Haldane phase is best seen in the two-parameter **λ-D 
 an `S = 1` open chain with both Ising (`λ`) and crystal-field (`D`) anisotropy:
 `Ĥ_{λ,D} = Σ_x [Ŝ_x^{(1)}Ŝ_{x+1}^{(1)} + Ŝ_x^{(2)}Ŝ_{x+1}^{(2)} + λ Ŝ_x^{(3)}Ŝ_{x+1}^{(3)}]
             + D Σ_x (Ŝ_x^{(3)})²`.
-At `λ = 1` it is the anisotropic model (8.1.1); at `λ = 1, D = 0` the Heisenberg chain.  For `λ > 0`
+At `λ = 1` it is the open-boundary version of the anisotropic model (8.1.1) (which (8.1.1) takes
+with periodic boundary, agreeing in the bulk); at `λ = 1, D = 0` the Heisenberg chain.  For `λ > 0`
 the ground-state phase diagram has three phases: the **large-`D`** phase, the **Haldane** phase
 (with
 hidden antiferromagnetic order), and — for large `λ` — the **Ising AF** phase with genuine Néel
@@ -41,7 +42,8 @@ open Matrix
 /-- The **λ-D model Hamiltonian** (eq. (8.2.1)): the `S = 1` open chain with Ising anisotropy `λ`
 (the XXZ coupling `Ŝ_x^{(1)}Ŝ_y^{(1)} + Ŝ_x^{(2)}Ŝ_y^{(2)} + λ Ŝ_x^{(3)}Ŝ_y^{(3)}` summed over the
 open nearest-neighbour bonds) and crystal-field anisotropy `D` (the single-ion `D (Ŝ^{(3)})²` term).
-At `λ = 1` it reduces to the anisotropic model (8.1.1). -/
+At `λ = 1` it is the **open-boundary** version of the anisotropic model (8.1.1) (which (8.1.1) takes
+with periodic boundary); the two agree in the bulk / thermodynamic limit. -/
 noncomputable def lambdaDChainHamiltonianS (L : ℕ) (lam D : ℝ) : ManyBodyOpS (Fin L) 2 :=
   (∑ x : Fin L, ∑ y : Fin L,
       openAnisotropicChainCoupling L x y • spinSDotXXZ x y (lam : ℂ) 2) +
