@@ -7907,6 +7907,24 @@ $(C_1,C_2)$, formalizing Tasaki's ``with the same constants as in Theorem 4.6''.
 scale-invariant Rayleigh-ratio form, conditional on long-range order (vacuous in one dimension by
 Corollary 4.3).  Chapters~3--10 backfill.
 
+\noindent\textbf{Theorem 4.9} (Tanaka, Tasaki §4.2.1, eqs.~(4.2.12)--(4.2.15), pp.~98--99; documented
+axiom, \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The Tanaka state exhibits \emph{full
+$SU(2)$ symmetry breaking} in the $(1,0,0)$ direction.  There \emph{exists} a sufficiently slowly diverging $M(L)$
+($\texttt{Tendsto}\ M\ \texttt{atTop atTop}$, with $M(L)+1\le C_1 L^{d/2}$; Tasaki's proof produces
+one, not every such sequence) for which the per-site staggered moments of $\Xi_{(1,0,0)}$ (in
+Rayleigh-ratio form via \texttt{expectationRatioRe}, helpers \texttt{tanakaOrderMean1/2/3} and
+\texttt{tanakaOrderSecond1/2/3}) satisfy $\liminf_L\langle\hat O_L^{(1)}/L^d\rangle\ge m^\ast$
+(4.2.12), $\liminf_L\langle(\hat O_L^{(1)}/L^d)^2\rangle\ge(m^\ast)^2$ (4.2.13) --- the rigorous
+$\liminf$ forms of Tasaki footnote~21 --- while $\langle\hat O_L^{(\alpha)}/L^d\rangle=0$ for
+$\alpha=2,3$ eventually (4.2.14) and $\lim_L\langle(\hat O_L^{(\alpha)}/L^d)^2\rangle=0$ for
+$\alpha=2,3$ (4.2.15), so the order-operator density behaves as a classical vector of magnitude
+$m^\ast$ pointing in $(1,0,0)$ with vanishing fluctuation.  The order parameter $m^\ast>0$
+(eq.~(4.2.9)) is recorded as an existential real (its double-limit construction and the bound
+$m^\ast\ge\sqrt{3q_0}$ of Theorem 4.11 kept separate); the $\alpha=2$ staggered operator
+\texttt{staggeredOrderOp2S} is added.  The axiom \texttt{tanakaSSB\_full\_symmetry\_breaking} shares
+$C_1$ with Theorem 4.6 and is conditional on long-range order (vacuous in one dimension by
+Corollary 4.3).  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}

@@ -4,6 +4,7 @@ import LatticeSystem.Quantum.SpinS.DysonLiebSimon
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Data.ZMod.Basic
+import Mathlib.Order.Filter.AtTopBot.Basic
 
 /-!
 # Tasaki §4.2: the "tower" of low-lying states (Theorem 4.6)
@@ -53,6 +54,18 @@ assignment `A`.  Since `Ŝ^{(1)} = (Ŝ^+ + Ŝ^−)/2`, this is `(Ô_L^+ + Ô_L^�
 operator whose direction `(1,0,0)` the Tanaka symmetry-breaking state singles out. -/
 noncomputable def staggeredOrderOp1S (A : Λ → Bool) (N : ℕ) : ManyBodyOpS Λ N :=
   ∑ x : Λ, (if A x then (1 : ℂ) else (-1 : ℂ)) • spinSSiteOp1 x N
+
+/-- The **staggered `2`-axis order operator** `Ô_L^{(2)} = Σ_x ε_x Ŝ_x^{(2)}` for a sublattice
+assignment `A`.  The `α = 3` staggered operator is the existing `staggeredOrderOpS`. -/
+noncomputable def staggeredOrderOp2S (A : Λ → Bool) (N : ℕ) : ManyBodyOpS Λ N :=
+  ∑ x : Λ, (if A x then (1 : ℂ) else (-1 : ℂ)) • spinSSiteOp2 x N
+
+/-- The **real Rayleigh expectation** of an operator `O` at a vector `w`:
+`expectationRatioRe O w = ⟨w, O w⟩.re / ⟨w, w⟩.re`.  Scale-invariant, so usable for states that are
+not (proven to be) unit-normalized — in particular the Tanaka state. -/
+noncomputable def expectationRatioRe {ι : Type*} [Fintype ι]
+    (O : Matrix ι ι ℂ) (w : ι → ℂ) : ℝ :=
+  (star w ⬝ᵥ O.mulVec w).re / (star w ⬝ᵥ w).re
 
 /-- The squared `L²` norm of a vector, as a real number: `vecNormSqRe w = (⟨w, w⟩).re`.  Used as the
 positive denominator in Rayleigh quotients and as the well-definedness witness for normalization. -/
@@ -113,6 +126,50 @@ so this bipartitions the torus (consistently for even `L`, where the wrap-around
 parity). -/
 def torusParitySublattice (d L : ℕ) [NeZero L] (x : HypercubicTorus d L) : Bool :=
   (∑ i : Fin d, (x i).val) % 2 = 0
+
+/-- The **per-site staggered moment** `⟨Ξ| Ô_L^{(α)} |Ξ⟩ / L^d` of the Tanaka state in axis
+`α = 1, 2, 3` (the order-operator density expectation), in Rayleigh-ratio form. -/
+noncomputable def tanakaOrderMean1 (d L N : ℕ) [NeZero L] (M : ℕ)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) : ℝ :=
+  expectationRatioRe (staggeredOrderOp1S (torusParitySublattice d L) N)
+    (tanakaSSBState (torusParitySublattice d L) N M Φ) / (L : ℝ) ^ d
+
+/-- The per-site staggered moment in axis `α = 2` (see `tanakaOrderMean1`). -/
+noncomputable def tanakaOrderMean2 (d L N : ℕ) [NeZero L] (M : ℕ)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) : ℝ :=
+  expectationRatioRe (staggeredOrderOp2S (torusParitySublattice d L) N)
+    (tanakaSSBState (torusParitySublattice d L) N M Φ) / (L : ℝ) ^ d
+
+/-- The per-site staggered moment in axis `α = 3` (using the existing `staggeredOrderOpS`). -/
+noncomputable def tanakaOrderMean3 (d L N : ℕ) [NeZero L] (M : ℕ)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) : ℝ :=
+  expectationRatioRe (staggeredOrderOpS (torusParitySublattice d L) N)
+    (tanakaSSBState (torusParitySublattice d L) N M Φ) / (L : ℝ) ^ d
+
+/-- The **per-site squared staggered moment** `⟨Ξ| (Ô_L^{(α)})² |Ξ⟩ / (L^d)²` of the Tanaka state in
+axis `α = 1, 2, 3` (the order-operator-density-squared expectation), in Rayleigh-ratio form. -/
+noncomputable def tanakaOrderSecond1 (d L N : ℕ) [NeZero L] (M : ℕ)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) : ℝ :=
+  expectationRatioRe
+    (staggeredOrderOp1S (torusParitySublattice d L) N *
+      staggeredOrderOp1S (torusParitySublattice d L) N)
+    (tanakaSSBState (torusParitySublattice d L) N M Φ) / ((L : ℝ) ^ d) ^ 2
+
+/-- The per-site squared staggered moment in axis `α = 2` (see `tanakaOrderSecond1`). -/
+noncomputable def tanakaOrderSecond2 (d L N : ℕ) [NeZero L] (M : ℕ)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) : ℝ :=
+  expectationRatioRe
+    (staggeredOrderOp2S (torusParitySublattice d L) N *
+      staggeredOrderOp2S (torusParitySublattice d L) N)
+    (tanakaSSBState (torusParitySublattice d L) N M Φ) / ((L : ℝ) ^ d) ^ 2
+
+/-- The per-site squared staggered moment in axis `α = 3` (see `tanakaOrderSecond1`). -/
+noncomputable def tanakaOrderSecond3 (d L N : ℕ) [NeZero L] (M : ℕ)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) : ℝ :=
+  expectationRatioRe
+    (staggeredOrderOpS (torusParitySublattice d L) N *
+      staggeredOrderOpS (torusParitySublattice d L) N)
+    (tanakaSSBState (torusParitySublattice d L) N M Φ) / ((L : ℝ) ^ d) ^ 2
 
 /-- **Tasaki Theorem 4.6 (Anderson's tower of low-lying states), AXIOM.**  Fix the spin `S = N/2`
 and a dimension `d ≥ 1`.  There are positive constants `C₁`, `C₂` (depending only on `d`, `S`, and
@@ -239,5 +296,79 @@ Tasaki sketches the proof (§4.2.2, following Tanaka [62]); recorded here as a f
 documented axiom over the torus family. -/
 axiom tanakaSSB_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
     ∃ C₁ C₂ : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂ ∧ IsTanakaSSBConstants d N q₀ C₁ C₂
+
+open Filter in
+/-- The Theorem 4.9 full-symmetry-breaking statement for fixed constants `C₁` and order parameter
+`mStar`.  For a slowly diverging sequence `M(L)` (`Tendsto M atTop atTop`, with `M(L) + 1 ≤
+C₁ L^{d/2}`), the Tanaka state `Ξ_{(1,0,0)}` realizes full `SU(2)` symmetry breaking in the `(1,0,0)`
+direction (eqs. (4.2.12)–(4.2.15)):
+* `lim_L ⟨Ξ| Ô_L^{(1)}/L^d |Ξ⟩ = mStar`                 (4.2.12),
+* `lim_L ⟨Ξ| (Ô_L^{(1)}/L^d)² |Ξ⟩ = mStar²`             (4.2.13),
+* `⟨Ξ| Ô_L^{(α)}/L^d |Ξ⟩ = 0` for `α = 2, 3`, all `L`   (4.2.14),
+* `lim_L ⟨Ξ| (Ô_L^{(α)}/L^d)² |Ξ⟩ = 0` for `α = 2, 3`   (4.2.15).
+
+All expectations are in scale-invariant Rayleigh-ratio form (`expectationRatioRe`), as `Ξ` is not
+proven unit-normalized in Lean.  The ground state family `Φ` (energies `E₀`) is given, with the
+minimizer / long-range-order conditions holding *eventually* (for all sufficiently large even `L`).
+The theorem then asserts the existence of a *sufficiently slowly diverging* sequence `M(L)`
+(`Tendsto M atTop atTop`, with the growth bound `M L + 1 ≤ C₁ L^{d/2}` and positive squared norms of
+the Tanaka terms/state holding eventually) — Tasaki's proof produces such an `M`, not every diverging
+one (Lemma 4.16 does not identify a concrete choice), so the statement is existential in `M`.  For
+that `M`, the order-operator-density expectations obey the symmetry-breaking relations.
+
+Per Tasaki footnote 21, the rigorous forms of (4.2.12)/(4.2.13) are `liminf`, so we state the sound
+lower bounds `liminf_L ⟨Ô_L^{(1)}/L^d⟩ ≥ mStar` and `liminf_L ⟨(Ô_L^{(1)}/L^d)²⟩ ≥ mStar²` (i.e.
+eventually `> mStar − ε` / `> mStar² − ε`); the matching upper bounds follow from `mStar` being the
+*maximal* density (eq. (4.2.9)) and are not separately encoded.  The order parameter `mStar > 0` is
+an existential real, not the double limit `lim_k lim_L`. -/
+def IsTanakaFullSSBConstants (d N : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
+  0 < C₁ ∧ 0 < mStar ∧
+    ∀ (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ),
+      -- the ground-state / minimizer / LRO conditions hold *eventually* for the given family
+      (∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
+        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec (Φ L) = E₀ L • Φ L ∧
+        (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+          (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
+        Φ L ≠ 0 ∧
+        q₀ ≤ (star (Φ L) ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
+            staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
+            ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2)) →
+      -- there exists a sufficiently slowly diverging M(L) for which the SSB relations hold
+      ∃ M : ℕ → ℕ, Tendsto M atTop atTop ∧
+        (∃ L₂ : ℕ, ∀ (L : ℕ) [NeZero L], L₂ ≤ L → 2 ≤ L → Even L →
+          0 < M L ∧ ((M L : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) ∧
+          0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L) (Φ L)) ∧
+          0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L + 1) (Φ L)) ∧
+          0 < vecNormSqRe (tanakaSSBState (torusParitySublattice d L) N (M L) (Φ L))) ∧
+        -- (4.2.12) liminf ≥ mStar
+        (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+          mStar - ε < tanakaOrderMean1 d L N (M L) (Φ L)) ∧
+        -- (4.2.13) liminf ≥ mStar²
+        (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+          mStar ^ 2 - ε < tanakaOrderSecond1 d L N (M L) (Φ L)) ∧
+        -- (4.2.14) the orthogonal moments vanish (eventually, exactly)
+        (∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+          tanakaOrderMean2 d L N (M L) (Φ L) = 0 ∧ tanakaOrderMean3 d L N (M L) (Φ L) = 0) ∧
+        -- (4.2.15) the orthogonal density fluctuations vanish
+        (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+          |tanakaOrderSecond2 d L N (M L) (Φ L)| < ε ∧ |tanakaOrderSecond3 d L N (M L) (Φ L)| < ε)
+
+/-- **Tasaki Theorem 4.9 (the Tanaka state exhibits full symmetry breaking), AXIOM.**  With the same
+constants `C₁`, `C₂` as Theorem 4.6 and an order parameter `mStar > 0`, the Tanaka state
+`|Ξ_{(1,0,0)}⟩` realizes full `SU(2)` symmetry breaking in the `(1,0,0)` direction (eqs.
+(4.2.12)–(4.2.15)): for a *sufficiently slowly diverging* `M(L)` (existential, as Tasaki's proof
+produces one — not every diverging sequence), the staggered moment per site has `liminf ≥ mStar`
+along axis `1`, the squared moment `liminf ≥ mStar²` (the `liminf` forms per footnote 21), while
+along axes `2, 3` both vanish — so the order-operator density behaves as a classical vector of
+magnitude `mStar` pointing in `(1,0,0)`, with vanishing fluctuation.
+
+The order parameter `mStar` is recorded as an existential real (`> 0`); its identity with the double
+limit (4.2.9) and the inequality `mStar ≥ √(3 q₀)` (Theorem 4.11) are kept separate.  Conditional on
+long-range order (same `q₀` premise as Theorem 4.6), hence vacuous in one dimension by Corollary 4.3.
+Tasaki gives the complete proof (§4.2.2, following Tanaka [62]); recorded here as a faithful, sound
+documented axiom over the torus family. -/
+axiom tanakaSSB_full_symmetry_breaking (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
+    ∃ C₁ C₂ mStar : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂ ∧
+      IsTanakaSSBConstants d N q₀ C₁ C₂ ∧ IsTanakaFullSSBConstants d N q₀ C₁ mStar
 
 end LatticeSystem.Quantum
