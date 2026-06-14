@@ -308,16 +308,20 @@ direction (eqs. (4.2.12)–(4.2.15)):
 * `lim_L ⟨Ξ| (Ô_L^{(α)}/L^d)² |Ξ⟩ = 0` for `α = 2, 3`   (4.2.15).
 
 All expectations are in scale-invariant Rayleigh-ratio form (`expectationRatioRe`), as `Ξ` is not
-proven unit-normalized in Lean.  For each torus the ground state `Φ L` (energy `E₀ L`) must be a
-minimizer with the long-range-order property (`q₀` premise) and the Tanaka tower terms / state must
-have positive squared norm (well-definedness of `unitNormalize`).  The order parameter `mStar > 0`
+proven unit-normalized in Lean.  For all *sufficiently large* even `L` the ground state `Φ L` (energy `E₀ L`)
+must be a minimizer with the long-range-order property (`q₀` premise), the growth bound
+`M L + 1 ≤ C₁ L^{d/2}` must hold, and the Tanaka tower terms / state must have positive squared norm
+(well-definedness of `unitNormalize`) — these model/growth conditions are imposed *eventually* (an
+`∃ L₁` threshold), matching the asymptotic nature of the statement.  The order parameter `mStar > 0`
 (eq. (4.2.9)) is recorded as an existential real parameter rather than constructed as the double limit
 `lim_k lim_L`. -/
 def IsTanakaFullSSBConstants (d N : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
   0 < C₁ ∧ 0 < mStar ∧
     ∀ (M : ℕ → ℕ) (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ),
       Tendsto M atTop atTop →
-      (∀ (L : ℕ) [NeZero L], 2 ≤ L → Even L →
+      -- the model and growth conditions hold *eventually* (for all sufficiently large even `L`),
+      -- matching the asymptotic nature of the statement
+      (∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
         0 < M L ∧ ((M L : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) ∧
         (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec (Φ L) = E₀ L • Φ L ∧
         (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
@@ -333,7 +337,7 @@ def IsTanakaFullSSBConstants (d N : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
         |tanakaOrderMean1 d L N (M L) (Φ L) - mStar| < ε) ∧
       (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
         |tanakaOrderSecond1 d L N (M L) (Φ L) - mStar ^ 2| < ε) ∧
-      (∀ (L : ℕ) [NeZero L], 2 ≤ L → Even L →
+      (∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
         tanakaOrderMean2 d L N (M L) (Φ L) = 0 ∧ tanakaOrderMean3 d L N (M L) (Φ L) = 0) ∧
       (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
         |tanakaOrderSecond2 d L N (M L) (Φ L)| < ε ∧ |tanakaOrderSecond3 d L N (M L) (Φ L)| < ε)
