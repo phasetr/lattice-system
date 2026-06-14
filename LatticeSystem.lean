@@ -47,6 +47,7 @@ import LatticeSystem.Quantum.KaplanHorschVonderLinden
 import LatticeSystem.Quantum.SpinS.DysonLiebSimon
 import LatticeSystem.Quantum.SpinS.HaldaneConjecture
 import LatticeSystem.Quantum.SpinS.AKLT
+import LatticeSystem.Quantum.SpinS.AKLTInfiniteChain
 import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattis
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisGeneral
