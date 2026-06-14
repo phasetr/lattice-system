@@ -378,7 +378,8 @@ parameter `q₀` as exact infinite-volume limits.  This bundles the conditioning
 4.11, 4.13 and Lemma 4.15: `M` diverges (`Tendsto M atTop atTop`); `Φ L` is an eventual minimizing
 nonzero ground state with the growth bound `M L + 1 ≤ C₁ L^{d/2}` and well-defined Tanaka terms;
 `q₀` is the exact LRO limit (eq. (4.1.7)/(4.2.25)); `m∗` is the exact staggered-moment limit
-(eq. (4.2.12)); and `m∗` is the genuine full-SSB order parameter (`IsTanakaFullSSBConstants`).  These
+(eq. (4.2.12)); and `m∗` is the genuine full-SSB order parameter (`IsTanakaFullSSBConstants`). 
+These
 conditions are unsatisfiable in `d = 1` (no LRO ground state, Corollary 4.3). -/
 def IsRealizingTanakaGroundStateFamily (d N : ℕ) (q₀ mStar C₁ : ℝ)
     (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ) (M : ℕ → ℕ) : Prop :=
@@ -400,17 +401,23 @@ def IsRealizingTanakaGroundStateFamily (d N : ℕ) (q₀ mStar C₁ : ℝ)
     |tanakaOrderMean1 d L N (M L) (Φ L) - mStar| < ε) ∧
   IsTanakaFullSSBConstants d N q₀ C₁ mStar
 
-/-- **Tasaki Theorem 4.11 (the two order parameters), AXIOM.**  The symmetry-breaking order parameter
+/-- **Tasaki Theorem 4.11 (the two order parameters), AXIOM.**  The symmetry-breaking order
+parameter
 `m∗` and the long-range-order parameter `q₀` satisfy `√(3 q₀) ≤ m∗` (eq. (4.2.23)).  The factor `√3`
 reflects the `SU(2)` symmetry of the Heisenberg model (for the `U(1)`/XXZ variant it is `√2`).
 
-To avoid the downward-closure of `IsTanakaFullSSBConstants` (a `liminf ≥ m` lower bound, true for any
-smaller `m` and vacuously true in `d = 1`), `m∗` and `q₀` are pinned as the **exact** infinite-volume
-limits of a `IsRealizingTanakaGroundStateFamily` (`hFamily`): a genuine realizing ground-state family
+To avoid the downward-closure of `IsTanakaFullSSBConstants` (a `liminf ≥ m` lower bound, true for
+any
+smaller `m` and vacuously true in `d = 1`), `m∗` and `q₀` are pinned as the **exact**
+infinite-volume
+limits of a `IsRealizingTanakaGroundStateFamily` (`hFamily`): a genuine realizing ground-state
+family
 `Φ` and slowly-diverging tower `M` with the exact LRO limit `q₀`, the exact staggered-moment limit
-`m∗`, and `m∗ = ` the full-SSB order parameter (`IsTanakaFullSSBConstants`, connecting to Theorem 4.9
+`m∗`, and `m∗ = ` the full-SSB order parameter (`IsTanakaFullSSBConstants`, connecting to Theorem
+4.9
 for the *same* `m∗`).  The exact-limit conditions force `m∗` to the unique limit value, so the
-predicate's downward-closure is harmless, and they are unsatisfiable in `d = 1` (no LRO ground state,
+predicate's downward-closure is harmless, and they are unsatisfiable in `d = 1` (no LRO ground
+state,
 Corollary 4.3), so the bound applies exactly where it should.  `m∗ > 0` follows from `q₀ > 0`. -/
 axiom tanakaSSB_orderParameter_lowerBound (d N : ℕ) (hd : 1 ≤ d) (q₀ mStar C₁ : ℝ)
     (hq₀ : 0 < q₀) (hC₁ : 0 < C₁)

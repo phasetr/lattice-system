@@ -5,15 +5,18 @@ import Mathlib.Analysis.Normed.Module.FiniteDimension
 /-!
 # Tasaki §4.2.2: the order-operator algebra and Lemma 4.14
 
-The proofs of the tower theorems use the per-volume order operators `ô^± = Ô_L^± / V` (`V = L^d`) and
+The proofs of the tower theorems use the per-volume order operators `ô^± = Ô_L^± / V` (`V = L^d`)
+and
 the `U(1)`-symmetric order operator `p̂ = ½(ô^+ ô^- + ô^- ô^+)` (eqs. (4.2.30)–(4.2.31)).  The
-commutator `[Ô_L^+, Ô_L^-] = 2 Ŝ_tot^{(3)}` (eq. (4.2.32)) gives `‖[ô^+, ô^-]‖ ≤ o₀/V` with `o₀ = 2S`
+commutator `[Ô_L^+, Ô_L^-] = 2 Ŝ_tot^{(3)}` (eq. (4.2.32)) gives `‖[ô^+, ô^-]‖ ≤ o₀/V` with `o₀ =
+2S`
 (eq. (4.2.33)), whence the key elementary bound:
 
 **Lemma 4.14** (eq. (4.2.34)): for any balanced sign sequence `s₁, …, s_{2n} ∈ {+, −}` (`n` pluses
 and `n` minuses), the operator norm of the difference between the product and `p̂ⁿ` is small,
 `‖ô^{s₁} ⋯ ô^{s_{2n}} − p̂ⁿ‖ ≤ n² (o₀)^{2n−1} / V`,
-because any balanced product can be rearranged to any other by at most `n²` neighboring `±` exchanges,
+because any balanced product can be rearranged to any other by at most `n²` neighboring `±`
+exchanges,
 each costing `≤ ‖[ô^+, ô^-]‖ ≤ o₀/V`.
 
 This file defines the order-operator algebra and records Lemma 4.14 as a documented axiom (the
@@ -83,13 +86,17 @@ symmetry-breaking order parameter `m∗` is the iterated limit of the ground-sta
 (eq. (4.2.38)): `m∗ = lim_{n↑∞} liminf_{L↑∞} ⟨p̂^{n+1}⟩ / ⟨p̂^n⟩` (the `n`-ratio is increasing and
 bounded, so the outer limit exists; the inner is a `liminf` per footnote 31).  We state the sound
 `liminf`-lower direction — for every `ε > 0`, for all large `n`, eventually in (even) `L` the ratio
-exceeds `m∗ − ε` — which captures `lim_n liminf_L ⟨p̂^{n+1}⟩/⟨p̂^n⟩ ≥ m∗`.  The axiom also records the
-`U(1)`-optimal bound `√(2 q₀) ≤ m∗` (eq. (4.2.39), the weaker `√2` companion of Theorem 4.11's `√3`).
+exceeds `m∗ − ε` — which captures `lim_n liminf_L ⟨p̂^{n+1}⟩/⟨p̂^n⟩ ≥ m∗`.  The axiom also records
+the
+`U(1)`-optimal bound `√(2 q₀) ≤ m∗` (eq. (4.2.39), the weaker `√2` companion of Theorem 4.11's
+`√3`).
 
 `m∗` is the genuine order parameter, pinned (as in Theorems 4.11/4.13) by a realizing ground-state
-family `Φ` with exact LRO limit `q₀`, staggered-moment limit `m∗`, `IsTanakaFullSSBConstants`, and the
+family `Φ` with exact LRO limit `q₀`, staggered-moment limit `m∗`, `IsTanakaFullSSBConstants`, and
+the
 realizing slow tower `M` — unsatisfiable in `d = 1` (no LRO, Corollary 4.3), so vacuous there.  The
-`p̂`-moment denominators are positive (`hPhat`, `⟨p̂^n⟩ ≥ (2q₀)^n > 0` under LRO, eq. (4.2.37)), so the
+`p̂`-moment denominators are positive (`hPhat`, `⟨p̂^n⟩ ≥ (2q₀)^n > 0` under LRO, eq. (4.2.37)),
+so the
 Rayleigh-ratio division is meaningful. -/
 axiom mStar_eq_phat_ratio_limit (d N : ℕ) (hd : 1 ≤ d) (q₀ mStar C₁ : ℝ)
     (hq₀ : 0 < q₀) (hC₁ : 0 < C₁)

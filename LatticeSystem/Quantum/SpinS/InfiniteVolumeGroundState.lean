@@ -7,7 +7,8 @@ import Mathlib.Topology.Algebra.InfiniteSum.Basic
 /-!
 # Tasaki §4.3.1: ground states of the infinite-volume antiferromagnetic Heisenberg model
 
-On the infinite hypercubic lattice `ℤᵈ` the antiferromagnetic Heisenberg model is treated through its
+On the infinite hypercubic lattice `ℤᵈ` the antiferromagnetic Heisenberg model is treated through
+its
 algebra of local observables and its states (linear functionals giving expectation values), rather
 than vectors in a Hilbert space.  Following Tasaki §4.3.1, we bundle the abstract data — the
 `C*`-algebra of observables, the per-site spin operators `Ŝ_x^{(α)}`, and the translation
@@ -16,7 +17,8 @@ automorphisms `τ_x` — into `InfiniteSpinSystem`, and reuse the existing `C*`-
 
 **Definition 4.17**: a *translation-invariant* state `ω` is a **ground state** of the
 antiferromagnetic Heisenberg model iff `ω(Ŝ_x · Ŝ_y) = ε_GS` for every nearest-neighbor bond
-`{x, y} ∈ B∞` (eq. (4.3.1)), where `ε_GS` is the ground-state energy density (per bond).  This is the
+`{x, y} ∈ B∞` (eq. (4.3.1)), where `ε_GS` is the ground-state energy density (per bond).  This is
+the
 infinite-volume version of the finite-volume variational characterization, restricted to
 translation-invariant states (cf. Definition A.25 / Theorem A.26).
 
@@ -57,11 +59,13 @@ namespace InfiniteSpinSystem
 
 variable {d : ℕ} {A : Type*} [CStarAlgebra A] [NormedSpace ℂ A] [StarModule ℂ A]
 
-/-- A site `x ∈ ℤᵈ` is **even** when its coordinate sum is even (`ℤᵈ_even`, eq. (4.3.2)); this is the
+/-- A site `x ∈ ℤᵈ` is **even** when its coordinate sum is even (`ℤᵈ_even`, eq. (4.3.2)); this is
+the
 infinite-volume `A`-sublattice. -/
 def evenSite (x : Fin d → ℤ) : Prop := (∑ i, x i) % 2 = 0
 
-/-- `{x, y}` is a **nearest-neighbor bond** (`B∞`, eq. (4.3.1)) when `x` and `y` differ in exactly one
+/-- `{x, y}` is a **nearest-neighbor bond** (`B∞`, eq. (4.3.1)) when `x` and `y` differ in exactly
+one
 coordinate by `±1`. -/
 def bond (x y : Fin d → ℤ) : Prop :=
   ∃ i : Fin d, |x i - y i| = 1 ∧ ∀ j, j ≠ i → x j = y j
@@ -71,7 +75,8 @@ noncomputable def spinDot (S : InfiniteSpinSystem d A) (x y : Fin d → ℤ) : A
   ∑ α : Fin 3, S.spin x α * S.spin y α
 
 /-- A state `ρ` is **translation invariant** when `ρ(τ_x a) = ρ(a)` for every observable `a` and
-every **even** translation `x ∈ ℤᵈ_even`.  This is exactly Tasaki's convention for §4.3: he restricts
+every **even** translation `x ∈ ℤᵈ_even`.  This is exactly Tasaki's convention for §4.3: he
+restricts
 the translations to the even sublattice `ℤᵈ_even`, "anticipating antiferromagnetic order" (the Néel
 state is invariant under even translations but *not* under odd ones), and footnote 35 explicitly
 notes this is a deliberate restriction of the general (all-`x`) notion to even translations.  So the
@@ -140,7 +145,8 @@ axiom IsGroundStateEnergyDensity {d : ℕ} {A : Type*} [CStarAlgebra A] [NormedS
 documented predicate, the infinite-volume LRO assumption).  Tasaki's construction of the
 symmetry-breaking ground states `ω_n` (Theorem 4.20) presumes the model has Néel long-range order
 (`m∗ > 0`); in one dimension there is no such order (cf. Corollary 4.3), so this hypothesis is not
-available there.  Kept uninterpreted so the existence of `ω_n` is genuinely conditional on long-range
+available there.  Kept uninterpreted so the existence of `ω_n` is genuinely conditional on
+long-range
 order, not trivially dischargeable. -/
 axiom HasStaggeredLRO {d : ℕ} {A : Type*} [CStarAlgebra A] [NormedSpace ℂ A] [StarModule ℂ A] :
     InfiniteSpinSystem d A → ℝ → Prop
@@ -148,7 +154,8 @@ axiom HasStaggeredLRO {d : ℕ} {A : Type*} [CStarAlgebra A] [NormedSpace ℂ A]
 /-- **Tasaki Theorem 4.20 for `ω_0` (the symmetric infinite-volume ground state), AXIOM.**  The
 infinite-volume state `ω_0` built as the `L↑∞` limit of the unique finite-volume ground-state
 expectation `⟨Φ_GS|·|Φ_GS⟩` (eq. (4.3.7)) is a translation-invariant ground state with vanishing
-single-site magnetization `ω_0(Ŝ_x^{(α)}) = 0` (eq. (4.3.9)): it exhibits long-range order but **no**
+single-site magnetization `ω_0(Ŝ_x^{(α)}) = 0` (eq. (4.3.9)): it exhibits long-range order but
+**no**
 spontaneous symmetry breaking.  The `L↑∞` limit's existence is assumed (Banach–Alaoglu, Theorem
 A.24); recorded as a documented axiom asserting the limit state exists with the stated properties.
 Conditional on `εGS` being the genuine ground-state energy density of `S` (`hε`), so it cannot be
@@ -182,7 +189,8 @@ The statement: every symmetry-breaking infinite-volume ground state `ω` — a t
 ground state with the Néel magnetization `ω(Ŝ_x^{(α)}) = (−1)^x m∗ n_α` for some `m∗ > 0` and unit
 direction `n` (the `ω_n` of Theorem 4.20) — is **ergodic**, hence a *physical* ground state
 (Definition 4.19).  This conjecture motivates identifying the low-lying states `|Ξ_n⟩` as physical
-"ground states".  Tasaki believes it likely valid but it is open; we record it without asserting it. -/
+"ground states".  Tasaki believes it likely valid but it is open; we record it without asserting
+it. -/
 def conjecture_4_21 (S : InfiniteSpinSystem d A) (εGS : ℝ) : Prop :=
   ∀ (mStar : ℝ), 0 < mStar → ∀ (n : Fin 3 → ℝ), IsUnitVector n →
     ∀ (ω : WeakDual ℂ A), IsInfiniteVolumeGroundState S εGS ω →
