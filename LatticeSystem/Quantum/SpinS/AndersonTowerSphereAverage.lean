@@ -105,7 +105,8 @@ def conjecture_4_12 (d N : ℕ) : Prop :=
       IsConjecture412Equality mStar q₀
 
 /-- The Proposition 4.10 statement for fixed constants.  For a given ground-state family `Φ` (with
-the minimizer / long-range-order conditions eventual) and the *actual* long-range-order limit `qStar`
+the minimizer / long-range-order conditions eventual) and the *actual* long-range-order limit
+`qStar`
 of that family (`q∗`, eq. (4.2.25), pinned by `Φ` — not freely chosen), **conditional on
 Conjecture 4.12** (`m∗ = √(3 qStar)`, a genuine hypothesis tying `m∗` to the physical `q∗`):
 there is a slowly diverging `M(L)` such that the *normalized solid-angle average* of the

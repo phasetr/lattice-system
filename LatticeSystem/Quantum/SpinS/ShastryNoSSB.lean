@@ -82,14 +82,16 @@ axiom shastry_no_symmetry_breaking_1d (N : ℕ) :
 *zero-field* one-dimensional spin-`S` antiferromagnetic Heisenberg ring
 (`heisenbergHamiltonianS (ringCoupling L) N`, i.e. `staggeredFieldChainHamiltonianS L 0 N`), the
 squared staggered order parameter per site vanishes in the thermodynamic limit (eq. (4.1.11)):
-`lim_{L↑∞} ⟨Φ_GS| (Ô_L^{(3)}/L)² |Φ_GS⟩ = 0`.  In explicit `ε`–`δ` form: for every `ε > 0` there is a
+`lim_{L↑∞} ⟨Φ_GS| (Ô_L^{(3)}/L)² |Φ_GS⟩ = 0`.  In explicit `ε`–`δ` form: for every `ε > 0` there
+is a
 size threshold `L₀` beyond which every normalized ground state `Φ` of the zero-field ring has
 `|⟨Φ, (Ô_L^{(3)})² Φ⟩.re / L²| < ε`.
 
 In Tasaki this is a *corollary* of Shastry's Theorem 4.2 (eq. (4.1.10)) together with the
 Kaplan–Horsch–von der Linden theorem (Theorem 3.2) and the Marshall–Lieb–Mattis theorem
 (Theorem 2.2): if long-range order were present, Theorem 3.2 would force a nonzero field-limit
-staggered moment, contradicting Theorem 4.2.  That derivation runs through the *double-limit* form of
+staggered moment, contradicting Theorem 4.2.  That derivation runs through the *double-limit* form
+of
 Theorem 3.2 (only its finite-volume variational core is formalized here) and the axiom Theorem 4.2,
 so we record Corollary 4.3 as a faithful documented axiom over the concrete zero-field ring family.
 The deep infinite-volume argument is deferred (in scope). -/

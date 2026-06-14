@@ -29,7 +29,8 @@ open Matrix Filter
 
 variable {N : ℕ}
 
-/-- The **staggered-field Hamiltonian** `Ĥ_h = Ĥ − h Ô_L^{(1)}` (eq. (4.2.27)) on the `d`-dimensional
+/-- The **staggered-field Hamiltonian** `Ĥ_h = Ĥ − h Ô_L^{(1)}` (eq. (4.2.27)) on the
+`d`-dimensional
 hypercubic torus: the antiferromagnetic nearest-neighbor Heisenberg Hamiltonian minus an external
 staggered field `h ≥ 0` coupled to the `1`-axis staggered order operator. -/
 noncomputable def staggeredFieldHamiltonianS (d L N : ℕ) [NeZero L] (h : ℝ) :
@@ -45,8 +46,10 @@ that for each `0 < h < δ` there is a size threshold `L₀` (depending on `h`) b
 even-side field ground state `Φ_GS,h,L` has `m∗ − ε ≤ ⟨Φ_GS,h,L, Ô_L^{(1)} Φ_GS,h,L⟩.re / L^d`.
 
 `m∗` is the genuine order parameter, pinned (as in Theorem 4.11) by a realizing *unperturbed* ground
-state family `Φ₀` and slow tower `M` (`hFamily : IsRealizingTanakaGroundStateFamily …`: exact LRO and
-staggered-moment limits plus `IsTanakaFullSSBConstants`) — these are unsatisfiable in `d = 1` (no LRO
+state family `Φ₀` and slow tower `M` (`hFamily : IsRealizingTanakaGroundStateFamily …`: exact LRO
+and
+staggered-moment limits plus `IsTanakaFullSSBConstants`) — these are unsatisfiable in `d = 1` (no
+LRO
 ground state, Corollary 4.3), so the statement is vacuous there.
 The field ground states `Φ_GS,h` are a *given* family of eigenvector/minimizer/nonzero states of
 `Ĥ_h` (`hField`).  Combined with Theorem 4.11, this yields `≥ m∗ ≥ √(3 q₀) > 0`. -/
