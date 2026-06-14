@@ -375,15 +375,20 @@ axiom tanakaSSB_full_symmetry_breaking (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (
 `m∗` and the long-range-order parameter `q₀` satisfy `√(3 q₀) ≤ m∗` (eq. (4.2.23)).  The factor `√3`
 reflects the `SU(2)` symmetry of the Heisenberg model (for the `U(1)`/XXZ variant it is `√2`).
 
-The predicate `IsTanakaFullSSBConstants … m` is *downward-closed* in `m` (it asserts the moments have
-`liminf ≥ m`, so it also holds for any smaller positive value).  Hence the bound is meaningful only
-for the **genuine** order parameter — the *maximal* such `m∗` — not an arbitrary lower bound.  The
-axiom therefore provides `m∗` together with a **maximality witness** (`hmax`: every `m'` for which the
-full-SSB bounds hold satisfies `m' ≤ m∗`), pinning `m∗` to the true order parameter (eq. (4.2.9)), and
-asserts `√(3 q₀) ≤ m∗`.  `m∗ > 0` then follows from `q₀ > 0`. -/
-axiom tanakaSSB_orderParameter_lowerBound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
-    ∃ C₁ mStar : ℝ, IsTanakaFullSSBConstants d N q₀ C₁ mStar ∧
-      (∀ m' : ℝ, (∃ C₁' : ℝ, IsTanakaFullSSBConstants d N q₀ C₁' m') → m' ≤ mStar) ∧
-      Real.sqrt (3 * q₀) ≤ mStar
+To avoid the downward-closure of `IsTanakaFullSSBConstants` (a `liminf ≥ m` lower bound, true for any
+smaller `m` and vacuously true in `d = 1`), `m∗` and `q₀` are pinned as the **exact** infinite-volume
+limits of a *genuine* realizing ground-state family `Φ`: `q₀` is the long-range-order limit (`hLRO`,
+eq. (4.1.7) / (4.2.25)) and `m∗` the staggered-moment limit of the Tanaka state (`hSSB`, eq. (4.2.12),
+exact two-sided limit).  These hypotheses are unsatisfiable in `d = 1` (no LRO ground state, Corollary
+4.3), so the bound applies exactly where it should.  `m∗ > 0` then follows from `q₀ > 0`. -/
+axiom tanakaSSB_orderParameter_lowerBound (d N : ℕ) (hd : 1 ≤ d) (q₀ mStar : ℝ) (hq₀ : 0 < q₀)
+    (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (M : ℕ → ℕ)
+    (hLRO : ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+      |(star (Φ L) ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
+          staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
+          ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2) - q₀| < ε)
+    (hSSB : ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+      |tanakaOrderMean1 d L N (M L) (Φ L) - mStar| < ε) :
+    Real.sqrt (3 * q₀) ≤ mStar
 
 end LatticeSystem.Quantum

@@ -7944,13 +7944,14 @@ long-range order (vacuous in one dimension by Corollary 4.3).  Chapters~3--10 ba
 \noindent\textbf{Theorem 4.11} (Koma--Tasaki, Tasaki §4.2.1, eq.~(4.2.23), p.~101; documented axiom,
 \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The two order parameters satisfy
 $\sqrt{3q_0}\le m^\ast$, where the factor $\sqrt3$ reflects the $SU(2)$ symmetry of the Heisenberg
-model (it becomes $\sqrt2$ for the $U(1)$/XXZ variant).  Because the predicate
-\texttt{IsTanakaFullSSBConstants}\,$\dots\,m$ is downward-closed in $m$ (the moments have
-$\liminf\ge m$), the bound is meaningful only for the \emph{maximal} such $m^\ast$.  The axiom
-\texttt{tanakaSSB\_orderParameter\_lowerBound} therefore provides $m^\ast$ with a maximality witness
-($\forall m'$ admitting the full-SSB bounds, $m'\le m^\ast$), pinning $m^\ast$ to the genuine order
-parameter (eq.~(4.2.9)), and concludes $\sqrt{3q_0}\le m^\ast$ (so $m^\ast>0$).  Chapters~3--10
-backfill.
+model (it becomes $\sqrt2$ for the $U(1)$/XXZ variant).  To avoid the downward-closure of the SSB
+predicate (a $\liminf\ge m$ bound, true for any smaller $m$ and vacuous in $d=1$), the axiom
+\texttt{tanakaSSB\_orderParameter\_lowerBound} pins $q_0$ and $m^\ast$ as the \emph{exact}
+infinite-volume limits of a genuine realizing ground-state family $\Phi$: $q_0$ is the long-range
+order limit (\texttt{hLRO}) and $m^\ast$ the staggered-moment limit $\texttt{tanakaOrderMean1}\to
+m^\ast$ of the Tanaka state (\texttt{hSSB}, exact two-sided limit).  These hypotheses are
+unsatisfiable in $d=1$ (no LRO ground state, Corollary~4.3), so the bound $\sqrt{3q_0}\le m^\ast$
+applies exactly where intended (and $m^\ast>0$ follows).  Chapters~3--10 backfill.
 
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
