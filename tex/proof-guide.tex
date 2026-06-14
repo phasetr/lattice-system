@@ -8425,6 +8425,26 @@ ground space is then the VBS state in which every bond carries a singlet (Kenned
 1988).  The affine identity is proved; the deep singlet characterization is a documented axiom.
 Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§7.2.1 Hidden antiferromagnetic order / string order parameter} (den
+Nijs--Rommelse; Tasaki §7.2.1, eqs.~(7.2.6)--(7.2.8), pp.~192--194;
+\texttt{Quantum/SpinS/AKLTStringOrder.lean}, Issue \#4485).  The AKLT VBS ground state carries no
+Néel order but a subtle \emph{hidden} antiferromagnetic order, measured by the den Nijs--Rommelse
+string order parameter.  \texttt{spinSStringPhaseS1} is the single-site string phase
+$e^{i\pi\hat S^z}=\mathrm{diag}(-1,1,-1)$ for $S=1$ (entry $(-1)^{k+1}$); \texttt{stringOperatorS}
+$x\,y$ is the diagonal string operator $\exp\!\big(i\pi\sum_{x<z<y}\hat S_z^{(3)}\big)$, acting on a
+configuration $\sigma$ by $\prod_{x<z<y}(-1)^{\sigma_z+1}$; and \texttt{stringCorrelationS}
+$x\,y\,\Phi=\langle\Phi|\hat S_x^{(3)}\exp(i\pi\sum\hat S^{(3)})\hat S_y^{(3)}|\Phi\rangle$ is the
+finite-volume string correlation ($=-S^{(3)}_{x,y}$; the two minus signs of (7.2.6)--(7.2.7) cancel,
+so $O_{\mathrm{string}}^{(3)}=\lim_{d}\lim_{L}$ of it).  The axiom
+\texttt{aklt\_string\_order\_7\_2\_8} states that for the AKLT VBS ground-state family (carried by the
+uninterpreted marker \texttt{IsAKLTVBSGroundStateFamily}) the string order parameter equals
+$O_{\mathrm{string}}^{(3)}(\Phi_{\mathrm{VBS}})=\tfrac49>0$ (eq.~7.2.8, written in the explicit
+double-$\varepsilon$ form with the inner thermodynamic limit $L\uparrow\infty$ taken first).  The
+positive string order is the hidden antiferromagnetic order of the Haldane phase (equal in all three
+directions by SU(2) invariance, while the Néel order vanishes).  Recorded as a documented axiom.
+Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
