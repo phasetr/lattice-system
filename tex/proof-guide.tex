@@ -8333,6 +8333,27 @@ Theorem~6.3); that gap consequence is \emph{not} formalized here, since the form
 (\texttt{lsm\_ground\_twist\_orthogonal}) is specialized to the antiferromagnetic Heisenberg chain.
 Recorded as a documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§6.3 Proposition 6.5} (the $S=1$ chain on the hidden-AFM subspace; Tasaki §6.3,
+eqs.~(6.3.7)--(6.3.9), pp.~168--170; documented axiom,
+\texttt{Quantum/SpinS/HiddenAntiferromagneticOrder.lean}, Issue \#4485).  In the semi-classical kink
+picture, the $S=1$ antiferromagnetic Heisenberg chain restricted to the artificial \emph{hidden
+antiferromagnetic order} subspace $H_{\mathrm{HAF}}$ realizes the Haldane phase.  For the spin-1 chain
+($N=2$, basis configs $\sigma:\mathrm{Fin}\,L\to\mathrm{Fin}\,3$ with $\sigma_x=0,1,2\mapsto+1,0,-1$),
+a configuration has \emph{complete hidden antiferromagnetic order} (\texttt{IsHiddenAFMConfig}, built
+from \texttt{IsPM}/\texttt{InCyclicOpen}/\texttt{IsNextPM}) when the nonzero ($\pm$) spins strictly
+alternate around the ring with arbitrary $0$-spins between (eq.~6.3.9).  We define the projection
+\texttt{hhafProjection} onto $H_{\mathrm{HAF}}$, the compressed Hamiltonian
+$\texttt{hhafRestrictedChainHamiltonianS}=P_{\mathrm{HAF}}\hat HP_{\mathrm{HAF}}$, and the
+$H_{\mathrm{HAF}}$-restricted spectrum \texttt{hhafRealSpectrum}.  The axiom
+\texttt{tasaki\_prop\_6\_5\_hhaf\_spin\_one} states that for even $L>0$ the restricted chain has a
+\emph{unique ground state}, a \emph{finite gap} ($\mathrm{gap}>0$ in the restricted spectrum), and an
+\emph{exponentially decaying} correlation $|\langle\Phi,\hat S_x\!\cdot\!\hat S_y\Phi\rangle/\langle
+\Phi,\Phi\rangle|\le Ce^{-d(x,y)/\xi}$ (ring distance \texttt{ringDist}) --- so the Haldane conjecture
+for $S=1$ holds rigorously within this artificial restricted Hilbert space.  Proved via a
+path-integral / two-dimensional classical statistical-mechanics representation (Gómez-Santos);
+recorded as a documented axiom.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
