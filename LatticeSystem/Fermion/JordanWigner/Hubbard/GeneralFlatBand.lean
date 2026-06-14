@@ -129,8 +129,10 @@ noncomputable def generalFlatBandProjectionMatrix :
     (generalFlatBandKernel T).starProjection.toLinearMap
 
 /-- **The active sites `Λ₀ = {x | (P₀)_{x,x} ≠ 0}`** (Tasaki §11.3.4): the support of
-the flat band's diagonal projection density. -/
-def generalFlatBandActiveSites : Type :=
+the flat band's diagonal projection density.  An `abbrev` so the `Fintype`/`DecidableEq`
+instances of the underlying subtype are found transparently (needed for matrix powers of the
+support matrix). -/
+abbrev generalFlatBandActiveSites : Type :=
   { x : Fin (M + 1) // generalFlatBandProjectionMatrix T x x ≠ 0 }
 
 /-- The real nonnegative **support matrix** of the restricted projection `((P₀)_{x,y})`
