@@ -7693,6 +7693,18 @@ $(\hat{S}^2_{\rm tot})v = S_{\max}(S_{\max}+1)v$.
     Definition 11.1.
 \end{itemize}
 
+\noindent\textbf{Proposition 11.2} (Tasaki §11.1.1, eq.~(11.1.4), pp.~377--378; documented
+axiom, \texttt{HubbardFerromagnetismStructure.lean}, Issue \#4477).  When the all-to-all Hubbard
+model exhibits saturated ferromagnetism, its ground states simplify to the
+$(2S_{\max}+1)$-fold $SU(2)$ multiplet built from the lowest-energy all-up Slater state.  We render
+this as \texttt{hubbard\_proposition\_11\_2}: \texttt{isSaturatedFerromagnet}\,$N\,t\,U$ implies the
+ground eigenspace at half filling $N+1$ (\texttt{hubbardGroundEigenspace}: the
+\texttt{hubbardHamiltonian}-eigenspace at the ground energy intersected with the $(N+1)$-electron
+number sector, \emph{without} the hard-core constraint, so that every ground state is captured) is a
+maximal-spin multiplet of dimension $N+2$ at $S_{\max}=(N+1)/2$.  A book-order backfill of the
+Chapter 11 numbered items; recorded as a documented axiom (the finite-dimensional but general-hopping
+structural argument is deferred).
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
