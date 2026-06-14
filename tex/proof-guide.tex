@@ -8292,6 +8292,26 @@ its spectral gap.  The gap dichotomy is captured by \texttt{realSpectrum} (the r
 recorded as a \texttt{Prop} only and \textbf{never asserted true}; the correlation-decay clauses
 (HOI3)/(I3) are deferred to a later module.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§6.2 Theorem 6.3} (Lieb--Schultz--Mattis, Affleck--Lieb theorem; Tasaki §6.2,
+eqs.~(6.2.1)--(6.2.19), pp.~158--162; documented axioms,
+\texttt{Quantum/SpinS/LiebSchultzMattis.lean}, Issue \#4485).  For a \emph{half-odd-integer} spin
+antiferromagnetic Heisenberg chain the spectral gap is $O(1/L)$.  We define the \emph{twist operator}
+$\hat U_{\mathrm{LSM}}=\exp[-i\sum_x\theta_x\hat S_x^{(3)}]$ with $\theta_x=(2\pi/L)x$
+(\texttt{lsmTwistOperator}, eqs.~6.2.2/6.2.3, via \texttt{NormedSpace.exp}) and the trial state
+$\Phi_{\mathrm{LSM}}=\hat U_{\mathrm{LSM}}\Phi_{\mathrm{GS}}$ (\texttt{lsmTrialState}, eq.~6.2.4).
+\emph{Lemma 6.1} (\texttt{lsm\_energy\_bound}, eq.~6.2.5) bounds the trial energy: $\langle
+\Phi_{\mathrm{LSM}},\hat H\Phi_{\mathrm{LSM}}\rangle/\langle\Phi_{\mathrm{LSM}},\Phi_{\mathrm{LSM}}
+\rangle-E_{\mathrm{GS}}\le 8\pi^2S^2/L$ for any $S$.  \emph{Lemma 6.2}
+(\texttt{lsm\_ground\_twist\_orthogonal}, eq.~6.2.18): for $N$ odd (half-odd-integer $S$) and the
+unique ground state ($\hat S_{\mathrm{tot}}^{(3)}=0$, with a uniqueness hypothesis \texttt{huniq}),
+$\langle\Phi_{\mathrm{GS}},\Phi_{\mathrm{LSM}}\rangle=0$.  \emph{Theorem 6.3}
+(\texttt{lieb\_schultz\_mattis\_affleck\_lieb}, eq.~6.2.19): for $N$ odd and even $L$ there is a
+positive spectral gap (\texttt{IsPositiveSpectralGap} of §6.1) bounded by $8\pi^2S^2/L$, so a
+half-odd-integer chain can never have both a unique ground state and a nonvanishing gap --- the
+rigorous half of the Haldane conjecture.  These deep finite-volume spectral results are recorded as
+documented axioms.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
