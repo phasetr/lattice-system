@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.Heisenberg
 import LatticeSystem.Quantum.SpinS.RayleighInfMatrix
+import LatticeSystem.Quantum.SpinS.DysonLiebSimon
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Data.ZMod.Basic
 
@@ -80,9 +81,15 @@ side `L ≥ 2`, for the antiferromagnetic nearest-neighbor Heisenberg model with
 
 The Rayleigh-quotient (ratio) form makes the bound scale-invariant, so no separate normalization of
 `ψ_M` is needed.  The uniform constant `C₂` exists precisely because the family is the genuine
-translation-invariant hypercubic torus.  Tasaki sketches the reflection-positivity / infinite-volume
-proof (§4.2.2); recorded here as a faithful, sound documented axiom over the concrete torus family. -/
-axiom tower_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) :
+translation-invariant hypercubic torus.
+
+The theorem is **conditional on long-range order**: the constants depend on the LRO parameter
+`q₀ > 0`, and the bound is asserted only for ground states whose staggered order parameter per site
+is bounded below by `q₀` (the hypothesis `hLRO`).  In one dimension there is no such ground state
+(Corollary 4.3, `no_long_range_order_1d`), so the statement is vacuous there — exactly as in Tasaki.
+Tasaki sketches the reflection-positivity / infinite-volume proof (§4.2.2); recorded here as a
+faithful, sound documented axiom over the concrete torus family. -/
+axiom tower_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
     ∃ C₁ C₂ : ℝ, 0 < C₁ ∧ 0 < C₂ ∧
       ∀ (L : ℕ) [NeZero L], 2 ≤ L → Even L →
         ∀ (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ) (M : ℕ),
@@ -90,6 +97,9 @@ axiom tower_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) :
           (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
             (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) →
           Φ ≠ 0 →
+          q₀ ≤ (star Φ ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
+              staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ)).re /
+              ((star Φ ⬝ᵥ Φ).re * (L : ℝ) ^ d) →
           (M : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
           ((staggeredRaisingOpS (torusParitySublattice d L) N) ^ M).mulVec Φ ≠ 0 →
           (star (((staggeredRaisingOpS (torusParitySublattice d L) N) ^ M).mulVec Φ) ⬝ᵥ
