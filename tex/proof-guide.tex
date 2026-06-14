@@ -7736,6 +7736,17 @@ states (over the pinned \texttt{hubbardEigenspaceAt}\,$E_0\,N_e$, $E_0$ nonempty
 all maximal-spin (with $2\le N_e$, since the zero- and one-electron sectors are trivially maximal-spin, and a genuinely transitive translation $\sigma$).  Keeping $d>2$ explicit is essential for soundness (the statement is false in
 $d=1$); the Roth/Gutzwiller variational proof is deferred.  Another book-order Chapter 11 backfill.
 
+\noindent\textbf{Lemma 11.10} (Tasaki §11.3.1, eqs.~(11.3.1)--(11.3.2), pp.~405--406;
+\textbf{discharged axiom-free}, \texttt{TasakiFlatBandBasisLemma.lean}, Issue \#4477).  On the
+decorated lattice $\Lambda=E\cup I$ the localized states $\{\alpha_p\}_{p\in E}$ (metallic) and
+$\{\beta_u\}_{u\in I}$ (oxygen) form a basis of the single-electron space.  We render the localized
+states as abstract orthogonal linearly-independent families and prove \texttt{tasaki\_lemma\_11\_10}:
+two linearly-independent families with $\langle\alpha_p,\beta_u\rangle=0$ and
+$|E|+|I|=|\Lambda|$ together span the whole space.  Orthogonality (\texttt{isOrtho\_span}) makes the
+spans disjoint, so $\dim(\mathrm{span}\,\alpha\sqcup\mathrm{span}\,\beta)=|E|+|I|=|\Lambda|$
+(\texttt{finrank\_sup\_add\_finrank\_inf\_eq}, \texttt{finrank\_euclideanSpace}), forcing the join to
+be everything.  A book-order Chapter 11 backfill, finite-dimensional and hence discharged.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
