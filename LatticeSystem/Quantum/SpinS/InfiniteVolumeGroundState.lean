@@ -1,5 +1,8 @@
 import LatticeSystem.Math.CStarAlgebra.State
 import Mathlib.Algebra.Star.StarAlgHom
+import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Int.Interval
+import Mathlib.Topology.Algebra.InfiniteSum.Basic
 
 /-!
 # Tasaki §4.3.1: ground states of the infinite-volume antiferromagnetic Heisenberg model
@@ -78,6 +81,38 @@ energy density: `ρ(Ŝ_x · Ŝ_y) = εGS` for all `{x, y} ∈ B∞`. -/
 def IsInfiniteVolumeGroundState (S : InfiniteSpinSystem d A) (εGS : ℝ) (ρ : WeakDual ℂ A) : Prop :=
   LatticeSystem.Math.IsState ρ ∧ TranslationInvariant S ρ ∧
     ∀ x y : Fin d → ℤ, bond x y → ρ (spinDot S x y) = (εGS : ℂ)
+
+instance : DecidablePred (evenSite (d := d)) := fun x => Int.decEq _ _
+
+/-- The finite box `Λ_L = [0, L)ᵈ ⊆ ℤᵈ` (volume `Lᵈ`), as a `Finset`. -/
+noncomputable def latticeBox (d L : ℕ) : Finset (Fin d → ℤ) :=
+  Fintype.piFinset fun _ : Fin d => Finset.Ico (0 : ℤ) (L : ℤ)
+
+/-- The **bulk operator** `Â_L = Σ_{x ∈ Λ_L ∩ ℤᵈ_even} τ_x(Â)` (eq. (4.3.5)): the sum of the
+translated observables over the even sites of the box `Λ_L`. -/
+noncomputable def bulkOp (S : InfiniteSpinSystem d A) (Â : A) (L : ℕ) : A :=
+  ∑ x ∈ (latticeBox d L).filter evenSite, S.transl x Â
+
+/-- **Tasaki Definition 4.18 (ergodic state).**  A translation-invariant state `ρ` is *ergodic* iff,
+for every self-adjoint observable `Â`, the fluctuation of the bulk density `Â_L / Lᵈ` vanishes in the
+infinite-volume limit (eq. (4.3.6)):
+`lim_{L↑∞} [ ρ(Â_L²) / (Lᵈ)² − (ρ(Â_L) / Lᵈ)² ] = 0`.
+The vanishing of the fluctuation is the law of large numbers for densities — the mark of a
+macroscopically "healthy" state.  (`Â` self-adjoint makes `ρ(Â_L)` and `ρ(Â_L²)` real, so the real
+parts carry the content; the index is shifted by one to avoid the empty `L = 0` box.) -/
+def IsErgodic (S : InfiniteSpinSystem d A) (ρ : WeakDual ℂ A) : Prop :=
+  TranslationInvariant S ρ ∧
+    ∀ Â : A, IsSelfAdjoint Â →
+      Filter.Tendsto
+        (fun L : ℕ =>
+          (ρ ((bulkOp S Â (L + 1)) ^ 2)).re / (((L : ℝ) + 1) ^ d) ^ 2
+            - ((ρ (bulkOp S Â (L + 1))).re / ((L : ℝ) + 1) ^ d) ^ 2)
+        Filter.atTop (nhds 0)
+
+/-- **Tasaki Definition 4.19 (physical ground state).**  A translation-invariant ground state `ω` of
+the antiferromagnetic Heisenberg model is a *physical ground state* when it is ergodic. -/
+def IsPhysicalGroundState (S : InfiniteSpinSystem d A) (εGS : ℝ) (ω : WeakDual ℂ A) : Prop :=
+  IsInfiniteVolumeGroundState S εGS ω ∧ IsErgodic S ω
 
 end InfiniteSpinSystem
 
