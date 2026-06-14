@@ -240,4 +240,16 @@ theorem generalFlatBand_mu_orthogonal_of_disjoint_support
   refine Finset.sum_eq_zero (fun x _ => ?_)
   rcases hdisj x with h | h <;> simp [RCLike.inner_apply, h]
 
+/-- **No site is shared across a basis cut**: if a set `J ⊆ I` is closed under basis-graph
+adjacency (a union of connected components), then no site `x` is covered by both a `J`-index and an
+`(I∖J)`-index.  A shared site would be a basis edge `z ~ z'` (`z ∈ J`, `z' ∉ J`), forcing `z' ∈ J` —
+contradiction.  This makes the active-site side-assignment of a basis cut well-defined. -/
+theorem generalFlatBand_no_shared_site_of_saturated {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} {J : Finset ↥I}
+    (hsat : ∀ z ∈ J, ∀ z' : ↥I, (generalFlatBandBasisGraph I μ).Adj z z' → z' ∈ J)
+    {x : Fin (M + 1)} {z : ↥I} (hz : z ∈ J) (hzx : μ z.1 x ≠ 0)
+    {z' : ↥I} (hz' : z' ∉ J) (hz'x : μ z'.1 x ≠ 0) : False := by
+  have hne : z ≠ z' := fun h => hz' (h ▸ hz)
+  exact hz' (hsat z hz z' ⟨fun h => hne (Subtype.ext h), x, hzx, hz'x⟩)
+
 end LatticeSystem.Fermion
