@@ -2,27 +2,29 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandProjectionBridg
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandDisconnected
 
 /-!
-# Tasaki Theorem 11.15: the projection-irreducibility bridge (in progress)
+# Tasaki Theorem 11.15: the projection-irreducibility bridge (DISCHARGED)
 
-This file works toward discharging `tasaki_theorem_11_15`
-(`generalFlatBandFerromagnetic T U ↔ generalFlatBandProjectionIrreducible T`), which will follow by
-composing the already-proved Theorem 11.17 (`generalFlatBand_theorem_11_17`,
-`ferromagnetic ↔ basis connected`) with the purely combinatorial/linear-algebraic **bridge**
+This file discharges `tasaki_theorem_11_15`
+(`generalFlatBandFerromagnetic T U ↔ generalFlatBandProjectionIrreducible T`) by composing the
+proved Theorem 11.17 (`generalFlatBand_theorem_11_17`, `ferromagnetic ↔ basis connected`) with the
+purely combinatorial/linear-algebraic **bridge**
 
 `generalFlatBandProjectionIrreducible T ↔ generalFlatBandBasisConnected I μ`.
 
-**The axiom `tasaki_theorem_11_15` (in `GeneralFlatBand.lean`) is NOT yet removed** — only part of
-the bridge is in place so far.  The bridge factors through an intermediate
-`generalFlatBandProjectionBlockReducible` predicate — the existence of a coordinate cut `W`
-separating two active sites with no `P₀` entries across it:
+The bridge factors through an intermediate `generalFlatBandProjectionBlockReducible` predicate — the
+existence of a coordinate cut `W` separating two active sites with no `P₀` entries across it:
 
-* `blockReducible ↔ ¬ basisConnected` — direction `¬basisConnected ⟹ blockReducible` (DONE,
-  `generalFlatBand_blockReducible_of_not_basisConnected`) builds the cut from the basis
-  disconnection (`exists_disconnection_cut_of_not_connected` +
-  `generalFlatBand_proj_offdiag_eq_zero_across_cut`); the converse (TODO) uses
-  `generalFlatBand_mu_confined_of_block`.
-* `projectionIrreducible ↔ ¬ blockReducible` (TODO) — the support matrix on the active sites is
-  irreducible (strongly connected) iff there is no such block cut.
+* `blockReducible ↔ ¬ basisConnected` (`generalFlatBand_blockReducible_of_not_basisConnected` and
+  `generalFlatBand_not_basisConnected_of_blockReducible`): a basis disconnection gives a `μ`-support
+  cut (`exists_disconnection_cut_of_not_connected` plus
+  `generalFlatBand_proj_offdiag_eq_zero_across_cut`)
+  and conversely each `μ_z` is confined to one side of a block cut
+  (`generalFlatBand_mu_confined_of_block`).
+* `projectionIrreducible ↔ ¬ blockReducible`
+  (`generalFlatBand_not_projectionIrreducible_of_blockReducible` and
+  `generalFlatBand_blockReducible_of_not_projectionIrreducible`): the support matrix on the active
+  sites is irreducible iff there is no such block cut (support powers stay in a block;
+  conversely the reachable set from an unreachable pair is a block cut).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §11.3.4, Theorem 11.15, pp. 408–412.
@@ -98,8 +100,8 @@ theorem generalFlatBand_blockReducible_of_not_basisConnected
     rw [hxy] at h2
     exact star_eq_zero.mp h2
 
-/-- **A block-reducible projection forces a disconnected basis**: if `P₀` is block-reducible then the
-special basis is not connected.  For a block cut `W`, each `μ_z` is confined to its index's side
+/-- **A block-reducible projection forces a disconnected basis**: if `P₀` is block-reducible then
+the special basis is not connected.  For a block cut `W`, each `μ_z` is confined to its index's side
 (`generalFlatBand_mu_confined_of_block`): `z.1 ∈ W ⟹ μ_z` supported in `W`, `z.1 ∉ W ⟹ μ_z`
 supported in `Wᶜ`.  Hence the index set splits into `J = {z | z.1 ∈ W}` and its complement (both
 nonempty, witnessed by the active sites on each side), with no basis edge crossing — a crossing edge
@@ -135,7 +137,8 @@ theorem generalFlatBand_not_basisConnected_of_blockReducible
     have hxW : x ∈ W := by
       by_contra hxW; exact hux (hconfW u.1 u.2 huW x hxW)
     by_contra hvW; exact hvx (hconfWc v.1 v.2 hvW x hxW)
-  have hclosed : ∀ {u v : ↥I}, (generalFlatBandBasisGraph I μ).Reachable u v → u.1 ∈ W → v.1 ∈ W := by
+  have hclosed : ∀ {u v : ↥I}, (generalFlatBandBasisGraph I μ).Reachable u v →
+      u.1 ∈ W → v.1 ∈ W := by
     intro u v hr
     obtain ⟨p⟩ := hr
     induction p with
@@ -150,9 +153,9 @@ theorem generalFlatBand_not_basisConnected_of_blockReducible
   exact hb (hclosed (hconn.preconnected ⟨za, hzaI⟩ ⟨zb, hzbI⟩) ha)
 
 /-- **Support powers stay inside a block**: if `(P₀)_{yx} = 0` across a coordinate cut `W`, then for
-active sites `i` with `i.1 ∈ W` and `j` with `j.1 ∉ W`, every power `(support^k)_{ij} = 0`.  The base
-case is the support entry itself (`|(P₀)_{ij}|² = 0` since `P₀` is Hermitian and vanishes across `W`);
-the induction splits the intermediate vertex `l` by side. -/
+active sites `i` with `i.1 ∈ W` and `j` with `j.1 ∉ W`, every power `(support^k)_{ij} = 0`.  The
+base case is the support entry itself (`|(P₀)_{ij}|² = 0`, since `P₀` is Hermitian and vanishes
+across `W`); the induction splits the intermediate vertex `l` by side. -/
 theorem generalFlatBand_support_pow_eq_zero_across_block
     (W : Finset (Fin (M + 1)))
     (hblock : ∀ x ∈ W, ∀ y ∉ W, generalFlatBandProjectionMatrix T y x = 0)
@@ -161,7 +164,7 @@ theorem generalFlatBand_support_pow_eq_zero_across_block
   have hbase : ∀ (a b : generalFlatBandActiveSites T), a.1 ∈ W → b.1 ∉ W →
       generalFlatBandProjectionSupportMatrix T a b = 0 := by
     intro a b ha hb
-    show Complex.normSq (generalFlatBandProjectionMatrix T a.1 b.1) = 0
+    change Complex.normSq (generalFlatBandProjectionMatrix T a.1 b.1) = 0
     rw [Complex.normSq_eq_zero]
     have h := hblock a.1 ha b.1 hb
     have h2 := (generalFlatBandProjectionMatrix_isHermitian T).apply b.1 a.1
@@ -179,9 +182,10 @@ theorem generalFlatBand_support_pow_eq_zero_across_block
     · rw [ih l hl, zero_mul]
 
 /-- **A block-reducible projection is not irreducible**: if `P₀` is block-reducible then the support
-matrix on the active sites is not irreducible.  The two active sites of the cut never connect: every
-power of the support matrix vanishes between them (`generalFlatBand_support_pow_eq_zero_across_block`),
-contradicting `isIrreducible_iff_exists_pow_pos`. -/
+matrix on the active sites is not irreducible.  The two active sites of the cut never connect:
+every power of the support matrix vanishes between them
+(`generalFlatBand_support_pow_eq_zero_across_block`), contradicting
+`isIrreducible_iff_exists_pow_pos`. -/
 theorem generalFlatBand_not_projectionIrreducible_of_blockReducible
     (hred : generalFlatBandProjectionBlockReducible T) :
     ¬ generalFlatBandProjectionIrreducible T := by
@@ -251,5 +255,39 @@ theorem generalFlatBand_blockReducible_of_not_projectionIrreducible
           ⟨ix, Finset.mem_univ _, mul_pos hposx hAedge⟩
       exact hyW (Finset.mem_filter.mpr
         ⟨Finset.mem_univ _, jy, rfl, kx + 1, Nat.succ_pos _, hreach⟩)
+
+/-- **The projection-irreducibility bridge**: for a special basis, the support matrix on the active
+sites is irreducible iff the basis is connected.  Both directions are contrapositives through
+`generalFlatBandProjectionBlockReducible`: `¬basisConnected ⟹ blockReducible ⟹ ¬projIrred` and
+`¬projIrred ⟹ blockReducible ⟹ ¬basisConnected`. -/
+theorem generalFlatBand_projectionIrreducible_iff_basisConnected
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ) (hD0 : 0 < generalFlatBandDim T) :
+    generalFlatBandProjectionIrreducible T ↔ generalFlatBandBasisConnected I μ := by
+  constructor
+  · intro hirr
+    by_contra hnc
+    exact generalFlatBand_not_projectionIrreducible_of_blockReducible T
+      (generalFlatBand_blockReducible_of_not_basisConnected T hbasis hD0 hnc) hirr
+  · intro hconn
+    by_contra hni
+    exact generalFlatBand_not_basisConnected_of_blockReducible T hbasis
+      (generalFlatBand_blockReducible_of_not_projectionIrreducible T hni) hconn
+
+/-- **Tasaki Theorem 11.15 (general flat-band ferromagnetism).**  For a Hermitian
+positive-semidefinite hopping matrix `T` with nonempty flat band (`D₀ > 0`) and `U > 0`, the
+`D₀`-electron Hubbard model is saturated-ferromagnetic **iff** the `Λ₀ × Λ₀` projection submatrix is
+irreducible.  Proved by choosing a special basis (Lemma 11.16, `generalFlatBand_lemma_11_16`),
+applying the proved Theorem 11.17 (`ferromagnetic ↔ basis connected`), and composing with the
+projection-irreducibility bridge (`generalFlatBand_projectionIrreducible_iff_basisConnected`).
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §11.3.4, Theorem 11.15, pp. 408–412. -/
+theorem tasaki_theorem_11_15 (U : ℝ) (hT : T.PosSemidef)
+    (hD0 : 0 < generalFlatBandDim T) (hU : 0 < U) :
+    generalFlatBandFerromagnetic T U ↔ generalFlatBandProjectionIrreducible T := by
+  obtain ⟨I, μ, hbasis⟩ := generalFlatBand_lemma_11_16 T hT
+  rw [generalFlatBand_theorem_11_17 T U hT hD0 hU hbasis]
+  exact (generalFlatBand_projectionIrreducible_iff_basisConnected T hbasis hD0).symm
 
 end LatticeSystem.Fermion
