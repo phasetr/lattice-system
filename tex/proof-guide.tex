@@ -7747,6 +7747,17 @@ spans disjoint, so $\dim(\mathrm{span}\,\alpha\sqcup\mathrm{span}\,\beta)=|E|+|I
 (\texttt{finrank\_sup\_add\_finrank\_inf\_eq}, \texttt{finrank\_euclideanSpace}), forcing the join to
 be everything.  A book-order Chapter 11 backfill, finite-dimensional and hence discharged.
 
+\noindent\textbf{Lemma 11.14} (Tasaki §11.3.3, p.~406; \textbf{discharged axiom-free},
+\texttt{Math/GramEigenspaceCorrespondence.lean}, Issue \#4477).  The hopping matrices $T=S^{\dagger}S$
+and $\tilde T=SS^{\dagger}$ have exactly identical positive eigenvalues with identical multiplicities.
+This is a general singular-value fact, so it is placed in \texttt{Math/} by topic
+(\texttt{finrank\_eigenspace\_gram\_eq}): for any $\lambda\ne0$ the $\lambda$-eigenspaces of
+$S^{\dagger}S$ and $SS^{\dagger}$ have equal dimension.  The map $\varphi\mapsto S\varphi$ embeds the
+former into the latter injectively ($S\varphi=0\Rightarrow S^{\dagger}S\varphi=\lambda\varphi=0
+\Rightarrow\varphi=0$), and applying the same fact to $S^{\dagger}$ (with $(S^{\dagger})^{\dagger}=S$)
+gives the reverse inequality.  A book-order Chapter 11 backfill, finite-dimensional and hence
+discharged.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
