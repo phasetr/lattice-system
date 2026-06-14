@@ -8493,6 +8493,23 @@ ground state is unique (marker \texttt{HasUniqueInfiniteVolumeVBSGroundState}). 
 restriction is essential (general-graph decay can fail).  Casimir, projector and Hamiltonian are
 concrete; Theorem 7.7 is a documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§7.3.3 Briegel--Raussendorf (cluster / graph) state} (Theorem 7.8; Tasaki §7.3.3,
+eqs.~(7.3.29)--(7.3.37), pp.~217--220; \texttt{Quantum/SpinS/ClusterState.lean}, Issue \#4485).  The
+cluster state is the $S=1/2$ stabilizer analogue of the VBS state.  \texttt{pauliXS}
+$x=2\hat S_x^{(1)}=\sigma_x^x$ and \texttt{pauliZS} $x=2\hat S_x^{(3)}=\sigma_x^z$ are the qubit
+Paulis ($N=1$ on \texttt{Fin}~$L$); \texttt{neighborZProduct} $G\,x$ is the diagonal
+$\prod_{y\sim x}\sigma_y^z$ (acting by $\prod_{y\sim x}(-1)^{\sigma_y}$); \texttt{brStabilizer}
+$G\,x=\sigma_x^x\prod_{y\sim x}\sigma_y^z=\hat K_x$ is the stabilizer ($\hat K_x^2=1$, eigenvalues
+$\pm1$); and \texttt{graphStateHamiltonianS} $G=-\sum_x\hat K_x$ is the stabilizer Hamiltonian
+(eq.~7.3.30).  The axiom \texttt{tasaki\_theorem\_7\_8} states that the cluster state $\Phi$ (marker
+\texttt{IsClusterState}) is, for $0<L$, the \emph{unique} ground state with ground energy
+$E_{\mathrm{GS}}=-N$ ($N=|\Lambda|=L$, \texttt{IsGroundEnergy}), gap above it exactly $2$
+(\texttt{IsPositiveSpectralGap}~$\dots$~$2$; $0<L$ excludes the one-dimensional empty lattice), and
+every ground-energy eigenvector proportional to $\Phi$.  Proved by mapping $\hat H_{\mathrm{BR}}$ to the trivial paramagnet $-\sum_x\sigma_x^x$
+through the controlled-$Z$ unitary $\hat U_C$ ($\hat U_C^2=1$); the Paulis, stabilizers and
+Hamiltonian are concrete, Theorem 7.8 a documented axiom.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
