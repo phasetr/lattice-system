@@ -78,14 +78,16 @@ axiom tasaki_5_1_xy_odlro_half_filling (d : ℕ) (hd : 2 ≤ d) :
 
 /-! ## Theorem 5.2: low-lying tower states of hard-core bosons -/
 
-/-- The **chemical-potential XY Hamiltonian** `Ĥ_μ = Ĥ_XY − μ N̂` (eq. (5.3.2)) on the
-`d`-dimensional torus, in spin form: `N̂ ↔ Ŝ_tot^{(3)} + L^d/2` (5.1.7), so up to the constant
-`μ L^d/2` (which cancels in all energy *differences*) the chemical-potential term is
-`−μ Ŝ_tot^{(3)}`.  Adjusting `μ` selects the particle density `ρ = N/L^d` of the ground state; half
-filling is `μ = 0`. -/
+/-- The **chemical-potential boson Hamiltonian** `Ĥ_μ = Ĥ − μ N̂` (eq. (5.3.2)) on the
+`d`-dimensional torus, in spin form.  Per the dictionary (5.1.7) the hard-core boson Hamiltonian is
+`Ĥ = 2 Ĥ_XY` and
+`N̂ ↔ Ŝ_tot^{(3)} + L^d/2`, so `Ĥ_μ = 2 Ĥ_XY − μ Ŝ_tot^{(3)}` up to the additive constant `μ L^d/2`
+(which cancels in all energy *differences*); the factor `2` on the XY term keeps the documented `μ`
+equal to Tasaki's chemical potential, so adjusting `μ` selects the particle density `ρ = N/L^d` with
+the textbook normalization (half filling is `μ = 0`). -/
 noncomputable def xyChemicalPotentialHamiltonianS (d L : ℕ) [NeZero L] (μ : ℝ) :
     ManyBodyOpS (HypercubicTorus d L) 1 :=
-  xyHamiltonianS d L - (μ : ℂ) • totalSpinSOp3 (HypercubicTorus d L) 1
+  (2 : ℂ) • xyHamiltonianS d L - (μ : ℂ) • totalSpinSOp3 (HypercubicTorus d L) 1
 
 /-- **The BEC tower constants predicate** (Tasaki Theorem 5.2, eq. (5.3.4)).  `IsBECTowerConstants d
 μ q₀ C₁ C₂` asserts that `C₁, C₂ > 0` and, for the chemical potential `μ` (which selects the density
@@ -93,9 +95,10 @@ noncomputable def xyChemicalPotentialHamiltonianS (d L : ℕ) [NeZero L] (μ : �
 `Φ_GS` of the chemical-potential XY Hamiltonian `Ĥ_μ`
 (eigenvector at the minimal real eigenvalue `E₀`, nonzero) that exhibits ODLRO with parameter `q₀`
 (the half-filling/XY-plane order parameters `⟨(Ô_L^{(α)})²⟩/(⟨Φ,Φ⟩ (L^d)²) ≥ q₀` for `α = 1, 2`,
-as in Theorem 5.1), the tower state `Γ_M = (Ô_L^{sgn M})^{|M|} Φ_GS` (for `|M| ≤ C₁ L^{d/2}`,
-nonvanishing) is low-lying with the **cubic** energy increment (eq. (5.3.4))
-`⟨Γ_M, Ĥ_μ Γ_M⟩ / ⟨Γ_M, Γ_M⟩ ≤ E₀ + C₂ |M|³ / L^d`.
+as in Theorem 5.1), the tower state `Γ_M = (Ô_L^{sgn M})^{|M|} Φ_GS` (for `|M| ≤ C₁ L^{d/2}`) is
+**well-defined (nonvanishing) and** low-lying with the **cubic** energy increment (eq. (5.3.4)):
+`towerState ≠ 0 ∧ ⟨Γ_M, Ĥ_μ Γ_M⟩ / ⟨Γ_M, Γ_M⟩ ≤ E₀ + C₂ |M|³ / L^d`.  Both the nonvanishing and the
+energy bound are *conclusions* (faithful to Theorem 5.2, which asserts `Γ_M` is nonvanishing).
 (The hard-core projection `P̂_hc` is the identity in the spin-`1/2` formulation.) -/
 def IsBECTowerConstants (d : ℕ) (μ q₀ C₁ C₂ : ℝ) : Prop :=
   0 < C₁ ∧ 0 < C₂ ∧
@@ -109,10 +112,10 @@ def IsBECTowerConstants (d : ℕ) (μ q₀ C₁ C₂ : ℝ) : Prop :=
           q₀ ≤ expectationRatioRe
             ((staggeredOrderOpAxisS α (torusParitySublattice d L) 1) ^ 2) Φ / ((L : ℝ) ^ d) ^ 2) →
         (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
-        towerState (torusParitySublattice d L) 1 M Φ ≠ 0 →
-        expectationRatioRe (xyChemicalPotentialHamiltonianS d L μ)
-            (towerState (torusParitySublattice d L) 1 M Φ) ≤
-          E₀.re + C₂ * (M.natAbs : ℝ) ^ 3 / (L : ℝ) ^ d
+        towerState (torusParitySublattice d L) 1 M Φ ≠ 0 ∧
+          expectationRatioRe (xyChemicalPotentialHamiltonianS d L μ)
+              (towerState (torusParitySublattice d L) 1 M Φ) ≤
+            E₀.re + C₂ * (M.natAbs : ℝ) ^ 3 / (L : ℝ) ^ d
 
 /-- **Tasaki Theorem 5.2 (low-lying tower states of hard-core bosons), AXIOM.**  Suppose the ground
 state `Φ_GS` of the chemical-potential XY Hamiltonian `Ĥ_μ` (5.3.2) exhibits ODLRO with some
