@@ -7779,6 +7779,17 @@ $w_{i_0}=0$ (via the spectral theorem, \texttt{rayleighOnVec\_unitary\_conj}, an
 would exceed $E_0+\delta$, a contradiction.  The $C\,L^{-d}$ bound from long-range order (the
 variational estimate~(3.4.12)) supplies the input $\delta$.
 
+\noindent\textbf{Theorem 3.2, finite-volume core} (Kaplan--Horsch--von der Linden, Tasaki §3.4, eqs.~(3.4.16)--(3.4.22),
+pp.~68--70; \textbf{discharged axiom-free}, \texttt{Quantum/KaplanHorschVonderLinden.lean}, Issue
+\#4485).  An infinitesimal symmetry-breaking field triggers SSB.  We discharge the finite-volume variational \emph{core} (eq.~(3.4.21)); the thermodynamic double limit (3.4.22) is not yet formalized.  The core is a
+finite-volume variational lower bound, \texttt{kaplan\_horsch\_vonderLinden\_order\_lower\_bound}:
+since the perturbed ground state $\Psi$ minimizes $H-hO$ ($h>0$), for any trial $\Xi$ the order
+parameter obeys $\langle\Xi,O\Xi\rangle+(E_0-\langle\Xi,H\Xi\rangle)/h\le\langle\Psi,O\Psi\rangle$.
+Proof: $R(H-hO)\Psi\le R(H-hO)\Xi$ with $R(H-hO)=R(H)-h\,R(O)$ (Rayleigh real-linearity), rearrange
+using $h>0$, and bound $R(H)\Psi\ge E_0$.  The double limit $L\uparrow\infty$, $h\downarrow0$ (with
+the essential bound $\langle\Xi_+,O_L/L^d\,\Xi_+\rangle\ge\sqrt{q_0}$) then gives the $\sqrt{q_0}$
+order-parameter bound (3.4.22) --- the thermodynamic input, which is not part of the formalized core.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
