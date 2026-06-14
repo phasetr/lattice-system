@@ -8147,6 +8147,21 @@ bound is weaker than the conjectured exponential decay but already excludes long
 $d=2$.  Proved by the McBryan--Spencer complex-translation method extended to quantum systems by
 Koma--Tasaki; recorded as a documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{Theorem 4.26} (Dyson--Lieb--Simon theorem; Tasaki §4.4.4, eq.~(4.4.52), p.~130;
+documented axiom, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  Genuine N\'eel
+long-range order at sufficiently low temperature in $d\ge 3$.  We add the per-axis staggered order
+operator \texttt{staggeredOrderOpAxisS} ($\alpha=0,1,2\mapsto\hat O^{(1)},\hat O^{(2)},\hat O^{(3)}$).
+The axiom \texttt{theorem\_4\_26\_staggered\_lro} states that for the antiferromagnetic Heisenberg
+model with $d\ge 3$ and any $S=N/2$ with $N\ge 1$ (\texttt{[NeZero N]}) there exist $\beta_0\in
+(0,\infty)$ and a function $q(\beta)$, positive for $\beta>\beta_0$, with $\langle(\hat
+O_L^{(\alpha)})^2\rangle_{\beta,0}^L/L^d\ge q(\beta)$ for every $\alpha=1,2,3$, every $\beta>\beta_0$,
+and all sufficiently large even volumes.  The hypothesis $N\ge 1$ is \emph{essential for soundness}:
+at $N=0$ the order operator vanishes and $\langle(\hat O_L^{(\alpha)})^2\rangle=0$ would contradict
+$q(\beta)>0$.  The proof uses reflection positivity (Dyson--Lieb--Simon~[12]; the case $d=3$,
+$S=1/2$ by Kennedy--Lieb--Shastry~[29]); the ferromagnetic counterpart is only conjectured, as it
+fails reflection positivity.  Recorded as a documented axiom.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
