@@ -8371,6 +8371,21 @@ $\Delta E_0$ and the ground-state family $\Phi$ are quantified outermost.  Prove
 state and its matrix-product representation (Affleck--Kennedy--Lieb--Tasaki, 1987); recorded as a
 documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§7.1.3 Theorem 7.2} (the AKLT model on the infinite chain, Matsui; Tasaki §7.1.3,
+p.~179, and Appendix~A.7; documented axiom, \texttt{Quantum/SpinS/AKLTInfiniteChain.lean}, Issue
+\#4485).  On the quasi-local $C^*$-algebra of the infinite chain, a state $\omega$ is a ground state
+iff \texttt{IsGroundState}~$\omega\,\delta$ (Def.~A.25, $\omega(\hat A^\dagger[\hat H,\hat A])\ge0$)
+and has a nonzero gap iff \texttt{HasNonzeroGap}~$\omega\,\delta\,\gamma$ (Def.~A.27, $\gamma>0$).  For
+the one-dimensional \texttt{InfiniteSpinSystem} with the AKLT dynamics $\delta$ (tied by the
+uninterpreted marker \texttt{IsAKLTChainDynamics}), the axiom \texttt{aklt\_theorem\_7\_2} asserts the
+existence of $\omega$ with \texttt{IsState}~$\omega$, \texttt{IsGroundState}~$\omega\,\delta$,
+\emph{uniqueness among states} ($\forall\omega'$, a state ground state, $\omega'=\omega$), and
+$\exists\gamma$, \texttt{HasNonzeroGap}~$\omega\,\delta\,\gamma$.  The unique ground state is the
+$L\uparrow\infty$ limit of the VBS state.  Proved by Matsui (uniqueness) building on AKLT; recorded as
+a documented operator-algebraic axiom (per the project's $C^*$-algebra policy).  Chapters~3--10
+backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
