@@ -482,4 +482,75 @@ theorem generalFlatBand_restrict_mem_kernel (W : Finset (Fin (M + 1)))
   exact Submodule.sum_mem _ (fun x _ =>
     Submodule.smul_mem _ _ (Submodule.starProjection_apply_mem _ _))
 
+/-- **Coordinate of a truncation**: `(Σ_{a∈S} v_a e_a)_w = if w ∈ S then v_w else 0`. -/
+theorem generalFlatBand_truncation_coord (S : Finset (Fin (M + 1)))
+    (v : EuclideanSpace ℂ (Fin (M + 1))) (w : Fin (M + 1)) :
+    WithLp.ofLp (∑ a ∈ S, v a • (EuclideanSpace.basisFun (Fin (M + 1)) ℂ a :
+      EuclideanSpace ℂ (Fin (M + 1)))) w = if w ∈ S then v w else 0 := by
+  have hbf : ∀ a b : Fin (M + 1),
+      inner ℂ (EuclideanSpace.basisFun (Fin (M + 1)) ℂ a)
+        (EuclideanSpace.basisFun (Fin (M + 1)) ℂ b : EuclideanSpace ℂ (Fin (M + 1)))
+        = if a = b then (1 : ℂ) else 0 :=
+    fun a b => orthonormal_iff_ite.mp (EuclideanSpace.basisFun (Fin (M + 1)) ℂ).orthonormal a b
+  have hcoord : WithLp.ofLp (∑ a ∈ S, v a • (EuclideanSpace.basisFun (Fin (M + 1)) ℂ a :
+        EuclideanSpace ℂ (Fin (M + 1)))) w
+      = inner ℂ (EuclideanSpace.basisFun (Fin (M + 1)) ℂ w)
+          (∑ a ∈ S, v a • (EuclideanSpace.basisFun (Fin (M + 1)) ℂ a :
+            EuclideanSpace ℂ (Fin (M + 1)))) := by
+    rw [EuclideanSpace.basisFun_inner]
+  rw [hcoord, inner_sum]
+  rw [show (∑ a ∈ S, inner ℂ (EuclideanSpace.basisFun (Fin (M + 1)) ℂ w)
+        (v a • (EuclideanSpace.basisFun (Fin (M + 1)) ℂ a :
+          EuclideanSpace ℂ (Fin (M + 1)))))
+      = ∑ a ∈ S, (if w = a then v a else 0) from
+    Finset.sum_congr rfl (fun a _ => by
+      rw [inner_smul_right, hbf w a]; split_ifs <;> simp)]
+  rw [Finset.sum_ite_eq S w (fun a => v a)]
+
+/-- **A special-basis vector confined to a `P₀`-block side**: for a coordinate cut `W` with no `P₀`
+entries linking it to its complement (`(P₀)_{yx} = 0` for `x ∈ W`, `y ∉ W`), if the index `z ∈ I`
+lies in `W` then `μ_z` is supported entirely in `W` (`μ_z(x) = 0` for `x ∉ W`).  Indeed the
+truncation `1_{Wᶜ}·μ_z` is a kernel vector (`generalFlatBand_restrict_mem_kernel`) vanishing at every
+index site (at `z` because `z ∈ W`, elsewhere by localisation `μ_z(z') = 0`), hence zero by
+`generalFlatBand_kernel_coord_determined`.  So a basis vector cannot straddle a `P₀`-block cut. -/
+theorem generalFlatBand_mu_confined_of_block {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (W : Finset (Fin (M + 1)))
+    (hblock : ∀ x ∈ W, ∀ y ∉ W, generalFlatBandProjectionMatrix T y x = 0)
+    {z : Fin (M + 1)} (hzI : z ∈ I) (hzW : z ∈ W) {x : Fin (M + 1)} (hxW : x ∉ W) :
+    μ z x = 0 := by
+  classical
+  have hvmem : (WithLp.toLp 2 (μ z) : EuclideanSpace ℂ (Fin (M + 1))) ∈ generalFlatBandKernel T :=
+    generalFlatBand_mu_mem_kernel T hbasis hzI
+  -- symmetric block hypothesis for the complementary side
+  have hblock' : ∀ a ∈ Wᶜ, ∀ b ∉ Wᶜ, generalFlatBandProjectionMatrix T b a = 0 := by
+    intro a ha b hb
+    rw [Finset.mem_compl] at ha
+    simp only [Finset.mem_compl, not_not] at hb
+    have h := hblock b hb a ha
+    have hH := generalFlatBandProjectionMatrix_isHermitian T
+    have h2 := hH.apply b a
+    rw [h] at h2; simpa using h2.symm
+  have hr_mem : (∑ a ∈ Wᶜ, (WithLp.toLp 2 (μ z) : EuclideanSpace ℂ (Fin (M + 1))) a •
+      (EuclideanSpace.basisFun (Fin (M + 1)) ℂ a : EuclideanSpace ℂ (Fin (M + 1))))
+      ∈ generalFlatBandKernel T :=
+    generalFlatBand_restrict_mem_kernel T Wᶜ hblock' hvmem
+  have hr0 : (∑ a ∈ Wᶜ, (WithLp.toLp 2 (μ z) : EuclideanSpace ℂ (Fin (M + 1))) a •
+      (EuclideanSpace.basisFun (Fin (M + 1)) ℂ a : EuclideanSpace ℂ (Fin (M + 1)))) = 0 := by
+    refine generalFlatBand_kernel_coord_determined T hbasis hr_mem (fun w hwI => ?_)
+    rw [generalFlatBand_truncation_coord Wᶜ _ w]
+    by_cases hwc : w ∈ Wᶜ
+    · rw [if_pos hwc]
+      have hwW : w ∉ W := Finset.mem_compl.mp hwc
+      rcases eq_or_ne w z with rfl | hne
+      · exact absurd hzW hwW
+      · show (WithLp.toLp 2 (μ z) : EuclideanSpace ℂ (Fin (M + 1))) w = 0
+        simpa using hbasis.2.2.2.2 z hzI w hwI hne.symm
+    · rw [if_neg hwc]
+  have hrx : WithLp.ofLp (∑ a ∈ Wᶜ, (WithLp.toLp 2 (μ z) : EuclideanSpace ℂ (Fin (M + 1))) a •
+      (EuclideanSpace.basisFun (Fin (M + 1)) ℂ a : EuclideanSpace ℂ (Fin (M + 1)))) x = 0 := by
+    rw [hr0]; rfl
+  rw [generalFlatBand_truncation_coord Wᶜ _ x, if_pos (Finset.mem_compl.mpr hxW)] at hrx
+  simpa using hrx
+
 end LatticeSystem.Fermion
