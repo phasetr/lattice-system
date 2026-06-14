@@ -150,7 +150,7 @@ theorem generalFlatBand_not_basisConnected_of_blockReducible
   exact hb (hclosed (hconn.preconnected ⟨za, hzaI⟩ ⟨zb, hzbI⟩) ha)
 
 /-- **Support powers stay inside a block**: if `(P₀)_{yx} = 0` across a coordinate cut `W`, then for
-active sites `i` with `i.1 ∈ W` and `j` with `j.1 ∉ W`, every power `(支持^k)_{ij} = 0`.  The base
+active sites `i` with `i.1 ∈ W` and `j` with `j.1 ∉ W`, every power `(support^k)_{ij} = 0`.  The base
 case is the support entry itself (`|(P₀)_{ij}|² = 0` since `P₀` is Hermitian and vanishes across `W`);
 the induction splits the intermediate vertex `l` by side. -/
 theorem generalFlatBand_support_pow_eq_zero_across_block
