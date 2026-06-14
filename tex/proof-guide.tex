@@ -8312,6 +8312,27 @@ half-odd-integer chain can never have both a unique ground state and a nonvanish
 rigorous half of the Haldane conjecture.  These deep finite-volume spectral results are recorded as
 documented axioms.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§6.2 Lemma 6.4} (generalized LSM variational bound; Tasaki §6.2,
+eqs.~(6.2.23)--(6.2.24), pp.~162--163; documented axiom,
+\texttt{Quantum/SpinS/LiebSchultzMattisGeneral.lean}, Issue \#4485).  Lemma 6.1 generalizes to
+\emph{any} short-ranged $U(1)$-invariant chain Hamiltonian $\hat H=\sum_x\hat h_x$ (eq.~6.2.23).  The
+class \texttt{IsShortRangeU1Chain} bundles the assumptions: each $\hat h_x$ is \emph{self-adjoint}
+(so $\sum_x\hat h_x$ is a genuine Hamiltonian), $r$-local (\texttt{IsLocalRangeR}, an uninterpreted
+locality marker), bounded $\|\hat h_x\|\le h_0$ in the $L^2$ operator norm
+(\texttt{manyBodyOperatorNormS}), and $U(1)$-invariant ($[\hat h_x,\hat S_{\mathrm{tot}}^{(3)}]=0$,
+\texttt{Commute}).  The axiom
+\texttt{tasaki\_lemma\_6\_4\_general\_trial\_energy\_bound} states the existence of a constant $C>0$,
+depending only on $S,r,h_0$, such that for \emph{any} ground state $\Phi_{\mathrm{GS}}$ (uniqueness
+not assumed) the twisted trial state obeys $\langle\Phi_{\mathrm{LSM}},\hat H\Phi_{\mathrm{LSM}}
+\rangle/\langle\Phi_{\mathrm{LSM}},\Phi_{\mathrm{LSM}}\rangle-E_{\mathrm{GS}}\le C/L$ for any $L$
+(eq.~6.2.24), with $C$ quantified outermost (uniform over $L$, $\hat h$, and $\Phi_{\mathrm{GS}}$).
+Tasaki remarks that for half-odd-integer $S$ with a translation-invariant ground state a generalized
+orthogonality argument then yields $0\le E_{1\mathrm{st}}-E_{\mathrm{GS}}\le C/L$ (as in
+Theorem~6.3); that gap consequence is \emph{not} formalized here, since the formal Lemma 6.2
+(\texttt{lsm\_ground\_twist\_orthogonal}) is specialized to the antiferromagnetic Heisenberg chain.
+Recorded as a documented axiom.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
