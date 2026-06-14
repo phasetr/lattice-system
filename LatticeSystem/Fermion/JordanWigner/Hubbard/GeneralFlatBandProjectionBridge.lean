@@ -401,7 +401,7 @@ theorem generalFlatBand_starProjection_expand
   have hexpand : v = ∑ x, v x •
       (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x : EuclideanSpace ℂ (Fin (M + 1))) := by
     have h := (EuclideanSpace.basisFun (Fin (M + 1)) ℂ).sum_repr v
-    simp only [EuclideanSpace.basisFun_inner] at h
+    simp only [EuclideanSpace.basisFun_repr] at h
     exact h.symm
   conv_lhs => rw [hexpand]
   rw [map_sum]
