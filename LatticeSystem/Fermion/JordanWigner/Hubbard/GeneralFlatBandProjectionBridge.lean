@@ -365,4 +365,30 @@ theorem generalFlatBand_proj_mem_side {I : Finset (Fin (M + 1))}
   rw [← hab, ha0, zero_add]
   exact hb
 
+/-- **The projection is block-diagonal across a basis cut**: if `x` is supported only by the
+`S`-side (every `μ_z`, `z ∈ Sᶜ`, vanishes at `x`) and `y` only by the `Sᶜ`-side, then
+`(P₀)_{xy} = 0`.  Indeed `(P₀)_{xy} = ⟪P₀ e_x, P₀ e_y⟫` with `P₀ e_x ∈ V_S`, `P₀ e_y ∈ V_Sᶜ`
+(`generalFlatBand_proj_mem_side`, the `S`-side case via `compl_compl`), and `V_S ⊥ V_Sᶜ`.  This is
+the block-diagonal structure: `P₀` has no entries linking the two sides of a basis cut. -/
+theorem generalFlatBand_proj_offdiag_eq_zero_across_cut {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (S : Set ↥I) (hdisj : ∀ z ∈ S, ∀ z' ∈ Sᶜ, ∀ x, μ z.1 x = 0 ∨ μ z'.1 x = 0)
+    {x y : Fin (M + 1)} (hxS : ∀ z ∈ Sᶜ, μ z.1 x = 0) (hyS : ∀ z ∈ S, μ z.1 y = 0) :
+    generalFlatBandProjectionMatrix T x y = 0 := by
+  have hPy : (generalFlatBandKernel T).starProjection
+      (EuclideanSpace.basisFun (Fin (M + 1)) ℂ y)
+      ∈ Submodule.span ℂ ((fun z : ↥I =>
+        (WithLp.toLp 2 (μ z.1) : EuclideanSpace ℂ (Fin (M + 1)))) '' Sᶜ) :=
+    generalFlatBand_proj_mem_side T hbasis S hdisj hyS
+  have hPx : (generalFlatBandKernel T).starProjection
+      (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x)
+      ∈ Submodule.span ℂ ((fun z : ↥I =>
+        (WithLp.toLp 2 (μ z.1) : EuclideanSpace ℂ (Fin (M + 1)))) '' S) := by
+    have h := generalFlatBand_proj_mem_side T hbasis Sᶜ
+      (fun z hz z' hz' xx => (hdisj z' (by simpa using hz') z hz xx).symm) hxS
+    simpa only [compl_compl] using h
+  rw [generalFlatBand_proj_offdiag_eq T x y, ← inner_conj_symm,
+    (Submodule.mem_orthogonal _ _).mp
+      (generalFlatBand_side_subspaces_orthogonal μ S hdisj hPx) _ hPy, map_zero]
+
 end LatticeSystem.Fermion
