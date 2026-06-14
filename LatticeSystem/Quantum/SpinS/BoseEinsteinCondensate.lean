@@ -173,7 +173,7 @@ exhibits the symmetry-breaking limits — stated in the sound eventual-`ε` form
   `→ (mStar sin θ)²`;
 * (5.3.6) the complex moments `⟨Ξ_θ, Ô_L^± Ξ_θ⟩ / L^d → mStar e^{±iθ}`. -/
 def IsBECCoherentSSBConstants (d : ℕ) (μ q₀ C₁ mStar : ℝ) : Prop :=
-  0 ≤ q₀ ∧ 0 < mStar ∧ Real.sqrt (2 * q₀) ≤ mStar ∧
+  0 < C₁ ∧ 0 ≤ q₀ ∧ 0 < mStar ∧ Real.sqrt (2 * q₀) ≤ mStar ∧
     ∀ (Mmax : ℕ → ℕ), IsSlowBECWindow d C₁ Mmax → ∀ (θ : ℝ)
       (Φ : (L : ℕ) → (HypercubicTorus d L → Fin 2) → ℂ) (E₀ : ℕ → ℂ),
       (∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
