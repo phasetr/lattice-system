@@ -273,7 +273,8 @@ noncomputable def coupledCrossCorrelation (d L : ℕ) [NeZero L] (x : Hypercubic
 hard-core boson condensates on copies `Λ_a`, `Λ_b` of the torus are weakly coupled by the tunneling
 Hamiltonian (strength `ε`), with the total particle number fixed at `2N` (the doubled half filling
 `Ŝ_tot^{(3)} = 0`).  Assuming the single uncoupled system has ODLRO with parameter `q₀ > 0`
-(eq. (5.2.5), Theorem 5.1), the unique ground state `Φ^ε` of the coupled Hamiltonian develops a
+(eq. (5.2.5), Theorem 5.1 — supplied as the hypothesis `hODLRO`, which ties `q₀` to the genuine
+order parameter of the uncoupled XY ground states), the unique ground state `Φ^ε` develops a
 **definite relative `U(1)` phase** between the two condensates: there is an order parameter `m̃`,
 with `m̃ ≥ m∗ ≥ √(2 q₀)`, such that (eqs. (5.5.5)–(5.5.6))
 `lim_{ε↓0} lim_{L↑∞} ⟨Φ^ε, â_{(x,a)}^† â_{(x,b)} Φ^ε⟩ / ⟨Φ^ε, Φ^ε⟩ = m̃² e^{−iφ}`,
@@ -285,7 +286,17 @@ eigenvector at the minimal energy, nonzero, in the `2N`-particle sector `Ŝ_tot^
 double limit is stated soundly in eventual-`ε'` form (outer `ε↓0`, inner `L↑∞`); `m̃` is existential
 with the lower bound `√(2 q₀)`.  Proved in Koma–Tasaki [22]; recorded as a documented axiom. -/
 axiom tasaki_5_4_coupled_bec_ssb (d : ℕ) (hd : 2 ≤ d) (φ q₀ : ℝ) (hq₀ : 0 < q₀)
-    (x : Fin d → ℤ) (Φ : ℝ → (L : ℕ) → (CoupledSite d L → Fin 2) → ℂ) (E₀ : ℝ → ℕ → ℂ)
+    (x : Fin d → ℤ)
+    -- the single *uncoupled* system has ODLRO with parameter `q₀` (Theorem 5.1, eq. (5.2.5)):
+    (hODLRO : ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], Even L → L₀ ≤ L →
+      ∀ (Ψ : (HypercubicTorus d L → Fin 2) → ℂ) (E : ℂ), Ψ ≠ 0 →
+        (xyHamiltonianS d L).mulVec Ψ = E • Ψ →
+        (∀ E' : ℂ, ∀ Ξ : (HypercubicTorus d L → Fin 2) → ℂ, Ξ ≠ 0 →
+          (xyHamiltonianS d L).mulVec Ξ = E' • Ξ → E.re ≤ E'.re) →
+        (totalSpinSOp3 (HypercubicTorus d L) 1).mulVec Ψ = 0 →
+        ∀ α : Fin 3, α ≠ 2 → q₀ ≤ expectationRatioRe
+          ((staggeredOrderOpAxisS α (torusParitySublattice d L) 1) ^ 2) Ψ / ((L : ℝ) ^ d) ^ 2)
+    (Φ : ℝ → (L : ℕ) → (CoupledSite d L → Fin 2) → ℂ) (E₀ : ℝ → ℕ → ℂ)
     (hΦ : ∀ ε : ℝ, 0 < ε → ∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
       (coupledHamiltonian d L φ ε).mulVec (Φ ε L) = E₀ ε L • Φ ε L ∧
       (∀ E : ℂ, ∀ Ψ : (CoupledSite d L → Fin 2) → ℂ, Ψ ≠ 0 →

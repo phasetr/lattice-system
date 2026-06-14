@@ -8258,7 +8258,9 @@ uncoupled XY copies (\texttt{sameSpeciesNNCoupling}) with the tunneling term
 $\hat H_{\mathrm{tunnel}}=-\sum_x(e^{i\varphi}\hat S_{(x,a)}^+\hat S_{(x,b)}^-+e^{-i\varphi}\hat
 S_{(x,a)}^-\hat S_{(x,b)}^+)$ (\texttt{tunnelHamiltonian}, eq.~5.5.3); the total particle number is
 fixed at $2N$ (doubled half filling $\hat S_{\mathrm{tot}}^{(3)}=0$).  Assuming the single uncoupled
-system has ODLRO ($q_0>0$), the axiom \texttt{tasaki\_5\_4\_coupled\_bec\_ssb} asserts that the unique
+system has ODLRO with parameter $q_0$ (the hypothesis \texttt{hODLRO}, which ties $q_0$ to the genuine
+order parameter of the uncoupled XY ground states via the Theorem~5.1 bound), the axiom
+\texttt{tasaki\_5\_4\_coupled\_bec\_ssb} asserts that the unique
 coupled ground state $\Phi^\varepsilon$ develops a definite relative $U(1)$ phase: there is an order
 parameter $\tilde m\ge\sqrt{2q_0}$ with $\lim_{\varepsilon\downarrow0}\lim_{L\uparrow\infty}\langle
 \Phi^\varepsilon,\hat a_{(x,a)}^\dagger\hat a_{(x,b)}\Phi^\varepsilon\rangle/\langle\Phi^\varepsilon,
