@@ -195,4 +195,61 @@ theorem generalFlatBand_not_projectionIrreducible_of_blockReducible
     ⟨xa, hxaA⟩ ⟨yb, hybA⟩ hxaW hybW] at hpos
   exact lt_irrefl 0 hpos
 
+/-- **A non-irreducible projection is block-reducible**: if the support matrix is not irreducible
+then `P₀` is block-reducible.  By `isIrreducible_iff_exists_pow_pos` there are active sites `i₀, j₀`
+with `(support^k)_{i₀ j₀} = 0` for all `k > 0` (no positive path).  Let `W` be the sites reachable
+from `i₀` (every active site `i` with `(support^k)_{i₀ i} > 0` for some `k > 0`).  Then `i₀` is in
+`W` (its diagonal `|(P₀)_{i₀ i₀}|² > 0` gives a self-loop) and `j₀` is not (it is unreachable);
+both are active.  No `P₀` entry crosses out of `W`: an entry `(P₀)_{yx} ≠ 0` with `x ∈ W` active
+would give a support edge `x → y` (Hermitian), extending a path from `i₀`, so `y` would be reachable
+— contradiction; an inactive `y` has a zero projection row. -/
+theorem generalFlatBand_blockReducible_of_not_projectionIrreducible
+    (hred : ¬ generalFlatBandProjectionIrreducible T) :
+    generalFlatBandProjectionBlockReducible T := by
+  classical
+  have hnonneg : ∀ i j, 0 ≤ generalFlatBandProjectionSupportMatrix T i j :=
+    fun i j => Complex.normSq_nonneg _
+  have hpownn : ∀ k i j, 0 ≤ (generalFlatBandProjectionSupportMatrix T ^ k) i j :=
+    fun k => Matrix.pow_apply_nonneg hnonneg k
+  have hloop : ∀ i : generalFlatBandActiveSites T,
+      0 < generalFlatBandProjectionSupportMatrix T i i :=
+    fun i => Complex.normSq_pos.mpr i.2
+  have hni : ¬ ∀ i j, ∃ k > 0, 0 < (generalFlatBandProjectionSupportMatrix T ^ k) i j :=
+    mt (isIrreducible_iff_exists_pow_pos hnonneg).mpr hred
+  push Not at hni
+  obtain ⟨i₀, j₀, hcut⟩ := hni
+  have hnoreach : ∀ k, 0 < k → (generalFlatBandProjectionSupportMatrix T ^ k) i₀ j₀ = 0 :=
+    fun k hk => le_antisymm (hcut k hk) (hpownn k i₀ j₀)
+  refine ⟨Finset.univ.filter (fun x => ∃ i : generalFlatBandActiveSites T,
+      (i : Fin (M + 1)) = x ∧ ∃ k, 0 < k ∧
+        0 < (generalFlatBandProjectionSupportMatrix T ^ k) i₀ i), ?_, ?_, ?_⟩
+  · refine ⟨i₀.1, Finset.mem_filter.mpr ⟨Finset.mem_univ _, i₀, rfl, 1, one_pos, ?_⟩, i₀.2⟩
+    rw [pow_one]; exact hloop i₀
+  · refine ⟨j₀.1, ?_, j₀.2⟩
+    rw [Finset.mem_filter]
+    rintro ⟨_, i, hi, k, hk, hpos⟩
+    rw [Subtype.ext hi, hnoreach k hk] at hpos
+    exact lt_irrefl 0 hpos
+  · intro x hxW y hyW
+    rw [Finset.mem_filter] at hxW
+    obtain ⟨_, ix, hix, kx, hkx, hposx⟩ := hxW
+    by_cases hyact : generalFlatBandProjectionMatrix T y y = 0
+    · exact generalFlatBand_proj_row_eq_zero_of_diag_zero T y x hyact
+    · set jy : generalFlatBandActiveSites T := ⟨y, hyact⟩ with hjy
+      by_contra hPyx
+      have hPxy : generalFlatBandProjectionMatrix T ix.1 jy.1 ≠ 0 := by
+        rw [hix]
+        intro h0
+        have h2 := (generalFlatBandProjectionMatrix_isHermitian T).apply jy.1 x
+        rw [h0, star_zero] at h2
+        exact hPyx h2.symm
+      have hAedge : 0 < generalFlatBandProjectionSupportMatrix T ix jy :=
+        Complex.normSq_pos.mpr hPxy
+      have hreach : 0 < (generalFlatBandProjectionSupportMatrix T ^ (kx + 1)) i₀ jy := by
+        rw [pow_succ, Matrix.mul_apply]
+        exact Finset.sum_pos' (fun l _ => mul_nonneg (hpownn kx i₀ l) (hnonneg l jy))
+          ⟨ix, Finset.mem_univ _, mul_pos hposx hAedge⟩
+      exact hyW (Finset.mem_filter.mpr
+        ⟨Finset.mem_univ _, jy, rfl, kx + 1, Nat.succ_pos _, hreach⟩)
+
 end LatticeSystem.Fermion
