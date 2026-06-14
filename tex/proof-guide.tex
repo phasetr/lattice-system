@@ -8548,6 +8548,23 @@ edge spins); the constants are quantified outside $\forall L$, hence length-unif
 Horsch--von der Linden / Koma--Tasaki variational argument (as Theorem 3.1); a documented axiom.
 Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§8.2.1 $\lambda$-D model: Néel $\le$ string order} (Theorem 8.3, Kennedy--Tasaki;
+Tasaki
+§8.2.1, eqs.~(8.2.1)--(8.2.4), pp.~239--241; \texttt{Quantum/SpinS/LambdaDModel.lean}, Issue \#4485).
+The two-parameter Haldane-phase model \texttt{lambdaDChainHamiltonianS} $L\,\lambda\,D=\sum_{x,y}
+[\texttt{openAnisotropicChainCoupling}]\cdot\texttt{spinSDotXXZ}\,x\,y\,\lambda\,2+D\sum_x(\hat
+S_x^{(3)})^2$ is the open XXZ chain with Ising anisotropy $\lambda$ and crystal field $D$ (eq.~8.2.1;
+$\lambda=1$ gives the anisotropic model 8.1.1).  The thermodynamic double-limit order parameters ---
+the Néel parameter \texttt{neelOrderParameterS} (8.2.2) and the den Nijs--Rommelse string parameter
+\texttt{stringOrderParameterS} (8.2.3), both uninterpreted $\mathbb{R}\to\mathbb{R}\to\texttt{Fin}~3
+\to\mathbb{R}$ functions of the model parameters --- satisfy, by the axiom
+\texttt{tasaki\_theorem\_8\_3} (eq.~8.2.4), $O_{\mathrm{N\acute eel}}^{(\alpha)}\le
+O_{\mathrm{string}}^{(\alpha)}$ for $\lambda\ge0$ and all $\alpha$: nonzero Néel order (the Ising AF
+phase) forces nonzero hidden antiferromagnetic order.  A separate axiom records the footnote
+$O_{\mathrm{N\acute eel}}^{(1)}=O_{\mathrm{N\acute eel}}^{(2)}\ge0$.  Proved via the path-integral
+representation (§6.3); a documented axiom.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
