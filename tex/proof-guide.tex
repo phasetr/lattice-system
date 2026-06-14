@@ -7944,11 +7944,13 @@ long-range order (vacuous in one dimension by Corollary 4.3).  Chapters~3--10 ba
 \noindent\textbf{Theorem 4.11} (Koma--Tasaki, Tasaki §4.2.1, eq.~(4.2.23), p.~101; documented axiom,
 \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The two order parameters satisfy
 $\sqrt{3q_0}\le m^\ast$, where the factor $\sqrt3$ reflects the $SU(2)$ symmetry of the Heisenberg
-model (it becomes $\sqrt2$ for the $U(1)$/XXZ variant).  Stated as a projection from the full
-symmetry-breaking constants: the axiom \texttt{mStar\_lowerBound\_of\_fullSSB} takes
-$\texttt{hSSB}:\texttt{IsTanakaFullSSBConstants}\ d\ N\ q_0\ C_1\ m^\ast$ (the \emph{same} $m^\ast$ as
-Theorem 4.9) with $q_0>0$ and concludes $\sqrt{3q_0}\le m^\ast$, so $m^\ast$ is the genuine SSB order
-parameter (and $m^\ast>0$ follows).  Chapters~3--10 backfill.
+model (it becomes $\sqrt2$ for the $U(1)$/XXZ variant).  Because the predicate
+\texttt{IsTanakaFullSSBConstants}\,$\dots\,m$ is downward-closed in $m$ (the moments have
+$\liminf\ge m$), the bound is meaningful only for the \emph{maximal} such $m^\ast$.  The axiom
+\texttt{tanakaSSB\_orderParameter\_lowerBound} therefore provides $m^\ast$ with a maximality witness
+($\forall m'$ admitting the full-SSB bounds, $m'\le m^\ast$), pinning $m^\ast$ to the genuine order
+parameter (eq.~(4.2.9)), and concludes $\sqrt{3q_0}\le m^\ast$ (so $m^\ast>0$).  Chapters~3--10
+backfill.
 
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}

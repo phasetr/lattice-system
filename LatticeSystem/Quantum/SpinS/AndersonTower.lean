@@ -375,12 +375,15 @@ axiom tanakaSSB_full_symmetry_breaking (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (
 `m∗` and the long-range-order parameter `q₀` satisfy `√(3 q₀) ≤ m∗` (eq. (4.2.23)).  The factor `√3`
 reflects the `SU(2)` symmetry of the Heisenberg model (for the `U(1)`/XXZ variant it is `√2`).
 
-Stated as a projection from the full-symmetry-breaking constants: given `m∗` is the genuine SSB order
-parameter of the model (`hSSB : IsTanakaFullSSBConstants d N q₀ C₁ m∗`, the *same* `m∗` as
-Theorem 4.9) with long-range-order parameter `q₀ > 0`, the bound holds — so `m∗` is not a fresh
-unrelated existential.  In particular `m∗ > 0` follows from `√(3 q₀) ≤ m∗` and `q₀ > 0`. -/
-axiom mStar_lowerBound_of_fullSSB (d N : ℕ) (hd : 1 ≤ d) (q₀ C₁ mStar : ℝ) (hq₀ : 0 < q₀)
-    (hSSB : IsTanakaFullSSBConstants d N q₀ C₁ mStar) :
-    Real.sqrt (3 * q₀) ≤ mStar
+The predicate `IsTanakaFullSSBConstants … m` is *downward-closed* in `m` (it asserts the moments have
+`liminf ≥ m`, so it also holds for any smaller positive value).  Hence the bound is meaningful only
+for the **genuine** order parameter — the *maximal* such `m∗` — not an arbitrary lower bound.  The
+axiom therefore provides `m∗` together with a **maximality witness** (`hmax`: every `m'` for which the
+full-SSB bounds hold satisfies `m' ≤ m∗`), pinning `m∗` to the true order parameter (eq. (4.2.9)), and
+asserts `√(3 q₀) ≤ m∗`.  `m∗ > 0` then follows from `q₀ > 0`. -/
+axiom tanakaSSB_orderParameter_lowerBound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
+    ∃ C₁ mStar : ℝ, IsTanakaFullSSBConstants d N q₀ C₁ mStar ∧
+      (∀ m' : ℝ, (∃ C₁' : ℝ, IsTanakaFullSSBConstants d N q₀ C₁' m') → m' ≤ mStar) ∧
+      Real.sqrt (3 * q₀) ≤ mStar
 
 end LatticeSystem.Quantum
