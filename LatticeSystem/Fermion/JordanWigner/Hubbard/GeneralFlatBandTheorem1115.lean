@@ -2,24 +2,26 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandProjectionBridg
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandDisconnected
 
 /-!
-# Tasaki Theorem 11.15: the projection-irreducibility bridge
+# Tasaki Theorem 11.15: the projection-irreducibility bridge (in progress)
 
-This file discharges `tasaki_theorem_11_15`
-(`generalFlatBandFerromagnetic T U ↔ generalFlatBandProjectionIrreducible T`) by composing the
-already-proved Theorem 11.17 (`generalFlatBand_theorem_11_17`,
+This file works toward discharging `tasaki_theorem_11_15`
+(`generalFlatBandFerromagnetic T U ↔ generalFlatBandProjectionIrreducible T`), which will follow by
+composing the already-proved Theorem 11.17 (`generalFlatBand_theorem_11_17`,
 `ferromagnetic ↔ basis connected`) with the purely combinatorial/linear-algebraic **bridge**
 
 `generalFlatBandProjectionIrreducible T ↔ generalFlatBandBasisConnected I μ`.
 
-The bridge factors through an intermediate `generalFlatBandProjectionBlockReducible` predicate — the
-existence of a coordinate cut `W` separating two active sites with no `P₀` entries across it:
+**The axiom `tasaki_theorem_11_15` (in `GeneralFlatBand.lean`) is NOT yet removed** — only part of
+the bridge is in place so far.  The bridge factors through an intermediate
+`generalFlatBandProjectionBlockReducible` predicate — the existence of a coordinate cut `W`
+separating two active sites with no `P₀` entries across it:
 
-* `blockReducible ↔ ¬ basisConnected` — direction `¬basisConnected ⟹ blockReducible` builds the
-  cut from the basis disconnection (`exists_disconnection_cut_of_not_connected` +
-  `generalFlatBand_proj_offdiag_eq_zero_across_cut`); the converse uses
-  `generalFlatBand_mu_confined_of_block` (a basis vector cannot straddle a `P₀`-block cut).
-* `projectionIrreducible ↔ ¬ blockReducible` — the support matrix on the active sites is irreducible
-  (strongly connected) iff there is no such block cut.
+* `blockReducible ↔ ¬ basisConnected` — direction `¬basisConnected ⟹ blockReducible` (DONE,
+  `generalFlatBand_blockReducible_of_not_basisConnected`) builds the cut from the basis disconnection
+  (`exists_disconnection_cut_of_not_connected` + `generalFlatBand_proj_offdiag_eq_zero_across_cut`);
+  the converse (TODO) uses `generalFlatBand_mu_confined_of_block`.
+* `projectionIrreducible ↔ ¬ blockReducible` (TODO) — the support matrix on the active sites is
+  irreducible (strongly connected) iff there is no such block cut.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §11.3.4, Theorem 11.15, pp. 408–412.
