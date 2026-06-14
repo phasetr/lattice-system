@@ -280,9 +280,11 @@ noncomputable def staggeredOrderOpAxisS (α : Fin 3) (A : Λ → Bool) (N : ℕ)
 /-- **Tasaki Theorem 4.26 (Dyson–Lieb–Simon theorem), AXIOM.**  For the antiferromagnetic Heisenberg
 model on the `d`-dimensional hypercubic lattice with `d ≥ 3` and any spin `S = N/2` (`N ≥ 1`), there
 exist a low-temperature threshold `β₀ ∈ (0, ∞)` and a function `q(β)`, with `q(β) > 0` for every
-`β > β₀`, such that the squared staggered order parameter per site stays bounded below by `q(β)` for
+`β > β₀`, such that the squared staggered order-parameter density stays bounded below by `q(β)` for
 sufficiently large (even) volumes (eq. (4.4.52)):
-`⟨(Ô_L^{(α)})²⟩_{β,0}^L / L^d ≥ q(β)`, for every `α = 1, 2, 3` and every `β > β₀`.
+`⟨(Ô_L^{(α)}/L^d)²⟩_{β,0}^L = ⟨(Ô_L^{(α)})²⟩_{β,0}^L / (L^d)² ≥ q(β)`, for every `α = 1, 2, 3` and
+every `β > β₀` (the operator `Ô_L^{(α)}/L^d` is squared, giving the `(L^d)²` normalization — the
+intensive long-range-order density, as in §4.1/§4.2).
 
 This is genuine **Néel long-range order at sufficiently low temperature** in `d ≥ 3` — one of the
 most important results in the mathematical study of quantum many-body systems — proved by Dyson,
@@ -296,7 +298,7 @@ axiom theorem_4_26_staggered_lro (d : ℕ) (hd : 3 ≤ d) (N : ℕ) [NeZero N] :
       ∀ (α : Fin 3) (β : ℝ), β₀ < β → ∃ L₀ : ℕ, ∀ n : ℕ, L₀ ≤ evenSide n →
         q β ≤ thermalAverageReS β (heisenbergFieldHamiltonianS false d (evenSide n) N 0)
             ((staggeredOrderOpAxisS α (torusParitySublattice d (evenSide n)) N) ^ 2) /
-          ((evenSide n : ℝ) ^ d)
+          ((evenSide n : ℝ) ^ d) ^ 2
 
 /-! ## Theorem 4.27: the Griffiths / Koma–Tasaki finite-temperature symmetry breaking -/
 
@@ -319,7 +321,7 @@ axiom theorem_4_27_griffiths_koma_tasaki_ssb (d : ℕ) (hd : 3 ≤ d) (N : ℕ) 
       (∀ (α : Fin 3) (β : ℝ), β₀ < β → ∃ L₀ : ℕ, ∀ n : ℕ, L₀ ≤ evenSide n →
         q β ≤ thermalAverageReS β (heisenbergFieldHamiltonianS false d (evenSide n) N 0)
             ((staggeredOrderOpAxisS α (torusParitySublattice d (evenSide n)) N) ^ 2) /
-          ((evenSide n : ℝ) ^ d)) ∧
+          ((evenSide n : ℝ) ^ d) ^ 2) ∧
       (∀ β : ℝ, β₀ < β → ∀ ε : ℝ, 0 < ε → ∃ δ : ℝ, 0 < δ ∧ ∀ h : ℝ, 0 < h → h < δ →
         ∃ L₀ : ℕ, ∀ n : ℕ, L₀ ≤ evenSide n →
           Real.sqrt (3 * q β) - ε ≤
