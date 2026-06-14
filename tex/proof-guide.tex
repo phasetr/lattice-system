@@ -7947,18 +7947,17 @@ $\sqrt{3q_0}\le m^\ast$, where the factor $\sqrt3$ reflects the $SU(2)$ symmetry
 model (it becomes $\sqrt2$ for the $U(1)$/XXZ variant).  To avoid the downward-closure of the SSB
 predicate (a $\liminf\ge m$ bound, true for any smaller $m$ and vacuous in $d=1$), the axiom
 \texttt{tanakaSSB\_orderParameter\_lowerBound} pins $q_0$ and $m^\ast$ as the \emph{exact}
-infinite-volume limits of a genuine realizing ground-state family $\Phi$ and the \emph{realizing}
-slowly-diverging tower sequence $M$ (\texttt{hMdiv}: $\texttt{Tendsto}\ M\ \texttt{atTop atTop}$ with
-growth $M+1\le C_1 L^{d/2}$): \texttt{hGS} requires $\Phi$ to be an eventual minimizing nonzero ground
-state with well-defined Tanaka terms, \texttt{hLRO} pins $q_0$ as the long-range-order limit, and
-\texttt{hSSB} pins $m^\ast$ as the staggered-moment limit $\texttt{tanakaOrderMean1}\to m^\ast$ (exact
-two-sided limit), and \texttt{hSSBpred}:\,$\texttt{IsTanakaFullSSBConstants}\ d\ N\ q_0\ C_1\ m^\ast$
-connects $m^\ast$ to the full-SSB API (Theorem 4.9) so the bound composes for the \emph{same}
-$m^\ast$.  These hypotheses are
+infinite-volume limits via a single hypothesis $\texttt{hFamily}:
+\texttt{IsRealizingTanakaGroundStateFamily}\ d\ N\ q_0\ m^\ast\ C_1\ \Phi\ E_0\ M$.  That predicate
+bundles: the diverging tower $\texttt{Tendsto}\ M\ \texttt{atTop atTop}$ with growth $M+1\le C_1
+L^{d/2}$; $\Phi$ an eventual minimizing nonzero ground state with well-defined Tanaka terms; the exact
+long-range-order limit $q_0$; the exact staggered-moment limit $\texttt{tanakaOrderMean1}\to m^\ast$;
+and $\texttt{IsTanakaFullSSBConstants}\ d\ N\ q_0\ C_1\ m^\ast$ connecting $m^\ast$ to the full-SSB API
+(Theorem 4.9) for the \emph{same} $m^\ast$.  These conditions are
 unsatisfiable in $d=1$ (no LRO ground state, Corollary~4.3), so the bound $\sqrt{3q_0}\le m^\ast$
-applies exactly where intended (and $m^\ast>0$ follows).  The realizing-family conditioning shared by
-Theorems 4.11, 4.13 and Lemma 4.15 is factored into one predicate
-\texttt{IsRealizingTanakaGroundStateFamily} (a DRY refactoring helper), used as the \texttt{hFamily}
+applies exactly where intended (and $m^\ast>0$ follows).  The same predicate
+\texttt{IsRealizingTanakaGroundStateFamily} is the realizing-family conditioning shared by
+Theorems 4.11, 4.13 and Lemma 4.15 (a DRY refactoring helper), used as the \texttt{hFamily}
 hypothesis of all three.  Chapters~3--10 backfill.
 
 \noindent\textbf{Conjecture 4.12} (Koma--Tasaki, Tasaki §4.2.1, eqs.~(4.2.25)--(4.2.26), pp.~101--102;
