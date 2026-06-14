@@ -113,11 +113,16 @@ Conjecture 4.12 (`m∗ = √(3 q∗)`), the normalized solid-angle average of th
 `SU(2)`-symmetric average of the symmetry-breaking "ground states" recovers the LRO-but-no-SSB
 ground state.
 
+The axiom asserts `IsTanakaFullSSBConstants d N q₀ C₁ mStar` (Theorem 4.9) alongside, so `mStar` is
+the *same* full-SSB order parameter — letting downstream code combine Proposition 4.10 with
+Theorem 4.9 for one physical order parameter.
+
 Recorded as a documented axiom, sharing constants `C₁`, `C₂`, `m∗` with the Anderson-tower /
 full-SSB statements and conditional on long-range order (vacuous in one dimension by Corollary 4.3).
 Conjecture 4.12 enters only as a hypothesis (`IsConjecture412Equality`); never asserted true. -/
 axiom tanakaSphereAverage_groundState (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
     ∃ C₁ C₂ mStar : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂ ∧
+      IsTanakaFullSSBConstants d N q₀ C₁ mStar ∧
       IsTanakaSphereAverageConstants d N q₀ C₁ mStar
 
 end LatticeSystem.Quantum
