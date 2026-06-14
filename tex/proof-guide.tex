@@ -7763,6 +7763,21 @@ discharged.
 discharged in future work.  Theorems 11.8 and 11.13, which Tasaki states without proof, likewise
 remain documented axioms.
 
+\noindent\textbf{Theorem 3.1} (Horsch--von der Linden, Tasaki §3.4, eqs.~(3.4.7)--(3.4.12),
+pp.~66--67; \textbf{discharged axiom-free}, \texttt{Quantum/HorschVonderLinden.lean}, Issue \#4485).
+The start of the Chapters~3--10 backfill (book order; infinite systems are in scope).  A ground state
+with long-range order but no spontaneous symmetry breaking has a low-lying excited energy eigenstate.
+We discharge the finite-dimensional core, \texttt{horsch\_vonderLinden\_lowLying}: for a Hermitian
+$H$ with minimum eigenvalue $E_0=$ \texttt{eigenvalues}\,$i_0$, a normalized state $\Gamma$ orthogonal
+to the ground eigenvector (its $i_0$ eigenbasis component vanishes) with Rayleigh energy
+$\langle\Gamma,H\Gamma\rangle\le E_0+\delta$ yields an excited eigenstate $j\ne i_0$ with
+$E_0\le E_j\le E_0+\delta$.  Proof: expand the Rayleigh quotient in the eigenbasis,
+$\langle\Gamma,H\Gamma\rangle=\sum_j\lVert w_j\rVert^2 E_j$ with $\sum_j\lVert w_j\rVert^2=1$ and
+$w_{i_0}=0$ (via the spectral theorem, \texttt{rayleighOnVec\_unitary\_conj}, and
+\texttt{rayleighOnVec\_diagonal\_real}); if every support index had $E_j>E_0+\delta$ the weighted sum
+would exceed $E_0+\delta$, a contradiction.  The $C\,L^{-d}$ bound from long-range order (the
+variational estimate~(3.4.12)) supplies the input $\delta$.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
