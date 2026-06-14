@@ -8477,9 +8477,13 @@ Hamiltonian.  \texttt{bondCasimirS} is the bond Casimir $(\hat S_x+\hat S_y)^2=2
 S_x\!\cdot\!\hat S_y$ (affine in $\hat S_x\!\cdot\!\hat S_y$, eigenvalue $J(J+1)$ on the spin-$J$ bond
 subspace); \texttt{bondMaxSpinProjectionS} is the concrete Lagrange/Casimir projector
 $\hat P_N[\hat S_x+\hat S_y]=\prod_{j=0}^{N-1}(\hat C-j(j+1))/(N(N+1)-j(j+1))$ onto the maximal bond
-total spin $J=N$; and \texttt{generalAKLTHamiltonianS} $G\,N=\tfrac12\sum_{x,y}[G.\mathrm{Adj}\,x\,y]
-\hat P_{\max}[\hat S_x+\hat S_y]$ is the bond sum over a \texttt{SimpleGraph} (eq.~7.3.7; on the
-hexagonal lattice $S=3/2$, $N=3$, this is $\sum_{\mathrm{bonds}}\hat P_3$, eq.~7.3.8).  The axiom
+total spin $J=N$; and \texttt{regularGraphAKLTHamiltonianS} $G\,N=\tfrac12\sum_{x,y}
+[G.\mathrm{Adj}\,x\,y]\hat P_N[\hat S_x+\hat S_y]$ is the bond sum over a \texttt{SimpleGraph}.  It is
+the \emph{regular (uniform-spin) specialization} of eq.~(7.3.7) --- a single global $S=N/2$, each
+bond projecting to $J=N$ --- which equals eq.~(7.3.7) exactly on an $N$-regular graph (the
+site-dependent spins $\bar S_x=\deg(x)/2$ of the non-regular case are not expressible in
+\texttt{ManyBodyOpS}~$\Lambda\,N$); on the 3-regular hexagonal lattice ($S=3/2$, $N=3$) it is
+$\sum_{\mathrm{bonds}}\hat P_3$ (eq.~7.3.8), the setting of Theorem 7.7.  The axiom
 \texttt{tasaki\_theorem\_7\_7} states that for the hexagonal lattice
 (marker \texttt{IsHexagonalLatticeAKLT}) with VBS ground state $\Phi$
 (marker \texttt{IsGeneralGraphVBSGroundState}) there are size-independent $C,\xi>0$ with the

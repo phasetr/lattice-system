@@ -14,6 +14,13 @@ a sum over bonds of the projection onto the *maximal* total spin of each bond.  
 site has coordination number 3, so the spins are uniform `S = 3/2` (`N = 3`) and the Hamiltonian is
 `Ĥ = Σ_{bonds} P̂_3[Ŝ_x + Ŝ_y]` (eq. (7.3.8)).
 
+We formalize the **regular (uniform-spin) specialization** `regularGraphAKLTHamiltonianS`: a single
+global spin `S = N/2` and each bond projecting to the maximal total spin `J = N`.  It coincides with
+eq. (7.3.7) exactly on an `N`-regular graph — in particular it is eq. (7.3.8) on the 3-regular
+hexagonal lattice — which is precisely the setting of Theorem 7.7.  The site-dependent spins
+`S̄_x = deg(x)/2` of the fully general (non-regular) eq. (7.3.7) are not expressible in the
+uniform-spin type `ManyBodyOpS Λ N` and are left for a future refinement.
+
 For uniform spin `S = N/2`, the bond projection onto the maximal total spin `J = N` is the
 **Lagrange/Casimir projector**: with `Ĉ = (Ŝ_x + Ŝ_y)² = 2S(S+1) + 2 Ŝ_x·Ŝ_y` (affine in `Ŝ_x·Ŝ_y`,
 with eigenvalue `J(J+1)` on the spin-`J` bond subspace, `J = 0,…,N`),
@@ -64,11 +71,19 @@ noncomputable def bondMaxSpinProjectionS (x y : Λ) (N : ℕ) : ManyBodyOpS Λ N
     ((N : ℂ) * (N + 1) - ((j : ℂ) * (j + 1)))⁻¹ •
       (bondCasimirS x y N - ((j : ℂ) * (j + 1)) • (1 : ManyBodyOpS Λ N))).prod
 
-/-- The **generalized AKLT Hamiltonian** on a graph `G` (eq. (7.3.7)) for uniform spin `S = N/2`:
-`Ĥ^{(Λ,B)}_AKLT = Σ_{{x,y}∈B} P̂_{max}[Ŝ_x + Ŝ_y]`, summed over the bonds of `G`.  Implemented as a
-half of the ordered double sum over adjacent pairs (each bond `{x,y}` is counted once as `(x,y)` and
-once as `(y,x)`, and the bond projection is symmetric). -/
-noncomputable def generalAKLTHamiltonianS (G : SimpleGraph Λ) [DecidableRel G.Adj] (N : ℕ) :
+/-- The **regular-graph (uniform-spin) AKLT Hamiltonian** on a graph `G`:
+`Ĥ_AKLT = Σ_{{x,y}∈B} P̂_N[Ŝ_x + Ŝ_y]`, summed over the bonds of `G`, with a *single global* spin
+`S = N/2` on every site and each bond projecting to the maximal total spin `J = N`.  Implemented as
+a half of the ordered double sum over adjacent pairs (each bond `{x,y}` is counted once as `(x,y)`
+and
+once as `(y,x)`, and the bond projection is symmetric).
+
+This is the **regular specialization** of Tasaki's generalized AKLT Hamiltonian (eq. (7.3.7)): that
+model assigns the site-dependent spin `S̄_x = deg(x)/2` and projects each bond onto `S̄_x + S̄_y`,
+so the two agree exactly on a `N`-regular graph (every site of degree `N`).  In particular this *is*
+eq. (7.3.8) on the 3-regular hexagonal lattice (`N = 3`, `S = 3/2`).  Site-dependent spins are not
+expressible in the uniform-spin type `ManyBodyOpS Λ N` and are left for a future refinement. -/
+noncomputable def regularGraphAKLTHamiltonianS (G : SimpleGraph Λ) [DecidableRel G.Adj] (N : ℕ) :
     ManyBodyOpS Λ N :=
   (1 / 2 : ℂ) • ∑ x : Λ, ∑ y : Λ,
     if G.Adj x y then bondMaxSpinProjectionS x y N else 0
