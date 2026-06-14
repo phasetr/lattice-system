@@ -45,6 +45,7 @@ import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPF
 import LatticeSystem.Quantum.HorschVonderLinden
 import LatticeSystem.Quantum.KaplanHorschVonderLinden
 import LatticeSystem.Quantum.SpinS.DysonLiebSimon
+import LatticeSystem.Quantum.SpinS.HaldaneConjecture
 import LatticeSystem.Quantum.SpinS.ShastryNoSSB
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO
 import LatticeSystem.Quantum.SpinS.AndersonTower

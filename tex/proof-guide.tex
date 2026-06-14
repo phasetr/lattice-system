@@ -8277,6 +8277,21 @@ ground-state family is given (unique by a Marshall--Lieb--Mattis argument), and 
 existential with lower bound $\sqrt{2q_0}$.  The two condensates are thus coupled coherently.  Proved
 by Koma--Tasaki~[22]; recorded as a documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§6.1 Haldane ``conjecture''} (Tasaki §6.1, eqs.~(6.1.1)--(6.1.3), pp.~153--157;
+\texttt{def : Prop}, never asserted true, \texttt{Quantum/SpinS/HaldaneConjecture.lean}, Issue
+\#4485).  Opening Tasaki Chapter~6 (Part~II, Haldane phenomena), we formalize the one-dimensional
+antiferromagnetic Heisenberg chain $\hat H=\sum_x\hat S_x\cdot\hat S_{x+1}$ on the ring (PBC,
+\texttt{afmHeisenbergChainHamiltonianS}, eq.~6.1.1, spin $S=N/2$) and the \emph{Haldane conjecture} on
+its spectral gap.  The gap dichotomy is captured by \texttt{realSpectrum} (the real eigenvalues),
+\texttt{IsGroundEnergy}, \texttt{IsPositiveSpectralGap} (first excited minus ground), \texttt{IsGapless}
+(the gap tends to $0$ as $L\uparrow\infty$, the $O(1/L)$ half-odd-integer case) and \texttt{IsGapped}
+(a uniform Haldane gap $\Delta>0$).  Then $\texttt{haldaneConjecture}\;N:=(\texttt{Odd}\;N\to
+\texttt{IsGapless}\;N)\wedge(2\le N\to\texttt{Even}\;N\to\texttt{IsGapped}\;N)$: half-odd-integer spin
+($N$ odd) is gapless, integer spin ($N$ even, $N\ge2$) is gapped.  This is a genuine conjecture,
+recorded as a \texttt{Prop} only and \textbf{never asserted true}; the correlation-decay clauses
+(HOI3)/(I3) are deferred to a later module.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
