@@ -8446,6 +8446,28 @@ positive string order is the hidden antiferromagnetic order of the Haldane phase
 directions by SU(2) invariance, while the Néel order vanishes).  Recorded as a documented axiom.
 Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§7.2.2 Matrix product representation} (Theorems 7.5--7.6; Tasaki §7.2.2,
+eqs.~(7.2.36), (7.2.41)--(7.2.42), pp.~202--203;
+\texttt{Quantum/SpinS/AKLTMatrixProduct.lean}, Issue \#4485).  The AKLT VBS state is the prototypical
+\emph{injective matrix product state}.  \texttt{MPSMatrices} $D\,N$ are the bond-dimension-$D$
+matrices $A^\sigma$; \texttt{mpsTransferMatrix} is the $D^2\times D^2$ transfer matrix
+$\tilde A_{(\alpha,\beta),(\alpha',\beta')}=\sum_\sigma\overline{A^\sigma_{\alpha,\alpha'}}
+A^\sigma_{\beta,\beta'}$ (eq.~7.2.42); \texttt{orderedProd} is the ordered product
+$A^{\sigma_1}\cdots A^{\sigma_\ell}$; \texttt{IsMPSNormalized} is $\sum_\sigma A^\sigma(A^\sigma)^\dagger
+=\lambda I$ ($\lambda>0$, eq.~7.2.41); and \texttt{HasPrimitiveTransferSpectrum} is the concrete
+spectral-gap condition ($\lambda$ in the spectrum, eigenspace \texttt{finrank}~$=1$, every other
+eigenvalue $\lVert\mu\rVert<\lambda$).  The axiom \texttt{mps\_theorem\_7\_5} states the equivalence
+of the three conditions (i) eventual spanning, (ii) spanning for all large lengths, (iii) primitive
+transfer spectrum, for normalized matrices of positive bond dimension --- the Perron--Frobenius
+characterization of an injective MPS.  The axiom \texttt{mps\_theorem\_7\_6}
+(Fannes--Nachtergaele--Werner, unproven in the book) gives uniqueness: two injective collections
+generating the same MPS (marker \texttt{GeneratesSameMPS}) are gauge-equivalent
+$A^\sigma=(\theta/c)\,U B^\sigma U^\dagger$ with $U$ unitary and $\lVert\theta\rVert=1$, the fact
+underlying the classification of symmetry-protected topological phases (§8.3.4).  The transfer
+matrix, ordered products, normalization, spanning and spectral conditions are defined concretely;
+Theorems 7.5--7.6 are documented axioms.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
