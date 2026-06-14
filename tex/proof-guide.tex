@@ -7968,6 +7968,20 @@ family (with LRO limit $q^\ast$ and SSB order parameter $m^\ast$ via \texttt{IsT
 --- and is \textbf{never asserted true} (no \texttt{axiom}/\texttt{theorem} derives it, which would be
 unsound).  Chapters~3--10 backfill.
 
+\noindent\textbf{Theorem 4.13} (Tasaki §4.2.1, eqs.~(4.2.27)--(4.2.28), pp.~102--103; documented
+axiom, \texttt{Quantum/SpinS/AndersonTowerField.lean}, Issue \#4485).  Spontaneous symmetry breaking
+under an infinitesimal staggered field: with the field Hamiltonian $\hat H_h=\hat H-h\,\hat
+O_L^{(1)}$ (\texttt{staggeredFieldHamiltonianS}, eq.~(4.2.27)) and its ground state
+$\Phi_{\mathrm{GS},h}$, the per-site staggered moment survives the iterated limit
+$\lim_{h\downarrow0}\liminf_{L\uparrow\infty}\langle\Phi_{\mathrm{GS},h}|\hat O_L^{(1)}/L^d
+|\Phi_{\mathrm{GS},h}\rangle\ge m^\ast$ (eq.~(4.2.28); footnote~26: rigorously $\liminf$).  The axiom
+\texttt{tanakaSSB\_field\_lowerBound} states it in $\varepsilon$--$\delta$ form with the inner
+threshold $L_0$ depending on the field $h$ (outer $h\downarrow0$, inner $\liminf_L$); the field ground
+states are a given eigenvector/minimizer/nonzero family of $\hat H_h$, and $m^\ast$ is pinned as the
+genuine order parameter by a realizing unperturbed ground state (\texttt{IsTanakaFullSSBConstants} +
+exact LRO/SSB limits, as in Theorem 4.11), unsatisfiable in $d=1$.  Combined with Theorem 4.11 this
+gives $\ge m^\ast\ge\sqrt{3q_0}>0$.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
