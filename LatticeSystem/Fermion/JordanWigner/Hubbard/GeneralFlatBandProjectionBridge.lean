@@ -252,4 +252,25 @@ theorem generalFlatBand_no_shared_site_of_saturated {I : Finset (Fin (M + 1))}
   have hne : z ≠ z' := fun h => hz' (h ▸ hz)
   exact hz' (hsat z hz z' ⟨fun h => hne (Subtype.ext h), x, hzx, hz'x⟩)
 
+/-- **A basis vector with no support from a side is orthogonal to that side's flat-band subspace**:
+if every `μ_z` (`z ∈ J`) vanishes at `x`, then `e_x ⊥ span{μ_z : z ∈ J}`.  Each generator gives
+`⟪μ_z, e_x⟫ = conj(μ_z(x)) = 0`, so `e_x` is orthogonal to the span.  This places `P₀ e_x` in the
+complementary side, the heart of the block-diagonal decomposition. -/
+theorem generalFlatBand_basisVec_mem_orthogonal_of_side {I : Finset (Fin (M + 1))}
+    (μ : Fin (M + 1) → Fin (M + 1) → ℂ) (S : Set ↥I) {x : Fin (M + 1)}
+    (hx : ∀ z ∈ S, μ z.1 x = 0) :
+    EuclideanSpace.basisFun (Fin (M + 1)) ℂ x
+      ∈ (Submodule.span ℂ ((fun z : ↥I =>
+        (WithLp.toLp 2 (μ z.1) : EuclideanSpace ℂ (Fin (M + 1)))) '' S))ᗮ := by
+  rw [Submodule.mem_orthogonal]
+  intro v hv
+  induction hv using Submodule.span_induction with
+  | mem w hw =>
+    obtain ⟨z, hzS, rfl⟩ := hw
+    rw [← inner_conj_symm, EuclideanSpace.basisFun_inner]
+    simp [hx z hzS]
+  | zero => simp
+  | add a b _ _ ha hb => rw [inner_add_left, ha, hb, add_zero]
+  | smul c a _ ha => rw [inner_smul_left, ha, mul_zero]
+
 end LatticeSystem.Fermion
