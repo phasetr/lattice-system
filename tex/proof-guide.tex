@@ -7850,6 +7850,19 @@ S_{\mathrm{tot}}^2$), so it is a \emph{discharge candidate}; we record
 antiferromagnetic family, to be discharged once the §2.5 Theorem 2.3 total-spin API and the (4.1.15)
 inequality are assembled.  Chapters~3--10 backfill.
 
+\noindent\textbf{Lemma 4.5} (Tasaki §4.1.2, eqs.~(4.1.55)--(4.1.57), pp.~87--88; documented axiom,
+\texttt{Math/ReflectionPositivityAveraging.lean}, Issue \#4485).  The abstract reflection-positivity
+averaging inequality at the heart of the reflection-positivity proof of Theorem 4.1.  For a
+real-valued function $F$ of a cyclic string of $2n$ arguments in an arbitrary type $V$ (the vector
+structure of Tasaki's $\mathbb{R}^D$ is never used), invariant under the cyclic shift (eq.~(4.1.55))
+and satisfying the reflection bound $F(f)\ge\frac12\bigl(F(\mathrm{reflectLeft}\,f)+
+F(\mathrm{reflectRight}\,f)\bigr)$ (eq.~(4.1.56)), one has the lower bound by the constant-string
+average $F(f)\ge(2n)^{-1}\sum_j F(j\mapsto f_j)$ (eq.~(4.1.57)).  We define the cyclic reindexing and
+the two reflections (\texttt{reindexCyclic}, \texttt{reflectLeft}, \texttt{reflectRight}) and record
+\texttt{reflectionPositivity\_averaging}.  Tasaki's $G_{\min}=0$ collapse proof is elementary but
+intricate (a doubling induction on the number of leading equal entries), so the lemma is a
+\emph{finite-dimensional discharge candidate}.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
