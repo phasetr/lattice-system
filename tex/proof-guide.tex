@@ -8354,6 +8354,23 @@ for $S=1$ holds rigorously within this artificial restricted Hilbert space.  Pro
 path-integral / two-dimensional classical statistical-mechanics representation (Gómez-Santos);
 recorded as a documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
+pp.~177--179; documented axiom, \texttt{Quantum/SpinS/AKLT.lean}, Issue \#4485).  The
+Affleck--Kennedy--Lieb--Tasaki model is the $S=1$ chain $\hat H_{\mathrm{AKLT}}=\sum_x\{\hat
+S_x\!\cdot\!\hat S_{x+1}+\tfrac13(\hat S_x\!\cdot\!\hat S_{x+1})^2\}$ (\texttt{akltHamiltonianS},
+eq.~7.1.1, periodic, $SU(2)$-invariant; the biquadratic term places it outside Marshall--Lieb--Mattis).
+The axiom \texttt{aklt\_theorem\_7\_1} states that for all sufficiently large chains (length $L=n+1$,
+any parity) the model has a \emph{unique ground state} $\Phi$ (the valence-bond-solid VBS state), a
+\emph{spectral gap} bounded below by a positive $L$-independent constant $\Delta E_0$
+(\texttt{IsPositiveSpectralGap}, $\Delta E_0\le\mathrm{gap}$), and the \emph{exact correlation}
+$\langle\Phi,\hat S_x\!\cdot\!\hat S_y\Phi\rangle/\langle\Phi,\Phi\rangle\to 4(-3)^{-|x-y|}$
+(eq.~7.1.2, sign-alternating exponential decay) for fixed sites with $|x-y|\ge1$ as $L\uparrow\infty$
+(fixed $\mathbb N$-sites embedded by \texttt{chainSite}, sound eventual-$\varepsilon$ form).  Both
+$\Delta E_0$ and the ground-state family $\Phi$ are quantified outermost.  Proved via the explicit VBS
+state and its matrix-product representation (Affleck--Kennedy--Lieb--Tasaki, 1987); recorded as a
+documented axiom.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
