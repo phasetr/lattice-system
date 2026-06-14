@@ -378,7 +378,7 @@ parameter `q₀` as exact infinite-volume limits.  This bundles the conditioning
 4.11, 4.13 and Lemma 4.15: `M` diverges (`Tendsto M atTop atTop`); `Φ L` is an eventual minimizing
 nonzero ground state with the growth bound `M L + 1 ≤ C₁ L^{d/2}` and well-defined Tanaka terms;
 `q₀` is the exact LRO limit (eq. (4.1.7)/(4.2.25)); `m∗` is the exact staggered-moment limit
-(eq. (4.2.12)); and `m∗` is the genuine full-SSB order parameter (`IsTanakaFullSSBConstants`). 
+(eq. (4.2.12)); and `m∗` is the genuine full-SSB order parameter (`IsTanakaFullSSBConstants`).
 These
 conditions are unsatisfiable in `d = 1` (no LRO ground state, Corollary 4.3). -/
 def IsRealizingTanakaGroundStateFamily (d N : ℕ) (q₀ mStar C₁ : ℝ)
