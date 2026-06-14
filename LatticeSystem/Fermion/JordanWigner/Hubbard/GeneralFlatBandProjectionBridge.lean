@@ -227,4 +227,17 @@ theorem generalFlatBand_proj_active_of_ne_zero (x y : Fin (M + 1))
   rw [← (generalFlatBandProjectionMatrix_isHermitian T).apply y x] at hyx
   exact (star_eq_zero.mp hyx)
 
+/-- **Special-basis vectors with disjoint site supports are orthogonal**: if for every site `x`
+either `μ_z(x) = 0` or `μ_{z'}(x) = 0`, then `⟪μ_z, μ_{z'}⟫ = 0`.  The inner product is the
+site-sum `Σ_x conj(μ_z(x)) μ_{z'}(x)`, and every term vanishes.  This makes the per-side flat-band
+subspaces of a basis cut orthogonal. -/
+theorem generalFlatBand_mu_orthogonal_of_disjoint_support
+    (μ : Fin (M + 1) → Fin (M + 1) → ℂ) (z z' : Fin (M + 1))
+    (hdisj : ∀ x, μ z x = 0 ∨ μ z' x = 0) :
+    inner ℂ (WithLp.toLp 2 (μ z) : EuclideanSpace ℂ (Fin (M + 1)))
+        (WithLp.toLp 2 (μ z')) = 0 := by
+  rw [PiLp.inner_apply]
+  refine Finset.sum_eq_zero (fun x _ => ?_)
+  rcases hdisj x with h | h <;> simp [RCLike.inner_apply, h]
+
 end LatticeSystem.Fermion
