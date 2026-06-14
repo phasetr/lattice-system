@@ -71,27 +71,33 @@ symmetry-breaking order parameter and the long-range-order parameter coincide, `
 def IsConjecture412Equality (mStar qStar : ℝ) : Prop :=
   mStar = Real.sqrt (3 * qStar)
 
-/-- The Proposition 4.10 statement for fixed constants.  **Conditional on Conjecture 4.12**: for
-every `qStar` such that the equality `m∗ = √(3 qStar)` holds (a genuine hypothesis the consumer
-supplies — `qStar` is *not* existentially hidden), for a given ground-state family `Φ` (with the
-minimizer /
-long-range-order conditions eventual) there is a slowly diverging `M(L)` such that the *normalized
-solid-angle average* of the symmetry-breaking states converges, up to a unimodular phase, to the
-ground state (eq. (4.2.22)):
+/-- The Proposition 4.10 statement for fixed constants.  For a given ground-state family `Φ` (with
+the minimizer / long-range-order conditions eventual) and the *actual* long-range-order limit `qStar`
+of that family (`q∗`, eq. (4.2.25), pinned by `Φ` — not freely chosen), **conditional on
+Conjecture 4.12** (`m∗ = √(3 qStar)`, a genuine hypothesis tying `m∗` to the physical `q∗`):
+there is a slowly diverging `M(L)` such that the *normalized solid-angle average* of the
+symmetry-breaking states converges, up to a unimodular phase, to the ground state (eq. (4.2.22)):
 `∀ ε > 0, ∃ L₀, ∀ L ≥ L₀ (even), ∃ z, ‖z‖ = 1 ∧ ‖unitNormalize(Ξ_avg) − z • unitNormalize(Φ)‖ < ε`. -/
 def IsTanakaSphereAverageConstants (d N : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
   0 < C₁ ∧ 0 < mStar ∧
-    -- the conjecture is a genuine hypothesis: for EVERY `qStar` making it hold, convergence follows
-    (∀ qStar : ℝ, IsConjecture412Equality mStar qStar →
-      ∀ (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ),
-        (∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
-          (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec (Φ L) = E₀ L • Φ L ∧
-          (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
-            (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
-          Φ L ≠ 0 ∧
-          q₀ ≤ (star (Φ L) ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
+    (∀ (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ),
+      (∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
+        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec (Φ L) = E₀ L • Φ L ∧
+        (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+          (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
+        Φ L ≠ 0 ∧
+        q₀ ≤ (star (Φ L) ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
+            staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
+            ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2)) →
+      -- `qStar` is the *actual* long-range-order limit `q∗` of this ground-state family
+      -- (eq. (4.2.25)); it is determined by `Φ`, not freely chosen
+      ∀ qStar : ℝ,
+        (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+          |(star (Φ L) ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
               staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
-              ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2)) →
+              ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2) - qStar| < ε) →
+        -- Conjecture 4.12 (eq. (4.2.26)) relating the SSB and LRO order parameters
+        IsConjecture412Equality mStar qStar →
         ∃ M : ℕ → ℕ, Tendsto M atTop atTop ∧
           (∃ L₂ : ℕ, ∀ (L : ℕ) [NeZero L], L₂ ≤ L → 2 ≤ L → Even L →
             0 < M L ∧ ((M L : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2)) ∧
