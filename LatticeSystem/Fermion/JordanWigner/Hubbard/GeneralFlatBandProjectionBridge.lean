@@ -273,4 +273,18 @@ theorem generalFlatBand_basisVec_mem_orthogonal_of_side {I : Finset (Fin (M + 1)
   | add a b _ _ ha hb => rw [inner_add_left, ha, hb, add_zero]
   | smul c a _ ha => rw [inner_smul_left, ha, mul_zero]
 
+/-- **`P₀` preserves orthogonality to a flat-band subspace**: if `V ≤ ker T` and `e_x ⊥ V`, then
+`P₀ e_x ⊥ V`.  For `w ∈ V ⊆ ker T`, `P₀` fixes `w`, so by self-adjointness
+`⟪w, P₀ e_x⟫ = ⟪P₀ w, e_x⟫ = ⟪w, e_x⟫ = 0`.  Combined with the side orthogonality this places
+`P₀ e_x` on the same side as `x`. -/
+theorem generalFlatBand_proj_mem_orthogonal {V : Submodule ℂ (EuclideanSpace ℂ (Fin (M + 1)))}
+    (hV : V ≤ generalFlatBandKernel T) {x : Fin (M + 1)}
+    (hx : EuclideanSpace.basisFun (Fin (M + 1)) ℂ x ∈ Vᗮ) :
+    (generalFlatBandKernel T).starProjection (EuclideanSpace.basisFun (Fin (M + 1)) ℂ x) ∈ Vᗮ := by
+  rw [Submodule.mem_orthogonal]
+  intro w hw
+  rw [← Submodule.inner_starProjection_left_eq_right,
+    Submodule.starProjection_eq_self_iff.mpr (hV hw)]
+  exact (Submodule.mem_orthogonal _ _).mp hx w hw
+
 end LatticeSystem.Fermion
