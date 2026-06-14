@@ -8090,6 +8090,22 @@ concrete $\liminf$ correlation \texttt{infiniteVolSpinCorrLiminf}, so the model 
 phase.  Both are proved by one-dimensional cluster-expansion / analyticity methods (Tasaki~[4]) and
 recorded as documented axioms.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{Theorem 4.23} (Tasaki §4.4.1, eqs.~(4.4.7)--(4.4.8), pp.~119--120; documented
+axiom, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  The Heisenberg model in
+$d\ge 2$ is \emph{disordered at sufficiently high temperature}.  Reusing the Theorem~4.22
+finite-temperature framework at general $d$ (\texttt{hd : 2 $\le$ d}), the axiom
+\texttt{tasaki\_4\_23\_high\_temperature\_disorder} asserts the existence of a threshold
+$\beta_0\in(0,\infty)$ depending only on $d$ and $S$ such that for every $\beta\in[0,\beta_0]$ both
+the no-SSB magnetization vanishing (4.4.7), $\lim_{h\downarrow0}\lim_{L\uparrow\infty}\langle\hat
+S_x^{(3)}\rangle_{\beta,h}^L=0$ (same $\varepsilon$--$\delta$ / $\liminf$-subsequence form as
+Theorem~4.22), and the exponential clustering (4.4.8), $|\langle\hat S_x^{(\alpha)}\hat
+S_y^{(\alpha)}\rangle_{\beta,0}^\infty|\le C(\beta)\,e^{-|x-y|/\xi(\beta)}$ with
+$\xi(\beta),C(\beta)\in(0,\infty)$, hold.  The shared high-temperature threshold $\beta_0$ binds both
+statements under one outer existential.  Proved by the cluster-expansion technique, valid at
+sufficiently high temperature in any dimension for any short-ranged interaction
+(Tasaki~[21,~50,~61]); recorded as a documented axiom.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}

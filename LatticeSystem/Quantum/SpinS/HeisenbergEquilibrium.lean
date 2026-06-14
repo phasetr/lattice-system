@@ -3,7 +3,8 @@ import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.Order.LiminfLimsup
 
 /-!
-# Tasaki §4.4: equilibrium states of the Heisenberg model — disorder in one dimension (Theorem 4.22)
+# Tasaki §4.4: equilibrium states of the Heisenberg model — high-temperature / one-dimensional
+disorder (Theorems 4.22, 4.23)
 
 For the standard spin-`S` Heisenberg model on the `d`-dimensional hypercubic torus we study the
 finite-temperature equilibrium (Gibbs) state.  With the field Hamiltonians (eqs. (4.4.1), (4.4.2))
@@ -24,16 +25,20 @@ the canonical average at inverse temperature `β = (k_B T)^{-1} ∈ [0, ∞)` is
   `α = 1, 2, 3`, `x, y ∈ ℤ`, so the model is in the disordered phase (`ξ(β)` bounds the
   correlation length).
 
+**Theorem 4.23** extends the same disorder (4.4.7)/(4.4.8) to `d ≥ 2` at *sufficiently high
+temperature*: there is a constant `β₀ ∈ (0, ∞)`, depending only on `d` and `S`, such that the model
+is disordered for every `β ∈ [0, β₀]`.
+
 These are proved by standard high-temperature / one-dimensional cluster-expansion (analyticity)
-methods (Tasaki [4]); following the project's policy for infinite-volume / finite-temperature
-results, we record Theorem 4.22 as two **documented axioms** over the established torus family.  The
-finite-temperature framework (`thermalAverageReS`, the two field Hamiltonians) is *defined* here;
-per footnote 41 the `L↑∞` limit is taken in the sound `liminf` / subsequence sense (the existence
-of the genuine limit is not asserted).
+methods (Tasaki [4, 21, 50, 61]); following the project's policy for infinite-volume /
+finite-temperature results, we record Theorems 4.22 and 4.23 as **documented axioms** over the
+established torus family.  The finite-temperature framework (`thermalAverageReS`, the two field
+Hamiltonians) is *defined* here; per footnote 41 the `L↑∞` limit is taken in the sound `liminf` /
+subsequence sense (the existence of the genuine limit is not asserted).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §4.4, §4.4.1, Theorem 4.22, eqs. (4.4.1)–(4.4.6), pp. 117–119 (footnote 41: rigorously
-`liminf` / a suitable subsequence of `L`).
+2020), §4.4, §4.4.1, Theorems 4.22 and 4.23, eqs. (4.4.1)–(4.4.8), pp. 117–119 (footnote 41:
+rigorously `liminf` / a suitable subsequence of `L`).
 -/
 
 namespace LatticeSystem.Quantum
@@ -156,5 +161,32 @@ methods
 axiom tasaki_4_22_exponential_clustering (N : ℕ) (ferro : Bool) (β : ℝ) (hβ : 0 ≤ β) :
     ∃ ξ C : ℝ, 0 < ξ ∧ 0 < C ∧ ∀ (α : Fin 3) (x y : Fin 1 → ℤ),
       |infiniteVolSpinCorrLiminf ferro 1 N β α x y| ≤ C * Real.exp (-(intL1Dist x y) / ξ)
+
+/-! ## Theorem 4.23 -/
+
+/-- **Tasaki Theorem 4.23 (disorder at high temperature in two or higher dimensions), AXIOM.**  For
+the ferromagnetic (`ferro = true`, uniform field) or antiferromagnetic (`ferro = false`, staggered
+field) Heisenberg model on the `d`-dimensional hypercubic lattice with `d ≥ 2` and any spin
+`S = N/2`, there exists a constant `β₀ ∈ (0, ∞)` — depending only on `d` and `S` — such that for
+every inverse temperature `β ∈ [0, β₀]` the model is disordered:
+
+* (4.4.7) the magnetization vanishes in the iterated limit
+  `lim_{h↓0} lim_{L↑∞} ⟨Ŝ_x^{(3)}⟩_{β,h}^L = 0` (no SSB; the order of the limits is essential),
+  stated in the same sound `ε`–`δ` / `liminf`-subsequence form as Theorem 4.22 (footnote 41);
+* (4.4.8) there exist `ξ(β), C(β) ∈ (0, ∞)` with exponential clustering
+  `|⟨Ŝ_x^{(α)} Ŝ_y^{(α)}⟩_{β,0}^∞| ≤ C(β) exp(−|x − y| / ξ(β))`, for every `α = 1, 2, 3` and
+  `x, y ∈ ℤ^d`.
+
+The high-temperature threshold `β₀` is shared by both statements (it depends only on `d` and `S`),
+so the two are bundled under one outer `∃ β₀, 0 < β₀ ∧ ∀ β ∈ [0, β₀], …`.  Proved by the
+cluster-expansion technique, valid at sufficiently high temperature in any dimension and for any
+short-ranged interaction (Tasaki [21, 50, 61]); recorded as a documented axiom. -/
+axiom tasaki_4_23_high_temperature_disorder (N : ℕ) (ferro : Bool) (d : ℕ) (hd : 2 ≤ d) :
+    ∃ β₀ : ℝ, 0 < β₀ ∧ ∀ β : ℝ, 0 ≤ β → β ≤ β₀ →
+      (∀ (x : Fin d → ℤ) (ε : ℝ), 0 < ε → ∃ δ : ℝ, 0 < δ ∧ ∀ h : ℝ, 0 < h → h < δ →
+        ∃ n₀ : ℕ, ∀ n : ℕ, n₀ ≤ n → ∃ m : ℕ, n ≤ m ∧
+          |finiteVolMagnetizationS ferro d N β h x m| < ε) ∧
+      (∃ ξ C : ℝ, 0 < ξ ∧ 0 < C ∧ ∀ (α : Fin 3) (x y : Fin d → ℤ),
+        |infiniteVolSpinCorrLiminf ferro d N β α x y| ≤ C * Real.exp (-(intL1Dist x y) / ξ))
 
 end LatticeSystem.Quantum
