@@ -7834,6 +7834,22 @@ Theorem 3.2 (only its finite-volume variational core is formalized here) and the
 so it is recorded as a faithful documented axiom (deep infinite-volume argument deferred, in scope).
 Chapters~3--10 backfill.
 
+\noindent\textbf{Theorem 4.4} (Shen--Qiu--Tian, Tasaki §4.1, eqs.~(4.1.12)--(4.1.13), pp.~77--78;
+documented axiom, \texttt{Quantum/SpinS/FerrimagneticLRO.lean}, Issue \#4485).  Ferrimagnetic
+long-range order on an asymmetric bipartite lattice: for the spin-$S$ antiferromagnetic Heisenberg
+model on a connected bipartite lattice $\Lambda=A\cup B$ (same hypotheses as Theorem 2.3), every
+ground state satisfies $\langle\Phi_{\mathrm{GS}}|(\hat O_\Lambda)^2|\Phi_{\mathrm{GS}}\rangle\ge
+S^2(|A|-|B|)^2$ (eq.~(4.1.13)), where $(\hat O_\Lambda)^2=\sum_{x,y}\varepsilon_x\varepsilon_y
+\hat S_x\cdot\hat S_y$ (eq.~(4.1.12), \texttt{staggeredCasimirOpS}) is the $SU(2)$-invariant squared
+staggered operator; when $|A|-|B|=a|\Lambda|$ this gives LRO (eq.~(4.1.14)).  Unlike Theorems
+4.1--4.3, Tasaki proves Theorem 4.4 by a finite-volume argument (chain (4.1.16): the cross-term
+positivity (4.1.15) from Problem 2.5.d, the Lieb--Mattis total spin $S_{\mathrm{tot}}=(|A|-|B|)S$ from
+Theorem 2.3, and $\langle(\hat S_{\mathrm{tot}})^2\rangle=S_{\mathrm{tot}}(S_{\mathrm{tot}}+1)\ge
+S_{\mathrm{tot}}^2$), so it is a \emph{discharge candidate}; we record
+\texttt{shenQiuTian\_ferrimagnetic\_lro} as a faithful documented axiom over the connected bipartite
+antiferromagnetic family, to be discharged once the §2.5 Theorem 2.3 total-spin API and the (4.1.15)
+inequality are assembled.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
