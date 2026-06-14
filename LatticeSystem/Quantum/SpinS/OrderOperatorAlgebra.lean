@@ -94,23 +94,7 @@ Rayleigh-ratio division is meaningful. -/
 axiom mStar_eq_phat_ratio_limit (d N : ℕ) (hd : 1 ≤ d) (q₀ mStar C₁ : ℝ)
     (hq₀ : 0 < q₀) (hC₁ : 0 < C₁)
     (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ) (M : ℕ → ℕ)
-    (hMdiv : Tendsto M atTop atTop)
-    (hGS : ∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
-      (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec (Φ L) = E₀ L • Φ L ∧
-      (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
-        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
-      Φ L ≠ 0 ∧
-      0 < M L ∧ ((M L : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) ∧
-      0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L) (Φ L)) ∧
-      0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L + 1) (Φ L)) ∧
-      0 < vecNormSqRe (tanakaSSBState (torusParitySublattice d L) N (M L) (Φ L)))
-    (hLRO : ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
-      |(star (Φ L) ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
-          staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
-          ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2) - q₀| < ε)
-    (hSSB : ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
-      |tanakaOrderMean1 d L N (M L) (Φ L) - mStar| < ε)
-    (hSSBpred : IsTanakaFullSSBConstants d N q₀ C₁ mStar)
+    (hFamily : IsRealizingTanakaGroundStateFamily d N q₀ mStar C₁ Φ E₀ M)
     (hPhat : ∀ (n L : ℕ) [NeZero L], 2 ≤ L → Even L →
       0 < expectationRatioRe (staggeredPhatS d L N ^ n) (Φ L)) :
     (∀ ε : ℝ, 0 < ε → ∃ n₀ : ℕ, ∀ n : ℕ, n₀ ≤ n →

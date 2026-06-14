@@ -45,31 +45,15 @@ that for each `0 < h < δ` there is a size threshold `L₀` (depending on `h`) b
 even-side field ground state `Φ_GS,h,L` has `m∗ − ε ≤ ⟨Φ_GS,h,L, Ô_L^{(1)} Φ_GS,h,L⟩.re / L^d`.
 
 `m∗` is the genuine order parameter, pinned (as in Theorem 4.11) by a realizing *unperturbed* ground
-state `Φ₀` with exact LRO limit `q₀` (`hLRO`) and staggered-moment limit `m∗` (`hSSB`) plus
-`IsTanakaFullSSBConstants` (`hSSBpred`) and the realizing slow tower `M` (`hGS₀`) — these are
-unsatisfiable in `d = 1` (no LRO ground state, Corollary 4.3), so the statement is vacuous there.
+state family `Φ₀` and slow tower `M` (`hFamily : IsRealizingTanakaGroundStateFamily …`: exact LRO and
+staggered-moment limits plus `IsTanakaFullSSBConstants`) — these are unsatisfiable in `d = 1` (no LRO
+ground state, Corollary 4.3), so the statement is vacuous there.
 The field ground states `Φ_GS,h` are a *given* family of eigenvector/minimizer/nonzero states of
 `Ĥ_h` (`hField`).  Combined with Theorem 4.11, this yields `≥ m∗ ≥ √(3 q₀) > 0`. -/
 axiom tanakaSSB_field_lowerBound (d N : ℕ) (hd : 1 ≤ d) (q₀ mStar C₁ : ℝ)
     (hq₀ : 0 < q₀) (hC₁ : 0 < C₁)
     (Φ₀ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ) (M : ℕ → ℕ)
-    (hMdiv : Tendsto M atTop atTop)
-    (hGS₀ : ∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
-      (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec (Φ₀ L) = E₀ L • Φ₀ L ∧
-      (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
-        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
-      Φ₀ L ≠ 0 ∧
-      0 < M L ∧ ((M L : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) ∧
-      0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L) (Φ₀ L)) ∧
-      0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L + 1) (Φ₀ L)) ∧
-      0 < vecNormSqRe (tanakaSSBState (torusParitySublattice d L) N (M L) (Φ₀ L)))
-    (hLRO : ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
-      |(star (Φ₀ L) ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
-          staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ₀ L))).re /
-          ((star (Φ₀ L) ⬝ᵥ Φ₀ L).re * ((L : ℝ) ^ d) ^ 2) - q₀| < ε)
-    (hSSB : ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
-      |tanakaOrderMean1 d L N (M L) (Φ₀ L) - mStar| < ε)
-    (hSSBpred : IsTanakaFullSSBConstants d N q₀ C₁ mStar)
+    (hFamily : IsRealizingTanakaGroundStateFamily d N q₀ mStar C₁ Φ₀ E₀ M)
     (PhiGS : ℝ → (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (EField : ℝ → ℕ → ℂ)
     (hField : ∀ h : ℝ, 0 < h → ∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
       (staggeredFieldHamiltonianS d L N h).mulVec (PhiGS h L) = EField h L • PhiGS h L ∧
