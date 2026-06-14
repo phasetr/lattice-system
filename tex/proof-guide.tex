@@ -7723,6 +7723,19 @@ flip into the lowest level) undercuts the all-up energy; the estimate needs the 
 eigenbasis fermion operators, so it is recorded as a documented axiom.  Another book-order Chapter 11
 backfill.
 
+\noindent\textbf{Theorem 11.4} (Tasaki §11.1.1, eqs.~(11.1.8)--(11.1.10), pp.~379--380; documented
+axiom, \texttt{HubbardImpossibilityLowDensity.lean}, Issue \#4477).  Impossibility of ferromagnetism
+at low densities (Pieri--Daul--Baeriswyl--Dzierzawa--Fazekas).  The dimension enters only through the
+exponent $2/d$ of the band condition (11.1.8), so no explicit $d$-dimensional lattice is needed: we
+state \texttt{hubbardBandCondition} on the ascending single-particle spectrum $\varepsilon$
+($\varepsilon_n-\varepsilon_1\ge c\,((n-n_0)/|\Lambda|)^{2/d}$) and record
+\texttt{hubbard\_theorem\_11\_4}: fixing $d>2$ and positive band constants, there is a
+\emph{size-uniform} density threshold $\rho_1>0$ such that for any Hermitian translation-invariant
+$t$ obeying the band condition, any filling $N_e/|\Lambda|\le\rho_1$ and any $U\ge0$, the ground
+states (over the pinned \texttt{hubbardEigenspaceAt}\,$E_0\,N_e$, $E_0$ nonempty and minimal) are not
+all maximal-spin (with $2\le N_e$, since the zero- and one-electron sectors are trivially maximal-spin, and a genuinely transitive translation $\sigma$).  Keeping $d>2$ explicit is essential for soundness (the statement is false in
+$d=1$); the Roth/Gutzwiller variational proof is deferred.  Another book-order Chapter 11 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
