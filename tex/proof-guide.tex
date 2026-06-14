@@ -8007,6 +8007,17 @@ Theorem~4.11's $\sqrt3$).  $m^\ast$ is pinned by a realizing ground-state family
 \texttt{IsTanakaFullSSBConstants} (unsatisfiable in $d=1$), and the $\hat p$-moment denominators are
 positive under long-range order (eq.~(4.2.37)).  Chapters~3--10 backfill.
 
+\noindent\textbf{Lemma 4.16} (Tasaki §4.2.2, p.~108; \textbf{discharged axiom-free},
+\texttt{Math/DoubleSequenceDiagonal.lean}, Issue \#4485).  Diagonal extraction from an iterated
+limit: if $f:\mathbb{N}\times\mathbb{N}\to\mathbb{R}$ satisfies $\lim_{M}\lim_{L}f_{L,M}=0$ (each
+column converges, $f_{\cdot,M}\to g_M$, and $g_M\to0$), then there is a nondecreasing $m:\mathbb{N}
+\to\mathbb{N}$ with $m(L)\to\infty$ and $\lim_L f_{L,m(L)}=0$.  This is the elementary real-analysis
+lemma Tasaki uses to choose the slowly diverging tower size $M(L)$ (it underlies the suitable $M(L)$
+in Proposition 4.10).  Being purely analytic, it is \emph{proved axiom-free}
+(\texttt{diagonal\_tendsto\_zero}) by the threshold construction (a strictly increasing $T_m\ge N_m$
+and the step index $m(L)=\texttt{Nat.findGreatest}$), with no operators or physics.  Chapters~3--10
+backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}

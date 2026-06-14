@@ -11,6 +11,7 @@ import LatticeSystem.Math.PerronFrobeniusSimple
 import LatticeSystem.Math.PerronFrobeniusFinrank
 import LatticeSystem.Math.PerronFrobenius
 import LatticeSystem.Math.RayleighAtEigenvector
+import LatticeSystem.Math.DoubleSequenceDiagonal
 import LatticeSystem.Math.ReflectionPositivityAveraging
 import LatticeSystem.Math.HermitianMaxEigenvalue
 import LatticeSystem.Math.HermitianEigenspaceBotAboveMax
