@@ -8431,16 +8431,24 @@ $\langle\Phi|\hat A|\Phi\rangle=0$ implies $\hat B|\Phi\rangle=0$
 \texttt{mulVec\_eq\_zero\_of\_sq\_sum\_inner\_zero}).  All proved (axiom-free,
 \texttt{Math/PosSemidef/Kernel.lean}).
 
-\medskip\noindent\textbf{Theorem A.12 (strong-coupling effective Hamiltonian, axiomatized).}
+\medskip\noindent\textbf{Theorem A.12 (strong-coupling effective Hamiltonian, proved).}
 For $\hat H_v=\hat H_0+v\hat V$ with $\hat H_0$ self-adjoint, $\hat V\ge0$, $v\ge0$, the
 eigenstates whose energy stays finite as $v\uparrow\infty$ are governed by the effective
 Schr\"odinger equation $\hat P_0\hat H_0|\Phi\rangle=E|\Phi\rangle$ on $H_0=\ker\hat V$.  We render the
 effective equation in weak form ($\langle\psi|\hat H_0|\Phi\rangle=E\langle\psi|\Phi\rangle$ for all
-$\psi\in H_0$, avoiding an explicit projection matrix); the axiom
-(\texttt{effectiveHamiltonian\_strongCoupling\_limit}, \texttt{Math/EffectiveLimit.lean})
-asserts, in the non-vacuous finite-energy${}\Rightarrow{}$effective direction, that a family
-$\Phi_v$ of $\hat H_v$-eigenstates converging to a nonzero $\Phi$ with energy $E_v\to E$ has
-$\Phi\in H_0$ and $\Phi$ solving the effective equation.  This underlies the §11.5 effective-theory limits
+$\psi\in H_0$, avoiding an explicit projection matrix), in the non-vacuous
+finite-energy${}\Rightarrow{}$effective direction: a family $\Phi_v$ of $\hat H_v$-eigenstates
+converging to a nonzero $\Phi$ with energy $E_v\to E$ has $\Phi\in H_0$ and $\Phi$ solving the
+effective equation.  \textbf{Now proved (axiom-free)}
+(\texttt{effectiveHamiltonian\_strongCoupling\_limit}, \texttt{Math/EffectiveLimit.lean}):
+pairing the eigenvalue relation with $\Phi_v$ gives
+$v\,\langle\Phi_v|\hat V|\Phi_v\rangle=E_v\langle\Phi_v|\Phi_v\rangle-\langle\Phi_v|\hat H_0|\Phi_v\rangle$,
+whose right side converges; multiplying by $v^{-1}\to0$ shows the limiting quadratic form
+$\langle\Phi|\hat V|\Phi\rangle$ vanishes, and Lemma A.11 yields $\hat V\Phi=0$.  Pairing instead
+with a fixed $\psi\in\ker\hat V$ kills the $v\hat V$ term outright ($\hat V$ Hermitian), so
+$\langle\psi|\hat H_0|\Phi_v\rangle=E_v\langle\psi|\Phi_v\rangle$ for every $v\ge0$, and the limit
+is the weak effective equation (sesquilinear pairings are coordinatewise finite sums, hence
+continuous).  This underlies the §11.5 effective-theory limits
 (\texttt{ttDKernel}/\texttt{ttEffectiveHamiltonian}).  This completes Appendix~A.2.
 
 \medskip\noindent\textbf{§A.3 angular momentum --- Lemma A.14 (su(2) ladder, proved).}  For
@@ -8576,13 +8584,14 @@ its GNS space; recorded as a documented axiom (the construction is in \texttt{ma
 \texttt{GelfandNaimarkSegal}; \texttt{Math/CStarAlgebra/GNS.lean}).
 
 \medskip\noindent\textbf{Appendix A: status and axiomatization policy.}  Tasaki's Appendix A is
-fully formalized in book order (A.1--A.28).  The linear-algebra and angular-momentum core that
-\texttt{mathlib} supports is proved axiom-free: A.4--A.7, A.9--A.11, A.13--A.20 (including Weyl
-eigenvalue monotonicity A.7 via Courant--Fischer, the simultaneous-diagonalization step of A.17,
-Perron--Frobenius for a real symmetric matrix A.18, and the polar / singular-value decompositions
-A.19/A.20).  The remaining items---A.1, A.8, A.12, and the operator-algebraic A.21--A.28 (Wigner,
-states, Banach--Alaoglu, ground states, GNS)---are recorded as faithful documented axioms (A.8
-trace-exp pending the spectral mapping for \texttt{exp}).  These
+fully formalized in book order (A.1--A.28), and \textbf{every item the book itself proves is now
+proved axiom-free}: A.1--A.20 (including the Lie product / Trotter formula A.1 built from scratch,
+Weyl eigenvalue monotonicity A.7 via Courant--Fischer, the trace-exponential monotonicity A.8 via
+the spectral mapping, the strong-coupling effective Hamiltonian A.12, the
+simultaneous-diagonalization step of A.17, Perron--Frobenius for a real symmetric matrix A.18, and
+the polar / singular-value decompositions A.19/A.20).  The remaining items---the operator-algebraic
+A.21--A.28 (Wigner, states, Banach--Alaoglu, ground states, GNS)---are recorded as faithful
+documented axioms.  These
 axioms are \emph{not} active proof targets here: the heavy functional-analytic and operator-algebraic
 theory has its natural home in a dedicated operator-algebra development (possibly contributed to
 \texttt{mathlib}), and the axioms wait for that implementation.  The project's policy is to
