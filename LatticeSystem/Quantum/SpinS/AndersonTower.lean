@@ -92,9 +92,10 @@ The Rayleigh-quotient (ratio) form makes the bound scale-invariant, so no separa
 translation-invariant hypercubic torus.
 
 The theorem is **conditional on long-range order**: the constants depend on the LRO parameter
-`q₀ > 0`, and the bound is asserted only for ground states whose staggered order parameter per site
-is bounded below by `q₀` (the hypothesis `hLRO`).  In one dimension there is no such ground state
-(Corollary 4.3, `no_long_range_order_1d`), so the statement is vacuous there — exactly as in Tasaki.
+`q₀ > 0`, and the bound is asserted only for ground states whose squared staggered order parameter
+`⟨Φ, (Ô_L^{(3)}/L^d)² Φ⟩ = ⟨Φ, Ô² Φ⟩ / (⟨Φ,Φ⟩ · (L^d)²)` is bounded below by `q₀` (the LRO
+hypothesis, eq. (4.1.7)).  In one dimension there is no such ground state (Corollary 4.3,
+`no_long_range_order_1d`), so the statement is vacuous there — exactly as in Tasaki.
 Tasaki sketches the reflection-positivity / infinite-volume proof (§4.2.2); recorded here as a
 faithful, sound documented axiom over the concrete torus family. -/
 axiom tower_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
@@ -107,7 +108,7 @@ axiom tower_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀
           Φ ≠ 0 →
           q₀ ≤ (star Φ ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
               staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ)).re /
-              ((star Φ ⬝ᵥ Φ).re * (L : ℝ) ^ d) →
+              ((star Φ ⬝ᵥ Φ).re * ((L : ℝ) ^ d) ^ 2) →
           (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
           towerState (torusParitySublattice d L) N M Φ ≠ 0 →
           (star (towerState (torusParitySublattice d L) N M Φ) ⬝ᵥ
