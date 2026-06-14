@@ -8536,11 +8536,15 @@ positivity of the den Nijs--Rommelse string order parameter $O_{\mathrm{string}}
 the ground state of (8.1.1) --- distinguishes the Haldane phase ($0\le D<D_c$) from the large-$D$
 phase and forces low-lying edge states.  The marker \texttt{HasStringLRO} $L\,D\,\Phi\,q$ carries the
 hidden-order bound (8.1.10) $\langle\Phi|(\hat O_{\mathrm{string}}^{(\alpha)}/L)^2|\Phi\rangle\ge
-q_\alpha$ ($q_\alpha>0$, $L$-independent).  The axiom \texttt{tasaki\_theorem\_8\_2} states that if
-$\Phi$ is the ground state (energy $E_0$) with \texttt{HasStringLRO}, then there are $L$-independent
-$C_\nu>0$ and three linearly independent excited states $\Psi_\nu$ ($\nu:\texttt{Fin}~3$,
-\texttt{LinearIndependent}) with $\hat H_D\Psi_\nu=E_\nu\Psi_\nu$ and $E_0<E_\nu\le E_0+C_\nu/L$ ---
-hidden order forces a near four-fold degeneracy (the free $S=1/2$ edge spins).  Proved by the
+q_\alpha$ ($q_\alpha>0$, $L$-independent).  Since edge states are an open-boundary phenomenon, the
+theorem uses the open-chain Hamiltonian \texttt{openAnisotropicChainHamiltonianS} (coupling
+\texttt{openChainCoupling}, no wrap-around).  The axiom \texttt{tasaki\_theorem\_8\_2} states that for
+fixed $D,q$ there are $L$-independent $C_\nu>0$ such that for every $L$, whenever $\Phi$ is the
+\emph{unique} ground state (\texttt{IsUniqueChainGroundState}) at energy $E_0$ with
+\texttt{HasStringLRO}, there are three linearly independent excited states $\Psi_\nu$
+($\nu:\texttt{Fin}~3$, \texttt{LinearIndependent}) with $\hat H_D^{\mathrm{open}}\Psi_\nu=E_\nu\Psi_\nu$
+and $E_0<E_\nu\le E_0+C_\nu/L$ --- hidden order forces a near four-fold degeneracy (the free $S=1/2$
+edge spins); the constants are quantified outside $\forall L$, hence length-uniform.  Proved by the
 Horsch--von der Linden / Koma--Tasaki variational argument (as Theorem 3.1); a documented axiom.
 Chapters~3--10 backfill.
 

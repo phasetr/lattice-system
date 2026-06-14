@@ -17,12 +17,12 @@ is the order parameter separating the two phases.  The positivity in the Haldane
 Koma and Tasaki then proved, exactly as in the tower-of-states argument of Theorem 3.1
 (Horsch–von der Linden), that hidden order forces low-lying excitations — the **edge states**:
 
-**Theorem 8.2**: assume the hidden-order bound (8.1.10) for the unique ground state of (8.1.1). 
-Then
-there exist **three independent excited states** `|Ψ_ν⟩` (`ν = 1, 2, 3`) whose energies satisfy
-`E_GS < E_ν ≤ E_GS + C_ν / L` with `L`-independent constants `C_ν`.  Thus hidden antiferromagnetic
-order forces a near four-fold degeneracy of low-lying states (the free `S = 1/2` edge spins of the
-open chain).
+**Theorem 8.2**: for the *open* anisotropic chain, assume the hidden-order bound (8.1.10) for the
+unique ground state.  Then there exist **three independent excited states** `|Ψ_ν⟩` (`ν = 1, 2, 3`)
+whose energies satisfy `E_GS < E_ν ≤ E_GS + C_ν / L` with `L`-independent constants `C_ν`.  Thus
+hidden antiferromagnetic order forces a near four-fold degeneracy of low-lying states (the free
+`S = 1/2` edge spins of the open chain).  Edge states are an open-boundary phenomenon, so the
+theorem uses the open-chain Hamiltonian `openAnisotropicChainHamiltonianS`.
 
 The hidden-order assumption (8.1.10) is carried by the uninterpreted marker `HasStringLRO` (its
 faithful form needs the global normalized string operator, not yet defined).  Theorem 8.2, whose
@@ -40,6 +40,20 @@ namespace LatticeSystem.Quantum
 
 open Matrix
 
+/-- The **open-chain nearest-neighbour coupling** on `Fin L`: `J x y = 1` iff `y = x + 1` (no
+periodic wrap-around), so the bonds are `{0,1}, {1,2}, …, {L−2, L−1}` and the two end sites `0` and
+`L−1` each have a single neighbour — the open boundary that carries the `S = 1/2` edge spins. -/
+def openChainCoupling (L : ℕ) (x y : Fin L) : ℂ :=
+  if y.val = x.val + 1 then 1 else 0
+
+/-- The **open-chain anisotropic `S = 1` Hamiltonian** with crystal-field anisotropy `D`: the
+open-boundary analogue of `anisotropicChainHamiltonianS`,
+`Ĥ_D^open = Σ_{x=0}^{L-2} Ŝ_x·Ŝ_{x+1} + D Σ_x (Ŝ_x^{(3)})²` (eq. (8.1.1) with open boundary).  The
+free boundary spins make the edge states of Theorem 8.2 possible. -/
+noncomputable def openAnisotropicChainHamiltonianS (L : ℕ) (D : ℝ) : ManyBodyOpS (Fin L) 2 :=
+  heisenbergHamiltonianS (openChainCoupling L) 2 +
+    (D : ℂ) • ∑ x : Fin L, spinSSiteOp3 x 2 * spinSSiteOp3 x 2
+
 /-- **Hidden-order (string long-range order) marker** `HasStringLRO L D Φ q`: the ground state `Φ`
 of the anisotropic chain `Ĥ_D` exhibits hidden antiferromagnetic order in all three directions,
 i.e. the den Nijs–Rommelse bound (8.1.10) `⟨Φ| (Ô_string^{(α)} / L)² |Φ⟩ ≥ q_α` holds for each `α`
@@ -48,26 +62,26 @@ operator; it is kept as an uninterpreted predicate so Theorem 8.2 assumes only t
 order. -/
 axiom HasStringLRO (L : ℕ) (D : ℝ) (Φ : (Fin L → Fin 3) → ℂ) (q : Fin 3 → ℝ) : Prop
 
-/-- **Tasaki Theorem 8.2 (hidden order forces edge states), AXIOM.**  Suppose `Φ` is the unique
-ground state of the anisotropic chain `Ĥ_D` (eq. (8.1.1)) at ground energy `E₀`, exhibiting hidden
-antiferromagnetic order with `L`-independent constants `q_α > 0` (`HasStringLRO`, the bound
-(8.1.10)).
-Then there exist `L`-independent constants `C_ν > 0` and **three linearly independent excited
-states**
-`Ψ_ν` (`ν : Fin 3`) with energies `E_ν` satisfying `Ĥ_D Ψ_ν = E_ν Ψ_ν` and
+/-- **Tasaki Theorem 8.2 (hidden order forces edge states), AXIOM.**  Fix the anisotropy `D` and
+hidden-order constants `q_α > 0`.  Then there are **`L`-independent** constants `C_ν > 0` such that:
+for every `L`, whenever `Φ` is the **unique** ground state of the *open-chain* Hamiltonian
+`Ĥ_D^open` at ground energy `E₀` (`IsUniqueChainGroundState`) exhibiting hidden antiferromagnetic
+order (`HasStringLRO L D Φ q`, the bound (8.1.10)), there exist **three linearly independent excited
+states** `Ψ_ν` (`ν : Fin 3`) with energies `E_ν` satisfying `Ĥ_D^open Ψ_ν = E_ν Ψ_ν` and
 `E₀ < E_ν ≤ E₀ + C_ν / L`.  Hidden antiferromagnetic order thus forces a near four-fold degeneracy
-of
-low-lying states — the free `S = 1/2` edge spins.  Proved by the Horsch–von der Linden / Koma–Tasaki
-variational (trial-state) argument, as in Theorem 3.1; recorded as a documented axiom. -/
-axiom tasaki_theorem_8_2 (D : ℝ) (L : ℕ) (Φ : (Fin L → Fin 3) → ℂ) (q : Fin 3 → ℝ) (E₀ : ℝ)
-    (hL : 0 < L) (hq : ∀ α : Fin 3, 0 < q α)
-    (hGS : IsGroundEnergy (anisotropicChainHamiltonianS L D) E₀) (hΦ : Φ ≠ 0)
-    (hΦeig : (anisotropicChainHamiltonianS L D).mulVec Φ = (E₀ : ℂ) • Φ)
-    (hLRO : HasStringLRO L D Φ q) :
-    ∃ (C : Fin 3 → ℝ) (Ψ : Fin 3 → ((Fin L → Fin 3) → ℂ)) (E : Fin 3 → ℝ),
-      (∀ ν : Fin 3, 0 < C ν) ∧ LinearIndependent ℂ Ψ ∧
-        ∀ ν : Fin 3,
-          (anisotropicChainHamiltonianS L D).mulVec (Ψ ν) = (E ν : ℂ) • Ψ ν ∧
-            E₀ < E ν ∧ E ν ≤ E₀ + C ν / (L : ℝ)
+of low-lying states — the free `S = 1/2` spins at the two open ends.  The constants `C_ν` are
+quantified outside `∀ L`, so the `O(1/L)` splitting is genuinely length-uniform.  Proved by the
+Horsch–von der Linden / Koma–Tasaki variational (trial-state) argument, as in Theorem 3.1; recorded
+as a documented axiom. -/
+axiom tasaki_theorem_8_2 (D : ℝ) (q : Fin 3 → ℝ) (hq : ∀ α : Fin 3, 0 < q α) :
+    ∃ C : Fin 3 → ℝ, (∀ ν : Fin 3, 0 < C ν) ∧
+      ∀ (L : ℕ) (Φ : (Fin L → Fin 3) → ℂ) (E₀ : ℝ),
+        IsUniqueChainGroundState (openAnisotropicChainHamiltonianS L D) E₀ Φ →
+        HasStringLRO L D Φ q →
+        ∃ (Ψ : Fin 3 → ((Fin L → Fin 3) → ℂ)) (E : Fin 3 → ℝ),
+          LinearIndependent ℂ Ψ ∧
+            ∀ ν : Fin 3,
+              (openAnisotropicChainHamiltonianS L D).mulVec (Ψ ν) = (E ν : ℂ) • Ψ ν ∧
+                E₀ < E ν ∧ E ν ≤ E₀ + C ν / (L : ℝ)
 
 end LatticeSystem.Quantum
