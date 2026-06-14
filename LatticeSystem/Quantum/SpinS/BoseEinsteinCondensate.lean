@@ -55,8 +55,9 @@ hypercubic torus with `d ≥ 2`, at half filling `ρ = 1/2` (the `Ŝ_tot^{(3)} =
 constant `q₀ > 0` depending only on `d` such that every ground state `Φ_GS` exhibits ODLRO
 (eq. (5.2.5)): for the two XY-plane staggered order operators `Ô_L^{(α)}` (`α = 1, 2`, here
 `α : Fin 3` with `α ≠ 2`),
-`⟨Φ_GS| (Ô_L^{(α)})² Φ_GS⟩ / ⟨Φ_GS| Φ_GS⟩ / L^d ≥ q₀`,
-for all sufficiently large even `L`.
+`⟨Φ_GS| (Ô_L^{(α)})² Φ_GS⟩ / ⟨Φ_GS| Φ_GS⟩ / (L^d)² ≥ q₀`,
+for all sufficiently large even `L`.  The squared order parameter is normalized by `(L^d)²` (the
+operator `Ô_L^{(α)}/L^d` is squared, eqs. (5.2.3)/(5.2.5)), the intensive ODLRO density.
 
 The ground state `Φ_GS` is a *given* per-`L` vector specified by the hypotheses (eigenvector of
 `xyHamiltonianS` at the minimal real eigenvalue, nonzero, and in the half-filling sector
@@ -73,6 +74,6 @@ axiom tasaki_5_1_xy_odlro_half_filling (d : ℕ) (hd : 2 ≤ d) :
         (totalSpinSOp3 (HypercubicTorus d L) 1).mulVec Φ = 0 →
         ∀ (α : Fin 3), α ≠ 2 →
           q₀ ≤ expectationRatioRe
-            ((staggeredOrderOpAxisS α (torusParitySublattice d L) 1) ^ 2) Φ / (L : ℝ) ^ d
+            ((staggeredOrderOpAxisS α (torusParitySublattice d L) 1) ^ 2) Φ / ((L : ℝ) ^ d) ^ 2
 
 end LatticeSystem.Quantum
