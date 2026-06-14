@@ -377,19 +377,25 @@ reflects the `SU(2)` symmetry of the Heisenberg model (for the `U(1)`/XXZ varian
 
 To avoid the downward-closure of `IsTanakaFullSSBConstants` (a `liminf ≥ m` lower bound, true for any
 smaller `m` and vacuously true in `d = 1`), `m∗` and `q₀` are pinned as the **exact** infinite-volume
-limits of a *genuine* realizing ground-state family `Φ`.  `hGS` requires `Φ L` to be an eventual
-minimizing ground state (eigenvector, minimal `.re`, nonzero) with well-defined Tanaka terms;
+limits of a *genuine* realizing ground-state family `Φ` and the *realizing* slowly-diverging tower
+sequence `M` (`hMdiv : Tendsto M atTop atTop`, with the growth bound `M L + 1 ≤ C₁ L^{d/2}` in `hGS`),
+so `m∗` is the order parameter of the *selected* Tanaka construction, not an arbitrary mean.  `hGS`
+requires `Φ L` to be an eventual minimizing ground state (eigenvector, minimal `.re`, nonzero) with
+well-defined Tanaka terms;
 `hLRO` pins `q₀` as the long-range-order limit (eq. (4.1.7) / (4.2.25)) and `hSSB` pins `m∗` as the
 staggered-moment limit of the Tanaka state (eq. (4.2.12), exact two-sided limit).  These hypotheses
 are unsatisfiable in `d = 1` (no LRO ground state, Corollary 4.3), so the bound applies exactly where
 it should.  `m∗ > 0` then follows from `q₀ > 0`. -/
-axiom tanakaSSB_orderParameter_lowerBound (d N : ℕ) (hd : 1 ≤ d) (q₀ mStar : ℝ) (hq₀ : 0 < q₀)
+axiom tanakaSSB_orderParameter_lowerBound (d N : ℕ) (hd : 1 ≤ d) (q₀ mStar C₁ : ℝ)
+    (hq₀ : 0 < q₀) (hC₁ : 0 < C₁)
     (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ) (M : ℕ → ℕ)
+    (hMdiv : Filter.Tendsto M Filter.atTop Filter.atTop)
     (hGS : ∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
       (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec (Φ L) = E₀ L • Φ L ∧
       (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
         (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
       Φ L ≠ 0 ∧
+      0 < M L ∧ ((M L : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) ∧
       0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L) (Φ L)) ∧
       0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L + 1) (Φ L)) ∧
       0 < vecNormSqRe (tanakaSSBState (torusParitySublattice d L) N (M L) (Φ L)))
