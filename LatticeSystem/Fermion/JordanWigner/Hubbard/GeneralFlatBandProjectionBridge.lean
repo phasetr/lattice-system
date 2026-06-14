@@ -287,4 +287,19 @@ theorem generalFlatBand_proj_mem_orthogonal {V : Submodule ℂ (EuclideanSpace �
     Submodule.starProjection_eq_self_iff.mpr (hV hw)]
   exact (Submodule.mem_orthogonal _ _).mp hx w hw
 
+/-- **The flat band splits over a cut of the index set**: for any `S ⊆ I`,
+`ker T = span{μ_z : z ∈ S} ⊔ span{μ_z : z ∈ Sᶜ}`.  The full spanning set is the union of the two
+sides, and `span` distributes over a union.  Together with side-orthogonality this is the orthogonal
+block decomposition of `ker T`. -/
+theorem generalFlatBand_kernel_eq_sup {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (S : Set ↥I) :
+    generalFlatBandKernel T
+      = Submodule.span ℂ ((fun z : ↥I =>
+          (WithLp.toLp 2 (μ z.1) : EuclideanSpace ℂ (Fin (M + 1)))) '' S)
+        ⊔ Submodule.span ℂ ((fun z : ↥I =>
+          (WithLp.toLp 2 (μ z.1) : EuclideanSpace ℂ (Fin (M + 1)))) '' Sᶜ) := by
+  rw [generalFlatBand_kernel_eq_span T hbasis, ← Submodule.span_union, ← Set.image_union,
+    Set.union_compl_self, Set.image_univ]
+
 end LatticeSystem.Fermion
