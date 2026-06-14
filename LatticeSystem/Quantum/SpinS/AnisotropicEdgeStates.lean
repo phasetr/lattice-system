@@ -40,10 +40,11 @@ namespace LatticeSystem.Quantum
 
 open Matrix
 
-/-- The **open-chain nearest-neighbour coupling** on `Fin L`: `J x y = 1` iff `y = x + 1` (no
-periodic wrap-around), so the bonds are `{0,1}, {1,2}, …, {L−2, L−1}` and the two end sites `0` and
-`L−1` each have a single neighbour — the open boundary that carries the `S = 1/2` edge spins. -/
-def openChainCoupling (L : ℕ) (x y : Fin L) : ℂ :=
+/-- The **open-chain nearest-neighbour coupling** on `Fin L`: `J x y = 1` iff `y = x + 1` (directed,
+no periodic wrap-around), so the bonds are `{0,1}, {1,2}, …, {L−2, L−1}` (each counted once) and the
+two end sites `0` and `L−1` each have a single neighbour — the open boundary that carries the
+`S = 1/2` edge spins. -/
+def openAnisotropicChainCoupling (L : ℕ) (x y : Fin L) : ℂ :=
   if y.val = x.val + 1 then 1 else 0
 
 /-- The **open-chain anisotropic `S = 1` Hamiltonian** with crystal-field anisotropy `D`: the
@@ -51,7 +52,7 @@ open-boundary analogue of `anisotropicChainHamiltonianS`,
 `Ĥ_D^open = Σ_{x=0}^{L-2} Ŝ_x·Ŝ_{x+1} + D Σ_x (Ŝ_x^{(3)})²` (eq. (8.1.1) with open boundary).  The
 free boundary spins make the edge states of Theorem 8.2 possible. -/
 noncomputable def openAnisotropicChainHamiltonianS (L : ℕ) (D : ℝ) : ManyBodyOpS (Fin L) 2 :=
-  heisenbergHamiltonianS (openChainCoupling L) 2 +
+  heisenbergHamiltonianS (openAnisotropicChainCoupling L) 2 +
     (D : ℂ) • ∑ x : Fin L, spinSSiteOp3 x 2 * spinSSiteOp3 x 2
 
 /-- **Hidden-order (string long-range order) marker** `HasStringLRO L D Φ q`: the ground state `Φ`
@@ -64,7 +65,7 @@ axiom HasStringLRO (L : ℕ) (D : ℝ) (Φ : (Fin L → Fin 3) → ℂ) (q : Fin
 
 /-- **Tasaki Theorem 8.2 (hidden order forces edge states), AXIOM.**  Fix the anisotropy `D` and
 hidden-order constants `q_α > 0`.  Then there are **`L`-independent** constants `C_ν > 0` such that:
-for every `L`, whenever `Φ` is the **unique** ground state of the *open-chain* Hamiltonian
+for every `L > 0`, whenever `Φ` is the **unique** ground state of the *open-chain* Hamiltonian
 `Ĥ_D^open` at ground energy `E₀` (`IsUniqueChainGroundState`) exhibiting hidden antiferromagnetic
 order (`HasStringLRO L D Φ q`, the bound (8.1.10)), there exist **three linearly independent excited
 states** `Ψ_ν` (`ν : Fin 3`) with energies `E_ν` satisfying `Ĥ_D^open Ψ_ν = E_ν Ψ_ν` and
@@ -75,7 +76,7 @@ Horsch–von der Linden / Koma–Tasaki variational (trial-state) argument, as i
 as a documented axiom. -/
 axiom tasaki_theorem_8_2 (D : ℝ) (q : Fin 3 → ℝ) (hq : ∀ α : Fin 3, 0 < q α) :
     ∃ C : Fin 3 → ℝ, (∀ ν : Fin 3, 0 < C ν) ∧
-      ∀ (L : ℕ) (Φ : (Fin L → Fin 3) → ℂ) (E₀ : ℝ),
+      ∀ (L : ℕ) (Φ : (Fin L → Fin 3) → ℂ) (E₀ : ℝ), 0 < L →
         IsUniqueChainGroundState (openAnisotropicChainHamiltonianS L D) E₀ Φ →
         HasStringLRO L D Φ q →
         ∃ (Ψ : Fin 3 → ((Fin L → Fin 3) → ℂ)) (E : Fin 3 → ℝ),
