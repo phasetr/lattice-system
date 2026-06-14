@@ -8565,6 +8565,24 @@ phase) forces nonzero hidden antiferromagnetic order.  A separate axiom records 
 $O_{\mathrm{N\acute eel}}^{(1)}=O_{\mathrm{N\acute eel}}^{(2)}\ge0$ (also for $\lambda\ge0$).  Proved via the path-integral
 representation (§6.3); a documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§8.2.2--§8.2.3 Kennedy--Tasaki transformation + Proposition 8.4} (Pollmann--Turner
+--Berg--Oshikawa; Tasaki §8.2.2--§8.2.3, eqs.~(8.2.5)--(8.2.7), pp.~241--251;
+\texttt{Quantum/SpinS/KennedyTasakiTransformation.lean}, Issue \#4485).  The nonlocal unitary
+realizing hidden $\mathbb{Z}_2\times\mathbb{Z}_2$ symmetry breaking.  \texttt{ktUnitaryS}~$L$ (marker)
+is the Kennedy--Tasaki unitary $\hat U_{\mathrm{KT}}=\prod_{u<v}\exp(i\pi\hat S_u^{(3)}\hat S_v^{(1)})$
+(eq.~8.2.5), with \texttt{ktUnitaryS\_sq} ($\hat U_{\mathrm{KT}}^2=1$) and
+\texttt{ktUnitaryS\_selfAdjoint} ($\hat U_{\mathrm{KT}}=\hat U_{\mathrm{KT}}^\dagger$) --- a
+self-adjoint involution.  \texttt{piRotationS}~$L\,\alpha=\prod_x\exp(i\pi\hat S_x^{(\alpha)})$
+(concrete, on-site matrix exponentials) is the $\pi$-rotation about axis $\alpha$;
+\texttt{IsZ2Z2Invariant}~$H$ is $(\hat U_\pi^{(\alpha)})^\dagger H\hat U_\pi^{(\alpha)}=H$ for all
+$\alpha$.  The markers \texttt{HasShortRangeInteraction}/\texttt{HasSomeShortRangeInteraction} capture
+range-$r$ locality.  The axiom \texttt{tasaki\_prop\_8\_4} states that for a short-range open-chain
+$\hat H$, the transformed $\hat U_{\mathrm{KT}}\hat H\hat U_{\mathrm{KT}}$ is again short-range
+\emph{iff} $\hat H$ is $\mathbb{Z}_2\times\mathbb{Z}_2$ invariant --- the hidden-symmetry-breaking
+picture is effective exactly when $\hat H$ has $\mathbb{Z}_2\times\mathbb{Z}_2$ symmetry.  A documented
+axiom.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
