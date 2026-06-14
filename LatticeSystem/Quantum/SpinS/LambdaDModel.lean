@@ -73,10 +73,11 @@ axiom. -/
 axiom tasaki_theorem_8_3 (lam D : ℝ) (hlam : 0 ≤ lam) (α : Fin 3) :
     neelOrderParameterS lam D α ≤ stringOrderParameterS lam D α
 
-/-- **Tasaki §8.2 footnote (transverse Néel parameters), AXIOM.**  For the λ-D model the Néel order
-parameters in the two transverse directions `α = 1, 2` coincide and are nonnegative:
-`O_Néel^{(1)}(λ, D) = O_Néel^{(2)}(λ, D) ≥ 0`. -/
-axiom tasaki_neel_transverse_eq_nonneg (lam D : ℝ) :
+/-- **Tasaki §8.2 footnote (transverse Néel parameters), AXIOM.**  For the λ-D model with `λ ≥ 0`
+the Néel order parameters in the two transverse directions `α = 1, 2` coincide and are nonnegative:
+`O_Néel^{(1)}(λ, D) = O_Néel^{(2)}(λ, D) ≥ 0`.  The `λ ≥ 0` hypothesis matches the parameter range
+of Theorem 8.3, of which this is a companion. -/
+axiom tasaki_neel_transverse_eq_nonneg (lam D : ℝ) (hlam : 0 ≤ lam) :
     neelOrderParameterS lam D 0 = neelOrderParameterS lam D 1 ∧ 0 ≤ neelOrderParameterS lam D 0
 
 end LatticeSystem.Quantum
