@@ -8208,7 +8208,9 @@ Anderson-tower Theorem~4.6.  We introduce the chemical-potential XY Hamiltonian 
 H_{\mathrm{XY}}-\mu\hat N$ (\texttt{xyChemicalPotentialHamiltonianS}, spin form $\hat
 H_{\mathrm{XY}}-\mu\,\hat S_{\mathrm{tot}}^{(3)}$, eq.~5.3.2; $\mu$ selects the density).  Given a
 ground state $\Phi_{\mathrm{GS}}$ of $\hat H_\mu$ exhibiting ODLRO with $q_0>0$ (Theorem~5.1), the
-axiom \texttt{tasaki\_5\_2\_bec\_tower} provides constants $C_1,C_2>0$ (depending on $d,\rho,q_0$) so
+axiom \texttt{tasaki\_5\_2\_bec\_tower} provides constants $C_1,C_2>0$ (depending on $d$, the density
+selected by $\mu$, and $q_0$; $\mu$ is a parameter of \texttt{IsBECTowerConstants}, so the constants
+are per-density) so
 that the tower states $\Gamma_M=(\hat O_L^{\mathrm{sgn}\,M})^{|M|}\Phi_{\mathrm{GS}}$ (for $|M|\le
 C_1L^{d/2}$, nonvanishing) are low-lying with the \emph{cubic} energy increment $\langle\Gamma_M,\hat
 H_\mu\Gamma_M\rangle/\langle\Gamma_M,\Gamma_M\rangle\le E_0+C_2|M|^3/L^d$ (eq.~5.3.4) --- cubic in
