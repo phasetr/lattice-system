@@ -8246,6 +8246,37 @@ form (footnote~9: the $\lim$ is to be interpreted properly), the construction is
 \texttt{IsBECCoherentSSBConstants}, and the statement is conditional on ODLRO.  Proved by
 Koma--Tasaki~[21]; recorded as a documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{Theorem 5.4} (symmetry breaking in coupled Bose--Einstein condensates; Tasaki §5.5,
+eqs.~(5.5.1)--(5.5.6), pp.~146--147; documented axiom,
+\texttt{Quantum/SpinS/BoseEinsteinCondensate.lean}, Issue \#4485).  \emph{Completes Tasaki Chapter~5.}
+Two hard-core boson condensates on copies $\Lambda_a,\Lambda_b$ of the torus
+(\texttt{CoupledSite}~$=$~\texttt{HypercubicTorus}~$\times$~\texttt{Bool}) are weakly coupled by a
+tunneling Hamiltonian.  The total Hamiltonian $\hat H_{\mathrm{tot}}^\varepsilon=\hat H_a+\hat
+H_b+\varepsilon\hat H_{\mathrm{tunnel}}$ (\texttt{coupledHamiltonian}, eq.~5.5.1) combines the two
+uncoupled boson copies $\hat H_a+\hat H_b=2(\hat H_{\mathrm{XY},a}+\hat H_{\mathrm{XY},b})$ (the boson
+factor $\hat H=2\hat H_{\mathrm{XY}}$, consistent with \texttt{xyChemicalPotentialHamiltonianS}, so
+$\varepsilon$ is the textbook tunneling strength; via \texttt{sameSpeciesNNCoupling}) with the
+tunneling term
+$\hat H_{\mathrm{tunnel}}=-\sum_x(e^{i\varphi}\hat S_{(x,a)}^+\hat S_{(x,b)}^-+e^{-i\varphi}\hat
+S_{(x,a)}^-\hat S_{(x,b)}^+)$ (\texttt{tunnelHamiltonian}, eq.~5.5.3); the total particle number is
+fixed at $2N$ (doubled half filling $\hat S_{\mathrm{tot}}^{(3)}=0$).  Assuming the single uncoupled
+system has ODLRO with parameter $q_0$ (the hypothesis \texttt{hODLRO}, which ties $q_0$ to the genuine
+order parameter of the uncoupled XY ground states via the Theorem~5.1 bound), the axiom
+\texttt{tasaki\_5\_4\_coupled\_bec\_ssb} asserts that the unique
+coupled ground state $\Phi^\varepsilon$ develops a definite relative $U(1)$ phase: there is an order
+parameter $\tilde m\ge\sqrt{2q_0}$ with $\lim_{\varepsilon\downarrow0}\lim_{L\uparrow\infty}\langle
+\Phi^\varepsilon,\hat a_{(x,a)}^\dagger\hat a_{(x,b)}\Phi^\varepsilon\rangle/\langle\Phi^\varepsilon,
+\Phi^\varepsilon\rangle=\tilde m^2e^{-i\varphi}$ (eq.~5.5.5; the cross-correlation
+\texttt{coupledCrossCorrelation}~$=\hat S_{(x,a)}^+\hat S_{(x,b)}^-$) \emph{and} the conjugate
+$\langle\Phi^\varepsilon,\hat a_{(x,a)}\hat a_{(x,b)}^\dagger\Phi^\varepsilon\rangle/\langle\cdot
+\rangle=\tilde m^2e^{+i\varphi}$ (eq.~5.5.6; \texttt{coupledCrossCorrelationConj}~$=\hat
+S_{(x,a)}^-\hat S_{(x,b)}^+$).  The double limit is stated in
+the sound eventual-$\varepsilon'$ form (outer $\varepsilon\downarrow0$, inner $L\uparrow\infty$), the
+ground-state family is given (unique by a Marshall--Lieb--Mattis argument), and $\tilde m$ is
+existential with lower bound $\sqrt{2q_0}$.  The two condensates are thus coupled coherently.  Proved
+by Koma--Tasaki~[22]; recorded as a documented axiom.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
