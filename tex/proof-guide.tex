@@ -8405,6 +8405,24 @@ correlation $|\texttt{connectedChainCorrelation}|\le Ce^{-d(x,y)/\xi}$ (ring dis
 nonzero one-point functions, and $L\ge3$ excludes the degenerate small rings.  Proved by Yarotsky via
 cluster expansion; recorded as a documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§7.1.3 Lemma 7.4} (local VBS ground-state characterization; Tasaki §7.1.2--§7.1.3,
+eqs.~(7.1.5), (7.1.19)--(7.1.20), pp.~181--187; \texttt{Quantum/SpinS/AKLTBondProjection.lean}, Issue
+\#4485).  The AKLT interaction is the bond projection onto total spin $2$.  For two $S=1$ spins,
+\texttt{bondSpin2ProjectionS} defines $\hat P_2[\hat S_x+\hat S_y]=\tfrac12(\hat S_x\!\cdot\!\hat S_y)
++\tfrac16(\hat S_x\!\cdot\!\hat S_y)^2+\tfrac13$, and the lemma
+\texttt{aklt\_bond\_term\_eq\_bondSpin2Projection} \emph{proves} the affine identity (eq.~7.1.5)
+$\hat S_x\!\cdot\!\hat S_y+\tfrac13(\hat S_x\!\cdot\!\hat S_y)^2=2\hat P_2[\hat S_x+\hat S_y]-\tfrac23$,
+so the AKLT local term penalizes only the spin-$2$ component of each bond and the ground states are
+exactly the states annihilated by every bond projection.  The axiom \texttt{tasaki\_lemma\_7\_4}
+states that a state $\Phi$ satisfies $\hat P_2[\hat S_x+\hat S_{x+1}]\,\Phi=0$ (eq.~7.1.19) at the
+periodic bond $\{x,\texttt{ringSucc}\,x\}$ \emph{iff} it has the valence-bond-solid singlet-tensor
+form (eq.~7.1.20), recorded through the uninterpreted marker \texttt{IsVBSGroundForm} (the
+duplicated-$S=\tfrac12$ / Schwinger-boson singlet construction is not yet formalized).  The AKLT
+ground space is then the VBS state in which every bond carries a singlet (Kennedy--Lieb--Tasaki
+1988).  The affine identity is proved; the deep singlet characterization is a documented axiom.
+Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
