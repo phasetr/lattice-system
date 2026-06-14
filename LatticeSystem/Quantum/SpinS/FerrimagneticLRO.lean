@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Heisenberg
+import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
 
 /-!
 # Tasaki §4.1: ferrimagnetic long-range order on an asymmetric bipartite lattice (Theorem 4.4)
@@ -45,24 +46,28 @@ noncomputable def staggeredCasimirOpS (A : Λ → Bool) (N : ℕ) : ManyBodyOpS 
     ((if A x then (1 : ℂ) else (-1 : ℂ)) * (if A y then (1 : ℂ) else (-1 : ℂ))) • spinSDot x y N
 
 /-- **Tasaki Theorem 4.4 (Shen–Qiu–Tian ferrimagnetic long-range order), AXIOM.**  Consider the
-spin-`S` (`S = N/2`) antiferromagnetic Heisenberg model on a *connected* bipartite lattice with
-sublattice assignment `A`, under the same hypotheses as Theorem 2.3: the coupling `J` is real
-(`hreal`) and symmetric (`hsym`), vanishes within a sublattice (`hbip`), and is strictly
-antiferromagnetic across the bipartition (`hcross`: every cross-sublattice pair is coupled with
-positive strength — this is the connectivity that makes the Lieb–Mattis theorem apply), with both
-sublattices nonempty (`hA`, `hB`).  Then for *any* normalized ground state `Φ` of
-`heisenbergHamiltonianS J N`, the squared staggered order parameter is bounded below by
-`S² (|A| − |B|)²` (eq. (4.1.13)):
+spin-`S` (`S = N/2`) antiferromagnetic Heisenberg model on a *connected* bipartite lattice, modeled
+by a connected lattice graph `G` whose edges all cross the bipartition `A` (`hGbip`, `hGconn`), with
+sublattice assignment `A`, under the same hypotheses as Theorem 2.3.  The coupling `J` is real
+(`hreal`) and symmetric (`hsym`), is supported on the edges of `G` (`hJoff`: `J` vanishes on
+non-edges — this allows finite-range / nearest-neighbor lattices such as the path, square, and Lieb
+lattices, and in particular vanishes within a sublattice), and is strictly antiferromagnetic on each
+edge (`hJon`: `0 < (J x y).re` for `G.Adj x y`).  Both sublattices are nonempty (`hA`, `hB`).  Then
+for *any* normalized ground state `Φ` of `heisenbergHamiltonianS J N`, the squared staggered order
+parameter is bounded below by `S² (|A| − |B|)²` (eq. (4.1.13)):
 `(N/2)² (|A| − |B|)² ≤ ⟨Φ, (Ô_Λ)² Φ⟩.re`.
 
 The left-hand side is independent of the choice of ground state because `(Ô_Λ)²` is `SU(2)`
-invariant.  Tasaki gives a finite-volume proof (chain (4.1.16)); we record Theorem 4.4 as a faithful
-documented axiom (a discharge candidate) over the concrete connected bipartite antiferromagnetic
+invariant.  Connectedness of `G` (not coupling of *every* cross pair) is what makes the Lieb–Mattis
+theorem apply.  Tasaki gives a finite-volume proof (chain (4.1.16)); we record Theorem 4.4 as a
+faithful documented axiom (a discharge candidate) over the connected bipartite antiferromagnetic
 family. -/
 axiom shenQiuTian_ferrimagnetic_lro (A : Λ → Bool) (J : Λ → Λ → ℂ) (N : ℕ)
+    (G : SimpleGraph Λ) [DecidableRel G.Adj]
+    (hGbip : ∀ x y, G.Adj x y → A x ≠ A y) (hGconn : G.Connected)
     (hreal : ∀ x y, (J x y).im = 0) (hsym : ∀ x y, J x y = J y x)
-    (hbip : ∀ x y, A x = A y → J x y = 0)
-    (hcross : ∀ x y, A x ≠ A y → 0 < (J x y).re)
+    (hJoff : ∀ x y, ¬ G.Adj x y → J x y = 0)
+    (hJon : ∀ x y, G.Adj x y → 0 < (J x y).re)
     (hA : 1 ≤ (Finset.univ.filter (fun x : Λ => A x = true)).card)
     (hB : 1 ≤ (Finset.univ.filter (fun x : Λ => A x = false)).card)
     (Φ : (Λ → Fin (N + 1)) → ℂ) (hnorm : star Φ ⬝ᵥ Φ = 1)
