@@ -166,15 +166,13 @@ Expressed via the shared `IsMaximalSpinMultipletSubmodule` predicate (see
 def generalFlatBandFerromagnetic (U : ℝ) : Prop :=
   IsMaximalSpinMultipletSubmodule M (generalFlatBandGroundSubmodule T U) (generalFlatBandDim T)
 
-/-- **Tasaki Theorem 11.15 (general flat-band ferromagnetism), AXIOM.**  For a Hermitian
+/-! **Tasaki Theorem 11.15 (general flat-band ferromagnetism).**  For a Hermitian
 positive-semidefinite hopping matrix `T` with nonempty flat band (`D₀ > 0`) and `U > 0`,
 the `D₀`-electron Hubbard model is saturated-ferromagnetic **iff** the `Λ₀ × Λ₀`
-projection submatrix is irreducible.  Tasaki gives a complete proof (via Lemma 11.16 and
-Theorem 11.17); it is deep, so the statement is recorded here as a documented axiom (to be
-discharged), matching the policy for Theorem 11.8 / Lemma 11.9 / Theorem 11.13. -/
-axiom tasaki_theorem_11_15 (U : ℝ) (hT : T.PosSemidef)
-    (hD0 : 0 < generalFlatBandDim T) (hU : 0 < U) :
-    generalFlatBandFerromagnetic T U ↔ generalFlatBandProjectionIrreducible T
+projection submatrix is irreducible.  **Now a proved theorem** `tasaki_theorem_11_15` in
+`GeneralFlatBandTheorem1115.lean` (Issue #4453): the axiom previously recorded here is
+discharged by composing the proved Theorem 11.17 (`ferromagnetic ↔ basis connected`) with the
+bridge `projectionIrreducible ↔ basis connected`. -/
 
 /-! ### Lemma 11.16 and Theorem 11.17 (the special basis and its connectivity)
 

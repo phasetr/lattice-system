@@ -510,7 +510,8 @@ theorem generalFlatBand_truncation_coord (S : Finset (Fin (M + 1)))
 /-- **A special-basis vector confined to a `P₀`-block side**: for a coordinate cut `W` with no `P₀`
 entries linking it to its complement (`(P₀)_{yx} = 0` for `x ∈ W`, `y ∉ W`), if the index `z ∈ I`
 lies in `W` then `μ_z` is supported entirely in `W` (`μ_z(x) = 0` for `x ∉ W`).  Indeed the
-truncation `1_{Wᶜ}·μ_z` is a kernel vector (`generalFlatBand_restrict_mem_kernel`) vanishing at every
+truncation `1_{Wᶜ}·μ_z` is a kernel vector (`generalFlatBand_restrict_mem_kernel`) vanishing at
+every
 index site (at `z` because `z ∈ W`, elsewhere by localisation `μ_z(z') = 0`), hence zero by
 `generalFlatBand_kernel_coord_determined`.  So a basis vector cannot straddle a `P₀`-block cut. -/
 theorem generalFlatBand_mu_confined_of_block {I : Finset (Fin (M + 1))}
