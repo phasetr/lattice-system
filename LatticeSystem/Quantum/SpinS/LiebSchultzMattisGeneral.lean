@@ -16,15 +16,19 @@ boundary conditions), is bounded `‖ĥ_x‖ ≤ h₀`, and is `U(1)`-invariant,
 that for *any* ground state `Φ_GS` (uniqueness is **not** assumed) the twisted trial state has
 energy `⟨Φ_LSM, Ĥ Φ_LSM⟩ / ⟨Φ_LSM, Φ_LSM⟩ − E_GS ≤ C/L`, for any `L`.
 
-If in addition `S` is a half-odd integer and the ground state is translation invariant
-(`T̂ Φ_GS = e^{iα} Φ_GS`), then Lemma 6.2 applies and one obtains `0 ≤ E_1st − E_GS ≤ C/L`, exactly
-as in Theorem 6.3 — now for a whole class of `U(1)`-invariant short-ranged chains.
+Tasaki further remarks that if `S` is a half-odd integer and the ground state is translation
+invariant (`T̂ Φ_GS = e^{iα} Φ_GS`), then *the same orthogonality argument* (a generalization of
+Lemma 6.2)
+gives `0 ≤ E_1st − E_GS ≤ C/L`, as in Theorem 6.3 — now for a whole class of `U(1)`-invariant
+short-ranged chains.  We do **not** formalize that gap consequence here: the formal Lemma 6.2
+(`lsm_ground_twist_orthogonal`) is specialized to the antiferromagnetic Heisenberg chain, so
+deriving it for a general `IsShortRangeU1Chain` would require a separate generalized orthogonality
+lemma.
 
 We record the locality of each `ĥ_x` through the (uninterpreted) marker predicate `IsLocalRangeR`,
 the norm bound through the `L²` operator norm `manyBodyOperatorNormS`, and `U(1)`-invariance through
 `Commute (ĥ_x) Ŝ_tot^{(3)}`, all bundled into `IsShortRangeU1Chain`.  Lemma 6.4 itself (the `C/L`
-variational bound, eq. (6.2.24)) is a documented axiom; the half-odd-integer gap consequence is the
-combination with Lemma 6.2 (`lsm_ground_twist_orthogonal`), exactly as for Theorem 6.3.
+variational bound, eq. (6.2.24)) is the documented axiom recorded here.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §6.2, Lemma 6.4, eqs. (6.2.23)–(6.2.24), pp. 162–163.
@@ -65,9 +69,10 @@ assumed) the Lieb–Schultz–Mattis trial state has energy bounded by `C/L` abo
 `⟨Φ_LSM, Ĥ Φ_LSM⟩ / ⟨Φ_LSM, Φ_LSM⟩ − E_GS ≤ C/L`, for any `L`.
 
 The constant `C` is uniform over the volume `L`, the local terms `ĥ`, and the ground state — it
-depends only on `S`, `r`, `h₀`.  Combined with Lemma 6.2 (when `S` is half-odd-integer and the
-ground state is translation invariant) this yields `0 ≤ E_1st − E_GS ≤ C/L`, generalizing
-Theorem 6.3 to all such chains.  Recorded as a documented axiom. -/
+depends only on `S`, `r`, `h₀`.  Tasaki remarks that for half-odd-integer `S` with a
+translation-invariant ground state a generalized orthogonality argument then yields
+`0 ≤ E_1st − E_GS ≤ C/L` (as in Theorem 6.3); that gap consequence is *not* formalized here (the
+formal Lemma 6.2 is Heisenberg-chain-specific).  Recorded as a documented axiom. -/
 axiom tasaki_lemma_6_4_general_trial_energy_bound (N r : ℕ) (h₀ : ℝ) :
     ∃ C : ℝ, 0 < C ∧ ∀ {L : ℕ} (h : Fin L → ManyBodyOpS (Fin L) N)
       (Φ_GS : (Fin L → Fin (N + 1)) → ℂ) (E_GS : ℝ), 0 < L →
