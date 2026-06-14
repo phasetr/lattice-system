@@ -3,8 +3,9 @@ import LatticeSystem.Quantum.SpinS.AnisotropicHeisenberg
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 /-!
-# Tasaki §5.1–§5.3: Bose–Einstein condensation of hard-core bosons — off-diagonal long-range order,
-low-lying tower states, and U(1) symmetry breaking (Theorems 5.1, 5.2, 5.3)
+# Tasaki §5.1–§5.5: Bose–Einstein condensation of hard-core bosons — off-diagonal long-range order,
+low-lying tower states, U(1) symmetry breaking, and coupled condensates
+(Theorems 5.1, 5.2, 5.3, 5.4)
 
 Tasaki Chapter 5 studies **Bose–Einstein condensation (BEC)** of bosons on the `d`-dimensional
 hypercubic lattice.  In the limit of infinitely strong on-site repulsion (`u ↑ ∞`) the bosonic
@@ -227,5 +228,73 @@ tower states needed to normalize the `Γ_M`.  Proved in Koma–Tasaki [21]; reco
 axiom. -/
 axiom tasaki_5_3_bec_u1_ssb (d : ℕ) (hd : 2 ≤ d) (μ q₀ : ℝ) (hq₀ : 0 < q₀) :
     ∃ C₁ mStar : ℝ, IsBECCoherentSSBConstants d μ q₀ C₁ mStar
+
+/-! ## Theorem 5.4: symmetry breaking in coupled Bose–Einstein condensates -/
+
+/-- The **coupled (two-species) lattice** `Λ_a ⊔ Λ_b` (Tasaki §5.5): two exact copies of the
+hypercubic torus, the site `(x, false)` lying on copy `a` and `(x, true)` on copy `b`.  The combined
+hard-core boson Hilbert space is `ManyBodyOpS (CoupledSite d L) 1`; the physical
+total-particle-number `2N` sector is the doubled half filling `Ŝ_tot^{(3)} = 0`. -/
+abbrev CoupledSite (d L : ℕ) : Type := HypercubicTorus d L × Bool
+
+/-- The **same-species nearest-neighbor coupling** on the coupled lattice: it is the torus
+nearest-neighbor coupling between two sites of the *same* species (`a–a` or `b–b`), and `0` across
+species.  The XY Hamiltonian built from it is `Ĥ_a + Ĥ_b` (eq. (5.5.2), the two uncoupled
+copies). -/
+noncomputable def sameSpeciesNNCoupling (d L : ℕ) [NeZero L] (p q : CoupledSite d L) : ℂ :=
+  if p.2 = q.2 then torusNNCoupling d L p.1 q.1 else 0
+
+/-- The **tunneling Hamiltonian** `Ĥ_tunnel = −Σ_x (e^{iφ} â_{(x,a)}^† â_{(x,b)} + e^{−iφ} â_{(x,a)}
+â_{(x,b)}^†)` (eq. (5.5.3)) that weakly couples the two condensates, in spin form: `â_{(x,a)}^†
+â_{(x,b)} ↔ Ŝ_{(x,a)}^+ Ŝ_{(x,b)}^−` (the staggered gauge signs `(−1)^x` cancel at equal `x`). -/
+noncomputable def tunnelHamiltonian (d L : ℕ) [NeZero L] (φ : ℝ) :
+    ManyBodyOpS (CoupledSite d L) 1 :=
+  -∑ x : HypercubicTorus d L,
+    (Complex.exp (Complex.I * (φ : ℂ)) •
+        (spinSSiteOpPlus (x, false) 1 * spinSSiteOpMinus (x, true) 1) +
+      Complex.exp (-(Complex.I * (φ : ℂ))) •
+        (spinSSiteOpMinus (x, false) 1 * spinSSiteOpPlus (x, true) 1))
+
+/-- The **total coupled Hamiltonian** `Ĥ_tot^ε = Ĥ_a + Ĥ_b + ε Ĥ_tunnel` (eq. (5.5.1)): the two
+uncoupled XY copies (via `sameSpeciesNNCoupling`, at anisotropy `λ = D = 0`) plus the tunneling term
+of strength `ε ≥ 0`. -/
+noncomputable def coupledHamiltonian (d L : ℕ) [NeZero L] (φ ε : ℝ) :
+    ManyBodyOpS (CoupledSite d L) 1 :=
+  anisotropicHeisenbergS (sameSpeciesNNCoupling d L) 0 0 1 + (ε : ℂ) • tunnelHamiltonian d L φ
+
+/-- The **inter-condensate correlation operator** `â_{(x,a)}^† â_{(x,b)}` (the observable of
+eqs. (5.5.5)/(5.5.6)), in spin form `Ŝ_{(x,a)}^+ Ŝ_{(x,b)}^−` — it annihilates a particle in
+condensate `b` at `x` and creates one in condensate `a` at `x`. -/
+noncomputable def coupledCrossCorrelation (d L : ℕ) [NeZero L] (x : HypercubicTorus d L) :
+    ManyBodyOpS (CoupledSite d L) 1 :=
+  spinSSiteOpPlus (x, false) 1 * spinSSiteOpMinus (x, true) 1
+
+/-- **Tasaki Theorem 5.4 (symmetry breaking in coupled Bose–Einstein condensates), AXIOM.**  Two
+hard-core boson condensates on copies `Λ_a`, `Λ_b` of the torus are weakly coupled by the tunneling
+Hamiltonian (strength `ε`), with the total particle number fixed at `2N` (the doubled half filling
+`Ŝ_tot^{(3)} = 0`).  Assuming the single uncoupled system has ODLRO with parameter `q₀ > 0`
+(eq. (5.2.5), Theorem 5.1), the unique ground state `Φ^ε` of the coupled Hamiltonian develops a
+**definite relative `U(1)` phase** between the two condensates: there is an order parameter `m̃`,
+with `m̃ ≥ m∗ ≥ √(2 q₀)`, such that (eqs. (5.5.5)–(5.5.6))
+`lim_{ε↓0} lim_{L↑∞} ⟨Φ^ε, â_{(x,a)}^† â_{(x,b)} Φ^ε⟩ / ⟨Φ^ε, Φ^ε⟩ = m̃² e^{−iφ}`,
+for any `x ∈ ℤ^d`.
+
+The two condensates are thus coupled coherently (entangled) with a fixed relative phase `φ`.  The
+ground state `Φ^ε` is a *given* family (unique per `(ε, L)` by a Marshall–Lieb–Mattis argument:
+eigenvector at the minimal energy, nonzero, in the `2N`-particle sector `Ŝ_tot^{(3)} = 0`).  The
+double limit is stated soundly in eventual-`ε'` form (outer `ε↓0`, inner `L↑∞`); `m̃` is existential
+with the lower bound `√(2 q₀)`.  Proved in Koma–Tasaki [22]; recorded as a documented axiom. -/
+axiom tasaki_5_4_coupled_bec_ssb (d : ℕ) (hd : 2 ≤ d) (φ q₀ : ℝ) (hq₀ : 0 < q₀)
+    (x : Fin d → ℤ) (Φ : ℝ → (L : ℕ) → (CoupledSite d L → Fin 2) → ℂ) (E₀ : ℝ → ℕ → ℂ)
+    (hΦ : ∀ ε : ℝ, 0 < ε → ∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
+      (coupledHamiltonian d L φ ε).mulVec (Φ ε L) = E₀ ε L • Φ ε L ∧
+      (∀ E : ℂ, ∀ Ψ : (CoupledSite d L → Fin 2) → ℂ, Ψ ≠ 0 →
+        (coupledHamiltonian d L φ ε).mulVec Ψ = E • Ψ → (E₀ ε L).re ≤ E.re) ∧
+      Φ ε L ≠ 0 ∧ (totalSpinSOp3 (CoupledSite d L) 1).mulVec (Φ ε L) = 0) :
+    ∃ mtilde : ℝ, Real.sqrt (2 * q₀) ≤ mtilde ∧
+      ∀ ε' : ℝ, 0 < ε' → ∃ ε₀ : ℝ, 0 < ε₀ ∧ ∀ ε : ℝ, 0 < ε → ε < ε₀ →
+        ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+          ‖expectationRatioComplex (coupledCrossCorrelation d L (torusEmbed d L x)) (Φ ε L)
+            - ((mtilde ^ 2 : ℝ) : ℂ) * Complex.exp (-(Complex.I * (φ : ℂ)))‖ < ε'
 
 end LatticeSystem.Quantum
