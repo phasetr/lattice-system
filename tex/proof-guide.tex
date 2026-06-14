@@ -7807,6 +7807,20 @@ graphs, e.g.\ with vanishing coupling), and its proof rests on reflection positi
 framework is in place (infinite-volume systems are in scope --- a deferral pending infrastructure,
 not an exclusion).  Chapters~3--10 backfill.
 
+\noindent\textbf{Theorem 4.2} (Shastry, Tasaki §4.1, eqs.~(4.1.9)--(4.1.10), pp.~76--77; documented
+axiom, \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of spontaneous symmetry
+breaking in one dimension: for the 1D spin-$S$ antiferromagnetic Heisenberg ring under a staggered
+field $\hat H_h=\sum_x\hat S_x\cdot\hat S_{x+1}-h\,\hat O_L^{(3)}$ (eq.~(4.1.9)), the per-site
+staggered order parameter of any normalized ground state vanishes in the iterated limit
+$\lim_{h\downarrow0}\lim_{L\uparrow\infty}\langle\Phi_{\mathrm{GS},h}|\hat O_L^{(3)}/L
+|\Phi_{\mathrm{GS},h}\rangle=0$ (eq.~(4.1.10)).  We define the ring nearest-neighbor coupling
+(\texttt{ringCoupling}), the staggered sublattice (\texttt{ringStaggeredSublattice}), and the
+staggered-field chain Hamiltonian (\texttt{staggeredFieldChainHamiltonianS}), and record
+\texttt{shastry\_no\_symmetry\_breaking\_1d} as the iterated limit in explicit $\varepsilon$--$\delta$
+form over normalized energy-minimizing ground states (so the per-site bound is scale-invariant).
+Tasaki states Theorem 4.2 without proof (Shastry's argument [58], rigorously formulated in [63]); the
+deep infinite-volume argument is deferred (in scope).  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
