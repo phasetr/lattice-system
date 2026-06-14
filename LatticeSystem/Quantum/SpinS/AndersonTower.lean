@@ -308,46 +308,59 @@ direction (eqs. (4.2.12)–(4.2.15)):
 * `lim_L ⟨Ξ| (Ô_L^{(α)}/L^d)² |Ξ⟩ = 0` for `α = 2, 3`   (4.2.15).
 
 All expectations are in scale-invariant Rayleigh-ratio form (`expectationRatioRe`), as `Ξ` is not
-proven unit-normalized in Lean.  For all *sufficiently large* even `L` the ground state `Φ L` (energy `E₀ L`)
-must be a minimizer with the long-range-order property (`q₀` premise), the growth bound
-`M L + 1 ≤ C₁ L^{d/2}` must hold, and the Tanaka tower terms / state must have positive squared norm
-(well-definedness of `unitNormalize`) — these model/growth conditions are imposed *eventually* (an
-`∃ L₁` threshold), matching the asymptotic nature of the statement.  The order parameter `mStar > 0`
-(eq. (4.2.9)) is recorded as an existential real parameter rather than constructed as the double limit
-`lim_k lim_L`. -/
+proven unit-normalized in Lean.  The ground state family `Φ` (energies `E₀`) is given, with the
+minimizer / long-range-order conditions holding *eventually* (for all sufficiently large even `L`).
+The theorem then asserts the existence of a *sufficiently slowly diverging* sequence `M(L)`
+(`Tendsto M atTop atTop`, with the growth bound `M L + 1 ≤ C₁ L^{d/2}` and positive squared norms of
+the Tanaka terms/state holding eventually) — Tasaki's proof produces such an `M`, not every diverging
+one (Lemma 4.16 does not identify a concrete choice), so the statement is existential in `M`.  For
+that `M`, the order-operator-density expectations obey the symmetry-breaking relations.
+
+Per Tasaki footnote 21, the rigorous forms of (4.2.12)/(4.2.13) are `liminf`, so we state the sound
+lower bounds `liminf_L ⟨Ô_L^{(1)}/L^d⟩ ≥ mStar` and `liminf_L ⟨(Ô_L^{(1)}/L^d)²⟩ ≥ mStar²` (i.e.
+eventually `> mStar − ε` / `> mStar² − ε`); the matching upper bounds follow from `mStar` being the
+*maximal* density (eq. (4.2.9)) and are not separately encoded.  The order parameter `mStar > 0` is
+an existential real, not the double limit `lim_k lim_L`. -/
 def IsTanakaFullSSBConstants (d N : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
   0 < C₁ ∧ 0 < mStar ∧
-    ∀ (M : ℕ → ℕ) (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ),
-      Tendsto M atTop atTop →
-      -- the model and growth conditions hold *eventually* (for all sufficiently large even `L`),
-      -- matching the asymptotic nature of the statement
+    ∀ (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ),
+      -- the ground-state / minimizer / LRO conditions hold *eventually* for the given family
       (∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
-        0 < M L ∧ ((M L : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) ∧
         (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec (Φ L) = E₀ L • Φ L ∧
         (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
           (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
         Φ L ≠ 0 ∧
         q₀ ≤ (star (Φ L) ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
             staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
-            ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2) ∧
-        0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L) (Φ L)) ∧
-        0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L + 1) (Φ L)) ∧
-        0 < vecNormSqRe (tanakaSSBState (torusParitySublattice d L) N (M L) (Φ L))) →
-      (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
-        |tanakaOrderMean1 d L N (M L) (Φ L) - mStar| < ε) ∧
-      (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
-        |tanakaOrderSecond1 d L N (M L) (Φ L) - mStar ^ 2| < ε) ∧
-      (∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
-        tanakaOrderMean2 d L N (M L) (Φ L) = 0 ∧ tanakaOrderMean3 d L N (M L) (Φ L) = 0) ∧
-      (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
-        |tanakaOrderSecond2 d L N (M L) (Φ L)| < ε ∧ |tanakaOrderSecond3 d L N (M L) (Φ L)| < ε)
+            ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2)) →
+      -- there exists a sufficiently slowly diverging M(L) for which the SSB relations hold
+      ∃ M : ℕ → ℕ, Tendsto M atTop atTop ∧
+        (∃ L₂ : ℕ, ∀ (L : ℕ) [NeZero L], L₂ ≤ L → 2 ≤ L → Even L →
+          0 < M L ∧ ((M L : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) ∧
+          0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L) (Φ L)) ∧
+          0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L + 1) (Φ L)) ∧
+          0 < vecNormSqRe (tanakaSSBState (torusParitySublattice d L) N (M L) (Φ L))) ∧
+        -- (4.2.12) liminf ≥ mStar
+        (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+          mStar - ε < tanakaOrderMean1 d L N (M L) (Φ L)) ∧
+        -- (4.2.13) liminf ≥ mStar²
+        (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+          mStar ^ 2 - ε < tanakaOrderSecond1 d L N (M L) (Φ L)) ∧
+        -- (4.2.14) the orthogonal moments vanish (eventually, exactly)
+        (∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+          tanakaOrderMean2 d L N (M L) (Φ L) = 0 ∧ tanakaOrderMean3 d L N (M L) (Φ L) = 0) ∧
+        -- (4.2.15) the orthogonal density fluctuations vanish
+        (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+          |tanakaOrderSecond2 d L N (M L) (Φ L)| < ε ∧ |tanakaOrderSecond3 d L N (M L) (Φ L)| < ε)
 
 /-- **Tasaki Theorem 4.9 (the Tanaka state exhibits full symmetry breaking), AXIOM.**  With the same
 constants `C₁`, `C₂` as Theorem 4.6 and an order parameter `mStar > 0`, the Tanaka state
 `|Ξ_{(1,0,0)}⟩` realizes full `SU(2)` symmetry breaking in the `(1,0,0)` direction (eqs.
-(4.2.12)–(4.2.15)): the staggered moment per site converges to `mStar` along axis `1`, the squared
-moment to `mStar²`, while along axes `2, 3` both vanish — so the order-operator density behaves as a
-classical vector of magnitude `mStar` pointing in `(1,0,0)`, with vanishing fluctuation.
+(4.2.12)–(4.2.15)): for a *sufficiently slowly diverging* `M(L)` (existential, as Tasaki's proof
+produces one — not every diverging sequence), the staggered moment per site has `liminf ≥ mStar`
+along axis `1`, the squared moment `liminf ≥ mStar²` (the `liminf` forms per footnote 21), while
+along axes `2, 3` both vanish — so the order-operator density behaves as a classical vector of
+magnitude `mStar` pointing in `(1,0,0)`, with vanishing fluctuation.
 
 The order parameter `mStar` is recorded as an existential real (`> 0`); its identity with the double
 limit (4.2.9) and the inequality `mStar ≥ √(3 q₀)` (Theorem 4.11) are kept separate.  Conditional on
