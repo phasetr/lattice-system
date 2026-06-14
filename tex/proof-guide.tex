@@ -8528,6 +8528,26 @@ correlation equals the connected one (the disordered symmetric ground state has 
 functions).  Proved by cluster-expansion perturbation theory for large $D$ (book $D_0\approx28$, the
 phase extending to $D_c\approx1$); a documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§8.1.2--§8.1.3 Hidden order forces edge states} (Theorem 8.2, Koma--Tasaki; Tasaki
+§8.1.2--§8.1.3, eqs.~(8.1.9)--(8.1.11), pp.~229--238;
+\texttt{Quantum/SpinS/AnisotropicEdgeStates.lean}, Issue \#4485).  Hidden antiferromagnetic order ---
+positivity of the den Nijs--Rommelse string order parameter $O_{\mathrm{string}}^{(\alpha)}(D)$ of
+the ground state of (8.1.1) --- distinguishes the Haldane phase ($0\le D<D_c$) from the large-$D$
+phase and forces low-lying edge states.  The marker \texttt{HasStringLRO} $L\,D\,\Phi\,q$ carries the
+hidden-order bound (8.1.10) $\langle\Phi|(\hat O_{\mathrm{string}}^{(\alpha)}/L)^2|\Phi\rangle\ge
+q_\alpha$ ($q_\alpha>0$, $L$-independent).  Since edge states are an open-boundary phenomenon, the
+theorem uses the open-chain Hamiltonian \texttt{openAnisotropicChainHamiltonianS} (coupling
+\texttt{openAnisotropicChainCoupling}, no wrap-around).  The axiom \texttt{tasaki\_theorem\_8\_2} states that for
+fixed $D,q$ there are $L$-independent $C_\nu>0$ such that for every $L>0$, whenever $\Phi$ is the
+\emph{unique} ground state (\texttt{IsUniqueChainGroundState}) at energy $E_0$ with
+\texttt{HasStringLRO}, there are three linearly independent excited states $\Psi_\nu$
+($\nu:\texttt{Fin}~3$, \texttt{LinearIndependent}) with $\hat H_D^{\mathrm{open}}\Psi_\nu=E_\nu\Psi_\nu$
+and $E_0<E_\nu\le E_0+C_\nu/L$ --- hidden order forces a near four-fold degeneracy (the free $S=1/2$
+edge spins); the constants are quantified outside $\forall L$, hence length-uniform.  Proved by the
+Horsch--von der Linden / Koma--Tasaki variational argument (as Theorem 3.1); a documented axiom.
+Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
