@@ -327,4 +327,42 @@ theorem generalFlatBand_side_subspaces_orthogonal {I : Finset (Fin (M + 1))}
   | add a b _ _ ha hb => rw [inner_add_left, ha, hb, add_zero]
   | smul c a _ ha => rw [inner_smul_left, ha, mul_zero]
 
+/-- **The projection of a side basis vector lands on that same side**: for a disjoint-support cut
+`S`, if every `μ_z` (`z ∈ S`) vanishes at `y` (so `y` is on the `Sᶜ`-side), then
+`P₀ e_y ∈ span{μ_z : z ∈ Sᶜ}`.  Indeed `P₀ e_y ∈ ker T = V_S ⊕ V_Sᶜ` decomposes as `a + b`
+(`a ∈ V_S`, `b ∈ V_Sᶜ`); but `P₀ e_y ⊥ V_S` (from `e_y ⊥ V_S` preserved by `P₀`) and `V_S ⊥ V_Sᶜ`
+force `⟪a, a⟫ = ⟪a, P₀ e_y⟫ = 0`, so `a = 0` and `P₀ e_y = b ∈ V_Sᶜ`.  This is the block-diagonal
+heart: `P₀` carries each side into itself. -/
+theorem generalFlatBand_proj_mem_side {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (S : Set ↥I) (hdisj : ∀ z ∈ S, ∀ z' ∈ Sᶜ, ∀ x, μ z.1 x = 0 ∨ μ z'.1 x = 0)
+    {y : Fin (M + 1)} (hy : ∀ z ∈ S, μ z.1 y = 0) :
+    (generalFlatBandKernel T).starProjection (EuclideanSpace.basisFun (Fin (M + 1)) ℂ y)
+      ∈ Submodule.span ℂ ((fun z : ↥I =>
+        (WithLp.toLp 2 (μ z.1) : EuclideanSpace ℂ (Fin (M + 1)))) '' Sᶜ) := by
+  set Pe := (generalFlatBandKernel T).starProjection
+    (EuclideanSpace.basisFun (Fin (M + 1)) ℂ y) with hPe
+  have hVS_le : Submodule.span ℂ ((fun z : ↥I =>
+      (WithLp.toLp 2 (μ z.1) : EuclideanSpace ℂ (Fin (M + 1)))) '' S)
+      ≤ generalFlatBandKernel T :=
+    le_sup_left.trans (generalFlatBand_kernel_eq_sup T hbasis S).ge
+  have hmemK : Pe ∈ generalFlatBandKernel T := Submodule.starProjection_apply_mem _ _
+  rw [generalFlatBand_kernel_eq_sup T hbasis S] at hmemK
+  obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.mp hmemK
+  have hPeS : Pe ∈ (Submodule.span ℂ ((fun z : ↥I =>
+      (WithLp.toLp 2 (μ z.1) : EuclideanSpace ℂ (Fin (M + 1)))) '' S))ᗮ :=
+    generalFlatBand_proj_mem_orthogonal T hVS_le
+      (generalFlatBand_basisVec_mem_orthogonal_of_side μ S hy)
+  have ha0 : a = 0 := by
+    have h1 : inner ℂ a Pe = 0 := (Submodule.mem_orthogonal _ _).mp hPeS a ha
+    have h2 : inner ℂ a b = (0 : ℂ) := by
+      have hba : inner ℂ b a = (0 : ℂ) :=
+        (Submodule.mem_orthogonal _ _).mp
+          (generalFlatBand_side_subspaces_orthogonal μ S hdisj ha) b hb
+      rw [← inner_conj_symm, hba, map_zero]
+    rw [← hab, inner_add_right, h2, add_zero] at h1
+    exact inner_self_eq_zero.mp h1
+  rw [← hab, ha0, zero_add]
+  exact hb
+
 end LatticeSystem.Fermion
