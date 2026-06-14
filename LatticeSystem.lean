@@ -52,6 +52,7 @@ import LatticeSystem.Quantum.SpinS.AKLTMatrixProduct
 import LatticeSystem.Quantum.SpinS.AKLTInfiniteChain
 import LatticeSystem.Quantum.SpinS.AKLTStability
 import LatticeSystem.Quantum.SpinS.AKLTStringOrder
+import LatticeSystem.Quantum.SpinS.ClusterState
 import LatticeSystem.Quantum.SpinS.GeneralAKLT
 import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattis
