@@ -8065,6 +8065,31 @@ n_\alpha$ (the $\omega_n$ of Theorem 4.20) is \emph{ergodic}, hence a physical g
 (Definition 4.19).  It is \textbf{never asserted true} (no \texttt{axiom}/\texttt{theorem} derives it).
 Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{Theorem 4.22} (Tasaki §4.4.1, eqs.~(4.4.1)--(4.4.6), pp.~117--119; documented
+axioms, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  The one-dimensional
+Heisenberg model is \emph{disordered at any nonzero temperature}.  This opens §4.4 by introducing the
+finite-temperature equilibrium (Gibbs) framework: the Gibbs operator $e^{-\beta\hat H}$
+(\texttt{thermalGibbsOpS}), partition function $Z(\beta)=\mathrm{Tr}\,e^{-\beta\hat H}$, and the real
+canonical average $\langle\hat A\rangle_\beta=\mathrm{Re}\,\mathrm{Tr}[\hat A\,e^{-\beta\hat
+H}]/\mathrm{Re}\,Z(\beta)$ (\texttt{thermalAverageReS}, eq.~(4.4.3); for Hermitian $\hat H$,
+$Z(\beta)>0$).  The two field Hamiltonians are unified in \texttt{heisenbergFieldHamiltonianS ferro}:
+ferromagnetic with a uniform field $\hat H_h=-\sum\hat S_x\!\cdot\!\hat S_y-h\sum\hat S_x^{(3)}$
+(eq.~(4.4.1)) and antiferromagnetic with a staggered field $\hat H_h=\sum\hat S_x\!\cdot\!\hat
+S_y-h\sum(-1)^x\hat S_x^{(3)}$ (eq.~(4.4.2)).  Sites $x\in\mathbb Z^d$ embed into the torus by
+coordinatewise reduction (\texttt{torusEmbed}), the $\ell^1$ distance is \texttt{intL1Dist}, and the
+$L\uparrow\infty$ limit is taken along the even sequence $L=2(n+1)$ (\texttt{evenSide}, footnote~41).
+Eq.~(4.4.5) (\texttt{tasaki\_4\_22\_magnetization\_vanishes}) is the no-SSB statement $\lim_{h\downarrow
+0}\lim_{L\uparrow\infty}\langle\hat S_x^{(3)}\rangle_{\beta,h}^L=0$ (the order of the limits is
+essential), stated soundly in $\varepsilon$--$\delta$ form with the inner $\liminf$ as an
+arbitrarily-large-volume subsequence ($\exists n_0,\forall n\ge n_0,\exists m\ge n,\ |\text{mag}|<
+\varepsilon$).  Eq.~(4.4.6) (\texttt{tasaki\_4\_22\_exponential\_clustering}) gives functions
+$\xi(\beta),C(\beta)\in(0,\infty)$ with the exponential clustering bound $|\langle\hat
+S_x^{(\alpha)}\hat S_y^{(\alpha)}\rangle_{\beta,0}^\infty|\le C(\beta)\,e^{-|x-y|/\xi(\beta)}$ on the
+concrete $\liminf$ correlation \texttt{infiniteVolSpinCorrLiminf}, so the model is in the disordered
+phase.  Both are proved by one-dimensional cluster-expansion / analyticity methods (Tasaki~[4]) and
+recorded as documented axioms.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
