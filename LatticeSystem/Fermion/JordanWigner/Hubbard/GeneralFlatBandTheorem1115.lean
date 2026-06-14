@@ -98,4 +98,55 @@ theorem generalFlatBand_blockReducible_of_not_basisConnected
     rw [hxy] at h2
     exact star_eq_zero.mp h2
 
+/-- **A block-reducible projection forces a disconnected basis**: if `P₀` is block-reducible then the
+special basis is not connected.  For a block cut `W`, each `μ_z` is confined to its index's side
+(`generalFlatBand_mu_confined_of_block`): `z.1 ∈ W ⟹ μ_z` supported in `W`, `z.1 ∉ W ⟹ μ_z`
+supported in `Wᶜ`.  Hence the index set splits into `J = {z | z.1 ∈ W}` and its complement (both
+nonempty, witnessed by the active sites on each side), with no basis edge crossing — a crossing edge
+`z ~ z'` would need a shared site `x` with `μ_z(x), μ_{z'}(x) ≠ 0`, impossible since `μ_z` lives in
+`W` and `μ_{z'}` in `Wᶜ`.  A vertex in `J` therefore cannot reach one outside `J`. -/
+theorem generalFlatBand_not_basisConnected_of_blockReducible
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hred : generalFlatBandProjectionBlockReducible T) :
+    ¬ generalFlatBandBasisConnected I μ := by
+  classical
+  obtain ⟨W, ⟨xa, hxaW, hxaA⟩, ⟨yb, hybW, hybA⟩, hblock⟩ := hred
+  -- symmetric block hypothesis for the complementary side
+  have hblock' : ∀ a ∈ Wᶜ, ∀ b ∉ Wᶜ, generalFlatBandProjectionMatrix T b a = 0 := by
+    intro a ha b hb
+    rw [Finset.mem_compl] at ha
+    simp only [Finset.mem_compl, not_not] at hb
+    have h := hblock b hb a ha
+    have h2 := (generalFlatBandProjectionMatrix_isHermitian T).apply a b
+    rw [h] at h2
+    exact star_eq_zero.mp h2
+  -- each basis vector is confined to its index's side
+  have hconfW : ∀ z ∈ I, z ∈ W → ∀ x ∉ W, μ z x = 0 :=
+    fun z hzI hzW x hxW => generalFlatBand_mu_confined_of_block T hbasis W hblock hzI hzW hxW
+  have hconfWc : ∀ z ∈ I, z ∉ W → ∀ x ∈ W, μ z x = 0 := by
+    intro z hzI hzW x hxW
+    exact generalFlatBand_mu_confined_of_block T hbasis Wᶜ hblock' hzI
+      (Finset.mem_compl.mpr hzW) (by simp only [Finset.mem_compl, not_not]; exact hxW)
+  -- the index side `{z | z.1 ∈ W}` is closed under basis-graph adjacency
+  have hadj : ∀ u v : ↥I, (generalFlatBandBasisGraph I μ).Adj u v → u.1 ∈ W → v.1 ∈ W := by
+    intro u v hAdj huW
+    obtain ⟨_, x, hux, hvx⟩ := hAdj
+    have hxW : x ∈ W := by
+      by_contra hxW; exact hux (hconfW u.1 u.2 huW x hxW)
+    by_contra hvW; exact hvx (hconfWc v.1 v.2 hvW x hxW)
+  have hclosed : ∀ {u v : ↥I}, (generalFlatBandBasisGraph I μ).Reachable u v → u.1 ∈ W → v.1 ∈ W := by
+    intro u v hr
+    obtain ⟨p⟩ := hr
+    induction p with
+    | nil => exact id
+    | cons h _ ih => exact fun hu => ih (hadj _ _ h hu)
+  -- the two active sites give vertices on opposite sides
+  obtain ⟨za, hzaI, hza_ne⟩ := (generalFlatBand_active_iff_exists_mu_ne T hbasis xa).mp hxaA
+  obtain ⟨zb, hzbI, hzb_ne⟩ := (generalFlatBand_active_iff_exists_mu_ne T hbasis yb).mp hybA
+  have ha : za ∈ W := by by_contra h; exact hza_ne (hconfWc za hzaI h xa hxaW)
+  have hb : zb ∉ W := by intro h; exact hzb_ne (hconfW zb hzbI h yb hybW)
+  intro hconn
+  exact hb (hclosed (hconn.preconnected ⟨za, hzaI⟩ ⟨zb, hzbI⟩) ha)
+
 end LatticeSystem.Fermion
