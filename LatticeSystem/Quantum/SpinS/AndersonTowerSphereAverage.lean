@@ -77,7 +77,8 @@ of that family (`q∗`, eq. (4.2.25), pinned by `Φ` — not freely chosen), **c
 Conjecture 4.12** (`m∗ = √(3 qStar)`, a genuine hypothesis tying `m∗` to the physical `q∗`):
 there is a slowly diverging `M(L)` such that the *normalized solid-angle average* of the
 symmetry-breaking states converges, up to a unimodular phase, to the ground state (eq. (4.2.22)):
-`∀ ε > 0, ∃ L₀, ∀ L ≥ L₀ (even), ∃ z, ‖z‖ = 1 ∧ ‖unitNormalize(Ξ_avg) − z • unitNormalize(Φ)‖ < ε`. -/
+`∀ ε > 0, ∃ L₀, ∀ L ≥ L₀ (even), ∃ z, ‖z‖ = 1 ∧ √(vecNormSqRe(unitNormalize(Ξ_avg) − z • Φ̂)) < ε`
+(the distance is the **L²/Hilbert** norm `√⟨·,·⟩`, via `vecNormSqRe`, not the default sup norm). -/
 def IsTanakaSphereAverageConstants (d N : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
   0 < C₁ ∧ 0 < mStar ∧
     (∀ (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ),
@@ -103,8 +104,8 @@ def IsTanakaSphereAverageConstants (d N : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
             0 < M L ∧ ((M L : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2)) ∧
           ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
             ∃ z : ℂ, ‖z‖ = 1 ∧
-              ‖unitNormalize (solidAngleAverageTanaka d L N (M L) (Φ L)) -
-                z • unitNormalize (Φ L)‖ < ε)
+              Real.sqrt (vecNormSqRe (unitNormalize (solidAngleAverageTanaka d L N (M L) (Φ L)) -
+                z • unitNormalize (Φ L))) < ε)
 
 /-- **Tasaki Proposition 4.10 (the solid-angle average is the ground state), AXIOM.**  Assuming
 Conjecture 4.12 (`m∗ = √(3 q∗)`), the normalized solid-angle average of the symmetry-breaking states
