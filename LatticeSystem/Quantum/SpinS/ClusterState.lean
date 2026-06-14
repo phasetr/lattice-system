@@ -83,8 +83,10 @@ stabilizer Hamiltonian `Ĥ_BR = −Σ_x K̂_x` (eq. (7.3.30)): the ground energy
 ground-energy eigenvector is a scalar multiple of `Φ`.  Proved by mapping `Ĥ_BR` to the trivial
 paramagnet `Ĥ_→ = −Σ_x σ̂_x^{(1)}` (whose unique ground state is the product state `Φ_→`) through
 the
-unitary `Û_C = ∏ Ĉ` of controlled-`Z` gates with `Û_C² = 1`; recorded as a documented axiom. -/
-axiom tasaki_theorem_7_8 (G : SimpleGraph (Fin L)) [DecidableRel G.Adj]
+unitary `Û_C = ∏ Ĉ` of controlled-`Z` gates with `Û_C² = 1`; recorded as a documented axiom.  The
+hypothesis `0 < L` excludes the empty lattice, where the Hilbert space is one-dimensional and there
+is no excited state for the gap. -/
+axiom tasaki_theorem_7_8 (G : SimpleGraph (Fin L)) [DecidableRel G.Adj] (hL : 0 < L)
     (Φ : (Fin L → Fin 2) → ℂ) (hΦ : IsClusterState G Φ) :
     IsGroundEnergy (graphStateHamiltonianS G) (-(Fintype.card (Fin L) : ℝ)) ∧
       IsPositiveSpectralGap (graphStateHamiltonianS G) 2 ∧ Φ ≠ 0 ∧
