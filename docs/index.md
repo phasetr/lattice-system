@@ -474,6 +474,16 @@ These are consumed by the Jordan–Wigner string / Hubbard hard-core projection 
 replacing the per-file private copies in `Fermion/JWAbstract.lean`,
 `Fermion/JordanWigner/Operators.lean`, and `Fermion/JordanWigner/Hubbard/HardcoreProjection.lean`.
 
+### Horsch–von der Linden low-lying states (Tasaki §3.4, Theorem 3.1)
+
+Start of the Chapters 3–10 backfill (Issue
+[#4485](https://github.com/phasetr/lattice-system/issues/4485); book order, infinite systems in
+scope). Tasaki §3.4, Theorem 3.1, eqs. (3.4.7)–(3.4.12), pp. 66–67.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `horsch_vonderLinden_lowLying` | for Hermitian `H` with min eigenvalue `E₀ = eigenvalues i₀`, a unit state `Γ` orthogonal to the ground eigenvector with `⟨Γ,HΓ⟩ ≤ E₀+δ` yields an energy eigenstate `j ≠ i₀` with `E₀ ≤ E_j ≤ E₀+δ` (a low-lying state; possibly another ground state if degenerate, as Tasaki notes) | `Quantum/HorschVonderLinden.lean` |
+
 ### Total spin operator (Tasaki §2.2 eq. (2.2.7), (2.2.8))
 
 Primary reference: Tasaki, *Physics and Mathematics of Quantum Many-Body

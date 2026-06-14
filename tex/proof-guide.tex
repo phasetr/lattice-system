@@ -7770,8 +7770,9 @@ with long-range order but no spontaneous symmetry breaking has a low-lying excit
 We discharge the finite-dimensional core, \texttt{horsch\_vonderLinden\_lowLying}: for a Hermitian
 $H$ with minimum eigenvalue $E_0=$ \texttt{eigenvalues}\,$i_0$, a normalized state $\Gamma$ orthogonal
 to the ground eigenvector (its $i_0$ eigenbasis component vanishes) with Rayleigh energy
-$\langle\Gamma,H\Gamma\rangle\le E_0+\delta$ yields an excited eigenstate $j\ne i_0$ with
-$E_0\le E_j\le E_0+\delta$.  Proof: expand the Rayleigh quotient in the eigenbasis,
+$\langle\Gamma,H\Gamma\rangle\le E_0+\delta$ yields a low-lying energy eigenstate $j\ne i_0$ with
+$E_0\le E_j\le E_0+\delta$ (possibly another ground state if degenerate, exactly as Tasaki notes).
+Proof: expand the Rayleigh quotient in the eigenbasis,
 $\langle\Gamma,H\Gamma\rangle=\sum_j\lVert w_j\rVert^2 E_j$ with $\sum_j\lVert w_j\rVert^2=1$ and
 $w_{i_0}=0$ (via the spectral theorem, \texttt{rayleighOnVec\_unitary\_conj}, and
 \texttt{rayleighOnVec\_diagonal\_real}); if every support index had $E_j>E_0+\delta$ the weighted sum
