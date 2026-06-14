@@ -7925,6 +7925,22 @@ $m^\ast\ge\sqrt{3q_0}$ of Theorem 4.11 kept separate); the $\alpha=2$ staggered 
 $C_1$ with Theorem 4.6 and is conditional on long-range order (vacuous in one dimension by
 Corollary 4.3).  Chapters~3--10 backfill.
 
+\noindent\textbf{Proposition 4.10} (Tasaki §4.2.1, eqs.~(4.2.17)--(4.2.22), pp.~99--100; documented
+axiom, \texttt{Quantum/SpinS/AndersonTowerSphereAverage.lean}, Issue \#4485).  The solid-angle average
+of the symmetry-breaking states recovers the ground state.  For a unit vector $n\in S^2\subset
+\mathbb{R}^3$ the direction order operator $\hat O_L^n=\sum_x\varepsilon_x(\hat S_x\cdot n)$
+(\texttt{directionStaggeredOp}) gives a direction symmetry-breaking state $|\Xi_n\rangle$
+(\texttt{directionTanakaState}, eq.~(4.2.17)); by $SU(2)$ covariance the solid-angle average
+$\frac1{4\pi}\int_{|n|=1}|\Xi_n\rangle\,dn$ (\texttt{solidAngleAverageTanaka}, the Bochner integral
+over \texttt{Metric.sphere} in $\texttt{EuclideanSpace}\ \mathbb{R}\ (\mathrm{Fin}\ 3)$ with surface
+measure \texttt{volume.toSphere}) is $SU(2)$ invariant.  \emph{Assuming Conjecture~4.12}
+($m^\ast=\sqrt{3q^\ast}$, \texttt{IsConjecture412Equality}, a \texttt{Prop} hypothesis never asserted
+true), the normalized average converges up to a unimodular phase to $|\Phi_{\mathrm{GS}}\rangle$
+(eq.~(4.2.22)): $\exists z,\ \lVert z\rVert=1,\ \lVert\mathrm{unitNormalize}(\Xi_{\mathrm{avg}})-z\cdot
+\mathrm{unitNormalize}(\Phi)\rVert<\varepsilon$.  The axiom
+\texttt{tanakaSphereAverage\_groundState} shares constants with Theorem 4.6 and is conditional on
+long-range order (vacuous in one dimension by Corollary 4.3).  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}

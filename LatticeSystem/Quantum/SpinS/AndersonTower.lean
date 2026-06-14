@@ -95,8 +95,8 @@ noncomputable def tanakaSSBState (A : Λ → Bool) (N M : ℕ)
   ((Real.sqrt (2 : ℝ) : ℂ))⁻¹ •
     (unitNormalize (tanakaTowerTerm A N M Φ) + unitNormalize (tanakaTowerTerm A N (M + 1) Φ))
 
-/-- The **Anderson tower trial state** `ψ_M = (Ô_L^{sgn M})^{|M|} Φ` (eq. (4.2.3), unnormalized): for
-`M ≥ 0` apply the staggered *raising* operator `M` times, for `M < 0` apply the staggered *lowering*
+/-- The **Anderson tower trial state** `ψ_M = (Ô_L^{sgn M})^{|M|} Φ` (eq. (4.2.3), unnormalized):
+for `M ≥ 0` apply the staggered *raising* operator `M` times, for `M < 0` apply the *lowering*
 operator `|M|` times.  This realizes the two-sided tower `Γ_M`, `Γ_{−M}` in the
 `Ŝ_tot^{(3)} = M` sectors. -/
 noncomputable def towerState (A : Λ → Bool) (N : ℕ) (M : ℤ)
@@ -218,17 +218,17 @@ axiom tower_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀
     ∃ C₁ C₂ : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂
 
 /-- **Tasaki Corollary 4.7 (the tower of low-lying energy eigenstates), AXIOM.**  Exactly as
-Theorem 3.1 turns a low-lying trial state into a low-lying energy eigenstate, Theorem 4.6 yields, for
-each nonzero magnetization `M ≠ 0`, an energy eigenstate `Ψ_M` in the `Ŝ_tot^{(3)}` sector `M`
+Theorem 3.1 turns a low-lying trial state into a low-lying energy eigenstate, Theorem 4.6 yields,
+for each nonzero magnetization `M ≠ 0`, an energy eigenstate `Ψ_M` in the `Ŝ_tot^{(3)}` sector `M`
 (eq. (4.2.7)): `E_GS < E_M ≤ E_GS + C₂ M² / L^d` (the strict gap is the excitation; `M = 0` is the
 ground state itself, excluded).
 
 Here the ground state `Φ` lies in a definite magnetization sector (`totalSpinSOp3 Φ = μ₀ • Φ`); the
 tower raises/lowers the magnetization by `M`, so `Ψ_M` lies in the sector `μ₀ + M`
 (`totalSpinSOp3 Ψ = (μ₀ + M) • Ψ`).  Distinct `M` give distinct (orthogonal) sectors, so this
-exhibits `O(L^{d/2})` distinct low-lying energy eigenstates — the rigorous Anderson tower.  The bound
-is conditional on long-range order (the same `q₀` premise as Theorem 4.6), hence vacuous in one
-dimension by Corollary 4.3.  Recorded as a faithful, sound documented axiom over the torus family. -/
+exhibits `O(L^{d/2})` distinct low-lying energy eigenstates — the rigorous Anderson tower.  The
+bound is conditional on long-range order (the same `q₀` premise as Theorem 4.6), hence vacuous in
+one dimension by Corollary 4.3.  Recorded as a faithful, sound documented axiom over the torus. -/
 axiom tower_lowLying_eigenstates (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
     ∃ C₁ C₂ : ℝ, 0 < C₁ ∧ 0 < C₂ ∧
       ∀ (L : ℕ) [NeZero L], 2 ≤ L → Even L →
@@ -251,14 +251,14 @@ axiom tower_lowLying_eigenstates (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ 
             (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Ψ = (μ₀ + (M : ℂ)) • Ψ
 
 /-- The Tanaka Theorem 4.8 energy bound for fixed constants `C₁`, `C₂` (the body of Theorem 4.8,
-factored so that the axiom can assert the *same* constants as Theorem 4.6).  For each `M(L) > 0` with
-`M + 1 ≤ C₁ L^{d/2}`, on every even-side torus the Tanaka symmetry-breaking state
+factored so that the axiom can assert the *same* constants as Theorem 4.6).  For each `M(L) > 0`
+with `M + 1 ≤ C₁ L^{d/2}`, on every even-side torus the Tanaka symmetry-breaking state
 `Ξ_{(1,0,0)} = tanakaSSBState A N M Φ` obeys the Rayleigh-ratio bound (eq. (4.2.11)):
 `⟨Ξ, Ĥ Ξ⟩ / ⟨Ξ, Ξ⟩ ≤ E_GS + C₂ {M+1}² / L^d`.
 
 The two tower terms and the state itself are required to have strictly positive squared norm
-(`vecNormSqRe > 0`), the well-definedness condition for `unitNormalize` (the Tanaka state is built by
-normalizing each term separately).  Conditional on long-range order (the same `q₀` premise as
+(`vecNormSqRe > 0`), the well-definedness condition for `unitNormalize` (the Tanaka state is built
+by normalizing each term separately).  Conditional on long-range order (the same `q₀` premise as
 Theorem 4.6), hence vacuous in one dimension by Corollary 4.3. -/
 def IsTanakaSSBConstants (d N : ℕ) (q₀ C₁ C₂ : ℝ) : Prop :=
   0 < C₁ ∧ 0 < C₂ ∧
@@ -283,15 +283,15 @@ def IsTanakaSSBConstants (d N : ℕ) (q₀ C₁ C₂ : ℝ) : Prop :=
             tanakaSSBState (torusParitySublattice d L) N M Φ).re ≤
         E₀.re + C₂ * ((M : ℝ) + 1) ^ 2 / (L : ℝ) ^ d
 
-/-- **Tasaki Theorem 4.8 (the Tanaka symmetry-breaking state is low-lying), AXIOM.**  With the *same*
-constants `C₁`, `C₂` as Theorem 4.6 (`IsAndersonTowerConstants`), the Tanaka state `|Ξ_{(1,0,0)}⟩`
+/-- **Tasaki Theorem 4.8 (the Tanaka symmetry-breaking state is low-lying), AXIOM.**  With the
+*same* constants `C₁`, `C₂` as Theorem 4.6 (`IsAndersonTowerConstants`), the Tanaka state `Ξ`
 (eq. (4.2.10)) — a candidate physical "ground state" with full symmetry breaking — is itself a
 low-lying state (eq. (4.2.11), `IsTanakaSSBConstants`):
 `⟨Ξ_{(1,0,0)}| Ĥ |Ξ_{(1,0,0)}⟩ / ⟨Ξ_{(1,0,0)}, Ξ_{(1,0,0)}⟩ ≤ E_GS + C₂ {M(L)+1}² / L^d`,
 for any increasing `M = M(L) > 0` with `M + 1 ≤ C₁ L^{d/2}`.
 
-Asserting both predicates with one pair `(C₁, C₂)` formalizes Tasaki's "with the same constants as in
-Theorem 4.6".  Conditional on long-range order, hence vacuous in one dimension by Corollary 4.3.
+Asserting both predicates with one pair `(C₁, C₂)` formalizes Tasaki's "with the same constants as
+in Theorem 4.6".  Conditional on long-range order, hence vacuous in one dimension by Corollary 4.3.
 Tasaki sketches the proof (§4.2.2, following Tanaka [62]); recorded here as a faithful, sound
 documented axiom over the torus family. -/
 axiom tanakaSSB_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
@@ -300,7 +300,7 @@ axiom tanakaSSB_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (h
 open Filter in
 /-- The Theorem 4.9 full-symmetry-breaking statement for fixed constants `C₁` and order parameter
 `mStar`.  For a slowly diverging sequence `M(L)` (`Tendsto M atTop atTop`, with `M(L) + 1 ≤
-C₁ L^{d/2}`), the Tanaka state `Ξ_{(1,0,0)}` realizes full `SU(2)` symmetry breaking in the `(1,0,0)`
+C₁ L^{d/2}`), the Tanaka state `Ξ_{(1,0,0)}` realizes full `SU(2)` symmetry breaking in the
 direction (eqs. (4.2.12)–(4.2.15)):
 * `lim_L ⟨Ξ| Ô_L^{(1)}/L^d |Ξ⟩ = mStar`                 (4.2.12),
 * `lim_L ⟨Ξ| (Ô_L^{(1)}/L^d)² |Ξ⟩ = mStar²`             (4.2.13),
@@ -312,8 +312,8 @@ proven unit-normalized in Lean.  The ground state family `Φ` (energies `E₀`) 
 minimizer / long-range-order conditions holding *eventually* (for all sufficiently large even `L`).
 The theorem then asserts the existence of a *sufficiently slowly diverging* sequence `M(L)`
 (`Tendsto M atTop atTop`, with the growth bound `M L + 1 ≤ C₁ L^{d/2}` and positive squared norms of
-the Tanaka terms/state holding eventually) — Tasaki's proof produces such an `M`, not every diverging
-one (Lemma 4.16 does not identify a concrete choice), so the statement is existential in `M`.  For
+the Tanaka terms/state holding eventually) — Tasaki's proof produces such an `M`, not every
+diverging one (Lemma 4.16 gives no concrete choice), so the statement is existential in `M`.  For
 that `M`, the order-operator-density expectations obey the symmetry-breaking relations.
 
 Per Tasaki footnote 21, the rigorous forms of (4.2.12)/(4.2.13) are `liminf`, so we state the sound
@@ -363,8 +363,8 @@ along axes `2, 3` both vanish — so the order-operator density behaves as a cla
 magnitude `mStar` pointing in `(1,0,0)`, with vanishing fluctuation.
 
 The order parameter `mStar` is recorded as an existential real (`> 0`); its identity with the double
-limit (4.2.9) and the inequality `mStar ≥ √(3 q₀)` (Theorem 4.11) are kept separate.  Conditional on
-long-range order (same `q₀` premise as Theorem 4.6), hence vacuous in one dimension by Corollary 4.3.
+limit (4.2.9) and the inequality `mStar ≥ √(3 q₀)` (Theorem 4.11) are kept separate.  Conditional
+on long-range order (same `q₀` premise as Theorem 4.6), hence vacuous in d=1 by Corollary 4.3.
 Tasaki gives the complete proof (§4.2.2, following Tanaka [62]); recorded here as a faithful, sound
 documented axiom over the torus family. -/
 axiom tanakaSSB_full_symmetry_breaking (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
