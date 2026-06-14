@@ -269,6 +269,13 @@ noncomputable def coupledCrossCorrelation (d L : ℕ) [NeZero L] (x : Hypercubic
     ManyBodyOpS (CoupledSite d L) 1 :=
   spinSSiteOpPlus (x, false) 1 * spinSSiteOpMinus (x, true) 1
 
+/-- The **conjugate inter-condensate correlation operator** `â_{(x,a)} â_{(x,b)}^†` (the observable
+of eq. (5.5.6)), in spin form `Ŝ_{(x,a)}^− Ŝ_{(x,b)}^+` — the adjoint of `coupledCrossCorrelation`,
+annihilating a particle in `a` at `x` and creating one in `b` at `x`. -/
+noncomputable def coupledCrossCorrelationConj (d L : ℕ) [NeZero L] (x : HypercubicTorus d L) :
+    ManyBodyOpS (CoupledSite d L) 1 :=
+  spinSSiteOpMinus (x, false) 1 * spinSSiteOpPlus (x, true) 1
+
 /-- **Tasaki Theorem 5.4 (symmetry breaking in coupled Bose–Einstein condensates), AXIOM.**  Two
 hard-core boson condensates on copies `Λ_a`, `Λ_b` of the torus are weakly coupled by the tunneling
 Hamiltonian (strength `ε`), with the total particle number fixed at `2N` (the doubled half filling
@@ -276,9 +283,10 @@ Hamiltonian (strength `ε`), with the total particle number fixed at `2N` (the d
 (eq. (5.2.5), Theorem 5.1 — supplied as the hypothesis `hODLRO`, which ties `q₀` to the genuine
 order parameter of the uncoupled XY ground states), the unique ground state `Φ^ε` develops a
 **definite relative `U(1)` phase** between the two condensates: there is an order parameter `m̃`,
-with `m̃ ≥ m∗ ≥ √(2 q₀)`, such that (eqs. (5.5.5)–(5.5.6))
-`lim_{ε↓0} lim_{L↑∞} ⟨Φ^ε, â_{(x,a)}^† â_{(x,b)} Φ^ε⟩ / ⟨Φ^ε, Φ^ε⟩ = m̃² e^{−iφ}`,
-for any `x ∈ ℤ^d`.
+with `m̃ ≥ m∗ ≥ √(2 q₀)`, such that for any `x ∈ ℤ^d`
+`lim_{ε↓0} lim_{L↑∞} ⟨Φ^ε, â_{(x,a)}^† â_{(x,b)} Φ^ε⟩ / ⟨Φ^ε, Φ^ε⟩ = m̃² e^{−iφ}` (eq. (5.5.5)) and
+the conjugate `lim_{ε↓0} lim_{L↑∞} ⟨Φ^ε, â_{(x,a)} â_{(x,b)}^† Φ^ε⟩ / ⟨Φ^ε, Φ^ε⟩ = m̃² e^{+iφ}`
+(eq. (5.5.6)).
 
 The two condensates are thus coupled coherently (entangled) with a fixed relative phase `φ`.  The
 ground state `Φ^ε` is a *given* family (unique per `(ε, L)` by a Marshall–Lieb–Mattis argument:
@@ -306,6 +314,8 @@ axiom tasaki_5_4_coupled_bec_ssb (d : ℕ) (hd : 2 ≤ d) (φ q₀ : ℝ) (hq₀
       ∀ ε' : ℝ, 0 < ε' → ∃ ε₀ : ℝ, 0 < ε₀ ∧ ∀ ε : ℝ, 0 < ε → ε < ε₀ →
         ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
           ‖expectationRatioComplex (coupledCrossCorrelation d L (torusEmbed d L x)) (Φ ε L)
-            - ((mtilde ^ 2 : ℝ) : ℂ) * Complex.exp (-(Complex.I * (φ : ℂ)))‖ < ε'
+            - ((mtilde ^ 2 : ℝ) : ℂ) * Complex.exp (-(Complex.I * (φ : ℂ)))‖ < ε' ∧
+          ‖expectationRatioComplex (coupledCrossCorrelationConj d L (torusEmbed d L x)) (Φ ε L)
+            - ((mtilde ^ 2 : ℝ) : ℂ) * Complex.exp (Complex.I * (φ : ℂ))‖ < ε'
 
 end LatticeSystem.Quantum
