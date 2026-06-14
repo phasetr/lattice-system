@@ -101,7 +101,7 @@ The vanishing of the fluctuation is the law of large numbers for densities — t
 macroscopically "healthy" state.  (`Â` self-adjoint makes `ρ(Â_L)` and `ρ(Â_L²)` real, so the real
 parts carry the content; the index is shifted by one to avoid the empty `L = 0` box.) -/
 def IsErgodic (S : InfiniteSpinSystem d A) (ρ : WeakDual ℂ A) : Prop :=
-  TranslationInvariant S ρ ∧
+  LatticeSystem.Math.IsState ρ ∧ TranslationInvariant S ρ ∧
     ∀ Â : A, IsSelfAdjoint Â →
       Filter.Tendsto
         (fun L : ℕ =>
