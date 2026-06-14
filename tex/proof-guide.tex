@@ -7821,6 +7821,19 @@ form over normalized energy-minimizing ground states (so the per-site bound is s
 Tasaki states Theorem 4.2 without proof (Shastry's argument [58], rigorously formulated in [63]); the
 deep infinite-volume argument is deferred (in scope).  Chapters~3--10 backfill.
 
+\noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
+\texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
+dimension: for the zero-field 1D spin-$S$ antiferromagnetic Heisenberg ring, the squared staggered
+order parameter per site vanishes in the thermodynamic limit,
+$\lim_{L\uparrow\infty}\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(3)}/L)^2|\Phi_{\mathrm{GS}}\rangle=0$
+(eq.~(4.1.11)).  We record \texttt{no\_long\_range\_order\_1d} in explicit $\varepsilon$--$\delta$ form
+over the zero-field ring family with normalized ground states.  In Tasaki this is a corollary of
+Shastry's Theorem 4.2 together with the Kaplan--Horsch--von der Linden theorem (Theorem 3.2) and the
+Marshall--Lieb--Mattis theorem (Theorem 2.2); the derivation runs through the double-limit form of
+Theorem 3.2 (only its finite-volume variational core is formalized here) and the axiom Theorem 4.2,
+so it is recorded as a faithful documented axiom (deep infinite-volume argument deferred, in scope).
+Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
