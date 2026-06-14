@@ -149,4 +149,50 @@ theorem generalFlatBand_not_basisConnected_of_blockReducible
   intro hconn
   exact hb (hclosed (hconn.preconnected ⟨za, hzaI⟩ ⟨zb, hzbI⟩) ha)
 
+/-- **Support powers stay inside a block**: if `(P₀)_{yx} = 0` across a coordinate cut `W`, then for
+active sites `i` with `i.1 ∈ W` and `j` with `j.1 ∉ W`, every power `(support^k)_{ij} = 0`.  The base
+case is the support entry itself (`|(P₀)_{ij}|² = 0` since `P₀` is Hermitian and vanishes across `W`);
+the induction splits the intermediate vertex `l` by side. -/
+theorem generalFlatBand_support_pow_eq_zero_across_block
+    (W : Finset (Fin (M + 1)))
+    (hblock : ∀ x ∈ W, ∀ y ∉ W, generalFlatBandProjectionMatrix T y x = 0)
+    (k : ℕ) (i j : generalFlatBandActiveSites T) (hi : i.1 ∈ W) (hj : j.1 ∉ W) :
+    (generalFlatBandProjectionSupportMatrix T ^ k) i j = 0 := by
+  have hbase : ∀ (a b : generalFlatBandActiveSites T), a.1 ∈ W → b.1 ∉ W →
+      generalFlatBandProjectionSupportMatrix T a b = 0 := by
+    intro a b ha hb
+    show Complex.normSq (generalFlatBandProjectionMatrix T a.1 b.1) = 0
+    rw [Complex.normSq_eq_zero]
+    have h := hblock a.1 ha b.1 hb
+    have h2 := (generalFlatBandProjectionMatrix_isHermitian T).apply b.1 a.1
+    rw [h] at h2
+    exact star_eq_zero.mp h2
+  induction k generalizing j with
+  | zero =>
+    rw [pow_zero, Matrix.one_apply, if_neg]
+    intro hij; rw [hij] at hi; exact hj hi
+  | succ n ih =>
+    rw [pow_succ, Matrix.mul_apply]
+    refine Finset.sum_eq_zero (fun l _ => ?_)
+    by_cases hl : l.1 ∈ W
+    · rw [hbase l j hl hj, mul_zero]
+    · rw [ih l hl, zero_mul]
+
+/-- **A block-reducible projection is not irreducible**: if `P₀` is block-reducible then the support
+matrix on the active sites is not irreducible.  The two active sites of the cut never connect: every
+power of the support matrix vanishes between them (`generalFlatBand_support_pow_eq_zero_across_block`),
+contradicting `isIrreducible_iff_exists_pow_pos`. -/
+theorem generalFlatBand_not_projectionIrreducible_of_blockReducible
+    (hred : generalFlatBandProjectionBlockReducible T) :
+    ¬ generalFlatBandProjectionIrreducible T := by
+  obtain ⟨W, ⟨xa, hxaW, hxaA⟩, ⟨yb, hybW, hybA⟩, hblock⟩ := hred
+  intro hirr
+  have hnonneg : ∀ i j, 0 ≤ generalFlatBandProjectionSupportMatrix T i j :=
+    fun i j => Complex.normSq_nonneg _
+  obtain ⟨k, _, hpos⟩ :=
+    ((isIrreducible_iff_exists_pow_pos hnonneg).mp hirr) ⟨xa, hxaA⟩ ⟨yb, hybA⟩
+  rw [generalFlatBand_support_pow_eq_zero_across_block T W hblock k
+    ⟨xa, hxaA⟩ ⟨yb, hybA⟩ hxaW hybW] at hpos
+  exact lt_irrefl 0 hpos
+
 end LatticeSystem.Fermion
