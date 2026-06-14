@@ -127,6 +127,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularFerromagnetism
 import LatticeSystem.Fermion.JordanWigner.Hubbard.FermionSiteSpin
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GroundSubspaceAtFilling
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardFerromagnetismStructure
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowU
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJModel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSpinSymmetry
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSpinSymmetryRaising
