@@ -1,5 +1,6 @@
 import LatticeSystem.Math.AnticommuteCommute
 import LatticeSystem.Math.ComplexVectorKernel
+import LatticeSystem.Math.GramEigenspaceCorrespondence
 import LatticeSystem.Math.ListProdMulVec
 import LatticeSystem.Math.EigenspaceWeightFinrank
 import LatticeSystem.Math.RayleighPosSemidefKernel
