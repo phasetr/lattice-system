@@ -8031,6 +8031,16 @@ $\tau_x$ (\texttt{transl}, bundled star-algebra isomorphisms with the action law
 for every nearest-neighbor bond, the infinite-volume variational characterization restricted to
 translation-invariant states.  Chapters~3--10 backfill.
 
+\noindent\textbf{Definitions 4.18 and 4.19} (Tasaki §4.3.1, eqs.~(4.3.5)--(4.3.6), pp.~114--115;
+\texttt{Quantum/SpinS/InfiniteVolumeGroundState.lean}, Issue \#4485).  \emph{Ergodic} and
+\emph{physical} ground states.  With the bulk operator $\hat A_L=\sum_{x\in\Lambda_L\cap\mathbb{Z}^d
+_{\mathrm{even}}}\tau_x(\hat A)$ (\texttt{bulkOp} over \texttt{latticeBox} $\Lambda_n=\{-n<x_i\le n\}$ (side $2n$), eq.~(4.3.5)), a
+translation-invariant state $\rho$ is \emph{ergodic} (\texttt{IsErgodic}) iff for every self-adjoint
+$\hat A$ the fluctuation of the density $\hat A_L/L^d$ vanishes, $\rho(\hat A_L^2)/(L^d)^2-
+(\rho(\hat A_L)/L^d)^2\to0$ (eq.~(4.3.6), the law of large numbers).  A translation-invariant ground
+state is a \emph{physical ground state} (\texttt{IsPhysicalGroundState}) iff it is ergodic
+(Definition 4.19).  Both are \texttt{def}-level Props.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
