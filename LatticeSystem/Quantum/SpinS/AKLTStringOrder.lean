@@ -9,9 +9,11 @@ order**: if one deletes the `0`'s (the `Ŝ^z = 0` sites) from a typical spin con
 remaining `+`'s and `−`'s alternate perfectly.  Den Nijs and Rommelse measured this through the
 **string order parameter** (eqs. (7.2.6)–(7.2.7))
 `S^{(3)}_{x,y}(Φ) := −⟨Φ| Ŝ_x^{(3)} exp(iπ Σ_{x<z<y} Ŝ_z^{(3)}) Ŝ_y^{(3)} |Φ⟩`,
-`O_string^{(3)}(Φ) := −lim_{y−x↑∞} lim_{L↑∞} S^{(3)}_{x,y}(Φ)`,
-where the *string* `exp(iπ Ŝ_z^{(3)})` of phase operators sits between `x` and `y`.  The two leading
-minus signs cancel, so `O_string^{(3)}(Φ) = lim lim ⟨Φ| Ŝ_x^{(3)} exp(iπ Σ Ŝ^{(3)}) Ŝ_y^{(3)} |Φ⟩`.
+`O_string^{(3)}(Φ) := lim_{y−x↑∞} lim_{L↑∞} S^{(3)}_{x,y}(Φ)`,
+where the *string* `exp(iπ Ŝ_z^{(3)})` of phase operators sits between `x` and `y`.  The raw
+expectation `⟨Φ| Ŝ_x^{(3)} exp(iπ Σ Ŝ^{(3)}) Ŝ_y^{(3)} |Φ⟩` is negative for the hidden-ordered state
+(it tends to `−4/9` for the VBS state), so the leading minus in `S^{(3)}_{x,y}` makes the string
+order parameter positive.
 
 For the VBS state the string order parameter is **positive** — explicitly (eq. (7.2.8))
 `O_string^{(1)}(Φ_VBS) = O_string^{(2)}(Φ_VBS) = O_string^{(3)}(Φ_VBS) = 4/9 > 0`
@@ -53,12 +55,14 @@ noncomputable def stringOperatorS (x y : Fin L) : ManyBodyOpS (Fin L) 2 :=
     ∏ z ∈ Finset.univ.filter fun z : Fin L => x.val < z.val ∧ z.val < y.val,
       (-1 : ℂ) ^ ((σ z).val + 1)
 
-/-- The **finite-volume string correlation** `⟨Φ| Ŝ_x^{(3)} exp(iπ Σ_{x<z<y} Ŝ_z^{(3)}) Ŝ_y^{(3)}
-|Φ⟩` (a Rayleigh ratio).  This is `−S^{(3)}_{x,y}(Φ)` in the notation of eq. (7.2.6); with the two
-minus signs of eqs. (7.2.6)–(7.2.7), the den Nijs–Rommelse string order parameter is
-`O_string^{(3)}(Φ) = lim_{y−x↑∞} lim_{L↑∞}` of this quantity. -/
+/-- The **den Nijs–Rommelse string correlation** `S^{(3)}_{x,y}(Φ) := −⟨Φ| Ŝ_x^{(3)} exp(iπ
+Σ_{x<z<y} Ŝ_z^{(3)}) Ŝ_y^{(3)} |Φ⟩` (eq. (7.2.6); a Rayleigh ratio with the leading minus sign).
+The raw expectation `⟨Ŝ_x^{(3)} exp(iπ Σ Ŝ^{(3)}) Ŝ_y^{(3)}⟩` is *negative* for the hidden-ordered
+state (it tends to `−4/9` for the VBS state), so the leading minus makes the string correlation
+positive; the string order parameter `O_string^{(3)}(Φ) = lim_{y−x↑∞} lim_{L↑∞} S^{(3)}_{x,y}(Φ)`
+equals `+4/9 > 0` for the VBS state. -/
 noncomputable def stringCorrelationS (x y : Fin L) (Φ : (Fin L → Fin 3) → ℂ) : ℝ :=
-  expectationRatioRe (spinSSiteOp3 x 2 * stringOperatorS x y * spinSSiteOp3 y 2) Φ
+  -expectationRatioRe (spinSSiteOp3 x 2 * stringOperatorS x y * spinSSiteOp3 y 2) Φ
 
 /-- **The AKLT VBS ground-state family marker** `IsAKLTVBSGroundStateFamily Φ`: the family `Φ L` is
 the unique valence-bond-solid ground state of the AKLT chain `akltHamiltonianS L` for each ring
@@ -68,8 +72,9 @@ axiom IsAKLTVBSGroundStateFamily (Φ : (L : ℕ) → (Fin L → Fin 3) → ℂ) 
 
 /-- **Tasaki §7.2.1 hidden antiferromagnetic order (eq. (7.2.8)), AXIOM.**  For the AKLT VBS
 ground-state family, the den Nijs–Rommelse string order parameter equals `4/9`:
-`O_string^{(3)}(Φ_VBS) = lim_{d↑∞} lim_{L↑∞} ⟨Φ_L| Ŝ_x^{(3)} exp(iπ Σ Ŝ^{(3)}) Ŝ_y^{(3)} |Φ_L⟩
-= 4/9`,
+`O_string^{(3)}(Φ_VBS) = lim_{d↑∞} lim_{L↑∞} S^{(3)}_{x,y}(Φ_L) = 4/9`
+(`S^{(3)}_{x,y} = stringCorrelationS` is the string correlation *with* the leading minus, so the raw
+expectation tends to `−4/9` and the order parameter to `+4/9`),
 written in the explicit double-`ε` form (the inner thermodynamic limit `L↑∞` taken before the
 separation limit `d = y − x ↑∞`, over ordered linear windows `0 < x < y < L` as in eq. (7.2.6),
 matching the linear interval of `stringOperatorS`).  Since `4/9 > 0`, the VBS state has **positive
