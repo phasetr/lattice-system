@@ -82,7 +82,7 @@ def IsInfiniteVolumeGroundState (S : InfiniteSpinSystem d A) (εGS : ℝ) (ρ : 
   LatticeSystem.Math.IsState ρ ∧ TranslationInvariant S ρ ∧
     ∀ x y : Fin d → ℤ, bond x y → ρ (spinDot S x y) = (εGS : ℂ)
 
-instance : DecidablePred (evenSite (d := d)) := fun x => Int.decEq _ _
+instance : DecidablePred (evenSite (d := d)) := fun x => Int.decEq ((∑ i, x i) % 2) 0
 
 /-- The finite box `Λ_L = [0, L)ᵈ ⊆ ℤᵈ` (volume `Lᵈ`), as a `Finset`. -/
 noncomputable def latticeBox (d L : ℕ) : Finset (Fin d → ℤ) :=
