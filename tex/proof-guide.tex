@@ -7863,6 +7863,25 @@ the two reflections (\texttt{reindexCyclic}, \texttt{reflectLeft}, \texttt{refle
 intricate (a doubling induction on the number of leading equal entries), so the lemma is a
 \emph{finite-dimensional discharge candidate}.  Chapters~3--10 backfill.
 
+\noindent\textbf{Theorem 4.6} (Koma--Tasaki, Tasaki §4.2.1, eqs.~(4.2.2)--(4.2.4), pp.~93--95;
+documented axiom, \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  Anderson's tower of
+low-lying states: for the $d$-dimensional hypercubic antiferromagnetic Heisenberg model with
+long-range order, the trial states $\Gamma_M=(\hat O_L^+)^M|\Phi_{\mathrm{GS}}\rangle/\lVert\cdot
+\rVert$ built from the staggered raising operator $\hat O_L^+=\sum_x\varepsilon_x\hat S_x^+$
+(eq.~(4.2.2)) lie in the $\hat S_{\mathrm{tot}}^{(3)}=M$ sector and, for $|M|\le C_1 L^{d/2}$, have
+energy $\langle\Gamma_M|\hat H|\Gamma_M\rangle\le E_{\mathrm{GS}}+C_2 M^2/L^d$ (eq.~(4.2.4)) --- an
+$O(L^{d/2})$ family of low-lying states, the rigorous Anderson tower.  To state this soundly (a
+uniform $C_2$ exists only for the genuine translation-invariant family) we build the $d$-dimensional
+hypercubic torus model: vertices $\texttt{HypercubicTorus}\,d\,L=\mathrm{Fin}\,d\to\mathbb{Z}/L$
+($L^d$ sites, \texttt{card\_hypercubicTorus}), the nearest-neighbor coupling
+\texttt{torusNNCoupling}, the parity (N\'eel) sublattice \texttt{torusParitySublattice}, and the
+staggered raising/lowering operators \texttt{staggeredRaisingOpS}/\texttt{staggeredLoweringOpS}.  The
+axiom \texttt{tower\_lowLying\_energy\_bound} states eq.~(4.2.4) in scale-invariant Rayleigh-ratio
+form over the torus family.  The statement is \emph{conditional on long-range order} (a $q_0>0$
+premise bounding the staggered order parameter per site from below), hence vacuous in one dimension by
+Corollary 4.3, exactly as in Tasaki.  The deep reflection-positivity / infinite-volume construction is
+deferred (in scope).  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
