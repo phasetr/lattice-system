@@ -302,4 +302,29 @@ theorem generalFlatBand_kernel_eq_sup {I : Finset (Fin (M + 1))}
   rw [generalFlatBand_kernel_eq_span T hbasis, ← Submodule.span_union, ← Set.image_union,
     Set.union_compl_self, Set.image_univ]
 
+/-- **The two sides of a disjoint-support cut span orthogonal subspaces**: if every `μ_z` (`z ∈ S`)
+and `μ_{z'}` (`z' ∈ Sᶜ`) have disjoint site supports, then `span{μ_z : z ∈ S} ⊥ span{μ_z : z ∈ Sᶜ}`.
+Each generator pair is orthogonal (`generalFlatBand_mu_orthogonal_of_disjoint_support`), and
+orthogonality lifts through the span on both sides.  For a saturated basis cut the hypothesis is
+supplied by `generalFlatBand_no_shared_site_of_saturated`. -/
+theorem generalFlatBand_side_subspaces_orthogonal {I : Finset (Fin (M + 1))}
+    (μ : Fin (M + 1) → Fin (M + 1) → ℂ) (S : Set ↥I)
+    (hdisj : ∀ z ∈ S, ∀ z' ∈ Sᶜ, ∀ x, μ z.1 x = 0 ∨ μ z'.1 x = 0) :
+    Submodule.span ℂ ((fun z : ↥I =>
+        (WithLp.toLp 2 (μ z.1) : EuclideanSpace ℂ (Fin (M + 1)))) '' S)
+      ≤ (Submodule.span ℂ ((fun z : ↥I =>
+        (WithLp.toLp 2 (μ z.1) : EuclideanSpace ℂ (Fin (M + 1)))) '' Sᶜ))ᗮ := by
+  rw [Submodule.span_le]
+  rintro _ ⟨z, hzS, rfl⟩
+  rw [SetLike.mem_coe, Submodule.mem_orthogonal]
+  intro v hv
+  induction hv using Submodule.span_induction with
+  | mem w hw =>
+    obtain ⟨z', hz'S, rfl⟩ := hw
+    exact generalFlatBand_mu_orthogonal_of_disjoint_support μ z'.1 z.1
+      (fun x => (hdisj z hzS z' hz'S x).symm)
+  | zero => rw [inner_zero_left]
+  | add a b _ _ ha hb => rw [inner_add_left, ha, hb, add_zero]
+  | smul c a _ ha => rw [inner_smul_left, ha, mul_zero]
+
 end LatticeSystem.Fermion
