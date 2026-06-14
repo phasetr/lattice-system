@@ -7958,6 +7958,16 @@ $m^\ast$.  These hypotheses are
 unsatisfiable in $d=1$ (no LRO ground state, Corollary~4.3), so the bound $\sqrt{3q_0}\le m^\ast$
 applies exactly where intended (and $m^\ast>0$ follows).  Chapters~3--10 backfill.
 
+\noindent\textbf{Conjecture 4.12} (Koma--Tasaki, Tasaki §4.2.1, eqs.~(4.2.25)--(4.2.26), pp.~101--102;
+axiom-free \texttt{Prop} statement, \texttt{Quantum/SpinS/AndersonTowerSphereAverage.lean}, Issue
+\#4485).  The symmetry-breaking and long-range-order parameters are conjectured to coincide,
+$m^\ast=\sqrt{3q^\ast}$ (where $q^\ast=\lim_L\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(\alpha)}/L^d)^2
+|\Phi_{\mathrm{GS}}\rangle$, eq.~(4.2.25)).  Being \emph{unproven}, it is registered as
+\texttt{def conjecture\_4\_12 (d N) : Prop} --- the statement quantified over a realizing ground-state
+family (with LRO limit $q^\ast$ and SSB order parameter $m^\ast$ via \texttt{IsTanakaFullSSBConstants})
+--- and is \textbf{never asserted true} (no \texttt{axiom}/\texttt{theorem} derives it, which would be
+unsound).  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}

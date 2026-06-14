@@ -66,10 +66,43 @@ noncomputable def solidAngleAverageTanaka (d L N M : ℕ) [NeZero L]
     directionTanakaState (n : EuclideanSpace ℝ (Fin 3)) (torusParitySublattice d L) N M Φ
       ∂(MeasureTheory.volume.toSphere)
 
-/-- **Conjecture 4.12 (eq. (4.2.26)), as a `Prop` statement only** (never asserted true here): the
+/-- **Conjecture 4.12 (eq. (4.2.26)), core equality as a `Prop`** (never asserted true): the
 symmetry-breaking order parameter and the long-range-order parameter coincide, `m∗ = √(3 q∗)`. -/
 def IsConjecture412Equality (mStar qStar : ℝ) : Prop :=
   mStar = Real.sqrt (3 * qStar)
+
+/-- **Tasaki Conjecture 4.12 (the SSB and LRO order parameters coincide), as a `Prop` STATEMENT
+ONLY** (eqs. (4.2.25)–(4.2.26)).  This registers the *unproven* conjecture as a numbered, searchable
+item; it is a `def … : Prop` and is **never asserted true** (no `axiom`/`theorem` derives it — that
+would be unsound, the conjecture being open).
+
+The statement: for the `d`-dimensional hypercubic antiferromagnetic Heisenberg model, whenever a
+genuine realizing ground-state family `Φ` (eventual minimizer, nonzero, well-defined Tanaka terms,
+realizing slowly-diverging tower `M`) has long-range-order limit `q∗` (`hLRO`, eq. (4.2.25)) and the
+Tanaka state has staggered-moment limit `m∗` (`hSSB`, eq. (4.2.12)) with `m∗` the genuine SSB order
+parameter (`IsTanakaFullSSBConstants`), then `m∗ = √(3 q∗)` (eq. (4.2.26)).  Tasaki believes this is
+very likely valid but it is far from proven; we record it without asserting it. -/
+def conjecture_4_12 (d N : ℕ) : Prop :=
+  ∀ (q₀ mStar C₁ : ℝ), 0 < q₀ → 0 < C₁ →
+    ∀ (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ) (M : ℕ → ℕ),
+      Tendsto M atTop atTop →
+      (∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
+        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec (Φ L) = E₀ L • Φ L ∧
+        (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+          (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
+        Φ L ≠ 0 ∧
+        0 < M L ∧ ((M L : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) ∧
+        0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L) (Φ L)) ∧
+        0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L + 1) (Φ L)) ∧
+        0 < vecNormSqRe (tanakaSSBState (torusParitySublattice d L) N (M L) (Φ L))) →
+      (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+        |(star (Φ L) ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
+            staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
+            ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2) - q₀| < ε) →
+      (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+        |tanakaOrderMean1 d L N (M L) (Φ L) - mStar| < ε) →
+      IsTanakaFullSSBConstants d N q₀ C₁ mStar →
+      IsConjecture412Equality mStar q₀
 
 /-- The Proposition 4.10 statement for fixed constants.  For a given ground-state family `Φ` (with
 the minimizer / long-range-order conditions eventual) and the *actual* long-range-order limit `qStar`
