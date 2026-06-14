@@ -256,11 +256,15 @@ noncomputable def tunnelHamiltonian (d L : ℕ) [NeZero L] (φ : ℝ) :
         (spinSSiteOpMinus (x, false) 1 * spinSSiteOpPlus (x, true) 1))
 
 /-- The **total coupled Hamiltonian** `Ĥ_tot^ε = Ĥ_a + Ĥ_b + ε Ĥ_tunnel` (eq. (5.5.1)): the two
-uncoupled XY copies (via `sameSpeciesNNCoupling`, at anisotropy `λ = D = 0`) plus the tunneling term
-of strength `ε ≥ 0`. -/
+uncoupled hard-core boson copies `Ĥ_a + Ĥ_b = 2 (Ĥ_XY,a + Ĥ_XY,b)` (the boson dictionary
+`Ĥ = 2 Ĥ_XY`, eq. (5.1.7), consistent with `xyChemicalPotentialHamiltonianS`; via
+`sameSpeciesNNCoupling` at
+anisotropy `λ = D = 0`) plus the tunneling term of strength `ε ≥ 0`.  The factor `2` keeps `ε` equal
+to Tasaki's tunneling strength relative to the boson Hamiltonians. -/
 noncomputable def coupledHamiltonian (d L : ℕ) [NeZero L] (φ ε : ℝ) :
     ManyBodyOpS (CoupledSite d L) 1 :=
-  anisotropicHeisenbergS (sameSpeciesNNCoupling d L) 0 0 1 + (ε : ℂ) • tunnelHamiltonian d L φ
+  (2 : ℂ) • anisotropicHeisenbergS (sameSpeciesNNCoupling d L) 0 0 1 +
+    (ε : ℂ) • tunnelHamiltonian d L φ
 
 /-- The **inter-condensate correlation operator** `â_{(x,a)}^† â_{(x,b)}` (the observable of
 eqs. (5.5.5)/(5.5.6)), in spin form `Ŝ_{(x,a)}^+ Ŝ_{(x,b)}^−` — it annihilates a particle in
