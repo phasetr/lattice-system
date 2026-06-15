@@ -4626,6 +4626,27 @@ linearly independent, i.e.\ iff the $\varphi^{(j)}$ are. This part
 (\texttt{slaterGram\_self\_det\_ne\_zero\_iff}) is proved axiom-free; the
 full lemma depends only on the Lemma 9.1 axiom.
 
+\medskip
+\noindent\textbf{Lemma 9.3} (Tasaki §9.2.3, pp.~320--321). If
+$\{\varphi^{(j)}\}$ and $\{\psi^{(j)}\}$ span the same $N$-dimensional
+subspace, then their Slater determinant states are proportional by a
+nonzero constant: there is $c \neq 0$ with $|\Psi\rangle = c\,|\Phi\rangle$
+(\texttt{lemma\_9\_3\_slater\_proportional\_of\_span\_eq}).
+
+\emph{Proof.} Write $\psi^{(j)} = \sum_k \beta_{j,k}\,\varphi^{(k)}$ via
+the change matrix $\beta$ (\texttt{slaterChangeMatrix}). Then
+$G(\chi,\psi) = G(\chi,\varphi)\,\beta^{\mathsf T}$, so by Lemma 9.1 and
+determinant multiplicativity
+$\langle \Phi_\chi, \Phi_\psi\rangle = \det(\beta)\,
+\langle \Phi_\chi, \Phi_\varphi\rangle$ for every $\chi$
+(\texttt{fockInner\_slater\_change}). Set $c = \det\beta$ and
+$w = |\Psi\rangle - c\,|\Phi\rangle$. Taking $\chi = \varphi$ and
+$\chi = \psi$ shows $w$ is orthogonal to both $|\Phi\rangle$ and
+$|\Psi\rangle$, hence to itself, so $\langle w, w\rangle = 0$ and $w = 0$
+by positive-definiteness of the Fock inner product. Finally $c \neq 0$,
+since $|\Psi\rangle \neq 0$ by Lemma 9.2 applied to the linearly
+independent $\psi$. The lemma depends only on the Lemma 9.1 axiom.
+
 \subsection{Hubbard spin symmetry: U(1)\texorpdfstring{$\times$}{×}U(1) invariance (Tasaki §9.3.3)}
 \label{subsec:hubbard-spin-symmetry}
 
