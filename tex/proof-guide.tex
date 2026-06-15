@@ -8421,6 +8421,17 @@ Both are Hermitian for real $J$ (\texttt{boxHeisenbergHamiltonianS\_isHermitian}
 $L\uparrow\infty$ thermodynamic limit is the §4.3 infinite-volume system \texttt{InfiniteSpinSystem},
 the boxes $\Lambda_n\uparrow\mathbb{Z}^d$ providing the exhaustion.  All proved (no axioms).
 
+\smallskip\noindent\emph{Finite-volume ground-state energy (Issue \#4564, PR1).}  The
+\textbf{finite-volume ground-state energy} $E_{\mathrm{GS},n}=\texttt{boxGroundEnergyS}\,d\,n\,N$ is
+the least eigenvalue of the Hermitian box AFM Hamiltonian (via \texttt{hermitianMinEigenvalue}, so
+$E_{\mathrm{GS},n}\le$ every eigenvalue, \texttt{boxGroundEnergyS\_le\_eigenvalues}); the
+\textbf{bond count} $|B_n|=\texttt{boxBondCount}\,d\,n$ is the number of edges of
+\texttt{hypercubicBoxGraph}\,$d\,n$; and the \textbf{finite-volume energy density}
+$E_{\mathrm{GS},n}/|B_n|=\texttt{boxGroundEnergyDensityS}\,d\,n\,N$ (eq.~(4.3.4)) is the quantity whose
+$L\uparrow\infty$ limit is the infinite-volume energy density $\varepsilon_{\mathrm{GS}}$ (recorded
+separately as a documented axiom).  All proved (no axioms); the limit content is the
+operator-algebraic part deferred to faithful axioms.
+
 \medskip
 \noindent\textbf{Theorem 4.22} (Tasaki §4.4.1, eqs.~(4.4.1)--(4.4.6), pp.~117--119; documented
 axioms, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  The one-dimensional
