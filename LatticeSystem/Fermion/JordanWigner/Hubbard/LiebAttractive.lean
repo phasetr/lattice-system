@@ -4,12 +4,12 @@ import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
 import Mathlib.Combinatorics.SimpleGraph.Connectivity.Connected
 
 /-!
-# Lieb's theorem for the attractive Hubbard model (Tasaki §10.2.1, Theorems 10.2 & 10.3)
+# Lieb's theorem for the attractive Hubbard model (Tasaki §10.2.1, Theorem 10.2)
 
-This file formalizes the statements of **Tasaki Theorem 10.2** (Lieb's
-theorem for the attractive Hubbard model) and **Theorem 10.3** (Tian's
-pair-correlation positivity), from Hal Tasaki, *Physics and Mathematics of
-Quantum Many-Body Systems*, 1st ed., Springer 2020, §10.2.1, pp. 348–349.
+This file formalizes the statement of **Tasaki Theorem 10.2** (Lieb's
+theorem for the attractive Hubbard model), from Hal Tasaki, *Physics and
+Mathematics of Quantum Many-Body Systems*, 1st ed., Springer 2020, §10.2.1,
+p. 348.
 
 The attractive Hubbard model has Hamiltonian `Ĥ = Ĥhop + Ĥatt-int` with an
 arbitrary real symmetric connected hopping matrix `T` (arbitrary on-site
@@ -18,18 +18,20 @@ energies allowed) and on-site attraction `Ĥatt-int = −Σ_x U_x n̂_{x,↑} n�
 
 * **Theorem 10.2**: for even electron number `N` with `0 < N ≤ 2|Λ|`, the
   ground state is unique and has total spin `S_tot = 0`.
-* **Theorem 10.3**: the pair-transfer correlation
-  `⟨ΦGS| ĉ†_{x,↑} ĉ†_{x,↓} ĉ_{y,↓} ĉ_{y,↑} |ΦGS⟩` is strictly positive
-  (a measure of off-diagonal long-range order).
+
+This file also sets up the pair-transfer operator `hubbardPairCorrelationOp`
+and `euclideanExpectation` used to state Theorem 10.3 (Tian's
+pair-correlation positivity); the Theorem 10.3 statement itself is added in
+a follow-up PR.
 
 ## Status
 
-Both are proved by Lieb's spin-space reflection-positivity method (and
-Tian's extension); per the project policy these deep reflection-positivity
-results are recorded as faithful documented `axiom`s, built on a concrete
-attractive Hubbard Hamiltonian. The general hopping kinetic term reuses the
-existing `hubbardKinetic`; the unique-ground-state predicate reuses
-`IsUniqueGroundStateOn` from the degenerate-perturbation development.
+Theorem 10.2 is proved by Lieb's spin-space reflection-positivity method (a
+deep result); per the project policy it is recorded as a faithful documented
+`axiom`, built on a concrete attractive Hubbard Hamiltonian. The general
+hopping kinetic term reuses the existing `hubbardKinetic`; the
+unique-ground-state predicate reuses `IsUniqueGroundStateOn` from the
+degenerate-perturbation development.
 -/
 
 namespace LatticeSystem.Fermion
