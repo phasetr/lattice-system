@@ -347,6 +347,7 @@ import LatticeSystem.Quantum.SpinS.AnisotropicLargeD
 import LatticeSystem.Quantum.SpinS.KennedyTasakiTransformation
 import LatticeSystem.Quantum.SpinS.LambdaDModel
 import LatticeSystem.Quantum.SpinS.SPTPhase
+import LatticeSystem.Quantum.SpinS.SPTTopologicalIndex
 import LatticeSystem.Quantum.SpinS.AxisSwappedAnisotropicHeisenberg
 import LatticeSystem.Quantum.SpinS.ManyBodyTensorS
 import LatticeSystem.Quantum.SpinS.ManyBodyTensorConj
