@@ -34,6 +34,7 @@ theorem star_vecMul (U : Matrix n n ℂ) (v : n → ℂ) :
   simp
   ring
 
+omit [DecidableEq n] in
 /-- `rayleighOnVec` under unitary similarity: for any matrix `U`,
 `rayleighOnVec (U * M * Uᴴ) v = rayleighOnVec M (Uᴴ.mulVec v)`. -/
 theorem rayleighOnVec_unitary_conj (U M : Matrix n n ℂ) (v : n → ℂ) :

@@ -43,6 +43,7 @@ theorem norm_unit_vec_component_le_one
   have hsq_le : ‖v i‖ ^ 2 ≤ 1 := by rw [← hsum]; exact hge
   nlinarith [sq_nonneg (‖v i‖ - 1), sq_nonneg (‖v i‖ + 1), norm_nonneg (v i)]
 
+omit [Nonempty n] in
 /-- For any unit vector `v` (matrix-side `dotProduct (star v) v = 1`) and any matrix `M`,
 the absolute value of the Rayleigh quotient is bounded by the sum of matrix entry magnitudes:
 `|rayleighOnVec M v| ≤ Σ_{i,j} ‖M i j‖`. -/
@@ -79,6 +80,7 @@ theorem abs_rayleighOnVec_le_sum_entryNorms_of_unit
           (norm_unit_vec_component_le_one hunit j) (norm_nonneg _)
     _ = ∑ i, ∑ j, ‖M i j‖ := by simp
 
+omit [Nonempty n] in
 /-- `rayleighOnVec M` on the matrix-side unit sphere is bounded below by `-Σ_{i,j} ‖M i j‖`. -/
 theorem rayleighOnVec_bddBelow_on_unit_sphere (M : Matrix n n ℂ) :
     BddBelow (Set.range

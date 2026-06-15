@@ -30,7 +30,7 @@ namespace LatticeSystem.Quantum
 
 /-- `γ(t).1 < 1` for `t ∈ (0, 1]` and `λ' < 1`. -/
 theorem anisotropicHeisenbergParametricPath_fst_lt_one
-    {lam' D' : ℝ} (hlam' : lam' < 1) {t : ℝ} (ht_pos : 0 < t) (ht_le : t ≤ 1) :
+    {lam' D' : ℝ} (hlam' : lam' < 1) {t : ℝ} (ht_pos : 0 < t) (_ht_le : t ≤ 1) :
     (anisotropicHeisenbergParametricPath lam' D' t).1 < 1 := by
   unfold anisotropicHeisenbergParametricPath
   change (1 - t) + t * lam' < 1

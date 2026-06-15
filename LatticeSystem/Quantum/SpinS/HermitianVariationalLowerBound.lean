@@ -25,6 +25,7 @@ open Matrix
 
 variable {n : Type*} [Fintype n] [DecidableEq n] [Nonempty n]
 
+omit [Nonempty n] in
 /-- Sum of squared component norms of `Uᴴ v` equals `(dotProduct (star v) v).re`
 when `U` is the Hermitian eigenvectorUnitary. -/
 theorem sum_normSq_conjTranspose_eigenvectorUnitary_mulVec_eq
