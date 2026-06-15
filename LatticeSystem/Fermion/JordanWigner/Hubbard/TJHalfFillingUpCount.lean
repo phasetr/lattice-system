@@ -5,7 +5,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSwapReachable
 # Tasaki 11.5.3: half-filling ground amplitudes depend only on the up-count (Theorem 11.26 PR3i-3b)
 
 The per-bond spin-swap invariance (`tJ_ground_amplitude_swap_invariant`, PR3i-3a) propagates
-along the connected chain: any two half-filling configs with the same number of up-spins are connected
+along the connected chain: any two half-filling configs with the same number of up-spins are
+connected
 by adjacent value-swaps (`adjacentSwapReachable_of_same_counts`, from the Prop 11.24 route), each of
 which is an adjacent bond swap.  Hence:
 
@@ -80,7 +81,8 @@ theorem tJ_ground_amplitude_eq_of_reachable (τ J : ℝ) (hJ : 0 < J)
     exact ih.trans (tJ_ground_amplitude_eq_of_adjacentSwapStep τ J hJ hv hbfull hst)
 
 /-- **Adjacent-swap reachability from equal value-counts, for all `N`.**  The `N = 0` case (a single
-site) is degenerate: equal value-counts force the configs to be equal, so reachability is reflexive. -/
+site) is degenerate: equal value-counts force the configs to be equal, so reachability is
+reflexive. -/
 theorem adjacentSwapReachable_of_same_counts_general (s s' : Fin (N + 1) → Fin 3)
     (hcount : ∀ v, (Finset.univ.filter (fun k => s k = v)).card
         = (Finset.univ.filter (fun k => s' k = v)).card) :

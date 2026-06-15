@@ -3,7 +3,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorBasis
 /-!
 # Tasaki 11.5: the general single-hop matrix element on the sector basis (Prop 11.24 PR-B7-3d)
 
-The per-term hopping matrix element `⟨Φ_{s'} | ĉ†_{iσ}ĉ_{jσ} | Φ_s⟩` for *arbitrary* sites `i, j` and
+The per-term hopping matrix element `⟨Φ_{s'} | ĉ†_{iσ}ĉ_{jσ} | Φ_s⟩` for *arbitrary* sites `i, j`
+and
 spin `σ`, before any adjacency or allowed-hop assumption.  Reading off the single-hop action
 (`fermionMultiCreation_mul_Annihilation_mulVec_basisVec`) at the bra configuration `tJConfigOf s'`,
 the element vanishes unless the source orbital `(j,σ)` is occupied and the target orbital `(i,σ)` is
@@ -23,7 +24,8 @@ open scoped BigOperators
 variable {N : ℕ}
 
 /-- **General single-hop matrix element.**  `⟨Φ_{s'} | ĉ†_{iσ}ĉ_{jσ} | Φ_s⟩` equals, when the source
-`(j,σ)` is occupied and the target `(i,σ)` is empty after removing the source, the product of the two
+`(j,σ)` is occupied and the target `(i,σ)` is empty after removing the source, the product of the
+two
 string signs times `[tJConfigOf s' = hopped config]`, and `0` otherwise. -/
 theorem tJ_hop_matrixElement_apply (N : ℕ) (s s' : Fin (N + 1) → Fin 3) (i j : Fin (N + 1))
     (σ : Fin 2) :

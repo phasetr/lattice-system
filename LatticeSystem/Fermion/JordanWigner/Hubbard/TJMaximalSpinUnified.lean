@@ -23,7 +23,8 @@ namespace LatticeSystem.Fermion
 open LatticeSystem.Quantum LatticeSystem.Lattice SimpleGraph
 
 /-- **The d=1 ferromagnetic t-J ground subspace is the maximal-spin multiplet for all `Ne ≤ K+1`.**
-For odd `Ne ≤ K+1` and `τ, J > 0`, the ground subspace of `tJHamiltonian K (cycleGraph (K+1)) τ J` at
+For odd `Ne ≤ K+1` and `τ, J > 0`, the ground subspace of `tJHamiltonian K (cycleGraph (K+1)) τ J`
+at
 filling `Ne` is `IsMaximalSpinMultipletSubmodule K · Ne` — the metallic case `Ne < K+1`
 (`proposition_11_24`) and the half-filling case `Ne = K+1` (`tJ_halfFilling_isMaximalSpinMultiplet`)
 combined. -/

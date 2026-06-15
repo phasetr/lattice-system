@@ -7,7 +7,8 @@ set_option linter.unusedSimpArgs false
 set_option linter.unusedVariables false
 
 /-!
-# Structural (j.13.h.3) bare submatrix `finrank ≤ 1` at `hermitianMinEigenvalue` (no `h_intermediate`)
+# Structural (j.13.h.3) bare submatrix `finrank ≤ 1` at `hermitianMinEigenvalue` (no
+`h_intermediate`)
 
 Issue #3887 (Tasaki §2.5 Theorem 2.4, `h_intermediate` vacuous-at-N=1 fix).
 

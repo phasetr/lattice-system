@@ -4,7 +4,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJExchangeBondSum
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJStepRelation
 
 /-!
-# Tasaki 11.5.3: the exchange bond acts as a half spin-swap on the filled sector (Theorem 11.26 PR3i)
+# Tasaki 11.5.3: the exchange bond acts as a half spin-swap on the filled sector (Theorem 11.26
+PR3i)
 
 On a fully occupied hard-core configuration `|Φ_s⟩` (`∀ k, s k ≠ 0`) the per-bond exchange operator
 `¼ n̂_x n̂_y − Ŝ_x·Ŝ_y` of `tJExchange` acts as a half difference between `|Φ_s⟩` and the
@@ -84,7 +85,8 @@ theorem fermionSpinPlusMinus_mulVec_tJConfigOf_eq_zero_of_target (N : ℕ)
   · exact fermionSpinPlusMinus_mulVec_tJConfigOf_eq_zero_of_source N s i j hj
 
 /-- **The reversed ladder `Ŝ⁻_x Ŝ⁺_y` as a sign-free swap.**  For an antiparallel pair `s x = ↑`,
-`s y = ↓` (`x ≠ y`), `Ŝ⁻_x Ŝ⁺_y |Φ_s⟩ = |Φ_{tJSpinSwap s x y}⟩` (commute to `Ŝ⁺_y Ŝ⁻_x` at `(y,x)`). -/
+`s y = ↓` (`x ≠ y`), `Ŝ⁻_x Ŝ⁺_y |Φ_s⟩ = |Φ_{tJSpinSwap s x y}⟩` (commute to `Ŝ⁺_y Ŝ⁻_x` at
+`(y,x)`). -/
 theorem fermionSpinMinusPlus_mulVec_tJConfigOf (N : ℕ) (s : Fin (N + 1) → Fin 3) (x y : Fin (N + 1))
     (hxy : x ≠ y) (hx : s x = 1) (hy : s y = 2) :
     (fermionSiteSpinMinus N x * fermionSiteSpinPlus N y).mulVec (basisVec (tJConfigOf N s)) =

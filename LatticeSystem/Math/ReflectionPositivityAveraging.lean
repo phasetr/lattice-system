@@ -14,13 +14,15 @@ range over an arbitrary type `V`).
 If `F` is invariant under the cyclic shift (cyclicity, eq. (4.1.55)) and satisfies the *reflection
 bound* (eq. (4.1.56))
 `F(f) ≥ ½ (F(reflect_left f) + F(reflect_right f))`,
-where `reflect_left f` mirrors the second half onto the first and `reflect_right f` mirrors the first
+where `reflect_left f` mirrors the second half onto the first and `reflect_right f` mirrors the
+first
 half onto the second, then `F` is bounded below by the average of its values on the `2n` constant
 strings (eq. (4.1.57)):
 `F(f) ≥ (1 / 2n) Σ_j F(j ↦ f j)`.
 
 Tasaki's proof is the elegant "`G_min = 0`" argument: subtract the constant-string average, restrict
-to the finite set of strings built from the entries of `f`, and show the minimum is `0` by collapsing
+to the finite set of strings built from the entries of `f`, and show the minimum is `0` by
+collapsing
 a minimizer to a constant string via repeated use of the reflection bound and cyclicity.  The proof
 is elementary but intricate (a doubling induction on the number of leading equal entries); we record
 the lemma as a documented axiom and mark it a **finite-dimensional discharge candidate**.
@@ -52,7 +54,8 @@ def reflectRight {V : Type*} (n : ℕ) (f : Fin (2 * n) → V) : Fin (2 * n) →
 `F : (Fin (2n) → V) → ℝ` be a real-valued function of a cyclic string of `2n` arguments in an
 arbitrary type `V`.  Assume `F` is invariant under the cyclic shift (`hcyc`, eq. (4.1.55)) and
 satisfies the reflection bound (`hrefl`, eq. (4.1.56)):
-`F f ≥ ½ (F (reflectLeft n f) + F (reflectRight n f))` for all `f`.  Then `F` is bounded below by the
+`F f ≥ ½ (F (reflectLeft n f) + F (reflectRight n f))` for all `f`.  Then `F` is bounded below by
+the
 average of its values on the `2n` constant strings (eq. (4.1.57)):
 `F f ≥ (1 / 2n) Σ_j F (fun _ => f j)`.
 

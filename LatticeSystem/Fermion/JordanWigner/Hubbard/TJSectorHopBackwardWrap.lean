@@ -5,7 +5,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorHopBackward
 # Tasaki 11.5: the leftward wrap hop is sign-free for odd `Ne` (Prop 11.24 PR-B7-3c)
 
 The cycle's wrap bond `{0, N}` also carries the *leftward* hop `ĉ†_{0σ}ĉ_{Nσ}` (the electron hops
-from the last site `N` to the first site `0`).  Like the rightward wrap hop, it is sign-free `+1` for
+from the last site `N` to the first site `0`).  Like the rightward wrap hop, it is sign-free `+1`
+for
 **odd** `Ne`: the strictly-between Jordan–Wigner occupation is `Ne − 1` (the empty target `0`
 contributes nothing below, the occupied source `N` contributes one above), so the backward sign
 parity collapses to `(-1)^(Ne-1) = +1`.

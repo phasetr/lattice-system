@@ -82,7 +82,8 @@ theorem tJ_perronFrobeniusMin_le_hermitianMinEigenvalue (hpos : 0 < N) (Ne : ℕ
 
 /-- **`μ ≤ groundEnergyAtFilling`.** Every admissible `(N̂=Ne, hard-core)` unit state has energy at
 least `hermitianMinEigenvalue Ĥ_W ≥ μ`: its energy equals the matrix Rayleigh quotient of its
-coefficient vector (Rayleigh bridge + isometry), bounded below by `hermitianMinEigenvalue Ĥ_W` by the
+coefficient vector (Rayleigh bridge + isometry), bounded below by `hermitianMinEigenvalue Ĥ_W` by
+the
 variational principle, and `μ ≤ hermitianMinEigenvalue Ĥ_W`. -/
 theorem tJ_groundEnergyAtFilling_ge_of_sectorMin (hpos : 0 < N) (Ne : ℕ) (hNeLt : Ne < N + 1)
     (hodd : Odd Ne) (τ J : ℝ) (hτ : 0 ≤ τ) (hJ : 0 ≤ J) {μ : ℝ}
@@ -129,14 +130,15 @@ theorem tJ_groundEnergyAtFilling_ge_of_sectorMin (hpos : 0 < N) (Ne : ℕ) (hNeL
           (φ : EuclideanSpace ℂ _).ofLp := by
         rw [rayleighOnVec_tJFillingCompress, ← hcompl]
 
+set_option maxHeartbeats 1000000 in
 -- Raised heartbeat budget: this E2 capstone chains several heavy facts (the lifted
 -- PF eigenvector admissibility and the W-restricted A.17 lower bound) whose combined
 -- elaboration exceeds the default limit.
-set_option maxHeartbeats 1000000 in
 /-- **E2 capstone: `groundEnergyAtFilling = μ`.** The ground energy of the d=1 ferromagnetic t-J
 model at odd filling `Ne` equals the Perron–Frobenius sector minimum `μ`: `≤` from the lifted PF
 eigenvector being admissible (`tJHamiltonian_groundEnergyAtFilling_le_of_sectorEigen`), `≥` from the
-W-restricted A.17 (`tJ_groundEnergyAtFilling_ge_of_sectorMin`).  Packaged with the PF eigenvector `v`
+W-restricted A.17 (`tJ_groundEnergyAtFilling_ge_of_sectorMin`).  Packaged with the PF eigenvector
+`v`
 (strictly positive) at `μ`, the unique positive spin-charge-separated ground state. -/
 theorem tJHamiltonian_groundEnergyAtFilling_eq_perronFrobeniusMin (hpos : 0 < N) (Ne : ℕ)
     (hNeLt : Ne < N + 1) (hodd : Odd Ne) (τ J : ℝ) (hτ : 0 < τ) (hJ : 0 < J) :

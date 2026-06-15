@@ -5,7 +5,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorHopNN
 
 The cyclic kinetic operator `K = Σ_σ Σ_i Σ_j (adj i j) ĉ†_{iσ}ĉ_{jσ}` contains, for each oriented
 adjacent pair, both the *rightward* hop `ĉ†_{(a+1)σ}ĉ_{aσ}` (`tJ_uphop_nn_mulVec` etc.) and the
-*leftward* hop `ĉ†_{aσ}ĉ_{(a+1)σ}`.  This file computes the leftward nearest-neighbour hop action and
+*leftward* hop `ĉ†_{aσ}ĉ_{(a+1)σ}`.  This file computes the leftward nearest-neighbour hop action
+and
 matrix element, which are again **sign-free** (`+1`): the single intervening Jordan–Wigner mode is
 empty, so the backward sign parity (`jwSign_mul_jwSign_update_backward`) collapses to `0`.
 

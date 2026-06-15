@@ -6,7 +6,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorBasis
 
 The kinetic part of the t-J Hamiltonian is the graph hopping sandwiched by the hard-core projection,
 `P̂hc · K · P̂hc`.  On a hard-core sector basis state `|Φ_s⟩ = basisVec (tJConfigOf s)` the *inner*
-projection acts as the identity (`tJConfigOf` is hard-core), so the sandwich reduces to the projected
+projection acts as the identity (`tJConfigOf` is hard-core), so the sandwich reduces to the
+projected
 hopping `P̂hc (K |Φ_s⟩)`, which still lands in the hard-core subspace.  This isolates the hopping
 matrix elements (computed sign-free in the hop lemmas) from the projection bookkeeping.
 

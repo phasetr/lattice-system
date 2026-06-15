@@ -8,7 +8,8 @@ import LatticeSystem.Quantum.SpinS.ParityReachableMagSum
 
 Issue #3739 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori).
 
-`parityReachableS_total_legacy`: for any two configurations sharing the same total-magnetization parity
+`parityReachableS_total_legacy`: for any two configurations sharing the same total-magnetization
+parity
 (`magSumS σ ≡ magSumS σ' (mod 2)`), `ParityReachableS` connects them.
 
 This closes the (d.3) reachability totality plan by chaining:

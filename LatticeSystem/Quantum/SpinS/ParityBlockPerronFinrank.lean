@@ -28,7 +28,8 @@ open Module Matrix
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-- **Parity-block Perron eigenspace `finrank ≤ 1`**: under case (i.2) strict (plus the
-intermediate-site and sublattice non-emptyness hypotheses needed by `parityReachableS_total_legacy`),
+intermediate-site and sublattice non-emptyness hypotheses needed by
+`parityReachableS_total_legacy`),
 the Perron eigenspace of the shifted parity-block PF matrix is at most one-dimensional. -/
 theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_perron_eigenspace_finrank_le_one
     (A : Λ → Bool) {J : Λ → Λ → ℂ}

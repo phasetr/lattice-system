@@ -6,7 +6,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorBasis
 
 The interaction term `n̂_x n̂_y / 4 − Ŝ_x · Ŝ_y` of the t-J Hamiltonian splits into the ladder part
 `½(Ŝ⁺_xŜ⁻_y + Ŝ⁻_xŜ⁺_y)` (off-diagonal, handled in PR-B5) and the *diagonal* part
-`n̂_x n̂_y / 4 − Ŝ³_x Ŝ³_y`.  The per-site number `n̂_x` and spin-z `Ŝ³_x` are diagonal operators on the
+`n̂_x n̂_y / 4 − Ŝ³_x Ŝ³_y`.  The per-site number `n̂_x` and spin-z `Ŝ³_x` are diagonal operators
+on the
 computational basis (combinations of mode-number operators), so their products act as scalars on
 `|Φ_s⟩`, and hence have **vanishing off-diagonal matrix element** `⟨Φ_{s'} | · | Φ_s⟩ = 0` for
 `s' ≠ s`.  This isolates the off-diagonal part of the effective matrix to the sign-free hopping and

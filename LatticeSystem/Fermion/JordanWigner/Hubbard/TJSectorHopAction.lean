@@ -9,7 +9,8 @@ Composing the operator-level single-hop action (`HopBasisVec.lean`), the config 
 computes the action of a single same-spin hopping term `ĉ†_{bσ}ĉ_{aσ}` on a t-J sector basis state
 for a *forward* allowed hop (`a.val < b.val`, source occupied with spin σ, target empty):
 
-  `ĉ†_{bσ}ĉ_{aσ} |Φ_s⟩ = (-1)^(#occupied modes strictly between (a,σ) and (b,σ)) · |Φ_{tJSiteHop s a b}⟩`.
+  `ĉ†_{bσ}ĉ_{aσ} |Φ_s⟩ = (-1)^(#occupied modes strictly between (a,σ) and (b,σ)) · |Φ_{tJSiteHop s
+  a b}⟩`.
 
 The sign is `(-1)` to the occupied modes strictly between source and target in Jordan–Wigner order;
 for the d=1 cycle's nearest-neighbour hops this exponent is `0` (the single intervening orbital is

@@ -6,7 +6,8 @@ import Mathlib.LinearAlgebra.Matrix.PosDef
 # Tasaki 11.5.3: a half-filling ground state is annihilated by every bond (Theorem 11.26 PR3i-2)
 
 A ground state `v` of the half-filling t-J model is annihilated by `tJExchange` (the ground energy
-is `0` and `Ĥ_tJ = J·tJExchange` on the filling sector), and `tJExchange = Σ_{⟨x,y⟩} bond_xy` is a sum
+is `0` and `Ĥ_tJ = J·tJExchange` on the filling sector), and `tJExchange = Σ_{⟨x,y⟩} bond_xy` is a
+sum
 of positive-semidefinite singlet projectors `bond_xy = ½ Δ_xy† Δ_xy`.  Hence `⟨v, tJExchange v⟩ = 0`
 forces `⟨v, bond_xy v⟩ = 0` on every bond, so `Δ_xy v = 0` and `bond_xy v = 0`:
 

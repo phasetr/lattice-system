@@ -7,7 +7,8 @@ import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergParametricMinEigenvalue
 Issue #3739 — Tasaki §2.5 Theorem 2.4 obligation (2) first-crossing argument.
 
 Defines the set
-`balancedGSSet J hJ N M_balanced lam' D' := { t : ℝ | hermitianMinEigenvalue (Ĥ_M_balanced(γ(t))) = hermitianMinEigenvalue (Ĥ(γ(t))) }`
+`balancedGSSet J hJ N M_balanced lam' D' := { t : ℝ | hermitianMinEigenvalue (Ĥ_M_balanced(γ(t))) =
+hermitianMinEigenvalue (Ĥ(γ(t))) }`
 and proves it is closed in `ℝ`.
 
 This is a building block for the first-crossing argument: `t* := sSup balancedGSSet`
