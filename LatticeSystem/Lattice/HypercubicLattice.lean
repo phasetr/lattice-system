@@ -1,7 +1,11 @@
 import Mathlib.Combinatorics.SimpleGraph.Basic
+import Mathlib.Combinatorics.SimpleGraph.Bipartite
+import Mathlib.Combinatorics.SimpleGraph.Coloring
 import Mathlib.Data.Fintype.Pi
 import Mathlib.Order.Interval.Finset.Basic
 import Mathlib.Data.Int.Interval
+import Mathlib.Algebra.Group.Int.Even
+import Mathlib.Algebra.Ring.Int.Parity
 
 /-!
 # The infinite hypercubic lattice `ℤᵈ` and its finite-volume exhaustion
@@ -116,5 +120,73 @@ theorem iUnion_hypercubicBox :
   intro x
   obtain ⟨n, hn⟩ := exists_mem_hypercubicBox x
   exact Set.mem_iUnion.mpr ⟨n, hn⟩
+
+/-! ### Bipartite structure: the even/odd parity sublattices
+
+The hypercubic lattice `ℤᵈ` is bipartite: a nearest-neighbor bond flips the
+parity of the coordinate sum `Σᵢ xᵢ`, so the **even** sublattice
+`ℤᵈ_even = {x : Σᵢ xᵢ even}` (the A-sublattice, Tasaki eq. (4.3.2)) and its
+complement (the B-sublattice) are the two color classes.  This is the
+combinatorial structure underlying antiferromagnetic / Néel order. -/
+
+/-- A nearest-neighbor bond flips the parity of the coordinate sum: if `x` and
+`y` are adjacent then `Σᵢ xᵢ` and `Σᵢ yᵢ` have **opposite** parity. -/
+theorem hypercubicLatticeGraph_adj_parity_ne {x y : Fin d → ℤ}
+    (h : (hypercubicLatticeGraph d).Adj x y) :
+    ¬ (Even (∑ i, x i) ↔ Even (∑ i, y i)) := by
+  obtain ⟨i, hi, hj⟩ := h
+  have hsum : (∑ k, x k) - ∑ k, y k = x i - y i := by
+    rw [← Finset.sum_sub_distrib, Finset.sum_eq_single i]
+    · intro k _ hki; rw [hj k hki, sub_self]
+    · intro hni; exact absurd (Finset.mem_univ i) hni
+  have hb : (0 : ℤ) ≤ 1 := zero_le_one
+  have hodd : ¬ Even (x i - y i) := by
+    rcases (abs_eq hb).mp hi with h1 | h1 <;> rw [h1, Int.even_iff] <;> omega
+  rw [← hsum] at hodd
+  rwa [Int.even_sub] at hodd
+
+/-- The **even sublattice** `ℤᵈ_even = {x : Σᵢ xᵢ even}` (the A-sublattice, Tasaki
+eq. (4.3.2)), the first color class of the bipartition. -/
+def hypercubicEvenSublattice (d : ℕ) : Set (Fin d → ℤ) :=
+  {x | Even (∑ i, x i)}
+
+/-- The **odd sublattice** `ℤᵈ_odd = {x : Σᵢ xᵢ odd}` (the B-sublattice), the
+second color class of the bipartition. -/
+def hypercubicOddSublattice (d : ℕ) : Set (Fin d → ℤ) :=
+  {x | ¬ Even (∑ i, x i)}
+
+variable (d) in
+/-- The hypercubic lattice `ℤᵈ` is **bipartite with the even/odd sublattices** as
+the two parts: every nearest-neighbor bond joins an even site to an odd site
+(Tasaki §4.3, eq. (4.3.2)). -/
+theorem hypercubicLatticeGraph_isBipartiteWith :
+    (hypercubicLatticeGraph d).IsBipartiteWith
+      (hypercubicEvenSublattice d) (hypercubicOddSublattice d) where
+  disjoint := by
+    rw [Set.disjoint_left]
+    intro x hx hx'
+    exact hx' hx
+  mem_of_adj := by
+    intro v w h
+    have hp := hypercubicLatticeGraph_adj_parity_ne h
+    by_cases hv : Even (∑ i, v i)
+    · exact Or.inl ⟨hv, fun hw => hp (iff_of_true hv hw)⟩
+    · exact Or.inr ⟨hv, by by_contra hw; exact hp (iff_of_false hv hw)⟩
+
+/-- The parity 2-coloring of `ℤᵈ`: a site is colored by the parity of its
+coordinate sum (`0` for even, `1` for odd). -/
+def hypercubicParityColoring (d : ℕ) :
+    (hypercubicLatticeGraph d).Coloring (Fin 2) :=
+  SimpleGraph.Coloring.mk (fun x => if Even (∑ i, x i) then 0 else 1)
+    (fun {x y} h => by
+      have hp := hypercubicLatticeGraph_adj_parity_ne h
+      by_cases hx : Even (∑ i, x i) <;> by_cases hy : Even (∑ i, y i) <;>
+        simp_all)
+
+variable (d) in
+/-- The hypercubic lattice `ℤᵈ` is **bipartite** (`Colorable 2`). -/
+theorem hypercubicLatticeGraph_isBipartite :
+    (hypercubicLatticeGraph d).IsBipartite :=
+  ⟨hypercubicParityColoring d⟩
 
 end LatticeSystem.Lattice
