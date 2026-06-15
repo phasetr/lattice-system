@@ -65,3 +65,5 @@ theorem spinSDotXXZSwap_apply_im_zero
     Complex.add_im, Complex.mul_im, Complex.mul_im, hc1, hc2,
     Matrix.add_apply, Matrix.add_apply, Complex.add_im, Complex.add_im, h1, h2, h3, h4]
   ring
+
+end LatticeSystem.Quantum

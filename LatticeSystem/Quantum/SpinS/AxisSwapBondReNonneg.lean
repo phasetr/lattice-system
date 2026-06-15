@@ -60,3 +60,5 @@ theorem spinSDotXXZSwap_apply_re_nonneg
   have hcoef2 : 0 ≤ (1 - lam.re) / 4 := by linarith
   simp only [sub_zero, mul_zero, add_zero]
   exact add_nonneg (mul_nonneg hcoef1 ht) (mul_nonneg hcoef2 hp)
+
+end LatticeSystem.Quantum

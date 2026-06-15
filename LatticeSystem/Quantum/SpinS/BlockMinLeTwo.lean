@@ -82,7 +82,7 @@ theorem matrix_eigenspace_finrank_le_two_at_min_block_mins
       rw [← heq] at h1
       omega
   · -- ν1 < ν0: ν = ν1.
-    push_neg at hle_case
+    push Not at hle_case
     have hν : ν = ν1 := min_eq_right (le_of_lt hle_case)
     rw [hν]
     -- For submatrix_0: by (i.4), eig submatrix_0 ν1 = ⊥, so finrank = 0.

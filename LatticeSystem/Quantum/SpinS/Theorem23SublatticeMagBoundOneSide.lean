@@ -36,7 +36,7 @@ theorem totalLowestWeight_re_le_complement_sub (A : Λ → Bool) {a b : ℝ}
     (hztot : (totalSpinSOp3 Λ N).mulVec w = m • w)
     (hker : (totalSpinSOpMinus Λ N).mulVec w = 0)
     (hcasA : (sublatticeSpinSquaredS N A).mulVec w = ((a * (a + 1) : ℝ) : ℂ) • w)
-    (hcasB : (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec w =
+    (hcasB : (sublatticeSpinSquaredS N (fun x => !A x)).mulVec w =
       ((b * (b + 1) : ℝ) : ℂ) • w) :
     m.re ≤ b - a := by
   obtain ⟨p, v, hv_ne, hp, hq, hkerA, hcA, hcB⟩ :=

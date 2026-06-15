@@ -107,7 +107,7 @@ sublattice-`A` magnetization component of an `(Ŝ_¬A)²`-eigenvector is again a
 `(Ŝ_¬A)²`-eigenvector at the same eigenvalue. -/
 theorem sublatticeMagProjFn_sublatticeSpinSquaredS_complement (A : Λ → Bool) (M : ℂ)
     {β : ℂ} {w : (Λ → Fin (N + 1)) → ℂ}
-    (hcas : (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec w = β • w) :
+    (hcas : (sublatticeSpinSquaredS N (fun x => !A x)).mulVec w = β • w) :
     (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec (sublatticeMagProjFn A M w) =
       β • sublatticeMagProjFn A M w := by
   -- `Commute (Ŝ_¬A)² (Ŝ_A^(3))` from the complement lemma at `¬A` (with `¬¬A = A`).

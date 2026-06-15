@@ -66,7 +66,7 @@ theorem hermitianMinEigenvalue_axisSwapped_ge_min_block_mins
       hermitianMinEigenvalue (axisSwapped_full_isHermitian_im (N := N) hJ hlam hD) := by
   classical
   by_contra hlt
-  push_neg at hlt
+  push Not at hlt
   have h0_lt : hermitianMinEigenvalue (axisSwapped_full_isHermitian_im (N := N) hJ hlam hD) <
       hermitianMinEigenvalue
         (axisSwappedAnisotropicHeisenbergS_submatrix_isHermitian_of_real

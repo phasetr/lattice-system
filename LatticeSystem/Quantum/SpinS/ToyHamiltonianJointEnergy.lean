@@ -31,7 +31,7 @@ theorem heisenbergToyHamiltonianS_mulVec_of_joint_casimir_eigenvector (A : Λ �
     {γ_tot γ_A γ_B : ℂ} {Ψ : (Λ → Fin (N + 1)) → ℂ}
     (htot : (totalSpinSSquared Λ N).mulVec Ψ = γ_tot • Ψ)
     (hA : (sublatticeSpinSquaredS N A).mulVec Ψ = γ_A • Ψ)
-    (hB : (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec Ψ = γ_B • Ψ) :
+    (hB : (sublatticeSpinSquaredS N (fun x => !A x)).mulVec Ψ = γ_B • Ψ) :
     (heisenbergToyHamiltonianS (Λ := Λ) A N).mulVec Ψ = (γ_tot - γ_A - γ_B) • Ψ := by
   rw [heisenbergToyHamiltonianS_eq_casimir_diff, Matrix.sub_mulVec, Matrix.sub_mulVec,
     htot, hA, hB, sub_smul, sub_smul]

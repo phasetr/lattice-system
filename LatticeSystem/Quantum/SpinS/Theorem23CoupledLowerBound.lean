@@ -37,7 +37,7 @@ theorem totalSpinSSquared_re_ge_coupled (A : V → Bool) (k : ℕ) {a b : ℝ}
     (hψ_mem : ψ ∈ magSubspaceS V N ((k : ℂ) - ((Fintype.card V : ℂ) * (N : ℂ) / 2)))
     (hγ : (totalSpinSSquared V N).mulVec ψ = γ • ψ)
     (hα : (sublatticeSpinSquaredS N A).mulVec ψ = ((a * (a + 1) : ℝ) : ℂ) • ψ)
-    (hβ : (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec ψ =
+    (hβ : (sublatticeSpinSquaredS N (fun x => !A x)).mulVec ψ =
       ((b * (b + 1) : ℝ) : ℂ) • ψ) :
     |a - b| * (|a - b| + 1) ≤ γ.re := by
   -- Reduce to a total lowest weight w' at the same three eigenvalues.

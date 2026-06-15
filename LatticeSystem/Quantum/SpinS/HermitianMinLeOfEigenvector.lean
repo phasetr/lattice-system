@@ -32,7 +32,7 @@ theorem hermitian_min_eigenvalue_le_of_eigenvector_exists
     (hw_eig : Matrix.mulVec M w = (μ : ℂ) • w) :
     hermitianMinEigenvalue hM ≤ μ := by
   by_contra hμ
-  push_neg at hμ
+  push Not at hμ
   -- hμ : μ < hermitianMinEigenvalue hM
   have h_bot := hermitian_eigenspace_eq_bot_of_real_lt_min hM hμ
   -- w is in the eigenspace at (μ : ℂ).
