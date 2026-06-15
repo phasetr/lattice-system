@@ -8663,6 +8663,25 @@ family.  Proving topological phase transitions resists standard statistical-mech
 settled it via an index theorem.  Concrete interpolating Hamiltonian; a documented axiom keeping the
 faithful three-way disjunction.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§8.4 Topological order: Kitaev's toric code} (Theorem 8.9,
+Bravyi--Hastings--Michalakis; Tasaki §8.4, eqs.~(8.4.1), (8.4.19), pp.~288--297;
+\texttt{Quantum/SpinS/ToricCode.lean}, Issue \#4485).  A gapped phase whose ground-state degeneracy is
+protected by the global topology, not by any symmetry.  Qubits live on the edges
+\texttt{ToricEdge}~$L=(\mathbb{Z}_L\times\mathbb{Z}_L)\times\texttt{Fin}~2$ of an $L\times L$ torus
+($2L^2$ edges); \texttt{starEdges}/\texttt{plaquetteEdges} are the four-edge stars $A_v$ and
+plaquettes $B_p$; \texttt{sigmaZS}/\texttt{sigmaXS} are $\sigma^z,\sigma^x$.  The toric code
+Hamiltonian \texttt{toricCodeHamiltonianS} $L=-\sum_v\prod_{A_v}\sigma^z-\sum_p\prod_{B_p}\sigma^x$
+(eq.~8.4.1) is a sum of commuting stabilizers (gap $\ge2$, four-fold degenerate on the torus), and
+\texttt{perturbedToricHamiltonianS} adds $\varepsilon\sum_x\hat V_x$ (eq.~8.4.19).  The axiom
+\texttt{tasaki\_theorem\_8\_9} states that for range-$r$ perturbations there are $L$-independent
+$\varepsilon_0,\Delta>0$ such that for $|\varepsilon|\le\varepsilon_0$, all $L\ge2$ (nontrivial torus), and any local
+perturbation (\texttt{IsToricPerturbation}) the perturbed Hamiltonian has four near-degenerate ground
+states separated by $\Delta$ (\texttt{HasFourNearlyDegenerateGroundStates}) --- the topological
+four-fold degeneracy is stable against arbitrary perturbations, no symmetry required.  Lattice,
+stabilizers and both Hamiltonians are concrete; Theorem 8.9 is a documented axiom.  Chapters~3--10
+backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
