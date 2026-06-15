@@ -24,7 +24,8 @@ open scoped BigOperators
 
 variable {N : ℕ}
 
-/-- The embedding of the filling space into the full Fock space: its column at the filling site-state
+/-- The embedding of the filling space into the full Fock space: its column at the filling
+site-state
 `s` is the computational basis vector `|Φ_s⟩ = basisVec (tJConfigOf s)`. -/
 noncomputable def tJFillingEmbedding (N Ne : ℕ) :
     Matrix (Fin (2 * N + 2) → Fin 2) (TJFillingSector N Ne) ℂ :=
@@ -55,7 +56,8 @@ theorem tJFillingEmbedding_mulVec (Ne : ℕ) (u : TJFillingSector N Ne → ℂ) 
   funext w
   unfold tJFillingEmbedding tJFillingExpansion
   rw [Matrix.mulVec, dotProduct, Finset.sum_apply]
-  exact Finset.sum_congr rfl (fun s _ => by rw [Matrix.of_apply, Pi.smul_apply, smul_eq_mul, mul_comm])
+  exact Finset.sum_congr rfl (fun s _ => by rw [Matrix.of_apply, Pi.smul_apply, smul_eq_mul,
+      mul_comm])
 
 /-- `Tᴴ` maps a Fock vector to its filling coefficient functional: `(Tᴴ v)_s = ⟨Φ_s, v⟩`. -/
 theorem tJFillingEmbedding_conjTranspose_mulVec (Ne : ℕ) (v : (Fin (2 * N + 2) → Fin 2) → ℂ) :

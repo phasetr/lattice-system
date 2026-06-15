@@ -62,7 +62,8 @@ theorem jointDiagonalIterate_hasEigenvector (A : Λ → Bool)
 omit [DecidableEq Λ] in
 /-- The diagonal eigenvalue function `k_A ↦ s_A − k_A` is injective. -/
 theorem jointDiagonal_eigenvalue_injective (A : Λ → Bool) :
-    Function.Injective (fun kA : Fin ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card * N + 1) =>
+    Function.Injective (fun kA : Fin ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card * N +
+        1) =>
       ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) * (N : ℂ) / 2 - (kA.val : ℂ)) := by
   intro i j hij
   simp only at hij
@@ -75,7 +76,8 @@ theorem jointDiagonalIterate_linearIndependent (A : Λ → Bool)
       (Finset.univ.filter (fun x : Λ => A x = true)).card) :
     LinearIndependent ℂ (jointDiagonalIterate A N) := by
   apply Module.End.eigenvectors_linearIndependent' ((sublatticeSpinSOp3 N A).mulVecLin)
-    (fun kA => ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) * (N : ℂ) / 2 - (kA.val : ℂ))
+    (fun kA => ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) * (N : ℂ) / 2 - (kA.val :
+        ℂ))
     (jointDiagonal_eigenvalue_injective A)
   exact jointDiagonalIterate_hasEigenvector A horient
 

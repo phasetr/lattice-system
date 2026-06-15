@@ -74,7 +74,8 @@ theorem tJFillingCompress_su2_31 (Ne : ℕ) :
 theorem tJFillingCompress_tJHamiltonian_commute_one (Ne : ℕ) (G : SimpleGraph (Fin (N + 1)))
     [DecidableRel G.Adj] (τ J : ℝ) :
     tJFillingCompress N Ne (tJHamiltonian N G τ J) * tJFillingCompress N Ne (tJTotalSpinOne N) =
-      tJFillingCompress N Ne (tJTotalSpinOne N) * tJFillingCompress N Ne (tJHamiltonian N G τ J) := by
+      tJFillingCompress N Ne (tJTotalSpinOne N) * tJFillingCompress N Ne (tJHamiltonian N G τ J) :=
+          by
   rw [tJFillingCompress_mul_of_right_preserves Ne _ (preservesTJFillingW_tJTotalSpinOne Ne),
     tJHamiltonian_mul_tJTotalSpinOne,
     ← tJFillingCompress_mul_of_right_preserves Ne _ (preservesTJFillingW_tJHamiltonian Ne G τ J)]
@@ -83,7 +84,8 @@ theorem tJFillingCompress_tJHamiltonian_commute_one (Ne : ℕ) (G : SimpleGraph 
 theorem tJFillingCompress_tJHamiltonian_commute_two (Ne : ℕ) (G : SimpleGraph (Fin (N + 1)))
     [DecidableRel G.Adj] (τ J : ℝ) :
     tJFillingCompress N Ne (tJHamiltonian N G τ J) * tJFillingCompress N Ne (tJTotalSpinTwo N) =
-      tJFillingCompress N Ne (tJTotalSpinTwo N) * tJFillingCompress N Ne (tJHamiltonian N G τ J) := by
+      tJFillingCompress N Ne (tJTotalSpinTwo N) * tJFillingCompress N Ne (tJHamiltonian N G τ J) :=
+          by
   rw [tJFillingCompress_mul_of_right_preserves Ne _ (preservesTJFillingW_tJTotalSpinTwo Ne),
     tJHamiltonian_mul_tJTotalSpinTwo,
     ← tJFillingCompress_mul_of_right_preserves Ne _ (preservesTJFillingW_tJHamiltonian Ne G τ J)]

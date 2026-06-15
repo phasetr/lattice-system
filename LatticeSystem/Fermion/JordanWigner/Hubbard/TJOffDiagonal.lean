@@ -52,7 +52,8 @@ hard-core bra `⟨Φ_{s'}|` drops both projections, leaving `⟨Φ_{s'} | K | Φ
 theorem tJKinetic_matrixElement_eq (N : ℕ) (G : SimpleGraph (Fin (N + 1))) [DecidableRel G.Adj]
     (s s' : Fin (N + 1) → Fin 3) :
     (∑ w, basisVec (tJConfigOf N s') w *
-        ((hubbardHardcoreProjection N * hubbardKineticOnGraph N G 1 * hubbardHardcoreProjection N).mulVec
+        ((hubbardHardcoreProjection N * hubbardKineticOnGraph N G 1 * hubbardHardcoreProjection
+            N).mulVec
             (basisVec (tJConfigOf N s))) w)
       = ∑ w, basisVec (tJConfigOf N s') w *
           ((hubbardKineticOnGraph N G 1).mulVec (basisVec (tJConfigOf N s))) w := by

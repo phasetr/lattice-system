@@ -51,20 +51,24 @@ theorem sublatticeSpinSquaredS_mulVec_jointLadderIterateDownS (A : Λ → Bool) 
   have hcomm : Commute (sublatticeSpinSquaredS N A)
       ((sublatticeSpinSOpMinus N A) ^ kA *
         (sublatticeSpinSOpMinus N (fun x => ! A x)) ^ kB) :=
-    ((sublatticeSpinSquaredS_commute_sublatticeSpinSOpMinus (Λ := Λ) (N := N) A).pow_right kA).mul_right
-      ((sublatticeSpinSquaredS_commute_sublatticeSpinSOpMinus_complement (Λ := Λ) (N := N) A).pow_right kB)
+    ((sublatticeSpinSquaredS_commute_sublatticeSpinSOpMinus (Λ := Λ) (N := N) A).pow_right
+        kA).mul_right
+      ((sublatticeSpinSquaredS_commute_sublatticeSpinSOpMinus_complement (Λ := Λ) (N := N)
+          A).pow_right kB)
   rw [Matrix.mulVec_mulVec, hcomm.eq, ← Matrix.mulVec_mulVec,
       sublatticeSpinSquaredS_mulVec_allAlignedStateS_zero (N := N) A, Matrix.mulVec_smul]
 
 /-- `(Ŝ_¬A)²` acts on the joint iterate by the maximal `¬A`-Casimir `s_B(s_B+1)`. -/
-theorem sublatticeSpinSquaredS_complement_mulVec_jointLadderIterateDownS (A : Λ → Bool) (kA kB : ℕ) :
+theorem sublatticeSpinSquaredS_complement_mulVec_jointLadderIterateDownS (A : Λ → Bool) (kA kB : ℕ)
+    :
     (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec (jointLadderIterateDownS A N kA kB) =
       (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) * ((N : ℂ) / 2) *
         (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) * ((N : ℂ) / 2) + 1)) •
         jointLadderIterateDownS A N kA kB := by
   rw [jointLadderIterateDownS_eq_prod]
   -- `Commute (Ŝ_¬A)² (Ŝ_A^-)`: the complement commute at `¬A` (with `¬¬A = A`).
-  have hcomm_cross : Commute (sublatticeSpinSquaredS N (fun x => ! A x)) (sublatticeSpinSOpMinus N A) := by
+  have hcomm_cross : Commute (sublatticeSpinSquaredS N (fun x => ! A x)) (sublatticeSpinSOpMinus N
+      A) := by
     have h := sublatticeSpinSquaredS_commute_sublatticeSpinSOpMinus_complement
       (Λ := Λ) (N := N) (fun x => ! A x)
     have hnotnot : (fun x => ! (! A x)) = A := by funext x; simp

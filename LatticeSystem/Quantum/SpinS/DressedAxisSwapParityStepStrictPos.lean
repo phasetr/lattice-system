@@ -32,7 +32,8 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-/-- **Unified `ParityStepS` strict positivity of the shifted PF matrix** (case (i.2) strict, `D > 0`).
+/-- **Unified `ParityStepS` strict positivity of the shifted PF matrix** (case (i.2) strict, `D >
+0`).
 For a `ParityStepS` on `bipartiteCompleteGraphOf A` under `−1 < λ.re < 1` real, real `D > 0`
 strict, the shifted matrix entry is strict positive. -/
 theorem shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityStepS_bipartite

@@ -44,7 +44,8 @@ noncomputable def jointSublatticeCasimirEigenspace
 /-- **Predicted GS finrank < joint Casimir finrank** at non-deg
 (`|¬A| ≤ |A|`). Direct from strict subspace inclusion in finite-
 dimensional space. -/
-theorem bipartiteToyGroundStateSubspacePredicted_finrank_lt_joint_eigenspace_finrank_of_nondegenerate
+theorem
+    bipartiteToyGroundStateSubspacePredicted_finrank_lt_joint_eigenspace_finrank_of_nondegenerate
     (A : Λ → Bool) (N : ℕ)
     (hA : 0 < (Finset.univ.filter (fun x : Λ => A x = true)).card)
     (hAc : 0 < (Finset.univ.filter (fun x : Λ => (! A x) = true)).card)

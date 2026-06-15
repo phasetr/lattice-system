@@ -93,7 +93,8 @@ theorem sublatticeSpinSquaredS_complement_antiAligned_eq_max (A : V → Bool) :
     intro x hx
     have hxA : A x = false := by simpa using hx
     simp [antiAlignedConfigS, hxA]
-  have hcas := sublatticeSpinSquaredS_mulVec_of_sublatticeSpinSOpMinus_eq_zero (fun x => ! A x) hmag hker
+  have hcas := sublatticeSpinSquaredS_mulVec_of_sublatticeSpinSOpMinus_eq_zero (fun x => ! A x)
+      hmag hker
   rw [hcas, sublatticeMagEigenvalue_antiAligned_notA A]
   congr 1
   ring

@@ -28,7 +28,8 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 theorem sublatticeMaxCasimirEigenspace_complement_ne_bot [Nonempty Λ] (A : Λ → Bool) :
     Module.End.eigenspace (sublatticeSpinSquaredS N (fun x => ! A x)).mulVecLin
         (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) * ((N : ℂ) / 2) *
-          (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) * ((N : ℂ) / 2) + 1)) ≠ ⊥ :=
+          (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) * ((N : ℂ) / 2) + 1)) ≠ ⊥
+              :=
   sublatticeMaxCasimirEigenspace_ne_bot (Λ := Λ) (N := N) (fun x => ! A x)
 
 end LatticeSystem.Quantum

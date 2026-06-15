@@ -74,7 +74,8 @@ theorem exists_sublattice_A_lowestWeight_component (A : Λ → Bool)
   have hk₀_max : ∀ k, k₀ < k → f k = 0 := by
     intro k hlt
     by_contra hne
-    have hmem : k ∈ Finset.univ.filter (fun k => f k ≠ 0) := Finset.mem_filter.mpr ⟨Finset.mem_univ k, hne⟩
+    have hmem : k ∈ Finset.univ.filter (fun k => f k ≠ 0) := Finset.mem_filter.mpr ⟨Finset.mem_univ
+        k, hne⟩
     exact absurd ((Finset.univ.filter (fun k => f k ≠ 0)).le_max' k hmem) (not_le.mpr hlt)
   -- Commute facts for inheriting the total Sz and Casimirs through the projection.
   have hcomm_tot : Commute (sublatticeSpinSOp3 N A) (totalSpinSOp3 Λ N) := by
@@ -126,7 +127,8 @@ theorem exists_sublattice_A_lowestWeight_component (A : Λ → Bool)
         exact Fin.ext (by exact_mod_cast (sub_right_inj.mp (sub_left_inj.mp hcontra)).symm)
       · intro h; exact absurd (Finset.mem_univ k₀) h
     -- The Ŝ_¬A^- contribution vanishes termwise.
-    have hB_term : sublatticeMagProjFn A L₁ ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec w) = 0 := by
+    have hB_term : sublatticeMagProjFn A L₁ ((sublatticeSpinSOpMinus N (fun x => ! A x)).mulVec w)
+        = 0 := by
       conv_lhs => rw [← hdecomp, Matrix.mulVec_sum, sublatticeMagProjFn_sum]
       refine Finset.sum_eq_zero (fun k _ => ?_)
       -- Ŝ_¬A^- (f k) ∈ A-mag level (sA − k) [preserves A-mag].

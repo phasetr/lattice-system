@@ -62,7 +62,8 @@ theorem tJExpansion_ne_zero_of_ne_zero (Ne : ℕ) {v : TJSpinHalfFillingSector N
 /-- **Variational bound on the t-J ground energy (E2, `≤`).** A nonzero real sector eigenvector `c`
 of `tJEffReMatrixOnSector` at eigenvalue `μ` lifts to an admissible state whose energy is `μ`, so
 `groundEnergyAtFilling Ĥ_tJ Ne ≤ μ`. -/
-theorem tJHamiltonian_groundEnergyAtFilling_le_of_sectorEigen (hpos : 0 < N) (Ne : ℕ) (hodd : Odd Ne)
+theorem tJHamiltonian_groundEnergyAtFilling_le_of_sectorEigen (hpos : 0 < N) (Ne : ℕ) (hodd : Odd
+    Ne)
     (τ J : ℝ) (hτ : 0 ≤ τ) (hJ : 0 ≤ J) {c : TJSpinHalfFillingSector N Ne → ℝ} (hc : c ≠ 0) (μ : ℝ)
     (heig : (tJEffReMatrixOnSector N Ne (cycleGraph (N + 1)) τ J) *ᵥ c = μ • c) :
     groundEnergyAtFilling (tJHamiltonian N (cycleGraph (N + 1)) τ J) Ne ≤ μ := by

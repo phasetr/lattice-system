@@ -35,7 +35,8 @@ theorem sublatticeSpinSOpPlus_mulVec_jointLadderIterateDownS_zeroA (A : Λ → B
       Matrix.mulVec_zero]
 
 /-- `Ŝ_¬A^+` annihilates `jointIterate k_A 0` (the `¬A`-block is the highest weight). -/
-theorem sublatticeSpinSOpPlus_complement_mulVec_jointLadderIterateDownS_zeroB (A : Λ → Bool) (kA : ℕ) :
+theorem sublatticeSpinSOpPlus_complement_mulVec_jointLadderIterateDownS_zeroB (A : Λ → Bool) (kA :
+    ℕ) :
     (sublatticeSpinSOpPlus N (fun x => ! A x)).mulVec (jointLadderIterateDownS A N kA 0) = 0 := by
   unfold jointLadderIterateDownS
   rw [pow_zero, Matrix.one_mulVec, Matrix.mulVec_mulVec,

@@ -83,7 +83,8 @@ theorem tasaki23_toy_groundState_casimir_eq_predicted_at_legacy
     (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) hComplex
   -- The toy ground state is a joint Casimir eigenvector (#3657).
   obtain ⟨⟨γ_tot, htot⟩, ⟨γ_A, hA⟩, ⟨γ_B, hB⟩⟩ :=
-    tasaki23_toy_groundState_joint_casimir_eigenvector_legacy A N c hc_strict h_intermediate hv_pos hH
+    tasaki23_toy_groundState_joint_casimir_eigenvector_legacy A N c hc_strict h_intermediate hv_pos
+        hH
   set w : (V → Fin (N + 1)) → ℂ :=
     magSectorEmbedding (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) with hw
   -- Energy: μ = γ_tot − γ_A − γ_B, so (γ_tot − γ_A − γ_B).re ≤ E.

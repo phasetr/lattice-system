@@ -35,7 +35,8 @@ variable {N : ℕ}
 If `s j ≠ ↑` the lowering `Ŝ⁻_j = ĉ†_{j↓}ĉ_{j↑}` hits an empty up-orbital. -/
 theorem fermionSpinPlusMinus_mulVec_tJConfigOf_eq_zero_of_source (N : ℕ)
     (s : Fin (N + 1) → Fin 3) (i j : Fin (N + 1)) (hj : s j ≠ 1) :
-    (fermionSiteSpinPlus N i * fermionSiteSpinMinus N j).mulVec (basisVec (tJConfigOf N s)) = 0 := by
+    (fermionSiteSpinPlus N i * fermionSiteSpinMinus N j).mulVec (basisVec (tJConfigOf N s)) = 0 :=
+        by
   have hmin : (fermionSiteSpinMinus N j).mulVec (basisVec (tJConfigOf N s)) = 0 := by
     unfold fermionSiteSpinMinus fermionDownCreation fermionUpAnnihilation
     rw [← Matrix.mulVec_mulVec, fermionMultiAnnihilation_mulVec_basisVec,
@@ -49,7 +50,8 @@ For `i ≠ j` with `s i ≠ ↓`, the raising `Ŝ⁺_i = ĉ†_{i↑}ĉ_{i↓}` 
 (unchanged by the `j`-local lowering `Ŝ⁻_j`). -/
 theorem fermionSpinPlusMinus_mulVec_tJConfigOf_eq_zero_of_target (N : ℕ)
     (s : Fin (N + 1) → Fin 3) (i j : Fin (N + 1)) (hij : i ≠ j) (hi : s i ≠ 2) :
-    (fermionSiteSpinPlus N i * fermionSiteSpinMinus N j).mulVec (basisVec (tJConfigOf N s)) = 0 := by
+    (fermionSiteSpinPlus N i * fermionSiteSpinMinus N j).mulVec (basisVec (tJConfigOf N s)) = 0 :=
+        by
   by_cases hj : s j = 1
   · -- `Ŝ⁻_j |Φ_s⟩ = scalar • |c'⟩` with `c'` differing from `tJConfigOf s` only at `j`'s orbitals
     have hmin : (fermionSiteSpinMinus N j).mulVec (basisVec (tJConfigOf N s)) =
@@ -110,7 +112,8 @@ theorem tJSpinSwap_eq_self_of_eq (s : Fin (N + 1) → Fin 3) (x y : Fin (N + 1))
 commute to `Ŝ⁺_y Ŝ⁻_x` and apply the source/target vanishing at `(y,x)`. -/
 theorem fermionSpinMinusPlus_mulVec_tJConfigOf_eq_zero_of_eq (N : ℕ) (s : Fin (N + 1) → Fin 3)
     (x y : Fin (N + 1)) (hxy : x ≠ y) (h : s x = s y) :
-    (fermionSiteSpinMinus N x * fermionSiteSpinPlus N y).mulVec (basisVec (tJConfigOf N s)) = 0 := by
+    (fermionSiteSpinMinus N x * fermionSiteSpinPlus N y).mulVec (basisVec (tJConfigOf N s)) = 0 :=
+        by
   rw [fermionSiteSpinMinus_mul_Plus_comm N x y hxy]
   rcases (show ∀ a : Fin 3, a ≠ 0 ∨ a = 0 from fun a => by tauto) (s x) with _ | _ <;>
   · by_cases hsx1 : s x = 1

@@ -49,7 +49,8 @@ theorem strict_gap_all_M_below_sInf_of_argmin
   by_cases h_M'_ne : (perMCrossingSet (Λ := Λ) hJ N M_balanced M' lam' D' ∩ Icc (0 : ℝ) 1).Nonempty
   · -- Non-empty M' set: argmin gives sInf M_chosen ≤ sInf M', so t' < sInf M'.
     have h_le := h_argmin M' hNE_M' hne_eq_M' h_M'_ne
-    have ht'_lt_M' : t' < sInf (perMCrossingSet (Λ := Λ) hJ N M_balanced M' lam' D' ∩ Icc (0 : ℝ) 1) :=
+    have ht'_lt_M' : t' < sInf (perMCrossingSet (Λ := Λ) hJ N M_balanced M' lam' D' ∩ Icc (0 : ℝ)
+        1) :=
       lt_of_lt_of_le ht'_lt_sInf h_le
     exact strict_per_M_gap_of_lt_sInf_perMCrossingSet
       hJ N M_balanced M' lam' D' h_M'_ne ht'_in_Icc ht'_lt_M'

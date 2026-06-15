@@ -71,7 +71,8 @@ theorem spinHalf_anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min
   -- hswap_eq : hermitianMinEigenvalue Ĥ = hermitianMinEigenvalue axisSwapped.
   -- Chain: hermitianMinEigenvalue Ĥ = hermitianMinEigenvalue axisSwapped (via hswap_eq)
   --                                  = min(block-0, block-1) (via hblock_eq).
-  -- But axisSwapped_full_isHermitian_im uses the same matrix as axisSwappedAnisotropicHeisenbergS_isHermitian_of_real.
+  -- But axisSwapped_full_isHermitian_im uses the same matrix as
+  -- axisSwappedAnisotropicHeisenbergS_isHermitian_of_real.
   -- The hermitianMinEigenvalue values match by congruence on the Hermitian instance.
   -- Rewrite the eigenvalue in h3888 to hermitianMinEigenvalue Ĥ.
   have henergy_eq : (min (hermitianMinEigenvalue

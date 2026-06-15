@@ -45,7 +45,8 @@ theorem tJ_uphop_forward_mulVec (N : ℕ) (s : Fin (N + 1) → Fin 3) (a b : Fin
   have hpne : spinfulIndex N b 0 ≠ spinfulIndex N a 0 := fun h =>
     hne ((spinfulIndex_eq_iff N b a 0 0).mp h).1.symm
   have hcq : tJConfigOf N s (spinfulIndex N a 0) = 1 := by rw [tJConfigOf_apply_up, if_pos ha]
-  have hcp : (Function.update (tJConfigOf N s) (spinfulIndex N a 0) 0) (spinfulIndex N b 0) = 0 := by
+  have hcp : (Function.update (tJConfigOf N s) (spinfulIndex N a 0) 0) (spinfulIndex N b 0) = 0 :=
+      by
     rw [Function.update_of_ne hpne, tJConfigOf_apply_up, if_neg (by rw [hb]; decide)]
   rw [fermionMultiCreation_mul_Annihilation_mulVec_basisVec, if_pos ⟨hcq, hcp⟩,
     jwSign_mul_jwSign_update_forward (2 * N + 1) (spinfulIndex N a 0) (spinfulIndex N b 0)
@@ -69,7 +70,8 @@ theorem tJ_downhop_forward_mulVec (N : ℕ) (s : Fin (N + 1) → Fin 3) (a b : F
   have hpne : spinfulIndex N b 1 ≠ spinfulIndex N a 1 := fun h =>
     hne ((spinfulIndex_eq_iff N b a 1 1).mp h).1.symm
   have hcq : tJConfigOf N s (spinfulIndex N a 1) = 1 := by rw [tJConfigOf_apply_down, if_pos ha]
-  have hcp : (Function.update (tJConfigOf N s) (spinfulIndex N a 1) 0) (spinfulIndex N b 1) = 0 := by
+  have hcp : (Function.update (tJConfigOf N s) (spinfulIndex N a 1) 0) (spinfulIndex N b 1) = 0 :=
+      by
     rw [Function.update_of_ne hpne, tJConfigOf_apply_down, if_neg (by rw [hb]; decide)]
   rw [fermionMultiCreation_mul_Annihilation_mulVec_basisVec, if_pos ⟨hcq, hcp⟩,
     jwSign_mul_jwSign_update_forward (2 * N + 1) (spinfulIndex N a 1) (spinfulIndex N b 1)

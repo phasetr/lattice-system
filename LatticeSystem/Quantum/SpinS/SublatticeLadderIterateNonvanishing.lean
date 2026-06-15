@@ -41,14 +41,16 @@ theorem sublatticeLadderIterateDownS_ne_zero (A : Λ → Bool) {k : ℕ}
     have hk_lt : k < (Finset.univ.filter (fun x : Λ => A x = true)).card * N := hk
     have h_vk_ne := ih (Nat.le_of_lt hk_lt)
     intro h_vk_succ_zero
-    have h_eigen := sublatticeSpinSOpPlus_mulVec_sublatticeLadderIterateDownS_succ (Λ := Λ) (N := N) A k
+    have h_eigen := sublatticeSpinSOpPlus_mulVec_sublatticeLadderIterateDownS_succ (Λ := Λ) (N :=
+        N) A k
     rw [h_vk_succ_zero, Matrix.mulVec_zero] at h_eigen
     have h_scalar_ne : (((k + 1 : ℕ) : ℂ) *
         ((Finset.univ.filter (fun x : Λ => A x = true)).card * (N : ℂ) - (k : ℂ))) ≠ 0 := by
       apply mul_ne_zero
       · exact_mod_cast Nat.succ_ne_zero k
       · intro h_eq
-        have hcN : (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) * (N : ℂ)) = (k : ℂ) :=
+        have hcN : (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) * (N : ℂ)) = (k : ℂ)
+            :=
           sub_eq_zero.mp h_eq
         have hcN' : (((Finset.univ.filter (fun x : Λ => A x = true)).card * N : ℕ) : ℂ) =
             ((k : ℕ) : ℂ) := by push_cast; exact hcN

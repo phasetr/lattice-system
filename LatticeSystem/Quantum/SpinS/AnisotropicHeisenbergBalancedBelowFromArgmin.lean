@@ -46,7 +46,8 @@ theorem balanced_GS_below_sInf_of_argmin
         sInf (perMCrossingSet (Λ := Λ) hJ N M_balanced M_chosen lam' D' ∩ Icc (0 : ℝ) 1) ≤
         sInf (perMCrossingSet (Λ := Λ) hJ N M_balanced M' lam' D' ∩ Icc (0 : ℝ) 1))
     -- "Every M' ≠ M_balanced (non-empty) has a crossing in Icc 0 1" — required to apply
-    -- strict_per_M_gap. For M' with no crossing, the strict gap trivially holds at all t' ∈ Icc 0 1.
+    -- strict_per_M_gap. For M' with no crossing, the strict gap trivially holds
+    -- at all t' ∈ Icc 0 1.
     (h_all_M_crossing_or_no_violation :
       ∀ M' : ℕ, ∀ _ : Nonempty (magConfigS Λ N M'), M' ≠ M_balanced → ∀ t' : ℝ,
         t' ∈ Icc (0 : ℝ) 1 →

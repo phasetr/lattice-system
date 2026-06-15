@@ -73,7 +73,8 @@ theorem exists_sector_hermitianMinEigenvalue_le_full
   -- Sector restriction is a sector eigvec at the full min (PR #3988).
   set μ : ℝ := hermitianMinEigenvalue
     (anisotropicHeisenbergS_full_isHermitian_real (Λ := Λ) hJ N lam D) with hμ_def
-  have hsec_eig := anisotropicHeisenbergS_magSector_submatrix_mulVec_magSectorRestriction_of_full_eigen
+  have hsec_eig :=
+      anisotropicHeisenbergS_magSector_submatrix_mulVec_magSectorRestriction_of_full_eigen
     J ((lam : ℂ)) ((D : ℂ)) (μ := ((μ : ℝ) : ℂ)) (M := M) hv_eig
   -- Sector restriction is non-zero.
   -- Hence μ IS an eigenvalue of the sector submatrix; sector min ≤ μ.

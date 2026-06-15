@@ -55,7 +55,8 @@ theorem jointLadderIterateDownS_ne_zero (A : Λ → Bool) {kA kB : ℕ}
       apply mul_ne_zero
       · exact_mod_cast Nat.succ_ne_zero kA
       · intro h_eq
-        have hcN : (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) * (N : ℂ)) = (kA : ℂ) :=
+        have hcN : (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) * (N : ℂ)) = (kA : ℂ)
+            :=
           sub_eq_zero.mp h_eq
         have hcN' : (((Finset.univ.filter (fun x : Λ => A x = true)).card * N : ℕ) : ℂ) =
             ((kA : ℕ) : ℂ) := by push_cast; exact hcN

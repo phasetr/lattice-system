@@ -50,7 +50,8 @@ theorem balanced_min_eq_full_at_sInf
           (anisotropicHeisenbergParametricPath lam' D'
             (sInf (perMCrossingSet (Λ := Λ) hJ N M_balanced M_chosen lam' D' ∩ Icc (0 : ℝ) 1))).1
           (anisotropicHeisenbergParametricPath lam' D'
-            (sInf (perMCrossingSet (Λ := Λ) hJ N M_balanced M_chosen lam' D' ∩ Icc (0 : ℝ) 1))).2) :=
+            (sInf (perMCrossingSet (Λ := Λ) hJ N M_balanced M_chosen lam' D' ∩ Icc (0 : ℝ) 1))).2)
+                :=
   balanced_GS_at_first_crossing_of_argmin hJ N M_balanced M_chosen lam' D'
     hne_chosen h_GS_at_SU2 h_balanced_GS_below
 

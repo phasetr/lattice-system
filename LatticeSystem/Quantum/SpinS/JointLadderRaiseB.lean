@@ -44,7 +44,8 @@ theorem sublatticeSpinSOpPlus_complement_mulVec_jointLadderIterateDownS_succB
   rw [hj (kB + 1), Matrix.mulVec_mulVec,
       ((sublatticeSpinSOpMinus_cross_commute_plus (Λ := Λ) (N := N) A).symm.pow_right kA).eq,
       ← Matrix.mulVec_mulVec,
-      sublatticeSpinSOpPlus_mulVec_sublatticeLadderIterateDownS_succ (Λ := Λ) (N := N) (fun x => ! A x) kB,
+      sublatticeSpinSOpPlus_mulVec_sublatticeLadderIterateDownS_succ (Λ := Λ) (N := N) (fun x => !
+          A x) kB,
       Matrix.mulVec_smul, ← hj kB]
 
 end LatticeSystem.Quantum
