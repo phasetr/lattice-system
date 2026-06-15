@@ -5359,6 +5359,21 @@ with staggered sign $\varepsilon_x = \pm 1$ on the two sublattices
 exhibiting ferrimagnetic long-range order. Recorded as a faithful documented
 \texttt{axiom} (Lieb's reflection positivity).
 
+\medskip
+\noindent\textbf{Proposition 10.7} (Tasaki §10.2.3, p.~356), \emph{proved
+axiom-free}. For a bipartite real symmetric hopping matrix $T$: (i) the
+single-electron spectrum is symmetric about zero, in the multiplicity form
+$(-T)\text{.charpoly} = T\text{.charpoly}$
+(\texttt{proposition\_10\_7\_charpoly\_neg\_eq}), proved via the diagonal gauge
+$D T D = -T$ with $D = \mathrm{diag}(\pm 1)$
+(\texttt{bipartiteSignMatrix}); (ii) there are at least $|A|-|B|$ zero modes,
+$\dim \ker T \ge |A|-|B|$
+(\texttt{proposition\_10\_7\_zero\_mode\_lower\_bound}), proved by sending
+$A$-supported vectors through $T$ into the $|B|$-dimensional $B$-supported
+subspace (bipartiteness) and applying rank–nullity over the $|A|$-dimensional
+domain. This is the one Chapter-10 item that is finite-dimensional linear
+algebra rather than reflection positivity, and it is fully discharged.
+
 %======================================================================
 \subsection{Effective Hamiltonian on the hard-core sector (Tasaki §11.2)}
 \label{subsec:hubbard-effective-hamiltonian}
