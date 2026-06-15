@@ -21,6 +21,7 @@ open Matrix
 
 variable {n : Type*} [Fintype n] [Nonempty n]
 
+omit [Nonempty n] in
 /-- For a unit vector `v` (matrix-side: `dotProduct (star v) v = 1`), each component
 satisfies `‖v_i‖ ≤ 1`. -/
 theorem norm_unit_vec_component_le_one

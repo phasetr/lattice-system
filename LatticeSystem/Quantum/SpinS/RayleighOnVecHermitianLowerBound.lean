@@ -29,6 +29,7 @@ open Matrix Module
 
 variable {n : Type*} [Fintype n] [DecidableEq n] [Nonempty n]
 
+omit [DecidableEq n] in
 /-- The Hermitian eigenvectorUnitary `U` is unitary: `U * Uᴴ = 1`. -/
 theorem eigenvectorUnitary_mul_conjTranspose_eq_one
     {M : Matrix n n ℂ} (hM : M.IsHermitian) :
@@ -40,6 +41,7 @@ theorem eigenvectorUnitary_mul_conjTranspose_eq_one
         Matrix n n ℂ) from rfl]
   exact h.2
 
+omit [DecidableEq n] in
 /-- The Hermitian eigenvectorUnitary `U` is unitary: `Uᴴ * U = 1`. -/
 theorem eigenvectorUnitary_conjTranspose_mul_eq_one
     {M : Matrix n n ℂ} (hM : M.IsHermitian) :
