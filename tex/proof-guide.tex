@@ -8432,6 +8432,17 @@ $L\uparrow\infty$ limit is the infinite-volume energy density $\varepsilon_{\mat
 separately as a documented axiom).  All proved (no axioms); the limit content is the
 operator-algebraic part deferred to faithful axioms.
 
+\smallskip\noindent\emph{Energy-density convergence (Issue \#4564, PR2).}  That the per-bond density
+denominator is genuinely positive on the tail is \textbf{proved}: for $0<d$, $1\le n$ the origin and
+the unit vector $e_i$ are adjacent box vertices, so $|B_n|>0$ (\texttt{boxBondCount\_pos}).  The
+thermodynamic-limit content of Tasaki eq.~(4.3.4) is then a \textbf{faithful documented axiom}
+\texttt{boxGroundEnergyDensityS\_tendsto}: for $0<d$ and $0<N$, the finite-volume per-bond
+ground-state energy density converges, $\exists\,\varepsilon_{\mathrm{GS}}$,
+$\texttt{boxGroundEnergyDensityS}\,d\,n\,N\xrightarrow{n\to\infty}\varepsilon_{\mathrm{GS}}$.  The
+limit value is existentially bound (pinned to the genuine limit of the box sequence, unique by the
+Hausdorff property of $\mathbb{R}$), not an arbitrary constant; the existence of the thermodynamic
+limit is the deep analytic / operator-algebraic content recorded as the axiom.
+
 \medskip
 \noindent\textbf{Theorem 4.22} (Tasaki §4.4.1, eqs.~(4.4.1)--(4.4.6), pp.~117--119; documented
 axioms, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  The one-dimensional

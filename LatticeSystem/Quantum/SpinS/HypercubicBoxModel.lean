@@ -1,6 +1,8 @@
 import LatticeSystem.Lattice.HypercubicLattice
 import LatticeSystem.Quantum.SpinS.Heisenberg
 import LatticeSystem.Quantum.SpinS.SubmatrixMinEigenvalue
+import Mathlib.Topology.Order.Basic
+import Mathlib.Order.Filter.AtTopBot.Basic
 
 /-!
 # The finite-volume Heisenberg model on a hypercubic box
@@ -105,5 +107,50 @@ Tasaki §4.3 eq. (4.3.4)); the `L↑∞` limit of this quantity is the infinite-
 ground-state energy density `ε_GS` (recorded separately as a documented axiom). -/
 noncomputable def boxGroundEnergyDensityS (d n N : ℕ) : ℝ :=
   boxGroundEnergyS d n N / (boxBondCount d n : ℝ)
+
+/-- The box has at least one nearest-neighbor bond once `0 < d` and `1 ≤ n`: the
+origin `0` and the unit vector `e_i` are both in `Λ_n` and are adjacent.  Hence the
+energy density has a positive denominator on the tail (so it is not vacuously
+ill-defined). -/
+theorem boxBondCount_pos (d n : ℕ) (hd : 0 < d) (hn : 1 ≤ n) : 0 < boxBondCount d n := by
+  classical
+  rw [boxBondCount, Finset.card_pos]
+  let i : Fin d := ⟨0, hd⟩
+  -- the origin `0` as a box vertex
+  have h0mem : (fun _ : Fin d => (0 : ℤ)) ∈ LatticeSystem.Lattice.hypercubicBox d n := by
+    rw [LatticeSystem.Lattice.mem_hypercubicBox]
+    intro j
+    show -(n : ℤ) < 0 ∧ (0 : ℤ) ≤ (n : ℤ)
+    omega
+  -- the unit vector `e_i` as a box vertex
+  have h1mem : (fun j : Fin d => if j = i then (1 : ℤ) else 0) ∈
+      LatticeSystem.Lattice.hypercubicBox d n := by
+    rw [LatticeSystem.Lattice.mem_hypercubicBox]
+    intro j
+    show -(n : ℤ) < (if j = i then (1 : ℤ) else 0) ∧ (if j = i then (1 : ℤ) else 0) ≤ (n : ℤ)
+    split_ifs <;> omega
+  refine ⟨s(⟨fun _ => 0, h0mem⟩, ⟨fun j => if j = i then 1 else 0, h1mem⟩), ?_⟩
+  rw [SimpleGraph.mem_edgeFinset, SimpleGraph.mem_edgeSet, hypercubicBoxGraph_adj]
+  refine ⟨i, ?_, ?_⟩
+  · change |(0 : ℤ) - (if i = i then (1 : ℤ) else 0)| = 1
+    simp
+  · intro j hj
+    change (0 : ℤ) = (if j = i then (1 : ℤ) else 0)
+    rw [if_neg hj]
+
+/-- **Tasaki §4.3 eq. (4.3.4), documented axiom.**  The finite-volume per-bond
+ground-state energy density of the spin-`S` antiferromagnetic Heisenberg model on
+the boxes `Λ_n ⊂ ℤᵈ` **converges** as the box grows (`n → ∞`); its limit is the
+infinite-volume ground-state energy density `ε_GS = ε_GS(d, N)`.  Recorded as a
+faithful documented axiom: the existence of the thermodynamic limit is the deep
+analytic / operator-algebraic content.  The `0 < d` hypothesis ensures the box
+has bonds (cf. `boxBondCount_pos`, so the per-bond density is well-defined on the
+tail); `0 < N` restricts to genuine spin `S > 0`.  The limit value `ε_GS` is
+existentially bound (pinned to the genuine limit of the box sequence, not an
+arbitrary constant — unique by the Hausdorff property of `ℝ`). -/
+axiom boxGroundEnergyDensityS_tendsto (d N : ℕ) (hd : 0 < d) (hN : 0 < N) :
+    ∃ εGS : ℝ,
+      Filter.Tendsto (fun n : ℕ => boxGroundEnergyDensityS d n N)
+        Filter.atTop (nhds εGS)
 
 end LatticeSystem.Quantum
