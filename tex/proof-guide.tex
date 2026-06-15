@@ -8351,6 +8351,28 @@ n_\alpha$ (the $\omega_n$ of Theorem 4.20) is \emph{ergodic}, hence a physical g
 Chapters~3--10 backfill.
 
 \medskip
+\noindent\textbf{Infinite-volume foundation: the hypercubic lattice $\mathbb{Z}^d$ and its box
+exhaustion} (Tasaki §3.1 eq.~(3.1.2), §4.3 eq.~(4.3.1), pp.~112--113;
+\texttt{Lattice/HypercubicLattice.lean}, Issue \#4557).  Toward the project's central long-term goal
+--- the thermodynamic (infinite-volume) limit --- this graph-centric, model-agnostic module fixes the
+substrate on which the limit is built.  \texttt{hypercubicLatticeGraph}\,$d$ is the infinite
+$d$-dimensional hypercubic lattice $\mathbb{Z}^d$ as a \texttt{SimpleGraph} on $\mathrm{Fin}\,d\to
+\mathbb{Z}$, two sites adjacent iff they differ in exactly one coordinate by $\pm1$ (the
+nearest-neighbor bond set $B_\infty$, eq.~(4.3.1)); \texttt{hypercubicLatticeGraph\_adj} unfolds the
+adjacency and a \texttt{DecidableRel} instance is provided.  \texttt{hypercubicBox}\,$d\,n$ is the
+centered finite box $\Lambda_n=\{x\in\mathbb{Z}^d:-n<x_i\le n\}$ of even side length $2n$
+(eq.~(3.1.2)).  The boxes form a \emph{monotone exhaustion} of $\mathbb{Z}^d$: nesting
+$\Lambda_n\subseteq\Lambda_{n+1}$ (\texttt{hypercubicBox\_subset\_succ},
+\texttt{hypercubicBox\_monotone}), every site lies in some box
+(\texttt{exists\_mem\_hypercubicBox}, witness $n=\sum_i|x_i|+1$, as $\mathrm{Ioc}(-n,n)$ excludes
+$-n$), and $\bigcup_n\Lambda_n=\mathbb{Z}^d$ (\texttt{iUnion\_hypercubicBox}).  This is the
+increasing-region API $\Lambda_n\uparrow\mathbb{Z}^d$ along which finite-volume systems converge to
+the infinite system.  The §4.3 helpers \texttt{bond} ($B_\infty$) and \texttt{latticeBox}
+($\Lambda_n$) are now thin wrappers over these graph-centric primitives
+(\texttt{bond\_iff\_adj}, \texttt{latticeBox\_eq\_hypercubicBox}), making the \texttt{Lattice} module
+the single source of truth.  Everything here is proved (no axioms).
+
+\medskip
 \noindent\textbf{Theorem 4.22} (Tasaki §4.4.1, eqs.~(4.4.1)--(4.4.6), pp.~117--119; documented
 axioms, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  The one-dimensional
 Heisenberg model is \emph{disordered at any nonzero temperature}.  This opens §4.4 by introducing the
