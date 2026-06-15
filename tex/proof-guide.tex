@@ -4647,6 +4647,37 @@ by positive-definiteness of the Fock inner product. Finally $c \neq 0$,
 since $|\Psi\rangle \neq 0$ by Lemma 9.2 applied to the linearly
 independent $\psi$. The lemma depends only on the Lemma 9.1 axiom.
 
+\medskip
+\noindent\textbf{Lemma 9.4} (general basis of $H_N$; Tasaki §9.2.3,
+pp.~321--322, eq.~(9.2.65)). For $M+1$ linearly independent
+single-particle states $\varphi^{(1)},\dots,\varphi^{(M+1)}$, the states
+\[
+  |\Gamma_{S\uparrow,S\downarrow}\rangle
+    = \Bigl(\textstyle\prod_{j\in S\uparrow}\hat C^\dagger_\uparrow(\varphi^{(j)})\Bigr)
+      \Bigl(\textstyle\prod_{j\in S\downarrow}\hat C^\dagger_\downarrow(\varphi^{(j)})\Bigr)
+      |\Phi_{\rm vac}\rangle,
+\]
+over all subset pairs $(S\uparrow, S\downarrow)$ with
+$|S\uparrow| + |S\downarrow| = N$, span the $N$-electron sector $H_N$
+(\texttt{tasaki\_lemma\_9\_4\_generalBasis\_span},
+\texttt{tasaki\_lemma\_9\_4\_of\_linearIndependent}, in
+\texttt{Hubbard/GeneralBasisHN.lean}).
+
+\emph{Proof (axiom-free).} We take $H_N$ to be the $N$-eigenspace of the
+total number operator $\hat N$ (\texttt{spinfulNElectronSubmodule}). The
+proof reuses the general-basis Fock-monomial framework of §11.3
+(\texttt{generalModeMonomial}, the occupation basis
+\texttt{generalOccBasis}, the diagonalization
+$\hat N\,|qs\rangle = (\operatorname{length} qs)\,|qs\rangle$, and the
+reordering-sign lemma \texttt{generalModeMonomial\_perm}). Each
+$|\Gamma_{S\uparrow,S\downarrow}\rangle$ is a product of $N$ creators, so
+it is an $\hat N$-eigenstate of eigenvalue $N$, giving the inclusion
+$\mathrm{span} \subseteq H_N$. Conversely, expanding any $v \in H_N$ in
+the occupation basis, the coefficients on configurations of the wrong
+particle count vanish, and every $N$-electron occupation monomial equals
+a nonzero multiple (a reordering sign) of some
+$|\Gamma_{S\uparrow,S\downarrow}\rangle$; hence $H_N \subseteq \mathrm{span}$.
+
 \subsection{Hubbard spin symmetry: U(1)\texorpdfstring{$\times$}{×}U(1) invariance (Tasaki §9.3.3)}
 \label{subsec:hubbard-spin-symmetry}
 
