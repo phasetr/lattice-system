@@ -8407,6 +8407,20 @@ is the uniform nearest-neighbor coupling feeding finite-volume many-body Hamilto
 graph inherits bipartiteness (\texttt{hypercubicBoxGraph\_isBipartite}, the parent parity coloring
 restricted along $\Lambda_n\hookrightarrow\mathbb{Z}^d$).  All proved (no axioms).
 
+\smallskip\noindent\emph{Concrete finite-volume model (Issue \#4557, PR6).}  Instantiating the
+graph-centric spin-$S$ Heisenberg Hamiltonian on the box graph gives the concrete
+\textbf{finite-volume Heisenberg model} on $\Lambda_n$,
+$\texttt{boxHeisenbergHamiltonianS}\,d\,n\,J\,N=\texttt{heisenbergHamiltonianOnGraphS}\,(\texttt{hypercubicBoxGraph}\,d\,n)\,J\,N
+\in\texttt{ManyBodyOpS}\,(\texttt{hypercubicBoxVertex}\,d\,n)\,N$, equal by \texttt{rfl} to the
+many-body Hamiltonian of the PR5 coupling \texttt{hypercubicBoxCoupling}.  Its antiferromagnetic
+specialization $\texttt{boxAFMHeisenbergHamiltonianS}\,d\,n\,N$ takes edge weight $J=\tfrac12$, so
+that the ordered-pair sum realizes Tasaki's unordered-bond Hamiltonian
+$\hat H_{\Lambda_n}=\sum_{\langle x,y\rangle}\hat S_x\cdot\hat S_y$ with coefficient $+1$ per bond.
+Both are Hermitian for real $J$ (\texttt{boxHeisenbergHamiltonianS\_isHermitian},
+\texttt{boxAFMHeisenbergHamiltonianS\_isHermitian}).  This is the finite-volume model whose
+$L\uparrow\infty$ thermodynamic limit is the §4.3 infinite-volume system \texttt{InfiniteSpinSystem},
+the boxes $\Lambda_n\uparrow\mathbb{Z}^d$ providing the exhaustion.  All proved (no axioms).
+
 \medskip
 \noindent\textbf{Theorem 4.22} (Tasaki §4.4.1, eqs.~(4.4.1)--(4.4.6), pp.~117--119; documented
 axioms, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  The one-dimensional
