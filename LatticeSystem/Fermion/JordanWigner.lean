@@ -117,6 +117,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralBasisHN
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetism
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SectorMinEnergy
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularHubbardModel
 import LatticeSystem.Fermion.JordanWigner.Hubbard.NonsingularLocalStability
