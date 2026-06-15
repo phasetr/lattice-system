@@ -1,6 +1,8 @@
 import Mathlib.Combinatorics.SimpleGraph.Basic
 import Mathlib.Combinatorics.SimpleGraph.Bipartite
 import Mathlib.Combinatorics.SimpleGraph.Coloring
+import Mathlib.Combinatorics.SimpleGraph.Maps
+import LatticeSystem.Lattice.Graph
 import Mathlib.Data.Fintype.Pi
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Order.Interval.Finset.Basic
@@ -198,5 +200,49 @@ variable (d) in
 theorem hypercubicLatticeGraph_isBipartite :
     (hypercubicLatticeGraph d).IsBipartite :=
   ⟨hypercubicParityColoring d⟩
+
+/-! ### The induced finite-volume subgraph on a box
+
+The finite box `Λ_n` carries the **induced** subgraph of the hypercubic lattice:
+a finite graph on which finite-volume Hamiltonians live.  This is the graph-centric
+finite-volume substrate `Λ_n ↪ ℤᵈ` of the thermodynamic limit. -/
+
+/-- The vertex type of the finite hypercubic box `Λ_n` (a subtype of `ℤᵈ`); a
+`Fintype` since the box is a `Finset`. -/
+abbrev hypercubicBoxVertex (d n : ℕ) : Type :=
+  (hypercubicBox d n : Set (Fin d → ℤ))
+
+/-- The **finite-volume graph** on the box `Λ_n`: the subgraph of the infinite
+hypercubic lattice `ℤᵈ` induced on the vertices of `Λ_n`. -/
+abbrev hypercubicBoxGraph (d n : ℕ) : SimpleGraph (hypercubicBoxVertex d n) :=
+  (hypercubicLatticeGraph d).induce (hypercubicBox d n : Set (Fin d → ℤ))
+
+/-- Adjacency in the finite-volume box graph is the parent nearest-neighbor bond
+condition on the underlying sites. -/
+theorem hypercubicBoxGraph_adj {d n : ℕ} {x y : hypercubicBoxVertex d n} :
+    (hypercubicBoxGraph d n).Adj x y ↔
+      ∃ i : Fin d, |(x : Fin d → ℤ) i - (y : Fin d → ℤ) i| = 1 ∧
+        ∀ j, j ≠ i → (x : Fin d → ℤ) j = (y : Fin d → ℤ) j :=
+  hypercubicLatticeGraph_adj
+
+/-- The **uniform nearest-neighbor coupling** on the finite box `Λ_n` with edge
+weight `J`: `J` on adjacent sites of the induced box graph, `0` otherwise.  This
+is the graph-centric finite-volume coupling for many-body Hamiltonians. -/
+noncomputable def hypercubicBoxCoupling (d n : ℕ) (J : ℂ) :
+    hypercubicBoxVertex d n → hypercubicBoxVertex d n → ℂ :=
+  couplingOf (hypercubicBoxGraph d n) J
+
+/-- The parity 2-coloring of the finite-volume box graph: the parent lattice
+parity coloring restricted along the inclusion `Λ_n ↪ ℤᵈ`. -/
+def hypercubicBoxParityColoring (d n : ℕ) :
+    (hypercubicBoxGraph d n).Coloring (Fin 2) :=
+  (hypercubicParityColoring d).comp
+    (SimpleGraph.Embedding.induce (hypercubicBox d n : Set (Fin d → ℤ))).toHom
+
+variable (d n : ℕ) in
+/-- The finite-volume box graph is **bipartite** (inherited from `ℤᵈ`). -/
+theorem hypercubicBoxGraph_isBipartite :
+    (hypercubicBoxGraph d n).IsBipartite :=
+  ⟨hypercubicBoxParityColoring d n⟩
 
 end LatticeSystem.Lattice

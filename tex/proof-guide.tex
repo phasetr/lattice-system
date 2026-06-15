@@ -8396,6 +8396,17 @@ antiferromagnetic / N\'eel order.  The §4.3 quantum-side parity helpers \texttt
 $\varepsilon_x=\pm1$ exactly on $\mathbb{Z}^d_{\mathrm{even}}$ / $\mathbb{Z}^d_{\mathrm{odd}}$).  All
 proved (no axioms).
 
+\smallskip\noindent\emph{Induced finite-volume subgraph (Issue \#4557, PR5).}  The finite box
+$\Lambda_n$ carries the \textbf{induced} subgraph
+$\texttt{hypercubicBoxGraph}\,d\,n=(\texttt{hypercubicLatticeGraph}\,d).\texttt{induce}\,\Lambda_n$ on
+the \texttt{Fintype} vertex subtype $\texttt{hypercubicBoxVertex}\,d\,n=\Lambda_n\subseteq\mathbb{Z}^d$
+(\texttt{hypercubicBoxGraph\_adj}: adjacency is the parent nearest-neighbor bond, by \texttt{induce\_adj}).
+This is the graph-centric finite-volume substrate $\Lambda_n\hookrightarrow\mathbb{Z}^d$ of the
+thermodynamic limit: \texttt{hypercubicBoxCoupling}\,$d\,n\,J=\texttt{couplingOf}\,(\texttt{hypercubicBoxGraph}\,d\,n)\,J$
+is the uniform nearest-neighbor coupling feeding finite-volume many-body Hamiltonians, and the box
+graph inherits bipartiteness (\texttt{hypercubicBoxGraph\_isBipartite}, the parent parity coloring
+restricted along $\Lambda_n\hookrightarrow\mathbb{Z}^d$).  All proved (no axioms).
+
 \medskip
 \noindent\textbf{Theorem 4.22} (Tasaki §4.4.1, eqs.~(4.4.1)--(4.4.6), pp.~117--119; documented
 axioms, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  The one-dimensional
