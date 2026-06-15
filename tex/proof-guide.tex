@@ -8618,6 +8618,23 @@ Schmidt decomposition.  This section is heuristic; the precise indices come in �
 (Ogata).  Markers for the antiunitary/inversion/Schmidt structure; the parity and classification are
 documented axioms.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§8.3.4 Matrix-product SPT index} (Theorem 8.7 Tachikawa + Corollary 8.5; Tasaki
+§8.3.4, eqs.~(8.3.42)--(8.3.47), pp.~269--279; \texttt{Quantum/SpinS/SPTMatrixProductIndex.lean},
+Issue \#4485).  For matrix product states the entanglement index becomes a precise invariant: a
+projective representation of the symmetry $G$ on the bond space with phase function (2-cocycle)
+$\varphi:G\to G\to\mathbb{R}$ (\texttt{IsProjectiveRep}), \emph{trivial} (\texttt{IsTrivialProjectiveRep})
+iff $\varphi$ is a coboundary (eq.~8.3.43); the cohomology class is the SPT index.  The axiom
+\texttt{tasaki\_theorem\_8\_7} states that a symmetric injective MPS
+(\texttt{SymmetricInjectiveMPSExists}, $\hat V(g)|\Phi\rangle=e^{i\eta_L(g)}|\Phi\rangle$) forces the
+projective representation to be trivial.  For half-odd-integer spin ($N$ odd) the axiom
+\texttt{z2z2Spin\_nontrivial\_of\_odd} (eq.~2.1.31) records that the $\mathbb{Z}_2\times\mathbb{Z}_2$
+representation is nontrivial, and \texttt{tasaki\_corollary\_8\_5} is then \emph{proved} as the
+contrapositive: for odd $N$ there is no $\mathbb{Z}_2\times\mathbb{Z}_2$-invariant injective MPS --- the
+matrix-product Lieb--Schultz--Mattis no-go.  Markers for the cocycle/coboundary cohomology and the MPS
+construction; Theorem 8.7 and the nontriviality are documented axioms, Corollary 8.5 a proved theorem.
+Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
