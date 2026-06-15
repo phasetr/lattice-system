@@ -4607,6 +4607,25 @@ $\langle \Phi_{\rm vac}, \Phi_{\rm vac}\rangle = 1$
 consistency guard. The downstream Lemmas 9.2 and 9.3 will be proved
 from this identity.
 
+\medskip
+\noindent\textbf{Lemma 9.2} (Tasaki §9.2.3, p.~320). The Slater
+determinant state $|\Phi\rangle$ is nonvanishing if and only if the
+single-electron wave functions $\varphi^{(1)},\dots,\varphi^{(N)}$ are
+linearly independent
+(\texttt{lemma\_9\_2\_slater\_ne\_zero\_iff\_linearIndependent}).
+
+\emph{Proof.} By Lemma 9.1 (with $\psi = \varphi$) the squared norm
+$\langle \Phi, \Phi\rangle$ equals the Gram determinant
+$\det(\langle \varphi^{(j)}, \varphi^{(k)}\rangle)$. The Fock inner
+product is positive definite, so $\Phi = 0$ iff
+$\langle \Phi, \Phi\rangle = 0$. Writing the coefficient matrix
+$A$ with columns $\varphi^{(j)}$ (so $A_{x,j} = \varphi^{(j)}(x)$), the
+Gram matrix is $G = A^{\mathsf H} A$, and $\ker(A^{\mathsf H} A) = \ker A$
+over $\mathbb{C}$; hence $\det G \neq 0$ iff the columns of $A$ are
+linearly independent, i.e.\ iff the $\varphi^{(j)}$ are. This part
+(\texttt{slaterGram\_self\_det\_ne\_zero\_iff}) is proved axiom-free; the
+full lemma depends only on the Lemma 9.1 axiom.
+
 \subsection{Hubbard spin symmetry: U(1)\texorpdfstring{$\times$}{×}U(1) invariance (Tasaki §9.3.3)}
 \label{subsec:hubbard-spin-symmetry}
 
