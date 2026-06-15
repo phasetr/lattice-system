@@ -2720,6 +2720,8 @@ fermion mode acting on `ℂ²` with computational basis
 | `slaterGram` / `singleParticleInner` | single-particle overlap (Gram) matrix `(G)_{j,k} = ⟨φ⁽ʲ⁾, ψ⁽ᵏ⁾⟩` and its entry `Σ_x φ(x)* ψ(x)` | `Fermion/JordanWigner/FockSpaceRepresentation.lean` |
 | `slaterState_nil` / `fockInner_vacuum_self` | empty Slater state is the vacuum; `⟨Φvac, Φvac⟩ = 1` (the `n = 0` instance of Lemma 9.1, proved axiom-free as a consistency guard) | `Fermion/JordanWigner/FockSpaceRepresentation.lean` |
 | `lemma_9_1_slater_inner_det` / `lemma_9_1_slater_inner_perm_sum` | **Lemma 9.1** (Tasaki §9.2.3, p. 319, eq. (9.2.53), **AXIOM**): the Slater overlap `⟨Φ, Ψ⟩ = det(⟨φ⁽ʲ⁾, ψ⁽ᵏ⁾⟩) = Σ_p (sign p) ∏_j ⟨φ⁽ʲ⁾, ψ⁽ᵖ⁽ʲ⁾⁾⟩`. Faithful documented axiom for the determinant overlap identity (a heavy finite-dim Wick/Laplace+Koszul development); the permutation-sum form is derived from it via the Leibniz expansion. | `Fermion/JordanWigner/FockSpaceRepresentation.lean` |
+| `slaterCoeffMatrix` / `slaterGram_self_eq_conjTranspose_mul_self` / `slaterGram_self_det_ne_zero_iff` | coefficient matrix `A` (columns = wave functions), `G = AᴴA`, and the linear-algebra core `det G ≠ 0 ↔ LinearIndependent ℂ φ` (axiom-free, via `ker(AᴴA)=ker A` + column-injectivity criterion) | `Fermion/JordanWigner/FockSpaceRepresentation.lean` |
+| `lemma_9_2_slater_ne_zero_iff_linearIndependent` | **Lemma 9.2** (Tasaki §9.2.3, p. 320): the Slater determinant state `slaterState (List.ofFn φ) ≠ 0 ↔ LinearIndependent ℂ φ`. Proved from Lemma 9.1 (`⟨Φ,Φ⟩ = det Gram`) + positive-definiteness of the Fock inner product. Depends only on the Lemma 9.1 axiom. | `Fermion/JordanWigner/FockSpaceRepresentation.lean` |
 
 #### Hubbard spin symmetry — full SU(2) invariance (Tasaki §9.3.3)
 
