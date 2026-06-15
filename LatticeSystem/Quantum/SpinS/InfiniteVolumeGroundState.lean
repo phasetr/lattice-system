@@ -1,3 +1,4 @@
+import LatticeSystem.Lattice.HypercubicLattice
 import LatticeSystem.Math.CStarAlgebra.State
 import Mathlib.Algebra.Star.StarAlgHom
 import Mathlib.Data.Fintype.Pi
@@ -66,9 +67,17 @@ def evenSite (x : Fin d → ℤ) : Prop := (∑ i, x i) % 2 = 0
 
 /-- `{x, y}` is a **nearest-neighbor bond** (`B∞`, eq. (4.3.1)) when `x` and `y` differ in exactly
 one
-coordinate by `±1`. -/
+coordinate by `±1`.  This is the adjacency of the graph-centric infinite hypercubic lattice
+`LatticeSystem.Lattice.hypercubicLatticeGraph d`; the local wrapper is kept for the faithful §4.3
+naming (cf. `bond_iff_adj`). -/
 def bond (x y : Fin d → ℤ) : Prop :=
-  ∃ i : Fin d, |x i - y i| = 1 ∧ ∀ j, j ≠ i → x j = y j
+  (LatticeSystem.Lattice.hypercubicLatticeGraph d).Adj x y
+
+/-- The nearest-neighbor `bond` predicate is exactly the adjacency of the infinite hypercubic
+lattice graph, unfolded to its differ-in-one-coordinate-by-`±1` form. -/
+theorem bond_iff_adj {x y : Fin d → ℤ} :
+    bond x y ↔ ∃ i : Fin d, |x i - y i| = 1 ∧ ∀ j, j ≠ i → x j = y j :=
+  LatticeSystem.Lattice.hypercubicLatticeGraph_adj
 
 /-- The **bond spin–spin operator** `Ŝ_x · Ŝ_y = Σ_α Ŝ_x^{(α)} Ŝ_y^{(α)}`. -/
 noncomputable def spinDot (S : InfiniteSpinSystem d A) (x y : Fin d → ℤ) : A :=
@@ -97,7 +106,11 @@ instance : DecidablePred (evenSite (d := d)) := fun x => Int.decEq ((∑ i, x i)
 /-- The finite hypercubic box `Λ_n = {x ∈ ℤᵈ : −n < xᵢ ≤ n}` (even side length `2n`, volume `(2n)ᵈ`,
 centered at the origin, cf. eq. (3.1.2)), as a `Finset`. -/
 noncomputable def latticeBox (d n : ℕ) : Finset (Fin d → ℤ) :=
-  Fintype.piFinset fun _ : Fin d => Finset.Ioc (-(n : ℤ)) (n : ℤ)
+  LatticeSystem.Lattice.hypercubicBox d n
+
+/-- The finite box `latticeBox d n` is the graph-centric `hypercubicBox d n`. -/
+theorem latticeBox_eq_hypercubicBox (d n : ℕ) :
+    latticeBox d n = LatticeSystem.Lattice.hypercubicBox d n := rfl
 
 /-- The **bulk operator** `Â_n = Σ_{x ∈ Λ_n ∩ ℤᵈ_even} τ_x(Â)` (eq. (4.3.5)): the sum of the
 translated observables over the even sites of the centered box `Λ_n` (side `2n`). -/
