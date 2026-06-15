@@ -8583,6 +8583,25 @@ $\hat H$, the transformed $\hat U_{\mathrm{KT}}\hat H\hat U_{\mathrm{KT}}$ is ag
 picture is effective exactly when $\hat H$ has $\mathbb{Z}_2\times\mathbb{Z}_2$ symmetry.  A documented
 axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§8.3.1--§8.3.2 Symmetry protected topological (SPT) phase} (Gu--Wen /
+Pollmann--Turner--Berg--Oshikawa; Tasaki §8.3.1--§8.3.2, eqs.~(8.3.1)--(8.3.4), pp.~251--256;
+\texttt{Quantum/SpinS/SPTPhase.lean}, Issue \#4485).  The Haldane phase is understood as a nontrivial
+SPT phase.  \texttt{guWenHamiltonianS} $L\,D\,B=\texttt{anisotropicChainHamiltonianS}\,L\,D+B\sum_x\hat
+S_x^{(1)}$ (eq.~8.3.4, the $S=1$ chain with a magnetic field $B$ in the 1-direction, breaking
+$\mathbb{Z}_2\times\mathbb{Z}_2$ to a single $\mathbb{Z}_2$; $B=0$ recovers the anisotropic model).
+The axiom \texttt{tasaki\_oshikawa\_8\_3\_3} (eq.~8.3.3) records that the spin-$S$ VBS string order is
+positive for odd $S$ and zero for even $S$, and \texttt{tasaki\_vbs\_edge\_degeneracy} that the
+spin-$S$ AKLT open chain has $(S{+}1)^2$-fold edge degeneracy.  The SPT notions are honest
+\texttt{def}s (never axioms): \texttt{HamiltonianPath} is a genuinely \texttt{Continuous} path of
+Hamiltonians, each short-range gapped-unique (marker \texttt{IsShortRangeGappedUniqueGS});
+\texttt{SymmetryConnected}~$sym$ requires every $\hat H_s$ to satisfy the symmetry predicate $sym$;
+\texttt{IsTrivialPhase}~$sym\,H$ is symmetry-connection to a product-state Hamiltonian
+(\texttt{IsProductStateHamiltonian}); and \texttt{IsSPTPhase}~$sym\,H$ is short-range gapped-unique,
+$sym$-symmetric, and not trivial.  The Haldane phase is the prototypical SPT phase protected by
+$\mathbb{Z}_2\times\mathbb{Z}_2$ (\texttt{IsZ2Z2Invariant}).  Concrete Hamiltonian + \texttt{def} SPT;
+the Oshikawa parity and edge degeneracy are documented axioms.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
