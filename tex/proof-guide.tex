@@ -8635,6 +8635,19 @@ matrix-product Lieb--Schultz--Mattis no-go.  Markers for the cocycle/coboundary 
 construction; Theorem 8.7 and the nontriviality are documented axioms, Corollary 8.5 a proved theorem.
 Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§8.3.5 Discrete-symmetry Lieb--Schultz--Mattis theorem} (Theorem 8.6, Ogata--Tasaki;
+Tasaki §8.3.5, pp.~276--280; \texttt{Quantum/SpinS/LiebSchultzMattisDiscrete.lean}, Issue \#4485).
+The general no-go theorem without continuous symmetry.  The axiom \texttt{tasaki\_theorem\_8\_6}
+states that for half-odd-integer spin ($S=N/2$ with $N$ odd) a short-ranged, translation-invariant
+Hamiltonian $H$ (markers \texttt{HasShortRangeHamiltonianS}, \texttt{IsTranslationInvariantS}) having
+either $\mathbb{Z}_2\times\mathbb{Z}_2$ or time-reversal symmetry (\texttt{IsZ2Z2SymmetricS} $\lor$
+\texttt{IsTimeReversalSymmetricS}) can never have a ground state that is both unique and gapped:
+$\lnot\,\texttt{HasUniqueGappedGroundStateS}\,H$.  Unlike the original LSM theorem (§6.2, which uses
+the continuous $U(1)$ symmetry), this needs only a discrete symmetry; proved rigorously by Ogata and
+Tasaki via the Cuntz algebra of a split-property pure state (no MPS approximation).  All predicates
+are honest markers; a documented axiom.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
