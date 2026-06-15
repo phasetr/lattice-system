@@ -5227,6 +5227,44 @@ configurations, so
 \end{itemize}
 
 %======================================================================
+\subsection{Degenerate perturbation theory: the effective Hamiltonian (Tasaki §10.1, Lemma 10.1)}
+\label{subsec:degenerate-perturbation}
+
+\noindent The first item of Chapter 10 (Lieb's theorems) is the
+degenerate-perturbation-theory lemma underlying the proof of Lieb's
+theorem for the repulsive Hubbard model. For a Hamiltonian family
+$\hat H(\lambda) = \hat H_0 + \lambda \hat V$ with $\hat H_0 \ge 0$
+Hermitian and ground space $H_0 = \ker \hat H_0$, the second-order
+effective Hamiltonian on $H_0$ is
+\[
+  \hat H_{\rm eff} = -\,\hat P_0\,\hat V\,\hat H_0^{-1}\,\hat V\,\hat P_0
+  \qquad (\text{Tasaki eq.~(10.1.20)}),
+\]
+where $\hat P_0$ is the orthogonal projection onto $H_0$
+(\texttt{kernelProjectionMatrix}, Hermitian and idempotent) and
+$\hat H_0^{-1}$ is the reduced (Moore--Penrose) inverse, supported on
+$H_0^\perp$ (\texttt{IsReducedInverse}). These are defined in
+\texttt{Math/MatrixAnalysis/DegeneratePerturbation.lean}.
+
+\medskip
+\noindent\textbf{Lemma 10.1} (Tasaki §10.1, p.~346). If the effective
+Hamiltonian $\hat H_{\rm eff}$ (restricted to $H_0$) has a unique ground
+state $|\Phi_{\rm eff\text{-}GS}\rangle$, then $\hat H(\lambda)$ has a
+unique ground state for all sufficiently small $\lambda > 0$, and a phase
+choice of normalized ground states converges to
+$|\Phi_{\rm eff\text{-}GS}\rangle$ as $\lambda \to 0^+$
+(\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation}).
+
+\emph{Status.} The content is the analytic theory of degenerate
+perturbations (continuity of the low-lying eigenstates and the
+$\lambda \to 0^+$ limit); per the project policy (perturbation-theory
+proofs are not undertaken) it is recorded as a faithful documented
+\texttt{axiom}, the weak-coupling companion of the strong-coupling
+Theorem A.12 (\texttt{effectiveHamiltonian\_strongCoupling\_limit}). The
+projection $\hat P_0$ is constructed concretely and its
+Hermitian/idempotent properties are proved as consistency guards.
+
+%======================================================================
 \subsection{Effective Hamiltonian on the hard-core sector (Tasaki §11.2)}
 \label{subsec:hubbard-effective-hamiltonian}
 %======================================================================

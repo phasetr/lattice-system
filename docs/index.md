@@ -2843,6 +2843,15 @@ fermion mode acting on `ℂ²` with computational basis
 | `hubbardHop_mulVec_hardcoreBasisState` | operator content of (11.2.4): `c†_{(x,s)} c_{(y,s)} \|Φ_{x,σ}⟩ = (jwSign·jwSign) • \|Φ_{y, σ_{y→x}}⟩` (create at hole `x`, annihilate at occupied `y`) | `Fermion/JordanWigner/Hubbard/HopAction.lean` |
 | `hubbardHopTerm_inner_hardcoreBasisState` | per-term content of (11.2.5): the matrix element `⟨Φ_{y,τ}\| c†_{(x,s)} c_{(y,s)} \|Φ_{x,σ}⟩` is the JW sign product times the indicator `τ = σ_{y→x}` | `Fermion/JordanWigner/Hubbard/HopMatrixElement.lean` |
 
+#### Degenerate perturbation theory: second-order effective Hamiltonian (Tasaki §10.1, Lemma 10.1)
+
+| Lean name | Statement | File |
+|---|---|---|
+| `matrixKernel` / `kernelProjectionMatrix` (+ `_isHermitian` / `_isIdempotent`) | ground space `H₀ = ker Ĥ₀` and the orthogonal projection matrix `P̂₀` onto it (via `Submodule.starProjection`); Hermitian + idempotent (proved axiom-free) | `Math/MatrixAnalysis/DegeneratePerturbation.lean` |
+| `IsReducedInverse` / `secondOrderEffectiveHamiltonian` / `perturbedHamiltonian` | the Moore–Penrose reduced inverse `Ĥ₀⁻¹`, the effective Hamiltonian `Ĥeff = −P̂₀ V̂ Ĥ₀⁻¹ V̂ P̂₀` (eq. (10.1.20)), and `Ĥ(λ) = Ĥ₀ + λ V̂` | `Math/MatrixAnalysis/DegeneratePerturbation.lean` |
+| `IsGroundEigenvalueOn` / `IsUniqueGroundStateOn` | ground-eigenvalue and unique-(normalized)-ground-state predicates for a Hermitian matrix restricted to a subspace | `Math/MatrixAnalysis/DegeneratePerturbation.lean` |
+| `tasaki_lemma_10_1_degenerate_perturbation` | **Lemma 10.1** (Tasaki §10.1, p. 346, **AXIOM**): if `Ĥeff` has a unique ground state on `ker Ĥ₀`, then `Ĥ(λ)` has a unique ground state for all sufficiently small `λ > 0`, converging (phase choice) to the effective ground state as `λ → 0⁺`. Analytic degenerate-perturbation theory → faithful documented axiom (companion to the strong-coupling `effectiveHamiltonian_strongCoupling_limit`, Theorem A.12). | `Math/MatrixAnalysis/DegeneratePerturbation.lean` |
+
 #### Hubbard effective Hamiltonian on the hard-core sector (Tasaki §11.2)
 
 | Lean name | Statement | File |
