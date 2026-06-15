@@ -55,7 +55,7 @@ theorem anisotropicHeisenbergS_magSectorProjection_eigen
     -- The second sum is 0 since H σ τ = 0 when sectors differ (#3898).
     -- So (H·w) σ = (H·v) σ = μ * v σ = μ * w σ.
     have hHwσ : H.mulVec w σ = H.mulVec v σ := by
-      show ∑ τ, H σ τ * w τ = ∑ τ, H σ τ * v τ
+      change ∑ τ, H σ τ * w τ = ∑ τ, H σ τ * v τ
       refine Finset.sum_congr rfl (fun τ _ => ?_)
       by_cases hτM : magSumS τ = M
       · have : w τ = v τ := by
@@ -77,7 +77,7 @@ theorem anisotropicHeisenbergS_magSectorProjection_eigen
     -- (H·w) σ = ∑_τ H σ τ * w τ. For τ in sector M: σ ∉ M ⟹ H σ τ = 0.
     -- For τ not in sector M: w τ = 0. So all terms vanish.
     have hHwσ : H.mulVec w σ = 0 := by
-      show ∑ τ, H σ τ * w τ = 0
+      change ∑ τ, H σ τ * w τ = 0
       refine Finset.sum_eq_zero (fun τ _ => ?_)
       by_cases hτM : magSumS τ = M
       · have hH0 : H σ τ = 0 := by

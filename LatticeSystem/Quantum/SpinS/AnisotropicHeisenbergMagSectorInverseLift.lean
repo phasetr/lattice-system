@@ -51,7 +51,7 @@ theorem anisotropicHeisenbergS_magSector_submatrix_mulVec_magSectorRestriction_o
   -- LHS: (Ĥ_M).mulVec (restrict Ψ) τ = ∑ τ' : magConfigS, Ĥ_M τ τ' * (restrict Ψ) τ'.
   --     = ∑ τ' : magConfigS, Ĥ τ.1 τ'.1 * Ψ τ'.1.
   -- Convert subtype sum to filter sum.
-  show ∑ τ' : magConfigS Λ N M,
+  change ∑ τ' : magConfigS Λ N M,
       anisotropicHeisenbergS_magSector_submatrix J lam D N M τ τ' *
         magSectorRestriction (M := M) Ψ τ' = μ * Ψ τ.1
   have hsec : (∑ τ' : magConfigS Λ N M,

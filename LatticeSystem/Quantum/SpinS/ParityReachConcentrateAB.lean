@@ -101,7 +101,7 @@ theorem parityReachableS_concentrate_AB
   · -- σ_AB b₀ = (σ_A b₀ + Σ bSitesExcept σ_A) = (σ b₀ + Σ σ_A b) = (σ b₀ + Σ σ b).
     rw [hsig_AB]; unfold drainSetInto; rw [if_pos rfl]
     ext
-    show (σ_A b₀).val + ∑ s ∈ bSitesExcept A b₀, (σ_A s).val =
+    change (σ_A b₀).val + ∑ s ∈ bSitesExcept A b₀, (σ_A s).val =
       (σ b₀).val + ∑ s ∈ bSitesExcept A b₀, (σ s).val
     rw [hsig_A_bSite b₀ hb₀]
     congr 1

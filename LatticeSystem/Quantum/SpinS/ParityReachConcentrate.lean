@@ -56,7 +56,7 @@ theorem parityReachableS_drainSetInto
       by_cases hka : k = a₀
       · rw [hka, if_pos rfl]
         ext
-        show (σ a₀).val + ∑ s ∈ (∅ : Finset V), (σ s).val = (σ a₀).val
+        change (σ a₀).val + ∑ s ∈ (∅ : Finset V), (σ s).val = (σ a₀).val
         simp
       · rw [if_neg hka]
         simp
@@ -98,7 +98,7 @@ theorem parityReachableS_drainSetInto
       rw [hsig_drain_off s hsa hsa₀]
     have hbound_ih : (σ_drain_a a₀).val + ∑ s ∈ S, (σ_drain_a s).val ≤ N := by
       rw [hsig_drain_a₀, hSum_eq]
-      show (σ a₀).val + (σ a).val + ∑ s ∈ S, (σ s).val ≤ N
+      change (σ a₀).val + (σ a).val + ∑ s ∈ S, (σ s).val ≤ N
       have := hbound; rw [hSum_insert] at this; omega
     have hkb_ih : (σ_drain_a b).val + 1 ≤ N := by
       rw [hsig_drain_off b ha_adj.ne.symm ha₀b.ne.symm]
@@ -113,10 +113,10 @@ theorem parityReachableS_drainSetInto
       by_cases hka₀ : k = a₀
       · rw [hka₀, if_pos rfl, if_pos rfl]
         ext
-        show (σ_drain_a a₀).val + ∑ s ∈ S, (σ_drain_a s).val =
+        change (σ_drain_a a₀).val + ∑ s ∈ S, (σ_drain_a s).val =
           (σ a₀).val + ∑ s ∈ (insert a S), (σ s).val
         rw [hsig_drain_a₀, hSum_eq, hSum_insert]
-        show (σ a₀).val + (σ a).val + ∑ s ∈ S, (σ s).val =
+        change (σ a₀).val + (σ a).val + ∑ s ∈ S, (σ s).val =
           (σ a₀).val + ((σ a).val + ∑ s ∈ S, (σ s).val)
         ring
       · rw [if_neg hka₀, if_neg hka₀]

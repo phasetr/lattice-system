@@ -60,7 +60,7 @@ theorem norm_mulVec_complex_le_mulVec_norm
   -- LHS = ‖∑ j, (B_real i j : ℂ) * w j‖
   -- ≤ ∑ j, ‖(B_real i j : ℂ) * w j‖ = ∑ j, |B_real i j| * ‖w j‖ = ∑ j, B_real i j * ‖w j‖.
   simp only [Matrix.mulVec, dotProduct, Matrix.map_apply]
-  show ‖∑ j, ((B_real i j : ℂ)) * w j‖ ≤ ∑ j, B_real i j * ‖w j‖
+  change ‖∑ j, ((B_real i j : ℂ)) * w j‖ ≤ ∑ j, B_real i j * ‖w j‖
   refine (norm_sum_le _ _).trans ?_
   apply Finset.sum_le_sum
   intros j _

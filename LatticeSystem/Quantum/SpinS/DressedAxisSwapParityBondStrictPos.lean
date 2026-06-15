@@ -287,7 +287,7 @@ theorem shiftedDressedAxisSwappedReMatrix_apply_pos_of_parityBondStepS_witness_b
   have hneg :=
     dressedAxisSwappedAnisotropicHeisenbergS_apply_re_neg_of_parityBondStepS_witness_bipartite
       A hJim hJnn hJself hJbip hlam hlb hub hDim hDnn hxy hAne hJpos_xy hsh hagree
-  show 0 < -((dressedAxisSwappedAnisotropicHeisenbergS A J lam D N) σ' σ).re
+  change 0 < -((dressedAxisSwappedAnisotropicHeisenbergS A J lam D N) σ' σ).re
   linarith
 
 /-- **Shifted PF strictly positive on a `ParityBondStepS`**.  For a bond-parity move on

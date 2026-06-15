@@ -198,7 +198,7 @@ theorem neg_dressedHeisenbergSReMatrix_apply_pos_of_raiseLowerStepS_witness
     0 < (-dressedHeisenbergSReMatrix A J N) σ' σ := by
   have hneg := dressedHeisenbergSReMatrix_apply_neg_of_raiseLowerStepS_witness
     A N hadj hAne hJ_real hJ_pos hJ_sym hsh hagree
-  show 0 < -dressedHeisenbergSReMatrix A J N σ' σ
+  change 0 < -dressedHeisenbergSReMatrix A J N σ' σ
   linarith
 
 /-- For a `RaiseLowerStepS` in the bipartite complete graph

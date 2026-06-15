@@ -176,17 +176,17 @@ theorem configDistS_decrease_of_over_under
     -- σ'' k = σ k for k ∉ {x, y}.
     show Nat.dist (σ'' k).val (σ' k).val = Nat.dist (σ k).val (σ' k).val
     have hupd : σ'' k = σ k := by
-      show (Function.update (Function.update σ x _) y _) k = σ k
+      change (Function.update (Function.update σ x _) y _) k = σ k
       rw [Function.update_of_ne hky, Function.update_of_ne hkx]
     rw [hupd]
   rw [Finset.sum_congr rfl hrest]
   -- Compute σ'' x and σ'' y.
   have hupdy_y : σ'' y =
       ⟨(σ y).val + 1, by have := (σ y).isLt; omega⟩ := by
-    show (Function.update (Function.update σ x _) y _) y = _
+    change (Function.update (Function.update σ x _) y _) y = _
     rw [Function.update_self]
   have hupd_x : σ'' x = ⟨(σ x).val - 1, by have := (σ x).isLt; omega⟩ := by
-    show (Function.update (Function.update σ x _) y _) x = _
+    change (Function.update (Function.update σ x _) y _) x = _
     rw [Function.update_of_ne hxy, Function.update_self]
   rw [hupd_x, hupdy_y]
   -- Now distances at x and y change by 1 each.
@@ -257,14 +257,14 @@ theorem raiseLowerReachableS_completeGraph_of_eq_magSumS
       -- σ'' agrees with σ off {x, y}.
       have hagree : ∀ k, k ≠ x → k ≠ y → σ'' k = σ k := by
         intro k hkx hky
-        show (Function.update (Function.update σ x _) y _) k = σ k
+        change (Function.update (Function.update σ x _) y _) k = σ k
         rw [Function.update_of_ne hky, Function.update_of_ne hkx]
       -- σ'' x and σ'' y values.
       have hupd_x : (σ'' x).val = (σ x).val - 1 := by
-        show (Function.update (Function.update σ x _) y _ x).val = _
+        change (Function.update (Function.update σ x _) y _ x).val = _
         rw [Function.update_of_ne hxy, Function.update_self]
       have hupd_y : (σ'' y).val = (σ y).val + 1 := by
-        show (Function.update (Function.update σ x _) y _ y).val = _
+        change (Function.update (Function.update σ x _) y _ y).val = _
         rw [Function.update_self]
       -- Adjacency in ⊤: any distinct pair.
       have hadj : (⊤ : SimpleGraph V).Adj x y := by
