@@ -20,10 +20,13 @@ is
   `Ĥeff = − P̂₀ V̂ Ĥ₀⁻¹ V̂ P̂₀`,   (eq. (10.1.20))
 
 where `P̂₀` is the orthogonal projection onto `H₀` and `Ĥ₀⁻¹` is the reduced
-(Moore–Penrose) inverse, supported on `H₀ᗮ`. Lemma 10.1 states: if `Ĥeff`
-(restricted to `H₀`) has a unique ground state `|Φeff-GS⟩`, then `Ĥ(λ)` has
-a unique ground state for all sufficiently small `λ > 0`, and a phase choice
-of normalized ground states converges to `|Φeff-GS⟩` as `λ → 0⁺`.
+(Moore–Penrose) inverse, supported on `H₀ᗮ`. The second-order formula
+applies when the first-order term vanishes on the degenerate subspace,
+`P̂₀ V̂ P̂₀ = 0` (so that Tasaki's `Ĥspin = λ² Ĥeff`, eq. (10.1.6), has no
+`λ¹` contribution). Lemma 10.1 states: if `Ĥeff` (restricted to `H₀`) has
+a unique ground state `|Φeff-GS⟩`, then `Ĥ(λ)` has a unique ground state for
+all sufficiently small `λ > 0`, and a phase choice of normalized ground
+states converges to `|Φeff-GS⟩` as `λ → 0⁺`.
 
 ## Status
 
@@ -135,10 +138,14 @@ def IsUniqueGroundStateOn (K : Submodule ℂ (EuclideanSpace ℂ n))
 /-- **Tasaki Lemma 10.1 (degenerate perturbation theory), AXIOM.**
 (1st ed., Springer 2020, §10.1, Lemma 10.1 / eq. (10.1.20), p. 346.)
 
-For `Ĥ(λ) = Ĥ₀ + λ V̂` with `Ĥ₀ ≥ 0` Hermitian, `V̂` Hermitian, and `H0inv`
-a reduced inverse of `Ĥ₀`: if the second-order effective Hamiltonian
-`Ĥeff = − P̂₀ V̂ Ĥ₀⁻¹ V̂ P̂₀` has a unique ground state `Φeff` on the kernel
-`H₀ = ker Ĥ₀`, then there is `λ₀ > 0` such that for every `λ ∈ (0, λ₀)` the
+For `Ĥ(λ) = Ĥ₀ + λ V̂` with `Ĥ₀ ≥ 0` Hermitian, `V̂` Hermitian, `H0inv`
+a reduced inverse of `Ĥ₀`, and the **first-order term vanishing on the
+degenerate subspace** (`P̂₀ V̂ P̂₀ = 0`, the condition under which the
+effective theory is governed by the second-order term — Tasaki eq.
+(10.1.6), `Ĥspin = λ² Ĥeff`, has no `λ¹` term): if the second-order
+effective Hamiltonian `Ĥeff = − P̂₀ V̂ Ĥ₀⁻¹ V̂ P̂₀` has a unique ground
+state `Φeff` on the kernel `H₀ = ker Ĥ₀`, then there is `λ₀ > 0` such that
+for every `λ ∈ (0, λ₀)` the
 perturbed Hamiltonian `Ĥ(λ)` has a unique ground state on the whole space,
 and (a phase choice of) these normalized ground states converges to `Φeff`
 as `λ → 0⁺`.
@@ -150,6 +157,7 @@ axiom tasaki_lemma_10_1_degenerate_perturbation [Nonempty n]
     (H0 V H0inv : Matrix n n ℂ)
     (hH0 : H0.IsHermitian) (hH0pos : H0.PosSemidef) (hV : V.IsHermitian)
     (hInv : IsReducedInverse H0 H0inv)
+    (hFirstOrder : kernelProjectionMatrix H0 * V * kernelProjectionMatrix H0 = 0)
     (Eeff : ℝ) (Φeff : EuclideanSpace ℂ n)
     (hEffGS : IsUniqueGroundStateOn (matrixKernel H0)
       (secondOrderEffectiveHamiltonian H0 V H0inv) Eeff Φeff) :

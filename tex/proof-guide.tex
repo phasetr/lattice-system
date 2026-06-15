@@ -5247,9 +5247,13 @@ $H_0^\perp$ (\texttt{IsReducedInverse}). These are defined in
 \texttt{Math/MatrixAnalysis/DegeneratePerturbation.lean}.
 
 \medskip
-\noindent\textbf{Lemma 10.1} (Tasaki §10.1, p.~346). If the effective
-Hamiltonian $\hat H_{\rm eff}$ (restricted to $H_0$) has a unique ground
-state $|\Phi_{\rm eff\text{-}GS}\rangle$, then $\hat H(\lambda)$ has a
+\noindent\textbf{Lemma 10.1} (Tasaki §10.1, p.~346). Assume the
+first-order term vanishes on the degenerate subspace,
+$\hat P_0 \hat V \hat P_0 = 0$ (so that Tasaki's
+$\hat H_{\rm spin} = \lambda^2 \hat H_{\rm eff}$, eq.~(10.1.6), has no
+$\lambda^1$ contribution). If the effective Hamiltonian
+$\hat H_{\rm eff}$ (restricted to $H_0$) has a unique ground state
+$|\Phi_{\rm eff\text{-}GS}\rangle$, then $\hat H(\lambda)$ has a
 unique ground state for all sufficiently small $\lambda > 0$, and a phase
 choice of normalized ground states converges to
 $|\Phi_{\rm eff\text{-}GS}\rangle$ as $\lambda \to 0^+$
