@@ -144,6 +144,7 @@ noncomputable def bipartiteHoppingBlock (A : Finset (Fin (N + 1)))
     ({x // x ∈ A} → ℝ) →ₗ[ℝ] (Fin (N + 1) → ℝ) :=
   T.mulVecLin ∘ₗ extByZero A
 
+/-- The `A`-block evaluated at `a` is `T (extByZero A a)`. -/
 @[simp]
 theorem bipartiteHoppingBlock_apply (A : Finset (Fin (N + 1)))
     (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (a : {x // x ∈ A} → ℝ) :
