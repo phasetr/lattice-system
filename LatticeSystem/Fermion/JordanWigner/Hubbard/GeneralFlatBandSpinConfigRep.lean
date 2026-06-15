@@ -1,0 +1,605 @@
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandSpinRep
+
+/-!
+# Spin-configuration capstone, eq. (11.3.47) (Tasaki §11.3.4, toward Theorem 11.17)
+
+PR8 (`flatBand_groundState_mem_imode`) places a flat-band Hubbard ground state `Φ` (at filling
+`D₀`) in the tight `I`-mode `μ`-Slater Fock submodule.  Tasaki's eq. (11.3.47) refines this to the
+*spin-configuration* form
+
+`Φ = Σ_{σ : I → {↑,↓}} C(σ)·Π_{z∈I} â†_{μ_z,σ_z}|vac⟩`,
+
+i.e. every index `z ∈ I` is occupied by **exactly one** spin.
+
+The argument works in the general occupation basis `generalOccBasis eμ` over the extended
+single-particle basis `eμ` (PR8 `exists_extended_special_basis`, `eμ (idx z) = μ_z`).  The flat-band
+ground state's occupation-basis coefficients vanish off the spin configurations:
+
+* **support** — `repr Φ g = 0` unless `g` is supported on the index modes `idx(I)`;
+* **filling** — `repr Φ g = 0` unless `|occupied g| = D₀`;
+* **no double occupancy** — `repr Φ g = 0` if some index mode `idx z` is doubly occupied.
+
+This module records the support and filling coefficient-vanishing facts first.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
+(1st ed.), §11.3.4, eq. (11.3.47).  Tracked in Issue #4363.
+-/
+
+namespace LatticeSystem.Fermion
+
+open Matrix LatticeSystem.Quantum Module
+open scoped BigOperators ComplexOrder
+
+variable {M : ℕ}
+
+/-- An occupation config `g` is **`idx(I)`-supported** when every occupied mode lies over an index
+mode `idx z` (`z ∈ I`): `g q = 1 → q.1 ∈ idx(I)`.  These are the configs whose occupation monomial
+is an `I`-mode `μ`-Slater state. -/
+def IsIdxSupported (I : Finset (Fin (M + 1))) (idx : Fin (M + 1) → Fin (M + 1))
+    (g : Fin (M + 1) × Fin 2 → Fin 2) : Prop :=
+  ∀ q : Fin (M + 1) × Fin 2, g q = 1 → q.1 ∈ I.image idx
+
+/-- **A mode monomial with all modes in `idx(I)` lies in the span of the `idx(I)`-supported
+occupation monomials.**  (The `idx(I)`-restricted analogue of
+`generalModeMonomial_mem_span_occMonomial`: reorder to the occupied-finset list of the indicator
+config, which is `idx(I)`-supported.) -/
+theorem generalModeMonomial_mem_span_idxSupported
+    {I : Finset (Fin (M + 1))} (idx : Fin (M + 1) → Fin (M + 1))
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (l : List (Fin (M + 1) × Fin 2))
+    (hl : ∀ q ∈ l, q.1 ∈ I.image idx) :
+    generalModeMonomial eμ l ∈ Submodule.span ℂ
+      {v | ∃ h, IsIdxSupported I idx h ∧ generalOccMonomial eμ h = v} := by
+  classical
+  by_cases hnd : l.Nodup
+  · set f : Fin (M + 1) × Fin 2 → Fin 2 := fun q => if q ∈ l.toFinset then 1 else 0 with hf
+    have hocc : generalOccFinset f = l.toFinset := by
+      ext q
+      simp only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and, hf]
+      by_cases h : q ∈ l.toFinset <;> simp [h]
+    have hfsupp : IsIdxSupported I idx f := by
+      intro q hq
+      have hmem : q ∈ l.toFinset := by
+        by_contra hc
+        have hfq : f q = 0 := by rw [hf]; exact if_neg hc
+        rw [hfq] at hq
+        exact absurd hq (by decide)
+      exact hl q (List.mem_toFinset.mp hmem)
+    have hperm : l.Perm (generalOccFinset f).toList := by
+      rw [hocc]; exact (List.toFinset_toList hnd).symm
+    obtain ⟨z, _, hz⟩ := generalModeMonomial_perm eμ hperm
+    rw [hz]
+    exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨f, hfsupp, rfl⟩)
+  · rw [generalModeMonomial_eq_zero_of_not_nodup eμ l hnd]
+    exact Submodule.zero_mem _
+
+/-- **A flat-band ground state lies in the span of the `idx(I)`-supported occupation monomials.**
+From PR8 (`flatBand_groundState_mem_imode`, the `I`-mode `μ`-Slater submodule) carried through the
+`μ`-Slater↔mode-monomial bridge (`generalFlatBandSlaterState_eq_generalModeMonomial`). -/
+theorem flatBand_groundState_mem_span_idxSupported
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (idx : Fin (M + 1) → Fin (M + 1))
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U) :
+    Φ ∈ Submodule.span ℂ
+      {v | ∃ h, IsIdxSupported I idx h ∧ generalOccMonomial eμ h = v} := by
+  have hmem := flatBand_groundState_mem_imode hbasis hT U hU hΦ
+  refine (Submodule.span_le.mpr ?_) hmem
+  rintro _ ⟨qs, hqs, rfl⟩
+  rw [generalFlatBandSlaterState_eq_generalModeMonomial eμ idx hidx qs hqs]
+  refine generalModeMonomial_mem_span_idxSupported idx eμ _ fun q hq => ?_
+  simp only [List.mem_map] at hq
+  obtain ⟨q', hq', rfl⟩ := hq
+  exact Finset.mem_image_of_mem idx (hqs q' hq')
+
+/-- **Support coefficient vanishing**: a flat-band ground state's `eμ`-occupation-basis coefficient
+vanishes on every config that is *not* `idx(I)`-supported.  From the span membership and
+`Basis.repr_support_subset_of_mem_span`. -/
+theorem flatBand_groundState_eμ_repr_eq_zero_of_not_idxSupported
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (idx : Fin (M + 1) → Fin (M + 1))
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U)
+    (g : Fin (M + 1) × Fin 2 → Fin 2) (hg : ¬ IsIdxSupported I idx g) :
+    (generalOccBasis eμ).repr Φ g = 0 := by
+  set b := generalOccBasis eμ with hb
+  have hbcoe : ∀ h, (b h : (Fin (2 * M + 2) → Fin 2) → ℂ) = generalOccMonomial eμ h :=
+    fun h => congrFun (coe_basisOfTopLeSpanOfCardEqFinrank _ _ _) h
+  have hset : (b '' {h | IsIdxSupported I idx h})
+      = {v | ∃ h, IsIdxSupported I idx h ∧ generalOccMonomial eμ h = v} := by
+    ext v
+    constructor
+    · rintro ⟨h, hh, rfl⟩; exact ⟨h, hh, (hbcoe h).symm⟩
+    · rintro ⟨h, hh, rfl⟩; exact ⟨h, hh, hbcoe h⟩
+  have hmem : Φ ∈ Submodule.span ℂ (b '' {h | IsIdxSupported I idx h}) := by
+    rw [hset]
+    exact flatBand_groundState_mem_span_idxSupported hbasis hT U hU eμ idx hidx hΦ
+  have hsub := b.repr_support_subset_of_mem_span {h | IsIdxSupported I idx h} hmem
+  by_contra hne
+  exact hg (hsub (Finsupp.mem_support_iff.mpr hne))
+
+/-- **Filling coefficient vanishing (general single-particle basis)**: a `D₀`-electron eigenstate
+of the total number operator has vanishing `generalOccBasis e`-coefficient on every config with a
+different particle count.  (The general-basis version of
+`groundState_generalOccBasis_repr_eq_zero_of_card_ne`, valid for any single-particle basis `e`.) -/
+theorem groundState_generalOccBasis_repr_eq_zero_of_card_ne'
+    (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ))
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} {D₀ : ℕ}
+    (hN : (fermionTotalNumber (2 * M + 1)).mulVec Φ = (D₀ : ℂ) • Φ)
+    (g : Fin (M + 1) × Fin 2 → Fin 2) (hg : (generalOccFinset g).card ≠ D₀) :
+    (generalOccBasis e).repr Φ g = 0 := by
+  set b := generalOccBasis e with hb
+  have hbcoe : ∀ h, (b h : (Fin (2 * M + 2) → Fin 2) → ℂ) = generalOccMonomial e h :=
+    fun h => congrFun (coe_basisOfTopLeSpanOfCardEqFinrank _ _ _) h
+  have hexp : (fermionTotalNumber (2 * M + 1)).mulVec Φ
+      = ∑ h, (b.repr Φ h * ((generalOccFinset h).card : ℂ)) • (b h) := by
+    conv_lhs => rw [← b.sum_repr Φ]
+    rw [Matrix.mulVec_sum]
+    refine Finset.sum_congr rfl fun h _ => ?_
+    rw [Matrix.mulVec_smul, hbcoe, fermionTotalNumber_mulVec_generalOccMonomial, smul_smul,
+      ← hbcoe]
+  have hrepr : b.repr ((fermionTotalNumber (2 * M + 1)).mulVec Φ) g
+      = b.repr Φ g * ((generalOccFinset g).card : ℂ) := by
+    rw [hexp, map_sum]
+    simp only [map_smul, Finsupp.coe_finset_sum, Finset.sum_apply, Finsupp.coe_smul,
+      Pi.smul_apply, smul_eq_mul, b.repr_self]
+    rw [Finset.sum_eq_single g]
+    · rw [Finsupp.single_eq_same, mul_one]
+    · intro h _ hhg
+      rw [Finsupp.single_eq_of_ne (Ne.symm hhg), mul_zero]
+    · intro h; exact absurd (Finset.mem_univ g) h
+  rw [hN, map_smul, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul] at hrepr
+  have hne : ((generalOccFinset g).card : ℂ) - (D₀ : ℂ) ≠ 0 := by
+    rw [sub_ne_zero, Ne, Nat.cast_inj]; exact hg
+  have : (b.repr Φ g) * (((generalOccFinset g).card : ℂ) - (D₀ : ℂ)) = 0 := by
+    rw [mul_sub, ← hrepr]; ring
+  exact (mul_eq_zero.mp this).resolve_right hne
+
+/-- The index map `idx` (sending `z ∈ I` to the `eμ`-index of `μ_z`) is **injective on `I`**:
+distinct indices give distinct `μ`-vectors (special-basis linear independence), hence distinct
+`eμ`-indices. -/
+theorem flatBandSpecial_idx_injOn {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    {a : Fin (M + 1)} (ha : a ∈ I) {b : Fin (M + 1)} (hb : b ∈ I) (hab : idx a = idx b) :
+    a = b := by
+  obtain ⟨_, _, hli, _, _⟩ := hbasis
+  have hμ : (fun z : I => (μ z.1 : Fin (M + 1) → ℂ)) ⟨a, ha⟩
+      = (fun z : I => (μ z.1 : Fin (M + 1) → ℂ)) ⟨b, hb⟩ := by
+    simp only [← hidx a ha, ← hidx b hb, hab]
+  exact Subtype.ext_iff.mp (hli.injective hμ)
+
+open Classical in
+/-- A **left inverse of `idx` on `I`**: for `y` in the image `idx(I)`, it returns a preimage in `I`
+(`idx ∘ idxInv = id` on `idx(I)`); elsewhere it is irrelevant. -/
+noncomputable def flatBandSpecialIdxInv (I : Finset (Fin (M + 1)))
+    (idx : Fin (M + 1) → Fin (M + 1)) (y : Fin (M + 1)) : Fin (M + 1) :=
+  if h : ∃ w ∈ I, idx w = y then h.choose else default
+
+/-- `idx (idxInv y) = y` whenever `y ∈ idx(I)`. -/
+theorem idx_flatBandSpecialIdxInv {I : Finset (Fin (M + 1))} {idx : Fin (M + 1) → Fin (M + 1)}
+    {y : Fin (M + 1)} (h : ∃ w ∈ I, idx w = y) :
+    idx (flatBandSpecialIdxInv I idx y) = y := by
+  rw [flatBandSpecialIdxInv, dif_pos h]; exact h.choose_spec.2
+
+/-- `idxInv y ∈ I` whenever `y ∈ idx(I)`. -/
+theorem flatBandSpecialIdxInv_mem {I : Finset (Fin (M + 1))} {idx : Fin (M + 1) → Fin (M + 1)}
+    {y : Fin (M + 1)} (h : ∃ w ∈ I, idx w = y) :
+    flatBandSpecialIdxInv I idx y ∈ I := by
+  rw [flatBandSpecialIdxInv, dif_pos h]; exact h.choose_spec.1
+
+/-- `idxInv (idx w) = w` for `w ∈ I` (genuine left inverse on `I`, using injectivity). -/
+theorem flatBandSpecialIdxInv_idx {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ}
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) {w : Fin (M + 1)} (hw : w ∈ I) :
+    flatBandSpecialIdxInv I idx (idx w) = w := by
+  have hex : ∃ v ∈ I, idx v = idx w := ⟨w, hw, rfl⟩
+  exact flatBandSpecial_idx_injOn hbasis hidx (flatBandSpecialIdxInv_mem hex) hw
+    (idx_flatBandSpecialIdxInv hex)
+
+/-- The **`μ`-Slater preimage list** of an `idx(I)`-supported config `g`: the occupied modes of `g`
+pulled back along `idxInv` to the index set `I`.  Its `μ`-Slater state is `occMon_eμ g`. -/
+noncomputable def flatBandSpecialPreimageList (I : Finset (Fin (M + 1)))
+    (idx : Fin (M + 1) → Fin (M + 1)) (g : Fin (M + 1) × Fin 2 → Fin 2) :
+    List (Fin (M + 1) × Fin 2) :=
+  ((generalOccFinset g).toList).map (fun q => (flatBandSpecialIdxInv I idx q.1, q.2))
+
+/-- Every mode of the preimage list lies over `I` (for an `idx(I)`-supported `g`). -/
+theorem flatBandSpecialPreimageList_mem {I : Finset (Fin (M + 1))}
+    {idx : Fin (M + 1) → Fin (M + 1)} {g : Fin (M + 1) × Fin 2 → Fin 2}
+    (hg : IsIdxSupported I idx g) (q : Fin (M + 1) × Fin 2)
+    (hq : q ∈ flatBandSpecialPreimageList I idx g) : q.1 ∈ I := by
+  rw [flatBandSpecialPreimageList, List.mem_map] at hq
+  obtain ⟨q', hq', rfl⟩ := hq
+  have hgq : g q' = 1 := by
+    have := Finset.mem_toList.mp hq'
+    simpa only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and] using this
+  exact flatBandSpecialIdxInv_mem (Finset.mem_image.mp (hg q' hgq))
+
+/-- Mapping the preimage list back through `idx` recovers the occupied-mode list of `g`. -/
+theorem flatBandSpecialPreimageList_map_idx {I : Finset (Fin (M + 1))}
+    {idx : Fin (M + 1) → Fin (M + 1)} {g : Fin (M + 1) × Fin 2 → Fin 2}
+    (hg : IsIdxSupported I idx g) :
+    (flatBandSpecialPreimageList I idx g).map (fun q => (idx q.1, q.2))
+      = (generalOccFinset g).toList := by
+  rw [flatBandSpecialPreimageList, List.map_map]
+  refine (List.map_congr_left ?_).trans (List.map_id _)
+  intro q hq
+  have hgq : g q = 1 := by
+    have := Finset.mem_toList.mp hq
+    simpa only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and] using this
+  simp only [Function.comp_apply, idx_flatBandSpecialIdxInv (Finset.mem_image.mp (hg q hgq)),
+    Prod.mk.eta, id_eq]
+
+/-- **`occMon_eμ g` is an `I`-mode `μ`-Slater state** (for an `idx(I)`-supported `g`), namely the
+state of its `μ`-Slater preimage list.  Via the forward bridge
+`generalFlatBandSlaterState_eq_generalModeMonomial`. -/
+theorem generalOccMonomial_eq_generalFlatBandSlaterState_of_idxSupported
+    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) {g : Fin (M + 1) × Fin 2 → Fin 2}
+    (hg : IsIdxSupported I idx g) :
+    generalOccMonomial eμ g
+      = generalFlatBandSlaterState μ (flatBandSpecialPreimageList I idx g) := by
+  rw [generalFlatBandSlaterState_eq_generalModeMonomial eμ idx hidx _
+        (flatBandSpecialPreimageList_mem hg),
+    flatBandSpecialPreimageList_map_idx hg, generalOccMonomial]
+
+/-- **The occupation count of the preimage list** equals `g` at the index mode: for `z ∈ I`,
+`count (z,σ) (preimage list) = [g(idx z,σ) = 1]`.  (The list is `idx(I)`-injective, hence nodup, and
+`(z,σ)` occurs iff `idx z` is occupied with spin `σ`.) -/
+theorem flatBandSpecialPreimageList_count
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) {g : Fin (M + 1) × Fin 2 → Fin 2}
+    (hg : IsIdxSupported I idx g) {z : Fin (M + 1)} (hz : z ∈ I) (σ : Fin 2) :
+    ((flatBandSpecialPreimageList I idx g).count (z, σ) : ℂ)
+      = if g (idx z, σ) = 1 then 1 else 0 := by
+  classical
+  set ps := flatBandSpecialPreimageList I idx g with hps
+  have hnd : ps.Nodup := by
+    rw [hps, flatBandSpecialPreimageList]
+    refine ((generalOccFinset g).nodup_toList).map_on ?_
+    intro a ha b hb hfab
+    have hga : g a = 1 := by
+      have := Finset.mem_toList.mp ha
+      simpa only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and] using this
+    have hgb : g b = 1 := by
+      have := Finset.mem_toList.mp hb
+      simpa only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and] using this
+    have h1 : flatBandSpecialIdxInv I idx a.1 = flatBandSpecialIdxInv I idx b.1 :=
+      (Prod.ext_iff.mp hfab).1
+    have ha1 : idx (flatBandSpecialIdxInv I idx a.1) = a.1 :=
+      idx_flatBandSpecialIdxInv (Finset.mem_image.mp (hg a hga))
+    have hb1 : idx (flatBandSpecialIdxInv I idx b.1) = b.1 :=
+      idx_flatBandSpecialIdxInv (Finset.mem_image.mp (hg b hgb))
+    exact Prod.ext (by rw [← ha1, h1, hb1]) (Prod.ext_iff.mp hfab).2
+  have hiff : (z, σ) ∈ ps ↔ g (idx z, σ) = 1 := by
+    rw [hps, flatBandSpecialPreimageList, List.mem_map]
+    constructor
+    · rintro ⟨q, hq, hfq⟩
+      have hgq : g q = 1 := by
+        have := Finset.mem_toList.mp hq
+        simpa only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and] using this
+      have hq1 : idx (flatBandSpecialIdxInv I idx q.1) = q.1 :=
+        idx_flatBandSpecialIdxInv (Finset.mem_image.mp (hg q hgq))
+      have hzeq : flatBandSpecialIdxInv I idx q.1 = z := (Prod.ext_iff.mp hfq).1
+      have hσeq : q.2 = σ := (Prod.ext_iff.mp hfq).2
+      have hqeq : (idx z, σ) = q := by
+        rw [hzeq] at hq1; exact Prod.ext hq1 hσeq.symm
+      rw [hqeq]; exact hgq
+    · intro hgz
+      refine ⟨(idx z, σ), ?_, ?_⟩
+      · rw [Finset.mem_toList]
+        simpa only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and] using hgz
+      · exact Prod.ext (flatBandSpecialIdxInv_idx hbasis hidx hz) rfl
+  by_cases hmem : (z, σ) ∈ ps
+  · rw [List.count_eq_one_of_mem hnd hmem, Nat.cast_one, if_pos (hiff.mp hmem)]
+  · rw [List.count_eq_zero_of_not_mem hmem, Nat.cast_zero, if_neg (fun hc => hmem (hiff.mpr hc))]
+
+/-- **The double index-mode number operator is diagonal on `idx(I)`-supported occupation
+monomials**,
+with eigenvalue `μ_z(z)²·[g(idx z,↑)=1]·[g(idx z,↓)=1]`.  Combines the two single diagonal actions
+(`muNumberOp_mulVec_generalFlatBandSlaterState`) through the `occMon_eμ ↔ μ`-Slater bridge. -/
+theorem muNumberOp_double_mulVec_generalOccMonomial_of_idxSupported
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) {g : Fin (M + 1) × Fin 2 → Fin 2}
+    (hg : IsIdxSupported I idx g) {z : Fin (M + 1)} (hz : z ∈ I) :
+    (muNumberOp μ z 0 * muNumberOp μ z 1).mulVec (generalOccMonomial eμ g)
+      = ((μ z z * (if g (idx z, 0) = 1 then (1 : ℂ) else 0))
+          * (μ z z * (if g (idx z, 1) = 1 then (1 : ℂ) else 0)))
+        • generalOccMonomial eμ g := by
+  have hbridge := generalOccMonomial_eq_generalFlatBandSlaterState_of_idxSupported hidx hg
+  rw [hbridge, ← Matrix.mulVec_mulVec,
+    muNumberOp_mulVec_generalFlatBandSlaterState hbasis hz 1 _
+      (flatBandSpecialPreimageList_mem hg),
+    Matrix.mulVec_smul,
+    muNumberOp_mulVec_generalFlatBandSlaterState hbasis hz 0 _
+      (flatBandSpecialPreimageList_mem hg),
+    smul_smul, flatBandSpecialPreimageList_count hbasis hidx hg hz 1,
+    flatBandSpecialPreimageList_count hbasis hidx hg hz 0, ← hbridge]
+  congr 1
+  ring
+
+/-- **No-double-occupancy coefficient vanishing**: a flat-band ground state's `eμ`-occupation-basis
+coefficient vanishes on every config with a *doubly occupied* index mode
+(`g(idx z,↑) = g(idx z,↓) = 1` for some `z ∈ I`).  From
+`muNumberOp_double_mulVec_eq_zero_of_mem_groundSubmodule` (PR7) and the diagonal action: expanding
+`Φ` in the basis, the double number operator has eigenvalue `μ_z(z)² ≠ 0` on such configs and `0`
+on the others, so `μ_z(z)²·c_g = 0`. -/
+theorem flatBand_groundState_eμ_repr_eq_zero_of_doublyOccupied
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (idx : Fin (M + 1) → Fin (M + 1))
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U)
+    (g : Fin (M + 1) × Fin 2 → Fin 2) {z : Fin (M + 1)} (hz : z ∈ I)
+    (h0 : g (idx z, 0) = 1) (h1 : g (idx z, 1) = 1) :
+    (generalOccBasis eμ).repr Φ g = 0 := by
+  classical
+  set b := generalOccBasis eμ with hb
+  have hbcoe : ∀ h, (b h : (Fin (2 * M + 2) → Fin 2) → ℂ) = generalOccMonomial eμ h :=
+    fun h => congrFun (coe_basisOfTopLeSpanOfCardEqFinrank _ _ _) h
+  have hzero := muNumberOp_double_mulVec_eq_zero_of_mem_groundSubmodule hbasis hT U hU hz hΦ
+  have hexp : (muNumberOp μ z 0 * muNumberOp μ z 1).mulVec Φ
+      = ∑ h, (b.repr Φ h
+          * ((μ z z * (if h (idx z, 0) = 1 then (1 : ℂ) else 0))
+              * (μ z z * (if h (idx z, 1) = 1 then (1 : ℂ) else 0)))) • (b h) := by
+    conv_lhs => rw [← b.sum_repr Φ]
+    rw [Matrix.mulVec_sum]
+    refine Finset.sum_congr rfl fun h _ => ?_
+    rw [Matrix.mulVec_smul]
+    by_cases hsupp : IsIdxSupported I idx h
+    · rw [hbcoe, muNumberOp_double_mulVec_generalOccMonomial_of_idxSupported hbasis hidx hsupp hz,
+        ← hbcoe, smul_smul]
+    · rw [flatBand_groundState_eμ_repr_eq_zero_of_not_idxSupported hbasis hT U hU eμ idx hidx hΦ
+        h hsupp, zero_smul, zero_mul, zero_smul]
+  have hrepr : b.repr ((muNumberOp μ z 0 * muNumberOp μ z 1).mulVec Φ) g
+      = b.repr Φ g
+        * ((μ z z * (if g (idx z, 0) = 1 then (1 : ℂ) else 0))
+            * (μ z z * (if g (idx z, 1) = 1 then (1 : ℂ) else 0))) := by
+    rw [hexp, map_sum]
+    simp only [map_smul, Finsupp.coe_finset_sum, Finset.sum_apply, Finsupp.coe_smul,
+      Pi.smul_apply, smul_eq_mul, b.repr_self]
+    rw [Finset.sum_eq_single g]
+    · rw [Finsupp.single_eq_same, mul_one]
+    · intro h _ hhg
+      rw [Finsupp.single_eq_of_ne (Ne.symm hhg), mul_zero]
+    · intro h; exact absurd (Finset.mem_univ g) h
+  rw [hzero, map_zero, Finsupp.coe_zero, Pi.zero_apply] at hrepr
+  have hev : (μ z z * (if g (idx z, 0) = 1 then (1 : ℂ) else 0))
+      * (μ z z * (if g (idx z, 1) = 1 then (1 : ℂ) else 0)) = μ z z * μ z z := by
+    rw [if_pos h0, if_pos h1]; ring
+  rw [hev] at hrepr
+  obtain ⟨_, _, _, hμz, _⟩ := hbasis
+  have hne : μ z z * μ z z ≠ 0 := mul_ne_zero (hμz z hz) (hμz z hz)
+  exact (mul_eq_zero.mp hrepr.symm).resolve_right hne
+
+/-- **Tasaki eq. (11.3.47) (spin-configuration representation)**: a flat-band Hubbard ground state
+`Φ` (Hermitian PSD hopping `T`, `U > 0`, filling `D₀`) lies in the span of the occupation monomials
+of the **spin configurations** — the `idx(I)`-supported configs with **no doubly occupied index
+mode** and exactly `D₀` occupied modes.  Since `D₀ = |I|`, such a config occupies each index mode
+`idx z` (`z ∈ I`) by exactly one spin, i.e. it is a one-spin-per-index `μ`-Slater state
+`Π_{z∈I} â†_{μ_z,σ_z}|vac⟩`.
+
+Assembled from the three coefficient-vanishing facts: support
+(`flatBand_groundState_eμ_repr_eq_zero_of_not_idxSupported`), no double occupancy
+(`flatBand_groundState_eμ_repr_eq_zero_of_doublyOccupied`), and filling
+(`groundState_generalOccBasis_repr_eq_zero_of_card_ne'`). -/
+theorem flatBand_groundState_mem_spinConfigSpan
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (idx : Fin (M + 1) → Fin (M + 1))
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U) :
+    Φ ∈ Submodule.span ℂ
+      {v | ∃ g, IsIdxSupported I idx g
+        ∧ (∀ z ∈ I, ¬ (g (idx z, 0) = 1 ∧ g (idx z, 1) = 1))
+        ∧ (generalOccFinset g).card = generalFlatBandDim T
+        ∧ generalOccMonomial eμ g = v} := by
+  classical
+  set b := generalOccBasis eμ with hb
+  have hbcoe : ∀ h, (b h : (Fin (2 * M + 2) → Fin 2) → ℂ) = generalOccMonomial eμ h :=
+    fun h => congrFun (coe_basisOfTopLeSpanOfCardEqFinrank _ _ _) h
+  have hN : (fermionTotalNumber (2 * M + 1)).mulVec Φ = (generalFlatBandDim T : ℂ) • Φ := by
+    have h := (Submodule.mem_inf.mp hΦ).2
+    rw [Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at h
+    exact h
+  rw [← b.sum_repr Φ]
+  refine Submodule.sum_mem _ fun g _ => ?_
+  by_cases hsupp : IsIdxSupported I idx g
+  · by_cases hdbl : ∃ z ∈ I, g (idx z, 0) = 1 ∧ g (idx z, 1) = 1
+    · obtain ⟨z, hz, h0, h1⟩ := hdbl
+      rw [flatBand_groundState_eμ_repr_eq_zero_of_doublyOccupied hbasis hT U hU eμ idx hidx hΦ
+        g hz h0 h1, zero_smul]
+      exact Submodule.zero_mem _
+    · by_cases hcard : (generalOccFinset g).card = generalFlatBandDim T
+      · refine Submodule.smul_mem _ _ (Submodule.subset_span
+          ⟨g, hsupp, fun z hz hc => hdbl ⟨z, hz, hc⟩, hcard, (hbcoe g).symm⟩)
+      · rw [groundState_generalOccBasis_repr_eq_zero_of_card_ne' eμ hN g hcard, zero_smul]
+        exact Submodule.zero_mem _
+  · rw [flatBand_groundState_eμ_repr_eq_zero_of_not_idxSupported hbasis hT U hU eμ idx hidx hΦ
+      g hsupp, zero_smul]
+    exact Submodule.zero_mem _
+
+/-- Two distinct `Fin 2` values are `0` and `1` in some order. -/
+theorem fin2_ne_cases {a b : Fin 2} (h : a ≠ b) :
+    (a = 0 ∧ b = 1) ∨ (a = 1 ∧ b = 0) := by
+  fin_cases a <;> fin_cases b <;> simp_all
+
+/-- Every `Fin 2` value is `0` or `1`. -/
+theorem fin2_eq_zero_or_one (a : Fin 2) : a = 0 ∨ a = 1 := by revert a; decide
+
+/-- **One spin per index (the pigeonhole behind eq. (11.3.47))**: a spin-configuration occupation
+`g` (`idx(I)`-supported, no doubly occupied index mode, exactly `D₀` occupied) occupies **every**
+index mode `idx z` (`z ∈ I`) by at least one spin.  Since `D₀ = |I|` and the first-coordinate
+projection is injective on the occupied finset (no double occupancy), it surjects onto `idx(I)`. -/
+theorem flatBandSpinConfig_occupied_per_index
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) {g : Fin (M + 1) × Fin 2 → Fin 2}
+    (hsupp : IsIdxSupported I idx g)
+    (hno : ∀ z ∈ I, ¬ (g (idx z, 0) = 1 ∧ g (idx z, 1) = 1))
+    (hcard : (generalOccFinset g).card = generalFlatBandDim T) {z : Fin (M + 1)} (hz : z ∈ I) :
+    g (idx z, 0) = 1 ∨ g (idx z, 1) = 1 := by
+  classical
+  have hgmem : ∀ {q : Fin (M + 1) × Fin 2}, q ∈ generalOccFinset g → g q = 1 := fun {q} hq => by
+    simpa only [generalOccFinset, Finset.mem_filter, Finset.mem_univ, true_and] using hq
+  have hinjOn : Set.InjOn (Prod.fst : Fin (M + 1) × Fin 2 → Fin (M + 1)) ↑(generalOccFinset g) := by
+    intro q hq q' hq' hqq
+    rw [Finset.mem_coe] at hq hq'
+    by_contra hne
+    have h2 : q.2 ≠ q'.2 := fun h => hne (Prod.ext hqq h)
+    obtain ⟨w, hw, hwq⟩ := Finset.mem_image.mp (hsupp q (hgmem hq))
+    have hqw : q = (idx w, q.2) := Prod.ext hwq.symm rfl
+    have hq'w : q' = (idx w, q'.2) := Prod.ext (by rw [← hqq, ← hwq]) rfl
+    have hga : g (idx w, q.2) = 1 := hqw ▸ hgmem hq
+    have hgb : g (idx w, q'.2) = 1 := hq'w ▸ hgmem hq'
+    refine hno w hw ?_
+    rcases fin2_ne_cases h2 with ⟨ha, hb⟩ | ⟨ha, hb⟩
+    · exact ⟨ha ▸ hga, hb ▸ hgb⟩
+    · exact ⟨hb ▸ hgb, ha ▸ hga⟩
+  -- the projection image of the occupied finset is all of `idx(I)`
+  set π : Fin (M + 1) × Fin 2 → Fin (M + 1) := Prod.fst with hπ
+  have hsub : (generalOccFinset g).image π ⊆ I.image idx := by
+    intro p hp
+    obtain ⟨q, hq, rfl⟩ := Finset.mem_image.mp hp
+    exact hsupp q (hgmem hq)
+  have hidxinj : Set.InjOn idx ↑I := fun a ha b hb hab =>
+    flatBandSpecial_idx_injOn hbasis hidx (Finset.mem_coe.mp ha) (Finset.mem_coe.mp hb) hab
+  have hcardeq : ((generalOccFinset g).image π).card = (I.image idx).card := by
+    rw [Finset.card_image_of_injOn hinjOn, Finset.card_image_of_injOn hidxinj, hcard]
+    exact (hbasis.1).symm
+  have himg : (generalOccFinset g).image π = I.image idx :=
+    Finset.eq_of_subset_of_card_le hsub hcardeq.ge
+  have hmem : idx z ∈ (generalOccFinset g).image π := by
+    rw [himg]; exact Finset.mem_image_of_mem idx hz
+  obtain ⟨q, hq, hqfst⟩ := Finset.mem_image.mp hmem
+  have hgq : g q = 1 := hgmem hq
+  have hqeq : q = (idx z, q.2) := Prod.ext hqfst rfl
+  rw [hqeq] at hgq
+  rcases fin2_eq_zero_or_one q.2 with h | h
+  · left; rw [h] at hgq; exact hgq
+  · right; rw [h] at hgq; exact hgq
+
+/-- **Exactly one spin per index, eq. (11.3.47) explicit form**: a spin-configuration occupation `g`
+(`idx(I)`-supported, no double occupancy, `D₀` occupied) occupies every index mode `idx z` (`z ∈ I`)
+by **exactly one** spin.  Combines the pigeonhole `flatBandSpinConfig_occupied_per_index` (at least
+one) with the no-double-occupancy hypothesis (not both). -/
+theorem flatBandSpinConfig_exactlyOne_per_index
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) {g : Fin (M + 1) × Fin 2 → Fin 2}
+    (hsupp : IsIdxSupported I idx g)
+    (hno : ∀ z ∈ I, ¬ (g (idx z, 0) = 1 ∧ g (idx z, 1) = 1))
+    (hcard : (generalOccFinset g).card = generalFlatBandDim T) {z : Fin (M + 1)} (hz : z ∈ I) :
+    (g (idx z, 0) = 1 ∧ g (idx z, 1) ≠ 1) ∨ (g (idx z, 0) ≠ 1 ∧ g (idx z, 1) = 1) := by
+  rcases flatBandSpinConfig_occupied_per_index hbasis hidx hsupp hno hcard hz with h0 | h1
+  · exact Or.inl ⟨h0, fun h1 => hno z hz ⟨h0, h1⟩⟩
+  · exact Or.inr ⟨fun h0 => hno z hz ⟨h0, h1⟩, h1⟩
+
+/-- **The one-spin-per-index occupation of a spin configuration** `σ : Fin (M+1) → Fin 2`: the
+config occupying exactly the modes `(idx z, σ z)` for `z ∈ I`.  Its occupation monomial is the
+spin-configuration `μ`-Slater state `Π_{z∈I} â†_{μ_z,σ_z}|vac⟩` of eq. (11.3.47). -/
+noncomputable def flatBandSpinConfigOcc (I : Finset (Fin (M + 1)))
+    (idx : Fin (M + 1) → Fin (M + 1)) (σ : Fin (M + 1) → Fin 2) :
+    Fin (M + 1) × Fin 2 → Fin 2 :=
+  fun q => if ∃ z ∈ I, q = (idx z, σ z) then 1 else 0
+
+open Classical in
+/-- **The spin-configuration state** `Π_{z∈I} â†_{μ_z,σ_z}|vac⟩`, indexed by a spin configuration
+`σ` (the summands of eq. (11.3.47)), realised as the occupation monomial of `flatBandSpinConfigOcc`
+over the extended basis `eμ`. -/
+noncomputable def flatBandSpinConfigState (I : Finset (Fin (M + 1)))
+    (idx : Fin (M + 1) → Fin (M + 1))
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (σ : Fin (M + 1) → Fin 2) :
+    (Fin (2 * M + 2) → Fin 2) → ℂ :=
+  generalOccMonomial eμ (flatBandSpinConfigOcc I idx σ)
+
+/-- **A spin-configuration occupation `g` is `flatBandSpinConfigOcc` of its spin function**: with
+`σ_g z := [g(idx z,↑) ≠ 1]`, a spin-config occupation (`idx(I)`-supported, no double occupancy, `D₀`
+occupied) equals `flatBandSpinConfigOcc I idx σ_g`.  Uses the explicit one-spin-per-index property
+(`flatBandSpinConfig_exactlyOne_per_index`). -/
+theorem flatBandSpinConfig_eq_spinConfigOcc
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    {eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)} {idx : Fin (M + 1) → Fin (M + 1)}
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z) {g : Fin (M + 1) × Fin 2 → Fin 2}
+    (hsupp : IsIdxSupported I idx g)
+    (hno : ∀ z ∈ I, ¬ (g (idx z, 0) = 1 ∧ g (idx z, 1) = 1))
+    (hcard : (generalOccFinset g).card = generalFlatBandDim T) :
+    g = flatBandSpinConfigOcc I idx (fun z => if g (idx z, 0) = 1 then 0 else 1) := by
+  classical
+  have hinj : ∀ {a b : Fin (M + 1)}, a ∈ I → b ∈ I → idx a = idx b → a = b :=
+    fun {a b} ha hb => flatBandSpecial_idx_injOn hbasis hidx ha hb
+  funext q
+  set σg : Fin (M + 1) → Fin 2 := fun z => if g (idx z, 0) = 1 then 0 else 1 with hσg
+  by_cases hq : q.1 ∈ I.image idx
+  · obtain ⟨z, hz, hzq⟩ := Finset.mem_image.mp hq
+    have hqz : q = (idx z, q.2) := Prod.ext hzq.symm rfl
+    -- value of the spin-config occupation at q
+    have hocc : flatBandSpinConfigOcc I idx σg q = if q.2 = σg z then 1 else 0 := by
+      unfold flatBandSpinConfigOcc
+      by_cases hτ : q.2 = σg z
+      · rw [if_pos ⟨z, hz, by rw [hqz, hτ]⟩, if_pos hτ]
+      · rw [if_neg hτ, if_neg ?_]
+        rintro ⟨w, hw, hwq⟩
+        have e1 : q.1 = idx w := by rw [hwq]
+        rw [← hzq] at e1
+        have hwz : idx w = idx z := e1.symm
+        exact hτ (by rw [hwq, hinj hw hz hwz])
+    rw [hocc]
+    conv_lhs => rw [hqz]
+    rcases flatBandSpinConfig_exactlyOne_per_index hbasis hidx hsupp hno hcard hz with
+      ⟨h0, h1⟩ | ⟨h0, h1⟩
+    · have hσz : σg z = 0 := by rw [hσg]; exact if_pos h0
+      have hg1 : g (idx z, 1) = 0 := (fin2_eq_zero_or_one _).resolve_right h1
+      rcases fin2_eq_zero_or_one q.2 with h | h <;> rw [h, hσz]
+      · rw [if_pos rfl]; exact h0
+      · rw [if_neg (by decide)]; exact hg1
+    · have hσz : σg z = 1 := by rw [hσg]; exact if_neg h0
+      have hg0 : g (idx z, 0) = 0 := (fin2_eq_zero_or_one _).resolve_right h0
+      rcases fin2_eq_zero_or_one q.2 with h | h <;> rw [h, hσz]
+      · rw [if_neg (by decide)]; exact hg0
+      · rw [if_pos rfl]; exact h1
+  · have hg0 : g q = 0 := (fin2_eq_zero_or_one (g q)).resolve_right (fun h => hq (hsupp q h))
+    rw [hg0]
+    unfold flatBandSpinConfigOcc
+    rw [if_neg ?_]
+    rintro ⟨w, hw, hwq⟩
+    exact hq (by rw [hwq]; exact Finset.mem_image_of_mem idx hw)
+
+/-- **Tasaki eq. (11.3.47), `σ`-parametrised form**: a flat-band Hubbard ground state lies in the
+span of the spin-configuration states `flatBandSpinConfigState` ranging over all spin configurations
+`σ : Fin (M+1) → Fin 2`.  From `flatBand_groundState_mem_spinConfigSpan` (PR9), each surviving
+spin-config occupation equals `flatBandSpinConfigOcc` of its spin function (PR10
+one-spin-per-index), so its occupation monomial is a `flatBandSpinConfigState`. -/
+theorem flatBand_groundState_mem_spinConfigStateSpan
+    {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
+    {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
+    (hT : T.PosSemidef) (U : ℝ) (hU : 0 < U)
+    (eμ : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (idx : Fin (M + 1) → Fin (M + 1))
+    (hidx : ∀ z ∈ I, (eμ (idx z) : Fin (M + 1) → ℂ) = μ z)
+    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} (hΦ : Φ ∈ generalFlatBandGroundSubmodule T U) :
+    Φ ∈ Submodule.span ℂ (Set.range (flatBandSpinConfigState I idx eμ)) := by
+  refine (Submodule.span_le.mpr ?_)
+    (flatBand_groundState_mem_spinConfigSpan hbasis hT U hU eμ idx hidx hΦ)
+  rintro _ ⟨g, hsupp, hno, hcard, rfl⟩
+  refine Submodule.subset_span ⟨fun z => if g (idx z, 0) = 1 then 0 else 1, ?_⟩
+  rw [flatBandSpinConfigState, ← flatBandSpinConfig_eq_spinConfigOcc hbasis hidx hsupp hno hcard]
+
+end LatticeSystem.Fermion

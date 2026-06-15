@@ -4556,6 +4556,128 @@ closed form, im-of-Hermitian, commutator, mul-Hamiltonian-im,
 hamiltonian-pow-im, anticommutator, commutator-re,
 partition function im, ofReal-re-eq, pow-trace).
 
+\subsection{Fock space representation and Slater determinants (Tasaki §9.2.3)}
+\label{subsec:fock-slater}
+
+\noindent The second-quantized (Fock space) representation of
+tight-binding electrons is developed in
+\texttt{Fermion/JordanWigner/FockSpaceRepresentation.lean}, working in
+the concrete Jordan--Wigner representation on
+$(\Lambda \to \mathrm{Fin}\,2) \to \mathbb{C}$. For a single-electron
+wave function $\varphi : \Lambda \to \mathbb{C}$ the smeared creation
+operator is
+\[
+  \hat C^\dagger(\varphi) = \sum_{x \in \Lambda} \varphi(x)\, \hat c^\dagger_x
+  \qquad (\text{Tasaki eq.~(9.2.46), p.~313}),
+\]
+(\texttt{fermionCreationFromVector}), and the \emph{Slater determinant
+state} of $\varphi^{(1)},\dots,\varphi^{(N)}$ is the ordered product
+\[
+  |\Phi\rangle = \hat C^\dagger(\varphi^{(1)}) \cdots
+    \hat C^\dagger(\varphi^{(N)}) |\Phi_{\rm vac}\rangle
+  \qquad (\text{Tasaki eq.~(9.2.52), p.~319}),
+\]
+(\texttt{slaterState}, an ordered \texttt{List.prod} since matrix
+multiplication is noncommutative).
+
+\medskip
+\noindent\textbf{Lemma 9.1} (Tasaki §9.2.3, p.~319, eq.~(9.2.53)).
+For two Slater determinant states $|\Phi\rangle$ and $|\Psi\rangle$,
+the inner product equals the determinant of the single-particle
+overlap (Gram) matrix:
+\[
+  \langle \Phi | \Psi \rangle
+    = \det\bigl(\langle \varphi^{(j)}, \psi^{(k)} \rangle\bigr)_{j,k}
+    = \sum_{p} (\operatorname{sign} p)
+        \prod_{j=1}^{N} \langle \varphi^{(j)}, \psi^{(p(j))} \rangle,
+\]
+where $p$ runs over all permutations.
+
+\emph{Status.} In the concrete Jordan--Wigner representation this is a
+finite-dimensional linear-algebra identity, but a direct sorry-free
+proof requires a dedicated anticommutator Wick/Laplace expansion with
+the associated ordered-list (Koszul) sign bookkeeping, comparable in
+size to the flat-band Slater-reorder development. It is therefore
+recorded as a faithful documented \texttt{axiom}
+(\texttt{lemma\_9\_1\_slater\_inner\_det}); its permutation-sum form
+(\texttt{lemma\_9\_1\_slater\_inner\_perm\_sum}) is derived from it by
+the Leibniz determinant expansion, and its $n = 0$ instance
+$\langle \Phi_{\rm vac}, \Phi_{\rm vac}\rangle = 1$
+(\texttt{fockInner\_vacuum\_self}) is proved axiom-free as a
+consistency guard. The downstream Lemmas 9.2 and 9.3 will be proved
+from this identity.
+
+\medskip
+\noindent\textbf{Lemma 9.2} (Tasaki §9.2.3, p.~320). The Slater
+determinant state $|\Phi\rangle$ is nonvanishing if and only if the
+single-electron wave functions $\varphi^{(1)},\dots,\varphi^{(N)}$ are
+linearly independent
+(\texttt{lemma\_9\_2\_slater\_ne\_zero\_iff\_linearIndependent}).
+
+\emph{Proof.} By Lemma 9.1 (with $\psi = \varphi$) the squared norm
+$\langle \Phi, \Phi\rangle$ equals the Gram determinant
+$\det(\langle \varphi^{(j)}, \varphi^{(k)}\rangle)$. The Fock inner
+product is positive definite, so $\Phi = 0$ iff
+$\langle \Phi, \Phi\rangle = 0$. Writing the coefficient matrix
+$A$ with columns $\varphi^{(j)}$ (so $A_{x,j} = \varphi^{(j)}(x)$), the
+Gram matrix is $G = A^{\mathsf H} A$, and $\ker(A^{\mathsf H} A) = \ker A$
+over $\mathbb{C}$; hence $\det G \neq 0$ iff the columns of $A$ are
+linearly independent, i.e.\ iff the $\varphi^{(j)}$ are. This part
+(\texttt{slaterGram\_self\_det\_ne\_zero\_iff}) is proved axiom-free; the
+full lemma depends only on the Lemma 9.1 axiom.
+
+\medskip
+\noindent\textbf{Lemma 9.3} (Tasaki §9.2.3, pp.~320--321). If
+$\{\varphi^{(j)}\}$ and $\{\psi^{(j)}\}$ span the same $N$-dimensional
+subspace, then their Slater determinant states are proportional by a
+nonzero constant: there is $c \neq 0$ with $|\Psi\rangle = c\,|\Phi\rangle$
+(\texttt{lemma\_9\_3\_slater\_proportional\_of\_span\_eq}).
+
+\emph{Proof.} Write $\psi^{(j)} = \sum_k \beta_{j,k}\,\varphi^{(k)}$ via
+the change matrix $\beta$ (\texttt{slaterChangeMatrix}). Then
+$G(\chi,\psi) = G(\chi,\varphi)\,\beta^{\mathsf T}$, so by Lemma 9.1 and
+determinant multiplicativity
+$\langle \Phi_\chi, \Phi_\psi\rangle = \det(\beta)\,
+\langle \Phi_\chi, \Phi_\varphi\rangle$ for every $\chi$
+(\texttt{fockInner\_slater\_change}). Set $c = \det\beta$ and
+$w = |\Psi\rangle - c\,|\Phi\rangle$. Taking $\chi = \varphi$ and
+$\chi = \psi$ shows $w$ is orthogonal to both $|\Phi\rangle$ and
+$|\Psi\rangle$, hence to itself, so $\langle w, w\rangle = 0$ and $w = 0$
+by positive-definiteness of the Fock inner product. Finally $c \neq 0$,
+since $|\Psi\rangle \neq 0$ by Lemma 9.2 applied to the linearly
+independent $\psi$. The lemma depends only on the Lemma 9.1 axiom.
+
+\medskip
+\noindent\textbf{Lemma 9.4} (general basis of $H_N$; Tasaki §9.2.3,
+pp.~321--322, eq.~(9.2.65)). For $M+1$ linearly independent
+single-particle states $\varphi^{(1)},\dots,\varphi^{(M+1)}$, the states
+\[
+  |\Gamma_{S\uparrow,S\downarrow}\rangle
+    = \Bigl(\textstyle\prod_{j\in S\uparrow}\hat C^\dagger_\uparrow(\varphi^{(j)})\Bigr)
+      \Bigl(\textstyle\prod_{j\in S\downarrow}\hat C^\dagger_\downarrow(\varphi^{(j)})\Bigr)
+      |\Phi_{\rm vac}\rangle,
+\]
+over all subset pairs $(S\uparrow, S\downarrow)$ with
+$|S\uparrow| + |S\downarrow| = N$, span the $N$-electron sector $H_N$
+(\texttt{tasaki\_lemma\_9\_4\_generalBasis\_span},
+\texttt{tasaki\_lemma\_9\_4\_of\_linearIndependent}, in
+\texttt{Hubbard/GeneralBasisHN.lean}).
+
+\emph{Proof (axiom-free).} We take $H_N$ to be the $N$-eigenspace of the
+total number operator $\hat N$ (\texttt{spinfulNElectronSubmodule}). The
+proof reuses the general-basis Fock-monomial framework of §11.3
+(\texttt{generalModeMonomial}, the occupation basis
+\texttt{generalOccBasis}, the diagonalization
+$\hat N\,|qs\rangle = (\operatorname{length} qs)\,|qs\rangle$, and the
+reordering-sign lemma \texttt{generalModeMonomial\_perm}). Each
+$|\Gamma_{S\uparrow,S\downarrow}\rangle$ is a product of $N$ creators, so
+it is an $\hat N$-eigenstate of eigenvalue $N$, giving the inclusion
+$\mathrm{span} \subseteq H_N$. Conversely, expanding any $v \in H_N$ in
+the occupation basis, the coefficients on configurations of the wrong
+particle count vanish, and every $N$-electron occupation monomial equals
+a nonzero multiple (a reordering sign) of some
+$|\Gamma_{S\uparrow,S\downarrow}\rangle$; hence $H_N \subseteq \mathrm{span}$.
+
 \subsection{Hubbard spin symmetry: U(1)\texorpdfstring{$\times$}{×}U(1) invariance (Tasaki §9.3.3)}
 \label{subsec:hubbard-spin-symmetry}
 
@@ -5103,6 +5225,169 @@ configurations, so
   \item \texttt{hubbardHardcoreBasisState\_mem\_sector}: each basis state lies in
     the sector.
 \end{itemize}
+
+%======================================================================
+\subsection{Degenerate perturbation theory: the effective Hamiltonian (Tasaki §10.1, Lemma 10.1)}
+\label{subsec:degenerate-perturbation}
+
+\noindent The first item of Chapter 10 (Lieb's theorems) is the
+degenerate-perturbation-theory lemma underlying the proof of Lieb's
+theorem for the repulsive Hubbard model. For a Hamiltonian family
+$\hat H(\lambda) = \hat H_0 + \lambda \hat V$ with $\hat H_0 \ge 0$
+Hermitian and ground space $H_0 = \ker \hat H_0$, the second-order
+effective Hamiltonian on $H_0$ is
+\[
+  \hat H_{\rm eff} = -\,\hat P_0\,\hat V\,\hat H_0^{-1}\,\hat V\,\hat P_0
+  \qquad (\text{Tasaki eq.~(10.1.20)}),
+\]
+where $\hat P_0$ is the orthogonal projection onto $H_0$
+(\texttt{kernelProjectionMatrix}, Hermitian and idempotent) and
+$\hat H_0^{-1}$ is the reduced (Moore--Penrose) inverse, supported on
+$H_0^\perp$ (\texttt{IsReducedInverse}). These are defined in
+\texttt{Math/MatrixAnalysis/DegeneratePerturbation.lean}.
+
+\medskip
+\noindent\textbf{Lemma 10.1} (Tasaki §10.1, p.~346). Assume the
+first-order term vanishes on the degenerate subspace,
+$\hat P_0 \hat V \hat P_0 = 0$ (so that Tasaki's
+$\hat H_{\rm spin} = \lambda^2 \hat H_{\rm eff}$, eq.~(10.1.6), has no
+$\lambda^1$ contribution). If the effective Hamiltonian
+$\hat H_{\rm eff}$ (restricted to $H_0$) has a unique ground state
+$|\Phi_{\rm eff\text{-}GS}\rangle$, then $\hat H(\lambda)$ has a
+unique ground state for all sufficiently small $\lambda > 0$, and a phase
+choice of normalized ground states converges to
+$|\Phi_{\rm eff\text{-}GS}\rangle$ as $\lambda \to 0^+$
+(\texttt{tasaki\_lemma\_10\_1\_degenerate\_perturbation}).
+
+\emph{Status.} The content is the analytic theory of degenerate
+perturbations (continuity of the low-lying eigenstates and the
+$\lambda \to 0^+$ limit); per the project policy (perturbation-theory
+proofs are not undertaken) it is recorded as a faithful documented
+\texttt{axiom}, the weak-coupling companion of the strong-coupling
+Theorem A.12 (\texttt{effectiveHamiltonian\_strongCoupling\_limit}). The
+projection $\hat P_0$ is constructed concretely and its
+Hermitian/idempotent properties are proved as consistency guards.
+
+%======================================================================
+\subsection{Lieb's theorem for the attractive Hubbard model (Tasaki §10.2.1, Theorems 10.2 \& 10.3)}
+\label{subsec:lieb-attractive}
+
+\noindent The attractive Hubbard model (Tasaki §10.2.1, eqs.~(10.2.1)/(10.2.2))
+has Hamiltonian $\hat H = \hat H_{\rm hop} + \hat H_{\rm att\text{-}int}$ with an
+arbitrary real symmetric hopping matrix $T$ (whose support graph
+\texttt{hoppingSupportGraph} is connected; arbitrary on-site energies $T_{xx}$
+allowed) and site-dependent on-site attraction
+$\hat H_{\rm att\text{-}int} = -\sum_x U_x\,\hat n_{x\uparrow}\hat n_{x\downarrow}$,
+$U_x > 0$ (\texttt{attractiveHubbardHamiltonian}, reusing the general kinetic
+term \texttt{hubbardKinetic}).
+
+\medskip
+\noindent\textbf{Theorem 10.2} (Lieb's theorem; Tasaki §10.2.1, p.~348). For an
+even electron number $N$ with $0 < N \le 2|\Lambda|$, the ground state of
+$\hat H$ in the $N$-electron sector is unique and a spin singlet,
+$(\hat S_{\rm tot})^2 = 0$
+(\texttt{theorem\_10\_2\_lieb\_attractive\_unique\_singlet}).
+
+\emph{Status.} Proved by Lieb's spin-space reflection-positivity method; per the
+project policy this deep reflection-positivity result is recorded as a faithful
+documented \texttt{axiom}, built on a concrete attractive Hubbard Hamiltonian,
+with the unique-ground-state predicate \texttt{IsUniqueGroundStateOn} reused from
+the degenerate-perturbation development (§10.1).
+
+\medskip
+\noindent\textbf{Theorem 10.3} (Tian; Tasaki §10.2.1, p.~349, eq.~(10.2.4)).
+Under the hypotheses of Theorem 10.2, the unique ground state has strictly
+positive on-site pair-transfer correlation
+$\langle\Phi_{\rm GS}|\,\hat c^\dagger_{x\uparrow}\hat c^\dagger_{x\downarrow}
+\hat c_{y\downarrow}\hat c_{y\uparrow}\,|\Phi_{\rm GS}\rangle > 0$ for all
+$x, y \in \Lambda$, a measure of off-diagonal long-range order
+(\texttt{theorem\_10\_3\_tian\_pair\_correlation\_positive}). The textbook states
+$0 < N \le 2|\Lambda|$; the Lean statement uses the non-full guard
+$N < 2|\Lambda|$ (the fully-filled endpoint makes off-site pair transfer vanish in
+the concrete Fock representation). Proved by Tian's extension of Lieb's
+reflection-positivity method; recorded as a faithful documented \texttt{axiom}.
+
+%======================================================================
+\subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
+\label{subsec:lieb-repulsive}
+
+\noindent The repulsive Hubbard model (Tasaki §10.2.2) has a \emph{bipartite}
+real symmetric connected hopping matrix $T$ ($\Lambda = A \sqcup B$, hopping
+only across sublattices; \texttt{HoppingRespectsBipartition}) and a repulsive
+on-site interaction, either the uniform form $\hat H_{\rm int} = U \sum_x
+\hat n_{x\uparrow}\hat n_{x\downarrow}$ ($U > 0$, eq.~(10.2.5),
+\texttt{repulsiveHubbardHamiltonian}) or the symmetric form $\sum_x U_x
+(\hat n_{x\uparrow}-\tfrac12)(\hat n_{x\downarrow}-\tfrac12)$ ($U_x > 0$,
+eq.~(10.2.6), \texttt{symmetricRepulsiveHubbardHamiltonian}). These hypotheses
+are packaged in \texttt{IsLiebRepulsiveModel}.
+
+\medskip
+\noindent\textbf{Theorem 10.4} (Lieb's theorem; Tasaki §10.2.2, p.~350). At
+half-filling $N = |\Lambda|$, every ground state has total spin
+$S_{\rm tot} = ||A|-|B||/2$, and the ground states are exactly
+$2 S_{\rm tot}+1 = |A|-|B|+1$ fold degenerate (the unavoidable SU(2) multiplet
+degeneracy). Formally
+(\texttt{theorem\_10\_4\_lieb\_repulsive\_half\_filling}): there is a ground
+energy $E_0$ whose $(N+1)$-electron ground subspace is nonzero, energy-minimal,
+lies in the Casimir eigenspace $S_0(S_0+1)$ with $S_0 = ||A|-|B||/2$, and has
+$\dim = |A|-|B|+1$.
+
+\emph{Status.} Proved by Lieb's spin-space reflection-positivity method (via the
+Shiba transformation from the attractive case, Theorem 10.2); per the project
+policy recorded as a faithful documented \texttt{axiom}, built on concrete
+repulsive Hubbard Hamiltonians.
+
+\medskip
+\noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351,
+eq.~(10.2.7)). Under the hypotheses of Theorem 10.4, for any ground state $v$
+the transverse spin correlation
+$\langle v|\,\hat S^{(1)}_x \hat S^{(1)}_y + \hat S^{(2)}_x \hat S^{(2)}_y\,|v\rangle
+= \tfrac12\langle v|\,\hat S^+_x \hat S^-_y + \hat S^-_x \hat S^+_y\,|v\rangle$
+is real, strictly positive when $x, y$ lie in the same sublattice and strictly
+negative otherwise (\texttt{theorem\_10\_5\_shen\_qiu\_tian\_spin\_correlation\_sign},
+reusing \texttt{IsLiebRepulsiveModel}). Shen–Qiu–Tian's extension of Lieb's
+reflection positivity; recorded as a faithful documented \texttt{axiom}.
+
+\medskip
+\noindent\textbf{Theorem 10.6} (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3,
+p.~354, eqs.~(10.2.16)/(10.2.17)). Under the hypotheses of Theorem 10.4, every
+normalized ground state $v$ satisfies the staggered-order-parameter bound
+$\langle v|(\hat O_L)^2|v\rangle \ge \bigl((|A|-|B|)/2\bigr)^2$, where
+$(\hat O_L)^2 = \sum_{x,y} \varepsilon_x \varepsilon_y\, \hat S_x \cdot \hat S_y$
+with staggered sign $\varepsilon_x = \pm 1$ on the two sublattices
+(\texttt{fermionStaggeredCasimirOp}, \texttt{theorem\_10\_6\_lieb\_ferrimagnetism}),
+exhibiting ferrimagnetic long-range order. Recorded as a faithful documented
+\texttt{axiom} (Lieb's reflection positivity).
+
+\medskip
+\noindent\textbf{Proposition 10.7} (Tasaki §10.2.3, p.~356), \emph{proved
+axiom-free}. For a bipartite real symmetric hopping matrix $T$: (i) the
+single-electron spectrum is symmetric about zero, in the multiplicity form
+$(-T)\text{.charpoly} = T\text{.charpoly}$
+(\texttt{proposition\_10\_7\_charpoly\_neg\_eq}), proved via the diagonal gauge
+$D T D = -T$ with $D = \mathrm{diag}(\pm 1)$
+(\texttt{bipartiteSignMatrix}); (ii) there are at least $|A|-|B|$ zero modes,
+$\dim \ker T \ge |A|-|B|$
+(\texttt{proposition\_10\_7\_zero\_mode\_lower\_bound}), proved by sending
+$A$-supported vectors through $T$ into the $|B|$-dimensional $B$-supported
+subspace (bipartiteness) and applying rank–nullity over the $|A|$-dimensional
+domain. This is the one Chapter-10 item that is finite-dimensional linear
+algebra rather than reflection positivity, and it is fully discharged.
+
+\medskip
+\noindent\textbf{Theorem 10.8} (Lieb–Shen–Qiu superconductivity; Tasaki §10.2.3,
+p.~359, eq.~(10.2.22)). For the symmetric attractive Hubbard model
+$\hat H_{\rm hop} - \sum_x U_x(\hat n_{x\uparrow}-\tfrac12)(\hat n_{x\downarrow}-\tfrac12)$
+(eq.~(10.2.21)) on a bipartite lattice with even electron number $N$,
+$2|B| \le N \le 2|A|$, the unique ground state
+$\varphi$ (Theorem 10.2) satisfies the pair off-diagonal-long-range-order bound
+$\langle\varphi|\,\hat b^\dagger \hat b\,|\varphi\rangle \ge (|A|-N/2)(N/2-|B|)$
+with $\hat b = \sum_x \hat c_{x\downarrow}\hat c_{x\uparrow}$
+(\texttt{totalPairCorrelationOperator},
+\texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity}); the positive regime
+is the standard criterion for superconductivity (fermion-pair condensation).
+Recorded as a faithful documented \texttt{axiom} (Lieb's reflection positivity,
+Shen–Qiu–Tian, plus Theorem 10.2 uniqueness).
 
 %======================================================================
 \subsection{Effective Hamiltonian on the hard-core sector (Tasaki §11.2)}
@@ -6333,6 +6618,8 @@ $h_0$, $|I|=D_0$, site-localised so that $\mu_z(z)\ne0$ and $\mu_z(z')=0$ for $z
 and Theorem 11.17 (the model is ferromagnetic iff that basis is \emph{connected}, where
 $\mu_z\sim\mu_{z'}$ when they share a nonzero component).
 
+\noindent\textbf{Theorem 11.15 discharge (Issue \#4453, \texttt{GeneralFlatBandProjectionBridge.lean}).}  With Theorem 11.17 now proved, Theorem 11.15 reduces to the bridge \texttt{generalFlatBandProjectionIrreducible}\,$T\iff$\texttt{generalFlatBandBasisConnected}\,$I\,\mu$.  Its foundations: the projection-matrix entry is an inner product $(P_0)_{xy}=\langle e_x, P_0 e_y\rangle$ (\texttt{generalFlatBandProjectionMatrix\_apply}); $P_0$ is Hermitian (\texttt{generalFlatBandProjectionMatrix\_isHermitian}, via \texttt{inner\_starProjection\_left\_eq\_right}), so the support matrix $|(P_0)_{xy}|^2$ is symmetric and its irreducibility is the strong connectivity of an undirected graph; and $P_0$ is idempotent (\texttt{generalFlatBandProjectionMatrix\_isIdempotent}).  The diagonal density is a squared norm $(P_0)_{xx}=\|P_0 e_x\|^2$ (\texttt{generalFlatBandProjectionMatrix\_diag\_eq}, by self-adjointness and idempotence), so a site is active, $(P_0)_{xx}\neq0$, exactly when $e_x\notin(\ker T)^\perp$ (\texttt{generalFlatBand\_diag\_ne\_zero\_iff}).  Every index site is active, $I\subseteq\Lambda_0$ (\texttt{generalFlatBand\_special\_index\_active}): for $z\in I$ the localised vector $\mu_z$ lies in $\ker T$ (\texttt{generalFlatBand\_mu\_mem\_kernel}, lifting $T\mu_z=0$) and $\mu_z(z)\neq0$, so $e_z$ is not orthogonal to $\ker T$, whence $(P_0)_{zz}\neq0$.  More generally, since $\ker T=\mathrm{span}\{\mu_z:z\in I\}$ (\texttt{generalFlatBand\_kernel\_eq\_span}, the $|I|=D_0$ independent vectors $\mu_z$ exhaust the $D_0$-dimensional flat band), a site is active exactly when some special-basis vector covers it: $(P_0)_{xx}\neq0\iff\exists z\in I,\ \mu_z(x)\neq0$ (\texttt{generalFlatBand\_active\_iff\_exists\_mu\_ne}).  So the active sites $\Lambda_0$ are precisely the $\mu$-supported sites.  The support matrix $|(P_0)_{xy}|^2$ is symmetric (\texttt{generalFlatBandProjectionSupportMatrix\_isSymm}, from $P_0$ Hermitian and conjugation-invariance of $\mathrm{normSq}$), so its irreducibility is the connectivity of an undirected support graph.  The bridge to basis-graph connectivity avoids the Gram inverse via the cut/block structure of the projection: a flat-band vector vanishing at every index site is zero (\texttt{generalFlatBand\_kernel\_coord\_determined}, since $v=\sum_z c_z\mu_z$ evaluated at index $w$ gives $c_w\mu_w(w)$ by the localisation $\mu_{z'}(w)=\delta_{z'w}\mu_w(w)$).  Hence a coordinate cut of the active sites that $P_0$ does not bridge forces $\ker T$ to block-decompose, and each $\mu_z$ to be supported on the side of its own index; the support-graph connectivity is thereby equivalent to the basis-graph connectivity.  As a first step, an inactive site has a vanishing projection row: $(P_0)_{xx}=0\Rightarrow P_0 e_x=0$ (\texttt{generalFlatBand\_proj\_apply\_eq\_zero\_of\_diag\_zero}) and hence $(P_0)_{xy}=0$ for all $y$ (\texttt{generalFlatBand\_proj\_row\_eq\_zero\_of\_diag\_zero}), so the support of $P_0$ is confined to the active sites $\Lambda_0$; equivalently, the off-diagonal entry is $(P_0)_{xy}=\langle P_0 e_x, P_0 e_y\rangle$ (\texttt{generalFlatBand\_proj\_offdiag\_eq}) and a support edge forces both endpoints active (\texttt{generalFlatBand\_proj\_active\_of\_ne\_zero}), so the support graph lives on $\Lambda_0$.  Special-basis vectors with disjoint site supports are orthogonal (\texttt{generalFlatBand\_mu\_orthogonal\_of\_disjoint\_support}, the inner product $\sum_x\overline{\mu_z(x)}\,\mu_{z'}(x)$ vanishing term by term), so the per-side flat-band subspaces $V_i=\mathrm{span}\{\mu_z:z\in I_i\}$ of a basis cut are orthogonal; moreover no site is shared across the cut (\texttt{generalFlatBand\_no\_shared\_site\_of\_saturated}: a site covered by indices on both sides would be a basis edge between them), so the active-site side-assignment is well-defined.  A basis vector with no support from a side is orthogonal to that side's flat-band subspace (\texttt{generalFlatBand\_basisVec\_mem\_orthogonal\_of\_side}: $\langle\mu_z,e_x\rangle=\overline{\mu_z(x)}=0$ on each generator), placing $P_0 e_x$ in the complementary side --- the heart of the block-diagonal decomposition.  Indeed $P_0$ preserves orthogonality to a flat-band subspace (\texttt{generalFlatBand\_proj\_mem\_orthogonal}: for $V\le\ker T$ and $e_x\perp V$, $\langle w,P_0 e_x\rangle=\langle P_0 w,e_x\rangle=\langle w,e_x\rangle=0$), so $P_0 e_x$ stays on $x$'s side of a cut.  The flat band splits over a cut, $\ker T=\mathrm{span}\{\mu_z:z\in S\}\sqcup\mathrm{span}\{\mu_z:z\in S^c\}$ (\texttt{generalFlatBand\_kernel\_eq\_sup}), which with side-orthogonality is the orthogonal block decomposition of $\ker T$.  The two sides span orthogonal subspaces, $V_S\perp V_{S^c}$, when their site supports are disjoint (\texttt{generalFlatBand\_side\_subspaces\_orthogonal}), the disjointness for a saturated cut coming from \texttt{no\_shared\_site\_of\_saturated}.  The projection then carries each side into itself: for $y$ on the $S^c$-side, $P_0 e_y\in V_{S^c}$ (\texttt{generalFlatBand\_proj\_mem\_side}), since $P_0 e_y=a+b\in V_S\oplus V_{S^c}$ with $P_0 e_y\perp V_S$ and $V_S\perp V_{S^c}$ forcing $\langle a,a\rangle=0$, hence $a=0$.  Hence $P_0$ is block-diagonal across a basis cut: $(P_0)_{xy}=0$ when $x$ is $S$-supported and $y$ is $S^c$-supported (\texttt{generalFlatBand\_proj\_offdiag\_eq\_zero\_across\_cut}), since $(P_0)_{xy}=\langle P_0 e_x,P_0 e_y\rangle$ with $P_0 e_x\in V_S$, $P_0 e_y\in V_{S^c}$, $V_S\perp V_{S^c}$.  For the reverse implication one needs the converse block transfer: writing $v_y=\sum_x v_x (P_0)_{yx}$ for $v\in\ker T$ (\texttt{generalFlatBand\_kernel\_coord\_matvec}, from $v=P_0v$ and $v=\sum_x v_x e_x$), a coordinate set $W$ with no $P_0$ entries linking it to its complement carries the truncation $1_W\!\cdot v=\sum_{x\in W}v_x e_x$ back into $\ker T$ (\texttt{generalFlatBand\_restrict\_mem\_kernel}; the $x\notin W$ part is killed by the block hypothesis with $P_0$ Hermitian) --- the linear-algebra core of ``$P_0$ reducible $\Rightarrow$ basis cut''.  Consequently a special-basis vector cannot straddle a $P_0$-block cut: for such a cut $W$, an index $z\in I\cap W$ has $\mu_z$ supported entirely in $W$ (\texttt{generalFlatBand\_mu\_confined\_of\_block}), since $1_{W^c}\!\cdot\mu_z$ is a kernel vector vanishing at every index site (at $z$ because $z\in W$, elsewhere by localisation) and is therefore $0$ by \texttt{generalFlatBand\_kernel\_coord\_determined}.  The discharge of Theorem 11.15 (file \texttt{GeneralFlatBandTheorem1115.lean}) composes the proved Theorem 11.17 ($\text{ferro}\iff\text{basis connected}$) with the bridge $\text{projectionIrreducible}\iff\text{basis connected}$, factored through \texttt{generalFlatBandProjectionBlockReducible} (a coordinate cut $W$ with an active site on each side and no $P_0$ entry across).  One direction, \texttt{generalFlatBand\_blockReducible\_of\_not\_basisConnected}, builds $W$ from the basis-disconnection cut's $\mu$-support: $A$-indices are active inside $W$, $A^c$-indices active outside, and $(P_0)_{yx}=0$ across by \texttt{generalFlatBand\_proj\_offdiag\_eq\_zero\_across\_cut} and $P_0$ Hermitian.  The converse (\texttt{generalFlatBand\_not\_basisConnected\_of\_blockReducible}) confines each $\mu_z$ to its index's side via \texttt{generalFlatBand\_mu\_confined\_of\_block}, so the index set splits into $J=\{z\mid z.1\in W\}$, closed under basis-graph adjacency with both sides nonempty (the active sites), whence a $J$-vertex cannot reach outside $J$ and the basis is disconnected.  One half of $\text{projectionIrreducible}\iff\neg\,\text{blockReducible}$ is also in place: \texttt{generalFlatBand\_not\_projectionIrreducible\_of\_blockReducible} shows a block-reducible $P_0$ is not irreducible, since support-matrix powers vanish between the two active sites across the cut (\texttt{generalFlatBand\_support\_pow\_eq\_zero\_across\_block}, an induction on the path length), contradicting \texttt{isIrreducible\_iff\_exists\_pow\_pos}.  The reverse, \texttt{generalFlatBand\_blockReducible\_of\_not\_projectionIrreducible}, builds the block cut from a non-irreducible support: \texttt{isIrreducible\_iff\_exists\_pow\_pos} yields active sites $i_0,j_0$ with no positive support path between them, and $W$ = the sites reachable from $i_0$ works ($i_0\in W$ via its self-loop $|(P_0)_{i_0 i_0}|^2>0$, $j_0\notin W$, and no $(P_0)$ entry crosses out of $W$ since it would extend a reachability path).  Together: $\text{projectionIrreducible}\iff\neg\,\text{blockReducible}$.  Together these give $\text{blockReducible}\iff\neg\,\text{basis connected}$; with $\text{projectionIrreducible}\iff\neg\,\text{blockReducible}$ (below) the full bridge is in place, and the final composition (\texttt{generalFlatBand\_projectionIrreducible\_iff\_basisConnected}) discharges the theorem: \texttt{tasaki\_theorem\_11\_15} is now a proved theorem (axiom removed, \texttt{\#print axioms} clean), obtained by choosing a special basis (Lemma 11.16), applying Theorem 11.17, and composing with the bridge.  This completes Tasaki \S11.3.4.
+
 \textbf{Lemma 11.16 is now discharged (axiom-free)} by elementary linear algebra
 (\texttt{generalFlatBand\_lemma\_11\_16}).  The construction: the restricted coordinate
 functionals $\mathrm{fc}_x = (\texttt{EuclideanSpace.proj}_x)\!\restriction_{\ker T}$
@@ -6351,6 +6638,345 @@ The remaining two, \texttt{tasaki\_theorem\_11\_15} and \texttt{generalFlatBand\
 (the basis connectivity is \texttt{generalFlatBandBasisGraph}/%
 \texttt{generalFlatBandBasisConnected}), are still recorded as documented axioms, matching the
 policy for Theorems 11.8 / 11.13; their proofs are deferred to later work.
+
+\medskip\noindent\textbf{Theorem 11.17 discharge, operator-algebraic foundation (Tasaki
+§11.3.4, Issue \#4363, PR1, \texttt{GeneralFlatBandOperators.lean}).}  Tasaki's proof of
+Theorem 11.17 mirrors the fully-proved Theorem 11.11 (the $\nu$-chain flat band), generalised
+from the concrete delta-chain modes to an \emph{arbitrary} special basis $\{\mu_z\}_{z\in I}$ of
+$\ker T$ (Lemma 11.16).  The first PR builds the operator-algebraic premise side.  The
+\emph{general flat-band creation/annihilation operators} are the smeared operators
+$\hat a^\dagger_{z,\sigma} := \hat C^\dagger_\sigma(\mu_z)$,
+$\hat a_{z,\sigma} := \hat C_\sigma(\mu_z)$
+(\texttt{generalFlatBandCreation}/\texttt{Annihilation}, with
+$\hat C^\dagger_\sigma(\varphi)=\sum_x \varphi(x)\,\hat c^\dagger_{x,\sigma}$).  Their adjoints
+$(\hat C^\dagger_\sigma(\varphi))^{\mathsf H}=\hat C_\sigma(\bar\varphi)$ and full
+$\mathbb C$-linearity are established, together with the canonical-anticommutation algebra: the
+unified site form $\{\hat c_{x,\sigma},\hat c^\dagger_{y,\tau}\}=[\,x{=}y\wedge
+\sigma{=}\tau\,]$, the \emph{bilinear} smeared form $\{\hat C_\sigma(\varphi),
+\hat C^\dagger_\tau(\psi)\}=\delta_{\sigma\tau}\bigl(\sum_x\varphi(x)\psi(x)\bigr)\cdot\mathbf 1$,
+and the site-dual form $\{\hat c_{z,\sigma},\hat a^\dagger_{z',\tau}\}=\delta_{\sigma\tau}\,
+\mu_{z'}(z)\cdot\mathbf 1$.  From these one obtains the $\hat a^\dagger$-monomial Slater states and
+their span (the right-hand side of eq.~(11.3.46)), the single- and double-site annihilation
+\emph{peel} formulae (the eq.~(11.3.48) engine), the doubled annihilator
+$\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ together with the double-occupancy Gram identity
+$\hat n_{x,\uparrow}\hat n_{x,\downarrow}=(\hat c_{x,\downarrow}\hat c_{x,\uparrow})^{\mathsf H}
+(\hat c_{x,\downarrow}\hat c_{x,\uparrow})$, and the kinetic-operator positivity: writing
+$T=C^{\mathsf H}C$ gives the Gram-sum factorisation
+$\hat H_{\rm hop}=\sum_\sigma\sum_k (\hat C_\sigma(C_k))^{\mathsf H}\hat C_\sigma(C_k)\ge0$.
+Consequently a flat-band ground state at filling $N=D_0$ (zero Rayleigh quotient, $U>0$) has
+\emph{no double occupancy} ($\hat n_{x,\uparrow}\hat n_{x,\downarrow}\Phi=0$,
+$\hat c_{x,\downarrow}\hat c_{x,\uparrow}\Phi=0$) and is annihilated by $\hat C_\sigma(\bar w)$ for
+\emph{every} $w\in\operatorname{range}T$.  (The smeared annihilator is $\mathbb C$-\emph{linear},
+so the exact killing space is the row span of the positive square root $C$ of $T=C^{\mathsf H}C$,
+which equals $\overline{\operatorname{range}T}$: writing $b=Cw$, the identity
+$\overline{(Tw)_x}=\sum_k C_{kx}\overline{b_k}$ exhibits $\overline{Tw}$ as a row combination, giving
+$\hat C_\sigma(\overline{Tw})\Phi=0$; for an \emph{orthonormal} eigenbasis the operator detecting
+occupation of a nonzero-eigenvalue mode $u$ is exactly $\hat C_\sigma(\bar u)$, so this is the form
+the Fock-spanning step consumes.)  The single-particle space is split by
+the Hermitian spectral theorem (\texttt{IsHermitian.eigenvectorBasis}): zero-eigenvalue
+eigenvectors lie in the flat band $\ker T$, nonzero-eigenvalue eigenvectors lie in
+$\operatorname{range}T$, and every $v$ decomposes as $v_{\ker}+v_{\rm range}$
+(\texttt{exists\_ker\_add\_range\_decomp}).  (These ground-state-annihilation and spectral results
+were later split into \texttt{GeneralFlatBandGroundAnnihilation.lean} in a build-speed refactor.)
+This is exactly the operator-algebraic premise of the
+Fock-spanning eq.~(11.3.46); the remaining Fock-space spanning, spin representation
+(eq.~(11.3.47)), sign relation (eq.~(11.3.49)) and connectivity capstone are the subsequent PRs.
+
+\medskip\noindent\textbf{Theorem 11.17 PR2, the general occupation basis (Tasaki §11.3.4,
+Issue \#4363, \texttt{GeneralFlatBandModeMonomial.lean} + \texttt{GeneralFlatBandOccBasis.lean}).}
+The right-hand side of eq.~(11.3.46) is a span of Fock monomials, so the proof needs a Fock
+\emph{basis} adapted to a single-particle basis.  Tasaki's argument reuses the fully-proved
+Theorem 11.11 occupation-basis machinery, which is in fact \emph{generic in the single-particle
+basis}; PR2 re-develops it for an arbitrary basis $e$ of the $M{+}1$ modes (to be instantiated at the
+spectral eigenbasis of $T$).  First the smeared creators anticommute,
+$\{\hat C^\dagger_\sigma(\varphi),\hat C^\dagger_\tau(\psi)\}=0$ (bilinear double sum of the site
+anticommutations), whence $(\hat C^\dagger_\sigma(\varphi))^2=0$.  The \emph{general-basis Fock
+monomials} are ordered products $\prod_{(i,\sigma)\in qs}\hat C^\dagger_\sigma(e_i)$ on the vacuum;
+their span is all of Fock space, because it is invariant under each mode creation, hence (writing a
+site creation $\hat c^\dagger_{x,\sigma}=\sum_i (e.\mathrm{repr}\,\delta_x)_i\,\hat
+C^\dagger_\sigma(e_i)$ via the basis expansion) under every \emph{site} creation, and every
+computational basis vector is an ordered product of site creations on the vacuum.  Reordering the
+creation list scales a monomial by a nonzero sign (induction on the permutation; a transposition
+flips the sign through the anticommutation), and a repeated mode kills it ($(\hat C^\dagger)^2=0$);
+so the \emph{occupation monomials} (products over the sorted occupied modes of a configuration
+$f$) still span $\top$, and there are $2^{2(M+1)}=\dim$ of them, giving the \textbf{general
+occupation basis} (\texttt{generalOccBasis}).  This is the Fock-space scaffolding for the
+eq.~(11.3.46) spanning step of the next PR.
+
+\medskip\noindent\textbf{Theorem 11.17 PR3, the spectral-eigenbasis annihilation peel (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandEigenbasis.lean}).}  To detect which modes a ground
+state occupies, the occupation basis is built on the \emph{orthonormal eigenbasis} of the hopping
+matrix.  The eigenbasis $T.\mathtt{IsHermitian.eigenvectorBasis}$ (on
+$\mathrm{EuclideanSpace}\,\mathbb C\,(\mathrm{Fin}(M{+}1))$) transports to a \texttt{Module.Basis}
+of the plain coordinate space $\mathrm{Fin}(M{+}1)\to\mathbb C$ (\texttt{eigenbasisAsBasis}, via
+\texttt{OrthonormalBasis.toBasis} and \texttt{WithLp.linearEquiv}).  Its coordinate orthonormality
+$\sum_x \overline{e_j(x)}\,e_k(x)=\delta_{jk}$ collapses the bilinear CAR coefficient, giving the
+\emph{dual canonical anticommutation relation}
+$\{\hat C_\sigma(\bar e_j),\hat C^\dagger_\tau(e_k)\}=\delta_{jk}\delta_{\sigma\tau}\cdot\mathbf 1$.
+Together with the smeared-annihilator vacuum kill $\hat C_\sigma(\varphi)|\mathrm{vac}\rangle=0$,
+moving $\hat C_\sigma(\bar e_j)$ rightward through a mode monomial yields the
+\textbf{eigenbasis-annihilation peel}
+$\hat C_\sigma(\bar e_j)\,|qs\rangle = \sum_i (-1)^i\,\delta_{j,(qs_i)_1}\delta_{\sigma,(qs_i)_2}\,
+|qs\setminus i\rangle$ — the operator removes the mode $(j,\sigma)$ wherever it occurs (Koszul
+sign), and annihilates a monomial not containing it.  This is the occupation-detection engine for
+the eq.~(11.3.46) hard direction (a flat-band ground state, annihilated by every nonzero-eigenvalue
+mode $\hat C_\sigma(\bar e_j)$, has occupation only on the flat band), completed in the next PR.
+
+\medskip\noindent\textbf{Theorem 11.17 PR4, eq.~(11.3.46) Fock spanning, hard direction (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSpanning.lean}).}  The flat-band ground state at
+filling is now shown to be a superposition of flat-band occupation monomials.  The transported
+eigenbasis satisfies $T\,e_j=\lambda_j e_j$, so the precise range-$T$ annihilation (PR1) gives
+$\hat C_\sigma(\bar e_j)\Phi=0$ for every nonzero-eigenvalue mode $j$.  Form the \emph{eigenmode
+number operator} $\hat n_{j,\sigma}=\hat C^\dagger_\sigma(e_j)\hat C_\sigma(\bar e_j)$; from the dual
+CAR and the creation anticommutation it obeys
+$\hat n_{j,\sigma}\hat C^\dagger_\tau(e_k)=\delta_{jk}\delta_{\sigma\tau}\hat C^\dagger_\tau(e_k)
++\hat C^\dagger_\tau(e_k)\hat n_{j,\sigma}$, so by induction on a mode monomial it is
+\emph{diagonal} in the occupation basis, $\hat n_{j,\sigma}\,\mathrm{occMon}(g)=g(j,\sigma)\,
+\mathrm{occMon}(g)$.  Since $\hat n_{j,\sigma}\Phi=\hat C^\dagger_\sigma(e_j)(\hat C_\sigma(\bar
+e_j)\Phi)=0$ for nonzero-eigenvalue $j$, expanding $\Phi=\sum_g c_g\,\mathrm{occMon}(g)$ in the
+occupation basis and reading off the coefficient of $g$ gives $c_g\,g(j,\sigma)=0$; hence the
+\textbf{coefficient vanishes}, $c_g=0$, whenever $g$ occupies a nonzero-eigenvalue mode.  Therefore
+$\Phi$ lies in the span of the \emph{flat-supported} occupation monomials (those occupying only
+zero-eigenvalue modes) --- this is \texttt{flatBand\_groundState\_mem\_flatFockSpan}, eq.~(11.3.46).
+
+\medskip\noindent\textbf{Theorem 11.17 PR5, filling refinement (Tasaki §11.3.4, Issue \#4363,
+\texttt{GeneralFlatBandFilling.lean}).}  The same diagonalisation argument applies to the
+\emph{total} fermion number $\hat N$: from the basis-independent raising relation
+$[\hat N,\hat C^\dagger_\sigma(w)]=\hat C^\dagger_\sigma(w)$, induction on a mode monomial gives
+$\hat N\,\mathrm{occMon}(g)=|\mathrm{occupied}(g)|\,\mathrm{occMon}(g)$, so $\hat N$ is diagonal in
+the occupation basis with eigenvalue the particle count.  A $D_0$-electron ground state
+($\hat N\Phi=D_0\Phi$) therefore has occupation-basis coefficients supported on the $D_0$-electron
+configurations; combined with eq.~(11.3.46) this yields
+\texttt{flatBand\_groundState\_atFilling\_mem\_flatFockSpan}: $\Phi$ lies in the span of the
+flat-supported occupation monomials with \emph{exactly} $D_0$ occupied modes.
+
+\medskip\noindent\textbf{Theorem 11.17 PR6, transport to the special basis (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandMuTransport.lean}).}  Eq.~(11.3.46) was proved over the spectral
+eigenbasis, but the spin representation (eq.~(11.3.47)) is stated over the \emph{special basis}
+$\{\mu_z\}$ (Lemma 11.16).  Since both are bases of the same flat band, the spanning transports.
+Concretely: $\ker T = \operatorname{span}\{\mu_z\}$ at the coordinate level (each $\mu_z\in\ker T$,
+they are independent and number $D_0=\dim\ker T$; the $\mathrm{WithLp}$ identification transports
+the finrank of $\ker T$ between $\mathrm{EuclideanSpace}$ and the plain coordinate space).  The
+$\mu$-Slater Fock submodule $\mathtt{generalFlatBandFockSubmodule}\ \mu$ is invariant under
+$\hat C^\dagger_\sigma(w)$ for every $w\in\operatorname{span}\{\mu_z\}$ (a combination of the mode
+creators $\hat a^\dagger_{\mu_z,\sigma}$, each of which prepends a mode to a Slater list), and
+contains the vacuum.  A flat-supported eigenbasis occupation monomial uses only flat eigenvectors,
+each lying in $\ker T=\operatorname{span}\{\mu_z\}$, so it lies in the $\mu$-Slater submodule; hence
+so does the ground state --- \texttt{flatBand\_groundState\_mem\_generalFlatBandFockSubmodule}.
+
+\medskip\noindent\textbf{Theorem 11.17 PR7, index-mode number operators toward eq.~(11.3.47)
+(Tasaki §11.3.4, Issue \#4363, \texttt{GeneralFlatBandSpinConfig.lean}).}  On the index set $I$ the
+special basis is localised ($\mu_{z'}(z)=\delta_{zz'}\mu_z(z)$), so the site annihilator $\hat
+c_{z,\sigma}$ ($z\in I$) is dual to the mode creator $\hat a^\dagger_{\mu_z,\sigma}$:
+$\{\hat c_{z,\sigma},\hat a^\dagger_{\mu_{z'},\tau}\}=\delta_{\sigma\tau}\delta_{zz'}\mu_z(z)$.  The
+index-mode number operator $\hat n^\mu_{z,\sigma}=\hat a^\dagger_{\mu_z,\sigma}\hat c_{z,\sigma}$
+obeys the creation commutation $[\hat n^\mu_{z,\sigma},\hat a^\dagger_{\mu_{z'},\tau}]
+=\delta_{\sigma\tau}\delta_{zz'}\mu_z(z)\,\hat a^\dagger_{\mu_{z'},\tau}$, so by induction it is
+diagonal in the $\mu$-Slater states, $\hat n^\mu_{z,\sigma}|qs\rangle=\mu_z(z)\,(\#(z,\sigma)\text{
+in }qs)\,|qs\rangle$.  The operator identity $\hat n^\mu_{z,\uparrow}\hat n^\mu_{z,\downarrow}
+=\hat a^\dagger_{\mu_z,\uparrow}\hat a^\dagger_{\mu_z,\downarrow}\,(\hat c_{z,\downarrow}\hat
+c_{z,\uparrow})$ together with the zero-energy condition $\hat c_{z,\downarrow}\hat
+c_{z,\uparrow}\Phi=0$ ($\hat H_{\rm int}\Phi=0$) gives \textbf{no double occupancy of the index
+modes}, $\hat n^\mu_{z,\uparrow}\hat n^\mu_{z,\downarrow}\Phi=0$.
+
+\medskip\noindent\textbf{Theorem 11.17 PR8, the tight $I$-mode transport (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandSpinRep.lean}).}  To extract the occupation coefficients we need a
+basis adapted to the index modes.  The special basis $\{\mu_z\}_{z\in I}$ is linearly independent, so
+it extends to a basis $e_\mu$ of the whole single-particle space (\texttt{exists\_extended\_special\_%
+basis}, via \texttt{Module.Basis.extend}); each $\mu_z$ is some $e_\mu(\mathrm{idx}\,z)$, so an
+$I$-mode $\mu$-Slater state equals a mode monomial over $e_\mu$ (\texttt{generalFlatBandSlaterState\_%
+eq\_generalModeMonomial}), carrying it into the general occupation basis $\texttt{generalOccBasis}\
+e_\mu$ and giving its linear independence.  Since PR6 builds a ground state only from $\ker T=%
+\operatorname{span}\{\mu_z\}$ creations, it actually lives in the \emph{tight} $I$-mode $\mu$-Slater
+submodule \texttt{generalFlatBandIModeFockSubmodule} (the span of $\mu$-Slater states whose modes all
+lie in $I$), which is invariant under index-mode creation and contains the ground state
+(\texttt{flatBand\_groundState\_mem\_imode}) --- resolving the subtlety that $\mu_z$ is unconstrained
+for $z\notin I$.
+
+\medskip\noindent\textbf{Theorem 11.17 PR9, the spin-configuration capstone, eq.~(11.3.47) (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSpinConfigRep.lean}).}  The coefficient extraction is
+carried out in the general occupation basis $\texttt{generalOccBasis}\ e_\mu$.  A left inverse
+$\mathrm{idxInv}$ of the index map on $I$ (\texttt{flatBandSpecialIdxInv}, with $\mathrm{idx}$
+injective on $I$ since distinct $\mu_z$ are distinct) identifies the $\mathrm{idx}(I)$-supported
+occupation monomials with $I$-mode $\mu$-Slater states:
+$\texttt{occMon}_{e_\mu}(g)=\prod_{z\in I}\hat a^\dagger_{\mu_z,\sigma}|vac\rangle$
+(\texttt{generalOccMonomial\_eq\_generalFlatBandSlaterState\_of\_idxSupported}).  On these the double
+index-mode number operator is diagonal with eigenvalue
+$\mu_z(z)^2\,[g(\mathrm{idx}\,z,\uparrow){=}1]\,[g(\mathrm{idx}\,z,\downarrow){=}1]$.  Expanding
+$\Phi$ in the basis, three coefficient-vanishing facts pin it down: (a) \emph{support} --- the
+coefficient vanishes off the $\mathrm{idx}(I)$-supported configs (PR8 tight membership +
+\texttt{Basis.repr\_support\_subset\_of\_mem\_span}); (b) \emph{no double occupancy} --- it vanishes
+on configs with a doubly occupied index mode, since $\mu_z(z)^2\ne0$ and $\hat n^\mu_{z,\uparrow}\hat
+n^\mu_{z,\downarrow}\Phi=0$ (PR7); (c) \emph{filling} --- it vanishes off the $D_0$-electron sector
+($\hat N$ diagonal).  As $D_0=|I|$, the surviving configs occupy each index mode by exactly one spin,
+so $\Phi$ lies in the span of the one-spin-per-index $\mu$-Slater states
+$\Phi=\sum_\sigma C(\sigma)\prod_{z\in I}\hat a^\dagger_{\mu_z,\sigma_z}|vac\rangle$ --- this is
+eq.~(11.3.47), \texttt{flatBand\_groundState\_mem\_spinConfigSpan} (sorry-free, axiom-clean).
+
+\medskip\noindent\textbf{Theorem 11.17 PR10, eq.~(11.3.47) explicit one-spin-per-index (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSpinConfigRep.lean}).}  The surviving spin-config
+occupations occupy each index mode by exactly one spin.  Pigeonhole: the first-coordinate projection
+$q\mapsto q.1$ is injective on the occupied finset (no double occupancy forbids two spins at the same
+$\mathrm{idx}\,z$), so its image has $|{\rm occupied}|=D_0=|I|$ elements inside $\mathrm{idx}(I)$
+(cardinality $|I|$), hence equals $\mathrm{idx}(I)$; every index mode is therefore occupied
+(\texttt{flatBandSpinConfig\_occupied\_per\_index}), and with no double occupancy \emph{exactly} one
+spin (\texttt{flatBandSpinConfig\_exactlyOne\_per\_index}).
+
+\medskip\noindent\textbf{Theorem 11.17 PR11, eq.~(11.3.47) $\sigma$-parametrised form (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSpinConfigRep.lean}).}  Eq.~(11.3.47) is restated with
+the surviving states indexed by spin configurations $\sigma:\Lambda\to\{\uparrow,\downarrow\}$: the
+one-spin-per-index occupation \texttt{flatBandSpinConfigOcc} (occupying exactly $(\mathrm{idx}\,z,
+\sigma_z)$ for $z\in I$) and its occupation monomial \texttt{flatBandSpinConfigState}
+$=\prod_{z\in I}\hat a^\dagger_{\mu_z,\sigma_z}|vac\rangle$.  Every surviving spin-config occupation
+equals \texttt{flatBandSpinConfigOcc} of its spin function $\sigma_g(z)=[g(\mathrm{idx}\,z,\uparrow)
+\ne1]$ (\texttt{flatBandSpinConfig\_eq\_spinConfigOcc}, from the one-spin-per-index property), so the
+spin-config span of PR9 is the span of the $\sigma$-states:
+$\Phi\in\operatorname{span}\{\,\texttt{flatBandSpinConfigState}\,\sigma\,\}_\sigma$
+(\texttt{flatBand\_groundState\_mem\_spinConfigStateSpan}) --- the $C(\sigma)$-coefficient foundation
+for the sign relation.
+
+\medskip\noindent\textbf{Theorem 11.17 PR12, spin-config state linear independence (Tasaki §11.3.4,
+Issue \#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  For the coefficients $C(\sigma)$ to be
+well-defined, the spin-configuration states must be linearly independent.  Distinct spin
+configurations $s:I\to\{\uparrow,\downarrow\}$ give distinct occupation configs
+\texttt{flatBandSpinConfigOcc} (evaluate the config equality at $(\mathrm{idx}\,z, s_z)$ and use the
+injectivity of $\mathrm{idx}$ on $I$), hence distinct elements of the basis
+$\texttt{generalOccBasis}\ e_\mu$; \texttt{flatBandSpinConfigState\_linearIndependent} then follows
+from \texttt{Basis.linearIndependent.comp}.
+
+\medskip\noindent\textbf{Theorem 11.17 PR13, explicit $C(\sigma)$ sum and Slater form (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  Two foundations for the
+sign argument.  First, each spin-config state is a $\mu$-Slater state of its preimage list
+(\texttt{flatBandSpinConfigState\_eq\_slaterState}, since \texttt{flatBandSpinConfigOcc} is
+$\mathrm{idx}(I)$-supported), so the proved site double-annihilation peel engine
+\texttt{generalFlatBand\_double\_siteAnnihilation\_peel} applies to them.  Second, since the spin
+configurations on the index set $I$ form a finite type, the span membership of PR11 (narrowed to
+$I$-configs, since \texttt{flatBandSpinConfigOcc} depends only on $\sigma|_I$ ---
+\texttt{flatBandSpinConfigOcc\_congr}) gives an explicit finite combination
+$\Phi=\sum_{s:I\to\{\uparrow,\downarrow\}} C(s)\,\texttt{flatBandSpinConfigState}\,(\mathrm{extend}\,s)$
+(\texttt{flatBand\_groundState\_eq\_spinConfigStateSum}, via
+\texttt{Submodule.mem\_span\_range\_iff\_exists\_fun}); indexing by $I\to\{\uparrow,\downarrow\}$
+(not the redundant $\Lambda\to\{\uparrow,\downarrow\}$) makes $C(s)$ the genuine, comparison-ready
+coefficients matching the linear-independence index type.
+
+\medskip\noindent\textbf{Theorem 11.17 PR14, eq.~(11.3.48) raw form (Tasaki §11.3.4, Issue \#4363,
+\texttt{GeneralFlatBandSignPropagation.lean}).}  The left-hand side of eq.~(11.3.48) is assembled in
+$C(\sigma)$ form.  The site double-annihilation of a spin-config state is the double annihilation of
+its $\mu$-Slater preimage list (\texttt{flatBandSpinConfigState\_cDownUp\_eq\_slaterDoubleAnnih}),
+on which the proved peel engine \texttt{generalFlatBand\_double\_siteAnnihilation\_peel} expands.
+Since $\hat c_{x,\downarrow}\hat c_{x,\uparrow}\Phi=0$ (the zero-energy condition) and
+$\Phi=\sum_s C(s)\,\texttt{flatBandSpinConfigState}$, the $C(\sigma)$-weighted sum of
+double-annihilated spin-config states vanishes for \emph{every} site $x$
+(\texttt{flatBand\_cDownUp\_spinConfigSum\_eq\_zero}); for $x\in\Lambda\setminus I$ the connectivity
+data $\mu_z(x)$ enters through the peel.  Collecting the $(D_0{-}2)$-occupied terms and using the
+linear independence (PR12) then yields the sign relation $C(\sigma)=C(\sigma_{z_1\leftrightarrow z_2})$
+(eq.~(11.3.49)) --- the subsequent PRs.
+
+\medskip\noindent\textbf{Theorem 11.17 PR15, spin-aware peel vanishing (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandSignPropagation.lean}).}  The non-contributing peel terms are killed
+up front.  If every mode of a $\mu$-Slater list has zero amplitude $\mu_{q.1}(x)=0$ at the site $x$
+or the wrong spin $q.2\ne\sigma$, then $\hat c_{x,\sigma}$ annihilates it
+(\texttt{generalFlatBand\_siteAnnihilation\_eq\_zero}, every peel term vanishing --- the general
+analogue of the proved Theorem 11.11 \texttt{flatBand\_siteAnnihilation\_eq\_zero}).  In particular,
+when $x$ connects to no index mode ($\mu_z(x)=0$ for all $z\in I$) the double annihilation kills the
+spin-config state (\texttt{flatBandSpinConfigState\_cDownUp\_eq\_zero\_of\_disconnected}) --- the
+trivial branch of eq.~(11.3.48), contributing no sign relation.
+
+\medskip\noindent\textbf{Theorem 11.17 PR16, $\mu$-Slater permutation scaling (Tasaki §11.3.4,
+Issue \#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  To compare list orderings (the opaque
+preimage list vs.\ a canonical order) when collecting peel terms, a $\mu$-Slater state changes only
+by a tracked sign under reordering: swapping the first two creations negates the state
+(\texttt{generalFlatBandSlaterState\_swap}, the two leading $\hat a^\dagger$ anticommute), and a
+general permutation of the creation list scales it by a nonzero $\pm1$
+(\texttt{generalFlatBandSlaterState\_perm}, the \texttt{generalFlatBandSlaterState} analogue of
+\texttt{generalModeMonomial\_perm}).
+
+\medskip\noindent\textbf{Theorem 11.17 PR17, the canonical spin-config list (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  The orbital-ordered creation list of a spin
+configuration is \texttt{flatBandSpinConfigList}~$=$ the sorted $(z,\sigma_z)$ for $z\in I$ (the
+general-basis analogue of the Theorem 11.11 \texttt{flatBandAlphaSpinList}).  Its occupied finset is
+$\{(\mathrm{idx}\,z,\sigma_z):z\in I\}$ (\texttt{flatBandSpinConfigOcc\_occFinset}); it is nodup with
+the same \texttt{toFinset} as the opaque $\mu$-Slater preimage list, hence a permutation of it
+(\texttt{flatBandSpinConfigList\_perm\_preimageList}).  Combined with the permutation scaling, the
+spin-config state is a nonzero-sign multiple of the canonical-list Slater state
+(\texttt{flatBandSpinConfigState\_eq\_smul\_canonical}) --- the orbital-ordered form on which the
+eq.~(11.3.48) double peel has explicit positions and Koszul signs.
+
+\medskip\noindent\textbf{Theorem 11.17 PR18, the cDownUp two-head extraction (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  On the orbital-ordered form, site
+annihilation removes a leading matching-spin head: $\hat c_{x,\sigma}$ applied to
+$(z,\sigma)\!::\!\text{rest}$ (with \text{rest} carrying no matching-spin mode connected to $x$)
+returns $\mu_z(x)\cdot\text{Slater}(\text{rest})$ (\texttt{generalFlatBand\_siteAnnihilation\_head},
+the general analogue of \texttt{flatBand\_siteAnnihilation\_head}).  Composing the two annihilations,
+$\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ removes the leading up head $(a,\uparrow)$ and down head
+$(b,\downarrow)$, leaving $\mu_a(x)\,\mu_b(x)\,\text{Slater}(\text{rest})$
+(\texttt{generalFlatBand\_cDownUp\_two\_head}, the analogue of \texttt{flatBand\_cDownUp\_two\_head})
+--- the seed of the eq.~(11.3.48) sign relation.
+
+\medskip\noindent\textbf{Theorem 11.17 PR19, the cDownUp swapped two-head (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  On the swapped down--up head pair, the
+extraction carries the opposite sign: $\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ on
+$(a,\downarrow)\!::\!(b,\uparrow)\!::\!\text{rest}$ gives
+$-\mu_a(x)\,\mu_b(x)\,\text{Slater}(\text{rest})$ (\texttt{generalFlatBand\_cDownUp\_two\_head\_swap},
+via \texttt{generalFlatBandSlaterState\_swap} composed with the two-head extraction).  This relative
+$-1$ versus the canonical up--down assignment (one extra Koszul transposition) is exactly the seed of
+the eq.~(11.3.49) sign relation $C(\sigma)=C(\sigma_{z_1\leftrightarrow z_2})$ (the general-basis
+analogue of the Theorem 11.11 \texttt{flatBand\_cDownUp\_swap}).
+
+\medskip\noindent\textbf{Theorem 11.17 PR20, the Slater move-pair-front (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  To extract an \emph{arbitrary} occupied pair
+(not just a leading one), bring it to the head.  Moving the head past the next two creations is sign
+$+1$ (two adjacent transpositions, \texttt{generalFlatBandSlaterState\_move\_one\_past\_two}); by
+induction, pushing a contiguous pair $a,b$ leftward past a block $l_1$ is $2|l_1|$ transpositions,
+hence $\text{Slater}(l_1 \mathbin{+\!+} a\!::\!b\!::\!l_2) = \text{Slater}(a\!::\!b\!::\!(l_1
+\mathbin{+\!+} l_2))$ (\texttt{generalFlatBandSlaterState\_move\_pair\_front}, the general-basis
+analogue of \texttt{flatBandModeMonomial\_move\_pair\_front}).  Combined with the two-head/swapped
+extraction, this gives the $\pm\mu_a(x)\mu_b(x)$ contribution of an arbitrary pair.
+
+\medskip\noindent\textbf{Theorem 11.17 PR21, extracting a pair at an arbitrary position (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  Composing the move-pair-front
+with the two-head extraction, $\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ on
+$l_1 \mathbin{+\!+} (a,\uparrow)\!::\!(b,\downarrow)\!::\!l_2$ (with $l_1,l_2$ disconnected from $x$)
+removes the pair with amplitude $\mu_a(x)\mu_b(x)$, leaving $\text{Slater}(l_1 \mathbin{+\!+} l_2)$
+(\texttt{generalFlatBand\_cDownUp\_extract\_pair}); the swapped assignment $(a,\downarrow),(b,\uparrow)$
+extracts with the opposite sign $-\mu_a(x)\mu_b(x)$
+(\texttt{generalFlatBand\_cDownUp\_extract\_pair\_swap}) --- the per-pair eq.~(11.3.49) relative
+$-1$.
+
+\medskip\noindent\textbf{Theorem 11.17 PR22, the canonical-Slater $D$-coefficient expansion (Tasaki
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  The sign-relation comparison
+of $\sigma$ and $\sigma_{z_1\leftrightarrow z_2}$ must be run in a single, order-fixed coefficient
+system.  The \texttt{flatBandSpinConfigState} coefficients carry an existential $\pm1$ canonical sign
+(\texttt{flatBandSpinConfigState\_eq\_smul\_canonical}); instead, since the canonical-list Slater
+states span the same space, $\Phi$ has an explicit expansion in them,
+$\Phi=\sum_s D(s)\,\text{Slater}(\texttt{flatBandSpinConfigList}\,\sigma_s)$
+(\texttt{flatBand\_groundState\_eq\_canonicalSlaterSum}, indexed by $s:I\to\{\uparrow,\downarrow\}$).
+The $D(s)$ are the order-fixed coefficients of eqs.~(11.3.47)--(11.3.49): in the canonical sorted
+order an index pair $a,b$ sits at the same positions $\mathrm{rank}(a),\mathrm{rank}(b)$ for both
+$\sigma$ and $\sigma_{a\leftrightarrow b}$, so the move-to-front permutation sign is shared and the
+relative $-1$ survives cleanly.  Reindexing the full double peel by removed pair and collecting via
+the occupation-basis coordinate functional and linear independence is the subsequent PR.  (The
+reorder/extraction machinery above --- the Slater swap/permutation, the canonical list, the
+head/two-head/swap extraction, the move-pair-front, the per-pair extraction, and the
+canonical-Slater $D$-coefficient expansion --- lives in \texttt{GeneralFlatBandSlaterReorder.lean},
+split from \texttt{GeneralFlatBandSignPropagation.lean} for build speed.  The canonical-list
+coordinate/config machinery built on top of it (the list length and per-mode shape, the
+occupation-basis coordinate functional and its distribution over the positional double-peel sum,
+the index-configuration \texttt{idxConfigOf} and its erase-tracking, the position$\leftrightarrow$index
+correspondence, and the erase-to-canonical bridge \texttt{flatBandSpinConfigList\_eraseIdx}) was in
+turn split into \texttt{GeneralFlatBandCanonicalCoord.lean} for build speed.  The occupation-basis coordinate functional distributes over a single inner peel term as $\texttt{repr}(\text{peelTerm})\,g = (-1)^i\,[qs_i{=}s]\,\mu_{qs_i}(x)\,\texttt{repr}(\text{Slater}(qs.\texttt{eraseIdx}\,i))\,g$ (\texttt{generalFlatBandPeelTerm\_repr}), so the inner $j$-sum collects term-wise to the bridge coordinate of the double-erased rest state, whose list is itself the canonical creation list over the twice-erased index set $(I\setminus\{a\})\setminus\{b\}$ (\texttt{flatBandSpinConfigList\_eraseIdx\_eraseIdx}).  Since this twice-erased set contains neither $a$ nor $b$ and $\sigma$ agrees with the spin-swapped $\sigma_{a\leftrightarrow b}$ off $\{a,b\}$, the rest list is identical for the two configurations (\texttt{flatBandSpinConfigList\_congr}), so the shared rest coefficient --- nonzero by evaluating the bridge coordinate at the rest config itself (\texttt{generalFlatBandSlaterState\_repr\_self\_ne\_zero}) --- cancels in the comparison $D(\sigma)=D(\sigma_{a\leftrightarrow b})$.  The "exactly one $(i,j)$" claim rests on the fact that the index config of a canonical creation list determines its index set (\texttt{idxConfigOf\_flatBandSpinConfigList\_inj}, by evaluating the config at the mode $(\mathrm{idx}\,w,\sigma w)$), so distinct double-peels empty distinct index pairs and land on distinct target configs; matching the rest set to $(I\setminus\{a\})\setminus\{b\}$ then pins the unordered removed pair to $\{a,b\}$ (\texttt{Finset.eq\_or\_eq\_of\_erase\_erase\_eq}); the opposite spin guards then disambiguate the outer index as $a$ and the inner index as $b$ (\texttt{flatBandSpinConfig\_doublePeel\_index\_eq}), the "exactly one $(i,j)$" engine.  The inner sum is a single peel, for which the removed index is pinned by the config alone (\texttt{flatBandSpinConfig\_singlePeel\_index\_eq}, via $S\setminus\{d\}=S\setminus\{b\}\Rightarrow d=b$).  Hence the inner $j$-sum collapses by \texttt{Finset.sum\_eq\_single} to a single term at the position of $b$ (off-positions give vanishing coordinates, the $b$-position carries the down-guard and rest list $\mathrm{canonical}(S\setminus\{b\})$), with Koszul sign $(-1)^{\mathrm{pos}_b}$ (\texttt{flatBandSpinConfig\_inner\_sum\_collapse}).  For an outer index $c\notin\{a,b\}$ the inner sum instead vanishes identically (\texttt{flatBandSpinConfig\_inner\_sum\_other\_outer\_zero}), the off-diagonal case of the outer collapse.  Together these give the single-term collapse $\texttt{repr}(\hat c_{x,\downarrow}\hat c_{x,\uparrow}\,\mathrm{Slater}(\sigma))\,g_{ab} = (-1)^{\mathrm{pos}_a}(-1)^{\mathrm{pos}_b}\,\mu_a(x)\,\mu_b(x)\,R$, where $R$ is the shared rest coordinate (\texttt{cDownUp\_canonical\_repr\_twoHole}).  The index at a canonical position equals the corresponding sorted-finset element (\texttt{flatBandSpinConfigList\_get\_fst\_eq\_sort}), so the position of an index is $\sigma$-independent (\texttt{flatBandSpinConfigList\_choose\_eq}), and (for $p\neq q$) the position of $b$ in $I\setminus\{a\}$ is $\mathrm{pos}_I(b)-[\mathrm{pos}_I(b)>\mathrm{pos}_I(a)]$ (\texttt{flatBandSpinConfigList\_choose\_erase\_shift}, via \texttt{List.getElem\_eraseIdx} on $I.\mathrm{sort}$), and the two single-transposition-shifted exponents $p+(q-[q>p])$ and $q+(p-[p>q])$ differ by exactly one, so the corresponding signs are negatives (\texttt{neg\_one\_pow\_two\_erase\_shift}); letting the Koszul signs of $\sigma$ and the spin-swapped $\sigma_{a\leftrightarrow b}$ be compared on the common $I.\mathrm{sort}$ positions.  Consequently the two-hole coordinate flips sign under the $a\leftrightarrow b$ spin swap, $\texttt{coord}_\sigma=-\texttt{coord}_{\sigma\circ(a\,b)}$ (\texttt{cDownUp\_canonical\_repr\_twoHole\_swap\_eq\_neg}) --- the eq.~(11.3.49) heart.  The collapse and sign machinery lives in \texttt{GeneralFlatBandTwoHoleCollapse.lean}, split from \texttt{GeneralFlatBandCanonicalCoord.lean} for build speed; the connectivity induction (from the eq.~(11.3.49) relation \texttt{flatBand\_groundState\_D\_swap\_eq} through the dimension bound \texttt{generalFlatBandGround\_finrank\_le\_of\_connected}) is in turn split into \texttt{GeneralFlatBandConnectivity.lean}, isolating its heavier \texttt{finrank} elaboration from the collapse core.  Evaluating the index config at every mode $(\mathrm{idx}\,w,s)$ refines the injectivity to a $\sigma$-varying form: equal configs force equal index sets \emph{and} matching spins (\texttt{idxConfigOf\_flatBandSpinConfigList\_inj\_gen}), the engine for the eq.~(11.3.49) sum collapse to the two configurations $\sigma$ and $\sigma_{a\leftrightarrow b}$: a contributing double peel of $\mathrm{Slater}(\tau)$ at the $(a,b)$-emptied target forces $\tau=\sigma$ or $\tau=\sigma\circ(a\,b)$ on $I$ (\texttt{flatBandSpinConfig\_doublePeel\_config\_eq}); hence a Slater coordinate at the $(a,b)$-emptied target vanishes whenever $\tau\notin\{\sigma,\sigma\circ(a\,b)\}$ (\texttt{cDownUp\_canonical\_repr\_eq\_zero\_of\_ne}); summing over all spin configs therefore collapses to the two terms $\sigma|_I$ and $(\sigma\circ(a\,b))|_I$ (\texttt{cDownUp\_canonicalSum\_eq\_two\_terms}).  Since acting with $\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ kills the ground state and the two surviving coordinates are negatives of each other and nonzero (for a connected pair $\mu_a(x),\mu_b(x)\neq0$), the coefficients of $\sigma$ and $\sigma_{a\leftrightarrow b}$ coincide: $D(\sigma)=D(\sigma_{a\leftrightarrow b})$ (\texttt{flatBand\_groundState\_D\_swap\_eq}), completing the eq.~(11.3.49) Marshall-sign relation.  On the special-basis connectivity graph (edge $z\sim z'$ iff some site $x$ has $\mu_z(x),\mu_{z'}(x)\neq0$) this gives the per-edge step $D(\sigma)=D(\sigma_{z\leftrightarrow z'})$ (\texttt{flatBand\_groundState\_D\_swap\_eq\_of\_adj}), and, since a same-spin swap is the identity on the configuration, the edge-swap invariance $D(\sigma)=D(\sigma\circ(z\,z'))$ holds unconditionally (\texttt{flatBand\_groundState\_D\_edgeSwap\_eq}); $D$ is thus invariant under every edge-transposition of the basis graph, the input to the connectivity induction toward Theorem 11.17.  Viewed as an action of $\mathrm{Perm}(I)$, $D(s)=D(s\circ(z\,z'))$ for every edge $z\sim z'$ (\texttt{flatBand\_groundState\_D\_permSwap\_eq}), so $D$ is invariant under the subgroup generated by the edge-transpositions.  By induction on a walk $z\rightsquigarrow z'$, decomposing $\mathrm{swap}(z,z')$ as the conjugate $\mathrm{swap}(z,w)\,\mathrm{swap}(w,z')\,\mathrm{swap}(z,w)$, this extends to $D(s\circ\mathrm{swap}(z,z'))=D(s)$ for all reachable $z,z'$ (\texttt{flatBand\_groundState\_D\_swap\_eq\_of\_walk}).  For a connected basis every transposition is therefore $D$-invariant, and since transpositions generate $\mathrm{Perm}(I)$, $D(s\circ\pi)=D(s)$ for all $\pi$ (\texttt{flatBand\_groundState\_D\_perm\_eq}); i.e. $D$ depends only on the number of up-spins: equal-weight configurations differ by a permutation (\texttt{exists\_perm\_comp\_of\_card\_eq}), so $D(s)=D(s')$ whenever $s,s'$ have the same up-count (\texttt{flatBand\_groundState\_D\_const\_of\_weight\_eq}).  Grouping the canonical-Slater decomposition of any ground state by up-count and factoring out the constant coefficient, every ground state lies in the span of the $D_0+1$ symmetric weight-states $W_0,\dots,W_{D_0}$, so the ground subspace has $\mathrm{finrank}\le D_0+1$ (\texttt{generalFlatBandGround\_finrank\_le\_of\_connected}).  For the matching lower bound, the all-up $\mu$-Slater state is a highest-weight vector: $\hat S^+_{\rm tot}$ annihilates it since each $\hat c_{i,\downarrow}$ does (every creation mode is spin-$\uparrow$, \texttt{generalFlatBand\_totalSpinPlus\_mulVec\_allUpSlater}), so \texttt{highestWeight\_spinMultiplet\_general} will generate the $D_0+1$-fold SU(2) tower.  The all-up Slater has $\hat N_{\rm tot}$ eigenvalue $D_0$ (the total number operator is diagonal on the $\mu$-Slater states, $\hat N_{\rm tot}|\mathrm{Slater}(qs)\rangle=|qs|\,|\mathrm{Slater}\rangle$, \texttt{fermionTotalNumber\_mulVec\_generalFlatBandSlaterState}), the filling input toward the weight $\hat S^z_{\rm tot}=D_0/2$.  Splitting the $2M{+}2$ modes into sites and spins via \texttt{sum\_spinful\_reindex} gives the charge decomposition $\hat N_{\rm tot}=\hat N_\uparrow+\hat N_\downarrow$ (\texttt{fermionTotalNumber\_eq\_up\_add\_down}); since $\hat c_{i,\downarrow}$ annihilates the all-up Slater, $\hat N_\downarrow|\mathrm{Slater}\rangle=0$ (\texttt{fermionTotalDownNumber\_mulVec\_allUpSlater}), whence $\hat N_\uparrow|\mathrm{Slater}\rangle=\hat N_{\rm tot}|\mathrm{Slater}\rangle=D_0|\mathrm{Slater}\rangle$ and $\hat S^z_{\rm tot}=(\hat N_\uparrow-\hat N_\downarrow)/2$ gives the highest weight $\hat S^z_{\rm tot}|\mathrm{Slater}\rangle=(D_0/2)|\mathrm{Slater}\rangle$ (\texttt{generalFlatBand\_totalSpinZ\_mulVec\_allUpSlater}), the second SU(2) highest-weight input for \texttt{highestWeight\_spinMultiplet\_general}.  Its occupation-basis self-coordinate is nonzero, so the all-up Slater is itself nonzero (\texttt{generalFlatBandSlaterState\_allUp\_ne\_zero}), the $\mathbf{v}\neq0$ nontriviality input.  For the remaining input $\mathbf{v}\in$ ground subspace, the kinetic part of $\hat H=\hat K+U\,\hat n_\uparrow\hat n_\downarrow$ factors as $\hat K=\sum_{\sigma,k}\hat C_\sigma(C_k)^\dagger\hat C_\sigma(C_k)$ for $T=C^\dagger C$, and the smeared annihilation $\hat C_\sigma(\varphi)=\sum_x\varphi(x)\hat c_{x,\sigma}$ peels to $\sum_i(-1)^i[\sigma{=}q_{i,2}]\big(\sum_x\varphi(x)\mu_{q_{i,1}}(x)\big)|\mathrm{Slater}(\mathrm{erase}\,i)\rangle$, so $\hat C_\sigma(\varphi)$ annihilates a $\mu$-Slater whenever every occupied mode is $\varphi$-orthogonal, $\sum_x\varphi(x)\mu_{q,1}(x)=0$ (\texttt{spinfulAnnihilationFromVector\_mulVec\_generalFlatBandSlaterState\_eq\_zero\_of\_orthogonal}); since $\mu_z\in\ker T=\ker C$ gives $C\mu_z=0$, i.e. $\sum_x C_k(x)\mu_z(x)=0$, each $\hat C_\sigma(C_k)$ kills the all-up Slater and hence $\hat K$ does.  Thus $\hat K|\mathrm{Slater}\rangle=0$ (\texttt{hubbardKinetic\_mulVec\_allUpSlater\_eq\_zero}); the interaction $U\sum_i\hat n_{i\uparrow}\hat n_{i\downarrow}$ also annihilates it (no double occupancy, \texttt{hubbardOnSiteInteraction\_mulVec\_allUpSlater\_eq\_zero}), so $\hat H|\mathrm{Slater}\rangle=0$; with $\hat N_{\rm tot}|\mathrm{Slater}\rangle=D_0|\mathrm{Slater}\rangle$ this places the all-up $\mu$-Slater in the ground submodule $\ker\hat H\cap\{N{=}D_0\}$ (\texttt{generalFlatBandSlaterState\_allUp\_mem\_groundSubmodule}), exhibiting the SU(2) highest-weight vector inside the ground subspace.  The lowering operator $\hat S^-_{\rm tot}$ preserves this ground submodule: it commutes with $\hat H$ (SU(2) symmetry, \texttt{fermionTotalSpinMinus\_commute\_hubbardHamiltonian}) and with $\hat N_{\rm tot}$ (\texttt{fermionTotalSpinMinus\_commute\_fermionTotalNumber}), so $\hat S^-_{\rm tot}$ maps $\ker\hat H\cap\{N{=}D_0\}$ into itself (\texttt{fermionTotalSpinMinus\_mulVec\_mem\_generalFlatBandGroundSubmodule}); hence the entire SU(2) tower $(\hat S^-_{\rm tot})^k|\mathrm{Slater}\rangle$ lies inside the ground subspace, the $D_0{+}1$ independent ground states for the lower bound.  Lifting this independent family into the ground submodule and counting (\texttt{LinearIndependent.of\_comp} then \texttt{fintype\_card\_le\_finrank}, with the extended single-particle basis $e_\mu$ and index map supplied by \texttt{exists\_extended\_special\_basis}) gives the \emph{unconditional} dimension lower bound $\mathrm{finrank}\,(\text{ground})\ge D_0+1$ (\texttt{generalFlatBandGround\_finrank\_ge}), valid for any special basis; combined with the connected upper bound \texttt{generalFlatBandGround\_finrank\_le\_of\_connected} it pins $\mathrm{finrank}=D_0+1$ on a connected basis.  Assembling these, on a connected basis the ground subspace is the $(D_0{+}1)$-fold maximal-spin multiplet (\texttt{generalFlatBand\_connected\_isMaximalSpinMultiplet}, the $\Leftarrow$ direction of Theorem 11.17): $\mathrm{finrank}=D_0+1$ by \texttt{le\_antisymm}, and since the $D_0{+}1$ independent tower members exhaust the dimension they span the ground subspace (\texttt{span\_eq\_top\_of\_card\_eq\_finrank}), on each of which $(\hat S_{\rm tot})^2$ acts as the maximal scalar $(D_0/2)(D_0/2+1)$; by linearity every ground state is such an eigenvector, so the ground subspace satisfies \texttt{IsMaximalSpinMultipletSubmodule}.  This mirrors the half-filling t-J capstone \texttt{tJ\_halfFilling\_isMaximalSpinMultiplet}.  For the converse ($\Rightarrow$, equivalently $\lnot$connected $\Rightarrow\lnot$multiplet) one exhibits ground states beyond the maximal-spin tower.  The kinetic kill is spin-independent (\texttt{hubbardKinetic\_mulVec\_spinConfigSlater\_eq\_zero}: every occupied mode lies in $\ker T$ regardless of spin), and for a spin configuration whose opposite-spin modes have disjoint site support ($\sigma z\neq\sigma w\Rightarrow\mu_z(x)\mu_w(x)=0$) no site is doubly occupied, so $\hat c_{x\downarrow}\hat c_{x\uparrow}$ annihilates the Slater (\texttt{generalCDownUp\_mulVec\_spinSeparatedSlater\_eq\_zero}, via the double peel) and hence the interaction $\sum_x U(\hat c_{x\downarrow}\hat c_{x\uparrow})^\dagger(\hat c_{x\downarrow}\hat c_{x\uparrow})$ does; such a spin-separated $\mu$-Slater is therefore a ground state (\texttt{generalFlatBandSlaterState\_spinSeparated\_mem\_groundSubmodule}).  On a disconnected basis a component-colouring (one spin per connected component) gives such a configuration outside the maximal-spin multiplet.  Concretely, a disconnected basis admits a non-trivial cut $(A,A^c)$ of the index set ($A$ the connected component of some vertex, both parts nonempty, no edge crossing, \texttt{exists\_disconnection\_cut\_of\_not\_connected}); the per-block weight states then number $(|A|+1)(|A^c|+1)>D_0+1$ (\texttt{disconnection\_cut\_card\_lt}), exceeding the maximal-spin dimension and contradicting $\mathrm{finrank}=D_0+1$.  These per-block weight states $W_{p,q}$ are ground states by the reverse of eq.~(11.3.49): for an edge-swap-invariant coefficient $D$, the $D$-weighted sum of $\hat c_{x\downarrow}\hat c_{x\uparrow}$-coordinates at the $(a,b)$-emptied target vanishes (\texttt{cDownUp\_canonicalSlaterSum\_repr\_twoHole\_eq\_zero\_of\_edgeSwap\_invariant}); the two-term collapse \texttt{cDownUp\_canonicalSum\_eq\_two\_terms} gives $D(\sigma)\,c_\sigma+D(\sigma')\,c_{\sigma'}$ with $c_{\sigma'}=-c_\sigma$, so either $a,b$ connect at $x$ (an edge, forcing $D(\sigma)=D(\sigma')$ and cancellation) or the $\mu_a(x)\mu_b(x)$ factor kills $c_\sigma$.  At an occupation target $g$ that is not such a two-hole config, the coordinate sum vanishes for a different reason (\texttt{cDownUp\_canonicalSlaterSum\_repr\_eq\_zero\_of\_not\_twoHoleTarget}): every inner rest-Slater coordinate of the double peel is a Kronecker delta at the occupation config of the twice-erased canonical list $((\mathrm{canonical}).\mathrm{eraseIdx}\,i).\mathrm{eraseIdx}\,j=\mathrm{canonical}((I\setminus\{a\})\setminus\{b\})$, which $g$ matches for no pair.  Reducing $\hat c_{x\downarrow}\hat c_{x\uparrow}\Phi=0$ to every occupation coordinate (via \texttt{generalOccBasis} injectivity) and dispatching the two cases gives the interaction kill (\texttt{generalCDownUp\_mulVec\_canonicalSlaterSum\_eq\_zero\_of\_edgeSwap\_invariant}); with the per-Slater kinetic kill and $\hat N_{\rm tot}=D_0$ this shows that an edge-swap-invariant canonical-Slater sum is a flat-band ground state (\texttt{canonicalSlaterSum\_mem\_groundSubmodule\_of\_edgeSwap\_invariant}), the converse of the eq.~(11.3.49) ground-state characterization, placing the per-block weight states $W_{p,q}$ into the ground subspace.  Concretely, the fiber sum $W_{p,q}=\sum_{s:\,\mathrm{up}_A s=p,\ \mathrm{up}_{A^c}s=q}\mathrm{Slater}(\mathrm{canonical}\,I\,(\mathrm{extend}\,s))$ has the indicator coefficient $D(s)=[\mathrm{up}_A s=p][\mathrm{up}_{A^c}s=q]$, which is edge-swap-invariant because a basis-graph edge $z\sim z'$ lies within one block (no crossing $\mu$-overlap) and an in-block transposition preserves each block's up-count (\texttt{upCountOn\_comp\_swap\_eq}); hence each $W_{p,q}$ is a ground state (\texttt{generalFlatBand\_blockWeightState\_mem\_groundSubmodule}).  The $(|A|+1)(|A^c|+1)$ states $W_{p,q}$ are linearly independent: at the index config of a representative of fiber $(p_0,q_0)$ (\texttt{exists\_blockUpCount\_config}), only $W_{p_0,q_0}$ has a nonzero occupation coordinate (the index config of a canonical creation list determines its spin configuration, \texttt{idxConfigOf\_flatBandSpinConfigList\_inj\_gen}, and the per-block up-counts pick out the fiber); hence $\mathrm{finrank}\ge(|A|+1)(|A^c|+1)>D_0+1$ (\texttt{generalFlatBand\_disconnected\_finrank\_gt}), contradicting the multiplet's $\mathrm{finrank}=D_0+1$ and giving the $\Rightarrow$ direction of Theorem 11.17.  Assembling both directions discharges the Theorem 11.17 axiom: \texttt{generalFlatBand\_theorem\_11\_17} is now a proved theorem \texttt{generalFlatBandFerromagnetic}\,$T\,U\iff$\texttt{generalFlatBandBasisConnected}\,$I\,\mu$, axiom-free (depending only on \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}).)
+
+\medskip\noindent\textbf{Theorem 11.17 PR23, the canonical double peel (Tasaki §11.3.4, Issue
+\#4363, \texttt{GeneralFlatBandSlaterReorder.lean}).}  The reindexing starts from the explicit
+expansion: $\hat c_{x,\downarrow}\hat c_{x,\uparrow}$ on $\text{Slater}(\texttt{flatBandSpinConfigList}\,
+\sigma)$ equals the position double-sum over the orbital-ordered canonical list
+(\texttt{cDownUp\_canonical\_eq\_doublePeel}, via the proved engine
+\texttt{generalFlatBand\_double\_siteAnnihilation\_peel}).  Its $(i,j)$ terms are to be collected by
+the removed index pair, then projected by the occupation-basis coordinate functional, in the
+subsequent PRs.  (Structural support: the canonical list has length $|I|$ and each of its modes is
+$(z,\sigma_z)$ --- so the double-peel spin guard $[q].2=\uparrow$ reads as a condition on $\sigma$
+of the index: \texttt{flatBandSpinConfigList\_length}, \texttt{flatBandSpinConfigList\_mem\_snd\_eq}.)  The projection itself is the Kronecker delta $\langle\texttt{generalOccBasis}\,e_\mu\rangle.\mathrm{repr}\,(\texttt{occMon}_{e_\mu}\,h)\,g=[h=g]$ (\texttt{generalOccMonomial\_repr}, since $\texttt{occMon}_{e_\mu}\,h$ is the basis vector).  And a one-erased canonical list keeps its modes of the form $(z,\sigma_z)$ and stays nodup (\texttt{flatBandSpinConfigList\_eraseIdx\_mem\_snd\_eq}, \texttt{flatBandSpinConfigList\_eraseIdx\_nodup}), so the $(D_0{-}1)$/$(D_0{-}2)$-electron states from the double peel are spin-config lists over a smaller index set.  Each canonical-list position is pinned to its index --- the mode at position $i$ is $(z_i,\sigma_{z_i})$ for the $i$-th smallest index $z_i\in I$ (\texttt{flatBandSpinConfigList\_getElem}).  Applying the occupation-basis coordinate functional $\langle\texttt{generalOccBasis}\,e_\mu\rangle.\mathrm{repr}\,\cdot\,g$ to the canonical double peel distributes by linearity over the position double-sum, leaving the coordinates of the doubly-erased $(D_0{-}2)$-Slater states weighted by the peel amplitudes and Koszul signs (\texttt{cDownUp\_canonical\_repr\_eq\_sum}); the removed-pair identification then picks out, for a fixed $(D_0{-}2)$-target $g$, the unique contributing $(i,j)$.  Each such coordinate is computed by \texttt{generalFlatBandSlaterState\_over\_I\_repr}: for a nodup list of index modes, $\langle\texttt{generalOccBasis}\,e_\mu\rangle.\mathrm{repr}\,(\text{Slater}\,qs)\,g=z\cdot[\mathrm{config}(qs)=g]$ for a nonzero sign $z$ (via the $\mu$-Slater$\leftrightarrow$mode-monomial bridge, permutation scaling, and the occupation-monomial coordinate).  The supporting generic fact $(\,l.\mathrm{eraseIdx}\,i).\mathrm{toFinset}=l.\mathrm{toFinset}.\mathrm{erase}\,l[i]$ for nodup $l$ (\texttt{List.toFinset\_eraseIdx\_of\_nodup}) tracks which mode each double-peel \texttt{eraseIdx} removes: the $\mathrm{idx}$-image occupation config \texttt{idxConfigOf} of a one-erased list zeroes the entry at the removed mode $(\mathrm{idx}\,qs[i].1,qs[i].2)$ (\texttt{idxConfigOf\_eraseIdx}); a double erase zeroes the config at both removed modes (\texttt{idxConfigOf\_eraseIdx\_eraseIdx}), giving the config of every $(D_0{-}2)$-Slater state from the double peel.  The canonical list\textquotesingle s own \texttt{idxConfigOf} is the spin-config occupation \texttt{flatBandSpinConfigOcc} (\texttt{idxConfigOf\_flatBandSpinConfigList}), connecting back to the established occupation machinery.  Distinct positions carry distinct indices (\texttt{flatBandSpinConfigList\_get\_fst\_inj}) --- the injectivity behind \textquotedblleft exactly one $(i,j)$ per removed pair\textquotedblright; each index of $I$ occurs at a unique position (\texttt{flatBandSpinConfigList\_mem}, \texttt{flatBandSpinConfigList\_existsUnique\_pos}).  Erasing a position of the canonical creation list yields the canonical list of the smaller index set (\texttt{Finset.sort\_eraseIdx\_eq\_sort\_erase}), so the $(D_0-2)$-electron rest states reuse the same canonical machinery; indeed erasing a canonical-list position returns the canonical list of the erased index set (\texttt{flatBandSpinConfigList\_eraseIdx}).  The double-annihilation expansion and sign relation
+(eqs.~(11.3.48)/(11.3.49)) toward the connectivity capstone are the subsequent PRs.
 
 \medskip\noindent\textbf{Sector minimum energy and the ferromagnetism criterion (Tasaki
 §11.4, eq.~(11.4.26)).}  Tasaki's non-singular Hubbard theory (Theorems 11.18--11.20) rests
@@ -7351,6 +7977,995 @@ $(\hat{S}^2_{\rm tot})v = S_{\max}(S_{\max}+1)v$.
   \item \texttt{isSaturatedFerromagnet N t U}: the Lean predicate for
     Definition 11.1.
 \end{itemize}
+
+\noindent\textbf{Proposition 11.2} (Tasaki §11.1.1, eq.~(11.1.4), pp.~377--378; documented
+axiom, \texttt{HubbardFerromagnetismStructure.lean}, Issue \#4477).  When the all-to-all Hubbard
+model exhibits saturated ferromagnetism, its ground states simplify to the
+$(2S_{\max}+1)$-fold $SU(2)$ multiplet built from the lowest-energy all-up Slater state.  We render
+this as \texttt{hubbard\_proposition\_11\_2}: for a genuine half-filling ground energy $E_0$ (nonempty
+$(N+1)$-electron eigenspace, minimal in real part), if the model is ferromagnetic there (every ground
+state is $(\hat S_{\mathrm{tot}})^2$-maximal at $S_{\max}=(N+1)/2$) then the ground eigenspace
+\texttt{hubbardEigenspaceAtFilling}\,$E_0$ (the \texttt{hubbardHamiltonian}-eigenspace at $E_0$
+intersected with the $(N+1)$-electron number sector, \emph{without} the hard-core constraint) is a
+maximal-spin multiplet of dimension $N+2$.  Pinning $E_0$ by the nonempty/minimal hypotheses keeps the
+axiom sound; the only content beyond the ferromagnetism premise is the dimension count.  A book-order
+backfill of the Chapter 11 numbered items; recorded as a documented axiom (the finite-dimensional but
+general-hopping structural argument is deferred).
+
+\noindent\textbf{Theorem 11.3} (Tasaki §11.1.1, eqs.~(11.1.5)--(11.1.6), pp.~378--379; documented
+axiom, \texttt{HubbardImpossibilityLowU.lean}, Issue \#4477).  Ferromagnetism is impossible when the
+on-site repulsion is smaller than the single-particle Fermi gap.  We build the single-particle
+spectrum \texttt{hubbardSingleParticleEnergies} (the Hermitian eigenvalues
+\texttt{ht.eigenvalues} of the hopping matrix $t$) and the Fermi gap \texttt{hubbardFermiGap}
+($\max_j\varepsilon_j-\min_j\varepsilon_j$, the completely-filled-band specialisation of Tasaki's
+$\varepsilon_N-\varepsilon_1$), and record \texttt{hubbard\_theorem\_11\_3}: for Hermitian $t$, a
+pinned genuine half-filling ground energy $E_0$ (nonempty and minimal $(N+1)$-electron eigenspace),
+and $0\le U<\texttt{hubbardFermiGap}$, the ground states are not all maximal-spin.  The conclusion
+negates the \emph{pinned} ground max-spin property over \texttt{hubbardEigenspaceAtFilling}\,$E_0$,
+not the vacuously-true \texttt{isSaturatedFerromagnet}, keeping the impossibility statement sound.
+Tasaki's variational trial state (11.1.6) (a single spin
+flip into the lowest level) undercuts the all-up energy; the estimate needs the single-particle
+eigenbasis fermion operators, so it is recorded as a documented axiom.  Another book-order Chapter 11
+backfill.
+
+\noindent\textbf{Theorem 11.4} (Tasaki §11.1.1, eqs.~(11.1.8)--(11.1.10), pp.~379--380; documented
+axiom, \texttt{HubbardImpossibilityLowDensity.lean}, Issue \#4477).  Impossibility of ferromagnetism
+at low densities (Pieri--Daul--Baeriswyl--Dzierzawa--Fazekas).  The dimension enters only through the
+exponent $2/d$ of the band condition (11.1.8), so no explicit $d$-dimensional lattice is needed: we
+state \texttt{hubbardBandCondition} on the ascending single-particle spectrum $\varepsilon$
+($\varepsilon_n-\varepsilon_1\ge c\,((n-n_0)/|\Lambda|)^{2/d}$) and record
+\texttt{hubbard\_theorem\_11\_4}: fixing $d>2$ and positive band constants, there is a
+\emph{size-uniform} density threshold $\rho_1>0$ such that for any Hermitian translation-invariant
+$t$ obeying the band condition, any filling $N_e/|\Lambda|\le\rho_1$ and any $U\ge0$, the ground
+states (over the pinned \texttt{hubbardEigenspaceAt}\,$E_0\,N_e$, $E_0$ nonempty and minimal) are not
+all maximal-spin (with $2\le N_e$, since the zero- and one-electron sectors are trivially maximal-spin, and a genuinely transitive translation $\sigma$).  Keeping $d>2$ explicit is essential for soundness (the statement is false in
+$d=1$); the Roth/Gutzwiller variational proof is deferred.  Another book-order Chapter 11 backfill.
+
+\noindent\textbf{Lemma 11.10} (Tasaki §11.3.1, eqs.~(11.3.1)--(11.3.2), pp.~405--406;
+\textbf{discharged axiom-free}, \texttt{TasakiFlatBandBasisLemma.lean}, Issue \#4477).  On the
+decorated lattice $\Lambda=E\cup I$ the localized states $\{\alpha_p\}_{p\in E}$ (metallic) and
+$\{\beta_u\}_{u\in I}$ (oxygen) form a basis of the single-electron space.  We render the localized
+states as abstract orthogonal linearly-independent families and prove \texttt{tasaki\_lemma\_11\_10}:
+two linearly-independent families with $\langle\alpha_p,\beta_u\rangle=0$ and
+$|E|+|I|=|\Lambda|$ together span the whole space.  Orthogonality (\texttt{isOrtho\_span}) makes the
+spans disjoint, so $\dim(\mathrm{span}\,\alpha\sqcup\mathrm{span}\,\beta)=|E|+|I|=|\Lambda|$
+(\texttt{finrank\_sup\_add\_finrank\_inf\_eq}, \texttt{finrank\_euclideanSpace}), forcing the join to
+be everything.  A book-order Chapter 11 backfill, finite-dimensional and hence discharged.
+
+\noindent\textbf{Lemma 11.14} (Tasaki §11.3.3, p.~406; \textbf{discharged axiom-free},
+\texttt{Math/GramEigenspaceCorrespondence.lean}, Issue \#4477).  The hopping matrices $T=S^{\dagger}S$
+and $\tilde T=SS^{\dagger}$ have exactly identical positive eigenvalues with identical multiplicities.
+This is a general singular-value fact, so it is placed in \texttt{Math/} by topic
+(\texttt{finrank\_eigenspace\_gram\_eq}): for any $\lambda\ne0$ the $\lambda$-eigenspaces of
+$S^{\dagger}S$ and $SS^{\dagger}$ have equal dimension.  The map $\varphi\mapsto S\varphi$ embeds the
+former into the latter injectively ($S\varphi=0\Rightarrow S^{\dagger}S\varphi=\lambda\varphi=0
+\Rightarrow\varphi=0$), and applying the same fact to $S^{\dagger}$ (with $(S^{\dagger})^{\dagger}=S$)
+gives the reverse inequality.  A book-order Chapter 11 backfill, finite-dimensional and hence
+discharged.
+
+\noindent\textbf{Deferred proofs.}  The Chapter~11 results 11.4, 11.18, 11.19, Lemmas 11.22, 11.23,
+11.25, and Theorem 11.27 are recorded as documented axioms with faithful, sound statements, to be
+discharged in future work.  Theorems 11.8 and 11.13, which Tasaki states without proof, likewise
+remain documented axioms.
+
+\noindent\textbf{Theorem 3.1} (Horsch--von der Linden, Tasaki §3.4, eqs.~(3.4.7)--(3.4.12),
+pp.~66--67; \textbf{discharged axiom-free}, \texttt{Quantum/HorschVonderLinden.lean}, Issue \#4485).
+The start of the Chapters~3--10 backfill (book order; infinite systems are in scope).  A ground state
+with long-range order but no spontaneous symmetry breaking has a low-lying excited energy eigenstate.
+We discharge the finite-dimensional core, \texttt{horsch\_vonderLinden\_lowLying}: for a Hermitian
+$H$ with minimum eigenvalue $E_0=$ \texttt{eigenvalues}\,$i_0$, a normalized state $\Gamma$ orthogonal
+to the ground eigenvector (its $i_0$ eigenbasis component vanishes) with Rayleigh energy
+$\langle\Gamma,H\Gamma\rangle\le E_0+\delta$ yields a low-lying energy eigenstate $j\ne i_0$ with
+$E_0\le E_j\le E_0+\delta$ (possibly another ground state if degenerate, exactly as Tasaki notes).
+Proof: expand the Rayleigh quotient in the eigenbasis,
+$\langle\Gamma,H\Gamma\rangle=\sum_j\lVert w_j\rVert^2 E_j$ with $\sum_j\lVert w_j\rVert^2=1$ and
+$w_{i_0}=0$ (via the spectral theorem, \texttt{rayleighOnVec\_unitary\_conj}, and
+\texttt{rayleighOnVec\_diagonal\_real}); if every support index had $E_j>E_0+\delta$ the weighted sum
+would exceed $E_0+\delta$, a contradiction.  The $C\,L^{-d}$ bound from long-range order (the
+variational estimate~(3.4.12)) supplies the input $\delta$.
+
+\noindent\textbf{Theorem 3.2, finite-volume core} (Kaplan--Horsch--von der Linden, Tasaki §3.4, eqs.~(3.4.16)--(3.4.22),
+pp.~68--70; \textbf{discharged axiom-free}, \texttt{Quantum/KaplanHorschVonderLinden.lean}, Issue
+\#4485).  An infinitesimal symmetry-breaking field triggers SSB.  We discharge the finite-volume variational \emph{core} (eq.~(3.4.21)); the thermodynamic double limit (3.4.22) is not yet formalized.  The core is a
+finite-volume variational lower bound, \texttt{kaplan\_horsch\_vonderLinden\_order\_lower\_bound}:
+since the perturbed ground state $\Psi$ minimizes $H-hO$ ($h>0$), for any trial $\Xi$ the order
+parameter obeys $\langle\Xi,O\Xi\rangle+(E_0-\langle\Xi,H\Xi\rangle)/h\le\langle\Psi,O\Psi\rangle$.
+Proof: $R(H-hO)\Psi\le R(H-hO)\Xi$ with $R(H-hO)=R(H)-h\,R(O)$ (Rayleigh real-linearity), rearrange
+using $h>0$, and bound $R(H)\Psi\ge E_0$.  The double limit $L\uparrow\infty$, $h\downarrow0$ (with
+the essential bound $\langle\Xi_+,O_L/L^d\,\Xi_+\rangle\ge\sqrt{q_0}$) then gives the $\sqrt{q_0}$
+order-parameter bound (3.4.22) --- the thermodynamic input, which is not part of the formalized core.  Chapters~3--10 backfill.
+
+\noindent\textbf{Theorem 4.1} (Dyson--Lieb--Simon / Neves--Perez / Kennedy--Lieb--Shastry, Tasaki
+§4.1, eq.~(4.1.7), pp.~88--90; \texttt{Quantum/SpinS/DysonLiebSimon.lean}, Issue \#4485).  Existence
+of N\'eel long-range order: for the antiferromagnetic Heisenberg model in dimension $d\ge3$ (any $S$)
+or $d=2$, $S\ge1$, the staggered order parameter is bounded below \emph{uniformly in the system
+size}, $\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(\alpha)})^2/L^d|\Phi_{\mathrm{GS}}\rangle\ge q_0>0$.
+We define the staggered (N\'eel) order operator
+$\texttt{staggeredOrderOpS}=\sum_x\varepsilon_x\hat S_x^{(3)}$ ($\varepsilon_x=\pm1$ the sublattice
+sign) and prove it Hermitian (\texttt{staggeredOrderOpS\_isHermitian}, a real $\pm1$ combination of
+the Hermitian $\hat S_x^{(3)}$), so $\langle\Phi|(\hat O)^2\Phi\rangle$ is a real nonnegative order
+parameter.  The N\'eel-LRO statement (eq.~(4.1.7)) is a deep theorem whose faithful, sound
+formalization requires the actual $d$-dimensional hypercubic torus with nearest-neighbor
+antiferromagnetic coupling (the uniform-in-$L$ bound is \emph{false} for arbitrary finite bipartite
+graphs, e.g.\ with vanishing coupling), and its proof rests on reflection positivity and infrared
+(Gaussian-domination) bounds; it is deferred until that hypercubic-lattice / reflection-positivity
+framework is in place (infinite-volume systems are in scope --- a deferral pending infrastructure,
+not an exclusion).  Chapters~3--10 backfill.
+
+\noindent\textbf{Theorem 4.2} (Shastry, Tasaki §4.1, eqs.~(4.1.9)--(4.1.10), pp.~76--77; documented
+axiom, \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of spontaneous symmetry
+breaking in one dimension: for the 1D spin-$S$ antiferromagnetic Heisenberg ring under a staggered
+field $\hat H_h=\sum_x\hat S_x\cdot\hat S_{x+1}-h\,\hat O_L^{(3)}$ (eq.~(4.1.9)), the per-site
+staggered order parameter of any normalized ground state vanishes in the iterated limit
+$\lim_{h\downarrow0}\lim_{L\uparrow\infty}\langle\Phi_{\mathrm{GS},h}|\hat O_L^{(3)}/L
+|\Phi_{\mathrm{GS},h}\rangle=0$ (eq.~(4.1.10)).  We define the ring nearest-neighbor coupling
+(\texttt{ringCoupling}), the staggered sublattice (\texttt{ringStaggeredSublattice}), and the
+staggered-field chain Hamiltonian (\texttt{staggeredFieldChainHamiltonianS}), and record
+\texttt{shastry\_no\_symmetry\_breaking\_1d} as the iterated limit in explicit $\varepsilon$--$\delta$
+form over normalized energy-minimizing ground states (so the per-site bound is scale-invariant).
+Tasaki states Theorem 4.2 without proof (Shastry's argument [58], rigorously formulated in [63]); the
+deep infinite-volume argument is deferred (in scope).  Chapters~3--10 backfill.
+
+\noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
+\texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
+dimension: for the zero-field 1D spin-$S$ antiferromagnetic Heisenberg ring, the squared staggered
+order parameter per site vanishes in the thermodynamic limit,
+$\lim_{L\uparrow\infty}\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(3)}/L)^2|\Phi_{\mathrm{GS}}\rangle=0$
+(eq.~(4.1.11)).  We record \texttt{no\_long\_range\_order\_1d} in explicit $\varepsilon$--$\delta$ form
+over the zero-field ring family with normalized ground states.  In Tasaki this is a corollary of
+Shastry's Theorem 4.2 together with the Kaplan--Horsch--von der Linden theorem (Theorem 3.2) and the
+Marshall--Lieb--Mattis theorem (Theorem 2.2); the derivation runs through the double-limit form of
+Theorem 3.2 (only its finite-volume variational core is formalized here) and the axiom Theorem 4.2,
+so it is recorded as a faithful documented axiom (deep infinite-volume argument deferred, in scope).
+Chapters~3--10 backfill.
+
+\noindent\textbf{Theorem 4.4} (Shen--Qiu--Tian, Tasaki §4.1, eqs.~(4.1.12)--(4.1.13), pp.~77--78;
+documented axiom, \texttt{Quantum/SpinS/FerrimagneticLRO.lean}, Issue \#4485).  Ferrimagnetic
+long-range order on an asymmetric bipartite lattice: for the spin-$S$ antiferromagnetic Heisenberg
+model on a connected bipartite lattice $\Lambda=A\cup B$ (same hypotheses as Theorem 2.3), every
+ground state satisfies $\langle\Phi_{\mathrm{GS}}|(\hat O_\Lambda)^2|\Phi_{\mathrm{GS}}\rangle\ge
+S^2(|A|-|B|)^2$ (eq.~(4.1.13)), where $(\hat O_\Lambda)^2=\sum_{x,y}\varepsilon_x\varepsilon_y
+\hat S_x\cdot\hat S_y$ (eq.~(4.1.12), \texttt{staggeredCasimirOpS}) is the $SU(2)$-invariant squared
+staggered operator; when $|A|-|B|=a|\Lambda|$ this gives LRO (eq.~(4.1.14)).  Unlike Theorems
+4.1--4.3, Tasaki proves Theorem 4.4 by a finite-volume argument (chain (4.1.16): the cross-term
+positivity (4.1.15) from Problem 2.5.d, the Lieb--Mattis total spin $S_{\mathrm{tot}}=(|A|-|B|)S$ from
+Theorem 2.3, and $\langle(\hat S_{\mathrm{tot}})^2\rangle=S_{\mathrm{tot}}(S_{\mathrm{tot}}+1)\ge
+S_{\mathrm{tot}}^2$), so it is a \emph{discharge candidate}; we record
+\texttt{shenQiuTian\_ferrimagnetic\_lro} as a faithful documented axiom over the connected bipartite
+antiferromagnetic family, to be discharged once the §2.5 Theorem 2.3 total-spin API and the (4.1.15)
+inequality are assembled.  Chapters~3--10 backfill.
+
+\noindent\textbf{Lemma 4.5} (Tasaki §4.1.2, eqs.~(4.1.55)--(4.1.57), pp.~87--88; documented axiom,
+\texttt{Math/ReflectionPositivityAveraging.lean}, Issue \#4485).  The abstract reflection-positivity
+averaging inequality at the heart of the reflection-positivity proof of Theorem 4.1.  For a
+real-valued function $F$ of a cyclic string of $2n$ arguments in an arbitrary type $V$ (the vector
+structure of Tasaki's $\mathbb{R}^D$ is never used), invariant under the cyclic shift (eq.~(4.1.55))
+and satisfying the reflection bound $F(f)\ge\frac12\bigl(F(\mathrm{reflectLeft}\,f)+
+F(\mathrm{reflectRight}\,f)\bigr)$ (eq.~(4.1.56)), one has the lower bound by the constant-string
+average $F(f)\ge(2n)^{-1}\sum_j F(j\mapsto f_j)$ (eq.~(4.1.57)).  We define the cyclic reindexing and
+the two reflections (\texttt{reindexCyclic}, \texttt{reflectLeft}, \texttt{reflectRight}) and record
+\texttt{reflectionPositivity\_averaging}.  Tasaki's $G_{\min}=0$ collapse proof is elementary but
+intricate (a doubling induction on the number of leading equal entries), so the lemma is a
+\emph{finite-dimensional discharge candidate}.  Chapters~3--10 backfill.
+
+\noindent\textbf{Theorem 4.6} (Koma--Tasaki, Tasaki §4.2.1, eqs.~(4.2.2)--(4.2.4), pp.~93--95;
+documented axiom, \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  Anderson's tower of
+low-lying states: for the $d$-dimensional hypercubic antiferromagnetic Heisenberg model with
+long-range order, the trial states $\Gamma_M=(\hat O_L^+)^M|\Phi_{\mathrm{GS}}\rangle/\lVert\cdot
+\rVert$ built from the staggered raising operator $\hat O_L^+=\sum_x\varepsilon_x\hat S_x^+$
+(eq.~(4.2.2)) lie in the $\hat S_{\mathrm{tot}}^{(3)}=M$ sector and, for $|M|\le C_1 L^{d/2}$, have
+energy $\langle\Gamma_M|\hat H|\Gamma_M\rangle\le E_{\mathrm{GS}}+C_2 M^2/L^d$ (eq.~(4.2.4)) --- an
+$O(L^{d/2})$ family of low-lying states, the rigorous Anderson tower.  To state this soundly (a
+uniform $C_2$ exists only for the genuine translation-invariant family) we build the $d$-dimensional
+hypercubic torus model: vertices $\texttt{HypercubicTorus}\,d\,L=\mathrm{Fin}\,d\to\mathbb{Z}/L$
+($L^d$ sites, \texttt{card\_hypercubicTorus}), the nearest-neighbor coupling
+\texttt{torusNNCoupling}, the parity (N\'eel) sublattice \texttt{torusParitySublattice}, and the
+staggered raising/lowering operators \texttt{staggeredRaisingOpS}/\texttt{staggeredLoweringOpS}.  The
+axiom \texttt{tower\_lowLying\_energy\_bound} states eq.~(4.2.4) in scale-invariant Rayleigh-ratio
+form over the torus family.  The statement is \emph{conditional on long-range order} (a $q_0>0$
+premise bounding the squared staggered order parameter $\langle(\hat O_L/L^d)^2\rangle$ from below),
+hence vacuous in one dimension by Corollary 4.3, exactly as in Tasaki.  The deep reflection-positivity
+/ infinite-volume construction is deferred (in scope).  Chapters~3--10 backfill.
+
+\noindent\textbf{Corollary 4.7} (Tasaki §4.2.1, eq.~(4.2.7), pp.~95--96; documented axiom,
+\texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The tower of low-lying energy
+\emph{eigenstates}: exactly as Theorem 3.1 turns a low-lying trial state into a low-lying energy
+eigenstate, Theorem 4.6 yields, for each magnetization $M$ with $|M|\le C_1 L^{d/2}$, an energy
+eigenstate $\Psi_M$ in the $\hat S_{\mathrm{tot}}^{(3)}$ sector $\mu_0+M$ with $E_{\mathrm{GS}}<E_M\le
+E_{\mathrm{GS}}+C_2 M^2/L^d$.  Distinct $M$ give distinct (orthogonal) sectors, so this exhibits
+$O(L^{d/2})$ distinct low-lying energy eigenstates --- the rigorous Anderson tower.  The axiom
+\texttt{tower\_lowLying\_eigenstates} is conditional on long-range order (the same $q_0$ premise as
+Theorem 4.6), hence vacuous in one dimension by Corollary 4.3.  Chapters~3--10 backfill.
+
+\noindent\textbf{Theorem 4.8} (Tanaka, Tasaki §4.2.1, eqs.~(4.2.10)--(4.2.11), pp.~97--98;
+documented axiom, \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The Tanaka
+full-symmetry-breaking state is low-lying: the candidate physical ``ground state''
+$|\Xi_{(1,0,0)}\rangle=\tfrac1{\sqrt2}\bigl((\hat O_L^{(1)})^M|\Phi_{\mathrm{GS}}\rangle/\lVert\cdot
+\rVert+(\hat O_L^{(1)})^{M+1}|\Phi_{\mathrm{GS}}\rangle/\lVert\cdot\rVert\bigr)$ (eq.~(4.2.10),
+\texttt{tanakaSSBState}; each term separately normalized via \texttt{unitNormalize} and
+\texttt{vecNormSqRe}, with the $1$-axis staggered operator \texttt{staggeredOrderOp1S}) satisfies
+$\langle\Xi_{(1,0,0)}|\hat H|\Xi_{(1,0,0)}\rangle/\langle\Xi_{(1,0,0)}|\Xi_{(1,0,0)}\rangle\le
+E_{\mathrm{GS}}+C_2\{M+1\}^2/L^d$ (eq.~(4.2.11)) for $M>0$ with $M+1\le C_1 L^{d/2}$.  The axiom
+\texttt{tanakaSSB\_lowLying\_energy\_bound} asserts both \texttt{IsAndersonTowerConstants} (the
+Theorem 4.6 body, refactored as a predicate) and \texttt{IsTanakaSSBConstants} for one pair
+$(C_1,C_2)$, formalizing Tasaki's ``with the same constants as in Theorem 4.6''.  Stated in
+scale-invariant Rayleigh-ratio form, conditional on long-range order (vacuous in one dimension by
+Corollary 4.3).  Chapters~3--10 backfill.
+
+\noindent\textbf{Theorem 4.9} (Tanaka, Tasaki §4.2.1, eqs.~(4.2.12)--(4.2.15), pp.~98--99; documented
+axiom, \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The Tanaka state exhibits \emph{full
+$SU(2)$ symmetry breaking} in the $(1,0,0)$ direction.  There \emph{exists} a sufficiently slowly diverging $M(L)$
+($\texttt{Tendsto}\ M\ \texttt{atTop atTop}$, with $M(L)+1\le C_1 L^{d/2}$; Tasaki's proof produces
+one, not every such sequence) for which the per-site staggered moments of $\Xi_{(1,0,0)}$ (in
+Rayleigh-ratio form via \texttt{expectationRatioRe}, helpers \texttt{tanakaOrderMean1/2/3} and
+\texttt{tanakaOrderSecond1/2/3}) satisfy $\liminf_L\langle\hat O_L^{(1)}/L^d\rangle\ge m^\ast$
+(4.2.12), $\liminf_L\langle(\hat O_L^{(1)}/L^d)^2\rangle\ge(m^\ast)^2$ (4.2.13) --- the rigorous
+$\liminf$ forms of Tasaki footnote~21 --- while $\langle\hat O_L^{(\alpha)}/L^d\rangle=0$ for
+$\alpha=2,3$ eventually (4.2.14) and $\lim_L\langle(\hat O_L^{(\alpha)}/L^d)^2\rangle=0$ for
+$\alpha=2,3$ (4.2.15), so the order-operator density behaves as a classical vector of magnitude
+$m^\ast$ pointing in $(1,0,0)$ with vanishing fluctuation.  The order parameter $m^\ast>0$
+(eq.~(4.2.9)) is recorded as an existential real (its double-limit construction and the bound
+$m^\ast\ge\sqrt{3q_0}$ of Theorem 4.11 kept separate); the $\alpha=2$ staggered operator
+\texttt{staggeredOrderOp2S} is added.  The axiom \texttt{tanakaSSB\_full\_symmetry\_breaking} shares
+$C_1$ with Theorem 4.6 and is conditional on long-range order (vacuous in one dimension by
+Corollary 4.3).  Chapters~3--10 backfill.
+
+\noindent\textbf{Proposition 4.10} (Tasaki §4.2.1, eqs.~(4.2.17)--(4.2.22), pp.~99--100; documented
+axiom, \texttt{Quantum/SpinS/AndersonTowerSphereAverage.lean}, Issue \#4485).  The solid-angle average
+of the symmetry-breaking states recovers the ground state.  For a unit vector $n\in S^2\subset
+\mathbb{R}^3$ the direction order operator $\hat O_L^n=\sum_x\varepsilon_x(\hat S_x\cdot n)$
+(\texttt{directionStaggeredOp}) gives a direction symmetry-breaking state $|\Xi_n\rangle$
+(\texttt{directionTanakaState}, eq.~(4.2.17)); by $SU(2)$ covariance the solid-angle average
+$\frac1{4\pi}\int_{|n|=1}|\Xi_n\rangle\,dn$ (\texttt{solidAngleAverageTanaka}, the Bochner integral
+over \texttt{Metric.sphere} in $\texttt{EuclideanSpace}\ \mathbb{R}\ (\mathrm{Fin}\ 3)$ with surface
+measure \texttt{volume.toSphere}) is $SU(2)$ invariant.  \emph{Assuming Conjecture~4.12}
+($m^\ast=\sqrt{3q^\ast}$, \texttt{IsConjecture412Equality}, a \texttt{Prop} hypothesis never asserted
+true), the normalized average converges up to a unimodular phase to $|\Phi_{\mathrm{GS}}\rangle$
+(eq.~(4.2.22)): $\exists z,\ \lVert z\rVert=1,\ \lVert\mathrm{unitNormalize}(\Xi_{\mathrm{avg}})-z\cdot
+\mathrm{unitNormalize}(\Phi)\rVert<\varepsilon$.  The axiom
+\texttt{tanakaSphereAverage\_groundState} shares constants with Theorem 4.6 and is conditional on
+long-range order (vacuous in one dimension by Corollary 4.3).  Chapters~3--10 backfill.
+
+\noindent\textbf{Theorem 4.11} (Koma--Tasaki, Tasaki §4.2.1, eq.~(4.2.23), p.~101; documented axiom,
+\texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The two order parameters satisfy
+$\sqrt{3q_0}\le m^\ast$, where the factor $\sqrt3$ reflects the $SU(2)$ symmetry of the Heisenberg
+model (it becomes $\sqrt2$ for the $U(1)$/XXZ variant).  To avoid the downward-closure of the SSB
+predicate (a $\liminf\ge m$ bound, true for any smaller $m$ and vacuous in $d=1$), the axiom
+\texttt{tanakaSSB\_orderParameter\_lowerBound} pins $q_0$ and $m^\ast$ as the \emph{exact}
+infinite-volume limits via a single hypothesis $\texttt{hFamily}:
+\texttt{IsRealizingTanakaGroundStateFamily}\ d\ N\ q_0\ m^\ast\ C_1\ \Phi\ E_0\ M$.  That predicate
+bundles: the diverging tower $\texttt{Tendsto}\ M\ \texttt{atTop atTop}$ with growth $M+1\le C_1
+L^{d/2}$; $\Phi$ an eventual minimizing nonzero ground state with well-defined Tanaka terms; the exact
+long-range-order limit $q_0$; the exact staggered-moment limit $\texttt{tanakaOrderMean1}\to m^\ast$;
+and $\texttt{IsTanakaFullSSBConstants}\ d\ N\ q_0\ C_1\ m^\ast$ connecting $m^\ast$ to the full-SSB API
+(Theorem 4.9) for the \emph{same} $m^\ast$.  These conditions are
+unsatisfiable in $d=1$ (no LRO ground state, Corollary~4.3), so the bound $\sqrt{3q_0}\le m^\ast$
+applies exactly where intended (and $m^\ast>0$ follows).  The same predicate
+\texttt{IsRealizingTanakaGroundStateFamily} is the realizing-family conditioning shared by
+Theorems 4.11, 4.13 and Lemma 4.15 (a DRY refactoring helper), used as the \texttt{hFamily}
+hypothesis of all three.  Chapters~3--10 backfill.
+
+\noindent\textbf{Conjecture 4.12} (Koma--Tasaki, Tasaki §4.2.1, eqs.~(4.2.25)--(4.2.26), pp.~101--102;
+axiom-free \texttt{Prop} statement, \texttt{Quantum/SpinS/AndersonTowerSphereAverage.lean}, Issue
+\#4485).  The symmetry-breaking and long-range-order parameters are conjectured to coincide,
+$m^\ast=\sqrt{3q^\ast}$ (where $q^\ast=\lim_L\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(\alpha)}/L^d)^2
+|\Phi_{\mathrm{GS}}\rangle$, eq.~(4.2.25)).  Being \emph{unproven}, it is registered as
+\texttt{def conjecture\_4\_12 (d N) : Prop} --- the statement quantified over a realizing ground-state
+family (with LRO limit $q^\ast$ and SSB order parameter $m^\ast$ via \texttt{IsTanakaFullSSBConstants})
+--- and is \textbf{never asserted true} (no \texttt{axiom}/\texttt{theorem} derives it, which would be
+unsound).  Chapters~3--10 backfill.
+
+\noindent\textbf{Theorem 4.13} (Tasaki §4.2.1, eqs.~(4.2.27)--(4.2.28), pp.~102--103; documented
+axiom, \texttt{Quantum/SpinS/AndersonTowerField.lean}, Issue \#4485).  Spontaneous symmetry breaking
+under an infinitesimal staggered field: with the field Hamiltonian $\hat H_h=\hat H-h\,\hat
+O_L^{(1)}$ (\texttt{staggeredFieldHamiltonianS}, eq.~(4.2.27)) and its ground state
+$\Phi_{\mathrm{GS},h}$, the per-site staggered moment survives the iterated limit
+$\lim_{h\downarrow0}\liminf_{L\uparrow\infty}\langle\Phi_{\mathrm{GS},h}|\hat O_L^{(1)}/L^d
+|\Phi_{\mathrm{GS},h}\rangle\ge m^\ast$ (eq.~(4.2.28); footnote~26: rigorously $\liminf$).  The axiom
+\texttt{tanakaSSB\_field\_lowerBound} states it in $\varepsilon$--$\delta$ form with the inner
+threshold $L_0$ depending on the field $h$ (outer $h\downarrow0$, inner $\liminf_L$); the field ground
+states are a given eigenvector/minimizer/nonzero family of $\hat H_h$, and $m^\ast$ is pinned as the
+genuine order parameter by a realizing unperturbed ground state (\texttt{IsTanakaFullSSBConstants} +
+exact LRO/SSB limits, as in Theorem 4.11), unsatisfiable in $d=1$.  Combined with Theorem 4.11 this
+gives $\ge m^\ast\ge\sqrt{3q_0}>0$.  Chapters~3--10 backfill.
+
+\noindent\textbf{Lemma 4.14} (Tasaki §4.2.2, eqs.~(4.2.30)--(4.2.34), pp.~104--105; documented axiom,
+\texttt{Quantum/SpinS/OrderOperatorAlgebra.lean}, Issue \#4485).  The order-operator algebra estimate
+underlying the tower proofs.  With the per-volume order operators $\hat o^{\pm}=\hat O_L^{\pm}/V$
+($V=L^d$, \texttt{staggeredOrderDensityOpS}) and $\hat p=\tfrac12(\hat o^+\hat o^-+\hat o^-\hat o^+)$
+(\texttt{staggeredPhatS}, eq.~(4.2.31)), and the commutator bound $\lVert[\hat o^+,\hat o^-]\rVert\le
+o_0/V$ (eq.~(4.2.33), $o_0=2S=N$): for any balanced sign sequence $s$ of length $2n$
+(\texttt{BalancedSigns}, $n$ pluses), $\lVert\hat o^{s_1}\cdots\hat o^{s_{2n}}-\hat p^{\,n}\rVert\le
+n^2 N^{2n-1}/L^d$ (eq.~(4.2.34)) in the genuine $L^2$ operator norm \texttt{manyBodyOperatorNormS} (via
+\texttt{toEuclideanLin}, not the entrywise matrix norm).  The axiom
+\texttt{staggered\_balanced\_order\_product\_norm\_le} records this elementary-but-involved
+finite-volume estimate (a discharge candidate via commutator rearrangement).  Chapters~3--10
+backfill.
+
+\noindent\textbf{Lemma 4.15} (Tasaki §4.2.2, eqs.~(4.2.38)--(4.2.39), pp.~105--106; documented axiom,
+\texttt{Quantum/SpinS/OrderOperatorAlgebra.lean}, Issue \#4485).  The order parameter as a $\hat
+p$-ratio double limit: $m^\ast=\lim_{n\uparrow\infty}\liminf_{L\uparrow\infty}\langle\hat
+p^{\,n+1}\rangle/\langle\hat p^{\,n}\rangle$ (eq.~(4.2.38); the $n$-ratio is increasing and bounded so
+the outer limit exists, the inner is a $\liminf$ per footnote~31).  The axiom
+\texttt{mStar\_eq\_phat\_ratio\_limit} states the sound $\liminf$-lower direction (for every
+$\varepsilon>0$, for all large $n$, eventually in even $L$ the ratio exceeds $m^\ast-\varepsilon$) and
+the $U(1)$-optimal bound $\sqrt{2q_0}\le m^\ast$ (eq.~(4.2.39), the $\sqrt2$ companion of
+Theorem~4.11's $\sqrt3$).  $m^\ast$ is pinned by a realizing ground-state family with
+\texttt{IsTanakaFullSSBConstants} (unsatisfiable in $d=1$), and the $\hat p$-moment denominators are
+positive under long-range order (eq.~(4.2.37)).  Chapters~3--10 backfill.
+
+\noindent\textbf{Lemma 4.16} (Tasaki §4.2.2, p.~108; \textbf{discharged axiom-free},
+\texttt{Math/DoubleSequenceDiagonal.lean}, Issue \#4485).  Diagonal extraction from an iterated
+limit: if $f:\mathbb{N}\times\mathbb{N}\to\mathbb{R}$ satisfies $\lim_{M}\lim_{L}f_{L,M}=0$ (each
+column converges, $f_{\cdot,M}\to g_M$, and $g_M\to0$), then there is a nondecreasing $m:\mathbb{N}
+\to\mathbb{N}$ with $m(L)\to\infty$ and $\lim_L f_{L,m(L)}=0$.  This is the elementary real-analysis
+lemma Tasaki uses to choose the slowly diverging tower size $M(L)$ (it underlies the suitable $M(L)$
+in Proposition 4.10).  Being purely analytic, it is \emph{proved axiom-free}
+(\texttt{diagonal\_tendsto\_zero}) by the threshold construction (a strictly increasing $T_m\ge N_m$
+and the step index $m(L)=\texttt{Nat.findGreatest}$), with no operators or physics.  Chapters~3--10
+backfill.
+
+\noindent\textbf{Definition 4.17} (Tasaki §4.3.1, eqs.~(4.3.1)--(4.3.4), pp.~112--113;
+\texttt{Quantum/SpinS/InfiniteVolumeGroundState.lean}, Issue \#4485).  Ground state of the
+\emph{infinite-volume} antiferromagnetic Heisenberg model on $\mathbb{Z}^d$.  The
+\texttt{structure InfiniteSpinSystem}\,$d\,A$ bundles the quasi-local $C^\ast$-algebra $A$, the
+per-site spin operators $\hat S_x^{(\alpha)}$ (\texttt{spin}), and the translation automorphisms
+$\tau_x$ (\texttt{transl}, bundled star-algebra isomorphisms with the action laws $\tau_0=\mathrm{id}$, $\tau_x\circ\tau_y=\tau_{x+y}$ and spin covariance $\tau_x(\hat S_y^{(\alpha)})=\hat S_{y+x}^{(\alpha)}$, eq.~(4.3.3)); helpers
+\texttt{evenSite}, \texttt{bond} ($B_\infty$), \texttt{spinDot} ($\hat S_x\cdot\hat S_y$), and
+\texttt{TranslationInvariant} are provided over the reused state machinery (\texttt{IsState},
+\texttt{WeakDual}).  A translation-invariant state $\omega$ is a ground state
+(\texttt{IsInfiniteVolumeGroundState}) iff $\omega(\hat S_x\cdot\hat S_y)=\varepsilon_{\mathrm{GS}}$
+for every nearest-neighbor bond, the infinite-volume variational characterization restricted to
+translation-invariant states.  Chapters~3--10 backfill.
+
+\noindent\textbf{Definitions 4.18 and 4.19} (Tasaki §4.3.1, eqs.~(4.3.5)--(4.3.6), pp.~114--115;
+\texttt{Quantum/SpinS/InfiniteVolumeGroundState.lean}, Issue \#4485).  \emph{Ergodic} and
+\emph{physical} ground states.  With the bulk operator $\hat A_L=\sum_{x\in\Lambda_L\cap\mathbb{Z}^d
+_{\mathrm{even}}}\tau_x(\hat A)$ (\texttt{bulkOp} over \texttt{latticeBox} $\Lambda_n=\{-n<x_i\le n\}$ (side $2n$), eq.~(4.3.5)), a
+translation-invariant state $\rho$ is \emph{ergodic} (\texttt{IsErgodic}) iff for every self-adjoint
+$\hat A$ the fluctuation of the density $\hat A_L/L^d$ vanishes, $\rho(\hat A_L^2)/(L^d)^2-
+(\rho(\hat A_L)/L^d)^2\to0$ (eq.~(4.3.6), the law of large numbers).  A translation-invariant ground
+state is a \emph{physical ground state} (\texttt{IsPhysicalGroundState}) iff it is ergodic
+(Definition 4.19).  Both are \texttt{def}-level Props.  Chapters~3--10 backfill.
+
+\noindent\textbf{Theorem 4.20} (Tasaki §4.3.1, eqs.~(4.3.7)--(4.3.10), pp.~114--115; documented
+axioms, \texttt{Quantum/SpinS/InfiniteVolumeGroundState.lean}, Issue \#4485).  The concrete
+infinite-volume ground states exist.  The state $\omega_0$, built as the $L\uparrow\infty$ limit of
+the unique finite-volume ground-state expectation $\langle\Phi_{\mathrm{GS}}|\cdot|\Phi_{\mathrm{GS}}
+\rangle$ (eq.~(4.3.7), \texttt{theorem\_4\_20\_omega0}), is a translation-invariant ground state with
+$\omega_0(\hat S_x^{(\alpha)})=0$ (eq.~(4.3.9)) --- long-range order, no symmetry breaking.  Assuming
+staggered long-range order with order parameter $m^\ast>0$ (\texttt{HasStaggeredLRO}), for every unit
+direction $n\in\mathbb{R}^3$ the state $\omega_n$ built from $\langle\Xi_n|\cdot|\Xi_n\rangle$
+(eq.~(4.3.8), \texttt{theorem\_4\_20\_omegaN}) is a translation-invariant ground state with N\'eel
+magnetization $\omega_n(\hat S_x^{(\alpha)})=(-1)^x m^\ast n_\alpha$ (eq.~(4.3.10),
+\texttt{staggeredSign}) --- long-range order and full symmetry breaking.  The $L\uparrow\infty$
+limits' existence is assumed (Banach--Alaoglu, Theorem A.24); both axioms are conditional on \texttt{IsGroundStateEnergyDensity}\,$S\ \varepsilon_{\mathrm{GS}}$ (the genuine energy density, eq.~(4.3.4)).  Chapters~3--10 backfill.
+
+\noindent\textbf{Conjecture 4.21} (Tasaki §4.3.1, eq.~after~(4.3.10), p.~115; axiom-free \texttt{Prop}
+statement, \texttt{Quantum/SpinS/InfiniteVolumeGroundState.lean}, Issue \#4485).  The symmetry-breaking
+infinite-volume ground states are physical.  Being \emph{unproven}, it is registered as
+\texttt{def conjecture\_4\_21 (S) (}$\varepsilon_{\mathrm{GS}}$\texttt{) : Prop}: every infinite-volume
+ground state $\omega$ with the N\'eel magnetization $\omega(\hat S_x^{(\alpha)})=(-1)^x m^\ast
+n_\alpha$ (the $\omega_n$ of Theorem 4.20) is \emph{ergodic}, hence a physical ground state
+(Definition 4.19).  It is \textbf{never asserted true} (no \texttt{axiom}/\texttt{theorem} derives it).
+Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{Theorem 4.22} (Tasaki §4.4.1, eqs.~(4.4.1)--(4.4.6), pp.~117--119; documented
+axioms, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  The one-dimensional
+Heisenberg model is \emph{disordered at any nonzero temperature}.  This opens §4.4 by introducing the
+finite-temperature equilibrium (Gibbs) framework: the Gibbs operator $e^{-\beta\hat H}$
+(\texttt{thermalGibbsOpS}), partition function $Z(\beta)=\mathrm{Tr}\,e^{-\beta\hat H}$, and the real
+canonical average $\langle\hat A\rangle_\beta=\mathrm{Re}\,\mathrm{Tr}[\hat A\,e^{-\beta\hat
+H}]/\mathrm{Re}\,Z(\beta)$ (\texttt{thermalAverageReS}, eq.~(4.4.3); for Hermitian $\hat H$,
+$Z(\beta)>0$).  The two field Hamiltonians are unified in \texttt{heisenbergFieldHamiltonianS ferro}:
+ferromagnetic with a uniform field $\hat H_h=-\sum\hat S_x\!\cdot\!\hat S_y-h\sum\hat S_x^{(3)}$
+(eq.~(4.4.1)) and antiferromagnetic with a staggered field $\hat H_h=\sum\hat S_x\!\cdot\!\hat
+S_y-h\sum(-1)^x\hat S_x^{(3)}$ (eq.~(4.4.2)).  Sites $x\in\mathbb Z^d$ embed into the torus by
+coordinatewise reduction (\texttt{torusEmbed}), the $\ell^1$ distance is \texttt{intL1Dist}, and the
+$L\uparrow\infty$ limit is taken along the even sequence $L=2(n+1)$ (\texttt{evenSide}, footnote~41).
+Eq.~(4.4.5) (\texttt{tasaki\_4\_22\_magnetization\_vanishes}) is the no-SSB statement $\lim_{h\downarrow
+0}\lim_{L\uparrow\infty}\langle\hat S_x^{(3)}\rangle_{\beta,h}^L=0$ (the order of the limits is
+essential), stated soundly in $\varepsilon$--$\delta$ form with the inner $\liminf$ as an
+arbitrarily-large-volume subsequence ($\exists n_0,\forall n\ge n_0,\exists m\ge n,\ |\text{mag}|<
+\varepsilon$).  Eq.~(4.4.6) (\texttt{tasaki\_4\_22\_exponential\_clustering}) gives functions
+$\xi(\beta),C(\beta)\in(0,\infty)$ with the exponential clustering bound $|\langle\hat
+S_x^{(\alpha)}\hat S_y^{(\alpha)}\rangle_{\beta,0}^\infty|\le C(\beta)\,e^{-|x-y|/\xi(\beta)}$ on the
+concrete $\liminf$ correlation \texttt{infiniteVolSpinCorrLiminf}, so the model is in the disordered
+phase.  Both are proved by one-dimensional cluster-expansion / analyticity methods (Tasaki~[4]) and
+recorded as documented axioms.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{Theorem 4.23} (Tasaki §4.4.1, eqs.~(4.4.7)--(4.4.8), pp.~119--120; documented
+axiom, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  The Heisenberg model in
+$d\ge 2$ is \emph{disordered at sufficiently high temperature}.  Reusing the Theorem~4.22
+finite-temperature framework at general $d$ (\texttt{hd : 2 $\le$ d}), the axiom
+\texttt{tasaki\_4\_23\_high\_temperature\_disorder} asserts the existence of a threshold
+$\beta_0\in(0,\infty)$ depending only on $d$ and $S$ (not on the ferro/antiferro flag, which is
+universally quantified \emph{after} the $\exists\,\beta_0$) such that for every $\beta\in[0,\beta_0]$
+both
+the no-SSB magnetization vanishing (4.4.7), $\lim_{h\downarrow0}\lim_{L\uparrow\infty}\langle\hat
+S_x^{(3)}\rangle_{\beta,h}^L=0$ (same $\varepsilon$--$\delta$ / $\liminf$-subsequence form as
+Theorem~4.22), and the exponential clustering (4.4.8), $|\langle\hat S_x^{(\alpha)}\hat
+S_y^{(\alpha)}\rangle_{\beta,0}^\infty|\le C(\beta)\,e^{-|x-y|/\xi(\beta)}$ with
+$\xi(\beta),C(\beta)\in(0,\infty)$, hold.  The shared high-temperature threshold $\beta_0$ binds both
+statements under one outer existential.  Proved by the cluster-expansion technique, valid at
+sufficiently high temperature in any dimension for any short-ranged interaction
+(Tasaki~[21,~50,~61]); recorded as a documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{Theorem 4.24} (improved Hohenberg--Mermin--Wagner theorem; Tasaki §4.4.3,
+eqs.~(4.4.21)--(4.4.22), pp.~123--124; documented axiom,
+\texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  The two-dimensional Heisenberg
+model exhibits \emph{no magnetic ordering of any type} at any nonzero temperature.  We introduce the
+generalized field Hamiltonian (4.4.21) \texttt{generalizedFieldHamiltonianS}, $\hat H_h=J\sum_{\langle
+x,y\rangle}\hat S_x\!\cdot\!\hat S_y-h\sum_x\sum_\alpha (\xi_x^{(\alpha)})\,\hat S_x^{(\alpha)}$
+(field $h_x=h\,\xi_x$), with
+$J\in\{-1,+1\}$ and an \emph{arbitrary} fixed field-direction family $\xi$ subject to $|\xi_x|\le 1$
+(the uniform and staggered fields are special cases; allowing arbitrary $\xi$ is what makes the
+exclusion cover \emph{any} ordering); its finite-volume Gibbs magnetization $\langle\hat
+S_x^{(\alpha)}\rangle_{\beta,h}^L$ is \texttt{finiteVolMagnetizationGenS}.  The axiom
+\texttt{improved\_hohenberg\_mermin\_wagner} asserts
+that in $d=2$, for any $\beta\in[0,\infty)$, either sign $J=\pm1$, any bounded $\xi$, every component
+$\alpha=1,2,3$, and every $x\in\mathbb Z^2$, $\lim_{h\downarrow0}\lim_{L\uparrow\infty}\langle\hat
+S_x^{(\alpha)}\rangle_{\beta,h}^L=0$ (4.4.22).  Per footnote~48 the inner $\lim_{L\uparrow\infty}$ is
+rigorously a $\limsup_{L\uparrow\infty}$, so — unlike the $\liminf$/subsequence form of
+Theorems~4.22/4.23 — the sound statement uses the \emph{eventual} form ($\exists n_0,\forall n\ge
+n_0$, all large even volumes).  The proof is McBryan--Spencer's complex-translation method [33,~44],
+which does not require translation invariance; recorded as a documented axiom.  Chapters~3--10
+backfill.
+
+\medskip
+\noindent\textbf{Theorem 4.25} (McBryan--Spencer, Koma--Tasaki theorem; Tasaki §4.4.3,
+eqs.~(4.4.23)--(4.4.24), pp.~124--125; documented axiom,
+\texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  In two dimensions at vanishing
+field, the finite-volume two-point correlation \texttt{finiteVolSpinCorrS} decays at least as a power
+law.  The axiom \texttt{mcbryan\_spencer\_koma\_tasaki} provides an $L$-independent positive
+\emph{decreasing} exponent $\eta(\beta)$ with $|\langle\hat S_x^{(\alpha)}\hat
+S_y^{(\alpha)}\rangle_{\beta,0}^L|\le 2S^2\,|x-y|^{-\eta(\beta)}$ (\texttt{Real.rpow}) for every
+$\alpha=1,2,3$, $\beta\in[0,\infty)$, and every pair of \emph{distinct} sites with $0<|x-y|<L/2$.
+The distinctness $0<|x-y|$ is \emph{required for soundness}: in Lean $\texttt{Real.rpow}\;0\;(-\eta)=0$,
+so the bound would be false at $x=y$ where the self-correlation $\langle(\hat S_x^{(\alpha)})^2\rangle$
+is positive.  The exponent behaves as $\eta(\beta)\simeq(16CS^2\beta)^{-1}$ for large $\beta$
+(eq.~(4.4.24)); the same $\eta$ is quantified before \texttt{ferro}, so it serves both signs.  The
+bound is weaker than the conjectured exponential decay but already excludes long-range order in
+$d=2$.  Proved by the McBryan--Spencer complex-translation method extended to quantum systems by
+Koma--Tasaki; recorded as a documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{Theorem 4.26} (Dyson--Lieb--Simon theorem; Tasaki §4.4.4, eq.~(4.4.52), p.~130;
+documented axiom, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  Genuine N\'eel
+long-range order at sufficiently low temperature in $d\ge 3$.  We add the per-axis staggered order
+operator \texttt{staggeredOrderOpAxisS} ($\alpha=0,1,2\mapsto\hat O^{(1)},\hat O^{(2)},\hat O^{(3)}$).
+The axiom \texttt{theorem\_4\_26\_staggered\_lro} states that for the antiferromagnetic Heisenberg
+model with $d\ge 3$ and any $S=N/2$ with $N\ge 1$ (\texttt{[NeZero N]}) there exist $\beta_0\in
+(0,\infty)$ and a function $q(\beta)$, positive for $\beta>\beta_0$, with $\langle(\hat
+O_L^{(\alpha)}/L^d)^2\rangle_{\beta,0}^L=\langle(\hat O_L^{(\alpha)})^2\rangle_{\beta,0}^L/(L^d)^2\ge
+q(\beta)$ for every $\alpha=1,2,3$, every $\beta>\beta_0$, and all sufficiently large even volumes
+(the operator $\hat O_L^{(\alpha)}/L^d$ is squared, giving the $(L^d)^2$ normalization---the
+intensive long-range-order density).  The hypothesis $N\ge 1$ is \emph{essential for soundness}:
+at $N=0$ the order operator vanishes and $\langle(\hat O_L^{(\alpha)})^2\rangle=0$ would contradict
+$q(\beta)>0$.  The proof uses reflection positivity (Dyson--Lieb--Simon~[12]; the case $d=3$,
+$S=1/2$ by Kennedy--Lieb--Shastry~[29]); the ferromagnetic counterpart is only conjectured, as it
+fails reflection positivity.  Recorded as a documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{Theorem 4.27} (Griffiths, Koma--Tasaki theorem; Tasaki §4.4.4, eq.~(4.4.53),
+p.~130; documented axiom, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  Under
+the same conditions as Theorem~4.26, low-temperature long-range order is accompanied by genuine
+symmetry breaking.  The axiom \texttt{theorem\_4\_27\_griffiths\_koma\_tasaki\_ssb} bundles the
+Theorem~4.26 long-range-order bound (4.4.52) and the symmetry-breaking bound (4.4.53) under one
+\emph{shared} $\exists\beta_0,\exists q$, so the ``same $q$'' dependence is explicit: with the
+staggered field (eq.~(4.4.2)), $\lim_{h\downarrow0}\lim_{L\uparrow\infty}\langle\hat
+O_L^{(3)}\rangle_{\beta,h}^L/L^d\ge\sqrt{3\,q(\beta)}$ for every $\beta>\beta_0$.  The $\sqrt3$ factor
+has the same origin as the one in Theorem~4.11.  The double limit is stated soundly in
+$\varepsilon$--$\delta$ form (outer $h\downarrow0$, inner $\liminf_{L\uparrow\infty}$ as an eventual
+lower bound), and $N\ge1$ is again essential.  Proved by Koma--Tasaki~[34], extending Griffiths'~[23]
+argument for commuting order operators; recorded as a documented axiom.  This completes Tasaki §4.4.
+Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{Theorem 5.1} (off-diagonal long-range order of hard-core bosons; Tasaki §5.1--§5.2,
+eqs.~(5.1.1)--(5.2.5), pp.~135--139; documented axiom,
+\texttt{Quantum/SpinS/BoseEinsteinCondensate.lean}, Issue \#4485).  This opens Tasaki Chapter~5 on
+Bose--Einstein condensation.  In the $u\uparrow\infty$ limit the bosonic Hubbard model (5.1.3)
+reduces to hard-core bosons (5.1.4), which are \emph{equivalent to the spin-$1/2$ XY model} (5.1.5)
+via the identification $\hat a_x^\dagger\leftrightarrow(-1)^x\hat S_x^+$, $\hat n_x\leftrightarrow\hat
+S_x^{(3)}+\tfrac12$, $\hat N\leftrightarrow\hat S_{\mathrm{tot}}^{(3)}+L^d/2$ (5.1.6)--(5.1.7); half
+filling $\rho=1/2$ is the $\hat S_{\mathrm{tot}}^{(3)}=0$ sector.  We realize the XY Hamiltonian as
+\texttt{xyHamiltonianS} (the XXZ Hamiltonian at $\lambda=D=0$, $N=1$), and the bosonic order operators
+$\hat O_L^{(1,2)}$ (5.2.2)/(5.2.4) as the staggered XY-plane spin order operators.  The axiom
+\texttt{tasaki\_5\_1\_xy\_odlro\_half\_filling} states that for $d\ge 2$ and half filling there is a
+constant $q_0>0$ (depending only on $d$) such that every ground state $\Phi_{\mathrm{GS}}$
+(eigenvector at the minimal energy, $\Phi\ne0$, $\hat S_{\mathrm{tot}}^{(3)}\Phi=0$) of
+\texttt{xyHamiltonianS} satisfies the ODLRO bound $\langle(\hat O_L^{(\alpha)})^2\rangle/\langle\Phi,
+\Phi\rangle/(L^d)^2\ge q_0$ for $\alpha=1,2$ and all sufficiently large even $L$ (5.2.5; the squared
+operator $\hat O_L^{(\alpha)}/L^d$ gives the $(L^d)^2$ normalization, the intensive ODLRO density).  Half filling is
+essential, and the ground state exhibits long-range order \emph{without} symmetry breaking
+(eq.~5.2.8).  Proved by Kennedy--Lieb--Shastry and Kubo--Kishi via reflection positivity; recorded as
+a documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{Theorem 5.2} (low-lying tower states of hard-core bosons; Tasaki §5.3,
+eqs.~(5.3.2)--(5.3.4), pp.~140--141; documented axiom,
+\texttt{Quantum/SpinS/BoseEinsteinCondensate.lean}, Issue \#4485).  This is the BEC counterpart of the
+Anderson-tower Theorem~4.6.  We introduce the chemical-potential boson Hamiltonian $\hat H_\mu=\hat H-\mu\hat N$
+(\texttt{xyChemicalPotentialHamiltonianS}, spin form $2\hat H_{\mathrm{XY}}-\mu\,\hat
+S_{\mathrm{tot}}^{(3)}$, since $\hat H=2\hat H_{\mathrm{XY}}$ and $\hat N\leftrightarrow\hat
+S_{\mathrm{tot}}^{(3)}+L^d/2$, eq.~5.3.2; the factor $2$ keeps the documented $\mu$ equal to Tasaki's
+chemical potential, which selects the density).  Given a ground state $\Phi_{\mathrm{GS}}$ of $\hat
+H_\mu$ exhibiting ODLRO with $q_0>0$ (Theorem~5.1), the
+axiom \texttt{tasaki\_5\_2\_bec\_tower} provides constants $C_1,C_2>0$ (depending on $d$, the density
+selected by $\mu$, and $q_0$; $\mu$ is a parameter of \texttt{IsBECTowerConstants}, so the constants
+are per-density) so
+that the tower states $\Gamma_M=(\hat O_L^{\mathrm{sgn}\,M})^{|M|}\Phi_{\mathrm{GS}}$ (for $|M|\le
+C_1L^{d/2}$) are \emph{nonvanishing and} low-lying --- both stated as conclusions (faithful to
+Theorem~5.2, which asserts $\Gamma_M$ is nonvanishing) --- with the \emph{cubic} energy increment
+$\langle\Gamma_M,\hat H_\mu\Gamma_M\rangle/\langle\Gamma_M,\Gamma_M\rangle\le E_0+C_2|M|^3/L^d$
+(eq.~5.3.4) --- cubic in
+$|M|$, in contrast to the quadratic $M^2$ of Theorem~4.6.  The construction and constants are bundled
+into the predicate \texttt{IsBECTowerConstants}; the bound is conditional on ODLRO, and the hard-core
+projection is the identity in the spin-$1/2$ formulation.  Proved by Koma--Tasaki~[21]; recorded as a
+documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{Theorem 5.3} (U(1) symmetry-breaking states of hard-core bosons; Tasaki §5.3,
+eqs.~(5.3.5)--(5.3.8), pp.~141--142; documented axiom,
+\texttt{Quantum/SpinS/BoseEinsteinCondensate.lean}, Issue \#4485).  This is the BEC counterpart of the
+Tanaka full-symmetry-breaking Theorem~4.9.  We introduce the phase-$\theta$ coherent state
+$\Xi_\theta=(2M_{\max}+1)^{-1/2}\sum_{M=-M_{\max}}^{M_{\max}}e^{-iM\theta}\Gamma_M$
+(\texttt{becCoherentState}, eq.~5.3.5; $\Gamma_M$ the normalized tower states), together with the
+slow-window predicate \texttt{IsSlowBECWindow} ($M_{\max}$ monotone, $\to\infty$, $\le C_1L^{d/2}$
+eventually) and the complex Rayleigh ratio \texttt{expectationRatioComplex} (for the non-self-adjoint
+$\hat O_L^\pm$).  The axiom \texttt{tasaki\_5\_3\_bec\_u1\_ssb} asserts that for every phase $\theta$
+and realizing ground-state family, there \emph{exists} a sufficiently slowly diverging $M_{\max}$
+(existential, matching Tasaki's ``if $M_{\max}$ diverges not too rapidly'' and Theorem~4.9's $\exists
+M$) for which $\Xi_\theta$ fully breaks the
+$U(1)$ symmetry: the magnetization densities converge to a classical planar vector of length $m_\ast$
+in direction $\theta$ --- (5.3.7) $\langle\hat O_L^{(1)}\rangle/L^d\to m_\ast\cos\theta$,
+$\langle\hat O_L^{(2)}\rangle/L^d\to m_\ast\sin\theta$; (5.3.8) the squared moments $\to(m_\ast\cos
+\theta)^2,(m_\ast\sin\theta)^2$; (5.3.6) the complex moments $\langle\hat O_L^\pm\rangle/L^d\to
+m_\ast e^{\pm i\theta}$ --- with the order parameter $m_\ast\ge\sqrt{2q_0}$ (the $U(1)$ $\sqrt2$
+bound, companion of Theorem~4.11's $\sqrt3$).  The limits are stated in the sound eventual-$\varepsilon$
+form (footnote~9: the $\lim$ is to be interpreted properly), the construction is bundled into
+\texttt{IsBECCoherentSSBConstants}, and the statement is conditional on ODLRO.  Proved by
+Koma--Tasaki~[21]; recorded as a documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{Theorem 5.4} (symmetry breaking in coupled Bose--Einstein condensates; Tasaki §5.5,
+eqs.~(5.5.1)--(5.5.6), pp.~146--147; documented axiom,
+\texttt{Quantum/SpinS/BoseEinsteinCondensate.lean}, Issue \#4485).  \emph{Completes Tasaki Chapter~5.}
+Two hard-core boson condensates on copies $\Lambda_a,\Lambda_b$ of the torus
+(\texttt{CoupledSite}~$=$~\texttt{HypercubicTorus}~$\times$~\texttt{Bool}) are weakly coupled by a
+tunneling Hamiltonian.  The total Hamiltonian $\hat H_{\mathrm{tot}}^\varepsilon=\hat H_a+\hat
+H_b+\varepsilon\hat H_{\mathrm{tunnel}}$ (\texttt{coupledHamiltonian}, eq.~5.5.1) combines the two
+uncoupled boson copies $\hat H_a+\hat H_b=2(\hat H_{\mathrm{XY},a}+\hat H_{\mathrm{XY},b})$ (the boson
+factor $\hat H=2\hat H_{\mathrm{XY}}$, consistent with \texttt{xyChemicalPotentialHamiltonianS}, so
+$\varepsilon$ is the textbook tunneling strength; via \texttt{sameSpeciesNNCoupling}) with the
+tunneling term
+$\hat H_{\mathrm{tunnel}}=-\sum_x(e^{i\varphi}\hat S_{(x,a)}^+\hat S_{(x,b)}^-+e^{-i\varphi}\hat
+S_{(x,a)}^-\hat S_{(x,b)}^+)$ (\texttt{tunnelHamiltonian}, eq.~5.5.3); the total particle number is
+fixed at $2N$ (doubled half filling $\hat S_{\mathrm{tot}}^{(3)}=0$).  Assuming the single uncoupled
+system has ODLRO with parameter $q_0$ (the hypothesis \texttt{hODLRO}, which ties $q_0$ to the genuine
+order parameter of the uncoupled XY ground states via the Theorem~5.1 bound), the axiom
+\texttt{tasaki\_5\_4\_coupled\_bec\_ssb} asserts that the unique
+coupled ground state $\Phi^\varepsilon$ develops a definite relative $U(1)$ phase: there is an order
+parameter $\tilde m\ge\sqrt{2q_0}$ with $\lim_{\varepsilon\downarrow0}\lim_{L\uparrow\infty}\langle
+\Phi^\varepsilon,\hat a_{(x,a)}^\dagger\hat a_{(x,b)}\Phi^\varepsilon\rangle/\langle\Phi^\varepsilon,
+\Phi^\varepsilon\rangle=\tilde m^2e^{-i\varphi}$ (eq.~5.5.5; the cross-correlation
+\texttt{coupledCrossCorrelation}~$=\hat S_{(x,a)}^+\hat S_{(x,b)}^-$) \emph{and} the conjugate
+$\langle\Phi^\varepsilon,\hat a_{(x,a)}\hat a_{(x,b)}^\dagger\Phi^\varepsilon\rangle/\langle\cdot
+\rangle=\tilde m^2e^{+i\varphi}$ (eq.~5.5.6; \texttt{coupledCrossCorrelationConj}~$=\hat
+S_{(x,a)}^-\hat S_{(x,b)}^+$).  The double limit is stated in
+the sound eventual-$\varepsilon'$ form (outer $\varepsilon\downarrow0$, inner $L\uparrow\infty$), the
+ground-state family is given (unique by a Marshall--Lieb--Mattis argument), and $\tilde m$ is
+existential with lower bound $\sqrt{2q_0}$.  The two condensates are thus coupled coherently.  Proved
+by Koma--Tasaki~[22]; recorded as a documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§6.1 Haldane ``conjecture''} (Tasaki §6.1, eqs.~(6.1.1)--(6.1.3), pp.~153--157;
+\texttt{def : Prop}, never asserted true, \texttt{Quantum/SpinS/HaldaneConjecture.lean}, Issue
+\#4485).  Opening Tasaki Chapter~6 (Part~II, Haldane phenomena), we formalize the one-dimensional
+antiferromagnetic Heisenberg chain $\hat H=\sum_x\hat S_x\cdot\hat S_{x+1}$ on the ring (PBC,
+\texttt{afmHeisenbergChainHamiltonianS}, eq.~6.1.1, spin $S=N/2$) and the \emph{Haldane conjecture} on
+its spectral gap.  The gap dichotomy is captured by \texttt{realSpectrum} (the real eigenvalues),
+\texttt{IsGroundEnergy}, \texttt{IsPositiveSpectralGap} (first excited minus ground), \texttt{IsGapless}
+(the gap tends to $0$ as $L\uparrow\infty$, the $O(1/L)$ half-odd-integer case) and \texttt{IsGapped}
+(a uniform Haldane gap $\Delta>0$).  Then $\texttt{haldaneConjecture}\;N:=(\texttt{Odd}\;N\to
+\texttt{IsGapless}\;N)\wedge(2\le N\to\texttt{Even}\;N\to\texttt{IsGapped}\;N)$: half-odd-integer spin
+($N$ odd) is gapless, integer spin ($N$ even, $N\ge2$) is gapped.  This is a genuine conjecture,
+recorded as a \texttt{Prop} only and \textbf{never asserted true}; the correlation-decay clauses
+(HOI3)/(I3) are deferred to a later module.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§6.2 Theorem 6.3} (Lieb--Schultz--Mattis, Affleck--Lieb theorem; Tasaki §6.2,
+eqs.~(6.2.1)--(6.2.19), pp.~158--162; documented axioms,
+\texttt{Quantum/SpinS/LiebSchultzMattis.lean}, Issue \#4485).  For a \emph{half-odd-integer} spin
+antiferromagnetic Heisenberg chain the spectral gap is $O(1/L)$.  We define the \emph{twist operator}
+$\hat U_{\mathrm{LSM}}=\exp[-i\sum_x\theta_x\hat S_x^{(3)}]$ with $\theta_x=(2\pi/L)x$
+(\texttt{lsmTwistOperator}, eqs.~6.2.2/6.2.3, via \texttt{NormedSpace.exp}) and the trial state
+$\Phi_{\mathrm{LSM}}=\hat U_{\mathrm{LSM}}\Phi_{\mathrm{GS}}$ (\texttt{lsmTrialState}, eq.~6.2.4).
+\emph{Lemma 6.1} (\texttt{lsm\_energy\_bound}, eq.~6.2.5) bounds the trial energy: $\langle
+\Phi_{\mathrm{LSM}},\hat H\Phi_{\mathrm{LSM}}\rangle/\langle\Phi_{\mathrm{LSM}},\Phi_{\mathrm{LSM}}
+\rangle-E_{\mathrm{GS}}\le 8\pi^2S^2/L$ for any $S$.  \emph{Lemma 6.2}
+(\texttt{lsm\_ground\_twist\_orthogonal}, eq.~6.2.18): for $N$ odd (half-odd-integer $S$) and the
+unique ground state ($\hat S_{\mathrm{tot}}^{(3)}=0$, with a uniqueness hypothesis \texttt{huniq}),
+$\langle\Phi_{\mathrm{GS}},\Phi_{\mathrm{LSM}}\rangle=0$.  \emph{Theorem 6.3}
+(\texttt{lieb\_schultz\_mattis\_affleck\_lieb}, eq.~6.2.19): for $N$ odd and even $L$ there is a
+positive spectral gap (\texttt{IsPositiveSpectralGap} of §6.1) bounded by $8\pi^2S^2/L$, so a
+half-odd-integer chain can never have both a unique ground state and a nonvanishing gap --- the
+rigorous half of the Haldane conjecture.  These deep finite-volume spectral results are recorded as
+documented axioms.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§6.2 Lemma 6.4} (generalized LSM variational bound; Tasaki §6.2,
+eqs.~(6.2.23)--(6.2.24), pp.~162--163; documented axiom,
+\texttt{Quantum/SpinS/LiebSchultzMattisGeneral.lean}, Issue \#4485).  Lemma 6.1 generalizes to
+\emph{any} short-ranged $U(1)$-invariant chain Hamiltonian $\hat H=\sum_x\hat h_x$ (eq.~6.2.23).  The
+class \texttt{IsShortRangeU1Chain} bundles the assumptions: each $\hat h_x$ is \emph{self-adjoint}
+(so $\sum_x\hat h_x$ is a genuine Hamiltonian), $r$-local (\texttt{IsLocalRangeR}, an uninterpreted
+locality marker), bounded $\|\hat h_x\|\le h_0$ in the $L^2$ operator norm
+(\texttt{manyBodyOperatorNormS}), and $U(1)$-invariant ($[\hat h_x,\hat S_{\mathrm{tot}}^{(3)}]=0$,
+\texttt{Commute}).  The axiom
+\texttt{tasaki\_lemma\_6\_4\_general\_trial\_energy\_bound} states the existence of a constant $C>0$,
+depending only on $S,r,h_0$, such that for \emph{any} ground state $\Phi_{\mathrm{GS}}$ (uniqueness
+not assumed) the twisted trial state obeys $\langle\Phi_{\mathrm{LSM}},\hat H\Phi_{\mathrm{LSM}}
+\rangle/\langle\Phi_{\mathrm{LSM}},\Phi_{\mathrm{LSM}}\rangle-E_{\mathrm{GS}}\le C/L$ for any $L$
+(eq.~6.2.24), with $C$ quantified outermost (uniform over $L$, $\hat h$, and $\Phi_{\mathrm{GS}}$).
+Tasaki remarks that for half-odd-integer $S$ with a translation-invariant ground state a generalized
+orthogonality argument then yields $0\le E_{1\mathrm{st}}-E_{\mathrm{GS}}\le C/L$ (as in
+Theorem~6.3); that gap consequence is \emph{not} formalized here, since the formal Lemma 6.2
+(\texttt{lsm\_ground\_twist\_orthogonal}) is specialized to the antiferromagnetic Heisenberg chain.
+Recorded as a documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§6.3 Proposition 6.5} (the $S=1$ chain on the hidden-AFM subspace; Tasaki §6.3,
+eqs.~(6.3.7)--(6.3.9), pp.~168--170; documented axiom,
+\texttt{Quantum/SpinS/HiddenAntiferromagneticOrder.lean}, Issue \#4485).  In the semi-classical kink
+picture, the $S=1$ antiferromagnetic Heisenberg chain restricted to the artificial \emph{hidden
+antiferromagnetic order} subspace $H_{\mathrm{HAF}}$ realizes the Haldane phase.  For the spin-1 chain
+($N=2$, basis configs $\sigma:\mathrm{Fin}\,L\to\mathrm{Fin}\,3$ with $\sigma_x=0,1,2\mapsto+1,0,-1$),
+a configuration has \emph{complete hidden antiferromagnetic order} (\texttt{IsHiddenAFMConfig}, built
+from \texttt{IsPM}/\texttt{InCyclicOpen}/\texttt{IsNextPM}) when the nonzero ($\pm$) spins strictly
+alternate around the ring with arbitrary $0$-spins between (eq.~6.3.9).  We define the projection
+\texttt{hhafProjection} onto $H_{\mathrm{HAF}}$, the compressed Hamiltonian
+$\texttt{hhafRestrictedChainHamiltonianS}=P_{\mathrm{HAF}}\hat HP_{\mathrm{HAF}}$, and the
+$H_{\mathrm{HAF}}$-restricted spectrum \texttt{hhafRealSpectrum}.  The axiom
+\texttt{tasaki\_prop\_6\_5\_hhaf\_spin\_one} states that for even $L>0$ the restricted chain has a
+\emph{unique ground state}, a \emph{finite gap} ($\mathrm{gap}>0$ in the restricted spectrum), and an
+\emph{exponentially decaying} correlation $|\langle\Phi,\hat S_x\!\cdot\!\hat S_y\Phi\rangle/\langle
+\Phi,\Phi\rangle|\le Ce^{-d(x,y)/\xi}$ (ring distance \texttt{ringDist}) --- so the Haldane conjecture
+for $S=1$ holds rigorously within this artificial restricted Hilbert space.  Proved via a
+path-integral / two-dimensional classical statistical-mechanics representation (Gómez-Santos);
+recorded as a documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
+pp.~177--179; documented axiom, \texttt{Quantum/SpinS/AKLT.lean}, Issue \#4485).  The
+Affleck--Kennedy--Lieb--Tasaki model is the $S=1$ chain $\hat H_{\mathrm{AKLT}}=\sum_x\{\hat
+S_x\!\cdot\!\hat S_{x+1}+\tfrac13(\hat S_x\!\cdot\!\hat S_{x+1})^2\}$ (\texttt{akltHamiltonianS},
+eq.~7.1.1, periodic, $SU(2)$-invariant; the biquadratic term places it outside Marshall--Lieb--Mattis).
+The axiom \texttt{aklt\_theorem\_7\_1} states that for all sufficiently large chains (length $L=n+1$,
+any parity) the model has a \emph{unique ground state} $\Phi$ (the valence-bond-solid VBS state), a
+\emph{spectral gap} bounded below by a positive $L$-independent constant $\Delta E_0$
+(\texttt{IsPositiveSpectralGap}, $\Delta E_0\le\mathrm{gap}$), and the \emph{exact correlation}
+$\langle\Phi,\hat S_x\!\cdot\!\hat S_y\Phi\rangle/\langle\Phi,\Phi\rangle\to 4(-3)^{-|x-y|}$
+(eq.~7.1.2, sign-alternating exponential decay) for fixed sites with $|x-y|\ge1$ as $L\uparrow\infty$
+(fixed $\mathbb N$-sites embedded by \texttt{chainSite}, sound eventual-$\varepsilon$ form).  Both
+$\Delta E_0$ and the ground-state family $\Phi$ are quantified outermost.  Proved via the explicit VBS
+state and its matrix-product representation (Affleck--Kennedy--Lieb--Tasaki, 1987); recorded as a
+documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§7.1.3 Theorem 7.2} (the AKLT model on the infinite chain, Matsui; Tasaki §7.1.3,
+p.~179, and Appendix~A.7; documented axiom, \texttt{Quantum/SpinS/AKLTInfiniteChain.lean}, Issue
+\#4485).  On the quasi-local $C^*$-algebra of the infinite chain, a state $\omega$ is a ground state
+iff \texttt{IsGroundState}~$\omega\,\delta$ (Def.~A.25, $\omega(\hat A^\dagger[\hat H,\hat A])\ge0$)
+and has a nonzero gap iff \texttt{HasNonzeroGap}~$\omega\,\delta\,\gamma$ (Def.~A.27, $\gamma>0$).  For
+the one-dimensional \texttt{InfiniteSpinSystem} with the AKLT dynamics $\delta$ (tied by the
+uninterpreted marker \texttt{IsAKLTChainDynamics}), the axiom \texttt{aklt\_theorem\_7\_2} asserts the
+existence of $\omega$ with \texttt{IsState}~$\omega$, \texttt{IsGroundState}~$\omega\,\delta$,
+\emph{uniqueness among states} ($\forall\omega'$, a state ground state, $\omega'=\omega$), and
+$\exists\gamma$, \texttt{HasNonzeroGap}~$\omega\,\delta\,\gamma$.  The unique ground state is the
+$L\uparrow\infty$ limit of the VBS state.  Proved by Matsui (uniqueness) building on AKLT; recorded as
+a documented operator-algebraic axiom (per the project's $C^*$-algebra policy).  Chapters~3--10
+backfill.
+
+\medskip
+\noindent\textbf{§7.1.3 Theorem 7.3} (stability of the AKLT gap, Yarotsky; Tasaki §7.1.3, eq.~(7.1.4),
+p.~180; documented axiom, \texttt{Quantum/SpinS/AKLTStability.lean}, Issue \#4485).  The gapped AKLT
+phase is stable under small local perturbations $\hat H_\varepsilon=\hat H_{\mathrm{AKLT}}+
+\varepsilon\sum_x\hat v_x$ (\texttt{perturbedAKLTHamiltonianS}, eq.~7.1.4).  The perturbation class
+\texttt{IsAKLTPerturbation} bundles: each $\hat v_x$ self-adjoint, $r$-local (\texttt{IsLocalRangeR}),
+uniformly bounded ($\texttt{manyBodyOperatorNormS}\le v_0$), and translation covariant
+($\hat v_x=\hat T^x\hat v_o\hat T^{-x}$, recorded by the uninterpreted marker
+\texttt{IsTranslationCovariant}).  The axiom \texttt{aklt\_theorem\_7\_3} states that for range $r$
+bounded by $v_0$ there is $\varepsilon_0>0$ such that for every $|\varepsilon|<\varepsilon_0$ there are
+$L$-\emph{independent} constants $\Delta E,C,\xi>0$ with: for any $L\ge3$ and any such $v$, the
+perturbed AKLT chain has a \emph{unique ground state} (\texttt{IsUniqueChainGroundState}), a gap
+$\ge\Delta E$ (\texttt{IsPositiveSpectralGap}), and exponential decay of the \emph{connected}
+correlation $|\texttt{connectedChainCorrelation}|\le Ce^{-d(x,y)/\xi}$ (ring distance).  The connected
+/truncated correlation $\langle\hat S_x\!\cdot\!\hat S_y\rangle-\sum_\alpha\langle\hat S_x^{(\alpha)}
+\rangle\langle\hat S_y^{(\alpha)}\rangle$ is used because a symmetry-breaking perturbation can give
+nonzero one-point functions, and $L\ge3$ excludes the degenerate small rings.  Proved by Yarotsky via
+cluster expansion; recorded as a documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§7.1.3 Lemma 7.4} (local VBS ground-state characterization; Tasaki §7.1.2--§7.1.3,
+eqs.~(7.1.5), (7.1.19)--(7.1.20), pp.~181--187; \texttt{Quantum/SpinS/AKLTBondProjection.lean}, Issue
+\#4485).  The AKLT interaction is the bond projection onto total spin $2$.  For two $S=1$ spins,
+\texttt{bondSpin2ProjectionS} defines $\hat P_2[\hat S_x+\hat S_y]=\tfrac12(\hat S_x\!\cdot\!\hat S_y)
++\tfrac16(\hat S_x\!\cdot\!\hat S_y)^2+\tfrac13$, and the lemma
+\texttt{aklt\_bond\_term\_eq\_bondSpin2Projection} \emph{proves} the affine identity (eq.~7.1.5)
+$\hat S_x\!\cdot\!\hat S_y+\tfrac13(\hat S_x\!\cdot\!\hat S_y)^2=2\hat P_2[\hat S_x+\hat S_y]-\tfrac23$,
+so the AKLT local term penalizes only the spin-$2$ component of each bond and the ground states are
+exactly the states annihilated by every bond projection.  The axiom \texttt{tasaki\_lemma\_7\_4}
+states that, for $1<L$ (so the bond $\{x,\texttt{ringSucc}\,x\}$ is genuinely two-site rather than a
+one-site self-interaction), a state $\Phi$ satisfies $\hat P_2[\hat S_x+\hat S_{x+1}]\,\Phi=0$
+(eq.~7.1.19) at the periodic bond $\{x,\texttt{ringSucc}\,x\}$ \emph{iff} it has the
+valence-bond-solid singlet-tensor
+form (eq.~7.1.20), recorded through the uninterpreted marker \texttt{IsVBSGroundForm} (the
+duplicated-$S=\tfrac12$ / Schwinger-boson singlet construction is not yet formalized).  The AKLT
+ground space is then the VBS state in which every bond carries a singlet (Kennedy--Lieb--Tasaki
+1988).  The affine identity is proved; the deep singlet characterization is a documented axiom.
+Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§7.2.1 Hidden antiferromagnetic order / string order parameter} (den
+Nijs--Rommelse; Tasaki §7.2.1, eqs.~(7.2.6)--(7.2.8), pp.~192--194;
+\texttt{Quantum/SpinS/AKLTStringOrder.lean}, Issue \#4485).  The AKLT VBS ground state carries no
+Néel order but a subtle \emph{hidden} antiferromagnetic order, measured by the den Nijs--Rommelse
+string order parameter.  \texttt{spinSStringPhaseS1} is the single-site string phase
+$e^{i\pi\hat S^z}=\mathrm{diag}(-1,1,-1)$ for $S=1$ (entry $(-1)^{k+1}$); \texttt{stringOperatorS}
+$x\,y$ is the diagonal string operator $\exp\!\big(i\pi\sum_{x<z<y}\hat S_z^{(3)}\big)$, acting on a
+configuration $\sigma$ by $\prod_{x<z<y}(-1)^{\sigma_z+1}$; and \texttt{stringCorrelationS}
+$x\,y\,\Phi=-\langle\Phi|\hat S_x^{(3)}\exp(i\pi\sum\hat S^{(3)})\hat S_y^{(3)}|\Phi\rangle$ is the
+den Nijs--Rommelse string correlation $S^{(3)}_{x,y}$ (eq.~7.2.6, with the leading minus; the raw
+expectation is negative, $\to-\tfrac49$ for the VBS state, so the minus makes it positive, and
+$O_{\mathrm{string}}^{(3)}=\lim_{d}\lim_{L}S^{(3)}_{x,y}$).  The axiom
+\texttt{aklt\_string\_order\_7\_2\_8} states that for the AKLT VBS ground-state family (carried by the
+uninterpreted marker \texttt{IsAKLTVBSGroundStateFamily}) the string order parameter equals
+$O_{\mathrm{string}}^{(3)}(\Phi_{\mathrm{VBS}})=\tfrac49>0$ (eq.~7.2.8, written in the explicit
+double-$\varepsilon$ form with the inner thermodynamic limit $L\uparrow\infty$ taken first).  The
+positive string order is the hidden antiferromagnetic order of the Haldane phase (equal in all three
+directions by SU(2) invariance, while the Néel order vanishes).  Recorded as a documented axiom.
+Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§7.2.2 Matrix product representation} (Theorems 7.5--7.6; Tasaki §7.2.2,
+eqs.~(7.2.36), (7.2.41)--(7.2.42), pp.~202--203;
+\texttt{Quantum/SpinS/AKLTMatrixProduct.lean}, Issue \#4485).  The AKLT VBS state is the prototypical
+\emph{injective matrix product state}.  \texttt{MPSMatrices} $D\,N$ are the bond-dimension-$D$
+matrices $A^\sigma$; \texttt{mpsTransferMatrix} is the $D^2\times D^2$ transfer matrix
+$\tilde A_{(\alpha,\beta),(\alpha',\beta')}=\sum_\sigma\overline{A^\sigma_{\alpha,\alpha'}}
+A^\sigma_{\beta,\beta'}$ (eq.~7.2.42); \texttt{orderedProd} is the ordered product
+$A^{\sigma_1}\cdots A^{\sigma_\ell}$; \texttt{IsMPSNormalized} is $\sum_\sigma A^\sigma(A^\sigma)^\dagger
+=\lambda I$ ($\lambda>0$, eq.~7.2.41); and \texttt{HasPrimitiveTransferSpectrum} is the concrete
+spectral-gap condition ($\lambda$ in the spectrum, eigenspace \texttt{finrank}~$=1$, every other
+eigenvalue $\lVert\mu\rVert<\lambda$).  The axiom \texttt{mps\_theorem\_7\_5} states the equivalence
+of the three conditions (i) eventual spanning, (ii) spanning for all large lengths, (iii) primitive
+transfer spectrum, for normalized matrices of positive bond dimension --- the Perron--Frobenius
+characterization of an injective MPS.  The axiom \texttt{mps\_theorem\_7\_6}
+(Fannes--Nachtergaele--Werner, unproven in the book) gives uniqueness: two injective collections
+generating the same MPS (marker \texttt{GeneratesSameMPS}) are related by a pure unitary gauge
+$A^\sigma=U B^\sigma U^\dagger$ with $U$ unitary (eq.~7.2.44; no extra scalar, which would rescale
+the length-$L$ amplitudes by its $L$-th power), the fact underlying the classification of
+symmetry-protected topological phases (§8.3.4).  The transfer
+matrix, ordered products, normalization, spanning and spectral conditions are defined concretely;
+Theorems 7.5--7.6 are documented axioms.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§7.3.2 AKLT model on a general graph} (Theorem 7.7; Tasaki §7.3.2,
+eqs.~(7.3.6)--(7.3.9), pp.~210--212; \texttt{Quantum/SpinS/GeneralAKLT.lean}, Issue \#4485).  The VBS
+construction extends to any graph $(\Lambda,B)$, giving the graph-centric generalized AKLT
+Hamiltonian.  \texttt{bondCasimirS} is the bond Casimir $(\hat S_x+\hat S_y)^2=2S(S+1)+2\hat
+S_x\!\cdot\!\hat S_y$ (affine in $\hat S_x\!\cdot\!\hat S_y$, eigenvalue $J(J+1)$ on the spin-$J$ bond
+subspace); \texttt{bondMaxSpinProjectionS} is the concrete Lagrange/Casimir projector
+$\hat P_N[\hat S_x+\hat S_y]=\prod_{j=0}^{N-1}(\hat C-j(j+1))/(N(N+1)-j(j+1))$ onto the maximal bond
+total spin $J=N$; and \texttt{regularGraphAKLTHamiltonianS} $G\,N=\tfrac12\sum_{x,y}
+[G.\mathrm{Adj}\,x\,y]\hat P_N[\hat S_x+\hat S_y]$ is the bond sum over a \texttt{SimpleGraph}.  It is
+the \emph{regular (uniform-spin) specialization} of eq.~(7.3.7) --- a single global $S=N/2$, each
+bond projecting to $J=N$ --- which equals eq.~(7.3.7) exactly on an $N$-regular graph (the
+site-dependent spins $\bar S_x=\deg(x)/2$ of the non-regular case are not expressible in
+\texttt{ManyBodyOpS}~$\Lambda\,N$); on the 3-regular hexagonal lattice ($S=3/2$, $N=3$) it is
+$\sum_{\mathrm{bonds}}\hat P_3$ (eq.~7.3.8), the setting of Theorem 7.7.  The axiom
+\texttt{tasaki\_theorem\_7\_7} states that for the hexagonal lattice
+(marker \texttt{IsHexagonalLatticeAKLT}) with VBS ground state $\Phi$
+(marker \texttt{IsGeneralGraphVBSGroundState}) there are size-independent $C,\xi>0$ with the
+sign-alternating exponential decay $0\le(-1)^{D(x,y)}\langle\hat S_x\!\cdot\!\hat S_y\rangle\le
+Ce^{-D(x,y)/\xi}$ ($D=G.\mathrm{dist}$, eq.~7.3.9) and the translation-invariant infinite-volume
+ground state is unique (marker \texttt{HasUniqueInfiniteVolumeVBSGroundState}).  The hexagonal
+restriction is essential (general-graph decay can fail).  Casimir, projector and Hamiltonian are
+concrete; Theorem 7.7 is a documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§7.3.3 Briegel--Raussendorf (cluster / graph) state} (Theorem 7.8; Tasaki §7.3.3,
+eqs.~(7.3.29)--(7.3.37), pp.~217--220; \texttt{Quantum/SpinS/ClusterState.lean}, Issue \#4485).  The
+cluster state is the $S=1/2$ stabilizer analogue of the VBS state.  \texttt{pauliXS}
+$x=2\hat S_x^{(1)}=\sigma_x^x$ and \texttt{pauliZS} $x=2\hat S_x^{(3)}=\sigma_x^z$ are the qubit
+Paulis ($N=1$ on \texttt{Fin}~$L$); \texttt{neighborZProduct} $G\,x$ is the diagonal
+$\prod_{y\sim x}\sigma_y^z$ (acting by $\prod_{y\sim x}(-1)^{\sigma_y}$); \texttt{brStabilizer}
+$G\,x=\sigma_x^x\prod_{y\sim x}\sigma_y^z=\hat K_x$ is the stabilizer ($\hat K_x^2=1$, eigenvalues
+$\pm1$); and \texttt{graphStateHamiltonianS} $G=-\sum_x\hat K_x$ is the stabilizer Hamiltonian
+(eq.~7.3.30).  The axiom \texttt{tasaki\_theorem\_7\_8} states that the cluster state $\Phi$ (marker
+\texttt{IsClusterState}) is, for $0<L$, the \emph{unique} ground state with ground energy
+$E_{\mathrm{GS}}=-N$ ($N=|\Lambda|=L$, \texttt{IsGroundEnergy}), gap above it exactly $2$
+(\texttt{IsPositiveSpectralGap}~$\dots$~$2$; $0<L$ excludes the one-dimensional empty lattice), and
+every ground-energy eigenvector proportional to $\Phi$.  Proved by mapping $\hat H_{\mathrm{BR}}$ to the trivial paramagnet $-\sum_x\sigma_x^x$
+through the controlled-$Z$ unitary $\hat U_C$ ($\hat U_C^2=1$); the Paulis, stabilizers and
+Hamiltonian are concrete, Theorem 7.8 a documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§8.1.1 Large-$D$ phase of the anisotropic $S=1$ chain} (Theorem 8.1; Tasaki §8.1.1,
+eqs.~(8.1.1)--(8.1.3), pp.~226--228; \texttt{Quantum/SpinS/AnisotropicLargeD.lean}, Issue \#4485).
+The Haldane phase is studied through the anisotropic $S=1$ chain with crystal-field anisotropy:
+\texttt{anisotropicChainHamiltonianS} $L\,D=$ \texttt{heisenbergHamiltonianS}~$(\texttt{ringCoupling}\,
+L)\,2+D\sum_x(\hat S_x^{(3)})^2$, i.e. $\hat H_D=\sum_x[\hat S_x\!\cdot\!\hat S_{x+1}+D(\hat
+S_x^{(3)})^2]$ (eq.~8.1.1, periodic ring); \texttt{spinSSiteComponentS} $\alpha\,x$ selects $\hat
+S_x^{(\alpha)}$.  As $D$ grows the gap closes at $D_c\approx1$ and reopens, separating the Haldane
+phase from the large-$D$ phase --- a topological phase transition with no distinguishing order
+parameter.  The axiom \texttt{tasaki\_theorem\_8\_1} states the large-$D$ behaviour: there is
+$D_0>0$ such that for $D\ge D_0$ there are $L$-independent $\Delta E_0,C,\xi>0$ with, for every even
+$L\ge2$, a unique ground state (\texttt{IsUniqueChainGroundState}), a gap $\ge\Delta E_0$
+(\texttt{IsPositiveSpectralGap}), and exponential decay $|\langle\hat S_x^{(\alpha)}\hat
+S_y^{(\alpha)}\rangle|\le Ce^{-d(x,y)/\xi}$ for all three $\alpha$ ($d=\texttt{ringDist}$).  The raw
+correlation equals the connected one (the disordered symmetric ground state has vanishing one-point
+functions).  Proved by cluster-expansion perturbation theory for large $D$ (book $D_0\approx28$, the
+phase extending to $D_c\approx1$); a documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§8.1.2--§8.1.3 Hidden order forces edge states} (Theorem 8.2, Koma--Tasaki; Tasaki
+§8.1.2--§8.1.3, eqs.~(8.1.9)--(8.1.11), pp.~229--238;
+\texttt{Quantum/SpinS/AnisotropicEdgeStates.lean}, Issue \#4485).  Hidden antiferromagnetic order ---
+positivity of the den Nijs--Rommelse string order parameter $O_{\mathrm{string}}^{(\alpha)}(D)$ of
+the ground state of (8.1.1) --- distinguishes the Haldane phase ($0\le D<D_c$) from the large-$D$
+phase and forces low-lying edge states.  The marker \texttt{HasStringLRO} $L\,D\,\Phi\,q$ carries the
+hidden-order bound (8.1.10) $\langle\Phi|(\hat O_{\mathrm{string}}^{(\alpha)}/L)^2|\Phi\rangle\ge
+q_\alpha$ ($q_\alpha>0$, $L$-independent).  Since edge states are an open-boundary phenomenon, the
+theorem uses the open-chain Hamiltonian \texttt{openAnisotropicChainHamiltonianS} (coupling
+\texttt{openAnisotropicChainCoupling}, no wrap-around).  The axiom \texttt{tasaki\_theorem\_8\_2} states that for
+fixed $D,q$ there are $L$-independent $C_\nu>0$ such that for every $L>0$, whenever $\Phi$ is the
+\emph{unique} ground state (\texttt{IsUniqueChainGroundState}) at energy $E_0$ with
+\texttt{HasStringLRO}, there are three linearly independent excited states $\Psi_\nu$
+($\nu:\texttt{Fin}~3$, \texttt{LinearIndependent}) with $\hat H_D^{\mathrm{open}}\Psi_\nu=E_\nu\Psi_\nu$
+and $E_0<E_\nu\le E_0+C_\nu/L$ --- hidden order forces a near four-fold degeneracy (the free $S=1/2$
+edge spins); the constants are quantified outside $\forall L$, hence length-uniform.  Proved by the
+Horsch--von der Linden / Koma--Tasaki variational argument (as Theorem 3.1); a documented axiom.
+Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§8.2.1 $\lambda$-D model: Néel $\le$ string order} (Theorem 8.3, Kennedy--Tasaki;
+Tasaki
+§8.2.1, eqs.~(8.2.1)--(8.2.4), pp.~239--241; \texttt{Quantum/SpinS/LambdaDModel.lean}, Issue \#4485).
+The two-parameter Haldane-phase model \texttt{lambdaDChainHamiltonianS} $L\,\lambda\,D=\sum_{x,y}
+[\texttt{openAnisotropicChainCoupling}]\cdot\texttt{spinSDotXXZ}\,x\,y\,\lambda\,2+D\sum_x(\hat
+S_x^{(3)})^2$ is the open XXZ chain with Ising anisotropy $\lambda$ and crystal field $D$ (eq.~8.2.1;
+$\lambda=1$ gives the open-boundary version of the anisotropic model 8.1.1, agreeing in the bulk).  The thermodynamic double-limit order parameters ---
+the Néel parameter \texttt{neelOrderParameterS} (8.2.2) and the den Nijs--Rommelse string parameter
+\texttt{stringOrderParameterS} (8.2.3), both uninterpreted $\mathbb{R}\to\mathbb{R}\to\texttt{Fin}~3
+\to\mathbb{R}$ functions of the model parameters --- satisfy, by the axiom
+\texttt{tasaki\_theorem\_8\_3} (eq.~8.2.4), $O_{\mathrm{N\acute eel}}^{(\alpha)}\le
+O_{\mathrm{string}}^{(\alpha)}$ for $\lambda\ge0$ and all $\alpha$: nonzero Néel order (the Ising AF
+phase) forces nonzero hidden antiferromagnetic order.  A separate axiom records the footnote
+$O_{\mathrm{N\acute eel}}^{(1)}=O_{\mathrm{N\acute eel}}^{(2)}\ge0$ (also for $\lambda\ge0$).  Proved via the path-integral
+representation (§6.3); a documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§8.2.2--§8.2.3 Kennedy--Tasaki transformation + Proposition 8.4} (Pollmann--Turner
+--Berg--Oshikawa; Tasaki §8.2.2--§8.2.3, eqs.~(8.2.5)--(8.2.7), pp.~241--251;
+\texttt{Quantum/SpinS/KennedyTasakiTransformation.lean}, Issue \#4485).  The nonlocal unitary
+realizing hidden $\mathbb{Z}_2\times\mathbb{Z}_2$ symmetry breaking.  \texttt{ktUnitaryS}~$L$ (marker)
+is the Kennedy--Tasaki unitary $\hat U_{\mathrm{KT}}=\prod_{u<v}\exp(i\pi\hat S_u^{(3)}\hat S_v^{(1)})$
+(eq.~8.2.5), with \texttt{ktUnitaryS\_sq} ($\hat U_{\mathrm{KT}}^2=1$) and
+\texttt{ktUnitaryS\_selfAdjoint} ($\hat U_{\mathrm{KT}}=\hat U_{\mathrm{KT}}^\dagger$) --- a
+self-adjoint involution.  \texttt{piRotationS}~$L\,\alpha=\prod_x\exp(i\pi\hat S_x^{(\alpha)})$
+(concrete, on-site matrix exponentials) is the $\pi$-rotation about axis $\alpha$;
+\texttt{IsZ2Z2Invariant}~$H$ is $(\hat U_\pi^{(\alpha)})^\dagger H\hat U_\pi^{(\alpha)}=H$ for all
+$\alpha$.  The markers \texttt{HasShortRangeInteraction}/\texttt{HasSomeShortRangeInteraction} capture
+range-$r$ locality.  The axiom \texttt{tasaki\_prop\_8\_4} states that for a short-range open-chain
+$\hat H$, the transformed $\hat U_{\mathrm{KT}}\hat H\hat U_{\mathrm{KT}}$ is again short-range
+\emph{iff} $\hat H$ is $\mathbb{Z}_2\times\mathbb{Z}_2$ invariant --- the hidden-symmetry-breaking
+picture is effective exactly when $\hat H$ has $\mathbb{Z}_2\times\mathbb{Z}_2$ symmetry.  A documented
+axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§8.3.1--§8.3.2 Symmetry protected topological (SPT) phase} (Gu--Wen /
+Pollmann--Turner--Berg--Oshikawa; Tasaki §8.3.1--§8.3.2, eqs.~(8.3.1)--(8.3.4), pp.~251--256;
+\texttt{Quantum/SpinS/SPTPhase.lean}, Issue \#4485).  The Haldane phase is understood as a nontrivial
+SPT phase.  \texttt{guWenHamiltonianS} $L\,D\,B=\texttt{anisotropicChainHamiltonianS}\,L\,D+B\sum_x\hat
+S_x^{(1)}$ (eq.~8.3.4, the $S=1$ chain with a magnetic field $B$ in the 1-direction, breaking
+$\mathbb{Z}_2\times\mathbb{Z}_2$ to a single $\mathbb{Z}_2$; $B=0$ recovers the anisotropic model).
+The axiom \texttt{tasaki\_oshikawa\_8\_3\_3} (eq.~8.3.3) records that the spin-$S$ VBS string order is
+positive for odd $S$ and zero for even $S$, and \texttt{tasaki\_vbs\_edge\_degeneracy} that the
+spin-$S$ AKLT open chain has $(S{+}1)^2$-fold edge degeneracy.  The SPT notions are honest
+\texttt{def}s (never axioms): \texttt{HamiltonianPath} is a genuinely \texttt{Continuous} path of
+Hamiltonians, each short-range gapped-unique (marker \texttt{IsShortRangeGappedUniqueGS});
+\texttt{SymmetryConnected}~$sym$ requires every $\hat H_s$ to satisfy the symmetry predicate $sym$;
+\texttt{IsTrivialPhase}~$sym\,H$ is symmetry-connection to a product-state Hamiltonian
+(\texttt{IsProductStateHamiltonian}); and \texttt{IsSPTPhase}~$sym\,H$ is short-range gapped-unique,
+$sym$-symmetric, and not trivial.  The Haldane phase is the prototypical SPT phase protected by
+$\mathbb{Z}_2\times\mathbb{Z}_2$ (\texttt{IsZ2Z2Invariant}).  Concrete Hamiltonian + \texttt{def} SPT;
+the Oshikawa parity and edge degeneracy are documented axioms.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§8.3.2--§8.3.3 Protecting symmetries + topological indices for SPT}
+(Pollmann--Turner--Berg--Oshikawa; Tasaki §8.3.2--§8.3.3, eqs.~(8.3.6)--(8.3.10), pp.~256--263;
+\texttt{Quantum/SpinS/SPTTopologicalIndex.lean}, Issue \#4485).  The Haldane phase is protected by any
+of three symmetries: (S1) $\mathbb{Z}_2\times\mathbb{Z}_2$ (\texttt{IsZ2Z2Invariant}), (S2)
+time-reversal (\texttt{IsTimeReversalInvariant} marker), (S3) bond-centered inversion
+(\texttt{IsBondInversionInvariant} marker).  The axiom \texttt{tasaki\_vbs\_inversion\_parity} gives
+the inversion-parity $\mathbb{Z}_2$ index $\hat U_{\mathrm{inv}}|\Phi_{\mathrm{VBS}}^S\rangle
+=(-1)^{L\cdot S}|\Phi_{\mathrm{VBS}}^S\rangle$ (odd $L\cdot S\Rightarrow$ odd parity $\Rightarrow$
+obstruction to the trivial state), and \texttt{tasaki\_spt\_classification} states that the spin-$S$
+VBS is a nontrivial SPT phase iff $S$ is odd (even $S\Rightarrow$ trivial).  \texttt{entanglementEntropyS}
+(marker, eqs.~8.3.7--8.3.8) is the bipartite entanglement entropy $-\sum_j p_j\log p_j$ from the
+Schmidt decomposition.  This section is heuristic; the precise indices come in §8.3.4 (MPS) and §8.3.6
+(Ogata).  Markers for the antiunitary/inversion/Schmidt structure; the parity and classification are
+documented axioms.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§8.3.4 Matrix-product SPT index} (Theorem 8.7 Tachikawa + Corollary 8.5; Tasaki
+§8.3.4, eqs.~(8.3.42)--(8.3.47), pp.~269--279; \texttt{Quantum/SpinS/SPTMatrixProductIndex.lean},
+Issue \#4485).  For matrix product states the entanglement index becomes a precise invariant: a
+projective representation of the symmetry $G$ on the bond space with phase function (2-cocycle)
+$\varphi:G\to G\to\mathbb{R}$ (\texttt{IsProjectiveRep}), \emph{trivial} (\texttt{IsTrivialProjectiveRep})
+iff $\varphi$ is a coboundary (eq.~8.3.43); the cohomology class is the SPT index.  The axiom
+\texttt{tasaki\_theorem\_8\_7} states that a symmetric injective MPS
+(\texttt{SymmetricInjectiveMPSExists}, $\hat V(g)|\Phi\rangle=e^{i\eta_L(g)}|\Phi\rangle$) forces the
+projective representation to be trivial.  For half-odd-integer spin ($N$ odd) the axiom
+\texttt{z2z2Spin\_nontrivial\_of\_odd} (eq.~2.1.31) records that the $\mathbb{Z}_2\times\mathbb{Z}_2$
+representation is nontrivial, and \texttt{tasaki\_corollary\_8\_5} is then \emph{proved} as the
+contrapositive: for odd $N$ there is no $\mathbb{Z}_2\times\mathbb{Z}_2$-invariant injective MPS --- the
+matrix-product Lieb--Schultz--Mattis no-go.  Markers for the cocycle/coboundary cohomology and the MPS
+construction; Theorem 8.7 and the nontriviality are documented axioms, Corollary 8.5 a proved theorem.
+Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§8.3.5 Discrete-symmetry Lieb--Schultz--Mattis theorem} (Theorem 8.6, Ogata--Tasaki;
+Tasaki §8.3.5, pp.~276--280; \texttt{Quantum/SpinS/LiebSchultzMattisDiscrete.lean}, Issue \#4485).
+The general no-go theorem without continuous symmetry.  The axiom \texttt{tasaki\_theorem\_8\_6}
+states that for half-odd-integer spin ($S=N/2$ with $N$ odd) a short-ranged, translation-invariant
+Hamiltonian $H$ (markers \texttt{HasShortRangeHamiltonianS}, \texttt{IsTranslationInvariantS}) having
+either $\mathbb{Z}_2\times\mathbb{Z}_2$ or time-reversal symmetry (\texttt{IsZ2Z2SymmetricS} $\lor$
+\texttt{IsTimeReversalSymmetricS}) can never have a ground state that is both unique and gapped:
+$\lnot\,\texttt{HasUniqueGappedGroundStateS}\,H$.  Unlike the original LSM theorem (§6.2, which uses
+the continuous $U(1)$ symmetry), this needs only a discrete symmetry; proved rigorously by Ogata and
+Tasaki via the Cuntz algebra of a split-property pure state (no MPS approximation).  All predicates
+are honest markers; a documented axiom.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§8.3.6 Rigorous SPT phase transition} (Theorem 8.8, Tasaki 2018 index theorem;
+Tasaki §8.3.6, eq.~(8.3.55), pp.~280--284; \texttt{Quantum/SpinS/SPTPhaseTransition.lean}, Issue
+\#4485).  \texttt{sptInterpolatingHamiltonianS} $L\,s=s\,\texttt{akltHamiltonianS}\,L+(1-s)\sum_x(\hat
+S_x^{(3)})^2$ (eq.~8.3.55) linearly connects the trivial Hamiltonian (8.1.2, $s=0$, large-$D$ phase)
+to the AKLT/VBS Hamiltonian (7.1.1, $s=1$, Haldane phase), keeping all three protecting symmetries.
+The axiom \texttt{tasaki\_theorem\_8\_8} states that the infinite-volume limit undergoes a phase
+transition: there is an intermediate $s\in(0,1)$ at which the family $L\mapsto\hat H_s$ is either
+gapless (\texttt{IsGaplessInInfiniteVolume}), or has more than one ground state
+(\texttt{HasMultipleGroundStatesInInfiniteVolume}), or shows a local-expectation discontinuity
+(\texttt{HasLocalExpectationDiscontinuityInInfiniteVolume}) --- markers on the $L\uparrow\infty$
+family.  Proving topological phase transitions resists standard statistical-mechanics methods; Tasaki
+settled it via an index theorem.  Concrete interpolating Hamiltonian; a documented axiom keeping the
+faithful three-way disjunction.  Chapters~3--10 backfill.
+
+\medskip
+\noindent\textbf{§8.4 Topological order: Kitaev's toric code} (Theorem 8.9,
+Bravyi--Hastings--Michalakis; Tasaki §8.4, eqs.~(8.4.1), (8.4.19), pp.~288--297;
+\texttt{Quantum/SpinS/ToricCode.lean}, Issue \#4485).  A gapped phase whose ground-state degeneracy is
+protected by the global topology, not by any symmetry.  Qubits live on the edges
+\texttt{ToricEdge}~$L=(\mathbb{Z}_L\times\mathbb{Z}_L)\times\texttt{Fin}~2$ of an $L\times L$ torus
+($2L^2$ edges); \texttt{starEdges}/\texttt{plaquetteEdges} are the four-edge stars $A_v$ and
+plaquettes $B_p$; \texttt{sigmaZS}/\texttt{sigmaXS} are $\sigma^z,\sigma^x$.  The toric code
+Hamiltonian \texttt{toricCodeHamiltonianS} $L=-\sum_v\prod_{A_v}\sigma^z-\sum_p\prod_{B_p}\sigma^x$
+(eq.~8.4.1) is a sum of commuting stabilizers (gap $\ge2$, four-fold degenerate on the torus), and
+\texttt{perturbedToricHamiltonianS} adds $\varepsilon\sum_x\hat V_x$ (eq.~8.4.19).  The axiom
+\texttt{tasaki\_theorem\_8\_9} states that for range-$r$ perturbations there are $L$-independent
+$\varepsilon_0,\Delta>0$ such that for $|\varepsilon|\le\varepsilon_0$, all $L\ge2$ (nontrivial torus), and any local
+perturbation (\texttt{IsToricPerturbation}) the perturbed Hamiltonian has four near-degenerate ground
+states separated by $\Delta$ (\texttt{HasFourNearlyDegenerateGroundStates}) --- the topological
+four-fold degeneracy is stable against arbitrary perturbations, no symmetry required.  Lattice,
+stabilizers and both Hamiltonians are concrete; Theorem 8.9 is a documented axiom.  Chapters~3--10
+backfill.
 
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}

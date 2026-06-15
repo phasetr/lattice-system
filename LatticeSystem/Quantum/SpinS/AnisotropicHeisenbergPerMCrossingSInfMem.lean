@@ -42,7 +42,7 @@ theorem bddBelow_perMCrossingSet_inter_Icc
     [Nonempty (magConfigS Λ N M_balanced)] [Nonempty (magConfigS Λ N M)]
     (lam' D' : ℝ) :
     BddBelow (perMCrossingSet (Λ := Λ) hJ N M_balanced M lam' D' ∩ Icc (0 : ℝ) 1) :=
-  ⟨0, fun t ht => ht.2.1⟩
+  ⟨0, fun _t ht => ht.2.1⟩
 
 /-- **`sInf` of the per-`M` crossing set ∩ `Icc 0 1` lies in the set**: given
 non-emptiness, the closed + bounded-below set achieves its infimum. -/

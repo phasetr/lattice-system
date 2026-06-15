@@ -1,5 +1,6 @@
 import LatticeSystem.Math.AnticommuteCommute
 import LatticeSystem.Math.ComplexVectorKernel
+import LatticeSystem.Math.GramEigenspaceCorrespondence
 import LatticeSystem.Math.ListProdMulVec
 import LatticeSystem.Math.EigenspaceWeightFinrank
 import LatticeSystem.Math.RayleighPosSemidefKernel
@@ -10,6 +11,8 @@ import LatticeSystem.Math.PerronFrobeniusSimple
 import LatticeSystem.Math.PerronFrobeniusFinrank
 import LatticeSystem.Math.PerronFrobenius
 import LatticeSystem.Math.RayleighAtEigenvector
+import LatticeSystem.Math.DoubleSequenceDiagonal
+import LatticeSystem.Math.ReflectionPositivityAveraging
 import LatticeSystem.Math.HermitianMaxEigenvalue
 import LatticeSystem.Math.HermitianEigenspaceBotAboveMax
 import LatticeSystem.Math.HermitianMaxGeOfEigenvector
@@ -28,6 +31,7 @@ import LatticeSystem.Math.MatrixAnalysis.TraceExpMonotone
 import LatticeSystem.Math.FrustrationFree
 import LatticeSystem.Math.PosSemidef.Kernel
 import LatticeSystem.Math.EffectiveLimit
+import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbation
 import LatticeSystem.Math.AngularMomentum.Ladder
 import LatticeSystem.Math.AngularMomentum.Quantization
 import LatticeSystem.Math.AngularMomentum.Multiplet
@@ -39,6 +43,30 @@ import LatticeSystem.Math.CStarAlgebra.State
 import LatticeSystem.Math.CStarAlgebra.GroundState
 import LatticeSystem.Math.CStarAlgebra.GNS
 import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPF
+import LatticeSystem.Quantum.HorschVonderLinden
+import LatticeSystem.Quantum.KaplanHorschVonderLinden
+import LatticeSystem.Quantum.SpinS.DysonLiebSimon
+import LatticeSystem.Quantum.SpinS.HaldaneConjecture
+import LatticeSystem.Quantum.SpinS.AKLT
+import LatticeSystem.Quantum.SpinS.AKLTBondProjection
+import LatticeSystem.Quantum.SpinS.AKLTMatrixProduct
+import LatticeSystem.Quantum.SpinS.AKLTInfiniteChain
+import LatticeSystem.Quantum.SpinS.AKLTStability
+import LatticeSystem.Quantum.SpinS.AKLTStringOrder
+import LatticeSystem.Quantum.SpinS.ClusterState
+import LatticeSystem.Quantum.SpinS.GeneralAKLT
+import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder
+import LatticeSystem.Quantum.SpinS.LiebSchultzMattis
+import LatticeSystem.Quantum.SpinS.LiebSchultzMattisGeneral
+import LatticeSystem.Quantum.SpinS.ShastryNoSSB
+import LatticeSystem.Quantum.SpinS.FerrimagneticLRO
+import LatticeSystem.Quantum.SpinS.AndersonTower
+import LatticeSystem.Quantum.SpinS.AndersonTowerField
+import LatticeSystem.Quantum.SpinS.AndersonTowerSphereAverage
+import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensate
+import LatticeSystem.Quantum.SpinS.HeisenbergEquilibrium
+import LatticeSystem.Quantum.SpinS.InfiniteVolumeGroundState
+import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphAltPath
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducibleStructural
@@ -233,6 +261,7 @@ import LatticeSystem.Fermion.Mode
 import LatticeSystem.Fermion.SingleMode
 import LatticeSystem.Fermion.JordanWigner
 import LatticeSystem.Fermion.JWAbstract
+import LatticeSystem.Fermion.JordanWigner.FockSpaceRepresentation
 -- Tasaki §2.5 Theorem 2.3 (spin-S Marshall–Lieb–Mattis) tree.
 -- These are the in-progress final-wrapper "tip" modules; importing them here
 -- pulls the whole §2.5 module tree into the build root so the default
@@ -315,6 +344,16 @@ import LatticeSystem.Quantum.SpinS.Theorem23TotalLoweringNonvanishing
 import LatticeSystem.Quantum.SpinS.Theorem23GeneralHOutside
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenberg
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergReduction
+import LatticeSystem.Quantum.SpinS.AnisotropicEdgeStates
+import LatticeSystem.Quantum.SpinS.AnisotropicLargeD
+import LatticeSystem.Quantum.SpinS.KennedyTasakiTransformation
+import LatticeSystem.Quantum.SpinS.LambdaDModel
+import LatticeSystem.Quantum.SpinS.LiebSchultzMattisDiscrete
+import LatticeSystem.Quantum.SpinS.SPTMatrixProductIndex
+import LatticeSystem.Quantum.SpinS.SPTPhase
+import LatticeSystem.Quantum.SpinS.SPTPhaseTransition
+import LatticeSystem.Quantum.SpinS.SPTTopologicalIndex
+import LatticeSystem.Quantum.SpinS.ToricCode
 import LatticeSystem.Quantum.SpinS.AxisSwappedAnisotropicHeisenberg
 import LatticeSystem.Quantum.SpinS.ManyBodyTensorS
 import LatticeSystem.Quantum.SpinS.ManyBodyTensorConj

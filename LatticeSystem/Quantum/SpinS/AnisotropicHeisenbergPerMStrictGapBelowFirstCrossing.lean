@@ -31,7 +31,7 @@ theorem strict_per_M_gap_of_lt_sInf_perMCrossingSet
     (N M_balanced M : ℕ)
     [Nonempty (magConfigS Λ N M_balanced)] [Nonempty (magConfigS Λ N M)]
     (lam' D' : ℝ)
-    (hne : (perMCrossingSet (Λ := Λ) hJ N M_balanced M lam' D' ∩ Icc (0 : ℝ) 1).Nonempty)
+    (_hne : (perMCrossingSet (Λ := Λ) hJ N M_balanced M lam' D' ∩ Icc (0 : ℝ) 1).Nonempty)
     {t : ℝ} (ht_mem : t ∈ Icc (0 : ℝ) 1)
     (ht_lt : t < sInf (perMCrossingSet (Λ := Λ) hJ N M_balanced M lam' D' ∩ Icc (0 : ℝ) 1)) :
     anisotropicHeisenbergS_magSector_minEigenvalue_alongParametricPath
@@ -41,7 +41,7 @@ theorem strict_per_M_gap_of_lt_sInf_perMCrossingSet
   -- Suppose by contradiction the gap fails: E_M(γ(t)) ≤ E_balanced(γ(t)).
   -- Then t ∈ perMCrossingSet, contradicting t < sInf.
   by_contra h_neg
-  push_neg at h_neg
+  push Not at h_neg
   -- h_neg : E_M(γ(t)) ≤ E_balanced(γ(t))? Wait, the negation of `<` is `≥`.
   -- Strict gap goal: E_balanced < E_M. Negation: E_M ≤ E_balanced.
   have h_in_perM : t ∈ perMCrossingSet (Λ := Λ) hJ N M_balanced M lam' D' :=

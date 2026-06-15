@@ -1,0 +1,117 @@
+import LatticeSystem.Quantum.SpinS.HaldaneConjecture
+import LatticeSystem.Quantum.SpinS.AndersonTower
+import LatticeSystem.Quantum.SpinS.MultiSiteDot
+import Mathlib.Analysis.SpecialFunctions.Exp
+
+/-!
+# Tasaki §6.3: hidden antiferromagnetic order and the `S = 1` chain on `H_HAF` (Proposition 6.5)
+
+The semi-classical "kink" picture of the `S = 1` antiferromagnetic Heisenberg chain views the
+ground state as a sea of Néel order (`+, −, +, −, …`) into which an arbitrary number of `0`-spins
+are inserted, while the nonzero spins keep their complete alternating order (eq. (6.3.9)).  The
+states realizing this picture span a **highly artificial subspace** `H_HAF` (the Hilbert space with
+hidden antiferromagnetic order), on which the kink dynamics destroys the Néel long-range order.
+
+For the spin-`1` chain (`N = 2`), a basis configuration `σ : Fin L → Fin 3` encodes the local spin
+via `Ŝ_x^{(3)} = 1 − (σ_x).val`, i.e. `σ_x = 0 ↦ +1`, `σ_x = 1 ↦ 0`, `σ_x = 2 ↦ −1`.  A
+configuration has **complete hidden antiferromagnetic order** (`IsHiddenAFMConfig`) when, deleting
+the `0`-spins (`σ_x = 1`), the surviving `±`-spins (`σ_x ∈ {0, 2}`) strictly alternate
+`+, −, +, −, …` around the ring.  `H_HAF` is the span of those basis states; the chain "defined on
+`H_HAF`" is the compressed Hamiltonian `P_HAF Ĥ P_HAF`.
+
+**Proposition 6.5**: the `S = 1` antiferromagnetic Heisenberg chain restricted to `H_HAF` has a
+unique ground state, a finite energy gap, and an exponentially decaying correlation function — so
+the Haldane "conjecture" for `S = 1` is rigorously justified *within this artificial restricted
+Hilbert space*.
+
+This was proved (Gómez-Santos' variational picture, via a path-integral / two-dimensional classical
+statistical-mechanics representation); following the project policy it is recorded as a documented
+axiom.  The `H_HAF` subspace, its projection, and the compressed Hamiltonian are *defined* here.
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §6.3, Proposition 6.5, eqs. (6.3.7)–(6.3.9), pp. 168–170; A. Gómez-Santos, Phys. Rev. Lett.
+**63**, 790 (1989).
+-/
+
+namespace LatticeSystem.Quantum
+
+open Matrix
+
+/-- `IsPM σ x`: site `x` carries a nonzero (`±`) spin, i.e. `σ_x ≠ 1` (so `σ_x ∈ {0, 2}`, spin
+`±1`). -/
+def IsPM {L : ℕ} (σ : Fin L → Fin 3) (x : Fin L) : Prop := σ x ≠ 1
+
+/-- `InCyclicOpen x y z`: the site `z` lies strictly between `x` and `y` along the ring `Fin L`,
+going in the increasing-index (cyclic) direction from `x` to `y` (the open arc). -/
+def InCyclicOpen {L : ℕ} (x y z : Fin L) : Prop :=
+  if x.val < y.val then x.val < z.val ∧ z.val < y.val else x.val < z.val ∨ z.val < y.val
+
+/-- `IsNextPM σ x y`: `y` is the **next** `±`-spin site after `x` around the ring — both `x`, `y`
+carry `±` spins, and every site strictly between them (cyclically) is a `0`-spin (`σ_z = 1`). -/
+def IsNextPM {L : ℕ} (σ : Fin L → Fin 3) (x y : Fin L) : Prop :=
+  x ≠ y ∧ IsPM σ x ∧ IsPM σ y ∧ ∀ z, InCyclicOpen x y z → σ z = 1
+
+/-- **Complete hidden antiferromagnetic order** (eq. (6.3.9)): every pair of *consecutive* `±`-spin
+sites carries opposite signs, so the nonzero spins strictly alternate `+, −, +, −, …` around the
+ring (with arbitrary `0`-spins inserted between).  Configurations with `0` or `1` nonzero spins
+satisfy this vacuously. -/
+def IsHiddenAFMConfig {L : ℕ} (σ : Fin L → Fin 3) : Prop :=
+  ∀ x y, IsNextPM σ x y → σ x ≠ σ y
+
+/-- The **hidden-antiferromagnetic-order projection** `P_HAF`: the orthogonal projection of the
+spin-1 chain onto `H_HAF`, the diagonal operator with entry `1` on hidden-AFM configurations and `0`
+otherwise (the computational basis is orthonormal). -/
+noncomputable def hhafProjection (L : ℕ) : ManyBodyOpS (Fin L) 2 := by
+  classical
+  exact Matrix.diagonal (fun σ => if IsHiddenAFMConfig σ then (1 : ℂ) else 0)
+
+/-- The **`S = 1` chain restricted to `H_HAF`**: the compressed Hamiltonian `P_HAF Ĥ P_HAF`, where
+`Ĥ = afmHeisenbergChainHamiltonianS L 2` is the spin-1 antiferromagnetic Heisenberg ring. -/
+noncomputable def hhafRestrictedChainHamiltonianS (L : ℕ) : ManyBodyOpS (Fin L) 2 :=
+  hhafProjection L * afmHeisenbergChainHamiltonianS L 2 * hhafProjection L
+
+/-- The **`H_HAF`-restricted real spectrum**: real eigenvalues of the compressed Hamiltonian whose
+eigenvectors lie in `H_HAF` (i.e. are fixed by the projection `P_HAF`).  This isolates the genuine
+spectrum of the restricted chain from the zeros from the orthogonal complement of `H_HAF`. -/
+def hhafRealSpectrum (L : ℕ) : Set ℝ :=
+  {E : ℝ | ∃ Φ : (Fin L → Fin 3) → ℂ, Φ ≠ 0 ∧ (hhafProjection L).mulVec Φ = Φ ∧
+    (hhafRestrictedChainHamiltonianS L).mulVec Φ = (E : ℂ) • Φ}
+
+/-- The **ring distance** between sites `x, y` on `Fin L`: the shorter of the two cyclic arc lengths
+`(y − x) mod L` and `(x − y) mod L`. -/
+def ringDist (L : ℕ) (x y : Fin L) : ℕ :=
+  min ((y.val + L - x.val) % L) ((x.val + L - y.val) % L)
+
+/-- The **normalized two-point correlation** `⟨Φ, Ŝ_x · Ŝ_y Φ⟩ / ⟨Φ, Φ⟩` of the spin-1 chain (real
+part; `Ŝ_x · Ŝ_y` is Hermitian). -/
+noncomputable def chainCorrelation (L : ℕ) (Φ : (Fin L → Fin 3) → ℂ) (x y : Fin L) : ℝ :=
+  expectationRatioRe (spinSDot x y 2) Φ
+
+/-- **Tasaki Proposition 6.5 (the `S = 1` chain on `H_HAF`), AXIOM.**  For an even ring `Fin L`
+(`L > 0`), the spin-`1` antiferromagnetic Heisenberg chain restricted to the
+hidden-antiferromagnetic subspace `H_HAF` (the compressed Hamiltonian
+`hhafRestrictedChainHamiltonianS`) has:
+
+* a **unique ground state** `Φ ∈ H_HAF` (a nonzero `H_HAF`-eigenvector at the minimal
+  `H_HAF`-energy `E`, with every `H_HAF` ground eigenvector a scalar multiple of `Φ`);
+* a **finite energy gap** `gap > 0` (a positive gap in the `H_HAF`-restricted spectrum: the first
+  excited `H_HAF`-energy `E₁` satisfies `gap = E₁ − E > 0`, with `E₁` minimal above `E`);
+* an **exponentially decaying correlation function**:
+  `|⟨Φ, Ŝ_x · Ŝ_y Φ⟩ / ⟨Φ, Φ⟩| ≤ C e^{−d(x,y)/ξ}` for some `ξ > 0`, `C ≥ 0`, where `d(x,y)` is the
+  ring distance.
+
+Thus the Haldane conjecture for `S = 1` (unique gapped disordered ground state) holds *rigorously
+within the artificial restricted Hilbert space* `H_HAF`.  Recorded as a documented axiom. -/
+axiom tasaki_prop_6_5_hhaf_spin_one (L : ℕ) (hL : Even L) (hLpos : 0 < L) :
+    ∃ (E gap ξ C : ℝ) (Φ : (Fin L → Fin 3) → ℂ),
+      (hhafProjection L).mulVec Φ = Φ ∧ Φ ≠ 0 ∧
+      (hhafRestrictedChainHamiltonianS L).mulVec Φ = (E : ℂ) • Φ ∧
+      (∀ E' ∈ hhafRealSpectrum L, E ≤ E') ∧
+      (∀ Ψ : (Fin L → Fin 3) → ℂ, Ψ ≠ 0 → (hhafProjection L).mulVec Ψ = Ψ →
+        (hhafRestrictedChainHamiltonianS L).mulVec Ψ = (E : ℂ) • Ψ → ∃ c : ℂ, Ψ = c • Φ) ∧
+      0 < gap ∧ (∃ E₁ ∈ hhafRealSpectrum L, E < E₁ ∧ gap = E₁ - E ∧
+        ∀ E' ∈ hhafRealSpectrum L, E < E' → E₁ ≤ E') ∧
+      0 < ξ ∧ 0 ≤ C ∧
+      ∀ x y : Fin L, |chainCorrelation L Φ x y| ≤ C * Real.exp (-(ringDist L x y : ℝ) / ξ)
+
+end LatticeSystem.Quantum

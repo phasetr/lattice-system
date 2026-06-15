@@ -129,8 +129,10 @@ noncomputable def generalFlatBandProjectionMatrix :
     (generalFlatBandKernel T).starProjection.toLinearMap
 
 /-- **The active sites `Λ₀ = {x | (P₀)_{x,x} ≠ 0}`** (Tasaki §11.3.4): the support of
-the flat band's diagonal projection density. -/
-def generalFlatBandActiveSites : Type :=
+the flat band's diagonal projection density.  An `abbrev` so the `Fintype`/`DecidableEq`
+instances of the underlying subtype are found transparently (needed for matrix powers of the
+support matrix). -/
+abbrev generalFlatBandActiveSites : Type :=
   { x : Fin (M + 1) // generalFlatBandProjectionMatrix T x x ≠ 0 }
 
 /-- The real nonnegative **support matrix** of the restricted projection `((P₀)_{x,y})`
@@ -164,15 +166,13 @@ Expressed via the shared `IsMaximalSpinMultipletSubmodule` predicate (see
 def generalFlatBandFerromagnetic (U : ℝ) : Prop :=
   IsMaximalSpinMultipletSubmodule M (generalFlatBandGroundSubmodule T U) (generalFlatBandDim T)
 
-/-- **Tasaki Theorem 11.15 (general flat-band ferromagnetism), AXIOM.**  For a Hermitian
+/-! **Tasaki Theorem 11.15 (general flat-band ferromagnetism).**  For a Hermitian
 positive-semidefinite hopping matrix `T` with nonempty flat band (`D₀ > 0`) and `U > 0`,
 the `D₀`-electron Hubbard model is saturated-ferromagnetic **iff** the `Λ₀ × Λ₀`
-projection submatrix is irreducible.  Tasaki gives a complete proof (via Lemma 11.16 and
-Theorem 11.17); it is deep, so the statement is recorded here as a documented axiom (to be
-discharged), matching the policy for Theorem 11.8 / Lemma 11.9 / Theorem 11.13. -/
-axiom tasaki_theorem_11_15 (U : ℝ) (hT : T.PosSemidef)
-    (hD0 : 0 < generalFlatBandDim T) (hU : 0 < U) :
-    generalFlatBandFerromagnetic T U ↔ generalFlatBandProjectionIrreducible T
+projection submatrix is irreducible.  **Now a proved theorem** `tasaki_theorem_11_15` in
+`GeneralFlatBandTheorem1115.lean` (Issue #4453): the axiom previously recorded here is
+discharged by composing the proved Theorem 11.17 (`ferromagnetic ↔ basis connected`) with the
+bridge `projectionIrreducible ↔ basis connected`. -/
 
 /-! ### Lemma 11.16 and Theorem 11.17 (the special basis and its connectivity)
 
@@ -301,17 +301,13 @@ def generalFlatBandBasisConnected (I : Finset (Fin (M + 1)))
     (μ : Fin (M + 1) → Fin (M + 1) → ℂ) : Prop :=
   (generalFlatBandBasisGraph I μ).Connected
 
-/-- **Tasaki Theorem 11.17 (connectivity form of flat-band ferromagnetism), AXIOM.**  For a
-special basis `{μ_z}` of the flat band (Lemma 11.16), the `D₀`-electron Hubbard model is
-saturated-ferromagnetic **iff** the basis is connected.  This is Mielke's second
-necessary-and-sufficient condition; Tasaki shows its connectivity is independent of the
-choice of special basis and equivalent to the irreducibility condition of Theorem 11.15.
-Recorded as a documented axiom (Issue #4186), matching the Theorem 11.8 / 11.13 / 11.15
-policy. -/
-axiom generalFlatBand_theorem_11_17 (U : ℝ) (hT : T.PosSemidef)
-    (hD0 : 0 < generalFlatBandDim T) (hU : 0 < U)
-    {I : Finset (Fin (M + 1))} {μ : Fin (M + 1) → Fin (M + 1) → ℂ}
-    (hbasis : IsGeneralFlatBandSpecialBasis T I μ) :
-    generalFlatBandFerromagnetic T U ↔ generalFlatBandBasisConnected I μ
+/-! **Tasaki Theorem 11.17 (connectivity form of flat-band ferromagnetism).**  For a special basis
+`{μ_z}` of the flat band (Lemma 11.16), the `D₀`-electron Hubbard model is saturated-ferromagnetic
+**iff** the basis is connected (Mielke's second necessary-and-sufficient condition).  Now a proved
+theorem — `generalFlatBand_theorem_11_17` in `GeneralFlatBandDisconnected.lean` (Issue #4363): the
+connected ⟹ multiplet direction is `generalFlatBand_connected_isMaximalSpinMultiplet` (the SU(2)
+tower lower bound with the connectivity-induction upper bound), and the converse is the
+contrapositive `¬connected ⟹ finrank > D₀+1` (`generalFlatBand_disconnected_finrank_gt`, the
+per-block weight states). -/
 
 end LatticeSystem.Fermion

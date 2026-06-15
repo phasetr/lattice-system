@@ -23,6 +23,7 @@ open Matrix
 
 variable {n : Type*} [Fintype n] [DecidableEq n]
 
+omit [DecidableEq n] in
 /-- Matrix-side adjoint identity for vecMul: `star v ᵥ* U = star (Uᴴ *ᵥ v)`. -/
 theorem star_vecMul (U : Matrix n n ℂ) (v : n → ℂ) :
     star v ᵥ* U = star (U.conjTranspose.mulVec v) := by
@@ -30,9 +31,10 @@ theorem star_vecMul (U : Matrix n n ℂ) (v : n → ℂ) :
   simp only [Matrix.vecMul, Matrix.mulVec, dotProduct, Pi.star_apply, RCLike.star_def,
              star_sum, star_mul', Matrix.conjTranspose_apply]
   refine Finset.sum_congr rfl (fun j _ => ?_)
-  simp [star_star]
+  simp
   ring
 
+omit [DecidableEq n] in
 /-- `rayleighOnVec` under unitary similarity: for any matrix `U`,
 `rayleighOnVec (U * M * Uᴴ) v = rayleighOnVec M (Uᴴ.mulVec v)`. -/
 theorem rayleighOnVec_unitary_conj (U M : Matrix n n ℂ) (v : n → ℂ) :

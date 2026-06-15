@@ -25,6 +25,7 @@ open Matrix
 
 variable {n : Type*} [Fintype n] [DecidableEq n] [Nonempty n]
 
+omit [DecidableEq n] [Nonempty n] in
 /-- Conditional upper bound: `rayleighInfMatrix M ≤ rayleighOnVec M v` for any unit `v`,
 provided the function is bounded below over the matrix-side unit sphere. -/
 theorem rayleighInfMatrix_le_rayleighOnVec_of_bddBelow

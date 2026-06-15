@@ -40,7 +40,7 @@ theorem balanced_GS_below_sInf_of_argmin
     (hne_chosen :
       (perMCrossingSet (Λ := Λ) hJ N M_balanced M_chosen lam' D' ∩ Icc (0 : ℝ) 1).Nonempty)
     -- Argmin property: M_chosen minimises per-M first crossings across M ≠ M_balanced.
-    (h_argmin :
+    (_h_argmin :
       ∀ M' : ℕ, ∀ _ : Nonempty (magConfigS Λ N M'), M' ≠ M_balanced →
         (perMCrossingSet (Λ := Λ) hJ N M_balanced M' lam' D' ∩ Icc (0 : ℝ) 1).Nonempty →
         sInf (perMCrossingSet (Λ := Λ) hJ N M_balanced M_chosen lam' D' ∩ Icc (0 : ℝ) 1) ≤
