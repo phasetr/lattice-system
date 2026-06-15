@@ -94,6 +94,28 @@ theorem afmThermodynamicLimit_exists_omega0
   theorem_4_20_omega0 S (boxGroundEnergyDensitySLimit d N)
     (afmThermodynamicLimit_energyDensity S N hd hN hS)
 
+/-- **The symmetry-breaking infinite-volume ground states exist for the box AFM
+model's thermodynamic limit** (proved from the energy-density bridge +
+Theorem 4.20).  Assuming `S` is the `L↑∞` limit of the concrete box AFM model and
+the model has staggered long-range order with order parameter `m∗ > 0`
+(`HasStaggeredLRO`), then for every unit direction `n ∈ ℝ³` there is a
+translation-invariant infinite-volume ground state `ω_n` at the concrete energy
+density, with Néel magnetization `ω_n(Ŝ_x^{(α)}) = (−1)^x m∗ n_α` (eqs. (4.3.8),
+(4.3.10)) — full spontaneous symmetry breaking.  Vacuous in one dimension, where
+there is no long-range order (`HasStaggeredLRO` is unavailable, cf. Corollary 4.3). -/
+theorem afmThermodynamicLimit_exists_omegaN
+    {d : ℕ} {A : Type*} [CStarAlgebra A] [NormedSpace ℂ A] [StarModule ℂ A]
+    (S : InfiniteSpinSystem d A) (N : ℕ) (hd : 0 < d) (hN : 0 < N)
+    (hS : IsAFMThermodynamicLimit S N)
+    (mStar : ℝ) (hm : 0 < mStar) (hLRO : HasStaggeredLRO S mStar)
+    (n : Fin 3 → ℝ) (hn : IsUnitVector n) :
+    ∃ ωn : WeakDual ℂ A,
+      IsInfiniteVolumeGroundState S (boxGroundEnergyDensitySLimit d N) ωn ∧
+        ∀ (x : Fin d → ℤ) (α : Fin 3),
+          ωn (S.spin x α) = ((staggeredSign x : ℝ) : ℂ) * (mStar : ℂ) * (n α : ℂ) :=
+  theorem_4_20_omegaN S (boxGroundEnergyDensitySLimit d N)
+    (afmThermodynamicLimit_energyDensity S N hd hN hS) mStar hm hLRO n hn
+
 end InfiniteSpinSystem
 
 end LatticeSystem.Quantum

@@ -8454,8 +8454,13 @@ has abstract ground-state energy density $\varepsilon_{\mathrm{GS}}(d,N)$
 (\texttt{IsGroundStateEnergyDensity}), and then \texttt{afmThermodynamicLimit\_exists\_omega0} is a
 \textbf{proved} theorem (via Theorem 4.20): an infinite-volume ground state $\omega_0$ exists for the
 box AFM model's thermodynamic limit, with $\omega_0(\hat S_x^{(\alpha)})=0$ (eqs.~(4.3.7), (4.3.9)).
-The existence of the limit system $S$ itself (the quasi-local $C^\ast$-algebra inductive limit) is a
-heavier statement deferred to a future thread.
+Likewise \texttt{afmThermodynamicLimit\_exists\_omegaN} is \textbf{proved} (via the $\omega_n$ part of
+Theorem 4.20): assuming staggered long-range order $m^\ast>0$ (\texttt{HasStaggeredLRO}), for each
+unit direction $n$ there is a symmetry-breaking ground state $\omega_n$ with N\'eel magnetization
+$\omega_n(\hat S_x^{(\alpha)})=(-1)^x m^\ast n_\alpha$ (eqs.~(4.3.8), (4.3.10)) --- vacuous in one
+dimension, where the long-range-order hypothesis is unavailable.  The existence of the limit system
+$S$ itself (the quasi-local $C^\ast$-algebra inductive limit) is a heavier statement deferred to a
+future thread.
 
 \medskip
 \noindent\textbf{Theorem 4.22} (Tasaki §4.4.1, eqs.~(4.4.1)--(4.4.6), pp.~117--119; documented
