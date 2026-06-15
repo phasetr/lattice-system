@@ -1,5 +1,6 @@
 import LatticeSystem.Lattice.HypercubicLattice
 import LatticeSystem.Quantum.SpinS.Heisenberg
+import LatticeSystem.Quantum.SpinS.SubmatrixMinEigenvalue
 
 /-!
 # The finite-volume Heisenberg model on a hypercubic box
@@ -72,5 +73,37 @@ noncomputable def boxAFMHeisenbergHamiltonianS (d n N : ℕ) :
 theorem boxAFMHeisenbergHamiltonianS_isHermitian (d n N : ℕ) :
     (boxAFMHeisenbergHamiltonianS d n N).IsHermitian :=
   boxHeisenbergHamiltonianS_isHermitian d n (by norm_num) N
+
+/-! ### Finite-volume ground-state energy and bond count
+
+The finite-volume groundwork for the thermodynamic limit (Issue #4564): the
+ground-state energy `E_{GS,n}` of the box model (the least eigenvalue of the
+Hermitian Hamiltonian) and the bond count `|B_n|`, whose ratio is the
+finite-volume energy density `E_{GS,n}/|B_n|` (Tasaki §4.3 eq. (4.3.4)).  All
+defined/proved — no axioms; the `L↑∞` limit content is recorded separately. -/
+
+/-- The **finite-volume ground-state energy** `E_{GS,n}` of the antiferromagnetic
+box Heisenberg model: the least eigenvalue of the Hermitian Hamiltonian
+`boxAFMHeisenbergHamiltonianS d n N`. -/
+noncomputable def boxGroundEnergyS (d n N : ℕ) : ℝ :=
+  hermitianMinEigenvalue (boxAFMHeisenbergHamiltonianS_isHermitian d n N)
+
+/-- The ground-state energy is `≤` every eigenvalue of the box Hamiltonian (it is
+the least eigenvalue). -/
+theorem boxGroundEnergyS_le_eigenvalues (d n N : ℕ)
+    (i : hypercubicBoxVertex d n → Fin (N + 1)) :
+    boxGroundEnergyS d n N ≤ (boxAFMHeisenbergHamiltonianS_isHermitian d n N).eigenvalues i :=
+  hermitian_min_eigenvalue_le (boxAFMHeisenbergHamiltonianS_isHermitian d n N) i
+
+/-- The **bond count** `|B_n|` of the finite hypercubic box: the number of
+nearest-neighbor bonds (edges of the induced box graph `hypercubicBoxGraph d n`). -/
+noncomputable def boxBondCount (d n : ℕ) : ℕ :=
+  (LatticeSystem.Lattice.hypercubicBoxGraph d n).edgeFinset.card
+
+/-- The **finite-volume ground-state energy density** `E_{GS,n} / |B_n|` (per bond,
+Tasaki §4.3 eq. (4.3.4)); the `L↑∞` limit of this quantity is the infinite-volume
+ground-state energy density `ε_GS` (recorded separately as a documented axiom). -/
+noncomputable def boxGroundEnergyDensityS (d n N : ℕ) : ℝ :=
+  boxGroundEnergyS d n N / (boxBondCount d n : ℝ)
 
 end LatticeSystem.Quantum
