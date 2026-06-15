@@ -106,16 +106,19 @@ axiom HasFourNearlyDegenerateGroundStates {Λ : Type} [Fintype Λ] [DecidableEq 
 
 /-- **Tasaki Theorem 8.9 (stability of topological order, Bravyi–Hastings–Michalakis), AXIOM.**  For
 range-`r` perturbations of the toric code there is a coupling threshold `ε₀ > 0` and a separation
-`Δ > 0` — both **independent of the lattice size `L`** — such that for every `|ε| ≤ ε₀`, every `L`,
-and every local perturbation family `V` (`IsToricPerturbation`), the perturbed Hamiltonian
+`Δ > 0` — both **independent of the lattice size `L`** — such that for every `|ε| ≤ ε₀`, every
+`L ≥ 2` (a nontrivial torus; on `L = 1` the forward and backward edges are identified and the
+four-fold structure collapses), and every local perturbation family `V` (`IsToricPerturbation`), the
+perturbed Hamiltonian
 `Ĥ_ε = Ĥ_tc + ε Σ_x V̂_x` has **four near-degenerate ground states** separated from the rest of the
 spectrum by at least `Δ` (`HasFourNearlyDegenerateGroundStates`).  The topological four-fold
 degeneracy is thus stable against *arbitrary* local perturbations, with no symmetry required —
 protected by the global topology.  Recorded as a documented axiom. -/
 axiom tasaki_theorem_8_9 (r : ℕ) :
     ∃ ε₀ Δ : ℝ, 0 < ε₀ ∧ 0 < Δ ∧ ∀ ε : ℝ, |ε| ≤ ε₀ →
-      ∀ (L : ℕ) [NeZero L] (V : ToricEdge L → ManyBodyOpS (ToricEdge L) 1),
-        IsToricPerturbation L r V →
-          HasFourNearlyDegenerateGroundStates (perturbedToricHamiltonianS L ε V) Δ
+      ∀ (L : ℕ) [NeZero L], 2 ≤ L →
+        ∀ (V : ToricEdge L → ManyBodyOpS (ToricEdge L) 1),
+          IsToricPerturbation L r V →
+            HasFourNearlyDegenerateGroundStates (perturbedToricHamiltonianS L ε V) Δ
 
 end LatticeSystem.Quantum
