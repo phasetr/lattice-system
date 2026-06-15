@@ -5374,6 +5374,19 @@ subspace (bipartiteness) and applying rank–nullity over the $|A|$-dimensional
 domain. This is the one Chapter-10 item that is finite-dimensional linear
 algebra rather than reflection positivity, and it is fully discharged.
 
+\medskip
+\noindent\textbf{Theorem 10.8} (Lieb–Shen–Qiu superconductivity; Tasaki §10.2.3,
+p.~359, eq.~(10.2.22)). For the attractive Hubbard model on a bipartite lattice
+with even electron number $N$, $2|B| \le N \le 2|A|$, the unique ground state
+$\varphi$ (Theorem 10.2) satisfies the pair off-diagonal-long-range-order bound
+$\langle\varphi|\,\hat b^\dagger \hat b\,|\varphi\rangle \ge (|A|-N/2)(N/2-|B|)$
+with $\hat b = \sum_x \hat c_{x\downarrow}\hat c_{x\uparrow}$
+(\texttt{totalPairCorrelationOperator},
+\texttt{theorem\_10\_8\_lieb\_shen\_qiu\_superconductivity}); the positive regime
+is the standard criterion for superconductivity (fermion-pair condensation).
+Recorded as a faithful documented \texttt{axiom} (Lieb's reflection positivity,
+Shen–Qiu–Tian, plus Theorem 10.2 uniqueness).
+
 %======================================================================
 \subsection{Effective Hamiltonian on the hard-core sector (Tasaki §11.2)}
 \label{subsec:hubbard-effective-hamiltonian}
