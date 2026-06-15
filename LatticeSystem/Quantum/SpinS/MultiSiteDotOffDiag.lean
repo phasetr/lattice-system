@@ -69,7 +69,7 @@ theorem spinSDot_apply_re_nonneg_of_raising_lowering_x
       Matrix.diagonal_apply_ne _ hσ'x]
     ring
   rw [h3eq]
-  simp
+  simp only [one_div, Complex.zero_re, add_zero, inv_pos, Nat.ofNat_pos, mul_nonneg_iff_of_pos_left, ge_iff_le]
   positivity
 
 /-- For `x ≠ y` and configurations `σ', σ` agreeing off `{x, y}` with
@@ -203,7 +203,7 @@ theorem spinSDot_apply_re_nonneg_of_raising_lowering_y
       Matrix.diagonal_apply_ne _ hσ'x]
     ring
   rw [h3eq]
-  simp
+  simp only [one_div, Complex.zero_re, add_zero, inv_pos, Nat.ofNat_pos, mul_nonneg_iff_of_pos_left, ge_iff_le]
   positivity
 
 

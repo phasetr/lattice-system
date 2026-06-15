@@ -823,14 +823,14 @@ theorem neelStateOf_complement_pair_independent
     have := congrArg (dotProduct (star (neelStateOf A))) h
     rw [dotProduct_add, dotProduct_smul, dotProduct_smul,
         neelStateOf_inner_self, horth_AcA, dotProduct_zero] at this
-    simp at this
+    simp only [smul_eq_mul, mul_one, mul_zero, add_zero] at this
     exact this
   have hc2 : c2 = 0 := by
     have := congrArg
       (dotProduct (star (neelStateOf (fun x : Λ => ! A x)))) h
     rw [dotProduct_add, dotProduct_smul, dotProduct_smul,
         neelStateOf_inner_self, horth_cAA, dotProduct_zero] at this
-    simp at this
+    simp only [smul_eq_mul, mul_zero, mul_one, zero_add] at this
     exact this
   exact ⟨hc1, hc2⟩
 
