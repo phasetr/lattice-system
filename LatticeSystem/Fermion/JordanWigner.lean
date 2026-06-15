@@ -263,6 +263,11 @@ import LatticeSystem.Fermion.JordanWigner.NumberCommutePauliOfNe
 set_option linter.unusedSectionVars false
 set_option linter.unusedSimpArgs false
 set_option linter.unusedVariables false
+-- This module is a pure re-export hub: imports + a large module-overview markdown
+-- table (one row per sub-module) + an empty namespace, with no proofs.  The table
+-- rows are single lines by markdown syntax and cannot be wrapped, so the long-line
+-- style linter is disabled file-wide here.
+set_option linter.style.longLine false
 
 /-!
 # Multi-mode fermion via Jordan–Wigner mapping
