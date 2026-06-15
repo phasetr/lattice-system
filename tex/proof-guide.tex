@@ -8602,6 +8602,22 @@ $sym$-symmetric, and not trivial.  The Haldane phase is the prototypical SPT pha
 $\mathbb{Z}_2\times\mathbb{Z}_2$ (\texttt{IsZ2Z2Invariant}).  Concrete Hamiltonian + \texttt{def} SPT;
 the Oshikawa parity and edge degeneracy are documented axioms.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§8.3.2--§8.3.3 Protecting symmetries + topological indices for SPT}
+(Pollmann--Turner--Berg--Oshikawa; Tasaki §8.3.2--§8.3.3, eqs.~(8.3.6)--(8.3.10), pp.~256--263;
+\texttt{Quantum/SpinS/SPTTopologicalIndex.lean}, Issue \#4485).  The Haldane phase is protected by any
+of three symmetries: (S1) $\mathbb{Z}_2\times\mathbb{Z}_2$ (\texttt{IsZ2Z2Invariant}), (S2)
+time-reversal (\texttt{IsTimeReversalInvariant} marker), (S3) bond-centered inversion
+(\texttt{IsBondInversionInvariant} marker).  The axiom \texttt{tasaki\_vbs\_inversion\_parity} gives
+the inversion-parity $\mathbb{Z}_2$ index $\hat U_{\mathrm{inv}}|\Phi_{\mathrm{VBS}}^S\rangle
+=(-1)^{L\cdot S}|\Phi_{\mathrm{VBS}}^S\rangle$ (odd $L\cdot S\Rightarrow$ odd parity $\Rightarrow$
+obstruction to the trivial state), and \texttt{tasaki\_spt\_classification} states that the spin-$S$
+VBS is a nontrivial SPT phase iff $S$ is odd (even $S\Rightarrow$ trivial).  \texttt{entanglementEntropyS}
+(marker, eqs.~8.3.7--8.3.8) is the bipartite entanglement entropy $-\sum_j p_j\log p_j$ from the
+Schmidt decomposition.  This section is heuristic; the precise indices come in §8.3.4 (MPS) and §8.3.6
+(Ogata).  Markers for the antiunitary/inversion/Schmidt structure; the parity and classification are
+documented axioms.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}
