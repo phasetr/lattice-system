@@ -8648,6 +8648,21 @@ the continuous $U(1)$ symmetry), this needs only a discrete symmetry; proved rig
 Tasaki via the Cuntz algebra of a split-property pure state (no MPS approximation).  All predicates
 are honest markers; a documented axiom.  Chapters~3--10 backfill.
 
+\medskip
+\noindent\textbf{§8.3.6 Rigorous SPT phase transition} (Theorem 8.8, Tasaki 2018 index theorem;
+Tasaki §8.3.6, eq.~(8.3.55), pp.~280--284; \texttt{Quantum/SpinS/SPTPhaseTransition.lean}, Issue
+\#4485).  \texttt{sptInterpolatingHamiltonianS} $L\,s=s\,\texttt{akltHamiltonianS}\,L+(1-s)\sum_x(\hat
+S_x^{(3)})^2$ (eq.~8.3.55) linearly connects the trivial Hamiltonian (8.1.2, $s=0$, large-$D$ phase)
+to the AKLT/VBS Hamiltonian (7.1.1, $s=1$, Haldane phase), keeping all three protecting symmetries.
+The axiom \texttt{tasaki\_theorem\_8\_8} states that the infinite-volume limit undergoes a phase
+transition: there is an intermediate $s\in(0,1)$ at which the family $L\mapsto\hat H_s$ is either
+gapless (\texttt{IsGaplessInInfiniteVolume}), or has more than one ground state
+(\texttt{HasMultipleGroundStatesInInfiniteVolume}), or shows a local-expectation discontinuity
+(\texttt{HasLocalExpectationDiscontinuityInInfiniteVolume}) --- markers on the $L\uparrow\infty$
+family.  Proving topological phase transitions resists standard statistical-mechanics methods; Tasaki
+settled it via an index theorem.  Concrete interpolating Hamiltonian; a documented axiom keeping the
+faithful three-way disjunction.  Chapters~3--10 backfill.
+
 %======================================================================
 \subsection{SU(2) algebra: \([\hat S^z,\hat S^-]=-\hat S^-\) and eigenvalue stepping (Tasaki §9.3.3, §11.1.1)}
 \label{subsec:hubbard-su2-algebra}

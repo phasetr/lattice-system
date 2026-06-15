@@ -349,6 +349,7 @@ import LatticeSystem.Quantum.SpinS.LambdaDModel
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisDiscrete
 import LatticeSystem.Quantum.SpinS.SPTMatrixProductIndex
 import LatticeSystem.Quantum.SpinS.SPTPhase
+import LatticeSystem.Quantum.SpinS.SPTPhaseTransition
 import LatticeSystem.Quantum.SpinS.SPTTopologicalIndex
 import LatticeSystem.Quantum.SpinS.AxisSwappedAnisotropicHeisenberg
 import LatticeSystem.Quantum.SpinS.ManyBodyTensorS
