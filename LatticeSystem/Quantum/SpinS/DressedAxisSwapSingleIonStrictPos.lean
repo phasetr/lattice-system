@@ -258,7 +258,7 @@ theorem shiftedDressedAxisSwappedReMatrix_apply_pos_of_singleIonStepS_witness
   have hneg :=
     dressedAxisSwappedAnisotropicHeisenbergS_apply_re_neg_of_singleIonStepS_witness
       (lam := lam) A hJself hDim hDpos hsx hagree
-  show 0 < -((dressedAxisSwappedAnisotropicHeisenbergS A J lam D N) σ' σ).re
+  change 0 < -((dressedAxisSwappedAnisotropicHeisenbergS A J lam D N) σ' σ).re
   linarith
 
 /-- **Shifted PF strict positive on a `SingleIonStepS`** (case (i.2), `D.re > 0`). -/

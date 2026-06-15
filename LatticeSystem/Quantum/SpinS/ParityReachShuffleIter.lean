@@ -46,13 +46,13 @@ theorem parityReachableS_shuffle_n_units
       · rw [hja]
         unfold configUpdateTwo
         rw [if_pos rfl]
-        ext; show (σ a).val - 0 = (σ a).val; omega
+        ext; change (σ a).val - 0 = (σ a).val; omega
       · unfold configUpdateTwo
         rw [if_neg hja]
         by_cases hja' : j = a'
         · rw [hja']
           rw [if_pos rfl]
-          ext; show (σ a').val + 0 = (σ a').val; omega
+          ext; change (σ a').val + 0 = (σ a').val; omega
         · rw [if_neg hja']
     rw [hself]
     exact ParityReachableS.refl _ _
@@ -92,14 +92,14 @@ theorem parityReachableS_shuffle_n_units
       by_cases hja : j = a
       · rw [hja, if_pos rfl, if_pos rfl]
         ext
-        show (σ_one a).val - k = (σ a).val - (k + 1)
+        change (σ_one a).val - k = (σ a).val - (k + 1)
         rw [hsig_one_a_val]
         omega
       · rw [if_neg hja, if_neg hja]
         by_cases hja' : j = a'
         · rw [hja', if_pos rfl, if_pos rfl]
           ext
-          show (σ_one a').val + k = (σ a').val + (k + 1)
+          change (σ_one a').val + k = (σ a').val + (k + 1)
           rw [hsig_one_a'_val]
           omega
         · rw [if_neg hja', if_neg hja']

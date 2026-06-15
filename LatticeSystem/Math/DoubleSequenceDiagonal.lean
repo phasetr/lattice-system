@@ -70,16 +70,16 @@ theorem diagonal_tendsto_zero (f : ℕ → ℕ → ℝ) (g : ℕ → ℝ)
   -- key facts: `T (m L) ≤ L` whenever `T 0 ≤ L`, and `K ≤ m L` whenever `L ≥ T K`.
   have hTmL : ∀ L, T 0 ≤ L → T (m L) ≤ L := by
     intro L hL
-    show T (Nat.findGreatest (fun k => T k ≤ L) L) ≤ L
+    change T (Nat.findGreatest (fun k => T k ≤ L) L) ≤ L
     exact Nat.findGreatest_spec (P := fun k => T k ≤ L) (Nat.zero_le L) hL
   have hmL_ge : ∀ K L, T K ≤ L → K ≤ m L := by
     intro K L hL
-    show K ≤ Nat.findGreatest (fun k => T k ≤ L) L
+    change K ≤ Nat.findGreatest (fun k => T k ≤ L) L
     exact Nat.le_findGreatest (P := fun k => T k ≤ L) (le_trans (hT_ge_self K) hL) hL
   refine ⟨m, ?_, ?_, ?_⟩
   · -- Monotone `m`.
     intro a b hab
-    show Nat.findGreatest (fun k => T k ≤ a) a ≤ Nat.findGreatest (fun k => T k ≤ b) b
+    change Nat.findGreatest (fun k => T k ≤ a) a ≤ Nat.findGreatest (fun k => T k ≤ b) b
     exact Nat.findGreatest_mono (P := fun k => T k ≤ a) (Q := fun k => T k ≤ b)
       (fun k hk => le_trans hk hab) hab
   · -- `m L → ∞`.

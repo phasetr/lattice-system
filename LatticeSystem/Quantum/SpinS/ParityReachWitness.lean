@@ -72,7 +72,7 @@ theorem raiseLowerStepS_pair_shift_lower_a_raise_b
   refine ⟨a, b, hadj, ?_, ?_⟩
   · right
     refine ⟨?_, ?_⟩
-    · rw [configUpdateTwo_at_a]; show (σ a).val - 1 + 1 = (σ a).val; omega
+    · rw [configUpdateTwo_at_a]; change (σ a).val - 1 + 1 = (σ a).val; omega
     · rw [configUpdateTwo_at_b _ hadj.ne]
   · exact configUpdateTwo_agree _ _ _ _ _
 
@@ -90,7 +90,7 @@ theorem raiseLowerStepS_pair_shift_raise_a_lower_b
   · left
     refine ⟨?_, ?_⟩
     · rw [configUpdateTwo_at_a]
-    · rw [configUpdateTwo_at_b _ hadj.ne]; show (σ b).val - 1 + 1 = (σ b).val; omega
+    · rw [configUpdateTwo_at_b _ hadj.ne]; change (σ b).val - 1 + 1 = (σ b).val; omega
   · exact configUpdateTwo_agree _ _ _ _ _
 
 omit [Fintype V] in
@@ -121,8 +121,8 @@ theorem parityBondStepS_pair_lower
   refine ⟨a, b, hadj, ?_, ?_⟩
   · right
     refine ⟨?_, ?_⟩
-    · rw [configUpdateTwo_at_a]; show (σ a).val - 1 + 1 = (σ a).val; omega
-    · rw [configUpdateTwo_at_b _ hadj.ne]; show (σ b).val - 1 + 1 = (σ b).val; omega
+    · rw [configUpdateTwo_at_a]; change (σ a).val - 1 + 1 = (σ a).val; omega
+    · rw [configUpdateTwo_at_b _ hadj.ne]; change (σ b).val - 1 + 1 = (σ b).val; omega
   · exact configUpdateTwo_agree _ _ _ _ _
 
 /-- Update at a single site. -/
@@ -160,7 +160,7 @@ theorem singleIonStepS_lower
     SingleIonStepS σ (configUpdateOne σ a ⟨(σ a).val - 2, by have := (σ a).isLt; omega⟩) := by
   refine ⟨a, ?_, ?_⟩
   · right
-    rw [configUpdateOne_at]; show (σ a).val - 2 + 2 = (σ a).val; omega
+    rw [configUpdateOne_at]; change (σ a).val - 2 + 2 = (σ a).val; omega
   · exact configUpdateOne_agree _ _ _
 
 end LatticeSystem.Quantum

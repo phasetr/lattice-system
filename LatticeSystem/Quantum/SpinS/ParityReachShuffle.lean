@@ -58,7 +58,7 @@ theorem parityReachableS_shuffle_a_to_aprime_via_b
     rw [hsig_mid]; exact configUpdateTwo_agree _ _ _ _ _ a' ha'a ha'b_ne
   -- Step 2: σ_mid → σ_final where σ_final = σ_mid with σ_mid a' += 1, σ_mid b -= 1.
   have hka'_mid : (σ_mid a').val + 1 ≤ N := by rw [hsig_mid_a']; exact hka'
-  have hkb_mid : 1 ≤ (σ_mid b).val := by rw [hsig_mid_b]; show 1 ≤ (σ b).val + 1; omega
+  have hkb_mid : 1 ≤ (σ_mid b).val := by rw [hsig_mid_b]; change 1 ≤ (σ b).val + 1; omega
   have hstep2 := raiseLowerStepS_pair_shift_raise_a_lower_b (N := N) A ha'b hka'_mid hkb_mid
   -- Show the final config equals our target.
   have hfinal_eq :
@@ -79,16 +79,16 @@ theorem parityReachableS_shuffle_a_to_aprime_via_b
         have h_kb : k ≠ b := hka'_k ▸ ha'b_ne
         simp only [configUpdateTwo, if_neg h_ka, if_pos hka'_k]
         ext
-        show (σ_mid a').val + 1 = (σ a').val + 1
+        change (σ_mid a').val + 1 = (σ a').val + 1
         rw [hsig_mid_a']
       · by_cases hkb_k : k = b
         · have h_ka : k ≠ a := hkb_k ▸ fun h => hab_ne h.symm
           have h_ka' : k ≠ a' := hkb_k ▸ fun h => ha'b_ne h.symm
           simp only [configUpdateTwo, if_neg h_ka, if_neg h_ka', if_pos hkb_k]
           ext
-          show (σ_mid b).val - 1 = (σ k).val
+          change (σ_mid b).val - 1 = (σ k).val
           rw [hkb_k, hsig_mid_b]
-          show (σ b).val + 1 - 1 = (σ b).val
+          change (σ b).val + 1 - 1 = (σ b).val
           omega
         · simp only [configUpdateTwo, if_neg hka_k, if_neg hka'_k, if_neg hkb_k]
           rw [hsig_mid]

@@ -139,7 +139,7 @@ theorem tJKinetic_commute_hubbardHardcoreProjection
       (hubbardHardcoreProjection N * hubbardKineticOnGraph N G 1 * hubbardHardcoreProjection N)
       (hubbardHardcoreProjection N) := by
   have h := hubbardHardcoreProjection_mul_self N
-  show hubbardHardcoreProjection N * hubbardKineticOnGraph N G 1 * hubbardHardcoreProjection N *
+  change hubbardHardcoreProjection N * hubbardKineticOnGraph N G 1 * hubbardHardcoreProjection N *
       hubbardHardcoreProjection N =
     hubbardHardcoreProjection N *
       (hubbardHardcoreProjection N * hubbardKineticOnGraph N G 1 * hubbardHardcoreProjection N)

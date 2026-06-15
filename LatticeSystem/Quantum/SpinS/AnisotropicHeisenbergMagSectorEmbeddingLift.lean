@@ -65,7 +65,7 @@ theorem anisotropicHeisenbergS_mulVec_magSectorEmbedding
         (anisotropicHeisenbergS J lam D N).mulVec (magSectorEmbedding Φ) σ =
         (anisotropicHeisenbergS_magSector_submatrix (Λ := Λ) J lam D N M).mulVec Φ
           ⟨σ, hσ⟩ := by
-      show ∑ ρ, (anisotropicHeisenbergS J lam D N) σ ρ * magSectorEmbedding Φ ρ =
+      change ∑ ρ, (anisotropicHeisenbergS J lam D N) σ ρ * magSectorEmbedding Φ ρ =
         ∑ ρ' : magConfigS Λ N M,
           anisotropicHeisenbergS_magSector_submatrix (Λ := Λ) J lam D N M ⟨σ, hσ⟩ ρ' *
             Φ ρ'
@@ -101,12 +101,12 @@ theorem anisotropicHeisenbergS_mulVec_magSectorEmbedding
     -- Now apply the sector eigenvalue equation.
     have hμ := congrFun hΦ ⟨σ, hσ⟩
     rw [hμ]
-    show μ * Φ ⟨σ, hσ⟩ = (μ • magSectorEmbedding Φ) σ
+    change μ * Φ ⟨σ, hσ⟩ = (μ • magSectorEmbedding Φ) σ
     rw [Pi.smul_apply, magSectorEmbedding_apply_of_mem Φ hσ, smul_eq_mul]
   · -- σ ∉ sector M. Both sides vanish.
     have hLHS_zero :
         (anisotropicHeisenbergS J lam D N).mulVec (magSectorEmbedding Φ) σ = 0 := by
-      show ∑ ρ, (anisotropicHeisenbergS J lam D N) σ ρ * magSectorEmbedding Φ ρ = 0
+      change ∑ ρ, (anisotropicHeisenbergS J lam D N) σ ρ * magSectorEmbedding Φ ρ = 0
       refine Finset.sum_eq_zero (fun ρ _ => ?_)
       by_cases hρ : magSumS ρ = M
       · -- ρ ∈ sector M, σ ∉ sector M: magSums differ ⟹ matrix element = 0.
@@ -115,7 +115,7 @@ theorem anisotropicHeisenbergS_mulVec_magSectorEmbedding
         rw [anisotropicHeisenbergS_apply_eq_zero_of_magSumS_ne J lam D hne, zero_mul]
       · rw [magSectorEmbedding_apply_of_not_mem Φ hρ, mul_zero]
     rw [hLHS_zero]
-    show (0 : ℂ) = (μ • magSectorEmbedding Φ) σ
+    change (0 : ℂ) = (μ • magSectorEmbedding Φ) σ
     rw [Pi.smul_apply, magSectorEmbedding_apply_of_not_mem Φ hσ, smul_zero]
 
 end LatticeSystem.Quantum

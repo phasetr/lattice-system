@@ -49,7 +49,7 @@ theorem parityReachableS_drain_a_into_a0
     by_cases hja : j = a
     · rw [hja, if_pos rfl, if_pos rfl]
       ext
-      show (σ a).val - (σ a).val = 0
+      change (σ a).val - (σ a).val = 0
       omega
     · rw [if_neg hja, if_neg hja]
   rw [htarget_eq] at hreach
