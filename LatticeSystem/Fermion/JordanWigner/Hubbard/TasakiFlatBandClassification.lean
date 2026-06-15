@@ -201,8 +201,10 @@ theorem flatBand_groundSubmodule_eq_multipletSpan_of_blocks (K : ℕ) (ν t U : 
 /-- **Tasaki Theorem 11.11 (flat-band ferromagnetism, half-filled ground space) — axiom-free.**
 The zero-energy `N_e = K+1` ground subspace of the flat-band Hubbard model is *exactly* the
 ferromagnetic lowering multiplet of `|Φα,all↑⟩` (the maximal-spin `(2 S_max + 1)`-dimensional
-multiplet).  `⊇` is the existence side; `⊆` is the classification, discharged here: every `Ŝ^z`-weight
-block is one-dimensional (`flatBand_block_finrank_le_one`, the swap-invariant coordinate argument), so
+multiplet).  `⊇` is the existence side; `⊆` is the classification, discharged here: every
+`Ŝ^z`-weight
+block is one-dimensional (`flatBand_block_finrank_le_one`, the swap-invariant coordinate argument),
+so
 the ground subspace has dimension `≤ K+2 = dim` of the multiplet. -/
 theorem flatBand_theorem_11_11_groundSubmodule_eq_multipletSpan (K : ℕ) (ν t U : ℝ)
     (hν : 0 < ν) (ht : 0 < t) (hU : 0 < U) :

@@ -17,7 +17,8 @@ with `a > 0` (e.g. the Lieb lattice, `a = 1/3`), eq. (4.1.13) gives
 Unlike the existence theorems 4.1–4.3, Theorem 4.4 has a complete *finite-volume* proof in Tasaki
 (the chain (4.1.16): the cross-term positivity (4.1.15) from Problem 2.5.d, the Lieb–Mattis total
 spin `S_tot = (|A| − |B|) S` from Theorem 2.3, and `⟨(Ŝ_tot)²⟩ = S_tot(S_tot + 1) ≥ S_tot²`).  It is
-therefore a **discharge candidate**; here we record it as a faithful, sound documented axiom over the
+therefore a **discharge candidate**; here we record it as a faithful, sound documented axiom over
+the
 concrete connected bipartite antiferromagnetic family (same hypotheses as Theorem 2.3), to be
 discharged once the §2.5 Theorem 2.3 total-spin API and the (4.1.15) cross-term inequality are
 assembled.

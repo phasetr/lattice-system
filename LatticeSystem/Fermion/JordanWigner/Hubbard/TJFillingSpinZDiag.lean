@@ -4,7 +4,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorSpin
 /-!
 # Tasaki 11.5: `Ŝ³` is diagonal on filling expansions; odd `Ne` has no `Ŝ³ = 0` state (Prop 11.24)
 
-`Ŝ³_tot` acts diagonally on the filling basis: on `tJFillingExpansion Φ` it scales each coefficient by
+`Ŝ³_tot` acts diagonally on the filling basis: on `tJFillingExpansion Φ` it scales each coefficient
+by
 `½(#↑ − #↓)` (`fermionTotalSpinZ_mulVec_tJFillingExpansion`).  For **odd** `Ne` every filling
 site-state has `#↑ ≠ #↓` (since `#↑ + #↓ = Ne` is odd), so the scale is nonzero — hence the only
 `Ŝ³ = 0` filling state is the zero vector (`tJFillingExpansion_eq_zero_of_spinZ_mulVec_eq_zero`).

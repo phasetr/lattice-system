@@ -50,7 +50,8 @@ private theorem eigenspace_one_inf_neg_one_eq_bot
 /-- **Eigenspace finrank EQUALITY under a commuting involution** (strengthens #3776 from `≤` to `=`):
 for finite-dimensional `T, P` with `T ∘ P = P ∘ T` and `P ∘ P = id`, every `T`-eigenspace
 **splits as a direct sum** across the two `P`-eigenspaces `±1`, giving
-`finrank (eigenspace T μ) = finrank (eigenspace T μ ⊓ eigenspace P 1) + finrank (eigenspace T μ ⊓ eigenspace P (−1))`. -/
+`finrank (eigenspace T μ) = finrank (eigenspace T μ ⊓ eigenspace P 1) + finrank (eigenspace T μ ⊓
+eigenspace P (−1))`. -/
 theorem eigenspace_finrank_eq_of_commuting_involution
     {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
     (T P : V →ₗ[ℂ] V) (hcomm : T ∘ₗ P = P ∘ₗ T) (hP : P ∘ₗ P = LinearMap.id) (μ : ℂ) :

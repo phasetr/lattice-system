@@ -4,7 +4,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJGroundEnergy
 # Tasaki 11.5: spin-½ `W`-eigenvalues are sector-matrix eigenvalues (Prop 11.24 PR-E2, `≥` crux)
 
 The crux bridge for the reverse ground-energy bound `μ ≤ groundEnergyAtFilling`: a `Ŝ³ = ½`,
-`N̂ = Ne`, hard-core (`W`) eigenvector of `Ĥ_tJ` at a real eigenvalue `E` produces a nonzero **real**
+`N̂ = Ne`, hard-core (`W`) eigenvector of `Ĥ_tJ` at a real eigenvalue `E` produces a nonzero
+**real**
 eigenvector of the sector matrix `tJEffReMatrixOnSector` at `E`
 (`tJ_spinHalf_W_eigenvector_to_sector`).  Combined with the Perron–Frobenius minimality, this gives
 `μ ≤ E` for every such `E` (`tJ_perronFrobenius_min_le_of_spinHalf_W_eigenvalue`).

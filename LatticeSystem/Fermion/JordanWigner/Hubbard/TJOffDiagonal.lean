@@ -21,7 +21,8 @@ open Matrix LatticeSystem.Quantum
 variable {N : ℕ}
 
 /-- **The hard-core projection drops on a sector configuration.**  Evaluating `P̂hc u` at the
-hard-core config `tJConfigOf s'` returns `u` there: the row of `P̂hc` at a hard-core configuration is
+hard-core config `tJConfigOf s'` returns `u` there: the row of `P̂hc` at a hard-core configuration
+is
 the unit vector. -/
 theorem tJ_hardcore_proj_apply (N : ℕ) (s' : Fin (N + 1) → Fin 3)
     (u : (Fin (2 * N + 2) → Fin 2) → ℂ) :

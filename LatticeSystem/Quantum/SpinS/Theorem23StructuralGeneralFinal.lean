@@ -16,7 +16,8 @@ coupling — truly unconditional (no `h_intermediate`)
 non-negative bipartite couplings positive on the complete bipartite graph.
 
 Combines Step 3 (common ground-state energy) + Step 2 of PR #3891 (structural sector
-existence) + already-`h_intermediate`-free `tasaki23_general_hOutside` / `tasaki23_eigenvalue_ge_common`
+existence) + already-`h_intermediate`-free `tasaki23_general_hOutside` /
+`tasaki23_eigenvalue_ge_common`
 to close `tasaki_2_5_theorem_2_3 A N J c` for general bipartite J at any N ≥ 1.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,

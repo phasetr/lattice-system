@@ -7,11 +7,14 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorHopBackwardWrap
 # Tasaki 11.5: each cyclic kinetic summand is `0` or `1` (Prop 11.24 PR-B7-3f)
 
 The off-diagonal kinetic matrix element expands over spins and ordered site pairs as
-`⟨Φ_{s'}|K|Φ_s⟩ = Σ_σ Σ_i Σ_j couplingOf(cycleGraph) i j · ⟨Φ_{s'}|ĉ†_{iσ}ĉ_{jσ}|Φ_s⟩`.  Each summand
+`⟨Φ_{s'}|K|Φ_s⟩ = Σ_σ Σ_i Σ_j couplingOf(cycleGraph) i j · ⟨Φ_{s'}|ĉ†_{iσ}ĉ_{jσ}|Φ_s⟩`.  Each
+summand
 is either `0` or `1`: non-adjacent pairs are killed by the graph coupling; for an adjacent pair the
-single-hop element vanishes unless the source carries spin `σ` and the target site is empty, in which
+single-hop element vanishes unless the source carries spin `σ` and the target site is empty, in
+which
 case the directional (rightward / leftward nearest-neighbour, or wrap) hop matrix element gives the
-sign-free indicator `[s' = tJSiteHop …] ∈ {0,1}`.  Hence the kinetic matrix element is a non-negative
+sign-free indicator `[s' = tJSiteHop …] ∈ {0,1}`.  Hence the kinetic matrix element is a
+non-negative
 real, the input to the Perron–Frobenius step.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
@@ -142,7 +145,8 @@ theorem tJ_kinetic_summand_zero_or_one (N : ℕ) (hpos : 0 < N) (s s' : Fin (N +
 
 /-- **The cyclic kinetic matrix element is a non-negative real.**  `⟨Φ_{s'}|K|Φ_s⟩ ≥ 0` (real part
 non-negative, imaginary part zero), since it is the sum of `{0,1}`-valued summands.  Hence the
-kinetic off-diagonal entry `−τ·⟨Φ_{s'}|K|Φ_s⟩ ≤ 0` for `τ ≥ 0`, feeding the Perron–Frobenius step. -/
+kinetic off-diagonal entry `−τ·⟨Φ_{s'}|K|Φ_s⟩ ≤ 0` for `τ ≥ 0`, feeding the Perron–Frobenius step.
+-/
 theorem tJKinetic_matrixElement_nonneg (N : ℕ) (hpos : 0 < N) (s s' : Fin (N + 1) → Fin 3)
     (Ne : ℕ) (hNe : (Finset.univ.filter (fun k => s k = 1)).card
         + (Finset.univ.filter (fun k => s k = 2)).card = Ne) (hodd : Odd Ne) :

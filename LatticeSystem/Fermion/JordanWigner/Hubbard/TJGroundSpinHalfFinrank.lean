@@ -7,7 +7,8 @@ import LatticeSystem.Quantum.SpinS.RealComplexEigenspaceBridge
 `finrank ℂ (groundSubmoduleAtFilling Ĥ_tJ Ne ⊓ (Ŝ³ = ½)) ≤ 1`: the ground states in the `Ŝ³ = ½`
 sector form a space of dimension at most one.  A ground state in that block is sector-supported, so
 its coefficient vector is a complex eigenvector of the sector matrix at the ground energy
-`μ = groundEnergyAtFilling`; the map `Φ ↦ tJExpansionCoeff Φ` is an injective `ℂ`-linear embedding of
+`μ = groundEnergyAtFilling`; the map `Φ ↦ tJExpansionCoeff Φ` is an injective `ℂ`-linear embedding
+of
 the block into that eigenspace, whose dimension is `≤ 1` by Perron–Frobenius
 (`matrix_complex_eigenspace_finrank_le_one_of_real`).
 

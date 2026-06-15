@@ -5,7 +5,8 @@ import LatticeSystem.Quantum.SpinS.RayleighUnitarySimilarity
 /-!
 # Tasaki 11.5: the filling embedding is an isometry, and the Rayleigh bridge (Prop 11.24 PR-E2 ≥)
 
-The orthonormal filling embedding `T` satisfies `Tᴴ T = 1` (`tJFillingEmbedding_conjTranspose_mul_self`),
+The orthonormal filling embedding `T` satisfies `Tᴴ T = 1`
+(`tJFillingEmbedding_conjTranspose_mul_self`),
 so it is an isometry: `⟨T c, T c⟩ = ⟨c, c⟩`.  Consequently the operator Rayleigh quotient of `Ĥ_tJ`
 on a lifted filling vector equals the matrix Rayleigh quotient of the compression `Ĥ_W`:
 `rayleighOnVec Ĥ_tJ (tJFillingExpansion c) = rayleighOnVec (tJFillingCompress Ĥ_tJ) c`

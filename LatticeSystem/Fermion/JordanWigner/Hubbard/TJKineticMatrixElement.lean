@@ -5,7 +5,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorHopWrap
 
 The per-term hopping matrix element `⟨Φ_{s'} | ĉ†_{bσ}ĉ_{aσ} | Φ_s⟩` for a *forward* allowed
 nearest-neighbour or wrap hop equals `1` exactly when `s'` is the hopped site-state
-`tJSiteHop s a b`, and `0` otherwise.  This combines the sign-free hop actions (`tJ_uphop_nn_mulVec`,
+`tJSiteHop s a b`, and `0` otherwise.  This combines the sign-free hop actions
+(`tJ_uphop_nn_mulVec`,
 the wrap variants) with the orthonormality of the sector basis (`tJConfigOf_basisVec_inner`); it is
 the off-diagonal `−τ` kinetic entry of the t-J effective matrix.
 

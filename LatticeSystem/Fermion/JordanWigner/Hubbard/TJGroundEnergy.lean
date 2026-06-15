@@ -8,7 +8,8 @@ hard-core variational problem (it is a no-double-occupancy `N̂ = Ne` eigenvecto
 energy `μ` (the lowest sector-matrix eigenvalue) bounds the ground energy from above:
 `groundEnergyAtFilling Ĥ_tJ Ne ≤ μ` (`tJHamiltonian_groundEnergyAtFilling_le_of_sectorEigen`).
 
-This is the easy half of the E2 ground-energy identification `groundEnergyAtFilling = μ`; the reverse
+This is the easy half of the E2 ground-energy identification `groundEnergyAtFilling = μ`; the
+reverse
 `μ ≤ groundEnergyAtFilling` (the global minimum sits in the `Ŝ³ = ½` block, via A.17 and odd `Ne`)
 follows next.  Together they make the lifted PF eigenvector a genuine ground state.
 

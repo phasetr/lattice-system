@@ -6,7 +6,8 @@ set_option linter.unusedSimpArgs false
 set_option linter.unusedVariables false
 
 /-!
-# Strict positivity of the axis-swapped bond off-diagonal entry on a transverse step (case (i) strict)
+# Strict positivity of the axis-swapped bond off-diagonal entry on a transverse step (case (i)
+strict)
 
 Issue #3739 (Tasaki §2.5 Theorem 2.4, Mattis–Nishimori).
 

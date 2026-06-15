@@ -6,7 +6,8 @@ import Mathlib.Order.Filter.AtTopBot.Basic
 # Diagonal extraction from an iterated limit (Tasaki Lemma 4.16)
 
 A double sequence `f : ℕ → ℕ → ℝ` (`f L m`) whose iterated limit vanishes,
-`lim_{m→∞} lim_{L→∞} f L m = 0`, admits a *diagonal* slow-diverging index `m(L)` along which it still
+`lim_{m→∞} lim_{L→∞} f L m = 0`, admits a *diagonal* slow-diverging index `m(L)` along which it
+still
 vanishes: there is a nondecreasing `m : ℕ → ℕ` with `m(L) → ∞` and `lim_{L→∞} f L (m L) = 0`.
 
 This is the elementary real-analysis lemma Tasaki uses to choose the slowly diverging tower size
@@ -15,7 +16,8 @@ It is purely analytic — no operators or physics — so we **discharge it axiom
 
 Construction (Tasaki's proof): with `g m = lim_L f L m → 0` and `ε m = 1/(m+1)`, pick a strictly
 increasing threshold `T m` with `T m ≥ N m` (where `|f L m − g m| < ε m` for `L ≥ N m`); set
-`m(L) = `the largest `k ≤ L` with `T k ≤ L` (`Nat.findGreatest`).  Then `m` is monotone, diverges, and
+`m(L) = `the largest `k ≤ L` with `T k ≤ L` (`Nat.findGreatest`).  Then `m` is monotone, diverges,
+and
 `|f L (m L)| ≤ |f L (m L) − g (m L)| + |g (m L)| → 0`.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
