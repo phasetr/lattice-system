@@ -2711,6 +2711,16 @@ fermion mode acting on `ℂ²` with computational basis
 | `fermionTotalDownNumber_commute_fermionUp{Creation,Annihilation,Number}` and the dual `fermionTotalUpNumber_commute_fermionDown{Creation,Annihilation,Number}` | the spinful number on one species commutes with every operator of the other species (different JW positions) | `Fermion/JordanWigner.lean` |
 | `fermionTotalDownNumber_commute_upHopping` / `fermionTotalUpNumber_commute_downHopping` | the spinful same-σ hopping term `c_{iσ}† c_{jσ}` commutes with the opposite-spin total number `N_{σ'≠σ}` (cross-spin half of `[H_kinetic, N_σ] = 0`) | `Fermion/JordanWigner.lean` |
 
+#### Fock space representation and Slater determinants (Tasaki §9.2.3)
+
+| Lean name | Statement | File |
+|---|---|---|
+| `fermionCreationFromVector` / `fermionAnnihilationFromVector` | smeared creation / annihilation operators `Ĉ†(φ) = Σ_x φ(x) ĉ†_x`, `Ĉ(φ) = Σ_x φ(x) ĉ_x` (Tasaki §9.2.3, eq. (9.2.46), p. 313) | `Fermion/JordanWigner/FockSpaceRepresentation.lean` |
+| `slaterState` | the Slater determinant state `\|Φ⟩ = Ĉ†(φ⁽¹⁾) ⋯ Ĉ†(φ⁽ᴺ⁾) \|Φvac⟩` (ordered `List.prod`; Tasaki eq. (9.2.52), p. 319) | `Fermion/JordanWigner/FockSpaceRepresentation.lean` |
+| `slaterGram` / `singleParticleInner` | single-particle overlap (Gram) matrix `(G)_{j,k} = ⟨φ⁽ʲ⁾, ψ⁽ᵏ⁾⟩` and its entry `Σ_x φ(x)* ψ(x)` | `Fermion/JordanWigner/FockSpaceRepresentation.lean` |
+| `slaterState_nil` / `fockInner_vacuum_self` | empty Slater state is the vacuum; `⟨Φvac, Φvac⟩ = 1` (the `n = 0` instance of Lemma 9.1, proved axiom-free as a consistency guard) | `Fermion/JordanWigner/FockSpaceRepresentation.lean` |
+| `lemma_9_1_slater_inner_det` / `lemma_9_1_slater_inner_perm_sum` | **Lemma 9.1** (Tasaki §9.2.3, p. 319, eq. (9.2.53), **AXIOM**): the Slater overlap `⟨Φ, Ψ⟩ = det(⟨φ⁽ʲ⁾, ψ⁽ᵏ⁾⟩) = Σ_p (sign p) ∏_j ⟨φ⁽ʲ⁾, ψ⁽ᵖ⁽ʲ⁾⁾⟩`. Faithful documented axiom for the determinant overlap identity (a heavy finite-dim Wick/Laplace+Koszul development); the permutation-sum form is derived from it via the Leibniz expansion. | `Fermion/JordanWigner/FockSpaceRepresentation.lean` |
+
 #### Hubbard spin symmetry — full SU(2) invariance (Tasaki §9.3.3)
 
 | Lean name | Statement | File |
