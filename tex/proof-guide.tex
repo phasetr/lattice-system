@@ -5269,7 +5269,7 @@ projection $\hat P_0$ is constructed concretely and its
 Hermitian/idempotent properties are proved as consistency guards.
 
 %======================================================================
-\subsection{Lieb's theorem for the attractive Hubbard model (Tasaki §10.2.1, Theorem 10.2)}
+\subsection{Lieb's theorem for the attractive Hubbard model (Tasaki §10.2.1, Theorems 10.2 \& 10.3)}
 \label{subsec:lieb-attractive}
 
 \noindent The attractive Hubbard model (Tasaki §10.2.1, eqs.~(10.2.1)/(10.2.2))
@@ -5293,6 +5293,19 @@ project policy this deep reflection-positivity result is recorded as a faithful
 documented \texttt{axiom}, built on a concrete attractive Hubbard Hamiltonian,
 with the unique-ground-state predicate \texttt{IsUniqueGroundStateOn} reused from
 the degenerate-perturbation development (§10.1).
+
+\medskip
+\noindent\textbf{Theorem 10.3} (Tian; Tasaki §10.2.1, p.~349, eq.~(10.2.4)).
+Under the hypotheses of Theorem 10.2, the unique ground state has strictly
+positive on-site pair-transfer correlation
+$\langle\Phi_{\rm GS}|\,\hat c^\dagger_{x\uparrow}\hat c^\dagger_{x\downarrow}
+\hat c_{y\downarrow}\hat c_{y\uparrow}\,|\Phi_{\rm GS}\rangle > 0$ for all
+$x, y \in \Lambda$, a measure of off-diagonal long-range order
+(\texttt{theorem\_10\_3\_tian\_pair\_correlation\_positive}). The textbook states
+$0 < N \le 2|\Lambda|$; the Lean statement uses the non-full guard
+$N < 2|\Lambda|$ (the fully-filled endpoint makes off-site pair transfer vanish in
+the concrete Fock representation). Proved by Tian's extension of Lieb's
+reflection-positivity method; recorded as a faithful documented \texttt{axiom}.
 
 %======================================================================
 \subsection{Effective Hamiltonian on the hard-core sector (Tasaki §11.2)}

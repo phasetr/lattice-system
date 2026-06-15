@@ -2852,13 +2852,14 @@ fermion mode acting on `ℂ²` with computational basis
 | `IsGroundEigenvalueOn` / `IsUniqueGroundStateOn` | ground-eigenvalue and unique-(normalized)-ground-state predicates for a Hermitian matrix restricted to a subspace | `Math/MatrixAnalysis/DegeneratePerturbation.lean` |
 | `tasaki_lemma_10_1_degenerate_perturbation` | **Lemma 10.1** (Tasaki §10.1, p. 346, **AXIOM**): assuming the first-order term vanishes on the degenerate subspace (`P̂₀ V̂ P̂₀ = 0`, so the effective theory is second-order, eq. (10.1.6)), if `Ĥeff` has a unique ground state on `ker Ĥ₀`, then `Ĥ(λ)` has a unique ground state for all sufficiently small `λ > 0`, converging (phase choice) to the effective ground state as `λ → 0⁺`. Analytic degenerate-perturbation theory → faithful documented axiom (companion to the strong-coupling `effectiveHamiltonian_strongCoupling_limit`, Theorem A.12). | `Math/MatrixAnalysis/DegeneratePerturbation.lean` |
 
-#### Lieb's theorem for the attractive Hubbard model (Tasaki §10.2.1, Theorem 10.2)
+#### Lieb's theorem for the attractive Hubbard model (Tasaki §10.2.1, Theorems 10.2 & 10.3)
 
 | Lean name | Statement | File |
 |---|---|---|
 | `hoppingSupportGraph` / `hubbardOnSiteInteractionSite` / `attractiveHubbardInteraction` / `attractiveHubbardHamiltonian` | the attractive Hubbard model `Ĥ = Ĥhop + Ĥatt-int` (eqs. (10.2.1)/(10.2.2)): general real symmetric hopping `T` (via `hubbardKinetic`) + site-dependent attraction `−Σ_x U_x n̂_{x,↑} n̂_{x,↓}`; the support graph encodes the connectivity hypothesis | `Fermion/JordanWigner/Hubbard/LiebAttractive.lean` |
 | `electronNumberSectorEuclidean` / `hubbardPairCorrelationOp` / `euclideanExpectation` | the `N`-electron sector (number eigenspace), the pair-transfer operator `ĉ†_{x↑}ĉ†_{x↓}ĉ_{y↓}ĉ_{y↑}`, and Euclidean expectation values | `Fermion/JordanWigner/Hubbard/LiebAttractive.lean` |
 | `theorem_10_2_lieb_attractive_unique_singlet` | **Theorem 10.2** (Tasaki §10.2.1, p. 348, **AXIOM**): for an even electron number `N` with `0 < N ≤ 2\|Λ\|`, connected real symmetric hopping, and site-dependent attraction `U_x > 0`, the ground state of `Ĥ` in the `N`-electron sector is unique and a spin singlet (`(Ŝ_tot)² = 0`). Lieb's spin-space reflection positivity → faithful documented axiom. | `Fermion/JordanWigner/Hubbard/LiebAttractive.lean` |
+| `theorem_10_3_tian_pair_correlation_positive` | **Theorem 10.3** (Tian; Tasaki §10.2.1, p. 349, eq. (10.2.4), **AXIOM**): under the Theorem 10.2 hypotheses (with the non-full guard `N < 2\|Λ\|`), the unique ground state has strictly positive on-site pair-transfer correlation `⟨ΦGS\| ĉ†_{x↑}ĉ†_{x↓}ĉ_{y↓}ĉ_{y↑} \|ΦGS⟩ > 0` for all `x, y` (off-diagonal long-range order). Reflection positivity (Tian's extension) → faithful documented axiom. | `Fermion/JordanWigner/Hubbard/LiebAttractive.lean` |
 
 #### Hubbard effective Hamiltonian on the hard-core sector (Tasaki §11.2)
 
