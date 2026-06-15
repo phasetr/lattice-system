@@ -113,3 +113,5 @@ theorem axisSwappedAnisotropicHeisenbergS_apply_eq_zero_of_magSum_parity_ne
         rw [onSiteS_mul_onSiteS_same]
         exact onSiteS_spinSOp2_sq_apply_eq_zero_of_magSum_parity_ne x hpar), mul_zero]
   rw [hbond, hsingle, add_zero]
+
+end LatticeSystem.Quantum

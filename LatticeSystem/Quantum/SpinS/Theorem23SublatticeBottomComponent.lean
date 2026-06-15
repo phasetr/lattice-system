@@ -40,7 +40,7 @@ theorem exists_sublattice_A_lowestWeight_component (A : Λ → Bool)
     (hztot : (totalSpinSOp3 Λ N).mulVec w = m • w)
     (hker : (totalSpinSOpMinus Λ N).mulVec w = 0)
     (hcasA : (sublatticeSpinSquaredS N A).mulVec w = α • w)
-    (hcasB : (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec w = β • w) :
+    (hcasB : (sublatticeSpinSquaredS N (fun x => !A x)).mulVec w = β • w) :
     ∃ (p : ℂ) (v : (Λ → Fin (N + 1)) → ℂ), v ≠ 0 ∧
       (sublatticeSpinSOp3 N A).mulVec v = p • v ∧
       (sublatticeSpinSOp3 N (fun x => ! A x)).mulVec v = (m - p) • v ∧

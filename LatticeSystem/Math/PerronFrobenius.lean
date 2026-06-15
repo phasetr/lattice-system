@@ -43,12 +43,11 @@ the Step 2 argument gives `w = 0`, hence `u = r v`. **[Fully proved.]**
 
 ## Sorry inventory
 
-- `exists_nonneg_eigenvec_max`: the Rayleigh equality condition
-  `w ⬝ᵥ (A *ᵥ w) = μ ‖w‖² → A *ᵥ w = μ • w` requires computing
-  `⟨w, Aw⟩` via the eigenbasis — blocked by Mathlib's `EuclideanSpace`/`n → ℝ` API gap.
-  This sorry is retained for documentation but is **no longer on the main proof path**:
-  `exists_pos_eigenvec_max` now calls `exists_positive_eigenvector_of_irreducible`
-  from `PerronFrobeniusMain` directly, bypassing this function entirely.
+None.  (The former documentation-only `exists_nonneg_eigenvec_max`, which carried
+a `sorry` for the Rayleigh equality step, was removed: it was never on the main
+proof path — `exists_pos_eigenvec_max` calls
+`exists_positive_eigenvector_of_irreducible` from `PerronFrobeniusMain` directly
+via the Collatz–Wielandt approach.)
 
 References: Seneta, *Non-negative Matrices and Markov Chains*, Ch. 1;
 Tasaki §11.2 (application to Nagaoka's theorem). Tracked in Issue #405.
@@ -59,23 +58,6 @@ namespace LatticeSystem.Math.PerronFrobenius
 open Matrix Finset
 
 variable {n : Type*} [Fintype n]
-
-/-! ## Non-negative max eigenvector (sorry for the Rayleigh equality step) -/
-
-/-- For a non-negative symmetric matrix, the maximum eigenvalue has a
-non-negative eigenvector.
-
-**Sorry**: the Rayleigh equality condition `R(|v|) = μ → A *ᵥ |v| = μ • |v|`
-requires computing `⟨w, Aw⟩` via the eigenbasis inner product. The mathematical
-argument is correct; the Lean proof is blocked by the `EuclideanSpace`/`n → ℝ` API.
-This function is retained for documentation; `exists_pos_eigenvec_max` now bypasses it
-via the Collatz-Wielandt approach (see `PerronFrobeniusMain`). -/
-theorem exists_nonneg_eigenvec_max [Nonempty n] [DecidableEq n]
-    {A : Matrix n n ℝ} (hA : A.IsHermitian)
-    (hNonneg : ∀ i j, 0 ≤ A i j) :
-    ∃ (μ : ℝ) (v : n → ℝ),
-      A *ᵥ v = μ • v ∧ v ≠ 0 ∧ (∀ i, 0 ≤ v i) ∧ ∀ k, hA.eigenvalues k ≤ μ := by
-  sorry
 
 /-! ## Strictly positive max eigenvector (irreducible case) -/
 
@@ -146,8 +128,8 @@ private lemma pos_of_nonneg_eigenvec
 /-- For an irreducible nonneg Hermitian matrix, the max eigenvalue has a
 strictly positive eigenvector.
 
-Proof: the sorry-bearing `exists_nonneg_eigenvec_max` is bypassed by calling
-`exists_positive_eigenvector_of_irreducible` directly (Collatz-Wielandt, PR C). -/
+Proof: `exists_positive_eigenvector_of_irreducible` is called directly
+(Collatz–Wielandt, PR C). -/
 theorem exists_pos_eigenvec_max [Nonempty n]
     {A : Matrix n n ℝ} (_ : A.IsHermitian) (hIrred : A.IsIrreducible) :
     ∃ (μ : ℝ) (v : n → ℝ), A *ᵥ v = μ • v ∧ v ≠ 0 ∧ ∀ i, 0 < v i := by

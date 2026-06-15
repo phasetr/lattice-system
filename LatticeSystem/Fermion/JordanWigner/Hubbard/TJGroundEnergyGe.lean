@@ -129,6 +129,9 @@ theorem tJ_groundEnergyAtFilling_ge_of_sectorMin (hpos : 0 < N) (Ne : ℕ) (hNeL
           (φ : EuclideanSpace ℂ _).ofLp := by
         rw [rayleighOnVec_tJFillingCompress, ← hcompl]
 
+-- Raised heartbeat budget: this E2 capstone chains several heavy facts (the lifted
+-- PF eigenvector admissibility and the W-restricted A.17 lower bound) whose combined
+-- elaboration exceeds the default limit.
 set_option maxHeartbeats 1000000 in
 /-- **E2 capstone: `groundEnergyAtFilling = μ`.** The ground energy of the d=1 ferromagnetic t-J
 model at odd filling `Ne` equals the Perron–Frobenius sector minimum `μ`: `≤` from the lifted PF
