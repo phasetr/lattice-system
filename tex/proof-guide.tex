@@ -5308,6 +5308,36 @@ the concrete Fock representation). Proved by Tian's extension of Lieb's
 reflection-positivity method; recorded as a faithful documented \texttt{axiom}.
 
 %======================================================================
+\subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
+\label{subsec:lieb-repulsive}
+
+\noindent The repulsive Hubbard model (Tasaki §10.2.2) has a \emph{bipartite}
+real symmetric connected hopping matrix $T$ ($\Lambda = A \sqcup B$, hopping
+only across sublattices; \texttt{HoppingRespectsBipartition}) and a repulsive
+on-site interaction, either the uniform form $\hat H_{\rm int} = U \sum_x
+\hat n_{x\uparrow}\hat n_{x\downarrow}$ ($U > 0$, eq.~(10.2.5),
+\texttt{repulsiveHubbardHamiltonian}) or the symmetric form $\sum_x U_x
+(\hat n_{x\uparrow}-\tfrac12)(\hat n_{x\downarrow}-\tfrac12)$ ($U_x > 0$,
+eq.~(10.2.6), \texttt{symmetricRepulsiveHubbardHamiltonian}). These hypotheses
+are packaged in \texttt{IsLiebRepulsiveModel}.
+
+\medskip
+\noindent\textbf{Theorem 10.4} (Lieb's theorem; Tasaki §10.2.2, p.~350). At
+half-filling $N = |\Lambda|$, every ground state has total spin
+$S_{\rm tot} = ||A|-|B||/2$, and the ground states are exactly
+$2 S_{\rm tot}+1 = |A|-|B|+1$ fold degenerate (the unavoidable SU(2) multiplet
+degeneracy). Formally
+(\texttt{theorem\_10\_4\_lieb\_repulsive\_half\_filling}): there is a ground
+energy $E_0$ whose $(N+1)$-electron ground subspace is nonzero, energy-minimal,
+lies in the Casimir eigenspace $S_0(S_0+1)$ with $S_0 = ||A|-|B||/2$, and has
+$\dim = |A|-|B|+1$.
+
+\emph{Status.} Proved by Lieb's spin-space reflection-positivity method (via the
+Shiba transformation from the attractive case, Theorem 10.2); per the project
+policy recorded as a faithful documented \texttt{axiom}, built on concrete
+repulsive Hubbard Hamiltonians.
+
+%======================================================================
 \subsection{Effective Hamiltonian on the hard-core sector (Tasaki §11.2)}
 \label{subsec:hubbard-effective-hamiltonian}
 %======================================================================

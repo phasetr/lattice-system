@@ -2861,6 +2861,15 @@ fermion mode acting on `ℂ²` with computational basis
 | `theorem_10_2_lieb_attractive_unique_singlet` | **Theorem 10.2** (Tasaki §10.2.1, p. 348, **AXIOM**): for an even electron number `N` with `0 < N ≤ 2\|Λ\|`, connected real symmetric hopping, and site-dependent attraction `U_x > 0`, the ground state of `Ĥ` in the `N`-electron sector is unique and a spin singlet (`(Ŝ_tot)² = 0`). Lieb's spin-space reflection positivity → faithful documented axiom. | `Fermion/JordanWigner/Hubbard/LiebAttractive.lean` |
 | `theorem_10_3_tian_pair_correlation_positive` | **Theorem 10.3** (Tian; Tasaki §10.2.1, p. 349, eq. (10.2.4), **AXIOM**): under the Theorem 10.2 hypotheses (with the non-full guard `N < 2\|Λ\|`), the unique ground state has strictly positive on-site pair-transfer correlation `⟨ΦGS\| ĉ†_{x↑}ĉ†_{x↓}ĉ_{y↓}ĉ_{y↑} \|ΦGS⟩ > 0` for all `x, y` (off-diagonal long-range order). Reflection positivity (Tian's extension) → faithful documented axiom. | `Fermion/JordanWigner/Hubbard/LiebAttractive.lean` |
 
+#### Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)
+
+| Lean name | Statement | File |
+|---|---|---|
+| `bipartitionComplement` / `HoppingRespectsBipartition` / `sublatticeImbalance` | the bipartition `Λ = A ⊔ Aᶜ`, the "hops only across sublattices" predicate, and `\|\|A\|−\|B\|\|` | `Fermion/JordanWigner/Hubbard/LiebRepulsive.lean` |
+| `repulsiveHubbardHamiltonian` / `symmetricRepulsiveHubbardInteraction` / `symmetricRepulsiveHubbardHamiltonian` | the uniform repulsive model `Ĥhop + U Σ n̂↑n̂↓` (eq. (10.2.5)) and the symmetric form `Σ_x U_x (n̂↑−½)(n̂↓−½)` (eq. (10.2.6)) | `Fermion/JordanWigner/Hubbard/LiebRepulsive.lean` |
+| `hubbardGroundSubmoduleAtElectronNumber` / `IsLiebRepulsiveHamiltonian` / `IsLiebRepulsiveModel` | non-hard-core fixed-`N` ground subspace (energy eigenspace ⊓ number sector); the two allowed interaction forms; the packaged model hypotheses (bipartite + symmetric + connected hopping) | `Fermion/JordanWigner/Hubbard/LiebRepulsive.lean` |
+| `theorem_10_4_lieb_repulsive_half_filling` | **Theorem 10.4** (Tasaki §10.2.2, p. 350, **AXIOM**): at half-filling `N = \|Λ\|`, the ground subspace is nonzero, energy-minimal, consists entirely of total-spin `S₀ = \|\|A\|−\|B\|\|/2` states (Casimir `S₀(S₀+1)`), and has dimension exactly `\|A\|−\|B\|+1` (the unavoidable SU(2) multiplet degeneracy). Lieb's reflection positivity via the Shiba transformation → faithful documented axiom. | `Fermion/JordanWigner/Hubbard/LiebRepulsive.lean` |
+
 #### Hubbard effective Hamiltonian on the hard-core sector (Tasaki §11.2)
 
 | Lean name | Statement | File |
