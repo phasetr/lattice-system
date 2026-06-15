@@ -8367,7 +8367,10 @@ $\Lambda_n\subseteq\Lambda_{n+1}$ (\texttt{hypercubicBox\_subset\_succ},
 (\texttt{exists\_mem\_hypercubicBox}, witness $n=\sum_i|x_i|+1$, as $\mathrm{Ioc}(-n,n)$ excludes
 $-n$), and $\bigcup_n\Lambda_n=\mathbb{Z}^d$ (\texttt{iUnion\_hypercubicBox}).  This is the
 increasing-region API $\Lambda_n\uparrow\mathbb{Z}^d$ along which finite-volume systems converge to
-the infinite system.  The §4.3 helpers \texttt{bond} ($B_\infty$) and \texttt{latticeBox}
+the infinite system.  The box \textbf{volume} is $|\Lambda_n|=(2n)^d$
+(\texttt{hypercubicBox\_card}, side $2n$ in each of $d$ directions), the normalization $L^d=(2n)^d$
+of the bulk-density and energy-density limits (eqs.~(4.3.4), (4.3.6)).  The §4.3 helpers
+\texttt{bond} ($B_\infty$) and \texttt{latticeBox}
 ($\Lambda_n$) are now thin wrappers over these graph-centric primitives
 (\texttt{bond\_iff\_adj}, \texttt{latticeBox\_eq\_hypercubicBox}), making the \texttt{Lattice} module
 the single source of truth.  Everything here is proved (no axioms).

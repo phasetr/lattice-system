@@ -2,6 +2,7 @@ import Mathlib.Combinatorics.SimpleGraph.Basic
 import Mathlib.Combinatorics.SimpleGraph.Bipartite
 import Mathlib.Combinatorics.SimpleGraph.Coloring
 import Mathlib.Data.Fintype.Pi
+import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Order.Interval.Finset.Basic
 import Mathlib.Data.Int.Interval
 import Mathlib.Algebra.Group.Int.Even
@@ -120,6 +121,15 @@ theorem iUnion_hypercubicBox :
   intro x
   obtain ⟨n, hn⟩ := exists_mem_hypercubicBox x
   exact Set.mem_iUnion.mpr ⟨n, hn⟩
+
+/-- The **volume** of the finite box is `(2n)ᵈ`: `|Λ_n| = (2n)ᵈ` (the box has
+side length `2n` in each of the `d` directions, Tasaki §4.3).  This is the volume
+normalization `Lᵈ = (2n)ᵈ` of the bulk-density / energy-density limits
+(eqs. (4.3.4), (4.3.6)). -/
+theorem hypercubicBox_card (d n : ℕ) : (hypercubicBox d n).card = (2 * n) ^ d := by
+  rw [hypercubicBox, Fintype.card_piFinset_const, Int.card_Ioc]
+  congr 1
+  omega
 
 /-! ### Bipartite structure: the even/odd parity sublattices
 
