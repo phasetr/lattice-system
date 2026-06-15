@@ -45,7 +45,7 @@ theorem rayleigh_quotient_at_eigenvector
   have h_num : (∑ i, v i * (M.mulVec v) i) = μ * (∑ i, v i * v i) := by
     have : ∀ i, v i * (M.mulVec v) i = μ * (v i * v i) := fun i => by
       have := congrFun hv i
-      simp [Pi.smul_apply, smul_eq_mul] at this
+      simp only [Pi.smul_apply, smul_eq_mul] at this
       rw [this]; ring
     rw [show (∑ i, v i * (M.mulVec v) i) = ∑ i, μ * (v i * v i) from
       Finset.sum_congr rfl (fun i _ => this i)]
