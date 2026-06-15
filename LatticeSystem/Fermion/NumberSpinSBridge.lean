@@ -31,6 +31,6 @@ theorem fermionNumber_eq_half_smul_one_sub_spinSOp3_one :
   unfold fermionNumber LatticeSystem.Quantum.spinSOp3
   ext i j
   fin_cases i <;> fin_cases j <;>
-    simp [Matrix.diagonal] <;> norm_num
+    simp [Matrix.diagonal]
 
 end LatticeSystem.Fermion

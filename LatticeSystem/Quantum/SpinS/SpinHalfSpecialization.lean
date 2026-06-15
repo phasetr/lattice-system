@@ -30,7 +30,7 @@ theorem spinSOpPlus_one_eq_spinHalfOpPlus :
     spinSOpPlus 1 = spinHalfOpPlus := by
   unfold spinSOpPlus spinHalfOpPlus
   ext i j
-  fin_cases i <;> fin_cases j <;> simp <;> norm_num
+  fin_cases i <;> fin_cases j <;> simp
 
 /-- `spinSOpMinus 1 = spinHalfOpMinus`: the spin-`S` lowering
 operator at `N = 1` is the standard spin-`1/2` lowering matrix
@@ -39,7 +39,7 @@ theorem spinSOpMinus_one_eq_spinHalfOpMinus :
     spinSOpMinus 1 = spinHalfOpMinus := by
   unfold spinSOpMinus spinHalfOpMinus
   ext i j
-  fin_cases i <;> fin_cases j <;> simp <;> norm_num
+  fin_cases i <;> fin_cases j <;> simp
 
 /-- `spinSOp3 1 = spinHalfOp3`: the spin-`S` `Ŝ^{(3)}` operator at
 `N = 1` is the standard spin-`1/2` operator `(1/2) • σ^z`. -/
@@ -47,7 +47,8 @@ theorem spinSOp3_one_eq_spinHalfOp3 :
     spinSOp3 1 = spinHalfOp3 := by
   unfold spinSOp3 spinHalfOp3 pauliZ
   ext i j
-  fin_cases i <;> fin_cases j <;> simp <;> norm_num
+  fin_cases i <;> fin_cases j <;> simp
+  norm_num
 
 /-- `spinSOp1 1 = spinHalfOp1`: the spin-`S` `Ŝ^{(1)}` operator at
 `N = 1` is the standard spin-`1/2` operator `(1/2) • σ^x`. -/
@@ -66,7 +67,6 @@ theorem spinSOp2_one_eq_spinHalfOp2 :
   rw [spinSOpPlus_one_eq_spinHalfOpPlus, spinSOpMinus_one_eq_spinHalfOpMinus]
   ext i j
   fin_cases i <;> fin_cases j <;>
-    simp [spinHalfOpPlus, spinHalfOpMinus, Complex.ext_iff] <;>
-    field_simp <;> ring
+    simp [spinHalfOpPlus, spinHalfOpMinus, Complex.ext_iff]
 
 end LatticeSystem.Quantum

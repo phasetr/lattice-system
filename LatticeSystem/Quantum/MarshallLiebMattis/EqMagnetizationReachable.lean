@@ -95,8 +95,9 @@ theorem exists_swap_pair_of_eq_magnetization
            else if x ∈ D10 then (-2 : ℤ) else 0) := by
         intro x
         simp only [hD01_def, hD10_def, Finset.mem_filter, Finset.mem_univ, true_and]
-        rcases h_σx : σ x with ⟨kx, _⟩ <;> rcases h_σ'x : σ' x with ⟨k'x, _⟩ <;>
-          interval_cases kx <;> interval_cases k'x <;> simp [spinSign]
+        rcases h_σx : σ x with ⟨kx, _⟩
+        rcases h_σ'x : σ' x with ⟨k'x, _⟩
+        interval_cases kx <;> interval_cases k'x <;> simp [spinSign]
       have hpoint_pair : ∀ x : Λ,
           spinSign (σ x) - spinSign (σ' x) =
           (if x ∈ D01 then (2 : ℤ) else 0) +

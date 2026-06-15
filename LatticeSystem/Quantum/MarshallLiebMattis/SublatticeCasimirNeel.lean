@@ -484,7 +484,6 @@ theorem magnetization_neelConfigOf (A : Λ → Bool) :
   rw [Finset.sum_add_distrib]
   rw [← Finset.sum_filter, Finset.sum_const]
   rw [← Finset.sum_filter, Finset.sum_const]
-  push_cast
   ring
 
 /-- **Sublattice-swap symmetry** of the spin-`1/2` Néel magnetization:

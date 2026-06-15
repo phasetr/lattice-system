@@ -62,7 +62,7 @@ theorem magEigenvalueS_eq_mMax_iff_allAlignedConfigS_zero
   · intro h
     rw [h, magEigenvalueS_allAlignedConfigS]
     rw [show ((0 : Fin (N + 1)).val : ℂ) = 0 from by simp]
-    push_cast; ring
+    ring
 
 set_option linter.unusedSectionVars false in
 /-- `magEigenvalueS σ = −m_max` iff `σ = allAlignedConfigS V N (Fin.last N)`. -/
@@ -94,7 +94,7 @@ theorem magEigenvalueS_eq_neg_mMax_iff_allAlignedConfigS_last
   · intro h
     rw [h, magEigenvalueS_allAlignedConfigS]
     rw [show ((Fin.last N).val : ℂ) = (N : ℂ) from by simp [Fin.last]]
-    push_cast; ring
+    ring
 
 /-! ## Magnetization subspace at the extremal eigenvalues -/
 
@@ -153,7 +153,7 @@ theorem span_allAlignedStateS_zero_le_magSubspaceS_mMax :
   rw [SetLike.mem_coe, mem_magSubspaceS_iff]
   rw [totalSpinSOp3_mulVec_allAlignedStateS, magEigenvalueS_allAlignedConfigS]
   rw [show ((0 : Fin (N + 1)).val : ℂ) = 0 from by simp]
-  push_cast; ring_nf
+  ring_nf
 
 /-- **`magSubspaceS V N m_max` is exactly the line through `|σ_⊤⟩`**. -/
 theorem magSubspaceS_mMax_eq_span_allAlignedStateS_zero :
@@ -216,7 +216,7 @@ theorem span_allAlignedStateS_last_le_magSubspaceS_neg_mMax :
   rw [SetLike.mem_coe, mem_magSubspaceS_iff]
   rw [totalSpinSOp3_mulVec_allAlignedStateS, magEigenvalueS_allAlignedConfigS]
   rw [show ((Fin.last N).val : ℂ) = (N : ℂ) from by simp [Fin.last]]
-  push_cast; ring_nf
+  ring_nf
 
 /-- **`magSubspaceS V N (-m_max)` is exactly the line through `|σ_⊥⟩`**. -/
 theorem magSubspaceS_neg_mMax_eq_span_allAlignedStateS_last :
