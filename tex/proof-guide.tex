@@ -5269,6 +5269,32 @@ projection $\hat P_0$ is constructed concretely and its
 Hermitian/idempotent properties are proved as consistency guards.
 
 %======================================================================
+\subsection{Lieb's theorem for the attractive Hubbard model (Tasaki §10.2.1, Theorem 10.2)}
+\label{subsec:lieb-attractive}
+
+\noindent The attractive Hubbard model (Tasaki §10.2.1, eqs.~(10.2.1)/(10.2.2))
+has Hamiltonian $\hat H = \hat H_{\rm hop} + \hat H_{\rm att\text{-}int}$ with an
+arbitrary real symmetric hopping matrix $T$ (whose support graph
+\texttt{hoppingSupportGraph} is connected; arbitrary on-site energies $T_{xx}$
+allowed) and site-dependent on-site attraction
+$\hat H_{\rm att\text{-}int} = -\sum_x U_x\,\hat n_{x\uparrow}\hat n_{x\downarrow}$,
+$U_x > 0$ (\texttt{attractiveHubbardHamiltonian}, reusing the general kinetic
+term \texttt{hubbardKinetic}).
+
+\medskip
+\noindent\textbf{Theorem 10.2} (Lieb's theorem; Tasaki §10.2.1, p.~348). For an
+even electron number $N$ with $0 < N \le 2|\Lambda|$, the ground state of
+$\hat H$ in the $N$-electron sector is unique and a spin singlet,
+$(\hat S_{\rm tot})^2 = 0$
+(\texttt{theorem\_10\_2\_lieb\_attractive\_unique\_singlet}).
+
+\emph{Status.} Proved by Lieb's spin-space reflection-positivity method; per the
+project policy this deep reflection-positivity result is recorded as a faithful
+documented \texttt{axiom}, built on a concrete attractive Hubbard Hamiltonian,
+with the unique-ground-state predicate \texttt{IsUniqueGroundStateOn} reused from
+the degenerate-perturbation development (§10.1).
+
+%======================================================================
 \subsection{Effective Hamiltonian on the hard-core sector (Tasaki §11.2)}
 \label{subsec:hubbard-effective-hamiltonian}
 %======================================================================
