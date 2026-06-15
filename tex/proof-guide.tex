@@ -8443,6 +8443,20 @@ limit value is existentially bound (pinned to the genuine limit of the box seque
 Hausdorff property of $\mathbb{R}$), not an arbitrary constant; the existence of the thermodynamic
 limit is the deep analytic / operator-algebraic content recorded as the axiom.
 
+\smallskip\noindent\emph{Thermodynamic-limit bridge (Issue \#4564 capstone, PR3).}  The named limit
+$\varepsilon_{\mathrm{GS}}(d,N)=\texttt{boxGroundEnergyDensitySLimit}\,d\,N$ (selected from the PR2
+axiom, proved to be the limit by \texttt{boxGroundEnergyDensityS\_tendsto\_limit}) is connected to the
+abstract §4.3 system.  Because the finite matrix algebras are \emph{not} identified with the abstract
+quasi-local $C^\ast$-algebra $A$, the bridge is a documented \emph{conditional} predicate
+$\texttt{IsAFMThermodynamicLimit}\,S\,N$ (``$S$ is the $L\uparrow\infty$ limit of the concrete box AFM
+model'').  The documented axiom \texttt{afmThermodynamicLimit\_energyDensity} states that such an $S$
+has abstract ground-state energy density $\varepsilon_{\mathrm{GS}}(d,N)$
+(\texttt{IsGroundStateEnergyDensity}), and then \texttt{afmThermodynamicLimit\_exists\_omega0} is a
+\textbf{proved} theorem (via Theorem 4.20): an infinite-volume ground state $\omega_0$ exists for the
+box AFM model's thermodynamic limit, with $\omega_0(\hat S_x^{(\alpha)})=0$ (eqs.~(4.3.7), (4.3.9)).
+The existence of the limit system $S$ itself (the quasi-local $C^\ast$-algebra inductive limit) is a
+heavier statement deferred to a future thread.
+
 \medskip
 \noindent\textbf{Theorem 4.22} (Tasaki §4.4.1, eqs.~(4.4.1)--(4.4.6), pp.~117--119; documented
 axioms, \texttt{Quantum/SpinS/HeisenbergEquilibrium.lean}, Issue \#4485).  The one-dimensional

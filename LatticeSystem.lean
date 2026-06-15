@@ -66,6 +66,7 @@ import LatticeSystem.Quantum.SpinS.AndersonTowerSphereAverage
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensate
 import LatticeSystem.Quantum.SpinS.HeisenbergEquilibrium
 import LatticeSystem.Quantum.SpinS.HypercubicBoxModel
+import LatticeSystem.Quantum.SpinS.HypercubicBoxThermodynamicLimit
 import LatticeSystem.Quantum.SpinS.InfiniteVolumeGroundState
 import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphAltPath
