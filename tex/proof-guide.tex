@@ -4556,6 +4556,57 @@ closed form, im-of-Hermitian, commutator, mul-Hamiltonian-im,
 hamiltonian-pow-im, anticommutator, commutator-re,
 partition function im, ofReal-re-eq, pow-trace).
 
+\subsection{Fock space representation and Slater determinants (Tasaki §9.2.3)}
+\label{subsec:fock-slater}
+
+\noindent The second-quantized (Fock space) representation of
+tight-binding electrons is developed in
+\texttt{Fermion/JordanWigner/FockSpaceRepresentation.lean}, working in
+the concrete Jordan--Wigner representation on
+$(\Lambda \to \mathrm{Fin}\,2) \to \mathbb{C}$. For a single-electron
+wave function $\varphi : \Lambda \to \mathbb{C}$ the smeared creation
+operator is
+\[
+  \hat C^\dagger(\varphi) = \sum_{x \in \Lambda} \varphi(x)\, \hat c^\dagger_x
+  \qquad (\text{Tasaki eq.~(9.2.46), p.~313}),
+\]
+(\texttt{fermionCreationFromVector}), and the \emph{Slater determinant
+state} of $\varphi^{(1)},\dots,\varphi^{(N)}$ is the ordered product
+\[
+  |\Phi\rangle = \hat C^\dagger(\varphi^{(1)}) \cdots
+    \hat C^\dagger(\varphi^{(N)}) |\Phi_{\rm vac}\rangle
+  \qquad (\text{Tasaki eq.~(9.2.52), p.~319}),
+\]
+(\texttt{slaterState}, an ordered \texttt{List.prod} since matrix
+multiplication is noncommutative).
+
+\medskip
+\noindent\textbf{Lemma 9.1} (Tasaki §9.2.3, p.~319, eq.~(9.2.53)).
+For two Slater determinant states $|\Phi\rangle$ and $|\Psi\rangle$,
+the inner product equals the determinant of the single-particle
+overlap (Gram) matrix:
+\[
+  \langle \Phi | \Psi \rangle
+    = \det\bigl(\langle \varphi^{(j)}, \psi^{(k)} \rangle\bigr)_{j,k}
+    = \sum_{p} (\operatorname{sign} p)
+        \prod_{j=1}^{N} \langle \varphi^{(j)}, \psi^{(p(j))} \rangle,
+\]
+where $p$ runs over all permutations.
+
+\emph{Status.} In the concrete Jordan--Wigner representation this is a
+finite-dimensional linear-algebra identity, but a direct sorry-free
+proof requires a dedicated anticommutator Wick/Laplace expansion with
+the associated ordered-list (Koszul) sign bookkeeping, comparable in
+size to the flat-band Slater-reorder development. It is therefore
+recorded as a faithful documented \texttt{axiom}
+(\texttt{lemma\_9\_1\_slater\_inner\_det}); its permutation-sum form
+(\texttt{lemma\_9\_1\_slater\_inner\_perm\_sum}) is derived from it by
+the Leibniz determinant expansion, and its $n = 0$ instance
+$\langle \Phi_{\rm vac}, \Phi_{\rm vac}\rangle = 1$
+(\texttt{fockInner\_vacuum\_self}) is proved axiom-free as a
+consistency guard. The downstream Lemmas 9.2 and 9.3 will be proved
+from this identity.
+
 \subsection{Hubbard spin symmetry: U(1)\texorpdfstring{$\times$}{×}U(1) invariance (Tasaki §9.3.3)}
 \label{subsec:hubbard-spin-symmetry}
 
