@@ -7,7 +7,8 @@ import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
 
 Issue #3739 — Tasaki §2.5 Theorem 2.4 obligation (2) first-crossing argument.
 
-The anisotropic analog of `heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen`
+The anisotropic analog of
+`heisenbergHamiltonianSMatrixOnMagSector_mulVec_magSectorRestriction_of_full_eigen`
 (in `MagSectorEmbedding.lean`): a full-Hilbert-space eigenvector `Ψ` of
 `Ĥ(λ, D)` at energy `μ` restricts to a sector-`M` eigenvector of the sector
 submatrix `Ĥ_M(λ, D)` at the same `μ`.
