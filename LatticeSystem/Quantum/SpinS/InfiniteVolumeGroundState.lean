@@ -146,6 +146,40 @@ def staggeredSign (x : Fin d → ℤ) : ℝ := if Even (∑ i, x i) then 1 else 
 /-- A vector `n : Fin 3 → ℝ` is a **unit vector** when `Σ_α (n α)² = 1`. -/
 def IsUnitVector (n : Fin 3 → ℝ) : Prop := (∑ α, (n α) ^ 2) = 1
 
+/-! ### Parity bridge to the graph-centric sublattices
+
+The §4.3 quantum-side parity helpers `evenSite` / `staggeredSign` agree with the
+graph-centric even/odd sublattices `Lattice.hypercubicEvenSublattice` /
+`hypercubicOddSublattice` of the bipartite hypercubic lattice (Issue #4557). -/
+
+/-- A site is **even** (`evenSite`) iff it lies in the graph-centric even
+sublattice `ℤᵈ_even` (the A-sublattice of the bipartite hypercubic lattice). -/
+theorem evenSite_iff_mem_hypercubicEvenSublattice (x : Fin d → ℤ) :
+    evenSite x ↔ x ∈ LatticeSystem.Lattice.hypercubicEvenSublattice d := by
+  simp only [evenSite, LatticeSystem.Lattice.hypercubicEvenSublattice, Set.mem_setOf_eq,
+    Int.even_iff]
+
+/-- A site lies in the graph-centric odd sublattice `ℤᵈ_odd` (the B-sublattice)
+iff it is **not** an even site. -/
+theorem mem_hypercubicOddSublattice_iff_not_evenSite (x : Fin d → ℤ) :
+    x ∈ LatticeSystem.Lattice.hypercubicOddSublattice d ↔ ¬ evenSite x := by
+  simp only [LatticeSystem.Lattice.hypercubicOddSublattice, Set.mem_setOf_eq, evenSite,
+    Int.even_iff]
+
+/-- The staggered sign is `+1` exactly on the even sublattice. -/
+theorem staggeredSign_eq_one_iff_mem_hypercubicEvenSublattice (x : Fin d → ℤ) :
+    staggeredSign x = 1 ↔ x ∈ LatticeSystem.Lattice.hypercubicEvenSublattice d := by
+  rw [show (x ∈ LatticeSystem.Lattice.hypercubicEvenSublattice d) ↔ Even (∑ i, x i) from Iff.rfl]
+  unfold staggeredSign
+  by_cases h : Even (∑ i, x i) <;> norm_num [h]
+
+/-- The staggered sign is `−1` exactly on the odd sublattice. -/
+theorem staggeredSign_eq_neg_one_iff_mem_hypercubicOddSublattice (x : Fin d → ℤ) :
+    staggeredSign x = -1 ↔ x ∈ LatticeSystem.Lattice.hypercubicOddSublattice d := by
+  rw [show (x ∈ LatticeSystem.Lattice.hypercubicOddSublattice d) ↔ ¬ Even (∑ i, x i) from Iff.rfl]
+  unfold staggeredSign
+  by_cases h : Even (∑ i, x i) <;> norm_num [h]
+
 /-- **`εGS` is the ground-state energy density of `S`** (an uninterpreted documented predicate): the
 per-bond ground-state energy density `ε_GS = lim_L E_GS,L / |B_L|` (eq. (4.3.4)) of the
 antiferromagnetic Heisenberg model `S`.  Kept uninterpreted so Theorem 4.20 asserts the existence of

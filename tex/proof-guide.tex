@@ -8389,7 +8389,12 @@ $x\mapsto[\sum_i x_i\bmod 2]$ (\texttt{hypercubicParityColoring}, a
 $\texttt{Coloring}\,(\mathrm{Fin}\,2)$) gives
 $G.\texttt{IsBipartite}=\texttt{Colorable}\,2$
 (\texttt{hypercubicLatticeGraph\_isBipartite}).  This is the combinatorial structure underlying
-antiferromagnetic / N\'eel order.  All proved (no axioms).
+antiferromagnetic / N\'eel order.  The §4.3 quantum-side parity helpers \texttt{evenSite} and
+\texttt{staggeredSign} agree with this graph-centric bipartition
+(\texttt{evenSite\_iff\_mem\_hypercubicEvenSublattice},
+\texttt{staggeredSign\_eq\_one\_iff\_mem\_hypercubicEvenSublattice} and the odd counterparts:
+$\varepsilon_x=\pm1$ exactly on $\mathbb{Z}^d_{\mathrm{even}}$ / $\mathbb{Z}^d_{\mathrm{odd}}$).  All
+proved (no axioms).
 
 \medskip
 \noindent\textbf{Theorem 4.22} (Tasaki §4.4.1, eqs.~(4.4.1)--(4.4.6), pp.~117--119; documented
