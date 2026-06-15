@@ -31,7 +31,7 @@ theorem strict_gap_all_M_below_sInf_of_argmin
     [Nonempty (magConfigS Λ N M_balanced)] [Nonempty (magConfigS Λ N M_chosen)]
     [Nonempty (Λ → Fin (N + 1))]
     (lam' D' : ℝ)
-    (hne_chosen :
+    (_hne_chosen :
       (perMCrossingSet (Λ := Λ) hJ N M_balanced M_chosen lam' D' ∩ Icc (0 : ℝ) 1).Nonempty)
     (h_argmin :
       ∀ M' : ℕ, ∀ _ : Nonempty (magConfigS Λ N M'), M' ≠ M_balanced →
@@ -58,7 +58,7 @@ theorem strict_gap_all_M_below_sInf_of_argmin
     -- t' ∈ Icc 0 1. If E_M'(γ(t')) ≤ E_balanced(γ(t')), then t' ∈ perMCrossingSet ∩ Icc 0 1
     -- = ∅. Contradiction.
     by_contra h_not_strict
-    push_neg at h_not_strict
+    push Not at h_not_strict
     have h_t'_in : t' ∈ perMCrossingSet (Λ := Λ) hJ N M_balanced M' lam' D' ∩ Icc (0 : ℝ) 1 :=
       ⟨h_not_strict, ht'_in_Icc⟩
     rw [h_M'_ne] at h_t'_in

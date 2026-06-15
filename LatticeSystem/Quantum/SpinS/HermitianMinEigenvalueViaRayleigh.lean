@@ -30,6 +30,7 @@ theorem exists_index_eigenvalue_eq_hermitianMinEigenvalue
   obtain ⟨i, _, hi⟩ := h
   exact ⟨i, hi⟩
 
+omit [Nonempty n] in
 /-- For each index `i`, the unit-eigenvector `(hM.eigenvectorBasis i).ofLp` has
 `dotProduct (star v) v = 1`. This is the matrix-side unit normalisation of the
 orthonormal eigenvector basis. -/

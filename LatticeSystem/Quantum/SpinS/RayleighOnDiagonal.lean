@@ -60,6 +60,7 @@ theorem rayleighOnVec_diagonal_real (lam : n → ℝ) (v : n → ℂ) :
 
 variable [Nonempty n]
 
+omit [DecidableEq n] in
 /-- Finite-sum lower bound: `Σ_i (‖v_i‖² · lam_i) ≥ (min_i lam_i) · Σ_i ‖v_i‖²`. -/
 theorem sum_normSq_mul_real_ge_min_mul_sum (lam : n → ℝ) (v : n → ℂ) :
     (Finset.univ.image lam).min' (Finset.image_nonempty.mpr Finset.univ_nonempty) *

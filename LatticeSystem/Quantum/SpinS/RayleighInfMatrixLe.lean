@@ -35,6 +35,7 @@ theorem rayleighInfMatrix_le_hermitianMinEigenvalue
   rayleighInfMatrix_le_hermitianMinEigenvalue_of_bddBelow hM
     (rayleighOnVec_bddBelow_on_unit_sphere M)
 
+omit [DecidableEq n] [Nonempty n] in
 /-- **Unconditional upper bound at a unit vector**: for Hermitian `M` and any unit `v`,
 `rayleighInfMatrix M ≤ rayleighOnVec M v`. -/
 theorem rayleighInfMatrix_le_rayleighOnVec
