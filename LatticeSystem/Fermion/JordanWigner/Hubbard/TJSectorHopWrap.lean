@@ -62,7 +62,8 @@ private theorem tJ_wrap_uphop_le_eq_one (N : ℕ) (s : Fin (N + 1) → Fin 3) (a
   rw [hfilter, Finset.sum_singleton, tJConfigOf_apply_up, if_pos ha]
   rfl
 
-/-- **Wrap up-hop is sign-free for odd `Ne`.**  For the cycle's wrap bond (`a.val = 0`, `b.val = N`),
+/-- **Wrap up-hop is sign-free for odd `Ne`.**  For the cycle's wrap bond (`a.val = 0`, `b.val =
+N`),
 source `a` ↑, target `b` empty, and an odd electron number `Ne = #↑ + #↓`, the strictly-between
 occupation is `Ne − 1` (even), so `ĉ†_{b↑}ĉ_{a↑} |Φ_s⟩ = |Φ_{tJSiteHop s a b}⟩`. -/
 theorem tJ_uphop_wrap_mulVec (N : ℕ) (s : Fin (N + 1) → Fin 3) (a b : Fin (N + 1))

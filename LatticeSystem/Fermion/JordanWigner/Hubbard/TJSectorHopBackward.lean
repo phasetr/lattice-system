@@ -37,7 +37,8 @@ theorem tJ_uphop_backward_nn_mulVec (N : ℕ) (s : Fin (N + 1) → Fin 3) (a b :
   have hcq : tJConfigOf N s (spinfulIndex N b 0) = 1 := by rw [tJConfigOf_apply_up, if_pos ha]
   have hcpz : tJConfigOf N s (spinfulIndex N a 0) = 0 := by
     rw [tJConfigOf_apply_up, if_neg (by rw [hsa]; decide)]
-  have hcp : (Function.update (tJConfigOf N s) (spinfulIndex N b 0) 0) (spinfulIndex N a 0) = 0 := by
+  have hcp : (Function.update (tJConfigOf N s) (spinfulIndex N b 0) 0) (spinfulIndex N a 0) = 0 :=
+      by
     rw [Function.update_of_ne hpne, hcpz]
   rw [fermionMultiCreation_mul_Annihilation_mulVec_basisVec, if_pos ⟨hcq, hcp⟩,
     jwSign_mul_jwSign_update_backward (2 * N + 1) (spinfulIndex N b 0) (spinfulIndex N a 0)
@@ -68,7 +69,8 @@ theorem tJ_downhop_backward_nn_mulVec (N : ℕ) (s : Fin (N + 1) → Fin 3) (a b
   have hcq : tJConfigOf N s (spinfulIndex N b 1) = 1 := by rw [tJConfigOf_apply_down, if_pos ha]
   have hcpz : tJConfigOf N s (spinfulIndex N a 1) = 0 := by
     rw [tJConfigOf_apply_down, if_neg (by rw [hsa]; decide)]
-  have hcp : (Function.update (tJConfigOf N s) (spinfulIndex N b 1) 0) (spinfulIndex N a 1) = 0 := by
+  have hcp : (Function.update (tJConfigOf N s) (spinfulIndex N b 1) 0) (spinfulIndex N a 1) = 0 :=
+      by
     rw [Function.update_of_ne hpne, hcpz]
   rw [fermionMultiCreation_mul_Annihilation_mulVec_basisVec, if_pos ⟨hcq, hcp⟩,
     jwSign_mul_jwSign_update_backward (2 * N + 1) (spinfulIndex N b 1) (spinfulIndex N a 1)
@@ -83,7 +85,8 @@ theorem tJ_downhop_backward_nn_mulVec (N : ℕ) (s : Fin (N + 1) → Fin 3) (a b
     rfl
   rw [hsum, pow_zero, one_smul]
 
-/-- **Leftward NN up-hop matrix element.**  `⟨Φ_{s'} | ĉ†_{a↑}ĉ_{b↑} | Φ_s⟩ = [s' = tJSiteHop s b a]`. -/
+/-- **Leftward NN up-hop matrix element.**  `⟨Φ_{s'} | ĉ†_{a↑}ĉ_{b↑} | Φ_s⟩ = [s' = tJSiteHop s b
+a]`. -/
 theorem tJ_uphop_backward_nn_matrixElement (N : ℕ) (s s' : Fin (N + 1) → Fin 3) (a b : Fin (N + 1))
     (hb : b.val = a.val + 1) (ha : s b = 1) (hsa : s a = 0) :
     (∑ w, basisVec (tJConfigOf N s') w *

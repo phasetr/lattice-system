@@ -42,10 +42,12 @@ theorem tasaki23_toy_min_energy_arith (a b sA sB : ℝ)
   rcases le_total b a with hba | hab
   · -- a ≥ b: |a − b| = a − b, f(a,b) = −2 b (a + 1).
     rw [abs_of_nonneg (by linarith)]
-    nlinarith [mul_le_mul hbB (by linarith : a + 1 ≤ sA + 1) (by linarith) (by linarith : (0:ℝ) ≤ sB)]
+    nlinarith [mul_le_mul hbB (by linarith : a + 1 ≤ sA + 1) (by linarith) (by linarith : (0:ℝ) ≤
+        sB)]
   · -- a < b: |a − b| = b − a, f(a,b) = −2 a (b + 1).
     rw [abs_of_nonpos (by linarith)]
     have hasB : a ≤ sB := le_trans hab hbB
-    nlinarith [mul_le_mul hasB (by linarith : b + 1 ≤ sA + 1) (by linarith) (by linarith : (0:ℝ) ≤ sB)]
+    nlinarith [mul_le_mul hasB (by linarith : b + 1 ≤ sA + 1) (by linarith) (by linarith : (0:ℝ) ≤
+        sB)]
 
 end LatticeSystem.Quantum

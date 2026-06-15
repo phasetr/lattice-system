@@ -74,15 +74,18 @@ theorem tasaki23_toy_groundState_casimir_eq_predicted_of_energy_le
   have hΨ_ne : Ψ ≠ 0 := tasaki23_marshallPositive_magSectorEmbedding_ne_zero A hv_pos
   -- Joint Casimir eigenvector (#3657): total and sublattice eigen-equations.
   obtain ⟨⟨γ_tot, htot⟩, _, _⟩ :=
-    tasaki23_toy_groundState_joint_casimir_eigenvector_legacy A N c hc_strict h_intermediate hv_pos hH
+    tasaki23_toy_groundState_joint_casimir_eigenvector_legacy A N c hc_strict h_intermediate hv_pos
+        hH
   -- Sublattice Casimir bounds (#3677).
   obtain ⟨⟨γ_A, hA_eq, hA_bd⟩, ⟨γ_B, hB_eq, hB_bd⟩⟩ :=
-    tasaki23_toy_groundState_sublattice_casimir_re_le_legacy A N c hc_strict h_intermediate hv_pos hH
+    tasaki23_toy_groundState_sublattice_casimir_re_le_legacy A N c hc_strict h_intermediate hv_pos
+        hH
   -- Toy energy formula (#3673): Ĥ_toy Ψ = (γ_tot − γ_A − γ_B) • Ψ.
   have hEnergy := heisenbergToyHamiltonianS_mulVec_of_joint_casimir_eigenvector A htot hA_eq hB_eq
   -- Ĥ_toy = heisenbergHamiltonianS (bipartiteCoupling A); so μ = γ_tot − γ_A − γ_B.
   have hμ_eq : (γ_tot - γ_A - γ_B) = (μ : ℂ) := by
-    have hHtoy : heisenbergToyHamiltonianS (Λ := V) A N = heisenbergHamiltonianS (bipartiteCoupling A) N :=
+    have hHtoy : heisenbergToyHamiltonianS (Λ := V) A N = heisenbergHamiltonianS (bipartiteCoupling
+        A) N :=
       rfl
     rw [hHtoy] at hEnergy
     have hcombine : (γ_tot - γ_A - γ_B) • Ψ = (μ : ℂ) • Ψ := hEnergy.symm.trans hH

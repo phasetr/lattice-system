@@ -121,7 +121,8 @@ theorem hermitianMinEigenvalue_axisSwapped_le_parity_block_min
         have h1 : magSumS σ % 2 < 2 := Nat.mod_lt _ (by norm_num)
         have h2 : magSumS τ % 2 < 2 := Nat.mod_lt _ (by norm_num)
         omega
-      exact axisSwappedAnisotropicHeisenbergS_apply_eq_zero_of_magSum_parity_ne hJself lam D hne hodd)
+      exact axisSwappedAnisotropicHeisenbergS_apply_eq_zero_of_magSum_parity_ne hJself lam D hne
+          hodd)
     (axisSwappedAnisotropicHeisenbergS_commute_magParityDiagS hJself lam D)
     ((μp : ℝ) : ℂ)
   have hpos_p : 1 ≤ finrank ℂ ↥(End.eigenspace (Matrix.toLin'

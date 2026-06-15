@@ -24,7 +24,8 @@ open Matrix Module
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-/-- **(#3887.6-dressed) Dressed submatrix hermitianMinEigenvalue identification (no `h_intermediate`)**. -/
+/-- **(#3887.6-dressed) Dressed submatrix hermitianMinEigenvalue identification (no
+`h_intermediate`)**. -/
 theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)
@@ -108,7 +109,8 @@ theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalu
     hermitianMinEigenvalue_eq_of_spectrum_eq _ _ h_spec_eq
   linarith [h_min_lift, h_min_bridge]
 
-/-- **(#3887.6-bare) Bare submatrix hermitianMinEigenvalue identification (no `h_intermediate`)**. -/
+/-- **(#3887.6-bare) Bare submatrix hermitianMinEigenvalue identification (no `h_intermediate`)**.
+-/
 theorem axisSwappedAnisotropicHeisenbergS_submatrix_hermitianMinEigenvalue_eq_pf
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)

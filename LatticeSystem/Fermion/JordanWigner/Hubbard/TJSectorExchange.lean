@@ -53,7 +53,8 @@ theorem tJConfigOf_tJSpinSwap (N : ℕ) (s : Fin (N + 1) → Fin 3) (i j : Fin (
 
 /-! ### The same-site Jordan–Wigner string cancellations -/
 
-/-- The modes below the successor `q` (`q.val = p.val + 1`) are those below `p` together with `p`. -/
+/-- The modes below the successor `q` (`q.val = p.val + 1`) are those below `p` together with `p`.
+-/
 private theorem tJ_filt_succ (M : ℕ) (p q : Fin (M + 1)) (hq : q.val = p.val + 1) :
     (Finset.univ.filter (fun k : Fin (M + 1) => k.val < q.val))
       = insert p (Finset.univ.filter (fun k => k.val < p.val)) := by
@@ -166,7 +167,8 @@ theorem fermionSiteSpinPlus_mul_Minus_mulVec_tJConfigOf (N : ℕ) (s : Fin (N + 
       = jwSign (2 * N + 1) (spinfulIndex N i 1) c2 • basisVec c3 := by
     rw [fermionMultiAnnihilation_mulVec_basisVec, if_pos hc2id]
   have step4 : (fermionMultiCreation (2 * N + 1) (spinfulIndex N i 0)).mulVec (basisVec c3)
-      = jwSign (2 * N + 1) (spinfulIndex N i 0) c3 • basisVec (tJConfigOf N (tJSpinSwap s i j)) := by
+      = jwSign (2 * N + 1) (spinfulIndex N i 0) c3 • basisVec (tJConfigOf N (tJSpinSwap s i j)) :=
+          by
     rw [fermionMultiCreation_mulVec_basisVec, if_pos hc3iu]
     congr 2
     rw [hc3, hc2, hc1, hcdef]; exact tJConfigOf_tJSpinSwap N s i j hi hj

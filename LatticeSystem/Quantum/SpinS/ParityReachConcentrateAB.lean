@@ -67,7 +67,8 @@ theorem parityReachableS_concentrate_AB
   -- σ_A on B-sites: σ_A b = σ b (since B-sites are not in A, hence not in aSitesExcept A a₀).
   have hsig_A_bSite : ∀ b, A b = false → σ_A b = σ b := by
     intro b hAb
-    have hb_ne_a₀ : b ≠ a₀ := by intro h; rw [h] at hAb; exact absurd (hAb.symm.trans ha₀) (by decide)
+    have hb_ne_a₀ : b ≠ a₀ := by intro h; rw [h] at hAb; exact absurd (hAb.symm.trans ha₀) (by
+        decide)
     have hb_notin : b ∉ aSitesExcept A a₀ := fun h => by
       have := (mem_aSitesExcept.mp h).1
       rw [hAb] at this; exact absurd this (by decide)
@@ -89,7 +90,8 @@ theorem parityReachableS_concentrate_AB
       (by intro h; exact (mem_bSitesExcept.mp h).2 rfl) with hsig_AB
   refine ⟨σ_AB, ParityReachableS.trans hreach_A hreach_B, ?_, ?_, ?_, ?_⟩
   · -- σ_AB a₀ = σ_A a₀ (a₀ ∉ B-sites since a₀ ∈ A).
-    have ha₀_ne_b₀ : a₀ ≠ b₀ := by intro h; rw [h] at ha₀; exact absurd (ha₀.symm.trans hb₀) (by decide)
+    have ha₀_ne_b₀ : a₀ ≠ b₀ := by intro h; rw [h] at ha₀; exact absurd (ha₀.symm.trans hb₀) (by
+        decide)
     have ha₀_notin_B : a₀ ∉ bSitesExcept A b₀ := fun h => by
       have := (mem_bSitesExcept.mp h).1
       rw [ha₀] at this; exact absurd this (by decide)
@@ -110,7 +112,8 @@ theorem parityReachableS_concentrate_AB
   · intro a ha
     have ha_ne_a₀ : a ≠ a₀ := (mem_aSitesExcept.mp ha).2
     have hAa : A a = true := (mem_aSitesExcept.mp ha).1
-    have ha_ne_b₀ : a ≠ b₀ := by intro h; rw [h] at hAa; exact absurd (hAa.symm.trans hb₀) (by decide)
+    have ha_ne_b₀ : a ≠ b₀ := by intro h; rw [h] at hAa; exact absurd (hAa.symm.trans hb₀) (by
+        decide)
     have ha_notin_B : a ∉ bSitesExcept A b₀ := fun h => by
       have := (mem_bSitesExcept.mp h).1
       rw [hAa] at this; exact absurd this (by decide)

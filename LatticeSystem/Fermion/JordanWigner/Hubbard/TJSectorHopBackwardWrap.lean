@@ -84,7 +84,8 @@ private theorem tJ_bwrap_ge_eq_one_down (N : ℕ) (s : Fin (N + 1) → Fin 3) (b
   rw [hfilter, Finset.sum_singleton, tJConfigOf_apply_down, if_pos hsb]
   rfl
 
-/-- **Leftward wrap up-hop is sign-free for odd `Ne`.**  Source `N` ↑, target `0` empty: the electron
+/-- **Leftward wrap up-hop is sign-free for odd `Ne`.**  Source `N` ↑, target `0` empty: the
+electron
 hops `N → 0` with no sign for odd `Ne`. -/
 theorem tJ_uphop_backward_wrap_mulVec (N : ℕ) (s : Fin (N + 1) → Fin 3) (a b : Fin (N + 1))
     (hpos : 0 < N) (ha0 : a.val = 0) (hbN : b.val = N) (ha : s b = 1) (hsa : s a = 0)
@@ -102,7 +103,8 @@ theorem tJ_uphop_backward_wrap_mulVec (N : ℕ) (s : Fin (N + 1) → Fin 3) (a b
   have hcq : tJConfigOf N s (spinfulIndex N b 0) = 1 := by rw [tJConfigOf_apply_up, if_pos ha]
   have hcpz : tJConfigOf N s (spinfulIndex N a 0) = 0 := by
     rw [tJConfigOf_apply_up, if_neg (by rw [hsa]; decide)]
-  have hcp : (Function.update (tJConfigOf N s) (spinfulIndex N b 0) 0) (spinfulIndex N a 0) = 0 := by
+  have hcp : (Function.update (tJConfigOf N s) (spinfulIndex N b 0) 0) (spinfulIndex N a 0) = 0 :=
+      by
     rw [Function.update_of_ne hpne, hcpz]
   rw [fermionMultiCreation_mul_Annihilation_mulVec_basisVec, if_pos ⟨hcq, hcp⟩,
     jwSign_mul_jwSign_update_backward (2 * N + 1) (spinfulIndex N b 0) (spinfulIndex N a 0)
@@ -137,7 +139,8 @@ theorem tJ_downhop_backward_wrap_mulVec (N : ℕ) (s : Fin (N + 1) → Fin 3) (a
   have hcq : tJConfigOf N s (spinfulIndex N b 1) = 1 := by rw [tJConfigOf_apply_down, if_pos ha]
   have hcpz : tJConfigOf N s (spinfulIndex N a 1) = 0 := by
     rw [tJConfigOf_apply_down, if_neg (by rw [hsa]; decide)]
-  have hcp : (Function.update (tJConfigOf N s) (spinfulIndex N b 1) 0) (spinfulIndex N a 1) = 0 := by
+  have hcp : (Function.update (tJConfigOf N s) (spinfulIndex N b 1) 0) (spinfulIndex N a 1) = 0 :=
+      by
     rw [Function.update_of_ne hpne, hcpz]
   rw [fermionMultiCreation_mul_Annihilation_mulVec_basisVec, if_pos ⟨hcq, hcp⟩,
     jwSign_mul_jwSign_update_backward (2 * N + 1) (spinfulIndex N b 1) (spinfulIndex N a 1)

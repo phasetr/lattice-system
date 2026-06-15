@@ -101,7 +101,8 @@ theorem tJ_groundEnergyAtFilling_ge_of_sectorMin (hpos : 0 < N) (Ne : ℕ) (hNeL
     tJ_perronFrobeniusMin_le_hermitianMinEigenvalue hpos Ne hodd τ J hτ hJ hμmin
   -- the filling space `W` is nonempty as a set of unit states (a basis state)
   haveI : Nonempty (fillingHardcoreStates N Ne) := by
-    refine ⟨⟨(WithLp.equiv 2 _).symm (basisVec (tJConfigOf N (Classical.choice hNE).val)), ?_, ?_, ?_⟩⟩
+    refine ⟨⟨(WithLp.equiv 2 _).symm (basisVec (tJConfigOf N (Classical.choice hNE).val)), ?_, ?_,
+        ?_⟩⟩
     · rw [EuclideanSpace.norm_eq,
         show (∑ i, ‖((WithLp.equiv 2 ((Fin (2 * N + 2) → Fin 2) → ℂ)).symm
               (basisVec (tJConfigOf N (Classical.choice hNE).val))).ofLp i‖ ^ 2) = (1 : ℝ) from ?_]

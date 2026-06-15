@@ -41,7 +41,8 @@ noncomputable def tJFillingExpansionCoeff (N Ne : ℕ) (u : (Fin (2 * N + 2) →
     TJFillingSector N Ne → ℂ :=
   fun s => ∑ w, basisVec (tJConfigOf N s.val) w * u w
 
-/-- **Left inverse: the coefficient functional inverts the filling expansion.**  The filling basis is
+/-- **Left inverse: the coefficient functional inverts the filling expansion.**  The filling basis
+is
 orthonormal, so `tJFillingExpansionCoeff (Σ_s v_s |Φ_s⟩) = v`. -/
 theorem tJFillingExpansionCoeff_tJFillingExpansion (Ne : ℕ) (v : TJFillingSector N Ne → ℂ) :
     tJFillingExpansionCoeff N Ne (tJFillingExpansion N Ne v) = v := by

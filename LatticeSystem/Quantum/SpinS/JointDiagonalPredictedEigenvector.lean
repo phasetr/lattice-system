@@ -72,12 +72,14 @@ theorem exists_jointPredictedCasimir_eigenvector (A : Λ → Bool)
           (((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) * ((N : ℂ) / 2) + 1)) • w ∧
       (sublatticeSpinSquaredS N (fun x => ! A x)).mulVec w =
         (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) * ((N : ℂ) / 2) *
-          (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) * ((N : ℂ) / 2) + 1)) • w := by
+          (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) * ((N : ℂ) / 2) + 1)) • w
+              := by
   obtain ⟨w, hw_ne, hw_span, hw_ker⟩ := exists_jointDiagonal_totalSpinSOpPlus_kernel A horient
   -- w lies in the joint Casimir eigenspace W (span ⊆ W).
   have hw_W : w ∈ jointSublatticeCasimirEigenspace (Λ := Λ) A N :=
     (Submodule.span_le.mpr
-      (Set.range_subset_iff.mpr (jointDiagonalIterate_mem_jointSublatticeCasimirEigenspace A))) hw_span
+      (Set.range_subset_iff.mpr (jointDiagonalIterate_mem_jointSublatticeCasimirEigenspace A)))
+          hw_span
   obtain ⟨hw_A, hw_B⟩ := hw_W
   rw [SetLike.mem_coe, Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hw_A
   rw [SetLike.mem_coe, Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at hw_B

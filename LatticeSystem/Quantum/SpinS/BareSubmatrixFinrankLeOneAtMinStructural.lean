@@ -25,7 +25,8 @@ open Matrix Module
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-/-- **(#3887.7) Bare submatrix `finrank ℂ ≤ 1` at `hermitianMinEigenvalue` (structural, no `h_intermediate`)**. -/
+/-- **(#3887.7) Bare submatrix `finrank ℂ ≤ 1` at `hermitianMinEigenvalue` (structural, no
+`h_intermediate`)**. -/
 theorem axisSwappedAnisotropicHeisenbergS_submatrix_finrank_le_one_at_hermitianMinEigenvalue
     (A : Λ → Bool) {J : Λ → Λ → ℂ}
     (hJim : ∀ x y, (J x y).im = 0) (hJnn : ∀ x y, 0 ≤ (J x y).re)

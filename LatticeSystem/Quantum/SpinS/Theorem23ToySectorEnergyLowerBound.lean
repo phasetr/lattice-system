@@ -74,7 +74,8 @@ theorem tasaki23_toy_sector_energy_ge_predicted_legacy
   have hH := heisenbergHamiltonianS_mulVec_magSectorEmbedding (bipartiteCoupling A)
     (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) hComplex
   obtain ⟨⟨γ_tot, htot⟩, ⟨γ_A, hA⟩, ⟨γ_B, hB⟩⟩ :=
-    tasaki23_toy_groundState_joint_casimir_eigenvector_legacy A N c hc_strict h_intermediate hv_pos hH
+    tasaki23_toy_groundState_joint_casimir_eigenvector_legacy A N c hc_strict h_intermediate hv_pos
+        hH
   -- The ground-state energy equals the Casimir combination `(γ_tot − γ_A − γ_B).re`.
   have hEnergy := heisenbergToyHamiltonianS_mulVec_of_joint_casimir_eigenvector A htot hA hB
   have hμGS_eq : γ_tot - γ_A - γ_B = (μGS : ℂ) :=

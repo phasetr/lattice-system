@@ -47,7 +47,8 @@ theorem fermionSiteSpinZ_mulVec_basisVec (N : ℕ) (x : Fin (N + 1))
   rw [fermionMultiNumber_mulVec_basisVec, fermionMultiNumber_mulVec_basisVec, ← sub_smul,
     smul_smul]
 
-/-- A diagonal operator (acting as a scalar on `|Φ_s⟩`) has vanishing off-diagonal matrix element. -/
+/-- A diagonal operator (acting as a scalar on `|Φ_s⟩`) has vanishing off-diagonal matrix element.
+-/
 theorem diagonal_offdiag_matrixElement_eq_zero (N : ℕ) (s s' : Fin (N + 1) → Fin 3)
     (op : ManyBodyOp (Fin (2 * N + 2)))
     (hd : ∃ sc : ℂ, op.mulVec (basisVec (tJConfigOf N s)) = sc • basisVec (tJConfigOf N s))

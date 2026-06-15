@@ -23,7 +23,8 @@ variable {M : ℕ}
 
 /-- The orthonormal eigenbasis of a Hermitian `T`, transported from `EuclideanSpace ℂ (Fin (M+1))`
 to a `Module.Basis` of the plain coordinate space `Fin (M+1) → ℂ`. -/
-noncomputable def eigenbasisAsBasis {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : T.IsHermitian) :
+noncomputable def eigenbasisAsBasis {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : T.IsHermitian)
+    :
     Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ) :=
   hT.eigenvectorBasis.toBasis.map (WithLp.linearEquiv 2 ℂ (Fin (M + 1) → ℂ))
 

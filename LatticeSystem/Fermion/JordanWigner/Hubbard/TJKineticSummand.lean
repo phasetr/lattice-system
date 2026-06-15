@@ -110,7 +110,8 @@ theorem tJ_kinetic_summand_zero_or_one (N : ℕ) (hpos : 0 < N) (s s' : Fin (N +
           · rw [tJ_downhop_nn_matrixElement N s s' j i hd hsj hsi0]; split_ifs <;> simp
           · rw [tJ_downhop_wrap_matrixElement N s s' j i hpos hj0 hiN hsj hsi0 Ne hNe hodd]
             split_ifs <;> simp
-          · rw [tJ_downhop_backward_wrap_matrixElement N s s' i j hpos hi0v hjN hsj hsi0 Ne hNe hodd]
+          · rw [tJ_downhop_backward_wrap_matrixElement N s s' i j hpos hi0v hjN hsj hsi0 Ne hNe
+              hodd]
             split_ifs <;> simp
       · -- target site ↑
         rcases tJ_fin2_eq σ with rfl | rfl
@@ -135,7 +136,8 @@ theorem tJ_kinetic_summand_zero_or_one (N : ℕ) (hpos : 0 < N) (s s' : Fin (N +
           · exact absurd (by rw [tJConfigOf_apply_up, if_pos ‹_›] at hsrc; exact hsrc) (by simp_all)
           · rfl
         · rw [tJConfigOf_apply_down]; split
-          · exact absurd (by rw [tJConfigOf_apply_down, if_pos ‹_›] at hsrc; exact hsrc) (by simp_all)
+          · exact absurd (by rw [tJConfigOf_apply_down, if_pos ‹_›] at hsrc; exact hsrc) (by
+              simp_all)
           · rfl
       rw [tJ_hop_matrixElement_eq_zero_of_source N s s' i j σ hsrc0]
       exact Or.inl rfl
@@ -175,7 +177,8 @@ theorem tJKinetic_matrixElement_nonneg (N : ℕ) (hpos : 0 < N) (s s' : Fin (N +
     refine Finset.sum_nonneg fun σ _ => Finset.sum_nonneg fun i _ => Finset.sum_nonneg fun j _ => ?_
     exact (hsumm σ i j).1
   · simp only [Complex.im_sum]
-    refine Finset.sum_eq_zero fun σ _ => Finset.sum_eq_zero fun i _ => Finset.sum_eq_zero fun j _ => ?_
+    refine Finset.sum_eq_zero fun σ _ => Finset.sum_eq_zero fun i _ => Finset.sum_eq_zero fun j _
+        => ?_
     exact (hsumm σ i j).2
 
 end LatticeSystem.Fermion
