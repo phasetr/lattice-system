@@ -346,6 +346,7 @@ import LatticeSystem.Quantum.SpinS.AnisotropicEdgeStates
 import LatticeSystem.Quantum.SpinS.AnisotropicLargeD
 import LatticeSystem.Quantum.SpinS.KennedyTasakiTransformation
 import LatticeSystem.Quantum.SpinS.LambdaDModel
+import LatticeSystem.Quantum.SpinS.LiebSchultzMattisDiscrete
 import LatticeSystem.Quantum.SpinS.SPTMatrixProductIndex
 import LatticeSystem.Quantum.SpinS.SPTPhase
 import LatticeSystem.Quantum.SpinS.SPTTopologicalIndex
