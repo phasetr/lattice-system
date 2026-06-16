@@ -47,21 +47,4 @@ theorem parityReachableS_of_raiseLowerReachableS {G : SimpleGraph V} {σ σ' : V
   refine Relation.ReflTransGen.mono ?_ h
   intro a b hab
   exact ParityStepS.of_raiseLower hab
-
-omit [DecidableEq V] in
-/-- **Within-sector ParityReachableS on the bipartite complete graph**: any two
-configurations sharing the same total magnetization are `ParityReachableS`-connected.
-
-Lifts `raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_legacy` through the inclusion
-`RaiseLowerStepS ⊆ ParityStepS`. -/
-theorem parityReachableS_bipartiteCompleteGraph_of_eq_magSumS
-    (A : V → Bool)
-    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
-      ∃ z, A z ≠ A x ∧ (τ z).val < N)
-    {σ σ' : V → Fin (N + 1)} (hmag : magSumS σ = magSumS σ') :
-    ParityReachableS (bipartiteCompleteGraphOf A) σ σ' := by
-  classical
-  exact parityReachableS_of_raiseLowerReachableS
-    (raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_legacy A h_intermediate hmag)
-
 end LatticeSystem.Quantum
