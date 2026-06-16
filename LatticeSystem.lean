@@ -42,7 +42,6 @@ import LatticeSystem.Math.WignerTheorem
 import LatticeSystem.Math.CStarAlgebra.State
 import LatticeSystem.Math.CStarAlgebra.GroundState
 import LatticeSystem.Math.CStarAlgebra.GNS
-import LatticeSystem.Quantum.SpinS.DressedBareSubmatrixMinEqPF
 import LatticeSystem.Quantum.HorschVonderLinden
 import LatticeSystem.Quantum.KaplanHorschVonderLinden
 import LatticeSystem.Quantum.SpinS.DysonLiebSimon
@@ -299,7 +298,6 @@ import LatticeSystem.Quantum.SpinS.SublatticeCasimirSpectralBound
 import LatticeSystem.Quantum.SpinS.ToyHamiltonianJointEnergy
 import LatticeSystem.Quantum.SpinS.CasimirSpectralLowerBound
 import LatticeSystem.Quantum.SpinS.Theorem23ToyCasimirPin
-import LatticeSystem.Quantum.SpinS.Theorem23ToySublatticeBounds
 import LatticeSystem.Quantum.SpinS.Theorem23ExtremalSector
 import LatticeSystem.Quantum.SpinS.Theorem23ExtremalHighestWeight
 import LatticeSystem.Quantum.SpinS.JointCasimirEigenspaceLadderInvariant
@@ -340,9 +338,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23ToyGSPredictedCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23PredictedEnergySectorAll
 import LatticeSystem.Quantum.SpinS.Theorem23ToyGSPredictedCasimirAt
 import LatticeSystem.Quantum.SpinS.Theorem23PFSectorCasimir
-import LatticeSystem.Quantum.SpinS.Theorem23IntervalCommonEnergy
 import LatticeSystem.Quantum.SpinS.Theorem23GlobalMinimality
-import LatticeSystem.Quantum.SpinS.Theorem23ToySectorEnergyLowerBound
 import LatticeSystem.Quantum.SpinS.Theorem23TotalLoweringNonvanishing
 import LatticeSystem.Quantum.SpinS.Theorem23GeneralHOutside
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenberg

@@ -1,5 +1,4 @@
 import LatticeSystem.Quantum.SpinS.Theorem23ToyCasimirPin
-import LatticeSystem.Quantum.SpinS.Theorem23ToySublatticeBounds
 import LatticeSystem.Quantum.SpinS.Theorem23ExtremalSector
 import LatticeSystem.Quantum.SpinS.ToyHamiltonianJointEnergy
 import LatticeSystem.Quantum.SpinS.Theorem23PFCasimirPredicted
