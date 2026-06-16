@@ -1,4 +1,5 @@
-import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducibleUnconditional
+import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducibleStructural
+import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapPFMatrix
 import LatticeSystem.Math.PerronFrobeniusFinrank
 import LatticeSystem.Math.PerronFrobenius
@@ -59,10 +60,14 @@ theorem shiftedDressedAxisSwappedReMatrixOnParityBlock_perron_eigenspace_finrank
     unfold Matrix.IsHermitian
     rw [Matrix.conjTranspose_eq_transpose_of_trivial]
     exact hSymm
-  -- Irreducibility unconditional via #3824.
-  have hIrred := shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_legacy
+  -- Irreducibility unconditional via the canonical (h_intermediate-free) variant.
+  -- `1 ≤ N` follows from `h_intermediate` (with `Λ` nonempty, from `hA_ne`).
+  have hN : 1 ≤ N := by
+    haveI : Nonempty Λ := ⟨hA_ne.choose⟩
+    exact (h_intermediate_imp_conditions A h_intermediate).2.2
+  have hIrred := shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible
     A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict
-    hA_ne hB_ne h_intermediate p
+    hA_ne hB_ne hN p
   -- Perron positive eigenvector + finrank ≤ 1 (#3779).
   obtain ⟨μ, v, hAv, _hvne, hv_pos⟩ :=
     LatticeSystem.Math.PerronFrobenius.exists_pos_eigenvec_max hHerm hIrred
