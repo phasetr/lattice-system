@@ -4,6 +4,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23ExtremalSector
 import LatticeSystem.Quantum.SpinS.ToyHamiltonianJointEnergy
 import LatticeSystem.Quantum.SpinS.Theorem23PFCasimirPredicted
 import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
+import LatticeSystem.Quantum.SpinS.Theorem23StructuralPFJointCasimir
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedSimpArgs false
@@ -40,7 +41,7 @@ in the extremal sector `M = min(|A|, |¬A|)·N`, the Marshall-positive toy groun
 state with toy energy `μ ≤ predicted − s_A(s_A+1) − s_B(s_B+1)` is a `(Ŝ_tot)²`
 eigenvector at the predicted Casimir value. -/
 theorem tasaki23_toy_groundState_casimir_eq_predicted_of_energy_le
-    (A : V → Bool) (N : ℕ) (c : ℝ)
+    (A : V → Bool) (N : ℕ) (c : ℝ) [Nonempty V]
     [Nonempty (magConfigS V N
       (min (Finset.univ.filter (fun x : V => A x = true)).card
         (Finset.univ.filter (fun x : V => (! A x) = true)).card * N))]
@@ -72,14 +73,13 @@ theorem tasaki23_toy_groundState_casimir_eq_predicted_of_energy_le
   set Ψ := magSectorEmbedding
     (fun σ : magConfigS V N _ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) with hΨ
   have hΨ_ne : Ψ ≠ 0 := tasaki23_marshallPositive_magSectorEmbedding_ne_zero A hv_pos
+  obtain ⟨hA_ne, hB_ne, hN⟩ := h_intermediate_imp_conditions A h_intermediate
   -- Joint Casimir eigenvector (#3657): total and sublattice eigen-equations.
   obtain ⟨⟨γ_tot, htot⟩, _, _⟩ :=
-    tasaki23_toy_groundState_joint_casimir_eigenvector_legacy A N c hc_strict h_intermediate hv_pos
-        hH
+    tasaki23_toy_groundState_joint_casimir_eigenvector A c hc_strict hA_ne hB_ne hN hv_pos hH
   -- Sublattice Casimir bounds (#3677).
   obtain ⟨⟨γ_A, hA_eq, hA_bd⟩, ⟨γ_B, hB_eq, hB_bd⟩⟩ :=
-    tasaki23_toy_groundState_sublattice_casimir_re_le_legacy A N c hc_strict h_intermediate hv_pos
-        hH
+    tasaki23_toy_groundState_sublattice_casimir_re_le A c hc_strict hA_ne hB_ne hN hv_pos hH
   -- Toy energy formula (#3673): Ĥ_toy Ψ = (γ_tot − γ_A − γ_B) • Ψ.
   have hEnergy := heisenbergToyHamiltonianS_mulVec_of_joint_casimir_eigenvector A htot hA_eq hB_eq
   -- Ĥ_toy = heisenbergHamiltonianS (bipartiteCoupling A); so μ = γ_tot − γ_A − γ_B.

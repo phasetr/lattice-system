@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.Theorem23ToyWitnessPredicted
 import LatticeSystem.Quantum.SpinS.Theorem23PFCasimirPredicted
+import LatticeSystem.Quantum.SpinS.Theorem23StructuralPFCasimirPredicted
 
 /-!
 # Base-sector predicted total Casimir for a general bipartite Heisenberg ground state
@@ -41,7 +42,7 @@ state in the same sector, and `tasaki23_pf_groundState_casimir_eq_predicted_of_w
 transfers the value to the `J`-ground state.  This discharges the `hsource_cas`
 hypothesis of the sector-existence chain at the base sector. -/
 theorem tasaki23_pf_groundState_casimir_eq_predicted_base
-    (A : V → Bool) (N : ℕ) (c c_toy : ℝ)
+    (A : V → Bool) (N : ℕ) (c c_toy : ℝ) [Nonempty V]
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
     [Nonempty (magConfigS V N
@@ -75,10 +76,11 @@ theorem tasaki23_pf_groundState_casimir_eq_predicted_base
       ((tasaki23PredictedCasimirValue (V := V) A N : ℝ) : ℂ) •
         magSectorEmbedding
           (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ)) := by
+  obtain ⟨hA_ne, hB_ne, hN⟩ := h_intermediate_imp_conditions A h_intermediate
   obtain ⟨w, hw_pos, hw_cas⟩ :=
     tasaki23_toy_groundState_casimir_eq_predicted A N c_toy horient hc_strict_toy
       h_intermediate
-  exact tasaki23_pf_groundState_casimir_eq_predicted_of_witness_legacy A N c hJ_real hJ_pos
-    hJ_nn hJ_sym hJ_bipartite hc_strict h_intermediate hv_pos hw_pos hH hw_cas
+  exact tasaki23_pf_groundState_casimir_eq_predicted_of_witness A c hJ_real hJ_pos
+    hJ_nn hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN hv_pos hw_pos hH hw_cas
 
 end LatticeSystem.Quantum

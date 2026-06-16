@@ -186,4 +186,23 @@ theorem raiseLowerReachableSMagSector_bipartiteCompleteGraph_legacy
   -- which is the same as σ → σ' (via Subtype.eta).
   exact this
 
+omit [Fintype V] [DecidableEq V] in
+/-- The old intermediate-site hypothesis `h_intermediate` implies that both
+sublattices are nonempty and the spin cutoff is positive, provided the vertex
+type is nonempty.  This bridges the deprecated `h_intermediate`-based API to the
+canonical `hA_ne`/`hB_ne`/`hN` hypotheses. -/
+theorem h_intermediate_imp_conditions [Nonempty V] (A : V → Bool)
+    (h_intermediate : ∀ τ : V → Fin (N + 1), ∀ x : V,
+      ∃ z, A z ≠ A x ∧ (τ z).val < N) :
+    (∃ a, A a = true) ∧ (∃ b, A b = false) ∧ 1 ≤ N := by
+  classical
+  obtain ⟨x⟩ := ‹Nonempty V›
+  obtain ⟨z, hAz, hzN⟩ := h_intermediate (fun _ => 0) x
+  have hN : 1 ≤ N := by simpa using hzN
+  cases hAx : A x
+  · have hz : A z = true := by cases hz' : A z <;> simp [hAx, hz'] at hAz ⊢
+    exact ⟨⟨z, hz⟩, ⟨x, hAx⟩, hN⟩
+  · have hz : A z = false := by cases hz' : A z <;> simp [hAx, hz'] at hAz ⊢
+    exact ⟨⟨x, hAx⟩, ⟨z, hz⟩, hN⟩
+
 end LatticeSystem.Quantum
