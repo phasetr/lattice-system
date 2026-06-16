@@ -1,4 +1,6 @@
 import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFEigenvector
+import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFEigenvectorStructural
+import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.ComplexDressedParityBlockFinrank
 import LatticeSystem.Quantum.SpinS.SubmatrixMinEigenvalue
 
@@ -50,10 +52,15 @@ theorem dressedAxisSwappedAnisotropicHeisenbergS_submatrix_complex_eigenvector_e
           (fun σ : parityConfigS Λ N p => σ.1)
           (fun σ : parityConfigS Λ N p => σ.1)) w = (ν : ℂ) • w := by
   -- (j.1): get positive real eigenvector.
+  -- (j.1) canonical (h_intermediate-free) variant; `1 ≤ N` from `h_intermediate`
+  -- (with `Λ` nonempty, from `hA_ne`).
+  have hN : 1 ≤ N := by
+    haveI : Nonempty Λ := ⟨hA_ne.choose⟩
+    exact (h_intermediate_imp_conditions A h_intermediate).2.2
   obtain ⟨ν, v, hv_pos, hvEq⟩ :=
-    dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists_legacy
+    dressedAxisSwappedAnisotropicHeisenbergSReMatrixOnParityBlock_pos_eigenvector_exists
       A hJim hJnn hJpos hJself hJbip hlam hlb hub hDim hDpos hc_strict
-      hA_ne hB_ne h_intermediate p
+      hA_ne hB_ne hN p
   refine ⟨ν, fun i => (v i : ℂ), ?_, ?_⟩
   · -- v.map ofReal ≠ 0: since v > 0, in particular v(any i) > 0, hence (v(i) : ℂ) ≠ 0.
     intro hzero
