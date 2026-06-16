@@ -1,4 +1,6 @@
 import LatticeSystem.Math.PerronFrobeniusSimple
+import LatticeSystem.Quantum.SpinS.Theorem23StructuralPFJointCasimir
+import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSector
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorMarshall
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorEigenvalueUnique
@@ -265,7 +267,7 @@ It is the form in which the sound chain applies directly to the actual
 Perron–Frobenius ground state. -/
 theorem tasaki23_pf_groundState_ladder_link_of_casimir_ne_kernel
     (A : V → Bool) {J : V → V → ℂ} (N : ℕ) (c : ℝ) {M : ℕ}
-    [Nonempty (magConfigS V N M)]
+    [Nonempty V] [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
     (hJ_pos : ∀ x y : V, (bipartiteCompleteGraphOf A).Adj x y → 0 < (J x y).re)
     (hJ_nn : ∀ x y, 0 ≤ (J x y).re)
@@ -306,9 +308,10 @@ theorem tasaki23_pf_groundState_ladder_link_of_casimir_ne_kernel
             (fun σ => (((marshallSignS A σ.1).re * v σ : ℝ) : ℂ))) ∈
         magSubspaceS V N
           ((((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ)) - 1) := by
+  obtain ⟨hA_ne, hB_ne, hN⟩ := h_intermediate_imp_conditions A h_intermediate
   obtain ⟨γ, hγ⟩ :=
-    tasaki23_pf_groundState_casimir_eigenvector_legacy A N c hJ_real hJ_pos hJ_nn
-      hJ_sym hJ_bipartite hc_strict h_intermediate hv_pos hH
+    tasaki23_pf_groundState_casimir_eigenvector A c hJ_real hJ_pos hJ_nn
+      hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN hv_pos hH
   exact tasaki23_pf_ladder_link_succ hH hγ (hγ_ne γ hγ)
     (tasaki23_marshallPositive_magSectorEmbedding_ne_zero A hv_pos)
 
