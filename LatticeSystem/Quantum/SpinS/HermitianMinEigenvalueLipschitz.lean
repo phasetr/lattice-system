@@ -29,6 +29,7 @@ open Matrix
 
 variable {n : Type*} [Fintype n] [DecidableEq n] [Nonempty n]
 
+omit [DecidableEq n] in
 /-- Helper: for Hermitian `A` and `B`, the upper bound
 `rayleighInfMatrix B ≤ rayleighInfMatrix A + Σ ‖(B - A)_{ij}‖`. -/
 theorem rayleighInfMatrix_le_add_sum_entryNorms
@@ -62,11 +63,13 @@ theorem rayleighInfMatrix_le_add_sum_entryNorms
     exact le_ciInf key
   linarith
 
+omit [DecidableEq n] in
 /-- **Lipschitz continuity** of `rayleighInfMatrix` in the entry-norm sum:
 `|rayleighInfMatrix A - rayleighInfMatrix B| ≤ Σ ‖(A - B)_{ij}‖`. -/
 theorem abs_rayleighInfMatrix_sub_le_sum_entryNorms
     {A B : Matrix n n ℂ} (hA : A.IsHermitian) (hB : B.IsHermitian) :
     |rayleighInfMatrix A - rayleighInfMatrix B| ≤ ∑ i, ∑ j, ‖(A - B) i j‖ := by
+  classical
   have hAB := rayleighInfMatrix_le_add_sum_entryNorms (A := A) (B := B) hA
   have hBA := rayleighInfMatrix_le_add_sum_entryNorms (A := B) (B := A) hB
   -- Σ ‖(B - A)_ij‖ = Σ ‖(A - B)_ij‖

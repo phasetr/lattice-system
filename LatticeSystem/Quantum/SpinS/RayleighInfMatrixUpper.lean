@@ -33,10 +33,12 @@ Hermitian `M` this equals `hermitianMinEigenvalue hM` (Rayleigh-Ritz). -/
 noncomputable def rayleighInfMatrix (M : Matrix n n ℂ) : ℝ :=
   ⨅ v : {v : n → ℂ // dotProduct (star v) v = 1}, rayleighOnVec M v.val
 
+omit [DecidableEq n] in
 /-- The matrix-side unit-sphere indexing subtype is nonempty for any Hermitian `M`
 (via the existence of a unit eigenvector). -/
 theorem nonempty_unit_dotProduct_subtype {M : Matrix n n ℂ} (hM : M.IsHermitian) :
     Nonempty {v : n → ℂ // dotProduct (star v) v = 1} := by
+  classical
   obtain ⟨v, hunit, _⟩ := exists_unit_vec_rayleighOnVec_eq_hermitianMinEigenvalue hM
   exact ⟨v, hunit⟩
 
