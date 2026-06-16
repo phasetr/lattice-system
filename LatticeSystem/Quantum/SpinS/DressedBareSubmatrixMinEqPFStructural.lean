@@ -1,5 +1,4 @@
 import LatticeSystem.Math.HermitianMinEqOfShiftPF
-import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFEigenvector
 import LatticeSystem.Quantum.SpinS.MarshallSubmatrixMinEq
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapPFMatrix
 import LatticeSystem.Quantum.SpinS.ParityBlockDressedFinrank

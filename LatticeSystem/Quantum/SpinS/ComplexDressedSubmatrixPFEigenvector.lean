@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFEigenvector
 import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFEigenvectorStructural
 import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.ComplexDressedParityBlockFinrank
