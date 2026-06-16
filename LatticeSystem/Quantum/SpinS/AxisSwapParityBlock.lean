@@ -26,6 +26,7 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
+omit [DecidableEq Λ] in
 /-- For configurations agreeing off `{x, y}`, the global occupation parity matches the local
 `{x, y}` parity. -/
 theorem magSumS_add_parity_eq_of_agree_off_two_site
@@ -33,6 +34,7 @@ theorem magSumS_add_parity_eq_of_agree_off_two_site
     (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
     (magSumS σ' + magSumS σ) % 2 =
       ((σ' x).val + (σ x).val + ((σ' y).val + (σ y).val)) % 2 := by
+  classical
   have hsum : magSumS σ' + magSumS σ = ∑ k : Λ, ((σ' k).val + (σ k).val) := by
     rw [magSumS_def, magSumS_def, ← Finset.sum_add_distrib]
   rw [hsum,
@@ -48,11 +50,13 @@ theorem magSumS_add_parity_eq_of_agree_off_two_site
   rw [hrest, ← Finset.mul_sum]
   omega
 
+omit [DecidableEq Λ] in
 /-- For configurations agreeing off a single site `x`, the global occupation parity matches the
 local `x` parity. -/
 theorem magSumS_add_parity_eq_of_agree_off_site
     (x : Λ) {σ' σ : Λ → Fin (N + 1)} (h : ∀ k, k ≠ x → σ' k = σ k) :
     (magSumS σ' + magSumS σ) % 2 = ((σ' x).val + (σ x).val) % 2 := by
+  classical
   have hsum : magSumS σ' + magSumS σ = ∑ k : Λ, ((σ' k).val + (σ k).val) := by
     rw [magSumS_def, magSumS_def, ← Finset.sum_add_distrib]
   rw [hsum, ← Finset.add_sum_erase _ (fun k => (σ' k).val + (σ k).val) (Finset.mem_univ x)]

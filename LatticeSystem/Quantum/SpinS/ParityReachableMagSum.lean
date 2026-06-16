@@ -24,6 +24,7 @@ namespace LatticeSystem.Quantum
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
+omit [DecidableEq V] in
 /-- A single parity-block step preserves the magnetization parity. -/
 theorem parityStepS_magSumS_parity_eq {G : SimpleGraph V} {σ σ' : V → Fin (N + 1)}
     (h : ParityStepS G σ σ') : magSumS σ' % 2 = magSumS σ % 2 := by
@@ -38,6 +39,7 @@ theorem parityStepS_magSumS_parity_eq {G : SimpleGraph V} {σ σ' : V → Fin (N
     have hp := magSumS_add_parity_eq_of_agree_off_site x hagree
     omega
 
+omit [DecidableEq V] in
 /-- `ParityReachableS` configurations have equal magnetization parity. -/
 theorem parityReachableS_magSumS_parity_eq {G : SimpleGraph V} {σ σ' : V → Fin (N + 1)}
     (h : ParityReachableS G σ σ') : magSumS σ' % 2 = magSumS σ % 2 := by
