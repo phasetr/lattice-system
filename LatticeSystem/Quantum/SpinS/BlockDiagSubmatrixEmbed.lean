@@ -31,18 +31,21 @@ private noncomputable def extendFromParity {p : ℕ}
     (w : parityConfigS Λ N p → ℂ) : (Λ → Fin (N + 1)) → ℂ :=
   fun σ => if hσ : magSumS σ % 2 = p then w ⟨σ, hσ⟩ else 0
 
+omit [DecidableEq Λ] in
 /-- Value of the zero-extension at a parity-`p` configuration: the original `w` value. -/
 private theorem extendFromParity_of_parity {p : ℕ}
     (w : parityConfigS Λ N p → ℂ) {σ : Λ → Fin (N + 1)} (hσ : magSumS σ % 2 = p) :
     extendFromParity w σ = w ⟨σ, hσ⟩ := by
   unfold extendFromParity; rw [dif_pos hσ]
 
+omit [DecidableEq Λ] in
 /-- Value of the zero-extension off the parity-`p` slice: zero. -/
 private theorem extendFromParity_of_other {p : ℕ}
     (w : parityConfigS Λ N p → ℂ) {σ : Λ → Fin (N + 1)} (hσ : magSumS σ % 2 ≠ p) :
     extendFromParity w σ = 0 := by
   unfold extendFromParity; rw [dif_neg hσ]
 
+omit [DecidableEq Λ] in
 /-- Additivity of the zero-extension map. -/
 private theorem extendFromParity_add {p : ℕ} (u v : parityConfigS Λ N p → ℂ) :
     extendFromParity (u + v) = extendFromParity u + extendFromParity v := by
@@ -53,9 +56,11 @@ private theorem extendFromParity_add {p : ℕ} (u v : parityConfigS Λ N p → �
   · rfl
   · simp
 
+omit [DecidableEq Λ] in
 /-- Scalar compatibility of the zero-extension map. -/
 private theorem extendFromParity_smul {p : ℕ} (c : ℂ) (v : parityConfigS Λ N p → ℂ) :
     extendFromParity (c • v) = c • extendFromParity v := by
+  classical
   funext σ
   change extendFromParity (c • v) σ = c • extendFromParity v σ
   unfold extendFromParity

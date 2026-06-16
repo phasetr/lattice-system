@@ -71,10 +71,12 @@ theorem Matrix.IsHermitian.dotProduct_eq_zero_of_eigenvalues_ne
 
 /-! ## Pairwise orthogonality of the ladder iterates -/
 
+omit [DecidableEq V] in
 /-- The ladder eigenvalue `m_max − k` is real, i.e., its complex
 conjugate equals itself. -/
 theorem ladderEigenvalueUp_star_eq (k : Fin (Fintype.card V * N + 1)) :
     star (ladderEigenvalueUp V N k) = ladderEigenvalueUp V N k := by
+  classical
   unfold ladderEigenvalueUp
   simp [Complex.star_def, Complex.conj_ofReal, Complex.conj_natCast]
 

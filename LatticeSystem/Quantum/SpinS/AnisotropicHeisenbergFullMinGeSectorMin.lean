@@ -29,6 +29,7 @@ open Matrix Module
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
+omit [DecidableEq Λ] in
 /-- **Existence of a non-zero sector projection** for any non-zero full vector:
 if `v ≠ 0`, then `∃ M`, `magSectorRestriction (M := M) v ≠ 0`. -/
 theorem exists_magSectorRestriction_ne_zero

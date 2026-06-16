@@ -368,10 +368,12 @@ theorem heisenbergToyHamiltonianS_mulVec_allAlignedStateS_zero
 private noncomputable def sublatticeCardS (A : Λ → Bool) : ℕ :=
   (Finset.univ.filter (fun x : Λ => A x = true)).card
 
+omit [DecidableEq Λ] in
 /-- Cardinality identity: `|Λ| = |A| + |¬A|` for any sublattice
 indicator `A : Λ → Bool`. -/
 private theorem sublatticeCardS_add_complement (A : Λ → Bool) :
     sublatticeCardS A + sublatticeCardS (fun x => ! A x) = Fintype.card Λ := by
+  classical
   unfold sublatticeCardS
   have hfilter : Finset.univ.filter (fun x : Λ => (! A x) = true) =
       Finset.univ.filter (fun x : Λ => ¬ (A x = true)) := by
