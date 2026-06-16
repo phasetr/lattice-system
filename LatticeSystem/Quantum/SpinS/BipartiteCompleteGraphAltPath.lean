@@ -55,7 +55,7 @@ applied to `σ_1` (step 2: x-z edge).
 Mirror of `exists_raiseLowerReachableS_bipartite_of_over_under_eq_sublattice`
 with the `σ z` condition flipped. -/
 theorem exists_raiseLowerReachableS_bipartite_of_over_under_eq_sublattice_alt
-    [Fintype V] [DecidableEq V]
+    [Fintype V]
     {A : V → Bool} {σ σ' : V → Fin (N + 1)}
     {x y : V} (hxy : x ≠ y) (hAeq : A x = A y)
     (hover : (σ' x).val < (σ x).val)
@@ -64,6 +64,7 @@ theorem exists_raiseLowerReachableS_bipartite_of_over_under_eq_sublattice_alt
     ∃ σ'' : V → Fin (N + 1),
       RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ σ'' ∧
         configDistS σ'' σ' + 2 = configDistS σ σ' := by
+  classical
   -- z ≠ x, z ≠ y (since A z ≠ A x = A y).
   have hzx : z ≠ x := fun heq => hAz (heq ▸ rfl)
   have hzy : z ≠ y := fun heq => hAz (heq ▸ hAeq.symm)

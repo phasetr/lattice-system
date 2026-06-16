@@ -33,7 +33,7 @@ whole single-electron space — so `{α_p} ∪ {β_u}` is a basis of `h ≅ ℂ^
 Proof: orthogonality makes the two spans disjoint, so
 `finrank (span α ⊔ span β) = finrank (span α) + finrank (span β) = |ιE| + |ιI| = |Λ|`, which equals
 the dimension of the whole space, forcing the join to be everything. -/
-theorem tasaki_lemma_11_10 {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+theorem tasaki_lemma_11_10 {Λ : Type*} [Fintype Λ]
     {ιE ιI : Type*} [Fintype ιE] [Fintype ιI]
     (α : ιE → EuclideanSpace ℂ Λ) (β : ιI → EuclideanSpace ℂ Λ)
     (hα : LinearIndependent ℂ α) (hβ : LinearIndependent ℂ β)
