@@ -23,6 +23,7 @@ namespace LatticeSystem.Quantum
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
+omit [DecidableEq V] in
 /-- **Structural MagSector reachability (no `h_intermediate`)**. -/
 theorem raiseLowerReachableSMagSector_bipartiteCompleteGraph
     (A : V → Bool) {M : ℕ}
@@ -30,6 +31,7 @@ theorem raiseLowerReachableSMagSector_bipartiteCompleteGraph
     (hN : 1 ≤ N)
     (σ σ' : magConfigS V N M) :
     RaiseLowerReachableSMagSector (bipartiteCompleteGraphOf A) σ σ' := by
+  classical
   have hreach : RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ.1 σ'.1 :=
     raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS A
       hA_ne hB_ne hN (σ.2.trans σ'.2.symm)

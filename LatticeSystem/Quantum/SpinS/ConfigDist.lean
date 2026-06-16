@@ -211,6 +211,7 @@ theorem configDistS_decrease_of_over_under
 
 /-! ## Reachability for the complete graph -/
 
+omit [DecidableEq V] in
 /-- For the complete graph `G = ⊤` (every distinct pair of vertices is
 adjacent), any two configurations with equal magnetization sum are
 `RaiseLowerReachableS`. The proof inducts on `configDistS σ σ'`,
@@ -219,6 +220,7 @@ using `exists_over_under` to find the witness sites and
 theorem raiseLowerReachableS_completeGraph_of_eq_magSumS
     {σ σ' : V → Fin (N + 1)} (hmag : magSumS σ = magSumS σ') :
     RaiseLowerReachableS (⊤ : SimpleGraph V) σ σ' := by
+  classical
   -- Strong induction on configDistS σ σ'.
   suffices h : ∀ n, ∀ σ σ' : V → Fin (N + 1),
       magSumS σ = magSumS σ' → configDistS σ σ' ≤ n →

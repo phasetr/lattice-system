@@ -97,6 +97,7 @@ theorem bipartiteCoupling_pos_of_diff_sublattice
   rw [if_pos h]
   simp
 
+omit [DecidableEq Λ] in
 /-- **Total ordered pair count** on a bipartite split:
 `Σ_{x, y} bipartiteCoupling A x y = 2 · |A| · |¬A|`.
 

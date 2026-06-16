@@ -356,11 +356,13 @@ theorem heisenbergToyHamiltonian_mulVec_basisVec_const
       sublatticeSpinHalfSquared_mulVec_basisVec_const (fun x => ! A x) s]
   rw [← sub_smul, ← sub_smul]
 
+omit [DecidableEq Λ] in
 /-- Cardinality identity: `|Λ| = |A| + |¬A|` for any sublattice
 indicator `A : Λ → Bool`.  Direct from
 `Finset.card_filter_add_card_filter_not`. -/
 private theorem sublatticeCard_add_complement (A : Λ → Bool) :
     sublatticeCard A + sublatticeCard (fun x => ! A x) = Fintype.card Λ := by
+  classical
   unfold sublatticeCard
   have hfilter : Finset.univ.filter (fun x : Λ => (! A x) = true) =
       Finset.univ.filter (fun x : Λ => ¬ (A x = true)) := by

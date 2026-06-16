@@ -442,6 +442,7 @@ theorem heisenbergToyHamiltonian_apply_diag_neel (A : Λ → Bool) :
 
 /-! ## Magnetization on the Néel state -/
 
+omit [DecidableEq Λ] in
 /-- `magnetization Λ (neelConfigOf A) = |A| − |¬A|`: the Néel
 configuration contributes `+1` on `A` (since `σ x = 0`) and `-1` on
 `¬A` (since `σ x = 1`).
@@ -486,6 +487,7 @@ theorem magnetization_neelConfigOf (A : Λ → Bool) :
   rw [← Finset.sum_filter, Finset.sum_const]
   ring
 
+omit [DecidableEq Λ] in
 /-- **Sublattice-swap symmetry** of the spin-`1/2` Néel magnetization:
 `magnetization Λ (neelConfigOf (¬A)) = |¬A| - |A|`. Spin-`1/2` mirror of
 γ-4 step 169: the complement Néel sits in the opposite magnetization
@@ -494,6 +496,7 @@ theorem magnetization_neelConfigOf_complement (A : Λ → Bool) :
     magnetization Λ (neelConfigOf (fun x : Λ => ! A x)) =
       ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℤ) -
         ((Finset.univ.filter (fun x : Λ => A x = true)).card : ℤ) := by
+  classical
   rw [magnetization_neelConfigOf]
   simp [Bool.not_not]
 

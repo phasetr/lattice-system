@@ -36,11 +36,13 @@ variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 /-! ## Eigenvalue characterisation of the extremal configurations -/
 
 set_option linter.unusedSectionVars false in
+omit [DecidableEq V] in
 /-- `magEigenvalueS σ = m_max` iff `σ = allAlignedConfigS V N 0`. -/
 theorem magEigenvalueS_eq_mMax_iff_allAlignedConfigS_zero
     (σ : V → Fin (N + 1)) :
     magEigenvalueS σ = (Fintype.card V : ℂ) * (N : ℂ) / 2 ↔
       σ = allAlignedConfigS V N 0 := by
+  classical
   constructor
   · intro h
     -- magEigenvalueS σ = (|V|·N : ℂ)/2 − magSumS σ = (|V|·N)/2 ⇒ magSumS σ = 0.
@@ -65,11 +67,13 @@ theorem magEigenvalueS_eq_mMax_iff_allAlignedConfigS_zero
     ring
 
 set_option linter.unusedSectionVars false in
+omit [DecidableEq V] in
 /-- `magEigenvalueS σ = −m_max` iff `σ = allAlignedConfigS V N (Fin.last N)`. -/
 theorem magEigenvalueS_eq_neg_mMax_iff_allAlignedConfigS_last
     (σ : V → Fin (N + 1)) :
     magEigenvalueS σ = -((Fintype.card V : ℂ) * (N : ℂ) / 2) ↔
       σ = allAlignedConfigS V N (Fin.last N) := by
+  classical
   constructor
   · intro h
     -- magEigenvalueS σ = (|V|·N : ℂ)/2 − magSumS σ = −(|V|·N)/2 ⇒ magSumS σ = |V|·N.

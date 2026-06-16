@@ -45,10 +45,12 @@ def disagreementSet (σ σ' : Λ → Fin 2) : Finset Λ :=
 /-- Configuration distance is the size of the disagreement set. -/
 def configDist (σ σ' : Λ → Fin 2) : ℕ := (disagreementSet σ σ').card
 
+omit [DecidableEq Λ] in
 @[simp] theorem mem_disagreementSet {σ σ' : Λ → Fin 2} {x : Λ} :
     x ∈ disagreementSet σ σ' ↔ σ x ≠ σ' x := by
   simp [disagreementSet]
 
+omit [DecidableEq Λ] in
 theorem configDist_eq_zero_iff (σ σ' : Λ → Fin 2) :
     configDist σ σ' = 0 ↔ σ = σ' := by
   unfold configDist disagreementSet
@@ -60,6 +62,7 @@ theorem configDist_eq_zero_iff (σ σ' : Λ → Fin 2) :
 /-! ## Existence of `(0, 1)` and `(1, 0)` sites for distinct
 configurations of equal magnetisation -/
 
+omit [DecidableEq Λ] in
 /-- For `σ ≠ σ'` with equal magnetisation, there exist sites
 `x, y` with `σ x = 0`, `σ' x = 1`, `σ y = 1`, `σ' y = 0`.
 
@@ -71,6 +74,7 @@ theorem exists_swap_pair_of_eq_magnetization
     {σ σ' : Λ → Fin 2} (hne : σ ≠ σ')
     (hmag : magnetization Λ σ = magnetization Λ σ') :
     ∃ x y : Λ, σ x = 0 ∧ σ' x = 1 ∧ σ y = 1 ∧ σ' y = 0 := by
+  classical
   -- The difference of magnetisations decomposes as
   --   2 · (#D01 - #D10), where D01 = {σ=0, σ'=1}, D10 = {σ=1, σ'=0}.
   -- Equality forces #D01 = #D10. Non-emptiness of disagreement set

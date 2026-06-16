@@ -30,6 +30,7 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 set_option linter.unusedSectionVars false in
+omit [DecidableEq V] in
 /-- The unique element of the M = 0 magnetization sector is the
 all-up configuration `allAlignedConfigS V N 0`. -/
 theorem magConfigS_zero_eq_allAlignedConfigS
@@ -50,11 +51,13 @@ theorem magConfigS_card_zero :
   exact Subtype.ext (magConfigS_zero_eq_allAlignedConfigS τ)
 
 set_option linter.unusedSectionVars false in
+omit [DecidableEq V] in
 /-- The unique element of the M = |V|·N magnetization sector is the
 all-down configuration `allAlignedConfigS V N (Fin.last N)`. -/
 theorem magConfigS_last_eq_allAlignedConfigS
     (τ : magConfigS V N (Fintype.card V * N)) :
     τ.1 = allAlignedConfigS V N (Fin.last N) := by
+  classical
   by_contra hne
   have hlt := magSumS_lt_card_mul_of_ne_allAlignedConfigS_last hne
   rw [τ.2] at hlt

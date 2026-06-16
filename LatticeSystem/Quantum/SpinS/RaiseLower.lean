@@ -99,6 +99,7 @@ theorem RaiseLowerReachableS.tail' {G : SimpleGraph V}
 
 /-! ## Magnetization conservation -/
 
+omit [DecidableEq V] in
 /-- A `RaiseLowerStepS` preserves the magnetization sum:
 `magSumS σ' = magSumS σ`. The raise at one site (+1) is exactly
 compensated by the lower at the other (−1). -/
@@ -143,6 +144,7 @@ theorem magSumS_eq_of_raiseLowerStepS {G : SimpleGraph V}
   · omega
   · omega
 
+omit [DecidableEq V] in
 /-- A `RaiseLowerReachableS` preserves the magnetization sum:
 iterated application of `magSumS_eq_of_raiseLowerStepS`. -/
 theorem magSumS_eq_of_raiseLowerReachableS {G : SimpleGraph V}
@@ -152,11 +154,13 @@ theorem magSumS_eq_of_raiseLowerReachableS {G : SimpleGraph V}
   | refl => rfl
   | tail _hτ hτσ' ih => rw [magSumS_eq_of_raiseLowerStepS hτσ', ih]
 
+omit [DecidableEq V] in
 /-- A `RaiseLowerReachableS` preserves the magnetization eigenvalue:
 `magEigenvalueS σ' = magEigenvalueS σ`. -/
 theorem magEigenvalueS_eq_of_raiseLowerReachableS {G : SimpleGraph V}
     {σ σ' : V → Fin (N + 1)} (h : RaiseLowerReachableS G σ σ') :
     magEigenvalueS σ' = magEigenvalueS σ := by
+  classical
   unfold magEigenvalueS
   rw [magSumS_eq_of_raiseLowerReachableS h]
 

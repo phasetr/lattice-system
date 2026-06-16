@@ -97,6 +97,7 @@ theorem bipartiteCompleteGraphOf_adj_of_ne_of_sublattice_ne
 
 variable [Fintype V] [DecidableEq V] {N : ℕ}
 
+omit [DecidableEq V] in
 /-- For an over site `x` (where `(σ' x).val < (σ x).val`) and an
 under site `y` (where `(σ y).val < (σ' y).val`) on different
 sublattices (`A x ≠ A y`), there exists a configuration `σ''` reachable
@@ -110,6 +111,7 @@ theorem exists_raiseLowerStepS_bipartite_of_over_under_ne_sublattice
     ∃ σ'' : V → Fin (N + 1),
       RaiseLowerStepS (bipartiteCompleteGraphOf A) σ σ'' ∧
         configDistS σ'' σ' + 2 = configDistS σ σ' := by
+  classical
   -- Bounds for the raise/lower update.
   have hx_bound : (σ x).val - 1 < N + 1 := by
     have := (σ x).isLt; omega
@@ -141,6 +143,7 @@ theorem exists_raiseLowerStepS_bipartite_of_over_under_ne_sublattice
   · -- Distance reduces by 2.
     exact configDistS_decrease_of_over_under hxy hover hunder
 
+omit [DecidableEq V] in
 /-- The "hard case" of bipartite reachability: when over and under
 sites land on the same sublattice, a 2-step transport through an
 opposite-sublattice intermediate `z` (with `σ z < N` so it has room
@@ -162,6 +165,7 @@ theorem exists_raiseLowerReachableS_bipartite_of_over_under_eq_sublattice
     ∃ σ'' : V → Fin (N + 1),
       RaiseLowerReachableS (bipartiteCompleteGraphOf A) σ σ'' ∧
         configDistS σ'' σ' + 2 = configDistS σ σ' := by
+  classical
   -- z ≠ x, z ≠ y (since A z ≠ A x = A y).
   have hzx : z ≠ x := fun heq => hAz (heq ▸ rfl)
   have hzy : z ≠ y := fun heq => hAz (heq ▸ hAeq.symm)

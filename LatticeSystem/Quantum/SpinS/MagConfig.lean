@@ -131,6 +131,7 @@ theorem RaiseLowerReachableSMagSector.tail' {G : SimpleGraph V} {M : ℕ}
     RaiseLowerReachableSMagSector G σ ρ :=
   Relation.ReflTransGen.tail h₁ h₂
 
+omit [DecidableEq V] in
 /-- Lift `RaiseLowerReachableS` from the full type to the subtype
 `magConfigS V N M`: given the chain endpoints both lie in the same
 sector, the chain itself stays within the sector (by `magSumS`
@@ -140,6 +141,7 @@ theorem raiseLowerReachableSMagSector_of_raiseLowerReachableS
     (hσM : magSumS σ = M) (hτM : magSumS τ = M)
     (hreach : RaiseLowerReachableS G σ τ) :
     RaiseLowerReachableSMagSector G ⟨σ, hσM⟩ ⟨τ, hτM⟩ := by
+  classical
   -- Generalize the target endpoint and its sector-proof.
   suffices h : ∀ (ρ : V → Fin (N + 1))
       (hρM : magSumS ρ = M)
