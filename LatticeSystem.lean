@@ -279,7 +279,6 @@ import LatticeSystem.Quantum.SpinS.Theorem23PFConstancy
 import LatticeSystem.Quantum.SpinS.Theorem23PFTotalSpin
 import LatticeSystem.Quantum.SpinS.Theorem23PFCasimirEigenvector
 import LatticeSystem.Quantum.SpinS.Theorem23PFCasimirPredicted
-import LatticeSystem.Quantum.SpinS.Theorem23PFToyJointCasimir
 import LatticeSystem.Quantum.SpinS.MagEigenvalueBound
 import LatticeSystem.Quantum.SpinS.SublatticeSzBound
 import LatticeSystem.Quantum.SpinS.CasimirWeightComponent
@@ -336,8 +335,6 @@ import LatticeSystem.Quantum.SpinS.Theorem23ToyMinEnergyBound
 import LatticeSystem.Quantum.SpinS.Theorem23ToyMinEnergyArithEq
 import LatticeSystem.Quantum.SpinS.Theorem23ToyGSPredictedCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23PredictedEnergySectorAll
-import LatticeSystem.Quantum.SpinS.Theorem23ToyGSPredictedCasimirAt
-import LatticeSystem.Quantum.SpinS.Theorem23PFSectorCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23GlobalMinimality
 import LatticeSystem.Quantum.SpinS.Theorem23TotalLoweringNonvanishing
 import LatticeSystem.Quantum.SpinS.Theorem23GeneralHOutside
