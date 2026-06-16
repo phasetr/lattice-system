@@ -379,7 +379,6 @@ import LatticeSystem.Quantum.SpinS.DressedAxisSwapSingleIonStrictPos
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapParityStepStrictPos
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockPowPos
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducible
-import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducibleUnconditional
 import LatticeSystem.Quantum.SpinS.ParityBlockPerronFinrank
 import LatticeSystem.Quantum.SpinS.ParityBlockUnshiftedFinrank
 import LatticeSystem.Quantum.SpinS.ParityBlockDressedFinrank
@@ -408,7 +407,6 @@ import LatticeSystem.Quantum.SpinS.BlockEigBotBelowJointMin
 import LatticeSystem.Quantum.SpinS.BlockMinLeTwo
 import LatticeSystem.Quantum.SpinS.BareAxisSwapMinLeTwo
 import LatticeSystem.Quantum.SpinS.BareAnisotropicMinLeTwo
-import LatticeSystem.Quantum.SpinS.DressedSubmatrixPFEigenvector
 import LatticeSystem.Quantum.SpinS.ComplexDressedSubmatrixPFEigenvector
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapDegeneracyBound
 import LatticeSystem.Quantum.SpinS.DressedFullEigInterParityLeOne

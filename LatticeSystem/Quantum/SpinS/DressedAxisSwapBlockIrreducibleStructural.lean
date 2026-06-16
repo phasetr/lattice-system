@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducibleUnconditional
+import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducible
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
 
 /-!
