@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.Theorem23PFToyJointCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralCasimirEigenvec
 import LatticeSystem.Quantum.SpinS.SublatticeCasimirSpectralBound
 

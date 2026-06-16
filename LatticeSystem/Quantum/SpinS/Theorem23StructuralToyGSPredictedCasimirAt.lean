@@ -1,4 +1,6 @@
-import LatticeSystem.Quantum.SpinS.Theorem23ToyGSPredictedCasimirAt
+import LatticeSystem.Quantum.SpinS.Theorem23PredictedEnergySectorAll
+import LatticeSystem.Quantum.SpinS.Theorem23ToyGroundEnergyBound
+import LatticeSystem.Quantum.SpinS.Theorem23ToyGSPredictedCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralMagSectorPF
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralPFJointCasimir
 

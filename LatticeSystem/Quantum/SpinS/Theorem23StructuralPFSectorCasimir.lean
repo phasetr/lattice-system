@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.Theorem23PFSectorCasimir
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralToyGSPredictedCasimirAt
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralPFCasimirPredicted
 

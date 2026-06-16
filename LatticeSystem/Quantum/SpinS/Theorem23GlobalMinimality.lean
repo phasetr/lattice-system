@@ -1,4 +1,5 @@
-import LatticeSystem.Quantum.SpinS.Theorem23PFSectorCasimir
+import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
+import LatticeSystem.Quantum.SpinS.Theorem23Sectors
 import LatticeSystem.Quantum.SpinS.Theorem23PFConstancyCasimir
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorMarshall
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorEigenvalueUnique
