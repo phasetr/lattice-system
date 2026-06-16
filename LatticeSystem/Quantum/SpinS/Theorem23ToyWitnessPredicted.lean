@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.Theorem23ToyWitness
 import LatticeSystem.Quantum.SpinS.Theorem23ToyGroundEnergyBound
 import LatticeSystem.Quantum.SpinS.JointPredictedSectorEigenvector
+import LatticeSystem.Quantum.SpinS.Theorem23StructuralMagSectorPF
 
 /-!
 # The toy-Hamiltonian ground state is a predicted-total-Casimir witness
@@ -41,7 +42,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 the predicted value `tasaki23PredictedCasimirValue A N`.  This discharges the single
 remaining obligation of the sound Perron–Frobenius route (Issue #3658). -/
 theorem tasaki23_toy_groundState_casimir_eq_predicted
-    (A : V → Bool) (N : ℕ) (c : ℝ)
+    (A : V → Bool) (N : ℕ) (c : ℝ) [Nonempty V]
     (horient : (Finset.univ.filter (fun x : V => (! A x) = true)).card ≤
       (Finset.univ.filter (fun x : V => A x = true)).card)
     [Nonempty (magConfigS V N
@@ -65,16 +66,17 @@ theorem tasaki23_toy_groundState_casimir_eq_predicted
   set M := min (Finset.univ.filter (fun x : V => A x = true)).card
       (Finset.univ.filter (fun x : V => (! A x) = true)).card * N with hM
   -- The Perron–Frobenius ground state of the bipartite toy Hamiltonian on sector M.
+  obtain ⟨hA_ne, hB_ne, hN⟩ := h_intermediate_imp_conditions A h_intermediate
   obtain ⟨μ, v, _hμ_lt_c, hv_pos, hReEig⟩ :=
-    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector_legacy
-      (M := M) A N c (bipartiteCoupling_im A)
+    exists_marshallSign_eigenvector_heisenbergHamiltonianSReMatrixOnMagSector
+      (M := M) A c (bipartiteCoupling_im A)
       (fun x y hadj => by
         rw [bipartiteCompleteGraphOf_adj_iff] at hadj
         exact bipartiteCoupling_pos_of_diff_sublattice A hadj.2)
       (fun x y => bipartiteCoupling_nonneg A x y)
       (bipartiteCoupling_symm A)
       (fun _ _ h => bipartiteCoupling_eq_zero_of_same_sublattice A h)
-      hc_strict h_intermediate
+      hc_strict hA_ne hB_ne hN
   -- The predicted-energy sector eigenvector φ at M (= |¬A|·N for |¬A| ≤ |A|).
   have hMeq : M = (Finset.univ.filter (fun x : V => (! A x) = true)).card * N := by
     rw [hM, min_eq_right horient]
