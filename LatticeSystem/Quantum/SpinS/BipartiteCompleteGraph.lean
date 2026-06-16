@@ -342,6 +342,7 @@ theorem raiseLowerReachableS_bipartiteCompleteGraph_of_eq_magSumS_legacy
 /-! ## Preconnectedness of `bipartiteCompleteGraphOf` -/
 
 set_option linter.unusedSectionVars false in
+omit [DecidableEq V] [Fintype V] in
 /-- The bipartite-complete graph `bipartiteCompleteGraphOf A` is
 preconnected when both sublattices are non-empty. Any two `x, y ∈ V`
 are joined by a walk of length ≤ 2:
@@ -356,6 +357,7 @@ theorem bipartiteCompleteGraphOf_preconnected
     (A : V → Bool)
     (hA_pos : ∃ x : V, A x = true) (hA_neg : ∃ y : V, A y = false) :
     (bipartiteCompleteGraphOf A).Preconnected := by
+  classical
   intro x y
   by_cases hAxy : A x = A y
   · -- Same sublattice: pick a vertex in the opposite sublattice.

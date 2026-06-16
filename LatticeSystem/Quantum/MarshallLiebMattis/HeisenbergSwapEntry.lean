@@ -34,6 +34,7 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
+omit [Fintype Λ] in
 /-- For `σ' = basisSwap σ x y` (with `x ≠ y`, `σ_x ≠ σ_y`) and any
 `u ≠ v`, if `{u, v} ≠ {x, y}` (encoded as the negation of "ordered
 match" with both orientations), then `basisSwap σ' u v ≠ σ`.

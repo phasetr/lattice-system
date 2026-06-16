@@ -500,6 +500,7 @@ theorem magnetization_neelConfigOf_complement (A : Λ → Bool) :
   rw [magnetization_neelConfigOf]
   simp [Bool.not_not]
 
+omit [DecidableEq Λ] [Fintype Λ] in
 /-- The spin-`1/2` Néel configuration `neelConfigOf A` is distinct from
 its sublattice-complement `neelConfigOf (¬A)` (as functions `Λ → Fin 2`)
 when `Λ` is non-empty: at any vertex `x` the swap exchanges `0 ↔ 1`,
@@ -507,6 +508,7 @@ witnessing the inequality. Spin-`1/2` mirror of γ-4 step 171's
 distinctness witness. -/
 theorem neelConfigOf_ne_complement [Nonempty Λ] (A : Λ → Bool) :
     neelConfigOf A ≠ neelConfigOf (fun x : Λ => ! A x) := by
+  classical
   obtain ⟨x⟩ := ‹Nonempty Λ›
   intro h
   have hx := congr_fun h x

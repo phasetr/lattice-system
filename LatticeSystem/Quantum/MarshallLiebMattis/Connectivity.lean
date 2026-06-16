@@ -65,24 +65,29 @@ relation containing `SwapStep G` that is reflexive and transitive. -/
 def SwapReachable (G : SimpleGraph Λ) : (Λ → Fin 2) → (Λ → Fin 2) → Prop :=
   Relation.ReflTransGen (SwapStep G)
 
+omit [Fintype Λ] in
 theorem SwapReachable.refl (G : SimpleGraph Λ) (σ : Λ → Fin 2) :
     SwapReachable G σ σ :=
   Relation.ReflTransGen.refl
 
+omit [Fintype Λ] in
 theorem SwapReachable.single (G : SimpleGraph Λ) {σ σ' : Λ → Fin 2}
     (h : SwapStep G σ σ') : SwapReachable G σ σ' :=
   Relation.ReflTransGen.single h
 
+omit [Fintype Λ] in
 theorem SwapReachable.trans {G : SimpleGraph Λ} {σ τ σ' : Λ → Fin 2}
     (h₁ : SwapReachable G σ τ) (h₂ : SwapReachable G τ σ') :
     SwapReachable G σ σ' :=
   Relation.ReflTransGen.trans h₁ h₂
 
+omit [Fintype Λ] in
 theorem SwapReachable.tail' {G : SimpleGraph Λ} {σ τ σ' : Λ → Fin 2}
     (h₁ : SwapReachable G σ τ) (h₂ : SwapStep G τ σ') :
     SwapReachable G σ σ' :=
   Relation.ReflTransGen.tail h₁ h₂
 
+omit [Fintype Λ] in
 /-- Single-edge case: a direct `SwapStep` is a `SwapReachable`. -/
 theorem SwapReachable.of_step {G : SimpleGraph Λ}
     {σ σ' : Λ → Fin 2} (h : SwapStep G σ σ') :
@@ -91,6 +96,7 @@ theorem SwapReachable.of_step {G : SimpleGraph Λ}
 
 /-! ## Walk-based connectivity -/
 
+omit [Fintype Λ] in
 /-- Helper: `basisSwap` agrees with the underlying configuration off
 `{x, y}`. -/
 private theorem basisSwap_off_xy {x y : Λ} (σ : Λ → Fin 2)
@@ -99,12 +105,14 @@ private theorem basisSwap_off_xy {x y : Λ} (σ : Λ → Fin 2)
   unfold basisSwap
   rw [Function.update_of_ne hzy, Function.update_of_ne hzx]
 
+omit [Fintype Λ] in
 /-- Helper: `basisSwap σ x y` at site `x` equals `σ y`. -/
 private theorem basisSwap_at_x {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin 2) :
     basisSwap σ x y x = σ y := by
   unfold basisSwap
   rw [Function.update_of_ne hxy, Function.update_self]
 
+omit [Fintype Λ] in
 /-- Helper: `basisSwap σ x y` at site `y` equals `σ x`. -/
 private theorem basisSwap_at_y {x y : Λ} (σ : Λ → Fin 2) :
     basisSwap σ x y y = σ x := by
@@ -117,6 +125,7 @@ private theorem fin2_eq_of_both_ne {s t u : Fin 2} (h₁ : s ≠ t) (h₂ : s �
   fin_cases s <;> fin_cases t <;> fin_cases u <;>
     first | rfl | (exact absurd rfl h₁) | (exact absurd rfl h₂)
 
+omit [Fintype Λ] in
 /-- **Key lemma (Tasaki p. 41).** If `G.Walk x y` exists and
 `σ x ≠ σ y`, then `σ` and `basisSwap σ x y` are `SwapReachable`.
 
@@ -231,6 +240,7 @@ theorem swapReachable_of_walk_of_ne
                 rw [basisSwap_off_xy σ hzu hzv]
         rw [← hgoal]; exact hcomb
 
+omit [Fintype Λ] in
 /-- **Property (iii) ingredient.** For a connected graph `G`, any
 two distinct vertices `x, y ∈ Λ` with `σ x ≠ σ y` admit a swap
 chain reaching `basisSwap σ x y`. -/
@@ -241,6 +251,7 @@ theorem swapReachable_of_reachable_of_ne
   obtain ⟨w⟩ := hxy_reach
   exact swapReachable_of_walk_of_ne w h
 
+omit [Fintype Λ] in
 /-- For a preconnected graph, the swap-reachability holds for any
 `x, y` with `σ x ≠ σ y`. -/
 theorem swapReachable_of_preconnected_of_ne

@@ -31,6 +31,7 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
+omit [Fintype Λ] in
 /-- `basisSwap` is symmetric in the two site arguments:
 `basisSwap σ x y = basisSwap σ y x`. -/
 private theorem basisSwap_swap_args (σ : Λ → Fin 2) {x y : Λ} (hxy : x ≠ y) :

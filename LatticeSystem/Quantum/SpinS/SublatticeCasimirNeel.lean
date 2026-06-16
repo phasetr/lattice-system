@@ -148,6 +148,7 @@ theorem magSumS_neelConfigOfS_complement (A : Λ → Bool) (N : ℕ) :
   rw [magSumS_neelConfigOfS]
   simp [Bool.not_not]
 
+omit [DecidableEq Λ] [Fintype Λ] in
 /-- The Néel configuration `neelConfigOfS A N` is distinct from its
 sublattice-complement `neelConfigOfS (¬A) N` (as functions `Λ → Fin (N+1)`)
 when `Λ` is non-empty and `0 < N`: at any vertex `x`, the swap takes
@@ -155,6 +156,7 @@ when `Λ` is non-empty and `0 < N`: at any vertex `x`, the swap takes
 theorem neelConfigOfS_ne_complement [Nonempty Λ] (A : Λ → Bool) (N : ℕ)
     (hN : 0 < N) :
     neelConfigOfS A N ≠ neelConfigOfS (fun x : Λ => ! A x) N := by
+  classical
   obtain ⟨x⟩ := ‹Nonempty Λ›
   intro h
   have hx := congr_fun h x
@@ -230,12 +232,14 @@ theorem totalSpinSOp3_mulVec_neelStateOfS (A : Λ → Bool) (N : ℕ) :
 
 /-! ## Néel config under sublattice swap -/
 
+omit [DecidableEq Λ] [Fintype Λ] in
 /-- `neelConfigOfS (¬A) N` is the "swapped" Néel configuration: `σ x = N`
 for `A x = true` (i.e., on `A`) and `σ x = 0` for `A x = false` (on `¬A`).
 This is the natural sublattice-swap dual of `neelConfigOfS A N`. -/
 theorem neelConfigOfS_complement (A : Λ → Bool) (N : ℕ) (x : Λ) :
     neelConfigOfS (fun y => ! A y) N x =
       if A x then Fin.last N else 0 := by
+  classical
   unfold neelConfigOfS
   by_cases hA : A x = true
   · simp [hA]

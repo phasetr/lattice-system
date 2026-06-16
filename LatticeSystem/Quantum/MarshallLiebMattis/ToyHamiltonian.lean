@@ -52,14 +52,17 @@ This is the (unnormalised) coupling for the MLM toy Hamiltonian
 noncomputable def bipartiteCoupling (A : Λ → Bool) : Λ → Λ → ℂ :=
   fun x y => if A x ≠ A y then 1 else 0
 
+omit [DecidableEq Λ] [Fintype Λ] in
 /-- The bipartite coupling is real (no imaginary part). -/
 theorem bipartiteCoupling_im (A : Λ → Bool) (x y : Λ) :
     (bipartiteCoupling A x y).im = 0 := by
+  classical
   unfold bipartiteCoupling
   by_cases h : A x ≠ A y
   · rw [if_pos h]; simp
   · rw [if_neg h]; simp
 
+omit [DecidableEq Λ] [Fintype Λ] in
 /-- The bipartite coupling is symmetric: `J(x, y) = J(y, x)`. -/
 theorem bipartiteCoupling_symm (A : Λ → Bool) (x y : Λ) :
     bipartiteCoupling A x y = bipartiteCoupling A y x := by
@@ -70,6 +73,7 @@ theorem bipartiteCoupling_symm (A : Λ → Bool) (x y : Λ) :
     push Not at h
     rw [if_neg (by push Not; exact h.symm)]
 
+omit [DecidableEq Λ] [Fintype Λ] in
 /-- The bipartite coupling is non-negative: `0 ≤ (J(x, y)).re`. -/
 theorem bipartiteCoupling_nonneg (A : Λ → Bool) (x y : Λ) :
     0 ≤ (bipartiteCoupling A x y).re := by
@@ -78,16 +82,19 @@ theorem bipartiteCoupling_nonneg (A : Λ → Bool) (x y : Λ) :
   · rw [if_pos h]; simp
   · rw [if_neg h]; simp
 
+omit [DecidableEq Λ] [Fintype Λ] in
 /-- The bipartite coupling vanishes on intra-sublattice pairs:
 `A x = A y → J(x, y) = 0`. -/
 theorem bipartiteCoupling_eq_zero_of_same_sublattice
     (A : Λ → Bool) {x y : Λ} (h : A x = A y) :
     bipartiteCoupling A x y = 0 := by
+  classical
   unfold bipartiteCoupling
   rw [if_neg]
   push Not
   exact h
 
+omit [DecidableEq Λ] [Fintype Λ] in
 /-- The bipartite coupling is positive on inter-sublattice pairs:
 `A x ≠ A y → 0 < (J(x, y)).re`. -/
 theorem bipartiteCoupling_pos_of_diff_sublattice
