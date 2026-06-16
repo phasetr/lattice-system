@@ -9666,6 +9666,12 @@ Marshall sign machinery + time-reversal action; see
   \texttt{tasaki\_2\_5\_theorem\_2\_3\_bipartiteToy} and
   \texttt{tasaki\_2\_5\_theorem\_2\_3\_of\_bipartiteCompletePositive}.
   PR~\#4082 synchronized the public status rows with these canonical names.
+  The migration bridge \texttt{h\_intermediate\_imp\_conditions} (Issue~\#4569)
+  shows the deprecated intermediate-support hypothesis $h_{\mathrm{intermediate}}$
+  implies the canonical conditions $(\exists a,\ A\,a=\mathtt{true})\wedge
+  (\exists b,\ A\,b=\mathtt{false})\wedge 1\le N$ for nonempty $V$, letting the
+  remaining $h_{\mathrm{intermediate}}$-based call sites move to the canonical
+  $\mathtt{hA\_ne}/\mathtt{hB\_ne}/\mathtt{hN}$ API.
 \item \textbf{DONE} Problem 2.5.a (single-cluster ground-state energy
   $-S(1+zS)$ for general spin $S$ and coordination $z$).  The final
   equality wrapper
