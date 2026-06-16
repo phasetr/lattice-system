@@ -43,7 +43,7 @@ eigenvalues are orthogonal in the dot product `star v ⬝ᵥ w`.
 
 The realness assumption is supplied as `star α = α` and `star β = β`. -/
 theorem Matrix.IsHermitian.dotProduct_eq_zero_of_eigenvalues_ne
-    {n : Type*} [Fintype n] [DecidableEq n]
+    {n : Type*} [Fintype n]
     {M : Matrix n n ℂ} (hM : M.IsHermitian)
     {α β : ℂ} (hα : star α = α) (hβ : star β = β)
     {v w : n → ℂ}
