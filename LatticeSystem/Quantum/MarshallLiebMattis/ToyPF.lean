@@ -33,6 +33,7 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
+omit [DecidableEq Λ] [Fintype Λ] in
 /-- The bipartite coupling and bipartite graph are mutually
 consistent: bipartiteGraphFromA-edges coincide with positive
 bipartiteCoupling. -/
@@ -44,10 +45,12 @@ private theorem bipartite_pos_on_graph (A : Λ → Bool) :
   exact bipartiteCoupling_pos_of_diff_sublattice A hadj
 
 set_option linter.unusedSectionVars false in
+omit [DecidableEq Λ] [Fintype Λ] in
 /-- The bipartite graph is bipartite-respecting: each edge crosses
 the sublattice partition. -/
 private theorem bipartite_graph_bipartite (A : Λ → Bool) :
     ∀ {x y : Λ}, (bipartiteGraphFromA A).Adj x y → A x ≠ A y := by
+  classical
   intro x y hadj
   rwa [bipartiteGraphFromA_adj] at hadj
 
