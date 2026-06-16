@@ -6,9 +6,8 @@ import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
 
 Issue #3887 (Tasaki §2.5 Theorem 2.4, `h_intermediate` vacuous-at-N=1 fix).
 
-(#3887.4): Structural variant of
-`shiftedDressedAxisSwappedReMatrixOnParityBlock_isIrreducible_legacy` that uses
-`parityReachableS_total` (#3887.3) instead of `parityReachableS_total_legacy`.
+(#3887.4): Structural (`h_intermediate`-free) parity-block irreducibility, using
+`parityReachableS_total` (#3887.3).
 
 Drops `h_intermediate`; requires `hA_ne + hB_ne + 1 ≤ N` instead. The result is
 identical in conclusion — irreducibility of the shifted parity-block matrix —
