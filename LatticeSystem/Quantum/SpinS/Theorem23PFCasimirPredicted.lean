@@ -37,7 +37,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 /-- **Realness of a Hermitian eigenvalue**: an eigenvalue of a Hermitian
 matrix that has a non-zero eigenvector is fixed by complex conjugation. -/
 theorem isHermitian_eigenvalue_star_eq
-    {n : Type*} [Fintype n] [DecidableEq n]
+    {n : Type*} [Fintype n]
     {A : Matrix n n ℂ} (hA : A.IsHermitian)
     {γ : ℂ} {v : n → ℂ} (hv : A.mulVec v = γ • v) (hv_ne : v ≠ 0) :
     star γ = γ := by

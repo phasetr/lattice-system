@@ -42,8 +42,9 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 /-- A finite sum of real numbers is strictly negative if every term is non-positive and at least
 one term is strictly negative. -/
 theorem Finset.sum_neg_of_forall_nonpos_of_exists_neg
-    {α : Type*} [DecidableEq α] {s : _root_.Finset α} {f : α → ℝ}
+    {α : Type*} {s : _root_.Finset α} {f : α → ℝ}
     (hnp : ∀ a ∈ s, f a ≤ 0) (hex : ∃ a ∈ s, f a < 0) : ∑ a ∈ s, f a < 0 := by
+  classical
   obtain ⟨a₀, ha₀, hf₀⟩ := hex
   have hrest : ∑ a ∈ s.erase a₀, f a ≤ 0 :=
     _root_.Finset.sum_nonpos (fun a ha => hnp a (_root_.Finset.mem_of_mem_erase ha))
