@@ -1,4 +1,5 @@
-import LatticeSystem.Quantum.SpinS.Theorem23PFCasimirEigenvector
+import LatticeSystem.Math.PerronFrobeniusSimple
+import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorMarshall
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralReach
 
 /-!
