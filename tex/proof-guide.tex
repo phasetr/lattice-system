@@ -4593,19 +4593,52 @@ overlap (Gram) matrix:
 \]
 where $p$ runs over all permutations.
 
-\emph{Status.} In the concrete Jordan--Wigner representation this is a
-finite-dimensional linear-algebra identity, but a direct sorry-free
-proof requires a dedicated anticommutator Wick/Laplace expansion with
-the associated ordered-list (Koszul) sign bookkeeping, comparable in
-size to the flat-band Slater-reorder development. It is therefore
-recorded as a faithful documented \texttt{axiom}
-(\texttt{lemma\_9\_1\_slater\_inner\_det}); its permutation-sum form
+\emph{Status: proved axiom-free} (\texttt{lemma\_9\_1\_slater\_inner\_det},
+depending only on \texttt{propext}, \texttt{Classical.choice},
+\texttt{Quot.sound}). In the concrete Jordan--Wigner representation this
+is a finite-dimensional linear-algebra identity, proved by induction on
+the electron number $n$ (the row-$0$ Laplace expansion of the Gram
+determinant). The permutation-sum form
 (\texttt{lemma\_9\_1\_slater\_inner\_perm\_sum}) is derived from it by
 the Leibniz determinant expansion, and its $n = 0$ instance
 $\langle \Phi_{\rm vac}, \Phi_{\rm vac}\rangle = 1$
-(\texttt{fockInner\_vacuum\_self}) is proved axiom-free as a
-consistency guard. The downstream Lemmas 9.2 and 9.3 will be proved
-from this identity.
+(\texttt{fockInner\_vacuum\_self}) is proved separately as a
+consistency guard. The downstream Lemmas 9.2 and 9.3 are proved from
+this identity.
+
+\emph{Proof of eq.~(9.2.53).} The argument moves the bra's creation
+operators to the ket and reads off the cofactor expansion. The Slater
+state of a cons list factors as
+$|\Phi_{a :: \varphi s}\rangle = \hat C^\dagger(a)\,|\Phi_{\varphi s}\rangle$
+(\texttt{slaterState\_cons}, from $\mathrm{List.ofFn\_succ}$ and
+$\mathrm{mulVec\_mulVec}$). Splitting off the bra's leading factor and
+using the adjoint move
+$\langle \hat A v, w\rangle = \langle v, \hat A^\dagger w\rangle$
+(\texttt{fockInner\_mulVec\_left}, from $\mathrm{star\_mulVec}$ and
+$\mathrm{dotProduct\_mulVec}$) together with
+$(\hat C^\dagger(\varphi))^\dagger = \hat C(\varphi^{*})$
+(\texttt{fermionCreationFromVector\_conjTranspose}) turns the leading bra
+creation into a smeared annihilation acting on the ket. The
+\emph{pull-through identity}
+(\texttt{annihilationFromVector\_mulVec\_slaterState}) then evaluates
+\[
+  \hat C(\chi)\,|\Phi_{\psi}\rangle
+    = \sum_{j} (-1)^{j}\,
+        \Bigl(\sum_x \chi(x)\,\psi^{(j)}(x)\Bigr)\,
+        |\Phi_{\psi \circ \widehat{\jmath}}\rangle,
+\]
+where $\widehat{\jmath} = j.\mathrm{succAbove}$ deletes the $j$-th
+single-electron state; it is proved by induction, anticommuting
+$\hat C(\chi)$ past the leading $\hat C^\dagger(\psi^{(0)})$ via the
+smeared mixed CAR
+$\{\hat C(\chi), \hat C^\dagger(\psi^{(0)})\} = (\sum_x \chi\psi^{(0)})\hat 1$
+(the $j = 0$ term) and killing the vacuum at the base case, the index
+bookkeeping handled by $\mathrm{Fin.succ\_succAbove\_zero}$ /
+$\mathrm{Fin.succ\_succAbove\_succ}$. Feeding $\chi = (\varphi^{(0)})^{*}$
+makes each scalar the Gram entry $\langle \varphi^{(0)}, \psi^{(j)}\rangle$,
+and the induction hypothesis identifies each cofactor overlap with the
+Gram submatrix determinant, so $\mathrm{Matrix.det\_succ\_row\_zero}$
+reassembles $\det(\langle \varphi^{(j)}, \psi^{(k)}\rangle)_{j,k}$.
 
 \medskip
 \noindent\textbf{Discharge progress (Issue \#4593, PR1).} The first
@@ -4671,8 +4704,8 @@ $A$ with columns $\varphi^{(j)}$ (so $A_{x,j} = \varphi^{(j)}(x)$), the
 Gram matrix is $G = A^{\mathsf H} A$, and $\ker(A^{\mathsf H} A) = \ker A$
 over $\mathbb{C}$; hence $\det G \neq 0$ iff the columns of $A$ are
 linearly independent, i.e.\ iff the $\varphi^{(j)}$ are. This part
-(\texttt{slaterGram\_self\_det\_ne\_zero\_iff}) is proved axiom-free; the
-full lemma depends only on the Lemma 9.1 axiom.
+(\texttt{slaterGram\_self\_det\_ne\_zero\_iff}) is proved axiom-free, and
+since Lemma 9.1 is now proved, the full lemma is axiom-free.
 
 \medskip
 \noindent\textbf{Lemma 9.3} (Tasaki §9.2.3, pp.~320--321). If
@@ -4693,7 +4726,8 @@ $\chi = \psi$ shows $w$ is orthogonal to both $|\Phi\rangle$ and
 $|\Psi\rangle$, hence to itself, so $\langle w, w\rangle = 0$ and $w = 0$
 by positive-definiteness of the Fock inner product. Finally $c \neq 0$,
 since $|\Psi\rangle \neq 0$ by Lemma 9.2 applied to the linearly
-independent $\psi$. The lemma depends only on the Lemma 9.1 axiom.
+independent $\psi$. Since Lemma 9.1 is now proved, the lemma is
+axiom-free.
 
 \medskip
 \noindent\textbf{Lemma 9.4} (general basis of $H_N$; Tasaki §9.2.3,
