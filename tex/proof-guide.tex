@@ -4631,6 +4631,31 @@ annihilation forms by conjugate transposition. These anticommutators
 are the Wick-reordering inputs for the eventual determinant expansion.
 
 \medskip
+\noindent\textbf{Discharge progress (Issue \#4593, PR2).} Building on PR1,
+the \emph{smeared}-operator canonical anticommutators and the
+vacuum-killing identity are established in
+\texttt{Fermion/JordanWigner/SmearedCAR.lean}. With the un-conjugated
+(bilinear) smeared operators $\hat C(\varphi) = \sum_x \varphi(x)\hat c_x$,
+$\hat C^\dagger(\psi) = \sum_x \psi(x)\hat c^\dagger_x$,
+\[
+  \{\hat C(\varphi), \hat C^\dagger(\psi)\}
+    = \Bigl(\sum_x \varphi(x)\,\psi(x)\Bigr)\,\hat 1,
+  \qquad
+  \{\hat C^\dagger(\varphi), \hat C^\dagger(\psi)\}
+    = \{\hat C(\varphi), \hat C(\psi)\} = 0,
+\]
+(\texttt{fermionFromVector\_anticomm\_mixed},
+\texttt{fermionCreationFromVector\_anticomm},
+\texttt{fermionAnnihilationFromVector\_anticomm}), obtained by expanding the
+bilinear sums into the on-site diagonal ($\{\hat c_x, \hat c^\dagger_x\} = 1$,
+$\hat c_x^2 = (\hat c^\dagger_x)^2 = 0$) and the PR1 cross-site off-diagonal,
+and the vacuum is annihilated,
+$\hat C(\varphi)\,|\Phi_{\rm vac}\rangle = 0$
+(\texttt{fermionAnnihilationFromVector\_mulVec\_vacuum}, from the per-site
+$\hat c_x|\Phi_{\rm vac}\rangle = 0$). These are the reordering and
+boundary inputs for the induction proving eq.~(9.2.53).
+
+\medskip
 \noindent\textbf{Lemma 9.2} (Tasaki §9.2.3, p.~320). The Slater
 determinant state $|\Phi\rangle$ is nonvanishing if and only if the
 single-electron wave functions $\varphi^{(1)},\dots,\varphi^{(N)}$ are
