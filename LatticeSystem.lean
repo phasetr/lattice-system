@@ -264,6 +264,7 @@ import LatticeSystem.Fermion.Mode
 import LatticeSystem.Fermion.SingleMode
 import LatticeSystem.Fermion.JordanWigner
 import LatticeSystem.Fermion.JWAbstract
+import LatticeSystem.Fermion.JWAbstractCrossSite
 import LatticeSystem.Fermion.JordanWigner.FockSpaceRepresentation
 -- Tasaki §2.5 Theorem 2.3 (spin-S Marshall–Lieb–Mattis) tree.
 -- These are the in-progress final-wrapper "tip" modules; importing them here

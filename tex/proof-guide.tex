@@ -4608,6 +4608,29 @@ consistency guard. The downstream Lemmas 9.2 and 9.3 will be proved
 from this identity.
 
 \medskip
+\noindent\textbf{Discharge progress (Issue \#4593, PR1).} The first
+foundational step toward a sorry-free proof of Lemma 9.1 is the
+cross-site canonical anticommutation algebra for the \emph{abstract}
+(general finite, linearly ordered $\Lambda$) fermion operators
+$\hat c^\dagger_x = \hat C^\dagger(\delta_x)$,
+$\hat c_x = \hat C(\delta_x)$, established in
+\texttt{Fermion/JWAbstractCrossSite.lean}. For $i \neq j$,
+\[
+  \{\hat c_i, \hat c_j\} = \{\hat c^\dagger_i, \hat c^\dagger_j\}
+    = \{\hat c_i, \hat c^\dagger_j\} = \{\hat c^\dagger_i, \hat c_j\} = 0
+\]
+(\texttt{fermionAnnihilationAbstract\_anticomm\_of\_ne},
+\texttt{fermionCreationAbstract\_anticomm\_of\_ne}, and the two mixed
+forms), each obtained from an $i < j$ form by trichotomy and
+$\mathrm{add\_comm}$, mirroring the $\mathrm{Fin}(N+1)$-indexed
+``multi'' versions in \texttt{CAR/CrossSiteOfNe.lean}. The required
+abstract Jordan--Wigner string lemmas
+($\{\sigma^\pm_i, J_j\} = 0$ for $i < j$, and commutation of two JW
+strings) are proved alongside; the creation forms are obtained from the
+annihilation forms by conjugate transposition. These anticommutators
+are the Wick-reordering inputs for the eventual determinant expansion.
+
+\medskip
 \noindent\textbf{Lemma 9.2} (Tasaki §9.2.3, p.~320). The Slater
 determinant state $|\Phi\rangle$ is nonvanishing if and only if the
 single-electron wave functions $\varphi^{(1)},\dots,\varphi^{(N)}$ are
