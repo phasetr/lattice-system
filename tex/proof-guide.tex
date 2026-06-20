@@ -8247,9 +8247,18 @@ $\langle\Phi|\hat T_{xy}|\Phi\rangle$ with $\hat T_{xy}=\tfrac12(\hat S_x^+\hat 
 its non-positivity for cross-sublattice pairs ($A x\ne A y$) on a Marshall-positive sector ground
 state $\Phi=\texttt{marshallSignS}\cdot c$ ($c>0$), and the summed dominance
 $\langle\Phi|\sum_{x,y}\hat T_{xy}|\Phi\rangle_{\mathrm{re}}\le
-\langle\Phi|\texttt{staggeredTransverseCasimirOpS}|\Phi\rangle_{\mathrm{re}}$.  The axiom
-\texttt{shenQiuTian\_ferrimagnetic\_lro} is retained pending the total-spin value
-$S_{\mathrm{tot}}=(|A|-|B|)S$ (Lieb--Mattis, PR3) and the capstone (PR4).  Chapters~3--10 backfill.
+\langle\Phi|\texttt{staggeredTransverseCasimirOpS}|\Phi\rangle_{\mathrm{re}}$.  PR3 (\#4607) adds the total-spin value in \texttt{Quantum/SpinS/FerrimagneticLROTotalSpin.lean}
+(coupling-agnostic via a \texttt{tasaki\_2\_5\_theorem\_2\_3} hypothesis):
+\texttt{exists\_centered\_groundState\_predictedCasimir\_of\_tasaki23} produces a centered
+($\hat S^{(3)}_{\mathrm{tot}}\Phi^0=0$) Marshall ground state with
+$(\hat S_{\mathrm{tot}})^2\Phi^0=S_{\mathrm{tot}}(S_{\mathrm{tot}}+1)\,\Phi^0$
+($S_{\mathrm{tot}}=(|A|-|B|)N/2$), via
+\texttt{tasaki23\_pf\_groundState\_casimir\_eq\_predicted\_sector} and the extremal-Casimir machinery.
+\emph{Structural gap} (Issue \#4604): the stated axiom assumes a \emph{connected}-graph coupling, but
+the available Theorem 2.3 needs \emph{complete-bipartite} positivity, so removing the axiom additionally
+requires the connected-coupling Marshall--Lieb--Mattis extension (a major sub-program).  The axiom
+\texttt{shenQiuTian\_ferrimagnetic\_lro} is retained pending the capstone (PR4).  Chapters~3--10
+backfill.
 
 \noindent\textbf{Lemma 4.5} (Tasaki §4.1.2, eqs.~(4.1.55)--(4.1.57), pp.~87--88; proved axiom-free,
 \texttt{Math/ReflectionPositivityAveraging.lean}, Issue \#4597).  The abstract reflection-positivity
