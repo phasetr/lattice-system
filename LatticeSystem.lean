@@ -61,6 +61,7 @@ import LatticeSystem.Quantum.SpinS.ShastryNoSSB
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO
 import LatticeSystem.Quantum.SpinS.FerrimagneticLROComponentAlgebra
 import LatticeSystem.Quantum.SpinS.FerrimagneticLROCrossTerm
+import LatticeSystem.Quantum.SpinS.FerrimagneticLROTotalSpin
 import LatticeSystem.Quantum.SpinS.AndersonTower
 import LatticeSystem.Quantum.SpinS.AndersonTowerField
 import LatticeSystem.Quantum.SpinS.AndersonTowerSphereAverage
