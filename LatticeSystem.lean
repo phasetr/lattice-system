@@ -346,6 +346,7 @@ import LatticeSystem.Quantum.SpinS.Theorem23PredictedEnergySectorAll
 import LatticeSystem.Quantum.SpinS.Theorem23GlobalMinimality
 import LatticeSystem.Quantum.SpinS.Theorem23TotalLoweringNonvanishing
 import LatticeSystem.Quantum.SpinS.SU2ExpectationLadderInvariant
+import LatticeSystem.Quantum.SpinS.SU2ExpectationLadderIterated
 import LatticeSystem.Quantum.SpinS.Theorem23GeneralHOutside
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenberg
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergReduction
