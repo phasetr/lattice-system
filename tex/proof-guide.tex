@@ -8241,10 +8241,15 @@ $\langle\text{transverse}\rangle\le\langle(\hat O_\Lambda)^2\rangle$, the compon
 $(\hat S_{\mathrm{tot}}^{(\alpha)})^2=\sum_{x,y}\hat S_x^{(\alpha)}\hat S_y^{(\alpha)}$, the Casimir
 identity $\sum_{x,y}(\hat S_x^{(1)}\hat S_y^{(1)}+\hat S_x^{(2)}\hat S_y^{(2)})=(\hat S_{\mathrm{tot}})^2
 -(\hat S_{\mathrm{tot}}^{(3)})^2$, and the $M=0$ reduction
-$\langle(\hat S_{\mathrm{tot}})^2\rangle=\langle\text{transverse}\rangle$.  The axiom
-\texttt{shenQiuTian\_ferrimagnetic\_lro} is retained pending the cross-term (4.1.15, PR2), the
-total-spin value $S_{\mathrm{tot}}=(|A|-|B|)S$ (Lieb--Mattis, PR3), and the capstone (PR4).
-Chapters~3--10 backfill.
+$\langle(\hat S_{\mathrm{tot}})^2\rangle=\langle\text{transverse}\rangle$.  PR2 (\#4606) adds the cross-term inequality (4.1.15) in
+\texttt{Quantum/SpinS/FerrimagneticLROCrossTerm.lean}: the transverse correlation
+$\langle\Phi|\hat T_{xy}|\Phi\rangle$ with $\hat T_{xy}=\tfrac12(\hat S_x^+\hat S_y^-+\hat S_x^-\hat S_y^+)$,
+its non-positivity for cross-sublattice pairs ($A x\ne A y$) on a Marshall-positive sector ground
+state $\Phi=\texttt{marshallSignS}\cdot c$ ($c>0$), and the summed dominance
+$\langle\Phi|\sum_{x,y}\hat T_{xy}|\Phi\rangle_{\mathrm{re}}\le
+\langle\Phi|\texttt{staggeredTransverseCasimirOpS}|\Phi\rangle_{\mathrm{re}}$.  The axiom
+\texttt{shenQiuTian\_ferrimagnetic\_lro} is retained pending the total-spin value
+$S_{\mathrm{tot}}=(|A|-|B|)S$ (Lieb--Mattis, PR3) and the capstone (PR4).  Chapters~3--10 backfill.
 
 \noindent\textbf{Lemma 4.5} (Tasaki §4.1.2, eqs.~(4.1.55)--(4.1.57), pp.~87--88; proved axiom-free,
 \texttt{Math/ReflectionPositivityAveraging.lean}, Issue \#4597).  The abstract reflection-positivity
