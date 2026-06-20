@@ -491,6 +491,7 @@ import LatticeSystem.Quantum.SpinS.Problem25dBalancedSectorWitness
 import LatticeSystem.Quantum.SpinS.Problem25dBalancedPFEndpoint
 import LatticeSystem.Quantum.SpinS.Problem25dBalancedPFSignCases
 import LatticeSystem.Quantum.SpinS.Problem25dBalancedPFCrossSign
+import LatticeSystem.Quantum.SpinS.WeightPreservingExpectationSum
 
 /-!
 # `lattice-system` library root

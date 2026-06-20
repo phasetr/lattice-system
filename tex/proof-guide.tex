@@ -8284,7 +8284,12 @@ gate) (Issue \#4604).  PR8 (\#4618,
 \texttt{heisenbergHamiltonianSMatrixOnMagSector\_finrank\_le\_one\_of\_marshall\_positive\_connected},
 the connected-coupling per-magnetization-sector ground-state uniqueness ($\operatorname{finrank}\le1$),
 obtained from the complete-graph lemma by substituting the connected sector irreducibility (Issue
-\#4617).
+\#4617).  PR9 (\#4619, \texttt{Quantum/SpinS/WeightPreservingExpectationSum.lean}) supplies step~3:
+\texttt{weightPreserving\_expectation\_eq\_sum\_sector} --- for any operator commuting with
+$\hat S^{(3)}_{\mathrm{tot}}$, $\langle\Phi|O|\Phi\rangle=\sum_M\langle\Phi_M|O|\Phi_M\rangle$ over the
+$\hat S^{(3)}$-weight sector components (cross terms vanish by $\hat S^{(3)}_{\mathrm{tot}}$-eigenvalue
+orthogonality; no Hermiticity of $O$ is required), the block-diagonal decomposition for
+$(\hat O_\Lambda)^2$'s expectation.
 
 \noindent\textbf{Theorem 4.4} (Shen--Qiu--Tian, Tasaki §4.1, eqs.~(4.1.12)--(4.1.13), pp.~77--78;
 documented axiom, \texttt{Quantum/SpinS/FerrimagneticLRO.lean}, Issue \#4485).  Ferrimagnetic
