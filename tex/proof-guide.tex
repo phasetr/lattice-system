@@ -8272,9 +8272,14 @@ $\langle w|O|w\rangle_{\mathrm{re}}/\langle w|w\rangle_{\mathrm{re}}$ is unchang
 $w\mapsto\hat S^-_{\mathrm{tot}}v$ (numerator and denominator scale by the same eigenvalue of
 $\hat S^+\hat S^-=(\hat S_{\mathrm{tot}})^2-(\hat S^{(3)})^2+\hat S^{(3)}$).  This is the ladder step
 that makes $(\hat O_\Lambda)^2$'s expectation constant across the spin-$S_{\mathrm{tot}}$ multiplet.
-The stated \texttt{shenQiuTian\_ferrimagnetic\_lro} axiom (universal over \emph{all} ground states)
-then remains pending only the final assembly of ingredient (b): the ground-state weight decomposition
-and sector-to-centre connection using this ladder-invariance (Issue \#4604).
+PR7 (\#4616, \texttt{Quantum/SpinS/SU2ExpectationLadderIterated.lean}) iterates this to
+$(\hat S^-_{\mathrm{tot}})^k$ (\texttt{su2\_expectationRatioRe\_ladder\_iterate\_invariant}), so every
+member of the lowering tower shares the centred ratio.  The stated
+\texttt{shenQiuTian\_ferrimagnetic\_lro} axiom (universal over \emph{all} ground states) then remains
+pending only the final assembly of ingredient (b): the ground-state weight decomposition together with
+the ground-eigenspace classification (any global-min eigenvector's nonzero $\hat S^{(3)}$-weight
+components lie in the admissible sectors --- requiring strict energy separation, the hard remaining
+gate) (Issue \#4604).
 
 \noindent\textbf{Theorem 4.4} (Shen--Qiu--Tian, Tasaki §4.1, eqs.~(4.1.12)--(4.1.13), pp.~77--78;
 documented axiom, \texttt{Quantum/SpinS/FerrimagneticLRO.lean}, Issue \#4485).  Ferrimagnetic
