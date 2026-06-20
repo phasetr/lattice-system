@@ -8256,9 +8256,17 @@ $(\hat S_{\mathrm{tot}})^2\Phi^0=S_{\mathrm{tot}}(S_{\mathrm{tot}}+1)\,\Phi^0$
 \texttt{tasaki23\_pf\_groundState\_casimir\_eq\_predicted\_sector} and the extremal-Casimir machinery.
 \emph{Structural gap} (Issue \#4604): the stated axiom assumes a \emph{connected}-graph coupling, but
 the available Theorem 2.3 needs \emph{complete-bipartite} positivity, so removing the axiom additionally
-requires the connected-coupling Marshall--Lieb--Mattis extension (a major sub-program).  The axiom
-\texttt{shenQiuTian\_ferrimagnetic\_lro} is retained pending the capstone (PR4).  Chapters~3--10
-backfill.
+requires the connected-coupling Marshall--Lieb--Mattis extension (a major sub-program).  PR4 (\#4608)
+proves the capstone \texttt{ferrimagnetic\_lro\_completeBipartite\_centered}
+(\texttt{Quantum/SpinS/FerrimagneticLROCapstone.lean}): assembling chain (4.1.16) on the centered
+ground state $\Phi^0$,
+$(N/2)^2(|A|-|B|)^2\,\langle\Phi^0|\Phi^0\rangle_{\mathrm{re}}\le
+\langle\Phi^0|(\hat O_\Lambda)^2|\Phi^0\rangle_{\mathrm{re}}$ (existence form, coupling-agnostic via a
+\texttt{tasaki\_2\_5\_theorem\_2\_3} hypothesis; sorry-free, axiom-clean, independent of the
+\texttt{shenQiuTian\_ferrimagnetic\_lro} axiom).  The original axiom is \emph{retained}: it asserts the
+bound for an \emph{arbitrary} ground state under a \emph{connected}-graph coupling, which additionally
+needs (i) the connected Marshall--Lieb--Mattis extension and (ii) the $(\hat O_\Lambda)^2$ $SU(2)$-invariance
+/ ground-multiplet expectation transfer.  Chapters~3--10 backfill.
 
 \noindent\textbf{Lemma 4.5} (Tasaki §4.1.2, eqs.~(4.1.55)--(4.1.57), pp.~87--88; proved axiom-free,
 \texttt{Math/ReflectionPositivityAveraging.lean}, Issue \#4597).  The abstract reflection-positivity

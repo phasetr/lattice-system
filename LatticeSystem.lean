@@ -59,6 +59,7 @@ import LatticeSystem.Quantum.SpinS.LiebSchultzMattis
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisGeneral
 import LatticeSystem.Quantum.SpinS.ShastryNoSSB
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO
+import LatticeSystem.Quantum.SpinS.FerrimagneticLROCapstone
 import LatticeSystem.Quantum.SpinS.FerrimagneticLROComponentAlgebra
 import LatticeSystem.Quantum.SpinS.FerrimagneticLROCrossTerm
 import LatticeSystem.Quantum.SpinS.FerrimagneticLROTotalSpin
