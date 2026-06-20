@@ -8301,7 +8301,14 @@ ladder, and contradict the absolute-value Casimir lower bound
 $|c-M|(|c-M|+1)>S_{\mathrm{tot}}(S_{\mathrm{tot}}+1)$.  This is the strict Lieb--Mattis level ordering
 for the connected antiferromagnetic Heisenberg model --- the last gate; only the final
 weight-decomposition assembly remains to discharge \texttt{shenQiuTian\_ferrimagnetic\_lro} (Issue
-\#4617).
+\#4617).  PR11 (\#4621, \texttt{Quantum/SpinS/FerrimagneticLROUniversal.lean}) adds the universal-form
+assembly infrastructure: \texttt{chain\_bound\_marshall\_sector} (Tasaki's chain~(4.1.16) at an
+arbitrary-weight Marshall sector vector, $(\gamma-m^2)\|w\|^2\le\langle w|(\hat O_\Lambda)^2|w\rangle$),
+the norm sum $\|\Phi\|^2=\sum_M\|\Phi_M\|^2$, the weight-component eigenvector lemma, the diagonal-shift
+$c$ existence, and the global-flip / weight-commute helpers.  The remaining step to remove the axiom is
+the $SU(2)$ Rayleigh-ratio constancy across the spin-$S_{\mathrm{tot}}$ multiplet (transfer the
+per-sector bound from a near-central admissible sector to all sectors via the merged iterated
+ladder-invariance), Issue~\#4617.
 
 \noindent\textbf{Theorem 4.4} (Shen--Qiu--Tian, Tasaki §4.1, eqs.~(4.1.12)--(4.1.13), pp.~77--78;
 documented axiom, \texttt{Quantum/SpinS/FerrimagneticLRO.lean}, Issue \#4485).  Ferrimagnetic
