@@ -8279,7 +8279,12 @@ member of the lowering tower shares the centred ratio.  The stated
 pending only the final assembly of ingredient (b): the ground-state weight decomposition together with
 the ground-eigenspace classification (any global-min eigenvector's nonzero $\hat S^{(3)}$-weight
 components lie in the admissible sectors --- requiring strict energy separation, the hard remaining
-gate) (Issue \#4604).
+gate) (Issue \#4604).  PR8 (\#4618,
+\texttt{Quantum/SpinS/ConnectedSectorFinrankLeOne.lean}) supplies step~1 of that dimension bound:
+\texttt{heisenbergHamiltonianSMatrixOnMagSector\_finrank\_le\_one\_of\_marshall\_positive\_connected},
+the connected-coupling per-magnetization-sector ground-state uniqueness ($\operatorname{finrank}\le1$),
+obtained from the complete-graph lemma by substituting the connected sector irreducibility (Issue
+\#4617).
 
 \noindent\textbf{Theorem 4.4} (Shen--Qiu--Tian, Tasaki §4.1, eqs.~(4.1.12)--(4.1.13), pp.~77--78;
 documented axiom, \texttt{Quantum/SpinS/FerrimagneticLRO.lean}, Issue \#4485).  Ferrimagnetic
