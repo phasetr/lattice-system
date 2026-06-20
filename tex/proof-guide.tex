@@ -8252,8 +8252,18 @@ global energy minimality of Theorem 2.3 hold for \emph{any} connected bipartite 
 not only the complete-bipartite case --- the $\mathrm{hOutside}$/lower-bound side reuses
 \texttt{tasaki23\_general\_hOutside} and \texttt{tasaki23\_eigenvalue\_ge\_common} unchanged (they need
 only non-negativity).  This is the connected-coupling extension of Marshall--Lieb--Mattis (Lieb--Mattis
-1962), the prerequisite for removing the Theorem 4.4 connected-coupling axiom (which also still needs
-the universal-form $SU(2)$ transfer, Issue \#4604).
+1962).  PR4 (\#4613, \texttt{Quantum/SpinS/ConnectedFerrimagneticLRO.lean}) assembles the
+connected-coupling ferrimagnetic LRO bound (existence form)
+\texttt{ferrimagnetic\_lro\_connected\_centered}: for any connected bipartite antiferromagnetic
+coupling ($G.\mathrm{Connected}$, bipartiteness, edge-positivity), there is a centered ground state
+$\Phi^0$ with
+$(N/2)^2(|A|-|B|)^2\,\langle\Phi^0|\Phi^0\rangle_{\mathrm{re}}\le
+\langle\Phi^0|(\hat O_\Lambda)^2|\Phi^0\rangle_{\mathrm{re}}$ --- Tasaki's chain (4.1.16) for the
+genuine connected (non-complete) coupling, built from the connected Theorem 2.3 data, the connected
+irreducibility Casimir value, and the (graph-agnostic) PR1/PR2 operator-algebra.  The stated
+\texttt{shenQiuTian\_ferrimagnetic\_lro} axiom (universal over \emph{all} ground states) then remains
+pending only the universal-form $(\hat O_\Lambda)^2$ $SU(2)$-invariance / ground-multiplet expectation
+transfer (Issue \#4604).
 
 \noindent\textbf{Theorem 4.4} (Shen--Qiu--Tian, Tasaki §4.1, eqs.~(4.1.12)--(4.1.13), pp.~77--78;
 documented axiom, \texttt{Quantum/SpinS/FerrimagneticLRO.lean}, Issue \#4485).  Ferrimagnetic
