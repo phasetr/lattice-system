@@ -8232,7 +8232,15 @@ walk between them carries one quantum across, decreasing the mismatch.  The sing
 transport (\texttt{transportOne}) is overflow-safe by branching at each edge --- push the quantum
 forward when the next vertex has room, otherwise recurse first to create room --- so intermediate
 vertices never exceed the spin bound.  This generalizes the complete-bipartite
-\texttt{raiseLowerReachableS\_bipartiteCompleteGraph} to arbitrary connected graphs.
+\texttt{raiseLowerReachableS\_bipartiteCompleteGraph} to arbitrary connected graphs.  PR2 (\#4611,
+\texttt{Quantum/SpinS/ConnectedDressedPF.lean}) lifts this to the dressed-matrix per-magnetization-sector
+Perron--Frobenius positivity for a general connected bipartite $G$:
+\texttt{exists\_matrixPow\_pos\_of\_magConfigS\_connected} gives
+$\exists k,\ 0<(\texttt{shiftedDressedSReMatrixOnMagSector}\,A\,J\,N\,c\,M)^k\,\sigma'\,\sigma$ from
+$G.\mathrm{Connected}$, bipartiteness $\mathrm{hGbip}$, and edge-positivity
+$G.\mathrm{Adj}\,x\,y\to 0<(J_{xy})_{\mathrm{re}}$ (not the stronger complete-bipartite positivity), by
+combining the graph-agnostic edge-local positivity witness with the connected reachability above ---
+generalizing \texttt{exists\_matrixPow\_pos\_of\_magConfigS\_bipartite}.
 
 \noindent\textbf{Theorem 4.4} (Shen--Qiu--Tian, Tasaki §4.1, eqs.~(4.1.12)--(4.1.13), pp.~77--78;
 documented axiom, \texttt{Quantum/SpinS/FerrimagneticLRO.lean}, Issue \#4485).  Ferrimagnetic
