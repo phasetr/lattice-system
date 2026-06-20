@@ -424,6 +424,7 @@ import LatticeSystem.Quantum.SpinS.ConnectedFerrimagneticLRO
 import LatticeSystem.Quantum.SpinS.ConnectedSectorFinrankLeOne
 import LatticeSystem.Quantum.SpinS.ConnectedSectorIrreducible
 import LatticeSystem.Quantum.SpinS.ConnectedTheorem23
+import LatticeSystem.Quantum.SpinS.StrictHOutsideFerrimagnetic
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapDegeneracyBound
 import LatticeSystem.Quantum.SpinS.DressedFullEigInterParityLeOne
 import LatticeSystem.Quantum.SpinS.GaugeIntersectionEigenspaceFinrank

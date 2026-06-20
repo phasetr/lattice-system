@@ -8289,7 +8289,19 @@ obtained from the complete-graph lemma by substituting the connected sector irre
 $\hat S^{(3)}_{\mathrm{tot}}$, $\langle\Phi|O|\Phi\rangle=\sum_M\langle\Phi_M|O|\Phi_M\rangle$ over the
 $\hat S^{(3)}$-weight sector components (cross terms vanish by $\hat S^{(3)}_{\mathrm{tot}}$-eigenvalue
 orthogonality; no Hermiticity of $O$ is required), the block-diagonal decomposition for
-$(\hat O_\Lambda)^2$'s expectation.
+$(\hat O_\Lambda)^2$'s expectation.  PR10 (\#4620,
+\texttt{Quantum/SpinS/StrictHOutsideFerrimagnetic.lean}) clears the hard gate (step~2):
+\texttt{tasaki23\_strict\_hOutside\_of\_connected} --- the \emph{strict} energy separation
+$\mu<\mu_M$ for any non-admissible sector $M\notin[\min\cdot N,\max\cdot N]$, the connected
+ferrimagnetic generalization of the balanced
+\texttt{tasaki23\_strict\_hOutside\_of\_card\_eq\_zero\_casimir\_ladder\_obstruction}.  Argument
+(Casimir equality-obstruction): ladder a hypothetical non-admissible $\mu$-eigenvector inward to the
+admissible band edge, pull the predicted Casimir $S_{\mathrm{tot}}(S_{\mathrm{tot}}+1)$ back through the
+ladder, and contradict the absolute-value Casimir lower bound
+$|c-M|(|c-M|+1)>S_{\mathrm{tot}}(S_{\mathrm{tot}}+1)$.  This is the strict Lieb--Mattis level ordering
+for the connected antiferromagnetic Heisenberg model --- the last gate; only the final
+weight-decomposition assembly remains to discharge \texttt{shenQiuTian\_ferrimagnetic\_lro} (Issue
+\#4617).
 
 \noindent\textbf{Theorem 4.4} (Shen--Qiu--Tian, Tasaki §4.1, eqs.~(4.1.12)--(4.1.13), pp.~77--78;
 documented axiom, \texttt{Quantum/SpinS/FerrimagneticLRO.lean}, Issue \#4485).  Ferrimagnetic
