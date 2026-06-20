@@ -8221,6 +8221,19 @@ Theorem 3.2 (only its finite-volume variational core is formalized here) and the
 so it is recorded as a faithful documented axiom (deep infinite-volume argument deferred, in scope).
 Chapters~3--10 backfill.
 
+\noindent\textbf{Connected-graph spin-configuration reachability} (Tasaki §2.5, proved axiom-free,
+\texttt{Quantum/SpinS/ConnectedRaiseLower.lean}, Issue \#4609).  A prerequisite for extending the
+Marshall--Lieb--Mattis Theorem 2.3 from complete-bipartite to connected couplings (and hence for
+removing the Theorem 4.4 axiom): on a connected graph $G$, any two equal-magnetization spin
+configurations are raise/lower reachable, $G.\mathrm{Connected}\to\mathrm{magSumS}\,\sigma=
+\mathrm{magSumS}\,\sigma'\to\texttt{RaiseLowerReachableS}\,G\,\sigma\,\sigma'$.  Proof by strong
+induction on the \texttt{configDistS} mismatch: a surplus and a deficit site exist; a connected-graph
+walk between them carries one quantum across, decreasing the mismatch.  The single-quantum path
+transport (\texttt{transportOne}) is overflow-safe by branching at each edge --- push the quantum
+forward when the next vertex has room, otherwise recurse first to create room --- so intermediate
+vertices never exceed the spin bound.  This generalizes the complete-bipartite
+\texttt{raiseLowerReachableS\_bipartiteCompleteGraph} to arbitrary connected graphs.
+
 \noindent\textbf{Theorem 4.4} (Shen--Qiu--Tian, Tasaki §4.1, eqs.~(4.1.12)--(4.1.13), pp.~77--78;
 documented axiom, \texttt{Quantum/SpinS/FerrimagneticLRO.lean}, Issue \#4485).  Ferrimagnetic
 long-range order on an asymmetric bipartite lattice: for the spin-$S$ antiferromagnetic Heisenberg
