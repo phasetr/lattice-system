@@ -1,0 +1,598 @@
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowUTrial
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardFerromagnetismStructure
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralBasisHN
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinSymmetryAux
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsHermitian
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SiteProjectionsIdempotent
+import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandPosSemidef
+import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
+import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
+import LatticeSystem.Quantum.SpinS.RayleighOnEigenvector
+import Mathlib.Analysis.Matrix.Spectrum
+import Mathlib.Analysis.Matrix.PosDef
+
+/-!
+# Tasaki §11.1.1: the variational sector machinery for Theorem 11.3
+
+This file builds the **fixed-electron-number sector compression** for the all-to-all Hubbard model
+(no hard-core constraint, unlike the §11.5 t-J compression of `TJFilling*`).  The `Ne`-electron
+sector `W = (N̂ = Ne)`-eigenspace is `Ĥ`-invariant (charge conservation), spanned by the
+computational basis vectors `|c⟩` over the `Ne`-electron configurations.  Compressing `Ĥ` to a
+matrix `Ĥ_W` in this orthonormal basis lets us run the finite-dimensional Rayleigh–Ritz argument:
+
+* `hubbardSectorCompress` — the matrix `Tᴴ Ĥ T` of `Ĥ` in the `Ne`-electron basis;
+* `rayleighOnVec_hubbardSectorCompress` — the Rayleigh bridge (operator Rayleigh of a lifted
+  sector vector = matrix Rayleigh of the compression);
+* `hubbardSector_minEnergy_eigenspace_ne_bot` — the compression's minimum eigenvalue lifts to a
+  genuine `Ĥ`-eigenvector in `W`, so `hubbardEigenspaceAt` at that energy is nonzero;
+* `hubbardSector_minEnergy_le_of_mem` — every `Ne`-electron vector's Rayleigh quotient is bounded
+  below by the sector minimum (variational principle).
+
+These are the §11.3-style sector tools specialised to the bare number sector, used by the
+variational discharge of Tasaki Theorem 11.3 (the spin-flip trial state lowers the energy below the
+all-up trace).
+
+Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
+2020), §11.1.1, Theorem 11.3, eqs. (11.1.5)–(11.1.6), pp. 378–379.
+-/
+
+namespace LatticeSystem.Fermion
+
+open Matrix LatticeSystem.Quantum Module
+open scoped ComplexOrder
+
+variable {N : ℕ}
+
+/-! ## The fixed-electron-number sector basis -/
+
+/-- **The `Ne`-electron configuration sector**: computational configurations
+`c : Fin (2N+2) → Fin 2` with total occupation `Σ_j c_j = Ne`.  Orthonormal basis of `W`. -/
+abbrev hubbardSectorConfig (N Ne : ℕ) :=
+  {c : Fin (2 * N + 2) → Fin 2 // (∑ j : Fin (2 * N + 2), (c j).val) = Ne}
+
+/-- **The sector embedding** `T : (W-coords) → (Fock)`: its column at the configuration `c` is the
+computational basis vector `|c⟩`. -/
+noncomputable def hubbardSectorEmbedding (N Ne : ℕ) :
+    Matrix (Fin (2 * N + 2) → Fin 2) (hubbardSectorConfig N Ne) ℂ :=
+  Matrix.of (fun w s => basisVec s.val w)
+
+/-- **The sector expansion** `Φ = Σ_c v_c |c⟩` over the `Ne`-electron basis. -/
+noncomputable def hubbardSectorExpansion (N Ne : ℕ) (v : hubbardSectorConfig N Ne → ℂ) :
+    (Fin (2 * N + 2) → Fin 2) → ℂ :=
+  ∑ s, v s • basisVec s.val
+
+/-- **The sector coefficient functional** `(Tᴴ u)_c = ⟨c, u⟩ = Σ_w |c⟩(w) · u(w)`. -/
+noncomputable def hubbardSectorCoeff (N Ne : ℕ) (u : (Fin (2 * N + 2) → Fin 2) → ℂ) :
+    hubbardSectorConfig N Ne → ℂ :=
+  fun s => ∑ w, basisVec s.val w * u w
+
+/-- `T` maps a coefficient vector to its sector expansion: `T u = Σ_s u_s |s⟩`. -/
+theorem hubbardSectorEmbedding_mulVec (Ne : ℕ) (u : hubbardSectorConfig N Ne → ℂ) :
+    (hubbardSectorEmbedding N Ne).mulVec u = hubbardSectorExpansion N Ne u := by
+  funext w
+  unfold hubbardSectorEmbedding hubbardSectorExpansion
+  rw [Matrix.mulVec, dotProduct, Finset.sum_apply]
+  exact Finset.sum_congr rfl (fun s _ => by
+    rw [Matrix.of_apply, Pi.smul_apply, smul_eq_mul, mul_comm])
+
+/-- `Tᴴ` maps a Fock vector to its sector coefficient functional: `(Tᴴ v)_s = ⟨s, v⟩`. -/
+theorem hubbardSectorEmbedding_conjTranspose_mulVec (Ne : ℕ)
+    (v : (Fin (2 * N + 2) → Fin 2) → ℂ) :
+    (hubbardSectorEmbedding N Ne)ᴴ.mulVec v = hubbardSectorCoeff N Ne v := by
+  funext s
+  unfold hubbardSectorCoeff
+  rw [Matrix.mulVec, dotProduct]
+  refine Finset.sum_congr rfl (fun w _ => ?_)
+  rw [Matrix.conjTranspose_apply, hubbardSectorEmbedding, Matrix.of_apply,
+    show star (basisVec s.val w) = basisVec s.val w from by rw [basisVec_apply]; split <;> simp]
+
+/-- The configuration of a vector `w`, recording its total occupation as the sector index proof when
+`Σ_j w_j = Ne`. -/
+theorem hubbardSectorConfig_of_count (N Ne : ℕ) (w : Fin (2 * N + 2) → Fin 2)
+    (hw : (∑ j : Fin (2 * N + 2), ((w j).val : ℂ)) = (Ne : ℂ)) :
+    (∑ j : Fin (2 * N + 2), (w j).val) = Ne := by
+  exact_mod_cast hw
+
+/-- **Completeness of the sector basis.**  An `N̂ = Ne` eigenvector equals its sector expansion
+`T (Tᴴ u)`.  The number sector is spanned by the `Ne`-electron computational basis vectors, on which
+a number eigenstate is supported. -/
+theorem hubbardSector_completeness (Ne : ℕ) (u : (Fin (2 * N + 2) → Fin 2) → ℂ)
+    (hN : (fermionTotalNumber (2 * N + 1)).mulVec u = (Ne : ℂ) • u) :
+    u = hubbardSectorExpansion N Ne (hubbardSectorCoeff N Ne u) := by
+  funext w
+  unfold hubbardSectorExpansion hubbardSectorCoeff
+  rw [Finset.sum_apply]
+  by_cases hw : (∑ j : Fin (2 * N + 2), ((w j).val : ℂ)) = (Ne : ℂ)
+  · set s₀ : hubbardSectorConfig N Ne := ⟨w, hubbardSectorConfig_of_count N Ne w hw⟩ with hs₀
+    rw [Finset.sum_eq_single s₀]
+    · rw [Pi.smul_apply, smul_eq_mul, hs₀, basisVec_apply, if_pos rfl, mul_one, basisVec_sum_mul]
+    · intro s _ hss₀
+      rw [Pi.smul_apply, smul_eq_mul, basisVec_apply,
+        if_neg (fun h => hss₀ (Subtype.ext (by rw [hs₀]; exact h.symm))), mul_zero]
+    · intro h; exact absurd (Finset.mem_univ s₀) h
+  · rw [mulVec_apply_eq_zero_of_number_ne N u (Ne : ℂ) hN w hw]
+    refine (Finset.sum_eq_zero fun s _ => ?_).symm
+    have hsc : (∑ j : Fin (2 * N + 2), ((s.val j).val : ℂ)) = (Ne : ℂ) := by
+      exact_mod_cast s.property
+    rw [Pi.smul_apply, smul_eq_mul, basisVec_apply,
+      if_neg (fun h => hw (by rw [h]; exact hsc)), mul_zero]
+
+/-! ## The sector compression and its Rayleigh bridge -/
+
+/-- The (rectangular) adjoint identity for the matrix inner product: `⟨c, Tᴴ y⟩ = ⟨T c, y⟩`. -/
+private theorem dotProduct_star_conjTranspose_mulVec' {m n : Type*} [Fintype m] [Fintype n]
+    (T : Matrix m n ℂ) (c : n → ℂ) (y : m → ℂ) :
+    dotProduct (star c) (Tᴴ.mulVec y) = dotProduct (star (T.mulVec c)) y := by
+  simp only [dotProduct, Matrix.mulVec, Matrix.conjTranspose_apply, Pi.star_apply,
+    star_sum, star_mul', Finset.mul_sum, Finset.sum_mul]
+  rw [Finset.sum_comm]
+  exact Finset.sum_congr rfl (fun w _ => Finset.sum_congr rfl (fun s _ => by ring))
+
+/-- **The `W`-compression** `compress(A) = Tᴴ A T`: the matrix of `A` in the `Ne`-electron basis. -/
+noncomputable def hubbardSectorCompress (N Ne : ℕ) (A : ManyBodyOp (Fin (2 * N + 2))) :
+    Matrix (hubbardSectorConfig N Ne) (hubbardSectorConfig N Ne) ℂ :=
+  (hubbardSectorEmbedding N Ne)ᴴ * A * hubbardSectorEmbedding N Ne
+
+/-- **The sector embedding has orthonormal columns:** `Tᴴ T = 1`. -/
+theorem hubbardSectorEmbedding_conjTranspose_mul_self (Ne : ℕ) :
+    (hubbardSectorEmbedding N Ne)ᴴ * hubbardSectorEmbedding N Ne = 1 := by
+  ext s s'
+  rw [Matrix.mul_apply]
+  rw [show (∑ w, (hubbardSectorEmbedding N Ne)ᴴ s w * hubbardSectorEmbedding N Ne w s')
+      = ∑ w, basisVec s.val w * basisVec s'.val w from by
+    refine Finset.sum_congr rfl (fun w _ => ?_)
+    rw [Matrix.conjTranspose_apply, hubbardSectorEmbedding, Matrix.of_apply, Matrix.of_apply,
+      show star (basisVec s.val w) = basisVec s.val w from by rw [basisVec_apply]; split <;> simp]]
+  rw [basisVec_inner, Matrix.one_apply]
+  by_cases h : s = s'
+  · rw [h, if_pos rfl, if_pos rfl]
+  · rw [if_neg (fun hc => h (Subtype.ext hc.symm)), if_neg h]
+
+/-- **The sector embedding is an isometry:** `⟨T c, T c⟩ = ⟨c, c⟩`. -/
+theorem hubbardSectorExpansion_dotProduct_self (Ne : ℕ) (c : hubbardSectorConfig N Ne → ℂ) :
+    dotProduct (star (hubbardSectorExpansion N Ne c)) (hubbardSectorExpansion N Ne c) =
+      dotProduct (star c) c := by
+  rw [← hubbardSectorEmbedding_mulVec,
+    ← dotProduct_star_conjTranspose_mulVec' (hubbardSectorEmbedding N Ne) c
+      ((hubbardSectorEmbedding N Ne).mulVec c),
+    Matrix.mulVec_mulVec, hubbardSectorEmbedding_conjTranspose_mul_self, Matrix.one_mulVec]
+
+/-- **The Rayleigh bridge.** The operator Rayleigh quotient of `A` on a lifted sector vector equals
+the matrix Rayleigh quotient of its compression `Ĥ_W = Tᴴ A T`. -/
+theorem rayleighOnVec_hubbardSectorCompress (Ne : ℕ) (A : ManyBodyOp (Fin (2 * N + 2)))
+    (c : hubbardSectorConfig N Ne → ℂ) :
+    rayleighOnVec (hubbardSectorCompress N Ne A) c =
+      rayleighOnVec A (hubbardSectorExpansion N Ne c) := by
+  have hmv : (hubbardSectorCompress N Ne A).mulVec c
+      = (hubbardSectorEmbedding N Ne)ᴴ.mulVec
+          (A.mulVec ((hubbardSectorEmbedding N Ne).mulVec c)) := by
+    unfold hubbardSectorCompress
+    rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
+  have key : dotProduct (star c) ((hubbardSectorCompress N Ne A).mulVec c)
+      = dotProduct (star (hubbardSectorExpansion N Ne c))
+          (A.mulVec (hubbardSectorExpansion N Ne c)) := by
+    rw [hmv, dotProduct_star_conjTranspose_mulVec', hubbardSectorEmbedding_mulVec]
+  unfold rayleighOnVec
+  rw [key]
+
+/-- **Hermiticity of the compression.** If `A` is Hermitian, so is its sector compression
+`Tᴴ A T`. -/
+theorem hubbardSectorCompress_isHermitian (Ne : ℕ) {A : ManyBodyOp (Fin (2 * N + 2))}
+    (hA : A.IsHermitian) :
+    (hubbardSectorCompress N Ne A).IsHermitian := by
+  unfold hubbardSectorCompress Matrix.IsHermitian
+  rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,
+    hA.eq, Matrix.mul_assoc]
+
+/-! ## Lifting sector eigenvectors to the number sector `W` -/
+
+/-- The number sector `W = (N̂ = Ne)`-eigenspace, as a submodule. -/
+noncomputable def hubbardSectorWSubmodule (N Ne : ℕ) :
+    Submodule ℂ ((Fin (2 * N + 2) → Fin 2) → ℂ) :=
+  Module.End.eigenspace (fermionTotalNumber (2 * N + 1)).mulVecLin (Ne : ℂ)
+
+/-- Membership in `W`: an `N̂ = Ne` eigenvector. -/
+theorem mem_hubbardSectorWSubmodule_iff (Ne : ℕ) {v : (Fin (2 * N + 2) → Fin 2) → ℂ} :
+    v ∈ hubbardSectorWSubmodule N Ne ↔
+      (fermionTotalNumber (2 * N + 1)).mulVec v = (Ne : ℂ) • v := by
+  rw [hubbardSectorWSubmodule, Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply]
+
+/-- A sector basis vector `|s⟩` lies in `W` (it is an `N̂ = Ne` eigenstate). -/
+theorem basisVec_sector_mem (Ne : ℕ) (s : hubbardSectorConfig N Ne) :
+    basisVec s.val ∈ hubbardSectorWSubmodule N Ne := by
+  rw [mem_hubbardSectorWSubmodule_iff, fermionTotalNumber_mulVec_basisVec]
+  rw [show (∑ j : Fin (2 * N + 2), ((s.val j).val : ℂ)) = (Ne : ℂ) from by
+    rw [← Nat.cast_sum]; exact_mod_cast congrArg (Nat.cast : ℕ → ℂ) s.property]
+
+/-- A sector expansion lies in `W` (a sum of `W`-members). -/
+theorem hubbardSectorExpansion_mem (Ne : ℕ) (v : hubbardSectorConfig N Ne → ℂ) :
+    hubbardSectorExpansion N Ne v ∈ hubbardSectorWSubmodule N Ne := by
+  unfold hubbardSectorExpansion
+  exact Submodule.sum_mem _ (fun s _ => Submodule.smul_mem _ _ (basisVec_sector_mem Ne s))
+
+/-- **Projection identity.** `T Tᴴ` acts as the identity on `W`: `T Tᴴ v = v` for `v ∈ W`
+(resolution of identity over the orthonormal `Ne`-electron basis). -/
+theorem hubbardSectorProjection_mulVec_eq_of_mem (Ne : ℕ)
+    {v : (Fin (2 * N + 2) → Fin 2) → ℂ} (h : v ∈ hubbardSectorWSubmodule N Ne) :
+    (hubbardSectorEmbedding N Ne * (hubbardSectorEmbedding N Ne)ᴴ).mulVec v = v := by
+  rw [← Matrix.mulVec_mulVec, hubbardSectorEmbedding_conjTranspose_mulVec,
+    hubbardSectorEmbedding_mulVec]
+  rw [mem_hubbardSectorWSubmodule_iff] at h
+  exact (hubbardSector_completeness Ne v h).symm
+
+/-- **`B` preserves `W`.** The reusable hypothesis of the eigenvector lift. -/
+def PreservesHubbardSectorW (N Ne : ℕ) (B : ManyBodyOp (Fin (2 * N + 2))) : Prop :=
+  ∀ v ∈ hubbardSectorWSubmodule N Ne, B.mulVec v ∈ hubbardSectorWSubmodule N Ne
+
+/-- **`Ĥ` preserves `W`** (charge conservation `[Ĥ, N̂] = 0`). -/
+theorem preservesHubbardSectorW_hamiltonian (Ne : ℕ)
+    (t : Fin (N + 1) → Fin (N + 1) → ℂ) (U : ℂ) :
+    PreservesHubbardSectorW N Ne (hubbardHamiltonian N t U) := by
+  intro v hv
+  rw [mem_hubbardSectorWSubmodule_iff] at hv ⊢
+  rw [Matrix.mulVec_mulVec,
+    ← (hubbardHamiltonian_commute_fermionTotalNumber N t U).eq,
+    ← Matrix.mulVec_mulVec, hv, Matrix.mulVec_smul]
+
+/-- **Eigenvector lift.** If `A` preserves `W` and `Φ` is an eigenvector of the compression
+`compress(A)` at `E`, then the lift `hubbardSectorExpansion Φ` is an eigenvector of `A` at `E`. -/
+theorem mulVec_hubbardSectorExpansion_of_compress_eigen (Ne : ℕ)
+    {A : ManyBodyOp (Fin (2 * N + 2))} (hA : PreservesHubbardSectorW N Ne A)
+    {Φ : hubbardSectorConfig N Ne → ℂ} {E : ℂ}
+    (hE : (hubbardSectorCompress N Ne A).mulVec Φ = E • Φ) :
+    A.mulVec (hubbardSectorExpansion N Ne Φ) = E • hubbardSectorExpansion N Ne Φ := by
+  have hAW := hA _ (hubbardSectorExpansion_mem Ne Φ)
+  have hinner : (hubbardSectorEmbedding N Ne)ᴴ.mulVec
+      (A.mulVec ((hubbardSectorEmbedding N Ne).mulVec Φ))
+        = (hubbardSectorCompress N Ne A).mulVec Φ := by
+    unfold hubbardSectorCompress
+    rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
+  rw [← hubbardSectorProjection_mulVec_eq_of_mem Ne hAW, ← hubbardSectorEmbedding_mulVec,
+    ← Matrix.mulVec_mulVec, hinner, hE, Matrix.mulVec_smul]
+
+/-! ## The sector minimum energy and its eigenspace -/
+
+/-- A nonzero sector coefficient vector lifts to a nonzero `W`-vector (isometry). -/
+theorem hubbardSectorExpansion_ne_zero (Ne : ℕ) {c : hubbardSectorConfig N Ne → ℂ} (hc : c ≠ 0) :
+    hubbardSectorExpansion N Ne c ≠ 0 := by
+  intro h
+  apply hc
+  have hiso := hubbardSectorExpansion_dotProduct_self Ne c
+  rw [h, star_zero, zero_dotProduct] at hiso
+  -- `hiso : 0 = Σ_s conj(c s) * c s`; each summand has nonneg real part, so all `c s = 0`.
+  funext s
+  have hsum : (∑ s', (starRingEnd ℂ) (c s') * c s') = 0 := by
+    rw [← hiso.symm]; rfl
+  have hnn : ∀ s' ∈ (Finset.univ : Finset (hubbardSectorConfig N Ne)),
+      0 ≤ (Complex.normSq (c s') : ℝ) := fun s' _ => Complex.normSq_nonneg _
+  have hre : (∑ s', Complex.normSq (c s')) = 0 := by
+    have : (∑ s', (starRingEnd ℂ) (c s') * c s') = ((∑ s', Complex.normSq (c s') : ℝ) : ℂ) := by
+      push_cast
+      refine Finset.sum_congr rfl (fun s' _ => ?_)
+      rw [Complex.normSq_eq_conj_mul_self]
+    rw [this] at hsum
+    exact_mod_cast hsum
+  have hzero : Complex.normSq (c s) = 0 :=
+    (Finset.sum_eq_zero_iff_of_nonneg hnn).mp hre s (Finset.mem_univ s)
+  rw [Pi.zero_apply, ← Complex.normSq_eq_zero]
+  exact hzero
+
+/-- **The sector minimum energy supplies a nonzero `Ne`-electron eigenspace.** For a Hermitian
+`hopping`/real-`U` Hubbard model, the compression `Ĥ_W`'s minimum eigenvalue `E_min` is attained by
+a genuine `Ĥ`-eigenvector in the `Ne`-electron sector, so the `Ĥ`-eigenspace at `E_min`
+intersected with that sector is nonzero. -/
+theorem hubbardSector_minEnergy_eigenspace_ne_bot (Ne : ℕ)
+    [Nonempty (hubbardSectorConfig N Ne)]
+    {t : Fin (N + 1) → Fin (N + 1) → ℂ} {U : ℂ}
+    (ht : ∀ i j, star (t i j) = t j i) (hU : star U = U) :
+    ∃ E : ℂ, E = ((hermitianMinEigenvalue (hubbardSectorCompress_isHermitian Ne
+        (hubbardHamiltonian_isHermitian N ht hU)) : ℝ) : ℂ) ∧
+      Module.End.eigenspace (hubbardHamiltonian N t U).mulVecLin E ⊓
+        Module.End.eigenspace (fermionTotalNumber (2 * N + 1)).mulVecLin (Ne : ℂ) ≠ ⊥ := by
+  classical
+  set hHW := hubbardSectorCompress_isHermitian Ne (hubbardHamiltonian_isHermitian N ht hU) with hHWd
+  obtain ⟨c, hc0, hceig⟩ := exists_nonzero_eigenvector_hermitianMinEigenvalue hHW
+  set E : ℂ := ((hermitianMinEigenvalue hHW : ℝ) : ℂ) with hE
+  refine ⟨E, rfl, ?_⟩
+  set Φ := hubbardSectorExpansion N Ne c with hΦ
+  have hΦ0 : Φ ≠ 0 := hubbardSectorExpansion_ne_zero Ne hc0
+  have hΦeig : (hubbardHamiltonian N t U).mulVec Φ = E • Φ :=
+    mulVec_hubbardSectorExpansion_of_compress_eigen Ne
+      (preservesHubbardSectorW_hamiltonian Ne t U) hceig
+  have hΦW : Φ ∈ hubbardSectorWSubmodule N Ne := hubbardSectorExpansion_mem Ne c
+  rw [mem_hubbardSectorWSubmodule_iff] at hΦW
+  intro hbot
+  apply hΦ0
+  have hmem : Φ ∈ Module.End.eigenspace (hubbardHamiltonian N t U).mulVecLin E ⊓
+      Module.End.eigenspace (fermionTotalNumber (2 * N + 1)).mulVecLin (Ne : ℂ) := by
+    rw [Submodule.mem_inf, Module.End.mem_eigenspace_iff, Module.End.mem_eigenspace_iff,
+      Matrix.mulVecLin_apply, Matrix.mulVecLin_apply]
+    exact ⟨hΦeig, hΦW⟩
+  rw [hbot, Submodule.mem_bot] at hmem
+  exact hmem
+
+/-- **Variational lower bound on the sector.** Any `Ne`-electron vector `v` has Rayleigh quotient at
+least `E_min · ‖v‖²`, where `E_min` is the compression's minimum eigenvalue. -/
+theorem hubbardSector_minEnergy_mul_le_rayleighOnVec
+    (Ne : ℕ) [Nonempty (hubbardSectorConfig N Ne)]
+    {t : Fin (N + 1) → Fin (N + 1) → ℂ} {U : ℂ}
+    (ht : ∀ i j, star (t i j) = t j i) (hU : star U = U)
+    {v : (Fin (2 * N + 2) → Fin 2) → ℂ}
+    (hv : (fermionTotalNumber (2 * N + 1)).mulVec v = (Ne : ℂ) • v) :
+    (hermitianMinEigenvalue (hubbardSectorCompress_isHermitian Ne
+        (hubbardHamiltonian_isHermitian N ht hU))) * (dotProduct (star v) v).re ≤
+      rayleighOnVec (hubbardHamiltonian N t U) v := by
+  set hHW := hubbardSectorCompress_isHermitian Ne (hubbardHamiltonian_isHermitian N ht hU) with hHWd
+  set c := hubbardSectorCoeff N Ne v with hc
+  have hexp : v = hubbardSectorExpansion N Ne c := hubbardSector_completeness Ne v hv
+  have hcc : (dotProduct (star c) c).re = (dotProduct (star v) v).re := by
+    rw [hc, ← hubbardSectorExpansion_dotProduct_self Ne, ← hexp]
+  have hvar := hermitianMinEigenvalue_mul_dotProduct_re_le_rayleighOnVec hHW c
+  rw [hcc] at hvar
+  calc hermitianMinEigenvalue hHW * (dotProduct (star v) v).re
+      ≤ rayleighOnVec (hubbardSectorCompress N Ne (hubbardHamiltonian N t U)) c := hvar
+    _ = rayleighOnVec (hubbardHamiltonian N t U) v := by
+        rw [rayleighOnVec_hubbardSectorCompress, ← hexp]
+
+/-! ## The total down-number on an eigenmode Slater determinant -/
+
+/-- **The total down number raises a smeared creation by `[σ = 1]`**:
+`N̂_↓ · Ĉ†_σ(w) = Ĉ†_σ(w)·N̂_↓ + (if σ = 1 then Ĉ†_σ(w) else 0)`. -/
+theorem fermionTotalDownNumber_mul_spinfulCreationFromVector (M : ℕ) (w : Fin (M + 1) → ℂ)
+    (σ : Fin 2) :
+    fermionTotalDownNumber M * spinfulCreationFromVector M w σ
+      = spinfulCreationFromVector M w σ * fermionTotalDownNumber M
+        + (if σ = 1 then spinfulCreationFromVector M w σ else 0) := by
+  rw [spinfulCreationFromVector, Finset.mul_sum, Finset.sum_mul]
+  by_cases hσ : σ = 1
+  · subst hσ
+    rw [if_pos rfl, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl fun x _ => ?_
+    rw [mul_smul_comm, smul_mul_assoc, ← smul_add]
+    congr 1
+    have hraise : fermionTotalDownNumber M *
+        fermionMultiCreation (2 * M + 1) (spinfulIndex M x 1)
+          = fermionMultiCreation (2 * M + 1) (spinfulIndex M x 1) * fermionTotalDownNumber M
+            + fermionMultiCreation (2 * M + 1) (spinfulIndex M x 1) := by
+      have h := fermionTotalDownNumber_commutator_fermionDownCreation M x
+      rw [fermionDownCreation] at h
+      rw [sub_eq_iff_eq_add] at h
+      rw [h]; abel
+    rw [hraise]
+  · rw [if_neg hσ, add_zero]
+    refine Finset.sum_congr rfl fun x _ => ?_
+    rw [mul_smul_comm, smul_mul_assoc]
+    congr 1
+    have hσ0 : σ = 0 := by omega
+    subst hσ0
+    have hcomm := fermionTotalDownNumber_commute_fermionUpCreation M x
+    rw [fermionUpCreation] at hcomm
+    exact hcomm.eq
+
+/-- **The total down number is diagonal in the eigenmode Slater monomials**:
+`N̂_↓|qs⟩ = (count of down-tags in qs)·|qs⟩`.  List induction via the down-raising relation. -/
+theorem fermionTotalDownNumber_mulVec_generalModeMonomial {M : ℕ}
+    (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (qs : List (Fin (M + 1) × Fin 2)) :
+    (fermionTotalDownNumber M).mulVec (generalModeMonomial e qs)
+      = ((qs.countP (fun q => q.2 = 1) : ℕ) : ℂ) • generalModeMonomial e qs := by
+  induction qs with
+  | nil =>
+    simp only [generalModeMonomial, List.map_nil, List.prod_nil, Matrix.one_mulVec,
+      List.countP_nil, Nat.cast_zero, zero_smul]
+    exact fermionTotalDownNumber_mulVec_vacuum M
+  | cons q qs' ih =>
+    obtain ⟨q1, q2⟩ := q
+    set C := spinfulCreationFromVector M (e q1) q2 with hC
+    set mon := generalModeMonomial e qs' with hmon
+    have hcons : generalModeMonomial e ((q1, q2) :: qs') = C.mulVec mon :=
+      (spinfulCreation_mulVec_generalModeMonomial e q1 q2 qs').symm
+    rw [hcons, Matrix.mulVec_mulVec, fermionTotalDownNumber_mul_spinfulCreationFromVector,
+      Matrix.add_mulVec, ← Matrix.mulVec_mulVec, ih, Matrix.mulVec_smul, ← hC]
+    by_cases hq2 : q2 = 1
+    · have hop : (if q2 = 1 then C else 0) = C := if_pos hq2
+      have hcnt : (((q1, q2) :: qs').countP (fun q => q.2 = 1) : ℂ)
+          = (qs'.countP (fun q => q.2 = 1) : ℂ) + 1 := by
+        rw [List.countP_cons, if_pos (show decide ((q1, q2).2 = 1) = true by simpa using hq2)]
+        push_cast; ring
+      rw [hop, hcnt]
+      module
+    · have hop : (if q2 = 1 then C else 0) = 0 := if_neg hq2
+      have hcnt : (((q1, q2) :: qs').countP (fun q => q.2 = 1) : ℂ)
+          = (qs'.countP (fun q => q.2 = 1) : ℂ) := by
+        rw [List.countP_cons, if_neg (show ¬ decide ((q1, q2).2 = 1) = true by simpa using hq2)]
+        push_cast; ring
+      rw [hop, Matrix.zero_mulVec, add_zero, hcnt]
+
+/-- The number of down-tags in the subset-pair list is `|SDown|`. -/
+theorem spinfulSubsetPairList_countP_down {M : ℕ} (SUp SDown : Finset (Fin (M + 1))) :
+    (spinfulSubsetPairList SUp SDown).countP (fun q => q.2 = 1) = SDown.card := by
+  rw [spinfulSubsetPairList, List.countP_append]
+  rw [show ((SUp.sort (· ≤ ·)).map (fun j => (j, (0 : Fin 2)))).countP (fun q => q.2 = 1)
+      = 0 from by
+    rw [List.countP_map, List.countP_eq_zero]; intro q _; simp]
+  rw [show ((SDown.sort (· ≤ ·)).map (fun j => (j, (1 : Fin 2)))).countP (fun q => q.2 = 1)
+      = (SDown.sort (· ≤ ·)).length from by
+    rw [List.countP_map, List.countP_eq_length]; intro q _; simp]
+  rw [zero_add, Finset.length_sort]
+
+/-- **The total down number on an eigenmode Slater state**: `N̂_↓ Ψ = |SDown| • Ψ` (the Slater state
+filling up-modes `SUp` and down-modes `SDown` has exactly `|SDown|` down electrons). -/
+theorem fermionTotalDownNumber_mulVec_spinfulGeneralBasisState {M : ℕ}
+    (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (SUp SDown : Finset (Fin (M + 1))) :
+    (fermionTotalDownNumber M).mulVec (spinfulGeneralBasisState e SUp SDown)
+      = ((SDown.card : ℕ) : ℂ) • spinfulGeneralBasisState e SUp SDown := by
+  rw [spinfulGeneralBasisState, fermionTotalDownNumber_mulVec_generalModeMonomial,
+    spinfulSubsetPairList_countP_down]
+
+/-! ## The interaction is bounded by the total down number -/
+
+/-- The only-down site projection `(1 − n̂_{i↑}) n̂_{i↓}` is positive-semidefinite (a Hermitian
+idempotent, hence `P = Pᴴ P`). -/
+theorem onlyDownProjection_posSemidef (M : ℕ) (i : Fin (M + 1)) :
+    ((1 - fermionUpNumber M i) * fermionDownNumber M i).PosSemidef := by
+  have hEq : ((1 - fermionUpNumber M i) * fermionDownNumber M i)ᴴ *
+      ((1 - fermionUpNumber M i) * fermionDownNumber M i)
+        = (1 - fermionUpNumber M i) * fermionDownNumber M i := by
+    rw [(one_sub_fermionUpNumber_mul_fermionDownNumber_isHermitian M i).eq]
+    exact one_sub_fermionUpNumber_mul_fermionDownNumber_sq M i
+  have h := Matrix.posSemidef_conjTranspose_mul_self
+    ((1 - fermionUpNumber M i) * fermionDownNumber M i)
+  rwa [hEq] at h
+
+/-- **`N̂_↓ − Σ_i n̂_{i↑}n̂_{i↓}` is positive-semidefinite**: it is the sum of the only-down site
+projections `Σ_i (1 − n̂_{i↑})n̂_{i↓}`, each PSD. -/
+theorem fermionTotalDownNumber_sub_onSiteInteraction_posSemidef (M : ℕ) :
+    (fermionTotalDownNumber M - hubbardOnSiteInteraction M 1).PosSemidef := by
+  rw [show fermionTotalDownNumber M - hubbardOnSiteInteraction M 1
+      = ∑ i : Fin (M + 1), ((1 - fermionUpNumber M i) * fermionDownNumber M i) from by
+    rw [fermionTotalDownNumber, hubbardOnSiteInteraction, ← Finset.sum_sub_distrib]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [one_smul, sub_mul, Matrix.one_mul]]
+  exact Matrix.posSemidef_sum _ (fun i _ => onlyDownProjection_posSemidef M i)
+
+/-- **The on-site interaction energy is sandwiched between `0` and the down-number energy**:
+`0 ≤ Re⟨v, Σ_i n̂↑n̂↓ v⟩ ≤ Re⟨v, N̂_↓ v⟩` for every `v` (each `n̂↑n̂↓` is PSD; `N̂_↓ − Σ n̂↑n̂↓`
+is PSD). -/
+theorem hubbardOnSiteInteraction_rayleigh_bounds (M : ℕ)
+    (v : (Fin (2 * M + 2) → Fin 2) → ℂ) :
+    0 ≤ (dotProduct (star v) ((hubbardOnSiteInteraction M 1).mulVec v)).re ∧
+      (dotProduct (star v) ((hubbardOnSiteInteraction M 1).mulVec v)).re ≤
+        (dotProduct (star v) ((fermionTotalDownNumber M).mulVec v)).re := by
+  have hintPSD : (hubbardOnSiteInteraction M 1).PosSemidef := by
+    unfold hubbardOnSiteInteraction
+    refine Matrix.posSemidef_sum _ (fun i _ => ?_)
+    rw [one_smul]
+    exact hubbardDoubleOccupancy_posSemidef M i
+  have hlow := hintPSD.re_dotProduct_nonneg v
+  have hdiff := (fermionTotalDownNumber_sub_onSiteInteraction_posSemidef M).re_dotProduct_nonneg v
+  refine ⟨hlow, ?_⟩
+  rw [Matrix.sub_mulVec (fermionTotalDownNumber M) (hubbardOnSiteInteraction M 1) v,
+    dotProduct_sub] at hdiff
+  simp only [RCLike.re_to_complex, Complex.sub_re] at hdiff ⊢
+  linarith
+
+/-! ## Non-vanishing of the eigenmode Slater state -/
+
+/-- **An eigenmode Slater state is nonzero.**  `spinfulGeneralBasisState e SUp SDown ≠ 0`: it is a
+nonzero scalar multiple of the occupation-basis vector for the config selecting `SUp`/`SDown`, which
+is a (nonzero) basis element. -/
+theorem spinfulGeneralBasisState_ne_zero {M : ℕ}
+    (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ)) (SUp SDown : Finset (Fin (M + 1))) :
+    spinfulGeneralBasisState e SUp SDown ≠ 0 := by
+  classical
+  set g₀ : Fin (M + 1) × Fin 2 → Fin 2 :=
+    fun q => if (q.2 = 0 ∧ q.1 ∈ SUp) ∨ (q.2 = 1 ∧ q.1 ∈ SDown) then 1 else 0 with hg₀
+  have hg₀val : ∀ q, g₀ q = if (q.2 = 0 ∧ q.1 ∈ SUp) ∨ (q.2 = 1 ∧ q.1 ∈ SDown) then 1 else 0 :=
+    fun q => rfl
+  have hup : occUpSet g₀ = SUp := by
+    ext j
+    rw [occUpSet, Finset.mem_filter]
+    constructor
+    · rintro ⟨-, hj⟩
+      by_contra hjn
+      rw [hg₀val, if_neg (by rintro (⟨_, h⟩ | ⟨h, _⟩); exacts [hjn h, by simp at h])] at hj
+      exact absurd hj (by decide)
+    · intro hj
+      exact ⟨Finset.mem_univ _, by rw [hg₀val (j, 0), if_pos (Or.inl ⟨rfl, hj⟩)]⟩
+  have hdown : occDownSet g₀ = SDown := by
+    ext j
+    rw [occDownSet, Finset.mem_filter]
+    constructor
+    · rintro ⟨-, hj⟩
+      by_contra hjn
+      rw [hg₀val, if_neg (by rintro (⟨h, _⟩ | ⟨_, h⟩); exacts [by simp at h, hjn h])] at hj
+      exact absurd hj (by decide)
+    · intro hj
+      exact ⟨Finset.mem_univ _, by rw [hg₀val (j, 1), if_pos (Or.inr ⟨rfl, hj⟩)]⟩
+  obtain ⟨z, hz0, hz⟩ := generalOccMonomial_eq_smul_generalBasisState e g₀
+  rw [hup, hdown] at hz
+  intro hzero
+  rw [hzero, smul_zero] at hz
+  have hbcoe : (generalOccBasis e g₀ : (Fin (2 * M + 2) → Fin 2) → ℂ) = generalOccMonomial e g₀ :=
+    congrFun (coe_basisOfTopLeSpanOfCardEqFinrank _ _ _) g₀
+  have hne : generalOccMonomial e g₀ ≠ 0 := by
+    rw [← hbcoe]; exact (generalOccBasis e).ne_zero g₀
+  exact hne hz
+
+/-- The self inner product is real: `⟨v, v⟩ = (Σ_i |v_i|² : ℝ)`. -/
+theorem dotProduct_star_self_eq_ofReal {n : Type*} [Fintype n] (v : n → ℂ) :
+    dotProduct (star v) v = ((∑ i, Complex.normSq (v i) : ℝ) : ℂ) := by
+  simp only [dotProduct, Pi.star_apply, RCLike.star_def]
+  push_cast
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [← Complex.normSq_eq_conj_mul_self]
+
+/-- For a nonzero vector `v`, the squared norm `(⟨v, v⟩).re = Σ_i |v_i|²` is strictly positive. -/
+theorem dotProduct_star_self_re_pos {n : Type*} [Fintype n] {v : n → ℂ} (hv : v ≠ 0) :
+    0 < (dotProduct (star v) v).re := by
+  classical
+  obtain ⟨i₀, hi₀⟩ := Function.ne_iff.mp hv
+  rw [Pi.zero_apply] at hi₀
+  rw [dotProduct_star_self_eq_ofReal, Complex.ofReal_re]
+  refine Finset.sum_pos' (fun i _ => Complex.normSq_nonneg _) ⟨i₀, Finset.mem_univ _, ?_⟩
+  exact (Complex.normSq_pos).mpr hi₀
+
+/-! ## The trial-state Rayleigh quotient -/
+
+/-- **The on-site interaction scales linearly in `U`**: `Ĥ_int(U) = U • Ĥ_int(1)`. -/
+theorem hubbardOnSiteInteraction_eq_smul (M : ℕ) (U : ℂ) :
+    hubbardOnSiteInteraction M U = U • hubbardOnSiteInteraction M 1 := by
+  rw [hubbardOnSiteInteraction, hubbardOnSiteInteraction, Finset.smul_sum]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [smul_smul, mul_one]
+
+/-- **The energy of the eigenmode Slater state with one down electron** is bounded above by
+`(kinetic energy) + U`.  For `0 ≤ U`, the spin-flipped trial state
+`Ψ = spinfulGeneralBasisState e SUp SDown` with `|SDown| = 1` has Rayleigh quotient
+`rayleighOnVec Ĥ Ψ ≤ (occupiedEigenEnergy).re · ‖Ψ‖² + U · ‖Ψ‖²` (kinetic exact, interaction
+sandwiched by the single down electron). -/
+theorem rayleighOnVec_hubbardHamiltonian_trial_le {M : ℕ}
+    {t : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} (hT : t.IsHermitian)
+    (SUp SDown : Finset (Fin (M + 1))) (hcard : SDown.card = 1) (U : ℝ) (hU : 0 ≤ U) :
+    rayleighOnVec (hubbardHamiltonian M t (U : ℂ))
+        (spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp SDown)
+      ≤ (occupiedEigenEnergy hT SUp SDown).re *
+          (dotProduct (star (spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp SDown))
+            (spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp SDown)).re
+        + U * (dotProduct (star (spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp SDown))
+            (spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp SDown)).re := by
+  set Ψ := spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp SDown with hΨ
+  set nrm := (dotProduct (star Ψ) Ψ).re with hnrm
+  -- kinetic energy is the scalar `occupiedEigenEnergy`
+  have hkin : (hubbardKinetic M t).mulVec Ψ = occupiedEigenEnergy hT SUp SDown • Ψ :=
+    hubbardKinetic_mulVec_spinfulGeneralBasisState hT SUp SDown
+  -- down-number eigenvalue is `|SDown| = 1`
+  have hdown : (fermionTotalDownNumber M).mulVec Ψ = ((SDown.card : ℕ) : ℂ) • Ψ :=
+    fermionTotalDownNumber_mulVec_spinfulGeneralBasisState (eigenbasisAsBasis hT) SUp SDown
+  -- split Ĥ = Ĥ_kin + Ĥ_int
+  have hsplit : (hubbardHamiltonian M t (U : ℂ)).mulVec Ψ
+      = (hubbardKinetic M t).mulVec Ψ + (hubbardOnSiteInteraction M (U : ℂ)).mulVec Ψ := by
+    rw [hubbardHamiltonian, Matrix.add_mulVec]
+  have hray : rayleighOnVec (hubbardHamiltonian M t (U : ℂ)) Ψ
+      = (occupiedEigenEnergy hT SUp SDown).re * nrm
+        + (dotProduct (star Ψ) ((hubbardOnSiteInteraction M (U : ℂ)).mulVec Ψ)).re := by
+    unfold rayleighOnVec
+    rw [hsplit, dotProduct_add, Complex.add_re, hkin, dotProduct_smul, smul_eq_mul,
+      Complex.mul_re]
+    have him : (dotProduct (star Ψ) Ψ).im = 0 := by
+      rw [dotProduct_star_self_eq_ofReal, Complex.ofReal_im]
+    rw [him, mul_zero, sub_zero, ← hnrm]
+  -- interaction energy bound: `Re⟨Ψ,Ĥ_int(U)Ψ⟩ ≤ U·nrm`
+  have hUscale : (hubbardOnSiteInteraction M (U : ℂ)).mulVec Ψ
+      = (U : ℂ) • (hubbardOnSiteInteraction M 1).mulVec Ψ := by
+    rw [hubbardOnSiteInteraction_eq_smul, Matrix.smul_mulVec]
+  obtain ⟨_, hupper⟩ := hubbardOnSiteInteraction_rayleigh_bounds M Ψ
+  have hdownE : (dotProduct (star Ψ) ((fermionTotalDownNumber M).mulVec Ψ)).re = nrm := by
+    rw [hdown, hcard, dotProduct_smul, smul_eq_mul, Nat.cast_one, one_mul, ← hnrm]
+  have hintBound : (dotProduct (star Ψ)
+      ((hubbardOnSiteInteraction M (U : ℂ)).mulVec Ψ)).re ≤ U * nrm := by
+    rw [hUscale, dotProduct_smul, smul_eq_mul, Complex.mul_re, Complex.ofReal_re,
+      Complex.ofReal_im, zero_mul, sub_zero]
+    calc U * (dotProduct (star Ψ) ((hubbardOnSiteInteraction M 1).mulVec Ψ)).re
+        ≤ U * (dotProduct (star Ψ) ((fermionTotalDownNumber M).mulVec Ψ)).re :=
+          mul_le_mul_of_nonneg_left hupper hU
+      _ = U * nrm := by rw [hdownE]
+  rw [hray]
+  linarith [hintBound]
+
+end LatticeSystem.Fermion

@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardFerromagnetismStructure
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowUTrial
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HubbardImpossibilityLowUVariational
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJAllUpProperties
 import Mathlib.Analysis.Matrix.Spectrum
 
@@ -196,17 +197,111 @@ impossibility statement is sound.
 
 Tasaki's proof: the trial state `|Ψ⟩ = ĉ†_{1,↓} ∏_{j=1}^{N-1} ĉ†_{j,↑}|0⟩` (eq. (11.1.6), one spin
 flipped into the lowest single-particle level) has energy `E_ferro − (ε_N − ε_1) + U·‖…‖²`, strictly
-below `E_ferro` when `U < ε_N − ε_1`, so the maximal-spin all-up state is not the ground state.  The
-variational estimate uses the single-particle eigenbasis fermion operators; it is finite-dimensional
-but needs that eigenbasis machinery, so it is recorded here as a documented axiom (to be
-discharged), matching the policy for the other deferred Chapter 11 results. -/
-axiom hubbard_theorem_11_3
+below `E_ferro` when `U < ε_N − ε_1`, so the maximal-spin all-up state is not the ground state. -/
+theorem hubbard_theorem_11_3
     (ht : Matrix.IsHermitian t) (U : ℝ) (E₀ : ℂ)
     (hne : hubbardEigenspaceAtFilling t (U : ℂ) E₀ ≠ ⊥)
     (hmin : ∀ E : ℂ, hubbardEigenspaceAtFilling t (U : ℂ) E ≠ ⊥ → E₀.re ≤ E.re)
     (hU0 : 0 ≤ U) (hUlt : U < hubbardFermiGap t ht) :
     ¬ ∀ v ∈ hubbardEigenspaceAtFilling t (U : ℂ) E₀,
       (fermionTotalSpinSquared N).mulVec v
-        = (((N + 1 : ℕ) : ℂ) / 2 * (((N + 1 : ℕ) : ℂ) / 2 + 1)) • v
+        = (((N + 1 : ℕ) : ℂ) / 2 * (((N + 1 : ℕ) : ℂ) / 2 + 1)) • v := by
+  classical
+  intro hall
+  -- Step 1: `|↑…↑⟩ ∈ G`, hence `E₀ = ∑ i, t i i = Tr`.
+  have hmem := hubbardAllUpState_mem_of_maxSpin t (U := (U : ℂ)) hne hall
+  have hE₀ : E₀ = ∑ i : Fin (N + 1), t i i := hubbard_groundEnergy_eq_trace t hmem
+  have hht : ∀ i j, star (t i j) = t j i := fun i j => ht.apply j i
+  have hhU : star (U : ℂ) = (U : ℂ) := by rw [Complex.star_def, Complex.conj_ofReal]
+  -- the trace equals the sum of (real) eigenvalues
+  have htrace : (∑ i : Fin (N + 1), t i i) = ((∑ j : Fin (N + 1), ht.eigenvalues j : ℝ) : ℂ) := by
+    have htr : Matrix.trace t = ∑ i : Fin (N + 1), t i i := rfl
+    rw [← htr, ht.trace_eq_sum_eigenvalues]; push_cast; rfl
+  -- `jmax`/`jmin` attain the band edges.
+  obtain ⟨jmax, -, hjmax⟩ :=
+    Finset.exists_mem_eq_sup' (Finset.univ_nonempty (α := Fin (N + 1))) ht.eigenvalues
+  obtain ⟨jmin, -, hjmin⟩ :=
+    Finset.exists_mem_eq_inf' (Finset.univ_nonempty (α := Fin (N + 1))) ht.eigenvalues
+  -- Step 2: the trial state filling all up-modes except `jmax`, and down-mode `jmin`.
+  set SUp : Finset (Fin (N + 1)) := Finset.univ \ {jmax} with hSUp
+  set SDown : Finset (Fin (N + 1)) := {jmin} with hSDown
+  set Ψ := spinfulGeneralBasisState (eigenbasisAsBasis ht) SUp SDown with hΨ
+  have hΨne : Ψ ≠ 0 := spinfulGeneralBasisState_ne_zero (eigenbasisAsBasis ht) SUp SDown
+  -- the trial state has `N + 1` electrons: `|SUp| + |SDown| = N + 1`.
+  have hSUpcard : SUp.card = N := by
+    rw [hSUp, Finset.card_sdiff]
+    simp
+  have hSDowncard : SDown.card = 1 := by rw [hSDown]; simp
+  have hΨnum : (fermionTotalNumber (2 * N + 1)).mulVec Ψ = ((N + 1 : ℕ) : ℂ) • Ψ := by
+    have := spinfulGeneralBasisState_mem (eigenbasisAsBasis ht) (Ne := N + 1) SUp SDown
+      (by rw [hSUpcard, hSDowncard])
+    rwa [spinfulNElectronSubmodule, Module.End.mem_eigenspace_iff, Matrix.mulVecLin_apply] at this
+  -- the all-up config has `N + 1` electrons, so the sector is nonempty.
+  have hAllUpCount : (∑ j : Fin (2 * N + 2),
+      ((if j.val % 2 = 0 then (1 : Fin 2) else 0).val)) = N + 1 := by
+    rw [sum_spinful_reindex N
+      (fun k => ((if k.val % 2 = 0 then (1 : Fin 2) else 0).val))]
+    rw [Finset.sum_congr rfl (fun i _ => show
+        (∑ r : Fin 2,
+          ((if (spinfulIndex N i r).val % 2 = 0 then (1 : Fin 2) else 0).val)) = 1 from by
+      rw [Fin.sum_univ_two,
+        if_pos (show (spinfulIndex N i 0).val % 2 = 0 by simp [spinfulIndex]),
+        if_neg (show ¬ (spinfulIndex N i 1).val % 2 = 0 by simp only [spinfulIndex]; omega)]
+      rfl)]
+    rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul, mul_one]
+  haveI hNE : Nonempty (hubbardSectorConfig N (N + 1)) :=
+    ⟨⟨fun k => if k.val % 2 = 0 then 1 else 0, hAllUpCount⟩⟩
+  -- the occupied single-particle energies: `Σ_{j≠jmax} ε_j + ε_jmin`.
+  have hoccE : (occupiedEigenEnergy ht SUp SDown).re
+      = (∑ j : Fin (N + 1), ht.eigenvalues j) - ht.eigenvalues jmax + ht.eigenvalues jmin := by
+    rw [occupiedEigenEnergy, hSUp, hSDown]
+    rw [show (∑ j ∈ Finset.univ \ {jmax}, (ht.eigenvalues j : ℂ))
+        = (∑ j : Fin (N + 1), (ht.eigenvalues j : ℂ)) - (ht.eigenvalues jmax : ℂ) from by
+      rw [Finset.sum_sdiff_eq_sub (by simp), Finset.sum_singleton]]
+    rw [Finset.sum_singleton]
+    rw [Complex.add_re, Complex.sub_re, Complex.re_sum]
+    simp only [Complex.ofReal_re]
+  -- Step 5: the trial energy is strictly below the trace.
+  set nrm := (dotProduct (star Ψ) Ψ).re with hnrm
+  have hnrmpos : 0 < nrm := dotProduct_star_self_re_pos hΨne
+  have hgap : ht.eigenvalues jmax - ht.eigenvalues jmin = hubbardFermiGap t ht := by
+    rw [hubbardFermiGap, hjmax, hjmin]
+  have htrialRayleigh : rayleighOnVec (hubbardHamiltonian N t (U : ℂ)) Ψ < (E₀.re) * nrm := by
+    have hle := rayleighOnVec_hubbardHamiltonian_trial_le ht SUp SDown hSDowncard U hU0
+    rw [← hΨ, ← hnrm] at hle
+    rw [hoccE] at hle
+    have hER : E₀.re = ∑ j : Fin (N + 1), ht.eigenvalues j := by
+      rw [hE₀, htrace, Complex.ofReal_re]
+    have hstrict : ((∑ j : Fin (N + 1), ht.eigenvalues j) - ht.eigenvalues jmax
+        + ht.eigenvalues jmin) * nrm + U * nrm < E₀.re * nrm := by
+      rw [hER]
+      have hUgap : U < ht.eigenvalues jmax - ht.eigenvalues jmin := by rw [hgap]; exact hUlt
+      nlinarith [hnrmpos, hUgap]
+    linarith
+  -- Step 6: the sector minimum eigenvalue gives a contradiction.
+  -- the sector minimum is ≤ the trial Rayleigh / ‖Ψ‖² < Tr
+  have hvar := hubbardSector_minEnergy_mul_le_rayleighOnVec (N + 1) hht hhU hΨnum
+  have hmineig := hubbardSector_minEnergy_eigenspace_ne_bot (N + 1) hht hhU
+  obtain ⟨E, hEval, hEne⟩ := hmineig
+  -- `hubbardEigenspaceAtFilling t U E ≠ ⊥`, so `E₀.re ≤ E.re`.
+  have hEfilling : hubbardEigenspaceAtFilling t (U : ℂ) E ≠ ⊥ := by
+    rw [hubbardEigenspaceAtFilling, hubbardEigenspaceAt]
+    exact hEne
+  have hE₀le : E₀.re ≤ E.re := hmin E hEfilling
+  -- `E.re = sector min`; combine: `E₀.re ≤ min ≤ trialRayleigh/nrm < E₀.re`.
+  have hEre : E.re = hermitianMinEigenvalue (hubbardSectorCompress_isHermitian (N + 1)
+      (hubbardHamiltonian_isHermitian N hht hhU)) := by rw [hEval, Complex.ofReal_re]
+  have hchain : (hermitianMinEigenvalue (hubbardSectorCompress_isHermitian (N + 1)
+      (hubbardHamiltonian_isHermitian N hht hhU))) * nrm ≤
+      rayleighOnVec (hubbardHamiltonian N t (U : ℂ)) Ψ := by
+    rw [← hnrm] at hvar; exact hvar
+  have : E₀.re * nrm < E₀.re * nrm := by
+    calc E₀.re * nrm
+        ≤ E.re * nrm := by exact mul_le_mul_of_nonneg_right hE₀le (le_of_lt hnrmpos)
+      _ = (hermitianMinEigenvalue (hubbardSectorCompress_isHermitian (N + 1)
+            (hubbardHamiltonian_isHermitian N hht hhU))) * nrm := by rw [hEre]
+      _ ≤ rayleighOnVec (hubbardHamiltonian N t (U : ℂ)) Ψ := hchain
+      _ < E₀.re * nrm := htrialRayleigh
+  exact lt_irrefl _ this
 
 end LatticeSystem.Fermion
