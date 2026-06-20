@@ -8082,21 +8082,32 @@ Hermiticity hypotheses $\overline{t_{ij}}=t_{ji}$, $\overline U=U$ are added rel
 statement (needed for the $\hat S^-$-invariance of the eigenspace) and hold for the physical Hubbard
 model, so the strengthening is sound.
 
-\noindent\textbf{Theorem 11.3} (Tasaki §11.1.1, eqs.~(11.1.5)--(11.1.6), pp.~378--379; documented
-axiom, \texttt{HubbardImpossibilityLowU.lean}, Issue \#4477).  Ferromagnetism is impossible when the
+\noindent\textbf{Theorem 11.3} (Tasaki §11.1.1, eqs.~(11.1.5)--(11.1.6), pp.~378--379; proved
+axiom-free, \texttt{HubbardImpossibilityLowU.lean} + \texttt{HubbardImpossibilityLowUVariational.lean},
+Issue \#4599).  Ferromagnetism is impossible when the
 on-site repulsion is smaller than the single-particle Fermi gap.  We build the single-particle
 spectrum \texttt{hubbardSingleParticleEnergies} (the Hermitian eigenvalues
 \texttt{ht.eigenvalues} of the hopping matrix $t$) and the Fermi gap \texttt{hubbardFermiGap}
 ($\max_j\varepsilon_j-\min_j\varepsilon_j$, the completely-filled-band specialisation of Tasaki's
-$\varepsilon_N-\varepsilon_1$), and record \texttt{hubbard\_theorem\_11\_3}: for Hermitian $t$, a
+$\varepsilon_N-\varepsilon_1$), and prove \texttt{hubbard\_theorem\_11\_3}: for Hermitian $t$, a
 pinned genuine half-filling ground energy $E_0$ (nonempty and minimal $(N+1)$-electron eigenspace),
 and $0\le U<\texttt{hubbardFermiGap}$, the ground states are not all maximal-spin.  The conclusion
 negates the \emph{pinned} ground max-spin property over \texttt{hubbardEigenspaceAtFilling}\,$E_0$,
 not the vacuously-true \texttt{isSaturatedFerromagnet}, keeping the impossibility statement sound.
-Tasaki's variational trial state (11.1.6) (a single spin
-flip into the lowest level) undercuts the all-up energy; the estimate needs the single-particle
-eigenbasis fermion operators, so it is recorded as a documented axiom.  Another book-order Chapter 11
-backfill.
+The proof: assuming every ground state were maximal-spin forces the all-up state into the ground
+eigenspace (Proposition 11.2's top-weight-uniqueness lemma), so $E_0=\sum_i t_{ii}=\sum_j\varepsilon_j$
+(the trace).  We diagonalize the kinetic term in the eigenbasis,
+$\hat H_{\mathrm{kin}}=\sum_\sigma\sum_j\varepsilon_j\,\hat n_{j,\sigma}$ (eq.~(11.1.5)), so the
+variational trial state (11.1.6) $\Psi=\hat d^\dagger_{j_{\min},\downarrow}\hat d_{j_{\max},\uparrow}
+|\!\uparrow\cdots\uparrow\rangle$ (one spin flipped from the top filled level into the lowest level) is
+an exact kinetic eigenstate with energy $\mathrm{Tr}\,t-(\varepsilon_{j_{\max}}-\varepsilon_{j_{\min}})
+=\mathrm{Tr}\,t-\mathrm{gap}$; the interaction contributes at most $U\|\Psi\|^2$ (one down electron,
+$\sum_x\hat n_{x\uparrow}\hat n_{x\downarrow}\le\hat N_\downarrow$ as a positive-semidefinite bound),
+so $\mathrm{rayleigh}(\hat H,\Psi)<\mathrm{Tr}\,t=E_0$ because $U<\mathrm{gap}$.  A
+fixed-electron-number sector Rayleigh--Ritz compression (the bare $(N+1)$-electron number sector,
+built like the §11.5 t-J \texttt{TJFilling} pattern) then produces a genuine $(N+1)$-electron
+$\hat H$-eigenvalue $E$ with $E<E_0$ and nonempty eigenspace, contradicting the minimality of $E_0$
+(\texttt{hmin}).  Another book-order Chapter 11 backfill.
 
 \noindent\textbf{Theorem 11.4} (Tasaki §11.1.1, eqs.~(11.1.8)--(11.1.10), pp.~379--380; documented
 axiom, \texttt{HubbardImpossibilityLowDensity.lean}, Issue \#4477).  Impossibility of ferromagnetism
