@@ -59,6 +59,7 @@ import LatticeSystem.Quantum.SpinS.LiebSchultzMattis
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisGeneral
 import LatticeSystem.Quantum.SpinS.ShastryNoSSB
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO
+import LatticeSystem.Quantum.SpinS.FerrimagneticLROComponentAlgebra
 import LatticeSystem.Quantum.SpinS.AndersonTower
 import LatticeSystem.Quantum.SpinS.AndersonTowerField
 import LatticeSystem.Quantum.SpinS.AndersonTowerSphereAverage
