@@ -417,6 +417,7 @@ import LatticeSystem.Quantum.SpinS.BareAnisotropicMinLeTwo
 import LatticeSystem.Quantum.SpinS.ComplexDressedSubmatrixPFEigenvector
 import LatticeSystem.Quantum.SpinS.ConnectedRaiseLower
 import LatticeSystem.Quantum.SpinS.ConnectedDressedPF
+import LatticeSystem.Quantum.SpinS.ConnectedFerrimagneticLRO
 import LatticeSystem.Quantum.SpinS.ConnectedSectorIrreducible
 import LatticeSystem.Quantum.SpinS.ConnectedTheorem23
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapDegeneracyBound
