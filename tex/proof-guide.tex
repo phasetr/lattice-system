@@ -8232,10 +8232,19 @@ staggered operator; when $|A|-|B|=a|\Lambda|$ this gives LRO (eq.~(4.1.14)).  Un
 4.1--4.3, Tasaki proves Theorem 4.4 by a finite-volume argument (chain (4.1.16): the cross-term
 positivity (4.1.15) from Problem 2.5.d, the Lieb--Mattis total spin $S_{\mathrm{tot}}=(|A|-|B|)S$ from
 Theorem 2.3, and $\langle(\hat S_{\mathrm{tot}})^2\rangle=S_{\mathrm{tot}}(S_{\mathrm{tot}}+1)\ge
-S_{\mathrm{tot}}^2$), so it is a \emph{discharge candidate}; we record
-\texttt{shenQiuTian\_ferrimagnetic\_lro} as a faithful documented axiom over the connected bipartite
-antiferromagnetic family, to be discharged once the §2.5 Theorem 2.3 total-spin API and the (4.1.15)
-inequality are assembled.  Chapters~3--10 backfill.
+S_{\mathrm{tot}}^2$), so it is a \emph{discharge candidate} (Issue \#4604).  PR1 (\#4605) formalizes the
+\emph{operator-algebra core} of chain (4.1.16) in
+\texttt{Quantum/SpinS/FerrimagneticLROComponentAlgebra.lean}: the transverse part
+\texttt{staggeredTransverseCasimirOpS} of $(\hat O_\Lambda)^2$, the split
+$(\hat O_\Lambda)^2=\text{transverse}+(\hat O_\Lambda^{(3)})^2$, the positive-semidefinite drop
+$\langle\text{transverse}\rangle\le\langle(\hat O_\Lambda)^2\rangle$, the component identities
+$(\hat S_{\mathrm{tot}}^{(\alpha)})^2=\sum_{x,y}\hat S_x^{(\alpha)}\hat S_y^{(\alpha)}$, the Casimir
+identity $\sum_{x,y}(\hat S_x^{(1)}\hat S_y^{(1)}+\hat S_x^{(2)}\hat S_y^{(2)})=(\hat S_{\mathrm{tot}})^2
+-(\hat S_{\mathrm{tot}}^{(3)})^2$, and the $M=0$ reduction
+$\langle(\hat S_{\mathrm{tot}})^2\rangle=\langle\text{transverse}\rangle$.  The axiom
+\texttt{shenQiuTian\_ferrimagnetic\_lro} is retained pending the cross-term (4.1.15, PR2), the
+total-spin value $S_{\mathrm{tot}}=(|A|-|B|)S$ (Lieb--Mattis, PR3), and the capstone (PR4).
+Chapters~3--10 backfill.
 
 \noindent\textbf{Lemma 4.5} (Tasaki §4.1.2, eqs.~(4.1.55)--(4.1.57), pp.~87--88; proved axiom-free,
 \texttt{Math/ReflectionPositivityAveraging.lean}, Issue \#4597).  The abstract reflection-positivity
