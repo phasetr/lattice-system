@@ -8060,19 +8060,27 @@ $(\hat{S}^2_{\rm tot})v = S_{\max}(S_{\max}+1)v$.
     Definition 11.1.
 \end{itemize}
 
-\noindent\textbf{Proposition 11.2} (Tasaki §11.1.1, eq.~(11.1.4), pp.~377--378; documented
-axiom, \texttt{HubbardFerromagnetismStructure.lean}, Issue \#4477).  When the all-to-all Hubbard
+\noindent\textbf{Proposition 11.2} (Tasaki §11.1.1, eq.~(11.1.4), pp.~377--378; proved axiom-free,
+\texttt{HubbardFerromagnetismStructure.lean}, Issue \#4599).  When the all-to-all Hubbard
 model exhibits saturated ferromagnetism, its ground states simplify to the
 $(2S_{\max}+1)$-fold $SU(2)$ multiplet built from the lowest-energy all-up Slater state.  We render
-this as \texttt{hubbard\_proposition\_11\_2}: for a genuine half-filling ground energy $E_0$ (nonempty
-$(N+1)$-electron eigenspace, minimal in real part), if the model is ferromagnetic there (every ground
-state is $(\hat S_{\mathrm{tot}})^2$-maximal at $S_{\max}=(N+1)/2$) then the ground eigenspace
+this as \texttt{hubbard\_proposition\_11\_2}: for Hermitian hopping $t$ ($\overline{t_{ij}}=t_{ji}$)
+and real $U$, a genuine half-filling ground energy $E_0$ (nonempty $(N+1)$-electron eigenspace,
+minimal in real part), if the model is ferromagnetic there (every ground state is
+$(\hat S_{\mathrm{tot}})^2$-maximal at $S_{\max}=(N+1)/2$) then the ground eigenspace
 \texttt{hubbardEigenspaceAtFilling}\,$E_0$ (the \texttt{hubbardHamiltonian}-eigenspace at $E_0$
 intersected with the $(N+1)$-electron number sector, \emph{without} the hard-core constraint) is a
-maximal-spin multiplet of dimension $N+2$.  Pinning $E_0$ by the nonempty/minimal hypotheses keeps the
-axiom sound; the only content beyond the ferromagnetism premise is the dimension count.  A book-order
-backfill of the Chapter 11 numbered items; recorded as a documented axiom (the finite-dimensional but
-general-hopping structural argument is deferred).
+maximal-spin multiplet of dimension $N+2$.  The only content beyond the ferromagnetism premise is the
+dimension count $\operatorname{finrank}=N+2$, proved by \texttt{le\_antisymm}: the lower bound is the
+all-up state's $SU(2)$ lowering tower (\texttt{highestWeight\_spinMultiplet\_general}, $N+2$ linearly
+independent ground states all in the eigenspace by $\hat S^-$-invariance); the upper bound observes
+that every one of the $N+2$ $\hat S^z$-weight blocks of the eigenspace has the \emph{same} dimension
+(both ladder directions inject, $\|\hat S^\pm v\|^2=(S_{\max}(S_{\max}+1)-m(m\pm1))\|v\|^2>0$ in the
+interior, from \texttt{fermionTotalSpin\_ladder\_norm}) as the top block, which is at most
+one-dimensional (the unique all-up $(N+1)$-electron $\hat S^z=S_{\max}$ configuration).  The
+Hermiticity hypotheses $\overline{t_{ij}}=t_{ji}$, $\overline U=U$ are added relative to Tasaki's bare
+statement (needed for the $\hat S^-$-invariance of the eigenspace) and hold for the physical Hubbard
+model, so the strengthening is sound.
 
 \noindent\textbf{Theorem 11.3} (Tasaki §11.1.1, eqs.~(11.1.5)--(11.1.6), pp.~378--379; documented
 axiom, \texttt{HubbardImpossibilityLowU.lean}, Issue \#4477).  Ferromagnetism is impossible when the
