@@ -8240,7 +8240,20 @@ $\exists k,\ 0<(\texttt{shiftedDressedSReMatrixOnMagSector}\,A\,J\,N\,c\,M)^k\,\
 $G.\mathrm{Connected}$, bipartiteness $\mathrm{hGbip}$, and edge-positivity
 $G.\mathrm{Adj}\,x\,y\to 0<(J_{xy})_{\mathrm{re}}$ (not the stronger complete-bipartite positivity), by
 combining the graph-agnostic edge-local positivity witness with the connected reachability above ---
-generalizing \texttt{exists\_matrixPow\_pos\_of\_magConfigS\_bipartite}.
+generalizing \texttt{exists\_matrixPow\_pos\_of\_magConfigS\_bipartite}.  PR3 (\#4612) assembles
+\emph{Theorem 2.3 itself for connected couplings}: the connected sector irreducibility
+\texttt{isIrreducible\_shiftedDressedSReMatrixOnMagSector\_connected}
+(\texttt{ConnectedSectorIrreducible.lean}), twenty \texttt{\_of\_irreducible} variants that parameterize
+the Perron--Frobenius-consuming Marshall--Lieb--Mattis chain by the irreducibility result (rendering it
+graph-agnostic), and the capstone \texttt{tasaki\_2\_5\_theorem\_2\_3\_data\_of\_connected}
+(\texttt{ConnectedTheorem23.lean}): the per-magnetization-sector Marshall-positive ground states and
+global energy minimality of Theorem 2.3 hold for \emph{any} connected bipartite coupling
+($G.\mathrm{Connected}$, bipartiteness, edge-positivity $G.\mathrm{Adj}\,x\,y\to 0<(J_{xy})_{\mathrm{re}}$),
+not only the complete-bipartite case --- the $\mathrm{hOutside}$/lower-bound side reuses
+\texttt{tasaki23\_general\_hOutside} and \texttt{tasaki23\_eigenvalue\_ge\_common} unchanged (they need
+only non-negativity).  This is the connected-coupling extension of Marshall--Lieb--Mattis (Lieb--Mattis
+1962), the prerequisite for removing the Theorem 4.4 connected-coupling axiom (which also still needs
+the universal-form $SU(2)$ transfer, Issue \#4604).
 
 \noindent\textbf{Theorem 4.4} (Shen--Qiu--Tian, Tasaki §4.1, eqs.~(4.1.12)--(4.1.13), pp.~77--78;
 documented axiom, \texttt{Quantum/SpinS/FerrimagneticLRO.lean}, Issue \#4485).  Ferrimagnetic
