@@ -8264,10 +8264,17 @@ irreducibility Casimir value, and the (graph-agnostic) PR1/PR2 operator-algebra.
 of $(\hat O_\Lambda)^2$: \texttt{staggeredCasimirOpS\_commute\_totalSpinSOp\{1,2,3\}} and the ladder
 versions (the squared staggered order operator commutes with every total-spin operator), immediate
 from the per-pair $[\,\texttt{spinSDot}\,x\,y,\hat S^{(\alpha)}_{\mathrm{tot}}]=0$ --- ingredient (a)
-of the universal-form transfer.  The stated \texttt{shenQiuTian\_ferrimagnetic\_lro} axiom (universal
-over \emph{all} ground states) then remains pending only ingredient (b): the ground-multiplet
-expectation transfer $\langle\Phi|(\hat O_\Lambda)^2|\Phi\rangle/\langle\Phi|\Phi\rangle$ constant
-across the spin-$S_{\mathrm{tot}}$ ground multiplet (Issue \#4604).
+of the universal-form transfer.  PR6 (\#4615, \texttt{Quantum/SpinS/SU2ExpectationLadderInvariant.lean}) proves the core of ingredient
+(b): \texttt{su2\_expectationRatioRe\_ladder\_invariant} --- for an $SU(2)$-invariant operator $O$
+(commuting with $\hat S^\pm_{\mathrm{tot}}$) and a joint $\hat S^{(3)}_{\mathrm{tot}}$/Casimir
+eigenvector $v$, the real expectation ratio
+$\langle w|O|w\rangle_{\mathrm{re}}/\langle w|w\rangle_{\mathrm{re}}$ is unchanged under lowering
+$w\mapsto\hat S^-_{\mathrm{tot}}v$ (numerator and denominator scale by the same eigenvalue of
+$\hat S^+\hat S^-=(\hat S_{\mathrm{tot}})^2-(\hat S^{(3)})^2+\hat S^{(3)}$).  This is the ladder step
+that makes $(\hat O_\Lambda)^2$'s expectation constant across the spin-$S_{\mathrm{tot}}$ multiplet.
+The stated \texttt{shenQiuTian\_ferrimagnetic\_lro} axiom (universal over \emph{all} ground states)
+then remains pending only the final assembly of ingredient (b): the ground-state weight decomposition
+and sector-to-centre connection using this ladder-invariance (Issue \#4604).
 
 \noindent\textbf{Theorem 4.4} (Shen--Qiu--Tian, Tasaki §4.1, eqs.~(4.1.12)--(4.1.13), pp.~77--78;
 documented axiom, \texttt{Quantum/SpinS/FerrimagneticLRO.lean}, Issue \#4485).  Ferrimagnetic
