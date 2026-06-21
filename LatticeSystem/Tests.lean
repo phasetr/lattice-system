@@ -70,6 +70,7 @@ import LatticeSystem.Tests.Ising
 import LatticeSystem.Tests.JWAbstract
 import LatticeSystem.Tests.Scale
 import LatticeSystem.Tests.NeelState
+import LatticeSystem.Tests.NeelState2D
 import LatticeSystem.Tests.MarshallDressedBasis
 import LatticeSystem.Tests.MarshallLiebMattisRealness
 import LatticeSystem.Tests.MarshallLiebMattisMarshallSignTrick
