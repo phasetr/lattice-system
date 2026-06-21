@@ -8731,6 +8731,22 @@ equals $\varepsilon_{\mathrm{GS}}$ on nonempty boxes and converges to it
 (\texttt{translatedBoxLocalHamiltonianEnergyDensity\_eq},
 \texttt{hasTranslatedBoxLocalHamiltonianEnergyDensity}).  No new axiom; all proved.
 
+\smallskip\noindent\emph{Algebra of the bulk operator $\hat A_n$} (Tasaki §4.3.1 eqs.~(4.3.5)--(4.3.6),
+pp.~112--115; \texttt{Quantum/SpinS/BulkOperator.lean}, Issue \#4644).  The constructive algebra of the
+bulk average $\hat A_n=\sum_{x\in\Lambda_n\cap\mathbb{Z}^d_{\mathrm{even}}}\tau_x\hat A$
+(eq.~(4.3.5)), whose index set is \texttt{evenLatticeBox}\,$d\,n=\Lambda_n\cap\mathbb{Z}^d_{\mathrm{even}}$.
+The map $\hat A\mapsto\hat A_n$ is $\mathbb{C}$-linear (\texttt{bulkOp\_zero}, \texttt{bulkOp\_add},
+\texttt{bulkOp\_smul}, \texttt{bulkOp\_finset\_sum}); the bulk of a spin / bond operator expands over
+the shifted even sites, $(\hat S_y^{(\alpha)})_n=\sum_x \hat S_{y+x}^{(\alpha)}$ and
+$(\hat S_y\cdot\hat S_z)_n=\sum_x \hat S_{y+x}\cdot\hat S_{z+x}$ (\texttt{bulkOp\_spin\_eq\_sum},
+\texttt{bulkOp\_spinDot\_eq\_sum}); these bulk observables are local, supported in the translated box
+$\Lambda_n+y$ (resp.\ the union $(\Lambda_n+y)\cup(\Lambda_n+z)$)
+(\texttt{bulkOp\_spin\_mem\_localSubalgebra}/\texttt{\_mem\_localAlg} and the \texttt{spinDot} forms);
+and for a translation-invariant state the bulk expectation is
+$\omega(\hat A_n)=|\Lambda_n\cap\mathbb{Z}^d_{\mathrm{even}}|\,\omega(\hat A)$
+(\texttt{bulkOp\_apply\_eq\_card\_mul}), since every even translation preserves the expectation.  No new
+axiom; all proved.
+
 \smallskip\noindent\emph{Concrete finite-volume model (Issue \#4557, PR6).}  Instantiating the
 graph-centric spin-$S$ Heisenberg Hamiltonian on the box graph gives the concrete
 \textbf{finite-volume Heisenberg model} on $\Lambda_n$,
