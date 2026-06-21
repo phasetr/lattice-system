@@ -8747,6 +8747,22 @@ $\omega(\hat A_n)=|\Lambda_n\cap\mathbb{Z}^d_{\mathrm{even}}|\,\omega(\hat A)$
 (\texttt{bulkOp\_apply\_eq\_card\_mul}), since every even translation preserves the expectation.  No new
 axiom; all proved.
 
+\smallskip\noindent\emph{Bulk density $\hat A_n/L^d$ and the ergodic fluctuation} (Tasaki §4.3.1
+eqs.~(4.3.5)--(4.3.6), pp.~114--115; \texttt{Quantum/SpinS/BulkDensity.lean}, Issue \#4644).  The
+macroscopic density observable and the fluctuation of Definition 4.18.  The real volume normalization
+\texttt{bulkVolume}\,$d\,n=(2n)^d$ equals the box cardinality (\texttt{latticeBox\_card\_real}), and the
+\textbf{bulk density} $\hat A_n/L^d$ (\texttt{bulkDensity}$=(L^d)^{-1}\cdot\hat A_n$) is
+$\mathbb{C}$-linear (\texttt{bulkDensity\_zero}/\texttt{\_add}/\texttt{\_smul}), with
+$\omega(\hat A_n/L^d)=(L^d)^{-1}\,\omega(\hat A_n)$ (\texttt{bulkDensity\_apply}) and the
+translation-invariant value $(L^d)^{-1}|\Lambda_n\cap\mathbb{Z}^d_{\mathrm{even}}|\,\omega(\hat A)$
+(\texttt{TranslationInvariant.bulkDensity\_apply\_eq\_card\_mul}).  The real first and second moments
+(\texttt{bulkDensityMean}, \texttt{bulkDensitySecondMoment}) and the
+\textbf{fluctuation} $\mathrm{Re}\,\omega(\hat A_n^2)/L^{2d}-(\mathrm{Re}\,\omega(\hat A_n)/L^d)^2$
+(\texttt{bulkDensityFluctuation}) give a named restatement of Definition 4.18
+(\texttt{isErgodic\_iff\_tendsto\_bulkDensityFluctuation}) together with the ergodic-state accessors
+(\texttt{IsErgodic.isState}/\texttt{translationInvariant}/\texttt{tendsto\_bulkDensityFluctuation}).
+No closed form for $|\Lambda_n\cap\mathbb{Z}^d_{\mathrm{even}}|$ is asserted; no new axiom, all proved.
+
 \smallskip\noindent\emph{Concrete finite-volume model (Issue \#4557, PR6).}  Instantiating the
 graph-centric spin-$S$ Heisenberg Hamiltonian on the box graph gives the concrete
 \textbf{finite-volume Heisenberg model} on $\Lambda_n$,
