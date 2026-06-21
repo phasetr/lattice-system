@@ -17912,7 +17912,9 @@ full \(\texttt{finrank}\le2\) bound.  The wrappers
 and
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_axisSwapped\_submatrix\_blocks\_path}
 therefore leave only the pathwise parity-block simplicity input.
-\texttt{AnisotropicHeisenbergSpinSCaseIIBlockPFMin.lean} rewrites that
+\texttt{AnisotropicHeisenbergSpinSCaseIIBlockPFMin.lean} (with its
+foundational PF/min path lemmas factored into the companion module
+\texttt{AnisotropicHeisenbergSpinSCaseIIBlockPFMinCore.lean}) rewrites that
 remaining input into the older PF/min conditional form.  The theorem
 \texttt{axisSwappedAnisotropicHeisenbergS\_submatrix\_finrank\_le\_one\_at\_full\_min\_of\_pf\_min}
 fixes a parity block \(p=0,1\).  If a real number \(\nu\) has
