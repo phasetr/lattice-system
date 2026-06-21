@@ -44,7 +44,7 @@ variable {d : ℕ} {A : Type*} [CStarAlgebra A]
 adjacent vertex pairs `(x, y)` are the two orientations of each undirected edge,
 so there are `2 · |E|` of them. -/
 private theorem orderedAdjPairs_card_eq_two_mul_edgeFinset_card
-    {V : Type*} [Fintype V] [DecidableEq V] (G : SimpleGraph V) [DecidableRel G.Adj] :
+    {V : Type*} [Fintype V] (G : SimpleGraph V) [DecidableRel G.Adj] :
     (Finset.univ.filter fun p : V × V => G.Adj p.1 p.2).card = 2 * G.edgeFinset.card := by
   have e : G.Dart ≃ {p : V × V // G.Adj p.1 p.2} :=
     { toFun := fun dt => ⟨dt.toProd, dt.adj⟩
@@ -95,7 +95,7 @@ theorem boxLocalHamiltonian_apply
   have hsmul : ω (boxLocalHamiltonian S n)
       = (1 / 2 : ℂ) * ω (∑ p ∈ boxOrderedBondPairs d n,
         InfiniteSpinSystem.spinDot S (p.1 : Fin d → ℤ) (p.2 : Fin d → ℤ)) := by
-    show ω ((1 / 2 : ℂ) • ∑ p ∈ boxOrderedBondPairs d n,
+    change ω ((1 / 2 : ℂ) • ∑ p ∈ boxOrderedBondPairs d n,
         InfiniteSpinSystem.spinDot S (p.1 : Fin d → ℤ) (p.2 : Fin d → ℤ))
       = (1 / 2 : ℂ) * ω (∑ p ∈ boxOrderedBondPairs d n,
         InfiniteSpinSystem.spinDot S (p.1 : Fin d → ℤ) (p.2 : Fin d → ℤ))
