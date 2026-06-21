@@ -8678,6 +8678,21 @@ self-adjointness or cross-site commutativity is claimed (the abstract system car
 abstract algebra is not identified with the finite-matrix model.  This is the immediate algebraic
 precursor of Appendix A.7's partial Hamiltonian $\hat H_L$.  All proved (no axioms).
 
+\smallskip\noindent\emph{Translation covariance of the local finite-box observables} (Tasaki §4.3.1
+eqs.~(4.3.3)--(4.3.6), §A.7; \texttt{Quantum/SpinS/BoxLocalTranslation.lean}, Issue \#4644).  How the
+local observables of an \texttt{InfiniteSpinSystem} transform under the translation automorphisms
+$\tau_x$.  The bond relation is shift-invariant (\texttt{bond\_add\_right\_iff},
+$\mathrm{bond}\,(y+x)\,(z+x)\Leftrightarrow\mathrm{bond}\,y\,z$); by multiplicativity the spin
+covariance $\tau_x(\hat S_y^{(\alpha)})=\hat S_{y+x}^{(\alpha)}$ lifts to the bond operator
+(\texttt{transl\_spinDot}, $\tau_x(\hat S_y\cdot\hat S_z)=\hat S_{y+x}\cdot\hat S_{z+x}$) and the bulk
+operator (\texttt{transl\_bulkOp}, $\tau_x\hat A_n=(\tau_x\hat A)_n$).  Writing the translated box
+$\Lambda_n+x$ (\texttt{translatedLatticeBox}, \texttt{mem\_translatedLatticeBox}), translating the box
+Hamiltonian gives the partial Hamiltonian of the shifted box,
+$\tau_x(\hat H_{\Lambda_n})=\hat H_{\Lambda_n+x}$ (\texttt{transl\_boxLocalHamiltonian}), which is
+supported in $\Lambda_n+x$ (\texttt{translatedBoxLocalHamiltonian\_mem\_localSubalgebra} /
+\texttt{\_mem\_localAlg} and the $\tau_x$ forms).  No self-adjointness or cross-site commutativity is
+used.  All proved (no axioms).
+
 \smallskip\noindent\emph{Concrete finite-volume model (Issue \#4557, PR6).}  Instantiating the
 graph-centric spin-$S$ Heisenberg Hamiltonian on the box graph gives the concrete
 \textbf{finite-volume Heisenberg model} on $\Lambda_n$,
