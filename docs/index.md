@@ -2368,8 +2368,8 @@ extremal weights `c = 0` (highest weight, "all up") and
 `c = Fin.last N` (lowest weight, "all down") are the highest- and
 lowest-weight vectors of the `J_tot = |V|·S = |V|·N/2` irreducible
 SU(2) representation in the multi-site Hilbert space. Tracked in
-Issue #412; assembled in PRs #875–#879. All theorems live in
-`Quantum/SpinS/AllAlignedState.lean`.
+Issue #412; assembled in PRs #875–#879. The foundational all-aligned theorems live in
+`Quantum/SpinS/AllAlignedStateCore.lean` (the ladder-preservation results remain in `Quantum/SpinS/AllAlignedState.lean`).
 
 | Lean name | Statement |
 |---|---|
