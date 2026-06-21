@@ -8763,6 +8763,22 @@ translation-invariant value $(L^d)^{-1}|\Lambda_n\cap\mathbb{Z}^d_{\mathrm{even}
 (\texttt{IsErgodic.isState}/\texttt{translationInvariant}/\texttt{tendsto\_bulkDensityFluctuation}).
 No closed form for $|\Lambda_n\cap\mathbb{Z}^d_{\mathrm{even}}|$ is asserted; no new axiom, all proved.
 
+\smallskip\noindent\emph{Even-sublattice cardinality $|\Lambda_n\cap\mathbb{Z}^d_{\mathrm{even}}|=(2n)^d/2$}
+(Tasaki §4.3.1, eqs.~(4.3.2)--(4.3.6), pp.~112--115;
+\texttt{Quantum/SpinS/EvenLatticeBoxCard.lean}, Issue \#4644).  This closes the finite combinatorial
+coefficient left open by the bulk-density layer.  The parity sign $\varepsilon(m)=(-1)^m$
+(\texttt{paritySign}) is multiplicative on sums (\texttt{paritySign\_add}, \texttt{paritySign\_sum}),
+and over the symmetric coordinate interval $\mathrm{Ioc}(-n,n]$ (with $n$ evens and $n$ odds) the signs
+cancel, $\sum_{z}\varepsilon(z)=0$ (\texttt{sum\_paritySign\_Ioc\_neg\_nat}); by the product
+generating-function identity the $d$-dimensional sign sum vanishes for $d\ge1$
+(\texttt{latticeBox\_paritySign\_sum\_eq\_zero}), so the box has equally many even and odd sites and
+$2\,|\Lambda_n\cap\mathbb{Z}^d_{\mathrm{even}}|=(2n)^d$ (\texttt{two\_mul\_evenLatticeBox\_card}), i.e.
+$|\Lambda_n\cap\mathbb{Z}^d_{\mathrm{even}}|=(2n)^d/2$ (\texttt{evenLatticeBox\_card\_real}).
+Consequently, for a translation-invariant state and $n\ge1$ the bulk density takes the clean value
+$\omega(\hat A_n/L^d)=\tfrac12\,\omega(\hat A)$ (\texttt{bulkDensity\_apply\_eq\_half\_mul}) and
+$\mathrm{Re}\,\omega(\hat A_n)/L^d=\tfrac12\,\mathrm{Re}\,\omega(\hat A)$
+(\texttt{bulkDensityMean\_eq\_half\_mul}).  No new axiom; all proved.
+
 \smallskip\noindent\emph{Concrete finite-volume model (Issue \#4557, PR6).}  Instantiating the
 graph-centric spin-$S$ Heisenberg Hamiltonian on the box graph gives the concrete
 \textbf{finite-volume Heisenberg model} on $\Lambda_n$,
