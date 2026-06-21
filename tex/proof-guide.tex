@@ -8639,6 +8639,27 @@ is the uniform nearest-neighbor coupling feeding finite-volume many-body Hamilto
 graph inherits bipartiteness (\texttt{hypercubicBoxGraph\_isBipartite}, the parent parity coloring
 restricted along $\Lambda_n\hookrightarrow\mathbb{Z}^d$).  All proved (no axioms).
 
+\smallskip\noindent\emph{Local-support interface of the quasi-local algebra} (Tasaki §4.3.1, §A.7,
+Definitions A.23/A.25/A.27, pp.~112--113, 530--533; \texttt{Quantum/SpinS/QuasiLocalSupport.lean},
+Issue \#4644).  The constructive layer between the finite boxes $\Lambda_n$ and the abstract
+quasi-local $C^\ast$-algebra $A$ of the infinite-volume system \texttt{InfiniteSpinSystem}\,$d\,A$.
+The local observable net is carried abstractly by \texttt{structure LocalSupportData}\,$S$: a support
+predicate \texttt{Supports}\,$\Lambda\,a$ ($a$ acts nontrivially only on sites of the finite region
+$\Lambda\subseteq\mathbb{Z}^d$), closed under the $\ast$-algebra operations
+($0,1,+,\cdot,\,c\,\cdot\,,\star$) and \emph{monotone} in $\Lambda$, with each per-site spin operator
+$\hat S_x^{(\alpha)}$ supported on the singleton $\{x\}$ (\texttt{spin\_supported\_singleton}).  From
+these laws \texttt{localSubalgebra}\,$\Lambda$ cuts out the $\ast$-subalgebra
+$A_\Lambda\subseteq A$ (a \texttt{StarSubalgebra}\,$\mathbb{C}\,A$, unit via $\emptyset\subseteq\Lambda$
+and scalars via $c\cdot1$), with \texttt{localSubalgebra\_mono}
+($\Lambda\subseteq\Gamma\Rightarrow A_\Lambda\le A_\Gamma$) and
+\texttt{localSubalgebra\_le\_localAlg} ($A_\Lambda\le A_{\mathrm{loc}}$).  Over the boxes,
+\texttt{boxLocalSubalgebra}\,$n=A_{\Lambda_n}$ forms a \textbf{monotone increasing tower}
+$A_{\Lambda_0}\le A_{\Lambda_1}\le\cdots$ (\texttt{boxLocalSubalgebra\_mono}, from
+\texttt{hypercubicBox\_subset\_succ}), and \texttt{spin\_mem\_boxLocalSubalgebra\_of\_mem} places
+$\hat S_x^{(\alpha)}\in A_{\Lambda_n}$ whenever $x\in\Lambda_n$.  No existence theorem for the
+inductive-limit quasi-local algebra is asserted here (that stays a documented axiom of the deeper
+operator-algebraic layer).  All proved (no axioms).
+
 \smallskip\noindent\emph{Concrete finite-volume model (Issue \#4557, PR6).}  Instantiating the
 graph-centric spin-$S$ Heisenberg Hamiltonian on the box graph gives the concrete
 \textbf{finite-volume Heisenberg model} on $\Lambda_n$,
