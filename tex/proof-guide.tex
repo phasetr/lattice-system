@@ -8798,6 +8798,23 @@ $\omega(\hat A_n/L^d)=\tfrac12\,\omega(\hat A)$ (\texttt{bulkDensity\_apply\_eq\
 ground state with an infinite-volume ground state whose bulk-density fluctuations all vanish.  No new
 axiom; all proved.
 
+\smallskip\noindent\emph{Staggered (N\'eel) bulk observable} (Tasaki §4.3.1, eqs.~(4.3.5), (4.3.9),
+(4.3.10), pp.~112--115; \texttt{Quantum/SpinS/StaggeredBulkSpin.lean}, Issue \#4644).  The
+antiferromagnetic order parameter at the abstract level.  The even-cell observable
+$\hat S_0^{(\alpha)}-\hat S_u^{(\alpha)}$ (\texttt{staggeredCellSpin}, supported on $\{0,u\}$) has bulk
+average $\sum_{x\in\Lambda_n\cap\mathbb{Z}^d_{\mathrm{even}}}
+(\hat S_x^{(\alpha)}-\hat S_{u+x}^{(\alpha)})$ (\texttt{staggeredBulkSpin\_eq\_sum}) and density
+\texttt{staggeredBulkSpinDensity}, with translation-invariant half-value
+$\omega(\text{cell}_n/L^d)=\tfrac12\,\omega(\text{cell})$.  Taking the single-site magnetization values
+as hypotheses (the conclusions of Theorem 4.20, not asserted here): on a symmetric zero-magnetization
+state the staggered bulk density vanishes (eq.~(4.3.9),
+\texttt{staggeredBulkSpinDensity\_apply\_of\_zero\_magnetization}); on a symmetry-breaking state with
+$\omega(\hat S_x^{(\alpha)})=(-1)^x m_\ast n_\alpha$ and $\texttt{staggeredSign}\,u=-1$ it equals the
+N\'eel order parameter $m_\ast n_\alpha$ (eq.~(4.3.10),
+\texttt{staggeredBulkSpinDensity\_apply\_of\_staggered\_magnetization}).  Locality
+(\texttt{staggeredCellSpin\_mem\_localAlg}) and a physical-ground-state fluctuation corollary are
+included.  No new axiom; all proved.
+
 \smallskip\noindent\emph{Concrete finite-volume model (Issue \#4557, PR6).}  Instantiating the
 graph-centric spin-$S$ Heisenberg Hamiltonian on the box graph gives the concrete
 \textbf{finite-volume Heisenberg model} on $\Lambda_n$,
