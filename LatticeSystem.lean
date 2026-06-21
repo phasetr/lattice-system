@@ -75,6 +75,7 @@ import LatticeSystem.Quantum.SpinS.InfiniteVolumeGroundState
 import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
 import LatticeSystem.Quantum.SpinS.QuasiLocalSupport
 import LatticeSystem.Quantum.SpinS.BoxLocalHamiltonian
+import LatticeSystem.Quantum.SpinS.BoxLocalTranslation
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphAltPath
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducibleStructural
