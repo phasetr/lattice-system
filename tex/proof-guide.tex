@@ -8712,6 +8712,25 @@ axioms (\texttt{boxGroundEnergyDensityS\_tendsto}, \texttt{afmThermodynamicLimit
 \texttt{theorem\_4\_20\_omega0}/\texttt{omegaN}); no analytic content is added here.  All proved (no
 axioms).
 
+\smallskip\noindent\emph{Translation-invariant expectations of the local finite-box observables}
+(Tasaki §4.3.1 eqs.~(4.3.3)--(4.3.6), pp.~112--115; §A.7 pp.~530--533;
+\texttt{Quantum/SpinS/BoxLocalTranslationInvariant.lean}, Issue \#4644).  The state-level
+consequences of the translation covariance.  For a translation-invariant state $\omega$
+(Definition 4.17) and an \textbf{even} shift $x\in\mathbb{Z}^d_{\mathrm{even}}$, expectations are
+unchanged: $\omega(\hat S_{y+x}\cdot\hat S_{z+x})=\omega(\hat S_y\cdot\hat S_z)$
+(\texttt{spinDot\_add\_right\_apply}), $\omega((\tau_x\hat A)_n)=\omega(\hat A_n)$
+(\texttt{bulkOp\_transl\_apply}), and $\omega(\hat H_{\Lambda_n+x})=\omega(\hat H_{\Lambda_n})$
+(\texttt{translatedBoxLocalHamiltonian\_apply\_eq}), whence the shifted-box energy density
+\texttt{translatedBoxLocalHamiltonianEnergyDensity} agrees with the centered one.  For an
+infinite-volume \emph{ground} state the bond energy condition is uniform over \emph{all} bonds, so for
+\textbf{every} shift $x$ the $\tfrac12$-scaled shifted bond sum collapses,
+$\omega(\hat H_{\Lambda_n+x})=|B_n|\,\varepsilon_{\mathrm{GS}}=\omega(\hat H_{\Lambda_n})$
+(\texttt{IsInfiniteVolumeGroundState.translatedBoxLocalHamiltonian\_apply} and
+\texttt{\_eq\_boxLocal}, using \texttt{bond\_add\_right\_iff}), and the shifted-box energy density
+equals $\varepsilon_{\mathrm{GS}}$ on nonempty boxes and converges to it
+(\texttt{translatedBoxLocalHamiltonianEnergyDensity\_eq},
+\texttt{hasTranslatedBoxLocalHamiltonianEnergyDensity}).  No new axiom; all proved.
+
 \smallskip\noindent\emph{Concrete finite-volume model (Issue \#4557, PR6).}  Instantiating the
 graph-centric spin-$S$ Heisenberg Hamiltonian on the box graph gives the concrete
 \textbf{finite-volume Heisenberg model} on $\Lambda_n$,
