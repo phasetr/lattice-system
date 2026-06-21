@@ -8779,6 +8779,25 @@ $\omega(\hat A_n/L^d)=\tfrac12\,\omega(\hat A)$ (\texttt{bulkDensity\_apply\_eq\
 $\mathrm{Re}\,\omega(\hat A_n)/L^d=\tfrac12\,\mathrm{Re}\,\omega(\hat A)$
 (\texttt{bulkDensityMean\_eq\_half\_mul}).  No new axiom; all proved.
 
+\smallskip\noindent\emph{Physical ground-state consequences} (Tasaki §4.3.1, Definitions 4.17--4.19,
+eqs.~(4.3.4)--(4.3.6), pp.~112--115; \texttt{Quantum/SpinS/PhysicalGroundStateConsequences.lean},
+Issue \#4644).  The capstone of the §4.3.1 constructive layer.  A \textbf{physical ground state}
+($\texttt{IsPhysicalGroundState}=$ infinite-volume ground state \emph{and} ergodic, Definition 4.19)
+inherits, all axiom-free, the structural accessors
+(\texttt{isInfiniteVolumeGroundState}/\texttt{isErgodic}/\texttt{isState}/\texttt{translationInvariant}),
+the bond energy condition $\omega(\hat S_x\cdot\hat S_y)=\varepsilon_{\mathrm{GS}}$
+(\texttt{spinDot\_apply}), the vanishing of the bulk-density fluctuation
+(\texttt{tendsto\_bulkDensityFluctuation}), the box and shifted-box energy densities equal to
+$\varepsilon_{\mathrm{GS}}$ with convergence
+(\texttt{boxLocalHamiltonian\_apply}, \texttt{hasBoxLocalHamiltonianEnergyDensity},
+\texttt{translatedBoxLocalHamiltonian\_apply},
+\texttt{hasTranslatedBoxLocalHamiltonianEnergyDensity}), and even-sublattice half-filling
+$\omega(\hat A_n/L^d)=\tfrac12\,\omega(\hat A)$ (\texttt{bulkDensity\_apply\_eq\_half\_mul},
+\texttt{bulkDensityMean\_eq\_half\_mul}).  The characterization
+\texttt{iff\_isInfiniteVolumeGroundState\_and\_tendsto\_bulkDensityFluctuation} identifies a physical
+ground state with an infinite-volume ground state whose bulk-density fluctuations all vanish.  No new
+axiom; all proved.
+
 \smallskip\noindent\emph{Concrete finite-volume model (Issue \#4557, PR6).}  Instantiating the
 graph-centric spin-$S$ Heisenberg Hamiltonian on the box graph gives the concrete
 \textbf{finite-volume Heisenberg model} on $\Lambda_n$,
