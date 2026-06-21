@@ -77,6 +77,7 @@ import LatticeSystem.Quantum.SpinS.QuasiLocalSupport
 import LatticeSystem.Quantum.SpinS.BoxLocalHamiltonian
 import LatticeSystem.Quantum.SpinS.BoxLocalTranslation
 import LatticeSystem.Quantum.SpinS.BoxLocalEnergyDensity
+import LatticeSystem.Quantum.SpinS.BoxLocalTranslationInvariant
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphAltPath
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapBlockIrreducibleStructural
