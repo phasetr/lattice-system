@@ -57,9 +57,11 @@ structure LocalSupportData (S : InfiniteSpinSystem d A) where
   /-- The unit observable is supported on the empty region. -/
   support_one : Supports ∅ 1
   /-- Support is closed under addition. -/
-  support_add : ∀ {Λ : Finset (Fin d → ℤ)} {a b : A}, Supports Λ a → Supports Λ b → Supports Λ (a + b)
+  support_add : ∀ {Λ : Finset (Fin d → ℤ)} {a b : A},
+    Supports Λ a → Supports Λ b → Supports Λ (a + b)
   /-- Support is closed under multiplication. -/
-  support_mul : ∀ {Λ : Finset (Fin d → ℤ)} {a b : A}, Supports Λ a → Supports Λ b → Supports Λ (a * b)
+  support_mul : ∀ {Λ : Finset (Fin d → ℤ)} {a b : A},
+    Supports Λ a → Supports Λ b → Supports Λ (a * b)
   /-- Support is closed under scalar multiplication. -/
   support_smul : ∀ {Λ : Finset (Fin d → ℤ)} (c : ℂ) {a : A}, Supports Λ a → Supports Λ (c • a)
   /-- Support is closed under the `*`-operation (adjoint). -/
