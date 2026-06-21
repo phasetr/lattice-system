@@ -8693,6 +8693,25 @@ supported in $\Lambda_n+x$ (\texttt{translatedBoxLocalHamiltonian\_mem\_localSub
 \texttt{\_mem\_localAlg} and the $\tau_x$ forms).  No self-adjointness or cross-site commutativity is
 used.  All proved (no axioms).
 
+\smallskip\noindent\emph{Box-local energy density of the abstract partial Hamiltonian} (Tasaki §4.3.1
+eq.~(4.3.4); \texttt{Quantum/SpinS/BoxLocalEnergyDensity.lean}, Issue \#4644).  This connects the
+abstract box partial Hamiltonian to Definition 4.17's per-bond ground-state energy density
+$\varepsilon_{\mathrm{GS}}$, with \textbf{no new axiom}.  The ordered adjacent vertex pairs of the box
+number twice its bond count, $|{\tt boxOrderedBondPairs}|=2\,|B_n|$
+(\texttt{boxOrderedBondPairs\_card\_eq\_two\_mul\_boxBondCount}, via the finite-graph dart count
+$\#\mathrm{Dart}=2\,\#E$).  In \emph{any} infinite-volume ground state $\omega$ (Definition 4.17, every
+bond carries $\varepsilon_{\mathrm{GS}}$), the $\tfrac12$-scaled ordered bond sum collapses:
+$\omega(\hat H_{\Lambda_n})=|B_n|\,\varepsilon_{\mathrm{GS}}$ (\texttt{boxLocalHamiltonian\_apply},
+using only linearity of $\omega$ and the ordered-pair count).  Hence the normalized box-local energy
+density $\omega(\hat H_{\Lambda_n})/|B_n|$ (\texttt{boxLocalHamiltonianEnergyDensity}) equals
+$\varepsilon_{\mathrm{GS}}$ exactly on nonempty boxes (\texttt{boxLocalHamiltonianEnergyDensity\_eq})
+and converges to it (\texttt{hasBoxLocalHamiltonianEnergyDensity}, with
+\texttt{HasBoxLocalHamiltonianEnergyDensity} a named convergence property).  The genuine existence of
+$\varepsilon_{\mathrm{GS}}$ and of infinite-volume ground states stays in the existing documented
+axioms (\texttt{boxGroundEnergyDensityS\_tendsto}, \texttt{afmThermodynamicLimit\_energyDensity},
+\texttt{theorem\_4\_20\_omega0}/\texttt{omegaN}); no analytic content is added here.  All proved (no
+axioms).
+
 \smallskip\noindent\emph{Concrete finite-volume model (Issue \#4557, PR6).}  Instantiating the
 graph-centric spin-$S$ Heisenberg Hamiltonian on the box graph gives the concrete
 \textbf{finite-volume Heisenberg model} on $\Lambda_n$,
