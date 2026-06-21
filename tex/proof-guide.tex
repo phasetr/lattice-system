@@ -8660,6 +8660,22 @@ $\hat S_x^{(\alpha)}\in A_{\Lambda_n}$ whenever $x\in\Lambda_n$.  No existence t
 inductive-limit quasi-local algebra is asserted here (that stays a documented axiom of the deeper
 operator-algebraic layer).  All proved (no axioms).
 
+\smallskip\noindent\emph{Inductive-limit interface of the box-local tower} (Tasaki Appendix A.7,
+pp.~530--533; §4.3.1, pp.~112--115; \texttt{Quantum/SpinS/QuasiLocalInductiveLimit.lean}, Issue
+\#4644).  The quasi-local algebra is the inductive limit (norm closure of the directed union) of the
+increasing local tower.  We form $A_{\mathrm{box}}=\bigsqcup_n A_{\Lambda_n}$
+(\texttt{boxLocalTowerSup}) and its norm closure \texttt{boxLocalTowerClosure}, proving axiom-free the
+order facts: each $A_{\Lambda_n}\le A_{\mathrm{box}}\le A_{\mathrm{loc}}$
+(\texttt{boxLocalSubalgebra\_le\_boxLocalTowerSup}, \texttt{boxLocalTowerSup\_le\_localAlg}), the tower
+is directed (\texttt{boxLocalSubalgebra\_directed}), and $A_{\mathrm{box}}\le\overline{A_{\mathrm{box}}}$.
+The two genuinely operator-algebraic identifications --- that the tower \emph{exhausts}
+$A_{\mathrm{loc}}$ ($A_{\mathrm{loc}}\le A_{\mathrm{box}}$, \texttt{BoxTowerExhaustsLocalAlg}) and that
+the ambient algebra is the norm closure of the tower
+($\overline{A_{\mathrm{box}}}=\top$, \texttt{BoxTowerClosureIsQuasiLocalAlgebra}) --- are recorded as
+\texttt{def\,:\,Prop} hypotheses, \emph{not asserted}: \texttt{LocalSupportData} supplies only the easy
+inclusion, and the reverse needs the finite-support property of the concrete realization
+(\texttt{boxLocalTowerSup\_eq\_localAlg\_of\_exhausts} is the conditional consequence).  No new axiom.
+
 \smallskip\noindent\emph{Finite-box partial Hamiltonian in the quasi-local algebra} (Tasaki §4.3.1
 eq.~(4.3.4), §A.7; \texttt{Quantum/SpinS/BoxLocalHamiltonian.lean}, Issue \#4644).  Building on the
 local-support interface, the \textbf{finite-box antiferromagnetic Heisenberg Hamiltonian}

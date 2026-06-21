@@ -74,6 +74,7 @@ import LatticeSystem.Quantum.SpinS.HypercubicBoxThermodynamicLimit
 import LatticeSystem.Quantum.SpinS.InfiniteVolumeGroundState
 import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
 import LatticeSystem.Quantum.SpinS.QuasiLocalSupport
+import LatticeSystem.Quantum.SpinS.QuasiLocalInductiveLimit
 import LatticeSystem.Quantum.SpinS.BoxLocalHamiltonian
 import LatticeSystem.Quantum.SpinS.BoxLocalTranslation
 import LatticeSystem.Quantum.SpinS.BulkOperator
