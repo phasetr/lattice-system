@@ -8831,6 +8831,19 @@ N\'eel order parameter $m_\ast n_\alpha$ (eq.~(4.3.10),
 (\texttt{staggeredCellSpin\_mem\_localAlg}) and a physical-ground-state fluctuation corollary are
 included.  No new axiom; all proved.
 
+\smallskip\noindent\emph{Quasi-local realization bundle} (Tasaki Appendix A.7, pp.~530--533;
+\texttt{Quantum/SpinS/QuasiLocalRealization.lean}, Issue \#4644).  The sound capstone of the
+constructive infinite-volume layer.  Appendix A.7 takes the quasi-local algebra to be the norm closure
+of the directed local net; since \texttt{InfiniteSpinSystem.localAlg} is a free field this cannot be
+asserted globally.  \texttt{structure QuasiLocalRealization} bundles an \texttt{InfiniteSpinSystem}, a
+\texttt{LocalSupportData}, and the two operator-algebraic hypotheses (\texttt{BoxTowerExhaustsLocalAlg},
+\texttt{BoxTowerClosureIsQuasiLocalAlgebra}) as fields.  For any realization $R$ we prove, axiom-free:
+$A_{\mathrm{box}}=A_{\mathrm{loc}}$ (\texttt{boxLocalTowerSup\_eq\_localAlg}),
+$\overline{A_{\mathrm{box}}}=\top$ (\texttt{boxLocalTowerClosure\_eq\_top}), the local algebra is dense
+($\overline{A_{\mathrm{loc}}}=\top$, \texttt{localAlg\_topologicalClosure\_eq\_top}), and the spins,
+finite-box Hamiltonians, and staggered bulk observables/densities are local and lie in the realized
+closure.  All consequences are conditional on the bundled hypotheses; no global assertion, no new axiom.
+
 \smallskip\noindent\emph{Concrete finite-volume model (Issue \#4557, PR6).}  Instantiating the
 graph-centric spin-$S$ Heisenberg Hamiltonian on the box graph gives the concrete
 \textbf{finite-volume Heisenberg model} on $\Lambda_n$,
