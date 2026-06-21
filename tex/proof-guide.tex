@@ -8660,6 +8660,24 @@ $\hat S_x^{(\alpha)}\in A_{\Lambda_n}$ whenever $x\in\Lambda_n$.  No existence t
 inductive-limit quasi-local algebra is asserted here (that stays a documented axiom of the deeper
 operator-algebraic layer).  All proved (no axioms).
 
+\smallskip\noindent\emph{Finite-box partial Hamiltonian in the quasi-local algebra} (Tasaki §4.3.1
+eq.~(4.3.4), §A.7; \texttt{Quantum/SpinS/BoxLocalHamiltonian.lean}, Issue \#4644).  Building on the
+local-support interface, the \textbf{finite-box antiferromagnetic Heisenberg Hamiltonian}
+$\hat H_{\Lambda_n}=\tfrac12\sum_{(x,y)\ \mathrm{bond\ in}\ \Lambda_n}\hat S_x\cdot\hat S_y$ of an
+infinite-volume system \texttt{InfiniteSpinSystem}\,$d\,A$ is realized as an element of the abstract
+quasi-local $C^\ast$-algebra $A$ (\texttt{boxLocalHamiltonian}).  The sum runs over the
+\emph{ordered} adjacent vertex pairs \texttt{boxOrderedBondPairs}\,$d\,n$ of the induced box graph
+(\texttt{mem\_boxOrderedBondPairs}; \texttt{swap\_mem\_boxOrderedBondPairs} for undirectedness), with
+a $\tfrac12$ prefactor compensating the double count --- the abstract system carries no
+$\hat S_x\cdot\hat S_y=\hat S_y\cdot\hat S_x$ symmetry to collapse unordered bonds.  Since each spin
+operator is supported on its site, a bond operator with both endpoints in $\Lambda$ lies in $A_\Lambda$
+(\texttt{spinDot\_mem\_localSubalgebra\_of\_mem}, a finite sum of products of box-local spins), whence
+$\hat H_{\Lambda_n}\in A_{\Lambda_n}$ (\texttt{boxLocalHamiltonian\_mem\_boxLocalSubalgebra}) and
+$\hat H_{\Lambda_n}\in A_{\mathrm{loc}}$ (\texttt{boxLocalHamiltonian\_mem\_localAlg}).  No
+self-adjointness or cross-site commutativity is claimed (the abstract system carries none), and the
+abstract algebra is not identified with the finite-matrix model.  This is the immediate algebraic
+precursor of Appendix A.7's partial Hamiltonian $\hat H_L$.  All proved (no axioms).
+
 \smallskip\noindent\emph{Concrete finite-volume model (Issue \#4557, PR6).}  Instantiating the
 graph-centric spin-$S$ Heisenberg Hamiltonian on the box graph gives the concrete
 \textbf{finite-volume Heisenberg model} on $\Lambda_n$,
