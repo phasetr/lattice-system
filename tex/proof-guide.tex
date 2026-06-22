@@ -8353,7 +8353,7 @@ $\langle\Phi|\hat T_{xy}|\Phi\rangle$ with $\hat T_{xy}=\tfrac12(\hat S_x^+\hat 
 its non-positivity for cross-sublattice pairs ($A x\ne A y$) on a Marshall-positive sector ground
 state $\Phi=\texttt{marshallSignS}\cdot c$ ($c>0$), and the summed dominance
 $\langle\Phi|\sum_{x,y}\hat T_{xy}|\Phi\rangle_{\mathrm{re}}\le
-\langle\Phi|\texttt{staggeredTransverseCasimirOpS}|\Phi\rangle_{\mathrm{re}}$.  PR3 (\#4607) adds the total-spin value in \texttt{Quantum/SpinS/FerrimagneticLROTotalSpin.lean}
+\langle\Phi|\texttt{staggeredTransverseCasimirOpS}|\Phi\rangle_{\mathrm{re}}$.  PR3 (\#4607) adds the total-spin value in \texttt{Quantum/SpinS/FerrimagneticLROTotalSpinCore.lean} (centered-sector admissibility) and \texttt{Quantum/SpinS/FerrimagneticLROTotalSpin.lean} (the centered ground state; split for build speed)
 (coupling-agnostic via a \texttt{tasaki\_2\_5\_theorem\_2\_3} hypothesis):
 \texttt{exists\_centered\_groundState\_predictedCasimir\_of\_tasaki23} produces a centered
 ($\hat S^{(3)}_{\mathrm{tot}}\Phi^0=0$) Marshall ground state with
