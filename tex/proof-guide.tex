@@ -19831,8 +19831,10 @@ $(\hat S^+_{\rm tot})^{|V|\cdot N + 1}\,|\sigma_\bot\rangle = 0$
 via $m_{\max}+1$ off-spectrum.
 
 \textbf{Extremal magnetization subspaces are 1-dimensional
-(PR~\#908)}: the new file
-\texttt{Quantum/SpinS/MagSubspaceExtremalDim.lean} proves
+(PR~\#908)}: the new files
+\texttt{Quantum/SpinS/MagSubspaceExtremalDimCore.lean} (eigenvalue
+characterisation) and \texttt{Quantum/SpinS/MagSubspaceExtremalDim.lean} (the
+extremal-eigenvalue magnetization-subspace dimension; split for build speed) prove
 \texttt{magEigenvalueS\_eq\_(neg\_)mMax\_iff\_allAlignedConfigS\_(last/zero)}:
 the eigenvalue $\pm m_{\max}$ is achieved exactly at the all-up
 (resp. all-down) constant configuration. Combined with the
