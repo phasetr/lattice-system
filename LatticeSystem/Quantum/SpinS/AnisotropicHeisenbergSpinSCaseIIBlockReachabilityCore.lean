@@ -1,5 +1,4 @@
-import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinSCaseIIBoundaryMoveSets
-import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinSCaseIIBlockPFMin
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinSCaseIIBoundaryMoveSetsCore
 import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphStructural
 import LatticeSystem.Quantum.SpinS.ParityReachableNoParityBondTotal
 import LatticeSystem.Quantum.SpinS.ParityReachableNoSingleIonTotal

@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinSCaseIIBlockReachabilityCore
+import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergSpinSCaseIIBlockPFMin
 
 /-!
 # Case (ii): block-level reachability totality
