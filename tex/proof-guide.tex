@@ -6882,7 +6882,9 @@ lie in $I$), which is invariant under index-mode creation and contains the groun
 for $z\notin I$.
 
 \medskip\noindent\textbf{Theorem 11.17 PR9, the spin-configuration capstone, eq.~(11.3.47) (Tasaki
-§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSpinConfigRep.lean}).}  The coefficient extraction is
+§11.3.4, Issue \#4363, \texttt{GeneralFlatBandSpinConfigRepCore.lean} for the index-support and
+coefficient-extraction machinery, \texttt{GeneralFlatBandSpinConfigRep.lean} for the assembled
+representation theorems --- split for build speed).}  The coefficient extraction is
 carried out in the general occupation basis $\texttt{generalOccBasis}\ e_\mu$.  A left inverse
 $\mathrm{idxInv}$ of the index map on $I$ (\texttt{flatBandSpecialIdxInv}, with $\mathrm{idx}$
 injective on $I$ since distinct $\mu_z$ are distinct) identifies the $\mathrm{idx}(I)$-supported
