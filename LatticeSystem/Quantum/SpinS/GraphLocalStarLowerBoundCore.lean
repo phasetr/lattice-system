@@ -7,13 +7,14 @@ import LatticeSystem.Quantum.SpinS.RayleighInfMatrix
 
 Foundational layer extracted from `GraphLocalStarLowerBound.lean` for build speed.
 This file builds the product-coordinate description of one graph-local star
-(`graphLocalProductConfig`, `graphLocalConfigEquiv` and its computation rules, the
-product cluster Hamiltonian `graphLocalClusterHamiltonianS_product` with its Hermiticity,
-outside-block vanishing and `mulVec` action) and the reindexed graph-local star matrix
-entries (`matrix_mulVec_reindex_comp_symm`, `rayleighOnVec_reindex_comp_symm`, …).
+(`graphLocalOutsideSite`, `graphLocalProductConfig`, `graphLocalConfigEquiv` and its
+computation rules) and the product cluster Hamiltonian `graphLocalClusterHamiltonianS_product`
+with its Hermiticity (`graphLocalClusterHamiltonianS_product_isHermitian`) and outside-block
+apply lemmas (`graphLocalClusterHamiltonianS_product_apply_of_outside_eq`/`_ne`).
 
-The Rayleigh decomposition over outside blocks, the Rayleigh-quotient reindexing, and the
-lower bound on the original graph-local star
+The product `mulVec` action, the reindexed graph-local star matrix entries
+(`matrix_mulVec_reindex_comp_symm`, `rayleighOnVec_reindex_comp_symm`, …), the Rayleigh
+decomposition over outside blocks, and the lower bound on the original graph-local star
 (`graphLocalClusterHamiltonianS_minEigenvalue_lower`) are kept in the capstone module
 `GraphLocalStarLowerBound.lean`.
 -/
