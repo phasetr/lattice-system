@@ -19,7 +19,7 @@ independent: `lemma_9_2_slater_ne_zero_iff_linearIndependent`).
 narrative are documented in the capstone module `FockSpaceRepresentation.lean`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
-(1st ed., Springer, 2020), §9.1, Lemmas 9.1–9.3, pp. 287–289.
+(1st ed., Springer, 2020), §9.2.3, Lemmas 9.1–9.2, eq. (9.2.53), pp. 319–321.
 -/
 
 namespace LatticeSystem.Fermion
