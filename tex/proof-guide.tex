@@ -20203,8 +20203,11 @@ Springer 2020, Problem~2.5.c, p.~43, and the Theorem~2.4 symmetry context,
 pp.~43--44.
 
 \textbf{Problem 2.5.c axis-swap ground-state phase input (PR~\#4066)}:
-the new file
-\texttt{Quantum/SpinS/Problem25cAxisSwapGroundStatePhase.lean} removes the
+the new files
+\texttt{Quantum/SpinS/Problem25cAxisSwapGroundStatePhaseCore.lean} (axis-swap
+reduction, commutation and phase input) and
+\texttt{Quantum/SpinS/Problem25cAxisSwapGroundStatePhase.lean} (the Problem 2.5.c
+squared-expectation wrappers; split for build speed) remove the
 last exact axis-swap state-invariance hypothesis from the previous wrapper.
 At the SU(2) point $\lambda=1$, $D=0$, the axis-swapped Hamiltonian
 \[
