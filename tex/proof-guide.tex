@@ -20551,8 +20551,10 @@ Tasaki, Springer 2020, Problem~2.5.d, p.~40, solution pp.~498--499, equations
 (S.22)--(S.23), with Theorems~2.3--2.4, pp.~42--44.
 
 \textbf{Problem 2.5.d balanced Perron--Frobenius endpoint (PR~\#4078)}.
-The file \path{Quantum/SpinS/Problem25dBalancedPFEndpoint.lean}
-connects the balanced-sector PF vector produced by the Theorem~2.3 common
+The files \path{Quantum/SpinS/Problem25dBalancedPFEndpointCore.lean} (the
+non-normalized phase bridge) and \path{Quantum/SpinS/Problem25dBalancedPFEndpoint.lean}
+(the balanced PF endpoint; split for build speed)
+connect the balanced-sector PF vector produced by the Theorem~2.3 common
 energy endpoint to the sector-supported Problem~2.5.d positivity chain.
 The Theorem~2.3 data return the embedded vector in the real-sign form
 \[
