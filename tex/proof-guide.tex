@@ -18096,7 +18096,10 @@ and
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_argmin\_first\_crossing}
 therefore leave only the argmin first-crossing contradiction callback as the
 remaining case~(ii) input.  The bridge
-\texttt{AnisotropicHeisenbergSpinSCaseIIArgminFinrank.lean} discharges that
+\texttt{AnisotropicHeisenbergSpinSCaseIIArgminFinrankCore.lean} (the argmin
+first-crossing contradiction) together with its case-(ii) target wrappers in
+\texttt{AnisotropicHeisenbergSpinSCaseIIArgminFinrank.lean} (split for build
+speed) discharges that
 callback from the standard first-crossing algebra once a full ground
 eigenspace bound \(\texttt{finrank}\le2\) is available at the selected
 first-crossing parameter.  The theorem
