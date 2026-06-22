@@ -3,7 +3,9 @@ import LatticeSystem.Quantum.SpinS.AndersonTower
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
 import LatticeSystem.Quantum.SpinS.SubmatrixMinEigenvalue
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
+import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
 import Mathlib.Analysis.SpecialFunctions.Exp
+import Mathlib.Analysis.Matrix.Order
 
 /-!
 # Tasaki §6.3: hidden antiferromagnetic order and the `S = 1` chain on `H_HAF` (Proposition 6.5)
@@ -38,6 +40,7 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1
 namespace LatticeSystem.Quantum
 
 open Matrix
+open scoped ComplexOrder
 
 /-- `IsPM σ x`: site `x` carries a nonzero (`±`) spin, i.e. `σ_x ≠ 1` (so `σ_x ∈ {0, 2}`, spin
 `±1`). -/
@@ -260,6 +263,54 @@ theorem hhafMinEnergy_mem_realSpectrum (L : ℕ) : hhafMinEnergy L ∈ hhafRealS
     hhafProjection_mulVec_hhafSubspaceEmbedding L w, ?_⟩
   rw [hhafRestrictedChainHamiltonianS_mulVec_hhafSubspaceEmbedding, hw_eig,
     hhafSubspaceEmbedding_smul, hhafMinEnergy]
+
+/-- **The `H_HAF`-restricted spectrum has a least element**, realized by `hhafMinEnergy`: the
+minimal restricted eigenvalue is `≤` every `hhafRealSpectrum` element.  This discharges the
+ground-energy existence *and minimality* part of Proposition 6.5: there is a genuine `H_HAF` ground
+energy `E = hhafMinEnergy L` with a nonzero ground state. -/
+theorem exists_hhaf_min_real_eigenvalue (L : ℕ) :
+    ∃ E ∈ hhafRealSpectrum L, ∀ E' ∈ hhafRealSpectrum L, E ≤ E' := by
+  refine ⟨hhafMinEnergy L, hhafMinEnergy_mem_realSpectrum L, ?_⟩
+  rintro E' ⟨Φ, hΦ_ne, hΦ_proj, hΦ_eig⟩
+  -- `Φ` is supported on `H_HAF`, so it is the embedding of its restriction `u`.
+  set u : hhafConfig L → ℂ := fun τ => Φ τ.1 with hu_def
+  have hΦ_emb : Φ = hhafSubspaceEmbedding L u := by
+    funext σ
+    by_cases hσ : IsHiddenAFMConfig σ
+    · rw [hhafSubspaceEmbedding, dif_pos hσ]
+    · rw [hhafSubspaceEmbedding, dif_neg hσ]
+      have hp := congrFun hΦ_proj σ
+      rw [hhafProjection, Matrix.mulVec_diagonal, if_neg hσ, zero_mul] at hp
+      exact hp.symm
+  -- The restriction `u` is an eigenvector of the restricted matrix at `E'`.
+  have hu_eig : (hhafRestrictedMatrix L).mulVec u = (E' : ℂ) • u := by
+    have h1 : hhafSubspaceEmbedding L ((hhafRestrictedMatrix L).mulVec u) =
+        hhafSubspaceEmbedding L ((E' : ℂ) • u) := by
+      rw [← hhafRestrictedChainHamiltonianS_mulVec_hhafSubspaceEmbedding, ← hΦ_emb, hΦ_eig,
+        hhafSubspaceEmbedding_smul, hΦ_emb]
+    funext τ
+    have h2 := congrFun h1 τ.1
+    rwa [hhafSubspaceEmbedding_apply_subtype, hhafSubspaceEmbedding_apply_subtype] at h2
+  have hu_ne : u ≠ 0 := by
+    intro h0
+    apply hΦ_ne
+    rw [hΦ_emb, h0]
+    funext σ
+    rw [hhafSubspaceEmbedding]
+    split <;> rfl
+  -- Rayleigh variational bound: `minEig · ‖u‖² ≤ rayleigh = E' · ‖u‖²`, and `‖u‖² > 0`.
+  have hvar := hermitianMinEigenvalue_mul_dotProduct_re_le_rayleighOnVec
+    (hhafRestrictedMatrix_isHermitian L) u
+  have hray : rayleighOnVec (hhafRestrictedMatrix L) u =
+      E' * (dotProduct (star u) u).re := by
+    rw [rayleighOnVec, hu_eig, dotProduct_smul, smul_eq_mul, Complex.mul_re,
+      Complex.ofReal_re, Complex.ofReal_im, zero_mul, sub_zero]
+  have hDpos : 0 < (dotProduct (star u) u).re := by
+    have hpos : (0 : ℂ) < dotProduct (star u) u := Matrix.dotProduct_star_self_pos_iff.mpr hu_ne
+    simpa using (Complex.lt_def.mp hpos).1
+  rw [hray] at hvar
+  rw [hhafMinEnergy]
+  exact le_of_mul_le_mul_right hvar hDpos
 
 /-- **Tasaki Proposition 6.5 (the `S = 1` chain on `H_HAF`), AXIOM.**  For an even ring `Fin L`
 (`L > 0`), the spin-`1` antiferromagnetic Heisenberg chain restricted to the

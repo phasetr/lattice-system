@@ -9214,8 +9214,10 @@ intertwines with the full compressed Hamiltonian through the zero-extension embe
 \texttt{hhafSubspaceEmbedding} ($P_{\mathrm{HAF}}\hat HP_{\mathrm{HAF}}\circ\mathrm{emb}
 =\mathrm{emb}\circ\texttt{hhafRestrictedMatrix}$), so its minimal eigenvalue \texttt{hhafMinEnergy}
 is a genuine \texttt{hhafRealSpectrum} member with a nonzero $H_{\mathrm{HAF}}$ ground state
-(\texttt{hhafMinEnergy\_mem\_realSpectrum}); the unique-GS, positive-gap, and exponential-decay core
-remains the deep residual.  Chapters~3--10 backfill.
+(\texttt{hhafMinEnergy\_mem\_realSpectrum}) and is moreover \emph{minimal} --- $\le$ every restricted
+eigenvalue, so a genuine restricted ground energy (\texttt{exists\_hhaf\_min\_real\_eigenvalue}, via
+the reverse embedding bridge and the Rayleigh variational bound).  The unique-GS, positive-gap, and
+exponential-decay core remains the deep residual.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
