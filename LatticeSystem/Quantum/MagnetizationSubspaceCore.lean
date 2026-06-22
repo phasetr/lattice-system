@@ -22,6 +22,8 @@ open Matrix Complex
 
 variable (Λ : Type*) [Fintype Λ] [DecidableEq Λ]
 
+/-- The magnetization-`M` subspace `H_M`: the `Ŝ_tot^(3)`-eigenspace
+for eigenvalue `M`, packaged as a `Submodule ℂ`. -/
 noncomputable def magnetizationSubspace (M : ℂ) :
     Submodule ℂ ((Λ → Fin 2) → ℂ) where
   carrier := { v | (totalSpinHalfOp3 Λ).mulVec v = M • v }
