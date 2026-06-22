@@ -20524,8 +20524,11 @@ Problem~2.5.d, p.~40, solution pp.~498--499, equations (S.22)--(S.23), with
 Theorems~2.3--2.4, pp.~42--44.
 
 \textbf{Problem 2.5.d balanced-sector ladder witness (PR~\#4077)}.
-The file \path{Quantum/SpinS/Problem25dBalancedSectorWitness.lean}
-supplies the sector-local strict ladder entry required by PR~\#4076 at the
+The files \path{Quantum/SpinS/Problem25dBalancedSectorWitnessCore.lean} (the
+signed ladder entries and balanced-sector witness) and
+\path{Quantum/SpinS/Problem25dBalancedSectorWitness.lean} (the balanced-sector
+dot-product wrapper; split for build speed)
+supply the sector-local strict ladder entry required by PR~\#4076 at the
 balanced sector \(M_0=|A|N\).  First,
 \path{twoSpinPlusMinus_ladder_signed_entry_re_pos_of_off_two_site_raise_lower}
 isolates the strict-entry calculation: for \(A(x)\ne A(y)\), agreement away
