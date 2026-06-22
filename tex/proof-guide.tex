@@ -18263,7 +18263,10 @@ records its diagonal, off-diagonal, strict-shift diagonal positivity, and
 symmetry facts.  The remaining case~(ii) PF work is to prove sign
 non-negativity, reachability/irreducibility, and PF/min identification for
 this shifted matrix in the region \(\lambda\ge1\), \(D\le0\).
-\texttt{AnisotropicHeisenbergSpinSCaseIIParityGaugedSigns.lean} adds the
+\texttt{AnisotropicHeisenbergSpinSCaseIIParityGaugedSignsCore.lean} (real
+parity-gauge products and parity-gauged entry sign transfer) and
+\texttt{AnisotropicHeisenbergSpinSCaseIIParityGaugedSigns.lean} (the
+shifted-matrix sign transfer; split for build speed) add the
 corresponding structural sign-transfer API.  The real gauge product lemmas
 \texttt{caseIIParityGaugeSignReal\_mul\_eq\_one\_of\_magSumS\_eq},
 \texttt{caseIIParityGaugeSignReal\_mul\_eq\_neg\_one\_of\_magSumS\_add\_two},
