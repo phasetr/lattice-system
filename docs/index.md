@@ -2932,10 +2932,10 @@ fermion mode acting on `ℂ²` with computational basis
 
 | Lean name | Statement | File |
 |---|---|---|
-| `jwSign_eq_neg_one_pow` | `jwSign N j c = (-1)^{∑_{k<j} (c k).val}` (string sign as parity of occupied modes) | `Fermion/JordanWigner/Hubbard/TasakiHopAction.lean` |
-| `sum_spinful_reindex` | reindex a sum over the `2N+2` JW modes into a double site/spin sum | `Fermion/JordanWigner/Hubbard/TasakiHopAction.lean` |
-| `hubbardTasakiBasisSign_eq` | the Tasaki basis sign is `ε = (-1)^x` (independent of `σ`) | `Fermion/JordanWigner/Hubbard/TasakiHopAction.lean` |
-| `hop_jwSign_source` / `hop_jwSign_target` | the two hop string signs as `(-1)` to the occupied-site count below the source / target orbital | `Fermion/JordanWigner/Hubbard/TasakiHopAction.lean` |
+| `jwSign_eq_neg_one_pow` | `jwSign N j c = (-1)^{∑_{k<j} (c k).val}` (string sign as parity of occupied modes) | `Fermion/JordanWigner/Hubbard/TasakiHopActionCore.lean` |
+| `sum_spinful_reindex` | reindex a sum over the `2N+2` JW modes into a double site/spin sum | `Fermion/JordanWigner/Hubbard/TasakiHopActionCore.lean` |
+| `hubbardTasakiBasisSign_eq` | the Tasaki basis sign is `ε = (-1)^x` (independent of `σ`) | `Fermion/JordanWigner/Hubbard/TasakiHopActionCore.lean` |
+| `hop_jwSign_source` / `hop_jwSign_target` | the two hop string signs as `(-1)` to the occupied-site count below the source / target orbital | `Fermion/JordanWigner/Hubbard/TasakiHopActionCore.lean` |
 | `hubbardTasakiHop_mulVec` | eq. (11.2.4): `ĉ†_{(x,s)} ĉ_{(z,s)} \|Φ_{x,σ}⟩ = -\|Φ_{z, σ_{z→x}}⟩` — the four fermion signs combine to the uniform `-1` (parity `2(x+z)-1` is odd) | `Fermion/JordanWigner/Hubbard/TasakiHopAction.lean` |
 
 #### Effective-Hamiltonian matrix element (Tasaki §11.2, eq. (11.2.5))
