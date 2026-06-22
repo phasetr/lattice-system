@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Problem25cAxisSwapGroundStatePhaseCore
+import LatticeSystem.Quantum.SpinS.Problem25cZAxisGroundStatePhase
 
 /-!
 # Tasaki Problem 2.5.c: axis-swap ground-state phase input

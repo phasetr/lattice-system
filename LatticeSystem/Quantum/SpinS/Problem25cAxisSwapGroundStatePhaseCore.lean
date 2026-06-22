@@ -1,4 +1,7 @@
-import LatticeSystem.Quantum.SpinS.Problem25cZAxisGroundStatePhase
+import LatticeSystem.Quantum.SpinS.AxisSwappedAnisotropicHeisenberg
+import LatticeSystem.Quantum.SpinS.Problem25cEigenspacePhaseBridge
+import LatticeSystem.Quantum.SpinS.AxisSwapUnitarySSpinSCore
+import LatticeSystem.Quantum.SpinS.Problem25cAxisSwapAdjointInput
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergReduction
 
 /-!
