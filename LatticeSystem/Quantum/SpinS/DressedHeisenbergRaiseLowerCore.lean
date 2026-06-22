@@ -1,6 +1,6 @@
 import LatticeSystem.Quantum.SpinS.HeisenbergRaiseLower
 import LatticeSystem.Quantum.SpinS.DressedHeisenberg
-import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
+import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphCore
 
 /-!
 # Dressed Heisenberg raise/lower steps: complex-matrix form (foundation)

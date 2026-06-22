@@ -1,6 +1,6 @@
 import LatticeSystem.Quantum.SpinS.Magnetization
 import LatticeSystem.Quantum.SpinS.RaiseLower
-import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
+import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphCore
 import Mathlib.Combinatorics.SimpleGraph.Basic
 
 set_option linter.unusedSectionVars false

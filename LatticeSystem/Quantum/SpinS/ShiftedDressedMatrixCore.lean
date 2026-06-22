@@ -2,7 +2,7 @@ import LatticeSystem.Quantum.SpinS.DressedHeisenberg
 import LatticeSystem.Quantum.SpinS.DressedHeisenbergMarshall
 import LatticeSystem.Quantum.SpinS.DressedHeisenbergOffXY
 import LatticeSystem.Quantum.SpinS.DressedHeisenbergRaiseLower
-import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
+import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphCore
 import LatticeSystem.Quantum.SpinS.RaiseLowerMatrixPow
 
 /-!

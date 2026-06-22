@@ -1,7 +1,7 @@
 import LatticeSystem.Quantum.SpinS.ParityReachable
 import LatticeSystem.Quantum.SpinS.ParityReachWitness
 import LatticeSystem.Quantum.SpinS.MagSumStepDown
-import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
+import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphCore
 
 /-!
 # Two-step `magSumS` reduction for the "hard" Case 2b of (d) reachability totality
