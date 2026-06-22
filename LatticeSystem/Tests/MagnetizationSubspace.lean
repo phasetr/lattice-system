@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.MagnetizationSubspace
+import LatticeSystem.Quantum.MagnetizationSubspaceCore
 
 /-!
 # Test coverage for Quantum/MagnetizationSubspace

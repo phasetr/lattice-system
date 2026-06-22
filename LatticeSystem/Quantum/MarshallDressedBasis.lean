@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.NeelState.MarshallSign
-import LatticeSystem.Quantum.MagnetizationSubspace
+import LatticeSystem.Quantum.MagnetizationSubspaceCore
 
 /-!
 # Marshall-dressed standard basis on a bipartite graph (Tasaki §2.5 eq. (2.5.8))
