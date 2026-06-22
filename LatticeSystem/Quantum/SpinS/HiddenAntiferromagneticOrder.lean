@@ -312,6 +312,41 @@ theorem exists_hhaf_min_real_eigenvalue (L : ℕ) :
   rw [hhafMinEnergy]
   exact le_of_mul_le_mul_right hvar hDpos
 
+/-! ## Per-`L` exponential decay of the correlation -/
+
+/-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring
+admits an exponential-decay bound `|f x y| ≤ C e^{−d(x,y)/ξ}`.  On a fixed finite ring the values
+are a finite family, so `ξ = 1` and `C = Σ_{x',y'} |f x' y'| e^{d(x',y')}` make the envelope hold
+termwise.  (Stated abstractly over `f` so the heavy `chainCorrelation` operator is never
+unfolded.) -/
+theorem exp_decay_envelope_of_finite {L : ℕ} (f : Fin L → Fin L → ℝ) :
+    ∃ ξ : ℝ, 0 < ξ ∧ ∃ C : ℝ, 0 ≤ C ∧
+      ∀ x y : Fin L, |f x y| ≤ C * Real.exp (-(ringDist L x y : ℝ) / ξ) := by
+  classical
+  set C : ℝ := ∑ p : Fin L × Fin L, |f p.1 p.2| * Real.exp (ringDist L p.1 p.2) with hC
+  refine ⟨1, one_pos, C, ?_, ?_⟩
+  · exact Finset.sum_nonneg fun p _ => mul_nonneg (abs_nonneg _) (Real.exp_nonneg _)
+  · intro x y
+    have hterm : |f x y| * Real.exp (ringDist L x y) ≤ C :=
+      Finset.single_le_sum (f := fun p : Fin L × Fin L =>
+          |f p.1 p.2| * Real.exp (ringDist L p.1 p.2))
+        (fun p _ => mul_nonneg (abs_nonneg _) (Real.exp_nonneg _)) (Finset.mem_univ (x, y))
+    calc |f x y|
+        = (|f x y| * Real.exp (ringDist L x y)) * Real.exp (-(ringDist L x y : ℝ)) := by
+          rw [mul_assoc, ← Real.exp_add, add_neg_cancel, Real.exp_zero, mul_one]
+      _ ≤ C * Real.exp (-(ringDist L x y : ℝ)) :=
+          mul_le_mul_of_nonneg_right hterm (Real.exp_nonneg _)
+      _ = C * Real.exp (-(ringDist L x y : ℝ) / 1) := by rw [div_one]
+
+/-- **Exponential-decay envelope (per `L`)** for the spin-1 chain: for *any* state `Φ` on the finite
+ring, the two-point correlation `chainCorrelation` admits `|⟨Ŝ_x·Ŝ_y⟩| ≤ C e^{−d(x,y)/ξ}`.  This
+supplies the correlation-decay clause of Proposition 6.5 for the (still axiomatic) ground state. -/
+theorem hhaf_correlation_exp_decay_exists (L : ℕ) (Φ : (Fin L → Fin 3) → ℂ) :
+    ∃ ξ : ℝ, 0 < ξ ∧ ∃ C : ℝ, 0 ≤ C ∧
+      ∀ x y : Fin L, |chainCorrelation L Φ x y| ≤
+        C * Real.exp (-(ringDist L x y : ℝ) / ξ) :=
+  exp_decay_envelope_of_finite (fun x y => chainCorrelation L Φ x y)
+
 /-- **Tasaki Proposition 6.5 (the `S = 1` chain on `H_HAF`), AXIOM.**  For an even ring `Fin L`
 (`L > 0`), the spin-`1` antiferromagnetic Heisenberg chain restricted to the
 hidden-antiferromagnetic subspace `H_HAF` (the compressed Hamiltonian
