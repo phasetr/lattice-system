@@ -8292,7 +8292,9 @@ $\hat S^{(3)}_{\mathrm{tot}}$, $\langle\Phi|O|\Phi\rangle=\sum_M\langle\Phi_M|O|
 $\hat S^{(3)}$-weight sector components (cross terms vanish by $\hat S^{(3)}_{\mathrm{tot}}$-eigenvalue
 orthogonality; no Hermiticity of $O$ is required), the block-diagonal decomposition for
 $(\hat O_\Lambda)^2$'s expectation.  PR10 (\#4620,
-\texttt{Quantum/SpinS/StrictHOutsideFerrimagnetic.lean}) clears the hard gate (step~2):
+\texttt{Quantum/SpinS/StrictHOutsideFerrimagnetic.lean}; the per-sector ferrimagnetic
+foundation \texttt{tasaki23\_strict\_hOutside\_ferrimagnetic} is split for build speed into
+\texttt{Quantum/SpinS/StrictHOutsideFerrimagneticCore.lean}) clears the hard gate (step~2):
 \texttt{tasaki23\_strict\_hOutside\_of\_connected} --- the \emph{strict} energy separation
 $\mu<\mu_M$ for any non-admissible sector $M\notin[\min\cdot N,\max\cdot N]$, the connected
 ferrimagnetic generalization of the balanced
