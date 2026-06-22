@@ -87,6 +87,46 @@ part; `Ŝ_x · Ŝ_y` is Hermitian). -/
 noncomputable def chainCorrelation (L : ℕ) (Φ : (Fin L → Fin 3) → ℂ) (x y : Fin L) : ℝ :=
   expectationRatioRe (spinSDot x y 2) Φ
 
+/-! ## Spectral foundations of the `H_HAF`-restricted chain
+
+Structural properties of the hidden-AFM projection and the compressed Hamiltonian that underlie
+Proposition 6.5: the projection is a Hermitian idempotent, and the compressed Hamiltonian
+`P_HAF Ĥ P_HAF` is Hermitian. -/
+
+/-- The hidden-AFM projection `P_HAF` is Hermitian: it is diagonal with real `0`/`1` entries. -/
+theorem hhafProjection_isHermitian (L : ℕ) : (hhafProjection L).IsHermitian := by
+  classical
+  rw [hhafProjection, Matrix.isHermitian_diagonal_iff]
+  intro σ
+  by_cases h : IsHiddenAFMConfig σ <;> simp [h]
+
+/-- The hidden-AFM projection `P_HAF` is idempotent: `P_HAF² = P_HAF` (entries are `0` or `1`). -/
+theorem hhafProjection_mul_self (L : ℕ) :
+    hhafProjection L * hhafProjection L = hhafProjection L := by
+  classical
+  rw [hhafProjection, Matrix.diagonal_mul_diagonal]
+  refine congrArg Matrix.diagonal ?_
+  funext σ
+  by_cases h : IsHiddenAFMConfig σ <;> simp [h]
+
+/-- The antiferromagnetic Heisenberg ring Hamiltonian is Hermitian (the ring coupling is real). -/
+theorem afmHeisenbergChainHamiltonianS_isHermitian (L N : ℕ) :
+    (afmHeisenbergChainHamiltonianS L N).IsHermitian := by
+  rw [afmHeisenbergChainHamiltonianS]
+  refine heisenbergHamiltonianS_isHermitian_of_real (fun x y => ?_) N
+  rw [ringCoupling]
+  split <;> simp
+
+/-- The `H_HAF`-restricted (compressed) Hamiltonian `P_HAF Ĥ P_HAF` is Hermitian. -/
+theorem hhafRestrictedChainHamiltonianS_isHermitian (L : ℕ) :
+    (hhafRestrictedChainHamiltonianS L).IsHermitian := by
+  rw [hhafRestrictedChainHamiltonianS]
+  have hP := (hhafProjection_isHermitian L).eq
+  have h := Matrix.isHermitian_conjTranspose_mul_mul
+    (A := afmHeisenbergChainHamiltonianS L 2) (hhafProjection L)
+    (afmHeisenbergChainHamiltonianS_isHermitian L 2)
+  rwa [hP] at h
+
 /-- **Tasaki Proposition 6.5 (the `S = 1` chain on `H_HAF`), AXIOM.**  For an even ring `Fin L`
 (`L > 0`), the spin-`1` antiferromagnetic Heisenberg chain restricted to the
 hidden-antiferromagnetic subspace `H_HAF` (the compressed Hamiltonian

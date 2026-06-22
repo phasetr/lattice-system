@@ -9202,7 +9202,12 @@ $H_{\mathrm{HAF}}$-restricted spectrum \texttt{hhafRealSpectrum}.  The axiom
 \Phi,\Phi\rangle|\le Ce^{-d(x,y)/\xi}$ (ring distance \texttt{ringDist}) --- so the Haldane conjecture
 for $S=1$ holds rigorously within this artificial restricted Hilbert space.  Proved via a
 path-integral / two-dimensional classical statistical-mechanics representation (Gómez-Santos);
-recorded as a documented axiom.  Chapters~3--10 backfill.
+recorded as a documented axiom.  As a first step toward discharging the axiom, the spectral
+foundations of the compressed chain are now proved (\texttt{hhafProjection\_isHermitian},
+\texttt{hhafProjection\_mul\_self}, \texttt{afmHeisenbergChainHamiltonianS\_isHermitian},
+\texttt{hhafRestrictedChainHamiltonianS\_isHermitian}): the projection $P_{\mathrm{HAF}}$ is a
+Hermitian idempotent and the compressed Hamiltonian $P_{\mathrm{HAF}}\hat HP_{\mathrm{HAF}}$ is
+Hermitian (Issue \#4718).  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
