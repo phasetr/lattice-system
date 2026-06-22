@@ -20417,8 +20417,11 @@ Problem~2.5.d sign theorem is now the longitudinal
 identity from ground-state SU(2) phase invariance.
 
 \textbf{Problem 2.5.d longitudinal component equality (PR~\#4074)}.
-The file \path{Quantum/SpinS/Problem25dLongitudinalComponentEquality.lean}
-discharges the second component equality left by PR~\#4072 under the same
+The files \path{Quantum/SpinS/Problem25dLongitudinalComponentEqualityCore.lean}
+(the phase-invariant bridges and axis equalities) and
+\path{Quantum/SpinS/Problem25dLongitudinalComponentEquality.lean} (the
+longitudinal equality and the Problem~2.5.d wrapper; split for build speed)
+discharge the second component equality left by PR~\#4072 under the same
 phase-invariance interface used in Problem~2.5.c.  The generic bridge
 \path{twoSpinProductCorrelationS_eq_of_conj_phaseInvariant} says that if a
 unitary conjugates one two-site product to another and the state is fixed by
