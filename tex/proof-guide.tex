@@ -4561,7 +4561,10 @@ partition function im, ofReal-re-eq, pow-trace).
 
 \noindent The second-quantized (Fock space) representation of
 tight-binding electrons is developed in
-\texttt{Fermion/JordanWigner/FockSpaceRepresentation.lean}, working in
+\texttt{Fermion/JordanWigner/FockSpaceRepresentation.lean} (with the
+Slater-state machinery and Lemmas 9.1--9.2 split into the companion
+\texttt{Fermion/JordanWigner/FockSpaceRepresentationCore.lean} for build
+speed; Lemma 9.3 is kept in the former), working in
 the concrete Jordan--Wigner representation on
 $(\Lambda \to \mathrm{Fin}\,2) \to \mathbb{C}$. For a single-electron
 wave function $\varphi : \Lambda \to \mathbb{C}$ the smeared creation
