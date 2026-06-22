@@ -18326,8 +18326,10 @@ record the boundary move-set choices when a strict local coefficient vanishes;
 the following PF/min layer then converts shifted non-negative irreducible
 blocks into bare parity-block PF/min witnesses.
 
-\texttt{AnisotropicHeisenbergSpinSCaseIIRawSupport.lean} proves that raw
-classification under the support-zero assumption
+\texttt{AnisotropicHeisenbergSpinSCaseIIRawSupport.lean} (with the local /
+total-entry zero tests split into
+\texttt{AnisotropicHeisenbergSpinSCaseIIRawSupportCore.lean} for build speed)
+proves that raw classification under the support-zero assumption
 \[
   J(x,y)=0 \quad\text{whenever}\quad
   (x,y)\notin E(\texttt{bipartiteCompleteGraphOf}~A).
