@@ -18076,7 +18076,10 @@ and
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_first\_crossing}
 therefore leave only the first-crossing contradiction callback as the
 remaining case~(ii) input.  The next bridge in
-\texttt{AnisotropicHeisenbergSpinSCaseIIArgminFirstCrossing.lean} narrows
+\texttt{AnisotropicHeisenbergSpinSCaseIIArgminFirstCrossingCore.lean} (with the
+case-(ii) target wrappers in
+\texttt{AnisotropicHeisenbergSpinSCaseIIArgminFirstCrossing.lean}; split for build
+speed) narrows
 that input to the sector selected by the finite argmin extraction.  The
 definition \texttt{caseIIArgminFirstCrossingContradiction} records the
 available data: the chosen sector is in the valid range, is non-balanced, has
