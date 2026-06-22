@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiFlatBandModelCore
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreProjection
 
 /-!
 # Tasaki's flat-band model: the d = 1 decorated (Delta) chain (Tasaki §11.3.1)

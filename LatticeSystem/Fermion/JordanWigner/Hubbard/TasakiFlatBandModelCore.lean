@@ -1,5 +1,4 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard
-import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreProjection
 
 /-!
 # Tasaki flat-band model: single-particle states and fermion operators (foundation)
