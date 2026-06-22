@@ -18126,7 +18126,10 @@ and
 therefore leave a path-global full-ground-eigenspace
 \(\texttt{finrank}\le2\) theorem as the remaining case~(ii) input.
 The block-path bridge in
-\texttt{AnisotropicHeisenbergSpinSCaseIIBlockPathFinrank.lean} rewrites this
+\texttt{AnisotropicHeisenbergSpinSCaseIIBlockPathFinrankCore.lean} (with the
+case-(ii) target wrappers in
+\texttt{AnisotropicHeisenbergSpinSCaseIIBlockPathFinrank.lean}; split for build
+speed) rewrites this
 input into the standard parity-block form.  The theorem
 \texttt{caseII\_path\_global\_finrank\_bound\_of\_axisSwapped\_submatrix\_blocks\_le\_one}
 uses
