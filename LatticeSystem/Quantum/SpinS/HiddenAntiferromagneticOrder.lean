@@ -1,6 +1,8 @@
 import LatticeSystem.Quantum.SpinS.HaldaneConjecture
 import LatticeSystem.Quantum.SpinS.AndersonTower
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
+import LatticeSystem.Quantum.SpinS.SubmatrixMinEigenvalue
+import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import Mathlib.Analysis.SpecialFunctions.Exp
 
 /-!
@@ -126,6 +128,138 @@ theorem hhafRestrictedChainHamiltonianS_isHermitian (L : ℕ) :
     (A := afmHeisenbergChainHamiltonianS L 2) (hhafProjection L)
     (afmHeisenbergChainHamiltonianS_isHermitian L 2)
   rwa [hP] at h
+
+/-! ## Ground-energy existence on `H_HAF`
+
+The compressed chain restricted to the hidden-AFM configuration subtype is a finite Hermitian
+matrix, so it has a minimal eigenvalue; its eigenvector embeds (by zero-extension) back to a genuine
+`H_HAF`-restricted ground state. This discharges the ground-energy existence/minimality part of
+Proposition 6.5. -/
+
+/-- Complete hidden-AFM order is decidable: it is a finite conjunction/implication of decidable
+atoms over the finite ring. -/
+instance hhafIsHiddenAFMConfig_decidable {L : ℕ} (σ : Fin L → Fin 3) :
+    Decidable (IsHiddenAFMConfig σ) := by
+  unfold IsHiddenAFMConfig IsNextPM IsPM InCyclicOpen
+  infer_instance
+
+/-- The index type of **hidden-AFM configurations**: spin-1 configurations with complete hidden
+antiferromagnetic order. -/
+def hhafConfig (L : ℕ) := {σ : Fin L → Fin 3 // IsHiddenAFMConfig σ}
+
+instance hhafConfig_fintype (L : ℕ) : Fintype (hhafConfig L) :=
+  Subtype.fintype _
+
+instance hhafConfig_decidableEq (L : ℕ) : DecidableEq (hhafConfig L) :=
+  inferInstanceAs (DecidableEq {σ : Fin L → Fin 3 // IsHiddenAFMConfig σ})
+
+/-- The all-`0`-spin configuration (`σ ≡ 1`, every site spin `0`) has no `±` spins, so it is
+vacuously hidden-AFM; hence the hidden-AFM configuration type is nonempty. -/
+instance hhafConfig_nonempty (L : ℕ) : Nonempty (hhafConfig L) :=
+  ⟨⟨fun _ => 1, fun _ _ h => (h.2.1 rfl).elim⟩⟩
+
+/-- The **compressed Hamiltonian restricted to the hidden-AFM configuration subtype**: the
+`H_HAF × H_HAF` submatrix of the AFM Heisenberg ring Hamiltonian. -/
+noncomputable def hhafRestrictedMatrix (L : ℕ) : Matrix (hhafConfig L) (hhafConfig L) ℂ :=
+  (afmHeisenbergChainHamiltonianS L 2).submatrix Subtype.val Subtype.val
+
+/-- The restricted matrix is Hermitian (submatrix of a Hermitian matrix). -/
+theorem hhafRestrictedMatrix_isHermitian (L : ℕ) : (hhafRestrictedMatrix L).IsHermitian :=
+  (afmHeisenbergChainHamiltonianS_isHermitian L 2).submatrix Subtype.val
+
+/-- **Zero-extension embedding** of an `H_HAF`-supported vector into the full spin-1 Hilbert space:
+`v` on hidden-AFM configurations, `0` elsewhere. -/
+noncomputable def hhafSubspaceEmbedding (L : ℕ) (v : hhafConfig L → ℂ) :
+    (Fin L → Fin 3) → ℂ :=
+  fun σ => if h : IsHiddenAFMConfig σ then v ⟨σ, h⟩ else 0
+
+/-- The embedding evaluated on a hidden-AFM configuration. -/
+theorem hhafSubspaceEmbedding_apply_subtype (L : ℕ) (v : hhafConfig L → ℂ) (σ : hhafConfig L) :
+    hhafSubspaceEmbedding L v σ.1 = v σ := by
+  obtain ⟨s, hs⟩ := σ
+  simp only [hhafSubspaceEmbedding, dif_pos hs]
+
+/-- The embedding vanishes off the hidden-AFM subspace. -/
+theorem hhafSubspaceEmbedding_apply_of_not (L : ℕ) (v : hhafConfig L → ℂ) {σ : Fin L → Fin 3}
+    (hσ : ¬ IsHiddenAFMConfig σ) : hhafSubspaceEmbedding L v σ = 0 := by
+  rw [hhafSubspaceEmbedding, dif_neg hσ]
+
+/-- The projection `P_HAF` fixes any embedded `H_HAF` vector. -/
+theorem hhafProjection_mulVec_hhafSubspaceEmbedding (L : ℕ) (v : hhafConfig L → ℂ) :
+    (hhafProjection L).mulVec (hhafSubspaceEmbedding L v) = hhafSubspaceEmbedding L v := by
+  funext σ
+  rw [hhafProjection, Matrix.mulVec_diagonal]
+  by_cases h : IsHiddenAFMConfig σ
+  · rw [if_pos h, one_mul]
+  · rw [if_neg h, zero_mul, hhafSubspaceEmbedding_apply_of_not L v h]
+
+/-- A nonzero `H_HAF` vector embeds to a nonzero full-space vector. -/
+theorem hhafSubspaceEmbedding_ne_zero (L : ℕ) {v : hhafConfig L → ℂ} (hv : v ≠ 0) :
+    hhafSubspaceEmbedding L v ≠ 0 := by
+  intro h0
+  apply hv
+  funext σ
+  have := congrFun h0 σ.1
+  rwa [hhafSubspaceEmbedding_apply_subtype, Pi.zero_apply] at this
+
+/-- **Compression–embedding intertwining**: the compressed Hamiltonian acting on an embedded
+`H_HAF` vector equals the embedding of the restricted matrix acting on that vector.  The inner
+projection fixes the embedding, and the outer projection picks out exactly the `H_HAF × H_HAF`
+block of the ring Hamiltonian. -/
+theorem hhafRestrictedChainHamiltonianS_mulVec_hhafSubspaceEmbedding (L : ℕ)
+    (v : hhafConfig L → ℂ) :
+    (hhafRestrictedChainHamiltonianS L).mulVec (hhafSubspaceEmbedding L v) =
+      hhafSubspaceEmbedding L ((hhafRestrictedMatrix L).mulVec v) := by
+  classical
+  rw [hhafRestrictedChainHamiltonianS, ← Matrix.mulVec_mulVec,
+    hhafProjection_mulVec_hhafSubspaceEmbedding, ← Matrix.mulVec_mulVec]
+  funext σ
+  rw [hhafProjection, Matrix.mulVec_diagonal]
+  by_cases hσ : IsHiddenAFMConfig σ
+  · rw [if_pos hσ, one_mul, hhafSubspaceEmbedding, dif_pos hσ]
+    -- Reduce the RHS subtype sum to `∑ τ', H σ τ'.1 * emb v τ'.1`.
+    have hRHS : ((hhafRestrictedMatrix L).mulVec v) ⟨σ, hσ⟩ =
+        ∑ τ' : hhafConfig L,
+          (afmHeisenbergChainHamiltonianS L 2) σ τ'.1 * hhafSubspaceEmbedding L v τ'.1 := by
+      change ∑ τ' : hhafConfig L, (hhafRestrictedMatrix L) ⟨σ, hσ⟩ τ' * v τ' = _
+      refine Finset.sum_congr rfl (fun τ' _ => ?_)
+      rw [hhafRestrictedMatrix, Matrix.submatrix_apply, hhafSubspaceEmbedding_apply_subtype]
+    rw [hRHS]
+    -- LHS full sum reduces to the same subtype sum (the embedding vanishes off `H_HAF`).
+    change ∑ τ, (afmHeisenbergChainHamiltonianS L 2) σ τ * hhafSubspaceEmbedding L v τ = _
+    rw [← Finset.sum_filter_of_ne (p := fun τ => IsHiddenAFMConfig τ)
+      (fun τ _ hne => by
+        by_contra h
+        exact hne (by rw [hhafSubspaceEmbedding_apply_of_not L v h, mul_zero]))]
+    exact Finset.sum_subtype
+      (Finset.univ.filter (fun τ : Fin L → Fin 3 => IsHiddenAFMConfig τ))
+      (fun τ => by simp [Finset.mem_filter])
+      (fun τ => (afmHeisenbergChainHamiltonianS L 2) σ τ * hhafSubspaceEmbedding L v τ)
+  · rw [if_neg hσ, zero_mul, hhafSubspaceEmbedding_apply_of_not L _ hσ]
+
+/-- The zero-extension embedding is scalar-linear. -/
+theorem hhafSubspaceEmbedding_smul (L : ℕ) (c : ℂ) (v : hhafConfig L → ℂ) :
+    hhafSubspaceEmbedding L (c • v) = c • hhafSubspaceEmbedding L v := by
+  funext σ
+  rw [hhafSubspaceEmbedding, Pi.smul_apply, hhafSubspaceEmbedding]
+  by_cases h : IsHiddenAFMConfig σ
+  · rw [dif_pos h, dif_pos h, Pi.smul_apply]
+  · rw [dif_neg h, dif_neg h, smul_zero]
+
+/-- The **candidate `H_HAF` ground energy**: the minimal eigenvalue of the restricted matrix. -/
+noncomputable def hhafMinEnergy (L : ℕ) : ℝ :=
+  hermitianMinEigenvalue (hhafRestrictedMatrix_isHermitian L)
+
+/-- **The candidate ground energy is a genuine `H_HAF`-restricted eigenvalue** (with a nonzero
+ground state in `H_HAF`): the minimal eigenvalue of the restricted matrix lifts via zero-extension
+to a member of `hhafRealSpectrum`. -/
+theorem hhafMinEnergy_mem_realSpectrum (L : ℕ) : hhafMinEnergy L ∈ hhafRealSpectrum L := by
+  obtain ⟨w, hw_ne, hw_eig⟩ :=
+    exists_nonzero_eigenvector_hermitianMinEigenvalue (hhafRestrictedMatrix_isHermitian L)
+  refine ⟨hhafSubspaceEmbedding L w, hhafSubspaceEmbedding_ne_zero L hw_ne,
+    hhafProjection_mulVec_hhafSubspaceEmbedding L w, ?_⟩
+  rw [hhafRestrictedChainHamiltonianS_mulVec_hhafSubspaceEmbedding, hw_eig,
+    hhafSubspaceEmbedding_smul, hhafMinEnergy]
 
 /-- **Tasaki Proposition 6.5 (the `S = 1` chain on `H_HAF`), AXIOM.**  For an even ring `Fin L`
 (`L > 0`), the spin-`1` antiferromagnetic Heisenberg chain restricted to the
