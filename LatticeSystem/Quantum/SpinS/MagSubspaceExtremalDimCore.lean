@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.MagConfigExtremalCardinality
 import LatticeSystem.Quantum.SpinS.AllAlignedStateCore
 
 /-!
