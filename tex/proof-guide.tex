@@ -18198,7 +18198,10 @@ and
 \texttt{anisotropicHeisenbergS\_case\_ii\_target\_zero\_magnetization\_of\_reachability\_pf\_min\_path}
 replace the lower-level raw-support path inputs by reachability totality plus
 the explicit corner PF/min callbacks.  The reachability-totality bridge in
-\texttt{AnisotropicHeisenbergSpinSCaseIIBlockReachability.lean} lifts
+\texttt{AnisotropicHeisenbergSpinSCaseIIBlockReachabilityCore.lean} (with the
+case-(ii) wrappers in
+\texttt{AnisotropicHeisenbergSpinSCaseIIBlockReachability.lean}; split for build
+speed) lifts
 full-configuration \(\texttt{ParityReachableS}\),
 \(\texttt{IonParityReachableS}\), and \(\texttt{BondParityReachableS}\) paths
 to the corresponding fixed-parity-block relations by parity preservation.  Its
