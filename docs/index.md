@@ -1571,14 +1571,14 @@ upper/lower-bound consumers live in the default Lean build
 | `totalSpinHalfOp{Plus,Minus}_exp_commute_of_commute` | ladder version: `Commute A (Ŝ^±_tot) → Commute A (exp(c • Ŝ^±_tot))` for any `c : ℂ` (useful for U(1) symmetry) | `Quantum/TotalSpin.lean` |
 | `totalSpinHalfRot{1,2,3}_conjTranspose_mul_self` | `(Û^(α)_θ_tot)ᴴ * Û^(α)_θ_tot = 1` (unitarity). Derived from `exp_mem_unitary_of_mem_skewAdjoint` after recognizing `-iθ Ŝ_tot^(α)` as skew-adjoint | `Quantum/TotalSpin.lean` |
 | `totalSpinHalfRot{1,2,3}_conj_eq_self_of_commute` | Tasaki eq. (2.2.13) finite form: `Commute A (Ŝ_tot^(α)) → (Û^(α)_θ_tot)ᴴ * A * Û^(α)_θ_tot = A`. Combines `_commute_of_commute` with unitarity | `Quantum/TotalSpin.lean` |
-| `IsInMagnetizationSubspace` | predicate for the magnetization-`M` eigenspace `H_M` (Tasaki eq. (2.2.9)/(2.2.10)) | `Quantum/MagnetizationSubspace.lean` |
-| `magnetizationSubspace M` | the magnetization-`M` eigenspace as a `Submodule ℂ ((Λ → Fin 2) → ℂ)` | `Quantum/MagnetizationSubspace.lean` |
-| `basisVec_mem_magnetizationSubspace` | `|σ⟩ ∈ H_{|σ|/2}` — basis states lie in their magnetization subspace | `Quantum/MagnetizationSubspace.lean` |
-| `magnetizationSubspace_disjoint` | distinct sectors `H_M ⊓ H_{M'} = ⊥` (`M ≠ M'`) — eigenvalue uniqueness | `Quantum/MagnetizationSubspace.lean` |
-| `iSup_magnetizationSubspace_eq_top` | `⨆_M H_M = ⊤` — every vector decomposes as a sum across sectors | `Quantum/MagnetizationSubspace.lean` |
-| `magnetizationSubspace_eq_eigenspace` | bridge `H_M = (Ŝ_tot^(3) as End).eigenspace M` (used to inherit `iSupIndep`) | `Quantum/MagnetizationSubspace.lean` |
-| `magnetizationSubspace_iSupIndep` | `iSupIndep`: each sector is disjoint from the supremum of all others | `Quantum/MagnetizationSubspace.lean` |
-| `magnetizationSubspace_isInternal` | `DirectSum.IsInternal`: full direct-sum decomposition `H = ⊕_M H_M` (Tasaki eqs. (2.2.9)/(2.2.10)) | `Quantum/MagnetizationSubspace.lean` |
+| `IsInMagnetizationSubspace` | predicate for the magnetization-`M` eigenspace `H_M` (Tasaki eq. (2.2.9)/(2.2.10)) | `Quantum/MagnetizationSubspaceCore.lean` |
+| `magnetizationSubspace M` | the magnetization-`M` eigenspace as a `Submodule ℂ ((Λ → Fin 2) → ℂ)` | `Quantum/MagnetizationSubspaceCore.lean` |
+| `basisVec_mem_magnetizationSubspace` | `|σ⟩ ∈ H_{|σ|/2}` — basis states lie in their magnetization subspace | `Quantum/MagnetizationSubspaceCore.lean` |
+| `magnetizationSubspace_disjoint` | distinct sectors `H_M ⊓ H_{M'} = ⊥` (`M ≠ M'`) — eigenvalue uniqueness | `Quantum/MagnetizationSubspaceCore.lean` |
+| `iSup_magnetizationSubspace_eq_top` | `⨆_M H_M = ⊤` — every vector decomposes as a sum across sectors | `Quantum/MagnetizationSubspaceCore.lean` |
+| `magnetizationSubspace_eq_eigenspace` | bridge `H_M = (Ŝ_tot^(3) as End).eigenspace M` (used to inherit `iSupIndep`) | `Quantum/MagnetizationSubspaceCore.lean` |
+| `magnetizationSubspace_iSupIndep` | `iSupIndep`: each sector is disjoint from the supremum of all others | `Quantum/MagnetizationSubspaceCore.lean` |
+| `magnetizationSubspace_isInternal` | `DirectSum.IsInternal`: full direct-sum decomposition `H = ⊕_M H_M` (Tasaki eqs. (2.2.9)/(2.2.10)) | `Quantum/MagnetizationSubspaceCore.lean` |
 
 ### Two-site spin inner product (Tasaki §2.2 eq. (2.2.16))
 

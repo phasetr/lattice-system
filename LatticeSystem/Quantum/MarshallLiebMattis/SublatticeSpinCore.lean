@@ -1,6 +1,6 @@
 import LatticeSystem.Quantum.TotalSpin
 import LatticeSystem.Quantum.TotalSpin.Casimir
-import LatticeSystem.Quantum.MagnetizationSubspace
+import LatticeSystem.Quantum.MagnetizationSubspaceCore
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedSimpArgs false

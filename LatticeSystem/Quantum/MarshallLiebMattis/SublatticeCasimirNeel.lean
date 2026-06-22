@@ -2,7 +2,7 @@ import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpinDot
 import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeSpinLadderProperties
 import LatticeSystem.Quantum.MarshallLiebMattis.ToyHamiltonianCasimir
 import LatticeSystem.Quantum.NeelState
-import LatticeSystem.Quantum.MagnetizationSubspace
+import LatticeSystem.Quantum.MagnetizationSubspaceCore
 import LatticeSystem.Quantum.MarshallLiebMattis.SublatticeCasimirNeelCore
 
 set_option linter.unusedSectionVars false

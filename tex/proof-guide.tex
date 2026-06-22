@@ -3352,7 +3352,7 @@ yields
 \end{align*}
 where $\mathcal H_{M}$ is the magnetisation-$M$ subspace of Tasaki
 eq.~(2.2.10) (formalised as \texttt{magnetizationSubspace} in
-\texttt{Quantum/MagnetizationSubspace.lean}).  Lean names:
+\texttt{Quantum/MagnetizationSubspaceCore.lean}).  Lean names:
 \texttt{totalSpinHalfOpMinus\_pow\_basisVec\_all\_up\_mem\_magnetizationSubspace}
 and
 \texttt{totalSpinHalfOpPlus\_pow\_basisVec\_all\_down\_mem\_magnetizationSubspace}.
@@ -19349,7 +19349,7 @@ strict bounds; \texttt{Nonempty} instances follow.
 \textbf{Magnetization subspaces form an internal direct sum
 (PR~\#889)}: the spin-`S` analog of the spin-1/2
 \texttt{magnetizationSubspace\_isInternal} (in
-\texttt{Quantum/MagnetizationSubspace.lean}). The new file
+\texttt{Quantum/MagnetizationSubspaceCore.lean}). The new file
 \texttt{Quantum/SpinS/MagnetizationDirectSum.lean} proves
 \texttt{magSubspaceS\_eq\_eigenspace} (bridge to
 \texttt{Module.End.eigenspace} of

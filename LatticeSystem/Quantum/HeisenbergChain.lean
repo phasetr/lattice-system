@@ -2,7 +2,7 @@ import LatticeSystem.Quantum.SpinDot
 import LatticeSystem.Quantum.IsingChain
 import LatticeSystem.Quantum.GibbsState
 import LatticeSystem.Quantum.GibbsState.Covariance
-import LatticeSystem.Quantum.MagnetizationSubspace
+import LatticeSystem.Quantum.MagnetizationSubspaceCore
 import LatticeSystem.Lattice.Graph
 
 /-!
