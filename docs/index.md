@@ -2970,10 +2970,10 @@ fermion mode acting on `ℂ²` with computational basis
 
 | Lean name | Statement | File |
 |---|---|---|
-| `fermionTotalSpinPlus_commutator_fermionTotalSpinMinus` | SU(2) ladder commutator `[Ŝ^+_tot, Ŝ^-_tot] = 2 Ŝ^z_tot` (Tasaki §9.3.3) | `Fermion/JordanWigner/Hubbard/WeakNagaokaTheorem.lean` |
-| `fermionTotalSpinSquared_commute_fermionTotalSpinMinus` | `[(Ŝ_tot)², Ŝ^-_tot] = 0` — the Casimir is constant along the spin-lowering tower | `Fermion/JordanWigner/Hubbard/WeakNagaokaTheorem.lean` |
+| `fermionTotalSpinPlus_commutator_fermionTotalSpinMinus` | SU(2) ladder commutator `[Ŝ^+_tot, Ŝ^-_tot] = 2 Ŝ^z_tot` (Tasaki §9.3.3) | `Fermion/JordanWigner/Hubbard/WeakNagaokaTheoremCore.lean` |
+| `fermionTotalSpinSquared_commute_fermionTotalSpinMinus` | `[(Ŝ_tot)², Ŝ^-_tot] = 0` — the Casimir is constant along the spin-lowering tower | `Fermion/JordanWigner/Hubbard/WeakNagaokaTheoremCore.lean` |
 | `fermionTotalSpinPlus_mul_fermionTotalSpinMinus` | `Ŝ^+_tot Ŝ^-_tot = (Ŝ_tot)² − Ŝ^z_tot(Ŝ^z_tot − 1)` — raising-after-lowering via the Casimir | `Fermion/JordanWigner/Hubbard/WeakNagaokaTheorem.lean` |
-| `fermionTotalSpinZ_mulVec_spinMinusPow` / `fermionTotalSpinSquared_mulVec_spinMinusPow` | `Ŝ^z` / Casimir towers: `(Ŝ^-_tot)^k v` has `Ŝ^z = N/2 − k` and constant Casimir, for any highest-weight `v` | `Fermion/JordanWigner/Hubbard/WeakNagaokaTheorem.lean` |
+| `fermionTotalSpinZ_mulVec_spinMinusPow` / `fermionTotalSpinSquared_mulVec_spinMinusPow` | `Ŝ^z` / Casimir towers: `(Ŝ^-_tot)^k v` has `Ŝ^z = N/2 − k` and constant Casimir, for any highest-weight `v` | `Fermion/JordanWigner/Hubbard/WeakNagaokaTheoremCore.lean` |
 | `spinMinusPow_ne_zero` / `spinMinusPow_linearIndependent` | the `N+1` lowered states `(Ŝ^-_tot)^k v` (`k ≤ N`) are nonzero (ladder eigenvalue `(k+1)(N−k) ≠ 0`) and linearly independent (distinct `Ŝ^z`) | `Fermion/JordanWigner/Hubbard/WeakNagaokaTheorem.lean` |
 | `weakNagaoka_spinMultiplet` | **Theorem 11.5 core**: a nonzero highest-weight `Ĥ_eff`-eigenvector `v` (`Ŝ^+_tot v = 0`, `Ŝ^z_tot v = (N/2) v`) generates `N+1 = 2 S_max + 1` linearly independent `Ĥ_eff`-eigenvectors `(Ŝ^-_tot)^k v` at the same energy, all with `S_tot = S_max = N/2`. | `Fermion/JordanWigner/Hubbard/WeakNagaokaTheorem.lean` |
 | `tasakiEffMatrix` / `tasakiEffMatrixUp` | the Tasaki matrix `M = Tᴴ Ĥ_eff T` of `Ĥ_eff` in the one-hole basis (Hermitian, entries `⟨Φ_q\|Ĥ_eff\|Φ_p⟩`) and its all-up principal block `M_↑` (Hermitian); `Ĥ_eff` preserves the all-up sector | `Fermion/JordanWigner/Hubbard/WeakNagaokaGroundState.lean` |
