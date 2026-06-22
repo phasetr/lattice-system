@@ -2,7 +2,7 @@ import LatticeSystem.Quantum.SpinS.DressedAxisSwapBondReStrictNeg
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapOffDiag
 import LatticeSystem.Quantum.SpinS.DressedAxisSwapPFMatrix
 import LatticeSystem.Quantum.SpinS.HeisenbergRaiseLower
-import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
+import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphCore
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedSimpArgs false

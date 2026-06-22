@@ -6,7 +6,7 @@ import LatticeSystem.Quantum.SpinS.ToyHamiltonianCasimir
 import LatticeSystem.Quantum.SpinS.BasisVecSOrthonormal
 import LatticeSystem.Quantum.SpinS.MagConfig
 import LatticeSystem.Quantum.SpinS.SingleSiteCasimirExpectation
-import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraph
+import LatticeSystem.Quantum.SpinS.BipartiteCompleteGraphCore
 import LatticeSystem.Quantum.SpinS.AllAlignedStateOrthogonal
 import LatticeSystem.Quantum.SpinS.SingleSiteTransverseMeanZero
 import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelCore
