@@ -9263,6 +9263,12 @@ configurations $\sigma\neq\tau$ have $\mathrm{dressed}(\sigma,\tau)\le 0$.  (The
 \texttt{ringCouplingSym\_bipartite} uses that for even $L$ the successor map $a\mapsto(a+1)\bmod L$
 flips parity, so two equal-parity sites are never nearest neighbours,
 via \texttt{Nat.mod\_mod\_of\_dvd}.)
+The dressed matrix is moreover symmetric (\texttt{hhafDressedMatrix\_isSymm}) and its diagonal equals
+the real restricted diagonal (\texttt{hhafDressedMatrix\_diag\_eq}, since the Marshall sign squares to
+$1$), bounded above by the restricted max energy.  Hence for any shift $c\ge$ the max energy the
+matrix $c\,I-M$ has nonnegative entries on an even ring (\texttt{hhafShifted\_entry\_nonneg}) --- the
+nonnegativity hypothesis of \texttt{perronFrobenius\_real\_symmetric}, which (given symmetry and
+irreducibility of $c\,I-M$) yields directly a one-dimensional lowest eigenspace.
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
