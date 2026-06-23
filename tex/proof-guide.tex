@@ -9150,16 +9150,27 @@ antiferromagnetic Heisenberg chain the spectral gap is $O(1/L)$.  We define the 
 $\hat U_{\mathrm{LSM}}=\exp[-i\sum_x\theta_x\hat S_x^{(3)}]$ with $\theta_x=(2\pi/L)x$
 (\texttt{lsmTwistOperator}, eqs.~6.2.2/6.2.3, via \texttt{NormedSpace.exp}) and the trial state
 $\Phi_{\mathrm{LSM}}=\hat U_{\mathrm{LSM}}\Phi_{\mathrm{GS}}$ (\texttt{lsmTrialState}, eq.~6.2.4).
-\emph{Lemma 6.1} (\texttt{lsm\_energy\_bound}, eq.~6.2.5) bounds the trial energy: $\langle
+\emph{Lemma 6.1} (\texttt{lsm\_energy\_bound}, eq.~6.2.5; \textbf{now a proved theorem}, axiom-free,
+\texttt{Quantum/SpinS/LiebSchultzMattisProof.lean}) bounds the trial energy: $\langle
 \Phi_{\mathrm{LSM}},\hat H\Phi_{\mathrm{LSM}}\rangle/\langle\Phi_{\mathrm{LSM}},\Phi_{\mathrm{LSM}}
-\rangle-E_{\mathrm{GS}}\le 8\pi^2S^2/L$ for any $S$.  \emph{Lemma 6.2}
+\rangle-E_{\mathrm{GS}}\le 8\pi^2S^2/L$ for any $S$.  The proof writes $\Delta_+\le\Delta_++\Delta_-=
+\langle\Phi,(\hat U^\dagger\hat H\hat U+\hat U\hat H\hat U^\dagger-2\hat H)\Phi\rangle/\|\Phi\|^2$
+($\Delta_-\ge0$ by the variational principle; the imaginary current cancels in the $\pm\theta$
+average), establishes the per-bond identity $\hat U^\dagger(\hat S_x\!\cdot\!\hat S_y)\hat U+\hat U(
+\hat S_x\!\cdot\!\hat S_y)\hat U^\dagger-2(\hat S_x\!\cdot\!\hat S_y)=2(\cos(\theta_x-\theta_y)-1)\,
+\mathrm{XY}_{xy}$ via $\hat U^\dagger\hat S_x^\pm\hat U=e^{\pm i\theta_x}\hat S_x^\pm$ and
+$\hat U^\dagger\hat S^{(3)}_x\hat S^{(3)}_y\hat U=\hat S^{(3)}_x\hat S^{(3)}_y$ (the longitudinal part
+is twist-invariant), and uses $\cos(\theta_x-\theta_y)=\cos(2\pi/L)$ on every coupled bond,
+$|\langle\mathrm{XY}_b\rangle|\le2S^2\|\Phi\|^2$, and $1-\cos(2\pi/L)\le(2\pi/L)^2/2$ summed over the
+$L$ bonds.  \emph{Lemma 6.2}
 (\texttt{lsm\_ground\_twist\_orthogonal}, eq.~6.2.18): for $N$ odd (half-odd-integer $S$) and the
 unique ground state ($\hat S_{\mathrm{tot}}^{(3)}=0$, with a uniqueness hypothesis \texttt{huniq}),
 $\langle\Phi_{\mathrm{GS}},\Phi_{\mathrm{LSM}}\rangle=0$.  \emph{Theorem 6.3}
 (\texttt{lieb\_schultz\_mattis\_affleck\_lieb}, eq.~6.2.19): for $N$ odd and even $L$ there is a
 positive spectral gap (\texttt{IsPositiveSpectralGap} of §6.1) bounded by $8\pi^2S^2/L$, so a
 half-odd-integer chain can never have both a unique ground state and a nonvanishing gap --- the
-rigorous half of the Haldane conjecture.  These deep finite-volume spectral results are recorded as
+rigorous half of the Haldane conjecture.  Lemma 6.1 is now discharged (a proved theorem); the
+remaining deep finite-volume spectral results (Lemmas 6.2 and Theorem 6.3) are recorded as
 documented axioms.  Chapters~3--10 backfill.
 
 \medskip
