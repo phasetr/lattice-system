@@ -115,4 +115,82 @@ theorem chainTranslation_conj_onSiteS (L N : ℕ) (i : Fin L)
   · rw [if_pos (hpred.mpr hc), if_pos hc, chainConfigShiftEquiv_apply, chainConfigShiftEquiv_apply]
   · rw [if_neg (fun h => hc (hpred.mp h)), if_neg hc]
 
+/-- **Conjugation is multiplicative** (`T̂` is unitary): `T̂† (A B) T̂ = (T̂† A T̂)(T̂† B T̂)`. -/
+theorem chainTranslation_conj_mul (L N : ℕ) (A B : ManyBodyOpS (Fin L) N) :
+    (chainTranslationOp L N).conjTranspose * (A * B) * chainTranslationOp L N =
+      ((chainTranslationOp L N).conjTranspose * A * chainTranslationOp L N) *
+        ((chainTranslationOp L N).conjTranspose * B * chainTranslationOp L N) := by
+  calc (chainTranslationOp L N).conjTranspose * (A * B) * chainTranslationOp L N
+      = (chainTranslationOp L N).conjTranspose * A *
+          (chainTranslationOp L N * (chainTranslationOp L N).conjTranspose) *
+          (B * chainTranslationOp L N) := by
+        rw [chainTranslationOp_unitary']; noncomm_ring
+    _ = ((chainTranslationOp L N).conjTranspose * A * chainTranslationOp L N) *
+          ((chainTranslationOp L N).conjTranspose * B * chainTranslationOp L N) := by
+        noncomm_ring
+
+/-- **Translation conjugation shifts both sites of a two-site dot product**:
+`T̂† (Ŝ_x · Ŝ_y) T̂ = Ŝ_{x+1} · Ŝ_{y+1}`. -/
+theorem chainTranslation_conj_spinSDot (L N : ℕ) (x y : Fin L) :
+    (chainTranslationOp L N).conjTranspose * spinSDot x y N * chainTranslationOp L N =
+      spinSDot (finRotate L x) (finRotate L y) N := by
+  rw [spinSDot_def, spinSDot_def]
+  simp only [Matrix.mul_add, Matrix.add_mul, chainTranslation_conj_mul,
+    chainTranslation_conj_onSiteS]
+
+/-- `(finRotate L z).val = (z.val + 1) % L` (cyclic successor on the ring). -/
+theorem val_finRotate (L : ℕ) (z : Fin L) : (finRotate L z).val = (z.val + 1) % L := by
+  obtain ⟨n, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (Fin.pos z).ne'
+  rw [finRotate_succ_apply, Fin.val_add_one]
+  split_ifs with h
+  · subst h; simp [Fin.val_last]
+  · rw [Nat.mod_eq_of_lt (by have := Fin.val_lt_last h; omega)]
+
+/-- **The ring coupling is translation invariant**: shifting both endpoints by the cyclic
+successor preserves the nearest-neighbor coupling. -/
+theorem ringCoupling_finRotate (L : ℕ) (x y : Fin L) :
+    ringCoupling L (finRotate L x) (finRotate L y) = ringCoupling L x y := by
+  unfold ringCoupling
+  rw [val_finRotate, val_finRotate]
+  have hiff : ((y.val + 1) % L = ((x.val + 1) % L + 1) % L) ↔ (y.val = (x.val + 1) % L) := by
+    constructor
+    · intro h
+      have hm : y.val ≡ (x.val + 1) % L [MOD L] := Nat.ModEq.add_right_cancel' 1 h
+      rwa [Nat.ModEq, Nat.mod_eq_of_lt y.isLt, Nat.mod_mod_of_dvd _ dvd_rfl] at hm
+    · intro h; rw [h]
+  simp only [hiff]
+
+/-- **The translation commutes with the AFM Heisenberg chain Hamiltonian**: `T̂ Ĥ = Ĥ T̂`. -/
+theorem chainTranslation_commute_hamiltonian (L N : ℕ) :
+    chainTranslationOp L N * afmHeisenbergChainHamiltonianS L N =
+      afmHeisenbergChainHamiltonianS L N * chainTranslationOp L N := by
+  have hconj : (chainTranslationOp L N).conjTranspose * afmHeisenbergChainHamiltonianS L N *
+      chainTranslationOp L N = afmHeisenbergChainHamiltonianS L N := by
+    unfold afmHeisenbergChainHamiltonianS heisenbergHamiltonianS
+    have key : ∀ x y : Fin L, (chainTranslationOp L N).conjTranspose *
+          (ringCoupling L x y • spinSDot x y N) * chainTranslationOp L N =
+        ringCoupling L x y • spinSDot (finRotate L x) (finRotate L y) N := by
+      intro x y
+      rw [Matrix.mul_smul, Matrix.smul_mul, chainTranslation_conj_spinSDot]
+    rw [show (chainTranslationOp L N).conjTranspose *
+          (∑ x : Fin L, ∑ y : Fin L, ringCoupling L x y • spinSDot x y N) *
+          chainTranslationOp L N =
+        ∑ x : Fin L, ∑ y : Fin L, (chainTranslationOp L N).conjTranspose *
+          (ringCoupling L x y • spinSDot x y N) * chainTranslationOp L N from by
+        simp only [Finset.mul_sum, Finset.sum_mul]]
+    rw [Finset.sum_congr rfl (fun x _ => Finset.sum_congr rfl (fun y _ => key x y))]
+    rw [Finset.sum_congr rfl (fun x _ => Finset.sum_congr rfl (fun y _ => by
+      rw [← ringCoupling_finRotate L x y]))]
+    rw [Finset.sum_congr rfl (fun x _ => (Equiv.sum_comp (finRotate L)
+      (fun b => ringCoupling L (finRotate L x) b • spinSDot (finRotate L x) b N)))]
+    rw [Equiv.sum_comp (finRotate L)
+      (fun a => ∑ b : Fin L, ringCoupling L a b • spinSDot a b N)]
+  calc chainTranslationOp L N * afmHeisenbergChainHamiltonianS L N
+      = chainTranslationOp L N * ((chainTranslationOp L N).conjTranspose *
+          afmHeisenbergChainHamiltonianS L N * chainTranslationOp L N) := by rw [hconj]
+    _ = (chainTranslationOp L N * (chainTranslationOp L N).conjTranspose) *
+          afmHeisenbergChainHamiltonianS L N * chainTranslationOp L N := by noncomm_ring
+    _ = afmHeisenbergChainHamiltonianS L N * chainTranslationOp L N := by
+        rw [chainTranslationOp_unitary', Matrix.one_mul]
+
 end LatticeSystem.Quantum
