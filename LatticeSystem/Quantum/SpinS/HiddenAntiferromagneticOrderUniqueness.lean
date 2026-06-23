@@ -1539,4 +1539,67 @@ theorem hhaf_magSumS_eq_L_of_even {L : ℕ} (σ : hhafConfig L) (heven : Even (p
   rw [← magSumS_eq_of_hhafReachable (hhaf_reachable_canonical σ heven)]
   simp [magSumS_def, hhafCanonical]
 
+/-! ## Block structure of the restricted matrix by magnetization sector -/
+
+/-- The restricted matrix is **block-diagonal by total magnetization**: entries between
+configurations of different `magSumS` vanish (magnetization conservation of the Heisenberg
+Hamiltonian). -/
+theorem hhafRestrictedMatrix_eq_zero_of_magSumS_ne {L : ℕ} {σ τ : hhafConfig L}
+    (h : magSumS σ.1 ≠ magSumS τ.1) : hhafRestrictedMatrix L σ τ = 0 := by
+  rw [hhafRestrictedMatrix, Matrix.submatrix_apply, afmHeisenbergChainHamiltonianS]
+  exact heisenbergHamiltonianS_apply_eq_zero_of_magSumS_ne (ringCoupling L) 2 (Ne.symm h)
+
+/-- The **`P`-slice** of the restricted matrix (its submatrix on `{σ // P σ}`). -/
+noncomputable def hhafRestrictedMatrixSlice {L : ℕ} (P : hhafConfig L → Prop) [DecidablePred P] :
+    Matrix {σ : hhafConfig L // P σ} {σ : hhafConfig L // P σ} ℂ :=
+  (hhafRestrictedMatrix L).submatrix Subtype.val Subtype.val
+
+/-- **Block restriction**: if the restricted matrix has no coupling from a `P`-configuration to a
+non-`P`-configuration, then a full eigenvector restricted to the `P`-slice is an eigenvector of the
+`P`-slice with the same eigenvalue. -/
+theorem hhafRestrictedMatrixSlice_mulVec_of_full_eigen {L : ℕ} (P : hhafConfig L → Prop)
+    [DecidablePred P] (hclosed : ∀ σ τ, P σ → ¬ P τ → hhafRestrictedMatrix L σ τ = 0)
+    {E : ℂ} {w : hhafConfig L → ℂ}
+    (hw : (hhafRestrictedMatrix L).mulVec w = E • w) :
+    (hhafRestrictedMatrixSlice P).mulVec (fun σ => w σ.1) = E • (fun σ => w σ.1) := by
+  classical
+  funext σ
+  have hfull : ∑ τ : hhafConfig L, hhafRestrictedMatrix L σ.1 τ * w τ = E * w σ.1 := by
+    have := congrFun hw σ.1
+    rwa [Matrix.mulVec, Pi.smul_apply, smul_eq_mul] at this
+  rw [Pi.smul_apply, smul_eq_mul, ← hfull]
+  -- split the full sum into the `P` part and the (vanishing) non-`P` part
+  rw [← Finset.sum_filter_add_sum_filter_not Finset.univ P
+    (fun τ => hhafRestrictedMatrix L σ.1 τ * w τ)]
+  have hnot : ∑ τ ∈ Finset.univ.filter (fun τ => ¬ P τ),
+      hhafRestrictedMatrix L σ.1 τ * w τ = 0 :=
+    Finset.sum_eq_zero fun τ hτ => by
+      rw [hclosed σ.1 τ σ.2 (Finset.mem_filter.mp hτ).2, zero_mul]
+  rw [hnot, add_zero]
+  -- the `P`-slice mulVec is the sum over the `P`-subtype
+  change (∑ τ : {σ : hhafConfig L // P σ}, hhafRestrictedMatrix L σ.1 τ.1 * w τ.1) = _
+  exact (Finset.sum_subtype (Finset.univ.filter P)
+    (fun x => by simp) (fun τ => hhafRestrictedMatrix L σ.1 τ * w τ)).symm
+
+/-- The **single-`±` slice is block-closed**: a single-`±` configuration (`pmCount = 1`, total
+magnetization `L ± 1`) has no coupling to a non-single-`±` configuration (which, by the
+classification, has even `pmCount` hence magnetization `L`). -/
+theorem hhafRestrictedMatrix_pmCount_one_block_closed {L : ℕ}
+    (σ τ : hhafConfig L) (hσ : pmCount L σ = 1) (hτ : ¬ pmCount L τ = 1) :
+    hhafRestrictedMatrix L σ τ = 0 := by
+  have hτeven : Even (pmCount L τ) := (hhaf_pmCount_eq_one_or_even τ).resolve_left hτ
+  refine hhafRestrictedMatrix_eq_zero_of_magSumS_ne ?_
+  rw [hhaf_magSumS_eq_L_of_even τ hτeven]
+  exact hhaf_magSumS_ne_L_of_pmCount_one σ hσ
+
+/-- The **balanced slice is block-closed**: an even-`pmCount` configuration (magnetization `L`) has
+no coupling to an odd-`pmCount` (i.e. `pmCount = 1`, magnetization `L ± 1`) configuration. -/
+theorem hhafRestrictedMatrix_even_block_closed {L : ℕ}
+    (σ τ : hhafConfig L) (hσ : Even (pmCount L σ)) (hτ : ¬ Even (pmCount L τ)) :
+    hhafRestrictedMatrix L σ τ = 0 := by
+  have hτ1 : pmCount L τ = 1 := (hhaf_pmCount_eq_one_or_even τ).resolve_right hτ
+  refine hhafRestrictedMatrix_eq_zero_of_magSumS_ne ?_
+  rw [hhaf_magSumS_eq_L_of_even σ hσ]
+  exact (hhaf_magSumS_ne_L_of_pmCount_one τ hτ1).symm
+
 end LatticeSystem.Quantum
