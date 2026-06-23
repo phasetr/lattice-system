@@ -9,6 +9,7 @@ import LatticeSystem.Math.HermitianMaxEigenvalue
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorMarshallCore
 import LatticeSystem.Quantum.SpinS.DressedHeisenbergRaiseLowerCore
 import LatticeSystem.Quantum.SpinS.RaiseLower
+import LatticeSystem.Math.PerronFrobeniusSymmetric
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Analysis.Matrix.Order
 import Mathlib.Analysis.Matrix.Spectrum
@@ -1640,6 +1641,39 @@ theorem hhafShiftedMatrix0_isIrreducible (L : ℕ) (hLeven : Even L)
       rw [pow_zero, Matrix.one_apply_ne hστ] at hk
       exact absurd hk (lt_irrefl 0)
     · exact hkpos
+
+/-- The **dressed restricted matrix on the balanced sector** (the submatrix of `hhafDressedMatrix`
+on `hhafConfig0`). -/
+noncomputable def hhafDressedMatrix0 (L : ℕ) : Matrix (hhafConfig0 L) (hhafConfig0 L) ℝ :=
+  (hhafDressedMatrix L).submatrix Subtype.val Subtype.val
+
+/-- The balanced-sector dressed matrix is symmetric. -/
+theorem hhafDressedMatrix0_isSymm (L : ℕ) : (hhafDressedMatrix0 L).IsSymm :=
+  (hhafDressedMatrix_isSymm L).submatrix Subtype.val
+
+/-- The balanced-sector shifted matrix is `c·I − M₀` (the identity restricts since `Subtype.val` is
+injective). -/
+theorem hhafShiftedMatrix0_eq (L : ℕ) (c : ℝ) :
+    hhafShiftedMatrix0 L c =
+      c • (1 : Matrix (hhafConfig0 L) (hhafConfig0 L) ℝ) - hhafDressedMatrix0 L := by
+  ext σ τ
+  simp only [hhafShiftedMatrix0, hhafDressedMatrix0, Matrix.submatrix_apply, Matrix.sub_apply,
+    Matrix.smul_apply, smul_eq_mul, Matrix.one_apply, Subtype.val_inj]
+
+/-- **Unique balanced-sector ground state (Perron–Frobenius).**  For an even ring, the
+balanced-sector dressed matrix has a strictly positive lowest eigenvector with a one-dimensional
+eigenspace — the unique ground state of the antiferromagnetic chain within the balanced (charge-`0`)
+sector of `H_HAF`. -/
+theorem hhafDressedMatrix0_ground_finrank_le_one (L : ℕ) (hLeven : Even L) :
+    ∃ (μ : ℝ) (v : hhafConfig0 L → ℝ), (∀ i, 0 < v i) ∧
+      (hhafDressedMatrix0 L).mulVec v = μ • v ∧
+      (∀ (lam : ℝ) (w : hhafConfig0 L → ℝ), w ≠ 0 →
+        (hhafDressedMatrix0 L).mulVec w = lam • w → μ ≤ lam) ∧
+      Module.finrank ℝ (Module.End.eigenspace (Matrix.toLin' (hhafDressedMatrix0 L)) μ) ≤ 1 := by
+  apply LatticeSystem.Math.perronFrobenius_real_symmetric (hhafDressedMatrix0 L)
+    (hhafDressedMatrix0_isSymm L) (hhafMaxEnergy L + 1)
+  rw [← hhafShiftedMatrix0_eq]
+  exact hhafShiftedMatrix0_isIrreducible L hLeven (by linarith)
 
 /-! ## Per-`L` exponential decay of the correlation -/
 
