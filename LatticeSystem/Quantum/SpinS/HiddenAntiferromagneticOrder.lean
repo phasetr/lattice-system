@@ -1067,6 +1067,51 @@ theorem notInCyclicOpen_succ {L : ℕ} {a b x y : Fin L}
   simp only [InCyclicOpen] at hnb ⊢
   rcases succ_val_cases hb with hbe | ⟨hbe, hL⟩ <;> split_ifs at hnb ⊢ <;> omega
 
+/-- **Successor membership equivalence**: if `b` is the cyclic successor of `a` and both differ from
+the endpoints `x, y`, then `a` and `b` are in the open arc `(x, y)` together or not at all. -/
+theorem inCyclicOpen_succ_iff_mem {L : ℕ} {a b x y : Fin L}
+    (hb : b.val = (a.val + 1) % L) (hax : a ≠ x) (hay : a ≠ y) (hbx : b ≠ x) (hby : b ≠ y) :
+    InCyclicOpen x y a ↔ InCyclicOpen x y b := by
+  have haxv : a.val ≠ x.val := fun hc => hax (Fin.ext hc)
+  have hayv : a.val ≠ y.val := fun hc => hay (Fin.ext hc)
+  have hbxv : b.val ≠ x.val := fun hc => hbx (Fin.ext hc)
+  have hbyv : b.val ≠ y.val := fun hc => hby (Fin.ext hc)
+  have ha := a.isLt; have hbv := b.isLt; have hxv := x.isLt; have hyv := y.isLt
+  simp only [InCyclicOpen]
+  rcases succ_val_cases hb with hbe | ⟨hbe, hL⟩ <;> split_ifs <;> omega
+
+/-- **Sub-arc inclusion** (shared left endpoint): if `a` is in the open arc `(x, y)`, then the open
+arc `(x, a)` is contained in `(x, y)`. -/
+theorem inCyclicOpen_sub_left {L : ℕ} {a x y z : Fin L}
+    (ha : InCyclicOpen x y a) (h : InCyclicOpen x a z) : InCyclicOpen x y z := by
+  have hav := a.isLt; have hxv := x.isLt; have hyv := y.isLt; have hzv := z.isLt
+  simp only [InCyclicOpen] at ha h ⊢
+  split_ifs at ha h ⊢ <;> omega
+
+/-- **Sub-arc inclusion** (shared right endpoint): if `b` is in the open arc `(x, y)`, then the open
+arc `(b, y)` is contained in `(x, y)`. -/
+theorem inCyclicOpen_sub_right {L : ℕ} {b x y z : Fin L}
+    (hb : InCyclicOpen x y b) (h : InCyclicOpen b y z) : InCyclicOpen x y z := by
+  have hbv := b.isLt; have hxv := x.isLt; have hyv := y.isLt; have hzv := z.isLt
+  simp only [InCyclicOpen] at hb h ⊢
+  split_ifs at hb h ⊢ <;> omega
+
+/-- The cyclic successor of the right endpoint is not in the open arc `(x, a)`. -/
+theorem notInCyclicOpen_succ_right {L : ℕ} {a b x : Fin L}
+    (hb : b.val = (a.val + 1) % L) (hax : x ≠ a) : ¬ InCyclicOpen x a b := by
+  have hxav : x.val ≠ a.val := fun hc => hax (Fin.ext hc)
+  have ha := a.isLt; have hbv := b.isLt; have hxv := x.isLt
+  simp only [InCyclicOpen]
+  rcases succ_val_cases hb with hbe | ⟨hbe, hL⟩ <;> split_ifs <;> omega
+
+/-- The cyclic predecessor of the left endpoint is not in the open arc `(b, y)`. -/
+theorem notInCyclicOpen_pred_left {L : ℕ} {a b y : Fin L}
+    (hb : b.val = (a.val + 1) % L) (hyb : y ≠ b) : ¬ InCyclicOpen b y a := by
+  have hybv : y.val ≠ b.val := fun hc => hyb (Fin.ext hc)
+  have ha := a.isLt; have hbv := b.isLt; have hyv := y.isLt
+  simp only [InCyclicOpen]
+  rcases succ_val_cases hb with hbe | ⟨hbe, hL⟩ <;> split_ifs <;> omega
+
 /-- **Slide move** (raw configuration): move the spin at site `a` onto the site `b`, leaving a `0`
 behind at `a`.  When `a` carries a `±` spin and `b` (its cyclic neighbour) carries a `0`, this
 slides the `±` spin one step along the ring. -/
@@ -1200,6 +1245,65 @@ theorem annihPM_isRaiseLowerStep {L : ℕ} (σ : Fin L → Fin 3) {a b : Fin L} 
     rcases hva with hva | hva <;> rcases hvb with hvb | hvb <;> simp_all
   · intro k hka hkb
     rw [annihPM_apply σ hab k, if_neg (by tauto)]
+
+/-- **The annihilation move preserves hidden antiferromagnetic order.**  Removing an adjacent,
+opposite-sign `+,−` pair keeps the strict alternation: each `IsNextPM` pair of the annihilated
+configuration either lies entirely off the removed pair (so it is already an `IsNextPM` pair of
+`σ`), or straddles it, in which case the removed `a`, `b` are the only `±` sites between the
+endpoints, and the endpoints inherit opposite signs through the chain `x, a, b, y`. -/
+theorem annihPM_isHiddenAFM {L : ℕ} {σ : Fin L → Fin 3} (hσ : IsHiddenAFMConfig σ)
+    {a b : Fin L} (hab : a ≠ b) (hbv : b.val = (a.val + 1) % L)
+    (ha : σ a ≠ 1) (hb1 : σ b ≠ 1) (hne : σ a ≠ σ b) :
+    IsHiddenAFMConfig (annihPM σ a b) := by
+  intro x y hxy
+  obtain ⟨hxny, hpmx, hpmy, harc⟩ := hxy
+  simp only [IsPM] at hpmx hpmy
+  have hτa : annihPM σ a b a = 1 := by rw [annihPM_apply σ hab a, if_pos (Or.inl rfl)]
+  have hτb : annihPM σ a b b = 1 := by rw [annihPM_apply σ hab b, if_pos (Or.inr rfl)]
+  have hxa : x ≠ a := fun h => hpmx (by rw [h, hτa])
+  have hxb : x ≠ b := fun h => hpmx (by rw [h, hτb])
+  have hya : y ≠ a := fun h => hpmy (by rw [h, hτa])
+  have hyb : y ≠ b := fun h => hpmy (by rw [h, hτb])
+  have hvo : ∀ w, w ≠ a → w ≠ b → annihPM σ a b w = σ w := fun w hwa hwb => by
+    rw [annihPM_apply σ hab w, if_neg (by tauto)]
+  have hpx : σ x ≠ 1 := by have h := hpmx; rw [hvo x hxa hxb] at h; exact h
+  have hpy : σ y ≠ 1 := by have h := hpmy; rw [hvo y hya hyb] at h; exact h
+  rw [hvo x hxa hxb, hvo y hya hyb]
+  by_cases hain : InCyclicOpen x y a
+  · -- a (hence b) lies between x and y: the chain x, a, b, y
+    have hbin : InCyclicOpen x y b :=
+      (inCyclicOpen_succ_iff_mem hbv hxa.symm hya.symm hxb.symm hyb.symm).mp hain
+    have hxsa : σ x ≠ σ a := by
+      refine hσ x a ⟨hxa, hpx, ha, ?_⟩
+      intro z hz
+      have hzna : z ≠ a := fun h => not_inCyclicOpen_self_right x a (h ▸ hz)
+      have hznb : z ≠ b := fun h => notInCyclicOpen_succ_right hbv hxa (h ▸ hz)
+      rw [← hvo z hzna hznb]; exact harc z (inCyclicOpen_sub_left hain hz)
+    have hbsy : σ b ≠ σ y := by
+      refine hσ b y ⟨fun h => hyb h.symm, hb1, hpy, ?_⟩
+      intro z hz
+      have hznb : z ≠ b := fun h => not_inCyclicOpen_self_left b y (h ▸ hz)
+      have hzna : z ≠ a := fun h => notInCyclicOpen_pred_left hbv hyb (h ▸ hz)
+      rw [← hvo z hzna hznb]; exact harc z (inCyclicOpen_sub_right hbin hz)
+    intro heq
+    have h1 : (σ x).val ≠ 1 := fun h => hpx (Fin.ext h)
+    have h2 : (σ a).val ≠ 1 := fun h => ha (Fin.ext h)
+    have h3 : (σ b).val ≠ 1 := fun h => hb1 (Fin.ext h)
+    have h4 : (σ y).val ≠ 1 := fun h => hpy (Fin.ext h)
+    have e1 : (σ x).val ≠ (σ a).val := fun h => hxsa (Fin.ext h)
+    have e2 : (σ b).val ≠ (σ y).val := fun h => hbsy (Fin.ext h)
+    have e3 : (σ a).val ≠ (σ b).val := fun h => hne (Fin.ext h)
+    have e4 : (σ x).val = (σ y).val := congrArg Fin.val heq
+    have := (σ x).isLt; have := (σ a).isLt; have := (σ b).isLt; have := (σ y).isLt
+    omega
+  · -- neither a nor b is between x and y: directly an `IsNextPM` pair of `σ`
+    have hbout : ¬ InCyclicOpen x y b := fun hbi =>
+      hain ((inCyclicOpen_succ_iff_mem hbv hxa.symm hya.symm hxb.symm hyb.symm).mpr hbi)
+    refine hσ x y ⟨hxny, hpx, hpy, ?_⟩
+    intro z hz
+    have hzna : z ≠ a := fun h => hain (h ▸ hz)
+    have hznb : z ≠ b := fun h => hbout (h ▸ hz)
+    rw [← hvo z hzna hznb]; exact harc z hz
 
 /-- The **number of `±` (nonzero) spins** in a hidden-AFM configuration — the induction measure for
 the kink reduction (each annihilation removes a `+,−` pair, decreasing it by `2`). -/
