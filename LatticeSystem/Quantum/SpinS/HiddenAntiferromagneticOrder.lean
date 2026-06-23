@@ -1324,6 +1324,54 @@ theorem pmCount_eq_zero_iff (L : ℕ) (σ : hhafConfig L) :
     rw [h]
     simp [hhafCanonical]
 
+/-- The annihilation move as a single step on the hidden-AFM subtype. -/
+theorem annihPM_isRaiseLowerStepSHhaf {L : ℕ} (σ : hhafConfig L) {a b : Fin L} (hab : a ≠ b)
+    (hbv : b.val = (a.val + 1) % L) (ha : σ.1 a ≠ 1) (hb1 : σ.1 b ≠ 1) (hne : σ.1 a ≠ σ.1 b) :
+    RaiseLowerStepSHhaf L σ ⟨annihPM σ.1 a b, annihPM_isHiddenAFM σ.2 hab hbv ha hb1 hne⟩ :=
+  annihPM_isRaiseLowerStep σ.1 hab hbv ha hb1 hne
+
+/-- Sliding a `±` spin onto an adjacent `0` preserves the number of `±` spins (the `±` at `p` is
+removed, but a new one appears at `s`). -/
+theorem slidePM_pmCount_card {L : ℕ} (σ : Fin L → Fin 3) {p s : Fin L} (hps : p ≠ s)
+    (hp : σ p ≠ 1) (hs : σ s = 1) :
+    (Finset.univ.filter (fun x => slidePM σ p s x ≠ 1)).card =
+      (Finset.univ.filter (fun x => σ x ≠ 1)).card := by
+  have hpmem : p ∈ Finset.univ.filter (fun x => σ x ≠ 1) :=
+    Finset.mem_filter.mpr ⟨Finset.mem_univ p, hp⟩
+  have hsnotmem : s ∉ (Finset.univ.filter (fun x => σ x ≠ 1)).erase p := by
+    simp only [Finset.mem_erase, Finset.mem_filter, Finset.mem_univ, true_and, hs]
+    tauto
+  have hset : (Finset.univ.filter (fun x => slidePM σ p s x ≠ 1)) =
+      insert s ((Finset.univ.filter (fun x => σ x ≠ 1)).erase p) := by
+    ext x
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert, Finset.mem_erase]
+    rw [slidePM_apply σ hps x]
+    by_cases hxs : x = s
+    · subst hxs; simp [hp, Ne.symm hps]
+    · by_cases hxp : x = p
+      · subst hxp; simp [hps]
+      · simp [hxs, hxp]
+  rw [hset, Finset.card_insert_of_notMem hsnotmem, Finset.card_erase_of_mem hpmem]
+  have : 1 ≤ (Finset.univ.filter (fun x => σ x ≠ 1)).card := Finset.card_pos.mpr ⟨p, hpmem⟩
+  omega
+
+/-- Annihilating a `±` pair strictly decreases the number of `±` spins. -/
+theorem annihPM_pmCount_card_lt {L : ℕ} (σ : Fin L → Fin 3) {a b : Fin L} (hab : a ≠ b)
+    (ha : σ a ≠ 1) :
+    (Finset.univ.filter (fun x => annihPM σ a b x ≠ 1)).card <
+      (Finset.univ.filter (fun x => σ x ≠ 1)).card := by
+  apply Finset.card_lt_card
+  rw [Finset.ssubset_iff_of_subset]
+  · refine ⟨a, Finset.mem_filter.mpr ⟨Finset.mem_univ a, ha⟩, ?_⟩
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, not_not]
+    rw [annihPM_apply σ hab a, if_pos (Or.inl rfl)]
+  · intro x hx
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hx ⊢
+    rw [annihPM_apply σ hab x] at hx
+    by_cases h : x = a ∨ x = b
+    · simp [h] at hx
+    · rw [if_neg h] at hx; exact hx
+
 /-! ## Per-`L` exponential decay of the correlation -/
 
 /-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring
