@@ -2,6 +2,8 @@ import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder
 import LatticeSystem.Math.PerronFrobeniusSymmetric
 import LatticeSystem.Quantum.SpinS.GaugeEigenspaceFinrank
 import LatticeSystem.Quantum.SpinS.RealComplexEigenspaceBridge
+import LatticeSystem.Quantum.SpinS.HermitianMinLeOfEigenvector
+import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import Mathlib.LinearAlgebra.Matrix.Gershgorin
 
 /-!
@@ -1747,5 +1749,243 @@ theorem hhafRestrictedMatrix_mulVec_hhafSliceExtend {L : ℕ} (P : hhafConfig L 
     rfl
   · rw [hhafSliceExtend, dif_neg hσ, mul_zero]
     exact Finset.sum_eq_zero fun τ _ => by rw [hclosed' σ τ.1 hσ τ.2, zero_mul]
+
+/-- **Consolidated balanced ground data** (a single `μ`): the balanced Perron–Frobenius energy
+`μ < −L` is the minimal eigenvalue of the complex balanced block, that block's `μ`-eigenspace is
+one-dimensional, and `μ` is realised by a nonzero eigenvector. -/
+theorem hhafRestrictedMatrix_balanced_ground (L : ℕ) (hLeven : Even L) (hL : 2 ≤ L) :
+    ∃ μ : ℝ, μ < -(L : ℝ) ∧
+      Module.finrank ℂ (Module.End.eigenspace (Matrix.toLin'
+        ((hhafRestrictedMatrix L).submatrix (Subtype.val : hhafConfig0 L → hhafConfig L)
+          Subtype.val)) (μ : ℂ)) ≤ 1 ∧
+      (∀ (lam : ℝ) (u : hhafConfig0 L → ℂ), u ≠ 0 →
+        ((hhafRestrictedMatrix L).submatrix (Subtype.val : hhafConfig0 L → hhafConfig L)
+          Subtype.val).mulVec u = (lam : ℂ) • u → μ ≤ lam) ∧
+      ∃ w : hhafConfig0 L → ℂ, w ≠ 0 ∧
+        ((hhafRestrictedMatrix L).submatrix (Subtype.val : hhafConfig0 L → hhafConfig L)
+          Subtype.val).mulVec w = (μ : ℂ) • w := by
+  obtain ⟨μ, v, hvpos, hMv, hmin, hfin⟩ := hhafDressedMatrix0_ground_finrank_le_one L hLeven
+  have hΘsq := hhafMarshallDiag0_mul_self L
+  have hΘinj : Function.Injective (hhafMarshallDiag0 L).mulVec := fun a b hab => by
+    have := congrArg (hhafMarshallDiag0 L).mulVec hab
+    rwa [Matrix.mulVec_mulVec, hΘsq, Matrix.one_mulVec, Matrix.mulVec_mulVec, hΘsq,
+      Matrix.one_mulVec] at this
+  have hreal0_dressed : hhafRestrictedMatrixReal0 L * hhafMarshallDiag0 L =
+      hhafMarshallDiag0 L * hhafDressedMatrix0 L := by
+    rw [hhafDressedMatrix0_eq_conj, ← Matrix.mul_assoc, ← Matrix.mul_assoc, hΘsq, Matrix.one_mul]
+  have hdressed_real0 : hhafDressedMatrix0 L * hhafMarshallDiag0 L =
+      hhafMarshallDiag0 L * hhafRestrictedMatrixReal0 L := by
+    rw [hhafDressedMatrix0_eq_conj, Matrix.mul_assoc, hΘsq, Matrix.mul_one]
+  have hmin_real0 : ∀ (lam : ℝ) (u : hhafConfig0 L → ℝ), u ≠ 0 →
+      (hhafRestrictedMatrixReal0 L).mulVec u = lam • u → μ ≤ lam := by
+    intro lam u hu hueig
+    refine hmin lam ((hhafMarshallDiag0 L).mulVec u)
+      (fun h => hu (hΘinj (by rw [h, Matrix.mulVec_zero]))) ?_
+    rw [Matrix.mulVec_mulVec, hdressed_real0, ← Matrix.mulVec_mulVec, hueig, Matrix.mulVec_smul]
+  refine ⟨μ, hhafDressedMatrix0_ground_lt_neg_L L hLeven hL hvpos hMv, ?_, ?_, ?_⟩
+  · rw [hhafRestrictedMatrix_submatrix0_eq_map]
+    apply matrix_complex_eigenspace_finrank_le_one_of_real
+    rw [← matrix_similar_eigenspace_finrank_eq hΘsq hΘsq (hhafDressedMatrix0_eq_conj L) μ]
+    exact hfin
+  · intro lam u hu hueig
+    rw [hhafRestrictedMatrix_submatrix0_eq_map] at hueig
+    by_cases hure : (fun i => (u i).re) = 0
+    · have huim : (fun i => (u i).im) ≠ 0 := fun hh => hu (funext fun i =>
+        Complex.ext (congrFun hure i) (congrFun hh i))
+      exact hmin_real0 lam _ huim (matrix_eigenvec_im_of_complex hueig)
+    · exact hmin_real0 lam _ hure (matrix_eigenvec_re_of_complex hueig)
+  · refine ⟨(fun i => (((hhafMarshallDiag0 L).mulVec v) i : ℂ)), ?_, ?_⟩
+    · intro h
+      have hΘv0 : (hhafMarshallDiag0 L).mulVec v = 0 := by
+        funext i; have := congrFun h i; simpa using this
+      have hv0 : v = 0 := hΘinj (by rw [hΘv0, Matrix.mulVec_zero])
+      obtain ⟨i⟩ := (inferInstance : Nonempty (hhafConfig0 L))
+      exact absurd (hv0 ▸ hvpos i) (lt_irrefl 0)
+    · rw [hhafRestrictedMatrix_submatrix0_eq_map]
+      apply matrix_eigenvec_map_ofReal
+      rw [Matrix.mulVec_mulVec, hreal0_dressed, ← Matrix.mulVec_mulVec, hMv, Matrix.mulVec_smul]
+
+/-- **The `H_HAF`-restricted ground eigenspace is one-dimensional** — the unique-ground-state core
+of Tasaki §6.3 Proposition 6.5.  At the ground energy `E = hhafMinEnergy < −2`, the single-`±` block
+is
+vacated (its eigenvalues are `≥ −2`) and the balanced block contributes the one-dimensional
+Perron–Frobenius ground state. -/
+theorem hhafRestrictedMatrix_ground_finrank_le_one (L : ℕ) (hLeven : Even L) (hL : 2 ≤ L) :
+    Module.finrank ℂ (Module.End.eigenspace (Matrix.toLin' (hhafRestrictedMatrix L))
+      (hhafMinEnergy L : ℂ)) ≤ 1 := by
+  classical
+  obtain ⟨μ, hμlt, hbal_fin, hbal_min, w0, hw0ne, hw0eig⟩ :=
+    hhafRestrictedMatrix_balanced_ground L hLeven hL
+  -- reverse-slice closure for the even (balanced) block
+  have hclosed_even : ∀ σ τ : hhafConfig L, ¬ Even (pmCount L σ) → Even (pmCount L τ) →
+      hhafRestrictedMatrix L σ τ = 0 := fun σ τ hσ hτ =>
+    hhafRestrictedMatrix_pmCount_one_block_closed σ τ
+      ((hhaf_pmCount_eq_one_or_even σ).resolve_right hσ)
+      (fun hpm1 => absurd (hpm1 ▸ hτ) (by decide))
+  -- P2: the ground energy is ≤ the balanced eigenvalue μ
+  have hEμ : hhafMinEnergy L ≤ μ :=
+    hermitian_min_eigenvalue_le_of_eigenvector_exists (hhafRestrictedMatrix_isHermitian L)
+      (hhafSliceExtend_ne_zero _ hw0ne)
+      (hhafRestrictedMatrix_mulVec_hhafSliceExtend (fun σ => Even (pmCount L σ)) hclosed_even
+        hw0eig)
+  -- P3: E < −2
+  have hLR : (2 : ℝ) ≤ (L : ℝ) := by exact_mod_cast hL
+  have hELt2 : hhafMinEnergy L < -2 := by linarith [hEμ, hμlt]
+  -- P4: any E-eigenvector vanishes on the single-`±` configurations
+  have hpm0 : ∀ {Ψ : hhafConfig L → ℂ},
+      (hhafRestrictedMatrix L).mulVec Ψ = (hhafMinEnergy L : ℂ) • Ψ →
+      ∀ τ : hhafConfigPM1 L, Ψ τ.1 = 0 := by
+    intro Ψ hΨ τ
+    by_contra hτ0
+    have hslice := hhafRestrictedMatrixSlice_mulVec_of_full_eigen (fun σ => pmCount L σ = 1)
+      (fun σ τ' hσ hτ' => hhafRestrictedMatrix_pmCount_one_block_closed σ τ' hσ hτ') hΨ
+    have hsne : (fun σ : hhafConfigPM1 L => Ψ σ.1) ≠ 0 := fun h => hτ0 (congrFun h τ)
+    have hev : Module.End.HasEigenvalue (Matrix.toLin' ((hhafRestrictedMatrix L).submatrix
+        (Subtype.val : hhafConfigPM1 L → hhafConfig L) Subtype.val)) (hhafMinEnergy L : ℂ) :=
+      Module.End.hasEigenvalue_of_hasEigenvector
+        ⟨Module.End.mem_eigenspace_iff.mpr (by rw [Matrix.toLin'_apply]; exact hslice), hsne⟩
+    linarith [hhafRestrictedMatrix_submatrixPM1_eigenvalue_ge L hL hev]
+  -- P5: E ≥ μ, hence E = μ (else a ground eigenvector would vanish on both blocks)
+  obtain ⟨Ψ₀, hΨ₀ne, hΨ₀eig⟩ :=
+    exists_nonzero_eigenvector_hermitianMinEigenvalue (hhafRestrictedMatrix_isHermitian L)
+  have hμE : μ ≤ hhafMinEnergy L := by
+    by_contra hlt
+    -- balanced restriction is a balanced eigenvector at E < μ = balanced min ⟹ zero
+    have hbal_eig := hhafRestrictedMatrixSlice_mulVec_of_full_eigen (fun σ => Even (pmCount L σ))
+      (fun σ τ hσ hτ => hhafRestrictedMatrix_even_block_closed σ τ hσ hτ) hΨ₀eig
+    apply hΨ₀ne
+    funext σ
+    rcases hhaf_pmCount_eq_one_or_even σ with hpm | hev
+    · exact hpm0 hΨ₀eig ⟨σ, hpm⟩
+    · by_contra hσ0
+      have hsne : (fun σ : hhafConfig0 L => Ψ₀ σ.1) ≠ 0 := fun h => hσ0 (congrFun h ⟨σ, hev⟩)
+      exact hlt (hbal_min (hhafMinEnergy L) _ hsne hbal_eig)
+  have hEeqμ : hhafMinEnergy L = μ := le_antisymm hEμ hμE
+  -- assemble: inject the ground eigenspace into the balanced block eigenspace
+  set R : (Module.End.eigenspace (Matrix.toLin' (hhafRestrictedMatrix L))
+      (hhafMinEnergy L : ℂ)) →ₗ[ℂ]
+      (Module.End.eigenspace (Matrix.toLin' ((hhafRestrictedMatrix L).submatrix
+        (Subtype.val : hhafConfig0 L → hhafConfig L) Subtype.val)) (μ : ℂ)) :=
+    { toFun := fun Ψ => ⟨fun σ => Ψ.1 σ.1, by
+        have hΨeig : (hhafRestrictedMatrix L).mulVec Ψ.1 = (hhafMinEnergy L : ℂ) • Ψ.1 := by
+          have := Module.End.mem_eigenspace_iff.mp Ψ.2; rwa [Matrix.toLin'_apply] at this
+        have hslice := hhafRestrictedMatrixSlice_mulVec_of_full_eigen
+          (fun σ => Even (pmCount L σ))
+          (fun σ τ hσ hτ => hhafRestrictedMatrix_even_block_closed σ τ hσ hτ) hΨeig
+        rw [Module.End.mem_eigenspace_iff, Matrix.toLin'_apply, ← hEeqμ]
+        exact hslice⟩
+      map_add' := fun x y => rfl
+      map_smul' := fun c x => rfl } with hRdef
+  have hR_inj : Function.Injective R := by
+    intro x y hxy
+    apply Subtype.ext
+    funext σ
+    have hbal0 : ∀ τ : hhafConfig0 L, x.1 τ.1 = y.1 τ.1 := fun τ =>
+      congrFun (congrArg Subtype.val hxy) τ
+    have hxeig : (hhafRestrictedMatrix L).mulVec x.1 = (hhafMinEnergy L : ℂ) • x.1 := by
+      have := Module.End.mem_eigenspace_iff.mp x.2; rwa [Matrix.toLin'_apply] at this
+    have hyeig : (hhafRestrictedMatrix L).mulVec y.1 = (hhafMinEnergy L : ℂ) • y.1 := by
+      have := Module.End.mem_eigenspace_iff.mp y.2; rwa [Matrix.toLin'_apply] at this
+    rcases hhaf_pmCount_eq_one_or_even σ with hpm | hev
+    · rw [hpm0 hxeig ⟨σ, hpm⟩, hpm0 hyeig ⟨σ, hpm⟩]
+    · exact hbal0 ⟨σ, hev⟩
+  exact le_trans (LinearMap.finrank_le_finrank_of_injective hR_inj) hbal_fin
+
+/-- A projection-fixed vector is the embedding of its restriction to `H_HAF`. -/
+theorem hhafSubspaceEmbedding_of_projFixed (L : ℕ) {Ψ : (Fin L → Fin 3) → ℂ}
+    (hΨ : (hhafProjection L).mulVec Ψ = Ψ) :
+    Ψ = hhafSubspaceEmbedding L (fun σ : hhafConfig L => Ψ σ.1) := by
+  funext σ
+  by_cases h : IsHiddenAFMConfig σ
+  · exact (hhafSubspaceEmbedding_apply_subtype L (fun σ : hhafConfig L => Ψ σ.1) ⟨σ, h⟩).symm
+  · rw [hhafSubspaceEmbedding_apply_of_not L (fun σ : hhafConfig L => Ψ σ.1) h]
+    have hc := congrFun hΨ σ
+    rw [hhafProjection, Matrix.mulVec_diagonal, if_neg h, zero_mul] at hc
+    exact hc.symm
+
+/-- A projection-fixed eigenvector of the compressed Hamiltonian restricts to an eigenvector of the
+restricted matrix at the same energy. -/
+theorem hhafRestrictedMatrix_mulVec_of_projFixed_eig (L : ℕ) {E : ℂ}
+    {Ψ : (Fin L → Fin 3) → ℂ} (hproj : (hhafProjection L).mulVec Ψ = Ψ)
+    (heig : (hhafRestrictedChainHamiltonianS L).mulVec Ψ = E • Ψ) :
+    (hhafRestrictedMatrix L).mulVec (fun σ : hhafConfig L => Ψ σ.1) =
+      E • (fun σ : hhafConfig L => Ψ σ.1) := by
+  set w : hhafConfig L → ℂ := fun σ => Ψ σ.1 with hw
+  have hΨemb : Ψ = hhafSubspaceEmbedding L w := hhafSubspaceEmbedding_of_projFixed L hproj
+  have hinj : Function.Injective (hhafSubspaceEmbedding L) := by
+    intro a b hab
+    funext σ
+    have := congrFun hab σ.1
+    rwa [hhafSubspaceEmbedding_apply_subtype, hhafSubspaceEmbedding_apply_subtype] at this
+  apply hinj
+  rw [← hhafRestrictedChainHamiltonianS_mulVec_hhafSubspaceEmbedding, ← hΨemb, heig,
+    hhafSubspaceEmbedding_smul, hΨemb]
+
+/-- **Tasaki §6.3 Proposition 6.5 — unique ground state, finite gap, exponential decay** for the
+`S = 1` antiferromagnetic Heisenberg chain on the hidden-antiferromagnetic subspace `H_HAF`
+(Gómez-Santos).  For an even ring there is a ground state `Φ` of the compressed Hamiltonian that is
+the **unique** (up to scalar) minimal-energy `H_HAF` vector, with a positive spectral gap and
+exponentially decaying correlations.  (This discharges the former axiom
+`tasaki_prop_6_5_hhaf_spin_one`.) -/
+theorem tasaki_prop_6_5_hhaf_spin_one (L : ℕ) (hL : Even L) (hLpos : 0 < L) :
+    ∃ (E gap ξ C : ℝ) (Φ : (Fin L → Fin 3) → ℂ),
+      (hhafProjection L).mulVec Φ = Φ ∧ Φ ≠ 0 ∧
+      (hhafRestrictedChainHamiltonianS L).mulVec Φ = (E : ℂ) • Φ ∧
+      (∀ E' ∈ hhafRealSpectrum L, E ≤ E') ∧
+      (∀ Ψ : (Fin L → Fin 3) → ℂ, Ψ ≠ 0 → (hhafProjection L).mulVec Ψ = Ψ →
+        (hhafRestrictedChainHamiltonianS L).mulVec Ψ = (E : ℂ) • Ψ → ∃ c : ℂ, Ψ = c • Φ) ∧
+      0 < gap ∧ (∃ E₁ ∈ hhafRealSpectrum L, E < E₁ ∧ gap = E₁ - E ∧
+        ∀ E' ∈ hhafRealSpectrum L, E < E' → E₁ ≤ E') ∧
+      0 < ξ ∧ 0 ≤ C ∧
+      ∀ x y : Fin L, |chainCorrelation L Φ x y| ≤ C * Real.exp (-(ringDist L x y : ℝ) / ξ) := by
+  have hL2 : 2 ≤ L := by obtain ⟨m, hm⟩ := hL; omega
+  obtain ⟨w₀, hw₀ne, hw₀eig⟩ :=
+    exists_nonzero_eigenvector_hermitianMinEigenvalue (hhafRestrictedMatrix_isHermitian L)
+  set Φ := hhafSubspaceEmbedding L w₀ with hΦdef
+  -- clause 3: the embedded ground vector is an eigenvector of the compressed Hamiltonian
+  have hΦeig : (hhafRestrictedChainHamiltonianS L).mulVec Φ = (hhafMinEnergy L : ℂ) • Φ := by
+    rw [hΦdef, hhafRestrictedChainHamiltonianS_mulVec_hhafSubspaceEmbedding, hw₀eig,
+      hhafSubspaceEmbedding_smul, hhafMinEnergy]
+  -- the finrank ≤ 1 bound on the restricted ground eigenspace
+  have hfin := hhafRestrictedMatrix_ground_finrank_le_one L hL hL2
+  have hw₀mem : w₀ ∈ Module.End.eigenspace (Matrix.toLin' (hhafRestrictedMatrix L))
+      (hhafMinEnergy L : ℂ) := by
+    rw [Module.End.mem_eigenspace_iff, Matrix.toLin'_apply]; exact hw₀eig
+  obtain ⟨gap, hgappos, hgapwit⟩ := exists_hhaf_positive_gap L hL hLpos
+  obtain ⟨ξ, hξpos, C, hCnn, hdecay⟩ := hhaf_correlation_exp_decay_exists L Φ
+  refine ⟨hhafMinEnergy L, gap, ξ, C, Φ,
+    hΦdef ▸ hhafProjection_mulVec_hhafSubspaceEmbedding L w₀,
+    hΦdef ▸ hhafSubspaceEmbedding_ne_zero L hw₀ne, hΦeig, ?_, ?_, hgappos, hgapwit, hξpos, hCnn,
+    hdecay⟩
+  · -- clause 4: minimality over the restricted spectrum
+    rintro E' ⟨Φ', hΦ'ne, hΦ'proj, hΦ'eig⟩
+    have hrest := hhafRestrictedMatrix_mulVec_of_projFixed_eig L hΦ'proj hΦ'eig
+    have hwne : (fun σ : hhafConfig L => Φ' σ.1) ≠ 0 := by
+      intro h
+      apply hΦ'ne
+      rw [hhafSubspaceEmbedding_of_projFixed L hΦ'proj, h]
+      funext σ; simp only [hhafSubspaceEmbedding, Pi.zero_apply]; split_ifs <;> rfl
+    exact hermitian_min_eigenvalue_le_of_eigenvector_exists (hhafRestrictedMatrix_isHermitian L)
+      hwne hrest
+  · -- clause 5: uniqueness via finrank ≤ 1
+    intro Ψ hΨne hΨproj hΨeig
+    have hrest := hhafRestrictedMatrix_mulVec_of_projFixed_eig L hΨproj hΨeig
+    have hΨmem : (fun σ : hhafConfig L => Ψ σ.1) ∈
+        Module.End.eigenspace (Matrix.toLin' (hhafRestrictedMatrix L)) (hhafMinEnergy L : ℂ) := by
+      rw [Module.End.mem_eigenspace_iff, Matrix.toLin'_apply]; exact hrest
+    rw [finrank_le_one_iff] at hfin
+    obtain ⟨v₀, hv₀⟩ := hfin
+    obtain ⟨cΨ, hcΨ⟩ := hv₀ ⟨_, hΨmem⟩
+    obtain ⟨c0, hc0⟩ := hv₀ ⟨w₀, hw₀mem⟩
+    have hΨv : (fun σ : hhafConfig L => Ψ σ.1) = cΨ • v₀.1 := by
+      have h := congrArg Subtype.val hcΨ.symm; simpa using h
+    have hw₀v : w₀ = c0 • v₀.1 := by
+      have h := congrArg Subtype.val hc0.symm; simpa using h
+    have hc0ne : c0 ≠ 0 := by
+      intro h; apply hw₀ne; rw [hw₀v, h, zero_smul]
+    refine ⟨cΨ * c0⁻¹, ?_⟩
+    rw [hhafSubspaceEmbedding_of_projFixed L hΨproj, hΦdef, ← hhafSubspaceEmbedding_smul]
+    congr 1
+    rw [hΨv, hw₀v, smul_smul, mul_assoc, inv_mul_cancel₀ hc0ne, mul_one]
 
 end LatticeSystem.Quantum
