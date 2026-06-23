@@ -9286,7 +9286,10 @@ walk-to-power bridge).  It remains to prove connectivity of the HAF configuratio
 configuration is reachable from the all-$0$ configuration by the canonical kink reduction).  The
 reduction inducts on the $\pm$-spin count \texttt{pmCount} (the number of nonzero spins, which
 \texttt{pmCount\_eq\_zero\_iff} characterises as vanishing exactly on the canonical configuration
-\texttt{hhafCanonical}); each annihilation of an adjacent $+,-$ pair removes two $\pm$ spins.
+\texttt{hhafCanonical}); each annihilation of an adjacent $+,-$ pair removes two $\pm$ spins.  The
+elementary move is the slide \texttt{slidePM} (transport the spin at $a$ onto a cyclic neighbour $b$,
+leaving a $0$ at $a$), which \texttt{slidePM\_isRaiseLowerStep} shows is a single ladder step on the
+ring bond $\{a,b\}$ whenever $a$ is $\pm$ and $b$ is $0$.
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
