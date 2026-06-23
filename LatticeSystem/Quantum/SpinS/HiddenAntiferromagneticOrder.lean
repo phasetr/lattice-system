@@ -596,19 +596,25 @@ private theorem hhaf_diag_eq_succ_sum (L : ℕ) (hL : 2 ≤ L) (σ : hhafConfig 
 `0` elsewhere. -/
 private def dwWeight (n : ℕ) : ℝ := if n = 0 then 1 else if n = 1 then -1 else 0
 
+/-- The domain-wall weight at index `0` is `1` (spin `+1`). -/
 private theorem dwWeight_zero : dwWeight 0 = 1 := rfl
 
+/-- The domain-wall weight at index `1` is `-1` (spin `-1`). -/
 private theorem dwWeight_one : dwWeight 1 = -1 := rfl
 
+/-- The domain-wall weight vanishes for indices `≥ 2` (spin `0`). -/
 private theorem dwWeight_ge_two {n : ℕ} (h : 2 ≤ n) : dwWeight n = 0 := by
   unfold dwWeight; rw [if_neg (by omega), if_neg (by omega)]
 
+/-- The `1 - σ` weight of the domain-wall configuration equals `dwWeight` of the site index. -/
 private theorem dwWeight_eq (L : ℕ) (x : Fin L) :
     (1 - ((hhafDomainWallConfig L).1 x).val : ℝ) = dwWeight x.val := by
   change (1 - ((hhafDomainWallRaw L x).val : ℝ)) = dwWeight x.val
   unfold hhafDomainWallRaw dwWeight
   split_ifs <;> norm_num
 
+/-- Each bond `x → x+1` of the domain-wall configuration contributes a non-positive product of
+consecutive weights. -/
 private theorem dwWeight_mul_succ_nonpos (L : ℕ) (hL : 2 ≤ L) (x : Fin L) :
     dwWeight x.val * dwWeight ((x.val + 1) % L) ≤ 0 := by
   have hxlt := x.isLt
