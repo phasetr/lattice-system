@@ -1699,4 +1699,53 @@ theorem hhafRestrictedMatrix_submatrixPM1_eigenvalue_ge (L : ℕ) (hL : 2 ≤ L)
     exact key _ hvim (matrix_eigenvec_im_of_complex hv_eig)
   · exact key _ hvre (matrix_eigenvec_re_of_complex hv_eig)
 
+/-- The **zero-extension** of a `P`-slice vector to all of `hhafConfig`. -/
+noncomputable def hhafSliceExtend {L : ℕ} (P : hhafConfig L → Prop) [DecidablePred P]
+    (w : {σ : hhafConfig L // P σ} → ℂ) : hhafConfig L → ℂ :=
+  fun σ => if h : P σ then w ⟨σ, h⟩ else 0
+
+/-- The zero-extension is nonzero when the slice vector is. -/
+theorem hhafSliceExtend_ne_zero {L : ℕ} (P : hhafConfig L → Prop) [DecidablePred P]
+    {w : {σ : hhafConfig L // P σ} → ℂ} (hw : w ≠ 0) : hhafSliceExtend P w ≠ 0 := by
+  intro h
+  apply hw
+  funext σ
+  have hc := congrFun h σ.1
+  rwa [hhafSliceExtend, dif_pos σ.2, Subtype.coe_eta, Pi.zero_apply] at hc
+
+/-- **Reverse block restriction**: if the restricted matrix has no coupling into a `P`-slice from
+its complement (`hclosed'`), then the zero-extension of a `P`-slice eigenvector is a full
+eigenvector with the same eigenvalue. -/
+theorem hhafRestrictedMatrix_mulVec_hhafSliceExtend {L : ℕ} (P : hhafConfig L → Prop)
+    [DecidablePred P] (hclosed' : ∀ σ τ, ¬ P σ → P τ → hhafRestrictedMatrix L σ τ = 0)
+    {E : ℂ} {w : {σ : hhafConfig L // P σ} → ℂ}
+    (hw : (hhafRestrictedMatrixSlice P).mulVec w = E • w) :
+    (hhafRestrictedMatrix L).mulVec (hhafSliceExtend P w) = E • (hhafSliceExtend P w) := by
+  classical
+  funext σ
+  have hsum : (hhafRestrictedMatrix L).mulVec (hhafSliceExtend P w) σ =
+      ∑ τ : {σ : hhafConfig L // P σ}, hhafRestrictedMatrix L σ τ.1 * w τ := by
+    rw [Matrix.mulVec, dotProduct,
+      ← Finset.sum_filter_add_sum_filter_not Finset.univ P
+        (fun τ => hhafRestrictedMatrix L σ τ * hhafSliceExtend P w τ)]
+    have hnot : ∑ τ ∈ Finset.univ.filter (fun τ => ¬ P τ),
+        hhafRestrictedMatrix L σ τ * hhafSliceExtend P w τ = 0 :=
+      Finset.sum_eq_zero fun τ hτ => by
+        rw [hhafSliceExtend, dif_neg (Finset.mem_filter.mp hτ).2, mul_zero]
+    have hmem : ∀ x : hhafConfig L, x ∈ Finset.univ.filter P ↔ P x :=
+      fun x => by simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+    rw [hnot, add_zero,
+      Finset.sum_subtype (Finset.univ.filter P) hmem
+        (fun τ => hhafRestrictedMatrix L σ τ * hhafSliceExtend P w τ)]
+    refine Finset.sum_congr rfl fun τ _ => ?_
+    rw [hhafSliceExtend, dif_pos τ.2, Subtype.coe_eta]
+  rw [hsum, Pi.smul_apply, smul_eq_mul]
+  by_cases hσ : P σ
+  · have heq := congrFun hw ⟨σ, hσ⟩
+    rw [Pi.smul_apply, smul_eq_mul] at heq
+    rw [hhafSliceExtend, dif_pos hσ, ← heq, hhafRestrictedMatrixSlice, Matrix.mulVec, dotProduct]
+    rfl
+  · rw [hhafSliceExtend, dif_neg hσ, mul_zero]
+    exact Finset.sum_eq_zero fun τ _ => by rw [hclosed' σ τ.1 hσ τ.2, zero_mul]
+
 end LatticeSystem.Quantum
