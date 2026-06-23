@@ -7,6 +7,8 @@ import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
 import LatticeSystem.Quantum.SpinS.HermitianVariationalUpperBound
 import LatticeSystem.Math.HermitianMaxEigenvalue
 import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorMarshallCore
+import LatticeSystem.Quantum.SpinS.DressedHeisenbergRaiseLowerCore
+import LatticeSystem.Quantum.SpinS.RaiseLower
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Analysis.Matrix.Order
 import Mathlib.Analysis.Matrix.Spectrum
@@ -906,6 +908,36 @@ theorem hhafShifted_entry_nonneg (L : ℕ) (hLeven : Even L) {c : ℝ}
     exact le_trans (hhafDressedMatrix_diag_le_hhafMaxEnergy L σ) hc
   · rw [if_neg h, mul_zero, zero_sub, neg_nonneg]
     exact hhafDressedMatrix_offdiag_nonpos L hLeven h
+
+/-- **Single ladder-step positivity**: if two hidden-AFM configurations differ by one adjacent
+raise/lower (ladder) move on a bipartite bond `{x, y}` (`ringSublattice x ≠ ringSublattice y`,
+`ringCouplingSym` positive there), the shifted matrix entry `(c·I − M) τ σ` is strictly positive —
+the Marshall-dressed Heisenberg off-diagonal is strictly negative on such a step.  This is the
+single-edge positivity for the Perron–Frobenius reachability argument (kink ergodicity). -/
+theorem hhafShifted_pos_of_ladderStep (L : ℕ) {c : ℝ} {σ τ : hhafConfig L} {x y : Fin L}
+    (hAne : ringSublattice L x ≠ ringSublattice L y)
+    (hJpos : 0 < (ringCouplingSym L x y).re)
+    (hsh : ((σ.1 x).val + 1 = (τ.1 x).val ∧ (τ.1 y).val + 1 = (σ.1 y).val) ∨
+      ((τ.1 x).val + 1 = (σ.1 x).val ∧ (σ.1 y).val + 1 = (τ.1 y).val))
+    (hagree : ∀ k, k ≠ x → k ≠ y → τ.1 k = σ.1 k) :
+    0 < (c • (1 : Matrix (hhafConfig L) (hhafConfig L) ℝ) - hhafDressedMatrix L) τ σ := by
+  have hxy : x ≠ y := fun h => hAne (by rw [h])
+  have hne : τ ≠ σ := by
+    intro h
+    have h1 : τ.1 = σ.1 := by rw [h]
+    rw [h1] at hsh
+    rcases hsh with ⟨ha, _⟩ | ⟨ha, _⟩ <;> omega
+  have hneg : (dressedHeisenbergS (ringSublattice L) (ringCouplingSym L) 2 τ.1 σ.1).re < 0 :=
+    dressedHeisenbergS_apply_re_neg_of_raiseLowerStepS_witness (ringSublattice L) 2
+      (G := ⊤) ((SimpleGraph.top_adj x y).mpr hxy) hAne (ringCouplingSym_im_zero L x y) hJpos
+      (ringCouplingSym_symm L x y) hsh hagree
+  have hM : hhafDressedMatrix L τ σ < 0 := by
+    rw [hhafDressedMatrix, Matrix.submatrix_apply, dressedHeisenbergSReMatrix_apply,
+      dressedHeisenbergS_ringCoupling_re_eq_half]
+    linarith
+  rw [Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply, smul_eq_mul, if_neg hne, mul_zero,
+    zero_sub, neg_pos]
+  exact hM
 
 /-! ## Per-`L` exponential decay of the correlation -/
 

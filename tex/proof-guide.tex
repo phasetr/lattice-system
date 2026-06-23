@@ -9269,6 +9269,11 @@ $1$), bounded above by the restricted max energy.  Hence for any shift $c\ge$ th
 matrix $c\,I-M$ has nonnegative entries on an even ring (\texttt{hhafShifted\_entry\_nonneg}) --- the
 nonnegativity hypothesis of \texttt{perronFrobenius\_real\_symmetric}, which (given symmetry and
 irreducibility of $c\,I-M$) yields directly a one-dimensional lowest eigenspace.
+The single-edge input to irreducibility is \texttt{hhafShifted\_pos\_of\_ladderStep}: two hidden-AFM
+configurations differing by one adjacent raise/lower move on a bipartite bond have a strictly
+positive shifted entry $(c\,I-M)_{\tau\sigma}>0$ (the Marshall-dressed Heisenberg off-diagonal is
+strictly negative on such a step, reusing the project's raise/lower witness on
+\texttt{ringCouplingSym} and the $\tfrac12$ scaling).
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
