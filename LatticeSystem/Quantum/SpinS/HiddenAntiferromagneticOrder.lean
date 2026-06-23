@@ -4,6 +4,7 @@ import LatticeSystem.Quantum.SpinS.MultiSiteDot
 import LatticeSystem.Quantum.SpinS.SubmatrixMinEigenvalue
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
+import LatticeSystem.Math.HermitianMaxEigenvalue
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Analysis.Matrix.Order
 
@@ -263,6 +264,38 @@ theorem hhafMinEnergy_mem_realSpectrum (L : ℕ) : hhafMinEnergy L ∈ hhafRealS
     hhafProjection_mulVec_hhafSubspaceEmbedding L w, ?_⟩
   rw [hhafRestrictedChainHamiltonianS_mulVec_hhafSubspaceEmbedding, hw_eig,
     hhafSubspaceEmbedding_smul, hhafMinEnergy]
+
+/-- **Every eigenvalue of the restricted matrix is a genuine `H_HAF`-restricted eigenvalue**: the
+`i`-th eigenvector of `hhafRestrictedMatrix` embeds via zero-extension to an `H_HAF` eigenvector of
+the compressed Hamiltonian at the same eigenvalue. -/
+theorem hhafRestrictedMatrix_eigenvalue_mem_realSpectrum (L : ℕ) (i : hhafConfig L) :
+    (hhafRestrictedMatrix_isHermitian L).eigenvalues i ∈ hhafRealSpectrum L := by
+  set hM := hhafRestrictedMatrix_isHermitian L with hMdef
+  have hne : ((hM.eigenvectorBasis i).ofLp : hhafConfig L → ℂ) ≠ 0 := by
+    intro h0
+    have h1 := eigenvectorBasis_dotProduct_self_eq_one hM i
+    rw [h0] at h1
+    simp at h1
+  have heig : (hhafRestrictedMatrix L).mulVec ((hM.eigenvectorBasis i).ofLp) =
+      ((hM.eigenvalues i : ℝ) : ℂ) • ((hM.eigenvectorBasis i).ofLp) := by
+    have h := Matrix.IsHermitian.mulVec_eigenvectorBasis hM i
+    convert h using 2
+  refine ⟨hhafSubspaceEmbedding L ((hM.eigenvectorBasis i).ofLp),
+    hhafSubspaceEmbedding_ne_zero L hne,
+    hhafProjection_mulVec_hhafSubspaceEmbedding L _, ?_⟩
+  rw [hhafRestrictedChainHamiltonianS_mulVec_hhafSubspaceEmbedding, heig,
+    hhafSubspaceEmbedding_smul]
+
+/-- The **maximal `H_HAF`-restricted energy**: the maximal eigenvalue of the restricted matrix. -/
+noncomputable def hhafMaxEnergy (L : ℕ) : ℝ :=
+  LatticeSystem.Math.hermitianMaxEigenvalue (hhafRestrictedMatrix_isHermitian L)
+
+/-- The maximal restricted eigenvalue is a genuine `H_HAF`-restricted eigenvalue. -/
+theorem hhafMaxEnergy_mem_realSpectrum (L : ℕ) : hhafMaxEnergy L ∈ hhafRealSpectrum L := by
+  obtain ⟨i, _, hi⟩ := Finset.mem_image.mp
+    (LatticeSystem.Math.hermitian_max_eigenvalue_mem_image (hhafRestrictedMatrix_isHermitian L))
+  rw [hhafMaxEnergy, ← hi]
+  exact hhafRestrictedMatrix_eigenvalue_mem_realSpectrum L i
 
 /-- **The `H_HAF`-restricted spectrum has a least element**, realized by `hhafMinEnergy`: the
 minimal restricted eigenvalue is `≤` every `hhafRealSpectrum` element.  This discharges the
