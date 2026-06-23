@@ -9416,6 +9416,19 @@ identify the balanced sector with $S^z=0$ and the single-$\pm$ sectors with $S^z
 higher sectors --- the magnetization-conservation input that splits a ground eigenvector into a
 balanced part and a single-$\pm$ part.
 
+This split is realised by the block structure
+\texttt{hhafRestrictedMatrix\_eq\_zero\_of\_magSumS\_ne} (entries between configurations of distinct
+$\mathtt{magSumS}$ vanish) together with the generic slice
+\texttt{hhafRestrictedMatrixSlice}~$P$ and
+\texttt{hhafRestrictedMatrixSlice\_mulVec\_of\_full\_eigen} (a full eigenvector restricted to a
+block-closed $P$-slice is a $P$-slice eigenvector at the same eigenvalue), instantiated at
+$P=\{\mathtt{pmCount}=1\}$ and $P=\{\text{even }\mathtt{pmCount}\}$ via the two block-closures
+\texttt{hhafRestrictedMatrix\_pmCount\_one\_block\_closed} and
+\texttt{hhafRestrictedMatrix\_even\_block\_closed} (a single-$\pm$ configuration couples only to
+single-$\pm$ ones, an even one only to even, by the classification). This is the block-diagonal
+decomposition into the balanced and single-$\pm$ blocks underlying the ground-eigenspace
+$\mathrm{finrank}\le 1$.
+
 \medskip
 \noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
 pp.~177--179; documented axiom, \texttt{Quantum/SpinS/AKLT.lean}, Issue \#4485).  The
