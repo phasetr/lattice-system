@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder
 import LatticeSystem.Math.PerronFrobeniusSymmetric
 import LatticeSystem.Quantum.SpinS.GaugeEigenspaceFinrank
+import LatticeSystem.Quantum.SpinS.RealComplexEigenspaceBridge
 import Mathlib.LinearAlgebra.Matrix.Gershgorin
 
 /-!
@@ -1601,5 +1602,101 @@ theorem hhafRestrictedMatrix_even_block_closed {L : ℕ}
   refine hhafRestrictedMatrix_eq_zero_of_magSumS_ne ?_
   rw [hhaf_magSumS_eq_L_of_even σ hσ]
   exact (hhaf_magSumS_ne_L_of_pmCount_one τ hτ1).symm
+
+/-! ## Ground-eigenspace finrank ≤ 1 -/
+
+/-- The **complex balanced block** (submatrix of `hhafRestrictedMatrix` on the balanced sector) is
+the real balanced block cast to `ℂ` (the entries are real). -/
+theorem hhafRestrictedMatrix_submatrix0_eq_map (L : ℕ) :
+    (hhafRestrictedMatrix L).submatrix (Subtype.val : hhafConfig0 L → hhafConfig L) Subtype.val =
+      (hhafRestrictedMatrixReal0 L).map (Complex.ofReal) := by
+  ext σ τ
+  rw [Matrix.submatrix_apply, Matrix.map_apply, hhafRestrictedMatrixReal0, Matrix.submatrix_apply]
+  exact (hhafRestrictedMatrixReal_ofReal L σ.1 τ.1).symm
+
+/-- The **complex balanced block ground eigenspace is one-dimensional**: transferring the real
+balanced Perron–Frobenius `finrank ≤ 1` through the real-to-complex bridge. -/
+theorem hhafRestrictedMatrix_submatrix0_eigenspace_finrank_le_one (L : ℕ) (hLeven : Even L) :
+    ∃ μ : ℝ, Module.finrank ℂ (Module.End.eigenspace (Matrix.toLin'
+      ((hhafRestrictedMatrix L).submatrix (Subtype.val : hhafConfig0 L → hhafConfig L)
+        Subtype.val)) (μ : ℂ)) ≤ 1 := by
+  obtain ⟨μ, w, _, _, _, hfin⟩ := hhafRestrictedMatrixReal0_ground_finrank_le_one L hLeven
+  refine ⟨μ, ?_⟩
+  rw [hhafRestrictedMatrix_submatrix0_eq_map]
+  exact matrix_complex_eigenspace_finrank_le_one_of_real (hhafRestrictedMatrixReal0 L) μ hfin
+
+/-- The **real (undressed) restricted matrix on the single-`±` sector**. -/
+noncomputable def hhafRestrictedMatrixRealPM1 (L : ℕ) :
+    Matrix (hhafConfigPM1 L) (hhafConfigPM1 L) ℝ :=
+  (hhafRestrictedMatrixReal L).submatrix Subtype.val Subtype.val
+
+/-- The complex single-`±` block is the real single-`±` block cast to `ℂ`. -/
+theorem hhafRestrictedMatrix_submatrixPM1_eq_map (L : ℕ) :
+    (hhafRestrictedMatrix L).submatrix (Subtype.val : hhafConfigPM1 L → hhafConfig L) Subtype.val =
+      (hhafRestrictedMatrixRealPM1 L).map (Complex.ofReal) := by
+  ext σ τ
+  rw [Matrix.submatrix_apply, Matrix.map_apply, hhafRestrictedMatrixRealPM1, Matrix.submatrix_apply]
+  exact (hhafRestrictedMatrixReal_ofReal L σ.1 τ.1).symm
+
+/-- The **single-`±` Marshall sign diagonal** `Θ` (entries `±1`). -/
+noncomputable def hhafMarshallDiagPM1 (L : ℕ) : Matrix (hhafConfigPM1 L) (hhafConfigPM1 L) ℝ :=
+  Matrix.diagonal (fun σ : hhafConfigPM1 L => (marshallSignS (ringSublattice L) σ.1.1).re)
+
+/-- The single-`±` Marshall sign diagonal squares to the identity. -/
+theorem hhafMarshallDiagPM1_mul_self (L : ℕ) :
+    hhafMarshallDiagPM1 L * hhafMarshallDiagPM1 L = 1 := by
+  rw [hhafMarshallDiagPM1, Matrix.diagonal_mul_diagonal]
+  have h1 : (fun σ : hhafConfigPM1 L => (marshallSignS (ringSublattice L) σ.1.1).re *
+      (marshallSignS (ringSublattice L) σ.1.1).re) = fun _ => 1 := by
+    funext σ
+    have h := congrArg Complex.re (marshallSignS_sq (ringSublattice L) σ.1.1)
+    rwa [Complex.mul_re, marshallSignS_im, mul_zero, sub_zero, Complex.one_re] at h
+  rw [h1, Matrix.diagonal_one]
+
+/-- The dressed single-`±` block is the Marshall conjugate of the undressed real block. -/
+theorem hhafDressedMatrixPM1_eq_conj (L : ℕ) :
+    hhafDressedMatrixPM1 L =
+      hhafMarshallDiagPM1 L * hhafRestrictedMatrixRealPM1 L * hhafMarshallDiagPM1 L := by
+  ext σ τ
+  rw [hhafDressedMatrixPM1, Matrix.submatrix_apply, hhafDressedMatrix_eq, Matrix.mul_assoc,
+    hhafMarshallDiagPM1, Matrix.diagonal_mul, Matrix.mul_diagonal, hhafRestrictedMatrixRealPM1,
+    Matrix.submatrix_apply]
+  ring
+
+/-- **The complex single-`±` block has all eigenvalues `≥ −2`.**  An eigenvalue is real (the block
+is real), transfers to a real-block eigenvector (re/im part), then to a dressed-block eigenvector
+via the Marshall conjugation, where the Gershgorin bound `≥ −2` applies. -/
+theorem hhafRestrictedMatrix_submatrixPM1_eigenvalue_ge (L : ℕ) (hL : 2 ≤ L) {E : ℝ}
+    (hE : Module.End.HasEigenvalue (Matrix.toLin'
+      ((hhafRestrictedMatrix L).submatrix (Subtype.val : hhafConfigPM1 L → hhafConfig L)
+        Subtype.val)) (E : ℂ)) : -2 ≤ E := by
+  rw [hhafRestrictedMatrix_submatrixPM1_eq_map] at hE
+  obtain ⟨v, hv_eig, hv_ne⟩ := hE.exists_hasEigenvector
+  rw [Module.End.mem_eigenspace_iff, Matrix.toLin'_apply] at hv_eig
+  -- transfer a nonzero real-block eigenvector to a dressed-block eigenvalue via Marshall
+  have hdΘ : hhafDressedMatrixPM1 L * hhafMarshallDiagPM1 L =
+      hhafMarshallDiagPM1 L * hhafRestrictedMatrixRealPM1 L := by
+    rw [hhafDressedMatrixPM1_eq_conj, Matrix.mul_assoc, Matrix.mul_assoc,
+      hhafMarshallDiagPM1_mul_self, Matrix.mul_one]
+  have key : ∀ w : hhafConfigPM1 L → ℝ, w ≠ 0 →
+      (hhafRestrictedMatrixRealPM1 L).mulVec w = E • w →
+      Module.End.HasEigenvalue (Matrix.toLin' (hhafDressedMatrixPM1 L)) E := by
+    intro w hw hweig
+    refine Module.End.hasEigenvalue_of_hasEigenvector
+      (x := (hhafMarshallDiagPM1 L).mulVec w) ⟨?_, ?_⟩
+    · rw [Module.End.mem_eigenspace_iff, Matrix.toLin'_apply, Matrix.mulVec_mulVec, hdΘ,
+        ← Matrix.mulVec_mulVec, hweig, Matrix.mulVec_smul]
+    · intro hh
+      apply hw
+      have h0 : (hhafMarshallDiagPM1 L).mulVec ((hhafMarshallDiagPM1 L).mulVec w) = 0 := by
+        rw [hh, Matrix.mulVec_zero]
+      rwa [Matrix.mulVec_mulVec, hhafMarshallDiagPM1_mul_self, Matrix.one_mulVec] at h0
+  refine hhafDressedMatrixPM1_eigenvalue_ge hL ?_
+  by_cases hvre : (fun i => (v i).re) = 0
+  · have hvim : (fun i => (v i).im) ≠ 0 := by
+      intro hh; apply hv_ne; funext i
+      exact Complex.ext (congrFun hvre i) (congrFun hh i)
+    exact key _ hvim (matrix_eigenvec_im_of_complex hv_eig)
+  · exact key _ hvre (matrix_eigenvec_re_of_complex hv_eig)
 
 end LatticeSystem.Quantum
