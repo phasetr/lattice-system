@@ -9246,10 +9246,14 @@ and is minimal among all spectrum elements above the ground energy by completene
 $E_1-\texttt{hhafMinEnergy}>0$.  Thus only the unique-ground-state clause of Proposition~6.5 remains
 axiomatic.  Toward its Perron--Frobenius discharge, the restricted matrix is shown to have real
 entries (\texttt{hhafRestrictedMatrix\_im\_zero}) and so descends to a real symmetric matrix
-(\texttt{hhafRestrictedMatrixReal}, \texttt{hhafRestrictedMatrixReal\_isSymm}); a Marshall gauge
-making the off-diagonals sign-definite plus irreducibility of the hidden-AFM configuration graph (the
-Gómez-Santos kink-ergodicity core) would then give a strictly positive Perron eigenvector at the
-ground energy, forcing a one-dimensional ground eigenspace.  Chapters~3--10 backfill.
+(\texttt{hhafRestrictedMatrixReal}, \texttt{hhafRestrictedMatrixReal\_isSymm}).  The Marshall gauge is
+then built (\texttt{ringSublattice} for the bipartite even/odd ring, \texttt{hhafDressedMatrix},
+\texttt{hhafDressedMatrix\_eq}: $\mathrm{dressed}(\sigma,\tau)=\varepsilon(\sigma)\varepsilon(\tau)
+M_{\mathrm{real}}(\sigma,\tau)$, reusing the project's dressed-Heisenberg machinery), a diagonal
+$\pm1$ sign similarity making the off-diagonals sign-definite.  Combined with irreducibility of the
+hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
+would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
+ground eigenspace.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
