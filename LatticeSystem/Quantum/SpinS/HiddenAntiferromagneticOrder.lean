@@ -4,6 +4,7 @@ import LatticeSystem.Quantum.SpinS.MultiSiteDot
 import LatticeSystem.Quantum.SpinS.SubmatrixMinEigenvalue
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
+import LatticeSystem.Quantum.SpinS.HermitianVariationalUpperBound
 import LatticeSystem.Math.HermitianMaxEigenvalue
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Analysis.Matrix.Order
@@ -411,6 +412,65 @@ theorem hhafRealSpectrum_finite (L : ℕ) : (hhafRealSpectrum L).Finite := by
   intro E' hE'
   obtain ⟨i, hi⟩ := hhafRealSpectrum_subset_eigenvalue_range L hE'
   exact ⟨i, hi⟩
+
+/-! ## Diagonal bounds on the restricted ground/top energy -/
+
+/-- The standard basis vector `e_σ : hhafConfig L → ℂ` (entry `1` at `σ`, `0` elsewhere). -/
+private noncomputable def hhafBasis (L : ℕ) (σ : hhafConfig L) : hhafConfig L → ℂ :=
+  fun τ => if τ = σ then 1 else 0
+
+/-- The complex conjugate of the standard basis vector is itself. -/
+private theorem hhaf_star_basis (L : ℕ) (σ : hhafConfig L) :
+    star (hhafBasis L σ) = hhafBasis L σ := by
+  funext τ
+  simp only [Pi.star_apply, hhafBasis]
+  split <;> simp
+
+/-- The standard basis vector at `σ` has unit norm. -/
+private theorem hhaf_basis_dotProduct_self (L : ℕ) (σ : hhafConfig L) :
+    dotProduct (star (hhafBasis L σ)) (hhafBasis L σ) = 1 := by
+  rw [hhaf_star_basis, dotProduct, Finset.sum_eq_single_of_mem σ (Finset.mem_univ σ)]
+  · simp [hhafBasis]
+  · intro j _ hj; simp [hhafBasis, hj]
+
+/-- The action of the restricted matrix on the basis vector is the `σ`-th column. -/
+private theorem hhaf_mulVec_basis (L : ℕ) (σ : hhafConfig L) :
+    (hhafRestrictedMatrix L).mulVec (hhafBasis L σ) = fun j => (hhafRestrictedMatrix L) j σ := by
+  funext j
+  rw [Matrix.mulVec, dotProduct, Finset.sum_eq_single_of_mem σ (Finset.mem_univ σ)]
+  · simp [hhafBasis]
+  · intro k _ hk; simp [hhafBasis, hk]
+
+/-- The Rayleigh quotient of the restricted matrix at the basis vector `e_σ` is the diagonal entry
+`(M σ σ).re`. -/
+private theorem hhaf_rayleigh_basis_eq_diag (L : ℕ) (σ : hhafConfig L) :
+    rayleighOnVec (hhafRestrictedMatrix L) (hhafBasis L σ) =
+      ((hhafRestrictedMatrix L) σ σ).re := by
+  unfold rayleighOnVec
+  congr 1
+  rw [hhaf_star_basis, hhaf_mulVec_basis, dotProduct,
+    Finset.sum_eq_single_of_mem σ (Finset.mem_univ σ)]
+  · simp [hhafBasis]
+  · intro j _ hj; simp [hhafBasis, hj]
+
+/-- **`hhafMinEnergy` is `≤` every diagonal entry** of the restricted matrix (Rayleigh at the basis
+vector). -/
+theorem hhafMinEnergy_le_diag (L : ℕ) (σ : hhafConfig L) :
+    hhafMinEnergy L ≤ ((hhafRestrictedMatrix L) σ σ).re := by
+  have h := hermitianMinEigenvalue_mul_dotProduct_re_le_rayleighOnVec
+    (hhafRestrictedMatrix_isHermitian L) (hhafBasis L σ)
+  rw [hhaf_basis_dotProduct_self, Complex.one_re, mul_one,
+    hhaf_rayleigh_basis_eq_diag] at h
+  exact h
+
+/-- **Every diagonal entry is `≤ hhafMaxEnergy`** (Rayleigh at the basis vector). -/
+theorem diag_le_hhafMaxEnergy (L : ℕ) (σ : hhafConfig L) :
+    ((hhafRestrictedMatrix L) σ σ).re ≤ hhafMaxEnergy L := by
+  have h := rayleighOnVec_le_hermitianMaxEigenvalue_mul_dotProduct_re
+    (hhafRestrictedMatrix_isHermitian L) (hhafBasis L σ)
+  rw [hhaf_basis_dotProduct_self, Complex.one_re, mul_one,
+    hhaf_rayleigh_basis_eq_diag] at h
+  exact h
 
 /-! ## Per-`L` exponential decay of the correlation -/
 

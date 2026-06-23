@@ -9228,8 +9228,13 @@ established: the reverse bridge \texttt{hhafRealSpectrum\_restrict} restricts an
 eigenvector to a \texttt{hhafRestrictedMatrix} eigenvector, so via mathlib's
 \texttt{spectrum\_real\_eq\_range\_eigenvalues} every spectrum element is an eigenvalue
 (\texttt{hhafRealSpectrum\_subset\_eigenvalue\_range}) and the restricted spectrum is \emph{finite}
-(\texttt{hhafRealSpectrum\_finite}).  The unique-GS and positive-gap parts remain the deep residual
-(the Gómez-Santos Perron--Frobenius core).  Chapters~3--10 backfill.
+(\texttt{hhafRealSpectrum\_finite}).  A new general max-Rayleigh bound
+(\texttt{HermitianVariationalUpperBound}, the dual of the lower bound) then yields the diagonal
+sandwich $\texttt{hhafMinEnergy}\le(\hat M_{\sigma\sigma})\!.\mathrm{re}\le\texttt{hhafMaxEnergy}$
+(\texttt{hhafMinEnergy\_le\_diag}, \texttt{diag\_le\_hhafMaxEnergy}) via the Rayleigh quotient at a
+standard basis vector --- the route to non-scalarity (\texttt{hhafMinEnergy}${}<{}$\texttt{hhafMaxEnergy})
+for the positive gap.  The unique-GS part remains the deep residual (the Gómez-Santos
+Perron--Frobenius core).  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
