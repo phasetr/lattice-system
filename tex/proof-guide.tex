@@ -9296,6 +9296,11 @@ transferring each consecutive-$\pm$ pair of the moved configuration back to one 
 (relabelling $b\mapsto a$) using the open-arc decomposition lemmas
 \texttt{inCyclicOpen\_succ\_left\_imp}, \texttt{inCyclicOpen\_succ\_right\_imp},
 \texttt{notInCyclicOpen\_succ} (each an \texttt{omega} calculation after the cyclic-wrap split).
+The slide lifts to a step on the hidden-AFM subtype (\texttt{slidePM\_isRaiseLowerStepSHhaf}).  The
+second elementary move is the annihilation \texttt{annihPM} (set adjacent $a,b$ both to $0$), which
+\texttt{annihPM\_isRaiseLowerStep} shows is a single ladder step when $a,b$ carry opposite $\pm$
+spins; that it preserves hidden antiferromagnetic order (removing an adjacent $+,-$ pair keeps the
+alternation) and the $\pm$-count reduction induction together establish connectivity.
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
