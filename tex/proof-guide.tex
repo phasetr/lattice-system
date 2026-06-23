@@ -9244,7 +9244,12 @@ first-excited energy $E_1$ is the least restricted-matrix eigenvalue strictly ab
 \texttt{hhafMinEnergy} (it exists by finiteness and non-scalarity, lies in \texttt{hhafRealSpectrum},
 and is minimal among all spectrum elements above the ground energy by completeness), so the gap
 $E_1-\texttt{hhafMinEnergy}>0$.  Thus only the unique-ground-state clause of Proposition~6.5 remains
-axiomatic.  Chapters~3--10 backfill.
+axiomatic.  Toward its Perron--Frobenius discharge, the restricted matrix is shown to have real
+entries (\texttt{hhafRestrictedMatrix\_im\_zero}) and so descends to a real symmetric matrix
+(\texttt{hhafRestrictedMatrixReal}, \texttt{hhafRestrictedMatrixReal\_isSymm}); a Marshall gauge
+making the off-diagonals sign-definite plus irreducibility of the hidden-AFM configuration graph (the
+Gómez-Santos kink-ergodicity core) would then give a strictly positive Perron eigenvector at the
+ground energy, forcing a one-dimensional ground eigenspace.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
