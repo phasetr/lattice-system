@@ -9349,9 +9349,12 @@ This is the first half of the inter-sector ordering; the remaining half bounds t
 magnetization-$\pm1$ single-$\pm$ sectors above $-L$.  Toward that bound,
 \texttt{hhaf\_diag\_eq\_zero\_of\_pmCount\_one} shows a single-$\pm$ configuration has vanishing
 diagonal energy (every bond has a $0$-spin endpoint, since only one site is $\pm$), the Gershgorin
-disc centre for the magnetization-$\pm1$ sectors; with the off-diagonal row sum bounded by $L-1$
-(each kink-hopping amplitude at most $1$ and $L$ configurations), Gershgorin gives the sector minimum
-$\ge -(L-1)>-L$, hence strictly above the balanced minimum for every even $L\ge 2$.
+disc centre for the magnetization-$\pm1$ sectors; the off-diagonal row sum equals the single-kink
+hopping amplitude sum $2$ (two unit-amplitude neighbours, or for $L=2$ a single doubled-amplitude
+neighbour), so Gershgorin gives the sector minimum $\ge -2$.  For $L\ge 4$ this is strictly above the
+balanced minimum ($\le -L\le -4<-2$); the boundary case $L=2$ (where the magnetization-$\pm1$ minimum
+$-2$ coincides with the balanced Néel diagonal) additionally needs the strict bound that the balanced
+ground energy lies strictly below $-2$ (off-diagonal mixing of the Néel state).
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
