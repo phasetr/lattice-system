@@ -7,6 +7,7 @@ import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
 import LatticeSystem.Math.HermitianMaxEigenvalue
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Analysis.Matrix.Order
+import Mathlib.Analysis.Matrix.Spectrum
 
 /-!
 # Tasaki §6.3: hidden antiferromagnetic order and the `S = 1` chain on `H_HAF` (Proposition 6.5)
@@ -344,6 +345,72 @@ theorem exists_hhaf_min_real_eigenvalue (L : ℕ) :
   rw [hray] at hvar
   rw [hhafMinEnergy]
   exact le_of_mul_le_mul_right hvar hDpos
+
+/-! ## The restricted spectrum is exactly the restricted-matrix eigenvalue set -/
+
+/-- **Reverse bridge**: any `H_HAF`-restricted eigenvector restricts to an eigenvector of the
+restricted matrix at the same eigenvalue.  (An `H_HAF` vector `Φ` fixed by `P_HAF` equals the
+embedding of its restriction `u`, so the compression–embedding intertwining transfers the eigenvalue
+equation back to `hhafRestrictedMatrix`.) -/
+theorem hhafRealSpectrum_restrict (L : ℕ) {E' : ℝ} (hE' : E' ∈ hhafRealSpectrum L) :
+    ∃ u : hhafConfig L → ℂ, u ≠ 0 ∧ (hhafRestrictedMatrix L).mulVec u = (E' : ℂ) • u := by
+  obtain ⟨Φ, hΦ_ne, hΦ_proj, hΦ_eig⟩ := hE'
+  set u : hhafConfig L → ℂ := fun τ => Φ τ.1 with hu_def
+  have hΦ_emb : Φ = hhafSubspaceEmbedding L u := by
+    funext σ
+    by_cases hσ : IsHiddenAFMConfig σ
+    · rw [hhafSubspaceEmbedding, dif_pos hσ]
+    · rw [hhafSubspaceEmbedding, dif_neg hσ]
+      have hp := congrFun hΦ_proj σ
+      rw [hhafProjection, Matrix.mulVec_diagonal, if_neg hσ, zero_mul] at hp
+      exact hp.symm
+  have hu_eig : (hhafRestrictedMatrix L).mulVec u = (E' : ℂ) • u := by
+    have h1 : hhafSubspaceEmbedding L ((hhafRestrictedMatrix L).mulVec u) =
+        hhafSubspaceEmbedding L ((E' : ℂ) • u) := by
+      rw [← hhafRestrictedChainHamiltonianS_mulVec_hhafSubspaceEmbedding, ← hΦ_emb, hΦ_eig,
+        hhafSubspaceEmbedding_smul, hΦ_emb]
+    funext τ
+    have h2 := congrFun h1 τ.1
+    rwa [hhafSubspaceEmbedding_apply_subtype, hhafSubspaceEmbedding_apply_subtype] at h2
+  have hu_ne : u ≠ 0 := by
+    intro h0
+    apply hΦ_ne
+    rw [hΦ_emb, h0]
+    funext σ
+    rw [hhafSubspaceEmbedding]
+    split <;> rfl
+  exact ⟨u, hu_ne, hu_eig⟩
+
+/-- **Spectral completeness**: every element of `hhafRealSpectrum` is an eigenvalue of the
+restricted matrix.  (Via the reverse bridge `E'` is a restricted-matrix eigenvalue, hence lies in
+`spectrum ℝ`, which for a Hermitian matrix is the range of the eigenvalue function.) -/
+theorem hhafRealSpectrum_subset_eigenvalue_range (L : ℕ) {E' : ℝ}
+    (hE' : E' ∈ hhafRealSpectrum L) :
+    ∃ i, (hhafRestrictedMatrix_isHermitian L).eigenvalues i = E' := by
+  obtain ⟨u, hu_ne, hu_eig⟩ := hhafRealSpectrum_restrict L hE'
+  have hmem : E' ∈ spectrum ℝ (hhafRestrictedMatrix L) := by
+    rw [spectrum.mem_iff]
+    intro hunit
+    have hAu : (algebraMap ℝ (Matrix (hhafConfig L) (hhafConfig L) ℂ) E').mulVec u =
+        (E' : ℂ) • u := by
+      funext j
+      rw [Matrix.algebraMap_eq_diagonal, Matrix.mulVec_diagonal, Pi.smul_apply, smul_eq_mul,
+        Pi.algebraMap_apply, Complex.coe_algebraMap]
+    have hinj := Matrix.mulVec_injective_iff_isUnit.mpr hunit
+    apply hu_ne
+    apply hinj
+    rw [Matrix.mulVec_zero, Matrix.sub_mulVec, hAu, hu_eig, sub_self]
+  rw [(hhafRestrictedMatrix_isHermitian L).spectrum_real_eq_range_eigenvalues] at hmem
+  exact hmem
+
+/-- The `H_HAF`-restricted spectrum is **finite** (it is contained in the finite eigenvalue image of
+the restricted matrix). -/
+theorem hhafRealSpectrum_finite (L : ℕ) : (hhafRealSpectrum L).Finite := by
+  apply Set.Finite.subset
+    (Set.finite_range (hhafRestrictedMatrix_isHermitian L).eigenvalues)
+  intro E' hE'
+  obtain ⟨i, hi⟩ := hhafRealSpectrum_subset_eigenvalue_range L hE'
+  exact ⟨i, hi⟩
 
 /-! ## Per-`L` exponential decay of the correlation -/
 
