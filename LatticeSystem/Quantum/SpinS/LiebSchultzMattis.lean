@@ -57,19 +57,9 @@ noncomputable def lsmTrialState (L N : ℕ) (Φ : (Fin L → Fin (N + 1)) → �
     (Fin L → Fin (N + 1)) → ℂ :=
   (lsmTwistOperator L N).mulVec Φ
 
-/-- **Tasaki Lemma 6.1 (the twisted state has low energy), AXIOM.**  For the antiferromagnetic
-Heisenberg chain of any spin `S = N/2` and any length `L`, the LSM trial state `Φ_LSM` has energy
-above the ground state bounded by `8π²S²/L` (eq. (6.2.5)):
-`⟨Φ_LSM, Ĥ Φ_LSM⟩ / ⟨Φ_LSM, Φ_LSM⟩ − E_GS ≤ 8π²S²/L`,
-for any ground-state eigenvector `Φ_GS` (nonzero eigenvector at the ground energy `E_GS`).  The
-bound follows from `e^{iθ Ŝ_x^{(3)}} Ŝ_x^± e^{−iθ Ŝ_x^{(3)}} = e^{±iθ} Ŝ_x^±` and the slow
-`θ_x − θ_{x+1} = O(1/L)` variation; recorded as a documented axiom. -/
-axiom lsm_energy_bound (L N : ℕ) (hL : 0 < L)
-    (Φ_GS : (Fin L → Fin (N + 1)) → ℂ) (E_GS : ℝ) (hne : Φ_GS ≠ 0)
-    (heig : (afmHeisenbergChainHamiltonianS L N).mulVec Φ_GS = (E_GS : ℂ) • Φ_GS)
-    (hmin : IsGroundEnergy (afmHeisenbergChainHamiltonianS L N) E_GS) :
-    expectationRatioRe (afmHeisenbergChainHamiltonianS L N) (lsmTrialState L N Φ_GS) - E_GS ≤
-      8 * Real.pi ^ 2 * ((N : ℝ) / 2) ^ 2 / (L : ℝ)
+-- **Tasaki Lemma 6.1 (the twisted state has low energy)** is now a proved theorem
+-- `lsm_energy_bound` in `LatticeSystem.Quantum.SpinS.LiebSchultzMattisProof` (the former axiom
+-- here is discharged); `⟨Φ_LSM, Ĥ Φ_LSM⟩ / ⟨Φ_LSM, Φ_LSM⟩ − E_GS ≤ 8π²S²/L` (eq. (6.2.5)).
 
 /-- **Tasaki Lemma 6.2 (the twisted state is orthogonal to the ground state), AXIOM.**  For
 **half-odd-integer** spin `S = N/2` (`N` odd) and the *unique* ground state `Φ_GS` of the chain (in
