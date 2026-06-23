@@ -1238,4 +1238,126 @@ theorem hhafDressedMatrixPM1_eigenvalue_ge {L : ℕ} (hL : 2 ≤ L) {μ : ℝ}
   rw [abs_le] at this
   linarith [this.1]
 
+/-! ## The balanced ground energy is strictly below `−L` -/
+
+/-- **Strict row inequality** for a real matrix with a strictly positive vector, nonpositive
+off-diagonal row entries, and at least one strictly negative off-diagonal entry: the weighted row
+sum is strictly below the diagonal contribution.  (The Perron–Frobenius row contradiction used to
+make the balanced ground energy strict.) -/
+theorem row_sum_mul_lt_diag_mul_of_offdiag_nonpos_exists_neg
+    {ι : Type*} [Fintype ι]
+    {M : Matrix ι ι ℝ} {v : ι → ℝ} {i : ι}
+    (hv : ∀ j, 0 < v j) (hoff : ∀ j, j ≠ i → M i j ≤ 0)
+    (hex : ∃ j, j ≠ i ∧ M i j < 0) :
+    ∑ j, M i j * v j < M i i * v i := by
+  classical
+  obtain ⟨k, hk_ne, hk_neg⟩ := hex
+  rw [← Finset.add_sum_erase _ _ (Finset.mem_univ i)]
+  have hkmem : k ∈ Finset.univ.erase i := Finset.mem_erase.mpr ⟨hk_ne, Finset.mem_univ k⟩
+  have hrest : ∑ j ∈ Finset.univ.erase i, M i j * v j < 0 := by
+    rw [← Finset.add_sum_erase _ _ hkmem]
+    have hkterm : M i k * v k < 0 := mul_neg_of_neg_of_pos hk_neg (hv k)
+    have hrest2 : ∑ j ∈ (Finset.univ.erase i).erase k, M i j * v j ≤ 0 :=
+      Finset.sum_nonpos fun j hj => mul_nonpos_iff.mpr (Or.inr
+        ⟨hoff j (Finset.mem_erase.mp (Finset.mem_of_mem_erase hj)).1, (hv j).le⟩)
+    linarith
+  linarith
+
+/-- Off-diagonal entries of the balanced-sector dressed block are nonpositive. -/
+theorem hhafDressedMatrix0_offdiag_nonpos (L : ℕ) (hLeven : Even L) {σ τ : hhafConfig0 L}
+    (hne : σ ≠ τ) : hhafDressedMatrix0 L σ τ ≤ 0 := by
+  rw [hhafDressedMatrix0, Matrix.submatrix_apply]
+  exact hhafDressedMatrix_offdiag_nonpos L hLeven (fun h => hne (Subtype.ext h))
+
+/-- The balanced-sector dressed diagonal at the Néel configuration is `−L`. -/
+theorem hhafDressedMatrix0_Neel_diag (L : ℕ) (hLeven : Even L) (hL : 2 ≤ L) :
+    hhafDressedMatrix0 L (hhafNeelConfig0 L hLeven hL) (hhafNeelConfig0 L hLeven hL) =
+      -(L : ℝ) := by
+  rw [hhafDressedMatrix0, Matrix.submatrix_apply, hhafDressedMatrix_diag_eq,
+    hhafRestrictedMatrixReal]
+  simp only [hhafNeelConfig0]
+  rw [hhafNeel_diag L hL hLeven]
+  simp
+
+/-- The Néel configuration has a **strictly-negative** balanced ladder neighbour: annihilating the
+adjacent opposite-`±` pair at sites `0, 1` is a single HAF step, so the dressed entry there is
+`< 0`. -/
+theorem hhafNeel_step_neighbor (L : ℕ) (hLeven : Even L) (hL : 2 ≤ L) :
+    ∃ τ : hhafConfig0 L, τ ≠ hhafNeelConfig0 L hLeven hL ∧
+      hhafDressedMatrix0 L (hhafNeelConfig0 L hLeven hL) τ < 0 := by
+  set a : Fin L := ⟨0, by omega⟩ with ha_def
+  set b : Fin L := ⟨1, by omega⟩ with hb_def
+  have hab : a ≠ b := by
+    rw [ha_def, hb_def]; exact fun h => by simpa using congrArg Fin.val h
+  have hbv : b.val = (a.val + 1) % L := by
+    rw [ha_def, hb_def]; simp [Nat.mod_eq_of_lt (show 1 < L by omega)]
+  have hva : hhafNeel L a = 0 := by rw [ha_def, hhafNeel]; simp
+  have hvb : hhafNeel L b = 2 := by
+    rw [hb_def, hhafNeel]; norm_num [Nat.mod_eq_of_lt (show 1 < L by omega)]
+  have hav : hhafNeel L a ≠ 1 := by rw [hva]; decide
+  have hbv1 : hhafNeel L b ≠ 1 := by rw [hvb]; decide
+  have hne : hhafNeel L a ≠ hhafNeel L b := by rw [hva, hvb]; decide
+  -- the annihilated config and its membership in the balanced sector
+  have hneelHAF := hhafNeel_isHiddenAFM L hLeven hL
+  set τ1 : hhafConfig L :=
+    ⟨annihPM (hhafNeel L) a b, annihPM_isHiddenAFM hneelHAF hab hbv hav hbv1 hne⟩ with hτ1
+  have hτ1pc : pmCount L τ1 = L - 2 := by
+    rw [hτ1, pmCount, annihPM_pmCount_eq (hhafNeel L) hab hav hbv1]
+    have : (Finset.univ.filter (fun x => hhafNeel L x ≠ 1)).card = L := hhafNeel_pmCount L
+    rw [this]
+  have hτ1even : Even (pmCount L τ1) := by
+    rw [hτ1pc]; obtain ⟨m, hm⟩ := hLeven; exact ⟨m - 1, by omega⟩
+  refine ⟨⟨τ1, hτ1even⟩, ?_, ?_⟩
+  · -- the neighbour differs from Néel at site `a` (Néel `0`, annihilated `1`)
+    intro h
+    have hval : annihPM (hhafNeel L) a b a = hhafNeel L a := congrFun (congrArg Subtype.val
+      (congrArg Subtype.val h)) a
+    rw [annihPM_apply (hhafNeel L) hab a, if_pos (Or.inl rfl)] at hval
+    exact hav hval.symm
+  · -- the step gives a strictly negative dressed entry
+    have hstep : RaiseLowerStepSHhaf L (hhafNeelConfig0 L hLeven hL).1 τ1 :=
+      annihPM_isRaiseLowerStepSHhaf ⟨hhafNeel L, hneelHAF⟩ hab hbv hav hbv1 hne
+    have hpos := hhafShifted_pos_of_stepHhaf L hLeven (c := 0) hstep
+    have hne1 : τ1 ≠ (hhafNeelConfig0 L hLeven hL).1 := by
+      intro h
+      have hval : annihPM (hhafNeel L) a b a = hhafNeel L a :=
+        congrFun (congrArg Subtype.val h) a
+      rw [annihPM_apply (hhafNeel L) hab a, if_pos (Or.inl rfl)] at hval
+      exact hav hval.symm
+    rw [Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply_ne hne1, smul_zero, zero_sub,
+      neg_pos] at hpos
+    -- `hpos : hhafDressedMatrix L τ1 Néel < 0`; symmetrize and restrict to the block
+    have heq : hhafDressedMatrix0 L (hhafNeelConfig0 L hLeven hL) ⟨τ1, hτ1even⟩ =
+        hhafDressedMatrix L τ1 (hhafNeelConfig0 L hLeven hL).1 := by
+      rw [hhafDressedMatrix0, Matrix.submatrix_apply]
+      exact (hhafDressedMatrix_isSymm L).apply τ1 (hhafNeelConfig0 L hLeven hL).1
+    rw [heq]; exact hpos
+
+/-- **The balanced ground energy is strictly below `−L`.**  The Perron–Frobenius lowest eigenvector
+`v > 0` paired with the Néel row gives `μ · v(Néel) = −L · v(Néel) + Σ_{τ≠Néel} M₀(Néel,τ) v(τ)`;
+every off-diagonal term is `≤ 0` and at least one (the annihilation neighbour) is `< 0`, so
+`μ · v(Néel) < −L · v(Néel)`, hence `μ < −L`.  Since `−L ≤ −2`, the balanced sector lies *strictly*
+below the magnetization-`±1` sectors (`≥ −2`), with no `L = 2` tie. -/
+theorem hhafDressedMatrix0_ground_lt_neg_L (L : ℕ) (hLeven : Even L) (hL : 2 ≤ L)
+    {μ : ℝ} {v : hhafConfig0 L → ℝ} (hposv : ∀ i, 0 < v i)
+    (heig : (hhafDressedMatrix0 L).mulVec v = μ • v) :
+    μ < -(L : ℝ) := by
+  set n := hhafNeelConfig0 L hLeven hL with hn
+  obtain ⟨τ, hτ_ne, hτ_neg⟩ := hhafNeel_step_neighbor L hLeven hL
+  -- the eigenvalue equation read at the Néel row
+  have hrow : ∑ j, hhafDressedMatrix0 L n j * v j = μ * v n := by
+    have hc := congrFun heig n
+    rw [Pi.smul_apply, smul_eq_mul] at hc
+    rw [← hc]; rfl
+  -- the strict row inequality
+  have hlt : ∑ j, hhafDressedMatrix0 L n j * v j < hhafDressedMatrix0 L n n * v n :=
+    row_sum_mul_lt_diag_mul_of_offdiag_nonpos_exists_neg (i := n) hposv
+      (fun j hj => hhafDressedMatrix0_offdiag_nonpos L hLeven fun h => hj h.symm)
+      ⟨τ, hτ_ne, hτ_neg⟩
+  have hdiag : hhafDressedMatrix0 L n n = -(L : ℝ) := hhafDressedMatrix0_Neel_diag L hLeven hL
+  rw [hrow, hdiag] at hlt
+  -- `μ * v n < -L * v n` with `v n > 0`
+  have hvn := hposv n
+  nlinarith [hlt, hvn]
+
 end LatticeSystem.Quantum
