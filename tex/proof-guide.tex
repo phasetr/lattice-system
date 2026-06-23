@@ -9220,9 +9220,11 @@ the reverse embedding bridge and the Rayleigh variational bound).  The \emph{per
 decay} clause is also proved (\texttt{exp\_decay\_envelope\_of\_finite},
 \texttt{hhaf\_correlation\_exp\_decay\_exists}): on a fixed finite ring the correlations are a finite
 family, so $\xi=1$ and $C=\sum_{x',y'}|\langle\hat S_{x'}\!\cdot\!\hat S_{y'}\rangle|e^{d(x',y')}$
-make $|\langle\hat S_x\!\cdot\!\hat S_y\rangle|\le Ce^{-d(x,y)/\xi}$ hold termwise.  The unique-GS and
-positive-gap parts remain the deep residual (the Gómez-Santos Perron--Frobenius core).
-Chapters~3--10 backfill.
+make $|\langle\hat S_x\!\cdot\!\hat S_y\rangle|\le Ce^{-d(x,y)/\xi}$ hold termwise.  Toward the gap,
+the max-energy infrastructure is in place: \texttt{hhafRestrictedMatrix\_eigenvalue\_mem\_realSpectrum}
+(each restricted-matrix eigenvalue embeds into \texttt{hhafRealSpectrum} via its eigenvector basis)
+and \texttt{hhafMaxEnergy}/\texttt{hhafMaxEnergy\_mem\_realSpectrum}.  The unique-GS and positive-gap
+parts remain the deep residual (the Gómez-Santos Perron--Frobenius core).  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
