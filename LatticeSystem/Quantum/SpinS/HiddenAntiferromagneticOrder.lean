@@ -813,6 +813,58 @@ theorem heisenbergHamiltonianS_ringCouplingSym (L : ℕ) :
     heisenbergHamiltonianS_add (ringCoupling L) (fun x y => ringCoupling L y x) 2
   rw [h, heisenbergHamiltonianS_coupling_swap, two_smul]
 
+/-- On an even ring the symmetrized coupling vanishes between same-sublattice sites: the ring is
+bipartite w.r.t. the even/odd indicator `ringSublattice`.  (For even `L`, `(a+1) % L` has the
+opposite parity to `a`, so two sites of equal parity are never nearest neighbours.) -/
+theorem ringCouplingSym_bipartite (L : ℕ) (hLeven : Even L) (x y : Fin L)
+    (hA : ringSublattice L x = ringSublattice L y) : ringCouplingSym L x y = 0 := by
+  have h2 : (2 : ℕ) ∣ L := hLeven.two_dvd
+  have hpar : x.val % 2 = y.val % 2 := by
+    have h3 : x.val % 2 < 2 := Nat.mod_lt _ (by norm_num)
+    have h4 : y.val % 2 < 2 := Nat.mod_lt _ (by norm_num)
+    simp only [ringSublattice, decide_eq_decide] at hA
+    omega
+  rw [ringCouplingSym, ringCoupling, ringCoupling, if_neg, if_neg, add_zero]
+  · intro h
+    have hm : x.val % 2 = (y.val + 1) % 2 := by
+      rw [h]; exact Nat.mod_mod_of_dvd (y.val + 1) h2
+    omega
+  · intro h
+    have hm : y.val % 2 = (x.val + 1) % 2 := by
+      rw [h]; exact Nat.mod_mod_of_dvd (x.val + 1) h2
+    omega
+
+/-- The dressed restricted matrix for the directed ring coupling is half that for the symmetrized
+coupling (`heisenbergHamiltonianS_ringCouplingSym` scaled through the Marshall dressing). -/
+theorem dressedHeisenbergS_ringCoupling_re_eq_half (L : ℕ) (A : Fin L → Bool)
+    (σ σ' : Fin L → Fin 3) :
+    (dressedHeisenbergS A (ringCoupling L) 2 σ σ').re =
+      (1 / 2) * (dressedHeisenbergS A (ringCouplingSym L) 2 σ σ').re := by
+  have hscale : dressedHeisenbergS A (ringCouplingSym L) 2 σ σ' =
+      (2 : ℂ) * dressedHeisenbergS A (ringCoupling L) 2 σ σ' := by
+    rw [dressedHeisenbergS_def, dressedHeisenbergS_def, heisenbergHamiltonianS_ringCouplingSym,
+      Matrix.smul_apply, smul_eq_mul]
+    ring
+  rw [hscale, Complex.mul_re]
+  simp
+
+/-- **Off-diagonal nonpositivity** (even ring): distinct hidden-AFM configurations have a
+non-positive dressed restricted matrix element — the diagonal `±1` Marshall gauge makes the
+antiferromagnetic off-diagonals sign-definite.  This is the entry point for the Perron–Frobenius
+uniqueness argument. -/
+theorem hhafDressedMatrix_offdiag_nonpos (L : ℕ) (hLeven : Even L) {σ τ : hhafConfig L}
+    (hne : σ ≠ τ) : hhafDressedMatrix L σ τ ≤ 0 := by
+  have hne1 : σ.1 ≠ τ.1 := fun h => hne (Subtype.ext h)
+  rw [hhafDressedMatrix, Matrix.submatrix_apply, dressedHeisenbergSReMatrix_apply,
+    dressedHeisenbergS_ringCoupling_re_eq_half]
+  have hnp := dressedHeisenbergS_apply_re_nonpos_of_ne_bipartite (ringSublattice L) 2
+    (ringCouplingSym_im_zero L) (ringCouplingSym_re_nonneg L) (ringCouplingSym_symm L)
+    (fun x y h => ringCouplingSym_bipartite L hLeven x y h) hne1
+  have : (1 / 2 : ℝ) * (dressedHeisenbergS (ringSublattice L) (ringCouplingSym L) 2 σ.1 τ.1).re ≤
+      (1 / 2 : ℝ) * 0 := by
+    apply mul_le_mul_of_nonneg_left hnp; norm_num
+  simpa using this
+
 /-! ## Per-`L` exponential decay of the correlation -/
 
 /-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring

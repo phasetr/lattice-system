@@ -9258,6 +9258,11 @@ $\hat H(J^{\mathrm{sym}})=2\,\hat H(J)$ (\texttt{heisenbergHamiltonianS\_ringCou
 two-site dot is symmetric so $\hat H(J^{\top})=\hat H(J)$,
 \texttt{heisenbergHamiltonianS\_coupling\_swap}), so the directed ring Hamiltonian is exactly
 $\tfrac12$ the symmetric one and the symmetric-coupling off-diagonal nonpositivity lemma applies.
+This yields \texttt{hhafDressedMatrix\_offdiag\_nonpos}: on an even ring, distinct hidden-AFM
+configurations $\sigma\neq\tau$ have $\mathrm{dressed}(\sigma,\tau)\le 0$.  (The bipartiteness input
+\texttt{ringCouplingSym\_bipartite} uses that for even $L$ the successor map $a\mapsto(a+1)\bmod L$
+flips parity, so two equal-parity sites are never nearest neighbours,
+via \texttt{Nat.mod\_mod\_of\_dvd}.)
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
