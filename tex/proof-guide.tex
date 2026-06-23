@@ -9278,6 +9278,12 @@ The bond graph is \texttt{hhafRingGraph} (cyclic nearest neighbours on $\mathbb{
 bipartite w.r.t.\ \texttt{ringSublattice} for even $L$ (\texttt{hhafRingGraph\_adj\_sublattice\_ne})
 and on whose edges \texttt{ringCouplingSym} is strictly positive
 (\texttt{ringCouplingSym\_re\_pos\_of\_ringGraph\_adj}).
+HAF-internal reachability \texttt{RaiseLowerReachableSHhaf} (the reflexive transitive closure of
+single HAF-preserving ladder moves) then lifts the per-step positivity to powers: if $\sigma'$ is
+reachable from $\sigma$, some power $(c\,I-M)^k$ is strictly positive at $(\sigma',\sigma)$
+(\texttt{exists\_matrixPow\_apply\_pos\_of\_hhafReachable}, mirroring the magnetization-sector
+walk-to-power bridge).  It remains to prove connectivity of the HAF configuration graph (every
+configuration is reachable from the all-$0$ configuration by the canonical kink reduction).
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
