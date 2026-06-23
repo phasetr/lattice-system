@@ -59,6 +59,7 @@ import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrderUniqueness
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattis
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisProof
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisOrthogonality
+import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingUniqueness
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisGeneral
 import LatticeSystem.Quantum.SpinS.ShastryNoSSB
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO
