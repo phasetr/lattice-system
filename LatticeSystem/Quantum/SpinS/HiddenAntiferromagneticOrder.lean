@@ -566,7 +566,7 @@ private theorem hhaf_succ_val {L : ℕ} (_hL : 2 ≤ L) (x : Fin L) :
 
 /-- **General restricted-diagonal formula**: for `L ≥ 2`, the diagonal entry collapses (over the
 directed ring bond `x → x+1`) to `∑_x (1 - σ_x)(1 - σ_{x+1})`. -/
-private theorem hhaf_diag_eq_succ_sum (L : ℕ) (hL : 2 ≤ L) (σ : hhafConfig L) :
+theorem hhaf_diag_eq_succ_sum (L : ℕ) (hL : 2 ≤ L) (σ : hhafConfig L) :
     (hhafRestrictedMatrix L) σ σ =
       ∑ x : Fin L, ((1 : ℂ) - ((σ.1 x).val : ℂ)) *
         (1 - ((σ.1 ⟨(x.val + 1) % L, Nat.mod_lt _ (by omega)⟩).val : ℂ)) := by
