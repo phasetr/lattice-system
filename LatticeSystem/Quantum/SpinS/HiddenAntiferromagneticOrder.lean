@@ -670,6 +670,48 @@ theorem hhafMinEnergy_lt_hhafMaxEnergy (L : ℕ) (_hLeven : Even L) (hL : 2 ≤ 
       rw [hhafAllZeroSpin_diag_re_eq_zero L hL]
     _ ≤ hhafMaxEnergy L := diag_le_hhafMaxEnergy L (hhafAllZeroSpinConfig L)
 
+/-! ## Positive spectral gap on `H_HAF` -/
+
+/-- **Positive-gap clause of Proposition 6.5**: for an even ring with `L > 0` (hence `L ≥ 2`), the
+`H_HAF`-restricted spectrum has a first-excited eigenvalue `E₁` strictly above the ground energy
+`hhafMinEnergy`, giving a positive gap `E₁ − hhafMinEnergy`.  (`E₁` is the least restricted-matrix
+eigenvalue above the minimum; it exists because the spectrum is finite and `hhafMaxEnergy >
+hhafMinEnergy` by non-scalarity, and it is minimal among all spectrum elements above the ground
+energy by spectral completeness.) -/
+theorem exists_hhaf_positive_gap (L : ℕ) (hLeven : Even L) (hLpos : 0 < L) :
+    ∃ gap : ℝ, 0 < gap ∧ ∃ E₁ ∈ hhafRealSpectrum L,
+      hhafMinEnergy L < E₁ ∧ gap = E₁ - hhafMinEnergy L ∧
+      ∀ E' ∈ hhafRealSpectrum L, hhafMinEnergy L < E' → E₁ ≤ E' := by
+  classical
+  have hL : 2 ≤ L := by rcases hLeven with ⟨k, hk⟩; omega
+  set hM := hhafRestrictedMatrix_isHermitian L with hMdef
+  set F : Finset ℝ := Finset.univ.image hM.eigenvalues with hF
+  set Fabove : Finset ℝ := F.filter (fun E' => hhafMinEnergy L < E') with hFabove
+  have hmax_mem : hhafMaxEnergy L ∈ Fabove := by
+    rw [hFabove, Finset.mem_filter]
+    refine ⟨?_, hhafMinEnergy_lt_hhafMaxEnergy L hLeven hL⟩
+    rw [hF, hhafMaxEnergy]
+    exact LatticeSystem.Math.hermitian_max_eigenvalue_mem_image hM
+  have hne : Fabove.Nonempty := ⟨_, hmax_mem⟩
+  set E₁ : ℝ := Fabove.min' hne with hE₁def
+  have hE₁_mem : E₁ ∈ Fabove := Finset.min'_mem _ hne
+  rw [hFabove, Finset.mem_filter] at hE₁_mem
+  obtain ⟨hE₁_F, hE₁_gt⟩ := hE₁_mem
+  rw [hF, Finset.mem_image] at hE₁_F
+  obtain ⟨i, _, hi⟩ := hE₁_F
+  have hE₁_spec : E₁ ∈ hhafRealSpectrum L := by
+    rw [← hi]
+    exact hhafRestrictedMatrix_eigenvalue_mem_realSpectrum L i
+  refine ⟨E₁ - hhafMinEnergy L, by linarith, E₁, hE₁_spec, hE₁_gt, rfl, ?_⟩
+  intro E' hE'_spec hE'_gt
+  obtain ⟨j, hj⟩ := hhafRealSpectrum_subset_eigenvalue_range L hE'_spec
+  have hE'_Fabove : E' ∈ Fabove := by
+    rw [hFabove, Finset.mem_filter]
+    refine ⟨?_, hE'_gt⟩
+    rw [hF, Finset.mem_image]
+    exact ⟨j, Finset.mem_univ j, hj⟩
+  exact Finset.min'_le _ _ hE'_Fabove
+
 /-! ## Per-`L` exponential decay of the correlation -/
 
 /-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring

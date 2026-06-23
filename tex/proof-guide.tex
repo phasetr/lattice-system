@@ -9238,8 +9238,13 @@ $\texttt{hhaf\_diag\_eq\_succ\_sum}$ ($\hat M_{\sigma\sigma}=\sum_x(1-\sigma_x)(
 inner ring-coupling sum collapsing to the successor bond) gives diagonal $0$ at the all-zero
 configuration and a strictly negative diagonal at the domain-wall configuration $[0,2,1,\dots,1]$, so
 $\texttt{hhafMinEnergy}\le\text{diag}_{\mathrm{dw}}<0\le\text{diag}_0\le\texttt{hhafMaxEnergy}$.  The
-unique-GS part remains the deep residual (the Gómez-Santos Perron--Frobenius core), and the gap
-clause is assembled next.  Chapters~3--10 backfill.
+unique-GS part remains the deep residual (the Gómez-Santos Perron--Frobenius core).  The
+\emph{positive-gap} clause is then assembled (\texttt{exists\_hhaf\_positive\_gap}, even $L>0$): the
+first-excited energy $E_1$ is the least restricted-matrix eigenvalue strictly above
+\texttt{hhafMinEnergy} (it exists by finiteness and non-scalarity, lies in \texttt{hhafRealSpectrum},
+and is minimal among all spectrum elements above the ground energy by completeness), so the gap
+$E_1-\texttt{hhafMinEnergy}>0$.  Thus only the unique-ground-state clause of Proposition~6.5 remains
+axiomatic.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
