@@ -472,6 +472,204 @@ theorem diag_le_hhafMaxEnergy (L : ℕ) (σ : hhafConfig L) :
     hhaf_rayleigh_basis_eq_diag] at h
   exact h
 
+/-! ## Concrete diagonal witnesses for non-scalarity -/
+
+/-- The hidden-AFM configuration with every site carrying spin `0` (`σ_x = 1`). -/
+def hhafAllZeroSpinConfig (L : ℕ) : hhafConfig L :=
+  ⟨fun _ => 1, fun _ _ h => (h.2.1 rfl).elim⟩
+
+/-- The raw domain-wall hidden-AFM configuration: site `0` carries `+1` (`σ = 0`), site `1`
+carries `-1` (`σ = 2`), and every other site carries spin `0` (`σ = 1`).  For `L < 2` the
+second special site is absent, but the same formula is still a valid vacuous hidden-AFM
+configuration. -/
+def hhafDomainWallRaw (L : ℕ) : Fin L → Fin 3 :=
+  fun x => if x.val = 0 then 0 else if x.val = 1 then 2 else 1
+
+/-- In the domain-wall configuration, a nonzero (`±`) spin can occur only at values `0` or `1`. -/
+private theorem hhafDomainWallRaw_pm_val {L : ℕ} (x : Fin L)
+    (hx : IsPM (hhafDomainWallRaw L) x) : x.val = 0 ∨ x.val = 1 := by
+  by_cases hx0 : x.val = 0
+  · exact Or.inl hx0
+  · by_cases hx1 : x.val = 1
+    · exact Or.inr hx1
+    · exfalso
+      exact hx (by simp [hhafDomainWallRaw, hx0, hx1])
+
+/-- The domain-wall raw configuration has complete hidden antiferromagnetic order: the only possible
+nonzero sites are `0` and `1`, and their spins are opposite. -/
+theorem hhafDomainWallRaw_isHiddenAFMConfig (L : ℕ) :
+    IsHiddenAFMConfig (hhafDomainWallRaw L) := by
+  intro x y hxy
+  rcases hxy with ⟨hxy_ne, hxpm, hypm, _⟩
+  rcases hhafDomainWallRaw_pm_val x hxpm with hx0 | hx1
+  · rcases hhafDomainWallRaw_pm_val y hypm with hy0 | hy1
+    · exact (hxy_ne (Fin.ext (by omega))).elim
+    · simp [hhafDomainWallRaw, hx0, hy1]
+  · rcases hhafDomainWallRaw_pm_val y hypm with hy0 | hy1
+    · simp [hhafDomainWallRaw, hx1, hy0]
+    · exact (hxy_ne (Fin.ext (by omega))).elim
+
+/-- The domain-wall hidden-AFM configuration used to witness a negative diagonal entry. -/
+def hhafDomainWallConfig (L : ℕ) : hhafConfig L :=
+  ⟨hhafDomainWallRaw L, hhafDomainWallRaw_isHiddenAFMConfig L⟩
+
+/-- The directed ring coupling has no self-loop when `L ≥ 2`. -/
+private theorem ringCoupling_self_eq_zero {L : ℕ} (hL : 2 ≤ L) (x : Fin L) :
+    ringCoupling L x x = 0 := by
+  rw [ringCoupling]
+  apply if_neg
+  intro h
+  have hxlt : x.val < L := x.isLt
+  by_cases hwrap : x.val + 1 < L
+  · rw [Nat.mod_eq_of_lt hwrap] at h
+    omega
+  · have hxle : x.val + 1 ≤ L := by omega
+    have hxadd : x.val + 1 = L := by omega
+    rw [hxadd, Nat.mod_self] at h
+    omega
+
+/-- At the all-zero-spin hidden-AFM configuration, the restricted diagonal entry is `0`. -/
+theorem hhafAllZeroSpin_diag_re_eq_zero (L : ℕ) (hL : 2 ≤ L) :
+    ((hhafRestrictedMatrix L) (hhafAllZeroSpinConfig L) (hhafAllZeroSpinConfig L)).re = 0 := by
+  rw [hhafRestrictedMatrix, Matrix.submatrix_apply, afmHeisenbergChainHamiltonianS,
+    heisenbergHamiltonianS_apply_diag]
+  change (∑ x : Fin L, ∑ y : Fin L,
+    ringCoupling L x y *
+      (if x = y then (2 : ℂ) * (2 + 2) / 4
+       else ((2 : ℂ) / 2 - ((hhafAllZeroSpinConfig L).1 x).val) *
+        ((2 : ℂ) / 2 - ((hhafAllZeroSpinConfig L).1 y).val))).re = 0
+  have hsum : (∑ x : Fin L, ∑ y : Fin L,
+      ringCoupling L x y *
+        (if x = y then (2 : ℂ) * (2 + 2) / 4
+         else ((2 : ℂ) / 2 - ((hhafAllZeroSpinConfig L).1 x).val) *
+          ((2 : ℂ) / 2 - ((hhafAllZeroSpinConfig L).1 y).val))) = 0 := by
+    refine Finset.sum_eq_zero fun x _ => ?_
+    refine Finset.sum_eq_zero fun y _ => ?_
+    by_cases hxy : x = y
+    · subst y
+      rw [if_pos rfl, ringCoupling_self_eq_zero hL x]
+      simp
+    · rw [if_neg hxy]
+      simp [hhafAllZeroSpinConfig]
+  rw [hsum]
+  rfl
+
+/-- The successor index value `(x+1) mod L`: it is `0` at the last site, `x+1` otherwise. -/
+private theorem hhaf_succ_val {L : ℕ} (_hL : 2 ≤ L) (x : Fin L) :
+    (x.val + 1) % L = if x.val + 1 = L then 0 else x.val + 1 := by
+  by_cases h : x.val + 1 = L
+  · rw [if_pos h, h, Nat.mod_self]
+  · rw [Nat.mod_eq_of_lt (by have := x.isLt; omega), if_neg h]
+
+/-- **General restricted-diagonal formula**: for `L ≥ 2`, the diagonal entry collapses (over the
+directed ring bond `x → x+1`) to `∑_x (1 - σ_x)(1 - σ_{x+1})`. -/
+private theorem hhaf_diag_eq_succ_sum (L : ℕ) (hL : 2 ≤ L) (σ : hhafConfig L) :
+    (hhafRestrictedMatrix L) σ σ =
+      ∑ x : Fin L, ((1 : ℂ) - ((σ.1 x).val : ℂ)) *
+        (1 - ((σ.1 ⟨(x.val + 1) % L, Nat.mod_lt _ (by omega)⟩).val : ℂ)) := by
+  rw [hhafRestrictedMatrix, Matrix.submatrix_apply, afmHeisenbergChainHamiltonianS,
+    heisenbergHamiltonianS_apply_diag]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [Finset.sum_eq_single (⟨(x.val + 1) % L, Nat.mod_lt _ (by omega)⟩ : Fin L)]
+  · have hne : x ≠ (⟨(x.val + 1) % L, Nat.mod_lt _ (by omega)⟩ : Fin L) := by
+      intro h
+      have hv := congrArg Fin.val h
+      have hxlt := x.isLt
+      have hsv := hhaf_succ_val hL x
+      simp only [hsv] at hv
+      split_ifs at hv with hc <;> omega
+    rw [if_neg hne]
+    have hcoup : ringCoupling L x ⟨(x.val + 1) % L, Nat.mod_lt _ (by omega)⟩ = 1 := by
+      rw [ringCoupling, if_pos rfl]
+    rw [hcoup, one_mul]
+    norm_num
+  · intro y _ hy
+    have hcoup0 : ringCoupling L x y = 0 := by
+      rw [ringCoupling, if_neg]
+      intro h
+      exact hy (Fin.ext h)
+    rw [hcoup0, zero_mul]
+  · intro hmem
+    exact absurd (Finset.mem_univ _) hmem
+
+/-- The `1 - σ` weight of the domain-wall configuration at index value `n`: `1` at `0`, `-1` at `1`,
+`0` elsewhere. -/
+private def dwWeight (n : ℕ) : ℝ := if n = 0 then 1 else if n = 1 then -1 else 0
+
+/-- The domain-wall weight at index `0` is `1` (spin `+1`). -/
+private theorem dwWeight_zero : dwWeight 0 = 1 := rfl
+
+/-- The domain-wall weight at index `1` is `-1` (spin `-1`). -/
+private theorem dwWeight_one : dwWeight 1 = -1 := rfl
+
+/-- The domain-wall weight vanishes for indices `≥ 2` (spin `0`). -/
+private theorem dwWeight_ge_two {n : ℕ} (h : 2 ≤ n) : dwWeight n = 0 := by
+  unfold dwWeight; rw [if_neg (by omega), if_neg (by omega)]
+
+/-- The `1 - σ` weight of the domain-wall configuration equals `dwWeight` of the site index. -/
+private theorem dwWeight_eq (L : ℕ) (x : Fin L) :
+    (1 - ((hhafDomainWallConfig L).1 x).val : ℝ) = dwWeight x.val := by
+  change (1 - ((hhafDomainWallRaw L x).val : ℝ)) = dwWeight x.val
+  unfold hhafDomainWallRaw dwWeight
+  split_ifs <;> norm_num
+
+/-- Each bond `x → x+1` of the domain-wall configuration contributes a non-positive product of
+consecutive weights. -/
+private theorem dwWeight_mul_succ_nonpos (L : ℕ) (hL : 2 ≤ L) (x : Fin L) :
+    dwWeight x.val * dwWeight ((x.val + 1) % L) ≤ 0 := by
+  have hxlt := x.isLt
+  rw [hhaf_succ_val hL x]
+  by_cases h0 : x.val = 0
+  · -- weight 1 at x; successor value 1 (L ≥ 2): weight -1, product -1 ≤ 0
+    rw [h0, if_neg (by omega : (0 : ℕ) + 1 ≠ L), dwWeight_zero]
+    norm_num [dwWeight_one]
+  · by_cases h1 : x.val = 1
+    · rw [h1]
+      by_cases hL2 : (1 : ℕ) + 1 = L
+      · rw [if_pos hL2, dwWeight_one, dwWeight_zero]; norm_num
+      · rw [if_neg hL2, dwWeight_one, dwWeight_ge_two (by omega)]; norm_num
+    · -- weight 0 at x ⟹ product 0
+      rw [dwWeight_ge_two (by omega : 2 ≤ x.val)]; norm_num
+
+/-- The domain-wall hidden-AFM configuration has a strictly negative restricted diagonal entry for
+every `L ≥ 2`: the bond `0 → 1` contributes `-1` and every other bond contributes `≤ 0`. -/
+theorem hhafDomainWall_diag_re_neg (L : ℕ) (hL : 2 ≤ L) :
+    ((hhafRestrictedMatrix L) (hhafDomainWallConfig L) (hhafDomainWallConfig L)).re < 0 := by
+  rw [hhaf_diag_eq_succ_sum L hL, Complex.re_sum]
+  have hterm : ∀ x : Fin L,
+      (((1 : ℂ) - ((hhafDomainWallConfig L).1 x).val) *
+        (1 - ((hhafDomainWallConfig L).1
+          ⟨(x.val + 1) % L, Nat.mod_lt _ (by omega)⟩).val)).re =
+      dwWeight x.val * dwWeight ((x.val + 1) % L) := by
+    intro x
+    rw [← dwWeight_eq L x, ← dwWeight_eq L ⟨(x.val + 1) % L, Nat.mod_lt _ (by omega)⟩]
+    simp [Complex.mul_re, Complex.sub_re, Complex.sub_im, Complex.one_re, Complex.one_im]
+  simp_rw [hterm]
+  have hlt : (∑ x : Fin L, dwWeight x.val * dwWeight ((x.val + 1) % L)) <
+      ∑ _x : Fin L, (0 : ℝ) := by
+    refine Finset.sum_lt_sum (fun x _ => dwWeight_mul_succ_nonpos L hL x) ?_
+    refine ⟨⟨0, by omega⟩, Finset.mem_univ _, ?_⟩
+    have h1 : ((⟨0, by omega⟩ : Fin L).val + 1) % L = 1 := by
+      change (0 + 1) % L = 1
+      rw [Nat.mod_eq_of_lt (by omega)]
+    rw [show (⟨0, by omega⟩ : Fin L).val = 0 from rfl, h1, dwWeight_zero, dwWeight_one]
+    norm_num
+  simpa using hlt
+
+/-- **Non-scalarity of the hidden-AFM restricted Hamiltonian**: for every even ring with `L ≥ 2`,
+the variational lower and upper diagonal witnesses force the minimal restricted energy to be
+strictly below the maximal restricted energy. -/
+theorem hhafMinEnergy_lt_hhafMaxEnergy (L : ℕ) (_hLeven : Even L) (hL : 2 ≤ L) :
+    hhafMinEnergy L < hhafMaxEnergy L := by
+  calc
+    hhafMinEnergy L ≤
+        ((hhafRestrictedMatrix L) (hhafDomainWallConfig L) (hhafDomainWallConfig L)).re :=
+      hhafMinEnergy_le_diag L (hhafDomainWallConfig L)
+    _ < 0 := hhafDomainWall_diag_re_neg L hL
+    _ = ((hhafRestrictedMatrix L) (hhafAllZeroSpinConfig L) (hhafAllZeroSpinConfig L)).re := by
+      rw [hhafAllZeroSpin_diag_re_eq_zero L hL]
+    _ ≤ hhafMaxEnergy L := diag_le_hhafMaxEnergy L (hhafAllZeroSpinConfig L)
+
 /-! ## Per-`L` exponential decay of the correlation -/
 
 /-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring
