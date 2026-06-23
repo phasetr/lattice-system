@@ -9318,7 +9318,14 @@ reachable from the canonical all-$0$ configuration.  \emph{The reduction targets
 (charge-$0$) sector}: the slide and annihilation moves conserve total $S^{(3)}$, and indeed the full
 hidden-AFM matrix is reducible (a single-$\pm$ configuration, magnetization $\pm 1$, is vacuously
 hidden-AFM but unreachable from the canonical configuration), so Perron--Frobenius applies to the
-balanced-sector block, which contains the antiferromagnetic ground state.
+balanced-sector block, which contains the antiferromagnetic ground state.  Concretely, the balanced
+sector \texttt{hhafConfig0} (even $\pm$-count) carries the block \texttt{hhafShiftedMatrix0}
+$=(c\,I-M)$, its connectivity lifts to the subtype (\texttt{hhaf\_reachable\_to\_canonical0}), and
+\texttt{hhafShiftedMatrix0\_isIrreducible} shows that for even $L$ and a strict shift
+$c>\text{max energy}$ this block is Perron--Frobenius irreducible (nonnegative with an
+entrywise-positive power, the diagonal handled by the strict shift).  Applying
+\texttt{perronFrobenius\_real\_symmetric} then bounds the balanced-sector ground eigenspace by a
+single dimension; the global ground state additionally requires the inter-sector energy ordering.
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
