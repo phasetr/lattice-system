@@ -1160,6 +1160,47 @@ theorem slidePM_isHiddenAFM {L : ℕ} {σ : Fin L → Fin 3} (hσ : IsHiddenAFMC
       have hznb : z ≠ b := fun h => hbnotarc (h ▸ hz)
       rw [← hvo z hzna hznb]; exact harc z hz
 
+/-- The slide move, as a single step on the hidden-AFM subtype `RaiseLowerStepSHhaf`. -/
+theorem slidePM_isRaiseLowerStepSHhaf {L : ℕ} (σ : hhafConfig L) {a b : Fin L} (hab : a ≠ b)
+    (hb : b.val = (a.val + 1) % L) (ha : σ.1 a ≠ 1) (hb1 : σ.1 b = 1) :
+    RaiseLowerStepSHhaf L σ ⟨slidePM σ.1 a b, slidePM_isHiddenAFM σ.2 hab hb ha hb1⟩ :=
+  slidePM_isRaiseLowerStep σ.1 hab hb ha hb1
+
+/-! ## Kink-reduction move: annihilating an adjacent `+,−` pair -/
+
+/-- **Annihilation move** (raw configuration): set both `a` and `b` to `0`-spins.  When `a`, `b` are
+adjacent and carry opposite `±` spins, this annihilates the `+,−` pair into two `0`s. -/
+def annihPM {L : ℕ} (σ : Fin L → Fin 3) (a b : Fin L) : Fin L → Fin 3 :=
+  Function.update (Function.update σ a 1) b 1
+
+/-- The annihilation move's value: `0` at `a` and `b`, unchanged elsewhere. -/
+theorem annihPM_apply {L : ℕ} (σ : Fin L → Fin 3) {a b : Fin L} (hab : a ≠ b) (k : Fin L) :
+    annihPM σ a b k = if k = a ∨ k = b then 1 else σ k := by
+  rw [annihPM]
+  by_cases hkb : k = b
+  · subst hkb; rw [Function.update_self, if_pos (Or.inr rfl)]
+  · rw [Function.update_of_ne hkb]
+    by_cases hka : k = a
+    · subst hka; rw [Function.update_self, if_pos (Or.inl rfl)]
+    · rw [Function.update_of_ne hka, if_neg (by tauto)]
+
+/-- The annihilation move is a single raise/lower (ladder) step on the ring-graph bond `{a, b}` when
+`a`, `b` are adjacent and carry opposite `±` spins. -/
+theorem annihPM_isRaiseLowerStep {L : ℕ} (σ : Fin L → Fin 3) {a b : Fin L} (hab : a ≠ b)
+    (hbv : b.val = (a.val + 1) % L) (ha : σ a ≠ 1) (hb1 : σ b ≠ 1) (hne : σ a ≠ σ b) :
+    RaiseLowerStepS (hhafRingGraph L) σ (annihPM σ a b) := by
+  refine ⟨a, b, ⟨hab, Or.inl hbv.symm⟩, ?_, ?_⟩
+  · have haa : annihPM σ a b a = 1 := by rw [annihPM_apply σ hab a, if_pos (Or.inl rfl)]
+    have hbb : annihPM σ a b b = 1 := by rw [annihPM_apply σ hab b, if_pos (Or.inr rfl)]
+    rw [haa, hbb]
+    -- σ a and σ b are opposite `±` values: {0, 2}
+    have hva : (σ a).val = 0 ∨ (σ a).val = 2 := by omega
+    have hvb : (σ b).val = 0 ∨ (σ b).val = 2 := by omega
+    have hvne : (σ a).val ≠ (σ b).val := fun h => hne (Fin.ext h)
+    rcases hva with hva | hva <;> rcases hvb with hvb | hvb <;> simp_all
+  · intro k hka hkb
+    rw [annihPM_apply σ hab k, if_neg (by tauto)]
+
 /-- The **number of `±` (nonzero) spins** in a hidden-AFM configuration — the induction measure for
 the kink reduction (each annihilation removes a `+,−` pair, decreasing it by `2`). -/
 def pmCount (L : ℕ) (σ : hhafConfig L) : ℕ :=
