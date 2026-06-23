@@ -50,7 +50,12 @@ theorem ringSym_ground_uniqueness (L N : ℕ) (hLeven : Even L) (hL2 : 2 ≤ L) 
     ∃ μ : ℝ,
       finrank ℂ (End.eigenspace (Matrix.toLin'
           (heisenbergHamiltonianS (ringCouplingSym L) N)) (μ : ℂ)) ≤ 1 ∧
-      (∀ {M : ℕ}, M ≠ (Finset.univ.filter (fun x : Fin L => ringSublattice L x = true)).card * N →
+      (∀ M ∈ tasaki23GroundStateSectors (V := Fin L) (ringSublattice L) N,
+        ∃ vM : magConfigS (Fin L) N M → ℝ, (∀ σ, 0 < vM σ) ∧
+          (heisenbergHamiltonianSReMatrixOnMagSector (ringCouplingSym L) N M).mulVec
+              (fun σ => (marshallSignS (ringSublattice L) σ.1).re * vM σ) =
+            μ • (fun σ => (marshallSignS (ringSublattice L) σ.1).re * vM σ)) ∧
+      (∀ {M : ℕ}, M ∉ tasaki23GroundStateSectors (V := Fin L) (ringSublattice L) N →
         [Nonempty (magConfigS (Fin L) N M)] →
         ∀ {μM : ℝ} {φ : magConfigS (Fin L) N M → ℝ}, φ ≠ 0 →
           (heisenbergHamiltonianSReMatrixOnMagSector (ringCouplingSym L) N M).mulVec φ = μM • φ →
@@ -86,30 +91,28 @@ theorem ringSym_ground_uniqueness (L N : ℕ) (hLeven : Even L) (hL2 : 2 ≤ L) 
     (fun x y hxy => ringCouplingSym_bipartite (n + 1) hLeven x y hxy)
     (fun x y h => cycleGraph_adj_ringCouplingSym_re_pos (n + 1) h)
     hc hc_toy hN hcardA1 hcardB1
-  refine ⟨μ, ?_, ?_⟩
-  · -- full-eigenspace finrank ≤ 1
-    have hM0_mem : M0 ∈ tasaki23GroundStateSectors (V := Fin (n + 1)) A N := by
-      rw [hM0, ring_tasaki23GroundStateSectors_singleton (n + 1) N hLeven hL2]
-      exact Finset.mem_singleton_self _
-    haveI : Nonempty (magConfigS (Fin (n + 1)) N M0) :=
-      magConfigS_nonempty_of_le_card_mul (tasaki23GroundStateSectors_le_card_mul A N hM0_mem)
-    obtain ⟨v, hv_pos, hv_heis⟩ := hpf M0 hM0_mem
-    have hsec : finrank ℂ (End.eigenspace (Matrix.toLin'
-        (heisenbergHamiltonianSMatrixOnMagSector (ringCouplingSym (n + 1)) N M0)) (μ : ℂ)) ≤ 1 :=
-      heisenbergHamiltonianSMatrixOnMagSector_finrank_le_one_of_marshall_positive_connected
-        A c hGconn (fun x y h => cycleGraph_adj_ringSublattice_ne (n + 1) hLeven h)
-        (ringCouplingSym_im_zero (n + 1))
-        (fun x y h => cycleGraph_adj_ringCouplingSym_re_pos (n + 1) h)
-        (ringCouplingSym_re_nonneg (n + 1)) (ringCouplingSym_symm (n + 1))
-        (fun x y hxy => ringCouplingSym_bipartite (n + 1) hLeven x y hxy) hc hv_pos hv_heis
-    refine heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_strict_sector_lower
-      (ringCouplingSym (n + 1)) M0 (ringCouplingSym_im_zero (n + 1)) ?_ hsec
-    intro M hM_ne _ μM φ hφ hφ_eig
-    rw [ring_tasaki23GroundStateSectors_singleton (n + 1) N hLeven hL2] at hstrict
-    exact hstrict (by rw [Finset.mem_singleton]; exact hM_ne) hφ hφ_eig
-  · -- strict outside-sector ordering
-    intro M hM_ne _ μM φ hφ hφ_eig
-    rw [ring_tasaki23GroundStateSectors_singleton (n + 1) N hLeven hL2] at hstrict
-    exact hstrict (by rw [Finset.mem_singleton]; exact hM_ne) hφ hφ_eig
+  refine ⟨μ, ?_, hpf, hstrict⟩
+  -- full-eigenspace finrank ≤ 1
+  have hM0_mem : M0 ∈ tasaki23GroundStateSectors (V := Fin (n + 1)) A N := by
+    rw [hM0, ring_tasaki23GroundStateSectors_singleton (n + 1) N hLeven hL2]
+    exact Finset.mem_singleton_self _
+  haveI : Nonempty (magConfigS (Fin (n + 1)) N M0) :=
+    magConfigS_nonempty_of_le_card_mul (tasaki23GroundStateSectors_le_card_mul A N hM0_mem)
+  obtain ⟨v, hv_pos, hv_heis⟩ := hpf M0 hM0_mem
+  have hsec : finrank ℂ (End.eigenspace (Matrix.toLin'
+      (heisenbergHamiltonianSMatrixOnMagSector (ringCouplingSym (n + 1)) N M0)) (μ : ℂ)) ≤ 1 :=
+    heisenbergHamiltonianSMatrixOnMagSector_finrank_le_one_of_marshall_positive_connected
+      A c hGconn (fun x y h => cycleGraph_adj_ringSublattice_ne (n + 1) hLeven h)
+      (ringCouplingSym_im_zero (n + 1))
+      (fun x y h => cycleGraph_adj_ringCouplingSym_re_pos (n + 1) h)
+      (ringCouplingSym_re_nonneg (n + 1)) (ringCouplingSym_symm (n + 1))
+      (fun x y hxy => ringCouplingSym_bipartite (n + 1) hLeven x y hxy) hc hv_pos hv_heis
+  refine heisenbergHamiltonianS_full_eigenspace_finrank_le_one_of_strict_sector_lower
+    (ringCouplingSym (n + 1)) M0 (ringCouplingSym_im_zero (n + 1)) ?_ hsec
+  intro M hM_ne _ μM φ hφ hφ_eig
+  have hM_notin : M ∉ tasaki23GroundStateSectors (V := Fin (n + 1)) A N := by
+    rw [ring_tasaki23GroundStateSectors_singleton (n + 1) N hLeven hL2, Finset.mem_singleton]
+    exact hM_ne
+  exact hstrict hM_notin hφ hφ_eig
 
 end LatticeSystem.Quantum
