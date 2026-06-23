@@ -9307,9 +9307,18 @@ forces opposite endpoint signs, via the sub-arc lemmas \texttt{inCyclicOpen\_suc
 $\pm$-count reduction induction together establish connectivity.  The reduction measure facts are
 \texttt{slidePM\_pmCount\_card} (a slide preserves the number of $\pm$ spins),
 \texttt{annihPM\_pmCount\_card\_lt} (an annihilation strictly decreases it), and the subtype-step
-lift \texttt{annihPM\_isRaiseLowerStepSHhaf}.  (Connectivity holds within a fixed magnetization
-sector: the slide and annihilation moves conserve total $S^{(3)}$, so the reduction targets the
-balanced, charge-$0$ sector containing the canonical configuration.)
+lift \texttt{annihPM\_isRaiseLowerStepSHhaf}.  Connectivity is then proved: the reduction measure
+$S(\sigma)=\sum_{x:\,\sigma_x\neq 0}(L-x)$ strictly decreases under a slide
+(\texttt{slidePM\_hhafS\_lt}) and an annihilation (\texttt{annihPM\_hhafS\_lt}), and
+\texttt{hhaf\_single\_step} exhibits, for any balanced non-canonical configuration, a single ladder
+move to a balanced configuration of smaller measure (the first $\pm$ spin sits at $p\le L-2$, and is
+either slid past a $0$ or annihilated against an adjacent opposite $\pm$).  A strong induction on
+$S$ gives \texttt{hhaf\_reachable\_to\_canonical}: every balanced hidden-AFM configuration is
+reachable from the canonical all-$0$ configuration.  \emph{The reduction targets the balanced
+(charge-$0$) sector}: the slide and annihilation moves conserve total $S^{(3)}$, and indeed the full
+hidden-AFM matrix is reducible (a single-$\pm$ configuration, magnetization $\pm 1$, is vacuously
+hidden-AFM but unreachable from the canonical configuration), so Perron--Frobenius applies to the
+balanced-sector block, which contains the antiferromagnetic ground state.
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
