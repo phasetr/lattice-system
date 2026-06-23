@@ -975,6 +975,45 @@ theorem ringCouplingSym_re_pos_of_ringGraph_adj (L : ℕ) {x y : Fin L}
     have h0 : 0 ≤ (ringCoupling L x y).re := by rw [ringCoupling]; split <;> simp
     rw [ringCouplingSym, h1, Complex.add_re, Complex.one_re]; linarith
 
+/-- One **HAF-internal ladder move**: two hidden-AFM configurations differ by a single raise/lower
+step on a ring-graph bond. -/
+def RaiseLowerStepSHhaf (L : ℕ) (σ τ : hhafConfig L) : Prop :=
+  RaiseLowerStepS (hhafRingGraph L) σ.1 τ.1
+
+/-- **HAF-internal reachability**: the reflexive transitive closure of `RaiseLowerStepSHhaf`, i.e.
+configurations connected by a path of HAF-preserving adjacent ladder moves. -/
+def RaiseLowerReachableSHhaf (L : ℕ) : hhafConfig L → hhafConfig L → Prop :=
+  Relation.ReflTransGen (RaiseLowerStepSHhaf L)
+
+/-- Per-step positivity: a single HAF ladder move yields a strictly positive shifted matrix entry
+(`hhafShifted_pos_of_ladderStep` with the ring-graph bipartite + edge-positivity data). -/
+theorem hhafShifted_pos_of_stepHhaf (L : ℕ) (hLeven : Even L) {c : ℝ} {σ τ : hhafConfig L}
+    (hstep : RaiseLowerStepSHhaf L σ τ) :
+    0 < (c • (1 : Matrix (hhafConfig L) (hhafConfig L) ℝ) - hhafDressedMatrix L) τ σ := by
+  obtain ⟨x, y, hadj, hsh, hagree⟩ := hstep
+  exact hhafShifted_pos_of_ladderStep L (hhafRingGraph_adj_sublattice_ne L hLeven hadj)
+    (ringCouplingSym_re_pos_of_ringGraph_adj L hadj) hsh hagree
+
+/-- **Walk-to-power positivity** on the hidden-AFM subtype: if `B` is nonnegative and strictly
+positive on each HAF ladder step, then HAF-reachability of `σ'` from `σ` forces some power `B^k` to
+be strictly positive at `(σ', σ)`.  Mirror of the magnetization-sector version. -/
+theorem exists_matrixPow_apply_pos_of_hhafReachable (L : ℕ)
+    {B : Matrix (hhafConfig L) (hhafConfig L) ℝ}
+    (hB_nn : ∀ σ τ, 0 ≤ B σ τ)
+    (hB_step : ∀ {σ τ : hhafConfig L}, RaiseLowerStepSHhaf L σ τ → 0 < B τ σ)
+    {σ σ' : hhafConfig L} (hreach : RaiseLowerReachableSHhaf L σ σ') :
+    ∃ k : ℕ, 0 < (B ^ k) σ' σ := by
+  induction hreach with
+  | refl => exact ⟨0, by simp [Matrix.one_apply_eq]⟩
+  | tail _h₁ h₂ ih =>
+    obtain ⟨k, hpos⟩ := ih
+    refine ⟨k + 1, ?_⟩
+    rw [pow_succ', Matrix.mul_apply]
+    apply Finset.sum_pos'
+    · intro l _
+      exact mul_nonneg (hB_nn _ _) (Matrix.pow_apply_nonneg hB_nn _ _ _)
+    · exact ⟨_, Finset.mem_univ _, mul_pos (hB_step h₂) hpos⟩
+
 /-! ## Per-`L` exponential decay of the correlation -/
 
 /-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring
