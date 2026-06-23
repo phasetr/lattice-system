@@ -9163,15 +9163,25 @@ $\hat U^\dagger\hat S^{(3)}_x\hat S^{(3)}_y\hat U=\hat S^{(3)}_x\hat S^{(3)}_y$ 
 is twist-invariant), and uses $\cos(\theta_x-\theta_y)=\cos(2\pi/L)$ on every coupled bond,
 $|\langle\mathrm{XY}_b\rangle|\le2S^2\|\Phi\|^2$, and $1-\cos(2\pi/L)\le(2\pi/L)^2/2$ summed over the
 $L$ bonds.  \emph{Lemma 6.2}
-(\texttt{lsm\_ground\_twist\_orthogonal}, eq.~6.2.18): for $N$ odd (half-odd-integer $S$) and the
-unique ground state ($\hat S_{\mathrm{tot}}^{(3)}=0$, with a uniqueness hypothesis \texttt{huniq}),
-$\langle\Phi_{\mathrm{GS}},\Phi_{\mathrm{LSM}}\rangle=0$.  \emph{Theorem 6.3}
+(\texttt{lsm\_ground\_twist\_orthogonal}, eq.~6.2.18; \textbf{now a proved theorem}, axiom-free,
+\texttt{Quantum/SpinS/LiebSchultzMattisOrthogonality.lean}): for $N$ odd (half-odd-integer $S$) and
+the unique ground state ($\hat S_{\mathrm{tot}}^{(3)}=0$, with a uniqueness hypothesis
+\texttt{huniq}), $\langle\Phi_{\mathrm{GS}},\Phi_{\mathrm{LSM}}\rangle=0$.  The proof introduces the
+cyclic translation operator $\hat T$ (a configuration-shift permutation matrix): $\hat T$ commutes
+with $\hat H$, so by uniqueness the ground state is a translation eigenvector
+$\hat T\Phi_{\mathrm{GS}}=c\,\Phi_{\mathrm{GS}}$ with $|c|=1$; and the diagonal transformation law
+$\hat T^\dagger\hat U_{\mathrm{LSM}}\hat T=(-1)^{2S}\hat U_{\mathrm{LSM}}\,
+e^{i(2\pi/L)\hat S_{\mathrm{tot}}^{(3)}}$ (eq.~6.2.17), which reduces --- because $\hat U$,
+its generator and $\hat S_{\mathrm{tot}}^{(3)}$ are all diagonal --- to a per-configuration identity
+for the LSM phase with a $2\pi$ boundary wrap producing $(-1)^N$.  Together with
+$\hat S_{\mathrm{tot}}^{(3)}\Phi_{\mathrm{GS}}=0$ this gives $\langle\Phi_{\mathrm{GS}},
+\Phi_{\mathrm{LSM}}\rangle=(-1)^N\langle\Phi_{\mathrm{GS}},\Phi_{\mathrm{LSM}}\rangle$, which vanishes
+for $N$ odd.  \emph{Theorem 6.3}
 (\texttt{lieb\_schultz\_mattis\_affleck\_lieb}, eq.~6.2.19): for $N$ odd and even $L$ there is a
 positive spectral gap (\texttt{IsPositiveSpectralGap} of §6.1) bounded by $8\pi^2S^2/L$, so a
 half-odd-integer chain can never have both a unique ground state and a nonvanishing gap --- the
-rigorous half of the Haldane conjecture.  Lemma 6.1 is now discharged (a proved theorem); the
-remaining deep finite-volume spectral results (Lemmas 6.2 and Theorem 6.3) are recorded as
-documented axioms.  Chapters~3--10 backfill.
+rigorous half of the Haldane conjecture.  Lemmas 6.1 and 6.2 are now discharged (proved theorems);
+only Theorem 6.3 remains a documented axiom.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§6.2 Lemma 6.4} (generalized LSM variational bound; Tasaki §6.2,

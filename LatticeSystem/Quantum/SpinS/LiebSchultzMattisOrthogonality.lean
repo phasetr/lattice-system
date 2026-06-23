@@ -243,4 +243,156 @@ theorem lsmPhase_chainConfigShift (L N : ℕ) (hL : 0 < L) (σ : Fin L → Fin (
         split_ifs <;> ring]
   rw [Finset.sum_sub_distrib]
 
+/-- Adjoint–vector identity (file-local copy). -/
+private theorem star_mulVec_dotProduct' {ι : Type*} [Fintype ι] (M : Matrix ι ι ℂ) (v w : ι → ℂ) :
+    star (M.mulVec v) ⬝ᵥ w = star v ⬝ᵥ M.conjTranspose.mulVec w := by
+  rw [Matrix.star_mulVec, Matrix.dotProduct_mulVec]
+
+/-- The boundary wrap exponentiates to `(−1)^{2S} = (−1)^N`: `e^{−i·2π(S − m)} = (−1)^N`. -/
+theorem exp_neg_I_two_pi_half_sub (N m : ℕ) :
+    NormedSpace.exp (-Complex.I * ((2 * Real.pi : ℂ) * ((N : ℂ) / 2 - (m : ℂ)))) =
+      ((-1 : ℂ) ^ N) := by
+  rw [← Complex.exp_eq_exp_ℂ,
+    show -Complex.I * ((2 * Real.pi : ℂ) * ((N : ℂ) / 2 - (m : ℂ))) =
+      (m : ℂ) * (2 * (Real.pi : ℂ) * Complex.I) + (N : ℂ) * (-((Real.pi : ℂ) * Complex.I)) by ring,
+    Complex.exp_add, Complex.exp_nat_mul_two_pi_mul_I, one_mul, Complex.exp_nat_mul,
+    Complex.exp_neg, Complex.exp_pi_mul_I]
+  norm_num
+
+/-- Diagonal action of an on-site `Ŝ³`: `(onSiteS x Ŝ³) Φ` at `σ` is `(S − σ_x) Φ_σ`. -/
+theorem onSiteS_spinSOp3_mulVec_apply (L N : ℕ) (x : Fin L)
+    (Φ : (Fin L → Fin (N + 1)) → ℂ) (σ : Fin L → Fin (N + 1)) :
+    (onSiteS x (spinSOp3 N)).mulVec Φ σ = ((N : ℂ) / 2 - ((σ x).val : ℂ)) * Φ σ := by
+  simp only [Matrix.mulVec, dotProduct]
+  rw [Finset.sum_eq_single σ]
+  · rw [onSiteS_apply, if_pos (fun _ _ => rfl), spinSOp3_apply_diag]
+  · intro τ _ hτ
+    rw [onSiteS_apply]
+    by_cases hagree : ∀ k, k ≠ x → σ k = τ k
+    · have hne : σ x ≠ τ x := fun hx =>
+        hτ (funext fun k => if hk : k = x then by subst hk; exact hx.symm else (hagree k hk).symm)
+      rw [if_pos hagree, spinSOp3_apply_offdiag N hne, zero_mul]
+    · rw [if_neg hagree, zero_mul]
+  · intro h; exact absurd (Finset.mem_univ _) h
+
+/-- The total `Ŝ³` is diagonal with eigenvalue the magnetization `Σ_x (S − σ_x)`. -/
+theorem totalSpinSOp3_mulVec_apply (L N : ℕ) (Φ : (Fin L → Fin (N + 1)) → ℂ)
+    (σ : Fin L → Fin (N + 1)) :
+    (totalSpinSOp3 (Fin L) N).mulVec Φ σ =
+      (∑ x : Fin L, ((N : ℂ) / 2 - ((σ x).val : ℂ))) * Φ σ := by
+  unfold totalSpinSOp3
+  rw [Matrix.sum_mulVec, Finset.sum_apply]
+  simp only [onSiteS_spinSOp3_mulVec_apply]
+  rw [← Finset.sum_mul]
+
+/-- **The twist diagonal entry under shift, at zero magnetization** (the operator content of
+eq. (6.2.17)): if `Σ_x(S − σ_x) = 0` then `e^{−iφ(Tσ)} = (−1)^N e^{−iφ(σ)}`. -/
+theorem lsmPhase_shift_exp_of_magSum_zero (L N : ℕ) (hL : 0 < L) (σ : Fin L → Fin (N + 1))
+    (hmag : (∑ x : Fin L, ((N : ℂ) / 2 - ((σ x).val : ℂ))) = 0) :
+    NormedSpace.exp (-Complex.I • lsmPhase L N (chainConfigShiftEquiv L N σ)) =
+      ((-1 : ℂ) ^ N) * NormedSpace.exp (-Complex.I • lsmPhase L N σ) := by
+  obtain ⟨n, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hL.ne'
+  have hbdry : (∑ x : Fin (n + 1), (if x.val + 1 = n + 1 then
+        (2 * Real.pi : ℂ) * ((N : ℂ) / 2 - ((σ (finRotate (n + 1) x)).val : ℂ)) else 0)) =
+      (2 * Real.pi : ℂ) * ((N : ℂ) / 2 - ((σ 0).val : ℂ)) := by
+    rw [Finset.sum_eq_single (Fin.last n)]
+    · rw [if_pos (by simp [Fin.val_last]), finRotate_last]
+    · intro τ _ hτ
+      rw [if_neg]
+      intro h
+      exact hτ (Fin.ext (by rw [Fin.val_last]; omega))
+    · intro h; exact absurd (Finset.mem_univ _) h
+  rw [lsmPhase_chainConfigShift (n + 1) N hL σ, hmag, mul_zero, sub_zero, hbdry,
+    smul_add, NormedSpace.exp_add_of_commute (Commute.all _ _), mul_comm, smul_eq_mul]
+  congr 1
+  exact exp_neg_I_two_pi_half_sub N (σ 0).val
+
+/-- **Translation-conjugated twist on a zero-magnetization state** (eq. (6.2.17) applied to `Φ`):
+`(T̂† Û_LSM T̂) Φ = (−1)^N Û_LSM Φ` whenever `Ŝ_tot^{(3)} Φ = 0`. -/
+theorem lsmTwist_chainTranslation_mulVec (L N : ℕ) (hL : 0 < L)
+    (Φ : (Fin L → Fin (N + 1)) → ℂ)
+    (hstot : (totalSpinSOp3 (Fin L) N).mulVec Φ = 0) :
+    ((chainTranslationOp L N).conjTranspose * lsmTwistOperator L N *
+        chainTranslationOp L N).mulVec Φ =
+      ((-1 : ℂ) ^ N) • (lsmTwistOperator L N).mulVec Φ := by
+  funext σ
+  have hLHS : ((chainTranslationOp L N).conjTranspose * lsmTwistOperator L N *
+        chainTranslationOp L N).mulVec Φ σ =
+      NormedSpace.exp (-Complex.I • lsmPhase L N (chainConfigShiftEquiv L N σ)) * Φ σ := by
+    simp only [Matrix.mulVec, dotProduct]
+    rw [Finset.sum_eq_single σ]
+    · rw [chainTranslation_conj_apply, lsmTwistOperator_eq_diagonal, Matrix.diagonal_apply_eq]
+    · intro τ _ hτ
+      rw [chainTranslation_conj_apply, lsmTwistOperator_eq_diagonal,
+        Matrix.diagonal_apply_ne _
+          (fun h => hτ ((chainConfigShiftEquiv L N).injective h).symm), zero_mul]
+    · intro h; exact absurd (Finset.mem_univ _) h
+  rw [hLHS]
+  have hUdiag : (lsmTwistOperator L N).mulVec Φ σ =
+      NormedSpace.exp (-Complex.I • lsmPhase L N σ) * Φ σ := by
+    rw [lsmTwistOperator_eq_diagonal, Matrix.mulVec_diagonal]
+  by_cases hΦ : Φ σ = 0
+  · rw [Pi.smul_apply, hUdiag, hΦ]; simp
+  · have hmag : (∑ x : Fin L, ((N : ℂ) / 2 - ((σ x).val : ℂ))) = 0 := by
+      have h := congrFun hstot σ
+      rw [totalSpinSOp3_mulVec_apply, Pi.zero_apply] at h
+      exact (mul_eq_zero.mp h).resolve_right hΦ
+    rw [lsmPhase_shift_exp_of_magSum_zero L N hL σ hmag, Pi.smul_apply, hUdiag]
+    simp only [smul_eq_mul]
+    ring
+
+/-- **Tasaki Lemma 6.2 (the twisted state is orthogonal to the ground state).**  Proved theorem
+discharging the §6.2 axiom: for half-odd-integer `S` (`N` odd) with a unique ground state in the
+`Ŝ_tot^{(3)} = 0` sector, `⟨Φ_GS, Û_LSM Φ_GS⟩ = 0` (eq. (6.2.18)). -/
+theorem lsm_ground_twist_orthogonal (L N : ℕ) (hL : 0 < L) (hNodd : Odd N)
+    (Φ_GS : (Fin L → Fin (N + 1)) → ℂ) (E_GS : ℝ) (hne : Φ_GS ≠ 0)
+    (heig : (afmHeisenbergChainHamiltonianS L N).mulVec Φ_GS = (E_GS : ℂ) • Φ_GS)
+    (_hmin : IsGroundEnergy (afmHeisenbergChainHamiltonianS L N) E_GS)
+    (huniq : ∀ Ψ : (Fin L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+      (afmHeisenbergChainHamiltonianS L N).mulVec Ψ = (E_GS : ℂ) • Ψ → ∃ c : ℂ, Ψ = c • Φ_GS)
+    (hstot : (totalSpinSOp3 (Fin L) N).mulVec Φ_GS = 0) :
+    star Φ_GS ⬝ᵥ lsmTrialState L N Φ_GS = 0 := by
+  have hpos : star Φ_GS ⬝ᵥ Φ_GS ≠ 0 := by
+    intro h
+    have := dotProduct_star_self_re_pos hne
+    rw [h] at this; simp at this
+  -- (1) the ground state is a translation eigenvector: `T̂ Φ = c Φ` with `|c| = 1`.
+  have hTne : (chainTranslationOp L N).mulVec Φ_GS ≠ 0 := by
+    intro h
+    apply hne
+    have h2 := congrArg (fun v => (chainTranslationOp L N).conjTranspose.mulVec v) h
+    simp only [Matrix.mulVec_mulVec, chainTranslationOp_unitary, Matrix.one_mulVec,
+      Matrix.mulVec_zero] at h2
+    exact h2
+  have hTeig : (afmHeisenbergChainHamiltonianS L N).mulVec
+        ((chainTranslationOp L N).mulVec Φ_GS) =
+      (E_GS : ℂ) • (chainTranslationOp L N).mulVec Φ_GS := by
+    rw [Matrix.mulVec_mulVec, ← chainTranslation_commute_hamiltonian, ← Matrix.mulVec_mulVec,
+      heig, Matrix.mulVec_smul]
+  obtain ⟨c, hc⟩ := huniq _ hTne hTeig
+  have hcc : star c * c = 1 := by
+    have hu : star ((chainTranslationOp L N).mulVec Φ_GS) ⬝ᵥ
+        (chainTranslationOp L N).mulVec Φ_GS = star Φ_GS ⬝ᵥ Φ_GS := by
+      rw [star_mulVec_dotProduct', Matrix.mulVec_mulVec, chainTranslationOp_unitary,
+        Matrix.one_mulVec]
+    rw [hc, star_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul,
+      ← mul_assoc] at hu
+    exact mul_right_cancel₀ hpos (hu.trans (one_mul _).symm)
+  -- (2) the overlap `u = ⟨Φ_GS, Û Φ_GS⟩` satisfies `u = (−1)^N u`, hence vanishes for `N` odd.
+  unfold lsmTrialState
+  have hb : star Φ_GS ⬝ᵥ ((chainTranslationOp L N).conjTranspose * lsmTwistOperator L N *
+        chainTranslationOp L N).mulVec Φ_GS = star Φ_GS ⬝ᵥ (lsmTwistOperator L N).mulVec Φ_GS := by
+    rw [Matrix.mul_assoc, ← Matrix.mulVec_mulVec, ← star_mulVec_dotProduct', hc,
+      ← Matrix.mulVec_mulVec, hc, Matrix.mulVec_smul, star_smul, smul_dotProduct,
+      dotProduct_smul, smul_eq_mul, smul_eq_mul, ← mul_assoc, hcc, one_mul]
+  have ha : star Φ_GS ⬝ᵥ ((chainTranslationOp L N).conjTranspose * lsmTwistOperator L N *
+        chainTranslationOp L N).mulVec Φ_GS =
+      ((-1 : ℂ) ^ N) * (star Φ_GS ⬝ᵥ (lsmTwistOperator L N).mulVec Φ_GS) := by
+    rw [lsmTwist_chainTranslation_mulVec L N hL Φ_GS hstot, dotProduct_smul, smul_eq_mul]
+  have key : star Φ_GS ⬝ᵥ (lsmTwistOperator L N).mulVec Φ_GS =
+      ((-1 : ℂ) ^ N) * (star Φ_GS ⬝ᵥ (lsmTwistOperator L N).mulVec Φ_GS) :=
+    hb.symm.trans ha
+  rw [hNodd.neg_one_pow] at key
+  linear_combination (1 / 2 : ℂ) * key
+
 end LatticeSystem.Quantum
