@@ -755,5 +755,54 @@ theorem hhafRestrictedMatrixReal0_ground_finrank_le_one (L : ℕ) (hLeven : Even
       (hhafMarshallDiag0_mul_self L) (hhafDressedMatrix0_eq_conj L) μ]
     exact hfin
 
+/-! ## The Néel configuration as a balanced ground-energy witness -/
+
+/-- The **Néel configuration**: spin `+1` on even sites (`σ_x = 0`), `−1` on odd sites (`σ_x = 2`) —
+the maximally antiferromagnetic balanced configuration. -/
+def hhafNeel (L : ℕ) : Fin L → Fin 3 := fun x => if x.val % 2 = 0 then 0 else 2
+
+/-- Every site of the Néel configuration carries a `±` spin. -/
+theorem hhafNeel_isPM (L : ℕ) (x : Fin L) : hhafNeel L x ≠ 1 := by
+  rw [hhafNeel]; split <;> decide
+
+/-- If `y` is not the cyclic successor of `x`, then the successor lies in the open arc `(x, y)`. -/
+theorem inCyclicOpen_succ_mem_of_ne {L : ℕ} (hL : 2 ≤ L) {x y : Fin L} (hxy : x ≠ y)
+    (hne : y.val ≠ (x.val + 1) % L) :
+    InCyclicOpen x y ⟨(x.val + 1) % L, Nat.mod_lt _ (by omega)⟩ := by
+  have hxv := x.isLt; have hyv := y.isLt
+  have hxyv : x.val ≠ y.val := fun h => hxy (Fin.ext h)
+  simp only [InCyclicOpen]
+  rcases Nat.lt_or_ge (x.val + 1) L with hlt | hge
+  · rw [Nat.mod_eq_of_lt hlt] at hne ⊢; split_ifs <;> omega
+  · have heq : x.val + 1 = L := by omega
+    rw [heq, Nat.mod_self] at hne ⊢; split_ifs <;> omega
+
+/-- **The Néel configuration is hidden-AFM** (on an even ring): all sites carry `±` spins, so every
+`IsNextPM` pair is cyclically adjacent, and adjacent sites have opposite parity hence opposite sign.
+-/
+theorem hhafNeel_isHiddenAFM (L : ℕ) (hLeven : Even L) (hL : 2 ≤ L) :
+    IsHiddenAFMConfig (hhafNeel L) := by
+  intro x y hxy
+  obtain ⟨hne, _, _, harc⟩ := hxy
+  have h2 : (2 : ℕ) ∣ L := hLeven.two_dvd
+  have hsucc : y.val = (x.val + 1) % L := by
+    by_contra hns
+    exact hhafNeel_isPM L _ (harc _ (inCyclicOpen_succ_mem_of_ne hL hne hns))
+  have hpar : x.val % 2 ≠ y.val % 2 := by
+    have hm : y.val % 2 = (x.val + 1) % 2 := by rw [hsucc]; exact Nat.mod_mod_of_dvd _ h2
+    omega
+  rw [hhafNeel, hhafNeel]
+  split_ifs <;> first | rfl | (exfalso; omega) | decide
+
+/-- Every site of the Néel configuration is a `±` spin, so its `±`-count is `L`. -/
+theorem hhafNeel_pmCount (L : ℕ) :
+    (Finset.univ.filter (fun x => hhafNeel L x ≠ 1)).card = L := by
+  rw [Finset.filter_true_of_mem (fun x _ => hhafNeel_isPM L x), Finset.card_univ, Fintype.card_fin]
+
+/-- The Néel configuration as a balanced (even-`pmCount`) hidden-AFM configuration. -/
+def hhafNeelConfig0 (L : ℕ) (hLeven : Even L) (hL : 2 ≤ L) : hhafConfig0 L :=
+  ⟨⟨hhafNeel L, hhafNeel_isHiddenAFM L hLeven hL⟩, by
+    have h : pmCount L ⟨hhafNeel L, hhafNeel_isHiddenAFM L hLeven hL⟩ = L := hhafNeel_pmCount L
+    rw [h]; exact hLeven⟩
 
 end LatticeSystem.Quantum

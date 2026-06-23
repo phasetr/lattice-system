@@ -9338,7 +9338,12 @@ field).  The global ground state additionally requires the inter-sector energy o
 sector is strictly lowest --- a Marshall--Lieb--Mattis statement within $H_{\mathrm{HAF}}$).
 (The entire Perron--Frobenius uniqueness development --- the kink moves through the Marshall transfer
 --- lives in the companion module \texttt{Quantum/SpinS/HiddenAntiferromagneticOrderUniqueness.lean},
-split off from \texttt{Quantum/SpinS/HiddenAntiferromagneticOrder.lean} for build speed.)
+split off from \texttt{Quantum/SpinS/HiddenAntiferromagneticOrder.lean} for build speed.)  Toward the
+inter-sector ordering, the Néel configuration \texttt{hhafNeel} ($+1$ on even sites, $-1$ on odd) is
+shown to be hidden antiferromagnetic on an even ring (\texttt{hhafNeel\_isHiddenAFM}: all sites carry
+$\pm$ spins, so every consecutive-$\pm$ pair is cyclically adjacent and of opposite parity) and
+balanced (\texttt{hhafNeelConfig0}), giving the variational witness for the balanced sector's low
+ground energy.
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
