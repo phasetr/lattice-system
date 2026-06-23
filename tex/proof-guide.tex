@@ -9274,6 +9274,10 @@ configurations differing by one adjacent raise/lower move on a bipartite bond ha
 positive shifted entry $(c\,I-M)_{\tau\sigma}>0$ (the Marshall-dressed Heisenberg off-diagonal is
 strictly negative on such a step, reusing the project's raise/lower witness on
 \texttt{ringCouplingSym} and the $\tfrac12$ scaling).
+The bond graph is \texttt{hhafRingGraph} (cyclic nearest neighbours on $\mathbb{Z}/L$), which is
+bipartite w.r.t.\ \texttt{ringSublattice} for even $L$ (\texttt{hhafRingGraph\_adj\_sublattice\_ne})
+and on whose edges \texttt{ringCouplingSym} is strictly positive
+(\texttt{ringCouplingSym\_re\_pos\_of\_ringGraph\_adj}).
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional

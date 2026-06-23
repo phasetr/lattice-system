@@ -939,6 +939,42 @@ theorem hhafShifted_pos_of_ladderStep (L : ℕ) {c : ℝ} {σ τ : hhafConfig L}
     zero_sub, neg_pos]
   exact hM
 
+/-- The **ring adjacency graph** on `Fin L`: `x ~ y` iff `x ≠ y` and the two sites are cyclic
+nearest neighbours (`(x+1) % L = y` or `(y+1) % L = x`).  This is the bipartite bond graph carrying
+the (symmetrized) nearest-neighbour coupling. -/
+def hhafRingGraph (L : ℕ) : SimpleGraph (Fin L) where
+  Adj x y := x ≠ y ∧ ((x.val + 1) % L = y.val ∨ (y.val + 1) % L = x.val)
+  symm := fun _ _ h => ⟨Ne.symm h.1, Or.symm h.2⟩
+  loopless := ⟨fun _ h => h.1 rfl⟩
+
+/-- The ring graph is bipartite w.r.t. the even/odd sublattice: adjacent sites have different
+`ringSublattice` value (for even `L`, cyclic neighbours have opposite parity). -/
+theorem hhafRingGraph_adj_sublattice_ne (L : ℕ) (hLeven : Even L) {x y : Fin L}
+    (hadj : (hhafRingGraph L).Adj x y) : ringSublattice L x ≠ ringSublattice L y := by
+  have h2 : (2 : ℕ) ∣ L := hLeven.two_dvd
+  obtain ⟨_, hor⟩ := hadj
+  have hpar : x.val % 2 ≠ y.val % 2 := by
+    rcases hor with h | h
+    · have hm : (x.val + 1) % L % 2 = (x.val + 1) % 2 := Nat.mod_mod_of_dvd _ h2
+      rw [h] at hm; omega
+    · have hm : (y.val + 1) % L % 2 = (y.val + 1) % 2 := Nat.mod_mod_of_dvd _ h2
+      rw [h] at hm; omega
+  simp only [ringSublattice, ne_eq, decide_eq_decide]
+  intro hiff; omega
+
+/-- The symmetrized coupling is strictly positive on every ring-graph edge (it is `1` on each
+nearest-neighbour ordered pair). -/
+theorem ringCouplingSym_re_pos_of_ringGraph_adj (L : ℕ) {x y : Fin L}
+    (hadj : (hhafRingGraph L).Adj x y) : 0 < (ringCouplingSym L x y).re := by
+  obtain ⟨_, hor⟩ := hadj
+  rcases hor with h | h
+  · have h1 : ringCoupling L x y = 1 := by rw [ringCoupling, if_pos h.symm]
+    have h0 : 0 ≤ (ringCoupling L y x).re := by rw [ringCoupling]; split <;> simp
+    rw [ringCouplingSym, h1, Complex.add_re, Complex.one_re]; linarith
+  · have h1 : ringCoupling L y x = 1 := by rw [ringCoupling, if_pos h.symm]
+    have h0 : 0 ≤ (ringCoupling L x y).re := by rw [ringCoupling]; split <;> simp
+    rw [ringCouplingSym, h1, Complex.add_re, Complex.one_re]; linarith
+
 /-! ## Per-`L` exponential decay of the correlation -/
 
 /-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring
