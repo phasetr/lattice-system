@@ -865,6 +865,48 @@ theorem hhafDressedMatrix_offdiag_nonpos (L : ℕ) (hLeven : Even L) {σ τ : hh
     apply mul_le_mul_of_nonneg_left hnp; norm_num
   simpa using this
 
+/-! ## Symmetry and the nonnegative Perron–Frobenius shift -/
+
+/-- The dressed restricted matrix is symmetric: `hhafDressedMatrix σ τ = ε(σ)ε(τ) M_real(σ,τ)`
+with `M_real` symmetric and the Marshall signs commuting. -/
+theorem hhafDressedMatrix_isSymm (L : ℕ) : (hhafDressedMatrix L).IsSymm := by
+  ext σ τ
+  rw [Matrix.transpose_apply, hhafDressedMatrix_eq, hhafDressedMatrix_eq,
+    (hhafRestrictedMatrixReal_isSymm L).apply τ σ]
+  ring
+
+/-- The diagonal of the dressed restricted matrix equals the real restricted diagonal (the Marshall
+sign squares to `1`). -/
+theorem hhafDressedMatrix_diag_eq (L : ℕ) (σ : hhafConfig L) :
+    hhafDressedMatrix L σ σ = hhafRestrictedMatrixReal L σ σ := by
+  rw [hhafDressedMatrix_eq]
+  have hsq : (marshallSignS (ringSublattice L) σ.1).re *
+      (marshallSignS (ringSublattice L) σ.1).re = 1 := by
+    have h := congrArg Complex.re (marshallSignS_sq (ringSublattice L) σ.1)
+    rwa [Complex.mul_re, marshallSignS_im, mul_zero, sub_zero, Complex.one_re] at h
+  rw [hsq, one_mul]
+
+/-- The dressed restricted diagonal is bounded above by the restricted max energy. -/
+theorem hhafDressedMatrix_diag_le_hhafMaxEnergy (L : ℕ) (σ : hhafConfig L) :
+    hhafDressedMatrix L σ σ ≤ hhafMaxEnergy L := by
+  rw [hhafDressedMatrix_diag_eq, hhafRestrictedMatrixReal]
+  exact diag_le_hhafMaxEnergy L σ
+
+/-- **Nonnegative Perron–Frobenius shift**: for any shift `c` at least the restricted max energy,
+the shifted matrix `c·I − M` has nonnegative entries on an even ring — the off-diagonals because
+`M σ τ ≤ 0` for `σ ≠ τ`, the diagonal because `M σ σ ≤ hhafMaxEnergy ≤ c`.  This is the nonneg
+hypothesis of `perronFrobenius_real_symmetric`. -/
+theorem hhafShifted_entry_nonneg (L : ℕ) (hLeven : Even L) {c : ℝ}
+    (hc : hhafMaxEnergy L ≤ c) (σ τ : hhafConfig L) :
+    0 ≤ (c • (1 : Matrix (hhafConfig L) (hhafConfig L) ℝ) - hhafDressedMatrix L) σ τ := by
+  rw [Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply, smul_eq_mul]
+  by_cases h : σ = τ
+  · subst h
+    rw [if_pos rfl, mul_one, sub_nonneg]
+    exact le_trans (hhafDressedMatrix_diag_le_hhafMaxEnergy L σ) hc
+  · rw [if_neg h, mul_zero, zero_sub, neg_nonneg]
+    exact hhafDressedMatrix_offdiag_nonpos L hLeven h
+
 /-! ## Per-`L` exponential decay of the correlation -/
 
 /-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring
