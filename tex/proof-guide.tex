@@ -9429,6 +9429,17 @@ single-$\pm$ ones, an even one only to even, by the classification). This is the
 decomposition into the balanced and single-$\pm$ blocks underlying the ground-eigenspace
 $\mathrm{finrank}\le 1$.
 
+The per-block spectral bounds are then: the complex blocks equal the real blocks cast to $\mathbb C$
+(\texttt{hhafRestrictedMatrix\_submatrix0\_eq\_map} and its single-$\pm$ analogue), so
+\texttt{hhafRestrictedMatrix\_submatrix0\_eigenspace\_finrank\_le\_one} gives the complex balanced
+block a one-dimensional ground eigenspace (real-to-complex bridge from the real balanced
+Perron--Frobenius), while \texttt{hhafRestrictedMatrix\_submatrixPM1\_eigenvalue\_ge} shows the
+complex single-$\pm$ block has all eigenvalues $\ge -2$ (a real eigenvalue's re/im part is a
+real-block eigenvector, carried to a dressed-block eigenvector by the Marshall conjugation
+\texttt{hhafDressedMatrixPM1\_eq\_conj}, where the Gershgorin bound applies). At the ground energy
+$E<-2$ the single-$\pm$ block is then vacated and the balanced block supplies the unique ground
+state.
+
 \medskip
 \noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
 pp.~177--179; documented axiom, \texttt{Quantum/SpinS/AKLT.lean}, Issue \#4485).  The
