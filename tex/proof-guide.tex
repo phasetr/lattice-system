@@ -9304,7 +9304,12 @@ adjacent $+,-$ pair keeps the alternation --- each consecutive-$\pm$ pair of the
 configuration either avoids the removed pair or straddles it, in which case the chain $x,a,b,y$
 forces opposite endpoint signs, via the sub-arc lemmas \texttt{inCyclicOpen\_succ\_iff\_mem},
 \texttt{inCyclicOpen\_sub\_left/\_right}, \texttt{notInCyclicOpen\_succ\_right/\_pred\_left}) and the
-$\pm$-count reduction induction together establish connectivity.
+$\pm$-count reduction induction together establish connectivity.  The reduction measure facts are
+\texttt{slidePM\_pmCount\_card} (a slide preserves the number of $\pm$ spins),
+\texttt{annihPM\_pmCount\_card\_lt} (an annihilation strictly decreases it), and the subtype-step
+lift \texttt{annihPM\_isRaiseLowerStepSHhaf}.  (Connectivity holds within a fixed magnetization
+sector: the slide and annihilation moves conserve total $S^{(3)}$, so the reduction targets the
+balanced, charge-$0$ sector containing the canonical configuration.)
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
