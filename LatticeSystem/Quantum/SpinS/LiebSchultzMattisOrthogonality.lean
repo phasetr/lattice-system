@@ -193,4 +193,54 @@ theorem chainTranslation_commute_hamiltonian (L N : ℕ) :
     _ = afmHeisenbergChainHamiltonianS L N * chainTranslationOp L N := by
         rw [chainTranslationOp_unitary', Matrix.one_mul]
 
+/-- **Per-site twist-angle shift**: `θ_x = θ_{x+1} − 2π/L + 2π·[x = last]`, the source of the
+boundary `(−1)^{2S}` factor in the translation law. -/
+theorem lsmAngle_finRotate (L : ℕ) (hL : 0 < L) (x : Fin L) :
+    ((2 * Real.pi * ((x.val : ℝ) + 1)) / (L : ℝ) : ℝ) =
+      ((2 * Real.pi * (((finRotate L x).val : ℝ) + 1)) / (L : ℝ) : ℝ) - 2 * Real.pi / (L : ℝ) +
+        (if x.val + 1 = L then 2 * Real.pi else 0) := by
+  have hL0 : (L : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hL.ne'
+  rw [val_finRotate]
+  by_cases h : x.val + 1 = L
+  · rw [if_pos h, h, Nat.mod_self]
+    have hxL : ((x.val : ℝ) + 1) = (L : ℝ) := by exact_mod_cast h
+    rw [hxL]; push_cast; field_simp; ring
+  · rw [if_neg h, Nat.mod_eq_of_lt (by have := x.isLt; omega)]
+    push_cast; field_simp; ring
+
+/-- **LSM phase of the shifted configuration** (eq. (6.2.15)–(6.2.16) at the diagonal level):
+`φ(Tσ) = φ(σ) − (2π/L)·Σ_x(S − σ_x) + (boundary)`.  The boundary indicator sum (the single last-site
+term `2π(S − σ_0)`) is the wrap that produces `(−1)^{2S}` after exponentiation. -/
+theorem lsmPhase_chainConfigShift (L N : ℕ) (hL : 0 < L) (σ : Fin L → Fin (N + 1)) :
+    lsmPhase L N (chainConfigShiftEquiv L N σ) =
+      lsmPhase L N σ -
+          ((2 * Real.pi / (L : ℝ) : ℝ) : ℂ) *
+            (∑ x : Fin L, ((N : ℂ) / 2 - ((σ x).val : ℂ))) +
+        (∑ x : Fin L, (if x.val + 1 = L then
+          (2 * Real.pi : ℂ) * ((N : ℂ) / 2 - ((σ (finRotate L x)).val : ℂ)) else 0)) := by
+  simp only [lsmPhase, chainConfigShiftEquiv_apply]
+  rw [show (∑ x : Fin L, (((2 * Real.pi * ((x.val : ℝ) + 1)) / (L : ℝ) : ℝ) : ℂ) *
+        ((N : ℂ) / 2 - ((σ (finRotate L x)).val : ℂ))) =
+      ∑ x : Fin L, (((((2 * Real.pi * (((finRotate L x).val : ℝ) + 1)) / (L : ℝ) : ℝ) : ℂ) -
+            ((2 * Real.pi / (L : ℝ) : ℝ) : ℂ) +
+            (if x.val + 1 = L then (2 * Real.pi : ℂ) else 0)) *
+          ((N : ℂ) / 2 - ((σ (finRotate L x)).val : ℂ))) from by
+        refine Finset.sum_congr rfl (fun x _ => ?_)
+        rw [lsmAngle_finRotate L hL x]
+        push_cast
+        split_ifs <;> push_cast <;> ring]
+  simp only [sub_mul, add_mul, Finset.sum_add_distrib, Finset.sum_sub_distrib]
+  rw [Equiv.sum_comp (finRotate L)
+        (fun j => (((2 * Real.pi * ((j.val : ℝ) + 1)) / (L : ℝ) : ℝ) : ℂ) *
+          ((N : ℂ) / 2 - ((σ j).val : ℂ))),
+    ← Finset.mul_sum,
+    Equiv.sum_comp (finRotate L) (fun j => ((N : ℂ) / 2 - ((σ j).val : ℂ)))]
+  rw [show (∑ x : Fin L, (if x.val + 1 = L then (2 * Real.pi : ℂ) else 0) *
+        ((N : ℂ) / 2 - ((σ (finRotate L x)).val : ℂ))) =
+      ∑ x : Fin L, (if x.val + 1 = L then
+        (2 * Real.pi : ℂ) * ((N : ℂ) / 2 - ((σ (finRotate L x)).val : ℂ)) else 0) from by
+        refine Finset.sum_congr rfl (fun x _ => ?_)
+        split_ifs <;> ring]
+  rw [Finset.sum_sub_distrib]
+
 end LatticeSystem.Quantum
