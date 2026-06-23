@@ -26,13 +26,13 @@ variable {n : Type*} [Fintype n] [DecidableEq n]
 
 /-- **Eigenspace dimension is a similarity invariant.** If `U * Uinv = 1`, `Uinv * U = 1`, and
 `H' = Uinv * H * U`, then for every `μ` the `μ`-eigenspaces of `H'` and `H` have equal finrank. -/
-theorem matrix_similar_eigenspace_finrank_eq
-    {U Uinv H H' : Matrix n n ℂ} (hUU : U * Uinv = 1) (hUinvU : Uinv * U = 1)
-    (hsim : H' = Uinv * H * U) (μ : ℂ) :
-    finrank ℂ (End.eigenspace (Matrix.toLin' H') μ) =
-      finrank ℂ (End.eigenspace (Matrix.toLin' H) μ) := by
+theorem matrix_similar_eigenspace_finrank_eq {𝕜 : Type*} [Field 𝕜]
+    {U Uinv H H' : Matrix n n 𝕜} (hUU : U * Uinv = 1) (hUinvU : Uinv * U = 1)
+    (hsim : H' = Uinv * H * U) (μ : 𝕜) :
+    finrank 𝕜 (End.eigenspace (Matrix.toLin' H') μ) =
+      finrank 𝕜 (End.eigenspace (Matrix.toLin' H) μ) := by
   -- `e = toLin' U` as a linear equivalence (`toFun = toLin' U`, since here `M' = U`).
-  set e : (n → ℂ) ≃ₗ[ℂ] (n → ℂ) := Matrix.toLin'OfInv hUinvU hUU with he
+  set e : (n → 𝕜) ≃ₗ[𝕜] (n → 𝕜) := Matrix.toLin'OfInv hUinvU hUU with he
   have he_v : ∀ v, e v = U *ᵥ v := fun v => by rw [he]; exact Matrix.toLin'_apply U v
   have he_symm : ∀ w, e.symm w = Uinv *ᵥ w := fun w => by rw [he]; exact Matrix.toLin'_apply Uinv w
   -- The eigenspace of `H'` maps onto the eigenspace of `H` under `e`.

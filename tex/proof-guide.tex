@@ -9329,8 +9329,13 @@ entrywise-positive power, the diagonal handled by the strict shift).  Applying
 block, \texttt{hhafDressedMatrix0\_isSymm} its symmetry, and \texttt{hhafShiftedMatrix0\_eq} the
 identity $\mathtt{hhafShiftedMatrix0}=c\,I-M_0$) then yields a strictly positive lowest eigenvector
 with a one-dimensional ground eigenspace --- the unique ground state of the chain \emph{within the
-balanced sector} of $H_{\mathrm{HAF}}$.  The global ground state additionally requires the
-Marshall-gauge transfer to the undressed block and the inter-sector energy ordering.
+balanced sector} of $H_{\mathrm{HAF}}$.  The Marshall similarity $M_0=\Theta\,M_0^{\mathrm{real}}\,
+\Theta$ (\texttt{hhafDressedMatrix0\_eq\_conj}, with $\Theta$ the $\pm1$ Marshall sign diagonal) then
+transfers this one-dimensional bound to the undressed real block
+(\texttt{hhafRestrictedMatrixReal0\_ground\_finrank\_le\_one}, via the generic
+\texttt{matrix\_similar\_eigenspace\_finrank\_eq}, generalised from $\mathbb{C}$ to an arbitrary
+field).  The global ground state additionally requires the inter-sector energy ordering (the balanced
+sector is strictly lowest --- a Marshall--Lieb--Mattis statement within $H_{\mathrm{HAF}}$).
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional

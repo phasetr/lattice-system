@@ -1675,6 +1675,51 @@ theorem hhafDressedMatrix0_ground_finrank_le_one (L : ℕ) (hLeven : Even L) :
   rw [← hhafShiftedMatrix0_eq]
   exact hhafShiftedMatrix0_isIrreducible L hLeven (by linarith)
 
+/-! ## Marshall-gauge transfer to the undressed balanced block -/
+
+/-- The **real (undressed) restricted matrix on the balanced sector**. -/
+noncomputable def hhafRestrictedMatrixReal0 (L : ℕ) : Matrix (hhafConfig0 L) (hhafConfig0 L) ℝ :=
+  (hhafRestrictedMatrixReal L).submatrix Subtype.val Subtype.val
+
+/-- The **balanced-sector Marshall sign diagonal** `Θ` (entries `±1`). -/
+noncomputable def hhafMarshallDiag0 (L : ℕ) : Matrix (hhafConfig0 L) (hhafConfig0 L) ℝ :=
+  Matrix.diagonal (fun σ : hhafConfig0 L => (marshallSignS (ringSublattice L) σ.1.1).re)
+
+/-- The Marshall sign diagonal squares to the identity (each entry is `±1`). -/
+theorem hhafMarshallDiag0_mul_self (L : ℕ) :
+    hhafMarshallDiag0 L * hhafMarshallDiag0 L = 1 := by
+  rw [hhafMarshallDiag0, Matrix.diagonal_mul_diagonal]
+  have h1 : (fun σ : hhafConfig0 L => (marshallSignS (ringSublattice L) σ.1.1).re *
+      (marshallSignS (ringSublattice L) σ.1.1).re) = fun _ => 1 := by
+    funext σ
+    have h := congrArg Complex.re (marshallSignS_sq (ringSublattice L) σ.1.1)
+    rwa [Complex.mul_re, marshallSignS_im, mul_zero, sub_zero, Complex.one_re] at h
+  rw [h1, Matrix.diagonal_one]
+
+/-- The balanced dressed block is the Marshall conjugate of the undressed real block:
+`M₀ = Θ · M_real₀ · Θ`. -/
+theorem hhafDressedMatrix0_eq_conj (L : ℕ) :
+    hhafDressedMatrix0 L =
+      hhafMarshallDiag0 L * hhafRestrictedMatrixReal0 L * hhafMarshallDiag0 L := by
+  ext σ τ
+  rw [hhafDressedMatrix0, Matrix.submatrix_apply, hhafDressedMatrix_eq, Matrix.mul_assoc,
+    hhafMarshallDiag0, Matrix.diagonal_mul, Matrix.mul_diagonal, hhafRestrictedMatrixReal0,
+    Matrix.submatrix_apply]
+  ring
+
+/-- **Unique balanced-sector ground state (undressed real form).**  Transferring
+`hhafDressedMatrix0_ground_finrank_le_one` through the Marshall similarity `M₀ = Θ M_real₀ Θ`, the
+undressed real restricted matrix on the balanced sector also has a one-dimensional ground
+eigenspace. -/
+theorem hhafRestrictedMatrixReal0_ground_finrank_le_one (L : ℕ) (hLeven : Even L) :
+    ∃ μ : ℝ, Module.finrank ℝ
+      (Module.End.eigenspace (Matrix.toLin' (hhafRestrictedMatrixReal0 L)) μ) ≤ 1 := by
+  obtain ⟨μ, _, _, _, _, hfin⟩ := hhafDressedMatrix0_ground_finrank_le_one L hLeven
+  refine ⟨μ, ?_⟩
+  rw [← matrix_similar_eigenspace_finrank_eq (hhafMarshallDiag0_mul_self L)
+    (hhafMarshallDiag0_mul_self L) (hhafDressedMatrix0_eq_conj L) μ]
+  exact hfin
+
 /-! ## Per-`L` exponential decay of the correlation -/
 
 /-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring
