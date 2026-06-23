@@ -832,4 +832,33 @@ theorem hhafMinEnergy_le_neg_L (L : ℕ) (hL : 2 ≤ L) (hLeven : Even L) :
   rw [hhafNeel_diag L hL hLeven] at h
   simpa using h
 
+/-! ## The magnetization-`±1` sectors and their energy lower bound -/
+
+/-- A configuration with a single `±` spin has **vanishing diagonal energy**: every bond has at
+least one `0`-spin endpoint (only one site is `±`), so each Ising term vanishes. -/
+theorem hhaf_diag_eq_zero_of_pmCount_one (L : ℕ) (hL : 2 ≤ L) (σ : hhafConfig L)
+    (hpm : pmCount L σ = 1) : (hhafRestrictedMatrix L) σ σ = 0 := by
+  rw [hhaf_diag_eq_succ_sum L hL]
+  refine Finset.sum_eq_zero (fun x _ => ?_)
+  -- at least one of `x`, `x+1` is a `0`-spin (`σ = 1`), since only one site is `±`
+  set s := Finset.univ.filter (fun z => σ.1 z ≠ 1) with hs
+  have hscard : s.card = 1 := hpm
+  have hzero : σ.1 x = 1 ∨ σ.1 ⟨(x.val + 1) % L, Nat.mod_lt _ (by omega)⟩ = 1 := by
+    by_contra hcon
+    rw [not_or] at hcon
+    obtain ⟨hx, hx1⟩ := hcon
+    have hxs : x ∈ s := Finset.mem_filter.mpr ⟨Finset.mem_univ _, hx⟩
+    have hx1s : (⟨(x.val + 1) % L, Nat.mod_lt _ (by omega)⟩ : Fin L) ∈ s :=
+      Finset.mem_filter.mpr ⟨Finset.mem_univ _, hx1⟩
+    have hne : x ≠ (⟨(x.val + 1) % L, Nat.mod_lt _ (by omega)⟩ : Fin L) := by
+      intro h
+      have hv : x.val = (x.val + 1) % L := congrArg Fin.val h
+      have hxlt := x.isLt
+      rcases Nat.lt_or_ge (x.val + 1) L with hlt | hge
+      · rw [Nat.mod_eq_of_lt hlt] at hv; omega
+      · rw [show x.val + 1 = L by omega, Nat.mod_self] at hv; omega
+    have : 2 ≤ s.card := Finset.one_lt_card.mpr ⟨x, hxs, _, hx1s, hne⟩
+    omega
+  rcases hzero with h | h <;> rw [h] <;> simp
+
 end LatticeSystem.Quantum
