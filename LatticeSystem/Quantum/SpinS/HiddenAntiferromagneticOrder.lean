@@ -773,6 +773,46 @@ theorem hhafDressedMatrix_eq (L : ℕ) (σ τ : hhafConfig L) :
       (fun x y => by rw [ringCoupling]; split <;> simp)]
   rfl
 
+/-! ## Off-diagonal nonpositivity of the dressed matrix -/
+
+/-- The Heisenberg Hamiltonian is invariant under transposing the coupling (the two-site dot is
+symmetric). -/
+theorem heisenbergHamiltonianS_coupling_swap {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (J : Λ → Λ → ℂ) (N : ℕ) :
+    heisenbergHamiltonianS (fun x y => J y x) N = heisenbergHamiltonianS J N := by
+  rw [heisenbergHamiltonianS, heisenbergHamiltonianS, Finset.sum_comm]
+  refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
+  rw [spinSDot_comm b a]
+
+/-- The **symmetrized ring coupling**: `1` on every nearest-neighbour ordered pair. -/
+def ringCouplingSym (L : ℕ) : Fin L → Fin L → ℂ :=
+  fun x y => ringCoupling L x y + ringCoupling L y x
+
+/-- The symmetrized coupling is symmetric. -/
+theorem ringCouplingSym_symm (L : ℕ) (x y : Fin L) :
+    ringCouplingSym L x y = ringCouplingSym L y x := by
+  rw [ringCouplingSym, ringCouplingSym, add_comm]
+
+/-- The symmetrized coupling is real. -/
+theorem ringCouplingSym_im_zero (L : ℕ) (x y : Fin L) : (ringCouplingSym L x y).im = 0 := by
+  rw [ringCouplingSym]; simp [ringCoupling]; split <;> split <;> simp
+
+/-- The symmetrized coupling is nonnegative. -/
+theorem ringCouplingSym_re_nonneg (L : ℕ) (x y : Fin L) : 0 ≤ (ringCouplingSym L x y).re := by
+  rw [ringCouplingSym]; simp [ringCoupling]; split <;> split <;> norm_num
+
+/-- The Heisenberg Hamiltonian with the symmetrized coupling is twice that with the directed ring
+coupling (the transpose summand reproduces the original via
+`heisenbergHamiltonianS_coupling_swap`). -/
+theorem heisenbergHamiltonianS_ringCouplingSym (L : ℕ) :
+    heisenbergHamiltonianS (ringCouplingSym L) 2 =
+      (2 : ℂ) • heisenbergHamiltonianS (ringCoupling L) 2 := by
+  have h : heisenbergHamiltonianS (ringCouplingSym L) 2 =
+      heisenbergHamiltonianS (ringCoupling L) 2 +
+        heisenbergHamiltonianS (fun x y => ringCoupling L y x) 2 :=
+    heisenbergHamiltonianS_add (ringCoupling L) (fun x y => ringCoupling L y x) 2
+  rw [h, heisenbergHamiltonianS_coupling_swap, two_smul]
+
 /-! ## Per-`L` exponential decay of the correlation -/
 
 /-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring
