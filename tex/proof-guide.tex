@@ -9354,7 +9354,10 @@ hopping amplitude sum $2$ (two unit-amplitude neighbours, or for $L=2$ a single 
 neighbour), so Gershgorin gives the sector minimum $\ge -2$.  For $L\ge 4$ this is strictly above the
 balanced minimum ($\le -L\le -4<-2$); the boundary case $L=2$ (where the magnetization-$\pm1$ minimum
 $-2$ coincides with the balanced Néel diagonal) additionally needs the strict bound that the balanced
-ground energy lies strictly below $-2$ (off-diagonal mixing of the Néel state).
+ground energy lies strictly below $-2$ (off-diagonal mixing of the Néel state).  The disc radius rests
+on the spin-$1$ ladder amplitude bound $|\langle\sigma'|\hat S_x\cdot\hat S_y|\sigma\rangle|\le 1$
+(\texttt{spinSDot\_re\_abs\_le\_one\_raising\_lowering} and its lowering/raising twin): the explicit
+matrix element $\tfrac12\sqrt{\,\cdot\,}\sqrt{\,\cdot\,}$ has each radicand at most $2$ for $N=2$.
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
