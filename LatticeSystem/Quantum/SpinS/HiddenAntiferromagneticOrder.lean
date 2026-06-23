@@ -712,6 +712,41 @@ theorem exists_hhaf_positive_gap (L : ℕ) (hLeven : Even L) (hLpos : 0 < L) :
     exact ⟨j, Finset.mem_univ j, hj⟩
   exact Finset.min'_le _ _ hE'_Fabove
 
+/-! ## Real form of the restricted matrix (toward Perron–Frobenius uniqueness)
+
+The restricted matrix has real entries (the AFM Heisenberg ring coupling is real and the `spinSDot`
+matrix elements are real), so it descends to a real symmetric matrix.  This is the entry point for
+the Perron–Frobenius route to the unique-ground-state clause of Proposition 6.5 (the remaining
+axiomatic part): a Marshall-type gauge plus irreducibility of the hidden-AFM configuration graph
+would give a strictly positive Perron eigenvector at the ground energy, forcing the ground
+eigenspace to be one-dimensional. -/
+
+/-- Every entry of the restricted matrix is real (`im = 0`). -/
+theorem hhafRestrictedMatrix_im_zero (L : ℕ) (σ τ : hhafConfig L) :
+    ((hhafRestrictedMatrix L) σ τ).im = 0 := by
+  rw [hhafRestrictedMatrix, Matrix.submatrix_apply, afmHeisenbergChainHamiltonianS]
+  exact heisenbergHamiltonianS_apply_im_zero 2
+    (fun x y => by rw [ringCoupling]; split <;> simp) σ.1 τ.1
+
+/-- The **real form** of the `H_HAF`-restricted matrix: its entrywise real part. -/
+noncomputable def hhafRestrictedMatrixReal (L : ℕ) : Matrix (hhafConfig L) (hhafConfig L) ℝ :=
+  fun σ τ => ((hhafRestrictedMatrix L) σ τ).re
+
+/-- The real form casts back to the complex restricted matrix (the entries are real). -/
+theorem hhafRestrictedMatrixReal_ofReal (L : ℕ) (σ τ : hhafConfig L) :
+    ((hhafRestrictedMatrixReal L σ τ : ℝ) : ℂ) = (hhafRestrictedMatrix L) σ τ :=
+  Complex.ext (Complex.ofReal_re _)
+    (by rw [Complex.ofReal_im]; exact (hhafRestrictedMatrix_im_zero L σ τ).symm)
+
+/-- The real form is symmetric (the restricted matrix is Hermitian with real entries). -/
+theorem hhafRestrictedMatrixReal_isSymm (L : ℕ) : (hhafRestrictedMatrixReal L).IsSymm := by
+  ext σ τ
+  rw [Matrix.transpose_apply, hhafRestrictedMatrixReal, hhafRestrictedMatrixReal]
+  have h : (hhafRestrictedMatrix L) τ σ = star ((hhafRestrictedMatrix L) σ τ) := by
+    conv_lhs => rw [← (hhafRestrictedMatrix_isHermitian L)]
+    rw [Matrix.conjTranspose_apply]
+  rw [h, Complex.star_def, Complex.conj_re]
+
 /-! ## Per-`L` exponential decay of the correlation -/
 
 /-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring
