@@ -1014,6 +1014,31 @@ theorem exists_matrixPow_apply_pos_of_hhafReachable (L : ℕ)
       exact mul_nonneg (hB_nn _ _) (Matrix.pow_apply_nonneg hB_nn _ _ _)
     · exact ⟨_, Finset.mem_univ _, mul_pos (hB_step h₂) hpos⟩
 
+/-! ## Canonical configuration and the `±`-spin count -/
+
+/-- The **canonical** all-`0`-spin hidden-AFM configuration (`σ ≡ 1`, every site spin `0`), the base
+case of the kink reduction. -/
+def hhafCanonical (L : ℕ) : hhafConfig L := ⟨fun _ => 1, fun _ _ h => (h.2.1 rfl).elim⟩
+
+/-- The **number of `±` (nonzero) spins** in a hidden-AFM configuration — the induction measure for
+the kink reduction (each annihilation removes a `+,−` pair, decreasing it by `2`). -/
+def pmCount (L : ℕ) (σ : hhafConfig L) : ℕ :=
+  (Finset.univ.filter (fun x => σ.1 x ≠ 1)).card
+
+/-- A configuration has no `±` spins iff it is the canonical all-`0` configuration. -/
+theorem pmCount_eq_zero_iff (L : ℕ) (σ : hhafConfig L) :
+    pmCount L σ = 0 ↔ σ = hhafCanonical L := by
+  rw [pmCount, Finset.card_eq_zero, Finset.filter_eq_empty_iff]
+  constructor
+  · intro h
+    apply Subtype.ext
+    funext x
+    have hx := h (Finset.mem_univ x)
+    simpa [hhafCanonical] using hx
+  · intro h x _
+    rw [h]
+    simp [hhafCanonical]
+
 /-! ## Per-`L` exponential decay of the correlation -/
 
 /-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring
