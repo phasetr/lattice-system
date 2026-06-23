@@ -1049,31 +1049,11 @@ theorem hhaf_correlation_exp_decay_exists (L : ℕ) (Φ : (Fin L → Fin 3) → 
         C * Real.exp (-(ringDist L x y : ℝ) / ξ) :=
   exp_decay_envelope_of_finite (fun x y => chainCorrelation L Φ x y)
 
-/-- **Tasaki Proposition 6.5 (the `S = 1` chain on `H_HAF`), AXIOM.**  For an even ring `Fin L`
-(`L > 0`), the spin-`1` antiferromagnetic Heisenberg chain restricted to the
-hidden-antiferromagnetic subspace `H_HAF` (the compressed Hamiltonian
-`hhafRestrictedChainHamiltonianS`) has:
-
-* a **unique ground state** `Φ ∈ H_HAF` (a nonzero `H_HAF`-eigenvector at the minimal
-  `H_HAF`-energy `E`, with every `H_HAF` ground eigenvector a scalar multiple of `Φ`);
-* a **finite energy gap** `gap > 0` (a positive gap in the `H_HAF`-restricted spectrum: the first
-  excited `H_HAF`-energy `E₁` satisfies `gap = E₁ − E > 0`, with `E₁` minimal above `E`);
-* an **exponentially decaying correlation function**:
-  `|⟨Φ, Ŝ_x · Ŝ_y Φ⟩ / ⟨Φ, Φ⟩| ≤ C e^{−d(x,y)/ξ}` for some `ξ > 0`, `C ≥ 0`, where `d(x,y)` is the
-  ring distance.
-
-Thus the Haldane conjecture for `S = 1` (unique gapped disordered ground state) holds *rigorously
-within the artificial restricted Hilbert space* `H_HAF`.  Recorded as a documented axiom. -/
-axiom tasaki_prop_6_5_hhaf_spin_one (L : ℕ) (hL : Even L) (hLpos : 0 < L) :
-    ∃ (E gap ξ C : ℝ) (Φ : (Fin L → Fin 3) → ℂ),
-      (hhafProjection L).mulVec Φ = Φ ∧ Φ ≠ 0 ∧
-      (hhafRestrictedChainHamiltonianS L).mulVec Φ = (E : ℂ) • Φ ∧
-      (∀ E' ∈ hhafRealSpectrum L, E ≤ E') ∧
-      (∀ Ψ : (Fin L → Fin 3) → ℂ, Ψ ≠ 0 → (hhafProjection L).mulVec Ψ = Ψ →
-        (hhafRestrictedChainHamiltonianS L).mulVec Ψ = (E : ℂ) • Ψ → ∃ c : ℂ, Ψ = c • Φ) ∧
-      0 < gap ∧ (∃ E₁ ∈ hhafRealSpectrum L, E < E₁ ∧ gap = E₁ - E ∧
-        ∀ E' ∈ hhafRealSpectrum L, E < E' → E₁ ≤ E') ∧
-      0 < ξ ∧ 0 ≤ C ∧
-      ∀ x y : Fin L, |chainCorrelation L Φ x y| ≤ C * Real.exp (-(ringDist L x y : ℝ) / ξ)
+/-! **Tasaki Proposition 6.5** (the `S = 1` chain on `H_HAF`, Gómez-Santos): for an even ring the
+compressed Hamiltonian `hhafRestrictedChainHamiltonianS` has a **unique ground state**, a **finite
+gap**, and **exponentially decaying** correlations.  This was formerly a documented axiom; it is now
+**proved** as `tasaki_prop_6_5_hhaf_spin_one` in the companion module
+`Quantum/SpinS/HiddenAntiferromagneticOrderUniqueness.lean` (Perron–Frobenius on the balanced sector
++ the magnetization-`±1` Gershgorin bound + the sector classification). -/
 
 end LatticeSystem.Quantum

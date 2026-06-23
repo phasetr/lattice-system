@@ -9447,6 +9447,20 @@ $P$-slice eigenvector is a full eigenvector at the same eigenvalue. It lifts the
 Perron--Frobenius eigenvector to a full restricted-matrix eigenvector, placing the balanced ground
 energy in the restricted spectrum.
 
+These assemble into the discharge of Proposition~6.5. The consolidated lemma
+\texttt{hhafRestrictedMatrix\_balanced\_ground} threads a single $\mu<-L$ (from the dressed
+Perron--Frobenius, carried through the Marshall conjugation) that is the minimal eigenvalue of the
+complex balanced block, with a one-dimensional $\mu$-eigenspace and a realising eigenvector. Then
+\texttt{hhafRestrictedMatrix\_ground\_finrank\_le\_one} shows the restricted ground eigenspace is
+one-dimensional: the ground energy $E=\mathtt{hhafMinEnergy}$ satisfies $E\le\mu<-2$, so the
+single-$\pm$ block (eigenvalues $\ge-2$) is vacated and $E=\mu$ makes the balanced block the unique
+contributor, via an injective restriction map $R$ into the balanced block eigenspace. Lifting to the
+compressed operator through \texttt{hhafSubspaceEmbedding\_of\_projFixed},
+\texttt{hhafRestrictedMatrix\_mulVec\_of\_projFixed\_eig}, and \texttt{finrank\_le\_one\_iff}, and
+combining with the previously established minimality, gap, and decay clauses, the former axiom
+\texttt{tasaki\_prop\_6\_5\_hhaf\_spin\_one} is now a \emph{proved theorem} (depending only on
+\texttt{propext}/\texttt{Classical.choice}/\texttt{Quot.sound}).
+
 \medskip
 \noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
 pp.~177--179; documented axiom, \texttt{Quantum/SpinS/AKLT.lean}, Issue \#4485).  The
