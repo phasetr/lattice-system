@@ -1020,6 +1020,53 @@ theorem exists_matrixPow_apply_pos_of_hhafReachable (L : ℕ)
 case of the kink reduction. -/
 def hhafCanonical (L : ℕ) : hhafConfig L := ⟨fun _ => 1, fun _ _ h => (h.2.1 rfl).elim⟩
 
+/-- A site is never in its own (left-endpoint) open cyclic arc. -/
+theorem not_inCyclicOpen_self_left {L : ℕ} (x y : Fin L) : ¬ InCyclicOpen x y x := by
+  simp only [InCyclicOpen]; split_ifs <;> omega
+
+/-- A site is never in its own (right-endpoint) open cyclic arc. -/
+theorem not_inCyclicOpen_self_right {L : ℕ} (x y : Fin L) : ¬ InCyclicOpen x y y := by
+  simp only [InCyclicOpen]; split_ifs <;> omega
+
+/-- The cyclic successor's value is `a.val + 1` (no wrap) or `0` (wrap at `a.val + 1 = L`). -/
+private theorem succ_val_cases {L : ℕ} {a b : Fin L} (hb : b.val = (a.val + 1) % L) :
+    b.val = a.val + 1 ∨ (b.val = 0 ∧ a.val + 1 = L) := by
+  rcases Nat.lt_or_ge (a.val + 1) L with hlt | hge
+  · exact Or.inl (by rw [hb, Nat.mod_eq_of_lt hlt])
+  · have heq : a.val + 1 = L := by have := a.isLt; omega
+    exact Or.inr ⟨by rw [hb, heq, Nat.mod_self], heq⟩
+
+/-- **Arc decomposition** (left endpoint successor): if `b` is the cyclic successor of `a` and
+`b ≠ y`, then any site in the open arc `(a, y)` is either `b` itself or in the open arc `(b, y)`. -/
+theorem inCyclicOpen_succ_left_imp {L : ℕ} {a b y z : Fin L}
+    (hb : b.val = (a.val + 1) % L) (hby : b ≠ y) (h : InCyclicOpen a y z) :
+    z = b ∨ InCyclicOpen b y z := by
+  have hbyv : b.val ≠ y.val := fun hc => hby (Fin.ext hc)
+  have ha := a.isLt; have hbv := b.isLt; have hyv := y.isLt; have hzv := z.isLt
+  rw [Fin.ext_iff]
+  simp only [InCyclicOpen] at h ⊢
+  rcases succ_val_cases hb with hbe | ⟨hbe, hL⟩ <;> split_ifs at h ⊢ <;> omega
+
+/-- **Arc inclusion** (right endpoint successor): if `b` is the cyclic successor of `a`, the open
+arc `(x, a)` is contained in the open arc `(x, b)`. -/
+theorem inCyclicOpen_succ_right_imp {L : ℕ} {a b x z : Fin L}
+    (hb : b.val = (a.val + 1) % L) (hxa : x ≠ a) (h : InCyclicOpen x a z) :
+    InCyclicOpen x b z := by
+  have hxav : x.val ≠ a.val := fun hc => hxa (Fin.ext hc)
+  have ha := a.isLt; have hbv := b.isLt; have hxv := x.isLt; have hzv := z.isLt
+  simp only [InCyclicOpen] at h ⊢
+  rcases succ_val_cases hb with hbe | ⟨hbe, hL⟩ <;> split_ifs at h ⊢ <;> omega
+
+/-- **Successor non-membership**: if `b` (the cyclic successor of `a`, with `b ≠ y`) is not in the
+open arc `(x, y)`, then neither is `a`. -/
+theorem notInCyclicOpen_succ {L : ℕ} {a b x y : Fin L}
+    (hb : b.val = (a.val + 1) % L) (hby : b ≠ y) (hnb : ¬ InCyclicOpen x y b) :
+    ¬ InCyclicOpen x y a := by
+  have hbyv : b.val ≠ y.val := fun hc => hby (Fin.ext hc)
+  have ha := a.isLt; have hbv := b.isLt; have hxv := x.isLt; have hyv := y.isLt
+  simp only [InCyclicOpen] at hnb ⊢
+  rcases succ_val_cases hb with hbe | ⟨hbe, hL⟩ <;> split_ifs at hnb ⊢ <;> omega
+
 /-- **Slide move** (raw configuration): move the spin at site `a` onto the site `b`, leaving a `0`
 behind at `a`.  When `a` carries a `±` spin and `b` (its cyclic neighbour) carries a `0`, this
 slides the `±` spin one step along the ring. -/
@@ -1054,6 +1101,64 @@ theorem slidePM_isRaiseLowerStep {L : ℕ} (σ : Fin L → Fin 3) {a b : Fin L} 
     · right; constructor <;> simp [h]
   · intro k hka hkb
     rw [slidePM_apply σ hab k, if_neg hkb, if_neg hka]
+
+/-- **The slide move preserves hidden antiferromagnetic order** — the heart of the kink-ergodicity
+argument.  Sliding a `±` spin at `a` onto its `0`-carrying cyclic successor `b` keeps the strict
+`+,−,…` alternation: the `±`-sign sequence in cyclic order is unchanged (only the position of one
+`±` spin shifts by one past a `0`).  The proof transfers each `IsNextPM` pair of the moved
+configuration back to an `IsNextPM` pair of `σ` (relabelling `b ↦ a`), using the arc-decomposition
+lemmas `inCyclicOpen_succ_left_imp` / `inCyclicOpen_succ_right_imp` / `notInCyclicOpen_succ`. -/
+theorem slidePM_isHiddenAFM {L : ℕ} {σ : Fin L → Fin 3} (hσ : IsHiddenAFMConfig σ)
+    {a b : Fin L} (hab : a ≠ b) (hb : b.val = (a.val + 1) % L)
+    (ha : σ a ≠ 1) (hb1 : σ b = 1) :
+    IsHiddenAFMConfig (slidePM σ a b) := by
+  intro x y hxy
+  obtain ⟨hxny, hpmx, hpmy, harc⟩ := hxy
+  simp only [IsPM] at hpmx hpmy
+  have hτa : slidePM σ a b a = 1 := by rw [slidePM_apply σ hab a, if_neg hab, if_pos rfl]
+  have hxa : x ≠ a := fun h => hpmx (by rw [h, hτa])
+  have hya : y ≠ a := fun h => hpmy (by rw [h, hτa])
+  have hvb : slidePM σ a b b = σ a := by rw [slidePM_apply σ hab b, if_pos rfl]
+  have hvo : ∀ w, w ≠ a → w ≠ b → slidePM σ a b w = σ w := fun w hwa hwb => by
+    rw [slidePM_apply σ hab w, if_neg hwb, if_neg hwa]
+  have hbnotarc : ¬ InCyclicOpen x y b := fun hbarc => by
+    have h := harc b hbarc; rw [hvb] at h; exact ha h
+  by_cases hxb : x = b
+  · by_cases hyb : y = b
+    · exact absurd (hxb.trans hyb.symm) hxny
+    · -- x = b, y ≠ b: transfer to the pair (a, y)
+      have hby : b ≠ y := hxb ▸ hxny
+      have hpy : σ y ≠ 1 := by have h := hpmy; rwa [hvo y hya hyb] at h
+      rw [hxb, hvb, hvo y hya hyb]
+      refine hσ a y ⟨fun h => hya h.symm, ha, hpy, ?_⟩
+      intro z hz
+      rcases inCyclicOpen_succ_left_imp hb hby hz with hzb | hzin
+      · rw [hzb]; exact hb1
+      · have hz1 := harc z (by rw [hxb]; exact hzin)
+        have hzna : z ≠ a := fun h => not_inCyclicOpen_self_left a y (h ▸ hz)
+        have hznb : z ≠ b := fun h => not_inCyclicOpen_self_left b y (h ▸ hzin)
+        rw [← hvo z hzna hznb]; exact hz1
+  · by_cases hyb : y = b
+    · -- x ≠ b, y = b: transfer to the pair (x, a)
+      have hpx : σ x ≠ 1 := by have h := hpmx; rwa [hvo x hxa hxb] at h
+      rw [hvo x hxa hxb, hyb, hvb]
+      refine hσ x a ⟨hxa, hpx, ha, ?_⟩
+      intro z hz
+      have hzx := inCyclicOpen_succ_right_imp hb hxa hz
+      have hz1 := harc z (by rw [hyb]; exact hzx)
+      have hzna : z ≠ a := fun h => not_inCyclicOpen_self_right x a (h ▸ hz)
+      have hznb : z ≠ b := fun h => not_inCyclicOpen_self_right x b (h ▸ hzx)
+      rw [← hvo z hzna hznb]; exact hz1
+    · -- x ≠ b, y ≠ b: transfer to the pair (x, y)
+      have hpx : σ x ≠ 1 := by have h := hpmx; rwa [hvo x hxa hxb] at h
+      have hpy : σ y ≠ 1 := by have h := hpmy; rwa [hvo y hya hyb] at h
+      rw [hvo x hxa hxb, hvo y hya hyb]
+      refine hσ x y ⟨hxny, hpx, hpy, ?_⟩
+      intro z hz
+      have hanotarc : ¬ InCyclicOpen x y a := notInCyclicOpen_succ hb (Ne.symm hyb) hbnotarc
+      have hzna : z ≠ a := fun h => hanotarc (h ▸ hz)
+      have hznb : z ≠ b := fun h => hbnotarc (h ▸ hz)
+      rw [← hvo z hzna hznb]; exact harc z hz
 
 /-- The **number of `±` (nonzero) spins** in a hidden-AFM configuration — the induction measure for
 the kink reduction (each annihilation removes a `+,−` pair, decreasing it by `2`). -/
