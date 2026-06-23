@@ -9440,6 +9440,13 @@ real-block eigenvector, carried to a dressed-block eigenvector by the Marshall c
 $E<-2$ the single-$\pm$ block is then vacated and the balanced block supplies the unique ground
 state.
 
+The reverse block restriction \texttt{hhafRestrictedMatrix\_mulVec\_hhafSliceExtend} (with the
+zero-extension \texttt{hhafSliceExtend} and \texttt{hhafSliceExtend\_ne\_zero}) is the counterpart of
+the forward slice: if no entry couples into a $P$-slice from its complement, the zero-extension of a
+$P$-slice eigenvector is a full eigenvector at the same eigenvalue. It lifts the balanced
+Perron--Frobenius eigenvector to a full restricted-matrix eigenvector, placing the balanced ground
+energy in the restricted spectrum.
+
 \medskip
 \noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
 pp.~177--179; documented axiom, \texttt{Quantum/SpinS/AKLT.lean}, Issue \#4485).  The
