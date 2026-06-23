@@ -9381,6 +9381,20 @@ per-entry bound, injectivity of the $\pm$-site map on the support, and the row-s
 $\sum_t(\mathtt{ringCouplingSym}\,s\,t).\mathrm{re}=2$ (each site has exactly two incident directed
 ring bonds). Since the balanced ground energy is $\le -L\le -2$, this places the $S^z=\pm1$ sectors
 at or above the balanced sector --- the single-kink tight-binding half of the inter-sector ordering.
+
+The balanced half is made \emph{strict} by \texttt{hhafDressedMatrix0\_ground\_lt\_neg\_L}: the
+balanced Perron--Frobenius lowest eigenvector $v>0$ paired with the N\'eel row of the eigenvalue
+equation $M_0 v=\mu v$ gives
+$\mu\,v(\mathrm{N\acute eel})=-L\,v(\mathrm{N\acute eel})+\sum_{\tau\ne\mathrm{N\acute eel}}
+M_0(\mathrm{N\acute eel},\tau)\,v(\tau)$. Every off-diagonal term is $\le 0$
+(\texttt{hhafDressedMatrix0\_offdiag\_nonpos}) and the annihilation neighbour
+(\texttt{hhafNeel\_step\_neighbor}, annihilating the adjacent opposite-$\pm$ pair at sites $0,1$) is
+strictly $<0$, so by the generic row inequality
+\texttt{row\_sum\_mul\_lt\_diag\_mul\_of\_offdiag\_nonpos\_exists\_neg} and the N\'eel diagonal value
+$M_0(\mathrm{N\acute eel},\mathrm{N\acute eel})=-L$ (\texttt{hhafDressedMatrix0\_Neel\_diag}) we get
+$\mu\,v(\mathrm{N\acute eel})<-L\,v(\mathrm{N\acute eel})$, hence $\mu<-L$. As $-L\le-2$, the balanced
+sector is \emph{strictly} below the $S^z=\pm1$ sectors with no $L=2$ tie, completing the inter-sector
+ordering.
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
