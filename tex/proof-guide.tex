@@ -9363,6 +9363,24 @@ $H=\mathtt{ringCouplingSym}\cdot\hat S_x\!\cdot\!\hat S_y$ gives
 \texttt{hhafDressedMatrix\_abs\_le\_ringCouplingSym}: a single-ladder-move dressed entry satisfies
 $|M_{\sigma\tau}|\le(\mathtt{ringCouplingSym}\,x\,y).\mathrm{re}$ (which is $1$ for $L\ge 3$ and $2$
 for $L=2$), so a single-$\pm$ row's off-diagonal sum is at most $2$.
+
+A structural observation (from the Codex cross-check) sharpens the sector analysis: the cyclic
+complete-hidden-AFM constraint (consecutive $\pm$ spins alternate sign around the ring)
+\emph{forbids} an odd number of $\pm$ spins greater than one, since an odd cycle cannot carry a
+consistent alternating $+,-,+,\dots$ labelling. Hence the only sectors of $H_{\mathrm{HAF}}$ are the
+balanced one ($S^z=0$, even $\mathtt{pmCount}$, the irreducible Perron--Frobenius block) and the
+single-$\pm$ sectors ($S^z=\pm1$, $\mathtt{pmCount}=1$); there are no higher-$|S^z|$ sectors, so the
+inter-sector ordering reduces to comparing these two. For the single-$\pm$ sector we prove
+\texttt{hhafDressedMatrixPM1\_eigenvalue\_ge}: every eigenvalue of the $\mathtt{pmCount}=1$ dressed
+block is $\ge -2$. By Gershgorin (\texttt{eigenvalue\_mem\_ball}) each row has centre $0$ (vanishing
+single-$\pm$ Ising diagonal) and radius $\le 2$. The radius bound
+(\texttt{hhafDressedMatrixPM1\_rowSum\_le\_two}) follows from the coupling characterization
+\texttt{hhafPM1\_coupling\_imp} (a nonzero off-diagonal forces $\tau=\mathtt{slidePM}$ of $\sigma$'s
+$\pm$ spin onto an adjacent site, sharing its $\pm$ value by magnetization conservation), the
+per-entry bound, injectivity of the $\pm$-site map on the support, and the row-sum identity
+$\sum_t(\mathtt{ringCouplingSym}\,s\,t).\mathrm{re}=2$ (each site has exactly two incident directed
+ring bonds). Since the balanced ground energy is $\le -L\le -2$, this places the $S^z=\pm1$ sectors
+at or above the balanced sector --- the single-kink tight-binding half of the inter-sector ordering.
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional

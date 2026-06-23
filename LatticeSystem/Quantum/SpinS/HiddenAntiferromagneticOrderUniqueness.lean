@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder
 import LatticeSystem.Math.PerronFrobeniusSymmetric
 import LatticeSystem.Quantum.SpinS.GaugeEigenspaceFinrank
+import Mathlib.LinearAlgebra.Matrix.Gershgorin
 
 /-!
 # Tasaki §6.3 Proposition 6.5: Perron–Frobenius uniqueness route (kink ergodicity)
@@ -956,5 +957,285 @@ theorem hhafDressedMatrix_abs_le_ringCouplingSym {L : ℕ} {σ τ : hhafConfig L
       ≤ (ringCoupling L x y + ringCoupling L y x).re * 1 :=
         mul_le_mul_of_nonneg_left hsd hsym_nonneg
     _ = (ringCoupling L x y + ringCoupling L y x).re := mul_one _
+
+/-- The **dressed** diagonal also vanishes for a single-`±` configuration: dressing only multiplies
+the entry by the real Marshall phases (`ε(σ).re²`), and the undressed diagonal is zero. -/
+theorem hhafDressedMatrix_diag_eq_zero_of_pmCount_one (L : ℕ) (hL : 2 ≤ L) (σ : hhafConfig L)
+    (hpm : pmCount L σ = 1) : hhafDressedMatrix L σ σ = 0 := by
+  rw [hhafDressedMatrix_eq, hhafRestrictedMatrixReal,
+    hhaf_diag_eq_zero_of_pmCount_one L hL σ hpm, Complex.zero_re, mul_zero]
+
+/-- The **magnetization-`±1` sector**: hidden-AFM configurations with exactly one `±` spin
+(`pmCount = 1`).  These span the total-`Sz = ±1` blocks of `H_HAF` and form a single-kink
+tight-binding problem. -/
+abbrev hhafConfigPM1 (L : ℕ) : Type := {σ : hhafConfig L // pmCount L σ = 1}
+
+/-- The **dressed restricted matrix on the magnetization-`±1` sector** (the submatrix of
+`hhafDressedMatrix` on `hhafConfigPM1`). -/
+noncomputable def hhafDressedMatrixPM1 (L : ℕ) :
+    Matrix (hhafConfigPM1 L) (hhafConfigPM1 L) ℝ :=
+  (hhafDressedMatrix L).submatrix Subtype.val Subtype.val
+
+/-- The magnetization-`±1` sector dressed matrix is symmetric. -/
+theorem hhafDressedMatrixPM1_isSymm (L : ℕ) : (hhafDressedMatrixPM1 L).IsSymm :=
+  (hhafDressedMatrix_isSymm L).submatrix Subtype.val
+
+/-- The magnetization-`±1` sector dressed matrix has **vanishing diagonal** (single-`±` Ising
+energy is zero). -/
+theorem hhafDressedMatrixPM1_diag_eq_zero (L : ℕ) (hL : 2 ≤ L) (σ : hhafConfigPM1 L) :
+    hhafDressedMatrixPM1 L σ σ = 0 := by
+  rw [hhafDressedMatrixPM1, Matrix.submatrix_apply]
+  exact hhafDressedMatrix_diag_eq_zero_of_pmCount_one L hL σ.1 σ.2
+
+/-- A vanishing undressed entry gives a vanishing dressed entry (dressing multiplies by the real
+Marshall phases). -/
+theorem hhafDressedMatrix_eq_zero_of_restricted_zero {L : ℕ} {σ τ : hhafConfig L}
+    (h : (hhafRestrictedMatrix L) σ τ = 0) : hhafDressedMatrix L σ τ = 0 := by
+  rw [hhafDressedMatrix_eq, hhafRestrictedMatrixReal, h, Complex.zero_re, mul_zero]
+
+/-- The **unique `±` site** of a single-`±` configuration (`pmCount = 1`).  Defined computably as
+the minimum of the (singleton) support so that `Finset.image`/`Finset.sum_image` reductions over the
+`±`-site map do not force an opaque `Classical.choose`. -/
+def hhafPM1Site {L : ℕ} (σ : hhafConfigPM1 L) : Fin L :=
+  (Finset.univ.filter (fun x => σ.1.1 x ≠ 1)).min' (by
+    rw [← Finset.card_pos]
+    have hc : (Finset.univ.filter (fun x => σ.1.1 x ≠ 1)).card = 1 := σ.2
+    omega)
+
+/-- The `±` site indeed carries a `±` spin. -/
+theorem hhafPM1Site_mem {L : ℕ} (σ : hhafConfigPM1 L) : σ.1.1 (hhafPM1Site σ) ≠ 1 := by
+  have h : hhafPM1Site σ ∈ Finset.univ.filter (fun x => σ.1.1 x ≠ 1) := by
+    rw [hhafPM1Site]; exact Finset.min'_mem _ _
+  exact (Finset.mem_filter.mp h).2
+
+/-- A site carries the `±` spin of a single-`±` configuration iff it is `hhafPM1Site`. -/
+theorem hhafPM1Site_spec {L : ℕ} (σ : hhafConfigPM1 L) (z : Fin L) :
+    σ.1.1 z ≠ 1 ↔ z = hhafPM1Site σ := by
+  obtain ⟨a, ha⟩ := Finset.card_eq_one.mp σ.2
+  have hsite : hhafPM1Site σ ∈ Finset.univ.filter (fun x => σ.1.1 x ≠ 1) := Finset.min'_mem _ _
+  rw [ha, Finset.mem_singleton] at hsite
+  constructor
+  · intro hz
+    have : z ∈ Finset.univ.filter (fun x => σ.1.1 x ≠ 1) :=
+      Finset.mem_filter.mpr ⟨Finset.mem_univ z, hz⟩
+    rw [ha, Finset.mem_singleton] at this
+    rw [this, hsite]
+  · intro hz; rw [hz]; exact hhafPM1Site_mem σ
+
+/-- Off the `±` site, a single-`±` configuration is `1`. -/
+theorem hhafPM1_eq_one_of_ne {L : ℕ} (σ : hhafConfigPM1 L) {z : Fin L}
+    (hz : z ≠ hhafPM1Site σ) : σ.1.1 z = 1 := by
+  by_contra h; exact hz ((hhafPM1Site_spec σ z).mp h)
+
+/-- The `±` value at the `±` site is `0` or `2`. -/
+theorem hhafPM1_site_val {L : ℕ} (σ : hhafConfigPM1 L) :
+    (σ.1.1 (hhafPM1Site σ)).val = 0 ∨ (σ.1.1 (hhafPM1Site σ)).val = 2 := by
+  have h : σ.1.1 (hhafPM1Site σ) ≠ 1 := (hhafPM1Site_spec σ (hhafPM1Site σ)).mpr rfl
+  have := (σ.1.1 (hhafPM1Site σ)).isLt
+  omega
+
+/-- **Coupling characterization for the single-`±` sector.**  Two distinct single-`±`
+configurations with a nonzero (undressed) matrix element differ at exactly their two `±` sites,
+agree elsewhere, share their `±` value, and one is the other with the `±` spin slid to the new site
+(`slidePM`). -/
+theorem hhafPM1_coupling_imp {L : ℕ} (σ τ : hhafConfigPM1 L) (hne : τ ≠ σ)
+    (hnz : (hhafRestrictedMatrix L) σ.1 τ.1 ≠ 0) :
+    hhafPM1Site σ ≠ hhafPM1Site τ ∧
+      (∀ k, k ≠ hhafPM1Site σ → k ≠ hhafPM1Site τ → σ.1.1 k = τ.1.1 k) ∧
+      (((τ.1.1 (hhafPM1Site σ)).val + 1 = (σ.1.1 (hhafPM1Site σ)).val ∧
+          (σ.1.1 (hhafPM1Site τ)).val + 1 = (τ.1.1 (hhafPM1Site τ)).val) ∨
+        ((σ.1.1 (hhafPM1Site σ)).val + 1 = (τ.1.1 (hhafPM1Site σ)).val ∧
+          (τ.1.1 (hhafPM1Site τ)).val + 1 = (σ.1.1 (hhafPM1Site τ)).val)) ∧
+      τ.1.1 = slidePM σ.1.1 (hhafPM1Site σ) (hhafPM1Site τ) := by
+  set s := hhafPM1Site σ with hsdef
+  set t := hhafPM1Site τ with htdef
+  -- entries are the Heisenberg matrix element
+  have hH : (heisenbergHamiltonianS (ringCoupling L) 2) σ.1.1 τ.1.1 ≠ 0 := by
+    rwa [hhafRestrictedMatrix, Matrix.submatrix_apply, afmHeisenbergChainHamiltonianS] at hnz
+  -- agreement off `{s, t}`
+  have hagree : ∀ k, k ≠ s → k ≠ t → σ.1.1 k = τ.1.1 k := fun k hks hkt => by
+    rw [hhafPM1_eq_one_of_ne σ hks, hhafPM1_eq_one_of_ne τ hkt]
+  -- `s ≠ t`
+  have hst : s ≠ t := by
+    intro h
+    -- then `σ`, `τ` agree off the single site `s`
+    have hagree' : ∀ k, k ≠ s → σ.1.1 k = τ.1.1 k := fun k hks =>
+      hagree k hks (h ▸ hks)
+    by_cases hval : σ.1.1 s = τ.1.1 s
+    · exact hne (Subtype.ext (Subtype.ext (funext fun k => by
+        by_cases hks : k = s
+        · rw [hks]; exact hval.symm
+        · exact (hagree' k hks).symm)))
+    · exact hH (heisenbergHamiltonianS_apply_eq_zero_of_one_site_diff (ringCoupling L) 2
+        (z := s) hagree' hval)
+  -- value match via magnetization conservation
+  have hmag : magSumS σ.1.1 = magSumS τ.1.1 := by
+    by_contra hm
+    exact hH (heisenbergHamiltonianS_apply_eq_zero_of_mag_ne (ringCoupling L) 2
+      (fun h => hm ((magEigenvalueS_eq_iff τ.1.1 σ.1.1).mp h).symm))
+  have hσt : σ.1.1 t = 1 := hhafPM1_eq_one_of_ne σ (Ne.symm hst)
+  have hτs : τ.1.1 s = 1 := hhafPM1_eq_one_of_ne τ hst
+  -- split the magnetization sum at `s` and `t`
+  have hvalsum : (σ.1.1 s).val + (σ.1.1 t).val = (τ.1.1 s).val + (τ.1.1 t).val := by
+    have hsplit : ∀ f : Fin L → Fin 3, magSumS f =
+        (f s).val + ((f t).val + ∑ x ∈ (Finset.univ.erase s).erase t, (f x).val) := fun f => by
+      rw [magSumS, ← Finset.add_sum_erase _ _ (Finset.mem_univ s),
+        ← Finset.add_sum_erase _ _ (Finset.mem_erase.mpr ⟨Ne.symm hst, Finset.mem_univ t⟩)]
+    have hrest : (∑ x ∈ (Finset.univ.erase s).erase t, (σ.1.1 x).val) =
+        ∑ x ∈ (Finset.univ.erase s).erase t, (τ.1.1 x).val :=
+      Finset.sum_congr rfl fun x hx => by
+        rw [hagree x (Finset.mem_erase.mp (Finset.mem_of_mem_erase hx)).1
+          (Finset.mem_erase.mp hx).1]
+    have hms := hsplit σ.1.1
+    have hmt := hsplit τ.1.1
+    omega
+  have hτsv : (τ.1.1 s).val = 1 := by simp [hτs]
+  have hσtv : (σ.1.1 t).val = 1 := by simp [hσt]
+  have hsval : (σ.1.1 s).val = (τ.1.1 t).val := by omega
+  refine ⟨hst, hagree, ?_, ?_⟩
+  · -- shift structure from the `±` value `0` or `2`
+    rcases hhafPM1_site_val σ with h0 | h2
+    · rw [← hsdef] at h0; right; constructor <;> omega
+    · rw [← hsdef] at h2; left; constructor <;> omega
+  · -- `τ = slidePM σ s t`
+    funext k
+    rw [slidePM_apply σ.1.1 hst k]
+    by_cases hkt : k = t
+    · rw [if_pos hkt, hkt]; exact Fin.eq_of_val_eq hsval.symm
+    · rw [if_neg hkt]
+      by_cases hks : k = s
+      · rw [if_pos hks, hks]; exact hτs
+      · rw [if_neg hks]; exact (hagree k hks hkt).symm
+
+/-- **Single-`±` row bound** (per entry): a nonzero off-diagonal entry of the single-`±` block is
+bounded by the symmetrized coupling between the two `±` sites. -/
+theorem hhafDressedMatrixPM1_offdiag_le {L : ℕ} (σ τ : hhafConfigPM1 L) (hne : τ ≠ σ)
+    (hnz : (hhafRestrictedMatrix L) σ.1 τ.1 ≠ 0) :
+    ‖hhafDressedMatrixPM1 L σ τ‖ ≤ (ringCouplingSym L (hhafPM1Site σ) (hhafPM1Site τ)).re := by
+  obtain ⟨hst, hagree, hsh, _⟩ := hhafPM1_coupling_imp σ τ hne hnz
+  rw [hhafDressedMatrixPM1, Matrix.submatrix_apply, Real.norm_eq_abs]
+  exact hhafDressedMatrix_abs_le_ringCouplingSym hst hsh hagree
+
+/-- The `±`-site map is **injective on the coupling support**: two distinct configurations both
+coupling to `σ` and sharing a `±` site are equal (both are the unique slide of `σ` to that site). -/
+theorem hhafPM1Site_injOn_support {L : ℕ} (σ : hhafConfigPM1 L) :
+    Set.InjOn (hhafPM1Site)
+      {τ : hhafConfigPM1 L | τ ≠ σ ∧ (hhafRestrictedMatrix L) σ.1 τ.1 ≠ 0} := by
+  intro τ hτ τ' hτ' heq
+  obtain ⟨_, _, _, hslide⟩ := hhafPM1_coupling_imp σ τ hτ.1 hτ.2
+  obtain ⟨_, _, _, hslide'⟩ := hhafPM1_coupling_imp σ τ' hτ'.1 hτ'.2
+  exact Subtype.ext (Subtype.ext (hslide.trans (heq ▸ hslide'.symm)))
+
+/-- A nonnegative function composed with a map injective on a finite index set sums to at most the
+total over the codomain.  Stated over abstract types so that `Finset.image`/`Finset.sum_image`
+reductions never force the (astronomically large) `Finset.univ` of a concrete configuration type. -/
+theorem sum_comp_le_sum_univ_of_injOn {α β : Type*} [Fintype β]
+    (s : Finset α) (g : α → β) (f : β → ℝ) (hf : ∀ b, 0 ≤ f b)
+    (hinj : Set.InjOn g (s : Set α)) :
+    ∑ a ∈ s, f (g a) ≤ ∑ b, f b := by
+  classical
+  rw [← Finset.sum_image
+    (fun x hx y hy h => hinj (Finset.mem_coe.mpr hx) (Finset.mem_coe.mpr hy) h)]
+  exact Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _) (fun b _ _ => hf b)
+
+/-- **Row-sum identity** for the symmetrized ring coupling: every site has exactly two incident
+directed ring bonds, so the real part of the row sum is `2` (the Gershgorin radius). -/
+theorem ringCouplingSym_re_row_sum (L : ℕ) (hL : 1 ≤ L) (s : Fin L) :
+    ∑ t : Fin L, (ringCouplingSym L s t).re = 2 := by
+  have hsucc : (⟨(s.val + 1) % L, Nat.mod_lt _ (by omega)⟩ : Fin L).val = (s.val + 1) % L := rfl
+  have hsum1 : ∑ t : Fin L, (ringCoupling L s t).re = 1 := by
+    rw [Finset.sum_eq_single (⟨(s.val + 1) % L, Nat.mod_lt _ (by omega)⟩ : Fin L)]
+    · rw [ringCoupling]; simp
+    · intro t _ hne
+      rw [ringCoupling]
+      have : t.val ≠ (s.val + 1) % L := fun h => hne (Fin.ext (h.trans hsucc.symm))
+      simp [this]
+    · intro h; exact absurd (Finset.mem_univ _) h
+  have hsucc_inj : ∀ a b : ℕ, a < L → b < L → (a + 1) % L = (b + 1) % L → a = b := by
+    intro a b ha hb hab
+    rcases Nat.lt_or_ge (a + 1) L with ha1 | ha1 <;> rcases Nat.lt_or_ge (b + 1) L with hb1 | hb1
+    · rw [Nat.mod_eq_of_lt ha1, Nat.mod_eq_of_lt hb1] at hab; omega
+    · rw [Nat.mod_eq_of_lt ha1, show b + 1 = L by omega, Nat.mod_self] at hab; omega
+    · rw [show a + 1 = L by omega, Nat.mod_self, Nat.mod_eq_of_lt hb1] at hab; omega
+    · omega
+  have hsum2 : ∑ t : Fin L, (ringCoupling L t s).re = 1 := by
+    set p : Fin L := ⟨(s.val + L - 1) % L, Nat.mod_lt _ (by omega)⟩ with hp
+    have hps : (p.val + 1) % L = s.val := by
+      have hsL := s.isLt
+      rcases Nat.eq_zero_or_pos s.val with h0 | h0
+      · simp only [hp, h0, Nat.mod_eq_of_lt (show 0 + L - 1 < L by omega)]
+        rw [show 0 + L - 1 + 1 = L by omega, Nat.mod_self]
+      · simp only [hp, show s.val + L - 1 = (s.val - 1) + L by omega, Nat.add_mod_right,
+          Nat.mod_eq_of_lt (show s.val - 1 < L by omega), show s.val - 1 + 1 = s.val by omega,
+          Nat.mod_eq_of_lt hsL]
+    rw [Finset.sum_eq_single p]
+    · rw [ringCoupling]; simp [hps.symm]
+    · intro t _ hne
+      rw [ringCoupling]
+      have : s.val ≠ (t.val + 1) % L := by
+        intro h
+        exact hne (Fin.ext (hsucc_inj t.val p.val t.isLt p.isLt (h ▸ hps).symm))
+      simp [this]
+    · intro h; exact absurd (Finset.mem_univ _) h
+  calc ∑ t : Fin L, (ringCouplingSym L s t).re
+      = ∑ t : Fin L, ((ringCoupling L s t).re + (ringCoupling L t s).re) := by
+        refine Finset.sum_congr rfl fun t _ => ?_
+        rw [ringCouplingSym, Complex.add_re]
+    _ = (∑ t : Fin L, (ringCoupling L s t).re) + ∑ t : Fin L, (ringCoupling L t s).re :=
+        Finset.sum_add_distrib
+    _ = 2 := by rw [hsum1, hsum2]; norm_num
+
+/-- **Magnetization-`±1` sector Gershgorin radius**: each single-`±` row has off-diagonal `ℓ¹`-norm
+at most `2`.  The support of a row is the `≤ 2` adjacent slides of the `±` spin, each bounded by the
+incident coupling, and the `±`-site map is injective on the support, so the sum collapses to the
+ring-coupling row sum `2`. -/
+theorem hhafDressedMatrixPM1_rowSum_le_two {L : ℕ} (hL : 1 ≤ L) (σ : hhafConfigPM1 L) :
+    ∑ τ ∈ Finset.univ.erase σ, ‖hhafDressedMatrixPM1 L σ τ‖ ≤ 2 := by
+  classical
+  set S := (Finset.univ.erase σ).filter
+    (fun τ => (hhafRestrictedMatrix L) σ.1 τ.1 ≠ 0) with hSdef
+  -- restrict the sum to the coupling support
+  have hsupp : ∑ τ ∈ Finset.univ.erase σ, ‖hhafDressedMatrixPM1 L σ τ‖ =
+      ∑ τ ∈ S, ‖hhafDressedMatrixPM1 L σ τ‖ := by
+    refine (Finset.sum_subset (Finset.filter_subset _ _) ?_).symm
+    intro τ hτ hτS
+    rw [Finset.mem_filter, not_and] at hτS
+    have h0 : (hhafRestrictedMatrix L) σ.1 τ.1 = 0 := by
+      by_contra h; exact hτS hτ h
+    have hd0 : hhafDressedMatrixPM1 L σ τ = 0 :=
+      hhafDressedMatrix_eq_zero_of_restricted_zero h0
+    rw [hd0, norm_zero]
+  rw [hsupp]
+  -- per-entry bound, then reindex by the injective `±`-site map
+  have hinj : Set.InjOn hhafPM1Site (S : Set (hhafConfigPM1 L)) := by
+    refine (hhafPM1Site_injOn_support σ).mono ?_
+    intro τ hτ
+    rw [hSdef, Finset.coe_filter] at hτ
+    exact ⟨Finset.mem_erase.mp hτ.1 |>.1, hτ.2⟩
+  calc ∑ τ ∈ S, ‖hhafDressedMatrixPM1 L σ τ‖
+      ≤ ∑ τ ∈ S, (ringCouplingSym L (hhafPM1Site σ) (hhafPM1Site τ)).re := by
+        refine Finset.sum_le_sum fun τ hτ => ?_
+        rw [hSdef, Finset.mem_filter] at hτ
+        exact hhafDressedMatrixPM1_offdiag_le σ τ (Finset.mem_erase.mp hτ.1).1 hτ.2
+    _ ≤ ∑ t : Fin L, (ringCouplingSym L (hhafPM1Site σ) t).re :=
+        sum_comp_le_sum_univ_of_injOn S hhafPM1Site _
+          (fun t => ringCouplingSym_re_nonneg L _ t) hinj
+    _ = 2 := ringCouplingSym_re_row_sum L hL _
+
+/-- **Magnetization-`±1` sector minimum energy `≥ −2`** (Gershgorin).  Every eigenvalue of the
+single-`±` dressed block lies in the disc of centre `0` (vanishing diagonal) and radius `2` (the
+ring-coupling row sum), so the lowest eigenvalue is at least `−2`.  This is the single-kink
+tight-binding lower bound that places the `Sz = ±1` sectors strictly above the balanced ground
+energy. -/
+theorem hhafDressedMatrixPM1_eigenvalue_ge {L : ℕ} (hL : 2 ≤ L) {μ : ℝ}
+    (hμ : Module.End.HasEigenvalue (Matrix.toLin' (hhafDressedMatrixPM1 L)) μ) :
+    -2 ≤ μ := by
+  obtain ⟨k, hk⟩ := eigenvalue_mem_ball hμ
+  rw [Metric.mem_closedBall, hhafDressedMatrixPM1_diag_eq_zero L hL k, Real.dist_eq, sub_zero] at hk
+  have hrow : ∑ j ∈ Finset.univ.erase k, ‖hhafDressedMatrixPM1 L k j‖ ≤ 2 :=
+    hhafDressedMatrixPM1_rowSum_le_two (by omega) k
+  have : |μ| ≤ 2 := le_trans hk hrow
+  rw [abs_le] at this
+  linarith [this.1]
 
 end LatticeSystem.Quantum
