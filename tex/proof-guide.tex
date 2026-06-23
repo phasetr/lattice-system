@@ -9400,6 +9400,22 @@ hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
 ground eigenspace.  Chapters~3--10 backfill.
 
+The sector structure is pinned down by \texttt{hhaf\_pmCount\_eq\_one\_or\_even}: a hidden-AFM
+configuration has exactly one $\pm$ spin or an even number; an odd count $\ge 3$ is impossible.
+Reading the $\pm$ sites in increasing index order (\texttt{orderEmbOfFin}), index-adjacent ones are
+\texttt{IsNextPM} pairs (\texttt{hhaf\_isNextPM\_consecutive}: no $\pm$ spin lies strictly between),
+so their signs strictly alternate (\texttt{hhaf\_pm\_alternates}, with the complement rule
+$v\mapsto 2-v$ of \texttt{pm\_flip}); and the maximal/minimal $\pm$ sites are an \texttt{IsNextPM}
+pair as well (\texttt{hhaf\_isNextPM\_wrap}: the cyclic wrap arc carries no $\pm$ spin). For an odd
+count the linear alternation makes the first and last $\pm$ signs equal, while the wrap forces them
+to differ --- contradiction. The magnetization corollaries
+\texttt{hhaf\_magSumS\_eq\_L\_of\_even} ($\mathtt{magSumS}=L$ on the even sector, via
+$\mathtt{magSumS}$-invariance under ladder moves and reachability from the canonical configuration)
+and \texttt{hhaf\_magSumS\_ne\_L\_of\_pmCount\_one} ($\mathtt{magSumS}=L\pm1$ for a single $\pm$ spin)
+identify the balanced sector with $S^z=0$ and the single-$\pm$ sectors with $S^z=\pm1$, with no
+higher sectors --- the magnetization-conservation input that splits a ground eigenvector into a
+balanced part and a single-$\pm$ part.
+
 \medskip
 \noindent\textbf{§7.1.1 Theorem 7.1} (the AKLT main theorem; Tasaki §7.1.1, eqs.~(7.1.1)--(7.1.2),
 pp.~177--179; documented axiom, \texttt{Quantum/SpinS/AKLT.lean}, Issue \#4485).  The
