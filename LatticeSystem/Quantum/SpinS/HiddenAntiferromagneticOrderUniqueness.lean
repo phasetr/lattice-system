@@ -1360,4 +1360,183 @@ theorem hhafDressedMatrix0_ground_lt_neg_L (L : ℕ) (hLeven : Even L) (hL : 2 �
   have hvn := hposv n
   nlinarith [hlt, hvn]
 
+/-! ## Classification of hidden-AFM sectors (`pmCount ∈ {1} ∪ even`)
+
+The complete-hidden-AFM constraint makes the `±` spins alternate in sign along the ring.  Reading
+the `±` sites in increasing index order, consecutive ones are `IsNextPM` pairs (no `±` spin strictly
+between), so their signs alternate; and the maximal/minimal `±` sites are also an `IsNextPM` pair
+(the cyclic wrap contains no `±` spin), which closes the alternation.  Consequently the `±` count is
+`1` or even, and `magSumS = L` exactly on the even (balanced) sector. -/
+
+/-- The finset of `±` sites of a configuration. -/
+def hhafPMFinset {L : ℕ} (σ : Fin L → Fin 3) : Finset (Fin L) :=
+  Finset.univ.filter (fun x => σ x ≠ 1)
+
+/-- Membership in the `±` finset is being a `±` site. -/
+theorem mem_hhafPMFinset {L : ℕ} (σ : Fin L → Fin 3) (x : Fin L) :
+    x ∈ hhafPMFinset σ ↔ σ x ≠ 1 := by
+  rw [hhafPMFinset, Finset.mem_filter]
+  exact ⟨fun h => h.2, fun h => ⟨Finset.mem_univ x, h⟩⟩
+
+/-- `hhafPMFinset` has cardinality `pmCount`. -/
+theorem hhafPMFinset_card {L : ℕ} (σ : hhafConfig L) :
+    (hhafPMFinset σ.1).card = pmCount L σ := rfl
+
+/-- **Consecutive `±` sites are an `IsNextPM` pair**: no `±` spin lies strictly between two
+index-adjacent `±` sites, so the open arc between them is all `0`-spins. -/
+theorem hhaf_isNextPM_consecutive {L k : ℕ} (σ : Fin L → Fin 3)
+    (h : (hhafPMFinset σ).card = k) (i : Fin k) (hi : i.val + 1 < k) :
+    IsNextPM σ ((hhafPMFinset σ).orderEmbOfFin h i)
+      ((hhafPMFinset σ).orderEmbOfFin h ⟨i.val + 1, hi⟩) := by
+  set e := (hhafPMFinset σ).orderEmbOfFin h with he
+  have hlt : e i < e ⟨i.val + 1, hi⟩ := e.strictMono (Nat.lt_succ_self i.val)
+  refine ⟨ne_of_lt hlt, ?_, ?_, ?_⟩
+  · exact (mem_hhafPMFinset σ _).mp (Finset.orderEmbOfFin_mem _ h i)
+  · exact (mem_hhafPMFinset σ _).mp (Finset.orderEmbOfFin_mem _ h _)
+  · intro z hz
+    have hlt' : (e i).val < (e ⟨i.val + 1, hi⟩).val := hlt
+    rw [InCyclicOpen, if_pos hlt'] at hz
+    by_contra hzpm
+    have hzF : z ∈ hhafPMFinset σ := (mem_hhafPMFinset σ z).mpr hzpm
+    have hzr : z ∈ Set.range e := by rw [he, Finset.range_orderEmbOfFin]; exact hzF
+    obtain ⟨m, hm⟩ := hzr
+    have hmi : i < m := e.strictMono.lt_iff_lt.mp (hm ▸ (Fin.lt_def).mpr hz.1)
+    have hmi1 : m < (⟨i.val + 1, hi⟩ : Fin k) :=
+      e.strictMono.lt_iff_lt.mp (hm ▸ (Fin.lt_def).mpr hz.2)
+    exact absurd (lt_of_lt_of_le hmi (Nat.lt_succ_iff.mp hmi1)) (lt_irrefl _)
+
+/-- Two distinct `±` spin values are complementary: `{0, 2}` with `v = 2 - u`. -/
+theorem pm_flip {u v : Fin 3} (hu : u ≠ 1) (hv : v ≠ 1) (huv : u ≠ v) :
+    v.val = 2 - u.val := by
+  have hu3 := u.isLt
+  have hv3 := v.isLt
+  have hune : u.val ≠ 1 := fun hh => hu (Fin.ext hh)
+  have hvne : v.val ≠ 1 := fun hh => hv (Fin.ext hh)
+  have huvne : u.val ≠ v.val := fun hh => huv (Fin.ext hh)
+  omega
+
+/-- **The maximal and minimal `±` sites are an `IsNextPM` pair** (the cyclic wrap): no `±` spin lies
+outside the index range `[min, max]` of `±` sites, so the wrap arc is all `0`-spins. -/
+theorem hhaf_isNextPM_wrap {L k : ℕ} (σ : Fin L → Fin 3) (h : (hhafPMFinset σ).card = k)
+    (hk : 2 ≤ k) :
+    IsNextPM σ ((hhafPMFinset σ).orderEmbOfFin h ⟨k - 1, by omega⟩)
+      ((hhafPMFinset σ).orderEmbOfFin h ⟨0, by omega⟩) := by
+  set e := (hhafPMFinset σ).orderEmbOfFin h with he
+  have hgt : e ⟨0, by omega⟩ < e ⟨k - 1, by omega⟩ := e.strictMono (by simp; omega)
+  refine ⟨ne_of_gt hgt, ?_, ?_, ?_⟩
+  · exact (mem_hhafPMFinset σ _).mp (Finset.orderEmbOfFin_mem _ h _)
+  · exact (mem_hhafPMFinset σ _).mp (Finset.orderEmbOfFin_mem _ h _)
+  · intro z hz
+    have hgt' : (e ⟨0, by omega⟩).val < (e ⟨k - 1, by omega⟩).val := hgt
+    have hnle : ¬ (e ⟨k - 1, by omega⟩).val < (e ⟨0, by omega⟩).val := by omega
+    rw [InCyclicOpen, if_neg hnle] at hz
+    by_contra hzpm
+    have hzF : z ∈ hhafPMFinset σ := (mem_hhafPMFinset σ z).mpr hzpm
+    have hzr : z ∈ Set.range e := by rw [he, Finset.range_orderEmbOfFin]; exact hzF
+    obtain ⟨m, hm⟩ := hzr
+    have hlo : e ⟨0, by omega⟩ ≤ e m := e.le_iff_le.mpr (Fin.le_def.mpr (Nat.zero_le _))
+    have hhi : e m ≤ e ⟨k - 1, by omega⟩ :=
+      e.le_iff_le.mpr (Fin.le_def.mpr (Nat.le_pred_of_lt m.isLt))
+    rw [hm] at hlo hhi
+    have hlo' : (e ⟨0, by omega⟩).val ≤ z.val := hlo
+    have hhi' : z.val ≤ (e ⟨k - 1, by omega⟩).val := hhi
+    omega
+
+/-- **The `±` signs alternate along the sorted `±` sites**: the `i`-th `±` value (in increasing
+index order) equals the `0`-th value when `i` is even and its complement when `i` is odd. -/
+theorem hhaf_pm_alternates {L k : ℕ} {σ : Fin L → Fin 3} (hσ : IsHiddenAFMConfig σ)
+    (h : (hhafPMFinset σ).card = k) (hk0 : 0 < k) :
+    ∀ j (hj : j < k), (σ ((hhafPMFinset σ).orderEmbOfFin h ⟨j, hj⟩)).val =
+      if Even j then (σ ((hhafPMFinset σ).orderEmbOfFin h ⟨0, hk0⟩)).val
+      else 2 - (σ ((hhafPMFinset σ).orderEmbOfFin h ⟨0, hk0⟩)).val := by
+  set e := (hhafPMFinset σ).orderEmbOfFin h with he
+  set a := (σ (e ⟨0, hk0⟩)).val with ha
+  intro j
+  induction j with
+  | zero =>
+    intro hj
+    split_ifs with hc
+    · rfl
+    · exact absurd (⟨0, rfl⟩ : Even 0) hc
+  | succ n ih =>
+    intro hj
+    have hn : n < k := by omega
+    have hstep := hhaf_isNextPM_consecutive σ h ⟨n, hn⟩ (by omega)
+    have hne := hσ _ _ hstep
+    have hpmn : σ (e ⟨n, hn⟩) ≠ 1 := (mem_hhafPMFinset σ _).mp (Finset.orderEmbOfFin_mem _ h _)
+    have hpmn1 : σ (e ⟨n + 1, hj⟩) ≠ 1 :=
+      (mem_hhafPMFinset σ _).mp (Finset.orderEmbOfFin_mem _ h _)
+    have hflip : (σ (e ⟨n + 1, hj⟩)).val = 2 - (σ (e ⟨n, hn⟩)).val := pm_flip hpmn hpmn1 hne
+    have ha2 : a ≤ 2 := by have := (σ (e ⟨0, hk0⟩)).isLt; omega
+    rw [hflip, ih hn]
+    simp only [Nat.even_iff]
+    split_ifs <;> omega
+
+/-- **Sector classification (count)**: a hidden-AFM configuration has exactly one `±` spin or an
+even number.  An odd count `≥ 3` is impossible: the wrap `IsNextPM` pair (max/min `±` site) would
+force the first and last `±` signs to differ, but the linear alternation makes them equal when the
+count is odd. -/
+theorem hhaf_pmCount_eq_one_or_even {L : ℕ} (σ : hhafConfig L) :
+    pmCount L σ = 1 ∨ Even (pmCount L σ) := by
+  set k := pmCount L σ with hk
+  rcases Nat.lt_or_ge k 2 with hlt | hge
+  · interval_cases k
+    · exact Or.inr ⟨0, rfl⟩
+    · exact Or.inl rfl
+  · refine Or.inr ?_
+    by_contra hodd
+    have hcard : (hhafPMFinset σ.1).card = k := hhafPMFinset_card σ
+    have hk0 : 0 < k := by omega
+    have hwrap := hhaf_isNextPM_wrap σ.1 hcard hge
+    have hne := σ.2 _ _ hwrap
+    have halt := hhaf_pm_alternates σ.2 hcard hk0
+    have hek : Even (k - 1) := Nat.even_iff.mpr (by rw [Nat.even_iff] at hodd; omega)
+    have hvk := halt (k - 1) (by omega)
+    rw [if_pos hek] at hvk
+    exact hne (Fin.ext hvk)
+
+/-- **Sector classification (magnetization, single-`±`)**: a single-`±` configuration has total
+magnetization `L ± 1`, never `L` (the lone `±` site contributes `0` or `2`, the rest contribute
+`1`). -/
+theorem hhaf_magSumS_ne_L_of_pmCount_one {L : ℕ} (σ : hhafConfig L) (hpm : pmCount L σ = 1) :
+    magSumS σ.1 ≠ L := by
+  have hpm' : (hhafPMFinset σ.1).card = 1 := (hhafPMFinset_card σ).trans hpm
+  obtain ⟨s, hs⟩ := Finset.card_eq_one.mp hpm'
+  have hsne : σ.1 s ≠ 1 :=
+    (mem_hhafPMFinset σ.1 s).mp (by rw [hs]; exact Finset.mem_singleton_self s)
+  have hother : ∀ x, x ≠ s → σ.1 x = 1 := by
+    intro x hx
+    by_contra hxpm
+    have hxF : x ∈ hhafPMFinset σ.1 := (mem_hhafPMFinset σ.1 x).mpr hxpm
+    rw [hs, Finset.mem_singleton] at hxF
+    exact hx hxF
+  have hrest : ∑ x ∈ Finset.univ.erase s, (σ.1 x).val = L - 1 := by
+    have hone : ∀ x ∈ Finset.univ.erase s, (σ.1 x).val = 1 := fun x hx => by
+      rw [hother x (Finset.mem_erase.mp hx).1]; rfl
+    rw [Finset.sum_congr rfl hone, Finset.sum_const, Finset.card_erase_of_mem (Finset.mem_univ s),
+      Finset.card_univ, Fintype.card_fin, smul_eq_mul, mul_one]
+  have hsval : (σ.1 s).val = 0 ∨ (σ.1 s).val = 2 := by
+    have h3 := (σ.1 s).isLt
+    have hne1 : (σ.1 s).val ≠ 1 := fun hh => hsne (Fin.ext hh)
+    omega
+  have hLpos : 1 ≤ L := by have := s.isLt; omega
+  rw [magSumS, ← Finset.add_sum_erase _ _ (Finset.mem_univ s), hrest]
+  omega
+
+/-- `magSumS` is invariant under HAF reachability (every ladder move preserves it). -/
+theorem magSumS_eq_of_hhafReachable {L : ℕ} {σ τ : hhafConfig L}
+    (h : RaiseLowerReachableSHhaf L σ τ) : magSumS σ.1 = magSumS τ.1 := by
+  induction h with
+  | refl => rfl
+  | tail _ hstep ih => rw [ih]; exact (magSumS_eq_of_raiseLowerStepS hstep).symm
+
+/-- **Sector classification (magnetization, balanced)**: an even-`±`-count configuration has total
+magnetization exactly `L`.  Every HAF ladder move preserves `magSumS`, and an even-count
+configuration is HAF-reachable from the canonical all-`0`-spin configuration (which has
+`magSumS = L`). -/
+theorem hhaf_magSumS_eq_L_of_even {L : ℕ} (σ : hhafConfig L) (heven : Even (pmCount L σ)) :
+    magSumS σ.1 = L := by
+  rw [← magSumS_eq_of_hhafReachable (hhaf_reachable_canonical σ heven)]
+  simp [magSumS_def, hhafCanonical]
+
 end LatticeSystem.Quantum
