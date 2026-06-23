@@ -1675,6 +1675,78 @@ theorem hhafDressedMatrix0_ground_finrank_le_one (L : ℕ) (hLeven : Even L) :
   rw [← hhafShiftedMatrix0_eq]
   exact hhafShiftedMatrix0_isIrreducible L hLeven (by linarith)
 
+/-! ## Marshall-gauge transfer to the undressed balanced block -/
+
+/-- The **real (undressed) restricted matrix on the balanced sector**. -/
+noncomputable def hhafRestrictedMatrixReal0 (L : ℕ) : Matrix (hhafConfig0 L) (hhafConfig0 L) ℝ :=
+  (hhafRestrictedMatrixReal L).submatrix Subtype.val Subtype.val
+
+/-- The **balanced-sector Marshall sign diagonal** `Θ` (entries `±1`). -/
+noncomputable def hhafMarshallDiag0 (L : ℕ) : Matrix (hhafConfig0 L) (hhafConfig0 L) ℝ :=
+  Matrix.diagonal (fun σ : hhafConfig0 L => (marshallSignS (ringSublattice L) σ.1.1).re)
+
+/-- The Marshall sign diagonal squares to the identity (each entry is `±1`). -/
+theorem hhafMarshallDiag0_mul_self (L : ℕ) :
+    hhafMarshallDiag0 L * hhafMarshallDiag0 L = 1 := by
+  rw [hhafMarshallDiag0, Matrix.diagonal_mul_diagonal]
+  have h1 : (fun σ : hhafConfig0 L => (marshallSignS (ringSublattice L) σ.1.1).re *
+      (marshallSignS (ringSublattice L) σ.1.1).re) = fun _ => 1 := by
+    funext σ
+    have h := congrArg Complex.re (marshallSignS_sq (ringSublattice L) σ.1.1)
+    rwa [Complex.mul_re, marshallSignS_im, mul_zero, sub_zero, Complex.one_re] at h
+  rw [h1, Matrix.diagonal_one]
+
+/-- The balanced dressed block is the Marshall conjugate of the undressed real block:
+`M₀ = Θ · M_real₀ · Θ`. -/
+theorem hhafDressedMatrix0_eq_conj (L : ℕ) :
+    hhafDressedMatrix0 L =
+      hhafMarshallDiag0 L * hhafRestrictedMatrixReal0 L * hhafMarshallDiag0 L := by
+  ext σ τ
+  rw [hhafDressedMatrix0, Matrix.submatrix_apply, hhafDressedMatrix_eq, Matrix.mul_assoc,
+    hhafMarshallDiag0, Matrix.diagonal_mul, Matrix.mul_diagonal, hhafRestrictedMatrixReal0,
+    Matrix.submatrix_apply]
+  ring
+
+/-- **Unique balanced-sector ground state (undressed real form).**  Transferring the full
+Perron–Frobenius data through the Marshall similarity `M₀ = Θ M_real₀ Θ`, the undressed real
+restricted matrix on the balanced sector has a nonzero lowest eigenvector (`Θ` on the dressed Perron
+vector), the same minimal eigenvalue, and a one-dimensional ground eigenspace. -/
+theorem hhafRestrictedMatrixReal0_ground_finrank_le_one (L : ℕ) (hLeven : Even L) :
+    ∃ (μ : ℝ) (w : hhafConfig0 L → ℝ), w ≠ 0 ∧
+      (hhafRestrictedMatrixReal0 L).mulVec w = μ • w ∧
+      (∀ (lam : ℝ) (u : hhafConfig0 L → ℝ), u ≠ 0 →
+        (hhafRestrictedMatrixReal0 L).mulVec u = lam • u → μ ≤ lam) ∧
+      Module.finrank ℝ
+        (Module.End.eigenspace (Matrix.toLin' (hhafRestrictedMatrixReal0 L)) μ) ≤ 1 := by
+  obtain ⟨μ, v, hvpos, hMv, hmin, hfin⟩ := hhafDressedMatrix0_ground_finrank_le_one L hLeven
+  have hΘsq : ∀ u, (hhafMarshallDiag0 L).mulVec ((hhafMarshallDiag0 L).mulVec u) = u := fun u => by
+    rw [Matrix.mulVec_mulVec, hhafMarshallDiag0_mul_self, Matrix.one_mulVec]
+  -- `M_real₀ (Θ u) = Θ (M₀ u)` and the symmetric `M₀ (Θ u) = Θ (M_real₀ u)`.
+  have hconj : ∀ u, (hhafRestrictedMatrixReal0 L).mulVec ((hhafMarshallDiag0 L).mulVec u) =
+      (hhafMarshallDiag0 L).mulVec ((hhafDressedMatrix0 L).mulVec u) := fun u => by
+    conv_rhs => rw [hhafDressedMatrix0_eq_conj]
+    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hΘsq]
+  have hconj' : ∀ u, (hhafDressedMatrix0 L).mulVec ((hhafMarshallDiag0 L).mulVec u) =
+      (hhafMarshallDiag0 L).mulVec ((hhafRestrictedMatrixReal0 L).mulVec u) := fun u => by
+    conv_lhs => rw [hhafDressedMatrix0_eq_conj]
+    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hΘsq]
+  have hΘinj : Function.Injective (hhafMarshallDiag0 L).mulVec := fun a b hab => by
+    have := congrArg (hhafMarshallDiag0 L).mulVec hab; rwa [hΘsq, hΘsq] at this
+  refine ⟨μ, (hhafMarshallDiag0 L).mulVec v, ?_, ?_, ?_, ?_⟩
+  · intro h
+    have hv0 : v = 0 := hΘinj (by rw [h, Matrix.mulVec_zero])
+    obtain ⟨i⟩ := (inferInstance : Nonempty (hhafConfig0 L))
+    exact absurd (hv0 ▸ hvpos i) (lt_irrefl 0)
+  · rw [hconj, hMv, Matrix.mulVec_smul]
+  · intro lam u hu hMu
+    have hu' : (hhafMarshallDiag0 L).mulVec u ≠ 0 :=
+      fun h => hu (hΘinj (by rw [h, Matrix.mulVec_zero]))
+    refine hmin lam ((hhafMarshallDiag0 L).mulVec u) hu' ?_
+    rw [hconj', hMu, Matrix.mulVec_smul]
+  · rw [← matrix_similar_eigenspace_finrank_eq (hhafMarshallDiag0_mul_self L)
+      (hhafMarshallDiag0_mul_self L) (hhafDressedMatrix0_eq_conj L) μ]
+    exact hfin
+
 /-! ## Per-`L` exponential decay of the correlation -/
 
 /-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring
