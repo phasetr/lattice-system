@@ -1020,6 +1020,41 @@ theorem exists_matrixPow_apply_pos_of_hhafReachable (L : ℕ)
 case of the kink reduction. -/
 def hhafCanonical (L : ℕ) : hhafConfig L := ⟨fun _ => 1, fun _ _ h => (h.2.1 rfl).elim⟩
 
+/-- **Slide move** (raw configuration): move the spin at site `a` onto the site `b`, leaving a `0`
+behind at `a`.  When `a` carries a `±` spin and `b` (its cyclic neighbour) carries a `0`, this
+slides the `±` spin one step along the ring. -/
+def slidePM {L : ℕ} (σ : Fin L → Fin 3) (a b : Fin L) : Fin L → Fin 3 :=
+  Function.update (Function.update σ a 1) b (σ a)
+
+/-- The slide move's value: `0` at `a`, the moved spin at `b`, unchanged elsewhere. -/
+theorem slidePM_apply {L : ℕ} (σ : Fin L → Fin 3) {a b : Fin L} (hab : a ≠ b) (k : Fin L) :
+    slidePM σ a b k = if k = b then σ a else if k = a then 1 else σ k := by
+  rw [slidePM]
+  by_cases hkb : k = b
+  · subst hkb; rw [Function.update_self, if_pos rfl]
+  · rw [Function.update_of_ne hkb, if_neg hkb]
+    by_cases hka : k = a
+    · subst hka; rw [Function.update_self, if_pos rfl]
+    · rw [Function.update_of_ne hka, if_neg hka]
+
+/-- The slide move is a single raise/lower (ladder) step on the ring-graph bond `{a, b}` when `b` is
+the cyclic successor of `a` carrying a `0`-spin. -/
+theorem slidePM_isRaiseLowerStep {L : ℕ} (σ : Fin L → Fin 3) {a b : Fin L} (hab : a ≠ b)
+    (hb : b.val = (a.val + 1) % L) (ha : σ a ≠ 1) (hb1 : σ b = 1) :
+    RaiseLowerStepS (hhafRingGraph L) σ (slidePM σ a b) := by
+  refine ⟨a, b, ⟨hab, Or.inl hb.symm⟩, ?_, ?_⟩
+  · -- shift data: a and b change, value `σ a ∈ {0, 2}`
+    have haa : slidePM σ a b a = 1 := by rw [slidePM_apply σ hab a, if_neg hab, if_pos rfl]
+    have hbb : slidePM σ a b b = σ a := by rw [slidePM_apply σ hab b, if_pos rfl]
+    rw [haa, hbb, hb1]
+    -- σ a is 0 or 2 (a `±` spin)
+    have : (σ a).val = 0 ∨ (σ a).val = 2 := by omega
+    rcases this with h | h
+    · left; constructor <;> simp [h]
+    · right; constructor <;> simp [h]
+  · intro k hka hkb
+    rw [slidePM_apply σ hab k, if_neg hkb, if_neg hka]
+
 /-- The **number of `±` (nonzero) spins** in a hidden-AFM configuration — the induction measure for
 the kink reduction (each annihilation removes a `+,−` pair, decreasing it by `2`). -/
 def pmCount (L : ℕ) (σ : hhafConfig L) : ℕ :=
