@@ -9250,7 +9250,15 @@ entries (\texttt{hhafRestrictedMatrix\_im\_zero}) and so descends to a real symm
 then built (\texttt{ringSublattice} for the bipartite even/odd ring, \texttt{hhafDressedMatrix},
 \texttt{hhafDressedMatrix\_eq}: $\mathrm{dressed}(\sigma,\tau)=\varepsilon(\sigma)\varepsilon(\tau)
 M_{\mathrm{real}}(\sigma,\tau)$, reusing the project's dressed-Heisenberg machinery), a diagonal
-$\pm1$ sign similarity making the off-diagonals sign-definite.  Combined with irreducibility of the
+$\pm1$ sign similarity making the off-diagonals sign-definite.  The off-diagonal sign step needs a
+\emph{symmetric} nearest-neighbour coupling, while the ring Hamiltonian uses the directed coupling
+$J_{x,x+1}=1$; the symmetrized coupling $J^{\mathrm{sym}}=J+J^{\top}$ (\texttt{ringCouplingSym}, with
+its symmetry/reality/nonnegativity lemmas) satisfies
+$\hat H(J^{\mathrm{sym}})=2\,\hat H(J)$ (\texttt{heisenbergHamiltonianS\_ringCouplingSym}, since the
+two-site dot is symmetric so $\hat H(J^{\top})=\hat H(J)$,
+\texttt{heisenbergHamiltonianS\_coupling\_swap}), so the directed ring Hamiltonian is exactly
+$\tfrac12$ the symmetric one and the symmetric-coupling off-diagonal nonpositivity lemma applies.
+Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
 ground eigenspace.  Chapters~3--10 backfill.
