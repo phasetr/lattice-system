@@ -910,4 +910,51 @@ theorem spinSDot_re_abs_le_one_lowering_raising {L : ℕ} {x y : Fin L} (hxy : x
   nlinarith [Real.sqrt_nonneg (((2 : ℝ) - (σ x).val) * ((σ x).val + 1)),
     Real.sqrt_nonneg (((σ y).val : ℝ) * ((2 : ℝ) - (σ y).val + 1)), hsqrtA, hsqrtB]
 
+/-- **Per-step dressed off-diagonal bound**: for two hidden-AFM configurations related by a single
+ladder move on the bond `{x, y}`, the dressed restricted matrix entry has magnitude at most the
+symmetrized coupling `ringCouplingSym` there (the Marshall signs are `±1`, the Heisenberg element is
+`ringCouplingSym · spinSDot`, and the spin-`1` ladder amplitude is `≤ 1`). -/
+theorem hhafDressedMatrix_abs_le_ringCouplingSym {L : ℕ} {σ τ : hhafConfig L} {x y : Fin L}
+    (hxy : x ≠ y)
+    (hsh : ((τ.1 x).val + 1 = (σ.1 x).val ∧ (σ.1 y).val + 1 = (τ.1 y).val) ∨
+      ((σ.1 x).val + 1 = (τ.1 x).val ∧ (τ.1 y).val + 1 = (σ.1 y).val))
+    (hagree : ∀ k, k ≠ x → k ≠ y → σ.1 k = τ.1 k) :
+    |hhafDressedMatrix L σ τ| ≤ (ringCouplingSym L x y).re := by
+  -- The Heisenberg entry is `ringCouplingSym · spinSDot`.
+  have hheis : (hhafRestrictedMatrix L) σ τ =
+      (ringCoupling L x y + ringCoupling L y x) *
+        (spinSDot x y 2 : ManyBodyOpS (Fin L) 2) σ.1 τ.1 := by
+    rw [hhafRestrictedMatrix, Matrix.submatrix_apply, afmHeisenbergChainHamiltonianS]
+    exact heisenbergHamiltonianS_apply_of_raiseLowerStepS_witness (ringCoupling L) 2
+      (G := ⊤) ((SimpleGraph.top_adj x y).mpr hxy) hsh hagree
+  have hsym_im : (ringCoupling L x y + ringCoupling L y x).im = 0 := by
+    simp only [ringCoupling]; split <;> split <;> simp
+  have hsd : |((spinSDot x y 2 : ManyBodyOpS (Fin L) 2) σ.1 τ.1).re| ≤ 1 := by
+    rcases hsh with ⟨h1, h2⟩ | ⟨h1, h2⟩
+    · exact spinSDot_re_abs_le_one_lowering_raising hxy hagree h1 h2
+    · exact spinSDot_re_abs_le_one_raising_lowering hxy hagree h1 h2
+  have hsym_nonneg : 0 ≤ (ringCoupling L x y + ringCoupling L y x).re := by
+    simp only [ringCoupling]; split <;> split <;> norm_num
+  rw [hhafDressedMatrix_eq, hhafRestrictedMatrixReal, hheis]
+  rw [Complex.mul_re, hsym_im, zero_mul, sub_zero]
+  rw [abs_mul, abs_mul]
+  have hmσ : |(marshallSignS (ringSublattice L) σ.1).re| = 1 := by
+    have h := congrArg Complex.re (marshallSignS_sq (ringSublattice L) σ.1)
+    rw [Complex.mul_re, marshallSignS_im, mul_zero, sub_zero, Complex.one_re] at h
+    rw [abs_eq (by norm_num : (0:ℝ) ≤ 1)]; rcases mul_self_eq_one_iff.mp h with h | h
+    · exact Or.inl h
+    · exact Or.inr h
+  have hmτ : |(marshallSignS (ringSublattice L) τ.1).re| = 1 := by
+    have h := congrArg Complex.re (marshallSignS_sq (ringSublattice L) τ.1)
+    rw [Complex.mul_re, marshallSignS_im, mul_zero, sub_zero, Complex.one_re] at h
+    rw [abs_eq (by norm_num : (0:ℝ) ≤ 1)]; rcases mul_self_eq_one_iff.mp h with h | h
+    · exact Or.inl h
+    · exact Or.inr h
+  rw [hmσ, hmτ, one_mul, one_mul, ringCouplingSym, abs_mul, abs_of_nonneg hsym_nonneg]
+  calc (ringCoupling L x y + ringCoupling L y x).re *
+        |((spinSDot x y 2 : ManyBodyOpS (Fin L) 2) σ.1 τ.1).re|
+      ≤ (ringCoupling L x y + ringCoupling L y x).re * 1 :=
+        mul_le_mul_of_nonneg_left hsd hsym_nonneg
+    _ = (ringCoupling L x y + ringCoupling L y x).re := mul_one _
+
 end LatticeSystem.Quantum

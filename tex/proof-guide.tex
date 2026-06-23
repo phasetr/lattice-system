@@ -9358,6 +9358,11 @@ ground energy lies strictly below $-2$ (off-diagonal mixing of the Néel state).
 on the spin-$1$ ladder amplitude bound $|\langle\sigma'|\hat S_x\cdot\hat S_y|\sigma\rangle|\le 1$
 (\texttt{spinSDot\_re\_abs\_le\_one\_raising\_lowering} and its lowering/raising twin): the explicit
 matrix element $\tfrac12\sqrt{\,\cdot\,}\sqrt{\,\cdot\,}$ has each radicand at most $2$ for $N=2$.
+Chaining through the Marshall dressing ($\pm1$ signs) and the Heisenberg single-bond formula
+$H=\mathtt{ringCouplingSym}\cdot\hat S_x\!\cdot\!\hat S_y$ gives
+\texttt{hhafDressedMatrix\_abs\_le\_ringCouplingSym}: a single-ladder-move dressed entry satisfies
+$|M_{\sigma\tau}|\le(\mathtt{ringCouplingSym}\,x\,y).\mathrm{re}$ (which is $1$ for $L\ge 3$ and $2$
+for $L=2$), so a single-$\pm$ row's off-diagonal sum is at most $2$.
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
