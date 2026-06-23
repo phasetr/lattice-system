@@ -805,4 +805,31 @@ def hhafNeelConfig0 (L : ℕ) (hLeven : Even L) (hL : 2 ≤ L) : hhafConfig0 L :
     have h : pmCount L ⟨hhafNeel L, hhafNeel_isHiddenAFM L hLeven hL⟩ = L := hhafNeel_pmCount L
     rw [h]; exact hLeven⟩
 
+/-- The **Néel diagonal energy is `−L`**: every nearest-neighbour bond is antiferromagnetic
+(`(+1)(−1) = −1`), so the sum over the `L` bonds is `−L`. -/
+theorem hhafNeel_diag (L : ℕ) (hL : 2 ≤ L) (hLeven : Even L) :
+    (hhafRestrictedMatrix L ⟨hhafNeel L, hhafNeel_isHiddenAFM L hLeven hL⟩
+      ⟨hhafNeel L, hhafNeel_isHiddenAFM L hLeven hL⟩) = ((-(L : ℝ) : ℝ) : ℂ) := by
+  rw [hhaf_diag_eq_succ_sum L hL]
+  have h2 : (2 : ℕ) ∣ L := hLeven.two_dvd
+  have hterm : ∀ x : Fin L, ((1 : ℂ) - ((hhafNeel L x).val : ℂ)) *
+      (1 - ((hhafNeel L ⟨(x.val + 1) % L, Nat.mod_lt _ (by omega)⟩).val : ℂ)) = -1 := by
+    intro x
+    have hpar : x.val % 2 ≠ ((x.val + 1) % L) % 2 := by
+      have hm : ((x.val + 1) % L) % 2 = (x.val + 1) % 2 := Nat.mod_mod_of_dvd _ h2
+      omega
+    simp only [hhafNeel]
+    split_ifs <;> first | (exfalso; omega) | (norm_num [Fin.val])
+  rw [Finset.sum_congr rfl (fun x _ => hterm x), Finset.sum_const, Finset.card_univ,
+    Fintype.card_fin]
+  push_cast; ring
+
+/-- **The global ground energy is at most `−L`** (Rayleigh quotient at the Néel configuration): the
+balanced sector contains the maximally-antiferromagnetic Néel state of energy `−L`. -/
+theorem hhafMinEnergy_le_neg_L (L : ℕ) (hL : 2 ≤ L) (hLeven : Even L) :
+    hhafMinEnergy L ≤ -(L : ℝ) := by
+  have h := hhafMinEnergy_le_diag L ⟨hhafNeel L, hhafNeel_isHiddenAFM L hLeven hL⟩
+  rw [hhafNeel_diag L hL hLeven] at h
+  simpa using h
+
 end LatticeSystem.Quantum

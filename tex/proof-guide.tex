@@ -9342,8 +9342,11 @@ split off from \texttt{Quantum/SpinS/HiddenAntiferromagneticOrder.lean} for buil
 inter-sector ordering, the Néel configuration \texttt{hhafNeel} ($+1$ on even sites, $-1$ on odd) is
 shown to be hidden antiferromagnetic on an even ring (\texttt{hhafNeel\_isHiddenAFM}: all sites carry
 $\pm$ spins, so every consecutive-$\pm$ pair is cyclically adjacent and of opposite parity) and
-balanced (\texttt{hhafNeelConfig0}), giving the variational witness for the balanced sector's low
-ground energy.
+balanced (\texttt{hhafNeelConfig0}).  Its diagonal energy is $-L$ (\texttt{hhafNeel\_diag}: every
+nearest-neighbour bond is antiferromagnetic, $(+1)(-1)=-1$), so the Rayleigh quotient at the Néel
+state gives \texttt{hhafMinEnergy\_le\_neg\_L}: the global restricted ground energy is at most $-L$.
+This is the first half of the inter-sector ordering; the remaining half bounds the
+magnetization-$\pm1$ single-$\pm$ sectors above $-L$.
 Combined with irreducibility of the
 hidden-AFM configuration graph (the Gómez-Santos kink-ergodicity core, still to be formalised), this
 would give a strictly positive Perron eigenvector at the ground energy, forcing a one-dimensional
