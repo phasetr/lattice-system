@@ -861,4 +861,53 @@ theorem hhaf_diag_eq_zero_of_pmCount_one (L : ℕ) (hL : 2 ≤ L) (σ : hhafConf
     omega
   rcases hzero with h | h <;> rw [h] <;> simp
 
+/-- **Spin-1 ladder amplitude bound** (raising/lowering): the off-diagonal `Ŝ_x·Ŝ_y` matrix element
+on a raise-at-`x`/lower-at-`y` step has real part of magnitude at most `1` (each `√` factor is at
+most `√2` for `N = 2`). -/
+theorem spinSDot_re_abs_le_one_raising_lowering {L : ℕ} {x y : Fin L} (hxy : x ≠ y)
+    {σ' σ : Fin L → Fin 3} (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hx : (σ' x).val + 1 = (σ x).val) (hy : (σ y).val + 1 = (σ' y).val) :
+    |((spinSDot x y 2 : ManyBodyOpS (Fin L) 2) σ' σ).re| ≤ 1 := by
+  have hA : ((σ x).val : ℝ) * ((2 : ℝ) - (σ x).val + 1) ≤ 2 := by
+    have := (σ x).isLt; interval_cases hc : (σ x).val <;> norm_num
+  have hB : ((2 : ℝ) - (σ y).val) * ((σ y).val + 1) ≤ 2 := by
+    have := (σ y).isLt; interval_cases hc : (σ y).val <;> norm_num
+  have hsqrtA : Real.sqrt (((σ x).val : ℝ) * ((2 : ℝ) - (σ x).val + 1)) ≤ Real.sqrt 2 :=
+    Real.sqrt_le_sqrt hA
+  have hsqrtB : Real.sqrt (((2 : ℝ) - (σ y).val) * ((σ y).val + 1)) ≤ Real.sqrt 2 :=
+    Real.sqrt_le_sqrt hB
+  have hre : ((spinSDot x y 2 : ManyBodyOpS (Fin L) 2) σ' σ).re =
+      (1 / 2) * (Real.sqrt (((σ x).val : ℝ) * ((2 : ℝ) - (σ x).val + 1)) *
+        Real.sqrt (((2 : ℝ) - (σ y).val) * ((σ y).val + 1))) := by
+    rw [spinSDot_apply_eq_raising_lowering_explicit hxy 2 h hx hy]
+    simp [Complex.mul_re]
+  rw [hre, abs_of_nonneg (by positivity)]
+  have hsqrt2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  nlinarith [Real.sqrt_nonneg (((σ x).val : ℝ) * ((2 : ℝ) - (σ x).val + 1)),
+    Real.sqrt_nonneg (((2 : ℝ) - (σ y).val) * ((σ y).val + 1)), hsqrtA, hsqrtB]
+
+/-- **Spin-1 ladder amplitude bound** (lowering/raising): the off-diagonal `Ŝ_x·Ŝ_y` matrix element
+on a lower-at-`x`/raise-at-`y` step has real part of magnitude at most `1`. -/
+theorem spinSDot_re_abs_le_one_lowering_raising {L : ℕ} {x y : Fin L} (hxy : x ≠ y)
+    {σ' σ : Fin L → Fin 3} (h : ∀ k, k ≠ x → k ≠ y → σ' k = σ k)
+    (hx : (σ x).val + 1 = (σ' x).val) (hy : (σ' y).val + 1 = (σ y).val) :
+    |((spinSDot x y 2 : ManyBodyOpS (Fin L) 2) σ' σ).re| ≤ 1 := by
+  have hA : ((2 : ℝ) - (σ x).val) * ((σ x).val + 1) ≤ 2 := by
+    have := (σ x).isLt; interval_cases hc : (σ x).val <;> norm_num
+  have hB : ((σ y).val : ℝ) * ((2 : ℝ) - (σ y).val + 1) ≤ 2 := by
+    have := (σ y).isLt; interval_cases hc : (σ y).val <;> norm_num
+  have hsqrtA : Real.sqrt (((2 : ℝ) - (σ x).val) * ((σ x).val + 1)) ≤ Real.sqrt 2 :=
+    Real.sqrt_le_sqrt hA
+  have hsqrtB : Real.sqrt (((σ y).val : ℝ) * ((2 : ℝ) - (σ y).val + 1)) ≤ Real.sqrt 2 :=
+    Real.sqrt_le_sqrt hB
+  have hre : ((spinSDot x y 2 : ManyBodyOpS (Fin L) 2) σ' σ).re =
+      (1 / 2) * (Real.sqrt (((2 : ℝ) - (σ x).val) * ((σ x).val + 1)) *
+        Real.sqrt (((σ y).val : ℝ) * ((2 : ℝ) - (σ y).val + 1))) := by
+    rw [spinSDot_apply_eq_lowering_raising_explicit hxy 2 h hx hy]
+    simp [Complex.mul_re]
+  rw [hre, abs_of_nonneg (by positivity)]
+  have hsqrt2 : Real.sqrt 2 * Real.sqrt 2 = 2 := Real.mul_self_sqrt (by norm_num)
+  nlinarith [Real.sqrt_nonneg (((2 : ℝ) - (σ x).val) * ((σ x).val + 1)),
+    Real.sqrt_nonneg (((σ y).val : ℝ) * ((2 : ℝ) - (σ y).val + 1)), hsqrtA, hsqrtB]
+
 end LatticeSystem.Quantum
