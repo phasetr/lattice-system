@@ -1533,6 +1533,114 @@ theorem hhaf_reachable_canonical {L : ℕ} (σ : hhafConfig L) (heven : Even (pm
     RaiseLowerReachableSHhaf L (hhafCanonical L) σ :=
   RaiseLowerReachableSHhaf_symm (hhaf_reachable_to_canonical σ heven)
 
+/-! ## Balanced (charge-`0`) sector block and its Perron–Frobenius irreducibility -/
+
+/-- The **balanced sector**: hidden-AFM configurations with an even number of `±` spins (equal
+numbers of `+` and `−` — magnetization `0`), the sector containing the antiferromagnetic ground
+state and on which the dressed matrix is irreducible. -/
+abbrev hhafConfig0 (L : ℕ) : Type := {σ : hhafConfig L // Even (pmCount L σ)}
+
+/-- The canonical all-`0` configuration is balanced (`pmCount = 0`). -/
+def hhafCanonical0 (L : ℕ) : hhafConfig0 L :=
+  ⟨hhafCanonical L, by rw [(pmCount_eq_zero_iff L (hhafCanonical L)).mpr rfl]; exact ⟨0, rfl⟩⟩
+
+instance hhafConfig0_nonempty (L : ℕ) : Nonempty (hhafConfig0 L) := ⟨hhafCanonical0 L⟩
+
+/-- A single HAF ladder step on the balanced sector. -/
+abbrev RaiseLowerStepSHhaf0 (L : ℕ) (σ τ : hhafConfig0 L) : Prop :=
+  RaiseLowerStepSHhaf L σ.1 τ.1
+
+/-- Balanced-sector HAF reachability. -/
+abbrev RaiseLowerReachableSHhaf0 (L : ℕ) : hhafConfig0 L → hhafConfig0 L → Prop :=
+  Relation.ReflTransGen (RaiseLowerStepSHhaf0 L)
+
+/-- Every balanced configuration reaches the canonical one within the balanced sector. -/
+theorem hhaf_reachable_to_canonical0 {L : ℕ} (σ : hhafConfig0 L) :
+    RaiseLowerReachableSHhaf0 L σ (hhafCanonical0 L) := by
+  suffices h : ∀ n (τ : hhafConfig0 L), hhafS τ.1.1 = n →
+      RaiseLowerReachableSHhaf0 L τ (hhafCanonical0 L) from h _ σ rfl
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n IH =>
+    intro τ hn
+    by_cases hpos : 0 < pmCount L τ.1
+    · obtain ⟨σ'', hstep, heven'', hlt⟩ := hhaf_single_step τ.1 hpos τ.2
+      have hstep0 : RaiseLowerStepSHhaf0 L τ ⟨σ'', heven''⟩ := hstep
+      exact (Relation.ReflTransGen.single hstep0).trans
+        (IH (hhafS σ''.1) (hn ▸ hlt) ⟨σ'', heven''⟩ rfl)
+    · have hz : pmCount L τ.1 = 0 := by omega
+      have hτc : τ = hhafCanonical0 L := Subtype.ext ((pmCount_eq_zero_iff L τ.1).mp hz)
+      rw [hτc]
+
+/-- Balanced-sector reachability is symmetric. -/
+theorem RaiseLowerReachableSHhaf0_symm {L : ℕ} {σ τ : hhafConfig0 L}
+    (h : RaiseLowerReachableSHhaf0 L σ τ) : RaiseLowerReachableSHhaf0 L τ σ := by
+  induction h with
+  | refl => exact Relation.ReflTransGen.refl
+  | tail _ hstep ih =>
+    have hstep' : RaiseLowerStepSHhaf0 L _ _ := RaiseLowerStepS.symm hstep
+    exact (Relation.ReflTransGen.single hstep').trans ih
+
+/-- The **balanced-sector shifted dressed matrix** `c·I − M` restricted to `hhafConfig0`. -/
+noncomputable def hhafShiftedMatrix0 (L : ℕ) (c : ℝ) :
+    Matrix (hhafConfig0 L) (hhafConfig0 L) ℝ :=
+  (c • (1 : Matrix (hhafConfig L) (hhafConfig L) ℝ) - hhafDressedMatrix L).submatrix
+    Subtype.val Subtype.val
+
+/-- Balanced-sector walk-to-power positivity (mirror of the `hhafReachable` version on the balanced
+subtype). -/
+theorem exists_matrixPow_apply_pos_of_hhafReachable0 (L : ℕ)
+    {B : Matrix (hhafConfig0 L) (hhafConfig0 L) ℝ}
+    (hB_nn : ∀ σ τ, 0 ≤ B σ τ)
+    (hB_step : ∀ {σ τ : hhafConfig0 L}, RaiseLowerStepSHhaf0 L σ τ → 0 < B τ σ)
+    {σ σ' : hhafConfig0 L} (hreach : RaiseLowerReachableSHhaf0 L σ σ') :
+    ∃ k : ℕ, 0 < (B ^ k) σ' σ := by
+  induction hreach with
+  | refl => exact ⟨0, by simp [Matrix.one_apply_eq]⟩
+  | tail _h₁ h₂ ih =>
+    obtain ⟨k, hpos⟩ := ih
+    refine ⟨k + 1, ?_⟩
+    rw [pow_succ', Matrix.mul_apply]
+    apply Finset.sum_pos'
+    · intro l _
+      exact mul_nonneg (hB_nn _ _) (Matrix.pow_apply_nonneg hB_nn _ _ _)
+    · exact ⟨_, Finset.mem_univ _, mul_pos (hB_step h₂) hpos⟩
+
+/-- **Irreducibility of the balanced-sector shifted matrix.**  For an even ring and a shift `c`
+strictly above the restricted max energy, `c·I − M` restricted to the balanced sector is
+Perron–Frobenius irreducible: nonnegative (`hhafShifted_entry_nonneg`) and entrywise-positive in
+some power (connectivity + per-step positivity). -/
+theorem hhafShiftedMatrix0_isIrreducible (L : ℕ) (hLeven : Even L)
+    {c : ℝ} (hc : hhafMaxEnergy L < c) :
+    (hhafShiftedMatrix0 L c).IsIrreducible := by
+  have hnn : ∀ σ τ : hhafConfig0 L, 0 ≤ hhafShiftedMatrix0 L c σ τ := fun σ τ =>
+    hhafShifted_entry_nonneg L hLeven (le_of_lt hc) σ.1 τ.1
+  rw [Matrix.isIrreducible_iff_exists_pow_pos hnn]
+  intro σ τ
+  by_cases hστ : σ = τ
+  · subst hστ
+    refine ⟨1, Nat.one_pos, ?_⟩
+    have hdiag : hhafShiftedMatrix0 L c σ σ = c - hhafDressedMatrix L σ.1 σ.1 := by
+      rw [hhafShiftedMatrix0, Matrix.submatrix_apply, Matrix.sub_apply, Matrix.smul_apply,
+        Matrix.one_apply_eq, smul_eq_mul, mul_one]
+    rw [pow_one, hdiag]
+    have := hhafDressedMatrix_diag_le_hhafMaxEnergy L σ.1
+    linarith
+  · have hreach : RaiseLowerReachableSHhaf0 L τ σ :=
+      (hhaf_reachable_to_canonical0 τ).trans
+        (RaiseLowerReachableSHhaf0_symm (hhaf_reachable_to_canonical0 σ))
+    obtain ⟨k, hk⟩ := exists_matrixPow_apply_pos_of_hhafReachable0 L hnn
+      (fun {a b} hstep => by
+        have h := hhafShifted_pos_of_stepHhaf L hLeven (c := c)
+          (σ := a.1) (τ := b.1) hstep
+        simpa only [hhafShiftedMatrix0, Matrix.submatrix_apply] using h) hreach
+    refine ⟨k, ?_, hk⟩
+    rcases Nat.eq_zero_or_pos k with hk0 | hkpos
+    · subst hk0
+      rw [pow_zero, Matrix.one_apply_ne hστ] at hk
+      exact absurd hk (lt_irrefl 0)
+    · exact hkpos
+
 /-! ## Per-`L` exponential decay of the correlation -/
 
 /-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring
