@@ -6,6 +6,7 @@ import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
 import LatticeSystem.Quantum.SpinS.HermitianVariationalUpperBound
 import LatticeSystem.Math.HermitianMaxEigenvalue
+import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorMarshallCore
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Analysis.Matrix.Order
 import Mathlib.Analysis.Matrix.Spectrum
@@ -746,6 +747,31 @@ theorem hhafRestrictedMatrixReal_isSymm (L : ℕ) : (hhafRestrictedMatrixReal L)
     conv_lhs => rw [← (hhafRestrictedMatrix_isHermitian L)]
     rw [Matrix.conjTranspose_apply]
   rw [h, Complex.star_def, Complex.conj_re]
+
+/-! ## Marshall gauge of the restricted matrix
+
+The Marshall sign on the bipartite even/odd ring sublattice gauges the restricted matrix so that its
+off-diagonal entries become sign-definite — the standard Perron–Frobenius preparation.  This reuses
+the project's dressed-Heisenberg machinery. -/
+
+/-- The bipartite even/odd sublattice indicator on the ring: `true` on even sites. -/
+def ringSublattice (L : ℕ) : Fin L → Bool := fun x => decide (x.val % 2 = 0)
+
+/-- The **Marshall-dressed real form** of the `H_HAF`-restricted matrix. -/
+noncomputable def hhafDressedMatrix (L : ℕ) : Matrix (hhafConfig L) (hhafConfig L) ℝ :=
+  (dressedHeisenbergSReMatrix (ringSublattice L) (ringCoupling L) 2).submatrix
+    Subtype.val Subtype.val
+
+/-- The dressed matrix is the Marshall-sign gauge of the real restricted matrix:
+`dressed σ τ = ε(σ) ε(τ) · M_real σ τ`. -/
+theorem hhafDressedMatrix_eq (L : ℕ) (σ τ : hhafConfig L) :
+    hhafDressedMatrix L σ τ =
+      (marshallSignS (ringSublattice L) σ.1).re * (marshallSignS (ringSublattice L) τ.1).re *
+        hhafRestrictedMatrixReal L σ τ := by
+  rw [hhafDressedMatrix, Matrix.submatrix_apply,
+    dressedHeisenbergSReMatrix_eq_marshallSign_mul_heisenberg (ringSublattice L) 2
+      (fun x y => by rw [ringCoupling]; split <;> simp)]
+  rfl
 
 /-! ## Per-`L` exponential decay of the correlation -/
 
