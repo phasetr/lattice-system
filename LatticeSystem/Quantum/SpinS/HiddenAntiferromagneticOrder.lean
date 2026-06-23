@@ -1372,6 +1372,167 @@ theorem annihPM_pmCount_card_lt {L : ℕ} (σ : Fin L → Fin 3) {a b : Fin L} (
     · simp [h] at hx
     · rw [if_neg h] at hx; exact hx
 
+/-! ## Kink-reduction measure and connectivity -/
+
+/-- The **reduction measure** `Σ_{x : ± spin} (L − x)` — strictly decreasing under both kink moves
+(sliding a `±` spin rightward and annihilating an adjacent pair), and `0` exactly on the canonical
+configuration. -/
+def hhafS {L : ℕ} (σ : Fin L → Fin 3) : ℕ :=
+  ∑ x ∈ Finset.univ.filter (fun x => σ x ≠ 1), (L - x.val)
+
+/-- The `±`-spin set after a slide: `p` removed, `s` inserted. -/
+theorem slidePM_filter_eq {L : ℕ} (σ : Fin L → Fin 3) {p s : Fin L} (hps : p ≠ s)
+    (hp : σ p ≠ 1) (hs : σ s = 1) :
+    (Finset.univ.filter (fun x => slidePM σ p s x ≠ 1)) =
+      insert s ((Finset.univ.filter (fun x => σ x ≠ 1)).erase p) := by
+  ext x
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert, Finset.mem_erase]
+  rw [slidePM_apply σ hps x]
+  by_cases hxs : x = s
+  · subst hxs; simp [hp, Ne.symm hps]
+  · by_cases hxp : x = p
+    · subst hxp; simp [hps]
+    · simp [hxs, hxp]
+
+/-- Sliding a `±` spin onto its non-wrapping successor strictly decreases the reduction measure. -/
+theorem slidePM_hhafS_lt {L : ℕ} (σ : Fin L → Fin 3) {p s : Fin L} (hps : p ≠ s)
+    (hsv : s.val = p.val + 1) (hp : σ p ≠ 1) (hs : σ s = 1) :
+    hhafS (slidePM σ p s) < hhafS σ := by
+  have hpmem : p ∈ Finset.univ.filter (fun x => σ x ≠ 1) :=
+    Finset.mem_filter.mpr ⟨Finset.mem_univ p, hp⟩
+  have hsnotmem : s ∉ (Finset.univ.filter (fun x => σ x ≠ 1)).erase p := by
+    simp only [Finset.mem_erase, Finset.mem_filter, Finset.mem_univ, true_and, hs]; tauto
+  rw [hhafS, hhafS, slidePM_filter_eq σ hps hp hs, Finset.sum_insert hsnotmem,
+    ← Finset.add_sum_erase _ (fun x => L - x.val) hpmem]
+  apply Nat.add_lt_add_right
+  have := s.isLt; have := p.isLt; omega
+
+/-- The `±`-spin set after an annihilation: `a` and `b` removed. -/
+theorem annihPM_filter_eq {L : ℕ} (σ : Fin L → Fin 3) {a b : Fin L} (hab : a ≠ b) :
+    (Finset.univ.filter (fun x => annihPM σ a b x ≠ 1)) =
+      ((Finset.univ.filter (fun x => σ x ≠ 1)).erase a).erase b := by
+  ext x
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_erase]
+  rw [annihPM_apply σ hab x]
+  by_cases h : x = a ∨ x = b
+  · rcases h with h | h <;> subst h <;> simp [hab, Ne.symm hab]
+  · rw [if_neg h]; push Not at h; tauto
+
+/-- Annihilating a `±` pair strictly decreases the reduction measure. -/
+theorem annihPM_hhafS_lt {L : ℕ} (σ : Fin L → Fin 3) {a b : Fin L} (hab : a ≠ b)
+    (ha : σ a ≠ 1) : hhafS (annihPM σ a b) < hhafS σ := by
+  have hamem : a ∈ Finset.univ.filter (fun x => σ x ≠ 1) :=
+    Finset.mem_filter.mpr ⟨Finset.mem_univ a, ha⟩
+  have hsub : (Finset.univ.filter (fun x => annihPM σ a b x ≠ 1)) ⊆
+      (Finset.univ.filter (fun x => σ x ≠ 1)).erase a := by
+    rw [annihPM_filter_eq σ hab]
+    exact Finset.erase_subset _ _
+  rw [hhafS, hhafS]
+  calc ∑ x ∈ Finset.univ.filter (fun x => annihPM σ a b x ≠ 1), (L - x.val)
+      ≤ ∑ x ∈ (Finset.univ.filter (fun x => σ x ≠ 1)).erase a, (L - x.val) :=
+        Finset.sum_le_sum_of_subset hsub
+    _ < ∑ x ∈ Finset.univ.filter (fun x => σ x ≠ 1), (L - x.val) := by
+        rw [← Finset.add_sum_erase _ (fun x => L - x.val) hamem]
+        have := a.isLt
+        omega
+
+/-- Annihilating a `±` pair removes exactly two `±` spins. -/
+theorem annihPM_pmCount_eq {L : ℕ} (σ : Fin L → Fin 3) {a b : Fin L} (hab : a ≠ b)
+    (ha : σ a ≠ 1) (hb1 : σ b ≠ 1) :
+    (Finset.univ.filter (fun x => annihPM σ a b x ≠ 1)).card =
+      (Finset.univ.filter (fun x => σ x ≠ 1)).card - 2 := by
+  have hamem : a ∈ Finset.univ.filter (fun x => σ x ≠ 1) :=
+    Finset.mem_filter.mpr ⟨Finset.mem_univ a, ha⟩
+  have hbmem : b ∈ (Finset.univ.filter (fun x => σ x ≠ 1)).erase a :=
+    Finset.mem_erase.mpr ⟨Ne.symm hab, Finset.mem_filter.mpr ⟨Finset.mem_univ b, hb1⟩⟩
+  rw [annihPM_filter_eq σ hab, Finset.card_erase_of_mem hbmem, Finset.card_erase_of_mem hamem]
+  omega
+
+/-- The open arc between a site and its (non-wrapping) cyclic successor is empty. -/
+theorem not_inCyclicOpen_adjacent {L : ℕ} {p s z : Fin L} (hsv : s.val = p.val + 1) :
+    ¬ InCyclicOpen p s z := by
+  have := p.isLt; have := s.isLt; have := z.isLt
+  simp only [InCyclicOpen]; split_ifs <;> omega
+
+/-- **Single reduction step**: a balanced (even-`pmCount`), non-canonical hidden-AFM configuration
+admits a single HAF ladder move to another balanced configuration with strictly smaller reduction
+measure — either sliding the first `±` spin past an adjacent `0`, or annihilating it against an
+adjacent `±` of opposite sign. -/
+theorem hhaf_single_step {L : ℕ} (σ : hhafConfig L) (hpos : 0 < pmCount L σ)
+    (heven : Even (pmCount L σ)) :
+    ∃ σ' : hhafConfig L, RaiseLowerStepSHhaf L σ σ' ∧ Even (pmCount L σ') ∧
+      hhafS σ'.1 < hhafS σ.1 := by
+  classical
+  set F := Finset.univ.filter (fun x => σ.1 x ≠ 1) with hF
+  have hcardF : F.card = pmCount L σ := rfl
+  have hFne : F.Nonempty := Finset.card_pos.mp (by rw [hcardF]; exact hpos)
+  set p := F.min' hFne with hp
+  have hpF : p ∈ F := F.min'_mem hFne
+  have hpval : σ.1 p ≠ 1 := (Finset.mem_filter.mp hpF).2
+  have hcard2 : 2 ≤ F.card := by
+    obtain ⟨k, hk⟩ := heven; rw [hcardF]; omega
+  have hpLe : p.val + 1 < L := by
+    obtain ⟨q, hqF, hqp⟩ :=
+      (Finset.one_lt_card_iff_nontrivial.mp (by omega : 1 < F.card)).exists_ne p
+    have hle : p ≤ q := F.min'_le q hqF
+    have : p.val < q.val := lt_of_le_of_ne hle (fun h => hqp (Fin.ext h).symm)
+    have := q.isLt; omega
+  set s : Fin L := ⟨p.val + 1, hpLe⟩ with hs
+  have hsv : s.val = p.val + 1 := rfl
+  have hps : p ≠ s := fun h => by simp [hs, Fin.ext_iff] at h
+  have hbv : s.val = (p.val + 1) % L := by rw [hsv, Nat.mod_eq_of_lt hpLe]
+  by_cases hsspin : σ.1 s = 1
+  · refine ⟨⟨slidePM σ.1 p s, slidePM_isHiddenAFM σ.2 hps hbv hpval hsspin⟩,
+      slidePM_isRaiseLowerStepSHhaf σ hps hbv hpval hsspin, ?_,
+      slidePM_hhafS_lt σ.1 hps hsv hpval hsspin⟩
+    have hpc : pmCount L ⟨slidePM σ.1 p s, slidePM_isHiddenAFM σ.2 hps hbv hpval hsspin⟩ =
+        pmCount L σ := slidePM_pmCount_card σ.1 hps hpval hsspin
+    rw [hpc]; exact heven
+  · have hnext : IsNextPM σ.1 p s :=
+      ⟨hps, hpval, hsspin, fun z hz => absurd hz (not_inCyclicOpen_adjacent hsv)⟩
+    have hopp : σ.1 p ≠ σ.1 s := σ.2 p s hnext
+    refine ⟨⟨annihPM σ.1 p s, annihPM_isHiddenAFM σ.2 hps hbv hpval hsspin hopp⟩,
+      annihPM_isRaiseLowerStepSHhaf σ hps hbv hpval hsspin hopp, ?_,
+      annihPM_hhafS_lt σ.1 hps hpval⟩
+    have hpc : pmCount L ⟨annihPM σ.1 p s, annihPM_isHiddenAFM σ.2 hps hbv hpval hsspin hopp⟩ =
+        pmCount L σ - 2 := annihPM_pmCount_eq σ.1 hps hpval hsspin
+    rw [hpc]
+    obtain ⟨k, hk⟩ := heven
+    exact ⟨k - 1, by omega⟩
+
+/-- HAF-internal reachability is symmetric (each ladder move is reversible). -/
+theorem RaiseLowerReachableSHhaf_symm {L : ℕ} {σ τ : hhafConfig L}
+    (h : RaiseLowerReachableSHhaf L σ τ) : RaiseLowerReachableSHhaf L τ σ := by
+  induction h with
+  | refl => exact Relation.ReflTransGen.refl
+  | tail _ hstep ih =>
+    have hstep' : RaiseLowerStepSHhaf L _ _ := RaiseLowerStepS.symm hstep
+    exact (Relation.ReflTransGen.single hstep').trans ih
+
+/-- **Connectivity (to canonical)**: every balanced (even-`pmCount`) hidden-AFM configuration is
+HAF-reachable from the canonical all-`0` configuration.  The reduction inducts on the measure
+`hhafS`, peeling one slide or annihilation at a time. -/
+theorem hhaf_reachable_to_canonical {L : ℕ} (σ : hhafConfig L) (heven : Even (pmCount L σ)) :
+    RaiseLowerReachableSHhaf L σ (hhafCanonical L) := by
+  suffices h : ∀ n (τ : hhafConfig L), hhafS τ.1 = n → Even (pmCount L τ) →
+      RaiseLowerReachableSHhaf L τ (hhafCanonical L) from h _ σ rfl heven
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n IH =>
+    intro τ hn heven'
+    by_cases hpos : 0 < pmCount L τ
+    · obtain ⟨τ', hstep, heven'', hlt⟩ := hhaf_single_step τ hpos heven'
+      exact (Relation.ReflTransGen.single hstep).trans (IH (hhafS τ'.1) (hn ▸ hlt) τ' rfl heven'')
+    · have hz : pmCount L τ = 0 := by omega
+      rw [(pmCount_eq_zero_iff L τ).mp hz]
+      exact Relation.ReflTransGen.refl
+
+/-- **Connectivity (from canonical)**: the canonical configuration reaches every balanced hidden-AFM
+configuration — the symmetric form of `hhaf_reachable_to_canonical`. -/
+theorem hhaf_reachable_canonical {L : ℕ} (σ : hhafConfig L) (heven : Even (pmCount L σ)) :
+    RaiseLowerReachableSHhaf L (hhafCanonical L) σ :=
+  RaiseLowerReachableSHhaf_symm (hhaf_reachable_to_canonical σ heven)
+
 /-! ## Per-`L` exponential decay of the correlation -/
 
 /-- **Finite exponential-decay envelope**: any real-valued two-index family `f` on a finite ring
