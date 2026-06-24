@@ -108,4 +108,29 @@ theorem spinSDot_commutator_spinSSiteOpPlus_eq_zero_of_ne (x y z : Λ)
   rw [spinSSiteOpPlus, sub_eq_zero]
   exact this.eq
 
+/-- **Two-site restriction of the bond–order commutator**: for a bond `x ≠ y`, `[Ŝ_x·Ŝ_y, Ô_L⁻]`
+collapses to the two on-bond contributions, since the staggered lowering operator's off-bond letters
+commute with `Ŝ_x·Ŝ_y`. -/
+theorem spinSDot_commutator_staggeredLoweringOpS_support (A : Λ → Bool) (x y : Λ) (hxy : x ≠ y) :
+    spinSDot x y N * staggeredLoweringOpS A N - staggeredLoweringOpS A N * spinSDot x y N
+      = (if A x then (1 : ℂ) else (-1 : ℂ))
+          • (spinSDot x y N * spinSSiteOpMinus x N - spinSSiteOpMinus x N * spinSDot x y N)
+        + (if A y then (1 : ℂ) else (-1 : ℂ))
+          • (spinSDot x y N * spinSSiteOpMinus y N - spinSSiteOpMinus y N * spinSDot x y N) := by
+  unfold staggeredLoweringOpS
+  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib]
+  have hterm : ∀ z : Λ,
+      spinSDot x y N * ((if A z then (1 : ℂ) else (-1 : ℂ)) • spinSSiteOpMinus z N)
+      - ((if A z then (1 : ℂ) else (-1 : ℂ)) • spinSSiteOpMinus z N) * spinSDot x y N
+      = (if A z then (1 : ℂ) else (-1 : ℂ))
+          • (spinSDot x y N * spinSSiteOpMinus z N - spinSSiteOpMinus z N * spinSDot x y N) := by
+    intro z; rw [mul_smul_comm, smul_mul_assoc, smul_sub]
+  rw [Finset.sum_congr rfl (fun z _ => hterm z)]
+  rw [← Finset.sum_subset (Finset.subset_univ ({x, y} : Finset Λ)) (fun z _ hz => ?_)]
+  · rw [Finset.sum_pair hxy]
+  · have hzx : z ≠ x := fun h => hz (by rw [h]; exact Finset.mem_insert_self x {y})
+    have hzy : z ≠ y := fun h => hz (by
+      rw [h]; exact Finset.mem_insert_of_mem (Finset.mem_singleton_self y))
+    rw [spinSDot_commutator_spinSSiteOpMinus_eq_zero_of_ne x y z hzx hzy, smul_zero]
+
 end LatticeSystem.Quantum
