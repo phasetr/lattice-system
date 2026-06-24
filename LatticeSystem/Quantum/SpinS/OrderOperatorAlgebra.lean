@@ -60,6 +60,12 @@ theorem manyBodyOperatorNormS_nonneg (M : ManyBodyOpS Λ N) : 0 ≤ manyBodyOper
 @[simp] theorem manyBodyOperatorNormS_zero : manyBodyOperatorNormS (0 : ManyBodyOpS Λ N) = 0 := by
   rw [manyBodyOperatorNormS_eq_toEuclideanCLM, map_zero, norm_zero]
 
+/-- The many-body `L²` operator norm is invariant under negation. -/
+theorem manyBodyOperatorNormS_neg (M : ManyBodyOpS Λ N) :
+    manyBodyOperatorNormS (-M) = manyBodyOperatorNormS M := by
+  rw [manyBodyOperatorNormS_eq_toEuclideanCLM, manyBodyOperatorNormS_eq_toEuclideanCLM, map_neg,
+    norm_neg]
+
 /-- **Triangle inequality** for the many-body `L²` operator norm. -/
 theorem manyBodyOperatorNormS_add_le (M₁ M₂ : ManyBodyOpS Λ N) :
     manyBodyOperatorNormS (M₁ + M₂) ≤ manyBodyOperatorNormS M₁ + manyBodyOperatorNormS M₂ := by
@@ -73,6 +79,13 @@ theorem manyBodyOperatorNormS_sub_le (M₁ M₂ : ManyBodyOpS Λ N) :
   rw [manyBodyOperatorNormS_eq_toEuclideanCLM, manyBodyOperatorNormS_eq_toEuclideanCLM,
     manyBodyOperatorNormS_eq_toEuclideanCLM, map_sub]
   exact norm_sub_le _ _
+
+/-- **Three-term triangle inequality** for the difference, via an intermediate operator. -/
+theorem manyBodyOperatorNormS_sub_le' (x y z : ManyBodyOpS Λ N) :
+    manyBodyOperatorNormS (x - z)
+      ≤ manyBodyOperatorNormS (x - y) + manyBodyOperatorNormS (y - z) := by
+  rw [show x - z = (x - y) + (y - z) from by abel]
+  exact manyBodyOperatorNormS_add_le _ _
 
 /-- **Scalar homogeneity** of the many-body `L²` operator norm. -/
 theorem manyBodyOperatorNormS_smul (c : ℂ) (M : ManyBodyOpS Λ N) :
@@ -500,20 +513,23 @@ theorem bringToFront : ∀ {a : Bool} {w : List Bool}, a ∈ w →
       · exact SwapChain.trans (SwapChain.cons x hchain)
           (SwapChain.step ⟨[], rest, x, a, by simp, by simp⟩ (SwapChain.refl _))
 
+/-- For a binary word, the `true`- and `false`-counts sum to the length. -/
+theorem count_true_add_count_false (l : List Bool) :
+    l.count true + l.count false = l.length := by
+  induction l with
+  | nil => rfl
+  | cons x xs ih => cases x <;> simp <;> omega
+
 /-- Two binary words with the same `true`-count and length are permutations of each other. -/
 theorem binary_perm_of_count {w w' : List Bool}
     (hlen : w.length = w'.length) (ht : w.count true = w'.count true) : w.Perm w' := by
   rw [List.perm_iff_count]
   intro b
-  have hsum : ∀ l : List Bool, l.count true + l.count false = l.length := by
-    intro l; induction l with
-    | nil => rfl
-    | cons x xs ih => cases x <;> simp <;> omega
   cases b with
   | true => exact ht
   | false =>
-    have h1 := hsum w
-    have h2 := hsum w'
+    have h1 := count_true_add_count_false w
+    have h2 := count_true_add_count_false w'
     omega
 
 /-- `countP (· != a)` counts the letters different from `a`, i.e. the `!a` letters. -/
@@ -552,6 +568,124 @@ theorem swapDist_le : ∀ {w w' : List Bool}, w.Perm w' →
       have hk2 : k ≤ rest.count true := by rw [← e1]; simpa using hk
       rw [e1, e2]
       nlinarith [hk2, hk', Nat.zero_le (rest.count true), Nat.zero_le (rest.count false)]
+
+/-! ### Word products of order operators and their swap-difference norm bounds (§4) -/
+
+/-- The **ordered product** of per-volume order operators along a binary word `w` (`true = ô⁺`,
+`false = ô⁻`). -/
+noncomputable def orderWordProd (d L N : ℕ) [NeZero L] (w : List Bool) :
+    ManyBodyOpS (HypercubicTorus d L) N :=
+  (w.map (staggeredOrderDensityOpS d L N)).prod
+
+/-- The word product over a length-`ℓ` word has norm `≤ N^ℓ` (each factor has norm `≤ N`). -/
+theorem orderWordProd_manyBodyOperatorNormS_le (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (w : List Bool) : manyBodyOperatorNormS (orderWordProd d L N w) ≤ (N : ℝ) ^ w.length := by
+  induction w with
+  | nil => simp [orderWordProd, manyBodyOperatorNormS_eq_toEuclideanCLM]
+  | cons b t ih =>
+    rw [orderWordProd, List.map_cons, List.prod_cons, List.length_cons, pow_succ']
+    refine le_trans (manyBodyOperatorNormS_mul_le _ _) ?_
+    refine mul_le_mul (staggeredOrderDensityOpS_manyBodyOperatorNormS_le d L N b hN) ih
+      (manyBodyOperatorNormS_nonneg _) (by positivity)
+
+/-- The single-swap commutator-norm cost `‖ô^a ô^b − ô^b ô^a‖ ≤ N/V` for any signs `a, b` (equal
+signs give `0`; `(+,−)` is eq. (4.2.33); `(−,+)` follows by negation). -/
+theorem orderOp_swapComm_manyBodyOperatorNormS_le (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (a b : Bool) :
+    manyBodyOperatorNormS (staggeredOrderDensityOpS d L N a * staggeredOrderDensityOpS d L N b
+        - staggeredOrderDensityOpS d L N b * staggeredOrderDensityOpS d L N a)
+      ≤ (N : ℝ) / (L : ℝ) ^ d := by
+  have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    positivity
+  cases a <;> cases b
+  · simp only [sub_self, manyBodyOperatorNormS_zero]; positivity
+  · rw [show staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+        = -(staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+          - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+        from by rw [neg_sub], manyBodyOperatorNormS_neg]
+    exact staggeredOrderDensity_commutator_manyBodyOperatorNormS_le d L N hN
+  · exact staggeredOrderDensity_commutator_manyBodyOperatorNormS_le d L N hN
+  · simp only [sub_self, manyBodyOperatorNormS_zero]; positivity
+
+/-- A single adjacent transposition of a length-`ℓ` word changes the order-word product by at most
+`N^(ℓ−2)·(N/V)`: the difference factors as `pre · [ô^a, ô^b] · suf`. -/
+theorem adjSwap_orderWordProd_manyBodyOperatorNormS_le (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    {w w' : List Bool} (h : AdjSwap w w') :
+    manyBodyOperatorNormS (orderWordProd d L N w - orderWordProd d L N w')
+      ≤ (N : ℝ) ^ (w.length - 2) * ((N : ℝ) / (L : ℝ) ^ d) := by
+  obtain ⟨pre, suf, a, b, rfl, rfl⟩ := h
+  have hexp : ∀ x y : Bool, orderWordProd d L N (pre ++ x :: y :: suf)
+      = orderWordProd d L N pre
+        * (staggeredOrderDensityOpS d L N x * staggeredOrderDensityOpS d L N y)
+        * orderWordProd d L N suf := by
+    intro x y
+    simp only [orderWordProd, List.map_append, List.map_cons, List.prod_append, List.prod_cons]
+    noncomm_ring
+  rw [hexp, hexp, ← sub_mul, ← mul_sub]
+  refine le_trans (manyBodyOperatorNormS_mul_le _ _) ?_
+  refine le_trans (mul_le_mul_of_nonneg_right (manyBodyOperatorNormS_mul_le _ _)
+    (manyBodyOperatorNormS_nonneg _)) ?_
+  have hlen : (pre ++ a :: b :: suf).length - 2 = pre.length + suf.length := by
+    simp [List.length_append]; omega
+  rw [hlen, pow_add]
+  have hpre := orderWordProd_manyBodyOperatorNormS_le d L N hN pre
+  have hsuf := orderWordProd_manyBodyOperatorNormS_le d L N hN suf
+  have hcomm := orderOp_swapComm_manyBodyOperatorNormS_le d L N hN a b
+  have hNpre : (0 : ℝ) ≤ (N : ℝ) ^ pre.length := by positivity
+  have hNsuf : (0 : ℝ) ≤ (N : ℝ) ^ suf.length := by positivity
+  calc manyBodyOperatorNormS (orderWordProd d L N pre)
+          * manyBodyOperatorNormS
+            (staggeredOrderDensityOpS d L N a * staggeredOrderDensityOpS d L N b
+              - staggeredOrderDensityOpS d L N b * staggeredOrderDensityOpS d L N a)
+          * manyBodyOperatorNormS (orderWordProd d L N suf)
+      ≤ (N : ℝ) ^ pre.length * ((N : ℝ) / (L : ℝ) ^ d) * (N : ℝ) ^ suf.length := by
+        refine mul_le_mul (mul_le_mul hpre hcomm (manyBodyOperatorNormS_nonneg _) hNpre) hsuf
+          (manyBodyOperatorNormS_nonneg _) (by positivity)
+    _ = (N : ℝ) ^ pre.length * (N : ℝ) ^ suf.length * ((N : ℝ) / (L : ℝ) ^ d) := by ring
+
+/-- A swap chain of length `k` changes the order-word product by at most `k · N^(ℓ−1)/V`, where `ℓ`
+is the (common) word length. -/
+theorem swapChain_orderWordProd_manyBodyOperatorNormS_le (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    {k : ℕ} {w w' : List Bool} (hc : SwapChain k w w') :
+    manyBodyOperatorNormS (orderWordProd d L N w - orderWordProd d L N w')
+      ≤ (k : ℝ) * ((N : ℝ) ^ (w.length - 1) / (L : ℝ) ^ d) := by
+  induction hc with
+  | refl w => simp [manyBodyOperatorNormS_zero]
+  | @step j w w' w'' hs hchain ih =>
+    have hlen : w.length = w'.length := hs.length_eq
+    have hge2 : 2 ≤ w.length := by
+      obtain ⟨pre, suf, a, b, rfl, _⟩ := hs; simp only [List.length_append, List.length_cons]; omega
+    refine le_trans (manyBodyOperatorNormS_sub_le' _ (orderWordProd d L N w') _) ?_
+    have h1 : manyBodyOperatorNormS (orderWordProd d L N w - orderWordProd d L N w')
+        ≤ (N : ℝ) ^ (w.length - 1) / (L : ℝ) ^ d := by
+      refine le_trans (adjSwap_orderWordProd_manyBodyOperatorNormS_le d L N hN hs) ?_
+      rw [show (N : ℝ) ^ (w.length - 2) * ((N : ℝ) / (L : ℝ) ^ d)
+          = (N : ℝ) ^ (w.length - 2) * (N : ℝ) / (L : ℝ) ^ d from by ring,
+        ← pow_succ, show w.length - 2 + 1 = w.length - 1 from by omega]
+    have ih' : manyBodyOperatorNormS (orderWordProd d L N w' - orderWordProd d L N w'')
+        ≤ (j : ℝ) * ((N : ℝ) ^ (w.length - 1) / (L : ℝ) ^ d) := by rw [hlen]; exact ih
+    refine le_trans (add_le_add h1 ih') (le_of_eq ?_)
+    push_cast; ring
+
+/-- The order-word products of two balanced words differ by at most `n²·N^(2n−1)/V`: combine the
+swap-diameter bound (`≤ n²` adjacent swaps, `swapDist_le`) with the per-chain norm bound. -/
+theorem orderWordProd_sub_balanced_manyBodyOperatorNormS_le (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    {n : ℕ} {w w' : List Bool} (hperm : w.Perm w') (hL : w.length = 2 * n)
+    (htrue : w.count true = n) :
+    manyBodyOperatorNormS (orderWordProd d L N w - orderWordProd d L N w')
+      ≤ (n : ℝ) ^ 2 * ((N : ℝ) ^ (2 * n - 1) / (L : ℝ) ^ d) := by
+  obtain ⟨k, hk, hchain⟩ := swapDist_le hperm
+  have hfalse : w.count false = n := by
+    have := count_true_add_count_false w; omega
+  have hkn : (k : ℝ) ≤ (n : ℝ) ^ 2 := by
+    have hk2 : k ≤ n * n := by rw [htrue, hfalse] at hk; exact hk
+    have hcast : ((n * n : ℕ) : ℝ) = (n : ℝ) ^ 2 := by rw [Nat.cast_mul, pow_two]
+    rw [← hcast]; exact_mod_cast hk2
+  refine le_trans (swapChain_orderWordProd_manyBodyOperatorNormS_le d L N hN hchain) ?_
+  rw [hL]
+  refine mul_le_mul_of_nonneg_right hkn ?_
+  positivity
 
 /-- **Tasaki Lemma 4.14 (order-operator algebra estimate), AXIOM.**  For any balanced sign sequence
 `s` of length `2n` (`n > 0`), the `L²` operator norm of the difference between the ordered product
