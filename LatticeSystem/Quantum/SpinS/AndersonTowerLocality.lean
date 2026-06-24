@@ -166,4 +166,103 @@ theorem spinSDot_commutator_staggeredLoweringOpS_norm_le (A : Λ → Bool) (x y 
     show ‖(if A y then (1 : ℂ) else (-1 : ℂ))‖ = 1 from by split_ifs <;> simp, one_mul, one_mul]
   linarith
 
+/-- A site-`w` raising operator commutes with an on-bond lowering commutator when `w` is off the
+bond and off `z` (everything is supported on `{x, y, z}`). -/
+theorem spinSSiteOpPlus_commute_bondMinusTerm (w x y z : Λ)
+    (hwx : w ≠ x) (hwy : w ≠ y) (hwz : w ≠ z) :
+    Commute (spinSSiteOpPlus w N)
+      (spinSDot x y N * spinSSiteOpMinus z N - spinSSiteOpMinus z N * spinSDot x y N) := by
+  have cdot : Commute (spinSSiteOpPlus w N) (spinSDot x y N) :=
+    (spinSDot_commute_onSiteS_of_ne x y w hwx hwy (spinSOpPlus N)).symm
+  have cmin : Commute (spinSSiteOpPlus w N) (spinSSiteOpMinus z N) :=
+    onSiteS_commute_of_ne hwz (spinSOpPlus N) (spinSOpMinus N)
+  exact (cdot.mul_right cmin).sub_right (cmin.mul_right cdot)
+
+/-- A site-`w` raising operator commutes with the bond–order lowering commutator `[Ŝ_x·Ŝ_y, Ô_L⁻]`
+when `w` is off the bond (it sees only the on-bond `{x,y}` support). -/
+theorem spinSSiteOpPlus_commute_bondStaggeredLowering (A : Λ → Bool) (w x y : Λ)
+    (hwx : w ≠ x) (hwy : w ≠ y) (hxy : x ≠ y) :
+    Commute (spinSSiteOpPlus w N)
+      (spinSDot x y N * staggeredLoweringOpS A N - staggeredLoweringOpS A N * spinSDot x y N) := by
+  rw [spinSDot_commutator_staggeredLoweringOpS_support A x y hxy]
+  exact ((spinSSiteOpPlus_commute_bondMinusTerm w x y x hwx hwy hwx).smul_right _).add_right
+    ((spinSSiteOpPlus_commute_bondMinusTerm w x y y hwx hwy hwy).smul_right _)
+
+/-- **Two-site restriction of the double commutator** `[Ô_L⁺, [Ŝ_x·Ŝ_y, Ô_L⁻]]`: collapses to the
+two on-bond raising contributions. -/
+theorem bondDoubleCommutator_support (A : Λ → Bool) (x y : Λ) (hxy : x ≠ y) :
+    staggeredRaisingOpS A N
+        * (spinSDot x y N * staggeredLoweringOpS A N - staggeredLoweringOpS A N * spinSDot x y N)
+      - (spinSDot x y N * staggeredLoweringOpS A N - staggeredLoweringOpS A N * spinSDot x y N)
+        * staggeredRaisingOpS A N
+      = (if A x then (1 : ℂ) else (-1 : ℂ))
+          • (spinSSiteOpPlus x N
+              * (spinSDot x y N * staggeredLoweringOpS A N
+                - staggeredLoweringOpS A N * spinSDot x y N)
+            - (spinSDot x y N * staggeredLoweringOpS A N
+                - staggeredLoweringOpS A N * spinSDot x y N) * spinSSiteOpPlus x N)
+        + (if A y then (1 : ℂ) else (-1 : ℂ))
+          • (spinSSiteOpPlus y N
+              * (spinSDot x y N * staggeredLoweringOpS A N
+                - staggeredLoweringOpS A N * spinSDot x y N)
+            - (spinSDot x y N * staggeredLoweringOpS A N
+                - staggeredLoweringOpS A N * spinSDot x y N) * spinSSiteOpPlus y N) := by
+  conv_lhs => rw [staggeredRaisingOpS]
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  have hterm : ∀ w : Λ, (if A w then (1 : ℂ) else (-1 : ℂ)) • spinSSiteOpPlus w N
+        * (spinSDot x y N * staggeredLoweringOpS A N - staggeredLoweringOpS A N * spinSDot x y N)
+      - (spinSDot x y N * staggeredLoweringOpS A N - staggeredLoweringOpS A N * spinSDot x y N)
+        * ((if A w then (1 : ℂ) else (-1 : ℂ)) • spinSSiteOpPlus w N)
+      = (if A w then (1 : ℂ) else (-1 : ℂ))
+          • (spinSSiteOpPlus w N
+              * (spinSDot x y N * staggeredLoweringOpS A N
+                - staggeredLoweringOpS A N * spinSDot x y N)
+            - (spinSDot x y N * staggeredLoweringOpS A N
+                - staggeredLoweringOpS A N * spinSDot x y N) * spinSSiteOpPlus w N) := by
+    intro w; rw [smul_mul_assoc, mul_smul_comm, smul_sub]
+  rw [Finset.sum_congr rfl (fun w _ => hterm w),
+    ← Finset.sum_subset (Finset.subset_univ ({x, y} : Finset Λ)) (fun w _ hw => ?_)]
+  · rw [Finset.sum_pair hxy]
+  · have hwx : w ≠ x := fun h => hw (by rw [h]; exact Finset.mem_insert_self x {y})
+    have hwy : w ≠ y := fun h => hw (by
+      rw [h]; exact Finset.mem_insert_of_mem (Finset.mem_singleton_self y))
+    rw [sub_eq_zero.mpr (spinSSiteOpPlus_commute_bondStaggeredLowering A w x y hwx hwy hxy).eq,
+      smul_zero]
+
+/-- **Per-bond double-commutator locality** `‖[Ô_L⁺, [Ŝ_x·Ŝ_y, Ô_L⁻]]‖ ≤ 48 N⁴` (`x ≠ y`):
+`L`-independent, the structural fact driving Lemma R2. -/
+theorem bondDoubleCommutator_norm_le (A : Λ → Bool) (x y : Λ) (hxy : x ≠ y) (hN : 1 ≤ N) :
+    manyBodyOperatorNormS
+      (staggeredRaisingOpS A N
+          * (spinSDot x y N * staggeredLoweringOpS A N - staggeredLoweringOpS A N * spinSDot x y N)
+        - (spinSDot x y N * staggeredLoweringOpS A N - staggeredLoweringOpS A N * spinSDot x y N)
+          * staggeredRaisingOpS A N)
+      ≤ 48 * (N : ℝ) ^ 4 := by
+  have hinner := spinSDot_commutator_staggeredLoweringOpS_norm_le A x y hxy hN
+  have hz : ∀ z : Λ, manyBodyOperatorNormS
+      (spinSSiteOpPlus z N
+          * (spinSDot x y N * staggeredLoweringOpS A N - staggeredLoweringOpS A N * spinSDot x y N)
+        - (spinSDot x y N * staggeredLoweringOpS A N - staggeredLoweringOpS A N * spinSDot x y N)
+          * spinSSiteOpPlus z N) ≤ 24 * (N : ℝ) ^ 4 := by
+    intro z
+    have hplus := spinSSiteOpPlus_manyBodyOperatorNormS_le (N := N) z hN
+    refine le_trans (manyBodyOperatorNormS_sub_le _ _) ?_
+    have h1 : manyBodyOperatorNormS (spinSSiteOpPlus z N
+        * (spinSDot x y N * staggeredLoweringOpS A N
+          - staggeredLoweringOpS A N * spinSDot x y N)) ≤ (N : ℝ) * (12 * (N : ℝ) ^ 3) := by
+      refine le_trans (manyBodyOperatorNormS_mul_le _ _) ?_
+      exact mul_le_mul hplus hinner (manyBodyOperatorNormS_nonneg _) (by positivity)
+    have h2 : manyBodyOperatorNormS ((spinSDot x y N * staggeredLoweringOpS A N
+          - staggeredLoweringOpS A N * spinSDot x y N) * spinSSiteOpPlus z N)
+        ≤ (12 * (N : ℝ) ^ 3) * (N : ℝ) := by
+      refine le_trans (manyBodyOperatorNormS_mul_le _ _) ?_
+      exact mul_le_mul hinner hplus (manyBodyOperatorNormS_nonneg _) (by positivity)
+    nlinarith [h1, h2]
+  rw [bondDoubleCommutator_support A x y hxy]
+  refine le_trans (manyBodyOperatorNormS_add_le _ _) ?_
+  rw [manyBodyOperatorNormS_smul, manyBodyOperatorNormS_smul,
+    show ‖(if A x then (1 : ℂ) else (-1 : ℂ))‖ = 1 from by split_ifs <;> simp,
+    show ‖(if A y then (1 : ℂ) else (-1 : ℂ))‖ = 1 from by split_ifs <;> simp, one_mul, one_mul]
+  linarith [hz x, hz y]
+
 end LatticeSystem.Quantum
