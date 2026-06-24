@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
+import LatticeSystem.Math.PosSemidef.Basics
 
 /-!
 # Tasaki §4.2.1 Theorem 4.6: Anderson tower energy bound — phat foundations
@@ -18,6 +19,7 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1
 namespace LatticeSystem.Quantum
 
 open Matrix
+open scoped ComplexOrder
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
@@ -46,5 +48,31 @@ theorem staggeredOrderDensityOpS_conjTranspose (d L N : ℕ) [NeZero L] (b : Boo
   rw [Matrix.conjTranspose_smul, star_inv₀, star_pow, Complex.star_def, Complex.conj_natCast]
   cases b <;>
     simp [staggeredRaisingOpS_conjTranspose, staggeredLoweringOpS_conjTranspose]
+
+/-- `ô⁻` is the conjugate transpose of `ô⁺`. -/
+theorem staggeredOrderDensityOpS_false_eq_conjTranspose (d L N : ℕ) [NeZero L] :
+    staggeredOrderDensityOpS d L N false
+      = Matrix.conjTranspose (staggeredOrderDensityOpS d L N true) :=
+  (staggeredOrderDensityOpS_conjTranspose d L N true).symm
+
+/-- **`ô⁺ô⁻` is positive-semidefinite** (`= ô⁺(ô⁺)ᴴ`). -/
+theorem staggeredOrderDensity_mul_posSemidef_tf (d L N : ℕ) [NeZero L] :
+    (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false).PosSemidef := by
+  have h := Matrix.posSemidef_self_mul_conjTranspose (staggeredOrderDensityOpS d L N true)
+  rwa [← staggeredOrderDensityOpS_false_eq_conjTranspose] at h
+
+/-- **`ô⁻ô⁺` is positive-semidefinite** (`= (ô⁺)ᴴô⁺`). -/
+theorem staggeredOrderDensity_mul_posSemidef_ft (d L N : ℕ) [NeZero L] :
+    (staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true).PosSemidef := by
+  have h := Matrix.posSemidef_conjTranspose_mul_self (staggeredOrderDensityOpS d L N true)
+  rwa [← staggeredOrderDensityOpS_false_eq_conjTranspose] at h
+
+/-- **`p̂` is Hermitian**: `p̂ = ½(ô⁺(ô⁺)ᴴ + (ô⁺)ᴴô⁺)` with both summands Hermitian squares. -/
+theorem staggeredPhatS_isHermitian (d L N : ℕ) [NeZero L] :
+    (staggeredPhatS d L N).IsHermitian := by
+  unfold staggeredPhatS
+  refine (((staggeredOrderDensity_mul_posSemidef_tf d L N).1.add
+    (staggeredOrderDensity_mul_posSemidef_ft d L N).1).smul ?_)
+  rw [isSelfAdjoint_iff, Complex.star_def, map_inv₀, Complex.conj_ofNat]
 
 end LatticeSystem.Quantum
