@@ -365,36 +365,92 @@ theorem totalSpinSOp3_commutator_staggeredOrderOp2S (A : Λ → Bool) :
   refine Finset.sum_congr rfl (fun x _ => ?_)
   rw [spinSSiteOp3_commutator_staggeredOrderOp2S, smul_comm (if A x then (1 : ℂ) else (-1 : ℂ))]
 
-/-- **Transverse component equality** (P6, eq. 4.1.7 SU(2) invariance): for a total-`Ŝ³`-singlet
-state (`Ŝ³_tot Φ = 0`), `⟨Φ, (Ô¹)² Φ⟩ = ⟨Φ, (Ô²)² Φ⟩`.  Via `[Ŝ³_tot, Ô¹Ô²] = i((Ô²)²−(Ô¹)²)` and
-the Hermitian shift killing both sides on the singlet. -/
-theorem staggeredOrder_sq_expectation_eq (A : Λ → Bool) (Φ : (Λ → Fin (N + 1)) → ℂ)
-    (hsing : (totalSpinSOp3 Λ N).mulVec Φ = 0) :
-    star Φ ⬝ᵥ (staggeredOrderOp1S A N * staggeredOrderOp1S A N).mulVec Φ
-      = star Φ ⬝ᵥ (staggeredOrderOp2S A N * staggeredOrderOp2S A N).mulVec Φ := by
-  have hS := totalSpinSOp3_isHermitian (Λ := Λ) (N := N)
-  have hleib : totalSpinSOp3 Λ N * (staggeredOrderOp1S A N * staggeredOrderOp2S A N)
-      - staggeredOrderOp1S A N * staggeredOrderOp2S A N * totalSpinSOp3 Λ N
-      = Complex.I • (staggeredOrderOp2S A N * staggeredOrderOp2S A N
-          - staggeredOrderOp1S A N * staggeredOrderOp1S A N) := by
-    have e : totalSpinSOp3 Λ N * (staggeredOrderOp1S A N * staggeredOrderOp2S A N)
-        - staggeredOrderOp1S A N * staggeredOrderOp2S A N * totalSpinSOp3 Λ N
-        = (totalSpinSOp3 Λ N * staggeredOrderOp1S A N
-            - staggeredOrderOp1S A N * totalSpinSOp3 Λ N) * staggeredOrderOp2S A N
-          + staggeredOrderOp1S A N * (totalSpinSOp3 Λ N * staggeredOrderOp2S A N
-            - staggeredOrderOp2S A N * totalSpinSOp3 Λ N) := by noncomm_ring
-    rw [e, totalSpinSOp3_commutator_staggeredOrderOp1S,
-      totalSpinSOp3_commutator_staggeredOrderOp2S, smul_mul_assoc, mul_smul_comm, neg_smul,
-      ← sub_eq_add_neg, ← smul_sub]
-  have hcomm0 : star Φ ⬝ᵥ (totalSpinSOp3 Λ N * (staggeredOrderOp1S A N * staggeredOrderOp2S A N)
-      - staggeredOrderOp1S A N * staggeredOrderOp2S A N * totalSpinSOp3 Λ N).mulVec Φ = 0 := by
+/-- **Generic singlet component equality**: if `S` is Hermitian with `S Φ = 0` and rotates `A, B`
+as `[S, A] = i B`, `[S, B] = −i A`, then `⟨Φ, A² Φ⟩ = ⟨Φ, B² Φ⟩`.  Via `[S, AB] = i(B²−A²)` and the
+Hermitian shift killing both sides on the singlet. -/
+theorem singlet_sq_expectation_eq {S A B : ManyBodyOpS Λ N} (hS : S.IsHermitian)
+    (hcomm1 : S * A - A * S = Complex.I • B) (hcomm2 : S * B - B * S = (-Complex.I) • A)
+    (Φ : (Λ → Fin (N + 1)) → ℂ) (hsing : S.mulVec Φ = 0) :
+    star Φ ⬝ᵥ (A * A).mulVec Φ = star Φ ⬝ᵥ (B * B).mulVec Φ := by
+  have hleib : S * (A * B) - A * B * S = Complex.I • (B * B - A * A) := by
+    have e : S * (A * B) - A * B * S
+        = (S * A - A * S) * B + A * (S * B - B * S) := by noncomm_ring
+    rw [e, hcomm1, hcomm2, smul_mul_assoc, mul_smul_comm, neg_smul, ← sub_eq_add_neg, ← smul_sub]
+  have hcomm0 : star Φ ⬝ᵥ (S * (A * B) - A * B * S).mulVec Φ = 0 := by
     rw [Matrix.sub_mulVec, dotProduct_sub, hermitian_dotProduct_shift hS, hsing, star_zero,
       zero_dotProduct, ← Matrix.mulVec_mulVec, hsing, Matrix.mulVec_zero, dotProduct_zero, sub_zero]
   rw [hleib, Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul] at hcomm0
-  have h2 : star Φ ⬝ᵥ (staggeredOrderOp2S A N * staggeredOrderOp2S A N
-      - staggeredOrderOp1S A N * staggeredOrderOp1S A N).mulVec Φ = 0 :=
+  have h2 : star Φ ⬝ᵥ (B * B - A * A).mulVec Φ = 0 :=
     (mul_eq_zero.mp hcomm0).resolve_left Complex.I_ne_zero
   rw [Matrix.sub_mulVec, dotProduct_sub, sub_eq_zero] at h2
   exact h2.symm
+
+/-- **Transverse component equality** (P6, eq. 4.1.7): for a total-`Ŝ³`-singlet state,
+`⟨Φ, (Ô¹)² Φ⟩ = ⟨Φ, (Ô²)² Φ⟩`. -/
+theorem staggeredOrder_sq_expectation_eq_12 (A : Λ → Bool) (Φ : (Λ → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 Λ N).mulVec Φ = 0) :
+    star Φ ⬝ᵥ (staggeredOrderOp1S A N * staggeredOrderOp1S A N).mulVec Φ
+      = star Φ ⬝ᵥ (staggeredOrderOp2S A N * staggeredOrderOp2S A N).mulVec Φ :=
+  singlet_sq_expectation_eq (totalSpinSOp3_isHermitian Λ N)
+    (totalSpinSOp3_commutator_staggeredOrderOp1S A)
+    (totalSpinSOp3_commutator_staggeredOrderOp2S A) Φ hsing
+
+/-- Per-site step of `[Ŝ¹_tot, Ô²] = i Ô³`: on-site `[Ŝ¹, Ŝ²] = i Ŝ³`. -/
+private theorem spinSSiteOp1_commutator_staggeredOrderOp2S (A : Λ → Bool) (x : Λ) :
+    spinSSiteOp1 x N * staggeredOrderOp2S A N - staggeredOrderOp2S A N * spinSSiteOp1 x N
+      = (if A x then (1 : ℂ) else (-1 : ℂ)) • (Complex.I • spinSSiteOp3 x N) := by
+  unfold staggeredOrderOp2S spinSSiteOp1 spinSSiteOp2 spinSSiteOp3
+  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib, Finset.sum_eq_single x]
+  · rw [mul_smul_comm, smul_mul_assoc, ← smul_sub, onSiteS_mul_onSiteS_same,
+      onSiteS_mul_onSiteS_same, ← onSiteS_sub, spinSOp1_commutator_spinSOp2, onSiteS_smul]
+  · intro y _ hyx
+    rw [mul_smul_comm, smul_mul_assoc, ← smul_sub,
+      (onSiteS_commute_of_ne (Ne.symm hyx) (spinSOp1 N) (spinSOp2 N)).eq, sub_self, smul_zero]
+  · intro h; exact absurd (Finset.mem_univ x) h
+
+/-- **Rotation commutator** `[Ŝ¹_tot, Ô_L^{(2)}] = i Ô_L^{(3)}`. -/
+theorem totalSpinSOp1_commutator_staggeredOrderOp2S (A : Λ → Bool) :
+    totalSpinSOp1 Λ N * staggeredOrderOp2S A N - staggeredOrderOp2S A N * totalSpinSOp1 Λ N
+      = Complex.I • staggeredOrderOpS A N := by
+  have hsum : (totalSpinSOp1 Λ N : ManyBodyOpS Λ N) = ∑ x : Λ, spinSSiteOp1 x N := rfl
+  rw [hsum, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib, staggeredOrderOpS,
+    Finset.smul_sum]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [spinSSiteOp1_commutator_staggeredOrderOp2S, smul_comm (if A x then (1 : ℂ) else (-1 : ℂ))]
+
+/-- Per-site step of `[Ŝ¹_tot, Ô³] = -i Ô²`: on-site `[Ŝ¹, Ŝ³] = -i Ŝ²`. -/
+private theorem spinSSiteOp1_commutator_staggeredOrderOpS (A : Λ → Bool) (x : Λ) :
+    spinSSiteOp1 x N * staggeredOrderOpS A N - staggeredOrderOpS A N * spinSSiteOp1 x N
+      = (if A x then (1 : ℂ) else (-1 : ℂ)) • ((-Complex.I) • spinSSiteOp2 x N) := by
+  unfold staggeredOrderOpS spinSSiteOp1 spinSSiteOp3 spinSSiteOp2
+  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib, Finset.sum_eq_single x]
+  · rw [mul_smul_comm, smul_mul_assoc, ← smul_sub, onSiteS_mul_onSiteS_same,
+      onSiteS_mul_onSiteS_same, ← onSiteS_sub,
+      show spinSOp1 N * spinSOp3 N - spinSOp3 N * spinSOp1 N = (-Complex.I) • spinSOp2 N from by
+        rw [← neg_sub, spinSOp3_commutator_spinSOp1, neg_smul], onSiteS_smul]
+  · intro y _ hyx
+    rw [mul_smul_comm, smul_mul_assoc, ← smul_sub,
+      (onSiteS_commute_of_ne (Ne.symm hyx) (spinSOp1 N) (spinSOp3 N)).eq, sub_self, smul_zero]
+  · intro h; exact absurd (Finset.mem_univ x) h
+
+/-- **Rotation commutator** `[Ŝ¹_tot, Ô_L^{(3)}] = -i Ô_L^{(2)}`. -/
+theorem totalSpinSOp1_commutator_staggeredOrderOpS (A : Λ → Bool) :
+    totalSpinSOp1 Λ N * staggeredOrderOpS A N - staggeredOrderOpS A N * totalSpinSOp1 Λ N
+      = (-Complex.I) • staggeredOrderOp2S A N := by
+  have hsum : (totalSpinSOp1 Λ N : ManyBodyOpS Λ N) = ∑ x : Λ, spinSSiteOp1 x N := rfl
+  rw [hsum, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib, staggeredOrderOp2S,
+    Finset.smul_sum]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [spinSSiteOp1_commutator_staggeredOrderOpS, smul_comm (if A x then (1 : ℂ) else (-1 : ℂ))]
+
+/-- **Component equality** (P6): for a total-`Ŝ¹`-singlet state,
+`⟨Φ, (Ô²)² Φ⟩ = ⟨Φ, (Ô³)² Φ⟩`. -/
+theorem staggeredOrder_sq_expectation_eq_23 (A : Λ → Bool) (Φ : (Λ → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp1 Λ N).mulVec Φ = 0) :
+    star Φ ⬝ᵥ (staggeredOrderOp2S A N * staggeredOrderOp2S A N).mulVec Φ
+      = star Φ ⬝ᵥ (staggeredOrderOpS A N * staggeredOrderOpS A N).mulVec Φ :=
+  singlet_sq_expectation_eq (totalSpinSOp1_isHermitian Λ N)
+    (totalSpinSOp1_commutator_staggeredOrderOp2S A)
+    (totalSpinSOp1_commutator_staggeredOrderOpS A) Φ hsing
 
 end LatticeSystem.Quantum
