@@ -732,4 +732,79 @@ theorem totalSpinSOp3_mulVec_orderWordProd_eigenvec (d L N : ℕ) [NeZero L] (w 
     congr 1
     rw [mCharge_cons]; ring
 
+/-! ### Generic pieces for the R1 induction (P8-3) -/
+
+/-- The `p̂`-moments are strictly positive under the LRO entry: `0 < mₙ`. -/
+theorem phatMoment_pos_of_lro (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) {q₀ : ℝ} (hq0 : 0 < q₀)
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1) (n : ℕ) :
+    0 < phatMoment d L N Φ n := by
+  cases n with
+  | zero => exact hm0
+  | succ k =>
+    have h := phatMoment_ge_of_lro d L N Φ hq0.le hm0 hlro k
+    have hpos : 0 < (2 * q₀) ^ (k + 1) * phatMoment d L N Φ 0 :=
+      mul_pos (pow_pos (mul_pos (by norm_num) hq0) (k + 1)) hm0
+    exact lt_of_lt_of_le hpos h
+
+/-- **Per-volume commutator as a scalar multiple of total spin** `[ô⁺, ô⁻] = (2/V²) Ŝ³_tot`. -/
+theorem staggeredOrderDensity_commutator_eq (d L N : ℕ) [NeZero L] :
+    staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+        - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true
+      = (((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹)
+          • ((2 : ℂ) • totalSpinSOp3 (HypercubicTorus d L) N) := by
+  rw [show staggeredOrderDensityOpS d L N true
+        = ((L : ℂ) ^ d)⁻¹ • staggeredRaisingOpS (torusParitySublattice d L) N from rfl,
+    show staggeredOrderDensityOpS d L N false
+        = ((L : ℂ) ^ d)⁻¹ • staggeredLoweringOpS (torusParitySublattice d L) N from rfl,
+    smul_mul_smul_comm, smul_mul_smul_comm, ← smul_sub, staggeredOrder_commutator]
+
+/-- The net charge has modulus at most the word length: `‖m(w)‖ ≤ |w|` (sum of `±1`s). -/
+theorem mCharge_norm_le (w : List Bool) : ‖mCharge w‖ ≤ (w.length : ℝ) := by
+  induction w with
+  | nil => simp
+  | cons b w ih =>
+    rw [mCharge_cons, List.length_cons]
+    calc ‖(if b then (1 : ℂ) else (-1 : ℂ)) + mCharge w‖
+        ≤ ‖(if b then (1 : ℂ) else (-1 : ℂ))‖ + ‖mCharge w‖ := norm_add_le _ _
+      _ ≤ 1 + (w.length : ℝ) := by
+          gcongr
+          · split_ifs <;> simp
+      _ = ((w.length + 1 : ℕ) : ℝ) := by push_cast; ring
+
+/-- **Single-swap factorization** of the order-word product difference:
+`ô^{pre++a::b::suf} − ô^{pre++b::a::suf} = ô^{pre} [ô^a, ô^b] ô^{suf}`. -/
+theorem orderWordProd_swap_diff_eq (d L N : ℕ) [NeZero L] (pre suf : List Bool) (a b : Bool) :
+    orderWordProd d L N (pre ++ a :: b :: suf) - orderWordProd d L N (pre ++ b :: a :: suf)
+      = orderWordProd d L N pre
+        * (staggeredOrderDensityOpS d L N a * staggeredOrderDensityOpS d L N b
+            - staggeredOrderDensityOpS d L N b * staggeredOrderDensityOpS d L N a)
+        * orderWordProd d L N suf := by
+  have hexp : ∀ x y : Bool, orderWordProd d L N (pre ++ x :: y :: suf)
+      = orderWordProd d L N pre
+        * (staggeredOrderDensityOpS d L N x * staggeredOrderDensityOpS d L N y)
+        * orderWordProd d L N suf := by
+    intro x y
+    simp only [orderWordProd, List.map_append, List.map_cons, List.prod_append, List.prod_cons]
+    noncomm_ring
+  rw [hexp, hexp, ← sub_mul, ← mul_sub]
+
+/-- **Convex-combination deviation**: if `c · |s| = 1` and every term `f i` lies within `D` of `x`,
+then `x` lies within `D` of the uniform average `c · ∑ f`. -/
+theorem abs_sub_smul_sum_le {ι : Type*} (s : Finset ι) (c : ℝ) (hc : 0 ≤ c)
+    (x : ℝ) (f : ι → ℝ) (D : ℝ) (hcard : c * (s.card : ℝ) = 1)
+    (hbound : ∀ i ∈ s, |x - f i| ≤ D) :
+    |x - c * ∑ i ∈ s, f i| ≤ D := by
+  have hx : x = c * ∑ _i ∈ s, x := by
+    rw [Finset.sum_const, nsmul_eq_mul, ← mul_assoc, hcard, one_mul]
+  have hstep : x - c * ∑ i ∈ s, f i = c * ∑ i ∈ s, (x - f i) := by
+    rw [Finset.sum_sub_distrib, mul_sub, ← hx]
+  rw [hstep, abs_mul, abs_of_nonneg hc]
+  calc c * |∑ i ∈ s, (x - f i)|
+      ≤ c * ∑ i ∈ s, |x - f i| := by
+        gcongr; exact Finset.abs_sum_le_sum_abs _ _
+    _ ≤ c * ∑ _i ∈ s, D := by gcongr with i hi; exact hbound i hi
+    _ = D := by rw [Finset.sum_const, nsmul_eq_mul, ← mul_assoc, hcard, one_mul]
+
 end LatticeSystem.Quantum
