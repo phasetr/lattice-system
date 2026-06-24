@@ -687,6 +687,85 @@ theorem orderWordProd_sub_balanced_manyBodyOperatorNormS_le (d L N : ℕ) [NeZer
   refine mul_le_mul_of_nonneg_right hkn ?_
   positivity
 
+/-! ### Expansion of `p̂ⁿ` as a uniform combination of balanced words (§5) -/
+
+/-- Snoc-decomposition of `Fin (n+1) → Bool` with `rfl`-clean components (init restriction and last
+value), used to expand the noncommutative `(A+B)^n`. -/
+def boolFinSuccEquiv (n : ℕ) : (Fin (n + 1) → Bool) ≃ (Fin n → Bool) × Bool where
+  toFun c := (fun i => c i.castSucc, c (Fin.last n))
+  invFun p := Fin.snoc p.1 p.2
+  left_inv c := by funext i; refine Fin.lastCases ?_ (fun j => ?_) i <;> simp
+  right_inv p := by refine Prod.ext ?_ ?_ <;> simp
+
+/-- **Noncommutative binomial expansion** as an ordered sum over sign assignments:
+`(A + B)^n = Σ_{c : Fin n → Bool} ∏_k (if c k then A else B)`.  Proved by induction on `n` peeling
+the last factor (the commutative `add_pow` is unavailable in a noncommutative ring). -/
+theorem add_pow_eq_sum_ofFn {R : Type*} [Ring R] (A B : R) :
+    ∀ n : ℕ, (A + B) ^ n
+      = ∑ c : Fin n → Bool, (List.ofFn (fun k => if c k then A else B)).prod
+  | 0 => by simp
+  | (n + 1) => by
+    have h : ∀ c' : Fin (n + 1) → Bool,
+        (List.ofFn (fun k => if c' k then A else B)).prod
+          = (List.ofFn (fun k => if (boolFinSuccEquiv n c').1 k then A else B)).prod
+            * (if (boolFinSuccEquiv n c').2 then A else B) :=
+      fun c' => by
+        rw [List.ofFn_succ', List.prod_concat]; rfl
+    rw [pow_succ, add_pow_eq_sum_ofFn A B n, Finset.sum_mul,
+      Fintype.sum_equiv (boolFinSuccEquiv n)
+        (fun c' : Fin (n + 1) → Bool => (List.ofFn (fun k => if c' k then A else B)).prod)
+        (fun p : (Fin n → Bool) × Bool =>
+          (List.ofFn (fun k => if p.1 k then A else B)).prod * (if p.2 then A else B)) h,
+      Fintype.sum_prod_type]
+    refine Finset.sum_congr rfl (fun c _ => ?_)
+    rw [Fintype.sum_bool]
+    exact mul_add _ A B
+
+/-- The **block word** for a sign assignment `c : Fin n → Bool`: a length-`2n` balanced binary word
+that concatenates the block `[+, −]` (`c k = true`) or `[−, +]` (`c k = false`) for each `k`. -/
+def blockWord {n : ℕ} (c : Fin n → Bool) : List Bool :=
+  (List.ofFn fun k => if c k then [true, false] else [false, true]).flatten
+
+/-- A block word has length `2n`. -/
+theorem blockWord_length {n : ℕ} (c : Fin n → Bool) : (blockWord c).length = 2 * n := by
+  simp only [blockWord, List.length_flatten, List.map_ofFn]
+  rw [List.sum_ofFn]
+  simp only [Function.comp]
+  rw [show (fun k => (if c k then [true, false] else [false, true]).length) = (fun _ => 2) from by
+    funext k; split <;> rfl]
+  simp [Finset.sum_const, mul_comm]
+
+/-- A block word has exactly `n` `true` letters (it is balanced). -/
+theorem blockWord_count_true {n : ℕ} (c : Fin n → Bool) : (blockWord c).count true = n := by
+  simp only [blockWord, List.count_flatten, List.map_ofFn]
+  rw [List.sum_ofFn]
+  simp only [Function.comp]
+  rw [show (fun k => (if c k then [true, false] else [false, true]).count true) = (fun _ => 1)
+      from by funext k; split <;> rfl]
+  simp
+
+/-- The order-word product of a block word equals the ordered product of the block operators
+`A = ô⁺ô⁻` (`c k = true`) or `B = ô⁻ô⁺` (`c k = false`). -/
+theorem orderWordProd_blockWord (d L N : ℕ) [NeZero L] {n : ℕ} (c : Fin n → Bool) :
+    orderWordProd d L N (blockWord c)
+      = (List.ofFn (fun k => if c k
+          then staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+          else
+            staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)).prod := by
+  simp only [orderWordProd, blockWord, List.map_flatten, List.prod_flatten, List.map_ofFn]
+  congr 1
+  refine List.ext_getElem (by simp) (fun k h1 h2 => ?_)
+  simp only [List.getElem_ofFn, Function.comp]
+  split <;> simp [staggeredOrderDensityOpS]
+
+/-- `p̂ⁿ` is the uniform `(½)ⁿ`-combination of the `2ⁿ` block-word products. -/
+theorem staggeredPhatS_pow_eq (d L N n : ℕ) [NeZero L] :
+    staggeredPhatS d L N ^ n
+      = ((2 : ℂ)⁻¹) ^ n • ∑ c : Fin n → Bool, orderWordProd d L N (blockWord c) := by
+  rw [staggeredPhatS, smul_pow, add_pow_eq_sum_ofFn]
+  congr 1
+  refine Finset.sum_congr rfl (fun c _ => (orderWordProd_blockWord d L N c).symm)
+
 /-- **Tasaki Lemma 4.14 (order-operator algebra estimate), AXIOM.**  For any balanced sign sequence
 `s` of length `2n` (`n > 0`), the `L²` operator norm of the difference between the ordered product
 `ô^{s₁} ⋯ ô^{s_{2n}}` and `p̂ⁿ` is bounded by `n² (o₀)^{2n−1} / V`, where `o₀ = 2S = N` and
