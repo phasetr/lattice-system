@@ -528,4 +528,58 @@ theorem staggeredPhatS_eq_cartesian_sq (d L N : ℕ) [NeZero L] :
   congr 1
   ring
 
+/-- The `p̂`-expectation in Cartesian form: `⟨Φ, p̂ Φ⟩ = V⁻² (⟨Ô¹² ⟩ + ⟨Ô²²⟩)`. -/
+theorem staggeredPhatS_dotProduct_cartesian (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) :
+    star Φ ⬝ᵥ (staggeredPhatS d L N).mulVec Φ
+      = (((L : ℂ) ^ d) ^ 2)⁻¹ *
+          (star Φ ⬝ᵥ (staggeredOrderOp1S (torusParitySublattice d L) N
+              * staggeredOrderOp1S (torusParitySublattice d L) N).mulVec Φ
+            + star Φ ⬝ᵥ (staggeredOrderOp2S (torusParitySublattice d L) N
+              * staggeredOrderOp2S (torusParitySublattice d L) N).mulVec Φ) := by
+  rw [staggeredPhatS_eq_cartesian_sq, Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul,
+    Matrix.add_mulVec, dotProduct_add]
+
+/-- **P7 (eq. 4.1.7 → LRO bound):** for an `Ŝ³`- and `Ŝ¹`-singlet ground state with squared
+staggered order parameter `≥ q₀`, the first `p̂`-moment obeys `2 q₀ ‖Φ‖² ≤ ⟨Φ, p̂ Φ⟩`.  By `SU(2)`
+invariance
+the three Cartesian order parameters are equal, so `⟨p̂⟩ = 2 ⟨(Ô³/V)²⟩ ≥ 2 q₀ ‖Φ‖²`. -/
+theorem phatMoment_one_ge_of_lro (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing3 : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0)
+    (hsing1 : (totalSpinSOp1 (HypercubicTorus d L) N).mulVec Φ = 0)
+    (q₀ : ℝ) (hm0 : 0 < (star Φ ⬝ᵥ Φ).re) (hL : (0 : ℝ) < (L : ℝ) ^ d)
+    (hlro : q₀ ≤ (star Φ ⬝ᵥ (staggeredOrderOpS (torusParitySublattice d L) N
+        * staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ).re
+        / ((star Φ ⬝ᵥ Φ).re * ((L : ℝ) ^ d) ^ 2)) :
+    2 * q₀ * (star Φ ⬝ᵥ Φ).re ≤ phatMoment d L N Φ 1 := by
+  set V2 : ℝ := ((L : ℝ) ^ d) ^ 2 with hV2def
+  have hV2 : 0 < V2 := pow_pos hL 2
+  have hz12 := staggeredOrder_sq_expectation_eq_12 (torusParitySublattice d L) Φ hsing3
+  have hz23 := staggeredOrder_sq_expectation_eq_23 (torusParitySublattice d L) Φ hsing1
+  -- m₁ = V⁻² (⟨Ô¹²⟩.re + ⟨Ô²²⟩.re) = 2 V⁻² ⟨Ô³²⟩.re
+  have hcast : (((L : ℂ) ^ d) ^ 2)⁻¹ = ((V2⁻¹ : ℝ) : ℂ) := by
+    rw [hV2def]; push_cast; ring
+  have hm1 : phatMoment d L N Φ 1
+      = V2⁻¹ * ((star Φ ⬝ᵥ (staggeredOrderOpS (torusParitySublattice d L) N
+          * staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ).re
+        + (star Φ ⬝ᵥ (staggeredOrderOpS (torusParitySublattice d L) N
+          * staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ).re) := by
+    rw [phatMoment, pow_one, staggeredPhatS_dotProduct_cartesian, hcast, hz12, hz23]
+    simp [Complex.mul_re, Complex.add_re]
+  rw [hm1]
+  -- from LRO: q₀ * (m₀ * V2) ≤ ⟨Ô³²⟩.re
+  rw [le_div_iff₀ (mul_pos hm0 hV2)] at hlro
+  have hz3 : q₀ * ((star Φ ⬝ᵥ Φ).re * V2)
+      ≤ (star Φ ⬝ᵥ (staggeredOrderOpS (torusParitySublattice d L) N
+        * staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ).re := hlro
+  rw [← two_mul]
+  -- 2 q₀ m₀ ≤ V⁻² · 2 · ⟨Ô³²⟩.re
+  have key : 2 * q₀ * (star Φ ⬝ᵥ Φ).re
+      = V2⁻¹ * (2 * (q₀ * ((star Φ ⬝ᵥ Φ).re * V2))) := by
+    field_simp
+  rw [key]
+  apply mul_le_mul_of_nonneg_left _ (le_of_lt (inv_pos.mpr hV2))
+  exact mul_le_mul_of_nonneg_left hz3 (by norm_num)
+
 end LatticeSystem.Quantum
