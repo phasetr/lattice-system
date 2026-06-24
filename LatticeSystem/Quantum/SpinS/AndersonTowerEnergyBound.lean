@@ -710,11 +710,23 @@ theorem mCharge_cons (b : Bool) (w : List Bool) :
     mCharge (b :: w) = (if b then (1 : ℂ) else (-1 : ℂ)) + mCharge w := by
   rw [mCharge, List.map_cons, List.sum_cons, mCharge]
 
+/-- The net charge is real-valued: `(m(w)).im = 0`. -/
+@[simp] theorem mCharge_im (w : List Bool) : (mCharge w).im = 0 := by
+  induction w with
+  | nil => simp
+  | cons b w ih => rw [mCharge_cons, Complex.add_im, ih, add_zero]; split_ifs <;> simp
+
 /-- Cons recursion for the ordered word product: `ô^{b::w} = ô^b · ô^{w}`. -/
 theorem orderWordProd_cons (d L N : ℕ) [NeZero L] (b : Bool) (w : List Bool) :
     orderWordProd d L N (b :: w)
       = staggeredOrderDensityOpS d L N b * orderWordProd d L N w := by
   rw [orderWordProd, orderWordProd, List.map_cons, List.prod_cons]
+
+/-- Append recursion for the ordered word product: `ô^{w ++ w'} = ô^{w} · ô^{w'}`. -/
+theorem orderWordProd_append (d L N : ℕ) [NeZero L] (w w' : List Bool) :
+    orderWordProd d L N (w ++ w')
+      = orderWordProd d L N w * orderWordProd d L N w' := by
+  rw [orderWordProd, orderWordProd, orderWordProd, List.map_append, List.prod_append]
 
 /-- **Word sector eigenvalue**: for a total-`Ŝ³` singlet `v` (`Ŝ³_tot v = 0`), the ordered word
 product is an eigenvector `Ŝ³_tot (ô^{w} v) = m(w) (ô^{w} v)` with eigenvalue the net charge. -/
@@ -824,5 +836,54 @@ theorem eigenvalue_norm_le_manyBodyOperatorNormS {B : ManyBodyOpS Λ N} {lam : �
   have h1 := (Matrix.toEuclideanCLM (𝕜 := ℂ) B).le_opNorm x
   rw [happ, norm_smul] at h1
   exact le_of_mul_le_mul_right h1 (norm_pos_iff.mpr hxne)
+
+/-! ### Expectation telescoping of swaps (P8-4) -/
+
+/-- The order-density commutator for any pair `a, b` is a scalar multiple of `Ŝ³_tot`:
+`ô^a ô^b − ô^b ô^a = σ(a,b) (2/V²) Ŝ³_tot`, `σ = 0` if `a = b`, `±1` otherwise. -/
+theorem orderDensity_comm_ab (d L N : ℕ) [NeZero L] (a b : Bool) :
+    staggeredOrderDensityOpS d L N a * staggeredOrderDensityOpS d L N b
+        - staggeredOrderDensityOpS d L N b * staggeredOrderDensityOpS d L N a
+      = (if a = b then (0 : ℂ) else if a then (1 : ℂ) else (-1 : ℂ))
+          • ((((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹)
+              • ((2 : ℂ) • totalSpinSOp3 (HypercubicTorus d L) N)) := by
+  rcases a with _ | _ <;> rcases b with _ | _
+  · simp
+  · rw [← staggeredOrderDensity_commutator_eq]; norm_num
+  · rw [show staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+          - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true
+        = -(staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false) from by
+        rw [neg_sub], ← staggeredOrderDensity_commutator_eq]
+    norm_num
+  · simp
+
+/-- **Single-swap expectation difference**: for a singlet `Φ`, the expectation of an order word
+changes under one adjacent transposition by a real scalar (`σ(a,b) · 2 m(suf)/V²`) times the
+expectation of the shortened (charge-removed) word. -/
+theorem orderWordProd_swap_dotProduct_eq (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0)
+    (pre suf : List Bool) (a b : Bool) :
+    (star Φ ⬝ᵥ (orderWordProd d L N (pre ++ a :: b :: suf)).mulVec Φ)
+        - (star Φ ⬝ᵥ (orderWordProd d L N (pre ++ b :: a :: suf)).mulVec Φ)
+      = ((if a = b then (0 : ℂ) else if a then (1 : ℂ) else (-1 : ℂ))
+            * ((((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge suf)))
+          * (star Φ ⬝ᵥ (orderWordProd d L N (pre ++ suf)).mulVec Φ) := by
+  have heig : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec ((orderWordProd d L N suf).mulVec Φ)
+      = mCharge suf • (orderWordProd d L N suf).mulVec Φ :=
+    totalSpinSOp3_mulVec_orderWordProd_eigenvec d L N suf hsing
+  have hvec : (orderWordProd d L N (pre ++ a :: b :: suf)
+        - orderWordProd d L N (pre ++ b :: a :: suf)).mulVec Φ
+      = ((if a = b then (0 : ℂ) else if a then (1 : ℂ) else (-1 : ℂ))
+            * ((((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge suf)))
+          • (orderWordProd d L N (pre ++ suf)).mulVec Φ := by
+    rw [orderWordProd_swap_diff_eq, orderDensity_comm_ab, ← Matrix.mulVec_mulVec,
+      ← Matrix.mulVec_mulVec, Matrix.smul_mulVec, Matrix.smul_mulVec, Matrix.smul_mulVec, heig,
+      Matrix.mulVec_smul, Matrix.mulVec_smul, Matrix.mulVec_smul, Matrix.mulVec_smul,
+      Matrix.mulVec_mulVec, ← orderWordProd_append, smul_smul, smul_smul, smul_smul]
+    congr 1
+    ring
+  rw [← dotProduct_sub, ← Matrix.sub_mulVec, hvec, dotProduct_smul, smul_eq_mul]
 
 end LatticeSystem.Quantum
