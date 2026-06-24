@@ -104,6 +104,13 @@ theorem manyBodyOperatorNormS_list_prod_le (l : List (ManyBodyOpS Λ N)) :
     refine le_trans (manyBodyOperatorNormS_mul_le a t.prod) ?_
     exact mul_le_mul_of_nonneg_left ih (manyBodyOperatorNormS_nonneg a)
 
+/-- **Finite-sum triangle inequality** for the many-body `L²` operator norm. -/
+theorem manyBodyOperatorNormS_sum_le {ι : Type*} (s : Finset ι) (f : ι → ManyBodyOpS Λ N) :
+    manyBodyOperatorNormS (∑ x ∈ s, f x) ≤ ∑ x ∈ s, manyBodyOperatorNormS (f x) := by
+  rw [manyBodyOperatorNormS_eq_toEuclideanCLM, map_sum]
+  refine le_trans (norm_sum_le _ _) (le_of_eq ?_)
+  exact Finset.sum_congr rfl (fun x _ => (manyBodyOperatorNormS_eq_toEuclideanCLM (f x)).symm)
+
 section L2Wrappers
 open scoped Matrix.Norms.L2Operator
 
@@ -269,6 +276,66 @@ noncomputable def balancedOrderProductS (d L N n : ℕ) [NeZero L] (s : Fin (2 *
 noncomputable def staggeredPhatS (d L N : ℕ) [NeZero L] : ManyBodyOpS (HypercubicTorus d L) N :=
   (2 : ℂ)⁻¹ • (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false +
     staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+
+/-- **Staggered order-operator norm bound** `‖Ô_L^±‖ ≤ V·N` (`V = card Λ`): triangle inequality over
+the `V` sites, each per-site ladder operator having norm `≤ N` (`= 2S`) and the staggered sign
+having unit modulus. -/
+theorem staggeredRaisingOpS_manyBodyOperatorNormS_le (A : Λ → Bool) (hN : 1 ≤ N) :
+    manyBodyOperatorNormS (staggeredRaisingOpS A N) ≤ (Fintype.card Λ : ℝ) * (N : ℝ) := by
+  refine le_trans (manyBodyOperatorNormS_sum_le _ _) ?_
+  calc ∑ x : Λ, manyBodyOperatorNormS ((if A x then (1 : ℂ) else (-1 : ℂ)) • spinSSiteOpPlus x N)
+      ≤ ∑ _x : Λ, (N : ℝ) := by
+        refine Finset.sum_le_sum (fun x _ => ?_)
+        rw [manyBodyOperatorNormS_smul]
+        have h1 : ‖(if A x then (1 : ℂ) else (-1 : ℂ))‖ = 1 := by split_ifs <;> simp
+        rw [h1, one_mul]
+        exact spinSSiteOpPlus_manyBodyOperatorNormS_le x hN
+    _ = (Fintype.card Λ : ℝ) * (N : ℝ) := by
+        rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+
+/-- **Staggered lowering order-operator norm bound** `‖Ô_L^−‖ ≤ V·N`. -/
+theorem staggeredLoweringOpS_manyBodyOperatorNormS_le (A : Λ → Bool) (hN : 1 ≤ N) :
+    manyBodyOperatorNormS (staggeredLoweringOpS A N) ≤ (Fintype.card Λ : ℝ) * (N : ℝ) := by
+  refine le_trans (manyBodyOperatorNormS_sum_le _ _) ?_
+  calc ∑ x : Λ, manyBodyOperatorNormS ((if A x then (1 : ℂ) else (-1 : ℂ)) • spinSSiteOpMinus x N)
+      ≤ ∑ _x : Λ, (N : ℝ) := by
+        refine Finset.sum_le_sum (fun x _ => ?_)
+        rw [manyBodyOperatorNormS_smul]
+        have h1 : ‖(if A x then (1 : ℂ) else (-1 : ℂ))‖ = 1 := by split_ifs <;> simp
+        rw [h1, one_mul]
+        exact spinSSiteOpMinus_manyBodyOperatorNormS_le x hN
+    _ = (Fintype.card Λ : ℝ) * (N : ℝ) := by
+        rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+
+/-- **Per-volume order-operator norm bound** `‖ô^±‖ ≤ N` (`= o₀`, eq. (4.2.33)): the staggered order
+operator has norm `≤ V·N`, and the per-volume normalization `V⁻¹ = (L^d)⁻¹` brings it to `N`. -/
+theorem staggeredOrderDensityOpS_manyBodyOperatorNormS_le (d L N : ℕ) [NeZero L] (b : Bool)
+    (hN : 1 ≤ N) : manyBodyOperatorNormS (staggeredOrderDensityOpS d L N b) ≤ (N : ℝ) := by
+  have hLpos : (0 : ℝ) < (L : ℝ) ^ d := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    positivity
+  unfold staggeredOrderDensityOpS
+  rw [manyBodyOperatorNormS_smul]
+  have hc : ‖((L : ℂ) ^ d)⁻¹‖ = ((L : ℝ) ^ d)⁻¹ := by
+    rw [norm_inv, norm_pow, Complex.norm_natCast]
+  have hcard : (Fintype.card (HypercubicTorus d L) : ℝ) = (L : ℝ) ^ d := by
+    rw [card_hypercubicTorus]; push_cast; ring
+  have hbound : manyBodyOperatorNormS
+      (if b then staggeredRaisingOpS (torusParitySublattice d L) N
+        else staggeredLoweringOpS (torusParitySublattice d L) N)
+      ≤ (L : ℝ) ^ d * (N : ℝ) := by
+    cases b with
+    | true =>
+      simpa [hcard] using staggeredRaisingOpS_manyBodyOperatorNormS_le
+        (torusParitySublattice d L) hN
+    | false =>
+      simpa [hcard] using staggeredLoweringOpS_manyBodyOperatorNormS_le
+        (torusParitySublattice d L) hN
+  rw [hc]
+  calc ((L : ℝ) ^ d)⁻¹ * manyBodyOperatorNormS _
+      ≤ ((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d * (N : ℝ)) := by
+        exact mul_le_mul_of_nonneg_left hbound (by positivity)
+    _ = (N : ℝ) := by field_simp
 
 /-- **Tasaki Lemma 4.14 (order-operator algebra estimate), AXIOM.**  For any balanced sign sequence
 `s` of length `2n` (`n > 0`), the `L²` operator norm of the difference between the ordered product
