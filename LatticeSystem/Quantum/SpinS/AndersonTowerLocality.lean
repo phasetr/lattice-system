@@ -133,4 +133,37 @@ theorem spinSDot_commutator_staggeredLoweringOpS_support (A : Λ → Bool) (x y 
       rw [h]; exact Finset.mem_insert_of_mem (Finset.mem_singleton_self y))
     rw [spinSDot_commutator_spinSSiteOpMinus_eq_zero_of_ne x y z hzx hzy, smul_zero]
 
+/-- A single bond–site lowering commutator is bounded: `‖[Ŝ_x·Ŝ_y, Ŝ_z⁻]‖ ≤ 6 N³`. -/
+theorem spinSDot_commutator_spinSSiteOpMinus_norm_le (x y z : Λ) (hN : 1 ≤ N) :
+    manyBodyOperatorNormS
+      (spinSDot x y N * spinSSiteOpMinus z N - spinSSiteOpMinus z N * spinSDot x y N)
+      ≤ 6 * (N : ℝ) ^ 3 := by
+  have hdot := spinSDot_manyBodyOperatorNormS_le (N := N) x y hN
+  have hmin := spinSSiteOpMinus_manyBodyOperatorNormS_le (N := N) z hN
+  refine le_trans (manyBodyOperatorNormS_sub_le _ _) ?_
+  have h1 : manyBodyOperatorNormS (spinSDot x y N * spinSSiteOpMinus z N)
+      ≤ 3 * (N : ℝ) ^ 2 * (N : ℝ) := by
+    refine le_trans (manyBodyOperatorNormS_mul_le _ _) ?_
+    exact mul_le_mul hdot hmin (manyBodyOperatorNormS_nonneg _) (by positivity)
+  have h2 : manyBodyOperatorNormS (spinSSiteOpMinus z N * spinSDot x y N)
+      ≤ (N : ℝ) * (3 * (N : ℝ) ^ 2) := by
+    refine le_trans (manyBodyOperatorNormS_mul_le _ _) ?_
+    exact mul_le_mul hmin hdot (manyBodyOperatorNormS_nonneg _) (by positivity)
+  nlinarith [h1, h2]
+
+/-- **Bond–order commutator norm bound** `‖[Ŝ_x·Ŝ_y, Ô_L⁻]‖ ≤ 12 N³` for `x ≠ y`. -/
+theorem spinSDot_commutator_staggeredLoweringOpS_norm_le (A : Λ → Bool) (x y : Λ)
+    (hxy : x ≠ y) (hN : 1 ≤ N) :
+    manyBodyOperatorNormS
+      (spinSDot x y N * staggeredLoweringOpS A N - staggeredLoweringOpS A N * spinSDot x y N)
+      ≤ 12 * (N : ℝ) ^ 3 := by
+  rw [spinSDot_commutator_staggeredLoweringOpS_support A x y hxy]
+  refine le_trans (manyBodyOperatorNormS_add_le _ _) ?_
+  have hx := spinSDot_commutator_spinSSiteOpMinus_norm_le (N := N) x y x hN
+  have hy := spinSDot_commutator_spinSSiteOpMinus_norm_le (N := N) x y y hN
+  rw [manyBodyOperatorNormS_smul, manyBodyOperatorNormS_smul,
+    show ‖(if A x then (1 : ℂ) else (-1 : ℂ))‖ = 1 from by split_ifs <;> simp,
+    show ‖(if A y then (1 : ℂ) else (-1 : ℂ))‖ = 1 from by split_ifs <;> simp, one_mul, one_mul]
+  linarith
+
 end LatticeSystem.Quantum
