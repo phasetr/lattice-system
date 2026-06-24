@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
+import LatticeSystem.Quantum.SpinS.CyclicCommutator31
 import LatticeSystem.Math.PosSemidef.Basics
 import Mathlib.Algebra.QuadraticDiscriminant
 
@@ -302,5 +303,32 @@ theorem phatMoment_ge_of_lro (d L N : ℕ) [NeZero L]
           = (2 * q₀) ^ (n + 1) * m 0 ^ (n + 1) := by rw [pow_succ]; ring
       _ ≤ m 0 ^ n * m (n + 1) := hkey
   exact le_of_mul_le_mul_left hfinal (pow_pos hm0 n)
+
+/-! ### SU(2) rotation of the staggered order operators (P6) -/
+
+/-- Per-site step of the rotation commutator `[Ŝ³_tot, Ô¹] = i Ô²`: the site-`x` `Ŝ³` commutes with
+the staggered `Ô¹` except at its own site, contributing `ε_x · (i Ŝ²_x)`. -/
+private theorem spinSSiteOp3_commutator_staggeredOrderOp1S (A : Λ → Bool) (x : Λ) :
+    spinSSiteOp3 x N * staggeredOrderOp1S A N - staggeredOrderOp1S A N * spinSSiteOp3 x N
+      = (if A x then (1 : ℂ) else (-1 : ℂ)) • (Complex.I • spinSSiteOp2 x N) := by
+  unfold staggeredOrderOp1S spinSSiteOp3 spinSSiteOp1 spinSSiteOp2
+  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib, Finset.sum_eq_single x]
+  · rw [mul_smul_comm, smul_mul_assoc, ← smul_sub, onSiteS_mul_onSiteS_same,
+      onSiteS_mul_onSiteS_same, ← onSiteS_sub, spinSOp3_commutator_spinSOp1, onSiteS_smul]
+  · intro y _ hyx
+    rw [mul_smul_comm, smul_mul_assoc, ← smul_sub,
+      (onSiteS_commute_of_ne (Ne.symm hyx) (spinSOp3 N) (spinSOp1 N)).eq, sub_self, smul_zero]
+  · intro h; exact absurd (Finset.mem_univ x) h
+
+/-- **Rotation commutator** `[Ŝ³_tot, Ô_L^{(1)}] = i Ô_L^{(2)}`: cross-site terms vanish; on-site
+terms give the single-site `[Ŝ³, Ŝ¹] = i Ŝ²`. -/
+theorem totalSpinSOp3_commutator_staggeredOrderOp1S (A : Λ → Bool) :
+    totalSpinSOp3 Λ N * staggeredOrderOp1S A N - staggeredOrderOp1S A N * totalSpinSOp3 Λ N
+      = Complex.I • staggeredOrderOp2S A N := by
+  have hsum : (totalSpinSOp3 Λ N : ManyBodyOpS Λ N) = ∑ x : Λ, spinSSiteOp3 x N := rfl
+  rw [hsum, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib, staggeredOrderOp2S,
+    Finset.smul_sum]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [spinSSiteOp3_commutator_staggeredOrderOp1S, smul_comm (if A x then (1 : ℂ) else (-1 : ℂ))]
 
 end LatticeSystem.Quantum
