@@ -1170,4 +1170,31 @@ theorem renormalized_balanced_product_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤
   rw [abs_of_nonneg (le_trans (by linarith [hPn] : (0:ℝ) ≤ 1 / 2 * phatMoment d L N Φ n) hge)]
   linarith [hclose.2]
 
+/-! ### R1 corollaries: tower denominator lower bound and well-definedness (P8-6) -/
+
+/-- **Tower denominator lower bound** (eq. (4.2.67) applied to `(ô⁻)^M (ô⁺)^M`): under
+`3 N M² ≤ 2 q₀ V`, the squared per-volume tower amplitude obeys `½ P_M ≤ ⟨Φ, (ô⁻)^M (ô⁺)^M Φ⟩`. -/
+theorem tower_denominator_lower_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1)
+    {M : ℕ} (hcond : 3 * (N : ℝ) * (M : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d) :
+    (1 / 2) * phatMoment d L N Φ M
+      ≤ (star Φ ⬝ᵥ (staggeredOrderDensityOpS d L N false ^ M
+          * staggeredOrderDensityOpS d L N true ^ M).mulVec Φ).re := by
+  have hwt : (List.replicate M false ++ List.replicate M true).count true = M := by
+    simp [List.count_append, List.count_replicate]
+  have hwf : (List.replicate M false ++ List.replicate M true).count false = M := by
+    simp [List.count_append, List.count_replicate]
+  have heq : orderWordProd d L N (List.replicate M false ++ List.replicate M true)
+      = staggeredOrderDensityOpS d L N false ^ M * staggeredOrderDensityOpS d L N true ^ M := by
+    rw [orderWordProd, List.map_append, List.map_replicate, List.map_replicate, List.prod_append,
+      List.prod_replicate, List.prod_replicate]
+  have hclose := orderWord_balanced_re_close d L N hN Φ hsing hm0 hlro M hcond
+    (List.replicate M false ++ List.replicate M true) hwt hwf
+  rw [abs_le] at hclose
+  rw [← heq]
+  linarith [hclose.1]
+
 end LatticeSystem.Quantum
