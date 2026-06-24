@@ -75,21 +75,35 @@ theorem staggeredPhatS_isHermitian (d L N : ℕ) [NeZero L] :
     (staggeredOrderDensity_mul_posSemidef_ft d L N).1).smul ?_)
   rw [isSelfAdjoint_iff, Complex.star_def, map_inv₀, Complex.conj_ofNat]
 
-/-- The expectation of `p̂` is nonnegative: `⟨Φ, p̂ Φ⟩.re = ½(⟨Φ, ô⁺ô⁻ Φ⟩.re + ⟨Φ, ô⁻ô⁺ Φ⟩.re) ≥ 0`,
-both summands being expectations of the Hermitian squares `ô⁺(ô⁺)ᴴ` and `(ô⁺)ᴴô⁺`. -/
+/-- The `p̂`-expectation factors as `⟨Φ, p̂ Φ⟩ = ½(⟨Φ, ô⁺ô⁻ Φ⟩ + ⟨Φ, ô⁻ô⁺ Φ⟩)` (as a complex
+number). -/
+theorem staggeredPhatS_dotProduct_mulVec_eq (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) :
+    star Φ ⬝ᵥ (staggeredPhatS d L N).mulVec Φ
+      = (2 : ℂ)⁻¹ * (star Φ ⬝ᵥ (staggeredOrderDensityOpS d L N true
+            * staggeredOrderDensityOpS d L N false).mulVec Φ
+          + star Φ ⬝ᵥ (staggeredOrderDensityOpS d L N false
+            * staggeredOrderDensityOpS d L N true).mulVec Φ) := by
+  unfold staggeredPhatS
+  rw [Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul, Matrix.add_mulVec, dotProduct_add]
+
+/-- **`p̂` is positive-semidefinite** as a matrix: `0 ≤ ⟨Φ, p̂ Φ⟩` in the complex order for every
+`Φ` (it is the `½`-average of the two Hermitian-square expectations). -/
+theorem staggeredPhatS_posSemidef (d L N : ℕ) [NeZero L] :
+    (staggeredPhatS d L N).PosSemidef := by
+  refine Matrix.PosSemidef.of_dotProduct_mulVec_nonneg (staggeredPhatS_isHermitian d L N)
+    (fun Φ => ?_)
+  rw [staggeredPhatS_dotProduct_mulVec_eq]
+  have hz1 := (staggeredOrderDensity_mul_posSemidef_tf d L N).dotProduct_mulVec_nonneg Φ
+  have hz2 := (staggeredOrderDensity_mul_posSemidef_ft d L N).dotProduct_mulVec_nonneg Φ
+  have h2 : (0 : ℂ) ≤ (2 : ℂ)⁻¹ := by
+    rw [Complex.le_def]; constructor <;> norm_num
+  exact mul_nonneg h2 (add_nonneg hz1 hz2)
+
+/-- The expectation of `p̂` is nonnegative: `⟨Φ, p̂ Φ⟩.re ≥ 0`. -/
 theorem staggeredPhatS_expectation_nonneg (d L N : ℕ) [NeZero L]
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) :
-    0 ≤ (star Φ ⬝ᵥ (staggeredPhatS d L N).mulVec Φ).re := by
-  have hn1 := (Complex.le_def.mp
-    ((staggeredOrderDensity_mul_posSemidef_tf d L N).dotProduct_mulVec_nonneg Φ)).1
-  have hn2 := (Complex.le_def.mp
-    ((staggeredOrderDensity_mul_posSemidef_ft d L N).dotProduct_mulVec_nonneg Φ)).1
-  simp only [Complex.zero_re] at hn1 hn2
-  unfold staggeredPhatS
-  rw [Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul, Matrix.add_mulVec, dotProduct_add,
-    Complex.mul_re, Complex.add_re,
-    show ((2 : ℂ)⁻¹).re = 1 / 2 from by norm_num,
-    show ((2 : ℂ)⁻¹).im = 0 from by norm_num, zero_mul, sub_zero]
-  linarith [hn1, hn2]
+    0 ≤ (star Φ ⬝ᵥ (staggeredPhatS d L N).mulVec Φ).re :=
+  (Complex.le_def.mp ((staggeredPhatS_posSemidef d L N).dotProduct_mulVec_nonneg Φ)).1
 
 end LatticeSystem.Quantum
