@@ -68,6 +68,15 @@ theorem hermitian_pow_dotProduct_split {n : Type*} [Fintype n] [DecidableEq n]
     star ((H ^ a).mulVec Φ) ⬝ᵥ ((H ^ b).mulVec Φ) = star Φ ⬝ᵥ (H ^ (a + b)).mulVec Φ := by
   rw [Matrix.star_mulVec, ← dotProduct_mulVec, (hH.pow a).eq, Matrix.mulVec_mulVec, ← pow_add]
 
+/-- **Hermitian quadratic forms are real**: `⟨Φ, H Φ⟩.im = 0` for Hermitian `H`. -/
+theorem hermitian_dotProduct_im_zero {n : Type*} [Fintype n] {H : Matrix n n ℂ}
+    (hH : H.IsHermitian) (Φ : n → ℂ) : (star Φ ⬝ᵥ H.mulVec Φ).im = 0 := by
+  classical
+  have h1 : (starRingEnd ℂ) (star Φ ⬝ᵥ H.mulVec Φ) = star Φ ⬝ᵥ H.mulVec Φ := by
+    rw [starRingEnd_apply, ← Matrix.star_dotProduct, Matrix.star_mulVec, hH.eq,
+      ← dotProduct_mulVec]
+  exact Complex.conj_eq_iff_im.mp h1
+
 /-- The **staggered raising order operator is the adjoint of the lowering one**:
 `(Ô_L^+)ᴴ = Ô_L^−` (each per-site `Ŝ⁺` adjoints to `Ŝ⁻`, and the staggered signs `±1` are real). -/
 theorem staggeredRaisingOpS_conjTranspose (A : Λ → Bool) :
@@ -119,6 +128,18 @@ theorem staggeredPhatS_isHermitian (d L N : ℕ) [NeZero L] :
   refine (((staggeredOrderDensity_mul_posSemidef_tf d L N).1.add
     (staggeredOrderDensity_mul_posSemidef_ft d L N).1).smul ?_)
   rw [isSelfAdjoint_iff, Complex.star_def, map_inv₀, Complex.conj_ofNat]
+
+/-- The **`p̂`-moment** `⟨Φ, p̂ᵏ Φ⟩` (real, since `p̂ᵏ` is Hermitian). -/
+noncomputable def phatMoment (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (k : ℕ) : ℝ :=
+  (star Φ ⬝ᵥ (staggeredPhatS d L N ^ k).mulVec Φ).re
+
+/-- The complex `p̂`-moment equals its (real) `phatMoment`. -/
+theorem phat_dotProduct_eq_phatMoment (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (k : ℕ) :
+    star Φ ⬝ᵥ (staggeredPhatS d L N ^ k).mulVec Φ = (phatMoment d L N Φ k : ℂ) := by
+  rw [phatMoment, Complex.ext_iff, Complex.ofReal_re, Complex.ofReal_im]
+  exact ⟨rfl, hermitian_dotProduct_im_zero ((staggeredPhatS_isHermitian d L N).pow k) Φ⟩
 
 /-- The `p̂`-expectation factors as `⟨Φ, p̂ Φ⟩ = ½(⟨Φ, ô⁺ô⁻ Φ⟩ + ⟨Φ, ô⁻ô⁺ Φ⟩)` (as a complex
 number). -/
