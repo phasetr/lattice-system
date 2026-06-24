@@ -807,4 +807,22 @@ theorem abs_sub_smul_sum_le {ι : Type*} (s : Finset ι) (c : ℝ) (hc : 0 ≤ c
     _ ≤ c * ∑ _i ∈ s, D := by gcongr with i hi; exact hbound i hi
     _ = D := by rw [Finset.sum_const, nsmul_eq_mul, ← mul_assoc, hcard, one_mul]
 
+/-- **Eigenvalue modulus is bounded by the operator norm**: if `B v = λ v` for `v ≠ 0`, then
+`‖λ‖ ≤ ‖B‖`.  This is the uniform `|λ_suf| ≤ N/V` engine for the renormalized R1 estimate. -/
+theorem eigenvalue_norm_le_manyBodyOperatorNormS {B : ManyBodyOpS Λ N} {lam : ℂ}
+    {v : (Λ → Fin (N + 1)) → ℂ} (hv : v ≠ 0) (h : B.mulVec v = lam • v) :
+    ‖lam‖ ≤ manyBodyOperatorNormS B := by
+  rw [manyBodyOperatorNormS_eq_toEuclideanCLM]
+  set x : EuclideanSpace ℂ (Λ → Fin (N + 1)) := WithLp.toLp 2 v with hxdef
+  have hxne : x ≠ 0 := by
+    intro hc
+    apply hv
+    have := congrArg WithLp.ofLp hc
+    simpa [hxdef] using this
+  have happ : Matrix.toEuclideanCLM (𝕜 := ℂ) B x = lam • x := by
+    rw [hxdef, Matrix.toEuclideanCLM_toLp, h, WithLp.toLp_smul]
+  have h1 := (Matrix.toEuclideanCLM (𝕜 := ℂ) B).le_opNorm x
+  rw [happ, norm_smul] at h1
+  exact le_of_mul_le_mul_right h1 (norm_pos_iff.mpr hxne)
+
 end LatticeSystem.Quantum
