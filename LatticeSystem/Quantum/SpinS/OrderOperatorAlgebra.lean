@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.AndersonTower
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.Normed.Module.FiniteDimension
+import Mathlib.Analysis.CStarAlgebra.Matrix
 
 /-!
 # Tasaki §4.2.2: the order-operator algebra and Lemma 4.14
@@ -40,6 +41,68 @@ triangle inequality — unlike the default entrywise matrix norm — so it is th
 order-operator bounds. -/
 noncomputable def manyBodyOperatorNormS (M : ManyBodyOpS Λ N) : ℝ :=
   ‖LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin M)‖
+
+/-- **Bridge to the bundled star-algebra image**: the many-body `L²` operator norm equals the
+operator norm of the continuous-linear-map image `Matrix.toEuclideanCLM M` (the two coincide because
+`toEuclideanCLM` is the bundled `toContinuousLinearMap ∘ toEuclideanLin`).  Routing through the
+`StarAlgEquiv` `toEuclideanCLM` lets the norm-algebra inequalities follow from the continuous-linear
+endomorphism `NormedRing`. -/
+theorem manyBodyOperatorNormS_eq_toEuclideanCLM (M : ManyBodyOpS Λ N) :
+    manyBodyOperatorNormS M = ‖Matrix.toEuclideanCLM (𝕜 := ℂ) M‖ := by
+  rw [manyBodyOperatorNormS]
+  congr 1
+
+/-- The many-body `L²` operator norm is nonnegative. -/
+theorem manyBodyOperatorNormS_nonneg (M : ManyBodyOpS Λ N) : 0 ≤ manyBodyOperatorNormS M :=
+  norm_nonneg _
+
+/-- The many-body `L²` operator norm of `0` is `0`. -/
+@[simp] theorem manyBodyOperatorNormS_zero : manyBodyOperatorNormS (0 : ManyBodyOpS Λ N) = 0 := by
+  rw [manyBodyOperatorNormS_eq_toEuclideanCLM, map_zero, norm_zero]
+
+/-- **Triangle inequality** for the many-body `L²` operator norm. -/
+theorem manyBodyOperatorNormS_add_le (M₁ M₂ : ManyBodyOpS Λ N) :
+    manyBodyOperatorNormS (M₁ + M₂) ≤ manyBodyOperatorNormS M₁ + manyBodyOperatorNormS M₂ := by
+  rw [manyBodyOperatorNormS_eq_toEuclideanCLM, manyBodyOperatorNormS_eq_toEuclideanCLM,
+    manyBodyOperatorNormS_eq_toEuclideanCLM, map_add]
+  exact norm_add_le _ _
+
+/-- **Subtraction triangle inequality** for the many-body `L²` operator norm. -/
+theorem manyBodyOperatorNormS_sub_le (M₁ M₂ : ManyBodyOpS Λ N) :
+    manyBodyOperatorNormS (M₁ - M₂) ≤ manyBodyOperatorNormS M₁ + manyBodyOperatorNormS M₂ := by
+  rw [manyBodyOperatorNormS_eq_toEuclideanCLM, manyBodyOperatorNormS_eq_toEuclideanCLM,
+    manyBodyOperatorNormS_eq_toEuclideanCLM, map_sub]
+  exact norm_sub_le _ _
+
+/-- **Scalar homogeneity** of the many-body `L²` operator norm. -/
+theorem manyBodyOperatorNormS_smul (c : ℂ) (M : ManyBodyOpS Λ N) :
+    manyBodyOperatorNormS (c • M) = ‖c‖ * manyBodyOperatorNormS M := by
+  rw [manyBodyOperatorNormS_eq_toEuclideanCLM, manyBodyOperatorNormS_eq_toEuclideanCLM, map_smul,
+    norm_smul]
+
+/-- **Submultiplicativity** of the many-body `L²` operator norm. -/
+theorem manyBodyOperatorNormS_mul_le (M₁ M₂ : ManyBodyOpS Λ N) :
+    manyBodyOperatorNormS (M₁ * M₂) ≤ manyBodyOperatorNormS M₁ * manyBodyOperatorNormS M₂ := by
+  rw [manyBodyOperatorNormS_eq_toEuclideanCLM, manyBodyOperatorNormS_eq_toEuclideanCLM,
+    manyBodyOperatorNormS_eq_toEuclideanCLM, map_mul]
+  exact norm_mul_le _ _
+
+/-- **Power submultiplicativity** of the many-body `L²` operator norm (for `n > 0`). -/
+theorem manyBodyOperatorNormS_pow_le (M : ManyBodyOpS Λ N) {n : ℕ} (hn : 0 < n) :
+    manyBodyOperatorNormS (M ^ n) ≤ manyBodyOperatorNormS M ^ n := by
+  rw [manyBodyOperatorNormS_eq_toEuclideanCLM, map_pow, manyBodyOperatorNormS_eq_toEuclideanCLM]
+  exact norm_pow_le' _ hn
+
+/-- **List-product submultiplicativity**: the norm of an ordered product is at most the product of
+the norms.  Used to bound `balancedOrderProductS`. -/
+theorem manyBodyOperatorNormS_list_prod_le (l : List (ManyBodyOpS Λ N)) :
+    manyBodyOperatorNormS l.prod ≤ (l.map manyBodyOperatorNormS).prod := by
+  induction l with
+  | nil => simp [manyBodyOperatorNormS_eq_toEuclideanCLM]
+  | cons a t ih =>
+    rw [List.prod_cons, List.map_cons, List.prod_cons]
+    refine le_trans (manyBodyOperatorNormS_mul_le a t.prod) ?_
+    exact mul_le_mul_of_nonneg_left ih (manyBodyOperatorNormS_nonneg a)
 
 /-- A sign sequence `s : Fin (2n) → Bool` (`true = +`, `false = −`) is **balanced** when it has
 exactly `n` pluses (hence `n` minuses), i.e. `Σ s_j = 0` in `±1` terms. -/
