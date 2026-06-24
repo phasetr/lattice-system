@@ -235,4 +235,72 @@ theorem phatMoment_sq_le (d L N : ℕ) [NeZero L]
     convert hcs using 3
     all_goals omega
 
+/-- **Cross log-convexity** of the `p̂`-moments: `m₁·mₙ ≤ m₀·mₙ₊₁` (the ratio `mₙ₊₁/mₙ` is
+increasing).  Pure consequence of `phatMoment_sq_le` + nonnegativity (no LRO). -/
+theorem phatMoment_cross (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (n : ℕ) :
+    phatMoment d L N Φ 1 * phatMoment d L N Φ n
+      ≤ phatMoment d L N Φ 0 * phatMoment d L N Φ (n + 1) := by
+  set m := phatMoment d L N Φ with hm
+  have hnn : ∀ j, 0 ≤ m j := phatMoment_nonneg d L N Φ
+  induction n with
+  | zero => exact le_of_eq (mul_comm _ _)
+  | succ k ih =>
+    have hsq : m (k + 1) ^ 2 ≤ m k * m (k + 2) := phatMoment_sq_le d L N Φ k
+    rcases eq_or_lt_of_le (hnn k) with h0 | hpos
+    · have hle : m (k + 1) ^ 2 ≤ 0 := by rw [← h0, zero_mul] at hsq; exact hsq
+      have hk1 : m (k + 1) = 0 := pow_eq_zero_iff two_ne_zero |>.mp (le_antisymm hle (sq_nonneg _))
+      rw [hk1, mul_zero]
+      exact mul_nonneg (hnn 0) (hnn (k + 1 + 1))
+    · have key : m k * (m 1 * m (k + 1)) ≤ m k * (m 0 * m (k + 2)) :=
+        calc m k * (m 1 * m (k + 1)) = (m 1 * m k) * m (k + 1) := by ring
+          _ ≤ (m 0 * m (k + 1)) * m (k + 1) := mul_le_mul_of_nonneg_right ih (hnn (k + 1))
+          _ = m 0 * m (k + 1) ^ 2 := by ring
+          _ ≤ m 0 * (m k * m (k + 2)) := mul_le_mul_of_nonneg_left hsq (hnn 0)
+          _ = m k * (m 0 * m (k + 2)) := by ring
+      exact le_of_mul_le_mul_left key hpos
+
+/-- **Geometric lower bound** for the `p̂`-moments: `m₁^{n+1} ≤ m₀ⁿ · mₙ₊₁` (iterating the cross
+log-convexity).  Pure (no LRO). -/
+theorem phatMoment_geom_le (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (n : ℕ) :
+    phatMoment d L N Φ 1 ^ (n + 1)
+      ≤ phatMoment d L N Φ 0 ^ n * phatMoment d L N Φ (n + 1) := by
+  set m := phatMoment d L N Φ with hm
+  have hnn : ∀ j, 0 ≤ m j := phatMoment_nonneg d L N Φ
+  induction n with
+  | zero => simp
+  | succ k ih =>
+    calc m 1 ^ (k + 2) = m 1 ^ (k + 1) * m 1 := by ring
+      _ ≤ (m 0 ^ k * m (k + 1)) * m 1 := by
+          exact mul_le_mul_of_nonneg_right ih (hnn 1)
+      _ = m 0 ^ k * (m 1 * m (k + 1)) := by ring
+      _ ≤ m 0 ^ k * (m 0 * m (k + 2)) :=
+          mul_le_mul_of_nonneg_left (phatMoment_cross d L N Φ (k + 1)) (pow_nonneg (hnn 0) k)
+      _ = m 0 ^ (k + 1) * m (k + 2) := by ring
+
+/-- **`p̂`-moment lower bound under long-range order** (eq. (4.2.37)): if `0 < m₀` and the LRO input
+`2q₀·m₀ ≤ m₁` holds (with `0 ≤ q₀`), then `(2q₀)^{n+1}·m₀ ≤ mₙ₊₁` (i.e. the normalized moment
+`⟨p̂ⁿ⁺¹⟩ ≥ (2q₀)^{n+1}`). -/
+theorem phatMoment_ge_of_lro (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) {q₀ : ℝ} (hq₀ : 0 ≤ q₀)
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1) (n : ℕ) :
+    (2 * q₀) ^ (n + 1) * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ (n + 1) := by
+  set m := phatMoment d L N Φ with hm
+  have h2q0 : 0 ≤ 2 * q₀ := mul_nonneg (by norm_num) hq₀
+  have hgeom := phatMoment_geom_le d L N Φ n
+  have hpow : (2 * q₀ * m 0) ^ (n + 1) ≤ m 1 ^ (n + 1) :=
+    pow_le_pow_left₀ (mul_nonneg h2q0 hm0.le) hlro (n + 1)
+  have hkey : (2 * q₀) ^ (n + 1) * m 0 ^ (n + 1) ≤ m 0 ^ n * m (n + 1) := by
+    calc (2 * q₀) ^ (n + 1) * m 0 ^ (n + 1)
+          = (2 * q₀ * m 0) ^ (n + 1) := (mul_pow (2 * q₀) (m 0) (n + 1)).symm
+      _ ≤ m 1 ^ (n + 1) := hpow
+      _ ≤ m 0 ^ n * m (n + 1) := hgeom
+  have hfinal : m 0 ^ n * ((2 * q₀) ^ (n + 1) * m 0) ≤ m 0 ^ n * m (n + 1) := by
+    calc m 0 ^ n * ((2 * q₀) ^ (n + 1) * m 0)
+          = (2 * q₀) ^ (n + 1) * m 0 ^ (n + 1) := by rw [pow_succ]; ring
+      _ ≤ m 0 ^ n * m (n + 1) := hkey
+  exact le_of_mul_le_mul_left hfinal (pow_pos hm0 n)
+
 end LatticeSystem.Quantum
