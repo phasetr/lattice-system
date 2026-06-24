@@ -63,6 +63,7 @@ import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingUniqueness
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingGroundUnique
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingEigenTransfer
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingMLMUnique
+import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingGroundData
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisGeneral
 import LatticeSystem.Quantum.SpinS.ShastryNoSSB
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO
