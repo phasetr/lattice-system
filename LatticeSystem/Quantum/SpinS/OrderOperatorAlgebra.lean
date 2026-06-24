@@ -337,6 +337,101 @@ theorem staggeredOrderDensityOpS_manyBodyOperatorNormS_le (d L N : ℕ) [NeZero 
         exact mul_le_mul_of_nonneg_left hbound (by positivity)
     _ = (N : ℝ) := by field_simp
 
+/-- The site-`x` raising operator commutes with the staggered lowering order operator except at its
+own site, where the single-site Cartan relation contributes `ε_x · onSiteS x (2 Ŝ³)`. -/
+private theorem spinSSiteOpPlus_commutator_staggeredLoweringOpS (A : Λ → Bool) (x : Λ) :
+    spinSSiteOpPlus x N * staggeredLoweringOpS A N
+      - staggeredLoweringOpS A N * spinSSiteOpPlus x N
+      = (if A x then (1 : ℂ) else (-1 : ℂ)) • onSiteS x ((2 : ℂ) • spinSOp3 N) := by
+  unfold staggeredLoweringOpS spinSSiteOpPlus spinSSiteOpMinus
+  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib,
+    Finset.sum_eq_single x]
+  · rw [mul_smul_comm, smul_mul_assoc, ← smul_sub, onSiteS_mul_onSiteS_same,
+      onSiteS_mul_onSiteS_same, ← onSiteS_sub, spinSOpPlus_commutator_spinSOpMinus]
+  · intro y _ hyx
+    rw [mul_smul_comm, smul_mul_assoc, ← smul_sub,
+      (onSiteS_commute_of_ne (Ne.symm hyx) (spinSOpPlus N) (spinSOpMinus N)).eq, sub_self,
+      smul_zero]
+  · intro h; exact absurd (Finset.mem_univ x) h
+
+/-- **Staggered order-operator commutator** (eq. (4.2.32)): `[Ô_L^+, Ô_L^-] = 2 Ŝ_tot^{(3)}`.  The
+staggered signs square to `1`, so the commutator is the unsigned total `Ŝ³`; cross-site terms vanish
+and each on-site term contributes the single-site Cartan relation `[Ŝ^+, Ŝ^-] = 2 Ŝ^{(3)}`. -/
+theorem staggeredOrder_commutator (A : Λ → Bool) :
+    staggeredRaisingOpS A N * staggeredLoweringOpS A N
+      - staggeredLoweringOpS A N * staggeredRaisingOpS A N
+      = (2 : ℂ) • (totalSpinSOp3 Λ N) := by
+  have hsum : (totalSpinSOp3 Λ N) = ∑ x : Λ, onSiteS x (spinSOp3 N) := rfl
+  unfold staggeredRaisingOpS
+  rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib, hsum, Finset.smul_sum]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [smul_mul_assoc, mul_smul_comm, ← smul_sub,
+    spinSSiteOpPlus_commutator_staggeredLoweringOpS, smul_smul,
+    show (if A x then (1 : ℂ) else (-1 : ℂ)) * (if A x then (1 : ℂ) else (-1 : ℂ)) = 1
+      from by split_ifs <;> ring, one_smul, onSiteS_smul]
+
+/-- **Per-site `Ŝ³` norm bound** `‖Ŝₓ^{(3)}‖ ≤ N/2` (`= S`): `Ŝ^{(3)}` is the diagonal of magnetic
+quantum numbers `m_k = N/2 − k ∈ [−N/2, N/2]`. -/
+theorem onSiteS_spinSOp3_manyBodyOperatorNormS_le (x : Λ) :
+    manyBodyOperatorNormS (onSiteS x (spinSOp3 N)) ≤ (N : ℝ) / 2 := by
+  rw [show spinSOp3 N = Matrix.diagonal (fun k : Fin (N + 1) => ((N : ℂ) / 2 - (k.val : ℂ)))
+      from rfl, onSiteS_diagonal]
+  refine manyBodyOperatorNormS_diagonal_le (by positivity) (fun σ => ?_)
+  have hk : ((σ x).val : ℝ) ≤ (N : ℝ) := by exact_mod_cast Nat.lt_succ_iff.mp (σ x).isLt
+  have hk0 : (0 : ℝ) ≤ ((σ x).val : ℝ) := by positivity
+  rw [show ((N : ℂ) / 2 - ((σ x).val : ℂ)) = (((N : ℝ) / 2 - ((σ x).val : ℝ)) : ℝ)
+      from by push_cast; ring, Complex.norm_real, Real.norm_eq_abs, abs_le]
+  constructor <;> linarith
+
+/-- **Total `Ŝ³` norm bound** `‖Ŝ_tot^{(3)}‖ ≤ V·N/2`: triangle inequality over the `V` sites. -/
+theorem totalSpinSOp3_manyBodyOperatorNormS_le :
+    manyBodyOperatorNormS (totalSpinSOp3 Λ N) ≤ (Fintype.card Λ : ℝ) * (N : ℝ) / 2 := by
+  rw [show (totalSpinSOp3 Λ N) = ∑ x : Λ, onSiteS x (spinSOp3 N) from rfl]
+  refine le_trans (manyBodyOperatorNormS_sum_le _ _) ?_
+  calc ∑ x : Λ, manyBodyOperatorNormS (onSiteS x (spinSOp3 N))
+      ≤ ∑ _x : Λ, (N : ℝ) / 2 :=
+        Finset.sum_le_sum (fun x _ => onSiteS_spinSOp3_manyBodyOperatorNormS_le x)
+    _ = (Fintype.card Λ : ℝ) * (N : ℝ) / 2 := by
+        rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]; ring
+
+/-- **Per-volume order-operator commutator norm bound** `‖[ô⁺, ô⁻]‖ ≤ N/V` (eq. (4.2.33),
+`o₀ = N`): `[ô⁺, ô⁻] = V⁻² [Ô⁺, Ô⁻] = V⁻² · 2 Ŝ_tot^{(3)}`, with `‖Ŝ_tot^{(3)}‖ ≤ V·N/2`. -/
+theorem staggeredOrderDensity_commutator_manyBodyOperatorNormS_le (d L N : ℕ) [NeZero L]
+    (hN : 1 ≤ N) :
+    manyBodyOperatorNormS
+        (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+          - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+      ≤ (N : ℝ) / (L : ℝ) ^ d := by
+  have hLpos : (0 : ℝ) < (L : ℝ) ^ d := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    positivity
+  have hcard : (Fintype.card (HypercubicTorus d L) : ℝ) = (L : ℝ) ^ d := by
+    rw [card_hypercubicTorus]; push_cast; ring
+  have htrue : staggeredOrderDensityOpS d L N true
+      = ((L : ℂ) ^ d)⁻¹ • staggeredRaisingOpS (torusParitySublattice d L) N := rfl
+  have hfalse : staggeredOrderDensityOpS d L N false
+      = ((L : ℂ) ^ d)⁻¹ • staggeredLoweringOpS (torusParitySublattice d L) N := rfl
+  have hcomm : staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+      - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true
+      = (((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) •
+          ((2 : ℂ) • (totalSpinSOp3 (HypercubicTorus d L) N)) := by
+    rw [htrue, hfalse, smul_mul_smul_comm, smul_mul_smul_comm, ← smul_sub,
+      staggeredOrder_commutator]
+  rw [hcomm, manyBodyOperatorNormS_smul, manyBodyOperatorNormS_smul]
+  have hc1 : ‖((L : ℂ) ^ d)⁻¹‖ = ((L : ℝ) ^ d)⁻¹ := by
+    rw [norm_inv, norm_pow, Complex.norm_natCast]
+  have hc : ‖((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹‖ = ((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ := by
+    rw [norm_mul, hc1]
+  have hc2 : ‖(2 : ℂ)‖ = 2 := by simp
+  rw [hc, hc2]
+  have hS := totalSpinSOp3_manyBodyOperatorNormS_le (Λ := HypercubicTorus d L) (N := N)
+  rw [hcard] at hS
+  calc ((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * manyBodyOperatorNormS _)
+      ≤ ((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * ((L : ℝ) ^ d * (N : ℝ) / 2)) := by
+        refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+        exact mul_le_mul_of_nonneg_left hS (by norm_num)
+    _ = (N : ℝ) / (L : ℝ) ^ d := by field_simp
+
 /-- **Tasaki Lemma 4.14 (order-operator algebra estimate), AXIOM.**  For any balanced sign sequence
 `s` of length `2n` (`n > 0`), the `L²` operator norm of the difference between the ordered product
 `ô^{s₁} ⋯ ô^{s_{2n}}` and `p̂ⁿ` is bounded by `n² (o₀)^{2n−1} / V`, where `o₀ = 2S = N` and
