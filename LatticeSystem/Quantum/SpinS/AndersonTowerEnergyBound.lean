@@ -614,4 +614,55 @@ theorem phatMoment_succ_two_q0_le (d L N : ℕ) [NeZero L]
       _ ≤ phatMoment d L N Φ 0 * phatMoment d L N Φ (n + 1) := hcross
   exact le_of_mul_le_mul_left hkey hm0'
 
+/-! ### Sector commutators `[Ŝ³_tot, Ô^±] = ±Ô^±` (P8-1) -/
+
+/-- Per-site step of `[Ŝ³_tot, Ô⁺] = Ô⁺`: on-site Cartan relation `[Ŝ³, Ŝ⁺] = Ŝ⁺`. -/
+private theorem spinSSiteOp3_commutator_staggeredRaisingOpS (A : Λ → Bool) (x : Λ) :
+    spinSSiteOp3 x N * staggeredRaisingOpS A N - staggeredRaisingOpS A N * spinSSiteOp3 x N
+      = (if A x then (1 : ℂ) else (-1 : ℂ)) • spinSSiteOpPlus x N := by
+  unfold staggeredRaisingOpS spinSSiteOp3 spinSSiteOpPlus
+  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib, Finset.sum_eq_single x]
+  · rw [mul_smul_comm, smul_mul_assoc, ← smul_sub, onSiteS_mul_onSiteS_same,
+      onSiteS_mul_onSiteS_same, ← onSiteS_sub, spinSOp3_commutator_spinSOpPlus]
+  · intro y _ hyx
+    rw [mul_smul_comm, smul_mul_assoc, ← smul_sub,
+      (onSiteS_commute_of_ne (Ne.symm hyx) (spinSOp3 N) (spinSOpPlus N)).eq, sub_self, smul_zero]
+  · intro h; exact absurd (Finset.mem_univ x) h
+
+/-- **Sector commutator** `[Ŝ³_tot, Ô_L⁺] = Ô_L⁺` (the raising order operator increases the total
+magnetization by one). -/
+theorem totalSpinSOp3_commutator_staggeredRaisingOpS (A : Λ → Bool) :
+    totalSpinSOp3 Λ N * staggeredRaisingOpS A N - staggeredRaisingOpS A N * totalSpinSOp3 Λ N
+      = staggeredRaisingOpS A N := by
+  have hsum : (totalSpinSOp3 Λ N : ManyBodyOpS Λ N) = ∑ x : Λ, spinSSiteOp3 x N := rfl
+  rw [hsum, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  conv_rhs => rw [staggeredRaisingOpS]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [spinSSiteOp3_commutator_staggeredRaisingOpS]
+
+/-- Per-site step of `[Ŝ³_tot, Ô⁻] = −Ô⁻`: on-site Cartan relation `[Ŝ³, Ŝ⁻] = −Ŝ⁻`. -/
+private theorem spinSSiteOp3_commutator_staggeredLoweringOpS (A : Λ → Bool) (x : Λ) :
+    spinSSiteOp3 x N * staggeredLoweringOpS A N - staggeredLoweringOpS A N * spinSSiteOp3 x N
+      = -((if A x then (1 : ℂ) else (-1 : ℂ)) • spinSSiteOpMinus x N) := by
+  unfold staggeredLoweringOpS spinSSiteOp3 spinSSiteOpMinus
+  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib, Finset.sum_eq_single x]
+  · rw [mul_smul_comm, smul_mul_assoc, ← smul_sub, onSiteS_mul_onSiteS_same,
+      onSiteS_mul_onSiteS_same, ← onSiteS_sub, spinSOp3_commutator_spinSOpMinus, onSiteS_neg,
+      smul_neg]
+  · intro y _ hyx
+    rw [mul_smul_comm, smul_mul_assoc, ← smul_sub,
+      (onSiteS_commute_of_ne (Ne.symm hyx) (spinSOp3 N) (spinSOpMinus N)).eq, sub_self, smul_zero]
+  · intro h; exact absurd (Finset.mem_univ x) h
+
+/-- **Sector commutator** `[Ŝ³_tot, Ô_L⁻] = −Ô_L⁻` (the lowering order operator decreases the total
+magnetization by one). -/
+theorem totalSpinSOp3_commutator_staggeredLoweringOpS (A : Λ → Bool) :
+    totalSpinSOp3 Λ N * staggeredLoweringOpS A N - staggeredLoweringOpS A N * totalSpinSOp3 Λ N
+      = -staggeredLoweringOpS A N := by
+  have hsum : (totalSpinSOp3 Λ N : ManyBodyOpS Λ N) = ∑ x : Λ, spinSSiteOp3 x N := rfl
+  rw [hsum, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  conv_rhs => rw [staggeredLoweringOpS, ← Finset.sum_neg_distrib]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [spinSSiteOp3_commutator_staggeredLoweringOpS]
+
 end LatticeSystem.Quantum
