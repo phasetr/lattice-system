@@ -1142,4 +1142,32 @@ theorem orderWord_balanced_re_close (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
       _ = q₀ * phatMoment d L N Φ m := by ring
       _ ≤ 1 / 2 * phatMoment d L N Φ (m + 1) := by linarith [hratio]
 
+/-- **Lemma R1 (eq. (4.2.67)).**  Under `3 N n² ≤ 2 q₀ V`, the real expectation of a balanced order
+product is pinched between `½ P_n` and `2 P_n`. -/
+theorem renormalized_balanced_product_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1)
+    {n : ℕ} (s : Fin (2 * n) → Bool) (hbal : BalancedSigns s)
+    (hcond : 3 * (N : ℝ) * (n : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d) :
+    (1 / 2) * phatMoment d L N Φ n
+        ≤ |(star Φ ⬝ᵥ (balancedOrderProductS d L N n s).mulVec Φ).re|
+      ∧ |(star Φ ⬝ᵥ (balancedOrderProductS d L N n s).mulVec Φ).re|
+        ≤ 2 * phatMoment d L N Φ n := by
+  have hwt : (List.ofFn s).count true = n := by rw [count_true_ofFn]; exact hbal
+  have hwf : (List.ofFn s).count false = n := by
+    have := count_true_add_count_false (List.ofFn s); rw [List.length_ofFn] at this; omega
+  have heq : balancedOrderProductS d L N n s = orderWordProd d L N (List.ofFn s) := by
+    rw [balancedOrderProductS, orderWordProd, List.map_ofFn]; rfl
+  rw [heq]
+  have hclose := orderWord_balanced_re_close d L N hN Φ hsing hm0 hlro n hcond (List.ofFn s) hwt hwf
+  rw [abs_le] at hclose
+  have hPn := phatMoment_nonneg d L N Φ n
+  have hge : 1 / 2 * phatMoment d L N Φ n
+      ≤ (star Φ ⬝ᵥ (orderWordProd d L N (List.ofFn s)).mulVec Φ).re := by linarith [hclose.1]
+  refine ⟨le_trans hge (le_abs_self _), ?_⟩
+  rw [abs_of_nonneg (le_trans (by linarith [hPn] : (0:ℝ) ≤ 1 / 2 * phatMoment d L N Φ n) hge)]
+  linarith [hclose.2]
+
 end LatticeSystem.Quantum
