@@ -582,4 +582,36 @@ theorem phatMoment_one_ge_of_lro (d L N : ℕ) [NeZero L]
   apply mul_le_mul_of_nonneg_left _ (le_of_lt (inv_pos.mpr hV2))
   exact mul_le_mul_of_nonneg_left hz3 (by norm_num)
 
+/-- The zeroth `p̂`-moment is the squared norm: `m₀ = ‖Φ‖²`. -/
+theorem phatMoment_zero (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) :
+    phatMoment d L N Φ 0 = (star Φ ⬝ᵥ Φ).re := by
+  rw [phatMoment, pow_zero, Matrix.one_mulVec]
+
+/-- **Renormalized moment ratio** `2 q₀ mₙ ≤ mₙ₊₁` (the engine of Lemma R1): combining the
+log-convexity cross inequality `m₁ mₙ ≤ m₀ mₙ₊₁` with the LRO entry `2 q₀ m₀ ≤ m₁` and cancelling
+`m₀ > 0`.  Iterating recovers `(2 q₀)ⁿ m₀ ≤ mₙ`. -/
+theorem phatMoment_succ_two_q0_le (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing3 : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0)
+    (hsing1 : (totalSpinSOp1 (HypercubicTorus d L) N).mulVec Φ = 0)
+    (q₀ : ℝ) (hm0 : 0 < (star Φ ⬝ᵥ Φ).re) (hL : (0 : ℝ) < (L : ℝ) ^ d)
+    (hlro : q₀ ≤ (star Φ ⬝ᵥ (staggeredOrderOpS (torusParitySublattice d L) N
+        * staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ).re
+        / ((star Φ ⬝ᵥ Φ).re * ((L : ℝ) ^ d) ^ 2)) (n : ℕ) :
+    2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1) := by
+  have hP7 : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1 := by
+    rw [phatMoment_zero]; exact phatMoment_one_ge_of_lro d L N Φ hsing3 hsing1 q₀ hm0 hL hlro
+  have hcross := phatMoment_cross d L N Φ n
+  have hm0' : 0 < phatMoment d L N Φ 0 := by rw [phatMoment_zero]; exact hm0
+  have hmn : 0 ≤ phatMoment d L N Φ n := phatMoment_nonneg d L N Φ n
+  have hkey : phatMoment d L N Φ 0 * (2 * q₀ * phatMoment d L N Φ n)
+      ≤ phatMoment d L N Φ 0 * phatMoment d L N Φ (n + 1) :=
+    calc phatMoment d L N Φ 0 * (2 * q₀ * phatMoment d L N Φ n)
+        = (2 * q₀ * phatMoment d L N Φ 0) * phatMoment d L N Φ n := by ring
+      _ ≤ phatMoment d L N Φ 1 * phatMoment d L N Φ n :=
+          mul_le_mul_of_nonneg_right hP7 hmn
+      _ ≤ phatMoment d L N Φ 0 * phatMoment d L N Φ (n + 1) := hcross
+  exact le_of_mul_le_mul_left hkey hm0'
+
 end LatticeSystem.Quantum
