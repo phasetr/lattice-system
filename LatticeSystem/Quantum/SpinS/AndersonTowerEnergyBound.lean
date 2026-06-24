@@ -172,4 +172,47 @@ theorem staggeredPhatS_expectation_nonneg (d L N : ℕ) [NeZero L]
     0 ≤ (star Φ ⬝ᵥ (staggeredPhatS d L N).mulVec Φ).re :=
   (Complex.le_def.mp ((staggeredPhatS_posSemidef d L N).dotProduct_mulVec_nonneg Φ)).1
 
+/-- **Log-convexity of the `p̂`-moments** (Cauchy–Schwarz, eq. (4.2.35)):
+`⟨p̂ⁿ⁺¹⟩² ≤ ⟨p̂ⁿ⟩ · ⟨p̂ⁿ⁺²⟩`.  Even centres use the standard inner product (`M = 1`), odd
+centres the `p̂`-weighted form (`M = p̂`); both reduce to the positive-semidefinite Cauchy–Schwarz
+of the moments read as `p̂`-power inner products. -/
+theorem phatMoment_sq_le (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (n : ℕ) :
+    (phatMoment d L N Φ (n + 1)) ^ 2
+      ≤ phatMoment d L N Φ n * phatMoment d L N Φ (n + 2) := by
+  have hH := staggeredPhatS_isHermitian d L N
+  rcases Nat.even_or_odd n with ⟨a, ha⟩ | ⟨a, ha⟩
+  · -- `n = a + a` (even centre `n+1`): `M = 1`.
+    have hone : (1 : Matrix (HypercubicTorus d L → Fin (N + 1))
+        (HypercubicTorus d L → Fin (N + 1)) ℂ).PosSemidef :=
+      Matrix.PosSemidef.of_dotProduct_mulVec_nonneg Matrix.isHermitian_one
+        (fun x => by rw [Matrix.one_mulVec]; exact dotProduct_star_self_nonneg x)
+    have hcs := posSemidef_re_dotProduct_mulVec_sq_le hone
+      ((staggeredPhatS d L N ^ a).mulVec Φ) ((staggeredPhatS d L N ^ (a + 1)).mulVec Φ)
+    simp only [Matrix.one_mulVec] at hcs
+    rw [hermitian_pow_dotProduct_split hH a (a + 1) Φ,
+      hermitian_pow_dotProduct_split hH a a Φ,
+      hermitian_pow_dotProduct_split hH (a + 1) (a + 1) Φ,
+      phat_dotProduct_eq_phatMoment, phat_dotProduct_eq_phatMoment,
+      phat_dotProduct_eq_phatMoment, Complex.ofReal_re, Complex.ofReal_re,
+      Complex.ofReal_re] at hcs
+    subst ha
+    convert hcs using 3
+    all_goals omega
+  · -- `n = 2a+1` (odd centre `n+1`): `M = p̂`.
+    have hpm : ∀ k : ℕ, (staggeredPhatS d L N).mulVec ((staggeredPhatS d L N ^ k).mulVec Φ)
+        = (staggeredPhatS d L N ^ (k + 1)).mulVec Φ :=
+      fun k => by rw [Matrix.mulVec_mulVec, ← pow_succ']
+    have hcs := posSemidef_re_dotProduct_mulVec_sq_le (staggeredPhatS_posSemidef d L N)
+      ((staggeredPhatS d L N ^ a).mulVec Φ) ((staggeredPhatS d L N ^ (a + 1)).mulVec Φ)
+    rw [hpm a, hpm (a + 1), hermitian_pow_dotProduct_split hH a (a + 2) Φ,
+      hermitian_pow_dotProduct_split hH a (a + 1) Φ,
+      hermitian_pow_dotProduct_split hH (a + 1) (a + 2) Φ,
+      phat_dotProduct_eq_phatMoment, phat_dotProduct_eq_phatMoment,
+      phat_dotProduct_eq_phatMoment, Complex.ofReal_re, Complex.ofReal_re,
+      Complex.ofReal_re] at hcs
+    subst ha
+    convert hcs using 3
+    all_goals omega
+
 end LatticeSystem.Quantum
