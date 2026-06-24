@@ -8517,18 +8517,24 @@ genuine order parameter by a realizing unperturbed ground state (\texttt{IsTanak
 exact LRO/SSB limits, as in Theorem 4.11), unsatisfiable in $d=1$.  Combined with Theorem 4.11 this
 gives $\ge m^\ast\ge\sqrt{3q_0}>0$.  Chapters~3--10 backfill.
 
-\noindent\textbf{Lemma 4.14} (Tasaki §4.2.2, eqs.~(4.2.30)--(4.2.34), pp.~104--105; documented axiom,
-\texttt{Quantum/SpinS/OrderOperatorAlgebra.lean}, Issue \#4485).  The order-operator algebra estimate
-underlying the tower proofs.  With the per-volume order operators $\hat o^{\pm}=\hat O_L^{\pm}/V$
-($V=L^d$, \texttt{staggeredOrderDensityOpS}) and $\hat p=\tfrac12(\hat o^+\hat o^-+\hat o^-\hat o^+)$
-(\texttt{staggeredPhatS}, eq.~(4.2.31)), and the commutator bound $\lVert[\hat o^+,\hat o^-]\rVert\le
-o_0/V$ (eq.~(4.2.33), $o_0=2S=N$): for any balanced sign sequence $s$ of length $2n$
-(\texttt{BalancedSigns}, $n$ pluses), $\lVert\hat o^{s_1}\cdots\hat o^{s_{2n}}-\hat p^{\,n}\rVert\le
-n^2 N^{2n-1}/L^d$ (eq.~(4.2.34)) in the genuine $L^2$ operator norm \texttt{manyBodyOperatorNormS} (via
-\texttt{toEuclideanLin}, not the entrywise matrix norm).  The axiom
-\texttt{staggered\_balanced\_order\_product\_norm\_le} records this elementary-but-involved
-finite-volume estimate (a discharge candidate via commutator rearrangement).  Chapters~3--10
-backfill.
+\noindent\textbf{Lemma 4.14} (Tasaki §4.2.2, eqs.~(4.2.30)--(4.2.34), pp.~104--105; \textbf{PROVED
+axiom-free}, \texttt{Quantum/SpinS/OrderOperatorAlgebra.lean}, Issues \#4485/\#4769).  The
+order-operator algebra estimate underlying the tower proofs.  With the per-volume order operators
+$\hat o^{\pm}=\hat O_L^{\pm}/V$ ($V=L^d$, \texttt{staggeredOrderDensityOpS}) and $\hat
+p=\tfrac12(\hat o^+\hat o^-+\hat o^-\hat o^+)$ (\texttt{staggeredPhatS}, eq.~(4.2.31)), and the
+commutator bound $\lVert[\hat o^+,\hat o^-]\rVert\le o_0/V$ (eq.~(4.2.33), $o_0=2S=N$): for any
+balanced sign sequence $s$ of length $2n$ (\texttt{BalancedSigns}, $n$ pluses), $\lVert\hat
+o^{s_1}\cdots\hat o^{s_{2n}}-\hat p^{\,n}\rVert\le n^2 N^{2n-1}/L^d$ (eq.~(4.2.34)) in the genuine
+$L^2$ operator norm \texttt{manyBodyOperatorNormS} (bridged to the bundled \texttt{toEuclideanCLM},
+not the entrywise matrix norm).  \texttt{staggered\_balanced\_order\_product\_norm\_le} is now a
+proved theorem: the $L^2$-norm algebra (submultiplicativity/triangle via the star-algebra equivalence
+\texttt{toEuclideanCLM}), the per-site bounds $\lVert\hat S_x^{\pm}\rVert\le N$ (via the $C^*$-identity
+and the diagonal $\hat S^-\hat S^+$ with entries $k(N-k+1)\le N^2$) and $\lVert\hat o^{\pm}\rVert\le
+N$, the staggered commutator $[\hat O^+,\hat O^-]=2\hat S^{(3)}_{\mathrm{tot}}$ giving $\lVert[\hat
+o^+,\hat o^-]\rVert\le N/V$, a permutation-group-free adjacent-swap telescoping
+(\texttt{SwapChain}/\texttt{swapDist\_le}, diameter $\le n^2$) bounding any two balanced words'
+products by $n^2 N^{2n-1}/V$, and the noncommutative binomial expansion of $\hat p^{\,n}$ as the
+uniform $(\tfrac12)^n$-combination of the $2^n$ block words.  Chapters~3--10 backfill.
 
 \noindent\textbf{Lemma 4.15} (Tasaki §4.2.2, eqs.~(4.2.38)--(4.2.39), pp.~105--106; documented axiom,
 \texttt{Quantum/SpinS/OrderOperatorAlgebra.lean}, Issue \#4485).  The order parameter as a $\hat
