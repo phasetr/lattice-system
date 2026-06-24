@@ -104,6 +104,147 @@ theorem manyBodyOperatorNormS_list_prod_le (l : List (ManyBodyOpS Λ N)) :
     refine le_trans (manyBodyOperatorNormS_mul_le a t.prod) ?_
     exact mul_le_mul_of_nonneg_left ih (manyBodyOperatorNormS_nonneg a)
 
+section L2Wrappers
+open scoped Matrix.Norms.L2Operator
+
+/-- The many-body `L²` operator norm coincides with the scoped `Matrix.Norms.L2Operator` norm. -/
+theorem manyBodyOperatorNormS_eq_l2 (M : ManyBodyOpS Λ N) :
+    manyBodyOperatorNormS M = ‖M‖ := by
+  rw [manyBodyOperatorNormS_eq_toEuclideanCLM, Matrix.l2_opNorm_toEuclideanCLM]
+
+/-- The many-body `L²` operator norm is invariant under conjugate transpose. -/
+theorem manyBodyOperatorNormS_conjTranspose (M : ManyBodyOpS Λ N) :
+    manyBodyOperatorNormS (Matrix.conjTranspose M) = manyBodyOperatorNormS M := by
+  rw [manyBodyOperatorNormS_eq_l2, manyBodyOperatorNormS_eq_l2, Matrix.l2_opNorm_conjTranspose]
+
+/-- `C*`-identity for the many-body `L²` operator norm: `‖MᴴM‖ = ‖M‖²`. -/
+theorem manyBodyOperatorNormS_conjTranspose_mul_self (M : ManyBodyOpS Λ N) :
+    manyBodyOperatorNormS (Matrix.conjTranspose M * M) = manyBodyOperatorNormS M ^ 2 := by
+  rw [manyBodyOperatorNormS_eq_l2, manyBodyOperatorNormS_eq_l2,
+    Matrix.l2_opNorm_conjTranspose_mul_self, sq]
+
+/-- The `L²` operator norm of a diagonal many-body operator bounded by `C` when every entry is. -/
+theorem manyBodyOperatorNormS_diagonal_le {v : (Λ → Fin (N + 1)) → ℂ} {C : ℝ} (hC : 0 ≤ C)
+    (h : ∀ σ, ‖v σ‖ ≤ C) : manyBodyOperatorNormS (Matrix.diagonal v) ≤ C := by
+  rw [manyBodyOperatorNormS_eq_l2, Matrix.l2_opNorm_diagonal]
+  exact (pi_norm_le_iff_of_nonneg hC).2 h
+
+end L2Wrappers
+
+/-- The site-embedded image of a diagonal single-site matrix is again diagonal, with entry indexed
+by the local configuration value `σ i`. -/
+theorem onSiteS_diagonal (i : Λ) (w : Fin (N + 1) → ℂ) :
+    (onSiteS i (Matrix.diagonal w) : ManyBodyOpS Λ N)
+      = Matrix.diagonal (fun σ => w (σ i)) := by
+  ext σ' σ
+  simp only [onSiteS_apply, Matrix.diagonal_apply]
+  by_cases h : σ' = σ
+  · subst h; simp
+  · rw [if_neg h]
+    by_cases hoff : ∀ k, k ≠ i → σ' k = σ k
+    · have hi : ¬ σ' i = σ i := fun hi => h (funext fun k => by
+        by_cases hk : k = i
+        · rw [hk]; exact hi
+        · exact hoff k hk)
+      rw [if_pos hoff, if_neg hi]
+    · rw [if_neg hoff]
+
+/-- **Single-site `Ŝ⁻Ŝ⁺` is diagonal** with entry `k ↦ k(N−k+1)` at index `k` (`m = N/2 − k`):
+the off-diagonal terms vanish (both factors require the same raising index), and the diagonal entry
+is the squared raising amplitude `(√(k(N−k+1)))²`. -/
+theorem spinSOpMinus_mul_spinSOpPlus_apply (N : ℕ) (i j : Fin (N + 1)) :
+    (spinSOpMinus N * spinSOpPlus N) i j
+      = if i = j then ((i.val : ℂ) * ((N : ℂ) - (i.val : ℂ) + 1)) else 0 := by
+  rw [Matrix.mul_apply]
+  have hg : ∀ l : Fin (N + 1), spinSOpMinus N i l * spinSOpPlus N l j
+      = if (l.val + 1 = i.val ∧ l.val + 1 = j.val)
+          then ((i.val : ℂ) * ((N : ℂ) - (i.val : ℂ) + 1)) else 0 := by
+    intro l
+    unfold spinSOpMinus spinSOpPlus
+    by_cases hi : l.val + 1 = i.val
+    · by_cases hj : l.val + 1 = j.val
+      · rw [if_pos hi, if_pos hj, if_pos ⟨hi, hj⟩, ← Complex.ofReal_mul]
+        have hiR : (l.val : ℝ) + 1 = (i.val : ℝ) := by exact_mod_cast hi
+        have hjR : (l.val : ℝ) + 1 = (j.val : ℝ) := by exact_mod_cast hj
+        have hN_le : (i.val : ℝ) ≤ (N : ℝ) := by exact_mod_cast Nat.lt_succ_iff.mp i.isLt
+        have key : Real.sqrt (((N : ℝ) - (l.val : ℝ)) * ((l.val : ℝ) + 1))
+            * Real.sqrt ((j.val : ℝ) * ((N : ℝ) - (j.val : ℝ) + 1))
+              = (i.val : ℝ) * ((N : ℝ) - (i.val : ℝ) + 1) := by
+          have e1 : ((N : ℝ) - (l.val : ℝ)) * ((l.val : ℝ) + 1)
+              = (i.val : ℝ) * ((N : ℝ) - (i.val : ℝ) + 1) := by
+            have hli : (l.val : ℝ) = (i.val : ℝ) - 1 := by linarith
+            rw [hli]; ring
+          have e2 : (j.val : ℝ) * ((N : ℝ) - (j.val : ℝ) + 1)
+              = (i.val : ℝ) * ((N : ℝ) - (i.val : ℝ) + 1) := by
+            have hji : (j.val : ℝ) = (i.val : ℝ) := by linarith
+            rw [hji]
+          rw [e1, e2]
+          exact Real.mul_self_sqrt (by nlinarith [hN_le, show (0:ℝ) ≤ (i.val : ℝ) by positivity])
+        rw [key]; push_cast; ring
+      · rw [if_pos hi, if_neg hj, mul_zero, if_neg (by tauto)]
+    · rw [if_neg hi, zero_mul, if_neg (by tauto)]
+  rw [Finset.sum_congr rfl (fun l _ => hg l)]
+  by_cases hij : i = j
+  · subst hij
+    rw [if_pos rfl]
+    by_cases hi0 : i.val = 0
+    · rw [Finset.sum_eq_zero (fun l _ => if_neg (by omega))]
+      have : (i.val : ℂ) = 0 := by rw [hi0]; simp
+      rw [this]; ring
+    · have hlt : i.val - 1 < N + 1 := by omega
+      have hval : (⟨i.val - 1, hlt⟩ : Fin (N + 1)).val = i.val - 1 := rfl
+      refine (Finset.sum_eq_single (⟨i.val - 1, hlt⟩ : Fin (N + 1)) ?_ ?_).trans ?_
+      · intro l _ hne
+        refine if_neg ?_
+        rintro ⟨h1, _⟩
+        exact hne (Fin.ext (by omega))
+      · intro h; exact absurd (Finset.mem_univ _) h
+      · exact if_pos ⟨by rw [hval]; omega, by rw [hval]; omega⟩
+  · rw [if_neg hij]
+    refine Finset.sum_eq_zero (fun l _ => if_neg ?_)
+    rintro ⟨h1, h2⟩
+    exact hij (Fin.ext (by omega))
+
+/-- The diagonal entry `k(N−k+1)` of `Ŝ⁻Ŝ⁺` is real, nonnegative and bounded by `N²` (`N ≥ 1`),
+by the AM–GM bound `k(N−k+1) ≤ ((N+1)/2)² ≤ N²`. -/
+private theorem spinSDiag_norm_le_sq (N : ℕ) (hN : 1 ≤ N) (k : Fin (N + 1)) :
+    ‖((k.val : ℂ) * ((N : ℂ) - (k.val : ℂ) + 1))‖ ≤ (N : ℝ) ^ 2 := by
+  have hle : ((k.val : ℝ)) ≤ (N : ℝ) := by exact_mod_cast Nat.lt_succ_iff.mp k.isLt
+  have hge : (0 : ℝ) ≤ ((k.val : ℝ)) := by positivity
+  have hNr : (1 : ℝ) ≤ (N : ℝ) := by exact_mod_cast hN
+  have hz : ((k.val : ℂ) * ((N : ℂ) - (k.val : ℂ) + 1))
+      = (((k.val : ℝ) * ((N : ℝ) - (k.val : ℝ) + 1)) : ℝ) := by push_cast; ring
+  rw [hz, Complex.norm_real, Real.norm_of_nonneg (by nlinarith)]
+  nlinarith
+
+/-- **Per-site raising-operator norm bound** `‖Ŝₓ⁺‖ ≤ N` (`= 2S`): via
+`‖Ŝₓ⁺‖² = ‖(Ŝₓ⁺)ᴴ Ŝₓ⁺‖ = ‖Ŝₓ⁻Ŝₓ⁺‖` and the diagonal bound `k(N−k+1) ≤ N²` (`N ≥ 1`). -/
+theorem spinSSiteOpPlus_manyBodyOperatorNormS_le (x : Λ) (hN : 1 ≤ N) :
+    manyBodyOperatorNormS (spinSSiteOpPlus x N) ≤ (N : ℝ) := by
+  have hconj : Matrix.conjTranspose (spinSSiteOpPlus x N) * spinSSiteOpPlus x N
+      = onSiteS x (Matrix.diagonal (fun k : Fin (N + 1) =>
+          ((k.val : ℂ) * ((N : ℂ) - (k.val : ℂ) + 1)))) := by
+    unfold spinSSiteOpPlus
+    rw [onSiteS_conjTranspose, spinSOpPlus_conjTranspose, onSiteS_mul_onSiteS_same]
+    congr 1
+    ext i j
+    rw [spinSOpMinus_mul_spinSOpPlus_apply, Matrix.diagonal_apply]
+  have hsq : manyBodyOperatorNormS (spinSSiteOpPlus x N) ^ 2 ≤ (N : ℝ) ^ 2 := by
+    rw [← manyBodyOperatorNormS_conjTranspose_mul_self, hconj, onSiteS_diagonal]
+    exact manyBodyOperatorNormS_diagonal_le (by positivity)
+      (fun σ => spinSDiag_norm_le_sq N hN (σ x))
+  have hnn : 0 ≤ manyBodyOperatorNormS (spinSSiteOpPlus x N) := manyBodyOperatorNormS_nonneg _
+  nlinarith [hsq, hnn, (by positivity : (0:ℝ) ≤ (N:ℝ))]
+
+/-- **Per-site lowering-operator norm bound** `‖Ŝₓ⁻‖ ≤ N`, by adjoint symmetry of the norm. -/
+theorem spinSSiteOpMinus_manyBodyOperatorNormS_le (x : Λ) (hN : 1 ≤ N) :
+    manyBodyOperatorNormS (spinSSiteOpMinus x N) ≤ (N : ℝ) := by
+  have hadj : spinSSiteOpMinus x N = Matrix.conjTranspose (spinSSiteOpPlus x N) := by
+    unfold spinSSiteOpPlus spinSSiteOpMinus
+    rw [onSiteS_conjTranspose, spinSOpPlus_conjTranspose]
+  rw [hadj, manyBodyOperatorNormS_conjTranspose]
+  exact spinSSiteOpPlus_manyBodyOperatorNormS_le x hN
+
 /-- A sign sequence `s : Fin (2n) → Bool` (`true = +`, `false = −`) is **balanced** when it has
 exactly `n` pluses (hence `n` minuses), i.e. `Σ s_j = 0` in `±1` terms. -/
 def BalancedSigns {n : ℕ} (s : Fin (2 * n) → Bool) : Prop :=
