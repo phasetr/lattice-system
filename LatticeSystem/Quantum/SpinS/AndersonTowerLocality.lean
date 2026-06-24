@@ -75,4 +75,37 @@ theorem spinSDot_manyBodyOperatorNormS_le (x y : Λ) (hN : 1 ≤ N) :
   have h3 := hb _ _ hp3x hp3y
   linarith
 
+/-! ### Locality of the bond–order commutators (P9-2) -/
+
+/-- **Disjoint commutation**: a bond operator `Ŝ_x · Ŝ_y` commutes with any site-`z` operator when
+`z ∉ {x, y}` (the on-site factors live on disjoint sites). -/
+theorem spinSDot_commute_onSiteS_of_ne (x y z : Λ) (hzx : z ≠ x) (hzy : z ≠ y)
+    (B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    Commute (spinSDot x y N) (onSiteS z B) := by
+  have cx : ∀ A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ,
+      Commute (onSiteS x A : ManyBodyOpS Λ N) (onSiteS z B) :=
+    fun A => onSiteS_commute_of_ne (Ne.symm hzx) A B
+  have cy : ∀ A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ,
+      Commute (onSiteS y A : ManyBodyOpS Λ N) (onSiteS z B) :=
+    fun A => onSiteS_commute_of_ne (Ne.symm hzy) A B
+  rw [spinSDot_def]
+  exact (((cx _).mul_left (cy _)).add_left ((cx _).mul_left (cy _))).add_left
+    ((cx _).mul_left (cy _))
+
+/-- The bond–staggered-lowering commutator `[Ŝ_x·Ŝ_y, Ŝ_z⁻]` vanishes off the bond (`z ∉ {x,y}`). -/
+theorem spinSDot_commutator_spinSSiteOpMinus_eq_zero_of_ne (x y z : Λ)
+    (hzx : z ≠ x) (hzy : z ≠ y) :
+    spinSDot x y N * spinSSiteOpMinus z N - spinSSiteOpMinus z N * spinSDot x y N = 0 := by
+  have := spinSDot_commute_onSiteS_of_ne x y z hzx hzy (spinSOpMinus N)
+  rw [spinSSiteOpMinus, sub_eq_zero]
+  exact this.eq
+
+/-- The bond–staggered-raising commutator `[Ŝ_x·Ŝ_y, Ŝ_z⁺]` vanishes off the bond (`z ∉ {x,y}`). -/
+theorem spinSDot_commutator_spinSSiteOpPlus_eq_zero_of_ne (x y z : Λ)
+    (hzx : z ≠ x) (hzy : z ≠ y) :
+    spinSDot x y N * spinSSiteOpPlus z N - spinSSiteOpPlus z N * spinSDot x y N = 0 := by
+  have := spinSDot_commute_onSiteS_of_ne x y z hzx hzy (spinSOpPlus N)
+  rw [spinSSiteOpPlus, sub_eq_zero]
+  exact this.eq
+
 end LatticeSystem.Quantum
