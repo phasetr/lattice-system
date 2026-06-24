@@ -1197,4 +1197,18 @@ theorem tower_denominator_lower_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
   rw [← heq]
   linarith [hclose.1]
 
+/-- The staggered raising operator is `V` times the per-volume density: `Ô⁺ = V ô⁺`. -/
+theorem staggeredRaisingOpS_eq_smul (d L N : ℕ) [NeZero L] :
+    staggeredRaisingOpS (torusParitySublattice d L) N
+      = ((L : ℂ) ^ d) • staggeredOrderDensityOpS d L N true := by
+  rw [show staggeredOrderDensityOpS d L N true
+      = ((L : ℂ) ^ d)⁻¹ • staggeredRaisingOpS (torusParitySublattice d L) N from rfl, smul_smul,
+    mul_inv_cancel₀ (pow_ne_zero d (Nat.cast_ne_zero.mpr (NeZero.ne L))), one_smul]
+
+/-- `(ô⁻)^M` is the conjugate transpose of `(ô⁺)^M`. -/
+theorem orderDensityFalse_pow_eq_conjTranspose (d L N M : ℕ) [NeZero L] :
+    staggeredOrderDensityOpS d L N false ^ M
+      = Matrix.conjTranspose (staggeredOrderDensityOpS d L N true ^ M) := by
+  rw [staggeredOrderDensityOpS_false_eq_conjTranspose, Matrix.conjTranspose_pow]
+
 end LatticeSystem.Quantum
