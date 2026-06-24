@@ -943,4 +943,42 @@ theorem orderWordProd_swap_re_diff_le (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
           apply mul_le_mul hσ hknorm (norm_nonneg _) (by norm_num)
       _ = (N : ℝ) / (L : ℝ) ^ d := one_mul _
 
+/-! ### Swap-chain telescoping and the R1 induction (P8-5) -/
+
+/-- An adjacent transposition preserves each letter count. -/
+theorem AdjSwap.count_eq {w w' : List Bool} (h : AdjSwap w w') (c : Bool) :
+    w.count c = w'.count c := by
+  obtain ⟨pre, suf, a, b, rfl, rfl⟩ := h
+  simp only [List.count_append, List.count_cons]
+  ring
+
+/-- **Per-swap real-expectation bound for balanced words**: for a balanced length-`2n` word `w`, one
+adjacent transposition changes `Re b_w` by at most `(N/V)·B`, where `B` bounds the real expectations
+of balanced length-`2(n−1)` words. -/
+theorem adjSwap_re_diff_le (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) (n : ℕ) (B : ℝ) (hB : 0 ≤ B)
+    (hbnd : ∀ u : List Bool, u.count true = n - 1 → u.count false = n - 1 →
+        |(star Φ ⬝ᵥ (orderWordProd d L N u).mulVec Φ).re| ≤ B)
+    {w w' : List Bool} (h : AdjSwap w w') (hwt : w.count true = n) (hwf : w.count false = n) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N w).mulVec Φ).re
+        - (star Φ ⬝ᵥ (orderWordProd d L N w').mulVec Φ).re|
+      ≤ (N : ℝ) / (L : ℝ) ^ d * B := by
+  obtain ⟨pre, suf, a, b, rfl, rfl⟩ := h
+  rcases a with _ | _ <;> rcases b with _ | _
+  · -- (false, false): w = w'
+    simp only [sub_self, abs_zero]; positivity
+  · -- (false, true)
+    refine le_trans (orderWordProd_swap_re_diff_le d L N hN Φ hsing pre suf false true) ?_
+    refine mul_le_mul_of_nonneg_left (hbnd _ ?_ ?_) (by positivity)
+    · simp at hwt ⊢; omega
+    · simp at hwf ⊢; omega
+  · -- (true, false)
+    refine le_trans (orderWordProd_swap_re_diff_le d L N hN Φ hsing pre suf true false) ?_
+    refine mul_le_mul_of_nonneg_left (hbnd _ ?_ ?_) (by positivity)
+    · simp at hwt ⊢; omega
+    · simp at hwf ⊢; omega
+  · -- (true, true): w = w'
+    simp only [sub_self, abs_zero]; positivity
+
 end LatticeSystem.Quantum
