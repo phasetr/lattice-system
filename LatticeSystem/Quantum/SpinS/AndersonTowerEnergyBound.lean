@@ -614,6 +614,24 @@ theorem phatMoment_succ_two_q0_le (d L N : ℕ) [NeZero L]
       _ ≤ phatMoment d L N Φ 0 * phatMoment d L N Φ (n + 1) := hcross
   exact le_of_mul_le_mul_left hkey hm0'
 
+/-- **Renormalized moment ratio, processed form** `2 q₀ mₙ ≤ mₙ₊₁` taking the LRO entry
+`2 q₀ m₀ ≤ m₁` directly (used inside the R1 induction). -/
+theorem phatMoment_succ_ratio (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) {q₀ : ℝ}
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hP7 : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1) (n : ℕ) :
+    2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1) := by
+  have hcross := phatMoment_cross d L N Φ n
+  have hmn : 0 ≤ phatMoment d L N Φ n := phatMoment_nonneg d L N Φ n
+  have hkey : phatMoment d L N Φ 0 * (2 * q₀ * phatMoment d L N Φ n)
+      ≤ phatMoment d L N Φ 0 * phatMoment d L N Φ (n + 1) :=
+    calc phatMoment d L N Φ 0 * (2 * q₀ * phatMoment d L N Φ n)
+        = (2 * q₀ * phatMoment d L N Φ 0) * phatMoment d L N Φ n := by ring
+      _ ≤ phatMoment d L N Φ 1 * phatMoment d L N Φ n :=
+          mul_le_mul_of_nonneg_right hP7 hmn
+      _ ≤ phatMoment d L N Φ 0 * phatMoment d L N Φ (n + 1) := hcross
+  exact le_of_mul_le_mul_left hkey hm0
+
 /-! ### Sector commutators `[Ŝ³_tot, Ô^±] = ±Ô^±` (P8-1) -/
 
 /-- Per-site step of `[Ŝ³_tot, Ô⁺] = Ô⁺`: on-site Cartan relation `[Ŝ³, Ŝ⁺] = Ŝ⁺`. -/
@@ -1011,5 +1029,117 @@ theorem swapChain_re_diff_le (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
           add_le_add h1 ih'
       _ = ((j : ℝ) + 1) * ((N : ℝ) / (L : ℝ) ^ d * B) := by ring
       _ = ((j + 1 : ℕ) : ℝ) * ((N : ℝ) / (L : ℝ) ^ d * B) := by push_cast; ring
+
+/-- `P_n` is the uniform `(½)ⁿ`-average of the real block-word expectations. -/
+theorem phatMoment_eq_blockWord_avg (d L N n : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) :
+    phatMoment d L N Φ n
+      = (2⁻¹ : ℝ) ^ n
+          * ∑ c : Fin n → Bool,
+              (star Φ ⬝ᵥ (orderWordProd d L N (blockWord c)).mulVec Φ).re := by
+  rw [phatMoment, staggeredPhatS_pow_eq, Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul,
+    Matrix.sum_mulVec, dotProduct_sum,
+    show ((2 : ℂ)⁻¹) ^ n = (((2⁻¹ : ℝ) ^ n : ℝ) : ℂ) from by push_cast; ring,
+    Complex.re_ofReal_mul, Complex.re_sum]
+
+set_option maxHeartbeats 800000 in
+-- The nested swap-chain + block-word-average induction exceeds the default heartbeat budget; the
+-- proof is a single large structural induction that cannot be split without artificial lemmas.
+/-- **Lemma R1, deviation form (eq. (4.2.67)).**  Under `3 N n² ≤ 2 q₀ V`, every balanced
+length-`2n` order word has real expectation within `½ P_n` of `P_n`.  Proved by induction on `n`:
+the renormalized swap-chain estimate (`swapChain_re_diff_le`) bounds the deviation of each word from
+the block-word average by `n² (N/V) (3/2) P_{n-1}`, and `P_{n-1} ≤ P_n/(2q₀)` collapses this to
+`½ P_n`. -/
+theorem orderWord_balanced_re_close (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1) :
+    ∀ (n : ℕ), 3 * (N : ℝ) * (n : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d →
+      ∀ w : List Bool, w.count true = n → w.count false = n →
+        |(star Φ ⬝ᵥ (orderWordProd d L N w).mulVec Φ).re - phatMoment d L N Φ n|
+          ≤ (1 / 2) * phatMoment d L N Φ n := by
+  intro n
+  induction n with
+  | zero =>
+    intro _ w hwt hwf
+    have hwnil : w = [] := by
+      have hlen : w.length = 0 := by
+        have := count_true_add_count_false w; omega
+      exact List.length_eq_zero_iff.mp hlen
+    subst hwnil
+    have hb : (star Φ ⬝ᵥ (orderWordProd d L N []).mulVec Φ).re = phatMoment d L N Φ 0 := by
+      rw [phatMoment_zero]
+      simp only [orderWordProd, List.map_nil, List.prod_nil, Matrix.one_mulVec]
+    rw [hb, sub_self, abs_zero]
+    have := phatMoment_nonneg d L N Φ 0
+    positivity
+  | succ m ih =>
+    intro hcond w hwt hwf
+    have hLpos : (0 : ℝ) < (L : ℝ) ^ d := by
+      have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+      positivity
+    have hPm : 0 ≤ phatMoment d L N Φ m := phatMoment_nonneg d L N Φ m
+    have hPm1 : 0 ≤ phatMoment d L N Φ (m + 1) := phatMoment_nonneg d L N Φ (m + 1)
+    -- inductive hypothesis at m
+    have hcondm : 3 * (N : ℝ) * (m : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d := by
+      refine le_trans ?_ hcond
+      have : (m : ℝ) ^ 2 ≤ ((m : ℝ) + 1) ^ 2 := by nlinarith [Nat.cast_nonneg (α := ℝ) m]
+      push_cast
+      nlinarith [Nat.cast_nonneg (α := ℝ) N, this]
+    have ihm := ih hcondm
+    -- uniform bound B = (3/2) P_m on balanced length-2m words
+    have hbnd : ∀ u : List Bool, u.count true = m + 1 - 1 → u.count false = m + 1 - 1 →
+        |(star Φ ⬝ᵥ (orderWordProd d L N u).mulVec Φ).re| ≤ 3 / 2 * phatMoment d L N Φ m := by
+      intro u hut huf
+      rw [Nat.add_sub_cancel] at hut huf
+      have hd := ihm u hut huf
+      have h2 := abs_sub_le (star Φ ⬝ᵥ (orderWordProd d L N u).mulVec Φ).re
+        (phatMoment d L N Φ m) 0
+      rw [sub_zero, sub_zero, abs_of_nonneg hPm] at h2
+      linarith [hd, h2]
+    -- per-block-word deviation bound D
+    have hper : ∀ c : Fin (m + 1) → Bool,
+        |(star Φ ⬝ᵥ (orderWordProd d L N w).mulVec Φ).re
+            - (star Φ ⬝ᵥ (orderWordProd d L N (blockWord c)).mulVec Φ).re|
+          ≤ ((m : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ m)) := by
+      intro c
+      have hperm : w.Perm (blockWord c) :=
+        binary_perm_of_count
+          (by rw [blockWord_length]; have := count_true_add_count_false w; omega)
+          (by rw [blockWord_count_true]; exact hwt)
+      obtain ⟨k, hk, hchain⟩ := swapDist_le hperm
+      have hchainbd := swapChain_re_diff_le d L N hN Φ hsing (m + 1)
+        (3 / 2 * phatMoment d L N Φ m) (by positivity) hbnd hchain hwt hwf
+      refine le_trans hchainbd ?_
+      refine mul_le_mul_of_nonneg_right ?_ (by positivity)
+      have hkle : (k : ℝ) ≤ ((m : ℝ) + 1) ^ 2 := by
+        have hk2 : k ≤ (m + 1) * (m + 1) := by rw [hwt, hwf] at hk; exact hk
+        calc (k : ℝ) ≤ ((m + 1) * (m + 1) : ℕ) := by exact_mod_cast hk2
+          _ = ((m : ℝ) + 1) ^ 2 := by push_cast; ring
+      exact hkle
+    -- deviation of w from the block-word average ≤ D
+    have hdev : |(star Φ ⬝ᵥ (orderWordProd d L N w).mulVec Φ).re - phatMoment d L N Φ (m + 1)|
+        ≤ ((m : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ m)) := by
+      rw [phatMoment_eq_blockWord_avg]
+      refine abs_sub_smul_sum_le Finset.univ ((2⁻¹ : ℝ) ^ (m + 1)) (by positivity) _ _ _ ?_ ?_
+      · rw [Finset.card_univ, Fintype.card_fun, Fintype.card_bool, Fintype.card_fin]
+        push_cast
+        rw [← mul_pow, show (2⁻¹ : ℝ) * 2 = 1 from by norm_num, one_pow]
+      · intro c _; exact hper c
+    -- D ≤ ½ P_{m+1} via the moment ratio
+    refine le_trans hdev ?_
+    have hratio : 2 * q₀ * phatMoment d L N Φ m ≤ phatMoment d L N Φ (m + 1) :=
+      phatMoment_succ_ratio d L N Φ hm0 hlro m
+    have hNV : (N : ℝ) / (L : ℝ) ^ d * ((m : ℝ) + 1) ^ 2 ≤ 2 * q₀ / 3 := by
+      rw [div_mul_eq_mul_div, div_le_iff₀ hLpos]
+      push_cast at hcond
+      nlinarith [hcond, hLpos]
+    calc ((m : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ m))
+        = 3 / 2 * phatMoment d L N Φ m * ((N : ℝ) / (L : ℝ) ^ d * ((m : ℝ) + 1) ^ 2) := by ring
+      _ ≤ 3 / 2 * phatMoment d L N Φ m * (2 * q₀ / 3) :=
+          mul_le_mul_of_nonneg_left hNV (by positivity)
+      _ = q₀ * phatMoment d L N Φ m := by ring
+      _ ≤ 1 / 2 * phatMoment d L N Φ (m + 1) := by linarith [hratio]
 
 end LatticeSystem.Quantum
