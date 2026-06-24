@@ -432,6 +432,127 @@ theorem staggeredOrderDensity_commutator_manyBodyOperatorNormS_le (d L N : ℕ) 
         exact mul_le_mul_of_nonneg_left hS (by norm_num)
     _ = (N : ℝ) / (L : ℝ) ^ d := by field_simp
 
+/-! ### Combinatorial core: adjacent-swap chains on binary words
+
+The rearrangement counting for Lemma 4.14 uses only adjacent transpositions of binary words (no
+permutation-group or sorting theory): a length-indexed `SwapChain`, the `bringToFront` move, and the
+diameter bound `swapDist ≤ (#true)·(#false)`. -/
+
+/-- A single **adjacent transposition** of two neighbouring letters in a binary word (the letters
+may be equal — the trivial swap is allowed and costs nothing). -/
+def AdjSwap (w w' : List Bool) : Prop :=
+  ∃ (pre suf : List Bool) (a b : Bool), w = pre ++ a :: b :: suf ∧ w' = pre ++ b :: a :: suf
+
+/-- An adjacent transposition preserves length. -/
+theorem AdjSwap.length_eq {w w' : List Bool} (h : AdjSwap w w') : w.length = w'.length := by
+  obtain ⟨pre, suf, a, b, rfl, rfl⟩ := h; simp [List.length_append]
+
+/-- A **length-`k` chain** of adjacent transpositions connecting `w` to `w'`. -/
+inductive SwapChain : ℕ → List Bool → List Bool → Prop
+  | refl (w : List Bool) : SwapChain 0 w w
+  | step {k : ℕ} {w w' w'' : List Bool} :
+      AdjSwap w w' → SwapChain k w' w'' → SwapChain (k + 1) w w''
+
+/-- Concatenation of swap chains. -/
+theorem SwapChain.trans {j k : ℕ} {w w' w'' : List Bool} :
+    SwapChain j w w' → SwapChain k w' w'' → SwapChain (j + k) w w'' := by
+  intro h1 h2
+  induction h1 with
+  | refl => simpa using h2
+  | step hs _ ih => exact (Nat.succ_add _ _ ▸ SwapChain.step hs (ih h2))
+
+/-- Prefixing a fixed letter to both endpoints preserves a swap chain (and its length). -/
+theorem SwapChain.cons {k : ℕ} {w w' : List Bool} (a : Bool) (h : SwapChain k w w') :
+    SwapChain k (a :: w) (a :: w') := by
+  induction h with
+  | refl => exact SwapChain.refl _
+  | step hs _ ih =>
+    obtain ⟨pre, suf, x, y, rfl, rfl⟩ := hs
+    exact SwapChain.step ⟨a :: pre, suf, x, y, by simp, by simp⟩ ih
+
+/-- A swap chain preserves length. -/
+theorem SwapChain.length_eq {k : ℕ} {w w' : List Bool} (h : SwapChain k w w') :
+    w.length = w'.length := by
+  induction h with
+  | refl => rfl
+  | step hs _ ih => exact (hs.length_eq).trans ih
+
+/-- **Bring an occurrence of `a` to the front**: if `a ∈ w`, a swap chain of length at most the
+number of letters `≠ a` moves an `a` to the head. -/
+theorem bringToFront : ∀ {a : Bool} {w : List Bool}, a ∈ w →
+    ∃ (rest : List Bool) (k : ℕ), w.Perm (a :: rest) ∧
+      k ≤ w.countP (· != a) ∧ SwapChain k w (a :: rest)
+  | a, [], h => absurd h (by simp)
+  | a, x :: xs, h => by
+    by_cases hx : x = a
+    · subst hx
+      exact ⟨xs, 0, List.Perm.refl _, Nat.zero_le _, SwapChain.refl _⟩
+    · have hmem : a ∈ xs := by
+        rcases List.mem_cons.1 h with h' | h'
+        · exact absurd h'.symm hx
+        · exact h'
+      obtain ⟨rest, k, hperm, hk, hchain⟩ := bringToFront hmem
+      refine ⟨x :: rest, k + 1, ?_, ?_, ?_⟩
+      · exact (hperm.cons x).trans (List.Perm.swap a x rest)
+      · have hxa : (x != a) = true := by simp [bne, hx]
+        simp only [List.countP_cons, hxa, if_true]
+        omega
+      · exact SwapChain.trans (SwapChain.cons x hchain)
+          (SwapChain.step ⟨[], rest, x, a, by simp, by simp⟩ (SwapChain.refl _))
+
+/-- Two binary words with the same `true`-count and length are permutations of each other. -/
+theorem binary_perm_of_count {w w' : List Bool}
+    (hlen : w.length = w'.length) (ht : w.count true = w'.count true) : w.Perm w' := by
+  rw [List.perm_iff_count]
+  intro b
+  have hsum : ∀ l : List Bool, l.count true + l.count false = l.length := by
+    intro l; induction l with
+    | nil => rfl
+    | cons x xs ih => cases x <;> simp <;> omega
+  cases b with
+  | true => exact ht
+  | false =>
+    have h1 := hsum w
+    have h2 := hsum w'
+    omega
+
+/-- `countP (· != a)` counts the letters different from `a`, i.e. the `!a` letters. -/
+private theorem countP_bne_eq_count_not (w : List Bool) (a : Bool) :
+    w.countP (· != a) = w.count (!a) := by
+  rw [List.count]
+  refine List.countP_congr (fun b _ => ?_)
+  cases a <;> cases b <;> rfl
+
+/-- **Swap-diameter bound**: two binary words of the same multiset are connected by a swap chain of
+length at most `(#true)·(#false)`.  Proved by induction on the *target* word via `bringToFront`. -/
+theorem swapDist_le : ∀ {w w' : List Bool}, w.Perm w' →
+    ∃ k, k ≤ w.count true * w.count false ∧ SwapChain k w w'
+  | w, [], hperm => by
+    rw [List.Perm.nil_eq (hperm.symm)]
+    exact ⟨0, by simp, SwapChain.refl _⟩
+  | w, a :: w'', hperm => by
+    have hmem : a ∈ w := hperm.symm.subset (by simp)
+    obtain ⟨rest, k, hpr, hk, hchain⟩ := bringToFront hmem
+    have hrest : rest.Perm w'' := (List.perm_cons a).1 (hpr.symm.trans hperm)
+    obtain ⟨k', hk', hchain'⟩ := swapDist_le hrest
+    refine ⟨k + k', ?_, SwapChain.trans hchain (SwapChain.cons a hchain')⟩
+    rw [countP_bne_eq_count_not] at hk
+    have hct : w.count true = (a :: rest).count true := hpr.count_eq true
+    have hcf : w.count false = (a :: rest).count false := hpr.count_eq false
+    cases a with
+    | true =>
+      have e1 : w.count true = rest.count true + 1 := by rw [hct, List.count_cons]; simp
+      have e2 : w.count false = rest.count false := by rw [hcf, List.count_cons]; simp
+      have hk2 : k ≤ rest.count false := by rw [← e2]; simpa using hk
+      rw [e1, e2]
+      nlinarith [hk2, hk', Nat.zero_le (rest.count true), Nat.zero_le (rest.count false)]
+    | false =>
+      have e1 : w.count true = rest.count true := by rw [hct, List.count_cons]; simp
+      have e2 : w.count false = rest.count false + 1 := by rw [hcf, List.count_cons]; simp
+      have hk2 : k ≤ rest.count true := by rw [← e1]; simpa using hk
+      rw [e1, e2]
+      nlinarith [hk2, hk', Nat.zero_le (rest.count true), Nat.zero_le (rest.count false)]
+
 /-- **Tasaki Lemma 4.14 (order-operator algebra estimate), AXIOM.**  For any balanced sign sequence
 `s` of length `2n` (`n > 0`), the `L²` operator norm of the difference between the ordered product
 `ô^{s₁} ⋯ ô^{s_{2n}}` and `p̂ⁿ` is bounded by `n² (o₀)^{2n−1} / V`, where `o₀ = 2S = N` and
