@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
 import LatticeSystem.Math.PosSemidef.Basics
+import Mathlib.Algebra.QuadraticDiscriminant
 
 /-!
 # Tasaki §4.2.1 Theorem 4.6: Anderson tower energy bound — phat foundations
@@ -22,6 +23,42 @@ open Matrix
 open scoped ComplexOrder
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
+
+/-- **Real Cauchy–Schwarz for a positive-semidefinite matrix form**: for `M` positive-semidefinite
+and any vectors `x, y`, `(Re⟨x, M y⟩)² ≤ ⟨x, M x⟩.re · ⟨y, M y⟩.re`, by the nonnegative-discriminant
+of the real quadratic `t ↦ ⟨x + t y, M (x + t y)⟩.re ≥ 0`. -/
+theorem posSemidef_re_dotProduct_mulVec_sq_le {n : Type*} [Fintype n]
+    {M : Matrix n n ℂ} (hM : M.PosSemidef) (x y : n → ℂ) :
+    (star x ⬝ᵥ M.mulVec y).re ^ 2
+      ≤ (star x ⬝ᵥ M.mulVec x).re * (star y ⬝ᵥ M.mulVec y).re := by
+  classical
+  -- Hermitian symmetry of the off-diagonal real part.
+  have hsymm : (star y ⬝ᵥ M.mulVec x).re = (star x ⬝ᵥ M.mulVec y).re := by
+    have h1 : star x ⬝ᵥ M.mulVec y = star (star y ⬝ᵥ M.mulVec x) := by
+      rw [Matrix.star_dotProduct, Matrix.star_mulVec, hM.isHermitian.eq, ← dotProduct_mulVec]
+    rw [h1, Complex.star_def, Complex.conj_re]
+  -- Four-term expansion of the diagonal of `x + t y`.
+  have hexp : ∀ t : ℝ, star (x + (t : ℂ) • y) ⬝ᵥ M.mulVec (x + (t : ℂ) • y)
+      = star x ⬝ᵥ M.mulVec x + (t : ℂ) * (star x ⬝ᵥ M.mulVec y)
+        + (t : ℂ) * (star y ⬝ᵥ M.mulVec x) + (t : ℂ) * (t : ℂ) * (star y ⬝ᵥ M.mulVec y) := by
+    intro t
+    simp only [Matrix.mulVec_add, Matrix.mulVec_smul, star_add, star_smul, add_dotProduct,
+      dotProduct_add, smul_dotProduct, dotProduct_smul, Complex.star_def, Complex.conj_ofReal,
+      smul_eq_mul]
+    ring
+  -- The quadratic `t ↦ ⟨x+ty, M(x+ty)⟩.re` is nonnegative for all real `t`.
+  have hquad : ∀ t : ℝ, 0 ≤ (star y ⬝ᵥ M.mulVec y).re * (t * t)
+      + 2 * (star x ⬝ᵥ M.mulVec y).re * t + (star x ⬝ᵥ M.mulVec x).re := by
+    intro t
+    have hnn := (Complex.le_def.mp (hM.dotProduct_mulVec_nonneg (x + (t : ℂ) • y))).1
+    rw [hexp t] at hnn
+    simp only [Complex.zero_re, Complex.add_re, Complex.mul_re, Complex.mul_im, Complex.ofReal_re,
+      Complex.ofReal_im, zero_mul, mul_zero, sub_zero] at hnn
+    rw [hsymm] at hnn
+    nlinarith [hnn]
+  have hdisc := discrim_le_zero hquad
+  rw [discrim] at hdisc
+  nlinarith [hdisc]
 
 /-- The **staggered raising order operator is the adjoint of the lowering one**:
 `(Ô_L^+)ᴴ = Ô_L^−` (each per-site `Ŝ⁺` adjoints to `Ŝ⁻`, and the staggered signs `±1` are real). -/
