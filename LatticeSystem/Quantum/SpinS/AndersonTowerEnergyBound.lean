@@ -453,4 +453,79 @@ theorem staggeredOrder_sq_expectation_eq_23 (A : Λ → Bool) (Φ : (Λ → Fin 
     (totalSpinSOp1_commutator_staggeredOrderOp2S A)
     (totalSpinSOp1_commutator_staggeredOrderOpS A) Φ hsing
 
+/-! ### From the LRO premise to `⟨p̂⟩ ≥ 2 q₀` (P7) -/
+
+/-- Cartesian decomposition of the raising operator: `Ŝ⁺ = Ŝ¹ + i Ŝ²`. -/
+theorem spinSOpPlus_eq_cartesian (N : ℕ) :
+    spinSOpPlus N = spinSOp1 N + Complex.I • spinSOp2 N := by
+  unfold spinSOp1 spinSOp2
+  rw [smul_smul, show Complex.I * (1 / (2 * Complex.I)) = 1 / 2 by
+    rw [mul_one_div]; field_simp]
+  module
+
+/-- Cartesian decomposition of the lowering operator: `Ŝ⁻ = Ŝ¹ − i Ŝ²`. -/
+theorem spinSOpMinus_eq_cartesian (N : ℕ) :
+    spinSOpMinus N = spinSOp1 N - Complex.I • spinSOp2 N := by
+  unfold spinSOp1 spinSOp2
+  rw [smul_smul, show Complex.I * (1 / (2 * Complex.I)) = 1 / 2 by
+    rw [mul_one_div]; field_simp]
+  module
+
+/-- Per-site Cartesian decomposition `Ŝ_x⁺ = Ŝ_x¹ + i Ŝ_x²`. -/
+theorem spinSSiteOpPlus_eq_cartesian (x : Λ) :
+    spinSSiteOpPlus x N = spinSSiteOp1 x N + Complex.I • spinSSiteOp2 x N := by
+  unfold spinSSiteOpPlus spinSSiteOp1 spinSSiteOp2
+  rw [spinSOpPlus_eq_cartesian, onSiteS_add, onSiteS_smul]
+
+/-- Per-site Cartesian decomposition `Ŝ_x⁻ = Ŝ_x¹ − i Ŝ_x²`. -/
+theorem spinSSiteOpMinus_eq_cartesian (x : Λ) :
+    spinSSiteOpMinus x N = spinSSiteOp1 x N - Complex.I • spinSSiteOp2 x N := by
+  unfold spinSSiteOpMinus spinSSiteOp1 spinSSiteOp2
+  rw [spinSOpMinus_eq_cartesian, onSiteS_sub, onSiteS_smul]
+
+/-- Cartesian decomposition of the staggered raising operator `Ô⁺ = Ô¹ + i Ô²`. -/
+theorem staggeredRaisingOpS_eq_cartesian (A : Λ → Bool) :
+    staggeredRaisingOpS A N = staggeredOrderOp1S A N + Complex.I • staggeredOrderOp2S A N := by
+  unfold staggeredRaisingOpS staggeredOrderOp1S staggeredOrderOp2S
+  rw [Finset.smul_sum, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [spinSSiteOpPlus_eq_cartesian, smul_add, smul_comm Complex.I]
+
+/-- Cartesian decomposition of the staggered lowering operator `Ô⁻ = Ô¹ − i Ô²`. -/
+theorem staggeredLoweringOpS_eq_cartesian (A : Λ → Bool) :
+    staggeredLoweringOpS A N = staggeredOrderOp1S A N - Complex.I • staggeredOrderOp2S A N := by
+  unfold staggeredLoweringOpS staggeredOrderOp1S staggeredOrderOp2S
+  rw [Finset.smul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [spinSSiteOpMinus_eq_cartesian, smul_sub, smul_comm Complex.I]
+
+/-- Algebraic expansion `(A + iB)(A − iB) + (A − iB)(A + iB) = 2(A² + B²)` (the imaginary cross
+terms cancel; `i² = −1`). -/
+theorem cartesian_ladder_anticomm_expand {n : Type*} [Fintype n]
+    (A B : Matrix n n ℂ) :
+    (A + Complex.I • B) * (A - Complex.I • B) + (A - Complex.I • B) * (A + Complex.I • B)
+      = (2 : ℂ) • (A * A + B * B) := by
+  have hI : (Complex.I • B) * (Complex.I • B) = -(B * B) := by
+    rw [smul_mul_assoc, mul_smul_comm, smul_smul, Complex.I_mul_I, neg_one_smul]
+  rw [add_mul, sub_mul, mul_sub, mul_sub, mul_add, mul_add, hI]
+  module
+
+/-- **`U(1)` order operator as transverse square sum** `p̂ = V⁻² (Ô¹² + Ô²²)` (eq. (4.2.31)). -/
+theorem staggeredPhatS_eq_cartesian_sq (d L N : ℕ) [NeZero L] :
+    staggeredPhatS d L N = (((L : ℂ) ^ d) ^ 2)⁻¹ •
+      (staggeredOrderOp1S (torusParitySublattice d L) N
+          * staggeredOrderOp1S (torusParitySublattice d L) N
+        + staggeredOrderOp2S (torusParitySublattice d L) N
+          * staggeredOrderOp2S (torusParitySublattice d L) N) := by
+  rw [staggeredPhatS,
+    show staggeredOrderDensityOpS d L N true
+        = ((L : ℂ) ^ d)⁻¹ • staggeredRaisingOpS (torusParitySublattice d L) N from rfl,
+    show staggeredOrderDensityOpS d L N false
+        = ((L : ℂ) ^ d)⁻¹ • staggeredLoweringOpS (torusParitySublattice d L) N from rfl,
+    staggeredRaisingOpS_eq_cartesian, staggeredLoweringOpS_eq_cartesian,
+    smul_mul_smul_comm, smul_mul_smul_comm, ← smul_add, cartesian_ladder_anticomm_expand,
+    smul_smul, smul_smul]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
