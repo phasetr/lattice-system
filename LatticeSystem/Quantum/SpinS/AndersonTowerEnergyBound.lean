@@ -981,4 +981,35 @@ theorem adjSwap_re_diff_le (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
   · -- (true, true): w = w'
     simp only [sub_self, abs_zero]; positivity
 
+/-- **Swap-chain telescoping**: a length-`k` swap chain between balanced length-`2n` words changes
+`Re b` by at most `k·(N/V)·B`. -/
+theorem swapChain_re_diff_le (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) (n : ℕ) (B : ℝ) (hB : 0 ≤ B)
+    (hbnd : ∀ u : List Bool, u.count true = n - 1 → u.count false = n - 1 →
+        |(star Φ ⬝ᵥ (orderWordProd d L N u).mulVec Φ).re| ≤ B)
+    {k : ℕ} {w w' : List Bool} (hc : SwapChain k w w') :
+    w.count true = n → w.count false = n →
+    |(star Φ ⬝ᵥ (orderWordProd d L N w).mulVec Φ).re
+        - (star Φ ⬝ᵥ (orderWordProd d L N w').mulVec Φ).re|
+      ≤ (k : ℝ) * ((N : ℝ) / (L : ℝ) ^ d * B) := by
+  induction hc with
+  | refl w => intro _ _; simp
+  | @step j w w' w'' hs hchain ih =>
+    intro hwt hwf
+    have hw't : w'.count true = n := by rw [← hs.count_eq true]; exact hwt
+    have hw'f : w'.count false = n := by rw [← hs.count_eq false]; exact hwf
+    have h1 := adjSwap_re_diff_le d L N hN Φ hsing n B hB hbnd hs hwt hwf
+    have ih' := ih hw't hw'f
+    calc |(star Φ ⬝ᵥ (orderWordProd d L N w).mulVec Φ).re
+            - (star Φ ⬝ᵥ (orderWordProd d L N w'').mulVec Φ).re|
+        ≤ |(star Φ ⬝ᵥ (orderWordProd d L N w).mulVec Φ).re
+              - (star Φ ⬝ᵥ (orderWordProd d L N w').mulVec Φ).re|
+          + |(star Φ ⬝ᵥ (orderWordProd d L N w').mulVec Φ).re
+              - (star Φ ⬝ᵥ (orderWordProd d L N w'').mulVec Φ).re| := abs_sub_le _ _ _
+      _ ≤ (N : ℝ) / (L : ℝ) ^ d * B + (j : ℝ) * ((N : ℝ) / (L : ℝ) ^ d * B) :=
+          add_le_add h1 ih'
+      _ = ((j : ℝ) + 1) * ((N : ℝ) / (L : ℝ) ^ d * B) := by ring
+      _ = ((j + 1 : ℕ) : ℝ) * ((N : ℝ) / (L : ℝ) ^ d * B) := by push_cast; ring
+
 end LatticeSystem.Quantum
