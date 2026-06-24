@@ -886,4 +886,61 @@ theorem orderWordProd_swap_dotProduct_eq (d L N : ℕ) [NeZero L]
     ring
   rw [← dotProduct_sub, ← Matrix.sub_mulVec, hvec, dotProduct_smul, smul_eq_mul]
 
+/-- The order-density commutator acts on a word vector as the scalar `(2/V²) m(suf)`. -/
+theorem orderCommutator_mulVec_orderWordProd (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) (suf : List Bool) :
+    (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+        - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true).mulVec
+        ((orderWordProd d L N suf).mulVec Φ)
+      = ((((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge suf))
+          • (orderWordProd d L N suf).mulVec Φ := by
+  rw [staggeredOrderDensity_commutator_eq, Matrix.smul_mulVec, Matrix.smul_mulVec,
+    totalSpinSOp3_mulVec_orderWordProd_eigenvec d L N suf hsing, smul_smul, smul_smul]
+  congr 1
+  ring
+
+/-- **Single-swap real-expectation bound**: one adjacent transposition changes the real part of the
+order-word expectation by at most `(N/V)` times the shortened word's real expectation. -/
+theorem orderWordProd_swap_re_diff_le (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0)
+    (pre suf : List Bool) (a b : Bool) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N (pre ++ a :: b :: suf)).mulVec Φ).re
+        - (star Φ ⬝ᵥ (orderWordProd d L N (pre ++ b :: a :: suf)).mulVec Φ).re|
+      ≤ (N : ℝ) / (L : ℝ) ^ d
+          * |(star Φ ⬝ᵥ (orderWordProd d L N (pre ++ suf)).mulVec Φ).re| := by
+  rw [← Complex.sub_re, orderWordProd_swap_dotProduct_eq d L N Φ hsing pre suf a b]
+  set κ := (if a = b then (0 : ℂ) else if a then (1 : ℂ) else (-1 : ℂ))
+      * ((((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge suf)) with hκ
+  have hLim : ((((L : ℂ) ^ d)⁻¹).im) = 0 := by
+    rw [show ((L : ℂ) ^ d)⁻¹ = (((((L : ℝ) ^ d)⁻¹ : ℝ)) : ℂ) from by push_cast; ring]
+    exact Complex.ofReal_im _
+  have hκim : κ.im = 0 := by
+    rw [hκ]
+    simp only [Complex.mul_im, Complex.mul_re, mCharge_im, hLim]
+    split_ifs <;> simp
+  rw [Complex.mul_re, hκim, zero_mul, sub_zero, abs_mul]
+  by_cases hu : (orderWordProd d L N suf).mulVec Φ = 0
+  · have hz0 : star Φ ⬝ᵥ (orderWordProd d L N (pre ++ suf)).mulVec Φ = 0 := by
+      rw [orderWordProd_append, ← Matrix.mulVec_mulVec, hu, Matrix.mulVec_zero, dotProduct_zero]
+    rw [hz0]; simp
+  · refine mul_le_mul_of_nonneg_right ?_ (abs_nonneg _)
+    have hknorm : ‖((((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge suf))‖
+        ≤ (N : ℝ) / (L : ℝ) ^ d :=
+      le_trans (eigenvalue_norm_le_manyBodyOperatorNormS hu
+          (orderCommutator_mulVec_orderWordProd d L N Φ hsing suf))
+        (staggeredOrderDensity_commutator_manyBodyOperatorNormS_le d L N hN)
+    have hσ : ‖(if a = b then (0 : ℂ) else if a then (1 : ℂ) else (-1 : ℂ))‖ ≤ 1 := by
+      split_ifs <;> simp
+    have hκeq : κ = (κ.re : ℂ) := Complex.ext rfl (by rw [hκim, Complex.ofReal_im])
+    calc |κ.re| = ‖(κ.re : ℂ)‖ := (Complex.norm_real _).symm
+      _ = ‖κ‖ := by rw [← hκeq]
+      _ = ‖(if a = b then (0 : ℂ) else if a then (1 : ℂ) else (-1 : ℂ))‖
+            * ‖((((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge suf))‖ := by
+          rw [hκ, norm_mul]
+      _ ≤ 1 * ((N : ℝ) / (L : ℝ) ^ d) := by
+          apply mul_le_mul hσ hknorm (norm_nonneg _) (by norm_num)
+      _ = (N : ℝ) / (L : ℝ) ^ d := one_mul _
+
 end LatticeSystem.Quantum
