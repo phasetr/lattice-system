@@ -172,6 +172,26 @@ theorem staggeredPhatS_expectation_nonneg (d L N : ℕ) [NeZero L]
     0 ≤ (star Φ ⬝ᵥ (staggeredPhatS d L N).mulVec Φ).re :=
   (Complex.le_def.mp ((staggeredPhatS_posSemidef d L N).dotProduct_mulVec_nonneg Φ)).1
 
+/-- **`p̂ᵏ` is positive-semidefinite** for every `k` (powers of a positive-semidefinite Hermitian
+operator stay positive-semidefinite): `p̂^{2j} = (p̂ʲ)ᴴ p̂ʲ` and `p̂^{2j+1} = (p̂ʲ)ᴴ p̂ p̂ʲ`. -/
+theorem staggeredPhatS_pow_posSemidef (d L N : ℕ) [NeZero L] (k : ℕ) :
+    (staggeredPhatS d L N ^ k).PosSemidef := by
+  rcases Nat.even_or_odd k with ⟨j, hj⟩ | ⟨j, hj⟩
+  · have := Matrix.posSemidef_conjTranspose_mul_self (staggeredPhatS d L N ^ j)
+    rwa [((staggeredPhatS_isHermitian d L N).pow j).eq, ← pow_add, ← hj] at this
+  · have h := (staggeredPhatS_posSemidef d L N).conjTranspose_mul_mul_same
+      (staggeredPhatS d L N ^ j)
+    rwa [((staggeredPhatS_isHermitian d L N).pow j).eq,
+      show staggeredPhatS d L N ^ j * staggeredPhatS d L N * staggeredPhatS d L N ^ j
+        = staggeredPhatS d L N ^ (2 * j + 1) from by
+          rw [← pow_succ, ← pow_add]; congr 1; omega, ← hj] at h
+
+/-- The `p̂`-moments are nonnegative: `⟨Φ, p̂ᵏ Φ⟩.re ≥ 0`. -/
+theorem phatMoment_nonneg (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (k : ℕ) :
+    0 ≤ phatMoment d L N Φ k :=
+  (Complex.le_def.mp ((staggeredPhatS_pow_posSemidef d L N k).dotProduct_mulVec_nonneg Φ)).1
+
 /-- **Log-convexity of the `p̂`-moments** (Cauchy–Schwarz, eq. (4.2.35)):
 `⟨p̂ⁿ⁺¹⟩² ≤ ⟨p̂ⁿ⟩ · ⟨p̂ⁿ⁺²⟩`.  Even centres use the standard inner product (`M = 1`), odd
 centres the `p̂`-weighted form (`M = p̂`); both reduce to the positive-semidefinite Cauchy–Schwarz
