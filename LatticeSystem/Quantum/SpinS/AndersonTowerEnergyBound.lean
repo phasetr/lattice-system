@@ -665,4 +665,71 @@ theorem totalSpinSOp3_commutator_staggeredLoweringOpS (A : Λ → Bool) :
   refine Finset.sum_congr rfl (fun x _ => ?_)
   rw [spinSSiteOp3_commutator_staggeredLoweringOpS]
 
+/-! ### Word sector eigenvalue (P8-2) -/
+
+/-- **Per-volume sector commutator** `[Ŝ³_tot, ô^b] = ε_b ô^b` (`ε_true = +1`, `ε_false = −1`):
+the per-volume raising/lowering density shifts the total magnetization by `±1`. -/
+theorem totalSpinSOp3_commutator_orderDensity (d L N : ℕ) [NeZero L] (b : Bool) :
+    totalSpinSOp3 (HypercubicTorus d L) N * staggeredOrderDensityOpS d L N b
+        - staggeredOrderDensityOpS d L N b * totalSpinSOp3 (HypercubicTorus d L) N
+      = (if b then (1 : ℂ) else (-1 : ℂ)) • staggeredOrderDensityOpS d L N b := by
+  cases b
+  · rw [show staggeredOrderDensityOpS d L N false
+        = ((L : ℂ) ^ d)⁻¹ • staggeredLoweringOpS (torusParitySublattice d L) N from rfl]
+    rw [mul_smul_comm, smul_mul_assoc, ← smul_sub, totalSpinSOp3_commutator_staggeredLoweringOpS]
+    simp [smul_neg]
+  · rw [show staggeredOrderDensityOpS d L N true
+        = ((L : ℂ) ^ d)⁻¹ • staggeredRaisingOpS (torusParitySublattice d L) N from rfl]
+    rw [mul_smul_comm, smul_mul_assoc, ← smul_sub, totalSpinSOp3_commutator_staggeredRaisingOpS]
+    simp
+
+/-- **Single-step magnetization shift**: if `Ŝ³_tot v = λ v` then `Ŝ³_tot (ô^b v) = (λ+ε_b)(ô^b v)`
+(`ε_true = +1`, `ε_false = −1`). -/
+theorem totalSpinSOp3_mulVec_orderDensity_eigenvec (d L N : ℕ) [NeZero L] (b : Bool)
+    {v : (HypercubicTorus d L → Fin (N + 1)) → ℂ} {lam : ℂ}
+    (hv : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec v = lam • v) :
+    (totalSpinSOp3 (HypercubicTorus d L) N).mulVec
+        ((staggeredOrderDensityOpS d L N b).mulVec v)
+      = (lam + (if b then (1 : ℂ) else (-1 : ℂ)))
+          • (staggeredOrderDensityOpS d L N b).mulVec v := by
+  have hcomm := totalSpinSOp3_commutator_orderDensity d L N b
+  have key : totalSpinSOp3 (HypercubicTorus d L) N * staggeredOrderDensityOpS d L N b
+      = staggeredOrderDensityOpS d L N b * totalSpinSOp3 (HypercubicTorus d L) N
+        + (if b then (1 : ℂ) else (-1 : ℂ)) • staggeredOrderDensityOpS d L N b := by
+    rw [← hcomm]; abel
+  rw [Matrix.mulVec_mulVec, key, Matrix.add_mulVec, Matrix.smul_mulVec, ← Matrix.mulVec_mulVec, hv,
+    Matrix.mulVec_smul, add_smul]
+
+/-- The **net magnetization charge** `m(w) = #{true} − #{false}` of an order word `w` (each `ô⁺`
+contributes `+1`, each `ô⁻` contributes `−1`), as the sum of per-letter signs. -/
+def mCharge (w : List Bool) : ℂ := (w.map (fun b => if b then (1 : ℂ) else (-1 : ℂ))).sum
+
+@[simp] theorem mCharge_nil : mCharge [] = 0 := by simp [mCharge]
+
+theorem mCharge_cons (b : Bool) (w : List Bool) :
+    mCharge (b :: w) = (if b then (1 : ℂ) else (-1 : ℂ)) + mCharge w := by
+  rw [mCharge, List.map_cons, List.sum_cons, mCharge]
+
+/-- Cons recursion for the ordered word product: `ô^{b::w} = ô^b · ô^{w}`. -/
+theorem orderWordProd_cons (d L N : ℕ) [NeZero L] (b : Bool) (w : List Bool) :
+    orderWordProd d L N (b :: w)
+      = staggeredOrderDensityOpS d L N b * orderWordProd d L N w := by
+  rw [orderWordProd, orderWordProd, List.map_cons, List.prod_cons]
+
+/-- **Word sector eigenvalue**: for a total-`Ŝ³` singlet `v` (`Ŝ³_tot v = 0`), the ordered word
+product is an eigenvector `Ŝ³_tot (ô^{w} v) = m(w) (ô^{w} v)` with eigenvalue the net charge. -/
+theorem totalSpinSOp3_mulVec_orderWordProd_eigenvec (d L N : ℕ) [NeZero L] (w : List Bool)
+    {v : (HypercubicTorus d L → Fin (N + 1)) → ℂ}
+    (hv : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec v = 0) :
+    (totalSpinSOp3 (HypercubicTorus d L) N).mulVec ((orderWordProd d L N w).mulVec v)
+      = mCharge w • (orderWordProd d L N w).mulVec v := by
+  induction w with
+  | nil =>
+    rw [orderWordProd, List.map_nil, List.prod_nil, Matrix.one_mulVec, mCharge_nil, zero_smul, hv]
+  | cons b w ih =>
+    rw [orderWordProd_cons, ← Matrix.mulVec_mulVec,
+      totalSpinSOp3_mulVec_orderDensity_eigenvec d L N b ih]
+    congr 1
+    rw [mCharge_cons]; ring
+
 end LatticeSystem.Quantum
