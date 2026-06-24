@@ -766,19 +766,110 @@ theorem staggeredPhatS_pow_eq (d L N n : ℕ) [NeZero L] :
   congr 1
   refine Finset.sum_congr rfl (fun c _ => (orderWordProd_blockWord d L N c).symm)
 
-/-- **Tasaki Lemma 4.14 (order-operator algebra estimate), AXIOM.**  For any balanced sign sequence
-`s` of length `2n` (`n > 0`), the `L²` operator norm of the difference between the ordered product
+/-- The `true`-count of a binary word `List.ofFn s` equals the cardinality of the `true`-fiber of
+`s` (so a `BalancedSigns` sequence yields a balanced word). -/
+theorem count_true_ofFn {m : ℕ} (s : Fin m → Bool) :
+    (List.ofFn s).count true = (Finset.univ.filter (fun i => s i = true)).card := by
+  have h : ∀ {m : ℕ} (s : Fin m → Bool),
+      (List.ofFn s).count true = ∑ i : Fin m, (if s i then 1 else 0) := by
+    intro m
+    induction m with
+    | zero => intro s; simp
+    | succ m ih =>
+      intro s
+      rw [List.ofFn_succ, List.count_cons, ih (fun i => s i.succ), Fin.sum_univ_succ]
+      have hif : (if (s 0 == true) then (1 : ℕ) else 0) = (if s 0 then 1 else 0) := by
+        cases s 0 <;> rfl
+      rw [hif]; ring
+  rw [h s, Finset.card_filter]
+
+/-- At `N = 0` (spin `0`) the per-volume order operator vanishes (the single-site ladder operators
+are the `1×1` zero matrices). -/
+theorem staggeredOrderDensityOpS_zero (d L : ℕ) [NeZero L] (b : Bool) :
+    staggeredOrderDensityOpS d L 0 b = 0 := by
+  have hp : spinSOpPlus 0 = 0 := by ext i j; fin_cases i; fin_cases j; simp [spinSOpPlus]
+  have hm : spinSOpMinus 0 = 0 := by ext i j; fin_cases i; fin_cases j; simp [spinSOpMinus]
+  have hos : ∀ (x : HypercubicTorus d L), (onSiteS x (0 : Matrix (Fin 1) (Fin 1) ℂ)
+      : ManyBodyOpS (HypercubicTorus d L) 0) = 0 := by
+    intro x; ext σ' σ; rw [onSiteS_apply]; simp
+  unfold staggeredOrderDensityOpS staggeredRaisingOpS staggeredLoweringOpS spinSSiteOpPlus
+    spinSSiteOpMinus
+  cases b <;> simp [hp, hm, hos]
+
+/-- **Tasaki Lemma 4.14 (order-operator algebra estimate), now a THEOREM.**  For any balanced sign
+sequence `s` of length `2n` (`n > 0`), the `L²` operator norm of the difference between the ordered
+product
 `ô^{s₁} ⋯ ô^{s_{2n}}` and `p̂ⁿ` is bounded by `n² (o₀)^{2n−1} / V`, where `o₀ = 2S = N` and
 `V = L^d` (eq. (4.2.34)):
 `‖ô^{s₁} ⋯ ô^{s_{2n}} − p̂ⁿ‖ ≤ n² N^{2n−1} / L^d`.
 
 Any balanced product rearranges to any other by `≤ n²` neighboring `±` exchanges, each costing
-`≤ ‖[ô^+, ô^-]‖ ≤ o₀/V` (eq. (4.2.33)); the bound follows with `‖ô^{±}‖ ≤ o₀`.  An elementary but
-involved finite-volume estimate — recorded as a documented axiom (discharge candidate). -/
-axiom staggered_balanced_order_product_norm_le {d L N n : ℕ} [NeZero L] (hn : 0 < n)
+`≤ ‖[ô^+, ô^-]‖ ≤ o₀/V` (eq. (4.2.33)); the bound follows with `‖ô^{±}‖ ≤ o₀`.  The proof writes
+`p̂ⁿ` as the uniform `(½)ⁿ`-combination of the `2ⁿ` balanced block words (`staggeredPhatS_pow_eq`),
+turns the difference into an average of word differences, and bounds each by `n²·N^{2n−1}/V` through
+the adjacent-swap telescoping (`orderWordProd_sub_balanced_manyBodyOperatorNormS_le`). -/
+theorem staggered_balanced_order_product_norm_le {d L N n : ℕ} [NeZero L] (hn : 0 < n)
     (s : Fin (2 * n) → Bool) (hbal : BalancedSigns s) :
     manyBodyOperatorNormS (balancedOrderProductS d L N n s - staggeredPhatS d L N ^ n) ≤
-      (n : ℝ) ^ 2 * (N : ℝ) ^ (2 * n - 1) / (L : ℝ) ^ d
+      (n : ℝ) ^ 2 * (N : ℝ) ^ (2 * n - 1) / (L : ℝ) ^ d := by
+  have hLpos : (0 : ℝ) < (L : ℝ) ^ d := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    positivity
+  rcases Nat.eq_zero_or_pos N with hN0 | hN
+  · -- N = 0: every per-volume order operator vanishes, so the difference is `0`.
+    subst hN0
+    have hbop : balancedOrderProductS d L 0 n s = 0 := by
+      rw [balancedOrderProductS]
+      refine List.prod_eq_zero ?_
+      refine List.mem_ofFn.2 ⟨⟨0, by omega⟩, ?_⟩
+      rw [staggeredOrderDensityOpS_zero]
+    have hphat : staggeredPhatS d L 0 ^ n = 0 := by
+      have h0 : staggeredPhatS d L 0 = 0 := by
+        rw [staggeredPhatS]; simp [staggeredOrderDensityOpS_zero]
+      rw [h0, zero_pow (by omega : n ≠ 0)]
+    rw [hbop, hphat, sub_zero, manyBodyOperatorNormS_zero]
+    positivity
+  · -- 1 ≤ N: average the balanced-word swap bound over the `2ⁿ` block words.
+    have hN1 : 1 ≤ N := hN
+    have hbop : balancedOrderProductS d L N n s = orderWordProd d L N (List.ofFn s) := by
+      rw [balancedOrderProductS, orderWordProd, List.map_ofFn]; rfl
+    have hLs : (List.ofFn s).length = 2 * n := by rw [List.length_ofFn]
+    have htrue : (List.ofFn s).count true = n := by rw [count_true_ofFn]; exact hbal
+    have hcard : (Fintype.card (Fin n → Bool)) = 2 ^ n := by
+      rw [Fintype.card_fun, Fintype.card_bool, Fintype.card_fin]
+    have hconst : orderWordProd d L N (List.ofFn s)
+        = ((2 : ℂ)⁻¹) ^ n • ∑ _c : Fin n → Bool, orderWordProd d L N (List.ofFn s) := by
+      have hsum : (∑ _c : Fin n → Bool, orderWordProd d L N (List.ofFn s))
+          = ((2 : ℂ) ^ n) • orderWordProd d L N (List.ofFn s) := by
+        simp only [Finset.sum_const, Finset.card_univ, hcard,
+          ← Nat.cast_smul_eq_nsmul (R := ℂ), Nat.cast_pow, Nat.cast_ofNat]
+      rw [hsum, smul_smul, ← mul_pow]
+      norm_num
+    rw [hbop, staggeredPhatS_pow_eq, hconst, ← smul_sub, ← Finset.sum_sub_distrib,
+      manyBodyOperatorNormS_smul]
+    have hnorm2 : ‖((2 : ℂ)⁻¹) ^ n‖ = ((2 : ℝ)⁻¹) ^ n := by
+      rw [norm_pow, norm_inv, Complex.norm_ofNat]
+    rw [hnorm2]
+    have hsum_le : manyBodyOperatorNormS
+        (∑ c : Fin n → Bool,
+          (orderWordProd d L N (List.ofFn s) - orderWordProd d L N (blockWord c)))
+        ≤ (2 ^ n : ℝ) * ((n : ℝ) ^ 2 * ((N : ℝ) ^ (2 * n - 1) / (L : ℝ) ^ d)) := by
+      refine le_trans (manyBodyOperatorNormS_sum_le _ _) ?_
+      calc ∑ c : Fin n → Bool, manyBodyOperatorNormS
+              (orderWordProd d L N (List.ofFn s) - orderWordProd d L N (blockWord c))
+          ≤ ∑ _c : Fin n → Bool, (n : ℝ) ^ 2 * ((N : ℝ) ^ (2 * n - 1) / (L : ℝ) ^ d) := by
+            refine Finset.sum_le_sum (fun c _ => ?_)
+            refine orderWordProd_sub_balanced_manyBodyOperatorNormS_le d L N hN1 ?_ hLs htrue
+            exact binary_perm_of_count (by rw [hLs, blockWord_length])
+              (by rw [htrue, blockWord_count_true])
+        _ = (2 ^ n : ℝ) * ((n : ℝ) ^ 2 * ((N : ℝ) ^ (2 * n - 1) / (L : ℝ) ^ d)) := by
+            rw [Finset.sum_const, Finset.card_univ, hcard, nsmul_eq_mul]; push_cast; ring
+    refine le_trans (mul_le_mul_of_nonneg_left hsum_le (by positivity)) (le_of_eq ?_)
+    rw [mul_div_assoc]
+    rw [show ((2 : ℝ)⁻¹) ^ n * ((2 ^ n : ℝ) * ((n : ℝ) ^ 2 * ((N : ℝ) ^ (2 * n - 1) / (L : ℝ) ^ d)))
+        = (((2 : ℝ)⁻¹) ^ n * (2 : ℝ) ^ n) * ((n : ℝ) ^ 2 * ((N : ℝ) ^ (2 * n - 1) / (L : ℝ) ^ d))
+        from by ring, ← mul_pow]
+    norm_num
 
 open Filter in
 /-- **Tasaki Lemma 4.15 (the order parameter as a `p̂`-ratio double limit), AXIOM.**  The
