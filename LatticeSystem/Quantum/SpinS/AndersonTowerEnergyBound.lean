@@ -60,6 +60,14 @@ theorem posSemidef_re_dotProduct_mulVec_sq_le {n : Type*} [Fintype n]
   rw [discrim] at hdisc
   nlinarith [hdisc]
 
+/-- **Splitting a Hermitian power across a dot product**: for Hermitian `H`,
+`⟨HᵃΦ, HᵇΦ⟩ = ⟨Φ, H^{a+b}Φ⟩`.  Lets the moments `⟨Φ, HᵏΦ⟩` be read as inner products of `H`-powers
+of `Φ`, the input to the Cauchy–Schwarz moment inequalities. -/
+theorem hermitian_pow_dotProduct_split {n : Type*} [Fintype n] [DecidableEq n]
+    {H : Matrix n n ℂ} (hH : H.IsHermitian) (a b : ℕ) (Φ : n → ℂ) :
+    star ((H ^ a).mulVec Φ) ⬝ᵥ ((H ^ b).mulVec Φ) = star Φ ⬝ᵥ (H ^ (a + b)).mulVec Φ := by
+  rw [Matrix.star_mulVec, ← dotProduct_mulVec, (hH.pow a).eq, Matrix.mulVec_mulVec, ← pow_add]
+
 /-- The **staggered raising order operator is the adjoint of the lowering one**:
 `(Ô_L^+)ᴴ = Ô_L^−` (each per-site `Ŝ⁺` adjoints to `Ŝ⁻`, and the staggered signs `±1` are real). -/
 theorem staggeredRaisingOpS_conjTranspose (A : Λ → Bool) :
