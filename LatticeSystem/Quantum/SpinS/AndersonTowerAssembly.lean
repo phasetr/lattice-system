@@ -197,4 +197,30 @@ theorem orderDensity_double_commutator_false_norm_le (d L N : ℕ) [NeZero L] (h
   rw [hconj, manyBodyOperatorNormS_conjTranspose]
   exact orderDensity_double_commutator_norm_le d L N hL hN
 
+/-! ### Capstone feeders (P9-8) -/
+
+/-- The nonnegative-`M` tower state is `V^M` times the per-volume order-density power on `Φ`:
+`Ψ_M = V^M (ô⁺)^M Φ`. -/
+theorem towerState_pos_eq_smul (d L N : ℕ) [NeZero L] (m : ℕ)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) :
+    towerState (torusParitySublattice d L) N (m : ℤ) Φ
+      = ((L : ℂ) ^ d) ^ m • (staggeredOrderDensityOpS d L N true ^ m).mulVec Φ := by
+  rw [towerState, if_pos (by positivity : (0 : ℤ) ≤ (m : ℤ)), Int.natAbs_natCast,
+    staggeredRaisingOpS_eq_smul, smul_pow, Matrix.smul_mulVec]
+
+/-- The Rayleigh quotient is invariant under a nonzero scalar rescaling of the vector. -/
+theorem rayleigh_smul_invariant {n : Type*} [Fintype n] (H : Matrix n n ℂ)
+    (c : ℂ) (hc : c ≠ 0) (v : n → ℂ) :
+    (star (c • v) ⬝ᵥ H.mulVec (c • v)).re / (star (c • v) ⬝ᵥ (c • v)).re
+      = (star v ⬝ᵥ H.mulVec v).re / (star v ⬝ᵥ v).re := by
+  have hns : (0 : ℝ) < Complex.normSq c := Complex.normSq_pos.mpr hc
+  have hnum : star (c • v) ⬝ᵥ H.mulVec (c • v)
+      = (Complex.normSq c : ℂ) * (star v ⬝ᵥ H.mulVec v) := by
+    rw [star_smul, Matrix.mulVec_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul,
+      ← mul_assoc, Complex.star_def, ← Complex.normSq_eq_conj_mul_self]
+  have hden : star (c • v) ⬝ᵥ (c • v) = (Complex.normSq c : ℂ) * (star v ⬝ᵥ v) := by
+    rw [star_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul, ← mul_assoc,
+      Complex.star_def, ← Complex.normSq_eq_conj_mul_self]
+  rw [hnum, hden, Complex.re_ofReal_mul, Complex.re_ofReal_mul, mul_div_mul_left _ _ (ne_of_gt hns)]
+
 end LatticeSystem.Quantum
