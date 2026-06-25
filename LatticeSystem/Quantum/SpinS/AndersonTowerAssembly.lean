@@ -137,4 +137,28 @@ theorem tower_numerator_double_commutator_le (d L N : ℕ) [NeZero L]
   rw [hre]
   linarith
 
+/-! ### Numerator expansion (P9-7) -/
+
+/-- **Commutator power telescope**: `[H, Aᴹ] = Σ_{j<M} Aʲ [H,A] A^{M-1-j}`. -/
+theorem commutator_pow_eq_sum {n : Type*} [Fintype n] [DecidableEq n]
+    (H A : Matrix n n ℂ) (M : ℕ) :
+    H * A ^ M - A ^ M * H
+      = ∑ j ∈ Finset.range M, A ^ j * (H * A - A * H) * A ^ (M - 1 - j) := by
+  induction M with
+  | zero => simp
+  | succ m ih =>
+    rw [Finset.sum_range_succ]
+    have hsplit : H * A ^ (m + 1) - A ^ (m + 1) * H
+        = (H * A ^ m - A ^ m * H) * A + A ^ m * (H * A - A * H) := by
+      rw [pow_succ]; noncomm_ring
+    rw [hsplit, ih, Finset.sum_mul]
+    rw [show A ^ (m + 1 - 1 - m) = (1 : Matrix n n ℂ) by simp]
+    rw [mul_one]
+    congr 1
+    refine Finset.sum_congr rfl (fun j hj => ?_)
+    rw [Finset.mem_range] at hj
+    rw [mul_assoc, ← pow_succ]
+    congr 2
+    omega
+
 end LatticeSystem.Quantum
