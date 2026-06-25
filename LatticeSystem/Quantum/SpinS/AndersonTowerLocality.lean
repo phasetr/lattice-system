@@ -11,6 +11,7 @@ import LatticeSystem.Quantum.SpinS.MultiSiteDot
 namespace LatticeSystem.Quantum
 
 open Matrix
+open scoped InnerProductSpace
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
@@ -486,5 +487,37 @@ theorem orderDensity_commutator_general_norm_le (d L N : ℕ) [NeZero L] (hN : 1
       ≤ manyBodyOperatorNormS G * (N : ℝ) :=
     le_trans (manyBodyOperatorNormS_mul_le _ _) (mul_le_mul_of_nonneg_left hd hG)
   nlinarith [h1, h2]
+
+/-- **Operator Cauchy–Schwarz** `|Re⟨u, G v⟩| ≤ ‖G‖ ‖u‖₂ ‖v‖₂` (the `L²`-operator-norm form). -/
+theorem abs_re_dotProduct_mulVec_le_norm_mul (G : ManyBodyOpS Λ N)
+    (u v : (Λ → Fin (N + 1)) → ℂ) :
+    |(star u ⬝ᵥ G.mulVec v).re|
+      ≤ manyBodyOperatorNormS G
+          * ‖(WithLp.toLp 2 u : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖
+          * ‖(WithLp.toLp 2 v : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖ := by
+  rw [manyBodyOperatorNormS_eq_toEuclideanCLM]
+  have hbridge : star u ⬝ᵥ G.mulVec v
+      = ⟪(WithLp.toLp 2 u : EuclideanSpace ℂ (Λ → Fin (N + 1))),
+          Matrix.toEuclideanCLM (𝕜 := ℂ) G (WithLp.toLp 2 v)⟫_ℂ := by
+    rw [Matrix.toEuclideanCLM_toLp, EuclideanSpace.inner_toLp_toLp]
+    exact (dotProduct_comm _ _)
+  rw [hbridge]
+  calc |(⟪(WithLp.toLp 2 u : EuclideanSpace ℂ (Λ → Fin (N + 1))),
+            Matrix.toEuclideanCLM (𝕜 := ℂ) G (WithLp.toLp 2 v)⟫_ℂ).re|
+      ≤ ‖⟪(WithLp.toLp 2 u : EuclideanSpace ℂ (Λ → Fin (N + 1))),
+            Matrix.toEuclideanCLM (𝕜 := ℂ) G (WithLp.toLp 2 v)⟫_ℂ‖ := by
+        simpa using RCLike.abs_re_le_norm
+          (⟪(WithLp.toLp 2 u : EuclideanSpace ℂ (Λ → Fin (N + 1))),
+            Matrix.toEuclideanCLM (𝕜 := ℂ) G (WithLp.toLp 2 v)⟫_ℂ)
+    _ ≤ ‖(WithLp.toLp 2 u : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖
+          * ‖Matrix.toEuclideanCLM (𝕜 := ℂ) G (WithLp.toLp 2 v)‖ := norm_inner_le_norm _ _
+    _ ≤ ‖(WithLp.toLp 2 u : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖
+          * (‖Matrix.toEuclideanCLM (𝕜 := ℂ) G‖
+            * ‖(WithLp.toLp 2 v : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖) := by
+        gcongr
+        exact (Matrix.toEuclideanCLM (𝕜 := ℂ) G).le_opNorm _
+    _ = ‖Matrix.toEuclideanCLM (𝕜 := ℂ) G‖
+          * ‖(WithLp.toLp 2 u : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖
+          * ‖(WithLp.toLp 2 v : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖ := by ring
 
 end LatticeSystem.Quantum
