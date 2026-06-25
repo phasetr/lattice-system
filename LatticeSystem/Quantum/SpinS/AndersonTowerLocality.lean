@@ -539,4 +539,13 @@ theorem orderWordProd_toLp_norm_sq_eq (d L N : ℕ) [NeZero L] (w : List Bool)
     star_mulVec_self_eq]
   rfl
 
+/-- `(ô^w)ᴴ = ô^{reverse-and-flip w}`: the conjugate transpose of an order word reverses the word
+and flips each `±` letter. -/
+theorem orderWordProd_conjTranspose (d L N : ℕ) [NeZero L] (w : List Bool) :
+    Matrix.conjTranspose (orderWordProd d L N w) = orderWordProd d L N (w.reverse.map not) := by
+  rw [orderWordProd, orderWordProd, Matrix.conjTranspose_list_prod]
+  congr 1
+  simp only [List.map_map, List.map_reverse, Function.comp_def,
+    staggeredOrderDensityOpS_conjTranspose]
+
 end LatticeSystem.Quantum
