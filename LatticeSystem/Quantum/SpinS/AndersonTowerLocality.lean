@@ -597,4 +597,79 @@ theorem orderWordProd_toLp_norm_sq_le (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
   rw [abs_le] at hclose
   linarith [hclose.2]
 
+/-- **Tasaki Lemma R2 (eq. (4.2.68)), general-`G` form.**  For a total-`Ŝ³` singlet `Φ` under the R1
+regime `3 N K² ≤ 2 q₀ V` (`K = |wₗ| + |wᵣ|`), an operator `G` inserted between two order-density
+words obeys `|Re⟨Φ, ô^{wₗ} G ô^{wᵣ} Φ⟩| ≤ (3/2)‖G‖ √(P_{|wₗ|} P_{|wᵣ|})`, via the operator
+Cauchy–Schwarz split at `G` into two balanced half-word radicands (each `≤ (3/2)P` by R1).  On the
+symmetric split `|wₗ| = |wᵣ| = n` this is `(3/2)‖G‖ P_n` (the form fed by the Anderson-tower
+numerator). -/
+theorem renormalized_inserted_product_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1)
+    (G : ManyBodyOpS (HypercubicTorus d L) N) (wₗ wᵣ : List Bool)
+    (hcond : 3 * (N : ℝ) * ((wₗ.length + wᵣ.length : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N wₗ * G * orderWordProd d L N wᵣ).mulVec Φ).re|
+      ≤ 3 / 2 * manyBodyOperatorNormS G
+          * Real.sqrt (phatMoment d L N Φ wₗ.length * phatMoment d L N Φ wᵣ.length) := by
+  have hcondL : 3 * (N : ℝ) * (wₗ.length : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d := by
+    refine le_trans ?_ hcond
+    have h : (wₗ.length : ℝ) ≤ ((wₗ.length + wᵣ.length : ℕ) : ℝ) := by
+      exact_mod_cast Nat.le_add_right _ _
+    exact mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (Nat.cast_nonneg _) h 2) (by positivity)
+  have hcondR : 3 * (N : ℝ) * (wᵣ.length : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d := by
+    refine le_trans ?_ hcond
+    have h : (wᵣ.length : ℝ) ≤ ((wₗ.length + wᵣ.length : ℕ) : ℝ) := by
+      exact_mod_cast Nat.le_add_left _ _
+    exact mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (Nat.cast_nonneg _) h 2) (by positivity)
+  have hPlnn : 0 ≤ phatMoment d L N Φ wₗ.length := phatMoment_nonneg d L N Φ wₗ.length
+  have hnu_sq : ‖(WithLp.toLp 2 ((Matrix.conjTranspose (orderWordProd d L N wₗ)).mulVec Φ)
+        : EuclideanSpace ℂ (HypercubicTorus d L → Fin (N + 1)))‖ ^ 2
+      ≤ 3 / 2 * phatMoment d L N Φ wₗ.length := by
+    rw [orderWordProd_conjTranspose]
+    have hb := orderWordProd_toLp_norm_sq_le d L N hN Φ hsing hm0 hlro (wₗ.reverse.map not)
+      (by simpa [List.length_map, List.length_reverse] using hcondL)
+    simpa [List.length_map, List.length_reverse] using hb
+  have hnv_sq : ‖(WithLp.toLp 2 ((orderWordProd d L N wᵣ).mulVec Φ)
+        : EuclideanSpace ℂ (HypercubicTorus d L → Fin (N + 1)))‖ ^ 2
+      ≤ 3 / 2 * phatMoment d L N Φ wᵣ.length :=
+    orderWordProd_toLp_norm_sq_le d L N hN Φ hsing hm0 hlro wᵣ hcondR
+  have hZ : star Φ ⬝ᵥ (orderWordProd d L N wₗ * G * orderWordProd d L N wᵣ).mulVec Φ
+      = star ((Matrix.conjTranspose (orderWordProd d L N wₗ)).mulVec Φ) ⬝ᵥ
+          G.mulVec ((orderWordProd d L N wᵣ).mulVec Φ) := by
+    rw [mul_assoc, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
+      star_dotProduct_mulVec_conjTranspose]
+  rw [hZ]
+  refine le_trans (abs_re_dotProduct_mulVec_le_norm_mul G _ _) ?_
+  set nu := ‖(WithLp.toLp 2 ((Matrix.conjTranspose (orderWordProd d L N wₗ)).mulVec Φ)
+      : EuclideanSpace ℂ (HypercubicTorus d L → Fin (N + 1)))‖ with hnu_def
+  set nv := ‖(WithLp.toLp 2 ((orderWordProd d L N wᵣ).mulVec Φ)
+      : EuclideanSpace ℂ (HypercubicTorus d L → Fin (N + 1)))‖ with hnv_def
+  have hnunn : 0 ≤ nu := norm_nonneg _
+  have hnvnn : 0 ≤ nv := norm_nonneg _
+  have hnu_le : nu ≤ Real.sqrt (3 / 2 * phatMoment d L N Φ wₗ.length) := by
+    rw [show nu = Real.sqrt (nu ^ 2) from (Real.sqrt_sq hnunn).symm]
+    exact Real.sqrt_le_sqrt hnu_sq
+  have hnv_le : nv ≤ Real.sqrt (3 / 2 * phatMoment d L N Φ wᵣ.length) := by
+    rw [show nv = Real.sqrt (nv ^ 2) from (Real.sqrt_sq hnvnn).symm]
+    exact Real.sqrt_le_sqrt hnv_sq
+  have hsqrt : Real.sqrt (3 / 2 * phatMoment d L N Φ wₗ.length)
+        * Real.sqrt (3 / 2 * phatMoment d L N Φ wᵣ.length)
+      = 3 / 2 * Real.sqrt (phatMoment d L N Φ wₗ.length * phatMoment d L N Φ wᵣ.length) := by
+    rw [← Real.sqrt_mul (mul_nonneg (by norm_num) hPlnn),
+      show 3 / 2 * phatMoment d L N Φ wₗ.length * (3 / 2 * phatMoment d L N Φ wᵣ.length)
+        = (3 / 2) ^ 2 * (phatMoment d L N Φ wₗ.length * phatMoment d L N Φ wᵣ.length) from by ring,
+      Real.sqrt_mul (by positivity), Real.sqrt_sq (by norm_num)]
+  calc manyBodyOperatorNormS G * nu * nv
+      = manyBodyOperatorNormS G * (nu * nv) := by ring
+    _ ≤ manyBodyOperatorNormS G
+          * (Real.sqrt (3 / 2 * phatMoment d L N Φ wₗ.length)
+            * Real.sqrt (3 / 2 * phatMoment d L N Φ wᵣ.length)) :=
+        mul_le_mul_of_nonneg_left (mul_le_mul hnu_le hnv_le hnvnn (Real.sqrt_nonneg _))
+          (manyBodyOperatorNormS_nonneg _)
+    _ = 3 / 2 * manyBodyOperatorNormS G
+          * Real.sqrt (phatMoment d L N Φ wₗ.length * phatMoment d L N Φ wᵣ.length) := by
+        rw [hsqrt]; ring
+
 end LatticeSystem.Quantum
