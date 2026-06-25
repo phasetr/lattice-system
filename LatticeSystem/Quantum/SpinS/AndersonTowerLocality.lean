@@ -385,4 +385,42 @@ theorem torusNNCoupling_total_norm_le (d L : ℕ) [NeZero L] :
         rw [Finset.sum_const, Finset.card_univ, card_hypercubicTorus, nsmul_eq_mul]
         push_cast; ring
 
+/-- **Spatial double-commutator norm bound (extensive)** `‖[Ô⁺, [Ĥ, Ô⁻]]‖ ≤ 96 d N⁴ V`: the bond
+expansion has `≤ 2dV` nonzero terms each of `L`-independent norm `≤ 48 N⁴`. -/
+theorem heisenberg_orderDouble_commutator_norm_le (d L N : ℕ) [NeZero L] (hL : 2 ≤ L) (hN : 1 ≤ N) :
+    manyBodyOperatorNormS
+      (staggeredRaisingOpS (torusParitySublattice d L) N
+          * (heisenbergHamiltonianS (torusNNCoupling d L) N
+              * staggeredLoweringOpS (torusParitySublattice d L) N
+            - staggeredLoweringOpS (torusParitySublattice d L) N
+              * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        - (heisenbergHamiltonianS (torusNNCoupling d L) N
+              * staggeredLoweringOpS (torusParitySublattice d L) N
+            - staggeredLoweringOpS (torusParitySublattice d L) N
+              * heisenbergHamiltonianS (torusNNCoupling d L) N)
+          * staggeredRaisingOpS (torusParitySublattice d L) N)
+      ≤ 96 * (d : ℝ) * (N : ℝ) ^ 4 * (L : ℝ) ^ d := by
+  rw [heisenberg_orderDouble_commutator_eq]
+  refine le_trans (manyBodyOperatorNormS_sum_le _ _) ?_
+  have hterm : ∀ p : HypercubicTorus d L × HypercubicTorus d L,
+      manyBodyOperatorNormS (torusNNCoupling d L p.1 p.2 • bondDoubleComm d L N p.1 p.2)
+        ≤ ‖torusNNCoupling d L p.1 p.2‖ * (48 * (N : ℝ) ^ 4) := by
+    intro p
+    rw [manyBodyOperatorNormS_smul]
+    by_cases hp : p.1 = p.2
+    · have hzero : torusNNCoupling d L p.1 p.2 = 0 := by
+        rw [hp]; exact torusNNCoupling_self_eq_zero d L hL p.2
+      rw [hzero]; simp
+    · exact mul_le_mul_of_nonneg_left (bondDoubleComm_norm_le d L N hp hN) (norm_nonneg _)
+  calc ∑ p : HypercubicTorus d L × HypercubicTorus d L,
+        manyBodyOperatorNormS (torusNNCoupling d L p.1 p.2 • bondDoubleComm d L N p.1 p.2)
+      ≤ ∑ p : HypercubicTorus d L × HypercubicTorus d L,
+          ‖torusNNCoupling d L p.1 p.2‖ * (48 * (N : ℝ) ^ 4) :=
+        Finset.sum_le_sum (fun p _ => hterm p)
+    _ = (∑ p : HypercubicTorus d L × HypercubicTorus d L, ‖torusNNCoupling d L p.1 p.2‖)
+          * (48 * (N : ℝ) ^ 4) := by rw [← Finset.sum_mul]
+    _ ≤ (2 * (d : ℝ) * (L : ℝ) ^ d) * (48 * (N : ℝ) ^ 4) :=
+        mul_le_mul_of_nonneg_right (torusNNCoupling_total_norm_le d L) (by positivity)
+    _ = 96 * (d : ℝ) * (N : ℝ) ^ 4 * (L : ℝ) ^ d := by ring
+
 end LatticeSystem.Quantum
