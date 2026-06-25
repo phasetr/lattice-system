@@ -265,4 +265,46 @@ theorem bondDoubleCommutator_norm_le (A : Λ → Bool) (x y : Λ) (hxy : x ≠ y
     show ‖(if A y then (1 : ℂ) else (-1 : ℂ))‖ = 1 from by split_ifs <;> simp, one_mul, one_mul]
   linarith [hz x, hz y]
 
+/-! ### Coupling row-sum bound and the spatial average (P9-3) -/
+
+/-- **Row-sum bound** `Σ_y ‖J x y‖ ≤ 2d` for the torus nearest-neighbor coupling: each row has at
+most `2d` neighbors (`±1` in each of the `d` axes). -/
+theorem torusNNCoupling_norm_rowSum_le (d L : ℕ) [NeZero L] (x : HypercubicTorus d L) :
+    ∑ y : HypercubicTorus d L, ‖torusNNCoupling d L x y‖ ≤ 2 * (d : ℝ) := by
+  classical
+  -- the neighbor map (axis, direction) ↦ shifted point
+  set nbr : Fin d × Bool → HypercubicTorus d L :=
+    fun p => Function.update x p.1 (x p.1 + (if p.2 then (1 : ZMod L) else (-1 : ZMod L))) with hnbr
+  have hnorm : ∀ y, ‖torusNNCoupling d L x y‖
+      = (if (∃ i : Fin d, (∀ j, j ≠ i → x j = y j) ∧ (y i = x i + 1 ∨ y i = x i - 1)) then (1 : ℝ)
+          else 0) := by
+    intro y; unfold torusNNCoupling; split_ifs <;> simp
+  rw [Finset.sum_congr rfl (fun y _ => hnorm y), Finset.sum_boole]
+  have hsub : (Finset.univ.filter
+      (fun y : HypercubicTorus d L =>
+        ∃ i : Fin d, (∀ j, j ≠ i → x j = y j) ∧ (y i = x i + 1 ∨ y i = x i - 1)))
+      ⊆ Finset.univ.image nbr := by
+    intro y hy
+    rw [Finset.mem_filter] at hy
+    obtain ⟨i, hagree, hval⟩ := hy.2
+    rcases hval with hv | hv
+    · refine Finset.mem_image.mpr ⟨(i, true), Finset.mem_univ _, ?_⟩
+      funext j
+      by_cases hj : j = i
+      · subst hj; simp only [hnbr, Function.update_self]; simp [hv]
+      · simp only [hnbr, Function.update_of_ne hj]; exact hagree j hj
+    · refine Finset.mem_image.mpr ⟨(i, false), Finset.mem_univ _, ?_⟩
+      funext j
+      by_cases hj : j = i
+      · subst hj; simp only [hnbr, Function.update_self]; simp [hv, sub_eq_add_neg]
+      · simp only [hnbr, Function.update_of_ne hj]; exact hagree j hj
+  calc ((Finset.univ.filter _).card : ℝ)
+      ≤ ((Finset.univ.image nbr).card : ℝ) := by
+        exact_mod_cast Finset.card_le_card hsub
+    _ ≤ ((Finset.univ : Finset (Fin d × Bool)).card : ℝ) := by
+        exact_mod_cast Finset.card_image_le
+    _ = 2 * (d : ℝ) := by
+        rw [Finset.card_univ, Fintype.card_prod, Fintype.card_fin, Fintype.card_bool]
+        push_cast; ring
+
 end LatticeSystem.Quantum
