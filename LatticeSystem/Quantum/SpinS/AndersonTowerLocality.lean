@@ -307,4 +307,60 @@ theorem torusNNCoupling_norm_rowSum_le (d L : ℕ) [NeZero L] (x : HypercubicTor
         rw [Finset.card_univ, Fintype.card_prod, Fintype.card_fin, Fintype.card_bool]
         push_cast; ring
 
+/-- The per-bond double commutator `[Ô_L⁺, [Ŝ_x·Ŝ_y, Ô_L⁻]]`. -/
+noncomputable def bondDoubleComm (d L N : ℕ) [NeZero L]
+    (x y : HypercubicTorus d L) : ManyBodyOpS (HypercubicTorus d L) N :=
+  staggeredRaisingOpS (torusParitySublattice d L) N
+      * (spinSDot x y N * staggeredLoweringOpS (torusParitySublattice d L) N
+        - staggeredLoweringOpS (torusParitySublattice d L) N * spinSDot x y N)
+    - (spinSDot x y N * staggeredLoweringOpS (torusParitySublattice d L) N
+        - staggeredLoweringOpS (torusParitySublattice d L) N * spinSDot x y N)
+      * staggeredRaisingOpS (torusParitySublattice d L) N
+
+/-- `‖[Ô⁺,[Ŝ_x·Ŝ_y,Ô⁻]]‖ ≤ 48 N⁴` for a genuine bond `x ≠ y` (restating
+`bondDoubleCommutator_norm_le` for `bondDoubleComm`). -/
+theorem bondDoubleComm_norm_le (d L N : ℕ) [NeZero L] {x y : HypercubicTorus d L}
+    (hxy : x ≠ y) (hN : 1 ≤ N) :
+    manyBodyOperatorNormS (bondDoubleComm d L N x y) ≤ 48 * (N : ℝ) ^ 4 :=
+  bondDoubleCommutator_norm_le (torusParitySublattice d L) x y hxy hN
+
+/-- A commutator distributes over a scalar-weighted finite sum on the right. -/
+theorem commutator_sum_smul_right {ι : Type*} (s : Finset ι) (A : ManyBodyOpS Λ N)
+    (c : ι → ℂ) (B : ι → ManyBodyOpS Λ N) :
+    A * (∑ i ∈ s, c i • B i) - (∑ i ∈ s, c i • B i) * A
+      = ∑ i ∈ s, c i • (A * B i - B i * A) := by
+  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib]
+  exact Finset.sum_congr rfl (fun i _ => by rw [mul_smul_comm, smul_mul_assoc, smul_sub])
+
+/-- A commutator distributes over a scalar-weighted finite sum on the left. -/
+theorem commutator_sum_smul_left {ι : Type*} (s : Finset ι) (A : ManyBodyOpS Λ N)
+    (c : ι → ℂ) (B : ι → ManyBodyOpS Λ N) :
+    (∑ i ∈ s, c i • B i) * A - A * (∑ i ∈ s, c i • B i)
+      = ∑ i ∈ s, c i • (B i * A - A * B i) := by
+  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib]
+  exact Finset.sum_congr rfl (fun i _ => by rw [smul_mul_assoc, mul_smul_comm, smul_sub])
+
+/-- **Bilinear expansion of the spatial double commutator** `[Ô⁺, [Ĥ, Ô⁻]] = Σ_{x,y} J x y ĝ_{x,y}`
+over the bonds, by distributing the commutator across the Hamiltonian sum. -/
+theorem heisenberg_orderDouble_commutator_eq (d L N : ℕ) [NeZero L] :
+    staggeredRaisingOpS (torusParitySublattice d L) N
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N
+            * staggeredLoweringOpS (torusParitySublattice d L) N
+          - staggeredLoweringOpS (torusParitySublattice d L) N
+            * heisenbergHamiltonianS (torusNNCoupling d L) N)
+      - (heisenbergHamiltonianS (torusNNCoupling d L) N
+            * staggeredLoweringOpS (torusParitySublattice d L) N
+          - staggeredLoweringOpS (torusParitySublattice d L) N
+            * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        * staggeredRaisingOpS (torusParitySublattice d L) N
+      = ∑ p : HypercubicTorus d L × HypercubicTorus d L,
+          torusNNCoupling d L p.1 p.2 • bondDoubleComm d L N p.1 p.2 := by
+  have hH : heisenbergHamiltonianS (torusNNCoupling d L) N
+      = ∑ p : HypercubicTorus d L × HypercubicTorus d L,
+          torusNNCoupling d L p.1 p.2 • spinSDot p.1 p.2 N := by
+    rw [heisenbergHamiltonianS_def, ← Finset.sum_product', Finset.univ_product_univ]
+  rw [hH]
+  simp only [commutator_sum_smul_left, commutator_sum_smul_right]
+  rfl
+
 end LatticeSystem.Quantum
