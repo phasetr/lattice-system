@@ -548,4 +548,34 @@ theorem orderWordProd_conjTranspose (d L N : ℕ) [NeZero L] (w : List Bool) :
   simp only [List.map_map, List.map_reverse, Function.comp_def,
     staggeredOrderDensityOpS_conjTranspose]
 
+/-! ### R2 main (P9-5): the inserted-product bound (eq. (4.2.68)) -/
+
+/-- For a binary word, `count c + count (¬c) = length`. -/
+theorem count_word_balanced (w : List Bool) (c : Bool) :
+    w.count c + w.count (!c) = w.length := by
+  cases c
+  · rw [Bool.not_false, add_comm]; exact count_true_add_count_false w
+  · rw [Bool.not_true]; exact count_true_add_count_false w
+
+/-- Counting through reverse-and-flip: `(w.reverse.map not).count c = w.count (¬c)`. -/
+theorem count_reverseMapNot (w : List Bool) (c : Bool) :
+    (w.reverse.map not).count c = w.count (!c) := by
+  have hinj : Function.Injective not := fun a b h => by simpa using congrArg not h
+  have h := List.count_map_of_injective w.reverse not hinj (!c)
+  rw [Bool.not_not] at h
+  rw [h]
+  exact (List.reverse_perm w).count_eq (!c)
+
+/-- The reverse-flip prefix balances any word: `((w.reverse.map not) ++ w).count c = |w|`. -/
+theorem count_reverseMapNot_append (w : List Bool) (c : Bool) :
+    (w.reverse.map not ++ w).count c = w.length := by
+  rw [List.count_append, count_reverseMapNot, add_comm]
+  exact count_word_balanced w c
+
+/-- **Adjoint-shift of a sandwiched expectation**: `⟨Φ, A v⟩ = ⟨Aᴴ Φ, v⟩`. -/
+theorem star_dotProduct_mulVec_conjTranspose {n : Type*} [Fintype n]
+    (A : Matrix n n ℂ) (Φ X : n → ℂ) :
+    star Φ ⬝ᵥ A.mulVec X = star ((Matrix.conjTranspose A).mulVec Φ) ⬝ᵥ X := by
+  rw [Matrix.star_mulVec, Matrix.conjTranspose_conjTranspose, Matrix.dotProduct_mulVec]
+
 end LatticeSystem.Quantum
