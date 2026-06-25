@@ -41,4 +41,100 @@ theorem heisenbergHamiltonianS_torus_isHermitian (d L N : ℕ) [NeZero L] :
     (heisenbergHamiltonianS (torusNNCoupling d L) N).IsHermitian :=
   heisenbergHamiltonianS_isHermitian_of_real (torusNNCoupling_real d L) N
 
+/-- **Variational gap ≤ double commutator (★).**  For a Hermitian `Ĥ` with ground state
+`Ĥ Φ = E₀ Φ` (`E₀` the minimum eigenvalue), the raising-tower energy gap is bounded by the symmetric
+double commutator: `⟨AΦ,ĤAΦ⟩ − E₀⟨AΦ,AΦ⟩ ≤ ⟨Φ, [A†,[Ĥ,A]] Φ⟩` with `A = (ô⁺)^M`, `A† = (ô⁻)^M`.
+Pure-algebra identity `NumGap(A) + NumGap(A†) = ⟨[A†,[Ĥ,A]]⟩` plus `NumGap(A†) ≥ 0`. -/
+theorem tower_numerator_double_commutator_le (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ) (M : ℕ)
+    (hev : (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ)
+    (hmin : ∀ (E : ℂ) (Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ), Ψ ≠ 0 →
+       (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re)
+    (hΦ : Φ ≠ 0) :
+    (star ((staggeredOrderDensityOpS d L N true ^ M).mulVec Φ) ⬝ᵥ
+        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec
+          ((staggeredOrderDensityOpS d L N true ^ M).mulVec Φ)).re
+      - E₀.re * (star ((staggeredOrderDensityOpS d L N true ^ M).mulVec Φ) ⬝ᵥ
+          (staggeredOrderDensityOpS d L N true ^ M).mulVec Φ).re
+    ≤ (star Φ ⬝ᵥ
+        ((staggeredOrderDensityOpS d L N false ^ M)
+            * (heisenbergHamiltonianS (torusNNCoupling d L) N
+                * staggeredOrderDensityOpS d L N true ^ M
+              - staggeredOrderDensityOpS d L N true ^ M
+                * heisenbergHamiltonianS (torusNNCoupling d L) N)
+          - (heisenbergHamiltonianS (torusNNCoupling d L) N
+                * staggeredOrderDensityOpS d L N true ^ M
+              - staggeredOrderDensityOpS d L N true ^ M
+                * heisenbergHamiltonianS (torusNNCoupling d L) N)
+            * (staggeredOrderDensityOpS d L N false ^ M)).mulVec Φ).re := by
+  set H := heisenbergHamiltonianS (torusNNCoupling d L) N with hH
+  set A := staggeredOrderDensityOpS d L N true ^ M with hA
+  set Adag := staggeredOrderDensityOpS d L N false ^ M with hAd
+  have hHerm : H.IsHermitian := heisenbergHamiltonianS_torus_isHermitian d L N
+  have hAdag : Adag = Matrix.conjTranspose A := orderDensityFalse_pow_eq_conjTranspose d L N M
+  have hE₀im : E₀.im = 0 := hermitian_mulVec_eigenvalue_im_zero hHerm hΦ hev
+  -- the four-term complex identity
+  have hT1 : star Φ ⬝ᵥ (Adag * (H * A)).mulVec Φ
+      = star (A.mulVec Φ) ⬝ᵥ H.mulVec (A.mulVec Φ) := by
+    rw [← Matrix.mulVec_mulVec, hAdag, star_dotProduct_mulVec_conjTranspose,
+      Matrix.conjTranspose_conjTranspose, Matrix.mulVec_mulVec]
+  have hT2 : star Φ ⬝ᵥ (Adag * A * H).mulVec Φ
+      = E₀ * (star (A.mulVec Φ) ⬝ᵥ A.mulVec Φ) := by
+    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hev, Matrix.mulVec_smul,
+      Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul, hAdag,
+      star_dotProduct_mulVec_conjTranspose, Matrix.conjTranspose_conjTranspose]
+  have hconjE : (star E₀ : ℂ) = E₀ := by
+    rw [Complex.star_def]; exact Complex.conj_eq_iff_im.mpr hE₀im
+  have hT3 : star Φ ⬝ᵥ (H * A * Adag).mulVec Φ
+      = E₀ * (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ) := by
+    rw [mul_assoc, hermitian_dotProduct_shift hHerm, hev, star_smul, smul_dotProduct, hconjE,
+      smul_eq_mul, ← Matrix.mulVec_mulVec, hAdag, star_dotProduct_mulVec_conjTranspose]
+  have hT4 : star Φ ⬝ᵥ (A * H * Adag).mulVec Φ
+      = star (Adag.mulVec Φ) ⬝ᵥ H.mulVec (Adag.mulVec Φ) := by
+    rw [mul_assoc, ← Matrix.mulVec_mulVec, hAdag, star_dotProduct_mulVec_conjTranspose,
+      Matrix.mulVec_mulVec]
+  have hP : Adag * (H * A - A * H) - (H * A - A * H) * Adag
+      = Adag * (H * A) - Adag * A * H - H * A * Adag + A * H * Adag := by noncomm_ring
+  have heq : star Φ ⬝ᵥ (Adag * (H * A - A * H) - (H * A - A * H) * Adag).mulVec Φ
+      = (star (A.mulVec Φ) ⬝ᵥ H.mulVec (A.mulVec Φ) - E₀ * (star (A.mulVec Φ) ⬝ᵥ A.mulVec Φ))
+        + (star (Adag.mulVec Φ) ⬝ᵥ H.mulVec (Adag.mulVec Φ)
+            - E₀ * (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ)) := by
+    rw [hP]
+    simp only [Matrix.add_mulVec, Matrix.sub_mulVec, dotProduct_add, dotProduct_sub,
+      hT1, hT2, hT3, hT4]
+    ring
+  -- take real parts; E₀ real and self-products real
+  have hself1 : (star (A.mulVec Φ) ⬝ᵥ A.mulVec Φ).im = 0 :=
+    ((Complex.le_def.mp (dotProduct_star_self_nonneg (A.mulVec Φ))).2).symm
+  have hself2 : (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ).im = 0 :=
+    ((Complex.le_def.mp (dotProduct_star_self_nonneg (Adag.mulVec Φ))).2).symm
+  have hre : (star Φ ⬝ᵥ (Adag * (H * A - A * H) - (H * A - A * H) * Adag).mulVec Φ).re
+      = (star (A.mulVec Φ) ⬝ᵥ H.mulVec (A.mulVec Φ)).re
+          - E₀.re * (star (A.mulVec Φ) ⬝ᵥ A.mulVec Φ).re
+        + ((star (Adag.mulVec Φ) ⬝ᵥ H.mulVec (Adag.mulVec Φ)).re
+          - E₀.re * (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ).re) := by
+    rw [heq]
+    simp only [Complex.add_re, Complex.sub_re, Complex.mul_re, hE₀im, hself1, hself2]
+    ring
+  -- NumGap(A†) ≥ 0 by the variational lower bound
+  have hvar := hermitianMinEigenvalue_mul_dotProduct_re_le_rayleighOnVec hHerm (Adag.mulVec Φ)
+  obtain ⟨v, hv_ne, hv_eig⟩ := exists_nonzero_eigenvector_hermitianMinEigenvalue hHerm
+  have hE₀le : E₀.re ≤ hermitianMinEigenvalue hHerm := by
+    have := hmin ((hermitianMinEigenvalue hHerm : ℝ) : ℂ) v hv_ne hv_eig
+    simpa using this
+  have hdenom : 0 ≤ (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ).re :=
+    (Complex.le_def.mp (dotProduct_star_self_nonneg (Adag.mulVec Φ))).1
+  have hnumgap_dag : 0 ≤ (star (Adag.mulVec Φ) ⬝ᵥ H.mulVec (Adag.mulVec Φ)).re
+      - E₀.re * (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ).re := by
+    have h1 : E₀.re * (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ).re
+        ≤ hermitianMinEigenvalue hHerm * (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ).re :=
+      mul_le_mul_of_nonneg_right hE₀le hdenom
+    have h2 : hermitianMinEigenvalue hHerm * (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ).re
+        ≤ rayleighOnVec H (Adag.mulVec Φ) := hvar
+    have h3 : rayleighOnVec H (Adag.mulVec Φ)
+        = (star (Adag.mulVec Φ) ⬝ᵥ H.mulVec (Adag.mulVec Φ)).re := rfl
+    linarith
+  rw [hre]
+  linarith
+
 end LatticeSystem.Quantum
