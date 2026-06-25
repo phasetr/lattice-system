@@ -520,4 +520,23 @@ theorem abs_re_dotProduct_mulVec_le_norm_mul (G : ManyBodyOpS Λ N)
           * ‖(WithLp.toLp 2 u : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖
           * ‖(WithLp.toLp 2 v : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖ := by ring
 
+/-- `⟨A Φ, A Φ⟩ = ⟨Φ, Aᴴ A Φ⟩` (the f-sum-rule pairing). -/
+theorem star_mulVec_self_eq {n : Type*} [Fintype n]
+    (A : Matrix n n ℂ) (Φ : n → ℂ) :
+    star (A.mulVec Φ) ⬝ᵥ A.mulVec Φ
+      = star Φ ⬝ᵥ (Matrix.conjTranspose A * A).mulVec Φ := by
+  rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec]
+
+/-- The squared `L²` norm of an order-word vector is a balanced-word expectation:
+`‖ô^w Φ‖² = ⟨Φ, (ô^w)ᴴ ô^w Φ⟩`. -/
+theorem orderWordProd_toLp_norm_sq_eq (d L N : ℕ) [NeZero L] (w : List Bool)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) :
+    ‖(WithLp.toLp 2 ((orderWordProd d L N w).mulVec Φ)
+        : EuclideanSpace ℂ (HypercubicTorus d L → Fin (N + 1)))‖ ^ 2
+      = (star Φ ⬝ᵥ (Matrix.conjTranspose (orderWordProd d L N w)
+          * orderWordProd d L N w).mulVec Φ).re := by
+  rw [← inner_self_eq_norm_sq (𝕜 := ℂ), EuclideanSpace.inner_toLp_toLp, dotProduct_comm,
+    star_mulVec_self_eq]
+  rfl
+
 end LatticeSystem.Quantum
