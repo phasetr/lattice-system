@@ -307,6 +307,14 @@ theorem torusNNCoupling_norm_rowSum_le (d L : ℕ) [NeZero L] (x : HypercubicTor
         rw [Finset.card_univ, Fintype.card_prod, Fintype.card_fin, Fintype.card_bool]
         push_cast; ring
 
+/-- Scaling a double commutator: `[c·A, [H, c·B]] = c² [A, [H, B]]`. -/
+theorem smul_double_commutator (c : ℂ) (A H B : ManyBodyOpS Λ N) :
+    (c • A) * (H * (c • B) - (c • B) * H) - (H * (c • B) - (c • B) * H) * (c • A)
+      = (c * c) • (A * (H * B - B * H) - (H * B - B * H) * A) := by
+  have hINNER : H * (c • B) - c • B * H = c • (H * B - B * H) := by
+    rw [mul_smul_comm, smul_mul_assoc, smul_sub]
+  rw [hINNER, smul_mul_smul_comm, smul_mul_smul_comm, ← smul_sub]
+
 /-- The per-bond double commutator `[Ô_L⁺, [Ŝ_x·Ŝ_y, Ô_L⁻]]`. -/
 noncomputable def bondDoubleComm (d L N : ℕ) [NeZero L]
     (x y : HypercubicTorus d L) : ManyBodyOpS (HypercubicTorus d L) N :=
@@ -422,5 +430,42 @@ theorem heisenberg_orderDouble_commutator_norm_le (d L N : ℕ) [NeZero L] (hL :
     _ ≤ (2 * (d : ℝ) * (L : ℝ) ^ d) * (48 * (N : ℝ) ^ 4) :=
         mul_le_mul_of_nonneg_right (torusNNCoupling_total_norm_le d L) (by positivity)
     _ = 96 * (d : ℝ) * (N : ℝ) ^ 4 * (L : ℝ) ^ d := by ring
+
+/-- **Per-volume double-commutator locality (eq. 4.2.65)** `‖[ô⁺, [Ĥ, ô⁻]]‖ ≤ 96 d N⁴ / V`: the
+spatial average is `O(1/V)`, the renormalized estimate driving Lemma R2. -/
+theorem orderDensity_double_commutator_norm_le (d L N : ℕ) [NeZero L] (hL : 2 ≤ L) (hN : 1 ≤ N) :
+    manyBodyOperatorNormS
+      (staggeredOrderDensityOpS d L N true
+          * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N false
+            - staggeredOrderDensityOpS d L N false * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        - (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N false
+            - staggeredOrderDensityOpS d L N false * heisenbergHamiltonianS (torusNNCoupling d L) N)
+          * staggeredOrderDensityOpS d L N true)
+      ≤ 96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d := by
+  have hV : (0 : ℝ) < (L : ℝ) ^ d := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    positivity
+  rw [show staggeredOrderDensityOpS d L N true
+      = ((L : ℂ) ^ d)⁻¹ • staggeredRaisingOpS (torusParitySublattice d L) N from rfl,
+    show staggeredOrderDensityOpS d L N false
+      = ((L : ℂ) ^ d)⁻¹ • staggeredLoweringOpS (torusParitySublattice d L) N from rfl,
+    smul_double_commutator, manyBodyOperatorNormS_smul,
+    show ‖((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹‖ = ((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ from by
+      rw [norm_mul, norm_inv, norm_pow, Complex.norm_natCast]]
+  calc ((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹
+        * manyBodyOperatorNormS (staggeredRaisingOpS (torusParitySublattice d L) N
+            * (heisenbergHamiltonianS (torusNNCoupling d L) N
+                * staggeredLoweringOpS (torusParitySublattice d L) N
+              - staggeredLoweringOpS (torusParitySublattice d L) N
+                * heisenbergHamiltonianS (torusNNCoupling d L) N)
+          - (heisenbergHamiltonianS (torusNNCoupling d L) N
+                * staggeredLoweringOpS (torusParitySublattice d L) N
+              - staggeredLoweringOpS (torusParitySublattice d L) N
+                * heisenbergHamiltonianS (torusNNCoupling d L) N)
+            * staggeredRaisingOpS (torusParitySublattice d L) N)
+      ≤ ((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (96 * (d : ℝ) * (N : ℝ) ^ 4 * (L : ℝ) ^ d) :=
+        mul_le_mul_of_nonneg_left (heisenberg_orderDouble_commutator_norm_le d L N hL hN)
+          (by positivity)
+    _ = 96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d := by field_simp
 
 end LatticeSystem.Quantum
