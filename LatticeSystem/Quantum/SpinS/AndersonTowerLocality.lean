@@ -363,4 +363,26 @@ theorem heisenberg_orderDouble_commutator_eq (d L N : ℕ) [NeZero L] :
   simp only [commutator_sum_smul_left, commutator_sum_smul_right]
   rfl
 
+/-- The nearest-neighbor coupling has no self-loop: `J x x = 0` (for `L ≥ 2`, since `±1 ≠ 0`). -/
+theorem torusNNCoupling_self_eq_zero (d L : ℕ) [NeZero L] (hL : 2 ≤ L)
+    (x : HypercubicTorus d L) : torusNNCoupling d L x x = 0 := by
+  haveI : Fact (1 < L) := ⟨hL⟩
+  unfold torusNNCoupling
+  rw [if_neg]
+  rintro ⟨i, _, h | h⟩
+  · exact one_ne_zero (by linear_combination -h : (1 : ZMod L) = 0)
+  · exact one_ne_zero (by linear_combination h : (1 : ZMod L) = 0)
+
+/-- **Total coupling weight** `Σ_{x,y} ‖J x y‖ ≤ 2 d V` (`V = Lᵈ`). -/
+theorem torusNNCoupling_total_norm_le (d L : ℕ) [NeZero L] :
+    ∑ p : HypercubicTorus d L × HypercubicTorus d L, ‖torusNNCoupling d L p.1 p.2‖
+      ≤ 2 * (d : ℝ) * (L : ℝ) ^ d := by
+  rw [← Finset.univ_product_univ, Finset.sum_product]
+  calc ∑ x : HypercubicTorus d L, ∑ y : HypercubicTorus d L, ‖torusNNCoupling d L x y‖
+      ≤ ∑ _x : HypercubicTorus d L, 2 * (d : ℝ) :=
+        Finset.sum_le_sum (fun x _ => torusNNCoupling_norm_rowSum_le d L x)
+    _ = 2 * (d : ℝ) * (L : ℝ) ^ d := by
+        rw [Finset.sum_const, Finset.card_univ, card_hypercubicTorus, nsmul_eq_mul]
+        push_cast; ring
+
 end LatticeSystem.Quantum
