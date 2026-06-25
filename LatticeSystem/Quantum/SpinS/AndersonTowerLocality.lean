@@ -578,4 +578,23 @@ theorem star_dotProduct_mulVec_conjTranspose {n : Type*} [Fintype n]
     star Φ ⬝ᵥ A.mulVec X = star ((Matrix.conjTranspose A).mulVec Φ) ⬝ᵥ X := by
   rw [Matrix.star_mulVec, Matrix.conjTranspose_conjTranspose, Matrix.dotProduct_mulVec]
 
+/-- **Order-word `L²`-radicand bound** `‖ô^w Φ‖² ≤ (3/2) P_{|w|}` under the R1 regime: the squared
+norm is the balanced expectation of `(ô^w)ᴴ ô^w = ô^{(¬w)ʳ ++ w}`, pinched by R1. -/
+theorem orderWordProd_toLp_norm_sq_le (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1)
+    (w : List Bool)
+    (hcond : 3 * (N : ℝ) * (w.length : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d) :
+    ‖(WithLp.toLp 2 ((orderWordProd d L N w).mulVec Φ)
+        : EuclideanSpace ℂ (HypercubicTorus d L → Fin (N + 1)))‖ ^ 2
+      ≤ 3 / 2 * phatMoment d L N Φ w.length := by
+  rw [orderWordProd_toLp_norm_sq_eq, orderWordProd_conjTranspose, ← orderWordProd_append]
+  have hclose := orderWord_balanced_re_close d L N hN Φ hsing hm0 hlro w.length hcond
+    (w.reverse.map not ++ w) (count_reverseMapNot_append w true)
+    (count_reverseMapNot_append w false)
+  rw [abs_le] at hclose
+  linarith [hclose.2]
+
 end LatticeSystem.Quantum
