@@ -74,4 +74,63 @@ theorem orderWord_orderCommutator_insert_mulVec_eq (d L N : ℕ) [NeZero L]
     orderCommutator_mulVec_orderWordProd d L N Φ hsing wr, Matrix.mulVec_smul,
     Matrix.mulVec_mulVec]
 
+/-- The identity operator lies in the local-decay class with `ζ = 0` (empty support). -/
+theorem isR2LocalUpTo_one (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (K : ℕ) :
+    IsR2LocalUpTo K 0 (N : ℝ) (manyBodyOperatorNormS (1 : ManyBodyOpS (HypercubicTorus d L) N))
+      (1 : ManyBodyOpS (HypercubicTorus d L) N) := by
+  have hsupp : SupportedOn (∅ : Finset (HypercubicTorus d L))
+      (1 : ManyBodyOpS (HypercubicTorus d L) N) := fun z _ B => Commute.one_left _
+  simpa using isR2LocalUpTo_of_supported hsupp hN K
+
+/-- **Plain order-word expectation bound** `|Re⟨Φ, ô^{wₗ} ô^{wᵣ} Φ⟩| ≤ 3‖1‖ · mf(|wₗ|+|wᵣ|)`
+(Lemma R2 with the trivial insertion `G = 1`). -/
+theorem plain_orderWord_re_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hq₀ : 0 < q₀) (hm0 : 0 < phatMoment d L N Φ 0)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1))
+    (wl wr : List Bool)
+    (hcond : 3 * (N : ℝ) * ((wl.length + wr.length : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N wl * orderWordProd d L N wr).mulVec Φ).re|
+      ≤ 3 * manyBodyOperatorNormS (1 : ManyBodyOpS (HypercubicTorus d L) N)
+          * momentFactor d L N Φ (wl.length + wr.length) := by
+  have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    positivity
+  have hbd := r2_split_independent d L N hN Φ hsing (q₀ := q₀) (ζ := (0 : ℝ)) (o₀ := (N : ℝ))
+    hq₀ hm0 hratio (by simp) (wl.length + wr.length) hcond (by simp) wl wr 1
+    (manyBodyOperatorNormS 1) rfl (isR2LocalUpTo_one d L N hN _)
+  rwa [mul_one] at hbd
+
+/-- **S2/S3 single-term bound.**  Combining the `[ô⁺,ô⁻]` scalarization with the plain order-word R2
+bound: `|Re⟨Φ, ô^{wₗ} [ô⁺,ô⁻] ô^{wᵣ} Φ⟩| ≤ ‖V⁻² · 2 m(wᵣ)‖ · 3‖1‖ · mf(|wₗ|+|wᵣ|)`. -/
+theorem orderCommutator_word_re_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hq₀ : 0 < q₀) (hm0 : 0 < phatMoment d L N Φ 0)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1))
+    (wl wr : List Bool)
+    (hcond : 3 * (N : ℝ) * ((wl.length + wr.length : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N wl
+        * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+          - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+        * orderWordProd d L N wr).mulVec Φ).re|
+      ≤ ‖(((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge wr)‖
+        * (3 * manyBodyOperatorNormS (1 : ManyBodyOpS (HypercubicTorus d L) N)
+            * momentFactor d L N Φ (wl.length + wr.length)) := by
+  rw [orderWord_orderCommutator_insert_mulVec_eq d L N Φ hsing wl wr, dotProduct_smul,
+    smul_eq_mul]
+  have hVim : (((L : ℂ) ^ d)⁻¹).im = 0 := by
+    rw [show ((L : ℂ) ^ d)⁻¹ = (((((L : ℝ) ^ d)⁻¹ : ℝ)) : ℂ) by push_cast; ring]
+    exact Complex.ofReal_im _
+  set s := (((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge wr) with hs
+  set Z := star Φ ⬝ᵥ (orderWordProd d L N wl * orderWordProd d L N wr).mulVec Φ with hZ
+  have hsim : s.im = 0 := by
+    rw [hs]; simp [Complex.mul_im, Complex.mul_re, hVim, mCharge_im]
+  have hre : (s * Z).re = s.re * Z.re := by rw [Complex.mul_re, hsim, zero_mul, sub_zero]
+  rw [hre, abs_mul]
+  refine mul_le_mul ?_ (plain_orderWord_re_bound d L N hN Φ hsing hq₀ hm0 hratio wl wr hcond)
+    (abs_nonneg _) (norm_nonneg _)
+  simpa using RCLike.abs_re_le_norm s
+
 end LatticeSystem.Quantum
