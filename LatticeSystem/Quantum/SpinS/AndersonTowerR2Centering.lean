@@ -269,4 +269,33 @@ theorem momentFactor_succ_ge (d L N : ℕ) [NeZero L]
     nlinarith [this]
   nlinarith [hkey]
 
+/-! ### The split-independent R2 induction (R2 commit 8) -/
+
+/-- **Balanced base of the R2 induction.**  When the inserted `G` sits at the word center
+(`||wₗ|−|wᵣ|| ≤ 1`), the geometric-mean Cauchy–Schwarz bound already produces the unified moment
+factor: `|Re⟨Φ, ô^{wₗ} G ô^{wᵣ} Φ⟩| ≤ (3/2)‖G‖ · mf(|wₗ|+|wᵣ|)`. -/
+theorem r2_balanced_base (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1)
+    (G : ManyBodyOpS (HypercubicTorus d L) N) (wₗ wᵣ : List Bool)
+    (hcond : 3 * (N : ℝ) * ((wₗ.length + wᵣ.length : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (himb : wₗ.length ≤ wᵣ.length + 1 ∧ wᵣ.length ≤ wₗ.length + 1) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N wₗ * G * orderWordProd d L N wᵣ).mulVec Φ).re|
+      ≤ 3 / 2 * manyBodyOperatorNormS G
+          * momentFactor d L N Φ (wₗ.length + wᵣ.length) := by
+  have hbd := renormalized_inserted_product_bound d L N hN Φ hsing hm0 hlro G wₗ wᵣ hcond
+  have hmf : Real.sqrt (phatMoment d L N Φ wₗ.length * phatMoment d L N Φ wᵣ.length)
+      = momentFactor d L N Φ (wₗ.length + wᵣ.length) := by
+    rw [momentFactor]
+    set a := wₗ.length with ha
+    set b := wᵣ.length with hb
+    congr 1
+    rcases (show (a = (a + b) / 2 ∧ b = (a + b + 1) / 2)
+        ∨ (a = (a + b + 1) / 2 ∧ b = (a + b) / 2) by omega) with ⟨h1, h2⟩ | ⟨h1, h2⟩
+    · rw [← h1, ← h2]
+    · rw [← h1, ← h2, mul_comm]
+  rwa [hmf] at hbd
+
 end LatticeSystem.Quantum
