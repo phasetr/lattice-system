@@ -201,4 +201,29 @@ theorem IsR2LocalUpTo.orderComm_mem [NeZero L] {K : ℕ} {ζ o₀ g₀ : ℝ}
   rw [List.length_cons, pow_succ]
   ring
 
+/-- **Mirror centering step (operator identity).**  Moving the first right letter `a` across the
+inserted `G` toward the center (from the right side) splits the sandwich into a more-balanced
+sandwich with the same `G` minus the decayed-commutator error sandwich. -/
+theorem inserted_centering_step_mirror_eq [NeZero L] (wₗ wᵣ' : List Bool) (a : Bool)
+    (G : ManyBodyOpS (HypercubicTorus d L) N) :
+    orderWordProd d L N wₗ * G * orderWordProd d L N (a :: wᵣ')
+      = orderWordProd d L N (wₗ ++ [a]) * G * orderWordProd d L N wᵣ'
+        - orderWordProd d L N wₗ * orderComm a G * orderWordProd d L N wᵣ' := by
+  rw [orderWordProd_mul_append, orderWordProd_singleton, orderWordProd_mul_cons, orderComm]
+  noncomm_ring
+
+/-- **Mirror centering step (expectation triangle bound).**  The right-side mirror of
+`inserted_centering_step_re_le`, used when the inserted `G` lies left of the center. -/
+theorem inserted_centering_step_mirror_re_le [NeZero L] (wₗ wᵣ' : List Bool) (a : Bool)
+    (G : ManyBodyOpS (HypercubicTorus d L) N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N wₗ * G
+          * orderWordProd d L N (a :: wᵣ')).mulVec Φ).re|
+      ≤ |(star Φ ⬝ᵥ (orderWordProd d L N (wₗ ++ [a]) * G
+            * orderWordProd d L N wᵣ').mulVec Φ).re|
+        + |(star Φ ⬝ᵥ (orderWordProd d L N wₗ * orderComm a G
+            * orderWordProd d L N wᵣ').mulVec Φ).re| := by
+  rw [inserted_centering_step_mirror_eq, Matrix.sub_mulVec, dotProduct_sub, Complex.sub_re]
+  exact abs_sub _ _
+
 end LatticeSystem.Quantum
