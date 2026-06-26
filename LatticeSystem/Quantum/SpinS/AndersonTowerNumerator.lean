@@ -182,4 +182,27 @@ theorem heisenberg_dotProduct_left (d L N : ℕ) [NeZero L]
     smul_eq_mul]
   rfl
 
+/-! ### Surfacing `d̂` via the Jacobi identity (LSp77 reordering core) -/
+
+/-- **Jacobi identity surfacing `d̂`.**  The nested commutator `[[Ĥ, ô⁺], ô⁻]` equals
+`[Ĥ, [ô⁺, ô⁻]] − [ô⁺, [Ĥ, ô⁻]] = [Ĥ, [ô⁺, ô⁻]] − d̂` — a pure ring identity.  Combined with
+`[Ĥ, [ô⁺, ô⁻]] = 0` (the order commutator is `∝ Ŝ³_tot`, which commutes with `Ĥ`), this gives
+`[[Ĥ, ô⁺], ô⁻] = −d̂`, the mechanism by which the Anderson-tower numerator surfaces `d̂`. -/
+theorem heisenberg_order_jacobi (d L N : ℕ) [NeZero L] :
+    (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        * staggeredOrderDensityOpS d L N false
+      - staggeredOrderDensityOpS d L N false
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true
+            * heisenbergHamiltonianS (torusNNCoupling d L) N)
+      = (heisenbergHamiltonianS (torusNNCoupling d L) N
+            * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+              - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+          - (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+              - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+            * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        - orderDoubleComm d L N := by
+  rw [orderDoubleComm]; noncomm_ring
+
 end LatticeSystem.Quantum
