@@ -205,4 +205,28 @@ theorem heisenberg_order_jacobi (d L N : ℕ) [NeZero L] :
         - orderDoubleComm d L N := by
   rw [orderDoubleComm]; noncomm_ring
 
+/-- **`Ĥ` commutes with the order commutator.**  Since `[ô⁺, ô⁻] = (2/V²) Ŝ³_tot` and `Ĥ` conserves
+total `Ŝ³`, the inner commutator `[Ĥ, [ô⁺, ô⁻]]` vanishes. -/
+theorem heisenberg_orderCommutator_commute (d L N : ℕ) [NeZero L] :
+    heisenbergHamiltonianS (torusNNCoupling d L) N
+        * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+          - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+      - (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+          - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+        * heisenbergHamiltonianS (torusNNCoupling d L) N = 0 := by
+  rw [staggeredOrderDensity_commutator_eq, smul_smul, mul_smul_comm, smul_mul_assoc, ← smul_sub,
+    heisenbergHamiltonianS_commutator_totalSpinSOp3, smul_zero]
+
+/-- **`[[Ĥ, ô⁺], ô⁻] = −d̂`.**  Combining the Jacobi identity with `[Ĥ, [ô⁺, ô⁻]] = 0`. -/
+theorem heisenberg_order_nested_eq_neg_orderDoubleComm (d L N : ℕ) [NeZero L] :
+    (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        * staggeredOrderDensityOpS d L N false
+      - staggeredOrderDensityOpS d L N false
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true
+            * heisenbergHamiltonianS (torusNNCoupling d L) N)
+      = - orderDoubleComm d L N := by
+  rw [heisenberg_order_jacobi, heisenberg_orderCommutator_commute, zero_sub]
+
 end LatticeSystem.Quantum
