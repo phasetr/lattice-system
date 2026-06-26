@@ -196,4 +196,84 @@ theorem isR2LocalUpTo_of_supported [NeZero L] {S : Finset (HypercubicTorus d L)}
     IsR2LocalUpTo K (S.card : ℝ) (N : ℝ) (manyBodyOperatorNormS G) G :=
   ⟨manyBodyOperatorNormS_nonneg G, fun u _ => iterOrderComm_norm_le_of_supported hN u G hG⟩
 
+/-! ### Linearity of `iterOrderComm` and the quasi-local-sum bound (R2 local-decay, commit 10) -/
+
+/-- `orderComm` is additive in its operator argument. -/
+theorem orderComm_add [NeZero L] (b : Bool) (G H : ManyBodyOpS (HypercubicTorus d L) N) :
+    orderComm b (G + H) = orderComm b G + orderComm b H := by
+  simp only [orderComm, mul_add, add_mul]; abel
+
+/-- `orderComm` commutes with scalar multiplication. -/
+theorem orderComm_smul [NeZero L] (b : Bool) (c : ℂ) (G : ManyBodyOpS (HypercubicTorus d L) N) :
+    orderComm b (c • G) = c • orderComm b G := by
+  simp only [orderComm, mul_smul_comm, smul_mul_assoc, smul_sub]
+
+/-- `iterOrderComm` of zero is zero. -/
+theorem iterOrderComm_zero [NeZero L] (u : List Bool) :
+    iterOrderComm u (0 : ManyBodyOpS (HypercubicTorus d L) N) = 0 := by
+  have h0 : orderComm (d := d) (L := L) (N := N) true 0 = 0 := by simp [orderComm]
+  have h0' : orderComm (d := d) (L := L) (N := N) false 0 = 0 := by simp [orderComm]
+  induction u with
+  | nil => rfl
+  | cons b u ih => rw [iterOrderComm_cons]; cases b <;> simp only [h0, h0', ih]
+
+/-- `iterOrderComm` commutes with scalar multiplication. -/
+theorem iterOrderComm_smul [NeZero L] (u : List Bool) (c : ℂ)
+    (G : ManyBodyOpS (HypercubicTorus d L) N) :
+    iterOrderComm u (c • G) = c • iterOrderComm u G := by
+  induction u generalizing G with
+  | nil => simp
+  | cons b u ih => rw [iterOrderComm_cons, iterOrderComm_cons, orderComm_smul, ih]
+
+/-- `iterOrderComm` is additive in its operator argument. -/
+theorem iterOrderComm_add [NeZero L] (u : List Bool) (G H : ManyBodyOpS (HypercubicTorus d L) N) :
+    iterOrderComm u (G + H) = iterOrderComm u G + iterOrderComm u H := by
+  induction u generalizing G H with
+  | nil => simp
+  | cons b u ih =>
+    rw [iterOrderComm_cons, iterOrderComm_cons, iterOrderComm_cons, orderComm_add, ih]
+
+/-- `iterOrderComm` distributes over a finite sum. -/
+theorem iterOrderComm_sum [NeZero L] {ι : Type*} (u : List Bool) (s : Finset ι)
+    (f : ι → ManyBodyOpS (HypercubicTorus d L) N) :
+    iterOrderComm u (∑ i ∈ s, f i) = ∑ i ∈ s, iterOrderComm u (f i) := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp [iterOrderComm_zero]
+  | insert i s hi ih => rw [Finset.sum_insert hi, Finset.sum_insert hi, iterOrderComm_add, ih]
+
+/-- **Quasi-local-sum decay.**  If `G = ∑_{i∈s} c_i • Gᵢ` with each `Gᵢ` supported on a set of size
+`≤ smax`, then every iterated order-density commutator of `G` decays by `(2·smax·N/V)^{|u|}` times
+the ℓ¹-aggregate `∑ |c_i|‖Gᵢ‖`.  This is the structural input for
+`d̂ = V⁻²∑_bonds J·bondDoubleComm`, a sum of two-site-supported terms (so `smax = 2`). -/
+theorem iterOrderComm_norm_le_of_localSum [NeZero L] {ι : Type*} (hN : 1 ≤ N) (u : List Bool)
+    (s : Finset ι) (c : ι → ℂ) (G : ι → ManyBodyOpS (HypercubicTorus d L) N)
+    (S : ι → Finset (HypercubicTorus d L)) (smax : ℕ)
+    (hsup : ∀ i ∈ s, SupportedOn (S i) (G i)) (hcard : ∀ i ∈ s, (S i).card ≤ smax) :
+    manyBodyOperatorNormS (iterOrderComm u (∑ i ∈ s, c i • G i))
+      ≤ (2 * (smax : ℝ) * (N : ℝ) / (L : ℝ) ^ d) ^ u.length
+        * ∑ i ∈ s, ‖c i‖ * manyBodyOperatorNormS (G i) := by
+  have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    positivity
+  rw [iterOrderComm_sum, Finset.mul_sum]
+  refine le_trans (manyBodyOperatorNormS_sum_le s _) (Finset.sum_le_sum (fun i hi => ?_))
+  rw [iterOrderComm_smul, manyBodyOperatorNormS_smul]
+  have hbd := iterOrderComm_norm_le_of_supported hN u (G i) (hsup i hi)
+  have hmono : (2 * ((S i).card : ℝ) * (N : ℝ) / (L : ℝ) ^ d) ^ u.length
+      ≤ (2 * (smax : ℝ) * (N : ℝ) / (L : ℝ) ^ d) ^ u.length := by
+    apply pow_le_pow_left₀ (by positivity)
+    gcongr
+    exact_mod_cast hcard i hi
+  calc ‖c i‖ * manyBodyOperatorNormS (iterOrderComm u (G i))
+      ≤ ‖c i‖ * ((2 * ((S i).card : ℝ) * (N : ℝ) / (L : ℝ) ^ d) ^ u.length
+          * manyBodyOperatorNormS (G i)) := by
+        exact mul_le_mul_of_nonneg_left hbd (norm_nonneg _)
+    _ ≤ ‖c i‖ * ((2 * (smax : ℝ) * (N : ℝ) / (L : ℝ) ^ d) ^ u.length
+          * manyBodyOperatorNormS (G i)) := by
+        gcongr
+        exact manyBodyOperatorNormS_nonneg _
+    _ = (2 * (smax : ℝ) * (N : ℝ) / (L : ℝ) ^ d) ^ u.length
+          * (‖c i‖ * manyBodyOperatorNormS (G i)) := by ring
+
 end LatticeSystem.Quantum
