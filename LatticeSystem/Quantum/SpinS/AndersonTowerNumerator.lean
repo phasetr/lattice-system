@@ -157,4 +157,29 @@ theorem orderDoubleComm_word_re_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (h
   · exact momentFactor_nonneg d L N Φ _
   · exact orderDoubleCommAggregate_le hL hN
 
+/-! ### Hamiltonian elimination on the ground eigenvector (assembly helpers) -/
+
+/-- **Right `Ĥ`-elimination.**  When `Ĥ Φ = E₀ Φ`, an `Ĥ` factored on the right of an operator
+collapses to the scalar `E₀`: `⟨Φ, (X Ĥ) Φ⟩ = E₀ ⟨Φ, X Φ⟩`. -/
+theorem heisenberg_dotProduct_right (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ)
+    (hev : (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ)
+    (X : ManyBodyOpS (HypercubicTorus d L) N) :
+    star Φ ⬝ᵥ (X * heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ
+      = E₀ * (star Φ ⬝ᵥ X.mulVec Φ) := by
+  rw [← Matrix.mulVec_mulVec, hev, Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul]
+
+/-- **Left `Ĥ`-elimination.**  For Hermitian `Ĥ` with `Ĥ Φ = E₀ Φ`, an `Ĥ` factored on the left
+collapses to `conj E₀`: `⟨Φ, (Ĥ X) Φ⟩ = conj(E₀) ⟨Φ, X Φ⟩`. -/
+theorem heisenberg_dotProduct_left (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ)
+    (hev : (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ)
+    (X : ManyBodyOpS (HypercubicTorus d L) N) :
+    star Φ ⬝ᵥ (heisenbergHamiltonianS (torusNNCoupling d L) N * X).mulVec Φ
+      = (starRingEnd ℂ) E₀ * (star Φ ⬝ᵥ X.mulVec Φ) := by
+  rw [← Matrix.mulVec_mulVec, star_dotProduct_mulVec_conjTranspose,
+    (heisenbergHamiltonianS_torus_isHermitian d L N).eq, hev, star_smul, smul_dotProduct,
+    smul_eq_mul]
+  rfl
+
 end LatticeSystem.Quantum
