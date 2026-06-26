@@ -57,4 +57,21 @@ theorem numerator_eq_sum_j (d L N M : ℕ) [NeZero L] :
   rw [heisenberg_orderDensityPow_commutator_eq, Finset.mul_sum, Finset.sum_mul,
     ← Finset.sum_sub_distrib]
 
+/-- **Scalarization of an inserted `[ô⁺, ô⁻]` (S2/S3 core).**  On a total-`Ŝ³` singlet `Φ`, the
+order commutator inserted between two order words collapses to a scalar (the suffix charge), since
+`[ô⁺, ô⁻]` acts on any order-word state as `(V⁻² · 2 m(suf))`:
+`(ô^{wₗ} [ô⁺,ô⁻] ô^{wᵣ}) Φ = (V⁻² · 2 m(wᵣ)) · (ô^{wₗ} ô^{wᵣ}) Φ`. -/
+theorem orderWord_orderCommutator_insert_mulVec_eq (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) (wl wr : List Bool) :
+    (orderWordProd d L N wl
+        * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+          - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+        * orderWordProd d L N wr).mulVec Φ
+      = ((((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge wr))
+          • (orderWordProd d L N wl * orderWordProd d L N wr).mulVec Φ := by
+  rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
+    orderCommutator_mulVec_orderWordProd d L N Φ hsing wr, Matrix.mulVec_smul,
+    Matrix.mulVec_mulVec]
+
 end LatticeSystem.Quantum
