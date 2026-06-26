@@ -114,6 +114,45 @@ theorem SupportedOn.sum {ι : Type*} {S : Finset Λ} (s : Finset ι)
 theorem supportedOn_zero {S : Finset Λ} : SupportedOn S (0 : ManyBodyOpS Λ N) :=
   fun _ _ _ => Commute.zero_left _
 
+/-- `SupportedOn` is monotone in the support set. -/
+theorem SupportedOn.mono {S T : Finset Λ} {G : ManyBodyOpS Λ N} (hG : SupportedOn S G)
+    (hST : S ⊆ T) : SupportedOn T G := fun z hz B => hG z (fun h => hz (hST h)) B
+
+/-- `SupportedOn` is closed under products. -/
+theorem SupportedOn.mul {S : Finset Λ} {G H : ManyBodyOpS Λ N} (hG : SupportedOn S G)
+    (hH : SupportedOn S H) : SupportedOn S (G * H) :=
+  fun z hz B => (hG z hz B).mul_left (hH z hz B)
+
+/-- `SupportedOn` is closed under sums. -/
+theorem SupportedOn.add {S : Finset Λ} {G H : ManyBodyOpS Λ N} (hG : SupportedOn S G)
+    (hH : SupportedOn S H) : SupportedOn S (G + H) :=
+  fun z hz B => (hG z hz B).add_left (hH z hz B)
+
+/-- `SupportedOn` is closed under differences. -/
+theorem SupportedOn.sub {S : Finset Λ} {G H : ManyBodyOpS Λ N} (hG : SupportedOn S G)
+    (hH : SupportedOn S H) : SupportedOn S (G - H) :=
+  fun z hz B => (hG z hz B).sub_left (hH z hz B)
+
+/-- An on-site operator is supported on its own site. -/
+theorem onSiteS_supportedOn (x : Λ) (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    SupportedOn {x} (onSiteS x A) :=
+  fun _z hz B => onSiteS_commute_of_ne
+    (Ne.symm (fun h => hz (Finset.mem_singleton.mpr h))) A B
+
+/-- The per-site raising/lowering operators are supported on their site. -/
+theorem siteOrderOp_supportedOn (b : Bool) (x : Λ) : SupportedOn {x} (siteOrderOp b x N) := by
+  cases b with
+  | true => exact onSiteS_supportedOn x (spinSOpPlus N)
+  | false => exact onSiteS_supportedOn x (spinSOpMinus N)
+
+/-- The bond operator `Ŝ_x·Ŝ_y` is supported on the bond `{x, y}`. -/
+theorem spinSDot_supportedOn (x y : Λ) : SupportedOn {x, y} (spinSDot x y N) := by
+  intro z hz B
+  have hzx : z ≠ x := fun h => hz (by rw [h]; exact Finset.mem_insert_self x {y})
+  have hzy : z ≠ y := fun h => hz (by
+    rw [h]; exact Finset.mem_insert_of_mem (Finset.mem_singleton_self y))
+  exact spinSDot_commute_onSiteS_of_ne x y z hzx hzy B
+
 /-- **Support preservation.**  An order-density commutator of an `S`-supported operator stays
 supported on `S`. -/
 theorem orderComm_supportedOn [NeZero L] {S : Finset (HypercubicTorus d L)}
@@ -275,5 +314,33 @@ theorem iterOrderComm_norm_le_of_localSum [NeZero L] {ι : Type*} (hN : 1 ≤ N)
         exact manyBodyOperatorNormS_nonneg _
     _ = (2 * (smax : ℝ) * (N : ℝ) / (L : ℝ) ^ d) ^ u.length
           * (‖c i‖ * manyBodyOperatorNormS (G i)) := by ring
+
+/-- **The per-bond double commutator is two-site supported.**  `bondDoubleComm x y` is built from
+the bond operator `Ŝ_x·Ŝ_y` and the on-bond raising/lowering operators, so it commutes with every
+on-site factor away from `{x, y}`. -/
+theorem bondDoubleComm_supportedOn [NeZero L] (x y : HypercubicTorus d L) (hxy : x ≠ y) :
+    SupportedOn ({x, y} : Finset (HypercubicTorus d L)) (bondDoubleComm d L N x y) := by
+  have hx : ({x} : Finset (HypercubicTorus d L)) ⊆ {x, y} :=
+    Finset.singleton_subset_iff.mpr (Finset.mem_insert_self x {y})
+  have hy : ({y} : Finset (HypercubicTorus d L)) ⊆ {x, y} :=
+    Finset.singleton_subset_iff.mpr (Finset.mem_insert_of_mem (Finset.mem_singleton_self y))
+  have hSx : SupportedOn ({x, y} : Finset _) (spinSSiteOpPlus x N) :=
+    (onSiteS_supportedOn x (spinSOpPlus N)).mono hx
+  have hSy : SupportedOn ({x, y} : Finset _) (spinSSiteOpPlus y N) :=
+    (onSiteS_supportedOn y (spinSOpPlus N)).mono hy
+  have hMx : SupportedOn ({x, y} : Finset _) (spinSSiteOpMinus x N) :=
+    (onSiteS_supportedOn x (spinSOpMinus N)).mono hx
+  have hMy : SupportedOn ({x, y} : Finset _) (spinSSiteOpMinus y N) :=
+    (onSiteS_supportedOn y (spinSOpMinus N)).mono hy
+  have hdot := spinSDot_supportedOn (N := N) x y
+  have hC : SupportedOn ({x, y} : Finset _)
+      (spinSDot x y N * staggeredLoweringOpS (torusParitySublattice d L) N
+        - staggeredLoweringOpS (torusParitySublattice d L) N * spinSDot x y N) := by
+    rw [spinSDot_commutator_staggeredLoweringOpS_support (torusParitySublattice d L) x y hxy]
+    exact (((hdot.mul hMx).sub (hMx.mul hdot)).smul _).add
+      (((hdot.mul hMy).sub (hMy.mul hdot)).smul _)
+  unfold bondDoubleComm
+  rw [bondDoubleCommutator_support (torusParitySublattice d L) x y hxy]
+  exact ((hSx.mul hC).sub (hC.mul hSx)).smul _ |>.add (((hSy.mul hC).sub (hC.mul hSy)).smul _)
 
 end LatticeSystem.Quantum
