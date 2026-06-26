@@ -27,4 +27,34 @@ theorem heisenberg_orderDensityPow_commutator_eq (d L N M : ℕ) [NeZero L] :
           * staggeredOrderDensityOpS d L N true ^ (M - 1 - j) :=
   commutator_pow_eq_sum _ _ M
 
+/-- **The numerator double commutator as a single sum over insertion positions.**  Substituting the
+commutator-power expansion of `[Ĥ, (ô⁺)^M]` into the ★-variational numerator gives a sum over `j` of
+the `(ô⁻)^M`-commutators of the position-`j` `[Ĥ, ô⁺]` insertions. -/
+theorem numerator_eq_sum_j (d L N M : ℕ) [NeZero L] :
+    staggeredOrderDensityOpS d L N false ^ M
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true ^ M
+          - staggeredOrderDensityOpS d L N true ^ M
+            * heisenbergHamiltonianS (torusNNCoupling d L) N)
+      - (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true ^ M
+          - staggeredOrderDensityOpS d L N true ^ M
+            * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        * staggeredOrderDensityOpS d L N false ^ M
+      = ∑ j ∈ Finset.range M,
+          (staggeredOrderDensityOpS d L N false ^ M
+              * (staggeredOrderDensityOpS d L N true ^ j
+                * (heisenbergHamiltonianS (torusNNCoupling d L) N
+                    * staggeredOrderDensityOpS d L N true
+                  - staggeredOrderDensityOpS d L N true
+                    * heisenbergHamiltonianS (torusNNCoupling d L) N)
+                * staggeredOrderDensityOpS d L N true ^ (M - 1 - j))
+            - (staggeredOrderDensityOpS d L N true ^ j
+                * (heisenbergHamiltonianS (torusNNCoupling d L) N
+                    * staggeredOrderDensityOpS d L N true
+                  - staggeredOrderDensityOpS d L N true
+                    * heisenbergHamiltonianS (torusNNCoupling d L) N)
+                * staggeredOrderDensityOpS d L N true ^ (M - 1 - j))
+              * staggeredOrderDensityOpS d L N false ^ M) := by
+  rw [heisenberg_orderDensityPow_commutator_eq, Finset.mul_sum, Finset.sum_mul,
+    ← Finset.sum_sub_distrib]
+
 end LatticeSystem.Quantum
