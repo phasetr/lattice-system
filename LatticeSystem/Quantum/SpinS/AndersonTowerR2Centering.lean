@@ -173,4 +173,32 @@ theorem inserted_centering_step_re_le [NeZero L] (wₗ' wᵣ : List Bool) (a : B
   rw [inserted_centering_step_eq, Matrix.add_mulVec, dotProduct_add, Complex.add_re]
   exact abs_add_le _ _
 
+/-! ### Bridging the local-decay class through one centering step (R2 commit 5) -/
+
+/-- A single order-density commutator of a depth-`≥1` local operator decays by `2ζo₀/V`:
+`‖orderComm a G‖ ≤ (2ζo₀/V) g₀`. -/
+theorem IsR2LocalUpTo.orderComm_norm_le [NeZero L] {K : ℕ} {ζ o₀ g₀ : ℝ}
+    {G : ManyBodyOpS (HypercubicTorus d L) N} (h : IsR2LocalUpTo K ζ o₀ g₀ G)
+    (a : Bool) (hK : 1 ≤ K) :
+    manyBodyOperatorNormS (orderComm a G) ≤ (2 * ζ * o₀) / (L : ℝ) ^ d * g₀ := by
+  have hb := h.norm_iter [a] (by simpa using hK)
+  simpa [iterOrderComm, pow_one] using hb
+
+/-- **Recursive class membership.**  If `G` is in the local-decay class up to depth `K+1`, then each
+order-density commutator `orderComm a G` is in the class up to depth `K` with the decayed constant
+`(2ζo₀/V) g₀`.  This drives the split-independent induction: each centering step lowers the depth by
+one and contracts the constant geometrically. -/
+theorem IsR2LocalUpTo.orderComm_mem [NeZero L] {K : ℕ} {ζ o₀ g₀ : ℝ}
+    {G : ManyBodyOpS (HypercubicTorus d L) N} (h : IsR2LocalUpTo (K + 1) ζ o₀ g₀ G)
+    (a : Bool) (hdecay : 0 ≤ (2 * ζ * o₀) / (L : ℝ) ^ d) :
+    IsR2LocalUpTo K ζ o₀ ((2 * ζ * o₀) / (L : ℝ) ^ d * g₀) (orderComm a G) := by
+  refine ⟨mul_nonneg hdecay h.g0_nonneg, ?_⟩
+  intro u hu
+  have heq : iterOrderComm u (orderComm a G) = iterOrderComm (a :: u) G := rfl
+  rw [heq]
+  have hb := h.norm_iter (a :: u) (by simp only [List.length_cons]; omega)
+  refine le_trans hb (le_of_eq ?_)
+  rw [List.length_cons, pow_succ]
+  ring
+
 end LatticeSystem.Quantum
