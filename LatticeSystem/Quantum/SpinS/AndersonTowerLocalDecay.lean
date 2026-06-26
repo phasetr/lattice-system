@@ -343,4 +343,96 @@ theorem bondDoubleComm_supportedOn [NeZero L] (x y : HypercubicTorus d L) (hxy :
   rw [bondDoubleCommutator_support (torusParitySublattice d L) x y hxy]
   exact ((hSx.mul hC).sub (hC.mul hSx)).smul _ |>.add (((hSy.mul hC).sub (hC.mul hSy)).smul _)
 
+/-! ### The physical double commutator `d̂` lies in the local-decay class (R2 commit 11b) -/
+
+/-- The per-volume double commutator `d̂ = [ô⁺, [Ĥ, ô⁻]]` (the operator inserted at the heart of the
+Anderson-tower numerator). -/
+noncomputable def orderDoubleComm (d L N : ℕ) [NeZero L] : ManyBodyOpS (HypercubicTorus d L) N :=
+  staggeredOrderDensityOpS d L N true
+      * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N false
+        - staggeredOrderDensityOpS d L N false * heisenbergHamiltonianS (torusNNCoupling d L) N)
+    - (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N false
+        - staggeredOrderDensityOpS d L N false * heisenbergHamiltonianS (torusNNCoupling d L) N)
+      * staggeredOrderDensityOpS d L N true
+
+/-- `d̂` is the volume-squared-averaged signed sum over genuine bonds of the per-bond double
+commutators: `d̂ = ∑_{x≠y} (V⁻² J_{xy}) · bondDoubleComm x y`. -/
+theorem orderDoubleComm_eq_offDiag_sum [NeZero L] (hL : 2 ≤ L) :
+    orderDoubleComm d L N
+      = ∑ p ∈ Finset.univ.filter
+          (fun p : HypercubicTorus d L × HypercubicTorus d L => p.1 ≠ p.2),
+          (((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹ * torusNNCoupling d L p.1 p.2)
+            • bondDoubleComm d L N p.1 p.2 := by
+  rw [orderDoubleComm,
+    show staggeredOrderDensityOpS d L N true
+      = ((L : ℂ) ^ d)⁻¹ • staggeredRaisingOpS (torusParitySublattice d L) N from rfl,
+    show staggeredOrderDensityOpS d L N false
+      = ((L : ℂ) ^ d)⁻¹ • staggeredLoweringOpS (torusParitySublattice d L) N from rfl,
+    smul_double_commutator, heisenberg_orderDouble_commutator_eq, Finset.smul_sum,
+    Finset.sum_congr rfl (fun p _ => smul_smul (((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹)
+      (torusNNCoupling d L p.1 p.2) (bondDoubleComm d L N p.1 p.2))]
+  refine (Finset.sum_filter_of_ne (fun p _ hfne => ?_)).symm
+  intro hpe
+  apply hfne
+  have hJ : torusNNCoupling d L p.1 p.2 = 0 := by
+    rw [hpe]; exact torusNNCoupling_self_eq_zero d L hL p.2
+  rw [hJ, mul_zero, zero_smul]
+
+/-- The ℓ¹-aggregate carried by `d̂`'s quasi-local decomposition. -/
+noncomputable def orderDoubleCommAggregate (d L N : ℕ) [NeZero L] : ℝ :=
+  ∑ p ∈ Finset.univ.filter (fun p : HypercubicTorus d L × HypercubicTorus d L => p.1 ≠ p.2),
+    ‖((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹ * torusNNCoupling d L p.1 p.2‖
+      * manyBodyOperatorNormS (bondDoubleComm d L N p.1 p.2)
+
+/-- **`d̂` lies in the local-decay class** with `ζ = 2`, `o₀ = N`, and `g₀` the ℓ¹-aggregate of its
+bond decomposition — the `IsR2LocalUpTo` hypothesis that Lemma R2 consumes for the numerator. -/
+theorem isR2LocalUpTo_orderDoubleComm [NeZero L] (hL : 2 ≤ L) (hN : 1 ≤ N) (K : ℕ) :
+    IsR2LocalUpTo K 2 (N : ℝ) (orderDoubleCommAggregate d L N) (orderDoubleComm d L N) := by
+  refine ⟨Finset.sum_nonneg
+    (fun p _ => mul_nonneg (norm_nonneg _) (manyBodyOperatorNormS_nonneg _)), fun u _ => ?_⟩
+  rw [orderDoubleComm_eq_offDiag_sum hL]
+  have hbd := iterOrderComm_norm_le_of_localSum hN u
+    (Finset.univ.filter (fun p : HypercubicTorus d L × HypercubicTorus d L => p.1 ≠ p.2))
+    (fun p => ((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹ * torusNNCoupling d L p.1 p.2)
+    (fun p => bondDoubleComm d L N p.1 p.2)
+    (fun p => ({p.1, p.2} : Finset (HypercubicTorus d L))) 2
+    (fun p hp => bondDoubleComm_supportedOn p.1 p.2 (Finset.mem_filter.mp hp).2)
+    (fun p _ => (Finset.card_insert_le _ _).trans (by simp))
+  simpa [orderDoubleCommAggregate] using hbd
+
+/-- **The aggregate is `≤ 96 d N⁴ / V`.**  The `≤ 2dV` nonzero bonds each contribute
+`V⁻²·1·48N⁴`. -/
+theorem orderDoubleCommAggregate_le [NeZero L] (hL : 2 ≤ L) (hN : 1 ≤ N) :
+    orderDoubleCommAggregate d L N ≤ 96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d := by
+  have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    positivity
+  have hVc : ‖((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹‖ = ((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ := by
+    simp only [norm_mul, norm_inv, norm_pow, Complex.norm_natCast]
+  calc orderDoubleCommAggregate d L N
+      ≤ ∑ p ∈ Finset.univ.filter
+          (fun p : HypercubicTorus d L × HypercubicTorus d L => p.1 ≠ p.2),
+          (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹) * ‖torusNNCoupling d L p.1 p.2‖
+            * (48 * (N : ℝ) ^ 4) := by
+        refine Finset.sum_le_sum (fun p hp => ?_)
+        rw [norm_mul, hVc]
+        exact mul_le_mul_of_nonneg_left
+          (bondDoubleComm_norm_le d L N (Finset.mem_filter.mp hp).2 hN) (by positivity)
+    _ = (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹) * (48 * (N : ℝ) ^ 4)
+          * ∑ p ∈ Finset.univ.filter
+            (fun p : HypercubicTorus d L × HypercubicTorus d L => p.1 ≠ p.2),
+            ‖torusNNCoupling d L p.1 p.2‖ := by
+        rw [Finset.mul_sum]; refine Finset.sum_congr rfl (fun p _ => by ring)
+    _ ≤ (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹) * (48 * (N : ℝ) ^ 4)
+          * (2 * (d : ℝ) * (L : ℝ) ^ d) := by
+        have hsub : (∑ p ∈ Finset.univ.filter
+              (fun p : HypercubicTorus d L × HypercubicTorus d L => p.1 ≠ p.2),
+              ‖torusNNCoupling d L p.1 p.2‖)
+            ≤ ∑ p : HypercubicTorus d L × HypercubicTorus d L, ‖torusNNCoupling d L p.1 p.2‖ :=
+          Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
+            (fun _ _ _ => norm_nonneg _)
+        exact mul_le_mul_of_nonneg_left (hsub.trans (torusNNCoupling_total_norm_le d L))
+          (by positivity)
+    _ = 96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d := by field_simp; ring
+
 end LatticeSystem.Quantum
