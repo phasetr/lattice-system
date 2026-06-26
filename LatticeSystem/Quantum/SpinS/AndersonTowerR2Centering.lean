@@ -133,4 +133,44 @@ theorem renormalized_inserted_product_bound_symm (d L N : ℕ) [NeZero L] (hN : 
   have hPnn : 0 ≤ phatMoment d L N Φ w.length := phatMoment_nonneg d L N Φ w.length
   rwa [Real.sqrt_mul_self hPnn] at hbd
 
+/-! ### The single centering step (R2 commit 4) -/
+
+/-- Operator-level append identity for the word product. -/
+theorem orderWordProd_mul_append [NeZero L] (w w' : List Bool) :
+    orderWordProd d L N (w ++ w')
+      = orderWordProd d L N w * orderWordProd d L N w' := by
+  simp [orderWordProd, List.map_append, List.prod_append]
+
+/-- A single-letter word product is the corresponding order-density operator. -/
+theorem orderWordProd_singleton [NeZero L] (a : Bool) :
+    orderWordProd d L N [a] = staggeredOrderDensityOpS d L N a := by
+  simp [orderWordProd]
+
+/-- **Single centering step (operator identity).**  Moving the last left letter `a` across the
+inserted `G` toward the center splits the sandwich into a more-balanced sandwich with the *same* `G`
+plus an error sandwich carrying the decayed commutator `orderComm a G`. -/
+theorem inserted_centering_step_eq [NeZero L] (wₗ' wᵣ : List Bool) (a : Bool)
+    (G : ManyBodyOpS (HypercubicTorus d L) N) :
+    orderWordProd d L N (wₗ' ++ [a]) * G * orderWordProd d L N wᵣ
+      = orderWordProd d L N wₗ' * G * orderWordProd d L N (a :: wᵣ)
+        + orderWordProd d L N wₗ' * orderComm a G * orderWordProd d L N wᵣ := by
+  rw [orderWordProd_mul_append, orderWordProd_singleton, orderWordProd_mul_cons, orderComm]
+  noncomm_ring
+
+/-- **Single centering step (expectation triangle bound).**  The real part of the imbalanced
+sandwich expectation is controlled by the more-balanced sandwich plus the decayed-commutator error
+sandwich.  Iterating drives `G` to the center (Step B) while accumulating geometrically small
+errors. -/
+theorem inserted_centering_step_re_le [NeZero L] (wₗ' wᵣ : List Bool) (a : Bool)
+    (G : ManyBodyOpS (HypercubicTorus d L) N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N (wₗ' ++ [a]) * G
+          * orderWordProd d L N wᵣ).mulVec Φ).re|
+      ≤ |(star Φ ⬝ᵥ (orderWordProd d L N wₗ' * G
+            * orderWordProd d L N (a :: wᵣ)).mulVec Φ).re|
+        + |(star Φ ⬝ᵥ (orderWordProd d L N wₗ' * orderComm a G
+            * orderWordProd d L N wᵣ).mulVec Φ).re| := by
+  rw [inserted_centering_step_eq, Matrix.add_mulVec, dotProduct_add, Complex.add_re]
+  exact abs_add_le _ _
+
 end LatticeSystem.Quantum
