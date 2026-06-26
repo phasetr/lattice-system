@@ -298,4 +298,187 @@ theorem r2_balanced_base (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
     · rw [← h1, ← h2, mul_comm]
   rwa [hmf] at hbd
 
+set_option maxHeartbeats 3200000 in -- nested centering induction over large operator-word terms
+/-- **Inner centering accumulation (R2, fixed `K`).**  Given the split-independent R2 bound at depth
+`K-1` (as `hIHerr`), one drives the inserted `G` from any split to the word center, accumulating at
+most `e` decayed-commutator errors: the bound is `(3/2)g₀ mf(K) + e · (3ρ g₀ mf(K))` whenever the
+imbalance is `≤ 2e+1`.  Extracted as a standalone lemma so the heavy double induction elaborates
+with its own budget and a small context. -/
+theorem r2_centering_accum (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ ζ o₀ : ℝ}
+    (hq₀ : 0 < q₀) (hm0 : 0 < phatMoment d L N Φ 0)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1))
+    (hdecay : 0 ≤ (2 * ζ * o₀) / (L : ℝ) ^ d) (K : ℕ)
+    (hcond : 3 * (N : ℝ) * ((K : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hIHerr : ∀ (X Y : List Bool) (Gc : ManyBodyOpS (HypercubicTorus d L) N) (g' : ℝ),
+        X.length + Y.length = K - 1 → IsR2LocalUpTo (K - 1) ζ o₀ g' Gc →
+        |(star Φ ⬝ᵥ (orderWordProd d L N X * Gc * orderWordProd d L N Y).mulVec Φ).re|
+          ≤ 3 * g' * momentFactor d L N Φ (K - 1)) :
+    ∀ (e : ℕ) (wₗ wᵣ : List Bool) (G : ManyBodyOpS (HypercubicTorus d L) N) (g₀ : ℝ),
+      wₗ.length + wᵣ.length = K → IsR2LocalUpTo K ζ o₀ g₀ G →
+      (wₗ.length ≤ wᵣ.length + (2 * e + 1) ∧ wᵣ.length ≤ wₗ.length + (2 * e + 1)) →
+      |(star Φ ⬝ᵥ (orderWordProd d L N wₗ * G * orderWordProd d L N wᵣ).mulVec Φ).re|
+        ≤ 3 / 2 * g₀ * momentFactor d L N Φ K
+          + (e : ℝ) * (3 * ((2 * ζ * o₀) / (L : ℝ) ^ d / Real.sqrt (2 * q₀))
+            * g₀ * momentFactor d L N Φ K) := by
+  have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    positivity
+  set δ := (2 * ζ * o₀) / (L : ℝ) ^ d with hδ
+  set sq := Real.sqrt (2 * q₀) with hsqdef
+  have hsqpos : 0 < sq := Real.sqrt_pos.mpr (by linarith)
+  set ρ := δ / sq with hρdef
+  have hρnn : 0 ≤ ρ := div_nonneg hdecay hsqpos.le
+  intro e
+  induction e with
+  | zero =>
+    intro wₗ wᵣ G g₀ hlen hcls himb
+    simp only [Nat.cast_zero, zero_mul, add_zero]
+    have hb := r2_balanced_base d L N hN Φ hsing hm0 (hratio 0) G wₗ wᵣ
+      (by rw [hlen]; exact hcond) ⟨by omega, by omega⟩
+    rw [hlen] at hb
+    refine le_trans hb ?_
+    have hGg := hcls.norm_le
+    have hmfnn := momentFactor_nonneg d L N Φ K
+    gcongr
+  | succ e ihe =>
+    intro wₗ wᵣ G g₀ hlen hcls himb
+    have hg0nn := hcls.g0_nonneg
+    have hmfnn := momentFactor_nonneg d L N Φ K
+    have hEnn : 0 ≤ 3 * ρ * g₀ * momentFactor d L N Φ K := by positivity
+    by_cases hbal : wₗ.length ≤ wᵣ.length + 1 ∧ wᵣ.length ≤ wₗ.length + 1
+    · have hb := r2_balanced_base d L N hN Φ hsing hm0 (hratio 0) G wₗ wᵣ
+        (by rw [hlen]; exact hcond) hbal
+      rw [hlen] at hb
+      have hb2 : |(star Φ ⬝ᵥ (orderWordProd d L N wₗ * G
+            * orderWordProd d L N wᵣ).mulVec Φ).re|
+          ≤ 3 / 2 * g₀ * momentFactor d L N Φ K := by
+        refine le_trans hb ?_
+        have hGg := hcls.norm_le
+        gcongr
+      nlinarith [hb2, hEnn, (by positivity : (0:ℝ) ≤ (e:ℝ))]
+    · have hK2 : 2 ≤ K := by omega
+      have hKeq : K = (K - 1) + 1 := by omega
+      have herror : ∀ (X Y : List Bool) (b : Bool),
+          X.length + Y.length = K - 1 →
+          |(star Φ ⬝ᵥ (orderWordProd d L N X * orderComm b G
+              * orderWordProd d L N Y).mulVec Φ).re|
+            ≤ 3 * ρ * g₀ * momentFactor d L N Φ K := by
+        intro X Y b hXY
+        have hclsb : IsR2LocalUpTo (K - 1) ζ o₀ (δ * g₀) (orderComm b G) := by
+          have hc := (hKeq ▸ hcls).orderComm_mem b hdecay
+          rw [← hδ] at hc
+          exact hc
+        have hout := hIHerr X Y (orderComm b G) (δ * g₀) hXY hclsb
+        have hr := momentFactor_succ_ge d L N Φ (K - 1) hq₀.le (hratio ((K - 1) / 2))
+        rw [← hsqdef, ← hKeq] at hr
+        have hmfKpnn := momentFactor_nonneg d L N Φ (K - 1)
+        have hkey : 3 * (δ * g₀) * momentFactor d L N Φ (K - 1)
+            ≤ 3 * ρ * g₀ * momentFactor d L N Φ K := by
+          have h3dg : 0 ≤ 3 * δ * g₀ :=
+            mul_nonneg (mul_nonneg (by norm_num) hdecay) hg0nn
+          have hstep := mul_le_mul_of_nonneg_left hr h3dg
+          have hρsq : ρ * sq = δ := by rw [hρdef]; field_simp
+          have key2 : 3 * (δ * g₀) * momentFactor d L N Φ (K - 1) * sq
+              ≤ 3 * ρ * g₀ * momentFactor d L N Φ K * sq := by
+            have hrw : 3 * ρ * g₀ * momentFactor d L N Φ K * sq
+                = 3 * δ * g₀ * momentFactor d L N Φ K := by rw [← hρsq]; ring
+            rw [hrw]; nlinarith [hstep]
+          exact le_of_mul_le_mul_right key2 hsqpos
+        exact le_trans hout hkey
+      rcases (by omega : wₗ.length ≥ wᵣ.length + 2 ∨ wᵣ.length ≥ wₗ.length + 2) with hlong | hlong
+      · rcases List.eq_nil_or_concat wₗ with hnil | ⟨wₗ', a, hwl⟩
+        · exfalso; rw [hnil] at hlong; simp only [List.length_nil] at hlong; omega
+        rw [List.concat_eq_append] at hwl
+        subst hwl
+        have hla : (wₗ' ++ [a]).length = wₗ'.length + 1 := by simp
+        rw [hla] at hlen hlong himb
+        have hlen' : wₗ'.length + (a :: wᵣ).length = K := by
+          simp only [List.length_cons]; omega
+        have hmain := ihe wₗ' (a :: wᵣ) G g₀ hlen' hcls
+          (by simp only [List.length_cons]; omega)
+        have herr := herror wₗ' wᵣ a (by omega)
+        have hbnd := inserted_centering_step_re_le (d := d) (L := L) (N := N) wₗ' wᵣ a G Φ
+        have hid : (↑(e + 1) : ℝ) * (3 * ρ * g₀ * momentFactor d L N Φ K)
+            = (↑e : ℝ) * (3 * ρ * g₀ * momentFactor d L N Φ K)
+              + 3 * ρ * g₀ * momentFactor d L N Φ K := by push_cast; ring
+        linarith [hbnd, hmain, herr, hid]
+      · rcases wᵣ with _ | ⟨a, wᵣ'⟩
+        · exfalso; simp only [List.length_nil] at hlong; omega
+        simp only [List.length_cons] at hlen
+        simp only [List.length_cons] at hlong
+        simp only [List.length_cons] at himb
+        have hlen' : (wₗ ++ [a]).length + wᵣ'.length = K := by
+          simp only [List.length_append, List.length_cons, List.length_nil]; omega
+        have hmain := ihe (wₗ ++ [a]) wᵣ' G g₀ hlen' hcls
+          (by simp only [List.length_append, List.length_cons, List.length_nil]; omega)
+        have herr := herror wₗ wᵣ' a (by omega)
+        have hbnd := inserted_centering_step_mirror_re_le (d := d) (L := L) (N := N) wₗ wᵣ' a G Φ
+        have hid : (↑(e + 1) : ℝ) * (3 * ρ * g₀ * momentFactor d L N Φ K)
+            = (↑e : ℝ) * (3 * ρ * g₀ * momentFactor d L N Φ K)
+              + 3 * ρ * g₀ * momentFactor d L N Φ K := by push_cast; ring
+        linarith [hbnd, hmain, herr, hid]
+
+/-- **Tasaki Lemma R2 (eq. (4.2.68)), split-independent form.**  For a total-`Ŝ³` singlet `Φ` whose
+order moments satisfy the LRO ratio `2q₀ P_n ≤ P_{n+1}`, an operator `G` of the local-decay class up
+to depth `K` inserted at *any* position of a length-`K` order word obeys
+`|Re⟨Φ, ô^{wₗ} G ô^{wᵣ} Φ⟩| ≤ 3 g₀ · mf(K)`, *independently of the split* `(|wₗ|, |wᵣ|)`.  Strong
+induction on `K`: the inner accumulation `r2_centering_accum` centers `G` (geometric-mean base, the
+`3/2` term) while each decayed error is bounded by the induction hypothesis at `K-1`; the geometric
+series is closed by the budget `Kρ ≤ 1/2`. -/
+theorem r2_split_independent (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ ζ o₀ : ℝ}
+    (hq₀ : 0 < q₀) (hm0 : 0 < phatMoment d L N Φ 0)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1))
+    (hdecay : 0 ≤ (2 * ζ * o₀) / (L : ℝ) ^ d) :
+    ∀ K : ℕ,
+      3 * (N : ℝ) * ((K : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d →
+      (K : ℝ) * ((2 * ζ * o₀) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2 →
+      ∀ (wₗ wᵣ : List Bool) (G : ManyBodyOpS (HypercubicTorus d L) N) (g₀ : ℝ),
+        wₗ.length + wᵣ.length = K → IsR2LocalUpTo K ζ o₀ g₀ G →
+        |(star Φ ⬝ᵥ (orderWordProd d L N wₗ * G * orderWordProd d L N wᵣ).mulVec Φ).re|
+          ≤ 3 * g₀ * momentFactor d L N Φ K := by
+  intro K
+  induction K using Nat.strong_induction_on with
+  | _ K ih =>
+    intro hcond hbudget wₗ wᵣ G g₀ hlen hcls
+    have hg0nn := hcls.g0_nonneg
+    have hmfnn := momentFactor_nonneg d L N Φ K
+    have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by
+      have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+      positivity
+    rcases Nat.eq_zero_or_pos K with hK0 | hKpos
+    · -- K = 0: empty words, the balanced base already gives the bound
+      have hb := r2_balanced_base d L N hN Φ hsing hm0 (hratio 0) G wₗ wᵣ
+        (by rw [hlen]; exact hcond) ⟨by omega, by omega⟩
+      rw [hlen] at hb
+      have hGg := hcls.norm_le
+      nlinarith [hb, mul_le_mul_of_nonneg_right hGg hmfnn, mul_nonneg hg0nn hmfnn]
+    · -- K ≥ 1: feed the inner accumulation with the strong-induction hypothesis at K-1
+      have hcondKm1 : 3 * (N : ℝ) * (((K - 1 : ℕ)) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d := by
+        refine le_trans ?_ hcond
+        gcongr
+        exact_mod_cast (by omega : K - 1 ≤ K)
+      have hbudgetKm1 : ((K - 1 : ℕ) : ℝ)
+          * ((2 * ζ * o₀) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2 := by
+        refine le_trans (mul_le_mul_of_nonneg_right ?_ ?_) hbudget
+        · exact_mod_cast (by omega : K - 1 ≤ K)
+        · exact div_nonneg hdecay (Real.sqrt_nonneg _)
+      have hIHerr : ∀ (X Y : List Bool) (Gc : ManyBodyOpS (HypercubicTorus d L) N) (g' : ℝ),
+          X.length + Y.length = K - 1 → IsR2LocalUpTo (K - 1) ζ o₀ g' Gc →
+          |(star Φ ⬝ᵥ (orderWordProd d L N X * Gc * orderWordProd d L N Y).mulVec Φ).re|
+            ≤ 3 * g' * momentFactor d L N Φ (K - 1) := fun X Y Gc g' hXY hcl =>
+        ih (K - 1) (by omega) hcondKm1 hbudgetKm1 X Y Gc g' hXY hcl
+      have hfin := r2_centering_accum d L N hN Φ hsing hq₀ hm0 hratio hdecay K hcond hIHerr
+        K wₗ wᵣ G g₀ hlen hcls ⟨by omega, by omega⟩
+      refine le_trans hfin ?_
+      have hb2 : (K : ℝ) * (3 * ((2 * ζ * o₀) / (L : ℝ) ^ d / Real.sqrt (2 * q₀))
+            * g₀ * momentFactor d L N Φ K)
+          ≤ 3 / 2 * (g₀ * momentFactor d L N Φ K) := by
+        have h := mul_le_mul_of_nonneg_right hbudget (mul_nonneg hg0nn hmfnn)
+        nlinarith [h]
+      nlinarith [hb2]
+
 end LatticeSystem.Quantum
