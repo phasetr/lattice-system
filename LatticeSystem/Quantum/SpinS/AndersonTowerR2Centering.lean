@@ -113,4 +113,24 @@ theorem orderWordProd_comm_eq_telescope [NeZero L] (w : List Bool)
     rw [h0, orderComm]
     noncomm_ring
 
+/-! ### Step B: the symmetric-split central bound (R2 commit 3) -/
+
+/-- **Step B (central Cauchy–Schwarz, symmetric split).**  When the inserted operator sits exactly
+at the center of a length-`2n` order word (equal left/right words `w`), the geometric mean of the
+two half-radicands collapses to a single moment: `|Re⟨Φ, ô^w G ô^w Φ⟩| ≤ (3/2)‖G‖ P_{|w|}`.  This
+is the target shape of the Anderson-tower numerator; the centering telescope (Step A) reduces an
+arbitrarily placed `G` to this symmetric form plus decayed error terms. -/
+theorem renormalized_inserted_product_bound_symm (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1)
+    (G : ManyBodyOpS (HypercubicTorus d L) N) (w : List Bool)
+    (hcond : 3 * (N : ℝ) * ((w.length + w.length : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N w * G * orderWordProd d L N w).mulVec Φ).re|
+      ≤ 3 / 2 * manyBodyOperatorNormS G * phatMoment d L N Φ w.length := by
+  have hbd := renormalized_inserted_product_bound d L N hN Φ hsing hm0 hlro G w w hcond
+  have hPnn : 0 ≤ phatMoment d L N Φ w.length := phatMoment_nonneg d L N Φ w.length
+  rwa [Real.sqrt_mul_self hPnn] at hbd
+
 end LatticeSystem.Quantum
