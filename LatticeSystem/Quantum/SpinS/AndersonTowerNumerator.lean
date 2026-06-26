@@ -133,4 +133,28 @@ theorem orderCommutator_word_re_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
     (abs_nonneg _) (norm_nonneg _)
   simpa using RCLike.abs_re_le_norm s
 
+/-- **S1 single-term bound.**  Lemma R2 applied to `d̂ = [ô⁺,[Ĥ,ô⁻]]` (which lies in the local-decay
+class with `g₀ ≤ 96 d N⁴/V`): `|Re⟨Φ, ô^{wₗ} d̂ ô^{wᵣ} Φ⟩| ≤ 3 · (96 d N⁴/V) · mf(|wₗ|+|wᵣ|)`. -/
+theorem orderDoubleComm_word_re_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hq₀ : 0 < q₀) (hm0 : 0 < phatMoment d L N Φ 0)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1))
+    (wl wr : List Bool)
+    (hcond : 3 * (N : ℝ) * ((wl.length + wr.length : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget : ((wl.length + wr.length : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N wl * orderDoubleComm d L N
+        * orderWordProd d L N wr).mulVec Φ).re|
+      ≤ 3 * (96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d)
+          * momentFactor d L N Φ (wl.length + wr.length) := by
+  have hbd := r2_split_independent d L N hN Φ hsing (q₀ := q₀) (ζ := (2 : ℝ)) (o₀ := (N : ℝ))
+    hq₀ hm0 hratio (by positivity) (wl.length + wr.length) hcond hbudget wl wr
+    (orderDoubleComm d L N) (orderDoubleCommAggregate d L N) rfl
+    (isR2LocalUpTo_orderDoubleComm hL hN _)
+  refine le_trans hbd ?_
+  gcongr
+  · exact momentFactor_nonneg d L N Φ _
+  · exact orderDoubleCommAggregate_le hL hN
+
 end LatticeSystem.Quantum
