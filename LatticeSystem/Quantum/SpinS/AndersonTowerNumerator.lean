@@ -229,4 +229,23 @@ theorem heisenberg_order_nested_eq_neg_orderDoubleComm (d L N : ℕ) [NeZero L] 
       = - orderDoubleComm d L N := by
   rw [heisenberg_order_jacobi, heisenberg_orderCommutator_commute, zero_sub]
 
+/-- **Operator Leibniz rule for commutators.**  `[X·Y, Z] = X·[Y, Z] + [X, Z]·Y`. -/
+theorem commutator_mul_left_eq {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
+    (X Y Z : ManyBodyOpS Λ N) :
+    X * Y * Z - Z * (X * Y) = X * (Y * Z - Z * Y) + (X * Z - Z * X) * Y := by
+  noncomm_ring
+
+/-- **Anti-expansion of `(ô⁻)^M` against an operator.**  `(ô⁻)^M X − X (ô⁻)^M` telescopes into a
+signed sum of single `[X, ô⁻]` insertions between powers of `ô⁻`. -/
+theorem orderMinusPow_commutator_eq (d L N M : ℕ) [NeZero L]
+    (X : ManyBodyOpS (HypercubicTorus d L) N) :
+    staggeredOrderDensityOpS d L N false ^ M * X
+        - X * staggeredOrderDensityOpS d L N false ^ M
+      = - ∑ k ∈ Finset.range M, staggeredOrderDensityOpS d L N false ^ k
+          * (X * staggeredOrderDensityOpS d L N false
+            - staggeredOrderDensityOpS d L N false * X)
+          * staggeredOrderDensityOpS d L N false ^ (M - 1 - k) := by
+  rw [← neg_sub (X * staggeredOrderDensityOpS d L N false ^ M)
+      (staggeredOrderDensityOpS d L N false ^ M * X), commutator_pow_eq_sum]
+
 end LatticeSystem.Quantum
