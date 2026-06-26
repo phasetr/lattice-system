@@ -70,4 +70,47 @@ theorem IsR2LocalUpTo.norm_le [NeZero L] {K : ℕ} {ζ o₀ g₀ : ℝ}
   have := h.norm_iter [] (Nat.zero_le _)
   simpa using this
 
+/-! ### Step A: the centering telescope of an inserted operator (R2 commit 2) -/
+
+/-- Operator-level cons identity for the word product. -/
+theorem orderWordProd_mul_cons [NeZero L] (b : Bool) (w : List Bool) :
+    orderWordProd d L N (b :: w)
+      = staggeredOrderDensityOpS d L N b * orderWordProd d L N w := by
+  simp [orderWordProd, List.map_cons, List.prod_cons]
+
+/-- The `i`-th telescope term of `[orderWordProd w, G]`: the prefix product, the single-letter
+order-density commutator at position `i`, then the suffix product. -/
+noncomputable def telescopeTerm [NeZero L] (w : List Bool)
+    (G : ManyBodyOpS (HypercubicTorus d L) N) (i : ℕ) : ManyBodyOpS (HypercubicTorus d L) N :=
+  orderWordProd d L N (w.take i) * orderComm (w.getD i false) G
+    * orderWordProd d L N (w.drop (i + 1))
+
+/-- **Step A telescope (eq. (4.2.68) centering).**  The commutator of a word product with `G`
+expands as the sum over positions `i` of the prefix–`[ô^{w_i},G]`–suffix terms.  Moving `G` from
+one end to the center is the difference of two such partial telescopes; each term carries one fewer
+order factor and the decayed commutator `orderComm`. -/
+theorem orderWordProd_comm_eq_telescope [NeZero L] (w : List Bool)
+    (G : ManyBodyOpS (HypercubicTorus d L) N) :
+    orderWordProd d L N w * G - G * orderWordProd d L N w
+      = ∑ i ∈ Finset.range w.length, telescopeTerm w G i := by
+  induction w with
+  | nil =>
+    simp [orderWordProd, telescopeTerm]
+  | cons b w ih =>
+    rw [List.length_cons, Finset.sum_range_succ', orderWordProd_mul_cons]
+    have hshift : ∀ i ∈ Finset.range w.length,
+        telescopeTerm (b :: w) G (i + 1)
+          = staggeredOrderDensityOpS d L N b * telescopeTerm w G i := by
+      intro i _
+      unfold telescopeTerm
+      rw [List.take_succ_cons, List.getD_cons_succ, List.drop_succ_cons, orderWordProd_mul_cons]
+      noncomm_ring
+    rw [Finset.sum_congr rfl hshift, ← Finset.mul_sum, ← ih]
+    have h0 : telescopeTerm (b :: w) G 0
+        = orderComm b G * orderWordProd d L N w := by
+      simp only [telescopeTerm, List.take_zero, List.getD_cons_zero, List.drop_succ_cons,
+        List.drop_zero, orderWordProd, List.map_nil, List.prod_nil, one_mul]
+    rw [h0, orderComm]
+    noncomm_ring
+
 end LatticeSystem.Quantum
