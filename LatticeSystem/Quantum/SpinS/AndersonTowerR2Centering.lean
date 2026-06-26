@@ -226,4 +226,47 @@ theorem inserted_centering_step_mirror_re_le [NeZero L] (wₗ wᵣ' : List Bool)
   rw [inserted_centering_step_mirror_eq, Matrix.sub_mulVec, dotProduct_sub, Complex.sub_re]
   exact abs_sub _ _
 
+/-! ### The unified moment factor and its growth ratio (R2 commit 7) -/
+
+/-- The **unified moment factor** `√(P_{⌊K/2⌋} · P_{⌈K/2⌉})` carried by the split-independent R2
+bound: for even `K = 2n` it is `P_n`, for odd `K = 2n+1` it is `√(P_n P_{n+1})`.  This single shape
+absorbs the even/odd case distinction in Tasaki's induction. -/
+noncomputable def momentFactor (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (K : ℕ) : ℝ :=
+  Real.sqrt (phatMoment d L N Φ (K / 2) * phatMoment d L N Φ ((K + 1) / 2))
+
+/-- The moment factor is nonnegative. -/
+theorem momentFactor_nonneg (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (K : ℕ) :
+    0 ≤ momentFactor d L N Φ K := Real.sqrt_nonneg _
+
+/-- For even `K`, the moment factor collapses to a single moment `P_{K/2}`. -/
+theorem momentFactor_two_mul (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (n : ℕ) :
+    momentFactor d L N Φ (2 * n) = phatMoment d L N Φ n := by
+  have h1 : 2 * n / 2 = n := by omega
+  have h2 : (2 * n + 1) / 2 = n := by omega
+  rw [momentFactor, h1, h2, Real.sqrt_mul_self (phatMoment_nonneg d L N Φ n)]
+
+/-- **Moment-factor growth ratio (unified, even/odd-free).**  One LRO moment step lifts the moment
+factor by `√(2q₀)`: `√(2q₀)·mf(K) ≤ mf(K+1)`.  The proof needs only the single ratio
+`2q₀ P_{K/2} ≤ P_{(K/2)+1}` because the shared factor `P_{(K+1)/2}` cancels (`(K+2)/2 = K/2+1`). -/
+theorem momentFactor_succ_ge (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (K : ℕ) {q₀ : ℝ} (hq₀ : 0 ≤ q₀)
+    (hratio : 2 * q₀ * phatMoment d L N Φ (K / 2) ≤ phatMoment d L N Φ (K / 2 + 1)) :
+    Real.sqrt (2 * q₀) * momentFactor d L N Φ K ≤ momentFactor d L N Φ (K + 1) := by
+  have hidx : (K + 1 + 1) / 2 = K / 2 + 1 := by omega
+  set a := phatMoment d L N Φ (K / 2) with ha
+  set b := phatMoment d L N Φ ((K + 1) / 2) with hb
+  set c := phatMoment d L N Φ (K / 2 + 1) with hc
+  have hann : 0 ≤ a := phatMoment_nonneg d L N Φ _
+  have hbnn : 0 ≤ b := phatMoment_nonneg d L N Φ _
+  rw [momentFactor, momentFactor, hidx, ← ha, ← hb, ← hc,
+    ← Real.sqrt_mul (show (0:ℝ) ≤ 2 * q₀ by positivity)]
+  apply Real.sqrt_le_sqrt
+  have hkey : 2 * q₀ * a * b ≤ b * c := by
+    have := mul_le_mul_of_nonneg_right hratio hbnn
+    nlinarith [this]
+  nlinarith [hkey]
+
 end LatticeSystem.Quantum
