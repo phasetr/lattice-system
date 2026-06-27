@@ -480,4 +480,37 @@ theorem s23_term3_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
       hcond hbudget using 4
     rw [orderWordProd_mul_append]; noncomm_ring
 
+/-! ### Collection helpers (nested-sum triangle inequality) -/
+
+/-- **Right power commutator telescope.**  `A^r·B − B·A^r = ∑_l A^l (A·B−B·A) A^{r-1-l}`. -/
+theorem pow_right_commutator_eq_sum {n : Type*} [Fintype n] [DecidableEq n]
+    (A B : Matrix n n ℂ) (r : ℕ) :
+    A ^ r * B - B * A ^ r
+      = ∑ l ∈ Finset.range r, A ^ l * (A * B - B * A) * A ^ (r - 1 - l) := by
+  have h : B * A ^ r - A ^ r * B
+      = ∑ l ∈ Finset.range r, A ^ l * (B * A - A * B) * A ^ (r - 1 - l) :=
+    commutator_pow_eq_sum B A r
+  have key : (∑ l ∈ Finset.range r, A ^ l * (A * B - B * A) * A ^ (r - 1 - l))
+      = -(∑ l ∈ Finset.range r, A ^ l * (B * A - A * B) * A ^ (r - 1 - l)) := by
+    rw [← Finset.sum_neg_distrib]
+    exact Finset.sum_congr rfl (fun l _ => by noncomm_ring)
+  rw [key, ← h]; abel
+
+/-- **Triangle inequality for a sum of sandwiched expectations.**  The real part of a finite-sum
+operator's expectation is bounded by the sum of the per-term absolute real parts. -/
+theorem abs_re_dotProduct_sum_le (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) {ι : Type*} (s : Finset ι)
+    (f : ι → ManyBodyOpS (HypercubicTorus d L) N) :
+    |(star Φ ⬝ᵥ (∑ i ∈ s, f i).mulVec Φ).re| ≤ ∑ i ∈ s, |(star Φ ⬝ᵥ (f i).mulVec Φ).re| := by
+  rw [Matrix.sum_mulVec, dotProduct_sum, Complex.re_sum]
+  exact Finset.abs_sum_le_sum_abs (fun i => (star Φ ⬝ᵥ (f i).mulVec Φ).re) s
+
+/-- The same triangle bound for a negated finite sum (`|Re| = |Re of the un-negated sum|`). -/
+theorem abs_re_dotProduct_neg_sum_le (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) {ι : Type*} (s : Finset ι)
+    (f : ι → ManyBodyOpS (HypercubicTorus d L) N) :
+    |(star Φ ⬝ᵥ (- ∑ i ∈ s, f i).mulVec Φ).re| ≤ ∑ i ∈ s, |(star Φ ⬝ᵥ (f i).mulVec Φ).re| := by
+  rw [Matrix.neg_mulVec, dotProduct_neg, Complex.neg_re, abs_neg]
+  exact abs_re_dotProduct_sum_le d L N Φ s f
+
 end LatticeSystem.Quantum
