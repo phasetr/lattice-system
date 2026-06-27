@@ -431,4 +431,53 @@ theorem dotProduct_orderWord_totalSpinSOp3_mid_eq (d L N : ℕ) [NeZero L]
     smul_eq_mul, ← orderWordProd_conjTranspose,
     ← star_dotProduct_mulVec_conjTranspose, Matrix.mulVec_mulVec, starRingEnd_apply]
 
+/-- **S2/S3 term-3 leaf.**  `[ô⁺,ô⁻]` left of `G = [Ĥ,ô⁺]`: convert to `(2/V²)Ŝ³`, scalarize `Ŝ³`
+onto the bra (`dotProduct_orderWord_totalSpinSOp3_mid_eq`), then bound the residual `G`-sandwich by
+R2 — giving `‖(2/V²) conj(m((wₗ)ʳ⁻))‖ · 3(24dN³) · mf`. -/
+theorem s23_term3_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hq₀ : 0 < q₀) (hm0 : 0 < phatMoment d L N Φ 0)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1))
+    (wl wm wr : List Bool)
+    (hcond : 3 * (N : ℝ) * (((wl ++ wm).length + wr.length : ℕ) : ℝ) ^ 2
+        ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget : (((wl ++ wm).length + wr.length : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N wl
+        * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+          - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+        * (orderWordProd d L N wm
+          * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+            - staggeredOrderDensityOpS d L N true
+              * heisenbergHamiltonianS (torusNNCoupling d L) N)
+          * orderWordProd d L N wr)).mulVec Φ).re|
+      ≤ ‖(((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹ * 2) * (starRingEnd ℂ) (mCharge (wl.reverse.map not))‖
+        * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3)
+            * momentFactor d L N Φ ((wl ++ wm).length + wr.length)) := by
+  set Y := orderWordProd d L N wm
+    * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+      - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+    * orderWordProd d L N wr with hY
+  rw [staggeredOrderDensity_commutator_eq, smul_smul, mul_smul_comm, smul_mul_assoc,
+    Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul,
+    dotProduct_orderWord_totalSpinSOp3_mid_eq d L N Φ hsing wl Y]
+  set s := (((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹ * 2)
+    * (starRingEnd ℂ) (mCharge (wl.reverse.map not)) with hs
+  have hVim : (((L : ℂ) ^ d)⁻¹).im = 0 := by
+    rw [show ((L : ℂ) ^ d)⁻¹ = (((((L : ℝ) ^ d)⁻¹ : ℝ)) : ℂ) by push_cast; ring]
+    exact Complex.ofReal_im _
+  have hsim : s.im = 0 := by
+    rw [hs]
+    simp [Complex.mul_im, Complex.mul_re, hVim, mCharge_im, Complex.conj_im, Complex.conj_re]
+  set Z := star Φ ⬝ᵥ (orderWordProd d L N wl * Y).mulVec Φ with hZ
+  have hre : (s * Z).re = s.re * Z.re := by rw [Complex.mul_re, hsim, zero_mul, sub_zero]
+  rw [← mul_assoc, ← hs, hre, abs_mul]
+  refine mul_le_mul ?_ ?_ (abs_nonneg _) (norm_nonneg _)
+  · simpa using RCLike.abs_re_le_norm s
+  · rw [hZ, hY]
+    convert heisenbergRaisingComm_word_re_bound d L N hN hL Φ hsing hq₀ hm0 hratio (wl ++ wm) wr
+      hcond hbudget using 4
+    rw [orderWordProd_mul_append]; noncomm_ring
+
 end LatticeSystem.Quantum
