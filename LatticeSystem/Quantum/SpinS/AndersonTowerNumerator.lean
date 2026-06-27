@@ -255,4 +255,16 @@ theorem orderWordProd_replicate (d L N a : ℕ) [NeZero L] (b : Bool) :
     orderWordProd d L N (List.replicate a b) = staggeredOrderDensityOpS d L N b ^ a := by
   rw [orderWordProd, List.map_replicate, List.prod_replicate]
 
+/-- The moment factor at the numerator word length `2M−2` is bounded by `P_M / (2q₀)`: it equals the
+even-`K` moment `P_{M-1}` (`2M−2 = 2(M−1)`), pinched by one LRO ratio step. -/
+theorem momentFactor_twoM_sub_two_le (d L N M : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) {q₀ : ℝ} (hq₀ : 0 < q₀) (hM : 1 ≤ M)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1)) :
+    momentFactor d L N Φ (2 * M - 2) ≤ phatMoment d L N Φ M / (2 * q₀) := by
+  rw [show 2 * M - 2 = 2 * (M - 1) from by omega, momentFactor_two_mul]
+  have hr := hratio (M - 1)
+  rw [show M - 1 + 1 = M from by omega] at hr
+  rw [le_div_iff₀ (by linarith)]
+  linarith [hr]
+
 end LatticeSystem.Quantum
