@@ -17,6 +17,7 @@ midpoints of the two opposite bonds `(n−1, n)` and `(2n−1, 0)`. -/
 def ringReflect (n : ℕ) (x : Fin (2 * n)) : Fin (2 * n) :=
   ⟨2 * n - 1 - x.val, by omega⟩
 
+/-- The underlying value of the bond reflection: `(r x).val = 2n − 1 − x.val`. -/
 @[simp] theorem ringReflect_val (n : ℕ) (x : Fin (2 * n)) :
     (ringReflect n x).val = 2 * n - 1 - x.val := rfl
 

@@ -33,6 +33,7 @@ theorem ringConfigReflect_involutive (n N : ℕ) :
 def ringConfigReflectEquiv (n N : ℕ) : (Fin (2 * n) → Fin (N + 1)) ≃ (Fin (2 * n) → Fin (N + 1)) :=
   Function.Involutive.toPerm _ (ringConfigReflect_involutive n N)
 
+/-- The configuration-reflection equivalence acts as `ringConfigReflect`. -/
 @[simp] theorem ringConfigReflectEquiv_apply (n N : ℕ) (σ : Fin (2 * n) → Fin (N + 1)) :
     ringConfigReflectEquiv n N σ = ringConfigReflect n N σ := rfl
 
@@ -43,6 +44,7 @@ def ringReflectionThetaS (n N : ℕ) (A : ManyBodyOpS (Fin (2 * n)) N) :
   Matrix.of fun σ τ =>
     starRingEnd ℂ (A (ringConfigReflect n N σ) (ringConfigReflect n N τ))
 
+/-- Entry of the reflection map: `θ(A) σ τ = conj (A (ρσ) (ρτ))`. -/
 @[simp] theorem ringReflectionThetaS_apply (A : ManyBodyOpS (Fin (2 * n)) N)
     (σ τ : Fin (2 * n) → Fin (N + 1)) :
     ringReflectionThetaS n N A σ τ

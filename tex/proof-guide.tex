@@ -8218,7 +8218,13 @@ staggered-field chain Hamiltonian (\texttt{staggeredFieldChainHamiltonianS}), an
 \texttt{shastry\_no\_symmetry\_breaking\_1d} as the iterated limit in explicit $\varepsilon$--$\delta$
 form over normalized energy-minimizing ground states (so the per-site bound is scale-invariant).
 Tasaki states Theorem 4.2 without proof (Shastry's argument [58], rigorously formulated in [63]); the
-deep infinite-volume argument is deferred (in scope).  Chapters~3--10 backfill.
+deep argument is being formalized as a dedicated \emph{reflection-positivity infrastructure} project
+(Issue \#4777).  The first layer establishes the even-ring \emph{bond reflection}
+$r(x) = 2n-1-x$ (\texttt{RingBondReflection.lean}: involutive, swapping the two halves, flipping the
+staggered sign) and the induced \emph{reflection map} $\theta(A)_{\sigma\tau} =
+\overline{A_{\rho\sigma,\rho\tau}}$ (\texttt{RingReflectionTheta.lean}: an antilinear
+$*$-automorphism with $\theta(\hat o_x(A)) = \hat o_{r(x)}(\overline A)$), the $\theta$ of the
+reflection-positivity condition $0 \le \operatorname{Re}\langle\theta(A)\,A\rangle$.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
