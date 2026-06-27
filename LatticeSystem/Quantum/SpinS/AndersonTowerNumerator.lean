@@ -768,4 +768,58 @@ theorem s2_part_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ 
   exact mul_le_mul_of_nonneg_right (by exact_mod_cast (by omega : M - 1 - j ≤ M))
     (mul_nonneg (by positivity) (mul_nonneg (by positivity) (momentFactor_nonneg d L N Φ _)))
 
+/-- **S3 part operator identity.**  The sandwiched S3 part
+`(ô⁻)^k·([(ô⁺)^j,ô⁻]·G·(ô⁺)^{M-1-j})·(ô⁻)^{M-1-k}` expands (left commutator
+`pow_right_commutator_eq_sum` over `l<j`) into the per-`l` S3 operators that `s3_lterm_bound`
+bounds. -/
+theorem s3_part_eq (d L N j k : ℕ) [NeZero L] :
+    staggeredOrderDensityOpS d L N false ^ k
+        * ((staggeredOrderDensityOpS d L N true ^ j * staggeredOrderDensityOpS d L N false
+            - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true ^ j)
+          * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+            - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+          * staggeredOrderDensityOpS d L N true ^ (M - 1 - j))
+        * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)
+      = ∑ l ∈ Finset.range j, staggeredOrderDensityOpS d L N false ^ k
+          * (staggeredOrderDensityOpS d L N true ^ l
+            * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+              - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+            * staggeredOrderDensityOpS d L N true ^ (j - 1 - l))
+          * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+            - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+          * staggeredOrderDensityOpS d L N true ^ (M - 1 - j)
+          * staggeredOrderDensityOpS d L N false ^ (M - 1 - k) := by
+  rw [pow_right_commutator_eq_sum]
+  simp only [Finset.sum_mul, Finset.mul_sum]
+  exact Finset.sum_congr rfl (fun l _ => by noncomm_ring)
+
+/-- **S3 part bound.**  The sandwiched S3 part is `≤ M · (V⁻²·2·(2M)·3(24dN³)·mf(2M-3))`
+(`≤ M` terms, each by `s3_lterm_bound`). -/
+theorem s3_part_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hq₀ : 0 < q₀) (hm0 : 0 < phatMoment d L N Φ 0)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1))
+    (hj : j < M) (hk : k < M)
+    (hcond : 3 * (N : ℝ) * ((2 * M - 3 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget : ((2 * M - 3 : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2) :
+    |(star Φ ⬝ᵥ (staggeredOrderDensityOpS d L N false ^ k
+        * ((staggeredOrderDensityOpS d L N true ^ j * staggeredOrderDensityOpS d L N false
+            - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true ^ j)
+          * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+            - staggeredOrderDensityOpS d L N true
+              * heisenbergHamiltonianS (torusNNCoupling d L) N)
+          * staggeredOrderDensityOpS d L N true ^ (M - 1 - j))
+        * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)).mulVec Φ).re|
+      ≤ (M : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (M : ℝ)))
+        * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * momentFactor d L N Φ (2 * M - 3))) := by
+  rw [s3_part_eq d L N j k]
+  refine le_trans (abs_re_dotProduct_sum_le d L N Φ _ _) ?_
+  refine le_trans (Finset.sum_le_sum (fun l hl => s3_lterm_bound d L N M j k l hN hL Φ hsing hq₀ hm0
+    hratio hj hk (Finset.mem_range.mp hl) hcond hbudget)) ?_
+  rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul]
+  exact mul_le_mul_of_nonneg_right (by exact_mod_cast (by omega : j ≤ M))
+    (mul_nonneg (by positivity) (mul_nonneg (by positivity) (momentFactor_nonneg d L N Φ _)))
+
 end LatticeSystem.Quantum
