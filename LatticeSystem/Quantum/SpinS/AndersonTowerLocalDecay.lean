@@ -178,6 +178,23 @@ theorem spinSDot_commutator_staggeredRaisingOpS_support (A : Λ → Bool) (x y :
       rw [h]; exact Finset.mem_insert_of_mem (Finset.mem_singleton_self y))
     rw [spinSDot_commutator_spinSSiteOpPlus_eq_zero_of_ne x y z hzx hzy, smul_zero]
 
+/-- The bond–raising commutator `[Ŝ_x·Ŝ_y, Ô_L⁺]` is supported on the bond `{x, y}`. -/
+theorem spinSDot_staggeredRaising_commutator_supportedOn (A : Λ → Bool) (x y : Λ) (hxy : x ≠ y) :
+    SupportedOn ({x, y} : Finset Λ)
+      (spinSDot x y N * staggeredRaisingOpS A N - staggeredRaisingOpS A N * spinSDot x y N) := by
+  rw [spinSDot_commutator_staggeredRaisingOpS_support A x y hxy]
+  have hx : ({x} : Finset Λ) ⊆ {x, y} :=
+    Finset.singleton_subset_iff.mpr (Finset.mem_insert_self x {y})
+  have hy : ({y} : Finset Λ) ⊆ {x, y} :=
+    Finset.singleton_subset_iff.mpr (Finset.mem_insert_of_mem (Finset.mem_singleton_self y))
+  have hSx : SupportedOn ({x, y} : Finset Λ) (spinSSiteOpPlus x N) :=
+    (onSiteS_supportedOn x (spinSOpPlus N)).mono hx
+  have hSy : SupportedOn ({x, y} : Finset Λ) (spinSSiteOpPlus y N) :=
+    (onSiteS_supportedOn y (spinSOpPlus N)).mono hy
+  have hdot := spinSDot_supportedOn (N := N) x y
+  exact (((hdot.mul hSx).sub (hSx.mul hdot)).smul _).add
+    (((hdot.mul hSy).sub (hSy.mul hdot)).smul _)
+
 /-- **Support preservation.**  An order-density commutator of an `S`-supported operator stays
 supported on `S`. -/
 theorem orderComm_supportedOn [NeZero L] {S : Finset (HypercubicTorus d L)}
