@@ -593,4 +593,16 @@ theorem s2_lterm_eq (d L N j k l r : ℕ) [NeZero L] :
     orderWordProd_replicate]
   noncomm_ring
 
+/-- The order-commutator scalar coefficient is bounded by the word length:
+`‖V⁻²·2·m(w)‖ ≤ V⁻²·2·|w|`. -/
+theorem orderScalar_norm_le (d L : ℕ) [NeZero L] (w : List Bool) :
+    ‖(((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge w)‖
+      ≤ ((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (w.length : ℝ)) := by
+  rw [norm_mul, show ‖((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹‖
+      = ((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ from by
+    simp only [norm_mul, norm_inv, norm_pow, Complex.norm_natCast]]
+  refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+  rw [norm_mul, show ‖(2 : ℂ)‖ = 2 from by norm_num]
+  exact mul_le_mul_of_nonneg_left (mCharge_norm_le w) (by norm_num)
+
 end LatticeSystem.Quantum
