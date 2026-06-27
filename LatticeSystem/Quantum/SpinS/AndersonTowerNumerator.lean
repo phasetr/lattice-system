@@ -570,4 +570,27 @@ theorem s1_middle_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 �
     Matrix.neg_mulVec, dotProduct_neg, Complex.neg_re, abs_neg]
   exact s1_term_bound d L N M j k hN hL Φ hsing hq₀ hm0 hratio hj hk hcond hbudget
 
+/-- A per-`l` S2 term equals an `s23_term1_bound`-shaped operator (replicate words). -/
+theorem s2_lterm_eq (d L N j k l r : ℕ) [NeZero L] :
+    staggeredOrderDensityOpS d L N false ^ k * staggeredOrderDensityOpS d L N true ^ j
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        * (staggeredOrderDensityOpS d L N true ^ l
+          * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+            - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+          * staggeredOrderDensityOpS d L N true ^ (r - 1 - l))
+        * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)
+      = orderWordProd d L N (List.replicate k false ++ List.replicate j true)
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        * (orderWordProd d L N (List.replicate l true)
+          * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+            - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+          * orderWordProd d L N (List.replicate (r - 1 - l) true
+            ++ List.replicate (M - 1 - k) false)) := by
+  rw [orderWordProd_mul_append, orderWordProd_replicate, orderWordProd_replicate,
+    orderWordProd_replicate, orderWordProd_mul_append, orderWordProd_replicate,
+    orderWordProd_replicate]
+  noncomm_ring
+
 end LatticeSystem.Quantum
