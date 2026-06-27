@@ -134,9 +134,9 @@ explicit `O(m²/V) + O(m⁴/V²)` energy excess of the trial state `(ô⁺)^m Φ
 noncomputable def towerEnergyCoeff (d L N m : ℕ) (q₀ : ℝ) : ℝ :=
   (m : ℝ) * ((m : ℝ) * (3 * (96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d) * (1 / (2 * q₀))
       + ((m : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (m : ℝ)))
-          * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * (1 / (2 * q₀) / Real.sqrt (2 * q₀))))
+          * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * (1 / (2 * q₀) * (1 + 1 / Real.sqrt (2 * q₀)))))
         + (m : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (m : ℝ)))
-          * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * (1 / (2 * q₀) / Real.sqrt (2 * q₀)))))))
+          * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * (1 / (2 * q₀) * (1 + 1 / Real.sqrt (2 * q₀))))))))
 
 /-- The trial-energy coefficient is nonnegative (for `q₀ > 0`). -/
 theorem towerEnergyCoeff_nonneg (d L N m : ℕ) {q₀ : ℝ} (hq₀ : 0 < q₀) :
@@ -149,7 +149,7 @@ theorem towerEnergyCoeff_nonneg (d L N m : ℕ) {q₀ : ℝ} (hq₀ : 0 < q₀) 
 /-- **Trial-state energy bound for `(ô⁺)^m Φ`.**  Combining the ★ variational gap, the numerator
 estimate `M²·(…)`, the moment-factor → `P_m` conversions, and the denominator lower bound `½P_m`
 gives the Rayleigh bound `≤ E₀ + 2·towerEnergyCoeff` for the (unnormalized) tower trial state. -/
-theorem tower_trial_energy_bound (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L) (hm : 2 ≤ m)
+theorem tower_trial_energy_bound (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L) (hm : 1 ≤ m)
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ)
     (hev : (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ)
     (hmin : ∀ (E : ℂ) (Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ), Ψ ≠ 0 →
@@ -203,10 +203,10 @@ theorem tower_trial_energy_bound (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) (hL :
               * (phatMoment d L N Φ m / (2 * q₀))
             + ((m : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (m : ℝ)))
                 * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3)
-                  * (phatMoment d L N Φ m / (2 * q₀) / Real.sqrt (2 * q₀))))
+                  * (phatMoment d L N Φ m / (2 * q₀) * (1 + 1 / Real.sqrt (2 * q₀)))))
               + (m : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (m : ℝ)))
                 * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3)
-                  * (phatMoment d L N Φ m / (2 * q₀) / Real.sqrt (2 * q₀))))))) from by
+                  * (phatMoment d L N Φ m / (2 * q₀) * (1 + 1 / Real.sqrt (2 * q₀)))))))) from by
       unfold towerEnergyCoeff; ring]
     gcongr
   -- denominator: ½ P_m ≤ ‖AΦ‖²
@@ -236,7 +236,7 @@ set_option maxHeartbeats 1600000 in -- large noncomm_ring conjTranspose identity
 raising one (`re_dotProduct_mulVec_conjTranspose` keeps the real part), so the same numerator bound
 applies; the denominator uses `tower_denominator_lower_bound_lower`. -/
 theorem tower_trial_energy_bound_lower (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
-    (hm : 2 ≤ m) (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ)
+    (hm : 1 ≤ m) (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ)
     (hev : (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ)
     (hmin : ∀ (E : ℂ) (Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ), Ψ ≠ 0 →
        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re)
@@ -319,10 +319,10 @@ theorem tower_trial_energy_bound_lower (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N)
               * (phatMoment d L N Φ m / (2 * q₀))
             + ((m : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (m : ℝ)))
                 * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3)
-                  * (phatMoment d L N Φ m / (2 * q₀) / Real.sqrt (2 * q₀))))
+                  * (phatMoment d L N Φ m / (2 * q₀) * (1 + 1 / Real.sqrt (2 * q₀)))))
               + (m : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (m : ℝ)))
                 * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3)
-                  * (phatMoment d L N Φ m / (2 * q₀) / Real.sqrt (2 * q₀))))))) from by
+                  * (phatMoment d L N Φ m / (2 * q₀) * (1 + 1 / Real.sqrt (2 * q₀)))))))) from by
       unfold towerEnergyCoeff; ring]
     gcongr
   have hdeneq : star Φ ⬝ᵥ (staggeredOrderDensityOpS d L N true ^ m
@@ -349,7 +349,7 @@ theorem tower_trial_energy_bound_lower (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N)
 `towerState m Φ = V^m·(ô⁺)^m Φ` has the same Rayleigh quotient as `(ô⁺)^m Φ` (scale invariance), so
 `tower_trial_energy_bound` transfers verbatim. -/
 theorem towerState_pos_rayleigh_bound (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
-    (hm : 2 ≤ m)
+    (hm : 1 ≤ m)
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ)
     (hev : (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ)
     (hmin : ∀ (E : ℂ) (Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ), Ψ ≠ 0 →
@@ -408,7 +408,7 @@ theorem towerState_neg_eq_smul (d L N m : ℕ) [NeZero L] (hm : 1 ≤ m)
 `towerState (-(m:ℤ)) Φ = V^m·(ô⁻)^m Φ` has the same Rayleigh quotient as `(ô⁻)^m Φ` (scale
 invariance), so `tower_trial_energy_bound_lower` transfers verbatim. -/
 theorem towerState_neg_rayleigh_bound (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
-    (hm : 2 ≤ m) (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ)
+    (hm : 1 ≤ m) (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ)
     (hev : (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ)
     (hmin : ∀ (E : ℂ) (Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ), Ψ ≠ 0 →
        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re)
@@ -505,12 +505,12 @@ theorem tower_conditions_of_le (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2
 /-- **The trial-energy coefficient is `O(m²/V)`.**  Under the size constraint `m² ≤ C₁²V`, the
 `O(m⁴/V²)` part is absorbed into the `O(m²/V)` part, giving
 `2·towerEnergyCoeff ≤ C₂·m²/V` with the explicit constant
-`C₂ = 288 d N⁴/q₀ + 576 C₁² d N³/(q₀√(2q₀))`. -/
+`C₂ = 288 d N⁴/q₀ + 576 C₁² d N³ (1 + 1/√(2q₀))/q₀`. -/
 theorem towerEnergyCoeff_le (d L N m : ℕ) [NeZero L] {q₀ C₁ : ℝ} (hq₀ : 0 < q₀)
     (hm2 : (m : ℝ) ^ 2 ≤ C₁ ^ 2 * (L : ℝ) ^ d) :
     2 * towerEnergyCoeff d L N m q₀
       ≤ (288 * (d : ℝ) * (N : ℝ) ^ 4 / q₀
-          + 576 * C₁ ^ 2 * (d : ℝ) * (N : ℝ) ^ 3 / (q₀ * Real.sqrt (2 * q₀)))
+          + 576 * C₁ ^ 2 * (d : ℝ) * (N : ℝ) ^ 3 * (1 + 1 / Real.sqrt (2 * q₀)) / q₀)
         * (m : ℝ) ^ 2 / (L : ℝ) ^ d := by
   have hLpos : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
   have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by positivity
@@ -519,7 +519,7 @@ theorem towerEnergyCoeff_le (d L N m : ℕ) [NeZero L] {q₀ C₁ : ℝ} (hq₀ 
     nlinarith [hm2, sq_nonneg ((m : ℝ) ^ 2)]
   have hsplit : 2 * towerEnergyCoeff d L N m q₀
       = 288 * (d : ℝ) * (N : ℝ) ^ 4 / q₀ * ((m : ℝ) ^ 2 / (L : ℝ) ^ d)
-        + 576 * (d : ℝ) * (N : ℝ) ^ 3 / (q₀ * Real.sqrt (2 * q₀))
+        + 576 * (d : ℝ) * (N : ℝ) ^ 3 * (1 + 1 / Real.sqrt (2 * q₀)) / q₀
           * ((m : ℝ) ^ 4 / ((L : ℝ) ^ d) ^ 2) := by
     rw [towerEnergyCoeff]
     field_simp
@@ -527,15 +527,17 @@ theorem towerEnergyCoeff_le (d L N m : ℕ) [NeZero L] {q₀ C₁ : ℝ} (hq₀ 
   have hmd : (m : ℝ) ^ 4 / ((L : ℝ) ^ d) ^ 2 ≤ C₁ ^ 2 * ((m : ℝ) ^ 2 / (L : ℝ) ^ d) := by
     rw [← mul_div_assoc, div_le_div_iff₀ (pow_pos hVpos 2) hVpos]
     nlinarith [hm4, hVpos]
+  have hc2nn : (0 : ℝ) ≤ 576 * (d : ℝ) * (N : ℝ) ^ 3 * (1 + 1 / Real.sqrt (2 * q₀)) / q₀ := by
+    positivity
   calc 2 * towerEnergyCoeff d L N m q₀
       = 288 * (d : ℝ) * (N : ℝ) ^ 4 / q₀ * ((m : ℝ) ^ 2 / (L : ℝ) ^ d)
-        + 576 * (d : ℝ) * (N : ℝ) ^ 3 / (q₀ * Real.sqrt (2 * q₀))
+        + 576 * (d : ℝ) * (N : ℝ) ^ 3 * (1 + 1 / Real.sqrt (2 * q₀)) / q₀
           * ((m : ℝ) ^ 4 / ((L : ℝ) ^ d) ^ 2) := hsplit
     _ ≤ 288 * (d : ℝ) * (N : ℝ) ^ 4 / q₀ * ((m : ℝ) ^ 2 / (L : ℝ) ^ d)
-        + 576 * (d : ℝ) * (N : ℝ) ^ 3 / (q₀ * Real.sqrt (2 * q₀))
+        + 576 * (d : ℝ) * (N : ℝ) ^ 3 * (1 + 1 / Real.sqrt (2 * q₀)) / q₀
           * (C₁ ^ 2 * ((m : ℝ) ^ 2 / (L : ℝ) ^ d)) := by gcongr
     _ = (288 * (d : ℝ) * (N : ℝ) ^ 4 / q₀
-          + 576 * C₁ ^ 2 * (d : ℝ) * (N : ℝ) ^ 3 / (q₀ * Real.sqrt (2 * q₀)))
+          + 576 * C₁ ^ 2 * (d : ℝ) * (N : ℝ) ^ 3 * (1 + 1 / Real.sqrt (2 * q₀)) / q₀)
         * (m : ℝ) ^ 2 / (L : ℝ) ^ d := by ring
 
 end LatticeSystem.Quantum

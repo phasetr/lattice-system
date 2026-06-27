@@ -267,30 +267,47 @@ theorem momentFactor_twoM_sub_two_le (d L N M : ℕ) [NeZero L]
   rw [le_div_iff₀ (by linarith)]
   linarith [hr]
 
-/-- The moment factor at the numerator word length `2M−3` is bounded by `P_M / (2q₀) / √(2q₀)`:
-one `momentFactor_succ_ge` step lifts `√(2q₀)·mf(2M-3) ≤ mf(2M-2)`, then
-`momentFactor_twoM_sub_two_le` bounds `mf(2M-2) ≤ P_M/(2q₀)`. -/
+/-- The moment factor at the numerator word length `2M−3` is bounded by
+`P_M / (2q₀) · (1 + 1/√(2q₀))`, uniformly for `M ≥ 1`.  For `M ≥ 2` one `momentFactor_succ_ge` step
+lifts `√(2q₀)·mf(2M-3) ≤ mf(2M-2) ≤ P_M/(2q₀)`, giving the sharper `P_M/(2q₀)/√(2q₀)`; for `M = 1`
+both word lengths collapse to `0` and `mf(0) ≤ P_1/(2q₀)`.  The single `(1 + 1/√(2q₀))` factor
+covers both, so the trial bound is uniform in `M ≥ 1` (no separate `M = 1` edge case). -/
 theorem momentFactor_twoM_sub_three_le (d L N M : ℕ) [NeZero L]
-    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) {q₀ : ℝ} (hq₀ : 0 < q₀) (hM : 2 ≤ M)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) {q₀ : ℝ} (hq₀ : 0 < q₀) (hM : 1 ≤ M)
     (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1)) :
     momentFactor d L N Φ (2 * M - 3)
-      ≤ phatMoment d L N Φ M / (2 * q₀) / Real.sqrt (2 * q₀) := by
+      ≤ phatMoment d L N Φ M / (2 * q₀) * (1 + 1 / Real.sqrt (2 * q₀)) := by
   have hsqrt : 0 < Real.sqrt (2 * q₀) := Real.sqrt_pos.mpr (by positivity)
-  have hstep : Real.sqrt (2 * q₀) * momentFactor d L N Φ (2 * M - 3)
-      ≤ momentFactor d L N Φ (2 * M - 2) := by
-    have hsucc := momentFactor_succ_ge d L N Φ (2 * M - 3) (le_of_lt hq₀)
-      (show 2 * q₀ * phatMoment d L N Φ ((2 * M - 3) / 2)
-          ≤ phatMoment d L N Φ ((2 * M - 3) / 2 + 1) from by
-        rw [show (2 * M - 3) / 2 = M - 2 from by omega,
-          show M - 2 + 1 = M - 1 from by omega]
-        have := hratio (M - 2); rwa [show M - 2 + 1 = M - 1 from by omega] at this)
-    rwa [show 2 * M - 3 + 1 = 2 * M - 2 from by omega] at hsucc
-  have htwo := momentFactor_twoM_sub_two_le d L N M Φ hq₀ (by omega) hratio
-  calc momentFactor d L N Φ (2 * M - 3)
-      ≤ momentFactor d L N Φ (2 * M - 2) / Real.sqrt (2 * q₀) := by
-        rw [le_div_iff₀ hsqrt]; linarith [hstep]
-    _ ≤ phatMoment d L N Φ M / (2 * q₀) / Real.sqrt (2 * q₀) :=
-        (div_le_div_iff_of_pos_right hsqrt).mpr htwo
+  have htwo := momentFactor_twoM_sub_two_le d L N M Φ hq₀ hM hratio
+  have hPMnn : 0 ≤ phatMoment d L N Φ M := phatMoment_nonneg d L N Φ M
+  have hdivnn : 0 ≤ phatMoment d L N Φ M / (2 * q₀) := by positivity
+  have hfacnn : 0 ≤ (1 : ℝ) / Real.sqrt (2 * q₀) := by positivity
+  rcases lt_or_ge M 2 with hM1 | hM2
+  · interval_cases M
+    have h0 : (2 * 1 - 3 : ℕ) = (2 * 1 - 2 : ℕ) := by norm_num
+    rw [h0]
+    nlinarith [htwo, hdivnn, hfacnn, mul_nonneg hdivnn hfacnn]
+  · have hstep : Real.sqrt (2 * q₀) * momentFactor d L N Φ (2 * M - 3)
+        ≤ momentFactor d L N Φ (2 * M - 2) := by
+      have hsucc := momentFactor_succ_ge d L N Φ (2 * M - 3) (le_of_lt hq₀)
+        (show 2 * q₀ * phatMoment d L N Φ ((2 * M - 3) / 2)
+            ≤ phatMoment d L N Φ ((2 * M - 3) / 2 + 1) from by
+          rw [show (2 * M - 3) / 2 = M - 2 from by omega,
+            show M - 2 + 1 = M - 1 from by omega]
+          have := hratio (M - 2); rwa [show M - 2 + 1 = M - 1 from by omega] at this)
+      rwa [show 2 * M - 3 + 1 = 2 * M - 2 from by omega] at hsucc
+    have hsharp : momentFactor d L N Φ (2 * M - 3)
+        ≤ phatMoment d L N Φ M / (2 * q₀) / Real.sqrt (2 * q₀) := by
+      calc momentFactor d L N Φ (2 * M - 3)
+          ≤ momentFactor d L N Φ (2 * M - 2) / Real.sqrt (2 * q₀) := by
+            rw [le_div_iff₀ hsqrt]; linarith [hstep]
+        _ ≤ phatMoment d L N Φ M / (2 * q₀) / Real.sqrt (2 * q₀) :=
+            (div_le_div_iff_of_pos_right hsqrt).mpr htwo
+    calc momentFactor d L N Φ (2 * M - 3)
+        ≤ phatMoment d L N Φ M / (2 * q₀) / Real.sqrt (2 * q₀) := hsharp
+      _ = phatMoment d L N Φ M / (2 * q₀) * (1 / Real.sqrt (2 * q₀)) := by ring
+      _ ≤ phatMoment d L N Φ M / (2 * q₀) * (1 + 1 / Real.sqrt (2 * q₀)) := by
+          gcongr; linarith [hfacnn]
 
 /-- **Triple Leibniz decomposition.**  `[A·G·C, Z] = A·G·[C,Z] + A·[G,Z]·C + [A,Z]·G·C` (pure ring
 identity).  Applied with `A = (ô⁺)^j`, `G = [Ĥ,ô⁺]`, `C = (ô⁺)^{M-1-j}`, `Z = ô⁻`: the middle term's
