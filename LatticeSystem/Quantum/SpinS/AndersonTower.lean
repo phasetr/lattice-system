@@ -171,7 +171,9 @@ noncomputable def tanakaOrderSecond3 (d L N : ℕ) [NeZero L] (M : ℕ)
       staggeredOrderOpS (torusParitySublattice d L) N)
     (tanakaSSBState (torusParitySublattice d L) N M Φ) / ((L : ℝ) ^ d) ^ 2
 
-/-- **Tasaki Theorem 4.6 (Anderson's tower of low-lying states), AXIOM.**  Fix the spin `S = N/2`
+/-- **Tasaki Theorem 4.6 (Anderson's tower of low-lying states) — predicate of the constants.**
+The energy bound itself is **proved** as `tower_lowLying_energy_bound` in
+`AndersonTowerTheorem46`.  Fix the spin `S = N/2`
 and a dimension `d ≥ 1`.  There are positive constants `C₁`, `C₂` (depending only on `d`, `S`, and
 the long-range-order parameter `q₀`) such that, on every `d`-dimensional hypercubic torus of even
 side `L ≥ 2`, for the antiferromagnetic nearest-neighbor Heisenberg model with ground state `Φ`
@@ -220,8 +222,9 @@ def IsAndersonTowerConstants (d N : ℕ) (q₀ C₁ C₂ : ℝ) : Prop :=
             towerState (torusParitySublattice d L) N M Φ).re ≤
         E₀.re + C₂ * (M : ℝ) ^ 2 / (L : ℝ) ^ d
 
-axiom tower_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
-    ∃ C₁ C₂ : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂
+-- `tower_lowLying_energy_bound` (the existence of the constants `C₁`, `C₂`) is **proved** in
+-- `LatticeSystem.Quantum.SpinS.AndersonTowerTheorem46` (downstream of this file, which only states
+-- the `IsAndersonTowerConstants` predicate, to avoid an import cycle with the numerator machinery).
 
 /-- **Tasaki Corollary 4.7 (the tower of low-lying energy eigenstates), AXIOM.**  Exactly as
 Theorem 3.1 turns a low-lying trial state into a low-lying energy eigenstate, Theorem 4.6 yields,

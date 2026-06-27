@@ -540,4 +540,116 @@ theorem towerEnergyCoeff_le (d L N m : ℕ) [NeZero L] {q₀ C₁ : ℝ} (hq₀ 
           + 576 * C₁ ^ 2 * (d : ℝ) * (N : ℝ) ^ 3 * (1 + 1 / Real.sqrt (2 * q₀)) / q₀)
         * (m : ℝ) ^ 2 / (L : ℝ) ^ d := by ring
 
+/-- **Tasaki Theorem 4.6 (Anderson's tower of low-lying states), PROVED.**  Discharges the former
+`tower_lowLying_energy_bound` axiom: there exist positive constants `C₁`, `C₂` (depending only on
+`d`, `S = N/2`, `q₀`) such that, for every even torus side `L ≥ 2`, every total-spin-singlet ground
+state `Φ` with long-range order `≥ q₀`, and every `M` with `|M| ≤ C₁ L^{d/2}` and nonzero tower
+state, the tower-state Rayleigh energy obeys `≤ E₀ + C₂ M²/L^d`.  For `N = 0` the order op vanishes,
+so the LRO premise is unsatisfiable and the statement is vacuous. -/
+theorem tower_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
+    ∃ C₁ C₂ : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂ := by
+  rcases Nat.eq_zero_or_pos N with hN0 | hN
+  · -- N = 0: spin-0, order operator vanishes, LRO premise unsatisfiable → vacuous
+    subst hN0
+    refine ⟨1, 1, one_pos, one_pos, ?_⟩
+    intro L _ hL hLeven Φ E₀ M hev hmin hΦ hsing3 hsing1 hlro hMbound htower
+    exfalso
+    have hO0 : staggeredOrderOpS (torusParitySublattice d L) 0 = 0 := by
+      rw [staggeredOrderOpS]
+      refine Finset.sum_eq_zero (fun x _ => ?_)
+      rw [spinSSiteOp3, show spinSOp3 0 = 0 from by
+        ext i j; rw [spinSOp3, Matrix.diagonal_apply]
+        rcases eq_or_ne i j with h | h
+        · subst h; simp
+        · simp [h], onSiteS_zero, smul_zero]
+    have hLpos : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    have hm0c : 0 < (star Φ ⬝ᵥ Φ).re :=
+      (Complex.lt_def.mp (Matrix.dotProduct_star_self_pos_iff.mpr hΦ)).1
+    rw [hO0] at hlro
+    simp only [zero_mul, Matrix.zero_mulVec, dotProduct_zero, Complex.zero_re, zero_div] at hlro
+    linarith [hlro]
+  · -- N ≥ 1
+    have hNR : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
+    have hdR : (0 : ℝ) < (d : ℝ) := by exact_mod_cast hd
+    set C₁ := min (Real.sqrt (q₀ / (6 * N)))
+      (Real.sqrt ((2 : ℝ) ^ d) * Real.sqrt (2 * q₀) / (16 * N)) with hC1
+    set C₂ := 288 * (d : ℝ) * (N : ℝ) ^ 4 / q₀
+      + 576 * C₁ ^ 2 * (d : ℝ) * (N : ℝ) ^ 3 * (1 + 1 / Real.sqrt (2 * q₀)) / q₀ with hC2
+    have ha : 0 < Real.sqrt (q₀ / (6 * N)) := Real.sqrt_pos.mpr (by positivity)
+    have hb : 0 < Real.sqrt ((2 : ℝ) ^ d) * Real.sqrt (2 * q₀) / (16 * N) := by positivity
+    have hC1pos : 0 < C₁ := lt_min ha hb
+    have hsq2q : 0 < Real.sqrt (2 * q₀) := Real.sqrt_pos.mpr (by positivity)
+    have hC2pos : 0 < C₂ := by
+      rw [hC2]
+      have h1 : 0 < 288 * (d : ℝ) * (N : ℝ) ^ 4 / q₀ := by positivity
+      have h2 : 0 ≤ 576 * C₁ ^ 2 * (d : ℝ) * (N : ℝ) ^ 3 * (1 + 1 / Real.sqrt (2 * q₀)) / q₀ := by
+        positivity
+      linarith
+    have hC1cond : 6 * (N : ℝ) * C₁ ^ 2 ≤ q₀ := by
+      have h1 : C₁ ≤ Real.sqrt (q₀ / (6 * N)) := min_le_left _ _
+      have h2 : C₁ ^ 2 ≤ q₀ / (6 * N) := by
+        calc C₁ ^ 2 ≤ (Real.sqrt (q₀ / (6 * N))) ^ 2 := by nlinarith [h1, hC1pos.le]
+          _ = q₀ / (6 * N) := Real.sq_sqrt (by positivity)
+      have h3 : 6 * (N : ℝ) * (q₀ / (6 * N)) = q₀ := by field_simp
+      nlinarith [h2, hNR]
+    have hC1bud : 16 * (N : ℝ) * C₁ ≤ Real.sqrt ((2 : ℝ) ^ d) * Real.sqrt (2 * q₀) := by
+      have h1 : C₁ ≤ Real.sqrt ((2 : ℝ) ^ d) * Real.sqrt (2 * q₀) / (16 * N) := min_le_right _ _
+      rw [le_div_iff₀ (by positivity)] at h1
+      linarith [h1]
+    refine ⟨C₁, C₂, hC1pos, hC2pos, ?_⟩
+    intro L _ hL hLeven Φ E₀ M hev hmin hΦ hsing3 hsing1 hlro hMbound htower
+    have hLpos : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by positivity
+    have hbridge : (L : ℝ) ^ ((d : ℝ) / 2) = Real.sqrt ((L : ℝ) ^ d) := by
+      rw [Real.sqrt_eq_rpow, ← Real.rpow_natCast (L : ℝ) d, ← Real.rpow_mul hLpos.le]
+      congr 1
+      ring
+    rw [hbridge] at hMbound
+    rcases lt_trichotomy M 0 with hM | hM | hM
+    · -- M < 0
+      obtain ⟨m, rfl⟩ : ∃ m : ℕ, M = -(m : ℤ) := ⟨M.natAbs, by omega⟩
+      have hmpos : 1 ≤ m := by omega
+      rw [Int.natAbs_neg, Int.natAbs_natCast] at hMbound
+      have hm2 : (m : ℝ) ^ 2 ≤ C₁ ^ 2 * (L : ℝ) ^ d := by
+        nlinarith [mul_self_le_mul_self (Nat.cast_nonneg m) hMbound, Real.sq_sqrt hVpos.le,
+          Real.sqrt_nonneg ((L : ℝ) ^ d), hC1pos.le]
+      obtain ⟨hc2, hb2, hc3, hb3, hcD⟩ :=
+        tower_conditions_of_le d L N m hN hL hq₀ hC1cond hC1bud hMbound
+      have hcoeff := towerEnergyCoeff_le d L N m hq₀ hm2
+      rw [← hC2] at hcoeff
+      have hsq : ((-(m : ℤ) : ℤ) : ℝ) ^ 2 = (m : ℝ) ^ 2 := by push_cast; ring
+      have hmain := towerState_neg_rayleigh_bound d L N m hN hL hmpos Φ E₀ hev hmin hΦ hsing3 hsing1
+        hq₀ hlro hc2 hb2 hc3 hb3 hcD htower
+      rw [hsq]
+      linarith [hmain, hcoeff]
+    · -- M = 0
+      subst hM
+      have hHerm := heisenbergHamiltonianS_torus_isHermitian d L N
+      have hE0im : E₀.im = 0 := hermitian_mulVec_eigenvalue_im_zero hHerm hΦ hev
+      have hm0c : 0 < (star Φ ⬝ᵥ Φ).re :=
+        (Complex.lt_def.mp (Matrix.dotProduct_star_self_pos_iff.mpr hΦ)).1
+      have hΦim : (star Φ ⬝ᵥ Φ).im = 0 :=
+        ((Complex.le_def.mp (dotProduct_star_self_nonneg Φ)).2).symm
+      rw [show towerState (torusParitySublattice d L) N (0 : ℤ) Φ = Φ from by rw [towerState]; simp,
+        hev, dotProduct_smul, smul_eq_mul, Complex.mul_re, hE0im, hΦim]
+      rw [show E₀.re * (star Φ ⬝ᵥ Φ).re - 0 * 0 = E₀.re * (star Φ ⬝ᵥ Φ).re by ring,
+        mul_div_assoc, div_self (ne_of_gt hm0c), mul_one]
+      simp
+    · -- M > 0
+      obtain ⟨m, rfl⟩ : ∃ m : ℕ, M = (m : ℤ) := ⟨M.natAbs, by omega⟩
+      have hmpos : 1 ≤ m := by omega
+      rw [Int.natAbs_natCast] at hMbound
+      have hm2 : (m : ℝ) ^ 2 ≤ C₁ ^ 2 * (L : ℝ) ^ d := by
+        nlinarith [mul_self_le_mul_self (Nat.cast_nonneg m) hMbound, Real.sq_sqrt hVpos.le,
+          Real.sqrt_nonneg ((L : ℝ) ^ d), hC1pos.le]
+      obtain ⟨hc2, hb2, hc3, hb3, hcD⟩ :=
+        tower_conditions_of_le d L N m hN hL hq₀ hC1cond hC1bud hMbound
+      have hcoeff := towerEnergyCoeff_le d L N m hq₀ hm2
+      rw [← hC2] at hcoeff
+      have hsq : ((m : ℤ) : ℝ) ^ 2 = (m : ℝ) ^ 2 := by push_cast; ring
+      have hmain := towerState_pos_rayleigh_bound d L N m hN hL hmpos Φ E₀ hev hmin hΦ hsing3 hsing1
+        hq₀ hlro hc2 hb2 hc3 hb3 hcD htower
+      rw [hsq]
+      linarith [hmain, hcoeff]
+
 end LatticeSystem.Quantum
