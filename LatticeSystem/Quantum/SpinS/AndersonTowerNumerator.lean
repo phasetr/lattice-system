@@ -605,4 +605,28 @@ theorem orderScalar_norm_le (d L : ℕ) [NeZero L] (w : List Bool) :
   rw [norm_mul, show ‖(2 : ℂ)‖ = 2 from by norm_num]
   exact mul_le_mul_of_nonneg_left (mCharge_norm_le w) (by norm_num)
 
+/-- A per-`l` S3 term equals an `s23_term3_bound`-shaped operator (replicate words). -/
+theorem s3_lterm_eq (d L N j k l : ℕ) [NeZero L] :
+    staggeredOrderDensityOpS d L N false ^ k
+        * (staggeredOrderDensityOpS d L N true ^ l
+          * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+            - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+          * staggeredOrderDensityOpS d L N true ^ (j - 1 - l))
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        * staggeredOrderDensityOpS d L N true ^ (M - 1 - j)
+        * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)
+      = orderWordProd d L N (List.replicate k false ++ List.replicate l true)
+        * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+          - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+        * (orderWordProd d L N (List.replicate (j - 1 - l) true)
+          * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+            - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+          * orderWordProd d L N (List.replicate (M - 1 - j) true
+            ++ List.replicate (M - 1 - k) false)) := by
+  rw [orderWordProd_mul_append, orderWordProd_replicate, orderWordProd_replicate,
+    orderWordProd_replicate, orderWordProd_mul_append, orderWordProd_replicate,
+    orderWordProd_replicate]
+  noncomm_ring
+
 end LatticeSystem.Quantum
