@@ -218,4 +218,40 @@ theorem tower_conditions_of_le (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2
   · nlinarith [hcond2m, mul_self_le_mul_self hsub3nn hsub3, hNnn]
   · nlinarith [hcond2m, sq_nonneg (m : ℝ), hNnn]
 
+/-- **The trial-energy coefficient is `O(m²/V)`.**  Under the size constraint `m² ≤ C₁²V`, the
+`O(m⁴/V²)` part is absorbed into the `O(m²/V)` part, giving
+`2·towerEnergyCoeff ≤ C₂·m²/V` with the explicit constant
+`C₂ = 288 d N⁴/q₀ + 576 C₁² d N³/(q₀√(2q₀))`. -/
+theorem towerEnergyCoeff_le (d L N m : ℕ) [NeZero L] {q₀ C₁ : ℝ} (hq₀ : 0 < q₀)
+    (hm2 : (m : ℝ) ^ 2 ≤ C₁ ^ 2 * (L : ℝ) ^ d) :
+    2 * towerEnergyCoeff d L N m q₀
+      ≤ (288 * (d : ℝ) * (N : ℝ) ^ 4 / q₀
+          + 576 * C₁ ^ 2 * (d : ℝ) * (N : ℝ) ^ 3 / (q₀ * Real.sqrt (2 * q₀)))
+        * (m : ℝ) ^ 2 / (L : ℝ) ^ d := by
+  have hLpos : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+  have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by positivity
+  have hsq : (0 : ℝ) < Real.sqrt (2 * q₀) := Real.sqrt_pos.mpr (by linarith)
+  have hm4 : (m : ℝ) ^ 4 ≤ C₁ ^ 2 * (m : ℝ) ^ 2 * (L : ℝ) ^ d := by
+    nlinarith [hm2, sq_nonneg ((m : ℝ) ^ 2)]
+  have hsplit : 2 * towerEnergyCoeff d L N m q₀
+      = 288 * (d : ℝ) * (N : ℝ) ^ 4 / q₀ * ((m : ℝ) ^ 2 / (L : ℝ) ^ d)
+        + 576 * (d : ℝ) * (N : ℝ) ^ 3 / (q₀ * Real.sqrt (2 * q₀))
+          * ((m : ℝ) ^ 4 / ((L : ℝ) ^ d) ^ 2) := by
+    rw [towerEnergyCoeff]
+    field_simp
+    ring
+  have hmd : (m : ℝ) ^ 4 / ((L : ℝ) ^ d) ^ 2 ≤ C₁ ^ 2 * ((m : ℝ) ^ 2 / (L : ℝ) ^ d) := by
+    rw [← mul_div_assoc, div_le_div_iff₀ (pow_pos hVpos 2) hVpos]
+    nlinarith [hm4, hVpos]
+  calc 2 * towerEnergyCoeff d L N m q₀
+      = 288 * (d : ℝ) * (N : ℝ) ^ 4 / q₀ * ((m : ℝ) ^ 2 / (L : ℝ) ^ d)
+        + 576 * (d : ℝ) * (N : ℝ) ^ 3 / (q₀ * Real.sqrt (2 * q₀))
+          * ((m : ℝ) ^ 4 / ((L : ℝ) ^ d) ^ 2) := hsplit
+    _ ≤ 288 * (d : ℝ) * (N : ℝ) ^ 4 / q₀ * ((m : ℝ) ^ 2 / (L : ℝ) ^ d)
+        + 576 * (d : ℝ) * (N : ℝ) ^ 3 / (q₀ * Real.sqrt (2 * q₀))
+          * (C₁ ^ 2 * ((m : ℝ) ^ 2 / (L : ℝ) ^ d)) := by gcongr
+    _ = (288 * (d : ℝ) * (N : ℝ) ^ 4 / q₀
+          + 576 * C₁ ^ 2 * (d : ℝ) * (N : ℝ) ^ 3 / (q₀ * Real.sqrt (2 * q₀)))
+        * (m : ℝ) ^ 2 / (L : ℝ) ^ d := by ring
+
 end LatticeSystem.Quantum
