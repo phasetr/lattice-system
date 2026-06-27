@@ -362,4 +362,52 @@ theorem heisenbergRaisingComm_word_re_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤
   · exact momentFactor_nonneg d L N Φ _
   · exact heisenbergRaisingCommAggregate_le hL hN
 
+/-- **S2/S3 term-1 leaf.**  A term with `G = [Ĥ, ô⁺]` left of a Φ-side `[ô⁺,ô⁻]`: scalarize the
+order commutator (left-factor form), then bound the residual `G`-sandwich by R2:
+`|Re⟨Φ, ô^{wₗ} G ô^{wₘ} [ô⁺,ô⁻] ô^{wᵣ} Φ⟩| ≤ ‖V⁻²·2m(wᵣ)‖ · 3(24dN³) · mf(|wₗ|+|wₘ|+|wᵣ|)`. -/
+theorem s23_term1_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hq₀ : 0 < q₀) (hm0 : 0 < phatMoment d L N Φ 0)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1))
+    (wl wm wr : List Bool)
+    (hcond : 3 * (N : ℝ) * ((wl.length + (wm.length + wr.length) : ℕ) : ℝ) ^ 2
+        ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget : ((wl.length + (wm.length + wr.length) : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N wl
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true
+            * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        * (orderWordProd d L N wm
+          * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+            - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+          * orderWordProd d L N wr)).mulVec Φ).re|
+      ≤ ‖(((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge wr)‖
+        * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3)
+            * momentFactor d L N Φ (wl.length + (wm.length + wr.length))) := by
+  rw [orderCommutator_insert_left_mulVec_eq d L N Φ hsing
+      (orderWordProd d L N wl
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true
+            * heisenbergHamiltonianS (torusNNCoupling d L) N)) wm wr,
+    dotProduct_smul, smul_eq_mul]
+  set s := (((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge wr) with hs
+  have hVim : (((L : ℂ) ^ d)⁻¹).im = 0 := by
+    rw [show ((L : ℂ) ^ d)⁻¹ = (((((L : ℝ) ^ d)⁻¹ : ℝ)) : ℂ) by push_cast; ring]
+    exact Complex.ofReal_im _
+  have hsim : s.im = 0 := by rw [hs]; simp [Complex.mul_im, Complex.mul_re, hVim, mCharge_im]
+  set Z := star Φ ⬝ᵥ (orderWordProd d L N wl
+      * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+        - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+      * (orderWordProd d L N wm * orderWordProd d L N wr)).mulVec Φ with hZ
+  have hre : (s * Z).re = s.re * Z.re := by rw [Complex.mul_re, hsim, zero_mul, sub_zero]
+  rw [hre, abs_mul]
+  refine mul_le_mul ?_ ?_ (abs_nonneg _) (norm_nonneg _)
+  · simpa using RCLike.abs_re_le_norm s
+  · rw [hZ, ← orderWordProd_mul_append]
+    have h := heisenbergRaisingComm_word_re_bound d L N hN hL Φ hsing hq₀ hm0 hratio wl (wm ++ wr)
+      (by rw [List.length_append]; exact hcond) (by rw [List.length_append]; exact hbudget)
+    simpa only [List.length_append] using h
+
 end LatticeSystem.Quantum
