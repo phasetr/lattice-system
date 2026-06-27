@@ -513,4 +513,32 @@ theorem abs_re_dotProduct_neg_sum_le (d L N : ℕ) [NeZero L]
   rw [Matrix.neg_mulVec, dotProduct_neg, Complex.neg_re, abs_neg]
   exact abs_re_dotProduct_sum_le d L N Φ s f
 
+/-- **Per-`j` three-way split with `d̂` surfaced.**  `[Tⱼ, ô⁻]` splits as `(ô⁺)^j G [(ô⁺)^r,ô⁻]`
+(S2) `− (ô⁺)^j d̂ (ô⁺)^r` (S1) `+ [(ô⁺)^j,ô⁻] G (ô⁺)^r` (S3), where `Tⱼ = (ô⁺)^j G (ô⁺)^r`,
+`G = [Ĥ,ô⁺]`, `r = M-1-j`, via the triple Leibniz plus the Jacobi identity `[G, ô⁻] = −d̂`. -/
+theorem Tj_orderMinus_decomp (d L N j r : ℕ) [NeZero L] :
+    (staggeredOrderDensityOpS d L N true ^ j
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        * staggeredOrderDensityOpS d L N true ^ r) * staggeredOrderDensityOpS d L N false
+      - staggeredOrderDensityOpS d L N false * (staggeredOrderDensityOpS d L N true ^ j
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        * staggeredOrderDensityOpS d L N true ^ r)
+      = staggeredOrderDensityOpS d L N true ^ j
+          * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+            - staggeredOrderDensityOpS d L N true
+              * heisenbergHamiltonianS (torusNNCoupling d L) N)
+          * (staggeredOrderDensityOpS d L N true ^ r * staggeredOrderDensityOpS d L N false
+            - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true ^ r)
+        + staggeredOrderDensityOpS d L N true ^ j * (- orderDoubleComm d L N)
+          * staggeredOrderDensityOpS d L N true ^ r
+        + (staggeredOrderDensityOpS d L N true ^ j * staggeredOrderDensityOpS d L N false
+            - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true ^ j)
+          * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+            - staggeredOrderDensityOpS d L N true
+              * heisenbergHamiltonianS (torusNNCoupling d L) N)
+          * staggeredOrderDensityOpS d L N true ^ r := by
+  rw [mul_mul_commutator_decomp, heisenberg_order_nested_eq_neg_orderDoubleComm]
+
 end LatticeSystem.Quantum
