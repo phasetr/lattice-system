@@ -629,4 +629,45 @@ theorem s3_lterm_eq (d L N j k l : ℕ) [NeZero L] :
     orderWordProd_replicate]
   noncomm_ring
 
+/-- **Per-`l` S2 bound (uniform in `l`).**  Each S2 term `≤ V⁻²·2·(2M)·3(24dN³)·mf(2M-3)`,
+independent of `l`, via `s2_lterm_eq` → `s23_term1_bound` → `orderScalar_norm_le`. -/
+theorem s2_lterm_bound (d L N M j k l : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hq₀ : 0 < q₀) (hm0 : 0 < phatMoment d L N Φ 0)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1))
+    (hj : j < M) (hk : k < M) (hl : l < M - 1 - j)
+    (hcond : 3 * (N : ℝ) * ((2 * M - 3 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget : ((2 * M - 3 : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2) :
+    |(star Φ ⬝ᵥ (staggeredOrderDensityOpS d L N false ^ k * staggeredOrderDensityOpS d L N true ^ j
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        * (staggeredOrderDensityOpS d L N true ^ l
+          * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+            - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+          * staggeredOrderDensityOpS d L N true ^ (M - 1 - j - 1 - l))
+        * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)).mulVec Φ).re|
+      ≤ ((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (M : ℝ)))
+        * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * momentFactor d L N Φ (2 * M - 3)) := by
+  have hwrlen : (List.replicate (M - 1 - j - 1 - l) true
+      ++ List.replicate (M - 1 - k) false).length ≤ 2 * M := by
+    simp only [List.length_append, List.length_replicate]; omega
+  have hlen : (List.replicate k false ++ List.replicate j true).length
+      + ((List.replicate l true).length
+        + (List.replicate (M - 1 - j - 1 - l) true ++ List.replicate (M - 1 - k) false).length)
+      = 2 * M - 3 := by
+    simp only [List.length_append, List.length_replicate]; omega
+  rw [s2_lterm_eq d L N j k l (M - 1 - j)]
+  refine le_trans (s23_term1_bound d L N hN hL Φ hsing hq₀ hm0 hratio
+    (List.replicate k false ++ List.replicate j true) (List.replicate l true)
+    (List.replicate (M - 1 - j - 1 - l) true ++ List.replicate (M - 1 - k) false)
+    (by rw [hlen]; exact hcond) (by rw [hlen]; exact hbudget)) ?_
+  rw [hlen]
+  refine mul_le_mul_of_nonneg_right ?_
+    (mul_nonneg (by positivity) (momentFactor_nonneg d L N Φ _))
+  refine (orderScalar_norm_le d L _).trans ?_
+  refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+  exact mul_le_mul_of_nonneg_left (by exact_mod_cast hwrlen) (by norm_num)
+
 end LatticeSystem.Quantum
