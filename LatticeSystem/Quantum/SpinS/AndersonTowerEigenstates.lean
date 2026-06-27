@@ -7,6 +7,9 @@ This file develops the magnetization-sector tools for the torus tower; the first
 magnetization eigenvalue shift of the tower trial state.
 -/
 import LatticeSystem.Quantum.SpinS.AndersonTowerTheorem46
+import LatticeSystem.Quantum.SpinS.MagSectorEmbedding
+import LatticeSystem.Quantum.SpinS.DressedMatrixOnMagSectorMarshallCore
+import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 
 namespace LatticeSystem.Quantum
 
@@ -59,5 +62,32 @@ theorem totalSpinSOp3_mulVec_towerState_eigenvec [NeZero L] (M : ℤ)
     rw [if_pos rfl]
     push_cast
     ring
+
+/-- **Magnetization-sector minimum energy eigenvector.**  For real coupling `J` and a nonempty
+magnetization sector `K`, the Heisenberg Hamiltonian has a nonzero eigenstate `ψ` whose energy is
+the minimum eigenvalue of the sector-restricted (Hermitian) matrix and which lies in the
+`Ŝ_tot^{(3)}` eigenspace of eigenvalue `|V|·N/2 − K`.  Built by lifting the restricted matrix's min
+eigenvector (`exists_nonzero_eigenvector_hermitianMinEigenvalue`) via
+`heisenbergHamiltonianS_mulVec_magSectorEmbedding`. -/
+theorem heisenbergHamiltonianS_magSector_min_eigenvector {V : Type*} [Fintype V] [DecidableEq V]
+    {J : V → V → ℂ} (hJ : ∀ x y, star (J x y) = J x y) (N K : ℕ)
+    [Nonempty (magConfigS V N K)] :
+    ∃ ψ : (V → Fin (N + 1)) → ℂ, ψ ≠ 0 ∧
+      (heisenbergHamiltonianS J N).mulVec ψ
+        = ((hermitianMinEigenvalue
+            (heisenbergHamiltonianSMatrixOnMagSector_isHermitian N K hJ) : ℝ) : ℂ) • ψ ∧
+      (totalSpinSOp3 V N).mulVec ψ
+        = (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (K : ℂ)) • ψ := by
+  obtain ⟨v, hv0, hveig⟩ :=
+    exists_nonzero_eigenvector_hermitianMinEigenvalue
+      (heisenbergHamiltonianSMatrixOnMagSector_isHermitian N K hJ)
+  refine ⟨magSectorEmbedding v, ?_, heisenbergHamiltonianS_mulVec_magSectorEmbedding J v hveig, ?_⟩
+  · intro hψ0
+    obtain ⟨τ, hτ⟩ := Function.ne_iff.mp hv0
+    apply hτ
+    have hval : magSectorEmbedding v τ.1 = v τ := magSectorEmbedding_apply_of_mem v τ.2
+    rw [Pi.zero_apply, ← hval, hψ0, Pi.zero_apply]
+  · rw [← mem_magSubspaceS_iff]
+    exact magSectorEmbedding_mem_magSubspaceS v
 
 end LatticeSystem.Quantum
