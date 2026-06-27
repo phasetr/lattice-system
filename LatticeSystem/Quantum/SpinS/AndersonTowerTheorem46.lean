@@ -17,6 +17,84 @@ namespace LatticeSystem.Quantum
 open Matrix
 open scoped ComplexOrder
 
+/-- **General variational gap ≤ double commutator.**  For a Hermitian `H` with ground state
+`H Φ = E₀ Φ` (`E₀` minimal) and any operator `A`, the trial-state energy gap is bounded by the
+symmetric double commutator with `Aᴴ`: `⟨AΦ,H AΦ⟩ − E₀⟨AΦ,AΦ⟩ ≤ ⟨Φ, [Aᴴ,[H,A]] Φ⟩`.  This is the
+operator-agnostic form of `tower_numerator_double_commutator_le` (which it generalizes from
+`A = (ô⁺)^M` to arbitrary `A`), used for both the raising (`A = (ô⁺)^m`) and lowering
+(`A = (ô⁻)^m`) towers. -/
+theorem variational_gap_le_double_commutator {n : Type*} [Fintype n] [Nonempty n]
+    (A H : Matrix n n ℂ) (hHerm : H.IsHermitian) (Φ : n → ℂ) (E₀ : ℂ)
+    (hev : H.mulVec Φ = E₀ • Φ)
+    (hmin : ∀ (E : ℂ) (Ψ : n → ℂ), Ψ ≠ 0 → H.mulVec Ψ = E • Ψ → E₀.re ≤ E.re) (hΦ : Φ ≠ 0) :
+    (star (A.mulVec Φ) ⬝ᵥ H.mulVec (A.mulVec Φ)).re
+        - E₀.re * (star (A.mulVec Φ) ⬝ᵥ A.mulVec Φ).re
+      ≤ (star Φ ⬝ᵥ (Matrix.conjTranspose A * (H * A - A * H)
+          - (H * A - A * H) * Matrix.conjTranspose A).mulVec Φ).re := by
+  classical
+  set Adag := Matrix.conjTranspose A with hAd
+  have hE₀im : E₀.im = 0 := hermitian_mulVec_eigenvalue_im_zero hHerm hΦ hev
+  have hT1 : star Φ ⬝ᵥ (Adag * (H * A)).mulVec Φ
+      = star (A.mulVec Φ) ⬝ᵥ H.mulVec (A.mulVec Φ) := by
+    rw [← Matrix.mulVec_mulVec, hAd, star_dotProduct_mulVec_conjTranspose,
+      Matrix.conjTranspose_conjTranspose, Matrix.mulVec_mulVec]
+  have hT2 : star Φ ⬝ᵥ (Adag * A * H).mulVec Φ
+      = E₀ * (star (A.mulVec Φ) ⬝ᵥ A.mulVec Φ) := by
+    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hev, Matrix.mulVec_smul,
+      Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul, hAd,
+      star_dotProduct_mulVec_conjTranspose, Matrix.conjTranspose_conjTranspose]
+  have hconjE : (star E₀ : ℂ) = E₀ := by
+    rw [Complex.star_def]; exact Complex.conj_eq_iff_im.mpr hE₀im
+  have hT3 : star Φ ⬝ᵥ (H * A * Adag).mulVec Φ
+      = E₀ * (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ) := by
+    rw [mul_assoc, hermitian_dotProduct_shift hHerm, hev, star_smul, smul_dotProduct, hconjE,
+      smul_eq_mul, ← Matrix.mulVec_mulVec, hAd, star_dotProduct_mulVec_conjTranspose]
+  have hT4 : star Φ ⬝ᵥ (A * H * Adag).mulVec Φ
+      = star (Adag.mulVec Φ) ⬝ᵥ H.mulVec (Adag.mulVec Φ) := by
+    rw [mul_assoc, ← Matrix.mulVec_mulVec, hAd, star_dotProduct_mulVec_conjTranspose,
+      Matrix.mulVec_mulVec]
+  have hP : Adag * (H * A - A * H) - (H * A - A * H) * Adag
+      = Adag * (H * A) - Adag * A * H - H * A * Adag + A * H * Adag := by noncomm_ring
+  have heq : star Φ ⬝ᵥ (Adag * (H * A - A * H) - (H * A - A * H) * Adag).mulVec Φ
+      = (star (A.mulVec Φ) ⬝ᵥ H.mulVec (A.mulVec Φ) - E₀ * (star (A.mulVec Φ) ⬝ᵥ A.mulVec Φ))
+        + (star (Adag.mulVec Φ) ⬝ᵥ H.mulVec (Adag.mulVec Φ)
+            - E₀ * (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ)) := by
+    rw [hP]
+    simp only [Matrix.add_mulVec, Matrix.sub_mulVec, dotProduct_add, dotProduct_sub,
+      hT1, hT2, hT3, hT4]
+    ring
+  have hself1 : (star (A.mulVec Φ) ⬝ᵥ A.mulVec Φ).im = 0 :=
+    ((Complex.le_def.mp (dotProduct_star_self_nonneg (A.mulVec Φ))).2).symm
+  have hself2 : (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ).im = 0 :=
+    ((Complex.le_def.mp (dotProduct_star_self_nonneg (Adag.mulVec Φ))).2).symm
+  have hre : (star Φ ⬝ᵥ (Adag * (H * A - A * H) - (H * A - A * H) * Adag).mulVec Φ).re
+      = (star (A.mulVec Φ) ⬝ᵥ H.mulVec (A.mulVec Φ)).re
+          - E₀.re * (star (A.mulVec Φ) ⬝ᵥ A.mulVec Φ).re
+        + ((star (Adag.mulVec Φ) ⬝ᵥ H.mulVec (Adag.mulVec Φ)).re
+          - E₀.re * (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ).re) := by
+    rw [heq]
+    simp only [Complex.add_re, Complex.sub_re, Complex.mul_re, hE₀im, hself1, hself2]
+    ring
+  have hvar := hermitianMinEigenvalue_mul_dotProduct_re_le_rayleighOnVec hHerm (Adag.mulVec Φ)
+  obtain ⟨v, hv_ne, hv_eig⟩ := exists_nonzero_eigenvector_hermitianMinEigenvalue hHerm
+  have hE₀le : E₀.re ≤ hermitianMinEigenvalue hHerm := by
+    have := hmin ((hermitianMinEigenvalue hHerm : ℝ) : ℂ) v hv_ne hv_eig
+    simpa using this
+  have hdenom : 0 ≤ (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ).re :=
+    (Complex.le_def.mp (dotProduct_star_self_nonneg (Adag.mulVec Φ))).1
+  have hnumgap_dag : 0 ≤ (star (Adag.mulVec Φ) ⬝ᵥ H.mulVec (Adag.mulVec Φ)).re
+      - E₀.re * (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ).re := by
+    have h1 : E₀.re * (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ).re
+        ≤ hermitianMinEigenvalue hHerm * (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ).re :=
+      mul_le_mul_of_nonneg_right hE₀le hdenom
+    have h2 : hermitianMinEigenvalue hHerm * (star (Adag.mulVec Φ) ⬝ᵥ Adag.mulVec Φ).re
+        ≤ rayleighOnVec H (Adag.mulVec Φ) := hvar
+    have h3 : rayleighOnVec H (Adag.mulVec Φ)
+        = (star (Adag.mulVec Φ) ⬝ᵥ H.mulVec (Adag.mulVec Φ)).re := rfl
+    linarith
+  rw [hre]
+  linarith
+
 /-- **The per-trial Rayleigh-bound coefficient.**  The numerator bound divided by the denominator
 lower bound `½P_m` (so the `P_m` factor cancels) leaves `2 ·` this coefficient, which is the
 explicit `O(m²/V) + O(m⁴/V²)` energy excess of the trial state `(ô⁺)^m Φ`.  Here `V = L^d`. -/
