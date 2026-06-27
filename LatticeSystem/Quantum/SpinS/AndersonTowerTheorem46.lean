@@ -95,6 +95,39 @@ theorem variational_gap_le_double_commutator {n : Type*} [Fintype n] [Nonempty n
   rw [hre]
   linarith
 
+/-- **Real part is conjugation-symmetric.**  `Re⟨Φ, Bᴴ Φ⟩ = Re⟨Φ, B Φ⟩` (the sesquilinear form of
+`Bᴴ` is the conjugate of that of `B`).  Used to transfer the raising numerator bound to the lowering
+tower, whose numerator operator is the conjugate transpose of the raising one. -/
+theorem re_dotProduct_mulVec_conjTranspose {n : Type*} [Fintype n] (B : Matrix n n ℂ) (Φ : n → ℂ) :
+    (star Φ ⬝ᵥ (Matrix.conjTranspose B).mulVec Φ).re = (star Φ ⬝ᵥ B.mulVec Φ).re := by
+  rw [star_dotProduct_mulVec_conjTranspose, Matrix.conjTranspose_conjTranspose,
+    Matrix.star_dotProduct, Complex.star_def, Complex.conj_re]
+
+/-- **Lowering-tower denominator lower bound.**  Mirror of `tower_denominator_lower_bound` for the
+lowering balanced word `(ô⁺)^M (ô⁻)^M`: `½P_M ≤ ‖(ô⁻)^M Φ‖²` via `orderWord_balanced_re_close`. -/
+theorem tower_denominator_lower_bound_lower (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1)
+    {M : ℕ} (hcond : 3 * (N : ℝ) * (M : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d) :
+    (1 / 2) * phatMoment d L N Φ M
+      ≤ (star Φ ⬝ᵥ (staggeredOrderDensityOpS d L N true ^ M
+          * staggeredOrderDensityOpS d L N false ^ M).mulVec Φ).re := by
+  have hwt : (List.replicate M true ++ List.replicate M false).count true = M := by
+    simp [List.count_append, List.count_replicate]
+  have hwf : (List.replicate M true ++ List.replicate M false).count false = M := by
+    simp [List.count_append, List.count_replicate]
+  have heq : orderWordProd d L N (List.replicate M true ++ List.replicate M false)
+      = staggeredOrderDensityOpS d L N true ^ M * staggeredOrderDensityOpS d L N false ^ M := by
+    rw [orderWordProd, List.map_append, List.map_replicate, List.map_replicate, List.prod_append,
+      List.prod_replicate, List.prod_replicate]
+  have hclose := orderWord_balanced_re_close d L N hN Φ hsing hm0 hlro M hcond
+    (List.replicate M true ++ List.replicate M false) hwt hwf
+  rw [abs_le] at hclose
+  rw [← heq]
+  linarith [hclose.1]
+
 /-- **The per-trial Rayleigh-bound coefficient.**  The numerator bound divided by the denominator
 lower bound `½P_m` (so the `P_m` factor cancels) leaves `2 ·` this coefficient, which is the
 explicit `O(m²/V) + O(m⁴/V²)` energy excess of the trial state `(ô⁺)^m Φ`.  Here `V = L^d`. -/
