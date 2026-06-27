@@ -410,4 +410,25 @@ theorem s23_term1_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
       (by rw [List.length_append]; exact hcond) (by rw [List.length_append]; exact hbudget)
     simpa only [List.length_append] using h
 
+/-- **Bra-side scalarization of a buried `Ŝ³`.**  Moving `Ŝ³` (`= [ô⁺,ô⁻]·V²/2`) onto the bra `Φ`
+via Hermiticity: `(ô^{wₗ})†Φ` is an `Ŝ³` eigenstate (charge `m((wₗ)ʳ⁻)`), so
+`⟨Φ, ô^{wₗ} Ŝ³ X Φ⟩ = conj(m((wₗ)ʳ⁻)) ⟨Φ, ô^{wₗ} X Φ⟩` for any right factor `X`. -/
+theorem dotProduct_orderWord_totalSpinSOp3_mid_eq (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) (wl : List Bool)
+    (X : ManyBodyOpS (HypercubicTorus d L) N) :
+    star Φ ⬝ᵥ (orderWordProd d L N wl * totalSpinSOp3 (HypercubicTorus d L) N * X).mulVec Φ
+      = (starRingEnd ℂ) (mCharge (wl.reverse.map not))
+          * (star Φ ⬝ᵥ (orderWordProd d L N wl * X).mulVec Φ) := by
+  have key : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec
+        ((orderWordProd d L N (wl.reverse.map not)).mulVec Φ)
+      = mCharge (wl.reverse.map not) • (orderWordProd d L N (wl.reverse.map not)).mulVec Φ :=
+    totalSpinSOp3_mulVec_orderWordProd_eigenvec d L N _ hsing
+  rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
+    star_dotProduct_mulVec_conjTranspose (orderWordProd d L N wl), orderWordProd_conjTranspose,
+    star_dotProduct_mulVec_conjTranspose (totalSpinSOp3 (HypercubicTorus d L) N),
+    (totalSpinSOp3_isHermitian (HypercubicTorus d L) N).eq, key, star_smul, smul_dotProduct,
+    smul_eq_mul, ← orderWordProd_conjTranspose,
+    ← star_dotProduct_mulVec_conjTranspose, Matrix.mulVec_mulVec, starRingEnd_apply]
+
 end LatticeSystem.Quantum
