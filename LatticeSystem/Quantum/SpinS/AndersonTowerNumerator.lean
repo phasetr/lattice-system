@@ -267,4 +267,13 @@ theorem momentFactor_twoM_sub_two_le (d L N M : ℕ) [NeZero L]
   rw [le_div_iff₀ (by linarith)]
   linarith [hr]
 
+/-- **Triple Leibniz decomposition.**  `[A·G·C, Z] = A·G·[C,Z] + A·[G,Z]·C + [A,Z]·G·C` (pure ring
+identity).  Applied with `A = (ô⁺)^j`, `G = [Ĥ,ô⁺]`, `C = (ô⁺)^{M-1-j}`, `Z = ô⁻`: the middle term's
+`[G,Z] = [[Ĥ,ô⁺],ô⁻] = −d̂` gives the S1 contribution, the outer two give the S2/S3 crossings. -/
+theorem mul_mul_commutator_decomp {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
+    (A G C Z : ManyBodyOpS Λ N) :
+    A * G * C * Z - Z * (A * G * C)
+      = A * G * (C * Z - Z * C) + A * (G * Z - Z * G) * C + (A * Z - Z * A) * G * C := by
+  noncomm_ring
+
 end LatticeSystem.Quantum
