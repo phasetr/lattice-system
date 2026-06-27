@@ -8429,15 +8429,21 @@ conjugation, $N=0$ is vacuous (the order operator vanishes).  The statement is \
 long-range order} (a $q_0>0$ premise bounding $\langle(\hat O_L/L^d)^2\rangle$ from below), hence
 vacuous in one dimension by Corollary 4.3, exactly as in Tasaki.
 
-\noindent\textbf{Corollary 4.7} (Tasaki §4.2.1, eq.~(4.2.7), pp.~95--96; documented axiom,
-\texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The tower of low-lying energy
-\emph{eigenstates}: exactly as Theorem 3.1 turns a low-lying trial state into a low-lying energy
-eigenstate, Theorem 4.6 yields, for each magnetization $M$ with $|M|\le C_1 L^{d/2}$, an energy
-eigenstate $\Psi_M$ in the $\hat S_{\mathrm{tot}}^{(3)}$ sector $\mu_0+M$ with $E_{\mathrm{GS}}<E_M\le
-E_{\mathrm{GS}}+C_2 M^2/L^d$.  Distinct $M$ give distinct (orthogonal) sectors, so this exhibits
-$O(L^{d/2})$ distinct low-lying energy eigenstates --- the rigorous Anderson tower.  The axiom
-\texttt{tower\_lowLying\_eigenstates} is conditional on long-range order (the same $q_0$ premise as
-Theorem 4.6), hence vacuous in one dimension by Corollary 4.3.  Chapters~3--10 backfill.
+\noindent\textbf{Corollary 4.7} (Tasaki §4.2.2, eq.~(4.2.7), pp.~95--96; \emph{now proved --- axiom
+discharged}, \texttt{Quantum/SpinS/AndersonTowerEigenstates.lean}, PR \#4775).  The tower of low-lying
+energy \emph{eigenstates}: exactly as Theorem 3.1 turns a low-lying trial state into a low-lying energy
+eigenstate, Theorem 4.6 yields, for a total-spin-singlet ground state and each magnetization
+$M\ne 0$ with $|M|\le C_1 L^{d/2}$ (nonzero tower state), an energy eigenstate $\Psi_M$ in the
+$\hat S_{\mathrm{tot}}^{(3)}$ sector $M$ with $E_{\mathrm{GS}}<E_M\le E_{\mathrm{GS}}+C_2 M^2/L^d$.
+\emph{Proof} (axiom-clean): $\Psi_M$ is the minimum-energy eigenstate of $\hat H$ restricted to the
+magnetization sector of the tower state $\Gamma_M$ (lift the restricted-Hermitian min eigenvector via
+the sector embedding); its energy is $\le$ the Rayleigh quotient of $\Gamma_M$ (variational lower
+bound transported along the norm/energy embedding bridges) $\le E_{\mathrm{GS}}+C_2 M^2/L^d$
+(Theorem 4.6); the strict gap uses a ground-sector-exclusion premise (every ground eigenstate is a
+singlet, so an eigenstate in sector $M\ne 0$ has energy $>E_{\mathrm{GS}}$).  Distinct $M$ give
+distinct (orthogonal) sectors, so this exhibits $O(L^{d/2})$ distinct low-lying energy eigenstates ---
+the rigorous Anderson tower.  Conditional on long-range order (the same $q_0$ premise as Theorem 4.6),
+hence vacuous in one dimension by Corollary 4.3.
 
 \noindent\textbf{Theorem 4.8} (Tanaka, Tasaki §4.2.1, eqs.~(4.2.10)--(4.2.11), pp.~97--98;
 documented axiom, \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The Tanaka
