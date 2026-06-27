@@ -161,4 +161,61 @@ theorem towerState_pos_rayleigh_bound (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) 
   exact tower_trial_energy_bound d L N m hN hL hm Φ E₀ hev hmin hΦ hsing3 hsing1 hq₀ hlro
     hcond2 hbudget2 hcond3 hbudget3 hcondD hAne
 
+/-- **The trial bounds `hcond2/3`, `hbudget2/3`, `hcondD` from a single size constraint.**  If
+`m ≤ C₁·√V` with `6N C₁² ≤ q₀` (handles all `3N(2m)² ≤ 2q₀V` conditions) and
+`16N C₁ ≤ √(2^d)·√(2q₀)` (handles all budget conditions, using `√V ≥ √(2^d)`), then every condition
+the numerator/denominator bounds need holds. -/
+theorem tower_conditions_of_le (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L) {q₀ C₁ : ℝ}
+    (hq₀ : 0 < q₀) (hC1cond : 6 * (N : ℝ) * C₁ ^ 2 ≤ q₀)
+    (hC1bud : 16 * (N : ℝ) * C₁ ≤ Real.sqrt ((2 : ℝ) ^ d) * Real.sqrt (2 * q₀))
+    (hm : (m : ℝ) ≤ C₁ * Real.sqrt ((L : ℝ) ^ d)) :
+    (3 * (N : ℝ) * ((2 * m - 2 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+      ∧ (((2 * m - 2 : ℕ) : ℝ) * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2)
+      ∧ (3 * (N : ℝ) * ((2 * m - 3 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+      ∧ (((2 * m - 3 : ℕ) : ℝ) * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2)
+      ∧ (3 * (N : ℝ) * (m : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d) := by
+  have hLR : (2 : ℝ) ≤ (L : ℝ) := by exact_mod_cast hL
+  have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by positivity
+  have hsqVsq : Real.sqrt ((L : ℝ) ^ d) ^ 2 = (L : ℝ) ^ d := Real.sq_sqrt hVpos.le
+  have hsqVnn : (0 : ℝ) ≤ Real.sqrt ((L : ℝ) ^ d) := Real.sqrt_nonneg _
+  have hsq2q : (0 : ℝ) < Real.sqrt (2 * q₀) := Real.sqrt_pos.mpr (by linarith)
+  have hmnn : (0 : ℝ) ≤ (m : ℝ) := Nat.cast_nonneg m
+  have hNnn : (0 : ℝ) ≤ (N : ℝ) := Nat.cast_nonneg N
+  -- m² ≤ C₁²·V
+  have hm2 : (m : ℝ) ^ 2 ≤ C₁ ^ 2 * (L : ℝ) ^ d := by
+    have := mul_self_le_mul_self hmnn hm
+    nlinarith [this, hsqVsq]
+  -- common condition `3N(2m)² ≤ 2q₀V`, hence the `2m-2`, `2m-3`, `m` cases
+  have hcond2m : 3 * (N : ℝ) * (2 * (m : ℝ)) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d := by
+    have h1 : 12 * (N : ℝ) * (m : ℝ) ^ 2 ≤ 12 * (N : ℝ) * (C₁ ^ 2 * (L : ℝ) ^ d) := by
+      nlinarith [hm2, hNnn]
+    nlinarith [h1, hC1cond, hVpos.le]
+  have hsub2 : ((2 * m - 2 : ℕ) : ℝ) ≤ 2 * (m : ℝ) := by exact_mod_cast Nat.sub_le (2 * m) 2
+  have hsub3 : ((2 * m - 3 : ℕ) : ℝ) ≤ 2 * (m : ℝ) := by exact_mod_cast Nat.sub_le (2 * m) 3
+  have hsub2nn : (0 : ℝ) ≤ ((2 * m - 2 : ℕ) : ℝ) := Nat.cast_nonneg _
+  have hsub3nn : (0 : ℝ) ≤ ((2 * m - 3 : ℕ) : ℝ) := Nat.cast_nonneg _
+  -- √V ≥ √(2^d)
+  have hVge : Real.sqrt ((2 : ℝ) ^ d) ≤ Real.sqrt ((L : ℝ) ^ d) :=
+    Real.sqrt_le_sqrt (by gcongr)
+  have h16 : 16 * (N : ℝ) * C₁ ≤ Real.sqrt ((L : ℝ) ^ d) * Real.sqrt (2 * q₀) :=
+    hC1bud.trans (mul_le_mul_of_nonneg_right hVge hsq2q.le)
+  -- budget chain helper: `(2m-k)·(4N/(V√(2q₀))) ≤ 1/2`
+  have hbud : ∀ a : ℝ, 0 ≤ a → a ≤ 2 * (m : ℝ) →
+      a * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2 := by
+    intro a hann haub
+    rw [div_div, ← mul_div_assoc, div_le_iff₀ (by positivity)]
+    -- goal: a * (2*2*N) ≤ 1/2 * (V * √(2q₀))
+    have ha2C : a ≤ 2 * (C₁ * Real.sqrt ((L : ℝ) ^ d)) := by nlinarith [haub, hm]
+    have hp1 : a * (2 * 2 * (N : ℝ))
+        ≤ 2 * (C₁ * Real.sqrt ((L : ℝ) ^ d)) * (2 * 2 * (N : ℝ)) :=
+      mul_le_mul_of_nonneg_right ha2C (by positivity)
+    have hp2 : Real.sqrt ((L : ℝ) ^ d) * (16 * (N : ℝ) * C₁)
+        ≤ Real.sqrt ((L : ℝ) ^ d) * (Real.sqrt ((L : ℝ) ^ d) * Real.sqrt (2 * q₀)) :=
+      mul_le_mul_of_nonneg_left h16 hsqVnn
+    nlinarith [hp1, hp2, hsqVsq]
+  refine ⟨?_, hbud _ hsub2nn hsub2, ?_, hbud _ hsub3nn hsub3, ?_⟩
+  · nlinarith [hcond2m, mul_self_le_mul_self hsub2nn hsub2, hNnn]
+  · nlinarith [hcond2m, mul_self_le_mul_self hsub3nn hsub3, hNnn]
+  · nlinarith [hcond2m, sq_nonneg (m : ℝ), hNnn]
+
 end LatticeSystem.Quantum
