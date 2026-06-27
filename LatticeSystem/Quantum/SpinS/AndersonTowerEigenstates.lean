@@ -34,4 +34,30 @@ theorem totalSpinSOp3_mulVec_orderDensityPow_eigenvec [NeZero L] (b : Bool) (m :
     push_cast
     ring
 
+/-- **The tower state lies in the magnetization sector `μ₀ + M`.**  If `Ŝ_tot^{(3)} Φ = μ₀ Φ` then
+`Ŝ_tot^{(3)} (towerState M Φ) = (μ₀ + M) (towerState M Φ)`: the raising/lowering tower shifts the
+total magnetization by `M` (the scalar `V^{|M|}` in `towerState` does not change the eigenvalue). -/
+theorem totalSpinSOp3_mulVec_towerState_eigenvec [NeZero L] (M : ℤ)
+    {Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ} {μ₀ : ℂ}
+    (hΦ : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = μ₀ • Φ) :
+    (totalSpinSOp3 (HypercubicTorus d L) N).mulVec
+        (towerState (torusParitySublattice d L) N M Φ)
+      = (μ₀ + (M : ℂ)) • towerState (torusParitySublattice d L) N M Φ := by
+  rcases lt_or_ge M 0 with hM | hM
+  · obtain ⟨m, rfl⟩ : ∃ m : ℕ, M = -(m : ℤ) := ⟨M.natAbs, by omega⟩
+    have hmpos : 1 ≤ m := by omega
+    rw [towerState_neg_eq_smul d L N m hmpos, Matrix.mulVec_smul,
+      totalSpinSOp3_mulVec_orderDensityPow_eigenvec false m hΦ, smul_smul, smul_smul]
+    congr 1
+    rw [if_neg (by decide)]
+    push_cast
+    ring
+  · obtain ⟨m, rfl⟩ : ∃ m : ℕ, M = (m : ℤ) := ⟨M.natAbs, by omega⟩
+    rw [towerState_pos_eq_smul, Matrix.mulVec_smul,
+      totalSpinSOp3_mulVec_orderDensityPow_eigenvec true m hΦ, smul_smul, smul_smul]
+    congr 1
+    rw [if_pos rfl]
+    push_cast
+    ring
+
 end LatticeSystem.Quantum
