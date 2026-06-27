@@ -387,6 +387,64 @@ theorem towerState_pos_rayleigh_bound (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) 
   exact tower_trial_energy_bound d L N m hN hL hm Φ E₀ hev hmin hΦ hsing3 hsing1 hq₀ hlro
     hcond2 hbudget2 hcond3 hbudget3 hcondD hAne
 
+/-- The staggered lowering operator is `V` times the per-volume lowering density: `Ô⁻ = V ô⁻`. -/
+theorem staggeredLoweringOpS_eq_smul (d L N : ℕ) [NeZero L] :
+    staggeredLoweringOpS (torusParitySublattice d L) N
+      = ((L : ℂ) ^ d) • staggeredOrderDensityOpS d L N false := by
+  rw [show staggeredOrderDensityOpS d L N false
+      = ((L : ℂ) ^ d)⁻¹ • staggeredLoweringOpS (torusParitySublattice d L) N from rfl, smul_smul,
+    mul_inv_cancel₀ (pow_ne_zero d (Nat.cast_ne_zero.mpr (NeZero.ne L))), one_smul]
+
+/-- The lowering tower state factors as a scalar multiple of the lowering density power:
+`towerState (-(m:ℤ)) Φ = V^m · (ô⁻)^m Φ`. -/
+theorem towerState_neg_eq_smul (d L N m : ℕ) [NeZero L] (hm : 1 ≤ m)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) :
+    towerState (torusParitySublattice d L) N (-(m : ℤ)) Φ
+      = ((L : ℂ) ^ d) ^ m • (staggeredOrderDensityOpS d L N false ^ m).mulVec Φ := by
+  rw [towerState, if_neg (by omega : ¬ (0 : ℤ) ≤ -(m : ℤ)), Int.natAbs_neg, Int.natAbs_natCast,
+    staggeredLoweringOpS_eq_smul, smul_pow, Matrix.smul_mulVec]
+
+/-- **Tower-state energy bound for `M = -(m) < 0`.**  The lowering tower state
+`towerState (-(m:ℤ)) Φ = V^m·(ô⁻)^m Φ` has the same Rayleigh quotient as `(ô⁻)^m Φ` (scale
+invariance), so `tower_trial_energy_bound_lower` transfers verbatim. -/
+theorem towerState_neg_rayleigh_bound (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
+    (hm : 2 ≤ m) (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ)
+    (hev : (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ)
+    (hmin : ∀ (E : ℂ) (Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ), Ψ ≠ 0 →
+       (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re)
+    (hΦ : Φ ≠ 0)
+    (hsing3 : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0)
+    (hsing1 : (totalSpinSOp1 (HypercubicTorus d L) N).mulVec Φ = 0)
+    {q₀ : ℝ} (hq₀ : 0 < q₀)
+    (hlro : q₀ ≤ (star Φ ⬝ᵥ (staggeredOrderOpS (torusParitySublattice d L) N
+        * staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ).re
+        / ((star Φ ⬝ᵥ Φ).re * ((L : ℝ) ^ d) ^ 2))
+    (hcond2 : 3 * (N : ℝ) * ((2 * m - 2 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget2 : ((2 * m - 2 : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2)
+    (hcond3 : 3 * (N : ℝ) * ((2 * m - 3 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget3 : ((2 * m - 3 : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2)
+    (hcondD : 3 * (N : ℝ) * (m : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (htower : towerState (torusParitySublattice d L) N (-(m : ℤ)) Φ ≠ 0) :
+    (star (towerState (torusParitySublattice d L) N (-(m : ℤ)) Φ) ⬝ᵥ
+        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec
+          (towerState (torusParitySublattice d L) N (-(m : ℤ)) Φ)).re
+        / (star (towerState (torusParitySublattice d L) N (-(m : ℤ)) Φ) ⬝ᵥ
+          towerState (torusParitySublattice d L) N (-(m : ℤ)) Φ).re
+      ≤ E₀.re + 2 * towerEnergyCoeff d L N m q₀ := by
+  have hVc : ((L : ℂ) ^ d) ^ m ≠ 0 :=
+    pow_ne_zero _ (pow_ne_zero _ (Nat.cast_ne_zero.mpr (NeZero.ne L)))
+  have hAne : (staggeredOrderDensityOpS d L N false ^ m).mulVec Φ ≠ 0 := by
+    intro h
+    apply htower
+    rw [towerState_neg_eq_smul d L N m (by omega), h, smul_zero]
+  rw [towerState_neg_eq_smul d L N m (by omega),
+    rayleigh_smul_invariant (heisenbergHamiltonianS (torusNNCoupling d L) N)
+      (((L : ℂ) ^ d) ^ m) hVc ((staggeredOrderDensityOpS d L N false ^ m).mulVec Φ)]
+  exact tower_trial_energy_bound_lower d L N m hN hL hm Φ E₀ hev hmin hΦ hsing3 hsing1 hq₀ hlro
+    hcond2 hbudget2 hcond3 hbudget3 hcondD hAne
+
 /-- **The trial bounds `hcond2/3`, `hbudget2/3`, `hcondD` from a single size constraint.**  If
 `m ≤ C₁·√V` with `6N C₁² ≤ q₀` (handles all `3N(2m)² ≤ 2q₀V` conditions) and
 `16N C₁ ≤ √(2^d)·√(2q₀)` (handles all budget conditions, using `√V ≥ √(2^d)`), then every condition
