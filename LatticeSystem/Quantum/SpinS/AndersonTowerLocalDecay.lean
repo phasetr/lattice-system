@@ -195,6 +195,39 @@ theorem spinSDot_staggeredRaising_commutator_supportedOn (A : Λ → Bool) (x y 
   exact (((hdot.mul hSx).sub (hSx.mul hdot)).smul _).add
     (((hdot.mul hSy).sub (hSy.mul hdot)).smul _)
 
+/-- A single bond–site raising commutator is bounded: `‖[Ŝ_x·Ŝ_y, Ŝ_z⁺]‖ ≤ 6 N³`. -/
+theorem spinSDot_commutator_spinSSiteOpPlus_norm_le (x y z : Λ) (hN : 1 ≤ N) :
+    manyBodyOperatorNormS
+      (spinSDot x y N * spinSSiteOpPlus z N - spinSSiteOpPlus z N * spinSDot x y N)
+      ≤ 6 * (N : ℝ) ^ 3 := by
+  have hdot := spinSDot_manyBodyOperatorNormS_le (N := N) x y hN
+  have hpl := spinSSiteOpPlus_manyBodyOperatorNormS_le (N := N) z hN
+  refine le_trans (manyBodyOperatorNormS_sub_le _ _) ?_
+  have h1 : manyBodyOperatorNormS (spinSDot x y N * spinSSiteOpPlus z N)
+      ≤ 3 * (N : ℝ) ^ 2 * (N : ℝ) :=
+    le_trans (manyBodyOperatorNormS_mul_le _ _)
+      (mul_le_mul hdot hpl (manyBodyOperatorNormS_nonneg _) (by positivity))
+  have h2 : manyBodyOperatorNormS (spinSSiteOpPlus z N * spinSDot x y N)
+      ≤ (N : ℝ) * (3 * (N : ℝ) ^ 2) :=
+    le_trans (manyBodyOperatorNormS_mul_le _ _)
+      (mul_le_mul hpl hdot (manyBodyOperatorNormS_nonneg _) (by positivity))
+  nlinarith [h1, h2]
+
+/-- **Bond–raising commutator norm bound** `‖[Ŝ_x·Ŝ_y, Ô_L⁺]‖ ≤ 12 N³` for `x ≠ y`. -/
+theorem spinSDot_commutator_staggeredRaisingOpS_norm_le (A : Λ → Bool) (x y : Λ)
+    (hxy : x ≠ y) (hN : 1 ≤ N) :
+    manyBodyOperatorNormS
+      (spinSDot x y N * staggeredRaisingOpS A N - staggeredRaisingOpS A N * spinSDot x y N)
+      ≤ 12 * (N : ℝ) ^ 3 := by
+  rw [spinSDot_commutator_staggeredRaisingOpS_support A x y hxy]
+  refine le_trans (manyBodyOperatorNormS_add_le _ _) ?_
+  have hx := spinSDot_commutator_spinSSiteOpPlus_norm_le (N := N) x y x hN
+  have hy := spinSDot_commutator_spinSSiteOpPlus_norm_le (N := N) x y y hN
+  rw [manyBodyOperatorNormS_smul, manyBodyOperatorNormS_smul,
+    show ‖(if A x then (1 : ℂ) else (-1 : ℂ))‖ = 1 from by split_ifs <;> simp,
+    show ‖(if A y then (1 : ℂ) else (-1 : ℂ))‖ = 1 from by split_ifs <;> simp, one_mul, one_mul]
+  linarith
+
 /-- **Support preservation.**  An order-density commutator of an `S`-supported operator stays
 supported on `S`. -/
 theorem orderComm_supportedOn [NeZero L] {S : Finset (HypercubicTorus d L)}
