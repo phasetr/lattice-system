@@ -136,4 +136,28 @@ theorem magSectorEmbedding_dotProduct_heisenberg {V : Type*} [Fintype V] [Decida
   rw [Pi.star_apply, Pi.star_apply, magSectorEmbedding_apply_subtype,
     heisenbergHamiltonianS_mulVec_magSectorEmbedding_apply_subtype]
 
+/-- **Sector minimum energy bounds the trial Rayleigh quotient.**  For a vector `ψ` in the
+magnetization-`K` sector (eigenspace eigenvalue `|V|·N/2 − K`), the sector-restricted minimum energy
+times `‖ψ‖²` is `≤ ⟨ψ, Ĥ ψ⟩`: restrict `ψ`, apply the variational lower bound to the restricted
+matrix, and transport along the two embedding bridges. -/
+theorem tower_sectorMin_mul_le {V : Type*} [Fintype V] [DecidableEq V]
+    {J : V → V → ℂ} (hJ : ∀ x y, star (J x y) = J x y) {K : ℕ}
+    [Nonempty (magConfigS V N K)] {ψ : (V → Fin (N + 1)) → ℂ}
+    (hmem : ψ ∈ magSubspaceS V N (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (K : ℂ))) :
+    hermitianMinEigenvalue (heisenbergHamiltonianSMatrixOnMagSector_isHermitian N K hJ)
+        * (star ψ ⬝ᵥ ψ).re
+      ≤ (star ψ ⬝ᵥ (heisenbergHamiltonianS J N).mulVec ψ).re := by
+  have hemb : magSectorEmbedding (magSectorRestriction (M := K) ψ) = ψ :=
+    magSectorEmbedding_magSectorRestriction_of_mem_magSubspaceS hmem
+  have hvar := hermitianMinEigenvalue_mul_dotProduct_re_le_rayleighOnVec
+    (heisenbergHamiltonianSMatrixOnMagSector_isHermitian N K hJ) (magSectorRestriction (M := K) ψ)
+  rw [show rayleighOnVec (heisenbergHamiltonianSMatrixOnMagSector J N K)
+        (magSectorRestriction (M := K) ψ)
+      = (star (magSectorRestriction (M := K) ψ)
+          ⬝ᵥ (heisenbergHamiltonianSMatrixOnMagSector J N K).mulVec
+            (magSectorRestriction (M := K) ψ)).re from rfl,
+    ← magSectorEmbedding_dotProduct_self (magSectorRestriction (M := K) ψ),
+    ← magSectorEmbedding_dotProduct_heisenberg J (magSectorRestriction (M := K) ψ), hemb] at hvar
+  exact hvar
+
 end LatticeSystem.Quantum
