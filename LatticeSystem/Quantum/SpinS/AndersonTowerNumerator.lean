@@ -905,4 +905,56 @@ theorem tower_jk_term_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 
   · exact s2_part_bound d L N M j k hN hL Φ hsing hq₀ hm0 hratio hj hk hcond3 hbudget3
   · exact s3_part_bound d L N M j k hN hL Φ hsing hq₀ hm0 hratio hj hk hcond3 hbudget3
 
+/-- **Numerator double-commutator bound.**  Summing the per-`(j,k)` bound over the `M²` insertion
+positions (`numerator_eq_sum_j` over `j`, then `orderMinusPow_commutator_eq` over `k`, with the
+nested triangle inequality) bounds the ★-variational numerator
+`⟨Φ, [(ô⁻)^M,[Ĥ,(ô⁺)^M]] Φ⟩` by `M²` copies of the per-`(j,k)` bound. -/
+theorem tower_numerator_bound (d L N M : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hq₀ : 0 < q₀) (hm0 : 0 < phatMoment d L N Φ 0)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1))
+    (hcond2 : 3 * (N : ℝ) * ((2 * M - 2 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget2 : ((2 * M - 2 : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2)
+    (hcond3 : 3 * (N : ℝ) * ((2 * M - 3 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget3 : ((2 * M - 3 : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2) :
+    |(star Φ ⬝ᵥ (staggeredOrderDensityOpS d L N false ^ M
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true ^ M
+          - staggeredOrderDensityOpS d L N true ^ M
+            * heisenbergHamiltonianS (torusNNCoupling d L) N)
+      - (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true ^ M
+          - staggeredOrderDensityOpS d L N true ^ M
+            * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        * staggeredOrderDensityOpS d L N false ^ M).mulVec Φ).re|
+      ≤ (M : ℝ) * ((M : ℝ) * (3 * (96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d)
+            * momentFactor d L N Φ (2 * M - 2)
+        + ((M : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (M : ℝ)))
+            * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * momentFactor d L N Φ (2 * M - 3)))
+          + (M : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (M : ℝ)))
+            * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * momentFactor d L N Φ (2 * M - 3)))))) := by
+  rw [numerator_eq_sum_j]
+  refine (abs_re_dotProduct_sum_le d L N Φ (Finset.range M) _).trans ?_
+  refine le_trans (Finset.sum_le_card_nsmul (Finset.range M) _
+    ((M : ℝ) * (3 * (96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d) * momentFactor d L N Φ (2 * M - 2)
+        + ((M : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (M : ℝ)))
+            * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * momentFactor d L N Φ (2 * M - 3)))
+          + (M : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (M : ℝ)))
+            * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * momentFactor d L N Φ (2 * M - 3)))))) ?_)
+    (le_of_eq (by rw [Finset.card_range, nsmul_eq_mul]))
+  intro j hj
+  rw [orderMinusPow_commutator_eq]
+  refine (abs_re_dotProduct_neg_sum_le d L N Φ (Finset.range M) _).trans ?_
+  refine le_trans (Finset.sum_le_card_nsmul (Finset.range M) _
+    (3 * (96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d) * momentFactor d L N Φ (2 * M - 2)
+      + ((M : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (M : ℝ)))
+          * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * momentFactor d L N Φ (2 * M - 3)))
+        + (M : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (M : ℝ)))
+          * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * momentFactor d L N Φ (2 * M - 3)))))
+    ?_) (le_of_eq (by rw [Finset.card_range, nsmul_eq_mul]))
+  intro k hk
+  exact tower_jk_term_bound d L N M j k hN hL Φ hsing hq₀ hm0 hratio
+    (Finset.mem_range.mp hj) (Finset.mem_range.mp hk) hcond2 hbudget2 hcond3 hbudget3
+
 end LatticeSystem.Quantum
