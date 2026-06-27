@@ -95,4 +95,26 @@ theorem ringReflectionThetaS_conjTranspose (A : ManyBodyOpS (Fin (2 * n)) N) :
   simp only [ringReflectionThetaS_apply, Matrix.conjTranspose_apply, Complex.star_def,
     Complex.conj_conj]
 
+/-- **`θ` on a single-site operator** reflects the site and conjugates the local matrix:
+`θ(onSiteS x A) = onSiteS (ringReflect n x) (conj A)`.  The bridge from `θ` to the staggered order
+operator and the chain Hamiltonian (their `θ`-images are computed from this in the next layer). -/
+theorem ringReflectionThetaS_onSiteS (x : Fin (2 * n))
+    (A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
+    ringReflectionThetaS n N (onSiteS x A)
+      = onSiteS (ringReflect n x) (A.map (starRingEnd ℂ)) := by
+  ext σ τ
+  have hinj := (ringReflect_involutive n).injective
+  have hcond : (∀ k, k ≠ x → σ (ringReflect n k) = τ (ringReflect n k))
+      ↔ (∀ j, j ≠ ringReflect n x → σ j = τ j) := by
+    constructor
+    · intro h j hj
+      have := h (ringReflect n j) (fun he => hj (by rw [← ringReflect_involutive n j, he]))
+      rwa [ringReflect_involutive n j] at this
+    · intro h k hk
+      exact h (ringReflect n k) (fun he => hk (hinj he))
+  simp only [ringReflectionThetaS_apply, onSiteS_apply, Matrix.map_apply, ringConfigReflect]
+  by_cases hc : ∀ k, k ≠ ringReflect n x → σ k = τ k
+  · rw [if_pos hc, if_pos (hcond.mpr hc)]
+  · rw [if_neg hc, if_neg (fun hh => hc (hcond.mp hh)), map_zero]
+
 end LatticeSystem.Quantum
