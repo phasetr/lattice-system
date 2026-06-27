@@ -230,6 +230,121 @@ theorem tower_trial_energy_bound (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) (hL :
     (show (0 : ℝ) ≤ 2 * towerEnergyCoeff d L N m q₀ by positivity)
   nlinarith [hgap, hkey, hPM, hCoeff]
 
+set_option maxHeartbeats 1600000 in -- large noncomm_ring conjTranspose identity on a 4-term operator
+/-- **Trial-state energy bound for the lowering tower `(ô⁻)^m Φ`.**  Mirror of
+`tower_trial_energy_bound`: the lowering numerator operator is the conjugate transpose of the
+raising one (`re_dotProduct_mulVec_conjTranspose` keeps the real part), so the same numerator bound
+applies; the denominator uses `tower_denominator_lower_bound_lower`. -/
+theorem tower_trial_energy_bound_lower (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
+    (hm : 2 ≤ m) (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ)
+    (hev : (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ)
+    (hmin : ∀ (E : ℂ) (Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ), Ψ ≠ 0 →
+       (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re)
+    (hΦ : Φ ≠ 0)
+    (hsing3 : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0)
+    (hsing1 : (totalSpinSOp1 (HypercubicTorus d L) N).mulVec Φ = 0)
+    {q₀ : ℝ} (hq₀ : 0 < q₀)
+    (hlro : q₀ ≤ (star Φ ⬝ᵥ (staggeredOrderOpS (torusParitySublattice d L) N
+        * staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ).re
+        / ((star Φ ⬝ᵥ Φ).re * ((L : ℝ) ^ d) ^ 2))
+    (hcond2 : 3 * (N : ℝ) * ((2 * m - 2 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget2 : ((2 * m - 2 : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2)
+    (hcond3 : 3 * (N : ℝ) * ((2 * m - 3 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget3 : ((2 * m - 3 : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2)
+    (hcondD : 3 * (N : ℝ) * (m : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hAne : (staggeredOrderDensityOpS d L N false ^ m).mulVec Φ ≠ 0) :
+    (star ((staggeredOrderDensityOpS d L N false ^ m).mulVec Φ) ⬝ᵥ
+        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec
+          ((staggeredOrderDensityOpS d L N false ^ m).mulVec Φ)).re
+        / (star ((staggeredOrderDensityOpS d L N false ^ m).mulVec Φ) ⬝ᵥ
+          (staggeredOrderDensityOpS d L N false ^ m).mulVec Φ).re
+      ≤ E₀.re + 2 * towerEnergyCoeff d L N m q₀ := by
+  have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    positivity
+  have hm0c : 0 < (star Φ ⬝ᵥ Φ).re :=
+    (Complex.lt_def.mp (Matrix.dotProduct_star_self_pos_iff.mpr hΦ)).1
+  have hm0 : 0 < phatMoment d L N Φ 0 := by rw [phatMoment_zero]; exact hm0c
+  have hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1) :=
+    phatMoment_succ_two_q0_le d L N Φ hsing3 hsing1 q₀ hm0c hVpos hlro
+  have htwo := momentFactor_twoM_sub_two_le d L N m Φ hq₀ (by omega) hratio
+  have hthree := momentFactor_twoM_sub_three_le d L N m Φ hq₀ hm hratio
+  have hnum := tower_numerator_bound d L N m hN hL Φ hsing3 hq₀ hm0 hratio
+    hcond2 hbudget2 hcond3 hbudget3
+  have hPM := phatMoment_nonneg d L N Φ m
+  have hHh : Matrix.conjTranspose (heisenbergHamiltonianS (torusNNCoupling d L) N)
+      = heisenbergHamiltonianS (torusNNCoupling d L) N :=
+    heisenbergHamiltonianS_torus_isHermitian d L N
+  have hft : Matrix.conjTranspose (staggeredOrderDensityOpS d L N true ^ m)
+      = staggeredOrderDensityOpS d L N false ^ m :=
+    (orderDensityFalse_pow_eq_conjTranspose d L N m).symm
+  have hff : Matrix.conjTranspose (staggeredOrderDensityOpS d L N false ^ m)
+      = staggeredOrderDensityOpS d L N true ^ m := by
+    rw [orderDensityFalse_pow_eq_conjTranspose, Matrix.conjTranspose_conjTranspose]
+  have hgap : (star ((staggeredOrderDensityOpS d L N false ^ m).mulVec Φ) ⬝ᵥ
+        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec
+          ((staggeredOrderDensityOpS d L N false ^ m).mulVec Φ)).re
+      - E₀.re * (star ((staggeredOrderDensityOpS d L N false ^ m).mulVec Φ) ⬝ᵥ
+          (staggeredOrderDensityOpS d L N false ^ m).mulVec Φ).re
+      ≤ phatMoment d L N Φ m * towerEnergyCoeff d L N m q₀ := by
+    refine (variational_gap_le_double_commutator (staggeredOrderDensityOpS d L N false ^ m)
+      (heisenbergHamiltonianS (torusNNCoupling d L) N) hHh Φ E₀ hev hmin hΦ).trans ?_
+    rw [show Matrix.conjTranspose (staggeredOrderDensityOpS d L N false ^ m)
+          * (heisenbergHamiltonianS (torusNNCoupling d L) N
+              * staggeredOrderDensityOpS d L N false ^ m
+            - staggeredOrderDensityOpS d L N false ^ m
+              * heisenbergHamiltonianS (torusNNCoupling d L) N)
+          - (heisenbergHamiltonianS (torusNNCoupling d L) N
+              * staggeredOrderDensityOpS d L N false ^ m
+            - staggeredOrderDensityOpS d L N false ^ m
+              * heisenbergHamiltonianS (torusNNCoupling d L) N)
+            * Matrix.conjTranspose (staggeredOrderDensityOpS d L N false ^ m)
+        = Matrix.conjTranspose (staggeredOrderDensityOpS d L N false ^ m
+            * (heisenbergHamiltonianS (torusNNCoupling d L) N
+                * staggeredOrderDensityOpS d L N true ^ m
+              - staggeredOrderDensityOpS d L N true ^ m
+                * heisenbergHamiltonianS (torusNNCoupling d L) N)
+          - (heisenbergHamiltonianS (torusNNCoupling d L) N
+                * staggeredOrderDensityOpS d L N true ^ m
+              - staggeredOrderDensityOpS d L N true ^ m
+                * heisenbergHamiltonianS (torusNNCoupling d L) N)
+            * staggeredOrderDensityOpS d L N false ^ m) from by
+      simp only [Matrix.conjTranspose_sub, Matrix.conjTranspose_mul, hHh, hft, hff]
+      noncomm_ring, re_dotProduct_mulVec_conjTranspose]
+    refine (le_abs_self _).trans (hnum.trans ?_)
+    rw [show phatMoment d L N Φ m * towerEnergyCoeff d L N m q₀
+        = (m : ℝ) * ((m : ℝ) * (3 * (96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d)
+              * (phatMoment d L N Φ m / (2 * q₀))
+            + ((m : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (m : ℝ)))
+                * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3)
+                  * (phatMoment d L N Φ m / (2 * q₀) / Real.sqrt (2 * q₀))))
+              + (m : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (m : ℝ)))
+                * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3)
+                  * (phatMoment d L N Φ m / (2 * q₀) / Real.sqrt (2 * q₀))))))) from by
+      unfold towerEnergyCoeff; ring]
+    gcongr
+  have hdeneq : star Φ ⬝ᵥ (staggeredOrderDensityOpS d L N true ^ m
+        * staggeredOrderDensityOpS d L N false ^ m).mulVec Φ
+      = star ((staggeredOrderDensityOpS d L N false ^ m).mulVec Φ) ⬝ᵥ
+          (staggeredOrderDensityOpS d L N false ^ m).mulVec Φ := by
+    rw [← Matrix.mulVec_mulVec, star_dotProduct_mulVec_conjTranspose,
+      ← orderDensityFalse_pow_eq_conjTranspose]
+  have hden : (1 / 2) * phatMoment d L N Φ m
+      ≤ (star ((staggeredOrderDensityOpS d L N false ^ m).mulVec Φ) ⬝ᵥ
+          (staggeredOrderDensityOpS d L N false ^ m).mulVec Φ).re := by
+    rw [← hdeneq]
+    exact tower_denominator_lower_bound_lower d L N hN Φ hsing3 hm0 (hratio 0) hcondD
+  have hdenpos : 0 < (star ((staggeredOrderDensityOpS d L N false ^ m).mulVec Φ) ⬝ᵥ
+      (staggeredOrderDensityOpS d L N false ^ m).mulVec Φ).re :=
+    (Complex.lt_def.mp (Matrix.dotProduct_star_self_pos_iff.mpr hAne)).1
+  have hCoeff := towerEnergyCoeff_nonneg d L N m hq₀
+  rw [div_le_iff₀ hdenpos]
+  have hkey := mul_le_mul_of_nonneg_left hden
+    (show (0 : ℝ) ≤ 2 * towerEnergyCoeff d L N m q₀ by positivity)
+  nlinarith [hgap, hkey, hPM, hCoeff]
+
 /-- **Tower-state energy bound for `M = m ≥ 0`.**  The raising tower state
 `towerState m Φ = V^m·(ô⁺)^m Φ` has the same Rayleigh quotient as `(ô⁺)^m Φ` (scale invariance), so
 `tower_trial_energy_bound` transfers verbatim. -/
