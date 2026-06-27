@@ -90,4 +90,50 @@ theorem heisenbergHamiltonianS_magSector_min_eigenvector {V : Type*} [Fintype V]
   · rw [← mem_magSubspaceS_iff]
     exact magSectorEmbedding_mem_magSubspaceS v
 
+/-- **Norm is preserved by the sector embedding.**  `⟨emb w, emb w⟩ = ⟨w, w⟩`: the zero-extension
+outside the sector contributes nothing, and the sector sum reindexes to the `magConfigS` subtype. -/
+theorem magSectorEmbedding_dotProduct_self {V : Type*} [Fintype V] [DecidableEq V] {M : ℕ}
+    (w : magConfigS V N M → ℂ) :
+    star (magSectorEmbedding w) ⬝ᵥ magSectorEmbedding w = star w ⬝ᵥ w := by
+  simp only [dotProduct]
+  rw [show (∑ ρ : V → Fin (N + 1),
+        star (magSectorEmbedding w) ρ * magSectorEmbedding w ρ)
+      = ∑ ρ ∈ Finset.univ.filter (fun ρ : V → Fin (N + 1) => magSumS ρ = M),
+          star (magSectorEmbedding w) ρ * magSectorEmbedding w ρ from
+    (Finset.sum_filter_of_ne (fun ρ _ hne => by
+      by_contra h
+      apply hne
+      rw [magSectorEmbedding_apply_of_not_mem w h, mul_zero])).symm]
+  rw [Finset.sum_subtype (Finset.univ.filter (fun ρ : V → Fin (N + 1) => magSumS ρ = M))
+    (p := fun ρ => magSumS ρ = M) (fun ρ => by simp [Finset.mem_filter])
+    (fun ρ => star (magSectorEmbedding w) ρ * magSectorEmbedding w ρ)]
+  refine Finset.sum_congr rfl (fun ρ' _ => ?_)
+  rw [Pi.star_apply, Pi.star_apply, magSectorEmbedding_apply_subtype]
+
+/-- **Energy quadratic form is preserved by the sector embedding.**
+`⟨emb w, Ĥ (emb w)⟩ = ⟨w, R w⟩` where `R` is the sector-restricted Hamiltonian: off-sector terms
+vanish and the sector sum reindexes, matching `Ĥ (emb w) τ.1 = R w τ`
+(`heisenbergHamiltonianS_mulVec_magSectorEmbedding_apply_subtype`). -/
+theorem magSectorEmbedding_dotProduct_heisenberg {V : Type*} [Fintype V] [DecidableEq V]
+    (J : V → V → ℂ) {M : ℕ} (w : magConfigS V N M → ℂ) :
+    star (magSectorEmbedding w) ⬝ᵥ (heisenbergHamiltonianS J N).mulVec (magSectorEmbedding w)
+      = star w ⬝ᵥ (heisenbergHamiltonianSMatrixOnMagSector J N M).mulVec w := by
+  simp only [dotProduct]
+  rw [show (∑ ρ : V → Fin (N + 1), star (magSectorEmbedding w) ρ
+        * (heisenbergHamiltonianS J N).mulVec (magSectorEmbedding w) ρ)
+      = ∑ ρ ∈ Finset.univ.filter (fun ρ : V → Fin (N + 1) => magSumS ρ = M),
+          star (magSectorEmbedding w) ρ
+            * (heisenbergHamiltonianS J N).mulVec (magSectorEmbedding w) ρ from
+    (Finset.sum_filter_of_ne (fun ρ _ hne => by
+      by_contra h
+      apply hne
+      rw [Pi.star_apply, magSectorEmbedding_apply_of_not_mem w h, star_zero, zero_mul])).symm]
+  rw [Finset.sum_subtype (Finset.univ.filter (fun ρ : V → Fin (N + 1) => magSumS ρ = M))
+    (p := fun ρ => magSumS ρ = M) (fun ρ => by simp [Finset.mem_filter])
+    (fun ρ => star (magSectorEmbedding w) ρ
+      * (heisenbergHamiltonianS J N).mulVec (magSectorEmbedding w) ρ)]
+  refine Finset.sum_congr rfl (fun τ _ => ?_)
+  rw [Pi.star_apply, Pi.star_apply, magSectorEmbedding_apply_subtype,
+    heisenbergHamiltonianS_mulVec_magSectorEmbedding_apply_subtype]
+
 end LatticeSystem.Quantum
