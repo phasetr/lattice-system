@@ -248,4 +248,11 @@ theorem orderMinusPow_commutator_eq (d L N M : ℕ) [NeZero L]
   rw [← neg_sub (X * staggeredOrderDensityOpS d L N false ^ M)
       (staggeredOrderDensityOpS d L N false ^ M * X), commutator_pow_eq_sum]
 
+/-- A power of a single order density is the order-word product over a constant word:
+`(ô^b)^a = ô^{replicate a b}`.  Lets the numerator's order-density powers be fed to the R2-based
+single-term bounds, which are phrased over `orderWordProd`. -/
+theorem orderWordProd_replicate (d L N a : ℕ) [NeZero L] (b : Bool) :
+    orderWordProd d L N (List.replicate a b) = staggeredOrderDensityOpS d L N b ^ a := by
+  rw [orderWordProd, List.map_replicate, List.prod_replicate]
+
 end LatticeSystem.Quantum
