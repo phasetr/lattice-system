@@ -14,6 +14,7 @@ import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 namespace LatticeSystem.Quantum
 
 open Matrix
+open scoped ComplexOrder
 
 variable {d L N : ℕ}
 
@@ -159,5 +160,99 @@ theorem tower_sectorMin_mul_le {V : Type*} [Fintype V] [DecidableEq V]
     ← magSectorEmbedding_dotProduct_self (magSectorRestriction (M := K) ψ),
     ← magSectorEmbedding_dotProduct_heisenberg J (magSectorRestriction (M := K) ψ), hemb] at hvar
   exact hvar
+
+/-- A nonzero coordinate of a `Ŝ_tot^{(3)}` eigenvector pins down its magnetization eigenvalue:
+if `v ∈ magSubspaceS V N c` and `v σ ≠ 0` then `magEigenvalueS σ = c`. -/
+theorem magEigenvalueS_of_mem_magSubspaceS {V : Type*} [Fintype V] [DecidableEq V] {c : ℂ}
+    {v : (V → Fin (N + 1)) → ℂ} (hv : v ∈ magSubspaceS V N c)
+    {σ : V → Fin (N + 1)} (hσ : v σ ≠ 0) : magEigenvalueS σ = c := by
+  rw [mem_magSubspaceS_iff] at hv
+  have hcg := congrFun hv σ
+  rw [totalSpinSOp3_mulVec_apply_eq_magEigenvalueS_mul] at hcg
+  exact mul_right_cancel₀ hσ hcg
+
+/-- **Tasaki Corollary 4.7 (the tower of low-lying energy eigenstates), PROVED.**  Discharges the
+former `tower_lowLying_eigenstates` axiom: for a total-spin-singlet ground state `Φ` with long-range
+order and each `M ≠ 0` with `|M| ≤ C₁ L^{d/2}` and nonzero tower state, there is a genuine Ĥ-energy
+eigenstate `Ψ` in the `Ŝ_tot^{(3)}` sector `M` with `E₀ < E_M ≤ E₀ + C₂ M²/L^d` (the rigorous
+Anderson tower).  `Ψ` is the minimum-energy eigenstate of `Ĥ` restricted to the sector of the tower
+state
+(`heisenbergHamiltonianS_magSector_min_eigenvector`); its energy is `≤ Rayleigh(towerState)`
+(`tower_sectorMin_mul_le`) `≤ E₀ + C₂M²/L^d` (Theorem 4.6); the strict gap uses the
+ground-sector-exclusion premise (every ground eigenstate is a singlet). -/
+theorem tower_lowLying_eigenstates (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
+    ∃ C₁ C₂ : ℝ, 0 < C₁ ∧ 0 < C₂ ∧
+      ∀ (L : ℕ) [NeZero L], 2 ≤ L → Even L →
+        ∀ (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ) (M : ℤ),
+          (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ →
+          (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+            (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) →
+          Φ ≠ 0 →
+          (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0 →
+          (totalSpinSOp1 (HypercubicTorus d L) N).mulVec Φ = 0 →
+          (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
+            (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ →
+            E.re = E₀.re → (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Ψ = 0) →
+          q₀ ≤ (star Φ ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
+              staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ)).re /
+              ((star Φ ⬝ᵥ Φ).re * ((L : ℝ) ^ d) ^ 2) →
+          M ≠ 0 →
+          (M.natAbs : ℝ) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) →
+          towerState (torusParitySublattice d L) N M Φ ≠ 0 →
+          ∃ (Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E_M : ℂ),
+            Ψ ≠ 0 ∧
+            (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E_M • Ψ ∧
+            E₀.re < E_M.re ∧ E_M.re ≤ E₀.re + C₂ * (M : ℝ) ^ 2 / (L : ℝ) ^ d ∧
+            (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Ψ = (M : ℂ) • Ψ := by
+  obtain ⟨C₁, C₂, hC1, hC2, hbound⟩ := tower_lowLying_energy_bound d N hd q₀ hq₀
+  refine ⟨C₁, C₂, hC1, hC2, ?_⟩
+  intro L _ hL hLeven Φ E₀ M hev hmin hΦ hsing3 hsing1 hexcl hlro hM0 hMbound htower
+  -- towerState lies in the Ŝ³-sector M (μ₀ = 0)
+  have htowerMem : towerState (torusParitySublattice d L) N M Φ
+      ∈ magSubspaceS (HypercubicTorus d L) N (M : ℂ) := by
+    rw [mem_magSubspaceS_iff]
+    have hsh := totalSpinSOp3_mulVec_towerState_eigenvec M (μ₀ := 0)
+      (by rw [zero_smul]; exact hsing3)
+    rwa [zero_add] at hsh
+  -- a support point σ₀ of towerState fixes the sector label K
+  obtain ⟨σ₀, hσ₀⟩ := Function.ne_iff.mp htower
+  have hσ₀' : towerState (torusParitySublattice d L) N M Φ σ₀ ≠ 0 := by simpa using hσ₀
+  set K := magSumS σ₀ with hK
+  have hKM : magEigenvalueS σ₀ = (M : ℂ) := magEigenvalueS_of_mem_magSubspaceS htowerMem hσ₀'
+  have hcardeq : ((Fintype.card (HypercubicTorus d L) : ℂ) * (N : ℂ) / 2) - (K : ℂ) = (M : ℂ) := by
+    rw [hK, ← magEigenvalueS_def σ₀]; exact hKM
+  haveI : Nonempty (magConfigS (HypercubicTorus d L) N K) := ⟨⟨σ₀, rfl⟩⟩
+  -- the sector minimum-energy eigenvector
+  obtain ⟨Ψ, hΨ0, hΨeig, hΨsec⟩ :=
+    heisenbergHamiltonianS_magSector_min_eigenvector (torusNNCoupling_real d L) N K
+  rw [hcardeq] at hΨsec
+  set μmin := hermitianMinEigenvalue
+    (heisenbergHamiltonianSMatrixOnMagSector_isHermitian N K (torusNNCoupling_real d L)) with hμ
+  refine ⟨Ψ, (μmin : ℂ), hΨ0, hΨeig, ?_, ?_, hΨsec⟩
+  · -- strict gap E₀.re < μmin
+    have hge : E₀.re ≤ μmin := by simpa using hmin (μmin : ℂ) Ψ hΨ0 hΨeig
+    refine lt_of_le_of_ne hge (fun heq => ?_)
+    have hz := hexcl (μmin : ℂ) Ψ hΨ0 hΨeig (by rw [Complex.ofReal_re]; exact heq.symm)
+    rw [hΨsec] at hz
+    exact (smul_ne_zero (by exact_mod_cast hM0) hΨ0) hz
+  · -- E_M = μmin ≤ E₀.re + C₂M²/V
+    have hdenpos : 0 < (star (towerState (torusParitySublattice d L) N M Φ) ⬝ᵥ
+        towerState (torusParitySublattice d L) N M Φ).re :=
+      (Complex.lt_def.mp (Matrix.dotProduct_star_self_pos_iff.mpr htower)).1
+    have hvar := tower_sectorMin_mul_le (torusNNCoupling_real d L) (K := K)
+      (ψ := towerState (torusParitySublattice d L) N M Φ) (by rw [hcardeq]; exact htowerMem)
+    rw [← hμ] at hvar
+    have hray := hbound L hL hLeven Φ E₀ M hev hmin hΦ hsing3 hsing1 hlro hMbound htower
+    rw [div_le_iff₀ hdenpos] at hray
+    have hμle : μmin ≤ (star (towerState (torusParitySublattice d L) N M Φ) ⬝ᵥ
+        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec
+          (towerState (torusParitySublattice d L) N M Φ)).re
+        / (star (towerState (torusParitySublattice d L) N M Φ) ⬝ᵥ
+          towerState (torusParitySublattice d L) N M Φ).re := by
+      rw [le_div_iff₀ hdenpos]; linarith [hvar]
+    simp only [Complex.ofReal_re]
+    calc μmin ≤ _ := hμle
+      _ ≤ E₀.re + C₂ * (M : ℝ) ^ 2 / (L : ℝ) ^ d := by
+          rw [div_le_iff₀ hdenpos]; linarith [hray]
 
 end LatticeSystem.Quantum
