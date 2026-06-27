@@ -276,4 +276,43 @@ theorem mul_mul_commutator_decomp {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N 
       = A * G * (C * Z - Z * C) + A * (G * Z - Z * G) * C + (A * Z - Z * A) * G * C := by
   noncomm_ring
 
+/-- **S1 single-term bound (powers form).**  Each `(ô⁻)^k (ô⁺)^j d̂ (ô⁺)^{M-1-j} (ô⁻)^{M-1-k}`
+expectation is an order-word sandwich of `d̂` of total length `2M−2`, hence bounded by
+`3(96dN⁴/V)·mf(2M−2)` via `orderDoubleComm_word_re_bound`. -/
+theorem s1_term_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hq₀ : 0 < q₀) (hm0 : 0 < phatMoment d L N Φ 0)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1))
+    (hj : j < M) (hk : k < M)
+    (hcond : 3 * (N : ℝ) * ((2 * M - 2 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget : ((2 * M - 2 : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2) :
+    |(star Φ ⬝ᵥ (staggeredOrderDensityOpS d L N false ^ k
+        * staggeredOrderDensityOpS d L N true ^ j * orderDoubleComm d L N
+        * staggeredOrderDensityOpS d L N true ^ (M - 1 - j)
+        * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)).mulVec Φ).re|
+      ≤ 3 * (96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d)
+          * momentFactor d L N Φ (2 * M - 2) := by
+  set wl := List.replicate k false ++ List.replicate j true with hwldef
+  set wr := List.replicate (M - 1 - j) true ++ List.replicate (M - 1 - k) false with hwrdef
+  have hwl : orderWordProd d L N wl = staggeredOrderDensityOpS d L N false ^ k
+      * staggeredOrderDensityOpS d L N true ^ j := by
+    rw [hwldef, orderWordProd_mul_append, orderWordProd_replicate, orderWordProd_replicate]
+  have hwr : orderWordProd d L N wr = staggeredOrderDensityOpS d L N true ^ (M - 1 - j)
+      * staggeredOrderDensityOpS d L N false ^ (M - 1 - k) := by
+    rw [hwrdef, orderWordProd_mul_append, orderWordProd_replicate, orderWordProd_replicate]
+  have hlen : wl.length + wr.length = 2 * M - 2 := by
+    simp only [hwldef, hwrdef, List.length_append, List.length_replicate]; omega
+  have hop : staggeredOrderDensityOpS d L N false ^ k
+        * staggeredOrderDensityOpS d L N true ^ j * orderDoubleComm d L N
+        * staggeredOrderDensityOpS d L N true ^ (M - 1 - j)
+        * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)
+      = orderWordProd d L N wl * orderDoubleComm d L N * orderWordProd d L N wr := by
+    rw [hwl, hwr]; noncomm_ring
+  rw [hop]
+  have hbd := orderDoubleComm_word_re_bound d L N hN hL Φ hsing hq₀ hm0 hratio wl wr
+    (by rw [hlen]; exact hcond) (by rw [hlen]; exact hbudget)
+  rwa [hlen] at hbd
+
 end LatticeSystem.Quantum
