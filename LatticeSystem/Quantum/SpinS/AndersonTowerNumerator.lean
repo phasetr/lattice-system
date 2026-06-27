@@ -720,4 +720,24 @@ theorem s3_lterm_bound (d L N M j k l : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 �
     ++ List.replicate l true).reverse.map not)),
     mul_le_mul_of_nonneg_left hm hV]
 
+/-- The sandwiched S2 part is the `l`-sum of the per-`l` S2 operators (expand `[(ô⁺)^r,ô⁻]`). -/
+theorem s2_part_eq (d L N j k r : ℕ) [NeZero L] :
+    staggeredOrderDensityOpS d L N false ^ k * (staggeredOrderDensityOpS d L N true ^ j
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        * (staggeredOrderDensityOpS d L N true ^ r * staggeredOrderDensityOpS d L N false
+          - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true ^ r))
+        * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)
+      = ∑ l ∈ Finset.range r, staggeredOrderDensityOpS d L N false ^ k
+          * staggeredOrderDensityOpS d L N true ^ j
+          * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+            - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+          * (staggeredOrderDensityOpS d L N true ^ l
+            * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+              - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+            * staggeredOrderDensityOpS d L N true ^ (r - 1 - l))
+          * staggeredOrderDensityOpS d L N false ^ (M - 1 - k) := by
+  rw [pow_right_commutator_eq_sum, Finset.mul_sum, Finset.mul_sum, Finset.sum_mul]
+  exact Finset.sum_congr rfl (fun l _ => by noncomm_ring)
+
 end LatticeSystem.Quantum
