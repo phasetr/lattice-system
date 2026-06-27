@@ -8396,24 +8396,38 @@ reflection so its trailing copies join the leading ones) collapses the minimiser
 where $G=0$.  Hence $G_{\min}=0$ and $F(f)-\mathrm{(avg)}=G(f)\ge G_{\min}=0$.  Chapters~3--10
 backfill.
 
-\noindent\textbf{Theorem 4.6} (Koma--Tasaki, Tasaki §4.2.1, eqs.~(4.2.2)--(4.2.4), pp.~93--95;
-documented axiom, \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  Anderson's tower of
-low-lying states: for the $d$-dimensional hypercubic antiferromagnetic Heisenberg model with
-long-range order, the trial states $\Gamma_M=(\hat O_L^+)^M|\Phi_{\mathrm{GS}}\rangle/\lVert\cdot
-\rVert$ built from the staggered raising operator $\hat O_L^+=\sum_x\varepsilon_x\hat S_x^+$
-(eq.~(4.2.2)) lie in the $\hat S_{\mathrm{tot}}^{(3)}=M$ sector and, for $|M|\le C_1 L^{d/2}$, have
-energy $\langle\Gamma_M|\hat H|\Gamma_M\rangle\le E_{\mathrm{GS}}+C_2 M^2/L^d$ (eq.~(4.2.4)) --- an
+\noindent\textbf{Theorem 4.6} (Koma--Tasaki, Tasaki §4.2.2, eqs.~(4.2.2)--(4.2.4), pp.~93--95;
+\emph{now proved --- axiom discharged}, \texttt{Quantum/SpinS/AndersonTowerTheorem46.lean}, PR
+\#4769/\#4773).  Anderson's tower of low-lying states: for the $d$-dimensional hypercubic
+antiferromagnetic Heisenberg model with long-range order, the trial states
+$\Gamma_M=(\hat O_L^+)^M|\Phi_{\mathrm{GS}}\rangle/\lVert\cdot\rVert$ built from the staggered raising
+operator $\hat O_L^+=\sum_x\varepsilon_x\hat S_x^+$ (eq.~(4.2.2)) lie in the
+$\hat S_{\mathrm{tot}}^{(3)}=M$ sector and, for $|M|\le C_1 L^{d/2}$, have energy
+$\langle\Gamma_M|\hat H|\Gamma_M\rangle\le E_{\mathrm{GS}}+C_2 M^2/L^d$ (eq.~(4.2.4)) --- an
 $O(L^{d/2})$ family of low-lying states, the rigorous Anderson tower.  To state this soundly (a
 uniform $C_2$ exists only for the genuine translation-invariant family) we build the $d$-dimensional
 hypercubic torus model: vertices $\texttt{HypercubicTorus}\,d\,L=\mathrm{Fin}\,d\to\mathbb{Z}/L$
 ($L^d$ sites, \texttt{card\_hypercubicTorus}), the nearest-neighbor coupling
 \texttt{torusNNCoupling}, the parity (N\'eel) sublattice \texttt{torusParitySublattice}, and the
 staggered raising/lowering operators \texttt{staggeredRaisingOpS}/\texttt{staggeredLoweringOpS}.  The
-axiom \texttt{tower\_lowLying\_energy\_bound} states eq.~(4.2.4) in scale-invariant Rayleigh-ratio
-form over the torus family.  The statement is \emph{conditional on long-range order} (a $q_0>0$
-premise bounding the squared staggered order parameter $\langle(\hat O_L/L^d)^2\rangle$ from below),
-hence vacuous in one dimension by Corollary 4.3, exactly as in Tasaki.  The deep reflection-positivity
-/ infinite-volume construction is deferred (in scope).  Chapters~3--10 backfill.
+theorem \texttt{tower\_lowLying\_energy\_bound} states eq.~(4.2.4) in scale-invariant Rayleigh-ratio
+form over the torus family.  \emph{Proof} (axiom-clean): the variational double-commutator bound
+($\star$, \texttt{tower\_numerator\_double\_commutator\_le}) reduces the energy gap to the symmetric
+numerator $\langle\Phi|[(\hat o_L^-)^M,[\hat H,(\hat o_L^+)^M]]|\Phi\rangle$ (per-volume densities
+$\hat o^\pm=\hat O^\pm/L^d$); Lemma~R2 (the split-independent renormalized commutator estimate
+\texttt{r2\_split\_independent}) together with the locality decay of
+$\hat d=[\hat o^+,[\hat H,\hat o^-]]$ and $[\hat H,\hat o^+]$ bounds the numerator by
+$M^2\bigl(A\,P_M/L^d+B\,M^2 P_M/L^{2d}\bigr)$ (the $P_M$ are the staggered moments
+\texttt{phatMoment}); Lemma~R1 (\texttt{orderWord\_balanced\_re\_close}) gives the denominator
+$\lVert(\hat o^\pm)^M\Phi\rVert^2\ge\tfrac12 P_M$; and the long-range-order moment recursion
+$2q_0P_n\le P_{n+1}$ (\texttt{phatMoment\_succ\_two\_q0\_le}) closes the ratio.  The recursion needs
+the ground state to be a \emph{total-spin singlet} ($\hat S_{\mathrm{tot}}^{(3)}\Phi=
+\hat S_{\mathrm{tot}}^{(1)}\Phi=0$, added to \texttt{IsAndersonTowerConstants}); on a bipartite
+lattice the antiferromagnetic Heisenberg ground state is the unique singlet (Marshall--Lieb--Mattis,
+Theorem 2.3), so this is a faithful refinement.  The $M<0$ (lowering) tower follows by Hermitian
+conjugation, $N=0$ is vacuous (the order operator vanishes).  The statement is \emph{conditional on
+long-range order} (a $q_0>0$ premise bounding $\langle(\hat O_L/L^d)^2\rangle$ from below), hence
+vacuous in one dimension by Corollary 4.3, exactly as in Tasaki.
 
 \noindent\textbf{Corollary 4.7} (Tasaki §4.2.1, eq.~(4.2.7), pp.~95--96; documented axiom,
 \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The tower of low-lying energy
