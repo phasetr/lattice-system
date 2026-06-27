@@ -119,4 +119,46 @@ theorem tower_trial_energy_bound (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) (hL :
     (show (0 : ℝ) ≤ 2 * towerEnergyCoeff d L N m q₀ by positivity)
   nlinarith [hgap, hkey, hPM, hCoeff]
 
+/-- **Tower-state energy bound for `M = m ≥ 0`.**  The raising tower state
+`towerState m Φ = V^m·(ô⁺)^m Φ` has the same Rayleigh quotient as `(ô⁺)^m Φ` (scale invariance), so
+`tower_trial_energy_bound` transfers verbatim. -/
+theorem towerState_pos_rayleigh_bound (d L N m : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
+    (hm : 2 ≤ m)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℂ)
+    (hev : (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Φ = E₀ • Φ)
+    (hmin : ∀ (E : ℂ) (Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ), Ψ ≠ 0 →
+       (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re)
+    (hΦ : Φ ≠ 0)
+    (hsing3 : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0)
+    (hsing1 : (totalSpinSOp1 (HypercubicTorus d L) N).mulVec Φ = 0)
+    {q₀ : ℝ} (hq₀ : 0 < q₀)
+    (hlro : q₀ ≤ (star Φ ⬝ᵥ (staggeredOrderOpS (torusParitySublattice d L) N
+        * staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ).re
+        / ((star Φ ⬝ᵥ Φ).re * ((L : ℝ) ^ d) ^ 2))
+    (hcond2 : 3 * (N : ℝ) * ((2 * m - 2 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget2 : ((2 * m - 2 : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2)
+    (hcond3 : 3 * (N : ℝ) * ((2 * m - 3 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget3 : ((2 * m - 3 : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2)
+    (hcondD : 3 * (N : ℝ) * (m : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (htower : towerState (torusParitySublattice d L) N (m : ℤ) Φ ≠ 0) :
+    (star (towerState (torusParitySublattice d L) N (m : ℤ) Φ) ⬝ᵥ
+        (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec
+          (towerState (torusParitySublattice d L) N (m : ℤ) Φ)).re
+        / (star (towerState (torusParitySublattice d L) N (m : ℤ) Φ) ⬝ᵥ
+          towerState (torusParitySublattice d L) N (m : ℤ) Φ).re
+      ≤ E₀.re + 2 * towerEnergyCoeff d L N m q₀ := by
+  have hVc : ((L : ℂ) ^ d) ^ m ≠ 0 :=
+    pow_ne_zero _ (pow_ne_zero _ (Nat.cast_ne_zero.mpr (NeZero.ne L)))
+  have hAne : (staggeredOrderDensityOpS d L N true ^ m).mulVec Φ ≠ 0 := by
+    intro h
+    apply htower
+    rw [towerState_pos_eq_smul, h, smul_zero]
+  rw [towerState_pos_eq_smul,
+    rayleigh_smul_invariant (heisenbergHamiltonianS (torusNNCoupling d L) N)
+      (((L : ℂ) ^ d) ^ m) hVc ((staggeredOrderDensityOpS d L N true ^ m).mulVec Φ)]
+  exact tower_trial_energy_bound d L N m hN hL hm Φ E₀ hev hmin hΦ hsing3 hsing1 hq₀ hlro
+    hcond2 hbudget2 hcond3 hbudget3 hcondD hAne
+
 end LatticeSystem.Quantum
