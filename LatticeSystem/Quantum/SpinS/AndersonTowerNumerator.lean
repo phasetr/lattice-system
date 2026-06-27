@@ -541,4 +541,33 @@ theorem Tj_orderMinus_decomp (d L N j r : ℕ) [NeZero L] :
           * staggeredOrderDensityOpS d L N true ^ r := by
   rw [mul_mul_commutator_decomp, heisenberg_order_nested_eq_neg_orderDoubleComm]
 
+/-- **S1 middle-term bound (sandwiched).**  The middle `(ô⁺)^j(−d̂)(ô⁺)^{M-1-j}`, sandwiched by
+`(ô⁻)^k … (ô⁻)^{M-1-k}`, equals `−` the `s1_term_bound` operator, so it has the same
+`3(96dN⁴/V)·mf(2M-2)` bound. -/
+theorem s1_middle_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hq₀ : 0 < q₀) (hm0 : 0 < phatMoment d L N Φ 0)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1))
+    (hj : j < M) (hk : k < M)
+    (hcond : 3 * (N : ℝ) * ((2 * M - 2 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget : ((2 * M - 2 : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2) :
+    |(star Φ ⬝ᵥ (staggeredOrderDensityOpS d L N false ^ k
+        * (staggeredOrderDensityOpS d L N true ^ j * (- orderDoubleComm d L N)
+          * staggeredOrderDensityOpS d L N true ^ (M - 1 - j))
+        * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)).mulVec Φ).re|
+      ≤ 3 * (96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d)
+          * momentFactor d L N Φ (2 * M - 2) := by
+  rw [show staggeredOrderDensityOpS d L N false ^ k
+        * (staggeredOrderDensityOpS d L N true ^ j * (- orderDoubleComm d L N)
+          * staggeredOrderDensityOpS d L N true ^ (M - 1 - j))
+        * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)
+      = - (staggeredOrderDensityOpS d L N false ^ k
+          * staggeredOrderDensityOpS d L N true ^ j * orderDoubleComm d L N
+          * staggeredOrderDensityOpS d L N true ^ (M - 1 - j)
+          * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)) from by noncomm_ring,
+    Matrix.neg_mulVec, dotProduct_neg, Complex.neg_re, abs_neg]
+  exact s1_term_bound d L N M j k hN hL Φ hsing hq₀ hm0 hratio hj hk hcond hbudget
+
 end LatticeSystem.Quantum
