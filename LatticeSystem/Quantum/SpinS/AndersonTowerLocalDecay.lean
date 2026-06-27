@@ -475,6 +475,33 @@ theorem isR2LocalUpTo_orderDoubleComm [NeZero L] (hL : 2 ≤ L) (hN : 1 ≤ N) (
     (fun p _ => (Finset.card_insert_le _ _).trans (by simp))
   simpa [orderDoubleCommAggregate] using hbd
 
+/-- The single Heisenberg–order commutator `[Ĥ, ô⁺]` as a bond sum (offDiag, diagonal `J = 0`):
+`[Ĥ, ô⁺] = ∑_{x≠y} (V⁻¹ J_{xy}) · [Ŝ_x·Ŝ_y, Ô⁺]`. -/
+theorem heisenbergRaisingComm_eq_offDiag_sum [NeZero L] (hL : 2 ≤ L) :
+    heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+        - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N
+      = ∑ p ∈ Finset.univ.filter
+          (fun p : HypercubicTorus d L × HypercubicTorus d L => p.1 ≠ p.2),
+          (((L : ℂ) ^ d)⁻¹ * torusNNCoupling d L p.1 p.2)
+            • (spinSDot p.1 p.2 N * staggeredRaisingOpS (torusParitySublattice d L) N
+              - staggeredRaisingOpS (torusParitySublattice d L) N * spinSDot p.1 p.2 N) := by
+  have hH : heisenbergHamiltonianS (torusNNCoupling d L) N
+      = ∑ p : HypercubicTorus d L × HypercubicTorus d L,
+          torusNNCoupling d L p.1 p.2 • spinSDot p.1 p.2 N := by
+    rw [heisenbergHamiltonianS_def, ← Finset.sum_product', Finset.univ_product_univ]
+  rw [show staggeredOrderDensityOpS d L N true
+      = ((L : ℂ) ^ d)⁻¹ • staggeredRaisingOpS (torusParitySublattice d L) N from rfl,
+    mul_smul_comm, smul_mul_assoc, ← smul_sub, hH, commutator_sum_smul_left, Finset.smul_sum,
+    Finset.sum_congr rfl (fun p _ => smul_smul (((L : ℂ) ^ d)⁻¹)
+      (torusNNCoupling d L p.1 p.2) (spinSDot p.1 p.2 N * staggeredRaisingOpS
+        (torusParitySublattice d L) N - staggeredRaisingOpS (torusParitySublattice d L) N
+        * spinSDot p.1 p.2 N))]
+  refine (Finset.sum_filter_of_ne (fun p _ hfne => ?_)).symm
+  intro hpe
+  apply hfne
+  rw [show torusNNCoupling d L p.1 p.2 = 0 from by
+    rw [hpe]; exact torusNNCoupling_self_eq_zero d L hL p.2, mul_zero, zero_smul]
+
 /-- **The aggregate is `≤ 96 d N⁴ / V`.**  The `≤ 2dV` nonzero bonds each contribute
 `V⁻²·1·48N⁴`. -/
 theorem orderDoubleCommAggregate_le [NeZero L] (hL : 2 ≤ L) (hN : 1 ≤ N) :
@@ -509,5 +536,67 @@ theorem orderDoubleCommAggregate_le [NeZero L] (hL : 2 ≤ L) (hN : 1 ≤ N) :
         exact mul_le_mul_of_nonneg_left (hsub.trans (torusNNCoupling_total_norm_le d L))
           (by positivity)
     _ = 96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d := by field_simp; ring
+
+/-- The ℓ¹-aggregate carried by `[Ĥ, ô⁺]`'s quasi-local decomposition. -/
+noncomputable def heisenbergRaisingCommAggregate (d L N : ℕ) [NeZero L] : ℝ :=
+  ∑ p ∈ Finset.univ.filter (fun p : HypercubicTorus d L × HypercubicTorus d L => p.1 ≠ p.2),
+    ‖((L : ℂ) ^ d)⁻¹ * torusNNCoupling d L p.1 p.2‖
+      * manyBodyOperatorNormS
+        (spinSDot p.1 p.2 N * staggeredRaisingOpS (torusParitySublattice d L) N
+          - staggeredRaisingOpS (torusParitySublattice d L) N * spinSDot p.1 p.2 N)
+
+/-- **`G = [Ĥ, ô⁺]` lies in the local-decay class** (`ζ = 2`, `o₀ = N`, `g₀` the bond aggregate):
+the single-commutator analogue of `isR2LocalUpTo_orderDoubleComm`, consumed by S2/S3. -/
+theorem isR2LocalUpTo_heisenbergRaisingComm [NeZero L] (hL : 2 ≤ L) (hN : 1 ≤ N) (K : ℕ) :
+    IsR2LocalUpTo K 2 (N : ℝ) (heisenbergRaisingCommAggregate d L N)
+      (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+        - staggeredOrderDensityOpS d L N true
+          * heisenbergHamiltonianS (torusNNCoupling d L) N) := by
+  refine ⟨Finset.sum_nonneg
+    (fun p _ => mul_nonneg (norm_nonneg _) (manyBodyOperatorNormS_nonneg _)), fun u _ => ?_⟩
+  rw [heisenbergRaisingComm_eq_offDiag_sum hL]
+  have hbd := iterOrderComm_norm_le_of_localSum hN u
+    (Finset.univ.filter (fun p : HypercubicTorus d L × HypercubicTorus d L => p.1 ≠ p.2))
+    (fun p => ((L : ℂ) ^ d)⁻¹ * torusNNCoupling d L p.1 p.2)
+    (fun p => spinSDot p.1 p.2 N * staggeredRaisingOpS (torusParitySublattice d L) N
+      - staggeredRaisingOpS (torusParitySublattice d L) N * spinSDot p.1 p.2 N)
+    (fun p => ({p.1, p.2} : Finset (HypercubicTorus d L))) 2
+    (fun p hp => spinSDot_staggeredRaising_commutator_supportedOn _ p.1 p.2
+      (Finset.mem_filter.mp hp).2)
+    (fun p _ => (Finset.card_insert_le _ _).trans (by simp))
+  simpa [heisenbergRaisingCommAggregate] using hbd
+
+/-- **The single-commutator aggregate is `≤ 24 d N³`.**  `≤ 2dV` bonds × `V⁻¹·12N³`. -/
+theorem heisenbergRaisingCommAggregate_le [NeZero L] (hL : 2 ≤ L) (hN : 1 ≤ N) :
+    heisenbergRaisingCommAggregate d L N ≤ 24 * (d : ℝ) * (N : ℝ) ^ 3 := by
+  have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    positivity
+  have hVc : ‖((L : ℂ) ^ d)⁻¹‖ = ((L : ℝ) ^ d)⁻¹ := by
+    simp only [norm_inv, norm_pow, Complex.norm_natCast]
+  calc heisenbergRaisingCommAggregate d L N
+      ≤ ∑ p ∈ Finset.univ.filter
+          (fun p : HypercubicTorus d L × HypercubicTorus d L => p.1 ≠ p.2),
+          ((L : ℝ) ^ d)⁻¹ * ‖torusNNCoupling d L p.1 p.2‖ * (12 * (N : ℝ) ^ 3) := by
+        refine Finset.sum_le_sum (fun p hp => ?_)
+        rw [norm_mul, hVc]
+        exact mul_le_mul_of_nonneg_left
+          (spinSDot_commutator_staggeredRaisingOpS_norm_le _ p.1 p.2
+            (Finset.mem_filter.mp hp).2 hN) (by positivity)
+    _ = ((L : ℝ) ^ d)⁻¹ * (12 * (N : ℝ) ^ 3)
+          * ∑ p ∈ Finset.univ.filter
+            (fun p : HypercubicTorus d L × HypercubicTorus d L => p.1 ≠ p.2),
+            ‖torusNNCoupling d L p.1 p.2‖ := by
+        rw [Finset.mul_sum]; refine Finset.sum_congr rfl (fun p _ => by ring)
+    _ ≤ ((L : ℝ) ^ d)⁻¹ * (12 * (N : ℝ) ^ 3) * (2 * (d : ℝ) * (L : ℝ) ^ d) := by
+        have hsub : (∑ p ∈ Finset.univ.filter
+              (fun p : HypercubicTorus d L × HypercubicTorus d L => p.1 ≠ p.2),
+              ‖torusNNCoupling d L p.1 p.2‖)
+            ≤ ∑ p : HypercubicTorus d L × HypercubicTorus d L, ‖torusNNCoupling d L p.1 p.2‖ :=
+          Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
+            (fun _ _ _ => norm_nonneg _)
+        exact mul_le_mul_of_nonneg_left (hsub.trans (torusNNCoupling_total_norm_le d L))
+          (by positivity)
+    _ = 24 * (d : ℝ) * (N : ℝ) ^ 3 := by field_simp; ring
 
 end LatticeSystem.Quantum
