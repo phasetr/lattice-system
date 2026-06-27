@@ -822,4 +822,87 @@ theorem s3_part_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ 
   exact mul_le_mul_of_nonneg_right (by exact_mod_cast (by omega : j ≤ M))
     (mul_nonneg (by positivity) (mul_nonneg (by positivity) (momentFactor_nonneg d L N Φ _)))
 
+/-- **Per-`(j,k)` term bound.**  The sandwiched commutator
+`(ô⁻)^k·([T_j, ô⁻])·(ô⁻)^{M-1-k}` (with `T_j = (ô⁺)^j·G·(ô⁺)^{M-1-j}`) decomposes
+(`Tj_orderMinus_decomp`) into the S1 middle `(−d̂)`, the S2 source and the S3 source; the triangle
+inequality plus `s1_middle_bound`, `s2_part_bound`, `s3_part_bound` yields the total bound. -/
+theorem tower_jk_term_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hq₀ : 0 < q₀) (hm0 : 0 < phatMoment d L N Φ 0)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1))
+    (hj : j < M) (hk : k < M)
+    (hcond2 : 3 * (N : ℝ) * ((2 * M - 2 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget2 : ((2 * M - 2 : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2)
+    (hcond3 : 3 * (N : ℝ) * ((2 * M - 3 : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget3 : ((2 * M - 3 : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2) :
+    |(star Φ ⬝ᵥ (staggeredOrderDensityOpS d L N false ^ k
+        * ((staggeredOrderDensityOpS d L N true ^ j
+              * (heisenbergHamiltonianS (torusNNCoupling d L) N
+                * staggeredOrderDensityOpS d L N true
+                - staggeredOrderDensityOpS d L N true
+                  * heisenbergHamiltonianS (torusNNCoupling d L) N)
+              * staggeredOrderDensityOpS d L N true ^ (M - 1 - j))
+            * staggeredOrderDensityOpS d L N false
+          - staggeredOrderDensityOpS d L N false
+            * (staggeredOrderDensityOpS d L N true ^ j
+              * (heisenbergHamiltonianS (torusNNCoupling d L) N
+                * staggeredOrderDensityOpS d L N true
+                - staggeredOrderDensityOpS d L N true
+                  * heisenbergHamiltonianS (torusNNCoupling d L) N)
+              * staggeredOrderDensityOpS d L N true ^ (M - 1 - j)))
+        * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)).mulVec Φ).re|
+      ≤ 3 * (96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d) * momentFactor d L N Φ (2 * M - 2)
+        + ((M : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (M : ℝ)))
+            * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * momentFactor d L N Φ (2 * M - 3)))
+          + (M : ℝ) * (((L : ℝ) ^ d)⁻¹ * ((L : ℝ) ^ d)⁻¹ * (2 * (2 * (M : ℝ)))
+            * (3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * momentFactor d L N Φ (2 * M - 3)))) := by
+  rw [show staggeredOrderDensityOpS d L N false ^ k
+        * ((staggeredOrderDensityOpS d L N true ^ j
+              * (heisenbergHamiltonianS (torusNNCoupling d L) N
+                * staggeredOrderDensityOpS d L N true
+                - staggeredOrderDensityOpS d L N true
+                  * heisenbergHamiltonianS (torusNNCoupling d L) N)
+              * staggeredOrderDensityOpS d L N true ^ (M - 1 - j))
+            * staggeredOrderDensityOpS d L N false
+          - staggeredOrderDensityOpS d L N false
+            * (staggeredOrderDensityOpS d L N true ^ j
+              * (heisenbergHamiltonianS (torusNNCoupling d L) N
+                * staggeredOrderDensityOpS d L N true
+                - staggeredOrderDensityOpS d L N true
+                  * heisenbergHamiltonianS (torusNNCoupling d L) N)
+              * staggeredOrderDensityOpS d L N true ^ (M - 1 - j)))
+        * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)
+      = staggeredOrderDensityOpS d L N false ^ k
+          * (staggeredOrderDensityOpS d L N true ^ j * (- orderDoubleComm d L N)
+            * staggeredOrderDensityOpS d L N true ^ (M - 1 - j))
+          * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)
+        + (staggeredOrderDensityOpS d L N false ^ k * (staggeredOrderDensityOpS d L N true ^ j
+            * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+              - staggeredOrderDensityOpS d L N true
+                * heisenbergHamiltonianS (torusNNCoupling d L) N)
+            * (staggeredOrderDensityOpS d L N true ^ (M - 1 - j)
+                * staggeredOrderDensityOpS d L N false
+              - staggeredOrderDensityOpS d L N false
+                * staggeredOrderDensityOpS d L N true ^ (M - 1 - j)))
+            * staggeredOrderDensityOpS d L N false ^ (M - 1 - k)
+          + staggeredOrderDensityOpS d L N false ^ k
+            * ((staggeredOrderDensityOpS d L N true ^ j * staggeredOrderDensityOpS d L N false
+                - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true ^ j)
+              * (heisenbergHamiltonianS (torusNNCoupling d L) N
+                * staggeredOrderDensityOpS d L N true
+                - staggeredOrderDensityOpS d L N true
+                  * heisenbergHamiltonianS (torusNNCoupling d L) N)
+              * staggeredOrderDensityOpS d L N true ^ (M - 1 - j))
+            * staggeredOrderDensityOpS d L N false ^ (M - 1 - k))
+      from by rw [Tj_orderMinus_decomp d L N j (M - 1 - j)]; noncomm_ring,
+    Matrix.add_mulVec, Matrix.add_mulVec, dotProduct_add, dotProduct_add,
+    Complex.add_re, Complex.add_re]
+  refine (abs_add_le _ _).trans (add_le_add ?_ ((abs_add_le _ _).trans (add_le_add ?_ ?_)))
+  · exact s1_middle_bound d L N M j k hN hL Φ hsing hq₀ hm0 hratio hj hk hcond2 hbudget2
+  · exact s2_part_bound d L N M j k hN hL Φ hsing hq₀ hm0 hratio hj hk hcond3 hbudget3
+  · exact s3_part_bound d L N M j k hN hL Φ hsing hq₀ hm0 hratio hj hk hcond3 hbudget3
+
 end LatticeSystem.Quantum
