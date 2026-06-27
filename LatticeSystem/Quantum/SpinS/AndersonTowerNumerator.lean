@@ -315,4 +315,51 @@ theorem s1_term_bound (d L N M j k : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ 
     (by rw [hlen]; exact hcond) (by rw [hlen]; exact hbudget)
   rwa [hlen] at hbd
 
+/-! ### S2/S3 single-term bound via R2 on `G = [Ĥ, ô⁺]` -/
+
+/-- **Scalarization of an inserted `[ô⁺,ô⁻]` with a left factor.**  Generalizes
+`orderWord_orderCommutator_insert_mulVec_eq` to allow an arbitrary operator `X` to the left:
+`(X · ô^{wₗ} [ô⁺,ô⁻] ô^{wᵣ}) Φ = (V⁻²·2 m(wᵣ)) · (X · ô^{wₗ} ô^{wᵣ}) Φ`. -/
+theorem orderCommutator_insert_left_mulVec_eq (d L N : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0)
+    (X : ManyBodyOpS (HypercubicTorus d L) N) (wl wr : List Bool) :
+    (X * (orderWordProd d L N wl
+        * (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+          - staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)
+        * orderWordProd d L N wr)).mulVec Φ
+      = ((((L : ℂ) ^ d)⁻¹ * ((L : ℂ) ^ d)⁻¹) * (2 * mCharge wr))
+          • (X * (orderWordProd d L N wl * orderWordProd d L N wr)).mulVec Φ := by
+  rw [← Matrix.mulVec_mulVec, orderWord_orderCommutator_insert_mulVec_eq d L N Φ hsing wl wr,
+    Matrix.mulVec_smul, Matrix.mulVec_mulVec]
+
+/-- **S2/S3 single-term bound (R2 on `G = [Ĥ, ô⁺]`).**  Lemma R2 applied to the single
+Heisenberg–order commutator (in the local-decay class with `g₀ ≤ 24 d N³`):
+`|Re⟨Φ, ô^{wₗ} G ô^{wᵣ} Φ⟩| ≤ 3 · (24 d N³) · mf(|wₗ|+|wᵣ|)`. -/
+theorem heisenbergRaisingComm_word_re_bound (d L N : ℕ) [NeZero L] (hN : 1 ≤ N) (hL : 2 ≤ L)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hq₀ : 0 < q₀) (hm0 : 0 < phatMoment d L N Φ 0)
+    (hratio : ∀ n, 2 * q₀ * phatMoment d L N Φ n ≤ phatMoment d L N Φ (n + 1))
+    (wl wr : List Bool)
+    (hcond : 3 * (N : ℝ) * ((wl.length + wr.length : ℕ) : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hbudget : ((wl.length + wr.length : ℕ) : ℝ)
+        * ((2 * 2 * (N : ℝ)) / (L : ℝ) ^ d / Real.sqrt (2 * q₀)) ≤ 1 / 2) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N wl
+        * (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+          - staggeredOrderDensityOpS d L N true
+            * heisenbergHamiltonianS (torusNNCoupling d L) N)
+        * orderWordProd d L N wr).mulVec Φ).re|
+      ≤ 3 * (24 * (d : ℝ) * (N : ℝ) ^ 3) * momentFactor d L N Φ (wl.length + wr.length) := by
+  have hbd := r2_split_independent d L N hN Φ hsing (q₀ := q₀) (ζ := (2 : ℝ)) (o₀ := (N : ℝ))
+    hq₀ hm0 hratio (by positivity) (wl.length + wr.length) hcond hbudget wl wr
+    (heisenbergHamiltonianS (torusNNCoupling d L) N * staggeredOrderDensityOpS d L N true
+      - staggeredOrderDensityOpS d L N true * heisenbergHamiltonianS (torusNNCoupling d L) N)
+    (heisenbergRaisingCommAggregate d L N) rfl
+    (isR2LocalUpTo_heisenbergRaisingComm hL hN _)
+  refine le_trans hbd ?_
+  gcongr
+  · exact momentFactor_nonneg d L N Φ _
+  · exact heisenbergRaisingCommAggregate_le hL hN
+
 end LatticeSystem.Quantum
