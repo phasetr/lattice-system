@@ -49,6 +49,7 @@ import LatticeSystem.Quantum.SpinS.StaggeredOrderSquare
 import LatticeSystem.Quantum.SpinS.StaggeredOrderSquareForm
 import LatticeSystem.Quantum.SpinS.SingleBondSpinSOp3Commutator
 import LatticeSystem.Quantum.SpinS.HeisenbergSpinSOp3Commutator
+import LatticeSystem.Quantum.SpinS.SingleBondDoubleCommutator
 import LatticeSystem.Quantum.SpinS.HaldaneConjecture
 import LatticeSystem.Quantum.SpinS.AKLT
 import LatticeSystem.Quantum.SpinS.AKLTBondProjection
