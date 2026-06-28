@@ -31,6 +31,23 @@ private theorem onSiteS_commutator_of_ne {i j : Λ} (hij : i ≠ j)
     (onSiteS i A : ManyBodyOpS Λ N) * onSiteS j B - onSiteS j B * onSiteS i A = 0 := by
   rw [(onSiteS_commute_of_ne hij A B).eq, sub_self]
 
+/-- **Off-bond vanishing**: a Heisenberg bond `Ŝ_x · Ŝ_y` commutes with `Ŝ_z^{(3)}` when `z` lies on
+neither endpoint (`z ≠ x`, `z ≠ y`), so the commutator vanishes. -/
+theorem spinSDot_commutator_onSiteS_spinSOp3_eq_zero_of_ne {x y z : Λ} (hzx : z ≠ x) (hzy : z ≠ y)
+    (N : ℕ) :
+    spinSDot x y N * onSiteS z (spinSOp3 N) - onSiteS z (spinSOp3 N) * spinSDot x y N = 0 := by
+  have h : Commute (spinSDot x y N) (onSiteS z (spinSOp3 N) : ManyBodyOpS Λ N) := by
+    rw [spinSDot_def]
+    have cx : ∀ A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ,
+        Commute (onSiteS x A : ManyBodyOpS Λ N) (onSiteS z (spinSOp3 N)) :=
+      fun A => onSiteS_commute_of_ne (Ne.symm hzx) A (spinSOp3 N)
+    have cy : ∀ A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ,
+        Commute (onSiteS y A : ManyBodyOpS Λ N) (onSiteS z (spinSOp3 N)) :=
+      fun A => onSiteS_commute_of_ne (Ne.symm hzy) A (spinSOp3 N)
+    exact (((cx _).mul_left (cy _)).add_left ((cx _).mul_left (cy _))).add_left
+      ((cx _).mul_left (cy _))
+  rw [h.eq, sub_self]
+
 /-- **The single-bond spin current**: `[Ŝ_a · Ŝ_b, Ŝ_a^{(3)}] = i (Ŝ_a^{(1)} Ŝ_b^{(2)} −
 Ŝ_a^{(2)} Ŝ_b^{(1)})` for `a ≠ b`.  Only the transverse bond components fail to commute with
 `Ŝ_a^{(3)}`. -/
