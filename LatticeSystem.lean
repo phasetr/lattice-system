@@ -81,6 +81,8 @@ import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingGroundUnique
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingEigenTransfer
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingMLMUnique
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingGroundData
+import LatticeSystem.Quantum.SpinS.HermitianGapExists
+import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingGap
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisGeneral
 import LatticeSystem.Quantum.SpinS.ShastryNoSSB
 import LatticeSystem.Quantum.SpinS.RingReflection

@@ -9578,16 +9578,20 @@ for $N$ odd.  \emph{Theorem 6.3}
 (\texttt{lieb\_schultz\_mattis\_affleck\_lieb}, eq.~6.2.19): for $N$ odd and even $L$ there is a
 positive spectral gap (\texttt{IsPositiveSpectralGap} of §6.1) bounded by $8\pi^2S^2/L$, so a
 half-odd-integer chain can never have both a unique ground state and a nonvanishing gap --- the
-rigorous half of the Haldane conjecture.  Lemmas 6.1 and 6.2 are now discharged (proved theorems);
-only Theorem 6.3 remains a documented axiom.  Toward discharging it, the ground-state uniqueness of
-the ring is established (connected-graph Marshall--Lieb--Mattis, \texttt{ringSym\_ground\_uniqueness});
-and \texttt{HermitianSecondEigenvalue.lean} supplies the generic Courant--Fischer
-\emph{second-eigenvalue variational bound} \texttt{hermitian\_second\_eigenvalue\_variational}: for a
-Hermitian $M$ with a one-dimensional $E_0$-eigenspace spanned by $\varphi_0$ and a real $E_1$
-lower-bounding every eigenvalue $\ne E_0$, every $\psi\perp\varphi_0$ obeys
-$E_1\,\|\psi\|^2\le\operatorname{rayleighOnVec} M\,\psi$ (eigenbasis expansion; orthogonality to
-$\varphi_0$ kills the $E_0$ components since the ground line is one-dimensional) --- the step that
-upper-bounds the first-excited energy by the LSM trial energy.  Chapters~3--10 backfill.
+rigorous half of the Haldane conjecture.  \emph{Theorem 6.3 is now a proved theorem}
+(\texttt{lieb\_schultz\_mattis\_affleck\_lieb}, axiom-free, \texttt{LiebSchultzMattisRingGap.lean}).
+The discharge assembles: ground-state uniqueness of the ring (connected-graph Marshall--Lieb--Mattis,
+\texttt{ringSym\_ground\_uniqueness}, \texttt{afm\_ring\_ground\_state\_data}) giving a one-dimensional
+$\hat S_{\mathrm{tot}}^{(3)}=0$ ground line; the generic Courant--Fischer
+\emph{second-eigenvalue variational bound} \texttt{hermitian\_second\_eigenvalue\_variational}
+(\texttt{HermitianSecondEigenvalue.lean}): for a Hermitian $M$ with a one-dimensional $E_0$-eigenspace
+spanned by $\varphi_0$ and a real $E_1$ lower-bounding every eigenvalue $\ne E_0$, every
+$\psi\perp\varphi_0$ obeys $E_1\,\|\psi\|^2\le\operatorname{rayleighOnVec} M\,\psi$ (eigenbasis
+expansion; orthogonality to $\varphi_0$ kills the $E_0$ components since the ground line is
+one-dimensional); the existence of an eigenvalue strictly above $E_0$
+(\texttt{hermitian\_exists\_eigenvalue\_gt}, \texttt{HermitianGapExists.lean}, since otherwise
+$M=E_0\cdot1$ would force a full-dimensional ground line) defines $E_1$; and Lemmas 6.1/6.2 bound
+$E_1-E_0\le8\pi^2S^2/L$.  Lemmas 6.1 and 6.2 are likewise proved theorems.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§6.2 Lemma 6.4} (generalized LSM variational bound; Tasaki §6.2,
