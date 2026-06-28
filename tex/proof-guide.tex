@@ -8503,7 +8503,10 @@ bound, \texttt{SingleBondSpinSOp3Commutator.lean} computes the single-bond spin 
 S_b^{(2)}-\hat S_a^{(2)}\hat S_b^{(1)})$ for $a\neq b$, with a symmetric right-endpoint companion
 \texttt{spinSDot\_commutator\_onSiteS\_spinSOp3\_right} and the off-bond vanishing
 \texttt{spinSDot\_commutator\_onSiteS\_spinSOp3\_eq\_zero\_of\_ne}; the building block of $[\hat H,\hat S_z^{(3)}]$ and the
-double commutator entering the bound on the staggered two-point function.
+double commutator entering the bound on the staggered two-point function.  The companion
+\texttt{HeisenbergSpinSOp3Commutator.lean} distributes the Hamiltonian commutator over bonds,
+\texttt{heisenbergHamiltonianS\_commutator\_onSiteS}: $[\hat H_J,\hat S_z^{(3)}]=\sum_x\sum_y J_{xy}[\hat
+S_x\cdot\hat S_y,\hat S_z^{(3)}]$, reducing the spin-current divergence to the bonds incident to $z$.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
