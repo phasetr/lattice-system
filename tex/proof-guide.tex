@@ -8260,7 +8260,17 @@ $\operatorname{Tr}((\theta C\,C)(\theta A\,A)) = \operatorname{Tr}(\theta(CA)\,(
 $\theta$'s multiplicativity, the commutation $C\,\theta A = \theta A\,C$, and the multiplicative
 closure $CA$ left-supported), together with its nonnegative finite-combination version
 \texttt{weightedTraceFunctional\_reflectionPositive\_finsetSum}.  These are the cone on which the
-Trotter/Lie-product factors of the Gibbs exponential will be mounted.
+Trotter/Lie-product factors of the Gibbs exponential will be mounted.  The sixth layer
+(\texttt{RingReflectionGibbsCone.lean}) packages the reflection-positive trace-weight cone:
+\texttt{RPTraceWeightS}~$M$ ($X \mapsto \operatorname{Tr}(M\,X)$ is an RP functional), the
+cone-representability predicate \texttt{RPTraceConeRepS} (a nonnegative finite combination
+$\sum_i c_i\,\theta(C_i)\,C_i$) closed under
+\texttt{one}/\texttt{zero}/\texttt{add}/\texttt{smul\_nonneg}/\texttt{mul}/\texttt{pow} (the product
+closure via \texttt{weightGen\_mul}: $(\theta C\,C)(\theta D\,D)=\theta(CD)\,(CD)$),
+\texttt{RPTraceConeRepS.rpTraceWeight} (representable $\Rightarrow$ RP trace weight), and
+\texttt{RPTraceWeightS.tendsto} (RP trace weights are closed under limits, by finite-dimensional
+trace continuity).  The next layer mounts the interaction Gibbs exponential
+$\exp\!\big(t\sum_i c_i\,\theta(C_i)\,C_i\big)$ as a limit of cone-representable partial sums.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
