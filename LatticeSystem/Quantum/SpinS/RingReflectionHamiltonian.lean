@@ -106,4 +106,51 @@ theorem ringReflectionThetaS_staggeredOrderOpS :
       cases ringStaggeredSublattice (2 * n) x <;> simp,
     neg_smul]
 
+/-- **`θ` fixes the ring Heisenberg Hamiltonian**: `θ(Ĥ) = Ĥ`.  Each `Ŝ_x·Ŝ_y` reflects to
+`Ŝ_{r x}·Ŝ_{r y}`; reindexing the pair `(x,y) ↦ (r y, r x)` and using the orientation reversal
+(`ringCoupling_ringReflect`) together with `spinSDot_comm` restores the original double sum. -/
+theorem ringReflectionThetaS_heisenbergHamiltonianS (n N : ℕ) (hn : 1 ≤ n) :
+    ringReflectionThetaS n N (heisenbergHamiltonianS (ringCoupling (2 * n)) N)
+      = heisenbergHamiltonianS (ringCoupling (2 * n)) N := by
+  have hcoeff : ∀ x y : Fin (2 * n),
+      (starRingEnd ℂ) (ringCoupling (2 * n) x y) = ringCoupling (2 * n) x y := by
+    intro x y; simp only [ringCoupling]; split <;> simp
+  rw [heisenbergHamiltonianS_def, ringReflectionThetaS_sum]
+  have step1 : ∀ x : Fin (2 * n),
+      ringReflectionThetaS n N (∑ y, ringCoupling (2 * n) x y • spinSDot x y N)
+        = ∑ y, ringCoupling (2 * n) x y • spinSDot (ringReflect n x) (ringReflect n y) N := by
+    intro x
+    rw [ringReflectionThetaS_sum]
+    refine Finset.sum_congr rfl (fun y _ => ?_)
+    rw [ringReflectionThetaS_smul, ringReflectionThetaS_spinSDot, hcoeff]
+  simp only [step1]
+  rw [← Fintype.sum_prod_type (f := fun p : Fin (2 * n) × Fin (2 * n) =>
+      ringCoupling (2 * n) p.1 p.2 • spinSDot (ringReflect n p.1) (ringReflect n p.2) N),
+    ← Fintype.sum_prod_type (f := fun p : Fin (2 * n) × Fin (2 * n) =>
+      ringCoupling (2 * n) p.1 p.2 • spinSDot p.1 p.2 N),
+    ← Equiv.sum_comp ((Equiv.prodComm (Fin (2 * n)) (Fin (2 * n))).trans
+      ((ringReflectEquiv n).prodCongr (ringReflectEquiv n)))]
+  refine Finset.sum_congr rfl (fun p _ => ?_)
+  simp only [Equiv.trans_apply, Equiv.prodComm_apply, Equiv.prodCongr_apply, Prod.map_fst,
+    Prod.map_snd, Prod.fst_swap, Prod.snd_swap, ringReflectEquiv_apply]
+  rw [ringCoupling_ringReflect n hn, ringReflect_involutive n, ringReflect_involutive n,
+    spinSDot_comm]
+
+/-- `θ` commutes with subtraction. -/
+theorem ringReflectionThetaS_sub (A B : ManyBodyOpS (Fin (2 * n)) N) :
+    ringReflectionThetaS n N (A - B) = ringReflectionThetaS n N A - ringReflectionThetaS n N B := by
+  ext σ τ
+  simp [ringReflectionThetaS, map_sub]
+
+/-- **`θ` flips the staggered field**: `θ(Ĥ_h) = Ĥ_{−h}`.  The Heisenberg part is fixed and the
+staggered-field term `−h·Ô_L^{(3)}` is negated (real `h`, `θ` conjugate-linear, `θ(Ô)=−Ô`), so the
+sign of the field reverses — the reflection symmetry exchanging the two staggered ground states. -/
+theorem ringReflectionThetaS_staggeredFieldChainHamiltonianS (n N : ℕ) (hn : 1 ≤ n) (h : ℝ) :
+    ringReflectionThetaS n N (staggeredFieldChainHamiltonianS (2 * n) h N)
+      = staggeredFieldChainHamiltonianS (2 * n) (-h) N := by
+  rw [staggeredFieldChainHamiltonianS, staggeredFieldChainHamiltonianS,
+    ringReflectionThetaS_sub, ringReflectionThetaS_heisenbergHamiltonianS n N hn,
+    ringReflectionThetaS_smul, ringReflectionThetaS_staggeredOrderOpS]
+  simp only [Complex.conj_ofReal, Complex.ofReal_neg, smul_neg, neg_smul, sub_neg_eq_add]
+
 end LatticeSystem.Quantum
