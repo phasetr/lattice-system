@@ -8375,6 +8375,14 @@ decomposition over its actual bonds.  The nineteenth layer
 gives $\theta(\texttt{ringLeftHamiltonian}) = \sum_x [\,\text{if } x+1<n \text{ then } \hat S_{r x}\cdot
 \hat S_{r(x+1)} \text{ else } 0\,]$, mapping each left bond $(x,x+1)$ to the reflected right bond
 $(r x, r(x+1)) = (2n-1-x, 2n-2-x)$ --- the right part $\theta(H_L)$ of the ring DLS decomposition.
+The twentieth layer (\texttt{RingReflectionConcreteGibbs.lean}) instantiates the ring decomposition
+with the concrete left part $H_L = \texttt{ringLeftHamiltonian}$: \texttt{ringDLSDecomposition} and
+\texttt{ringDLSDecomposition\_toHamiltonian} give the gauged ring Hamiltonian
+$H = \texttt{ringLeftHamiltonian} + \theta(\texttt{ringLeftHamiltonian})
+- (\texttt{crossBondInteractionS}\,0 + \texttt{crossBondInteractionS}\,(n-1))$, and
+\texttt{ringDLSDecomposition\_gibbs\_rpTraceWeight} concludes that $\exp(-\beta H)$ is a
+reflection-positive trace weight ($\beta \ge 0$).  Identifying $H$ with the physical ungauged
+Hamiltonian is the next step.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
