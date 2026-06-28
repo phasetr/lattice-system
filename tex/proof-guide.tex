@@ -8563,7 +8563,11 @@ so the oscillator strength is $O(L)$.  In a normalized state
 S_a^{(2)}\hat S_b^{(2)})\Phi\rangle|\le2N^2$ (norm bound + the norm--expectation bridge + $\|\Phi\|=1$).  The general form
 \texttt{ExpectationNormBound.lean} records \texttt{expectation\_abs\_le\_manyBodyOperatorNormS}: for any
 $M$ and normalized $\Phi$, $|\operatorname{Re}\langle\Phi,M\Phi\rangle|\le\|M\|$, converting operator-norm bounds into
-expectation bounds in the Falk--Bruch argument.
+expectation bounds in the Falk--Bruch argument.  \texttt{OscillatorStrengthBound.lean} assembles these into
+the $O(L)$ oscillator-strength bound \texttt{oscillatorStrength\_abs\_le}: in a normalized state $\Phi$,
+$|\operatorname{Re}\langle\Phi,[\hat O,[\hat H,\hat O]]\Phi\rangle|\le12N^3\,L$, combining the double-sum form,
+the off-pair vanishing (three nonzero $z$ per $x$), the uniform per-pair norm $\le4N^3$, and the
+norm--expectation bridge --- the $O(L)$ numerator of the ground-state Falk--Bruch bound.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
