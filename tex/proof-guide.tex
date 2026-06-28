@@ -8370,7 +8370,11 @@ Hamiltonian into its left, right, and crossing bonds.  The eighteenth layer
 \texttt{ringLeftHamiltonian\_eq\_leftBondSum} gives $\texttt{ringLeftHamiltonian}\,n\,N
 = \sum_x [\,\text{if } x+1<n \text{ then } \hat S_x\cdot\hat S_{x+1} \text{ else } 0\,]$ --- only the
 bonds $(x, x+1)$ entirely inside $\{0,\dots,n-1\}$ survive --- the left part of the ring DLS
-decomposition over its actual bonds.
+decomposition over its actual bonds.  The nineteenth layer
+(\texttt{RingReflectionRightBondSum.lean}) reflects this: \texttt{ringReflectionThetaS\_ringLeftHamiltonian}
+gives $\theta(\texttt{ringLeftHamiltonian}) = \sum_x [\,\text{if } x+1<n \text{ then } \hat S_{r x}\cdot
+\hat S_{r(x+1)} \text{ else } 0\,]$, mapping each left bond $(x,x+1)$ to the reflected right bond
+$(r x, r(x+1)) = (2n-1-x, 2n-2-x)$ --- the right part $\theta(H_L)$ of the ring DLS decomposition.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
