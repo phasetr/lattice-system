@@ -75,6 +75,7 @@ import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrder
 import LatticeSystem.Quantum.SpinS.HiddenAntiferromagneticOrderUniqueness
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattis
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisProof
+import LatticeSystem.Quantum.SpinS.LiebSchultzMattisProofCore
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisOrthogonality
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingUniqueness
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingGroundUnique
