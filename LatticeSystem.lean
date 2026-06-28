@@ -47,6 +47,7 @@ import LatticeSystem.Quantum.KaplanHorschVonderLinden
 import LatticeSystem.Quantum.SpinS.DysonLiebSimon
 import LatticeSystem.Quantum.SpinS.FalkBruchInfra
 import LatticeSystem.Quantum.SpinS.TransverseBondEnergyNorm
+import LatticeSystem.Quantum.SpinS.TransverseBondEnergyExpectation
 import LatticeSystem.Quantum.SpinS.HaldaneConjecture
 import LatticeSystem.Quantum.SpinS.AKLT
 import LatticeSystem.Quantum.SpinS.AKLTBondProjection
