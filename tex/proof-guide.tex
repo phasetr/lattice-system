@@ -8537,7 +8537,10 @@ $[\hat O,[\hat H,\hat O]]=\sum_x\sum_z\varepsilon_x\varepsilon_z[\hat S_x^{(3)},
 f-sum-rule double commutator as a double site sum collapsing to $O(L)$ off-diagonally.  \texttt{TransverseBondEnergyNorm.lean}
 bounds each summand: \texttt{transverseBondEnergy\_manyBodyOperatorNormS\_le} gives $\|\hat S_a^{(1)}\hat
 S_b^{(1)}+\hat S_a^{(2)}\hat S_b^{(2)}\|\le2N^2$ (per-site $\|\hat S^{(\alpha)}\|\le N$ + submultiplicativity),
-so the oscillator strength is $O(L)$.
+so the oscillator strength is $O(L)$.  In a normalized state
+\texttt{TransverseBondEnergyExpectation.lean} turns this into an expectation bound
+\texttt{transverseBondEnergy\_expectation\_abs\_le}: $|\langle\Phi,(\hat S_a^{(1)}\hat S_b^{(1)}+\hat
+S_a^{(2)}\hat S_b^{(2)})\Phi\rangle|\le2N^2$ (norm bound + the norm--expectation bridge + $\|\Phi\|=1$).
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
