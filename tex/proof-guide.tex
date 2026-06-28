@@ -5435,6 +5435,27 @@ $\mathrm{coeff}(\hat H_{\rm int}\psi)_{u,h}=\bigl(\sum_x V_x\,u_x\,(1-h_x)\bigr)
 specialization $V_x=-U_x$). The kinetic term's left/right action on the
 coefficient matrix is a subsequent layer.
 
+\medskip
+\noindent\textbf{Block order and Jordan--Wigner sign separation (PR3).} The
+repository's $\texttt{spinfulIndex}\,N\,i\,\sigma = 2i+\sigma$ \emph{interleaves}
+up (even) and down (odd) orbitals, so the Jordan--Wigner string of a same-species
+hop $\hat c^\dagger_{i\sigma}\hat c_{j\sigma}$ passes through the opposite-species
+orbitals between the two sites and the hopping sign depends on the opposite spin
+configuration; the kinetic term then does \emph{not} factor as a left/right action
+on the coefficient matrix. Lieb's argument requires the \textbf{block order} (all
+up orbitals $0\dots N$, then all down $N+1\dots 2N+1$), introduced in file
+\texttt{LiebAttractiveBlockOrder.lean} as $\texttt{hubbardBlockIndex}\,N\,i\,\sigma
+= i + \sigma(N+1)$ with the block merge $\texttt{hubbardBlockMergeConfig}$. The
+main results are the \textbf{sign-separation} lemmas: using the strictly-between
+parity $\texttt{jwSign\_mul\_jwSign\_update\_forward/backward}$ and a reindexing of
+the between-modes to same-species sites
+($\texttt{hubbardBlock\_betweenSum\_up/down}$), the combined sign of an up-spin hop
+equals $(-1)^{\sum_{j<k<i} u_k}$ and so depends only on the up configuration
+($\texttt{hubbardBlock\_upHop\_jwSign\_forward}$ and its backward and down-spin
+analogues). This is the structural fact that lets the kinetic term factor as a
+left action (up) and right action (down) on the coefficient matrix in the next
+layer.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
