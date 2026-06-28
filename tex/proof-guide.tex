@@ -8546,7 +8546,9 @@ S_z^{(3)}]=\sum_x[\hat S_x\cdot\hat S_{x+1},\hat S_z^{(3)}]$, localizing the spi
 bonds incident to $z$.  \texttt{RingHamiltonianCommutatorClosed.lean} completes the collapse,
 \texttt{heisenbergHamiltonianS\_ringCoupling\_commutator\_onSiteS\_spinSOp3\_closed}: on a ring $L\ge2$,
 $[\hat H,\hat S_z^{(3)}]=[\hat S_z\cdot\hat S_{z+1},\hat S_z^{(3)}]+[\hat S_{z-1}\cdot\hat S_z,\hat S_z^{(3)}]$ ---
-the two bonds incident to $z$, every other bond commuting.  \texttt{TransverseBondEnergyNorm.lean}
+the two bonds incident to $z$, every other bond commuting.  \texttt{SingleBondCommutatorNorm.lean} bounds each
+bond commutator: \texttt{spinSDot\_commutator\_onSiteS\_spinSOp3\_norm\_le} gives $\|[\hat S_a\cdot\hat
+S_b,\hat S_a^{(3)}]\|\le2N^2$, so $\|[\hat H,\hat S_z^{(3)}]\|$ is $O(1)$ and the oscillator strength $O(L)$.  \texttt{TransverseBondEnergyNorm.lean}
 bounds each summand: \texttt{transverseBondEnergy\_manyBodyOperatorNormS\_le} gives $\|\hat S_a^{(1)}\hat
 S_b^{(1)}+\hat S_a^{(2)}\hat S_b^{(2)}\|\le2N^2$ (per-site $\|\hat S^{(\alpha)}\|\le N$ + submultiplicativity),
 so the oscillator strength is $O(L)$.  In a normalized state
