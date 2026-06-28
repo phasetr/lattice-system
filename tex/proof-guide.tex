@@ -5418,6 +5418,23 @@ $\operatorname{tr}(CAC A^{\mathsf H})=\operatorname{tr}(MM^{\mathsf H})\ge0$ wit
 $M=BAB$. The Hamiltonian positivity, Perron--Frobenius uniqueness, and the singlet
 conclusion are later layers.
 
+\medskip
+\noindent\textbf{The interaction is diagonal on the coefficient matrix (PR2).} In
+file \texttt{LiebAttractiveCoeffAction.lean} we carry out the interaction half of
+the operator-to-matrix translation. The on-site Hubbard interaction
+$\sum_x V_x\,\hat n_{x\uparrow}\hat n_{x\downarrow}$ is diagonal on the
+computational basis, $(\sum_x V_x\hat n_{x\uparrow}\hat n_{x\downarrow})|c\rangle
+=\bigl(\sum_x V_x\,n_{x\uparrow}(c)\,n_{x\downarrow}(c)\bigr)|c\rangle$
+($\texttt{hubbardOnSiteInteractionSite\_mulVec\_basisVec}$), hence acts pointwise on
+any state ($\texttt{hubbardOnSiteInteractionSite\_mulVec\_apply}$). Reading this
+through the SRP coefficient matrix, with the down index gauged to a hole, gives an
+\emph{entrywise} (Hadamard) action
+$\mathrm{coeff}(\hat H_{\rm int}\psi)_{u,h}=\bigl(\sum_x V_x\,u_x\,(1-h_x)\bigr)\,
+\mathrm{coeff}(\psi)_{u,h}$
+($\texttt{spinReflectionCoeff\_hubbardOnSiteInteractionSite}$, and its attractive
+specialization $V_x=-U_x$). The kinetic term's left/right action on the
+coefficient matrix is a subsequent layer.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
