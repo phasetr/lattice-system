@@ -8510,7 +8510,11 @@ S_x\cdot\hat S_y,\hat S_z^{(3)}]$, reducing the spin-current divergence to the b
 \texttt{SingleBondDoubleCommutator.lean} computes the f-sum-rule integrand
 \texttt{spinSDot\_double\_commutator\_onSiteS\_spinSOp3}: $[\hat S_a^{(3)},[\hat S_a\cdot\hat S_b,\hat
 S_a^{(3)}]]=-(\hat S_a^{(1)}\hat S_b^{(1)}+\hat S_a^{(2)}\hat S_b^{(2)})$, the negated transverse bond
-energy (oscillator strength of the staggered mode), bounded by the bond energy.
+energy (oscillator strength of the staggered mode), bounded by the bond energy.  The companion
+\texttt{DoubleCommutatorVariational.lean} relates the f-sum-rule oscillator strength to the variational
+energy, \texttt{double\_commutator\_ground\_state\_eq}: for a ground state $H\Phi=E_0\Phi$ and Hermitian
+$A$, $\langle\Phi,[A,[H,A]]\Phi\rangle=2\langle A\Phi,HA\Phi\rangle-2E_0\langle A\Phi,A\Phi\rangle$ --- the
+denominator of the ground-state Falk--Bruch inequality.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
