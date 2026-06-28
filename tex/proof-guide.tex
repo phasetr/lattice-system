@@ -9579,7 +9579,15 @@ for $N$ odd.  \emph{Theorem 6.3}
 positive spectral gap (\texttt{IsPositiveSpectralGap} of §6.1) bounded by $8\pi^2S^2/L$, so a
 half-odd-integer chain can never have both a unique ground state and a nonvanishing gap --- the
 rigorous half of the Haldane conjecture.  Lemmas 6.1 and 6.2 are now discharged (proved theorems);
-only Theorem 6.3 remains a documented axiom.  Chapters~3--10 backfill.
+only Theorem 6.3 remains a documented axiom.  Toward discharging it, the ground-state uniqueness of
+the ring is established (connected-graph Marshall--Lieb--Mattis, \texttt{ringSym\_ground\_uniqueness});
+and \texttt{HermitianSecondEigenvalue.lean} supplies the generic Courant--Fischer
+\emph{second-eigenvalue variational bound} \texttt{hermitian\_second\_eigenvalue\_variational}: for a
+Hermitian $M$ with a one-dimensional $E_0$-eigenspace spanned by $\varphi_0$ and a real $E_1$
+lower-bounding every eigenvalue $\ne E_0$, every $\psi\perp\varphi_0$ obeys
+$E_1\,\|\psi\|^2\le\operatorname{rayleighOnVec} M\,\psi$ (eigenbasis expansion; orthogonality to
+$\varphi_0$ kills the $E_0$ components since the ground line is one-dimensional) --- the step that
+upper-bounds the first-excited energy by the LSM trial energy.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§6.2 Lemma 6.4} (generalized LSM variational bound; Tasaki §6.2,
