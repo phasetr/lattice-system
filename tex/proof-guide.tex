@@ -8427,7 +8427,11 @@ gives $\texttt{rightGauge}\cdot(\hat S_x\cdot\hat S_{r x})\cdot\texttt{rightGaug
 Both ring crossing bonds $(n-1,n)$ and $(2n-1,0)$ are of this form.  The twenty-eighth layer
 (\texttt{RingReflectionNonCrossConj.lean}) sums these: \texttt{rightGauge\_conj\_ringLeftHamiltonian}
 and \texttt{rightGauge\_conj\_theta\_ringLeftHamiltonian} show the gauge fixes both the left bond
-Hamiltonian and the reflected right bond Hamiltonian $\theta(\texttt{ringLeftHamiltonian})$.
+Hamiltonian and the reflected right bond Hamiltonian $\theta(\texttt{ringLeftHamiltonian})$.  The twenty-ninth
+layer (\texttt{RingReflectionGaugeAssembly.lean}) assembles these: \texttt{rightGauge\_conj\_ringHamiltonian}
+shows the right-half gauge conjugates the ring Heisenberg Hamiltonian into the reflection-positive DLS
+Hamiltonian $\texttt{rightGauge}\cdot\hat H\cdot\texttt{rightGaugeInv}=\texttt{ringDLSDecomposition.toHamiltonian}$,
+the unitary equivalence bridging the physical ring antiferromagnet to its reflection-positive form.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
