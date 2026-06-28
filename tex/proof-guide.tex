@@ -8324,7 +8324,13 @@ left-supported $X$, $\exp(X + \theta X) = \exp X \cdot \theta(\exp X) = \theta(\
 $\theta(X)$ commute --- together with $\theta(\exp X)=\exp(\theta X)$ and \texttt{mul\_theta\_comm}),
 so its right-hand side is a single cone generator $\theta(L)\,L$ ($L=\exp X$), giving
 \texttt{coneRep\_exp\_add}: $\exp(X+\theta X)$ is cone-representable.  This is the kinetic building
-block ($e^{-\beta H_0/m}$) that the Trotter expansion of $e^{-\beta H}$ consumes.
+block ($e^{-\beta H_0/m}$) that the Trotter expansion of $e^{-\beta H}$ consumes.  The thirteenth
+layer (\texttt{RingReflectionMulExpConeRep.lean}) shows an RP trace weight absorbs the exponential of
+a cone-representable operator: \texttt{RPTraceWeightS.mul\_exp\_coneRep\_right} --- if $M$ is RP and
+$P$ is cone-representable, then $M\cdot\exp P$ is RP, since the partial sums $\sum_{k<m}(k!)^{-1}P^k$
+are cone-representable, each $M\cdot(\text{partial sum})$ is RP by \texttt{mul\_coneRep\_right}, and
+$M\cdot\exp P$ is their limit (continuity of left multiplication and \texttt{RPTraceWeightS.tendsto}).
+This consumes the interaction Gibbs factor $e^{\beta D/m}$ in the Trotter expansion.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
