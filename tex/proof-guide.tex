@@ -8330,7 +8330,19 @@ a cone-representable operator: \texttt{RPTraceWeightS.mul\_exp\_coneRep\_right} 
 $P$ is cone-representable, then $M\cdot\exp P$ is RP, since the partial sums $\sum_{k<m}(k!)^{-1}P^k$
 are cone-representable, each $M\cdot(\text{partial sum})$ is RP by \texttt{mul\_coneRep\_right}, and
 $M\cdot\exp P$ is their limit (continuity of left multiplication and \texttt{RPTraceWeightS.tendsto}).
-This consumes the interaction Gibbs factor $e^{\beta D/m}$ in the Trotter expansion.
+This consumes the interaction Gibbs factor $e^{\beta D/m}$ in the Trotter expansion.  The fourteenth
+layer (\texttt{RingReflectionGibbsCapstone.lean}) is the \textbf{full Gibbs reflection positivity}:
+for a reflection-positive decomposition $H = H_L + \theta(H_L) - D$ and $\beta \ge 0$, the Gibbs
+weight $\exp(-\beta H)$ is a reflection-positive trace weight
+(\texttt{RPDecomposition.gibbs\_rpTraceWeight}).  The Dyson--Lieb--Simon Trotter assembly writes
+$e^{-\beta H} = e^{A+B}$ with $A = -\beta(H_L+\theta H_L)$, $B = \beta D$, uses the Lie product
+formula $e^{A+B} = \lim_m (e^{A/m} e^{B/m})^m$ (\texttt{lieProductFormula}), and consumes each finite
+factor with an accumulating RP trace weight --- the kinetic factor $e^{A/m} = \exp(Y+\theta Y)$ is
+cone-representable (\texttt{coneRep\_exp\_add}, absorbed by \texttt{mul\_coneRep\_right}) and the
+interaction factor $e^{B/m}$ is the exponential of a cone-representable operator (absorbed by
+\texttt{mul\_exp\_coneRep\_right}) --- then concludes by induction over the power and
+\texttt{RPTraceWeightS.tendsto}.  This is the reflection positivity at the heart of the
+Dyson--Lieb--Simon / Shastry argument.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
