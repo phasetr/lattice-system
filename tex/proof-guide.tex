@@ -8447,7 +8447,12 @@ carrying every reflection-positivity bound back to the physical ring antiferroma
 \operatorname{Tr}(M\theta(A-tB)(A-tB))$ as a nonnegative quadratic in $t$ and taking its discriminant gives
 $(\operatorname{Re}\operatorname{Tr}(M\theta(A)B)+\operatorname{Re}\operatorname{Tr}(M\theta(B)A))^2\le
 4\operatorname{Re}\operatorname{Tr}(M\theta(A)A)\operatorname{Re}\operatorname{Tr}(M\theta(B)B)$ --- the workhorse for
-the Dyson--Lieb--Simon infrared bound.
+the Dyson--Lieb--Simon infrared bound.  The thirty-third layer
+(\texttt{RingReflectionTraceReality.lean}) records that the reflection map conjugates the trace,
+\texttt{ringReflectionThetaS\_trace}: $\operatorname{Tr}(\theta X)=\overline{\operatorname{Tr}X}$ (reindex the
+diagonal by the involutive site reflection); hence for a reflection-invariant weight $M$ ($\theta M=M$) and
+left-supported $A$ the form diagonal $\operatorname{Tr}(M\theta(A)A)$ is real (\texttt{rpForm\_diag\_im\_zero}),
+so $(A,B)\mapsto\operatorname{Tr}(M\theta(A)B)$ is a genuine positive-semidefinite form with real diagonal.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
