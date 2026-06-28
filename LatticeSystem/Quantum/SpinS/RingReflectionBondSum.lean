@@ -16,25 +16,25 @@ open Matrix
 variable {n N : ℕ}
 
 /-- The cyclic successor on the ring `Fin (2n)`: `x ↦ x + 1 (mod 2n)`. -/
-def ringSucc (n : ℕ) (x : Fin (2 * n)) : Fin (2 * n) :=
+def ringBondSucc (n : ℕ) (x : Fin (2 * n)) : Fin (2 * n) :=
   ⟨(x.val + 1) % (2 * n), Nat.mod_lt _ (by have := x.isLt; omega)⟩
 
 /-- The underlying value of the cyclic successor. -/
-@[simp] theorem ringSucc_val (x : Fin (2 * n)) :
-    (ringSucc n x).val = (x.val + 1) % (2 * n) := rfl
+@[simp] theorem ringBondSucc_val (x : Fin (2 * n)) :
+    (ringBondSucc n x).val = (x.val + 1) % (2 * n) := rfl
 
 /-- **The ring Heisenberg Hamiltonian as a bond sum.**  The directed nearest-neighbor coupling
 collapses the double sum to a single sum over the bonds `(x, x+1)`. -/
 theorem heisenbergHamiltonianS_ringCoupling_eq_bondSum (n N : ℕ) :
     heisenbergHamiltonianS (ringCoupling (2 * n)) N
-      = ∑ x : Fin (2 * n), spinSDot x (ringSucc n x) N := by
+      = ∑ x : Fin (2 * n), spinSDot x (ringBondSucc n x) N := by
   rw [heisenbergHamiltonianS_def]
   refine Finset.sum_congr rfl (fun x _ => ?_)
-  rw [Finset.sum_eq_single (ringSucc n x)]
-  · rw [ringCoupling, if_pos (ringSucc_val x), one_smul]
+  rw [Finset.sum_eq_single (ringBondSucc n x)]
+  · rw [ringCoupling, if_pos (ringBondSucc_val x), one_smul]
   · intro y _ hy
     have hne : ¬ ((y : ℕ) = (x.val + 1) % (2 * n)) := fun hcond =>
-      hy (Fin.ext (by rw [ringSucc_val]; exact hcond))
+      hy (Fin.ext (by rw [ringBondSucc_val]; exact hcond))
     rw [ringCoupling, if_neg hne, zero_smul]
   · intro h; exact absurd (Finset.mem_univ _) h
 
