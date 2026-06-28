@@ -8301,7 +8301,16 @@ $\exp(t\cdot\texttt{crossBondInteractionS}\,x)$ ($t\ge 0$) is a reflection-posit
 \texttt{mul\_theta\_comm} and the interaction-exponential cone).  The abstract \texttt{RPDecomposition}
 structure ($H_L + \theta(H_L) - \sum_b C_b\,\theta(C_b)$, all $C_b$ left-supported) packages the DLS
 form, with \texttt{interaction\_exp\_rpTraceWeight} giving the reflection positivity of the Gibbs
-interaction factor.
+interaction factor.  The tenth layer (\texttt{RingReflectionGibbsRP.lean}) records the closure of
+reflection-positive trace weights under cone generators $\theta(L)\,L$ ($L$ left-supported).  The
+naive ``conjugation'' closure $M \mapsto L\,M\,\theta(L)$ is \emph{false} --- the homomorphism order
+$\theta(LA) = \theta(L)\theta(A)$ clashes with the test operator $B = AL$, and left-supported
+operators do not commute.  The correct closure multiplies by a cone generator:
+\texttt{RPTraceWeightS.mul\_weightGen\_right} ($M\,(\theta(L)\,L)$ is RP, substituting the test
+operator $A \mapsto L\,A$ and using $L\,\theta(A) = \theta(A)\,L$, $\theta(L)\theta(A) = \theta(LA)$)
+and \texttt{RPTraceWeightS.weightGen\_mul\_left} ($(\theta(L)\,L)\,M$ is RP, substituting
+$A \mapsto A\,L$ via trace cyclicity).  These are the kinetic-factor building blocks of the full
+Dyson--Lieb--Simon Gibbs reflection positivity.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
