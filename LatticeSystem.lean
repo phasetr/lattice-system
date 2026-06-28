@@ -86,6 +86,7 @@ import LatticeSystem.Quantum.SpinS.RingReflectionLeftHamiltonian
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSum
 import LatticeSystem.Quantum.SpinS.RingReflectionLeftBondSum
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSplit
+import LatticeSystem.Quantum.SpinS.RingReflectionRightEqTheta
 import LatticeSystem.Quantum.SpinS.RingReflectionRightBondSum
 import LatticeSystem.Quantum.SpinS.RingReflectionConcreteGibbs
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO
