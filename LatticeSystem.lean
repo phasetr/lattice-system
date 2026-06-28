@@ -73,6 +73,7 @@ import LatticeSystem.Quantum.SpinS.RingReflectionPositivity
 import LatticeSystem.Quantum.SpinS.RingReflectionTraceCone
 import LatticeSystem.Quantum.SpinS.RingReflectionWeightedCone
 import LatticeSystem.Quantum.SpinS.RingReflectionGibbsCone
+import LatticeSystem.Quantum.SpinS.RingReflectionGibbsExp
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO
 import LatticeSystem.Quantum.SpinS.FerrimagneticLROCapstone
 import LatticeSystem.Quantum.SpinS.StaggeredCasimirSU2Invariance
