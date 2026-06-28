@@ -8540,7 +8540,10 @@ S_b^{(1)}+\hat S_a^{(2)}\hat S_b^{(2)}\|\le2N^2$ (per-site $\|\hat S^{(\alpha)}\
 so the oscillator strength is $O(L)$.  In a normalized state
 \texttt{TransverseBondEnergyExpectation.lean} turns this into an expectation bound
 \texttt{transverseBondEnergy\_expectation\_abs\_le}: $|\langle\Phi,(\hat S_a^{(1)}\hat S_b^{(1)}+\hat
-S_a^{(2)}\hat S_b^{(2)})\Phi\rangle|\le2N^2$ (norm bound + the norm--expectation bridge + $\|\Phi\|=1$).
+S_a^{(2)}\hat S_b^{(2)})\Phi\rangle|\le2N^2$ (norm bound + the norm--expectation bridge + $\|\Phi\|=1$).  The general form
+\texttt{ExpectationNormBound.lean} records \texttt{expectation\_abs\_le\_manyBodyOperatorNormS}: for any
+$M$ and normalized $\Phi$, $|\langle\Phi,M\Phi\rangle|\le\|M\|$, converting operator-norm bounds into
+expectation bounds in the Falk--Bruch argument.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
