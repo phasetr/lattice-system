@@ -8540,6 +8540,9 @@ O]]\Phi\rangle=\sum_x\sum_z\varepsilon_x\varepsilon_z\langle\Phi,[\hat S_x^{(3)}
 the oscillator strength as a double sum of two-site expectations.  \texttt{RingBondSumGeneral.lean} records the
 ring Hamiltonian on any length as a bond sum, \texttt{heisenbergHamiltonianS\_ringCoupling\_eq\_bondSum\_general}:
 $\hat H=\sum_x\hat S_x\cdot\hat S_{\texttt{finRotate}\,x}$, used to localize $[\hat H,\hat S_z^{(3)}]$ to the two
+bonds incident to $z$.  \texttt{RingHamiltonianCommutatorBondSum.lean} carries out the first
+step, \texttt{heisenbergHamiltonianS\_ringCoupling\_commutator\_onSiteS\_spinSOp3}: $[\hat H,\hat
+S_z^{(3)}]=\sum_x[\hat S_x\cdot\hat S_{x+1},\hat S_z^{(3)}]$, localizing the spin-current divergence to the
 bonds incident to $z$.  \texttt{TransverseBondEnergyNorm.lean}
 bounds each summand: \texttt{transverseBondEnergy\_manyBodyOperatorNormS\_le} gives $\|\hat S_a^{(1)}\hat
 S_b^{(1)}+\hat S_a^{(2)}\hat S_b^{(2)}\|\le2N^2$ (per-site $\|\hat S^{(\alpha)}\|\le N$ + submultiplicativity),
