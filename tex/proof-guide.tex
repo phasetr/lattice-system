@@ -8416,6 +8416,11 @@ The twenty-fifth layer (\texttt{RingReflectionGaugeConj.lean}) shows conjugation
 gauge is an algebra homomorphism: \texttt{rightGauge\_conj\_mul}/\texttt{\_add}/\texttt{\_smul}/\texttt{\_sum}
 distribute over products, sums, scalars, and finite sums, so (with \texttt{rightGauge\_conj\_onSiteS})
 the gauge image of any operator built from single-site operators is computable.
+The twenty-sixth layer (\texttt{RingReflectionBondConj.lean}) proves the gauge fixes every
+non-crossing bond: \texttt{rightGauge\_conj\_spinSDot\_left} (left bond, both sites $<n$,
+untouched) and \texttt{rightGauge\_conj\_spinSDot\_right} (right bond, both sites gauged --- the
+$\hat S^1$/$\hat S^3$ sign flips cancel, $\hat S^2$ unchanged).  Only the two crossing bonds acquire
+the DLS sign flip.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
