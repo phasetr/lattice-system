@@ -8354,6 +8354,12 @@ $\texttt{toHamiltonian} = H_L + \theta(H_L) - (\text{crossing})$.  Then
 \texttt{ring\_gibbs\_rpTraceWeight} concludes that the gauged ring Gibbs weight is a
 reflection-positive trace weight ($\beta \ge 0$).  The concrete left-bond $H_L$ and the unitary
 equivalence to the ungauged $\texttt{heisenbergHamiltonianS}\,(\texttt{ringCoupling}\,(2n))$ are the
+next step.  The sixteenth layer (\texttt{RingReflectionLeftHamiltonian.lean}) supplies the concrete
+left part $H_L$: \texttt{heisenbergHamiltonianS\_supportedOnLeft} (a Heisenberg Hamiltonian whose
+coupling vanishes unless both sites lie in the left half is left-supported, being a sum of scalar
+multiples of left-half two-site dot products), the restricted coupling \texttt{ringLeftCoupling}, and
+\texttt{ringLeftHamiltonian}, the left-supported $H_L$ that feeds the ring DLS decomposition.  The
+remaining bond-split identification with the gauged ring Hamiltonian and the unitary ungauge are the
 next step.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
