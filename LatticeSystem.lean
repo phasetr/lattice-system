@@ -53,6 +53,7 @@ import LatticeSystem.Quantum.SpinS.SingleBondDoubleCommutator
 import LatticeSystem.Quantum.SpinS.DoubleCommutatorVariational
 import LatticeSystem.Quantum.SpinS.DoubleCommutatorNonneg
 import LatticeSystem.Quantum.SpinS.FalkBruch
+import LatticeSystem.Quantum.SpinS.HermitianSubMinPosSemidef
 import LatticeSystem.Quantum.SpinS.HaldaneConjecture
 import LatticeSystem.Quantum.SpinS.AKLT
 import LatticeSystem.Quantum.SpinS.AKLTBondProjection

@@ -8521,7 +8521,10 @@ the Rayleigh minimum) --- the sign of the Falk--Bruch numerator.  \texttt{FalkBr
 ground-state Falk--Bruch inequality \texttt{falkBruch\_of\_mulVec\_eq}: for positive-semidefinite $K$ and
 $w$ in the range of $K$ ($Ky=w$), $(\operatorname{Re}\langle w,w\rangle)^2\le\operatorname{Re}\langle w,Kw\rangle
 \cdot\operatorname{Re}\langle y,w\rangle$ --- an immediate instance of the PSD Cauchy--Schwarz with second
-argument $y$, requiring neither the spectral theorem nor a pseudo-inverse.
+argument $y$, requiring neither the spectral theorem nor a pseudo-inverse.  The companion
+\texttt{HermitianSubMinPosSemidef.lean} supplies the PSD operator $K$: \texttt{hermitianSubMin\_posSemidef}
+shows $H-E_0$ ($E_0=\texttt{hermitianMinEigenvalue}$) is positive-semidefinite --- its quadratic form is
+real (Hermiticity) with nonnegative real part (the variational lower bound).
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
