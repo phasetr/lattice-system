@@ -8485,7 +8485,11 @@ thermal-state translation symmetry used by the momentum-space infrared analysis.
 $\tau(X)=T^\dagger X T$ is a trace-preserving $*$-homomorphism, \texttt{chessboard\_ringTranslateConj\_of}
 shows any chessboard estimate holds verbatim for the translation-conjugated data $(\tau M,\tau(\theta A),
 \tau B)$, where $\tau M$ is the Marshall gauge relative to the shifted reflection plane --- carrying the
-single-axis chessboard to every bond of the ring toward Gaussian domination.
+single-axis chessboard to every bond of the ring toward Gaussian domination.  The fortieth layer
+(\texttt{RingReflectionCauchySchwarzSqrt.lean}) takes square roots in the chessboard to obtain the usable
+Cauchy--Schwarz form \texttt{rpTraceWeight\_cauchySchwarz\_abs}: $|\operatorname{Re}\operatorname{Tr}(M\theta(A)B)|
+\le\sqrt{\operatorname{Re}\operatorname{Tr}(M\theta(A)A)}\,\sqrt{\operatorname{Re}\operatorname{Tr}(M\theta(B)B)}$ (the
+diagonals are nonnegative since $M$ is reflection-positive), the form iterated in the DLS spreading argument.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
