@@ -8452,7 +8452,14 @@ the Dyson--Lieb--Simon infrared bound.  The thirty-third layer
 \texttt{ringReflectionThetaS\_trace}: $\operatorname{Tr}(\theta X)=\overline{\operatorname{Tr}X}$ (reindex the
 diagonal by the involutive site reflection); hence for a reflection-invariant weight $M$ ($\theta M=M$) and
 left-supported $A$ the form diagonal $\operatorname{Tr}(M\theta(A)A)$ is real (\texttt{rpForm\_diag\_im\_zero}),
-so $(A,B)\mapsto\operatorname{Tr}(M\theta(A)B)$ is a genuine positive-semidefinite form with real diagonal.
+so $(A,B)\mapsto\operatorname{Tr}(M\theta(A)B)$ is a genuine positive-semidefinite form with real diagonal.  The thirty-fourth layer
+(\texttt{RingReflectionChessboard.lean}) proves the chessboard inequality: for a reflection-invariant RP
+weight $M$ ($\theta M=M$) and left-supported $A,B$, the off-diagonal value is symmetric
+(\texttt{rpForm\_re\_symm}, $\operatorname{Re}\operatorname{Tr}(M\theta(A)B)=\operatorname{Re}\operatorname{Tr}(M\theta(B)A)$,
+since $A$ commutes with the right-half $\theta B$); feeding this into the Cauchy--Schwarz discriminant
+collapses the cross term, giving \texttt{rpTraceWeight\_reflection\_step}:
+$(\operatorname{Re}\operatorname{Tr}(M\theta(A)B))^2\le\operatorname{Re}\operatorname{Tr}(M\theta(A)A)\,\operatorname{Re}
+\operatorname{Tr}(M\theta(B)B)$ --- the DLS factorization step underlying Gaussian domination.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
