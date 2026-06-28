@@ -8397,7 +8397,14 @@ of the left bonds, so reindexing by the bijection $x \mapsto r(x+1)$ (the cyclic
 symmetry of $\hat S_x\cdot\hat S_y$ gives \texttt{ringRightBondSum\_eq\_theta}:
 $\texttt{ringRightBondSum} = \theta(\texttt{ringLeftHamiltonian})$.  Combined with the bond split,
 $\texttt{heisenbergHamiltonianS}\,(\texttt{ringCoupling}\,(2n)) = \texttt{ringLeftHamiltonian}
-+ \theta(\texttt{ringLeftHamiltonian}) + (\text{ungauged crossing bonds})$.
++ \theta(\texttt{ringLeftHamiltonian}) + (\text{ungauged crossing bonds})$.  The twenty-third layer
+(\texttt{RingReflectionUngaugedDLS.lean}) records this combination as
+\texttt{heisenbergHamiltonianS\_ringCoupling\_ungauged\_dls}:
+$\texttt{heisenbergHamiltonianS}\,(\texttt{ringCoupling}\,(2n)) = \texttt{ringLeftHamiltonian}
++ \theta(\texttt{ringLeftHamiltonian}) + (\hat S_{n-1}\cdot\hat S_n + \hat S_{2n-1}\cdot\hat S_0)$.
+The crossing term is the \emph{ungauged} antiferromagnetic crossing bond; it differs from the gauged
+\texttt{crossBondInteractionS} (with the $\hat S^2$ sign flipped) by the DLS/Marshall gauge, bridged by
+the gauge unitary in the next step.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
