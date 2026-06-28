@@ -8317,7 +8317,14 @@ cone: \texttt{RPTraceWeightS.zero}/\texttt{one} (the identity is RP --- the $\be
 \texttt{RPTraceWeightS.mul\_coneRep\_right} (an RP trace weight times a cone-representable operator is
 again RP, since $M\cdot\sum_i c_i\,\theta(C_i)C_i = \sum_i c_i\,(M\cdot\theta(C_i)C_i)$, each summand
 RP by the cone-generator closure).  This is the algebraic engine that accumulates reflection
-positivity factor by factor in the Trotter expansion of $e^{-\beta H}$.
+positivity factor by factor in the Trotter expansion of $e^{-\beta H}$.  The twelfth layer
+(\texttt{RingReflectionKineticConeRep.lean}) shows the kinetic Gibbs factor is cone-representable: for
+left-supported $X$, $\exp(X + \theta X) = \exp X \cdot \theta(\exp X) = \theta(\exp X)\cdot \exp X$
+(\texttt{ringReflectionThetaS\_exp\_add\_eq}, using \texttt{exp\_add\_of\_commute} --- $X$ and
+$\theta(X)$ commute --- together with $\theta(\exp X)=\exp(\theta X)$ and \texttt{mul\_theta\_comm}),
+so its right-hand side is a single cone generator $\theta(L)\,L$ ($L=\exp X$), giving
+\texttt{coneRep\_exp\_add}: $\exp(X+\theta X)$ is cone-representable.  This is the kinetic building
+block ($e^{-\beta H_0/m}$) that the Trotter expansion of $e^{-\beta H}$ consumes.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
