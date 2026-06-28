@@ -8480,7 +8480,12 @@ layer (\texttt{RingTranslationGibbs.lean}) records the complementary translation
 \emph{physical} ring (the gauge breaks it, but the ungauged Heisenberg Hamiltonian does not):
 \texttt{chainTranslation\_conj\_gibbs} ($\exp(-\beta\hat H)$ translation invariant) and
 \texttt{thermalAverageReS\_chainTranslation} ($\langle T^\dagger A T\rangle=\langle A\rangle$), the
-thermal-state translation symmetry used by the momentum-space infrared analysis.
+thermal-state translation symmetry used by the momentum-space infrared analysis.  The thirty-ninth layer
+(\texttt{RingReflectionChessboardTransport.lean}) transports the chessboard across planes: since
+$\tau(X)=T^\dagger X T$ is a trace-preserving $*$-homomorphism, \texttt{chessboard\_ringTranslateConj\_of}
+shows any chessboard estimate holds verbatim for the translation-conjugated data $(\tau M,\tau(\theta A),
+\tau B)$, where $\tau M$ is the Marshall gauge relative to the shifted reflection plane --- carrying the
+single-axis chessboard to every bond of the ring toward Gaussian domination.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
