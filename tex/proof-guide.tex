@@ -8310,7 +8310,14 @@ operators do not commute.  The correct closure multiplies by a cone generator:
 operator $A \mapsto L\,A$ and using $L\,\theta(A) = \theta(A)\,L$, $\theta(L)\theta(A) = \theta(LA)$)
 and \texttt{RPTraceWeightS.weightGen\_mul\_left} ($(\theta(L)\,L)\,M$ is RP, substituting
 $A \mapsto A\,L$ via trace cyclicity).  These are the kinetic-factor building blocks of the full
-Dyson--Lieb--Simon Gibbs reflection positivity.
+Dyson--Lieb--Simon Gibbs reflection positivity.  The eleventh layer
+(\texttt{RingReflectionRPWeightCone.lean}) shows the reflection-positive trace weights form a convex
+cone: \texttt{RPTraceWeightS.zero}/\texttt{one} (the identity is RP --- the $\beta=0$ trace cone),
+\texttt{add}, \texttt{smul\_nonneg}, \texttt{sum}, and the key
+\texttt{RPTraceWeightS.mul\_coneRep\_right} (an RP trace weight times a cone-representable operator is
+again RP, since $M\cdot\sum_i c_i\,\theta(C_i)C_i = \sum_i c_i\,(M\cdot\theta(C_i)C_i)$, each summand
+RP by the cone-generator closure).  This is the algebraic engine that accumulates reflection
+positivity factor by factor in the Trotter expansion of $e^{-\beta H}$.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
