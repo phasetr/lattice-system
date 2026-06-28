@@ -116,6 +116,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandTheorem1115
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralBasisHN
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveReflection
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveCoeffAction
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBlockOrder
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
