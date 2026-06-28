@@ -11,7 +11,6 @@ unconditional Corollary 4.3 to the susceptibility bound `Re⟨y, ÔΦ⟩ ≤ C·
 -/
 import LatticeSystem.Quantum.SpinS.StaggeredOrderSusceptibility
 import LatticeSystem.Quantum.SpinS.HermitianGroundStateEigenvalue
-import LatticeSystem.Quantum.SpinS.AndersonTowerEnergyBound
 
 namespace LatticeSystem.Quantum
 
