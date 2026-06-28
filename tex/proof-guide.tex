@@ -8435,7 +8435,12 @@ the unitary equivalence bridging the physical ring antiferromagnet to its reflec
 (\texttt{RingReflectionGibbsGauge.lean}) lifts this to the Gibbs operator: since conjugation commutes
 with the matrix exponential (\texttt{Matrix.exp\_units\_conj}), \texttt{exp\_neg\_smul\_toHamiltonian\_eq}
 shows $\exp(-\beta\cdot\texttt{toHamiltonian})=\texttt{rightGauge}\cdot\exp(-\beta\hat H)\cdot\texttt{rightGaugeInv}$,
-so physical thermal averages become DLS thermal averages of gauge-transformed observables.
+so physical thermal averages become DLS thermal averages of gauge-transformed observables.  The thirty-first
+layer (\texttt{RingReflectionThermalTransfer.lean}) makes this quantitative: the gauge is a similarity
+transform, so \texttt{thermalPartitionFnS\_toHamiltonian\_eq} ($Z$ gauge-invariant) and
+\texttt{thermalAverageReS\_toHamiltonian\_eq} show the physical ring Heisenberg canonical average of $A$
+equals the DLS canonical average of $\texttt{rightGauge}\cdot A\cdot\texttt{rightGaugeInv}$ --- the bridge
+carrying every reflection-positivity bound back to the physical ring antiferromagnet.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
