@@ -8489,7 +8489,12 @@ single-axis chessboard to every bond of the ring toward Gaussian domination.  Th
 (\texttt{RingReflectionCauchySchwarzSqrt.lean}) takes square roots in the chessboard to obtain the usable
 Cauchy--Schwarz form \texttt{rpTraceWeight\_cauchySchwarz\_abs}: $|\operatorname{Re}\operatorname{Tr}(M\theta(A)B)|
 \le\sqrt{\operatorname{Re}\operatorname{Tr}(M\theta(A)A)}\,\sqrt{\operatorname{Re}\operatorname{Tr}(M\theta(B)B)}$ (the
-diagonals are nonnegative since $M$ is reflection-positive), the form iterated in the DLS spreading argument.
+diagonals are nonnegative since $M$ is reflection-positive), the form iterated in the DLS spreading argument.  Toward Corollary~4.3,
+\texttt{StaggeredOrderSquare.lean} records the two-point expansion of the staggered order parameter
+\texttt{staggeredOrderOpS\_sq\_eq\_sum}: $\hat O^2=\sum_x\sum_y\varepsilon_x\varepsilon_y\hat S_x^{(3)}\hat S_y^{(3)}$,
+the bridge from the order parameter to the two-point functions bounded by the reflection-positivity
+machinery (the squared order parameter per $L^2$ is controlled by the total two-point sum, only $O(L)$
+in one dimension).
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
