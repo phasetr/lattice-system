@@ -7,8 +7,39 @@ operator and the staggered-field chain Hamiltonian.  The two key geometric facts
 orientation-reversal of the directed ring coupling under reflection and the staggered-sign flip.
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionTheta
+import LatticeSystem.Quantum.SpinS.MultiSiteDot
 
 namespace LatticeSystem.Quantum
+
+variable {n N : ℕ}
+
+/-- `Ŝ^{(1)}` has real entries, so it is fixed by entrywise conjugation. -/
+theorem spinSOp1_map_conj (N : ℕ) : (spinSOp1 N).map (starRingEnd ℂ) = spinSOp1 N := by
+  ext i j
+  exact Complex.conj_eq_iff_im.mpr (spinSOp1_apply_im_zero N i j)
+
+/-- `Ŝ^{(3)}` has real entries, so it is fixed by entrywise conjugation. -/
+theorem spinSOp3_map_conj (N : ℕ) : (spinSOp3 N).map (starRingEnd ℂ) = spinSOp3 N := by
+  ext i j
+  exact Complex.conj_eq_iff_im.mpr (spinSOp3_apply_im_zero N i j)
+
+/-- `Ŝ^{(2)}` has pure-imaginary entries, so entrywise conjugation negates it. -/
+theorem spinSOp2_map_conj (N : ℕ) : (spinSOp2 N).map (starRingEnd ℂ) = -(spinSOp2 N) := by
+  ext i j
+  rw [Matrix.map_apply, Matrix.neg_apply]
+  apply Complex.ext
+  · simp [spinSOp2_apply_re_zero]
+  · simp
+
+/-- **`θ` fixes the two-site dot product (up to reflection)**: `θ(Ŝ_x · Ŝ_y) = Ŝ_{r x} · Ŝ_{r y}`.
+`θ` is a homomorphism; the `Ŝ^{(2)}` factors each pick up a sign under conjugation, but the two
+signs cancel in every product, so the dot product is reflected without sign. -/
+theorem ringReflectionThetaS_spinSDot (x y : Fin (2 * n)) :
+    ringReflectionThetaS n N (spinSDot x y N)
+      = spinSDot (ringReflect n x) (ringReflect n y) N := by
+  simp only [spinSDot_def, ringReflectionThetaS_add, ringReflectionThetaS_mul,
+    ringReflectionThetaS_onSiteS, spinSOp1_map_conj, spinSOp2_map_conj, spinSOp3_map_conj,
+    onSiteS_neg, neg_mul_neg]
 
 /-- **Orientation reversal of the ring coupling under bond reflection**:
 `J (r x) (r y) = J y x`.  The bond reflection `r(x) = 2n − 1 − x` reverses the cyclic orientation,
