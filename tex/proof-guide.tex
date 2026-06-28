@@ -5456,6 +5456,26 @@ analogues). This is the structural fact that lets the kinetic term factor as a
 left action (up) and right action (down) on the coefficient matrix in the next
 layer.
 
+\medskip
+\noindent\textbf{A single same-species hop acts on a single spin species (PR4).}
+In file \texttt{LiebAttractiveHopAction.lean} we turn the sign separation into a
+basis-state action. Writing the single-particle hop on a configuration as
+$\texttt{hubbardSpinHopConfig}\,N\,u\,j\,i$ (empty the source $j$, fill the target
+$i$) and proving that updating the block merge at an up (resp. down) orbital
+updates only the up (resp. down) configuration
+($\texttt{hubbardBlockMergeConfig\_update\_up/down}$), the single hop
+$\hat c^\dagger_{\mathrm{block}\,i\,\sigma}\hat c_{\mathrm{block}\,j\,\sigma}$
+acts on a block-merge basis state by hopping \emph{only} its own spin's
+configuration, with the PR3-separated Jordan--Wigner sign:
+$\hat c^\dagger_{\mathrm{block}\,i\,0}\hat c_{\mathrm{block}\,j\,0}
+|\mathrm{merge}\,u\,d\rangle = (-1)^{\sum_{j<k<i}u_k}\,
+|\mathrm{merge}\,(\mathrm{hop}\,u)\,d\rangle$ (and the backward and down-spin
+analogues, $\texttt{hubbardBlock\_upHop\_forward\_mulVec}$ etc.). This is the
+basis-level form of the kinetic left/right coefficient-matrix action; assembling
+the block-ordered kinetic operator and connecting it to the interleaved
+$\texttt{hubbardKinetic}$ via a signed mode-permutation operator are the next
+layers.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
