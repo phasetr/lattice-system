@@ -8270,7 +8270,17 @@ closure via \texttt{weightGen\_mul}: $(\theta C\,C)(\theta D\,D)=\theta(CD)\,(CD
 \texttt{RPTraceConeRepS.rpTraceWeight} (representable $\Rightarrow$ RP trace weight), and
 \texttt{RPTraceWeightS.tendsto} (RP trace weights are closed under limits, by finite-dimensional
 trace continuity).  The next layer mounts the interaction Gibbs exponential
-$\exp\!\big(t\sum_i c_i\,\theta(C_i)\,C_i\big)$ as a limit of cone-representable partial sums.
+$\exp\!\big(t\sum_i c_i\,\theta(C_i)\,C_i\big)$ as a limit of cone-representable partial sums.  The
+seventh layer (\texttt{RingReflectionGibbsExp.lean}) carries this out:
+\texttt{rpInteractionExp\_reflectionPositive} shows that for a nonnegative finite interaction
+$D = t\sum_i c_i\,\theta(C_i)\,C_i$ ($t, c_i \ge 0$, $C_i$ left-supported) the matrix exponential
+$\exp D$ is a reflection-positive trace weight.  Each partial sum $\sum_{k<m}(k!)^{-1}D^k$ of the
+exponential series is cone-representable (closure under \texttt{smul\_nonneg}/\texttt{add}/\texttt{pow}),
+hence an RP trace weight, and $\exp D$ is their limit
+(\texttt{expSeries\_summable'.hasSum.tendsto\_sum\_nat}), so \texttt{RPTraceWeightS.tendsto} applies.
+The matrix exponential uses the $L^\infty$-operator-norm Banach structure
+(\texttt{open scoped Matrix.Norms.Operator}), whose topology coincides with the entrywise (Pi)
+topology underlying the trace continuity, so there is no topology diamond.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
