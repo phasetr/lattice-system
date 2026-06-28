@@ -9,6 +9,7 @@ SU(2) factor.  This is the building block of `[Ĥ, Ŝ_z^{(3)}]` (the spin-curren
 double commutator entering the infrared / f-sum-rule bound on the staggered two-point function.
 -/
 import LatticeSystem.Quantum.SpinS.MultiSiteDot
+import LatticeSystem.Quantum.SpinS.MultiSiteCommutator
 import LatticeSystem.Quantum.SpinS.CyclicCommutator23
 import LatticeSystem.Quantum.SpinS.CyclicCommutator31
 
@@ -24,15 +25,8 @@ private lemma leibniz_commutatorS (A B T : ManyBodyOpS Λ N) :
     A * B * T - T * (A * B) = A * (B * T - T * B) + (A * T - T * A) * B := by
   rw [mul_sub, sub_mul, mul_assoc, mul_assoc, mul_assoc]; abel
 
-/-- The commutator of two single-site operators at the **same** site:
-`[onSiteS i A, onSiteS i B] = onSiteS i (A·B − B·A)`. -/
-theorem onSiteS_commutator_same (i : Λ) (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
-    (onSiteS i A : ManyBodyOpS Λ N) * onSiteS i B - onSiteS i B * onSiteS i A
-      = onSiteS i (A * B - B * A) := by
-  rw [onSiteS_mul_onSiteS_same, onSiteS_mul_onSiteS_same, onSiteS_sub]
-
 /-- The commutator of two single-site operators at **different** sites vanishes. -/
-theorem onSiteS_commutator_of_ne {i j : Λ} (hij : i ≠ j)
+private theorem onSiteS_commutator_of_ne {i j : Λ} (hij : i ≠ j)
     (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
     (onSiteS i A : ManyBodyOpS Λ N) * onSiteS j B - onSiteS j B * onSiteS i A = 0 := by
   rw [(onSiteS_commute_of_ne hij A B).eq, sub_self]
