@@ -46,5 +46,6 @@ import LatticeSystem.Quantum.SpinS.RingReflectionChessboard
 import LatticeSystem.Quantum.SpinS.RingReflectionThetaInvariance
 import LatticeSystem.Quantum.SpinS.RingReflectionGibbsChessboard
 import LatticeSystem.Quantum.SpinS.RingReflectionTranslation
+import LatticeSystem.Quantum.SpinS.RingReflectionCauchySchwarzSqrt
 import LatticeSystem.Quantum.SpinS.RingReflectionRightBondSum
 import LatticeSystem.Quantum.SpinS.RingReflectionConcreteGibbs
