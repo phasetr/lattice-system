@@ -8280,7 +8280,14 @@ hence an RP trace weight, and $\exp D$ is their limit
 (\texttt{expSeries\_summable'.hasSum.tendsto\_sum\_nat}), so \texttt{RPTraceWeightS.tendsto} applies.
 The matrix exponential uses the $L^\infty$-operator-norm Banach structure
 (\texttt{open scoped Matrix.Norms.Operator}), whose topology coincides with the entrywise (Pi)
-topology underlying the trace continuity, so there is no topology diamond.
+topology underlying the trace continuity, so there is no topology diamond.  The eighth layer
+(\texttt{RingReflectionExpSupport.lean}) records two facts about the matrix exponential and the
+left subalgebra: \texttt{SupportedOnLeftS.exp} ($X$ left-supported $\Rightarrow \exp X$
+left-supported --- the left subalgebra is closed under products, sums, scalars and entrywise limits
+(\texttt{SupportedOnLeftS.of\_tendsto}), and $\exp X$ is the limit of its partial sums) and
+\texttt{ringReflectionThetaS\_exp} ($\theta(\exp X) = \exp(\theta X)$, since $\theta$ is a continuous
+conjugate-linear $*$-automorphism with real exponential coefficients).  These are the building blocks
+for the $e^{-\beta H_L}$ Hamiltonian factor of the full Gibbs reflection-positivity decomposition.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
