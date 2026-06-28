@@ -8465,7 +8465,12 @@ reflection-invariant, \texttt{ringReflectionThetaS\_toHamiltonian}: $\theta(\tex
 \texttt{toHamiltonian}$ (the $H_L+\theta(H_L)$ part is swapped to itself; each crossing bond is fixed since
 $\hat S_x^\alpha$ commutes with $\theta(\hat S_x^\alpha)$), hence the gauged Gibbs weight is
 reflection-invariant (\texttt{ringReflectionThetaS\_ringDLSGibbs}), supplying the $\theta M=M$ hypothesis
-for the chessboard and real-diagonal lemmas.
+for the chessboard and real-diagonal lemmas.  The thirty-sixth layer
+(\texttt{RingReflectionGibbsChessboard.lean}) combines these: since the gauged ring Gibbs weight
+$M=\exp(-\beta\,\texttt{toHamiltonian})$ is both reflection-positive and reflection-invariant,
+\texttt{ringDLSGibbs\_reflection\_step} is the concrete chessboard estimate
+$(\operatorname{Re}\operatorname{Tr}(M\theta(A)B))^2\le\operatorname{Re}\operatorname{Tr}(M\theta(A)A)\,\operatorname{Re}
+\operatorname{Tr}(M\theta(B)B)$ for the thermal state of the physical ring antiferromagnet.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
