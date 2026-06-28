@@ -8234,7 +8234,8 @@ staggered sign flips), $\theta(\hat H) = \hat H$ (reindexing $(x,y)\mapsto(r(y),
 orientation reversal and dot-product symmetry), and $\theta(\hat H_h) = \hat H_{-h}$ --- the
 reflection symmetry exchanging the two staggered ground states.  The third layer
 (\texttt{RingReflectionPositivity.lean}) introduces the left-half subalgebra \texttt{SupportedOnLeftS}
-(operators acting trivially on the right half $\{n,\dots,2n-1\}$, closed under sums, products, scalar
+(the subalgebra $B(\mathcal H_{\mathrm{left}})\otimes I_{\mathrm{right}}$: entries vanish off the
+right-diagonal and are independent of the common right-half value; closed under sums and scalar
 multiples, with left-site $\hat o_x$ generators), shows $\theta$ maps left-supported operators to
 right-supported ones, and defines the reflection-positive functional predicate
 $0 \le \operatorname{Re}\varphi(\theta(A)\,A)$ for left-supported $A$ --- the positivity at the heart
