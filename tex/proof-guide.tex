@@ -8390,7 +8390,14 @@ $x=2n-1$), and summing the bond form over this partition gives
 $\texttt{heisenbergHamiltonianS}\,(\texttt{ringCoupling}\,(2n)) = \texttt{ringLeftHamiltonian}
 + \texttt{ringRightBondSum} + \hat S_{n-1}\cdot\hat S_n + \hat S_{2n-1}\cdot\hat S_0$.  Identifying
 \texttt{ringRightBondSum} with $\theta(\texttt{ringLeftHamiltonian})$ and the crossing bonds with the
-gauged interaction is the next step.
+gauged interaction is the next step.  The twenty-second layer
+(\texttt{RingReflectionRightEqTheta.lean}) carries out the first: the right bonds are the reflections
+of the left bonds, so reindexing by the bijection $x \mapsto r(x+1)$ (the cyclic successor
+\texttt{ringBondSucc}, shown bijective as $\cdot + 1$, composed with the reflection) and using the
+symmetry of $\hat S_x\cdot\hat S_y$ gives \texttt{ringRightBondSum\_eq\_theta}:
+$\texttt{ringRightBondSum} = \theta(\texttt{ringLeftHamiltonian})$.  Combined with the bond split,
+$\texttt{heisenbergHamiltonianS}\,(\texttt{ringCoupling}\,(2n)) = \texttt{ringLeftHamiltonian}
++ \theta(\texttt{ringLeftHamiltonian}) + (\text{ungauged crossing bonds})$.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
