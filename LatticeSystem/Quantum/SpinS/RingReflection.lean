@@ -4,8 +4,8 @@ Aggregator for the ring reflection-positivity development (Tasaki §4.1 Theorem 
 This module re-exports the entire `RingReflection*` / `RingBondReflection` tree — the quantum
 Dyson–Lieb–Simon / Shastry reflection-positivity infrastructure for the one-dimensional
 staggered-field antiferromagnetic Heisenberg ring: even-ring bond reflection and the reflection map
-`θ`, the left-supported subalgebra and reflection-positivity functional, the trace / weighted / Gibbs
-cones, the Gibbs reflection-positivity capstone, the concrete gauged ring DLS decomposition, the
+`θ`, the left-supported subalgebra and reflection-positivity functional, the trace / weighted /
+Gibbs cones, the Gibbs reflection-positivity capstone, the concrete gauged ring DLS decomposition, the
 right-half gauge bridge (physical ⟷ DLS), thermal-average transfer, and the Cauchy–Schwarz /
 chessboard inequalities.  Downstream files (and the build root) import this single module instead of
 the individual layers.
