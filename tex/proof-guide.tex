@@ -8224,7 +8224,15 @@ $r(x) = 2n-1-x$ (\texttt{RingBondReflection.lean}: involutive, swapping the two 
 staggered sign) and the induced \emph{reflection map} $\theta(A)_{\sigma\tau} =
 \overline{A_{\rho\sigma,\rho\tau}}$ (\texttt{RingReflectionTheta.lean}: an antilinear
 $*$-automorphism with $\theta(\hat o_x(A)) = \hat o_{r(x)}(\overline A)$), the $\theta$ of the
-reflection-positivity condition $0 \le \operatorname{Re}\langle\theta(A)\,A\rangle$.
+reflection-positivity condition $0 \le \operatorname{Re}\langle\theta(A)\,A\rangle$.  The second layer
+(\texttt{RingReflectionHamiltonian.lean}) computes the $\theta$-images of the model operators: the
+directed coupling reverses orientation ($J_{r(x),r(y)} = J_{y,x}$), the spin components conjugate as
+$\overline{\hat S^{(1)}} = \hat S^{(1)}$, $\overline{\hat S^{(3)}} = \hat S^{(3)}$,
+$\overline{\hat S^{(2)}} = -\hat S^{(2)}$, hence $\theta(\hat S_x\!\cdot\!\hat S_y) =
+\hat S_{r(x)}\!\cdot\!\hat S_{r(y)}$; consequently $\theta(\hat O_L^{(3)}) = -\hat O_L^{(3)}$ (the
+staggered sign flips), $\theta(\hat H) = \hat H$ (reindexing $(x,y)\mapsto(r(y),r(x))$ with the
+orientation reversal and dot-product symmetry), and $\theta(\hat H_h) = \hat H_{-h}$ --- the
+reflection symmetry exchanging the two staggered ground states.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
