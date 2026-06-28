@@ -8517,7 +8517,11 @@ $A$, $\langle\Phi,[A,[H,A]]\Phi\rangle=2\langle A\Phi,HA\Phi\rangle-2E_0\langle 
 denominator of the ground-state Falk--Bruch inequality.  \texttt{DoubleCommutatorNonneg.lean} then
 shows this is nonnegative, \texttt{double\_commutator\_ground\_state\_nonneg}: $\operatorname{Re}\langle\Phi,
 [A,[H,A]]\Phi\rangle\ge0$ (twice the variational energy of $A\Phi$, nonnegative since the ground energy is
-the Rayleigh minimum) --- the sign of the Falk--Bruch numerator.
+the Rayleigh minimum) --- the sign of the Falk--Bruch numerator.  \texttt{FalkBruch.lean} proves the abstract
+ground-state Falk--Bruch inequality \texttt{falkBruch\_of\_mulVec\_eq}: for positive-semidefinite $K$ and
+$w$ in the range of $K$ ($Ky=w$), $(\operatorname{Re}\langle w,w\rangle)^2\le\operatorname{Re}\langle w,Kw\rangle
+\cdot\operatorname{Re}\langle y,w\rangle$ --- an immediate instance of the PSD Cauchy--Schwarz with second
+argument $y$, requiring neither the spectral theorem nor a pseudo-inverse.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
