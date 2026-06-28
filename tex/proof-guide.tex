@@ -8475,7 +8475,12 @@ layer (\texttt{RingReflectionTranslation.lean}) begins the multi-reflection phas
 fixed-axis reflection $\theta$ by the ring translation \texttt{chainTranslationOp} shifts the reflection
 axis, with \texttt{chainTranslation\_conj\_ringReflectionThetaS\_onSiteS}/\texttt{\_spinSDot} sending the
 sites to $\texttt{finRotate}(\texttt{ringReflect}\,\cdot)$ --- the foundation for reflections across every
-bond needed to spread the single-axis chessboard toward Gaussian domination.
+bond needed to spread the single-axis chessboard toward Gaussian domination.  The thirty-eighth
+layer (\texttt{RingTranslationGibbs.lean}) records the complementary translation symmetry of the
+\emph{physical} ring (the gauge breaks it, but the ungauged Heisenberg Hamiltonian does not):
+\texttt{chainTranslation\_conj\_gibbs} ($\exp(-\beta\hat H)$ translation invariant) and
+\texttt{thermalAverageReS\_chainTranslation} ($\langle T^\dagger A T\rangle=\langle A\rangle$), the
+thermal-state translation symmetry used by the momentum-space infrared analysis.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
