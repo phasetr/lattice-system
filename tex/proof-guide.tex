@@ -8506,7 +8506,11 @@ S_b^{(2)}-\hat S_a^{(2)}\hat S_b^{(1)})$ for $a\neq b$, with a symmetric right-e
 double commutator entering the bound on the staggered two-point function.  The companion
 \texttt{HeisenbergSpinSOp3Commutator.lean} distributes the Hamiltonian commutator over bonds,
 \texttt{heisenbergHamiltonianS\_commutator\_onSiteS}: $[\hat H_J,\hat S_z^{(3)}]=\sum_x\sum_y J_{xy}[\hat
-S_x\cdot\hat S_y,\hat S_z^{(3)}]$, reducing the spin-current divergence to the bonds incident to $z$.
+S_x\cdot\hat S_y,\hat S_z^{(3)}]$, reducing the spin-current divergence to the bonds incident to $z$.  Applying $\hat S_a^{(3)}$ once more,
+\texttt{SingleBondDoubleCommutator.lean} computes the f-sum-rule integrand
+\texttt{spinSDot\_double\_commutator\_onSiteS\_spinSOp3}: $[\hat S_a^{(3)},[\hat S_a\cdot\hat S_b,\hat
+S_a^{(3)}]]=-(\hat S_a^{(1)}\hat S_b^{(1)}+\hat S_a^{(2)}\hat S_b^{(2)})$, the negated transverse bond
+energy (oscillator strength of the staggered mode), bounded by the bond energy.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
