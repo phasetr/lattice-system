@@ -68,6 +68,7 @@ theorem ringCoupling_ringReflect (n : ℕ) (hn : 1 ≤ n) (x y : Fin (2 * n)) :
 def ringReflectEquiv (n : ℕ) : Fin (2 * n) ≃ Fin (2 * n) :=
   Function.Involutive.toPerm _ (ringReflect_involutive n)
 
+/-- The reflection permutation acts as the bond reflection `ringReflect`. -/
 @[simp] theorem ringReflectEquiv_apply (n : ℕ) (x : Fin (2 * n)) :
     ringReflectEquiv n x = ringReflect n x := rfl
 
