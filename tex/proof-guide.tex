@@ -5393,6 +5393,31 @@ $N < 2|\Lambda|$ (the fully-filled endpoint makes off-site pair transfer vanish 
 the concrete Fock representation). Proved by Tian's extension of Lieb's
 reflection-positivity method; recorded as a faithful documented \texttt{axiom}.
 
+\medskip
+\noindent\textbf{Spin-reflection-positivity foundation (PR1 toward discharging
+Theorem 10.2).} In file \texttt{LiebAttractiveReflection.lean} we build the
+finite-dimensional language in which Lieb's reflection-positivity proof is
+stated, all axiom-free. The state space $(\mathrm{Fin}\,(2N+2)\to\mathrm{Fin}\,2)
+\to\mathbb{C}$ factorizes at the basis level as $H=H_\uparrow\otimes H_\downarrow$:
+a spin-orbital configuration is the same data as a pair of single-species
+configurations via $\texttt{spinfulIndex}$ ($\texttt{hubbardSpinConfigEquiv}$),
+inducing the coefficient-matrix isomorphism $\psi\mapsto M_{u,d}=\psi(\mathrm{merge}\,
+u\,d)$ ($\texttt{hubbardSpinCoeffLinearEquiv}$). The spin reflection $\theta$
+combines the spin flip with a particle--hole transformation,
+$(n_\uparrow,n_\downarrow)\mapsto(1-n_\downarrow,1-n_\uparrow)$
+($\texttt{spinReflectionConfig}$, $\texttt{spinReflectionThetaVec}$); it is an
+involutive antiunitary, $\langle\theta\psi,\theta\varphi\rangle=
+\overline{\langle\psi,\varphi\rangle}$ ($\texttt{spinReflectionThetaVec\_dotProduct}$),
+and acts on the (down-hole gauged) coefficient matrix as the conjugate transpose,
+$\mathrm{coeff}(\theta\psi)=\mathrm{coeff}(\psi)^{\mathsf H}$
+($\texttt{spinReflectionCoeff\_thetaVec}$). The algebraic heart of SRP is the
+reusable nonnegativity $0\le\operatorname{Re}\operatorname{tr}(CAC A^{\mathsf H})$
+for any positive-semidefinite $C$ ($\texttt{spinReflection\_gramMatrix\_nonneg}$),
+proved by writing $C=B^2$ with $B\ge0$ Hermitian and using cyclicity to get
+$\operatorname{tr}(CAC A^{\mathsf H})=\operatorname{tr}(MM^{\mathsf H})\ge0$ with
+$M=BAB$. The Hamiltonian positivity, Perron--Frobenius uniqueness, and the singlet
+conclusion are later layers.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}

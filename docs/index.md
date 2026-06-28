@@ -2953,6 +2953,17 @@ fermion mode acting on `ℂ²` with computational basis
 | `theorem_10_2_lieb_attractive_unique_singlet` | **Theorem 10.2** (Tasaki §10.2.1, p. 348, **AXIOM**): for an even electron number `N` with `0 < N ≤ 2\|Λ\|`, connected real symmetric hopping, and site-dependent attraction `U_x > 0`, the ground state of `Ĥ` in the `N`-electron sector is unique and a spin singlet (`(Ŝ_tot)² = 0`). Lieb's spin-space reflection positivity → faithful documented axiom. | `Fermion/JordanWigner/Hubbard/LiebAttractive.lean` |
 | `theorem_10_3_tian_pair_correlation_positive` | **Theorem 10.3** (Tian; Tasaki §10.2.1, p. 349, eq. (10.2.4), **AXIOM**): under the Theorem 10.2 hypotheses (with the non-full guard `N < 2\|Λ\|`), the unique ground state has strictly positive on-site pair-transfer correlation `⟨ΦGS\| ĉ†_{x↑}ĉ†_{x↓}ĉ_{y↓}ĉ_{y↑} \|ΦGS⟩ > 0` for all `x, y` (off-diagonal long-range order). Reflection positivity (Tian's extension) → faithful documented axiom. | `Fermion/JordanWigner/Hubbard/LiebAttractive.lean` |
 
+#### Spin-reflection-positivity foundation for Lieb's theorem (Tasaki §10.2.1, PR1 toward discharging Theorem 10.2)
+
+The finite-dimensional spin-reflection-positivity (SRP) coefficient-matrix language in which Lieb's proof is stated (the first layer toward discharging `theorem_10_2_lieb_attractive_unique_singlet`; the Hamiltonian positivity / Perron–Frobenius uniqueness / singlet argument are later layers). All axiom-free.
+
+| Lean name | Statement | File |
+|---|---|---|
+| `hubbardSpinConfig` / `hubbardUpConfig` / `hubbardDownConfig` / `hubbardMergeConfig` / `hubbardSpinConfigEquiv` | the basis-level factorization `H = H↑ ⊗ H↓`: a spin-orbital configuration `Fin (2N+2) → Fin 2` is the same data as a pair of single-species configurations `(up, down)` (via `spinfulIndex`), packaged as an `Equiv` | `Fermion/JordanWigner/Hubbard/LiebAttractiveReflection.lean` |
+| `hubbardSpinCoeffLinearEquiv` | the induced linear isomorphism of a state vector with its coefficient matrix `M_{u,d} = ψ (merge u d)` indexed by up/down configurations | `Fermion/JordanWigner/Hubbard/LiebAttractiveReflection.lean` |
+| `flipOccupation` / `particleHoleConfig` / `spinReflectionConfig` / `spinReflectionThetaVec` | the spin reflection `θ` (antiunitary spin-flip ∘ particle–hole, `(n↑,n↓) ↦ (1−n↓,1−n↑)`) at the configuration and state-vector level; `particleHoleConfig_involutive`, `spinReflectionConfig_involutive`, `spinReflectionThetaVec_smul` (conjugate-linear), `spinReflectionThetaVec_dotProduct` (`⟨θψ,θφ⟩ = conj⟨ψ,φ⟩`, antiunitarity) | `Fermion/JordanWigner/Hubbard/LiebAttractiveReflection.lean` |
+| `spinReflectionCoeff` / `SpinReflectionPositive` / `spinReflectionCoeff_thetaVec` / `spinReflection_gramMatrix_nonneg` | the SRP coefficient matrix (down index read as a hole), its positive-semidefiniteness predicate, the `θ`-on-coefficients = conjugate-transpose law, and the reusable nonnegativity `0 ≤ Re tr (C A C Aᴴ)` for `C` positive-semidefinite (the algebraic heart of SRP, via `C = B²` and `tr (C A C Aᴴ) = tr (M Mᴴ)`) | `Fermion/JordanWigner/Hubbard/LiebAttractiveReflection.lean` |
+
 #### Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)
 
 | Lean name | Statement | File |
