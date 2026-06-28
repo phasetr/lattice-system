@@ -8514,7 +8514,10 @@ energy (oscillator strength of the staggered mode), bounded by the bond energy. 
 \texttt{DoubleCommutatorVariational.lean} relates the f-sum-rule oscillator strength to the variational
 energy, \texttt{double\_commutator\_ground\_state\_eq}: for a ground state $H\Phi=E_0\Phi$ and Hermitian
 $A$, $\langle\Phi,[A,[H,A]]\Phi\rangle=2\langle A\Phi,HA\Phi\rangle-2E_0\langle A\Phi,A\Phi\rangle$ --- the
-denominator of the ground-state Falk--Bruch inequality.
+denominator of the ground-state Falk--Bruch inequality.  \texttt{DoubleCommutatorNonneg.lean} then
+shows this is nonnegative, \texttt{double\_commutator\_ground\_state\_nonneg}: $\operatorname{Re}\langle\Phi,
+[A,[H,A]]\Phi\rangle\ge0$ (twice the variational energy of $A\Phi$, nonnegative since the ground energy is
+the Rayleigh minimum) --- the sign of the Falk--Bruch numerator.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
