@@ -19,8 +19,8 @@ open Matrix
 open scoped ComplexOrder
 
 /-- **Abstract ground-state Falk–Bruch inequality.**  For a positive-semidefinite `K` and a vector
-`w` in the range of `K` (`K y = w`), `(Re⟨w, w⟩)² ≤ Re⟨w, K w⟩ · Re⟨y, w⟩` — an immediate instance of
-PSD Cauchy–Schwarz. -/
+`w` in the range of `K` (`K y = w`), `(Re⟨w, w⟩)² ≤ Re⟨w, K w⟩ · Re⟨y, w⟩`.  An immediate instance
+of PSD Cauchy–Schwarz. -/
 theorem falkBruch_of_mulVec_eq {n : Type*} [Fintype n] {K : Matrix n n ℂ} (hK : K.PosSemidef)
     {w y : n → ℂ} (hy : K.mulVec y = w) :
     (star w ⬝ᵥ w).re ^ 2
