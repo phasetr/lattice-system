@@ -8382,7 +8382,15 @@ $H = \texttt{ringLeftHamiltonian} + \theta(\texttt{ringLeftHamiltonian})
 - (\texttt{crossBondInteractionS}\,0 + \texttt{crossBondInteractionS}\,(n-1))$, and
 \texttt{ringDLSDecomposition\_gibbs\_rpTraceWeight} concludes that $\exp(-\beta H)$ is a
 reflection-positive trace weight ($\beta \ge 0$).  Identifying $H$ with the physical ungauged
-Hamiltonian is the next step.
+Hamiltonian is the next step.  The twenty-first layer (\texttt{RingReflectionBondSplit.lean}) splits
+the ring Hamiltonian into its bonds: the bonds $(x, x+1)$ of $\mathrm{Fin}(2n)$ fall into four
+disjoint classes by $x$ (left $x\le n-2$, crossing $x=n-1$, right $n\le x\le 2n-2$, crossing
+$x=2n-1$), and summing the bond form over this partition gives
+\texttt{heisenbergHamiltonianS\_ringCoupling\_bond\_split}:
+$\texttt{heisenbergHamiltonianS}\,(\texttt{ringCoupling}\,(2n)) = \texttt{ringLeftHamiltonian}
++ \texttt{ringRightBondSum} + \hat S_{n-1}\cdot\hat S_n + \hat S_{2n-1}\cdot\hat S_0$.  Identifying
+\texttt{ringRightBondSum} with $\theta(\texttt{ringLeftHamiltonian})$ and the crossing bonds with the
+gauged interaction is the next step.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
