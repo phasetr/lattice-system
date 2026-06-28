@@ -8528,7 +8528,10 @@ real (Hermiticity) with nonnegative real part (the variational lower bound).  Th
 \texttt{FalkBruchDoubleCommutator.lean} combines these into the concrete bound
 \texttt{falkBruch\_double\_commutator}: for a ground state $\Phi$, Hermitian $A$ and a potential $y$ for
 $A\Phi$ ($(H-E_0)y=A\Phi$), $2(\operatorname{Re}\langle\Phi,A^2\Phi\rangle)^2\le\operatorname{Re}\langle\Phi,
-[A,[H,A]]\Phi\rangle\cdot\operatorname{Re}\langle y,A\Phi\rangle$ --- oscillator strength times susceptibility.
+[A,[H,A]]\Phi\rangle\cdot\operatorname{Re}\langle y,A\Phi\rangle$ --- oscillator strength times susceptibility.  \texttt{StaggeredOrderCommutator.lean} expands the
+oscillator strength: \texttt{staggeredOrderOpS\_commutator} ($[\hat O,C]=\sum_x\varepsilon_x[\hat
+S_x^{(3)},C]$), applied twice giving $[\hat O,[\hat H,\hat O]]$ as a double site sum whose terms vanish off
+adjacent sites, reducing the naive $O(L^2)$ count to $O(L)$.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
