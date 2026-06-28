@@ -8288,6 +8288,20 @@ left-supported --- the left subalgebra is closed under products, sums, scalars a
 \texttt{ringReflectionThetaS\_exp} ($\theta(\exp X) = \exp(\theta X)$, since $\theta$ is a continuous
 conjugate-linear $*$-automorphism with real exponential coefficients).  These are the building blocks
 for the $e^{-\beta H_L}$ Hamiltonian factor of the full Gibbs reflection-positivity decomposition.
+The ninth layer (\texttt{RingReflectionRPDecomposition.lean}) records the Dyson--Lieb--Simon
+decomposition data and the crossing-bond interaction.  The per-bond interaction at a left site $x$ is
+$\texttt{crossBondInteractionS}\,x = \sum_\alpha \hat S_x^\alpha\,\theta(\hat S_x^\alpha)$, with the
+\emph{gauge identity}
+$\texttt{crossBondInteractionS}\,x = \hat S_x^1 \hat S_{rx}^1 - \hat S_x^2 \hat S_{rx}^2
++ \hat S_x^3 \hat S_{rx}^3$; the lone minus sign on the $\hat S^2$ term is the sign flipped by the
+DLS/Marshall gauge (a $\pi$-rotation around axis $2$ on the right half), making all three components
+contribute the same negative reflection-positive sign.  Each $\texttt{onSiteS}\,x\,\hat S^\alpha$
+($x<n$) is left-supported, and \texttt{crossBondInteractionS\_exp\_rpTraceWeight} shows that
+$\exp(t\cdot\texttt{crossBondInteractionS}\,x)$ ($t\ge 0$) is a reflection-positive trace weight (via
+\texttt{mul\_theta\_comm} and the interaction-exponential cone).  The abstract \texttt{RPDecomposition}
+structure ($H_L + \theta(H_L) - \sum_b C_b\,\theta(C_b)$, all $C_b$ left-supported) packages the DLS
+form, with \texttt{interaction\_exp\_rpTraceWeight} giving the reflection positivity of the Gibbs
+interaction factor.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
