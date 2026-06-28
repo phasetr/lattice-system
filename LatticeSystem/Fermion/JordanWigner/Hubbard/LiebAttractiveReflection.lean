@@ -77,6 +77,7 @@ def hubbardMergeConfig (N : ℕ) (u d : hubbardSpinConfig N) :
     if o.val % 2 = 0 then u ⟨o.val / 2, by have := o.isLt; omega⟩
     else d ⟨o.val / 2, by have := o.isLt; omega⟩
 
+/-- Merging reads the up part on even orbitals: `merge u d (2 i) = u i`. -/
 @[simp]
 theorem hubbardMergeConfig_spinfulIndex_zero (N : ℕ) (u d : hubbardSpinConfig N)
     (i : Fin (N + 1)) : hubbardMergeConfig N u d (spinfulIndex N i 0) = u i := by
@@ -87,6 +88,7 @@ theorem hubbardMergeConfig_spinfulIndex_zero (N : ℕ) (u d : hubbardSpinConfig 
   have hdiv : (spinfulIndex N i 0).val / 2 = i.val := by omega
   exact Fin.ext hdiv
 
+/-- Merging reads the down part on odd orbitals: `merge u d (2 i + 1) = d i`. -/
 @[simp]
 theorem hubbardMergeConfig_spinfulIndex_one (N : ℕ) (u d : hubbardSpinConfig N)
     (i : Fin (N + 1)) : hubbardMergeConfig N u d (spinfulIndex N i 1) = d i := by
@@ -97,16 +99,20 @@ theorem hubbardMergeConfig_spinfulIndex_one (N : ℕ) (u d : hubbardSpinConfig N
   have hdiv : (spinfulIndex N i 1).val / 2 = i.val := by omega
   exact Fin.ext hdiv
 
+/-- The up projection recovers the up part of a merge: `up (merge u d) = u`. -/
 @[simp]
 theorem hubbardUpConfig_merge (N : ℕ) (u d : hubbardSpinConfig N) :
     hubbardUpConfig N (hubbardMergeConfig N u d) = u := by
   funext i; simp [hubbardUpConfig]
 
+/-- The down projection recovers the down part of a merge: `down (merge u d) = d`. -/
 @[simp]
 theorem hubbardDownConfig_merge (N : ℕ) (u d : hubbardSpinConfig N) :
     hubbardDownConfig N (hubbardMergeConfig N u d) = d := by
   funext i; simp [hubbardDownConfig]
 
+/-- Merging the up/down projections recovers the configuration:
+`merge (up c) (down c) = c`. -/
 @[simp]
 theorem hubbardMergeConfig_up_down (N : ℕ) (c : Fin (2 * N + 2) → Fin 2) :
     hubbardMergeConfig N (hubbardUpConfig N c) (hubbardDownConfig N c) = c := by
@@ -157,6 +163,7 @@ theorem hubbardConfig_count_eq_up_add_down (N : ℕ) (c : Fin (2 * N + 2) → Fi
 orbital). -/
 def flipOccupation : Fin 2 → Fin 2 := fun a => if a = 0 then 1 else 0
 
+/-- The occupation flip is an involution: `flip (flip a) = a`. -/
 @[simp]
 theorem flipOccupation_flipOccupation (a : Fin 2) :
     flipOccupation (flipOccupation a) = a := by
@@ -167,10 +174,12 @@ occupation number. -/
 def particleHoleConfig (N : ℕ) (c : hubbardSpinConfig N) : hubbardSpinConfig N :=
   fun i => flipOccupation (c i)
 
+/-- The particle–hole map is an involution. -/
 theorem particleHoleConfig_involutive (N : ℕ) :
     Function.Involutive (particleHoleConfig N) := by
   intro c; funext i; simp [particleHoleConfig]
 
+/-- The particle–hole map is an involution (simp form). -/
 @[simp]
 theorem particleHoleConfig_particleHoleConfig (N : ℕ) (c : hubbardSpinConfig N) :
     particleHoleConfig N (particleHoleConfig N c) = c :=
@@ -183,6 +192,7 @@ def spinReflectionConfig (N : ℕ) (c : Fin (2 * N + 2) → Fin 2) :
   hubbardMergeConfig N (particleHoleConfig N (hubbardDownConfig N c))
     (particleHoleConfig N (hubbardUpConfig N c))
 
+/-- The configuration-level spin reflection `θ` is an involution. -/
 theorem spinReflectionConfig_involutive (N : ℕ) :
     Function.Involutive (spinReflectionConfig N) := by
   intro c
