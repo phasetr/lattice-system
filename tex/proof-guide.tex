@@ -8440,7 +8440,14 @@ layer (\texttt{RingReflectionThermalTransfer.lean}) makes this quantitative: the
 transform, so \texttt{thermalPartitionFnS\_toHamiltonian\_eq} ($Z$ gauge-invariant) and
 \texttt{thermalAverageReS\_toHamiltonian\_eq} show the physical ring Heisenberg canonical average of $A$
 equals the DLS canonical average of $\texttt{rightGauge}\cdot A\cdot\texttt{rightGaugeInv}$ --- the bridge
-carrying every reflection-positivity bound back to the physical ring antiferromagnet.
+carrying every reflection-positivity bound back to the physical ring antiferromagnet.  The thirty-second layer
+(\texttt{RingReflectionCauchySchwarz.lean}) proves the reflection-positivity Cauchy--Schwarz inequality
+\texttt{rpTraceWeight\_cauchySchwarz}: a reflection-positive trace weight $M$ makes $(A,B)\mapsto
+\operatorname{Tr}(M\theta(A)B)$ a positive-semidefinite form, so expanding $0\le\operatorname{Re}
+\operatorname{Tr}(M\theta(A-tB)(A-tB))$ as a nonnegative quadratic in $t$ and taking its discriminant gives
+$(\operatorname{Re}\operatorname{Tr}(M\theta(A)B)+\operatorname{Re}\operatorname{Tr}(M\theta(B)A))^2\le
+4\operatorname{Re}\operatorname{Tr}(M\theta(A)A)\operatorname{Re}\operatorname{Tr}(M\theta(B)B)$ --- the workhorse for
+the Dyson--Lieb--Simon infrared bound.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
