@@ -8497,7 +8497,11 @@ machinery (the squared order parameter per $L^2$ is controlled by the total two-
 in one dimension).  The companion \texttt{StaggeredOrderSquareForm.lean} lifts this to the
 ground-state quadratic form \texttt{staggeredOrderOpS\_sq\_dotProduct}: $\langle\Phi,\hat O^2\Phi\rangle=
 \sum_x\sum_y\varepsilon_x\varepsilon_y\langle\Phi,\hat S_x^{(3)}\hat S_y^{(3)}\Phi\rangle$, the order parameter in
-the exact state-expectation form $\langle\Phi,\hat O^2\Phi\rangle$ of the Corollary.
+the exact state-expectation form $\langle\Phi,\hat O^2\Phi\rangle$ of the Corollary.  Toward the infrared / f-sum-rule
+bound, \texttt{SingleBondSpinSOp3Commutator.lean} computes the single-bond spin current
+\texttt{spinSDot\_commutator\_onSiteS\_spinSOp3}: $[\hat S_a\cdot\hat S_b,\hat S_a^{(3)}]=i(\hat S_a^{(1)}\hat
+S_b^{(2)}-\hat S_a^{(2)}\hat S_b^{(1)})$ for $a\neq b$, the building block of $[\hat H,\hat S_z^{(3)}]$ and the
+double commutator entering the bound on the staggered two-point function.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
