@@ -8494,7 +8494,10 @@ diagonals are nonnegative since $M$ is reflection-positive), the form iterated i
 \texttt{staggeredOrderOpS\_sq\_eq\_sum}: $\hat O^2=\sum_x\sum_y\varepsilon_x\varepsilon_y\hat S_x^{(3)}\hat S_y^{(3)}$,
 the bridge from the order parameter to the two-point functions bounded by the reflection-positivity
 machinery (the squared order parameter per $L^2$ is controlled by the total two-point sum, only $O(L)$
-in one dimension).
+in one dimension).  The companion \texttt{StaggeredOrderSquareForm.lean} lifts this to the
+ground-state quadratic form \texttt{staggeredOrderOpS\_sq\_dotProduct}: $\langle\Phi,\hat O^2\Phi\rangle=
+\sum_x\sum_y\varepsilon_x\varepsilon_y\langle\Phi,\hat S_x^{(3)}\hat S_y^{(3)}\Phi\rangle$, the order parameter in
+the exact state-expectation form $\langle\Phi,\hat O^2\Phi\rangle$ of the Corollary.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
