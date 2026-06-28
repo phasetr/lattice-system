@@ -8420,7 +8420,11 @@ The twenty-sixth layer (\texttt{RingReflectionBondConj.lean}) proves the gauge f
 non-crossing bond: \texttt{rightGauge\_conj\_spinSDot\_left} (left bond, both sites $<n$,
 untouched) and \texttt{rightGauge\_conj\_spinSDot\_right} (right bond, both sites gauged --- the
 $\hat S^1$/$\hat S^3$ sign flips cancel, $\hat S^2$ unchanged).  Only the two crossing bonds acquire
-the DLS sign flip.
+the DLS sign flip.  The twenty-seventh layer (\texttt{RingReflectionCrossConj.lean}) computes that flip:
+for a left site $x<n$ (with reflection $r x$ a right site), \texttt{rightGauge\_conj\_crossBond}
+gives $\texttt{rightGauge}\cdot(\hat S_x\cdot\hat S_{r x})\cdot\texttt{rightGaugeInv}
+= -\,\texttt{crossBondInteractionS}\,x$ --- the left endpoint untouched, the right endpoint gauged.
+Both ring crossing bonds $(n-1,n)$ and $(2n-1,0)$ are of this form.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
