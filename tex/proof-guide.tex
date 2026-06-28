@@ -8232,7 +8232,14 @@ $\overline{\hat S^{(2)}} = -\hat S^{(2)}$, hence $\theta(\hat S_x\!\cdot\!\hat S
 \hat S_{r(x)}\!\cdot\!\hat S_{r(y)}$; consequently $\theta(\hat O_L^{(3)}) = -\hat O_L^{(3)}$ (the
 staggered sign flips), $\theta(\hat H) = \hat H$ (reindexing $(x,y)\mapsto(r(y),r(x))$ with the
 orientation reversal and dot-product symmetry), and $\theta(\hat H_h) = \hat H_{-h}$ --- the
-reflection symmetry exchanging the two staggered ground states.
+reflection symmetry exchanging the two staggered ground states.  The third layer
+(\texttt{RingReflectionPositivity.lean}) introduces the left-half subalgebra \texttt{SupportedOnLeftS}
+(the subalgebra $B(\mathcal H_{\mathrm{left}})\otimes I_{\mathrm{right}}$: entries vanish off the
+right-diagonal and are independent of the common right-half value; closed under sums and scalar
+multiples, with left-site $\hat o_x$ generators), shows $\theta$ maps left-supported operators to
+right-supported ones, and defines the reflection-positive functional predicate
+$0 \le \operatorname{Re}\varphi(\theta(A)\,A)$ for left-supported $A$ --- the positivity at the heart
+of the Dyson--Lieb--Simon / Shastry argument.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
