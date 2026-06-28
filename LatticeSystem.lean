@@ -95,6 +95,7 @@ import LatticeSystem.Quantum.SpinS.RingReflectionCrossConj
 import LatticeSystem.Quantum.SpinS.RingReflectionNonCrossConj
 import LatticeSystem.Quantum.SpinS.RingReflectionGaugeAssembly
 import LatticeSystem.Quantum.SpinS.RingReflectionGibbsGauge
+import LatticeSystem.Quantum.SpinS.RingReflectionThermalTransfer
 import LatticeSystem.Quantum.SpinS.RingReflectionRightBondSum
 import LatticeSystem.Quantum.SpinS.RingReflectionConcreteGibbs
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO
