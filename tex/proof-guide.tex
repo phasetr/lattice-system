@@ -8342,7 +8342,19 @@ cone-representable (\texttt{coneRep\_exp\_add}, absorbed by \texttt{mul\_coneRep
 interaction factor $e^{B/m}$ is the exponential of a cone-representable operator (absorbed by
 \texttt{mul\_exp\_coneRep\_right}) --- then concludes by induction over the power and
 \texttt{RPTraceWeightS.tendsto}.  This is the reflection positivity at the heart of the
-Dyson--Lieb--Simon / Shastry argument.
+Dyson--Lieb--Simon / Shastry argument.  The fifteenth layer
+(\texttt{RingReflectionRingInstance.lean}) applies the capstone to the gauged ring antiferromagnet:
+the two crossing bonds of $\mathrm{Fin}(2n)$ are $(n-1, n)$ and $(2n-1, 0)$, reflected from the left
+sites $n-1$ and $0$, so \texttt{ringCrossingRPDecomposition} packages (for an arbitrary left-supported
+$H_L$) the \texttt{RPDecomposition} whose crossing bonds are the single-site spin operators at sites
+$0$ and $n-1$; \texttt{ringCrossingRPDecomposition\_interaction} identifies its interaction as
+$\texttt{crossBondInteractionS}\,0 + \texttt{crossBondInteractionS}\,(n-1)$ and
+\texttt{ringCrossingRPDecomposition\_toHamiltonian} gives
+$\texttt{toHamiltonian} = H_L + \theta(H_L) - (\text{crossing})$.  Then
+\texttt{ring\_gibbs\_rpTraceWeight} concludes that the gauged ring Gibbs weight is a
+reflection-positive trace weight ($\beta \ge 0$).  The concrete left-bond $H_L$ and the unitary
+equivalence to the ungauged $\texttt{heisenbergHamiltonianS}\,(\texttt{ringCoupling}\,(2n))$ are the
+next step.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
