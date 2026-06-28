@@ -8524,7 +8524,11 @@ $w$ in the range of $K$ ($Ky=w$), $(\operatorname{Re}\langle w,w\rangle)^2\le\op
 argument $y$, requiring neither the spectral theorem nor a pseudo-inverse.  The companion
 \texttt{HermitianSubMinPosSemidef.lean} supplies the PSD operator $K$: \texttt{hermitianSubMin\_posSemidef}
 shows $H-E_0$ ($E_0=\texttt{hermitianMinEigenvalue}$) is positive-semidefinite --- its quadratic form is
-real (Hermiticity) with nonnegative real part (the variational lower bound).
+real (Hermiticity) with nonnegative real part (the variational lower bound).  The companion
+\texttt{FalkBruchDoubleCommutator.lean} combines these into the concrete bound
+\texttt{falkBruch\_double\_commutator}: for a ground state $\Phi$, Hermitian $A$ and a potential $y$ for
+$A\Phi$ ($(H-E_0)y=A\Phi$), $2(\operatorname{Re}\langle\Phi,A^2\Phi\rangle)^2\le\operatorname{Re}\langle\Phi,
+[A,[H,A]]\Phi\rangle\cdot\operatorname{Re}\langle y,A\Phi\rangle$ --- oscillator strength times susceptibility.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
