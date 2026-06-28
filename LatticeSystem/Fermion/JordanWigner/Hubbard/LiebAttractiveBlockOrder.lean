@@ -42,10 +42,12 @@ orbitals (`σ = 1 ↦ i + (N+1)`). -/
 def hubbardBlockIndex (N : ℕ) (i : Fin (N + 1)) (σ : Fin 2) : Fin (2 * N + 2) :=
   ⟨i.val + (if σ = 0 then 0 else N + 1), by have := i.isLt; split <;> omega⟩
 
+/-- The value of an up block index is the site index. -/
 @[simp]
 theorem hubbardBlockIndex_zero_val (N : ℕ) (i : Fin (N + 1)) :
     (hubbardBlockIndex N i 0).val = i.val := by simp [hubbardBlockIndex]
 
+/-- The value of a down block index is the site index shifted past all up orbitals. -/
 @[simp]
 theorem hubbardBlockIndex_one_val (N : ℕ) (i : Fin (N + 1)) :
     (hubbardBlockIndex N i 1).val = i.val + (N + 1) := by
@@ -62,6 +64,7 @@ def hubbardBlockMergeConfig (N : ℕ) (u d : hubbardSpinConfig N) :
     if h : o.val < N + 1 then u ⟨o.val, h⟩
     else d ⟨o.val - (N + 1), by have := o.isLt; omega⟩
 
+/-- The block merge reads the up part at an up block index. -/
 @[simp]
 theorem hubbardBlockMergeConfig_blockIndex_zero (N : ℕ) (u d : hubbardSpinConfig N)
     (i : Fin (N + 1)) :
@@ -71,6 +74,7 @@ theorem hubbardBlockMergeConfig_blockIndex_zero (N : ℕ) (u d : hubbardSpinConf
   rw [hubbardBlockMergeConfig, dif_pos hlt]
   congr 1
 
+/-- The block merge reads the down part at a down block index. -/
 @[simp]
 theorem hubbardBlockMergeConfig_blockIndex_one (N : ℕ) (u d : hubbardSpinConfig N)
     (i : Fin (N + 1)) :
