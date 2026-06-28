@@ -67,6 +67,7 @@ import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingGroundData
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisGeneral
 import LatticeSystem.Quantum.SpinS.ShastryNoSSB
 import LatticeSystem.Quantum.SpinS.RingReflection
+import LatticeSystem.Quantum.SpinS.RingTranslationGibbs
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO
 import LatticeSystem.Quantum.SpinS.FerrimagneticLROCapstone
 import LatticeSystem.Quantum.SpinS.StaggeredCasimirSU2Invariance
