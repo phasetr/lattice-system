@@ -59,6 +59,7 @@ import LatticeSystem.Quantum.SpinS.PairCommutatorNorm
 import LatticeSystem.Quantum.SpinS.PairCommutatorVanish
 import LatticeSystem.Quantum.SpinS.OscillatorStrengthBound
 import LatticeSystem.Quantum.SpinS.StaggeredOrderSusceptibility
+import LatticeSystem.Quantum.SpinS.HermitianGroundStateEigenvalue
 import LatticeSystem.Quantum.SpinS.HaldaneConjecture
 import LatticeSystem.Quantum.SpinS.AKLT
 import LatticeSystem.Quantum.SpinS.AKLTBondProjection

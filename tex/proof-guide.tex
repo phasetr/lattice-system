@@ -8577,6 +8577,11 @@ since the oscillator factor is $\le12N^3L$ and the susceptibility $\chi=\operato
 O\Phi\rangle=\operatorname{Re}\langle y,(\hat H-E_0)y\rangle\ge0$ is PSD.  This reduces Corollary 4.3 to the
 susceptibility bound $\chi\le C\,L$ (the reflection-positivity infrared bound): then $\langle\hat
 O^2\rangle\le\sqrt{6N^3C}\,L$, so $\langle(\hat O/L)^2\rangle\to0$.
+\texttt{HermitianGroundStateEigenvalue.lean} bridges the axiom hypothesis to this interface with
+\texttt{groundState\_mulVec\_eq\_hermitianMinEigenvalue}: for a Hermitian $H$ and a normalized
+eigenvector $\Phi$ ($H\Phi=E_0\Phi$) whose $E_0$ has minimal real part over all eigenpairs,
+$H\Phi=(\texttt{hermitianMinEigenvalue}\,H)\,\Phi$ ($E_0$ is real by Hermiticity, and $E_0.\mathrm{re}$ is
+squeezed between the variational lower bound and the minimizing eigenvector).
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
