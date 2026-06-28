@@ -8470,7 +8470,12 @@ for the chessboard and real-diagonal lemmas.  The thirty-sixth layer
 $M=\exp(-\beta\,\texttt{toHamiltonian})$ is both reflection-positive and reflection-invariant,
 \texttt{ringDLSGibbs\_reflection\_step} is the concrete chessboard estimate
 $(\operatorname{Re}\operatorname{Tr}(M\theta(A)B))^2\le\operatorname{Re}\operatorname{Tr}(M\theta(A)A)\,\operatorname{Re}
-\operatorname{Tr}(M\theta(B)B)$ for the thermal state of the physical ring antiferromagnet.
+\operatorname{Tr}(M\theta(B)B)$ for the thermal state of the physical ring antiferromagnet.  The thirty-seventh
+layer (\texttt{RingReflectionTranslation.lean}) begins the multi-reflection phase: conjugating the
+fixed-axis reflection $\theta$ by the ring translation \texttt{chainTranslationOp} shifts the reflection
+axis, with \texttt{chainTranslation\_conj\_ringReflectionThetaS\_onSiteS}/\texttt{\_spinSDot} sending the
+sites to $\texttt{finRotate}(\texttt{ringReflect}\,\cdot)$ --- the foundation for reflections across every
+bond needed to spread the single-axis chessboard toward Gaussian domination.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
