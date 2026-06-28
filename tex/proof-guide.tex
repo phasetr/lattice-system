@@ -8431,7 +8431,11 @@ Hamiltonian and the reflected right bond Hamiltonian $\theta(\texttt{ringLeftHam
 layer (\texttt{RingReflectionGaugeAssembly.lean}) assembles these: \texttt{rightGauge\_conj\_ringHamiltonian}
 shows the right-half gauge conjugates the ring Heisenberg Hamiltonian into the reflection-positive DLS
 Hamiltonian $\texttt{rightGauge}\cdot\hat H\cdot\texttt{rightGaugeInv}=\texttt{ringDLSDecomposition.toHamiltonian}$,
-the unitary equivalence bridging the physical ring antiferromagnet to its reflection-positive form.
+the unitary equivalence bridging the physical ring antiferromagnet to its reflection-positive form.  The thirtieth layer
+(\texttt{RingReflectionGibbsGauge.lean}) lifts this to the Gibbs operator: since conjugation commutes
+with the matrix exponential (\texttt{Matrix.exp\_units\_conj}), \texttt{exp\_neg\_smul\_toHamiltonian\_eq}
+shows $\exp(-\beta\cdot\texttt{toHamiltonian})=\texttt{rightGauge}\cdot\exp(-\beta\hat H)\cdot\texttt{rightGaugeInv}$,
+so physical thermal averages become DLS thermal averages of gauge-transformed observables.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
