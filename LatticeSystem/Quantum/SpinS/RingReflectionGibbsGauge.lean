@@ -34,9 +34,11 @@ noncomputable def rightGaugeUnit : (ManyBodyOpS (Fin (2 * n)) N)ˣ where
   val_inv := G.rightGauge_mul_rightGaugeInv n
   inv_val := G.rightGaugeInv_mul_rightGauge n
 
+/-- The underlying operator of `rightGaugeUnit` is `rightGauge`. -/
 @[simp] theorem rightGaugeUnit_val :
     (G.rightGaugeUnit n : ManyBodyOpS (Fin (2 * n)) N) = G.rightGauge n := rfl
 
+/-- The underlying operator of the inverse unit `(rightGaugeUnit)⁻¹` is `rightGaugeInv`. -/
 @[simp] theorem rightGaugeUnit_inv :
     (((G.rightGaugeUnit n)⁻¹ : (ManyBodyOpS (Fin (2 * n)) N)ˣ) : ManyBodyOpS (Fin (2 * n)) N)
       = G.rightGaugeInv n := rfl
