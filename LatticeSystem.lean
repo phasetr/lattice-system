@@ -99,6 +99,7 @@ import LatticeSystem.Quantum.SpinS.RingReflectionThermalTransfer
 import LatticeSystem.Quantum.SpinS.RingReflectionCauchySchwarz
 import LatticeSystem.Quantum.SpinS.RingReflectionTraceReality
 import LatticeSystem.Quantum.SpinS.RingReflectionChessboard
+import LatticeSystem.Quantum.SpinS.RingReflectionThetaInvariance
 import LatticeSystem.Quantum.SpinS.RingReflectionRightBondSum
 import LatticeSystem.Quantum.SpinS.RingReflectionConcreteGibbs
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO

@@ -8459,7 +8459,13 @@ weight $M$ ($\theta M=M$) and left-supported $A,B$, the off-diagonal value is sy
 since $A$ commutes with the right-half $\theta B$); feeding this into the Cauchy--Schwarz discriminant
 collapses the cross term, giving \texttt{rpTraceWeight\_reflection\_step}:
 $(\operatorname{Re}\operatorname{Tr}(M\theta(A)B))^2\le\operatorname{Re}\operatorname{Tr}(M\theta(A)A)\,\operatorname{Re}
-\operatorname{Tr}(M\theta(B)B)$ --- the DLS factorization step underlying Gaussian domination.
+\operatorname{Tr}(M\theta(B)B)$ --- the DLS factorization step underlying Gaussian domination.  The thirty-fifth
+layer (\texttt{RingReflectionThetaInvariance.lean}) shows the gauged DLS Hamiltonian is
+reflection-invariant, \texttt{ringReflectionThetaS\_toHamiltonian}: $\theta(\texttt{toHamiltonian})=
+\texttt{toHamiltonian}$ (the $H_L+\theta(H_L)$ part is swapped to itself; each crossing bond is fixed since
+$\hat S_x^\alpha$ commutes with $\theta(\hat S_x^\alpha)$), hence the gauged Gibbs weight is
+reflection-invariant (\texttt{ringReflectionThetaS\_ringDLSGibbs}), supplying the $\theta M=M$ hypothesis
+for the chessboard and real-diagonal lemmas.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
