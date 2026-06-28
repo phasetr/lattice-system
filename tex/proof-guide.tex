@@ -8239,7 +8239,17 @@ right-diagonal and are independent of the common right-half value; closed under 
 multiples, with left-site $\hat o_x$ generators), shows $\theta$ maps left-supported operators to
 right-supported ones, and defines the reflection-positive functional predicate
 $0 \le \operatorname{Re}\varphi(\theta(A)\,A)$ for left-supported $A$ --- the positivity at the heart
-of the Dyson--Lieb--Simon / Shastry argument.
+of the Dyson--Lieb--Simon / Shastry argument.  The fourth layer
+(\texttt{RingReflectionTraceCone.lean}) discharges the $\beta = 0$ base case
+\texttt{traceFunctional\_reflectionPositive}: the trace functional $X \mapsto \operatorname{Tr} X$ is
+reflection positive, $0 \le \operatorname{Re}\operatorname{Tr}(\theta(A)\,A)$ for every left-supported
+$A$.  The proof collapses $\operatorname{Tr}(\theta(A)\,A) = \sum_{\sigma,\mu}
+\theta(A)_{\sigma\mu} A_{\mu\sigma}$ to its diagonal (both support conditions force $\mu=\sigma$), then
+factorizes over the left/right configuration split \texttt{configSplitEquiv} (built from
+\texttt{finSumFinEquiv}): the diagonal value $A_{\sigma\sigma}$ depends only on the left half, so
+$\operatorname{Tr}(\theta(A)\,A) = \overline{S}\,S = \lVert S\rVert^2 \ge 0$ with
+$S = \sum_\ell D_\ell$.  This infinite-temperature trace cone is the building block on which a later
+layer mounts the Gibbs exponential via the Trotter / Lie-product expansion.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
