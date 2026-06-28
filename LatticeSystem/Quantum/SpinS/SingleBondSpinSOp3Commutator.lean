@@ -18,6 +18,8 @@ open Matrix Complex
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
+/-- Leibniz rule for the commutator with a third operator:
+`[A·B, T] = A·[B, T] + [A, T]·B`. -/
 private lemma leibniz_commutatorS (A B T : ManyBodyOpS Λ N) :
     A * B * T - T * (A * B) = A * (B * T - T * B) + (A * T - T * A) * B := by
   rw [mul_sub, sub_mul, mul_assoc, mul_assoc, mul_assoc]; abel
