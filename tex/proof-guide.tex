@@ -8365,7 +8365,12 @@ Hamiltonian to a bond sum: since \texttt{ringCoupling}$(2n)$ is $1$ exactly on s
 $(x, x+1 \bmod 2n)$, \texttt{heisenbergHamiltonianS\_ringCoupling\_eq\_bondSum} gives
 $\texttt{heisenbergHamiltonianS}\,(\texttt{ringCoupling}\,(2n))\,N
 = \sum_x \hat S_x \cdot \hat S_{\texttt{ringBondSucc}\,x}$, the starting point for splitting the ring
-Hamiltonian into its left, right, and crossing bonds.
+Hamiltonian into its left, right, and crossing bonds.  The eighteenth layer
+(\texttt{RingReflectionLeftBondSum.lean}) collapses the left coupling's double sum:
+\texttt{ringLeftHamiltonian\_eq\_leftBondSum} gives $\texttt{ringLeftHamiltonian}\,n\,N
+= \sum_x [\,\text{if } x+1<n \text{ then } \hat S_x\cdot\hat S_{x+1} \text{ else } 0\,]$ --- only the
+bonds $(x, x+1)$ entirely inside $\{0,\dots,n-1\}$ survive --- the left part of the ring DLS
+decomposition over its actual bonds.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one

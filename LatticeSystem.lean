@@ -84,6 +84,7 @@ import LatticeSystem.Quantum.SpinS.RingReflectionGibbsCapstone
 import LatticeSystem.Quantum.SpinS.RingReflectionRingInstance
 import LatticeSystem.Quantum.SpinS.RingReflectionLeftHamiltonian
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSum
+import LatticeSystem.Quantum.SpinS.RingReflectionLeftBondSum
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO
 import LatticeSystem.Quantum.SpinS.FerrimagneticLROCapstone
 import LatticeSystem.Quantum.SpinS.StaggeredCasimirSU2Invariance
