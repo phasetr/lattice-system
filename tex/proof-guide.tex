@@ -8581,7 +8581,16 @@ O^2\rangle\le\sqrt{6N^3C}\,L$, so $\langle(\hat O/L)^2\rangle\to0$.
 \texttt{groundState\_mulVec\_eq\_hermitianMinEigenvalue}: for a Hermitian $H$ and a normalized
 eigenvector $\Phi$ ($H\Phi=E_0\Phi$) whose $E_0$ has minimal real part over all eigenpairs,
 $H\Phi=(\texttt{hermitianMinEigenvalue}\,H)\,\Phi$ ($E_0$ is real by Hermiticity, and $E_0.\mathrm{re}$ is
-squeezed between the variational lower bound and the minimizing eigenvector).
+squeezed between the variational lower bound and the minimizing eigenvector).  \texttt{NoLongRangeOrderConditional.lean}
+assembles the whole chain into the exact $\varepsilon$--$\delta$ statement of Corollary 4.3 \emph{modulo
+the susceptibility bound}, \texttt{no\_long\_range\_order\_1d\_of\_susceptibility}: if there is $C\ge0$
+such that every normalized ground state of the zero-field ring has a potential $y$ for $\hat O\Phi$ with
+$\operatorname{Re}\langle y,\hat O\Phi\rangle\le C\,L$, then for every $\varepsilon>0$ there is $L_0$ beyond
+which every normalized ground state has $|\langle\Phi,\hat O^2\Phi\rangle_{\mathrm{re}}/L^2|<\varepsilon$
+(combining the $O(L)$ oscillator bound, the susceptibility reduction, the ground-state bridge, and an
+Archimedean $\varepsilon$--$\delta$).  This isolates the unconditional Corollary 4.3 to the
+reflection-positivity infrared bound $\operatorname{Re}\langle y,\hat O\Phi\rangle\le C\,L$; the documented
+axiom \texttt{no\_long\_range\_order\_1d} remains until that bound is established.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
