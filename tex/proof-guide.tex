@@ -8500,7 +8500,8 @@ ground-state quadratic form \texttt{staggeredOrderOpS\_sq\_dotProduct}: $\langle
 the exact state-expectation form $\langle\Phi,\hat O^2\Phi\rangle$ of the Corollary.  Toward the infrared / f-sum-rule
 bound, \texttt{SingleBondSpinSOp3Commutator.lean} computes the single-bond spin current
 \texttt{spinSDot\_commutator\_onSiteS\_spinSOp3}: $[\hat S_a\cdot\hat S_b,\hat S_a^{(3)}]=i(\hat S_a^{(1)}\hat
-S_b^{(2)}-\hat S_a^{(2)}\hat S_b^{(1)})$ for $a\neq b$, the building block of $[\hat H,\hat S_z^{(3)}]$ and the
+S_b^{(2)}-\hat S_a^{(2)}\hat S_b^{(1)})$ for $a\neq b$, with a symmetric right-endpoint companion
+\texttt{spinSDot\_commutator\_onSiteS\_spinSOp3\_right}; the building block of $[\hat H,\hat S_z^{(3)}]$ and the
 double commutator entering the bound on the staggered two-point function.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,

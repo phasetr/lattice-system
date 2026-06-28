@@ -72,4 +72,14 @@ theorem spinSDot_commutator_onSiteS_spinSOp3 {a b : Λ} (hab : a ≠ b) (N : ℕ
   rw [onSiteS_neg, onSiteS_smul, onSiteS_smul, neg_mul, smul_mul_assoc, smul_mul_assoc, smul_sub]
   abel
 
+/-- **The single-bond spin current at the right endpoint**: `[Ŝ_a · Ŝ_b, Ŝ_b^{(3)}] =
+i (Ŝ_b^{(1)} Ŝ_a^{(2)} − Ŝ_b^{(2)} Ŝ_a^{(1)})` for `a ≠ b`, the companion of
+`spinSDot_commutator_onSiteS_spinSOp3` (via the symmetry `Ŝ_a · Ŝ_b = Ŝ_b · Ŝ_a`). -/
+theorem spinSDot_commutator_onSiteS_spinSOp3_right {a b : Λ} (hab : a ≠ b) (N : ℕ) :
+    spinSDot a b N * onSiteS b (spinSOp3 N) - onSiteS b (spinSOp3 N) * spinSDot a b N
+      = I • (onSiteS b (spinSOp1 N) * onSiteS a (spinSOp2 N)
+          - onSiteS b (spinSOp2 N) * onSiteS a (spinSOp1 N)) := by
+  rw [spinSDot_comm a b]
+  exact spinSDot_commutator_onSiteS_spinSOp3 (Ne.symm hab) N
+
 end LatticeSystem.Quantum
