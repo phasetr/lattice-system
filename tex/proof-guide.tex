@@ -8531,7 +8531,10 @@ $A\Phi$ ($(H-E_0)y=A\Phi$), $2(\operatorname{Re}\langle\Phi,A^2\Phi\rangle)^2\le
 [A,[H,A]]\Phi\rangle\cdot\operatorname{Re}\langle y,A\Phi\rangle$ --- oscillator strength times susceptibility.  \texttt{StaggeredOrderCommutator.lean} expands the
 oscillator strength: \texttt{staggeredOrderOpS\_commutator} ($[\hat O,C]=\sum_x\varepsilon_x[\hat
 S_x^{(3)},C]$), applied twice giving $[\hat O,[\hat H,\hat O]]$ as a double site sum whose terms vanish off
-adjacent sites, reducing the naive $O(L^2)$ count to $O(L)$.
+adjacent sites, reducing the naive $O(L^2)$ count to $O(L)$.  Applied twice,
+\texttt{StaggeredOrderDoubleCommutator.lean} gives \texttt{staggeredOrderOpS\_double\_commutator}:
+$[\hat O,[\hat H,\hat O]]=\sum_x\sum_z\varepsilon_x\varepsilon_z[\hat S_x^{(3)},[\hat H,\hat S_z^{(3)}]]$, the
+f-sum-rule double commutator as a double site sum collapsing to $O(L)$ off-diagonally.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
