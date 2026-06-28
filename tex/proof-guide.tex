@@ -8424,7 +8424,10 @@ the DLS sign flip.  The twenty-seventh layer (\texttt{RingReflectionCrossConj.le
 for a left site $x<n$ (with reflection $r x$ a right site), \texttt{rightGauge\_conj\_crossBond}
 gives $\texttt{rightGauge}\cdot(\hat S_x\cdot\hat S_{r x})\cdot\texttt{rightGaugeInv}
 = -\,\texttt{crossBondInteractionS}\,x$ --- the left endpoint untouched, the right endpoint gauged.
-Both ring crossing bonds $(n-1,n)$ and $(2n-1,0)$ are of this form.
+Both ring crossing bonds $(n-1,n)$ and $(2n-1,0)$ are of this form.  The twenty-eighth layer
+(\texttt{RingReflectionNonCrossConj.lean}) sums these: \texttt{rightGauge\_conj\_ringLeftHamiltonian}
+and \texttt{rightGauge\_conj\_theta\_ringLeftHamiltonian} show the gauge fixes both the left bond
+Hamiltonian and the reflected right bond Hamiltonian $\theta(\texttt{ringLeftHamiltonian})$.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
