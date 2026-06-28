@@ -8249,7 +8249,18 @@ factorizes over the left/right configuration split \texttt{configSplitEquiv} (bu
 \texttt{finSumFinEquiv}): the diagonal value $A_{\sigma\sigma}$ depends only on the left half, so
 $\operatorname{Tr}(\theta(A)\,A) = \overline{S}\,S = \lVert S\rVert^2 \ge 0$ with
 $S = \sum_\ell D_\ell$.  This infinite-temperature trace cone is the building block on which a later
-layer mounts the Gibbs exponential via the Trotter / Lie-product expansion.
+layer mounts the Gibbs exponential via the Trotter / Lie-product expansion.  The fifth layer
+(\texttt{RingReflectionWeightedCone.lean}) is the algebraic completion of the cone:
+\texttt{SupportedOnLeftS.mul} (the left-half subalgebra is closed under products),
+\texttt{SupportedOnLeftS.mul\_theta\_comm} (a left-supported $A$ commutes with $\theta(B)$, which acts
+on the right half), and the \emph{weighted trace cone}
+\texttt{weightedTraceFunctional\_reflectionPositive}: for left-supported $C$ the functional
+$X \mapsto \operatorname{Tr}((\theta(C)\,C)\,X)$ is reflection positive, via
+$\operatorname{Tr}((\theta C\,C)(\theta A\,A)) = \operatorname{Tr}(\theta(CA)\,(CA)) \ge 0$ (using
+$\theta$'s multiplicativity, the commutation $C\,\theta A = \theta A\,C$, and the multiplicative
+closure $CA$ left-supported), together with its nonnegative finite-combination version
+\texttt{weightedTraceFunctional\_reflectionPositive\_finsetSum}.  These are the cone on which the
+Trotter/Lie-product factors of the Gibbs exponential will be mounted.
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
