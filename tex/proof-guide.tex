@@ -8550,7 +8550,9 @@ the two bonds incident to $z$, every other bond commuting.  \texttt{SingleBondCo
 bond commutator: \texttt{spinSDot\_commutator\_onSiteS\_spinSOp3\_norm\_le} gives $\|[\hat S_a\cdot\hat
 S_b,\hat S_a^{(3)}]\|\le2N^2$, so $\|[\hat H,\hat S_z^{(3)}]\|$ is $O(1)$ and the oscillator strength $O(L)$.  \texttt{RingHamiltonianCommutatorNorm.lean} records this length-independent
 bound, \texttt{heisenbergHamiltonianS\_ringCoupling\_commutator\_onSiteS\_spinSOp3\_norm\_le}: $\|[\hat
-H,\hat S_z^{(3)}]\|\le4N^2$ (sum of the two single-bond norms).  \texttt{TransverseBondEnergyNorm.lean}
+H,\hat S_z^{(3)}]\|\le4N^2$ (sum of the two single-bond norms).  \texttt{PairCommutatorNorm.lean} then bounds each oscillator-strength
+summand uniformly in $L$, \texttt{pair\_double\_commutator\_norm\_le}: $\|[\hat S_x^{(3)},[\hat H,\hat
+S_z^{(3)}]]\|\le4N^3$.  \texttt{TransverseBondEnergyNorm.lean}
 bounds each summand: \texttt{transverseBondEnergy\_manyBodyOperatorNormS\_le} gives $\|\hat S_a^{(1)}\hat
 S_b^{(1)}+\hat S_a^{(2)}\hat S_b^{(2)}\|\le2N^2$ (per-site $\|\hat S^{(\alpha)}\|\le N$ + submultiplicativity),
 so the oscillator strength is $O(L)$.  In a normalized state
