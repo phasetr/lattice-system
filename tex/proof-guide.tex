@@ -5732,6 +5732,27 @@ $i=j$ term is the same number-operator value $\hat n_i$. Specializing
 i.e.\ $B_{\rm r}=PA^{\mathsf T}P$ with $P=\texttt{particleHoleConfig}$
 ($\texttt{hubbardBlockKineticDownFixedRightMatrix\_eq\_up}$).
 
+\medskip\noindent\textbf{The kinetic energy as a coefficient-matrix trace (PR19).}
+File \texttt{LiebAttractiveEnergyTrace.lean} begins the reflection-positive energy
+assembly. The block-order kinetic energy of a state vector $\psi$ is expressed as a
+trace on the block coefficient matrix $C=\texttt{hubbardBlockCoeff}\,\psi$. Reindexing
+the energy dot-product sum over configurations by the bijection
+$(u,h)\mapsto\mathrm{merge}\,u\,(Ph)$ ($\texttt{hubbardBlockSpinConfigEquiv}$ composed
+with the particle--hole involution $P$ on the second factor) and inserting the PR10
+coefficient action $\mathrm{kinetic}=AC+CB_{\rm r}$ gives
+\[
+  \langle\psi|\hat H_{\rm kin}|\psi\rangle
+    = \texttt{dotProduct}\,(\star\psi)\,((\texttt{hubbardBlockKinetic}\,N\,T)\,\psi)
+    = \operatorname{tr}\!\bigl(C^{\mathsf H}\,(AC+CB_{\rm r})\bigr)
+\]
+($\texttt{hubbardBlockKinetic\_dotProduct\_eq\_trace}$), where the entrywise expansion
+$\operatorname{tr}(C^{\mathsf H}M)=\sum_{u,h}\overline{C_{uh}}\,M_{uh}$ is
+$\texttt{trace\_conjTranspose\_mul\_eq\_sum}$. This holds for \emph{every} $\psi$ (no
+half-filling restriction --- that enters later, at the Perron--Frobenius/polar step).
+It is the bridge from the operator energy to the spin-reflection Gram form
+$0\le\operatorname{Re}\operatorname{tr}(CACA^{\mathsf H})$ (PR1), which a subsequent
+layer reaches via $B_{\rm r}=PA^{\mathsf T}P$ (PR18).
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
