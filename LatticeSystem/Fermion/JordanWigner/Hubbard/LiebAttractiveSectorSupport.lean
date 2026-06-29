@@ -60,6 +60,7 @@ noncomputable def hubbardBlockIndexEquiv (N : ℕ) :
       obtain ⟨i, σ, hiσ⟩ := exists_hubbardBlockIndex N k
       exact ⟨(i, σ), hiσ.symm⟩)
 
+/-- The block-index equivalence applies as the block index `hubbardBlockIndex i σ`. -/
 @[simp]
 theorem hubbardBlockIndexEquiv_apply (N : ℕ) (p : Fin (N + 1) × Fin 2) :
     hubbardBlockIndexEquiv N p = hubbardBlockIndex N p.1 p.2 := rfl
