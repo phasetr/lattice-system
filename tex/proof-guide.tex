@@ -5942,6 +5942,18 @@ increase (each $\operatorname{Re}\operatorname{tr}(WI_xWI_x)\le\operatorname{Re}
 the $-U_x\le0$ sign flipping the inequality): $\texttt{liebSRPEnergy\_abs\_le}$. This is the heart of
 spin-space reflection positivity.
 
+\medskip\noindent\textbf{The kinetic reconciliation identity (PR33a, Hubbard reconciliation crux).}
+File \texttt{LiebAttractiveKineticW.lean} fixes the correct Hermitian coefficient matrix for the energy
+reconciliation: the \emph{block} coefficient $C$ with a particle-hole \emph{column} reindex $W:=C\,P$
+($P$ the particle-hole permutation, a Hermitian involution) --- not the raw $\texttt{spinReflectionCoeff}$
+(whose $\varepsilon$-bridge to the block coefficient is non-gauge). Since $B_{\rm r}=P\,A^{\mathsf H}\,P$
+(PR22), for Hermitian $W$ the block kinetic quadratic form is clean:
+\[
+  \operatorname{tr}\!\bigl(C^{\mathsf H}(AC+C(PA^{\mathsf H}P))\bigr)=2\operatorname{tr}(W^2A)
+\]
+(cyclic trace and $P^2=1$; $\texttt{trace\_conj\_kinetic\_eq\_two\_trace\_W\_sq}$), identifying $T_S=A$ for
+the abstract $\texttt{liebSRPEnergy}$ on $W$.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
