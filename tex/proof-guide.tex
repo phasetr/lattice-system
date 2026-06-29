@@ -5596,6 +5596,21 @@ interleaved merge
 fermionic operator conjugacy (transporting creation/annihilation operators under
 the permutation) is the next layer.
 
+\medskip
+\noindent\textbf{The signed permutation operator (PR12).} File
+\texttt{LiebAttractivePermutation.lean} builds the second-quantized transport
+operator. Generalizing the cyclic translation operator of §11.4 (and reusing the
+already-general Jordan--Wigner sign $\texttt{translationJwSign}$), the signed
+permutation operator $\texttt{permutationOperator}\,\pi$ acts on the occupation
+basis as $|\sigma\rangle\mapsto\varepsilon(\pi,\sigma)\,|\sigma\circ\pi^{-1}\rangle$
+($\texttt{permutationOperator\_mulVec\_basisVec}$) and is \textbf{unitary}
+($\texttt{permutationOperator\_conjTranspose\_mul}$ and its companion, the second
+following from $A^{\mathsf H}A=1\Rightarrow AA^{\mathsf H}=1$ in finite dimension).
+Specializing to the block $\leftrightarrow$ interleaved permutation gives the
+unitary $\texttt{hubbardBlockToSpinfulPermutationOperator}$ that will transport the
+Fock operators between the two orderings. The creation/annihilation conjugation
+identity is the next layer.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
