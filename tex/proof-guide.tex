@@ -6142,6 +6142,14 @@ relabeling $U^{\mathsf H}$ preserves the count, so the entry vanishes off the ba
 ($\texttt{blockWCoeff\_apply\_eq\_zero\_of\_count\_ne}$). The genuine invariant square block is the balanced
 sector $|u|=|h|=N_e/2$ ($N_e$ even), treated next.
 
+\medskip\noindent\textbf{Single configuration-hop uniqueness (PR40b).}
+File \texttt{LiebAttractiveKineticHopEntry.lean} proves the combinatorial uniqueness underlying the
+configuration-graph connectivity of $A=\texttt{hubbardBlockKineticUpFixedMatrix}$: from a fixed configuration
+$u$ (with $u_j=1$, $u_i=0$), the single hop $q\to p$ reaches $\texttt{hop}\,u\,j\,i$ only for $(p,q)=(i,j)$
+($\texttt{hubbardSpinHopConfig\_inj\_of\_hop}$). This term-selection collapses the kinetic double sum
+$\sum_{p,q}T_{p,q}\,\hat c^\dagger_p\hat c_q$ to the surviving $(i,j)$ entry ($=\pm T_{i,j}\neq0$) in the
+connectivity step.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
