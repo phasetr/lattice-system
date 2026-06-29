@@ -160,6 +160,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveHermitianGround
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveNormFoundation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveHamiltonianHermitian
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractivePosSemidefGround
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveGroundLyapunov
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation

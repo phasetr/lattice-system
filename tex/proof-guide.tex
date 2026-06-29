@@ -6123,6 +6123,16 @@ single $\delta_a\in\ker R$ propagates along every walk ($R\delta_a=0\implies R(A
 puts every neighbour into the kernel); connectivity forces all-or-nothing. With the kernel invariance (PR39a) and
 the coordinate-subspace property (PR39b), this is the abstract form of Tasaki Lemma 10.10.
 
+\medskip\noindent\textbf{The W-space Lyapunov equation (PR39d).}
+File \texttt{LiebAttractiveGroundLyapunov.lean} derives, for a $\hat H$-eigenvector $\psi$ at eigenvalue $E$, the
+W-space Schr\"odinger equation for $R:=\texttt{blockWCoeff}\,\psi$ (intertwiner PR36c $+$ linearity):
+\[
+  A R+R A^{\mathsf H}-\sum_x U_x\,D_x R D_x=E R,
+\]
+$A=\texttt{hubbardBlockKineticUpFixedMatrix}\,T$, $D_x=\texttt{hubbardUpOccupationDiag}\,x$
+($\texttt{blockWCoeff\_lyapunov\_of\_eigenvector}$). This is precisely the hypothesis form of the abstract Lemma 10.10
+($\texttt{posSemidef\_ground\_kernel\_propagation}$, $\texttt{posDef\_or\_eq\_zero\_of\_connected\_support}$).
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
