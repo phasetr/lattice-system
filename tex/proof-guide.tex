@@ -5900,6 +5900,20 @@ $\texttt{spinReflectionCoeff}(\theta\psi)=(\texttt{spinReflectionCoeff}\,\psi)^{
 coefficient matrix is Hermitian iff $\psi$ is fixed by the spin reflection $\theta$
 ($\texttt{spinReflectionCoeff\_isHermitian\_iff\_thetaFixed}$).
 
+\medskip\noindent\textbf{The SRP eigenvalue rearrangement (PR29, corrected endgame).}
+The mathematical heart of Lieb's inequality $E(W)\ge E(|W|)$ (Tasaki eq.~(10.2.41)$\to$(10.2.43)) is an
+elementary rearrangement. For a Hermitian $W=\sum_j\lambda_j v_jv_j^\dagger$ and
+$|W|=\sum_j|\lambda_j|v_jv_j^\dagger$, the kinetic term $\sum_j\lambda_j^2(v_j^\dagger Tv_j)$ is invariant
+($\lambda_j^2=|\lambda_j|^2$), while the attractive interaction
+$-\sum_x U_x\sum_{j,k}\lambda_j\lambda_k|v_j^\dagger I^{(x)}v_k|^2$ ($U_x>0$) does not increase, because for
+nonnegative weights $a_{j,k}=|v_j^\dagger I^{(x)}v_k|^2\ge0$,
+\[
+  \sum_{j,k}\lambda_j\lambda_k\,a_{j,k}\le\sum_{j,k}|\lambda_j||\lambda_k|\,a_{j,k}
+\]
+termwise ($\lambda_j\lambda_k\le|\lambda_j||\lambda_k|$). File \texttt{LiebAttractiveSRPRearrangement.lean}
+isolates this inequality ($\texttt{lieb\_srp\_rearrangement}$); assembling it into the full energy
+functional $E(W)\ge E(|W|)$ on the sectorized Hermitian coefficient matrix is a subsequent layer.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
