@@ -6077,6 +6077,13 @@ norm, $\sum_{u,h}||W|_{u,h}|^2=\sum_{u,h}|W_{u,h}|^2$ (from $|W|^2=W^2$ and
 $\operatorname{tr}(|W|^{\mathsf H}|W|)=\operatorname{tr}(W^2)=\operatorname{tr}(W^{\mathsf H}W)$). These
 identities let the SRP monotonicity transfer from the energy functional to actual states.
 
+\medskip\noindent\textbf{The Hamiltonian is Hermitian (PR38b).}
+File \texttt{LiebAttractiveHamiltonianHermitian.lean} records that $\hat H=\texttt{attractiveHubbardHamiltonian}$
+is Hermitian for symmetric real hopping $T$ ($\texttt{attractiveHubbardHamiltonian\_isHermitian}$): the kinetic
+part via $\texttt{hubbardKinetic\_isHermitian}$, the attractive interaction $-\sum_x U_x\hat n_{x\uparrow}\hat n_{x\downarrow}$
+as a real combination of Hermitian double-occupancy operators. This is the input to the variational/Perron--Frobenius
+arguments of the PSD ground-representative step.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
