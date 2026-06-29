@@ -5932,6 +5932,16 @@ to the spectral double sum $\operatorname{Re}\operatorname{tr}(WIWI)=\sum_{j,k}\
 $|\lambda|$, and the elementary rearrangement $\texttt{lieb\_srp\_rearrangement}$ (PR29) closes the
 inequality ($\texttt{trace\_hermitian\_interaction\_re\_le\_abs}$).
 
+\medskip\noindent\textbf{The abstract SRP energy monotonicity (PR32, corrected endgame).}
+File \texttt{LiebAttractiveEnergyMonotone.lean} combines the kinetic invariance ($|W|^2=W^2$, PR30) and the
+interaction inequality (PR31) into the energy monotonicity $E(|W|)\le E(W)$ (Tasaki eq.~(10.2.43)). The
+Lieb energy functional ($\texttt{liebSRPEnergy}$)
+$E(W)=2\operatorname{Re}\operatorname{tr}(W^2T)-2\sum_x U_x\operatorname{Re}\operatorname{tr}(WI_xWI_x)$
+($U_x\ge0$) has unchanged kinetic term under $W\mapsto|W|$, and its attractive interaction does not
+increase (each $\operatorname{Re}\operatorname{tr}(WI_xWI_x)\le\operatorname{Re}\operatorname{tr}(|W|I_x|W|I_x)$,
+the $-U_x\le0$ sign flipping the inequality): $\texttt{liebSRPEnergy\_abs\_le}$. This is the heart of
+spin-space reflection positivity.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
