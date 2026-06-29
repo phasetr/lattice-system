@@ -5835,6 +5835,25 @@ under the spin-reflection variational replacement $C\mapsto|C|$. The positive-se
 Perron--Frobenius structure lives on $\texttt{spinReflectionCoeff}$ (not the block coefficient matrix
 of the kinetic trace), so the interaction energy is naturally expressed there.
 
+\medskip\noindent\textbf{Equal entry magnitudes of the two coefficient matrices (PR25).}
+File \texttt{LiebAttractiveCoeffNormSq.lean} bridges the two coordinate systems. The kinetic trace
+lives on $\texttt{hubbardBlockCoeff}\,(U^{\mathsf H}\psi)$ (PR23) while the interaction and the
+positive-semidefinite/Perron--Frobenius structure live on $\texttt{spinReflectionCoeff}\,\psi$
+(PR24, PR1); PR17 relates them entrywise by a Jordan--Wigner sign $\varepsilon$,
+$\texttt{spinReflectionCoeff}\,(U\psi)=\varepsilon\odot\texttt{hubbardBlockCoeff}\,\psi$. Since
+$\varepsilon=\pm1$ is a root of unity ($\operatorname{normSq}\varepsilon=1$, from
+$\texttt{translationJwSign\_sq}$/$\texttt{translationJwSign\_star}$), the two matrices have equal
+entry magnitudes:
+\[
+  \bigl|\,(\texttt{spinReflectionCoeff}\,\psi)_{u,h}\,\bigr|^2
+    = \bigl|\,(\texttt{hubbardBlockCoeff}\,(U^{\mathsf H}\psi))_{u,h}\,\bigr|^2
+\]
+($\texttt{spinReflectionCoeff\_normSq\_eq\_hubbardBlockCoeff}$, via PR17 at $\varphi=U^{\mathsf H}\psi$
+and $U U^{\mathsf H}=1$). This lets the variational replacement $C\mapsto|C|$ (run on the
+positive-semidefinite $\texttt{spinReflectionCoeff}$) control the interaction energy expressed on the
+block coefficient matrix, without transporting positive-semidefiniteness through the non-gauge sign
+$\varepsilon$.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
