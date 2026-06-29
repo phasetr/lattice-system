@@ -147,6 +147,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveHermitianAbs
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveInteractionIneq
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveEnergyMonotone
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveKineticW
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveInteractionW
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
