@@ -6004,6 +6004,19 @@ is a composition of linear isomorphisms --- surjective, with explicit inverse $\
 ($\texttt{blockWCoeff\_gammaWState}$). This is the coordinate backbone for parametrizing trial states by a
 Hermitian $W$.
 
+\medskip\noindent\textbf{The $\Gamma$-reflection $\Theta$ and the Hermitian-$W$ criterion (PR35, $\Gamma$-family layer 2).}
+File \texttt{LiebAttractiveGammaReflection.lean} defines the $\Gamma$-reflection $\Theta\psi:=\Gamma((\texttt{blockWCoeff}\,\psi)^{\mathsf H})$,
+the state map that conjugate-transposes the coefficient $W\mapsto W^{\mathsf H}$ in $\Gamma$ coordinates, and
+proves the criterion
+\[
+  (\texttt{blockWCoeff}\,\psi)\ \text{Hermitian}\iff\Theta\psi=\psi.
+\]
+Here $\texttt{blockWCoeff}\,\psi=\texttt{hubbardBlockCoeff}(U^{\mathsf H}\psi)\cdot P$ is injective (PR34 gauge
+cancellation composed with the unitary $U^{\mathsf H}$), and $\texttt{blockWCoeff}(\Theta\psi)=(\texttt{blockWCoeff}\,\psi)^{\mathsf H}$
+by $\Gamma$-surjectivity, so the criterion follows by injectivity. This is the $\varepsilon$-bridge-free
+analogue of $\texttt{spinReflectionCoeff\_isHermitian\_iff\_thetaFixed}$ for the matrix $W$ the energy
+reconciliation actually uses.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
