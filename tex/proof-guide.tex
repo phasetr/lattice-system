@@ -5799,6 +5799,26 @@ $A^{\mathsf H}=A^{\mathsf T}$
 ($\texttt{hubbardBlockKineticDownFixedRightMatrix\_eq\_permConj\_conjTranspose}$), the adjoint
 form the SRP energy bound consumes.
 
+\medskip\noindent\textbf{The interleaved kinetic energy as a block trace (PR23).}
+File \texttt{LiebAttractiveInterleavedEnergy.lean} ports the PR19 trace from the block kinetic
+operator to the interleaved $\texttt{hubbardKinetic}$ used by the attractive Hamiltonian. PR16
+gives $U\,\hat H^{\rm block}_{\rm kin}\,U^{\mathsf H}=\hat H_{\rm kin}$ with
+$U=\texttt{permutationOperator}\,(\texttt{hubbardBlockToSpinfulOrbitalEquiv}\,N)$; combined with the
+elementary quadratic-form conjugation identity
+$\langle v|UMU^{\mathsf H}|v\rangle=\langle U^{\mathsf H}v|M|U^{\mathsf H}v\rangle$
+($\texttt{dotProduct\_conj\_mul\_conjTranspose}$, pure matrix algebra, no unitarity required),
+the interleaved kinetic energy equals the PR19 block trace at the back-rotated state:
+\[
+  \langle\psi|\hat H_{\rm kin}|\psi\rangle
+    = \operatorname{tr}\!\bigl(C'^{\mathsf H}(AC'+C'B_{\rm r})\bigr),\qquad
+  C'=\texttt{hubbardBlockCoeff}\,(U^{\mathsf H}\psi)
+\]
+($\texttt{hubbardKinetic\_dotProduct\_eq\_block\_trace\_of\_interleaved}$). This is the kinetic
+half of the full attractive-Hubbard energy functional; the interaction is Hadamard-diagonal on the
+spin-reflection coefficient matrix $\texttt{spinReflectionCoeff}$ (which, not
+$\texttt{hubbardBlockCoeff}$, carries the positive-semidefinite / Perron--Frobenius structure), and
+the two coordinate systems are reconciled through the PR17 entrywise-sign bridge in a later layer.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
