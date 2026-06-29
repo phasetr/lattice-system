@@ -5645,6 +5645,30 @@ inversions through $q$ ($\#S(c)=\#S(\mathrm{update}\,c\,q\,0)+(\#B+\#C)$), while
 $E_q(c)=\#A+\#B$ and (after reindexing the sum by $\pi$) $E_{\pi q}(\sigma)=\#A+\#C$;
 both exponents are $\#B+\#C$ modulo the cancelling even terms.
 
+\medskip
+\noindent\textbf{The conjugated single-hop operator equality (PR15).} File
+\texttt{LiebAttractiveCocycleOperator.lean} assembles PR13 and PR14 into the operator
+identity
+\[
+  U(\hat c^\dagger_p\hat c_q)U^{\mathsf H}
+    = \hat c^\dagger_{\pi p}\hat c_{\pi q},\qquad U=\texttt{permutationOperator}\,\pi:
+\]
+conjugating a single hop by the signed permutation operator is exactly the hop at the
+permuted orbitals. The \emph{cocycle} ($\texttt{permutationHopConjSign\_eq}$) collapses
+the PR13 composite sign to the single permuted bare hop sign: under the hop-allowed
+condition, multiplying the two PR14 parity laws (remove at $q$, add at $p$) and using
+$\mathrm{jwSign}^2=1$, $\varepsilon(\pi,\cdot)^2=1$ gives
+$\texttt{permutationHopConjSign}\,\pi\,p\,q\,\sigma
+   = \mathrm{jwSign}_{\pi q}(\sigma)\cdot
+     \mathrm{jwSign}_{\pi p}(\mathrm{update}\,\sigma\,(\pi q)\,0)$.
+The PR13 target state
+$\mathrm{update}^2(\sigma\circ\pi)\circ\pi^{-1}$ relabels (via $\texttt{update\_comp\_perm}$
+twice and $\pi\circ\pi^{-1}=\mathrm{id}$) to $\mathrm{update}^2\,\sigma$ at the permuted
+orbitals, so the conjugated hop and the bare hop $\hat c^\dagger_{\pi p}\hat c_{\pi q}$
+agree on every basis column ($\texttt{permutationOperator\_hop\_conj\_mulVec\_basisVec}$);
+matrix extensionality then gives the operator identity
+($\texttt{permutationOperator\_hop\_conj\_eq}$).
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
