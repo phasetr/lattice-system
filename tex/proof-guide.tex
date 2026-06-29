@@ -5708,6 +5708,30 @@ block merge, the bridge is a single entrywise sign --- \emph{not} a row/column g
 $D_1CD_2$ --- so it cannot transport positive-semidefiniteness; the RP energy form is
 therefore carried on the raw $\texttt{hubbardBlockCoeff}$.
 
+\medskip\noindent\textbf{The down/up kinetic adjoint relation $B_{\rm r}=PA^{\mathsf T}P$ (PR18).}
+File \texttt{LiebAttractiveBrRelation.lean} fixes the relation between the right
+multiplier $B_{\rm r}=\texttt{hubbardBlockKineticDownFixedRightMatrix}$ and the left
+multiplier $A=\texttt{hubbardBlockKineticUpFixedMatrix}$ \emph{before} assembling the
+reflection-positive energy trace (so the correct adjoint enters). The heart is a
+spin-species swap of the kinetic matrix entry: for any spectator configurations
+$w,v$,
+\[
+  \texttt{hubbardBlockKineticDown}\,N\,T\,(\mathrm{merge}\,w\,a)\,(\mathrm{merge}\,w\,b)
+    = \texttt{hubbardBlockKineticUp}\,N\,T\,(\mathrm{merge}\,a\,v)\,(\mathrm{merge}\,b\,v)
+\]
+($\texttt{hubbardBlock\_kineticDown\_entry\_eq\_kineticUp\_entry}$). The entry is
+independent of the spectator species because the Jordan--Wigner between-occupation
+sign only sees the active species (PR3 $\texttt{hubbardBlock\_betweenSum\_up/\_down}$);
+the firing condition only depends on the active column configuration; and the diagonal
+$i=j$ term is the same number-operator value $\hat n_i$. Specializing
+($w=\mathbf 0$, $a=Ph'$, $b=Ph$, $v=P\mathbf 0$) gives, with no symmetry hypothesis on $T$,
+\[
+  \texttt{hubbardBlockKineticDownFixedRightMatrix}\,N\,T\,h\,h'
+    = \texttt{hubbardBlockKineticUpFixedMatrix}\,N\,T\,(Ph')\,(Ph),
+\]
+i.e.\ $B_{\rm r}=PA^{\mathsf T}P$ with $P=\texttt{particleHoleConfig}$
+($\texttt{hubbardBlockKineticDownFixedRightMatrix\_eq\_up}$).
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
