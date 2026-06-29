@@ -5966,6 +5966,15 @@ $W$ the trace collapses cleanly:
 PR33a the half-filled energy is $2\operatorname{tr}(W^2A)-\sum_x U_x\operatorname{tr}(W D_x W D_x)
 =\texttt{liebSRPEnergy}\,A\,D\,(U/2)\,W$.
 
+\medskip\noindent\textbf{Particle-hole conjugation facts (PR33c).}
+File \texttt{LiebAttractivePHConjDiag.lean} collects the elementary facts about $P=\texttt{particleHoleConfigPermMatrix}$
+used to assemble the reconciliation: $P$ is a Hermitian involution ($P^2=1$, $P^{\mathsf H}=P$;
+$\texttt{particleHoleConfigPermMatrix\_mul\_self}$, $\texttt{particleHoleConfigPermMatrix\_isHermitian}$);
+conjugating a diagonal by $P$ reindexes it by the involution $\varphi$, $P\,(\operatorname{diag}d)\,P
+=\operatorname{diag}(d\circ\varphi)$ ($\texttt{particleHoleConfigPermMatrix\_conj\_diagonal}$); hence the
+hole diagonal is the particle-hole conjugate of the up diagonal, $E_x=P\,D_x\,P$
+($\texttt{hubbardHoleOccupationDiag\_eq\_permConj}$). This is the $I_x=P\,D_x\,P$ input feeding PR33b.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
