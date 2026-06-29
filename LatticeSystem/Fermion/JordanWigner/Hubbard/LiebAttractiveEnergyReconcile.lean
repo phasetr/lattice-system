@@ -40,7 +40,7 @@ spectral absolute value `|W|`.
   real-part consumer `Re⟨ψ|Ĥ|ψ⟩ = liebSRPEnergy A D (U/2) W`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
-1st ed., Springer 2020, §10.2.4, eq. (10.2.39); E. H. Lieb,
+1st ed., Springer 2020, §10.2.4, eq. (10.2.39), pp. 363–367; E. H. Lieb,
 *Phys. Rev. Lett.* **62** (1989) 1201.
 -/
 
