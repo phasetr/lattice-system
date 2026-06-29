@@ -5923,6 +5923,15 @@ and proves its three structural facts: it is positive-semidefinite
 hence Hermitian, and squares to $W^2$ ($\texttt{hermitianAbs\_mul\_self}$: $|W|^2=W^2$, the kinetic
 invariance $\operatorname{Tr}(W^2T)=\operatorname{Tr}(|W|^2T)$ under $W\mapsto|W|$).
 
+\medskip\noindent\textbf{The abstract SRP interaction inequality (PR31, corrected endgame).}
+File \texttt{LiebAttractiveInteractionIneq.lean} proves, for Hermitian $W,I$,
+$\operatorname{Re}\operatorname{tr}(WIWI)\le\operatorname{Re}\operatorname{tr}(|W|I|W|I)$. Diagonalizing
+$W=U\,D\,U^{\mathsf H}$ (spectral theorem) and setting $M=U^{\mathsf H}IU$, the trace cyclically expands
+to the spectral double sum $\operatorname{Re}\operatorname{tr}(WIWI)=\sum_{j,k}\lambda_j\lambda_k|M_{j,k}|^2$
+(via $\texttt{trace\_mul\_comm}$ and the PR27 diagonal-sandwich expansion); $|W|$ yields the same with
+$|\lambda|$, and the elementary rearrangement $\texttt{lieb\_srp\_rearrangement}$ (PR29) closes the
+inequality ($\texttt{trace\_hermitian\_interaction\_re\_le\_abs}$).
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}

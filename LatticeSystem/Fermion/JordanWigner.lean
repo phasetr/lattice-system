@@ -144,6 +144,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveInteractionTrace
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveHermitianCoeff
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveSRPRearrangement
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveHermitianAbs
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveInteractionIneq
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
