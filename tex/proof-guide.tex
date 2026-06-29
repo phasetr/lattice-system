@@ -5494,6 +5494,23 @@ the level of the fixed-species fibers. Identifying these operators as left / rig
 multiplication on the coefficient matrix and connecting them to the interleaved
 $\texttt{hubbardKinetic}$ are the subsequent layers.
 
+\medskip
+\noindent\textbf{The row-local up-kinetic action on the block coefficient matrix
+(PR6).} In file \texttt{LiebAttractiveBlockCoeff.lean} we read the species
+factorization in coefficient-matrix language. Introducing the block coefficient
+matrix $\texttt{hubbardBlockCoeff}\,N\,\psi\,u\,h = \psi(\mathrm{merge}\,u\,
+(\mathbf{1}-h))$ (the block-order analogue of $\texttt{spinReflectionCoeff}$), the
+fixed-down-fiber invariance of PR5 gives that the up-kinetic matrix entry between
+configurations with different down parts vanishes
+($\texttt{hubbardBlockKineticUp\_apply\_eq\_zero\_of\_down\_ne}$). Reindexing the
+matrix-vector product over the block factorization and discarding those vanishing
+terms, the up kinetic operator acts on the block coefficient matrix as a
+\emph{row-local (left) action}: each column $h$ is transformed by a fixed
+per-column matrix with no mixing between columns
+($\texttt{hubbardBlockCoeff\_hubbardBlockKineticUp\_mulVec}$). Identifying that
+per-column matrix with the single-species Fock kinetic operator, and connecting the
+block order to the interleaved $\texttt{hubbardKinetic}$, are the next layers.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}

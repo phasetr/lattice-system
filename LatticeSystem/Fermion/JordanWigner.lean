@@ -119,6 +119,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveCoeffAction
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBlockOrder
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveHopAction
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBlockKinetic
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBlockCoeff
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
