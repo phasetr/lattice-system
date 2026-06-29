@@ -5608,8 +5608,21 @@ basis as $|\sigma\rangle\mapsto\varepsilon(\pi,\sigma)\,|\sigma\circ\pi^{-1}\ran
 following from $A^{\mathsf H}A=1\Rightarrow AA^{\mathsf H}=1$ in finite dimension).
 Specializing to the block $\leftrightarrow$ interleaved permutation gives the
 unitary $\texttt{hubbardBlockToSpinfulPermutationOperator}$ that will transport the
-Fock operators between the two orderings. The creation/annihilation conjugation
-identity is the next layer.
+Fock operators between the two orderings.
+
+\medskip
+\noindent\textbf{The conjugated single-hop basis action (PR13).} File
+\texttt{LiebAttractiveConjHop.lean} computes the action of a conjugated hopping
+term on a basis state. Chaining the basis actions of $U^{\mathsf H}$
+($U^{\mathsf H}|\sigma\rangle = \varepsilon(\pi,\sigma\circ\pi)\,
+|\sigma\circ\pi\rangle$, $\texttt{permutationOperator\_conjTranspose\_mulVec\_basisVec}$),
+the bare hop, and $U$, we obtain
+$U(\hat c^\dagger_p\hat c_q)U^{\mathsf H}|\sigma\rangle$ as a signed basis state
+($\texttt{permutationOperator\_hopping\_conj\_mulVec\_basisVec}$), with the
+composite Jordan--Wigner / permutation sign $\texttt{permutationHopConjSign}$ kept
+explicit. Reducing this to the operator equality $U\hat H_{\mathrm{block}}
+U^{\mathsf H}=\hat H_{\mathrm{interleaved}}$ requires the Jordan--Wigner sign
+cocycle identities, a later layer.
 
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}

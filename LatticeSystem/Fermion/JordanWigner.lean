@@ -126,6 +126,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveFockDown
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBlockKineticMatrix
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveInterleave
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractivePermutation
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveConjHop
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
