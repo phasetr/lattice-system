@@ -5767,6 +5767,21 @@ $\texttt{toMatrix\_toPEquiv\_mul}$/$\texttt{mul\_toMatrix\_toPEquiv}$
 as matrix algebra (rather than entrywise) keeps the subsequent reflection-positive
 trace manipulations free of entrywise rewriting.
 
+\medskip\noindent\textbf{The block kinetic operator and its fixed matrix are Hermitian (PR21).}
+File \texttt{LiebAttractiveKineticHermitian.lean} establishes the Hermitian half of the
+reflection-positive Gram input. For a Hermitian hopping matrix $T$
+($\overline{T_{ij}}=T_{ji}$, in particular any real symmetric $T$) the block up-kinetic
+operator $\texttt{hubbardBlockKineticUp}$ is Hermitian
+($\texttt{hubbardBlockKineticUp\_isHermitian}$, the same argument as
+$\texttt{fermionHopping\_isHermitian}$ with the mode indices replaced by the block
+indices $\texttt{hubbardBlockIndex}\,N\,i\,0$). Its gauge-fixed left multiplier
+$A=\texttt{hubbardBlockKineticUpFixedMatrix}$ is therefore Hermitian, $A^{\mathsf H}=A$
+($\texttt{hubbardBlockKineticUpFixedMatrix\_isHermitian}$): the entries of $A$ are matrix
+elements of the Hermitian operator between block-merge configurations. Combined with the
+entrywise reality $A^{\mathsf T}=A$ (a later layer) this gives $A^{\mathsf H}=A^{\mathsf T}$,
+hence $B_{\rm r}=P\,A^{\mathsf H}\,P$, which the SRP energy bound
+$\texttt{spinReflection\_gramMatrix\_nonneg}$ consumes.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
