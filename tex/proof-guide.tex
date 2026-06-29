@@ -5580,6 +5580,22 @@ coefficient-matrix form of Lieb's kinetic energy; what remains is connecting the
 block order to the interleaved order, assembling the reflection-positivity energy
 form, and the Perron--Frobenius / singlet endpoint.
 
+\medskip
+\noindent\textbf{The block $\leftrightarrow$ interleaved relabeling (PR11).} File
+\texttt{LiebAttractiveInterleave.lean} builds the combinatorial bridge between the
+two orderings of the $2N+2$ spin-orbitals: the interleaved order
+$\texttt{spinfulIndex}\,N\,i\,\sigma=2i+\sigma$ (used by the actual Hamiltonian and
+$\texttt{spinReflectionCoeff}$) and the block order $\texttt{hubbardBlockIndex}\,
+N\,i\,\sigma=i+\sigma(N+1)$ (used by the kinetic factorization). Factoring each
+through $(\mathrm{site},\mathrm{spin})$, the orbital permutation
+$\texttt{hubbardBlockToSpinfulOrbitalEquiv}$ sends a block index to the interleaved
+index, and the induced configuration relabeling
+$\texttt{hubbardBlockToSpinfulConfigEquiv}$ carries the block merge to the
+interleaved merge
+($\texttt{hubbardBlockToSpinfulConfigEquiv\_hubbardBlockMergeConfig}$). The signed
+fermionic operator conjugacy (transporting creation/annihilation operators under
+the permutation) is the next layer.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
