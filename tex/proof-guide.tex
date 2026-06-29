@@ -6017,6 +6017,17 @@ by $\Gamma$-surjectivity, so the criterion follows by injectivity. This is the $
 analogue of $\texttt{spinReflectionCoeff\_isHermitian\_iff\_thetaFixed}$ for the matrix $W$ the energy
 reconciliation actually uses.
 
+\medskip\noindent\textbf{The kinetic intertwiner (PR36a, $\Gamma$-family).}
+File \texttt{LiebAttractiveKineticIntertwiner.lean} computes how the kinetic Hamiltonian acts in the
+$W$-coordinate $W:=\texttt{blockWCoeff}\,\psi$. Conjugating to block order ($U^{\mathsf H}\hat H_{\rm kin}U=\texttt{hubbardBlockKinetic}$)
+and applying the block coefficient action $C\mapsto A\,C+C\,B_{\rm r}$ with $B_{\rm r}=P\,A^{\mathsf H}\,P$, the
+$\cdot P$ reindex collapses the gauge:
+\[
+  \texttt{blockWCoeff}(\hat H_{\rm kin}\psi)=A\,W+W\,A^{\mathsf H},
+\]
+$A=\texttt{hubbardBlockKineticUpFixedMatrix}\,T$ ($\texttt{blockWCoeff\_hubbardKinetic\_mulVec}$, entrywise-real $T$).
+This is manifestly equivariant under $W\mapsto W^{\mathsf H}$ --- the kinetic half of the $\hat H$--$\Theta$ commutation.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
