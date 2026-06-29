@@ -6106,6 +6106,15 @@ $\sum_x U_x\langle I_xv,R\,I_xv\rangle=0$; each summand is nonnegative and $U_x>
 Lemma A.11), and the vector form then gives $R(A^{\mathsf H}v)=0$. This invariance is what the connectivity
 argument propagates to force $R$ positive definite or zero ($\texttt{posSemidef\_ground\_kernel\_propagation}$).
 
+\medskip\noindent\textbf{Basis extraction (PR39b, Lemma 10.10).}
+File \texttt{Math/PosSemidef/SeparatingProjectionKernel.lean} shows that if $\ker R$ is invariant under each of a
+family of $0/1$-diagonal projections $\operatorname{diag}(d_x)$ whose diagonals separate points, then $\ker R$ is
+spanned by standard basis vectors: $Rv=0$, $v_a\neq0\implies R\delta_a=0$
+($\texttt{basis\_mem\_ker\_of\_separating\_projections}$). The proof avoids any noncommutative matrix product --- a
+finite induction peels one projection (or its complement) at a time on the partial-projection vector
+$s\mapsto[\forall x\in T,\ d_x s=d_x a]\,v_s$, which at $T=\mathrm{univ}$ collapses (by separation) to $v_a\,\delta_a$.
+This "kernel is a coordinate subspace" fact feeds the connectivity dichotomy.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
