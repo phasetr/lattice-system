@@ -5511,6 +5511,22 @@ per-column matrix with no mixing between columns
 per-column matrix with the single-species Fock kinetic operator, and connecting the
 block order to the interleaved $\texttt{hubbardKinetic}$, are the next layers.
 
+\medskip
+\noindent\textbf{The column-local down-kinetic action (PR7).} The down-spin dual
+is in file \texttt{LiebAttractiveBlockCoeffDown.lean}. Since the block coefficient
+matrix gauges the down index as a hole ($\texttt{particleHoleConfig}$), the down
+kinetic operator — which keeps the up configuration fixed
+($\texttt{hubbardBlockKineticDown\_mulVec\_basisVec\_mem\_fixedUp}$) and mixes the
+down configuration — acts on the \emph{column} index of the coefficient matrix
+through the particle-hole involution. Mirroring PR6 (the up-block off-diagonal
+entries vanish, $\texttt{hubbardBlockKineticDown\_apply\_eq\_zero\_of\_up\_ne}$) and
+reindexing the physical down configuration back to the hole column label via
+$\texttt{particleHoleConfigEquiv}$, the down kinetic operator acts on the block
+coefficient matrix as a column-local action
+($\texttt{hubbardBlockCoeff\_hubbardBlockKineticDown\_mulVec}$). Identifying the
+per-row matrix with the single-species Fock kinetic operator and connecting to the
+interleaved $\texttt{hubbardKinetic}$ are the next layers.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
