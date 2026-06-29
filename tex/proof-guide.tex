@@ -6084,6 +6084,19 @@ part via $\texttt{hubbardKinetic\_isHermitian}$, the attractive interaction $-\s
 as a real combination of Hermitian double-occupancy operators. This is the input to the variational/Perron--Frobenius
 arguments of the PSD ground-representative step.
 
+\medskip\noindent\textbf{A positive-semidefinite-$W$ ground state (PR38c, the SRP variational step).}
+File \texttt{LiebAttractivePosSemidefGround.lean} proves the ground energy is attained by a state whose
+reconciliation coefficient $W=\texttt{blockWCoeff}$ is positive semidefinite. From a unit minimum-eigenvector of
+$\hat H$ (eigenvalue $\mu=\texttt{hermitianMinEigenvalue}$), the Hermitian-$W$ representative $\varphi$ (PR37) gives
+$W$ Hermitian with $\hat H\varphi=\mu\varphi$; the realizing state $\varphi':=\Gamma(|W|)$ satisfies the squeeze
+\[
+  \mu\|\varphi'\|^2\le\langle\varphi'|\hat H|\varphi'\rangle=E(|W|)\le E(W)=\langle\varphi|\hat H|\varphi\rangle
+  =\mu\|\varphi\|^2=\mu\|\varphi'\|^2
+\]
+(energy reconciliation, $\texttt{liebSRPEnergy\_abs\_le}$, and the isometry of PR38a), so all inequalities are equalities
+and $\texttt{mulVec\_eq\_smul\_of\_rayleighOnVec\_eq\_min}$ makes $\varphi'$ a ground vector. As $\|\varphi'\|=\|\varphi\|>0$
+it is nonzero and $\texttt{blockWCoeff}\,\varphi'=|W|$ is PSD ($\texttt{exists\_posSemidefW\_ground}$, for symmetric $T$, $U\ge0$).
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
