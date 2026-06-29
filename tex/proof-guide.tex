@@ -5669,6 +5669,22 @@ agree on every basis column ($\texttt{permutationOperator\_hop\_conj\_mulVec\_ba
 matrix extensionality then gives the operator identity
 ($\texttt{permutationOperator\_hop\_conj\_eq}$).
 
+\medskip
+\noindent\textbf{The block $\leftrightarrow$ interleaved kinetic operator equality (PR16).}
+File \texttt{LiebAttractiveKineticConj.lean} sums the PR15 single-hop identity over the
+hopping matrix. With $U=\texttt{permutationOperator}\,(\texttt{hubbardBlockToSpinfulOrbitalEquiv}\,N)$
+the block $\leftrightarrow$ interleaved orbital relabeling, distributing the conjugation over
+the kinetic sum (via $\texttt{mul\_sum}$/$\texttt{sum\_mul}$/$\texttt{mul\_smul}$/$\texttt{smul\_mul}$)
+and applying PR15 to each summand $\hat c^\dagger_{\mathrm{block}\,i\,s}\hat c_{\mathrm{block}\,j\,s}
+\mapsto \hat c^\dagger_{\mathrm{spinful}\,i\,s}\hat c_{\mathrm{spinful}\,j\,s}$ gives the
+per-species statement ($\texttt{hubbardBlockKineticSpecies\_conj\_eq}$). Combining the two spin
+species ($\texttt{Fin.sum\_univ\_two}$) yields
+\[
+  U\cdot\texttt{hubbardBlockKinetic}\cdot U^{\mathsf H}=\texttt{hubbardKinetic},
+\]
+($\texttt{hubbardBlockKinetic\_conj\_eq}$): the block-ordered kinetic operator $\hat H_\uparrow+\hat
+H_\downarrow$ and the interleaved Hubbard kinetic operator are unitarily equivalent.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
