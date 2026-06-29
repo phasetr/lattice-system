@@ -82,6 +82,19 @@ def hubbardBlockSpinConfigEquiv (N : ℕ) :
   left_inv c := by simp
   right_inv p := by obtain ⟨u, d⟩ := p; simp
 
+/-- The block-order linear isomorphism between a state vector and its coefficient
+matrix `M_{u,d} = ψ (merge u d)` (the block analogue of
+`hubbardSpinCoeffLinearEquiv`). -/
+noncomputable def hubbardBlockCoeffLinearEquiv (N : ℕ) :
+    ((Fin (2 * N + 2) → Fin 2) → ℂ) ≃ₗ[ℂ]
+      Matrix (hubbardSpinConfig N) (hubbardSpinConfig N) ℂ where
+  toFun ψ := fun u d => ψ (hubbardBlockMergeConfig N u d)
+  map_add' ψ φ := by funext u d; simp
+  map_smul' a ψ := by funext u d; simp
+  invFun M := fun c => M (hubbardBlockUpConfig N c) (hubbardBlockDownConfig N c)
+  left_inv ψ := by funext c; simp
+  right_inv M := by funext u d; simp
+
 /-- The block (down-hole-gauged) coefficient matrix of a state vector. -/
 noncomputable def hubbardBlockCoeff (N : ℕ)
     (ψ : (Fin (2 * N + 2) → Fin 2) → ℂ) :
