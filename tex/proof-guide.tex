@@ -5624,6 +5624,27 @@ explicit. Reducing this to the operator equality $U\hat H_{\mathrm{block}}
 U^{\mathsf H}=\hat H_{\mathrm{interleaved}}$ requires the Jordan--Wigner sign
 cocycle identities, a later layer.
 
+\medskip
+\noindent\textbf{The JW sign cocycle: one-mode-update parity (PR14).} File
+\texttt{LiebAttractiveJwCocycle.lean} proves the algebraic input for the cocycle.
+First, updating a permuted configuration commutes with precomposition by $\pi$:
+$\mathrm{update}(\sigma\circ\pi)\,a\,v = (\mathrm{update}\,\sigma\,(\pi a)\,v)\circ\pi$
+($\texttt{update\_comp\_perm}$). Second, the \emph{one-mode-update parity law}: for
+the permuted configuration $c=\sigma\circ\pi$ with $c_q=1$,
+\[
+  \varepsilon(\pi,c)\,\varepsilon(\pi,\mathrm{update}\,c\,q\,0)
+    = \mathrm{jwSign}_q(c)\cdot \mathrm{jwSign}_{\pi q}(\sigma)
+\]
+($\texttt{translationJwSign\_mul\_update\_zero\_comp\_eq\_jwSign\_mul}$), and the dual
+add-to-empty form ($\texttt{translationJwSign\_mul\_update\_one\_comp\_eq\_jwSign\_mul}$).
+Writing $S(c)$ for the set of occupied inversions of $\pi$ and $E_j$ for the
+occupied-modes-below-$j$ count, the claim is $\#S(c)+\#S(\mathrm{update}\,c\,q\,0)
+\equiv E_q(c)+E_{\pi q}(\sigma)\pmod 2$. Partitioning the occupied $k\neq q$ by
+$(k<q?)\times(\pi k<\pi q?)$ into $A,B,C,D$, zeroing $q$ removes exactly the
+inversions through $q$ ($\#S(c)=\#S(\mathrm{update}\,c\,q\,0)+(\#B+\#C)$), while
+$E_q(c)=\#A+\#B$ and (after reindexing the sum by $\pi$) $E_{\pi q}(\sigma)=\#A+\#C$;
+both exponents are $\#B+\#C$ modulo the cancelling even terms.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
