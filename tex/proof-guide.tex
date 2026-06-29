@@ -6059,6 +6059,15 @@ $\hat H\psi=E\psi$ with $E\in\mathbb R$, then $\hat H(\Theta\psi)=E\,(\Theta\psi
 to ground vectors --- the input that lets the next layer build a nonzero $\Theta$-fixed (Hermitian-$W$)
 ground representative.
 
+\medskip\noindent\textbf{A Hermitian-$W$ ground representative (PR37, $\Gamma$-family).}
+File \texttt{LiebAttractiveHermitianGround.lean} shows the ground energy is attained by a $\Theta$-fixed
+(Hermitian-$W$) state. Given any nonzero ground vector $\psi_0$, the symmetrization $\psi_0+\Theta\psi_0$ is
+$\Theta$-fixed and again a ground vector; if it vanishes ($\Theta\psi_0=-\psi_0$), the rotated combination
+$i\psi_0+\Theta(i\psi_0)=2i\psi_0$ is nonzero and $\Theta$-fixed (anti-linearity). Hence
+$\texttt{exists\_hermitianW\_ground}$: a nonzero $\hat H$-eigenvector at the same real eigenvalue with a
+\emph{Hermitian} $\texttt{blockWCoeff}$, to which the energy reconciliation and SRP monotonicity
+($\texttt{liebSRPEnergy\_abs\_le}$) apply in the next layer.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
