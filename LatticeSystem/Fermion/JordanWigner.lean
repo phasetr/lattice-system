@@ -139,6 +139,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveKineticReal
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveInterleavedEnergy
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveInteractionEnergy
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveCoeffNormSq
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveFullEnergy
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
