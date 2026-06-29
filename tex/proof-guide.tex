@@ -6097,6 +6097,15 @@ $W$ Hermitian with $\hat H\varphi=\mu\varphi$; the realizing state $\varphi':=\G
 and $\texttt{mulVec\_eq\_smul\_of\_rayleighOnVec\_eq\_min}$ makes $\varphi'$ a ground vector. As $\|\varphi'\|=\|\varphi\|>0$
 it is nonzero and $\texttt{blockWCoeff}\,\varphi'=|W|$ is PSD ($\texttt{exists\_posSemidefW\_ground}$, for symmetric $T$, $U\ge0$).
 
+\medskip\noindent\textbf{Kernel propagation (PR39a, analytic heart of Lemma 10.10).}
+File \texttt{Math/PosSemidef/GroundKernelPropagation.lean} proves that a PSD $R$ solving the ground-state
+Lyapunov equation $A R+R A^{\mathsf H}-\sum_x U_x\,I_x R I_x=E R$ (with $U_x>0$ and $A$, $I_x$ Hermitian) has a
+kernel invariant under each $I_x$ and under $A$: $Rv=0\implies R(I_xv)=0\ \forall x$ and $R(Av)=0$. The mechanism
+is purely positive-semidefinite: sandwiching the equation by $v$ kills the kinetic part ($Rv=0$), leaving
+$\sum_x U_x\langle I_xv,R\,I_xv\rangle=0$; each summand is nonnegative and $U_x>0$, so each $R(I_xv)=0$ (Tasaki
+Lemma A.11), and the vector form then gives $R(A^{\mathsf H}v)=0$. This invariance is what the connectivity
+argument propagates to force $R$ positive definite or zero ($\texttt{posSemidef\_ground\_kernel\_propagation}$).
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
