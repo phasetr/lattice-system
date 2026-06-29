@@ -55,16 +55,19 @@ def hubbardBlockUpConfig (N : ℕ) (c : Fin (2 * N + 2) → Fin 2) : hubbardSpin
 def hubbardBlockDownConfig (N : ℕ) (c : Fin (2 * N + 2) → Fin 2) : hubbardSpinConfig N :=
   fun i => c (hubbardBlockIndex N i 1)
 
+/-- The block up projection recovers the up part of a block merge. -/
 @[simp]
 theorem hubbardBlockUpConfig_merge (N : ℕ) (u d : hubbardSpinConfig N) :
     hubbardBlockUpConfig N (hubbardBlockMergeConfig N u d) = u := by
   funext i; simp [hubbardBlockUpConfig]
 
+/-- The block down projection recovers the down part of a block merge. -/
 @[simp]
 theorem hubbardBlockDownConfig_merge (N : ℕ) (u d : hubbardSpinConfig N) :
     hubbardBlockDownConfig N (hubbardBlockMergeConfig N u d) = d := by
   funext i; simp [hubbardBlockDownConfig]
 
+/-- Merging the block up/down projections recovers the configuration. -/
 @[simp]
 theorem hubbardBlockMergeConfig_up_down (N : ℕ) (c : Fin (2 * N + 2) → Fin 2) :
     hubbardBlockMergeConfig N (hubbardBlockUpConfig N c) (hubbardBlockDownConfig N c) = c := by
