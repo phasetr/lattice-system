@@ -5753,6 +5753,20 @@ It is the bridge from the operator energy to the spin-reflection Gram form
 $0\le\operatorname{Re}\operatorname{tr}(CACA^{\mathsf H})$ (PR1), which a subsequent
 layer reaches via $B_{\rm r}=PA^{\mathsf T}P$ (PR18).
 
+\medskip\noindent\textbf{The adjoint relation as a permutation conjugation (PR20).}
+File \texttt{LiebAttractivePermConj.lean} repackages the entrywise PR18 relation
+$B_{\rm r}\,h\,h'=A\,(Ph')\,(Ph)$ as an honest \emph{matrix} identity
+\[
+  B_{\rm r}=P_{\rm mat}\,A^{\mathsf T}\,P_{\rm mat},
+\]
+where $P_{\rm mat}=\texttt{particleHoleConfigPermMatrix}=(\texttt{particleHoleConfigEquiv}\,N)
+.\texttt{toPEquiv.toMatrix}$ is the permutation matrix of the particle--hole involution
+(its own inverse, $\texttt{particleHoleConfigEquiv\_symm}$). Proved from PR18 via
+$\texttt{toMatrix\_toPEquiv\_mul}$/$\texttt{mul\_toMatrix\_toPEquiv}$
+($\texttt{hubbardBlockKineticDownFixedRightMatrix\_eq\_permConj}$). Having the relation
+as matrix algebra (rather than entrywise) keeps the subsequent reflection-positive
+trace manipulations free of entrywise rewriting.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
