@@ -5975,6 +5975,22 @@ conjugating a diagonal by $P$ reindexes it by the involution $\varphi$, $P\,(\op
 hole diagonal is the particle-hole conjugate of the up diagonal, $E_x=P\,D_x\,P$
 ($\texttt{hubbardHoleOccupationDiag\_eq\_permConj}$). This is the $I_x=P\,D_x\,P$ input feeding PR33b.
 
+\medskip\noindent\textbf{The full energy reconciliation (PR33d, the assembly).}
+File \texttt{LiebAttractiveEnergyReconcile.lean} ties the reconciliation together. Combining the energy
+decomposition (PR26), the kinetic identity (PR33a), the interaction trace form (PR27), the particle-hole
+conjugation facts (PR33c) and the interaction identity (PR33b): for symmetric hopping $T$ and a state
+$\psi$ whose block coefficient matrix gives a \emph{Hermitian} $W:=C\,P$, the half-filled energy is
+\[
+  \langle\psi|\hat H|\psi\rangle=2\operatorname{tr}(W^2A)-\sum_x U_x\operatorname{tr}(W D_x W D_x),
+  \qquad
+  \operatorname{Re}\langle\psi|\hat H|\psi\rangle=\texttt{liebSRPEnergy}\,A\,D\,(U/2)\,W
+\]
+($\texttt{attractiveHubbardHamiltonian\_energy\_eq\_liebSRP\_trace\_of\_blockW\_isHermitian}$ and its
+real-part consumer). The hypothesis $(C\,P)^{\mathsf H}=C\,P$ is not automatic for a general $\psi$ ---
+in Lieb's argument the trial states are parametrized by a Hermitian $W$ (the $\Gamma(W)$ ansatz), so this
+layer states the reconciliation conditionally; a later layer identifies the ground energy with a
+Hermitian-$W$ state and then applies $\texttt{liebSRPEnergy\_abs\_le}$ to replace $W$ by $|W|$.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
