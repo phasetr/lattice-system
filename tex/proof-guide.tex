@@ -5854,6 +5854,22 @@ positive-semidefinite $\texttt{spinReflectionCoeff}$) control the interaction en
 block coefficient matrix, without transporting positive-semidefiniteness through the non-gauge sign
 $\varepsilon$.
 
+\medskip\noindent\textbf{The full attractive-Hubbard energy functional (PR26).}
+File \texttt{LiebAttractiveFullEnergy.lean} assembles the kinetic trace (PR23) and the attractive
+interaction's diagonal $\operatorname{normSq}$ sum (PR24), bridged by the equal-magnitude relation
+(PR25), into the energy of $\hat H=\hat H_{\rm kin}+\hat H_{\rm int}$ on the block coefficient matrix
+$C'=\texttt{hubbardBlockCoeff}\,(U^{\mathsf H}\psi)$:
+\[
+  \langle\psi|\hat H|\psi\rangle
+    = \operatorname{tr}\!\bigl(C'^{\mathsf H}(AC'+C'B_{\rm r})\bigr)
+      + \sum_{u,h}\Bigl(\sum_x -U_x\,u_x\,(1-h_x)\Bigr)\,\bigl|C'_{u,h}\bigr|^2
+\]
+($\texttt{attractiveHubbardHamiltonian\_dotProduct\_eq\_block}$). This is the energy functional whose
+spin-reflection variational minimization is the remaining endgame: the matrix polar replacement
+$C\mapsto|C|=(C^{\mathsf H}C)^{1/2}$ (\emph{not} the entrywise modulus), a Lieb trace inequality
+$\operatorname{Tr}(C^{\mathsf H}DCE)\le\operatorname{Tr}(|C|D|C|E)$ for diagonal nonnegative $D,E$,
+Perron--Frobenius uniqueness on the connected hopping support, and the spin-flip singlet conclusion.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
