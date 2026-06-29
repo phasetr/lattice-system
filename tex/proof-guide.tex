@@ -6050,6 +6050,15 @@ $U$ real), and $\Theta$ acts as $W\mapsto W^{\mathsf H}$ in the injective $W$-co
 ($\texttt{attractiveHubbardHamiltonian\_gammaThetaVec\_commute}$). Thus $\Theta$ commutes with $\hat H$ and
 preserves every eigenspace of $\hat H$ --- the key input for the Hermitian-$W$ ground-state representative.
 
+\medskip\noindent\textbf{The $\Gamma$-reflection is anti-linear and preserves eigenvectors (PR36d, $\Gamma$-family).}
+File \texttt{LiebAttractiveGammaAntilinear.lean} records that $\Theta$ is \emph{anti-linear}
+($\Theta(c\,\psi)=\bar c\,\Theta\psi$, since it conjugate-transposes $W$) and an involution ($\Theta^2=\mathrm{id}$).
+With the commutation (PR36c), anti-linearity yields eigenvector preservation at real eigenvalues: if
+$\hat H\psi=E\psi$ with $E\in\mathbb R$, then $\hat H(\Theta\psi)=E\,(\Theta\psi)$
+($\texttt{gammaThetaVec\_preserves\_eigenvector}$). Since ground energies are real, $\Theta$ maps ground vectors
+to ground vectors --- the input that lets the next layer build a nonzero $\Theta$-fixed (Hermitian-$W$)
+ground representative.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
