@@ -5782,6 +5782,23 @@ entrywise reality $A^{\mathsf T}=A$ (a later layer) this gives $A^{\mathsf H}=A^
 hence $B_{\rm r}=P\,A^{\mathsf H}\,P$, which the SRP energy bound
 $\texttt{spinReflection\_gramMatrix\_nonneg}$ consumes.
 
+\medskip\noindent\textbf{The reality half: $B_{\rm r}=P_{\rm mat}\,A^{\mathsf H}\,P_{\rm mat}$ (PR22).}
+File \texttt{LiebAttractiveKineticReal.lean} supplies the entrywise reality that upgrades
+PR20 to the adjoint form. The Gram bound consumes the adjoint $A^{\mathsf H}$, whereas PR20
+gives the transpose $A^{\mathsf T}$; for a Hermitian operator these differ (for $\sigma_y$,
+$\operatorname{tr}(A A^{\mathsf T})<0$), so the bridge genuinely needs the reality of $A$. For a
+real hopping matrix $T$ ($\overline{T_{ij}}=T_{ij}$) the entries of
+$A=\texttt{hubbardBlockKineticUpFixedMatrix}$ are sums of $T_{ij}$ times hopping matrix
+elements, each a product of Jordan--Wigner string signs $\pm1$ (real:
+$\texttt{jwSign\_star}$, $\texttt{fermionHoppingTerm\_entry\_real}$). Hence
+$A^{\mathsf H}=A^{\mathsf T}$
+($\texttt{hubbardBlockKineticUpFixedMatrix\_conjTranspose\_eq\_transpose}$), giving
+\[
+  B_{\rm r}=P_{\rm mat}\,A^{\mathsf H}\,P_{\rm mat}
+\]
+($\texttt{hubbardBlockKineticDownFixedRightMatrix\_eq\_permConj\_conjTranspose}$), the adjoint
+form the SRP energy bound consumes.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
