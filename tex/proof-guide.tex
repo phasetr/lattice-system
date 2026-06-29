@@ -5563,6 +5563,23 @@ multiplication (down) by single fixed matrices; identifying those matrices
 explicitly and connecting to the interleaved $\texttt{hubbardKinetic}$ are the next
 layers.
 
+\medskip
+\noindent\textbf{The block kinetic acts as $A\,C + C\,B$ (PR10).} File
+\texttt{LiebAttractiveBlockKineticMatrix.lean} packages the gauge-independent
+actions as honest matrix multiplications. With the fixed left multiplier
+$A=\texttt{hubbardBlockKineticUpFixedMatrix}$ and the fixed right multiplier
+$B_r=\texttt{hubbardBlockKineticDownFixedRightMatrix}$ (the transpose of the
+gauge-independent per-row down matrix), the up kinetic acts as $C\mapsto A\,C$
+($\texttt{hubbardBlockKineticUpCoeffAction\_eq\_mul\_fixed}$) and the down kinetic
+as $C\mapsto C\,B_r$
+($\texttt{hubbardBlockKineticDownCoeffAction\_eq\_mul\_fixedRight}$), so the
+spin-symmetric block kinetic operator $\texttt{hubbardBlockKinetic}=\hat H_\uparrow
++\hat H_\downarrow$ acts on the block coefficient matrix as $C\mapsto A\,C+C\,B_r$
+($\texttt{hubbardBlockCoeff\_hubbardBlockKinetic\_mulVec}$). This is the
+coefficient-matrix form of Lieb's kinetic energy; what remains is connecting the
+block order to the interleaved order, assembling the reflection-positivity energy
+form, and the Perron--Frobenius / singlet endpoint.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
