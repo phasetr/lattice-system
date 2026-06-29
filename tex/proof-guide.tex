@@ -5870,6 +5870,23 @@ $C\mapsto|C|=(C^{\mathsf H}C)^{1/2}$ (\emph{not} the entrywise modulus), a Lieb 
 $\operatorname{Tr}(C^{\mathsf H}DCE)\le\operatorname{Tr}(|C|D|C|E)$ for diagonal nonnegative $D,E$,
 Perron--Frobenius uniqueness on the connected hopping support, and the spin-flip singlet conclusion.
 
+\medskip\noindent\textbf{The interaction as a diagonal-sandwich trace form (PR27).}
+File \texttt{LiebAttractiveInteractionTrace.lean} rewrites the attractive interaction's diagonal
+$\operatorname{normSq}$ sum as a trace form sandwiching the coefficient matrix between site-occupation
+diagonals:
+\[
+  \sum_{u,h}\Bigl(\sum_x -U_x u_x(1-h_x)\Bigr)|C_{u,h}|^2
+    = -\sum_x U_x\,\operatorname{tr}\!\bigl(C^{\mathsf H}D_xCE_x\bigr),
+\]
+where $D_x=\operatorname{diag}(u\mapsto u_x)=\texttt{hubbardUpOccupationDiag}$ and
+$E_x=\operatorname{diag}(h\mapsto1-h_x)=\texttt{hubbardHoleOccupationDiag}$ are positive-semidefinite
+(entries $0$/$1$). The generic helper
+$\texttt{trace\_conjTranspose\_mul\_diagonal\_mul\_diagonal\_eq\_sum\_normSq}$ expands
+$\operatorname{tr}(C^{\mathsf H}\operatorname{diag}(d)\,C\operatorname{diag}(e))=\sum_{i,j}d_i e_j|C_{i,j}|^2$.
+This is the form on which the spin-reflection variational replacement $C\mapsto|C|$ acts via the Lieb
+trace inequality $\operatorname{tr}(C^{\mathsf H}DCE)\le\operatorname{tr}(|C|D|C|E)$ (next layer): with
+$-U_x\le0$, replacing $C$ by $|C|$ does not raise the interaction energy.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
