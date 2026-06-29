@@ -6039,6 +6039,17 @@ sandwich $\sum_x V_x\,D_x\,C\,E_x$ and collapsing the $\cdot P$ reindex ($E_x\,P
 $D_x=\texttt{hubbardUpOccupationDiag}\,x$ ($\texttt{blockWCoeff\_attractiveHubbardInteraction\_mulVec}$).
 Manifestly equivariant under $W\mapsto W^{\mathsf H}$ --- the interaction half of the $\hat H$--$\Theta$ commutation.
 
+\medskip\noindent\textbf{The Hamiltonian commutes with the $\Gamma$-reflection (PR36c, $\Gamma$-family).}
+File \texttt{LiebAttractiveHamiltonianCommute.lean} assembles the kinetic and interaction intertwiners into
+the full $W$-coordinate action $\texttt{blockWCoeff}(\hat H\psi)=G(W):=A\,W+W\,A^{\mathsf H}+\sum_x(-U_x)\,D_x\,W\,D_x$.
+The generator $G$ is equivariant under conjugate transpose, $G(W^{\mathsf H})=(G\,W)^{\mathsf H}$ ($D_x$ Hermitian,
+$U$ real), and $\Theta$ acts as $W\mapsto W^{\mathsf H}$ in the injective $W$-coordinate, so
+\[
+  \hat H(\Theta\psi)=\Theta(\hat H\psi)
+\]
+($\texttt{attractiveHubbardHamiltonian\_gammaThetaVec\_commute}$). Thus $\Theta$ commutes with $\hat H$ and
+preserves every eigenspace of $\hat H$ --- the key input for the Hermitian-$W$ ground-state representative.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
