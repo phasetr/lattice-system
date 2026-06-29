@@ -6115,6 +6115,14 @@ finite induction peels one projection (or its complement) at a time on the parti
 $s\mapsto[\forall x\in T,\ d_x s=d_x a]\,v_s$, which at $T=\mathrm{univ}$ collapses (by separation) to $v_a\,\delta_a$.
 This "kernel is a coordinate subspace" fact feeds the connectivity dichotomy.
 
+\medskip\noindent\textbf{Connected-support dichotomy (PR39c, abstract Lemma 10.10).}
+File \texttt{Math/PosSemidef/ConnectedSupportDichotomy.lean} assembles the abstract Lemma 10.10: a PSD $R$ whose
+kernel is invariant under $A$ and is a coordinate subspace, where a connected graph $G$ has every edge $b\sim a$
+witnessing $A_{ba}\neq0$, is positive definite or zero ($\texttt{posDef\_or\_eq\_zero\_of\_connected\_support}$). A
+single $\delta_a\in\ker R$ propagates along every walk ($R\delta_a=0\implies R(A\delta_a)=0$, and basis extraction
+puts every neighbour into the kernel); connectivity forces all-or-nothing. With the kernel invariance (PR39a) and
+the coordinate-subspace property (PR39b), this is the abstract form of Tasaki Lemma 10.10.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}

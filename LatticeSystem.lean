@@ -32,6 +32,7 @@ import LatticeSystem.Math.FrustrationFree
 import LatticeSystem.Math.PosSemidef.Kernel
 import LatticeSystem.Math.PosSemidef.GroundKernelPropagation
 import LatticeSystem.Math.PosSemidef.SeparatingProjectionKernel
+import LatticeSystem.Math.PosSemidef.ConnectedSupportDichotomy
 import LatticeSystem.Math.EffectiveLimit
 import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbation
 import LatticeSystem.Math.AngularMomentum.Ladder
