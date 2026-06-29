@@ -5685,6 +5685,29 @@ species ($\texttt{Fin.sum\_univ\_two}$) yields
 ($\texttt{hubbardBlockKinetic\_conj\_eq}$): the block-ordered kinetic operator $\hat H_\uparrow+\hat
 H_\downarrow$ and the interleaved Hubbard kinetic operator are unitarily equivalent.
 
+\medskip
+\noindent\textbf{The SRP $\leftrightarrow$ block coefficient bridge (PR17).} File
+\texttt{LiebAttractiveCoeffBridge.lean} connects the spin-reflection coefficient matrix
+$\texttt{spinReflectionCoeff}$ (the SRP/PSD matrix, PR1) and the block coefficient matrix
+$\texttt{hubbardBlockCoeff}$ (on which the kinetic acts as $C\mapsto AC+CB_{\rm r}$, PR10)
+through $U=\texttt{hubbardBlockToSpinfulPermutationOperator}\,N$. Evaluating the signed
+permutation action on an arbitrary vector,
+$(U\psi)\,\tau=\varepsilon(\pi,\tau\circ\pi)\,\psi(\tau\circ\pi)$
+($\texttt{permutationOperator\_mulVec\_apply}$), and using
+$\mathrm{intMerge}\circ\pi=\mathrm{blockMerge}$, the two matrices are related \emph{entrywise}
+by the per-configuration Jordan--Wigner sign of the relabeling:
+\[
+  \texttt{spinReflectionCoeff}\,(U\psi)\,u\,h
+    = \varepsilon(\pi,\ \mathrm{blockMerge}\,u\,h)\cdot
+      \texttt{hubbardBlockCoeff}\,\psi\,u\,h
+\]
+($\texttt{spinReflectionCoeff\_hubbardBlockToSpinfulPermutationOperator\_mulVec}$), with
+$\varepsilon=\texttt{translationJwSign}\,(\texttt{hubbardBlockToSpinfulOrbitalEquiv}\,N)$.
+Since both matrices share the particle-hole hole gauge and differ only by interleaved vs
+block merge, the bridge is a single entrywise sign --- \emph{not} a row/column gauge
+$D_1CD_2$ --- so it cannot transport positive-semidefiniteness; the RP energy form is
+therefore carried on the raw $\texttt{hubbardBlockCoeff}$.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
