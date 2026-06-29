@@ -5819,6 +5819,22 @@ spin-reflection coefficient matrix $\texttt{spinReflectionCoeff}$ (which, not
 $\texttt{hubbardBlockCoeff}$, carries the positive-semidefinite / Perron--Frobenius structure), and
 the two coordinate systems are reconciled through the PR17 entrywise-sign bridge in a later layer.
 
+\medskip\noindent\textbf{The interaction energy as a diagonal $\operatorname{normSq}$ sum (PR24).}
+File \texttt{LiebAttractiveInteractionEnergy.lean} lifts the PR2 Hadamard-diagonal action of the
+on-site interaction to the energy quadratic form. Reindexing the inner product over the interleaved
+up/down factorization ($\texttt{hubbardSpinConfigEquiv}$ and the particle--hole reindexing, the
+interleaved analogue of PR19) gives
+\[
+  \langle\psi|\hat H_{\rm int}|\psi\rangle
+    = \sum_{u,h}\Bigl(\sum_x -U_x\,u_x\,(1-h_x)\Bigr)\,
+      \bigl|\,(\texttt{spinReflectionCoeff}\,\psi)_{u,h}\,\bigr|^2
+\]
+($\texttt{attractiveHubbardInteraction\_dotProduct\_eq\_spinReflectionCoeff\_normSq}$). For attractive
+$U_x>0$ the weight $\sum_x -U_x u_x(1-h_x)\le0$ is non-positive --- the sign that lowers the energy
+under the spin-reflection variational replacement $C\mapsto|C|$. The positive-semidefinite /
+Perron--Frobenius structure lives on $\texttt{spinReflectionCoeff}$ (not the block coefficient matrix
+of the kinetic trace), so the interaction energy is naturally expressed there.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
