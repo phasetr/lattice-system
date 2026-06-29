@@ -5544,6 +5544,25 @@ matrix does not depend on the hole label
 statement (where only the \emph{combined} sign is up-independent) and the explicit
 identification with the single-species Fock kinetic operator are the next layers.
 
+\medskip
+\noindent\textbf{Gauge independence of the down-kinetic coefficient matrix (PR9).}
+File \texttt{LiebAttractiveFockDown.lean} proves the down-spin dual: the per-row
+matrix $\texttt{hubbardBlockKineticDownCoeffMatrix}\,N\,T\,u$ is independent of the
+up label $u$. Here the argument cannot mirror PR8 directly: an individual
+Jordan--Wigner sign at a down block index sees \emph{all} up orbitals (they lie
+below it), so the individual down sign depends on the up configuration; only the
+\emph{combined} hop sign is up-independent (the up contribution appears squared and
+cancels). We therefore reuse the PR4 single-hop action lemmas
+($\texttt{hubbardBlock\_downHop\_forward/backward\_mulVec}$, whose combined sign is
+already down-only) through a $\texttt{lt\_trichotomy}$ case split, handling the
+$i=j$ diagonal by the number operator
+($\texttt{hubbardBlock\_downHop\_apply\_merge\_indep\_up}$,
+$\texttt{hubbardBlockKineticDownCoeffMatrix\_indep\_up}$). With PR8, the kinetic
+term now acts on the block coefficient matrix as left multiplication (up) and right
+multiplication (down) by single fixed matrices; identifying those matrices
+explicitly and connecting to the interleaved $\texttt{hubbardKinetic}$ are the next
+layers.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
