@@ -6068,6 +6068,15 @@ $\texttt{exists\_hermitianW\_ground}$: a nonzero $\hat H$-eigenvector at the sam
 \emph{Hermitian} $\texttt{blockWCoeff}$, to which the energy reconciliation and SRP monotonicity
 ($\texttt{liebSRPEnergy\_abs\_le}$) apply in the next layer.
 
+\medskip\noindent\textbf{Norm/isometry foundation (PR38a).}
+File \texttt{LiebAttractiveNormFoundation.lean} matches the relevant norms. The coordinate map
+$\psi\mapsto\texttt{blockWCoeff}\,\psi$ is an \emph{isometry} (a configuration reshape composed with the
+unitary back-rotation $U^{\mathsf H}$): $\langle\psi,\psi\rangle=\sum_{u,h}|W_{u,h}|^2$ and
+$\langle\Gamma(W),\Gamma(W)\rangle=\sum_{u,h}|W_{u,h}|^2$. The spectral absolute value preserves the Frobenius
+norm, $\sum_{u,h}||W|_{u,h}|^2=\sum_{u,h}|W_{u,h}|^2$ (from $|W|^2=W^2$ and
+$\operatorname{tr}(|W|^{\mathsf H}|W|)=\operatorname{tr}(W^2)=\operatorname{tr}(W^{\mathsf H}W)$). These
+identities let the SRP monotonicity transfer from the energy functional to actual states.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
