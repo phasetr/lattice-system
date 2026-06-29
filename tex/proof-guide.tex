@@ -5527,6 +5527,23 @@ coefficient matrix as a column-local action
 per-row matrix with the single-species Fock kinetic operator and connecting to the
 interleaved $\texttt{hubbardKinetic}$ are the next layers.
 
+\medskip
+\noindent\textbf{Gauge independence of the up-kinetic coefficient matrix (PR8).}
+In file \texttt{LiebAttractiveFockUp.lean} we show the per-column matrix of PR6 is
+independent of the hole label, identifying the up-kinetic action as left
+multiplication by a single fixed matrix. In block order all up orbitals lie below
+all down orbitals, so the Jordan--Wigner string of an up-spin hop sees only the up
+configuration ($\texttt{jwSign\_blockZero\_congr\_of\_eq\_below}$); together with the
+fact that a basis-vector value between two block merges sharing a down part is
+independent of that down part ($\texttt{basisVec\_hubbardBlockMerge\_same\_down\_eq}$),
+the up-kinetic matrix entry between configurations with a common down part is
+independent of that down part
+($\texttt{hubbardBlockKineticUp\_apply\_merge\_indep\_down}$), so the per-column
+matrix does not depend on the hole label
+($\texttt{hubbardBlockKineticUpCoeffMatrix\_indep\_down}$). The analogous down-side
+statement (where only the \emph{combined} sign is up-independent) and the explicit
+identification with the single-species Fock kinetic operator are the next layers.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
