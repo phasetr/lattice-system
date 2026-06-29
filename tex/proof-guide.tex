@@ -5914,6 +5914,15 @@ termwise ($\lambda_j\lambda_k\le|\lambda_j||\lambda_k|$). File \texttt{LiebAttra
 isolates this inequality ($\texttt{lieb\_srp\_rearrangement}$); assembling it into the full energy
 functional $E(W)\ge E(|W|)$ on the sectorized Hermitian coefficient matrix is a subsequent layer.
 
+\medskip\noindent\textbf{The spectral absolute value (PR30, corrected endgame).}
+File \texttt{LiebAttractiveHermitianAbs.lean} constructs the spectral absolute value
+$|W|=U\,|D|\,U^{\mathsf H}$ of a Hermitian $W=U\,D\,U^{\mathsf H}$ ($U=\texttt{eigenvectorUnitary}$,
+$D=\operatorname{diag}(\text{eigenvalues})$) via the mathlib spectral theorem, as $\texttt{hermitianAbs}$,
+and proves its three structural facts: it is positive-semidefinite
+($\texttt{hermitianAbs\_posSemidef}$, via $\texttt{PosSemidef.diagonal}$ and unitary conjugation),
+hence Hermitian, and squares to $W^2$ ($\texttt{hermitianAbs\_mul\_self}$: $|W|^2=W^2$, the kinetic
+invariance $\operatorname{Tr}(W^2T)=\operatorname{Tr}(|W|^2T)$ under $W\mapsto|W|$).
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
