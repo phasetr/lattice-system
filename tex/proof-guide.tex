@@ -5887,6 +5887,19 @@ This is the form on which the spin-reflection variational replacement $C\mapsto|
 trace inequality $\operatorname{tr}(C^{\mathsf H}DCE)\le\operatorname{tr}(|C|D|C|E)$ (next layer): with
 $-U_x\le0$, replacing $C$ by $|C|$ does not raise the interaction energy.
 
+\medskip\noindent\textbf{The Hermitian coefficient condition (PR28, corrected endgame).}
+The earlier polar-replacement route ($C\mapsto(C^{\mathsf H}C)^{1/2}$) is unsound; Lieb's actual
+argument (Tasaki §10.2.4, p.363–367) works with the coefficient matrix in \emph{Hermitian} form $W$
+(the $|\Gamma(W)\rangle$ representation), and the spin-reflection inequality $E(W)\ge E(|W|)$ uses the
+\emph{spectral} absolute value $|W|=\sum_j|\lambda_j|v_jv_j^\dagger$ of a Hermitian $W$ (which makes the
+inequality elementary: the kinetic term $\sum_j\lambda_j^2(v_j^\dagger Tv_j)$ is invariant and the
+interaction rearrangement $\sum_{j,k}\lambda_j\lambda_k a_{jk}\le\sum_{j,k}|\lambda_j||\lambda_k|a_{jk}$
+holds termwise). File \texttt{LiebAttractiveHermitianCoeff.lean} establishes the entry point: the
+coefficient map is injective ($\texttt{spinReflectionCoeff\_injective}$), and since PR1 gives
+$\texttt{spinReflectionCoeff}(\theta\psi)=(\texttt{spinReflectionCoeff}\,\psi)^{\mathsf H}$, the
+coefficient matrix is Hermitian iff $\psi$ is fixed by the spin reflection $\theta$
+($\texttt{spinReflectionCoeff\_isHermitian\_iff\_thetaFixed}$).
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
