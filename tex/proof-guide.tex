@@ -5954,6 +5954,18 @@ reconciliation: the \emph{block} coefficient $C$ with a particle-hole \emph{colu
 (cyclic trace and $P^2=1$; $\texttt{trace\_conj\_kinetic\_eq\_two\_trace\_W\_sq}$), identifying $T_S=A$ for
 the abstract $\texttt{liebSRPEnergy}$ on $W$.
 
+\medskip\noindent\textbf{The interaction reconciliation identity (PR33b).}
+File \texttt{LiebAttractiveInteractionW.lean} is the companion for the interaction term. The attractive
+interaction is the diagonal sandwich $-\sum_x U_x\operatorname{tr}(C^{\mathsf H}D_xC\,E_x)$ (PR27); under the
+same reindex $W:=C\,P$ the hole diagonal is the particle-hole conjugate $E_x=P\,D_x\,P$, so for Hermitian
+$W$ the trace collapses cleanly:
+\[
+  \operatorname{tr}\!\bigl(C^{\mathsf H}D\,C\,(PDP)\bigr)=\operatorname{tr}(W\,D\,W\,D)
+\]
+(cyclic trace and $P^2=1$; $\texttt{trace\_conj\_interaction\_eq\_trace\_W}$), identifying $I_S=D_x$. With
+PR33a the half-filled energy is $2\operatorname{tr}(W^2A)-\sum_x U_x\operatorname{tr}(W D_x W D_x)
+=\texttt{liebSRPEnergy}\,A\,D\,(U/2)\,W$.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
