@@ -5476,6 +5476,24 @@ the block-ordered kinetic operator and connecting it to the interleaved
 $\texttt{hubbardKinetic}$ via a signed mode-permutation operator are the next
 layers.
 
+\medskip
+\noindent\textbf{The block kinetic operators mix a single spin species (PR5).} In
+file \texttt{LiebAttractiveBlockKinetic.lean} we assemble the block-order
+single-species kinetic operators
+$\texttt{hubbardBlockKineticUp}\,N\,T = \sum_{i,j} T_{i,j}\,
+\hat c^\dagger_{\mathrm{block}\,i\,\uparrow}\hat c_{\mathrm{block}\,j\,\uparrow}$
+(and the down analogue) and prove, using the PR4 single-hop action summed over all
+$i,j$ (including $i=j$ and the vanishing terms, handled uniformly by
+$\texttt{fermionMultiCreation\_mul\_Annihilation\_mulVec\_basisVec}$), that the up
+kinetic operator maps a block-merge basis state into the span of basis states with
+the \emph{same down configuration}
+($\texttt{hubbardBlockKineticUp\_mulVec\_basisVec\_mem\_fixedDown}$, with the down
+operator dual). This is the species factorization
+$\hat H = \hat H_\uparrow\otimes\mathbf{1} + \mathbf{1}\otimes\hat H_\downarrow$ at
+the level of the fixed-species fibers. Identifying these operators as left / right
+multiplication on the coefficient matrix and connecting them to the interleaved
+$\texttt{hubbardKinetic}$ are the subsequent layers.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
