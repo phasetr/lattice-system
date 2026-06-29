@@ -6028,6 +6028,17 @@ $\cdot P$ reindex collapses the gauge:
 $A=\texttt{hubbardBlockKineticUpFixedMatrix}\,T$ ($\texttt{blockWCoeff\_hubbardKinetic\_mulVec}$, entrywise-real $T$).
 This is manifestly equivariant under $W\mapsto W^{\mathsf H}$ --- the kinetic half of the $\hat H$--$\Theta$ commutation.
 
+\medskip\noindent\textbf{The interaction intertwiner (PR36b, $\Gamma$-family).}
+File \texttt{LiebAttractiveInteractionIntertwiner.lean} handles the attractive interaction. Being diagonal in
+configuration space, its action transports through the Jordan--Wigner $\varepsilon$-bridge ($\varepsilon^2=1$
+cancels --- no Hermiticity obstruction for a diagonal operator); writing the entrywise weight as a diagonal
+sandwich $\sum_x V_x\,D_x\,C\,E_x$ and collapsing the $\cdot P$ reindex ($E_x\,P=P\,D_x$) gives
+\[
+  \texttt{blockWCoeff}(\hat H_{\rm int}\psi)=\sum_x(-U_x)\,D_x\,W\,D_x,
+\]
+$D_x=\texttt{hubbardUpOccupationDiag}\,x$ ($\texttt{blockWCoeff\_attractiveHubbardInteraction\_mulVec}$).
+Manifestly equivariant under $W\mapsto W^{\mathsf H}$ --- the interaction half of the $\hat H$--$\Theta$ commutation.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
