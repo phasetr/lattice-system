@@ -6133,6 +6133,15 @@ $A=\texttt{hubbardBlockKineticUpFixedMatrix}\,T$, $D_x=\texttt{hubbardUpOccupati
 ($\texttt{blockWCoeff\_lyapunov\_of\_eigenvector}$). This is precisely the hypothesis form of the abstract Lemma 10.10
 ($\texttt{posSemidef\_ground\_kernel\_propagation}$, $\texttt{posDef\_or\_eq\_zero\_of\_connected\_support}$).
 
+\medskip\noindent\textbf{The $\texttt{blockWCoeff}$ sector support (PR40a).}
+File \texttt{LiebAttractiveSectorSupport.lean} shows that for a state $\psi$ in the $N_e$-electron sector
+($\hat N\psi=N_e\psi$), $\texttt{blockWCoeff}\,\psi$ is supported on the anti-diagonal band $|u|+|h|=N_e$:
+$\texttt{blockWCoeff}\,\psi\,u\,h=(U^{\mathsf H}\psi)(\mathrm{blockMerge}\,u\,h)$, with
+$\mathrm{count}(\mathrm{blockMerge}\,u\,h)=|u|+|h|$ ($\texttt{hubbardBlockMergeConfig\_count}$), and the orbital
+relabeling $U^{\mathsf H}$ preserves the count, so the entry vanishes off the band
+($\texttt{blockWCoeff\_apply\_eq\_zero\_of\_count\_ne}$). The genuine invariant square block is the balanced
+sector $|u|=|h|=N_e/2$ ($N_e$ even), treated next.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
