@@ -5991,6 +5991,19 @@ in Lieb's argument the trial states are parametrized by a Hermitian $W$ (the $\G
 layer states the reconciliation conditionally; a later layer identifies the ground energy with a
 Hermitian-$W$ state and then applies $\texttt{liebSRPEnergy\_abs\_le}$ to replace $W$ by $|W|$.
 
+\medskip\noindent\textbf{$\Gamma$ coordinates (PR34, $\Gamma$-family layer 1).}
+File \texttt{LiebAttractiveGammaCoords.lean} establishes the $\Gamma$-coordinate picture of the
+reconciliation's $W$. The key is a \emph{gauge cancellation}: the particle-hole column reindex $P$ exactly
+undoes the particle-hole gauge in $\texttt{hubbardBlockCoeff}$,
+\[
+  \texttt{hubbardBlockCoeff}\,\psi\cdot P=\texttt{hubbardBlockCoeffLinearEquiv}\,\psi,
+\]
+the \emph{plain} block-coefficient linear isomorphism. Hence $W=\texttt{hubbardBlockCoeffLinearEquiv}(U^{\mathsf H}\psi)$
+is a composition of linear isomorphisms --- surjective, with explicit inverse $\Gamma(W):=U\,(\mathrm{LE}^{-1}W)$
+($\texttt{gammaWState}$) satisfying $\texttt{hubbardBlockCoeff}(U^{\mathsf H}\Gamma(W))\cdot P=W$
+($\texttt{blockWCoeff\_gammaWState}$). This is the coordinate backbone for parametrizing trial states by a
+Hermitian $W$.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}

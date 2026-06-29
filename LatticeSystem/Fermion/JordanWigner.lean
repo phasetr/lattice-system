@@ -150,6 +150,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveKineticW
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveInteractionW
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractivePHConjDiag
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveEnergyReconcile
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveGammaCoords
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
