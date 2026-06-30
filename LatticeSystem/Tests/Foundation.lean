@@ -18,7 +18,6 @@ Methods covered:
 - A. decide-based universal property test (finite Decidable predicates).
 - B. matrix entry-wise on small `Fin n` (`ext i j <;> fin_cases`).
 - C. bridge identity (definitional equality between two definitions).
-- F. `#guard_msgs` (deprecation warning capture).
 - G. small exhaustive (`Fin n; fin_cases`) (semantic verification on
   small instances).
 
@@ -85,30 +84,6 @@ holds definitionally. -/
 example (N : ℕ) (J : ℝ) :
     periodicChainCoupling N J =
       couplingOf (SimpleGraph.cycleGraph (N + 2)) (-(J : ℂ)) := rfl
-
-/-! ## F. `#guard_msgs` for deprecation warning capture
-
-Demonstrates that `#guard_msgs` can be used to pin the diagnostic
-output of a command. Intended use cases:
-- `@[deprecated]` warning text.
-- Intended `error`-level command output.
-- Linter behaviour fixation.
-
-This POC defines a small deprecated symbol and verifies the
-expected warning message is emitted. -/
-
-/-- A throw-away deprecated `def` for the `#guard_msgs` POC. -/
-@[deprecated "POC: use `foundationPocReplacement`" (since := "2026-04-22")]
-def foundationPocOldDef : ℕ := 0
-
-/-- The intended replacement (also throw-away). -/
-def foundationPocReplacement : ℕ := 0
-
-/--
-warning: `LatticeSystem.Tests.Foundation.foundationPocOldDef` has been deprecated: POC: use `foundationPocReplacement`
--/
-#guard_msgs in
-example : ℕ := foundationPocOldDef
 
 /-! ## G. small exhaustive (`Fin n; fin_cases`)
 
