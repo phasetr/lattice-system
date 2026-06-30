@@ -6150,6 +6150,15 @@ $u$ (with $u_j=1$, $u_i=0$), the single hop $q\to p$ reaches $\texttt{hop}\,u\,j
 $\sum_{p,q}T_{p,q}\,\hat c^\dagger_p\hat c_q$ to the surviving $(i,j)$ entry ($=\pm T_{i,j}\neq0$) in the
 connectivity step.
 
+\medskip\noindent\textbf{The kinetic single-hop entry is nonzero (PR40c).}
+File \texttt{LiebAttractiveKineticEntry.lean} proves the up-kinetic matrix entry between a single-hop
+configuration and its source is nonzero: $A(\texttt{hop}\,u\,j\,i)\,u\neq0$ ($=\pm T_{i,j}$) for $u_j=1$,
+$u_i=0$, $i\neq j$, $T_{i,j}\neq0$ ($\texttt{hubbardBlockKineticUpFixedMatrix\_apply\_hop\_ne}$). Expanding the
+entry $((\hat H_\uparrow)|u\rangle)(\texttt{hop}\,u\,j\,i)$ over the kinetic double sum
+$\sum_{p,q}T_{p,q}\,\hat c^\dagger_p\hat c_q$, only the $(p,q)=(i,j)$ term reaches the hopped configuration
+(single-hop uniqueness, PR40b), leaving $\pm T_{i,j}$. This is the edge-weight-nonzero input for the
+configuration-graph connectivity.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
