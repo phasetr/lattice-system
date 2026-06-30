@@ -6159,6 +6159,18 @@ $\sum_{p,q}T_{p,q}\,\hat c^\dagger_p\hat c_q$, only the $(p,q)=(i,j)$ term reach
 (single-hop uniqueness, PR40b), leaving $\pm T_{i,j}$. This is the edge-weight-nonzero input for the
 configuration-graph connectivity.
 
+\medskip\noindent\textbf{Connectivity of the fixed-count kinetic support graph (PR40d).}
+File \texttt{LiebAttractiveSectorConnectivity.lean} builds, on the fixed up-count sector
+$\{u : \sum_x u_x = k\}$, the kinetic support graph $\texttt{hubbardKineticSectorGraph}$ (two
+configurations adjacent when both off-diagonal entries $A_{p,q},A_{q,p}$ are nonzero) and proves it is
+\emph{preconnected} whenever the hopping graph $\texttt{hoppingSupportGraph}\,T$ is (with real-symmetric
+$T$), via $\texttt{hubbardKineticSectorGraph\_preconnected}$. Two equal-count configurations share the
+same magnetization, hence are linked by configuration swaps along hopping edges
+($\texttt{swapReachable\_of\_eq\_magnetization}$); each swap is a sector-graph edge, the forward kinetic
+entry coming from PR40c and the reverse one from Hermiticity of $A$ ($\texttt{sectorGraph\_adj\_of\_hop}$).
+This supplies the connected-support hypothesis of the abstract Lemma~10.10
+($\texttt{posDef\_or\_eq\_zero\_of\_connected\_support}$).
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
