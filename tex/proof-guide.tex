@@ -6171,6 +6171,18 @@ entry coming from PR40c and the reverse one from Hermiticity of $A$ ($\texttt{se
 This supplies the connected-support hypothesis of the abstract Lemma~10.10
 ($\texttt{posDef\_or\_eq\_zero\_of\_connected\_support}$).
 
+\medskip\noindent\textbf{An $Ne$-electron sector ground vector (PR40e-pre1).}
+File \texttt{LiebAttractiveSectorGround.lean} produces, for symmetric real hopping $T$ and any site
+attraction $U$, a nonzero vector $\varphi$ in the $Ne$-electron sector ($\hat N\varphi=Ne\cdot\varphi$)
+that is an eigenvector of $\texttt{attractiveHubbardHamiltonian}\,N\,T\,U$ at the minimum eigenvalue of
+the \emph{sector compression} (not the full Hamiltonian), via
+$\texttt{exists\_attractive\_sector\_ground}$. The construction uses charge conservation
+$[\hat H,\hat N]=0$ ($\texttt{attractiveHubbardHamiltonian\_commute\_fermionTotalNumber}$, from the
+site-interaction commutation $\texttt{hubbardOnSiteInteractionSite\_commute\_fermionTotalNumber}$) to
+get $\texttt{preservesHubbardSectorW\_attractive}$, then the generic eigenvector lift
+$\texttt{mulVec\_hubbardSectorExpansion\_of\_compress\_eigen}$. This is the fixed-$Ne$ membership the
+Lieb spin-reflection-positivity sector argument requires.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
