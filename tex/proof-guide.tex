@@ -6183,6 +6183,16 @@ get $\texttt{preservesHubbardSectorW\_attractive}$, then the generic eigenvector
 $\texttt{mulVec\_hubbardSectorExpansion\_of\_compress\_eigen}$. This is the fixed-$Ne$ membership the
 Lieb spin-reflection-positivity sector argument requires.
 
+\medskip\noindent\textbf{Generic fixed-sector variational tools (PR40e-pre2a).}
+File \texttt{LiebAttractiveSectorVariational.lean} generalizes the uniform-Hubbard sector variational
+facts to an arbitrary Hermitian operator $A$, against the minimum eigenvalue $E_{Ne}$ of its sector
+compression. For any $Ne$-electron vector $v$ ($\hat N v = Ne\cdot v$):
+$\texttt{hubbardSector\_minEnergy\_mul\_le\_rayleighOnVec\_of\_isHermitian}$ gives the lower bound
+$E_{Ne}\,\|v\|^2 \le \langle v|A|v\rangle$, and (for $A$ preserving the sector)
+$\texttt{mulVec\_eq\_smul\_of\_hubbardSector\_rayleighOnVec\_eq\_min}$ gives the converse: attaining the
+sector minimum forces $A v = E_{Ne} v$. These are the squeeze infrastructure for the in-sector
+positive-semidefinite-$W$ ground construction.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
