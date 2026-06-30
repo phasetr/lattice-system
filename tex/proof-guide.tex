@@ -6193,6 +6193,17 @@ $\texttt{mulVec\_eq\_smul\_of\_hubbardSector\_rayleighOnVec\_eq\_min}$ gives the
 sector minimum forces $A v = E_{Ne} v$. These are the squeeze infrastructure for the in-sector
 positive-semidefinite-$W$ ground construction.
 
+\medskip\noindent\textbf{The $\Gamma$-reflection preserves the electron-number sector (PR40e-pre2a2).}
+File \texttt{LiebAttractiveThetaSector.lean} shows the $\Gamma$-reflection
+$\Theta = \texttt{gammaWState}\circ(\cdot)^{\mathsf H}\circ\texttt{blockWCoeff}$ preserves the
+$Ne$-electron sector: $\hat N\psi = Ne\cdot\psi \Rightarrow \hat N(\Theta\psi) = Ne\cdot\Theta\psi$
+($\texttt{gammaThetaVec\_preserves\_fermionTotalNumber}$). Conjugate transpose preserves the
+$\texttt{blockWCoeff}$ band support $|u|+|h|=Ne$ (it swaps $(u,h)\mapsto(h,u)$), and a band-supported
+$W$ yields a sector $\texttt{gammaWState}$ ($\texttt{gammaWState\_mem\_numberSector\_of\_band\_supported}$),
+using the converse $\texttt{mulVec\_eq\_smul\_number\_of\_apply\_eq\_zero}$ of the PR40a band support.
+Consequently the Hermitian-$W$ ground representative strengthens to remain in the $Ne$-sector
+($\texttt{exists\_hermitianW\_ground\_in\_sector}$).
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
