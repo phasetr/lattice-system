@@ -15,7 +15,7 @@ ground states are Marshall positive, so their overlap is non-zero, and both are
 total-Casimir eigenvectors, forcing their eigenvalues to coincide.
 
 This module discharges the `hsource_cas` hypothesis of
-`tasaki_2_5_theorem_2_3_sector_existence` /
+`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` /
 `tasaki23_successor_sector_existence_with_lowered_predictedCasimir` at the base
 extremal sector `M = min(|A|,|¬A|)·N`: the toy witness
 `tasaki23_toy_groundState_casimir_eq_predicted` (#3711) supplies `hw_cas`, and the
