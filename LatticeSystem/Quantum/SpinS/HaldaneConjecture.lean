@@ -42,6 +42,14 @@ the periodic nearest-neighbor `ringCoupling`. -/
 noncomputable def afmHeisenbergChainHamiltonianS (L N : ℕ) : ManyBodyOpS (Fin L) N :=
   heisenbergHamiltonianS (ringCoupling L) N
 
+/-- The AFM Heisenberg chain Hamiltonian is Hermitian (the ring coupling is real). -/
+theorem afmHeisenbergChainHamiltonianS_isHermitian (L N : ℕ) :
+    (afmHeisenbergChainHamiltonianS L N).IsHermitian := by
+  rw [afmHeisenbergChainHamiltonianS]
+  refine heisenbergHamiltonianS_isHermitian_of_real (fun x y => ?_) N
+  rw [ringCoupling]
+  split <;> simp
+
 /-- The **real spectrum** of a chain operator `H`: the set of real numbers `E` that are eigenvalues
 of `H` (witnessed by a nonzero eigenvector `Φ` with `H Φ = E Φ`).  For the Hermitian Heisenberg
 Hamiltonian all eigenvalues are real, so this captures the full spectrum. -/

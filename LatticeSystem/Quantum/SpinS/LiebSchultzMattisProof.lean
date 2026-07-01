@@ -419,15 +419,6 @@ theorem lsm_energy_diff_symm_sum (L N : ℕ) (Φ : (Fin L → Fin (N + 1)) → �
   rw [two_smul]
   abel
 
-/-- The AFM Heisenberg chain Hamiltonian is **Hermitian** (real `ringCoupling`).
-(File-local copy to keep this module self-contained; a public version lives elsewhere.) -/
-private theorem afmHeisenbergChainHamiltonianS_isHermitian (L N : ℕ) :
-    (afmHeisenbergChainHamiltonianS L N).IsHermitian := by
-  apply heisenbergHamiltonianS_isHermitian_of_real
-  intro x y
-  simp only [ringCoupling]
-  split <;> simp
-
 /-- **Variational lower bound (`Δ₋ ≥ 0`)**: the ground energy lower-bounds the real Rayleigh
 quotient of *any* nonzero vector.  Chains `E_GS ≤ hermitianMinEigenvalue ≤ expectationRatioRe`:
 the minimum eigenvalue is in the spectrum (so `≥ E_GS` by minimality) and lower-bounds every
