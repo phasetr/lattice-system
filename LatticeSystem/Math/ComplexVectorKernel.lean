@@ -38,4 +38,22 @@ theorem star_mulVec_dotProduct {m n : Type*} [Fintype m] [Fintype n] (M : Matrix
     star (M.mulVec v) ⬝ᵥ w = star v ⬝ᵥ M.conjTranspose.mulVec w := by
   rw [Matrix.star_mulVec, Matrix.dotProduct_mulVec]
 
+/-- `star v ⬝ᵥ v = ∑ ‖v i‖²` as a real cast into `ℂ` (the self inner product is a
+non-negative real). -/
+theorem star_dotProduct_self_eq {n : Type*} [Fintype n] (v : n → ℂ) :
+    star v ⬝ᵥ v = ((∑ i, Complex.normSq (v i) : ℝ) : ℂ) := by
+  rw [dotProduct, Complex.ofReal_sum]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
+
+/-- The conjugated quadratic form `⟨v, Mᴴ M v⟩ = ‖M v‖²` is a non-negative real. -/
+theorem star_dotProduct_conjTranspose_mul_mulVec_eq {n : Type*} [Fintype n]
+    (M : Matrix n n ℂ) (v : n → ℂ) :
+    star v ⬝ᵥ (M.conjTranspose * M).mulVec v =
+      ((∑ i, Complex.normSq ((M.mulVec v) i) : ℝ) : ℂ) := by
+  rw [← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, ← Matrix.star_mulVec, dotProduct,
+    Complex.ofReal_sum]
+  refine Finset.sum_congr rfl (fun i _ => ?_)
+  rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
+
 end LatticeSystem

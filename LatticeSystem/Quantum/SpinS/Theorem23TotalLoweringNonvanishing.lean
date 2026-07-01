@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.CasimirRearrangement
 import LatticeSystem.Quantum.SpinS.TotalSpin
 import LatticeSystem.Quantum.SpinS.Magnetization
+import LatticeSystem.Math.ComplexVectorKernel
 
 /-!
 # Non-vanishing of one total-spin lowering/raising step on a weight vector
@@ -30,23 +31,6 @@ open Matrix
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
-/-- The conjugated quadratic form `⟨v, Mᴴ M v⟩ = ‖M v‖²` is a non-negative real. -/
-private theorem star_dotProduct_conjTranspose_mul_mulVec_eq'
-    {n : Type*} [Fintype n] (M : Matrix n n ℂ) (v : n → ℂ) :
-    star v ⬝ᵥ (M.conjTranspose * M).mulVec v =
-      ((∑ i, Complex.normSq ((M.mulVec v) i) : ℝ) : ℂ) := by
-  rw [← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, ← Matrix.star_mulVec, dotProduct,
-    Complex.ofReal_sum]
-  refine Finset.sum_congr rfl (fun i _ => ?_)
-  rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
-
-/-- `star v ⬝ᵥ v = ∑ ‖v i‖²` as a real cast into `ℂ`. -/
-private theorem star_dotProduct_self_eq' {n : Type*} [Fintype n] (v : n → ℂ) :
-    star v ⬝ᵥ v = ((∑ i, Complex.normSq (v i) : ℝ) : ℂ) := by
-  rw [dotProduct, Complex.ofReal_sum]
-  refine Finset.sum_congr rfl (fun i _ => ?_)
-  rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
-
 /-- **Total-spin lowering magnitude identity** on a weight-`w` vector:
 `‖Ŝ⁻_tot Φ‖² = ‖Ŝ⁺_tot Φ‖² + 2 w ‖Φ‖²` (all as the real squared norms cast to `ℂ`). -/
 theorem totalSpinSOpMinus_mulVec_normSq_eq (V : Type*) [Fintype V] [DecidableEq V] (N : ℕ)
@@ -66,12 +50,12 @@ theorem totalSpinSOpMinus_mulVec_normSq_eq (V : Type*) [Fintype V] [DecidableEq 
   have hM : star Φ ⬝ᵥ (totalSpinSOpPlus V N * totalSpinSOpMinus V N).mulVec Φ =
       ((∑ i, Complex.normSq ((totalSpinSOpMinus V N).mulVec Φ i) : ℝ) : ℂ) := by
     rw [← totalSpinSOpMinus_conjTranspose (Λ := V) (N := N)]
-    exact star_dotProduct_conjTranspose_mul_mulVec_eq' _ Φ
+    exact star_dotProduct_conjTranspose_mul_mulVec_eq _ Φ
   -- `‖Ŝ⁺Φ‖²` via `(Ŝ⁺)† = Ŝ⁻`.
   have hP : star Φ ⬝ᵥ (totalSpinSOpMinus V N * totalSpinSOpPlus V N).mulVec Φ =
       ((∑ i, Complex.normSq ((totalSpinSOpPlus V N).mulVec Φ i) : ℝ) : ℂ) := by
     rw [← totalSpinSOpPlus_conjTranspose (Λ := V) (N := N)]
-    exact star_dotProduct_conjTranspose_mul_mulVec_eq' _ Φ
+    exact star_dotProduct_conjTranspose_mul_mulVec_eq _ Φ
   -- Expand `star Φ ⬝ᵥ (Ŝ⁺Ŝ⁻) Φ` through `hPM`.
   have hexp : star Φ ⬝ᵥ (totalSpinSOpPlus V N * totalSpinSOpMinus V N).mulVec Φ =
       star Φ ⬝ᵥ (totalSpinSOpMinus V N * totalSpinSOpPlus V N).mulVec Φ +
@@ -81,7 +65,7 @@ theorem totalSpinSOpMinus_mulVec_normSq_eq (V : Type*) [Fintype V] [DecidableEq 
     congr 1
     rw [hz, dotProduct_smul, smul_eq_mul]
     ring
-  rw [hM, hP, star_dotProduct_self_eq'] at hexp
+  rw [hM, hP, star_dotProduct_self_eq] at hexp
   exact hexp
 
 /-- **One lowering step is non-zero on a positive-weight vector.** For `Φ ≠ 0` with

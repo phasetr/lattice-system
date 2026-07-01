@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.SpinSymmetry
+import LatticeSystem.Fermion.JordanWigner.Hubbard.AllUpState
 
 /-!
 # Hubbard all-down-spin state: no double occupancy (mirror of `AllUpState`)
@@ -40,18 +41,6 @@ noncomputable def hubbardAllDownState (N : ℕ) :
     (Fin (2 * N + 2) → Fin 2) → ℂ :=
   basisVec (fun k : Fin (2 * N + 2) => if k.val % 2 = 0 then 0 else 1)
 
-/-! ## Auxiliary: parity of spinful JW indices -/
-
-/-- The spin-up JW index `spinfulIndex N i 0` has even value. -/
-private theorem spinfulIndex_up_even' (N : ℕ) (i : Fin (N + 1)) :
-    (spinfulIndex N i 0).val % 2 = 0 := by
-  simp [spinfulIndex]
-
-/-- The spin-down JW index `spinfulIndex N i 1` has odd value. -/
-private theorem spinfulIndex_down_odd' (N : ℕ) (i : Fin (N + 1)) :
-    (spinfulIndex N i 1).val % 2 = 1 := by
-  simp [spinfulIndex]
-
 /-! ## Number-operator action on the all-down state -/
 
 /-- The spin-down number operator at site `i` acts as the
@@ -64,7 +53,7 @@ theorem fermionDownNumber_mulVec_allDownState (N : ℕ) (i : Fin (N + 1)) :
   funext τ
   -- spin-down site is odd, so the all-down configuration has occupation 1.
   have hodd : ¬(spinfulIndex N i 1).val % 2 = 0 := by
-    have := spinfulIndex_down_odd' N i; omega
+    have := spinfulIndex_down_odd N i; omega
   simp only [if_neg hodd]
   rw [Fin.sum_univ_two]
   have h0 : (spinHalfOpMinus * spinHalfOpPlus) (0 : Fin 2) (1 : Fin 2) = 0 := by
@@ -94,7 +83,7 @@ theorem fermionUpNumber_mulVec_allDownState (N : ℕ) (i : Fin (N + 1)) :
     basisVec (Function.update (fun j : Fin (2 * N + 2) =>
         if j.val % 2 = 0 then (0 : Fin 2) else 1)
       (spinfulIndex N i 0) k) τ = 0
-  simp only [if_pos (spinfulIndex_up_even' N i)]
+  simp only [if_pos (spinfulIndex_up_even N i)]
   fin_cases k <;> simp [spinHalfOpMinus, spinHalfOpPlus]
 
 /-! ## Interaction on all-down state -/
@@ -135,7 +124,7 @@ theorem fermionUpAnnihilation_mulVec_allDownState (N : ℕ) (i : Fin (N + 1)) :
       basisVec (Function.update (fun j : Fin (2 * N + 2) =>
           if j.val % 2 = 0 then (0 : Fin 2) else 1)
         (spinfulIndex N i 0) k) τ = 0
-    simp only [if_pos (spinfulIndex_up_even' N i)]
+    simp only [if_pos (spinfulIndex_up_even N i)]
     fin_cases k <;> simp [spinHalfOpPlus]
   rw [hinner, Matrix.mulVec_zero]
 
@@ -159,7 +148,7 @@ theorem fermionDownCreation_mulVec_allDownState (N : ℕ) (i : Fin (N + 1)) :
           if j.val % 2 = 0 then (0 : Fin 2) else 1)
         (spinfulIndex N i 1) k) τ = 0
     have hodd : ¬(spinfulIndex N i 1).val % 2 = 0 := by
-      have := spinfulIndex_down_odd' N i; omega
+      have := spinfulIndex_down_odd N i; omega
     simp only [if_neg hodd]
     fin_cases k <;> simp [spinHalfOpMinus]
   rw [hinner, Matrix.mulVec_zero]

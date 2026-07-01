@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.SublatticeSpinLadder
 import LatticeSystem.Quantum.SpinS.Theorem23PFCasimirPredicted
+import LatticeSystem.Math.ComplexVectorKernel
 
 /-!
 # Sublattice Casimir dominates `S^3(S^3 ± 1)` (magnitude bound)
@@ -24,23 +25,6 @@ namespace LatticeSystem.Quantum
 open Matrix
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
-
-/-- The conjugated quadratic form `⟨v, Mᴴ M v⟩ = ‖M v‖²` is a non-negative real. -/
-private theorem star_dotProduct_conjTranspose_mul_mulVec_eq
-    {n : Type*} [Fintype n] (M : Matrix n n ℂ) (v : n → ℂ) :
-    star v ⬝ᵥ (M.conjTranspose * M).mulVec v =
-      ((∑ i, Complex.normSq ((M.mulVec v) i) : ℝ) : ℂ) := by
-  rw [← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, ← Matrix.star_mulVec, dotProduct,
-    Complex.ofReal_sum]
-  refine Finset.sum_congr rfl (fun i _ => ?_)
-  rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
-
-/-- `(star v ⬝ᵥ v)` is a positive real for `v ≠ 0`. -/
-private theorem star_dotProduct_self_eq {n : Type*} [Fintype n] (v : n → ℂ) :
-    star v ⬝ᵥ v = ((∑ i, Complex.normSq (v i) : ℝ) : ℂ) := by
-  rw [dotProduct, Complex.ofReal_sum]
-  refine Finset.sum_congr rfl (fun i _ => ?_)
-  rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
 
 private theorem star_dotProduct_self_re_pos {n : Type*} [Fintype n]
     {v : n → ℂ} (hv : v ≠ 0) : 0 < (star v ⬝ᵥ v).re := by

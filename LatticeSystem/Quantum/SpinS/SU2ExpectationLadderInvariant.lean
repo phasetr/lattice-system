@@ -40,15 +40,6 @@ open Matrix
 
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
-/-- `star v ⬝ᵥ v = ∑ ‖v i‖²` as a real cast into `ℂ`.  Local copy of the (private)
-helper `star_dotProduct_self_eq'` of `Theorem23TotalLoweringNonvanishing`, duplicated
-here because `private` declarations are not visible across module boundaries. -/
-private theorem star_dotProduct_self_eq'' {n : Type*} [Fintype n] (v : n → ℂ) :
-    star v ⬝ᵥ v = ((∑ i, Complex.normSq (v i) : ℝ) : ℂ) := by
-  rw [dotProduct, Complex.ofReal_sum]
-  refine Finset.sum_congr rfl (fun i _ => ?_)
-  rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
-
 /-- **Scalar action of `Ŝ⁺_tot Ŝ⁻_tot` on a joint eigenvector.** If
 `Ŝ³_tot v = m • v` and `(Ŝ_tot)² v = γ • v`, then
 `(Ŝ⁺_tot Ŝ⁻_tot) *ᵥ v = (γ − m·m + m) • v`, the Casimir-rearrangement eigenvalue. -/
@@ -125,9 +116,9 @@ theorem su2_expectationRatioRe_ladder_invariant (O : ManyBodyOpS V N)
   have hnum := su2_expectation_ladder_cross O hOplus hOminus hz hcas
   -- Recast `‖·‖²` casts back into `star · ⬝ᵥ ·` form.
   have hSm_self : star Sm ⬝ᵥ Sm =
-      ((∑ i, Complex.normSq (Sm i) : ℝ) : ℂ) := star_dotProduct_self_eq'' Sm
+      ((∑ i, Complex.normSq (Sm i) : ℝ) : ℂ) := star_dotProduct_self_eq Sm
   have hv_self : star v ⬝ᵥ v = ((∑ i, Complex.normSq (v i) : ℝ) : ℂ) :=
-    star_dotProduct_self_eq'' v
+    star_dotProduct_self_eq v
   -- The complex scalar factor `c = γ − m² + m`.
   set c : ℂ := γ - m * m + m with hcdef
   -- Denominator scaling rewritten in `star · ⬝ᵥ ·` form.
