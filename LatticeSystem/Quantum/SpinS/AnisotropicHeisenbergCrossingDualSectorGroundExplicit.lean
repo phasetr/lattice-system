@@ -6,9 +6,9 @@ import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergParametricGapCrossingGen
 
 Issue #3739 — Tasaki §2.5 Theorem 2.4 obligation (2).
 
-Variant of PR #3972 `anisotropicHeisenbergS_crossing_dual_sector_ground_eigenvectors_generic`
-whose conclusion eliminates the inner `∃ μ : ℝ` by replacing the existential with
-the explicit value `hermitianMinEigenvalue (Ĥ_M_0(γ(t*)))`.
+Variant of the PR #3972 generic crossing dual-sector eigenvector wrapper
+(since removed) whose conclusion eliminates the inner `∃ μ : ℝ` by replacing
+the existential with the explicit value `hermitianMinEigenvalue (Ĥ_M_0(γ(t*)))`.
 
 This form lets downstream proofs avoid the opaque-existential-μ issue and
 enables the obligation (2) capstone wiring at the global-min energy.

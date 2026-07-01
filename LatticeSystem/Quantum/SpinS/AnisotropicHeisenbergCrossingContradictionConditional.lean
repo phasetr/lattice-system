@@ -23,8 +23,9 @@ Combines:
 - A simple non-vanishing check for `magSectorEmbedding`.
 
 This is the final algebraic step of the IVT crossing argument; the input
-sector eigenvectors at the crossing point are supplied by PR #3964
-(`anisotropicHeisenbergS_crossing_dual_sector_ground_eigenvectors`).
+sector eigenvectors at the crossing point were supplied by PR #3964's
+crossing dual-sector eigenvector construction (since removed; the crossing
+route was completed via a separate wiring).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 Springer 2020, §2.5 Theorem 2.4, p. 43–44.

@@ -6,10 +6,10 @@ import Mathlib.Topology.Order.IntermediateValue
 
 Issue #3739 — Tasaki §2.5 Theorem 2.4 obligation (2).
 
-Generalisation of `anisotropicHeisenbergS_parametric_gap_crossing` (PR #3959,
-specialised to `M_0 = 0`) to an arbitrary ground sector `M_0`. Needed by the
-actual Tasaki §2.5 Theorem 2.4 application with `M_0 = balanced = |Λ|·N/2`
-(the centered-zero sector that contains the symmetric GS).
+Generalisation of the PR #3959 `M_0 = 0` parametric gap crossing (since
+removed) to an arbitrary ground sector `M_0`. Needed by the actual Tasaki
+§2.5 Theorem 2.4 application with `M_0 = balanced = |Λ|·N/2` (the
+centered-zero sector that contains the symmetric GS).
 
 Proof structure identical to PR #3959; only the sector label is parameterised.
 
