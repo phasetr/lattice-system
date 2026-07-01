@@ -4,6 +4,7 @@ import LatticeSystem.Quantum.SpinS.EigenspaceFinrankLeOneTransfer
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import LatticeSystem.Quantum.SpinS.HermitianMinLeOfEigenvector
 import LatticeSystem.Quantum.SpinS.Theorem24SectorPFFromTheorem23
+import LatticeSystem.Math.ComplexVectorKernel
 /-!
 # SU(2)-point global uniqueness from the MLM endpoint — core lemmas
 
@@ -285,18 +286,6 @@ theorem heisenbergHamiltonianS_totalSpinSSquared_mulVec_raise_landed_eq_zero_of_
 /-! ## Zero-Casimir singlet image obstruction -/
 
 omit [DecidableEq V] in
-/-- The conjugate-symmetric norm identity
-`⟪M v, M v⟫ = ⟪v, Mᴴ M v⟫`, written as a sum of complex norm squares. -/
-private theorem star_dotProduct_conjTranspose_mul_mulVec_eq_normSq
-    {n : Type*} [Fintype n] (M : Matrix n n ℂ) (v : n → ℂ) :
-    star v ⬝ᵥ (M.conjTranspose * M).mulVec v =
-      ((∑ i, Complex.normSq ((M.mulVec v) i) : ℝ) : ℂ) := by
-  rw [← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, ← Matrix.star_mulVec, dotProduct,
-    Complex.ofReal_sum]
-  refine Finset.sum_congr rfl (fun i _ => ?_)
-  rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
-
-omit [DecidableEq V] in
 /-- If a vector is in the range of `M` and is killed by `Mᴴ`, then the vector is
 zero.  This is the finite-dimensional Hilbert-space fact `range M ⟂ ker Mᴴ`. -/
 private theorem eq_zero_of_eq_mulVec_and_conjTranspose_mulVec_eq_zero
@@ -309,7 +298,7 @@ private theorem eq_zero_of_eq_mulVec_and_conjTranspose_mulVec_eq_zero
     calc
       ((∑ i, Complex.normSq (w i) : ℝ) : ℂ) =
           star u ⬝ᵥ (M.conjTranspose * M).mulVec u := by
-            rw [star_dotProduct_conjTranspose_mul_mulVec_eq_normSq]
+            rw [star_dotProduct_conjTranspose_mul_mulVec_eq]
             simp [hw_eq]
       _ = star u ⬝ᵥ M.conjTranspose.mulVec w := by
             rw [hw_eq, ← Matrix.mulVec_mulVec]

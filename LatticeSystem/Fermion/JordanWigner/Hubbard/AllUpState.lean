@@ -52,12 +52,12 @@ noncomputable def hubbardAllUpState (N : ℕ) :
 /-! ## Auxiliary: parity of spinful JW indices -/
 
 /-- The spin-up JW index `spinfulIndex N i 0` has even value. -/
-private theorem spinfulIndex_up_even (N : ℕ) (i : Fin (N + 1)) :
+theorem spinfulIndex_up_even (N : ℕ) (i : Fin (N + 1)) :
     (spinfulIndex N i 0).val % 2 = 0 := by
   simp [spinfulIndex]
 
 /-- The spin-down JW index `spinfulIndex N i 1` has odd value. -/
-private theorem spinfulIndex_down_odd (N : ℕ) (i : Fin (N + 1)) :
+theorem spinfulIndex_down_odd (N : ℕ) (i : Fin (N + 1)) :
     (spinfulIndex N i 1).val % 2 = 1 := by
   simp [spinfulIndex]
 
