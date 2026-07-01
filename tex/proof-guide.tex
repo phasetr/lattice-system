@@ -4670,7 +4670,10 @@ are the Wick-reordering inputs for the eventual determinant expansion.
 \noindent\textbf{Discharge progress (Issue \#4593, PR2).} Building on PR1,
 the \emph{smeared}-operator canonical anticommutators and the
 vacuum-killing identity are established in
-\texttt{Fermion/JordanWigner/SmearedCAR.lean}. With the un-conjugated
+\texttt{Fermion/JordanWigner/SmearedOperators.lean} (the smeared operator
+definitions, the mixed CAR, and the vacuum-killing identity) and
+\texttt{Fermion/JordanWigner/SmearedCAR.lean} (the pure creation /
+annihilation anticommutators). With the un-conjugated
 (bilinear) smeared operators $\hat C(\varphi) = \sum_x \varphi(x)\hat c_x$,
 $\hat C^\dagger(\psi) = \sum_x \psi(x)\hat c^\dagger_x$,
 \[

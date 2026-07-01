@@ -1,5 +1,5 @@
 import LatticeSystem.Fermion.JWAbstract
-import LatticeSystem.Fermion.JWAbstractCrossSite
+import LatticeSystem.Fermion.JordanWigner.SmearedOperators
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.LinearAlgebra.Matrix.DotProduct
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
@@ -28,26 +28,6 @@ open Matrix LatticeSystem.Quantum
 open scoped BigOperators ComplexOrder
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] [LinearOrder Λ]
-
-
-/-- The Jordan–Wigner Fock vacuum `|Φvac⟩`: the all-empty
-computational-basis configuration `(fun _ => 0)` (Tasaki §9.2.3,
-p. 314). It is annihilated by every `ĉ_x`. -/
-noncomputable def fermionVacuumAbstract : (Λ → Fin 2) → ℂ :=
-  basisVec (fun _ : Λ => (0 : Fin 2))
-
-/-- The smeared creation operator `Ĉ†(φ) = Σ_x φ(x) ĉ†_x`
-(Tasaki eq. (9.2.46), p. 313). -/
-noncomputable def fermionCreationFromVector (φ : Λ → ℂ) : ManyBodyOp Λ :=
-  ∑ x : Λ, φ x • fermionCreationAbstract x
-
-/-- The smeared annihilation operator `Ĉ(φ) = Σ_x φ(x)* ĉ_x` written
-without the conjugation on the coefficients, i.e. `Σ_x φ(x) ĉ_x`; the
-physical `Ĉ(φ)` is obtained by feeding the conjugated vector. We keep
-the linear (un-conjugated) form here for algebraic convenience
-(Tasaki eq. (9.2.46), p. 313). -/
-noncomputable def fermionAnnihilationFromVector (φ : Λ → ℂ) : ManyBodyOp Λ :=
-  ∑ x : Λ, φ x • fermionAnnihilationAbstract x
 
 /-- The Fock-space inner product `⟨v, w⟩ = Σ_τ v(τ)* w(τ)` of two
 many-body vectors. -/
@@ -100,89 +80,12 @@ theorem fockInner_vacuum_self :
 
 /-! ### Algebraic core of Lemma 9.1
 
-The following `private` helpers prove the smeared canonical
-anticommutation relations and the vacuum-killing identity needed for the
-induction proof of Lemma 9.1. They are stated for the smeared operators
-`Ĉ(φ)` / `Ĉ†(ψ)` and reduce to the per-site CAR from
-`LatticeSystem.Fermion.JWAbstract` /
-`LatticeSystem.Fermion.JWAbstractCrossSite`. (The public companions live
-in `LatticeSystem.Fermion.JordanWigner.SmearedCAR`, which imports this
-file; we keep `private` copies here to avoid an import cycle.) -/
-
-omit [LinearOrder Λ] in
-/-- Expansion of the anticommutator of two coefficient-weighted operator
-sums into a weighted double sum of per-pair anticommutators (algebraic
-core of the smeared CAR). -/
-private lemma sumSmulAnticommEqDoubleSum
-    (φ ψ : Λ → ℂ) (f g : Λ → ManyBodyOp Λ) :
-    (∑ x : Λ, φ x • f x) * (∑ y : Λ, ψ y • g y) +
-        (∑ y : Λ, ψ y • g y) * (∑ x : Λ, φ x • f x)
-      = ∑ x : Λ, ∑ y : Λ, (φ x * ψ y) • (f x * g y + g y * f x) := by
-  have hST : (∑ x : Λ, φ x • f x) * (∑ y : Λ, ψ y • g y)
-      = ∑ x : Λ, ∑ y : Λ, (φ x * ψ y) • (f x * g y) := by
-    rw [Finset.sum_mul]
-    refine Finset.sum_congr rfl fun x _ => ?_
-    rw [Finset.mul_sum]
-    refine Finset.sum_congr rfl fun y _ => ?_
-    rw [Matrix.smul_mul, Matrix.mul_smul, smul_smul]
-  have hTS : (∑ y : Λ, ψ y • g y) * (∑ x : Λ, φ x • f x)
-      = ∑ x : Λ, ∑ y : Λ, (φ x * ψ y) • (g y * f x) := by
-    rw [Finset.sum_mul]
-    rw [show (∑ y : Λ, (ψ y • g y) * ∑ x : Λ, φ x • f x)
-        = ∑ y : Λ, ∑ x : Λ, (φ x * ψ y) • (g y * f x) from by
-      refine Finset.sum_congr rfl fun y _ => ?_
-      rw [Finset.mul_sum]
-      refine Finset.sum_congr rfl fun x _ => ?_
-      rw [Matrix.smul_mul, Matrix.mul_smul, smul_smul, mul_comm (ψ y) (φ x)]]
-    rw [Finset.sum_comm]
-  rw [hST, hTS, ← Finset.sum_add_distrib]
-  refine Finset.sum_congr rfl fun x _ => ?_
-  rw [← Finset.sum_add_distrib]
-  refine Finset.sum_congr rfl fun y _ => ?_
-  rw [smul_add]
-
-/-- **Smeared mixed CAR** (Tasaki §9.2.3, p. 313): `Ĉ(φ) Ĉ†(ψ) +
-Ĉ†(ψ) Ĉ(φ) = (Σ_x φ(x) ψ(x)) · 1`. `private` copy used by Lemma 9.1. -/
-private theorem fermionFromVectorAnticommMixed (φ ψ : Λ → ℂ) :
-    fermionAnnihilationFromVector φ * fermionCreationFromVector ψ +
-        fermionCreationFromVector ψ * fermionAnnihilationFromVector φ
-      = (∑ x : Λ, φ x * ψ x) • (1 : ManyBodyOp Λ) := by
-  unfold fermionAnnihilationFromVector fermionCreationFromVector
-  rw [sumSmulAnticommEqDoubleSum φ ψ fermionAnnihilationAbstract
-    fermionCreationAbstract]
-  rw [Finset.sum_smul]
-  refine Finset.sum_congr rfl fun x _ => ?_
-  rw [Finset.sum_eq_single x]
-  · rw [fermionMultiAnticommAbstract_self]
-  · intro y _ hyx
-    rw [fermionAnnihilationAbstract_creation_anticomm_of_ne (Ne.symm hyx),
-      smul_zero]
-  · intro hx; exact absurd (Finset.mem_univ x) hx
-
-/-- **Smeared annihilation vacuum-killing** (Tasaki §9.2.3, p. 314):
-`Ĉ(φ) |Φvac⟩ = 0`. `private` copy used by Lemma 9.1. -/
-private theorem fermionAnnihilationFromVectorMulVecVacuum (φ : Λ → ℂ) :
-    (fermionAnnihilationFromVector φ).mulVec
-        (fermionVacuumAbstract : (Λ → Fin 2) → ℂ) = 0 := by
-  have hsite : ∀ x : Λ, (fermionAnnihilationAbstract x).mulVec
-      (fermionVacuumAbstract : (Λ → Fin 2) → ℂ) = 0 := by
-    intro x
-    unfold fermionAnnihilationAbstract fermionVacuumAbstract
-    rw [← Matrix.mulVec_mulVec, onSite_mulVec_basisVec]
-    have hzero : (fun τ : Λ → Fin 2 =>
-        ∑ k : Fin 2, spinHalfOpPlus k ((fun _ : Λ => (0 : Fin 2)) x) *
-          basisVec (Function.update (fun _ : Λ => (0 : Fin 2)) x k) τ)
-        = (0 : (Λ → Fin 2) → ℂ) := by
-      funext τ
-      refine Finset.sum_eq_zero fun k _ => ?_
-      have : spinHalfOpPlus k (0 : Fin 2) = 0 := by
-        fin_cases k <;> simp [spinHalfOpPlus]
-      rw [this, zero_mul]
-    rw [hzero, Matrix.mulVec_zero]
-  unfold fermionAnnihilationFromVector
-  rw [Matrix.sum_mulVec]
-  refine Finset.sum_eq_zero fun x _ => ?_
-  rw [Matrix.smul_mulVec, hsite x, smul_zero]
+The smeared canonical anticommutation relations and the vacuum-killing
+identity used in the induction proof of Lemma 9.1 live upstream in
+`LatticeSystem.Fermion.JordanWigner.SmearedOperators`
+(`fermionFromVector_anticomm_mixed`,
+`fermionAnnihilationFromVector_mulVec_vacuum`). The remaining `private`
+helpers below package the Slater-state recursion specific to this file. -/
 
 /-- The Slater state of a cons list factors as one creation operator
 acting on the Slater state of the tail:
@@ -277,13 +180,13 @@ private theorem annihilationFromVector_mulVec_slaterState
     -- |Φ_{[ψ₀]}⟩ = Ĉ†(ψ₀)|Φvac⟩; pull Ĉ(χ) through with the mixed CAR
     rw [show ([ψ 0] : List (Λ → ℂ)) = ψ 0 :: [] from rfl, slaterState_cons,
       slaterState_nil, Matrix.mulVec_mulVec]
-    have hmixed := fermionFromVectorAnticommMixed χ (ψ 0)
+    have hmixed := fermionFromVector_anticomm_mixed χ (ψ 0)
     have hsub : fermionAnnihilationFromVector χ * fermionCreationFromVector (ψ 0)
         = (∑ x : Λ, χ x * ψ 0 x) • (1 : ManyBodyOp Λ)
           - fermionCreationFromVector (ψ 0) * fermionAnnihilationFromVector χ :=
       eq_sub_of_add_eq hmixed
     rw [hsub, Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec,
-      ← Matrix.mulVec_mulVec, fermionAnnihilationFromVectorMulVecVacuum,
+      ← Matrix.mulVec_mulVec, fermionAnnihilationFromVector_mulVec_vacuum,
       Matrix.mulVec_zero, sub_zero, Fin.val_zero, pow_zero, one_mul]
   | succ m ih =>
     -- head/tail split of the ket
@@ -291,7 +194,7 @@ private theorem annihilationFromVector_mulVec_slaterState
         = ψ 0 :: List.ofFn (fun i : Fin (m + 1) => ψ i.succ) := List.ofFn_succ
     rw [hofn, slaterState_cons, Matrix.mulVec_mulVec]
     -- move Ĉ(χ) past the leading Ĉ†(ψ₀) with the mixed CAR
-    have hmixed := fermionFromVectorAnticommMixed χ (ψ 0)
+    have hmixed := fermionFromVector_anticomm_mixed χ (ψ 0)
     have hsub : fermionAnnihilationFromVector χ * fermionCreationFromVector (ψ 0)
         = (∑ x : Λ, χ x * ψ 0 x) • (1 : ManyBodyOp Λ)
           - fermionCreationFromVector (ψ 0) * fermionAnnihilationFromVector χ :=
