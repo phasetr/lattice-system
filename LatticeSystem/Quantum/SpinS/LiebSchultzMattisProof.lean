@@ -8,6 +8,7 @@ import Mathlib.Analysis.Complex.Order
 import LatticeSystem.Quantum.SpinS.AxisSwapUnitarySSpinSCore
 import LatticeSystem.Quantum.SpinS.Problem25cZAxisRotationInput
 import LatticeSystem.Math.PosSemidef.Basics
+import LatticeSystem.Math.ComplexVectorKernel
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.Matrix.Normed
 
@@ -30,12 +31,6 @@ namespace LatticeSystem.Quantum
 
 open Matrix NormedSpace
 open scoped ComplexOrder
-
-/-- Adjoint–vector identity: `⟨M v, w⟩ = ⟨v, Mᴴ w⟩` for the (conjugate-linear-left) dot product.
-(File-local private copy; the generic foundations live in `LiebSchultzMattisProofCore`.) -/
-private theorem star_mulVec_dotProduct {ι : Type*} [Fintype ι] (M : Matrix ι ι ℂ) (v w : ι → ℂ) :
-    star (M.mulVec v) ⬝ᵥ w = star v ⬝ᵥ M.conjTranspose.mulVec w := by
-  rw [Matrix.star_mulVec, Matrix.dotProduct_mulVec]
 
 /-- The **LSM twist generator** `G = Σ_x θ_x Ŝ³_x` (`θ_x = 2π(x+1)/L`), the Hermitian operator
 exponentiated (with `−i`) to form `lsmTwistOperator`. -/
