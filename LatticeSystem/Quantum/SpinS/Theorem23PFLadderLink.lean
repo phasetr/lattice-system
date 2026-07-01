@@ -10,7 +10,8 @@ import LatticeSystem.Quantum.SpinS.Theorem23PredictedEndpoint
 Sound replacement for the deleted saturated-ladder-iterate route (Issue
 #3542; see `.self-local/docs/tasaki-2-5-pf-route-design.md`).  The
 per-sector Marshall-positive Perron–Frobenius ground state
-(`tasaki_2_5_theorem_2_3_sector_existence`) is chained across adjacent
+(`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`) is
+chained across adjacent
 magnetization sectors by the SU(2) total-lowering operator, using only
 `[Ĥ, Ŝ⁻_tot] = 0` and the total-Casimir non-vanishing criterion.
 
@@ -44,7 +45,8 @@ lowering-kernel value, then its total-lowering image `Ŝ⁻_tot · Ψ` is
   (`Ŝ⁻_tot` lowers the `Ŝ_tot^(3)` eigenvalue by one).
 
 This packages the sound energy-preserving step that chains the per-sector
-Perron–Frobenius ground states of `tasaki_2_5_theorem_2_3_sector_existence`
+Perron–Frobenius ground states of
+`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`
 across the admissible range.  No Marshall positivity of the lowered vector
 is used. -/
 theorem tasaki23_pf_ladder_link_succ

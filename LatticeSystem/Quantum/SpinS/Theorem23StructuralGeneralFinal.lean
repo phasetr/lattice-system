@@ -1,5 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralCommonGroundEnergy
-import LatticeSystem.Quantum.SpinS.Theorem23StructuralSectorExistence
+import LatticeSystem.Quantum.SpinS.Theorem23StructuralMLMFull
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralBipartiteToy
 import LatticeSystem.Quantum.SpinS.Theorem23GeneralHOutside
 
@@ -69,7 +69,7 @@ theorem tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive
   refine ⟨μ, ?_, ?_⟩
   · intro M hM _hNe
     obtain ⟨μM, vM, hμM_lt, hvM_pos, hH_M, _hsupp, huniq⟩ :=
-      tasaki_2_5_theorem_2_3_sector_existence (N := N) (M := M) A c
+      marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full (N := N) (M := M) A c
         hJ_real hJ_real' hJ_pos hJ_nn hJ_sym hJ_bipartite hc_strict hA_ne hB_ne hN
     have hReEig_M : (heisenbergHamiltonianSReMatrixOnMagSector J N M).mulVec
         (fun σ => (marshallSignS A σ.1).re * vM σ) =

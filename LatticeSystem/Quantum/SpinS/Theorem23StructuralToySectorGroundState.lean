@@ -1,4 +1,4 @@
-import LatticeSystem.Quantum.SpinS.Theorem23StructuralSectorExistence
+import LatticeSystem.Quantum.SpinS.Theorem23StructuralMLMFull
 import LatticeSystem.Quantum.SpinS.Theorem23StructuralToySectorLowerBound
 import LatticeSystem.Quantum.SpinS.Theorem23PredictedEnergySectorAll
 import LatticeSystem.Quantum.SpinS.Theorem23ToyGSPredictedCasimir
@@ -10,7 +10,7 @@ import LatticeSystem.Quantum.SpinS.BipartiteToyMinEnergy
 (Thm23-#3887.19): structural variant of the per-sector toy ground-state
 at predicted-energy package (the original `toy_sector_groundState_at_predicted`
 witness was removed together with `Theorem23ToyFinal.lean` in PR #3917). Uses
-- `tasaki_2_5_theorem_2_3_sector_existence` (Thm23-#3887.16)
+- `marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full` (Thm23-#3887.15)
 - `tasaki23_toy_sector_energy_ge_predicted` (Thm23-#3887.17)
 - `tasaki23_toy_sector_groundEnergy_le_of_witness` (already h_intermediate-free)
 - `exists_predictedEnergy_sector_eigenvector_of_mem` (already h_intermediate-free)
@@ -53,7 +53,8 @@ theorem toy_sector_groundState_at_predicted
   classical
   set E := (bipartiteToyMinEnergyPredicted (Λ := V) A N).re with hEdef
   obtain ⟨μM, vM, hμM_lt, hvM_pos, hH_M, _hsupp, huniq⟩ :=
-    tasaki_2_5_theorem_2_3_sector_existence (M := M) A c (bipartiteCoupling_im A)
+    marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full (M := M) A c
+      (bipartiteCoupling_im A)
       (fun x y => by
         rw [Complex.star_def, Complex.conj_eq_iff_im]; exact bipartiteCoupling_im A x y)
       (fun x y hadj => by

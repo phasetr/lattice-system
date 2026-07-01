@@ -305,7 +305,8 @@ theorem exists_marshallSign_eigenvector_heisenbergHamiltonianS_full_of_irreducib
   exact ⟨μ, v, hμ, hv_pos, heisenbergHamiltonianS_mulVec_magSectorEmbedding J _ hmul⟩
 
 /-- **Per-sector existence step from a supplied irreducibility witness**.
-Graph-agnostic variant of `tasaki_2_5_theorem_2_3_sector_existence`. -/
+Graph-agnostic variant of
+`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`. -/
 theorem tasaki_2_5_theorem_2_3_sector_existence_of_irreducible
     (A : V → Bool) {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
