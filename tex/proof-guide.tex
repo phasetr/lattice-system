@@ -2970,7 +2970,7 @@ parallel spins).
 Unfold \texttt{heisenbergHamiltonian} to
 $\sum_{x,y} J(x,y)\,\hat S_x\cdot\hat S_y$. By
 \texttt{Matrix.sum\_mulVec} each summand acts on the constant basis
-state independently. The internal lemma
+state independently. The lemma
 \texttt{spinHalfDot\_mulVec\_const} provides the eigenvalue
 $\tfrac{3}{4}$ for $x=y$ (using \texttt{spinHalfDot\_self}, which
 gives $\hat S_x\cdot\hat S_x = (3/4)\,I$) and $\tfrac{1}{4}$ for

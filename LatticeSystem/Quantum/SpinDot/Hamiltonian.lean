@@ -20,21 +20,6 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
 
-/-- `Ŝ_x · Ŝ_y` action on a uniformly-aligned basis state (constant `s`):
-`(3/4) |s⟩` for `x = y`, `(1/4) |s⟩` for `x ≠ y`.  (Private copy of the
-`HamiltonianCore` helper, duplicated because `private` declarations do not cross
-module boundaries.) -/
-private theorem spinHalfDot_mulVec_const (s : Fin 2) (x y : Λ) :
-    (spinHalfDot x y).mulVec (basisVec (fun _ : Λ => s)) =
-      (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ)) •
-        basisVec (fun _ : Λ => s) := by
-  by_cases hxy : x = y
-  · subst hxy
-    rw [if_pos rfl, spinHalfDot_self]
-    rw [Matrix.smul_mulVec, Matrix.one_mulVec]
-  · rw [if_neg hxy]
-    exact spinHalfDot_mulVec_basisVec_parallel hxy _ rfl
-
 /-! ## Spin-`1/2` total `Ŝ_tot^{(1,2)}` zero expectation (γ-4 step 215) -/
 
 /-- Per-site spin-`1/2` `Ŝ^(1)_x` has zero expectation on every basis
