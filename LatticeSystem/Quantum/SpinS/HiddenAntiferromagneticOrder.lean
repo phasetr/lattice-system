@@ -120,14 +120,6 @@ theorem hhafProjection_mul_self (L : ℕ) :
   funext σ
   by_cases h : IsHiddenAFMConfig σ <;> simp [h]
 
-/-- The antiferromagnetic Heisenberg ring Hamiltonian is Hermitian (the ring coupling is real). -/
-theorem afmHeisenbergChainHamiltonianS_isHermitian (L N : ℕ) :
-    (afmHeisenbergChainHamiltonianS L N).IsHermitian := by
-  rw [afmHeisenbergChainHamiltonianS]
-  refine heisenbergHamiltonianS_isHermitian_of_real (fun x y => ?_) N
-  rw [ringCoupling]
-  split <;> simp
-
 /-- The `H_HAF`-restricted (compressed) Hamiltonian `P_HAF Ĥ P_HAF` is Hermitian. -/
 theorem hhafRestrictedChainHamiltonianS_isHermitian (L : ℕ) :
     (hhafRestrictedChainHamiltonianS L).IsHermitian := by
