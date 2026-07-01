@@ -1,5 +1,4 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandSpinRep
-import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralBasisHN
 
 /-!
 # General flat-band ground states: index-supported representation (foundation)

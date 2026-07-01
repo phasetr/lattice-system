@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandSpinConfigRepCore
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralBasisHN
 
 /-!
 # Spin-configuration capstone, eq. (11.3.47) (Tasaki §11.3.4, toward Theorem 11.17)
