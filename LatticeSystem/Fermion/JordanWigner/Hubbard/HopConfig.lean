@@ -25,11 +25,6 @@ def hubbardSpinMove (N : ℕ) (σ : Fin (N + 1) → Bool) (x y : Fin (N + 1)) :
     Fin (N + 1) → Bool :=
   Function.update σ x (σ y)
 
-/-- A `Fin 2` value that is not `0` is `1`. -/
-theorem fin_two_ne_zero {v : Fin 2} (h : v ≠ 0) : v = 1 := by
-  have h2 := v.isLt
-  exact Fin.ext (by have : v.val ≠ 0 := fun hv => h (Fin.ext hv); omega)
-
 /-- Spatial content of (11.2.4): filling the hole `x` with an electron of spin
 `s` hopped from `y` turns the configuration of `|Φ_{x,σ}⟩` into that of
 `|Φ_{y, σ_{y→x}}⟩`. The hypothesis `hs` says the `s`-orbital at `y` is
@@ -51,7 +46,7 @@ theorem hubbardOneHoleConfig_hop
       rw [hubbardOneHoleConfig_apply_up, if_neg (Ne.symm hxy')] at hs
       refine ⟨fun _ => rfl, fun _ => ?_⟩
       by_cases hσ : σ y <;> simp_all
-    · obtain rfl : s = 1 := fin_two_ne_zero hs0
+    · obtain rfl : s = 1 := Fin.eq_one_of_ne_zero _ hs0
       rw [hubbardOneHoleConfig_apply_down, if_neg (Ne.symm hxy')] at hs
       refine ⟨fun hσ => ?_, fun h => absurd h (by decide)⟩
       rw [hσ] at hs; simp at hs
@@ -63,11 +58,11 @@ theorem hubbardOneHoleConfig_hop
   have hrs : (r = 0) ∨ (r = 1) := by
     rcases eq_or_ne r 0 with h | h
     · exact Or.inl h
-    · exact Or.inr (fin_two_ne_zero h)
+    · exact Or.inr (Fin.eq_one_of_ne_zero _ h)
   have hss : (s = 0) ∨ (s = 1) := by
     rcases eq_or_ne s 0 with h | h
     · exact Or.inl h
-    · exact Or.inr (fin_two_ne_zero h)
+    · exact Or.inr (Fin.eq_one_of_ne_zero _ h)
   rcases eq_or_ne a x with rfl | hax
   · -- former hole site x (note a = x ≠ y)
     rcases hrs with rfl | rfl <;> rcases hss with rfl | rfl <;>

@@ -95,7 +95,7 @@ theorem exists_eq_hubbardOneHoleConfig_of_isOneHoleHardcore
       · rw [if_pos hcu]; exact hcu
       · rw [if_neg hcu]; exact fin_two_eq_zero_of_ne_one hcu
   · -- down orbital
-    obtain rfl : s = 1 := fin_two_ne_zero hs
+    obtain rfl : s = 1 := Fin.eq_one_of_ne_zero _ hs
     rw [hubbardOneHoleConfig_apply_down]
     by_cases hix : i = x
     · subst hix; rw [if_pos rfl]; exact hx_hole.2
@@ -110,7 +110,7 @@ theorem exists_eq_hubbardOneHoleConfig_of_isOneHoleHardcore
         · exact h
       · rw [if_neg hcu]
         have hup0 : c (spinfulIndex N i 0) = 0 := fin_two_eq_zero_of_ne_one hcu
-        exact fin_two_ne_zero (fun hd => hnothole ⟨hup0, hd⟩)
+        exact Fin.eq_one_of_ne_zero _ (fun hd => hnothole ⟨hup0, hd⟩)
 
 /-! ## The one-hole hard-core sector and its spanning set -/
 

@@ -32,7 +32,7 @@ private theorem hubbardOneHoleConfig_hole_zero
     hubbardOneHoleConfig N x σ (spinfulIndex N x s) = 0 := by
   by_cases h : s = 0
   · subst h; rw [hubbardOneHoleConfig_apply_up, if_pos rfl]
-  · obtain rfl : s = 1 := fin_two_ne_zero h
+  · obtain rfl : s = 1 := Fin.eq_one_of_ne_zero _ h
     rw [hubbardOneHoleConfig_apply_down, if_pos rfl]
 
 /-- Operator content of (11.2.4): the hole-filling hopping term

@@ -347,10 +347,6 @@ theorem isOneHoleHardcore_of_noDouble_count (N : ℕ) (c : Fin (2 * N + 2) → F
     rw [hh, Finset.mem_singleton] at hmem
     exact hmem
 
-/-- A `Fin 2` value that is not `0` equals `1`. -/
-private theorem fin2_eq_one_of_ne_zero {a : Fin 2} (h : a ≠ 0) : a = 1 :=
-  Fin.ext (by have := a.isLt; have : a.val ≠ 0 := fun hv => h (Fin.ext hv); omega)
-
 /-- **Support of a hard-core number eigenstate.** If `v` lies in the hard-core
 subspace and is an `N`-electron eigenstate (`N̂ v = N • v`), then `v(w) = 0` at
 every configuration `w` that is not one-hole hard-core. So `v` is supported on
@@ -367,7 +363,7 @@ theorem mulVec_apply_eq_zero_of_not_oneHole (N : ℕ)
       intro i
       by_contra hcon
       rw [not_or] at hcon
-      exact hd ⟨i, fin2_eq_one_of_ne_zero hcon.1, fin2_eq_one_of_ne_zero hcon.2⟩
+      exact hd ⟨i, Fin.eq_one_of_ne_zero _ hcon.1, Fin.eq_one_of_ne_zero _ hcon.2⟩
     refine mulVec_apply_eq_zero_of_number_ne N v (N : ℂ) hN w (fun heq => hw ?_)
     refine isOneHoleHardcore_of_noDouble_count N w hnd ?_
     exact_mod_cast heq
