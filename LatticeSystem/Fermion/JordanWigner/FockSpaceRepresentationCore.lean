@@ -1,5 +1,4 @@
 import LatticeSystem.Fermion.JWAbstract
-import LatticeSystem.Fermion.JWAbstractCrossSite
 import LatticeSystem.Fermion.JordanWigner.SmearedOperators
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.LinearAlgebra.Matrix.DotProduct

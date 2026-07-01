@@ -1,6 +1,5 @@
 import LatticeSystem.Fermion.JWAbstractCrossSite
 import LatticeSystem.Fermion.JordanWigner.SmearedOperators
-import LatticeSystem.Fermion.JordanWigner.FockSpaceRepresentation
 
 /-!
 # Smeared canonical anticommutation relations (Tasaki §9.2.3)
