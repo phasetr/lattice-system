@@ -20837,20 +20837,6 @@ $-m_{\max}\pm k$, where $m_{\max} = |\Lambda|\cdot N/2$.
    k\,(\hat S^\mp_{\rm tot})^k$.
 \end{itemize}
 
-\textbf{Extremal magnetization sectors are 1-dimensional
-(PR~\#885)}: the combinatorial counterpart of the uniqueness of the
-highest- and lowest-weight states of the $J_{\rm tot}=|\Lambda|\cdot S$
-irreducible SU(2) representation. In the file
-\texttt{Quantum/SpinS/MagConfigExtremalCardinality.lean} the
-$M=0$ (resp. $M=|V|\cdot N$) magnetization sector subtype
-\texttt{magConfigS V N M} is shown to contain exactly the
-all-up (resp. all-down) configuration, hence
-\texttt{Fintype.card (magConfigS V N 0) = 1} via
-\texttt{Fintype.card\_eq\_one\_iff} and the
-\texttt{magSumS\_pos\_of\_ne\_allAlignedConfigS\_zero}~/
-\texttt{magSumS\_lt\_card\_mul\_of\_ne\_allAlignedConfigS\_last}
-strict bounds; \texttt{Nonempty} instances follow.
-
 \textbf{Magnetization subspaces form an internal direct sum
 (PR~\#889)}: the spin-`S` analog of the spin-1/2
 \texttt{magnetizationSubspace\_isInternal} (in
