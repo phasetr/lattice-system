@@ -1,4 +1,5 @@
 import LatticeSystem.Quantum.SpinS.Theorem23TotalLoweringNonvanishing
+import LatticeSystem.Math.ComplexVectorKernel
 
 /-!
 # SU(2)-invariant operator expectations are total-ladder invariant
@@ -47,15 +48,6 @@ private theorem star_dotProduct_self_eq'' {n : Type*} [Fintype n] (v : n → ℂ
   rw [dotProduct, Complex.ofReal_sum]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
-
-/-- **Matrix-adjoint dot-product law.** For a square matrix `M` and vectors `a b`,
-`star (M *ᵥ a) ⬝ᵥ b = star a ⬝ᵥ (Mᴴ *ᵥ b)`.  This is the finite-dimensional
-adjoint identity `⟨M a, b⟩ = ⟨a, Mᴴ b⟩` written in `dotProduct` form, obtained from
-`Matrix.star_mulVec` and `Matrix.dotProduct_mulVec`. -/
-theorem star_mulVec_dotProduct {n : Type*} [Fintype n]
-    (M : Matrix n n ℂ) (a b : n → ℂ) :
-    star (M.mulVec a) ⬝ᵥ b = star a ⬝ᵥ (M.conjTranspose.mulVec b) := by
-  rw [Matrix.star_mulVec, Matrix.dotProduct_mulVec]
 
 /-- **Scalar action of `Ŝ⁺_tot Ŝ⁻_tot` on a joint eigenvector.** If
 `Ŝ³_tot v = m • v` and `(Ŝ_tot)² v = γ • v`, then

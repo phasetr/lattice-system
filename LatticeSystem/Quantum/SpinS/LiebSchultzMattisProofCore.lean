@@ -6,6 +6,7 @@ import Mathlib.Analysis.Complex.Order
 import LatticeSystem.Quantum.SpinS.AxisSwapUnitarySSpinSCore
 import LatticeSystem.Quantum.SpinS.Problem25cZAxisRotationInput
 import LatticeSystem.Math.PosSemidef.Basics
+import LatticeSystem.Math.ComplexVectorKernel
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.Matrix.Normed
 
@@ -41,12 +42,6 @@ theorem dotProduct_star_self_re_pos {ι : Type*} [Fintype ι] {v : ι → ℂ} (
   rw [hsum, Complex.ofReal_re]
   exact Finset.sum_pos' (fun i _ => Complex.normSq_nonneg _)
     ⟨i₀, Finset.mem_univ _, Complex.normSq_pos.mpr hi₀⟩
-
-/-- Adjoint–vector identity: `⟨M v, w⟩ = ⟨v, Mᴴ w⟩` for the (conjugate-linear-left) dot product.
-(File-local copy to keep this module self-contained; a public version lives elsewhere.) -/
-private theorem star_mulVec_dotProduct {ι : Type*} [Fintype ι] (M : Matrix ι ι ℂ) (v w : ι → ℂ) :
-    star (M.mulVec v) ⬝ᵥ w = star v ⬝ᵥ M.conjTranspose.mulVec w := by
-  rw [Matrix.star_mulVec, Matrix.dotProduct_mulVec]
 
 /-- Complex exponentials multiply by adding exponents (forward rewrite helper, `a b` explicit so the
 `Commute` witness is resolved inside the proof — avoids metavariable issues in `←` rewrites). -/

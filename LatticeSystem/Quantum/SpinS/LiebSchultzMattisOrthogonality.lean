@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisProof
 import LatticeSystem.Quantum.SpinS.TotalSpin
+import LatticeSystem.Math.ComplexVectorKernel
 import Mathlib.Logic.Equiv.Fin.Rotate
 
 /-!
@@ -243,11 +244,6 @@ theorem lsmPhase_chainConfigShift (L N : ℕ) (hL : 0 < L) (σ : Fin L → Fin (
         split_ifs <;> ring]
   rw [Finset.sum_sub_distrib]
 
-/-- Adjoint–vector identity (file-local copy). -/
-private theorem star_mulVec_dotProduct' {ι : Type*} [Fintype ι] (M : Matrix ι ι ℂ) (v w : ι → ℂ) :
-    star (M.mulVec v) ⬝ᵥ w = star v ⬝ᵥ M.conjTranspose.mulVec w := by
-  rw [Matrix.star_mulVec, Matrix.dotProduct_mulVec]
-
 /-- The boundary wrap exponentiates to `(−1)^{2S} = (−1)^N`: `e^{−i·2π(S − m)} = (−1)^N`. -/
 theorem exp_neg_I_two_pi_half_sub (N m : ℕ) :
     NormedSpace.exp (-Complex.I * ((2 * Real.pi : ℂ) * ((N : ℂ) / 2 - (m : ℂ)))) =
@@ -373,7 +369,7 @@ theorem lsm_ground_twist_orthogonal (L N : ℕ) (hL : 0 < L) (hNodd : Odd N)
   have hcc : star c * c = 1 := by
     have hu : star ((chainTranslationOp L N).mulVec Φ_GS) ⬝ᵥ
         (chainTranslationOp L N).mulVec Φ_GS = star Φ_GS ⬝ᵥ Φ_GS := by
-      rw [star_mulVec_dotProduct', Matrix.mulVec_mulVec, chainTranslationOp_unitary,
+      rw [star_mulVec_dotProduct, Matrix.mulVec_mulVec, chainTranslationOp_unitary,
         Matrix.one_mulVec]
     rw [hc, star_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul,
       ← mul_assoc] at hu
@@ -382,7 +378,7 @@ theorem lsm_ground_twist_orthogonal (L N : ℕ) (hL : 0 < L) (hNodd : Odd N)
   unfold lsmTrialState
   have hb : star Φ_GS ⬝ᵥ ((chainTranslationOp L N).conjTranspose * lsmTwistOperator L N *
         chainTranslationOp L N).mulVec Φ_GS = star Φ_GS ⬝ᵥ (lsmTwistOperator L N).mulVec Φ_GS := by
-    rw [Matrix.mul_assoc, ← Matrix.mulVec_mulVec, ← star_mulVec_dotProduct', hc,
+    rw [Matrix.mul_assoc, ← Matrix.mulVec_mulVec, ← star_mulVec_dotProduct, hc,
       ← Matrix.mulVec_mulVec, hc, Matrix.mulVec_smul, star_smul, smul_dotProduct,
       dotProduct_smul, smul_eq_mul, smul_eq_mul, ← mul_assoc, hcc, one_mul]
   have ha : star Φ_GS ⬝ᵥ ((chainTranslationOp L N).conjTranspose * lsmTwistOperator L N *
