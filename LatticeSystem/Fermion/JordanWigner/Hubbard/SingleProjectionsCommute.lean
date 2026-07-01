@@ -43,7 +43,9 @@ lemma one_sub_fermionMultiNumber_commute_fermionMultiNumber'
   have hcomm := (fermionMultiNumber_commute N i j).eq
   rw [sub_mul, mul_sub, Matrix.one_mul, Matrix.mul_one, hcomm]
 
-private lemma one_sub_one_sub_commute
+/-- `Commute (1 − n_i) (1 − n_j)`: the complements of two number
+operators commute (from `fermionMultiNumber_commute`). -/
+lemma one_sub_fermionMultiNumber_commute_one_sub_fermionMultiNumber
     (N : ℕ) (i j : Fin (N + 1)) :
     Commute (1 - fermionMultiNumber N i) (1 - fermionMultiNumber N j) := by
   unfold Commute SemiconjBy
@@ -73,7 +75,7 @@ theorem fermionUpProjection_commute_of_any
     (2 * N + 1) (spinfulIndex N i 0) (spinfulIndex N j 1)
   have c10 := one_sub_fermionMultiNumber_commute_fermionMultiNumber'
     (2 * N + 1) (spinfulIndex N i 1) (spinfulIndex N j 0)
-  have c11 := one_sub_one_sub_commute (2 * N + 1)
+  have c11 := one_sub_fermionMultiNumber_commute_one_sub_fermionMultiNumber (2 * N + 1)
     (spinfulIndex N i 1) (spinfulIndex N j 1)
   exact Commute.mul_right (Commute.mul_left c00 c10)
     (Commute.mul_left c01 c11)
@@ -85,7 +87,7 @@ theorem fermionDownProjection_commute_of_any
     Commute ((1 - fermionUpNumber N i) * fermionDownNumber N i)
       ((1 - fermionUpNumber N j) * fermionDownNumber N j) := by
   unfold fermionUpNumber fermionDownNumber
-  have c00 := one_sub_one_sub_commute (2 * N + 1)
+  have c00 := one_sub_fermionMultiNumber_commute_one_sub_fermionMultiNumber (2 * N + 1)
     (spinfulIndex N i 0) (spinfulIndex N j 0)
   have c01 := one_sub_fermionMultiNumber_commute_fermionMultiNumber'
     (2 * N + 1) (spinfulIndex N i 0) (spinfulIndex N j 1)
