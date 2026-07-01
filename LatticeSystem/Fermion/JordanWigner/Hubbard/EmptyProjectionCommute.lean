@@ -1,4 +1,4 @@
-import LatticeSystem.Fermion.JordanWigner.Hubbard.DoubleOccupancyProjection
+import LatticeSystem.Fermion.JordanWigner.Hubbard.SingleProjectionsCommute
 
 /-!
 # Cross-site Hubbard empty projection commute
@@ -24,24 +24,6 @@ Tracked as part of Phase 2 fermion infrastructure (Issue #412).
 namespace LatticeSystem.Fermion
 
 open LatticeSystem.Quantum
-
-private lemma one_sub_fermionMultiNumber_commute_one_sub_fermionMultiNumber
-    (N : ℕ) (i j : Fin (N + 1)) :
-    Commute (1 - fermionMultiNumber N i) (1 - fermionMultiNumber N j) := by
-  unfold Commute SemiconjBy
-  have hcomm := (fermionMultiNumber_commute N i j).eq
-  rw [show ((1 : ManyBodyOp (Fin (N + 1))) - fermionMultiNumber N i) *
-      (1 - fermionMultiNumber N j) =
-      1 - fermionMultiNumber N j - fermionMultiNumber N i +
-        fermionMultiNumber N i * fermionMultiNumber N j from by
-    rw [sub_mul, mul_sub, mul_sub]; simp only [one_mul, mul_one]; abel,
-    show ((1 : ManyBodyOp (Fin (N + 1))) - fermionMultiNumber N j) *
-      (1 - fermionMultiNumber N i) =
-      1 - fermionMultiNumber N i - fermionMultiNumber N j +
-        fermionMultiNumber N j * fermionMultiNumber N i from by
-    rw [sub_mul, mul_sub, mul_sub]; simp only [one_mul, mul_one]; abel]
-  rw [hcomm]
-  abel
 
 /-- `Commute (p_∅(i)) (p_∅(j))`: cross-site empty projections
 commute. -/
