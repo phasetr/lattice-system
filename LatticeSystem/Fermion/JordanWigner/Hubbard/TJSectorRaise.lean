@@ -22,45 +22,6 @@ open scoped BigOperators
 
 variable {N : ℕ}
 
-/-- The modes below the successor `q` (`q.val = p.val + 1`) are those below `p` together with `p`.
-Local copy of the `TJSectorExchange` private helper (module-boundary convention). -/
-private theorem tJ_filt_succ (M : ℕ) (p q : Fin (M + 1)) (hq : q.val = p.val + 1) :
-    (Finset.univ.filter (fun k : Fin (M + 1) => k.val < q.val))
-      = insert p (Finset.univ.filter (fun k => k.val < p.val)) := by
-  ext k; simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert]
-  constructor
-  · intro hk; rcases eq_or_ne k p with rfl | h
-    · exact Or.inl rfl
-    · exact Or.inr (by have : k.val ≠ p.val := fun he => h (Fin.ext he); omega)
-  · rintro (rfl | hk) <;> omega
-
-/-- `p` lies above all the modes strictly below it. Local copy of the `TJSectorExchange` helper. -/
-private theorem tJ_p_notmem (M : ℕ) (p : Fin (M + 1)) :
-    p ∉ (Finset.univ.filter (fun k : Fin (M + 1) => k.val < p.val)) := by
-  simp only [Finset.mem_filter, Finset.mem_univ, true_and]; omega
-
-/-- **Adjacent-pair cancellation, high mode first.**  For successive modes `p, q`
-(`q.val = p.val + 1`) with `c p = 0`, `jwSign q c · jwSign p (update c q 0) = 1`.  Local copy of the
-`TJSectorExchange` private helper (module-boundary convention). -/
-private theorem jwSign_succ_cancel_high (M : ℕ) (c : Fin (M + 1) → Fin 2) (p q : Fin (M + 1))
-    (hq : q.val = p.val + 1) (hcp : c p = 0) :
-    jwSign M q c * jwSign M p (Function.update c q 0) = 1 := by
-  rw [jwSign_eq_neg_one_pow, jwSign_eq_neg_one_pow, ← pow_add]
-  have hA : (∑ k ∈ (Finset.univ.filter (fun k : Fin (M + 1) => k.val < q.val)), (c k).val)
-      = ∑ k ∈ (Finset.univ.filter (fun k : Fin (M + 1) => k.val < p.val)), (c k).val := by
-    have h1 : (∑ k ∈ (Finset.univ.filter (fun k : Fin (M + 1) => k.val < q.val)), (c k).val)
-        = (c p).val + ∑ k ∈ (Finset.univ.filter (fun k : Fin (M + 1) => k.val < p.val)),
-            (c k).val := by
-      rw [tJ_filt_succ M p q hq]; exact Finset.sum_insert (tJ_p_notmem M p)
-    rw [h1, hcp]; simp
-  have hB : (∑ k ∈ (Finset.univ.filter (fun k : Fin (M + 1) => k.val < p.val)),
-      ((Function.update c q 0) k).val)
-      = ∑ k ∈ (Finset.univ.filter (fun k : Fin (M + 1) => k.val < p.val)), (c k).val :=
-    Finset.sum_congr rfl fun k hk => by
-      simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hk
-      rw [Function.update_of_ne (fun h => by rw [h] at hk; omega)]
-  rw [hA, hB, show ∀ a : ℕ, a + a = 2 * a from fun a => by ring, pow_mul]; norm_num
-
 /-- **Single-site raise config identity**: for `s x = ↓`, the spinful occupation of `s` with `x`
 raised to `↑` is `tJConfigOf s` with the down-orbital emptied and the up-orbital filled. -/
 theorem tJConfigOf_update_raise (N : ℕ) (s : Fin (N + 1) → Fin 3) (x : Fin (N + 1)) (hx : s x = 2) :

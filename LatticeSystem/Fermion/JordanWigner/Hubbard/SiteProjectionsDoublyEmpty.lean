@@ -27,7 +27,9 @@ namespace LatticeSystem.Fermion
 
 open LatticeSystem.Quantum
 
-private lemma fermionMultiNumber_mul_one_sub_self_eq_zero
+/-- `n_i · (1 − n_i) = 0` for the per-site multi-index number
+operator (from `n_i · (c_i · c_i†) = 0` and `c_i · c_i† = 1 − n_i`). -/
+lemma fermionMultiNumber_mul_one_sub_self_eq_zero
     (N : ℕ) (i : Fin (N + 1)) :
     fermionMultiNumber N i * (1 - fermionMultiNumber N i) = 0 := by
   have h := fermionMultiNumber_mul_fermionMultiAnnihilation_mul_fermionMultiCreation_eq_zero
@@ -36,7 +38,9 @@ private lemma fermionMultiNumber_mul_one_sub_self_eq_zero
   rw [fermionMultiAnnihilation_mul_fermionMultiCreation_eq_one_sub_number] at h
   exact h
 
-private lemma one_sub_fermionMultiNumber_mul_self_eq_zero
+/-- `(1 − n_i) · n_i = 0` for the per-site multi-index number
+operator (from `(c_i · c_i†) · n_i = 0` and `c_i · c_i† = 1 − n_i`). -/
+lemma one_sub_fermionMultiNumber_mul_self_eq_zero
     (N : ℕ) (i : Fin (N + 1)) :
     (1 - fermionMultiNumber N i) * fermionMultiNumber N i = 0 := by
   have h := fermionMultiAnnihilation_mul_fermionMultiCreation_mul_fermionMultiNumber_eq_zero

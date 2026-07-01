@@ -51,23 +51,6 @@ theorem tJConfigOf_apply_down (N : ℕ) (s : Fin (N + 1) → Fin 3) (i : Fin (N 
   have hmod : (spinfulIndex N i 1).val % 2 = 1 := by rw [hval, Nat.mul_add_mod]
   simp only [tJConfigOf, hsite, hmod, if_neg (by norm_num : ¬ (1 = 0))]
 
-/-- The double-occupancy operator vanishes on `basisVec c` when the up-orbital is empty (duplicated
-private helper from `HardcoreBasis.lean`). -/
-private theorem tJ_doubleOcc_vanish_up (N : ℕ) (i : Fin (N + 1)) (c : Fin (2 * N + 2) → Fin 2)
-    (h : c (spinfulIndex N i 0) = 0) : (hubbardDoubleOccupancy N i).mulVec (basisVec c) = 0 := by
-  unfold hubbardDoubleOccupancy
-  rw [(fermionUpNumber_commute_fermionDownNumber N i).eq, ← Matrix.mulVec_mulVec]
-  unfold fermionUpNumber
-  rw [fermionMultiNumber_mulVec_basisVec, h]
-  simp
-
-/-- The double-occupancy operator vanishes on `basisVec c` when the down-orbital is empty. -/
-private theorem tJ_doubleOcc_vanish_down (N : ℕ) (i : Fin (N + 1)) (c : Fin (2 * N + 2) → Fin 2)
-    (h : c (spinfulIndex N i 1) = 0) : (hubbardDoubleOccupancy N i).mulVec (basisVec c) = 0 := by
-  unfold hubbardDoubleOccupancy fermionDownNumber
-  rw [← Matrix.mulVec_mulVec, fermionMultiNumber_mulVec_basisVec, h]
-  simp
-
 /-- **Every `tJConfigOf` basis state is hard-core**: at each site at least one orbital is empty
 (since `s i ∈ {0,1,2}` occupies at most one), so the double-occupancy operator vanishes. -/
 theorem tJConfigOf_mem_hardcore (N : ℕ) (s : Fin (N + 1) → Fin 3) :
@@ -75,9 +58,9 @@ theorem tJConfigOf_mem_hardcore (N : ℕ) (s : Fin (N + 1) → Fin 3) :
   rw [mem_hubbardHardcoreSubspace_iff]
   intro i
   by_cases h : s i = 2
-  · refine tJ_doubleOcc_vanish_up N i _ ?_
+  · refine hubbardDoubleOccupancy_mulVec_basisVec_eq_zero_of_up_empty N i _ ?_
     rw [tJConfigOf_apply_up, if_neg (by rw [h]; decide)]
-  · refine tJ_doubleOcc_vanish_down N i _ ?_
+  · refine hubbardDoubleOccupancy_mulVec_basisVec_eq_zero_of_down_empty N i _ ?_
     rw [tJConfigOf_apply_down, if_neg h]
 
 /-- `tJConfigOf` is injective: the spinful occupation determines the site state (the up-orbital

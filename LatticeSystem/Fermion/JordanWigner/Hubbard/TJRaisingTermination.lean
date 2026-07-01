@@ -23,30 +23,6 @@ open scoped BigOperators
 
 variable {N : ℕ}
 
-/-- Per-site `[N̂_↓, Ŝ⁺_x] = −Ŝ⁺_x` (local copy of the `TJSpinSymmetry` private helper). -/
-private theorem totalDownNumber_mul_siteSpinPlus (N : ℕ) (x : Fin (N + 1)) :
-    fermionTotalDownNumber N * fermionSiteSpinPlus N x =
-      fermionSiteSpinPlus N x * fermionTotalDownNumber N - fermionSiteSpinPlus N x := by
-  unfold fermionSiteSpinPlus
-  have hup := (fermionTotalDownNumber_commute_fermionUpCreation N x).eq
-  have han : fermionTotalDownNumber N * fermionDownAnnihilation N x =
-      fermionDownAnnihilation N x * fermionTotalDownNumber N - fermionDownAnnihilation N x := by
-    have h := fermionTotalDownNumber_commutator_fermionDownAnnihilation N x
-    linear_combination (norm := noncomm_ring) h
-  calc fermionTotalDownNumber N * (fermionUpCreation N x * fermionDownAnnihilation N x)
-      = (fermionTotalDownNumber N * fermionUpCreation N x) * fermionDownAnnihilation N x := by
-        rw [← mul_assoc]
-    _ = (fermionUpCreation N x * fermionTotalDownNumber N) * fermionDownAnnihilation N x := by
-        rw [hup]
-    _ = fermionUpCreation N x * (fermionTotalDownNumber N * fermionDownAnnihilation N x) := by
-        rw [mul_assoc]
-    _ = fermionUpCreation N x *
-          (fermionDownAnnihilation N x * fermionTotalDownNumber N -
-            fermionDownAnnihilation N x) := by
-        rw [han]
-    _ = fermionUpCreation N x * fermionDownAnnihilation N x * fermionTotalDownNumber N -
-          fermionUpCreation N x * fermionDownAnnihilation N x := by noncomm_ring
-
 /-- **Total `[N̂_↓, Ŝ⁺_tot] = −Ŝ⁺_tot`.**  Each raising removes one down-spin. -/
 theorem fermionTotalDownNumber_mul_fermionTotalSpinPlus (N : ℕ) :
     fermionTotalDownNumber N * fermionTotalSpinPlus N =

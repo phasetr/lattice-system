@@ -30,22 +30,6 @@ namespace LatticeSystem.Fermion
 
 open LatticeSystem.Quantum
 
-private lemma fermionMultiNumber_mul_one_sub_self_eq_zero
-    (N : ℕ) (i : Fin (N + 1)) :
-    fermionMultiNumber N i * (1 - fermionMultiNumber N i) = 0 := by
-  have h := fermionMultiNumber_mul_fermionMultiAnnihilation_mul_fermionMultiCreation_eq_zero
-    N i
-  rw [fermionMultiAnnihilation_mul_fermionMultiCreation_eq_one_sub_number] at h
-  exact h
-
-private lemma one_sub_fermionMultiNumber_mul_self_eq_zero
-    (N : ℕ) (i : Fin (N + 1)) :
-    (1 - fermionMultiNumber N i) * fermionMultiNumber N i = 0 := by
-  have h := fermionMultiAnnihilation_mul_fermionMultiCreation_mul_fermionMultiNumber_eq_zero
-    N i
-  rw [fermionMultiAnnihilation_mul_fermionMultiCreation_eq_one_sub_number] at h
-  exact h
-
 /-- `p_↑(i) · p_⇈(i) = 0`. -/
 theorem fermionUpProjection_mul_fermionDoublyProjection_eq_zero
     (N : ℕ) (i : Fin (N + 1)) :
