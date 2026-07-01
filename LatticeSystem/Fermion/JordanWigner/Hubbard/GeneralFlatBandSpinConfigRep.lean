@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandSpinConfigRepCore
+import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralBasisHN
 
 /-!
 # Spin-configuration capstone, eq. (11.3.47) (Tasaki §11.3.4, toward Theorem 11.17)
@@ -42,7 +43,7 @@ mode** and exactly `D₀` occupied modes.  Since `D₀ = |I|`, such a config occ
 Assembled from the three coefficient-vanishing facts: support
 (`flatBand_groundState_eμ_repr_eq_zero_of_not_idxSupported`), no double occupancy
 (`flatBand_groundState_eμ_repr_eq_zero_of_doublyOccupied`), and filling
-(`groundState_generalOccBasis_repr_eq_zero_of_card_ne'`). -/
+(`generalOccBasis_repr_eq_zero_of_card_ne`). -/
 theorem flatBand_groundState_mem_spinConfigSpan
     {T : Matrix (Fin (M + 1)) (Fin (M + 1)) ℂ} {I : Finset (Fin (M + 1))}
     {μ : Fin (M + 1) → Fin (M + 1) → ℂ} (hbasis : IsGeneralFlatBandSpecialBasis T I μ)
@@ -74,7 +75,7 @@ theorem flatBand_groundState_mem_spinConfigSpan
     · by_cases hcard : (generalOccFinset g).card = generalFlatBandDim T
       · refine Submodule.smul_mem _ _ (Submodule.subset_span
           ⟨g, hsupp, fun z hz hc => hdbl ⟨z, hz, hc⟩, hcard, (hbcoe g).symm⟩)
-      · rw [groundState_generalOccBasis_repr_eq_zero_of_card_ne' eμ hN g hcard, zero_smul]
+      · rw [generalOccBasis_repr_eq_zero_of_card_ne eμ hN g hcard, zero_smul]
         exact Submodule.zero_mem _
   · rw [flatBand_groundState_eμ_repr_eq_zero_of_not_idxSupported hbasis hT U hU eμ idx hidx hΦ
       g hsupp, zero_smul]

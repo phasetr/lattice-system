@@ -113,43 +113,6 @@ theorem flatBand_groundState_eμ_repr_eq_zero_of_not_idxSupported
   by_contra hne
   exact hg (hsub (Finsupp.mem_support_iff.mpr hne))
 
-/-- **Filling coefficient vanishing (general single-particle basis)**: a `D₀`-electron eigenstate
-of the total number operator has vanishing `generalOccBasis e`-coefficient on every config with a
-different particle count.  (The general-basis version of
-`groundState_generalOccBasis_repr_eq_zero_of_card_ne`, valid for any single-particle basis `e`.) -/
-theorem groundState_generalOccBasis_repr_eq_zero_of_card_ne'
-    (e : Module.Basis (Fin (M + 1)) ℂ (Fin (M + 1) → ℂ))
-    {Φ : (Fin (2 * M + 2) → Fin 2) → ℂ} {D₀ : ℕ}
-    (hN : (fermionTotalNumber (2 * M + 1)).mulVec Φ = (D₀ : ℂ) • Φ)
-    (g : Fin (M + 1) × Fin 2 → Fin 2) (hg : (generalOccFinset g).card ≠ D₀) :
-    (generalOccBasis e).repr Φ g = 0 := by
-  set b := generalOccBasis e with hb
-  have hbcoe : ∀ h, (b h : (Fin (2 * M + 2) → Fin 2) → ℂ) = generalOccMonomial e h :=
-    fun h => congrFun (coe_basisOfTopLeSpanOfCardEqFinrank _ _ _) h
-  have hexp : (fermionTotalNumber (2 * M + 1)).mulVec Φ
-      = ∑ h, (b.repr Φ h * ((generalOccFinset h).card : ℂ)) • (b h) := by
-    conv_lhs => rw [← b.sum_repr Φ]
-    rw [Matrix.mulVec_sum]
-    refine Finset.sum_congr rfl fun h _ => ?_
-    rw [Matrix.mulVec_smul, hbcoe, fermionTotalNumber_mulVec_generalOccMonomial, smul_smul,
-      ← hbcoe]
-  have hrepr : b.repr ((fermionTotalNumber (2 * M + 1)).mulVec Φ) g
-      = b.repr Φ g * ((generalOccFinset g).card : ℂ) := by
-    rw [hexp, map_sum]
-    simp only [map_smul, Finsupp.coe_finset_sum, Finset.sum_apply, Finsupp.coe_smul,
-      Pi.smul_apply, smul_eq_mul, b.repr_self]
-    rw [Finset.sum_eq_single g]
-    · rw [Finsupp.single_eq_same, mul_one]
-    · intro h _ hhg
-      rw [Finsupp.single_eq_of_ne (Ne.symm hhg), mul_zero]
-    · intro h; exact absurd (Finset.mem_univ g) h
-  rw [hN, map_smul, Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul] at hrepr
-  have hne : ((generalOccFinset g).card : ℂ) - (D₀ : ℂ) ≠ 0 := by
-    rw [sub_ne_zero, Ne, Nat.cast_inj]; exact hg
-  have : (b.repr Φ g) * (((generalOccFinset g).card : ℂ) - (D₀ : ℂ)) = 0 := by
-    rw [mul_sub, ← hrepr]; ring
-  exact (mul_eq_zero.mp this).resolve_right hne
-
 /-- The index map `idx` (sending `z ∈ I` to the `eμ`-index of `μ_z`) is **injective on `I`**:
 distinct indices give distinct `μ`-vectors (special-basis linear independence), hence distinct
 `eμ`-indices. -/
