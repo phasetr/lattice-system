@@ -76,7 +76,7 @@ omit [Fintype V] [DecidableEq V] in
 theorem bondParityStepS_symm {G : SimpleGraph V} {σ σ' : V → Fin (N + 1)}
     (h : BondParityStepS G σ σ') : BondParityStepS G σ' σ := by
   rcases h with hRL | hPB
-  · exact Or.inl (raiseLowerStepS_symm hRL)
+  · exact Or.inl (RaiseLowerStepS.symm hRL)
   · exact Or.inr (parityBondStepS_symm hPB)
 
 omit [Fintype V] [DecidableEq V] in

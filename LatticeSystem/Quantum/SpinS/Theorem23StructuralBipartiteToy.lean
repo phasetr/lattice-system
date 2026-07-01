@@ -27,7 +27,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V]
 
 omit [DecidableEq V] in
 /-- A non-empty domain underlies any non-zero real sector vector. -/
-private theorem nonempty_magConfigS_of_fn_ne_zero_structural {N M : ℕ}
+theorem nonempty_magConfigS_of_fn_ne_zero_structural {N M : ℕ}
     {φ : magConfigS V N M → ℝ} (hne : φ ≠ 0) : Nonempty (magConfigS V N M) := by
   by_contra h
   rw [not_nonempty_iff] at h

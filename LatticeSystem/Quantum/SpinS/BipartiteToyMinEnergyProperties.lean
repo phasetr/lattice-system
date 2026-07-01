@@ -46,22 +46,6 @@ theorem bipartiteToyMinEnergyPredicted_eq_zero_of_cardNotA_zero
   push_cast
   ring
 
-/-- **Néel-state gap**: `bipartiteToyMinEnergyPredicted A N =
-⟨Φ_Néel|Ĥ_toy_S|Φ_Néel⟩ − |¬A|·N`. The Néel expectation
-exceeds the predicted minimum by `|¬A|·N ≥ 0`, with equality iff
-`|¬A| = 0` or `N = 0` (degenerate cases). This shows the Néel
-state is NOT the toy-Hamiltonian ground state in the
-non-degenerate `|¬A|·N ≥ 1` regime. -/
-theorem bipartiteToyMinEnergyPredicted_eq_neelExpectation_sub_cardNotA_mul_N
-    (A : Λ → Bool) (N : ℕ) :
-    bipartiteToyMinEnergyPredicted (Λ := Λ) A N =
-      -(((Finset.univ.filter (fun x : Λ => A x = true)).card : ℂ) *
-          ((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
-          ((N : ℂ) * (N : ℂ)) / 2) -
-        (((Finset.univ.filter (fun x : Λ => (! A x) = true)).card : ℂ) *
-          (N : ℂ)) := by
-  exact bipartiteToyMinEnergyPredicted_eq_simplified A N
-
 /-- **Balanced edge case**: when `|A| = |¬A|`, the imbalance term
 `(s_A − s_B)(s_A − s_B + 1)` vanishes and the predicted minimum
 collapses to `−2 s_A(s_A + 1)`. -/

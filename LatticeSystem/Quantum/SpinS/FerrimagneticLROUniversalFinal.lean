@@ -97,7 +97,7 @@ private theorem ferrimagnetic_lro_oriented
       hΦ_ne hΦ_eig (fun {μ'} {Ψ'} => hΦ_min) M
   -- Expectation sum decomposition.
   have hexp := weightPreserving_expectation_eq_sum_sector (staggeredCasimirOpS A N)
-    (staggeredCasimirOpS_commute_op3' A N) Φ
+    (staggeredCasimirOpS_commute_totalSpinSOp3 A N) Φ
   have hexpre : (star Φ ⬝ᵥ (staggeredCasimirOpS A N).mulVec Φ).re =
       ∑ M ∈ Finset.range (Fintype.card Λ * N + 1),
         (star (magSectorEmbedding (magSectorRestriction (M := M) Φ)) ⬝ᵥ

@@ -25,15 +25,6 @@ open Matrix Module Set
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 /-! ## Deformation-path and target wrappers with `D >= 0` -/
 
-/-- Along the Theorem 2.4 deformation path, nonnegative target `D` stays
-nonnegative. -/
-theorem anisotropicHeisenbergParametricPath_snd_nonneg_general
-    {lam' D' : ℝ} (hD' : 0 ≤ D') {t : ℝ} (ht_nn : 0 ≤ t) :
-    0 ≤ (anisotropicHeisenbergParametricPath lam' D' t).2 := by
-  unfold anisotropicHeisenbergParametricPath
-  change 0 ≤ t * D'
-  exact mul_nonneg ht_nn hD'
-
 set_option linter.style.longLine false in
 /-- General spin-`S` anisotropic `H` eigenspace `finrank <= 2` at its global
 Hermitian minimum under `D.re >= 0`. -/
@@ -113,7 +104,7 @@ theorem anisotropicHeisenbergS_eigenspace_finrank_le_two_at_global_min_path_D_no
     (D' := D') hlam'_lb (le_of_lt ht_pos) ht_le
   have hub := anisotropicHeisenbergParametricPath_fst_lt_one
     (D' := D') hlam'_ub ht_pos ht_le
-  have hDnn := anisotropicHeisenbergParametricPath_snd_nonneg_general
+  have hDnn := anisotropicHeisenbergParametricPath_snd_nonneg
     (lam' := lam') hD' (le_of_lt ht_pos)
   set lam_t : ℂ := ((anisotropicHeisenbergParametricPath lam' D' t).1 : ℂ)
   set D_t : ℂ := ((anisotropicHeisenbergParametricPath lam' D' t).2 : ℂ)

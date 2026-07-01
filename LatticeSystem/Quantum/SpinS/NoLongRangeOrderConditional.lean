@@ -17,15 +17,10 @@ namespace LatticeSystem.Quantum
 open Matrix
 open scoped ComplexOrder
 
-/-- The ring nearest-neighbor coupling is real-valued (`0`/`1`), hence self-conjugate. -/
-private theorem ringCoupling_self_star' (L : ℕ) (x y : Fin L) :
-    star (ringCoupling L x y) = ringCoupling L x y := by
-  unfold ringCoupling; split <;> simp
-
 /-- Hermiticity of the zero-field ring Heisenberg Hamiltonian. -/
 private theorem ringHeisenberg_isHermitian (L N : ℕ) :
     (heisenbergHamiltonianS (ringCoupling L) N).IsHermitian :=
-  heisenbergHamiltonianS_isHermitian_of_real (ringCoupling_self_star' L) N
+  heisenbergHamiltonianS_isHermitian_of_real (ringCoupling_self_star L) N
 
 /-- **Conditional Corollary 4.3 (absence of long-range order in one dimension), modulo the
 susceptibility bound.**  Suppose the staggered static susceptibility of every normalized ground

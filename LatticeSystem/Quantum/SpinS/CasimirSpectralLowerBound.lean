@@ -28,7 +28,7 @@ variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 omit [DecidableEq V] in
 /-- The real part of the magnetization value `s_max − k`. -/
-private theorem sMax_sub_natCast_re (k : ℕ) :
+theorem sMax_sub_natCast_re (k : ℕ) :
     (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (k : ℂ)).re =
       (Fintype.card V : ℝ) * (N : ℝ) / 2 - (k : ℝ) := by
   simp [Complex.sub_re, Complex.mul_re]

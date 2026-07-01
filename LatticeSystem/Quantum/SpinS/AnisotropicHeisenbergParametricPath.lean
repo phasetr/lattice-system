@@ -65,4 +65,13 @@ theorem continuous_anisotropicHeisenbergS_magSector_minEigenvalue_along_parametr
   (continuous_anisotropicHeisenbergS_magSector_minEigenvalue_real (Λ := Λ) hJ N M).comp
     (continuous_anisotropicHeisenbergParametricPath lam' D')
 
+/-- Along the Theorem 2.4 deformation path, nonnegative target `D` stays
+nonnegative. -/
+theorem anisotropicHeisenbergParametricPath_snd_nonneg
+    {lam' D' : ℝ} (hD' : 0 ≤ D') {t : ℝ} (ht_nn : 0 ≤ t) :
+    0 ≤ (anisotropicHeisenbergParametricPath lam' D' t).2 := by
+  unfold anisotropicHeisenbergParametricPath
+  change 0 ≤ t * D'
+  exact mul_nonneg ht_nn hD'
+
 end LatticeSystem.Quantum

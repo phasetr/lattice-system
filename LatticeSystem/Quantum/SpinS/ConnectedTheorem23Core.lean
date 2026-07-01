@@ -304,10 +304,9 @@ theorem exists_marshallSign_eigenvector_heisenbergHamiltonianS_full_of_irreducib
       (N := N) (M := M) A c hJ_real hIrred
   exact ⟨μ, v, hμ, hv_pos, heisenbergHamiltonianS_mulVec_magSectorEmbedding J _ hmul⟩
 
-/-- **Bundled MLM full-Hilbert ground state from a supplied irreducibility
-witness**. Graph-agnostic variant of
-`marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full`. -/
-theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full_of_irreducible
+/-- **Per-sector existence step from a supplied irreducibility witness**.
+Graph-agnostic variant of `tasaki_2_5_theorem_2_3_sector_existence`. -/
+theorem tasaki_2_5_theorem_2_3_sector_existence_of_irreducible
     (A : V → Bool) {J : V → V → ℂ} (c : ℝ) {M : ℕ}
     [Nonempty (magConfigS V N M)]
     (hJ_real : ∀ x y, (J x y).im = 0)
@@ -367,32 +366,6 @@ theorem marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full_of_irre
     change (magSectorRestriction Ψ' τ).re = r * ((marshallSignS A τ.1).re * v τ)
     rw [hτ]
     rw [Complex.ofReal_re]
-
-/-- **Per-sector existence step from a supplied irreducibility witness**.
-Graph-agnostic variant of `tasaki_2_5_theorem_2_3_sector_existence`. -/
-theorem tasaki_2_5_theorem_2_3_sector_existence_of_irreducible
-    (A : V → Bool) {J : V → V → ℂ} (c : ℝ) {M : ℕ}
-    [Nonempty (magConfigS V N M)]
-    (hJ_real : ∀ x y, (J x y).im = 0)
-    (hJ_real' : ∀ x y, star (J x y) = J x y)
-    (hIrred : (shiftedDressedSReMatrixOnMagSector A J N c M).IsIrreducible) :
-    ∃ (μ : ℝ) (v : magConfigS V N M → ℝ),
-      μ < c ∧ (∀ σ, 0 < v σ) ∧
-      (heisenbergHamiltonianS J N).mulVec
-        (magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ))) =
-        (μ : ℂ) • magSectorEmbedding
-          (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) ∧
-      (∀ σ, magSumS σ ≠ M →
-        magSectorEmbedding (fun τ => (((marshallSignS A τ.1).re * v τ : ℝ) : ℂ)) σ = 0) ∧
-      (∀ {μ' : ℝ} {Ψ' : (V → Fin (N + 1)) → ℂ},
-        (heisenbergHamiltonianS J N).mulVec Ψ' = (μ' : ℂ) • Ψ' →
-        (∀ σ, magSumS σ ≠ M → Ψ' σ = 0) →
-        (∀ τ : magConfigS V N M, 0 < (marshallSignS A τ.1).re * (Ψ' τ.1).re) →
-        μ' = μ ∧ ∃ r : ℝ, 0 < r ∧
-          ∀ τ : magConfigS V N M,
-            (Ψ' τ.1).re = r * ((marshallSignS A τ.1).re * v τ)) :=
-  marshallLiebMattis_spinS_heisenbergHamiltonianS_groundState_full_of_irreducible
-    (N := N) (M := M) A c hJ_real hJ_real' hIrred
 
 /-! ## Casimir branch parameterised by irreducibility -/
 

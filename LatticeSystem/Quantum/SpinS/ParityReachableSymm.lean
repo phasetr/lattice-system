@@ -25,19 +25,6 @@ namespace LatticeSystem.Quantum
 variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 omit [Fintype V] [DecidableEq V] in
-/-- **Symmetry of a `RaiseLowerStepS`**: the disjunction `(σ x + 1 = σ' x ∧ σ' y + 1 = σ y) ∨
-(σ' x + 1 = σ x ∧ σ y + 1 = σ' y)` is symmetric in `σ` and `σ'`. -/
-theorem raiseLowerStepS_symm {G : SimpleGraph V} {σ σ' : V → Fin (N + 1)}
-    (h : RaiseLowerStepS G σ σ') : RaiseLowerStepS G σ' σ := by
-  obtain ⟨x, y, hadj, hor, hoff⟩ := h
-  refine ⟨x, y, hadj, ?_, ?_⟩
-  · rcases hor with ⟨hxy_raise_a, hxy_lower_b⟩ | ⟨hxy_lower_a, hxy_raise_b⟩
-    · exact Or.inr ⟨hxy_raise_a, hxy_lower_b⟩
-    · exact Or.inl ⟨hxy_lower_a, hxy_raise_b⟩
-  · intro k hkx hky
-    exact (hoff k hkx hky).symm
-
-omit [Fintype V] [DecidableEq V] in
 /-- **Symmetry of a `ParityBondStepS`**. -/
 theorem parityBondStepS_symm {G : SimpleGraph V} {σ σ' : V → Fin (N + 1)}
     (h : ParityBondStepS G σ σ') : ParityBondStepS G σ' σ := by
@@ -67,7 +54,7 @@ their individual symmetries. -/
 theorem parityStepS_symm {G : SimpleGraph V} {σ σ' : V → Fin (N + 1)}
     (h : ParityStepS G σ σ') : ParityStepS G σ' σ := by
   rcases h with hRL | hPB | hSI
-  · exact Or.inl (raiseLowerStepS_symm hRL)
+  · exact Or.inl (RaiseLowerStepS.symm hRL)
   · exact Or.inr (Or.inl (parityBondStepS_symm hPB))
   · exact Or.inr (Or.inr (singleIonStepS_symm hSI))
 

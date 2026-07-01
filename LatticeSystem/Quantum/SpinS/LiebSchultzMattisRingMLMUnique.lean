@@ -23,7 +23,7 @@ namespace LatticeSystem.Quantum
 open Matrix SimpleGraph Module
 
 /-- The directed ring coupling is self-conjugate (real). -/
-private theorem ringCouplingSym_star (L : ℕ) (x y : Fin L) :
+theorem ringCouplingSym_star (L : ℕ) (x y : Fin L) :
     star (ringCouplingSym L x y) = ringCouplingSym L x y := by
   rw [Complex.star_def, Complex.conj_eq_iff_im.mpr (ringCouplingSym_im_zero L x y)]
 

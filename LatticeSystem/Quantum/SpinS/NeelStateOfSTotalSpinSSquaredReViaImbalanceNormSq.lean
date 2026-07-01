@@ -1,11 +1,11 @@
-import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelBasisVecS
+import LatticeSystem.Quantum.SpinS.SublatticeCasimirNeelExpectations
 import LatticeSystem.Quantum.SpinS.BipartiteToyMinEnergySymmReViaImbalanceNormSq
 
 /-!
 # `<Φ_Néel|(Ŝ_tot)²|Φ_Néel>.re = ‖biw‖² + |Λ|·N/2`
 
 The Néel-state Casimir expectation
-(`neelStateOfS_totalSpinSSquared_expectation_via_general`) reads
+(`neelStateOfS_totalSpinSSquared_expectation_card_Lambda`) reads
 
   `<Φ_Néel(A, N) | (Ŝ_tot)² | Φ_Néel(A, N)>
      = ((|A|−|¬A|)·N/2)² + |Λ|·N/2`.
@@ -36,7 +36,7 @@ theorem neelStateOfS_totalSpinSSquared_expectation_re_via_imbalance_norm_sq :
       ‖bipartiteImbalanceWeight (Λ := Λ) A N‖ *
           ‖bipartiteImbalanceWeight (Λ := Λ) A N‖ +
         (Fintype.card Λ : ℝ) * (N : ℝ) / 2 := by
-  rw [neelStateOfS_totalSpinSSquared_expectation_via_general]
+  rw [neelStateOfS_totalSpinSSquared_expectation_card_Lambda]
   have hbiw_norm_sq :=
     bipartiteImbalanceWeight_norm_mul_self_eq_re_mul_self (Λ := Λ) A N
   rw [bipartiteImbalanceWeight_re_eq] at hbiw_norm_sq

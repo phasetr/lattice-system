@@ -17,7 +17,8 @@ state `Φ` of the connected bipartite antiferromagnetic spin-`S` Heisenberg mode
 ## Strategy (Tasaki chain (4.1.16), assembled over magnetization sectors)
 
 The squared staggered order operator `(Ô_Λ)² = staggeredCasimirOpS A N` is `SU(2)`
-invariant, so it commutes with `Ŝ_tot^{(3)}` (`staggeredCasimirOpS_commute_op3'`).  Hence the
+invariant, so it commutes with `Ŝ_tot^{(3)}`
+(`staggeredCasimirOpS_commute_totalSpinSOp3`).  Hence the
 standard expectation `⟨Φ, (Ô)² Φ⟩` splits as a finite sum over magnetization sectors `M` of the
 diagonal expectations on the weight components `Φ_M`
 (`weightPreserving_expectation_eq_sum_sector`), and likewise `‖Φ‖² = Σ_M ‖Φ_M‖²`
@@ -81,12 +82,6 @@ theorem staggeredCasimirOpS_compl (A : Λ → Bool) (N : ℕ) :
   refine Finset.sum_congr rfl (fun x _ => Finset.sum_congr rfl (fun y _ => ?_))
   congr 1
   by_cases hx : A x <;> by_cases hy : A y <;> simp [hx, hy]
-
-/-- `staggeredCasimirOpS` commutes with `Ŝ_tot^{(3)}`, hence with the magnetization
-operator: this is the weight-preservation needed for the sector decomposition. -/
-theorem staggeredCasimirOpS_commute_op3' (A : Λ → Bool) (N : ℕ) :
-    Commute (staggeredCasimirOpS A N) (totalSpinSOp3 Λ N) :=
-  staggeredCasimirOpS_commute_totalSpinSOp3 A N
 
 /-- **Weight-component squared norm decomposition.** Applying the weight-preserving
 expectation sum to the identity operator gives `‖Φ‖² = Σ_M ‖Φ_M‖²` (real parts). -/

@@ -185,14 +185,14 @@ theorem lower_iterate_ne_zero
 
 omit [DecidableEq V] in
 /-- Real part of the shifted weight `((card·N/2) − M) + j`. -/
-private theorem weight_add_re (M j : ℕ) :
+theorem weight_add_re (M j : ℕ) :
     (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ) + (j : ℂ)).re =
       (Fintype.card V : ℝ) * (N : ℝ) / 2 - (M : ℝ) + (j : ℝ) := by
   simp [Complex.add_re, Complex.sub_re, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
 
 omit [DecidableEq V] in
 /-- Real part of the shifted weight `((card·N/2) − M) − j`. -/
-private theorem weight_sub_re (M j : ℕ) :
+theorem weight_sub_re (M j : ℕ) :
     (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ) - (j : ℂ)).re =
       (Fintype.card V : ℝ) * (N : ℝ) / 2 - (M : ℝ) - (j : ℝ) := by
   simp [Complex.sub_re, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]

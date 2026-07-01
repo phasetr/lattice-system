@@ -261,7 +261,10 @@ private lemma onSiteS_mul_onSiteS_value_of_disagree {i j : Λ}
     have := hall k hki
     rwa [pivotLeftS_off_j hkj] at this
 
-private lemma onSiteS_mul_onSiteS_apply_of_ne {i j : Λ} (hij : i ≠ j)
+/-- Public matrix element formula for the product of distinct-site
+embeddings: factors into a per-site product of `A` and `B`'s
+matrix elements, with the off-site delta. -/
+theorem onSiteS_mul_onSiteS_apply_eq {i j : Λ} (hij : i ≠ j)
     (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
     (σ' σ : Λ → Fin (N + 1)) :
     (onSiteS i A * onSiteS j B) σ' σ =
@@ -275,26 +278,14 @@ private lemma onSiteS_mul_onSiteS_apply_of_ne {i j : Λ} (hij : i ≠ j)
   · rw [if_neg h]
     exact onSiteS_mul_onSiteS_value_of_disagree A B h
 
-/-- Public matrix element formula for the product of distinct-site
-embeddings: factors into a per-site product of `A` and `B`'s
-matrix elements, with the off-site delta. -/
-theorem onSiteS_mul_onSiteS_apply_eq {i j : Λ} (hij : i ≠ j)
-    (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ)
-    (σ' σ : Λ → Fin (N + 1)) :
-    (onSiteS i A * onSiteS j B) σ' σ =
-      if ∀ k, k ≠ i → k ≠ j → σ' k = σ k then
-        A (σ' i) (σ i) * B (σ' j) (σ j)
-      else 0 :=
-  onSiteS_mul_onSiteS_apply_of_ne hij A B σ' σ
-
 /-- Operators embedded at distinct sites commute. -/
 theorem onSiteS_mul_onSiteS_of_ne {i j : Λ} (hij : i ≠ j)
     (A B : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ) :
     (onSiteS i A * onSiteS j B : ManyBodyOpS Λ N) =
       onSiteS j B * onSiteS i A := by
   ext σ' σ
-  rw [onSiteS_mul_onSiteS_apply_of_ne hij,
-      onSiteS_mul_onSiteS_apply_of_ne hij.symm]
+  rw [onSiteS_mul_onSiteS_apply_eq hij,
+      onSiteS_mul_onSiteS_apply_eq hij.symm]
   have hcond :
       (∀ k, k ≠ i → k ≠ j → σ' k = σ k) ↔
         (∀ k, k ≠ j → k ≠ i → σ' k = σ k) := by

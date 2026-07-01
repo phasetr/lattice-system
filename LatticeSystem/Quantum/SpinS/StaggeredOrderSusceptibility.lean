@@ -20,7 +20,7 @@ open Matrix
 open scoped ComplexOrder
 
 /-- The ring nearest-neighbor coupling is real-valued (`0`/`1`), hence self-conjugate. -/
-private theorem ringCoupling_self_star (L : ℕ) (x y : Fin L) :
+theorem ringCoupling_self_star (L : ℕ) (x y : Fin L) :
     star (ringCoupling L x y) = ringCoupling L x y := by
   unfold ringCoupling; split <;> simp
 
