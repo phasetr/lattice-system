@@ -24,7 +24,7 @@ variable (Λ : Type*) [Fintype Λ] [DecidableEq Λ] (N : ℕ)
 /-! ## Casimir invariance: `[(Ŝ_tot)², Ŝ_tot^{(α)}] = 0` -/
 
 /-- Internal Leibniz: `[X·X, C] = X·[X,C] + [X,C]·X`. -/
-private lemma square_commutator_totalSpinS (X C : ManyBodyOpS Λ N) :
+lemma square_commutator_totalSpinS (X C : ManyBodyOpS Λ N) :
     X * X * C - C * (X * X) = X * (X * C - C * X) + (X * C - C * X) * X := by
   rw [mul_sub, sub_mul]
   have h1 : X * (C * X) = X * C * X := (mul_assoc X C X).symm
