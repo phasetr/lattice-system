@@ -7,10 +7,10 @@ For `[Nonempty V]`, the magnetization subspace `magSubspaceS V N (m_max)`
 (highest weight) and `magSubspaceS V N (-m_max)` (lowest weight) are
 each spanned by a single vector — `|σ_⊤⟩` and `|σ_⊥⟩` respectively.
 
-This is the analytic counterpart of PR #885's combinatorial fact
-`magConfigS_card_zero / _last = 1`, lifted to subspaces of the
-multi-site Hilbert space via `Ŝ^z_tot` diagonality in the `basisVecS`
-basis.
+This is the analytic counterpart of PR #885's combinatorial fact that the two
+extremal magnetization configuration sets are singletons (the `magConfigS`
+cardinality lemmas, since removed), lifted to subspaces of the multi-site
+Hilbert space via `Ŝ^z_tot` diagonality in the `basisVecS` basis.
 
 The argument: `Ŝ^z_tot` is diagonal in the `basisVecS` basis with
 eigenvalue `magEigenvalueS σ` at configuration `σ`. The eigenvalue
