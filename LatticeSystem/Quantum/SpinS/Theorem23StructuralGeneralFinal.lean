@@ -29,14 +29,6 @@ namespace LatticeSystem.Quantum
 
 variable {V : Type*} [Fintype V] [DecidableEq V]
 
-omit [DecidableEq V] in
-/-- A non-empty domain underlies any non-zero real sector vector. -/
-private theorem nonempty_magConfigS_of_fn_ne_zero_general_structural {N M : ℕ}
-    {φ : magConfigS V N M → ℝ} (hne : φ ≠ 0) : Nonempty (magConfigS V N M) := by
-  by_contra h
-  rw [not_nonempty_iff] at h
-  exact hne (funext (fun τ => (h.false τ).elim))
-
 /-- **Truly-unconditional Tasaki §2.5 Theorem 2.3 for a general connected bipartite
 antiferromagnetic coupling** (canonical orientation `|¬A| ≤ |A|`, `s_B > 0`, `N ≥ 1`):
 the full `tasaki_2_5_theorem_2_3` statement holds for any real symmetric
@@ -126,7 +118,7 @@ theorem tasaki_2_5_theorem_2_3_of_bipartiteCompletePositive
       exact ⟨he.trans hμM_eq, hr⟩
   · refine tasaki23_eigenvalue_ge_common A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite
       hc_strict hcommon (fun {M} hM_non {μM φ} hφ_ne hφ => ?_)
-    haveI : Nonempty (magConfigS V N M) := nonempty_magConfigS_of_fn_ne_zero_general_structural
+    haveI : Nonempty (magConfigS V N M) := nonempty_magConfigS_of_fn_ne_zero_structural
         hφ_ne
     exact tasaki23_general_hOutside A N c hJ_real hJ_real' hJ_nn hJ_sym hJ_bipartite hc_strict
       hcommon hM_non hφ_ne hφ

@@ -78,7 +78,7 @@ omit [Fintype V] [DecidableEq V] in
 theorem ionParityStepS_symm {G : SimpleGraph V} {σ σ' : V → Fin (N + 1)}
     (h : IonParityStepS G σ σ') : IonParityStepS G σ' σ := by
   rcases h with hRL | hSI
-  · exact Or.inl (raiseLowerStepS_symm hRL)
+  · exact Or.inl (RaiseLowerStepS.symm hRL)
   · exact Or.inr (singleIonStepS_symm hSI)
 
 omit [Fintype V] [DecidableEq V] in

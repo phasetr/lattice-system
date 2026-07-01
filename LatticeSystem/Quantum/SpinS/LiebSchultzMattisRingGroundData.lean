@@ -24,11 +24,6 @@ namespace LatticeSystem.Quantum
 
 open Matrix Module
 
-/-- The symmetrized ring coupling is self-conjugate (file-local copy). -/
-private theorem ringCouplingSym_star' (L : ℕ) (x y : Fin L) :
-    star (ringCouplingSym L x y) = ringCouplingSym L x y := by
-  rw [Complex.star_def, Complex.conj_eq_iff_im.mpr (ringCouplingSym_im_zero L x y)]
-
 /-- **Ground-state data of the AFM Heisenberg ring** (`L` even ≥ 2, `N ≥ 1`): a ground energy `E₀`
 and a nonzero ground eigenvector `Φ_GS` whose `E₀`-eigenspace is one-dimensional (uniqueness) and
 which lies in the `Ŝ_tot^{(3)} = 0` sector. -/
@@ -86,7 +81,7 @@ theorem afm_ring_ground_state_data (L N : ℕ) (hLeven : Even L) (hL2 : 2 ≤ L)
   have hmin : ∀ {μ' : ℝ} {Ψ : (Fin L → Fin (N + 1)) → ℂ}, Ψ ≠ 0 →
       (heisenbergHamiltonianS (ringCouplingSym L) N).mulVec Ψ = (μ' : ℂ) • Ψ → μ ≤ μ' := by
     intro μ' Ψ hΨ heig
-    refine tasaki23_eigenvalue_ge_common A N c (ringCouplingSym_im_zero L) (ringCouplingSym_star' L)
+    refine tasaki23_eigenvalue_ge_common A N c (ringCouplingSym_im_zero L) (ringCouplingSym_star L)
       (ringCouplingSym_re_nonneg L) (ringCouplingSym_symm L)
       (fun x y hxy => ringCouplingSym_bipartite L hLeven x y hxy) hc hpf ?_ hΨ heig
     intro M hM μM φ hφ heig2

@@ -31,29 +31,6 @@ variable {V : Type*} [Fintype V] [DecidableEq V] {N : ℕ}
 
 /-! ## Absolute-value total-Casimir lower bound -/
 
-omit [DecidableEq V] in
-/-- The real part of the magnetization value `s_max − k`. -/
-private theorem sMaxSubRe (k : ℕ) :
-    (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (k : ℂ)).re =
-      (Fintype.card V : ℝ) * (N : ℝ) / 2 - (k : ℝ) := by
-  simp [Complex.sub_re, Complex.mul_re]
-
-omit [DecidableEq V] in
-/-- Real part of the shifted weight `((card·N/2) − M) − j` (local copy of the
-private `Theorem23GeneralHOutside.weight_sub_re`). -/
-private theorem weightSubRe (M j : ℕ) :
-    (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ) - (j : ℂ)).re =
-      (Fintype.card V : ℝ) * (N : ℝ) / 2 - (M : ℝ) - (j : ℝ) := by
-  simp [Complex.sub_re, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
-
-omit [DecidableEq V] in
-/-- Real part of the shifted weight `((card·N/2) − M) + j` (local copy of the
-private `Theorem23GeneralHOutside.weight_add_re`). -/
-private theorem weightAddRe (M j : ℕ) :
-    (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ) + (j : ℂ)).re =
-      (Fintype.card V : ℝ) * (N : ℝ) / 2 - (M : ℝ) + (j : ℝ) := by
-  simp [Complex.add_re, Complex.sub_re, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
-
 /-- **Existence of a lowest-weight eigenvector, magnetization-tracking**: from a
 non-zero `(Ŝ_tot)²`-eigenvector at `γ` in `magSubspaceS V N (s_max − k)`, lowering
 with `Ŝ⁻_tot` produces a non-zero lowest-weight eigenvector at the same `γ` whose
@@ -76,7 +53,7 @@ private theorem exists_lowestWeight_eigenvector_le :
     intro γ w hw_ne hw_mem hcas
     by_cases hker : (totalSpinSOpMinus V N).mulVec w = 0
     · refine ⟨_, w, hw_ne, hw_mem, hker, hcas, ?_⟩
-      rw [sMaxSubRe]
+      rw [sMax_sub_natCast_re]
     · -- Lower one step into `s_max − (k + 1)`.
       have hmem1 := totalSpinSOpMinus_mulVec_mem_magSubspaceS_of_mem hw_mem
       have hidx : (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (k : ℂ)) - 1 =
@@ -160,7 +137,7 @@ private theorem totalSpinSSquared_eigenvalue_re_ge_neg_of_mem_magSubspaceS
     rw [← hτ]; simp [magEigenvalueS_def]
   have hMre_le : M'.re ≤ M.re := by
     have hMre : M.re = (Fintype.card V : ℝ) * (N : ℝ) / 2 - (magSumS σ : ℝ) := by
-      rw [hMeq, sMaxSubRe]
+      rw [hMeq, sMax_sub_natCast_re]
     rw [hMre]; exact hM'_le
   -- γ.re = M'.re (M'.re − 1).
   have hre : γ.re = M'.re * (M'.re - 1) := by
@@ -613,7 +590,7 @@ theorem tasaki23_strict_hOutside_ferrimagnetic
         have hpos : ∀ j : ℕ, j < k →
             0 < (((Fintype.card V : ℂ) * (N : ℂ) / 2) - (M : ℂ) - (j : ℂ)).re := by
           intro j hj
-          rw [weightSubRe]
+          rw [weight_sub_re]
           have h2 : ((min cardA cardB * N : ℕ) : ℝ) ≤ (Fintype.card V : ℝ) * (N : ℝ) / 2 := by
             have h2card : 2 * min cardA cardB ≤ Fintype.card V := by rw [← hsum]; omega
             have hcast : ((min cardA cardB * N : ℕ) : ℝ) =
@@ -650,7 +627,7 @@ theorem tasaki23_strict_hOutside_ferrimagnetic
               (j : ℂ)).re < 0 := by
           intro j hj
           rw [show ((max cardA cardB * N + k : ℕ) : ℂ) = (M : ℂ) by exact_mod_cast hkval.symm]
-          rw [weightAddRe]
+          rw [weight_add_re]
           have h2 : (Fintype.card V : ℝ) * (N : ℝ) / 2 ≤ ((max cardA cardB * N : ℕ) : ℝ) := by
             have h2card : Fintype.card V ≤ 2 * max cardA cardB := by rw [← hsum]; omega
             have hcast : ((max cardA cardB * N : ℕ) : ℝ) =
