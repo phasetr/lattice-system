@@ -31,9 +31,10 @@ theorem complexVec_eq_zero_of_star_dotProduct {n : Type*} [Fintype n] {v : n →
       (Finset.mem_univ j)
   exact Complex.normSq_eq_zero.mp hj
 
-/-- For a complex square matrix `M`, `star (M *ᵥ v) ⬝ᵥ w = star v ⬝ᵥ Mᴴ *ᵥ w`
+/-- For a (rectangular) complex matrix `M`, `star (M *ᵥ v) ⬝ᵥ w = star v ⬝ᵥ Mᴴ *ᵥ w`
 (adjoint move across the dot product). -/
-theorem star_mulVec_dotProduct {ι : Type*} [Fintype ι] (M : Matrix ι ι ℂ) (v w : ι → ℂ) :
+theorem star_mulVec_dotProduct {m n : Type*} [Fintype m] [Fintype n] (M : Matrix m n ℂ)
+    (v : n → ℂ) (w : m → ℂ) :
     star (M.mulVec v) ⬝ᵥ w = star v ⬝ᵥ M.conjTranspose.mulVec w := by
   rw [Matrix.star_mulVec, Matrix.dotProduct_mulVec]
 

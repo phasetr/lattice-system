@@ -1,6 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJFillingCompress
 import LatticeSystem.Quantum.SpinS.RayleighInfMatrix
 import LatticeSystem.Quantum.SpinS.RayleighUnitarySimilarity
+import LatticeSystem.Math.ComplexVectorKernel
 
 /-!
 # Tasaki 11.5: the filling embedding is an isometry, and the Rayleigh bridge (Prop 11.24 PR-E2 ≥)
@@ -25,15 +26,6 @@ open scoped BigOperators
 
 variable {N : ℕ}
 
-/-- The (rectangular) adjoint identity for the matrix inner product: `⟨c, Tᴴ y⟩ = ⟨T c, y⟩`. -/
-private theorem dotProduct_star_conjTranspose_mulVec {m n : Type*} [Fintype m] [Fintype n]
-    (T : Matrix m n ℂ) (c : n → ℂ) (y : m → ℂ) :
-    dotProduct (star c) (Tᴴ.mulVec y) = dotProduct (star (T.mulVec c)) y := by
-  simp only [dotProduct, Matrix.mulVec, Matrix.conjTranspose_apply, Pi.star_apply,
-    star_sum, star_mul', Finset.mul_sum, Finset.sum_mul]
-  rw [Finset.sum_comm]
-  exact Finset.sum_congr rfl (fun w _ => Finset.sum_congr rfl (fun s _ => by ring))
-
 /-- **The filling embedding has orthonormal columns:** `Tᴴ T = 1`. -/
 theorem tJFillingEmbedding_conjTranspose_mul_self (Ne : ℕ) :
     (tJFillingEmbedding N Ne)ᴴ * tJFillingEmbedding N Ne = 1 := by
@@ -55,7 +47,7 @@ theorem tJFillingExpansion_dotProduct_self (Ne : ℕ) (c : TJFillingSector N Ne 
     dotProduct (star (tJFillingExpansion N Ne c)) (tJFillingExpansion N Ne c) =
       dotProduct (star c) c := by
   rw [← tJFillingEmbedding_mulVec,
-    ← dotProduct_star_conjTranspose_mulVec (tJFillingEmbedding N Ne) c
+    star_mulVec_dotProduct (tJFillingEmbedding N Ne) c
       ((tJFillingEmbedding N Ne).mulVec c),
     Matrix.mulVec_mulVec, tJFillingEmbedding_conjTranspose_mul_self, Matrix.one_mulVec]
 
@@ -72,7 +64,7 @@ theorem rayleighOnVec_tJFillingCompress (Ne : ℕ) (A : ManyBodyOp (Fin (2 * N +
     rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
   have key : dotProduct (star c) ((tJFillingCompress N Ne A).mulVec c)
       = dotProduct (star (tJFillingExpansion N Ne c)) (A.mulVec (tJFillingExpansion N Ne c)) := by
-    rw [hmv, dotProduct_star_conjTranspose_mulVec, tJFillingEmbedding_mulVec]
+    rw [hmv, (star_mulVec_dotProduct _ c _).symm, tJFillingEmbedding_mulVec]
   unfold rayleighOnVec
   rw [key]
 
