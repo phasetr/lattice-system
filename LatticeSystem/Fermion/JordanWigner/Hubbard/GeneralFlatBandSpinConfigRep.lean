@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralFlatBandSpinConfigRepCore
 import LatticeSystem.Fermion.JordanWigner.Hubbard.GeneralBasisHN
+import LatticeSystem.Math.FinCases
 
 /-!
 # Spin-configuration capstone, eq. (11.3.47) (Tasaki §11.3.4, toward Theorem 11.17)
@@ -85,9 +86,6 @@ theorem flatBand_groundState_mem_spinConfigSpan
 theorem fin2_ne_cases {a b : Fin 2} (h : a ≠ b) :
     (a = 0 ∧ b = 1) ∨ (a = 1 ∧ b = 0) := by
   fin_cases a <;> fin_cases b <;> simp_all
-
-/-- Every `Fin 2` value is `0` or `1`. -/
-theorem fin2_eq_zero_or_one (a : Fin 2) : a = 0 ∨ a = 1 := by revert a; decide
 
 /-- **One spin per index (the pigeonhole behind eq. (11.3.47))**: a spin-configuration occupation
 `g` (`idx(I)`-supported, no doubly occupied index mode, exactly `D₀` occupied) occupies **every**
