@@ -10,6 +10,7 @@ import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import LatticeSystem.Quantum.SpinS.RayleighOnEigenvector
 import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.Analysis.Matrix.PosDef
+import LatticeSystem.Math.ComplexVectorKernel
 
 /-!
 # Hubbard low-`U` impossibility (variational lower bound): foundation
@@ -109,15 +110,6 @@ theorem hubbardSector_completeness (Ne : ℕ) (u : (Fin (2 * N + 2) → Fin 2) �
 
 /-! ## The sector compression and its Rayleigh bridge -/
 
-/-- The (rectangular) adjoint identity for the matrix inner product: `⟨c, Tᴴ y⟩ = ⟨T c, y⟩`. -/
-private theorem dotProduct_star_conjTranspose_mulVec' {m n : Type*} [Fintype m] [Fintype n]
-    (T : Matrix m n ℂ) (c : n → ℂ) (y : m → ℂ) :
-    dotProduct (star c) (Tᴴ.mulVec y) = dotProduct (star (T.mulVec c)) y := by
-  simp only [dotProduct, Matrix.mulVec, Matrix.conjTranspose_apply, Pi.star_apply,
-    star_sum, star_mul', Finset.mul_sum, Finset.sum_mul]
-  rw [Finset.sum_comm]
-  exact Finset.sum_congr rfl (fun w _ => Finset.sum_congr rfl (fun s _ => by ring))
-
 /-- **The `W`-compression** `compress(A) = Tᴴ A T`: the matrix of `A` in the `Ne`-electron basis. -/
 noncomputable def hubbardSectorCompress (N Ne : ℕ) (A : ManyBodyOp (Fin (2 * N + 2))) :
     Matrix (hubbardSectorConfig N Ne) (hubbardSectorConfig N Ne) ℂ :=
@@ -143,7 +135,7 @@ theorem hubbardSectorExpansion_dotProduct_self (Ne : ℕ) (c : hubbardSectorConf
     dotProduct (star (hubbardSectorExpansion N Ne c)) (hubbardSectorExpansion N Ne c) =
       dotProduct (star c) c := by
   rw [← hubbardSectorEmbedding_mulVec,
-    ← dotProduct_star_conjTranspose_mulVec' (hubbardSectorEmbedding N Ne) c
+    star_mulVec_dotProduct (hubbardSectorEmbedding N Ne) c
       ((hubbardSectorEmbedding N Ne).mulVec c),
     Matrix.mulVec_mulVec, hubbardSectorEmbedding_conjTranspose_mul_self, Matrix.one_mulVec]
 
@@ -161,7 +153,7 @@ theorem rayleighOnVec_hubbardSectorCompress (Ne : ℕ) (A : ManyBodyOp (Fin (2 *
   have key : dotProduct (star c) ((hubbardSectorCompress N Ne A).mulVec c)
       = dotProduct (star (hubbardSectorExpansion N Ne c))
           (A.mulVec (hubbardSectorExpansion N Ne c)) := by
-    rw [hmv, dotProduct_star_conjTranspose_mulVec', hubbardSectorEmbedding_mulVec]
+    rw [hmv, (star_mulVec_dotProduct _ c _).symm, hubbardSectorEmbedding_mulVec]
   unfold rayleighOnVec
   rw [key]
 
