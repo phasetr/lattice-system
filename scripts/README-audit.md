@@ -12,6 +12,10 @@ both decidable from text):
   (off the critical path), not in the capstone allowlist, not `@[simp]`.
 - **Duplicate declaration**: a `theorem`/`lemma` whose statement matches an existing
   one (twin / doubled). Detected textually.
+- **Long line**: an added line over 100 columns (mathlib's longLine rule; URLs and
+  imports exempt). Enforced in this hook, not as a build error: the longLine syntax
+  linter registers only after `import Mathlib`, so a lakefile option for it is silently
+  ignored (verified). Existing long lines are grandfathered (ratchet).
 
 `def`/`abbrev` duplication depends on the body (same type but different value is not a
 duplicate), which text cannot decide soundly, and α-renamed duplicates are also

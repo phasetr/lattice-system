@@ -17,6 +17,10 @@ What it blocks (the *entity*, not the name — renaming never bypasses it):
   V2 duplicate declaration: a new theorem/lemma whose statement (everything after
      the name, up to ':=') matches an existing one's statement, even under a
      different name (twin / doubled / mirror).
+  V3 long line: an ADDED line over 100 columns (mathlib's longLine rule; URLs and
+     imports exempt). The longLine syntax linter cannot be a lakefile build error
+     downstream (it registers only after `import Mathlib`), so it is enforced here
+     textually on the diff. Existing long lines are grandfathered (ratchet).
 
 Non-blocking (report only; forced splits are disallowed):
   oversize files are listed but never affect the exit code.
@@ -196,6 +200,37 @@ def added_decl_targets(base):
     return targets
 
 
+def added_long_lines(base, limit=100):
+    """Return [(file, lineno, width)] for lines ADDED vs `base` over `limit` columns
+    (codepoints). This is mathlib's longLine rule enforced textually in the hook:
+    the longLine *syntax* linter cannot be a lakefile build error downstream (it is
+    registered only after `import Mathlib`, so a leanOptions entry for it is silently
+    ignored). URLs and import lines are exempt, as upstream. Ratchet: only added
+    lines are checked, so existing long lines are grandfathered."""
+    diff = subprocess.run(
+        ["git", "diff", "--unified=0", f"{base}...HEAD", "--", "*.lean"],
+        capture_output=True, text=True, check=True).stdout
+    out = []
+    cur = None
+    newline = 0
+    for l in diff.splitlines():
+        if l.startswith("+++ b/"):
+            cur = l[6:].strip()
+            continue
+        if l.startswith("@@"):
+            mh = re.search(r'\+(\d+)', l)
+            newline = int(mh.group(1)) if mh else 0
+            continue
+        if l.startswith("+") and not l.startswith("+++"):
+            content = l[1:]
+            if (len(content) > limit and cur
+                    and "http" not in content
+                    and not content.lstrip().startswith("import ")):
+                out.append((cur, newline, len(content)))
+            newline += 1
+    return out
+
+
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "--diff"
     base = sys.argv[2] if len(sys.argv) > 2 else "main"
@@ -221,6 +256,7 @@ def main():
             return 2
         try:
             targets = added_decl_targets(resolved)  # {(name, file, lineno)}
+            long_lines = added_long_lines(resolved)  # [(file, lineno, width)]
         except subprocess.CalledProcessError as e:
             print(f"[audit-gate] BLOCKED: git diff against '{resolved}' failed: {e}")
             return 2
@@ -228,6 +264,7 @@ def main():
         scope_label = f"new decls vs {resolved}"
     else:
         scope = decls
+        long_lines = []  # width is only ratcheted on the diff, not scanned whole-repo
         scope_label = "whole repo"
 
     # V1 decorative declaration (zero reference). Count references by the name's
@@ -290,6 +327,12 @@ def main():
             print(f"   {f}:{ln}  {name}  ==  {loc}")
         print(f"   -> a confirmed non-duplicate (different ambient context) goes in"
               f" {ALLOWLIST}")
+    if long_lines:
+        fail = True
+        print("\nV3 long line (>100 columns, added): wrap it (mathlib's longLine rule,"
+              " enforced in this hook because it cannot be a lakefile build error)")
+        for f, ln, w in long_lines:
+            print(f"   {f}:{ln}  ({w} cols)")
 
     if fail and mode == "--diff":
         print("\n[audit-gate] BLOCKED. Resolve the entities above before pushing.")
