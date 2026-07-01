@@ -138,8 +138,9 @@ theorem heisenbergHamiltonian_mulVec_preserves_totalSpinHalfSquared_eigenvalue
 /-! ## Casimir eigenvalue on the all-up / all-down states -/
 
 /-- `Ŝ_x · Ŝ_y` action on a uniformly-aligned basis state (constant `s`):
-`(3/4) |s⟩` for `x = y`, `(1/4) |s⟩` for `x ≠ y`. -/
-private theorem spinHalfDot_mulVec_const (s : Fin 2) (x y : Λ) :
+`(3/4) |s⟩` for `x = y`, `(1/4) |s⟩` for `x ≠ y`.  Canonical version; the
+downstream `SpinDot/Hamiltonian.lean` imports and reuses this (no copy). -/
+theorem spinHalfDot_mulVec_const (s : Fin 2) (x y : Λ) :
     (spinHalfDot x y).mulVec (basisVec (fun _ : Λ => s)) =
       (if x = y then (3 / 4 : ℂ) else (1 / 4 : ℂ)) •
         basisVec (fun _ : Λ => s) := by
