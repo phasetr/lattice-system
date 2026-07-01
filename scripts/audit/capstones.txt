@@ -1,0 +1,7 @@
+# audit-gate allowlist (exempts a declaration name from BOTH V1 and V2)
+# One Lean name per line.
+#   - V1: public book theorems (capstones) that are legitimately zero-referenced.
+#   - V2: a declaration a reviewer has confirmed is NOT a real duplicate despite a
+#         matching displayed statement (e.g. distinct ambient `variable` context
+#         that the textual gate cannot see).
+# Add a name only after confirming the finding is a genuine false positive.
