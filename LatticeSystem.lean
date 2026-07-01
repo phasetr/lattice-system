@@ -325,6 +325,7 @@ import LatticeSystem.Fermion.SingleMode
 import LatticeSystem.Fermion.JordanWigner
 import LatticeSystem.Fermion.JWAbstract
 import LatticeSystem.Fermion.JWAbstractCrossSite
+import LatticeSystem.Fermion.JordanWigner.SmearedOperators
 import LatticeSystem.Fermion.JordanWigner.FockSpaceRepresentation
 import LatticeSystem.Fermion.JordanWigner.SmearedCAR
 -- Tasaki §2.5 Theorem 2.3 (spin-S Marshall–Lieb–Mattis) tree.
