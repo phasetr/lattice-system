@@ -28,20 +28,6 @@ namespace LatticeSystem.Fermion
 
 open LatticeSystem.Quantum
 
-private lemma n_commute_one_sub
-    (N : ℕ) (i j : Fin (N + 1)) :
-    Commute (fermionMultiNumber N i) (1 - fermionMultiNumber N j) := by
-  unfold Commute SemiconjBy
-  have hcomm := (fermionMultiNumber_commute N i j).eq
-  rw [mul_sub, sub_mul, Matrix.one_mul, Matrix.mul_one, hcomm]
-
-private lemma one_sub_commute_n
-    (N : ℕ) (i j : Fin (N + 1)) :
-    Commute (1 - fermionMultiNumber N i) (fermionMultiNumber N j) := by
-  unfold Commute SemiconjBy
-  have hcomm := (fermionMultiNumber_commute N i j).eq
-  rw [sub_mul, mul_sub, Matrix.one_mul, Matrix.mul_one, hcomm]
-
 private lemma one_sub_commute_one_sub
     (N : ℕ) (i j : Fin (N + 1)) :
     Commute (1 - fermionMultiNumber N i) (1 - fermionMultiNumber N j) := by
@@ -65,11 +51,11 @@ theorem fermionEmptyProjection_commute_fermionUpProjection_of_any
     Commute ((1 - fermionUpNumber N i) * (1 - fermionDownNumber N i))
       (fermionUpNumber N j * (1 - fermionDownNumber N j)) := by
   unfold fermionUpNumber fermionDownNumber
-  have c00 := one_sub_commute_n (2 * N + 1)
+  have c00 := one_sub_fermionMultiNumber_commute_fermionMultiNumber' (2 * N + 1)
     (spinfulIndex N i 0) (spinfulIndex N j 0)
   have c01 := one_sub_commute_one_sub (2 * N + 1)
     (spinfulIndex N i 0) (spinfulIndex N j 1)
-  have c10 := one_sub_commute_n (2 * N + 1)
+  have c10 := one_sub_fermionMultiNumber_commute_fermionMultiNumber' (2 * N + 1)
     (spinfulIndex N i 1) (spinfulIndex N j 0)
   have c11 := one_sub_commute_one_sub (2 * N + 1)
     (spinfulIndex N i 1) (spinfulIndex N j 1)
@@ -84,11 +70,11 @@ theorem fermionEmptyProjection_commute_fermionDownProjection_of_any
   unfold fermionUpNumber fermionDownNumber
   have c00 := one_sub_commute_one_sub (2 * N + 1)
     (spinfulIndex N i 0) (spinfulIndex N j 0)
-  have c01 := one_sub_commute_n (2 * N + 1)
+  have c01 := one_sub_fermionMultiNumber_commute_fermionMultiNumber' (2 * N + 1)
     (spinfulIndex N i 0) (spinfulIndex N j 1)
   have c10 := one_sub_commute_one_sub (2 * N + 1)
     (spinfulIndex N i 1) (spinfulIndex N j 0)
-  have c11 := one_sub_commute_n (2 * N + 1)
+  have c11 := one_sub_fermionMultiNumber_commute_fermionMultiNumber' (2 * N + 1)
     (spinfulIndex N i 1) (spinfulIndex N j 1)
   exact Commute.mul_right (Commute.mul_left c00 c10)
     (Commute.mul_left c01 c11)
@@ -99,13 +85,13 @@ theorem fermionEmptyProjection_commute_fermionDoublyProjection_of_any
     Commute ((1 - fermionUpNumber N i) * (1 - fermionDownNumber N i))
       (fermionUpNumber N j * fermionDownNumber N j) := by
   unfold fermionUpNumber fermionDownNumber
-  have c00 := one_sub_commute_n (2 * N + 1)
+  have c00 := one_sub_fermionMultiNumber_commute_fermionMultiNumber' (2 * N + 1)
     (spinfulIndex N i 0) (spinfulIndex N j 0)
-  have c01 := one_sub_commute_n (2 * N + 1)
+  have c01 := one_sub_fermionMultiNumber_commute_fermionMultiNumber' (2 * N + 1)
     (spinfulIndex N i 0) (spinfulIndex N j 1)
-  have c10 := one_sub_commute_n (2 * N + 1)
+  have c10 := one_sub_fermionMultiNumber_commute_fermionMultiNumber' (2 * N + 1)
     (spinfulIndex N i 1) (spinfulIndex N j 0)
-  have c11 := one_sub_commute_n (2 * N + 1)
+  have c11 := one_sub_fermionMultiNumber_commute_fermionMultiNumber' (2 * N + 1)
     (spinfulIndex N i 1) (spinfulIndex N j 1)
   exact Commute.mul_right (Commute.mul_left c00 c10)
     (Commute.mul_left c01 c11)
@@ -120,9 +106,9 @@ theorem fermionUpProjection_commute_fermionDoublyProjection_of_any
     (spinfulIndex N i 0) (spinfulIndex N j 0)
   have c01 := fermionMultiNumber_commute (2 * N + 1)
     (spinfulIndex N i 0) (spinfulIndex N j 1)
-  have c10 := one_sub_commute_n (2 * N + 1)
+  have c10 := one_sub_fermionMultiNumber_commute_fermionMultiNumber' (2 * N + 1)
     (spinfulIndex N i 1) (spinfulIndex N j 0)
-  have c11 := one_sub_commute_n (2 * N + 1)
+  have c11 := one_sub_fermionMultiNumber_commute_fermionMultiNumber' (2 * N + 1)
     (spinfulIndex N i 1) (spinfulIndex N j 1)
   exact Commute.mul_right (Commute.mul_left c00 c10)
     (Commute.mul_left c01 c11)
@@ -133,9 +119,9 @@ theorem fermionDownProjection_commute_fermionDoublyProjection_of_any
     Commute ((1 - fermionUpNumber N i) * fermionDownNumber N i)
       (fermionUpNumber N j * fermionDownNumber N j) := by
   unfold fermionUpNumber fermionDownNumber
-  have c00 := one_sub_commute_n (2 * N + 1)
+  have c00 := one_sub_fermionMultiNumber_commute_fermionMultiNumber' (2 * N + 1)
     (spinfulIndex N i 0) (spinfulIndex N j 0)
-  have c01 := one_sub_commute_n (2 * N + 1)
+  have c01 := one_sub_fermionMultiNumber_commute_fermionMultiNumber' (2 * N + 1)
     (spinfulIndex N i 0) (spinfulIndex N j 1)
   have c10 := fermionMultiNumber_commute (2 * N + 1)
     (spinfulIndex N i 1) (spinfulIndex N j 0)

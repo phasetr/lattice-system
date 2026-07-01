@@ -26,11 +26,6 @@ namespace LatticeSystem.Fermion
 
 open Matrix LatticeSystem.Quantum
 
-/-- A `Fin 2` value that is not `0` is `1`. -/
-private theorem fin_two_ne_zero {v : Fin 2} (h : v ≠ 0) : v = 1 := by
-  have h2 := v.isLt
-  exact Fin.ext (by have : v.val ≠ 0 := fun hv => h (Fin.ext hv); omega)
-
 /-- The one-hole configuration is empty on both orbitals at the hole site. -/
 private theorem hubbardOneHoleConfig_hole_zero
     (N : ℕ) (x : Fin (N + 1)) (σ : Fin (N + 1) → Bool) (s : Fin 2) :

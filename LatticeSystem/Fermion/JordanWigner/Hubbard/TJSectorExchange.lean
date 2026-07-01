@@ -55,7 +55,7 @@ theorem tJConfigOf_tJSpinSwap (N : ℕ) (s : Fin (N + 1) → Fin 3) (i j : Fin (
 
 /-- The modes below the successor `q` (`q.val = p.val + 1`) are those below `p` together with `p`.
 -/
-private theorem tJ_filt_succ (M : ℕ) (p q : Fin (M + 1)) (hq : q.val = p.val + 1) :
+theorem tJ_filt_succ (M : ℕ) (p q : Fin (M + 1)) (hq : q.val = p.val + 1) :
     (Finset.univ.filter (fun k : Fin (M + 1) => k.val < q.val))
       = insert p (Finset.univ.filter (fun k => k.val < p.val)) := by
   ext k; simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert]
@@ -66,7 +66,7 @@ private theorem tJ_filt_succ (M : ℕ) (p q : Fin (M + 1)) (hq : q.val = p.val +
   · rintro (rfl | hk) <;> omega
 
 /-- `p` lies above all the modes strictly below it. -/
-private theorem tJ_p_notmem (M : ℕ) (p : Fin (M + 1)) :
+theorem tJ_p_notmem (M : ℕ) (p : Fin (M + 1)) :
     p ∉ (Finset.univ.filter (fun k : Fin (M + 1) => k.val < p.val)) := by
   simp only [Finset.mem_filter, Finset.mem_univ, true_and]; omega
 
@@ -94,7 +94,7 @@ private theorem jwSign_succ_cancel_low (M : ℕ) (c : Fin (M + 1) → Fin 2) (p 
 
 /-- **Adjacent-pair cancellation, high mode first.**  For successive modes `p, q` (`q.val =
 p.val + 1`) with `c p = 0`, `jwSign q c · jwSign p (update c q 0) = 1`. -/
-private theorem jwSign_succ_cancel_high (M : ℕ) (c : Fin (M + 1) → Fin 2) (p q : Fin (M + 1))
+theorem jwSign_succ_cancel_high (M : ℕ) (c : Fin (M + 1) → Fin 2) (p q : Fin (M + 1))
     (hq : q.val = p.val + 1) (hcp : c p = 0) :
     jwSign M q c * jwSign M p (Function.update c q 0) = 1 := by
   rw [jwSign_eq_neg_one_pow, jwSign_eq_neg_one_pow, ← pow_add]

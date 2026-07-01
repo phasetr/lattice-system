@@ -25,14 +25,18 @@ namespace LatticeSystem.Fermion
 
 open LatticeSystem.Quantum
 
-private lemma fermionMultiNumber_commute_one_sub_fermionMultiNumber'
+/-- `Commute (n_i) (1 − n_j)`: a number operator commutes with the
+complement of another (from `fermionMultiNumber_commute`). -/
+lemma fermionMultiNumber_commute_one_sub_fermionMultiNumber'
     (N : ℕ) (i j : Fin (N + 1)) :
     Commute (fermionMultiNumber N i) (1 - fermionMultiNumber N j) := by
   unfold Commute SemiconjBy
   have hcomm := (fermionMultiNumber_commute N i j).eq
   rw [mul_sub, sub_mul, Matrix.one_mul, Matrix.mul_one, hcomm]
 
-private lemma one_sub_fermionMultiNumber_commute_fermionMultiNumber'
+/-- `Commute (1 − n_i) (n_j)`: the complement of a number operator
+commutes with another (from `fermionMultiNumber_commute`). -/
+lemma one_sub_fermionMultiNumber_commute_fermionMultiNumber'
     (N : ℕ) (i j : Fin (N + 1)) :
     Commute (1 - fermionMultiNumber N i) (fermionMultiNumber N j) := by
   unfold Commute SemiconjBy

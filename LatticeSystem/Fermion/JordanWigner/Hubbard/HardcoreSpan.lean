@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HardcoreBasis
+import LatticeSystem.Fermion.JordanWigner.Hubbard.HopConfig
 
 /-!
 # Span of the one-hole hard-core sector by the basis states
@@ -42,11 +43,6 @@ def IsOneHoleHardcoreConfig (N : ℕ) (c : Fin (2 * N + 2) → Fin 2) : Prop :=
 private theorem fin_two_eq_zero_of_ne_one {v : Fin 2} (h : v ≠ 1) : v = 0 := by
   have h2 := v.isLt
   exact Fin.ext (by have : v.val ≠ 1 := fun hv => h (Fin.ext hv); omega)
-
-/-- A `Fin 2` value that is not `0` is `1`. -/
-private theorem fin_two_eq_one_of_ne_zero {v : Fin 2} (h : v ≠ 0) : v = 1 := by
-  have h2 := v.isLt
-  exact Fin.ext (by have : v.val ≠ 0 := fun hv => h (Fin.ext hv); omega)
 
 /-! ## The parametrized configurations are exactly the one-hole hard-core ones -/
 
@@ -99,7 +95,7 @@ theorem exists_eq_hubbardOneHoleConfig_of_isOneHoleHardcore
       · rw [if_pos hcu]; exact hcu
       · rw [if_neg hcu]; exact fin_two_eq_zero_of_ne_one hcu
   · -- down orbital
-    obtain rfl : s = 1 := fin_two_eq_one_of_ne_zero hs
+    obtain rfl : s = 1 := fin_two_ne_zero hs
     rw [hubbardOneHoleConfig_apply_down]
     by_cases hix : i = x
     · subst hix; rw [if_pos rfl]; exact hx_hole.2
@@ -114,7 +110,7 @@ theorem exists_eq_hubbardOneHoleConfig_of_isOneHoleHardcore
         · exact h
       · rw [if_neg hcu]
         have hup0 : c (spinfulIndex N i 0) = 0 := fin_two_eq_zero_of_ne_one hcu
-        exact fin_two_eq_one_of_ne_zero (fun hd => hnothole ⟨hup0, hd⟩)
+        exact fin_two_ne_zero (fun hd => hnothole ⟨hup0, hd⟩)
 
 /-! ## The one-hole hard-core sector and its spanning set -/
 

@@ -75,7 +75,7 @@ private theorem fermionDownNumber_mulVec_basisVec_eq_zero_of_empty
 
 /-- The double-occupancy operator annihilates a basis vector whose up-orbital
 at site `i` is empty (commute `n_↑ n_↓ = n_↓ n_↑`, then `n_↑` kills it). -/
-private theorem hubbardDoubleOccupancy_mulVec_basisVec_eq_zero_of_up_empty
+theorem hubbardDoubleOccupancy_mulVec_basisVec_eq_zero_of_up_empty
     (N : ℕ) (i : Fin (N + 1)) (c : Fin (2 * N + 2) → Fin 2)
     (h : c (spinfulIndex N i 0) = 0) :
     (hubbardDoubleOccupancy N i).mulVec (basisVec c) = 0 := by
@@ -85,7 +85,7 @@ private theorem hubbardDoubleOccupancy_mulVec_basisVec_eq_zero_of_up_empty
 
 /-- The double-occupancy operator annihilates a basis vector whose
 down-orbital at site `i` is empty (`n_↓` kills it directly). -/
-private theorem hubbardDoubleOccupancy_mulVec_basisVec_eq_zero_of_down_empty
+theorem hubbardDoubleOccupancy_mulVec_basisVec_eq_zero_of_down_empty
     (N : ℕ) (i : Fin (N + 1)) (c : Fin (2 * N + 2) → Fin 2)
     (h : c (spinfulIndex N i 1) = 0) :
     (hubbardDoubleOccupancy N i).mulVec (basisVec c) = 0 := by

@@ -26,7 +26,7 @@ def hubbardSpinMove (N : ℕ) (σ : Fin (N + 1) → Bool) (x y : Fin (N + 1)) :
   Function.update σ x (σ y)
 
 /-- A `Fin 2` value that is not `0` is `1`. -/
-private theorem fin_two_ne_zero {v : Fin 2} (h : v ≠ 0) : v = 1 := by
+theorem fin_two_ne_zero {v : Fin 2} (h : v ≠ 0) : v = 1 := by
   have h2 := v.isLt
   exact Fin.ext (by have : v.val ≠ 0 := fun hv => h (Fin.ext hv); omega)
 

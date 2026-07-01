@@ -46,7 +46,7 @@ private theorem totalUpNumber_mul_siteSpinPlus (N : ℕ) (x : Fin (N + 1)) :
           fermionUpCreation N x * fermionDownAnnihilation N x := by noncomm_ring
 
 /-- Weight relation `N̂_↓ Ŝ^+_x = Ŝ^+_x (N̂_↓ − 1)`: the down-number lowers by one on `Ŝ^+_x`. -/
-private theorem totalDownNumber_mul_siteSpinPlus (N : ℕ) (x : Fin (N + 1)) :
+theorem totalDownNumber_mul_siteSpinPlus (N : ℕ) (x : Fin (N + 1)) :
     fermionTotalDownNumber N * fermionSiteSpinPlus N x =
       fermionSiteSpinPlus N x * fermionTotalDownNumber N - fermionSiteSpinPlus N x := by
   unfold fermionSiteSpinPlus
