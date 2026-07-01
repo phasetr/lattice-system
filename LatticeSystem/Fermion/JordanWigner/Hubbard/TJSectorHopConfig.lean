@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorHop
+import LatticeSystem.Math.FinCases
 
 /-!
 # Tasaki 11.5: the hop config identity for the t-J sector basis (Prop 11.24 PR3c-2)
@@ -32,14 +33,6 @@ private theorem tJ_hop_ne_down (s : Fin (N + 1) → Fin 3) (a b : Fin (N + 1)) (
     (hb : s b = 0) : a ≠ b := by
   rintro rfl; rw [ha] at hb; exact absurd hb (by decide)
 
-/-- A spin label is `0` or `1` (the two-element dichotomy used throughout the t-J sector files). -/
-theorem tJ_fin2_eq (r : Fin 2) : r = 0 ∨ r = 1 := by
-  rcases eq_or_ne r 0 with h | h
-  · exact Or.inl h
-  · refine Or.inr (Fin.ext ?_)
-    have h0 : r.val ≠ 0 := fun hh => h (Fin.ext hh)
-    have := r.isLt; omega
-
 /-- **Up-hop config identity**: when site `a` is ↑ and site `b` is empty, the spinful occupation of
 `tJSiteHop s a b` is `tJConfigOf s` with the up-orbital of `a` emptied and the up-orbital of `b`
 filled.  The down-orbitals are untouched. -/
@@ -52,7 +45,7 @@ theorem tJConfigOf_tJSiteHop_up (N : ℕ) (s : Fin (N + 1) → Fin 3) (a b : Fin
   funext k
   obtain ⟨i, r, rfl⟩ := exists_spinfulIndex N k
   simp only [Function.update_apply, spinfulIndex_eq_iff]
-  rcases tJ_fin2_eq r with rfl | rfl <;> rcases eq_or_ne i a with rfl | hia <;>
+  rcases fin2_eq_zero_or_one r with rfl | rfl <;> rcases eq_or_ne i a with rfl | hia <;>
     rcases eq_or_ne i b with rfl | hib <;>
     simp_all [tJConfigOf_apply_up, tJConfigOf_apply_down, tJSiteHop]
 
@@ -68,7 +61,7 @@ theorem tJConfigOf_tJSiteHop_down (N : ℕ) (s : Fin (N + 1) → Fin 3) (a b : F
   funext k
   obtain ⟨i, r, rfl⟩ := exists_spinfulIndex N k
   simp only [Function.update_apply, spinfulIndex_eq_iff]
-  rcases tJ_fin2_eq r with rfl | rfl <;> rcases eq_or_ne i a with rfl | hia <;>
+  rcases fin2_eq_zero_or_one r with rfl | rfl <;> rcases eq_or_ne i a with rfl | hia <;>
     rcases eq_or_ne i b with rfl | hib <;>
     simp_all [tJConfigOf_apply_up, tJConfigOf_apply_down, tJSiteHop]
 

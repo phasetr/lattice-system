@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorHopConfig
+import LatticeSystem.Math.FinCases
 import LatticeSystem.Fermion.JordanWigner.Hubbard.HopSignBetween
 import LatticeSystem.Fermion.JordanWigner.Hubbard.FermionSiteSpin
 
@@ -47,7 +48,7 @@ theorem tJConfigOf_tJSpinSwap (N : ℕ) (s : Fin (N + 1) → Fin 3) (i j : Fin (
   funext k
   obtain ⟨t, r, rfl⟩ := exists_spinfulIndex N k
   simp only [Function.update_apply, spinfulIndex_eq_iff]
-  rcases (show r = 0 ∨ r = 1 from tJ_fin2_eq r) with rfl | rfl <;>
+  rcases (show r = 0 ∨ r = 1 from fin2_eq_zero_or_one r) with rfl | rfl <;>
     rcases eq_or_ne t i with rfl | hti <;> rcases eq_or_ne t j with rfl | htj <;>
     simp_all [tJConfigOf_apply_up, tJConfigOf_apply_down, tJSpinSwap]
 

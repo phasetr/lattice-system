@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJStepRelation
+import LatticeSystem.Math.FinCases
 import Mathlib.Logic.Relation
 
 /-!
@@ -29,9 +30,6 @@ open Matrix LatticeSystem.Quantum LatticeSystem.Lattice SimpleGraph
 
 variable {N : ℕ}
 
-/-- A `Fin 3` value is `0`, `1`, or `2`. -/
-private theorem fin3_cases (v : Fin 3) : v = 0 ∨ v = 1 ∨ v = 2 := by fin_cases v <;> simp
-
 /-- **An adjacent-value swap step.**  `s'` is obtained from `s` by exchanging the values at an
 adjacent pair `a, b` of *distinct* values (precomposition with `Equiv.swap a b`). -/
 def AdjacentSwapStep (N : ℕ) (s s' : Fin (N + 1) → Fin 3) : Prop :=
@@ -45,11 +43,11 @@ theorem adjacentSwapStep_to_TJStep (s s' : Fin (N + 1) → Fin 3) (h : AdjacentS
   obtain ⟨a, b, hAdj, hne, hs'⟩ := h
   have hswapcomm : s' = fun k => s (Equiv.swap b a k) := by
     rw [hs']; funext k; rw [Equiv.swap_comm]
-  rcases fin3_cases (s a) with ha | ha | ha
+  rcases fin3_eq_zero_or_one_or_two (s a) with ha | ha | ha
   · -- s a = ∅: hop b → a
     refine Or.inl ⟨b, a, hAdj.symm, fun hb => hne (ha.trans hb.symm), ha, ?_⟩
     rw [hswapcomm, tJSiteHop_eq_comp_swap s b a ha]
-  · rcases fin3_cases (s b) with hb | hb | hb
+  · rcases fin3_eq_zero_or_one_or_two (s b) with hb | hb | hb
     · -- s b = ∅: hop a → b
       refine Or.inl ⟨a, b, hAdj, by rw [ha]; decide, hb, ?_⟩
       rw [hs', tJSiteHop_eq_comp_swap s a b hb]
@@ -57,7 +55,7 @@ theorem adjacentSwapStep_to_TJStep (s s' : Fin (N + 1) → Fin 3) (h : AdjacentS
     · -- s a = ↑, s b = ↓: exchange b, a
       refine Or.inr ⟨b, a, hAdj.symm, hb, ha, ?_⟩
       rw [hswapcomm, tJSpinSwap_eq_comp_swap s b a]
-  · rcases fin3_cases (s b) with hb | hb | hb
+  · rcases fin3_eq_zero_or_one_or_two (s b) with hb | hb | hb
     · -- s b = ∅: hop a → b
       refine Or.inl ⟨a, b, hAdj, by rw [ha]; decide, hb, ?_⟩
       rw [hs', tJSiteHop_eq_comp_swap s a b hb]

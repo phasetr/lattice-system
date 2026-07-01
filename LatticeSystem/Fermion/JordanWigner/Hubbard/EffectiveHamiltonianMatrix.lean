@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TasakiHopAction
+import LatticeSystem.Math.FinCases
 import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonian
 
 /-!
@@ -68,16 +69,10 @@ private theorem hardcore_proj_apply (N : ℕ) (y : Fin (N + 1)) (τ : Fin (N + 1
 
 /-! ## Auxiliary facts about one-hole configurations -/
 
-/-- A `Fin 2` value is `0` or `1`. -/
-private theorem fin_two_cases (r : Fin 2) : r = 0 ∨ r = 1 := by
-  rcases r with ⟨rv, hrv⟩; interval_cases rv
-  · exact Or.inl rfl
-  · exact Or.inr rfl
-
 /-- The one-hole configuration is empty on both orbitals of its hole site. -/
 private theorem oneHole_hole_zero (N : ℕ) (y : Fin (N + 1)) (τ : Fin (N + 1) → Bool)
     (r : Fin 2) : hubbardOneHoleConfig N y τ (spinfulIndex N y r) = 0 := by
-  rcases fin_two_cases r with rfl | rfl
+  rcases fin2_eq_zero_or_one r with rfl | rfl
   · rw [hubbardOneHoleConfig_apply_up, if_pos rfl]
   · rw [hubbardOneHoleConfig_apply_down, if_pos rfl]
 
@@ -131,7 +126,7 @@ private theorem hop_config_forces (N : ℕ) (x y i j : Fin (N + 1))
     intro h; exact hxy ((spinfulIndex_eq_iff N x y _ _).mp h).1
   rw [if_neg hxne,
     show hubbardOneHoleConfig N x σ (spinfulIndex N x (if τ x then 0 else 1)) = 0 from
-      by rcases fin_two_cases (if τ x then (0 : Fin 2) else 1) with h | h <;>
+      by rcases fin2_eq_zero_or_one (if τ x then (0 : Fin 2) else 1) with h | h <;>
         rw [h] <;> [rw [hubbardOneHoleConfig_apply_up, if_pos rfl];
           rw [hubbardOneHoleConfig_apply_down, if_pos rfl]],
     oneHole_occupied N y τ x hxy] at e2
@@ -286,7 +281,7 @@ private theorem hop_diag_forces (N : ℕ) (x i j : Fin (N + 1))
   have hjx' : j.val ≠ x.val := fun h => hjx (Fin.ext h)
   -- `s` is the occupied orbital of `j`.
   have hsoj : s = (if σ j then 0 else 1) := by
-    rcases fin_two_cases s with rfl | rfl
+    rcases fin2_eq_zero_or_one s with rfl | rfl
     · rw [hubbardOneHoleConfig_apply_up, if_neg hjx'] at hvj
       by_cases hσ : σ j
       · simp [hσ]
@@ -307,7 +302,7 @@ private theorem hop_diag_forces (N : ℕ) (x i j : Fin (N + 1))
         rw [← hsoj]; exact fun h => h2 (by rw [h])
       have hz : hubbardOneHoleConfig N x σ
           (spinfulIndex N j (if τ j then 0 else 1)) = 0 := by
-        rcases fin_two_cases (if τ j then (0 : Fin 2) else 1) with hoτ | hoτ
+        rcases fin2_eq_zero_or_one (if τ j then (0 : Fin 2) else 1) with hoτ | hoτ
         · rw [hoτ, hubbardOneHoleConfig_apply_up, if_neg hjx',
             if_neg (show ¬ σ j from fun hσ => hoτs (by rw [hoτ, if_pos hσ]))]
         · rw [hoτ, hubbardOneHoleConfig_apply_down, if_neg hjx',

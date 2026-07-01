@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJExchangeBondSum
+import LatticeSystem.Math.FinCases
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJStepRelation
 
 /-!
@@ -44,7 +45,7 @@ theorem tJ_cycle_hop_kinetic_summand_eq_one (N : ℕ) (hpos : 0 < N)
   have hcoup : couplingOf (cycleGraph (N + 1)) (1 : ℂ) b a = 1 := by
     unfold couplingOf; rw [if_pos hAdj]
   rw [hcoup, one_mul]
-  rcases tJ_fin2_eq σ with rfl | rfl
+  rcases fin2_eq_zero_or_one σ with rfl | rfl
   · rw [if_pos rfl] at hsa
     rcases cycleGraph_adj_val_cases N hpos b a hAdj with hd | hd | ⟨hbN, ha0⟩ | ⟨haN, hb0⟩
     · rw [tJ_uphop_backward_nn_matrixElement N s s' b a hd hsa hsb, if_pos hs']
@@ -224,7 +225,7 @@ theorem tJEffMatrix_re_neg_of_step (N : ℕ) (hpos : 0 < N) (s s' : Fin (N + 1) 
   rcases hstep with ⟨a, b, hAdj, hsa0, hsb, hs'⟩ | ⟨i, j, hAdj, hi, hj, hs'⟩
   · -- hop step: kinetic ≥ 1, interaction ≤ 0
     have hσ : ∃ σ : Fin 2, s a = if σ = 0 then 1 else 2 := by
-      rcases tJ_fin3_cases (s a) with h | h | h
+      rcases fin3_eq_zero_or_one_or_two (s a) with h | h | h
       · exact absurd h hsa0
       · exact ⟨0, by simp [h]⟩
       · exact ⟨1, by simp [h]⟩
