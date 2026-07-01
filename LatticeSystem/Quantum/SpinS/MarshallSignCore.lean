@@ -81,14 +81,6 @@ theorem marshallSignS_eq_of_eq (A : V → Bool)
     {σ' σ : V → Fin (N + 1)} (h : σ' = σ) :
     marshallSignS A σ' = marshallSignS A σ := by rw [h]
 
-/-- Symmetric form of the Marshall sign product:
-`marshallSignS A σ' * marshallSignS A σ = marshallSignS A σ * marshallSignS A σ'`. -/
-theorem marshallSignS_mul_swap (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
-    marshallSignS A σ * marshallSignS A σ' =
-      marshallSignS A σ' * marshallSignS A σ :=
-  mul_comm _ _
-
-
 /-- For a constant configuration `σ ≡ s` and `s.val` even, the
 Marshall sign is `+1`. (Each `(-1)^(s.val)` factor is `+1`.) -/
 theorem marshallSignS_const_of_even
@@ -352,13 +344,6 @@ theorem marshallSignS_mul_self_inv (A : V → Bool) (σ : V → Fin (N + 1)) :
     marshallSignS A σ * (marshallSignS A σ)⁻¹ = 1 := by
   rw [marshallSignS_inv, marshallSignS_sq]
 
-/-- The Marshall sign is `±1` valued in `ℝ` (after embedding into ℂ). -/
-theorem marshallSignS_re (A : V → Bool) (σ : V → Fin (N + 1)) :
-    (marshallSignS A σ).re = 1 ∨ (marshallSignS A σ).re = -1 := by
-  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
-  · left; rw [h]; rfl
-  · right; rw [h]; rfl
-
 /-- Imaginary part of the Marshall sign is zero. -/
 theorem marshallSignS_im (A : V → Bool) (σ : V → Fin (N + 1)) :
     (marshallSignS A σ).im = 0 := by
@@ -440,11 +425,6 @@ theorem marshallSignS_mul_comm (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
     marshallSignS A σ * marshallSignS A σ' =
       marshallSignS A σ' * marshallSignS A σ :=
   mul_comm _ _
-
-/-- Restated form: `marshallSignS A σ * marshallSignS A σ = 1`. -/
-theorem marshallSignS_mul_self (A : V → Bool) (σ : V → Fin (N + 1)) :
-    marshallSignS A σ * marshallSignS A σ = 1 :=
-  marshallSignS_sq A σ
 
 /-- The Marshall sign belongs to the set `{1, -1}`. -/
 theorem marshallSignS_mem_pm_one
