@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorExchange
+import LatticeSystem.Math.FinCases
 
 /-!
 # Tasaki 11.5: the single-site spin-raising operator is sign-free on the sector basis (Prop 11.24)
@@ -30,7 +31,7 @@ theorem tJConfigOf_update_raise (N : ℕ) (s : Fin (N + 1) → Fin 3) (x : Fin (
   funext k
   obtain ⟨t, r, rfl⟩ := exists_spinfulIndex N k
   simp only [Function.update_apply, spinfulIndex_eq_iff]
-  rcases (show r = 0 ∨ r = 1 from tJ_fin2_eq r) with rfl | rfl <;>
+  rcases (show r = 0 ∨ r = 1 from fin2_eq_zero_or_one r) with rfl | rfl <;>
     rcases eq_or_ne t x with rfl | htx <;>
     simp_all [tJConfigOf_apply_up, tJConfigOf_apply_down]
 

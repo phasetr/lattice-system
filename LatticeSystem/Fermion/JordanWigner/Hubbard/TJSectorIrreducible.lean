@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorShifted
+import LatticeSystem.Math.FinCases
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSwapReachable
 import LatticeSystem.Quantum.MarshallLiebMattis.MatrixPowExtend
 
@@ -28,9 +29,6 @@ open scoped BigOperators
 
 variable {N : ℕ}
 
-/-- A `Fin 3` value is `0`, `1`, or `2`. -/
-private theorem fin3_cases' (v : Fin 3) : v = 0 ∨ v = 1 ∨ v = 2 := by fin_cases v <;> simp
-
 /-- **The three value-counts partition the sites.**  Every site is empty, `↑`, or `↓`, so the
 counts sum to `N + 1`. -/
 theorem tJ_value_count_total (s : Fin (N + 1) → Fin 3) :
@@ -40,7 +38,7 @@ theorem tJ_value_count_total (s : Fin (N + 1) → Fin 3) :
   classical
   have h1 : ∀ k : Fin (N + 1),
       ((if s k = 0 then 1 else 0) + (if s k = 1 then 1 else 0)) + (if s k = 2 then (1 : ℕ) else 0)
-        = 1 := fun k => by rcases fin3_cases' (s k) with h | h | h <;> simp [h]
+        = 1 := fun k => by rcases fin3_eq_zero_or_one_or_two (s k) with h | h | h <;> simp [h]
   simp only [Finset.card_filter]
   rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
   trans (∑ _k : Fin (N + 1), 1)
@@ -57,7 +55,7 @@ theorem tJSector_same_counts (Ne : ℕ) (q p : TJSpinHalfFillingSector N Ne) (v 
   obtain ⟨hp1, hp2⟩ := p.property
   have htq := tJ_value_count_total q.val
   have htp := tJ_value_count_total p.val
-  rcases fin3_cases' v with rfl | rfl | rfl
+  rcases fin3_eq_zero_or_one_or_two v with rfl | rfl | rfl
   · omega
   · omega
   · omega

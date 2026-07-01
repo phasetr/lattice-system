@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJOccupationCount
+import LatticeSystem.Math.FinCases
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorHopBackward
 
 /-!
@@ -37,7 +38,7 @@ private theorem tJ_bwrap_le_eq_zero (N : ℕ) (s : Fin (N + 1) → Fin 3) (a : F
     rw [h2] at hk
     exact Fin.ext (by omega)
   subst hi
-  rcases tJ_fin2_eq r with rfl | rfl
+  rcases fin2_eq_zero_or_one r with rfl | rfl
   · rw [tJConfigOf_apply_up, if_neg (by rw [hsa]; decide)]; rfl
   · rw [tJConfigOf_apply_down, if_neg (by rw [hsa]; decide)]; rfl
 

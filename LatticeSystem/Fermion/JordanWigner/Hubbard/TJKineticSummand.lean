@@ -2,6 +2,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJKineticNonneg
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJKineticMatrixElement
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJOffDiagonal
 import LatticeSystem.Fermion.JordanWigner.Hubbard.TJSectorHopBackwardWrap
+import LatticeSystem.Math.FinCases
 
 /-!
 # Tasaki 11.5: each cyclic kinetic summand is `0` or `1` (Prop 11.24 PR-B7-3f)
@@ -28,16 +29,12 @@ open scoped BigOperators
 
 variable {N : ℕ}
 
-/-- A `Fin 3` site value is `0`, `1`, or `2`. -/
-theorem tJ_fin3_cases (v : Fin 3) : v = 0 ∨ v = 1 ∨ v = 2 := by
-  fin_cases v <;> simp
-
 /-- An occupied `σ`-orbital forces the site spin: `tJConfigOf s (spinfulIndex i σ) = 1` gives
 `s i = 1` for `σ = ↑` and `s i = 2` for `σ = ↓`. -/
 private theorem tJ_site_of_orbital (N : ℕ) (s : Fin (N + 1) → Fin 3) (i : Fin (N + 1)) (σ : Fin 2)
     (h : tJConfigOf N s (spinfulIndex N i σ) = 1) :
     s i = if σ = 0 then 1 else 2 := by
-  rcases tJ_fin2_eq σ with rfl | rfl
+  rcases fin2_eq_zero_or_one σ with rfl | rfl
   · rw [tJConfigOf_apply_up] at h; split at h
     · simpa using ‹s i = 1›
     · exact absurd h (by decide)
@@ -91,9 +88,9 @@ theorem tJ_kinetic_summand_zero_or_one (N : ℕ) (hpos : 0 < N) (s s' : Fin (N +
     rw [hcoup, one_mul]
     by_cases hsrc : tJConfigOf N s (spinfulIndex N j σ) = 1
     · have hsj : s j = if σ = 0 then 1 else 2 := tJ_site_of_orbital N s j σ hsrc
-      rcases tJ_fin3_cases (s i) with hsi0 | hsi1 | hsi2
+      rcases fin3_eq_zero_or_one_or_two (s i) with hsi0 | hsi1 | hsi2
       · -- target site empty: fully allowed
-        rcases tJ_fin2_eq σ with rfl | rfl
+        rcases fin2_eq_zero_or_one σ with rfl | rfl
         · rw [if_pos rfl] at hsj
           rcases cycleGraph_adj_val_cases N hpos i j hAdj with hd | hd | ⟨hiN, hj0⟩ | ⟨hjN, hi0v⟩
           · rw [tJ_uphop_backward_nn_matrixElement N s s' i j hd hsj hsi0]
@@ -114,7 +111,7 @@ theorem tJ_kinetic_summand_zero_or_one (N : ℕ) (hpos : 0 < N) (s s' : Fin (N +
               hodd]
             split_ifs <;> simp
       · -- target site ↑
-        rcases tJ_fin2_eq σ with rfl | rfl
+        rcases fin2_eq_zero_or_one σ with rfl | rfl
         · rw [tJ_hop_matrixElement_eq_zero_of_target N s s' i j 0 hij
             (by rw [tJConfigOf_apply_up, if_pos hsi1])]
           exact Or.inl rfl
@@ -122,7 +119,7 @@ theorem tJ_kinetic_summand_zero_or_one (N : ℕ) (hpos : 0 < N) (s s' : Fin (N +
             (by rw [tJConfigOf_apply_up, if_pos hsi1])]
           exact Or.inl rfl
       · -- target site ↓
-        rcases tJ_fin2_eq σ with rfl | rfl
+        rcases fin2_eq_zero_or_one σ with rfl | rfl
         · rw [tJ_hop_matrixElement_eq_zero_of_target_other N s s' i j 0 1 (by decide) hij
             (by rw [tJConfigOf_apply_down, if_pos hsi2])]
           exact Or.inl rfl
@@ -131,7 +128,7 @@ theorem tJ_kinetic_summand_zero_or_one (N : ℕ) (hpos : 0 < N) (s s' : Fin (N +
           exact Or.inl rfl
     · -- source empty
       have hsrc0 : tJConfigOf N s (spinfulIndex N j σ) = 0 := by
-        rcases tJ_fin2_eq σ with rfl | rfl
+        rcases fin2_eq_zero_or_one σ with rfl | rfl
         · rw [tJConfigOf_apply_up]; split
           · exact absurd (by rw [tJConfigOf_apply_up, if_pos ‹_›] at hsrc; exact hsrc) (by simp_all)
           · rfl

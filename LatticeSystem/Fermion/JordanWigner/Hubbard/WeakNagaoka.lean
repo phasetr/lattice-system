@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.EffectiveHamiltonianMatrix
+import LatticeSystem.Math.FinCases
 import Mathlib.Analysis.MeanInequalities
 
 /-!
@@ -124,12 +125,6 @@ theorem hubbardEffEnergy_expand (N : ℕ) (t : Fin (N + 1) → Fin (N + 1) → �
 
 /-! ## Bridge between configuration equality and the hole-move bijection -/
 
-/-- A `Fin 2` value is `0` or `1`. -/
-private theorem fin_two_cases' (r : Fin 2) : r = 0 ∨ r = 1 := by
-  rcases r with ⟨rv, hrv⟩; interval_cases rv
-  · exact Or.inl rfl
-  · exact Or.inr rfl
-
 /-- The one-hole configuration depends on the spin assignment only off the hole
 site. -/
 theorem oneHoleConfig_congr (N : ℕ) (x : Fin (N + 1)) (σ₁ σ₂ : Fin (N + 1) → Bool)
@@ -139,11 +134,11 @@ theorem oneHoleConfig_congr (N : ℕ) (x : Fin (N + 1)) (σ₁ σ₂ : Fin (N + 
   obtain ⟨z, r, rfl⟩ := exists_spinfulIndex N k
   by_cases hzx : z = x
   · subst hzx
-    rcases fin_two_cases' r with rfl | rfl
+    rcases fin2_eq_zero_or_one r with rfl | rfl
     · simp [hubbardOneHoleConfig_apply_up]
     · simp [hubbardOneHoleConfig_apply_down]
   · have hzx' : z.val ≠ x.val := fun hh => hzx (Fin.ext hh)
-    rcases fin_two_cases' r with rfl | rfl
+    rcases fin2_eq_zero_or_one r with rfl | rfl
     · rw [hubbardOneHoleConfig_apply_up, hubbardOneHoleConfig_apply_up, h z hzx]
     · rw [hubbardOneHoleConfig_apply_down, hubbardOneHoleConfig_apply_down, h z hzx]
 
