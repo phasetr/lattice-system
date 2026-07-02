@@ -12,8 +12,8 @@ ground vector of the **site-dependent attractive** Hamiltonian
 Hamiltonian).
 
 The existing fixed-sector machinery in `HubbardImpossibilityLowUVariationalCore.lean`
-(`hubbardSectorCompress`, `hubbardSectorExpansion`, the eigenvector lift
-`mulVec_hubbardSectorExpansion_of_compress_eigen`) is generic over any number-conserving operator.
+(`configSectorCompress`, `configSectorExpansion`, the eigenvector lift
+`configSectorExpansion_of_compress_eigen`) is generic over any number-conserving operator.
 This module supplies the missing charge-conservation input for the attractive Hamiltonian and
 instantiates the lift.
 
@@ -21,6 +21,10 @@ instantiates the lift.
 
 * `hubbardOnSiteInteractionSite_commute_fermionTotalNumber` — the site interaction conserves `N̂`.
 * `attractiveHubbardHamiltonian_commute_fermionTotalNumber` — the attractive `Ĥ` conserves `N̂`.
+* `fermionTotal{Up,Down}Number_commute_hubbardOnSiteInteractionSite` — the site interaction
+  conserves each spin number `N̂_↑`, `N̂_↓`.
+* `attractiveHubbardHamiltonian_commute_fermionTotal{Up,Down}Number` — the attractive `Ĥ`
+  conserves each spin number: `[Ĥ, N̂_↑] = [Ĥ, N̂_↓] = 0`.
 * `preservesHubbardSectorW_attractive` — `Ĥ` preserves the `Ne`-sector `W`-submodule.
 * `exists_attractive_sector_ground` — a nonzero `Ne`-sector eigenvector at the sector-compression
   minimum eigenvalue.
@@ -54,6 +58,56 @@ theorem attractiveHubbardHamiltonian_commute_fermionTotalNumber
   exact (hubbardKinetic_commute_fermionTotalNumber N _).add_left
     (hubbardOnSiteInteractionSite_commute_fermionTotalNumber _)
 
+/-- `N_↑` commutes with the site-dependent on-site interaction `Σ_x V_x n̂_{x,↑} n̂_{x,↓}`: every
+summand is a product of pairwise-commuting number operators (mirror of the uniform-coupling
+`fermionTotalUpNumber_commute_hubbardOnSiteInteraction`). -/
+theorem fermionTotalUpNumber_commute_hubbardOnSiteInteractionSite (V : Fin (N + 1) → ℂ) :
+    Commute (fermionTotalUpNumber N) (hubbardOnSiteInteractionSite N V) := by
+  unfold fermionTotalUpNumber hubbardOnSiteInteractionSite
+  refine Commute.sum_left _ _ _ (fun k _ => ?_)
+  refine Commute.sum_right _ _ _ (fun i _ => ?_)
+  refine Commute.smul_right ?_ (V i)
+  unfold fermionUpNumber fermionDownNumber
+  refine Commute.mul_right ?_ ?_
+  · exact fermionMultiNumber_commute (2 * N + 1)
+      (spinfulIndex N k 0) (spinfulIndex N i 0)
+  · exact fermionMultiNumber_commute (2 * N + 1)
+      (spinfulIndex N k 0) (spinfulIndex N i 1)
+
+/-- `N_↓` commutes with the site-dependent on-site interaction `Σ_x V_x n̂_{x,↑} n̂_{x,↓}` (mirror
+of the uniform-coupling `fermionTotalDownNumber_commute_hubbardOnSiteInteraction`). -/
+theorem fermionTotalDownNumber_commute_hubbardOnSiteInteractionSite (V : Fin (N + 1) → ℂ) :
+    Commute (fermionTotalDownNumber N) (hubbardOnSiteInteractionSite N V) := by
+  unfold fermionTotalDownNumber hubbardOnSiteInteractionSite
+  refine Commute.sum_left _ _ _ (fun k _ => ?_)
+  refine Commute.sum_right _ _ _ (fun i _ => ?_)
+  refine Commute.smul_right ?_ (V i)
+  unfold fermionUpNumber fermionDownNumber
+  refine Commute.mul_right ?_ ?_
+  · exact fermionMultiNumber_commute (2 * N + 1)
+      (spinfulIndex N k 1) (spinfulIndex N i 0)
+  · exact fermionMultiNumber_commute (2 * N + 1)
+      (spinfulIndex N k 1) (spinfulIndex N i 1)
+
+/-- The **attractive Hubbard Hamiltonian conserves the spin-up number**: `[Ĥ, N̂_↑] = 0`. Both the
+kinetic term and the site attraction commute with `N̂_↑` (mirror of
+`attractiveHubbardHamiltonian_commute_fermionTotalNumber`). -/
+theorem attractiveHubbardHamiltonian_commute_fermionTotalUpNumber
+    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : Fin (N + 1) → ℝ) :
+    Commute (attractiveHubbardHamiltonian N T U) (fermionTotalUpNumber N) := by
+  unfold attractiveHubbardHamiltonian attractiveHubbardInteraction
+  exact (fermionTotalUpNumber_commute_hubbardKinetic N _).symm.add_left
+    (fermionTotalUpNumber_commute_hubbardOnSiteInteractionSite _).symm
+
+/-- The **attractive Hubbard Hamiltonian conserves the spin-down number**: `[Ĥ, N̂_↓] = 0` (mirror
+of `attractiveHubbardHamiltonian_commute_fermionTotalNumber`). -/
+theorem attractiveHubbardHamiltonian_commute_fermionTotalDownNumber
+    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : Fin (N + 1) → ℝ) :
+    Commute (attractiveHubbardHamiltonian N T U) (fermionTotalDownNumber N) := by
+  unfold attractiveHubbardHamiltonian attractiveHubbardInteraction
+  exact (fermionTotalDownNumber_commute_hubbardKinetic N _).symm.add_left
+    (fermionTotalDownNumber_commute_hubbardOnSiteInteractionSite _).symm
+
 /-- The attractive Hamiltonian **preserves the `Ne`-sector `W`-submodule** — the reusable
 hypothesis of the eigenvector lift. -/
 theorem preservesHubbardSectorW_attractive (Ne : ℕ)
@@ -74,16 +128,19 @@ theorem exists_attractive_sector_ground (Ne : ℕ) [Nonempty (hubbardSectorConfi
     ∃ φ : (Fin (2 * N + 2) → Fin 2) → ℂ, φ ≠ 0
       ∧ (fermionTotalNumber (2 * N + 1)).mulVec φ = (Ne : ℂ) • φ
       ∧ (attractiveHubbardHamiltonian N T U).mulVec φ
-          = ((hermitianMinEigenvalue (hubbardSectorCompress_isHermitian Ne
+          = ((hermitianMinEigenvalue (configSectorCompress_isHermitian
+              (hubbardNumberSectorPred N Ne)
               (attractiveHubbardHamiltonian_isHermitian T U hT)) : ℝ) : ℂ) • φ := by
   classical
-  set hHW := hubbardSectorCompress_isHermitian Ne (attractiveHubbardHamiltonian_isHermitian T U hT)
-    with hHWd
+  set hHW := configSectorCompress_isHermitian (hubbardNumberSectorPred N Ne)
+    (attractiveHubbardHamiltonian_isHermitian T U hT) with hHWd
   obtain ⟨c, hc0, hceig⟩ := exists_nonzero_eigenvector_hermitianMinEigenvalue hHW
-  refine ⟨hubbardSectorExpansion N Ne c, hubbardSectorExpansion_ne_zero Ne hc0, ?_, ?_⟩
-  · have hmem := hubbardSectorExpansion_mem Ne c
-    rwa [mem_hubbardSectorWSubmodule_iff] at hmem
-  · exact mulVec_hubbardSectorExpansion_of_compress_eigen Ne
-      (preservesHubbardSectorW_attractive Ne T U) hceig
+  set Φ := configSectorExpansion N (hubbardNumberSectorPred N Ne) c with hΦ
+  have hΦW : Φ ∈ hubbardSectorWSubmodule N Ne := hubbardSectorExpansion_mem Ne c
+  refine ⟨Φ, configSectorExpansion_ne_zero (hubbardNumberSectorPred N Ne) hc0, ?_, ?_⟩
+  · rw [← mem_hubbardSectorWSubmodule_iff]; exact hΦW
+  · have hApres := hubbardNumberSector_supported_of_mem Ne
+      (preservesHubbardSectorW_attractive Ne T U Φ hΦW)
+    exact configSectorExpansion_of_compress_eigen (hubbardNumberSectorPred N Ne) hApres hceig
 
 end LatticeSystem.Fermion

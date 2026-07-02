@@ -9,8 +9,8 @@ sector `W = (N̂ = Ne)`-eigenspace is `Ĥ`-invariant (charge conservation), span
 computational basis vectors `|c⟩` over the `Ne`-electron configurations.  Compressing `Ĥ` to a
 matrix `Ĥ_W` in this orthonormal basis lets us run the finite-dimensional Rayleigh–Ritz argument:
 
-* `hubbardSectorCompress` — the matrix `Tᴴ Ĥ T` of `Ĥ` in the `Ne`-electron basis;
-* `rayleighOnVec_hubbardSectorCompress` — the Rayleigh bridge (operator Rayleigh of a lifted
+* `configSectorCompress` — the matrix `Tᴴ Ĥ T` of `Ĥ` in the `Ne`-electron basis;
+* `rayleighOnVec_configSectorCompress` — the Rayleigh bridge (operator Rayleigh of a lifted
   sector vector = matrix Rayleigh of the compression);
 * `hubbardSector_minEnergy_eigenspace_ne_bot` — the compression's minimum eigenvalue lifts to a
   genuine `Ĥ`-eigenvector in `W`, so `hubbardEigenspaceAt` at that energy is nonzero;

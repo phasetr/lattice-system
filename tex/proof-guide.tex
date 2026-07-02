@@ -6207,6 +6207,19 @@ using the converse $\texttt{mulVec\_eq\_smul\_number\_of\_apply\_eq\_zero}$ of t
 Consequently the Hermitian-$W$ ground representative strengthens to remain in the $Ne$-sector
 ($\texttt{exists\_hermitianW\_ground\_in\_sector}$).
 
+\medskip\noindent\textbf{The per-spin balanced $(\hat S^3=0)$ sector and Hermitian-$W$ ground (PR40e-pre2b, Tasaki §10.2.4, Lemma 10.9).}
+The SRP endgame requires the Hermitian-$W$ ground not just in the number-electron sector,
+but in the finer \emph{per-spin balanced} sector $\hat N_\uparrow = \hat N_\downarrow = k$ (total
+$\hat S^3 = 0$, electron number $2k$). The ground coefficient $W = \texttt{blockWCoeff}$ must
+be supported on the \emph{principal} square block $S_k \times S_k$ (not the anti-diagonal band of
+the plain number sector), enabling the connected-support dichotomy argument in the next step.
+Files \texttt{LiebAttractiveBalancedSectorGround.lean} and \texttt{LiebAttractiveBalancedThetaSector.lean}
+instantiate the generic sector-compression core $\texttt{configSector}*$ at the balanced predicate
+$P(c):=(\sum_i c_{i\uparrow}=k) \land (\sum_i c_{i\downarrow}=k)$, giving a balanced ground vector
+$\varphi$ ($\texttt{exists\_attractive\_balanced\_ground}$) and showing that the $\Gamma$-reflection
+preserves the balanced per-spin sector ($\texttt{gammaThetaVec\_preserves\_balanced}$), so the
+symmetrized Hermitian-$W$ ground stays balanced ($\texttt{exists\_hermitianW\_ground\_in\_balanced\_sector}$).
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}

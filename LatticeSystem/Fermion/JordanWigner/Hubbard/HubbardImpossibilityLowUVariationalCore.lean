@@ -17,13 +17,33 @@ import LatticeSystem.Math.ComplexVectorKernel
 
 Foundational layer extracted from `HubbardImpossibilityLowUVariational.lean` for build
 speed (Tasaki §11.4 / flat-band Hubbard variational impossibility).  This file develops
-the fixed-electron-number sector basis, the total down-number operator on eigenmode
-Slater determinants, and the interaction bound by the total down number
+the **predicate/support-based configuration-sector compression** (`configSector*`), the
+number-sector instance built on it, the total down-number operator on eigenmode Slater
+determinants, and the interaction bound by the total down number
 (`fermionTotalDownNumber_sub_onSiteInteraction_posSemidef`,
 `hubbardOnSiteInteraction_rayleigh_bounds`).
 
+The compression machinery is generic in a decidable configuration predicate `P`: the sector is
+`configSector N P = {c // P c}`, completeness is stated in **support** form (a vector supported on
+`P` equals its sector expansion), and the eigenvector lift only requires that the operator keeps its
+expansion `P`-supported.  Both the number sector (`P c := Σ_j c_j = Ne`) and the per-spin balanced
+sector (`P c := Σ_i c_{i↑} = k ∧ Σ_i c_{i↓} = k`) are instances; no compression machinery is
+duplicated across the two.
+
 The non-vanishing of the eigenmode Slater state and the trial-state Rayleigh quotient
 are kept in the capstone module `HubbardImpossibilityLowUVariational.lean`.
+
+## Main results
+
+* `configSector`, `configSectorEmbedding`, `configSectorExpansion`, `configSectorCoeff` — the
+  generic sector basis, embedding `T`, expansion `T·`, and coefficient functional `Tᴴ·`.
+* `configSector_completeness` — a `P`-supported vector equals its sector expansion `T (Tᴴ u)`.
+* `configSectorCompress`, `configSectorCompress_isHermitian`, `rayleighOnVec_configSectorCompress`
+  — the compression `Tᴴ A T`, its Hermiticity, and the Rayleigh bridge.
+* `configSectorExpansion_of_compress_eigen` — the eigenvector lift: if `A` keeps `T c` supported on
+  `P` and `c` is a compression eigenvector at `E`, then the lift is an `A`-eigenvector at `E`.
+* `hubbardSectorConfig`, `hubbardSector_minEnergy_eigenspace_ne_bot`,
+  `hubbardSector_minEnergy_mul_le_rayleighOnVec` — the number-sector instance (`P = Σ_j c_j = Ne`).
 -/
 
 namespace LatticeSystem.Fermion
@@ -34,96 +54,102 @@ open scoped ComplexOrder
 variable {N : ℕ}
 
 
-/-! ## The fixed-electron-number sector basis -/
+/-! ## The fixed-configuration sector basis (predicate/support-based) -/
+
+/-- **A configuration sector** for a decidable predicate `P` on Fock configurations
+`c : Fin (2N+2) → Fin 2`: the subtype `{c // P c}`.  Its computational basis vectors `|c⟩` (over the
+`c` satisfying `P`) form an orthonormal basis of the `P`-supported subspace. -/
+abbrev configSector (N : ℕ) (P : (Fin (2 * N + 2) → Fin 2) → Prop) :=
+  {c : Fin (2 * N + 2) → Fin 2 // P c}
+
+/-- **The number-sector predicate**: a Fock configuration `c` has total occupation `Ne`. -/
+abbrev hubbardNumberSectorPred (N Ne : ℕ) : (Fin (2 * N + 2) → Fin 2) → Prop :=
+  fun c => (∑ j : Fin (2 * N + 2), (c j).val) = Ne
 
 /-- **The `Ne`-electron configuration sector**: computational configurations
 `c : Fin (2N+2) → Fin 2` with total occupation `Σ_j c_j = Ne`.  Orthonormal basis of `W`. -/
-abbrev hubbardSectorConfig (N Ne : ℕ) :=
-  {c : Fin (2 * N + 2) → Fin 2 // (∑ j : Fin (2 * N + 2), (c j).val) = Ne}
+abbrev hubbardSectorConfig (N Ne : ℕ) := configSector N (hubbardNumberSectorPred N Ne)
 
-/-- **The sector embedding** `T : (W-coords) → (Fock)`: its column at the configuration `c` is the
-computational basis vector `|c⟩`. -/
-noncomputable def hubbardSectorEmbedding (N Ne : ℕ) :
-    Matrix (Fin (2 * N + 2) → Fin 2) (hubbardSectorConfig N Ne) ℂ :=
+/-- **The sector embedding** `T : (sector-coords) → (Fock)`: its column at the configuration `c` is
+the computational basis vector `|c⟩`. -/
+noncomputable def configSectorEmbedding (N : ℕ) (P : (Fin (2 * N + 2) → Fin 2) → Prop)
+    [DecidablePred P] :
+    Matrix (Fin (2 * N + 2) → Fin 2) (configSector N P) ℂ :=
   Matrix.of (fun w s => basisVec s.val w)
 
-/-- **The sector expansion** `Φ = Σ_c v_c |c⟩` over the `Ne`-electron basis. -/
-noncomputable def hubbardSectorExpansion (N Ne : ℕ) (v : hubbardSectorConfig N Ne → ℂ) :
+/-- **The sector expansion** `Φ = Σ_c v_c |c⟩` over the `P`-sector basis. -/
+noncomputable def configSectorExpansion (N : ℕ) (P : (Fin (2 * N + 2) → Fin 2) → Prop)
+    [DecidablePred P] (v : configSector N P → ℂ) :
     (Fin (2 * N + 2) → Fin 2) → ℂ :=
   ∑ s, v s • basisVec s.val
 
 /-- **The sector coefficient functional** `(Tᴴ u)_c = ⟨c, u⟩ = Σ_w |c⟩(w) · u(w)`. -/
-noncomputable def hubbardSectorCoeff (N Ne : ℕ) (u : (Fin (2 * N + 2) → Fin 2) → ℂ) :
-    hubbardSectorConfig N Ne → ℂ :=
+noncomputable def configSectorCoeff (N : ℕ) (P : (Fin (2 * N + 2) → Fin 2) → Prop)
+    [DecidablePred P] (u : (Fin (2 * N + 2) → Fin 2) → ℂ) :
+    configSector N P → ℂ :=
   fun s => ∑ w, basisVec s.val w * u w
 
 /-- `T` maps a coefficient vector to its sector expansion: `T u = Σ_s u_s |s⟩`. -/
-theorem hubbardSectorEmbedding_mulVec (Ne : ℕ) (u : hubbardSectorConfig N Ne → ℂ) :
-    (hubbardSectorEmbedding N Ne).mulVec u = hubbardSectorExpansion N Ne u := by
+theorem configSectorEmbedding_mulVec (P : (Fin (2 * N + 2) → Fin 2) → Prop) [DecidablePred P]
+    (u : configSector N P → ℂ) :
+    (configSectorEmbedding N P).mulVec u = configSectorExpansion N P u := by
   funext w
-  unfold hubbardSectorEmbedding hubbardSectorExpansion
+  unfold configSectorEmbedding configSectorExpansion
   rw [Matrix.mulVec, dotProduct, Finset.sum_apply]
   exact Finset.sum_congr rfl (fun s _ => by
     rw [Matrix.of_apply, Pi.smul_apply, smul_eq_mul, mul_comm])
 
 /-- `Tᴴ` maps a Fock vector to its sector coefficient functional: `(Tᴴ v)_s = ⟨s, v⟩`. -/
-theorem hubbardSectorEmbedding_conjTranspose_mulVec (Ne : ℕ)
-    (v : (Fin (2 * N + 2) → Fin 2) → ℂ) :
-    (hubbardSectorEmbedding N Ne)ᴴ.mulVec v = hubbardSectorCoeff N Ne v := by
+theorem configSectorEmbedding_conjTranspose_mulVec (P : (Fin (2 * N + 2) → Fin 2) → Prop)
+    [DecidablePred P] (v : (Fin (2 * N + 2) → Fin 2) → ℂ) :
+    (configSectorEmbedding N P)ᴴ.mulVec v = configSectorCoeff N P v := by
   funext s
-  unfold hubbardSectorCoeff
+  unfold configSectorCoeff
   rw [Matrix.mulVec, dotProduct]
   refine Finset.sum_congr rfl (fun w _ => ?_)
-  rw [Matrix.conjTranspose_apply, hubbardSectorEmbedding, Matrix.of_apply,
+  rw [Matrix.conjTranspose_apply, configSectorEmbedding, Matrix.of_apply,
     show star (basisVec s.val w) = basisVec s.val w from by rw [basisVec_apply]; split <;> simp]
 
-/-- The configuration of a vector `w`, recording its total occupation as the sector index proof when
-`Σ_j w_j = Ne`. -/
-theorem hubbardSectorConfig_of_count (N Ne : ℕ) (w : Fin (2 * N + 2) → Fin 2)
-    (hw : (∑ j : Fin (2 * N + 2), ((w j).val : ℂ)) = (Ne : ℂ)) :
-    (∑ j : Fin (2 * N + 2), (w j).val) = Ne := by
-  exact_mod_cast hw
-
-/-- **Completeness of the sector basis.**  An `N̂ = Ne` eigenvector equals its sector expansion
-`T (Tᴴ u)`.  The number sector is spanned by the `Ne`-electron computational basis vectors, on which
-a number eigenstate is supported. -/
-theorem hubbardSector_completeness (Ne : ℕ) (u : (Fin (2 * N + 2) → Fin 2) → ℂ)
-    (hN : (fermionTotalNumber (2 * N + 1)).mulVec u = (Ne : ℂ) • u) :
-    u = hubbardSectorExpansion N Ne (hubbardSectorCoeff N Ne u) := by
+/-- **Completeness of the sector basis.**  A vector `u` supported on the sector (`u w = 0` whenever
+`¬ P w`) equals its sector expansion `T (Tᴴ u)`; the sector is spanned by the computational basis
+vectors on which such a vector is supported. -/
+theorem configSector_completeness (P : (Fin (2 * N + 2) → Fin 2) → Prop) [DecidablePred P]
+    (u : (Fin (2 * N + 2) → Fin 2) → ℂ) (hsupp : ∀ w, ¬ P w → u w = 0) :
+    u = configSectorExpansion N P (configSectorCoeff N P u) := by
   funext w
-  unfold hubbardSectorExpansion hubbardSectorCoeff
+  unfold configSectorExpansion configSectorCoeff
   rw [Finset.sum_apply]
-  by_cases hw : (∑ j : Fin (2 * N + 2), ((w j).val : ℂ)) = (Ne : ℂ)
-  · set s₀ : hubbardSectorConfig N Ne := ⟨w, hubbardSectorConfig_of_count N Ne w hw⟩ with hs₀
+  by_cases hw : P w
+  · set s₀ : configSector N P := ⟨w, hw⟩ with hs₀
     rw [Finset.sum_eq_single s₀]
     · rw [Pi.smul_apply, smul_eq_mul, hs₀, basisVec_apply, if_pos rfl, mul_one, basisVec_sum_mul]
     · intro s _ hss₀
       rw [Pi.smul_apply, smul_eq_mul, basisVec_apply,
         if_neg (fun h => hss₀ (Subtype.ext (by rw [hs₀]; exact h.symm))), mul_zero]
     · intro h; exact absurd (Finset.mem_univ s₀) h
-  · rw [mulVec_apply_eq_zero_of_number_ne N u (Ne : ℂ) hN w hw]
+  · rw [hsupp w hw]
     refine (Finset.sum_eq_zero fun s _ => ?_).symm
-    have hsc : (∑ j : Fin (2 * N + 2), ((s.val j).val : ℂ)) = (Ne : ℂ) := by
-      exact_mod_cast s.property
     rw [Pi.smul_apply, smul_eq_mul, basisVec_apply,
-      if_neg (fun h => hw (by rw [h]; exact hsc)), mul_zero]
+      if_neg (fun h => hw (by rw [h]; exact s.property)), mul_zero]
 
 /-! ## The sector compression and its Rayleigh bridge -/
 
-/-- **The `W`-compression** `compress(A) = Tᴴ A T`: the matrix of `A` in the `Ne`-electron basis. -/
-noncomputable def hubbardSectorCompress (N Ne : ℕ) (A : ManyBodyOp (Fin (2 * N + 2))) :
-    Matrix (hubbardSectorConfig N Ne) (hubbardSectorConfig N Ne) ℂ :=
-  (hubbardSectorEmbedding N Ne)ᴴ * A * hubbardSectorEmbedding N Ne
+/-- **The sector compression** `compress(A) = Tᴴ A T`: the matrix of `A` in the `P`-sector basis. -/
+noncomputable def configSectorCompress (N : ℕ) (P : (Fin (2 * N + 2) → Fin 2) → Prop)
+    [DecidablePred P] (A : ManyBodyOp (Fin (2 * N + 2))) :
+    Matrix (configSector N P) (configSector N P) ℂ :=
+  (configSectorEmbedding N P)ᴴ * A * configSectorEmbedding N P
 
 /-- **The sector embedding has orthonormal columns:** `Tᴴ T = 1`. -/
-theorem hubbardSectorEmbedding_conjTranspose_mul_self (Ne : ℕ) :
-    (hubbardSectorEmbedding N Ne)ᴴ * hubbardSectorEmbedding N Ne = 1 := by
+theorem configSectorEmbedding_conjTranspose_mul_self (P : (Fin (2 * N + 2) → Fin 2) → Prop)
+    [DecidablePred P] :
+    (configSectorEmbedding N P)ᴴ * configSectorEmbedding N P = 1 := by
   ext s s'
   rw [Matrix.mul_apply]
-  rw [show (∑ w, (hubbardSectorEmbedding N Ne)ᴴ s w * hubbardSectorEmbedding N Ne w s')
+  rw [show (∑ w, (configSectorEmbedding N P)ᴴ s w * configSectorEmbedding N P w s')
       = ∑ w, basisVec s.val w * basisVec s'.val w from by
     refine Finset.sum_congr rfl (fun w _ => ?_)
-    rw [Matrix.conjTranspose_apply, hubbardSectorEmbedding, Matrix.of_apply, Matrix.of_apply,
+    rw [Matrix.conjTranspose_apply, configSectorEmbedding, Matrix.of_apply, Matrix.of_apply,
       show star (basisVec s.val w) = basisVec s.val w from by rw [basisVec_apply]; split <;> simp]]
   rw [basisVec_inner, Matrix.one_apply]
   by_cases h : s = s'
@@ -131,42 +157,96 @@ theorem hubbardSectorEmbedding_conjTranspose_mul_self (Ne : ℕ) :
   · rw [if_neg (fun hc => h (Subtype.ext hc.symm)), if_neg h]
 
 /-- **The sector embedding is an isometry:** `⟨T c, T c⟩ = ⟨c, c⟩`. -/
-theorem hubbardSectorExpansion_dotProduct_self (Ne : ℕ) (c : hubbardSectorConfig N Ne → ℂ) :
-    dotProduct (star (hubbardSectorExpansion N Ne c)) (hubbardSectorExpansion N Ne c) =
+theorem configSectorExpansion_dotProduct_self (P : (Fin (2 * N + 2) → Fin 2) → Prop)
+    [DecidablePred P] (c : configSector N P → ℂ) :
+    dotProduct (star (configSectorExpansion N P c)) (configSectorExpansion N P c) =
       dotProduct (star c) c := by
-  rw [← hubbardSectorEmbedding_mulVec,
-    star_mulVec_dotProduct (hubbardSectorEmbedding N Ne) c
-      ((hubbardSectorEmbedding N Ne).mulVec c),
-    Matrix.mulVec_mulVec, hubbardSectorEmbedding_conjTranspose_mul_self, Matrix.one_mulVec]
+  rw [← configSectorEmbedding_mulVec,
+    star_mulVec_dotProduct (configSectorEmbedding N P) c
+      ((configSectorEmbedding N P).mulVec c),
+    Matrix.mulVec_mulVec, configSectorEmbedding_conjTranspose_mul_self, Matrix.one_mulVec]
 
 /-- **The Rayleigh bridge.** The operator Rayleigh quotient of `A` on a lifted sector vector equals
-the matrix Rayleigh quotient of its compression `Ĥ_W = Tᴴ A T`. -/
-theorem rayleighOnVec_hubbardSectorCompress (Ne : ℕ) (A : ManyBodyOp (Fin (2 * N + 2)))
-    (c : hubbardSectorConfig N Ne → ℂ) :
-    rayleighOnVec (hubbardSectorCompress N Ne A) c =
-      rayleighOnVec A (hubbardSectorExpansion N Ne c) := by
-  have hmv : (hubbardSectorCompress N Ne A).mulVec c
-      = (hubbardSectorEmbedding N Ne)ᴴ.mulVec
-          (A.mulVec ((hubbardSectorEmbedding N Ne).mulVec c)) := by
-    unfold hubbardSectorCompress
+the matrix Rayleigh quotient of its compression `A_W = Tᴴ A T`. -/
+theorem rayleighOnVec_configSectorCompress (P : (Fin (2 * N + 2) → Fin 2) → Prop) [DecidablePred P]
+    (A : ManyBodyOp (Fin (2 * N + 2))) (c : configSector N P → ℂ) :
+    rayleighOnVec (configSectorCompress N P A) c =
+      rayleighOnVec A (configSectorExpansion N P c) := by
+  have hmv : (configSectorCompress N P A).mulVec c
+      = (configSectorEmbedding N P)ᴴ.mulVec
+          (A.mulVec ((configSectorEmbedding N P).mulVec c)) := by
+    unfold configSectorCompress
     rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
-  have key : dotProduct (star c) ((hubbardSectorCompress N Ne A).mulVec c)
-      = dotProduct (star (hubbardSectorExpansion N Ne c))
-          (A.mulVec (hubbardSectorExpansion N Ne c)) := by
-    rw [hmv, (star_mulVec_dotProduct _ c _).symm, hubbardSectorEmbedding_mulVec]
+  have key : dotProduct (star c) ((configSectorCompress N P A).mulVec c)
+      = dotProduct (star (configSectorExpansion N P c))
+          (A.mulVec (configSectorExpansion N P c)) := by
+    rw [hmv, (star_mulVec_dotProduct _ c _).symm, configSectorEmbedding_mulVec]
   unfold rayleighOnVec
   rw [key]
 
 /-- **Hermiticity of the compression.** If `A` is Hermitian, so is its sector compression
 `Tᴴ A T`. -/
-theorem hubbardSectorCompress_isHermitian (Ne : ℕ) {A : ManyBodyOp (Fin (2 * N + 2))}
-    (hA : A.IsHermitian) :
-    (hubbardSectorCompress N Ne A).IsHermitian := by
-  unfold hubbardSectorCompress Matrix.IsHermitian
+theorem configSectorCompress_isHermitian (P : (Fin (2 * N + 2) → Fin 2) → Prop) [DecidablePred P]
+    {A : ManyBodyOp (Fin (2 * N + 2))} (hA : A.IsHermitian) :
+    (configSectorCompress N P A).IsHermitian := by
+  unfold configSectorCompress Matrix.IsHermitian
   rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,
     hA.eq, Matrix.mul_assoc]
 
-/-! ## Lifting sector eigenvectors to the number sector `W` -/
+/-! ## Lifting sector eigenvectors -/
+
+/-- **Projection identity (support form).** `T Tᴴ` acts as the identity on `P`-supported vectors:
+`T Tᴴ v = v` whenever `v w = 0` for all `w` with `¬ P w` (resolution of identity over the
+orthonormal sector basis). -/
+theorem configSectorProjection_mulVec_eq_of_supported (P : (Fin (2 * N + 2) → Fin 2) → Prop)
+    [DecidablePred P] {v : (Fin (2 * N + 2) → Fin 2) → ℂ} (hsupp : ∀ w, ¬ P w → v w = 0) :
+    (configSectorEmbedding N P * (configSectorEmbedding N P)ᴴ).mulVec v = v := by
+  rw [← Matrix.mulVec_mulVec, configSectorEmbedding_conjTranspose_mulVec,
+    configSectorEmbedding_mulVec]
+  exact (configSector_completeness P v hsupp).symm
+
+/-- **Eigenvector lift (support form).** If `A` keeps the lift `T c` supported on `P` and `c` is an
+eigenvector of the compression `compress(A)` at `E`, then the lift `configSectorExpansion c` is an
+eigenvector of `A` at `E`. -/
+theorem configSectorExpansion_of_compress_eigen (P : (Fin (2 * N + 2) → Fin 2) → Prop)
+    [DecidablePred P] {A : ManyBodyOp (Fin (2 * N + 2))} {c : configSector N P → ℂ} {E : ℂ}
+    (hApres : ∀ w, ¬ P w → A.mulVec (configSectorExpansion N P c) w = 0)
+    (hE : (configSectorCompress N P A).mulVec c = E • c) :
+    A.mulVec (configSectorExpansion N P c) = E • configSectorExpansion N P c := by
+  have hinner : (configSectorEmbedding N P)ᴴ.mulVec
+      (A.mulVec ((configSectorEmbedding N P).mulVec c))
+        = (configSectorCompress N P A).mulVec c := by
+    unfold configSectorCompress
+    rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
+  rw [← configSectorProjection_mulVec_eq_of_supported P hApres, ← configSectorEmbedding_mulVec,
+    ← Matrix.mulVec_mulVec, hinner, hE, Matrix.mulVec_smul]
+
+/-- A nonzero sector coefficient vector lifts to a nonzero vector (isometry). -/
+theorem configSectorExpansion_ne_zero (P : (Fin (2 * N + 2) → Fin 2) → Prop) [DecidablePred P]
+    {c : configSector N P → ℂ} (hc : c ≠ 0) : configSectorExpansion N P c ≠ 0 := by
+  intro h
+  apply hc
+  have hiso := configSectorExpansion_dotProduct_self P c
+  rw [h, star_zero, zero_dotProduct] at hiso
+  -- `hiso : 0 = Σ_s conj(c s) * c s`; each summand has nonneg real part, so all `c s = 0`.
+  funext s
+  have hsum : (∑ s', (starRingEnd ℂ) (c s') * c s') = 0 := by
+    rw [← hiso.symm]; rfl
+  have hnn : ∀ s' ∈ (Finset.univ : Finset (configSector N P)),
+      0 ≤ (Complex.normSq (c s') : ℝ) := fun s' _ => Complex.normSq_nonneg _
+  have hre : (∑ s', Complex.normSq (c s')) = 0 := by
+    have : (∑ s', (starRingEnd ℂ) (c s') * c s') = ((∑ s', Complex.normSq (c s') : ℝ) : ℂ) := by
+      push_cast
+      refine Finset.sum_congr rfl (fun s' _ => ?_)
+      rw [Complex.normSq_eq_conj_mul_self]
+    rw [this] at hsum
+    exact_mod_cast hsum
+  have hzero : Complex.normSq (c s) = 0 :=
+    (Finset.sum_eq_zero_iff_of_nonneg hnn).mp hre s (Finset.mem_univ s)
+  rw [Pi.zero_apply, ← Complex.normSq_eq_zero]
+  exact hzero
+
+/-! ## The number sector `W` as an `N̂`-eigenspace -/
 
 /-- The number sector `W = (N̂ = Ne)`-eigenspace, as a submodule. -/
 noncomputable def hubbardSectorWSubmodule (N Ne : ℕ) :
@@ -186,23 +266,13 @@ theorem basisVec_sector_mem (Ne : ℕ) (s : hubbardSectorConfig N Ne) :
   rw [show (∑ j : Fin (2 * N + 2), ((s.val j).val : ℂ)) = (Ne : ℂ) from by
     rw [← Nat.cast_sum]; exact_mod_cast congrArg (Nat.cast : ℕ → ℂ) s.property]
 
-/-- A sector expansion lies in `W` (a sum of `W`-members). -/
+/-- A number-sector expansion lies in `W` (a sum of `W`-members). -/
 theorem hubbardSectorExpansion_mem (Ne : ℕ) (v : hubbardSectorConfig N Ne → ℂ) :
-    hubbardSectorExpansion N Ne v ∈ hubbardSectorWSubmodule N Ne := by
-  unfold hubbardSectorExpansion
+    configSectorExpansion N (hubbardNumberSectorPred N Ne) v ∈ hubbardSectorWSubmodule N Ne := by
+  unfold configSectorExpansion
   exact Submodule.sum_mem _ (fun s _ => Submodule.smul_mem _ _ (basisVec_sector_mem Ne s))
 
-/-- **Projection identity.** `T Tᴴ` acts as the identity on `W`: `T Tᴴ v = v` for `v ∈ W`
-(resolution of identity over the orthonormal `Ne`-electron basis). -/
-theorem hubbardSectorProjection_mulVec_eq_of_mem (Ne : ℕ)
-    {v : (Fin (2 * N + 2) → Fin 2) → ℂ} (h : v ∈ hubbardSectorWSubmodule N Ne) :
-    (hubbardSectorEmbedding N Ne * (hubbardSectorEmbedding N Ne)ᴴ).mulVec v = v := by
-  rw [← Matrix.mulVec_mulVec, hubbardSectorEmbedding_conjTranspose_mulVec,
-    hubbardSectorEmbedding_mulVec]
-  rw [mem_hubbardSectorWSubmodule_iff] at h
-  exact (hubbardSector_completeness Ne v h).symm
-
-/-- **`B` preserves `W`.** The reusable hypothesis of the eigenvector lift. -/
+/-- **`B` preserves `W`.** The reusable hypothesis for the number-sector eigenvector lift. -/
 def PreservesHubbardSectorW (N Ne : ℕ) (B : ManyBodyOp (Fin (2 * N + 2))) : Prop :=
   ∀ v ∈ hubbardSectorWSubmodule N Ne, B.mulVec v ∈ hubbardSectorWSubmodule N Ne
 
@@ -216,72 +286,43 @@ theorem preservesHubbardSectorW_hamiltonian (Ne : ℕ)
     ← (hubbardHamiltonian_commute_fermionTotalNumber N t U).eq,
     ← Matrix.mulVec_mulVec, hv, Matrix.mulVec_smul]
 
-/-- **Eigenvector lift.** If `A` preserves `W` and `Φ` is an eigenvector of the compression
-`compress(A)` at `E`, then the lift `hubbardSectorExpansion Φ` is an eigenvector of `A` at `E`. -/
-theorem mulVec_hubbardSectorExpansion_of_compress_eigen (Ne : ℕ)
-    {A : ManyBodyOp (Fin (2 * N + 2))} (hA : PreservesHubbardSectorW N Ne A)
-    {Φ : hubbardSectorConfig N Ne → ℂ} {E : ℂ}
-    (hE : (hubbardSectorCompress N Ne A).mulVec Φ = E • Φ) :
-    A.mulVec (hubbardSectorExpansion N Ne Φ) = E • hubbardSectorExpansion N Ne Φ := by
-  have hAW := hA _ (hubbardSectorExpansion_mem Ne Φ)
-  have hinner : (hubbardSectorEmbedding N Ne)ᴴ.mulVec
-      (A.mulVec ((hubbardSectorEmbedding N Ne).mulVec Φ))
-        = (hubbardSectorCompress N Ne A).mulVec Φ := by
-    unfold hubbardSectorCompress
-    rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
-  rw [← hubbardSectorProjection_mulVec_eq_of_mem Ne hAW, ← hubbardSectorEmbedding_mulVec,
-    ← Matrix.mulVec_mulVec, hinner, hE, Matrix.mulVec_smul]
+/-- The `P`-support of a number-sector member: a `W`-vector vanishes off the `Ne`-shell. -/
+theorem hubbardNumberSector_supported_of_mem (Ne : ℕ)
+    {v : (Fin (2 * N + 2) → Fin 2) → ℂ} (hv : v ∈ hubbardSectorWSubmodule N Ne)
+    (w : Fin (2 * N + 2) → Fin 2) (hw : ¬ hubbardNumberSectorPred N Ne w) : v w = 0 := by
+  rw [mem_hubbardSectorWSubmodule_iff] at hv
+  exact mulVec_apply_eq_zero_of_number_ne N v (Ne : ℂ) hv w
+    (fun hcast => hw (by exact_mod_cast hcast))
 
-/-! ## The sector minimum energy and its eigenspace -/
+/-! ## The number-sector minimum energy and its eigenspace -/
 
-/-- A nonzero sector coefficient vector lifts to a nonzero `W`-vector (isometry). -/
-theorem hubbardSectorExpansion_ne_zero (Ne : ℕ) {c : hubbardSectorConfig N Ne → ℂ} (hc : c ≠ 0) :
-    hubbardSectorExpansion N Ne c ≠ 0 := by
-  intro h
-  apply hc
-  have hiso := hubbardSectorExpansion_dotProduct_self Ne c
-  rw [h, star_zero, zero_dotProduct] at hiso
-  -- `hiso : 0 = Σ_s conj(c s) * c s`; each summand has nonneg real part, so all `c s = 0`.
-  funext s
-  have hsum : (∑ s', (starRingEnd ℂ) (c s') * c s') = 0 := by
-    rw [← hiso.symm]; rfl
-  have hnn : ∀ s' ∈ (Finset.univ : Finset (hubbardSectorConfig N Ne)),
-      0 ≤ (Complex.normSq (c s') : ℝ) := fun s' _ => Complex.normSq_nonneg _
-  have hre : (∑ s', Complex.normSq (c s')) = 0 := by
-    have : (∑ s', (starRingEnd ℂ) (c s') * c s') = ((∑ s', Complex.normSq (c s') : ℝ) : ℂ) := by
-      push_cast
-      refine Finset.sum_congr rfl (fun s' _ => ?_)
-      rw [Complex.normSq_eq_conj_mul_self]
-    rw [this] at hsum
-    exact_mod_cast hsum
-  have hzero : Complex.normSq (c s) = 0 :=
-    (Finset.sum_eq_zero_iff_of_nonneg hnn).mp hre s (Finset.mem_univ s)
-  rw [Pi.zero_apply, ← Complex.normSq_eq_zero]
-  exact hzero
-
-/-- **The sector minimum energy supplies a nonzero `Ne`-electron eigenspace.** For a Hermitian
-`hopping`/real-`U` Hubbard model, the compression `Ĥ_W`'s minimum eigenvalue `E_min` is attained by
-a genuine `Ĥ`-eigenvector in the `Ne`-electron sector, so the `Ĥ`-eigenspace at `E_min`
+/-- **The number-sector minimum energy supplies a nonzero `Ne`-electron eigenspace.** For a
+Hermitian `hopping`/real-`U` Hubbard model, the compression `Ĥ_W`'s minimum eigenvalue `E_min` is
+attained by a genuine `Ĥ`-eigenvector in the `Ne`-electron sector, so the `Ĥ`-eigenspace at `E_min`
 intersected with that sector is nonzero. -/
 theorem hubbardSector_minEnergy_eigenspace_ne_bot (Ne : ℕ)
     [Nonempty (hubbardSectorConfig N Ne)]
     {t : Fin (N + 1) → Fin (N + 1) → ℂ} {U : ℂ}
     (ht : ∀ i j, star (t i j) = t j i) (hU : star U = U) :
-    ∃ E : ℂ, E = ((hermitianMinEigenvalue (hubbardSectorCompress_isHermitian Ne
-        (hubbardHamiltonian_isHermitian N ht hU)) : ℝ) : ℂ) ∧
+    ∃ E : ℂ, E = ((hermitianMinEigenvalue (configSectorCompress_isHermitian
+        (hubbardNumberSectorPred N Ne) (hubbardHamiltonian_isHermitian N ht hU)) : ℝ) : ℂ) ∧
       Module.End.eigenspace (hubbardHamiltonian N t U).mulVecLin E ⊓
         Module.End.eigenspace (fermionTotalNumber (2 * N + 1)).mulVecLin (Ne : ℂ) ≠ ⊥ := by
   classical
-  set hHW := hubbardSectorCompress_isHermitian Ne (hubbardHamiltonian_isHermitian N ht hU) with hHWd
+  set hHW := configSectorCompress_isHermitian (hubbardNumberSectorPred N Ne)
+    (hubbardHamiltonian_isHermitian N ht hU) with hHWd
   obtain ⟨c, hc0, hceig⟩ := exists_nonzero_eigenvector_hermitianMinEigenvalue hHW
   set E : ℂ := ((hermitianMinEigenvalue hHW : ℝ) : ℂ) with hE
   refine ⟨E, rfl, ?_⟩
-  set Φ := hubbardSectorExpansion N Ne c with hΦ
-  have hΦ0 : Φ ≠ 0 := hubbardSectorExpansion_ne_zero Ne hc0
-  have hΦeig : (hubbardHamiltonian N t U).mulVec Φ = E • Φ :=
-    mulVec_hubbardSectorExpansion_of_compress_eigen Ne
-      (preservesHubbardSectorW_hamiltonian Ne t U) hceig
+  set Φ := configSectorExpansion N (hubbardNumberSectorPred N Ne) c with hΦ
+  have hΦ0 : Φ ≠ 0 := configSectorExpansion_ne_zero (hubbardNumberSectorPred N Ne) hc0
   have hΦW : Φ ∈ hubbardSectorWSubmodule N Ne := hubbardSectorExpansion_mem Ne c
+  have hApres : ∀ w, ¬ hubbardNumberSectorPred N Ne w →
+      (hubbardHamiltonian N t U).mulVec Φ w = 0 :=
+    hubbardNumberSector_supported_of_mem Ne
+      (preservesHubbardSectorW_hamiltonian Ne t U Φ hΦW)
+  have hΦeig : (hubbardHamiltonian N t U).mulVec Φ = E • Φ :=
+    configSectorExpansion_of_compress_eigen (hubbardNumberSectorPred N Ne) hApres hceig
   rw [mem_hubbardSectorWSubmodule_iff] at hΦW
   intro hbot
   apply hΦ0
@@ -293,28 +334,33 @@ theorem hubbardSector_minEnergy_eigenspace_ne_bot (Ne : ℕ)
   rw [hbot, Submodule.mem_bot] at hmem
   exact hmem
 
-/-- **Variational lower bound on the sector.** Any `Ne`-electron vector `v` has Rayleigh quotient at
-least `E_min · ‖v‖²`, where `E_min` is the compression's minimum eigenvalue. -/
+/-- **Variational lower bound on the number sector.** Any `Ne`-electron vector `v` has Rayleigh
+quotient at least `E_min · ‖v‖²`, where `E_min` is the compression's minimum eigenvalue. -/
 theorem hubbardSector_minEnergy_mul_le_rayleighOnVec
     (Ne : ℕ) [Nonempty (hubbardSectorConfig N Ne)]
     {t : Fin (N + 1) → Fin (N + 1) → ℂ} {U : ℂ}
     (ht : ∀ i j, star (t i j) = t j i) (hU : star U = U)
     {v : (Fin (2 * N + 2) → Fin 2) → ℂ}
     (hv : (fermionTotalNumber (2 * N + 1)).mulVec v = (Ne : ℂ) • v) :
-    (hermitianMinEigenvalue (hubbardSectorCompress_isHermitian Ne
+    (hermitianMinEigenvalue (configSectorCompress_isHermitian (hubbardNumberSectorPred N Ne)
         (hubbardHamiltonian_isHermitian N ht hU))) * (dotProduct (star v) v).re ≤
       rayleighOnVec (hubbardHamiltonian N t U) v := by
-  set hHW := hubbardSectorCompress_isHermitian Ne (hubbardHamiltonian_isHermitian N ht hU) with hHWd
-  set c := hubbardSectorCoeff N Ne v with hc
-  have hexp : v = hubbardSectorExpansion N Ne c := hubbardSector_completeness Ne v hv
+  set hHW := configSectorCompress_isHermitian (hubbardNumberSectorPred N Ne)
+    (hubbardHamiltonian_isHermitian N ht hU) with hHWd
+  set c := configSectorCoeff N (hubbardNumberSectorPred N Ne) v with hc
+  have hsupp : ∀ w, ¬ hubbardNumberSectorPred N Ne w → v w = 0 :=
+    hubbardNumberSector_supported_of_mem Ne ((mem_hubbardSectorWSubmodule_iff Ne).mpr hv)
+  have hexp : v = configSectorExpansion N (hubbardNumberSectorPred N Ne) c :=
+    configSector_completeness (hubbardNumberSectorPred N Ne) v hsupp
   have hcc : (dotProduct (star c) c).re = (dotProduct (star v) v).re := by
-    rw [hc, ← hubbardSectorExpansion_dotProduct_self Ne, ← hexp]
+    rw [hc, ← configSectorExpansion_dotProduct_self (hubbardNumberSectorPred N Ne), ← hexp]
   have hvar := hermitianMinEigenvalue_mul_dotProduct_re_le_rayleighOnVec hHW c
   rw [hcc] at hvar
   calc hermitianMinEigenvalue hHW * (dotProduct (star v) v).re
-      ≤ rayleighOnVec (hubbardSectorCompress N Ne (hubbardHamiltonian N t U)) c := hvar
+      ≤ rayleighOnVec (configSectorCompress N (hubbardNumberSectorPred N Ne)
+          (hubbardHamiltonian N t U)) c := hvar
     _ = rayleighOnVec (hubbardHamiltonian N t U) v := by
-        rw [rayleighOnVec_hubbardSectorCompress, ← hexp]
+        rw [rayleighOnVec_configSectorCompress, ← hexp]
 
 /-! ## The total down-number on an eigenmode Slater determinant -/
 
