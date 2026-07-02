@@ -50,18 +50,6 @@ theorem magSumS_real_nonneg (σ : Λ → Fin (N + 1)) :
   exact_mod_cast magSumS_nonneg σ
 
 omit [DecidableEq Λ] in
-/-- The cast `(magSumS σ : ℂ).re = (magSumS σ : ℝ)`. -/
-theorem magSumS_complex_re (σ : Λ → Fin (N + 1)) :
-    ((magSumS σ : ℂ)).re = (magSumS σ : ℝ) := by
-  simp
-
-omit [DecidableEq Λ] in
-/-- The cast `(magSumS σ : ℂ).im = 0`. -/
-theorem magSumS_complex_im (σ : Λ → Fin (N + 1)) :
-    ((magSumS σ : ℂ)).im = 0 := by
-  simp
-
-omit [DecidableEq Λ] in
 /-- `magSumS σ ≤ |Λ| · N`. -/
 theorem magSumS_le (σ : Λ → Fin (N + 1)) :
     magSumS σ ≤ Fintype.card Λ * N := by
@@ -129,38 +117,6 @@ theorem mem_magSubspaceS_iff (M : ℂ) (v : (Λ → Fin (N + 1)) → ℂ) :
 theorem zero_mem_magSubspaceS (M : ℂ) :
     (0 : (Λ → Fin (N + 1)) → ℂ) ∈ magSubspaceS Λ N M :=
   (magSubspaceS Λ N M).zero_mem
-
-/-- Sum-membership for the magnetization subspace. -/
-theorem add_mem_magSubspaceS (M : ℂ) {v w : (Λ → Fin (N + 1)) → ℂ}
-    (hv : v ∈ magSubspaceS Λ N M) (hw : w ∈ magSubspaceS Λ N M) :
-    v + w ∈ magSubspaceS Λ N M :=
-  (magSubspaceS Λ N M).add_mem hv hw
-
-/-- Scalar multiplication membership. -/
-theorem smul_mem_magSubspaceS (M : ℂ) (c : ℂ)
-    {v : (Λ → Fin (N + 1)) → ℂ} (hv : v ∈ magSubspaceS Λ N M) :
-    c • v ∈ magSubspaceS Λ N M :=
-  (magSubspaceS Λ N M).smul_mem c hv
-
-/-- Negation membership in `magSubspaceS`. -/
-theorem neg_mem_magSubspaceS (M : ℂ)
-    {v : (Λ → Fin (N + 1)) → ℂ} (hv : v ∈ magSubspaceS Λ N M) :
-    -v ∈ magSubspaceS Λ N M :=
-  (magSubspaceS Λ N M).neg_mem hv
-
-/-- Subtraction membership in `magSubspaceS`. -/
-theorem sub_mem_magSubspaceS (M : ℂ)
-    {v w : (Λ → Fin (N + 1)) → ℂ} (hv : v ∈ magSubspaceS Λ N M)
-    (hw : w ∈ magSubspaceS Λ N M) :
-    v - w ∈ magSubspaceS Λ N M :=
-  (magSubspaceS Λ N M).sub_mem hv hw
-
-/-- `Finset.sum` membership in `magSubspaceS`. -/
-theorem finset_sum_mem_magSubspaceS {ι : Type*} (M : ℂ)
-    (s : Finset ι) (f : ι → (Λ → Fin (N + 1)) → ℂ)
-    (hf : ∀ i ∈ s, f i ∈ magSubspaceS Λ N M) :
-    (∑ i ∈ s, f i) ∈ magSubspaceS Λ N M :=
-  (magSubspaceS Λ N M).sum_mem hf
 
 /-- Distinct magnetization eigenvalues give disjoint subspaces. -/
 theorem magSubspaceS_disjoint {M M' : ℂ} (hMM' : M ≠ M') :
@@ -346,19 +302,6 @@ theorem magSumS_const_zero :
   simp
 
 omit [DecidableEq Λ] in
-/-- `magSumS (fun _ => Fin.last N) = |Λ| · N`. -/
-theorem magSumS_const_last :
-    magSumS (fun _ : Λ => (Fin.last N : Fin (N + 1))) =
-      Fintype.card Λ * N := by
-  rw [magSumS_const]
-  rfl
-
-omit [DecidableEq Λ] in
-/-- `magSumS σ = magSumS σ`: trivial reflexivity. -/
-theorem magSumS_refl (σ : Λ → Fin (N + 1)) :
-    magSumS σ = magSumS σ := rfl
-
-omit [DecidableEq Λ] in
 /-- `magSumS σ = 0` iff `σ x = 0` for every `x : Λ`. -/
 theorem magSumS_eq_zero_iff (σ : Λ → Fin (N + 1)) :
     magSumS σ = 0 ↔ ∀ x : Λ, σ x = 0 := by
@@ -372,21 +315,6 @@ theorem magSumS_eq_zero_iff (σ : Λ → Fin (N + 1)) :
   · intro h x _
     rw [h x]
     rfl
-
-omit [DecidableEq Λ] in
-/-- `magEigenvalueS σ = 0` ↔ `magSumS σ = |Λ| · N / 2` (the
-half-occupation condition). For spin-1/2 (`N = 1`) this means the
-configuration has equal numbers of up/down spins. -/
-theorem magEigenvalueS_eq_zero_iff (σ : Λ → Fin (N + 1)) :
-    magEigenvalueS σ = 0 ↔
-      ((Fintype.card Λ : ℂ) * (N : ℂ)) / 2 = (magSumS σ : ℂ) := by
-  unfold magEigenvalueS
-  constructor
-  · intro h
-    exact sub_eq_zero.mp h
-  · intro h
-    rw [← h]
-    ring
 
 omit [DecidableEq Λ] in
 /-- `magEigenvalueS σ ∈ ℝ`: the eigenvalue is real-valued (its
@@ -430,17 +358,6 @@ theorem magEigenvalueS_re_upper_bound (σ : Λ → Fin (N + 1)) :
   linarith
 
 omit [DecidableEq Λ] in
-/-- The absolute value of the magnetization eigenvalue is bounded by
-`(|Λ| · N) / 2`. -/
-theorem magEigenvalueS_re_abs_bound (σ : Λ → Fin (N + 1)) :
-    |(magEigenvalueS σ).re| ≤ ((Fintype.card Λ : ℝ) * (N : ℝ)) / 2 := by
-  rw [abs_le]
-  refine ⟨?_, magEigenvalueS_re_upper_bound σ⟩
-  have := magEigenvalueS_re_lower_bound (Λ := Λ) σ
-  linarith
-
-
-omit [DecidableEq Λ] in
 /-- `magEigenvalueS σ = ((magEigenvalueS σ).re : ℂ)`: its imaginary
 part vanishes, so it equals its embedded real part. -/
 theorem magEigenvalueS_eq_ofReal_re (σ : Λ → Fin (N + 1)) :
@@ -448,13 +365,6 @@ theorem magEigenvalueS_eq_ofReal_re (σ : Λ → Fin (N + 1)) :
   apply Complex.ext
   · simp
   · simp [magEigenvalueS_im_zero]
-
-/-- `Ŝ_tot^{(3)} · |σ⟩ = ((magEigenvalueS σ).re : ℂ) • |σ⟩` — the
-real-eigenvalue form of `totalSpinSOp3_mulVec_basisVecS`. -/
-theorem totalSpinSOp3_mulVec_basisVecS_real (σ : Λ → Fin (N + 1)) :
-    (totalSpinSOp3 Λ N).mulVec (basisVecS σ) =
-      ((magEigenvalueS σ).re : ℂ) • basisVecS σ := by
-  rw [totalSpinSOp3_mulVec_basisVecS, ← magEigenvalueS_eq_ofReal_re]
 
 omit [DecidableEq Λ] in
 /-- `magEigenvalueS σ = magEigenvalueS σ' ↔ magSumS σ = magSumS σ'`:
@@ -479,23 +389,6 @@ theorem magEigenvalueS_eq_iff (σ σ' : Λ → Fin (N + 1)) :
     exact_mod_cast h'
   · intro h
     rw [h]
-
-omit [DecidableEq Λ] in
-/-- `magSumS σ ≥ (σ y).val` at any site `y`. -/
-theorem magSumS_ge_of_exists (σ : Λ → Fin (N + 1)) (y : Λ) :
-    (σ y).val ≤ magSumS σ := by
-  unfold magSumS
-  exact Finset.single_le_sum
-    (f := fun x => (σ x).val) (fun _ _ => Nat.zero_le _) (Finset.mem_univ y)
-
-omit [DecidableEq Λ] in
-/-- `magSumS σ > 0` ↔ there exists `x` with `σ x ≠ 0`. -/
-theorem magSumS_pos_iff (σ : Λ → Fin (N + 1)) :
-    0 < magSumS σ ↔ ∃ x : Λ, σ x ≠ 0 := by
-  rw [Nat.pos_iff_ne_zero]
-  rw [Ne, magSumS_eq_zero_iff]
-  push Not
-  rfl
 
 omit [DecidableEq Λ] in
 /-- For `N = 0` (`S = 0`), `magSumS σ = 0` always (the only Fin 1
@@ -539,48 +432,6 @@ theorem magEigenvalueS_of_isEmpty [IsEmpty Λ] (σ : Λ → Fin (N + 1)) :
   ring
 
 omit [DecidableEq Λ] in
-/-- For `N = 0` (`S = 0`), `(magEigenvalueS σ).re = 0`. -/
-theorem magEigenvalueS_re_of_N_zero (σ : Λ → Fin 1) :
-    (magEigenvalueS (N := 0) σ).re = 0 := by
-  rw [magEigenvalueS_of_N_zero σ]
-  simp
-
-omit [DecidableEq Λ] in
-/-- For an empty lattice, `(magEigenvalueS σ).re = 0`. -/
-theorem magEigenvalueS_re_of_isEmpty [IsEmpty Λ] (σ : Λ → Fin (N + 1)) :
-    (magEigenvalueS σ).re = 0 := by
-  rw [magEigenvalueS_of_isEmpty σ]
-  simp
-
-/-- For trivial spin (`N = 0`), `magSubspaceS Λ 0 0 = ⊤`: every
-vector is in the zero-magnetization subspace because every basis
-state has eigenvalue 0. -/
-theorem magSubspaceS_N_zero_zero_eq_top :
-    magSubspaceS Λ 0 0 = ⊤ := by
-  refine eq_top_iff.mpr (fun v _ => ?_)
-  rw [mem_magSubspaceS_iff]
-  rw [show (totalSpinSOp3 Λ 0 : ManyBodyOpS Λ 0) = 0 from
-    totalSpinSOp3_N_zero (Λ := Λ)]
-  rw [Matrix.zero_mulVec]
-  simp
-
-/-- For trivial spin (`N = 0`) and `M ≠ 0`, `magSubspaceS Λ 0 M = ⊥`:
-no vector has nonzero magnetization since `Ŝ_tot^{(3)} = 0`. -/
-theorem magSubspaceS_N_zero_ne_zero_eq_bot {M : ℂ} (hM : M ≠ 0) :
-    magSubspaceS Λ 0 M = ⊥ := by
-  refine eq_bot_iff.mpr (fun v hv => ?_)
-  rw [mem_magSubspaceS_iff] at hv
-  rw [show (totalSpinSOp3 Λ 0 : ManyBodyOpS Λ 0) = 0 from
-    totalSpinSOp3_N_zero (Λ := Λ)] at hv
-  rw [Matrix.zero_mulVec] at hv
-  -- hv : 0 = M • v
-  rw [Submodule.mem_bot]
-  have : M • v = 0 := hv.symm
-  rcases smul_eq_zero.mp this with hM' | hv'
-  · exact (hM hM').elim
-  · exact hv'
-
-omit [DecidableEq Λ] in
 /-- `magEigenvalueS (fun _ => 0) = (|Λ| · N : ℂ)/2`. -/
 theorem magEigenvalueS_const_zero :
     magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1))) =
@@ -589,7 +440,6 @@ theorem magEigenvalueS_const_zero :
   rw [magSumS_const_zero]
   push_cast
   ring
-
 
 omit [DecidableEq Λ] in
 /-- `magEigenvalueS` of a constant configuration. The maximum value
@@ -613,21 +463,5 @@ theorem magEigenvalueS_const_last :
   rw [magEigenvalueS_const]
   simp [Fin.val_last]
   ring
-
-omit [DecidableEq Λ] in
-/-- `magEigenvalueS_re` at the all-zero config: `(|Λ| · N : ℝ)/2`. -/
-theorem magEigenvalueS_re_const_zero :
-    (magEigenvalueS (fun _ : Λ => (0 : Fin (N + 1)))).re =
-      (Fintype.card Λ : ℝ) * (N : ℝ) / 2 := by
-  rw [magEigenvalueS_const_zero]
-  simp
-
-omit [DecidableEq Λ] in
-/-- `magEigenvalueS_re` at the all-`Fin.last N` config: `-((|Λ| · N : ℝ)/2)`. -/
-theorem magEigenvalueS_re_const_last :
-    (magEigenvalueS (fun _ : Λ => (Fin.last N : Fin (N + 1)))).re =
-      -((Fintype.card Λ : ℝ) * (N : ℝ) / 2) := by
-  rw [magEigenvalueS_const_last]
-  simp
 
 end LatticeSystem.Quantum
