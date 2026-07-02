@@ -182,6 +182,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveFullSectorSU2Alg
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveFullSectorEnergy
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveFullSectorUnique
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveTheorem102Witness
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveTheorem102
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetism

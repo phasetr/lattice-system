@@ -38,6 +38,14 @@ exists_signDefiniteCompress_ground_in_balanced_sector
 # `balanced_ground_eigenspace_finrank_le_one`, and the balanced singlet
 # `balancedGround_totalSpinSquared_eigenvalue_zero`, via the Ŝ³ weight decomposition of G_full and
 # the SU(2)-multiplet weight-0-companion contradiction (`ham_su2_multiplet_companion`, Theorem A.16).
-# Legitimately zero-referenced participating milestone; consumed by the eventual §10.2.1 Theorem 10.2
+# Legitimately zero-referenced participating milestone; consumed by the §10.2.1 Theorem 10.2
 # singlet-uniqueness discharge (PR-E, Euclidean `IsUniqueGroundStateOn` assembly).
 attractiveHubbardFullSectorGround_unique_singlet
+
+# V1 book capstone: Tasaki §10.2.4 Theorem 10.2 (Lieb's theorem for the attractive Hubbard model),
+# now PROVED axiom-free (PR-E, #4852): for even Ne with 0 < Ne ≤ 2|Λ|, connected symmetric hopping
+# and U > 0, the Ne-electron ground state is unique and a spin singlet. Assembles the plain-space
+# full-sector singlet-uniqueness milestone into the Euclidean `IsUniqueGroundStateOn` predicate.
+# Legitimately zero-referenced book capstone (documented §10.2 Theorem 10.2); Theorem 10.3 (Tian)
+# takes this ground state as a hypothesis and remains a documented axiom.
+theorem_10_2_lieb_attractive_unique_singlet
