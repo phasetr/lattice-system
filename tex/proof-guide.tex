@@ -6220,6 +6220,21 @@ $\varphi$ ($\texttt{exists\_attractive\_balanced\_ground}$) and showing that the
 preserves the balanced per-spin sector ($\texttt{gammaThetaVec\_preserves\_balanced}$), so the
 symmetrized Hermitian-$W$ ground stays balanced ($\texttt{exists\_hermitianW\_ground\_in\_balanced\_sector}$).
 
+\medskip\noindent\textbf{The balanced PSD-$W$ ground state (PR40f, Tasaki §10.2.4, Lemma 10.9).}
+The SRP squeeze is refined to produce a **positive-semidefinite** reconciliation coefficient $W$ in
+the balanced sector. From the Hermitian-$W$ ground $\varphi$ (PR40e-pre2b), the coefficient
+$W = \texttt{blockWCoeff}(\varphi)$ is supported on the principal $S_k \times S_k$ block; the
+`$W$-index isometry' $J = \texttt{hubbardCountSectorEmbedding}$ (columns over count-$k$ configurations,
+$J^\dagger J = 1$) allows the block rewrite $W = J \cdot W_S \cdot J^\dagger$ where $W_S = J^\dagger W J$
+is the \emph{compressed} coefficient on the count-$k$ sector ($\texttt{blockWCoeff\_eq\_embed\_compress\_of\_balanced}$).
+The SRP absolute-value candidate $\varphi' := \Gamma(J \cdot |W_S| \cdot J^\dagger)$ produces a PSD coefficient
+(by \texttt{Matrix.PosSemidef.mul\_mul\_conjTranspose\_same}) and satisfies the energy squeeze $E(\varphi')
+\le E(\varphi) = \mu \cdot \|\varphi\|^2$ (by isometry invariance \texttt{liebSRPEnergy\_conj\_isometry}, PSD
+monotonicity \texttt{liebSRPEnergy\_abs\_le}, and the balanced variational lower bound
+\texttt{configSector\_minEnergy\_mul\_le\_rayleighOnVec\_of\_isHermitian}), where $\mu$ is the balanced-sector
+minimum eigenvalue. Hence $\varphi'$ is a balanced ground vector at $\mu$ with $\texttt{blockWCoeff}(\varphi')$
+positive semidefinite; this is the $(Ŝ³ = 0)$ incarnation of Tasaki's $|W|$ squeeze in Lemma 10.9.
+
 %======================================================================
 \subsection{Lieb's theorem for the repulsive Hubbard model at half-filling (Tasaki §10.2.2, Theorem 10.4)}
 \label{subsec:lieb-repulsive}
