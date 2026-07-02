@@ -37,3 +37,9 @@ exists_signDefiniteCompress_ground_in_balanced_sector
 # participating milestone; consumed by the eventual §10.2.1 Theorem 10.2 singlet capstone
 # (lifting Ŝ³=0 uniqueness to the whole Ne-electron sector via SU(2)).
 balanced_ground_eigenspace_finrank_le_one
+
+# SU(2)-invariance capstone: `[(Ŝ_tot)², Ĥ] = 0` for the attractive Hubbard Hamiltonian with
+# site-dependent U (Tasaki §10.2 / §9.3.3 eq. (9.3.35)). Zero-referenced until the PR-C
+# uniqueness→singlet step consumes it (unique GS + commuting Casimir ⟹ (Ŝ_tot)²-eigenstate);
+# the three generator commutes ([Ŝ⁺], [Ŝ⁻], [Ŝ³]) are consumed here, so this is the sole tip.
+fermionTotalSpinSquared_commute_attractiveHubbardHamiltonian
