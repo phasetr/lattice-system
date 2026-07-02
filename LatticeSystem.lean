@@ -26,6 +26,7 @@ import LatticeSystem.Math.HermitianMaxEqPF
 import LatticeSystem.Math.HermitianSpectrumShift
 import LatticeSystem.Math.HermitianMinEqOfShiftPF
 import LatticeSystem.Math.InvariantSubmoduleEigenvector
+import LatticeSystem.Math.SubmoduleFinrankLeOne
 import LatticeSystem.Math.MatrixAnalysis.LieProduct
 import LatticeSystem.Math.PosSemidef.Basics
 import LatticeSystem.Math.MatrixAnalysis.EigenvalueMonotone
