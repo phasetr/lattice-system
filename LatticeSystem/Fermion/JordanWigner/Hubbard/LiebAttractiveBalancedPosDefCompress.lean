@@ -308,16 +308,18 @@ theorem exists_posDefCompress_ground_in_balanced_sector (k : ℕ)
   · exact hpd
   · exact absurd hz (blockWCoeff_sectorCompress_ne_zero_of_ne_zero k φ hφ0 hφUp hφDn)
 
-/-- **The balanced-sector sign-definite compressed coefficient** (Tasaki §10.2.4, Lemma 10.9).
-For symmetric real hopping `T` whose support graph is connected and strictly attractive on-site
-interaction `U > 0`, there is a nonzero balanced (`Ŝ³ = 0`) ground state `φ` of the attractive
-Hubbard Hamiltonian, at the balanced-compression minimum eigenvalue `E`, with Hermitian
-reconciliation coefficient `blockWCoeff φ`, whose sector-compressed coefficient
-`W_S = Jᴴ · blockWCoeff φ · J`, `J = hubbardCountSectorEmbedding N k`, is *sign-definite*:
-`W_S.PosDef ∨ (−W_S).PosDef`. This is Tasaki's Lemma 10.9, assembled from Lemma 10.10's dichotomy:
+/-- **Sign-definiteness of *any* balanced Hermitian-`W` ground's compressed coefficient**
+(Tasaki §10.2.4, Lemma 10.9, forall form). For symmetric real hopping `T` whose support graph is
+connected and strictly attractive on-site interaction `U > 0`, let `φ` be *any* nonzero balanced
+(`N̂_↑ = N̂_↓ = k`) ground state of the attractive Hubbard Hamiltonian at the
+balanced-compression minimum eigenvalue `E`, with Hermitian reconciliation coefficient
+`blockWCoeff φ`. Then its sector-compressed coefficient `W_S = Jᴴ · blockWCoeff φ · J`,
+`J = hubbardCountSectorEmbedding N k`, is *sign-definite*: `W_S.PosDef ∨ (−W_S).PosDef`. This is
+the content of Tasaki's Lemma 10.9, assembled from Lemma 10.10's dichotomy, using ONLY the four
+hypotheses on the given `φ` (balanced `N̂_↑ = N̂_↓ = k`, Hermitian `blockWCoeff φ`, ground at `E`)
+— never any special property of a constructed representative:
 
-* take a balanced Hermitian-`W` ground `φ` (`exists_hermitianW_ground_in_balanced_sector`); its
-  compressed matrix `W_S` (Hermitian) solves the compressed Lyapunov/Schrödinger equation via
+* the compressed matrix `W_S` (Hermitian) solves the compressed Lyapunov/Schrödinger equation via
   `blockWCoeff_lyapunov_of_eigenvector` and `lyapunov_conjugate_isometry`;
 * its spectral absolute value `P = |W_S|` (`hermitianAbs`) is PSD (`hermitianAbs_posSemidef`) and
   solves the *same* compressed equation, because `Γ(J·P·Jᴴ)` is again a `Ĥ`-ground at `E`
@@ -331,33 +333,30 @@ reconciliation coefficient `blockWCoeff φ`, whose sector-compressed coefficient
   the first case `IsUnit (P − W_S)` (`Matrix.PosDef.isUnit`) cancels to `P + W_S = 0`, i.e.
   `−W_S = P` is positive definite, and in the second case `W_S = P` is positive definite.
 
-Both the sign-definiteness of `W_S` and the eigenvector relation at the balanced minimum eigenvalue
-`E` are retained, as the downstream uniqueness step (`Tr(W'W) > 0`) consumes both. -/
-theorem exists_signDefiniteCompress_ground_in_balanced_sector (k : ℕ)
+The forall form is consumed by the balanced ground-eigenspace `finrank ≤ 1` argument, which must
+apply sign-definiteness to every `Θ`-fixed ground; the existence capstone
+`exists_signDefiniteCompress_ground_in_balanced_sector` is a corollary. -/
+theorem hermitianW_balanced_ground_signDefinite (k : ℕ)
     [Nonempty (hubbardBalancedConfig N k)]
     (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : Fin (N + 1) → ℝ)
     (hT_symm : ∀ i j, T i j = T j i) (hU_pos : ∀ x, 0 < U x)
-    (hT_conn : (hoppingSupportGraph T).Preconnected) :
-    ∃ φ : (Fin (2 * N + 2) → Fin 2) → ℂ, φ ≠ 0
-      ∧ (fermionTotalUpNumber N).mulVec φ = (k : ℂ) • φ
-      ∧ (fermionTotalDownNumber N).mulVec φ = (k : ℂ) • φ
-      ∧ (blockWCoeff N φ).IsHermitian
-      ∧ (((hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ
-              * hubbardCountSectorEmbedding N k).PosDef
-          ∨ (-((hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ
-              * hubbardCountSectorEmbedding N k)).PosDef)
-      ∧ (attractiveHubbardHamiltonian N T U).mulVec φ
-          = ((hermitianMinEigenvalue (configSectorCompress_isHermitian
-              (hubbardBalancedSectorPred N k)
-              (attractiveHubbardHamiltonian_isHermitian T U hT_symm)) : ℝ) : ℂ) • φ := by
+    (hT_conn : (hoppingSupportGraph T).Preconnected)
+    (φ : (Fin (2 * N + 2) → Fin 2) → ℂ) (hφ0 : φ ≠ 0)
+    (hφUp : (fermionTotalUpNumber N).mulVec φ = (k : ℂ) • φ)
+    (hφDn : (fermionTotalDownNumber N).mulVec φ = (k : ℂ) • φ)
+    (hφHerm : (blockWCoeff N φ).IsHermitian)
+    (hφeig : (attractiveHubbardHamiltonian N T U).mulVec φ
+        = ((hermitianMinEigenvalue (configSectorCompress_isHermitian
+            (hubbardBalancedSectorPred N k)
+            (attractiveHubbardHamiltonian_isHermitian T U hT_symm)) : ℝ) : ℂ) • φ) :
+    ((hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ
+          * hubbardCountSectorEmbedding N k).PosDef
+      ∨ (-((hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ
+          * hubbardCountSectorEmbedding N k)).PosDef := by
   classical
-  -- The balanced Hermitian-`W` ground representative (PR40e-pre2b).
-  obtain ⟨φ, hφ0, hφUp, hφDn, hφHerm, hφeig⟩ :=
-    exists_hermitianW_ground_in_balanced_sector k T U hT_symm
   set E : ℝ := hermitianMinEigenvalue (configSectorCompress_isHermitian
     (hubbardBalancedSectorPred N k)
     (attractiveHubbardHamiltonian_isHermitian T U hT_symm)) with hEdef
-  refine ⟨φ, hφ0, hφUp, hφDn, hφHerm, ?_, hφeig⟩
   -- The sector isometry `J` and the compressed Hermitian coefficient `W_S`.
   have hJ : (hubbardCountSectorEmbedding N k)ᴴ * hubbardCountSectorEmbedding N k = 1 :=
     hubbardCountSectorEmbedding_conjTranspose_mul_self k
@@ -414,5 +413,41 @@ theorem exists_signDefiniteCompress_ground_in_balanced_sector (k : ℕ)
   · -- `P − W_S = 0` ⟹ `W_S = P` positive definite.
     left
     rw [← sub_eq_zero.mp hR'0]; exact hP_pd
+
+/-- **The balanced-sector sign-definite compressed coefficient** (Tasaki §10.2.4, Lemma 10.9).
+For symmetric real hopping `T` whose support graph is connected and strictly attractive on-site
+interaction `U > 0`, there is a nonzero balanced (`Ŝ³ = 0`) ground state `φ` of the attractive
+Hubbard Hamiltonian, at the balanced-compression minimum eigenvalue `E`, with Hermitian
+reconciliation coefficient `blockWCoeff φ`, whose sector-compressed coefficient
+`W_S = Jᴴ · blockWCoeff φ · J`, `J = hubbardCountSectorEmbedding N k`, is *sign-definite*:
+`W_S.PosDef ∨ (−W_S).PosDef`. This is Tasaki's Lemma 10.9: obtain a balanced Hermitian-`W` ground
+`φ` (`exists_hermitianW_ground_in_balanced_sector`), then apply the forall form
+`hermitianW_balanced_ground_signDefinite`, which shows sign-definiteness for any such ground.
+
+Both the sign-definiteness of `W_S` and the eigenvector relation at the balanced minimum eigenvalue
+`E` are retained, as the downstream uniqueness step (`Tr(W'W) > 0`) consumes both. -/
+theorem exists_signDefiniteCompress_ground_in_balanced_sector (k : ℕ)
+    [Nonempty (hubbardBalancedConfig N k)]
+    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : Fin (N + 1) → ℝ)
+    (hT_symm : ∀ i j, T i j = T j i) (hU_pos : ∀ x, 0 < U x)
+    (hT_conn : (hoppingSupportGraph T).Preconnected) :
+    ∃ φ : (Fin (2 * N + 2) → Fin 2) → ℂ, φ ≠ 0
+      ∧ (fermionTotalUpNumber N).mulVec φ = (k : ℂ) • φ
+      ∧ (fermionTotalDownNumber N).mulVec φ = (k : ℂ) • φ
+      ∧ (blockWCoeff N φ).IsHermitian
+      ∧ (((hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ
+              * hubbardCountSectorEmbedding N k).PosDef
+          ∨ (-((hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ
+              * hubbardCountSectorEmbedding N k)).PosDef)
+      ∧ (attractiveHubbardHamiltonian N T U).mulVec φ
+          = ((hermitianMinEigenvalue (configSectorCompress_isHermitian
+              (hubbardBalancedSectorPred N k)
+              (attractiveHubbardHamiltonian_isHermitian T U hT_symm)) : ℝ) : ℂ) • φ := by
+  -- The balanced Hermitian-`W` ground representative (PR40e-pre2b).
+  obtain ⟨φ, hφ0, hφUp, hφDn, hφHerm, hφeig⟩ :=
+    exists_hermitianW_ground_in_balanced_sector k T U hT_symm
+  exact ⟨φ, hφ0, hφUp, hφDn, hφHerm,
+    hermitianW_balanced_ground_signDefinite k T U hT_symm hU_pos hT_conn
+      φ hφ0 hφUp hφDn hφHerm hφeig, hφeig⟩
 
 end LatticeSystem.Fermion

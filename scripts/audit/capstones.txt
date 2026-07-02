@@ -22,16 +22,18 @@ anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_reachability_pf_min_
 # (Its PR40f precursor exists_posSemidefW_ground_in_balanced_sector is now consumed here.)
 exists_posDefCompress_ground_in_balanced_sector
 
-# V1 capstone: the balanced-sector sign-definite compressed coefficient, the assembly of
-# Tasaki §10.2.4 Lemma 10.9 (`W_S.PosDef ∨ (−W_S).PosDef`) on the balanced (Ŝ³=0) sector (#4852).
-# Legitimately zero-referenced now; consumed by the next PR (the Lieb uniqueness step
-# `Tr(W'W) > 0`, which needs both the sign-definiteness and the eigenvector relation retained
-# in its conclusion).
+# V1 milestone: the balanced-sector sign-definite compressed coefficient EXISTENCE, a faithful
+# statement of Tasaki §10.2.4 Lemma 10.9 (`W_S.PosDef ∨ (−W_S).PosDef`) on the balanced (Ŝ³=0)
+# sector (#4852). Its PROOF BODY is the forall `hermitianW_balanced_ground_signDefinite`, which
+# IS consumed (by the finrank ≤ 1 uniqueness capstone below and by this existence corollary); the
+# existence packaging itself stays a documented zero-referenced Lemma 10.9 milestone.
 exists_signDefiniteCompress_ground_in_balanced_sector
 
-# V1 milestone: the balanced ground-state overlap non-orthogonality core, assembling
-# Tasaki §10.2.4 Theorem 10.2 uniqueness (`⟨φ',φ⟩ ≠ 0` for two sign-definite-compressed
-# balanced grounds) from the cross-overlap identity + sector reduction + `Tr(PosDef·PosDef)>0`
-# (#4852). Legitimately zero-referenced now; consumed by the next PR (the finrank ≤ 1 / singlet
-# uniqueness capstone, which combines this non-orthogonality with a θ-symmetric ground basis).
-balanced_signDefinite_ground_dotProduct_ne_zero
+# V1 capstone: the balanced ground eigenspace `finrank ℂ ≤ 1`, the uniqueness half of Tasaki
+# §10.2.4 Theorem 10.2 on the balanced (Ŝ³=0) sector (#4852). Assembles the overlap
+# non-orthogonality core `balanced_signDefinite_ground_dotProduct_ne_zero` (now CONSUMED here,
+# hence delisted), the forall sign-definiteness `hermitianW_balanced_ground_signDefinite`
+# (Lemma 10.9), and the generic real-form finrank toolkit. Legitimately zero-referenced
+# participating milestone; consumed by the eventual §10.2.1 Theorem 10.2 singlet capstone
+# (lifting Ŝ³=0 uniqueness to the whole Ne-electron sector via SU(2)).
+balanced_ground_eigenspace_finrank_le_one
