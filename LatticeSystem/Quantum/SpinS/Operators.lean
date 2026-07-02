@@ -279,35 +279,6 @@ theorem spinSOp2_apply_re_zero (N : ℕ) (i j : Fin (N + 1)) :
   rw [Matrix.smul_apply, Matrix.sub_apply, smul_eq_mul]
   simp [spinSOpPlus_apply_im_zero, spinSOpMinus_apply_im_zero]
 
-/-- The product `Ŝ^{(1)}_{i,j} * Ŝ^{(1)}_{k,l}` has non-negative real
-part: both factors are real and have non-negative real part. -/
-theorem spinSOp1_mul_spinSOp1_re_nonneg (N : ℕ)
-    (i j k l : Fin (N + 1)) :
-    0 ≤ (spinSOp1 N i j * spinSOp1 N k l).re := by
-  rw [Complex.mul_re]
-  rw [spinSOp1_apply_im_zero, spinSOp1_apply_im_zero]
-  rw [zero_mul, sub_zero]
-  exact mul_nonneg (spinSOp1_apply_re_nonneg N i j)
-    (spinSOp1_apply_re_nonneg N k l)
-
-/-- The product `Ŝ^{(2)}_{i,j} * Ŝ^{(2)}_{k,l}` has zero imaginary
-part. (Pure imag × pure imag = real.) -/
-theorem spinSOp2_mul_spinSOp2_im_zero (N : ℕ)
-    (i j k l : Fin (N + 1)) :
-    (spinSOp2 N i j * spinSOp2 N k l).im = 0 := by
-  rw [Complex.mul_im]
-  rw [spinSOp2_apply_re_zero, spinSOp2_apply_re_zero]
-  ring
-
-/-- The product `Ŝ^{(1)}_{i,j} * Ŝ^{(1)}_{k,l}` has zero imaginary
-part. (Real × real = real.) -/
-theorem spinSOp1_mul_spinSOp1_im_zero (N : ℕ)
-    (i j k l : Fin (N + 1)) :
-    (spinSOp1 N i j * spinSOp1 N k l).im = 0 := by
-  rw [Complex.mul_im]
-  rw [spinSOp1_apply_im_zero, spinSOp1_apply_im_zero]
-  ring
-
 /-- All entries of `Ŝ^{(3)}` have zero imaginary part. -/
 theorem spinSOp3_apply_im_zero (N : ℕ) (i j : Fin (N + 1)) :
     (spinSOp3 N i j).im = 0 := by
@@ -319,58 +290,11 @@ theorem spinSOp3_apply_im_zero (N : ℕ) (i j : Fin (N + 1)) :
   · rw [Matrix.diagonal_apply_ne _ h]
     simp
 
-/-- The product `Ŝ^{(3)}_{i,j} * Ŝ^{(3)}_{k,l}` has zero imaginary
-part. (Both factors are real.) -/
-theorem spinSOp3_mul_spinSOp3_im_zero (N : ℕ)
-    (i j k l : Fin (N + 1)) :
-    (spinSOp3 N i j * spinSOp3 N k l).im = 0 := by
-  rw [Complex.mul_im]
-  rw [spinSOp3_apply_im_zero, spinSOp3_apply_im_zero]
-  ring
-
 /-- `(spinSOp3 N k k).re = N/2 - k.val`. -/
 theorem spinSOp3_apply_diag_re (N : ℕ) (k : Fin (N + 1)) :
     (spinSOp3 N k k).re = (N : ℝ) / 2 - (k.val : ℝ) := by
   rw [spinSOp3_apply_diag]
   simp
-
-/-- The diagonal product `(spinSOp3 N k k * spinSOp3 N l l).re =
-(N/2 - k.val)(N/2 - l.val)`. -/
-theorem spinSOp3_mul_spinSOp3_diag_re (N : ℕ) (k l : Fin (N + 1)) :
-    (spinSOp3 N k k * spinSOp3 N l l).re =
-      ((N : ℝ) / 2 - (k.val : ℝ)) * ((N : ℝ) / 2 - (l.val : ℝ)) := by
-  rw [Complex.mul_re]
-  rw [spinSOp3_apply_im_zero, spinSOp3_apply_im_zero]
-  rw [zero_mul, sub_zero]
-  rw [spinSOp3_apply_diag_re, spinSOp3_apply_diag_re]
-
-/-- Each entry of `Ŝ^{(3)}` equals its own real-part embedding. -/
-theorem spinSOp3_apply_eq_ofReal (N : ℕ) (i j : Fin (N + 1)) :
-    spinSOp3 N i j = ((spinSOp3 N i j).re : ℂ) := by
-  apply Complex.ext
-  · simp
-  · simp [spinSOp3_apply_im_zero]
-
-/-- Each entry of `Ŝ^+` equals its own real-part embedding. -/
-theorem spinSOpPlus_apply_eq_ofReal (N : ℕ) (i j : Fin (N + 1)) :
-    spinSOpPlus N i j = ((spinSOpPlus N i j).re : ℂ) := by
-  apply Complex.ext
-  · simp
-  · simp [spinSOpPlus_apply_im_zero]
-
-/-- Each entry of `Ŝ^-` equals its own real-part embedding. -/
-theorem spinSOpMinus_apply_eq_ofReal (N : ℕ) (i j : Fin (N + 1)) :
-    spinSOpMinus N i j = ((spinSOpMinus N i j).re : ℂ) := by
-  apply Complex.ext
-  · simp
-  · simp [spinSOpMinus_apply_im_zero]
-
-/-- Each entry of `Ŝ^{(1)}` equals its own real-part embedding. -/
-theorem spinSOp1_apply_eq_ofReal (N : ℕ) (i j : Fin (N + 1)) :
-    spinSOp1 N i j = ((spinSOp1 N i j).re : ℂ) := by
-  apply Complex.ext
-  · simp
-  · simp [spinSOp1_apply_im_zero]
 
 /-- Top of the ladder: `Ŝ^+` annihilates the highest-weight state. -/
 theorem spinSOpPlus_apply_top (N : ℕ) (j : Fin (N + 1)) :
@@ -391,14 +315,5 @@ theorem spinSOpMinus_apply_bottom (N : ℕ) (j : Fin (N + 1)) :
   intro h
   -- `j.val + 1 = (⟨0, _⟩ : Fin (N+1)).val = 0`, impossible.
   simp at h
-
-/-! ## Reduction lemmas to existing concrete cases (sanity checks) -/
-
-/-- For `N = 0` (trivial spin `S = 0`), `Ŝ^{(3)}` is the zero matrix. -/
-theorem spinSOp3_zero : spinSOp3 0 = 0 := by
-  unfold spinSOp3
-  ext i j
-  fin_cases i; fin_cases j
-  simp [Matrix.diagonal]
 
 end LatticeSystem.Quantum

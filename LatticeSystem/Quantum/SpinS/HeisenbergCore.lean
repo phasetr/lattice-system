@@ -170,19 +170,6 @@ theorem heisenbergHamiltonianS_neg (J : Λ → Λ → ℂ) (N : ℕ) :
   intro y _
   rw [neg_smul]
 
-/-- The Heisenberg Hamiltonian is anti-distributive over subtraction
-in the coupling: -/
-theorem heisenbergHamiltonianS_sub (J J' : Λ → Λ → ℂ) (N : ℕ) :
-    heisenbergHamiltonianS (Λ := Λ) (fun x y => J x y - J' x y) N =
-      heisenbergHamiltonianS J N - heisenbergHamiltonianS J' N := by
-  have h : (fun x y : Λ => J x y - J' x y) =
-      (fun x y => J x y + (-(J' x y))) := by
-    ext x y; ring
-  rw [h]
-  rw [heisenbergHamiltonianS_add]
-  rw [heisenbergHamiltonianS_neg]
-  abel
-
 /-- The Heisenberg Hamiltonian matrix element formula:
 `(heisenbergHamiltonianS J N) σ τ = ∑_{x,y} J(x,y) (Ŝ_x · Ŝ_y) σ τ`. -/
 theorem heisenbergHamiltonianS_apply (J : Λ → Λ → ℂ) (N : ℕ)
@@ -276,85 +263,12 @@ noncomputable def heisenbergHamiltonianPeriodicChainS
   heisenbergHamiltonianOnGraphS (SimpleGraph.cycleGraph (M + 2))
     (-(J : ℂ)) N
 
-/-- Definitional unfolding of `heisenbergHamiltonianChainS`. -/
-theorem heisenbergHamiltonianChainS_def (M : ℕ) (J : ℝ) (N : ℕ) :
-    heisenbergHamiltonianChainS M J N =
-      heisenbergHamiltonianOnGraphS (SimpleGraph.pathGraph (M + 1))
-        (-(J : ℂ)) N := rfl
-
-/-- Definitional unfolding of `heisenbergHamiltonianPeriodicChainS`. -/
-theorem heisenbergHamiltonianPeriodicChainS_def (M : ℕ) (J : ℝ) (N : ℕ) :
-    heisenbergHamiltonianPeriodicChainS M J N =
-      heisenbergHamiltonianOnGraphS (SimpleGraph.cycleGraph (M + 2))
-        (-(J : ℂ)) N := rfl
-
 /-- Hermiticity of the periodic chain spin-`S` Heisenberg Hamiltonian. -/
 theorem heisenbergHamiltonianPeriodicChainS_isHermitian
     (M : ℕ) (J : ℝ) (N : ℕ) :
     (heisenbergHamiltonianPeriodicChainS M J N).IsHermitian :=
   heisenbergHamiltonianOnGraphS_isHermitian _
     (by simp : star (-(J : ℂ)) = -(J : ℂ)) N
-
-/-- The Heisenberg-on-graph Hamiltonian commutes with `Ŝ_tot^{(α)}`
-for every axis (specialised SU(2) invariance for graph-derived
-couplings). -/
-theorem heisenbergHamiltonianOnGraphS_commute_totalSpinSOp1
-    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (N : ℕ) :
-    heisenbergHamiltonianOnGraphS G J N * totalSpinSOp1 Λ N -
-        totalSpinSOp1 Λ N * heisenbergHamiltonianOnGraphS G J N = 0 :=
-  heisenbergHamiltonianS_commutator_totalSpinSOp1 _ N
-
-theorem heisenbergHamiltonianOnGraphS_commute_totalSpinSOp2
-    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (N : ℕ) :
-    heisenbergHamiltonianOnGraphS G J N * totalSpinSOp2 Λ N -
-        totalSpinSOp2 Λ N * heisenbergHamiltonianOnGraphS G J N = 0 :=
-  heisenbergHamiltonianS_commutator_totalSpinSOp2 _ N
-
-theorem heisenbergHamiltonianOnGraphS_commute_totalSpinSOp3
-    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (N : ℕ) :
-    heisenbergHamiltonianOnGraphS G J N * totalSpinSOp3 Λ N -
-        totalSpinSOp3 Λ N * heisenbergHamiltonianOnGraphS G J N = 0 :=
-  heisenbergHamiltonianS_commutator_totalSpinSOp3 _ N
-
-/-- The Heisenberg-on-graph Hamiltonian commutes with `(Ŝ_tot)²`. -/
-theorem heisenbergHamiltonianOnGraphS_commute_totalSpinSSquared
-    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (N : ℕ) :
-    Commute (heisenbergHamiltonianOnGraphS G J N)
-      (totalSpinSSquared Λ N) :=
-  heisenbergHamiltonianS_commute_totalSpinSSquared _ N
-
-/-- The Heisenberg Hamiltonian preserves `(Ŝ_tot)²` eigenvalues:
-if `(Ŝ_tot)² · v = S · v`, then `(Ŝ_tot)² · (Ĥ · v) = S · (Ĥ · v)`.
-Operator-level simultaneous diagonalisation. -/
-theorem heisenbergHamiltonianS_mulVec_preserves_totalSpinSSquared_eigenvalue
-    (J : Λ → Λ → ℂ) (N : ℕ)
-    {S : ℂ} {v : (Λ → Fin (N + 1)) → ℂ}
-    (hv : (totalSpinSSquared Λ N).mulVec v = S • v) :
-    (totalSpinSSquared Λ N).mulVec
-        ((heisenbergHamiltonianS J N).mulVec v) =
-      S • (heisenbergHamiltonianS J N).mulVec v := by
-  have hcomm : totalSpinSSquared Λ N * heisenbergHamiltonianS J N =
-      heisenbergHamiltonianS J N * totalSpinSSquared Λ N :=
-    (heisenbergHamiltonianS_commute_totalSpinSSquared J N).symm
-  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hv,
-    Matrix.mulVec_smul]
-
-/-- The Heisenberg Hamiltonian preserves `Ŝ_tot^{(3)}` eigenvalues:
-if `Ŝ_tot^{(3)} · v = M · v`, then `Ŝ_tot^{(3)} · (Ĥ · v) = M · (Ĥ · v)`.
-The `(Ŝ_tot)^{(3)}`-analogue of the Casimir version. -/
-theorem heisenbergHamiltonianS_mulVec_preserves_totalSpinSOp3_eigenvalue
-    (J : Λ → Λ → ℂ) (N : ℕ)
-    {M : ℂ} {v : (Λ → Fin (N + 1)) → ℂ}
-    (hv : (totalSpinSOp3 Λ N).mulVec v = M • v) :
-    (totalSpinSOp3 Λ N).mulVec
-        ((heisenbergHamiltonianS J N).mulVec v) =
-      M • (heisenbergHamiltonianS J N).mulVec v := by
-  have hcomm : totalSpinSOp3 Λ N * heisenbergHamiltonianS J N =
-      heisenbergHamiltonianS J N * totalSpinSOp3 Λ N :=
-    (sub_eq_zero.mp
-      (heisenbergHamiltonianS_commutator_totalSpinSOp3 J N)).symm
-  rw [Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, hv,
-    Matrix.mulVec_smul]
 
 /-- The Heisenberg Hamiltonian preserves each magnetization subspace:
 `v ∈ magSubspaceS Λ N M ⇒ (Ĥ · v) ∈ magSubspaceS Λ N M`.
@@ -367,26 +281,6 @@ theorem heisenbergHamiltonianS_mulVec_mem_magSubspaceS
   mem_magSubspaceS_of_commute M (heisenbergHamiltonianS J N)
     (sub_eq_zero.mp
       (heisenbergHamiltonianS_commutator_totalSpinSOp3 J N)).symm hv
-
-/-- The Heisenberg-on-graph Hamiltonian preserves magnetization subspaces. -/
-theorem heisenbergHamiltonianOnGraphS_mulVec_mem_magSubspaceS
-    (G : SimpleGraph Λ) [DecidableRel G.Adj] (J : ℂ) (N : ℕ) (M : ℂ)
-    {v : (Λ → Fin (N + 1)) → ℂ}
-    (hv : v ∈ magSubspaceS Λ N M) :
-    (heisenbergHamiltonianOnGraphS G J N).mulVec v ∈ magSubspaceS Λ N M :=
-  heisenbergHamiltonianS_mulVec_mem_magSubspaceS _ N M hv
-
-/-- For real coupling, the diagonal entries of the Heisenberg
-Hamiltonian have zero imaginary part. (Since the Hamiltonian is
-Hermitian for real coupling, its diagonal is real.) -/
-theorem heisenbergHamiltonianS_apply_diag_im_zero
-    {J : Λ → Λ → ℂ} (N : ℕ)
-    (hreal : ∀ x y, star (J x y) = J x y)
-    (σ : Λ → Fin (N + 1)) :
-    ((heisenbergHamiltonianS J N) σ σ).im = 0 := by
-  have hH := heisenbergHamiltonianS_isHermitian_of_real (Λ := Λ) hreal N
-  have := hH.apply σ σ
-  exact Complex.conj_eq_iff_im.mp this
 
 /-- Applying the Heisenberg Hamiltonian to a basis vector and reading
 the result at configuration `τ` yields the matrix element
