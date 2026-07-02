@@ -28,3 +28,10 @@ exists_posDefCompress_ground_in_balanced_sector
 # `Tr(W'W) > 0`, which needs both the sign-definiteness and the eigenvector relation retained
 # in its conclusion).
 exists_signDefiniteCompress_ground_in_balanced_sector
+
+# V1 milestone: the balanced ground-state overlap non-orthogonality core, assembling
+# Tasaki §10.2.4 Theorem 10.2 uniqueness (`⟨φ',φ⟩ ≠ 0` for two sign-definite-compressed
+# balanced grounds) from the cross-overlap identity + sector reduction + `Tr(PosDef·PosDef)>0`
+# (#4852). Legitimately zero-referenced now; consumed by the next PR (the finrank ≤ 1 / singlet
+# uniqueness capstone, which combines this non-orthogonality with a θ-symmetric ground basis).
+balanced_signDefinite_ground_dotProduct_ne_zero

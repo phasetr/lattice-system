@@ -49,23 +49,28 @@ theorem rayleighOnVec_unitary_conj (U M : Matrix n n ℂ) (v : n → ℂ) :
   rw [dotProduct_mulVec]
   rw [star_vecMul]
 
+/-- **Polarized isometry of `Uᴴ` for unitary `U`** (with `U * Uᴴ = 1`): the back-rotation
+`Uᴴ` preserves the (Hermitian) pairing of two vectors,
+`dotProduct (star (Uᴴ.mulVec v')) (Uᴴ.mulVec v) = dotProduct (star v') v`. -/
+theorem dotProduct_star_conjTranspose_mulVec
+    {U : Matrix n n ℂ} (hU : U * U.conjTranspose = 1) (v' v : n → ℂ) :
+    dotProduct (star (U.conjTranspose.mulVec v')) (U.conjTranspose.mulVec v) =
+      dotProduct (star v') v := by
+  -- star (Uᴴ *ᵥ v') = star v' ᵥ* U (reverse of `star_vecMul U v'`).
+  rw [← star_vecMul]
+  -- (star v' ᵥ* U) ⬝ᵥ (Uᴴ *ᵥ v) = star v' ⬝ᵥ (U * Uᴴ) *ᵥ v.
+  rw [show (star v' ᵥ* U) ⬝ᵥ U.conjTranspose.mulVec v =
+        star v' ⬝ᵥ (U * U.conjTranspose).mulVec v from by
+        rw [← Matrix.mulVec_mulVec, ← dotProduct_mulVec]]
+  rw [hU, Matrix.one_mulVec]
+
 /-- For unitary `U` (with `Uᴴ * U = 1`), unit-normalisation is preserved by `Uᴴ`:
-`dotProduct (star (Uᴴ.mulVec v)) (Uᴴ.mulVec v) = dotProduct (star v) v`. -/
+`dotProduct (star (Uᴴ.mulVec v)) (Uᴴ.mulVec v) = dotProduct (star v) v`. The `v' = v`
+instance of `dotProduct_star_conjTranspose_mulVec`. -/
 theorem dotProduct_star_conjTranspose_mulVec_self
     {U : Matrix n n ℂ} (hU : U * U.conjTranspose = 1) (v : n → ℂ) :
     dotProduct (star (U.conjTranspose.mulVec v)) (U.conjTranspose.mulVec v) =
-      dotProduct (star v) v := by
-  -- star (Uᴴ v) ⬝ᵥ (Uᴴ v) = (Uᴴ v) ᵥ* Uᴴ ⬝ᵥ ... hmm. Use star_vecMul trick.
-  -- star (Uᴴ *ᵥ v) = star v ᵥ* U (from star_vecMul U v applied carefully... wait,
-  -- the original star_vecMul gives star v ᵥ* U = star (Uᴴ *ᵥ v),
-  -- so reverse: star (Uᴴ *ᵥ v) = star v ᵥ* U).
-  rw [← star_vecMul]
-  -- Now goal: (star v ᵥ* U) ⬝ᵥ (Uᴴ *ᵥ v) = star v ⬝ᵥ v
-  -- Use vecMul_dotProduct + mulVec_mulVec: (v ᵥ* U) ⬝ᵥ (Uᴴ *ᵥ v) = v ᵥ* U ⬝ᵥ Uᴴ *ᵥ v
-  -- = ? Need to relate to (U * Uᴴ).
-  rw [show (star v ᵥ* U) ⬝ᵥ U.conjTranspose.mulVec v =
-        star v ⬝ᵥ (U * U.conjTranspose).mulVec v from by
-        rw [← Matrix.mulVec_mulVec, ← dotProduct_mulVec]]
-  rw [hU, Matrix.one_mulVec]
+      dotProduct (star v) v :=
+  dotProduct_star_conjTranspose_mulVec hU v v
 
 end LatticeSystem.Quantum
