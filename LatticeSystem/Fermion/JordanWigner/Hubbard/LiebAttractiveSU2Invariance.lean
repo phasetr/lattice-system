@@ -105,4 +105,21 @@ theorem fermionTotalSpinPlus_commute_attractiveHubbardHamiltonian
     (fermionTotalSpinPlus_commute_hubbardOnSiteInteractionSite N
       (fun x => -(U x : ℂ)))
 
+/-- `[Ŝ⁻_tot, Ĥ] = 0` for the attractive Hubbard Hamiltonian: derived
+from `[Ŝ⁺_tot, Ĥ] = 0` by taking conjugate transposes, using
+`(Ŝ⁺_tot)ᴴ = Ŝ⁻_tot` and the Hermiticity of `Ĥ` (symmetric real
+hopping).  Clone of `fermionTotalSpinMinus_commute_hubbardHamiltonian`
+(Tasaki §9.3.3, eq. (9.3.35); §10.2.1). -/
+theorem fermionTotalSpinMinus_commute_attractiveHubbardHamiltonian
+    (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
+    (U : Fin (N + 1) → ℝ) (hT : ∀ i j, T i j = T j i) :
+    Commute (fermionTotalSpinMinus N) (attractiveHubbardHamiltonian N T U) := by
+  have h_plus :=
+    (fermionTotalSpinPlus_commute_attractiveHubbardHamiltonian N T U).eq
+  have h_H := attractiveHubbardHamiltonian_isHermitian T U hT
+  have h_adj := congrArg Matrix.conjTranspose h_plus
+  simp only [Matrix.conjTranspose_mul, fermionTotalSpinPlus_conjTranspose N,
+    h_H.eq] at h_adj
+  exact h_adj.symm
+
 end LatticeSystem.Fermion
