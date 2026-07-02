@@ -160,4 +160,25 @@ theorem fermionTotalSpinZ_commute_attractiveHubbardHamiltonian
   exact ((fermionTotalUpNumber_commute_attractiveHubbardHamiltonian N T U).sub_left
     (fermionTotalDownNumber_commute_attractiveHubbardHamiltonian N T U)).smul_left _
 
+/-- **`[(Ŝ_tot)², Ĥ] = 0` for the attractive Hubbard Hamiltonian**: the
+Casimir `(Ŝ_tot)² = Ŝ⁻_tot Ŝ⁺_tot + Ŝ³_tot(Ŝ³_tot + 1)` commutes with
+`Ĥ`, i.e. `Ĥ` is `SU(2)` invariant.  Assembled from the three generator
+commutes above, exactly as
+`fermionTotalSpinSquared_commute_hubbardHamiltonian`.  The Hermiticity
+hypothesis `hT` (symmetric real hopping) is needed for the `Ŝ⁻`
+commutator.  Reference: Tasaki §9.3.3, p. 333; §10.2.1, pp. 348–349;
+§11.1.1, p. 372. -/
+theorem fermionTotalSpinSquared_commute_attractiveHubbardHamiltonian
+    (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
+    (U : Fin (N + 1) → ℝ) (hT : ∀ i j, T i j = T j i) :
+    Commute (fermionTotalSpinSquared N) (attractiveHubbardHamiltonian N T U) := by
+  unfold fermionTotalSpinSquared
+  apply Commute.add_left
+  · -- [Ŝ⁻Ŝ⁺, Ĥ] = 0
+    exact (fermionTotalSpinMinus_commute_attractiveHubbardHamiltonian N T U hT).mul_left
+      (fermionTotalSpinPlus_commute_attractiveHubbardHamiltonian N T U)
+  · -- [Ŝ³(Ŝ³ + 1), Ĥ] = 0
+    have h_z := fermionTotalSpinZ_commute_attractiveHubbardHamiltonian N T U
+    exact h_z.mul_left (h_z.add_left (Commute.one_left _))
+
 end LatticeSystem.Fermion
