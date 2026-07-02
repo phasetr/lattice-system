@@ -21,6 +21,10 @@ instantiates the lift.
 
 * `hubbardOnSiteInteractionSite_commute_fermionTotalNumber` — the site interaction conserves `N̂`.
 * `attractiveHubbardHamiltonian_commute_fermionTotalNumber` — the attractive `Ĥ` conserves `N̂`.
+* `fermionTotal{Up,Down}Number_commute_hubbardOnSiteInteractionSite` — the site interaction
+  conserves each spin number `N̂_↑`, `N̂_↓`.
+* `attractiveHubbardHamiltonian_commute_fermionTotal{Up,Down}Number` — the attractive `Ĥ`
+  conserves each spin number: `[Ĥ, N̂_↑] = [Ĥ, N̂_↓] = 0`.
 * `preservesHubbardSectorW_attractive` — `Ĥ` preserves the `Ne`-sector `W`-submodule.
 * `exists_attractive_sector_ground` — a nonzero `Ne`-sector eigenvector at the sector-compression
   minimum eigenvalue.
@@ -53,6 +57,56 @@ theorem attractiveHubbardHamiltonian_commute_fermionTotalNumber
   unfold attractiveHubbardHamiltonian attractiveHubbardInteraction
   exact (hubbardKinetic_commute_fermionTotalNumber N _).add_left
     (hubbardOnSiteInteractionSite_commute_fermionTotalNumber _)
+
+/-- `N_↑` commutes with the site-dependent on-site interaction `Σ_x V_x n̂_{x,↑} n̂_{x,↓}`: every
+summand is a product of pairwise-commuting number operators (mirror of the uniform-coupling
+`fermionTotalUpNumber_commute_hubbardOnSiteInteraction`). -/
+theorem fermionTotalUpNumber_commute_hubbardOnSiteInteractionSite (V : Fin (N + 1) → ℂ) :
+    Commute (fermionTotalUpNumber N) (hubbardOnSiteInteractionSite N V) := by
+  unfold fermionTotalUpNumber hubbardOnSiteInteractionSite
+  refine Commute.sum_left _ _ _ (fun k _ => ?_)
+  refine Commute.sum_right _ _ _ (fun i _ => ?_)
+  refine Commute.smul_right ?_ (V i)
+  unfold fermionUpNumber fermionDownNumber
+  refine Commute.mul_right ?_ ?_
+  · exact fermionMultiNumber_commute (2 * N + 1)
+      (spinfulIndex N k 0) (spinfulIndex N i 0)
+  · exact fermionMultiNumber_commute (2 * N + 1)
+      (spinfulIndex N k 0) (spinfulIndex N i 1)
+
+/-- `N_↓` commutes with the site-dependent on-site interaction `Σ_x V_x n̂_{x,↑} n̂_{x,↓}` (mirror
+of the uniform-coupling `fermionTotalDownNumber_commute_hubbardOnSiteInteraction`). -/
+theorem fermionTotalDownNumber_commute_hubbardOnSiteInteractionSite (V : Fin (N + 1) → ℂ) :
+    Commute (fermionTotalDownNumber N) (hubbardOnSiteInteractionSite N V) := by
+  unfold fermionTotalDownNumber hubbardOnSiteInteractionSite
+  refine Commute.sum_left _ _ _ (fun k _ => ?_)
+  refine Commute.sum_right _ _ _ (fun i _ => ?_)
+  refine Commute.smul_right ?_ (V i)
+  unfold fermionUpNumber fermionDownNumber
+  refine Commute.mul_right ?_ ?_
+  · exact fermionMultiNumber_commute (2 * N + 1)
+      (spinfulIndex N k 1) (spinfulIndex N i 0)
+  · exact fermionMultiNumber_commute (2 * N + 1)
+      (spinfulIndex N k 1) (spinfulIndex N i 1)
+
+/-- The **attractive Hubbard Hamiltonian conserves the spin-up number**: `[Ĥ, N̂_↑] = 0`. Both the
+kinetic term and the site attraction commute with `N̂_↑` (mirror of
+`attractiveHubbardHamiltonian_commute_fermionTotalNumber`). -/
+theorem attractiveHubbardHamiltonian_commute_fermionTotalUpNumber
+    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : Fin (N + 1) → ℝ) :
+    Commute (attractiveHubbardHamiltonian N T U) (fermionTotalUpNumber N) := by
+  unfold attractiveHubbardHamiltonian attractiveHubbardInteraction
+  exact (fermionTotalUpNumber_commute_hubbardKinetic N _).symm.add_left
+    (fermionTotalUpNumber_commute_hubbardOnSiteInteractionSite _).symm
+
+/-- The **attractive Hubbard Hamiltonian conserves the spin-down number**: `[Ĥ, N̂_↓] = 0` (mirror
+of `attractiveHubbardHamiltonian_commute_fermionTotalNumber`). -/
+theorem attractiveHubbardHamiltonian_commute_fermionTotalDownNumber
+    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : Fin (N + 1) → ℝ) :
+    Commute (attractiveHubbardHamiltonian N T U) (fermionTotalDownNumber N) := by
+  unfold attractiveHubbardHamiltonian attractiveHubbardInteraction
+  exact (fermionTotalDownNumber_commute_hubbardKinetic N _).symm.add_left
+    (fermionTotalDownNumber_commute_hubbardOnSiteInteractionSite _).symm
 
 /-- The attractive Hamiltonian **preserves the `Ne`-sector `W`-submodule** — the reusable
 hypothesis of the eigenvector lift. -/
