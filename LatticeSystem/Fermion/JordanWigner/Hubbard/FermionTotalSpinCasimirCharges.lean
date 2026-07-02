@@ -57,4 +57,17 @@ theorem fermionTotalSpinSquared_commute_fermionTotalNumber (N : ℕ) :
   · have h_z := fermionTotalSpinZ_commute_fermionTotalNumber N
     exact h_z.mul_left (h_z.add_left (Commute.one_left _))
 
+/-- **`[(Ŝ_tot)², Ŝ³_tot] = 0`**: the total-spin Casimir commutes with the `z`-component.  From
+`[(Ŝ_tot)², Ŝ⁺_tot] = [(Ŝ_tot)², Ŝ⁻_tot] = 0` the Casimir commutes with both `Ŝ⁺Ŝ⁻` and `Ŝ⁻Ŝ⁺`,
+hence with their difference `Ŝ⁺Ŝ⁻ − Ŝ⁻Ŝ⁺ = 2 Ŝ³_tot`; dividing by the unit `2` gives the claim.
+Reference: Tasaki §9.3.3, p. 332. -/
+theorem fermionTotalSpinSquared_commute_fermionTotalSpinZ (N : ℕ) :
+    Commute (fermionTotalSpinSquared N) (fermionTotalSpinZ N) := by
+  have hplus := fermionTotalSpinSquared_commute_fermionTotalSpinPlus N
+  have hminus := fermionTotalSpinSquared_commute_fermionTotalSpinMinus N
+  have hcomm : Commute (fermionTotalSpinSquared N) ((2 : ℂ) • fermionTotalSpinZ N) := by
+    rw [← fermionTotalSpinPlus_commutator_fermionTotalSpinMinus N]
+    exact (hplus.mul_right hminus).sub_right (hminus.mul_right hplus)
+  exact (Commute.smul_right_iff₀ (by norm_num : (2 : ℂ) ≠ 0)).mp hcomm
+
 end LatticeSystem.Fermion
