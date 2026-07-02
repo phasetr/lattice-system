@@ -40,9 +40,13 @@ Since each column `J · s` of the embedding is the standard basis vector `|s.val
   strictly attractive `U > 0` and connected symmetric hopping `T`, the balanced
   positive-semidefinite ground state `φ` of PR40f has a *positive-definite* sector-compressed
   coefficient `R_k = Jᴴ · blockWCoeff φ · J`.
+* `exists_signDefiniteCompress_ground_in_balanced_sector` — **the assembly capstone (Lemma 10.9).**
+  For strictly attractive `U > 0` and connected symmetric hopping `T`, there is a balanced
+  Hermitian-`W` ground state `φ` whose compressed coefficient `W_S = Jᴴ · blockWCoeff φ · J` is
+  *sign-definite*: `W_S.PosDef ∨ (−W_S).PosDef`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
-1st ed., Springer 2020, §10.2.4 (Lemma 10.10), pp. 363–367.
+1st ed., Springer 2020, §10.2.4 (Lemmas 10.9–10.10), pp. 363–367.
 -/
 
 namespace LatticeSystem.Fermion
@@ -303,5 +307,112 @@ theorem exists_posDefCompress_ground_in_balanced_sector (k : ℕ)
   rcases posDefCompress_dichotomy k T U hT_symm hU_pos hT_conn hRk_psd hcomp with hpd | hz
   · exact hpd
   · exact absurd hz (blockWCoeff_sectorCompress_ne_zero_of_ne_zero k φ hφ0 hφUp hφDn)
+
+/-- **The balanced-sector sign-definite compressed coefficient** (Tasaki §10.2.4, Lemma 10.9).
+For symmetric real hopping `T` whose support graph is connected and strictly attractive on-site
+interaction `U > 0`, there is a nonzero balanced (`Ŝ³ = 0`) ground state `φ` of the attractive
+Hubbard Hamiltonian, at the balanced-compression minimum eigenvalue `E`, with Hermitian
+reconciliation coefficient `blockWCoeff φ`, whose sector-compressed coefficient
+`W_S = Jᴴ · blockWCoeff φ · J`, `J = hubbardCountSectorEmbedding N k`, is *sign-definite*:
+`W_S.PosDef ∨ (−W_S).PosDef`. This is Tasaki's Lemma 10.9, assembled from Lemma 10.10's dichotomy:
+
+* take a balanced Hermitian-`W` ground `φ` (`exists_hermitianW_ground_in_balanced_sector`); its
+  compressed matrix `W_S` (Hermitian) solves the compressed Lyapunov/Schrödinger equation via
+  `blockWCoeff_lyapunov_of_eigenvector` and `lyapunov_conjugate_isometry`;
+* its spectral absolute value `P = |W_S|` (`hermitianAbs`) is PSD (`hermitianAbs_posSemidef`) and
+  solves the *same* compressed equation, because `Γ(J·P·Jᴴ)` is again a `Ĥ`-ground at `E`
+  (`gammaWState_hermitianAbs_isEigenvector`), whose block coefficient compresses back to `P`;
+* the reusable dichotomy `posDefCompress_dichotomy` applied to `P` gives `P.PosDef ∨ P = 0`,
+  resolved to `P.PosDef` since `W_S ≠ 0` (`blockWCoeff_sectorCompress_ne_zero_of_ne_zero`) forces
+  `P ≠ 0` (`|W_S|² = W_S²` via `hermitianAbs_mul_self`, `conjTranspose_mul_self_eq_zero`);
+* the difference `P − W_S` is PSD (`hermitianAbs_sub_posSemidef`) and solves the same equation
+  (`lyapunovEq_sub`), so the dichotomy gives `(P − W_S).PosDef ∨ P − W_S = 0`;
+* since `(P − W_S)·(P + W_S) = P² − W_S² = 0` (`hermitianAbs_commute` cancels the cross terms), in
+  the first case `IsUnit (P − W_S)` (`Matrix.PosDef.isUnit`) cancels to `P + W_S = 0`, i.e.
+  `−W_S = P` is positive definite, and in the second case `W_S = P` is positive definite.
+
+Both the sign-definiteness of `W_S` and the eigenvector relation at the balanced minimum eigenvalue
+`E` are retained, as the downstream uniqueness step (`Tr(W'W) > 0`) consumes both. -/
+theorem exists_signDefiniteCompress_ground_in_balanced_sector (k : ℕ)
+    [Nonempty (hubbardBalancedConfig N k)]
+    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : Fin (N + 1) → ℝ)
+    (hT_symm : ∀ i j, T i j = T j i) (hU_pos : ∀ x, 0 < U x)
+    (hT_conn : (hoppingSupportGraph T).Preconnected) :
+    ∃ φ : (Fin (2 * N + 2) → Fin 2) → ℂ, φ ≠ 0
+      ∧ (fermionTotalUpNumber N).mulVec φ = (k : ℂ) • φ
+      ∧ (fermionTotalDownNumber N).mulVec φ = (k : ℂ) • φ
+      ∧ (blockWCoeff N φ).IsHermitian
+      ∧ (((hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ
+              * hubbardCountSectorEmbedding N k).PosDef
+          ∨ (-((hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ
+              * hubbardCountSectorEmbedding N k)).PosDef)
+      ∧ (attractiveHubbardHamiltonian N T U).mulVec φ
+          = ((hermitianMinEigenvalue (configSectorCompress_isHermitian
+              (hubbardBalancedSectorPred N k)
+              (attractiveHubbardHamiltonian_isHermitian T U hT_symm)) : ℝ) : ℂ) • φ := by
+  classical
+  -- The balanced Hermitian-`W` ground representative (PR40e-pre2b).
+  obtain ⟨φ, hφ0, hφUp, hφDn, hφHerm, hφeig⟩ :=
+    exists_hermitianW_ground_in_balanced_sector k T U hT_symm
+  set E : ℝ := hermitianMinEigenvalue (configSectorCompress_isHermitian
+    (hubbardBalancedSectorPred N k)
+    (attractiveHubbardHamiltonian_isHermitian T U hT_symm)) with hEdef
+  refine ⟨φ, hφ0, hφUp, hφDn, hφHerm, ?_, hφeig⟩
+  -- The sector isometry `J` and the compressed Hermitian coefficient `W_S`.
+  have hJ : (hubbardCountSectorEmbedding N k)ᴴ * hubbardCountSectorEmbedding N k = 1 :=
+    hubbardCountSectorEmbedding_conjTranspose_mul_self k
+  set WS := (hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ
+    * hubbardCountSectorEmbedding N k with hWSdef
+  have hWS : WS.IsHermitian := by
+    rw [hWSdef]
+    change ((hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ
+        * hubbardCountSectorEmbedding N k)ᴴ
+      = (hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ * hubbardCountSectorEmbedding N k
+    rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,
+      hφHerm.eq, Matrix.mul_assoc]
+  -- `W_S` solves the compressed Lyapunov equation (from the Hermitian ground `φ`).
+  have hemb : blockWCoeff N φ = hubbardCountSectorEmbedding N k * WS
+      * (hubbardCountSectorEmbedding N k)ᴴ := by
+    rw [hWSdef]; exact blockWCoeff_eq_embed_compress_of_balanced k φ hφUp hφDn
+  have hWS_lyap := Math.lyapunov_conjugate_isometry hJ hemb
+    (blockWCoeff_lyapunov_of_eigenvector T U φ E hφeig)
+  -- `Γ(J·|W_S|·Jᴴ)` is again a `Ĥ`-ground at `E` (commit 4), so `|W_S|` solves the same equation.
+  obtain ⟨-, -, -, -, hφ'eig⟩ :=
+    gammaWState_hermitianAbs_isEigenvector k T U hT_symm (fun x => (hU_pos x).le)
+      φ hφ0 hφUp hφDn hφHerm hWS hφeig
+  set P := hermitianAbs hWS with hPdef
+  have hemb' : blockWCoeff N (gammaWState N (hubbardCountSectorEmbedding N k * P
+        * (hubbardCountSectorEmbedding N k)ᴴ))
+      = hubbardCountSectorEmbedding N k * P * (hubbardCountSectorEmbedding N k)ᴴ := by
+    rw [blockWCoeff, blockWCoeff_gammaWState]
+  have hP_lyap := Math.lyapunov_conjugate_isometry hJ hemb'
+    (blockWCoeff_lyapunov_of_eigenvector T U _ E hφ'eig)
+  -- Squares and commutation of `P = |W_S|` with `W_S`.
+  have hWSne : WS ≠ 0 :=
+    blockWCoeff_sectorCompress_ne_zero_of_ne_zero k φ hφ0 hφUp hφDn
+  have hsq : P * P = WS * WS := hermitianAbs_mul_self hWS
+  have hcomm : P * WS = WS * P := hermitianAbs_commute hWS
+  -- `P` is positive definite: PSD + compressed Lyapunov ⟹ `P.PosDef ∨ P = 0`, and `P ≠ 0`.
+  have hP_pd : P.PosDef := by
+    rcases posDefCompress_dichotomy k T U hT_symm hU_pos hT_conn
+        (hermitianAbs_posSemidef hWS) hP_lyap with hpd | hp0
+    · exact hpd
+    · have hP0 : P = 0 := hPdef.trans hp0
+      exact absurd (Matrix.conjTranspose_mul_self_eq_zero.mp
+        (by rw [hWS.eq, ← hsq, hP0, Matrix.zero_mul])) hWSne
+  -- `R' = P − W_S` is PSD and solves the same compressed equation.
+  rcases posDefCompress_dichotomy k T U hT_symm hU_pos hT_conn
+      (hermitianAbs_sub_posSemidef hWS) (Math.lyapunovEq_sub hP_lyap hWS_lyap) with hR'pd | hR'0
+  · -- `(P − W_S)·(P + W_S) = 0` with `P − W_S` invertible ⟹ `−W_S = P` positive definite.
+    right
+    have hprod : (P - WS) * (P + WS) = 0 := by
+      rw [Matrix.sub_mul, Matrix.mul_add, Matrix.mul_add, hsq, hcomm]; abel
+    have hPWS0 : P + WS = 0 :=
+      (hR'pd.isUnit.mul_right_inj).mp (by rw [hprod, Matrix.mul_zero])
+    have hnegP : -WS = P := by rw [neg_eq_iff_add_eq_zero, add_comm]; exact hPWS0
+    rw [hnegP]; exact hP_pd
+  · -- `P − W_S = 0` ⟹ `W_S = P` positive definite.
+    left
+    rw [← sub_eq_zero.mp hR'0]; exact hP_pd
 
 end LatticeSystem.Fermion
