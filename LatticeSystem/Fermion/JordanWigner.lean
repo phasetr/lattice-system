@@ -180,6 +180,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveTotalSpinEigenst
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveSingletGround
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveFullSectorSU2Algebra
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveFullSectorEnergy
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveFullSectorUnique
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
