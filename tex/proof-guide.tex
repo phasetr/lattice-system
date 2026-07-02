@@ -5377,11 +5377,15 @@ $\hat H$ in the $N$-electron sector is unique and a spin singlet,
 $(\hat S_{\rm tot})^2 = 0$
 (\texttt{theorem\_10\_2\_lieb\_attractive\_unique\_singlet}).
 
-\emph{Status.} Proved by Lieb's spin-space reflection-positivity method; per the
-project policy this deep reflection-positivity result is recorded as a faithful
-documented \texttt{axiom}, built on a concrete attractive Hubbard Hamiltonian,
-with the unique-ground-state predicate \texttt{IsUniqueGroundStateOn} reused from
-the degenerate-perturbation development (§10.1).
+\emph{Status.} \textbf{Now PROVED axiom-free} (in
+\texttt{LiebAttractiveTheorem102.lean}): Lieb's spin-space reflection positivity
+is carried out on the balanced ($\hat S^3 = 0$) block and lifted to the full
+$N$-electron sector through the generic SU(2) multiplet engine (Appendix~A),
+giving the full-sector ground eigenspace as a one-dimensional spin singlet; this
+plain-space milestone is assembled into the unique-ground-state predicate
+\texttt{IsUniqueGroundStateOn} (reused from the degenerate-perturbation
+development, §10.1) via the \texttt{Matrix.toEuclideanLin}/\texttt{mulVec}
+correspondence.
 
 \medskip
 \noindent\textbf{Theorem 10.3} (Tian; Tasaki §10.2.1, p.~349, eq.~(10.2.4)).

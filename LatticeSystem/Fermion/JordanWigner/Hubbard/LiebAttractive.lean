@@ -24,12 +24,15 @@ energies allowed) and on-site attraction `Ĥatt-int = −Σ_x U_x n̂_{x,↑} n�
 
 ## Status
 
-Both are proved by Lieb's spin-space reflection-positivity method (and
-Tian's extension); per the project policy these deep reflection-positivity
-results are recorded as faithful documented `axiom`s, built on a concrete
-attractive Hubbard Hamiltonian. The general hopping kinetic term reuses the
-existing `hubbardKinetic`; the unique-ground-state predicate reuses
-`IsUniqueGroundStateOn` from the degenerate-perturbation development.
+**Theorem 10.2 is now PROVED axiom-free** (in `LiebAttractiveTheorem102.lean`,
+`theorem_10_2_lieb_attractive_unique_singlet`): Lieb's spin-space
+reflection-positivity is carried out on the balanced (`Ŝ³ = 0`) block and
+lifted to the full `Ne`-electron sector through the generic SU(2) multiplet
+engine (Tasaki Appendix A). Theorem 10.3 (Tian's pair-correlation
+positivity) is still recorded as a faithful documented `axiom`, built on a
+concrete attractive Hubbard Hamiltonian. The general hopping kinetic term
+reuses the existing `hubbardKinetic`; the unique-ground-state predicate
+reuses `IsUniqueGroundStateOn` from the degenerate-perturbation development.
 -/
 
 namespace LatticeSystem.Fermion
@@ -88,27 +91,6 @@ state vector `φ`. -/
 noncomputable def euclideanExpectation {ι : Type*} [Fintype ι]
     (O : Matrix ι ι ℂ) (φ : EuclideanSpace ℂ ι) : ℂ :=
   dotProduct (star φ.ofLp) (O.mulVec φ.ofLp)
-
-/-- **Tasaki Theorem 10.2** (Lieb's theorem for the attractive Hubbard
-model, 1st ed., Springer 2020, §10.2.1, p. 348, **AXIOM**). For an
-arbitrary real symmetric hopping matrix `T` whose support graph is
-connected (with arbitrary on-site energies) and site-dependent attraction
-`U_x > 0`, and an even electron number `N` with `0 < N ≤ 2|Λ|`, the ground
-state of `Ĥ = Ĥhop + Ĥatt-int` in the `N`-electron sector is unique and a
-spin singlet (`(Ŝ_tot)² = 0`).
-
-Proved by Lieb's spin-space reflection-positivity method; recorded as a
-faithful documented axiom. -/
-axiom theorem_10_2_lieb_attractive_unique_singlet (N Ne : ℕ)
-    (hNe_even : Even Ne) (hNe_pos : 0 < Ne) (hNe_le : Ne ≤ 2 * (N + 1))
-    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
-    (hT_symm : ∀ x y, T x y = T y x)
-    (hT_conn : (hoppingSupportGraph T).Preconnected)
-    (U : Fin (N + 1) → ℝ) (hU_pos : ∀ x, 0 < U x) :
-    ∃ (E : ℝ) (φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)),
-      IsUniqueGroundStateOn (electronNumberSectorEuclidean N Ne)
-          (attractiveHubbardHamiltonian N T U) E φ ∧
-        Matrix.toEuclideanLin (fermionTotalSpinSquared N) φ = 0
 
 /-- **Tasaki Theorem 10.3** (Tian's pair-correlation positivity, 1st ed.,
 Springer 2020, §10.2.1, p. 349, eq. (10.2.4), **AXIOM**). Under the
