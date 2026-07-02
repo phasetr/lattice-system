@@ -43,45 +43,6 @@ theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_im_zero
     ring
   · rw [if_neg h]; simp
 
-/-- For distinct sites `x ≠ y`, the product `onSiteS x (S^3) * onSiteS y (S^3)`
-preserves real entries. -/
-theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_eq_ofReal_re
-    {x y : Λ} (hxy : x ≠ y) (σ' σ : Λ → Fin (N + 1)) :
-    (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
-          : ManyBodyOpS Λ N) σ' σ =
-      ((((onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
-          : ManyBodyOpS Λ N) σ' σ).re : ℝ) : ℂ) := by
-  apply Complex.ext
-  · simp
-  · rw [Complex.ofReal_im]
-    exact onSiteS_spinSOp3_mul_onSiteS_spinSOp3_im_zero hxy σ' σ
-
-/-- For distinct sites `x ≠ y`, the product `S+_x ⊗ S-_y` matrix
-element equals its real-part embedding. -/
-theorem onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_eq_ofReal_re
-    {x y : Λ} (hxy : x ≠ y) (σ' σ : Λ → Fin (N + 1)) :
-    (onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N)
-          : ManyBodyOpS Λ N) σ' σ =
-      ((((onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N)
-          : ManyBodyOpS Λ N) σ' σ).re : ℝ) : ℂ) := by
-  apply Complex.ext
-  · simp
-  · rw [Complex.ofReal_im]
-    exact onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_im_zero hxy σ' σ
-
-/-- For distinct sites `x ≠ y`, the product `S-_x ⊗ S+_y` matrix
-element equals its real-part embedding. -/
-theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_eq_ofReal_re
-    {x y : Λ} (hxy : x ≠ y) (σ' σ : Λ → Fin (N + 1)) :
-    (onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
-          : ManyBodyOpS Λ N) σ' σ =
-      ((((onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
-          : ManyBodyOpS Λ N) σ' σ).re : ℝ) : ℂ) := by
-  apply Complex.ext
-  · simp
-  · rw [Complex.ofReal_im]
-    exact onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_im_zero hxy σ' σ
-
 /-- For distinct sites `x ≠ y`, when configurations agree at every
 site other than `x` and `y`, the matrix element of `S^3_x S^3_y`
 factors into the per-site `S^3` entries. -/
@@ -120,14 +81,6 @@ theorem onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_eq_zero_of_off_two_si
           : ManyBodyOpS Λ N) σ' σ = 0 := by
   rw [onSiteS_mul_onSiteS_apply_eq hxy, if_neg h]
 
-/-- Same for `S-_x ⊗ S+_y`. -/
-theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_eq_zero_of_off_two_site_diff
-    {x y : Λ} (hxy : x ≠ y) {σ' σ : Λ → Fin (N + 1)}
-    (h : ¬ ∀ k, k ≠ x → k ≠ y → σ' k = σ k) :
-    (onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
-          : ManyBodyOpS Λ N) σ' σ = 0 := by
-  rw [onSiteS_mul_onSiteS_apply_eq hxy, if_neg h]
-
 /-- Vanishing with witness difference site: if `z ∉ {x, y}` and
 `σ' z ≠ σ z`, the product `onSiteS x A * onSiteS y B` vanishes at
 `(σ', σ)`. -/
@@ -142,46 +95,7 @@ theorem onSiteS_mul_onSiteS_apply_eq_zero_of_diff_outside_pair
   intro hagree
   exact hz (hagree z hzx hzy)
 
-/-- Same for `S^3_x ⊗ S^3_y`. -/
-theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_eq_zero_of_diff_outside_pair
-    {x y : Λ} (hxy : x ≠ y)
-    {σ' σ : Λ → Fin (N + 1)}
-    {z : Λ} (hzx : z ≠ x) (hzy : z ≠ y) (hz : σ' z ≠ σ z) :
-    (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
-          : ManyBodyOpS Λ N) σ' σ = 0 :=
-  onSiteS_mul_onSiteS_apply_eq_zero_of_diff_outside_pair hxy _ _ hzx hzy hz
-
-/-- Same for `S+_x ⊗ S-_y`. -/
-theorem onSiteS_spinSOpPlus_mul_onSiteS_spinSOpMinus_apply_eq_zero_of_diff_outside_pair
-    {x y : Λ} (hxy : x ≠ y)
-    {σ' σ : Λ → Fin (N + 1)}
-    {z : Λ} (hzx : z ≠ x) (hzy : z ≠ y) (hz : σ' z ≠ σ z) :
-    (onSiteS x (spinSOpPlus N) * onSiteS y (spinSOpMinus N)
-          : ManyBodyOpS Λ N) σ' σ = 0 :=
-  onSiteS_mul_onSiteS_apply_eq_zero_of_diff_outside_pair hxy _ _ hzx hzy hz
-
-/-- Same for `S-_x ⊗ S+_y`. -/
-theorem onSiteS_spinSOpMinus_mul_onSiteS_spinSOpPlus_apply_eq_zero_of_diff_outside_pair
-    {x y : Λ} (hxy : x ≠ y)
-    {σ' σ : Λ → Fin (N + 1)}
-    {z : Λ} (hzx : z ≠ x) (hzy : z ≠ y) (hz : σ' z ≠ σ z) :
-    (onSiteS x (spinSOpMinus N) * onSiteS y (spinSOpPlus N)
-          : ManyBodyOpS Λ N) σ' σ = 0 :=
-  onSiteS_mul_onSiteS_apply_eq_zero_of_diff_outside_pair hxy _ _ hzx hzy hz
-
 /-! ## `(S^3 ⊗ S^3)` matrix element formulas -/
-
-/-- For `x ≠ y`, when `σ' = σ`, the `S^3_x ⊗ S^3_y` matrix element
-factors into the per-site `S^3` diagonal entries:
-`(N/2 - σ_x.val) * (N/2 - σ_y.val)`. -/
-theorem onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_diag
-    {x y : Λ} (hxy : x ≠ y) (σ : Λ → Fin (N + 1)) :
-    (onSiteS x (spinSOp3 N) * onSiteS y (spinSOp3 N)
-          : ManyBodyOpS Λ N) σ σ =
-      ((N : ℂ) / 2 - (σ x).val) * ((N : ℂ) / 2 - (σ y).val) := by
-  rw [onSiteS_spinSOp3_mul_onSiteS_spinSOp3_apply_of_off_two_site_agree hxy
-    (fun _ _ _ => rfl)]
-  rw [spinSOp3_apply_diag, spinSOp3_apply_diag]
 
 /-- For `x ≠ y` and `σ' σ` agreeing off `{x, y}` with `σ' x ≠ σ x`,
 the `S^3_x ⊗ S^3_y` matrix element vanishes (`S^3` is diagonal). -/

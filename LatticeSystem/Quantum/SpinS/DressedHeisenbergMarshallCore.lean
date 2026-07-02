@@ -93,26 +93,6 @@ theorem dressedHeisenbergS_apply_eq_zero_of_one_site_diff
     (Λ := V) J N hagree hz]
   ring
 
-/-- The dressed Heisenberg matrix (as a `ManyBodyOpS`) vanishes on
-one-site differences. -/
-theorem dressedHeisenbergSMatrix_apply_eq_zero_of_one_site_diff
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
-    {σ' σ : V → Fin (N + 1)}
-    {z : V} (hagree : ∀ k, k ≠ z → σ' k = σ k) (hz : σ' z ≠ σ z) :
-    dressedHeisenbergSMatrix A J N σ' σ = 0 :=
-  dressedHeisenbergS_apply_eq_zero_of_one_site_diff A J N hagree hz
-
-/-- The real-part dressed Heisenberg matrix vanishes on one-site
-differences. -/
-theorem dressedHeisenbergSReMatrix_apply_eq_zero_of_one_site_diff
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
-    {σ' σ : V → Fin (N + 1)}
-    {z : V} (hagree : ∀ k, k ≠ z → σ' k = σ k) (hz : σ' z ≠ σ z) :
-    dressedHeisenbergSReMatrix A J N σ' σ = 0 := by
-  rw [dressedHeisenbergSReMatrix_apply,
-    dressedHeisenbergS_apply_eq_zero_of_one_site_diff A J N hagree hz]
-  simp
-
 /-- Dressed Heisenberg matrix vanishes on three-site differences. -/
 theorem dressedHeisenbergS_apply_eq_zero_of_three_diff
     (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
@@ -125,29 +105,6 @@ theorem dressedHeisenbergS_apply_eq_zero_of_three_diff
   rw [heisenbergHamiltonianS_apply_eq_zero_of_three_diff (Λ := V) J N
     h12 h13 h23 hz1 hz2 hz3]
   ring
-
-/-- Dressed Heisenberg `Matrix` vanishes on three-site differences. -/
-theorem dressedHeisenbergSMatrix_apply_eq_zero_of_three_diff
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
-    {σ' σ : V → Fin (N + 1)}
-    {z₁ z₂ z₃ : V}
-    (h12 : z₁ ≠ z₂) (h13 : z₁ ≠ z₃) (h23 : z₂ ≠ z₃)
-    (hz1 : σ' z₁ ≠ σ z₁) (hz2 : σ' z₂ ≠ σ z₂) (hz3 : σ' z₃ ≠ σ z₃) :
-    dressedHeisenbergSMatrix A J N σ' σ = 0 :=
-  dressedHeisenbergS_apply_eq_zero_of_three_diff A J N h12 h13 h23 hz1 hz2 hz3
-
-/-- Real-part dressed Heisenberg matrix vanishes on three-site differences. -/
-theorem dressedHeisenbergSReMatrix_apply_eq_zero_of_three_diff
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
-    {σ' σ : V → Fin (N + 1)}
-    {z₁ z₂ z₃ : V}
-    (h12 : z₁ ≠ z₂) (h13 : z₁ ≠ z₃) (h23 : z₂ ≠ z₃)
-    (hz1 : σ' z₁ ≠ σ z₁) (hz2 : σ' z₂ ≠ σ z₂) (hz3 : σ' z₃ ≠ σ z₃) :
-    dressedHeisenbergSReMatrix A J N σ' σ = 0 := by
-  rw [dressedHeisenbergSReMatrix_apply,
-    dressedHeisenbergS_apply_eq_zero_of_three_diff A J N
-      h12 h13 h23 hz1 hz2 hz3]
-  simp
 
 /-- Symmetric: bipartite case `x ∉ A, y ∈ A`, raising at `x`. -/
 theorem marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_y
@@ -203,27 +160,6 @@ theorem marshallSignS_mul_spinSDot_apply_re_nonpos_bipartite_y_lowering
   rw [neg_nonpos]
   exact spinSDot_apply_re_nonneg_of_raising_lowering_y hxy N h hx
 
-/-- The real-part dressed Heisenberg matrix is additive in the
-coupling. -/
-theorem dressedHeisenbergSReMatrix_add_J
-    (A : V → Bool) (J J' : V → V → ℂ) (N : ℕ)
-    (σ σ' : V → Fin (N + 1)) :
-    dressedHeisenbergSReMatrix A (fun x y => J x y + J' x y) N σ σ' =
-      dressedHeisenbergSReMatrix A J N σ σ' +
-        dressedHeisenbergSReMatrix A J' N σ σ' := by
-  rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_add_J]
-  simp [dressedHeisenbergSReMatrix_apply]
-
-/-- The real-part dressed Heisenberg matrix negates with the
-coupling. -/
-theorem dressedHeisenbergSReMatrix_neg_J
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ)
-    (σ σ' : V → Fin (N + 1)) :
-    dressedHeisenbergSReMatrix A (fun x y => -(J x y)) N σ σ' =
-      -(dressedHeisenbergSReMatrix A J N σ σ') := by
-  rw [dressedHeisenbergSReMatrix_apply, dressedHeisenbergS_neg_J]
-  simp [dressedHeisenbergSReMatrix_apply]
-
 /-- For real coupling, the real-part dressed Heisenberg matrix is
 Hermitian (which for a real-valued matrix is equivalent to
 symmetry). -/
@@ -246,24 +182,6 @@ theorem dressedHeisenbergSReMatrix_couplingOf_isHermitian
   dressedHeisenbergSReMatrix_isHermitian A N
     (LatticeSystem.Lattice.couplingOf_real G hJ)
 
-/-- Real-part dressed Heisenberg matrix on the open chain — Hermiticity. -/
-theorem dressedHeisenbergSReMatrix_chain_isHermitian
-    (M : ℕ) (A : Fin (M + 1) → Bool) (J : ℝ) (N : ℕ) :
-    (dressedHeisenbergSReMatrix A
-        (LatticeSystem.Lattice.couplingOf
-          (SimpleGraph.pathGraph (M + 1)) (-(J : ℂ))) N).IsHermitian :=
-  dressedHeisenbergSReMatrix_couplingOf_isHermitian A _
-    (by simp : star (-(J : ℂ)) = -(J : ℂ)) N
-
-/-- Real-part dressed Heisenberg matrix on the periodic chain — Hermiticity. -/
-theorem dressedHeisenbergSReMatrix_periodicChain_isHermitian
-    (M : ℕ) (A : Fin (M + 2) → Bool) (J : ℝ) (N : ℕ) :
-    (dressedHeisenbergSReMatrix A
-        (LatticeSystem.Lattice.couplingOf
-          (SimpleGraph.cycleGraph (M + 2)) (-(J : ℂ))) N).IsHermitian :=
-  dressedHeisenbergSReMatrix_couplingOf_isHermitian A _
-    (by simp : star (-(J : ℂ)) = -(J : ℂ)) N
-
 /-- The complex dressed matrix entry equals the real-embedded
 real-part: `dressed σ' σ = ((dressedRe σ' σ : ℝ) : ℂ)` for coupling
 with real entries. -/
@@ -278,15 +196,5 @@ theorem dressedHeisenbergSMatrix_apply_eq_ofReal_re
   · rfl
   · rw [Complex.ofReal_im]
     exact dressedHeisenbergS_apply_im_zero A N hreal σ' σ
-
-/-- Matrix-level equality: the complex dressed matrix equals the
-ℂ-embedding of the real-valued dressed matrix entry-wise. -/
-theorem dressedHeisenbergSMatrix_eq_dressedHeisenbergSReMatrix_complex
-    (A : V → Bool) {J : V → V → ℂ} (N : ℕ)
-    (hreal : ∀ x y, (J x y).im = 0) :
-    dressedHeisenbergSMatrix A J N =
-      (dressedHeisenbergSReMatrix A J N).map (fun r : ℝ => (r : ℂ)) := by
-  ext σ' σ
-  rw [Matrix.map_apply, dressedHeisenbergSMatrix_apply_eq_ofReal_re A N hreal]
 
 end LatticeSystem.Quantum
