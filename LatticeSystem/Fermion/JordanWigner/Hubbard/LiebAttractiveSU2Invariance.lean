@@ -91,4 +91,18 @@ theorem fermionTotalDownNumber_commute_hubbardOnSiteInteractionSite
   · exact fermionMultiNumber_commute (2 * N + 1)
       (spinfulIndex N k 1) (spinfulIndex N i 1)
 
+/-- `[Ŝ⁺_tot, Ĥ] = 0` for the attractive Hubbard Hamiltonian: the
+kinetic part commutes by `fermionTotalSpinPlus_commute_hubbardKinetic`
+(generic complex hopping) and the attractive interaction commutes by
+the site-`U` lemma above (Tasaki §9.3.3, eq. (9.3.35); §10.2.1). -/
+theorem fermionTotalSpinPlus_commute_attractiveHubbardHamiltonian
+    (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
+    (U : Fin (N + 1) → ℝ) :
+    Commute (fermionTotalSpinPlus N) (attractiveHubbardHamiltonian N T U) := by
+  unfold attractiveHubbardHamiltonian attractiveHubbardInteraction
+  exact (fermionTotalSpinPlus_commute_hubbardKinetic N
+      (fun x y => (T x y : ℂ))).add_right
+    (fermionTotalSpinPlus_commute_hubbardOnSiteInteractionSite N
+      (fun x => -(U x : ℂ)))
+
 end LatticeSystem.Fermion
