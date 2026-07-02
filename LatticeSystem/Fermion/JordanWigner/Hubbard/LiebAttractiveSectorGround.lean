@@ -12,8 +12,8 @@ ground vector of the **site-dependent attractive** Hamiltonian
 Hamiltonian).
 
 The existing fixed-sector machinery in `HubbardImpossibilityLowUVariationalCore.lean`
-(`hubbardSectorCompress`, `hubbardSectorExpansion`, the eigenvector lift
-`mulVec_hubbardSectorExpansion_of_compress_eigen`) is generic over any number-conserving operator.
+(`configSectorCompress`, `configSectorExpansion`, the eigenvector lift
+`configSectorExpansion_of_compress_eigen`) is generic over any number-conserving operator.
 This module supplies the missing charge-conservation input for the attractive Hamiltonian and
 instantiates the lift.
 
