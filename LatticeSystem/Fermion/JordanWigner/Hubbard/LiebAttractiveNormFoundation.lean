@@ -21,7 +21,9 @@ And `|W| = hermitianAbs W` has the same Frobenius norm as `W` (`|W|² = W²`,
 
 * `dotProduct_star_self_eq_sum_normSq` — `⟨v, v⟩ = Σ |v_c|²`.
 * `blockWCoeff_dotProduct_eq` — `⟨ψ, ψ⟩ = Σ_{u,h} |W_{u,h}|²` (`W = blockWCoeff ψ`).
+* `blockWCoeff_dotProduct_cross_eq` — `⟨ψ', ψ⟩ = tr((blockWCoeff ψ')ᴴ · blockWCoeff ψ)`.
 * `gammaWState_dotProduct_eq` — `⟨Γ(W), Γ(W)⟩ = Σ_{u,h} |W_{u,h}|²`.
+* `gammaWState_dotProduct_cross_eq` — `⟨Γ(W'), Γ(W)⟩ = tr(W'ᴴ · W)`.
 * `hermitianAbs_sum_normSq_eq` — `Σ_{u,h} ||W|_{u,h}|² = Σ_{u,h} |W_{u,h}|²`.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
@@ -67,6 +69,32 @@ theorem blockWCoeff_dotProduct_eq (ψ : (Fin (2 * N + 2) → Fin 2) → ℂ) :
   refine Finset.sum_congr rfl (fun u _ => Finset.sum_congr rfl (fun h _ => ?_))
   rw [hbw u h]; rfl
 
+/-- **Polarized coordinate isometry.** The Hermitian pairing of two states equals the
+Frobenius pairing `tr((blockWCoeff ψ')ᴴ · blockWCoeff ψ)` of their coefficient matrices.
+The `ψ' = ψ` case recovers the squared norm `blockWCoeff_dotProduct_eq`. -/
+theorem blockWCoeff_dotProduct_cross_eq
+    (ψ' ψ : (Fin (2 * N + 2) → Fin 2) → ℂ) :
+    dotProduct (star ψ') ψ
+      = Matrix.trace ((blockWCoeff N ψ')ᴴ * blockWCoeff N ψ) := by
+  -- `blockWCoeff χ u h = (Uᴴχ)(merge u h)` for either coefficient argument.
+  have hbw : ∀ (χ : (Fin (2 * N + 2) → Fin 2) → ℂ) u h, blockWCoeff N χ u h
+      = (hubbardBlockToSpinfulPermutationOperator N)ᴴ.mulVec χ
+          (hubbardBlockMergeConfig N u h) := by
+    intro χ u h
+    rw [blockWCoeff_eq_linearEquiv]
+    simp only [hubbardBlockCoeffLinearEquiv, LinearEquiv.coe_mk]
+    rfl
+  rw [trace_conjTranspose_mul_eq_sum,
+    ← LatticeSystem.Quantum.dotProduct_star_conjTranspose_mulVec
+        (hubbardBlockToSpinfulPermutationOperator_mul_conjTranspose N) ψ' ψ,
+    dotProduct,
+    ← Equiv.sum_comp (hubbardBlockSpinConfigEquiv N).symm
+        (fun c => (star ((hubbardBlockToSpinfulPermutationOperator N)ᴴ.mulVec ψ')) c
+          * (hubbardBlockToSpinfulPermutationOperator N)ᴴ.mulVec ψ c),
+    Fintype.sum_prod_type]
+  refine Finset.sum_congr rfl (fun u _ => Finset.sum_congr rfl (fun h _ => ?_))
+  rw [hbw ψ' u h, hbw ψ u h, Pi.star_apply]; rfl
+
 /-- The squared norm of the realizing state `Γ(W)` equals the Frobenius norm of `W`. -/
 theorem gammaWState_dotProduct_eq
     (W : Matrix (hubbardSpinConfig N) (hubbardSpinConfig N) ℂ) :
@@ -74,6 +102,16 @@ theorem gammaWState_dotProduct_eq
       = ∑ u : hubbardSpinConfig N, ∑ h : hubbardSpinConfig N,
           (Complex.normSq (W u h) : ℂ) := by
   rw [blockWCoeff_dotProduct_eq, blockWCoeff, blockWCoeff_gammaWState]
+
+/-- **Polarized realizing-state overlap.** The Hermitian pairing of two realizing states
+`Γ(W'), Γ(W)` equals the Frobenius pairing `tr(W'ᴴ · W)` of their coefficient matrices;
+the `W' = W` case recovers `gammaWState_dotProduct_eq`. -/
+theorem gammaWState_dotProduct_cross_eq
+    (W' W : Matrix (hubbardSpinConfig N) (hubbardSpinConfig N) ℂ) :
+    dotProduct (star (gammaWState N W')) (gammaWState N W)
+      = (W'ᴴ * W).trace := by
+  rw [blockWCoeff_dotProduct_cross_eq]
+  simp only [blockWCoeff, blockWCoeff_gammaWState]
 
 /-- **`|W|` has the same Frobenius norm as `W`.** Since `|W|² = W²` and both are
 Hermitian, `tr(|W|ᴴ|W|) = tr(W²) = tr(WᴴW)`. -/
