@@ -27,6 +27,9 @@ Since each column `J · s` of the embedding is the standard basis vector `|s.val
 * `hubbardCountSectorEmbedding_conjTranspose_mul_upOccupationDiag_mul` — the site-`x` up-occupation
   diagonal compresses to the sector-restricted occupation diagonal
   `diagonal (s ↦ (s.val x))`.
+* `blockWCoeff_sectorCompress_ne_zero_of_ne_zero` — for a nonzero balanced state `ψ`, the
+  sector-compressed coefficient `R_k = Jᴴ · blockWCoeff ψ · J` is nonzero (the nonvanishing input
+  to the connected-support dichotomy `R ≠ 0 ⟹ R.PosDef`).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 1st ed., Springer 2020, §10.2.4 (Lemma 10.10), pp. 363–367.
@@ -85,5 +88,41 @@ theorem hubbardCountSectorEmbedding_conjTranspose_mul_upOccupationDiag_mul (k : 
   by_cases h : s = s'
   · rw [h, if_pos rfl, if_pos rfl]
   · rw [if_neg h, if_neg (fun hc => h (Subtype.ext hc))]
+
+/-- **Nonvanishing of the sector-compressed coefficient.** For a nonzero state `ψ` in the balanced
+sector (`N̂_↑ ψ = N̂_↓ ψ = k·ψ`), its sector compression `R_k = Jᴴ · blockWCoeff ψ · J` through the
+embedding `J = hubbardCountSectorEmbedding N k` is nonzero. Indeed, if `R_k = 0` then the balanced
+principal-block rewrite `blockWCoeff ψ = J · R_k · Jᴴ` (`blockWCoeff_eq_embed_compress_of_balanced`)
+collapses to `blockWCoeff ψ = 0`; but the coordinate map `ψ ↦ blockWCoeff ψ` is a norm isometry
+(`blockWCoeff_dotProduct_eq`), so `⟨ψ, ψ⟩ = Σ |blockWCoeff ψ|² = 0` would force `ψ = 0`, a
+contradiction. This is the nonvanishing input `R ≠ 0` feeding the connected-support dichotomy
+`R ≠ 0 ⟹ R.PosDef` of Tasaki §10.2.4 Lemma 10.10. -/
+theorem blockWCoeff_sectorCompress_ne_zero_of_ne_zero (k : ℕ)
+    (ψ : (Fin (2 * N + 2) → Fin 2) → ℂ) (hψ : ψ ≠ 0)
+    (hUp : (fermionTotalUpNumber N).mulVec ψ = (k : ℂ) • ψ)
+    (hDn : (fermionTotalDownNumber N).mulVec ψ = (k : ℂ) • ψ) :
+    (hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N ψ
+        * hubbardCountSectorEmbedding N k ≠ 0 := by
+  intro hRk0
+  -- `R_k = 0` collapses the balanced principal-block rewrite to `blockWCoeff ψ = 0`.
+  have hW0 : blockWCoeff N ψ = 0 := by
+    have h := blockWCoeff_eq_embed_compress_of_balanced k ψ hUp hDn
+    rw [hRk0] at h
+    rw [h, Matrix.mul_zero, Matrix.zero_mul]
+  -- The isometry `⟨ψ, ψ⟩ = Σ |blockWCoeff ψ|²` then forces every coordinate of `ψ` to vanish.
+  apply hψ
+  funext c
+  have hdot : dotProduct (star ψ) ψ = 0 := by
+    rw [blockWCoeff_dotProduct_eq, hW0]
+    simp
+  rw [dotProduct_star_self_eq_sum_normSq] at hdot
+  have hreal : (∑ c, Complex.normSq (ψ c)) = 0 := by
+    have h2 : ((∑ c, Complex.normSq (ψ c) : ℝ) : ℂ) = 0 := by
+      rw [Complex.ofReal_sum]; exact hdot
+    exact_mod_cast h2
+  have hc : Complex.normSq (ψ c) = 0 :=
+    (Finset.sum_eq_zero_iff_of_nonneg (fun c _ => Complex.normSq_nonneg _)).mp hreal c
+      (Finset.mem_univ c)
+  exact Complex.normSq_eq_zero.mp hc
 
 end LatticeSystem.Fermion
