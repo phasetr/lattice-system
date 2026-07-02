@@ -16,31 +16,17 @@ anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_reachability_pf_min_
 
 # V1 capstone: the balanced-sector positive-definite ground coefficient, the assembly of
 # Tasaki §10.2.4 Lemma 10.10 (`R ≠ 0 ⟹ R.PosDef`) on the balanced (Ŝ³=0) sector (#4852).
-# Legitimately zero-referenced milestone. Lemma 10.9 (below) does NOT reference this capstone
-# directly: both Lemma 10.10 and Lemma 10.9 consume the shared reusable dichotomy core
-# `posDefCompress_dichotomy` (design GLUE 1), so both remain zero-referenced milestones.
+# Legitimately zero-referenced book-lemma milestone: the Theorem 10.2 chain consumes the shared
+# reusable dichotomy core `posDefCompress_dichotomy` (design GLUE 1), not this existence packaging,
+# so this faithful Lemma 10.10 statement stays a documented zero-referenced milestone.
 # (Its PR40f precursor exists_posSemidefW_ground_in_balanced_sector is now consumed here.)
 exists_posDefCompress_ground_in_balanced_sector
 
-# V1 milestone: the balanced-sector sign-definite compressed coefficient EXISTENCE, a faithful
-# statement of Tasaki §10.2.4 Lemma 10.9 (`W_S.PosDef ∨ (−W_S).PosDef`) on the balanced (Ŝ³=0)
-# sector (#4852). Its PROOF BODY is the forall `hermitianW_balanced_ground_signDefinite`, which
-# IS consumed (by the finrank ≤ 1 uniqueness capstone below and by this existence corollary); the
-# existence packaging itself stays a documented zero-referenced Lemma 10.9 milestone.
-exists_signDefiniteCompress_ground_in_balanced_sector
-
-# V1 capstone: the full Ne-electron ground eigenspace is the balanced singlet — the uniqueness +
-# singlet milestone of Tasaki §10.2.1 Theorem 10.2 (#4852, PR-D' full-sector lift). For even
-# Ne = 2k, connected symmetric hopping and U > 0, `G_full := (Ĥ = E_full) ⊓ (N̂ = Ne)` is nonempty,
-# `finrank ℂ ≤ 1`, and every nonzero member is a spin singlet `(Ŝ_tot)² = 0`. Assembles (now all
-# CONSUMED here, hence delisted): the balanced-block = full-sector energy equality
-# `attractiveHubbard_balanced_energy_eq_number_sector`, the balanced uniqueness
-# `balanced_ground_eigenspace_finrank_le_one`, and the balanced singlet
-# `balancedGround_totalSpinSquared_eigenvalue_zero`, via the Ŝ³ weight decomposition of G_full and
-# the SU(2)-multiplet weight-0-companion contradiction (`ham_su2_multiplet_companion`, Theorem A.16).
-# Legitimately zero-referenced participating milestone; consumed by the §10.2.1 Theorem 10.2
-# singlet-uniqueness discharge (PR-E, Euclidean `IsUniqueGroundStateOn` assembly).
-attractiveHubbardFullSectorGround_unique_singlet
+# NOTE (tier2 2026-07-03): two former entries were DELISTED after the Theorem 10.2 discharge because
+# they are now genuinely CONSUMED (real term references), so the V1 gate no longer needs to exempt
+# them: `exists_signDefiniteCompress_ground_in_balanced_sector` (Lemma 10.9 existence, consumed at
+# LiebAttractiveSingletGround.lean:183) and `attractiveHubbardFullSectorGround_unique_singlet`
+# (full-sector milestone, consumed at LiebAttractiveTheorem102.lean:82). Their decls stay in place.
 
 # V1 book capstone: Tasaki §10.2.4 Theorem 10.2 (Lieb's theorem for the attractive Hubbard model),
 # now PROVED axiom-free (PR-E, #4852): for even Ne with 0 < Ne ≤ 2|Λ|, connected symmetric hopping
