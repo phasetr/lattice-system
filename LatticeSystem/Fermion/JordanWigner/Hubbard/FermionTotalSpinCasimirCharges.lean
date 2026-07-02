@@ -70,4 +70,30 @@ theorem fermionTotalSpinSquared_commute_fermionTotalSpinZ (N : ℕ) :
     exact (hplus.mul_right hminus).sub_right (hminus.mul_right hplus)
   exact (Commute.smul_right_iff₀ (by norm_num : (2 : ℂ) ≠ 0)).mp hcomm
 
+/-- **`[(Ŝ_tot)², N̂_↑] = 0`**: the total-spin Casimir commutes with the spin-up number.  Using
+`N̂_↑ = ½ N̂ + Ŝ³_tot` (from `N̂ = N̂_↑ + N̂_↓` and `Ŝ³_tot = ½(N̂_↑ − N̂_↓)`), this reduces to
+`[(Ŝ_tot)², N̂] = 0` and `[(Ŝ_tot)², Ŝ³_tot] = 0`.  Reference: Tasaki §10.2.1, pp. 348–349. -/
+theorem fermionTotalSpinSquared_commute_fermionTotalUpNumber (N : ℕ) :
+    Commute (fermionTotalSpinSquared N) (fermionTotalUpNumber N) := by
+  have hid : fermionTotalUpNumber N =
+      (1 / 2 : ℂ) • fermionTotalNumber (2 * N + 1) + fermionTotalSpinZ N := by
+    rw [fermionTotalNumber_eq_up_add_down, fermionTotalSpinZ]
+    module
+  rw [hid]
+  exact ((fermionTotalSpinSquared_commute_fermionTotalNumber N).smul_right _).add_right
+    (fermionTotalSpinSquared_commute_fermionTotalSpinZ N)
+
+/-- **`[(Ŝ_tot)², N̂_↓] = 0`**: the total-spin Casimir commutes with the spin-down number.  Using
+`N̂_↓ = ½ N̂ − Ŝ³_tot`, this reduces to `[(Ŝ_tot)², N̂] = 0` and `[(Ŝ_tot)², Ŝ³_tot] = 0`.
+Reference: Tasaki §10.2.1, pp. 348–349. -/
+theorem fermionTotalSpinSquared_commute_fermionTotalDownNumber (N : ℕ) :
+    Commute (fermionTotalSpinSquared N) (fermionTotalDownNumber N) := by
+  have hid : fermionTotalDownNumber N =
+      (1 / 2 : ℂ) • fermionTotalNumber (2 * N + 1) - fermionTotalSpinZ N := by
+    rw [fermionTotalNumber_eq_up_add_down, fermionTotalSpinZ]
+    module
+  rw [hid]
+  exact ((fermionTotalSpinSquared_commute_fermionTotalNumber N).smul_right _).sub_right
+    (fermionTotalSpinSquared_commute_fermionTotalSpinZ N)
+
 end LatticeSystem.Fermion
