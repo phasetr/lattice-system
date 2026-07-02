@@ -63,44 +63,6 @@ theorem mem_sublatticeMagSubspaceS_iff (A : Λ → Bool) (M : ℂ)
     v ∈ sublatticeMagSubspaceS A M ↔ (sublatticeSpinSOp3 N A).mulVec v = M • v :=
   Iff.rfl
 
-/-- The zero vector lies in every sublattice magnetization subspace. -/
-theorem zero_mem_sublatticeMagSubspaceS (A : Λ → Bool) (M : ℂ) :
-    (0 : (Λ → Fin (N + 1)) → ℂ) ∈ sublatticeMagSubspaceS A M :=
-  (sublatticeMagSubspaceS A M).zero_mem
-
-/-- Sum-membership for the sublattice magnetization subspace. -/
-theorem add_mem_sublatticeMagSubspaceS (A : Λ → Bool) (M : ℂ)
-    {v w : (Λ → Fin (N + 1)) → ℂ}
-    (hv : v ∈ sublatticeMagSubspaceS A M) (hw : w ∈ sublatticeMagSubspaceS A M) :
-    v + w ∈ sublatticeMagSubspaceS A M :=
-  (sublatticeMagSubspaceS A M).add_mem hv hw
-
-/-- Scalar multiplication membership in `sublatticeMagSubspaceS`. -/
-theorem smul_mem_sublatticeMagSubspaceS (A : Λ → Bool) (M : ℂ) (c : ℂ)
-    {v : (Λ → Fin (N + 1)) → ℂ} (hv : v ∈ sublatticeMagSubspaceS A M) :
-    c • v ∈ sublatticeMagSubspaceS A M :=
-  (sublatticeMagSubspaceS A M).smul_mem c hv
-
-/-- Negation membership in `sublatticeMagSubspaceS`. -/
-theorem neg_mem_sublatticeMagSubspaceS (A : Λ → Bool) (M : ℂ)
-    {v : (Λ → Fin (N + 1)) → ℂ} (hv : v ∈ sublatticeMagSubspaceS A M) :
-    -v ∈ sublatticeMagSubspaceS A M :=
-  (sublatticeMagSubspaceS A M).neg_mem hv
-
-/-- Subtraction membership in `sublatticeMagSubspaceS`. -/
-theorem sub_mem_sublatticeMagSubspaceS (A : Λ → Bool) (M : ℂ)
-    {v w : (Λ → Fin (N + 1)) → ℂ}
-    (hv : v ∈ sublatticeMagSubspaceS A M) (hw : w ∈ sublatticeMagSubspaceS A M) :
-    v - w ∈ sublatticeMagSubspaceS A M :=
-  (sublatticeMagSubspaceS A M).sub_mem hv hw
-
-/-- `Finset.sum` membership in `sublatticeMagSubspaceS`. -/
-theorem finset_sum_mem_sublatticeMagSubspaceS {ι : Type*} (A : Λ → Bool) (M : ℂ)
-    (s : Finset ι) (f : ι → (Λ → Fin (N + 1)) → ℂ)
-    (hf : ∀ i ∈ s, f i ∈ sublatticeMagSubspaceS A M) :
-    (∑ i ∈ s, f i) ∈ sublatticeMagSubspaceS A M :=
-  (sublatticeMagSubspaceS A M).sum_mem hf
-
 /-- Distinct sublattice magnetization eigenvalues give disjoint subspaces. -/
 theorem sublatticeMagSubspaceS_disjoint (A : Λ → Bool) {M M' : ℂ} (hMM' : M ≠ M') :
     Disjoint (sublatticeMagSubspaceS (N := N) A M)

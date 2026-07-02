@@ -97,30 +97,6 @@ theorem onSiteS_apply_im_zero (i : Λ)
   · rw [if_pos h]; exact hA _ _
   · rw [if_neg h]; simp
 
-/-- If every entry of `A` has zero real part, every entry of
-`onSiteS i A` has zero real part. -/
-theorem onSiteS_apply_re_zero (i : Λ)
-    {A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ}
-    (hA : ∀ p q, (A p q).re = 0)
-    (σ' σ : Λ → Fin (N + 1)) :
-    ((onSiteS i A : ManyBodyOpS Λ N) σ' σ).re = 0 := by
-  rw [onSiteS_apply]
-  by_cases h : ∀ k, k ≠ i → σ' k = σ k
-  · rw [if_pos h]; exact hA _ _
-  · rw [if_neg h]; simp
-
-/-- If every entry of `A` has non-negative real part, every entry of
-`onSiteS i A` has non-negative real part. -/
-theorem onSiteS_apply_re_nonneg (i : Λ)
-    {A : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ}
-    (hA : ∀ p q, 0 ≤ (A p q).re)
-    (σ' σ : Λ → Fin (N + 1)) :
-    0 ≤ ((onSiteS i A : ManyBodyOpS Λ N) σ' σ).re := by
-  rw [onSiteS_apply]
-  by_cases h : ∀ k, k ≠ i → σ' k = σ k
-  · rw [if_pos h]; exact hA _ _
-  · rw [if_neg h]; simp
-
 /-- Every entry of `onSiteS i (Ŝ^+)` has zero imaginary part. -/
 theorem onSiteS_spinSOpPlus_apply_im_zero (i : Λ) (σ' σ : Λ → Fin (N + 1)) :
     ((onSiteS i (spinSOpPlus N) : ManyBodyOpS Λ N) σ' σ).im = 0 :=
@@ -131,31 +107,10 @@ theorem onSiteS_spinSOpMinus_apply_im_zero (i : Λ) (σ' σ : Λ → Fin (N + 1)
     ((onSiteS i (spinSOpMinus N) : ManyBodyOpS Λ N) σ' σ).im = 0 :=
   onSiteS_apply_im_zero i (spinSOpMinus_apply_im_zero N) σ' σ
 
-/-- Every entry of `onSiteS i (Ŝ^+)` has non-negative real part. -/
-theorem onSiteS_spinSOpPlus_apply_re_nonneg (i : Λ) (σ' σ : Λ → Fin (N + 1)) :
-    0 ≤ ((onSiteS i (spinSOpPlus N) : ManyBodyOpS Λ N) σ' σ).re :=
-  onSiteS_apply_re_nonneg i (spinSOpPlus_apply_re_nonneg N) σ' σ
-
-/-- Every entry of `onSiteS i (Ŝ^-)` has non-negative real part. -/
-theorem onSiteS_spinSOpMinus_apply_re_nonneg
-    (i : Λ) (σ' σ : Λ → Fin (N + 1)) :
-    0 ≤ ((onSiteS i (spinSOpMinus N) : ManyBodyOpS Λ N) σ' σ).re :=
-  onSiteS_apply_re_nonneg i (spinSOpMinus_apply_re_nonneg N) σ' σ
-
 /-- Every entry of `onSiteS i (Ŝ^{(1)})` has zero imaginary part. -/
 theorem onSiteS_spinSOp1_apply_im_zero (i : Λ) (σ' σ : Λ → Fin (N + 1)) :
     ((onSiteS i (spinSOp1 N) : ManyBodyOpS Λ N) σ' σ).im = 0 :=
   onSiteS_apply_im_zero i (spinSOp1_apply_im_zero N) σ' σ
-
-/-- Every entry of `onSiteS i (Ŝ^{(1)})` has non-negative real part. -/
-theorem onSiteS_spinSOp1_apply_re_nonneg (i : Λ) (σ' σ : Λ → Fin (N + 1)) :
-    0 ≤ ((onSiteS i (spinSOp1 N) : ManyBodyOpS Λ N) σ' σ).re :=
-  onSiteS_apply_re_nonneg i (spinSOp1_apply_re_nonneg N) σ' σ
-
-/-- Every entry of `onSiteS i (Ŝ^{(2)})` has zero real part. -/
-theorem onSiteS_spinSOp2_apply_re_zero (i : Λ) (σ' σ : Λ → Fin (N + 1)) :
-    ((onSiteS i (spinSOp2 N) : ManyBodyOpS Λ N) σ' σ).re = 0 :=
-  onSiteS_apply_re_zero i (spinSOp2_apply_re_zero N) σ' σ
 
 /-- Every entry of `onSiteS i (Ŝ^{(3)})` has zero imaginary part. -/
 theorem onSiteS_spinSOp3_apply_im_zero (i : Λ) (σ' σ : Λ → Fin (N + 1)) :

@@ -38,18 +38,6 @@ theorem magSumS_def (σ : Λ → Fin (N + 1)) :
     magSumS σ = ∑ x : Λ, (σ x).val := rfl
 
 omit [DecidableEq Λ] in
-/-- `magSumS σ ≥ 0` always. -/
-theorem magSumS_nonneg (σ : Λ → Fin (N + 1)) : 0 ≤ magSumS σ := by
-  unfold magSumS
-  exact Finset.sum_nonneg (fun _ _ => Nat.zero_le _)
-
-omit [DecidableEq Λ] in
-/-- The cast `(magSumS σ : ℝ) ≥ 0`. -/
-theorem magSumS_real_nonneg (σ : Λ → Fin (N + 1)) :
-    (0 : ℝ) ≤ (magSumS σ : ℝ) := by
-  exact_mod_cast magSumS_nonneg σ
-
-omit [DecidableEq Λ] in
 /-- `magSumS σ ≤ |Λ| · N`. -/
 theorem magSumS_le (σ : Λ → Fin (N + 1)) :
     magSumS σ ≤ Fintype.card Λ * N := by
@@ -112,11 +100,6 @@ eigenvector with eigenvalue `M`. -/
 theorem mem_magSubspaceS_iff (M : ℂ) (v : (Λ → Fin (N + 1)) → ℂ) :
     v ∈ magSubspaceS Λ N M ↔ (totalSpinSOp3 Λ N).mulVec v = M • v :=
   Iff.rfl
-
-/-- The zero vector lies in every magnetization subspace. -/
-theorem zero_mem_magSubspaceS (M : ℂ) :
-    (0 : (Λ → Fin (N + 1)) → ℂ) ∈ magSubspaceS Λ N M :=
-  (magSubspaceS Λ N M).zero_mem
 
 /-- Distinct magnetization eigenvalues give disjoint subspaces. -/
 theorem magSubspaceS_disjoint {M M' : ℂ} (hMM' : M ≠ M') :
@@ -332,30 +315,6 @@ theorem magEigenvalueS_re (σ : Λ → Fin (N + 1)) :
       ((Fintype.card Λ : ℝ) * (N : ℝ)) / 2 - (magSumS σ : ℝ) := by
   unfold magEigenvalueS
   simp
-
-omit [DecidableEq Λ] in
-/-- `magEigenvalueS σ` is bounded: `(magEigenvalueS σ).re ≥ -(|Λ| · N) / 2`.
-The most-down configuration `σ ≡ N` (giving `magSumS σ = |Λ| · N`)
-gives the lowest value `-(|Λ| · N) / 2`. -/
-theorem magEigenvalueS_re_lower_bound (σ : Λ → Fin (N + 1)) :
-    -((Fintype.card Λ : ℝ) * (N : ℝ)) / 2 ≤ (magEigenvalueS σ).re := by
-  rw [magEigenvalueS_re]
-  have hle := magSumS_le σ
-  have : (magSumS σ : ℝ) ≤ ((Fintype.card Λ : ℝ) * (N : ℝ)) := by
-    have : ((magSumS σ : ℕ) : ℝ) ≤ ((Fintype.card Λ * N : ℕ) : ℝ) :=
-      Nat.cast_le.mpr hle
-    simp at this; linarith
-  linarith
-
-omit [DecidableEq Λ] in
-/-- `magEigenvalueS σ` is bounded above: `(magEigenvalueS σ).re ≤ (|Λ| · N) / 2`.
-The most-up configuration `σ ≡ 0` (giving `magSumS σ = 0`) gives the
-highest value `(|Λ| · N) / 2`. -/
-theorem magEigenvalueS_re_upper_bound (σ : Λ → Fin (N + 1)) :
-    (magEigenvalueS σ).re ≤ ((Fintype.card Λ : ℝ) * (N : ℝ)) / 2 := by
-  rw [magEigenvalueS_re]
-  have hnn := magSumS_real_nonneg σ
-  linarith
 
 omit [DecidableEq Λ] in
 /-- `magEigenvalueS σ = ((magEigenvalueS σ).re : ℂ)`: its imaginary

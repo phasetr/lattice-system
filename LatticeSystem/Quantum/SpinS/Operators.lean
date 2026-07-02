@@ -257,21 +257,6 @@ theorem spinSOp1_apply_im_zero (N : ℕ) (i j : Fin (N + 1)) :
   rw [Matrix.smul_apply, Matrix.add_apply, smul_eq_mul]
   simp [spinSOpPlus_apply_im_zero, spinSOpMinus_apply_im_zero]
 
-/-- All entries of `Ŝ^{(1)}` have non-negative real part. -/
-theorem spinSOp1_apply_re_nonneg (N : ℕ) (i j : Fin (N + 1)) :
-    0 ≤ (spinSOp1 N i j).re := by
-  have hP := spinSOpPlus_apply_re_nonneg N i j
-  have hM := spinSOpMinus_apply_re_nonneg N i j
-  unfold spinSOp1
-  rw [Matrix.smul_apply, Matrix.add_apply, smul_eq_mul]
-  change 0 ≤ ((1 / 2 : ℂ) * (spinSOpPlus N i j + spinSOpMinus N i j)).re
-  rw [Complex.mul_re]
-  have h1 : ((1 / 2 : ℂ)).re = 1 / 2 := by norm_num
-  have h2 : ((1 / 2 : ℂ)).im = 0 := by norm_num
-  rw [h1, h2, zero_mul, sub_zero]
-  rw [Complex.add_re]
-  positivity
-
 /-- All entries of `Ŝ^{(2)}` have zero real part. -/
 theorem spinSOp2_apply_re_zero (N : ℕ) (i j : Fin (N + 1)) :
     (spinSOp2 N i j).re = 0 := by
