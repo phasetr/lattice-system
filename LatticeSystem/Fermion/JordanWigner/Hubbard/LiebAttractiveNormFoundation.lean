@@ -78,12 +78,11 @@ theorem gammaWState_dotProduct_eq
 /-- **`|W|` has the same Frobenius norm as `W`.** Since `|W|² = W²` and both are
 Hermitian, `tr(|W|ᴴ|W|) = tr(W²) = tr(WᴴW)`. -/
 theorem hermitianAbs_sum_normSq_eq
-    {W : Matrix (hubbardSpinConfig N) (hubbardSpinConfig N) ℂ} (hW : W.IsHermitian) :
-    ∑ u : hubbardSpinConfig N, ∑ h : hubbardSpinConfig N,
-        (Complex.normSq (hermitianAbs hW u h) : ℂ)
-      = ∑ u : hubbardSpinConfig N, ∑ h : hubbardSpinConfig N,
-          (Complex.normSq (W u h) : ℂ) := by
-  have key : ∀ (M : Matrix (hubbardSpinConfig N) (hubbardSpinConfig N) ℂ),
+    {n : Type*} [Fintype n] [DecidableEq n]
+    {W : Matrix n n ℂ} (hW : W.IsHermitian) :
+    ∑ u : n, ∑ h : n, (Complex.normSq (hermitianAbs hW u h) : ℂ)
+      = ∑ u : n, ∑ h : n, (Complex.normSq (W u h) : ℂ) := by
+  have key : ∀ (M : Matrix n n ℂ),
       M.IsHermitian → ∑ u, ∑ h, (Complex.normSq (M u h) : ℂ) = Matrix.trace (M * M) := by
     intro M hM
     rw [show M * M = Mᴴ * M from by rw [hM.eq], trace_conjTranspose_mul_eq_sum]
