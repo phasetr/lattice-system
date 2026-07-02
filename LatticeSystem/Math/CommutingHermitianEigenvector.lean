@@ -120,4 +120,25 @@ theorem Matrix.exists_common_eigenvector_of_isHermitian_commute {d : Type*} [Fin
     = Matrix.mulVec B (Matrix.mulVec A (WithLp.ofLp x)) i
   rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hAB]
 
+/-- **Matrix real-eigenvalue extraction.** A Hermitian matrix `A` over `ℂ` with a nonzero
+eigenvector `v` (in `mulVec` form `A *ᵥ v = c • v`) has a real eigenvalue: `c` is the complex cast
+of some real `μ` (namely `c.re`).  Bridged to `Matrix.toEuclideanLin` via
+`Matrix.isHermitian_iff_isSymmetric` and `isSymmetric_eigenvalue_eq_ofReal`.  This is the reusable
+matrix form of the self-adjoint real-spectrum fact (avoiding a private `dotProduct`-based
+reimplementation). -/
+theorem isHermitian_mulVec_eigenvalue_eq_ofReal {d : Type*} [Fintype d]
+    {A : Matrix d d ℂ} (hA : A.IsHermitian) {c : ℂ} {v : d → ℂ}
+    (hv : v ≠ 0) (hAv : A.mulVec v = c • v) : ∃ μ : ℝ, (μ : ℂ) = c := by
+  classical
+  refine ⟨c.re, ?_⟩
+  have hsym : (Matrix.toEuclideanLin A).IsSymmetric := Matrix.isHermitian_iff_isSymmetric.mp hA
+  have hvne : (WithLp.toLp 2 v : EuclideanSpace ℂ d) ≠ 0 := by
+    rw [ne_eq, WithLp.toLp_eq_zero]; exact hv
+  have hAv' : Matrix.toEuclideanLin A (WithLp.toLp 2 v) = c • (WithLp.toLp 2 v) := by
+    have h1 : Matrix.toEuclideanLin A (WithLp.toLp 2 v) = WithLp.toLp 2 (A.mulVec v) := by
+      rw [show Matrix.toEuclideanLin A = Matrix.toLpLin 2 2 A from rfl, Matrix.toLpLin_toLp,
+        Matrix.toLin'_apply]
+    rw [h1, hAv, WithLp.toLp_smul]
+  exact isSymmetric_eigenvalue_eq_ofReal hsym hvne hAv'
+
 end LatticeSystem.Math

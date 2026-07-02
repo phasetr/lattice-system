@@ -175,6 +175,8 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBalancedPosDefCo
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveOverlapPositive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBalancedUniqueness
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveSU2Invariance
+import LatticeSystem.Fermion.JordanWigner.Hubbard.FermionTotalSpinCasimirCharges
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveTotalSpinEigenstate
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
