@@ -128,16 +128,19 @@ theorem exists_attractive_sector_ground (Ne : ℕ) [Nonempty (hubbardSectorConfi
     ∃ φ : (Fin (2 * N + 2) → Fin 2) → ℂ, φ ≠ 0
       ∧ (fermionTotalNumber (2 * N + 1)).mulVec φ = (Ne : ℂ) • φ
       ∧ (attractiveHubbardHamiltonian N T U).mulVec φ
-          = ((hermitianMinEigenvalue (hubbardSectorCompress_isHermitian Ne
+          = ((hermitianMinEigenvalue (configSectorCompress_isHermitian
+              (hubbardNumberSectorPred N Ne)
               (attractiveHubbardHamiltonian_isHermitian T U hT)) : ℝ) : ℂ) • φ := by
   classical
-  set hHW := hubbardSectorCompress_isHermitian Ne (attractiveHubbardHamiltonian_isHermitian T U hT)
-    with hHWd
+  set hHW := configSectorCompress_isHermitian (hubbardNumberSectorPred N Ne)
+    (attractiveHubbardHamiltonian_isHermitian T U hT) with hHWd
   obtain ⟨c, hc0, hceig⟩ := exists_nonzero_eigenvector_hermitianMinEigenvalue hHW
-  refine ⟨hubbardSectorExpansion N Ne c, hubbardSectorExpansion_ne_zero Ne hc0, ?_, ?_⟩
-  · have hmem := hubbardSectorExpansion_mem Ne c
-    rwa [mem_hubbardSectorWSubmodule_iff] at hmem
-  · exact mulVec_hubbardSectorExpansion_of_compress_eigen Ne
-      (preservesHubbardSectorW_attractive Ne T U) hceig
+  set Φ := configSectorExpansion N (hubbardNumberSectorPred N Ne) c with hΦ
+  have hΦW : Φ ∈ hubbardSectorWSubmodule N Ne := hubbardSectorExpansion_mem Ne c
+  refine ⟨Φ, configSectorExpansion_ne_zero (hubbardNumberSectorPred N Ne) hc0, ?_, ?_⟩
+  · rw [← mem_hubbardSectorWSubmodule_iff]; exact hΦW
+  · have hApres := hubbardNumberSector_supported_of_mem Ne
+      (preservesHubbardSectorW_attractive Ne T U Φ hΦW)
+    exact configSectorExpansion_of_compress_eigen (hubbardNumberSectorPred N Ne) hApres hceig
 
 end LatticeSystem.Fermion

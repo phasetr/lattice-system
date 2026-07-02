@@ -166,6 +166,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveKineticHopEntry
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveKineticEntry
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveSectorConnectivity
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveSectorGround
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBalancedSectorGround
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveSectorVariational
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveThetaSector
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive

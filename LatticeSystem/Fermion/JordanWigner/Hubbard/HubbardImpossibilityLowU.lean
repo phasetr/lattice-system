@@ -289,16 +289,19 @@ theorem hubbard_theorem_11_3
     exact hEne
   have hE₀le : E₀.re ≤ E.re := hmin E hEfilling
   -- `E.re = sector min`; combine: `E₀.re ≤ min ≤ trialRayleigh/nrm < E₀.re`.
-  have hEre : E.re = hermitianMinEigenvalue (hubbardSectorCompress_isHermitian (N + 1)
+  have hEre : E.re = hermitianMinEigenvalue (configSectorCompress_isHermitian
+      (hubbardNumberSectorPred N (N + 1))
       (hubbardHamiltonian_isHermitian N hht hhU)) := by rw [hEval, Complex.ofReal_re]
-  have hchain : (hermitianMinEigenvalue (hubbardSectorCompress_isHermitian (N + 1)
+  have hchain : (hermitianMinEigenvalue (configSectorCompress_isHermitian
+      (hubbardNumberSectorPred N (N + 1))
       (hubbardHamiltonian_isHermitian N hht hhU))) * nrm ≤
       rayleighOnVec (hubbardHamiltonian N t (U : ℂ)) Ψ := by
     rw [← hnrm] at hvar; exact hvar
   have : E₀.re * nrm < E₀.re * nrm := by
     calc E₀.re * nrm
         ≤ E.re * nrm := by exact mul_le_mul_of_nonneg_right hE₀le (le_of_lt hnrmpos)
-      _ = (hermitianMinEigenvalue (hubbardSectorCompress_isHermitian (N + 1)
+      _ = (hermitianMinEigenvalue (configSectorCompress_isHermitian
+            (hubbardNumberSectorPred N (N + 1))
             (hubbardHamiltonian_isHermitian N hht hhU))) * nrm := by rw [hEre]
       _ ≤ rayleighOnVec (hubbardHamiltonian N t (U : ℂ)) Ψ := hchain
       _ < E₀.re * nrm := htrialRayleigh
