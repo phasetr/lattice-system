@@ -45,4 +45,16 @@ theorem fermionTotalSpinSquared_commute_fermionTotalSpinPlus (N : ℕ) :
     fermionTotalSpinMinus_conjTranspose N] at h2
   exact h2.symm
 
+/-- **`[(Ŝ_tot)², N̂] = 0`**: the total-spin Casimir commutes with the total particle number.
+Assembled from `[Ŝ⁻_tot, N̂] = [Ŝ⁺_tot, N̂] = [Ŝ³_tot, N̂] = 0` term by term, exactly as for the
+Hamiltonian.  Reference: Tasaki §11.1.1, p. 372. -/
+theorem fermionTotalSpinSquared_commute_fermionTotalNumber (N : ℕ) :
+    Commute (fermionTotalSpinSquared N) (fermionTotalNumber (2 * N + 1)) := by
+  unfold fermionTotalSpinSquared
+  apply Commute.add_left
+  · exact (fermionTotalSpinMinus_commute_fermionTotalNumber N).mul_left
+      (fermionTotalSpinPlus_commute_fermionTotalNumber N)
+  · have h_z := fermionTotalSpinZ_commute_fermionTotalNumber N
+    exact h_z.mul_left (h_z.add_left (Commute.one_left _))
+
 end LatticeSystem.Fermion
