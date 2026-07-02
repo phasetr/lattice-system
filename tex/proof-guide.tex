@@ -6237,16 +6237,16 @@ positive semidefinite; this is the $(Ŝ³ = 0)$ incarnation of Tasaki's $|W|$ sq
 
 \medskip\noindent\textbf{Sign-definiteness dichotomy for the compressed coefficient (PR40g, Tasaki §10.2.4, Lemma 10.9).}
 The compressed coefficient $W_S$ of a balanced Hermitian-$W$ ground $\varphi$ from PR40e-pre2b is shown to be
-\textbf{sign-definite}: either $W_S.PosDef$ or $(−W_S).PosDef$. The absolute-value form $P := |W_S|$ is
+\textbf{sign-definite}: either $W_S.PosDef$ or $(-W_S).PosDef$. The absolute-value form $P := |W_S|$ is
 computed (via \texttt{gammaWState\_hermitianAbs\_isEigenvector}), producing a ground state $\Gamma(J \cdot P \cdot J^\dagger)$
 at the balanced minimum $\mu$. The reusable dichotomy \texttt{posDefCompress\_dichotomy} (extracted from the
 Lemma 10.10 capstone's kernel argument in PR #4939) shows that $P.PosDef \lor P = 0$. The difference
-$R' := P − W_S$ is positive semidefinite (\texttt{hermitianAbs\_sub\_posSemidef}) and satisfies the same
+$R' := P - W_S$ is positive semidefinite (\texttt{hermitianAbs\_sub\_posSemidef}) and satisfies the same
 Lyapunov equation as $P$ (\texttt{lyapunovEq\_sub}), hence the dichotomy also yields $R'.PosDef \lor R' = 0$.
 The crucial commutativity $P \cdot W_S = W_S \cdot P$ (\texttt{hermitianAbs\_commute}) and the matrix relation
-$(P − W_S) \cdot (P + W_S) = P^2 − W_S^2 = 0$ (since $|W_S|^2 = W_S^2$ for Hermitian $W_S$) then force
-either $P = W_S$ (positive semidefinite and positive definite, hence $W_S.PosDef$) or $P = −W_S$
-(so $(−W_S).PosDef$). This sign-definiteness — either $W_S.PosDef \lor (−W_S).PosDef$ — is the crux of
+$(P - W_S) \cdot (P + W_S) = P^2 - W_S^2 = 0$ (since $|W_S|^2 = W_S^2$ for Hermitian $W_S$) then force
+either $P = W_S$ (positive semidefinite and positive definite, hence $W_S.PosDef$) or $P = -W_S$
+(so $(-W_S).PosDef$). This sign-definiteness — either $W_S.PosDef \lor (-W_S).PosDef$ — is the crux of
 Tasaki §10.2.4 Lemma 10.9, distinguishing the SRP endgame dichotomy before applying the kernel argument
 that leads to Lemma 10.10's positive-definiteness conclusion. With symmetric $T$, $U(x) > 0$.
 
