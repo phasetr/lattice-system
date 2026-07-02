@@ -29,29 +29,15 @@ exists_posDefCompress_ground_in_balanced_sector
 # existence packaging itself stays a documented zero-referenced Lemma 10.9 milestone.
 exists_signDefiniteCompress_ground_in_balanced_sector
 
-# V1 capstone: the balanced ground eigenspace `finrank ℂ ≤ 1`, the uniqueness half of Tasaki
-# §10.2.4 Theorem 10.2 on the balanced (Ŝ³=0) sector (#4852). Assembles the overlap
-# non-orthogonality core `balanced_signDefinite_ground_dotProduct_ne_zero` (now CONSUMED here,
-# hence delisted), the forall sign-definiteness `hermitianW_balanced_ground_signDefinite`
-# (Lemma 10.9), and the generic real-form finrank toolkit. Legitimately zero-referenced
-# participating milestone; consumed by the eventual §10.2.1 Theorem 10.2 singlet capstone
-# (lifting Ŝ³=0 uniqueness to the whole Ne-electron sector via SU(2)).
-balanced_ground_eigenspace_finrank_le_one
-
-# V1 capstone: the balanced ground state is a spin singlet `(Ŝ_tot)² ψ = 0` (Tasaki §10.2.4
-# Theorem 10.2, singlet step; §9.3.3). For a nonzero balanced ground state ψ, `(Ŝ_tot)² ψ = 0`.
-# Assembles the eigenstate step `balancedGround_totalSpinSquared_eigenvector` (now CONSUMED here,
-# hence delisted), Lemma 10.9 sign-definiteness `hermitianW_balanced_ground_signDefinite`, the
-# finrank≤1 uniqueness `balanced_ground_eigenspace_finrank_le_one`, and the explicit doubly-occupied
-# singlet reference `gammaWState_single_diag`. Legitimately zero-referenced participating milestone;
-# consumed by the eventual §10.2.1 lift of the Ŝ³=0 singlet result to the whole Ne-electron sector.
-balancedGround_totalSpinSquared_eigenvalue_zero
-
-# V1 capstone: the balanced-block ground energy equals the full Ne-electron sector ground energy
-# `E_bal = E_full` (Tasaki §10.2.1 Theorem 10.2, PR-D' full-sector lift, #4852). The `E_full ≤ E_bal`
-# half is the balanced-into-full variational inclusion; the `E_bal ≤ E_full` half lifts a full-sector
-# ground state through the generic Theorem A.17 engine (`ham_eigenstate_spin_zero_or_half`) to a
-# balanced state at energy E_full (even-Ne parity mirror of the t-J route
-# `tJ_perronFrobeniusMin_le_hermitianMinEigenvalue`). Legitimately zero-referenced participating
-# milestone; consumed by the eventual §10.2.1 Theorem 10.2 singlet-uniqueness discharge (PR-E).
-attractiveHubbard_balanced_energy_eq_number_sector
+# V1 capstone: the full Ne-electron ground eigenspace is the balanced singlet — the uniqueness +
+# singlet milestone of Tasaki §10.2.1 Theorem 10.2 (#4852, PR-D' full-sector lift). For even
+# Ne = 2k, connected symmetric hopping and U > 0, `G_full := (Ĥ = E_full) ⊓ (N̂ = Ne)` is nonempty,
+# `finrank ℂ ≤ 1`, and every nonzero member is a spin singlet `(Ŝ_tot)² = 0`. Assembles (now all
+# CONSUMED here, hence delisted): the balanced-block = full-sector energy equality
+# `attractiveHubbard_balanced_energy_eq_number_sector`, the balanced uniqueness
+# `balanced_ground_eigenspace_finrank_le_one`, and the balanced singlet
+# `balancedGround_totalSpinSquared_eigenvalue_zero`, via the Ŝ³ weight decomposition of G_full and
+# the SU(2)-multiplet weight-0-companion contradiction (`ham_su2_multiplet_companion`, Theorem A.16).
+# Legitimately zero-referenced participating milestone; consumed by the eventual §10.2.1 Theorem 10.2
+# singlet-uniqueness discharge (PR-E, Euclidean `IsUniqueGroundStateOn` assembly).
+attractiveHubbardFullSectorGround_unique_singlet
