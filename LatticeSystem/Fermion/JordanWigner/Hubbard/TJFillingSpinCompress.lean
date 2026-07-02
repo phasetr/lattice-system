@@ -64,13 +64,6 @@ theorem preservesTJFillingW_sub (Ne : ℕ) {B₁ B₂ : ManyBodyOp (Fin (2 * N +
   rw [Matrix.sub_mulVec]
   exact Submodule.sub_mem _ (h₁ v hv) (h₂ v hv)
 
-/-- `Ŝ⁺_tot` commutes with `N̂` (number-conserving per-site hops). -/
-theorem fermionTotalSpinPlus_commute_fermionTotalNumber (N : ℕ) :
-    Commute (fermionTotalSpinPlus N) (fermionTotalNumber (2 * N + 1)) := by
-  rw [fermionTotalSpinPlus_eq_sum_siteSpinPlus]
-  exact Commute.sum_left _ _ _
-    (fun i _ => (fermionTotalNumber_commute_fermionSiteSpinPlus i).symm)
-
 /-- `Ŝ⁽³⁾_tot` preserves `W`. -/
 theorem preservesTJFillingW_fermionTotalSpinZ (Ne : ℕ) :
     PreservesTJFillingW N Ne (fermionTotalSpinZ N) :=

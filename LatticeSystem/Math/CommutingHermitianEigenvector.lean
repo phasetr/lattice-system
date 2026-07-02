@@ -23,6 +23,7 @@ This is used to discharge Tasaki's Theorem A.17 (`exists_joint_su2_energy_eigens
 -/
 
 open Module Module.End
+open scoped ComplexOrder
 
 namespace LatticeSystem.Math
 
@@ -140,5 +141,29 @@ theorem isHermitian_mulVec_eigenvalue_eq_ofReal {d : Type*} [Fintype d]
         Matrix.toLin'_apply]
     rw [h1, hAv, WithLp.toLp_smul]
   exact isSymmetric_eigenvalue_eq_ofReal hsym hvne hAv'
+
+/-- **Matrix nonnegative-eigenvalue extraction.**  A positive semidefinite matrix `A` over `ℂ`
+with a nonzero real eigenvector `v` (`A *ᵥ v = c • v`, `c : ℝ`) has a nonnegative eigenvalue
+`0 ≤ c`, because the quadratic form `star v ⬝ᵥ (A *ᵥ v) = c · ‖v‖²` is `≥ 0` and `‖v‖² > 0`. -/
+theorem Matrix.posSemidef_mulVec_eigenvalue_nonneg {d : Type*} [Fintype d]
+    {A : Matrix d d ℂ} (hA : A.PosSemidef) {v : d → ℂ} {c : ℝ}
+    (hv : v ≠ 0) (hAv : A.mulVec v = (c : ℂ) • v) : 0 ≤ c := by
+  classical
+  have hquad : (0 : ℂ) ≤ dotProduct (star v) (A.mulVec v) := hA.dotProduct_mulVec_nonneg v
+  have hnorm : dotProduct (star v) v = ((∑ i, Complex.normSq (v i) : ℝ) : ℂ) := by
+    simp only [dotProduct, Pi.star_apply, RCLike.star_def]
+    push_cast
+    exact Finset.sum_congr rfl (fun i _ => by rw [Complex.normSq_eq_conj_mul_self])
+  have hpos : 0 < (∑ i, Complex.normSq (v i) : ℝ) := by
+    obtain ⟨i₀, hi₀⟩ := Function.ne_iff.mp hv
+    rw [Pi.zero_apply] at hi₀
+    exact Finset.sum_pos' (fun i _ => Complex.normSq_nonneg _)
+      ⟨i₀, Finset.mem_univ _, Complex.normSq_pos.mpr hi₀⟩
+  rw [hAv, dotProduct_smul, smul_eq_mul, hnorm] at hquad
+  rw [show (c : ℂ) * ((∑ i, Complex.normSq (v i) : ℝ) : ℂ)
+      = ((c * (∑ i, Complex.normSq (v i)) : ℝ) : ℂ) by push_cast; ring] at hquad
+  have hcs : 0 ≤ c * (∑ i, Complex.normSq (v i) : ℝ) := by
+    rwa [← Complex.ofReal_zero, Complex.real_le_real] at hquad
+  exact le_of_mul_le_mul_right (by rw [zero_mul]; exact hcs) hpos
 
 end LatticeSystem.Math
