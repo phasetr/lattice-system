@@ -122,4 +122,42 @@ theorem fermionTotalSpinMinus_commute_attractiveHubbardHamiltonian
     h_H.eq] at h_adj
   exact h_adj.symm
 
+/-- `[N̂_↑, Ĥ] = 0` for the attractive Hubbard Hamiltonian: kinetic
+commute `fermionTotalUpNumber_commute_hubbardKinetic` plus the site-`U`
+interaction commute above. -/
+theorem fermionTotalUpNumber_commute_attractiveHubbardHamiltonian
+    (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
+    (U : Fin (N + 1) → ℝ) :
+    Commute (fermionTotalUpNumber N) (attractiveHubbardHamiltonian N T U) := by
+  unfold attractiveHubbardHamiltonian attractiveHubbardInteraction
+  exact (fermionTotalUpNumber_commute_hubbardKinetic N
+      (fun x y => (T x y : ℂ))).add_right
+    (fermionTotalUpNumber_commute_hubbardOnSiteInteractionSite N
+      (fun x => -(U x : ℂ)))
+
+/-- `[N̂_↓, Ĥ] = 0` for the attractive Hubbard Hamiltonian: kinetic
+commute `fermionTotalDownNumber_commute_hubbardKinetic` plus the
+site-`U` interaction commute above. -/
+theorem fermionTotalDownNumber_commute_attractiveHubbardHamiltonian
+    (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
+    (U : Fin (N + 1) → ℝ) :
+    Commute (fermionTotalDownNumber N) (attractiveHubbardHamiltonian N T U) := by
+  unfold attractiveHubbardHamiltonian attractiveHubbardInteraction
+  exact (fermionTotalDownNumber_commute_hubbardKinetic N
+      (fun x y => (T x y : ℂ))).add_right
+    (fermionTotalDownNumber_commute_hubbardOnSiteInteractionSite N
+      (fun x => -(U x : ℂ)))
+
+/-- `[Ŝ³_tot, Ĥ] = 0` for the attractive Hubbard Hamiltonian: free
+corollary of `[N̂_↑, Ĥ] = [N̂_↓, Ĥ] = 0` and `Ŝ³ = (N̂_↑ − N̂_↓)/2`.
+Clone of `fermionTotalSpinZ_commute_hubbardHamiltonian`
+(Tasaki §9.3.3, p. 333; §10.2.1). -/
+theorem fermionTotalSpinZ_commute_attractiveHubbardHamiltonian
+    (N : ℕ) (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
+    (U : Fin (N + 1) → ℝ) :
+    Commute (fermionTotalSpinZ N) (attractiveHubbardHamiltonian N T U) := by
+  unfold fermionTotalSpinZ
+  exact ((fermionTotalUpNumber_commute_attractiveHubbardHamiltonian N T U).sub_left
+    (fermionTotalDownNumber_commute_attractiveHubbardHamiltonian N T U)).smul_left _
+
 end LatticeSystem.Fermion
