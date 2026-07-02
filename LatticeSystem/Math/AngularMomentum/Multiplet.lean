@@ -44,28 +44,31 @@ theorem ham_mulVec_raiseIter (hcH1 : H * J1 = J1 * H) (hcH2 : H * J2 = J2 * H) {
       Matrix.mulVec_mulVec, hcomm, ← Matrix.mulVec_mulVec, ih, Matrix.mulVec_smul]
 
 omit [DecidableEq d] in
-/-- **Tasaki Theorem A.16 (SU(2)-multiplet degeneracy).**  Let `Ĥ` be `su(2)`-invariant
-(`Ĥ Ĵ⁽ᵅ⁾ = Ĵ⁽ᵅ⁾ Ĥ`) and let `Φ ≠ 0` be a joint eigenstate in `H_{J,M0}` (`Ĵ² Φ = J(J+1) Φ`,
-`Ĵ⁽³⁾ Φ = M0 Φ`) with `Ĥ Φ = E Φ` and `J ≥ 0`.  Then for every `k ≤ 2J` there is a *nonzero*
-companion `Ψ ∈ H_{J,J−k}` (`Ĵ² Ψ = J(J+1) Ψ`, `Ĵ⁽³⁾ Ψ = (J−k) Ψ`) with the same energy
-`Ĥ Ψ = E Ψ`.  As `k` runs `0,…,2J`, this realizes the `2J+1` magnetic numbers `M = J,…,−J`, so the
-level `E` is at least `(2J+1)`-fold degenerate.  Proof: raise `Φ` to the top `H_{J,J}`
-(`J − M0 ∈ ℤ≥0` by Lemma A.15), then lower `k` times via the reflected raising. -/
-theorem ham_su2_multiplet (hcH1 : H * J1 = J1 * H) (hcH2 : H * J2 = J2 * H)
-    (_hcH3 : H * J3 = J3 * H) (h1 : J1.IsHermitian) (h2 : J2.IsHermitian)
+/-- **SU(2)-multiplet companion with a generic commuting-operator eigenvalue tracker.**  This is
+the operator-agnostic core of Tasaki Theorem A.16.  Given a nonzero joint eigenstate `Φ` of
+`Ĵ²`/`Ĵ⁽³⁾` (`Ĵ² Φ = J(J+1) Φ`, `Ĵ⁽³⁾ Φ = M0 Φ`, `J ≥ 0`), for every `k ≤ 2J` there is a *nonzero*
+companion `Ψ ∈ H_{J,J−k}` obtained from `Φ` by ladder maps `Ψ = (Ĵ⁻)^k (Ĵ⁺)^{J−M0} Φ`.  The last
+conjunct records the key structural fact that the ladder construction preserves the eigenvalue of
+*any* matrix `A` commuting with `Ĵ⁽¹⁾` and `Ĵ⁽²⁾`: if `A Φ = a Φ` then `A Ψ = a Ψ`.  Specialising
+`A` to an `su(2)`-invariant Hamiltonian `Ĥ` recovers energy preservation (`ham_su2_multiplet`); it
+can equally be specialised to a conserved charge (e.g. the total electron number `N̂`) commuting
+with the raising/lowering operators, so the companion stays in the same charge sector. -/
+theorem ham_su2_multiplet_companion (h1 : J1.IsHermitian) (h2 : J2.IsHermitian)
     (h12 : J1 * J2 - J2 * J1 = Complex.I • J3) (h23 : J2 * J3 - J3 * J2 = Complex.I • J1)
-    (h31 : J3 * J1 - J1 * J3 = Complex.I • J2) {Φ : d → ℂ} {Jr M0 : ℝ} {E : ℂ} (hΦ : Φ ≠ 0)
+    (h31 : J3 * J1 - J1 * J3 = Complex.I • J2) {Φ : d → ℂ} {Jr M0 : ℝ} (hΦ : Φ ≠ 0)
     (hJ : 0 ≤ Jr) (hsq : (J1 * J1 + J2 * J2 + J3 * J3).mulVec Φ = ((Jr * (Jr + 1) : ℝ) : ℂ) • Φ)
-    (h3 : J3.mulVec Φ = (M0 : ℂ) • Φ) (hH : H.mulVec Φ = E • Φ) :
+    (h3 : J3.mulVec Φ = (M0 : ℂ) • Φ) :
     ∀ k : ℕ, (k : ℝ) ≤ 2 * Jr →
       ∃ Ψ : d → ℂ, Ψ ≠ 0 ∧
         (J1 * J1 + J2 * J2 + J3 * J3).mulVec Ψ = ((Jr * (Jr + 1) : ℝ) : ℂ) • Ψ ∧
-        J3.mulVec Ψ = ((Jr - k : ℝ) : ℂ) • Ψ ∧ H.mulVec Ψ = E • Ψ := by
+        J3.mulVec Ψ = ((Jr - k : ℝ) : ℂ) • Ψ ∧
+        ∀ (A : Matrix d d ℂ) (a : ℂ), A * J1 = J1 * A → A * J2 = J2 * A →
+          A.mulVec Φ = a • Φ → A.mulVec Ψ = a • Ψ := by
   -- Spin bound on the seed state and `J − M0 ∈ ℤ≥0` (Lemma A.15): write `J − M0 = t`.
   obtain ⟨hM0lb, hM0ub⟩ := angMom_abs_le_J J1 J2 J3 h1 h2 h12 hΦ hJ hsq h3
   obtain ⟨t, ht⟩ := angMom_sub_mem_nat J1 J2 J3 h1 h2 h12 h23 h31 hΦ hJ hsq h3
   have hMt : M0 + (t : ℝ) = Jr := by linarith
-  -- Top state `T = (Ĵ⁺)^t Φ ∈ H_{J,J}`, nonzero, energy `E`.
+  -- Top state `T = (Ĵ⁺)^t Φ ∈ H_{J,J}`, nonzero.
   set T := raiseIter J1 J2 t Φ with hT
   have hTeig := raiseIter_eigenspace J1 J2 J3 h12 h23 h31 hsq h3 t
   have hTne : T ≠ 0 := by
@@ -75,7 +78,6 @@ theorem ham_su2_multiplet (hcH1 : H * J1 = J1 * H) (hcH2 : H * J2 = J2 * H)
   have hTsq : (J1 * J1 + J2 * J2 + J3 * J3).mulVec T = ((Jr * (Jr + 1) : ℝ) : ℂ) • T := hTeig.1
   have hT3 : J3.mulVec T = ((Jr : ℝ) : ℂ) • T := by
     have := hTeig.2; rw [show ((M0 + (t : ℝ)) : ℝ) = Jr from hMt] at this; exact this
-  have hHT : H.mulVec T = E • T := ham_mulVec_raiseIter H J1 J2 hcH1 hcH2 hH t
   -- Reflected operators `(Ĵ⁽¹⁾, −Ĵ⁽²⁾, −Ĵ⁽³⁾)`: same `su(2)` relations, raising = `Ĵ⁻`.
   have h12' := su2Reflect12 J1 J2 J3 h12
   have h23' := su2Reflect23 J1 J2 J3 h23
@@ -104,6 +106,32 @@ theorem ham_su2_multiplet (hcH1 : H * J1 = J1 * H) (hcH2 : H * J2 = J2 * H)
     congr 1
     push_cast
     ring
-  · exact ham_mulVec_raiseIter H J1 (-J2) hcH1 (by rw [Matrix.mul_neg, Matrix.neg_mul, hcH2]) hHT k
+  · intro A a hcA1 hcA2 hAΦ
+    have hAT : A.mulVec T = a • T := ham_mulVec_raiseIter A J1 J2 hcA1 hcA2 hAΦ t
+    exact ham_mulVec_raiseIter A J1 (-J2) hcA1
+      (by rw [Matrix.mul_neg, Matrix.neg_mul, hcA2]) hAT k
+
+omit [DecidableEq d] in
+/-- **Tasaki Theorem A.16 (SU(2)-multiplet degeneracy).**  Let `Ĥ` be `su(2)`-invariant
+(`Ĥ Ĵ⁽ᵅ⁾ = Ĵ⁽ᵅ⁾ Ĥ`) and let `Φ ≠ 0` be a joint eigenstate in `H_{J,M0}` (`Ĵ² Φ = J(J+1) Φ`,
+`Ĵ⁽³⁾ Φ = M0 Φ`) with `Ĥ Φ = E Φ` and `J ≥ 0`.  Then for every `k ≤ 2J` there is a *nonzero*
+companion `Ψ ∈ H_{J,J−k}` (`Ĵ² Ψ = J(J+1) Ψ`, `Ĵ⁽³⁾ Ψ = (J−k) Ψ`) with the same energy
+`Ĥ Ψ = E Ψ`.  As `k` runs `0,…,2J`, this realizes the `2J+1` magnetic numbers `M = J,…,−J`, so the
+level `E` is at least `(2J+1)`-fold degenerate.  A corollary of the operator-agnostic companion
+`ham_su2_multiplet_companion`, specialising its commuting-operator tracker to `A = Ĥ`, `a = E`. -/
+theorem ham_su2_multiplet (hcH1 : H * J1 = J1 * H) (hcH2 : H * J2 = J2 * H)
+    (_hcH3 : H * J3 = J3 * H) (h1 : J1.IsHermitian) (h2 : J2.IsHermitian)
+    (h12 : J1 * J2 - J2 * J1 = Complex.I • J3) (h23 : J2 * J3 - J3 * J2 = Complex.I • J1)
+    (h31 : J3 * J1 - J1 * J3 = Complex.I • J2) {Φ : d → ℂ} {Jr M0 : ℝ} {E : ℂ} (hΦ : Φ ≠ 0)
+    (hJ : 0 ≤ Jr) (hsq : (J1 * J1 + J2 * J2 + J3 * J3).mulVec Φ = ((Jr * (Jr + 1) : ℝ) : ℂ) • Φ)
+    (h3 : J3.mulVec Φ = (M0 : ℂ) • Φ) (hH : H.mulVec Φ = E • Φ) :
+    ∀ k : ℕ, (k : ℝ) ≤ 2 * Jr →
+      ∃ Ψ : d → ℂ, Ψ ≠ 0 ∧
+        (J1 * J1 + J2 * J2 + J3 * J3).mulVec Ψ = ((Jr * (Jr + 1) : ℝ) : ℂ) • Ψ ∧
+        J3.mulVec Ψ = ((Jr - k : ℝ) : ℂ) • Ψ ∧ H.mulVec Ψ = E • Ψ := by
+  intro k hk
+  obtain ⟨Ψ, hΨ0, hΨsq, hΨ3, hclause⟩ :=
+    ham_su2_multiplet_companion J1 J2 J3 h1 h2 h12 h23 h31 hΦ hJ hsq h3 k hk
+  exact ⟨Ψ, hΨ0, hΨsq, hΨ3, hclause H E hcH1 hcH2 hH⟩
 
 end LatticeSystem.Math
