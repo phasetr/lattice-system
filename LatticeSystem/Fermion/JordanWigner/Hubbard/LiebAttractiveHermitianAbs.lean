@@ -25,6 +25,10 @@ structural properties: it is positive-semidefinite (hence Hermitian) and squares
 * `hermitianAbs_posSemidef` — `|W|` is positive-semidefinite.
 * `hermitianAbs_isHermitian` — `|W|` is Hermitian.
 * `hermitianAbs_mul_self` — `|W|² = W²` (kinetic invariance).
+* `hermitianAbs_sub_posSemidef` — `|W| − W` is positive-semidefinite
+  (eigenvalues `|λᵢ| − λᵢ ≥ 0`).
+* `hermitianAbs_commute` — `|W|` commutes with `W` (both diagonalize in the same
+  eigenbasis).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 1st ed., Springer 2020, §10.2.4, eq. (10.2.42); E. H. Lieb,
@@ -92,5 +96,57 @@ theorem hermitianAbs_mul_self {W : Matrix n n ℂ} (hW : W.IsHermitian) :
     rw [h1, hUU, Matrix.mul_one]
     noncomm_ring
   rw [hermitianAbs, ← hU, ← hAbsD, key, hsq, hWspec, key]
+
+/-- **`|W| − W` is positive-semidefinite**: in the eigenbasis `W = U·D·Uᴴ` the
+difference is `U·(|D|−D)·Uᴴ`, a unitary conjugate of the nonnegative diagonal `|D|−D`
+(entries `|λᵢ| − λᵢ ≥ 0`). -/
+theorem hermitianAbs_sub_posSemidef {W : Matrix n n ℂ} (hW : W.IsHermitian) :
+    (hermitianAbs hW - W).PosSemidef := by
+  set U := (hW.eigenvectorUnitary : Matrix n n ℂ) with hU
+  set absD : Matrix n n ℂ :=
+    Matrix.diagonal (RCLike.ofReal ∘ fun i => |hW.eigenvalues i|) with hAbsD
+  set D : Matrix n n ℂ := Matrix.diagonal (RCLike.ofReal ∘ hW.eigenvalues) with hD
+  have hWspec : W = U * D * Uᴴ := by
+    conv_lhs => rw [hW.spectral_theorem]
+    rw [Unitary.conjStarAlgAut_apply, Matrix.star_eq_conjTranspose, Matrix.mul_assoc, ← hU, ← hD]
+  have hdiff : hermitianAbs hW - W = U * (absD - D) * Uᴴ := by
+    rw [hermitianAbs, ← hU, ← hAbsD, hWspec, Matrix.mul_sub, Matrix.sub_mul]
+  have hPSD : (absD - D).PosSemidef := by
+    rw [hAbsD, hD, Matrix.diagonal_sub]
+    refine Matrix.PosSemidef.diagonal ?_
+    intro i
+    simp only [Function.comp_apply, ← RCLike.ofReal_sub]
+    exact RCLike.ofReal_nonneg.mpr (sub_nonneg.mpr (le_abs_self (hW.eigenvalues i)))
+  rw [hdiff]
+  exact hPSD.mul_mul_conjTranspose_same U
+
+/-- **`|W|` commutes with `W`**: both are functions of the same eigenbasis
+(`|W| = U·|D|·Uᴴ`, `W = U·D·Uᴴ`) and the diagonal matrices `|D|`, `D` commute. -/
+theorem hermitianAbs_commute {W : Matrix n n ℂ} (hW : W.IsHermitian) :
+    hermitianAbs hW * W = W * hermitianAbs hW := by
+  set U := (hW.eigenvectorUnitary : Matrix n n ℂ) with hU
+  set absD : Matrix n n ℂ :=
+    Matrix.diagonal (RCLike.ofReal ∘ fun i => |hW.eigenvalues i|) with hAbsD
+  set D : Matrix n n ℂ := Matrix.diagonal (RCLike.ofReal ∘ hW.eigenvalues) with hD
+  have hUU : Uᴴ * U = 1 := eigenvectorUnitary_conjTranspose_mul hW
+  have hWspec : W = U * D * Uᴴ := by
+    conv_lhs => rw [hW.spectral_theorem]
+    rw [Unitary.conjStarAlgAut_apply, Matrix.star_eq_conjTranspose, Matrix.mul_assoc, ← hU, ← hD]
+  have hcomm : absD * D = D * absD := by
+    rw [hAbsD, hD, Matrix.diagonal_mul_diagonal, Matrix.diagonal_mul_diagonal]
+    congr 1
+    funext i
+    simp only [Function.comp_apply]
+    ring
+  rw [hermitianAbs, ← hU, ← hAbsD, hWspec]
+  have hL : U * absD * Uᴴ * (U * D * Uᴴ) = U * (absD * D) * Uᴴ := by
+    have h1 : U * absD * Uᴴ * (U * D * Uᴴ) = U * absD * (Uᴴ * U) * D * Uᴴ := by noncomm_ring
+    rw [h1, hUU, Matrix.mul_one]
+    noncomm_ring
+  have hR : U * D * Uᴴ * (U * absD * Uᴴ) = U * (D * absD) * Uᴴ := by
+    have h1 : U * D * Uᴴ * (U * absD * Uᴴ) = U * D * (Uᴴ * U) * absD * Uᴴ := by noncomm_ring
+    rw [h1, hUU, Matrix.mul_one]
+    noncomm_ring
+  rw [hL, hR, hcomm]
 
 end LatticeSystem.Fermion

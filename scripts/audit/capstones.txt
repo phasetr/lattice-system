@@ -16,7 +16,15 @@ anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_reachability_pf_min_
 
 # V1 capstone: the balanced-sector positive-definite ground coefficient, the assembly of
 # Tasaki §10.2.4 Lemma 10.10 (`R ≠ 0 ⟹ R.PosDef`) on the balanced (Ŝ³=0) sector (#4852).
-# Legitimately zero-referenced now; consumed by the next PR (Lemma 10.9, which needs both the
-# PosDef compression and the eigenvector relation retained in its conclusion).
+# Legitimately zero-referenced milestone. Lemma 10.9 (below) does NOT reference this capstone
+# directly: both Lemma 10.10 and Lemma 10.9 consume the shared reusable dichotomy core
+# `posDefCompress_dichotomy` (design GLUE 1), so both remain zero-referenced milestones.
 # (Its PR40f precursor exists_posSemidefW_ground_in_balanced_sector is now consumed here.)
 exists_posDefCompress_ground_in_balanced_sector
+
+# V1 capstone: the balanced-sector sign-definite compressed coefficient, the assembly of
+# Tasaki §10.2.4 Lemma 10.9 (`W_S.PosDef ∨ (−W_S).PosDef`) on the balanced (Ŝ³=0) sector (#4852).
+# Legitimately zero-referenced now; consumed by the next PR (the Lieb uniqueness step
+# `Tr(W'W) > 0`, which needs both the sign-definiteness and the eigenvector relation retained
+# in its conclusion).
+exists_signDefiniteCompress_ground_in_balanced_sector
