@@ -33,6 +33,10 @@ squeeze onto the compressed sub-block and produces the terminal **PSD-`W`, balan
 * `hubbardCountSectorEmbedding_conjTranspose_mul_self` — its orthonormality `Jᴴ · J = 1`.
 * `blockWCoeff_eq_embed_compress_of_balanced` — the principal-block rewrite
   `blockWCoeff ψ = J · (Jᴴ · blockWCoeff ψ · J) · Jᴴ` for a balanced `ψ`.
+* `gammaWState_hermitianAbs_isEigenvector` — the reusable SRP squeeze core: from a balanced
+  Hermitian ground `φ` at `E`, the absolute-value state `Γ(J · |W_S| · Jᴴ)` is again a nonzero
+  balanced ground vector at the same `E` with PSD block coefficient. It exposes the connection
+  to the specific input `φ` (needed to show `|W_S|` solves the compressed Lyapunov equation).
 * `exists_posSemidefW_ground_in_balanced_sector` — the terminal balanced (`Ŝ³ = 0`) ground state
   whose reconciliation coefficient `blockWCoeff` is *positive semidefinite*, at the
   balanced-compression minimum eigenvalue. This is the SRP half of Lemma 10.9.
@@ -166,34 +170,55 @@ theorem blockWCoeff_eq_embed_compress_of_balanced (k : ℕ)
     simp only [Matrix.mul_assoc]
   rw [expand, hL, hR]
 
-/-- **A positive-semidefinite-`W` ground state in the balanced (`Ŝ³ = 0`) sector.** For symmetric
-real hopping `T` and nonnegative attraction `U`, there is a nonzero balanced ground vector `φ'`
-(`N̂_↑ φ' = N̂_↓ φ' = k·φ'`) of the attractive Hubbard Hamiltonian, at the balanced-compression
-minimum eigenvalue `E`, whose reconciliation coefficient `blockWCoeff φ'` is *positive
-semidefinite*. It refines `exists_hermitianW_ground_in_balanced_sector` (`W` Hermitian) by running
-the Lieb spin-reflection-positivity squeeze against the compressed coefficient `W_S = Jᴴ·W·J` and
-its spectral absolute value `|W_S|`: the candidate `φ' := Γ(J·|W_S|·Jᴴ)` has PSD block coefficient
-(`Matrix.PosSemidef.mul_mul_conjTranspose_same`), stays in the balanced block (image of `J`), has
-the same Frobenius norm (`frobenius_conj_isometry` + `hermitianAbs_sum_normSq_eq`) and no larger
-energy (`liebSRPEnergy_conj_isometry` + `liebSRPEnergy_abs_le`, using `0 ≤ U`); the balanced
-variational lower bound (`configSector_minEnergy_mul_le_rayleighOnVec_of_isHermitian`) then forces
-`φ'` to be a ground vector at `E`. This is the SRP (`Ŝ³ = 0`) half of Tasaki §10.2.4 Lemma 10.9. -/
-theorem exists_posSemidefW_ground_in_balanced_sector (k : ℕ)
+/-- **The spectral-absolute-value state of a balanced Hermitian ground is itself a ground state
+at the same energy.** Given a nonzero balanced (`Ŝ³ = 0`) eigenvector `φ` of the attractive
+Hubbard Hamiltonian at the balanced-compression minimum eigenvalue `E`, with Hermitian
+reconciliation coefficient `W = blockWCoeff φ` and Hermitian compressed matrix
+`W_S = Jᴴ · W · J` (`J = hubbardCountSectorEmbedding N k`), the *absolute-value* candidate
+`φ' := Γ(J · |W_S| · Jᴴ)` (`|W_S| = hermitianAbs hWS`) is again a nonzero balanced ground vector
+of `Ĥ` at the *same* `E`, with positive-semidefinite `blockWCoeff φ'`. This is the reusable Lieb
+spin-reflection-positivity squeeze core of Tasaki §10.2.4 Lemma 10.9: `φ'` has PSD block
+coefficient (`Matrix.PosSemidef.mul_mul_conjTranspose_same`), stays in the balanced block (image
+of `J`), has the same Frobenius norm (`frobenius_conj_isometry` + `hermitianAbs_sum_normSq_eq`)
+and no larger energy (`liebSRPEnergy_conj_isometry` + `liebSRPEnergy_abs_le`, using `0 ≤ U`); the
+balanced variational lower bound (`configSector_minEnergy_mul_le_rayleighOnVec_of_isHermitian`)
+then forces `φ'` to be a ground vector at `E`. It exposes the connection to the specific input
+`φ` (which the existential `exists_posSemidefW_ground_in_balanced_sector` discards) so that
+`|W_S|` can be shown to satisfy the compressed Lyapunov equation at `E`. -/
+theorem gammaWState_hermitianAbs_isEigenvector (k : ℕ)
     [Nonempty (hubbardBalancedConfig N k)]
     (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : Fin (N + 1) → ℝ)
-    (hT : ∀ i j, T i j = T j i) (hU : ∀ x, 0 ≤ U x) :
-    ∃ φ : (Fin (2 * N + 2) → Fin 2) → ℂ, φ ≠ 0
-      ∧ (fermionTotalUpNumber N).mulVec φ = (k : ℂ) • φ
-      ∧ (fermionTotalDownNumber N).mulVec φ = (k : ℂ) • φ
-      ∧ (blockWCoeff N φ).PosSemidef
-      ∧ (attractiveHubbardHamiltonian N T U).mulVec φ
+    (hT : ∀ i j, T i j = T j i) (hU : ∀ x, 0 ≤ U x)
+    (φ : (Fin (2 * N + 2) → Fin 2) → ℂ) (hφ0 : φ ≠ 0)
+    (hφUp : (fermionTotalUpNumber N).mulVec φ = (k : ℂ) • φ)
+    (hφDn : (fermionTotalDownNumber N).mulVec φ = (k : ℂ) • φ)
+    (hφHerm : (blockWCoeff N φ).IsHermitian)
+    (hWS : ((hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ
+        * hubbardCountSectorEmbedding N k).IsHermitian)
+    (hφeig : (attractiveHubbardHamiltonian N T U).mulVec φ
+        = ((hermitianMinEigenvalue (configSectorCompress_isHermitian
+            (hubbardBalancedSectorPred N k)
+            (attractiveHubbardHamiltonian_isHermitian T U hT)) : ℝ) : ℂ) • φ) :
+    gammaWState N (hubbardCountSectorEmbedding N k * hermitianAbs hWS
+        * (hubbardCountSectorEmbedding N k)ᴴ) ≠ 0
+      ∧ (fermionTotalUpNumber N).mulVec (gammaWState N (hubbardCountSectorEmbedding N k
+          * hermitianAbs hWS * (hubbardCountSectorEmbedding N k)ᴴ))
+          = (k : ℂ) • gammaWState N (hubbardCountSectorEmbedding N k * hermitianAbs hWS
+              * (hubbardCountSectorEmbedding N k)ᴴ)
+      ∧ (fermionTotalDownNumber N).mulVec (gammaWState N (hubbardCountSectorEmbedding N k
+          * hermitianAbs hWS * (hubbardCountSectorEmbedding N k)ᴴ))
+          = (k : ℂ) • gammaWState N (hubbardCountSectorEmbedding N k * hermitianAbs hWS
+              * (hubbardCountSectorEmbedding N k)ᴴ)
+      ∧ (blockWCoeff N (gammaWState N (hubbardCountSectorEmbedding N k * hermitianAbs hWS
+          * (hubbardCountSectorEmbedding N k)ᴴ))).PosSemidef
+      ∧ (attractiveHubbardHamiltonian N T U).mulVec (gammaWState N (hubbardCountSectorEmbedding N k
+          * hermitianAbs hWS * (hubbardCountSectorEmbedding N k)ᴴ))
           = ((hermitianMinEigenvalue (configSectorCompress_isHermitian
               (hubbardBalancedSectorPred N k)
-              (attractiveHubbardHamiltonian_isHermitian T U hT)) : ℝ) : ℂ) • φ := by
+              (attractiveHubbardHamiltonian_isHermitian T U hT)) : ℝ) : ℂ)
+            • gammaWState N (hubbardCountSectorEmbedding N k * hermitianAbs hWS
+                * (hubbardCountSectorEmbedding N k)ᴴ) := by
   classical
-  -- The balanced Hermitian-`W` ground representative (PR40e-pre2b).
-  obtain ⟨φ, hφ0, hφUp, hφDn, hφHerm, hφeig⟩ :=
-    exists_hermitianW_ground_in_balanced_sector k T U hT
   set hA := attractiveHubbardHamiltonian_isHermitian T U hT with hAdef
   set E : ℝ := hermitianMinEigenvalue (configSectorCompress_isHermitian
     (hubbardBalancedSectorPred N k) hA) with hEdef
@@ -208,13 +233,8 @@ theorem exists_posSemidefW_ground_in_balanced_sector (k : ℕ)
     rw [Matrix.conjTranspose_apply, hJapply,
       show star (basisVec s.val w) = basisVec s.val w from by
         rw [basisVec_apply]; split <;> simp]
-  -- The compressed coefficient `W_S = Jᴴ·W·J` (Hermitian) and its spectral absolute value.
+  -- The compressed coefficient `W_S = Jᴴ·W·J` (Hermitian, supplied) and its spectral abs.
   set WS := Jᴴ * blockWCoeff N φ * J with hWSdef
-  have hWS : WS.IsHermitian := by
-    rw [hWSdef]
-    change (Jᴴ * blockWCoeff N φ * J)ᴴ = Jᴴ * blockWCoeff N φ * J
-    rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,
-      hφHerm.eq, Matrix.mul_assoc]
   set absWS := hermitianAbs hWS with habsdef
   -- The PSD-`W` candidate `Wpsd = J·|W_S|·Jᴴ` and its realizing state `φ'`.
   set Wpsd := J * absWS * Jᴴ with hWpsddef
@@ -310,13 +330,54 @@ theorem exists_posSemidefW_ground_in_balanced_sector (k : ℕ)
         (fun hcast => hdn (by exact_mod_cast hcast))
     · exact mulVec_apply_eq_zero_of_upNumber_ne _ (k : ℂ) hHφ'up w
         (fun hcast => hup (by exact_mod_cast hcast))
-  -- Assemble the deliverable.
+  -- Assemble the deliverable about `φ'`.
   have hpos : 0 < (dotProduct (star φ') φ').re := by
     rw [hnorm]; exact dotProduct_star_self_re_pos hφ0
-  refine ⟨φ', ?_, hφ'up, hφ'dn, ?_, ?_⟩
+  refine ⟨?_, hφ'up, hφ'dn, ?_, ?_⟩
   · intro h; rw [h] at hpos; simp [dotProduct] at hpos
   · rw [hbwφ']; exact hpsd
   · exact mulVec_eq_smul_of_configSector_rayleighOnVec_eq_min
       (hubbardBalancedSectorPred N k) hA hφ'supp0 hApres' hsqueeze
+
+/-- **A positive-semidefinite-`W` ground state in the balanced (`Ŝ³ = 0`) sector.** For symmetric
+real hopping `T` and nonnegative attraction `U`, there is a nonzero balanced ground vector `φ'`
+(`N̂_↑ φ' = N̂_↓ φ' = k·φ'`) of the attractive Hubbard Hamiltonian, at the balanced-compression
+minimum eigenvalue `E`, whose reconciliation coefficient `blockWCoeff φ'` is *positive
+semidefinite*. It refines `exists_hermitianW_ground_in_balanced_sector` (`W` Hermitian) by running
+the Lieb spin-reflection-positivity squeeze against the compressed coefficient `W_S = Jᴴ·W·J` and
+its spectral absolute value `|W_S|`: the candidate `φ' := Γ(J·|W_S|·Jᴴ)` has PSD block coefficient
+(`Matrix.PosSemidef.mul_mul_conjTranspose_same`), stays in the balanced block (image of `J`), has
+the same Frobenius norm (`frobenius_conj_isometry` + `hermitianAbs_sum_normSq_eq`) and no larger
+energy (`liebSRPEnergy_conj_isometry` + `liebSRPEnergy_abs_le`, using `0 ≤ U`); the balanced
+variational lower bound (`configSector_minEnergy_mul_le_rayleighOnVec_of_isHermitian`) then forces
+`φ'` to be a ground vector at `E`. This is the SRP (`Ŝ³ = 0`) half of Tasaki §10.2.4 Lemma 10.9. -/
+theorem exists_posSemidefW_ground_in_balanced_sector (k : ℕ)
+    [Nonempty (hubbardBalancedConfig N k)]
+    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ) (U : Fin (N + 1) → ℝ)
+    (hT : ∀ i j, T i j = T j i) (hU : ∀ x, 0 ≤ U x) :
+    ∃ φ : (Fin (2 * N + 2) → Fin 2) → ℂ, φ ≠ 0
+      ∧ (fermionTotalUpNumber N).mulVec φ = (k : ℂ) • φ
+      ∧ (fermionTotalDownNumber N).mulVec φ = (k : ℂ) • φ
+      ∧ (blockWCoeff N φ).PosSemidef
+      ∧ (attractiveHubbardHamiltonian N T U).mulVec φ
+          = ((hermitianMinEigenvalue (configSectorCompress_isHermitian
+              (hubbardBalancedSectorPred N k)
+              (attractiveHubbardHamiltonian_isHermitian T U hT)) : ℝ) : ℂ) • φ := by
+  classical
+  -- The balanced Hermitian-`W` ground representative (PR40e-pre2b).
+  obtain ⟨φ, hφ0, hφUp, hφDn, hφHerm, hφeig⟩ :=
+    exists_hermitianW_ground_in_balanced_sector k T U hT
+  -- The compressed coefficient `W_S = Jᴴ·W·J` is Hermitian.
+  have hWS : ((hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ
+      * hubbardCountSectorEmbedding N k).IsHermitian := by
+    change ((hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ
+        * hubbardCountSectorEmbedding N k)ᴴ
+      = (hubbardCountSectorEmbedding N k)ᴴ * blockWCoeff N φ * hubbardCountSectorEmbedding N k
+    rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,
+      hφHerm.eq, Matrix.mul_assoc]
+  -- The absolute-value state `φ' = Γ(J·|W_S|·Jᴴ)` is a balanced ground vector at the same `E`.
+  obtain ⟨hφ'0, hφ'up, hφ'dn, hφ'psd, hφ'eig⟩ :=
+    gammaWState_hermitianAbs_isEigenvector k T U hT hU φ hφ0 hφUp hφDn hφHerm hWS hφeig
+  exact ⟨_, hφ'0, hφ'up, hφ'dn, hφ'psd, hφ'eig⟩
 
 end LatticeSystem.Fermion
