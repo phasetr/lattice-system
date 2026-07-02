@@ -1,4 +1,5 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveHamiltonianHermitian
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveSectorGround
 
 /-!
 # SU(2) invariance of the attractive Hubbard Hamiltonian (Tasaki §10.2)
@@ -20,10 +21,10 @@ scalar-`U` proofs of §9.3.3 clone directly to the
 
 ## Main results
 
-* `fermionTotalSpinPlus_commute_hubbardOnSiteInteractionSite`,
-  `fermionTotalUpNumber_commute_hubbardOnSiteInteractionSite`,
-  `fermionTotalDownNumber_commute_hubbardOnSiteInteractionSite` — the
-  site-dependent-`U` interaction commutes with `Ŝ⁺`, `N̂_↑`, `N̂_↓`.
+* `fermionTotalSpinPlus_commute_hubbardOnSiteInteractionSite` — the
+  site-dependent-`U` interaction commutes with `Ŝ⁺`.  (The analogous
+  `N̂_↑`, `N̂_↓` commutes live in `LiebAttractiveSectorGround.lean` and
+  are reused here.)
 * `fermionTotalSpinPlus_commute_attractiveHubbardHamiltonian`,
   `fermionTotalSpinMinus_commute_attractiveHubbardHamiltonian`,
   `fermionTotalSpinZ_commute_attractiveHubbardHamiltonian` — the three
@@ -57,39 +58,6 @@ theorem fermionTotalSpinPlus_commute_hubbardOnSiteInteractionSite
   apply Commute.smul_right _ (U x)
   exact (Commute.sum_right _ _ _ (fun k _ =>
     (fermionSpinPlusTerm_commute_interactionTerm N k x).symm)).symm
-
-/-- `[N̂_↑, Σ_x U_x n̂_{x,↑} n̂_{x,↓}] = 0`: the site-dependent-`U`
-analogue of `fermionTotalUpNumber_commute_hubbardOnSiteInteraction`.
-All summands are products of pairwise commuting number operators. -/
-theorem fermionTotalUpNumber_commute_hubbardOnSiteInteractionSite
-    (N : ℕ) (U : Fin (N + 1) → ℂ) :
-    Commute (fermionTotalUpNumber N) (hubbardOnSiteInteractionSite N U) := by
-  unfold fermionTotalUpNumber hubbardOnSiteInteractionSite
-  refine Commute.sum_left _ _ _ (fun k _ => ?_)
-  refine Commute.sum_right _ _ _ (fun i _ => ?_)
-  refine Commute.smul_right ?_ (U i)
-  unfold fermionUpNumber fermionDownNumber
-  refine Commute.mul_right ?_ ?_
-  · exact fermionMultiNumber_commute (2 * N + 1)
-      (spinfulIndex N k 0) (spinfulIndex N i 0)
-  · exact fermionMultiNumber_commute (2 * N + 1)
-      (spinfulIndex N k 0) (spinfulIndex N i 1)
-
-/-- `[N̂_↓, Σ_x U_x n̂_{x,↑} n̂_{x,↓}] = 0`: the site-dependent-`U`
-analogue of `fermionTotalDownNumber_commute_hubbardOnSiteInteraction`. -/
-theorem fermionTotalDownNumber_commute_hubbardOnSiteInteractionSite
-    (N : ℕ) (U : Fin (N + 1) → ℂ) :
-    Commute (fermionTotalDownNumber N) (hubbardOnSiteInteractionSite N U) := by
-  unfold fermionTotalDownNumber hubbardOnSiteInteractionSite
-  refine Commute.sum_left _ _ _ (fun k _ => ?_)
-  refine Commute.sum_right _ _ _ (fun i _ => ?_)
-  refine Commute.smul_right ?_ (U i)
-  unfold fermionUpNumber fermionDownNumber
-  refine Commute.mul_right ?_ ?_
-  · exact fermionMultiNumber_commute (2 * N + 1)
-      (spinfulIndex N k 1) (spinfulIndex N i 0)
-  · exact fermionMultiNumber_commute (2 * N + 1)
-      (spinfulIndex N k 1) (spinfulIndex N i 1)
 
 /-- `[Ŝ⁺_tot, Ĥ] = 0` for the attractive Hubbard Hamiltonian: the
 kinetic part commutes by `fermionTotalSpinPlus_commute_hubbardKinetic`
@@ -132,7 +100,7 @@ theorem fermionTotalUpNumber_commute_attractiveHubbardHamiltonian
   unfold attractiveHubbardHamiltonian attractiveHubbardInteraction
   exact (fermionTotalUpNumber_commute_hubbardKinetic N
       (fun x y => (T x y : ℂ))).add_right
-    (fermionTotalUpNumber_commute_hubbardOnSiteInteractionSite N
+    (fermionTotalUpNumber_commute_hubbardOnSiteInteractionSite
       (fun x => -(U x : ℂ)))
 
 /-- `[N̂_↓, Ĥ] = 0` for the attractive Hubbard Hamiltonian: kinetic
@@ -145,7 +113,7 @@ theorem fermionTotalDownNumber_commute_attractiveHubbardHamiltonian
   unfold attractiveHubbardHamiltonian attractiveHubbardInteraction
   exact (fermionTotalDownNumber_commute_hubbardKinetic N
       (fun x y => (T x y : ℂ))).add_right
-    (fermionTotalDownNumber_commute_hubbardOnSiteInteractionSite N
+    (fermionTotalDownNumber_commute_hubbardOnSiteInteractionSite
       (fun x => -(U x : ℂ)))
 
 /-- `[Ŝ³_tot, Ĥ] = 0` for the attractive Hubbard Hamiltonian: free
