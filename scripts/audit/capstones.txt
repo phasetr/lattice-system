@@ -13,3 +13,8 @@
 # Φ hypothesis), so they are NOT real duplicates.
 anisotropicHeisenbergS_case_ii_target_finrank_le_one_of_reachability_pf_min_path
 anisotropicHeisenbergS_case_ii_target_zero_magnetization_of_reachability_pf_min_path
+
+# V1 capstone: the terminal balanced (Ŝ³=0) Hermitian-W ground milestone of Tasaki §10.2.4
+# (PR40e-pre2b, #4852). Legitimately zero-referenced now; consumed by the next PR/PSD step
+# (the balanced analog of exists_hermitianW_ground_in_sector, #4909).
+exists_hermitianW_ground_in_balanced_sector

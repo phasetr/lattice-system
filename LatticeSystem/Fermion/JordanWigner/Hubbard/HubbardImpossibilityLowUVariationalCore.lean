@@ -110,17 +110,6 @@ theorem configSectorEmbedding_conjTranspose_mulVec (P : (Fin (2 * N + 2) → Fin
   rw [Matrix.conjTranspose_apply, configSectorEmbedding, Matrix.of_apply,
     show star (basisVec s.val w) = basisVec s.val w from by rw [basisVec_apply]; split <;> simp]
 
-/-- **The sector expansion is supported on `P`.**  `Φ = Σ_s v_s |s⟩` vanishes at any configuration
-`w` outside the sector, since each `|s⟩` is supported at `s.val`, which satisfies `P`. -/
-theorem configSectorExpansion_supported (P : (Fin (2 * N + 2) → Fin 2) → Prop) [DecidablePred P]
-    (v : configSector N P → ℂ) {w : Fin (2 * N + 2) → Fin 2} (hw : ¬ P w) :
-    configSectorExpansion N P v w = 0 := by
-  unfold configSectorExpansion
-  rw [Finset.sum_apply]
-  refine Finset.sum_eq_zero fun s _ => ?_
-  rw [Pi.smul_apply, smul_eq_mul, basisVec_apply,
-    if_neg (fun h => hw (by rw [h]; exact s.property)), mul_zero]
-
 /-- **Completeness of the sector basis.**  A vector `u` supported on the sector (`u w = 0` whenever
 `¬ P w`) equals its sector expansion `T (Tᴴ u)`; the sector is spanned by the computational basis
 vectors on which such a vector is supported. -/
