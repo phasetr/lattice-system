@@ -144,14 +144,6 @@ theorem dressedHeisenbergS_N_zero
   rw [heisenbergHamiltonianS_N_zero (Λ := V) J]
   simp
 
-/-- The diagonal real part of `dressedHeisenbergS` equals the
-diagonal real part of `heisenbergHamiltonianS`. -/
-theorem dressedHeisenbergS_diag_re
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ : V → Fin (N + 1)) :
-    (dressedHeisenbergS A J N σ σ).re =
-      ((heisenbergHamiltonianS J N) σ σ).re := by
-  rw [dressedHeisenbergS_diag]
-
 /-- Dressed Heisenberg is additive in the coupling. -/
 theorem dressedHeisenbergS_add_J
     (A : V → Bool) (J J' : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
@@ -209,76 +201,10 @@ noncomputable def dressedHeisenbergSMatrix
     ManyBodyOpS V N :=
   fun σ σ' => dressedHeisenbergS A J N σ σ'
 
-/-- Definitional unfolding of `dressedHeisenbergSMatrix`. -/
-theorem dressedHeisenbergSMatrix_def
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) :
-    dressedHeisenbergSMatrix A J N =
-      (fun σ σ' => dressedHeisenbergS A J N σ σ') := rfl
-
 /-- Component-wise unfolding of `dressedHeisenbergSMatrix`. -/
 theorem dressedHeisenbergSMatrix_apply
     (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ σ' : V → Fin (N + 1)) :
     dressedHeisenbergSMatrix A J N σ σ' = dressedHeisenbergS A J N σ σ' := rfl
-
-/-- The dressed Heisenberg matrix is zero when the coupling is zero. -/
-theorem dressedHeisenbergSMatrix_zero_J (A : V → Bool) (N : ℕ) :
-    dressedHeisenbergSMatrix A (fun _ _ : V => (0 : ℂ)) N = 0 := by
-  ext σ σ'
-  rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_zero_J]
-  simp
-
-/-- For trivial spin (`N = 0`), the dressed Heisenberg matrix is zero. -/
-theorem dressedHeisenbergSMatrix_N_zero
-    (A : V → Bool) (J : V → V → ℂ) :
-    dressedHeisenbergSMatrix A J 0 = 0 := by
-  ext σ σ'
-  rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_N_zero]
-  simp
-
-/-- The dressed Heisenberg matrix is additive in the coupling. -/
-theorem dressedHeisenbergSMatrix_add_J
-    (A : V → Bool) (J J' : V → V → ℂ) (N : ℕ) :
-    dressedHeisenbergSMatrix A (fun x y => J x y + J' x y) N =
-      dressedHeisenbergSMatrix A J N + dressedHeisenbergSMatrix A J' N := by
-  ext σ σ'
-  rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_add_J]
-  simp [dressedHeisenbergSMatrix_apply]
-
-/-- The dressed Heisenberg matrix is homogeneous in the coupling. -/
-theorem dressedHeisenbergSMatrix_smul_J
-    (A : V → Bool) (c : ℂ) (J : V → V → ℂ) (N : ℕ) :
-    dressedHeisenbergSMatrix A (fun x y => c * J x y) N =
-      c • dressedHeisenbergSMatrix A J N := by
-  ext σ σ'
-  rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_smul_J]
-  simp [dressedHeisenbergSMatrix_apply]
-
-/-- The dressed Heisenberg matrix negates with the coupling. -/
-theorem dressedHeisenbergSMatrix_neg_J
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) :
-    dressedHeisenbergSMatrix A (fun x y => -(J x y)) N =
-      -(dressedHeisenbergSMatrix A J N) := by
-  ext σ σ'
-  rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_neg_J]
-  simp [dressedHeisenbergSMatrix_apply]
-
-/-- The dressed Heisenberg matrix is anti-distributive over subtraction
-in the coupling. -/
-theorem dressedHeisenbergSMatrix_sub_J
-    (A : V → Bool) (J J' : V → V → ℂ) (N : ℕ) :
-    dressedHeisenbergSMatrix A (fun x y => J x y - J' x y) N =
-      dressedHeisenbergSMatrix A J N - dressedHeisenbergSMatrix A J' N := by
-  ext σ σ'
-  rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_sub_J]
-  simp [dressedHeisenbergSMatrix_apply]
-
-/-- The diagonal of the dressed Heisenberg matrix equals the diagonal
-of the plain Heisenberg matrix (Marshall signs cancel as `(±1)^2 = 1`). -/
-theorem dressedHeisenbergSMatrix_apply_diag
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ : V → Fin (N + 1)) :
-    dressedHeisenbergSMatrix A J N σ σ =
-      (heisenbergHamiltonianS J N) σ σ := by
-  rw [dressedHeisenbergSMatrix_apply, dressedHeisenbergS_diag]
 
 /-- The dressed Heisenberg matrix as a product: `dressed σ' σ =
 sign(σ') · sign(σ) · heisenberg σ' σ`. -/
@@ -344,18 +270,6 @@ theorem dressedHeisenbergSMatrix_mulVec_basisVecS_mem_magSubspaceS
     rw [totalSpinSOp3_apply_off_diag (Ne.symm hρ), zero_mul]
   · intro hτ; exact (hτ (Finset.mem_univ τ)).elim
 
-/-- The dressed Heisenberg matrix applied to a Marshall-dressed basis
-state lies in the same magnetization subspace as the underlying
-basis vector. -/
-theorem dressedHeisenbergSMatrix_mulVec_marshallDressedBasisS_mem_magSubspaceS
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (σ : V → Fin (N + 1)) :
-    (dressedHeisenbergSMatrix A J N).mulVec (marshallDressedBasisS A σ) ∈
-      magSubspaceS V N (magEigenvalueS σ) := by
-  unfold marshallDressedBasisS
-  rw [Matrix.mulVec_smul]
-  exact (magSubspaceS V N (magEigenvalueS σ)).smul_mem _
-    (dressedHeisenbergSMatrix_mulVec_basisVecS_mem_magSubspaceS A J N σ)
-
 /-- The dressed Heisenberg matrix commutes with `Ŝ_tot^{(3)}`. -/
 theorem dressedHeisenbergSMatrix_commute_totalSpinSOp3
     (A : V → Bool) (J : V → V → ℂ) (N : ℕ) :
@@ -388,17 +302,6 @@ theorem dressedHeisenbergSMatrix_commute_totalSpinSOp3
   · have hzero := dressedHeisenbergSMatrix_apply_eq_zero_of_mag_ne
       A J N hmag
     rw [hzero]; ring
-
-/-- The dressed Heisenberg matrix preserves each magnetization
-subspace: for `v ∈ magSubspaceS V N M`, `(dressedMatrix · v) ∈
-magSubspaceS V N M`. -/
-theorem dressedHeisenbergSMatrix_mulVec_mem_magSubspaceS
-    (A : V → Bool) (J : V → V → ℂ) (N : ℕ) (M : ℂ)
-    {v : (V → Fin (N + 1)) → ℂ}
-    (hv : v ∈ magSubspaceS V N M) :
-    (dressedHeisenbergSMatrix A J N).mulVec v ∈ magSubspaceS V N M :=
-  mem_magSubspaceS_of_commute M (dressedHeisenbergSMatrix A J N)
-    (dressedHeisenbergSMatrix_commute_totalSpinSOp3 A J N).symm hv
 
 /-- For real coupling, the dressed matrix is Hermitian. -/
 theorem dressedHeisenbergSMatrix_isHermitian

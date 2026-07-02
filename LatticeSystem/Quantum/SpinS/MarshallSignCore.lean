@@ -76,43 +76,6 @@ theorem marshallSignS_N_zero (A : V → Bool) (σ : V → Fin 1) :
     funext x; apply Fin.ext; have := (σ x).isLt; omega
   rw [this, marshallSignS_const_zero]
 
-/-- The Marshall sign at `σ'` and `σ` are equal when σ' = σ. -/
-theorem marshallSignS_eq_of_eq (A : V → Bool)
-    {σ' σ : V → Fin (N + 1)} (h : σ' = σ) :
-    marshallSignS A σ' = marshallSignS A σ := by rw [h]
-
-/-- For a constant configuration `σ ≡ s` and `s.val` even, the
-Marshall sign is `+1`. (Each `(-1)^(s.val)` factor is `+1`.) -/
-theorem marshallSignS_const_of_even
-    (A : V → Bool) {s : Fin (N + 1)} (hs : Even s.val) :
-    marshallSignS A (fun _ : V => s) = 1 := by
-  unfold marshallSignS
-  apply Finset.prod_eq_one
-  intro x _
-  by_cases hAx : A x
-  · rw [if_pos hAx]
-    exact Even.neg_one_pow hs
-  · rw [if_neg hAx]
-
-
-/-- The Marshall sign restricted to `A`-sites: factors away the
-trivial `1` contributions from non-`A` sites. -/
-theorem marshallSignS_eq_prod_A_filter
-    (A : V → Bool) (σ : V → Fin (N + 1)) :
-    marshallSignS A σ =
-      ∏ x ∈ Finset.univ.filter (fun x : V => A x = true),
-        ((-1 : ℂ) ^ (σ x).val) := by
-  classical
-  unfold marshallSignS
-  rw [Finset.prod_filter]
-
-
-/-- Definitional unfolding of `marshallSignS`. -/
-theorem marshallSignS_def (A : V → Bool) (σ : V → Fin (N + 1)) :
-    marshallSignS A σ =
-      ∏ x : V, if A x then ((-1 : ℂ) ^ (σ x).val) else 1 := rfl
-
-
 /-- Product of two Marshall signs at the same sublattice indicator
 factors site-wise: each `A`-site contributes `(-1)^((σ x).val + (σ' x).val)`. -/
 theorem marshallSignS_mul (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
@@ -176,21 +139,6 @@ theorem marshallSignS_norm (A : V → Bool) (σ : V → Fin (N + 1)) :
   rcases marshallSignS_eq_one_or_neg_one A σ with h | h
   · rw [h, norm_one]
   · rw [h]; simp
-
-/-- Even powers of the Marshall sign are `1`. -/
-theorem marshallSignS_pow_two_mul (A : V → Bool) (σ : V → Fin (N + 1))
-    (k : ℕ) :
-    marshallSignS A σ ^ (2 * k) = 1 := by
-  rw [pow_mul]
-  rw [show marshallSignS A σ ^ 2 = 1 from by
-    rw [pow_two]; exact marshallSignS_sq A σ]
-  rw [one_pow]
-
-/-- Cube of the Marshall sign equals itself: `(σ_M)^3 = σ_M`. -/
-theorem marshallSignS_pow_three (A : V → Bool) (σ : V → Fin (N + 1)) :
-    marshallSignS A σ ^ 3 = marshallSignS A σ := by
-  rw [show (3 : ℕ) = 2 + 1 from rfl]
-  rw [pow_succ, pow_two, marshallSignS_sq, one_mul]
 
 /-- **Marshall sign factorization on two-site differences**: when
 configurations `σ', σ` agree at every site except possibly `x` and
@@ -334,16 +282,6 @@ theorem marshallSignS_inv (A : V → Bool) (σ : V → Fin (N + 1)) :
   · rw [h]; simp
   · rw [h]; simp
 
-/-- `(marshallSignS A σ)⁻¹ * marshallSignS A σ = 1`. -/
-theorem marshallSignS_inv_mul_self (A : V → Bool) (σ : V → Fin (N + 1)) :
-    (marshallSignS A σ)⁻¹ * marshallSignS A σ = 1 := by
-  rw [marshallSignS_inv, marshallSignS_sq]
-
-/-- `marshallSignS A σ * (marshallSignS A σ)⁻¹ = 1`. -/
-theorem marshallSignS_mul_self_inv (A : V → Bool) (σ : V → Fin (N + 1)) :
-    marshallSignS A σ * (marshallSignS A σ)⁻¹ = 1 := by
-  rw [marshallSignS_inv, marshallSignS_sq]
-
 /-- Imaginary part of the Marshall sign is zero. -/
 theorem marshallSignS_im (A : V → Bool) (σ : V → Fin (N + 1)) :
     (marshallSignS A σ).im = 0 := by
@@ -406,33 +344,12 @@ theorem marshallSignS_re_eq_one_or_neg_one (A : V → Bool) (σ : V → Fin (N +
   · left; rw [h]; simp
   · right; rw [h]; simp
 
-/-- The absolute value of the Marshall sign's real part is exactly 1. -/
-theorem marshallSignS_re_abs (A : V → Bool) (σ : V → Fin (N + 1)) :
-    |(marshallSignS A σ).re| = 1 := by
-  rcases marshallSignS_re_eq_one_or_neg_one A σ with h | h
-  · rw [h]; simp
-  · rw [h]; simp
-
 /-- The square of the Marshall sign's real part equals 1. -/
 theorem marshallSignS_re_sq (A : V → Bool) (σ : V → Fin (N + 1)) :
     (marshallSignS A σ).re * (marshallSignS A σ).re = 1 := by
   rcases marshallSignS_re_eq_one_or_neg_one A σ with h | h
   · rw [h]; norm_num
   · rw [h]; norm_num
-
-/-- Marshall sign multiplication is commutative (trivially in ℂ). -/
-theorem marshallSignS_mul_comm (A : V → Bool) (σ σ' : V → Fin (N + 1)) :
-    marshallSignS A σ * marshallSignS A σ' =
-      marshallSignS A σ' * marshallSignS A σ :=
-  mul_comm _ _
-
-/-- The Marshall sign belongs to the set `{1, -1}`. -/
-theorem marshallSignS_mem_pm_one
-    (A : V → Bool) (σ : V → Fin (N + 1)) :
-    marshallSignS A σ ∈ ({1, -1} : Set ℂ) := by
-  rcases marshallSignS_eq_one_or_neg_one A σ with h | h
-  · left; exact h
-  · right; rw [Set.mem_singleton_iff]; exact h
 
 /-- The Marshall sign is real: its complex conjugate is itself. Each
 factor `(-1)^k` is real, so the star/conjugation acts as identity on
