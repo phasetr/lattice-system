@@ -21,7 +21,7 @@ with `W := blockWCoeff φ` and `S := hubbardBlockKineticUpFixedMatrix N (single 
 single-hop up-kinetic matrix.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
-2020, §10.2.4, p. 372 (eq. (10.2.51)); E. H. Lieb, *Phys. Rev. Lett.* **62** (1989) 1201.
+2020, §10.2.4, p. 367 (eq. (10.2.51)); E. H. Lieb, *Phys. Rev. Lett.* **62** (1989) 1201.
 -/
 
 namespace LatticeSystem.Fermion

@@ -28,7 +28,7 @@ operator `U = hubbardBlockToSpinfulPermutationOperator` and the single-hop conju
 `permutationOperator_hop_conj_eq` (exactly analogous to `hubbardBlockKinetic_conj_eq`).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
-2020, §10.2.4, p. 372 (eq. (10.2.50)/(10.2.51)); E. H. Lieb, *Phys. Rev. Lett.* **62** (1989) 1201;
+2020, §10.2.4, p. 367 (eq. (10.2.50)/(10.2.51)); E. H. Lieb, *Phys. Rev. Lett.* **62** (1989) 1201;
 G.-S. Tian, *J. Phys. A* **27** (1994).
 -/
 

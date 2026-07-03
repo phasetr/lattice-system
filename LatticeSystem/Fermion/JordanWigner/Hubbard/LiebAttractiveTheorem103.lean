@@ -15,7 +15,7 @@ The declaration `theorem_10_3_tian_pair_correlation_positive` was previously rec
 documented `axiom` (in `LiebAttractive.lean`).  It is now a fully proved theorem, discharged
 axiom-free (modulo `propext`/`Classical.choice`/`Quot.sound`).
 
-## The assembly (Tasaki eq. (10.2.50)/(10.2.51), p. 372)
+## The assembly (Tasaki eq. (10.2.50)/(10.2.51), p. 367)
 
 Write `P = ĉ†_{x,↑} ĉ†_{x,↓} ĉ_{y,↓} ĉ_{y,↑}` for the pair-transfer operator and
 `S = hubbardBlockKineticUpFixedMatrix (single x y 1)` for the single-hop transfer matrix.
@@ -33,7 +33,7 @@ Write `P = ĉ†_{x,↑} ĉ†_{x,↓} ĉ_{y,↓} ĉ_{y,↑}` for the pair-trans
   `0 < Tr(R · (S_cᴴ · R · S_c))`.  As `|c⁻¹|² > 0`, the expectation is strictly positive.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
-2020, §10.2, Theorem 10.3 (Tian), pp. 349, 372; E. H. Lieb, *Phys. Rev. Lett.* **62** (1989) 1201;
+2020, §10.2, Theorem 10.3 (Tian), pp. 349, 367; E. H. Lieb, *Phys. Rev. Lett.* **62** (1989) 1201;
 G.-S. Tian, *J. Phys. A* **27** (1994).
 -/
 
