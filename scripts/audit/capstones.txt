@@ -44,3 +44,11 @@ theorem_10_2_lieb_attractive_unique_singlet
 # factorization + trace lemma for PosDef×PosSemidef products. Legitimately zero-referenced
 # book capstone (documented §10.2 Theorem 10.3).
 theorem_10_3_tian_pair_correlation_positive
+
+# V1 intermediate milestone (TEMPORARY — delist in the c6 PR that consumes it): Tasaki §10.2.2
+# Theorem 10.4 discharge arc, PR-1 (#4852, PR #4950). The Shiba unitary Û^S conjugates the
+# symmetric repulsive Hubbard interaction to its negative, `Ûᴴ Ĥ^{sym}_int Û = −Ĥ^{sym}_int`
+# (Tasaki eq 9.3.54, p.336). Reference-terminal in this PR; the full Hamiltonian-conjugation
+# capstone `shibaUnitary_conj_repulsive_eq_attractive` (eq 10.2.10) in the c6 PR will consume it,
+# at which point this entry is delisted (same pattern as the attractive-arc intermediate milestones).
+shibaSignedUnitary_conj_symmetricInteraction
