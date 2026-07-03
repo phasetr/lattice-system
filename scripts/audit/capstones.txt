@@ -60,3 +60,9 @@ theorem_10_5_shen_qiu_tian_transverse_sign
 # Tasaki states this WITHOUT proof, citing Kubo–Kishi, Phys. Rev. B 41, 4866 (1990); recorded
 # as a documented axiom (same policy as mielke_theorem_11_13). Legitimately zero-referenced.
 theorem_10_11_kubo_kishi_susceptibility_bound
+
+# Tasaki §4.2.2 Theorem 4.8 arc (#4958) PR2 [N1]: same-sign double commutators [ô^±,[Ĥ,ô^±]] in
+# the local-decay class. Intermediate milestones consumed by the [N2] 1-axis numerator / [N5]
+# capstone in a later PR of #4958; temporarily allowlisted, to be delisted at the capstone PR.
+isR2LocalUpTo_orderDoubleCommSameSign
+orderDoubleCommSameSignAggregate_le
