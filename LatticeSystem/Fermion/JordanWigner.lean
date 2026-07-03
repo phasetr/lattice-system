@@ -188,6 +188,9 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractivePairTransferMatr
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractivePairCorrelationTrace
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveTheorem103
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsive
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaTransform
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaUnitary
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaInteraction
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetism
 import LatticeSystem.Fermion.JordanWigner.Hubbard.BipartiteSpectrum
