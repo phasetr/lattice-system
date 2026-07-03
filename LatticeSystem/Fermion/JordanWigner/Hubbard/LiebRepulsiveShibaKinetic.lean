@@ -236,7 +236,7 @@ private theorem jwSign_shibaConfig_mul (j : Fin (2 * N + 2))
 /-- **The crossing sign at a spinful mode** (Tasaki eq. (9.3.52) ingredient):
 `jwSign (spinfulIndex q s) (σc) = (−1)^q · jwSign (spinfulIndex q s) c`.  The number
 of down modes below `spinfulIndex q s` is `q` (both for `s = 0` and `s = 1`). -/
-private theorem jwSign_shibaConfig_spinful (q : Fin (N + 1)) (s : Fin 2)
+theorem jwSign_shibaConfig_spinful (q : Fin (N + 1)) (s : Fin 2)
     (c : Fin (2 * N + 2) → Fin 2) :
     jwSign (2 * N + 1) (spinfulIndex N q s) (shibaConfig N c)
       = (-1 : ℂ) ^ (q : ℕ) * jwSign (2 * N + 1) (spinfulIndex N q s) c := by
@@ -272,7 +272,7 @@ private theorem shibaConfig_apply_parity (c : Fin (2 * N + 2) → Fin 2)
 
 /-- Updating an up mode commutes with the Shiba flip (which fixes up modes):
 `σ(update x (2p) v) = update (σx) (2p) v`. -/
-private theorem shibaConfig_update_up (x : Fin (2 * N + 2) → Fin 2)
+theorem shibaConfig_update_up (x : Fin (2 * N + 2) → Fin 2)
     (p : Fin (N + 1)) (v : Fin 2) :
     shibaConfig N (Function.update x (spinfulIndex N p 0) v)
       = Function.update (shibaConfig N x) (spinfulIndex N p 0) v := by
@@ -284,7 +284,7 @@ private theorem shibaConfig_update_up (x : Fin (2 * N + 2) → Fin 2)
 
 /-- Updating a down mode commutes with the Shiba flip up to the occupation flip
 (which acts on the down species): `σ(update x (2p+1) v) = update (σx) (2p+1) (flip v)`. -/
-private theorem shibaConfig_update_down (x : Fin (2 * N + 2) → Fin 2)
+theorem shibaConfig_update_down (x : Fin (2 * N + 2) → Fin 2)
     (p : Fin (N + 1)) (v : Fin 2) :
     shibaConfig N (Function.update x (spinfulIndex N p 1) v)
       = Function.update (shibaConfig N x) (spinfulIndex N p 1) (flipOccupation v) := by
@@ -295,12 +295,12 @@ private theorem shibaConfig_update_down (x : Fin (2 * N + 2) → Fin 2)
       Function.update_of_ne hk]
 
 /-- The crossing parity is real (a product of `±1`): `star J = J`. -/
-private theorem shibaJwFlipParity_star (c : Fin (2 * N + 2) → Fin 2) :
+theorem shibaJwFlipParity_star (c : Fin (2 * N + 2) → Fin 2) :
     star (shibaJwFlipParity N c) = shibaJwFlipParity N c := by
   rw [shibaJwFlipParity, star_mul', shibaCrossingSpecies_star, shibaCrossingSpecies_star]
 
 /-- The sublattice gauge is real (a product of `±1`): `star g = g`. -/
-private theorem shibaGauge_star (A : Finset (Fin (N + 1))) (c : Fin (2 * N + 2) → Fin 2) :
+theorem shibaGauge_star (A : Finset (Fin (N + 1))) (c : Fin (2 * N + 2) → Fin 2) :
     star (shibaGauge A c) = shibaGauge A c := by
   unfold shibaGauge
   rw [star_prod]
@@ -311,7 +311,7 @@ private theorem shibaGauge_star (A : Finset (Fin (N + 1))) (c : Fin (2 * N + 2) 
 
 /-- Updating a spin-`s` mode does not change the spin-`r` crossing parity when
 `r ≠ s`, since `cs r` reads only the spin-`r` modes. -/
-private theorem shibaCrossingSpecies_update_ne (r : Fin 2)
+theorem shibaCrossingSpecies_update_ne (r : Fin 2)
     (c : Fin (2 * N + 2) → Fin 2) (y : Fin (N + 1)) (s : Fin 2) (v : Fin 2) (hs : s ≠ r) :
     shibaCrossingSpecies N r (Function.update c (spinfulIndex N y s) v)
       = shibaCrossingSpecies N r c := by
@@ -321,7 +321,7 @@ private theorem shibaCrossingSpecies_update_ne (r : Fin 2)
 
 /-- The sublattice gauge is unchanged by updating an up mode, since it reads only
 the down occupations `2x+1`: `g(update x (2p) v) = g(x)`. -/
-private theorem shibaGauge_update_up (A : Finset (Fin (N + 1)))
+theorem shibaGauge_update_up (A : Finset (Fin (N + 1)))
     (x : Fin (2 * N + 2) → Fin 2) (p : Fin (N + 1)) (v : Fin 2) :
     shibaGauge A (Function.update x (spinfulIndex N p 0) v) = shibaGauge A x := by
   unfold shibaGauge
@@ -572,7 +572,7 @@ private theorem diagonal_mulVec_basisVec (s : (Fin (2 * N + 2) → Fin 2) → �
   · rw [if_neg h, mul_zero, mul_zero]
 
 /-- **Column action of the Shiba unitary**: `Û ·ᵥ |c⟩ = s(σc) • |σc⟩`. -/
-private theorem shibaSignedUnitary_mulVec_basisVec (s : (Fin (2 * N + 2) → Fin 2) → ℂ)
+theorem shibaSignedUnitary_mulVec_basisVec (s : (Fin (2 * N + 2) → Fin 2) → ℂ)
     (c : Fin (2 * N + 2) → Fin 2) :
     (shibaSignedUnitary N s).mulVec (basisVec c)
       = s (shibaConfig N c) • basisVec (shibaConfig N c) := by
@@ -581,7 +581,7 @@ private theorem shibaSignedUnitary_mulVec_basisVec (s : (Fin (2 * N + 2) → Fin
 
 /-- **Column action of the adjoint Shiba unitary**:
 `Ûᴴ ·ᵥ |c⟩ = s̄(c) • |σc⟩`. -/
-private theorem shibaSignedUnitary_conjTranspose_mulVec_basisVec
+theorem shibaSignedUnitary_conjTranspose_mulVec_basisVec
     (s : (Fin (2 * N + 2) → Fin 2) → ℂ) (c : Fin (2 * N + 2) → Fin 2) :
     (Matrix.conjTranspose (shibaSignedUnitary N s)).mulVec (basisVec c)
       = star (s c) • basisVec (shibaConfig N c) := by
@@ -590,7 +590,7 @@ private theorem shibaSignedUnitary_conjTranspose_mulVec_basisVec
     Pi.star_apply]
 
 /-- Two operators agree once their columns (actions on all basis vectors) agree. -/
-private theorem matrix_ext_mulVec_basisVec
+theorem matrix_ext_mulVec_basisVec
     {A B : Matrix (Fin (2 * N + 2) → Fin 2) (Fin (2 * N + 2) → Fin 2) ℂ}
     (h : ∀ c, A.mulVec (basisVec c) = B.mulVec (basisVec c)) : A = B := by
   ext i j

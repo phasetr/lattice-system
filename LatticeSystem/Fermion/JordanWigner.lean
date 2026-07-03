@@ -195,6 +195,7 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaKinetic
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaConjugation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaSector
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveBalancedGround
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaSpinOp
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveCorrelation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebFerrimagnetism
 import LatticeSystem.Fermion.JordanWigner.Hubbard.BipartiteSpectrum

@@ -1,6 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaSector
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaConjugation
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveTheorem102
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveTheorem103
 
 /-!
 # Lieb's theorem, symmetric repulsive Hubbard model at half filling (Tasaki §10.2.2, Thm 10.4)
@@ -76,15 +77,23 @@ perturbation theory.
 Proof: transport the attractive-model number-sector unique ground state (Theorem 10.2,
 `theorem_10_2_lieb_attractive_unique_singlet`, applied to `T + diag(U/2)`) through the Shiba unitary
 `Û`, using the conjugation `Ûᴴ Ĥ^{rep,sym} Û = Ĥ^{attr} − ¼(∑ U)·1` (c6, eq. (10.2.10)) and the
-charge exchange `Û N̂ Ûᴴ = 2 Ŝ³ + (N+1)·1` / `Ûᴴ Ŝ³ Û = ½(N̂ − (N+1)·1)`. -/
+charge exchange `Û N̂ Ûᴴ = 2 Ŝ³ + (N+1)·1` / `Ûᴴ Ŝ³ Û = ½(N̂ − (N+1)·1)`.
+
+The transported ground state `φ = Û φ_attr` is exposed via `φ.ofLp = Û φ_attr.ofLp` together
+with Theorem 10.3's pair-transfer positivity of the underlying attractive ground state `φ_attr`;
+this is what Theorem 10.5 (Shen–Qiu–Tian) consumes. -/
 theorem repulsiveHalfFilling_balancedSector_ground_unique (N : ℕ) (hNodd : Odd N)
     {A : Finset (Fin (N + 1))} (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
     (hT_symm : ∀ x y, T x y = T y x) (hbip : HoppingRespectsBipartition A T)
     (hT_conn : (hoppingSupportGraph T).Preconnected)
     (U : Fin (N + 1) → ℝ) (hU_pos : ∀ x, 0 < U x) :
-    ∃ (E : ℝ) (φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)),
+    ∃ (E : ℝ) (φ φattr : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)),
       IsUniqueGroundStateOn (spinZSectorEuclidean N 0)
-          (symmetricRepulsiveHubbardHamiltonian N T U) E φ := by
+          (symmetricRepulsiveHubbardHamiltonian N T U) E φ ∧
+        φ.ofLp = (shibaSignedUnitary N (shibaSignFn A)).mulVec φattr.ofLp ∧
+        ∀ x y : Fin (N + 1),
+          0 < (euclideanExpectation (hubbardPairCorrelationOp N x y) φattr).re ∧
+            (euclideanExpectation (hubbardPairCorrelationOp N x y) φattr).im = 0 := by
   classical
   -- Abbreviations for the Shiba unitary, the two Hamiltonians and the scalar shift.
   set Ush : Matrix (Fin (2 * N + 2) → Fin 2) (Fin (2 * N + 2) → Fin 2) ℂ :=
@@ -148,6 +157,9 @@ theorem repulsiveHalfFilling_balancedSector_ground_unique (N : ℕ) (hNodd : Odd
     theorem_10_2_lieb_attractive_unique_singlet N (N + 1) hNodd.add_one (by omega) (by omega)
       T' hT'_symm hT'_conn U hU_pos
   obtain ⟨hmemφ, hnormφ, hHφ, hgroundφ, huniqφ⟩ := huniqueAttr
+  -- Theorem 10.3 (Tian): the attractive ground state has positive pair-transfer correlation.
+  have hpair := theorem_10_3_tian_pair_correlation_positive N (N + 1) hNodd.add_one (by omega)
+    (by omega) T' hT'_symm hT'_conn U hU_pos ⟨hmemφ, hnormφ, hHφ, hgroundφ, huniqφ⟩
   set f : (Fin (2 * N + 2) → Fin 2) → ℂ := φattr.ofLp with hf
   -- Plain-space eigenrelations for `φ_attr`.
   have hHf : Hattr.mulVec f = (Eattr : ℂ) • f := bwd Hattr (Eattr : ℂ) φattr hHφ
@@ -262,6 +274,6 @@ theorem repulsiveHalfFilling_balancedSector_ground_unique (N : ℕ) (hNodd : Odd
       _ = Ush.mulVec ((Matrix.conjTranspose Ush).mulVec ψ'.ofLp) := by rw [Matrix.mulVec_mulVec]
       _ = Ush.mulVec (c • f) := by rw [hcofLp]
       _ = c • Ush.mulVec f := by rw [Matrix.mulVec_smul]
-  exact ⟨Eattr - cR, ψ, hψmem, hψnorm, hEeig, hground, huniq⟩
+  exact ⟨Eattr - cR, ψ, φattr, ⟨hψmem, hψnorm, hEeig, hground, huniq⟩, hψofLp, hpair⟩
 
 end LatticeSystem.Fermion
