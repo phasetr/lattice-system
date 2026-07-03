@@ -52,3 +52,11 @@ theorem_10_3_tian_pair_correlation_positive
 # via repulsiveSpinZSector_ground_unique + spin↔pair conjugation (eq. 10.2.13) + Theorem 10.3.
 # Replaces the removed over-strong per-sector axiom. Legitimately zero-referenced book milestone.
 theorem_10_5_shen_qiu_tian_transverse_sign
+
+# PERMANENT book capstone (Tasaki §10.2.5 Theorem 10.11, Kubo–Kishi finite-temperature
+# susceptibility bound): at half-filling (μ = U/2) the charge and on-site pairing Duhamel
+# susceptibilities of the uniform repulsive Hubbard model on a bipartite connected lattice
+# satisfy χ^c_q ≤ 1/U and χ^p_q ≤ 2/U for every β > 0 and wave number q (eq. 10.2.56).
+# Tasaki states this WITHOUT proof, citing Kubo–Kishi, Phys. Rev. B 41, 4866 (1990); recorded
+# as a documented axiom (same policy as mielke_theorem_11_13). Legitimately zero-referenced.
+theorem_10_11_kubo_kishi_susceptibility_bound

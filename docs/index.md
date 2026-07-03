@@ -155,6 +155,15 @@ perturbation-theoretic proof — such as the total-spin values in Lieb's repulsi
 theorem (Theorem 10.4) — are recorded as documented axioms while their companion
 finite-coupling combinatorial bounds are proved axiom-free.
 
+- **Book theorems that Tasaki states without proof** (results he quotes from the
+external literature rather than proving in the text): **Theorem 10.11** (Kubo–Kishi
+finite-temperature charge/pairing susceptibility bound, Tasaki §10.2.5, citing
+Kubo–Kishi, *Phys. Rev. B* **41**, 4866 (1990)) and **Theorem 11.13** (Mielke's
+flat-band ferromagnetism, `mielke_theorem_11_13`) are recorded as **faithful documented
+axioms** on the concrete finite-volume operators (here the Duhamel susceptibilities),
+matching the "Tasaki states it without proof" policy — the reproving of the cited
+external work is not an active project goal.
+
 Accordingly the project's policy is to **axiomatize only the appendix and
 perturbation-theory results that Tasaki's formalized main development actually uses**,
 to **prove** the remaining ones where `mathlib` provides the tools, and otherwise to
@@ -3055,6 +3064,16 @@ The finite-dimensional spin-reflection-positivity (SRP) coefficient-matrix langu
 | `fermionStaggeredCasimirOp` / `theorem_10_6_lieb_ferrimagnetism` | **Theorem 10.6** (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3, p. 354, eqs. (10.2.16)/(10.2.17), **AXIOM**): every normalized repulsive-Hubbard ground state satisfies `⟨v\| (Ô_L)² \|v⟩ ≥ ((\|A\|−\|B\|)/2)²`, where `(Ô_L)² = Σ_{x,y} ε_xε_y Ŝ_x·Ŝ_y` (staggered sign `ε_x=±1` per sublattice) — ferrimagnetic long-range order. Reuses `IsLiebRepulsiveModel`. Reflection positivity → faithful documented axiom. | `Fermion/JordanWigner/Hubbard/LiebFerrimagnetism.lean` |
 | `bipartiteSignMatrix` / `proposition_10_7_charpoly_neg_eq` / `proposition_10_7_zero_mode_lower_bound` | **Proposition 10.7** (Tasaki §10.2.3, p. 356, **PROVED axiom-free**): for a bipartite real symmetric hopping `T`, (i) the single-electron spectrum is symmetric about zero — `(-T).charpoly = T.charpoly` via the gauge `D T D = -T` (`D = diag(±1)`); (ii) there are at least `\|A\|−\|B\|` zero modes — `Module.finrank (ker T.mulVecLin) ≥ \|A\|−\|B\|` via the `A→B` block map and rank–nullity. The one Chapter-10 item that is finite-dim linear algebra. | `Fermion/JordanWigner/Hubbard/BipartiteSpectrum.lean` |
 | `totalPairAnnihilationOperator` / `totalPairCreationOperator` / `totalPairCorrelationOperator` / `symmetricAttractiveHubbardHamiltonian` / `liebShenQiuPairLowerBound` / `theorem_10_8_lieb_shen_qiu_superconductivity` | **Theorem 10.8** (Lieb–Shen–Qiu superconductivity; Tasaki §10.2.3, p. 359, eq. (10.2.22), **AXIOM**): for the **symmetric** attractive Hubbard model `Ĥhop − Σ_x U_x(n̂_↑−½)(n̂_↓−½)` (eq. (10.2.21)) on a bipartite lattice with even `N`, `2\|B\| ≤ N ≤ 2\|A\|`, the unique ground state satisfies `⟨φ\| b̂† b̂ \|φ⟩ ≥ (\|A\|−N/2)(N/2−\|B\|)` with `b̂ = Σ_x ĉ_{x↓}ĉ_{x↑}` — off-diagonal long-range order (fermion-pair condensation / superconductivity). Reflection positivity + Theorem 10.2 uniqueness → faithful documented axiom. | `Fermion/JordanWigner/Hubbard/LiebShenQiu.lean` |
+
+#### Kubo–Kishi finite-temperature susceptibility bound (Tasaki §10.2.5, Theorem 10.11, AXIOM)
+
+The finite-temperature version of Lieb's theorem (Kubo–Kishi): at half-filling the repulsive Hubbard model's charge and on-site pairing susceptibilities are bounded uniformly in temperature and wave number, so there is no CDW or superconducting long-range order. Tasaki states it **without proof**, citing Kubo–Kishi, *Phys. Rev. B* **41**, 4866 (1990) → recorded as a **documented axiom** (same policy as `mielke_theorem_11_13` / `theorem_10_4`).
+
+| Lean name | Statement | File |
+|---|---|---|
+| `imagTimeEvolve` / `duhamelStaticSusceptibility` | (generic) the imaginary-time (Wick-rotated) Heisenberg evolution `A(τ) = e^{τH}A e^{-τH}` and the **Duhamel (Kubo) static isothermal susceptibility** `χ_{AB}(β) = ∫₀^β (⟨A(τ)B⟩_β − ⟨A⟩_β⟨B⟩_β) dτ` (Tasaki §10.2.5, the fluctuation–dissipation form of the second-derivative susceptibilities eqs. (10.2.53)/(10.2.54); prefactor `1`, `ℂ`-valued `intervalIntegral`) | `Quantum/GibbsState/Duhamel.lean` |
+| `grandCanonicalRepulsiveHubbard` / `fourierCharacter` / `chargeFourierMode` / `pairFieldFourierMode` / `chargeSusceptibility` / `pairSusceptibility` | the grand-canonical Hamiltonian `Ĥ − μN̂` (core of eq. (10.2.52)); the 1D wave-number character `w_x = exp(2πi k x/(N+1))` (eq. (10.2.55), `|w_x|=1`, genuine periodic lattice character); the charge Fourier mode `ñ_q = |Λ|^{-1/2}Σ_x w_x n̂_x` and the pairing Fourier mode `p̂_q = |Λ|^{-1/2}Σ_x w_x(ĉ†_{x↑}ĉ†_{x↓}+ĉ_{x↓}ĉ_{x↑})`; and the charge / on-site pairing susceptibilities `χ^c_q`, `χ^p_q` as Duhamel two-point functions of these modes at `±q` (eqs. (10.2.53)/(10.2.54)) | `Fermion/JordanWigner/Hubbard/LiebKuboKishi.lean` |
+| `theorem_10_11_kubo_kishi_susceptibility_bound` | **Theorem 10.11** (Kubo–Kishi; Tasaki §10.2.5, pp. 368–369, eqs. (10.2.52)–(10.2.56), **AXIOM**, PR #4957): for the uniform repulsive Hubbard model (`U > 0`, eq. (10.2.5)) on a bipartite real symmetric connected hopping `T` (Theorem 10.4 conditions except electron number) at half-filling `μ = U/2`, for every `β > 0` and every wave number `k` the susceptibilities are real and `χ^c_k(β, U/2) ≤ 1/U`, `χ^p_k(β, U/2) ≤ 2/U` (eq. (10.2.56)) — no CDW or superconducting order at finite temperature. Tasaki states it without proof, citing Kubo–Kishi, *Phys. Rev. B* **41**, 4866 (1990) → faithful documented axiom. | `Fermion/JordanWigner/Hubbard/LiebKuboKishi.lean` |
 
 #### Hubbard effective Hamiltonian on the hard-core sector (Tasaki §11.2)
 

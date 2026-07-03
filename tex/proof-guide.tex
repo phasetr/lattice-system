@@ -6454,6 +6454,88 @@ Recorded as a faithful documented \texttt{axiom} (Lieb's reflection positivity,
 Shen–Qiu–Tian, plus Theorem 10.2 uniqueness).
 
 %======================================================================
+\subsection{Kubo–Kishi finite-temperature susceptibility bound (Tasaki §10.2.5, Theorem 10.11)}
+\label{subsec:kubo-kishi-10-11}
+%======================================================================
+
+\noindent\textbf{Setup} (Tasaki §10.2.5, p.~368, eqs.~(10.2.52)–(10.2.55)).
+Kubo and Kishi proved a finite-temperature analogue of Lieb's theorem for the
+repulsive Hubbard model at half-filling. Tasaki defines the grand-canonical
+thermodynamic function with two fictitious external fields
+$(\gamma_x)_{x\in\Lambda}$ (testing charge ordering) and
+$(\eta_x)_{x\in\Lambda}$ (testing superconducting ordering),
+\[
+  J(\beta,\mu,(\gamma_x),(\eta_x))
+  = -\tfrac1\beta \log \operatorname{Tr}
+    \exp\!\Big(-\beta\big(\hat H-\mu\hat N
+      -\!\sum_{x,\sigma}\gamma_x\hat n_{x,\sigma}
+      -\!\sum_x \eta_x(\hat c^\dagger_{x\uparrow}\hat c^\dagger_{x\downarrow}
+        +\hat c_{x\downarrow}\hat c_{x\uparrow})\big)\Big)
+  \quad\text{(eq.~(10.2.52))},
+\]
+and the charge and on-site pairing susceptibilities as the second derivatives
+\[
+  \chi^c_q(\beta,\mu)
+    = -\frac{\partial}{\partial\tilde\gamma_q}
+       \frac{\partial}{\partial\tilde\gamma_{-q}}
+       J\Big|_{\gamma=\eta=0}\ \ (\text{eq.~(10.2.53)}),
+  \qquad
+  \chi^p_q(\beta,\mu)
+    = -\frac{\partial}{\partial\tilde\eta_q}
+       \frac{\partial}{\partial\tilde\eta_{-q}}
+       J\Big|_{\gamma=\eta=0}\ \ (\text{eq.~(10.2.54)}),
+\]
+where the Fourier components $\tilde\gamma_q=|\Lambda|^{-1/2}\sum_x\gamma_x e^{iq\cdot x}$
+(eq.~(10.2.55)) are taken over a lattice ``which we assume to have a periodic structure''.
+
+\medskip
+\noindent\textbf{Duhamel implementation.}
+By the fluctuation–dissipation theorem these second derivatives equal the
+Duhamel (Kubo) imaginary-time two-point functions, which is the form we
+formalize:
+\[
+  \chi_{AB}(\beta)
+    = \int_0^\beta \big(\langle A(\tau)B\rangle_\beta
+      - \langle A\rangle_\beta\langle B\rangle_\beta\big)\,d\tau,
+  \qquad A(\tau)=e^{\tau\hat H}A\,e^{-\tau\hat H}
+\]
+(prefactor $1$; a $\mathbb C$-valued \texttt{intervalIntegral} over the scalar
+\texttt{gibbsExpectation} integrand, so no matrix-valued integral is needed)
+--- \texttt{imagTimeEvolve}, \texttt{duhamelStaticSusceptibility} in
+\texttt{Quantum/GibbsState/Duhamel.lean}. On the grand-canonical Hamiltonian
+$\hat H-\mu\hat N$ (\texttt{grandCanonicalRepulsiveHubbard}) with
+$\mu=U/2$ (half-filling, the particle–hole-symmetric point), $\chi^c_q$
+(\texttt{chargeSusceptibility}) is the Duhamel susceptibility of the charge
+Fourier mode $\tilde n_q=|\Lambda|^{-1/2}\sum_x w_x\hat n_x$
+(\texttt{chargeFourierMode}) and $\chi^p_q$ (\texttt{pairSusceptibility}) that of
+the pairing Fourier mode $\hat p_q=|\Lambda|^{-1/2}\sum_x w_x(\hat c^\dagger_{x\uparrow}
+\hat c^\dagger_{x\downarrow}+\hat c_{x\downarrow}\hat c_{x\uparrow})$
+(\texttt{pairFieldFourierMode}), with the wave number realized by the genuine
+periodic-lattice character $w_x=\exp(2\pi i\,k\,x/(N+1))$ (\texttt{fourierCharacter},
+$|w_x|=1$, eq.~(10.2.55)).
+
+\medskip
+\noindent\textbf{Theorem 10.11} (Kubo–Kishi; Tasaki §10.2.5, pp.~368–369,
+eq.~(10.2.56)). Consider the uniform repulsive Hubbard model (eq.~(10.2.5),
+$U>0$) satisfying the conditions of Theorem 10.4 (bipartite real symmetric
+connected hopping, \emph{except} the electron-number condition), at the
+half-filling chemical potential $\mu=U/2$. Then for every $\beta>0$ and every
+wave number $q$,
+\[
+  \chi^c_q(\beta,U/2)\le \frac1U,
+  \qquad
+  \chi^p_q(\beta,U/2)\le \frac2U
+  \qquad\text{(eq.~(10.2.56))},
+\]
+so the half-filled model exhibits no charge-density-wave or superconducting
+long-range order at any finite temperature
+(\texttt{theorem\_10\_11\_kubo\_kishi\_susceptibility\_bound}). Tasaki states
+this \emph{without proof}, citing Kubo–Kishi, \emph{Phys.\ Rev.\ B} \textbf{41},
+4866 (1990); following the project policy for book theorems Tasaki records
+without proof (as with \texttt{mielke\_theorem\_11\_13}), it is a faithful
+documented \texttt{axiom} on the concrete Duhamel susceptibilities.
+
+%======================================================================
 \subsection{Effective Hamiltonian on the hard-core sector (Tasaki §11.2)}
 \label{subsec:hubbard-effective-hamiltonian}
 %======================================================================
