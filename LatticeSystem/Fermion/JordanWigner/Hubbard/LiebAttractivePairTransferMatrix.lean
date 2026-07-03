@@ -1,5 +1,6 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
 import LatticeSystem.Fermion.JordanWigner.CAR.CrossSiteOfNe
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveKineticConj
 
 /-!
 # The pair-transfer operator as a hop product / block transfer matrix (Tasaki §10.2.4)
@@ -70,5 +71,81 @@ theorem hubbardPairCorrelationOp_eq_hop_product (N : ℕ) (x y : Fin (N + 1)) :
   have hmid : b * (c * d) = d * (b * c) := by rw [h1, h2]; exact neg_neg _
   rw [mul_assoc (a * b) c d, mul_assoc a b (c * d), hmid]
   exact (mul_assoc a d (b * c)).symm
+
+/-- A single-entry up block kinetic operator collapses to one hop:
+`hubbardBlockKineticUp N (single x y 1) = ĉ†_{block x,↑} ĉ_{block y,↑}`.  The double sum over the
+single-entry matrix `Matrix.single x y 1` keeps only the `(i, j) = (x, y)` term. -/
+private theorem hubbardBlockKineticUp_single (N : ℕ) (x y : Fin (N + 1)) :
+    hubbardBlockKineticUp N (Matrix.single x y 1)
+      = fermionMultiCreation (2 * N + 1) (hubbardBlockIndex N x 0)
+        * fermionMultiAnnihilation (2 * N + 1) (hubbardBlockIndex N y 0) := by
+  rw [hubbardBlockKineticUp,
+    Finset.sum_eq_single_of_mem x (Finset.mem_univ x)
+      (fun i _ hix => Finset.sum_eq_zero (fun j _ => by
+        rw [Matrix.single_apply, if_neg (fun h => hix h.1.symm), zero_smul])),
+    Finset.sum_eq_single_of_mem y (Finset.mem_univ y)
+      (fun j _ hjy => by rw [Matrix.single_apply, if_neg (fun h => hjy h.2.symm), zero_smul]),
+    Matrix.single_apply_same, one_smul]
+
+/-- A single-entry down block kinetic operator collapses to one hop:
+`hubbardBlockKineticDown N (single x y 1) = ĉ†_{block x,↓} ĉ_{block y,↓}`. -/
+private theorem hubbardBlockKineticDown_single (N : ℕ) (x y : Fin (N + 1)) :
+    hubbardBlockKineticDown N (Matrix.single x y 1)
+      = fermionMultiCreation (2 * N + 1) (hubbardBlockIndex N x 1)
+        * fermionMultiAnnihilation (2 * N + 1) (hubbardBlockIndex N y 1) := by
+  rw [hubbardBlockKineticDown,
+    Finset.sum_eq_single_of_mem x (Finset.mem_univ x)
+      (fun i _ hix => Finset.sum_eq_zero (fun j _ => by
+        rw [Matrix.single_apply, if_neg (fun h => hix h.1.symm), zero_smul])),
+    Finset.sum_eq_single_of_mem y (Finset.mem_univ y)
+      (fun j _ hjy => by rw [Matrix.single_apply, if_neg (fun h => hjy h.2.symm), zero_smul]),
+    Matrix.single_apply_same, one_smul]
+
+/-- **The block ↔ interleaved conjugate of the pair-transfer operator is the single-hop block
+transfer product.**  Conjugating the pair-transfer operator by the block ↔ interleaved permutation
+operator `U = hubbardBlockToSpinfulPermutationOperator N` (as in `hubbardBlockKinetic_conj_eq`)
+sends the block-ordered product of a single up hop and a single down hop, at the single-entry
+hopping `Matrix.single x y 1`, to the interleaved pair-transfer operator:
+`U · (hubbardBlockKineticUp (single x y 1) · hubbardBlockKineticDown (single x y 1)) · Uᴴ
+  = ĉ†_{x,↑} ĉ†_{x,↓} ĉ_{y,↓} ĉ_{y,↑}`.  Each hop is transported by the single-hop conjugation
+identity `permutationOperator_hop_conj_eq` (with `π` sending `block i s ↦ spinful i s`), and the two
+interleaved hops recombine into the pair-transfer operator by
+`hubbardPairCorrelationOp_eq_hop_product`.  This is the index-matching step (L2b) of
+Tasaki §10.2.4 (Theorem 10.3): it lets the Theorem 10.2 coefficient machinery (whose `blockWCoeff`
+already carries the `Uᴴ` back-rotation) act on the pair-transfer operator through the block-ordered
+single-species kinetic operators. -/
+theorem hubbardBlockToSpinful_conj_pairCorrelation (N : ℕ) (x y : Fin (N + 1)) :
+    hubbardBlockToSpinfulPermutationOperator N
+        * (hubbardBlockKineticUp N (Matrix.single x y 1)
+            * hubbardBlockKineticDown N (Matrix.single x y 1))
+        * (hubbardBlockToSpinfulPermutationOperator N)ᴴ
+      = hubbardPairCorrelationOp N x y := by
+  set U := hubbardBlockToSpinfulPermutationOperator N with hU
+  set P1 := fermionMultiCreation (2 * N + 1) (hubbardBlockIndex N x 0)
+    * fermionMultiAnnihilation (2 * N + 1) (hubbardBlockIndex N y 0) with hP1
+  set P2 := fermionMultiCreation (2 * N + 1) (hubbardBlockIndex N x 1)
+    * fermionMultiAnnihilation (2 * N + 1) (hubbardBlockIndex N y 1) with hP2
+  rw [hubbardBlockKineticUp_single, hubbardBlockKineticDown_single, ← hP1, ← hP2]
+  have hUU : Uᴴ * U = 1 := hubbardBlockToSpinfulPermutationOperator_conjTranspose_mul N
+  -- Split the conjugation across the product, inserting `Uᴴ · U = 1`.
+  have key : P1 * P2 = P1 * Uᴴ * (U * P2) := by
+    rw [Matrix.mul_assoc P1, ← Matrix.mul_assoc Uᴴ U P2, hUU, Matrix.one_mul]
+  have hsplit : U * (P1 * P2) * Uᴴ = (U * P1 * Uᴴ) * (U * P2 * Uᴴ) := by
+    rw [key]; simp only [Matrix.mul_assoc]
+  -- Conjugate each single hop by `U = permutationOperator π` (`π : block i s ↦ spinful i s`).
+  have hc1 : U * P1 * Uᴴ
+      = fermionMultiCreation (2 * N + 1) (spinfulIndex N x 0)
+        * fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N y 0) := by
+    rw [hU, hP1, hubbardBlockToSpinfulPermutationOperator, permutationOperator_hop_conj_eq,
+      hubbardBlockToSpinfulOrbitalEquiv_hubbardBlockIndex,
+      hubbardBlockToSpinfulOrbitalEquiv_hubbardBlockIndex]
+  have hc2 : U * P2 * Uᴴ
+      = fermionMultiCreation (2 * N + 1) (spinfulIndex N x 1)
+        * fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N y 1) := by
+    rw [hU, hP2, hubbardBlockToSpinfulPermutationOperator, permutationOperator_hop_conj_eq,
+      hubbardBlockToSpinfulOrbitalEquiv_hubbardBlockIndex,
+      hubbardBlockToSpinfulOrbitalEquiv_hubbardBlockIndex]
+  rw [hsplit, hc1, hc2, hubbardPairCorrelationOp_eq_hop_product]
+  rfl
 
 end LatticeSystem.Fermion
