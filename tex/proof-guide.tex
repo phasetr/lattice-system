@@ -5398,7 +5398,8 @@ $x, y \in \Lambda$, a measure of off-diagonal long-range order
 $0 < N \le 2|\Lambda|$; the Lean statement uses the non-full guard
 $N < 2|\Lambda|$ (the fully-filled endpoint makes off-site pair transfer vanish in
 the concrete Fock representation). Proved by Tian's extension of Lieb's
-reflection-positivity method; recorded as a faithful documented \texttt{axiom}.
+reflection-positivity method; now a \emph{proved theorem}, discharged axiom-free
+(\texttt{LiebAttractiveTheorem103.lean}; \#print axioms clean).
 
 \medskip
 \noindent\textbf{Discharge skeleton for Theorem 10.3 (Tasaki §10.2.4, p.~367).}
@@ -5433,9 +5434,9 @@ giving the key identity (Tasaki eq.~(10.2.51))
 Then $S^{x,y}W_{\rm GS}(S^{x,y})^{\mathsf H}$ is positive semidefinite (congruence
 preserves PSD) and nonvanishing (an $x{\leftarrow}y$ hop exists in the non-full
 sector), so the footnote-16 trace lemma (Tasaki p.~364: $M$ positive definite,
-$M'$ PSD and nonzero $\Rightarrow\operatorname{Tr}[MM']>0$, already available in
-Lean as \texttt{Matrix.PosDef.trace\_mul\_pos} from the Theorem 10.2 uniqueness
-step) yields
+$M'$ PSD and nonzero $\Rightarrow\operatorname{Tr}[MM']>0$, in Lean the
+PSD-factor extension \texttt{Matrix.PosDef.trace\_mul\_posSemidef\_pos} of the
+Theorem 10.2 uniqueness step's \texttt{Matrix.PosDef.trace\_mul\_pos}) yields
 $\operatorname{Tr}[W_{\rm GS}S^{x,y}W_{\rm GS}(S^{x,y})^{\mathsf H}]>0$; reality of
 $S^{x,y}$ with Hermitian $W_{\rm GS}$ makes the imaginary part vanish. The only
 new Lean work is $S^{x,y}$, the single-hop $\hat c^\dagger_{x,\sigma}\hat
