@@ -846,4 +846,31 @@ theorem shibaSignedUnitary_conj_symmetricKinetic {A : Finset (Fin (N + 1))}
     refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
     rw [hsymm j i]
 
+/-! ### Modulus of the concrete Shiba sign -/
+
+/-- **The concrete Shiba sign has modulus one** (Tasaki eq. (9.3.50), p. 336):
+`s̄ s = 1` for `s = shibaSignFn A`.  The Jordan–Wigner crossing parity `J` and the
+sublattice gauge `g` are each real and square to one, so their product `s = J·g` does
+too.  This is the modulus-one hypothesis needed to apply the sign-dressed interaction
+conjugation `shibaSignedUnitary_conj_symmetricInteraction` to the concrete Shiba
+unitary (used by the full conjugation capstone, eq. (10.2.10)). -/
+theorem shibaSignFn_star_mul_self (A : Finset (Fin (N + 1)))
+    (c : Fin (2 * N + 2) → Fin 2) :
+    star (shibaSignFn A c) * shibaSignFn A c = 1 := by
+  have hJsq : shibaJwFlipParity N c * shibaJwFlipParity N c = 1 := by
+    rw [shibaJwFlipParity,
+      show shibaCrossingSpecies N 0 c * shibaCrossingSpecies N 1 c
+            * (shibaCrossingSpecies N 0 c * shibaCrossingSpecies N 1 c)
+          = shibaCrossingSpecies N 0 c * shibaCrossingSpecies N 0 c
+            * (shibaCrossingSpecies N 1 c * shibaCrossingSpecies N 1 c) from by ring,
+      shibaCrossingSpecies_sq, shibaCrossingSpecies_sq, mul_one]
+  have hgsq : shibaGauge A c * shibaGauge A c = 1 := by
+    have h := shibaGauge_star_mul_self A c
+    rwa [shibaGauge_star] at h
+  rw [shibaSignFn, star_mul', shibaJwFlipParity_star, shibaGauge_star,
+    show shibaJwFlipParity N c * shibaGauge A c * (shibaJwFlipParity N c * shibaGauge A c)
+        = shibaJwFlipParity N c * shibaJwFlipParity N c
+          * (shibaGauge A c * shibaGauge A c) from by ring,
+    hJsq, hgsq, mul_one]
+
 end LatticeSystem.Fermion

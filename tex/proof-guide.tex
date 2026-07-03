@@ -6363,8 +6363,15 @@ eqs.~(9.3.48)/(9.3.50), pp.~335--336); (c5) \emph{interaction sign-flip}
 pp.~334--336): capstone $\hat U^\dagger \hat H_{\rm int}' \hat U = -\hat H_{\rm
 int}'$ via the sign-dressed unitary. (c4) \emph{kinetic-term conjugation}
 (\texttt{LiebRepulsiveShibaKinetic.lean}, eq.~(9.3.52), p.~336): capstone
-$\hat U^\dagger \hat H_{\rm kin} \hat U = \hat H_{\rm kin}$ (PR~\#4951). Later
-PRs add full exchange (c6) and spin-sector transport (c1); Theorem~10.4 capstone
+$\hat U^\dagger \hat H_{\rm kin} \hat U = \hat H_{\rm kin}$ (PR~\#4951). (c6)
+\emph{full repulsive$\to$attractive conjugation}
+(\texttt{LiebRepulsiveShibaConjugation.lean}, eqs.~(10.2.10)/(10.2.11), p.~352,
+PR~\#4952): capstone \texttt{shibaSignedUnitary\_conj\_symmetricRepulsive\_eq\_attractive},
+$\hat U^\dagger (\hat H_{\rm kin} + \hat H_{\rm int}') \hat U =
+\hat H^{\rm att}(T + \operatorname{diag}(U/2), U) - \tfrac14 \sum_x U_x$; the kinetic
+invariance (c4) and interaction sign-flip (c5) combine, with the chemical shift of
+$-\hat H_{\rm int}'$ absorbed into the hopping diagonal and the leftover negative
+scalar constant. Later PRs add spin-sector transport (c1); Theorem~10.4 capstone
 awaits perturbation-theory spin-value determination.
 
 \medskip
