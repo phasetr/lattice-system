@@ -9,11 +9,11 @@ import LatticeSystem.Fermion.JordanWigner.Hubbard.TJExchangeBondSum
 
 This file **proves** **Tasaki Theorem 10.5** (Shen, Qiu, and Tian; Hal Tasaki, *Physics and
 Mathematics of Quantum Many-Body Systems*, 1st ed., Springer 2020, §10.2.2, p. 351/353,
-eqs. (10.2.7)/(10.2.8)/(10.2.13)) on the **balanced (`Ŝ³ = 0`) sector**: under the hypotheses of
-Theorem 10.4 (odd `N`, connected real symmetric bipartite hopping `T`, on-site repulsion
-`U_x > 0`), the transverse spin–spin correlation in the unique balanced-sector ground state is
-**strictly positive for sites in the same sublattice and strictly negative for sites in different
-sublattices**.
+eqs. (10.2.7)/(10.2.8)/(10.2.13)) on the **general spin-`z` sector `Ŝ³ = m`**: under the hypotheses
+of Theorem 10.4 (any `N`, even electron number `0 < Ne < 2(N+1)`, connected real symmetric
+bipartite hopping `T`, on-site repulsion `U_x > 0`), the transverse spin–spin correlation in the
+unique ground state on the sector `Ŝ³ = m` with `m = (Ne − (N+1))/2` is **strictly positive for
+sites in the same sublattice and strictly negative for sites in different sublattices**.
 
 ## The assembly (crux-free)
 
@@ -29,10 +29,11 @@ positive; the diagonal (`x = y`) contribution is `‖ĉ†_{x↑} ĉ†_{x↓} �
 
 ## Scope (over-claim avoided)
 
-Only the **balanced `Ŝ³ = 0` sector** is claimed, matching Theorem 10.4's
-`repulsiveHalfFilling_balancedSector_ground_unique`.  The general `(N₁, N₂)` / `Ŝ³ = m ≠ 0`
-sectors require the number ↔ spin-`z` sector transport for `m ≠ 0` and are deferred (not
-axiomatized).
+The unique ground state on the **general spin-`z` sector `Ŝ³ = m`** (`m = (Ne − (N+1))/2`, even
+`Ne`) is handled via Theorem 10.4's general-sector uniqueness
+`repulsiveSpinZSector_ground_unique`.  Only the correlation sign is claimed; the total-spin value
+is **not** asserted (that needs the deferred degenerate perturbation theory).  The balanced
+`Ŝ³ = 0` sector is the `Ne = N + 1` special case.
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, 1st ed., Springer
 2020, §10.2.2, Theorem 10.5, eqs. (10.2.7)/(10.2.8)/(10.2.13), pp. 351, 353; E. H. Lieb,
@@ -135,29 +136,31 @@ private theorem euclideanExpectation_conjTranspose_mul_self
   refine Finset.sum_congr rfl (fun j _ => ?_)
   rw [Pi.star_apply, Complex.star_def, mul_comm, Complex.mul_conj]
 
-/-! ## Tasaki Theorem 10.5 (balanced sector) -/
+/-! ## Tasaki Theorem 10.5 (general spin-`z` sector) -/
 
 /-- **Tasaki Theorem 10.5** (Shen–Qiu–Tian; 1st ed., Springer 2020, §10.2.2, p. 351/353,
-eqs. (10.2.7)/(10.2.8)/(10.2.13); **PROVED** on the balanced `Ŝ³ = 0` sector, no axiom).
-Under the hypotheses of Theorem 10.4 (odd `N`, connected real symmetric bipartite hopping `T`,
-on-site repulsion `U_x > 0`), for the unique ground state `φ` on the balanced spin-`z` sector
-`Ŝ³ = 0`, the transverse spin correlation
+eqs. (10.2.7)/(10.2.8)/(10.2.13); **PROVED** on the general spin-`z` sector `Ŝ³ = m`, no axiom).
+Under the hypotheses of Theorem 10.4 (any `N`, even electron number `0 < Ne < 2(N+1)`, connected
+real symmetric bipartite hopping `T`, on-site repulsion `U_x > 0`), for the unique ground state
+`φ` on the spin-`z` sector `Ŝ³ = m` with `m = (Ne − (N+1))/2`, the transverse spin correlation
 `⟨φ| Ŝ⁽¹⁾_x Ŝ⁽¹⁾_y + Ŝ⁽²⁾_x Ŝ⁽²⁾_y |φ⟩` is real, and is strictly positive when `x, y` lie in the
 same sublattice and strictly negative otherwise.
 
-Only the balanced `Ŝ³ = 0` sector is claimed (matching
-`repulsiveHalfFilling_balancedSector_ground_unique`); the general `(N₁, N₂)` / `Ŝ³ = m ≠ 0`
-sectors are deferred.  Proof: transport `φ = Û φ_attr` through the Shiba unitary
-(`euclideanExpectation_shiba_conj`), send `Ŝ⁺_x Ŝ⁻_y` to the pair-transfer operator
-(`shibaSignedUnitary_conj_spinPlusMinus`, eq. (10.2.13)), and apply Tian's positivity
+The total-spin value is **not** claimed (uniqueness ⟹ correlation sign only); the balanced
+`Ŝ³ = 0` sector is the `Ne = N + 1` special case.  Proof: transport `φ = Û φ_attr` through the
+Shiba unitary (`euclideanExpectation_shiba_conj`), send `Ŝ⁺_x Ŝ⁻_y` to the pair-transfer operator
+(`shibaSignedUnitary_conj_spinPlusMinus`, eq. (10.2.13)) using the general spin-`z`-sector
+uniqueness `repulsiveSpinZSector_ground_unique`, and apply Tian's positivity
 (`theorem_10_3_tian_pair_correlation_positive`, Theorem 10.3). -/
-theorem theorem_10_5_shen_qiu_tian_transverse_sign (N : ℕ) (hNodd : Odd N)
+theorem theorem_10_5_shen_qiu_tian_transverse_sign (N Ne : ℕ)
+    (hNe_even : Even Ne) (hNe_pos : 0 < Ne) (hNe_lt : Ne < 2 * (N + 1))
     {A : Finset (Fin (N + 1))} (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
     (hT_symm : ∀ x y, T x y = T y x) (hbip : HoppingRespectsBipartition A T)
     (hT_conn : (hoppingSupportGraph T).Preconnected)
     (U : Fin (N + 1) → ℝ) (hU_pos : ∀ x, 0 < U x)
     {E : ℝ} {φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)}
-    (hGS : IsUniqueGroundStateOn (spinZSectorEuclidean N 0)
+    (hGS : IsUniqueGroundStateOn
+      (spinZSectorEuclidean N (((Ne : ℂ) - ((N : ℂ) + 1)) / 2))
       (symmetricRepulsiveHubbardHamiltonian N T U) E φ) :
     ∀ x y : Fin (N + 1),
       (euclideanExpectation (fermionSpinTransverse N x y) φ).im = 0 ∧
@@ -169,7 +172,7 @@ theorem theorem_10_5_shen_qiu_tian_transverse_sign (N : ℕ) (hNodd : Odd N)
   set Ush : Matrix (Fin (2 * N + 2) → Fin 2) (Fin (2 * N + 2) → Fin 2) ℂ :=
     shibaSignedUnitary N (shibaSignFn A) with hUsh
   obtain ⟨Elem, ψ, φattr, huniqψ, hψeq, hpair⟩ :=
-    repulsiveHalfFilling_balancedSector_ground_unique N hNodd T hT_symm hbip hT_conn U hU_pos
+    repulsiveSpinZSector_ground_unique N Ne hNe_even hNe_pos hNe_lt T hT_symm hbip hT_conn U hU_pos
   obtain ⟨hφmem, hφnorm, hφeig, hφground, _⟩ := hGS
   obtain ⟨hψmem, hψnorm, hψeig, hψground, hψuniq⟩ := huniqψ
   have hφne : φ ≠ 0 := fun h => by rw [h, norm_zero] at hφnorm; exact one_ne_zero hφnorm.symm

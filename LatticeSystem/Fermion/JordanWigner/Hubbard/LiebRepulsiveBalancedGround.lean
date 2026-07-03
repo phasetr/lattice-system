@@ -15,9 +15,9 @@ and on-site repulsion `U_x > 0`, the symmetric (`μ = U/2`) repulsive Hubbard Ha
 `Ĥ^{rep,sym}` has a **unique** ground state on each **balanced spin-`z` sector** `Ŝ³ = m`, where
 `m = (Ne − (N+1))/2` is fixed by an even electron number `0 < Ne < 2(N+1)`.  This is obtained by
 **transporting** the attractive-model number-sector result (Theorem 10.2) through the Shiba unitary
-`Û`.  The half-filling / balanced case `Ne = N+1` (so `m = 0`) is recovered as a thin corollary
-(`repulsiveHalfFilling_balancedSector_ground_unique`), which is what Theorem 10.5 (Shen–Qiu–Tian)
-currently consumes.
+`Û`.  This general spin-`z`-sector uniqueness `repulsiveSpinZSector_ground_unique` is what
+Theorem 10.5 (Shen–Qiu–Tian) consumes; the half-filling / balanced case `Ne = N+1` (so `m = 0`) is
+the special case `Ne = N + 1`.
 
 ## The transport
 
@@ -88,7 +88,7 @@ eigenvalue `Ne` becomes the spin-`z` eigenvalue `m = (Ne − (N+1))/2` (eq. (10.
 
 The transported ground state `φ = Û φ_attr` is exposed via `φ.ofLp = Û φ_attr.ofLp` together
 with Theorem 10.3's pair-transfer positivity of the underlying attractive ground state `φ_attr`;
-this is what Theorem 10.5 (Shen–Qiu–Tian) consumes at `Ne = N+1`. -/
+this is what Theorem 10.5 (Shen–Qiu–Tian) consumes on the general spin-`z` sector `Ŝ³ = m`. -/
 theorem repulsiveSpinZSector_ground_unique (N Ne : ℕ)
     (hNe_even : Even Ne) (hNe_pos : 0 < Ne) (hNe_lt : Ne < 2 * (N + 1))
     {A : Finset (Fin (N + 1))} (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
@@ -288,28 +288,5 @@ theorem repulsiveSpinZSector_ground_unique (N Ne : ℕ)
       _ = Ush.mulVec (c • f) := by rw [hcofLp]
       _ = c • Ush.mulVec f := by rw [Matrix.mulVec_smul]
   exact ⟨Eattr - cR, ψ, φattr, ⟨hψmem, hψnorm, hEeig, hground, huniq⟩, hψofLp, hpair⟩
-
-/-- **Tasaki Theorem 10.4** at half filling / the balanced sector `Ŝ³ = 0` (1st ed., Springer 2020,
-§10.2.2, pp. 350–352; **PROVED**, no axiom).  This is the `Ne = N + 1` (so `m = 0`) special case of
-the general spin-`z`-sector uniqueness `repulsiveSpinZSector_ground_unique`: for odd `N`, a
-connected real symmetric hopping `T` respecting a bipartition `A`, and on-site repulsion `U_x > 0`,
-the symmetric repulsive Hubbard Hamiltonian has a **unique** ground state on the balanced spin-`z`
-sector `Ŝ³ = 0`.  It packages the transported ground state `φ = Û φ_attr` and Theorem 10.3's
-pair-transfer positivity of `φ_attr`, and is what Theorem 10.5 (Shen–Qiu–Tian) consumes. -/
-theorem repulsiveHalfFilling_balancedSector_ground_unique (N : ℕ) (hNodd : Odd N)
-    {A : Finset (Fin (N + 1))} (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
-    (hT_symm : ∀ x y, T x y = T y x) (hbip : HoppingRespectsBipartition A T)
-    (hT_conn : (hoppingSupportGraph T).Preconnected)
-    (U : Fin (N + 1) → ℝ) (hU_pos : ∀ x, 0 < U x) :
-    ∃ (E : ℝ) (φ φattr : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)),
-      IsUniqueGroundStateOn (spinZSectorEuclidean N 0)
-          (symmetricRepulsiveHubbardHamiltonian N T U) E φ ∧
-        φ.ofLp = (shibaSignedUnitary N (shibaSignFn A)).mulVec φattr.ofLp ∧
-        ∀ x y : Fin (N + 1),
-          0 < (euclideanExpectation (hubbardPairCorrelationOp N x y) φattr).re ∧
-            (euclideanExpectation (hubbardPairCorrelationOp N x y) φattr).im = 0 := by
-  have h := repulsiveSpinZSector_ground_unique N (N + 1) hNodd.add_one
-    (by omega) (by omega) T hT_symm hbip hT_conn U hU_pos
-  rwa [show ((((N + 1 : ℕ) : ℂ) - ((N : ℂ) + 1)) / 2) = 0 by push_cast; ring] at h
 
 end LatticeSystem.Fermion

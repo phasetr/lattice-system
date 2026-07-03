@@ -6379,36 +6379,38 @@ $\hat U^\dagger \hat S^3 \hat U = \tfrac12(\hat N - (N{+}1)\mathbf 1)$; combined
 c6 conjugation this transports the attractive-model number-sector unique ground state
 (Theorem~10.2, applied to $T + \operatorname{diag}(U/2)$ at electron number $N_e$) to the
 repulsive-model spin-$z$ sector $\hat S^3 = m$, giving the capstone
-\texttt{repulsiveSpinZSector\_ground\_unique}: for odd $N$ and an even electron number
+\texttt{repulsiveSpinZSector\_ground\_unique}: for any $N$ and an even electron number
 $0 < N_e < 2(N{+}1)$, the symmetric ($\mu = U/2$) repulsive Hubbard Hamiltonian has a
 \emph{unique} ground state on the sector $\hat S^3 = m$ with $m = (N_e-(N{+}1))/2$ (the
-number eigenvalue $N_e$ maps to the spin-$z$ eigenvalue $m$). The half-filling / balanced
-case $N_e = N{+}1$ (so $m = 0$) is recovered as the thin corollary
-\texttt{repulsiveHalfFilling\_balancedSector\_ground\_unique}, which Theorem~10.5 consumes.
+number eigenvalue $N_e$ maps to the spin-$z$ eigenvalue $m$). This general spin-$z$-sector
+uniqueness \texttt{repulsiveSpinZSector\_ground\_unique} is what Theorem~10.5 consumes; the
+half-filling / balanced case $N_e = N{+}1$ (so $m = 0$) is the special case.
 The total-spin value is not claimed (the Shiba map sends $\hat{\mathbf S}^2$ to the
 $\eta$-pseudospin Casimir), so the full Theorem~10.4 capstone still awaits
 perturbation-theory spin-value determination.
 
 \medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351/353,
-eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the balanced
-$\hat S^3=0$ sector}). Under the hypotheses of Theorem 10.4, for the unique
-ground state $\varphi$ on the balanced spin-$z$ sector $\hat S^3=0$ the
-transverse spin correlation
+eqs.~(10.2.7)/(10.2.8)/(10.2.13); \emph{proved axiom-free on the general spin-$z$
+sector $\hat S^3=m$}). Under the hypotheses of Theorem 10.4 (any $N$, even
+electron number $0<N_e<2(N+1)$), for the unique ground state $\varphi$ on the
+spin-$z$ sector $\hat S^3=m$ with $m=(N_e-(N+1))/2$ the transverse spin
+correlation
 $\langle \varphi|\,\hat S^{(1)}_x \hat S^{(1)}_y + \hat S^{(2)}_x \hat S^{(2)}_y\,|\varphi\rangle
 = \tfrac12\langle \varphi|\,\hat S^+_x \hat S^-_y + \hat S^-_x \hat S^+_y\,|\varphi\rangle$
 is real, strictly positive when $x, y$ lie in the same sublattice and strictly
 negative otherwise (\texttt{theorem\_10\_5\_shen\_qiu\_tian\_transverse\_sign}).
 Proof: the Shiba unitary transports $\varphi = \hat U\varphi_{\mathrm{attr}}$ to
-the attractive Theorem-10.2 ground state and sends the transverse spin operators
-to the on-site pair operators (eq.~(10.2.13),
+the attractive Theorem-10.2 ground state (via the general-sector uniqueness
+\texttt{repulsiveSpinZSector\_ground\_unique}) and sends the transverse spin
+operators to the on-site pair operators (eq.~(10.2.13),
 \texttt{shibaSignedUnitary\_conj\_spinPlusMinus}), so the correlation equals
 $\tfrac12\varepsilon_x\varepsilon_y$ times a sum of Tian pair-transfer
 correlations (Theorem 10.3), each strictly positive, with the diagonal term
 $\|\hat c^\dagger_{x\uparrow}\hat c^\dagger_{x\downarrow}\varphi_{\mathrm{attr}}\|^2\ge0$;
-$\varepsilon_x\varepsilon_y=+1$ iff $x,y$ share a sublattice. The over-strong
-per-sector axiom is removed; only the balanced $\hat S^3=0$ sector (matching
-Theorem 10.4) is claimed, the general $(N_1,N_2)$ sectors being deferred.
+$\varepsilon_x\varepsilon_y=+1$ iff $x,y$ share a sublattice. Only the
+correlation sign is claimed (the total-spin value is not asserted); the balanced
+$\hat S^3=0$ sector is the $N_e=N+1$ special case.
 
 \medskip
 \noindent\textbf{Theorem 10.6} (Shen–Qiu–Tian ferrimagnetism; Tasaki §10.2.3,
