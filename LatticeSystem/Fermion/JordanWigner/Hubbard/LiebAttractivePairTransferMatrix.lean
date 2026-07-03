@@ -1,6 +1,10 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractive
 import LatticeSystem.Fermion.JordanWigner.CAR.CrossSiteOfNe
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveKineticConj
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveGammaReflection
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveBlockCoeffDown
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractiveKineticReal
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractivePHConjDiag
 
 /-!
 # The pair-transfer operator as a hop product / block transfer matrix (Tasaki §10.2.4)
@@ -147,5 +151,43 @@ theorem hubbardBlockToSpinful_conj_pairCorrelation (N : ℕ) (x y : Fin (N + 1))
       hubbardBlockToSpinfulOrbitalEquiv_hubbardBlockIndex]
   rw [hsplit, hc1, hc2, hubbardPairCorrelationOp_eq_hop_product]
   rfl
+
+/-- **The pair-transfer operator acts on the reconciliation coefficient matrix as
+`W ↦ S · W · Sᵀ`.**  With `S := hubbardBlockKineticUpFixedMatrix N (single x y 1)` the fixed
+single-hop up-kinetic matrix and `W := blockWCoeff N ψ`,
+`blockWCoeff N ((hubbardPairCorrelationOp N x y).mulVec ψ) = S · W · Sᵀ`.  The interleaved
+pair-transfer operator is back-rotated by `Uᴴ` (absorbed in `blockWCoeff`) to the block-ordered hop
+product `hubbardBlockKineticUp (single x y 1) · hubbardBlockKineticDown (single x y 1)`
+(`hubbardBlockToSpinful_conj_pairCorrelation`); the up hop acts by left multiplication by `S`
+(`hubbardBlockKineticUpCoeffAction_eq_mul_fixed`) and the down hop by right multiplication by the
+fixed-right matrix `Bᵣ = Pₚₕ · Sᴴ · Pₚₕ`
+(`hubbardBlockKineticDownFixedRightMatrix_eq_permConj_conjTranspose`); collapsing the
+particle-hole gauge `Pₚₕ² = 1` and using `Sᴴ = Sᵀ` for the real single-entry hopping yields
+`S · W · Sᵀ`.  This is step L3 of Tasaki §10.2.4 (Theorem 10.3). -/
+theorem blockWCoeff_pairCorrelation_mulVec (N : ℕ) (x y : Fin (N + 1))
+    (ψ : (Fin (2 * N + 2) → Fin 2) → ℂ) :
+    blockWCoeff N ((hubbardPairCorrelationOp N x y).mulVec ψ)
+      = hubbardBlockKineticUpFixedMatrix N (Matrix.single x y 1) * blockWCoeff N ψ
+        * (hubbardBlockKineticUpFixedMatrix N (Matrix.single x y 1))ᵀ := by
+  have hSEreal : ∀ i j, star ((Matrix.single x y (1 : ℂ)) i j) = (Matrix.single x y 1) i j := by
+    intro i j; rw [Matrix.single_apply]; split <;> simp
+  -- Back-rotate `Uᴴ · P = (block up-hop · block down-hop) · Uᴴ` (from L2b).
+  have hconj : (hubbardBlockToSpinfulPermutationOperator N)ᴴ.mulVec
+        ((hubbardPairCorrelationOp N x y).mulVec ψ)
+      = (hubbardBlockKineticUp N (Matrix.single x y 1)
+          * hubbardBlockKineticDown N (Matrix.single x y 1)).mulVec
+          ((hubbardBlockToSpinfulPermutationOperator N)ᴴ.mulVec ψ) := by
+    rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
+    congr 1
+    rw [← hubbardBlockToSpinful_conj_pairCorrelation, ← Matrix.mul_assoc, ← Matrix.mul_assoc,
+      hubbardBlockToSpinfulPermutationOperator_conjTranspose_mul, Matrix.one_mul]
+  rw [blockWCoeff, blockWCoeff, hconj, ← Matrix.mulVec_mulVec,
+    hubbardBlockCoeff_hubbardBlockKineticUp_mulVec, hubbardBlockKineticUpCoeffAction_eq_mul_fixed,
+    hubbardBlockCoeff_hubbardBlockKineticDown_mulVec,
+    hubbardBlockKineticDownCoeffAction_eq_mul_fixedRight,
+    hubbardBlockKineticDownFixedRightMatrix_eq_permConj_conjTranspose N hSEreal,
+    hubbardBlockKineticUpFixedMatrix_conjTranspose_eq_transpose N hSEreal]
+  simp only [Matrix.mul_assoc]
+  rw [particleHoleConfigPermMatrix_mul_self, Matrix.mul_one]
 
 end LatticeSystem.Fermion
