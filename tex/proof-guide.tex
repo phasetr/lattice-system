@@ -6379,12 +6379,12 @@ $\hat U^\dagger \hat S^3 \hat U = \tfrac12(\hat N - (N{+}1)\mathbf 1)$; combined
 c6 conjugation this transports the attractive-model number-sector unique ground state
 (Theorem~10.2, applied to $T + \operatorname{diag}(U/2)$ at electron number $N_e$) to the
 repulsive-model spin-$z$ sector $\hat S^3 = m$, giving the capstone
-\texttt{repulsiveSpinZSector\_ground\_unique}: for odd $N$ and an even electron number
+\texttt{repulsiveSpinZSector\_ground\_unique}: for any $N$ and an even electron number
 $0 < N_e < 2(N{+}1)$, the symmetric ($\mu = U/2$) repulsive Hubbard Hamiltonian has a
 \emph{unique} ground state on the sector $\hat S^3 = m$ with $m = (N_e-(N{+}1))/2$ (the
-number eigenvalue $N_e$ maps to the spin-$z$ eigenvalue $m$). The half-filling / balanced
-case $N_e = N{+}1$ (so $m = 0$) is recovered as the thin corollary
-\texttt{repulsiveHalfFilling\_balancedSector\_ground\_unique}, which Theorem~10.5 consumes.
+number eigenvalue $N_e$ maps to the spin-$z$ eigenvalue $m$). This general spin-$z$-sector
+uniqueness \texttt{repulsiveSpinZSector\_ground\_unique} is what Theorem~10.5 consumes; the
+half-filling / balanced case $N_e = N{+}1$ (so $m = 0$) is the special case.
 The total-spin value is not claimed (the Shiba map sends $\hat{\mathbf S}^2$ to the
 $\eta$-pseudospin Casimir), so the full Theorem~10.4 capstone still awaits
 perturbation-theory spin-value determination.

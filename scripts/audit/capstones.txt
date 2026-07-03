@@ -45,19 +45,10 @@ theorem_10_2_lieb_attractive_unique_singlet
 # book capstone (documented §10.2 Theorem 10.3).
 theorem_10_3_tian_pair_correlation_positive
 
-# PERMANENT book capstone (Tasaki §10.2.2 Theorem 10.4, the axiom-free balanced-sector portion):
-# for odd N (so Ne = N+1 is even), connected real symmetric bipartite hopping and on-site
-# repulsion U_x > 0, the symmetric (μ = U/2, half-filling) repulsive Hubbard Hamiltonian has a
-# UNIQUE ground state on the balanced spin-z sector Ŝ³ = 0. Proved axiom-free (#4852, PR #4953) by
-# transporting Theorem 10.2 through the Shiba unitary (c6 conjugation + number/spin-z charge
-# exchange). The total-spin value is not claimed (deferred perturbation axiom governs it).
-# Legitimately zero-referenced book milestone; no delisting planned.
-repulsiveHalfFilling_balancedSector_ground_unique
-
 # PERMANENT book capstone (Tasaki §10.2.2 Theorem 10.5, Shen–Qiu–Tian transverse-spin sign):
-# on the balanced Ŝ³ = 0 sector the unique repulsive-Hubbard ground state has transverse spin
-# correlation strictly positive on the same sublattice and strictly negative across sublattices.
-# Proved axiom-free (#4852) by Shiba transport + spin↔pair conjugation (eq. 10.2.13) + Theorem 10.3.
-# Replaces the removed over-strong per-sector axiom; general (N₁,N₂)/Ŝ³=m sectors deferred.
-# Legitimately zero-referenced book milestone; no delisting planned.
+# on the general spin-z sector Ŝ³ = m (m = (Ne−(N+1))/2, even Ne, 0 < Ne < 2(N+1)) the unique
+# repulsive-Hubbard ground state has transverse spin correlation strictly positive on the same
+# sublattice and strictly negative across sublattices. Proved axiom-free (#4852) by Shiba transport
+# via repulsiveSpinZSector_ground_unique + spin↔pair conjugation (eq. 10.2.13) + Theorem 10.3.
+# Replaces the removed over-strong per-sector axiom. Legitimately zero-referenced book milestone.
 theorem_10_5_shen_qiu_tian_transverse_sign
