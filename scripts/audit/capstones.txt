@@ -53,3 +53,11 @@ theorem_10_3_tian_pair_correlation_positive
 # exchange). The total-spin value is not claimed (deferred perturbation axiom governs it).
 # Legitimately zero-referenced book milestone; no delisting planned.
 repulsiveHalfFilling_balancedSector_ground_unique
+
+# PERMANENT book capstone (Tasaki §10.2.2 Theorem 10.5, Shen–Qiu–Tian transverse-spin sign):
+# on the balanced Ŝ³ = 0 sector the unique repulsive-Hubbard ground state has transverse spin
+# correlation strictly positive on the same sublattice and strictly negative across sublattices.
+# Proved axiom-free (#4852) by Shiba transport + spin↔pair conjugation (eq. 10.2.13) + Theorem 10.3.
+# Replaces the removed over-strong per-sector axiom; general (N₁,N₂)/Ŝ³=m sectors deferred.
+# Legitimately zero-referenced book milestone; no delisting planned.
+theorem_10_5_shen_qiu_tian_transverse_sign
