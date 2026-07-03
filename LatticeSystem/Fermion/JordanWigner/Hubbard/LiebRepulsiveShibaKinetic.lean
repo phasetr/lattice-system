@@ -20,11 +20,9 @@ multiply to `+1`, and the real symmetry `t_{x,y} = t_{y,x}` restores the term.
 This file supplies:
 
 * the sublattice gauge `gaugeSign` and its bond-cancellation `gaugeSign_mul_of_bipartite`;
-* the down-flip gauge factor `shibaGauge`;
-* the **mechanical conjugation reductions** `shibaPermMatrix_conj_apply` (general matrix
-  version of `shibaPermMatrix_conj_diagonal`) and `shibaSignedUnitary_conj_apply`, which
-  express the conjugated matrix entry `(Ûᴴ M Û)(i,j) = s̄(σi)·M(σi,σj)·s(σj)`
-  (`σ = shibaConfig`).
+* the down-flip gauge factor `shibaGauge` and the crossing parity `shibaJwFlipParity`;
+* the column (basis-vector) action of the Shiba unitary and the per-hop conjugation
+  identities `shibaSignedUnitary_conj_upHop` / `shibaSignedUnitary_conj_downHop`.
 
 ## Main definitions
 
@@ -34,8 +32,7 @@ This file supplies:
 ## Main results
 
 * `gaugeSign_mul_of_bipartite` — `ε_x ε_y = −1` on a bipartite bond.
-* `shibaPermMatrix_conj_apply` — `(P·M·P)(i,j) = M(σi, σj)`.
-* `shibaSignedUnitary_conj_apply` — `(Ûᴴ·M·Û)(i,j) = s̄(σi)·M(σi,σj)·s(σj)`.
+* `shibaSignedUnitary_conj_symmetricKinetic` — `Ûᴴ Ĥhop Û = Ĥhop` (eq. (9.3.52)).
 
 Reference: H. Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*,
 1st ed., Springer 2020, §9.3.3, eqs. (9.3.43)/(9.3.52), pp. 334–336;
@@ -125,16 +122,6 @@ private theorem shibaCrossingSpecies_sq (r : Fin 2) (c : Fin (2 * N + 2) → Fin
   · rw [if_pos h, ← pow_add, ← two_mul, pow_mul, neg_one_sq, one_pow]
   · rw [if_neg h, mul_one]
 
-/-- The crossing parity has modulus one: `s̄ s = 1`. -/
-theorem shibaJwFlipParity_star_mul_self (c : Fin (2 * N + 2) → Fin 2) :
-    star (shibaJwFlipParity N c) * shibaJwFlipParity N c = 1 := by
-  rw [shibaJwFlipParity, star_mul', shibaCrossingSpecies_star, shibaCrossingSpecies_star,
-    show shibaCrossingSpecies N 0 c * shibaCrossingSpecies N 1 c
-        * (shibaCrossingSpecies N 0 c * shibaCrossingSpecies N 1 c)
-      = (shibaCrossingSpecies N 0 c * shibaCrossingSpecies N 0 c)
-        * (shibaCrossingSpecies N 1 c * shibaCrossingSpecies N 1 c) from by ring,
-    shibaCrossingSpecies_sq, shibaCrossingSpecies_sq, mul_one]
-
 /-- The sublattice gauge factor has modulus one: `s̄ s = 1`. -/
 theorem shibaGauge_star_mul_self (A : Finset (Fin (N + 1)))
     (c : Fin (2 * N + 2) → Fin 2) :
@@ -144,52 +131,6 @@ theorem shibaGauge_star_mul_self (A : Finset (Fin (N + 1)))
   by_cases h : c (spinfulIndex N x 1) = 0
   · rw [if_pos h, star_one, mul_one]
   · rw [if_neg h, star_neg, star_one]; ring
-
-/-- **The concrete Shiba sign has modulus one** (Tasaki eq. (9.3.50)): `s̄ s = 1`.
-This is exactly the hypothesis `hs` required by the interaction conjugation
-`shibaSignedUnitary_conj_symmetricInteraction`, so the same `s` fixes both the
-kinetic term (this file) and the interaction term (c5). -/
-theorem shibaSignFn_star_mul_self (A : Finset (Fin (N + 1)))
-    (c : Fin (2 * N + 2) → Fin 2) :
-    star (shibaSignFn A c) * shibaSignFn A c = 1 := by
-  rw [shibaSignFn, star_mul']
-  rw [show star (shibaJwFlipParity N c) * star (shibaGauge A c)
-        * (shibaJwFlipParity N c * shibaGauge A c)
-      = (star (shibaJwFlipParity N c) * shibaJwFlipParity N c)
-        * (star (shibaGauge A c) * shibaGauge A c) from by ring,
-    shibaJwFlipParity_star_mul_self, shibaGauge_star_mul_self, mul_one]
-
-/-! ## Mechanical conjugation reductions -/
-
-/-- **General-matrix Shiba permutation conjugation** (the non-diagonal analogue of
-`shibaPermMatrix_conj_diagonal`): conjugating any matrix `M` by the Shiba permutation
-reindexes both arguments by the involution `σ = shibaConfig`,
-`(P·M·P)(i,j) = M(σi, σj)`. -/
-theorem shibaPermMatrix_conj_apply
-    (M : Matrix (Fin (2 * N + 2) → Fin 2) (Fin (2 * N + 2) → Fin 2) ℂ)
-    (i j : Fin (2 * N + 2) → Fin 2) :
-    (shibaPermMatrix N * M * shibaPermMatrix N) i j
-      = M (shibaConfig N i) (shibaConfig N j) := by
-  simp only [shibaPermMatrix, toMatrix_toPEquiv_mul, mul_toMatrix_toPEquiv,
-    Matrix.submatrix_apply, id_eq, shibaConfigEquiv_symm, shibaConfigEquiv_apply]
-
-/-- **Entry formula for the sign-dressed Shiba conjugation** (Tasaki eq. (9.3.50)
-applied to conjugation): for any diagonal sign `s` and matrix `M`,
-`(Ûᴴ·M·Û)(i,j) = s̄(σi)·M(σi,σj)·s(σj)` with `σ = shibaConfig`.  Combines the
-conjugate-transpose formula `Ûᴴ = P·diagonal(s̄)`, the diagonal-multiplication
-entry laws, and `shibaPermMatrix_conj_apply`. -/
-theorem shibaSignedUnitary_conj_apply (s : (Fin (2 * N + 2) → Fin 2) → ℂ)
-    (M : Matrix (Fin (2 * N + 2) → Fin 2) (Fin (2 * N + 2) → Fin 2) ℂ)
-    (i j : Fin (2 * N + 2) → Fin 2) :
-    (Matrix.conjTranspose (shibaSignedUnitary N s) * M * shibaSignedUnitary N s) i j
-      = star (s (shibaConfig N i)) * M (shibaConfig N i) (shibaConfig N j)
-          * s (shibaConfig N j) := by
-  rw [shibaSignedUnitary_conjTranspose, shibaSignedUnitary,
-    show shibaPermMatrix N * Matrix.diagonal (star s) * M
-          * (Matrix.diagonal s * shibaPermMatrix N)
-        = shibaPermMatrix N * (Matrix.diagonal (star s) * M * Matrix.diagonal s)
-          * shibaPermMatrix N from by simp only [Matrix.mul_assoc],
-    shibaPermMatrix_conj_apply, Matrix.mul_diagonal, Matrix.diagonal_mul, Pi.star_apply]
 
 /-! ## The crux: kinetic invariance (Tasaki eq. (9.3.52)) -/
 
@@ -312,10 +253,6 @@ private theorem jwSign_shibaConfig_spinful (q : Fin (N + 1)) (s : Fin 2)
             * jwSign (2 * N + 1) (spinfulIndex N q s) c)
           * jwSign (2 * N + 1) (spinfulIndex N q s) c := by ring
     _ = (-1 : ℂ) ^ (q : ℕ) * jwSign (2 * N + 1) (spinfulIndex N q s) c := by rw [hmul]
-
-/-- The mode index value: `(spinfulIndex N y r).val = 2 y + r`. -/
-private theorem spinfulIndex_val (y : Fin (N + 1)) (r : Fin 2) :
-    (spinfulIndex N y r).val = 2 * y.val + r.val := by simp [spinfulIndex]
 
 /-- Pointwise value of the Shiba flip: it fixes even (up) modes and flips odd
 (down) modes. -/
