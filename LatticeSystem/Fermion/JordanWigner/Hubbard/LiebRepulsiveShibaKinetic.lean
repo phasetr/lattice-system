@@ -552,6 +552,65 @@ private theorem shibaJwFlipParity_hop_product (r : Fin 2)
       hprod, shibaCrossingSpecies_update_ne 0 _ p 1 1 (by decide),
       shibaCrossingSpecies_update_ne 0 _ q 1 0 (by decide), shibaCrossingSpecies_sq, mul_one]
 
+/-- **The down-hop CAR sign reversal** (Tasaki eq. (9.3.43), p. 334): swapping a
+down hop `q → p` for its reverse `p → q` flips the Jordan–Wigner sign:
+`jwSign_Q(c)·jwSign_P(c with Q↦1) = − jwSign_P(c)·jwSign_Q(c with P↦0)`
+(source `p` occupied, `q` empty).  Both signs are `(−1)` to a parity of occupied
+modes; the parities differ by exactly `1` (one of `P<Q`, `Q<P` holds), giving the
+CAR `−1`. -/
+private theorem jwSign_down_hop_car (c : Fin (2 * N + 2) → Fin 2) (p q : Fin (N + 1))
+    (hpq : p ≠ q) (hcp : c (spinfulIndex N p 1) = 1) (hcq : c (spinfulIndex N q 1) = 0) :
+    jwSign (2 * N + 1) (spinfulIndex N q 1) c
+        * jwSign (2 * N + 1) (spinfulIndex N p 1) (Function.update c (spinfulIndex N q 1) 1)
+      = - (jwSign (2 * N + 1) (spinfulIndex N p 1) c
+        * jwSign (2 * N + 1) (spinfulIndex N q 1)
+          (Function.update c (spinfulIndex N p 1) 0)) := by
+  rw [jwSign_eq_neg_one_pow, jwSign_eq_neg_one_pow, jwSign_eq_neg_one_pow,
+    jwSign_eq_neg_one_pow, ← pow_add, ← pow_add]
+  have hi : (∑ k ∈ Finset.univ.filter
+        (fun k : Fin (2 * N + 2) => k.val < (spinfulIndex N p 1).val),
+        ((Function.update c (spinfulIndex N q 1) 1) k).val)
+      = (∑ k ∈ Finset.univ.filter (fun k => k.val < (spinfulIndex N p 1).val), (c k).val)
+        + (if (spinfulIndex N q 1).val < (spinfulIndex N p 1).val then 1 else 0) := by
+    rw [Finset.sum_congr rfl (fun k _ =>
+        show ((Function.update c (spinfulIndex N q 1) 1) k).val
+          = (c k).val + (if k = spinfulIndex N q 1 then 1 else 0) from by
+        by_cases hk : k = spinfulIndex N q 1
+        · subst hk; simp [Function.update_self, hcq]
+        · rw [Function.update_of_ne hk, if_neg hk, add_zero]),
+      Finset.sum_add_distrib, Finset.sum_ite_eq']
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+  have hii : (∑ k ∈ Finset.univ.filter
+        (fun k : Fin (2 * N + 2) => k.val < (spinfulIndex N q 1).val), (c k).val)
+      = (∑ k ∈ Finset.univ.filter (fun k => k.val < (spinfulIndex N q 1).val),
+          ((Function.update c (spinfulIndex N p 1) 0) k).val)
+        + (if (spinfulIndex N p 1).val < (spinfulIndex N q 1).val then 1 else 0) := by
+    rw [Finset.sum_congr rfl (fun k _ =>
+        show (c k).val = ((Function.update c (spinfulIndex N p 1) 0) k).val
+          + (if k = spinfulIndex N p 1 then 1 else 0) from by
+        by_cases hk : k = spinfulIndex N p 1
+        · subst hk; simp [Function.update_self, hcp]
+        · rw [Function.update_of_ne hk, if_neg hk, add_zero]),
+      Finset.sum_add_distrib, Finset.sum_ite_eq']
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+  rw [hi, hii]
+  set S3 := ∑ k ∈ Finset.univ.filter
+    (fun k : Fin (2 * N + 2) => k.val < (spinfulIndex N p 1).val), (c k).val
+  set S4 := ∑ k ∈ Finset.univ.filter
+    (fun k : Fin (2 * N + 2) => k.val < (spinfulIndex N q 1).val),
+    ((Function.update c (spinfulIndex N p 1) 0) k).val
+  set iP := if (spinfulIndex N p 1).val < (spinfulIndex N q 1).val then 1 else 0 with hiP
+  set iQ := if (spinfulIndex N q 1).val < (spinfulIndex N p 1).val then 1 else 0 with hiQ
+  have hone : iP + iQ = 1 := by
+    have hne : (spinfulIndex N p 1).val ≠ (spinfulIndex N q 1).val :=
+      fun h => hpq ((spinfulIndex_eq_iff N p q 1 1).mp (Fin.ext h)).1
+    rw [hiP, hiQ]
+    rcases lt_or_gt_of_ne hne with h | h
+    · rw [if_pos h, if_neg (by omega)]
+    · rw [if_neg (by omega), if_pos h]
+  rw [show (S4 + iP) + (S3 + iQ) = (S3 + S4) + 1 by omega, pow_succ]
+  ring
+
 /-! ### Column (basis-vector) action of the Shiba unitary -/
 
 /-- The Shiba permutation sends a basis vector to the flipped basis vector:
