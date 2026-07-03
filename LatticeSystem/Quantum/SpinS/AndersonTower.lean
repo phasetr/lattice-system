@@ -248,7 +248,16 @@ with `M + 1 ≤ C₁ L^{d/2}`, on every even-side torus the Tanaka symmetry-brea
 The two tower terms and the state itself are required to have strictly positive squared norm
 (`vecNormSqRe > 0`), the well-definedness condition for `unitNormalize` (the Tanaka state is built
 by normalizing each term separately).  Conditional on long-range order (the same `q₀` premise as
-Theorem 4.6), hence vacuous in one dimension by Corollary 4.3. -/
+Theorem 4.6), hence vacuous in one dimension by Corollary 4.3.
+
+As in `IsAndersonTowerConstants`, the bound is asserted for a **total-spin-singlet ground state**
+(`Ŝ_tot^{(3)} Φ = 0` and `Ŝ_tot^{(1)} Φ = 0`, eq. (4.1.7)): on a bipartite lattice the
+antiferromagnetic Heisenberg ground state is the unique total-spin singlet (Marshall–Lieb–Mattis,
+Theorem 2.3), so this is the physically relevant ground state and a faithful refinement, not a
+genuine extra restriction.  The singlet hypothesis is exactly what powers the long-range-order
+moment recursion `2q₀ P_n ≤ P_{n+1}` (`phatMoment_succ_two_q0_le`) underlying the reduction of
+Theorem 4.8 to the Theorem 4.6 (`IsAndersonTowerConstants`) machinery (the 1-axis double-commutator
+estimate, Tasaki §4.2.2, eqs. (4.2.69)–(4.2.71)). -/
 def IsTanakaSSBConstants (d N : ℕ) (q₀ C₁ C₂ : ℝ) : Prop :=
   0 < C₁ ∧ 0 < C₂ ∧
     ∀ (L : ℕ) [NeZero L], 2 ≤ L → Even L →
@@ -257,6 +266,8 @@ def IsTanakaSSBConstants (d N : ℕ) (q₀ C₁ C₂ : ℝ) : Prop :=
         (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
           (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → E₀.re ≤ E.re) →
         Φ ≠ 0 →
+        (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0 →
+        (totalSpinSOp1 (HypercubicTorus d L) N).mulVec Φ = 0 →
         q₀ ≤ (star Φ ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
             staggeredOrderOpS (torusParitySublattice d L) N).mulVec Φ)).re /
             ((star Φ ⬝ᵥ Φ).re * ((L : ℝ) ^ d) ^ 2) →
@@ -281,8 +292,14 @@ for any increasing `M = M(L) > 0` with `M + 1 ≤ C₁ L^{d/2}`.
 
 Asserting both predicates with one pair `(C₁, C₂)` formalizes Tasaki's "with the same constants as
 in Theorem 4.6".  Conditional on long-range order, hence vacuous in one dimension by Corollary 4.3.
-Tasaki sketches the proof (§4.2.2, following Tanaka [62]); recorded here as a faithful, sound
-documented axiom over the torus family. -/
+
+This is a **tractable axiom scheduled for discharge** (tracking #4958), not an operator-algebra
+documented axiom: Tasaki gives the complete proof (§4.2.2, following Tanaka [62], eqs.
+(4.2.69)–(4.2.71)) by reducing the 1-axis Tanaka state to the Theorem 4.6
+(`IsAndersonTowerConstants`) double-commutator machinery.  The statement-shape is now fixed: both
+predicates carry the total-spin-singlet hypothesis (eq. (4.1.7)), faithful to Tanaka's premise and
+required by the reused long-range-order moment recursion.  The energy bound (crux: the 1-axis
+numerator's binomial cancellation) will be discharged in a later PR of #4958. -/
 axiom tanakaSSB_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
     ∃ C₁ C₂ : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂ ∧ IsTanakaSSBConstants d N q₀ C₁ C₂
 
