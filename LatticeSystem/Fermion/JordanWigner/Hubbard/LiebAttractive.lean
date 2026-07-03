@@ -92,31 +92,8 @@ noncomputable def euclideanExpectation {ι : Type*} [Fintype ι]
     (O : Matrix ι ι ℂ) (φ : EuclideanSpace ℂ ι) : ℂ :=
   dotProduct (star φ.ofLp) (O.mulVec φ.ofLp)
 
-/-- **Tasaki Theorem 10.3** (Tian's pair-correlation positivity, 1st ed.,
-Springer 2020, §10.2.1, p. 349, eq. (10.2.4), **AXIOM**). Under the
-hypotheses of Theorem 10.2, the unique ground state `|ΦGS⟩` of the
-attractive Hubbard model has strictly positive on-site pair-transfer
-correlation for all sites `x, y`:
-`⟨ΦGS| ĉ†_{x,↑} ĉ†_{x,↓} ĉ_{y,↓} ĉ_{y,↑} |ΦGS⟩ > 0` (a measure of
-off-diagonal long-range order).
-
-The textbook states the bound for `0 < N ≤ 2|Λ|`; in the concrete finite
-Fock representation the fully-filled endpoint `N = 2|Λ|` makes off-site
-pair transfer vanish, so the Lean statement uses the non-full guard
-`N < 2|Λ|` (the book endpoint is noted here). Proved by Lieb's
-reflection-positivity method extended by Tian; recorded as a faithful
-documented axiom. -/
-axiom theorem_10_3_tian_pair_correlation_positive (N Ne : ℕ)
-    (hNe_even : Even Ne) (hNe_pos : 0 < Ne) (hNe_lt : Ne < 2 * (N + 1))
-    (T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ)
-    (hT_symm : ∀ x y, T x y = T y x)
-    (hT_conn : (hoppingSupportGraph T).Preconnected)
-    (U : Fin (N + 1) → ℝ) (hU_pos : ∀ x, 0 < U x)
-    {E : ℝ} {φ : EuclideanSpace ℂ (Fin (2 * N + 2) → Fin 2)}
-    (hGS : IsUniqueGroundStateOn (electronNumberSectorEuclidean N Ne)
-      (attractiveHubbardHamiltonian N T U) E φ) :
-    ∀ x y : Fin (N + 1),
-      0 < (euclideanExpectation (hubbardPairCorrelationOp N x y) φ).re ∧
-        (euclideanExpectation (hubbardPairCorrelationOp N x y) φ).im = 0
+-- **Tasaki Theorem 10.3** (Tian's pair-correlation positivity, 1st ed., Springer 2020, §10.2,
+-- p. 349, eq. (10.2.4)) is now a **proved theorem** `theorem_10_3_tian_pair_correlation_positive`
+-- in `LiebAttractiveTheorem103.lean` (no longer an axiom).
 
 end LatticeSystem.Fermion

@@ -106,4 +106,30 @@ theorem trace_mul_posSemidef_pos {n : Type*} [Fintype n]
   · obtain ⟨i, hi⟩ := hex
     exact ⟨i, Finset.mem_univ i, mul_pos hS.diag_pos (RCLike.ofReal_pos.mpr hi)⟩
 
+/-- **`Nᴴ · R · N` is nonzero whenever `R` is positive definite and `N` is nonzero.**
+If `N a b ≠ 0`
+then the `(b, b)` diagonal entry of `Nᴴ · R · N` is the positive-definite quadratic form of `R` on
+the nonzero `b`-th column of `N`, hence strictly positive, so the matrix is nonzero.  This resolves
+the nonvanishing hypothesis of `trace_mul_posSemidef_pos` for the second factor `S_cᴴ · R · S_c` in
+the pair-correlation positivity of Tasaki §10.2.4 (Theorem 10.3). -/
+theorem conjTranspose_mul_mul_ne_zero {n : Type*} [Fintype n]
+    {R N : Matrix n n ℂ} (hR : R.PosDef) (hN : N ≠ 0) : Nᴴ * R * N ≠ 0 := by
+  classical
+  obtain ⟨a, b, hab⟩ : ∃ a b, N a b ≠ 0 := by
+    by_contra h
+    push Not at h
+    exact hN (by ext a b; exact h a b)
+  have hv : (fun i => N i b) ≠ 0 := fun h => hab (congrFun h a)
+  have hpos : 0 < star (fun i => N i b) ⬝ᵥ R *ᵥ (fun i => N i b) :=
+    hR.dotProduct_mulVec_pos hv
+  have hentry : (Nᴴ * R * N) b b = star (fun i => N i b) ⬝ᵥ R *ᵥ (fun i => N i b) := by
+    simp only [Matrix.mul_apply, dotProduct, Matrix.mulVec, Matrix.conjTranspose_apply,
+      Pi.star_apply, Finset.mul_sum, Finset.sum_mul]
+    rw [Finset.sum_comm]
+    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => by ring))
+  have hbb : (Nᴴ * R * N) b b ≠ 0 := by rw [hentry]; exact ne_of_gt hpos
+  intro hzero
+  rw [hzero, Matrix.zero_apply] at hbb
+  exact hbb rfl
+
 end Matrix.PosDef
