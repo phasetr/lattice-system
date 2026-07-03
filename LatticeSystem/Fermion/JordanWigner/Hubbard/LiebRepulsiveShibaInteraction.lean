@@ -1,6 +1,7 @@
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaUnitary
 import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsive
 import LatticeSystem.Fermion.JordanWigner.Hubbard.WeakNagaokaTheoremCore
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebAttractivePHConjDiag
 
 /-!
 # The Shiba particle-hole flip of the symmetric interaction (Tasaki §9.3.3, eq. (9.3.54))
@@ -38,7 +39,6 @@ also fix the kinetic term.  This file supplies the sign-independent core.
   the Shiba flip.
 * `shibaPermMatrix_conj_symmetricInteraction` — `P·Ĥint'·P = −Ĥint'`
   (Tasaki eq. (9.3.54), interaction part).
-* `shibaSignedUnitary_conjTranspose_mul_self` — `Û` is unitary for modulus-one `s`.
 * `shibaSignedUnitary_conj_symmetricInteraction` — `Ûᴴ·Ĥint'·Û = −Ĥint'`
   (Tasaki eq. (9.3.54), interaction part, sign-dressed form).
 
@@ -70,19 +70,6 @@ theorem fermionMultiNumber_eq_diagonal (M : ℕ) (j : Fin (M + 1)) :
   by_cases h : τ = ρ
   · subst h; rw [basisVec_self, mul_one, if_pos rfl]
   · rw [basisVec_of_ne h, mul_zero, if_neg h]
-
-/-- The spin-up site-occupation number is diagonal: `n̂_{x↑} = diagonal (c ↦ c (2x))`. -/
-theorem fermionUpNumber_eq_diagonal (x : Fin (N + 1)) :
-    fermionUpNumber N x
-      = Matrix.diagonal (fun c => ((c (spinfulIndex N x 0)).val : ℂ)) :=
-  fermionMultiNumber_eq_diagonal (2 * N + 1) (spinfulIndex N x 0)
-
-/-- The spin-down site-occupation number is diagonal:
-`n̂_{x↓} = diagonal (c ↦ c (2x+1))`. -/
-theorem fermionDownNumber_eq_diagonal (x : Fin (N + 1)) :
-    fermionDownNumber N x
-      = Matrix.diagonal (fun c => ((c (spinfulIndex N x 1)).val : ℂ)) :=
-  fermionMultiNumber_eq_diagonal (2 * N + 1) (spinfulIndex N x 1)
 
 /-- The diagonal entry function of the symmetric repulsive interaction `Ĥint'`
 (Tasaki eq. (9.3.47)/(10.2.6)):
@@ -140,12 +127,6 @@ theorem shibaConfig_apply_down (c : Fin (2 * N + 2) → Fin 2) (x : Fin (N + 1))
   simp only [shibaConfig, hubbardMergeConfig_spinfulIndex_one, particleHoleConfig,
     hubbardDownConfig]
 
-/-- The occupation flip negates the centered occupation:
-`(flip a).val − ½ = −(a.val − ½)`, i.e. `(flip a).val = 1 − a.val` as complex numbers. -/
-theorem flipOccupation_val_cast (a : Fin 2) :
-    ((flipOccupation a).val : ℂ) = 1 - (a.val : ℂ) := by
-  fin_cases a <;> simp [flipOccupation]
-
 /-- **The Shiba flip negates the interaction diagonal** (Tasaki eq. (9.3.54),
 interaction part, p. 336): under `n̂_{x↓} ↦ 1 − n̂_{x↓}` each factor `(n̂_{x↓} − ½)`
 flips sign while `(n̂_{x↑} − ½)` is untouched, so every summand is negated. -/
@@ -156,7 +137,7 @@ theorem symmetricRepulsiveInteractionDiag_shibaConfig (U : Fin (N + 1) → ℝ)
   rw [symmetricRepulsiveInteractionDiag, symmetricRepulsiveInteractionDiag,
     ← Finset.sum_neg_distrib]
   refine Finset.sum_congr rfl (fun x _ => ?_)
-  rw [shibaConfig_apply_up, shibaConfig_apply_down, flipOccupation_val_cast]
+  rw [shibaConfig_apply_up, shibaConfig_apply_down, flipOccupation_val_complex]
   ring
 
 /-! ## The interaction sign flip via the Shiba permutation -/
@@ -193,20 +174,6 @@ theorem shibaSignedUnitary_conjTranspose (s : (Fin (2 * N + 2) → Fin 2) → �
       = shibaPermMatrix N * Matrix.diagonal (star s) := by
   rw [shibaSignedUnitary, Matrix.conjTranspose_mul, Matrix.diagonal_conjTranspose,
     shibaPermMatrix_isHermitian.eq]
-
-/-- The sign-dressed Shiba unitary is unitary when `s` has modulus one
-(`s̄·s = 1`): `Ûᴴ·Û = 1` (Tasaki eq. (9.3.50)). -/
-theorem shibaSignedUnitary_conjTranspose_mul_self
-    (s : (Fin (2 * N + 2) → Fin 2) → ℂ) (hs : ∀ c, star (s c) * s c = 1) :
-    Matrix.conjTranspose (shibaSignedUnitary N s) * shibaSignedUnitary N s = 1 := by
-  rw [shibaSignedUnitary_conjTranspose, shibaSignedUnitary,
-    show shibaPermMatrix N * Matrix.diagonal (star s) * (Matrix.diagonal s * shibaPermMatrix N)
-        = shibaPermMatrix N * (Matrix.diagonal (star s) * Matrix.diagonal s) * shibaPermMatrix N
-      from by simp only [Matrix.mul_assoc],
-    diagonal_mul_diagonal,
-    show (fun c => (star s) c * s c) = (fun _ => (1 : ℂ)) from by
-      funext c; simp only [Pi.star_apply]; exact hs c,
-    diagonal_one, Matrix.mul_one, shibaPermMatrix_mul_self]
 
 /-- **The sign-dressed Shiba unitary flips the sign of the symmetric interaction**
 (Tasaki eq. (9.3.54), interaction part, p. 336): `Ûᴴ·Ĥint'·Û = −Ĥint'`.  The
