@@ -79,7 +79,7 @@ theorem hubbardPairCorrelationOp_eq_hop_product (N : ℕ) (x y : Fin (N + 1)) :
 /-- A single-entry up block kinetic operator collapses to one hop:
 `hubbardBlockKineticUp N (single x y 1) = ĉ†_{block x,↑} ĉ_{block y,↑}`.  The double sum over the
 single-entry matrix `Matrix.single x y 1` keeps only the `(i, j) = (x, y)` term. -/
-private theorem hubbardBlockKineticUp_single (N : ℕ) (x y : Fin (N + 1)) :
+theorem hubbardBlockKineticUp_single (N : ℕ) (x y : Fin (N + 1)) :
     hubbardBlockKineticUp N (Matrix.single x y 1)
       = fermionMultiCreation (2 * N + 1) (hubbardBlockIndex N x 0)
         * fermionMultiAnnihilation (2 * N + 1) (hubbardBlockIndex N y 0) := by
