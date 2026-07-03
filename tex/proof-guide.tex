@@ -6353,6 +6353,19 @@ policy recorded as a faithful documented \texttt{axiom}, built on concrete
 repulsive Hubbard Hamiltonians.
 
 \medskip
+\noindent \emph{Shiba transformation infrastructure (PR~\#4950).} The axiom-free
+axial part of Theorem~10.4 (Tasaki §9.3.3, pp.~334--336) constructs the Shiba
+transformation progressively: (c2) particle-hole involution on down-spin
+configurations (\texttt{LiebRepulsiveShibaTransform.lean}, eq.~(9.3.48),
+p.~335); (c3) unsigned permutation matrix (\texttt{LiebRepulsiveShibaUnitary.lean},
+eqs.~(9.3.48)/(9.3.50), pp.~335--336); (c5) **interaction sign-flip**
+(\texttt{LiebRepulsiveShibaInteraction.lean}, eqs.~(9.3.47)/(9.3.54),
+pp.~334--336): capstone $\hat U^\dagger \hat H_{\rm int}' \hat U = -\hat H_{\rm
+int}'$ via the sign-dressed unitary. Later PRs add kinetic-term conjugation
+(c4), full exchange (c6), and spin-sector transport (c1); Theorem~10.4 capstone
+awaits perturbation-theory spin-value determination.
+
+\medskip
 \noindent\textbf{Theorem 10.5} (Shen–Qiu–Tian; Tasaki §10.2.2, p.~351,
 eq.~(10.2.7)). Under the hypotheses of Theorem 10.4, for any ground state $v$
 the transverse spin correlation
