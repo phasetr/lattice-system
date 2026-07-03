@@ -33,5 +33,14 @@ exists_posDefCompress_ground_in_balanced_sector
 # and U > 0, the Ne-electron ground state is unique and a spin singlet. Assembles the plain-space
 # full-sector singlet-uniqueness milestone into the Euclidean `IsUniqueGroundStateOn` predicate.
 # Legitimately zero-referenced book capstone (documented §10.2 Theorem 10.2); Theorem 10.3 (Tian)
-# takes this ground state as a hypothesis and remains a documented axiom.
+# consumes this unique ground as a hypothesis.
 theorem_10_2_lieb_attractive_unique_singlet
+
+# V1 book capstone: Tasaki §10.2.4 Theorem 10.3 (Tian's pair-correlation positivity for the
+# attractive Hubbard model), now PROVED axiom-free (PR #4949): under Theorem 10.2 hypotheses
+# (even Ne, symmetric hopping, U > 0), the unique ground state has strictly positive on-site
+# pair-transfer correlation ⟨ΦGS| ĉ†_{x↑}ĉ†_{x↓}ĉ_{y↓}ĉ_{y↑} |ΦGS⟩ > 0. Tian's reflection-positivity
+# extension + balanced-sector positive-definite compression + pair-hopping transfer-matrix
+# factorization + trace lemma for PosDef×PosSemidef products. Legitimately zero-referenced
+# book capstone (documented §10.2 Theorem 10.3).
+theorem_10_3_tian_pair_correlation_positive
