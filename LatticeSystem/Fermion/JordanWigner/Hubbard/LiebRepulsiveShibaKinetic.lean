@@ -751,4 +751,96 @@ private theorem shibaSignedUnitary_conj_upHop (A : Finset (Fin (N + 1)))
       rw [hσQ, hupdQ, shibaConfig_apply_up]; exact hcond
     rw [if_neg hcondσ, if_neg hcond, smul_zero, Matrix.mulVec_zero]
 
+/-! ### The down-hop reverses with the sublattice gauge (Tasaki eq. (9.3.52), down part) -/
+
+/-- **The Shiba conjugation reverses each down hop with the sublattice gauge**
+(Tasaki eq. (9.3.52), down part, p. 336): for `p ≠ q`,
+`Ûᴴ (ĉ†_{2p+1} ĉ_{2q+1}) Û = −ε_p ε_q · ĉ†_{2q+1} ĉ_{2p+1}`.  The particle-hole flip
+on the down species turns `ĉ†_{2p+1} ĉ_{2q+1}` into `ĉ_{2p+1} ĉ†_{2q+1}` (the reversed
+hop with a CAR sign `−1`, eq. (9.3.43)); the flipped-down crossing sign `(−1)^{p+q}`
+is cancelled by the crossing parity, and the sublattice gauge supplies `ε_p ε_q`. -/
+private theorem shibaSignedUnitary_conj_downHop (A : Finset (Fin (N + 1)))
+    (p q : Fin (N + 1)) (hpq : p ≠ q) :
+    Matrix.conjTranspose (shibaSignedUnitary N (shibaSignFn A))
+        * (fermionMultiCreation (2 * N + 1) (spinfulIndex N p 1)
+            * fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N q 1))
+        * shibaSignedUnitary N (shibaSignFn A)
+      = (- gaugeSign A p * gaugeSign A q) • (fermionMultiCreation (2 * N + 1) (spinfulIndex N q 1)
+          * fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N p 1)) := by
+  have hPneQ : spinfulIndex N p 1 ≠ spinfulIndex N q 1 :=
+    fun h => hpq ((spinfulIndex_eq_iff N p q 1 1).mp h).1
+  have hflip1 : ∀ a : Fin 2, flipOccupation a = 1 ↔ a = 0 := by intro a; fin_cases a <;> decide
+  have hflip0 : ∀ a : Fin 2, flipOccupation a = 0 ↔ a = 1 := by intro a; fin_cases a <;> decide
+  apply matrix_ext_mulVec_basisVec
+  intro c
+  rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, shibaSignedUnitary_mulVec_basisVec,
+    Matrix.mulVec_smul, fermionMultiCreation_mul_Annihilation_mulVec_basisVec (2 * N + 1)
+      (spinfulIndex N p 1) (spinfulIndex N q 1) (shibaConfig N c),
+    Matrix.smul_mulVec, fermionMultiCreation_mul_Annihilation_mulVec_basisVec (2 * N + 1)
+      (spinfulIndex N q 1) (spinfulIndex N p 1) c]
+  have hcondσ_iff : (shibaConfig N c (spinfulIndex N q 1) = 1
+        ∧ (Function.update (shibaConfig N c) (spinfulIndex N q 1) 0) (spinfulIndex N p 1) = 0)
+      ↔ (c (spinfulIndex N p 1) = 1
+        ∧ (Function.update c (spinfulIndex N p 1) 0) (spinfulIndex N q 1) = 0) := by
+    rw [shibaConfig_apply_down, Function.update_of_ne hPneQ, shibaConfig_apply_down,
+      Function.update_of_ne hPneQ.symm, hflip1, hflip0]
+    tauto
+  by_cases hcond : c (spinfulIndex N p 1) = 1
+      ∧ (Function.update c (spinfulIndex N p 1) 0) (spinfulIndex N q 1) = 0
+  · have hcp : c (spinfulIndex N p 1) = 1 := hcond.1
+    have hcq : c (spinfulIndex N q 1) = 0 := by
+      have h := hcond.2; rwa [Function.update_of_ne hPneQ.symm] at h
+    have hcondσ := hcondσ_iff.mpr hcond
+    rw [if_pos hcondσ, if_pos hcond]
+    have hupdD : Function.update (shibaConfig N c) (spinfulIndex N q 1) 0
+        = shibaConfig N (Function.update c (spinfulIndex N q 1) 1) := by
+      rw [shibaConfig_update_down]; rfl
+    have htgt : Function.update (Function.update (shibaConfig N c) (spinfulIndex N q 1) 0)
+          (spinfulIndex N p 1) 1
+        = shibaConfig N (Function.update (Function.update c (spinfulIndex N p 1) 0)
+            (spinfulIndex N q 1) 1) := by
+      rw [shibaConfig_update_down, shibaConfig_update_down,
+        show flipOccupation (0 : Fin 2) = 1 from rfl, show flipOccupation (1 : Fin 2) = 0 from rfl,
+        Function.update_comm hPneQ]
+    rw [smul_smul, Matrix.mulVec_smul, htgt,
+      shibaSignedUnitary_conjTranspose_mulVec_basisVec, shibaConfig_shibaConfig, smul_smul,
+      smul_smul]
+    congr 1
+    have hjQ : jwSign (2 * N + 1) (spinfulIndex N q 1) (shibaConfig N c)
+        = (-1 : ℂ) ^ (q : ℕ) * jwSign (2 * N + 1) (spinfulIndex N q 1) c :=
+      jwSign_shibaConfig_spinful q 1 c
+    have hjP : jwSign (2 * N + 1) (spinfulIndex N p 1)
+          (Function.update (shibaConfig N c) (spinfulIndex N q 1) 0)
+        = (-1 : ℂ) ^ (p : ℕ) * jwSign (2 * N + 1) (spinfulIndex N p 1)
+          (Function.update c (spinfulIndex N q 1) 1) := by
+      rw [hupdD]; exact jwSign_shibaConfig_spinful p 1 (Function.update c (spinfulIndex N q 1) 1)
+    have hqσ : shibaConfig N c (spinfulIndex N q 1) = 1 := hcondσ.1
+    have hpσ : (Function.update (shibaConfig N c) (spinfulIndex N q 1) 0)
+        (spinfulIndex N p 1) = 0 := hcondσ.2
+    have hpσ2 : shibaConfig N c (spinfulIndex N p 1) = 0 := by rw [shibaConfig_apply_down, hcp]; rfl
+    have hJ := shibaJwFlipParity_hop_product 1 (shibaConfig N c) p q hqσ hpσ
+    have hg := shibaGauge_down_hop_product A (shibaConfig N c) p q hpq hqσ hpσ2
+    have hcar := jwSign_down_hop_car c p q hpq hcp hcq
+    have hab : ((-1 : ℂ) ^ (p : ℕ) * (-1 : ℂ) ^ (q : ℕ))
+        * ((-1 : ℂ) ^ (p : ℕ) * (-1 : ℂ) ^ (q : ℕ)) = 1 := by
+      rw [show ((-1 : ℂ) ^ (p : ℕ) * (-1 : ℂ) ^ (q : ℕ))
+            * ((-1 : ℂ) ^ (p : ℕ) * (-1 : ℂ) ^ (q : ℕ))
+          = ((-1 : ℂ) ^ (p : ℕ) * (-1 : ℂ) ^ (p : ℕ))
+            * ((-1 : ℂ) ^ (q : ℕ) * (-1 : ℂ) ^ (q : ℕ)) from by ring,
+        ← pow_add, ← pow_add, ← two_mul, ← two_mul, pow_mul, pow_mul, neg_one_sq,
+        one_pow, one_pow, one_mul]
+    rw [shibaSignFn, shibaSignFn, ← htgt, star_mul', shibaGauge_star, shibaJwFlipParity_star,
+      hjQ, hjP]
+    trans shibaGauge A (shibaConfig N c) * shibaGauge A (Function.update
+          (Function.update (shibaConfig N c) (spinfulIndex N q 1) 0) (spinfulIndex N p 1) 1)
+        * (shibaJwFlipParity N (shibaConfig N c) * shibaJwFlipParity N (Function.update
+            (Function.update (shibaConfig N c) (spinfulIndex N q 1) 0) (spinfulIndex N p 1) 1)
+          * ((-1 : ℂ) ^ (p : ℕ) * (-1 : ℂ) ^ (q : ℕ)))
+        * (jwSign (2 * N + 1) (spinfulIndex N q 1) c
+          * jwSign (2 * N + 1) (spinfulIndex N p 1) (Function.update c (spinfulIndex N q 1) 1))
+    · ring
+    · rw [hJ, hab, hg, hcar]; ring
+  · rw [if_neg (fun hc => hcond (hcondσ_iff.mp hc)), if_neg hcond, smul_zero,
+      Matrix.mulVec_zero, smul_zero]
+
 end LatticeSystem.Fermion
