@@ -60,4 +60,50 @@ theorem trace_mul_pos {n : Type*} [Fintype n] [Nonempty n]
   refine Finset.sum_pos (fun i _ => ?_) Finset.univ_nonempty
   exact mul_pos hS.diag_pos (RCLike.ofReal_pos.mpr (hB.eigenvalues_pos i))
 
+/-- **The trace of `A · B` is strictly positive when `A` is positive definite and `B` is a
+nonzero positive-semidefinite matrix.**  For a positive-definite complex matrix `A` and a nonzero
+positive-semidefinite complex matrix `B` over a (finite, decidable) index type, `0 < Tr(A · B)`
+in the `ComplexOrder`.  Diagonalizing `B` as `U · diag(λ) · Uᴴ` with `λ_i ≥ 0` (and at least one
+`λ_i > 0` because `B ≠ 0`) and cycling the trace gives
+`Tr(A · B) = Σ_i (Uᴴ · A · U)_{ii} · λ_i`, a sum of nonnegative terms (positive diagonal of the
+positive-definite `Uᴴ · A · U` times nonnegative eigenvalues of `B`) with at least one strictly
+positive term.  This is the footnote-16 ingredient, extended to a positive-semidefinite second
+factor, behind the pair-correlation positivity `Tr(W_GS · S · W_GS · Sᵀ) > 0` of Tasaki §10.2.4
+(Theorem 10.3, 1st ed., Springer 2020, p. 372). -/
+theorem trace_mul_posSemidef_pos {n : Type*} [Fintype n]
+    {A B : Matrix n n ℂ} (hA : A.PosDef) (hB : B.PosSemidef) (hB_ne : B ≠ 0) :
+    0 < (A * B).trace := by
+  classical
+  have hBH : B.IsHermitian := hB.isHermitian
+  have hu : IsUnit (hBH.eigenvectorUnitary : Matrix n n ℂ) :=
+    IsUnit.of_mul_eq_one _ (Unitary.coe_mul_star_self hBH.eigenvectorUnitary)
+  have hUinj : Function.Injective (hBH.eigenvectorUnitary : Matrix n n ℂ).mulVec :=
+    Matrix.mulVec_injective_of_isUnit hu
+  have hS : ((hBH.eigenvectorUnitary : Matrix n n ℂ)ᴴ * A *
+      (hBH.eigenvectorUnitary : Matrix n n ℂ)).PosDef :=
+    hA.conjTranspose_mul_mul_same hUinj
+  have key : (A * B).trace
+      = ((hBH.eigenvectorUnitary : Matrix n n ℂ)ᴴ * A *
+          (hBH.eigenvectorUnitary : Matrix n n ℂ) *
+          diagonal (RCLike.ofReal ∘ hBH.eigenvalues)).trace := by
+    conv_lhs =>
+      rw [hBH.spectral_theorem, Unitary.conjStarAlgAut_apply, Matrix.star_eq_conjTranspose]
+    rw [← Matrix.mul_assoc, Matrix.trace_mul_cycle, ← Matrix.mul_assoc]
+  have hex : ∃ i, 0 < hBH.eigenvalues i := by
+    by_contra h
+    push Not at h
+    apply hB_ne
+    have hfun : (RCLike.ofReal ∘ hBH.eigenvalues : n → ℂ) = 0 := by
+      funext i
+      have : hBH.eigenvalues i = 0 := le_antisymm (h i) (hB.eigenvalues_nonneg i)
+      simp [Function.comp_apply, this]
+    rw [hBH.spectral_theorem, hfun]
+    simp
+  rw [key]
+  simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_diagonal, Function.comp_apply]
+  refine Finset.sum_pos' (fun i _ => ?_) ?_
+  · exact mul_nonneg hS.diag_pos.le (RCLike.ofReal_nonneg.mpr (hB.eigenvalues_nonneg i))
+  · obtain ⟨i, hi⟩ := hex
+    exact ⟨i, Finset.mem_univ i, mul_pos hS.diag_pos (RCLike.ofReal_pos.mpr hi)⟩
+
 end Matrix.PosDef
