@@ -1,0 +1,3 @@
+import LatticeSystem.Fermion.JordanWigner.Hubbard.LiebRepulsiveShibaConjugation
+open LatticeSystem.Fermion
+#print axioms shibaSignedUnitary_conj_symmetricRepulsive_eq_attractive

@@ -45,19 +45,14 @@ theorem_10_2_lieb_attractive_unique_singlet
 # book capstone (documented §10.2 Theorem 10.3).
 theorem_10_3_tian_pair_correlation_positive
 
-# V1 intermediate milestone (TEMPORARY — delist in the c6 PR that consumes it): Tasaki §10.2.2
-# Theorem 10.4 discharge arc, PR-1 (#4852, PR #4950). The Shiba unitary Û^S conjugates the
-# symmetric repulsive Hubbard interaction to its negative, `Ûᴴ Ĥ^{sym}_int Û = −Ĥ^{sym}_int`
-# (Tasaki eq 9.3.54, p.336). Reference-terminal in this PR; the full Hamiltonian-conjugation
-# capstone `shibaUnitary_conj_repulsive_eq_attractive` (eq 10.2.10) in the c6 PR will consume it,
-# at which point this entry is delisted (same pattern as the attractive-arc intermediate milestones).
-shibaSignedUnitary_conj_symmetricInteraction
-
-# V1 intermediate milestone (TEMPORARY — delist in the c6 PR that consumes it): Tasaki §10.2.2
-# Theorem 10.4 discharge arc, PR-C (#4852, PR #4951). The Shiba unitary Û^S leaves the symmetric
-# Hubbard hopping term invariant, `Ûᴴ Ĥ^{sym}_kin Û = Ĥ^{sym}_kin` (Tasaki eq 9.3.52, p.336): the
-# CAR −1 from swapping down creation/annihilation cancels the bipartite gauge ε_xε_y=−1 on each bond.
-# Reference-terminal in this PR; the full Hamiltonian-conjugation capstone
-# `shibaUnitary_conj_repulsive_eq_attractive` (eq 10.2.10) in the c6 PR will consume it (with the c5
-# interaction milestone), at which point this entry is delisted.
-shibaSignedUnitary_conj_symmetricKinetic
+# V1 intermediate milestone (TEMPORARY — delist in the c7 PR that consumes it): Tasaki §10.2.2
+# Theorem 10.4 discharge arc, c6 (#4852, PR #4952). The full Shiba conjugation sends the symmetric
+# repulsive Hubbard Hamiltonian to an attractive one, `Ûᴴ (Ĥhop + Ĥint') Û =
+# attractiveHubbardHamiltonian (T + diag(U/2)) U − ¼ Σ_x U_x` (Tasaki eqs 10.2.10/10.2.11, p.352):
+# kinetic invariance (c4) + interaction sign flip (c5) + chemical shift absorbed into the hopping
+# diagonal, minus the negative scalar. This consumes the former c4/c5 milestones
+# (shibaSignedUnitary_conj_symmetricKinetic / _symmetricInteraction), which are now delisted.
+# Reference-terminal in this PR; the balanced-sector ground-state transport capstone
+# `repulsiveHalfFilling_balancedSector_ground_unique` in the c7 PR will consume it, at which point
+# this entry is delisted.
+shibaSignedUnitary_conj_symmetricRepulsive_eq_attractive
