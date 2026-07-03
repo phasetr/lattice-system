@@ -80,38 +80,60 @@ noncomputable def shibaGauge (A : Finset (Fin (N + 1))) (c : Fin (2 * N + 2) →
   ∏ x ∈ bipartitionComplement A,
     (if c (spinfulIndex N x 1) = 0 then (1 : ℂ) else -1)
 
-/-- The **Jordan–Wigner down-flip crossing parity** of a configuration `c`
-(Tasaki eq. (9.3.50), the string part of the Shiba sign): `∏_x (−1)^{x} n̂_{x↑}`,
-i.e. the product over occupied up modes `2x` of `(−1)^x`.
+/-- The **single-species Jordan–Wigner crossing parity** at spin `r`: the product
+over the occupied spin-`r` modes `spinfulIndex x r` of `(−1)^x` (Tasaki eq. (9.3.50),
+string part).  This is the sign the diagonal dressing must supply on a spin-`r` hop so
+that the flipped-down crossing factor `(−1)^{p+q}` is cancelled. -/
+noncomputable def shibaCrossingSpecies (N : ℕ) (r : Fin 2)
+    (c : Fin (2 * N + 2) → Fin 2) : ℂ :=
+  ∏ x : Fin (N + 1), (if c (spinfulIndex N x r) = 1 then (-1 : ℂ) ^ (x : ℕ) else 1)
 
-This is the sign the diagonal dressing must supply so that the sign-dressed Shiba
-unitary `Û = diagonal(s)·P` leaves the *up* kinetic term invariant: flipping the
-down occupations below the up mode `2q` (as the permutation `P` does) multiplies the
-Jordan–Wigner string sign `jwSign 2q` by `(−1)^q`, and this factor `(−1)^q`
-(for the source) times `(−1)^p` (for the target) is exactly cancelled by the ratio
-of `shibaJwFlipParity` at the two up-hopped configurations. -/
+/-- The **Jordan–Wigner crossing parity** of a configuration `c` (Tasaki eq. (9.3.50),
+string part of the Shiba sign): the product over **all** occupied modes of `(−1)^{site}`,
+`∏_{k : c k = 1} (−1)^{⌊k/2⌋}`, realised as the product of the up (`r=0`) and down
+(`r=1`) single-species crossing parities.
+
+Both species are needed: the up factor cancels the crossing sign of an up hop and the
+down factor cancels that of a down hop (the Shiba flip acts on the down species, so a
+down hop also picks up a `(−1)^{p+q}` crossing sign that the down factor cancels). -/
 noncomputable def shibaJwFlipParity (N : ℕ) (c : Fin (2 * N + 2) → Fin 2) : ℂ :=
-  ∏ x : Fin (N + 1),
-    (if c (spinfulIndex N x 0) = 1 then (-1 : ℂ) ^ (x : ℕ) else 1)
+  shibaCrossingSpecies N 0 c * shibaCrossingSpecies N 1 c
 
-/-- The **concrete Shiba sign** `s = (Jordan–Wigner down-flip crossing parity) ×
-(sublattice gauge)` (Tasaki eq. (9.3.50), p. 336): the specific diagonal sign that
-dresses the Shiba permutation into the full Shiba unitary `Û = diagonal(s)·P` so that
+/-- The **concrete Shiba sign** `s = (Jordan–Wigner crossing parity) × (sublattice
+gauge)` (Tasaki eq. (9.3.50), p. 336): the specific diagonal sign that dresses the
+Shiba permutation into the full Shiba unitary `Û = diagonal(s)·P` so that
 `Ûᴴ Ĥhop Û = Ĥhop` (kinetic invariance, eq. (9.3.52)). -/
 noncomputable def shibaSignFn (A : Finset (Fin (N + 1)))
     (c : Fin (2 * N + 2) → Fin 2) : ℂ :=
   shibaJwFlipParity N c * shibaGauge A c
 
-/-- The crossing parity has modulus one: `s̄ s = 1`.  Each factor is real and equal
-to `±1`, so its square is `1` and the product of squares is `1`. -/
+/-- The single-species crossing parity is real: `star (cs r c) = cs r c`. -/
+private theorem shibaCrossingSpecies_star (r : Fin 2) (c : Fin (2 * N + 2) → Fin 2) :
+    star (shibaCrossingSpecies N r c) = shibaCrossingSpecies N r c := by
+  rw [shibaCrossingSpecies, star_prod]
+  refine Finset.prod_congr rfl (fun x _ => ?_)
+  by_cases h : c (spinfulIndex N x r) = 1
+  · rw [if_pos h, star_pow, star_neg, star_one]
+  · rw [if_neg h, star_one]
+
+/-- The single-species crossing parity squares to one: `cs r c · cs r c = 1`. -/
+private theorem shibaCrossingSpecies_sq (r : Fin 2) (c : Fin (2 * N + 2) → Fin 2) :
+    shibaCrossingSpecies N r c * shibaCrossingSpecies N r c = 1 := by
+  rw [shibaCrossingSpecies, ← Finset.prod_mul_distrib]
+  refine Finset.prod_eq_one (fun x _ => ?_)
+  by_cases h : c (spinfulIndex N x r) = 1
+  · rw [if_pos h, ← pow_add, ← two_mul, pow_mul, neg_one_sq, one_pow]
+  · rw [if_neg h, mul_one]
+
+/-- The crossing parity has modulus one: `s̄ s = 1`. -/
 theorem shibaJwFlipParity_star_mul_self (c : Fin (2 * N + 2) → Fin 2) :
     star (shibaJwFlipParity N c) * shibaJwFlipParity N c = 1 := by
-  rw [shibaJwFlipParity, star_prod, ← Finset.prod_mul_distrib]
-  refine Finset.prod_eq_one (fun x _ => ?_)
-  by_cases h : c (spinfulIndex N x 0) = 1
-  · rw [if_pos h, star_pow, star_neg, star_one, ← pow_add, ← two_mul, pow_mul]
-    norm_num
-  · rw [if_neg h, star_one, mul_one]
+  rw [shibaJwFlipParity, star_mul', shibaCrossingSpecies_star, shibaCrossingSpecies_star,
+    show shibaCrossingSpecies N 0 c * shibaCrossingSpecies N 1 c
+        * (shibaCrossingSpecies N 0 c * shibaCrossingSpecies N 1 c)
+      = (shibaCrossingSpecies N 0 c * shibaCrossingSpecies N 0 c)
+        * (shibaCrossingSpecies N 1 c * shibaCrossingSpecies N 1 c) from by ring,
+    shibaCrossingSpecies_sq, shibaCrossingSpecies_sq, mul_one]
 
 /-- The sublattice gauge factor has modulus one: `s̄ s = 1`. -/
 theorem shibaGauge_star_mul_self (A : Finset (Fin (N + 1)))
@@ -323,15 +345,22 @@ private theorem shibaConfig_update_up (x : Fin (2 * N + 2) → Fin 2)
   · rw [Function.update_of_ne hk, shibaConfig_apply_parity, shibaConfig_apply_parity,
       Function.update_of_ne hk]
 
+/-- Updating a down mode commutes with the Shiba flip up to the occupation flip
+(which acts on the down species): `σ(update x (2p+1) v) = update (σx) (2p+1) (flip v)`. -/
+private theorem shibaConfig_update_down (x : Fin (2 * N + 2) → Fin 2)
+    (p : Fin (N + 1)) (v : Fin 2) :
+    shibaConfig N (Function.update x (spinfulIndex N p 1) v)
+      = Function.update (shibaConfig N x) (spinfulIndex N p 1) (flipOccupation v) := by
+  funext k
+  by_cases hk : k = spinfulIndex N p 1
+  · subst hk; rw [shibaConfig_apply_down, Function.update_self, Function.update_self]
+  · rw [Function.update_of_ne hk, shibaConfig_apply_parity, shibaConfig_apply_parity,
+      Function.update_of_ne hk]
+
 /-- The crossing parity is real (a product of `±1`): `star J = J`. -/
 private theorem shibaJwFlipParity_star (c : Fin (2 * N + 2) → Fin 2) :
     star (shibaJwFlipParity N c) = shibaJwFlipParity N c := by
-  unfold shibaJwFlipParity
-  rw [star_prod]
-  refine Finset.prod_congr rfl (fun y _ => ?_)
-  by_cases h : c (spinfulIndex N y 0) = 1
-  · rw [if_pos h, star_pow, star_neg, star_one]
-  · rw [if_neg h, star_one]
+  rw [shibaJwFlipParity, star_mul', shibaCrossingSpecies_star, shibaCrossingSpecies_star]
 
 /-- The sublattice gauge is real (a product of `±1`): `star g = g`. -/
 private theorem shibaGauge_star (A : Finset (Fin (N + 1))) (c : Fin (2 * N + 2) → Fin 2) :
@@ -343,13 +372,15 @@ private theorem shibaGauge_star (A : Finset (Fin (N + 1))) (c : Fin (2 * N + 2) 
   · rw [if_pos h, star_one]
   · rw [if_neg h, star_neg, star_one]
 
-/-- The crossing parity is unchanged by the Shiba flip, since it reads only the
-(fixed) up occupations: `J(σc) = J(c)`. -/
-private theorem shibaJwFlipParity_shibaConfig (c : Fin (2 * N + 2) → Fin 2) :
-    shibaJwFlipParity N (shibaConfig N c) = shibaJwFlipParity N c := by
-  unfold shibaJwFlipParity
-  refine Finset.prod_congr rfl (fun y _ => ?_)
-  rw [shibaConfig_apply_up]
+/-- Updating a spin-`s` mode does not change the spin-`r` crossing parity when
+`r ≠ s`, since `cs r` reads only the spin-`r` modes. -/
+private theorem shibaCrossingSpecies_update_ne (r : Fin 2)
+    (c : Fin (2 * N + 2) → Fin 2) (y : Fin (N + 1)) (s : Fin 2) (v : Fin 2) (hs : s ≠ r) :
+    shibaCrossingSpecies N r (Function.update c (spinfulIndex N y s) v)
+      = shibaCrossingSpecies N r c := by
+  unfold shibaCrossingSpecies
+  refine Finset.prod_congr rfl (fun z _ => ?_)
+  rw [Function.update_of_ne (fun h => hs ((spinfulIndex_eq_iff N z y r s).mp h).2.symm)]
 
 /-- The sublattice gauge is unchanged by updating an up mode, since it reads only
 the down occupations `2x+1`: `g(update x (2p) v) = g(x)`. -/
@@ -361,40 +392,107 @@ private theorem shibaGauge_update_up (A : Finset (Fin (N + 1)))
   rw [Function.update_of_ne (fun h => by
     exact absurd ((spinfulIndex_eq_iff N z p 1 0).mp h).2 (by decide))]
 
-/-- **The up-hop crossing-parity product** (the sign the Shiba dressing supplies on
-an up hop): when the hop `q → p` fires (source `2q` occupied, target `2p` empty),
-`J(c) · J(hopped c) = (−1)^p (−1)^q`.  Only the sites `p` and `q` differ between the
-two configurations, contributing `(−1)^p` and `(−1)^q`; every other site squares to
-`1`. -/
-private theorem shibaJwFlipParity_up_hop_product (c : Fin (2 * N + 2) → Fin 2)
-    (p q : Fin (N + 1)) (hq : c (spinfulIndex N q 0) = 1)
-    (hp : (Function.update c (spinfulIndex N q 0) 0) (spinfulIndex N p 0) = 0) :
-    shibaJwFlipParity N c
-        * shibaJwFlipParity N (Function.update
-            (Function.update c (spinfulIndex N q 0) 0) (spinfulIndex N p 0) 1)
+/-- **The down-hop sublattice-gauge product** (Tasaki eq. (9.3.52), gauge part,
+p. 336): when a down hop fires on `d` (`d(2q+1)=1`, `d(2p+1)=0`), the gauge at `d`
+times the gauge at the hopped configuration is the product of the two sublattice
+signs `ε_p ε_q = gaugeSign A p · gaugeSign A q`.  Only sites `p`, `q` differ, each
+contributing `−1` exactly when it lies in `Aᶜ`, i.e. `ε` at that site. -/
+private theorem shibaGauge_down_hop_product (A : Finset (Fin (N + 1)))
+    (d : Fin (2 * N + 2) → Fin 2) (p q : Fin (N + 1)) (hpq : p ≠ q)
+    (hq : d (spinfulIndex N q 1) = 1) (hp : d (spinfulIndex N p 1) = 0) :
+    shibaGauge A d * shibaGauge A (Function.update
+        (Function.update d (spinfulIndex N q 1) 0) (spinfulIndex N p 1) 1)
+      = gaugeSign A p * gaugeSign A q := by
+  have hPneQ : spinfulIndex N p 1 ≠ spinfulIndex N q 1 :=
+    fun h => hpq ((spinfulIndex_eq_iff N p q 1 1).mp h).1
+  set td := Function.update (Function.update d (spinfulIndex N q 1) 0)
+    (spinfulIndex N p 1) 1 with htd_def
+  have htdp : td (spinfulIndex N p 1) = 1 := by rw [htd_def, Function.update_self]
+  have htdq : td (spinfulIndex N q 1) = 0 := by
+    rw [htd_def, Function.update_of_ne hPneQ.symm, Function.update_self]
+  have htdz : ∀ z : Fin (N + 1), z ≠ p → z ≠ q →
+      td (spinfulIndex N z 1) = d (spinfulIndex N z 1) := by
+    intro z hzp hzq
+    rw [htd_def, Function.update_of_ne (fun h => hzp ((spinfulIndex_eq_iff N z p 1 1).mp h).1),
+      Function.update_of_ne (fun h => hzq ((spinfulIndex_eq_iff N z q 1 1).mp h).1)]
+  rw [shibaGauge, shibaGauge, ← Finset.prod_mul_distrib]
+  have hrest : ∀ z ∈ bipartitionComplement A, z ≠ p → z ≠ q →
+      (if d (spinfulIndex N z 1) = 0 then (1 : ℂ) else -1)
+        * (if td (spinfulIndex N z 1) = 0 then (1 : ℂ) else -1) = 1 := by
+    intro z _ hzp hzq
+    rw [htdz z hzp hzq]
+    by_cases h : d (spinfulIndex N z 1) = 0
+    · rw [if_pos h]; ring
+    · rw [if_neg h]; ring
+  have hhp : (if d (spinfulIndex N p 1) = 0 then (1 : ℂ) else -1)
+      * (if td (spinfulIndex N p 1) = 0 then (1 : ℂ) else -1) = -1 := by
+    rw [hp, htdp, if_pos rfl, if_neg (by decide)]; ring
+  have hhq : (if d (spinfulIndex N q 1) = 0 then (1 : ℂ) else -1)
+      * (if td (spinfulIndex N q 1) = 0 then (1 : ℂ) else -1) = -1 := by
+    rw [hq, htdq, if_neg (by decide), if_pos rfl]; ring
+  have hmemp : p ∉ A → p ∈ bipartitionComplement A := fun h =>
+    Finset.mem_filter.mpr ⟨Finset.mem_univ p, h⟩
+  have hmemq : q ∉ A → q ∈ bipartitionComplement A := fun h =>
+    Finset.mem_filter.mpr ⟨Finset.mem_univ q, h⟩
+  have hnotmem : ∀ z ∈ bipartitionComplement A, z ∉ A := fun z hz =>
+    (Finset.mem_filter.mp hz).2
+  unfold gaugeSign
+  by_cases hpA : p ∈ A <;> by_cases hqA : q ∈ A
+  · rw [if_pos hpA, if_pos hqA, mul_one]
+    refine Finset.prod_eq_one (fun z hz => hrest z hz ?_ ?_)
+    · rintro rfl; exact hnotmem z hz hpA
+    · rintro rfl; exact hnotmem z hz hqA
+  · rw [if_pos hpA, if_neg hqA, one_mul,
+      ← Finset.mul_prod_erase (bipartitionComplement A) _ (hmemq hqA), hhq,
+      Finset.prod_eq_one (fun z hz => ?_), mul_one]
+    rw [Finset.mem_erase] at hz
+    exact hrest z hz.2 (fun h => hnotmem z hz.2 (h ▸ hpA)) hz.1
+  · rw [if_neg hpA, if_pos hqA, mul_one,
+      ← Finset.mul_prod_erase (bipartitionComplement A) _ (hmemp hpA), hhp,
+      Finset.prod_eq_one (fun z hz => ?_), mul_one]
+    rw [Finset.mem_erase] at hz
+    exact hrest z hz.2 hz.1 (fun h => hnotmem z hz.2 (h ▸ hqA))
+  · rw [if_neg hpA, if_neg hqA,
+      ← Finset.mul_prod_erase (bipartitionComplement A) _ (hmemp hpA),
+      ← Finset.mul_prod_erase ((bipartitionComplement A).erase p) _
+        (Finset.mem_erase.mpr ⟨fun h => hpq h.symm, hmemq hqA⟩),
+      hhp, hhq, Finset.prod_eq_one (fun z hz => ?_), mul_one]
+    rw [Finset.mem_erase, Finset.mem_erase] at hz
+    exact hrest z hz.2.2 hz.2.1 hz.1
+
+/-- **The single-species crossing-parity product** (the sign the Shiba dressing
+supplies on a spin-`r` hop): when the hop `q → p` fires (source `spinful q r`
+occupied, target `spinful p r` empty), `cs r c · cs r (hopped c) = (−1)^p (−1)^q`.
+Only sites `p`, `q` differ, contributing `(−1)^p`, `(−1)^q`; every other site
+squares to `1`. -/
+private theorem shibaCrossingSpecies_hop_product (r : Fin 2)
+    (c : Fin (2 * N + 2) → Fin 2) (p q : Fin (N + 1))
+    (hq : c (spinfulIndex N q r) = 1)
+    (hp : (Function.update c (spinfulIndex N q r) 0) (spinfulIndex N p r) = 0) :
+    shibaCrossingSpecies N r c
+        * shibaCrossingSpecies N r (Function.update
+            (Function.update c (spinfulIndex N q r) 0) (spinfulIndex N p r) 1)
       = (-1 : ℂ) ^ (p : ℕ) * (-1 : ℂ) ^ (q : ℕ) := by
   by_cases hpq : p = q
   · subst hpq
-    have htc : Function.update (Function.update c (spinfulIndex N p 0) 0)
-        (spinfulIndex N p 0) 1 = c := by
+    have htc : Function.update (Function.update c (spinfulIndex N p r) 0)
+        (spinfulIndex N p r) 1 = c := by
       rw [Function.update_idem, ← hq, Function.update_eq_self]
-    rw [htc]
-    nth_rewrite 1 [← shibaJwFlipParity_star c]
-    rw [shibaJwFlipParity_star_mul_self, ← pow_add, ← two_mul, pow_mul, neg_one_sq, one_pow]
-  · have hPneQ : spinfulIndex N p 0 ≠ spinfulIndex N q 0 :=
-      fun h => hpq ((spinfulIndex_eq_iff N p q 0 0).mp h).1
-    have hcp : c (spinfulIndex N p 0) = 0 := by rwa [Function.update_of_ne hPneQ] at hp
-    set tc := Function.update (Function.update c (spinfulIndex N q 0) 0)
-      (spinfulIndex N p 0) 1 with htc_def
-    have htcp : tc (spinfulIndex N p 0) = 1 := by rw [htc_def, Function.update_self]
-    have htcq : tc (spinfulIndex N q 0) = 0 := by
+    rw [htc, shibaCrossingSpecies_sq, ← pow_add, ← two_mul, pow_mul, neg_one_sq, one_pow]
+  · have hPneQ : spinfulIndex N p r ≠ spinfulIndex N q r :=
+      fun h => hpq ((spinfulIndex_eq_iff N p q r r).mp h).1
+    have hcp : c (spinfulIndex N p r) = 0 := by rwa [Function.update_of_ne hPneQ] at hp
+    set tc := Function.update (Function.update c (spinfulIndex N q r) 0)
+      (spinfulIndex N p r) 1 with htc_def
+    have htcp : tc (spinfulIndex N p r) = 1 := by rw [htc_def, Function.update_self]
+    have htcq : tc (spinfulIndex N q r) = 0 := by
       rw [htc_def, Function.update_of_ne hPneQ.symm, Function.update_self]
     have htcy : ∀ y : Fin (N + 1), y ≠ p → y ≠ q →
-        tc (spinfulIndex N y 0) = c (spinfulIndex N y 0) := by
+        tc (spinfulIndex N y r) = c (spinfulIndex N y r) := by
       intro y hyp hyq
-      rw [htc_def, Function.update_of_ne (fun h => hyp ((spinfulIndex_eq_iff N y p 0 0).mp h).1),
-        Function.update_of_ne (fun h => hyq ((spinfulIndex_eq_iff N y q 0 0).mp h).1)]
-    unfold shibaJwFlipParity
+      rw [htc_def, Function.update_of_ne (fun h => hyp ((spinfulIndex_eq_iff N y p r r).mp h).1),
+        Function.update_of_ne (fun h => hyq ((spinfulIndex_eq_iff N y q r r).mp h).1)]
+    unfold shibaCrossingSpecies
     rw [← Finset.prod_mul_distrib,
       ← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ p),
       ← Finset.mul_prod_erase (Finset.univ.erase p) _
@@ -404,9 +502,55 @@ private theorem shibaJwFlipParity_up_hop_product (c : Fin (2 * N + 2) → Fin 2)
         one_mul, mul_one, mul_one]
     · rw [Finset.mem_erase, Finset.mem_erase] at hy
       rw [htcy y hy.2.1 hy.1]
-      by_cases h : c (spinfulIndex N y 0) = 1
+      by_cases h : c (spinfulIndex N y r) = 1
       · rw [if_pos h, ← pow_add, ← two_mul, pow_mul, neg_one_sq, one_pow]
       · rw [if_neg h, mul_one]
+
+/-- **The crossing-parity product on a spin-`r` hop** (up: `r=0`, down: `r=1`):
+`J(c) · J(hopped c) = (−1)^p (−1)^q`.  The spin-`r` factor supplies `(−1)^{p+q}`;
+the other-species factor is unchanged by the hop and squares to `1`. -/
+private theorem shibaJwFlipParity_hop_product (r : Fin 2)
+    (c : Fin (2 * N + 2) → Fin 2) (p q : Fin (N + 1))
+    (hq : c (spinfulIndex N q r) = 1)
+    (hp : (Function.update c (spinfulIndex N q r) 0) (spinfulIndex N p r) = 0) :
+    shibaJwFlipParity N c
+        * shibaJwFlipParity N (Function.update
+            (Function.update c (spinfulIndex N q r) 0) (spinfulIndex N p r) 1)
+      = (-1 : ℂ) ^ (p : ℕ) * (-1 : ℂ) ^ (q : ℕ) := by
+  have hprod := shibaCrossingSpecies_hop_product r c p q hq hp
+  by_cases hr : r = 0
+  · subst hr
+    rw [shibaJwFlipParity, shibaJwFlipParity,
+      show shibaCrossingSpecies N 0 c * shibaCrossingSpecies N 1 c
+          * (shibaCrossingSpecies N 0 (Function.update
+              (Function.update c (spinfulIndex N q 0) 0) (spinfulIndex N p 0) 1)
+            * shibaCrossingSpecies N 1 (Function.update
+              (Function.update c (spinfulIndex N q 0) 0) (spinfulIndex N p 0) 1))
+        = (shibaCrossingSpecies N 0 c * shibaCrossingSpecies N 0 (Function.update
+              (Function.update c (spinfulIndex N q 0) 0) (spinfulIndex N p 0) 1))
+          * (shibaCrossingSpecies N 1 c * shibaCrossingSpecies N 1 (Function.update
+              (Function.update c (spinfulIndex N q 0) 0) (spinfulIndex N p 0) 1))
+        from by ring,
+      hprod, shibaCrossingSpecies_update_ne 1 _ p 0 1 (by decide),
+      shibaCrossingSpecies_update_ne 1 _ q 0 0 (by decide), shibaCrossingSpecies_sq, mul_one]
+  · have hr1 : r = 1 := Fin.ext (by
+      have h2 := r.isLt
+      have h0 : r.val ≠ 0 := fun h => hr (Fin.ext h)
+      omega)
+    subst hr1
+    rw [shibaJwFlipParity, shibaJwFlipParity,
+      show shibaCrossingSpecies N 0 c * shibaCrossingSpecies N 1 c
+          * (shibaCrossingSpecies N 0 (Function.update
+              (Function.update c (spinfulIndex N q 1) 0) (spinfulIndex N p 1) 1)
+            * shibaCrossingSpecies N 1 (Function.update
+              (Function.update c (spinfulIndex N q 1) 0) (spinfulIndex N p 1) 1))
+        = (shibaCrossingSpecies N 1 c * shibaCrossingSpecies N 1 (Function.update
+              (Function.update c (spinfulIndex N q 1) 0) (spinfulIndex N p 1) 1))
+          * (shibaCrossingSpecies N 0 c * shibaCrossingSpecies N 0 (Function.update
+              (Function.update c (spinfulIndex N q 1) 0) (spinfulIndex N p 1) 1))
+        from by ring,
+      hprod, shibaCrossingSpecies_update_ne 0 _ p 1 1 (by decide),
+      shibaCrossingSpecies_update_ne 0 _ q 1 0 (by decide), shibaCrossingSpecies_sq, mul_one]
 
 /-! ### Column (basis-vector) action of the Shiba unitary -/
 
@@ -511,24 +655,17 @@ private theorem shibaSignedUnitary_conj_upHop (A : Finset (Fin (N + 1)))
         = (-1 : ℂ) ^ (p : ℕ) * jwSign (2 * N + 1) (spinfulIndex N p 0)
           (Function.update c (spinfulIndex N q 0) 0) := by
       rw [hupdQ]; exact jwSign_shibaConfig_spinful p 0 (Function.update c (spinfulIndex N q 0) 0)
-    have hsσc : shibaSignFn A (shibaConfig N c)
-        = shibaJwFlipParity N c * shibaGauge A (shibaConfig N c) := by
-      rw [shibaSignFn, shibaJwFlipParity_shibaConfig]
-    have hstarσt : star (shibaSignFn A (shibaConfig N (Function.update
-          (Function.update c (spinfulIndex N q 0) 0) (spinfulIndex N p 0) 1)))
-        = shibaJwFlipParity N (Function.update (Function.update c (spinfulIndex N q 0) 0)
-            (spinfulIndex N p 0) 1)
-          * shibaGauge A (shibaConfig N (Function.update
-            (Function.update c (spinfulIndex N q 0) 0) (spinfulIndex N p 0) 1)) := by
-      rw [shibaSignFn, star_mul', shibaGauge_star, shibaJwFlipParity_star,
-        shibaJwFlipParity_shibaConfig, mul_comm]
-    have hgσt : shibaGauge A (shibaConfig N (Function.update
-          (Function.update c (spinfulIndex N q 0) 0) (spinfulIndex N p 0) 1))
-        = shibaGauge A (shibaConfig N c) := by
-      rw [shibaConfig_update_up, shibaConfig_update_up, shibaGauge_update_up,
-        shibaGauge_update_up]
-    rw [hsσc, hjQ, hjP, hstarσt, hgσt]
-    have hJprod := shibaJwFlipParity_up_hop_product c p q hcond.1 hcond.2
+    have hqσ : shibaConfig N c (spinfulIndex N q 0) = 1 := by rw [hσQ]; exact hcond.1
+    have hpσ : (Function.update (shibaConfig N c) (spinfulIndex N q 0) 0)
+        (spinfulIndex N p 0) = 0 := by rw [hupdQ, shibaConfig_apply_up]; exact hcond.2
+    have hστ : shibaConfig N (Function.update (Function.update c (spinfulIndex N q 0) 0)
+          (spinfulIndex N p 0) 1)
+        = Function.update (Function.update (shibaConfig N c) (spinfulIndex N q 0) 0)
+            (spinfulIndex N p 0) 1 := by
+      rw [shibaConfig_update_up, shibaConfig_update_up]
+    rw [shibaSignFn, shibaSignFn, hστ, star_mul', shibaGauge_star, shibaJwFlipParity_star,
+      shibaGauge_update_up, shibaGauge_update_up, hjQ, hjP]
+    have hJprod := shibaJwFlipParity_hop_product 0 (shibaConfig N c) p q hqσ hpσ
     have hg2 : shibaGauge A (shibaConfig N c) * shibaGauge A (shibaConfig N c) = 1 := by
       have h := shibaGauge_star_mul_self A (shibaConfig N c); rwa [shibaGauge_star] at h
     have hab : ((-1 : ℂ) ^ (p : ℕ) * (-1 : ℂ) ^ (q : ℕ))
@@ -539,20 +676,16 @@ private theorem shibaSignedUnitary_conj_upHop (A : Finset (Fin (N + 1)))
             * ((-1 : ℂ) ^ (q : ℕ) * (-1 : ℂ) ^ (q : ℕ)) from by ring,
         ← pow_add, ← pow_add, ← two_mul, ← two_mul, pow_mul, pow_mul, neg_one_sq,
         one_pow, one_pow, one_mul]
-    rw [show shibaJwFlipParity N c * shibaGauge A (shibaConfig N c)
-          * ((-1 : ℂ) ^ (q : ℕ) * jwSign (2 * N + 1) (spinfulIndex N q 0) c
-            * ((-1 : ℂ) ^ (p : ℕ) * jwSign (2 * N + 1) (spinfulIndex N p 0)
-              (Function.update c (spinfulIndex N q 0) 0)))
-          * (shibaJwFlipParity N (Function.update (Function.update c (spinfulIndex N q 0) 0)
-              (spinfulIndex N p 0) 1) * shibaGauge A (shibaConfig N c))
-        = (shibaJwFlipParity N c * shibaJwFlipParity N (Function.update
-              (Function.update c (spinfulIndex N q 0) 0) (spinfulIndex N p 0) 1))
+    trans (shibaJwFlipParity N (shibaConfig N c) * shibaJwFlipParity N (Function.update
+              (Function.update (shibaConfig N c) (spinfulIndex N q 0) 0)
+              (spinfulIndex N p 0) 1))
           * (shibaGauge A (shibaConfig N c) * shibaGauge A (shibaConfig N c))
           * ((-1 : ℂ) ^ (p : ℕ) * (-1 : ℂ) ^ (q : ℕ))
           * (jwSign (2 * N + 1) (spinfulIndex N q 0) c
             * jwSign (2 * N + 1) (spinfulIndex N p 0)
-              (Function.update c (spinfulIndex N q 0) 0)) from by ring,
-      hJprod, hg2, mul_one, hab, one_mul]
+              (Function.update c (spinfulIndex N q 0) 0))
+    · ring
+    · rw [hJprod, hg2, mul_one, hab, one_mul]
   · have hcondσ : ¬ (shibaConfig N c (spinfulIndex N q 0) = 1
         ∧ (Function.update (shibaConfig N c) (spinfulIndex N q 0) 0)
           (spinfulIndex N p 0) = 0) := by
