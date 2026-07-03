@@ -291,6 +291,7 @@ import LatticeSystem.Quantum.Rotation3D
 import LatticeSystem.Quantum.MagnetizationSubspace
 import LatticeSystem.Quantum.GibbsState
 import LatticeSystem.Quantum.GibbsState.Covariance
+import LatticeSystem.Quantum.GibbsState.Duhamel
 import LatticeSystem.Quantum.HeisenbergChain
 import LatticeSystem.Quantum.HeisenbergChain.Eigenvalues
 import LatticeSystem.Quantum.HeisenbergChain.Gibbs
