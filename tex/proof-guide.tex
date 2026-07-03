@@ -5401,6 +5401,49 @@ the concrete Fock representation). Proved by Tian's extension of Lieb's
 reflection-positivity method; recorded as a faithful documented \texttt{axiom}.
 
 \medskip
+\noindent\textbf{Discharge skeleton for Theorem 10.3 (Tasaki §10.2.4, p.~367).}
+The proof reuses the entire spin-space reflection-positivity (SRP) machinery of
+Theorem 10.2 and adds one new object. Write the unique ground state as
+$|\Phi_{\rm GS}\rangle = |\Gamma(W_{\rm GS})\rangle$ (the $|\Gamma(W)\rangle$
+representation of eq.~(10.2.33)) with $W_{\rm GS}$ \emph{positive definite}
+(Lemma 10.9 / Theorem 10.2, taking the positive branch WLOG). The new ingredient
+is the single-species pair-hopping transfer matrix $S^{x,y}$ on the balanced
+configuration space $\mathcal S=\{A\subset\Lambda:|A|=N/2\}$,
+\[
+  S^{x,y}_{A,B}=\langle\Phi_{\rm vac}|
+    \Bigl(\textstyle\prod_{z\in A}\hat c_{z,\sigma}\Bigr)
+    \hat c^\dagger_{x,\sigma}\hat c_{y,\sigma}
+    \Bigl(\textstyle\prod_{z\in B}\hat c^\dagger_{z,\sigma}\Bigr)
+  |\Phi_{\rm vac}\rangle
+  \qquad(\text{Tasaki eq.~(10.2.50)}),
+\]
+which is real, $\sigma$-independent, but (unlike $T_{A,B}$) \emph{not} symmetric
+in $A,B$. Anticommuting the two species,
+$\hat c^\dagger_{x\uparrow}\hat c^\dagger_{x\downarrow}
+\hat c_{y\downarrow}\hat c_{y\uparrow}
+=\hat c^\dagger_{x\uparrow}\hat c_{y\uparrow}\,
+\hat c^\dagger_{x\downarrow}\hat c_{y\downarrow}$, the matrix element factorizes
+as $\langle\Xi_{A'B'}|\cdots|\Xi_{AB}\rangle=S^{x,y}_{A',A}S^{x,y}_{B',B}$,
+giving the key identity (Tasaki eq.~(10.2.51))
+\[
+  \langle\Gamma(W)|\hat c^\dagger_{x\uparrow}\hat c^\dagger_{x\downarrow}
+    \hat c_{y\downarrow}\hat c_{y\uparrow}|\Gamma(W)\rangle
+  =\operatorname{Tr}\!\bigl[W\,S^{x,y}\,W\,(S^{x,y})^{\mathsf H}\bigr].
+\]
+Then $S^{x,y}W_{\rm GS}(S^{x,y})^{\mathsf H}$ is positive semidefinite (congruence
+preserves PSD) and nonvanishing (an $x{\leftarrow}y$ hop exists in the non-full
+sector), so the footnote-16 trace lemma (Tasaki p.~364: $M$ positive definite,
+$M'$ PSD and nonzero $\Rightarrow\operatorname{Tr}[MM']>0$, already available in
+Lean as \texttt{Matrix.PosDef.trace\_mul\_pos} from the Theorem 10.2 uniqueness
+step) yields
+$\operatorname{Tr}[W_{\rm GS}S^{x,y}W_{\rm GS}(S^{x,y})^{\mathsf H}]>0$; reality of
+$S^{x,y}$ with Hermitian $W_{\rm GS}$ makes the imaginary part vanish. The only
+new Lean work is $S^{x,y}$, the single-hop $\hat c^\dagger_{x,\sigma}\hat
+c_{y,\sigma}$ matrix element, and the factorization; the endgame is the existing
+trace lemma. (Design note:
+\texttt{.self-local/docs/theorem-10-3-tian-pair-correlation-discharge-design.md}.)
+
+\medskip
 \noindent\textbf{Spin-reflection-positivity foundation (PR1 toward discharging
 Theorem 10.2).} In file \texttt{LiebAttractiveReflection.lean} we build the
 finite-dimensional language in which Lieb's reflection-positivity proof is
