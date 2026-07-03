@@ -137,18 +137,30 @@ now covered. The appendix splits into two kinds of items:
 
 **Value judgment / policy.** The documented axioms above are kept as *faithful,
 book-order statements* — they record exactly what Tasaki proves — but they are
-**not active proof targets** of this project. The heavy functional-analytic and
-operator-algebraic results (states on the quasi-local C\*-algebra, weak-∗
+**not active proof targets** of this project. They fall into two categories:
+
+- **Operator-algebraic results** (Appendix A.21–A.28): the heavy functional-analytic and
+operator-algebraic structures (states on the quasi-local C\*-algebra, weak-∗
 compactness, ground states, GNS, Wigner) belong to a dedicated operator-algebra /
 functional-analysis development; such a development may well be carried out
 **separately** (for instance contributed to `mathlib`), and these axioms simply
-**wait for that implementation**. Accordingly the project's policy is to
-**axiomatize only the appendix results that Tasaki's formalized main development
-actually uses**, to **prove** the remaining ones where `mathlib` provides the
-tools, and otherwise to leave a faithful axiom in place rather than invest in a
-large bespoke operator-algebra build whose natural home is elsewhere. The
-`#print axioms` of every theorem in the repository makes the precise dependency
-on these documented axioms auditable.
+**wait for that implementation**.
+
+- **Perturbation-theoretic results** (e.g., **Lemma 10.1** (Tasaki §10.1, degenerate
+perturbation theory) and singular-perturbation arguments in Chapter 10): the analytic
+proofs of weak-coupling continuation and adiabatic following for eigenstate families
+are **not undertaken** as an active project goal; such techniques naturally belong to
+a separate analytic-perturbation development. Results whose only missing link is a
+perturbation-theoretic proof — such as the total-spin values in Lieb's repulsive-Hubbard
+theorem (Theorem 10.4) — are recorded as documented axioms while their companion
+finite-coupling combinatorial bounds are proved axiom-free.
+
+Accordingly the project's policy is to **axiomatize only the appendix and
+perturbation-theory results that Tasaki's formalized main development actually uses**,
+to **prove** the remaining ones where `mathlib` provides the tools, and otherwise to
+leave a faithful axiom in place rather than invest in large bespoke developments whose
+natural home is elsewhere. The `#print axioms` of every theorem in the repository makes
+the precise dependency on these documented axioms auditable.
 
 ## Formalized theorems
 
@@ -2937,7 +2949,7 @@ fermion mode acting on `ℂ²` with computational basis
 | `hoppingSupportGraph` / `hubbardOnSiteInteractionSite` / `attractiveHubbardInteraction` / `attractiveHubbardHamiltonian` | the attractive Hubbard model `Ĥ = Ĥhop + Ĥatt-int` (eqs. (10.2.1)/(10.2.2)): general real symmetric hopping `T` (via `hubbardKinetic`) + site-dependent attraction `−Σ_x U_x n̂_{x,↑} n̂_{x,↓}`; the support graph encodes the connectivity hypothesis | `Fermion/JordanWigner/Hubbard/LiebAttractive.lean` |
 | `electronNumberSectorEuclidean` / `hubbardPairCorrelationOp` / `euclideanExpectation` | the `N`-electron sector (number eigenspace), the pair-transfer operator `ĉ†_{x↑}ĉ†_{x↓}ĉ_{y↓}ĉ_{y↑}`, and Euclidean expectation values | `Fermion/JordanWigner/Hubbard/LiebAttractive.lean` |
 | `theorem_10_2_lieb_attractive_unique_singlet` | **Theorem 10.2** (Tasaki §10.2.1, p. 348, **PROVED**, axiom-free): for an even electron number `N` with `0 < N ≤ 2\|Λ\|`, connected real symmetric hopping, and site-dependent attraction `U_x > 0`, the ground state of `Ĥ` in the `N`-electron sector is unique and a spin singlet (`(Ŝ_tot)² = 0`). Discharged from the plain-space full-sector singlet-uniqueness milestone via Lieb's spin-space reflection positivity on the balanced block lifted through the SU(2) multiplet engine; assembled into the Euclidean `IsUniqueGroundStateOn` predicate. | `Fermion/JordanWigner/Hubbard/LiebAttractiveTheorem102.lean` |
-| `theorem_10_3_tian_pair_correlation_positive` | **Theorem 10.3** (Tian; Tasaki §10.2.1, p. 349, eq. (10.2.4), **AXIOM**): under the Theorem 10.2 hypotheses (with the non-full guard `N < 2\|Λ\|`), the unique ground state has strictly positive on-site pair-transfer correlation `⟨ΦGS\| ĉ†_{x↑}ĉ†_{x↓}ĉ_{y↓}ĉ_{y↑} \|ΦGS⟩ > 0` for all `x, y` (off-diagonal long-range order). Reflection positivity (Tian's extension) → faithful documented axiom. | `Fermion/JordanWigner/Hubbard/LiebAttractive.lean` |
+| `theorem_10_3_tian_pair_correlation_positive` | **Theorem 10.3** (Tian; Tasaki §10.2.1–§10.2.4, p. 349, eq. (10.2.4) + p. 367, eqs. (10.2.50)/(10.2.51), **PROVED**, axiom-free, PR #4949): under the Theorem 10.2 hypotheses (with the non-full guard `N < 2\|Λ\|`), the unique ground state of the attractive Hubbard model has strictly positive on-site pair-transfer correlation `⟨ΦGS\| ĉ†_{x↑}ĉ†_{x↓}ĉ_{y↓}ĉ_{y↑} \|ΦGS⟩ > 0` for all `x, y` (off-diagonal long-range order / pair condensation). Tian's extension of Lieb's reflection positivity → the pair-hopping transfer matrix `S` on the balanced-sector configuration space factorizes the matrix element through the sector compression (`hubbardCountSectorEmbedding`), yielding `⟨φ| P |φ⟩ = Tr(W·S·W·Sᴴ)` with `W = blockWCoeff φ` the unique ground's coefficient matrix (Euclidean `IsUniqueGroundStateOn` lifted from Theorem 10.2); the balanced compression `S_c = Jᴴ·S·J` is nonzero (`hubbardCountSectorEmbedding_pairFixed_compress_ne_zero`), and with `W = c⁻¹·W_bal` (collinearity via uniqueness) where `W_bal = J·R·Jᴴ` and `R` is positive definite (`exists_posDefCompress_ground_in_balanced_sector`), the trace reduces to `|c⁻¹|²·Tr(R·(S_cᴴ·R·S_c))`, which is strictly positive by the positive-definite/positive-semidefinite trace lemma (`trace_mul_posSemidef_pos`). With symmetric `T`, `U(x) > 0`, kinetic-graph connectivity. | `Fermion/JordanWigner/Hubbard/LiebAttractiveTheorem103.lean` |
 
 #### Spin-reflection-positivity foundation for Lieb's theorem (Tasaki §10.2.1, PR1 toward discharging Theorem 10.2)
 

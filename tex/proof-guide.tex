@@ -5398,7 +5398,51 @@ $x, y \in \Lambda$, a measure of off-diagonal long-range order
 $0 < N \le 2|\Lambda|$; the Lean statement uses the non-full guard
 $N < 2|\Lambda|$ (the fully-filled endpoint makes off-site pair transfer vanish in
 the concrete Fock representation). Proved by Tian's extension of Lieb's
-reflection-positivity method; recorded as a faithful documented \texttt{axiom}.
+reflection-positivity method; now a \emph{proved theorem}, discharged axiom-free
+(\texttt{LiebAttractiveTheorem103.lean}; \#print axioms clean).
+
+\medskip
+\noindent\textbf{Discharge skeleton for Theorem 10.3 (Tasaki §10.2.4, p.~367).}
+The proof reuses the entire spin-space reflection-positivity (SRP) machinery of
+Theorem 10.2 and adds one new object. Write the unique ground state as
+$|\Phi_{\rm GS}\rangle = |\Gamma(W_{\rm GS})\rangle$ (the $|\Gamma(W)\rangle$
+representation of eq.~(10.2.33)) with $W_{\rm GS}$ \emph{positive definite}
+(Lemma 10.9 / Theorem 10.2, taking the positive branch WLOG). The new ingredient
+is the single-species pair-hopping transfer matrix $S^{x,y}$ on the balanced
+configuration space $\mathcal S=\{A\subset\Lambda:|A|=N/2\}$,
+\[
+  S^{x,y}_{A,B}=\langle\Phi_{\rm vac}|
+    \Bigl(\textstyle\prod_{z\in A}\hat c_{z,\sigma}\Bigr)
+    \hat c^\dagger_{x,\sigma}\hat c_{y,\sigma}
+    \Bigl(\textstyle\prod_{z\in B}\hat c^\dagger_{z,\sigma}\Bigr)
+  |\Phi_{\rm vac}\rangle
+  \qquad(\text{Tasaki eq.~(10.2.50)}),
+\]
+which is real, $\sigma$-independent, but (unlike $T_{A,B}$) \emph{not} symmetric
+in $A,B$. Anticommuting the two species,
+$\hat c^\dagger_{x\uparrow}\hat c^\dagger_{x\downarrow}
+\hat c_{y\downarrow}\hat c_{y\uparrow}
+=\hat c^\dagger_{x\uparrow}\hat c_{y\uparrow}\,
+\hat c^\dagger_{x\downarrow}\hat c_{y\downarrow}$, the matrix element factorizes
+as $\langle\Xi_{A'B'}|\cdots|\Xi_{AB}\rangle=S^{x,y}_{A',A}S^{x,y}_{B',B}$,
+giving the key identity (Tasaki eq.~(10.2.51))
+\[
+  \langle\Gamma(W)|\hat c^\dagger_{x\uparrow}\hat c^\dagger_{x\downarrow}
+    \hat c_{y\downarrow}\hat c_{y\uparrow}|\Gamma(W)\rangle
+  =\operatorname{Tr}\!\bigl[W\,S^{x,y}\,W\,(S^{x,y})^{\mathsf H}\bigr].
+\]
+Then $S^{x,y}W_{\rm GS}(S^{x,y})^{\mathsf H}$ is positive semidefinite (congruence
+preserves PSD) and nonvanishing (an $x{\leftarrow}y$ hop exists in the non-full
+sector), so the footnote-16 trace lemma (Tasaki p.~364: $M$ positive definite,
+$M'$ PSD and nonzero $\Rightarrow\operatorname{Tr}[MM']>0$, in Lean the
+PSD-factor extension \texttt{Matrix.PosDef.trace\_mul\_posSemidef\_pos} of the
+Theorem 10.2 uniqueness step's \texttt{Matrix.PosDef.trace\_mul\_pos}) yields
+$\operatorname{Tr}[W_{\rm GS}S^{x,y}W_{\rm GS}(S^{x,y})^{\mathsf H}]>0$; reality of
+$S^{x,y}$ with Hermitian $W_{\rm GS}$ makes the imaginary part vanish. The only
+new Lean work is $S^{x,y}$, the single-hop $\hat c^\dagger_{x,\sigma}\hat
+c_{y,\sigma}$ matrix element, and the factorization; the endgame is the existing
+trace lemma. (Design note:
+\texttt{.self-local/docs/theorem-10-3-tian-pair-correlation-discharge-design.md}.)
 
 \medskip
 \noindent\textbf{Spin-reflection-positivity foundation (PR1 toward discharging
@@ -11608,13 +11652,19 @@ the spectral mapping, the strong-coupling effective Hamiltonian A.12, the
 simultaneous-diagonalization step of A.17, Perron--Frobenius for a real symmetric matrix A.18, and
 the polar / singular-value decompositions A.19/A.20).  The remaining items---the operator-algebraic
 A.21--A.28 (Wigner, states, Banach--Alaoglu, ground states, GNS)---are recorded as faithful
-documented axioms.  These
-axioms are \emph{not} active proof targets here: the heavy functional-analytic and operator-algebraic
-theory has its natural home in a dedicated operator-algebra development (possibly contributed to
-\texttt{mathlib}), and the axioms wait for that implementation.  The project's policy is to
-axiomatize only the appendix results that Tasaki's formalized main text actually uses, to prove the
-rest where \texttt{mathlib} allows, and otherwise to keep a faithful book-order axiom; every
-theorem's \texttt{\#print axioms} keeps the dependency on these axioms auditable.
+documented axioms.
+
+These axioms are \emph{not} active proof targets here, and the project similarly records
+perturbation-theoretic results as documented axioms (e.g., degenerate perturbation theory,
+Lemma 10.1 (Tasaki \S10.1), and singular-perturbation arguments in Chapter 10): the analytic
+proofs of weak-coupling continuation and adiabatic following for eigenstate families belong to
+a separate analytic-perturbation development.  The heavy functional-analytic, operator-algebraic,
+and perturbation-theoretic theory has its natural home in dedicated developments (possibly
+contributed to \texttt{mathlib}), and the axioms wait for that implementation.  The project's
+policy is to axiomatize only the appendix and perturbation-theory results that Tasaki's formalized
+main text actually uses, to prove the rest where \texttt{mathlib} allows, and otherwise to keep a
+faithful book-order axiom; every theorem's \texttt{\#print axioms} keeps the dependency on these
+axioms auditable.
 
 \section{Open items / TODO and axioms}
 \label{sec:open-items}
