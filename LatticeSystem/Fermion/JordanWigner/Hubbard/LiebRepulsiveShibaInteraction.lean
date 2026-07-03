@@ -39,6 +39,8 @@ also fix the kinetic term.  This file supplies the sign-independent core.
   the Shiba flip.
 * `shibaPermMatrix_conj_symmetricInteraction` — `P·Ĥint'·P = −Ĥint'`
   (Tasaki eq. (9.3.54), interaction part).
+* `shibaSignedUnitary_conjTranspose_mul_self` — `Ûᴴ·Û = 1` (unitarity).
+* `shibaSignedUnitary_self_mul_conjTranspose` — `Û·Ûᴴ = 1` (unitarity).
 * `shibaSignedUnitary_conj_symmetricInteraction` — `Ûᴴ·Ĥint'·Û = −Ĥint'`
   (Tasaki eq. (9.3.54), interaction part, sign-dressed form).
 
@@ -174,6 +176,38 @@ theorem shibaSignedUnitary_conjTranspose (s : (Fin (2 * N + 2) → Fin 2) → �
       = shibaPermMatrix N * Matrix.diagonal (star s) := by
   rw [shibaSignedUnitary, Matrix.conjTranspose_mul, Matrix.diagonal_conjTranspose,
     shibaPermMatrix_isHermitian.eq]
+
+/-- **The sign-dressed Shiba unitary is unitary** when `s` has modulus one
+(`s̄·s = 1`): `Ûᴴ·Û = 1` (Tasaki eq. (9.3.50)).  The signs cancel
+(`diagonal (s̄)·diagonal s = 1`) and the permutation part squares to the identity. -/
+theorem shibaSignedUnitary_conjTranspose_mul_self
+    (s : (Fin (2 * N + 2) → Fin 2) → ℂ) (hs : ∀ c, star (s c) * s c = 1) :
+    Matrix.conjTranspose (shibaSignedUnitary N s) * shibaSignedUnitary N s = 1 := by
+  rw [shibaSignedUnitary_conjTranspose, shibaSignedUnitary,
+    show shibaPermMatrix N * Matrix.diagonal (star s) * (Matrix.diagonal s * shibaPermMatrix N)
+        = shibaPermMatrix N * (Matrix.diagonal (star s) * Matrix.diagonal s) * shibaPermMatrix N
+      from by simp only [Matrix.mul_assoc],
+    diagonal_mul_diagonal,
+    show (fun c => (star s) c * s c) = (fun _ => (1 : ℂ)) from by
+      funext c; simp only [Pi.star_apply]; exact hs c,
+    diagonal_one, Matrix.mul_one, shibaPermMatrix_mul_self]
+
+/-- **The sign-dressed Shiba unitary is unitary on the other side** when `s` has
+modulus one (`s̄·s = 1`): `Û·Ûᴴ = 1` (Tasaki eq. (9.3.50)).  Symmetric to
+`shibaSignedUnitary_conjTranspose_mul_self`: the permutation part squares to the
+identity and the signs `s·s̄ = 1` cancel. -/
+theorem shibaSignedUnitary_self_mul_conjTranspose
+    (s : (Fin (2 * N + 2) → Fin 2) → ℂ) (hs : ∀ c, star (s c) * s c = 1) :
+    shibaSignedUnitary N s * Matrix.conjTranspose (shibaSignedUnitary N s) = 1 := by
+  rw [shibaSignedUnitary_conjTranspose, shibaSignedUnitary,
+    show Matrix.diagonal s * shibaPermMatrix N * (shibaPermMatrix N * Matrix.diagonal (star s))
+        = Matrix.diagonal s * (shibaPermMatrix N * shibaPermMatrix N) * Matrix.diagonal (star s)
+      from by simp only [Matrix.mul_assoc],
+    shibaPermMatrix_mul_self, Matrix.mul_one, diagonal_mul_diagonal,
+    show (fun c => s c * (star s) c) = (fun _ => (1 : ℂ)) from by
+      funext c; simp only [Pi.star_apply]
+      rw [mul_comm]; exact hs c,
+    diagonal_one]
 
 /-- **The sign-dressed Shiba unitary flips the sign of the symmetric interaction**
 (Tasaki eq. (9.3.54), interaction part, p. 336): `Ûᴴ·Ĥint'·Û = −Ĥint'`.  The

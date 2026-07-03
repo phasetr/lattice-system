@@ -34,6 +34,7 @@ space rather than the single-species one.
 ## Main results
 
 * `shibaPermMatrix_apply` — entrywise formula.
+* `shibaPermMatrix_mul_self` — `P·P = 1`.
 * `shibaPermMatrix_isHermitian` — `Pᴴ = P`.
 * `shibaPermMatrix_conj_diagonal` — `P·diagonal d·P = diagonal (d ∘ shibaConfig)`.
 
@@ -63,6 +64,17 @@ theorem shibaPermMatrix_apply (i j : Fin (2 * N + 2) → Fin 2) :
     shibaPermMatrix N i j = if shibaConfig N i = j then 1 else 0 := by
   simp only [shibaPermMatrix, PEquiv.toMatrix_apply, Equiv.toPEquiv_apply,
     Option.mem_some_iff, eq_comm, shibaConfigEquiv_apply]
+
+/-- The Shiba permutation matrix is an involution: `P·P = 1`.  Since `P` is the
+permutation matrix of the involution `shibaConfig`, squaring it reindexes by
+`shibaConfig ∘ shibaConfig = id`. -/
+theorem shibaPermMatrix_mul_self :
+    shibaPermMatrix N * shibaPermMatrix N = 1 := by
+  funext i j
+  rw [Matrix.mul_apply]
+  simp only [shibaPermMatrix_apply, ite_mul, one_mul, zero_mul,
+    Finset.sum_ite_eq, Finset.mem_univ, if_true]
+  rw [shibaConfig_shibaConfig, Matrix.one_apply]
 
 /-- The Shiba permutation matrix is Hermitian: `Pᴴ = P`. -/
 theorem shibaPermMatrix_isHermitian :
