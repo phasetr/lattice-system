@@ -843,4 +843,70 @@ private theorem shibaSignedUnitary_conj_downHop (A : Finset (Fin (N + 1)))
   · rw [if_neg (fun hc => hcond (hcondσ_iff.mp hc)), if_neg hcond, smul_zero,
       Matrix.mulVec_zero, smul_zero]
 
+/-! ### The kinetic term is Shiba-invariant (Tasaki eq. (9.3.52)) -/
+
+/-- **The Shiba transformation leaves the kinetic term invariant** (Tasaki
+eq. (9.3.52), p. 336): for a bipartite real symmetric hopping `T`,
+`Ûᴴ Ĥhop Û = Ĥhop`.  The up hops are fixed (`shibaSignedUnitary_conj_upHop`); the
+down hops reverse with a sign `−ε_p ε_q` (`shibaSignedUnitary_conj_downHop`), and
+summing over the symmetric hopping — where the diagonal `T_{xx} = 0` (bipartite) and
+each bond contributes `−ε_p ε_q = +1` (`gaugeSign_mul_of_bipartite`) — reconstitutes
+the down kinetic term after relabelling `p ↔ q` (`T_{pq} = T_{qp}`). -/
+theorem shibaSignedUnitary_conj_symmetricKinetic {A : Finset (Fin (N + 1))}
+    {T : Matrix (Fin (N + 1)) (Fin (N + 1)) ℝ} (hsymm : ∀ x y, T x y = T y x)
+    (hbip : HoppingRespectsBipartition A T) :
+    Matrix.conjTranspose (shibaSignedUnitary N (shibaSignFn A))
+        * hubbardKinetic N (fun x y => (T x y : ℂ))
+        * shibaSignedUnitary N (shibaSignFn A)
+      = hubbardKinetic N (fun x y => (T x y : ℂ)) := by
+  rw [hubbardKinetic, Finset.mul_sum, Finset.sum_mul, Fin.sum_univ_two, Fin.sum_univ_two]
+  congr 1
+  · -- up hops are fixed
+    rw [Finset.mul_sum, Finset.sum_mul]
+    refine Finset.sum_congr rfl (fun i _ => ?_)
+    rw [Finset.mul_sum, Finset.sum_mul]
+    refine Finset.sum_congr rfl (fun j _ => ?_)
+    rw [mul_smul_comm, smul_mul_assoc, shibaSignedUnitary_conj_upHop]
+  · -- down hops reverse with the sublattice gauge; the sum reconstitutes the down term
+    rw [Finset.mul_sum, Finset.sum_mul]
+    have hpushj : ∀ i : Fin (N + 1),
+        Matrix.conjTranspose (shibaSignedUnitary N (shibaSignFn A))
+            * (∑ j : Fin (N + 1), (T i j : ℂ) •
+              (fermionMultiCreation (2 * N + 1) (spinfulIndex N i 1)
+                * fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j 1)))
+            * shibaSignedUnitary N (shibaSignFn A)
+          = ∑ j : Fin (N + 1), (T i j : ℂ) •
+              (Matrix.conjTranspose (shibaSignedUnitary N (shibaSignFn A))
+                * (fermionMultiCreation (2 * N + 1) (spinfulIndex N i 1)
+                  * fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j 1))
+                * shibaSignedUnitary N (shibaSignFn A)) := by
+      intro i
+      rw [Finset.mul_sum, Finset.sum_mul]
+      refine Finset.sum_congr rfl (fun j _ => ?_)
+      rw [mul_smul_comm, smul_mul_assoc]
+    rw [Finset.sum_congr rfl (fun i _ => hpushj i)]
+    have hterm : ∀ i j : Fin (N + 1),
+        (T i j : ℂ) • (Matrix.conjTranspose (shibaSignedUnitary N (shibaSignFn A))
+            * (fermionMultiCreation (2 * N + 1) (spinfulIndex N i 1)
+              * fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N j 1))
+            * shibaSignedUnitary N (shibaSignFn A))
+          = (T i j : ℂ) • (fermionMultiCreation (2 * N + 1) (spinfulIndex N j 1)
+            * fermionMultiAnnihilation (2 * N + 1) (spinfulIndex N i 1)) := by
+      intro i j
+      by_cases hij : i = j
+      · subst hij
+        have htii : T i i = 0 := by
+          by_contra h; exact iff_not_self (hbip h)
+        rw [htii]; simp
+      · rw [shibaSignedUnitary_conj_downHop A i j hij, smul_smul]
+        by_cases hT : T i j = 0
+        · rw [hT]; simp
+        · have hgauge := gaugeSign_mul_of_bipartite hbip hT
+          rw [show (T i j : ℂ) * (- gaugeSign A i * gaugeSign A j) = (T i j : ℂ) from by
+            rw [neg_mul, hgauge]; ring]
+    rw [Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => hterm i j)),
+      Finset.sum_comm]
+    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
+    rw [hsymm j i]
+
 end LatticeSystem.Fermion
