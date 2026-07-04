@@ -9941,7 +9941,10 @@ of the symmetry-breaking states recovers the ground state.  For a unit vector $n
 (\texttt{directionTanakaState}, eq.~(4.2.17)); by $SU(2)$ covariance the solid-angle average
 $\frac1{4\pi}\int_{|n|=1}|\Xi_n\rangle\,dn$ (\texttt{solidAngleAverageTanaka}, the Bochner integral
 over \texttt{Metric.sphere} in $\texttt{EuclideanSpace}\ \mathbb{R}\ (\mathrm{Fin}\ 3)$ with surface
-measure \texttt{volume.toSphere}) is $SU(2)$ invariant.  \emph{Assuming Conjecture~4.12}
+measure \texttt{volume.toSphere}) is $SU(2)$ invariant.  The realizing ground-state family $\Phi$ is
+conditioned (matching \texttt{IsTanakaFullSSBConstants}) to be a total-spin singlet $\hat
+S^{(3)}_{\mathrm{tot}}\Phi=\hat S^{(1)}_{\mathrm{tot}}\Phi=0$ that is axis-1 reversal invariant
+$\Theta\Phi=\Phi$, so the linked full-SSB premise is non-vacuous.  \emph{Assuming Conjecture~4.12}
 ($m^\ast=\sqrt{3q^\ast}$, \texttt{IsConjecture412Equality}, a \texttt{Prop} hypothesis never asserted
 true), the normalized average converges up to a unimodular phase to $|\Phi_{\mathrm{GS}}\rangle$
 (eq.~(4.2.22)): $\exists z,\ \lVert z\rVert=1,\ \lVert\mathrm{unitNormalize}(\Xi_{\mathrm{avg}})-z\cdot
@@ -9974,8 +9977,10 @@ axiom-free \texttt{Prop} statement, \texttt{Quantum/SpinS/AndersonTowerSphereAve
 $m^\ast=\sqrt{3q^\ast}$ (where $q^\ast=\lim_L\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(\alpha)}/L^d)^2
 |\Phi_{\mathrm{GS}}\rangle$, eq.~(4.2.25)).  Being \emph{unproven}, it is registered as
 \texttt{def conjecture\_4\_12 (d N) : Prop} --- the statement quantified over a realizing ground-state
-family (with LRO limit $q^\ast$ and SSB order parameter $m^\ast$ via \texttt{IsTanakaFullSSBConstants})
---- and is \textbf{never asserted true} (no \texttt{axiom}/\texttt{theorem} derives it, which would be
+family (a total-spin singlet $\hat S^{(3)}_{\mathrm{tot}}\Phi=\hat S^{(1)}_{\mathrm{tot}}\Phi=0$ with
+axis-1 reversal invariance $\Theta\Phi=\Phi$, matching \texttt{IsTanakaFullSSBConstants}; LRO limit
+$q^\ast$ and SSB order parameter $m^\ast$ via \texttt{IsTanakaFullSSBConstants}) --- and is
+\textbf{never asserted true} (no \texttt{axiom}/\texttt{theorem} derives it, which would be
 unsound).  Chapters~3--10 backfill.
 
 \noindent\textbf{Theorem 4.13} (Tasaki §4.2.1, eqs.~(4.2.27)--(4.2.28), pp.~102--103; documented
