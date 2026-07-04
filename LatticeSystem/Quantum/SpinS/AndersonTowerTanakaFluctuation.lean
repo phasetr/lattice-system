@@ -5,7 +5,7 @@ transverse fluctuation decay (4.2.15), `lim_{L↑∞} ⟨Ξ| (Ô_L^{(2)}/L^d)² 
 The mechanism (Tasaki eqs. (4.2.49)–(4.2.55), pp. 106–108).  Write `Ã := ô⁺ + ô⁻` (so
 `Ô_L^{(1)} = (V/2) Ã`, `V = L^d`) and `P_k := ⟨Φ, p̂^k Φ⟩` (`phatMoment`).  The per-site transverse
 fluctuation of the tower term `u_k` is
-`δ_k := ⟨u_k| (ô^{(2)})² |u_k⟩ = ⟨tt_k, (Ô^{(2)})² tt_k⟩ / (B_k V²)` with `B_k = ‖(Ô_L^{(1)})^k Φ‖²`.
+`δ_k := ⟨u_k| (ô^{(2)})² |u_k⟩ = ⟨tt_k, (Ô^{(2)})² tt_k⟩ / (B_k V²)`, `B_k = ‖(Ô_L^{(1)})^k Φ‖²`.
 Since `(Ô^{(2)})² = V² p̂ − (Ô^{(1)})²` (`staggeredPhatS_eq_cartesian_sq`), `δ_k = Q_k − R_k` with
 `Q_k = ⟨tt_k, p̂ tt_k⟩ / B_k = E_k / D_k` and `R_k = B_{k+1}/(B_k V²) = D_{k+1}/(4 D_k)`, where
 `D_k := ⟨Φ, Ã^{2k} Φ⟩` and `E_k := ⟨Φ, Ã^k p̂ Ã^k Φ⟩`.
@@ -427,5 +427,462 @@ theorem orderSum_pow_phat_insert_close (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
     show |(1 : ℝ) / 2| = 1 / 2 from by norm_num]
   refine le_trans (mul_le_mul_of_nonneg_left (abs_add_le _ _) (by norm_num)) ?_
   linarith [hbtf, hbft]
+
+/-! ### [F4] `Ô^{(2)}`-infrastructure: Hermiticity and parity commutation of `(Ô^{(2)})²` -/
+
+/-- **The `2`-axis staggered order operator is Hermitian** (mirror of
+`staggeredOrderOp1S_isHermitian`, using `spinSOp2_isHermitian`). -/
+theorem staggeredOrderOp2S_isHermitian {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (A : Λ → Bool) (N : ℕ) : (staggeredOrderOp2S A N).IsHermitian := by
+  refine Matrix.isHermitian_sum Finset.univ (fun x _ => ?_)
+  refine Matrix.IsHermitian.smul ?_ ?_
+  · exact onSiteS_isHermitian x (spinSOp2_isHermitian N)
+  · by_cases h : A x
+    · simp [h, IsSelfAdjoint, star_one]
+    · simp [h, IsSelfAdjoint]
+
+/-- `Ô^{(2)} = (2i)⁻¹(Ô⁺ − Ô⁻)` (Cartesian decomposition, real parts cancel). -/
+private theorem staggeredOrderOp2S_eq_smul {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    (A : Λ → Bool) (N : ℕ) :
+    staggeredOrderOp2S A N
+      = (2 * Complex.I)⁻¹ • (staggeredRaisingOpS A N - staggeredLoweringOpS A N) := by
+  have h : staggeredRaisingOpS A N - staggeredLoweringOpS A N
+      = (2 * Complex.I) • staggeredOrderOp2S A N := by
+    rw [staggeredRaisingOpS_eq_cartesian, staggeredLoweringOpS_eq_cartesian]; module
+  rw [h, smul_smul, inv_mul_cancel₀ (mul_ne_zero two_ne_zero Complex.I_ne_zero), one_smul]
+
+/-- `Û Ô^{(2)} = -Ô^{(2)} Û`: the parity operator anticommutes with the `2`-axis order operator
+(both raising and lowering flip sign under `Û`, so does their difference `2i Ô^{(2)}`). -/
+private theorem diagonal_magParitySignS_mul_staggeredOrderOp2S {Λ : Type*} [Fintype Λ]
+    [DecidableEq Λ] {N : ℕ} (A : Λ → Bool) :
+    Matrix.diagonal (magParitySignS (Λ := Λ) (N := N)) * staggeredOrderOp2S A N
+      = -(staggeredOrderOp2S A N * Matrix.diagonal (magParitySignS (Λ := Λ) (N := N))) := by
+  have key : Matrix.diagonal (magParitySignS (Λ := Λ) (N := N))
+        * (staggeredRaisingOpS A N - staggeredLoweringOpS A N)
+      = -((staggeredRaisingOpS A N - staggeredLoweringOpS A N)
+        * Matrix.diagonal (magParitySignS (Λ := Λ) (N := N))) := by
+    rw [Matrix.mul_sub, Matrix.sub_mul, diagonal_magParitySignS_mul_staggeredRaisingOpS,
+      diagonal_magParitySignS_mul_staggeredLoweringOpS]
+    abel
+  rw [staggeredOrderOp2S_eq_smul, mul_smul_comm, key, smul_neg, smul_mul_assoc]
+
+/-- **`(Ô^{(2)})²` commutes with the parity operator** `Û = diag(magParitySignS)` (two
+anticommutations), the `2`-axis analogue of `staggeredOrderOp1S_sq_comm_diagonal_magParitySignS`. -/
+private theorem staggeredOrderOp2S_sq_comm_diagonal_magParitySignS {Λ : Type*} [Fintype Λ]
+    [DecidableEq Λ] {N : ℕ} (A : Λ → Bool) :
+    (staggeredOrderOp2S A N * staggeredOrderOp2S A N)
+        * Matrix.diagonal (magParitySignS (Λ := Λ) (N := N))
+      = Matrix.diagonal (magParitySignS (Λ := Λ) (N := N))
+        * (staggeredOrderOp2S A N * staggeredOrderOp2S A N) := by
+  have hDH := diagonal_magParitySignS_mul_staggeredOrderOp2S (Λ := Λ) (N := N) A
+  set H := staggeredOrderOp2S A N
+  set D := Matrix.diagonal (magParitySignS (Λ := Λ) (N := N))
+  have hHD : H * D = -(D * H) := by rw [hDH]; exact (neg_neg _).symm
+  calc H * H * D = H * (H * D) := mul_assoc H H D
+    _ = H * -(D * H) := by rw [hHD]
+    _ = -(H * (D * H)) := by rw [mul_neg]
+    _ = -(H * D * H) := by rw [mul_assoc]
+    _ = -(-(D * H) * H) := by rw [hHD]
+    _ = D * H * H := by rw [neg_mul]; exact neg_neg _
+    _ = D * (H * H) := mul_assoc D H H
+
+/-- **`(Ô^{(2)})²` diagonal element**: `⟨û_j, (Ô^{(2)})² û_j⟩.re = ⟨tt_j, (Ô^{(2)})² tt_j⟩.re / B_j`
+for `B_j = ‖tt_j‖² > 0` (the unit normalization contributes `B_j⁻¹`). -/
+private theorem staggeredOrderOp2Ssq_unitNormalize_diag {Λ : Type*} [Fintype Λ] [DecidableEq Λ]
+    {N : ℕ} (A : Λ → Bool) (j : ℕ) {Φ : (Λ → Fin (N + 1)) → ℂ}
+    (hj : 0 < vecNormSqRe (tanakaTowerTerm A N j Φ)) :
+    (star (unitNormalize (tanakaTowerTerm A N j Φ))
+        ⬝ᵥ (staggeredOrderOp2S A N * staggeredOrderOp2S A N).mulVec
+          (unitNormalize (tanakaTowerTerm A N j Φ))).re
+      = (star (tanakaTowerTerm A N j Φ)
+          ⬝ᵥ (staggeredOrderOp2S A N * staggeredOrderOp2S A N).mulVec
+            (tanakaTowerTerm A N j Φ)).re / vecNormSqRe (tanakaTowerTerm A N j Φ) := by
+  simp only [unitNormalize]
+  rw [star_smul_dotProduct_mulVec_smul]
+  have hc : star (((Real.sqrt (vecNormSqRe (tanakaTowerTerm A N j Φ)) : ℝ) : ℂ)⁻¹)
+        * ((Real.sqrt (vecNormSqRe (tanakaTowerTerm A N j Φ)) : ℝ) : ℂ)⁻¹
+      = (((vecNormSqRe (tanakaTowerTerm A N j Φ))⁻¹ : ℝ) : ℂ) := by
+    rw [Complex.star_def, map_inv₀, Complex.conj_ofReal, ← mul_inv, ← Complex.ofReal_mul,
+      Real.mul_self_sqrt hj.le, ← Complex.ofReal_inv]
+  rw [hc, Complex.re_ofReal_mul, mul_comm, ← div_eq_mul_inv]
+
+/-! ### [F4] `second2` decomposition into the two transverse fluctuations `δ_M`, `δ_{M+1}` -/
+
+/-- **[F4] `second2` sandwich decomposition (eq. (4.2.49)).**  The axis-2 squared per-site moment of
+the Tanaka state decomposes into the average of the two diagonal transverse fluctuations
+`δ_k = ⟨tt_k, (Ô^{(2)})² tt_k⟩ / (B_k V²)`: `second2 = ½(δ_M + δ_{M+1})`.  The squared order
+operator is Hermitian and conserves parity, so the cross term vanishes
+(`tanakaTowerTerm_cross_charge_conserving_eq_zero`); the diagonal terms are the normalized
+fluctuations. -/
+theorem tanakaOrderSecond2_eq_half_sum (d L N M : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing3 : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0)
+    (hBM : 0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N M Φ))
+    (hBM1 : 0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M + 1) Φ)) :
+    tanakaOrderSecond2 d L N M Φ
+      = 1 / 2 * ((star (tanakaTowerTerm (torusParitySublattice d L) N M Φ)
+            ⬝ᵥ (staggeredOrderOp2S (torusParitySublattice d L) N
+              * staggeredOrderOp2S (torusParitySublattice d L) N).mulVec
+              (tanakaTowerTerm (torusParitySublattice d L) N M Φ)).re
+            / vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N M Φ)
+          + (star (tanakaTowerTerm (torusParitySublattice d L) N (M + 1) Φ)
+            ⬝ᵥ (staggeredOrderOp2S (torusParitySublattice d L) N
+              * staggeredOrderOp2S (torusParitySublattice d L) N).mulVec
+              (tanakaTowerTerm (torusParitySublattice d L) N (M + 1) Φ)).re
+            / vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M + 1) Φ))
+        / ((L : ℝ) ^ d) ^ 2 := by
+  have hHHh : (staggeredOrderOp2S (torusParitySublattice d L) N
+      * staggeredOrderOp2S (torusParitySublattice d L) N).IsHermitian :=
+    (staggeredOrderOp2S_isHermitian _ _).mul_of_commute (staggeredOrderOp2S_isHermitian _ _) rfl
+  have hden : vecNormSqRe (tanakaSSBState (torusParitySublattice d L) N M Φ) = 1 :=
+    tanakaSSBState_vecNormSqRe_eq_one _ M hsing3 hBM hBM1
+  have hcross0 : star (unitNormalize (tanakaTowerTerm (torusParitySublattice d L) N M Φ))
+      ⬝ᵥ (staggeredOrderOp2S (torusParitySublattice d L) N
+        * staggeredOrderOp2S (torusParitySublattice d L) N).mulVec
+        (unitNormalize (tanakaTowerTerm (torusParitySublattice d L) N (M + 1) Φ)) = 0 := by
+    simp only [unitNormalize]
+    rw [star_smul_dotProduct_mulVec_smul,
+      tanakaTowerTerm_cross_charge_conserving_eq_zero (torusParitySublattice d L) _ M hsing3
+        (staggeredOrderOp2S_sq_comm_diagonal_magParitySignS (torusParitySublattice d L)),
+      mul_zero]
+  have hnum : (star (tanakaSSBState (torusParitySublattice d L) N M Φ)
+      ⬝ᵥ (staggeredOrderOp2S (torusParitySublattice d L) N
+        * staggeredOrderOp2S (torusParitySublattice d L) N).mulVec
+        (tanakaSSBState (torusParitySublattice d L) N M Φ)).re
+      = 1 / 2 * ((star (tanakaTowerTerm (torusParitySublattice d L) N M Φ)
+            ⬝ᵥ (staggeredOrderOp2S (torusParitySublattice d L) N
+              * staggeredOrderOp2S (torusParitySublattice d L) N).mulVec
+              (tanakaTowerTerm (torusParitySublattice d L) N M Φ)).re
+            / vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N M Φ)
+          + (star (tanakaTowerTerm (torusParitySublattice d L) N (M + 1) Φ)
+            ⬝ᵥ (staggeredOrderOp2S (torusParitySublattice d L) N
+              * staggeredOrderOp2S (torusParitySublattice d L) N).mulVec
+              (tanakaTowerTerm (torusParitySublattice d L) N (M + 1) Φ)).re
+            / vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M + 1) Φ)) := by
+    rw [tanakaSSBState_dotProduct_mulVec_re_eq (torusParitySublattice d L) M
+        (staggeredOrderOp2S (torusParitySublattice d L) N
+          * staggeredOrderOp2S (torusParitySublattice d L) N) hHHh Φ,
+      staggeredOrderOp2Ssq_unitNormalize_diag (torusParitySublattice d L) M hBM,
+      staggeredOrderOp2Ssq_unitNormalize_diag (torusParitySublattice d L) (M + 1) hBM1,
+      hcross0, Complex.zero_re, add_zero]
+  rw [tanakaOrderSecond2, expectationRatioRe, hnum,
+    show (star (tanakaSSBState (torusParitySublattice d L) N M Φ)
+      ⬝ᵥ tanakaSSBState (torusParitySublattice d L) N M Φ).re = 1 from hden, div_one]
+
+/-! ### [F3] the transverse fluctuation `δ_k = (4 E_k − D_{k+1}) / (4 D_k)` -/
+
+/-- **[F3] Bridge: the transverse fluctuation as a `D`/`E` ratio.**  Writing `Ã = ô⁺ + ô⁻` and
+`D_j = ⟨Φ, Ã^{2j} Φ⟩`, `E_k = ⟨Φ, Ã^k p̂ Ã^k Φ⟩`, the per-site diagonal transverse fluctuation
+`δ_k = ⟨tt_k, (Ô^{(2)})² tt_k⟩ / (B_k V²)` equals `(4 E_k − D_{k+1}) / (4 D_k)`.  Uses the scale
+invariance `tt_k = (V/2)^k Ã^k Φ`, the Cartesian identity `(Ô^{(2)})² = V² p̂ − (Ô^{(1)})²`, and
+`(Ô^{(1)})² = (V²/4) Ã²`; the volume factors `V` and `(V/2)^{2k}` cancel in the ratio. -/
+theorem tanaka_delta_eq (d L N k : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) :
+    (star (tanakaTowerTerm (torusParitySublattice d L) N k Φ)
+        ⬝ᵥ (staggeredOrderOp2S (torusParitySublattice d L) N
+          * staggeredOrderOp2S (torusParitySublattice d L) N).mulVec
+          (tanakaTowerTerm (torusParitySublattice d L) N k Φ)).re
+        / vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N k Φ) / ((L : ℝ) ^ d) ^ 2
+      = (4 * (star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true
+              + staggeredOrderDensityOpS d L N false) ^ k * staggeredPhatS d L N
+            * (staggeredOrderDensityOpS d L N true
+              + staggeredOrderDensityOpS d L N false) ^ k).mulVec Φ).re
+          - (star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true
+              + staggeredOrderDensityOpS d L N false) ^ (2 * (k + 1))).mulVec Φ).re)
+        / (4 * (star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true
+            + staggeredOrderDensityOpS d L N false) ^ (2 * k)).mulVec Φ).re) := by
+  set Ã := staggeredOrderDensityOpS d L N true + staggeredOrderDensityOpS d L N false with hÃ
+  have hÃH : Ã.IsHermitian := orderDensitySum_isHermitian d L N
+  have hVne : ((L : ℂ) ^ d) ≠ 0 := pow_ne_zero d (Nat.cast_ne_zero.mpr (NeZero.ne L))
+  have hVRne : ((L : ℝ) ^ d) ≠ 0 := pow_ne_zero d (Nat.cast_ne_zero.mpr (NeZero.ne L))
+  -- scale invariance: replace `tt_k` by `Ã^k Φ`
+  have htt : tanakaTowerTerm (torusParitySublattice d L) N k Φ
+      = ((L : ℂ) ^ d / 2) ^ k • (Ã ^ k).mulVec Φ := by
+    rw [tanakaTowerTerm, staggeredOrderOp1S_eq_smul_orderDensitySum, smul_pow, Matrix.smul_mulVec]
+  have hc : ((L : ℂ) ^ d / 2) ^ k ≠ 0 :=
+    pow_ne_zero _ (div_ne_zero hVne two_ne_zero)
+  have hscale : (star (tanakaTowerTerm (torusParitySublattice d L) N k Φ)
+        ⬝ᵥ (staggeredOrderOp2S (torusParitySublattice d L) N
+          * staggeredOrderOp2S (torusParitySublattice d L) N).mulVec
+          (tanakaTowerTerm (torusParitySublattice d L) N k Φ)).re
+        / vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N k Φ)
+      = (star ((Ã ^ k).mulVec Φ)
+          ⬝ᵥ (staggeredOrderOp2S (torusParitySublattice d L) N
+            * staggeredOrderOp2S (torusParitySublattice d L) N).mulVec ((Ã ^ k).mulVec Φ)).re
+        / (star ((Ã ^ k).mulVec Φ) ⬝ᵥ (Ã ^ k).mulVec Φ).re := by
+    rw [vecNormSqRe, htt]
+    exact rayleigh_smul_invariant _ _ hc _
+  rw [hscale]
+  -- the sandwiched middle operator: `(Ô²)² = V² p̂ − (V²/4) Ã²`
+  have hmid : star ((Ã ^ k).mulVec Φ)
+        ⬝ᵥ (staggeredOrderOp2S (torusParitySublattice d L) N
+          * staggeredOrderOp2S (torusParitySublattice d L) N).mulVec ((Ã ^ k).mulVec Φ)
+      = ((L : ℂ) ^ d) ^ 2 * (star Φ ⬝ᵥ (Ã ^ k * staggeredPhatS d L N * Ã ^ k).mulVec Φ)
+        - ((L : ℂ) ^ d) ^ 2 / 4
+          * (star Φ ⬝ᵥ (Ã ^ (2 * (k + 1))).mulVec Φ) := by
+    have hV2 : ((L : ℂ) ^ d) ^ 2 • staggeredPhatS d L N
+        = staggeredOrderOp1S (torusParitySublattice d L) N
+            * staggeredOrderOp1S (torusParitySublattice d L) N
+          + staggeredOrderOp2S (torusParitySublattice d L) N
+            * staggeredOrderOp2S (torusParitySublattice d L) N := by
+      rw [staggeredPhatS_eq_cartesian_sq, smul_smul,
+        mul_inv_cancel₀ (pow_ne_zero 2 hVne), one_smul]
+    have hI1 : staggeredOrderOp2S (torusParitySublattice d L) N
+          * staggeredOrderOp2S (torusParitySublattice d L) N
+        = ((L : ℂ) ^ d) ^ 2 • staggeredPhatS d L N
+          - staggeredOrderOp1S (torusParitySublattice d L) N
+            * staggeredOrderOp1S (torusParitySublattice d L) N := by
+      rw [hV2]; abel
+    have hI2 : staggeredOrderOp1S (torusParitySublattice d L) N
+          * staggeredOrderOp1S (torusParitySublattice d L) N
+        = (((L : ℂ) ^ d) ^ 2 / 4) • (Ã * Ã) := by
+      rw [staggeredOrderOp1S_eq_smul_orderDensitySum, ← hÃ, smul_mul_smul_comm]
+      congr 1
+      ring
+    -- move `Ã^k` onto `Φ` on both sides (Hermitian)
+    have hh : Matrix.conjTranspose (Ã ^ k) = Ã ^ k := (hÃH.pow k).eq
+    have hmove : ∀ M' : ManyBodyOpS (HypercubicTorus d L) N,
+        star ((Ã ^ k).mulVec Φ) ⬝ᵥ M'.mulVec ((Ã ^ k).mulVec Φ)
+          = star Φ ⬝ᵥ (Ã ^ k * M' * Ã ^ k).mulVec Φ := by
+      intro M'
+      calc star ((Ã ^ k).mulVec Φ) ⬝ᵥ M'.mulVec ((Ã ^ k).mulVec Φ)
+          = star ((Matrix.conjTranspose (Ã ^ k)).mulVec Φ) ⬝ᵥ M'.mulVec ((Ã ^ k).mulVec Φ) := by
+            rw [hh]
+        _ = star Φ ⬝ᵥ (Ã ^ k).mulVec (M'.mulVec ((Ã ^ k).mulVec Φ)) :=
+            (star_dotProduct_mulVec_conjTranspose (Ã ^ k) Φ _).symm
+        _ = star Φ ⬝ᵥ (Ã ^ k * M' * Ã ^ k).mulVec Φ := by
+            rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
+    rw [hI1, Matrix.sub_mulVec, dotProduct_sub, Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul,
+      hI2, Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul, hmove, hmove,
+      show Ã ^ k * (Ã * Ã) * Ã ^ k = Ã ^ (2 * (k + 1)) from by
+        rw [← mul_assoc, ← pow_succ, ← pow_succ, ← pow_add]; congr 1; ring]
+  have hden : star ((Ã ^ k).mulVec Φ) ⬝ᵥ (Ã ^ k).mulVec Φ
+      = star Φ ⬝ᵥ (Ã ^ (2 * k)).mulVec Φ := by
+    rw [hermitian_pow_dotProduct_split hÃH k k Φ, two_mul]
+  have hnumre : (((L : ℂ) ^ d) ^ 2
+        * (star Φ ⬝ᵥ (Ã ^ k * staggeredPhatS d L N * Ã ^ k).mulVec Φ)
+      - ((L : ℂ) ^ d) ^ 2 / 4 * (star Φ ⬝ᵥ (Ã ^ (2 * (k + 1))).mulVec Φ)).re
+      = ((L : ℝ) ^ d) ^ 2 * (star Φ ⬝ᵥ (Ã ^ k * staggeredPhatS d L N * Ã ^ k).mulVec Φ).re
+        - ((L : ℝ) ^ d) ^ 2 / 4 * (star Φ ⬝ᵥ (Ã ^ (2 * (k + 1))).mulVec Φ).re := by
+    rw [Complex.sub_re]
+    congr 1
+    · rw [Complex.mul_re, show ((L : ℂ) ^ d) ^ 2 = (((L : ℝ) ^ d) ^ 2 : ℝ) from by push_cast; ring,
+        Complex.ofReal_re, Complex.ofReal_im, zero_mul, sub_zero]
+    · rw [Complex.mul_re,
+        show ((L : ℂ) ^ d) ^ 2 / 4 = (((L : ℝ) ^ d) ^ 2 / 4 : ℝ) from by push_cast; ring,
+        Complex.ofReal_re, Complex.ofReal_im, zero_mul, sub_zero]
+  rw [hmid, hden, hnumre, div_div]
+  -- `(V²·E − (V²/4)·D')/(D_k·V²) = (4E − D')/(4 D_k)`; the volume factor cancels
+  rcases eq_or_ne (star Φ ⬝ᵥ (Ã ^ (2 * k)).mulVec Φ).re 0 with h0 | hne
+  · rw [h0]; simp
+  · have hV2ne : ((L : ℝ) ^ d) ^ 2 ≠ 0 := by positivity
+    rw [show (2 * (k + 1)) = 2 * k + 2 from by ring]
+    field_simp
+
+/-- **Abstract division bound** for the transverse fluctuation.  With `q = k+1`, central binomials
+`c, c2` obeying the Pascal relation `q(4c − c2) = 2c`, and the F1/F2 pinches `num ≤ (2c/q)P' +
+(4c+c2)β`, `4c(P − βk) ≤ den`, plus `P' ≤ N² P` and `βk ≤ P/2`, the ratio `num/den` is at most
+`N²/(2q)` plus a clean `O(β + βk)` error. Pure real arithmetic. -/
+private theorem delta_frac_bound (q c c2 P P' bet betk den n2 num : ℝ)
+    (hq : 0 < q) (hc : 0 < c) (hP : 0 < P)
+    (hbet : 0 ≤ bet) (hbetk : 0 ≤ betk) (hc2 : 0 ≤ c2) (hn2 : 0 ≤ n2) (hP' : 0 ≤ P')
+    (hP'n2 : P' ≤ n2 * P) (hbetkhalf : betk ≤ P / 2)
+    (hden : 4 * c * (P - betk) ≤ den)
+    (hnum : num ≤ 2 * c / q * P' + (4 * c + c2) * bet) :
+    num / den
+      ≤ n2 / (2 * q) + ((4 * c + c2) * bet / (2 * c * P) + n2 * betk / (q * P)) := by
+  have hW : 0 < P - betk := by linarith
+  have h4cW : 0 < 4 * c * (P - betk) := by positivity
+  have hdenpos : 0 < den := lt_of_lt_of_le h4cW hden
+  -- `num/den ≤ A/(4c(P−βk))`
+  have hA : 0 ≤ 2 * c / q * P' + (4 * c + c2) * bet := by positivity
+  have hstep12 : num / den ≤ (2 * c / q * P' + (4 * c + c2) * bet) / (4 * c * (P - betk)) := by
+    calc num / den ≤ (2 * c / q * P' + (4 * c + c2) * bet) / den := by gcongr
+      _ ≤ (2 * c / q * P' + (4 * c + c2) * bet) / (4 * c * (P - betk)) :=
+          div_le_div_of_nonneg_left hA h4cW hden
+  refine le_trans hstep12 ?_
+  -- split the upper numerator into the two fractions
+  have hsplit : (2 * c / q * P' + (4 * c + c2) * bet) / (4 * c * (P - betk))
+      = P' / (2 * q * (P - betk)) + (4 * c + c2) * bet / (4 * c * (P - betk)) := by
+    rw [add_div]
+    congr 1
+    rw [div_mul_eq_mul_div, div_div, div_eq_div_iff (by positivity) (by positivity)]
+    ring
+  rw [hsplit]
+  -- `Term1 = P'/(2q(P−βk)) ≤ N²/(2q) + N²βk/(qP)`; the factor `q` cancels
+  have hbase : P' / (P - betk) ≤ (n2 * P + 2 * n2 * betk) / P := by
+    rw [div_le_div_iff₀ hW hP]
+    nlinarith [mul_nonneg hP.le (by linarith [hP'n2] : (0 : ℝ) ≤ n2 * P - P'),
+      mul_nonneg (mul_nonneg hn2 hbetk) (by linarith : (0 : ℝ) ≤ P - 2 * betk)]
+  have hterm1 : P' / (2 * q * (P - betk)) ≤ n2 / (2 * q) + n2 * betk / (q * P) := by
+    rw [show P' / (2 * q * (P - betk)) = P' / (P - betk) / (2 * q) from by
+        rw [div_div, mul_comm (2 * q)],
+      show n2 / (2 * q) + n2 * betk / (q * P) = (n2 * P + 2 * n2 * betk) / P / (2 * q) from by
+        field_simp]
+    gcongr
+  -- `Term2 = (4c+c2)β/(4c(P−βk)) ≤ (4c+c2)β/(2cP)`
+  have hterm2 : (4 * c + c2) * bet / (4 * c * (P - betk)) ≤ (4 * c + c2) * bet / (2 * c * P) := by
+    apply div_le_div_of_nonneg_left (by positivity) (by positivity)
+    nlinarith [hbetkhalf, hc.le]
+  linarith [hterm1, hterm2]
+
+/-- **Central-binomial Pascal identity (real form)**: `(k+1)(4 C(2k,k) − C(2k+2,k+1)) = 2 C(2k,k)`,
+from `Nat.succ_mul_centralBinom_succ`.  This makes the leading coefficient `4c − c2 = 2c/(k+1)`. -/
+private theorem pascal_real (k : ℕ) :
+    ((k : ℝ) + 1) * (4 * ((2 * k).choose k : ℝ) - ((2 * (k + 1)).choose (k + 1) : ℝ))
+      = 2 * ((2 * k).choose k : ℝ) := by
+  have h := Nat.succ_mul_centralBinom_succ k
+  rw [Nat.centralBinom_eq_two_mul_choose, Nat.centralBinom_eq_two_mul_choose] at h
+  have hr : ((k + 1) * (2 * (k + 1)).choose (k + 1) : ℝ)
+      = (2 * (2 * k + 1) * (2 * k).choose k : ℝ) := by exact_mod_cast h
+  push_cast at hr
+  nlinarith [hr]
+
+/-- The explicit finite-`L` upper bound on the transverse fluctuation `δ_{j+1}` (eq. (4.2.55)): the
+sharp leading term `N²/(2(j+2))` from the central-binomial cancellation, plus a genuinely `O(1/V)`
+error assembled from the F1/F2 fine bands. -/
+noncomputable def deltaFluctBound (d L N j : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) : ℝ :=
+  (N : ℝ) ^ 2 / (2 * ((j : ℝ) + 1 + 1))
+    + ((4 * ((2 * (j + 1)).choose (j + 1) : ℝ) + ((2 * (j + 1 + 1)).choose (j + 1 + 1) : ℝ))
+          * (((j : ℝ) + 1 + 1) ^ 2
+            * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ (j + 1))))
+          / (2 * ((2 * (j + 1)).choose (j + 1) : ℝ) * phatMoment d L N Φ (j + 1))
+      + (N : ℝ) ^ 2
+          * (((j : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ j)))
+          / (((j : ℝ) + 1 + 1) * phatMoment d L N Φ (j + 1)))
+
+set_option maxHeartbeats 3200000 in
+-- The final assembly elaborates several large order-word expectation terms against the abstract
+-- division bound, exceeding the default heartbeat budget.
+/-- **[F3] Transverse fluctuation decay bound (eq. (4.2.55)).**  Under long-range order (`0 < q₀`)
+and the size condition `3 N (j+2)² ≤ 2 q₀ V`, the per-site transverse fluctuation of the tower term
+`u_{j+1}` obeys `δ_{j+1} ≤ N²/(2(j+2)) + O(1/V)` (`deltaFluctBound`).  The sharp leading term of the
+central-binomial Pascal cancellation (`pascal_real`), the fine two-sided pinches of the denominator
+(`orderSum_pow_two_denom_close`) and the `p̂`-insertion (`orderSum_pow_phat_insert_close`), and the
+Rayleigh power ratio (`phatMoment_succ_le_normSq`); the volume factors cancel via `tanaka_delta_eq`.
+The error term is `O(1/V)` (each fine band carries an explicit `N/V`). -/
+theorem tanaka_delta_le (d L N j : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing3 : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ} (hq₀ : 0 < q₀)
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1)
+    (hcond : 3 * (N : ℝ) * ((j : ℝ) + 1 + 1) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d) :
+    (star (tanakaTowerTerm (torusParitySublattice d L) N (j + 1) Φ)
+        ⬝ᵥ (staggeredOrderOp2S (torusParitySublattice d L) N
+          * staggeredOrderOp2S (torusParitySublattice d L) N).mulVec
+          (tanakaTowerTerm (torusParitySublattice d L) N (j + 1) Φ)).re
+        / vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (j + 1) Φ) / ((L : ℝ) ^ d) ^ 2
+      ≤ deltaFluctBound d L N j Φ := by
+  have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    positivity
+  -- size conditions (native cast form at `j+1`, plain at `j`)
+  have hcond1 : 3 * (N : ℝ) * (((j + 1 : ℕ) : ℝ) + 1) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d := by
+    push_cast; nlinarith [hcond]
+  have hcondj : 3 * (N : ℝ) * ((j : ℝ) + 1) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d := by
+    have hle : ((j : ℝ) + 1) ^ 2 ≤ ((j : ℝ) + 1 + 1) ^ 2 := by
+      nlinarith [Nat.cast_nonneg (α := ℝ) j]
+    nlinarith [hcond, mul_le_mul_of_nonneg_left hle (by positivity : (0 : ℝ) ≤ 3 * (N : ℝ))]
+  -- positivity
+  have hcpos : (0 : ℝ) < ((2 * (j + 1)).choose (j + 1) : ℝ) := by
+    exact_mod_cast Nat.choose_pos (by omega)
+  have hPcpos : 0 < phatMoment d L N Φ (j + 1) := by
+    have hge := phatMoment_ge_of_lro d L N Φ hq₀.le hm0 hlro j
+    have hpos : 0 < (2 * q₀) ^ (j + 1) * phatMoment d L N Φ 0 :=
+      mul_pos (pow_pos (by linarith) (j + 1)) hm0
+    exact lt_of_lt_of_le hpos hge
+  have hPjnn : 0 ≤ phatMoment d L N Φ j := phatMoment_nonneg d L N Φ j
+  -- F2 at `j+1`, F1 at `j+1`, F1 at `j`; normalize casts to `↑j + 1`
+  have hcast : ((j + 1 : ℕ) : ℝ) + 1 = (j : ℝ) + 1 + 1 := by push_cast; ring
+  have hF2 := orderSum_pow_phat_insert_close d L N hN Φ hsing3 hm0 hlro (j + 1) hcond1
+  rw [abs_le, hcast] at hF2
+  have hF1' := orderSum_pow_two_denom_close d L N hN Φ hsing3 hm0 hlro (j + 1) hcond1
+  rw [abs_le, hcast] at hF1'
+  have hF1 := orderSum_pow_two_denom_close d L N hN Φ hsing3 hm0 hlro j hcondj
+  rw [abs_le] at hF1
+  -- Gap2 and the `betk ≤ Pc/2` collapse
+  have hP'n2 := phatMoment_succ_le_normSq d L N hN Φ (j + 1)
+  have hNV : (N : ℝ) / (L : ℝ) ^ d * ((j : ℝ) + 1) ^ 2 ≤ 2 * q₀ / 3 := by
+    rw [div_mul_eq_mul_div, div_le_iff₀ hVpos]; nlinarith [hcondj]
+  have hratio := phatMoment_succ_ratio d L N Φ hm0 hlro j
+  have hbetkhalf : ((j : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ j))
+      ≤ phatMoment d L N Φ (j + 1) / 2 := by
+    have h1 : ((j : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ j))
+        ≤ q₀ * phatMoment d L N Φ j := by
+      have hmul := mul_le_mul_of_nonneg_right hNV
+        (by positivity : (0 : ℝ) ≤ 3 / 2 * phatMoment d L N Φ j)
+      nlinarith [hmul, hPjnn]
+    nlinarith [h1, hratio, hq₀, hPjnn]
+  -- Pascal `4c - c2 = 2c/q`
+  have hpasc := pascal_real (j + 1)
+  have h4c_c2 : 4 * ((2 * (j + 1)).choose (j + 1) : ℝ) - ((2 * (j + 1 + 1)).choose (j + 1 + 1) : ℝ)
+      = 2 * ((2 * (j + 1)).choose (j + 1) : ℝ) / ((j : ℝ) + 1 + 1) := by
+    rw [eq_div_iff (by positivity)]
+    have : (((j + 1 : ℕ) : ℝ) + 1) = (j : ℝ) + 1 + 1 := by push_cast; ring
+    rw [this] at hpasc; linarith [hpasc]
+  -- convert the goal to the `D/E` ratio, then abstract the three large expectations as reals
+  rw [tanaka_delta_eq d L N (j + 1) Φ]
+  set E := (star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true
+      + staggeredOrderDensityOpS d L N false) ^ (j + 1) * staggeredPhatS d L N
+      * (staggeredOrderDensityOpS d L N true
+        + staggeredOrderDensityOpS d L N false) ^ (j + 1)).mulVec Φ).re with hEdef
+  set Dnext := (star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true
+      + staggeredOrderDensityOpS d L N false) ^ (2 * (j + 1 + 1))).mulVec Φ).re with hDnextdef
+  set Dcur := (star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true
+      + staggeredOrderDensityOpS d L N false) ^ (2 * (j + 1))).mulVec Φ).re with hDcurdef
+  -- numerator/denominator bounds (small terms now)
+  have hnum : 4 * E - Dnext
+      ≤ 2 * ((2 * (j + 1)).choose (j + 1) : ℝ) / ((j : ℝ) + 1 + 1) * phatMoment d L N Φ (j + 1 + 1)
+        + (4 * ((2 * (j + 1)).choose (j + 1) : ℝ) + ((2 * (j + 1 + 1)).choose (j + 1 + 1) : ℝ))
+          * (((j : ℝ) + 1 + 1) ^ 2
+            * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ (j + 1)))) := by
+    rw [← h4c_c2]; nlinarith [hF2.2, hF1'.1]
+  have hden : 4 * ((2 * (j + 1)).choose (j + 1) : ℝ)
+        * (phatMoment d L N Φ (j + 1)
+          - ((j : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ j)))
+      ≤ 4 * Dcur := by
+    nlinarith [hF1.1]
+  rw [deltaFluctBound]
+  exact delta_frac_bound ((j : ℝ) + 1 + 1) ((2 * (j + 1)).choose (j + 1) : ℝ)
+    ((2 * (j + 1 + 1)).choose (j + 1 + 1) : ℝ) (phatMoment d L N Φ (j + 1))
+    (phatMoment d L N Φ (j + 1 + 1))
+    (((j : ℝ) + 1 + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ (j + 1))))
+    (((j : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ j)))
+    (4 * Dcur) ((N : ℝ) ^ 2) (4 * E - Dnext)
+    (by positivity) hcpos hPcpos
+    (by have := phatMoment_nonneg d L N Φ (j + 1); positivity)
+    (by have := phatMoment_nonneg d L N Φ j; positivity) (by positivity) (by positivity)
+    (phatMoment_nonneg d L N Φ (j + 1 + 1)) hP'n2 hbetkhalf hden hnum
+
+/-- **[F4/F3] Axis-2 fluctuation decay, finite-`L` form (eq. (4.2.15)).**  The Tanaka state's axis-2
+squared per-site moment is the average of the two transverse fluctuations, each bounded by
+`tanaka_delta_le`: `second2 ≤ ½(deltaFluctBound i + deltaFluctBound (i+1))`, where `M = i+1`.  Both
+summands have the sharp leading term `N²/(2·)` from the central-binomial cancellation plus an
+`O(1/V)` remainder, so the bound `→ 0` as `M → ∞` with `M²/V → 0` (the `ε`-convergence is assembled
+in the capstone PR).  Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*
+(1st ed., Springer, 2020), §4.2.2, eq. (4.2.15)/(4.2.49)–(4.2.55), pp. 106–108. -/
+theorem tanakaOrderSecond2_le (d L N i : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing3 : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ} (hq₀ : 0 < q₀)
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1)
+    (hcond : 3 * (N : ℝ) * ((i : ℝ) + 1 + 1 + 1) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (hBM : 0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (i + 1) Φ))
+    (hBM1 : 0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (i + 1 + 1) Φ)) :
+    tanakaOrderSecond2 d L N (i + 1) Φ
+      ≤ 1 / 2 * (deltaFluctBound d L N i Φ + deltaFluctBound d L N (i + 1) Φ) := by
+  have hcondi : 3 * (N : ℝ) * ((i : ℝ) + 1 + 1) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d := by
+    have hle : ((i : ℝ) + 1 + 1) ^ 2 ≤ ((i : ℝ) + 1 + 1 + 1) ^ 2 := by
+      nlinarith [Nat.cast_nonneg (α := ℝ) i]
+    nlinarith [hcond, mul_le_mul_of_nonneg_left hle (by positivity : (0 : ℝ) ≤ 3 * (N : ℝ))]
+  have hcondi1 : 3 * (N : ℝ) * (((i + 1 : ℕ) : ℝ) + 1 + 1) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d := by
+    have hcast : (((i + 1 : ℕ) : ℝ) + 1 + 1) = (i : ℝ) + 1 + 1 + 1 := by push_cast; ring
+    rw [hcast]; exact hcond
+  have hd1 := tanaka_delta_le d L N i hN Φ hsing3 hq₀ hm0 hlro hcondi
+  have hd2 := tanaka_delta_le d L N (i + 1) hN Φ hsing3 hq₀ hm0 hlro hcondi1
+  rw [tanakaOrderSecond2_eq_half_sum d L N (i + 1) Φ hsing3 hBM hBM1, mul_div_assoc, add_div,
+    mul_add]
+  linarith [hd1, hd2]
 
 end LatticeSystem.Quantum
