@@ -5,6 +5,7 @@ import LatticeSystem.Math.GramEigenspaceCorrespondence
 import LatticeSystem.Math.ListProdMulVec
 import LatticeSystem.Math.EigenspaceWeightFinrank
 import LatticeSystem.Math.RayleighPosSemidefKernel
+import LatticeSystem.Math.OperatorNormRayleigh
 import LatticeSystem.Math.PerronFrobeniusPrimitive
 import LatticeSystem.Math.CollatzWielandt
 import LatticeSystem.Math.PerronFrobeniusMain
