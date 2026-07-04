@@ -66,3 +66,8 @@ theorem_10_11_kubo_kishi_susceptibility_bound
 # capstone in a later PR of #4958; temporarily allowlisted, to be delisted at the capstone PR.
 isR2LocalUpTo_orderDoubleCommSameSign
 orderDoubleCommSameSignAggregate_le
+
+# Tasaki §4.2.2 Theorem 4.8 arc (#4958) PR3 [N4]: parity cross-term vanishing (eq. 4.2.69),
+# ⟨(ô¹)^M Φ, Ĥ (ô¹)^{M+1} Φ⟩ = 0. Consumed by the [N5] capstone in a later PR of #4958;
+# temporarily allowlisted, to be delisted at the capstone PR.
+tanakaTowerTerm_cross_energy_eq_zero
