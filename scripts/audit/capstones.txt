@@ -71,3 +71,11 @@ orderDoubleCommSameSignAggregate_le
 # ⟨(ô¹)^M Φ, Ĥ (ô¹)^{M+1} Φ⟩ = 0. Consumed by the [N5] capstone in a later PR of #4958;
 # temporarily allowlisted, to be delisted at the capstone PR.
 tanakaTowerTerm_cross_energy_eq_zero
+
+# Tasaki §4.2.2 Theorem 4.8 crux sub-arc (#4958) PR-A: ±-word expansion basis + scale-inv bridge
+# + charge-selection rules. Terminal tips consumed by the [N3] denominator / [N2] numerator / [N5]
+# capstone in later PRs of #4958; temporarily allowlisted, to be delisted at the capstone PR.
+orderOp1S_pow_eq_smul_sum
+tanakaTowerTerm_expectationRatioRe_eq
+dotProduct_orderWord_singlet_eq_zero_of_charge_ne
+dotProduct_word_sandwich_eq_zero_of_charge_ne
