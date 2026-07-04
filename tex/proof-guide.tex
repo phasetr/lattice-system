@@ -9931,7 +9931,23 @@ explicitly (it does not follow from $\hat S_{\mathrm{tot}}^{(1)}\Phi=0$, since $
 $\hat S_{\mathrm{tot}}^{(1)}$) and is exactly what forces the transverse moments (4.2.14) to vanish.
 The axiom \texttt{tanakaSSB\_full\_symmetry\_breaking} shares
 $C_1$ with Theorem 4.6 and is conditional on long-range order (vacuous in one dimension by
-Corollary 4.3).  Chapters~3--10 backfill.
+Corollary 4.3).  Chapters~3--10 backfill.  \emph{Discharge PR2 (PR \#4969)} constructs the reversal-symmetry
+machinery for the full-SSB proof: the axis-1 spin reversal $\Theta$ conjugates the staggered order
+operators (eqs.~(4.2.48)): $\Theta\hat O^{(1)}\Theta=\hat O^{(1)}$ (axis-1 is fixed),
+$\Theta\hat O^{(2)}\Theta=-\hat O^{(2)}$, $\Theta\hat O^{(3)}\Theta=-\hat O^{(3)}$ (transverse reversal);
+$\Theta$ is a real symmetric involution ($\Theta^\dagger=\Theta$, where the dagger denotes hermitian
+conjugate) and commutes with $\hat O^{(1)}$ so it fixes the Tanaka state $\Theta\Xi=\Xi$ when
+$\Theta\Phi=\Phi$.  The transverse moment vanishing (4.2.14) follows from symmetry: for a
+$\Theta$-anti-invariant operator ($\Theta O\Theta=-O$) and $\Theta$-invariant state ($\Theta\Xi=\Xi$),
+expectation values must vanish, $\langle\Xi|O|\Xi\rangle=0$, since conjugating by the symmetric $\Theta$
+turns any such expectation into its own negative.  The general sandwich expansion (4.2.45)--(4.2.49)
+expresses $\langle\Xi|O|\Xi\rangle_{\mathrm{re}}$ for Hermitian $O$ in terms of the two unit-normalized
+tower terms and their cross term, reducing complex expressions to simpler diagonal pieces; the cross
+term vanishes for any charge-conserving operator (commuting with $\hat U=\exp(i\pi\hat S_{\mathrm{tot}}^{(3)})$),
+since the two adjacent tower terms $(\hat O^{(1)})^M\Phi$ and $(\hat O^{(1)})^{M+1}\Phi$ are parity
+eigenstates with opposite eigenvalues (Tasaki eq.~(4.2.69), axis-3 analogue of the energy cross-term
+vanishing).  The new file \texttt{Quantum/SpinS/AndersonTowerTanakaMoments.lean} records all these
+identities.
 
 \noindent\textbf{Proposition 4.10} (Tasaki §4.2.1, eqs.~(4.2.17)--(4.2.22), pp.~99--100; documented
 axiom, \texttt{Quantum/SpinS/AndersonTowerSphereAverage.lean}, Issue \#4485).  The solid-angle average
