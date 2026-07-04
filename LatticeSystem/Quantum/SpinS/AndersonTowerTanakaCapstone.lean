@@ -30,12 +30,12 @@ open scoped ComplexOrder
 /-! ### Scalar-multiple algebra of sesquilinear forms -/
 
 /-- **Scalar bilinearity of the `L²` form**: `⟨a•p, b•q⟩ = (conj a · b) ⟨p, q⟩`. -/
-private theorem star_smul_dotProduct_smul {ι : Type*} [Fintype ι] (a b : ℂ) (p q : ι → ℂ) :
+theorem star_smul_dotProduct_smul {ι : Type*} [Fintype ι] (a b : ℂ) (p q : ι → ℂ) :
     star (a • p) ⬝ᵥ (b • q) = (star a * b) * (star p ⬝ᵥ q) := by
   rw [star_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul, mul_assoc]
 
 /-- **Scalar bilinearity of the sandwiched form**: `⟨a•p, M (b•q)⟩ = (conj a · b) ⟨p, M q⟩`. -/
-private theorem star_smul_dotProduct_mulVec_smul {ι : Type*} [Fintype ι] (a b : ℂ)
+theorem star_smul_dotProduct_mulVec_smul {ι : Type*} [Fintype ι] (a b : ℂ)
     (M : Matrix ι ι ℂ) (p q : ι → ℂ) :
     star (a • p) ⬝ᵥ M.mulVec (b • q) = (star a * b) * (star p ⬝ᵥ M.mulVec q) := by
   rw [star_smul, Matrix.mulVec_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul,

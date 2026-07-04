@@ -9949,6 +9949,22 @@ eigenstates with opposite eigenvalues (Tasaki eq.~(4.2.69), axis-3 analogue of t
 vanishing).  The new file \texttt{Quantum/SpinS/AndersonTowerTanakaMoments.lean} records all these
 identities.
 
+\emph{Discharge PR3 (PR \#4970)} establishes the lower bounds (4.2.12) and (4.2.13).
+The mechanism uses log-convexity of even bare moments $B_k:=\|(\hat O_L^{(1)})^k\Phi\|^2$ (Cauchy--Schwarz,
+eq.~(4.2.35)) to prove monotonicity of the ratio $R_k:=B_{k+1}/(B_kV^2)$ (\texttt{real\_logConvex\_cross}).
+The base case $R_0\ge q_0$ follows from charge selection $\langle(\hat O^{(1)})^2\rangle=\langle\hat
+p\rangle V^2/2$ combined with the proved long-range-order bridge $\langle\hat p\rangle\ge 2q_0\|\Phi\|^2$
+(\texttt{phatMoment\_succ\_two\_q0\_le}); hence $R_M\ge q_0$ via \texttt{orderOp1\_evenMoment\_ratio\_ge\_q0}.
+The \(\Xi\) sandwich with parity structure (odd-moment diagonals vanish by 1-axis parity
+(eq.~(4.2.48)), squared operator commutes with $\hat U=\exp(i\pi\hat S^{(3)}_{\mathrm{tot}})$ so
+cross-terms vanish) yields both bounds at every finite volume: $\sqrt{q_0}\le\langle\Xi|\hat
+O_L^{(1)}/L^d|\Xi\rangle$ (eq.~4.2.12, \texttt{sqrt\_q0\_le\_tanakaOrderMean1}); $q_0\le\langle\Xi|
+(\hat O_L^{(1)}/L^d)^2|\Xi\rangle$ (eq.~4.2.13, \texttt{q0\_le\_tanakaOrderSecond1}). Infrastructure:
+hermiticity of $\hat O^{(1)}$ (\texttt{staggeredOrderOp1S\_isHermitian}), unit normalization
+(\texttt{tanakaSSBState\_vecNormSqRe\_eq\_one}). Unlike Theorem 4.8 (eqs.~4.2.34--4.2.44), no
+central-binomial cancellation needed---only ratio monotonicity. The new file
+\texttt{Quantum/SpinS/AndersonTowerTanakaLowerBounds.lean} records all lower-bound statements.
+
 \noindent\textbf{Proposition 4.10} (Tasaki §4.2.1, eqs.~(4.2.17)--(4.2.22), pp.~99--100; documented
 axiom, \texttt{Quantum/SpinS/AndersonTowerSphereAverage.lean}, Issue \#4485).  The solid-angle average
 of the symmetry-breaking states recovers the ground state.  For a unit vector $n\in S^2\subset
