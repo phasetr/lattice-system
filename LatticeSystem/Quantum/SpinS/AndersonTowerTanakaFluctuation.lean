@@ -195,4 +195,237 @@ theorem phatMoment_succ_le_normSq (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
         ≤ manyBodyOperatorNormS (staggeredPhatS d L N) * phatMoment d L N Φ (2 * a + 1) := hkey
       _ ≤ (N : ℝ) ^ 2 * phatMoment d L N Φ (2 * a + 1) := mul_le_mul_of_nonneg_right hpn hP1nn
 
+/-! ### [F2] two-sided `p̂`-insertion closeness: `E_k = C(2k,k) P_{k+1} + O(1/V)` -/
+
+/-- **Balanced-pair count**: the number of pairs `(cₗ, cᵣ)` of length-`k` binary words with combined
+`true`-count `k` equals the central binomial `C(2k, k)`.  The concatenation bijection
+`(cₗ, cᵣ) ↦ Fin.append cₗ cᵣ` (`List.ofFn_fin_append` + `List.count_append`) reduces it to the
+single-word count `card_ofFn_count_true_eq` at length `2k`. -/
+theorem card_prod_count_true_add (k : ℕ) :
+    (Finset.univ.filter (fun p : (Fin k → Bool) × (Fin k → Bool) =>
+        (List.ofFn p.1).count true + (List.ofFn p.2).count true = k)).card = (2 * k).choose k := by
+  rw [two_mul, ← card_ofFn_count_true_eq (k + k) k]
+  refine Finset.card_nbij' (fun p => Fin.append p.1 p.2)
+    (fun c => (fun i => c (Fin.castAdd k i), fun i => c (Fin.natAdd k i))) ?_ ?_ ?_ ?_
+  · intro p hp
+    rw [Finset.coe_filter, Set.mem_setOf_eq] at hp
+    rw [Finset.coe_filter, Set.mem_setOf_eq]
+    refine ⟨Finset.mem_univ _, ?_⟩
+    rw [List.ofFn_fin_append, List.count_append]
+    exact hp.2
+  · intro c hc
+    rw [Finset.coe_filter, Set.mem_setOf_eq] at hc
+    rw [Finset.coe_filter, Set.mem_setOf_eq]
+    refine ⟨Finset.mem_univ _, ?_⟩
+    have hsplit : (List.ofFn c).count true
+        = (List.ofFn (fun i => c (Fin.castAdd k i))).count true
+          + (List.ofFn (fun i => c (Fin.natAdd k i))).count true := by
+      rw [← List.count_append, ← List.ofFn_fin_append, Fin.append_castAdd_natAdd]
+    rw [← hsplit]; exact hc.2
+  · intro p _
+    refine Prod.ext ?_ ?_ <;> funext i
+    · exact Fin.append_left p.1 p.2 i
+    · exact Fin.append_right p.1 p.2 i
+  · intro c _
+    exact Fin.append_castAdd_natAdd
+
+/-- **`p̂`-insertion sandwich as a word double sum**: expanding `Ã = ô⁺ + ô⁻` on both sides,
+`⟨Φ, Ã^k G Ã^k Φ⟩` (for a fixed middle word operator `G = orderWordProd mid`) is the double sum over
+`(cₗ, cᵣ)` of the real expectations of the concatenated words `cₗ ++ mid ++ cᵣ`
+(`orderDensitySum_pow_eq_sum_words` + `orderWordProd_append`). -/
+private theorem orderSum_pow_sandwich_re_eq (d L N k : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (mid : List Bool) :
+    (star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true + staggeredOrderDensityOpS d L N false) ^ k
+        * orderWordProd d L N mid
+        * (staggeredOrderDensityOpS d L N true
+          + staggeredOrderDensityOpS d L N false) ^ k).mulVec Φ).re
+      = ∑ cl : Fin k → Bool, ∑ cr : Fin k → Bool,
+          (star Φ ⬝ᵥ (orderWordProd d L N (List.ofFn cl ++ mid ++ List.ofFn cr)).mulVec Φ).re := by
+  have hop : (staggeredOrderDensityOpS d L N true + staggeredOrderDensityOpS d L N false) ^ k
+        * orderWordProd d L N mid
+        * (staggeredOrderDensityOpS d L N true + staggeredOrderDensityOpS d L N false) ^ k
+      = ∑ cl : Fin k → Bool, ∑ cr : Fin k → Bool,
+          orderWordProd d L N (List.ofFn cl ++ mid ++ List.ofFn cr) := by
+    rw [orderDensitySum_pow_eq_sum_words, Finset.sum_mul, Finset.sum_mul]
+    refine Finset.sum_congr rfl (fun cl _ => ?_)
+    rw [Matrix.mul_sum]
+    refine Finset.sum_congr rfl (fun cr _ => ?_)
+    rw [orderWordProd_append, orderWordProd_append]
+  rw [hop, Matrix.sum_mulVec, dotProduct_sum, Complex.re_sum]
+  refine Finset.sum_congr rfl (fun cl _ => ?_)
+  rw [Matrix.sum_mulVec, dotProduct_sum, Complex.re_sum]
+
+/-- **Per-mid `p̂`-insertion closeness**: for a charge-`0` middle word `mid` (one `true`, one
+`false`), the sandwiched expectation `⟨Φ, Ã^k (orderWordProd mid) Ã^k Φ⟩` is within
+`C(2k,k) · (k+1)² (N/V) (3/2 P_k)` of `C(2k,k) · P_{k+1}`.  The concatenated words `cₗ ++ mid ++ cᵣ`
+have length `2(k+1)`; charge selection kills the pairs with `#t(cₗ)+#t(cᵣ) ≠ k`, and the surviving
+`C(2k,k)` balanced pairs (`card_prod_count_true_add`) are each pinched by the fine band. -/
+private theorem orderSum_pow_mid_close (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1) (k : ℕ)
+    (hcond : 3 * (N : ℝ) * ((k : ℝ) + 1) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (mid : List Bool) (hmt : mid.count true = 1) (hmf : mid.count false = 1) :
+    |(star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true + staggeredOrderDensityOpS d L N false) ^ k
+          * orderWordProd d L N mid
+          * (staggeredOrderDensityOpS d L N true
+            + staggeredOrderDensityOpS d L N false) ^ k).mulVec Φ).re
+        - ((2 * k).choose k : ℝ) * phatMoment d L N Φ (k + 1)|
+      ≤ ((2 * k).choose k : ℝ)
+        * (((k : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ k))) := by
+  rw [orderSum_pow_sandwich_re_eq,
+    show (∑ cl : Fin k → Bool, ∑ cr : Fin k → Bool,
+          (star Φ ⬝ᵥ (orderWordProd d L N (List.ofFn cl ++ mid ++ List.ofFn cr)).mulVec Φ).re)
+        = ∑ p : (Fin k → Bool) × (Fin k → Bool),
+            (star Φ ⬝ᵥ (orderWordProd d L N (List.ofFn p.1 ++ mid ++ List.ofFn p.2)).mulVec Φ).re
+      from by rw [Fintype.sum_prod_type]]
+  -- helper counts on the concatenated word
+  have hcount : ∀ p : (Fin k → Bool) × (Fin k → Bool),
+      (List.ofFn p.1 ++ mid ++ List.ofFn p.2).count true
+          = (List.ofFn p.1).count true + 1 + (List.ofFn p.2).count true
+        ∧ (List.ofFn p.1 ++ mid ++ List.ofFn p.2).count false
+          = (List.ofFn p.1).count false + 1 + (List.ofFn p.2).count false := by
+    intro p
+    constructor <;> rw [List.count_append, List.count_append]
+    · rw [hmt]
+    · rw [hmf]
+  have hlen : ∀ p : (Fin k → Bool) × (Fin k → Bool),
+      (List.ofFn p.1).count true + (List.ofFn p.1).count false = k
+        ∧ (List.ofFn p.2).count true + (List.ofFn p.2).count false = k := by
+    intro p
+    refine ⟨?_, ?_⟩ <;>
+      · have := count_true_add_count_false (List.ofFn (Prod.fst p))
+        have := count_true_add_count_false (List.ofFn (Prod.snd p))
+        simp only [List.length_ofFn] at *; omega
+  rw [← Finset.sum_filter_add_sum_filter_not Finset.univ
+    (fun p : (Fin k → Bool) × (Fin k → Bool) =>
+      (List.ofFn p.1).count true + (List.ofFn p.2).count true = k)]
+  -- unbalanced pairs carry nonzero charge, so vanish
+  have hunbal : ∑ p ∈ Finset.univ.filter
+        (fun p : (Fin k → Bool) × (Fin k → Bool) =>
+          ¬ (List.ofFn p.1).count true + (List.ofFn p.2).count true = k),
+        (star Φ ⬝ᵥ (orderWordProd d L N
+          (List.ofFn p.1 ++ mid ++ List.ofFn p.2)).mulVec Φ).re = 0 := by
+    refine Finset.sum_eq_zero (fun p hp => ?_)
+    rw [Finset.mem_filter] at hp
+    refine dotProduct_orderWord_singlet_eq_zero_of_charge_ne d L N Φ hsing _ ?_
+    rw [mCharge_eq_count, (hcount p).1, (hcount p).2]
+    intro hzero
+    refine hp.2 ?_
+    have hnat : (List.ofFn p.1).count true + 1 + (List.ofFn p.2).count true
+        = (List.ofFn p.1).count false + 1 + (List.ofFn p.2).count false := by
+      exact_mod_cast sub_eq_zero.mp hzero
+    have h1 := (hlen p).1
+    have h2 := (hlen p).2
+    omega
+  rw [hunbal, add_zero]
+  -- constant term as a balanced-pair sum of `P_{k+1}`
+  have hconst : ((2 * k).choose k : ℝ) * phatMoment d L N Φ (k + 1)
+      = ∑ _p ∈ Finset.univ.filter
+          (fun p : (Fin k → Bool) × (Fin k → Bool) =>
+            (List.ofFn p.1).count true + (List.ofFn p.2).count true = k),
+          phatMoment d L N Φ (k + 1) := by
+    rw [Finset.sum_const, card_prod_count_true_add, nsmul_eq_mul]
+  rw [hconst, ← Finset.sum_sub_distrib]
+  refine le_trans (Finset.abs_sum_le_sum_abs _ _) ?_
+  have hband : ∀ p ∈ Finset.univ.filter
+      (fun p : (Fin k → Bool) × (Fin k → Bool) =>
+        (List.ofFn p.1).count true + (List.ofFn p.2).count true = k),
+      |(star Φ ⬝ᵥ (orderWordProd d L N
+            (List.ofFn p.1 ++ mid ++ List.ofFn p.2)).mulVec Φ).re - phatMoment d L N Φ (k + 1)|
+        ≤ ((k : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ k)) := by
+    intro p hp
+    rw [Finset.mem_filter] at hp
+    have hbal := hp.2
+    have hwt : (List.ofFn p.1 ++ mid ++ List.ofFn p.2).count true = k + 1 := by
+      rw [(hcount p).1]; omega
+    have hwf : (List.ofFn p.1 ++ mid ++ List.ofFn p.2).count false = k + 1 := by
+      rw [(hcount p).2]
+      have h1 := (hlen p).1
+      have h2 := (hlen p).2
+      omega
+    exact orderWord_balanced_re_close_fine d L N hN Φ hsing hm0 hlro k hcond _ hwt hwf
+  refine le_trans (Finset.sum_le_sum hband) ?_
+  rw [Finset.sum_const, card_prod_count_true_add, nsmul_eq_mul]
+
+/-- **[F2] Two-sided `p̂`-insertion closeness (eq. (4.2.50)).**  On a `Ŝ_tot^{(3)}`-singlet, under
+`3 N (k+1)² ≤ 2 q₀ V`, the `p̂`-sandwich `E_k = ⟨Φ, Ã^k p̂ Ã^k Φ⟩` is within
+`C(2k,k) · (k+1)² (N/V) (3/2 P_k)` of `C(2k,k) · P_{k+1}`.  Writing `p̂ = ½(ô⁺ô⁻ + ô⁻ô⁺)`, both
+charge-`0` middle words `[t,f]` and `[f,t]` are handled by `orderSum_pow_mid_close`, and the two
+closeness bounds combine through the `½`-average. -/
+theorem orderSum_pow_phat_insert_close (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1) (k : ℕ)
+    (hcond : 3 * (N : ℝ) * ((k : ℝ) + 1) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d) :
+    |(star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true + staggeredOrderDensityOpS d L N false) ^ k
+          * staggeredPhatS d L N
+          * (staggeredOrderDensityOpS d L N true
+            + staggeredOrderDensityOpS d L N false) ^ k).mulVec Φ).re
+        - ((2 * k).choose k : ℝ) * phatMoment d L N Φ (k + 1)|
+      ≤ ((2 * k).choose k : ℝ)
+        * (((k : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ k))) := by
+  have htf : staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
+      = orderWordProd d L N [true, false] := by simp [orderWordProd]
+  have hft : staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true
+      = orderWordProd d L N [false, true] := by simp [orderWordProd]
+  -- expand `p̂ = ½(ô⁺ô⁻ + ô⁻ô⁺)` and average the two charge-`0` sandwiches
+  have hopid : (staggeredOrderDensityOpS d L N true + staggeredOrderDensityOpS d L N false) ^ k
+        * staggeredPhatS d L N
+        * (staggeredOrderDensityOpS d L N true + staggeredOrderDensityOpS d L N false) ^ k
+      = (2 : ℂ)⁻¹ •
+          ((staggeredOrderDensityOpS d L N true + staggeredOrderDensityOpS d L N false) ^ k
+              * orderWordProd d L N [true, false]
+              * (staggeredOrderDensityOpS d L N true + staggeredOrderDensityOpS d L N false) ^ k
+            + (staggeredOrderDensityOpS d L N true + staggeredOrderDensityOpS d L N false) ^ k
+              * orderWordProd d L N [false, true]
+              * (staggeredOrderDensityOpS d L N true
+                + staggeredOrderDensityOpS d L N false) ^ k) := by
+    rw [staggeredPhatS, htf, hft, mul_smul_comm, smul_mul_assoc]
+    congr 1
+    rw [mul_add, add_mul]
+  have hexp : (star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true
+          + staggeredOrderDensityOpS d L N false) ^ k * staggeredPhatS d L N
+          * (staggeredOrderDensityOpS d L N true
+            + staggeredOrderDensityOpS d L N false) ^ k).mulVec Φ).re
+      = 1 / 2 * ((star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true
+            + staggeredOrderDensityOpS d L N false) ^ k * orderWordProd d L N [true, false]
+            * (staggeredOrderDensityOpS d L N true
+              + staggeredOrderDensityOpS d L N false) ^ k).mulVec Φ).re
+          + (star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true
+            + staggeredOrderDensityOpS d L N false) ^ k * orderWordProd d L N [false, true]
+            * (staggeredOrderDensityOpS d L N true
+              + staggeredOrderDensityOpS d L N false) ^ k).mulVec Φ).re) := by
+    rw [hopid, Matrix.smul_mulVec, dotProduct_smul, smul_eq_mul, Matrix.add_mulVec, dotProduct_add,
+      show (2 : ℂ)⁻¹ = ((1 / 2 : ℝ) : ℂ) from by norm_num, Complex.re_ofReal_mul, Complex.add_re]
+  rw [hexp]
+  have hbtf := orderSum_pow_mid_close d L N hN Φ hsing hm0 hlro k hcond [true, false]
+    (by decide) (by decide)
+  have hbft := orderSum_pow_mid_close d L N hN Φ hsing hm0 hlro k hcond [false, true]
+    (by decide) (by decide)
+  rw [show (1 / 2 * ((star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true
+          + staggeredOrderDensityOpS d L N false) ^ k * orderWordProd d L N [true, false]
+          * (staggeredOrderDensityOpS d L N true
+            + staggeredOrderDensityOpS d L N false) ^ k).mulVec Φ).re
+        + (star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true
+          + staggeredOrderDensityOpS d L N false) ^ k * orderWordProd d L N [false, true]
+          * (staggeredOrderDensityOpS d L N true
+            + staggeredOrderDensityOpS d L N false) ^ k).mulVec Φ).re)
+      - ((2 * k).choose k : ℝ) * phatMoment d L N Φ (k + 1))
+      = 1 / 2 * (((star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true
+            + staggeredOrderDensityOpS d L N false) ^ k * orderWordProd d L N [true, false]
+            * (staggeredOrderDensityOpS d L N true
+              + staggeredOrderDensityOpS d L N false) ^ k).mulVec Φ).re
+          - ((2 * k).choose k : ℝ) * phatMoment d L N Φ (k + 1))
+        + ((star Φ ⬝ᵥ ((staggeredOrderDensityOpS d L N true
+            + staggeredOrderDensityOpS d L N false) ^ k * orderWordProd d L N [false, true]
+            * (staggeredOrderDensityOpS d L N true
+              + staggeredOrderDensityOpS d L N false) ^ k).mulVec Φ).re
+          - ((2 * k).choose k : ℝ) * phatMoment d L N Φ (k + 1))) from by ring, abs_mul,
+    show |(1 : ℝ) / 2| = 1 / 2 from by norm_num]
+  refine le_trans (mul_le_mul_of_nonneg_left (abs_add_le _ _) (by norm_num)) ?_
+  linarith [hbtf, hbft]
+
 end LatticeSystem.Quantum
