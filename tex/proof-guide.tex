@@ -9923,7 +9923,13 @@ $\alpha=2,3$ (4.2.15), so the order-operator density behaves as a classical vect
 $m^\ast$ pointing in $(1,0,0)$ with vanishing fluctuation.  The order parameter $m^\ast>0$
 (eq.~(4.2.9)) is recorded as an existential real (its double-limit construction and the bound
 $m^\ast\ge\sqrt{3q_0}$ of Theorem 4.11 kept separate); the $\alpha=2$ staggered operator
-\texttt{staggeredOrderOp2S} is added.  The axiom \texttt{tanakaSSB\_full\_symmetry\_breaking} shares
+\texttt{staggeredOrderOp2S} is added.  The ground-state family is conditioned to be a total-spin
+singlet ($\hat S_{\mathrm{tot}}^{(3)}\Phi=0$, $\hat S_{\mathrm{tot}}^{(1)}\Phi=0$, eq.~(4.1.7)) that
+is invariant under the axis-1 spin reversal $\Theta=\texttt{manyBodyReversalS}$ ($\Theta\Phi=\Phi$):
+the singlet part is a faithful Marshall--Lieb--Mattis refinement, while $\Theta\Phi=\Phi$ is added
+explicitly (it does not follow from $\hat S_{\mathrm{tot}}^{(1)}\Phi=0$, since $\Theta$ commutes with
+$\hat S_{\mathrm{tot}}^{(1)}$) and is exactly what forces the transverse moments (4.2.14) to vanish.
+The axiom \texttt{tanakaSSB\_full\_symmetry\_breaking} shares
 $C_1$ with Theorem 4.6 and is conditional on long-range order (vacuous in one dimension by
 Corollary 4.3).  Chapters~3--10 backfill.
 
