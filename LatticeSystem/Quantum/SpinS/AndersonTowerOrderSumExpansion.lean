@@ -72,13 +72,6 @@ theorem staggeredOrderOp1S_eq_smul_orderDensitySum (d L N : ℕ) [NeZero L] :
   congr 1
   rw [div_eq_mul_inv, mul_comm]
 
-/-- **`±`-word expansion of `(Ô_L^{(1)})^k`** (eqs. (4.2.30)/(4.2.71)): the `k`-th power of the
-`1`-axis order operator is `(L^d/2)^k` times the sum of all length-`k` order words. -/
-theorem orderOp1S_pow_eq_smul_sum (d L N k : ℕ) [NeZero L] :
-    (staggeredOrderOp1S (torusParitySublattice d L) N) ^ k
-      = ((L : ℂ) ^ d / 2) ^ k • ∑ c : Fin k → Bool, orderWordProd d L N (List.ofFn c) := by
-  rw [staggeredOrderOp1S_eq_smul_orderDensitySum, smul_pow, orderDensitySum_pow_eq_sum_words]
-
 /-- **Scale-invariance bridge** (eq. (4.2.70)): the Rayleigh quotient of the Tanaka tower term
 `(Ô_L^{(1)})^k Φ` equals that of the un-normalized density power `(ô⁺ + ô⁻)^k Φ`, because the two
 differ by the nonzero scalar `(L^d/2)^k` and the Rayleigh quotient is scale invariant.  This lets

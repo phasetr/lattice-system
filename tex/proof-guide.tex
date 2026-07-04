@@ -9878,17 +9878,34 @@ the rigorous Anderson tower.  Conditional on long-range order (the same $q_0$ pr
 hence vacuous in one dimension by Corollary 4.3.
 
 \noindent\textbf{Theorem 4.8} (Tanaka, Tasaki §4.2.1, eqs.~(4.2.10)--(4.2.11), pp.~97--98;
-documented axiom, \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The Tanaka
-full-symmetry-breaking state is low-lying: the candidate physical ``ground state''
+\textbf{proved} axiom-free, \texttt{Quantum/SpinS/AndersonTowerTanakaCapstone.lean}, Issue \#4958
+PR-E).  The Tanaka full-symmetry-breaking state is low-lying: the candidate physical ``ground
+state''
 $|\Xi_{(1,0,0)}\rangle=\tfrac1{\sqrt2}\bigl((\hat O_L^{(1)})^M|\Phi_{\mathrm{GS}}\rangle/\lVert\cdot
 \rVert+(\hat O_L^{(1)})^{M+1}|\Phi_{\mathrm{GS}}\rangle/\lVert\cdot\rVert\bigr)$ (eq.~(4.2.10),
 \texttt{tanakaSSBState}; each term separately normalized via \texttt{unitNormalize} and
 \texttt{vecNormSqRe}, with the $1$-axis staggered operator \texttt{staggeredOrderOp1S}) satisfies
 $\langle\Xi_{(1,0,0)}|\hat H|\Xi_{(1,0,0)}\rangle/\langle\Xi_{(1,0,0)}|\Xi_{(1,0,0)}\rangle\le
-E_{\mathrm{GS}}+C_2\{M+1\}^2/L^d$ (eq.~(4.2.11)) for $M>0$ with $M+1\le C_1 L^{d/2}$.  The axiom
-\texttt{tanakaSSB\_lowLying\_energy\_bound} asserts both \texttt{IsAndersonTowerConstants} (the
-Theorem 4.6 body, refactored as a predicate) and \texttt{IsTanakaSSBConstants} for one pair
-$(C_1,C_2)$, formalizing Tasaki's ``with the same constants as in Theorem 4.6''.  Stated in
+E_{\mathrm{GS}}+C_2\{M+1\}^2/L^d$ (eq.~(4.2.11)) for $M>0$ with $M+1\le C_1 L^{d/2}$.  The theorem
+\texttt{tanakaSSB\_lowLying\_energy\_bound} produces one pair $(C_1,C_2)$ satisfying both
+\texttt{IsAndersonTowerConstants} (Theorem 4.6) and \texttt{IsTanakaSSBConstants}, obtained by merging
+the two existentials with $C_1=\min$ (tightening the $M$-bounds) and $C_2=\max$ (weakening the energy
+bounds).  \emph{Proof.}  The scale-invariance drop (eq.~(4.2.70),
+\texttt{tanakaTowerTerm\_expectationRatioRe\_eq}) reduces the Rayleigh quotient of each tower term
+$(\hat O_L^{(1)})^k\Phi$ to that of $\tilde A^k\Phi$ with the Hermitian summed density $\tilde
+A=\hat o^++\hat o^-$; the variational gap
+(\texttt{variational\_gap\_le\_double\_commutator}) bounds it by the double-commutator numerator
+(\texttt{tanaka\_numerator\_bound}, eq.~(4.2.71), $\le
+k^2\,C(2(k-1),k-1)\,1152\,dN^4/V\,P_{k-1}$) over the balanced-word denominator
+(\texttt{orderSum\_pow\_two\_denom\_lower}, eq.~(4.2.67), $\ge C(2k,k)\,\tfrac12 P_k$).  The
+\emph{central-binomial (Pascal) cancellation} $2\,C(2(k-1),k-1)\le C(2k,k)$
+(\texttt{two\_mul\_choose\_two\_mul\_sub\_one\_le}, from \texttt{Nat.succ\_mul\_centralBinom\_succ})
+together with the long-range-order moment step $2q_0 P_{k-1}\le P_k$ collapse the ratio to $\le
+E_{\mathrm{GS}}+576\,dN^4/q_0\cdot k^2/L^d$.  Finally the two adjacent tower terms are orthonormal
+(\texttt{tanakaTowerTerm\_dotProduct\_cross\_eq\_zero}) and energy-decoupled (the parity cross-term
+vanishes, eq.~(4.2.69), \texttt{tanakaTowerTerm\_cross\_energy\_eq\_zero}), so the Tanaka state's
+Rayleigh energy is the average of the two per-term bounds
+(\texttt{tanakaSSBState\_expectationRatioRe\_le}), $\le E_{\mathrm{GS}}+C_2\{M+1\}^2/L^d$.  Stated in
 scale-invariant Rayleigh-ratio form, conditional on long-range order (vacuous in one dimension by
 Corollary 4.3).  Chapters~3--10 backfill.
 
