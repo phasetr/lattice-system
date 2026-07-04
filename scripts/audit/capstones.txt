@@ -61,36 +61,12 @@ theorem_10_5_shen_qiu_tian_transverse_sign
 # as a documented axiom (same policy as mielke_theorem_11_13). Legitimately zero-referenced.
 theorem_10_11_kubo_kishi_susceptibility_bound
 
-# Tasaki §4.2.2 Theorem 4.8 arc (#4958) PR2 [N1]: same-sign double commutators [ô^±,[Ĥ,ô^±]] in
-# the local-decay class. Intermediate milestones consumed by the [N2] 1-axis numerator / [N5]
-# capstone in a later PR of #4958; temporarily allowlisted, to be delisted at the capstone PR.
-isR2LocalUpTo_orderDoubleCommSameSign
-orderDoubleCommSameSignAggregate_le
-
-# Tasaki §4.2.2 Theorem 4.8 arc (#4958) PR3 [N4]: parity cross-term vanishing (eq. 4.2.69),
-# ⟨(ô¹)^M Φ, Ĥ (ô¹)^{M+1} Φ⟩ = 0. Consumed by the [N5] capstone in a later PR of #4958;
-# temporarily allowlisted, to be delisted at the capstone PR.
-tanakaTowerTerm_cross_energy_eq_zero
-
-# Tasaki §4.2.2 Theorem 4.8 crux sub-arc (#4958) PR-A: ±-word expansion basis + scale-inv bridge
-# + charge-selection rules. Terminal tips consumed by the [N3] denominator / [N2] numerator / [N5]
-# capstone in later PRs of #4958; temporarily allowlisted, to be delisted at the capstone PR.
-orderOp1S_pow_eq_smul_sum
-tanakaTowerTerm_expectationRatioRe_eq
-dotProduct_orderWord_singlet_eq_zero_of_charge_ne
-dotProduct_word_sandwich_eq_zero_of_charge_ne
-# PR-B [N3] denominator lower bound tip (#4958); terminal until PR-E capstone consumes it, then delist.
-orderSum_pow_two_denom_lower
-
-# Tasaki §4.2.2 Theorem 4.8 crux sub-arc (#4958) PR-C: [N2] generic double-commutator power
-# telescope (eq. 4.2.71) + charge {-2,0,+2} decomposition of d̃ = [Ã,[Ĥ,Ã]] + per-piece Ŝ³-charge
-# homogeneity + mirror piece [ô⁻,[Ĥ,ô⁺]] local-decay membership. Terminal tips consumed by the
-# [N2] assembly (PR-D) / [N5] capstone (PR-E); temporarily allowlisted, to be delisted at PR-E.
-double_commutator_pow_eq_double_sum
-orderDensitySumDoubleComm_eq_charge_pieces
-totalSpinSOp3_commutator_orderDoubleCommSameSign
-totalSpinSOp3_commutator_orderDoubleComm
-totalSpinSOp3_commutator_orderDoubleCommMirror
-isR2LocalUpTo_orderDoubleCommMirror
-orderDoubleCommMirrorAggregate_le
-tanaka_numerator_bound
+# V1 book capstone: Tasaki §4.2.2 Theorem 4.8 (the Tanaka symmetry-breaking state is low-lying),
+# now PROVED axiom-free (PR-E, #4958): there is one pair of positive constants (C₁, C₂) satisfying
+# both IsAndersonTowerConstants (Theorem 4.6) and IsTanakaSSBConstants (Theorem 4.8). Discharges the
+# former `tanakaSSB_lowLying_energy_bound` axiom by reducing the Tanaka state's Rayleigh quotient to
+# the Theorem 4.6 double-commutator machinery via the central-binomial (Pascal) cancellation
+# C(2(k-1),k-1)/C(2k,k) = k/(2(2k-1)) ≤ 1/2 (eqs. (4.2.69)–(4.2.71)). Legitimately zero-referenced
+# book capstone; the PR-A…PR-D arc tips (numerator/denominator/telescope/cross-term/charge pieces)
+# are now genuinely CONSUMED by this capstone chain, so their former allowlist entries were delisted.
+tanakaSSB_lowLying_energy_bound

@@ -283,25 +283,14 @@ def IsTanakaSSBConstants (d N : ℕ) (q₀ C₁ C₂ : ℝ) : Prop :=
             tanakaSSBState (torusParitySublattice d L) N M Φ).re ≤
         E₀.re + C₂ * ((M : ℝ) + 1) ^ 2 / (L : ℝ) ^ d
 
-/-- **Tasaki Theorem 4.8 (the Tanaka symmetry-breaking state is low-lying), AXIOM.**  With the
-*same* constants `C₁`, `C₂` as Theorem 4.6 (`IsAndersonTowerConstants`), the Tanaka state `Ξ`
-(eq. (4.2.10)) — a candidate physical "ground state" with full symmetry breaking — is itself a
-low-lying state (eq. (4.2.11), `IsTanakaSSBConstants`):
-`⟨Ξ_{(1,0,0)}| Ĥ |Ξ_{(1,0,0)}⟩ / ⟨Ξ_{(1,0,0)}, Ξ_{(1,0,0)}⟩ ≤ E_GS + C₂ {M(L)+1}² / L^d`,
-for any increasing `M = M(L) > 0` with `M + 1 ≤ C₁ L^{d/2}`.
-
-Asserting both predicates with one pair `(C₁, C₂)` formalizes Tasaki's "with the same constants as
-in Theorem 4.6".  Conditional on long-range order, hence vacuous in one dimension by Corollary 4.3.
-
-This is a **tractable axiom scheduled for discharge** (tracking #4958), not an operator-algebra
-documented axiom: Tasaki gives the complete proof (§4.2.2, following Tanaka [62], eqs.
-(4.2.69)–(4.2.71)) by reducing the 1-axis Tanaka state to the Theorem 4.6
-(`IsAndersonTowerConstants`) double-commutator machinery.  The statement-shape is now fixed: both
-predicates carry the total-spin-singlet hypothesis (eq. (4.1.7)), faithful to Tanaka's premise and
-required by the reused long-range-order moment recursion.  The energy bound (crux: the 1-axis
-numerator's binomial cancellation) will be discharged in a later PR of #4958. -/
-axiom tanakaSSB_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
-    ∃ C₁ C₂ : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂ ∧ IsTanakaSSBConstants d N q₀ C₁ C₂
+-- **Tasaki Theorem 4.8 (the Tanaka symmetry-breaking state is low-lying)** — the existence of one
+-- pair of constants `C₁`, `C₂` with both `IsAndersonTowerConstants` and `IsTanakaSSBConstants` — is
+-- **proved** as `tanakaSSB_lowLying_energy_bound` in
+-- `LatticeSystem.Quantum.SpinS.AndersonTowerTanakaCapstone` (downstream of this file, which only
+-- states the `IsTanakaSSBConstants` predicate, to avoid an import cycle with the 1-axis numerator /
+-- denominator machinery).  It reduces the Tanaka state's Rayleigh quotient (eq. (4.2.11)) to the
+-- Theorem 4.6 double-commutator estimate via the 1-axis binomial cancellation
+-- `C(2(k-1),k-1)/C(2k,k) = k/(2(2k-1)) ≤ 1/2` (eqs. (4.2.69)–(4.2.71), following Tanaka [62]).
 
 open Filter in
 /-- The Theorem 4.9 full-symmetry-breaking statement for fixed constants `C₁` and order parameter
