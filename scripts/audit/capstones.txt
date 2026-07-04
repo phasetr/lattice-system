@@ -81,3 +81,15 @@ dotProduct_orderWord_singlet_eq_zero_of_charge_ne
 dotProduct_word_sandwich_eq_zero_of_charge_ne
 # PR-B [N3] denominator lower bound tip (#4958); terminal until PR-E capstone consumes it, then delist.
 orderSum_pow_two_denom_lower
+
+# Tasaki §4.2.2 Theorem 4.8 crux sub-arc (#4958) PR-C: [N2] generic double-commutator power
+# telescope (eq. 4.2.71) + charge {-2,0,+2} decomposition of d̃ = [Ã,[Ĥ,Ã]] + per-piece Ŝ³-charge
+# homogeneity + mirror piece [ô⁻,[Ĥ,ô⁺]] local-decay membership. Terminal tips consumed by the
+# [N2] assembly (PR-D) / [N5] capstone (PR-E); temporarily allowlisted, to be delisted at PR-E.
+double_commutator_pow_eq_double_sum
+orderDensitySumDoubleComm_eq_charge_pieces
+totalSpinSOp3_commutator_orderDoubleCommSameSign
+totalSpinSOp3_commutator_orderDoubleComm
+totalSpinSOp3_commutator_orderDoubleCommMirror
+isR2LocalUpTo_orderDoubleCommMirror
+orderDoubleCommMirrorAggregate_le

@@ -8,6 +8,7 @@ the `[ô⁺, ô⁻]` terms (second/third sums, `O(M⁴/V²)`).
 -/
 import LatticeSystem.Quantum.SpinS.AndersonTowerLocalDecay
 import LatticeSystem.Quantum.SpinS.AndersonTowerAssembly
+import LatticeSystem.Math.CommutatorTelescope
 
 namespace LatticeSystem.Quantum
 

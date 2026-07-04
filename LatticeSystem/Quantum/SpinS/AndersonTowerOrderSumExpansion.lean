@@ -107,7 +107,7 @@ theorem tanakaTowerTerm_expectationRatioRe_eq (d L N k : ℕ) [NeZero L]
 charges `a` and `b` (`[A, X] = a X`, `[A, Y] = b Y`), then it commutes with the product `X Y` up to
 the summed charge, `[A, X Y] = (a + b) (X Y)`.  This is the derivation identity for the commutator
 `[A, ·]`. -/
-private theorem commutator_smul_of_smul {n : Type*} [Fintype n]
+theorem commutator_smul_of_smul {n : Type*} [Fintype n]
     {A X Y : Matrix n n ℂ} {a b : ℂ} (hX : A * X - X * A = a • X) (hY : A * Y - Y * A = b • Y) :
     A * (X * Y) - (X * Y) * A = (a + b) • (X * Y) := by
   have hderiv : A * (X * Y) - (X * Y) * A = (A * X - X * A) * Y + X * (A * Y - Y * A) := by
