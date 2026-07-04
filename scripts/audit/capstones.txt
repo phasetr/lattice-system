@@ -93,3 +93,4 @@ totalSpinSOp3_commutator_orderDoubleComm
 totalSpinSOp3_commutator_orderDoubleCommMirror
 isR2LocalUpTo_orderDoubleCommMirror
 orderDoubleCommMirrorAggregate_le
+tanaka_numerator_bound
