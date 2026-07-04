@@ -9909,8 +9909,8 @@ Rayleigh energy is the average of the two per-term bounds
 scale-invariant Rayleigh-ratio form, conditional on long-range order (vacuous in one dimension by
 Corollary 4.3).  Chapters~3--10 backfill.
 
-\noindent\textbf{Theorem 4.9} (Tanaka, Tasaki §4.2.1, eqs.~(4.2.12)--(4.2.15), pp.~98--99; documented
-axiom, \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The Tanaka state exhibits \emph{full
+\noindent\textbf{Theorem 4.9} (Tanaka, Tasaki §4.2.2, eqs.~(4.2.12)--(4.2.15), pp.~98--108; \textbf{proved},
+\texttt{Quantum/SpinS/AndersonTowerTheorem49.lean}, Issue \#4967 PR5).  The Tanaka state exhibits \emph{full
 $SU(2)$ symmetry breaking} in the $(1,0,0)$ direction.  There \emph{exists} a sufficiently slowly diverging $M(L)$
 ($\texttt{Tendsto}\ M\ \texttt{atTop atTop}$, with $M(L)+1\le C_1 L^{d/2}$; Tasaki's proof produces
 one, not every such sequence) for which the per-site staggered moments of $\Xi_{(1,0,0)}$ (in
@@ -9929,9 +9929,9 @@ is invariant under the axis-1 spin reversal $\Theta=\texttt{manyBodyReversalS}$ 
 the singlet part is a faithful Marshall--Lieb--Mattis refinement, while $\Theta\Phi=\Phi$ is added
 explicitly (it does not follow from $\hat S_{\mathrm{tot}}^{(1)}\Phi=0$, since $\Theta$ commutes with
 $\hat S_{\mathrm{tot}}^{(1)}$) and is exactly what forces the transverse moments (4.2.14) to vanish.
-The axiom \texttt{tanakaSSB\_full\_symmetry\_breaking} shares
-$C_1$ with Theorem 4.6 and is conditional on long-range order (vacuous in one dimension by
-Corollary 4.3).  Chapters~3--10 backfill.  \emph{Discharge PR2 (PR \#4969)} constructs the reversal-symmetry
+The proved theorem \texttt{tanakaSSB\_full\_symmetry\_breaking} shares
+$C_1$ with Theorem 4.6, takes $m^\ast=\sqrt{q_0}$, and is conditional on long-range order (vacuous in one
+dimension by Corollary 4.3).  Chapters~3--10 backfill.  \emph{Discharge PR2 (PR \#4969)} constructs the reversal-symmetry
 machinery for the full-SSB proof: the axis-1 spin reversal $\Theta$ conjugates the staggered order
 operators (eqs.~(4.2.48)): $\Theta\hat O^{(1)}\Theta=\hat O^{(1)}$ (axis-1 is fixed),
 $\Theta\hat O^{(2)}\Theta=-\hat O^{(2)}$, $\Theta\hat O^{(3)}\Theta=-\hat O^{(3)}$ (transverse reversal);
@@ -9998,6 +9998,30 @@ proved theorems in \texttt{Quantum/SpinS/AndersonTowerTanakaFluctuation.lean} (a
 the overall Theorem~4.9 (\texttt{tanakaSSB\_full\_symmetry\_breaking}), whose full $\varepsilon$-convergence
 assembly remains in the final capstone PR5.  The Rayleigh power ratio [Gap2] reuses the operator
 Cauchy--Schwarz corollary \texttt{abs\_re\_dotProduct\_mulVec\_le\_norm\_mul}.
+
+\emph{Discharge PR5 (PR \#4972, capstone)} converts the axiom into the proved theorem
+\texttt{tanakaSSB\_full\_symmetry\_breaking} in \texttt{Quantum/SpinS/AndersonTowerTheorem49.lean},
+using the \emph{explicit} slowly-diverging sequence $M(L):=\lfloor L^{d/4}\rfloor$.  Four ingredients
+close the four relations.  \emph{(a) Axis-3 $=$ axis-2 (eq.~(4.2.56)).}  The axis-1 order operator
+commutes with the total axis-1 spin ($[\hat S_{\mathrm{tot}}^{(1)},\hat O^{(1)}]=0$,
+\texttt{totalSpinSOp1\_commute\_staggeredOrderOp1S}), so $\hat S_{\mathrm{tot}}^{(1)}\Xi=0$ and the
+singlet component equality \texttt{staggeredOrder\_sq\_expectation\_eq\_23} applied at $\Xi$ gives
+$\text{second}3=\text{second}2$ \emph{exactly}
+(\texttt{tanakaOrderSecond3\_eq\_tanakaOrderSecond2}); no separate axis-3 asymptotics are needed.
+\emph{(b) Tower positivity.}  The renormalized ratchet \texttt{orderOp1\_evenMoment\_ratio\_ge\_q0}
+propagates $\|\Phi\|^2>0$ to $\|(\hat O^{(1)})^k\Phi\|^2>0$ for all $k$
+(\texttt{tanakaTowerTerm\_vecNormSqRe\_pos}).  \emph{(c) Clean fluctuation bound [F5].}  The finite-$L$
+bound \texttt{deltaFluctBound} is dominated by $N^2/(2(j+2))+K(j+2)^2/V$ with $K=6N+3N^3/(4q_0)$
+(\texttt{deltaFluctBound\_le\_clean}): the moment $P_{j+1}$ cancels in the leading term, the
+central-binomial ratio is $\le4$ (\texttt{Nat.succ\_mul\_centralBinom\_succ}), and $P_j/P_{j+1}\le
+1/(2q_0)$ (\texttt{phatMoment\_succ\_ratio}).  \emph{(d) $M(L)$ and confluence.}  $M(L)=\lfloor
+L^{d/4}\rfloor$ diverges (\texttt{tendsto\_rpow\_atTop}, \texttt{tendsto\_nat\_floor\_atTop}) with
+$M+1\le C_1 L^{d/2}$ and $(M+2)^2/L^d\to0$ (via \texttt{tendsto\_rpow\_neg\_atTop} and a
+\texttt{squeeze\_zero'} argument), so the fluctuation bound $\to0$ and (4.2.15) holds for both
+transverse axes; the lower bounds (4.2.12)/(4.2.13) come from PR3 with $m^\ast=\sqrt{q_0}$ (so
+$(m^\ast)^2=q_0$), and (4.2.14) from PR2.  The $N=0$ branch is vacuous (the order operator vanishes,
+contradicting long-range order).  The proved theorem depends only on
+\texttt{[propext, Classical.choice, Quot.sound]}.
 
 \noindent\textbf{Proposition 4.10} (Tasaki §4.2.1, eqs.~(4.2.17)--(4.2.22), pp.~99--100; documented
 axiom, \texttt{Quantum/SpinS/AndersonTowerSphereAverage.lean}, Issue \#4485).  The solid-angle average
