@@ -10106,13 +10106,21 @@ o^+,\hat o^-]\rVert\le N/V$, a permutation-group-free adjacent-swap telescoping
 products by $n^2 N^{2n-1}/V$, and the noncommutative binomial expansion of $\hat p^{\,n}$ as the
 uniform $(\tfrac12)^n$-combination of the $2^n$ block words.  Chapters~3--10 backfill.
 
-\noindent\textbf{Lemma 4.15} (Tasaki §4.2.2, eqs.~(4.2.38)--(4.2.39), pp.~105--106; documented axiom,
+\noindent\textbf{Lemma 4.15} (Tasaki §4.2.2, eqs.~(4.2.38)--(4.2.39), p.~105; documented axiom,
 \texttt{Quantum/SpinS/OrderOperatorAlgebra.lean}, Issue \#4485).  The order parameter as a $\hat
-p$-ratio double limit: $m^\ast=\lim_{n\uparrow\infty}\liminf_{L\uparrow\infty}\langle\hat
-p^{\,n+1}\rangle/\langle\hat p^{\,n}\rangle$ (eq.~(4.2.38); the $n$-ratio is increasing and bounded so
-the outer limit exists, the inner is a $\liminf$ per footnote~31).  The axiom
-\texttt{mStar\_eq\_phat\_ratio\_limit} states the sound $\liminf$-lower direction (for every
-$\varepsilon>0$, for all large $n$, eventually in even $L$ the ratio exceeds $m^\ast-\varepsilon$) and
+p$-ratio double limit.  Tasaki eq.~(4.2.38) states $m^\ast=\lim_{n\uparrow\infty}\liminf_{L\uparrow
+\infty}\sqrt{\langle\hat p^{\,n+1}\rangle/\langle\hat p^{\,n}\rangle}$ with a \emph{square root}
+(the $\sqrt{\ }$ radical is present in the printed equation; a \texttt{pdftotext} extraction of the
+PDF dropped it).  Squaring, the formal axiom equivalently records that the \emph{bare (unrooted)
+ratio} has the iterated limit $(m^\ast)^2=\lim_{n\uparrow\infty}\liminf_{L\uparrow\infty}\langle\hat
+p^{\,n+1}\rangle/\langle\hat p^{\,n}\rangle$ (the $n$-ratio is increasing and bounded so the outer
+limit exists, the inner is a $\liminf$ per footnote~31).  This is consistent with $\hat p=(\hat
+o^1)^2+(\hat o^2)^2$ having density-squared dimension ($\langle\hat p^{\,n}\rangle\simeq(m^\ast)^{2n}$)
+and with eq.~(4.2.37) $\langle\hat p^{\,n}\rangle/\langle\hat p^{\,n-1}\rangle\ge2q_0$ together with
+eq.~(4.2.39) $m^\ast\ge\sqrt{2q_0}$.  The axiom
+\texttt{mStar\_eq\_phat\_ratio\_limit} states the sound $\liminf$-lower direction of the squared
+form (for every $\varepsilon>0$, for all large $n$, eventually in even $L$ the bare ratio exceeds
+$(m^\ast)^2-\varepsilon$) and
 the $U(1)$-optimal bound $\sqrt{2q_0}\le m^\ast$ (eq.~(4.2.39), the $\sqrt2$ companion of
 Theorem~4.11's $\sqrt3$).  $m^\ast$ is pinned by a realizing ground-state family with
 \texttt{IsTanakaFullSSBConstants} (unsatisfiable in $d=1$), and the $\hat p$-moment denominators are
