@@ -363,27 +363,14 @@ def IsTanakaFullSSBConstants (d N : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
         (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
           |tanakaOrderSecond2 d L N (M L) (Φ L)| < ε ∧ |tanakaOrderSecond3 d L N (M L) (Φ L)| < ε)
 
-/-- **Tasaki Theorem 4.9 (the Tanaka state exhibits full symmetry breaking), AXIOM.**  With the same
-constants `C₁`, `C₂` as Theorem 4.6 and an order parameter `mStar > 0`, the Tanaka state
-`|Ξ_{(1,0,0)}⟩` realizes full `SU(2)` symmetry breaking in the `(1,0,0)` direction (eqs.
-(4.2.12)–(4.2.15)): for a *sufficiently slowly diverging* `M(L)` (existential, as Tasaki's proof
-produces one — not every diverging sequence), the staggered moment per site has `liminf ≥ mStar`
-along axis `1`, the squared moment `liminf ≥ mStar²` (the `liminf` forms per footnote 21), while
-along axes `2, 3` both vanish — so the order-operator density behaves as a classical vector of
-magnitude `mStar` pointing in `(1,0,0)`, with vanishing fluctuation.
-
-The order parameter `mStar` is recorded as an existential real (`> 0`); its identity with the double
-limit (4.2.9) and the inequality `mStar ≥ √(3 q₀)` (Theorem 4.11) are kept separate.  The
-ground-state family is conditioned to be a total-spin singlet (`Ŝ_tot^{(3)} Φ = 0`, `Ŝ_tot^{(1)} Φ =
-0`, eq. (4.1.7)) that is invariant under the axis-1 spin reversal (`Θ Φ = Φ`); the singlet part is a
-faithful refinement (the unique Marshall–Lieb–Mattis singlet, Theorem 2.3) and the reversal
-invariance is what makes the transverse moments (4.2.14) vanish.  Conditional on long-range order
-(same `q₀` premise as Theorem 4.6), hence vacuous in d=1 by Corollary 4.3.  Tasaki gives the
-complete proof (§4.2.2, following Tanaka [62]); recorded here as a faithful, sound documented axiom
-over the torus family. -/
-axiom tanakaSSB_full_symmetry_breaking (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
-    ∃ C₁ C₂ mStar : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂ ∧
-      IsTanakaSSBConstants d N q₀ C₁ C₂ ∧ IsTanakaFullSSBConstants d N q₀ C₁ mStar
+-- **Tasaki Theorem 4.9 (the Tanaka state exhibits full symmetry breaking)** — the existence of the
+-- constants `C₁`, `C₂` (as in Theorem 4.6) and an order parameter `mStar > 0` with
+-- `IsAndersonTowerConstants`, `IsTanakaSSBConstants` and `IsTanakaFullSSBConstants` — is **proved**
+-- as `tanakaSSB_full_symmetry_breaking` in
+-- `LatticeSystem.Quantum.SpinS.AndersonTowerTheorem49` (downstream of this file, which only states
+-- the `IsTanakaFullSSBConstants` predicate, to avoid an import cycle with the order-parameter
+-- lower-bound / fluctuation-decay machinery).  The `M(L) = ⌊L^{d/4}⌋` sequence realizes the four
+-- symmetry-breaking relations (4.2.12)–(4.2.15) following Tanaka [62].
 
 open Filter in
 /-- A **realizing Tanaka ground-state family**: a ground-state family `Φ` (energies `E₀`) and a

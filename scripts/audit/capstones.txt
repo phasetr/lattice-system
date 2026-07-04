@@ -71,16 +71,11 @@ theorem_10_11_kubo_kishi_susceptibility_bound
 # are now genuinely CONSUMED by this capstone chain, so their former allowlist entries were delisted.
 tanakaSSB_lowLying_energy_bound
 
-# TEMPORARY §4.2.2 Theorem 4.9 arc tips (#4967): the axis-1 transverse-moment layer and the
-# order-parameter lower bounds toward `tanakaSSB_full_symmetry_breaking` (Theorem 4.9). The (4.2.14)
-# transverse moments (PR2, #4969) and the (4.2.12)/(4.2.13) lower bounds (PR3, #4970) are
-# zero-referenced NOW and will be CONSUMED by the later PR5/PR6 arc (transverse fluctuation decay,
-# capstone), at which point they are DELISTED (same lifecycle as the delisted Theorem 4.8 PR-A…PR-D
-# tips).  The PR2 shared infrastructure `tanakaSSBState_dotProduct_mulVec_re_eq` and
-# `tanakaTowerTerm_cross_charge_conserving_eq_zero` are now CONSUMED by the PR3 lower bounds, so they
-# are delisted here.
-tanakaOrderMean2_eq_zero
-tanakaOrderMean3_eq_zero
-sqrt_q0_le_tanakaOrderMean1
-q0_le_tanakaOrderSecond1
-tanakaOrderSecond2_le
+# §4.2.2 Theorem 4.9 (Tanaka full symmetry breaking) — the discharged book capstone (#4967, PR5).
+# The former axiom `tanakaSSB_full_symmetry_breaking` is now a PROVED theorem
+# (`AndersonTowerTheorem49.lean`) that CONSUMES the whole Theorem 4.9 arc: the (4.2.14) transverse
+# moments (`tanakaOrderMean2_eq_zero`/`tanakaOrderMean3_eq_zero`), the (4.2.12)/(4.2.13) lower bounds
+# (`sqrt_q0_le_tanakaOrderMean1`/`q0_le_tanakaOrderSecond1`), and the (4.2.15) fluctuation decay
+# (`tanakaOrderSecond2_le`).  Those arc tips are therefore DELISTED here (same lifecycle as the
+# delisted Theorem 4.8 PR-A…PR-D tips); only the capstone remains allowlisted.
+tanakaSSB_full_symmetry_breaking
