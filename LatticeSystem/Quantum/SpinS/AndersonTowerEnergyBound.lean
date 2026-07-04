@@ -1043,8 +1043,57 @@ theorem phatMoment_eq_blockWord_avg (d L N n : ℕ) [NeZero L]
     Complex.re_ofReal_mul, Complex.re_sum]
 
 set_option maxHeartbeats 800000 in
--- The nested swap-chain + block-word-average induction exceeds the default heartbeat budget; the
--- proof is a single large structural induction that cannot be split without artificial lemmas.
+-- The nested swap-chain + block-word-average kernel exceeds the default heartbeat budget.
+/-- **Non-recursive swap-chain + block-word-average kernel (eq. (4.2.34)).**  Given a uniform
+bound `B` on the real expectations of balanced length-`2m` order words, every balanced length-
+`2(m+1)` word `w` has real expectation within `(m+1)² (N/V) B` of `P_{m+1}`.  The proof combines
+the renormalized swap-chain estimate (`swapChain_re_diff_le`) with the block-word average
+(`abs_sub_smul_sum_le`).  This kernel carries the weakest possible hypotheses (no `q₀`, no
+low-energy condition): both the crude `½ P`-collapse (`orderWord_balanced_re_close`) and the fine
+`O(1/V)` two-sided bound (`orderWord_balanced_re_close_fine`) invoke it, so the swap-chain
+machinery is written exactly once. -/
+private theorem orderWord_balanced_re_close_step (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) (m : ℕ) (B : ℝ) (hB : 0 ≤ B)
+    (hbnd : ∀ u : List Bool, u.count true = m → u.count false = m →
+        |(star Φ ⬝ᵥ (orderWordProd d L N u).mulVec Φ).re| ≤ B)
+    (w : List Bool) (hwt : w.count true = m + 1) (hwf : w.count false = m + 1) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N w).mulVec Φ).re - phatMoment d L N Φ (m + 1)|
+      ≤ ((m : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * B) := by
+  -- per-block-word deviation bound
+  have hbnd' : ∀ u : List Bool, u.count true = m + 1 - 1 → u.count false = m + 1 - 1 →
+      |(star Φ ⬝ᵥ (orderWordProd d L N u).mulVec Φ).re| ≤ B := by
+    intro u hut huf
+    rw [Nat.add_sub_cancel] at hut huf
+    exact hbnd u hut huf
+  have hper : ∀ c : Fin (m + 1) → Bool,
+      |(star Φ ⬝ᵥ (orderWordProd d L N w).mulVec Φ).re
+          - (star Φ ⬝ᵥ (orderWordProd d L N (blockWord c)).mulVec Φ).re|
+        ≤ ((m : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * B) := by
+    intro c
+    have hperm : w.Perm (blockWord c) :=
+      binary_perm_of_count
+        (by rw [blockWord_length]; have := count_true_add_count_false w; omega)
+        (by rw [blockWord_count_true]; exact hwt)
+    obtain ⟨k, hk, hchain⟩ := swapDist_le hperm
+    have hchainbd := swapChain_re_diff_le d L N hN Φ hsing (m + 1) B hB hbnd' hchain hwt hwf
+    refine le_trans hchainbd ?_
+    refine mul_le_mul_of_nonneg_right ?_ (by positivity)
+    have hkle : (k : ℝ) ≤ ((m : ℝ) + 1) ^ 2 := by
+      have hk2 : k ≤ (m + 1) * (m + 1) := by rw [hwt, hwf] at hk; exact hk
+      calc (k : ℝ) ≤ ((m + 1) * (m + 1) : ℕ) := by exact_mod_cast hk2
+        _ = ((m : ℝ) + 1) ^ 2 := by push_cast; ring
+    exact hkle
+  -- deviation of w from the block-word average ≤ D
+  rw [phatMoment_eq_blockWord_avg]
+  refine abs_sub_smul_sum_le Finset.univ ((2⁻¹ : ℝ) ^ (m + 1)) (by positivity) _ _ _ ?_ ?_
+  · rw [Finset.card_univ, Fintype.card_fun, Fintype.card_bool, Fintype.card_fin]
+    push_cast
+    rw [← mul_pow, show (2⁻¹ : ℝ) * 2 = 1 from by norm_num, one_pow]
+  · intro c _; exact hper c
+
+set_option maxHeartbeats 800000 in
+-- The `n`-induction chaining the shared kernel with the moment-ratio collapse is heartbeat-heavy.
 /-- **Lemma R1, deviation form (eq. (4.2.67)).**  Under `3 N n² ≤ 2 q₀ V`, every balanced
 length-`2n` order word has real expectation within `½ P_n` of `P_n`.  Proved by induction on `n`:
 the renormalized swap-chain estimate (`swapChain_re_diff_le`) bounds the deviation of each word from
@@ -1089,44 +1138,17 @@ theorem orderWord_balanced_re_close (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
       nlinarith [Nat.cast_nonneg (α := ℝ) N, this]
     have ihm := ih hcondm
     -- uniform bound B = (3/2) P_m on balanced length-2m words
-    have hbnd : ∀ u : List Bool, u.count true = m + 1 - 1 → u.count false = m + 1 - 1 →
+    have hbnd : ∀ u : List Bool, u.count true = m → u.count false = m →
         |(star Φ ⬝ᵥ (orderWordProd d L N u).mulVec Φ).re| ≤ 3 / 2 * phatMoment d L N Φ m := by
       intro u hut huf
-      rw [Nat.add_sub_cancel] at hut huf
       have hd := ihm u hut huf
       have h2 := abs_sub_le (star Φ ⬝ᵥ (orderWordProd d L N u).mulVec Φ).re
         (phatMoment d L N Φ m) 0
       rw [sub_zero, sub_zero, abs_of_nonneg hPm] at h2
       linarith [hd, h2]
-    -- per-block-word deviation bound D
-    have hper : ∀ c : Fin (m + 1) → Bool,
-        |(star Φ ⬝ᵥ (orderWordProd d L N w).mulVec Φ).re
-            - (star Φ ⬝ᵥ (orderWordProd d L N (blockWord c)).mulVec Φ).re|
-          ≤ ((m : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ m)) := by
-      intro c
-      have hperm : w.Perm (blockWord c) :=
-        binary_perm_of_count
-          (by rw [blockWord_length]; have := count_true_add_count_false w; omega)
-          (by rw [blockWord_count_true]; exact hwt)
-      obtain ⟨k, hk, hchain⟩ := swapDist_le hperm
-      have hchainbd := swapChain_re_diff_le d L N hN Φ hsing (m + 1)
-        (3 / 2 * phatMoment d L N Φ m) (by positivity) hbnd hchain hwt hwf
-      refine le_trans hchainbd ?_
-      refine mul_le_mul_of_nonneg_right ?_ (by positivity)
-      have hkle : (k : ℝ) ≤ ((m : ℝ) + 1) ^ 2 := by
-        have hk2 : k ≤ (m + 1) * (m + 1) := by rw [hwt, hwf] at hk; exact hk
-        calc (k : ℝ) ≤ ((m + 1) * (m + 1) : ℕ) := by exact_mod_cast hk2
-          _ = ((m : ℝ) + 1) ^ 2 := by push_cast; ring
-      exact hkle
-    -- deviation of w from the block-word average ≤ D
-    have hdev : |(star Φ ⬝ᵥ (orderWordProd d L N w).mulVec Φ).re - phatMoment d L N Φ (m + 1)|
-        ≤ ((m : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ m)) := by
-      rw [phatMoment_eq_blockWord_avg]
-      refine abs_sub_smul_sum_le Finset.univ ((2⁻¹ : ℝ) ^ (m + 1)) (by positivity) _ _ _ ?_ ?_
-      · rw [Finset.card_univ, Fintype.card_fun, Fintype.card_bool, Fintype.card_fin]
-        push_cast
-        rw [← mul_pow, show (2⁻¹ : ℝ) * 2 = 1 from by norm_num, one_pow]
-      · intro c _; exact hper c
+    -- deviation of w from the block-word average ≤ D, via the shared swap-chain kernel
+    have hdev := orderWord_balanced_re_close_step d L N hN Φ hsing m
+      (3 / 2 * phatMoment d L N Φ m) (by positivity) hbnd w hwt hwf
     -- D ≤ ½ P_{m+1} via the moment ratio
     refine le_trans hdev ?_
     have hratio : 2 * q₀ * phatMoment d L N Φ m ≤ phatMoment d L N Φ (m + 1) :=
@@ -1141,6 +1163,42 @@ theorem orderWord_balanced_re_close (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
           mul_le_mul_of_nonneg_left hNV (by positivity)
       _ = q₀ * phatMoment d L N Φ m := by ring
       _ ≤ 1 / 2 * phatMoment d L N Φ (m + 1) := by linarith [hratio]
+
+set_option maxHeartbeats 800000 in
+-- Elaborating the shared-kernel application against the `phatMoment` band is heartbeat-heavy.
+/-- **Lemma R1, fine two-sided form (eq. (4.2.34)).**  Under `3 N (m+1)² ≤ 2 q₀ V`, every balanced
+length-`2(m+1)` order word has real expectation within the genuinely `O(1/V)` band
+`(m+1)² (N/V) (3/2 P_m)` of `P_{m+1}`.  Unlike the crude `½ P_{m+1}` collapse
+(`orderWord_balanced_re_close`), the `(m+1)² N/V` prefactor is retained; this is what resolves the
+central-binomial Pascal cancellation in the axis-2 fluctuation decay (4.2.15).  Proved by feeding
+the crude closeness at `m` into the shared swap-chain kernel `orderWord_balanced_re_close_step`. -/
+theorem orderWord_balanced_re_close_fine (d L N : ℕ) [NeZero L] (hN : 1 ≤ N)
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ)
+    (hsing : (totalSpinSOp3 (HypercubicTorus d L) N).mulVec Φ = 0) {q₀ : ℝ}
+    (hm0 : 0 < phatMoment d L N Φ 0)
+    (hlro : 2 * q₀ * phatMoment d L N Φ 0 ≤ phatMoment d L N Φ 1) (m : ℕ)
+    (hcond : 3 * (N : ℝ) * ((m : ℝ) + 1) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d)
+    (w : List Bool) (hwt : w.count true = m + 1) (hwf : w.count false = m + 1) :
+    |(star Φ ⬝ᵥ (orderWordProd d L N w).mulVec Φ).re - phatMoment d L N Φ (m + 1)|
+      ≤ ((m : ℝ) + 1) ^ 2 * ((N : ℝ) / (L : ℝ) ^ d * (3 / 2 * phatMoment d L N Φ m)) := by
+  have hPm : 0 ≤ phatMoment d L N Φ m := phatMoment_nonneg d L N Φ m
+  -- crude closeness at `m` (its hypothesis follows from `hcond` since `m² ≤ (m+1)²`)
+  have hcondm : 3 * (N : ℝ) * (m : ℝ) ^ 2 ≤ 2 * q₀ * (L : ℝ) ^ d := by
+    refine le_trans ?_ hcond
+    have : (m : ℝ) ^ 2 ≤ ((m : ℝ) + 1) ^ 2 := by nlinarith [Nat.cast_nonneg (α := ℝ) m]
+    nlinarith [Nat.cast_nonneg (α := ℝ) N, this]
+  have hcrude := orderWord_balanced_re_close d L N hN Φ hsing hm0 hlro m hcondm
+  -- convert crude closeness (`|· − P_m| ≤ ½ P_m`) into a uniform absolute bound `3/2 P_m`
+  have hbnd : ∀ u : List Bool, u.count true = m → u.count false = m →
+      |(star Φ ⬝ᵥ (orderWordProd d L N u).mulVec Φ).re| ≤ 3 / 2 * phatMoment d L N Φ m := by
+    intro u hut huf
+    have hd := hcrude u hut huf
+    have h2 := abs_sub_le (star Φ ⬝ᵥ (orderWordProd d L N u).mulVec Φ).re
+      (phatMoment d L N Φ m) 0
+    rw [sub_zero, sub_zero, abs_of_nonneg hPm] at h2
+    linarith [hd, h2]
+  exact orderWord_balanced_re_close_step d L N hN Φ hsing m
+    (3 / 2 * phatMoment d L N Φ m) (by positivity) hbnd w hwt hwf
 
 /-- **Lemma R1 (eq. (4.2.67)).**  Under `3 N n² ≤ 2 q₀ V`, the real expectation of a balanced order
 product is pinched between `½ P_n` and `2 P_n`. -/

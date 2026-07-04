@@ -9965,6 +9965,40 @@ hermiticity of $\hat O^{(1)}$ (\texttt{staggeredOrderOp1S\_isHermitian}), unit n
 central-binomial cancellation needed---only ratio monotonicity. The new file
 \texttt{Quantum/SpinS/AndersonTowerTanakaLowerBounds.lean} records all lower-bound statements.
 
+\emph{Discharge PR4 (PR \#4971)} establishes the axis-2 transverse fluctuation decay (4.2.15),
+$\lim_L\langle(\hat O_L^{(2)}/L^d)^2\rangle=0$.  The proof mechanism (Tasaki eqs.~(4.2.49)--(4.2.55),
+pp.~106--108): write $\tilde O:=\hat o^+ + \hat o^-$ (so $\hat O_L^{(1)}=(V/2)\tilde O$, $V=L^d$), and
+$P_k:=\langle\Phi,\hat p^k\Phi\rangle$ (\texttt{phatMoment}, where $\hat p=\tfrac12(\hat o^+\hat o^-+\hat o^-\hat o^+)$).
+The per-site transverse fluctuation of the $k$-th tower term $u_k$ is $\delta_k:=\langle u_k|(\hat
+o^{(2)})^2|u_k\rangle = Q_k - R_k$ with $Q_k=E_k/D_k$ (single $\hat p$-insertion, numerator $E_k=\langle\Phi,\tilde O^k\hat p\tilde O^k\Phi\rangle$), $R_k=D_{k+1}/(4D_k)$ (ratio of denominators), $D_k=\langle\Phi,\tilde O^{2k}\Phi\rangle$.
+The two survive-and-count estimates are:
+\begin{itemize}
+\item \emph{[F1] Two-sided denominator closeness} (\texttt{orderSum\_pow\_two\_denom\_close}, eq.~(4.2.42)):
+$|D_{m+1}-\binom{2(m+1)}{m+1}P_{m+1}|\le\binom{2(m+1)}{m+1}\cdot(m+1)^2(N/L^d)(\tfrac32 P_m)$ via
+balanced-word expansion into the $2^{2(m+1)}$ order words; singlet charge-selection kills unbalanced words,
+leaving $\binom{2(m+1)}{m+1}$ balanced words, each pinched to within the fine two-sided band of $P_{m+1}$
+by \texttt{orderWord\_balanced\_re\_close\_fine} (eq.~(4.2.34), \textbf{not} the crude $\tfrac12 P$ bound).
+The key is retaining the $(m+1)^2(N/L^d)$ prefactor (vs.~crudely collapsing to $P_{m+1}$), visible in the
+refined bound; this is what resolves the central-binomial cancellation.
+\item \emph{[F2] Numerator closeness with $\hat p$-insertion} (\texttt{orderSum\_pow\_phat\_insert\_close}, eq.~(4.2.50)):
+$|E_k-\binom{2k}{k}P_{k+1}|\le\ldots$ via length-$2(k+1)$ balanced-word expansion with a central
+charge-0 $\hat p$-insertion, counted by Vandermonde's identity.
+\item \emph{[Gap2] Rayleigh power ratio} (\texttt{staggeredPhatS\_manyBodyOperatorNormS\_le},
+\texttt{phatMoment\_succ\_le\_normSq}): $P_{k+1}\le N^2 P_k$ and $\|\hat p u_k\|^2\le P_{k+1}$.
+\end{itemize}
+Combined with the Pascal ratio $(k+1)\binom{2k+2}{k+1}=2(2k+1)\binom{2k}{k}$ (\texttt{Nat.succ\_mul\_centralBinom\_succ}, eq.~(4.2.43))
+and the Rayleigh power bounds, this gives $\delta_k\le N^2/(2k+2)+O(1/L^d)\to0$, whence
+(\texttt{tanakaOrderSecond2\_eq\_half\_sum}, \texttt{tanaka\_delta\_eq}, \texttt{tanaka\_delta\_le})
+$\text{second}2=\tfrac12(\delta_M+\delta_{M+1})\to0$.  The per-site fluctuation decomposition
+(\texttt{tanakaOrderSecond2\_eq\_half\_sum}) takes the average over the two tower terms.  The $\delta_k$
+bound (\texttt{tanaka\_delta\_le}) chains the two-sided denominators (F1) and numerator (F2) with the
+Pascal ratio; the capstone (\texttt{tanakaOrderSecond2\_le}, eq.~(4.2.15)) assembles the full decay.
+\textbf{Status}: all lemmas (F1--Gap2--F3--F4) and the section tip \texttt{tanakaOrderSecond2\_le} are now
+proved theorems in \texttt{Quantum/SpinS/AndersonTowerTanakaFluctuation.lean} (axiom-free); the AXIOM is
+the overall Theorem~4.9 (\texttt{tanakaSSB\_full\_symmetry\_breaking}), whose full $\varepsilon$-convergence
+assembly remains in the final capstone PR5.  The Rayleigh power ratio [Gap2] reuses the operator
+Cauchy--Schwarz corollary \texttt{abs\_re\_dotProduct\_mulVec\_le\_norm\_mul}.
+
 \noindent\textbf{Proposition 4.10} (Tasaki §4.2.1, eqs.~(4.2.17)--(4.2.22), pp.~99--100; documented
 axiom, \texttt{Quantum/SpinS/AndersonTowerSphereAverage.lean}, Issue \#4485).  The solid-angle average
 of the symmetry-breaking states recovers the ground state.  For a unit vector $n\in S^2\subset
