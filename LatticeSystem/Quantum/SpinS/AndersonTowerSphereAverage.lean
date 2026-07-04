@@ -77,11 +77,14 @@ item; it is a `def … : Prop` and is **never asserted true** (no `axiom`/`theor
 would be unsound, the conjecture being open).
 
 The statement: for the `d`-dimensional hypercubic antiferromagnetic Heisenberg model, whenever a
-genuine realizing ground-state family `Φ` (eventual minimizer, nonzero, well-defined Tanaka terms,
-realizing slowly-diverging tower `M`) has long-range-order limit `q∗` (`hLRO`, eq. (4.2.25)) and the
-Tanaka state has staggered-moment limit `m∗` (`hSSB`, eq. (4.2.12)) with `m∗` the genuine SSB order
-parameter (`IsTanakaFullSSBConstants`), then `m∗ = √(3 q∗)` (eq. (4.2.26)).  Tasaki believes this is
-very likely valid but it is far from proven; we record it without asserting it. -/
+genuine realizing ground-state family `Φ` (eventual minimizer, nonzero, a **total-spin singlet**
+`Ŝ_tot^{(3)} Φ = Ŝ_tot^{(1)} Φ = 0` that is **axis-1 reversal invariant** `Θ Φ = Φ` — matching the
+conditioning of `IsTanakaFullSSBConstants`, so the linked full-SSB premise is non-vacuous — with
+well-defined Tanaka terms and realizing slowly-diverging tower `M`) has long-range-order limit `q∗`
+(`hLRO`, eq. (4.2.25)) and the Tanaka state has staggered-moment limit `m∗` (`hSSB`, eq. (4.2.12))
+with `m∗` the genuine SSB order parameter (`IsTanakaFullSSBConstants`), then `m∗ = √(3 q∗)`
+(eq. (4.2.26)).  Tasaki believes this is very likely valid but it is far from proven; we record it
+without asserting it. -/
 def conjecture_4_12 (d N : ℕ) : Prop :=
   ∀ (q₀ mStar C₁ : ℝ), 0 < q₀ → 0 < C₁ →
     ∀ (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ) (M : ℕ → ℕ),
@@ -91,6 +94,9 @@ def conjecture_4_12 (d N : ℕ) : Prop :=
         (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
           (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
         Φ L ≠ 0 ∧
+        (totalSpinSOp3 (HypercubicTorus d L) N).mulVec (Φ L) = 0 ∧
+        (totalSpinSOp1 (HypercubicTorus d L) N).mulVec (Φ L) = 0 ∧
+        (manyBodyReversalS (HypercubicTorus d L) N).mulVec (Φ L) = Φ L ∧
         0 < M L ∧ ((M L : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) ∧
         0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L) (Φ L)) ∧
         0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L + 1) (Φ L)) ∧
@@ -105,8 +111,10 @@ def conjecture_4_12 (d N : ℕ) : Prop :=
       IsConjecture412Equality mStar q₀
 
 /-- The Proposition 4.10 statement for fixed constants.  For a given ground-state family `Φ` (with
-the minimizer / long-range-order conditions eventual) and the *actual* long-range-order limit
-`qStar`
+the minimizer / long-range-order conditions eventual, and — matching `IsTanakaFullSSBConstants` — a
+**total-spin singlet** `Ŝ_tot^{(3)} Φ = Ŝ_tot^{(1)} Φ = 0` that is **axis-1 reversal invariant**
+`Θ Φ = Φ`, so the shared full-SSB conditioning stays non-vacuous) and the *actual* long-range-order
+limit `qStar`
 of that family (`q∗`, eq. (4.2.25), pinned by `Φ` — not freely chosen), **conditional on
 Conjecture 4.12** (`m∗ = √(3 qStar)`, a genuine hypothesis tying `m∗` to the physical `q∗`):
 there is a slowly diverging `M(L)` such that the *normalized solid-angle average* of the
@@ -121,6 +129,9 @@ def IsTanakaSphereAverageConstants (d N : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
         (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
           (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
         Φ L ≠ 0 ∧
+        (totalSpinSOp3 (HypercubicTorus d L) N).mulVec (Φ L) = 0 ∧
+        (totalSpinSOp1 (HypercubicTorus d L) N).mulVec (Φ L) = 0 ∧
+        (manyBodyReversalS (HypercubicTorus d L) N).mulVec (Φ L) = Φ L ∧
         q₀ ≤ (star (Φ L) ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
             staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
             ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2)) →

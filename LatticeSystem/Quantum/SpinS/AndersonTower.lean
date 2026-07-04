@@ -1,6 +1,7 @@
 import LatticeSystem.Quantum.SpinS.Heisenberg
 import LatticeSystem.Quantum.SpinS.RayleighInfMatrix
 import LatticeSystem.Quantum.SpinS.DysonLiebSimon
+import LatticeSystem.Quantum.SpinS.ManyBodyReversalS
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Data.ZMod.Basic
@@ -315,7 +316,18 @@ Per Tasaki footnote 21, the rigorous forms of (4.2.12)/(4.2.13) are `liminf`, so
 lower bounds `liminf_L ⟨Ô_L^{(1)}/L^d⟩ ≥ mStar` and `liminf_L ⟨(Ô_L^{(1)}/L^d)²⟩ ≥ mStar²` (i.e.
 eventually `> mStar − ε` / `> mStar² − ε`); the matching upper bounds follow from `mStar` being the
 *maximal* density (eq. (4.2.9)) and are not separately encoded.  The order parameter `mStar > 0` is
-an existential real, not the double limit `lim_k lim_L`. -/
+an existential real, not the double limit `lim_k lim_L`.
+
+As in `IsAndersonTowerConstants`/`IsTanakaSSBConstants`, the ground-state family is required to be a
+**total-spin singlet** (`Ŝ_tot^{(3)} Φ = 0` and `Ŝ_tot^{(1)} Φ = 0`, eq. (4.1.7)) that is also
+**invariant under the axis-1 spin reversal** `Θ = manyBodyReversalS` (the `π`-rotation about axis 1,
+`Θ Φ = Φ`).  On a bipartite lattice the antiferromagnetic Heisenberg ground state is the unique
+total-spin singlet (Marshall–Lieb–Mattis, Theorem 2.3), so the singlet part is a faithful
+refinement, not an extra restriction; it powers the charge-selection / long-range-order moment
+recursion behind (4.2.12)/(4.2.13).  The reversal invariance `Θ Φ = Φ` is added explicitly because
+it does *not* follow from `Ŝ_tot^{(1)} Φ = 0` alone (`Θ` commutes with `Ŝ_tot^{(1)}`, so it need not
+act as the identity on that eigenspace); it is exactly what forces the transverse moments (4.2.14)
+`⟨Ξ| Ô_L^{(2,3)} |Ξ⟩ = 0` to vanish (`Θ Ô^{(2,3)} Θ = -Ô^{(2,3)}`). -/
 def IsTanakaFullSSBConstants (d N : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
   0 < C₁ ∧ 0 < mStar ∧
     ∀ (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ),
@@ -325,6 +337,9 @@ def IsTanakaFullSSBConstants (d N : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
         (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
           (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
         Φ L ≠ 0 ∧
+        (totalSpinSOp3 (HypercubicTorus d L) N).mulVec (Φ L) = 0 ∧
+        (totalSpinSOp1 (HypercubicTorus d L) N).mulVec (Φ L) = 0 ∧
+        (manyBodyReversalS (HypercubicTorus d L) N).mulVec (Φ L) = Φ L ∧
         q₀ ≤ (star (Φ L) ⬝ᵥ ((staggeredOrderOpS (torusParitySublattice d L) N *
             staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
             ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2)) →
@@ -358,10 +373,14 @@ along axes `2, 3` both vanish — so the order-operator density behaves as a cla
 magnitude `mStar` pointing in `(1,0,0)`, with vanishing fluctuation.
 
 The order parameter `mStar` is recorded as an existential real (`> 0`); its identity with the double
-limit (4.2.9) and the inequality `mStar ≥ √(3 q₀)` (Theorem 4.11) are kept separate.  Conditional
-on long-range order (same `q₀` premise as Theorem 4.6), hence vacuous in d=1 by Corollary 4.3.
-Tasaki gives the complete proof (§4.2.2, following Tanaka [62]); recorded here as a faithful, sound
-documented axiom over the torus family. -/
+limit (4.2.9) and the inequality `mStar ≥ √(3 q₀)` (Theorem 4.11) are kept separate.  The
+ground-state family is conditioned to be a total-spin singlet (`Ŝ_tot^{(3)} Φ = 0`, `Ŝ_tot^{(1)} Φ =
+0`, eq. (4.1.7)) that is invariant under the axis-1 spin reversal (`Θ Φ = Φ`); the singlet part is a
+faithful refinement (the unique Marshall–Lieb–Mattis singlet, Theorem 2.3) and the reversal
+invariance is what makes the transverse moments (4.2.14) vanish.  Conditional on long-range order
+(same `q₀` premise as Theorem 4.6), hence vacuous in d=1 by Corollary 4.3.  Tasaki gives the
+complete proof (§4.2.2, following Tanaka [62]); recorded here as a faithful, sound documented axiom
+over the torus family. -/
 axiom tanakaSSB_full_symmetry_breaking (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
     ∃ C₁ C₂ mStar : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂ ∧
       IsTanakaSSBConstants d N q₀ C₁ C₂ ∧ IsTanakaFullSSBConstants d N q₀ C₁ mStar
@@ -371,7 +390,9 @@ open Filter in
 slowly-diverging tower sequence `M` that pin the order parameter `m∗` and the long-range-order
 parameter `q₀` as exact infinite-volume limits.  This bundles the conditioning shared by Theorems
 4.11, 4.13 and Lemma 4.15: `M` diverges (`Tendsto M atTop atTop`); `Φ L` is an eventual minimizing
-nonzero ground state with the growth bound `M L + 1 ≤ C₁ L^{d/2}` and well-defined Tanaka terms;
+nonzero ground state that is a total-spin singlet (`Ŝ_tot^{(3)} Φ = 0`, `Ŝ_tot^{(1)} Φ = 0`,
+eq. (4.1.7)) and axis-1 reversal invariant (`Θ Φ = Φ`, matching `IsTanakaFullSSBConstants`), with
+the growth bound `M L + 1 ≤ C₁ L^{d/2}` and well-defined Tanaka terms;
 `q₀` is the exact LRO limit (eq. (4.1.7)/(4.2.25)); `m∗` is the exact staggered-moment limit
 (eq. (4.2.12)); and `m∗` is the genuine full-SSB order parameter (`IsTanakaFullSSBConstants`).
 These
@@ -384,6 +405,9 @@ def IsRealizingTanakaGroundStateFamily (d N : ℕ) (q₀ mStar C₁ : ℝ)
     (∀ E : ℂ, ∀ Ψ : (HypercubicTorus d L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
       (heisenbergHamiltonianS (torusNNCoupling d L) N).mulVec Ψ = E • Ψ → (E₀ L).re ≤ E.re) ∧
     Φ L ≠ 0 ∧
+    (totalSpinSOp3 (HypercubicTorus d L) N).mulVec (Φ L) = 0 ∧
+    (totalSpinSOp1 (HypercubicTorus d L) N).mulVec (Φ L) = 0 ∧
+    (manyBodyReversalS (HypercubicTorus d L) N).mulVec (Φ L) = Φ L ∧
     0 < M L ∧ ((M L : ℝ) + 1) ≤ C₁ * (L : ℝ) ^ ((d : ℝ) / 2) ∧
     0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L) (Φ L)) ∧
     0 < vecNormSqRe (tanakaTowerTerm (torusParitySublattice d L) N (M L + 1) (Φ L)) ∧
