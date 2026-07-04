@@ -9981,7 +9981,7 @@ by \texttt{orderWord\_balanced\_re\_close\_fine} (eq.~(4.2.34), \textbf{not} the
 The key is retaining the $(m+1)^2(N/L^d)$ prefactor (vs.~crudely collapsing to $P_{m+1}$), visible in the
 refined bound; this is what resolves the central-binomial cancellation.
 \item \emph{[F2] Numerator closeness with $\hat p$-insertion} (\texttt{orderSum\_pow\_phat\_insert\_close}, eq.~(4.2.50)):
-$|E_k-\binom{2(k+1)}{k+1}P_{k+1}|\le\ldots$ via length-$2(k+1)$ balanced-word expansion with a central
+$|E_k-\binom{2k}{k}P_{k+1}|\le\ldots$ via length-$2(k+1)$ balanced-word expansion with a central
 charge-0 $\hat p$-insertion, counted by Vandermonde's identity.
 \item \emph{[Gap2] Rayleigh power ratio} (\texttt{staggeredPhatS\_manyBodyOperatorNormS\_le},
 \texttt{phatMoment\_succ\_le\_normSq}): $P_{k+1}\le N^2 P_k$ and $\|\hat p u_k\|^2\le P_{k+1}$.
@@ -9993,10 +9993,11 @@ $\text{second}2=\tfrac12(\delta_M+\delta_{M+1})\to0$.  The per-site fluctuation 
 (\texttt{tanakaOrderSecond2\_eq\_half\_sum}) takes the average over the two tower terms.  The $\delta_k$
 bound (\texttt{tanaka\_delta\_le}) chains the two-sided denominators (F1) and numerator (F2) with the
 Pascal ratio; the capstone (\texttt{tanakaOrderSecond2\_le}, eq.~(4.2.15)) assembles the full decay.
-\textbf{Status}: all lemmas (F1--Gap2--F3--F4) are now proved in \texttt{Quantum/SpinS/AndersonTowerTanakaFluctuation.lean};
-the capstone (\texttt{tanakaOrderSecond2\_le}) remains marked AXIOM pending the $\varepsilon$-convergence
-proof in the final capstone PR5.  Generic helper \texttt{re\_dotProduct\_mulVec\_le\_norm\_toEuclideanCLM}
-(Rayleigh ratio via operator norm, \texttt{Math/OperatorNormRayleigh.lean}) is now a proved theorem.
+\textbf{Status}: all lemmas (F1--Gap2--F3--F4) and the section tip \texttt{tanakaOrderSecond2\_le} are now
+proved theorems in \texttt{Quantum/SpinS/AndersonTowerTanakaFluctuation.lean} (axiom-free); the AXIOM is
+the overall Theorem~4.9 (\texttt{tanakaSSB\_full\_symmetry\_breaking}), whose full $\varepsilon$-convergence
+assembly remains in the final capstone PR5.  The Rayleigh power ratio [Gap2] reuses the operator
+Cauchy--Schwarz corollary \texttt{abs\_re\_dotProduct\_mulVec\_le\_norm\_mul}.
 
 \noindent\textbf{Proposition 4.10} (Tasaki §4.2.1, eqs.~(4.2.17)--(4.2.22), pp.~99--100; documented
 axiom, \texttt{Quantum/SpinS/AndersonTowerSphereAverage.lean}, Issue \#4485).  The solid-angle average

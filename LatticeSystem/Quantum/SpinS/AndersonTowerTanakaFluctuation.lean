@@ -26,7 +26,6 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1
 2020), §4.2.2, eqs. (4.2.33)/(4.2.34)/(4.2.49)–(4.2.55), pp. 104–108 (Tanaka [62]).
 -/
 import LatticeSystem.Quantum.SpinS.AndersonTowerTanakaLowerBounds
-import LatticeSystem.Math.OperatorNormRayleigh
 
 namespace LatticeSystem.Quantum
 
@@ -132,17 +131,41 @@ theorem staggeredPhatS_manyBodyOperatorNormS_le (d L N : ℕ) [NeZero L] (hN : 1
     (staggeredOrderDensityOpS d L N true * staggeredOrderDensityOpS d L N false
       + staggeredOrderDensityOpS d L N false * staggeredOrderDensityOpS d L N true)]
 
-/-- **Even-index Rayleigh bound**: `P_{2a+1} ≤ ‖p̂‖ · P_{2a}`.  Apply the operator-norm Rayleigh
-inequality (`re_dotProduct_mulVec_le_norm_toEuclideanCLM`) to `w = p̂^a Φ`; Hermiticity of `p̂^a`
-collapses `⟨w, p̂ w⟩` to `P_{2a+1}` and `⟨w, w⟩` to `P_{2a}`. -/
+/-- **Even-index Rayleigh bound**: `P_{2a+1} ≤ ‖p̂‖ · P_{2a}`.  Apply the operator Cauchy–Schwarz
+corollary (`abs_re_dotProduct_mulVec_le_norm_mul` with `u = v = w = p̂^a Φ`) plus `le_abs_self`,
+using the norm-square bridge `‖w‖₂² = ⟨w, w⟩` to turn the two `L²` norms into `⟨w, w⟩`; Hermiticity
+of `p̂^a` collapses `⟨w, p̂ w⟩` to `P_{2a+1}` and `⟨w, w⟩` to `P_{2a}`. -/
 private theorem phatMoment_two_mul_succ_le (d L N : ℕ) [NeZero L]
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (a : ℕ) :
     phatMoment d L N Φ (2 * a + 1)
       ≤ manyBodyOperatorNormS (staggeredPhatS d L N) * phatMoment d L N Φ (2 * a) := by
   have hH := staggeredPhatS_isHermitian d L N
-  have hR := LatticeSystem.Math.re_dotProduct_mulVec_le_norm_toEuclideanCLM
-    (staggeredPhatS d L N) ((staggeredPhatS d L N ^ a).mulVec Φ)
-  rw [← manyBodyOperatorNormS_eq_toEuclideanCLM] at hR
+  have hnorm : ‖(WithLp.toLp 2 ((staggeredPhatS d L N ^ a).mulVec Φ)
+        : EuclideanSpace ℂ (HypercubicTorus d L → Fin (N + 1)))‖ ^ 2
+      = (star ((staggeredPhatS d L N ^ a).mulVec Φ)
+          ⬝ᵥ (staggeredPhatS d L N ^ a).mulVec Φ).re := by
+    rw [← inner_self_eq_norm_sq (𝕜 := ℂ), EuclideanSpace.inner_toLp_toLp, dotProduct_comm,
+      RCLike.re_to_complex]
+  have hR : (star ((staggeredPhatS d L N ^ a).mulVec Φ)
+          ⬝ᵥ (staggeredPhatS d L N).mulVec ((staggeredPhatS d L N ^ a).mulVec Φ)).re
+      ≤ manyBodyOperatorNormS (staggeredPhatS d L N)
+          * (star ((staggeredPhatS d L N ^ a).mulVec Φ)
+              ⬝ᵥ (staggeredPhatS d L N ^ a).mulVec Φ).re := by
+    calc (star ((staggeredPhatS d L N ^ a).mulVec Φ)
+              ⬝ᵥ (staggeredPhatS d L N).mulVec ((staggeredPhatS d L N ^ a).mulVec Φ)).re
+        ≤ |(star ((staggeredPhatS d L N ^ a).mulVec Φ)
+              ⬝ᵥ (staggeredPhatS d L N).mulVec ((staggeredPhatS d L N ^ a).mulVec Φ)).re| :=
+          le_abs_self _
+      _ ≤ manyBodyOperatorNormS (staggeredPhatS d L N)
+            * ‖(WithLp.toLp 2 ((staggeredPhatS d L N ^ a).mulVec Φ)
+                : EuclideanSpace ℂ (HypercubicTorus d L → Fin (N + 1)))‖
+            * ‖(WithLp.toLp 2 ((staggeredPhatS d L N ^ a).mulVec Φ)
+                : EuclideanSpace ℂ (HypercubicTorus d L → Fin (N + 1)))‖ :=
+          abs_re_dotProduct_mulVec_le_norm_mul (staggeredPhatS d L N) _ _
+      _ = manyBodyOperatorNormS (staggeredPhatS d L N)
+            * (star ((staggeredPhatS d L N ^ a).mulVec Φ)
+                ⬝ᵥ (staggeredPhatS d L N ^ a).mulVec Φ).re := by
+          rw [mul_assoc, ← pow_two, hnorm]
   have hww : (star ((staggeredPhatS d L N ^ a).mulVec Φ)
       ⬝ᵥ (staggeredPhatS d L N ^ a).mulVec Φ).re = phatMoment d L N Φ (2 * a) := by
     rw [hermitian_pow_dotProduct_split hH a a Φ, phatMoment, two_mul]
