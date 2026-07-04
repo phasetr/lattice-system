@@ -222,4 +222,48 @@ theorem orderDoubleCommSameSignAggregate_le [NeZero L] (hL : 2 ≤ L) (hN : 1 �
   field_simp
   ring
 
+/-! ### The charge-neutral mirror double commutator `[ô⁻, [Ĥ, ô⁺]]` in the local-decay class -/
+
+/-- The per-volume **mirror** double commutator `d̂' = [ô⁻, [Ĥ, ô⁺]]`, the missing charge-neutral
+partner of the Theorem 4.6 mixed-sign piece `orderDoubleComm = [ô⁺, [Ĥ, ô⁻]]`.  Together they form
+the charge-`0` block `G₀` of the `1`-axis double commutator `d̃ = [ô^{(1)}, [Ĥ, ô^{(1)}]]`. -/
+noncomputable def orderDoubleCommMirror (d L N : ℕ) [NeZero L] :
+    ManyBodyOpS (HypercubicTorus d L) N :=
+  staggeredOrderDensityOpS d L N false * heisenbergSignComm d L N true
+    - heisenbergSignComm d L N true * staggeredOrderDensityOpS d L N false
+
+/-- The ℓ¹-aggregate for the mirror double commutator: one extra `orderComm` decay factor
+`2ζo₀/V = 2·2·N/V` times the single raising-commutator aggregate (mirror of
+`orderDoubleCommSameSignAggregate`). -/
+noncomputable def orderDoubleCommMirrorAggregate (d L N : ℕ) [NeZero L] : ℝ :=
+  (2 * 2 * (N : ℝ)) / (L : ℝ) ^ d * heisenbergSignCommAggregate d L N true
+
+/-- **The mirror double commutator lies in the local-decay class** (`ζ = 2`, `o₀ = N`, `g₀` its
+aggregate).  Obtained from `[Ĥ, ô⁺] ∈` class (at depth `K + 1`) by the recursion
+`IsR2LocalUpTo.orderComm_mem` with a lowering `orderComm false` step. -/
+theorem isR2LocalUpTo_orderDoubleCommMirror [NeZero L] (hL : 2 ≤ L) (hN : 1 ≤ N) (K : ℕ) :
+    IsR2LocalUpTo K 2 (N : ℝ) (orderDoubleCommMirrorAggregate d L N)
+      (orderDoubleCommMirror d L N) := by
+  have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    positivity
+  have hdecay : (0 : ℝ) ≤ (2 * 2 * (N : ℝ)) / (L : ℝ) ^ d := by positivity
+  exact (isR2LocalUpTo_heisenbergSignComm hL hN true (K + 1)).orderComm_mem false hdecay
+
+/-- **The mirror double-commutator aggregate is `≤ 96 d N⁴ / V`** — the same `O(1/V)` bound as the
+mixed-sign and same-sign pieces. -/
+theorem orderDoubleCommMirrorAggregate_le [NeZero L] (hL : 2 ≤ L) (hN : 1 ≤ N) :
+    orderDoubleCommMirrorAggregate d L N ≤ 96 * (d : ℝ) * (N : ℝ) ^ 4 / (L : ℝ) ^ d := by
+  have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by
+    have : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
+    positivity
+  have hsingle := heisenbergSignCommAggregate_le (d := d) hL hN true
+  rw [orderDoubleCommMirrorAggregate]
+  have hkey : (2 * 2 * (N : ℝ)) / (L : ℝ) ^ d * heisenbergSignCommAggregate d L N true
+      ≤ (2 * 2 * (N : ℝ)) / (L : ℝ) ^ d * (24 * (d : ℝ) * (N : ℝ) ^ 3) :=
+    mul_le_mul_of_nonneg_left hsingle (by positivity)
+  refine hkey.trans (le_of_eq ?_)
+  field_simp
+  ring
+
 end LatticeSystem.Quantum
