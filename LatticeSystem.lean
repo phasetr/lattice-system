@@ -128,6 +128,7 @@ import LatticeSystem.Quantum.SpinS.AndersonTowerTanakaNumeratorAssembly
 import LatticeSystem.Quantum.SpinS.AndersonTowerTanakaCapstone
 import LatticeSystem.Quantum.SpinS.AndersonTowerTanakaMoments
 import LatticeSystem.Quantum.SpinS.AndersonTowerTanakaLowerBounds
+import LatticeSystem.Quantum.SpinS.AndersonTowerTanakaFluctuation
 import LatticeSystem.Quantum.SpinS.AndersonTowerEigenstates
 import LatticeSystem.Quantum.SpinS.QuasiLocalSupport
 import LatticeSystem.Quantum.SpinS.QuasiLocalInductiveLimit
