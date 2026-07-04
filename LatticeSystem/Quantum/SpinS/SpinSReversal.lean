@@ -104,4 +104,19 @@ theorem spinReversalS_conj_spinSOpMinus (N : ℕ) :
     rw [this]; push_cast [Nat.cast_sub hj]; ring
   · rw [if_neg (by omega), if_neg h]
 
+/-- **`F` fixes `Ŝ¹`** (the axis-1 π-rotation leaves the longitudinal-in-plane axis 1 invariant).
+From `Ŝ¹ = ½(Ŝ⁺ + Ŝ⁻)` and `F Ŝ⁺ F = Ŝ⁻`, `F Ŝ⁻ F = Ŝ⁺`. -/
+theorem spinReversalS_conj_spinSOp1 (N : ℕ) :
+    spinReversalS N * spinSOp1 N * spinReversalS N = spinSOp1 N := by
+  rw [spinSOp1, mul_smul_comm, smul_mul_assoc, mul_add, add_mul,
+    spinReversalS_conj_spinSOpPlus, spinReversalS_conj_spinSOpMinus,
+    add_comm (spinSOpMinus N) (spinSOpPlus N)]
+
+/-- **`F` conjugates `Ŝ²` to `−Ŝ²`** (the axis-1 π-rotation reverses the transverse axis 2).
+From `Ŝ² = (Ŝ⁺ − Ŝ⁻)/(2i)` and `F Ŝ⁺ F = Ŝ⁻`, `F Ŝ⁻ F = Ŝ⁺`. -/
+theorem spinReversalS_conj_spinSOp2 (N : ℕ) :
+    spinReversalS N * spinSOp2 N * spinReversalS N = -spinSOp2 N := by
+  rw [spinSOp2, mul_smul_comm, smul_mul_assoc, mul_sub, sub_mul,
+    spinReversalS_conj_spinSOpPlus, spinReversalS_conj_spinSOpMinus, ← neg_sub, smul_neg]
+
 end LatticeSystem.Quantum

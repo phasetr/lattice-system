@@ -23,19 +23,6 @@ open Matrix
 
 variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
-/-- `F Ŝ¹ F = Ŝ¹` (axis-1 π-rotation fixes the axis-1 spin). -/
-theorem spinReversalS_conj_spinSOp1 (N : ℕ) :
-    spinReversalS N * spinSOp1 N * spinReversalS N = spinSOp1 N := by
-  rw [spinSOp1, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_add, Matrix.add_mul,
-    spinReversalS_conj_spinSOpPlus, spinReversalS_conj_spinSOpMinus,
-    add_comm (spinSOpMinus N) (spinSOpPlus N)]
-
-/-- `F Ŝ² F = −Ŝ²`. -/
-theorem spinReversalS_conj_spinSOp2 (N : ℕ) :
-    spinReversalS N * spinSOp2 N * spinReversalS N = -spinSOp2 N := by
-  rw [spinSOp2, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_sub, Matrix.sub_mul,
-    spinReversalS_conj_spinSOpPlus, spinReversalS_conj_spinSOpMinus, ← smul_neg, neg_sub]
-
 /-- Conjugation by `Θ` distributes over a product (inserting `Θ² = 1`). -/
 theorem manyBodyReversalS_conj_mul (A B : ManyBodyOpS Λ N) :
     manyBodyReversalS Λ N * (A * B) * manyBodyReversalS Λ N =
