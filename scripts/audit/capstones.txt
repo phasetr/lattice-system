@@ -79,3 +79,5 @@ orderOp1S_pow_eq_smul_sum
 tanakaTowerTerm_expectationRatioRe_eq
 dotProduct_orderWord_singlet_eq_zero_of_charge_ne
 dotProduct_word_sandwich_eq_zero_of_charge_ne
+# PR-B [N3] denominator lower bound tip (#4958); terminal until PR-E capstone consumes it, then delist.
+orderSum_pow_two_denom_lower
