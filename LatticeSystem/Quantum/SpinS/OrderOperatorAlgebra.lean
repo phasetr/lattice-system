@@ -872,15 +872,18 @@ theorem staggered_balanced_order_product_norm_le {d L N n : ℕ} [NeZero L] (hn 
     norm_num
 
 open Filter in
-/-- **Tasaki Lemma 4.15 (the order parameter as a `p̂`-ratio double limit), AXIOM.**  The
-symmetry-breaking order parameter `m∗` is the iterated limit of the ground-state `p̂`-ratios
-(eq. (4.2.38)): `(m∗)² = lim_{n↑∞} liminf_{L↑∞} ⟨p̂^{n+1}⟩ / ⟨p̂^n⟩` (the `n`-ratio is increasing
-and bounded, so the outer limit exists; the inner is a `liminf` per footnote 31).  Note that `p̂`
-has density-squared dimension (`p̂ = (ô¹)² + (ô²)²`), so the ratio limit is `(m∗)²` not `m∗`
-(Tasaki eq. (4.2.38) prints `m∗` as a dimensional slip; the consistency of eq. (4.2.38) with
-eq. (4.2.37) `⟨p̂^n⟩/⟨p̂^{n-1}⟩ ≥ 2 q₀` and eq. (4.2.39) `m∗ ≥ √(2 q₀)` forces the common limit to
-be `(m∗)²`, per txt:5709–5710).  We state the sound `liminf`-lower direction — for every `ε > 0`,
-for all large `n`, eventually in (even) `L` the ratio exceeds `(m∗)² − ε` — which captures
+/-- **Tasaki Lemma 4.15 (the order parameter as a `p̂`-ratio double limit), AXIOM.**  Tasaki
+§4.2.2 eq. (4.2.38) (rendered p. 105) states the symmetry-breaking order parameter `m∗` as the
+square-rooted iterated limit of the ground-state `p̂`-ratios,
+`m∗ = lim_{n↑∞} liminf_{L↑∞} √(⟨p̂^{n+1}⟩ / ⟨p̂^n⟩)` (the `√` radical is present in the printed
+equation; a `pdftotext` extraction of the PDF dropped it).  Squaring, this equivalently records
+that the **bare (unrooted) ratio** has the iterated limit `(m∗)²`, i.e.
+`(m∗)² = lim_{n↑∞} liminf_{L↑∞} ⟨p̂^{n+1}⟩ / ⟨p̂^n⟩` (the `n`-ratio is increasing and bounded, so
+the outer limit exists; the inner is a `liminf` per footnote 31).  This is consistent with
+`p̂ = (ô¹)² + (ô²)²` having density-squared dimension (`⟨p̂^n⟩ ≃ (m∗)^{2n}`, txt:5709–5710) and
+with eq. (4.2.37) `⟨p̂^n⟩/⟨p̂^{n-1}⟩ ≥ 2 q₀` combined with eq. (4.2.39) `m∗ ≥ √(2 q₀)`.  We state
+the sound `liminf`-lower direction of the squared form — for every `ε > 0`, for all large `n`,
+eventually in (even) `L` the bare ratio exceeds `(m∗)² − ε` — which captures
 `lim_n liminf_L ⟨p̂^{n+1}⟩/⟨p̂^n⟩ ≥ (m∗)²`.  The axiom also records the `U(1)`-optimal bound
 `√(2 q₀) ≤ m∗` (eq. (4.2.39), the weaker `√2` companion of Theorem 4.11's `√3`).
 
