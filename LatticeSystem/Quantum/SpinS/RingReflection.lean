@@ -50,3 +50,4 @@ import LatticeSystem.Quantum.SpinS.RingReflectionCauchySchwarzSqrt
 import LatticeSystem.Quantum.SpinS.RingReflectionRightBondSum
 import LatticeSystem.Quantum.SpinS.RingReflectionConcreteGibbs
 import LatticeSystem.Quantum.SpinS.RingReflectionFieldWeight
+import LatticeSystem.Quantum.SpinS.RingReflectionTwoFieldWeight

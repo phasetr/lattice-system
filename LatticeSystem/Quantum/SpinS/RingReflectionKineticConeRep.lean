@@ -33,6 +33,20 @@ theorem ringReflectionThetaS_exp_add_eq {X : ManyBodyOpS (Fin (2 * n)) N}
   rw [NormedSpace.exp_add_of_commute (hX.mul_theta_comm hX), ← ringReflectionThetaS_exp]
   exact hX.exp.mul_theta_comm hX.exp
 
+/-- **Asymmetric kinetic merge.**  For left-supported `X` and `Y`, the product of the left factor
+`exp X` and the reflected right factor `θ(exp Y)` merges into a single exponential
+`exp(X + θ Y)` (the two factors commute since `X` acts on the left half and `θ(exp Y)` on the
+right).  This is the two-field analogue of `ringReflectionThetaS_exp_add_eq`, with independent left
+and right generators; it lives here (where the matrix-exponential norm diamond of the Lie-product
+layer is absent) so the two-field Gibbs weight can consume it as a black box. -/
+theorem ringReflectionThetaS_exp_mul_theta_exp {X Y : ManyBodyOpS (Fin (2 * n)) N}
+    (hX : SupportedOnLeftS n N X) (hY : SupportedOnLeftS n N Y) :
+    NormedSpace.exp X * ringReflectionThetaS n N (NormedSpace.exp Y)
+      = NormedSpace.exp (X + ringReflectionThetaS n N Y) := by
+  haveI : CompleteSpace (ManyBodyOpS (Fin (2 * n)) N) :=
+    FiniteDimensional.complete ℂ (ManyBodyOpS (Fin (2 * n)) N)
+  rw [ringReflectionThetaS_exp, NormedSpace.exp_add_of_commute (hX.mul_theta_comm hY)]
+
 /-- **The kinetic Gibbs factor is cone-representable.**  For a left-supported `X`,
 `exp(X + θ X)` is cone-representable (a single cone generator `θ(L)·L`, `L = exp X`). -/
 theorem coneRep_exp_add {X : ManyBodyOpS (Fin (2 * n)) N} (hX : SupportedOnLeftS n N X) :
