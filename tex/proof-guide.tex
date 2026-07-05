@@ -9442,7 +9442,20 @@ $H = \texttt{ringLeftHamiltonian} + \theta(\texttt{ringLeftHamiltonian})
 - (\texttt{crossBondInteractionS}\,0 + \texttt{crossBondInteractionS}\,(n-1))$, and
 \texttt{ringDLSDecomposition\_gibbs\_rpTraceWeight} concludes that $\exp(-\beta H)$ is a
 reflection-positive trace weight ($\beta \ge 0$).  Identifying $H$ with the physical ungauged
-Hamiltonian is the next step.  The twenty-first layer (\texttt{RingReflectionBondSplit.lean}) splits
+Hamiltonian is the next step.
+
+\noindent\textbf{Gaussian-domination infrastructure layer (field-augmented foundation)}
+(\texttt{RingReflectionFieldWeight.lean}, Tasaki \S4.1 toward Theorem 4.2, eqs.~(4.1.49)--(4.1.51)):
+the first sound piece of the finite-$\beta$ Gaussian-domination sub-arc.  For the Dyson--Lieb--Simon
+Gaussian-domination bound $Z_\beta(h) \le Z_\beta(0)$, the infrastructure augments the left-half
+DLS part $H_L$ with a diagonal single-site field $\sum_{x < n} (a\,x) \cdot \hat S_x^{(3)}$, yielding
+the field-augmented left Hamiltonian \texttt{ringLeftFieldHamiltonian}\,$n\,N\,a$ (still left-supported,
+via \texttt{ringLeftFieldHamiltonian\_supportedOnLeft}). The ring crossing decomposition instantiated
+with this field-augmented part gives \texttt{ringFieldDLSDecomposition}\,$n\,N\,a$ --- the DLS form
+of the uniform-field antiferromagnet. For a field configuration $a$ symmetric across the reflection
+plane, the reconstructed Hamiltonian is $H_{\text{sym}} = L_{\text{field}}(a) + \theta(L_{\text{field}}(a)) - \text{crossing}$, and its Gibbs weight \texttt{ringDLSFieldWeightSym}\,$n\,N\,\beta\,a = \exp(-\beta H_{\text{sym}})$ is again a reflection-positive trace weight (\texttt{ringDLSFieldWeightSym\_rpTraceWeight}, $\beta \ge 0$) and reflection-invariant (\texttt{ringReflectionThetaS\_ringDLSFieldWeightSym}) --- the Fourier-insertion target for the later Gaussian-domination chessboard and infrared-bound PRs.
+
+The twenty-first layer (\texttt{RingReflectionBondSplit.lean}) splits
 the ring Hamiltonian into its bonds: the bonds $(x, x+1)$ of $\mathrm{Fin}(2n)$ fall into four
 disjoint classes by $x$ (left $x\le n-2$, crossing $x=n-1$, right $n\le x\le 2n-2$, crossing
 $x=2n-1$), and summing the bond form over this partition gives
