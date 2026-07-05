@@ -9300,16 +9300,21 @@ multiples, with left-site $\hat o_x$ generators), shows $\theta$ maps left-suppo
 right-supported ones, and defines the reflection-positive functional predicate
 $0 \le \operatorname{Re}\varphi(\theta(A)\,A)$ for left-supported $A$ --- the positivity at the heart
 of the Dyson--Lieb--Simon / Shastry argument.  The fourth layer
-(\texttt{RingReflectionTraceCone.lean}) discharges the $\beta = 0$ base case
-\texttt{traceFunctional\_reflectionPositive}: the trace functional $X \mapsto \operatorname{Tr} X$ is
-reflection positive, $0 \le \operatorname{Re}\operatorname{Tr}(\theta(A)\,A)$ for every left-supported
-$A$.  The proof collapses $\operatorname{Tr}(\theta(A)\,A) = \sum_{\sigma,\mu}
-\theta(A)_{\sigma\mu} A_{\mu\sigma}$ to its diagonal (both support conditions force $\mu=\sigma$), then
+(\texttt{RingReflectionTraceCone.lean}) establishes the $\beta = 0$ base case via the \emph{bilinear
+reflection base identity} \texttt{trace\_theta\_mul\_eq\_refLeftSum\_mul}: for left-supported
+operators, $\operatorname{Tr}(\theta(A)\,B) = \overline{S_A}\,S_B$ where $S_X = \texttt{refLeftSum}\,X =
+\sum_\ell X_{\sigma_\ell,\sigma_\ell}$ is the left-diagonal coordinate (the trace-cone ``square root''
+coordinate of $X$).  Taking $B := A$ recovers the functional positivity conclusion
+\texttt{traceFunctional\_reflectionPositive}: the trace functional is reflection positive,
+$0 \le \operatorname{Re}\operatorname{Tr}(\theta(A)\,A)$ for every left-supported $A$.  The proof of the
+bilinear identity collapses $\operatorname{Tr}(\theta(A)\,B) = \sum_{\sigma,\mu}
+\theta(A)_{\sigma\mu} B_{\mu\sigma}$ to its diagonal (both support conditions force $\mu=\sigma$), then
 factorizes over the left/right configuration split \texttt{configSplitEquiv} (built from
-\texttt{finSumFinEquiv}): the diagonal value $A_{\sigma\sigma}$ depends only on the left half, so
-$\operatorname{Tr}(\theta(A)\,A) = \overline{S}\,S = \lVert S\rVert^2 \ge 0$ with
-$S = \sum_\ell D_\ell$.  This infinite-temperature trace cone is the building block on which a later
-layer mounts the Gibbs exponential via the Trotter / Lie-product expansion.  The fifth layer
+\texttt{finSumFinEquiv}): the diagonal values $A_{\sigma\sigma}$ and $B_{\sigma\sigma}$ depend only on
+the left half, giving $\operatorname{Tr}(\theta(A)\,B) = \overline{S_A}\,S_B$, the factorized form on
+which the Gibbs / doubled Cauchy--Schwarz layer is built.  This infinite-temperature trace cone is the
+building block on which a later layer mounts the Gibbs exponential via the Trotter / Lie-product
+expansion.  The fifth layer
 (\texttt{RingReflectionWeightedCone.lean}) is the algebraic completion of the cone:
 \texttt{SupportedOnLeftS.mul} (the left-half subalgebra is closed under products),
 \texttt{SupportedOnLeftS.mul\_theta\_comm} (a left-supported $A$ commutes with $\theta(B)$, which acts

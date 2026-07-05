@@ -100,6 +100,97 @@ theorem configSplitEquiv_fst_ringConfigReflect (σ : Fin (2 * n) → Fin (N + 1)
   have := j.isLt
   omega
 
+/-- Left-diagonal sum `S(A) = ∑_ℓ A_{(ℓ,ℓ),(ℓ,ℓ)}`, the cone "square-root" coordinate of a
+left-supported operator: the scalar value that enters the reflection-positive factorization
+`Tr(θ(A)·B) = conj(S A)·S B`. -/
+noncomputable def refLeftSum (n N : ℕ) (A : ManyBodyOpS (Fin (2 * n)) N) : ℂ :=
+  ∑ ℓ : Fin n → Fin (N + 1),
+    A ((configSplitEquiv n N).symm (ℓ, ℓ)) ((configSplitEquiv n N).symm (ℓ, ℓ))
+
+/-- **Bilinear reflection base identity (the `β = 0` cone).**  For left-supported operators `A`, `B`
+the reflection trace form factorizes over the left-diagonal coordinate `refLeftSum`:
+`Tr(θ(A)·B) = conj(S A)·S B`.  This is the genuine bilinear generalization of the diagonal
+`traceFunctional_reflectionPositive` (recovered by `B := A`); it is the base identity on which the
+Gibbs / doubled Cauchy–Schwarz layer of the Dyson–Lieb–Simon / Shastry argument is mounted
+(Tasaki §4.1, Theorem 4.2). -/
+theorem trace_theta_mul_eq_refLeftSum_mul {A B : ManyBodyOpS (Fin (2 * n)) N}
+    (hA : SupportedOnLeftS n N A) (hB : SupportedOnLeftS n N B) :
+    (ringReflectionThetaS n N A * B).trace
+      = starRingEnd ℂ (refLeftSum n N A) * refLeftSum n N B := by
+  -- `DA`, `DB` are the left-diagonal summand functions of `A`, `B`; `refLeftSum` is their sum.
+  set DA : (Fin n → Fin (N + 1)) → ℂ :=
+    fun ℓ => A ((configSplitEquiv n N).symm (ℓ, ℓ)) ((configSplitEquiv n N).symm (ℓ, ℓ))
+    with hDA
+  set DB : (Fin n → Fin (N + 1)) → ℂ :=
+    fun ℓ => B ((configSplitEquiv n N).symm (ℓ, ℓ)) ((configSplitEquiv n N).symm (ℓ, ℓ))
+    with hDB
+  have hrA : refLeftSum n N A = ∑ ℓ, DA ℓ := rfl
+  have hrB : refLeftSum n N B = ∑ ℓ, DB ℓ := rfl
+  rw [hrA, hrB]
+  -- Each diagonal is a function of the left half alone.
+  have hADA : ∀ τ : Fin (2 * n) → Fin (N + 1), A τ τ = DA (configSplitEquiv n N τ).1 := by
+    intro τ
+    simp only [hDA]
+    apply hA.diag_eq
+    intro i hi
+    rw [configSplitEquiv_symm_apply_left _ _ i hi, configSplitEquiv_fst]
+  have hADB : ∀ τ : Fin (2 * n) → Fin (N + 1), B τ τ = DB (configSplitEquiv n N τ).1 := by
+    intro τ
+    simp only [hDB]
+    apply hB.diag_eq
+    intro i hi
+    rw [configSplitEquiv_symm_apply_left _ _ i hi, configSplitEquiv_fst]
+  -- Step 1: support collapse.  Left agreement now comes from `hA.theta_right`, right from `hB.1`.
+  have hcollapse : (ringReflectionThetaS n N A * B).trace
+      = ∑ σ, ringReflectionThetaS n N A σ σ * B σ σ := by
+    simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_apply]
+    refine Finset.sum_congr rfl (fun σ _ => ?_)
+    rw [Finset.sum_eq_single σ]
+    · intro μ _ hμ
+      by_contra hprod
+      obtain ⟨hθne, hBne⟩ := mul_ne_zero_iff.mp hprod
+      have hL : ∀ i : Fin (2 * n), (i : ℕ) < n → σ i = μ i := hA.theta_right σ μ hθne
+      have hR : ∀ i : Fin (2 * n), n ≤ (i : ℕ) → μ i = σ i := hB.1 μ σ hBne
+      apply hμ
+      funext x
+      rcases lt_or_ge (x : ℕ) n with hx | hx
+      · exact (hL x hx).symm
+      · exact hR x hx
+    · intro h; exact absurd (Finset.mem_univ σ) h
+  -- Step 2: rewrite the `θ`-diagonal and `B`-diagonal, pass to `DA`, `DB`.
+  have hsum : (ringReflectionThetaS n N A * B).trace
+      = ∑ σ, starRingEnd ℂ (DA fun j => (configSplitEquiv n N σ).2 (Fin.rev j))
+          * DB (configSplitEquiv n N σ).1 := by
+    rw [hcollapse]
+    refine Finset.sum_congr rfl (fun σ _ => ?_)
+    rw [ringReflectionThetaS_apply, hADA (ringConfigReflect n N σ), hADB σ]
+    have he : (configSplitEquiv n N (ringConfigReflect n N σ)).1
+        = fun j => (configSplitEquiv n N σ).2 (Fin.rev j) :=
+      funext (configSplitEquiv_fst_ringConfigReflect σ)
+    rw [he]
+  -- Step 3: reindex the `r`-sum by `r ↦ r ∘ rev`.
+  have hC : (∑ r : Fin n → Fin (N + 1), starRingEnd ℂ (DA fun j => r (Fin.rev j)))
+      = starRingEnd ℂ (∑ r, DA r) := by
+    have hsc : (∑ r : Fin n → Fin (N + 1), starRingEnd ℂ (DA fun j => r (Fin.rev j)))
+        = ∑ r, starRingEnd ℂ (DA r) :=
+      Fintype.sum_equiv (Equiv.arrowCongr (Function.Involutive.toPerm Fin.rev Fin.rev_rev)
+          (Equiv.refl (Fin (N + 1))))
+        (fun r : Fin n → Fin (N + 1) => starRingEnd ℂ (DA fun j => r (Fin.rev j)))
+        (fun r : Fin n → Fin (N + 1) => starRingEnd ℂ (DA r)) (fun _ => rfl)
+    rw [hsc, ← map_sum]
+  -- Step 4: factorize the double sum into `conj(S A)·S B`.
+  have hdouble : (∑ ℓ, ∑ r : Fin n → Fin (N + 1),
+        starRingEnd ℂ (DA fun j => r (Fin.rev j)) * DB ℓ)
+      = starRingEnd ℂ (∑ ℓ, DA ℓ) * ∑ ℓ, DB ℓ := by
+    simp_rw [← Finset.sum_mul]
+    rw [hC, ← Finset.mul_sum]
+  -- Assemble.
+  rw [hsum, ← Equiv.sum_comp (configSplitEquiv n N).symm
+      (fun σ => starRingEnd ℂ (DA fun j => (configSplitEquiv n N σ).2 (Fin.rev j))
+        * DB (configSplitEquiv n N σ).1)]
+  simp only [Equiv.apply_symm_apply]
+  rw [Fintype.sum_prod_type, hdouble]
+
 /-- **Trace reflection positivity (the `β = 0` base case).**  The trace functional `X ↦ Tr X` on the
 even-ring operator algebra is a reflection-positive functional: for every left-supported operator
 `A`, `0 ≤ Re Tr(θ(A) · A)`.  The proof shows `Tr(θ(A)·A) = conj S · S = ‖S‖²` with
@@ -109,72 +200,8 @@ argument (Tasaki §4.1, Theorem 4.2). -/
 theorem traceFunctional_reflectionPositive (n N : ℕ) :
     ReflectionPositiveFunctionalS n N (fun X => X.trace) := by
   intro A hA
-  -- `D ℓ` = the diagonal value of `A` on the configuration whose left half is `ℓ`.
-  set D : (Fin n → Fin (N + 1)) → ℂ :=
-    fun ℓ => A ((configSplitEquiv n N).symm (ℓ, ℓ)) ((configSplitEquiv n N).symm (ℓ, ℓ)) with hD
-  -- The diagonal of a left-supported `A` is a function of its left half alone.
-  have hAD : ∀ τ : Fin (2 * n) → Fin (N + 1), A τ τ = D ((configSplitEquiv n N τ).1) := by
-    intro τ
-    simp only [hD]
-    apply hA.diag_eq
-    intro i hi
-    rw [configSplitEquiv_symm_apply_left _ _ i hi, configSplitEquiv_fst]
-  -- Step 1: support collapse — only the diagonal `μ = σ` survives.
-  have hcollapse : (ringReflectionThetaS n N A * A).trace
-      = ∑ σ, ringReflectionThetaS n N A σ σ * A σ σ := by
-    simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_apply]
-    refine Finset.sum_congr rfl (fun σ _ => ?_)
-    rw [Finset.sum_eq_single σ]
-    · intro μ _ hμ
-      by_contra hprod
-      obtain ⟨hθne, hAne⟩ := mul_ne_zero_iff.mp hprod
-      have hθ : A (ringConfigReflect n N σ) (ringConfigReflect n N μ) ≠ 0 := by
-        intro h0; apply hθne; rw [ringReflectionThetaS_apply, h0, map_zero]
-      have hR : ∀ i : Fin (2 * n), n ≤ (i : ℕ) → μ i = σ i := hA.1 μ σ hAne
-      have hL : ∀ i : Fin (2 * n), n ≤ (i : ℕ) →
-          ringConfigReflect n N σ i = ringConfigReflect n N μ i := hA.1 _ _ hθ
-      apply hμ
-      funext x
-      rcases lt_or_ge (x : ℕ) n with hx | hx
-      · have hi : n ≤ (ringReflect n x : ℕ) := by rw [ringReflect_val]; omega
-        have hxx := hL (ringReflect n x) hi
-        simp only [ringConfigReflect, ringReflect_involutive n x] at hxx
-        exact hxx.symm
-      · exact hR x hx
-    · intro h; exact absurd (Finset.mem_univ σ) h
-  -- Step 2: rewrite the diagonal of `θ(A)` and pass to `D`.
-  have hsum : (ringReflectionThetaS n N A * A).trace
-      = ∑ σ, (starRingEnd ℂ) (D fun j => (configSplitEquiv n N σ).2 (Fin.rev j))
-          * D (configSplitEquiv n N σ).1 := by
-    rw [hcollapse]
-    refine Finset.sum_congr rfl (fun σ _ => ?_)
-    rw [ringReflectionThetaS_apply, hAD σ, hAD (ringConfigReflect n N σ)]
-    have he : (configSplitEquiv n N (ringConfigReflect n N σ)).1
-        = fun j => (configSplitEquiv n N σ).2 (Fin.rev j) :=
-      funext (configSplitEquiv_fst_ringConfigReflect σ)
-    rw [he]
-  -- Step 3: reindexing `r ↦ r ∘ rev`, the inner sum is `conj (∑ r, D r)`.
-  have hC : (∑ r : Fin n → Fin (N + 1), (starRingEnd ℂ) (D fun j => r (Fin.rev j)))
-      = (starRingEnd ℂ) (∑ r, D r) := by
-    have hsc : (∑ r : Fin n → Fin (N + 1), (starRingEnd ℂ) (D fun j => r (Fin.rev j)))
-        = ∑ r, (starRingEnd ℂ) (D r) :=
-      Fintype.sum_equiv (Equiv.arrowCongr (Function.Involutive.toPerm Fin.rev Fin.rev_rev)
-          (Equiv.refl (Fin (N + 1))))
-        (fun r : Fin n → Fin (N + 1) => (starRingEnd ℂ) (D fun j => r (Fin.rev j)))
-        (fun r : Fin n → Fin (N + 1) => (starRingEnd ℂ) (D r)) (fun _ => rfl)
-    rw [hsc, ← map_sum]
-  -- Step 4: factorize the double sum into `conj S · S`.
-  have hdouble : (∑ ℓ, ∑ r : Fin n → Fin (N + 1), (starRingEnd ℂ) (D fun j => r (Fin.rev j)) * D ℓ)
-      = (starRingEnd ℂ) (∑ ℓ, D ℓ) * ∑ ℓ, D ℓ := by
-    simp_rw [← Finset.sum_mul]
-    rw [hC, ← Finset.mul_sum]
-  -- Assemble: `Tr(θ(A)·A) = conj S · S = ‖S‖² ≥ 0`.
   change 0 ≤ (ringReflectionThetaS n N A * A).trace.re
-  rw [hsum, ← Equiv.sum_comp (configSplitEquiv n N).symm
-      (fun σ => (starRingEnd ℂ) (D fun j => (configSplitEquiv n N σ).2 (Fin.rev j))
-        * D (configSplitEquiv n N σ).1)]
-  simp only [Equiv.apply_symm_apply]
-  rw [Fintype.sum_prod_type, hdouble, mul_comm, Complex.mul_conj, Complex.ofReal_re]
+  rw [trace_theta_mul_eq_refLeftSum_mul hA hA, mul_comm, Complex.mul_conj, Complex.ofReal_re]
   exact Complex.normSq_nonneg _
 
 end LatticeSystem.Quantum
