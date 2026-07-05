@@ -49,3 +49,4 @@ import LatticeSystem.Quantum.SpinS.RingReflectionTranslation
 import LatticeSystem.Quantum.SpinS.RingReflectionCauchySchwarzSqrt
 import LatticeSystem.Quantum.SpinS.RingReflectionRightBondSum
 import LatticeSystem.Quantum.SpinS.RingReflectionConcreteGibbs
+import LatticeSystem.Quantum.SpinS.RingReflectionFieldWeight

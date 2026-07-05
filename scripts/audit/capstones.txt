@@ -79,3 +79,11 @@ tanakaSSB_lowLying_energy_bound
 # (`tanakaOrderSecond2_le`).  Those arc tips are therefore DELISTED here (same lifecycle as the
 # delisted Theorem 4.8 PR-A…PR-D tips); only the capstone remains allowlisted.
 tanakaSSB_full_symmetry_breaking
+
+# TEMPORARY — §4.1 Theorem 4.2 (#4777) Gaussian-domination sub-arc (design v2), PR7a tips (#4975).
+# The symmetric-field RP-trace-weight property and reflection invariance of the field-extended ring
+# weight (`RingReflectionFieldWeight.lean`). Zero-referenced ONLY until PR7b builds the two-field
+# weight `W(a,b)` + finite-β RP Cauchy–Schwarz, which CONSUMES both. DELIST when PR7b lands (same
+# temporary-then-delist lifecycle as the delisted Theorem 4.8 PR-A…PR-D / Theorem 4.9 arc tips).
+ringDLSFieldWeightSym_rpTraceWeight
+ringReflectionThetaS_ringDLSFieldWeightSym
