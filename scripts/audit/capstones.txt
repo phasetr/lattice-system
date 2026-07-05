@@ -87,3 +87,12 @@ tanakaSSB_full_symmetry_breaking
 # temporary-then-delist lifecycle as the delisted Theorem 4.8 PR-A…PR-D / Theorem 4.9 arc tips).
 ringDLSFieldWeightSym_rpTraceWeight
 ringReflectionThetaS_ringDLSFieldWeightSym
+
+# TEMPORARY — §4.1 Theorem 4.2 (#4777) Gaussian-domination sub-arc (design v2), PR7b-i tips (#4976).
+# The diagonal specialisation and Lie-product Trotter-limit representation of the two-field
+# ("doubled") Gibbs weight `W(a,b)` (`RingReflectionTwoFieldWeight.lean`). Zero-referenced ONLY
+# until PR7b-iii expands the Trotter approximant into its cone form for the two-field reflection
+# Cauchy–Schwarz bound, which CONSUMES both. DELIST when PR7b-iii lands (same temporary-then-delist
+# lifecycle as the delisted Theorem 4.8 PR-A…PR-D / Theorem 4.9 arc tips).
+ringTwoFieldWeight_self
+ringTwoFieldWeight_isLimit
