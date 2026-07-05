@@ -96,3 +96,13 @@ ringReflectionThetaS_ringDLSFieldWeightSym
 # lifecycle as the delisted Theorem 4.8 PR-A…PR-D / Theorem 4.9 arc tips).
 ringTwoFieldWeight_self
 ringTwoFieldWeight_isLimit
+
+# TEMPORARY — §4.1 Theorem 4.2 (#4777) Gaussian-domination sub-arc (design v2), PR7b-iii-a tips
+# (#4978). The two-field product pairing (SWEEP) identity and its trace corollary (†)
+# (`RingReflectionTwoFieldPairing.lean`): the m-fold doubled DLS approximant collapses to a single
+# nonnegative reflection Gram pairing `∑ₖ vₖ·conj(refLeftSum 𝓛ₖ(y))·refLeftSum 𝓛ₖ(x)`.
+# Zero-referenced ONLY until PR7b-iii-b assembles the finite reflection Cauchy–Schwarz from this
+# Gram form, which CONSUMES both. DELIST when PR7b-iii-b lands (same temporary-then-delist lifecycle
+# as the delisted Theorem 4.8 PR-A…PR-D / Theorem 4.9 arc tips).
+twoField_product_pairing
+twoField_product_pairing_trace
