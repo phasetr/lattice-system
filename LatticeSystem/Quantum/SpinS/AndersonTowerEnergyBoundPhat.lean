@@ -174,12 +174,6 @@ theorem staggeredPhatS_posSemidef (d L N : ℕ) [NeZero L] :
     rw [Complex.le_def]; constructor <;> norm_num
   exact mul_nonneg h2 (add_nonneg hz1 hz2)
 
-/-- The expectation of `p̂` is nonnegative: `⟨Φ, p̂ Φ⟩.re ≥ 0`. -/
-theorem staggeredPhatS_expectation_nonneg (d L N : ℕ) [NeZero L]
-    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) :
-    0 ≤ (star Φ ⬝ᵥ (staggeredPhatS d L N).mulVec Φ).re :=
-  (Complex.le_def.mp ((staggeredPhatS_posSemidef d L N).dotProduct_mulVec_nonneg Φ)).1
-
 /-- **`p̂ᵏ` is positive-semidefinite** for every `k` (powers of a positive-semidefinite Hermitian
 operator stay positive-semidefinite): `p̂^{2j} = (p̂ʲ)ᴴ p̂ʲ` and `p̂^{2j+1} = (p̂ʲ)ᴴ p̂ p̂ʲ`. -/
 theorem staggeredPhatS_pow_posSemidef (d L N : ℕ) [NeZero L] (k : ℕ) :
