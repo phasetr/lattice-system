@@ -186,19 +186,14 @@ ringBondSquareFieldPartitionRe_eq_scaled
 # PR-BS10 (uniform-field bound) consumes it. RE-EVALUATE/DELIST when consumed by PR-BS10.
 ringBondSquareFieldPartitionRe_const
 
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.1 Thm 4.2 (#4777) bond-square DLS (PR-BS6,
-# `RingReflectionBondSquareTwoFieldWeight.lean`). Trotter limit of the field-dependent two-field weight.
-# Zero-referenced until PR-BS7 (bond-square reflection Cauchy–Schwarz) consumes it for the outer m→∞ limit.
-# RE-EVALUATE/DELIST when consumed by PR-BS7.
-ringBondSquareTwoFieldWeight_isLimit
-
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.1 Thm 4.2 (#4777) bond-square DLS (PR-BS6,
-# `RingReflectionBondSquareTwoFieldWeight.lean`). `RPTwoFieldConeRepS` instance of the bond-square
-# field-dependent crossing family. Zero-referenced until PR-BS7 feeds it to
-# `twoField_pairing_cauchySchwarz_exp`. RE-EVALUATE/DELIST when consumed by PR-BS7.
-ringBondSquareFieldCrossing_twoFieldConeRep
 
 # TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.1 Thm 4.2 (#4777) bond-square DLS (PR-BS6,
 # `RingReflectionBondSquareTwoFieldWeight.lean`). Diagonal collapse `W(a,a)` of the two-field weight.
-# Zero-referenced until PR-BS7/BS8 consume the diagonal slot. RE-EVALUATE/DELIST when consumed by PR-BS7.
+# Zero-referenced until PR-BS8 consumes the diagonal slot. RE-EVALUATE/DELIST when consumed by PR-BS8.
 ringBondSquareTwoFieldWeight_self
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.1 Thm 4.2 (#4777) bond-square reflection Cauchy–Schwarz capstone (PR-BS7, `RingReflectionTwoFieldCauchySchwarz.lean`).
+# The bond-square variant of Tasaki's reflection Cauchy–Schwarz inequality: `(Re Tr W^{BS}(a,b))² ≤ Re Tr W^{BS}(a,a)·Re Tr W^{BS}(b,b)`.
+# Zero-referenced until PR-BS8 (physical identification + reflection step) consumes it.
+# RE-EVALUATE/DELIST when consumed by PR-BS8.
+ringBondSquareTwoFieldWeight_reflection_cauchySchwarz

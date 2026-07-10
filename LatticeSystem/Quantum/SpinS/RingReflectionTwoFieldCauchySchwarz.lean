@@ -22,6 +22,7 @@ form of Tasaki's reflection bound (4.1.51),
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionTwoFieldWeight
 import LatticeSystem.Quantum.SpinS.RingReflectionTwoFieldConeCauchySchwarz
+import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareTwoFieldWeight
 import Mathlib.Analysis.Normed.Algebra.Exponential
 import Mathlib.Analysis.Matrix.Normed
 
@@ -151,5 +152,48 @@ theorem ringTwoFieldWeight_reflection_cauchySchwarz (n N : ℕ) [NeZero n] (β :
     (hP m).toField a b
   nth_rewrite 3 [ringFieldDLSDecomposition_interaction_eq n N a b] at h3
   exact h3
+
+/-- **Two-field reflection Cauchy–Schwarz on the doubled bond-square Gibbs weight** — the finite-β
+matrix form of Tasaki's reflection bound (4.1.51), p. 86 (proof pp. 89–93; DLS 1978 §2–3), in the
+bond-square (field-dependent crossing) presentation of (4.1.67).  For `0 ≤ β`, the doubled
+bond-square Gibbs weight `W^{BS}(a,b) = ringBondSquareTwoFieldWeight n N β a b` obeys
+`(Re Tr W^{BS}(a,b))² ≤ Re Tr W^{BS}(a,a) · Re Tr W^{BS}(b,b)`.
+Proved by the outer Trotter limit `m → ∞`: the isLimit approximant `T_m(x,y) → W^{BS}(x,y)`
+(`ringBondSquareTwoFieldWeight_isLimit`); each `T_m` satisfies the per-`m` reflection Cauchy–Schwarz
+(`twoField_pairing_cauchySchwarz_exp` with kinetic `g_m z = exp(-(β/m)·H_L(z))` and crossing
+`P_m(x,y) = (β/m)·crossing(x,y)`, cone-positive because `0 ≤ β`); and `cauchySchwarz_of_tendsto`
+streams the per-`m` bound to the limit.  Unlike the linear
+`ringTwoFieldWeight_reflection_cauchySchwarz`, the crossing is genuinely field-dependent
+(`ringBondSquareFieldCrossing`), so its `(b,b)` slot is already native — no `interaction_eq`
+`D_a → D_b` splice and no `.toField` bridge is needed. -/
+theorem ringBondSquareTwoFieldWeight_reflection_cauchySchwarz (n N : ℕ) [NeZero n] (β : ℝ)
+    (hβ : 0 ≤ β) (a b : Fin (2 * n) → ℝ) :
+    ((ringBondSquareTwoFieldWeight n N β a b).trace.re) ^ 2
+      ≤ (ringBondSquareTwoFieldWeight n N β a a).trace.re
+        * (ringBondSquareTwoFieldWeight n N β b b).trace.re := by
+  have htr : Continuous fun M' : ManyBodyOpS (Fin (2 * n)) N => M'.trace.re := by
+    haveI : CompleteSpace (ManyBodyOpS (Fin (2 * n)) N) :=
+      FiniteDimensional.complete ℂ (ManyBodyOpS (Fin (2 * n)) N)
+    exact Complex.continuous_re.comp (Continuous.matrix_trace continuous_id)
+  -- the field-crossing factor `P_m(x,y) = (β/m)·crossing(x,y)` is cone-representable (`0 ≤ β`)
+  have hP : ∀ m : ℕ, RPTwoFieldConeRepS n N
+      (fun x y => (m : ℂ)⁻¹ • ((β : ℂ) • ringBondSquareFieldCrossing n N x y)) := by
+    intro m
+    have hsc : (fun x y : Fin (2 * n) → ℝ =>
+          (m : ℂ)⁻¹ • ((β : ℂ) • ringBondSquareFieldCrossing n N x y))
+        = (fun x y => (((m : ℝ)⁻¹ * β : ℝ) : ℂ) • ringBondSquareFieldCrossing n N x y) := by
+      funext x y; rw [smul_smul]; congr 1; push_cast; ring
+    rw [hsc]
+    exact (ringBondSquareFieldCrossing_twoFieldConeRep n N).smul_nonneg
+      (mul_nonneg (inv_nonneg.mpr (Nat.cast_nonneg m)) hβ)
+  refine cauchySchwarz_of_tendsto
+    ((htr.tendsto _).comp (ringBondSquareTwoFieldWeight_isLimit n N β a b))
+    ((htr.tendsto _).comp (ringBondSquareTwoFieldWeight_isLimit n N β a a))
+    ((htr.tendsto _).comp (ringBondSquareTwoFieldWeight_isLimit n N β b b)) (fun m => ?_)
+  exact twoField_pairing_cauchySchwarz_exp m
+    (fun z => NormedSpace.exp ((m : ℂ)⁻¹ • (-(β : ℂ) • ringBondSquareLeftFieldHamiltonian n N z)))
+    (fun z => (((ringBondSquareLeftFieldHamiltonian_supportedOnLeft n N z).smul (-(β : ℂ))).smul
+      ((m : ℂ)⁻¹)).exp)
+    (hP m) a b
 
 end LatticeSystem.Quantum
