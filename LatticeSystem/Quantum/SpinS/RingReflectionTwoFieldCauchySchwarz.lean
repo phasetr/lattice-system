@@ -6,10 +6,11 @@ Streaming the finite `(m,r)` reflection Cauchy–Schwarz of `RingReflectionTwoFi
 (`twoField_product_pairing_cauchySchwarz`) to the doubled Gibbs weight `W(a,b) =
 ringTwoFieldWeight n N β a b` requires a genuinely NESTED double limit: the Dyson–Lieb–Simon Trotter
 approximant `T_m(x,y) = (E_G(x)·θ(E_G(y))·exp((β/m)·D))^m` carries the crossing factor as the
-exponential `exp((β/m)·D)`, which is NOT a finite cone but only the `r → ∞` limit of the cone partial
-sums `S_r = ∑_{k<r}(k!)⁻¹•((β/m)·D)ᵏ`.  So one first closes `r → ∞` (exp-of-cone) to lift the finite
-Cauchy–Schwarz from `U_{m,r}` to `T_m` (`twoField_pairing_cauchySchwarz_exp`), then `m → ∞` (Trotter,
-`ringTwoFieldWeight_isLimit`) to reach `W`.  Both limit passages reuse the abstract limit-preserving
+exponential `exp((β/m)·D)`, which is NOT a finite cone but only the `r → ∞` limit of the cone
+partial sums `S_r = ∑_{k<r}(k!)⁻¹•((β/m)·D)ᵏ`.  So one first closes `r → ∞` (exp-of-cone) to lift
+the finite Cauchy–Schwarz from `U_{m,r}` to `T_m` (`twoField_pairing_cauchySchwarz_exp`), then
+`m → ∞` (Trotter, `ringTwoFieldWeight_isLimit`) to reach `W`.  Both passages reuse the
+limit-preserving
 Cauchy–Schwarz `cauchySchwarz_of_tendsto`.  The field-free crossing interaction `D`
 (`ringFieldDLSDecomposition_interaction_eq`) aligns the `(b,b)` slot, whose isLimit carries `D_b`
 while the per-`m` fact produces `D_a`.  The hypothesis `0 ≤ β` is needed for cone positivity of the
@@ -102,5 +103,45 @@ private theorem twoField_pairing_cauchySchwarz_exp (m : ℕ)
     (((hcont x y).tendsto (NormedSpace.exp P)).comp hexp)
     (((hcont x x).tendsto (NormedSpace.exp P)).comp hexp)
     (((hcont y y).tendsto (NormedSpace.exp P)).comp hexp) hCSr
+
+/-- **Two-field reflection Cauchy–Schwarz on the doubled Gibbs weight** — the finite-β matrix form
+of Tasaki's reflection bound (4.1.51), p. 86 (proof pp. 89–93; DLS 1978 §2–3).  For `0 ≤ β`, the
+doubled Gibbs weight `W(a,b) = ringTwoFieldWeight n N β a b` obeys
+`(Re Tr W(a,b))² ≤ Re Tr W(a,a) · Re Tr W(b,b)`.
+Proved by the outer Trotter limit `m → ∞`: the isLimit approximant `T_m(x,y) → W(x,y)`
+(`ringTwoFieldWeight_isLimit`); each `T_m` satisfies the per-`m` reflection Cauchy–Schwarz
+(`twoField_pairing_cauchySchwarz_exp` with kinetic `g_m z = exp(-(β/m)·Lfield z)` and crossing
+`P_m = (β/m)·D_a`, cone-positive because `0 ≤ β`); the field-free crossing
+(`ringFieldDLSDecomposition_interaction_eq`) rewrites the `(b,b)` slot's `D_a → D_b` to match
+`isLimit(b,b)`; and `cauchySchwarz_of_tendsto` streams the per-`m` bound to the limit. -/
+theorem ringTwoFieldWeight_reflection_cauchySchwarz (n N : ℕ) [NeZero n] (β : ℝ) (hβ : 0 ≤ β)
+    (a b : Fin (2 * n) → ℝ) :
+    ((ringTwoFieldWeight n N β a b).trace.re) ^ 2
+      ≤ (ringTwoFieldWeight n N β a a).trace.re * (ringTwoFieldWeight n N β b b).trace.re := by
+  have htr : Continuous fun M' : ManyBodyOpS (Fin (2 * n)) N => M'.trace.re := by
+    haveI : CompleteSpace (ManyBodyOpS (Fin (2 * n)) N) :=
+      FiniteDimensional.complete ℂ (ManyBodyOpS (Fin (2 * n)) N)
+    exact Complex.continuous_re.comp (Continuous.matrix_trace continuous_id)
+  -- the crossing factor `P_m = (β/m)·D_a` is cone-representable because `0 ≤ β`
+  have hP : ∀ m : ℕ, RPTraceConeRepS n N
+      ((m : ℂ)⁻¹ • ((β : ℂ) • (ringFieldDLSDecomposition n N a).interaction)) := by
+    intro m
+    have hsc : (m : ℂ)⁻¹ • ((β : ℂ) • (ringFieldDLSDecomposition n N a).interaction)
+        = (((m : ℝ)⁻¹ * β : ℝ) : ℂ) • (ringFieldDLSDecomposition n N a).interaction := by
+      rw [smul_smul]; congr 1; push_cast; ring
+    rw [hsc]
+    exact (ringFieldDLSDecomposition n N a).interaction_coneRep.smul_nonneg
+      (mul_nonneg (inv_nonneg.mpr (Nat.cast_nonneg m)) hβ)
+  refine cauchySchwarz_of_tendsto
+    ((htr.tendsto _).comp (ringTwoFieldWeight_isLimit n N β a b))
+    ((htr.tendsto _).comp (ringTwoFieldWeight_isLimit n N β a a))
+    ((htr.tendsto _).comp (ringTwoFieldWeight_isLimit n N β b b)) (fun m => ?_)
+  have h3 := twoField_pairing_cauchySchwarz_exp m
+    (fun z => NormedSpace.exp ((m : ℂ)⁻¹ • (-(β : ℂ) • ringLeftFieldHamiltonian n N z)))
+    (fun z => (((ringLeftFieldHamiltonian_supportedOnLeft n N z).smul (-(β : ℂ))).smul
+      ((m : ℂ)⁻¹)).exp)
+    (hP m) a b
+  nth_rewrite 3 [ringFieldDLSDecomposition_interaction_eq n N a b] at h3
+  exact h3
 
 end LatticeSystem.Quantum
