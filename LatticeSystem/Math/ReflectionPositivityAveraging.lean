@@ -55,8 +55,10 @@ section Proof
 variable {V : Type*}
 
 /-- On a nonempty `Fin N`, the one-step rotation `finRotate N` is the successor map `i ↦ i + 1`.
-This rephrases `finRotate_succ_apply` after exhibiting `N` as a successor. -/
-private lemma finRotate_eq_add_one {N : ℕ} [NeZero N] (i : Fin N) :
+This rephrases `finRotate_succ_apply` after exhibiting `N` as a successor.  Public so the
+bond-square reindexing lemmas (Tasaki §4.1 Theorem 4.2, PR-BS9) can bridge `finRotate (2n)` to the
+cyclic successor `ringBondSucc n`. -/
+lemma finRotate_eq_add_one {N : ℕ} [NeZero N] (i : Fin N) :
     finRotate N i = i + 1 := by
   obtain ⟨p, rfl⟩ : ∃ p, N = p + 1 := ⟨N - 1, Nat.succ_pred_eq_of_pos (NeZero.pos N) |>.symm⟩
   exact finRotate_succ_apply i
