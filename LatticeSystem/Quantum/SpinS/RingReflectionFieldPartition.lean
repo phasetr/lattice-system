@@ -62,8 +62,10 @@ theorem physFieldOf_self (n : ℕ) (h : Fin (2 * n) → ℝ) :
 half `{z ≥ n}` equals summing `g ∘ r` over the left half `{x < n}`, via the reflection bijection
 `r = ringReflect n` between the two halves (`ringReflect_lt_iff`, involutivity).  Used in the crux
 gauge conjugation to align the gauged right-half field term with the θ-transported field
-(Tasaki §4.1, reflected field copies (4.1.50), p. 86). -/
-private theorem sum_right_eq_sum_reflect_left {M : Type*} [AddCommMonoid M] (n : ℕ)
+(Tasaki §4.1, reflected field copies (4.1.50), p. 86).  Public (de-privatised for PR-BS8a-ii, which
+reuses it from `RingReflectionBondSquareGaugeCrux` to reindex the single-ion right half — statement
+and proof unchanged, visibility only, avoiding a duplicate reindex lemma). -/
+theorem sum_right_eq_sum_reflect_left {M : Type*} [AddCommMonoid M] (n : ℕ)
     (g : Fin (2 * n) → M) :
     ∑ z ∈ Finset.univ.filter (fun z : Fin (2 * n) => n ≤ (z : ℕ)), g z
       = ∑ x ∈ Finset.univ.filter (fun x : Fin (2 * n) => (x : ℕ) < n), g (ringReflect n x) := by
