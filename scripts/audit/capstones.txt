@@ -205,9 +205,18 @@ ringBondSquareTwoFieldWeight_reflection_cauchySchwarz
 # Marshall gauge and the left field bulk bridge reindexes the gauged intra-left piece.
 # Their decls stay in place (same delist lifecycle as the Theorem 4.8 / Theorem 4.9 arc tips).
 
-# TEMPORARY arc-tip (temp-then-delist) — §4.1 Thm 4.2 (#4777) bond-square gauge conjugation crux (PR-BS8a-ii,
-# `RingReflectionBondSquareGaugeCrux.lean`). Gauge crux (G): right-half Marshall gauge conjugates the
-# physical bond-square Hamiltonian into the BS6 two-field DLS operator `H_L(a) + θ(H_L(b)) − crossing(a,b)`.
-# Zero-referenced until PR-BS8b (physical identification `Z^{BS}=Re Tr W`) consumes it. RE-EVALUATE/DELIST
-# when consumed by PR-BS8b.
-rightGauge_conj_ringBondSquareFieldHamiltonian
+# NOTE (PR-BS8b, #4997): the PR-BS8a-ii gauge crux (G) `rightGauge_conj_ringBondSquareFieldHamiltonian`
+# (`RingReflectionBondSquareGaugeCrux.lean`) is now DELISTED — it is genuinely CONSUMED by the PR-BS8b
+# physical identification stage (`RingReflectionBondSquarePhysId.lean`): conjugation of the partition
+# function via the unitary Marshall gauge and gauge-invariance of trace yields the identification
+# `Z^{BS}(physBondSquareFieldOf a b) = Re Tr W^{BS}(a,b)`. Its decl stays in place (same delist
+# lifecycle as the Theorem 4.8 / Theorem 4.9 arc tips).
+
+# TEMPORARY arc-tip (temp-then-delist) — §4.1 Thm 4.2 (#4777) bond-square physical-field one reflection step
+# (PR-BS8b, `RingReflectionBondSquarePhysId.lean`). The one reflection step in sign-free classical form:
+# `Z^{BS}(g)² ≤ Z^{BS}(reflectLeft g)·Z^{BS}(reflectRight g)` (Tasaki (4.1.51), pp. 85–89, proof p. 92).
+# Proves the three field mirrors collapse via the staggered wrapper cancellation and feeds the merged
+# BS7 capstone `ringBondSquareTwoFieldWeight_reflection_cauchySchwarz` into the reflection Cauchy–Schwarz.
+# Zero-referenced ONLY until PR-BS9 (chessboard bound via `reflectionPositivity_averaging`) consumes it.
+# RE-EVALUATE/DELIST when consumed by PR-BS9.
+ringBondSquareFieldPartitionRe_reflection_step
