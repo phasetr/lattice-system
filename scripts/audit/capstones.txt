@@ -127,34 +127,38 @@ ringReflectionThetaS_ringDLSFieldWeightSym
 # PR7d-i. It (with its exclusive sub-tips `ringTwoFieldWeight_self` /
 # `ringDLSFieldWeightSym_rpTraceWeight`) is retained for the PR7e collapse `Z_β(staggered_c) = Z_β(0)`
 # (diagonal reflection-symmetric case); RE-EVALUATE at PR7e — delete the whole diagonal sub-chain if
-# still unconsumed when the arc completes. `ringFieldPartitionRe_reflection_step` is DELISTED by
-# PR7d-iii (consumed by the Gaussian-domination capstone), not by PR7d-i.
+# still unconsumed when the arc completes.
+# NOTE (PR7d-iii, #4986): the PR7c one reflection step `ringFieldPartitionRe_reflection_step`
+# (`RingReflectionFieldPartition.lean`), the finite-β partition-function reflection bound
+# `Z_β(h)² ≤ Z_β(h_L)·Z_β(h_R)`, is now DELISTED — it is genuinely CONSUMED by the PR7d-iii
+# Gaussian-domination capstone `ringFieldPartition_gaussianDomination`
+# (`RingReflectionGaussianDomination.lean`) as the `hrefl` reflection bound of the classical
+# averaging lemma. Its decl stays in place (same delist lifecycle as the Theorem 4.8 / 4.9 arc tips).
 ringTwoFieldWeight_self_trace_re_nonneg
-ringFieldPartitionRe_reflection_step
 
-# TEMPORARY — §4.1 Theorem 4.2 (#4777) Gaussian-domination sub-arc (design v2), PR7d-i tips (#4984,
-# `RingReflectionFieldPartitionSymmetry.lean`). The three symmetries of the field partition function
-# viewed as a function of the field `h`: translation invariance `Z_β(h) = Z_β(h ∘ finRotate)`,
-# spin-flip invariance `Z_β(−h) = Z_β(h)`, and strict positivity `0 < Z_β(h)` (Tasaki (4.1.49)–
-# (4.1.52), pp. 85–86; chessboard estimate Lemma 4.5, pp. 87–88). Zero-referenced ONLY until the
-# PR7d-iii Gaussian-domination capstone `ringFieldPartition_gaussianDomination` consumes them as the
-# cyclicity (A, B) and `−log Z` domain (C) hypotheses of the classical averaging lemma. DELIST when
-# PR7d-iii lands (same temporary-then-delist lifecycle as the Theorem 4.8 / Theorem 4.9 arc tips).
-ringFieldPartitionRe_translate
-ringFieldPartitionRe_neg
-ringFieldPartitionRe_pos
+# NOTE (PR7d-iii, #4986): the PR7d-i field-partition symmetries
+# (`RingReflectionFieldPartitionSymmetry.lean`) — translation invariance `ringFieldPartitionRe_translate`,
+# spin-flip invariance `ringFieldPartitionRe_neg`, and strict positivity `ringFieldPartitionRe_pos` —
+# are now DELISTED — all three are genuinely CONSUMED by the PR7d-iii Gaussian-domination capstone
+# `ringFieldPartition_gaussianDomination` (`RingReflectionGaussianDomination.lean`): translation +
+# spin-flip supply its `hcyc` cyclicity hypothesis and strict positivity is the `−log Z` domain
+# condition of its `hrefl`. Their decls stay in place (same delist lifecycle as the Theorem 4.8 /
+# Theorem 4.9 arc tips).
 
-# TEMPORARY — §4.1 Theorem 4.2 (#4777) Gaussian-domination sub-arc (design v2), PR7d-ii tips (#4985,
-# `RingReflectionStaggeredRelabel.lean`). The staggered relabel `P h z = (−1)^z·h z` bridge lemmas
-# reconciling the classical sign-free mirror reflections with the quantum signed field copies
-# (Tasaki staggered field Hamiltonian (4.1.48) / reflected field copies (4.1.50), pp. 85–86): its
-# involutivity, `P (reflectLeft g) = ringFieldReflectLeft (P g)`, `P (reflectRight g) =
-# ringFieldReflectRight (P g)`, and `P (const c) = staggered_c`. Zero-referenced ONLY until the
-# PR7d-iii Gaussian-domination capstone `ringFieldPartition_gaussianDomination` consumes them as the
-# `hcyc`/`hrefl` bridge that carries the classical averaging lemma (Lemma 4.5, pp. 87–88) onto the
-# quantum reflected copies. DELIST when PR7d-iii lands (same temporary-then-delist lifecycle as the
-# Theorem 4.8 / Theorem 4.9 arc tips).
-ringStaggeredRelabel_involutive
-ringStaggeredRelabel_reflectLeft
-ringStaggeredRelabel_reflectRight
-ringStaggeredRelabel_const
+# NOTE (PR7d-iii, #4986): the PR7d-ii staggered relabel bridge lemmas
+# (`RingReflectionStaggeredRelabel.lean`) — `ringStaggeredRelabel_involutive`,
+# `ringStaggeredRelabel_reflectLeft`, `ringStaggeredRelabel_reflectRight`,
+# `ringStaggeredRelabel_const` — are now DELISTED — all four are genuinely CONSUMED by the PR7d-iii
+# Gaussian-domination capstone `ringFieldPartition_gaussianDomination`
+# (`RingReflectionGaussianDomination.lean`) as the `hcyc`/`hrefl` bridge carrying the classical
+# averaging lemma onto the quantum reflected copies (and `const` identifies the product terms). Their
+# decls stay in place (same delist lifecycle as the Theorem 4.8 / Theorem 4.9 arc tips).
+
+# TEMPORARY — §4.1 Theorem 4.2 (#4777) Gaussian-domination sub-arc (design v2), PR7d-iii capstone
+# (#4986, `RingReflectionGaussianDomination.lean`). The chessboard bound
+# `Z_β(h)^{2n} ≤ Π_j Z_β(staggered_{g_j})` obtained from Tasaki's reflection bound (4.1.51) by the
+# cyclic averaging inequality (Lemma 4.5, (4.1.55)–(4.1.57), pp. 87–88; FILS, Comm. Math. Phys. 62
+# (1978) 1–34). Zero-referenced ONLY until PR7e collapses each `Z_β(staggered_c)` to `Z_β(0)` and
+# concludes the uniform-field bound `Z_β(h) ≤ Z_β(0)` (Tasaki (4.1.49)/(4.1.52), pp. 85–86). DELIST
+# when PR7e lands (same temporary-then-delist lifecycle as the Theorem 4.8 / Theorem 4.9 arc tips).
+ringFieldPartition_gaussianDomination
