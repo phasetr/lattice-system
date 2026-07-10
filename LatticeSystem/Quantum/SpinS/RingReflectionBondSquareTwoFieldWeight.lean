@@ -7,10 +7,15 @@ Gaussian domination for the bond-square (real-operator) model (Tasaki §4.1, (4.
 book p. 90), this file supplies the three PR-BS6 objects, all in the gauge spin basis
 (bare `onSiteS x (spinSOp_ N)` with the `(−1)ˣ`/`i` staggering carried by the reflection `θ`):
 
-* `ringBondSquareLeftFieldHamiltonian` — the left half `Ĥᴸ_a` of (4.1.67): the intra-left bond
-  terms `−Ŝ¹Ŝ¹ + Ŝ²Ŝ² + ½(Ŝ³ₓ − Ŝ³_y − a_x + a_y)²`, the single-ion `−(Ŝ³)²`, and the boundary
-  half-square `½(Ŝ³ₓ − a_x)²`.  Only its left-supportedness is proved here (square-non-expanded,
-  coefficient/sign-agnostic); the exact physical coefficients are the deferred PR-BS8 content.
+* `ringBondSquareLeftFieldHamiltonian` — the left half `Ĥᴸ_a` of (4.1.67) in the repo DLS
+  plain-sum (physical Heisenberg) frame: the intra-left bond terms
+  `+Ŝ¹Ŝ¹ + Ŝ²Ŝ² + ½(Ŝ³ₓ + Ŝ³_y − a_x − a_y)²`,
+  the single-ion `−(Ŝ³)²`, and the boundary half-square `½(Ŝ³ₓ − a_x)²`.  (Sign-frame corrected from
+  the earlier T̂-ferromagnetic verbatim transcription: on an intra-left bond the `(−1)ˣ` of
+  `T̂³ = (−1)ˣŜ³` flips the α = 1 sign to `+Ŝ¹Ŝ¹` and turns the longitudinal difference `Ŝ³ₓ − Ŝ³_y`
+  into the sum `Ŝ³ₓ + Ŝ³_y`; the α = 2 slot and the single-site squares are unchanged.)  Only its
+  left-supportedness is proved here (square-non-expanded, coefficient/sign-agnostic); the exact
+  physical coefficients are the deferred PR-BS8 content.
 * `ringBondSquareCrossingGen` / `ringBondSquareFieldCrossing` — the field-dependent crossing
   generators `C^{(α)}_b(a)` (kinetic α = 1, 2 field-free; longitudinal α = 3 a bare central scalar
   shift `+ (−a_x)•1`) and the two-field crossing `∑_c θ(C_c(b))·C_c(a)`, exhibited as a
@@ -36,21 +41,26 @@ open scoped Matrix.Norms.Operator
 variable {n N : ℕ}
 
 /-- **Bond-square left-half Hamiltonian** `Ĥᴸ_a` in the gauge spin basis (Tasaki (4.1.67), book
-p. 90): the intra-left bond terms `−Ŝ¹ₓŜ¹_y + Ŝ²ₓŜ²_y + ½(Ŝ³ₓ − Ŝ³_y − a_x + a_y)²` (summed over
-ordered left pairs gated by the ring coupling), the single-ion `−(Ŝ³ₓ)²` over the left half, and the
-boundary half-square `½(Ŝ³ₓ − a_x)²` over the two crossing-left sites `0`, `n − 1`.  It is
-left-supported; the exact bulk/single-ion/field coefficients are the deferred PR-BS8 physical
-identification and do not gate any PR-BS6 obligation. -/
+p. 90), in the repo DLS plain-sum (physical Heisenberg) frame: the intra-left bond terms
+`+Ŝ¹ₓŜ¹_y + Ŝ²ₓŜ²_y + ½(Ŝ³ₓ + Ŝ³_y − a_x − a_y)²` (summed over ordered left pairs gated by the ring
+coupling), the single-ion `−(Ŝ³ₓ)²` over the left half, and the boundary half-square `½(Ŝ³ₓ − a_x)²`
+over the two crossing-left sites `0`, `n − 1`.  The intra-left signs are the corrected gauge frame:
+the `(−1)ˣ` of `T̂³ = (−1)ˣŜ³` (absorbed in `θ`, not written explicitly) flips the α = 1 sign to
+`+Ŝ¹Ŝ¹` and turns the longitudinal difference into the sum-form `½(Ŝ³ₓ + Ŝ³_y − a_x − a_y)²` (both
+fields subtracted) on an adjacent intra-left bond — matching the merged linear left frame; the α = 2
+term and the single-site squares are sign-neutral.  It is left-supported; the exact bulk/single-ion/
+field coefficients are the deferred PR-BS8 physical identification and do not gate any PR-BS6
+obligation. -/
 noncomputable def ringBondSquareLeftFieldHamiltonian (n N : ℕ) [NeZero n]
     (a : Fin (2 * n) → ℝ) : ManyBodyOpS (Fin (2 * n)) N :=
   (∑ x ∈ Finset.univ.filter (fun x : Fin (2 * n) => (x : ℕ) < n),
       ∑ y ∈ Finset.univ.filter (fun y : Fin (2 * n) => (y : ℕ) < n),
-        ringLeftCoupling n x y • ((-1 : ℂ) • (onSiteS x (spinSOp1 N) * onSiteS y (spinSOp1 N))
+        ringLeftCoupling n x y • (onSiteS x (spinSOp1 N) * onSiteS y (spinSOp1 N)
           + onSiteS x (spinSOp2 N) * onSiteS y (spinSOp2 N)
-          + (1 / 2 : ℂ) • ((onSiteS x (spinSOp3 N) + (-1 : ℂ) • onSiteS y (spinSOp3 N)
-                + (-(a x : ℂ)) • 1 + (a y : ℂ) • 1)
-              * (onSiteS x (spinSOp3 N) + (-1 : ℂ) • onSiteS y (spinSOp3 N)
-                + (-(a x : ℂ)) • 1 + (a y : ℂ) • 1))))
+          + (1 / 2 : ℂ) • ((onSiteS x (spinSOp3 N) + onSiteS y (spinSOp3 N)
+                + (-(a x : ℂ)) • 1 + (-(a y : ℂ)) • 1)
+              * (onSiteS x (spinSOp3 N) + onSiteS y (spinSOp3 N)
+                + (-(a x : ℂ)) • 1 + (-(a y : ℂ)) • 1))))
     + ∑ x ∈ Finset.univ.filter (fun x : Fin (2 * n) => (x : ℕ) < n),
         (-1 : ℂ) • (onSiteS x (spinSOp3 N) * onSiteS x (spinSOp3 N))
     + ∑ p : Fin 2, (1 / 2 : ℂ) • ((onSiteS (ringCrossingSite n p) (spinSOp3 N)
@@ -70,11 +80,11 @@ theorem ringBondSquareLeftFieldHamiltonian_supportedOnLeft (n N : ℕ) [NeZero n
   · have hxn : (x : ℕ) < n := (Finset.mem_filter.mp hx).2
     have hyn : (y : ℕ) < n := (Finset.mem_filter.mp hy).2
     refine SupportedOnLeftS.smul _ ?_
-    have hd : SupportedOnLeftS n N (onSiteS x (spinSOp3 N) + (-1 : ℂ) • onSiteS y (spinSOp3 N)
-        + (-(a x : ℂ)) • 1 + (a y : ℂ) • 1) :=
-      (((onSiteS_supportedOnLeft hxn _).add ((onSiteS_supportedOnLeft hyn _).smul _)).add
+    have hd : SupportedOnLeftS n N (onSiteS x (spinSOp3 N) + onSiteS y (spinSOp3 N)
+        + (-(a x : ℂ)) • 1 + (-(a y : ℂ)) • 1) :=
+      (((onSiteS_supportedOnLeft hxn _).add (onSiteS_supportedOnLeft hyn _)).add
         (SupportedOnLeftS.one.smul _)).add (SupportedOnLeftS.one.smul _)
-    refine ((((onSiteS_supportedOnLeft hxn _).mul (onSiteS_supportedOnLeft hyn _)).smul _).add
+    refine (((onSiteS_supportedOnLeft hxn _).mul (onSiteS_supportedOnLeft hyn _)).add
       ((onSiteS_supportedOnLeft hxn _).mul (onSiteS_supportedOnLeft hyn _))).add ?_
     exact (hd.mul hd).smul _
   · have hxn : (x : ℕ) < n := (Finset.mem_filter.mp hx).2
