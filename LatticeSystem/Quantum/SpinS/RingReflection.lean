@@ -58,3 +58,4 @@ import LatticeSystem.Quantum.SpinS.RingReflectionFieldPartition
 import LatticeSystem.Quantum.SpinS.RingReflectionFieldPartitionSymmetry
 import LatticeSystem.Quantum.SpinS.RingReflectionStaggeredRelabel
 import LatticeSystem.Quantum.SpinS.RingReflectionGaussianDomination
+import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareTwoFieldWeight
