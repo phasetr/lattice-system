@@ -211,4 +211,17 @@ theorem ringFieldPartitionRe_physFieldOf (G : AxisTwoPiRotS N) (n : ℕ) [NeZero
   rw [ringFieldPartitionRe, thermalPartitionFnS, thermalGibbsOpS, ringTwoFieldWeight, hexp,
     G.trace_rightGauge_conj n]
 
+/-- **Diagonal nonnegativity** `0 ≤ Re Tr W(a,a)`.  The diagonal doubled weight `W(a,a) =
+ringDLSFieldWeightSym a` is a reflection-positive trace weight for `β ≥ 0`
+(`ringDLSFieldWeightSym_rpTraceWeight`); applying its cone property to the trivial left-supported
+observable `A = 1` (with `θ(1)·1 = 1`) gives `0 ≤ Re Tr(W(a,a)·1) = Re Tr W(a,a)`.  This is the
+diagonal positivity that the downstream symmetrization chain `Z_β(h) ≤ Z_β(0)` requires
+(Tasaki §4.1, Gaussian domination (4.1.49)). -/
+theorem ringTwoFieldWeight_self_trace_re_nonneg (n N : ℕ) [NeZero n] {β : ℝ} (hβ : 0 ≤ β)
+    (a : Fin (2 * n) → ℝ) : 0 ≤ (ringTwoFieldWeight n N β a a).trace.re := by
+  rw [ringTwoFieldWeight_self]
+  have h := ringDLSFieldWeightSym_rpTraceWeight n N hβ a (1 : ManyBodyOpS (Fin (2 * n)) N)
+    SupportedOnLeftS.one
+  simpa only [ringReflectionThetaS_one, mul_one] using h
+
 end LatticeSystem.Quantum
