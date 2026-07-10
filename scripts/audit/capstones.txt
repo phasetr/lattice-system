@@ -162,3 +162,12 @@ ringTwoFieldWeight_self_trace_re_nonneg
 # concludes the uniform-field bound `Z_β(h) ≤ Z_β(0)` (Tasaki (4.1.49)/(4.1.52), pp. 85–86). DELIST
 # when PR7e lands (same temporary-then-delist lifecycle as the Theorem 4.8 / Theorem 4.9 arc tips).
 ringFieldPartition_gaussianDomination
+
+# TEMPORARY — §4.1 Theorem 4.2 (#4777) bond-square field infrastructure (PR-BS1,
+# `RingReflectionBondSquareField.lean`). The Hermiticity of Tasaki's bond-square field Hamiltonian
+# (4.1.48) via the reduction identity to the linear-core form (Tasaki §4.1, book p.86). Supporting
+# theorem of the PR-BS1 reduction identity `ringBondSquareFieldHamiltonian_eq`; both are zero-referenced
+# until PR-BS2 (scalar-constant Hermiticity repair) consumes them. RE-EVALUATE at PR-BS2 when the
+# bond-square scalar constant and the reflected field Hamiltonians enter the reflection-positivity
+# chain; DELIST if consumed or sunset if replaced by a different scalar-repair route.
+ringBondSquareFieldHamiltonian_isHermitian
