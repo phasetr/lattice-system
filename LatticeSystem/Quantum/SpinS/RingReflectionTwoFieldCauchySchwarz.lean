@@ -28,6 +28,8 @@ namespace LatticeSystem.Quantum
 
 open Matrix Filter Topology
 
+open scoped Matrix.Norms.Operator
+
 variable {n N : ℕ}
 
 /-- **Limit-preserving Cauchy–Schwarz** (pure topology).  Along any nontrivial filter `l`, if the
@@ -56,5 +58,49 @@ private theorem ringFieldDLSDecomposition_interaction_eq (n N : ℕ) [NeZero n]
       = (ringFieldDLSDecomposition n N b).interaction := by
   rw [ringFieldDLSDecomposition, ringFieldDLSDecomposition,
     ringCrossingRPDecomposition_interaction, ringCrossingRPDecomposition_interaction]
+
+/-- **Per-`m` reflection Cauchy–Schwarz with an exponential crossing factor** (the `r → ∞`
+passage).  For the Dyson–Lieb–Simon per-`m` approximant `T_m(x,y) = (g(x)·θ(g(y))·exp P)^m` — with
+left-supported kinetic family `g` and cone-representable `P` — the real part of the trace pairing
+obeys `(Re Tr T_m(x,y))² ≤ Re Tr T_m(x,x) · Re Tr T_m(y,y)`.  Obtained by closing the inner limit
+`r → ∞` of the finite `(m,r)` Cauchy–Schwarz `twoField_product_pairing_cauchySchwarz`: for each `r`
+the crossing partial sum `S_r = ∑_{k<r}(k!)⁻¹•Pᵏ` is a literal finite cone
+(`RPTraceConeRepS.expSeriesPartialSum`), and `S_r → exp P` (`NormedSpace.exp_eq_tsum`), so
+`cauchySchwarz_of_tendsto` streams the per-`r` inequality to the exponential.  This is the inner
+limit of the double limit of Tasaki (4.1.51) (pp. 89–93; DLS 1978 §2–3). -/
+private theorem twoField_pairing_cauchySchwarz_exp (m : ℕ)
+    (g : (Fin (2 * n) → ℝ) → ManyBodyOpS (Fin (2 * n)) N)
+    (hg : ∀ z, SupportedOnLeftS n N (g z)) {P : ManyBodyOpS (Fin (2 * n)) N}
+    (hP : RPTraceConeRepS n N P) (x y : Fin (2 * n) → ℝ) :
+    (((g x * ringReflectionThetaS n N (g y) * NormedSpace.exp P) ^ m).trace.re) ^ 2
+      ≤ ((g x * ringReflectionThetaS n N (g x) * NormedSpace.exp P) ^ m).trace.re
+        * ((g y * ringReflectionThetaS n N (g y) * NormedSpace.exp P) ^ m).trace.re := by
+  -- the crossing partial sums converge to `exp P` (reused clean-context lemma)
+  have hexp := expSeriesPartialSum_tendsto (n := n) (N := N) P
+  -- continuity of `M' ↦ Re Tr ((g u · θ(g v) · M')^m)` (matrix topology)
+  have hcont : ∀ u v : Fin (2 * n) → ℝ, Continuous
+      (fun M' : ManyBodyOpS (Fin (2 * n)) N =>
+        ((g u * ringReflectionThetaS n N (g v) * M') ^ m).trace.re) := by
+    intro u v
+    haveI : CompleteSpace (ManyBodyOpS (Fin (2 * n)) N) :=
+      FiniteDimensional.complete ℂ (ManyBodyOpS (Fin (2 * n)) N)
+    exact Complex.continuous_re.comp
+      (Continuous.matrix_trace ((continuous_const.mul continuous_id).pow m))
+  -- the per-`r` finite Cauchy–Schwarz (crossing is the literal finite cone `S_r`)
+  have hCSr : ∀ r : ℕ,
+      (((g x * ringReflectionThetaS n N (g y)
+          * ∑ k ∈ Finset.range r, ((Nat.factorial k : ℂ))⁻¹ • P ^ k) ^ m).trace.re) ^ 2
+        ≤ ((g x * ringReflectionThetaS n N (g x)
+            * ∑ k ∈ Finset.range r, ((Nat.factorial k : ℂ))⁻¹ • P ^ k) ^ m).trace.re
+          * ((g y * ringReflectionThetaS n N (g y)
+            * ∑ k ∈ Finset.range r, ((Nat.factorial k : ℂ))⁻¹ • P ^ k) ^ m).trace.re := by
+    intro r
+    obtain ⟨ι, _, C, c, hC, hc, heq⟩ := hP.expSeriesPartialSum r
+    rw [heq]
+    exact twoField_product_pairing_cauchySchwarz m g hg c hc C hC x y
+  exact cauchySchwarz_of_tendsto
+    (((hcont x y).tendsto (NormedSpace.exp P)).comp hexp)
+    (((hcont x x).tendsto (NormedSpace.exp P)).comp hexp)
+    (((hcont y y).tendsto (NormedSpace.exp P)).comp hexp) hCSr
 
 end LatticeSystem.Quantum
