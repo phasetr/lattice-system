@@ -228,7 +228,8 @@ theorem ringTwoFieldWeight_self_trace_re_nonneg (n N : ℕ) [NeZero n] {β : ℝ
 
 /-- **Reflected left field copy** `h_L` (Tasaki §4.1, reflected field copies (4.1.50), p. 86): keep
 the left half of `h` and reflect it onto the right, i.e. the diagonal split `physFieldOf n h h`. -/
-def ringFieldReflectLeft (n : ℕ) (h : Fin (2 * n) → ℝ) : Fin (2 * n) → ℝ := physFieldOf n h h
+def ringFieldReflectLeft (n : ℕ) (h : Fin (2 * n) → ℝ) : Fin (2 * n) → ℝ :=
+  physFieldOf n h h
 
 /-- **Reflected right field copy** `h_R` (Tasaki §4.1, reflected field copies (4.1.50), p. 86): keep
 the right half of `h` and reflect it onto the left, i.e. the diagonal split of `−h∘r`. -/
