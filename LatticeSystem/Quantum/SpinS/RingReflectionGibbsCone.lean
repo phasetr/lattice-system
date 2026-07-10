@@ -102,6 +102,22 @@ theorem RPTraceConeRepS.pow {M : ManyBodyOpS (Fin (2 * n)) N} (hM : RPTraceConeR
   | 0 => by simpa using RPTraceConeRepS.one
   | k + 1 => by rw [pow_succ]; exact (RPTraceConeRepS.pow hM k).mul hM
 
+/-- The exponential partial sums `∑_{k<r} (k!)⁻¹ • Pᵏ` of a cone-representable operator `P` are
+cone-representable — the `r → ∞` cone approximants of `exp P` — by closure of `RPTraceConeRepS`
+under `one`/`add`/`smul_nonneg`/`pow`.  Extracted so both `RPTraceWeightS.mul_exp_coneRep_right`
+and the two-field reflection Cauchy–Schwarz double limit of Tasaki (4.1.51) (pp. 89–93; DLS 1978
+§2–3) consume the same induction. -/
+theorem RPTraceConeRepS.expSeriesPartialSum {P : ManyBodyOpS (Fin (2 * n)) N}
+    (hP : RPTraceConeRepS n N P) (r : ℕ) :
+    RPTraceConeRepS n N (∑ k ∈ Finset.range r, ((Nat.factorial k : ℂ))⁻¹ • P ^ k) := by
+  induction r with
+  | zero => simpa using RPTraceConeRepS.zero
+  | succ r ih =>
+    rw [Finset.sum_range_succ]
+    refine ih.add ?_
+    rw [show ((Nat.factorial r : ℂ))⁻¹ = (((Nat.factorial r : ℝ)⁻¹ : ℝ) : ℂ) by push_cast; ring]
+    exact (hP.pow r).smul_nonneg (inv_nonneg.mpr (Nat.cast_nonneg _))
+
 /-- A cone-representable weight is a reflection-positive trace weight. -/
 theorem RPTraceConeRepS.rpTraceWeight {M : ManyBodyOpS (Fin (2 * n)) N}
     (hM : RPTraceConeRepS n N M) : RPTraceWeightS n N M := by

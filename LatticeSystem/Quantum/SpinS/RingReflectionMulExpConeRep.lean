@@ -33,16 +33,8 @@ theorem RPTraceWeightS.mul_exp_coneRep_right {M P : ManyBodyOpS (Fin (2 * n)) N}
     FiniteDimensional.complete ℂ (ManyBodyOpS (Fin (2 * n)) N)
   -- each `M · (partial sum)` is an RP trace weight (the partial sum is cone-representable)
   have hSm : ∀ m, RPTraceWeightS n N
-      (M * ∑ k ∈ Finset.range m, ((Nat.factorial k : ℂ))⁻¹ • P ^ k) := by
-    intro m
-    refine hM.mul_coneRep_right ?_
-    induction m with
-    | zero => simpa using RPTraceConeRepS.zero
-    | succ m ih =>
-      rw [Finset.sum_range_succ]
-      refine ih.add ?_
-      rw [show ((Nat.factorial m : ℂ))⁻¹ = (((Nat.factorial m : ℝ)⁻¹ : ℝ) : ℂ) by push_cast; ring]
-      exact (hP.pow m).smul_nonneg (inv_nonneg.mpr (Nat.cast_nonneg _))
+      (M * ∑ k ∈ Finset.range m, ((Nat.factorial k : ℂ))⁻¹ • P ^ k) :=
+    fun m => hM.mul_coneRep_right (hP.expSeriesPartialSum m)
   -- the partial sums converge to `M · exp P`
   have hlim : Filter.Tendsto
       (fun m => M * ∑ k ∈ Finset.range m, ((Nat.factorial k : ℂ))⁻¹ • P ^ k)
