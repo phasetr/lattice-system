@@ -115,4 +115,69 @@ theorem ringReflectionThetaS_ringLeftFieldHamiltonian (n N : ℕ) (b : Fin (2 * 
   refine congrArg _ (Finset.sum_congr rfl (fun x _ => ?_))
   rw [ringReflectionThetaS_smul, Complex.conj_ofReal, ringReflectionThetaS_onSiteS_spinSOp3]
 
+/-- **Physical per-site field Hamiltonian** `Ĥ_field(h) = Ĥ_0 + Σ_z (h z)·Ŝ_z^{(3)}` on the even
+ring, with `Ĥ_0 = heisenbergHamiltonianS (ringCoupling (2n))` the field-free symmetric ring
+Hamiltonian and a per-site Zeeman field over all sites (Tasaki §4.1, field Hamiltonian (4.1.48),
+pp. 85–86, with the `−(−1)^x` folded into the per-site field `h`). -/
+noncomputable def ringFieldHamiltonian (n N : ℕ) (h : Fin (2 * n) → ℝ) :
+    ManyBodyOpS (Fin (2 * n)) N :=
+  heisenbergHamiltonianS (ringCoupling (2 * n)) N + ∑ z, (h z : ℂ) • onSiteS z (spinSOp3 N)
+
+namespace AxisTwoPiRotS
+
+/-- **Crux: the right-half gauge turns `Ĥ_field(physFieldOf a b)` into the doubled Hamiltonian.**
+For the split field `physFieldOf n a b`, conjugation by the right-half Marshall gauge equals the
+two-field ("doubled") Hamiltonian `Lfield(a) + θ(Lfield(b)) − D` underlying `W(a,b)`.  The
+field-free part `Ĥ_0 ↦ H_L + θ(H_L) − crossing` is `rightGauge_conj_ringHamiltonian`; the field
+part splits by half — on the left `a` survives directly, on the right the two minus signs (the
+gauge `−Ŝ^{(3)}` and the `−b(r z)` slot) cancel and, reindexed by `r`, reproduce the θ-transported
+field `Σ_{x<n} (b x)·Ŝ_{r x}^{(3)}` of `θ(Lfield(b))`.  This is the sign core of Tasaki's
+reflection bound (4.1.51), proof pp. 89–93; DLS 1978 §2–3. -/
+theorem rightGauge_conj_ringFieldHamiltonian (G : AxisTwoPiRotS N) (n : ℕ) [NeZero n]
+    (a b : Fin (2 * n) → ℝ) :
+    G.rightGauge n * ringFieldHamiltonian n N (physFieldOf n a b) * G.rightGaugeInv n
+      = ringLeftFieldHamiltonian n N a
+        + ringReflectionThetaS n N (ringLeftFieldHamiltonian n N b)
+        - (ringFieldDLSDecomposition n N a).interaction := by
+  have hfield : G.rightGauge n
+        * (∑ z, (physFieldOf n a b z : ℂ) • onSiteS z (spinSOp3 N)) * G.rightGaugeInv n
+      = (∑ x ∈ Finset.univ.filter (fun x : Fin (2 * n) => (x : ℕ) < n),
+            (a x : ℂ) • onSiteS x (spinSOp3 N))
+        + ∑ x ∈ Finset.univ.filter (fun x : Fin (2 * n) => (x : ℕ) < n),
+            (b x : ℂ) • onSiteS (ringReflect n x) (spinSOp3 N) := by
+    rw [rightGauge_conj_sum]
+    rw [Finset.sum_congr rfl (fun z _ => by
+        rw [rightGauge_conj_smul, G.rightGauge_conj_onSiteS_spinSOp3 n z] :
+      ∀ z ∈ (Finset.univ : Finset (Fin (2 * n))),
+        G.rightGauge n * ((physFieldOf n a b z : ℂ) • onSiteS z (spinSOp3 N)) * G.rightGaugeInv n
+          = (physFieldOf n a b z : ℂ)
+            • onSiteS z (if n ≤ (z : ℕ) then - spinSOp3 N else spinSOp3 N))]
+    rw [← Finset.sum_filter_add_sum_filter_not Finset.univ (fun z : Fin (2 * n) => (z : ℕ) < n)]
+    congr 1
+    · refine Finset.sum_congr rfl (fun z hz => ?_)
+      have hz' : (z : ℕ) < n := (Finset.mem_filter.mp hz).2
+      simp only [physFieldOf, if_pos hz', if_neg (by omega : ¬ n ≤ (z : ℕ))]
+    · rw [show (Finset.univ.filter (fun z : Fin (2 * n) => ¬ (z : ℕ) < n))
+            = Finset.univ.filter (fun z : Fin (2 * n) => n ≤ (z : ℕ)) from by
+          apply Finset.filter_congr; intro z _; simp only [not_lt]]
+      rw [sum_right_eq_sum_reflect_left n (fun z => (physFieldOf n a b z : ℂ)
+          • onSiteS z (if n ≤ (z : ℕ) then - spinSOp3 N else spinSOp3 N))]
+      refine Finset.sum_congr rfl (fun x hx => ?_)
+      have hx' : (x : ℕ) < n := (Finset.mem_filter.mp hx).2
+      have hrx : n ≤ ((ringReflect n x : Fin (2 * n)) : ℕ) := by
+        have := (ringReflect_lt_iff n (ringReflect n x)).not
+        rw [ringReflect_involutive n x] at this; omega
+      simp only [physFieldOf, if_pos hrx,
+        if_neg (by omega : ¬ ((ringReflect n x : Fin (2 * n)) : ℕ) < n),
+        ringReflect_involutive n x, Complex.ofReal_neg, onSiteS_neg]
+      rw [smul_neg, neg_smul]
+      exact neg_neg _
+  rw [ringFieldHamiltonian, rightGauge_conj_add, G.rightGauge_conj_ringHamiltonian n,
+    ringDLSDecomposition_toHamiltonian, hfield, ringLeftFieldHamiltonian,
+    ringReflectionThetaS_ringLeftFieldHamiltonian, ringFieldDLSDecomposition,
+    ringCrossingRPDecomposition_interaction]
+  abel
+
+end AxisTwoPiRotS
+
 end LatticeSystem.Quantum
