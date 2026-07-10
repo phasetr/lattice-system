@@ -54,3 +54,4 @@ import LatticeSystem.Quantum.SpinS.RingReflectionTwoFieldWeight
 import LatticeSystem.Quantum.SpinS.RingReflectionTwoFieldPairing
 import LatticeSystem.Quantum.SpinS.RingReflectionTwoFieldConeCauchySchwarz
 import LatticeSystem.Quantum.SpinS.RingReflectionTwoFieldCauchySchwarz
+import LatticeSystem.Quantum.SpinS.RingReflectionFieldPartition

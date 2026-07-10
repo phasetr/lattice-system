@@ -80,20 +80,19 @@ tanakaSSB_lowLying_energy_bound
 # delisted Theorem 4.8 PR-A…PR-D tips); only the capstone remains allowlisted.
 tanakaSSB_full_symmetry_breaking
 
-# TEMPORARY — §4.1 Theorem 4.2 (#4777) Gaussian-domination sub-arc (design v2), PR7a tips (#4975).
-# The symmetric-field RP-trace-weight property and reflection invariance of the field-extended ring
-# weight (`RingReflectionFieldWeight.lean`). Zero-referenced ONLY until PR7b builds the two-field
-# weight `W(a,b)` + finite-β RP Cauchy–Schwarz, which CONSUMES both. DELIST when PR7b lands (same
-# temporary-then-delist lifecycle as the delisted Theorem 4.8 PR-A…PR-D / Theorem 4.9 arc tips).
-ringDLSFieldWeightSym_rpTraceWeight
+# TEMPORARY — §4.1 Theorem 4.2 (#4777) Gaussian-domination sub-arc (design v2), PR7a tip (#4975).
+# The reflection invariance of the field-extended ring weight (`RingReflectionFieldWeight.lean`).
+# Zero-referenced ONLY until the PR7d chessboard/transport step consumes it. DELIST when PR7d lands
+# (same temporary-then-delist lifecycle as the delisted Theorem 4.8 PR-A…PR-D / Theorem 4.9 arc tips).
 ringReflectionThetaS_ringDLSFieldWeightSym
 
-# TEMPORARY — §4.1 Theorem 4.2 (#4777) Gaussian-domination sub-arc (design v2), PR7b-i tip (#4976).
-# The diagonal specialisation of the two-field ("doubled") Gibbs weight `W(a,b)`
-# (`RingReflectionTwoFieldWeight.lean`). Zero-referenced ONLY until the physical partition function
-# `Z` of PR7c consumes it. DELIST when PR7c lands (same temporary-then-delist lifecycle as the
-# delisted Theorem 4.8 PR-A…PR-D / Theorem 4.9 arc tips).
-ringTwoFieldWeight_self
+# NOTE (PR7c, #4983): the PR7a tip `ringDLSFieldWeightSym_rpTraceWeight`
+# (`RingReflectionFieldWeight.lean`) and the PR7b-i tip `ringTwoFieldWeight_self`
+# (`RingReflectionTwoFieldWeight.lean`) are now DELISTED — both are genuinely CONSUMED by the PR7c
+# diagonal nonnegativity `ringTwoFieldWeight_self_trace_re_nonneg`
+# (`RingReflectionFieldPartition.lean`): `ringTwoFieldWeight_self` rewrites `W(a,a)` to the
+# symmetric-field weight and `ringDLSFieldWeightSym_rpTraceWeight` supplies its RP-cone positivity at
+# `A = 1`. Their decls stay in place (same delist lifecycle as the Theorem 4.8 / Theorem 4.9 arc tips).
 
 # NOTE (PR7b-iii-c, #4982): the PR7b-i tip `ringTwoFieldWeight_isLimit`
 # (`RingReflectionTwoFieldWeight.lean`) and the PR7b-iii-b tip `twoField_product_pairing_cauchySchwarz`
@@ -110,10 +109,17 @@ ringTwoFieldWeight_self
 # `twoField_product_pairing_trace`. Their decls stay in place (same delist lifecycle as the Theorem
 # 4.8 PR-A…PR-D / Theorem 4.9 arc tips).
 
-# TEMPORARY — §4.1 Theorem 4.2 (#4777) Gaussian-domination sub-arc (design v2), PR7b-iii-c capstone
-# (#4982). The two-field reflection Cauchy–Schwarz on the doubled Gibbs weight
+# NOTE (PR7c, #4983): the PR7b-iii-c capstone `ringTwoFieldWeight_reflection_cauchySchwarz`
 # (`RingReflectionTwoFieldCauchySchwarz.lean`), the finite-β matrix form of Tasaki's reflection bound
-# (4.1.51): `(Re Tr W(a,b))² ≤ Re Tr W(a,a)·Re Tr W(b,b)`.  Zero-referenced ONLY until PR7c mounts the
-# Gaussian-domination / order-parameter bound on it, which CONSUMES it. DELIST when PR7c lands (same
-# temporary-then-delist lifecycle as the delisted Theorem 4.8 PR-A…PR-D / Theorem 4.9 arc tips).
-ringTwoFieldWeight_reflection_cauchySchwarz
+# (4.1.51) `(Re Tr W(a,b))² ≤ Re Tr W(a,a)·Re Tr W(b,b)`, is now DELISTED — it is genuinely CONSUMED
+# by the PR7c one reflection step `ringFieldPartitionRe_reflection_step`
+# (`RingReflectionFieldPartition.lean`). Its decl stays in place (same delist lifecycle as the
+# Theorem 4.8 / Theorem 4.9 arc tips).
+
+# TEMPORARY — §4.1 Theorem 4.2 (#4777) Gaussian-domination sub-arc (design v2), PR7c tips (#4983,
+# `RingReflectionFieldPartition.lean`). The diagonal nonnegativity `0 ≤ Re Tr W(a,a)` and the finite-β
+# partition-function reflection step `Z_β(h)² ≤ Z_β(h_L)·Z_β(h_R)` (Tasaki reflection bound (4.1.51)).
+# Zero-referenced ONLY until the PR7d symmetrization chain `Z_β(h) ≤ Z_β(0)` consumes both. DELIST
+# when PR7d lands (same temporary-then-delist lifecycle as the Theorem 4.8 / Theorem 4.9 arc tips).
+ringTwoFieldWeight_self_trace_re_nonneg
+ringFieldPartitionRe_reflection_step
