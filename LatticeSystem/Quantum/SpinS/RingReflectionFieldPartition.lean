@@ -99,4 +99,20 @@ theorem rightGauge_conj_onSiteS_spinSOp3 (G : AxisTwoPiRotS N) (n : ℕ) (z : Fi
 
 end AxisTwoPiRotS
 
+/-- **θ field-part expansion of the field-augmented left Hamiltonian.**  The reflection `θ` of
+`Lfield(b) = ringLeftHamiltonian + Σ_{x<n} (b x)·Ŝ_x^{(3)}` is `θ(ringLeftHamiltonian)` plus the
+θ-transported field `Σ_{x<n} (b x)·Ŝ_{r x}^{(3)}`.  Since `Ŝ^{(3)}` is real, `θ` reflects the site
+and leaves the operator (and the real coefficient) unchanged
+(`ringReflectionThetaS_onSiteS_spinSOp3`, `Complex.conj_ofReal`).  This is the right-supported field
+of the doubled weight `W(a,b)`
+(Tasaki §4.1 Theorem 4.2 proof, pp. 89–93). -/
+theorem ringReflectionThetaS_ringLeftFieldHamiltonian (n N : ℕ) (b : Fin (2 * n) → ℝ) :
+    ringReflectionThetaS n N (ringLeftFieldHamiltonian n N b)
+      = ringReflectionThetaS n N (ringLeftHamiltonian n N)
+        + ∑ x ∈ Finset.univ.filter (fun x : Fin (2 * n) => (x : ℕ) < n),
+            (b x : ℂ) • onSiteS (ringReflect n x) (spinSOp3 N) := by
+  rw [ringLeftFieldHamiltonian, ringReflectionThetaS_add, ringReflectionThetaS_sum]
+  refine congrArg _ (Finset.sum_congr rfl (fun x _ => ?_))
+  rw [ringReflectionThetaS_smul, Complex.conj_ofReal, ringReflectionThetaS_onSiteS_spinSOp3]
+
 end LatticeSystem.Quantum
