@@ -175,7 +175,13 @@ ringBondSquareFieldHamiltonian_isHermitian
 # TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.1 Theorem 4.2 (#4777) bond-square partition-function
 # infrastructure (PR-BS2, `RingReflectionBondSquareFieldPartition.lean`). Scaled reduction identity
 # `Z^{BS}_β(h) = e^{−βC(h)} · Z^{repo}_β(kOf h)` (bond-square partition function = scalar factor ×
-# linear-core partition function, Tasaki §4.1 (4.1.49), p.86). Zero-referenced ONLY until PR-BS3
-# (constant-field collapse) consumes it via C(h) ≥ 0 / e^{−βC} ≤ 1 to collapse each `Z_β(staggered_c)`
-# to `Z_β(0)`. RE-EVALUATE/DELIST when consumed by PR-BS3 (constant-field collapse).
+# linear-core partition function, Tasaki §4.1 (4.1.49), p.86). Zero-referenced ONLY until PR-BS10
+# (uniform-field bound) consumes it via the scaled reduction Z^{BS}_β(h) = e^{−βC(h)} · Z^{repo}_β(kOf h)
+# to collapse each `Z_β(staggered_c)` to `Z_β(0)`. RE-EVALUATE/DELIST when consumed by PR-BS10.
 ringBondSquareFieldPartitionRe_eq_scaled
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.1 Theorem 4.2 (#4777) bond-square constant-field
+# collapse (PR-BS3, `RingReflectionBondSquareFieldPartition.lean`). Partition-function collapse
+# `Z^{BS}_β(fun _=>c)=Z^{repo}_β(0)` (constant field → zero field on even ring). Zero-referenced until
+# PR-BS10 (uniform-field bound) consumes it. RE-EVALUATE/DELIST when consumed by PR-BS10.
+ringBondSquareFieldPartitionRe_const

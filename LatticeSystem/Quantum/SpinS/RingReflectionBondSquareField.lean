@@ -189,5 +189,71 @@ theorem ringBondSquareFieldHamiltonian_isHermitian (n N : ℕ) [NeZero n] (h : F
   exact (ringFieldHamiltonian_isHermitian n N _).add
     (Matrix.isHermitian_one.smul (Complex.conj_ofReal _))
 
+/-- **Staggered sign flips under the cyclic successor** (even-ring parity, Tasaki §4.1, footnote 10,
+book p.84): `(−1)^{z+1} = −(−1)^z` on `Fin (2n)`, including the wraparound bond `{2n−1, 0}` where
+`(−1)^{2n−1} = −1` (`2n` even, needs `n ≥ 1`).  The successor value is `(z+1) mod 2n`
+(`ringBondSucc_val`); on the interior bonds this is `z+1` (`pow_succ`), and on the wraparound bond
+it is `0` with the residual `−(−1)^{2n−1}` closed by `Odd.neg_one_pow`.  Analogue for the successor
+of the reflection sign flip `neg_one_pow_ringReflect`; a distinct map (successor, not reflection),
+so not a duplicate. -/
+private lemma neg_one_pow_ringBondSucc (n : ℕ) [NeZero n] (z : Fin (2 * n)) :
+    (-1 : ℝ) ^ (ringBondSucc n z : ℕ) = -(-1 : ℝ) ^ (z : ℕ) := by
+  rw [ringBondSucc_val]
+  have hlt : (z : ℕ) < 2 * n := z.isLt
+  have hn : 0 < n := Nat.pos_of_ne_zero (NeZero.ne n)
+  rcases Nat.lt_or_ge (z.val + 1) (2 * n) with hc | hc
+  · rw [Nat.mod_eq_of_lt hc, pow_succ]; ring
+  · have hz : z.val + 1 = 2 * n := by omega
+    have hval : (z : ℕ) = 2 * n - 1 := by omega
+    have hodd : (-1 : ℝ) ^ (2 * n - 1) = -1 := Odd.neg_one_pow ⟨n - 1, by omega⟩
+    rw [hz, Nat.mod_self, pow_zero, hval, hodd]; ring
+
+/-- **On-bond staggered cancellation `(♦)`** at a constant field (Tasaki §4.1, footnote 10, book
+p.84): for `h^const_z ≡ c` the staggered values on any cyclic ring bond sum to zero,
+`f_z + f_{z+1} = (−1)^z c + (−1)^{z+1} c = 0`, via `(−1)^{z+1} = −(−1)^z`
+(`neg_one_pow_ringBondSucc`).  This single even-ring fact is consumed twice, by
+`ringBondSquareConst_const` (§2) and `ringBondSquareLinField_const` (§3). -/
+private lemma ringBondSquareStagField_const_bond_cancel (n : ℕ) [NeZero n] (c : ℝ)
+    (z : Fin (2 * n)) :
+    ringBondSquareStagField (fun _ => c) z
+      + ringBondSquareStagField (fun _ => c) (ringBondSucc n z) = 0 := by
+  simp only [ringBondSquareStagField]
+  rw [neg_one_pow_ringBondSucc]; ring
+
+/-- **Constant-field scalar vanishes** `C(h^const) = 0` (Tasaki §4.1 (4.1.49), book p.86): since
+`C(h) = ½ Σ_bonds (f_z + f_{z+1})²` and every bond term vanishes at a constant field
+(`ringBondSquareStagField_const_bond_cancel`), the whole sum is `0`.  The equality (not the general
+nonnegativity `C ≥ 0`, delivered by PR-BS2) is what the collapse consumes. -/
+theorem ringBondSquareConst_const (n : ℕ) [NeZero n] (c : ℝ) :
+    ringBondSquareConst n (fun _ => c) = 0 := by
+  rw [ringBondSquareConst,
+    Finset.sum_eq_zero (fun x _ => by rw [ringBondSquareStagField_const_bond_cancel]; ring)]
+  ring
+
+/-- **Constant-field linear field vanishes** `kOf(h^const) = 0` (Tasaki §4.1 (4.1.38), book p.84):
+each per-site coefficient `−((f_{z−1} + f_z) + (f_z + f_{z+1}))` is the sum of the two incident
+adjacent-bond cancellations `(♦)`, so `ringBondSquareLinField n (fun _ => c) = 0`.  The predecessor
+bond `{z−1, z}` is realised via the group inverse identity `ringBondSucc n (z − 1) = z`
+(`ringBondSucc_eq_add_one`), matching the def's `z − 1` slot. -/
+theorem ringBondSquareLinField_const (n : ℕ) [NeZero n] (c : ℝ) :
+    ringBondSquareLinField n (fun _ => c) = 0 := by
+  funext z
+  rw [ringBondSquareLinField, Pi.zero_apply]
+  have h1 := ringBondSquareStagField_const_bond_cancel n c z
+  have hsucc : ringBondSucc n (z - 1) = z := by rw [ringBondSucc_eq_add_one, sub_add_cancel]
+  have h2 := ringBondSquareStagField_const_bond_cancel n c (z - 1)
+  rw [hsucc] at h2
+  rw [h1, h2]; ring
+
+/-- **Operator collapse** `Ĥ_{h^const} = Ĥ₀` (Tasaki §4.1, footnote 10, book p.84; (4.1.49), book
+p.86): at a constant field the bond-square field Hamiltonian collapses to the field-free linear core
+`ringFieldHamiltonian n N 0`, via the reduction `(★)` (`ringBondSquareFieldHamiltonian_eq`) and the
+two vanishings `ringBondSquareLinField_const` (§3) and `ringBondSquareConst_const` (§2).  This is
+the finite-`N` operator form of Tasaki's `E_GS(h^const) = E_GS(0,…,0)`. -/
+theorem ringBondSquareFieldHamiltonian_const (n N : ℕ) [NeZero n] (c : ℝ) :
+    ringBondSquareFieldHamiltonian n N (fun _ => c) = ringFieldHamiltonian n N 0 := by
+  rw [ringBondSquareFieldHamiltonian_eq, ringBondSquareLinField_const, ringBondSquareConst_const,
+    Complex.ofReal_zero, zero_smul, add_zero]
+
 end LatticeSystem.Quantum
 
