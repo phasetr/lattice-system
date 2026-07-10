@@ -80,4 +80,23 @@ private theorem sum_right_eq_sum_reflect_left {M : Type*} [AddCommMonoid M] (n :
   · intro x _; exact ringReflect_involutive n x
   · intro z _; rw [ringReflect_involutive n z]
 
+namespace AxisTwoPiRotS
+
+/-- **Ŝ^{(3)} specialisation of the right-half gauge conjugation.**  The right-half Marshall gauge
+conjugates the single-site `Ŝ^{(3)}` to `−Ŝ^{(3)}` on right sites (`z ≥ n`, via
+`AxisTwoPiRotS.conj_spinSOp3`, the DLS/Marshall sign) and leaves it fixed on left sites (`z < n`):
+`rightGauge · onSiteS z Ŝ^{(3)} · rightGaugeInv = onSiteS z (if n ≤ z then −Ŝ^{(3)} else Ŝ^{(3)})`.
+This is the sign that, combined with the `−b(r z)` slot of `physFieldOf`, transports the right field
+with the correct positive sign (Tasaki §4.1 Theorem 4.2 proof, pp. 89–93). -/
+theorem rightGauge_conj_onSiteS_spinSOp3 (G : AxisTwoPiRotS N) (n : ℕ) (z : Fin (2 * n)) :
+    G.rightGauge n * onSiteS z (spinSOp3 N) * G.rightGaugeInv n
+      = onSiteS z (if n ≤ (z : ℕ) then - spinSOp3 N else spinSOp3 N) := by
+  rw [G.rightGauge_conj_onSiteS n z]
+  congr 1
+  split
+  · rw [G.conj_spinSOp3]
+  · rfl
+
+end AxisTwoPiRotS
+
 end LatticeSystem.Quantum
