@@ -36,60 +36,64 @@ open Matrix
 
 variable {n N : ℕ}
 
-/-- **SWEEP operator identity, single step.**  For left-supported `La`, `Ga`, `Gb`, `Cᵢ` the mixed
+/-- **SWEEP operator identity, single step.**  For left-supported `La`, `Ga`, `Gb`, `Cb` the mixed
 product formed by appending one doubled-kinetic-plus-crossing factor rearranges into a single
-reflection pairing whose two piles carry the SAME crossing generator `Cᵢ`, the field entering only
-through the left factors `La`/`Ga` (non-reflected pile) and `Lb`/`Gb` (reflected pile):
+reflection pairing.  The two piles now carry DIFFERENT crossing generators — the reflected pile the
+`y`-field factor `Cb` (`= C i y`), the non-reflected pile the `x`-field factor `Ca` (`= C i x`) —
+the field entering both the kinetic factors `La`/`Ga`, `Lb`/`Gb` and the crossing factors `Ca`/`Cb`:
 
-    `θ(Lb)·La · (Ga·θ(Gb)·(θ(Cᵢ)·Cᵢ)) = θ(Lb·Gb·Cᵢ) · (La·Ga·Cᵢ)`.
+    `θ(Lb)·La · (Ga·θ(Gb)·(θ(Cb)·Ca)) = θ(Lb·Gb·Cb) · (La·Ga·Ca)`.
 
 The proof moves the left-supported block `La·Ga` to the right past the reflected block
-`θ(Gb)·θ(Cᵢ) = θ(Gb·Cᵢ)` by the disjoint-support commutation `SupportedOnLeftS.mul_theta_comm`; the
-remaining reassociations are pure monoid bookkeeping.  (The reflected header `Lb` needs no support
-hypothesis.) -/
-private theorem sweep_operator_identity {La Lb Ga Gb Ci : ManyBodyOpS (Fin (2 * n)) N}
+`θ(Gb)·θ(Cb) = θ(Gb·Cb)` by the disjoint-support commutation `SupportedOnLeftS.mul_theta_comm`; the
+remaining reassociations are pure monoid bookkeeping.  The trailing non-reflected crossing `Ca`
+stays to the far right and never crosses `θ`, so — like the reflected header `Lb` — it needs no
+support hypothesis. -/
+private theorem sweep_operator_identity {La Lb Ga Gb Ca Cb : ManyBodyOpS (Fin (2 * n)) N}
     (hLa : SupportedOnLeftS n N La) (hGa : SupportedOnLeftS n N Ga)
-    (hGb : SupportedOnLeftS n N Gb) (hCi : SupportedOnLeftS n N Ci) :
+    (hGb : SupportedOnLeftS n N Gb) (hCb : SupportedOnLeftS n N Cb) :
     ringReflectionThetaS n N Lb * La
-        * (Ga * ringReflectionThetaS n N Gb * (ringReflectionThetaS n N Ci * Ci))
-      = ringReflectionThetaS n N (Lb * Gb * Ci) * (La * Ga * Ci) := by
-  have hcomm : La * Ga * (ringReflectionThetaS n N Gb * ringReflectionThetaS n N Ci)
-      = ringReflectionThetaS n N Gb * ringReflectionThetaS n N Ci * (La * Ga) := by
-    have h := (hLa.mul hGa).mul_theta_comm (hGb.mul hCi)
+        * (Ga * ringReflectionThetaS n N Gb * (ringReflectionThetaS n N Cb * Ca))
+      = ringReflectionThetaS n N (Lb * Gb * Cb) * (La * Ga * Ca) := by
+  have hcomm : La * Ga * (ringReflectionThetaS n N Gb * ringReflectionThetaS n N Cb)
+      = ringReflectionThetaS n N Gb * ringReflectionThetaS n N Cb * (La * Ga) := by
+    have h := (hLa.mul hGa).mul_theta_comm (hGb.mul hCb)
     rwa [ringReflectionThetaS_mul] at h
   rw [ringReflectionThetaS_mul, ringReflectionThetaS_mul]
   calc ringReflectionThetaS n N Lb * La
-          * (Ga * ringReflectionThetaS n N Gb * (ringReflectionThetaS n N Ci * Ci))
+          * (Ga * ringReflectionThetaS n N Gb * (ringReflectionThetaS n N Cb * Ca))
       = ringReflectionThetaS n N Lb
-          * (La * Ga * (ringReflectionThetaS n N Gb * ringReflectionThetaS n N Ci)) * Ci := by
+          * (La * Ga * (ringReflectionThetaS n N Gb * ringReflectionThetaS n N Cb)) * Ca := by
         noncomm_ring
     _ = ringReflectionThetaS n N Lb
-          * (ringReflectionThetaS n N Gb * ringReflectionThetaS n N Ci * (La * Ga)) * Ci := by
+          * (ringReflectionThetaS n N Gb * ringReflectionThetaS n N Cb * (La * Ga)) * Ca := by
         rw [hcomm]
-    _ = ringReflectionThetaS n N Lb * ringReflectionThetaS n N Gb * ringReflectionThetaS n N Ci
-          * (La * Ga * Ci) := by noncomm_ring
+    _ = ringReflectionThetaS n N Lb * ringReflectionThetaS n N Gb * ringReflectionThetaS n N Cb
+          * (La * Ga * Ca) := by noncomm_ring
 
 /-- **Two-field product pairing (the SWEEP identity).**  The doubled Dyson–Lieb–Simon approximant
-`(g(x)·θ(g(y))·∑ᵢ wᵢ·(θ(Cᵢ)·Cᵢ))^m` — with left-supported kinetic family `g`, nonnegative cone
-weights `wᵢ ≥ 0`, and left-supported cone generators `Cᵢ` — collapses into a single nonnegative
-reflection pairing over the crossing family `κ = ιᵐ`:
+`(g(x)·θ(g(y))·∑ᵢ wᵢ·(θ(Cᵢ(y))·Cᵢ(x)))^m` — with left-supported kinetic family `g`, nonnegative cone
+weights `wᵢ ≥ 0`, and a FIELD-DEPENDENT left-supported crossing family `Cᵢ(z)` (the reflected pile
+carrying the `y`-field factor `Cᵢ(y)`, the non-reflected pile the `x`-field factor `Cᵢ(x)`) —
+collapses into a single nonnegative reflection pairing over the crossing family `κ = ιᵐ`:
 
-    `(g(x)·θ(g(y))·∑ᵢ wᵢ·(θ(Cᵢ)·Cᵢ))^m = ∑ₖ vₖ·(θ(𝓛ₖ(y)) · 𝓛ₖ(x))`,
+    `(g(x)·θ(g(y))·∑ᵢ wᵢ·(θ(Cᵢ(y))·Cᵢ(x)))^m = ∑ₖ vₖ·(θ(𝓛ₖ(y)) · 𝓛ₖ(x))`,
 
-where `vₖ = ∏ w ≥ 0` and the pattern-shared family `𝓛ₖ(z) = g(z)·C_{i₁}·…·g(z)·C_{iₘ}` is
-left-supported and depends on the field only through `z`, with the SAME crossing sequence `k` in
-both piles.  Proved by induction on `m`, each step appending one factor and sweeping the appended
-left-supported block past the reflected block via `sweep_operator_identity`. -/
+where `vₖ = ∏ w ≥ 0` and the pattern-shared family `𝓛ₖ(z) = g(z)·C_{i₁}(z)·…·g(z)·C_{iₘ}(z)` is
+left-supported, with the SAME crossing sequence `k` in both piles and the field entering through
+`z`.  Proved by induction on `m`, each step appending one factor and sweeping the appended
+left-supported block past the reflected block via `sweep_operator_identity`.  The field-free pairing
+is the constant specialization `C i z := C i`. -/
 theorem twoField_product_pairing (m : ℕ)
     (g : (Fin (2 * n) → ℝ) → ManyBodyOpS (Fin (2 * n)) N)
     (hg : ∀ x, SupportedOnLeftS n N (g x)) {ι : Type} [Fintype ι] (w : ι → ℝ)
-    (hw : ∀ i, 0 ≤ w i) (C : ι → ManyBodyOpS (Fin (2 * n)) N)
-    (hC : ∀ i, SupportedOnLeftS n N (C i)) :
+    (hw : ∀ i, 0 ≤ w i) (C : ι → (Fin (2 * n) → ℝ) → ManyBodyOpS (Fin (2 * n)) N)
+    (hC : ∀ i z, SupportedOnLeftS n N (C i z)) :
     ∃ (κ : Type) (_ : Fintype κ) (v : κ → ℝ)
       (𝓛 : κ → (Fin (2 * n) → ℝ) → ManyBodyOpS (Fin (2 * n)) N),
       (∀ k, 0 ≤ v k) ∧ (∀ k x, SupportedOnLeftS n N (𝓛 k x)) ∧
         ∀ x y, (g x * ringReflectionThetaS n N (g y)
-              * ∑ i, (w i : ℂ) • (ringReflectionThetaS n N (C i) * C i)) ^ m
+              * ∑ i, (w i : ℂ) • (ringReflectionThetaS n N (C i y) * C i x)) ^ m
           = ∑ k, (v k : ℂ) • (ringReflectionThetaS n N (𝓛 k y) * 𝓛 k x) := by
   induction m with
   | zero =>
@@ -100,15 +104,15 @@ theorem twoField_product_pairing (m : ℕ)
   | succ m ih =>
     obtain ⟨κ, instκ, v, 𝓛, hv, hsupp, heq⟩ := ih
     refine ⟨κ × ι, inferInstance, fun p => v p.1 * w p.2,
-      fun p z => 𝓛 p.1 z * g z * C p.2, fun p => mul_nonneg (hv p.1) (hw p.2),
-      fun p z => ((hsupp p.1 z).mul (hg z)).mul (hC p.2), ?_⟩
+      fun p z => 𝓛 p.1 z * g z * C p.2 z, fun p => mul_nonneg (hv p.1) (hw p.2),
+      fun p z => ((hsupp p.1 z).mul (hg z)).mul (hC p.2 z), ?_⟩
     intro x y
     rw [pow_succ, heq x y, Finset.sum_mul, Fintype.sum_prod_type]
     refine Finset.sum_congr rfl (fun k _ => ?_)
     rw [Finset.mul_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl (fun i _ => ?_)
     rw [smul_mul_assoc, mul_smul_comm, mul_smul_comm, smul_smul,
-      sweep_operator_identity (hsupp k x) (hg x) (hg y) (hC i), Complex.ofReal_mul]
+      sweep_operator_identity (hsupp k x) (hg x) (hg y) (hC i y), Complex.ofReal_mul]
 
 /-- **The pairing trace form (†).**  Taking the trace of the SWEEP identity
 `twoField_product_pairing` and applying the bilinear reflection base identity
@@ -121,13 +125,13 @@ pairing consumed by the doubled reflection Cauchy–Schwarz (PR7b-iii-b). -/
 theorem twoField_product_pairing_trace (m : ℕ)
     (g : (Fin (2 * n) → ℝ) → ManyBodyOpS (Fin (2 * n)) N)
     (hg : ∀ x, SupportedOnLeftS n N (g x)) {ι : Type} [Fintype ι] (w : ι → ℝ)
-    (hw : ∀ i, 0 ≤ w i) (C : ι → ManyBodyOpS (Fin (2 * n)) N)
-    (hC : ∀ i, SupportedOnLeftS n N (C i)) :
+    (hw : ∀ i, 0 ≤ w i) (C : ι → (Fin (2 * n) → ℝ) → ManyBodyOpS (Fin (2 * n)) N)
+    (hC : ∀ i z, SupportedOnLeftS n N (C i z)) :
     ∃ (κ : Type) (_ : Fintype κ) (v : κ → ℝ)
       (𝓛 : κ → (Fin (2 * n) → ℝ) → ManyBodyOpS (Fin (2 * n)) N),
       (∀ k, 0 ≤ v k) ∧ (∀ k x, SupportedOnLeftS n N (𝓛 k x)) ∧
         ∀ x y, ((g x * ringReflectionThetaS n N (g y)
-              * ∑ i, (w i : ℂ) • (ringReflectionThetaS n N (C i) * C i)) ^ m).trace
+              * ∑ i, (w i : ℂ) • (ringReflectionThetaS n N (C i y) * C i x)) ^ m).trace
           = ∑ k, (v k : ℂ)
               * (starRingEnd ℂ (refLeftSum n N (𝓛 k y)) * refLeftSum n N (𝓛 k x)) := by
   obtain ⟨κ, instκ, v, 𝓛, hv, hsupp, heq⟩ :=

@@ -98,7 +98,7 @@ private theorem twoField_pairing_cauchySchwarz_exp (m : ℕ)
     intro r
     obtain ⟨ι, _, C, c, hC, hc, heq⟩ := hP.expSeriesPartialSum r
     rw [heq]
-    exact twoField_product_pairing_cauchySchwarz m g hg c hc C hC x y
+    exact twoField_product_pairing_cauchySchwarz m g hg c hc (fun i _ => C i) (fun i _ => hC i) x y
   exact cauchySchwarz_of_tendsto
     (((hcont x y).tendsto (NormedSpace.exp P)).comp hexp)
     (((hcont x x).tendsto (NormedSpace.exp P)).comp hexp)
