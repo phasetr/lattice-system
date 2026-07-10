@@ -60,3 +60,4 @@ import LatticeSystem.Quantum.SpinS.RingReflectionStaggeredRelabel
 import LatticeSystem.Quantum.SpinS.RingReflectionGaussianDomination
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareTwoFieldWeight
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareUngaugedDLS
+import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareGaugeCrux

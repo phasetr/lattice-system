@@ -198,14 +198,16 @@ ringBondSquareTwoFieldWeight_self
 # RE-EVALUATE/DELIST when consumed by PR-BS8.
 ringBondSquareTwoFieldWeight_reflection_cauchySchwarz
 
-# TEMPORARY arc-tip (temp-then-delist) — §4.1 Thm 4.2 (#4777) ungauged bond-square DLS split (PR-BS8a-i,
-# `RingReflectionBondSquareUngaugedDLS.lean`). Physical bond-square Hamiltonian = intra-left +
-# intra-right + 2 crossing − single-ion (ungauged, square-non-expanded). Zero-referenced until
-# PR-BS8a-ii (gauge crux) conjugates it via rightGauge. RE-EVALUATE/DELIST when consumed by PR-BS8a-ii.
-ringBondSquareFieldHamiltonian_ungauged_dls
+# NOTE (PR-BS8a-ii, #4996): the PR-BS8a-i tips `ringBondSquareFieldHamiltonian_ungauged_dls` and
+# `ringBondSquareLeftBondSum_eq_leftCouplingBulk` are now DELISTED — both are genuinely CONSUMED by
+# the PR-BS8a-ii gauge crux (G) `rightGauge_conj_ringBondSquareFieldHamiltonian`
+# (`RingReflectionBondSquareGaugeCrux.lean`): the ungauged split is conjugated via the right-half
+# Marshall gauge and the left field bulk bridge reindexes the gauged intra-left piece.
+# Their decls stay in place (same delist lifecycle as the Theorem 4.8 / Theorem 4.9 arc tips).
 
-# TEMPORARY arc-tip (temp-then-delist) — §4.1 Thm 4.2 (#4777) intra-left directed sum ↔
-# `ringBondSquareLeftFieldHamiltonian` bulk bridge (PR-BS8a-i, `RingReflectionBondSquareUngaugedDLS.lean`).
-# Zero-referenced until PR-BS8a-ii identifies the ungauged left piece with H_L. RE-EVALUATE/DELIST when
-# consumed by PR-BS8a-ii.
-ringBondSquareLeftBondSum_eq_leftCouplingBulk
+# TEMPORARY arc-tip (temp-then-delist) — §4.1 Thm 4.2 (#4777) bond-square gauge conjugation crux (PR-BS8a-ii,
+# `RingReflectionBondSquareGaugeCrux.lean`). Gauge crux (G): right-half Marshall gauge conjugates the
+# physical bond-square Hamiltonian into the BS6 two-field DLS operator `H_L(a) + θ(H_L(b)) − crossing(a,b)`.
+# Zero-referenced until PR-BS8b (physical identification `Z^{BS}=Re Tr W`) consumes it. RE-EVALUATE/DELIST
+# when consumed by PR-BS8b.
+rightGauge_conj_ringBondSquareFieldHamiltonian
