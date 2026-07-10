@@ -76,4 +76,33 @@ private theorem reflGram_cauchySchwarz {κ : Type} [Fintype κ] (v : κ → ℝ)
     (fun p : κ × Fin 2 => Real.sqrt (v p.1) * ![(Sa p.1).re, (Sa p.1).im] p.2)
     (fun p : κ × Fin 2 => Real.sqrt (v p.1) * ![(Sb p.1).re, (Sb p.1).im] p.2)
 
+/-- **Two-field pairing finite reflection Cauchy–Schwarz.**  For the doubled Dyson–Lieb–Simon
+approximant `U_{m}(x,y) = (g(x)·θ(g(y))·∑ᵢ wᵢ·(θ(Cᵢ)·Cᵢ))^m` — left-supported kinetic family `g`,
+nonnegative cone weights `wᵢ ≥ 0`, left-supported cone generators `Cᵢ` — the real part of the trace
+pairing obeys the finite Gram Cauchy–Schwarz bound
+
+    `(Re Tr U_{m}(x,y))² ≤ Re Tr U_{m}(x,x) · Re Tr U_{m}(y,y)`.
+
+Obtained by extracting the single crossing family `(κ, v, 𝓛)` of the two-field pairing trace
+identity (†) `twoField_product_pairing_trace` — whose diagonal instances `Tr U_{m}(x,x)`,
+`Tr U_{m}(y,y)` share that SAME family — and closing the resulting weighted ℓ² Gram bound with
+`reflGram_cauchySchwarz`.  This is the finite `(m,r)` inequality streamed to the `r→∞`, `m→∞` double
+limit in the next PR of the Theorem 4.2 arc. -/
+theorem twoField_product_pairing_cauchySchwarz (m : ℕ)
+    (g : (Fin (2 * n) → ℝ) → ManyBodyOpS (Fin (2 * n)) N)
+    (hg : ∀ x, SupportedOnLeftS n N (g x)) {ι : Type} [Fintype ι] (w : ι → ℝ)
+    (hw : ∀ i, 0 ≤ w i) (C : ι → ManyBodyOpS (Fin (2 * n)) N)
+    (hC : ∀ i, SupportedOnLeftS n N (C i)) (x y : Fin (2 * n) → ℝ) :
+    (((g x * ringReflectionThetaS n N (g y)
+        * ∑ i, (w i : ℂ) • (ringReflectionThetaS n N (C i) * C i)) ^ m).trace.re) ^ 2
+      ≤ ((g x * ringReflectionThetaS n N (g x)
+          * ∑ i, (w i : ℂ) • (ringReflectionThetaS n N (C i) * C i)) ^ m).trace.re
+        * ((g y * ringReflectionThetaS n N (g y)
+          * ∑ i, (w i : ℂ) • (ringReflectionThetaS n N (C i) * C i)) ^ m).trace.re := by
+  obtain ⟨κ, instκ, v, 𝓛, hv, hsupp, heq⟩ :=
+    twoField_product_pairing_trace m g hg w hw C hC
+  rw [heq x y, heq x x, heq y y]
+  exact reflGram_cauchySchwarz v hv (fun k => refLeftSum n N (𝓛 k x))
+    (fun k => refLeftSum n N (𝓛 k y))
+
 end LatticeSystem.Quantum
