@@ -9348,15 +9348,18 @@ The matrix exponential uses the $L^\infty$-operator-norm Banach structure
 topology underlying the trace continuity, so there is no topology diamond.  The seventh-b layer
 (\texttt{RingReflectionTwoFieldPairing.lean}) establishes the SWEEP operator identity, a key
 algebraic reduction for the doubled Dyson--Lieb--Simon approximant.  The doubled approximant
-$\big(g(x)\,\theta(g(y))\,\sum_i w_i(\theta(C_i)\,C_i)\big)^m$ (with left-supported kinetic family
-$g$, nonnegative weights $w_i \ge 0$, left-supported cone generators $C_i$) is swept via the
-single-step identity \texttt{sweep\_operator\_identity} (using disjoint-support commutation and
+$\big(g(x)\,\theta(g(y))\,\sum_i w_i(\theta(C_i(y))\,C_i(x))\big)^m$ (with left-supported kinetic family
+$g$, nonnegative weights $w_i \ge 0$, and \emph{field-dependent} left-supported cone generators $C_i(z)$ ---
+the reflected pile carrying the $y$-field factor $C_i(y)$, the non-reflected pile the $x$-field factor $C_i(x)$)
+is swept via the single-step identity \texttt{sweep\_operator\_identity} (using disjoint-support commutation and
 $\theta$'s multiplicativity) to collapse into a nonnegative reflection pairing
 $\sum_k v_k(\theta(\mathfrak{L}_k(y))\,\mathfrak{L}_k(x))$ where $v_k = \prod w \ge 0$ and the pattern-shared
 family $\mathfrak{L}_k(z)$ (left-supported, field-dependent only through $z$) is proved by \texttt{twoField\_product\_pairing}.
+The field-free pairing is the constant specialization $C_i(z) := C_i$ (Tasaki \S4.1 Theorem 4.2,
+equations (4.1.65)--(4.1.69), p.~90).
 Taking the trace and applying the bilinear identity yields the weighted Gram form (†)
 \texttt{twoField\_product\_pairing\_trace}, consumed by the doubled reflection Cauchy--Schwarz layer
-(next PR).  The eighth layer
+(next PR, PR \#4990).  The eighth layer
 (\texttt{RingReflectionExpSupport.lean}) records two facts about the matrix exponential and the
 left subalgebra: \texttt{SupportedOnLeftS.exp} ($X$ left-supported $\Rightarrow \exp X$
 left-supported --- the left subalgebra is closed under products, sums, scalars and entrywise limits
