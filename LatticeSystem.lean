@@ -98,6 +98,7 @@ import LatticeSystem.Quantum.SpinS.ShastryNoSSB
 import LatticeSystem.Quantum.SpinS.RingReflection
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareField
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareFieldPartition
+import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareUngaugedDLS
 import LatticeSystem.Quantum.SpinS.RingTranslationGibbs
 import LatticeSystem.Quantum.SpinS.RingReflectionChessboardTransport
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO

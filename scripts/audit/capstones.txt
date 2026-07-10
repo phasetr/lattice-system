@@ -197,3 +197,15 @@ ringBondSquareTwoFieldWeight_self
 # Zero-referenced until PR-BS8 (physical identification + reflection step) consumes it.
 # RE-EVALUATE/DELIST when consumed by PR-BS8.
 ringBondSquareTwoFieldWeight_reflection_cauchySchwarz
+
+# TEMPORARY arc-tip (temp-then-delist) — §4.1 Thm 4.2 (#4777) ungauged bond-square DLS split (PR-BS8a-i,
+# `RingReflectionBondSquareUngaugedDLS.lean`). Physical bond-square Hamiltonian = intra-left +
+# intra-right + 2 crossing − single-ion (ungauged, square-non-expanded). Zero-referenced until
+# PR-BS8a-ii (gauge crux) conjugates it via rightGauge. RE-EVALUATE/DELIST when consumed by PR-BS8a-ii.
+ringBondSquareFieldHamiltonian_ungauged_dls
+
+# TEMPORARY arc-tip (temp-then-delist) — §4.1 Thm 4.2 (#4777) intra-left directed sum ↔
+# `ringBondSquareLeftFieldHamiltonian` bulk bridge (PR-BS8a-i, `RingReflectionBondSquareUngaugedDLS.lean`).
+# Zero-referenced until PR-BS8a-ii identifies the ungauged left piece with H_L. RE-EVALUATE/DELIST when
+# consumed by PR-BS8a-ii.
+ringBondSquareLeftBondSum_eq_leftCouplingBulk

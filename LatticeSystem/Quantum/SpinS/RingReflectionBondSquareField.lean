@@ -24,8 +24,10 @@ variable {n N : ℕ}
 
 /-- **Staggered field** `f_x = (−1)ˣ h_x` (Tasaki §4.1 (4.1.48), book p.86, the raw staggered field
 before folding the sign into the per-site coupling).  The sign convention `even ↦ +1` matches
-`ringStaggeredSublattice`. -/
-private def ringBondSquareStagField (h : Fin (2 * n) → ℝ) (x : Fin (2 * n)) : ℝ :=
+`ringStaggeredSublattice`.  Public so that the reflection-positivity bond-square DLS split
+(`RingReflectionBondSquareUngaugedDLS`, PR-BS8a-i) can name the physical Hamiltonian's per-bond
+staggered field when reorganising its directed bond sum. -/
+def ringBondSquareStagField (h : Fin (2 * n) → ℝ) (x : Fin (2 * n)) : ℝ :=
   (-1) ^ (x : ℕ) * h x
 
 /-- **Per-site linear field** `kOf h` consumed by `ringFieldHamiltonian` in the reduction `(★)`:
