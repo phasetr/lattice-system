@@ -180,4 +180,35 @@ theorem rightGauge_conj_ringFieldHamiltonian (G : AxisTwoPiRotS N) (n : ℕ) [Ne
 
 end AxisTwoPiRotS
 
+/-- **Physical field partition function** `Z_β(h) = Re Tr exp(−β·Ĥ_field(h))` (Tasaki §4.1,
+canonical partition function of the field Hamiltonian (4.1.48)).  We take the real part
+*definitionally*: the
+field Hamiltonian is Hermitian, so the Gibbs trace is real and `.re` recovers it; the genuine
+nonnegativity `Z_β ≥ 0` is supplied downstream by the reflection-positivity cone
+(`ringTwoFieldWeight_self_trace_re_nonneg`), not by a reality lemma. -/
+noncomputable def ringFieldPartitionRe (n N : ℕ) (β : ℝ) (h : Fin (2 * n) → ℝ) : ℝ :=
+  (thermalPartitionFnS β (ringFieldHamiltonian n N h)).re
+
+/-- **Identification of the physical partition function with the two-field weight trace.**  For the
+split field `physFieldOf n a b`, the physical partition function equals the real trace of the
+doubled Gibbs weight: `Z_β(physFieldOf a b) = Re Tr W(a,b)`.  Since the right-half gauge is unitary
+(`rightGaugeUnit`), `exp(−β·Ĥ_field)` conjugates to `exp(−β·(doubled Hamiltonian))`
+(`Matrix.exp_units_conj` + the crux `rightGauge_conj_ringFieldHamiltonian`) and the trace is
+gauge-invariant (`trace_rightGauge_conj`).  This transports Tasaki's reflection bound (4.1.51) to
+the partition function (proof pp. 89–93; DLS 1978 §2–3). -/
+theorem ringFieldPartitionRe_physFieldOf (G : AxisTwoPiRotS N) (n : ℕ) [NeZero n] (β : ℝ)
+    (a b : Fin (2 * n) → ℝ) :
+    ringFieldPartitionRe n N β (physFieldOf n a b) = (ringTwoFieldWeight n N β a b).trace.re := by
+  have hexp := Matrix.exp_units_conj (G.rightGaugeUnit n)
+    (-(β : ℂ) • ringFieldHamiltonian n N (physFieldOf n a b))
+  simp only [AxisTwoPiRotS.rightGaugeUnit_val, AxisTwoPiRotS.rightGaugeUnit_inv] at hexp
+  rw [show G.rightGauge n * (-(β : ℂ) • ringFieldHamiltonian n N (physFieldOf n a b))
+        * G.rightGaugeInv n
+      = -(β : ℂ) • (ringLeftFieldHamiltonian n N a
+        + ringReflectionThetaS n N (ringLeftFieldHamiltonian n N b)
+        - (ringFieldDLSDecomposition n N a).interaction) from by
+    rw [mul_smul_comm, smul_mul_assoc, G.rightGauge_conj_ringFieldHamiltonian n a b]] at hexp
+  rw [ringFieldPartitionRe, thermalPartitionFnS, thermalGibbsOpS, ringTwoFieldWeight, hexp,
+    G.trace_rightGauge_conj n]
+
 end LatticeSystem.Quantum
