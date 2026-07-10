@@ -96,6 +96,7 @@ import LatticeSystem.Quantum.SpinS.LiebSchultzMattisRingGap
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisGeneral
 import LatticeSystem.Quantum.SpinS.ShastryNoSSB
 import LatticeSystem.Quantum.SpinS.RingReflection
+import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareField
 import LatticeSystem.Quantum.SpinS.RingTranslationGibbs
 import LatticeSystem.Quantum.SpinS.RingReflectionChessboardTransport
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO
