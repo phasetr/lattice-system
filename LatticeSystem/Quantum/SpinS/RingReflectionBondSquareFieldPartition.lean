@@ -77,4 +77,16 @@ theorem ringBondSquareFieldPartitionRe_eq_scaled (n N : ℕ) [NeZero n] (β : �
     rw [Complex.ofReal_exp, Complex.ofReal_mul, Complex.ofReal_neg]
   rw [hcast, Complex.re_ofReal_mul]
 
+/-- **Partition-function collapse** `Z^{BS}_β(h^const) = Z^{repo}_β(0)` (Tasaki §4.1 (4.1.49), book
+p.86): at a constant field the bond-square field partition function collapses to the field-free
+linear-core partition function `ringFieldPartitionRe n N β 0`.  Proved directly from the operator
+collapse `ringBondSquareFieldHamiltonian_const` (PR-BS3): both partition functions are the real part
+of the Gibbs trace of the same Hamiltonian `ringFieldHamiltonian n N 0`.  Holds for all `β ∈ ℝ` (the
+scalar `e^{−βC} = e⁰ = 1` since `C(h^const) = 0`).  This is the finite-`β` form of Tasaki's
+`E_GS(h^const) = E_GS(0,…,0)`, consumed by the uniform-field bound (PR-BS10). -/
+theorem ringBondSquareFieldPartitionRe_const (n N : ℕ) [NeZero n] (β : ℝ) (c : ℝ) :
+    ringBondSquareFieldPartitionRe n N β (fun _ => c) = ringFieldPartitionRe n N β 0 := by
+  simp only [ringBondSquareFieldPartitionRe, ringFieldPartitionRe,
+    ringBondSquareFieldHamiltonian_const]
+
 end LatticeSystem.Quantum
