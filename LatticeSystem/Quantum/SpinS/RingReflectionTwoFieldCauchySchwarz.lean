@@ -60,24 +60,32 @@ private theorem ringFieldDLSDecomposition_interaction_eq (n N : ℕ) [NeZero n]
   rw [ringFieldDLSDecomposition, ringFieldDLSDecomposition,
     ringCrossingRPDecomposition_interaction, ringCrossingRPDecomposition_interaction]
 
-/-- **Per-`m` reflection Cauchy–Schwarz with an exponential crossing factor** (the `r → ∞`
-passage).  For the Dyson–Lieb–Simon per-`m` approximant `T_m(x,y) = (g(x)·θ(g(y))·exp P)^m` — with
-left-supported kinetic family `g` and cone-representable `P` — the real part of the trace pairing
-obeys `(Re Tr T_m(x,y))² ≤ Re Tr T_m(x,x) · Re Tr T_m(y,y)`.  Obtained by closing the inner limit
-`r → ∞` of the finite `(m,r)` Cauchy–Schwarz `twoField_product_pairing_cauchySchwarz`: for each `r`
-the crossing partial sum `S_r = ∑_{k<r}(k!)⁻¹•Pᵏ` is a literal finite cone
-(`RPTraceConeRepS.expSeriesPartialSum`), and `S_r → exp P` (`NormedSpace.exp_eq_tsum`), so
-`cauchySchwarz_of_tendsto` streams the per-`r` inequality to the exponential.  This is the inner
-limit of the double limit of Tasaki (4.1.51) (pp. 89–93; DLS 1978 §2–3). -/
+/-- **Per-`m` reflection Cauchy–Schwarz with a field-dependent exponential crossing factor** (the
+`r → ∞` passage).  For the Dyson–Lieb–Simon per-`m` approximant
+`T_m(x,y) = (g(x)·θ(g(y))·exp P(x,y))^m` — with left-supported kinetic family `g` and a
+field-dependent field-crossing cone `P(u,v) = ∑ᵢ cᵢ•(θ(C i v)·C i u)` (`RPTwoFieldConeRepS`) — the
+real part of the trace pairing obeys
+`(Re Tr T_m(x,y))² ≤ Re Tr T_m(x,x) · Re Tr T_m(y,y)`, the three slots carrying the field-matched
+crossings `exp P(x,y)`, `exp P(x,x)`, `exp P(y,y)`.  Obtained by closing the inner limit `r → ∞`
+of the finite `(m,r)` Cauchy–Schwarz `twoField_product_pairing_cauchySchwarz` (already
+field-dependent): for each `r` the crossing partial sum `S_r(u,v) = ∑_{k<r}(k!)⁻¹•(P u v)ᵏ` is a
+single field-crossing finite cone shared across the three slots
+(`RPTwoFieldConeRepS.expSeriesPartialSum`), and `S_r(u,v) → exp P(u,v)`
+(`expSeriesPartialSum_tendsto`, applied separately at each slot), so `cauchySchwarz_of_tendsto`
+streams the per-`r` inequality to the exponential.  This is the inner limit of the double limit of
+Tasaki (4.1.51)/(4.1.69) (pp. 89–93; DLS 1978 §2–3). -/
 private theorem twoField_pairing_cauchySchwarz_exp (m : ℕ)
     (g : (Fin (2 * n) → ℝ) → ManyBodyOpS (Fin (2 * n)) N)
-    (hg : ∀ z, SupportedOnLeftS n N (g z)) {P : ManyBodyOpS (Fin (2 * n)) N}
-    (hP : RPTraceConeRepS n N P) (x y : Fin (2 * n) → ℝ) :
-    (((g x * ringReflectionThetaS n N (g y) * NormedSpace.exp P) ^ m).trace.re) ^ 2
-      ≤ ((g x * ringReflectionThetaS n N (g x) * NormedSpace.exp P) ^ m).trace.re
-        * ((g y * ringReflectionThetaS n N (g y) * NormedSpace.exp P) ^ m).trace.re := by
-  -- the crossing partial sums converge to `exp P` (reused clean-context lemma)
-  have hexp := expSeriesPartialSum_tendsto (n := n) (N := N) P
+    (hg : ∀ z, SupportedOnLeftS n N (g z))
+    {P : (Fin (2 * n) → ℝ) → (Fin (2 * n) → ℝ) → ManyBodyOpS (Fin (2 * n)) N}
+    (hP : RPTwoFieldConeRepS n N P) (x y : Fin (2 * n) → ℝ) :
+    (((g x * ringReflectionThetaS n N (g y) * NormedSpace.exp (P x y)) ^ m).trace.re) ^ 2
+      ≤ ((g x * ringReflectionThetaS n N (g x) * NormedSpace.exp (P x x)) ^ m).trace.re
+        * ((g y * ringReflectionThetaS n N (g y) * NormedSpace.exp (P y y)) ^ m).trace.re := by
+  -- the crossing partial sums converge to `exp P(u,v)`, separately at each slot
+  have hexpxy := expSeriesPartialSum_tendsto (n := n) (N := N) (P x y)
+  have hexpxx := expSeriesPartialSum_tendsto (n := n) (N := N) (P x x)
+  have hexpyy := expSeriesPartialSum_tendsto (n := n) (N := N) (P y y)
   -- continuity of `M' ↦ Re Tr ((g u · θ(g v) · M')^m)` (matrix topology)
   have hcont : ∀ u v : Fin (2 * n) → ℝ, Continuous
       (fun M' : ManyBodyOpS (Fin (2 * n)) N =>
@@ -87,22 +95,22 @@ private theorem twoField_pairing_cauchySchwarz_exp (m : ℕ)
       FiniteDimensional.complete ℂ (ManyBodyOpS (Fin (2 * n)) N)
     exact Complex.continuous_re.comp
       (Continuous.matrix_trace ((continuous_const.mul continuous_id).pow m))
-  -- the per-`r` finite Cauchy–Schwarz (crossing is the literal finite cone `S_r`)
+  -- the per-`r` finite Cauchy–Schwarz (each slot's crossing is the shared finite cone `S_r`)
   have hCSr : ∀ r : ℕ,
       (((g x * ringReflectionThetaS n N (g y)
-          * ∑ k ∈ Finset.range r, ((Nat.factorial k : ℂ))⁻¹ • P ^ k) ^ m).trace.re) ^ 2
+          * ∑ k ∈ Finset.range r, ((Nat.factorial k : ℂ))⁻¹ • (P x y) ^ k) ^ m).trace.re) ^ 2
         ≤ ((g x * ringReflectionThetaS n N (g x)
-            * ∑ k ∈ Finset.range r, ((Nat.factorial k : ℂ))⁻¹ • P ^ k) ^ m).trace.re
+            * ∑ k ∈ Finset.range r, ((Nat.factorial k : ℂ))⁻¹ • (P x x) ^ k) ^ m).trace.re
           * ((g y * ringReflectionThetaS n N (g y)
-            * ∑ k ∈ Finset.range r, ((Nat.factorial k : ℂ))⁻¹ • P ^ k) ^ m).trace.re := by
+            * ∑ k ∈ Finset.range r, ((Nat.factorial k : ℂ))⁻¹ • (P y y) ^ k) ^ m).trace.re := by
     intro r
     obtain ⟨ι, _, C, c, hC, hc, heq⟩ := hP.expSeriesPartialSum r
-    rw [heq]
-    exact twoField_product_pairing_cauchySchwarz m g hg c hc (fun i _ => C i) (fun i _ => hC i) x y
+    simp only [heq]
+    exact twoField_product_pairing_cauchySchwarz m g hg c hc C hC x y
   exact cauchySchwarz_of_tendsto
-    (((hcont x y).tendsto (NormedSpace.exp P)).comp hexp)
-    (((hcont x x).tendsto (NormedSpace.exp P)).comp hexp)
-    (((hcont y y).tendsto (NormedSpace.exp P)).comp hexp) hCSr
+    (((hcont x y).tendsto (NormedSpace.exp (P x y))).comp hexpxy)
+    (((hcont x x).tendsto (NormedSpace.exp (P x x))).comp hexpxx)
+    (((hcont y y).tendsto (NormedSpace.exp (P y y))).comp hexpyy) hCSr
 
 /-- **Two-field reflection Cauchy–Schwarz on the doubled Gibbs weight** — the finite-β matrix form
 of Tasaki's reflection bound (4.1.51), p. 86 (proof pp. 89–93; DLS 1978 §2–3).  For `0 ≤ β`, the
@@ -140,7 +148,7 @@ theorem ringTwoFieldWeight_reflection_cauchySchwarz (n N : ℕ) [NeZero n] (β :
     (fun z => NormedSpace.exp ((m : ℂ)⁻¹ • (-(β : ℂ) • ringLeftFieldHamiltonian n N z)))
     (fun z => (((ringLeftFieldHamiltonian_supportedOnLeft n N z).smul (-(β : ℂ))).smul
       ((m : ℂ)⁻¹)).exp)
-    (hP m) a b
+    (hP m).toField a b
   nth_rewrite 3 [ringFieldDLSDecomposition_interaction_eq n N a b] at h3
   exact h3
 
