@@ -143,3 +143,18 @@ ringFieldPartitionRe_reflection_step
 ringFieldPartitionRe_translate
 ringFieldPartitionRe_neg
 ringFieldPartitionRe_pos
+
+# TEMPORARY — §4.1 Theorem 4.2 (#4777) Gaussian-domination sub-arc (design v2), PR7d-ii tips (#4985,
+# `RingReflectionStaggeredRelabel.lean`). The staggered relabel `P h z = (−1)^z·h z` bridge lemmas
+# reconciling the classical sign-free mirror reflections with the quantum signed field copies
+# (Tasaki staggered field Hamiltonian (4.1.48) / reflected field copies (4.1.50), pp. 85–86): its
+# involutivity, `P (reflectLeft g) = ringFieldReflectLeft (P g)`, `P (reflectRight g) =
+# ringFieldReflectRight (P g)`, and `P (const c) = staggered_c`. Zero-referenced ONLY until the
+# PR7d-iii Gaussian-domination capstone `ringFieldPartition_gaussianDomination` consumes them as the
+# `hcyc`/`hrefl` bridge that carries the classical averaging lemma (Lemma 4.5, pp. 87–88) onto the
+# quantum reflected copies. DELIST when PR7d-iii lands (same temporary-then-delist lifecycle as the
+# Theorem 4.8 / Theorem 4.9 arc tips).
+ringStaggeredRelabel_involutive
+ringStaggeredRelabel_reflectLeft
+ringStaggeredRelabel_reflectRight
+ringStaggeredRelabel_const
