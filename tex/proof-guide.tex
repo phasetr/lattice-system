@@ -9731,7 +9731,7 @@ $H\Phi=(\texttt{hermitianMinEigenvalue}\,H)\,\Phi$ ($E_0$ is real by Hermiticity
 squeezed between the variational lower bound and the minimizing eigenvector).  \texttt{NoLongRangeOrderConditional.lean}
 assembles the whole chain into the exact $\varepsilon$--$\delta$ statement of Corollary 4.3 \emph{modulo
 the susceptibility bound}, \texttt{no\_long\_range\_order\_1d\_of\_susceptibility}: if there is $C\ge0$
-such that every normalized ground state of the zero-field ring has a potential $y$ for $\hat O\Phi$ with
+such that every normalized ground state of an even zero-field ring ($L\ge 2$, $L$ even) has a potential $y$ for $\hat O\Phi$ with
 $\operatorname{Re}\langle y,\hat O\Phi\rangle\le C\,L$, then for every $\varepsilon>0$ there is $L_0$ beyond
 which every normalized ground state has $|\langle\Phi,\hat O^2\Phi\rangle_{\mathrm{re}}/L^2|<\varepsilon$
 (combining the $O(L)$ oscillator bound, the susceptibility reduction, the ground-state bridge, and an
