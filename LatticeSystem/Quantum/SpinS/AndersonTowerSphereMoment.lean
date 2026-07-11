@@ -4,7 +4,7 @@ import LatticeSystem.Math.NoncommPowerExpansion
 import Mathlib.Analysis.Matrix.Normed
 
 /-!
-# Tasaki §4.2: operator polynomial expansion of the direction sphere average (eq. (4.2.58))
+# Tasaki §4.2: operator polynomial expansion of the direction sphere average (eq. (4.2.59))
 
 For a unit vector `n ∈ S² ⊂ ℝ³` the direction order operator `Ô_L^n = Σ_x ε_x (Ŝ_x · n)`
 (`directionStaggeredOp`) decomposes along the three spin axes as `Ô_L^n = Σ_α n_α ô^{(α)}`, where
@@ -19,7 +19,7 @@ with the ordered operator product kept **literally** (`List.ofFn … |>.prod`); 
 introduced (that contraction is deferred to the next step of the argument).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
-2020), §4.2.2, eq. (4.2.58), p.108 (attributed there to "(4.40) of [66]", Koma–Tasaki).
+2020), §4.2.2, eq. (4.2.59), p.108 (operator expansion; scalar monomial moments are eq. (4.2.58)).
 -/
 
 namespace LatticeSystem.Quantum
@@ -49,7 +49,7 @@ theorem directionStaggeredOp_eq_sum (n : EuclideanSpace ℝ (Fin 3)) (A : Λ →
   refine Finset.sum_congr rfl fun x _ => ?_
   module
 
-/-- **Tasaki eq. (4.2.58), operator polynomial expansion.**  The sphere average of the `M`-th power
+/-- **Tasaki eq. (4.2.59), operator polynomial expansion.**  The sphere average of the `M`-th power
 of the direction order operator expands into a finite sum over index tuples `f : Fin M → Fin 3`,
 each weighted by the scalar sphere monomial moment `sphereMonomialMoment(count f)` and multiplied by
 the **ordered** product `∏_j ô^{(f j)}` of staggered axis operators.  Tuples with an odd axis
