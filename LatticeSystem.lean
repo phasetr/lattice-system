@@ -124,6 +124,7 @@ import LatticeSystem.Quantum.SpinS.AndersonTower
 import LatticeSystem.Quantum.SpinS.AndersonTowerField
 import LatticeSystem.Quantum.SpinS.AndersonTowerSphereAverage
 import LatticeSystem.Quantum.SpinS.AndersonTowerSphereMoment
+import LatticeSystem.Quantum.SpinS.AndersonTowerOrderSq
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensate
 import LatticeSystem.Quantum.SpinS.HeisenbergEquilibrium
 import LatticeSystem.Quantum.SpinS.HypercubicBoxModel
