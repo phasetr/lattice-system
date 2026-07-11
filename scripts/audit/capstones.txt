@@ -277,3 +277,18 @@ no_long_range_order_1d
 # ordered operator product `∏_j ô^{(f j)}` (no commutators). Zero-referenced until PR-3 (commutator
 # O(1/V) contraction) consumes it. RE-EVALUATE/DELIST when consumed by PR-3.
 sphereAverage_directionStaggeredOp_pow
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-3.0,
+# `Quantum/SpinS/AndersonTowerOrderSq.lean`. Transverse/longitudinal split of the squared order
+# operator (Tasaki eq. (4.2.31) bridge): `ô² = V²·p̂ + (ô^(3))²`, decomposing `orderSqOp` into the
+# `U(1)` operator `staggeredPhatS` (transverse) and `staggeredOrderOpS²` (longitudinal). Zero-
+# referenced until PR-3.1/PR-3.3 (commutator contraction to `(ô²)^{M/2}`) consume it.
+# RE-EVALUATE/DELIST when consumed by PR-3.1/PR-3.3.
+orderSqOp_eq_smul_staggeredPhatS_add_sq
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-3.0,
+# `Quantum/SpinS/AndersonTowerOrderSq.lean`. Singlet closure of the total-spin `2`-axis generator:
+# a total-`Ŝ³`/`Ŝ¹`-singlet is a full total-spin singlet (`Ŝ² = −i[Ŝ³,Ŝ¹]`). Zero-referenced until
+# PR-3.2 (Cartesian commutator-word right-shift annihilation) consumes it.
+# RE-EVALUATE/DELIST when consumed by PR-3.2.
+totalSpinSOp2_mulVec_eq_zero_of_singlet
