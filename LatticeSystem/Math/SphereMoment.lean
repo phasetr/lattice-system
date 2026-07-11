@@ -363,4 +363,30 @@ theorem sphereMonomialMoment_even (k : Fin 3 → ℕ) (h : ∀ i, Even (k i)) :
   field_simp
   ring
 
+/-- **Closed-form sphere monomial moment (piecewise).**  The value of the `S² ⊂ ℝ³` monomial moment
+`∫_{S²} ∏ i, (n i)^(k i) dσ(n)`: it is the double-factorial closed form
+`4π · (∏ i, (k i - 1)‼) / ((∑ i, k i) + 1)‼` when all exponents `k i` are even, and `0` otherwise
+(Tasaki eq. (4.2.58)).  This bundles `sphereMonomialMoment_odd` / `sphereMonomialMoment_even` into a
+single constant, evaluated by `sphereMonomialMoment_eq`. -/
+noncomputable def sphereMonomialMoment (k : Fin 3 → ℕ) : ℝ :=
+  if (∀ i, Even (k i)) then
+    4 * Real.pi * ((∏ i, ((k i - 1)‼) : ℕ) : ℝ) / (((∑ i, k i) + 1)‼ : ℝ)
+  else 0
+
+/-- **Evaluation of the sphere monomial moment.**  The Bochner integral of the monomial
+`∏ i, n i^{k i}` against the rotation-invariant surface measure equals the piecewise constant
+`sphereMonomialMoment k` (Tasaki eq. (4.2.58)).  This is the single consumption point of both
+`sphereMonomialMoment_odd` and `sphereMonomialMoment_even`. -/
+theorem sphereMonomialMoment_eq (k : Fin 3 → ℕ) :
+    ∫ n : Metric.sphere (0 : EuclideanSpace ℝ (Fin 3)) 1,
+      ∏ i, ((n : EuclideanSpace ℝ (Fin 3)) i) ^ (k i) ∂volume.toSphere
+      = sphereMonomialMoment k := by
+  unfold sphereMonomialMoment
+  by_cases h : ∀ i, Even (k i)
+  · rw [if_pos h]
+    exact sphereMonomialMoment_even k h
+  · rw [if_neg h]
+    obtain ⟨i, hi⟩ := not_forall.mp h
+    exact sphereMonomialMoment_odd k ⟨i, Nat.not_even_iff_odd.mp hi⟩
+
 end LatticeSystem.Math

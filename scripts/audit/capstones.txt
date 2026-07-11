@@ -270,11 +270,10 @@ ringBondSquareField_susceptibility_sum_rule
 # Only referenced (as a comment) by AndersonTower.lean; a terminal book corollary, legitimately ref-0.
 no_long_range_order_1d
 
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) sphere-moment PR-1,
-# `Math/SphereMoment.lean`. Scalar substrate of Tasaki eq. (4.2.58), p.108: the closed-form monomial
-# (Dirichlet) moments of the S²⊂ℝ³ surface measure `volume.toSphere`. `sphereMonomialMoment_odd`
-# (vanishing when some exponent is odd) and `sphereMonomialMoment_even`
-# (`= 4π·∏(kᵢ-1)‼ / (Σkᵢ+1)‼`) are zero-referenced until PR-2 (operator polynomial expansion of the
-# Anderson-tower crux) consumes them. RE-EVALUATE/DELIST when consumed by PR-2.
-sphereMonomialMoment_odd
-sphereMonomialMoment_even
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) sphere-moment PR-2,
+# `Quantum/SpinS/AndersonTowerSphereMoment.lean`. Operator polynomial expansion of Tasaki
+# eq. (4.2.58), p.108: the sphere average `∫_{S²} (Ô_L^n)^M dσ(n)` expands into a finite sum over
+# index tuples `f : Fin M → Fin 3`, each weighted by `sphereMonomialMoment(count f)` times the
+# ordered operator product `∏_j ô^{(f j)}` (no commutators). Zero-referenced until PR-3 (commutator
+# O(1/V) contraction) consumes it. RE-EVALUATE/DELIST when consumed by PR-3.
+sphereAverage_directionStaggeredOp_pow
