@@ -29,6 +29,32 @@ namespace LatticeSystem.Math
 
 open Finset List
 
+/-- **Letter count as a fibre cardinality**: for `f : Fin n → ι` the number of occurrences of a
+letter `a` in the word `List.ofFn f` equals the cardinality of the fibre
+`{j | f j = a}`, i.e. `(List.ofFn f).count a = (univ.filter (fun j => f j = a)).card`.
+
+This bridges the `List.count` form used by the sphere-moment/order-word estimates with the
+`Finset.filter`-cardinality form produced by the position-selection counting arguments.  It
+generalises the two-letter helper `count_true_ofFn`
+(`LatticeSystem/Quantum/SpinS/OrderOperatorAlgebra.lean`) to an arbitrary alphabet with decidable
+equality.  Proved by rewriting the count as the indicator sum `∑ i, if f i = a then 1 else 0`
+(induction on `n`, peeling the head with `List.ofFn_succ`) and collapsing it with
+`Finset.card_filter`. -/
+theorem count_ofFn_eq_card_filter {ι : Type*} [DecidableEq ι] {n : ℕ} (f : Fin n → ι) (a : ι) :
+    (List.ofFn f).count a = (univ.filter (fun j => f j = a)).card := by
+  have h : ∀ {n : ℕ} (f : Fin n → ι),
+      (List.ofFn f).count a = ∑ i : Fin n, (if f i = a then 1 else 0) := by
+    intro n
+    induction n with
+    | zero => intro f; simp
+    | succ n ih =>
+      intro f
+      rw [List.ofFn_succ, List.count_cons, ih (fun i => f i.succ), Fin.sum_univ_succ]
+      have hif : (if (f 0 == a) then (1 : ℕ) else 0) = (if f 0 = a then 1 else 0) := by
+        by_cases h0 : f 0 = a <;> simp [h0]
+      rw [hif]; ring
+  rw [h f, Finset.card_filter]
+
 /-- **Multinomial Pascal step**: decrementing the count at one occupied letter `j` scales the
 multinomial coefficient by `k j / (∑ k)`.  Precisely, for `1 ≤ k j`,
 `(∑ i, k i) · multinomial univ (k − eⱼ) = k j · multinomial univ k`, where `k − eⱼ` is
