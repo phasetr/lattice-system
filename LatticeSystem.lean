@@ -15,6 +15,7 @@ import LatticeSystem.Math.RayleighAtEigenvector
 import LatticeSystem.Math.RealForm.AntilinearFixedFinrank
 import LatticeSystem.Math.DoubleSequenceDiagonal
 import LatticeSystem.Math.ReflectionPositivityAveraging
+import LatticeSystem.Math.SphereMoment
 import LatticeSystem.Math.HermitianMaxEigenvalue
 import LatticeSystem.Math.HermitianEigenspaceBotAboveMax
 import LatticeSystem.Math.HermitianMaxGeOfEigenvector
