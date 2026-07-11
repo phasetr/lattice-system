@@ -321,3 +321,11 @@ cartWord_ofFn
 # (The PR-3.2b-ii single-swap expectation identity `cartWord_swap_dotProduct_eq` is now consumed
 # by PR-3.3a `cartWord_swap_re_diff_le` and was delisted.)
 cartWord_swapChain_re_diff_norm_le
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-3.3b-α,
+# `Quantum/SpinS/AndersonTowerGroupedNormalForm.lean`. The purely combinatorial grouped-normal-form
+# swap-chain generator: every `Fin 3` order word `List.ofFn f` reaches its grouped normal form
+# `groupedFin3 (count)` by a swap chain of length `≤ M²`.  Fed into the PR-3.3a band tip
+# `cartWord_swapChain_re_diff_norm_le` by the pinch body (PR-3.3b).  Zero-referenced until consumed.
+# RE-EVALUATE/DELIST when consumed by PR-3.3b.
+ofFn_swapChain_groupedFin3
