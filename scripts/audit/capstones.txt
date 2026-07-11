@@ -292,3 +292,12 @@ orderSqOp_eq_smul_staggeredPhatS_add_sq
 # PR-3.2 (Cartesian commutator-word right-shift annihilation) consumes it.
 # RE-EVALUATE/DELIST when consumed by PR-3.2.
 totalSpinSOp2_mulVec_eq_zero_of_singlet
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-3.1,
+# `Quantum/SpinS/AndersonTowerEnergyBoundSU2.lean`. Order×order commutators
+# `[Ô^{(α)}, Ô^{(β)}] = i ε_{αβγ} Ŝ^{(γ)}_tot`: the two staggering signs square to `1`, so the
+# commutator is the unstaggered total spin. Feeds the PR-3.2 Cartesian swap-band contraction.
+# Zero-referenced until PR-3.2 consumes them. RE-EVALUATE/DELIST when consumed by PR-3.2.
+staggeredOrderOp1S_commutator_staggeredOrderOp2S
+staggeredOrderOp2S_commutator_staggeredOrderOpS
+staggeredOrderOpS_commutator_staggeredOrderOp1S
