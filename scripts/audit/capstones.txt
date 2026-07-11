@@ -301,3 +301,18 @@ totalSpinSOp2_mulVec_eq_zero_of_singlet
 staggeredOrderOp1S_commutator_staggeredOrderOp2S
 staggeredOrderOp2S_commutator_staggeredOrderOpS
 staggeredOrderOpS_commutator_staggeredOrderOp1S
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-3.2a,
+# `Quantum/SpinS/AndersonTowerCartWord.lean` + `Quantum/SpinS/AndersonTowerEnergyBoundSU2.lean`.
+# Cartesian order-word basis (`cartWord` cons/append/`ofFn` bridge to eq. (4.2.59)), the purely
+# algebraic operator single-swap difference `cartWord_swap_diff_eq`, and the two missing off-diagonal
+# total×order rotation commutators `[Ŝ²_tot, ô^{(1)}] = −i ô^{(3)}`, `[Ŝ²_tot, ô^{(3)}] = i ô^{(1)}`
+# (completing the six needed to push `Ŝ^{(γ)}_tot` through a Cartesian word). Zero-referenced until
+# PR-3.2b (swap-band telescoping / expectation identity) consumes them.
+# RE-EVALUATE/DELIST when consumed by PR-3.2b.
+cartWord_cons
+cartWord_append
+cartWord_ofFn
+cartWord_swap_diff_eq
+totalSpinSOp2_commutator_staggeredOrderOp1S
+totalSpinSOp2_commutator_staggeredOrderOpS
