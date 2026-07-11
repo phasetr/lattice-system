@@ -24,14 +24,18 @@ private theorem ringHeisenberg_isHermitian (L N : ℕ) :
 
 /-- **Conditional Corollary 4.3 (absence of long-range order in one dimension), modulo the
 susceptibility bound.**  Suppose the staggered static susceptibility of every normalized ground
-state of the zero-field ring is `O(L)`: there is `C ≥ 0` such that for every `L ≥ 2` and every
+state of the zero-field **even** ring is `O(L)`: there is `C ≥ 0` such that for every even `L ≥ 2`
+and every
 normalized
 ground state `Φ` (eigenvalue `hermitianMinEigenvalue`) there is a potential `y` for `ÔΦ`
 (`(Ĥ − E₀) y = ÔΦ`) with `Re⟨y, ÔΦ⟩ ≤ C·L`.  Then the squared staggered order parameter per site
 vanishes in the thermodynamic limit: for every `ε > 0` there is `L₀` beyond which every normalized
-ground state has `|⟨Φ, Ô² Φ⟩.re / L²| < ε`. -/
+ground state of an even ring `L ≥ L₀` has `|⟨Φ, Ô² Φ⟩.re / L²| < ε`.  The `Even L` guard is
+essential: only bipartite (even) rings carry a balanced staggered sublattice, so `ÔΦ ⊥ Φ` and the
+resolvent potential `y` exists; odd rings are non-bipartite and lie outside Tasaki's §4.1
+setting. -/
 theorem no_long_range_order_1d_of_susceptibility (N : ℕ) (hN : 1 ≤ N) (C : ℝ) (hC : 0 ≤ C)
-    (hsusc : ∀ L : ℕ, 2 ≤ L → ∀ Φ : (Fin L → Fin (N + 1)) → ℂ, star Φ ⬝ᵥ Φ = 1 →
+    (hsusc : ∀ L : ℕ, 2 ≤ L → Even L → ∀ Φ : (Fin L → Fin (N + 1)) → ℂ, star Φ ⬝ᵥ Φ = 1 →
       (heisenbergHamiltonianS (ringCoupling L) N).mulVec Φ
           = (hermitianMinEigenvalue (ringHeisenberg_isHermitian L N) : ℂ) • Φ →
       ∃ y : (Fin L → Fin (N + 1)) → ℂ,
@@ -40,7 +44,7 @@ theorem no_long_range_order_1d_of_susceptibility (N : ℕ) (hN : 1 ≤ N) (C : �
               • (1 : ManyBodyOpS (Fin L) N)).mulVec y
           = (staggeredOrderOpS (ringStaggeredSublattice L) N).mulVec Φ
         ∧ (star y ⬝ᵥ (staggeredOrderOpS (ringStaggeredSublattice L) N).mulVec Φ).re ≤ C * (L : ℝ)) :
-    ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L →
+    ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L → Even L →
       ∀ Φ : (Fin L → Fin (N + 1)) → ℂ, star Φ ⬝ᵥ Φ = 1 →
         (∃ E₀ : ℂ, (staggeredFieldChainHamiltonianS L 0 N).mulVec Φ = E₀ • Φ ∧
           (∀ E : ℂ, ∀ Ψ : (Fin L → Fin (N + 1)) → ℂ, Ψ ≠ 0 →
@@ -52,7 +56,7 @@ theorem no_long_range_order_1d_of_susceptibility (N : ℕ) (hN : 1 ≤ N) (C : �
   intro ε hε
   -- Archimedean threshold: `m > 6 N³ C / ε²`
   obtain ⟨m, hm⟩ := exists_nat_gt (6 * (N : ℝ) ^ 3 * C / ε ^ 2)
-  refine ⟨max m 2, fun L hL Φ hΦnorm hgs => ?_⟩
+  refine ⟨max m 2, fun L hL hLeven Φ hΦnorm hgs => ?_⟩
   have hL2 : 2 ≤ L := le_trans (le_max_right _ _) hL
   have hLm : m ≤ L := le_trans (le_max_left _ _) hL
   haveI : NeZero L := ⟨by omega⟩
@@ -66,7 +70,7 @@ theorem no_long_range_order_1d_of_susceptibility (N : ℕ) (hN : 1 ≤ N) (C : �
   have hHeig := groundState_mulVec_eq_hermitianMinEigenvalue (ringHeisenberg_isHermitian L N)
     hΦnorm heig hmin
   -- susceptibility potential
-  obtain ⟨y, hy, hχ⟩ := hsusc L hL2 Φ hΦnorm hHeig
+  obtain ⟨y, hy, hχ⟩ := hsusc L hL2 hLeven Φ hΦnorm hHeig
   -- Falk–Bruch + oscillator: `2 (⟨Ô²⟩.re)² ≤ 12 N³ L · χ`
   have hpr68 := staggeredOrder_sq_le_susceptibility L N hL2 hN hΦnorm hHeig hy
   set s := (star Φ ⬝ᵥ (staggeredOrderOpS (ringStaggeredSublattice L) N

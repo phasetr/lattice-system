@@ -73,6 +73,7 @@ import LatticeSystem.Quantum.SpinS.StaggeredOrderSusceptibility
 import LatticeSystem.Quantum.SpinS.HermitianGroundStateEigenvalue
 import LatticeSystem.Quantum.SpinS.HermitianSecondEigenvalue
 import LatticeSystem.Quantum.SpinS.NoLongRangeOrderConditional
+import LatticeSystem.Quantum.SpinS.NoLongRangeOrder1D
 import LatticeSystem.Quantum.SpinS.HaldaneConjecture
 import LatticeSystem.Quantum.SpinS.AKLT
 import LatticeSystem.Quantum.SpinS.AKLTBondProjection
