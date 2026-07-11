@@ -15,10 +15,11 @@ See `.self-local/docs/math-tasaki-4-1-48-bond-square-reduction.md` (issue #4777)
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionFieldPartitionSymmetry
 import LatticeSystem.Quantum.SpinS.RingReflectionRightEqTheta
+import LatticeSystem.Math.ReflectionPositivityAveraging
 
 namespace LatticeSystem.Quantum
 
-open Matrix
+open Matrix LatticeSystem.Math
 
 variable {n N : ℕ}
 
@@ -256,6 +257,72 @@ theorem ringBondSquareFieldHamiltonian_const (n N : ℕ) [NeZero n] (c : ℝ) :
     ringBondSquareFieldHamiltonian n N (fun _ => c) = ringFieldHamiltonian n N 0 := by
   rw [ringBondSquareFieldHamiltonian_eq, ringBondSquareLinField_const, ringBondSquareConst_const,
     Complex.ofReal_zero, zero_smul, add_zero]
+
+/-- **The one-step ring rotation equals the cyclic successor** on the even ring (Tasaki §4.1,
+cyclicity source (4.1.60), book p.88): `finRotate (2n) x = ringBondSucc n x`, both being the
+successor `x + 1` (`LatticeSystem.Math.finRotate_eq_add_one`, `ringBondSucc_eq_add_one`).  This
+bridge lets the classical cyclic shift `reindexCyclic` (defined via `finRotate`) reuse the even-ring
+staggered-sign lemma `neg_one_pow_ringBondSucc` phrased in `ringBondSucc`. -/
+private lemma finRotate_eq_ringBondSucc (n : ℕ) [NeZero n] (x : Fin (2 * n)) :
+    finRotate (2 * n) x = ringBondSucc n x := by
+  haveI : NeZero (2 * n) := ⟨by have := NeZero.pos n; omega⟩
+  rw [ringBondSucc_eq_add_one, LatticeSystem.Math.finRotate_eq_add_one]
+
+/-- **The staggered field acquires a global sign under the cyclic shift** (Tasaki §4.1, cyclicity
+source (4.1.60), book p.88): `ringBondSquareStagField (reindexCyclic n g) x =
+−ringBondSquareStagField g (ringBondSucc n x)`.  Since `reindexCyclic n g x = g (ringBondSucc n x)`
+(`finRotate_eq_ringBondSucc`) and the staggered sign flips under the successor
+(`neg_one_pow_ringBondSucc`), the period-2 staggered factor turns the one-step shift into the global
+minus feeding `ringBondSquareConst_reindexCyclic` (squared, sign-free) and
+`ringBondSquareLinField_reindexCyclic` (odd covariance). -/
+private lemma ringBondSquareStagField_reindexCyclic (n : ℕ) [NeZero n] (g : Fin (2 * n) → ℝ)
+    (x : Fin (2 * n)) :
+    ringBondSquareStagField (reindexCyclic n g) x
+      = - ringBondSquareStagField g (ringBondSucc n x) := by
+  simp only [ringBondSquareStagField, reindexCyclic]
+  rw [finRotate_eq_ringBondSucc n x, neg_one_pow_ringBondSucc n x]
+  ring
+
+/-- **Cyclic-shift invariance of the scalar constant** `(A)` (Tasaki §4.1 (4.1.37), book p.84):
+`ringBondSquareConst n (reindexCyclic n g) = ringBondSquareConst n g`.  The scalar constant is a sum
+of *squared* bond sums, so the global sign carried by the cyclic shift
+(`ringBondSquareStagField_reindexCyclic`) is squared away; the shifted bond sum
+`(f_{z+1} + f_{z+2})²` is then reindexed onto the original bond sum by the successor bijection
+`ringBondSucc_bijective`.  Feeds the cyclicity of the bond-square partition function (PR-BS9). -/
+theorem ringBondSquareConst_reindexCyclic (n : ℕ) [NeZero n] (g : Fin (2 * n) → ℝ) :
+    ringBondSquareConst n (reindexCyclic n g) = ringBondSquareConst n g := by
+  simp only [ringBondSquareConst]
+  congr 1
+  rw [← Fintype.sum_bijective (ringBondSucc n) ringBondSucc_bijective
+      (fun x => (ringBondSquareStagField g (ringBondSucc n x)
+          + ringBondSquareStagField g (ringBondSucc n (ringBondSucc n x))) ^ 2)
+      (fun y => (ringBondSquareStagField g y
+          + ringBondSquareStagField g (ringBondSucc n y)) ^ 2)
+      (fun _ => rfl)]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [ringBondSquareStagField_reindexCyclic n g x,
+    ringBondSquareStagField_reindexCyclic n g (ringBondSucc n x)]
+  ring
+
+/-- **Odd cyclic-shift covariance of the linear field** `(B)` (Tasaki §4.1 (4.1.38), book p.84):
+`ringBondSquareLinField n (reindexCyclic n g) = fun z ↦ −ringBondSquareLinField n g (finRotate (2n)
+z)`.  Each of the four staggered slots of `kOf` acquires the global sign
+(`ringBondSquareStagField_reindexCyclic`), and the incident bonds shift by one site
+(`ringBondSucc n (z − 1) = z`, `ringBondSucc n z − 1 = z`), so the shifted linear field is the
+negated, rotated original.  The global minus is absorbed downstream by the spin-flip invariance of
+`Z^{repo}` and the rotation by its translation invariance (PR-BS9). -/
+theorem ringBondSquareLinField_reindexCyclic (n : ℕ) [NeZero n] (g : Fin (2 * n) → ℝ) :
+    ringBondSquareLinField n (reindexCyclic n g)
+      = fun z => - ringBondSquareLinField n g (finRotate (2 * n) z) := by
+  funext z
+  simp only [ringBondSquareLinField]
+  rw [finRotate_eq_ringBondSucc n z]
+  have hpred : ringBondSucc n (z - 1) = z := by rw [ringBondSucc_eq_add_one, sub_add_cancel]
+  have hsz1 : ringBondSucc n z - 1 = z := by rw [ringBondSucc_eq_add_one, add_sub_cancel_right]
+  rw [ringBondSquareStagField_reindexCyclic n g z,
+    ringBondSquareStagField_reindexCyclic n g (ringBondSucc n z),
+    ringBondSquareStagField_reindexCyclic n g (z - 1), hpred, hsz1]
+  ring
 
 end LatticeSystem.Quantum
 

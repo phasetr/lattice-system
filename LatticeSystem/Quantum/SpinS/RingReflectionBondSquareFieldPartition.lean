@@ -19,7 +19,7 @@ import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareField
 
 namespace LatticeSystem.Quantum
 
-open Matrix
+open Matrix LatticeSystem.Math
 
 variable {n N : ℕ}
 
@@ -76,6 +76,41 @@ theorem ringBondSquareFieldPartitionRe_eq_scaled (n N : ℕ) [NeZero n] (β : �
   have hcast : Complex.exp (-(β : ℂ) * (c : ℂ)) = ((Real.exp (-β * c) : ℝ) : ℂ) := by
     rw [Complex.ofReal_exp, Complex.ofReal_mul, Complex.ofReal_neg]
   rw [hcast, Complex.re_ofReal_mul]
+
+/-- **Strict positivity of the bond-square field partition function** `0 < Z^{BS}_β(h)`
+(Tasaki §4.1 (4.1.48), book p.86, the `−log Z` domain of the chessboard estimate).  Via the
+scalar-shift reduction `(★★)` (`ringBondSquareFieldPartitionRe_eq_scaled`) it is the product of the
+positive scalar `e^{−βC(h)}` (`Real.exp_pos`) and the strictly positive linear-core partition
+function `Z^{repo}_β(kOf h)` (`ringFieldPartitionRe_pos`).  This is the domain condition of the
+`−log Z` symmetrisation (PR-BS9). -/
+theorem ringBondSquareFieldPartitionRe_pos (n N : ℕ) [NeZero n] (β : ℝ) (h : Fin (2 * n) → ℝ) :
+    0 < ringBondSquareFieldPartitionRe n N β h := by
+  rw [ringBondSquareFieldPartitionRe_eq_scaled]
+  exact mul_pos (Real.exp_pos _) (ringFieldPartitionRe_pos n N β _)
+
+/-- **Cyclicity of the bond-square field partition function** `Z^{BS}_β(reindexCyclic n g) =
+Z^{BS}_β(g)` (Tasaki §4.1, cyclicity source (4.1.55)/(4.1.60), book p.88).  Reduced to the linear
+core by the scalar-shift `(★★)` (`ringBondSquareFieldPartitionRe_eq_scaled`): the scalar constant is
+cyclic-invariant `(A)` (`ringBondSquareConst_reindexCyclic`), and the linear field is odd-covariant
+`(B)` (`ringBondSquareLinField_reindexCyclic`), whose global sign is absorbed by the spin-flip
+invariance `ringFieldPartitionRe_neg` and whose rotation by the translation invariance
+`ringFieldPartitionRe_translate` of `Z^{repo}`.  Supplies the cyclicity hypothesis of the chessboard
+estimate (Lemma 4.5) for the bond-square partition function (PR-BS9). -/
+theorem ringBondSquareFieldPartitionRe_reindexCyclic (G : AxisTwoPiRotS N) (n : ℕ) [NeZero n]
+    (β : ℝ) (g : Fin (2 * n) → ℝ) :
+    ringBondSquareFieldPartitionRe n N β (reindexCyclic n g)
+      = ringBondSquareFieldPartitionRe n N β g := by
+  rw [ringBondSquareFieldPartitionRe_eq_scaled, ringBondSquareFieldPartitionRe_eq_scaled,
+    ringBondSquareConst_reindexCyclic, ringBondSquareLinField_reindexCyclic]
+  congr 1
+  calc ringFieldPartitionRe n N β
+          (fun z => - ringBondSquareLinField n g (finRotate (2 * n) z))
+      = ringFieldPartitionRe n N β
+          (fun z => ringBondSquareLinField n g (finRotate (2 * n) z)) :=
+        ringFieldPartitionRe_neg G n β
+          (fun z => ringBondSquareLinField n g (finRotate (2 * n) z))
+    _ = ringFieldPartitionRe n N β (ringBondSquareLinField n g) :=
+        (ringFieldPartitionRe_translate n N β (ringBondSquareLinField n g)).symm
 
 /-- **Partition-function collapse** `Z^{BS}_β(h^const) = Z^{repo}_β(0)` (Tasaki §4.1 (4.1.49), book
 p.86): at a constant field the bond-square field partition function collapses to the field-free
