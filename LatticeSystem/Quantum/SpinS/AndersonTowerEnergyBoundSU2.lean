@@ -160,6 +160,76 @@ theorem staggeredOrder_sq_expectation_eq_23 (A : Λ → Bool) (Φ : (Λ → Fin 
     (totalSpinSOp1_commutator_staggeredOrderOp2S A)
     (totalSpinSOp1_commutator_staggeredOrderOpS A) Φ hsing
 
+/-! ### Order×order commutators `[Ô^{(α)}, Ô^{(β)}] = i ε_{αβγ} Ŝ^{(γ)}_tot` (Prop 4.10 arc)
+
+The commutator of two staggered order operators is the **unstaggered** total spin: the two
+staggering signs `ε_x` multiply to `ε_x² = 1`, so `[Ô^{(α)}, Ô^{(β)}] = Σ_x [Ŝ^{(α)}_x, Ŝ^{(β)}_x]
+= i ε_{αβγ} Σ_x Ŝ^{(γ)}_x = i ε_{αβγ} Ŝ^{(γ)}_tot`.  These three identities feed the
+commutator-contraction (swap-band) step that reduces the ordered product `∏_j Ô^{(f j)}` of Tasaki
+eq. (4.2.59) to the grouped `(Ô²)^{M/2}` main part. -/
+
+/-- Per-site step of `[Ŝ²_x, Ô³] = i Ŝ¹_x`: on-site `[Ŝ², Ŝ³] = i Ŝ¹`. -/
+private theorem spinSSiteOp2_commutator_staggeredOrderOpS (A : Λ → Bool) (x : Λ) :
+    spinSSiteOp2 x N * staggeredOrderOpS A N - staggeredOrderOpS A N * spinSSiteOp2 x N
+      = (if A x then (1 : ℂ) else (-1 : ℂ)) • (Complex.I • spinSSiteOp1 x N) := by
+  unfold staggeredOrderOpS spinSSiteOp2 spinSSiteOp3 spinSSiteOp1
+  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib, Finset.sum_eq_single x]
+  · rw [mul_smul_comm, smul_mul_assoc, ← smul_sub, onSiteS_mul_onSiteS_same,
+      onSiteS_mul_onSiteS_same, ← onSiteS_sub, spinSOp2_commutator_spinSOp3, onSiteS_smul]
+  · intro y _ hyx
+    rw [mul_smul_comm, smul_mul_assoc, ← smul_sub,
+      (onSiteS_commute_of_ne (Ne.symm hyx) (spinSOp2 N) (spinSOp3 N)).eq, sub_self, smul_zero]
+  · intro h; exact absurd (Finset.mem_univ x) h
+
+/-- **Order×order commutator** `[Ô_L^{(1)}, Ô_L^{(2)}] = i Ŝ³_tot`.  Expanding the left factor
+`Ô^{(1)} = Σ_x ε_x Ŝ^{(1)}_x` and applying `[Ŝ^{(1)}_x, Ô^{(2)}] = ε_x · i Ŝ^{(3)}_x`, the two
+staggering signs cancel (`ε_x² = 1`), leaving the unstaggered total `Ŝ³_tot = Σ_x Ŝ^{(3)}_x`. -/
+theorem staggeredOrderOp1S_commutator_staggeredOrderOp2S (A : Λ → Bool) :
+    staggeredOrderOp1S A N * staggeredOrderOp2S A N
+        - staggeredOrderOp2S A N * staggeredOrderOp1S A N
+      = Complex.I • totalSpinSOp3 Λ N := by
+  have hsum : (totalSpinSOp3 Λ N : ManyBodyOpS Λ N) = ∑ x : Λ, spinSSiteOp3 x N := rfl
+  rw [staggeredOrderOp1S, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib, hsum,
+    Finset.smul_sum]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [smul_mul_assoc, mul_smul_comm, ← smul_sub, spinSSiteOp1_commutator_staggeredOrderOp2S,
+    smul_smul]
+  have hsq : (if A x then (1 : ℂ) else (-1 : ℂ)) * (if A x then (1 : ℂ) else (-1 : ℂ)) = 1 := by
+    cases A x <;> norm_num
+  rw [hsq, one_smul]
+
+/-- **Order×order commutator** `[Ô_L^{(2)}, Ô_L^{(3)}] = i Ŝ¹_tot`.  Same mechanism via the
+per-site `[Ŝ^{(2)}_x, Ô^{(3)}] = ε_x · i Ŝ^{(1)}_x`; the staggering squares to `1`. -/
+theorem staggeredOrderOp2S_commutator_staggeredOrderOpS (A : Λ → Bool) :
+    staggeredOrderOp2S A N * staggeredOrderOpS A N
+        - staggeredOrderOpS A N * staggeredOrderOp2S A N
+      = Complex.I • totalSpinSOp1 Λ N := by
+  have hsum : (totalSpinSOp1 Λ N : ManyBodyOpS Λ N) = ∑ x : Λ, spinSSiteOp1 x N := rfl
+  rw [staggeredOrderOp2S, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib, hsum,
+    Finset.smul_sum]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [smul_mul_assoc, mul_smul_comm, ← smul_sub, spinSSiteOp2_commutator_staggeredOrderOpS,
+    smul_smul]
+  have hsq : (if A x then (1 : ℂ) else (-1 : ℂ)) * (if A x then (1 : ℂ) else (-1 : ℂ)) = 1 := by
+    cases A x <;> norm_num
+  rw [hsq, one_smul]
+
+/-- **Order×order commutator** `[Ô_L^{(3)}, Ô_L^{(1)}] = i Ŝ²_tot`.  Same mechanism via the
+per-site `[Ŝ^{(3)}_x, Ô^{(1)}] = ε_x · i Ŝ^{(2)}_x`; the staggering squares to `1`. -/
+theorem staggeredOrderOpS_commutator_staggeredOrderOp1S (A : Λ → Bool) :
+    staggeredOrderOpS A N * staggeredOrderOp1S A N
+        - staggeredOrderOp1S A N * staggeredOrderOpS A N
+      = Complex.I • totalSpinSOp2 Λ N := by
+  have hsum : (totalSpinSOp2 Λ N : ManyBodyOpS Λ N) = ∑ x : Λ, spinSSiteOp2 x N := rfl
+  rw [staggeredOrderOpS, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib, hsum,
+    Finset.smul_sum]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [smul_mul_assoc, mul_smul_comm, ← smul_sub, spinSSiteOp3_commutator_staggeredOrderOp1S,
+    smul_smul]
+  have hsq : (if A x then (1 : ℂ) else (-1 : ℂ)) * (if A x then (1 : ℂ) else (-1 : ℂ)) = 1 := by
+    cases A x <;> norm_num
+  rw [hsq, one_smul]
+
 /-! ### From the LRO premise to `⟨p̂⟩ ≥ 2 q₀` (P7) -/
 
 /-- Cartesian decomposition of the raising operator: `Ŝ⁺ = Ŝ¹ + i Ŝ²`. -/
