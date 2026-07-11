@@ -241,3 +241,19 @@ ringBondSquareFieldPartitionRe_uniform_bound
 # finite-β bond-square partition inequality passage to zero temperature. Zero-referenced until PR-χ2
 # (susceptibility sum rule / response function) consumes it. RE-EVALUATE/DELIST when consumed by PR-χ2.
 ringBondSquareFieldHamiltonian_hermitianMinEigenvalue_ge_field_zero
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.1 Thm 4.2 (#4777) susceptibility first-order
+# infrastructure (PR-χ2a, `HermitianPseudoinverse.lean`). The existence of an orthogonal pseudoinverse
+# potential for a Hermitian positive-semidefinite matrix (Tasaki §4.1 (4.1.39), book p. 84): if
+# `v ⊥ ker A`, then ∃ y with `A y = v` and `y ⊥ ker A` (Moore–Penrose pseudoinverse image).
+# Zero-referenced until PR-χ2b (variational sum rule) consumes it as the pseudoinverse perturbation
+# response. RE-EVALUATE/DELIST when consumed by PR-χ2b.
+hermitian_posSemidef_exists_orthogonal_potential
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.1 Thm 4.2 (#4777) susceptibility first-order
+# vanishing (PR-χ2a, `RingReflectionBondSquareSusceptibility.lean`). The first-order vanishing
+# `⟨Φ|V|Φ⟩ = 0` of the linear-in-field Zeeman operator `V = Σ_z (kOf h)_z · Ŝ³_z` in a unique ground
+# state of the field-free ring Hamiltonian (Tasaki §4.1 (4.1.38)–(4.1.39), book p. 84). Zero-referenced
+# until PR-χ2b (susceptibility sum rule) consumes it as the first-order perturbation correction
+# (which vanishes, reducing the second-order formula). RE-EVALUATE/DELIST when consumed by PR-χ2b.
+ringBondSquareLinFieldOp_groundState_expectation_zero

@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.AnisotropicReflectionEigenspace
 import LatticeSystem.Quantum.SpinS.AnisotropicHeisenbergU1
+import LatticeSystem.Math.MatrixAnalysis.UniqueEigenspaceInvolution
 import Mathlib.LinearAlgebra.Dimension.FreeAndStrongRankCondition
 
 /-!
@@ -55,55 +56,15 @@ theorem anisotropicHeisenbergS_unique_groundState_has_zero_magnetization
     rw [Matrix.mulVec_mulVec,
         (anisotropicHeisenbergS_commute_totalSpinSOp3 J lam D N).eq,
         ← Matrix.mulVec_mulVec, hΦ, Matrix.mulVec_smul]
-  -- Θ Φ ∈ E (via H Θ = Θ H).
-  have hΘΦ_in : (manyBodyReversalS Λ N).mulVec Φ ∈ E := by
-    rw [hEdef, End.mem_eigenspace_iff, Matrix.toLin'_apply, hHdef]
-    rw [Matrix.mulVec_mulVec,
-        anisotropicHeisenbergS_mul_manyBodyReversalS,
-        ← Matrix.mulVec_mulVec, hΦ, Matrix.mulVec_smul]
-  -- From finrank ≤ 1, extract a generator v of E.
-  obtain ⟨v, hv⟩ := finrank_le_one_iff.mp huniq
-  -- Φ = a • v.val, Ŝ³_tot Φ = b • v.val, Θ Φ = c • v.val.
-  obtain ⟨a, ha⟩ := hv ⟨Φ, hΦ_in⟩
-  obtain ⟨b, hb⟩ := hv ⟨_, hSΦ_in⟩
-  obtain ⟨c, hc⟩ := hv ⟨_, hΘΦ_in⟩
-  -- Underlying vector equations.
-  have ha' : a • (v : (Λ → Fin (N + 1)) → ℂ) = Φ := by
-    have h := congrArg ((↑) : ↥E → (Λ → Fin (N + 1)) → ℂ) ha
-    simpa using h
-  have hb' : b • (v : (Λ → Fin (N + 1)) → ℂ) = (totalSpinSOp3 Λ N).mulVec Φ := by
-    have h := congrArg ((↑) : ↥E → (Λ → Fin (N + 1)) → ℂ) hb
-    simpa using h
-  have hc' : c • (v : (Λ → Fin (N + 1)) → ℂ) = (manyBodyReversalS Λ N).mulVec Φ := by
-    have h := congrArg ((↑) : ↥E → (Λ → Fin (N + 1)) → ℂ) hc
-    simpa using h
-  -- a ≠ 0 (since Φ ≠ 0).
-  have ha_ne : a ≠ 0 := by
-    intro h0
-    apply hΦ_ne
-    rw [← ha', h0, zero_smul]
-  -- Derive Ŝ³_tot Φ = (b/a) • Φ and Θ Φ = (c/a) • Φ.
-  have hSΦ_eq : (totalSpinSOp3 Λ N).mulVec Φ = (b * a⁻¹) • Φ := by
-    rw [← hb', ← ha', smul_smul, mul_assoc, inv_mul_cancel₀ ha_ne, mul_one]
-  have hΘΦ_eq : (manyBodyReversalS Λ N).mulVec Φ = (c * a⁻¹) • Φ := by
-    rw [← hc', ← ha', smul_smul, mul_assoc, inv_mul_cancel₀ ha_ne, mul_one]
-  set γ := b * a⁻¹ with hγdef
-  set δ := c * a⁻¹ with hδdef
-  -- Θ²Φ = Φ ⟹ δ² Φ = Φ ⟹ δ² = 1 (since Φ ≠ 0) ⟹ δ ≠ 0.
-  have hΘ2 : (manyBodyReversalS Λ N).mulVec ((manyBodyReversalS Λ N).mulVec Φ) = Φ := by
-    rw [Matrix.mulVec_mulVec, manyBodyReversalS_mul_self, Matrix.one_mulVec]
-  have hδ2 : δ ^ 2 • Φ = Φ := by
-    have h := hΘ2
-    rw [hΘΦ_eq, Matrix.mulVec_smul, hΘΦ_eq, smul_smul, ← sq] at h
-    exact h
-  have hδ2_eq : δ ^ 2 = 1 := by
-    have hΦne_smul : (1 : ℂ) • Φ = Φ := one_smul _ _
-    have heq : δ ^ 2 • Φ = (1 : ℂ) • Φ := hδ2.trans hΦne_smul.symm
-    by_contra hne
-    have hsub : (δ ^ 2 - 1) • Φ = 0 := by
-      rw [sub_smul, heq, sub_self]
-    have hdiff_ne : δ ^ 2 - 1 ≠ 0 := sub_ne_zero.mpr hne
-    exact hΦ_ne ((smul_eq_zero.mp hsub).resolve_left hdiff_ne)
+  -- The reflection `Θ` acts as `δ` (`= ±1`) on the unique ground state (shared eigenspace lemma).
+  obtain ⟨δ, hΘΦ_eq, hδ2_eq⟩ :=
+    LatticeSystem.Math.exists_involution_eigenvalue_of_unique_eigenspace H
+      (manyBodyReversalS Λ N) μ huniq hΦ_ne hΦ
+      (anisotropicHeisenbergS_mul_manyBodyReversalS J lam D) (manyBodyReversalS_mul_self Λ N)
+  -- `Ŝ³_tot Φ` is a scalar multiple `γ • Φ` (same eigenspace, uniqueness).
+  obtain ⟨γ, hSΦ_eq⟩ :=
+    LatticeSystem.Math.exists_smul_of_mem_finrank_le_one huniq hΦ_in hΦ_ne hSΦ_in
+  -- `δ ≠ 0` from `δ² = 1`.
   have hδ_ne : δ ≠ 0 := by
     intro h0
     rw [h0, pow_two, mul_zero] at hδ2_eq
