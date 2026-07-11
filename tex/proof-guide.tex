@@ -10274,6 +10274,25 @@ true), the normalized average converges up to a unimodular phase to $|\Phi_{\mat
 \texttt{tanakaSphereAverage\_groundState} shares constants with Theorem 4.6 and is conditional on
 long-range order (vacuous in one dimension by Corollary 4.3).  Chapters~3--10 backfill.
 
+\medskip\noindent\textbf{Telescoping crux of Proposition 4.10} (Tasaki §4.2.2,
+eqs.~(4.2.58)--(4.2.59), p.~108; \textbf{PROVED axiom-free}, Issue \#4974, PR \#5018;
+\texttt{Quantum/SpinS/AndersonTowerTelescoping.lean}).  The core algebraic machinery enabling the
+Cartesian order-word contraction in Proposition 4.10 is a three-part telescoping crux.
+\textbf{(1) Push-through via uniform commutator} (\texttt{stagOpVec\_commutator\_eq},
+\texttt{totalSpinSOpVec\_mul\_cartWord\_eq}): the commutator $[\hat o^{(\alpha)},\hat o^{(\beta)}] =
+i\sum_\gamma\varepsilon_{\alpha\beta\gamma}\hat S^{(\gamma)}_{\mathrm{tot}}$ pushes a total-spin
+generator through a Cartesian order word into a length-preserving sum over single-letter rotations.
+\textbf{(2) Singlet boundary erasure} (\texttt{totalSpinSOpVec\_mulVec\_cartWord\_singlet},
+\texttt{orderComm\_mulVec\_cartWord\_singlet}): on a total-spin singlet $\Phi$ (annihilated by
+$\hat S^{(3)}_{\mathrm{tot}}$ and $\hat S^{(1)}_{\mathrm{tot}}$, hence by $\hat
+S^{(2)}_{\mathrm{tot}}$ via SU$(2)$ identity), the leading term vanishes, collapsing to the pure
+rotation sum enabling Proposition~4.10.  \textbf{(3) Single-swap expectation identity}
+(\texttt{cartWord\_swap\_dotProduct\_eq}): the Cartesian analogue of Theorem~4.9's
+\texttt{orderWordProd\_swap\_dotProduct\_eq}; one adjacent transposition decomposes as a signed
+triple sum over shorter charge-removed words, resolving the swap-band contraction.  All three steps
+are \textbf{equalities only}; the real-part band, operator-norm bound, and $O(1/V)$ estimate
+deferred to PR-3.3 (Proposition~4.10 capstone).
+
 \noindent\textbf{Theorem 4.11} (Koma--Tasaki, Tasaki §4.2.1, eq.~(4.2.23), p.~101; documented axiom,
 \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The two order parameters satisfy
 $\sqrt{3q_0}\le m^\ast$, where the factor $\sqrt3$ reflects the $SU(2)$ symmetry of the Heisenberg
