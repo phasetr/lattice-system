@@ -28,7 +28,8 @@ namespace LatticeSystem.Quantum
 open Matrix
 
 /-- **Shastry staggered susceptibility bound (`χ(k*) ≤ C·L`), DOCUMENTED AXIOM.**  For the
-zero-field one-dimensional spin-`S` antiferromagnetic Heisenberg ring on `L ≥ 2` sites there is a
+zero-field one-dimensional spin-`S` antiferromagnetic Heisenberg ring on an **even** number `L ≥ 2`
+of sites there is a
 size-uniform
 constant `C ≥ 0` such that every *normalized* ground state `Φ` (energy `hermitianMinEigenvalue`)
 admits a potential `y` for `ÔΦ` — `(Ĥ − E₀) y = ÔΦ` — whose static staggered susceptibility is
@@ -53,12 +54,19 @@ in-book argument):
   dimensions greater than one*, J. Stat. Phys. **53**, 1019 (1988), esp. p. 1022 — the
   inverse-Fourier refinement [29].
 
-Stated over `L ≥ 2` (so odd rings are covered without a separate even/odd argument).  The statement
-is the `hsusc` hypothesis of `no_long_range_order_1d_of_susceptibility`, bundled with its
-size-uniform constant `∃ C, 0 ≤ C ∧ …`, so that feeding it into the conditional reduction
-discharges Corollary 4.3. -/
+Restricted to **even** rings `L ≥ 2` (`Even L`): only bipartite (even) rings carry a balanced
+staggered sublattice `Σ_x ε_x = 0`, so the ground state is an SU(2)-invariant singlet with
+`⟨Φ, ÔΦ⟩ = 0`, hence `ÔΦ ⊥ ker(Ĥ − E₀)` and the resolvent potential `y` with `(Ĥ − E₀) y = ÔΦ`
+genuinely exists.  Odd rings are non-bipartite: the staggered sublattice is unbalanced
+(`Σ_x ε_x ≠ 0`, e.g. `L = 3`), `ÔΦ` need not be orthogonal to the ground state, no such `y` exists,
+and they lie outside Tasaki's §4.1 setting (whose lattice `(Λ_L, B_L)` is defined for even `L`
+only; §3.1, §4.1.1).  The statement is the `hsusc` hypothesis of
+`no_long_range_order_1d_of_susceptibility`, bundled with its size-uniform constant
+`∃ C, 0 ≤ C ∧ …`, so that feeding it into the conditional reduction discharges the even-ring
+Corollary 4.3. -/
 axiom shastry_staggered_susceptibility_bound (N : ℕ) (hN : 1 ≤ N) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ L : ℕ, 2 ≤ L → ∀ Φ : (Fin L → Fin (N + 1)) → ℂ, star Φ ⬝ᵥ Φ = 1 →
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ L : ℕ, 2 ≤ L → Even L → ∀ Φ : (Fin L → Fin (N + 1)) → ℂ,
+      star Φ ⬝ᵥ Φ = 1 →
       (heisenbergHamiltonianS (ringCoupling L) N).mulVec Φ
           = (hermitianMinEigenvalue
               (heisenbergHamiltonianS_isHermitian_of_real (ringCoupling_self_star L) N) : ℂ) • Φ →
@@ -90,14 +98,19 @@ zero-field one-dimensional spin-`S` antiferromagnetic Heisenberg ring
 (`heisenbergHamiltonianS (ringCoupling L) N`, i.e. `staggeredFieldChainHamiltonianS L 0 N`), the
 squared staggered order parameter per site vanishes in the thermodynamic limit (eq. (4.1.11)):
 for every `ε > 0` there is a size threshold `L₀` beyond which every normalized ground state `Φ` of
-the zero-field ring has `|⟨Φ, (Ô_L^{(3)})² Φ⟩.re / L²| < ε`.
+the zero-field **even** ring `L` has `|⟨Φ, (Ô_L^{(3)})² Φ⟩.re / L²| < ε`.
+
+Restricted to even rings (`Even L`), faithful to Tasaki: §3.1 defines the lattice `(Λ_L, B_L)`
+for even `L`, and §4.1.1 states the model "with even L".  Only bipartite (even) rings carry the
+balanced staggered sublattice underlying the staggered order parameter and the unique-singlet
+ground state (MLM, Thm 2.2); odd rings are non-bipartite and lie outside §4.1's setting.
 
 Discharged from the conditional reduction `no_long_range_order_1d_of_susceptibility` fed with the
 documented Shastry susceptibility axiom `shastry_staggered_susceptibility_bound` (for `N ≥ 1`); the
 degenerate spin-`0` case `N = 0` is unconditional since the staggered order operator vanishes there
 (`staggeredOrderOpS_spin_zero`). -/
 theorem no_long_range_order_1d (N : ℕ) :
-    ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L →
+    ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L → Even L →
       ∀ Φ : (Fin L → Fin (N + 1)) → ℂ,
         star Φ ⬝ᵥ Φ = 1 →
         (∃ E₀ : ℂ, (staggeredFieldChainHamiltonianS L 0 N).mulVec Φ = E₀ • Φ ∧
@@ -110,7 +123,7 @@ theorem no_long_range_order_1d (N : ℕ) :
   rcases Nat.eq_zero_or_pos N with rfl | hN
   · -- spin-`0`: the staggered order operator vanishes, so the parameter is identically zero.
     intro ε hε
-    refine ⟨0, fun L _ Φ _ _ => ?_⟩
+    refine ⟨0, fun L _ _ Φ _ _ => ?_⟩
     rw [staggeredOrderOpS_spin_zero]
     simpa using hε
   · -- `N ≥ 1`: feed the Shastry susceptibility axiom into the conditional reduction.
