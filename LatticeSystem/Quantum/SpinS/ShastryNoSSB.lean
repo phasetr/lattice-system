@@ -73,10 +73,12 @@ normalized ground state `Φ` of `staggeredFieldChainHamiltonianS L h N` has
 Here a ground state is a normalized energy-minimizing eigenvector (`Φ ≠ 0`,
 `star Φ ⬝ᵥ Φ = 1`, `Ĥ_h Φ = E₀ • Φ` with `E₀.re` minimal over eigenpairs);
 normalization makes per-site bound scale-invariant. We record it as a faithful,
-sound documented axiom over the concrete ring family. The deep thermodynamic-limit
-/ infinite-volume argument (Shastry–Tanaka–Takeda–Idogaki) is deferred (infinite-
-volume systems are in scope, routed via the constructive box-to-limit track
-#4644). -/
+sound documented axiom over the concrete ring family (Tasaki does not prove it,
+citing the original Shastry argument [58] and its rigorous formulation [63]).
+The deep thermodynamic-limit / infinite-volume argument (Shastry–Tanaka–Takeda–
+Idogaki) is documented-axiom material; the reflection-positivity infrastructure
+project (#4777) formalizes supporting finite-dim RP layers for the Gibbs
+decomposition, not a re-proof of Thm 4.2 itself. -/
 axiom shastry_no_symmetry_breaking_1d (N : ℕ) :
     ∀ ε : ℝ, 0 < ε → ∃ h₀ : ℝ, 0 < h₀ ∧
       ∀ h : ℝ, 0 < h → h < h₀ → ∃ L₀ : ℕ, ∀ L : ℕ, L₀ ≤ L →
