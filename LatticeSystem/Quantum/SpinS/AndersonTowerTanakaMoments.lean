@@ -127,19 +127,25 @@ theorem manyBodyReversalS_conjTranspose (Λ : Type*) [Fintype Λ] [DecidableEq �
 
 /-! ### The transverse moments (4.2.14) vanish -/
 
-/-- **Symmetry vanishing under a symmetric involution reversing `O`.**  If `Θᴴ = Θ`, `Θ Ξ = Ξ`
-and `Θ O Θ = -O`, then `⟨Ξ| O |Ξ⟩ = 0`: conjugating by `Θ` turns the expectation into its own
-negative.  This is the mechanism behind the vanishing transverse moments (4.2.14). -/
-private theorem dotProduct_mulVec_eq_zero_of_conj_anti {ι : Type*} [Fintype ι]
-    (Θ O : Matrix ι ι ℂ) (Ξ : ι → ℂ) (hΘsym : Matrix.conjTranspose Θ = Θ)
-    (hΘΞ : Θ.mulVec Ξ = Ξ) (hanti : Θ * O * Θ = -O) :
+/-- **Symmetry vanishing under a symmetric involution reversing `O`.**  If `Θᴴ = Θ`,
+`Θ Ξ = δ • Ξ` with `δ` of unit modulus (`δ · δ̄ = 1`), and `Θ O Θ = -O`, then `⟨Ξ| O |Ξ⟩ = 0`:
+conjugating by `Θ` sends the expectation to `(δ δ̄)·` its own negative `= -⟨Ξ|O|Ξ⟩`.  This is the
+mechanism behind the vanishing transverse moments (4.2.14) and, at `δ = ±1`, the first-order
+vanishing of the susceptibility perturbation (§4.1 Theorem 4.2, issue #4777). -/
+theorem dotProduct_mulVec_eq_zero_of_conj_anti {ι : Type*} [Fintype ι]
+    (Θ O : Matrix ι ι ℂ) (Ξ : ι → ℂ) {δ : ℂ} (hΘsym : Matrix.conjTranspose Θ = Θ)
+    (hΘΞ : Θ.mulVec Ξ = δ • Ξ) (hδ : δ * star δ = 1) (hanti : Θ * O * Θ = -O) :
     star Ξ ⬝ᵥ O.mulVec Ξ = 0 := by
-  have hinv : star Ξ ⬝ᵥ O.mulVec Ξ = star Ξ ⬝ᵥ (Θ * O * Θ).mulVec Ξ := by
-    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hΘΞ,
-      star_dotProduct_mulVec_conjTranspose Θ Ξ (O.mulVec Ξ), hΘsym, hΘΞ]
-  rw [hanti, Matrix.neg_mulVec, dotProduct_neg] at hinv
-  have h2 : (2 : ℂ) * (star Ξ ⬝ᵥ O.mulVec Ξ) = 0 := by linear_combination hinv
-  exact (mul_eq_zero.mp h2).resolve_left two_ne_zero
+  have hR : star Ξ ⬝ᵥ (Θ * O * Θ).mulVec Ξ = (δ * star δ) * (star Ξ ⬝ᵥ O.mulVec Ξ) := by
+    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hΘΞ, Matrix.mulVec_smul,
+      Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul,
+      star_dotProduct_mulVec_conjTranspose, hΘsym, hΘΞ,
+      star_smul, smul_dotProduct, smul_eq_mul, ← mul_assoc]
+  have hL : star Ξ ⬝ᵥ (Θ * O * Θ).mulVec Ξ = -(star Ξ ⬝ᵥ O.mulVec Ξ) := by
+    rw [hanti, Matrix.neg_mulVec, dotProduct_neg]
+  have hfin : -(star Ξ ⬝ᵥ O.mulVec Ξ) = star Ξ ⬝ᵥ O.mulVec Ξ := by
+    rw [← hL, hR, hδ, one_mul]
+  linear_combination (-1 / 2 : ℂ) * hfin
 
 /-- **Tasaki eq. (4.2.14) for `α = 2`: `⟨Ξ| Ô_L^{(2)} |Ξ⟩ = 0`.**  The axis-1 reversal `Θ` fixes `Ξ`
 (`Θ Φ = Φ`) and reverses `Ô_L^{(2)}` (`Θ Ô^{(2)} Θ = -Ô^{(2)}`), so the per-site moment vanishes
@@ -151,9 +157,10 @@ theorem tanakaOrderMean2_eq_zero (d L N M : ℕ) [NeZero L]
   have hz : star (tanakaSSBState (torusParitySublattice d L) N M Φ)
       ⬝ᵥ (staggeredOrderOp2S (torusParitySublattice d L) N).mulVec
         (tanakaSSBState (torusParitySublattice d L) N M Φ) = 0 :=
-    dotProduct_mulVec_eq_zero_of_conj_anti _ _ _
+    dotProduct_mulVec_eq_zero_of_conj_anti _ _ _ (δ := 1)
       (manyBodyReversalS_conjTranspose (HypercubicTorus d L) N)
-      (manyBodyReversalS_mulVec_tanakaSSBState (torusParitySublattice d L) M hΘΦ)
+      (by rw [manyBodyReversalS_mulVec_tanakaSSBState (torusParitySublattice d L) M hΘΦ, one_smul])
+      (by rw [star_one, mul_one])
       (manyBodyReversalS_conj_staggeredOrderOp2S (torusParitySublattice d L))
   rw [tanakaOrderMean2, expectationRatioRe, hz, Complex.zero_re, zero_div, zero_div]
 
@@ -166,9 +173,10 @@ theorem tanakaOrderMean3_eq_zero (d L N M : ℕ) [NeZero L]
   have hz : star (tanakaSSBState (torusParitySublattice d L) N M Φ)
       ⬝ᵥ (staggeredOrderOpS (torusParitySublattice d L) N).mulVec
         (tanakaSSBState (torusParitySublattice d L) N M Φ) = 0 :=
-    dotProduct_mulVec_eq_zero_of_conj_anti _ _ _
+    dotProduct_mulVec_eq_zero_of_conj_anti _ _ _ (δ := 1)
       (manyBodyReversalS_conjTranspose (HypercubicTorus d L) N)
-      (manyBodyReversalS_mulVec_tanakaSSBState (torusParitySublattice d L) M hΘΦ)
+      (by rw [manyBodyReversalS_mulVec_tanakaSSBState (torusParitySublattice d L) M hΘΦ, one_smul])
+      (by rw [star_one, mul_one])
       (manyBodyReversalS_conj_staggeredOrderOpS (torusParitySublattice d L))
   rw [tanakaOrderMean3, expectationRatioRe, hz, Complex.zero_re, zero_div, zero_div]
 

@@ -9786,6 +9786,58 @@ This \textbf{TEMPORARY capstone} (\texttt{ringBondSquareFieldHamiltonian\_hermit
 forms the entry point to the next susceptibility PR-$\chi_2$ (magnetic sum rule) and the
 long-range-order ($\chi_3$ onwards) theorems downstream (Issue \#4777).
 
+\medskip\noindent\textbf{Susceptibility phase $\chi_{2a}$: Pseudoinverse existence and first-order vanishing}
+(Tasaki \S4.1, eqs.~(4.1.39)--(4.1.41), pp.~84--86; PR-$\chi_{2a}$, Issue \#4777).  Foundation for the magnetic
+susceptibility sum rule: the second-order perturbation expansion requires both (i)~a well-defined pseudoinverse $A^+$
+for the resolvent (enabling the perturbative series to invert on the orthogonal complement of the kernel), and
+(ii)~vanishing of the first-order correction term under spin-flip symmetry of the unique ground state (so the second-order
+formula (4.1.41) has no first-order contribution).
+
+\noindent\textbf{(χ2a-i) Pseudoinverse existence for Hermitian matrices} (\texttt{hermitian\_posSemidef\_exists\_orthogonal\_potential},
+\texttt{HermitianPseudoinverse.lean}):  For a positive-semidefinite (hence Hermitian) matrix $A$, if $v \perp \ker A$,
+then $\exists y: A y = v \land y \perp \ker A$ (Moore--Penrose pseudoinverse image).  Since $\mathrm{range}\,A = (\ker A)^\perp$
+for self-adjoint $A$ (via \texttt{LinearMap.orthogonal\_ker} + adjoint identity), $v$ lies in the range; projecting any
+preimage onto $(\ker A)^\perp$ yields $y$ orthogonal to the kernel while preserving the image.  Load-bearing for the
+resolvent identity and susceptibility finite-order perturbation (Tasaki (4.1.39)/(4.1.41), pp.~84--86).
+
+\noindent\textbf{(χ2a-ii) Scalar-multiple extraction from one-dimensional eigenspace}
+(\texttt{exists\_smul\_of\_mem\_finrank\_le\_one}, \texttt{UniqueEigenspaceInvolution.lean}):
+If a submodule $E$ has $\mathrm{finrank} \le 1$, and $\Phi \ne 0$ and $w$ both lie in $E$, then $\exists c: w = c \bullet \Phi$
+(any element is a scalar multiple of any non-zero member).  This is the uniqueness engine used by the involution eigenvalue
+lemma below, shared with Theorem 2.4 (§2.5, issue \#4777).
+
+\noindent\textbf{(χ2a-iii) Involution eigenvalue on unique ground state}
+(\texttt{exists\_involution\_eigenvalue\_of\_unique\_eigenspace}, \texttt{UniqueEigenspaceInvolution.lean}):
+If a Hermitian matrix $H$ has a $\mu$-eigenspace of $\mathrm{finrank} \le 1$ (unique ground state), $\Phi$ is a
+non-zero $\mu$-eigenvector, and $\Theta$ commutes with $H$ and is an involution ($\Theta^2 = 1$), then
+$\exists \delta: \Theta \Phi = \delta \bullet \Phi \land \delta^2 = 1$ ($\Theta$ acts as $\pm 1$ on the unique eigenstate).
+The mechanism: $\Theta \Phi$ lies in the eigenspace (commutation with $H$), so equals $\delta \bullet \Phi$ (uniqueness via χ2a-ii),
+and $\Theta^2 \Phi = \Phi$ forces $\delta^2 = 1$.  Used in both Theorem 2.4 (no-magnetization GS constraint, §2.5) and χ2a
+first-order vanishing here (§4.1, pp.~84--86).
+
+\noindent\textbf{(χ2a-iv) Vanishing under symmetric anti-involution}
+(\texttt{dotProduct\_mulVec\_eq\_zero\_of\_conj\_anti}, \texttt{AndersonTowerTanakaMoments.lean}):
+\emph{Shared lemma for Theorem 4.9 transverse-moment vanishing} (§4.2.2, issue \#4777, PR \#5001) \emph{and} χ2a
+first-order vanishing.  If $\Theta^\dagger = \Theta$ (real symmetric), $\Theta \Xi = \delta \bullet \Xi$ with
+$\delta \cdot \overline{\delta} = 1$ (unit modulus), and $\Theta O \Theta = -O$ (anti-invariance), then
+$\langle \Xi | O | \Xi \rangle = 0$.  Proof: conjugating by $\Theta$ yields $\langle \Xi | (\Theta O \Theta) | \Xi \rangle =
+(\delta \overline{\delta}) \cdot \langle \Xi | O | \Xi \rangle = \langle \Xi | O | \Xi \rangle$ (by unit-modulus identity),
+but also $= -\langle \Xi | O | \Xi \rangle$ (by anti-invariance), so vanishing.  At $\delta = \pm 1$ (unique eigenspace case),
+this is the crux of first-order vanishing in the susceptibility perturbation (Tasaki (4.1.39), p.~84).  De-privatized from
+\texttt{AndersonTowerTanakaMoments.lean}; signature generalized from $\delta = 1$ to $\delta * \mathrm{star}\,\delta = 1$.
+
+\noindent\textbf{(χ2a-v) First-order susceptibility vanishing} (\texttt{ringBondSquareLinFieldOp\_groundState\_expectation\_zero},
+\texttt{RingReflectionBondSquareSusceptibility.lean}):
+\textbf{TEMPORARY capstone of χ2a}: the Zeeman perturbation $V = \sum_z (\mathrm{kOf}\,h)_z \cdot \hat S^3_z$
+(the 1st-order term in the susceptibility expansion $\texttt{ringBondSquareFieldHamiltonian\_eq}$, reduction $(\star)$)
+vanishes in expectation on any unique ground state $\Phi$ of the field-free ring Hamiltonian $H_0 =
+\texttt{ringFieldHamiltonian}\,n\,N\,0$.  The axis-1 spin reversal $\Theta = \texttt{manyBodyReversalS}$ is a real symmetric
+involution commuting with $H_0$ and reversing each $\hat S^3_z$ ($\Theta \hat S^3_z \Theta = -\hat S^3_z$), hence reversing $V$
+($\Theta V \Theta = -V$).  On the unique ground state, $\Theta \Phi = \delta \Phi$ with $\delta = \pm 1$ (via χ2a-iii),
+so $\langle \Phi | V | \Phi \rangle = 0$ (via χ2a-iv).  This ensures the second-order perturbation formula (4.1.41) has no
+first-order correction, enabling the sum-rule capstone χ2b to close the susceptibility.  Bridges χ1 (ground-state energy
+lower bound from field-free theory, PR-$\chi_1$) to χ2b (sum-rule capstone).
+
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
 dimension: for the zero-field 1D spin-$S$ antiferromagnetic Heisenberg ring, the squared staggered
