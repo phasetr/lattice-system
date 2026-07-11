@@ -698,8 +698,11 @@ def boolFinSuccEquiv (n : ℕ) : (Fin (n + 1) → Bool) ≃ (Fin n → Bool) × 
   right_inv p := by refine Prod.ext ?_ ?_ <;> simp
 
 /-- **Noncommutative binomial expansion** as an ordered sum over sign assignments:
-`(A + B)^n = Σ_{c : Fin n → Bool} ∏_k (if c k then A else B)`.  Proved by induction on `n` peeling
-the last factor (the commutative `add_pow` is unavailable in a noncommutative ring). -/
+`(A + B)^n = Σ_{c : Fin n → Bool} ∏_k (if c k then A else B)`.  Proved by induction on `n`
+peeling the last factor (the commutative `add_pow` is unavailable in a noncommutative ring).
+**Note**: this is a specialization of the fully general `pow_sum_smul_eq_sum_smul_prod`
+(NoncommPowerExpansion.lean) to the case `ι = Bool` (two operators via smul scalars
+`1 • A` and `1 • B`). -/
 theorem add_pow_eq_sum_ofFn {R : Type*} [Ring R] (A B : R) :
     ∀ n : ℕ, (A + B) ^ n
       = ∑ c : Fin n → Bool, (List.ofFn (fun k => if c k then A else B)).prod
