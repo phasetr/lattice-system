@@ -16,6 +16,7 @@ import LatticeSystem.Math.RealForm.AntilinearFixedFinrank
 import LatticeSystem.Math.DoubleSequenceDiagonal
 import LatticeSystem.Math.ReflectionPositivityAveraging
 import LatticeSystem.Math.SphereMoment
+import LatticeSystem.Math.NoncommPowerExpansion
 import LatticeSystem.Math.HermitianMaxEigenvalue
 import LatticeSystem.Math.HermitianEigenspaceBotAboveMax
 import LatticeSystem.Math.HermitianMaxGeOfEigenvector
@@ -122,6 +123,7 @@ import LatticeSystem.Quantum.SpinS.FerrimagneticLROTotalSpin
 import LatticeSystem.Quantum.SpinS.AndersonTower
 import LatticeSystem.Quantum.SpinS.AndersonTowerField
 import LatticeSystem.Quantum.SpinS.AndersonTowerSphereAverage
+import LatticeSystem.Quantum.SpinS.AndersonTowerSphereMoment
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensate
 import LatticeSystem.Quantum.SpinS.HeisenbergEquilibrium
 import LatticeSystem.Quantum.SpinS.HypercubicBoxModel

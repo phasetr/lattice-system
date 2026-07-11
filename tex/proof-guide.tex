@@ -10394,6 +10394,31 @@ for the sphere moment: odd cases vanish via the antisymmetry of $\texttt{gaussFu
 indices; even cases yield the closed form via the known closed values of Gaussian half-moments at
 even indices. Chapters~3--10 backfill.
 
+\noindent\textbf{Operator sphere-average polynomial expansion} (Tasaki §4.2.2, eq.~(4.2.59),
+p.~108; \textbf{proved axiom-free}, \texttt{Quantum/SpinS/AndersonTowerSphereMoment.lean},
+Issue \#4974, PR \#5013). The principal sphere-average machinery for Proposition 4.10's
+solid-angle decomposition. The direction order operator $\hat O_L^n = \sum_x \varepsilon_x
+(\hat S_x \cdot n)$ for $n \in S^2 \subset \mathbb{R}^3$ decomposes along the three spin
+axes as $\hat O_L^n = \sum_\alpha n_\alpha \hat o^{(\alpha)}$, where $\hat o^{(\alpha)}$ are
+the three staggered axis operators ({\texttt{staggeredOrderOp1S}}, {\texttt{staggeredOrderOp2S}},
+{\texttt{staggeredOrderOpS}}), bundled into the operator vector {\texttt{stagOpVec}}. Raising to
+the $M$-th power and integrating over the sphere (the unit sphere $\mathrm{Metric.sphere}(0, 1)
+\subset \mathbb{R}^3$ with surface measure $\mathrm{volume.toSphere}$), the noncommutative
+multinomial expansion (\texttt{pow\_sum\_smul\_eq\_sum\_smul\_prod}) together with the scalar
+monomial moments (\texttt{sphereMonomialMoment\_eq}, the resolved values from eq.~(4.2.58))
+yields the operator formula:
+\begin{equation*}
+  \int_{S^2} (\hat O_L^n)^M d\sigma(n) = \sum_{f : \mathrm{Fin}~M \to \mathrm{Fin}~3}
+    \texttt{sphereMonomialMoment}(\mathrm{count}\,f) \cdot \prod_j \hat o^{(f_j)},
+\end{equation*}
+where the ordered operator product is kept \textbf{literally} as $(\text{List.ofFn}
+\ldots).\text{prod}$ (no commutators introduced), tuples with odd axis multiplicities
+contribute 0 (via {\texttt{sphereMonomialMoment}}), and the operator order is preserved
+exactly. This capstone theorem (\texttt{sphereAverage\_directionStaggeredOp\_pow}) feeds
+directly into the infinite-volume averaging argument of Proposition 4.10, providing the
+scalar-substrate link between finite microscopic calculations and the macroscopic phase
+structure. Chapters~3--10 backfill.
+
 \noindent\textbf{Definition 4.17} (Tasaki §4.3.1, eqs.~(4.3.1)--(4.3.4), pp.~112--113;
 \texttt{Quantum/SpinS/InfiniteVolumeGroundState.lean}, Issue \#4485).  Ground state of the
 \emph{infinite-volume} antiferromagnetic Heisenberg model on $\mathbb{Z}^d$.  The
