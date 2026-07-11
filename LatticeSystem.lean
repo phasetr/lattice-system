@@ -102,6 +102,7 @@ import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareUngaugedDLS
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareGaugeCrux
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquarePhysId
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareGaussianDomination
+import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareUniformBound
 import LatticeSystem.Quantum.SpinS.RingTranslationGibbs
 import LatticeSystem.Quantum.SpinS.RingReflectionChessboardTransport
 import LatticeSystem.Quantum.SpinS.FerrimagneticLRO
