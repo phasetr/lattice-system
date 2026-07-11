@@ -9838,6 +9838,36 @@ so $\langle \Phi | V | \Phi \rangle = 0$ (via χ2a-iv).  This ensures the second
 first-order correction, enabling the sum-rule capstone χ2b to close the susceptibility.  Bridges χ1 (ground-state energy
 lower bound from field-free theory, PR-$\chi_1$) to χ2b (sum-rule capstone).
 
+\noindent\textbf{(χ2b) Susceptibility sum rule} (\texttt{ringBondSquareField\_susceptibility\_sum\_rule},
+Tasaki §4.1 Theorem 4.2, eq.~(4.1.41), book p.~84, susceptibility sum rule / PR \#5002):
+\textbf{CAPSTONE of χ2} (second-order perturbation phase).  The ground-state energy uniform-field bound $E_{\mathrm{GS}}(\lambda h) \ge E_{\mathrm{GS}}(0)$ (χ1,
+\texttt{ringBondSquareFieldHamiltonian\_hermitianMinEigenvalue\_ge\_field\_zero}), expanded to second order in the field
+strength $\lambda$, yields Tasaki's susceptibility sum rule.  Writing the bond-square field Hamiltonian at the scaled
+field $\lambda h$ as the proved operator identity \texttt{ringBondSquareFieldHamiltonian\_smulField\_eq},
+\[
+\hat H_\lambda = H_0 + \lambda \cdot V + (\lambda^2 C(h)) \cdot 1,
+\]
+with $H_0 = \texttt{ringFieldHamiltonian}(n, N, 0)$ the field-free ring Heisenberg Hamiltonian, $V = \sum_z (\mathrm{kOf}\,h)_z \cdot \hat S^3_z$
+the Zeeman perturbation (Tasaki's $-\hat O_b$, eq.~(4.1.38)), and $C(h) = \tfrac{1}{2}\sum(f_x + f_{x+1})^2$ the scalar constant,
+the trial state $\psi_\lambda = \Phi - \lambda \cdot y$ ($y$ the pseudoinverse potential $(H_0 - E_0) y = V \Phi$, $y \perp \Phi$)
+makes the variational lower bound $E_{\mathrm{GS}}(\lambda h) \langle \psi_\lambda | \psi_\lambda \rangle \le \langle \psi_\lambda | \hat H_\lambda | \psi_\lambda \rangle$
+into a $\lambda$-polynomial.  Expanding the denominator $\langle \psi_\lambda | \psi_\lambda \rangle = 1 + \lambda^2 \langle y | y \rangle + O(\lambda^4)$
+and the numerator $\langle \psi_\lambda | \hat H_\lambda | \psi_\lambda \rangle = E_0 + \lambda^2 (C(h) - \chi) + O(\lambda^3)$
+(where the first-order term drops because $\langle \Phi | V | \Phi \rangle = 0$ by χ2a-v), the ratio becomes a quadratic polynomial in $\lambda$:
+\[
+\frac{\langle \psi_\lambda | \hat H_\lambda | \psi_\lambda \rangle}{\langle \psi_\lambda | \psi_\lambda \rangle} = E_0 + \lambda^2(C(h) - \chi) + O(\lambda^3),
+\]
+where $\chi = \operatorname{Re} \langle y, V \Phi \rangle$ is the susceptibility.  The variational inequality and the χ1 bound
+$E_0 \le E_{\mathrm{GS}}(\lambda h)$ combine (via \texttt{le\_of\_forall\_pos\_poly}, the $\lambda \to 0^+$ limiting step)
+to force the $\lambda^2$-coefficient to be non-negative: $0 \le C(h) - \chi$, yielding the sum rule
+\[
+\chi = \operatorname{Re} \langle y, V \Phi \rangle \le C(h) = \tfrac{1}{2}\sum(f_x + f_{x+1})^2.
+\]
+Phrased in the $\texttt{hsusc}$ shape (hypothetical-susceptibility carrier from \texttt{no\_long\_range\_order\_1d\_of\_susceptibility})
+for general field $h$; staggered specialisation and the Green-function $\le C \cdot L$ bound belong to χ3 (next stage).
+This is the second-order perturbation gate toward Theorem 4.2 long-range order, closing the susceptibility `free energy $\to$ ground state'
+inference (χ1 $\to$ χ2 $\to$ Theorem 4.2).
+
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
 dimension: for the zero-field 1D spin-$S$ antiferromagnetic Heisenberg ring, the squared staggered

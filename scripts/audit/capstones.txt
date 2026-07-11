@@ -235,25 +235,30 @@ ringBondSquareTwoFieldWeight_reflection_cauchySchwarz
 # consumed.
 ringBondSquareFieldPartitionRe_uniform_bound
 
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.1 Thm 4.2 (#4777) T→0 free-energy limit
-# (PR-χ1, `RingReflectionBondSquareGroundEnergy.lean`). The ground-state energy uniform-field bound
-# `E_GS(h) ≥ E_GS(0)` (Tasaki §4.1 (4.1.40)/(4.1.49), book pp. 85–86). Terminal capstone of the
-# finite-β bond-square partition inequality passage to zero temperature. Zero-referenced until PR-χ2
-# (susceptibility sum rule / response function) consumes it. RE-EVALUATE/DELIST when consumed by PR-χ2.
-ringBondSquareFieldHamiltonian_hermitianMinEigenvalue_ge_field_zero
+# NOTE (PR-χ1, #4777): the PR-χ1 terminal capstone `ringBondSquareFieldHamiltonian_hermitianMinEigenvalue_ge_field_zero`
+# (`RingReflectionBondSquareGroundEnergy.lean`) — the ground-state energy uniform-field bound
+# `E_GS(h) ≥ E_GS(0)` (Tasaki §4.1 (4.1.40)/(4.1.49), pp. 85–86) from finite-β partition passage
+# to zero temperature — is now DELISTED (PR-χ2b, #4777). It is genuinely CONSUMED by the PR-χ2b
+# susceptibility sum rule capstone `ringBondSquareField_susceptibility_sum_rule`
+# (`RingReflectionBondSquareSusceptibilitySumRule.lean:286`): the ground-energy bound provides the
+# second-order coefficient extraction from the trial-state Rayleigh quotient in the variational bound.
+# Its decl stays in place (same delist lifecycle as the Theorem 4.8 / Theorem 4.9 arc tips).
 
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.1 Thm 4.2 (#4777) susceptibility first-order
-# infrastructure (PR-χ2a, `HermitianPseudoinverse.lean`). The existence of an orthogonal pseudoinverse
-# potential for a Hermitian positive-semidefinite matrix (Tasaki §4.1 (4.1.39), book p. 84): if
-# `v ⊥ ker A`, then ∃ y with `A y = v` and `y ⊥ ker A` (Moore–Penrose pseudoinverse image).
-# Zero-referenced until PR-χ2b (variational sum rule) consumes it as the pseudoinverse perturbation
-# response. RE-EVALUATE/DELIST when consumed by PR-χ2b.
-hermitian_posSemidef_exists_orthogonal_potential
+# NOTE (PR-χ2b, #4777): the PR-χ2a tips `hermitian_posSemidef_exists_orthogonal_potential`
+# (Moore–Penrose pseudoinverse; `HermitianPseudoinverse.lean` def) and `ringBondSquareLinFieldOp_groundState_expectation_zero`
+# (first-order vanishing `⟨Φ|V|Φ⟩ = 0`; `RingReflectionBondSquareSusceptibility.lean` def) are now DELISTED
+# — both are genuinely CONSUMED by the PR-χ2b susceptibility sum rule capstone
+# `ringBondSquareField_susceptibility_sum_rule` (`RingReflectionBondSquareSusceptibilitySumRule.lean`):
+# the pseudoinverse potential is the crux of the variational bound (line 183) and the first-order vanishing
+# is the λ²-coefficient reduction (line 156). Their decls stay in place (same delist lifecycle as the
+# Theorem 4.8 / Theorem 4.9 arc tips).
 
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.1 Thm 4.2 (#4777) susceptibility first-order
-# vanishing (PR-χ2a, `RingReflectionBondSquareSusceptibility.lean`). The first-order vanishing
-# `⟨Φ|V|Φ⟩ = 0` of the linear-in-field Zeeman operator `V = Σ_z (kOf h)_z · Ŝ³_z` in a unique ground
-# state of the field-free ring Hamiltonian (Tasaki §4.1 (4.1.38)–(4.1.39), book p. 84). Zero-referenced
-# until PR-χ2b (susceptibility sum rule) consumes it as the first-order perturbation correction
-# (which vanishes, reducing the second-order formula). RE-EVALUATE/DELIST when consumed by PR-χ2b.
-ringBondSquareLinFieldOp_groundState_expectation_zero
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.1 Thm 4.2 (#4777) susceptibility sum rule
+# capstone (PR-χ2b, `RingReflectionBondSquareSusceptibilitySumRule.lean`). The variational bound on the
+# susceptibility of the linear-in-field Zeeman operator `χ_b = Re⟨y, VΦ⟩ ≤ ½Σ(f_x+f_{x+1})²` for a unique
+# ground state of the field-free ring Heisenberg Hamiltonian (Tasaki §4.1 eq. (4.1.41), book p. 84):
+# the pseudoinverse potential `(H₀−E₀)y = VΦ` with `y ⊥ Φ` from PR-χ2a is used with the ground-energy
+# bound (χ1) to extract the second-order coefficient from a trial-state Rayleigh quotient expansion.
+# Zero-referenced until PR-χ3 (Green-function susceptibility bound via Shastry propagator) consumes it.
+# RE-EVALUATE/DELIST when consumed by PR-χ3.
+ringBondSquareField_susceptibility_sum_rule
