@@ -13,20 +13,21 @@ has three layers:
 * the **single adjacent-swap band** `cartWord_swap_re_diff_le`: taking the real part of the
   triple-sum swap identity and bounding it, term by term, by a uniform bound `B` on the shortened
   (charge-removed, length-`M−2`) Cartesian word expectations.  Since the Levi-Civita
-  coefficients are **real** (`leviCivita3` valued in `{0, ±1} ⊂ ℂ`), the imaginary-part cancellation
-  of the `Bool` swap band is
+  coefficients are **real** (`leviCivita3` valued in `{0, ±1} ⊂ ℂ`), the
+  imaginary-part cancellation of the `Bool` swap band is
   unnecessary here — each of the `9·|suf|` terms is bounded by `B`;
 * the **branching swap-chain band** `cartWord_swapChain_re_diff_le`: a length-`k` chain of adjacent
   transpositions changes the real expectation by at most `k · 9M · B` — the induction over
   `SwapChain` (now polymorphic, `OrderOperatorAlgebra`) bundling each branching single-swap step;
 * the **uniform norm bound** `cartWord_expectation_re_abs_le` supplying the concrete
-  `B = (V·N)^{M−2} · ⟨Φ, Φ⟩.re` from operator-norm submultiplicativity `‖ô^{w}‖ ≤ (V·N)^{|w|}`
-  (`cartWord_manyBodyOperatorNormS_le`, `stagOpVec_manyBodyOperatorNormS_le`), and the capstone
+  `B = (V·N)^{M−2} · ⟨Φ, Φ⟩.re` from operator-norm submultiplicativity
+  `‖ô^{w}‖ ≤ (V·N)^{|w|}` (`cartWord_manyBodyOperatorNormS_le`,
+  `stagOpVec_manyBodyOperatorNormS_le`), and the capstone
   `cartWord_swapChain_re_diff_norm_le` instantiating it into a self-contained band.
 
 The self-contained norm scale keeps this step independent of the `(ô²)`-moment lower bound (a
-separate arc); the `ordered → grouped` main-part identification and the `doubleFactorial → 1/(M+1)`
-reconstruction are the next step (PR-3.3b).
+separate arc); the `ordered → grouped` main-part identification and the
+`doubleFactorial → 1/(M+1)` reconstruction are the next step (PR-3.3b).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §4.2.2, eqs. (4.2.58)–(4.2.59), p.108; cf. Tasaki, arXiv:1807.05847.
@@ -44,16 +45,17 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 private theorem leviCivita3_im (a b c : Fin 3) : (leviCivita3 a b c).im = 0 := by
   fin_cases a <;> fin_cases b <;> fin_cases c <;> simp [leviCivita3]
 
-/-- The Levi-Civita symbol has norm at most one: `‖ε_{αβγ}‖ ≤ 1`, since its values `{0, ±1}` all
-have norm at most one. -/
-private theorem leviCivita3_norm_le_one (a b c : Fin 3) : ‖leviCivita3 a b c‖ ≤ 1 := by
+/-- The Levi-Civita symbol has norm at most one: `‖ε_{αβγ}‖ ≤ 1`, since its values
+`{0, ±1}` all have norm at most one. -/
+private theorem leviCivita3_norm_le_one (a b c : Fin 3) :
+    ‖leviCivita3 a b c‖ ≤ 1 := by
   fin_cases a <;> fin_cases b <;> fin_cases c <;> simp [leviCivita3]
 
-/-- **Real double-coefficient bound.**  For two real scalars `a`, `b` of norm at most one, the real
-part of the doubled rotation coefficient `(i a)(i b) z` is dominated by `|z.re|`.  This packages the
-single-swap coefficient `(i ε_{αβγ})(i ε_{γ w_k δ})`, which — being real — contributes no imaginary
-cross term: `((i a)(i b) z).re = −(a.re · b.re) · z.re`, whence `|·| ≤ |a.re| · |b.re| · |z.re| ≤
-|z.re|`. -/
+/-- **Real double-coefficient bound.**  For two real scalars `a`, `b` of norm at most one, the
+real part of the doubled rotation coefficient `(i a)(i b) z` is dominated by `|z.re|`.  This
+packages the single-swap coefficient `(i ε_{αβγ})(i ε_{γ w_k δ})`, which — being real —
+contributes no imaginary cross term: `((i a)(i b) z).re = −(a.re · b.re) · z.re`, whence
+`|·| ≤ |a.re| · |b.re| · |z.re| ≤ |z.re|`. -/
 private theorem cart_double_coeff_re_le (a b : ℂ) (ha : a.im = 0) (hb : b.im = 0)
     (hna : ‖a‖ ≤ 1) (hnb : ‖b‖ ≤ 1) (z : ℂ) :
     |((Complex.I * a) * (Complex.I * b) * z).re| ≤ |z.re| := by
@@ -162,15 +164,16 @@ theorem cartWord_swapChain_re_diff_le (A : Λ → Bool) (Φ : (Λ → Fin (N + 1
 
 /-! ### The uniform operator-norm bound and the concrete band -/
 
-/-- **Uniform axis-operator norm bound** `‖ô^{(α)}‖ ≤ V·N`.  Each staggered axis operator is a
-`±1`-signed sum of the `V` per-site spin operators, whose norms are at most `N`
-(`onSiteS_spinSOp{1,2,3}_manyBodyOperatorNormS_le`); the triangle inequality gives the extensive
-bound uniformly in the axis `α`. -/
-theorem stagOpVec_manyBodyOperatorNormS_le (A : Λ → Bool) (N : ℕ) (hN : 1 ≤ N) (α : Fin 3) :
-    manyBodyOperatorNormS (stagOpVec A N α) ≤ (Fintype.card Λ : ℝ) * N := by
-  have hbound : ∀ (S : Λ → ManyBodyOpS Λ N), (∀ x, manyBodyOperatorNormS (S x) ≤ (N : ℝ)) →
-      manyBodyOperatorNormS (∑ x : Λ, (if A x then (1 : ℂ) else (-1 : ℂ)) • S x)
-        ≤ (Fintype.card Λ : ℝ) * N := by
+/-- **Uniform axis-operator norm bound** `‖ô^{(α)}‖ ≤ V·N`.  Each staggered axis operator
+is a `±1`-signed sum of the `V` per-site spin operators, whose norms are at most `N`
+(`onSiteS_spinSOp{1,2,3}_manyBodyOperatorNormS_le`); the triangle inequality gives the
+extensive bound uniformly in the axis `α`. -/
+theorem stagOpVec_manyBodyOperatorNormS_le (A : Λ → Bool) (N : ℕ) (hN : 1 ≤ N)
+    (α : Fin 3) : manyBodyOperatorNormS (stagOpVec A N α) ≤ (Fintype.card Λ : ℝ) * N := by
+  have hbound : ∀ (S : Λ → ManyBodyOpS Λ N),
+      (∀ x, manyBodyOperatorNormS (S x) ≤ (N : ℝ)) →
+        manyBodyOperatorNormS (∑ x : Λ, (if A x then (1 : ℂ) else (-1 : ℂ)) • S x)
+          ≤ (Fintype.card Λ : ℝ) * N := by
     intro S hS
     refine le_trans (manyBodyOperatorNormS_sum_le _ _) ?_
     calc ∑ x : Λ, manyBodyOperatorNormS ((if A x then (1 : ℂ) else (-1 : ℂ)) • S x)
@@ -189,10 +192,11 @@ theorem stagOpVec_manyBodyOperatorNormS_le (A : Λ → Bool) (N : ℕ) (hN : 1 �
   · rw [staggeredOrderOpS]
     exact hbound _ (fun x => le_trans (onSiteS_spinSOp3_manyBodyOperatorNormS_le x) (by linarith))
 
-/-- **Cartesian word norm bound** `‖ô^{w}‖ ≤ (V·N)^{|w|}`: submultiplicativity of the operator norm
-over the ordered product, each letter contributing the uniform axis bound `‖ô^{(α)}‖ ≤ V·N`
-(`stagOpVec_manyBodyOperatorNormS_le`). -/
-theorem cartWord_manyBodyOperatorNormS_le (A : Λ → Bool) (N : ℕ) (hN : 1 ≤ N) (w : List (Fin 3)) :
+/-- **Cartesian word norm bound** `‖ô^{w}‖ ≤ (V·N)^{|w|}`: submultiplicativity of the
+operator norm over the ordered product, each letter contributing the uniform axis bound
+`‖ô^{(α)}‖ ≤ V·N` (`stagOpVec_manyBodyOperatorNormS_le`). -/
+theorem cartWord_manyBodyOperatorNormS_le (A : Λ → Bool) (N : ℕ) (hN : 1 ≤ N)
+    (w : List (Fin 3)) :
     manyBodyOperatorNormS (cartWord A N w) ≤ ((Fintype.card Λ : ℝ) * N) ^ w.length := by
   induction w with
   | nil =>
@@ -207,22 +211,23 @@ theorem cartWord_manyBodyOperatorNormS_le (A : Λ → Bool) (N : ℕ) (hN : 1 �
             (manyBodyOperatorNormS_nonneg _) (by positivity)
       _ = ((Fintype.card Λ : ℝ) * N) ^ (t.length + 1) := by rw [pow_succ']
 
-/-- The self-pairing real part equals the squared Euclidean norm: `⟨Φ, Φ⟩.re = ‖Φ‖²₂`. -/
+/-- The self-pairing real part equals the squared Euclidean norm:
+`⟨Φ, Φ⟩.re = ‖Φ‖²₂`. -/
 private theorem re_star_dotProduct_self_eq (Φ : (Λ → Fin (N + 1)) → ℂ) :
-    (star Φ ⬝ᵥ Φ).re
-      = ‖(WithLp.toLp 2 Φ : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖
-          * ‖(WithLp.toLp 2 Φ : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖ := by
+    (star Φ ⬝ᵥ Φ).re =
+      ‖(WithLp.toLp 2 Φ : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖ *
+      ‖(WithLp.toLp 2 Φ : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖ := by
   have h := inner_self_eq_norm_mul_norm (𝕜 := ℂ)
     (WithLp.toLp 2 Φ : EuclideanSpace ℂ (Λ → Fin (N + 1)))
   rw [EuclideanSpace.inner_eq_star_dotProduct] at h
   rw [dotProduct_comm] at h
   simpa using h
 
-/-- **Uniform real-expectation norm bound** `|⟨Φ, ô^{w} Φ⟩.re| ≤ (V·N)^{|w|} · ⟨Φ, Φ⟩.re`.
-Combining
-the operator Cauchy–Schwarz bound (`abs_re_dotProduct_mulVec_le_norm_mul`) with the Cartesian word
-norm bound (`cartWord_manyBodyOperatorNormS_le`); the self-contained scale needed to discharge the
-uniform bound `B` of the swap-chain band. -/
+/-- **Uniform real-expectation norm bound**
+`|⟨Φ, ô^{w} Φ⟩.re| ≤ (V·N)^{|w|} · ⟨Φ, Φ⟩.re`. Combining the operator
+Cauchy–Schwarz bound (`abs_re_dotProduct_mulVec_le_norm_mul`) with the Cartesian word
+norm bound (`cartWord_manyBodyOperatorNormS_le`); the self-contained scale needed to
+discharge the uniform bound `B` of the swap-chain band. -/
 theorem cartWord_expectation_re_abs_le (A : Λ → Bool) (N : ℕ) (hN : 1 ≤ N) (w : List (Fin 3))
     (Φ : (Λ → Fin (N + 1)) → ℂ) :
     |(star Φ ⬝ᵥ (cartWord A N w).mulVec Φ).re|
@@ -233,12 +238,12 @@ theorem cartWord_expectation_re_abs_le (A : Λ → Bool) (N : ℕ) (hN : 1 ≤ N
   refine mul_le_mul_of_nonneg_right (cartWord_manyBodyOperatorNormS_le A N hN w) ?_
   rw [re_star_dotProduct_self_eq]; positivity
 
-/-- **Concrete branching swap-chain band** (Prop 4.10 arc PR-3.3a capstone).  Instantiating the
-abstract band `cartWord_swapChain_re_diff_le` with the self-contained operator-norm scale
-`B = (V·N)^{n−2} · ⟨Φ, Φ⟩.re` (`cartWord_expectation_re_abs_le`): a length-`k` swap chain between
-length-`n` Cartesian order words changes the real expectation by at most
-`k · 9n · (V·N)^{n−2} · ⟨Φ, Φ⟩.re`.  This is the `ordered → grouped` real band consumed by the
-main-part identification (PR-3.3b). -/
+/-- **Concrete branching swap-chain band** (Prop 4.10 arc PR-3.3a capstone).  Instantiating
+the abstract band `cartWord_swapChain_re_diff_le` with the self-contained operator-norm scale
+`B = (V·N)^{n−2} · ⟨Φ, Φ⟩.re` (`cartWord_expectation_re_abs_le`): a length-`k` swap chain
+between length-`n` Cartesian order words changes the real expectation by at most
+`k · 9n · (V·N)^{n−2} · ⟨Φ, Φ⟩.re`. This is the `ordered → grouped` real band
+consumed by the main-part identification (PR-3.3b). -/
 theorem cartWord_swapChain_re_diff_norm_le (A : Λ → Bool) (N : ℕ) (hN : 1 ≤ N)
     (Φ : (Λ → Fin (N + 1)) → ℂ) (h3 : (totalSpinSOp3 Λ N).mulVec Φ = 0)
     (h1 : (totalSpinSOp1 Λ N).mulVec Φ = 0) (n : ℕ) {k : ℕ} {w w' : List (Fin 3)}
