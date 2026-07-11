@@ -230,6 +230,48 @@ theorem staggeredOrderOpS_commutator_staggeredOrderOp1S (A : Λ → Bool) :
     cases A x <;> norm_num
   rw [hsq, one_smul]
 
+/-! ### Missing total×order rotation commutators `[Ŝ²_tot, ô⁽¹⁾]`, `[Ŝ²_tot, ô⁽³⁾]` (Prop 4.10 arc)
+
+The two `Ŝ²_tot` off-diagonal rotation commutators, completing the six off-diagonal total×order
+commutators `[Ŝ^{(γ)}_tot, ô^{(β)}] = i ε_{γβδ} ô^{(δ)}` needed to push `Ŝ^{(γ)}_tot` through a
+Cartesian order word in the swap-band telescoping (Prop 4.10 arc PR-3.2b).  Same per-site mechanism
+as the `Ŝ³_tot`/`Ŝ¹_tot` cases above. -/
+
+/-- Per-site step of `[Ŝ²_tot, Ô¹] = −i Ô³`: on-site `[Ŝ², Ŝ¹] = −i Ŝ³`. -/
+private theorem spinSSiteOp2_commutator_staggeredOrderOp1S (A : Λ → Bool) (x : Λ) :
+    spinSSiteOp2 x N * staggeredOrderOp1S A N - staggeredOrderOp1S A N * spinSSiteOp2 x N
+      = (if A x then (1 : ℂ) else (-1 : ℂ)) • ((-Complex.I) • spinSSiteOp3 x N) := by
+  unfold staggeredOrderOp1S spinSSiteOp2 spinSSiteOp1 spinSSiteOp3
+  rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_sub_distrib, Finset.sum_eq_single x]
+  · rw [mul_smul_comm, smul_mul_assoc, ← smul_sub, onSiteS_mul_onSiteS_same,
+      onSiteS_mul_onSiteS_same, ← onSiteS_sub,
+      show spinSOp2 N * spinSOp1 N - spinSOp1 N * spinSOp2 N = (-Complex.I) • spinSOp3 N from by
+        rw [← neg_sub, spinSOp1_commutator_spinSOp2, neg_smul], onSiteS_smul]
+  · intro y _ hyx
+    rw [mul_smul_comm, smul_mul_assoc, ← smul_sub,
+      (onSiteS_commute_of_ne (Ne.symm hyx) (spinSOp2 N) (spinSOp1 N)).eq, sub_self, smul_zero]
+  · intro h; exact absurd (Finset.mem_univ x) h
+
+/-- **Rotation commutator** `[Ŝ²_tot, Ô_L^{(1)}] = −i Ô_L^{(3)}` (`ε_{213} = −1`). -/
+theorem totalSpinSOp2_commutator_staggeredOrderOp1S (A : Λ → Bool) :
+    totalSpinSOp2 Λ N * staggeredOrderOp1S A N - staggeredOrderOp1S A N * totalSpinSOp2 Λ N
+      = (-Complex.I) • staggeredOrderOpS A N := by
+  have hsum : (totalSpinSOp2 Λ N : ManyBodyOpS Λ N) = ∑ x : Λ, spinSSiteOp2 x N := rfl
+  rw [hsum, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib, staggeredOrderOpS,
+    Finset.smul_sum]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [spinSSiteOp2_commutator_staggeredOrderOp1S, smul_comm (if A x then (1 : ℂ) else (-1 : ℂ))]
+
+/-- **Rotation commutator** `[Ŝ²_tot, Ô_L^{(3)}] = i Ô_L^{(1)}` (`ε_{231} = +1`). -/
+theorem totalSpinSOp2_commutator_staggeredOrderOpS (A : Λ → Bool) :
+    totalSpinSOp2 Λ N * staggeredOrderOpS A N - staggeredOrderOpS A N * totalSpinSOp2 Λ N
+      = Complex.I • staggeredOrderOp1S A N := by
+  have hsum : (totalSpinSOp2 Λ N : ManyBodyOpS Λ N) = ∑ x : Λ, spinSSiteOp2 x N := rfl
+  rw [hsum, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_sub_distrib, staggeredOrderOp1S,
+    Finset.smul_sum]
+  refine Finset.sum_congr rfl (fun x _ => ?_)
+  rw [spinSSiteOp2_commutator_staggeredOrderOpS, smul_comm (if A x then (1 : ℂ) else (-1 : ℂ))]
+
 /-! ### From the LRO premise to `⟨p̂⟩ ≥ 2 q₀` (P7) -/
 
 /-- Cartesian decomposition of the raising operator: `Ŝ⁺ = Ŝ¹ + i Ŝ²`. -/
