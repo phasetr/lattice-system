@@ -150,10 +150,10 @@ functional-analysis development; such a development may well be carried out
 perturbation theory) and singular-perturbation arguments in Chapter 10): the analytic
 proofs of weak-coupling continuation and adiabatic following for eigenstate families
 are **not undertaken** as an active project goal; such techniques naturally belong to
-a separate analytic-perturbation development. Results whose only missing link is a
-perturbation-theoretic proof — such as the total-spin values in Lieb's repulsive-Hubbard
-theorem (Theorem 10.4) — are recorded as documented axioms while their companion
-finite-coupling combinatorial bounds are proved axiom-free.
+a separate analytic-perturbation development. **Theorem 10.4** (Lieb's repulsive-Hubbard
+half-filling ground state) currently has its entire content axiomatized: the global minimum
+energy, ground-state degeneracy, and total-spin values are all undischarged. (The fixed-Ŝ³-sector
+ground-state uniqueness has been proved; full theorem discharge is tracked in Issue #5004.)
 
 - **Book theorems that Tasaki states without proof** (results he quotes from the
 external literature rather than proving in the text): **Theorem 10.11** (Kubo–Kishi
