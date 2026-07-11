@@ -50,9 +50,6 @@ in-book argument):
 * K. Tanaka, K. Takeda, T. Idogaki, *Rigorous results for the antiferromagnetic Heisenberg model*,
   J. Magn. Magn. Mater. **272–276**, 908 (2004) — the rigorous mathematical formulation cited by
   Tasaki [63].
-* T. Kennedy, E. H. Lieb, B. S. Shastry, *The XY model has long-range order for all spins and all
-  dimensions greater than one*, J. Stat. Phys. **53**, 1019 (1988), esp. p. 1022 — the
-  inverse-Fourier refinement [29].
 
 Restricted to **even** rings `L ≥ 2` (`Even L`): only bipartite (even) rings carry a balanced
 staggered sublattice `Σ_x ε_x = 0`, so the ground state is an SU(2)-invariant singlet with

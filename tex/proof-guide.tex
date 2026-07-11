@@ -9870,8 +9870,10 @@ inference (χ1 $\to$ χ2 $\to$ Theorem 4.2).
 
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; theorem,
 \texttt{Quantum/SpinS/NoLongRangeOrder1D.lean}, Issue \#4777).  Absence of long-range order in one
-dimension: for the zero-field 1D spin-$S$ antiferromagnetic Heisenberg ring, the squared staggered
-order parameter per site vanishes in the thermodynamic limit,
+dimension on \textbf{even} rings: for the zero-field 1D spin-$S$ antiferromagnetic Heisenberg ring on
+\textbf{even} $L$ sites (faithful to Tasaki §3.1/§4.1.1, which define the lattice for even $L$ only;
+only bipartite rings carry a balanced staggered sublattice), the squared staggered order parameter per
+site vanishes in the thermodynamic limit,
 $\lim_{L\uparrow\infty}\langle\Phi_{\mathrm{GS}}|(\hat O_L^{(3)}/L)^2|\Phi_{\mathrm{GS}}\rangle=0$
 (eq.~(4.1.11)).  We record \texttt{no\_long\_range\_order\_1d} in explicit $\varepsilon$--$\delta$ form
 over the zero-field ring family with normalized ground states.  It is \emph{discharged} by feeding the
@@ -9883,8 +9885,7 @@ the susceptibility bound in the book: footnote~3 (p.~76) cites Shastry [58] with
 formulation of Tanaka--Takeda--Idogaki [63], and footnote~9 (p.~83) singles out the
 $f_L^{(-1)}(k^\ast)$ bound as the only ``nontrivial part that requires some hard analysis'', deferring
 it to the external literature (Shastry, J.~Phys.~A \textbf{25}, L249 (1992) [58];
-Tanaka--Takeda--Idogaki, J.~Magn.~Magn.~Mater.\ \textbf{272--276}, 908 (2004) [63];
-Kennedy--Lieb--Shastry, J.~Stat.~Phys.\ \textbf{53}, 1019 (1988), p.~1022 [29]).  Per the project's
+Tanaka--Takeda--Idogaki, J.~Magn.~Magn.~Mater.\ \textbf{272--276}, 908 (2004) [63]).  Per the project's
 explicit instruction this genuinely external, hard-analysis estimate (massive-Green / inverse-Fourier
 control of the $k^\ast=\pi$ singularity) is recorded as a documented axiom.  In the book Corollary 4.3
 is instead a corollary of Shastry's Theorem 4.2 (still a documented axiom in
