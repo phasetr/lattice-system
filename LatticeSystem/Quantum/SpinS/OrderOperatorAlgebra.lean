@@ -495,9 +495,11 @@ theorem SwapChain.length_eq {α : Type*} {k : ℕ} {w w' : List α} (h : SwapCha
   | step hs _ ih => exact (hs.length_eq).trans ih
 
 /-- **Bring an occurrence of `a` to the front**: if `a ∈ w`, a swap chain of length at most the
-number of letters `≠ a` moves an `a` to the head. -/
-theorem bringToFront : ∀ {a : Bool} {w : List Bool}, a ∈ w →
-    ∃ (rest : List Bool) (k : ℕ), w.Perm (a :: rest) ∧
+number of letters `≠ a` moves an `a` to the head.  Stated over an arbitrary letter alphabet `α`
+with decidable equality (the proof is `Bool`-independent), so that both the binary ladder words
+(Theorem 4.6) and the `Fin 3` Cartesian order words (Proposition 4.10) reuse it. -/
+theorem bringToFront {α : Type*} [DecidableEq α] : ∀ {a : α} {w : List α}, a ∈ w →
+    ∃ (rest : List α) (k : ℕ), w.Perm (a :: rest) ∧
       k ≤ w.countP (· != a) ∧ SwapChain k w (a :: rest)
   | a, [], h => absurd h (by simp)
   | a, x :: xs, h => by
@@ -511,7 +513,7 @@ theorem bringToFront : ∀ {a : Bool} {w : List Bool}, a ∈ w →
       obtain ⟨rest, k, hperm, hk, hchain⟩ := bringToFront hmem
       refine ⟨x :: rest, k + 1, ?_, ?_, ?_⟩
       · exact (hperm.cons x).trans (List.Perm.swap a x rest)
-      · have hxa : (x != a) = true := by simp [bne, hx]
+      · have hxa : (x != a) = true := bne_iff_ne.mpr hx
         simp only [List.countP_cons, hxa, if_true]
         omega
       · exact SwapChain.trans (SwapChain.cons x hchain)
@@ -572,6 +574,31 @@ theorem swapDist_le : ∀ {w w' : List Bool}, w.Perm w' →
       have hk2 : k ≤ rest.count true := by rw [← e1]; simpa using hk
       rw [e1, e2]
       nlinarith [hk2, hk', Nat.zero_le (rest.count true), Nat.zero_le (rest.count false)]
+
+/-- **Generic swap-diameter bound** over an arbitrary alphabet: two words of the same multiset are
+connected by a swap chain of length at most `(length)²`.  Unlike the tight binary bound
+`swapDist_le` (used at its `Bool` alphabet by Theorem 4.9), this holds for any alphabet: the loose
+`length²` diameter suffices for the `Fin 3` Cartesian order words of Proposition 4.10.  Proved by
+induction on the *target* word via `bringToFront`, bounding each front-move by `≤ length`. -/
+theorem swapDist_le_length_sq {α : Type*} {w w' : List α} (hperm : w.Perm w') :
+    ∃ k, k ≤ w.length * w.length ∧ SwapChain k w w' := by
+  classical
+  induction w' generalizing w with
+  | nil =>
+    rw [List.Perm.nil_eq (hperm.symm)]
+    exact ⟨0, by simp, SwapChain.refl _⟩
+  | cons a w'' ih =>
+    have hmem : a ∈ w := hperm.symm.subset (by simp)
+    obtain ⟨rest, k, hpr, hk, hchain⟩ := bringToFront hmem
+    have hrest : rest.Perm w'' := (List.perm_cons a).1 (hpr.symm.trans hperm)
+    obtain ⟨k', hk', hchain'⟩ := ih hrest
+    refine ⟨k + k', ?_, hchain.trans (hchain'.cons a)⟩
+    have hlen : w.length = rest.length + 1 := by rw [hpr.length_eq, List.length_cons]
+    have hkle : k ≤ rest.length + 1 := by
+      rw [← hlen]; exact le_trans hk List.countP_le_length
+    calc k + k' ≤ (rest.length + 1) + rest.length * rest.length := Nat.add_le_add hkle hk'
+      _ ≤ (rest.length + 1) * (rest.length + 1) := by nlinarith [Nat.zero_le rest.length]
+      _ = w.length * w.length := by rw [hlen]
 
 /-! ### Word products of order operators and their swap-difference norm bounds (§4) -/
 
