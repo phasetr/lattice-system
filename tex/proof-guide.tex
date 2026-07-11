@@ -10291,7 +10291,9 @@ rotation sum enabling Proposition~4.10.  \textbf{(3) Single-swap expectation ide
 \texttt{orderWordProd\_swap\_dotProduct\_eq}; one adjacent transposition decomposes as a signed
 triple sum over shorter charge-removed words, resolving the swap-band contraction.  All three steps
 are \textbf{equalities only}; the real-part band, operator-norm bound, and $O(1/V)$ estimate
-deferred to PR-3.3 (Proposition~4.10 capstone).
+deferred to PR-3.3.  The pinch-equation multiplicity conversion (\texttt{card\_ofFn\_count\_eq},
+\texttt{Math/Combinatorics/MultinomialFiber.lean}) counts the grouped-word fibers via multinomial
+coefficients (eqs.~(4.2.58)--(4.2.59) RHS).
 
 \noindent\textbf{Theorem 4.11} (Koma--Tasaki, Tasaki §4.2.1, eq.~(4.2.23), p.~101; documented axiom,
 \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The two order parameters satisfy

@@ -3,8 +3,8 @@ Generic multinomial fiber cardinality.
 
 This file proves a purely combinatorial counting identity: for a finite alphabet `ι`, the number of
 words `List.ofFn f` (`f : Fin n → ι`) whose letter `i` occurs exactly `k i` times equals the
-multinomial coefficient `Nat.multinomial Finset.univ k = n! / ∏ i, (k i)!` (under the size condition
-`∑ i, k i = n`).
+multinomial coefficient `Nat.multinomial Finset.univ k = n! / ∏ i, (k i)!`
+(under the size condition `∑ i, k i = n`).
 
 It generalises the binary special case `card_ofFn_count_true_eq`
 (`LatticeSystem/Quantum/SpinS/AndersonTowerTanakaDenominator.lean`), and is consumed by the
@@ -76,9 +76,9 @@ private lemma multinomial_mul_update_pred {ι : Type*} [Fintype ι] [DecidableEq
     _ = (k j * ∏ i, (Function.update k j m i).factorial) * Nat.multinomial univ k := by rw [hQP]
     _ = (∏ i, (Function.update k j m i).factorial) * (k j * Nat.multinomial univ k) := by ring
 
-/-- **Generic multinomial fiber cardinality**: the number of functions `f : Fin n → ι` whose induced
-word `List.ofFn f` contains each letter `i` exactly `k i` times equals the multinomial coefficient
-`Nat.multinomial univ k`, provided the counts sum to the length (`∑ i, k i = n`).
+/-- **Generic multinomial fiber cardinality**: the number of functions `f : Fin n → ι` whose
+induced word `List.ofFn f` contains each letter `i` exactly `k i` times equals the multinomial
+coefficient `Nat.multinomial univ k`, provided the counts sum to the length (`∑ i, k i = n`).
 
 This generalises `card_ofFn_count_true_eq` (the two-letter/`Bool` case, a binomial coefficient) to
 an arbitrary finite alphabet.  The proof inducts on `n`, splitting off the first letter with
