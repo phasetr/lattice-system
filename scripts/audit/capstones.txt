@@ -234,3 +234,10 @@ ringBondSquareTwoFieldWeight_reflection_cauchySchwarz
 # until the downstream Fourier/IR → susceptibility → Theorem 4.2 arc consumes it. RE-EVALUATE/DELIST when
 # consumed.
 ringBondSquareFieldPartitionRe_uniform_bound
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.1 Thm 4.2 (#4777) T→0 free-energy limit
+# (PR-χ1, `RingReflectionBondSquareGroundEnergy.lean`). The ground-state energy uniform-field bound
+# `E_GS(h) ≥ E_GS(0)` (Tasaki §4.1 (4.1.40)/(4.1.49), book pp. 85–86). Terminal capstone of the
+# finite-β bond-square partition inequality passage to zero temperature. Zero-referenced until PR-χ2
+# (susceptibility sum rule / response function) consumes it. RE-EVALUATE/DELIST when consumed by PR-χ2.
+ringBondSquareFieldHamiltonian_hermitianMinEigenvalue_ge_field_zero

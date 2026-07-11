@@ -9739,6 +9739,53 @@ Archimedean $\varepsilon$--$\delta$).  This isolates the unconditional Corollary
 reflection-positivity infrared bound $\operatorname{Re}\langle y,\hat O\Phi\rangle\le C\,L$; the documented
 axiom \texttt{no\_long\_range\_order\_1d} remains until that bound is established.
 
+\medskip\noindent\textbf{Susceptibility phase $\chi_1$: Free energy and ground-state energy limit}
+(Tasaki §4.1, (4.1.40)/(4.1.49), pp.~85--86; PR-$\chi_1$, Issue \#4777).  The
+$T\to 0$ limit of the finite-$\beta$ bond-square partition bound
+$Z^{\mathrm{BS}}_\beta(h)\le Z^{\mathrm{BS}}_\beta(0)$ (PR-BS10) passes to the
+ground-state energy inequality $E_{\mathrm{GS}}(h)\ge E_{\mathrm{GS}}(0)$ via
+real-analytic limits.  Two lemmas bridge finite temperature to zero temperature:
+\begin{enumerate}
+\item \textbf{(SUM) Eigenvalue-sum spectral form} (\texttt{trace\_exp\_smul\_neg\_re\_eq\_sum\_exp}):
+  For a Hermitian matrix $\hat H$, the real part of the Gibbs trace is the sum of
+  Boltzmann weights,
+  \[ \operatorname{Re}\,\operatorname{Tr}e^{-\beta\hat H}
+     = \sum_i e^{-\beta\lambda_i}, \]
+  where $\lambda_i$ are the real eigenvalues. Proof: write $\hat H = U\operatorname{diag}(\lambda)U^\dagger$
+  (spectral theorem); the scalar $-\beta$ folds into the diagonal; the matrix exponential
+  passes through the conjugation automorphism and exponentiates entrywise; each
+  entry $e^{-\beta\lambda_i}$ is real.
+\item \textbf{($\chi_1$-a) Ground-state energy as the $T\to 0$ limit of the free energy}
+  (\texttt{tendsto\_neg\_inv\_mul\_log\_trace\_exp\_re\_atTop\_hermitianMinEigenvalue}):
+  For a Hermitian matrix $\hat H$ on a non-empty index type,
+  \[ -\frac{1}{\beta}\log(Z(\beta))
+     \to \min(\text{spectrum of }\hat H)
+     \quad\text{as } \beta\to\infty, \]
+  where $Z(\beta)=\operatorname{Re}\,\operatorname{Tr}e^{-\beta\hat H}$. Proof: with
+  $E=\min_i\lambda_i$ and the Boltzmann squeeze $e^{-\beta E}\le Z(\beta)\le
+  |\Omega|e^{-\beta E}$ (where $|\Omega|$ is the cardinality of the index type),
+  taking logs and multiplying by $-1/\beta$ yields
+  \[ E - \frac{\log|\Omega|}{\beta}
+     \le -\frac{1}{\beta}\log Z(\beta)
+     \le E, \]
+  and both bounds converge to $E$ since $(\log|\Omega|)/\beta\to 0$.
+\end{enumerate}
+These limits apply to the bond-square field Hamiltonian $\hat H_h$ at any field
+$h$.  Since the partition functions at both $h$ and $0$ are strictly positive
+(rigorous positivity from the bond-square infrared bound PR-BS9),
+$\operatorname{Re}\log$ is monotone, and multiplying the finite-$\beta$ inequality
+$Z^{\mathrm{BS}}_\beta(h)\le Z^{\mathrm{BS}}_\beta(0)$ by $-(1/\beta)>0$ reverses
+it into
+\[ -\frac{1}{\beta}\log Z^{\mathrm{BS}}_\beta(0)
+   \le
+   -\frac{1}{\beta}\log Z^{\mathrm{BS}}_\beta(h). \]
+Applying (SUM) to both Hamiltonians and then ($\chi_1$-a) to both free-energy sequences,
+the limit $\beta\to\infty$ of the Tendsto sandwich yields the ground-state inequality
+\[ E_{\mathrm{GS}}(0) \le E_{\mathrm{GS}}(h). \]
+This \textbf{TEMPORARY capstone} (\texttt{ringBondSquareFieldHamiltonian\_hermitianMinEigenvalue\_ge\_field\_zero})
+forms the entry point to the next susceptibility PR-$\chi_2$ (magnetic sum rule) and the
+long-range-order ($\chi_3$ onwards) theorems downstream (Issue \#4777).
+
 \noindent\textbf{Corollary 4.3} (Tasaki §4.1, eq.~(4.1.11), p.~77; documented axiom,
 \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of long-range order in one
 dimension: for the zero-field 1D spin-$S$ antiferromagnetic Heisenberg ring, the squared staggered
