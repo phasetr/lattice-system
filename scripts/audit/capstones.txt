@@ -329,3 +329,12 @@ cartWord_swapChain_re_diff_norm_le
 # `cartWord_swapChain_re_diff_norm_le` by the pinch body (PR-3.3b).  Zero-referenced until consumed.
 # RE-EVALUATE/DELIST when consumed by PR-3.3b.
 ofFn_swapChain_groupedFin3
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-3.3b-β,
+# `Math/Combinatorics/MultinomialFiber.lean`. The purely combinatorial multinomial fiber count:
+# the number of words `List.ofFn f` (`f : Fin n → ι`) realising a prescribed letter-count vector
+# `k` (with `∑ k = n`) equals `Nat.multinomial univ k`.  Generalises the `Bool`
+# `card_ofFn_count_true_eq`; fed into the `doubleFactorial → 1/(M+1)` per-configuration matching by
+# the pinch body (PR-3.3b).  Zero-referenced until consumed.
+# RE-EVALUATE/DELIST when consumed by PR-3.3b.
+card_ofFn_count_eq
