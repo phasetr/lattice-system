@@ -10369,6 +10369,31 @@ in Proposition 4.10).  Being purely analytic, it is \emph{proved axiom-free}
 and the step index $m(L)=\texttt{Nat.findGreatest}$), with no operators or physics.  Chapters~3--10
 backfill.
 
+\noindent\textbf{Scalar sphere monomial moments} (Tasaki §4.2.2, eq.~(4.2.58), p.~108;
+\textbf{proved axiom-free}, \texttt{Math/SphereMoment.lean}, Issue \#4974, PR \#5012).
+The spherical (Dirichlet)
+monomial integral $\int_{S^2} \prod_i n_i^{k_i} d\sigma(n)$ on the unit sphere $S^2 \subset
+\mathbb{R}^3$ with rotation-invariant surface measure $\sigma = \texttt{volume.toSphere}$ (total
+mass $4\pi$). For any exponent tuple $k \in \mathbb{N}^3$ and total degree $M = \sum_i k_i$:
+\begin{align*}
+  \int_{S^2} \prod_i n_i^{k_i} d\sigma(n) = \begin{cases}
+    0 & \text{if some } k_i \text{ is odd,} \\
+    4\pi \cdot \frac{\prod_i (k_i - 1)!!}{(M + 1)!!} & \text{if all } k_i \text{ are even,}
+  \end{cases}
+\end{align*}
+where $!!$ denotes the double factorial (\texttt{Nat.doubleFactorial}). This identity (attributed
+in Tasaki to ``(4.40) of [66]'' Koma--Tasaki) is the scalar substrate consumed by the operator
+polynomial expansion of Proposition 4.10's sphere-average argument (the operator version appears in
+eq.~(4.2.59)); the double-factorial closed form is load-bearing: the ratio
+$(M-1)!! / (M+1)!! = 1/(M+1)$ produces the $1/(M+1)$ coefficient of eq.~(4.2.58).  Proof: via
+the isotropic Gaussian integral $\int_{\mathbb{R}^3} (\prod_i x_i^{k_i}) e^{-\|x\|^2/2} dx$
+evaluated in two ways --- Cartesian factorisation over axes (yielding $\prod_i
+\texttt{gaussFullMoment}(k_i)$) and polar decomposition into sphere moment times radial Gaussian
+(yielding the sphere integral times $\texttt{gaussHalfMoment}(M+2)$). Equating these and solving
+for the sphere moment: odd cases vanish via the antisymmetry of $\texttt{gaussFullMoment}$ at odd
+indices; even cases yield the closed form via the known closed values of Gaussian half-moments at
+even indices. Chapters~3--10 backfill.
+
 \noindent\textbf{Definition 4.17} (Tasaki §4.3.1, eqs.~(4.3.1)--(4.3.4), pp.~112--113;
 \texttt{Quantum/SpinS/InfiniteVolumeGroundState.lean}, Issue \#4485).  Ground state of the
 \emph{infinite-volume} antiferromagnetic Heisenberg model on $\mathbb{Z}^d$.  The
