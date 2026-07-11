@@ -316,3 +316,10 @@ cartWord_ofFn
 cartWord_swap_diff_eq
 totalSpinSOp2_commutator_staggeredOrderOp1S
 totalSpinSOp2_commutator_staggeredOrderOpS
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-3.2b-i,
+# `Quantum/SpinS/AndersonTowerLeviCivita.lean`. Uniform single-letter total×order rotation
+# commutator `[Ŝ^{(γ)}_tot, ô^{(β)}] = i Σ_δ ε_{γβδ} ô^{(δ)}`, merging the six off-diagonal and
+# three diagonal commutators via the `leviCivita3` scalar. Zero-referenced until PR-3.2b-ii
+# (operator swap-band telescoping) consumes it. RE-EVALUATE/DELIST when consumed by PR-3.2b-ii.
+totalSpinSOpVec_commutator_stagOpVec
