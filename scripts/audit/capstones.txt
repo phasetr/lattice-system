@@ -311,10 +311,13 @@ staggeredOrderOpS_commutator_staggeredOrderOp1S
 # `totalSpinSOpVec_commutator_stagOpVec`, are now consumed by PR-3.2b-ii and were delisted.)
 cartWord_ofFn
 
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-3.2b-ii,
-# `Quantum/SpinS/AndersonTowerTelescoping.lean`. The single-swap expectation identity
-# `⟨Φ, ô^{pre α β suf} Φ⟩ − ⟨Φ, ô^{pre β α suf} Φ⟩ = Σ_γ Σ_k Σ_δ (i ε_{αβγ})(i ε_{γ suf_k δ})
-# ⟨Φ, ô^{pre ++ suf[k ↦ δ]} Φ⟩`, the Cartesian analogue of the `Bool` eigenvalue telescoping.
-# Zero-referenced until the swap-band `.re` band / `O(1/V)` estimate (PR-3.3) consumes it.
-# RE-EVALUATE/DELIST when consumed by PR-3.3.
-cartWord_swap_dotProduct_eq
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-3.3a,
+# `Quantum/SpinS/AndersonTowerCartWordReBand.lean`. The concrete `ordered → grouped` real band
+# `|⟨Φ, ô^{w} Φ⟩.re − ⟨Φ, ô^{w'} Φ⟩.re| ≤ k · 9n · (V·N)^{n−2} · ⟨Φ, Φ⟩.re` for a swap chain,
+# the Cartesian analogue of the `Bool` `swapChain_re_diff_le` (Theorem 4.9) with a self-contained
+# operator-norm scale.  Zero-referenced until the main-part identification and the
+# `doubleFactorial → 1/(M+1)` reconstruction (PR-3.3b) consume it.
+# RE-EVALUATE/DELIST when consumed by PR-3.3b.
+# (The PR-3.2b-ii single-swap expectation identity `cartWord_swap_dotProduct_eq` is now consumed
+# by PR-3.3a `cartWord_swap_re_diff_le` and was delisted.)
+cartWord_swapChain_re_diff_norm_le

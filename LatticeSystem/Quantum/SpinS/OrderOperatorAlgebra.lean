@@ -451,23 +451,27 @@ The rearrangement counting for Lemma 4.14 uses only adjacent transpositions of b
 permutation-group or sorting theory): a length-indexed `SwapChain`, the `bringToFront` move, and the
 diameter bound `swapDist ≤ (#true)·(#false)`. -/
 
-/-- A single **adjacent transposition** of two neighbouring letters in a binary word (the letters
-may be equal — the trivial swap is allowed and costs nothing). -/
-def AdjSwap (w w' : List Bool) : Prop :=
-  ∃ (pre suf : List Bool) (a b : Bool), w = pre ++ a :: b :: suf ∧ w' = pre ++ b :: a :: suf
+/-- A single **adjacent transposition** of two neighbouring letters in a word (the letters
+may be equal — the trivial swap is allowed and costs nothing).  Stated over an arbitrary letter
+alphabet `α` so that both the `Bool` ladder words (Theorem 4.6) and the `Fin 3` Cartesian order
+words (Proposition 4.10, `cartWord`) share the same swap-chain machinery. -/
+def AdjSwap {α : Type*} (w w' : List α) : Prop :=
+  ∃ (pre suf : List α) (a b : α), w = pre ++ a :: b :: suf ∧ w' = pre ++ b :: a :: suf
 
 /-- An adjacent transposition preserves length. -/
-theorem AdjSwap.length_eq {w w' : List Bool} (h : AdjSwap w w') : w.length = w'.length := by
+theorem AdjSwap.length_eq {α : Type*} {w w' : List α} (h : AdjSwap w w') :
+    w.length = w'.length := by
   obtain ⟨pre, suf, a, b, rfl, rfl⟩ := h; simp [List.length_append]
 
-/-- A **length-`k` chain** of adjacent transpositions connecting `w` to `w'`. -/
-inductive SwapChain : ℕ → List Bool → List Bool → Prop
-  | refl (w : List Bool) : SwapChain 0 w w
-  | step {k : ℕ} {w w' w'' : List Bool} :
+/-- A **length-`k` chain** of adjacent transpositions connecting `w` to `w'`, over an arbitrary
+letter alphabet `α`. -/
+inductive SwapChain {α : Type*} : ℕ → List α → List α → Prop
+  | refl (w : List α) : SwapChain 0 w w
+  | step {k : ℕ} {w w' w'' : List α} :
       AdjSwap w w' → SwapChain k w' w'' → SwapChain (k + 1) w w''
 
 /-- Concatenation of swap chains. -/
-theorem SwapChain.trans {j k : ℕ} {w w' w'' : List Bool} :
+theorem SwapChain.trans {α : Type*} {j k : ℕ} {w w' w'' : List α} :
     SwapChain j w w' → SwapChain k w' w'' → SwapChain (j + k) w w'' := by
   intro h1 h2
   induction h1 with
@@ -475,7 +479,7 @@ theorem SwapChain.trans {j k : ℕ} {w w' w'' : List Bool} :
   | step hs _ ih => exact (Nat.succ_add _ _ ▸ SwapChain.step hs (ih h2))
 
 /-- Prefixing a fixed letter to both endpoints preserves a swap chain (and its length). -/
-theorem SwapChain.cons {k : ℕ} {w w' : List Bool} (a : Bool) (h : SwapChain k w w') :
+theorem SwapChain.cons {α : Type*} {k : ℕ} {w w' : List α} (a : α) (h : SwapChain k w w') :
     SwapChain k (a :: w) (a :: w') := by
   induction h with
   | refl => exact SwapChain.refl _
@@ -484,7 +488,7 @@ theorem SwapChain.cons {k : ℕ} {w w' : List Bool} (a : Bool) (h : SwapChain k 
     exact SwapChain.step ⟨a :: pre, suf, x, y, by simp, by simp⟩ ih
 
 /-- A swap chain preserves length. -/
-theorem SwapChain.length_eq {k : ℕ} {w w' : List Bool} (h : SwapChain k w w') :
+theorem SwapChain.length_eq {α : Type*} {k : ℕ} {w w' : List α} (h : SwapChain k w w') :
     w.length = w'.length := by
   induction h with
   | refl => rfl
