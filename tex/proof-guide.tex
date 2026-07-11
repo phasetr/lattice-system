@@ -10419,6 +10419,35 @@ directly into the infinite-volume averaging argument of Proposition 4.10, provid
 scalar-substrate link between finite microscopic calculations and the macroscopic phase
 structure. Chapters~3--10 backfill.
 
+\noindent\textbf{Squared order operator and transverse/longitudinal split} (Tasaki
+§4.2.2, eq.~(4.2.31), p.~108; \textbf{proved axiom-free},
+\texttt{Quantum/SpinS/AndersonTowerOrderSq.lean}, Issue \#4974, PR \#5014).
+The rotationally invariant squared order operator
+$\hat o^2 = \sum_\alpha (\hat o^{(\alpha)})^2$ ({\texttt{orderSqOp}}) is the sum of squared
+staggered axis operators over the three Cartesian spin axes. Its $(M/2)$-th power
+$(\hat o^2)^{M/2}$ carries the leading contribution to the solid-angle average
+$\int_{S^2} (\hat O_L^n)^M d\sigma(n)$ after the ordered operator product is contracted
+via axis commutators. \textbf{Transverse/longitudinal decomposition} (Tasaki eq.~(4.2.31),
+p.~108; {\texttt{orderSqOp\_eq\_smul\_staggeredPhatS\_add\_sq}}): on the hypercubic torus,
+\begin{equation*}
+  \hat o^2 = V^2 \cdot \hat p + (\hat o^{(3)})^2,
+\end{equation*}
+where $V = L^d$ is the volume, $\hat p = \texttt{staggeredPhatS}$ is the $U(1)$-symmetric
+order operator carrying the transverse part $(\hat o^{(1)})^2 + (\hat o^{(2)})^2$, and
+$(\hat o^{(3)})^2$ is the longitudinal part. The factor $V^2$ undoes the per-volume
+normalization built into $\hat p$, allowing the transverse contribution to be handled through
+the existing Theorem 4.9 $\hat p$-moment machinery and the commutator hierarchy. The
+\textbf{singlet closure property} (Tasaki §4.2.2, p.~108;
+{\texttt{totalSpinSOp2\_mulVec\_eq\_zero\_of\_singlet}}):
+if a state $\Phi$ is annihilated by the total-spin $3$-axis and $1$-axis generators
+($\hat S_{\mathrm{tot}}^{(3)} \Phi = 0$, $\hat S_{\mathrm{tot}}^{(1)} \Phi = 0$), then it is
+automatically annihilated by the $2$-axis generator ($\hat S_{\mathrm{tot}}^{(2)} \Phi = 0$)
+via the SU(2) commutator identity $\hat S_{\mathrm{tot}}^{(2)} = -i[\hat S_{\mathrm{tot}}^{(3)},
+\hat S_{\mathrm{tot}}^{(1)}]$. Thus a total-$\hat S^{(3)}$/$\hat S^{(1)}$-singlet is a full
+total-spin singlet, so all three Cartesian generators can be pushed through the later
+commutator-contraction words in the Proposition 4.10 sphere-average argument. Chapters~3--10
+backfill.
+
 \noindent\textbf{Definition 4.17} (Tasaki §4.3.1, eqs.~(4.3.1)--(4.3.4), pp.~112--113;
 \texttt{Quantum/SpinS/InfiniteVolumeGroundState.lean}, Issue \#4485).  Ground state of the
 \emph{infinite-volume} antiferromagnetic Heisenberg model on $\mathbb{Z}^d$.  The
