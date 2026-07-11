@@ -9266,8 +9266,10 @@ graphs, e.g.\ with vanishing coupling), and its proof rests on reflection positi
 framework is in place (infinite-volume systems are in scope --- a deferral pending infrastructure,
 not an exclusion).  Chapters~3--10 backfill.
 
-\noindent\textbf{Theorem 4.2} (Shastry, Tasaki §4.1, eqs.~(4.1.9)--(4.1.10), pp.~76--77; documented
-axiom, \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  Absence of spontaneous symmetry
+\noindent\textbf{Theorem 4.2} (Shastry, Tasaki §4.1, eqs.~(4.1.9)--(4.1.10), pp.~76--77; \textbf{cite-only}
+\textbf{documented axiom}, \texttt{Quantum/SpinS/ShastryNoSSB.lean}, Issue \#4485).  \textbf{Tasaki
+§4.1 footnote 3 explicitly states ``We do not prove Theorem 4.2 in the present book'' and refers to
+Shastry [58] (J.~Phys.~A 25:~L249, 1992) and Tanaka--Takeda--Idogaki [63] (J.~Magn.~Magn.~Mater.~272--276:~908, 2004); hence Theorem 4.2 is a documented axiom.}  Absence of spontaneous symmetry
 breaking in one dimension: for the 1D spin-$S$ antiferromagnetic Heisenberg ring under a staggered
 field $\hat H_h=\sum_x\hat S_x\cdot\hat S_{x+1}-h\,\hat O_L^{(3)}$ (eq.~(4.1.9)), the per-site
 staggered order parameter of any normalized ground state vanishes in the iterated limit
@@ -9276,9 +9278,9 @@ $\lim_{h\downarrow0}\lim_{L\uparrow\infty}\langle\Phi_{\mathrm{GS},h}|\hat O_L^{
 (\texttt{ringCoupling}), the staggered sublattice (\texttt{ringStaggeredSublattice}), and the
 staggered-field chain Hamiltonian (\texttt{staggeredFieldChainHamiltonianS}), and record
 \texttt{shastry\_no\_symmetry\_breaking\_1d} as the iterated limit in explicit $\varepsilon$--$\delta$
-form over normalized energy-minimizing ground states (so the per-site bound is scale-invariant).
-Tasaki states Theorem 4.2 without proof (Shastry's argument [58], rigorously formulated in [63]); the
-deep argument is being formalized as a dedicated \emph{reflection-positivity infrastructure} project
+form over normalized energy-minimizing ground states (so the per-site bound is scale-invariant).  We
+record it as a faithful documented axiom over the concrete ring family; the deep infinite-volume
+argument is being formalized as a dedicated \emph{reflection-positivity infrastructure} project
 (Issue \#4777).  The first layer establishes the even-ring \emph{bond reflection}
 $r(x) = 2n-1-x$ (\texttt{RingBondReflection.lean}: involutive, swapping the two halves, flipping the
 staggered sign) and the induced \emph{reflection map} $\theta(A)_{\sigma\tau} =
