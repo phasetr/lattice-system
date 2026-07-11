@@ -262,3 +262,10 @@ ringBondSquareFieldPartitionRe_uniform_bound
 # Zero-referenced until PR-χ3 (Green-function susceptibility bound via Shastry propagator) consumes it.
 # RE-EVALUATE/DELIST when consumed by PR-χ3.
 ringBondSquareField_susceptibility_sum_rule
+
+# Tasaki §4.1 Corollary 4.3 (absence of long-range order in 1D), `NoLongRangeOrder1D.lean`, PR #5003.
+# Zero-referenced public book capstone: `lim_{L↑∞} ⟨Φ_GS|(Ô_L^(3)/L)²|Φ_GS⟩ = 0` (eq. (4.1.11)),
+# discharged from an axiom into a theorem via the documented Shastry susceptibility axiom
+# `shastry_staggered_susceptibility_bound` fed into `no_long_range_order_1d_of_susceptibility`.
+# Only referenced (as a comment) by AndersonTower.lean; a terminal book corollary, legitimately ref-0.
+no_long_range_order_1d
