@@ -10502,6 +10502,14 @@ directly into the infinite-volume averaging argument of Proposition 4.10, provid
 scalar-substrate link between finite microscopic calculations and the macroscopic phase
 structure. Chapters~3--10 backfill.
 
+\noindent\textbf{Sphere-average normalisation reduction} (Tasaki §4.2.2, eqs.~(4.2.57)--(4.2.61),
+pp.~108--109; \textbf{PROVED axiom-free}, \texttt{Quantum/SpinS/AndersonTowerSphereReduce.lean},
+Issue \#4974, PR \#5037). For a total-spin singlet $\Phi$ (annihilated by $\hat S^{(3)}_{\mathrm{tot}}$ and $\hat S^{(1)}_{\mathrm{tot}}$), the normalised solid-angle average of the direction symmetry-breaking states equals the normalisation of the single even-power sphere integral applied to $\Phi$:
+\[
+\mathrm{unitNormalize}(\Xi_{\mathrm{avg}}) = \mathrm{unitNormalize}\left(\left(\int_{S^2} (\hat O_L^n)^{2j} d\sigma(n)\right) \Phi\right),
+\]
+where $2j = \begin{cases} M & \text{if } M \text{ is even} \\ M+1 & \text{if } M \text{ is odd} \end{cases}$. The odd one of the two adjacent powers $\{M, M+1\}$ integrates to the zero operator; the even one survives with a fixed positive-real normalisation constant that $\mathrm{unitNormalize}$ absorbs. This is the tip consumed by the vector-remainder bridge (PR-6b) and final assembly (PR-6c). Chapters~3--10 backfill.
+
 \noindent\textbf{Squared order operator and transverse/longitudinal split} (Tasaki
 §4.2.2, eq.~(4.2.31), p.~108; \textbf{proved axiom-free},
 \texttt{Quantum/SpinS/AndersonTowerOrderSq.lean}, Issue \#4974, PR \#5014).

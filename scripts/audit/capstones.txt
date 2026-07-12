@@ -368,3 +368,15 @@ orderSqMoment_geom_tendsto
 # Conjecture 4.12 (never asserted).  Zero-referenced until the sphere-average assembly (PR-6) consumes
 # it via the diagonal extraction (Lemma 4.16).  RE-EVALUATE/DELIST when consumed by PR-6.
 orderSq_collapse_ratio_tendsto_one
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-6a,
+# `Quantum/SpinS/AndersonTowerSphereReduce.lean`.  Normalisation reduction of the solid-angle
+# average: `unitNormalize(Ξ_avg) = unitNormalize((∫_{S²} (Ô_L^n)^{2j} dσ(n)) Φ)` with
+# `2j = if Even M then M else M+1`, for a total-spin singlet `Φ`.  The odd one of the adjacent
+# powers `{M, M+1}` integrates to the zero operator (`sphereMonomialMoment` odd case); the even one
+# survives with a fixed positive-real normalisation constant absorbed by `unitNormalize` (degenerate
+# `c=0` handled internally, no positivity hypothesis).  Consumes L4b-iii norm isotropy and the L3
+# Bochner–`mulVec` interchange (Tasaki §4.2.2, eqs. (4.2.57)–(4.2.61), p. 108–109).  Zero-referenced
+# until the vector-remainder bridge (PR-6b) and arc capstone (PR-6c) consume it.  RE-EVALUATE/DELIST
+# when consumed by PR-6c (arc capstone).
+solidAngleAverageTanaka_unitNormalize_eq_orderPow
