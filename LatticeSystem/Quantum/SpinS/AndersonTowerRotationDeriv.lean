@@ -110,21 +110,23 @@ theorem rotationPath_coord_hasDerivAt (γ : Fin 3) (n : EuclideanSpace ℝ (Fin 
     HasDerivAt (fun t : ℝ => ((rotationPath γ n t δ : ℝ) : ℂ))
       (∑ β : Fin 3, leviCivita3 γ β δ * ((rotationPath γ n θ β : ℝ) : ℂ)) θ := by
   fin_cases γ <;> fin_cases δ <;>
-    simp only [rotationPath_apply, rotationCoords, Fin.sum_univ_three, leviCivita3]
+    simp only [rotationPath_apply, rotationCoords, Fin.sum_univ_three, leviCivita3,
+      Fin.reduceFinMk, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+      Matrix.cons_val_two, Matrix.tail_cons]
   · simpa using hasDerivAt_const θ ((n 0 : ℝ) : ℂ)
   · convert (hasDerivAt_realCosSin (n 1) (-(n 2)) θ).ofReal_comp using 1
-    push_cast; ring
+    simp only [Complex.ofReal_add, Complex.ofReal_mul, Complex.ofReal_neg]; ring
   · convert (hasDerivAt_realCosSin (n 2) (n 1) θ).ofReal_comp using 1
-    push_cast; ring
+    simp only [Complex.ofReal_add, Complex.ofReal_mul, Complex.ofReal_neg]; ring
   · convert (hasDerivAt_realCosSin (n 0) (n 2) θ).ofReal_comp using 1
-    push_cast; ring
+    simp only [Complex.ofReal_add, Complex.ofReal_mul, Complex.ofReal_neg]; ring
   · simpa using hasDerivAt_const θ ((n 1 : ℝ) : ℂ)
   · convert (hasDerivAt_realCosSin (n 2) (-(n 0)) θ).ofReal_comp using 1
-    push_cast; ring
+    simp only [Complex.ofReal_add, Complex.ofReal_mul, Complex.ofReal_neg]; ring
   · convert (hasDerivAt_realCosSin (n 0) (-(n 1)) θ).ofReal_comp using 1
-    push_cast; ring
+    simp only [Complex.ofReal_add, Complex.ofReal_mul, Complex.ofReal_neg]; ring
   · convert (hasDerivAt_realCosSin (n 1) (n 0) θ).ofReal_comp using 1
-    push_cast; ring
+    simp only [Complex.ofReal_add, Complex.ofReal_mul, Complex.ofReal_neg]; ring
   · simpa using hasDerivAt_const θ ((n 2 : ℝ) : ℂ)
 
 /-! ### Index bridges: `ofFn`/`set`/`update` and the reindexed master Ward -/
