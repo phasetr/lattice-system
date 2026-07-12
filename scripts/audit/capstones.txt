@@ -320,3 +320,12 @@ sphereAverage_orderSqMoment_relative_close
 # (Tasaki §4.2.2, eqs. (4.2.57)–(4.2.58), p. 108).  Zero-referenced until the collapse
 # identification (L5) consumes it. RE-EVALUATE/DELIST when consumed.
 orderSqOp_expectation_eq_three_mul_axis3
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) L3,
+# `Quantum/SpinS/AndersonTowerSphereMoment.lean`. The Bochner–`mulVec` interchange
+# `∫ ((Ô_L^n)^k Φ) dσ = (∫ (Ô_L^n)^k dσ) Φ`: right multiplication by the fixed tower vector `Φ`
+# (a finite-dimensional, hence continuous, ℂ-linear map on operators) commutes with the sphere
+# Bochner integral via `ContinuousLinearMap.integral_comp_comm` (Tasaki §4.2.2, eq. (4.2.59),
+# p. 108).  Zero-referenced until the vector assembly (PR-6) linearizes the operator expansion
+# onto `Φ`. RE-EVALUATE/DELIST when consumed.
+sphereAverage_directionStaggeredOp_pow_mulVec
