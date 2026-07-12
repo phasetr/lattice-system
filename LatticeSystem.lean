@@ -129,6 +129,7 @@ import LatticeSystem.Quantum.SpinS.AndersonTowerField
 import LatticeSystem.Quantum.SpinS.AndersonTowerSphereAverage
 import LatticeSystem.Quantum.SpinS.AndersonTowerSphereMoment
 import LatticeSystem.Quantum.SpinS.AndersonTowerOrderSq
+import LatticeSystem.Quantum.SpinS.AndersonTowerOrderSqIsotropy
 import LatticeSystem.Quantum.SpinS.AndersonTowerOrderSqMoment
 import LatticeSystem.Quantum.SpinS.AndersonTowerCartWord
 import LatticeSystem.Quantum.SpinS.AndersonTowerLeviCivita

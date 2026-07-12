@@ -312,3 +312,11 @@ staggeredOrderOpS_commutator_staggeredOrderOp1S
 # (The PR-3.3b pinch tip `cartWord_sphereAverage_pinch` and the PR-4a `ô²`-moment lower bound
 # `orderSqMoment_ge` are now consumed by this relative-close estimate and were delisted.)
 sphereAverage_orderSqMoment_relative_close
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR L4a,
+# `Quantum/SpinS/AndersonTowerOrderSqIsotropy.lean`. The factor-3 diagonal isotropy
+# `⟨Φ, ô² Φ⟩ = 3 · ⟨Φ, (ô^{(3)})² Φ⟩` for a total-spin singlet `Φ` (Ŝ³_tot Φ = Ŝ¹_tot Φ = 0),
+# chaining the singlet component equalities eq_12/eq_23 through the Fin 3 expansion of orderSqOp
+# (Tasaki §4.2.2, eqs. (4.2.57)–(4.2.58), p. 108).  Zero-referenced until the collapse
+# identification (L5) consumes it. RE-EVALUATE/DELIST when consumed.
+orderSqOp_expectation_eq_three_mul_axis3
