@@ -302,22 +302,13 @@ staggeredOrderOp1S_commutator_staggeredOrderOp2S
 staggeredOrderOp2S_commutator_staggeredOrderOpS
 staggeredOrderOpS_commutator_staggeredOrderOp1S
 
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-3.3b,
-# `Quantum/SpinS/AndersonTowerPinch.lean`. The pinch scalar band identity
-# `|⟨Φ, (∫ (Ô_L^n)^{2m} dσ) Φ⟩.re − (4π/(2m+1)) ⟨Φ, (ô²)^m Φ⟩.re| ≤ cartPinchPoly m · (V·N)^{2m−2} ·
-# ⟨Φ, Φ⟩.re`: the sphere average expressed as the rotationally invariant main part up to an
-# `O((V·N)^{2m−2})` remainder (Tasaki §4.2.2, eqs. (4.2.58)/(4.2.59), p. 108).  Zero-referenced
-# until the ratio-limit collapse (PR-4/PR-5) consumes it. RE-EVALUATE/DELIST when consumed.
-# (The PR-3.2a `cartWord_ofFn`, the PR-3.3a band tip `cartWord_swapChain_re_diff_norm_le`, the
-# PR-3.3b-α grouped-normal-form generator `ofFn_swapChain_groupedFin3`, the PR-3.3b-β/γ combinatorial
-# tips `card_ofFn_count_eq` / `count_ofFn_eq_card_filter` / `two_mul_factorial_eq` and the PR-3.3b-γ
-# coefficient match `pinch_coeff_match` are now consumed by this pinch body and were delisted.)
-cartWord_sphereAverage_pinch
-
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-4a,
-# `Quantum/SpinS/AndersonTowerOrderSqMoment.lean`. The `ô²`-moment lower bound
-# `R_m ≥ (q₀ · (L^d)²)^m · R_0` (`R_k = ⟨Φ, (ô²)^k Φ⟩`), obtained by telescoping the moment
-# log-convexity from the base ratio bound `R_1 ≥ q₀ (L^d)² R_0` under the long-range-order
-# hypothesis (Tasaki §4.2.2, eqs. (4.2.36)/(4.2.37), pp. 105–108).  Zero-referenced until the
-# sphere-average relative-close estimate (PR-4b) consumes it. RE-EVALUATE/DELIST when consumed.
-orderSqMoment_ge
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-4b,
+# `Quantum/SpinS/AndersonTowerSphereMomentRatio.lean`. The sphere-average relative-close estimate
+# `|⟨Φ, (∫ (Ô_L^n)^{2m} dσ) Φ⟩.re − (4π/(2m+1)) R_m| ≤ (cartPinchPoly m · N^{2m−2} / (q₀^m · V²)) · R_m`
+# (`R_m = ⟨Φ, (ô²)^m Φ⟩.re`, `V = L^d`): the pinch absolute remainder divided by the `ô²`-moment
+# lower bound, cancelling the volume exponent `V^{2m−2}/V^{2m} = 1/V²` into a relative `O(1/V²)` error
+# (Tasaki §4.2.2, eqs. (4.2.58)/(4.2.59), p. 108).  Zero-referenced until the ratio-limit collapse
+# (PR-5) consumes it. RE-EVALUATE/DELIST when consumed.
+# (The PR-3.3b pinch tip `cartWord_sphereAverage_pinch` and the PR-4a `ô²`-moment lower bound
+# `orderSqMoment_ge` are now consumed by this relative-close estimate and were delisted.)
+sphereAverage_orderSqMoment_relative_close
