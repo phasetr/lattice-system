@@ -10298,6 +10298,30 @@ coefficients (eqs.~(4.2.58)--(4.2.59) RHS), with the pinch-coefficient arithmeti
 reconciling the doubled-count multinomial, odd double-factorial sphere moment, and plain multinomial
 via universal factor $4\pi/(2M+1)$.
 
+\medskip\noindent\textbf{Pinch capstone scalar band identity of Proposition 4.10}
+(Tasaki §4.2.2, eqs.~(4.2.58)--(4.2.59), p.~108; \textbf{PROVED axiom-free}, Issue \#4974, PR
+\#5025; \texttt{Quantum/SpinS/AndersonTowerPinch.lean}). The final theorem \texttt{cartWord\_sphereAverage\_pinch}
+realizes the main-part identification and error bound of Proposition 4.10: for a total-spin singlet
+$\Phi$ (annihilated by $\hat S^{(3)}_{\mathrm{tot}}$ and $\hat S^{(1)}_{\mathrm{tot}}$), the real
+expectation of the $2m$-th sphere average of the direction order operator equals the rotationally
+invariant main part up to an $O((V \cdot N)^{2m-2})$ error:
+\[
+\left|\left\langle\Phi,\left(\int_{S^2}\left(\hat O_L^n\right)^{2m}d\sigma\right)\Phi\right\rangle_{\mathrm{re}}
+-\frac{4\pi}{2m+1}\left\langle\Phi,(\hat o^2)^m\Phi\right\rangle_{\mathrm{re}}\right|
+\le C_m \cdot(V \cdot N)^{2m-2}\cdot\left\langle\Phi,\Phi\right\rangle_{\mathrm{re}},
+\]
+where $C_m = \texttt{cartPinchPoly}\ m$ bundles the sphere-moment weight, the $4\pi/(2m+1)$ factor, and the
+swap-chain diameter scales. The proof routes through five stages: \textbf{(1)} ordered-configuration
+expectations (weighted by the sphere monomial moments; eq.~(4.2.59) LHS) are contracted to grouped
+normal form via the real band of PR-3.3a (\texttt{cartWord\_swapChain\_re\_diff\_norm\_le}); \textbf{(2)}
+squared-configuration expectations (via the square-word identity $(\hat o^2)^m = \sum_g \hat o^{\text{sqWord } g}$,
+\texttt{orderSqOp\_pow\_eq\_sum\_cartWord}) are contracted by the same band; \textbf{(3)} main parts are
+equated through the grouped-normal-form multinomial match (\texttt{pinch\_coeff\_match}, PR-3.3b-$\gamma$,
+eqs.~(4.2.58)--(4.2.59) RHS); \textbf{(4)} the remainder is aggregated from the self-contained
+operator-norm band; \textbf{(5)} singlet property ($\hat S_{\mathrm{tot}}|\Phi\rangle=0$) enables
+boundary erasure of the commutator sum. The moment identification in the identity (eqs.~(4.2.58)--(4.2.59))
+and Conjecture~4.12's ratio-limit lower bound are deferred to later steps (PR-4/PR-5).
+
 \noindent\textbf{Theorem 4.11} (Koma--Tasaki, Tasaki §4.2.1, eq.~(4.2.23), p.~101; documented axiom,
 \texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The two order parameters satisfy
 $\sqrt{3q_0}\le m^\ast$, where the factor $\sqrt3$ reflects the $SU(2)$ symmetry of the Heisenberg
