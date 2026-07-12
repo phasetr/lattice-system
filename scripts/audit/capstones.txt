@@ -349,23 +349,22 @@ orderSq_collapse_vecNormSqRe
 # consumes it as the per-direction normalisation constant `c_M`. RE-EVALUATE/DELIST when consumed.
 directionTanakaTowerTerm_vecNormSqRe_indep
 
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) L5-b-i,
-# `Quantum/SpinS/AndersonTowerOrderSqBaseRatio.lean`. The base `ô²`-moment ratio limit
-# `lim_L R_1/(R_0·V²) = (m∗)²` for a total-spin-singlet ground-state family, from factor-3 diagonal
-# isotropy `R_1 = 3·⟨(ô^{(3)})²⟩`, the axis-3 long-range-order limit `⟨(ô^{(3)})²⟩/(‖Φ‖²V²) → q∗`, and
-# Conjecture 4.12 `(m∗)² = 3 q∗` (explicit hypothesis, never asserted).  Concentration-independent
-# and independent of Theorem 4.9 `m∗ = √q₀` (Tasaki §4.2.2, eqs. (4.2.25)–(4.2.26), (4.2.57)–(4.2.59),
-# p. 108–109).  Zero-referenced until the geometric moment squeeze (L5-b-iii) consumes it as the
-# base of the geometric lower bound.  RE-EVALUATE/DELIST when consumed.
-orderSqMoment_baseRatio_tendsto
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) L5-b-iii,
+# `Quantum/SpinS/AndersonTowerOrderSqGeom.lean`.  The fixed-`n` geometric moment limit
+# `lim_L R_n/(R_0·V^{2n}) = (m∗)^{2n}` for a total-spin-singlet ground-state family, a squeeze of the
+# log-convex lower bound `s_0^n ≤ R_n/(R_0·V^{2n})` (`orderSqMoment_geom_lower`, driven to `(m∗)^{2n}`
+# by the base ratio limit `orderSqMoment_baseRatio_tendsto`) against the concentration upper bound
+# `orderSqMoment_ratio_le_mStarSq` telescoped through `T_{n+1} = s_n·T_n` (Tasaki §4.2.2,
+# eqs. (4.2.37), (4.2.57)–(4.2.61), p. 105–108).  Conditional on Conjecture 4.12 (never asserted).
+# Zero-referenced standalone milestone tip until consumed downstream.  RE-EVALUATE/DELIST when consumed.
+orderSqMoment_geom_tendsto
 
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) L5-b-ii DOCUMENTED AXIOM,
-# `Quantum/SpinS/AndersonTowerOrderSqConcentration.lean`.  The ground-state `ô²`-moment concentration
-# upper bound `∀ n, ∀ ε>0, eventually_L  R_{n+1}/(R_n·V²) < (m∗)² + ε` (the `limsup`-upper direction
-# of `lim_n lim_L R_{n+1}/(R_n·V²) = (m∗)²`).  Tasaki states the analogous `p̂` concentration only by
-# citing Koma–Tasaki [66] ("elementary, proof omitted", eq. (4.2.40)) and instructs to *repeat the
-# `p̂` argument* for the `ô²` field (eqs. (4.2.59)–(4.2.61)); recorded as a documented axiom with
-# parity to the `p̂`-side mirror `mStar_eq_phat_ratio_limit` per the 2026-07-12 no-overreach boundary,
-# conditional on Conjecture 4.12 (never asserted).  Zero-referenced until the geometric moment squeeze
-# (L5-b-iii) consumes it as the per-ratio upper bound.  RE-EVALUATE/DELIST when consumed by L5-b-iii.
-orderSqMoment_ratio_le_mStarSq
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) L5-b-iii collapse tip,
+# `Quantum/SpinS/AndersonTowerOrderSqGeom.lean`.  The moment collapse ratio `R_j/(√R_{2j}·√R_0) → 1`
+# for a total-spin-singlet ground-state family (so the L5-a collapse identity
+# `orderSq_collapse_vecNormSqRe = 2(1 − R_j/(√R_{2j}√R_0))` tends to `0`).  Scale invariance
+# `R_j/(√R_{2j}√R_0) = T_j/√T_{2j} → (m∗)^{2j}/√((m∗)^{4j}) = 1` (`m∗ > 0`), from the fixed-`n`
+# geometric moment limit at `n = j, 2j` (Tasaki §4.2.2, eq. (4.2.60), p. 108).  Conditional on
+# Conjecture 4.12 (never asserted).  Zero-referenced until the sphere-average assembly (PR-6) consumes
+# it via the diagonal extraction (Lemma 4.16).  RE-EVALUATE/DELIST when consumed by PR-6.
+orderSq_collapse_ratio_tendsto_one

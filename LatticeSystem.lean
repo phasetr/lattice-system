@@ -134,6 +134,7 @@ import LatticeSystem.Quantum.SpinS.AndersonTowerOrderSqMoment
 import LatticeSystem.Quantum.SpinS.AndersonTowerOrderSqCollapse
 import LatticeSystem.Quantum.SpinS.AndersonTowerOrderSqBaseRatio
 import LatticeSystem.Quantum.SpinS.AndersonTowerOrderSqConcentration
+import LatticeSystem.Quantum.SpinS.AndersonTowerOrderSqGeom
 import LatticeSystem.Quantum.SpinS.AndersonTowerCartWord
 import LatticeSystem.Quantum.SpinS.AndersonTowerLeviCivita
 import LatticeSystem.Quantum.SpinS.AndersonTowerTelescoping
