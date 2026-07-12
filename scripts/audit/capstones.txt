@@ -358,3 +358,14 @@ directionTanakaTowerTerm_vecNormSqRe_indep
 # p. 108–109).  Zero-referenced until the geometric moment squeeze (L5-b-iii) consumes it as the
 # base of the geometric lower bound.  RE-EVALUATE/DELIST when consumed.
 orderSqMoment_baseRatio_tendsto
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) L5-b-ii DOCUMENTED AXIOM,
+# `Quantum/SpinS/AndersonTowerOrderSqConcentration.lean`.  The ground-state `ô²`-moment concentration
+# upper bound `∀ n, ∀ ε>0, eventually_L  R_{n+1}/(R_n·V²) < (m∗)² + ε` (the `limsup`-upper direction
+# of `lim_n lim_L R_{n+1}/(R_n·V²) = (m∗)²`).  Tasaki states the analogous `p̂` concentration only by
+# citing Koma–Tasaki [66] ("elementary, proof omitted", eq. (4.2.40)) and instructs to *repeat the
+# `p̂` argument* for the `ô²` field (eqs. (4.2.59)–(4.2.61)); recorded as a documented axiom with
+# parity to the `p̂`-side mirror `mStar_eq_phat_ratio_limit` per the 2026-07-12 no-overreach boundary,
+# conditional on Conjecture 4.12 (never asserted).  Zero-referenced until the geometric moment squeeze
+# (L5-b-iii) consumes it as the per-ratio upper bound.  RE-EVALUATE/DELIST when consumed by L5-b-iii.
+orderSqMoment_ratio_le_mStarSq
