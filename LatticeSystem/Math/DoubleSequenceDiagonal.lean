@@ -111,4 +111,88 @@ theorem diagonal_tendsto_zero (f : ℕ → ℕ → ℝ) (g : ℕ → ℝ)
       _ < ε / 2 + ε / 2 := by linarith
       _ = ε := by ring
 
+/-- **Capped diagonal extraction from an iterated limit.**  The growth-controlled companion of
+`diagonal_tendsto_zero`: given in addition a cap sequence `κ` with `κ L → ∞`, one can choose the
+diagonal index `m` to satisfy `m L ≤ κ L` for *every* `L` while keeping `m L → ∞` and
+`f L (m L) → 0`.  This lets a downstream consumer impose an explicit growth ceiling on the extracted
+slowly diverging index (used to pin the tower size `M(L) ≤ C₁ L^{d/2}` in Proposition 4.10, where
+the unconstrained `diagonal_tendsto_zero` gives no such bound).  The construction caps Tasaki's
+diagonal
+index, `m L = min (diagIndex (thresholdSeq N) L) (κ L)`; the threshold argument is unchanged since
+`m L ≤ diagIndex (thresholdSeq N) L` still forces `thresholdSeq N (m L) ≤ L`. -/
+theorem diagonal_tendsto_zero_capped (f : ℕ → ℕ → ℝ) (g : ℕ → ℝ) (κ : ℕ → ℕ)
+    (hg : ∀ m, Tendsto (fun L : ℕ => f L m) atTop (𝓝 (g m)))
+    (hg0 : Tendsto g atTop (𝓝 0)) (hκ : Tendsto κ atTop atTop) :
+    ∃ m : ℕ → ℕ, Tendsto m atTop atTop ∧ (∀ L, m L ≤ κ L) ∧
+      Tendsto (fun L : ℕ => f L (m L)) atTop (𝓝 0) := by
+  -- For each `m`, a threshold `N m` past which `f L m` is within `1/(m+1)` of `g m`.
+  have hN : ∀ m : ℕ, ∃ Nm : ℕ, ∀ L : ℕ, Nm ≤ L → |f L m - g m| < 1 / (m + 1 : ℝ) := by
+    intro m
+    obtain ⟨Nm, hNm⟩ := Metric.tendsto_atTop.mp (hg m) (1 / (m + 1 : ℝ)) (by positivity)
+    exact ⟨Nm, fun L hL => by rw [← Real.dist_eq]; exact hNm L hL⟩
+  choose N hNspec using hN
+  -- Strictly increasing thresholds `T` with `T m ≥ N m`.
+  set T : ℕ → ℕ := thresholdSeq N with hTdef
+  have hT_ge_N : ∀ m, N m ≤ T m := by
+    intro m; cases m with
+    | zero => exact le_rfl
+    | succ k => exact le_max_right _ _
+  have hT_strictMono : StrictMono T := by
+    apply strictMono_nat_of_lt_succ
+    intro m
+    exact lt_of_lt_of_le (Nat.lt_succ_self _) (le_max_left _ _)
+  have hT_ge_self : ∀ m, m ≤ T m := by
+    intro m; induction m with
+    | zero => exact Nat.zero_le _
+    | succ k ih =>
+      have : T k < T (k + 1) := hT_strictMono (Nat.lt_succ_self k)
+      omega
+  -- Tasaki's uncapped diagonal index `d0 L`, and the capped index `m L = min (d0 L) (κ L)`.
+  set d0 : ℕ → ℕ := diagIndex T with hd0def
+  set m : ℕ → ℕ := fun L => min (d0 L) (κ L) with hmdef
+  have hTmL : ∀ L, T 0 ≤ L → T (d0 L) ≤ L := by
+    intro L hL
+    change T (Nat.findGreatest (fun k => T k ≤ L) L) ≤ L
+    exact Nat.findGreatest_spec (P := fun k => T k ≤ L) (Nat.zero_le L) hL
+  have hd0_ge : ∀ K L, T K ≤ L → K ≤ d0 L := by
+    intro K L hL
+    change K ≤ Nat.findGreatest (fun k => T k ≤ L) L
+    exact Nat.le_findGreatest (P := fun k => T k ≤ L) (le_trans (hT_ge_self K) hL) hL
+  -- `m L → ∞`: the minimum of two sequences that each diverge to `+∞`.
+  have hmtop : Tendsto m atTop atTop := by
+    rw [tendsto_atTop_atTop]
+    intro K
+    obtain ⟨Lκ, hLκ⟩ := tendsto_atTop_atTop.mp hκ K
+    refine ⟨max (T K) Lκ, fun L hL => ?_⟩
+    have h1 : K ≤ d0 L := hd0_ge K L (le_trans (le_max_left _ _) hL)
+    have h2 : K ≤ κ L := hLκ L (le_trans (le_max_right _ _) hL)
+    exact le_min h1 h2
+  refine ⟨m, hmtop, fun L => min_le_right _ _, ?_⟩
+  -- `f L (m L) → 0`, by the same threshold argument (now `m L ≤ d0 L` forces `T (m L) ≤ L`).
+  rw [Metric.tendsto_atTop]
+  intro ε hε
+  obtain ⟨K₁, hK₁⟩ :=
+    Metric.tendsto_atTop.mp (tendsto_one_div_add_atTop_nhds_zero_nat (𝕜 := ℝ)) (ε / 2)
+      (by positivity)
+  obtain ⟨K₂, hK₂⟩ := Metric.tendsto_atTop.mp hg0 (ε / 2) (by positivity)
+  obtain ⟨L₃, hL₃⟩ := tendsto_atTop_atTop.mp hmtop (max K₁ K₂)
+  refine ⟨max (T 0) L₃, fun L hL => ?_⟩
+  have hT0 : T 0 ≤ L := le_trans (le_max_left _ _) hL
+  have hge : max K₁ K₂ ≤ m L := hL₃ L (le_trans (le_max_right _ _) hL)
+  have hmd0 : T (m L) ≤ L :=
+    le_trans (hT_strictMono.monotone (min_le_left (d0 L) (κ L))) (hTmL L hT0)
+  have hNmL : N (m L) ≤ L := le_trans (hT_ge_N (m L)) hmd0
+  have h1 : |f L (m L) - g (m L)| < 1 / (m L + 1 : ℝ) := hNspec (m L) L hNmL
+  have h2 : 1 / (m L + 1 : ℝ) < ε / 2 := by
+    have := hK₁ (m L) (le_trans (le_max_left _ _) hge)
+    rwa [Real.dist_eq, sub_zero, abs_of_pos (by positivity)] at this
+  have h3 : |g (m L)| < ε / 2 := by
+    have := hK₂ (m L) (le_trans (le_max_right _ _) hge)
+    rwa [Real.dist_eq, sub_zero] at this
+  rw [Real.dist_eq, sub_zero]
+  calc |f L (m L)| = |(f L (m L) - g (m L)) + g (m L)| := by ring_nf
+    _ ≤ |f L (m L) - g (m L)| + |g (m L)| := abs_add_le _ _
+    _ < ε / 2 + ε / 2 := by linarith
+    _ = ε := by ring
+
 end LatticeSystem.Math

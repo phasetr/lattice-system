@@ -386,3 +386,16 @@ solidAngleAverageTanaka_unitNormalize_eq_orderPow
 # eqs. (4.2.58)/(4.2.59), p. 108).  Zero-referenced until PR-6c instantiates it on the torus and
 # relativises with the (ô²)-moment lower bound.  RE-EVALUATE/DELIST when consumed by PR-6c.
 sphereAverage_orderSq_vecRemainder_le
+
+# PR-6c-i (Prop 4.10, #4974) analytic parts, `Quantum/SpinS/AndersonTowerSphereDischargeParts.lean`
+# and `Math/DoubleSequenceDiagonal.lean`.  Standalone sub-lemmas of the final discharge, zero-
+# referenced until PR-6c-ii (final assembly) consumes them.  RE-EVALUATE/DELIST when consumed by
+# PR-6c-ii.
+#  * S-4 L²-norm triangle inequality for `vecNormSqRe`.
+sqrt_vecNormSqRe_sub_triangle
+#  * S-5 first-term per-volume bound: normalized sphere integral vs normalized `(ô²)ʲ` tower term
+#    (Tasaki §4.2.2, eqs. (4.2.58)–(4.2.61), p. 108–109), Φ-independent RHS `∝ (L^d)⁻¹`.
+sphereAverage_op_unitNormalize_sub_le
+#  * S-6 capped diagonal extraction (growth-ceilinged companion of `diagonal_tendsto_zero`,
+#    Tasaki Lemma 4.16), used to pin `M(L) ≤ C₁ L^{d/2}` in PR-6c-ii.
+diagonal_tendsto_zero_capped
