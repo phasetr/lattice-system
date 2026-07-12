@@ -40,17 +40,18 @@ variable {Λ : Type*} [Fintype Λ] [DecidableEq Λ] {N : ℕ}
 
 /-! ### Configuration grouping into the multinomial-weighted normal-form sum -/
 
-/-- **Configuration grouping** (Prop 4.10 pinch bookkeeping).  For any scalar functional `ψ` of a
-`Fin 3` count vector, summing `ψ (count word)` over all length-`n` axis configurations
-`F : Fin n → Fin 3` equals the multinomial-weighted sum over count vectors `k` summing to `n`:
-`∑_F ψ(count F) = ∑_{∑ k = n} multinomial(k) · ψ(k)`.  The configurations are grouped by their
-count vector (`Finset.sum_comp`); each count vector summing to `n` is realised (the multinomial
-fibre is non-empty by `Nat.multinomial_pos`), and the fibre cardinality is the multinomial
-coefficient (`card_ofFn_count_eq`, PR-3.3b-β). -/
-private lemma config_sum_eq_multinomial_sum {n : ℕ} (ψ : (Fin 3 → ℕ) → ℝ) :
+/-- **Configuration grouping into a module** (Prop 4.10 pinch bookkeeping, `AddCommMonoid`-valued).
+For any `ψ` of a `Fin 3` count vector valued in an `AddCommMonoid M`, summing `ψ (count word)` over
+all length-`n` axis configurations `F : Fin n → Fin 3` equals the multinomial-weighted (`ℕ`-scalar)
+sum over count vectors `k` summing to `n`: `∑_F ψ(count F) = ∑_{∑ k = n} multinomial(k) • ψ(k)`.
+The configurations are grouped by their count vector (`Finset.sum_comp`); each count vector summing
+to `n` is realised (the multinomial fibre is non-empty by `Nat.multinomial_pos`), and the fibre
+cardinality is the multinomial coefficient (`card_ofFn_count_eq`, PR-3.3b-β).  Both the `ℝ`-valued
+`config_sum_eq_multinomial_sum` and the operator-valued grouping of PR-6b-ii specialise it. -/
+theorem config_sum_eq_multinomial_sum_module {M : Type*} [AddCommMonoid M] {n : ℕ}
+    (ψ : (Fin 3 → ℕ) → M) :
     ∑ F : Fin n → Fin 3, ψ (fun α => (List.ofFn F).count α)
-      = ∑ k ∈ Finset.Nat.antidiagonalTuple 3 n,
-          (Nat.multinomial Finset.univ k : ℝ) * ψ k := by
+      = ∑ k ∈ Finset.Nat.antidiagonalTuple 3 n, Nat.multinomial Finset.univ k • ψ k := by
   have himg : (Finset.univ.image
         (fun F : Fin n → Fin 3 => (fun α => (List.ofFn F).count α)))
       = Finset.Nat.antidiagonalTuple 3 n := by
@@ -75,14 +76,26 @@ private lemma config_sum_eq_multinomial_sum {n : ℕ} (ψ : (Fin 3 → ℕ) → 
     himg]
   refine Finset.sum_congr rfl (fun b hb => ?_)
   rw [Finset.Nat.mem_antidiagonalTuple] at hb
-  rw [nsmul_eq_mul]
-  congr 1
-  rw [← LatticeSystem.Math.card_ofFn_count_eq n b hb]
-  norm_cast
-  congr 1
-  ext F
-  simp only [Finset.mem_filter, Finset.mem_univ, true_and]
-  exact ⟨fun h i => congrFun h i, fun h => funext h⟩
+  have hcard : (Finset.univ.filter
+        (fun F : Fin n → Fin 3 => (fun α => (List.ofFn F).count α) = b)).card
+      = Nat.multinomial Finset.univ b := by
+    rw [← LatticeSystem.Math.card_ofFn_count_eq n b hb]
+    congr 1
+    ext F
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+    exact ⟨fun h i => congrFun h i, fun h => funext h⟩
+  rw [hcard]
+
+/-- **Configuration grouping into the multinomial-weighted normal-form sum** (`ℝ`-valued
+specialisation of `config_sum_eq_multinomial_sum_module`).  `∑_F ψ(count F) = ∑_{∑ k = n}
+multinomial(k) · ψ k`, converting the `ℕ`-scalar multiples of the module version into real products
+via `nsmul_eq_mul`. -/
+private lemma config_sum_eq_multinomial_sum {n : ℕ} (ψ : (Fin 3 → ℕ) → ℝ) :
+    ∑ F : Fin n → Fin 3, ψ (fun α => (List.ofFn F).count α)
+      = ∑ k ∈ Finset.Nat.antidiagonalTuple 3 n,
+          (Nat.multinomial Finset.univ k : ℝ) * ψ k := by
+  rw [config_sum_eq_multinomial_sum_module ψ]
+  exact Finset.sum_congr rfl (fun k _ => nsmul_eq_mul _ _)
 
 /-! ### The squared order operator as a sum of doubled Cartesian words -/
 
