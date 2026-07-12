@@ -10510,6 +10510,30 @@ Issue \#4974, PR \#5037). For a total-spin singlet $\Phi$ (annihilated by $\hat 
 \]
 where $2j = \begin{cases} M & \text{if } M \text{ is even} \\ M+1 & \text{if } M \text{ is odd} \end{cases}$. The odd one of the two adjacent powers $\{M, M+1\}$ integrates to the zero operator; the even one survives with a fixed positive-real normalisation constant that $\mathrm{unitNormalize}$ absorbs. This is the tip consumed by the vector-remainder bridge (PR-6b) and final assembly (PR-6c). Chapters~3--10 backfill.
 
+\medskip\noindent\textbf{Operator-norm $\to$ mulVec vector bound infrastructure} (Tasaki §4.2.2,
+Proposition 4.10 arc PR-6b-i; \textbf{PROVED axiom-free},
+\texttt{Quantum/SpinS/OrderOperatorAlgebra.lean} /
+\texttt{Quantum/SpinS/AndersonTowerCartWordReBand.lean}, Issue \#4974, PR \#5040).
+The generic linear-algebra bridge from operator-norm bounds to vector-norm
+bounds feeding the Bochner solid-angle interchange and sphere-average vector
+assembly. \textbf{L$^2$-operator-norm $\to$ mulVec}
+(\texttt{mulVec\_toLp\_norm\_le}, \texttt{sqrt\_vecNormSqRe\_mulVec\_le}):
+establishes $\|\hat G.\text{mulVec}(v)\| \le \|\hat G\| \cdot \|v\|$ via
+continuous-linear-map \texttt{toEuclideanCLM}; the real-norm wrapper expresses
+vector norms in square-root form for moment inequalities. \textbf{Spin-operator
+norms} (\texttt{totalSpinSOp$\mathtt{\{1,2,3\}}$\_manyBodyOperatorNormS\_le}):
+the three Cartesian total-spin generators bounded by $(V \cdot N/2)$ (diagonal)
+or $V \cdot N$ (off-diagonal). \textbf{Cartesian order-word operator-norm band}
+(\texttt{stagOpVec\_commutator\_manyBodyOperatorNormS\_le},
+\texttt{cartWord\_adjSwap\_manyBodyOperatorNormS\_diff\_le},
+\texttt{cartWord\_swapChain\_manyBodyOperatorNormS\_diff\_le}): operator-norm
+analogs of the scalar real-part band (PR-3.3a), bounding Cartesian order-word
+commutators and swap chains by $k \cdot (V \cdot N)^{n-1}$ where $n$ is word
+length and $k$ is the chain length. Single-swap cost $(V \cdot N)$ per word
+(without the scalar singlet-Cauchy--Schwarz squaring). Scope: L$^2$-vector
+bounds and extended operator-norm infrastructure; pinch capstone and
+sphere-average vector assembly remain deferred. Chapters~3--10 backfill.
+
 \noindent\textbf{Squared order operator and transverse/longitudinal split} (Tasaki
 §4.2.2, eq.~(4.2.31), p.~108; \textbf{proved axiom-free},
 \texttt{Quantum/SpinS/AndersonTowerOrderSq.lean}, Issue \#4974, PR \#5014).

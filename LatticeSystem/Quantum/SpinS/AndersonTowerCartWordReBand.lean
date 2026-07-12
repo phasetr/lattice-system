@@ -211,6 +211,179 @@ theorem cartWord_manyBodyOperatorNormS_le (A : Λ → Bool) (N : ℕ) (hN : 1 �
             (manyBodyOperatorNormS_nonneg _) (by positivity)
       _ = ((Fintype.card Λ : ℝ) * N) ^ (t.length + 1) := by rw [pow_succ']
 
+/-! ### Operator-norm swap-chain band (Prop 4.10 arc PR-6b-i, vector pinch infrastructure)
+
+The scalar swap-chain band above bounds the *real-expectation* difference `⟨Φ, ·Φ⟩.re` of two
+Cartesian words related by adjacent transpositions, using the singlet premises `h3`, `h1` to cancel
+imaginary cross terms.  The vector pinch bridge (PR-6b-ii) instead needs an *operator-norm* band
+`‖ô^{w} − ô^{w'}‖` with **no singlet premise**, obtained directly from the strict commutator
+identity `[ô^{(α)}, ô^{(β)}] = ±i Ŝ_tot^{(γ)}` and the extensive total-spin norm
+`‖Ŝ_tot^{(γ)}‖ ≤ V·N`.
+An operator swap costs one factor of `V·N` (the scalar band's `V·N`-squared improvement is a
+singlet-only phenomenon, unavailable at the operator level), so a chain of `k` swaps between
+length-`n` words costs `k·(V·N)^{n−1}`. -/
+
+/-- **Total `Ŝ¹` norm bound** `‖Ŝ_tot^{(1)}‖ ≤ V·N`: triangle inequality over the `V`
+sites, each `‖Ŝ_x^{(1)}‖ ≤ N` (`onSiteS_spinSOp1_manyBodyOperatorNormS_le`).  The `1`-axis
+mirror of `totalSpinSOp3_manyBodyOperatorNormS_le`; the per-site `1`-axis bound is the (loose)
+ladder bound `N`, so the extensive constant is `V·N` rather than the diagonal `V·N/2`. -/
+theorem totalSpinSOp1_manyBodyOperatorNormS_le (hN : 1 ≤ N) :
+    manyBodyOperatorNormS (totalSpinSOp1 Λ N) ≤ (Fintype.card Λ : ℝ) * N := by
+  rw [show (totalSpinSOp1 Λ N) = ∑ x : Λ, onSiteS x (spinSOp1 N) from rfl]
+  refine le_trans (manyBodyOperatorNormS_sum_le _ _) ?_
+  calc ∑ x : Λ, manyBodyOperatorNormS (onSiteS x (spinSOp1 N))
+      ≤ ∑ _x : Λ, (N : ℝ) :=
+        Finset.sum_le_sum (fun x _ => onSiteS_spinSOp1_manyBodyOperatorNormS_le x hN)
+    _ = (Fintype.card Λ : ℝ) * N := by
+        rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+
+/-- **Total `Ŝ²` norm bound** `‖Ŝ_tot^{(2)}‖ ≤ V·N`: triangle inequality over the `V`
+sites, each `‖Ŝ_x^{(2)}‖ ≤ N` (`onSiteS_spinSOp2_manyBodyOperatorNormS_le`).  The `2`-axis
+mirror of `totalSpinSOp3_manyBodyOperatorNormS_le`. -/
+theorem totalSpinSOp2_manyBodyOperatorNormS_le (hN : 1 ≤ N) :
+    manyBodyOperatorNormS (totalSpinSOp2 Λ N) ≤ (Fintype.card Λ : ℝ) * N := by
+  rw [show (totalSpinSOp2 Λ N) = ∑ x : Λ, onSiteS x (spinSOp2 N) from rfl]
+  refine le_trans (manyBodyOperatorNormS_sum_le _ _) ?_
+  calc ∑ x : Λ, manyBodyOperatorNormS (onSiteS x (spinSOp2 N))
+      ≤ ∑ _x : Λ, (N : ℝ) :=
+        Finset.sum_le_sum (fun x _ => onSiteS_spinSOp2_manyBodyOperatorNormS_le x hN)
+    _ = (Fintype.card Λ : ℝ) * N := by
+        rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+
+/-- **Axis-commutator operator-norm bound** `‖[ô^{(α)}, ô^{(β)}]‖ ≤ V·N`.  Along the
+diagonal `α = β` the commutator vanishes; off the diagonal it equals `±i Ŝ_tot^{(γ)}` for
+the complementary axis `γ` (`staggeredOrderOp{1,2,3}S_commutator_*`), and
+`‖i Ŝ_tot^{(γ)}‖ = ‖Ŝ_tot^{(γ)}‖ ≤ V·N`
+(`totalSpinSOp{1,2,3}_manyBodyOperatorNormS_le`).  No singlet premise is used. -/
+theorem stagOpVec_commutator_manyBodyOperatorNormS_le (A : Λ → Bool) (hN : 1 ≤ N)
+    (α β : Fin 3) :
+    manyBodyOperatorNormS
+        (stagOpVec A N α * stagOpVec A N β - stagOpVec A N β * stagOpVec A N α)
+      ≤ (Fintype.card Λ : ℝ) * N := by
+  have hVN : (0 : ℝ) ≤ (Fintype.card Λ : ℝ) * N := by positivity
+  have hh1 : manyBodyOperatorNormS (totalSpinSOp1 Λ N) ≤ (Fintype.card Λ : ℝ) * N :=
+    totalSpinSOp1_manyBodyOperatorNormS_le hN
+  have hh2 : manyBodyOperatorNormS (totalSpinSOp2 Λ N) ≤ (Fintype.card Λ : ℝ) * N :=
+    totalSpinSOp2_manyBodyOperatorNormS_le hN
+  have hh3 : manyBodyOperatorNormS (totalSpinSOp3 Λ N) ≤ (Fintype.card Λ : ℝ) * N :=
+    le_trans totalSpinSOp3_manyBodyOperatorNormS_le (by linarith)
+  have hcross : ∀ T : ManyBodyOpS Λ N,
+      manyBodyOperatorNormS T ≤ (Fintype.card Λ : ℝ) * N →
+      manyBodyOperatorNormS (Complex.I • T) ≤ (Fintype.card Λ : ℝ) * N := by
+    intro T hT
+    rw [manyBodyOperatorNormS_smul, Complex.norm_I, one_mul]; exact hT
+  fin_cases α <;> fin_cases β
+  · change manyBodyOperatorNormS (staggeredOrderOp1S A N * staggeredOrderOp1S A N
+        - staggeredOrderOp1S A N * staggeredOrderOp1S A N) ≤ (Fintype.card Λ : ℝ) * N
+    rw [sub_self, manyBodyOperatorNormS_zero]; exact hVN
+  · change manyBodyOperatorNormS (staggeredOrderOp1S A N * staggeredOrderOp2S A N
+        - staggeredOrderOp2S A N * staggeredOrderOp1S A N) ≤ (Fintype.card Λ : ℝ) * N
+    rw [staggeredOrderOp1S_commutator_staggeredOrderOp2S]; exact hcross _ hh3
+  · change manyBodyOperatorNormS (staggeredOrderOp1S A N * staggeredOrderOpS A N
+        - staggeredOrderOpS A N * staggeredOrderOp1S A N) ≤ (Fintype.card Λ : ℝ) * N
+    rw [← neg_sub (staggeredOrderOpS A N * staggeredOrderOp1S A N)
+        (staggeredOrderOp1S A N * staggeredOrderOpS A N),
+      staggeredOrderOpS_commutator_staggeredOrderOp1S, manyBodyOperatorNormS_neg]
+    exact hcross _ hh2
+  · change manyBodyOperatorNormS (staggeredOrderOp2S A N * staggeredOrderOp1S A N
+        - staggeredOrderOp1S A N * staggeredOrderOp2S A N) ≤ (Fintype.card Λ : ℝ) * N
+    rw [← neg_sub (staggeredOrderOp1S A N * staggeredOrderOp2S A N)
+        (staggeredOrderOp2S A N * staggeredOrderOp1S A N),
+      staggeredOrderOp1S_commutator_staggeredOrderOp2S, manyBodyOperatorNormS_neg]
+    exact hcross _ hh3
+  · change manyBodyOperatorNormS (staggeredOrderOp2S A N * staggeredOrderOp2S A N
+        - staggeredOrderOp2S A N * staggeredOrderOp2S A N) ≤ (Fintype.card Λ : ℝ) * N
+    rw [sub_self, manyBodyOperatorNormS_zero]; exact hVN
+  · change manyBodyOperatorNormS (staggeredOrderOp2S A N * staggeredOrderOpS A N
+        - staggeredOrderOpS A N * staggeredOrderOp2S A N) ≤ (Fintype.card Λ : ℝ) * N
+    rw [staggeredOrderOp2S_commutator_staggeredOrderOpS]; exact hcross _ hh1
+  · change manyBodyOperatorNormS (staggeredOrderOpS A N * staggeredOrderOp1S A N
+        - staggeredOrderOp1S A N * staggeredOrderOpS A N) ≤ (Fintype.card Λ : ℝ) * N
+    rw [staggeredOrderOpS_commutator_staggeredOrderOp1S]; exact hcross _ hh2
+  · change manyBodyOperatorNormS (staggeredOrderOpS A N * staggeredOrderOp2S A N
+        - staggeredOrderOp2S A N * staggeredOrderOpS A N) ≤ (Fintype.card Λ : ℝ) * N
+    rw [← neg_sub (staggeredOrderOp2S A N * staggeredOrderOpS A N)
+        (staggeredOrderOpS A N * staggeredOrderOp2S A N),
+      staggeredOrderOp2S_commutator_staggeredOrderOpS, manyBodyOperatorNormS_neg]
+    exact hcross _ hh1
+  · change manyBodyOperatorNormS (staggeredOrderOpS A N * staggeredOrderOpS A N
+        - staggeredOrderOpS A N * staggeredOrderOpS A N) ≤ (Fintype.card Λ : ℝ) * N
+    rw [sub_self, manyBodyOperatorNormS_zero]; exact hVN
+
+/-- **Single adjacent-swap operator-norm band** `‖ô^{w} − ô^{w'}‖ ≤ (V·N)^{n−1}` for an
+`AdjSwap w w'` of a length-`n` word.  Splitting `w = pre ++ a :: b :: suf`, the difference factors
+as `ô^{pre} · ([ô^{(a)}, ô^{(b)}]) · ô^{suf}`; submultiplicativity with
+`‖ô^{pre}‖ ≤ (V·N)^{|pre|}`, `‖[ô^{(a)}, ô^{(b)}]‖ ≤ V·N` and
+`‖ô^{suf}‖ ≤ (V·N)^{|suf|}` gives
+`(V·N)^{|pre|+1+|suf|} = (V·N)^{n−1}`.  No singlet premise. -/
+theorem cartWord_adjSwap_manyBodyOperatorNormS_diff_le (A : Λ → Bool) (N : ℕ) (hN : 1 ≤ N)
+    (n : ℕ) {w w' : List (Fin 3)} (h : AdjSwap w w') (hn : w.length = n) :
+    manyBodyOperatorNormS (cartWord A N w - cartWord A N w')
+      ≤ ((Fintype.card Λ : ℝ) * N) ^ (n - 1) := by
+  obtain ⟨pre, suf, a, b, rfl, rfl⟩ := h
+  have hinner : stagOpVec A N a * (stagOpVec A N b * cartWord A N suf)
+        - stagOpVec A N b * (stagOpVec A N a * cartWord A N suf)
+      = (stagOpVec A N a * stagOpVec A N b - stagOpVec A N b * stagOpVec A N a)
+          * cartWord A N suf := by
+    rw [sub_mul, mul_assoc, mul_assoc]
+  have hdiff : cartWord A N (pre ++ a :: b :: suf) - cartWord A N (pre ++ b :: a :: suf)
+      = cartWord A N pre
+          * ((stagOpVec A N a * stagOpVec A N b - stagOpVec A N b * stagOpVec A N a)
+              * cartWord A N suf) := by
+    rw [cartWord_append, cartWord_append, cartWord_cons, cartWord_cons, cartWord_cons,
+      cartWord_cons, ← mul_sub, hinner]
+  have hlen2 : pre.length + suf.length + 2 = n := by
+    simp only [List.length_append, List.length_cons] at hn; omega
+  rw [hdiff]
+  calc manyBodyOperatorNormS (cartWord A N pre
+          * ((stagOpVec A N a * stagOpVec A N b - stagOpVec A N b * stagOpVec A N a)
+              * cartWord A N suf))
+      ≤ manyBodyOperatorNormS (cartWord A N pre)
+          * manyBodyOperatorNormS ((stagOpVec A N a * stagOpVec A N b
+              - stagOpVec A N b * stagOpVec A N a) * cartWord A N suf) :=
+        manyBodyOperatorNormS_mul_le _ _
+    _ ≤ manyBodyOperatorNormS (cartWord A N pre)
+          * (manyBodyOperatorNormS (stagOpVec A N a * stagOpVec A N b
+              - stagOpVec A N b * stagOpVec A N a) * manyBodyOperatorNormS (cartWord A N suf)) :=
+        mul_le_mul_of_nonneg_left (manyBodyOperatorNormS_mul_le _ _)
+          (manyBodyOperatorNormS_nonneg _)
+    _ ≤ ((Fintype.card Λ : ℝ) * N) ^ pre.length
+          * (((Fintype.card Λ : ℝ) * N) * ((Fintype.card Λ : ℝ) * N) ^ suf.length) := by
+        refine mul_le_mul (cartWord_manyBodyOperatorNormS_le A N hN pre)
+          (mul_le_mul (stagOpVec_commutator_manyBodyOperatorNormS_le A hN a b)
+            (cartWord_manyBodyOperatorNormS_le A N hN suf) (manyBodyOperatorNormS_nonneg _)
+            (by positivity)) ?_ (by positivity)
+        exact mul_nonneg (manyBodyOperatorNormS_nonneg _) (manyBodyOperatorNormS_nonneg _)
+    _ = ((Fintype.card Λ : ℝ) * N) ^ (n - 1) := by
+        rw [← pow_succ', ← pow_add]; congr 1; omega
+
+/-- **Branching swap-chain operator-norm band** `‖ô^{w} − ô^{w'}‖ ≤ k·(V·N)^{n−1}`
+for a length-`k` `SwapChain` between length-`n` Cartesian order words.  Telescoping the single-swap
+band `cartWord_adjSwap_manyBodyOperatorNormS_diff_le` over the chain via the three-term triangle
+inequality `manyBodyOperatorNormS_sub_le'`.  The operator-norm analogue of the scalar
+`cartWord_swapChain_re_diff_le`, used (singlet-free) by the vector pinch bridge. -/
+theorem cartWord_swapChain_manyBodyOperatorNormS_diff_le (A : Λ → Bool) (N : ℕ) (hN : 1 ≤ N)
+    (n : ℕ) {k : ℕ} {w w' : List (Fin 3)} (hc : SwapChain k w w') (hn : w.length = n) :
+    manyBodyOperatorNormS (cartWord A N w - cartWord A N w')
+      ≤ (k : ℝ) * ((Fintype.card Λ : ℝ) * N) ^ (n - 1) := by
+  revert hn
+  induction hc with
+  | refl w =>
+    intro _
+    rw [sub_self, manyBodyOperatorNormS_zero]; positivity
+  | @step j w w' w'' hs hchain ih =>
+    intro hn
+    have hw'n : w'.length = n := by rw [← hs.length_eq]; exact hn
+    have hstep := cartWord_adjSwap_manyBodyOperatorNormS_diff_le A N hN n hs hn
+    have ih' := ih hw'n
+    calc manyBodyOperatorNormS (cartWord A N w - cartWord A N w'')
+        ≤ manyBodyOperatorNormS (cartWord A N w - cartWord A N w')
+            + manyBodyOperatorNormS (cartWord A N w' - cartWord A N w'') :=
+          manyBodyOperatorNormS_sub_le' _ _ _
+      _ ≤ ((Fintype.card Λ : ℝ) * N) ^ (n - 1)
+            + (j : ℝ) * ((Fintype.card Λ : ℝ) * N) ^ (n - 1) := add_le_add hstep ih'
+      _ = ((j + 1 : ℕ) : ℝ) * ((Fintype.card Λ : ℝ) * N) ^ (n - 1) := by push_cast; ring
+
 /-- The self-pairing real part equals the squared Euclidean norm:
 `⟨Φ, Φ⟩.re = ‖Φ‖²₂`. -/
 private theorem re_star_dotProduct_self_eq (Φ : (Λ → Fin (N + 1)) → ℂ) :
