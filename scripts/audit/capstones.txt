@@ -380,3 +380,21 @@ orderSq_collapse_ratio_tendsto_one
 # until the vector-remainder bridge (PR-6b) and arc capstone (PR-6c) consume it.  RE-EVALUATE/DELIST
 # when consumed by PR-6c (arc capstone).
 solidAngleAverageTanaka_unitNormalize_eq_orderPow
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-6b-i,
+# `Quantum/SpinS/OrderOperatorAlgebra.lean`.  The `vecNormSqRe` operator-norm vector bound
+# `√(vecNormSqRe (G Φ)) ≤ ‖G‖_op · √(vecNormSqRe Φ)`, the plain-vector companion of the operator
+# Cauchy–Schwarz `abs_re_dotProduct_mulVec_le_norm_mul`, obtained from `mulVec_toLp_norm_le` and
+# `sqrt_vecNormSqRe_eq_toLp_norm` (Tasaki §4.2.2, eqs. (4.2.58)–(4.2.59), p. 108).  Zero-referenced
+# until the vector-remainder bridge (PR-6b-ii, tip B) applies it to `G = D_j`, `Φ` the tower vector.
+# RE-EVALUATE/DELIST when consumed by PR-6b-ii.
+sqrt_vecNormSqRe_mulVec_le
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-6b-i,
+# `Quantum/SpinS/AndersonTowerCartWordReBand.lean`.  The operator-norm swap-chain band
+# `‖ô^{w} − ô^{w'}‖ ≤ k·(V·N)^{n−1}` for a length-`k` `SwapChain` between length-`n` Cartesian order
+# words — the singlet-free operator analogue of the scalar `cartWord_swapChain_re_diff_le`, built from
+# the strict axis commutator `[ô^{(α)},ô^{(β)}] = ±i Ŝ_tot^{(γ)}` (Tasaki §4.2.2, eqs. (4.2.58)–
+# (4.2.59), p. 108).  Zero-referenced until the vector-remainder bridge (PR-6b-ii, tip A) sums it over
+# the ordered→grouped swap chains of `D_j`.  RE-EVALUATE/DELIST when consumed by PR-6b-ii.
+cartWord_swapChain_manyBodyOperatorNormS_diff_le
