@@ -10424,6 +10424,23 @@ Theorem~4.11's $\sqrt3$).  $m^\ast$ is pinned by a realizing ground-state family
 \texttt{IsTanakaFullSSBConstants} (unsatisfiable in $d=1$), and the $\hat p$-moment denominators are
 positive under long-range order (eq.~(4.2.37)).  Chapters~3--10 backfill.
 
+\noindent\textbf{Proposition 4.10 ($\hat o^2$ concentration upper bound)} (Tasaki §4.2.2,
+eqs.~(4.2.40), (4.2.59)--(4.2.61), pp.~105--109; documented axiom,
+\texttt{Quantum/SpinS/AndersonTowerOrderSqConcentration.lean}, PR \#5035).  The $\hat o^2$-moment
+concentration upper bound, the parity-symmetric mirror of Lemma~4.15 for the $\hat p$ field.  For
+the staggered ground-state family $\Phi$ with successive moments $R_k=\langle(\hat o^2)^k\rangle$,
+the $V^2$-normalised ratio $s_n=R_{n+1}/(R_n\cdot V^2)$ satisfies the $\limsup$-upper direction:
+for all $n$ and $\varepsilon>0$, eventually in $L$, $s_n<(m^\ast)^2+\varepsilon$.  Tasaki §4.2.2
+eq.~(4.2.40) states the $\hat p$-field concentration is ``elementary, proof omitted; see [66]''
+(Koma--Tasaki, \emph{Symmetry breaking and finite-size effects in quantum many-body systems},
+J.~Stat.~Phys.~\textbf{76} (1994) 745--803), and eqs.~(4.2.59)--(4.2.61) instruct the reader to
+\emph{repeat the $\hat p$ argument} for the $\hat o^2$ field, yielding
+$\lim_{n}\lim_L s_n=(m^\ast)^2$.  Per the 2026-07-12 no-overreach boundary, this sub-arc is
+deferred with parity to the $\hat p$-side mirror (already a documented axiom) rather than rebuilding
+the 6--9~PR Koma--Tasaki [66] concentration machinery.  Conjecture~4.12 is an explicit hypothesis
+(never asserted true).  Conditional on singlet hypothesis, axis-3 long-range-order limit $q_\ast$,
+and moment positivity.  Vacuous in $d=1$ (no LRO, Corollary~4.3).  Chapters~3--10 backfill.
+
 \noindent\textbf{Lemma 4.16} (Tasaki §4.2.2, p.~108; \textbf{discharged axiom-free},
 \texttt{Math/DoubleSequenceDiagonal.lean}, Issue \#4485).  Diagonal extraction from an iterated
 limit: if $f:\mathbb{N}\times\mathbb{N}\to\mathbb{R}$ satisfies $\lim_{M}\lim_{L}f_{L,M}=0$ (each
