@@ -339,11 +339,12 @@ sphereAverage_directionStaggeredOp_pow_mulVec
 # consumed.
 orderSq_collapse_vecNormSqRe
 
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) L4b-i,
-# `Quantum/SpinS/AndersonTowerMasterWard.lean`. The master Ward identity
-# `Σ_k Σ_δ ε_{γ w_k δ} ⟨Φ, ô^{w[k↦δ]} Φ⟩ = 0` for a total-spin singlet `Φ`, obtained by
-# evaluating `⟨Φ, Ŝ^{(γ)}_tot (ô^{w} Φ)⟩` two ways (Hermitian shift onto the singlet vs. the
-# telescoping rotation sum) and cancelling `i ≠ 0` (Tasaki §4.2.2, eqs. (4.2.57)–(4.2.61),
-# p. 108–109).  Zero-referenced until the rotation-derivative step (L4b-ii) reads it as the
-# vanishing so(3) derivative of the directional moment. RE-EVALUATE/DELIST when consumed.
-cartWord_ward_singlet
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) L4b-ii,
+# `Quantum/SpinS/AndersonTowerRotationDeriv.lean`. Rotation-derivative vanishing of the directional
+# moment `d/dθ ⟨Φ, (Ô_L^{R_γ(θ) n₀})^{2M} Φ⟩ = 0` for a total-spin singlet `Φ`: the polynomial
+# expansion makes the θ-dependence the coordinate monomials, whose commutative product derivative
+# (`HasDerivAt.finset_prod`) fed by the generator ODE collapses via the regrouping involution into
+# the reindexed master Ward identity `cartWord_ward_singlet_ofFn` (Tasaki §4.2.2,
+# eqs. (4.2.57)–(4.2.59), p. 108–109).  Zero-referenced until the global-constancy step (L4b-iii)
+# feeds it to `is_const_of_deriv_eq_zero`. RE-EVALUATE/DELIST when consumed.
+directionMoment_rotationPath_hasDerivAt_zero
