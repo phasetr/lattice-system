@@ -338,3 +338,12 @@ sphereAverage_directionStaggeredOp_pow_mulVec
 # assembly (PR-6) consumes it in the triangle-inequality second term. RE-EVALUATE/DELIST when
 # consumed.
 orderSq_collapse_vecNormSqRe
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) L4b-i,
+# `Quantum/SpinS/AndersonTowerMasterWard.lean`. The master Ward identity
+# `Σ_k Σ_δ ε_{γ w_k δ} ⟨Φ, ô^{w[k↦δ]} Φ⟩ = 0` for a total-spin singlet `Φ`, obtained by
+# evaluating `⟨Φ, Ŝ^{(γ)}_tot (ô^{w} Φ)⟩` two ways (Hermitian shift onto the singlet vs. the
+# telescoping rotation sum) and cancelling `i ≠ 0` (Tasaki §4.2.2, eqs. (4.2.57)–(4.2.61),
+# p. 108–109).  Zero-referenced until the rotation-derivative step (L4b-ii) reads it as the
+# vanishing so(3) derivative of the directional moment. RE-EVALUATE/DELIST when consumed.
+cartWord_ward_singlet
