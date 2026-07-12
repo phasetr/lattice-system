@@ -45,6 +45,7 @@ import LatticeSystem.Math.PosSemidef.LyapunovIsometryCompress
 import LatticeSystem.Math.PosSemidef.TraceProductPos
 import LatticeSystem.Math.PosSemidef.ExpPosDef
 import LatticeSystem.Math.EffectiveLimit
+import LatticeSystem.Math.Analysis.RealLogConvexSequence
 import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbation
 import LatticeSystem.Math.AngularMomentum.Ladder
 import LatticeSystem.Math.AngularMomentum.Quantization
@@ -128,6 +129,7 @@ import LatticeSystem.Quantum.SpinS.AndersonTowerField
 import LatticeSystem.Quantum.SpinS.AndersonTowerSphereAverage
 import LatticeSystem.Quantum.SpinS.AndersonTowerSphereMoment
 import LatticeSystem.Quantum.SpinS.AndersonTowerOrderSq
+import LatticeSystem.Quantum.SpinS.AndersonTowerOrderSqMoment
 import LatticeSystem.Quantum.SpinS.AndersonTowerCartWord
 import LatticeSystem.Quantum.SpinS.AndersonTowerLeviCivita
 import LatticeSystem.Quantum.SpinS.AndersonTowerTelescoping
