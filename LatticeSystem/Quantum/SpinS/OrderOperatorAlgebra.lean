@@ -124,10 +124,10 @@ theorem manyBodyOperatorNormS_sum_le {ι : Type*} (s : Finset ι) (f : ι → Ma
   refine le_trans (norm_sum_le _ _) (le_of_eq ?_)
   exact Finset.sum_congr rfl (fun x _ => (manyBodyOperatorNormS_eq_toEuclideanCLM (f x)).symm)
 
-/-- **Operator-norm vector bound** `‖G v‖₂ ≤ ‖G‖_op ‖v‖₂`.  Routing `G.mulVec` through the bundled
-continuous-linear-map image `Matrix.toEuclideanCLM` and applying `ContinuousLinearMap.le_opNorm`.
-This is the plain vector-norm companion to the inner-product Cauchy–Schwarz form
-`abs_re_dotProduct_mulVec_le_norm_mul`. -/
+/-- **Operator-norm vector bound** `‖G v‖₂ ≤ ‖G‖_op ‖v‖₂`.  Routing `G.mulVec`
+through the bundled continuous-linear-map image `Matrix.toEuclideanCLM` and applying
+`ContinuousLinearMap.le_opNorm`.  This is the plain vector-norm companion to the
+inner-product Cauchy–Schwarz form `abs_re_dotProduct_mulVec_le_norm_mul`. -/
 theorem mulVec_toLp_norm_le (G : ManyBodyOpS Λ N) (v : (Λ → Fin (N + 1)) → ℂ) :
     ‖(WithLp.toLp 2 (G.mulVec v) : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖
       ≤ manyBodyOperatorNormS G
@@ -138,8 +138,8 @@ theorem mulVec_toLp_norm_le (G : ManyBodyOpS Λ N) (v : (Λ → Fin (N + 1)) →
   rwa [Matrix.toEuclideanCLM_toLp] at h
 
 /-- **`vecNormSqRe` as a squared `L²` norm**: `√(vecNormSqRe w) = ‖toLp 2 w‖`, since
-`vecNormSqRe w = ⟨w, w⟩.re = ‖toLp 2 w‖²` and the square root of a square is the (nonnegative)
-norm.  The bridge from the real self-pairing to the Euclidean `L²` norm. -/
+`vecNormSqRe w = ⟨w, w⟩.re = ‖toLp 2 w‖²` and the square root of a square is the
+(nonnegative) norm.  The bridge from the real self-pairing to the Euclidean `L²` norm. -/
 theorem sqrt_vecNormSqRe_eq_toLp_norm (w : (Λ → Fin (N + 1)) → ℂ) :
     Real.sqrt (vecNormSqRe w)
       = ‖(WithLp.toLp 2 w : EuclideanSpace ℂ (Λ → Fin (N + 1)))‖ := by
@@ -155,9 +155,10 @@ theorem sqrt_vecNormSqRe_eq_toLp_norm (w : (Λ → Fin (N + 1)) → ℂ) :
   rw [hsq]
   exact Real.sqrt_mul_self (norm_nonneg _)
 
-/-- **`vecNormSqRe` operator-norm vector bound** `√(vecNormSqRe (G v)) ≤ ‖G‖_op √(vecNormSqRe v)`:
-the `vecNormSqRe` form of `mulVec_toLp_norm_le`, obtained by rewriting each `√(vecNormSqRe ·)` as an
-`L²` norm via `sqrt_vecNormSqRe_eq_toLp_norm`. -/
+/-- **`vecNormSqRe` operator-norm vector bound**
+`√(vecNormSqRe (G v)) ≤ ‖G‖_op √(vecNormSqRe v)`: the `vecNormSqRe` form of
+`mulVec_toLp_norm_le`, obtained by rewriting each `√(vecNormSqRe ·)` as an `L²` norm via
+`sqrt_vecNormSqRe_eq_toLp_norm`. -/
 theorem sqrt_vecNormSqRe_mulVec_le (G : ManyBodyOpS Λ N) (v : (Λ → Fin (N + 1)) → ℂ) :
     Real.sqrt (vecNormSqRe (G.mulVec v))
       ≤ manyBodyOperatorNormS G * Real.sqrt (vecNormSqRe v) := by
