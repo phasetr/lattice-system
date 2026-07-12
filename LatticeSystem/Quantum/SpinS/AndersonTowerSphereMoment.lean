@@ -109,4 +109,42 @@ theorem sphereAverage_directionStaggeredOp_pow (A : Λ → Bool) (N M : ℕ) :
           (fun α => (Finset.univ.filter (fun j => f j = α)).card) : ℝ) : ℂ) := by
         rw [hreal]
 
+/-- **Bochner–`mulVec` interchange for the direction order operator.**  The sphere Bochner integral
+of the matrix-valued `k`-th power `(Ô_L^n)^k` commutes with right multiplication by a fixed
+configuration vector `Φ`: integrating the vectors `(Ô_L^n)^k Φ` equals applying `·.mulVec Φ` to the
+operator Bochner integral `∫_{S²} (Ô_L^n)^k dσ(n)`.  Since `M ↦ M.mulVec Φ` is a finite-dimensional
+(hence continuous) `ℂ`-linear map, this is `ContinuousLinearMap.integral_comp_comm`; it linearizes
+the operator expansion `sphereAverage_directionStaggeredOp_pow` onto the tower vector `Φ`. -/
+theorem sphereAverage_directionStaggeredOp_pow_mulVec (A : Λ → Bool) (k : ℕ)
+    (Φ : (Λ → Fin (N + 1)) → ℂ) :
+    (∫ n : Metric.sphere (0 : EuclideanSpace ℝ (Fin 3)) 1,
+        ((directionStaggeredOp (n : EuclideanSpace ℝ (Fin 3)) A N) ^ k).mulVec Φ
+          ∂volume.toSphere)
+      = (∫ n : Metric.sphere (0 : EuclideanSpace ℝ (Fin 3)) 1,
+          (directionStaggeredOp (n : EuclideanSpace ℝ (Fin 3)) A N) ^ k
+            ∂volume.toSphere).mulVec Φ := by
+  haveI : CompleteSpace (ManyBodyOpS Λ N) := FiniteDimensional.complete ℂ _
+  -- Right multiplication by the fixed vector `Φ` as a continuous `ℂ`-linear map on operators.
+  let L : ManyBodyOpS Λ N →ₗ[ℂ] ((Λ → Fin (N + 1)) → ℂ) :=
+    { toFun := fun M => M.mulVec Φ
+      map_add' := fun M₁ M₂ => Matrix.add_mulVec M₁ M₂ Φ
+      map_smul' := fun c M => Matrix.smul_mulVec c M Φ }
+  let Lc : ManyBodyOpS Λ N →L[ℂ] ((Λ → Fin (N + 1)) → ℂ) := ⟨L, L.continuous_of_finiteDimensional⟩
+  -- The operator power is continuous in `n` and supported on the compact sphere, hence integrable.
+  have hcoord : ∀ i : Fin 3, Continuous
+      (fun n : ↥(Metric.sphere (0 : EuclideanSpace ℝ (Fin 3)) 1) =>
+        (((n : EuclideanSpace ℝ (Fin 3)) i : ℝ) : ℂ)) := fun i =>
+    Complex.continuous_ofReal.comp ((EuclideanSpace.proj i).continuous.comp continuous_subtype_val)
+  have hdir : Continuous (fun n : ↥(Metric.sphere (0 : EuclideanSpace ℝ (Fin 3)) 1) =>
+      directionStaggeredOp (n : EuclideanSpace ℝ (Fin 3)) A N) := by
+    refine continuous_finset_sum _ fun x _ => Continuous.smul continuous_const ?_
+    exact (((hcoord 0).smul continuous_const).add ((hcoord 1).smul continuous_const)).add
+      ((hcoord 2).smul continuous_const)
+  have hInt : Integrable (fun n : ↥(Metric.sphere (0 : EuclideanSpace ℝ (Fin 3)) 1) =>
+      (directionStaggeredOp (n : EuclideanSpace ℝ (Fin 3)) A N) ^ k) volume.toSphere :=
+    (hdir.pow k).integrable_of_hasCompactSupport
+      (HasCompactSupport.of_support_subset_isCompact isCompact_univ (Set.subset_univ _))
+  simpa only [Lc, L, ContinuousLinearMap.coe_mk', LinearMap.coe_mk, AddHom.coe_mk] using
+    Lc.integral_comp_comm hInt
+
 end LatticeSystem.Quantum
