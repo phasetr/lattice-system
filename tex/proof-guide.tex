@@ -10534,6 +10534,24 @@ length and $k$ is the chain length. Single-swap cost $(V \cdot N)$ per word
 bounds and extended operator-norm infrastructure; pinch capstone and
 sphere-average vector assembly remain deferred. Chapters~3--10 backfill.
 
+\medskip\noindent\textbf{Vector pinch bridge for sphere-average remainder bound}
+(Tasaki §4.2.2, Proposition 4.10 arc PR-6b-ii; \textbf{PROVED axiom-free},
+\texttt{Quantum/SpinS/AndersonTowerSphereVecRemainder.lean}, Issue \#4974, PR
+\#5041, eqs.~(4.2.58)--(4.2.59), p.~108). The L$^2$ vector-norm remainder
+bound, converting operator-norm swap-band bounds into vector pinch via
+solid-angle average. \textbf{Tip B capstone} (\texttt{sphereAverage\_orderSq\
+\_vecRemainder\_le}): the solid-angle-average vector distance from the main
+part $(4\pi/(2j+1))(\hat o^2)^j \Phi$ is bounded by $\sqrt{\texttt{cartPinchVecPoly}(m)
+\cdot N^{2m-2} / (q_0^m \cdot V^2)} \cdot \sqrt{R_0}$ where $R_m = \langle \Phi,
+(\hat o^2)^m \Phi \rangle$. Helper lemmas:
+\texttt{sphereMoment\_grouped\_eq\_orderSq\_grouped} (grouped-word moment
+identity) and \texttt{sphereAverage\_orderSq\_manyBodyOperatorNormS\_diff\_le}
+(single-swap vector bound); both consume the PR-6b-i operator-norm
+infrastructure and the PR-6a sphere-reduce tip. Feeds the final sphere-average
+assembly (PR-6c, Proposition 4.10 capstone). Scope: vector pinch bound only;
+ratio collapse and $L \to \infty$ limit are PR-6c sequels. Chapters~3--10
+backfill.
+
 \noindent\textbf{Squared order operator and transverse/longitudinal split} (Tasaki
 §4.2.2, eq.~(4.2.31), p.~108; \textbf{proved axiom-free},
 \texttt{Quantum/SpinS/AndersonTowerOrderSq.lean}, Issue \#4974, PR \#5014).
