@@ -1,12 +1,13 @@
 /-
 Double-factorial arithmetic for the even factorial.
 
-This file proves the elementary identity `(2a)! = 2^a · a! · (2a-1)‼` splitting an even factorial
-into its even and odd double-factorial parts.  It is a thin corollary of the mathlib lemmas
+This file proves the elementary identity `(2a)! = 2^a · a! · (2a-1)‼` splitting an even
+factorial into its even and odd double-factorial parts.  It is a thin corollary of the mathlib
+lemmas
 `Nat.doubleFactorial_two_mul` (`(2n)‼ = 2^n · n!`) and `Nat.factorial_eq_mul_doubleFactorial`
 (`(n+1)! = (n+1)‼ · n‼`), and feeds the Prop 4.10 (Tasaki §4.2.2, p. 108) coefficient match, where
-the per-configuration even factorials `(2 hᵢ)!` are converted into the odd double factorials
-`(2 hᵢ - 1)‼` appearing in the sphere-moment closed form.
+the per-configuration even factorials `(2 hᵢ)!` are converted into the odd double
+factorials `(2 hᵢ - 1)‼` appearing in the sphere-moment closed form.
 
 Reference: Tasaki, *Physics and Mathematics of Quantum Many-Body Systems*, §4.2.2, p. 108.
 -/

@@ -23,18 +23,18 @@ namespace LatticeSystem.Math
 open Finset
 open scoped Nat
 
-/-- **Pinch coefficient match** (Tasaki §4.2.2, p. 108, eqs. (4.2.58)/(4.2.59)): for a `Fin 3` count
-vector `h`, with `M = ∑ i, h i`,
+/-- **Pinch coefficient match** (Tasaki §4.2.2, p. 108, eqs. (4.2.58)/(4.2.59)):
+for a `Fin 3` count vector `h`, with `M = ∑ i, h i`,
 `multinomial(2h) · (4π · ∏(2hᵢ-1)‼ / (2M+1)‼) = (4π / (2M+1)) · multinomial(h)`.
 
 The doubled-count multinomial multiplicity times the odd double-factorial sphere moment equals the
 plain multinomial coefficient up to the universal `4π / (2M+1)` factor.  The proof establishes the
 underlying natural-number identity
 `multinomial(2h) · ∏(2hᵢ-1)‼ · (2M+1) = multinomial(h) · (2M+1)‼`
-by multiplying both sides by `2^M · ∏ hᵢ!` (positive) and recognising each side as `(2M+1)!` via
-`Nat.multinomial_spec`, `two_mul_factorial_eq`, `Nat.doubleFactorial_two_mul` and
-`Nat.factorial_eq_mul_doubleFactorial`; the real identity then follows by clearing the two positive
-denominators. -/
+by multiplying both sides by `2^M · ∏ hᵢ!` (positive) and recognising each side as `(2M+1)!`
+via `Nat.multinomial_spec`, `two_mul_factorial_eq`, `Nat.doubleFactorial_two_mul` and
+`Nat.factorial_eq_mul_doubleFactorial`; the real identity then follows by clearing the two
+positive denominators. -/
 theorem pinch_coeff_match (h : Fin 3 → ℕ) :
     (Nat.multinomial Finset.univ (fun i => 2 * h i) : ℝ)
         * (4 * Real.pi * ((∏ i, ((2 * h i - 1)‼ : ℕ)) : ℝ) / (((2 * (∑ i, h i)) + 1)‼ : ℝ))
@@ -44,7 +44,8 @@ theorem pinch_coeff_match (h : Fin 3 → ℕ) :
   have hPh_pos : 0 < ∏ i, (h i)! := Finset.prod_pos (fun i _ => Nat.factorial_pos _)
   have hpow_pos : 0 < 2 ^ M := pow_pos (by norm_num) M
   have hmul_pos : 0 < 2 ^ M * ∏ i, (h i)! := Nat.mul_pos hpow_pos hPh_pos
-  -- Product form of the doubled even factorials: `∏ (2hᵢ)! = 2^M · ∏ hᵢ! · ∏ (2hᵢ-1)‼`.
+  -- Product form of the doubled even factorials:
+  -- `∏ (2hᵢ)! = 2^M · ∏ hᵢ! · ∏ (2hᵢ-1)‼`.
   have hP2 : (∏ i, (2 * h i)!) = 2 ^ M * (∏ i, (h i)!) * (∏ i, (2 * h i - 1)‼) := by
     calc (∏ i, (2 * h i)!)
         = ∏ i, (2 ^ (h i) * (h i)! * (2 * h i - 1)‼) :=
