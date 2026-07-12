@@ -339,12 +339,12 @@ sphereAverage_directionStaggeredOp_pow_mulVec
 # consumed.
 orderSq_collapse_vecNormSqRe
 
-# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) L4b-ii,
-# `Quantum/SpinS/AndersonTowerRotationDeriv.lean`. Rotation-derivative vanishing of the directional
-# moment `d/dθ ⟨Φ, (Ô_L^{R_γ(θ) n₀})^{2M} Φ⟩ = 0` for a total-spin singlet `Φ`: the polynomial
-# expansion makes the θ-dependence the coordinate monomials, whose commutative product derivative
-# (`HasDerivAt.finset_prod`) fed by the generator ODE collapses via the regrouping involution into
-# the reindexed master Ward identity `cartWord_ward_singlet_ofFn` (Tasaki §4.2.2,
-# eqs. (4.2.57)–(4.2.59), p. 108–109).  Zero-referenced until the global-constancy step (L4b-iii)
-# feeds it to `is_const_of_deriv_eq_zero`. RE-EVALUATE/DELIST when consumed.
-directionMoment_rotationPath_hasDerivAt_zero
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) L4b-iii,
+# `Quantum/SpinS/AndersonTowerDirectionIsotropy.lean`. Per-direction tower-term norm isotropy:
+# `‖(Ô_L^n)^M Φ‖²` is the same at any two unit vectors `n, n' ∈ S²` for a total-spin singlet `Φ`.
+# Arc constancy (`is_const_of_deriv_eq_zero` on the L4b-ii vanishing derivative) plus two-arc sphere
+# reachability from the north pole (`sphere_reachable_from_e3`) give moment isotropy, which the
+# Hermiticity of `directionStaggeredOp` transports to the tower-term squared norm (Tasaki §4.2.2,
+# eqs. (4.2.57)–(4.2.61), p. 108–109).  Zero-referenced until the sphere-average assembly (PR-6)
+# consumes it as the per-direction normalisation constant `c_M`. RE-EVALUATE/DELIST when consumed.
+directionTanakaTowerTerm_vecNormSqRe_indep
