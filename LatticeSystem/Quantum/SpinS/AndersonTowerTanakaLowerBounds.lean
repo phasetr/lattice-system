@@ -27,6 +27,7 @@ Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1
 -/
 import LatticeSystem.Quantum.SpinS.AndersonTowerTanakaMoments
 import LatticeSystem.Quantum.SpinS.AndersonTowerTanakaCapstone
+import LatticeSystem.Math.Analysis.RealLogConvexSequence
 
 namespace LatticeSystem.Quantum
 
@@ -55,33 +56,6 @@ private theorem staggeredOrderOp1S_mulVec_tanakaTowerTerm (A : Λ → Bool) (k :
     (Φ : (Λ → Fin (N + 1)) → ℂ) :
     (staggeredOrderOp1S A N).mulVec (tanakaTowerTerm A N k Φ) = tanakaTowerTerm A N (k + 1) Φ := by
   rw [tanakaTowerTerm, tanakaTowerTerm, pow_succ', Matrix.mulVec_mulVec]
-
-/-! ### Log-convex cross inequality for a nonnegative sequence -/
-
-/-- **Cross log-convexity of a nonnegative log-convex sequence**: if `0 ≤ m k` for all `k` and
-`m (k+1)² ≤ m k · m (k+2)`, then `m 1 · m n ≤ m 0 · m (n+1)` (the ratio `m (n+1)/m n` is
-non-decreasing).  Applied to the even bare `1`-axis moments `B_k = ‖(Ô_L^{(1)})^k Φ‖²`, this is the
-monotonicity of `R_k = B_{k+1}/(B_k V²)` (eq. (4.2.36) for `ô^{(1)}`). -/
-private theorem real_logConvex_cross {m : ℕ → ℝ} (hnn : ∀ k, 0 ≤ m k)
-    (hsq : ∀ k, m (k + 1) ^ 2 ≤ m k * m (k + 2)) (n : ℕ) :
-    m 1 * m n ≤ m 0 * m (n + 1) := by
-  induction n with
-  | zero => exact le_of_eq (mul_comm _ _)
-  | succ k ih =>
-    have hsqk : m (k + 1) ^ 2 ≤ m k * m (k + 2) := hsq k
-    rcases eq_or_lt_of_le (hnn k) with h0 | hpos
-    · have hle : m (k + 1) ^ 2 ≤ 0 := by rw [← h0, zero_mul] at hsqk; exact hsqk
-      have hk1 : m (k + 1) = 0 :=
-        pow_eq_zero_iff two_ne_zero |>.mp (le_antisymm hle (sq_nonneg _))
-      rw [hk1, mul_zero]
-      exact mul_nonneg (hnn 0) (hnn (k + 1 + 1))
-    · have key : m k * (m 1 * m (k + 1)) ≤ m k * (m 0 * m (k + 2)) :=
-        calc m k * (m 1 * m (k + 1)) = m 1 * m k * m (k + 1) := by ring
-          _ ≤ m 0 * m (k + 1) * m (k + 1) := mul_le_mul_of_nonneg_right ih (hnn (k + 1))
-          _ = m 0 * m (k + 1) ^ 2 := by ring
-          _ ≤ m 0 * (m k * m (k + 2)) := mul_le_mul_of_nonneg_left hsqk (hnn 0)
-          _ = m k * (m 0 * m (k + 2)) := by ring
-      exact le_of_mul_le_mul_left key hpos
 
 /-! ### The renormalized moment ratio `R_k ≥ q₀` -/
 
@@ -128,7 +102,7 @@ theorem orderOp1_evenMoment_ratio_ge_q0 (d L N k : ℕ) [NeZero L]
     simp only [Matrix.one_mulVec] at hcs
     rw [hmid j] at hcs
     exact hcs
-  have hcross := real_logConvex_cross hBnn hsq
+  have hcross := LatticeSystem.Math.real_logConvex_cross hBnn hsq
   -- `B 0 = ‖Φ‖² > 0`.
   have hB0 : B 0 = (star Φ ⬝ᵥ Φ).re := by
     simp only [hBdef, vecNormSqRe, tanakaTowerTerm, pow_zero, Matrix.one_mulVec]
