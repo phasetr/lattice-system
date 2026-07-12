@@ -329,3 +329,12 @@ orderSqOp_expectation_eq_three_mul_axis3
 # p. 108).  Zero-referenced until the vector assembly (PR-6) linearizes the operator expansion
 # onto `Φ`. RE-EVALUATE/DELIST when consumed.
 sphereAverage_directionStaggeredOp_pow_mulVec
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR L5-a,
+# `Quantum/SpinS/AndersonTowerOrderSqCollapse.lean`. The `ô²`-collapse identity (Tasaki
+# eq. (4.2.60)): `‖unitNormalize(Bʲ Φ) − Φ̂‖² = 2(1 − R_j/(√R_{2j}·√R_0))` for `B = ô²` and
+# moments `R_k = orderSqMoment d L N Φ k`.  Purely algebraic and unconditional (sesquilinear
+# expansion of two unit vectors via `B` Hermitian).  Zero-referenced until the sphere-average
+# assembly (PR-6) consumes it in the triangle-inequality second term. RE-EVALUATE/DELIST when
+# consumed.
+orderSq_collapse_vecNormSqRe
