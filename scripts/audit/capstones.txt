@@ -313,3 +313,11 @@ staggeredOrderOpS_commutator_staggeredOrderOp1S
 # tips `card_ofFn_count_eq` / `count_ofFn_eq_card_filter` / `two_mul_factorial_eq` and the PR-3.3b-γ
 # coefficient match `pinch_coeff_match` are now consumed by this pinch body and were delisted.)
 cartWord_sphereAverage_pinch
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-4a,
+# `Quantum/SpinS/AndersonTowerOrderSqMoment.lean`. The `ô²`-moment lower bound
+# `R_m ≥ (q₀ · (L^d)²)^m · R_0` (`R_k = ⟨Φ, (ô²)^k Φ⟩`), obtained by telescoping the moment
+# log-convexity from the base ratio bound `R_1 ≥ q₀ (L^d)² R_0` under the long-range-order
+# hypothesis (Tasaki §4.2.2, eqs. (4.2.36)/(4.2.37), pp. 105–108).  Zero-referenced until the
+# sphere-average relative-close estimate (PR-4b) consumes it. RE-EVALUATE/DELIST when consumed.
+orderSqMoment_ge

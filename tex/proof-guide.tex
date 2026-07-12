@@ -10255,6 +10255,24 @@ $(m^\ast)^2=q_0$), and (4.2.14) from PR2.  The $N=0$ branch is vacuous (the orde
 contradicting long-range order).  The proved theorem depends only on
 \texttt{[propext, Classical.choice, Quot.sound]}.
 
+\medskip\noindent\textbf{Squared-order-operator moment lower bound (PR-4a)} (Tasaki §4.2.2,
+Proposition 4.10 arc, eqs.~(4.2.31), (4.2.35)--(4.2.37), pp.~105--108; \textbf{PROVED axiom-free},
+Issue \#4974, PR \#5026; \texttt{Quantum/SpinS/AndersonTowerOrderSqMoment.lean},
+\texttt{Math/Analysis/RealLogConvexSequence.lean}).  The squared-order-operator moments
+$R_m:=\langle\Phi,(\hat\omega^2)^m\Phi\rangle$ (where $\hat\omega^2=\texttt{orderSqOp}$) satisfy the
+lower bound $R_m\ge(q_0\cdot L^d)^{2m}\cdot R_0$, driving the sphere-average relative-close estimate
+of Proposition~4.10.  The derivation lifts the Theorem~4.9 $\hat p$-moment machinery verbatim to
+$\hat\omega^2$: \textbf{(1)~Log-convexity} ($R_{k+1}^2\le R_k\cdot R_{k+2}$): $\hat\omega^2$ is
+Hermitian and positive-semidefinite via the split $\hat\omega^2=(L^d)^2\hat p+(\hat o^{(3)})^2$, so
+moments obey the positive-semidefinite Cauchy--Schwarz bound. \textbf{(2)~Base ratio}
+($R_1\ge q_0\cdot(L^d)^2\cdot R_0$): from the split and the long-range-order hypothesis
+$q_0\le\langle(\hat o^{(3)})^2\rangle/(\|\Phi\|^2(L^d)^2)$ (no isotropy required).
+\textbf{(3)~Telescoping} ($R_m\ge(q_0\cdot L^d)^{2m}\cdot R_0$): abstract
+$\texttt{real\_logConvex\_geometric\_lower}$ iterates the log-convexity to the geometric lower bound.
+\emph{Scope:} only the $q_0$ one-sided lower bound; the sphere-average relative-close and its
+$L\to\infty$ limit are sequel PR-4b; Tanaka-state infrastructure and Conjecture~4.12 (isotropy
+$m^\ast=\sqrt{3q_0}$) remain deferred.
+
 \noindent\textbf{Proposition 4.10} (Tasaki §4.2.1, eqs.~(4.2.17)--(4.2.22), pp.~99--100; documented
 axiom, \texttt{Quantum/SpinS/AndersonTowerSphereAverage.lean}, Issue \#4485).  The solid-angle average
 of the symmetry-breaking states recovers the ground state.  For a unit vector $n\in S^2\subset
