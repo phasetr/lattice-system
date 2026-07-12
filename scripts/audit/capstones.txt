@@ -338,3 +338,25 @@ ofFn_swapChain_groupedFin3
 # the pinch body (PR-3.3b).  Zero-referenced until consumed.
 # RE-EVALUATE/DELIST when consumed by PR-3.3b.
 card_ofFn_count_eq
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-3.3b-γ,
+# `Math/Combinatorics/MultinomialFiber.lean`. Bridges the `List.count` form of the sphere-moment
+# estimates with the `Finset.filter`-cardinality form of the position-selection counts:
+# `(List.ofFn f).count a = (univ.filter (fun j => f j = a)).card`.  Generalises the `Bool`
+# `count_true_ofFn`; fed into the per-configuration matching by the pinch body (PR-3.3b).
+# Zero-referenced until consumed. RE-EVALUATE/DELIST when consumed by PR-3.3b.
+count_ofFn_eq_card_filter
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-3.3b-γ,
+# `Math/DoubleFactorial.lean`. The even-factorial split `(2a)! = 2^a · a! · (2a-1)‼` converting the
+# per-configuration even factorials into the odd double factorials of the sphere-moment closed
+# form.  Fed into the `doubleFactorial → 1/(M+1)` coefficient match by the pinch body (PR-3.3b).
+# Zero-referenced until consumed. RE-EVALUATE/DELIST when consumed by PR-3.3b.
+two_mul_factorial_eq
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) PR-3.3b-γ,
+# `Math/Combinatorics/PinchCoeff.lean`. The scalar coefficient match reconciling the doubled-count
+# multinomial multiplicity and the odd double-factorial sphere moment with the plain multinomial,
+# up to `4π/(2M+1)`.  The §2.4 arithmetic capstone consumed by the pinch body (PR-3.3b).
+# Zero-referenced until consumed. RE-EVALUATE/DELIST when consumed by PR-3.3b.
+pinch_coeff_match

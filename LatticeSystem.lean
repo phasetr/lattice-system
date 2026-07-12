@@ -17,6 +17,8 @@ import LatticeSystem.Math.DoubleSequenceDiagonal
 import LatticeSystem.Math.ReflectionPositivityAveraging
 import LatticeSystem.Math.SphereMoment
 import LatticeSystem.Math.Combinatorics.MultinomialFiber
+import LatticeSystem.Math.Combinatorics.PinchCoeff
+import LatticeSystem.Math.DoubleFactorial
 import LatticeSystem.Math.NoncommPowerExpansion
 import LatticeSystem.Math.HermitianMaxEigenvalue
 import LatticeSystem.Math.HermitianEigenspaceBotAboveMax
