@@ -137,6 +137,7 @@ import LatticeSystem.Quantum.SpinS.AndersonTowerLeviCivita
 import LatticeSystem.Quantum.SpinS.AndersonTowerTelescoping
 import LatticeSystem.Quantum.SpinS.AndersonTowerMasterWard
 import LatticeSystem.Quantum.SpinS.AndersonTowerRotationDeriv
+import LatticeSystem.Quantum.SpinS.AndersonTowerDirectionIsotropy
 import LatticeSystem.Quantum.SpinS.AndersonTowerCartWordReBand
 import LatticeSystem.Quantum.SpinS.AndersonTowerGroupedNormalForm
 import LatticeSystem.Quantum.SpinS.AndersonTowerPinch
