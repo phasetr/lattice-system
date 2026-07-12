@@ -348,3 +348,13 @@ orderSq_collapse_vecNormSqRe
 # eqs. (4.2.57)–(4.2.61), p. 108–109).  Zero-referenced until the sphere-average assembly (PR-6)
 # consumes it as the per-direction normalisation constant `c_M`. RE-EVALUATE/DELIST when consumed.
 directionTanakaTowerTerm_vecNormSqRe_indep
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — §4.2 Prop 4.10 (#4974) L5-b-i,
+# `Quantum/SpinS/AndersonTowerOrderSqBaseRatio.lean`. The base `ô²`-moment ratio limit
+# `lim_L R_1/(R_0·V²) = (m∗)²` for a total-spin-singlet ground-state family, from factor-3 diagonal
+# isotropy `R_1 = 3·⟨(ô^{(3)})²⟩`, the axis-3 long-range-order limit `⟨(ô^{(3)})²⟩/(‖Φ‖²V²) → q∗`, and
+# Conjecture 4.12 `(m∗)² = 3 q∗` (explicit hypothesis, never asserted).  Concentration-independent
+# and independent of Theorem 4.9 `m∗ = √q₀` (Tasaki §4.2.2, eqs. (4.2.25)–(4.2.26), (4.2.57)–(4.2.59),
+# p. 108–109).  Zero-referenced until the geometric moment squeeze (L5-b-iii) consumes it as the
+# base of the geometric lower bound.  RE-EVALUATE/DELIST when consumed.
+orderSqMoment_baseRatio_tendsto
