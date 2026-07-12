@@ -61,8 +61,10 @@ private theorem vecNormSqRe_eq_zero {ι : Type*} [Fintype ι] {w : ι → ℂ}
 
 /-- **`unitNormalize` is invariant under a positive real rescaling**:
 `unitNormalize((t : ℂ) • v) = unitNormalize v` for `0 < t`.  The scalar `t` cancels between the
-vector and its rescaled norm `√(t² ‖v‖²) = t ‖v‖`. -/
-private theorem unitNormalize_ofReal_smul {ι : Type*} [Fintype ι] {t : ℝ} (ht : 0 < t)
+vector and its rescaled norm `√(t² ‖v‖²) = t ‖v‖`.  Exported (non-`private`) for reuse in the
+sphere-average final assembly (Proposition 4.10, PR-6c), where the positive constant
+`4π/(2j+1)` in front of `(ô²)ʲ Φ` is absorbed by the normalization. -/
+theorem unitNormalize_ofReal_smul {ι : Type*} [Fintype ι] {t : ℝ} (ht : 0 < t)
     (v : ι → ℂ) : unitNormalize (((t : ℝ) : ℂ) • v) = unitNormalize v := by
   have htc : ((t : ℝ) : ℂ) ≠ 0 := by exact_mod_cast ht.ne'
   have hnorm : vecNormSqRe (((t : ℝ) : ℂ) • v) = t ^ 2 * vecNormSqRe v := by

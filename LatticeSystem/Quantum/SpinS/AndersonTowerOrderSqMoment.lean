@@ -95,6 +95,18 @@ theorem orderSq_dotProduct_eq_orderSqMoment (d L N : ℕ) [NeZero L]
   rw [orderSqMoment, Complex.ext_iff, Complex.ofReal_re, Complex.ofReal_im]
   exact ⟨rfl, hermitian_dotProduct_im_zero ((orderSqOp_torus_isHermitian d L N).pow k) Φ⟩
 
+/-- **The `j`-th `ô²`-tower term has squared `L²` norm `R_{2j}`**: `‖(ô²)ʲ Φ‖² = R_{2j}` (Tasaki
+eq. (4.2.60) building block).  Since `ô²` is Hermitian, `⟨(ô²)ʲ Φ, (ô²)ʲ Φ⟩ = ⟨Φ, (ô²)^{2j} Φ⟩`
+(`hermitian_pow_dotProduct_split`), whose real part is `orderSqMoment d L N Φ (2 j)`.  Exported for
+the sphere-average final assembly (Proposition 4.10, PR-6c), where the normalization denominator of
+`(ô²)ʲ Φ` must be read off as the moment `R_{2j}`. -/
+theorem vecNormSqRe_orderSqPow_mulVec (d L N j : ℕ) [NeZero L]
+    (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) :
+    vecNormSqRe ((orderSqOp (torusParitySublattice d L) N ^ j).mulVec Φ)
+      = orderSqMoment d L N Φ (2 * j) := by
+  rw [vecNormSqRe, hermitian_pow_dotProduct_split (orderSqOp_torus_isHermitian d L N) j j Φ,
+    orderSq_dotProduct_eq_orderSqMoment, Complex.ofReal_re, two_mul]
+
 /-- The `ô²`-moments are nonnegative: `R_k ≥ 0`. -/
 theorem orderSqMoment_nonneg (d L N : ℕ) [NeZero L]
     (Φ : (HypercubicTorus d L → Fin (N + 1)) → ℂ) (k : ℕ) :
