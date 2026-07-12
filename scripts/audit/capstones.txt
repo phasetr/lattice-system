@@ -398,3 +398,9 @@ sqrt_vecNormSqRe_mulVec_le
 # (4.2.59), p. 108).  Zero-referenced until the vector-remainder bridge (PR-6b-ii, tip A) sums it over
 # the ordered→grouped swap chains of `D_j`.  RE-EVALUATE/DELIST when consumed by PR-6b-ii.
 cartWord_swapChain_manyBodyOperatorNormS_diff_le
+
+# PR-6b-ii (Prop 4.10, #4974) tip B: the L² vector pinch bridge bounding the distance between the
+# sphere average Op_{2j}Φ and its rotationally invariant main part (4π/(2j+1))(ô²)^jΦ (Tasaki §4.2.2,
+# eqs. (4.2.58)/(4.2.59), p. 108).  Zero-referenced until PR-6c instantiates it on the torus and
+# relativises with the (ô²)-moment lower bound.  RE-EVALUATE/DELIST when consumed by PR-6c.
+sphereAverage_orderSq_vecRemainder_le
