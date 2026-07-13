@@ -382,7 +382,14 @@ eq. (4.1.7)) and axis-1 reversal invariant (`Θ Φ = Φ`, matching `IsTanakaFull
 the growth bound `M L + 1 ≤ C₁ L^{d/2}` and well-defined Tanaka terms;
 `q₀` is the exact LRO limit (eq. (4.1.7)/(4.2.25)); `m∗` is the exact staggered-moment limit
 (eq. (4.2.12)); and `m∗` is the genuine full-SSB order parameter (`IsTanakaFullSSBConstants`).
-These
+The final conjunct records Tasaki's genuine **slow-divergence** hypothesis for `M(L)`: it grows
+`o(L^{d/2}) = o(√V)`, i.e. for *every* `c > 0` eventually `M(L) + 1 ≤ c L^{d/2}` (Theorem 4.9
+footnote 21 "diverges not too rapidly", Lemma 4.16 "indefinitely slowly", pp. 98/108–109;
+physically `M(L) = ⌊L^{d/4}⌋ = o(L^{d/2})`).  This is strictly stronger than — and implies, at
+`c := C₁` — the earlier `O(L^{d/2})`-form conjunct `M(L) + 1 ≤ C₁ L^{d/2}` kept in the per-`L`
+block (which stays a locality choice, bundled with `0 < M L` and consumed by Theorem 4.13); it
+repairs the latent under-faithfulness of the `O`-form and makes the Theorem 4.8 energy gate
+`M(L) + 1 ≤ C₁_E L^{d/2}` derivable for the specific `C₁_E` that Theorem 4.8 fixes. These
 conditions are unsatisfiable in `d = 1` (no LRO ground state, Corollary 4.3). -/
 def IsRealizingTanakaGroundStateFamily (d N : ℕ) (q₀ mStar C₁ : ℝ)
     (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ) (M : ℕ → ℕ) : Prop :=
@@ -405,7 +412,11 @@ def IsRealizingTanakaGroundStateFamily (d N : ℕ) (q₀ mStar C₁ : ℝ)
         ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2) - q₀| < ε) ∧
   (∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
     |tanakaOrderMean1 d L N (M L) (Φ L) - mStar| < ε) ∧
-  IsTanakaFullSSBConstants d N q₀ C₁ mStar
+  IsTanakaFullSSBConstants d N q₀ C₁ mStar ∧
+  -- **slow divergence `M(L) = o(L^{d/2})`** (Tasaki Thm 4.9 fn. 21 / Lemma 4.16): for every
+  -- `c > 0`, eventually `M(L) + 1 ≤ c L^{d/2}`.  Implies the `O`-form conjunct at `c := C₁`.
+  (∀ c : ℝ, 0 < c → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
+    ((M L : ℝ) + 1) ≤ c * (L : ℝ) ^ ((d : ℝ) / 2))
 
 -- **Tasaki Theorem 4.11 (the two order parameters), eq. (4.2.23), p. 101** — the bound
 -- `√(3 q₀) ≤ m∗` for a `IsRealizingTanakaGroundStateFamily` — is now **proved** as

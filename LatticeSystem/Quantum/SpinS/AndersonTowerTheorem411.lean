@@ -68,7 +68,7 @@ theorem tanakaSSB_orderParameter_lowerBound (d N : ℕ) (hd : 1 ≤ d) (q₀ mSt
   -- full-SSB constants `.2.2.2.2` (which supply `0 < m∗`).
   obtain ⟨L₁, hEv⟩ := hFamily.2.1
   have hlim3 := hFamily.2.2.1
-  have hFull := hFamily.2.2.2.2
+  have hFull := hFamily.2.2.2.2.1
   -- Eventual total-spin-singlet property, projected out of the family block (conjuncts 4 and 5).
   have hsinglet : ∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
       (totalSpinSOp3 (HypercubicTorus d L) N).mulVec (Φ L) = 0 ∧
