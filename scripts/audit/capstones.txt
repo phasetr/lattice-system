@@ -80,6 +80,16 @@ tanakaSSB_lowLying_energy_bound
 # delisted Theorem 4.8 PR-A…PR-D tips); only the capstone remains allowlisted.
 tanakaSSB_full_symmetry_breaking
 
+# V1 book capstone: §4.2.2 Theorem 4.11 (the two order parameters), eq. (4.2.23), p. 101 — the
+# discharged book capstone (#5006, PR-3, `AndersonTowerTheorem411.lean`).  The former axiom
+# `tanakaSSB_orderParameter_lowerBound` is now a PROVED theorem `√(3 q₀) ≤ m∗` that CONSUMES the
+# Conjecture-4.12-free base-ratio limit `orderSqMoment_baseRatio_tendsto_threeQ` (`→ 3 q₀`, PR-1) and
+# the documented `SU(2)`/`ô²` concentration axiom `orderSqMoment_ratio_le_mStarSq_family` (PR-2, the
+# `p̂`/`U(1)` mirror companion).  Legitimately zero-referenced terminal book statement (Conjecture
+# 4.12 `(m∗)² = 3 q₀` is only this "easy half" `≥`, never asserted; `IsConjecture412Equality` does
+# not appear in `#print axioms`).
+tanakaSSB_orderParameter_lowerBound
+
 # TEMPORARY — §4.1 Theorem 4.2 (#4777) Gaussian-domination sub-arc (design v2), PR7a tip (#4975).
 # The reflection invariance of the field-extended ring weight (`RingReflectionFieldWeight.lean`).
 # NOTE (PR7d-i, #4984): the adopted symmetrisation route reuses the classical averaging lemma via
