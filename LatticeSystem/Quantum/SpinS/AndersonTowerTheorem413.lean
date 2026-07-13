@@ -1,4 +1,3 @@
-import LatticeSystem.Quantum.SpinS.AndersonTowerField
 import LatticeSystem.Quantum.SpinS.AndersonTowerTanakaCapstone
 
 /-!
