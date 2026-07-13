@@ -308,3 +308,10 @@ sphereAverage_orderSqMoment_relative_close
 # eqs. (4.2.37), (4.2.57)–(4.2.61), p. 105–108).  Conditional on Conjecture 4.12 (never asserted).
 # Zero-referenced standalone milestone tip until consumed downstream.  RE-EVALUATE/DELIST when consumed.
 orderSqMoment_geom_tendsto
+
+# Tasaki §4.2.2 Theorem 4.8 realizing-family trial-energy input (axiom-free), the companion consumed
+# by Theorem 4.13 (`tanakaSSB_field_lowerBound`).  Derived from the proved Theorem 4.8
+# (`tanakaSSB_lowLying_energy_bound`) via the family's `o(L^{d/2})` gate + `q₀/2` LRO rescale; no
+# companion axiom.  Zero-referenced tip until consumed by Theorem 4.13 (PR-2').  RE-EVALUATE/DELIST
+# when consumed.
+tanakaSSB_realizingFamily_energyBound
