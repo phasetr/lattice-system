@@ -50,8 +50,9 @@ never asserted), matching the base ratio's hypothesis surface (singlet family `h
 long-range-order limit `hlim3 → q∗`, moment positivity `hR`); unsatisfiable in `d = 1` (no LRO,
 Corollary 4.3), so vacuous there.
 
-Here `R_k = orderSqMoment d L N Φ k` and `V² = (L^d)²`; `hR` (moment positivity) makes the division
-meaningful, corresponding to the `p̂` mirror's `hPhat`. -/
+Here `R_k = orderSqMoment d L N Φ k` and `V² = (L^d)²`; `hR` (eventual moment positivity, `∃ Lr`,
+matching the eventual form of `hsinglet`/`hlim3`) makes the division meaningful, corresponding to
+the `p̂` mirror's `hPhat`. -/
 axiom orderSqMoment_ratio_le_mStarSq (d N : ℕ) (hd : 1 ≤ d)
     (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ)
     (hsinglet : ∃ L₁ : ℕ, ∀ (L : ℕ) [NeZero L], L₁ ≤ L → 2 ≤ L → Even L →
@@ -63,7 +64,8 @@ axiom orderSqMoment_ratio_le_mStarSq (d N : ℕ) (hd : 1 ≤ d)
           staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
           ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2) - qStar| < ε)
     (hconj : IsConjecture412Equality mStar qStar)
-    (hR : ∀ (n L : ℕ) [NeZero L], 2 ≤ L → Even L → 0 < orderSqMoment d L N (Φ L) n) :
+    (hR : ∃ Lr : ℕ, ∀ (n L : ℕ) [NeZero L], Lr ≤ L → 2 ≤ L → Even L →
+      0 < orderSqMoment d L N (Φ L) n) :
     ∀ (n : ℕ) (ε : ℝ), 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
       orderSqMoment d L N (Φ L) (n + 1) /
           (orderSqMoment d L N (Φ L) n * ((L : ℝ) ^ d) ^ 2) < mStar ^ 2 + ε

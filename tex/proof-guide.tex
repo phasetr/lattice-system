@@ -10273,11 +10273,11 @@ $\texttt{real\_logConvex\_geometric\_lower}$ iterates the log-convexity to the g
 $L\to\infty$ limit are sequel PR-4b; Tanaka-state infrastructure and Conjecture~4.12 (isotropy
 $m^\ast=\sqrt{3q_0}$) remain deferred.
 
-\noindent\textbf{Proposition 4.10} (Tasaki §4.2.1, eqs.~(4.2.17)--(4.2.22), pp.~99--100; documented
-axiom, \texttt{Quantum/SpinS/AndersonTowerSphereAverage.lean}, Issue \#4485).  The solid-angle average
-of the symmetry-breaking states recovers the ground state.  For a unit vector $n\in S^2\subset
-\mathbb{R}^3$ the direction order operator $\hat O_L^n=\sum_x\varepsilon_x(\hat S_x\cdot n)$
-(\texttt{directionStaggeredOp}) gives a direction symmetry-breaking state $|\Xi_n\rangle$
+\noindent\textbf{Proposition 4.10} (Tasaki §4.2.1, eqs.~(4.2.17)--(4.2.22), pp.~99--100; \textbf{proved
+theorem (conditional)}, \texttt{Quantum/SpinS/AndersonTowerSphereGroundState.lean}, PR~\#5044).  The
+solid-angle average of the symmetry-breaking states recovers the ground state.  For a unit vector
+$n\in S^2\subset\mathbb{R}^3$ the direction order operator $\hat O_L^n=\sum_x\varepsilon_x(\hat S_x\cdot
+n)$ (\texttt{directionStaggeredOp}) gives a direction symmetry-breaking state $|\Xi_n\rangle$
 (\texttt{directionTanakaState}, eq.~(4.2.17)); by $SU(2)$ covariance the solid-angle average
 $\frac1{4\pi}\int_{|n|=1}|\Xi_n\rangle\,dn$ (\texttt{solidAngleAverageTanaka}, the Bochner integral
 over \texttt{Metric.sphere} in $\texttt{EuclideanSpace}\ \mathbb{R}\ (\mathrm{Fin}\ 3)$ with surface
@@ -10286,11 +10286,12 @@ conditioned (matching \texttt{IsTanakaFullSSBConstants}) to be a total-spin sing
 S^{(3)}_{\mathrm{tot}}\Phi=\hat S^{(1)}_{\mathrm{tot}}\Phi=0$ that is axis-1 reversal invariant
 $\Theta\Phi=\Phi$, so the linked full-SSB premise is non-vacuous.  \emph{Assuming Conjecture~4.12}
 ($m^\ast=\sqrt{3q^\ast}$, \texttt{IsConjecture412Equality}, a \texttt{Prop} hypothesis never asserted
-true), the normalized average converges up to a unimodular phase to $|\Phi_{\mathrm{GS}}\rangle$
-(eq.~(4.2.22)): $\exists z,\ \lVert z\rVert=1,\ \lVert\mathrm{unitNormalize}(\Xi_{\mathrm{avg}})-z\cdot
-\mathrm{unitNormalize}(\Phi)\rVert<\varepsilon$.  The axiom
-\texttt{tanakaSphereAverage\_groundState} shares constants with Theorem 4.6 and is conditional on
-long-range order (vacuous in one dimension by Corollary 4.3).  Chapters~3--10 backfill.
+true) \emph{and the documented axiom} \texttt{orderSqMoment\_ratio\_le\_mStarSq} ($\hat o^2$
+concentration, Koma--Tasaki [66]), the normalized average converges up to a unimodular phase to
+$|\Phi_{\mathrm{GS}}\rangle$ (eq.~(4.2.22)): $\exists z,\ \lVert z\rVert=1,\ \lVert
+\mathrm{unitNormalize}(\Xi_{\mathrm{avg}})-z\cdot\mathrm{unitNormalize}(\Phi)\rVert<\varepsilon$.
+The theorem \texttt{tanakaSphereAverage\_groundState} shares constants with Theorem 4.6 and is
+conditional on long-range order (vacuous in one dimension by Corollary 4.3).  Chapters~3--10 backfill.
 
 \medskip\noindent\textbf{Telescoping crux of Proposition 4.10} (Tasaki §4.2.2,
 eqs.~(4.2.58)--(4.2.59), p.~108; \textbf{PROVED axiom-free}, Issue \#4974, PR \#5018;
