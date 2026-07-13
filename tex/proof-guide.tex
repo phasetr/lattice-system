@@ -10341,24 +10341,25 @@ operator-norm band; \textbf{(5)} singlet property ($\hat S_{\mathrm{tot}}|\Phi\r
 boundary erasure of the commutator sum. The moment identification in the identity (eqs.~(4.2.58)--(4.2.59))
 and Conjecture~4.12's ratio-limit lower bound are deferred to later steps (PR-4/PR-5).
 
-\noindent\textbf{Theorem 4.11} (Koma--Tasaki, Tasaki §4.2.1, eq.~(4.2.23), p.~101; documented axiom,
-\texttt{Quantum/SpinS/AndersonTower.lean}, Issue \#4485).  The two order parameters satisfy
-$\sqrt{3q_0}\le m^\ast$, where the factor $\sqrt3$ reflects the $SU(2)$ symmetry of the Heisenberg
-model (it becomes $\sqrt2$ for the $U(1)$/XXZ variant).  To avoid the downward-closure of the SSB
-predicate (a $\liminf\ge m$ bound, true for any smaller $m$ and vacuous in $d=1$), the axiom
-\texttt{tanakaSSB\_orderParameter\_lowerBound} pins $q_0$ and $m^\ast$ as the \emph{exact}
-infinite-volume limits via a single hypothesis $\texttt{hFamily}:
+\noindent\textbf{Theorem 4.11} (Koma--Tasaki, Tasaki §4.2.1, eq.~(4.2.23), p.~101; \textbf{PROVED}
+(theorem, conditional), \texttt{Quantum/SpinS/AndersonTowerTheorem411.lean}, Issue \#5047).  The
+two order parameters satisfy $\sqrt{3q_0}\le m^\ast$, where the factor $\sqrt3$ reflects the $SU(2)$
+symmetry of the Heisenberg model (it becomes $\sqrt2$ for the $U(1)$/XXZ variant).  To avoid the
+downward-closure of the SSB predicate (a $\liminf\ge m$ bound, true for any smaller $m$ and vacuous
+in $d=1$), the theorem \texttt{tanakaSSB\_orderParameter\_lowerBound} pins $q_0$ and $m^\ast$ as
+the \emph{exact} infinite-volume limits via a single hypothesis $\texttt{hFamily}:
 \texttt{IsRealizingTanakaGroundStateFamily}\ d\ N\ q_0\ m^\ast\ C_1\ \Phi\ E_0\ M$.  That predicate
 bundles: the diverging tower $\texttt{Tendsto}\ M\ \texttt{atTop atTop}$ with growth $M+1\le C_1
-L^{d/2}$; $\Phi$ an eventual minimizing nonzero ground state with well-defined Tanaka terms; the exact
-long-range-order limit $q_0$; the exact staggered-moment limit $\texttt{tanakaOrderMean1}\to m^\ast$;
-and $\texttt{IsTanakaFullSSBConstants}\ d\ N\ q_0\ C_1\ m^\ast$ connecting $m^\ast$ to the full-SSB API
-(Theorem 4.9) for the \emph{same} $m^\ast$.  These conditions are
-unsatisfiable in $d=1$ (no LRO ground state, Corollary~4.3), so the bound $\sqrt{3q_0}\le m^\ast$
-applies exactly where intended (and $m^\ast>0$ follows).  The same predicate
-\texttt{IsRealizingTanakaGroundStateFamily} is the realizing-family conditioning shared by
-Theorems 4.11, 4.13 and Lemma 4.15 (a DRY refactoring helper), used as the \texttt{hFamily}
-hypothesis of all three.  Chapters~3--10 backfill.
+L^{d/2}$; $\Phi$ an eventual minimizing nonzero ground state with well-defined Tanaka terms; the
+exact long-range-order limit $q_0$; the exact staggered-moment limit $\texttt{tanakaOrderMean1}\to
+m^\ast$; and $\texttt{IsTanakaFullSSBConstants}\ d\ N\ q_0\ C_1\ m^\ast$ connecting $m^\ast$ to the
+full-SSB API (Theorem 4.9) for the \emph{same} $m^\ast$.  These conditions are unsatisfiable in
+$d=1$ (no LRO ground state, Corollary~4.3), so the bound $\sqrt{3q_0}\le m^\ast$ applies exactly
+where intended (and $m^\ast>0$ follows).  **Conditional on documented axiom
+\texttt{orderSqMoment\_ratio\_le\_mStarSq\_family}** (ô² concentration, Koma–Tasaki [66]);
+Conjecture~4.12 is *not* required.  The same predicate \texttt{IsRealizingTanakaGroundStateFamily}
+is the realizing-family conditioning shared by Theorems~4.11, 4.13 and Lemma~4.15 (a DRY
+refactoring helper), used as the \texttt{hFamily} hypothesis of all three.  Chapters~3--10 backfill.
 
 \noindent\textbf{Conjecture 4.12} (Koma--Tasaki, Tasaki §4.2.1, eqs.~(4.2.25)--(4.2.26), pp.~101--102;
 axiom-free \texttt{Prop} statement, \texttt{Quantum/SpinS/AndersonTowerSphereAverage.lean}, Issue

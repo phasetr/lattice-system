@@ -407,28 +407,13 @@ def IsRealizingTanakaGroundStateFamily (d N : ℕ) (q₀ mStar C₁ : ℝ)
     |tanakaOrderMean1 d L N (M L) (Φ L) - mStar| < ε) ∧
   IsTanakaFullSSBConstants d N q₀ C₁ mStar
 
-/-- **Tasaki Theorem 4.11 (the two order parameters), AXIOM.**  The symmetry-breaking order
-parameter
-`m∗` and the long-range-order parameter `q₀` satisfy `√(3 q₀) ≤ m∗` (eq. (4.2.23)).  The factor `√3`
-reflects the `SU(2)` symmetry of the Heisenberg model (for the `U(1)`/XXZ variant it is `√2`).
-
-To avoid the downward-closure of `IsTanakaFullSSBConstants` (a `liminf ≥ m` lower bound, true for
-any
-smaller `m` and vacuously true in `d = 1`), `m∗` and `q₀` are pinned as the **exact**
-infinite-volume
-limits of a `IsRealizingTanakaGroundStateFamily` (`hFamily`): a genuine realizing ground-state
-family
-`Φ` and slowly-diverging tower `M` with the exact LRO limit `q₀`, the exact staggered-moment limit
-`m∗`, and `m∗ = ` the full-SSB order parameter (`IsTanakaFullSSBConstants`, connecting to Theorem
-4.9
-for the *same* `m∗`).  The exact-limit conditions force `m∗` to the unique limit value, so the
-predicate's downward-closure is harmless, and they are unsatisfiable in `d = 1` (no LRO ground
-state,
-Corollary 4.3), so the bound applies exactly where it should.  `m∗ > 0` follows from `q₀ > 0`. -/
-axiom tanakaSSB_orderParameter_lowerBound (d N : ℕ) (hd : 1 ≤ d) (q₀ mStar C₁ : ℝ)
-    (hq₀ : 0 < q₀) (hC₁ : 0 < C₁)
-    (Φ : (L : ℕ) → (HypercubicTorus d L → Fin (N + 1)) → ℂ) (E₀ : ℕ → ℂ) (M : ℕ → ℕ)
-    (hFamily : IsRealizingTanakaGroundStateFamily d N q₀ mStar C₁ Φ E₀ M) :
-    Real.sqrt (3 * q₀) ≤ mStar
+-- **Tasaki Theorem 4.11 (the two order parameters), eq. (4.2.23), p. 101** — the bound
+-- `√(3 q₀) ≤ m∗` for a `IsRealizingTanakaGroundStateFamily` — is now **proved** as
+-- `tanakaSSB_orderParameter_lowerBound` in
+-- `LatticeSystem.Quantum.SpinS.AndersonTowerTheorem411` (downstream of this file, which only
+-- states the `IsRealizingTanakaGroundStateFamily` predicate, to avoid an import cycle with the
+-- base-ratio / concentration machinery).  It consumes the Conjecture-4.12-free base-ratio limit
+-- `→ 3 q₀` and the documented `SU(2)`/`ô²` concentration axiom
+-- `orderSqMoment_ratio_le_mStarSq_family`.
 
 end LatticeSystem.Quantum
