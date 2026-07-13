@@ -10442,6 +10442,21 @@ the 6--9~PR Koma--Tasaki [66] concentration machinery.  Conjecture~4.12 is an ex
 (never asserted true).  Conditional on singlet hypothesis, axis-3 long-range-order limit $q_\ast$,
 and moment positivity.  Vacuous in $d=1$ (no LRO, Corollary~4.3).  Chapters~3--10 backfill.
 
+\noindent\textbf{Theorem 4.11 ($\hat o^2$ concentration, $n=0$ case, hFamily-pinned)} (Tasaki
+§4.2.2, eq.~(4.2.23), pp.~101, 105--109; documented axiom,
+\texttt{Quantum/SpinS/AndersonTowerOrderSqConcentration.lean}, PR \#5046).  The $n=0$
+ô²-moment concentration upper bound, \emph{hFamily-pinned and hconj-free}.  Unlike the general
+axiom \texttt{orderSqMoment\_ratio\_le\_mStarSq} (Proposition~4.10), this variant pins $m^\ast$
+to its genuine value via the realizing GS family (\texttt{IsRealizingTanakaGroundStateFamily}:
+exact infinite-volume limits, total-spin singlet, matching \texttt{IsTanakaFullSSBConstants}),
+making the base ratio $s_0<(m^\ast)^2+\varepsilon$ true independent of Conjecture~4.12.  Naive
+deletion of the \texttt{hconj} constraint leaves $m^\ast$ free; taking $m^\ast=0$ while $\Phi$ is
+a genuine LRO singlet satisfies all other hypotheses yet yields the false inequality
+$0<3q_\ast<\varepsilon$.  Pinning captures only Theorem~4.11's ``easy half'' ($m^\ast\ge\sqrt{3q_0}$);
+the matching equality $(m^\ast)^2=3q_0$ is Conjecture~4.12.  SU(2) parity mirror of the
+already-documented $\hat p$/U(1) axiom (Lemma~4.15, same $m^\ast$ via \texttt{IsTanakaFullSSBConstants},
+$\sqrt{3}$ vs $\sqrt{2}$ isotropy). Unsatisfiable in $d=1$ (no LRO GS), hence vacuous.
+
 \noindent\textbf{Lemma 4.16} (Tasaki §4.2.2, p.~108; \textbf{discharged axiom-free},
 \texttt{Math/DoubleSequenceDiagonal.lean}, Issue \#4485).  Diagonal extraction from an iterated
 limit: if $f:\mathbb{N}\times\mathbb{N}\to\mathbb{R}$ satisfies $\lim_{M}\lim_{L}f_{L,M}=0$ (each
