@@ -309,9 +309,10 @@ sphereAverage_orderSqMoment_relative_close
 # Zero-referenced standalone milestone tip until consumed downstream.  RE-EVALUATE/DELIST when consumed.
 orderSqMoment_geom_tendsto
 
-# Tasaki §4.2.2 Theorem 4.8 realizing-family trial-energy input (axiom-free), the companion consumed
-# by Theorem 4.13 (`tanakaSSB_field_lowerBound`).  Derived from the proved Theorem 4.8
-# (`tanakaSSB_lowLying_energy_bound`) via the family's `o(L^{d/2})` gate + `q₀/2` LRO rescale; no
-# companion axiom.  Zero-referenced tip until consumed by Theorem 4.13 (PR-2').  RE-EVALUATE/DELIST
-# when consumed.
-tanakaSSB_realizingFamily_energyBound
+# Tasaki §4.2.1 Theorem 4.13 (SSB under an infinitesimal staggered field), PROVED axiom-free
+# (`#print axioms` = propext/Classical.choice/Quot.sound only).  The `lim_{h↓0} liminf_{L↑∞}` staggered
+# moment of the field ground state is `≥ m∗` (eqs. (4.2.27)–(4.2.28), pp. 102–103) via the Rayleigh–Ritz
+# (KHVL) variational method of §3.4 Thm 3.2, with the Tanaka state as trial state, the proved companion
+# `tanakaSSB_realizingFamily_energyBound` (Thm 4.8) as energy input, and the family's own moment limit.
+# Book-capstone tip (Thm 4.13 is the §4.2.1 SSB payoff); the energy companion below is now consumed here.
+tanakaSSB_field_lowerBound
