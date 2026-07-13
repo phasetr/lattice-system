@@ -137,11 +137,14 @@ private theorem geom_tendsto_filter (d N : ℕ) (hd : 1 ≤ d)
           staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
           ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2) - qStar| < ε)
     (hconj : IsConjecture412Equality mStar qStar)
-    (hR : ∀ (n L : ℕ) [NeZero L], 2 ≤ L → Even L → 0 < orderSqMoment d L N (Φ L) n) (n : ℕ) :
+    (hR : ∃ Lr : ℕ, ∀ (n L : ℕ) [NeZero L], Lr ≤ L → 2 ≤ L → Even L →
+      0 < orderSqMoment d L N (Φ L) n) (n : ℕ) :
     Tendsto (fun L => normOrderSqMoment d N Φ n L) evenAtTop (𝓝 ((mStar ^ 2) ^ n)) := by
-  -- "Good" `L`: even and `≥ 2` (hence `NeZero`).
-  have hgood : ∀ᶠ L in evenAtTop, 2 ≤ L ∧ Even L := by
-    rw [eventually_evenAtTop]; exact ⟨2, fun L hL hev => ⟨hL, hev⟩⟩
+  obtain ⟨Lr, hRpt⟩ := hR
+  -- "Good" `L`: even, `≥ 2` (hence `NeZero`) and past the moment-positivity threshold `Lr`.
+  have hgood : ∀ᶠ L in evenAtTop, 2 ≤ L ∧ Even L ∧ Lr ≤ L := by
+    rw [eventually_evenAtTop]
+    exact ⟨max 2 Lr, fun L hL hev => ⟨by omega, hev, by omega⟩⟩
   -- Base ratio limit as a filter statement: `s_0 = T_1 → (m∗)²`.
   have hbaseF : Tendsto (fun L => normOrderSqMoment d N Φ 1 L) evenAtTop (𝓝 (mStar ^ 2)) := by
     rw [Metric.tendsto_nhds]; intro ε hε
@@ -156,10 +159,10 @@ private theorem geom_tendsto_filter (d N : ℕ) (hd : 1 ≤ d)
   have hle : ∀ᶠ L in evenAtTop,
       (normOrderSqMoment d N Φ 1 L) ^ n ≤ normOrderSqMoment d N Φ n L := by
     filter_upwards [hgood] with L hgd
-    obtain ⟨h2, hev⟩ := hgd
+    obtain ⟨h2, hev, hLr⟩ := hgd
     haveI : NeZero L := ⟨by omega⟩
     rw [normOrderSqMoment_eq, normOrderSqMoment_eq, pow_one]
-    exact orderSqMoment_geom_lower d L N (Φ L) (hR 0 L h2 hev) n
+    exact orderSqMoment_geom_lower d L N (Φ L) (hRpt 0 L hLr h2 hev) n
   -- The concentration upper bound, telescoped through `T_{n+1} = s_n · T_n`.
   have hUpper : ∀ (m : ℕ) (ε' : ℝ), 0 < ε' →
       ∀ᶠ L in evenAtTop, normOrderSqMoment d N Φ m L ≤ (mStar ^ 2 + ε') ^ m := by
@@ -168,29 +171,32 @@ private theorem geom_tendsto_filter (d N : ℕ) (hd : 1 ≤ d)
     | zero =>
       intro ε' _
       filter_upwards [hgood] with L hgd
-      obtain ⟨h2, hev⟩ := hgd
+      obtain ⟨h2, hev, hLr⟩ := hgd
       haveI : NeZero L := ⟨by omega⟩
       rw [normOrderSqMoment_eq]
       simp only [pow_zero, mul_one]
-      rw [div_self (hR 0 L h2 hev).ne']
+      rw [div_self (hRpt 0 L hLr h2 hev).ne']
     | succ k ih =>
       intro ε' hε'
       have hupk := ih ε' hε'
       rw [eventually_evenAtTop] at hupk ⊢
       obtain ⟨L₁, hL₁⟩ := hupk
       obtain ⟨L₂, hL₂⟩ := orderSqMoment_ratio_le_mStarSq d N hd Φ hsinglet qStar mStar hlim3 hconj
-        hR k ε' hε'
-      refine ⟨max (max L₁ L₂) 2, fun L hL hev => ?_⟩
+        ⟨Lr, hRpt⟩ k ε' hε'
+      refine ⟨max (max (max L₁ L₂) Lr) 2, fun L hL hev => ?_⟩
       have h2 : 2 ≤ L := le_trans (le_max_right _ _) hL
+      have hLr : Lr ≤ L := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hL
       haveI : NeZero L := ⟨by omega⟩
       have hTk : normOrderSqMoment d N Φ k L ≤ (mStar ^ 2 + ε') ^ k :=
-        hL₁ L (le_trans (le_trans (le_max_left _ _) (le_max_left _ _)) hL) hev
+        hL₁ L (le_trans (le_trans (le_trans (le_max_left _ _) (le_max_left _ _))
+          (le_max_left _ _)) hL) hev
       have hsk : orderSqMoment d L N (Φ L) (k + 1) /
           (orderSqMoment d L N (Φ L) k * ((L : ℝ) ^ d) ^ 2) < mStar ^ 2 + ε' :=
-        hL₂ L (le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hL) h2 hev
+        hL₂ L (le_trans (le_trans (le_trans (le_max_right _ _) (le_max_left _ _))
+          (le_max_left _ _)) hL) h2 hev
       have hLpos : (0 : ℝ) < (L : ℝ) := by exact_mod_cast (by omega : 0 < L)
-      have hRk0 : orderSqMoment d L N (Φ L) k ≠ 0 := (hR k L h2 hev).ne'
-      have hR00 : orderSqMoment d L N (Φ L) 0 ≠ 0 := (hR 0 L h2 hev).ne'
+      have hRk0 : orderSqMoment d L N (Φ L) k ≠ 0 := (hRpt k L hLr h2 hev).ne'
+      have hR00 : orderSqMoment d L N (Φ L) 0 ≠ 0 := (hRpt 0 L hLr h2 hev).ne'
       have hV20 : ((L : ℝ) ^ d) ^ 2 ≠ 0 := by positivity
       have hrec : normOrderSqMoment d N Φ (k + 1) L
           = (orderSqMoment d L N (Φ L) (k + 1) /
@@ -251,7 +257,8 @@ theorem orderSqMoment_geom_tendsto (d N : ℕ) (hd : 1 ≤ d)
           staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
           ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2) - qStar| < ε)
     (hconj : IsConjecture412Equality mStar qStar)
-    (hR : ∀ (n L : ℕ) [NeZero L], 2 ≤ L → Even L → 0 < orderSqMoment d L N (Φ L) n) (n : ℕ) :
+    (hR : ∃ Lr : ℕ, ∀ (n L : ℕ) [NeZero L], Lr ≤ L → 2 ≤ L → Even L →
+      0 < orderSqMoment d L N (Φ L) n) (n : ℕ) :
     ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
       |orderSqMoment d L N (Φ L) n /
           (orderSqMoment d L N (Φ L) 0 * (((L : ℝ) ^ d) ^ 2) ^ n) - (mStar ^ 2) ^ n| < ε := by
@@ -289,15 +296,17 @@ theorem orderSq_collapse_ratio_tendsto_one (d N : ℕ) (hd : 1 ≤ d)
           staggeredOrderOpS (torusParitySublattice d L) N).mulVec (Φ L))).re /
           ((star (Φ L) ⬝ᵥ Φ L).re * ((L : ℝ) ^ d) ^ 2) - qStar| < ε)
     (hconj : IsConjecture412Equality mStar qStar)
-    (hR : ∀ (n L : ℕ) [NeZero L], 2 ≤ L → Even L → 0 < orderSqMoment d L N (Φ L) n) (j : ℕ) :
+    (hR : ∃ Lr : ℕ, ∀ (n L : ℕ) [NeZero L], Lr ≤ L → 2 ≤ L → Even L →
+      0 < orderSqMoment d L N (Φ L) n) (j : ℕ) :
     ∀ ε : ℝ, 0 < ε → ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], L₀ ≤ L → 2 ≤ L → Even L →
       |orderSqMoment d L N (Φ L) j /
           (Real.sqrt (orderSqMoment d L N (Φ L) (2 * j)) *
             Real.sqrt (orderSqMoment d L N (Φ L) 0)) - 1| < ε := by
   have hmStar2pos : 0 < mStar ^ 2 := pow_pos hmStar 2
+  obtain ⟨Lr, hRpt⟩ := hR
   -- The two fixed-`n` limits, as filter statements.
-  have hj := geom_tendsto_filter d N hd Φ hsinglet qStar mStar hlim3 hconj hR j
-  have h2j := geom_tendsto_filter d N hd Φ hsinglet qStar mStar hlim3 hconj hR (2 * j)
+  have hj := geom_tendsto_filter d N hd Φ hsinglet qStar mStar hlim3 hconj ⟨Lr, hRpt⟩ j
+  have h2j := geom_tendsto_filter d N hd Φ hsinglet qStar mStar hlim3 hconj ⟨Lr, hRpt⟩ (2 * j)
   -- `√((m∗²)^{2j}) = (m∗²)^j`.
   have hden_lim : Real.sqrt ((mStar ^ 2) ^ (2 * j)) = (mStar ^ 2) ^ j := by
     rw [mul_comm 2 j, pow_mul, Real.sqrt_sq (by positivity)]
@@ -309,13 +318,14 @@ theorem orderSq_collapse_ratio_tendsto_one (d N : ℕ) (hd : 1 ≤ d)
     have := hj.div hb (pow_pos hmStar2pos j).ne'
     rwa [div_self (pow_pos hmStar2pos j).ne'] at this
   -- Scale invariance `R_j / (√R_{2j} √R_0) = T_j / √T_{2j}` for good `L`.
-  have hgood : ∀ᶠ L in evenAtTop, 2 ≤ L ∧ Even L := by
-    rw [eventually_evenAtTop]; exact ⟨2, fun L hL hev => ⟨hL, hev⟩⟩
+  have hgood : ∀ᶠ L in evenAtTop, 2 ≤ L ∧ Even L ∧ Lr ≤ L := by
+    rw [eventually_evenAtTop]
+    exact ⟨max 2 Lr, fun L hL hev => ⟨by omega, hev, by omega⟩⟩
   have hCollapseEq : ∀ᶠ L in evenAtTop,
       normOrderSqMoment d N Φ j L / Real.sqrt (normOrderSqMoment d N Φ (2 * j) L)
         = collapseRatioTot d N Φ j L := by
     filter_upwards [hgood] with L hgd
-    obtain ⟨h2, hev⟩ := hgd
+    obtain ⟨h2, hev, hLr⟩ := hgd
     haveI : NeZero L := ⟨by omega⟩
     rw [collapseRatioTot_eq]
     have hLpos : (0 : ℝ) < (L : ℝ) := by exact_mod_cast (by omega : 0 < L)
@@ -328,8 +338,8 @@ theorem orderSq_collapse_ratio_tendsto_one (d N : ℕ) (hd : 1 ≤ d)
     set b := Real.sqrt (orderSqMoment d L N (Φ L) (2 * j)) with hb_def
     set v := (((L : ℝ) ^ d) ^ 2) ^ j with hv_def
     have haR0 : orderSqMoment d L N (Φ L) 0 = a * a := (Real.mul_self_sqrt hr0).symm
-    have ha0 : a ≠ 0 := by rw [ha_def]; exact Real.sqrt_ne_zero'.mpr (hR 0 L h2 hev)
-    have hb0 : b ≠ 0 := by rw [hb_def]; exact Real.sqrt_ne_zero'.mpr (hR (2 * j) L h2 hev)
+    have ha0 : a ≠ 0 := by rw [ha_def]; exact Real.sqrt_ne_zero'.mpr (hRpt 0 L hLr h2 hev)
+    have hb0 : b ≠ 0 := by rw [hb_def]; exact Real.sqrt_ne_zero'.mpr (hRpt (2 * j) L hLr h2 hev)
     have hv0 : v ≠ 0 := by rw [hv_def]; positivity
     rw [haR0]
     field_simp

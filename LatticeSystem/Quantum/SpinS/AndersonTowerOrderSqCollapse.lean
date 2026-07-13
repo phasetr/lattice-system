@@ -55,10 +55,9 @@ theorem orderSq_collapse_vecNormSqRe (d L N j : ℕ) [NeZero L]
   set Rj := orderSqMoment d L N Φ j with hRjdef
   set R0 := orderSqMoment d L N Φ 0 with hR0def
   have hH : B.IsHermitian := orderSqOp_torus_isHermitian d L N
-  -- `‖Bʲ Φ‖² = R_{2j}` (Hermitian split `⟨Bʲ Φ, Bʲ Φ⟩ = ⟨Φ, B^{2j} Φ⟩`).
+  -- `‖Bʲ Φ‖² = R_{2j}` via the shared `ô²`-tower norm identity (`vecNormSqRe_orderSqPow_mulVec`).
   have hvsu : vecNormSqRe u = R2j := by
-    rw [vecNormSqRe, hudef, hermitian_pow_dotProduct_split hH j j Φ,
-      orderSq_dotProduct_eq_orderSqMoment, Complex.ofReal_re, hR2jdef, two_mul]
+    rw [hudef, hBdef, hR2jdef]; exact vecNormSqRe_orderSqPow_mulVec d L N j Φ
   -- `‖Φ‖² = R_0` (the zeroth moment is the plain squared norm).
   have hvsv : vecNormSqRe Φ = R0 := by
     rw [vecNormSqRe, hR0def, orderSqMoment, pow_zero, Matrix.one_mulVec]

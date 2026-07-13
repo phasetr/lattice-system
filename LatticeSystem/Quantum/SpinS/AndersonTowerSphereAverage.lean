@@ -16,12 +16,14 @@ proportional to the unique ground state `|Φ_GS⟩` (eq. (4.2.21)).
 equality `m∗ = √(3 q∗)` of Conjecture 4.12, the normalized solid-angle average converges to `|Φ_GS⟩`
 (up to phase) as `L ↑ ∞`.
 
-We record it as a documented axiom.  Following the established design: the solid-angle average is
-the Bochner integral over the unit sphere in `EuclideanSpace ℝ (Fin 3)` with the surface measure
-`volume.toSphere` (`solidAngleAverageTanaka`); Conjecture 4.12 is an explicit `Prop` hypothesis
-(`IsConjecture412Equality`, never asserted as true here); the convergence is stated up to a
-unimodular phase (`Φ_GS` is only defined up to phase); and it is conditional on long-range order
-(vacuous in one dimension by Corollary 4.3).
+This file provides only the defining predicates and geometry.  The proposition itself is *proved*
+(conditional on Conjecture 4.12 and the `ô²`-concentration documented axiom) downstream in
+`AndersonTowerSphereGroundState` as `tanakaSphereAverage_groundState`.  Following the established
+design: the solid-angle average is the Bochner integral over the unit sphere in
+`EuclideanSpace ℝ (Fin 3)` with the surface measure `volume.toSphere` (`solidAngleAverageTanaka`);
+Conjecture 4.12 is an explicit `Prop` hypothesis (`IsConjecture412Equality`, never asserted as true
+here); the convergence is stated up to a unimodular phase (`Φ_GS` is only defined up to phase); and
+it is conditional on long-range order (vacuous in one dimension by Corollary 4.3).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §4.2.1, Proposition 4.10, eqs. (4.2.17)–(4.2.22), pp. 99–100.
@@ -152,23 +154,10 @@ def IsTanakaSphereAverageConstants (d N : ℕ) (q₀ C₁ mStar : ℝ) : Prop :=
               Real.sqrt (vecNormSqRe (unitNormalize (solidAngleAverageTanaka d L N (M L) (Φ L)) -
                 z • unitNormalize (Φ L))) < ε)
 
-/-- **Tasaki Proposition 4.10 (the solid-angle average is the ground state), AXIOM.**  Assuming
-Conjecture 4.12 (`m∗ = √(3 q∗)`), the normalized solid-angle average of the symmetry-breaking states
-`|Ξ_n⟩` converges (up to phase) to the unique ground state `|Φ_GS⟩` as `L ↑ ∞` (eq. (4.2.22)): the
-`SU(2)`-symmetric average of the symmetry-breaking "ground states" recovers the LRO-but-no-SSB
-ground state.
-
-The axiom asserts `IsTanakaFullSSBConstants d N q₀ C₁ mStar` (Theorem 4.9) alongside, so `mStar` is
-the *same* full-SSB order parameter — letting downstream code combine Proposition 4.10 with
-Theorem 4.9 for one physical order parameter.
-
-Recorded as a documented axiom, sharing constants `C₁`, `C₂`, `m∗` with the Anderson-tower /
-full-SSB statements and conditional on long-range order (vacuous in one dimension by Corollary 4.3).
-Conjecture 4.12 enters only as a hypothesis (`IsConjecture412Equality`); never asserted true. -/
-axiom tanakaSphereAverage_groundState (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq₀ : 0 < q₀) :
-    ∃ C₁ C₂ mStar : ℝ, IsAndersonTowerConstants d N q₀ C₁ C₂ ∧
-      IsTanakaSSBConstants d N q₀ C₁ C₂ ∧
-      IsTanakaFullSSBConstants d N q₀ C₁ mStar ∧
-      IsTanakaSphereAverageConstants d N q₀ C₁ mStar
+-- **Tasaki Proposition 4.10 (the solid-angle average is the ground state)** is *proved*
+-- (conditional on Conjecture 4.12 and the `ô²`-concentration documented axiom) as
+-- `tanakaSphereAverage_groundState` in `LatticeSystem.Quantum.SpinS.AndersonTowerSphereGroundState`
+-- (downstream of this file, which only provides the defining predicates, to avoid an import cycle
+-- with the discharge machinery).
 
 end LatticeSystem.Quantum
