@@ -268,5 +268,4 @@ phatMoment_one_ge_of_planar_lro
 # propext/Classical.choice/Quot.sound only).  Zero-referenced until the PR-5 assembly feeds them into
 # `variational_gap_le_double_commutator` for the cubic energy bound.  RE-EVALUATE/DELIST when consumed
 # by PR-5.
-chemicalPotential_double_commutator_muTerm
 chemicalPotential_numerator_muTerm
