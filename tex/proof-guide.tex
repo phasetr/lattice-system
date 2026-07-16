@@ -11144,7 +11144,18 @@ M(\lVert A\Phi\rVert^2-\lVert A^{\dagger}\Phi\rVert^2)$
 (\texttt{chemicalPotential\_numerator\_muTerm}, §4-c), consuming PR-1's
 \texttt{totalSpinSOp3\_commutator\_towerPow} as the $[\hat S_{\mathrm{tot}}^{(3)},A]=M\,A$ input; the
 residual first-order moment-difference term is later localized to a \texttt{BECSectorCurvatureBound}
-predicate (half filling $\mu=0$ is the term-free special case).  The \texttt{tasaki\_5\_2\_bec\_tower}
+predicate (half filling $\mu=0$ is the term-free special case).  PR-4 (\#5057) adds the tower
+denominator geometric lower bound and non-vanishing
+(\texttt{Quantum/SpinS/BoseEinsteinCondensateDenominator.lean}):
+$\tfrac12(2q_0)^{\lvert M\rvert}m_0\le\langle\Phi,(\hat o^{\mp})^{\lvert M\rvert}(\hat
+o^{\pm})^{\lvert M\rvert}\Phi\rangle=\lVert(\hat o^{\pm})^{\lvert M\rvert}\Phi\rVert^2$
+(\texttt{becTowerDenominator\_geom\_lower\_raising}/\texttt{\_lowering}), combining the balanced-word
+denominator bound \texttt{tower\_denominator\_lower\_bound(\_lower)} --- which needs \emph{only} the
+half-filling $\hat S_{\mathrm{tot}}^{(3)}\Phi=0$ sector hypothesis, not the full SU(2) singlet, so it
+applies verbatim to the $\mu=0$ chemical-potential XY ground state --- with the moment geometric
+bound \texttt{phatMoment\_ge\_of\_lro} fed by PR-2's planar base; whence the tower state is
+nonvanishing $\Gamma_M\ne0$ (\texttt{becTowerState\_ne\_zero\_of\_planar\_lro}, supplying the first
+conjunct of \texttt{IsBECTowerConstants}).  The \texttt{tasaki\_5\_2\_bec\_tower}
 axiom is to be discharged (axiom$\to$theorem) at the final PR of the arc.  Chapters~3--10 backfill.
 
 \medskip
