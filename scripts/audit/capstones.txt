@@ -256,3 +256,16 @@ totalSpinSOp3_commutator_towerPow
 # it into the singlet-free recursion `phatMoment_succ_ratio` for the tower denominator lower bound.
 # RE-EVALUATE/DELIST when consumed by PR-4/PR-5.
 phatMoment_one_ge_of_planar_lro
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — Tasaki §5.3 Theorem 5.2 (BEC low-lying tower
+# states) discharge arc PR-3 (#5056), `Quantum/SpinS/BoseEinsteinCondensateNumerator.lean`.  The exact
+# variational-numerator algebra of the `−μ Ŝ³_tot` term: the double commutator of
+# `Ĥ_μ = 2 Ĥ_XY − μ Ŝ³_tot` with the tower operator splits as
+# `[Aᴴ,[Ĥ_μ,A]] = [Aᴴ,[2 Ĥ_XY,A]] − (μM)·[Aᴴ,A]` (`chemicalPotential_double_commutator_muTerm`,
+# §4-b), with real-part numerator `⟨Φ,[Aᴴ,[2 Ĥ_XY,A]]Φ⟩ − μM(‖AΦ‖²−‖AᴴΦ‖²)`
+# (`chemicalPotential_numerator_muTerm`, §4-c); the `[Ŝ³_tot,A]=M·A` input is PR-1's
+# `totalSpinSOp3_commutator_towerPow`.  Proved axiom-free (`#print axioms` =
+# propext/Classical.choice/Quot.sound only).  Zero-referenced until the PR-5 assembly feeds them into
+# `variational_gap_le_double_commutator` for the cubic energy bound.  RE-EVALUATE/DELIST when consumed
+# by PR-5.
+chemicalPotential_numerator_muTerm
