@@ -56,4 +56,56 @@ theorem xyChemicalPotentialHamiltonianS_isHermitian (d L : ℕ) [NeZero L] (μ :
   · simp [IsSelfAdjoint, star_ofNat]
   · simp [IsSelfAdjoint, Complex.conj_ofReal]
 
+/-! ## Sector eigenvalue of the tower operator -/
+
+/-- **Eigenoperator power commutator.**  If `A` is an eigenoperator of the adjoint action of `H`
+with eigenvalue `c` (`[H, A] = c • A`), then `[H, Aⁿ] = (n c) • Aⁿ`: the adjoint eigenvalue is
+additive under products.  Proved by induction on `n` via the Leibniz rule for the commutator. -/
+private theorem commutator_pow_smul_eigen {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (H A : Matrix ι ι ℂ) {c : ℂ} (h : H * A - A * H = c • A) (n : ℕ) :
+    H * A ^ n - A ^ n * H = ((n : ℂ) * c) • A ^ n := by
+  induction n with
+  | zero => simp
+  | succ k ih =>
+    have hleib : H * A ^ (k + 1) - A ^ (k + 1) * H
+        = (H * A ^ k - A ^ k * H) * A + A ^ k * (H * A - A * H) := by
+      rw [pow_succ]; noncomm_ring
+    rw [hleib, ih, h]
+    simp only [smul_mul_assoc, mul_smul_comm]
+    rw [← add_smul, ← pow_succ]
+    congr 1
+    push_cast; ring
+
+/-- **Tower-operator sector eigenvalue**
+`[Ŝ_tot^{(3)}, (Ô_L^{sgn M})^{|M|}] = M (Ô_L^{sgn M})^{|M|}`
+(§4-a of the design note): applying the staggered raising order operator `Ô_L^+` raises the total
+magnetization by one and the lowering operator `Ô_L^−` lowers it by one, so the `|M|`-fold tower
+operator carries total-magnetization eigenvalue exactly `M` under the adjoint action of
+`Ŝ_tot^{(3)}`.  The operator is exactly the one used by `towerState`, so this feeds the
+`−μ Ŝ_tot^{(3)}` term of the tower double commutator. -/
+theorem totalSpinSOp3_commutator_towerPow (A : Λ → Bool) (M : ℤ) :
+    totalSpinSOp3 Λ N
+        * (if 0 ≤ M then staggeredRaisingOpS A N else staggeredLoweringOpS A N) ^ M.natAbs
+      - (if 0 ≤ M then staggeredRaisingOpS A N else staggeredLoweringOpS A N) ^ M.natAbs
+        * totalSpinSOp3 Λ N
+      = (M : ℂ)
+        • (if 0 ≤ M then staggeredRaisingOpS A N else staggeredLoweringOpS A N) ^ M.natAbs := by
+  by_cases hM : 0 ≤ M
+  · rw [if_pos hM]
+    rw [commutator_pow_smul_eigen (totalSpinSOp3 Λ N) (staggeredRaisingOpS A N)
+      (by rw [one_smul]; exact totalSpinSOp3_commutator_staggeredRaisingOpS A) M.natAbs]
+    congr 1
+    rw [mul_one]
+    have h1 : (M.natAbs : ℤ) = M := Int.natAbs_of_nonneg hM
+    calc (M.natAbs : ℂ) = ((M.natAbs : ℤ) : ℂ) := by rw [Int.cast_natCast]
+      _ = (M : ℂ) := by rw [h1]
+  · rw [if_neg hM]
+    rw [commutator_pow_smul_eigen (totalSpinSOp3 Λ N) (staggeredLoweringOpS A N)
+      (by rw [neg_one_smul]; exact totalSpinSOp3_commutator_staggeredLoweringOpS A) M.natAbs]
+    congr 1
+    have h1 : (M.natAbs : ℤ) = -M := by omega
+    calc (M.natAbs : ℂ) * (-1) = ((M.natAbs : ℤ) : ℂ) * (-1) := by rw [Int.cast_natCast]
+      _ = ((-M : ℤ) : ℂ) * (-1) := by rw [h1]
+      _ = (M : ℂ) := by push_cast; ring
+
 end LatticeSystem.Quantum
