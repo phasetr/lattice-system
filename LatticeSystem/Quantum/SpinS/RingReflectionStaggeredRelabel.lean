@@ -17,8 +17,8 @@ This file discharges that `−(−1)ˣ` sign decision once and for all by the **
 `ringStaggeredSublattice_ringReflect`) exactly cancels the `physFieldOf` minus sign `−h (r z)`.
 Consequently `P` carries the classical mirror reflections onto the quantum signed field copies:
 `P (reflectLeft g) = ringFieldReflectLeft (P g)` and `P (reflectRight g) = ringFieldReflectRight
-(P g)`, and constant strings onto staggered constant fields `P (const c) = staggered_c`.  After this
-relabel the classical Lemma 4.5 applies verbatim (consumed downstream in PR7d-iii).
+(P g)`.  After this relabel the classical Lemma 4.5 applies verbatim (consumed downstream in
+PR7d-iii).
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §4.1, staggered field Hamiltonian (4.1.48) and reflected field copies (4.1.50), pp. 85–86;
@@ -65,13 +65,6 @@ carries the classical sign-free mirror reflections onto the quantum signed field
 def ringStaggeredRelabel (n : ℕ) (h : Fin (2 * n) → ℝ) : Fin (2 * n) → ℝ :=
   fun z => (-1 : ℝ) ^ (z : ℕ) * h z
 
-/-- **Staggered constant field** `staggered_c z = (−1)^z · c` (Tasaki §4.1, (4.1.48), pp. 85–86):
-the staggered relabel of the constant string `fun _ => c` (`ringStaggeredRelabel_const`).  PR7d-iii
-Gaussian domination bounds `Z_β(h)^{2n}` by a product of these staggered constant-field partition
-functions, each collapsed to `Z_β(0)` in PR7e. -/
-def ringStaggeredConstField (n : ℕ) (c : ℝ) : Fin (2 * n) → ℝ :=
-  fun z => (-1 : ℝ) ^ (z : ℕ) * c
-
 /-- **The staggered relabel is an involution:** `P (P h) = h`, since `(−1)^z · (−1)^z = 1`.  This
 lets PR7d-iii recover an arbitrary physical field `h` as `P g` with `g = P h`, feeding it into the
 classical averaging inequality (Tasaki Lemma 4.5, pp. 87–88). -/
@@ -113,14 +106,5 @@ theorem ringStaggeredRelabel_reflectRight (n : ℕ) (g : Fin (2 * n) → ℝ) :
     ring
   · rw [if_neg hz, if_neg hz, ringReflect_involutive n z]
     ring
-
-/-- **Constant string ↔ staggered constant field.**  `P (fun _ => c) = staggered_c`, i.e.
-`ringStaggeredRelabel n (fun _ => c) = ringStaggeredConstField n c` (Tasaki §4.1, (4.1.48),
-pp. 85–86).  Identifies each constant-string argument of the classical averaging inequality with the
-staggered constant field whose partition function PR7e collapses to `Z_β(0)`. -/
-theorem ringStaggeredRelabel_const (n : ℕ) (c : ℝ) :
-    ringStaggeredRelabel n (fun _ => c) = ringStaggeredConstField n c := by
-  funext z
-  simp only [ringStaggeredRelabel, ringStaggeredConstField]
 
 end LatticeSystem.Quantum

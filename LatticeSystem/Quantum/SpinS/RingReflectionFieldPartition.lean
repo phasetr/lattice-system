@@ -17,8 +17,8 @@ signs — the gauge conjugation `U·Ŝ^{(3)}·U⁻¹ = −Ŝ^{(3)}` and the `−
 cancel, so the θ-transported right field `Σ_{x<n} (b x)·Ŝ_{r x}^{(3)}` acquires its correct positive
 sign with no new sign lemma.  Gauge conjugation of `Ĥ_field(physFieldOf a b)` therefore equals the
 doubled Hamiltonian `Lfield(a) + θ(Lfield(b)) − D`, and — by gauge unitarity and trace invariance —
-`Z_β(physFieldOf a b) = Re Tr W(a,b)`.  Feeding this into the merged capstone
-`ringTwoFieldWeight_reflection_cauchySchwarz` yields the **one reflection step**
+`Z_β(physFieldOf a b) = Re Tr W(a,b)`.  This identification is the physical bridge consumed by the
+bond-square reflection Cauchy–Schwarz route toward the **one reflection step**
 `Z_β(h)² ≤ Z_β(h_L)·Z_β(h_R)`, the finite-β partition-function form of Tasaki's reflection bound
 (4.1.51) (of which the T = 0 bound `E_GS(h) ≥ ½{E_GS(h_L)+E_GS(h_R)}` is the `β → ∞` limit).
 

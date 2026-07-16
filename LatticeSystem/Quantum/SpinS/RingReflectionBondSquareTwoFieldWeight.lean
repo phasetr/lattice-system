@@ -22,7 +22,7 @@ book p. 90), this file supplies the three PR-BS6 objects, all in the gauge spin 
   `RPTwoFieldConeRepS` — the object the PR-BS5 exp-of-cone Cauchy–Schwarz fires on.
 * `ringBondSquareTwoFieldWeight` — the two-field weight `exp(−β·(H_L(a) + θ(H_L(b)) − crossing))`,
   its diagonal `b = a` collapse (`_self`), and its Trotter-limit representation (`_isLimit`, via
-  `lieProductFormula`, mirroring the linear `ringTwoFieldWeight_isLimit`).
+  `lieProductFormula`).
 
 The reflection Cauchy–Schwarz capstone `(Re Tr W(a,b))² ≤ Re Tr W(a,a)·Re Tr W(b,b)` and the
 physical-field identification are deferred to PR-BS7/BS8.
@@ -166,8 +166,8 @@ theorem ringBondSquareTwoFieldWeight_self (n N : ℕ) [NeZero n] (β : ℝ) (a :
 Lie-product limit of the Dyson–Lieb–Simon approximant with the field-dependent left kinetic factor
 `exp(−(β/m)·H_L(a))`, its `θ`-reflected right partner, and the field-crossing factor
 `exp((β/m)·crossing(a,b))`.  The left and right kinetic factors commute (disjoint supports), so the
-two-factor Lie product formula `lieProductFormula` applies — mirroring the linear
-`ringTwoFieldWeight_isLimit`, the only difference being the crossing's two-field dependence. -/
+two-factor Lie product formula `lieProductFormula` applies, with the crossing's genuine two-field
+dependence carried through the cone representation. -/
 theorem ringBondSquareTwoFieldWeight_isLimit (n N : ℕ) [NeZero n] (β : ℝ)
     (a b : Fin (2 * n) → ℝ) :
     Tendsto (fun m : ℕ =>
