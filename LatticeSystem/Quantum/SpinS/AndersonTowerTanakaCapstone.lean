@@ -407,10 +407,7 @@ theorem exists_isTanakaSSBConstants (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq�
       linarith [h1]
     refine ⟨C₁, 576 * (d : ℝ) * (N : ℝ) ^ 4 / q₀, hC1pos, by positivity, ?_⟩
     intro L _ hL hLeven Φ E₀ M hev hmin hΦ hsing3 hsing1 hlro hMpos hMbound hn1 hn2 hn3
-    have hLpos : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
-    have hbridge : (L : ℝ) ^ ((d : ℝ) / 2) = Real.sqrt ((L : ℝ) ^ d) := by
-      rw [Real.sqrt_eq_rpow, ← Real.rpow_natCast (L : ℝ) d, ← Real.rpow_mul hLpos.le]
-      congr 1; ring
+    have hbridge := LatticeSystem.Math.Ldhalf_bridge d L
     rw [hbridge] at hMbound
     have hmM : (M : ℝ) ≤ C₁ * Real.sqrt ((L : ℝ) ^ d) := le_trans (by linarith) hMbound
     have hmM1 : ((M + 1 : ℕ) : ℝ) ≤ C₁ * Real.sqrt ((L : ℝ) ^ d) := by push_cast; exact hMbound

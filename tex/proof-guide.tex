@@ -11129,7 +11129,15 @@ $\langle\Gamma_M,\hat H_\mu\Gamma_M\rangle/\langle\Gamma_M,\Gamma_M\rangle\le E_
 $|M|$, in contrast to the quadratic $M^2$ of Theorem~4.6.  The construction and constants are bundled
 into the predicate \texttt{IsBECTowerConstants}; the bound is conditional on ODLRO, and the hard-core
 projection is the identity in the spin-$1/2$ formulation.  Proved by Koma--Tasaki~[21]; recorded as a
-documented axiom.  Chapters~3--10 backfill.
+documented axiom.  \emph{Discharge arc in progress} (PR~\#5053): the Hamiltonian-independent
+foundational algebra --- Hermiticity of $\hat H_\mu$
+(\texttt{xyChemicalPotentialHamiltonianS\_isHermitian}) and the tower sector eigenvalue
+$[\hat S_{\mathrm{tot}}^{(3)},(\hat O_L^{\mathrm{sgn}\,M})^{|M|}]=M\,(\hat
+O_L^{\mathrm{sgn}\,M})^{|M|}$ (\texttt{totalSpinSOp3\_commutator\_towerPow}, §4-a) --- is collected in
+\texttt{Quantum/SpinS/BoseEinsteinCondensateAlgebra.lean}, together with the shared real-analysis
+window bridge $L^{d/2}=\sqrt{L^d}$ (\texttt{LatticeSystem.Math.Ldhalf\_bridge},
+\texttt{Math/Analysis/RealRpowNatSqrt.lean}); the \texttt{tasaki\_5\_2\_bec\_tower} axiom is to be
+discharged (axiom$\to$theorem) at the final PR of the arc.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{Theorem 5.3} (U(1) symmetry-breaking states of hard-core bosons; Tasaki §5.3,
