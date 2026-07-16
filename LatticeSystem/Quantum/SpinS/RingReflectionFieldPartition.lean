@@ -11,22 +11,19 @@ Its physical partition function is the real part of the Gibbs trace
 `Z_β(h) = Re Tr exp(−β·Ĥ_field(h))`.
 
 The **field-splitting map** `physFieldOf n a b z = if z < n then a z else −b(r z)` realizes `h` as
-the physical field whose right-half Marshall gauge transform reproduces the two-field ("doubled")
-weight `W(a,b) = ringTwoFieldWeight n N β a b`.  The **sign crux** is that the two right-half minus
+the physical field whose right-half Marshall gauge transform reproduces the doubled Hamiltonian
+`Lfield(a) + θ(Lfield(b)) − D`.  The **sign crux** is that the two right-half minus
 signs — the gauge conjugation `U·Ŝ^{(3)}·U⁻¹ = −Ŝ^{(3)}` and the `−b(r z)` slot of `physFieldOf` —
 cancel, so the θ-transported right field `Σ_{x<n} (b x)·Ŝ_{r x}^{(3)}` acquires its correct positive
-sign with no new sign lemma.  Gauge conjugation of `Ĥ_field(physFieldOf a b)` therefore equals the
-doubled Hamiltonian `Lfield(a) + θ(Lfield(b)) − D`, and — by gauge unitarity and trace invariance —
-`Z_β(physFieldOf a b) = Re Tr W(a,b)`.  This identification is the physical bridge consumed by the
-bond-square reflection Cauchy–Schwarz route toward the **one reflection step**
-`Z_β(h)² ≤ Z_β(h_L)·Z_β(h_R)`, the finite-β partition-function form of Tasaki's reflection bound
-(4.1.51) (of which the T = 0 bound `E_GS(h) ≥ ½{E_GS(h_L)+E_GS(h_R)}` is the `β → ∞` limit).
+sign with no new sign lemma.  This gauge conjugation of `Ĥ_field(physFieldOf a b)`
+(`rightGauge_conj_ringFieldHamiltonian`) is the physical bridge consumed by the bond-square
+reflection-positivity route toward Tasaki's reflection bound (4.1.51), pp. 85–86.
 
 This file records the field-splitting bookkeeping (`physFieldOf`, `physFieldOf_self`,
 `sum_right_eq_sum_reflect_left`), the Ŝ^{(3)} specialisation of the gauge conjugation, the θ
 field-part expansion of `Lfield(b)`, the physical field Hamiltonian (`ringFieldHamiltonian`) and the
 crux gauge
-conjugation, the physical partition function (`ringFieldPartitionRe`) with its identification, and
+conjugation, the physical partition function (`ringFieldPartitionRe`), and
 the reflected field copies (`ringFieldReflectLeft`/`ringFieldReflectRight`).
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionTwoFieldCauchySchwarz
@@ -192,28 +189,6 @@ nonnegativity `Z_β ≥ 0` is supplied downstream by the reflection-positivity c
 reality lemma. -/
 noncomputable def ringFieldPartitionRe (n N : ℕ) (β : ℝ) (h : Fin (2 * n) → ℝ) : ℝ :=
   (thermalPartitionFnS β (ringFieldHamiltonian n N h)).re
-
-/-- **Identification of the physical partition function with the two-field weight trace.**  For the
-split field `physFieldOf n a b`, the physical partition function equals the real trace of the
-doubled Gibbs weight: `Z_β(physFieldOf a b) = Re Tr W(a,b)`.  Since the right-half gauge is unitary
-(`rightGaugeUnit`), `exp(−β·Ĥ_field)` conjugates to `exp(−β·(doubled Hamiltonian))`
-(`Matrix.exp_units_conj` + the crux `rightGauge_conj_ringFieldHamiltonian`) and the trace is
-gauge-invariant (`trace_rightGauge_conj`).  This transports Tasaki's reflection bound (4.1.51) to
-the partition function (proof pp. 89–93; DLS 1978 §2–3). -/
-theorem ringFieldPartitionRe_physFieldOf (G : AxisTwoPiRotS N) (n : ℕ) [NeZero n] (β : ℝ)
-    (a b : Fin (2 * n) → ℝ) :
-    ringFieldPartitionRe n N β (physFieldOf n a b) = (ringTwoFieldWeight n N β a b).trace.re := by
-  have hexp := Matrix.exp_units_conj (G.rightGaugeUnit n)
-    (-(β : ℂ) • ringFieldHamiltonian n N (physFieldOf n a b))
-  simp only [AxisTwoPiRotS.rightGaugeUnit_val, AxisTwoPiRotS.rightGaugeUnit_inv] at hexp
-  rw [show G.rightGauge n * (-(β : ℂ) • ringFieldHamiltonian n N (physFieldOf n a b))
-        * G.rightGaugeInv n
-      = -(β : ℂ) • (ringLeftFieldHamiltonian n N a
-        + ringReflectionThetaS n N (ringLeftFieldHamiltonian n N b)
-        - (ringFieldDLSDecomposition n N a).interaction) from by
-    rw [mul_smul_comm, smul_mul_assoc, G.rightGauge_conj_ringFieldHamiltonian n a b]] at hexp
-  rw [ringFieldPartitionRe, thermalPartitionFnS, thermalGibbsOpS, ringTwoFieldWeight, hexp,
-    G.trace_rightGauge_conj n]
 
 /-- **Reflected left field copy** `h_L` (Tasaki §4.1, reflected field copies (4.1.50), p. 86): keep
 the left half of `h` and reflect it onto the right, i.e. the diagonal split `physFieldOf n h h`. -/

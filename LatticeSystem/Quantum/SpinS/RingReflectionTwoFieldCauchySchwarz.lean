@@ -19,7 +19,6 @@ exponential-crossing Cauchy–Schwarz `twoField_pairing_cauchySchwarz_exp`, and 
 `ringBondSquareTwoFieldWeight_reflection_cauchySchwarz`: the finite-β matrix form of Tasaki's
 reflection bound (4.1.51), `(Re Tr W^{BS}(a,b))² ≤ Re Tr W^{BS}(a,a) · Re Tr W^{BS}(b,b)`.
 -/
-import LatticeSystem.Quantum.SpinS.RingReflectionTwoFieldWeight
 import LatticeSystem.Quantum.SpinS.RingReflectionTwoFieldConeCauchySchwarz
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareTwoFieldWeight
 import Mathlib.Analysis.Normed.Algebra.Exponential

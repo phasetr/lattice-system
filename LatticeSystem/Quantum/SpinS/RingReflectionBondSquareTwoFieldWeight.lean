@@ -27,7 +27,8 @@ book p. 90), this file supplies the three PR-BS6 objects, all in the gauge spin 
 The reflection Cauchy–Schwarz capstone `(Re Tr W(a,b))² ≤ Re Tr W(a,a)·Re Tr W(b,b)` and the
 physical-field identification are deferred to PR-BS7/BS8.
 -/
-import LatticeSystem.Quantum.SpinS.RingReflectionTwoFieldWeight
+import LatticeSystem.Quantum.SpinS.RingReflectionFieldWeight
+import LatticeSystem.Quantum.SpinS.RingReflectionGibbsCapstone
 import LatticeSystem.Quantum.SpinS.RingReflectionRingInstance
 import LatticeSystem.Quantum.SpinS.RingReflectionGibbsCone
 import LatticeSystem.Quantum.SpinS.RingReflectionLeftHamiltonian

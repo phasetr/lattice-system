@@ -50,8 +50,7 @@ function equals the real trace of the doubled bond-square Gibbs weight:
 `exp(−β·Ĥ^{BS}(a,b))` (`Matrix.exp_units_conj` + the gauge crux (G)
 `rightGauge_conj_ringBondSquareFieldHamiltonian`) and the trace is gauge-invariant
 (`trace_rightGauge_conj`).  This transports Tasaki's bond-square reflection bound (4.1.51) to the
-partition function (proof pp. 89–93; DLS 1978 §2–3).  The verbatim bond-square mirror of the linear
-`ringFieldPartitionRe_physFieldOf`. -/
+partition function (proof pp. 89–93; DLS 1978 §2–3). -/
 theorem ringBondSquareFieldPartitionRe_physFieldOf (G : AxisTwoPiRotS N) (n : ℕ) [NeZero n] (β : ℝ)
     (a b : Fin (2 * n) → ℝ) :
     ringBondSquareFieldPartitionRe n N β (physBondSquareFieldOf n a b)
