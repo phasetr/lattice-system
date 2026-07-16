@@ -26,8 +26,8 @@ This file records the field-splitting bookkeeping (`physFieldOf`, `physFieldOf_s
 `sum_right_eq_sum_reflect_left`), the Ŝ^{(3)} specialisation of the gauge conjugation, the θ
 field-part expansion of `Lfield(b)`, the physical field Hamiltonian (`ringFieldHamiltonian`) and the
 crux gauge
-conjugation, the physical partition function (`ringFieldPartitionRe`) with its identification, the
-diagonal nonnegativity, and the one reflection step.
+conjugation, the physical partition function (`ringFieldPartitionRe`) with its identification, and
+the reflected field copies (`ringFieldReflectLeft`/`ringFieldReflectRight`).
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionTwoFieldCauchySchwarz
 import LatticeSystem.Quantum.SpinS.RingReflectionThermalTransfer
@@ -188,8 +188,8 @@ end AxisTwoPiRotS
 canonical partition function of the field Hamiltonian (4.1.48)).  We take the real part
 *definitionally*: the
 field Hamiltonian is Hermitian, so the Gibbs trace is real and `.re` recovers it; the genuine
-nonnegativity `Z_β ≥ 0` is supplied downstream by the reflection-positivity cone
-(`ringTwoFieldWeight_self_trace_re_nonneg`), not by a reality lemma. -/
+nonnegativity `Z_β ≥ 0` is supplied downstream by the reflection-positivity cone, not by a
+reality lemma. -/
 noncomputable def ringFieldPartitionRe (n N : ℕ) (β : ℝ) (h : Fin (2 * n) → ℝ) : ℝ :=
   (thermalPartitionFnS β (ringFieldHamiltonian n N h)).re
 
@@ -215,19 +215,6 @@ theorem ringFieldPartitionRe_physFieldOf (G : AxisTwoPiRotS N) (n : ℕ) [NeZero
   rw [ringFieldPartitionRe, thermalPartitionFnS, thermalGibbsOpS, ringTwoFieldWeight, hexp,
     G.trace_rightGauge_conj n]
 
-/-- **Diagonal nonnegativity** `0 ≤ Re Tr W(a,a)`.  The diagonal doubled weight `W(a,a) =
-ringDLSFieldWeightSym a` is a reflection-positive trace weight for `β ≥ 0`
-(`ringDLSFieldWeightSym_rpTraceWeight`); applying its cone property to the trivial left-supported
-observable `A = 1` (with `θ(1)·1 = 1`) gives `0 ≤ Re Tr(W(a,a)·1) = Re Tr W(a,a)`.  This is the
-diagonal positivity that the downstream symmetrization chain `Z_β(h) ≤ Z_β(0)` requires
-(Tasaki §4.1, Gaussian domination (4.1.49)). -/
-theorem ringTwoFieldWeight_self_trace_re_nonneg (n N : ℕ) [NeZero n] {β : ℝ} (hβ : 0 ≤ β)
-    (a : Fin (2 * n) → ℝ) : 0 ≤ (ringTwoFieldWeight n N β a a).trace.re := by
-  rw [ringTwoFieldWeight_self]
-  have h := ringDLSFieldWeightSym_rpTraceWeight n N hβ a (1 : ManyBodyOpS (Fin (2 * n)) N)
-    SupportedOnLeftS.one
-  simpa only [ringReflectionThetaS_one, mul_one] using h
-
 /-- **Reflected left field copy** `h_L` (Tasaki §4.1, reflected field copies (4.1.50), p. 86): keep
 the left half of `h` and reflect it onto the right, i.e. the diagonal split `physFieldOf n h h`. -/
 def ringFieldReflectLeft (n : ℕ) (h : Fin (2 * n) → ℝ) : Fin (2 * n) → ℝ :=
@@ -237,27 +224,5 @@ def ringFieldReflectLeft (n : ℕ) (h : Fin (2 * n) → ℝ) : Fin (2 * n) → �
 the right half of `h` and reflect it onto the left, i.e. the diagonal split of `−h∘r`. -/
 def ringFieldReflectRight (n : ℕ) (h : Fin (2 * n) → ℝ) : Fin (2 * n) → ℝ :=
   physFieldOf n (fun x => - h (ringReflect n x)) (fun x => - h (ringReflect n x))
-
-/-- **One reflection step: the finite-β partition-function form of Tasaki's reflection bound
-(4.1.51).**  For `β ≥ 0` and any physical field `h`, `Z_β(h)² ≤ Z_β(h_L)·Z_β(h_R)` with `h_L`, `h_R`
-the reflected field copies (4.1.50).  Writing `h = physFieldOf n h b` with `b = −h∘r`
-(`physFieldOf_self`), the identification `Z_β(physFieldOf a b) = Re Tr W(a,b)`
-(`ringFieldPartitionRe_physFieldOf`) at `(h,b)`, `(h,h)`, `(b,b)` reduces the bound to the merged
-capstone `ringTwoFieldWeight_reflection_cauchySchwarz` (proof pp. 89–93; DLS 1978 §2–3).  The
-`T = 0` ground-state bound `E_GS(h) ≥ ½{E_GS(h_L)+E_GS(h_R)}` is its `β → ∞` limit. -/
-theorem ringFieldPartitionRe_reflection_step (G : AxisTwoPiRotS N) (n : ℕ) [NeZero n] {β : ℝ}
-    (hβ : 0 ≤ β) (h : Fin (2 * n) → ℝ) :
-    (ringFieldPartitionRe n N β h) ^ 2
-      ≤ ringFieldPartitionRe n N β (ringFieldReflectLeft n h)
-        * ringFieldPartitionRe n N β (ringFieldReflectRight n h) := by
-  have hself : ringFieldPartitionRe n N β h
-      = (ringTwoFieldWeight n N β h (fun x => - h (ringReflect n x))).trace.re := by
-    rw [← ringFieldPartitionRe_physFieldOf G n β h (fun x => - h (ringReflect n x)),
-      physFieldOf_self]
-  rw [hself, ringFieldReflectLeft, ringFieldReflectRight,
-    ringFieldPartitionRe_physFieldOf G n β h h,
-    ringFieldPartitionRe_physFieldOf G n β (fun x => - h (ringReflect n x))
-      (fun x => - h (ringReflect n x))]
-  exact ringTwoFieldWeight_reflection_cauchySchwarz n N β hβ h (fun x => - h (ringReflect n x))
 
 end LatticeSystem.Quantum

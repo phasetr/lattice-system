@@ -16,10 +16,9 @@ with `Lfield = ringLeftFieldHamiltonian` the field-augmented left part and
 kinetic factor splits by `exp_add_of_commute`, giving the Dyson–Lieb–Simon Trotter approximant
 `(E_G · θ(E_{G'}) · E_D)^m` whose limit is `W(a,b)`.
 
-This file records the doubled weight (`ringTwoFieldWeight`), its diagonal specialisation to the
-symmetric-field weight (`ringTwoFieldWeight_self`), and the Lie-product Trotter-limit representation
-(`ringTwoFieldWeight_isLimit`).  The later reflection Cauchy–Schwarz PR (PR7b-iii) consumes the
-Trotter representation to expand the crossing factor into its nonnegative cone form.
+This file records the doubled weight (`ringTwoFieldWeight`) and the Lie-product Trotter-limit
+representation (`ringTwoFieldWeight_isLimit`).  The later reflection Cauchy–Schwarz PR (PR7b-iii)
+consumes the Trotter representation to expand the crossing factor into its nonnegative cone form.
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionFieldWeight
 import LatticeSystem.Quantum.SpinS.RingReflectionGibbsCapstone
@@ -42,14 +41,6 @@ noncomputable def ringTwoFieldWeight (n N : ℕ) [NeZero n] (β : ℝ) (a b : Fi
   NormedSpace.exp (-(β : ℂ) • (ringLeftFieldHamiltonian n N a
     + ringReflectionThetaS n N (ringLeftFieldHamiltonian n N b)
     - (ringFieldDLSDecomposition n N a).interaction))
-
-/-- **Diagonal specialisation.**  With the same field `a` on both halves the doubled weight is the
-symmetric-field weight of PR7a: `W(a,a) = ringDLSFieldWeightSym a`.  Indeed the doubled Hamiltonian
-`Lfield(a) + θ(Lfield(a)) − D` is exactly `(ringFieldDLSDecomposition a).toHamiltonian`. -/
-theorem ringTwoFieldWeight_self (n N : ℕ) [NeZero n] (β : ℝ) (a : Fin (2 * n) → ℝ) :
-    ringTwoFieldWeight n N β a a = ringDLSFieldWeightSym n N β a := by
-  rw [ringTwoFieldWeight, ringDLSFieldWeightSym, RPDecomposition.toHamiltonian]
-  rfl
 
 /-- **Trotter-limit representation of the doubled weight.**  The doubled weight `W(a,b)` is the
 Lie-product limit of the Dyson–Lieb–Simon approximant `(E_G · θ(E_{G'}) · E_D)^m` with kinetic

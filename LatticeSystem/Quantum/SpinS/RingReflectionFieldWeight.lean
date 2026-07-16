@@ -13,9 +13,8 @@ reflection-positive trace weight and is reflection invariant.  This symmetric-fi
 Fourier-insertion target consumed by the later Gaussian-domination PRs.
 
 This file records the field-augmented left Hamiltonian (`ringLeftFieldHamiltonian`) and its left
-support, the associated DLS decomposition (`ringFieldDLSDecomposition`), the symmetric-field Gibbs
-weight (`ringDLSFieldWeightSym`) with its reflection-positive trace-weight property and its
-reflection invariance.
+support, the associated DLS decomposition (`ringFieldDLSDecomposition`), and the symmetric-field
+Gibbs weight (`ringDLSFieldWeightSym`).
 -/
 import LatticeSystem.Quantum.SpinS.RingReflectionConcreteGibbs
 import LatticeSystem.Quantum.SpinS.RingReflectionThetaInvariance
@@ -74,20 +73,5 @@ finite-β field-shifted weight whose reflection positivity drives Gaussian domin
 noncomputable def ringDLSFieldWeightSym (n N : ℕ) [NeZero n] (β : ℝ) (a : Fin (2 * n) → ℝ) :
     ManyBodyOpS (Fin (2 * n)) N :=
   NormedSpace.exp (-(β : ℂ) • (ringFieldDLSDecomposition n N a).toHamiltonian)
-
-/-- **The symmetric-field weight is a reflection-positive trace weight** (for `β ≥ 0`), directly by
-the Gibbs capstone `RPDecomposition.gibbs_rpTraceWeight` applied to the field-augmented
-decomposition. -/
-theorem ringDLSFieldWeightSym_rpTraceWeight (n N : ℕ) [NeZero n] {β : ℝ} (hβ : 0 ≤ β)
-    (a : Fin (2 * n) → ℝ) : RPTraceWeightS n N (ringDLSFieldWeightSym n N β a) :=
-  (ringFieldDLSDecomposition n N a).gibbs_rpTraceWeight hβ
-
-/-- **The symmetric-field weight is reflection invariant**: `θ(exp(−β·H_{sym})) = exp(−β·H_{sym})`.
-Supplies the `θ M = M` hypothesis for the chessboard/real-diagonal reflection lemmas. -/
-theorem ringReflectionThetaS_ringDLSFieldWeightSym (n N : ℕ) [NeZero n] (β : ℝ)
-    (a : Fin (2 * n) → ℝ) :
-    ringReflectionThetaS n N (ringDLSFieldWeightSym n N β a) = ringDLSFieldWeightSym n N β a := by
-  rw [ringDLSFieldWeightSym, ringReflectionThetaS_exp, ringReflectionThetaS_smul, map_neg,
-    Complex.conj_ofReal, ringReflectionThetaS_ringFieldDLSDecomposition_toHamiltonian]
 
 end LatticeSystem.Quantum
