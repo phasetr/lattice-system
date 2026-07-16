@@ -5,9 +5,10 @@ import LatticeSystem.Quantum.SpinS.AndersonTowerEnergyBoundSectorWords
 # Tasaki §5.3 Theorem 5.2 (BEC low-lying tower states): foundational algebra (PR-1)
 
 This file collects the Hamiltonian-independent algebraic groundwork for the discharge of the
-Bose–Einstein-condensation tower theorem (`tasaki_5_2_bec_tower`, Tasaki §5.3, eq. (5.3.4)).  It is
-the BEC counterpart of the Anderson-tower Theorem 4.6 foundations, adapted to the chemical-potential
-XY Hamiltonian `Ĥ_μ = 2 Ĥ_XY − μ Ŝ_tot^{(3)}` (eq. (5.3.2), `xyChemicalPotentialHamiltonianS`).
+Bose–Einstein-condensation tower theorem (`tasaki_5_2_bec_tower`, Tasaki §5.3, eq. (5.3.4)).
+It is the BEC counterpart of the Anderson-tower Theorem 4.6 foundations, adapted to the
+chemical-potential XY Hamiltonian `Ĥ_μ = 2 Ĥ_XY − μ Ŝ_tot^{(3)}` (eq. (5.3.2),
+`xyChemicalPotentialHamiltonianS`).
 
 The pieces proved here are:
 
@@ -15,10 +16,11 @@ The pieces proved here are:
   chemical potential `μ` times the Hermitian `Ŝ_tot^{(3)}`), the self-adjointness prerequisite of
   the variational double-commutator engine.
 * `totalSpinSOp3_commutator_towerPow` — the sector eigenvalue of the tower operator,
-  `[Ŝ_tot^{(3)}, (Ô_L^{sgn M})^{|M|}] = M (Ô_L^{sgn M})^{|M|}` (§4-a of the design note): obtained
-  by iterating the per-operator Cartan relations `[Ŝ_tot^{(3)}, Ô_L^±] = ±Ô_L^±`
-  (`totalSpinSOp3_commutator_staggeredRaisingOpS`/`…LoweringOpS`) through the generic eigenoperator
-  power law `commutator_pow_smul_eigen`.  This is the `−μ Ŝ_tot^{(3)}` chemical-potential
+  `[Ŝ_tot^{(3)}, (Ô_L^{sgn M})^{|M|}] = M (Ô_L^{sgn M})^{|M|}` (§4-a of the design note):
+  obtained by iterating the per-operator Cartan relations `[Ŝ_tot^{(3)}, Ô_L^±] = ±Ô_L^±`
+  (`totalSpinSOp3_commutator_staggeredRaisingOpS`/`…LoweringOpS`) through the generic
+  eigenoperator power law `commutator_pow_smul_eigen`.  This is the `−μ Ŝ_tot^{(3)}`
+  chemical-potential
   contribution to the double commutator of the tower trial state.
 * `Ldhalf_bridge` — the real-analysis identity `L^{d/2} = √(L^d)` bridging the `rpow` window
   `|M| ≤ C₁ L^{d/2}` (eq. (5.3.4)) to the `√(L^d)` normalization used by the tower engine.
@@ -59,8 +61,9 @@ theorem xyChemicalPotentialHamiltonianS_isHermitian (d L : ℕ) [NeZero L] (μ :
 /-! ## Sector eigenvalue of the tower operator -/
 
 /-- **Eigenoperator power commutator.**  If `A` is an eigenoperator of the adjoint action of `H`
-with eigenvalue `c` (`[H, A] = c • A`), then `[H, Aⁿ] = (n c) • Aⁿ`: the adjoint eigenvalue is
-additive under products.  Proved by induction on `n` via the Leibniz rule for the commutator. -/
+with eigenvalue `c` (`[H, A] = c • A`), then `[H, Aⁿ] = (n c) • Aⁿ`: the adjoint eigenvalue
+is additive under products.  Proved by induction on `n` via the Leibniz rule for the
+commutator. -/
 private theorem commutator_pow_smul_eigen {ι : Type*} [Fintype ι] [DecidableEq ι]
     (H A : Matrix ι ι ℂ) {c : ℂ} (h : H * A - A * H = c • A) (n : ℕ) :
     H * A ^ n - A ^ n * H = ((n : ℂ) * c) • A ^ n := by
@@ -112,8 +115,8 @@ theorem totalSpinSOp3_commutator_towerPow (A : Λ → Bool) (M : ℤ) :
 
 /-- **`rpow`–`sqrt` bridge** `L^{d/2} = √(L^d)`: the tower window `|M| ≤ C₁ L^{d/2}` (eq. (5.3.4))
 is stated with the real power `(L : ℝ) ^ ((d : ℝ) / 2)`, whereas the Anderson-tower engine
-normalizes by `√(L^d)`; the two agree.  Proved by rewriting `√` as the `1/2`-power and collapsing
-`(L^d)^{1/2} = L^{d·(1/2)}`. -/
+normalizes by `√(L^d)`; the two agree.  Proved by rewriting `√` as the `1/2`-power and
+collapsing `(L^d)^{1/2} = L^{d·(1/2)}`. -/
 theorem Ldhalf_bridge (d L : ℕ) :
     (L : ℝ) ^ ((d : ℝ) / 2) = Real.sqrt ((L : ℝ) ^ d) := by
   rw [Real.sqrt_eq_rpow, ← Real.rpow_natCast (L : ℝ) d, ← Real.rpow_mul (Nat.cast_nonneg L)]
