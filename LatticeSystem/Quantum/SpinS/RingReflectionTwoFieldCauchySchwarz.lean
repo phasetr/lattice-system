@@ -109,7 +109,7 @@ Proved by the outer Trotter limit `m → ∞`: the isLimit approximant `T_m(x,y)
 `P_m(x,y) = (β/m)·crossing(x,y)`, cone-positive because `0 ≤ β`); and `cauchySchwarz_of_tendsto`
 streams the per-`m` bound to the limit.  The crossing is genuinely field-dependent
 (`ringBondSquareFieldCrossing`), so its `(b,b)` slot is already native — no field-free-crossing
-splice and no `.toField` bridge is needed. -/
+splice is needed. -/
 theorem ringBondSquareTwoFieldWeight_reflection_cauchySchwarz (n N : ℕ) [NeZero n] (β : ℝ)
     (hβ : 0 ≤ β) (a b : Fin (2 * n) → ℝ) :
     ((ringBondSquareTwoFieldWeight n N β a b).trace.re) ^ 2
