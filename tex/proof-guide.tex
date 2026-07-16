@@ -11099,8 +11099,14 @@ constant $q_0>0$ (depending only on $d$) such that every ground state $\Phi_{\ma
 \Phi\rangle/(L^d)^2\ge q_0$ for $\alpha=1,2$ and all sufficiently large even $L$ (5.2.5; the squared
 operator $\hat O_L^{(\alpha)}/L^d$ gives the $(L^d)^2$ normalization, the intensive ODLRO density).  Half filling is
 essential, and the ground state exhibits long-range order \emph{without} symmetry breaking
-(eq.~5.2.8).  Proved by Kennedy--Lieb--Shastry and Kubo--Kishi via reflection positivity; recorded as
-a documented axiom.  Chapters~3--10 backfill.
+(eq.~5.2.8).  Proved by Kennedy--Lieb--Shastry and Kubo--Kishi via reflection positivity.  The
+recorded statement is \emph{uniform-in-$L$ finite-dimensional} (the same pattern as the discharged
+Theorems~4.6/4.8/4.9/4.11), \emph{not} a true infinite-volume claim; it is a documented axiom because
+the $d$-dimensional reflection-positivity / infrared-bound proof technique
+(Dyson--Lieb--Simon / Kennedy--Lieb--Shastry / Kubo--Kishi) is intractable at this project's scale
+(the existing reflection-positivity infrastructure is one-dimensional-ring-only), not because the
+subject is infinite-volume.  Rectification condition: should a $d$-dimensional RP/IR-bound
+infrastructure ever be built, Theorem~5.1 returns to a prove-target.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{Theorem 5.2} (low-lying tower states of hard-core bosons; Tasaki §5.3,
@@ -11177,7 +11183,11 @@ S_{(x,a)}^-\hat S_{(x,b)}^+$).  The double limit is stated in
 the sound eventual-$\varepsilon'$ form (outer $\varepsilon\downarrow0$, inner $L\uparrow\infty$), the
 ground-state family is given (unique by a Marshall--Lieb--Mattis argument), and $\tilde m$ is
 existential with lower bound $\sqrt{2q_0}$.  The two condensates are thus coupled coherently.  Proved
-by Koma--Tasaki~[22]; recorded as a documented axiom.  Chapters~3--10 backfill.
+by Koma--Tasaki~[22]; recorded as a documented axiom.  Unlike Theorem~5.1, this is a \emph{genuine
+iterated thermodynamic limit} $\lim_{\varepsilon\downarrow0}\lim_{L\uparrow\infty}$: a Tasaki
+footnote states that the existence of the limit itself is unproven (open in the source literature),
+so it falls under the open-conjecture exclusion of the externally-cited-theorem prove policy, rather
+than being a tractable finite-dimensional cite-only case.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{§6.1 Haldane ``conjecture''} (Tasaki §6.1, eqs.~(6.1.1)--(6.1.3), pp.~153--157;
