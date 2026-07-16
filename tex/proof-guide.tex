@@ -11131,8 +11131,21 @@ window bridge $L^{d/2}=\sqrt{L^d}$ (\texttt{LatticeSystem.Math.Ldhalf\_bridge},
 $2q_0\lVert\Phi\rVert^2\le\langle\Phi,\hat p\,\Phi\rangle$
 (\texttt{phatMoment\_one\_ge\_of\_planar\_lro}, PR-2, \#5051), driven directly by the two XY-plane
 ODLRO hypotheses ($\alpha=1,2$) in place of the SU(2) singlet/isotropy base of Theorem~4.6, is in
-\texttt{Quantum/SpinS/BoseEinsteinCondensateMoment.lean}; the \texttt{tasaki\_5\_2\_bec\_tower} axiom
-is to be discharged (axiom$\to$theorem) at the final PR of the arc.  Chapters~3--10 backfill.
+\texttt{Quantum/SpinS/BoseEinsteinCondensateMoment.lean}.  PR-3 (\#5056) adds the exact
+variational-numerator algebra of the $-\mu\,\hat S_{\mathrm{tot}}^{(3)}$ term
+(\texttt{Quantum/SpinS/BoseEinsteinCondensateNumerator.lean}): the double commutator of
+$\hat H_\mu=2\hat H_{\mathrm{XY}}-\mu\hat S_{\mathrm{tot}}^{(3)}$ with the tower operator splits
+exactly as
+$[A^{\dagger},[\hat H_\mu,A]]=[A^{\dagger},[2\hat H_{\mathrm{XY}},A]]-(\mu M)\,[A^{\dagger},A]$
+(\texttt{chemicalPotential\_double\_commutator\_muTerm}, §4-b), whose real-part variational
+numerator is
+$\langle\Phi,[A^{\dagger},[2\hat H_{\mathrm{XY}},A]]\Phi\rangle-\mu
+M(\lVert A\Phi\rVert^2-\lVert A^{\dagger}\Phi\rVert^2)$
+(\texttt{chemicalPotential\_numerator\_muTerm}, §4-c), consuming PR-1's
+\texttt{totalSpinSOp3\_commutator\_towerPow} as the $[\hat S_{\mathrm{tot}}^{(3)},A]=M\,A$ input; the
+residual first-order moment-difference term is later localized to a \texttt{BECSectorCurvatureBound}
+predicate (half filling $\mu=0$ is the term-free special case).  The \texttt{tasaki\_5\_2\_bec\_tower}
+axiom is to be discharged (axiom$\to$theorem) at the final PR of the arc.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{Theorem 5.3} (U(1) symmetry-breaking states of hard-core bosons; Tasaki §5.3,
