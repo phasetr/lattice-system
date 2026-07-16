@@ -329,3 +329,13 @@ tanakaSSB_field_lowerBound
 # consumed by the two Anderson-tower sites `AndersonTowerTheorem46.lean` / `AndersonTowerTanakaCapstone.lean`.)
 xyChemicalPotentialHamiltonianS_isHermitian
 totalSpinSOp3_commutator_towerPow
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — Tasaki §5.3 Theorem 5.2 (BEC low-lying tower
+# states) discharge arc PR-2 (#5051), `Quantum/SpinS/BoseEinsteinCondensateMoment.lean`.  The
+# U(1)-planar base entry `2 q₀ ‖Φ‖² ≤ ⟨Φ, p̂ Φ⟩` (Tasaki §5.3 eq. (5.2.5) → eq. (4.2.37) base,
+# p. 139/105) driven directly by the two XY-plane ODLRO hypotheses (α = 1, 2), replacing the SU(2)
+# singlet/isotropy base of Theorem 4.6 (`phatMoment_one_ge_of_lro`).  Proved axiom-free
+# (`#print axioms` = propext/Classical.choice/Quot.sound only).  Zero-referenced until PR-4/PR-5 feed
+# it into the singlet-free recursion `phatMoment_succ_ratio` for the tower denominator lower bound.
+# RE-EVALUATE/DELIST when consumed by PR-4/PR-5.
+phatMoment_one_ge_of_planar_lro
