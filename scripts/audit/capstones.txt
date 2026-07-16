@@ -269,3 +269,13 @@ phatMoment_one_ge_of_planar_lro
 # `variational_gap_le_double_commutator` for the cubic energy bound.  RE-EVALUATE/DELIST when consumed
 # by PR-5.
 chemicalPotential_numerator_muTerm
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — Tasaki §5.3 Theorem 5.2 (BEC low-lying tower
+# states) discharge arc PR-4 (#5057), `Quantum/SpinS/BoseEinsteinCondensateDenominator.lean`.  The
+# non-vanishing of the tower state `Γ_M = (Ô_L^{sgn M})^{|M|} Φ ≠ 0` (first conjunct of
+# `IsBECTowerConstants`): derived from the geometric denominator lower bound
+# `½ (2 q₀)^{|M|} m₀ ≤ ‖(ô^±)^{|M|} Φ‖²` (`becTowerDenominator_geom_lower_raising`/`_lowering`, which
+# are themselves referenced here, hence not zero-ref tips) via the scalar `V^{|M|} ≠ 0`.  Proved
+# axiom-free (`#print axioms` = propext/Classical.choice/Quot.sound only).  Zero-referenced until the
+# PR-5 assembly feeds it into `IsBECTowerConstants`.  RE-EVALUATE/DELIST when consumed by PR-5.
+becTowerState_ne_zero_of_planar_lro
