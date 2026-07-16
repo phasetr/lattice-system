@@ -27,10 +27,16 @@ statement (5.2.5) `⟨Φ_GS| (Ô_L^{(α)})² / L^d |Φ_GS⟩ ≥ q₀ > 0` for `
 
 **Theorem 5.1**: for `d ≥ 2` and half filling `ρ = 1/2`, ODLRO holds with a constant `q₀ > 0`
 depending only on `d`.  This is the BEC counterpart of the Dyson–Lieb–Simon Néel order; it was
-proved by Kennedy–Lieb–Shastry and by Kubo–Kishi via reflection positivity.  Being an
-infinite-volume result, it is recorded here as a documented axiom on the spin (XY) side.  (The
-ground state itself exhibits *no* SSB, `⟨Ô_L^{(α)}/L^d⟩ = 0`, since it has a fixed particle number —
-LRO without SSB, eq. (5.2.8).)
+proved by Kennedy–Lieb–Shastry and by Kubo–Kishi via reflection positivity.  The statement recorded
+here is **uniform-in-`L` finite-dimensional** — the same pattern as the discharged Theorems
+4.6/4.8/4.9/4.11 — *not* a true infinite-volume claim.  It is a documented axiom because the
+`d`-dimensional reflection-positivity / infrared-bound proof technique
+(Dyson–Lieb–Simon / Kennedy–Lieb–Shastry / Kubo–Kishi) is intractable at this project's scale (the
+existing reflection-positivity infrastructure is one-dimensional-ring-only), *not* because the
+subject is infinite-volume.  Rectification condition: should a `d`-dimensional RP/IR-bound
+infrastructure ever be built, Theorem 5.1 returns to a prove-target.  (The ground state itself
+exhibits *no* SSB, `⟨Ô_L^{(α)}/L^d⟩ = 0`, since it has a fixed particle number — LRO without SSB,
+eq. (5.2.8).)
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §5.1–§5.2, Theorem 5.1, eqs. (5.1.1)–(5.2.5), pp. 135–139.
@@ -66,7 +72,12 @@ The ground state `Φ_GS` is a *given* per-`L` vector specified by the hypotheses
 `Ŝ_tot^{(3)} Φ_GS = 0`); the bound holds for *every* such ground state.  Half filling
 (`Ŝ_tot^{(3)} = 0`) is essential — it is the sector to which ODLRO/BEC corresponds (Theorem 2.4) —
 and `Φ ≠ 0` makes the Rayleigh ratio well defined.  Proved by Kennedy–Lieb–Shastry and Kubo–Kishi
-via the reflection-positivity method of Dyson–Lieb–Simon; recorded as a documented axiom. -/
+via the reflection-positivity method of Dyson–Lieb–Simon.  Despite invoking `d`-dimensional
+reflection positivity, this statement is **uniform-in-`L` finite-dimensional** (like Theorems
+4.6/4.8/4.9/4.11); it is a documented axiom because the `d`-dim RP/IR-bound proof technique is
+intractable at project scale (the existing RP infrastructure is 1D-ring-only), *not* because the
+subject is infinite-volume.  It returns to a prove-target if a `d`-dim RP/IR-bound infrastructure is
+ever built. -/
 axiom tasaki_5_1_xy_odlro_half_filling (d : ℕ) (hd : 2 ≤ d) :
     ∃ q₀ : ℝ, 0 < q₀ ∧ ∃ L₀ : ℕ, ∀ (L : ℕ) [NeZero L], Even L → L₀ ≤ L →
       ∀ (Φ : (HypercubicTorus d L → Fin 2) → ℂ) (E₀ : ℂ), Φ ≠ 0 →
@@ -296,7 +307,11 @@ The two condensates are thus coupled coherently (entangled) with a fixed relativ
 ground state `Φ^ε` is a *given* family (unique per `(ε, L)` by a Marshall–Lieb–Mattis argument:
 eigenvector at the minimal energy, nonzero, in the `2N`-particle sector `Ŝ_tot^{(3)} = 0`).  The
 double limit is stated soundly in eventual-`ε'` form (outer `ε↓0`, inner `L↑∞`); `m̃` is existential
-with the lower bound `√(2 q₀)`.  Proved in Koma–Tasaki [22]; recorded as a documented axiom. -/
+with the lower bound `√(2 q₀)`.  Proved in Koma–Tasaki [22]; recorded as a documented axiom.  Unlike
+Theorem 5.1, this is a **genuine iterated thermodynamic limit** `lim_{ε↓0} lim_{L↑∞}`: a Tasaki
+footnote states that the existence of the limit itself is unproven (open in the source literature),
+so it falls under the open-conjecture exclusion of the externally-cited-theorem prove policy, rather
+than being a tractable finite-dimensional cite-only case. -/
 axiom tasaki_5_4_coupled_bec_ssb (d : ℕ) (hd : 2 ≤ d) (φ q₀ : ℝ) (hq₀ : 0 < q₀)
     (x : Fin d → ℤ)
     -- the single *uncoupled* system has ODLRO with parameter `q₀` (Theorem 5.1, eq. (5.2.5)):
