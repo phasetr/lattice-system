@@ -1,26 +1,24 @@
 /-
-The two-field reflection Cauchy–Schwarz on the doubled Gibbs weight `W(a,b)` via a double limit
-(Tasaki §4.1 Theorem 4.2, reflection-positivity layer; (4.1.51), pp. 89–93; DLS 1978 §2–3).
+The two-field reflection Cauchy–Schwarz on the doubled bond-square Gibbs weight `W^{BS}(a,b)` via a
+double limit (Tasaki §4.1 Theorem 4.2, reflection-positivity layer; (4.1.51), pp. 89–93; DLS 1978
+§2–3).
 
 Streaming the finite `(m,r)` reflection Cauchy–Schwarz of `RingReflectionTwoFieldConeCauchySchwarz`
-(`twoField_product_pairing_cauchySchwarz`) to the doubled Gibbs weight `W(a,b) =
-ringTwoFieldWeight n N β a b` requires a genuinely NESTED double limit: the Dyson–Lieb–Simon Trotter
-approximant `T_m(x,y) = (E_G(x)·θ(E_G(y))·exp((β/m)·D))^m` carries the crossing factor as the
-exponential `exp((β/m)·D)`, which is NOT a finite cone but only the `r → ∞` limit of the cone
-partial sums `S_r = ∑_{k<r}(k!)⁻¹•((β/m)·D)ᵏ`.  So one first closes `r → ∞` (exp-of-cone) to lift
-the finite Cauchy–Schwarz from `U_{m,r}` to `T_m` (`twoField_pairing_cauchySchwarz_exp`), then
-`m → ∞` (Trotter, `ringTwoFieldWeight_isLimit`) to reach `W`.  Both passages reuse the
-limit-preserving
-Cauchy–Schwarz `cauchySchwarz_of_tendsto`.  The field-free crossing interaction `D`
-(`ringFieldDLSDecomposition_interaction_eq`) aligns the `(b,b)` slot, whose isLimit carries `D_b`
-while the per-`m` fact produces `D_a`.  The hypothesis `0 ≤ β` is needed for cone positivity of the
-crossing factor (isLimit itself needs no sign hypothesis).
+(`twoField_product_pairing_cauchySchwarz`) to a doubled Gibbs weight requires a genuinely NESTED
+double limit: the Dyson–Lieb–Simon Trotter approximant
+`T_m(x,y) = (E_G(x)·θ(E_G(y))·exp((β/m)·D))^m` carries the crossing factor as the exponential
+`exp((β/m)·D)`, which is NOT a finite cone but only the `r → ∞` limit of the cone partial sums
+`S_r = ∑_{k<r}(k!)⁻¹•((β/m)·D)ᵏ`.  So one first closes `r → ∞` (exp-of-cone) to lift the finite
+Cauchy–Schwarz from `U_{m,r}` to `T_m` (`twoField_pairing_cauchySchwarz_exp`), then `m → ∞`
+(Trotter, `ringBondSquareTwoFieldWeight_isLimit`) to reach `W^{BS}`.  Both passages reuse the
+limit-preserving Cauchy–Schwarz `cauchySchwarz_of_tendsto`.  The hypothesis `0 ≤ β` is needed for
+cone positivity of the crossing factor (isLimit itself needs no sign hypothesis).
 
-This file records the capstone `ringTwoFieldWeight_reflection_cauchySchwarz`: the finite-β matrix
-form of Tasaki's reflection bound (4.1.51),
-`(Re Tr W(a,b))² ≤ Re Tr W(a,a) · Re Tr W(b,b)`.
+This file records the limit-preserving Cauchy–Schwarz `cauchySchwarz_of_tendsto`, the per-`m`
+exponential-crossing Cauchy–Schwarz `twoField_pairing_cauchySchwarz_exp`, and the capstone
+`ringBondSquareTwoFieldWeight_reflection_cauchySchwarz`: the finite-β matrix form of Tasaki's
+reflection bound (4.1.51), `(Re Tr W^{BS}(a,b))² ≤ Re Tr W^{BS}(a,a) · Re Tr W^{BS}(b,b)`.
 -/
-import LatticeSystem.Quantum.SpinS.RingReflectionTwoFieldWeight
 import LatticeSystem.Quantum.SpinS.RingReflectionTwoFieldConeCauchySchwarz
 import LatticeSystem.Quantum.SpinS.RingReflectionBondSquareTwoFieldWeight
 import Mathlib.Analysis.Normed.Algebra.Exponential
@@ -46,20 +44,6 @@ private theorem cauchySchwarz_of_tendsto {ι : Type*} {l : Filter ι} [l.NeBot]
     (hxy : Tendsto pxy l (𝓝 axy)) (hxx : Tendsto pxx l (𝓝 axx)) (hyy : Tendsto pyy l (𝓝 ayy))
     (hCS : ∀ i, (pxy i) ^ 2 ≤ pxx i * pyy i) : axy ^ 2 ≤ axx * ayy :=
   le_of_tendsto_of_tendsto' (hxy.pow 2) (hxx.mul hyy) hCS
-
-/-- **Field-independence of the crossing interaction.**  The crossing interaction of the
-field-augmented DLS decomposition does not depend on the field argument:
-`(ringFieldDLSDecomposition a).interaction = (ringFieldDLSDecomposition b).interaction`.  Both equal
-the field-free sum of the two gauged crossing-bond interactions
-(`ringCrossingRPDecomposition_interaction`).  Needed to align the `(b,b)` slot of the double limit
-of Tasaki (4.1.51) (pp. 89–93): `isLimit(a,b)`/`isLimit(a,a)` carry `D_a` while `isLimit(b,b)`
-carries `D_b`, so the per-`m` fact's third slot is rewritten `D_a → D_b`. -/
-private theorem ringFieldDLSDecomposition_interaction_eq (n N : ℕ) [NeZero n]
-    (a b : Fin (2 * n) → ℝ) :
-    (ringFieldDLSDecomposition n N a).interaction
-      = (ringFieldDLSDecomposition n N b).interaction := by
-  rw [ringFieldDLSDecomposition, ringFieldDLSDecomposition,
-    ringCrossingRPDecomposition_interaction, ringCrossingRPDecomposition_interaction]
 
 /-- **Per-`m` reflection Cauchy–Schwarz with a field-dependent exponential crossing factor** (the
 `r → ∞` passage).  For the Dyson–Lieb–Simon per-`m` approximant
@@ -113,46 +97,6 @@ private theorem twoField_pairing_cauchySchwarz_exp (m : ℕ)
     (((hcont x x).tendsto (NormedSpace.exp (P x x))).comp hexpxx)
     (((hcont y y).tendsto (NormedSpace.exp (P y y))).comp hexpyy) hCSr
 
-/-- **Two-field reflection Cauchy–Schwarz on the doubled Gibbs weight** — the finite-β matrix form
-of Tasaki's reflection bound (4.1.51), p. 86 (proof pp. 89–93; DLS 1978 §2–3).  For `0 ≤ β`, the
-doubled Gibbs weight `W(a,b) = ringTwoFieldWeight n N β a b` obeys
-`(Re Tr W(a,b))² ≤ Re Tr W(a,a) · Re Tr W(b,b)`.
-Proved by the outer Trotter limit `m → ∞`: the isLimit approximant `T_m(x,y) → W(x,y)`
-(`ringTwoFieldWeight_isLimit`); each `T_m` satisfies the per-`m` reflection Cauchy–Schwarz
-(`twoField_pairing_cauchySchwarz_exp` with kinetic `g_m z = exp(-(β/m)·Lfield z)` and crossing
-`P_m = (β/m)·D_a`, cone-positive because `0 ≤ β`); the field-free crossing
-(`ringFieldDLSDecomposition_interaction_eq`) rewrites the `(b,b)` slot's `D_a → D_b` to match
-`isLimit(b,b)`; and `cauchySchwarz_of_tendsto` streams the per-`m` bound to the limit. -/
-theorem ringTwoFieldWeight_reflection_cauchySchwarz (n N : ℕ) [NeZero n] (β : ℝ) (hβ : 0 ≤ β)
-    (a b : Fin (2 * n) → ℝ) :
-    ((ringTwoFieldWeight n N β a b).trace.re) ^ 2
-      ≤ (ringTwoFieldWeight n N β a a).trace.re * (ringTwoFieldWeight n N β b b).trace.re := by
-  have htr : Continuous fun M' : ManyBodyOpS (Fin (2 * n)) N => M'.trace.re := by
-    haveI : CompleteSpace (ManyBodyOpS (Fin (2 * n)) N) :=
-      FiniteDimensional.complete ℂ (ManyBodyOpS (Fin (2 * n)) N)
-    exact Complex.continuous_re.comp (Continuous.matrix_trace continuous_id)
-  -- the crossing factor `P_m = (β/m)·D_a` is cone-representable because `0 ≤ β`
-  have hP : ∀ m : ℕ, RPTraceConeRepS n N
-      ((m : ℂ)⁻¹ • ((β : ℂ) • (ringFieldDLSDecomposition n N a).interaction)) := by
-    intro m
-    have hsc : (m : ℂ)⁻¹ • ((β : ℂ) • (ringFieldDLSDecomposition n N a).interaction)
-        = (((m : ℝ)⁻¹ * β : ℝ) : ℂ) • (ringFieldDLSDecomposition n N a).interaction := by
-      rw [smul_smul]; congr 1; push_cast; ring
-    rw [hsc]
-    exact (ringFieldDLSDecomposition n N a).interaction_coneRep.smul_nonneg
-      (mul_nonneg (inv_nonneg.mpr (Nat.cast_nonneg m)) hβ)
-  refine cauchySchwarz_of_tendsto
-    ((htr.tendsto _).comp (ringTwoFieldWeight_isLimit n N β a b))
-    ((htr.tendsto _).comp (ringTwoFieldWeight_isLimit n N β a a))
-    ((htr.tendsto _).comp (ringTwoFieldWeight_isLimit n N β b b)) (fun m => ?_)
-  have h3 := twoField_pairing_cauchySchwarz_exp m
-    (fun z => NormedSpace.exp ((m : ℂ)⁻¹ • (-(β : ℂ) • ringLeftFieldHamiltonian n N z)))
-    (fun z => (((ringLeftFieldHamiltonian_supportedOnLeft n N z).smul (-(β : ℂ))).smul
-      ((m : ℂ)⁻¹)).exp)
-    (hP m).toField a b
-  nth_rewrite 3 [ringFieldDLSDecomposition_interaction_eq n N a b] at h3
-  exact h3
-
 /-- **Two-field reflection Cauchy–Schwarz on the doubled bond-square Gibbs weight** — the finite-β
 matrix form of Tasaki's reflection bound (4.1.51), p. 86 (proof pp. 89–93; DLS 1978 §2–3), in the
 bond-square (field-dependent crossing) presentation of (4.1.67).  For `0 ≤ β`, the doubled
@@ -162,10 +106,9 @@ Proved by the outer Trotter limit `m → ∞`: the isLimit approximant `T_m(x,y)
 (`ringBondSquareTwoFieldWeight_isLimit`); each `T_m` satisfies the per-`m` reflection Cauchy–Schwarz
 (`twoField_pairing_cauchySchwarz_exp` with kinetic `g_m z = exp(-(β/m)·H_L(z))` and crossing
 `P_m(x,y) = (β/m)·crossing(x,y)`, cone-positive because `0 ≤ β`); and `cauchySchwarz_of_tendsto`
-streams the per-`m` bound to the limit.  Unlike the linear
-`ringTwoFieldWeight_reflection_cauchySchwarz`, the crossing is genuinely field-dependent
-(`ringBondSquareFieldCrossing`), so its `(b,b)` slot is already native — no `interaction_eq`
-`D_a → D_b` splice and no `.toField` bridge is needed. -/
+streams the per-`m` bound to the limit.  The crossing is genuinely field-dependent
+(`ringBondSquareFieldCrossing`), so its `(b,b)` slot is already native — no field-free-crossing
+splice is needed. -/
 theorem ringBondSquareTwoFieldWeight_reflection_cauchySchwarz (n N : ℕ) [NeZero n] (β : ℝ)
     (hβ : 0 ≤ β) (a b : Fin (2 * n) → ℝ) :
     ((ringBondSquareTwoFieldWeight n N β a b).trace.re) ^ 2

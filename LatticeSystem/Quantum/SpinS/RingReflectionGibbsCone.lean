@@ -129,7 +129,7 @@ such that for every field pair `(u, v)`
 `P u v = ∑ᵢ cᵢ • (θ(C i v) · C i u)` (the reflected pile carries the field `v`, the non-reflected
 pile the field `u`).  The diagonal `u = v` is a genuine `θ(A)·A` cone; the off-diagonal `u ≠ v`
 is the field-crossing form.  The field-free `RPTraceConeRepS n N M` embeds as the constant family
-`C i z := Ĉ i` (bridge `RPTraceConeRepS.toField`), so this is a true generalisation, not a
+`C i z := Ĉ i`, so this is a true generalisation, not a
 duplicate.  It closes under the algebraic operations exactly as `RPTraceConeRepS`, giving the shared
 field-crossing cone family that the three slots of the two-field reflection Cauchy–Schwarz of Tasaki
 (4.1.51)/(4.1.69) (pp. 89–93; DLS 1978 §2–3) consume. -/
@@ -230,15 +230,6 @@ theorem RPTwoFieldConeRepS.expSeriesPartialSum
     refine ih.add ?_
     rw [show ((Nat.factorial r : ℂ))⁻¹ = (((Nat.factorial r : ℝ)⁻¹ : ℝ) : ℂ) by push_cast; ring]
     exact (hP.pow r).smul_nonneg (inv_nonneg.mpr (Nat.cast_nonneg _))
-
-/-- **Field-free bridge.**  A (field-independent) cone-representable weight `M` lifts to the
-constant field-crossing cone `fun _ _ => M` via the constant generator family `C i z := Ĉ i`.
-This is a plain coercion (not a duplicate declaration): it recovers `RPTraceConeRepS` as the
-`u = v`, constant-in-field degenerate case of `RPTwoFieldConeRepS`. -/
-theorem RPTraceConeRepS.toField {M : ManyBodyOpS (Fin (2 * n)) N}
-    (hM : RPTraceConeRepS n N M) : RPTwoFieldConeRepS n N (fun _ _ => M) := by
-  obtain ⟨ι, _, C, c, hC, hc, rfl⟩ := hM
-  exact ⟨ι, inferInstance, fun i _ => C i, c, fun i _ => hC i, hc, fun _ _ => rfl⟩
 
 /-- A cone-representable weight is a reflection-positive trace weight. -/
 theorem RPTraceConeRepS.rpTraceWeight {M : ManyBodyOpS (Fin (2 * n)) N}
