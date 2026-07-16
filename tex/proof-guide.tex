@@ -11136,8 +11136,12 @@ $[\hat S_{\mathrm{tot}}^{(3)},(\hat O_L^{\mathrm{sgn}\,M})^{|M|}]=M\,(\hat
 O_L^{\mathrm{sgn}\,M})^{|M|}$ (\texttt{totalSpinSOp3\_commutator\_towerPow}, §4-a) --- is collected in
 \texttt{Quantum/SpinS/BoseEinsteinCondensateAlgebra.lean}, together with the shared real-analysis
 window bridge $L^{d/2}=\sqrt{L^d}$ (\texttt{LatticeSystem.Math.Ldhalf\_bridge},
-\texttt{Math/Analysis/RealRpowNatSqrt.lean}); the \texttt{tasaki\_5\_2\_bec\_tower} axiom is to be
-discharged (axiom$\to$theorem) at the final PR of the arc.  Chapters~3--10 backfill.
+\texttt{Math/Analysis/RealRpowNatSqrt.lean}).  The crux U(1)-planar $\hat p$-moment base entry
+$2q_0\lVert\Phi\rVert^2\le\langle\Phi,\hat p\,\Phi\rangle$
+(\texttt{phatMoment\_one\_ge\_of\_planar\_lro}, PR-2, \#5051), driven directly by the two XY-plane
+ODLRO hypotheses ($\alpha=1,2$) in place of the SU(2) singlet/isotropy base of Theorem~4.6, is in
+\texttt{Quantum/SpinS/BoseEinsteinCondensateMoment.lean}; the \texttt{tasaki\_5\_2\_bec\_tower} axiom
+is to be discharged (axiom$\to$theorem) at the final PR of the arc.  Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{Theorem 5.3} (U(1) symmetry-breaking states of hard-core bosons; Tasaki §5.3,
