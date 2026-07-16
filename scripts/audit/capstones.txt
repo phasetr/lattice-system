@@ -319,12 +319,13 @@ tanakaSSB_field_lowerBound
 
 # TEMPORARY arc foundations (temp-then-delist lifecycle) — Tasaki §5.3 Theorem 5.2 (BEC low-lying
 # tower states) discharge arc PR-1 (#5051), `Quantum/SpinS/BoseEinsteinCondensateAlgebra.lean`.  These
-# three Hamiltonian-independent foundation lemmas are proved axiom-free (`#print axioms` =
+# two Hamiltonian-independent foundation lemmas are proved axiom-free (`#print axioms` =
 # propext/Classical.choice/Quot.sound only) and are consumed by the later PRs of the same arc:
 #   - `xyChemicalPotentialHamiltonianS_isHermitian` (Ĥ_μ Hermitian) — PR-3/PR-5 double-commutator gap;
-#   - `totalSpinSOp3_commutator_towerPow` ([Ŝ³_tot, tower]=M·tower, §4-a) — PR-3 −μ Ŝ³_tot term;
-#   - `Ldhalf_bridge` (L^{d/2}=√(L^d)) — PR-5 cubic energy assembly window.
+#   - `totalSpinSOp3_commutator_towerPow` ([Ŝ³_tot, tower]=M·tower, §4-a) — PR-3 −μ Ŝ³_tot term.
 # Zero-referenced foundation tips until consumed downstream.  RE-EVALUATE/DELIST when consumed.
+# (The former `Ldhalf_bridge` entry was DELISTED: it moved to the generic real-analysis home
+# `Math/Analysis/RealRpowNatSqrt.lean` as `LatticeSystem.Math.Ldhalf_bridge` and is now genuinely
+# consumed by the two Anderson-tower sites `AndersonTowerTheorem46.lean` / `AndersonTowerTanakaCapstone.lean`.)
 xyChemicalPotentialHamiltonianS_isHermitian
 totalSpinSOp3_commutator_towerPow
-Ldhalf_bridge

@@ -22,11 +22,13 @@ The pieces proved here are:
   eigenoperator power law `commutator_pow_smul_eigen`.  This is the `−μ Ŝ_tot^{(3)}`
   chemical-potential
   contribution to the double commutator of the tower trial state.
-* `Ldhalf_bridge` — the real-analysis identity `L^{d/2} = √(L^d)` bridging the `rpow` window
-  `|M| ≤ C₁ L^{d/2}` (eq. (5.3.4)) to the `√(L^d)` normalization used by the tower engine.
 
-These are consumed by the later PRs of the Theorem 5.2 arc (the double-commutator numerator bound
-and the cubic energy assembly); they add no textbook content of their own.
+The generic `rpow`–`sqrt` window bridge `L^{d/2} = √(L^d)` lives in
+`LatticeSystem/Math/Analysis/RealRpowNatSqrt.lean` (`LatticeSystem.Math.Ldhalf_bridge`): a
+source-independent real-analysis fact shared with the Anderson tower, not declared here.
+
+These lemmas are consumed by the later PRs of the Theorem 5.2 arc (the double-commutator numerator
+bound and the cubic energy assembly); they add no textbook content of their own.
 
 Reference: Hal Tasaki, *Physics and Mathematics of Quantum Many-Body Systems* (1st ed., Springer,
 2020), §5.3, Theorem 5.2, eqs. (5.3.1)–(5.3.4), pp. 140–141 (Koma–Tasaki [21]).
@@ -110,17 +112,5 @@ theorem totalSpinSOp3_commutator_towerPow (A : Λ → Bool) (M : ℤ) :
     calc (M.natAbs : ℂ) * (-1) = ((M.natAbs : ℤ) : ℂ) * (-1) := by rw [Int.cast_natCast]
       _ = ((-M : ℤ) : ℂ) * (-1) := by rw [h1]
       _ = (M : ℂ) := by push_cast; ring
-
-/-! ## `L^{d/2}` ↔ `√(L^d)` bridge -/
-
-/-- **`rpow`–`sqrt` bridge** `L^{d/2} = √(L^d)`: the tower window `|M| ≤ C₁ L^{d/2}` (eq. (5.3.4))
-is stated with the real power `(L : ℝ) ^ ((d : ℝ) / 2)`, whereas the Anderson-tower engine
-normalizes by `√(L^d)`; the two agree.  Proved by rewriting `√` as the `1/2`-power and
-collapsing `(L^d)^{1/2} = L^{d·(1/2)}`. -/
-theorem Ldhalf_bridge (d L : ℕ) :
-    (L : ℝ) ^ ((d : ℝ) / 2) = Real.sqrt ((L : ℝ) ^ d) := by
-  rw [Real.sqrt_eq_rpow, ← Real.rpow_natCast (L : ℝ) d, ← Real.rpow_mul (Nat.cast_nonneg L)]
-  congr 1
-  ring
 
 end LatticeSystem.Quantum

@@ -46,6 +46,7 @@ import LatticeSystem.Math.PosSemidef.TraceProductPos
 import LatticeSystem.Math.PosSemidef.ExpPosDef
 import LatticeSystem.Math.EffectiveLimit
 import LatticeSystem.Math.Analysis.RealLogConvexSequence
+import LatticeSystem.Math.Analysis.RealRpowNatSqrt
 import LatticeSystem.Math.MatrixAnalysis.DegeneratePerturbation
 import LatticeSystem.Math.AngularMomentum.Ladder
 import LatticeSystem.Math.AngularMomentum.Quantization

@@ -11,6 +11,7 @@ This file is downstream of `AndersonTower.lean` (which only states the predicate
 theorem can refer to the numerator machinery without an import cycle.
 -/
 import LatticeSystem.Quantum.SpinS.AndersonTowerNumerator
+import LatticeSystem.Math.Analysis.RealRpowNatSqrt
 
 namespace LatticeSystem.Quantum
 
@@ -600,10 +601,7 @@ theorem tower_lowLying_energy_bound (d N : ℕ) (hd : 1 ≤ d) (q₀ : ℝ) (hq�
     intro L _ hL hLeven Φ E₀ M hev hmin hΦ hsing3 hsing1 hlro hMbound htower
     have hLpos : (0 : ℝ) < (L : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne L)
     have hVpos : (0 : ℝ) < (L : ℝ) ^ d := by positivity
-    have hbridge : (L : ℝ) ^ ((d : ℝ) / 2) = Real.sqrt ((L : ℝ) ^ d) := by
-      rw [Real.sqrt_eq_rpow, ← Real.rpow_natCast (L : ℝ) d, ← Real.rpow_mul hLpos.le]
-      congr 1
-      ring
+    have hbridge := LatticeSystem.Math.Ldhalf_bridge d L
     rw [hbridge] at hMbound
     rcases lt_trichotomy M 0 with hM | hM | hM
     · -- M < 0
