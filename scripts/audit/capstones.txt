@@ -279,3 +279,15 @@ chemicalPotential_numerator_muTerm
 # axiom-free (`#print axioms` = propext/Classical.choice/Quot.sound only).  Zero-referenced until the
 # PR-5 assembly feeds it into `IsBECTowerConstants`.  RE-EVALUATE/DELIST when consumed by PR-5.
 becTowerState_ne_zero_of_planar_lro
+
+# TEMPORARY arc-tip (temp-then-delist lifecycle) — Tasaki §5.3 Theorem 5.2 (BEC low-lying tower
+# states) discharge arc PR-4b (#5058), `Quantum/SpinS/BoseEinsteinCondensateXYNumerator.lean`.  The
+# XY-planar variational numerator bound `|Re⟨Φ,[Aᴴ,[2 Ĥ_XY,A]]Φ⟩| ≤ 4·(O(M²/V) shape)`
+# (`xy_tower_numerator_bound`): the pure-XY numerator (half filling, N=1) obtained from the
+# definitional split `Ĥ_XY = Ĥ_Heis − Ĥ_ZZ` (`xyHamiltonianS_eq_heisenberg_sub_zz`) with the
+# Heisenberg term reusing `tower_numerator_bound` verbatim and the ZZ residual bounded by the reduced
+# replica `zz_tower_numerator_bound` (both referenced here, hence not zero-ref tips).  Proved
+# axiom-free (`#print axioms` = propext/Classical.choice/Quot.sound only).  Zero-referenced until the
+# PR-5 assembly feeds it into the tower Rayleigh/cubic energy bound.  RE-EVALUATE/DELIST when consumed
+# by PR-5.
+xy_tower_numerator_bound
