@@ -155,6 +155,7 @@ import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateAlgebra
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateDenominator
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateMoment
 import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateNumerator
+import LatticeSystem.Quantum.SpinS.BoseEinsteinCondensateXYNumerator
 import LatticeSystem.Quantum.SpinS.HeisenbergEquilibrium
 import LatticeSystem.Quantum.SpinS.HypercubicBoxModel
 import LatticeSystem.Quantum.SpinS.HypercubicBoxThermodynamicLimit

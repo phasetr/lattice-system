@@ -11155,7 +11155,20 @@ half-filling $\hat S_{\mathrm{tot}}^{(3)}\Phi=0$ sector hypothesis, not the full
 applies verbatim to the $\mu=0$ chemical-potential XY ground state --- with the moment geometric
 bound \texttt{phatMoment\_ge\_of\_lro} fed by PR-2's planar base; whence the tower state is
 nonvanishing $\Gamma_M\ne0$ (\texttt{becTowerState\_ne\_zero\_of\_planar\_lro}, supplying the first
-conjunct of \texttt{IsBECTowerConstants}).  The \texttt{tasaki\_5\_2\_bec\_tower}
+conjunct of \texttt{IsBECTowerConstants}).  PR-4b (\#5058) adds the XY-planar variational numerator
+bound (\texttt{Quantum/SpinS/BoseEinsteinCondensateXYNumerator.lean}): via the definitional split
+$\hat H_{\mathrm{XY}}=\hat H_{\mathrm{Heis}}-\hat H_{\mathrm{ZZ}}$
+(\texttt{xyHamiltonianS\_eq\_heisenberg\_sub\_zz}, from \texttt{spinSDotXXZ\_eq\_spinSDot\_add} at
+$\lambda=0$, with $\hat H_{\mathrm{ZZ}}=\sum J_{xy}\hat S^{(3)}_x\hat S^{(3)}_y$) the pure-XY
+numerator $\langle\Phi,[A^{\dagger},[2\hat H_{\mathrm{XY}},A]]\Phi\rangle$ splits by
+Hamiltonian-linearity into $2\cdot(\text{Heisenberg numerator})-2\cdot(\text{ZZ numerator})$; the
+Heisenberg term reuses the Anderson-tower asset \texttt{tower\_numerator\_bound} verbatim, and the
+residual ZZ term is bounded by a reduced replica \texttt{zz\_tower\_numerator\_bound} (its
+$\hat H_{\mathrm{ZZ}}$ locality obtained directly from
+\texttt{iterOrderComm\_norm\_le\_of\_localSum}, with the \emph{same} $24dN^3$/$96dN^4/V$ aggregates),
+giving the identical $O(M^2/V)$ moment-factor shape; the assembled \texttt{xy\_tower\_numerator\_bound}
+is the \texttt{Term1} numerator (half filling, $N=1$) consumed by the PR-5 tower assembly.  The
+\texttt{tasaki\_5\_2\_bec\_tower}
 axiom is to be discharged (axiom$\to$theorem) at the final PR of the arc.  Chapters~3--10 backfill.
 
 \medskip
