@@ -108,4 +108,16 @@ theorem totalSpinSOp3_commutator_towerPow (A : Λ → Bool) (M : ℤ) :
       _ = ((-M : ℤ) : ℂ) * (-1) := by rw [h1]
       _ = (M : ℂ) := by push_cast; ring
 
+/-! ## `L^{d/2}` ↔ `√(L^d)` bridge -/
+
+/-- **`rpow`–`sqrt` bridge** `L^{d/2} = √(L^d)`: the tower window `|M| ≤ C₁ L^{d/2}` (eq. (5.3.4))
+is stated with the real power `(L : ℝ) ^ ((d : ℝ) / 2)`, whereas the Anderson-tower engine
+normalizes by `√(L^d)`; the two agree.  Proved by rewriting `√` as the `1/2`-power and collapsing
+`(L^d)^{1/2} = L^{d·(1/2)}`. -/
+theorem Ldhalf_bridge (d L : ℕ) :
+    (L : ℝ) ^ ((d : ℝ) / 2) = Real.sqrt ((L : ℝ) ^ d) := by
+  rw [Real.sqrt_eq_rpow, ← Real.rpow_natCast (L : ℝ) d, ← Real.rpow_mul (Nat.cast_nonneg L)]
+  congr 1
+  ring
+
 end LatticeSystem.Quantum
