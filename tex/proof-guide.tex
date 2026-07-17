@@ -11101,90 +11101,69 @@ infrastructure ever be built, Theorem~5.1 returns to a prove-target.  Chapters~3
 
 \medskip
 \noindent\textbf{Theorem 5.2} (low-lying tower states of hard-core bosons; Tasaki §5.3,
-eqs.~(5.3.2)--(5.3.4), pp.~140--141; documented axiom,
-\texttt{Quantum/SpinS/BoseEinsteinCondensate.lean}, Issue \#4485).  This is the BEC counterpart of the
-Anderson-tower Theorem~4.6.  We introduce the chemical-potential boson Hamiltonian $\hat H_\mu=\hat H-\mu\hat N$
+eqs.~(5.3.2)--(5.3.4), footnote~8, pp.~140--141).  \emph{Half-filling kernel proved axiom-free}
+(\texttt{tasaki\_5\_2\_bec\_tower\_half\_filling},
+\texttt{Quantum/SpinS/BoseEinsteinCondensateTower.lean}, \#5060); \emph{general-$\mu$ documented
+axiom} \texttt{tasaki\_5\_2\_bec\_tower} (\texttt{Quantum/SpinS/BoseEinsteinCondensate.lean}, Issue
+\#4485) retained.  This is the BEC counterpart of the Anderson-tower Theorem~4.6.  We introduce the
+chemical-potential boson Hamiltonian $\hat H_\mu=\hat H-\mu\hat N$
 (\texttt{xyChemicalPotentialHamiltonianS}, spin form $2\hat H_{\mathrm{XY}}-\mu\,\hat
 S_{\mathrm{tot}}^{(3)}$, since $\hat H=2\hat H_{\mathrm{XY}}$ and $\hat N\leftrightarrow\hat
 S_{\mathrm{tot}}^{(3)}+L^d/2$, eq.~5.3.2; the factor $2$ keeps the documented $\mu$ equal to Tasaki's
-chemical potential, which selects the density).  Given a ground state $\Phi_{\mathrm{GS}}$ of $\hat
-H_\mu$ exhibiting ODLRO with $q_0>0$ (Theorem~5.1), the
-axiom \texttt{tasaki\_5\_2\_bec\_tower} provides constants $C_1,C_2>0$ (depending on $d$, the density
-selected by $\mu$, and $q_0$; $\mu$ is a parameter of \texttt{IsBECTowerConstants}, so the constants
-are per-density) so
+chemical potential, half filling $\mu=0$).  Given a ground state $\Phi_{\mathrm{GS}}$ of $\hat
+H_\mu$ exhibiting ODLRO with $q_0>0$ (Theorem~5.1), there are constants $C_1,C_2>0$ so
 that the tower states $\Gamma_M=(\hat O_L^{\mathrm{sgn}\,M})^{|M|}\Phi_{\mathrm{GS}}$ (for $|M|\le
 C_1L^{d/2}$) are \emph{nonvanishing and} low-lying --- both stated as conclusions (faithful to
 Theorem~5.2, which asserts $\Gamma_M$ is nonvanishing) --- with the \emph{cubic} energy increment
 $\langle\Gamma_M,\hat H_\mu\Gamma_M\rangle/\langle\Gamma_M,\Gamma_M\rangle\le E_0+C_2|M|^3/L^d$
 (eq.~5.3.4) --- cubic in
-$|M|$, in contrast to the quadratic $M^2$ of Theorem~4.6.  The construction and constants are bundled
-into the predicate \texttt{IsBECTowerConstants}; the bound is conditional on ODLRO, and the hard-core
-projection is the identity in the spin-$1/2$ formulation.  Proved by Koma--Tasaki~[21]; recorded as a
-documented axiom.  \emph{Discharge arc in progress} (PR~\#5053): the Hamiltonian-independent
-foundational algebra --- Hermiticity of $\hat H_\mu$
-(\texttt{xyChemicalPotentialHamiltonianS\_isHermitian}) and the tower sector eigenvalue
-$[\hat S_{\mathrm{tot}}^{(3)},(\hat O_L^{\mathrm{sgn}\,M})^{|M|}]=M\,(\hat
-O_L^{\mathrm{sgn}\,M})^{|M|}$ (\texttt{totalSpinSOp3\_commutator\_towerPow}, §4-a) --- is collected in
-\texttt{Quantum/SpinS/BoseEinsteinCondensateAlgebra.lean}, together with the shared real-analysis
-window bridge $L^{d/2}=\sqrt{L^d}$ (\texttt{LatticeSystem.Math.Ldhalf\_bridge},
-\texttt{Math/Analysis/RealRpowNatSqrt.lean}).  The crux U(1)-planar $\hat p$-moment base entry
+$|M|$, in contrast to the quadratic $M^2$ of Theorem~4.6.  Conditional on ODLRO; the hard-core
+projection is the identity in the spin-$1/2$ formulation.  Proved by Koma--Tasaki~[21].
+
+\emph{Half-filling discharge} ($\mu=0$, axiom-free): the predicate
+\texttt{IsBECTowerConstantsHalfFilling} is the $\mu=0$ kernel of \texttt{IsBECTowerConstants} with an
+inner premise conjunct $\hat S^{(3)}_{\mathrm{tot}}\Phi=0$ (the Theorem~5.1 half-filling sector).  Its
+foundations: Hermiticity of $\hat H_\mu$
+(\texttt{xyChemicalPotentialHamiltonianS\_isHermitian},
+\texttt{Quantum/SpinS/BoseEinsteinCondensateAlgebra.lean}) with the shared real-analysis window
+bridge $L^{d/2}=\sqrt{L^d}$ (\texttt{LatticeSystem.Math.Ldhalf\_bridge},
+\texttt{Math/Analysis/RealRpowNatSqrt.lean}); the crux U(1)-planar $\hat p$-moment base entry
 $2q_0\lVert\Phi\rVert^2\le\langle\Phi,\hat p\,\Phi\rangle$
-(\texttt{phatMoment\_one\_ge\_of\_planar\_lro}, PR-2, \#5051), driven directly by the two XY-plane
-ODLRO hypotheses ($\alpha=1,2$) in place of the SU(2) singlet/isotropy base of Theorem~4.6, is in
-\texttt{Quantum/SpinS/BoseEinsteinCondensateMoment.lean}.  PR-3 (\#5056) adds the exact
-variational-numerator algebra of the $-\mu\,\hat S_{\mathrm{tot}}^{(3)}$ term
-(\texttt{Quantum/SpinS/BoseEinsteinCondensateNumerator.lean}): the double commutator of
-$\hat H_\mu=2\hat H_{\mathrm{XY}}-\mu\hat S_{\mathrm{tot}}^{(3)}$ with the tower operator splits
-exactly as
-$[A^{\dagger},[\hat H_\mu,A]]=[A^{\dagger},[2\hat H_{\mathrm{XY}},A]]-(\mu M)\,[A^{\dagger},A]$
-(\texttt{chemicalPotential\_double\_commutator\_muTerm}, §4-b), whose real-part variational
-numerator is
-$\langle\Phi,[A^{\dagger},[2\hat H_{\mathrm{XY}},A]]\Phi\rangle-\mu
-M(\lVert A\Phi\rVert^2-\lVert A^{\dagger}\Phi\rVert^2)$
-(\texttt{chemicalPotential\_numerator\_muTerm}, §4-c), consuming PR-1's
-\texttt{totalSpinSOp3\_commutator\_towerPow} as the $[\hat S_{\mathrm{tot}}^{(3)},A]=M\,A$ input; the
-residual first-order moment-difference term is later localized to a \texttt{BECSectorCurvatureBound}
-predicate (half filling $\mu=0$ is the term-free special case).  PR-4 (\#5057) adds the tower
+(\texttt{phatMoment\_one\_ge\_of\_planar\_lro},
+\texttt{Quantum/SpinS/BoseEinsteinCondensateMoment.lean}), driven directly by the two XY-plane ODLRO
+hypotheses ($\alpha=1,2$) in place of the SU(2) singlet/isotropy base of Theorem~4.6; the tower
 denominator geometric lower bound and non-vanishing
-(\texttt{Quantum/SpinS/BoseEinsteinCondensateDenominator.lean}):
 $\tfrac12(2q_0)^{\lvert M\rvert}m_0\le\langle\Phi,(\hat o^{\mp})^{\lvert M\rvert}(\hat
 o^{\pm})^{\lvert M\rvert}\Phi\rangle=\lVert(\hat o^{\pm})^{\lvert M\rvert}\Phi\rVert^2$
-(\texttt{becTowerDenominator\_geom\_lower\_raising}/\texttt{\_lowering}), combining the balanced-word
-denominator bound \texttt{tower\_denominator\_lower\_bound(\_lower)} --- which needs \emph{only} the
-half-filling $\hat S_{\mathrm{tot}}^{(3)}\Phi=0$ sector hypothesis, not the full SU(2) singlet, so it
-applies verbatim to the $\mu=0$ chemical-potential XY ground state --- with the moment geometric
-bound \texttt{phatMoment\_ge\_of\_lro} fed by PR-2's planar base; whence the tower state is
-nonvanishing $\Gamma_M\ne0$ (\texttt{becTowerState\_ne\_zero\_of\_planar\_lro}, supplying the first
-conjunct of \texttt{IsBECTowerConstants}).  PR-4b (\#5058) adds the XY-planar variational numerator
-bound (\texttt{Quantum/SpinS/BoseEinsteinCondensateXYNumerator.lean}): via the definitional split
+(\texttt{becTowerDenominator\_geom\_lower\_raising}/\texttt{\_lowering},
+\texttt{becTowerState\_ne\_zero\_of\_planar\_lro},
+\texttt{Quantum/SpinS/BoseEinsteinCondensateDenominator.lean}), needing \emph{only} the half-filling
+$\hat S_{\mathrm{tot}}^{(3)}\Phi=0$ sector; and the XY-planar variational numerator bound
+(\texttt{Quantum/SpinS/BoseEinsteinCondensateXYNumerator.lean}) via the definitional split
 $\hat H_{\mathrm{XY}}=\hat H_{\mathrm{Heis}}-\hat H_{\mathrm{ZZ}}$
 (\texttt{xyHamiltonianS\_eq\_heisenberg\_sub\_zz}, from \texttt{spinSDotXXZ\_eq\_spinSDot\_add} at
-$\lambda=0$, with $\hat H_{\mathrm{ZZ}}=\sum J_{xy}\hat S^{(3)}_x\hat S^{(3)}_y$) the pure-XY
-numerator $\langle\Phi,[A^{\dagger},[2\hat H_{\mathrm{XY}},A]]\Phi\rangle$ splits by
-Hamiltonian-linearity into $2\cdot(\text{Heisenberg numerator})-2\cdot(\text{ZZ numerator})$; the
-Heisenberg term reuses the Anderson-tower asset \texttt{tower\_numerator\_bound} verbatim, and the
-residual ZZ term is bounded by a reduced replica \texttt{zz\_tower\_numerator\_bound} (its
-$\hat H_{\mathrm{ZZ}}$ locality obtained directly from
-\texttt{iterOrderComm\_norm\_le\_of\_localSum}, with the \emph{same} $24dN^3$/$96dN^4/V$ aggregates),
-giving the identical $O(M^2/V)$ moment-factor shape; the assembled \texttt{xy\_tower\_numerator\_bound}
-is the \texttt{Term1} numerator (half filling, $N=1$) consumed by the PR-5 tower assembly.  PR-5
-(\#5051) adds the half-filling predicate \texttt{IsBECTowerConstantsHalfFilling} (the $\mu=0$ kernel of
-\texttt{IsBECTowerConstants}, with an inner premise conjunct $\hat S^{(3)}_{\mathrm{tot}}\Phi=0$) and the
-axiom-free tower-energy assembly (\texttt{Quantum/SpinS/BoseEinsteinCondensateTower.lean}): at $\mu=0$
-the chemical-potential Hamiltonian collapses to $\hat H_0=2\hat H_{\mathrm{XY}}$
-(\texttt{xyChemicalPotentialHamiltonianS\_zero}), so the variational gap
-(\texttt{variational\_gap\_le\_double\_commutator}) is bounded by the pure-XY numerator
+$\lambda=0$), splitting $\langle\Phi,[A^{\dagger},[2\hat H_{\mathrm{XY}},A]]\Phi\rangle$ into
+$2\cdot(\text{Heisenberg numerator})-2\cdot(\text{ZZ numerator})$: the Heisenberg term reuses
+\texttt{tower\_numerator\_bound} verbatim and the residual ZZ term is bounded by
+\texttt{zz\_tower\_numerator\_bound} (same $24dN^3$/$96dN^4/V$ aggregates), yielding the $O(M^2/V)$
+\texttt{xy\_tower\_numerator\_bound}.  The axiom-free assembly
+(\texttt{Quantum/SpinS/BoseEinsteinCondensateTower.lean}): at $\mu=0$ the Hamiltonian collapses to
+$\hat H_0=2\hat H_{\mathrm{XY}}$ (\texttt{xyChemicalPotentialHamiltonianS\_zero}), so the variational
+gap (\texttt{variational\_gap\_le\_double\_commutator}) is bounded by the pure-XY numerator
 \texttt{xy\_tower\_numerator\_bound} (no residual first-order $\mu$-term), and the denominator
 $\tfrac12 P_M\le\|(\hat o^{\pm})^M\Phi\|^2$ (\texttt{tower\_denominator\_lower\_bound}) cancels the
 $P_M$, giving the quadratic trial bound $E_0+8\cdot\texttt{towerEnergyCoeff}$
 (\texttt{becTowerState\_pos/neg\_rayleigh\_bound\_halfFilling}); \texttt{towerEnergyCoeff\_le} sharpens
 this to $O(M^2/L^d)$ and the rounding $M^2\le|M|^3$ ($|M|\ge1$) casts it into the faithful cubic
-increment $C_2|M|^3/L^d$ of eq.~(5.3.4) (footnote~8: the cubic is Tasaki's deliberately weakened form),
-with the nonvanishing conjunct from PR-4; \texttt{becTowerConstantsHalfFilling\_of\_planar\_lro}
-constructs the explicit $C_1,C_2>0$.  Only the half-filling kernel is discharged axiom-free: the
-general-$\mu$ \texttt{tasaki\_5\_2\_bec\_tower} stays a documented axiom (its bound rests on the
-Koma--Tasaki [21] reflection-positivity/infrared machinery, intractable at project scale, so the
-general-$\mu$ $\mu$-term algebra of PR-1/PR-3 remains for that axiom).  Chapters~3--10 backfill.
+increment $C_2|M|^3/L^d$ of eq.~(5.3.4) (footnote~8: the cubic is Tasaki's deliberately weakened form);
+\texttt{becTowerConstantsHalfFilling\_of\_planar\_lro} constructs the explicit $C_1,C_2>0$ and
+\texttt{tasaki\_5\_2\_bec\_tower\_half\_filling} closes the existential (\texttt{\#print axioms} =
+\texttt{propext}/\texttt{Classical.choice}/\texttt{Quot.sound} only).  Only the half-filling kernel is
+discharged axiom-free: the general-$\mu$ \texttt{tasaki\_5\_2\_bec\_tower} stays a documented axiom
+because at $\mu\ne0$ a ground state has $\hat S_{\mathrm{tot}}^{(3)}\Phi=s_0\ne0$, so the reused
+half-filling bricks no longer close and the bound rests on the Koma--Tasaki [21] $d$-dimensional
+reflection-positivity/infrared machinery, the same RP-intractability exception as Theorem~5.1.
+Chapters~3--10 backfill.
 
 \medskip
 \noindent\textbf{Theorem 5.3} (U(1) symmetry-breaking states of hard-core bosons; Tasaki §5.3,
