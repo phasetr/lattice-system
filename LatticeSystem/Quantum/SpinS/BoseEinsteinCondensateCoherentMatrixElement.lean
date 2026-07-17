@@ -47,6 +47,31 @@ private theorem staggeredRaisingOpS_mulVec_towerState_of_nonneg (A : Λ → Bool
   rw [if_pos hM, if_pos (show (0 : ℤ) ≤ M + 1 by linarith), hnat, pow_succ',
     Matrix.mulVec_mulVec]
 
+/-- **Lowering-branch form of the tower state** (`M ≤ 0`): `towerState M Φ = (Ô⁻)^{|M|} Φ`.  At
+`M = 0` both branches collapse to `(·)^0 = 1`, so the lowering power agrees with the definition. -/
+private theorem towerState_eq_loweringPow_of_nonpos (A : Λ → Bool) {M : ℤ} (hM : M ≤ 0)
+    {Φ : (Λ → Fin (N + 1)) → ℂ} :
+    towerState A N M Φ = ((staggeredLoweringOpS A N) ^ M.natAbs).mulVec Φ := by
+  unfold towerState
+  rcases eq_or_lt_of_le hM with h | h
+  · subst h; simp
+  · rw [if_neg (not_le.mpr h)]
+
+/-- **Lowering recursion of the tower states** (`M ≤ 0`): `Ô⁻ towerState M Φ = towerState (M−1) Φ`
+(mirror of `staggeredRaisingOpS_mulVec_towerState_of_nonneg`; `(Ô⁻)^{|M|+1} = (Ô⁻)^{|M−1|}`). -/
+private theorem staggeredLoweringOpS_mulVec_towerState_of_nonpos (A : Λ → Bool) {M : ℤ}
+    (hM : M ≤ 0) {Φ : (Λ → Fin (N + 1)) → ℂ} :
+    (staggeredLoweringOpS A N).mulVec (towerState A N M Φ) = towerState A N (M - 1) Φ := by
+  have hnat : (M - 1).natAbs = M.natAbs + 1 := by
+    have h1 : (M.natAbs : ℤ) = -M := by
+      rw [← Int.natAbs_neg]; exact Int.natAbs_of_nonneg (by linarith)
+    have h2 : ((M - 1).natAbs : ℤ) = -(M - 1) := by
+      rw [← Int.natAbs_neg]; exact Int.natAbs_of_nonneg (by linarith)
+    omega
+  rw [towerState_eq_loweringPow_of_nonpos A hM,
+    towerState_eq_loweringPow_of_nonpos A (show M - 1 ≤ 0 by linarith), hnat, pow_succ',
+    Matrix.mulVec_mulVec]
+
 /-- **Sector orthogonality of the off-diagonal element** (Tasaki §5.3, eq. (5.3.3)): at half filling
 (`Ŝ³_tot Φ = 0`), the raising off-diagonal element `⟨Γ_{M'}, Ô⁺ Γ_M⟩` vanishes unless `M' = M + 1`.
 The vector `Ô⁺ Γ_M` is a `Ŝ³_tot`-eigenvector with eigenvalue `M + 1` (raising increments the
@@ -116,6 +141,55 @@ theorem becOffDiagonal_eq_norm_ratio (A : Λ → Bool) {M : ℤ} (hM : 0 ≤ M)
     show ((vecNormSqRe (towerState A N (M + 1) Φ) : ℝ) : ℂ)
         = ((Real.sqrt (vecNormSqRe (towerState A N (M + 1) Φ)) : ℝ) : ℂ) ^ 2 from by
       rw [← Complex.ofReal_pow, Real.sq_sqrt hna'.le]]
+  field_simp
+
+/-- **Off-diagonal element as an inverse norm ratio on the lowering side** (Tasaki §5.3, eqs.
+(5.3.3), (5.3.6); math-note §2② 2026-07-17 refinement): for `M ≤ −1` (both tower states nonzero) the
+same `Ô⁺`-sandwiched adjacent element is the **inverse** ratio `⟨Γ_{M+1}, Ô⁺ Γ_M⟩ = √(D_M/D_{M+1})`,
+`D_M = vecNormSqRe (towerState … M Φ)`.  Here the tower is built with `Ô⁻`, so `Ô⁺ Γ_M` is *not*
+parallel to `Γ_{M+1}`; instead `(Ô⁺)ᴴ = Ô⁻` (`staggeredRaisingOpS_conjTranspose`) moves `Ô⁺` onto
+the bra and the lowering recursion `Ô⁻ towerState (M+1) Φ = towerState M Φ` collapses it to
+`‖Γ_M‖²`,
+giving the inverse of the `M ≥ 0` ratio. -/
+theorem becOffDiagonal_eq_norm_ratio_neg (A : Λ → Bool) {M : ℤ} (hM : M ≤ -1)
+    {Φ : (Λ → Fin (N + 1)) → ℂ} (ht : towerState A N M Φ ≠ 0)
+    (ht' : towerState A N (M + 1) Φ ≠ 0) :
+    star (unitNormalize (towerState A N (M + 1) Φ)) ⬝ᵥ
+      (staggeredRaisingOpS A N).mulVec (unitNormalize (towerState A N M Φ))
+      = ((Real.sqrt (vecNormSqRe (towerState A N M Φ)
+          / vecNormSqRe (towerState A N (M + 1) Φ)) : ℝ) : ℂ) := by
+  have hrec : (staggeredLoweringOpS A N).mulVec (towerState A N (M + 1) Φ)
+      = towerState A N M Φ := by
+    have h := staggeredLoweringOpS_mulVec_towerState_of_nonpos A
+      (show M + 1 ≤ 0 by linarith) (Φ := Φ)
+    rwa [add_sub_cancel_right] at h
+  have hadj : star (towerState A N (M + 1) Φ) ⬝ᵥ
+        (staggeredRaisingOpS A N).mulVec (towerState A N M Φ)
+      = star (towerState A N M Φ) ⬝ᵥ towerState A N M Φ := by
+    have h := star_mulVec_dotProduct (staggeredLoweringOpS A N) (towerState A N (M + 1) Φ)
+      (towerState A N M Φ)
+    rw [staggeredLoweringOpS_conjTranspose, hrec] at h
+    exact h.symm
+  have hna : 0 < vecNormSqRe (towerState A N M Φ) := by
+    rw [vecNormSqRe]; exact (Complex.lt_def.mp (Matrix.dotProduct_star_self_pos_iff.mpr ht)).1
+  have hna' : 0 < vecNormSqRe (towerState A N (M + 1) Φ) := by
+    rw [vecNormSqRe]; exact (Complex.lt_def.mp (Matrix.dotProduct_star_self_pos_iff.mpr ht')).1
+  have hself : star (towerState A N M Φ) ⬝ᵥ towerState A N M Φ
+      = ((vecNormSqRe (towerState A N M Φ) : ℝ) : ℂ) := by
+    apply Complex.ext
+    · rw [Complex.ofReal_re]; rfl
+    · rw [Complex.ofReal_im]
+      exact ((Complex.le_def.mp (dotProduct_star_self_nonneg _)).2).symm
+  have h1 : ((Real.sqrt (vecNormSqRe (towerState A N (M + 1) Φ)) : ℝ) : ℂ) ≠ 0 := by
+    exact_mod_cast (Real.sqrt_pos.mpr hna').ne'
+  have h2 : ((Real.sqrt (vecNormSqRe (towerState A N M Φ)) : ℝ) : ℂ) ≠ 0 := by
+    exact_mod_cast (Real.sqrt_pos.mpr hna).ne'
+  unfold unitNormalize
+  rw [star_smul_dotProduct_mulVec_smul, hadj, hself, Complex.star_def, map_inv₀,
+    Complex.conj_ofReal, Real.sqrt_div hna.le, Complex.ofReal_div,
+    show ((vecNormSqRe (towerState A N M Φ) : ℝ) : ℂ)
+        = ((Real.sqrt (vecNormSqRe (towerState A N M Φ)) : ℝ) : ℂ) ^ 2 from by
+      rw [← Complex.ofReal_pow, Real.sq_sqrt hna.le]]
   field_simp
 
 end LatticeSystem.Quantum
