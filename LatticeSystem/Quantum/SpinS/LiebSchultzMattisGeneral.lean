@@ -141,27 +141,26 @@ far-window and central-angle factors are removed, eqs. (6.2.26)–(6.2.27)). -/
 noncomputable def localTwistOperator (L N r : ℕ) (x : Fin L) : ManyBodyOpS (Fin L) N :=
   NormedSpace.exp (-Complex.I • localTwistGen L N r x)
 
-/-- The **local twist operator's adjoint** is `Û_x† = exp(+i M̂_x)`, since `M̂_x` is Hermitian. -/
+/-- The **local twist operator's adjoint** is `Û_x† = exp(+i M̂_x)`, since `M̂_x` is Hermitian
+(the generic `conjTranspose_exp_neg_I_smul_of_isHermitian`). -/
 theorem localTwistOperator_conjTranspose (L N r : ℕ) (x : Fin L) :
     (localTwistOperator L N r x).conjTranspose
       = NormedSpace.exp (Complex.I • localTwistGen L N r x) := by
-  rw [localTwistOperator, ← Matrix.exp_conjTranspose, Matrix.conjTranspose_smul,
-    (localTwistGen_isHermitian L N r x).eq]
-  congr 1
-  rw [Complex.star_def, map_neg, Complex.conj_I, neg_neg]
+  rw [localTwistOperator]
+  exact conjTranspose_exp_neg_I_smul_of_isHermitian (localTwistGen_isHermitian L N r x)
 
-/-- The **local twist operator is unitary**: `Û_x† Û_x = 1`. -/
+/-- The **local twist operator is unitary**: `Û_x† Û_x = 1` (the generic
+`conjTranspose_mul_exp_neg_I_smul_of_isHermitian`). -/
 theorem localTwistOperator_unitary (L N r : ℕ) (x : Fin L) :
     (localTwistOperator L N r x).conjTranspose * localTwistOperator L N r x = 1 := by
-  rw [localTwistOperator_conjTranspose, localTwistOperator, ← Matrix.exp_add_of_commute]
-  · rw [show Complex.I • localTwistGen L N r x + -Complex.I • localTwistGen L N r x =
-      (0 : ManyBodyOpS (Fin L) N) by rw [neg_smul, add_neg_cancel]]
-    exact NormedSpace.exp_zero
-  · exact (Commute.refl (localTwistGen L N r x)).smul_left Complex.I |>.smul_right (-Complex.I)
+  rw [localTwistOperator]
+  exact conjTranspose_mul_exp_neg_I_smul_of_isHermitian (localTwistGen_isHermitian L N r x)
 
-/-- The **local twist operator is unitary**: `Û_x Û_x† = 1` (the companion identity). -/
+/-- The **local twist operator is unitary**: `Û_x Û_x† = 1` (the companion identity, generic
+`exp_neg_I_smul_mul_conjTranspose_of_isHermitian`). -/
 theorem localTwistOperator_unitary' (L N r : ℕ) (x : Fin L) :
-    localTwistOperator L N r x * (localTwistOperator L N r x).conjTranspose = 1 :=
-  mul_eq_one_comm.mpr (localTwistOperator_unitary L N r x)
+    localTwistOperator L N r x * (localTwistOperator L N r x).conjTranspose = 1 := by
+  rw [localTwistOperator]
+  exact exp_neg_I_smul_mul_conjTranspose_of_isHermitian (localTwistGen_isHermitian L N r x)
 
 end LatticeSystem.Quantum

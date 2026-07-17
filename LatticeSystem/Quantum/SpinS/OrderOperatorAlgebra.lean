@@ -2,6 +2,7 @@ import LatticeSystem.Quantum.SpinS.AndersonTower
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.Analysis.CStarAlgebra.Matrix
+import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 
 /-!
 # Tasaki §4.2.2: the order-operator algebra and Lemma 4.14
@@ -235,6 +236,37 @@ theorem manyBodyOperatorNormS_unitary_conj {U Y : ManyBodyOpS Λ N}
             (manyBodyOperatorNormS_nonneg _)
       _ = manyBodyOperatorNormS (U * Y * Matrix.conjTranspose U) := by
           rw [manyBodyOperatorNormS_conjTranspose, hUnorm]; ring
+
+section MatrixExpUnitary
+
+variable {n : Type*} [Fintype n] [DecidableEq n]
+
+/-- **Adjoint of a Hermitian-generated unitary**: for a Hermitian `G`, the adjoint of `exp(−i G)` is
+`exp(+i G)` (`Matrix.exp_conjTranspose` plus `Gᴴ = G`).  The generic fact underlying the LSM twist
+operators `Û_LSM = exp(−i G)` and the local twist operators `Û_x = exp(−i M̂_x)`. -/
+theorem conjTranspose_exp_neg_I_smul_of_isHermitian {G : Matrix n n ℂ} (hG : G.IsHermitian) :
+    (NormedSpace.exp (-Complex.I • G)).conjTranspose = NormedSpace.exp (Complex.I • G) := by
+  rw [← Matrix.exp_conjTranspose, Matrix.conjTranspose_smul, hG.eq]
+  congr 1
+  rw [Complex.star_def, map_neg, Complex.conj_I, neg_neg]
+
+/-- **A Hermitian-generated exponential is unitary** (`Ûᴴ Û = 1`): for a Hermitian `G`,
+`exp(−iG)ᴴ exp(−iG) = exp(iG) exp(−iG) = exp(0) = 1`.  The two exponents commute (both scalar
+multiples of `G`), so `Matrix.exp_add_of_commute` collapses the product. -/
+theorem conjTranspose_mul_exp_neg_I_smul_of_isHermitian {G : Matrix n n ℂ} (hG : G.IsHermitian) :
+    (NormedSpace.exp (-Complex.I • G)).conjTranspose * NormedSpace.exp (-Complex.I • G) = 1 := by
+  rw [conjTranspose_exp_neg_I_smul_of_isHermitian hG, ← Matrix.exp_add_of_commute]
+  · rw [show Complex.I • G + -Complex.I • G = (0 : Matrix n n ℂ) by rw [neg_smul, add_neg_cancel]]
+    exact NormedSpace.exp_zero
+  · exact (Commute.refl G).smul_left Complex.I |>.smul_right (-Complex.I)
+
+/-- **A Hermitian-generated exponential is unitary** (`Û Ûᴴ = 1`, companion identity): for a
+Hermitian `G`, `exp(−iG) exp(−iG)ᴴ = 1`, by one-sided-inverse commutativity of square matrices. -/
+theorem exp_neg_I_smul_mul_conjTranspose_of_isHermitian {G : Matrix n n ℂ} (hG : G.IsHermitian) :
+    NormedSpace.exp (-Complex.I • G) * (NormedSpace.exp (-Complex.I • G)).conjTranspose = 1 :=
+  mul_eq_one_comm.mpr (conjTranspose_mul_exp_neg_I_smul_of_isHermitian hG)
+
+end MatrixExpUnitary
 
 /-- The site-embedded image of a diagonal single-site matrix is again diagonal, with entry indexed
 by the local configuration value `σ i`. -/

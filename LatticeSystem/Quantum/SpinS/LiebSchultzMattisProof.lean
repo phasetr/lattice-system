@@ -1,5 +1,6 @@
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattis
 import LatticeSystem.Quantum.SpinS.LiebSchultzMattisProofCore
+import LatticeSystem.Quantum.SpinS.OrderOperatorAlgebra
 import LatticeSystem.Quantum.SpinS.HermitianVariationalLowerBound
 import LatticeSystem.Quantum.SpinS.HermitianMinEigenvalueEigenvector
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
@@ -48,27 +49,25 @@ theorem lsmGenerator_isHermitian (L N : ℕ) : (lsmGenerator L N).IsHermitian :=
   rw [(onSiteS_isHermitian x (spinSOp3_isHermitian N)).eq, Complex.star_def,
     Complex.conj_ofReal]
 
-/-- The **twist operator is unitary**: `Û_LSM† = exp(+i G)`. -/
+/-- The **twist operator is unitary**: `Û_LSM† = exp(+i G)` (the generic
+`conjTranspose_exp_neg_I_smul_of_isHermitian`). -/
 theorem lsmTwistOperator_conjTranspose (L N : ℕ) :
     (lsmTwistOperator L N).conjTranspose = NormedSpace.exp (Complex.I • lsmGenerator L N) := by
-  rw [lsmTwistOperator_eq_exp, ← Matrix.exp_conjTranspose, Matrix.conjTranspose_smul,
-    (lsmGenerator_isHermitian L N).eq]
-  congr 1
-  rw [Complex.star_def, map_neg, Complex.conj_I, neg_neg]
+  rw [lsmTwistOperator_eq_exp]
+  exact conjTranspose_exp_neg_I_smul_of_isHermitian (lsmGenerator_isHermitian L N)
 
-/-- `Û_LSM† Û_LSM = 1`. -/
+/-- `Û_LSM† Û_LSM = 1` (the generic `conjTranspose_mul_exp_neg_I_smul_of_isHermitian`). -/
 theorem lsmTwistOperator_unitary (L N : ℕ) :
     (lsmTwistOperator L N).conjTranspose * lsmTwistOperator L N = 1 := by
-  rw [lsmTwistOperator_conjTranspose, lsmTwistOperator_eq_exp, ← Matrix.exp_add_of_commute]
-  · rw [show Complex.I • lsmGenerator L N + -Complex.I • lsmGenerator L N =
-      (0 : ManyBodyOpS (Fin L) N) by rw [neg_smul, add_neg_cancel]]
-    exact NormedSpace.exp_zero
-  · exact (Commute.refl (lsmGenerator L N)).smul_left Complex.I |>.smul_right (-Complex.I)
+  rw [lsmTwistOperator_eq_exp]
+  exact conjTranspose_mul_exp_neg_I_smul_of_isHermitian (lsmGenerator_isHermitian L N)
 
-/-- `Û_LSM Û_LSM† = 1` (the companion unitarity identity). -/
+/-- `Û_LSM Û_LSM† = 1` (the companion unitarity identity, generic
+`exp_neg_I_smul_mul_conjTranspose_of_isHermitian`). -/
 theorem lsmTwistOperator_unitary' (L N : ℕ) :
-    lsmTwistOperator L N * (lsmTwistOperator L N).conjTranspose = 1 :=
-  mul_eq_one_comm.mpr (lsmTwistOperator_unitary L N)
+    lsmTwistOperator L N * (lsmTwistOperator L N).conjTranspose = 1 := by
+  rw [lsmTwistOperator_eq_exp]
+  exact exp_neg_I_smul_mul_conjTranspose_of_isHermitian (lsmGenerator_isHermitian L N)
 
 /-- **The twisted state's Rayleigh quotient equals the conjugated Hamiltonian's Rayleigh quotient.**
 By unitarity of `Û_LSM`, `⟨Φ_LSM, Ĥ Φ_LSM⟩ / ⟨Φ_LSM, Φ_LSM⟩ = ⟨Φ_GS, Û† Ĥ Û Φ_GS⟩ / ⟨Φ_GS,
