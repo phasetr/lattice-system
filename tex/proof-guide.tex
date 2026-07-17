@@ -11249,7 +11249,25 @@ now public), the $\pm$ complex moments (PR-4), the lowering$\to$raising window s
 \texttt{becCoherent\_loweringWindow\_eq\_raisingWindow} (reindex $M\mapsto M-1$, each lowering element
 equalling the raising element one step down --- \texttt{becOffDiagonal\_lowering\_shift\_eq}), and the
 Euler identities $\tfrac12(e^{i\theta}+e^{-i\theta})=\cos\theta$,
-$(2i)^{-1}(e^{i\theta}-e^{-i\theta})=\sin\theta$; std3 only.  The
+$(2i)^{-1}(e^{i\theta}-e^{-i\theta})=\sin\theta$; std3 only.  \emph{PR-6} (\#5067) records the
+order-parameter concentration lower bound $m^\ast\ge\sqrt{2q_0}$ (Tasaki §5.3, ``As in
+Theorem~4.11 \dots we can prove the bound $m^\ast\ge\sqrt{2q_0}$. See~(4.2.39)'', pp.~141--142) as a
+\textbf{documented axiom} \texttt{becMStar\_ge\_sqrt\_twoQ} --- the BEC half-filling counterpart of
+the SU(2) concentration axiom \texttt{orderSqMoment\_ratio\_le\_mStarSq\_family} (Theorem~4.11) and
+the $\hat p$-mirror \texttt{mStar\_eq\_phat\_ratio\_limit}, with the $U(1)$ planar factor $\sqrt2$
+(two axes $\alpha=1,2$, base ratio $\to 2q_0$) in place of the SU(2) $\sqrt3$; per the 2026-07-12
+no-overreach boundary the Koma--Tasaki [66] concentration mechanism is deferred with parity, not
+rebuilt.  $m^\ast$ is pinned to its genuine value by the new predicate
+\texttt{IsRealizingBECCoherentFamily} (the $U(1)$ planar analogue of
+\texttt{IsRealizingTanakaGroundStateFamily}: a slow window plus an eventual $\mu=0$ half-filling GS
+with $\hat S_{\mathrm{tot}}^{(3)}\Phi=0$, two-axis ODLRO $\ge q_0$, nonzero window tower states, and
+the pinning limit $\langle\Xi_0,\hat O_L^{(1)}\Xi_0\rangle/L^d\to m^\ast$, eq.~5.3.7 at $\theta=0$;
+the axis-1 singlet and reversal invariance of the SU(2) family are \emph{not} imposed, so it is
+directly instantiable by the BEC ground state).  A free $m^\ast$ would make the bound FALSE
+($m^\ast{:=}0$, $q_0>0$), hence the family pinning; only the ``easy half'' $m^{\ast 2}\ge 2q_0$ is
+asserted, never the still-open equality $m^{\ast 2}=2q_0$.  The axiom is declared but not yet
+consumed (the discharge using it is a later arc PR), so all PR-6 declarations stay std3, and it is
+vacuous in $d=1$ (Corollary~4.3).  The
 general-$\mu$ \texttt{tasaki\_5\_3\_bec\_u1\_ssb} stays a documented axiom ($d$-dim RP-intractability,
 Koma--Tasaki [21]), the same two-track policy as Theorem~5.2.  Chapters~3--10 backfill.
 
